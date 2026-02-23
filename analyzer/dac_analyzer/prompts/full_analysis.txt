@@ -1,0 +1,61 @@
+You are analyzing a screenshot from a Dota Auto Chess (the Dota 2 mod) game VOD. Extract the complete game state visible in this frame.
+
+## Known Units (for reference)
+$UNITS_LIST
+
+## Known Items (for reference)
+Basic: $BASIC_ITEMS
+Combined: $COMBINED_ITEMS
+
+## What to Extract
+
+Look carefully at the entire screenshot and extract:
+
+1. **Round number**: Top of screen, may be in Chinese (第X回合)
+2. **Phase**: "preparation" (shopping/placing), "combat" (fighting), "between" (results)
+3. **Player HP**: The spectated player's health points
+4. **Gold**: Current gold amount (usually bottom of screen near shop)
+5. **Level/XP**: Player level and experience if visible
+6. **Win/Loss streak**: If a streak indicator is visible
+7. **Board units**: All units placed on the chess board. For each unit identify:
+   - Unit name (match to known units list above)
+   - Star level (1, 2, or 3 stars - look for star icons above units)
+   - Approximate position (front/mid/back + left/center/right)
+   - Any items equipped (glowing effects or item icons on the unit)
+8. **Bench units**: Units sitting on the bench (bottom row, not on the board)
+9. **Active synergies**: Synergy panel usually on the left side of the screen
+10. **Shop offerings**: The 5 units available in the shop (if visible, usually at the bottom)
+
+## Important Notes
+- Chinese stream text is common - translate unit/item names to English
+- Star levels are CRITICAL - a 2-star unit has 2 stars above it, 3-star has 3
+- Some units may be hard to identify - use your best judgment and note low confidence
+- Items on units may appear as small icons or glowing effects
+- The synergy panel on the left shows active synergy bonuses with counts
+
+Respond with ONLY a JSON object, no other text:
+{
+  "round": <number or null>,
+  "phase": "<preparation|combat|between|other>",
+  "player_hp": <number or null>,
+  "gold": <number or null>,
+  "level": <number or null>,
+  "xp": "<current/needed or null>",
+  "streak": "<win_N, lose_N, or null>",
+  "board_units": [
+    {
+      "name": "<unit name>",
+      "star_level": <1|2|3>,
+      "position": "<front|mid|back>_<left|center|right>",
+      "items": ["<item name>", ...],
+      "confidence": <0.0-1.0>
+    }
+  ],
+  "bench_units": ["<unit name>", ...],
+  "active_synergies": [
+    {"name": "<synergy name>", "count": "<active/total>"}
+  ],
+  "shop_units": ["<unit name>", ...],
+  "items_on_board": ["<item name>", ...],
+  "notes": "<any other observations about the game state>"
+}

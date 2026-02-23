@@ -1,0 +1,41 @@
+{
+  "basic_items": [
+    "Chainmail",
+    "Cloak",
+    "Broadsword",
+    "Javelin",
+    "Mithril Hammer",
+    "Crown",
+    "Robe of the Magi",
+    "Blight Stone",
+    "Ring of Health",
+    "Vitality Booster",
+    "Void Stone",
+    "Ring of Regen",
+    "Stout Shield"
+  ],
+  "combined_items": {
+    "Assault Cuirass": {"components": ["Chainmail", "Chainmail"], "effect": "+10 armor, +10 attack speed to allies"},
+    "Hood of Defiance": {"components": ["Cloak", "Cloak"], "effect": "+50% magic resistance, blocks 200 magic damage"},
+    "Daedalus": {"components": ["Broadsword", "Broadsword"], "effect": "+80 damage, 25% chance for 2.35x crit"},
+    "Monkey King Bar": {"components": ["Javelin", "Javelin"], "effect": "+60 damage, 35% chance for 100 bonus magic damage"},
+    "Maelstrom": {"components": ["Javelin", "Mithril Hammer"], "effect": "+25 damage, 25% chain lightning"},
+    "Mjollnir": {"components": ["Maelstrom", "Mithril Hammer"], "effect": "Upgraded Maelstrom"},
+    "Crystalys": {"components": ["Broadsword", "Javelin"], "effect": "+20 damage, 20% crit"},
+    "Blade Mail": {"components": ["Chainmail", "Broadsword"], "effect": "+5 armor, +10 damage, reflects damage"},
+    "Black King Bar": {"components": ["Mithril Hammer", "Crown"], "effect": "Magic immunity for 6s"},
+    "Mekansm": {"components": ["Chainmail", "Ring of Regen"], "effect": "Heals allies for 250 HP"},
+    "Pipe of Insight": {"components": ["Hood of Defiance", "Ring of Regen"], "effect": "Magic barrier to allies"},
+    "Refresher Orb": {"components": ["Void Stone", "Void Stone"], "effect": "Resets ability cooldown after cast"},
+    "Scythe of Vyse": {"components": ["Void Stone", "Crown"], "effect": "Hexes a random enemy for 3s"},
+    "Force Staff": {"components": ["Crown", "Ring of Regen"], "effect": "Pushes target away"},
+    "Medallion of Courage": {"components": ["Chainmail", "Blight Stone"], "effect": "+5 armor, reduces enemy armor"},
+    "Desolator": {"components": ["Blight Stone", "Blight Stone"], "effect": "-8 armor debuff on attack"},
+    "Heart of Tarrasque": {"components": ["Vitality Booster", "Ring of Health"], "effect": "+1000 HP, +3.5% HP regen"},
+    "Vanguard": {"components": ["Vitality Booster", "Stout Shield"], "effect": "+250 HP, damage block"},
+    "Radiance": {"components": ["Robe of the Magi", "Robe of the Magi"], "effect": "Burns nearby enemies for 60 DPS"},
+    "Arcane Boots": {"components": ["Robe of the Magi", "Ring of Regen"], "effect": "+25% mana on attack to allies"},
+    "Brooch of the Martyr": {"components": ["Robe of the Magi", "Void Stone"], "effect": "+50% mana on taking damage"},
+    "Vladmir's Offering": {"components": ["Crown", "Ring of Health"], "effect": "+20% damage, +3 armor, lifesteal to allies"}
+  }
+}
