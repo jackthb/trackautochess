@@ -1,11 +1,15 @@
 /**
  * Scrape autochess.site for current patch unit/item data.
- * Writes to ../data/units.json and ../data/items.json
+ * Intercepts XHR/fetch responses to capture API calls,
+ * and falls back to DOM extraction if needed.
+ *
+ * Writes raw data to ../data/ for inspection.
  *
  * Usage:
  *   node scrape.js               # scrape everything
  *   node scrape.js --target pieces
  *   node scrape.js --target items
+ *   node scrape.js --target patches
  */
 
 import puppeteer from "puppeteer";
@@ -20,62 +24,81 @@ const BASE_URL = "https://www.autochess.site";
 const args = process.argv.slice(2);
 const target = args.includes("--target") ? args[args.indexOf("--target") + 1] : "all";
 
-async function scrapePieces(page) {
-  console.log("Scraping pieces from", `${BASE_URL}/pieces`);
-  await page.goto(`${BASE_URL}/pieces`, { waitUntil: "networkidle2", timeout: 30000 });
-
-  // Wait for piece data to render
-  await page.waitForSelector("[class*='piece'], [class*='hero'], [class*='unit'], table", {
-    timeout: 10000,
-  }).catch(() => console.warn("Selector timeout — attempting extraction anyway"));
-
-  const raw = await page.evaluate(() => {
-    // Dump all visible text and structure for inspection
-    return {
-      title: document.title,
-      url: location.href,
-      bodyText: document.body.innerText.slice(0, 5000),
-      tables: Array.from(document.querySelectorAll("table")).map((t) => t.outerHTML.slice(0, 2000)),
-      lists: Array.from(document.querySelectorAll("ul, ol")).map((l) => l.innerText.slice(0, 500)),
-    };
-  });
-
-  return raw;
+function save(filename, data) {
+  const outPath = resolve(DATA_DIR, filename);
+  writeFileSync(outPath, JSON.stringify(data, null, 2));
+  console.log(`  Written: ${outPath}`);
 }
 
-async function scrapeItems(page) {
-  console.log("Scraping items from", `${BASE_URL}/items`);
-  await page.goto(`${BASE_URL}/items`, { waitUntil: "networkidle2", timeout: 30000 });
+async function scrapePage(browser, path) {
+  const url = `${BASE_URL}${path}`;
+  console.log(`\nFetching ${url}`);
 
-  await page.waitForSelector("[class*='item'], table", {
-    timeout: 10000,
-  }).catch(() => console.warn("Selector timeout — attempting extraction anyway"));
+  const page = await browser.newPage();
+  const intercepted = [];
 
-  const raw = await page.evaluate(() => {
-    return {
-      title: document.title,
-      url: location.href,
-      bodyText: document.body.innerText.slice(0, 5000),
-      tables: Array.from(document.querySelectorAll("table")).map((t) => t.outerHTML.slice(0, 2000)),
-    };
+  // Intercept all responses — capture any JSON that looks like game data
+  page.on("response", async (response) => {
+    const resUrl = response.url();
+    const contentType = response.headers()["content-type"] || "";
+    if (contentType.includes("application/json") || resUrl.includes("/api/")) {
+      try {
+        const text = await response.text();
+        const json = JSON.parse(text);
+        intercepted.push({ url: resUrl, data: json });
+        console.log(`  Intercepted JSON: ${resUrl} (${text.length} bytes)`);
+      } catch {
+        // not valid JSON, skip
+      }
+    }
   });
 
-  return raw;
-}
+  await page.setViewport({ width: 1440, height: 900 });
+  await page.goto(url, { waitUntil: "networkidle2", timeout: 30000 });
 
-async function scrapePatchNotes(page) {
-  console.log("Scraping patch notes from", `${BASE_URL}/patch-notes`);
-  await page.goto(`${BASE_URL}/patch-notes`, { waitUntil: "networkidle2", timeout: 30000 });
+  // Give React/Next.js extra time to hydrate
+  await new Promise((r) => setTimeout(r, 3000));
 
-  const raw = await page.evaluate(() => {
-    return {
-      title: document.title,
-      url: location.href,
-      bodyText: document.body.innerText.slice(0, 3000),
-    };
+  // Take a screenshot so we can see what rendered
+  const screenshotPath = resolve(DATA_DIR, `screenshot${path.replace(/\//g, "_")}.png`);
+  await page.screenshot({ path: screenshotPath, fullPage: true });
+  console.log(`  Screenshot: ${screenshotPath}`);
+
+  // Extract all visible text content and any structured data attributes
+  const dom = await page.evaluate(() => {
+    // Try common data attribute patterns used by React apps
+    const dataAttrs = Array.from(document.querySelectorAll("[data-piece], [data-unit], [data-hero], [data-item]"))
+      .map((el) => el.outerHTML.slice(0, 500));
+
+    // Grab all text content grouped by tag
+    const headings = Array.from(document.querySelectorAll("h1, h2, h3, h4"))
+      .map((el) => el.innerText.trim())
+      .filter(Boolean);
+
+    const bodyText = document.body.innerText;
+
+    // Look for Next.js / Nuxt hydration data in script tags
+    const scripts = Array.from(document.querySelectorAll("script[type='application/json'], script#__NEXT_DATA__"))
+      .map((s) => s.textContent.slice(0, 10000));
+
+    // Grab all table data if present
+    const tables = Array.from(document.querySelectorAll("table")).map((t) => ({
+      headers: Array.from(t.querySelectorAll("th")).map((th) => th.innerText.trim()),
+      rows: Array.from(t.querySelectorAll("tr")).map((tr) =>
+        Array.from(tr.querySelectorAll("td")).map((td) => td.innerText.trim())
+      ).filter((r) => r.length > 0),
+    }));
+
+    // Grab all list items
+    const listItems = Array.from(document.querySelectorAll("li"))
+      .map((li) => li.innerText.trim())
+      .filter((t) => t.length > 0 && t.length < 200);
+
+    return { headings, bodyText: bodyText.slice(0, 10000), dataAttrs, scripts, tables, listItems };
   });
 
-  return raw;
+  await page.close();
+  return { url, intercepted, dom };
 }
 
 async function main() {
@@ -87,36 +110,33 @@ async function main() {
   });
 
   try {
-    const page = await browser.newPage();
-    await page.setViewport({ width: 1280, height: 900 });
+    const pages = {
+      pieces: "/pieces",
+      items: "/items",
+      patches: "/patch-notes",
+    };
 
-    const results = {};
+    for (const [name, path] of Object.entries(pages)) {
+      if (target !== "all" && target !== name) continue;
 
-    if (target === "all" || target === "pieces") {
-      results.pieces = await scrapePieces(page);
-      const outPath = resolve(DATA_DIR, "pieces_raw.json");
-      writeFileSync(outPath, JSON.stringify(results.pieces, null, 2));
-      console.log("Raw pieces data written to", outPath);
+      const result = await scrapePage(browser, path);
+      save(`${name}_raw.json`, result);
+
+      if (result.intercepted.length > 0) {
+        console.log(`  Found ${result.intercepted.length} API response(s) for ${name}`);
+        result.intercepted.forEach((r, i) => save(`${name}_api_${i}.json`, r.data));
+      } else {
+        console.log(`  No API responses intercepted for ${name} — see screenshot`);
+      }
+
+      // Print first 500 chars of body text so we can see what rendered
+      console.log(`\n  Body preview:\n  ${result.dom.bodyText.slice(0, 500).replace(/\n/g, "\n  ")}`);
     }
-
-    if (target === "all" || target === "items") {
-      results.items = await scrapeItems(page);
-      const outPath = resolve(DATA_DIR, "items_raw.json");
-      writeFileSync(outPath, JSON.stringify(results.items, null, 2));
-      console.log("Raw items data written to", outPath);
-    }
-
-    if (target === "all" || target === "patches") {
-      results.patches = await scrapePatchNotes(page);
-      const outPath = resolve(DATA_DIR, "patches_raw.json");
-      writeFileSync(outPath, JSON.stringify(results.patches, null, 2));
-      console.log("Raw patch data written to", outPath);
-    }
-
-    console.log("\nDone. Review *_raw.json files to build structured parsers.");
   } finally {
     await browser.close();
   }
+
+  console.log("\nDone. Check data/*_raw.json and data/screenshot_*.png");
 }
 
 main().catch((err) => {

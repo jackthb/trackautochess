@@ -1,0 +1,233 @@
+{
+  "items": {
+    "Bracer": {
+      "tier": 1
+    },
+    "Wraith Band": {
+      "tier": 1
+    },
+    "Null Talisman": {
+      "tier": 1
+    },
+    "Crystalys": {
+      "tier": 1
+    },
+    "Skull Basher": {
+      "tier": 1
+    },
+    "Buckler": {
+      "tier": 1
+    },
+    "Gossamar Cape": {
+      "tier": 1
+    },
+    "Ring Of Basilius": {
+      "tier": 1
+    },
+    "Orb Of Corrosion": {
+      "tier": 1
+    },
+    "Spark Of Courage": {
+      "tier": 1
+    },
+    "Lucky Pendant": {
+      "tier": 1
+    },
+    "Bullwhip": {
+      "tier": 1
+    },
+    "Hand Of Midas": {
+      "tier": 1
+    },
+    "Force Staff": {
+      "tier": 1
+    },
+    "Blink Dagger": {
+      "tier": 1
+    },
+    "Tranquil Boots": {
+      "tier": 2
+    },
+    "Maelstrom": {
+      "tier": 2
+    },
+    "Princes Knife": {
+      "tier": 2
+    },
+    "Kaya": {
+      "tier": 2
+    },
+    "Aghanims Shard": {
+      "tier": 2
+    },
+    "Mask Of Madness": {
+      "tier": 2
+    },
+    "Blade Mail": {
+      "tier": 2
+    },
+    "Vanguard": {
+      "tier": 2
+    },
+    "Pavise": {
+      "tier": 2
+    },
+    "Hood Of Defiance": {
+      "tier": 2
+    },
+    "Vladmirs Offering": {
+      "tier": 2
+    },
+    "Witless Shako": {
+      "tier": 1
+    },
+    "Bottle": {
+      "tier": 2
+    },
+    "Telescope": {
+      "tier": 2
+    },
+    "Spider Legs": {
+      "tier": 2
+    },
+    "Ascetics Cap": {
+      "tier": 2
+    },
+    "Arcane Boots": {
+      "tier": 3
+    },
+    "Sliver": {
+      "tier": 2
+    },
+    "Moon Shard": {
+      "tier": 3
+    },
+    "Desolator": {
+      "tier": 3
+    },
+    "Diffusal Blade": {
+      "tier": 3
+    },
+    "Heavens Halberd": {
+      "tier": 3
+    },
+    "Trident": {
+      "tier": 3
+    },
+    "Paladin Sword": {
+      "tier": 3
+    },
+    "Mekansm": {
+      "tier": 3
+    },
+    "Crimson Guard": {
+      "tier": 3
+    },
+    "Pipe Of Insight": {
+      "tier": 3
+    },
+    "Drum Of Endurance": {
+      "tier": 3
+    },
+    "Shivas Guard": {
+      "tier": 3
+    },
+    "Linkens Sphere": {
+      "tier": 3
+    },
+    "Bloodstone": {
+      "tier": 3
+    },
+    "Aegis Of Immortal": {
+      "tier": 3
+    },
+    "Spell Prism": {
+      "tier": 3
+    },
+    "Avianas Feather": {
+      "tier": 2
+    },
+    "Minotaur Horn": {
+      "tier": 4
+    },
+    "Radiance": {
+      "tier": 4
+    },
+    "Monkey King Bar": {
+      "tier": 4
+    },
+    "Butterfly": {
+      "tier": 4
+    },
+    "Bloodthorn": {
+      "tier": 4
+    },
+    "Black King Bar": {
+      "tier": 4
+    },
+    "Giants Ring": {
+      "tier": 4
+    },
+    "Abyssal Blade": {
+      "tier": 4
+    },
+    "Gleipnir": {
+      "tier": 4
+    },
+    "Battle Fury": {
+      "tier": 4
+    },
+    "Manta Style": {
+      "tier": 4
+    },
+    "Dagon": {
+      "tier": 4
+    },
+    "Refresher Orb": {
+      "tier": 4
+    },
+    "Necronomicon": {
+      "tier": 4
+    },
+    "Guardian Greaves": {
+      "tier": 4
+    },
+    "Rapier": {
+      "tier": 5
+    },
+    "Daedalus": {
+      "tier": 5
+    },
+    "Mjollnir": {
+      "tier": 5
+    },
+    "Havoc": {
+      "tier": 5
+    },
+    "Eye Of Skadi": {
+      "tier": 5
+    },
+    "Aghanims Scepter": {
+      "tier": 5
+    },
+    "Scythe Of Vyse": {
+      "tier": 5
+    },
+    "Satanic": {
+      "tier": 5
+    },
+    "Assault Cuirass": {
+      "tier": 5
+    },
+    "Aeon Disk": {
+      "tier": 5
+    },
+    "Mirror Shield": {
+      "tier": 5
+    },
+    "Ogre Hood": {
+      "tier": 5
+    }
+  },
+  "total": 76
+}
