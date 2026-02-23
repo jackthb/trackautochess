@@ -29,12 +29,13 @@ Pull current patch data from autochess.site and build a rich internal DB — uni
 |------|--------|-------|
 | Initial `units.json` / `items.json` | ✅ done | Handwritten, likely outdated |
 | Puppeteer scraper scaffold | ✅ done | `scraper/scrape.js` — dumps raw HTML/text |
-| Parse pieces page → structured JSON | 🔨 in progress | Need to inspect raw output first |
-| Parse items page → structured JSON | 📋 planned | Same approach as pieces |
+| Parse pieces page → structured JSON | ✅ done | `scrape_costs.mjs` — cost filter + synergy filter via `<select>` on board builder |
+| Build canonical `units.json` | ✅ done | `build_units_json.mjs` — 114 units with cost + synergies, synced to analyzer |
+| Parse items page → structured JSON | ✅ done | `items_parsed.json` — 76 items with tiers |
 | Patch notes scraper | 📋 planned | For patch version detection |
 | Unit screenshot DB | 💡 idea | Capture buy-screen images of each unit at 1/2/3★ for use as vision prompt reference |
 | Patch-aware data versioning | 💡 idea | Tag each unit/item JSON with patch version; detect which patch a VOD is from based on unit pool |
-| Auto-sync data → analyzer package | 📋 planned | Scraper writes to `data/`, script copies to `analyzer/dac_analyzer/data/` |
+| Auto-sync data → analyzer package | ✅ done | `build_units_json.mjs` copies `data/units.json` → `analyzer/dac_analyzer/data/units.json` |
 
 ---
 
@@ -97,12 +98,19 @@ Accurate per-frame game state extraction from VOD screenshots. Currently uses Cl
 | Task | Status | Notes |
 |------|--------|-------|
 | Puppeteer scaffold | ✅ done | `scrape.js` — launches browser, dumps raw page content |
-| Install dependencies | 📋 planned | `cd scraper && npm install` |
-| Run against autochess.site | 🔨 in progress | Need to inspect what the site actually renders |
-| Parse pieces into `units.json` | 📋 planned | After inspecting raw output |
-| Parse items into `items.json` | 📋 planned | |
-| Patch version detection | 📋 planned | |
+| Install dependencies | ✅ done | `cd scraper && npm install` |
+| Scrape 114 units with costs | ✅ done | `scrape_costs.mjs` — uses `<select>` cost + synergy filters on board builder |
+| Build canonical `units.json` | ✅ done | `build_units_json.mjs` — syncs to analyzer data dir |
+| Scrape 76 items | ✅ done | `items_parsed.json` from items page |
+| Patch version detection | 📋 planned | Compare unit pool to known patches |
 | Scheduled/CI auto-update | 💡 idea | Run scraper on a schedule, PR the data update |
+
+### Key Scraper Findings
+- autochess.site is a React SPA — must navigate from home page, not direct URL
+- Cost filter is a `<select>` element (not buttons) — use `select.value = "1"; dispatchEvent(change)`
+- Synergy filter is also a `<select>` — index 0 on page, cost filter is index 1
+- Unit cards: `.grid.grid-cols-4 .group.cursor-pointer` → `.truncate` div has name
+- Item registry (grid-cols-6) has item cards that look like buttons but are item instances
 
 ---
 
@@ -135,7 +143,7 @@ Accurate per-frame game state extraction from VOD screenshots. Currently uses Cl
 
 ## Immediate Next Steps
 
-1. `cd scraper && npm install && node scrape.js` — see what autochess.site actually renders
-2. Build parser for pieces page → structured `units.json`
-3. Fix prompt issues (streamer name, synergies, xp) using better-grounded data
-4. Full end-to-end test run with `--no-adaptive` + `llava:7b` to get a complete output
+1. Fix prompt issues (streamer name, synergies, xp) now that we have accurate unit/synergy data
+2. Full end-to-end test run with `--no-adaptive` + a stable Ollama model to get complete output
+3. Test `llava:7b` as stable alternative to `qwen2.5vl:7b` for batch analysis
+4. Add items scrape to build `items.json` with full current patch item list

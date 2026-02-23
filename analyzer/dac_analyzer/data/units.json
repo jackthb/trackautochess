@@ -1,96 +1,827 @@
 {
   "units": {
-    "Axe": {"cost": 1, "species": ["Orc"], "class": ["Warrior"]},
-    "Enchantress": {"cost": 1, "species": ["Beast"], "class": ["Druid"]},
-    "Ogre Magi": {"cost": 1, "species": ["Ogre"], "class": ["Mage"]},
-    "Tusk": {"cost": 1, "species": ["Beast"], "class": ["Warrior"]},
-    "Drow Ranger": {"cost": 1, "species": ["Undead"], "class": ["Hunter"]},
-    "Bounty Hunter": {"cost": 1, "species": ["Goblin"], "class": ["Assassin"]},
-    "Clockwerk": {"cost": 1, "species": ["Goblin"], "class": ["Mech"]},
-    "Shadow Shaman": {"cost": 1, "species": ["Troll"], "class": ["Shaman"]},
-    "Tinker": {"cost": 1, "species": ["Goblin"], "class": ["Mech"]},
-    "Anti-Mage": {"cost": 1, "species": ["Elf"], "class": ["Demon Hunter"]},
-    "Tiny": {"cost": 1, "species": ["Elemental"], "class": ["Warrior"]},
-    "Mars": {"cost": 1, "species": ["God"], "class": ["Warrior"]},
-
-    "Crystal Maiden": {"cost": 2, "species": ["Human"], "class": ["Mage"]},
-    "Beast Master": {"cost": 2, "species": ["Orc"], "class": ["Hunter"]},
-    "Juggernaut": {"cost": 2, "species": ["Orc"], "class": ["Warrior"]},
-    "Timbersaw": {"cost": 2, "species": ["Goblin"], "class": ["Mech"]},
-    "Queen of Pain": {"cost": 2, "species": ["Demon"], "class": ["Assassin"]},
-    "Puck": {"cost": 2, "species": ["Elf", "Dragon"], "class": ["Mage"]},
-    "Witch Doctor": {"cost": 2, "species": ["Troll"], "class": ["Warlock"]},
-    "Slardar": {"cost": 2, "species": ["Naga"], "class": ["Warrior"]},
-    "Chaos Knight": {"cost": 2, "species": ["Demon"], "class": ["Knight"]},
-    "Treant Protector": {"cost": 2, "species": ["Elf"], "class": ["Druid"]},
-    "Morphling": {"cost": 2, "species": ["Elemental"], "class": ["Assassin"]},
-    "Winter Wyvern": {"cost": 2, "species": ["Dragon"], "class": ["Mage"]},
-    "Nature's Prophet": {"cost": 2, "species": ["Elf"], "class": ["Druid"]},
-    "Luna": {"cost": 2, "species": ["Elf"], "class": ["Knight"]},
-    "Mirana": {"cost": 2, "species": ["Elf"], "class": ["Hunter"]},
-
-    "Lycan": {"cost": 3, "species": ["Human", "Beast"], "class": ["Warrior"]},
-    "Venomancer": {"cost": 3, "species": ["Beast"], "class": ["Warlock"]},
-    "Omniknight": {"cost": 3, "species": ["Human"], "class": ["Knight"]},
-    "Razor": {"cost": 3, "species": ["Elemental"], "class": ["Mage"]},
-    "Windranger": {"cost": 3, "species": ["Elf"], "class": ["Hunter"]},
-    "Phantom Assassin": {"cost": 3, "species": ["Elf"], "class": ["Assassin"]},
-    "Abaddon": {"cost": 3, "species": ["Undead"], "class": ["Knight"]},
-    "Sand King": {"cost": 3, "species": ["Beast"], "class": ["Assassin"]},
-    "Slark": {"cost": 3, "species": ["Naga"], "class": ["Assassin"]},
-    "Sniper": {"cost": 3, "species": ["Dwarf"], "class": ["Hunter"]},
-    "Terrorblade": {"cost": 3, "species": ["Demon"], "class": ["Demon Hunter"]},
-    "Viper": {"cost": 3, "species": ["Dragon"], "class": ["Assassin"]},
-    "Shadow Fiend": {"cost": 3, "species": ["Demon"], "class": ["Warlock"]},
-    "Troll Warlord": {"cost": 4, "species": ["Troll"], "class": ["Warrior"]},
-
-    "Kunkka": {"cost": 4, "species": ["Human"], "class": ["Warrior"]},
-    "Doom": {"cost": 4, "species": ["Demon"], "class": ["Warrior"]},
-    "Necrophos": {"cost": 4, "species": ["Undead"], "class": ["Warlock"]},
-    "Templar Assassin": {"cost": 4, "species": ["Elf"], "class": ["Assassin"]},
-    "Alchemist": {"cost": 4, "species": ["Goblin"], "class": ["Warlock"]},
-    "Disruptor": {"cost": 4, "species": ["Orc"], "class": ["Shaman"]},
-    "Keeper of the Light": {"cost": 4, "species": ["Human"], "class": ["Mage"]},
-    "Dragon Knight": {"cost": 4, "species": ["Human", "Dragon"], "class": ["Knight"]},
-    "Lone Druid": {"cost": 4, "species": ["Beast"], "class": ["Druid"]},
-    "Medusa": {"cost": 4, "species": ["Naga"], "class": ["Hunter"]},
-
-    "Gyrocopter": {"cost": 5, "species": ["Dwarf"], "class": ["Mech"]},
-    "Tide Hunter": {"cost": 5, "species": ["Naga"], "class": ["Hunter"]},
-    "Enigma": {"cost": 5, "species": ["Elemental"], "class": ["Warlock"]},
-    "Lich": {"cost": 5, "species": ["Undead"], "class": ["Mage"]},
-    "Techies": {"cost": 5, "species": ["Goblin"], "class": ["Mech"]},
-    "Death Prophet": {"cost": 5, "species": ["Undead"], "class": ["Warlock"]},
-    "Zeus": {"cost": 5, "species": ["God"], "class": ["Mage"]}
-  },
-  "synergies": {
-    "species": {
-      "Beast": [2, 4, 6],
-      "Demon": [1],
-      "Dragon": [3],
-      "Dwarf": [1],
-      "Elf": [3, 6],
-      "Elemental": [2, 4],
-      "Goblin": [3, 6],
-      "God": [1, 2],
-      "Human": [2, 4, 6],
-      "Naga": [2, 4],
-      "Ogre": [1],
-      "Orc": [2, 4],
-      "Troll": [2, 4],
-      "Undead": [2, 4]
+    "Mirana": {
+      "cost": 1,
+      "synergies": [
+        "Elf",
+        "Hunter"
+      ]
     },
-    "classes": {
-      "Assassin": [3, 6],
-      "Demon Hunter": [1, 2],
-      "Druid": [2, 4],
-      "Hunter": [3, 6],
-      "Knight": [2, 4, 6],
-      "Mage": [3, 6],
-      "Mech": [2, 4],
-      "Shaman": [1, 2],
-      "Warlock": [3, 6],
-      "Warrior": [3, 6, 9]
+    "Dark Willow": {
+      "cost": 1,
+      "synergies": [
+        "Elf",
+        "Wizard"
+      ]
+    },
+    "Witch Doctor": {
+      "cost": 1,
+      "synergies": [
+        "Troll",
+        "Warlock"
+      ]
+    },
+    "Shadow Shaman": {
+      "cost": 1,
+      "synergies": [
+        "Shaman",
+        "Troll"
+      ]
+    },
+    "Dazzle": {
+      "cost": 1,
+      "synergies": [
+        "Priest",
+        "Troll"
+      ]
+    },
+    "Tusk": {
+      "cost": 1,
+      "synergies": [
+        "Beast",
+        "Warrior"
+      ]
+    },
+    "Hoodwink": {
+      "cost": 1,
+      "synergies": [
+        "Beast",
+        "Hunter"
+      ]
+    },
+    "Enchantress": {
+      "cost": 1,
+      "synergies": [
+        "Beast",
+        "Centaur",
+        "Druid"
+      ]
+    },
+    "Crystal Maiden": {
+      "cost": 1,
+      "synergies": [
+        "Human",
+        "Mage"
+      ]
+    },
+    "Axe": {
+      "cost": 1,
+      "synergies": [
+        "Orc",
+        "Warrior"
+      ]
+    },
+    "Clockwerk": {
+      "cost": 1,
+      "synergies": [
+        "Goblin",
+        "Mech"
+      ]
+    },
+    "Tinker": {
+      "cost": 1,
+      "synergies": [
+        "Goblin",
+        "Mech"
+      ]
+    },
+    "Tiny": {
+      "cost": 2,
+      "synergies": [
+        "Elemental",
+        "Warrior"
+      ]
+    },
+    "Mars": {
+      "cost": 1,
+      "synergies": [
+        "God",
+        "Warrior"
+      ]
+    },
+    "Spirit Breaker": {
+      "cost": 1,
+      "synergies": [
+        "Assassin",
+        "Tauren"
+      ]
+    },
+    "Bane": {
+      "cost": 1,
+      "synergies": [
+        "Faceless",
+        "Satyr",
+        "Warlock"
+      ]
+    },
+    "Bounty Hunter": {
+      "cost": 1,
+      "synergies": [
+        "Draenei",
+        "Goblin",
+        "Hunter"
+      ]
+    },
+    "Shadow Demon": {
+      "cost": 1,
+      "synergies": [
+        "Demon",
+        "Draenei",
+        "Priest"
+      ]
+    },
+    "Skywrath Mage": {
+      "cost": 1,
+      "synergies": [
+        "Harpy",
+        "Mage"
+      ]
+    },
+    "Clinkz": {
+      "cost": 1,
+      "synergies": [
+        "Hunter",
+        "Undead"
+      ]
+    },
+    "Abaddon": {
+      "cost": 1,
+      "synergies": [
+        "Knight",
+        "Undead"
+      ]
+    },
+    "Winter Wyvern": {
+      "cost": 1,
+      "synergies": [
+        "Dragon",
+        "Mage",
+        "Undead"
+      ]
+    },
+    "Windranger": {
+      "cost": 2,
+      "synergies": [
+        "Elf",
+        "Hunter"
+      ]
+    },
+    "Luna": {
+      "cost": 2,
+      "synergies": [
+        "Elf",
+        "Knight"
+      ]
+    },
+    "Puck": {
+      "cost": 2,
+      "synergies": [
+        "Dragon",
+        "Elf",
+        "Mage"
+      ]
+    },
+    "Furion": {
+      "cost": 2,
+      "synergies": [
+        "Druid",
+        "Elf"
+      ]
+    },
+    "Batrider": {
+      "cost": 2,
+      "synergies": [
+        "Knight",
+        "Troll"
+      ]
+    },
+    "Lina": {
+      "cost": 2,
+      "synergies": [
+        "Human",
+        "Mage"
+      ]
+    },
+    "Juggernaut": {
+      "cost": 2,
+      "synergies": [
+        "Orc",
+        "Warrior"
+      ]
+    },
+    "Beastmaster": {
+      "cost": 2,
+      "synergies": [
+        "Hunter",
+        "Orc"
+      ]
+    },
+    "Bloodseeker": {
+      "cost": 2,
+      "synergies": [
+        "Orc",
+        "Shaman"
+      ]
+    },
+    "Timbersaw": {
+      "cost": 2,
+      "synergies": [
+        "Goblin",
+        "Mech"
+      ]
+    },
+    "Slark": {
+      "cost": 2,
+      "synergies": [
+        "Assassin",
+        "Naga"
+      ]
+    },
+    "Naga Siren": {
+      "cost": 3,
+      "synergies": [
+        "Naga",
+        "Wizard"
+      ]
+    },
+    "Oracle": {
+      "cost": 2,
+      "synergies": [
+        "God",
+        "Priest"
+      ]
+    },
+    "Brewmaster": {
+      "cost": 1,
+      "synergies": [
+        "Monk",
+        "Pandaren"
+      ]
+    },
+    "Sniper": {
+      "cost": 2,
+      "synergies": [
+        "Dwarf",
+        "Hunter"
+      ]
+    },
+    "Chaos Knight": {
+      "cost": 2,
+      "synergies": [
+        "Demon",
+        "Knight"
+      ]
+    },
+    "Meepo": {
+      "cost": 2,
+      "synergies": [
+        "Kobold",
+        "Mech"
+      ]
+    },
+    "Faceless Void": {
+      "cost": 2,
+      "synergies": [
+        "Assassin",
+        "Faceless"
+      ]
+    },
+    "Dark Seer": {
+      "cost": 2,
+      "synergies": [
+        "Draenei",
+        "Warlock"
+      ]
+    },
+    "Centaur Warrunner": {
+      "cost": 2,
+      "synergies": [
+        "Centaur",
+        "Warrior"
+      ]
+    },
+    "Muerta": {
+      "cost": 2,
+      "synergies": [
+        "Hunter",
+        "Undead"
+      ]
+    },
+    "Lifestealer": {
+      "cost": 2,
+      "synergies": [
+        "Kobold",
+        "Undead",
+        "Wizard"
+      ]
+    },
+    "Vengeful Spirit": {
+      "cost": 2,
+      "synergies": [
+        "Demon Hunter",
+        "Harpy",
+        "Undead"
+      ]
+    },
+    "Treant Protector": {
+      "cost": 3,
+      "synergies": [
+        "Druid",
+        "Elf"
+      ]
+    },
+    "Marci": {
+      "cost": 3,
+      "synergies": [
+        "Elf",
+        "Monk"
+      ]
+    },
+    "Huskar": {
+      "cost": 3,
+      "synergies": [
+        "Troll",
+        "Warrior"
+      ]
+    },
+    "Venomancer": {
+      "cost": 3,
+      "synergies": [
+        "Aqir",
+        "Beast",
+        "Warlock"
+      ]
+    },
+    "Lycan": {
+      "cost": 3,
+      "synergies": [
+        "Beast",
+        "Human",
+        "Warrior"
+      ]
+    },
+    "Legion Commander": {
+      "cost": 3,
+      "synergies": [
+        "Human",
+        "Knight"
+      ]
+    },
+    "Viper": {
+      "cost": 3,
+      "synergies": [
+        "Assassin",
+        "Dragon"
+      ]
+    },
+    "Slardar": {
+      "cost": 3,
+      "synergies": [
+        "Naga",
+        "Warrior"
+      ]
+    },
+    "Razor": {
+      "cost": 3,
+      "synergies": [
+        "Elemental",
+        "Mage"
+      ]
+    },
+    "Enigma": {
+      "cost": 3,
+      "synergies": [
+        "Elemental",
+        "Warlock"
+      ]
+    },
+    "Rubick": {
+      "cost": 3,
+      "synergies": [
+        "God",
+        "Wizard"
+      ]
+    },
+    "Sand King": {
+      "cost": 3,
+      "synergies": [
+        "Aqir",
+        "Assassin"
+      ]
+    },
+    "Ogre Magi": {
+      "cost": 3,
+      "synergies": [
+        "Mage",
+        "Ogre"
+      ]
+    },
+    "Shadow Fiend": {
+      "cost": 3,
+      "synergies": [
+        "Demon",
+        "Warlock"
+      ]
+    },
+    "Terrorblade": {
+      "cost": 3,
+      "synergies": [
+        "Demon",
+        "Demon Hunter"
+      ]
+    },
+    "Earthshaker": {
+      "cost": 3,
+      "synergies": [
+        "Shaman",
+        "Tauren"
+      ]
+    },
+    "Riki": {
+      "cost": 3,
+      "synergies": [
+        "Assassin",
+        "Satyr"
+      ]
+    },
+    "Dawnbreaker": {
+      "cost": 3,
+      "synergies": [
+        "Draenei",
+        "Knight"
+      ]
+    },
+    "Kez": {
+      "cost": 3,
+      "synergies": [
+        "Assassin",
+        "Harpy"
+      ]
+    },
+    "Pudge": {
+      "cost": 3,
+      "synergies": [
+        "Undead",
+        "Warrior"
+      ]
+    },
+    "Drow Ranger": {
+      "cost": 3,
+      "synergies": [
+        "Hunter",
+        "Undead"
+      ]
+    },
+    "Undying": {
+      "cost": 3,
+      "synergies": [
+        "Priest",
+        "Undead"
+      ]
+    },
+    "Phantom Assassin": {
+      "cost": 4,
+      "synergies": [
+        "Assassin",
+        "Elf"
+      ]
+    },
+    "Anti-mage": {
+      "cost": 4,
+      "synergies": [
+        "Demon Hunter",
+        "Elf"
+      ]
+    },
+    "Pangolier": {
+      "cost": 4,
+      "synergies": [
+        "Assassin",
+        "Beast"
+      ]
+    },
+    "Lone Druid": {
+      "cost": 4,
+      "synergies": [
+        "Beast",
+        "Druid"
+      ]
+    },
+    "Monkey King": {
+      "cost": 4,
+      "synergies": [
+        "Beast",
+        "Monk"
+      ]
+    },
+    "Kunkka": {
+      "cost": 4,
+      "synergies": [
+        "Human",
+        "Warrior"
+      ]
+    },
+    "Keeper Of The Light": {
+      "cost": 4,
+      "synergies": [
+        "Human",
+        "Mage"
+      ]
+    },
+    "Dragon Knight": {
+      "cost": 4,
+      "synergies": [
+        "Dragon",
+        "Human",
+        "Knight"
+      ]
+    },
+    "Chen": {
+      "cost": 4,
+      "synergies": [
+        "Orc",
+        "Priest"
+      ]
+    },
+    "Snapfire": {
+      "cost": 4,
+      "synergies": [
+        "Goblin",
+        "Knight"
+      ]
+    },
+    "Alchemist": {
+      "cost": 4,
+      "synergies": [
+        "Goblin",
+        "Ogre",
+        "Warlock"
+      ]
+    },
+    "Medusa": {
+      "cost": 4,
+      "synergies": [
+        "Hunter",
+        "Naga"
+      ]
+    },
+    "Elder Titan": {
+      "cost": 4,
+      "synergies": [
+        "Druid",
+        "God",
+        "Tauren"
+      ]
+    },
+    "Broodmother": {
+      "cost": 4,
+      "synergies": [
+        "Aqir",
+        "Hunter"
+      ]
+    },
+    "Doom": {
+      "cost": 4,
+      "synergies": [
+        "Demon",
+        "Warrior"
+      ]
+    },
+    "Lion": {
+      "cost": 4,
+      "synergies": [
+        "Demon",
+        "Wizard"
+      ]
+    },
+    "Magnus": {
+      "cost": 4,
+      "synergies": [
+        "Assassin",
+        "Centaur"
+      ]
+    },
+    "Lich": {
+      "cost": 4,
+      "synergies": [
+        "Mage",
+        "Undead"
+      ]
+    },
+    "Death Prophet": {
+      "cost": 4,
+      "synergies": [
+        "Undead",
+        "Warlock"
+      ]
+    },
+    "Nyx Assassin": {
+      "cost": 4,
+      "synergies": [
+        "Aqir",
+        "Assassin",
+        "Undead"
+      ]
+    },
+    "Ember Spirit": {
+      "cost": 4,
+      "synergies": [
+        "Assassin",
+        "Pandaren"
+      ]
+    },
+    "Earth Spirit": {
+      "cost": 4,
+      "synergies": [
+        "Pandaren",
+        "Shaman"
+      ]
+    },
+    "Storm Spirit": {
+      "cost": 4,
+      "synergies": [
+        "Mage",
+        "Pandaren"
+      ]
+    },
+    "Void Spirit": {
+      "cost": 4,
+      "synergies": [
+        "Monk",
+        "Pandaren"
+      ]
+    },
+    "Templar Assassin": {
+      "cost": 5,
+      "synergies": [
+        "Assassin",
+        "Elf"
+      ]
+    },
+    "Invoker": {
+      "cost": 5,
+      "synergies": [
+        "Elf",
+        "Mage"
+      ]
+    },
+    "Troll Warlord": {
+      "cost": 5,
+      "synergies": [
+        "Troll",
+        "Warrior"
+      ]
+    },
+    "Primal Beast": {
+      "cost": 5,
+      "synergies": [
+        "Beast",
+        "Warrior"
+      ]
+    },
+    "Omniknight": {
+      "cost": 5,
+      "synergies": [
+        "Human",
+        "Knight"
+      ]
+    },
+    "Warlock": {
+      "cost": 5,
+      "synergies": [
+        "Orc",
+        "Warlock"
+      ]
+    },
+    "Disruptor": {
+      "cost": 5,
+      "synergies": [
+        "Orc",
+        "Shaman"
+      ]
+    },
+    "Techies": {
+      "cost": 5,
+      "synergies": [
+        "Goblin",
+        "Mech"
+      ]
+    },
+    "Jakiro": {
+      "cost": 5,
+      "synergies": [
+        "Dragon",
+        "Mage"
+      ]
+    },
+    "Ringmaster": {
+      "cost": 5,
+      "synergies": []
+    },
+    "Tidehunter": {
+      "cost": 5,
+      "synergies": [
+        "Hunter",
+        "Naga"
+      ]
+    },
+    "Morphling": {
+      "cost": 5,
+      "synergies": [
+        "Assassin",
+        "Elemental",
+        "Elf"
+      ]
+    },
+    "Zeus": {
+      "cost": 5,
+      "synergies": [
+        "God",
+        "Mage"
+      ]
+    },
+    "Leshrac": {
+      "cost": 5,
+      "synergies": [
+        "Centaur",
+        "Druid",
+        "God"
+      ]
+    },
+    "Gyrocopter": {
+      "cost": 5,
+      "synergies": [
+        "Dwarf",
+        "Mech"
+      ]
+    },
+    "Sven": {
+      "cost": 5,
+      "synergies": [
+        "Demon",
+        "Warrior"
+      ]
+    },
+    "Queen Of Pain": {
+      "cost": 5,
+      "synergies": [
+        "Assassin",
+        "Demon"
+      ]
+    },
+    "Abyssal Underlord": {
+      "cost": 5,
+      "synergies": [
+        "Demon",
+        "Warlock"
+      ]
+    },
+    "Arc Warden": {
+      "cost": 5,
+      "synergies": [
+        "Kobold",
+        "Shaman"
+      ]
+    },
+    "Wraith King": {
+      "cost": 5,
+      "synergies": [
+        "Undead",
+        "Warrior"
+      ]
+    },
+    "Necrophos": {
+      "cost": 5,
+      "synergies": [
+        "Undead",
+        "Warlock"
+      ]
+    },
+    "Spectre": {
+      "cost": 5,
+      "synergies": [
+        "Demon Hunter",
+        "Undead"
+      ]
+    },
+    "Largo": {
+      "cost": 2,
+      "synergies": [
+        "Monk",
+        "Naga"
+      ]
+    }
+  },
+  "_meta": {
+    "source": "autochess.site board builder cost/synergy filters",
+    "scraped": "2026-02-23",
+    "totalUnits": 114,
+    "byCost": {
+      "$1": 22,
+      "$2": 23,
+      "$3": 23,
+      "$4": 24,
+      "$5": 22
     }
   }
 }
