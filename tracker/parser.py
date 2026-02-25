@@ -206,6 +206,74 @@ def parse_screenshot(
     )
 
 
+def parse_history_screenshot(
+    image_path: Path,
+    player_name: str,
+    screenshot_date: str,
+    model: str = "qwen2.5vl:7b",
+    ollama_url: str = "http://localhost:11434",
+) -> list[GameRow]:
+    """
+    Parse a MY MATCHES history screen screenshot.
+    Returns a list of GameRow (one per visible row), oldest-first order reversed to newest-first.
+    """
+    synergy_list = ", ".join(_load_synergies())
+    prompt = _load_prompt("parse_history.txt")
+    prompt = prompt.replace("$PLAYER_NAME", player_name)
+    prompt = prompt.replace("$SYNERGIES_LIST", synergy_list)
+
+    b64 = _image_to_base64(image_path)
+    raw = _ollama(model, ollama_url, prompt, [b64])
+    if not raw:
+        return []
+
+    try:
+        rows_data = json.loads(_strip_fences(raw))
+        if not isinstance(rows_data, list):
+            print(f"[tracker] ERROR: expected list, got: {type(rows_data)}")
+            return []
+    except json.JSONDecodeError as e:
+        print(f"[tracker] ERROR: Could not parse history response: {e}")
+        print(f"[tracker] Raw: {raw[:400]}")
+        return []
+
+    rows = []
+    for i, d in enumerate(rows_data):
+        synergies_str = str(d.get("synergies") or "")
+        # Strip unknown synergies (?:N) if model couldn't read icons
+        synergies_str = "|".join(
+            p for p in synergies_str.split("|") if not p.startswith("?")
+        )
+        comp = _comp_from_synergies(synergies_str)
+
+        raw_level = d.get("level")
+        try:
+            level_int = int(str(raw_level).strip())
+            level = str(level_int) if 1 <= level_int <= 15 else ""
+        except (ValueError, TypeError):
+            level = ""
+
+        date_label = str(d.get("date") or "")
+        # Use screenshot date + row index as a unique date if relative time shown
+        date_str = f"{screenshot_date} (row {i+1}: {date_label})" if date_label else screenshot_date
+
+        rows.append(GameRow(
+            date=date_str,
+            placement=str(d.get("placement") or ""),
+            comp=comp,
+            synergies=synergies_str,
+            talents="",
+            relic="",
+            level=level,
+            wl=str(d.get("wl") or ""),
+            screenshot=image_path.name,
+            notes=f"gold:{d.get('gold','')} imported from history",
+        ))
+
+    print(f"[tracker] Parsed {len(rows)} rows from history screenshot.")
+    return rows
+
+
 def _comp_from_synergies(synergies_str: str) -> str:
     """Build a human-readable comp name from the synergies string.
 

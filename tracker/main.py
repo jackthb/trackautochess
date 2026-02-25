@@ -129,11 +129,60 @@ def cmd_import(args: list[str]) -> None:
     importer.import_csv(src, games_csv, dry_run=dry_run)
 
 
+def cmd_import_history(args: list[str]) -> None:
+    """Handle: python main.py import-history <screenshot> [--dry-run]
+
+    Parse a MY MATCHES history screenshot and import all visible rows.
+    Screenshot multiple pages and run this command for each.
+    """
+    import parser as game_parser
+    import csv_writer
+
+    if not args:
+        print("Usage: python main.py import-history <screenshot.jpg> [--dry-run]")
+        sys.exit(1)
+
+    screenshot_path = Path(args[0])
+    dry_run = "--dry-run" in args
+
+    if not screenshot_path.exists():
+        print(f"[tracker] ERROR: File not found: {screenshot_path}")
+        sys.exit(1)
+
+    config = load_config()
+    games_csv = Path(config.get("games_csv", str(GAMES_CSV))).expanduser()
+    date_str = datetime.now().strftime("%Y-%m-%d")
+
+    print(f"[tracker] Parsing history screenshot: {screenshot_path.name}")
+    rows = game_parser.parse_history_screenshot(
+        image_path=screenshot_path,
+        player_name=config.get("player_name", "jack"),
+        screenshot_date=date_str,
+        model=config.get("model", "qwen2.5vl:7b"),
+        ollama_url=config.get("ollama_url", "http://localhost:11434"),
+    )
+
+    if not rows:
+        print("[tracker] No rows parsed.")
+        return
+
+    if dry_run:
+        print(f"[tracker] DRY RUN — would import {len(rows)} row(s):")
+        for r in rows:
+            print(f"  placement={r.placement}  level={r.level}  wl={r.wl}  synergies={r.synergies}  notes={r.notes}")
+    else:
+        for row in rows:
+            csv_writer.append_row(row, games_csv)
+        print(f"[tracker] Imported {len(rows)} row(s) into {games_csv}")
+
+
 def main() -> None:
     config = load_config()
 
     if len(sys.argv) > 1 and sys.argv[1] == "import":
         cmd_import(sys.argv[2:])
+    elif len(sys.argv) > 1 and sys.argv[1] == "import-history":
+        cmd_import_history(sys.argv[2:])
     else:
         run_listener(config)
 
