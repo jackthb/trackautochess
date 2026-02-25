@@ -14,9 +14,15 @@ from pathlib import Path
 block_cipher = None
 
 # Paths relative to spec file location
-TRACKER_DIR = os.path.dirname(os.path.abspath(SPECPATH))
+# SPECPATH is the directory containing the spec file in PyInstaller
+TRACKER_DIR = SPECPATH
 ROOT_DIR = os.path.dirname(TRACKER_DIR)
 DATA_DIR = os.path.join(ROOT_DIR, "data")
+
+# Portable Tesseract OCR — set this to the directory containing tesseract.exe + DLLs + tessdata/
+# Download from: https://digi.bib.uni-mannheim.de/tesseract/
+# Install, then copy the install directory here (or point to it).
+TESSERACT_DIR = os.path.join(os.path.dirname(TRACKER_DIR), "tesseract-portable")
 
 # Bundled data files: (source, dest_in_bundle)
 datas = [
@@ -25,6 +31,7 @@ datas = [
     (os.path.join(DATA_DIR, "items.json"), "data"),
     (os.path.join(DATA_DIR, "relics.json"), "data"),
     (os.path.join(TRACKER_DIR, "prompts"), "prompts"),
+    (TESSERACT_DIR, "tesseract"),
 ]
 
 # Filter out missing paths (optional files)

@@ -22,6 +22,23 @@ import pystray
 from PIL import Image
 from plyer import notification
 
+# ── Tesseract setup (bundled or system) ───────────────────────────────────────
+
+def _setup_tesseract():
+    """Point pytesseract at bundled Tesseract if running from PyInstaller exe."""
+    import pytesseract
+    if getattr(sys, 'frozen', False):
+        # Running as PyInstaller bundle — tesseract is in _MEIPASS/tesseract/
+        base = Path(sys._MEIPASS)
+        tess_exe = base / "tesseract" / "tesseract.exe"
+        if tess_exe.exists():
+            pytesseract.pytesseract.tesseract_cmd = str(tess_exe)
+            os.environ["TESSDATA_PREFIX"] = str(base / "tesseract" / "tessdata")
+            return
+    # Not frozen or bundled tesseract missing — hope it's on PATH
+
+_setup_tesseract()
+
 # ── Config ────────────────────────────────────────────────────────────────────
 
 DAC_DIR = Path.home() / ".dac"
