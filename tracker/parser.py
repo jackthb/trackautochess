@@ -150,7 +150,54 @@ def _parse_main_fields(
         return None
 
 
-# ── public API ────────────────────────────────────────────────────────────────
+# ── CV path ──────────────────────────────────────────────────────────────────
+
+def parse_screenshot_cv(
+    image_path: Path,
+    player_name: str,
+    date_str: str,
+    screenshot_rel: str,
+    icons_dir: Path,
+) -> GameRow | None:
+    """Parse a screenshot using deterministic CV (no Ollama).
+
+    Returns GameRow or None if CV can't handle this screen type.
+    """
+    try:
+        from cv_parser import parse_screenshot_cv as _cv_parse
+    except ImportError as e:
+        print(f"[tracker] CV parser not available: {e}")
+        return None
+
+    data = _cv_parse(image_path, player_name, icons_dir)
+    if data is None:
+        return None
+
+    synergies_str = data.get("synergies", "")
+    comp = _comp_from_synergies(synergies_str)
+
+    raw_level = data.get("level")
+    try:
+        level_int = int(str(raw_level).strip())
+        level = str(level_int) if 1 <= level_int <= 15 else ""
+    except (ValueError, TypeError):
+        level = ""
+
+    return GameRow(
+        date=date_str,
+        placement=data.get("placement", ""),
+        comp=comp,
+        synergies=synergies_str,
+        talents="",
+        relic=data.get("relic", ""),
+        level=level,
+        wl=data.get("wl", ""),
+        screenshot=screenshot_rel,
+        notes="",
+    )
+
+
+# ── public API (Ollama) ─────────────────────────────────────────────────────
 
 def parse_screenshot(
     image_path: Path,
@@ -217,10 +264,8 @@ def parse_history_screenshot(
     Parse a MY MATCHES history screen screenshot.
     Returns a list of GameRow (one per visible row), oldest-first order reversed to newest-first.
     """
-    synergy_list = ", ".join(_load_synergies())
     prompt = _load_prompt("parse_history.txt")
     prompt = prompt.replace("$PLAYER_NAME", player_name)
-    prompt = prompt.replace("$SYNERGIES_LIST", synergy_list)
 
     b64 = _image_to_base64(image_path)
     raw = _ollama(model, ollama_url, prompt, [b64])
@@ -240,10 +285,6 @@ def parse_history_screenshot(
     rows = []
     for i, d in enumerate(rows_data):
         synergies_str = str(d.get("synergies") or "")
-        # Strip unknown synergies (?:N) if model couldn't read icons
-        synergies_str = "|".join(
-            p for p in synergies_str.split("|") if not p.startswith("?")
-        )
         comp = _comp_from_synergies(synergies_str)
 
         raw_level = d.get("level")
@@ -257,6 +298,12 @@ def parse_history_screenshot(
         # Use screenshot date + row index as a unique date if relative time shown
         date_str = f"{screenshot_date} (row {i+1}: {date_label})" if date_label else screenshot_date
 
+        notes_parts = ["imported from history"]
+        if d.get("gold"):
+            notes_parts.append(f"gold:{d.get('gold')}")
+        if d.get("rank"):
+            notes_parts.append(f"rank:{d.get('rank')}")
+
         rows.append(GameRow(
             date=date_str,
             placement=str(d.get("placement") or ""),
@@ -267,7 +314,7 @@ def parse_history_screenshot(
             level=level,
             wl=str(d.get("wl") or ""),
             screenshot=image_path.name,
-            notes=f"gold:{d.get('gold','')} imported from history",
+            notes="|".join(notes_parts),
         ))
 
     print(f"[tracker] Parsed {len(rows)} rows from history screenshot.")

@@ -1,0 +1,21 @@
+{
+  "manifest_version": 2,
+  "name": "DAC Translator",
+  "version": "0.1",
+  "description": "Real-time Russian→English subtitles for Twitch streams",
+
+  "permissions": ["activeTab", "storage"],
+
+  "browser_action": {
+    "default_popup": "popup.html",
+    "default_title": "DAC Translator"
+  },
+
+  "content_scripts": [{
+    "matches": ["*://*.twitch.tv/*", "*://*.douyu.com/*"],
+    "js": ["content_script.js"],
+    "run_at": "document_idle"
+  }],
+
+  "web_accessible_resources": ["audio-processor.js"]
+}

@@ -4,36 +4,34 @@ The screen shows a list of past games, one row per game, top to bottom (most rec
 ## Player
 $PLAYER_NAME
 
-## Known Synergies (use ONLY these names)
-$SYNERGIES_LIST
-
 ## What to extract from each row
 
-Each row contains:
-- **placement**: shown as "#X/8" on the left — extract just the number X (1–8)
-- **level**: shown as "LvXX" — extract the number (in-game board level, 1–10 only; ignore chess rank Lv)
-- **synergies**: small count badges showing (4)(2)(2)(2)(1) etc. with synergy icons
-  - Try to identify each synergy by its icon. Use ONLY names from the Known Synergies list.
-  - Format: "Warlock:4|Demon Hunter:2|Hunter:2" (pipe-separated Name:Count, highest count first)
-  - If icons are too small to read reliably, just record the counts as "?:4|?:2|?:2"
-- **gold**: shown as "$XXX" — extract the number
-- **wl**: win-loss record shown as "NN-NN" — extract as-is
-- **date**: any time shown (e.g. "4h ago", "2d ago") — extract as-is
+Each row contains (left to right):
+- **placement**: shown as "#X/8" — extract just the number X (1–8)
+- **level**: shown as "LvXX" next to placement — extract the number (e.g. 22, 19, 11)
+- **synergies**: small icon badges with counts like (4)(3)(2)(2)(1)
+  - Identify each icon using the Known Synergies list. Format: "warlock:4|hunter:2|demonhunter:2" (lowercase, pipe-separated, highest count first)
+  - If an icon is unreadable write "?:N" for that slot
+- **gold**: shown as "$XXX" — extract the number only
+- **wl**: win-loss shown as "NN-NN" — extract as-is
+- **rank**: shown on the far right e.g. "Bishop-1", "Knight-9", "Rook-2" — extract as-is
+- **date**: relative time shown e.g. "just now", "2h ago", "1d ago" — extract as-is
 
 ## Output format
 
-Return ONLY a JSON array, no other text:
+Return ONLY a JSON array — no markdown fences, no explanation:
 [
   {
     "placement": "4",
-    "level": "10",
-    "synergies": "Warlock:4|Hunter:2|Demon Hunter:2",
+    "level": "22",
+    "synergies": "warlock:4|hunter:2|demonhunter:2",
     "gold": "403",
     "wl": "18-10",
-    "date": "4h ago"
+    "rank": "Bishop-1",
+    "date": "just now"
   },
   ...
 ]
 
-Extract ALL rows visible on screen, top to bottom.
-If a field is not clearly readable, use "".
+IMPORTANT: Extract EVERY row visible — count carefully and do not skip any. There are typically 8-10 rows per screen.
+If a field is unclear, use "".

@@ -1,0 +1,87 @@
+{
+  "source": "Auto Chess VPK (workshop item 1613886175) + ref/570_82.jpg",
+  "note": "Player-level relics shown in the Relics column of the in-game item list",
+  "relics": {
+    "item_upgrade_lootbox": {
+      "name": "Weaponsmith",
+      "description": ""
+    },
+    "item_streak_plus": {
+      "name": "Chiaroscuro Certainty",
+      "description": ""
+    },
+    "item_conceal_prepare": {
+      "name": "Shroud of Concealment",
+      "description": ""
+    },
+    "item_free_ban": {
+      "name": "Gaolers Master Key",
+      "description": ""
+    },
+    "item_second_chance": {
+      "name": "Second Chance",
+      "description": ""
+    },
+    "item_egg": {
+      "name": "Greevil Egg",
+      "description": "",
+      "note": "icon missing — need to source correct image"
+    },
+    "item_bench_contract": {
+      "name": "Magic Seed",
+      "description": ""
+    },
+    "item_rm_wheel_of_wonder": {
+      "name": "Wheel of Wonder",
+      "description": ""
+    },
+    "item_double_coin": {
+      "name": "Doubloon",
+      "description": ""
+    },
+    "item_repeat_relic": {
+      "name": "Time-Space Replica",
+      "description": ""
+    },
+    "item_both_leaves": {
+      "name": "Leafy Essence",
+      "description": ""
+    },
+    "item_malefic_rapture": {
+      "name": "Malefic Rapture",
+      "description": ""
+    },
+    "item_more_creep": {
+      "name": "March of the Beasts",
+      "description": ""
+    },
+    "item_magic_box": {
+      "name": "Magic box",
+      "description": ""
+    },
+    "item_double_io": {
+      "name": "Grace of Nature",
+      "description": ""
+    },
+    "item_more_interest": {
+      "name": "The Great Vault",
+      "description": ""
+    },
+    "item_more_reward": {
+      "name": "Sin Reaper",
+      "description": ""
+    },
+    "item_stolen_vault": {
+      "name": "Stolen Vault",
+      "description": ""
+    },
+    "item_upgrade_roll": {
+      "name": "Elite Recruiter",
+      "description": ""
+    },
+    "item_vampiric_embrace": {
+      "name": "Vampire Fangs",
+      "description": ""
+    }
+  }
+}

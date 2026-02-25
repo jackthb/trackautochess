@@ -1,0 +1,18 @@
+{
+	"5": [
+	{"name": "Reaper", "effect": "+1 Gold on awayhome victory"},	
+	{"name": "Reaper", "effect": "+1 Gold on home defeat"}
+	],
+	"10": [	
+	{"name": "Greedy", "effect": "-1 Price for owned pieces"},
+	{"name": "Ascendency", "effect": "Chances to +1 level recruit"}
+	],
+	"25": [	
+	{"name": "Frenzy", "effect": "+25% Lifesteal on damaging courier"},
+	{"name": "Guardian", "effect": "-25% Damage taken on courier"}
+	],
+	"35": [
+	{"name": "Radiance", "effect": "Higher chance to recruit IO"},
+	{"name": "Flourish", "effect": "Max courier level unlocked"}
+	]
+}

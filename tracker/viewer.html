@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>DAC Tracker</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: #0d1117; color: #c9d1d9; font-family: -apple-system, 'Segoe UI', sans-serif; padding: 20px; }
+h1 { color: #58a6ff; margin-bottom: 8px; font-size: 24px; }
+.subtitle { color: #8b949e; margin-bottom: 20px; font-size: 14px; }
+
+.stats { display: flex; gap: 16px; margin-bottom: 24px; flex-wrap: wrap; }
+.stat-card { background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 16px 20px; min-width: 120px; }
+.stat-card .label { color: #8b949e; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; }
+.stat-card .value { color: #f0f6fc; font-size: 28px; font-weight: 700; margin-top: 4px; }
+.stat-card .detail { color: #8b949e; font-size: 12px; margin-top: 2px; }
+
+table { width: 100%; border-collapse: collapse; background: #161b22; border-radius: 8px; overflow: hidden; }
+thead { background: #1c2128; }
+th { text-align: left; padding: 10px 12px; color: #8b949e; font-size: 12px; font-weight: 600;
+     text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid #30363d; }
+td { padding: 10px 12px; border-bottom: 1px solid #21262d; font-size: 14px; }
+tr:hover { background: #1c2128; }
+
+.placement { font-weight: 700; font-size: 18px; display: inline-block; width: 28px; height: 28px;
+             line-height: 28px; text-align: center; border-radius: 4px; }
+.p1 { background: #ffd700; color: #000; }
+.p2 { background: #c0c0c0; color: #000; }
+.p3 { background: #cd7f32; color: #000; }
+.p4 { background: #2d333b; color: #adbac7; }
+.p5, .p6, .p7, .p8 { background: #1c2128; color: #768390; }
+
+.synergy { display: inline-block; background: #1f2937; padding: 2px 8px; border-radius: 4px;
+           margin: 1px 2px; font-size: 12px; white-space: nowrap; }
+.synergy .count { color: #58a6ff; font-weight: 600; }
+
+.wl { font-family: monospace; }
+.win { color: #3fb950; }
+.loss { color: #f85149; }
+.notes { color: #8b949e; font-size: 12px; }
+.empty { color: #484f58; font-style: italic; }
+
+.load-section { margin-bottom: 24px; }
+.load-section input { display: none; }
+.load-btn { background: #238636; color: #fff; border: none; padding: 10px 20px; border-radius: 6px;
+            cursor: pointer; font-size: 14px; font-weight: 600; }
+.load-btn:hover { background: #2ea043; }
+.auto-load { color: #8b949e; font-size: 12px; margin-top: 8px; }
+
+.chart { margin-bottom: 24px; background: #161b22; border: 1px solid #30363d; border-radius: 8px; padding: 16px; }
+.chart-title { color: #8b949e; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px; }
+.chart-bars { display: flex; align-items: flex-end; gap: 4px; height: 100px; }
+.chart-bar { flex: 1; background: #238636; border-radius: 2px 2px 0 0; min-width: 20px; position: relative; }
+.chart-bar:hover { opacity: 0.8; }
+.chart-bar .tip { position: absolute; top: -20px; left: 50%; transform: translateX(-50%);
+                  font-size: 11px; color: #c9d1d9; white-space: nowrap; display: none; }
+.chart-bar:hover .tip { display: block; }
+.chart-labels { display: flex; gap: 4px; margin-top: 4px; }
+.chart-labels span { flex: 1; text-align: center; font-size: 11px; color: #484f58; }
+</style>
+</head>
+<body>
+
+<h1>DAC Game Tracker</h1>
+<div class="subtitle">Dota Auto Chess match history</div>
+
+<div class="load-section">
+  <label class="load-btn" for="csv-input">Load CSV</label>
+  <input type="file" id="csv-input" accept=".csv">
+  <div class="auto-load">Load your ~/.dac/games.csv file</div>
+</div>
+
+<div class="stats" id="stats"></div>
+<div class="chart" id="chart" style="display:none">
+  <div class="chart-title">Placement distribution</div>
+  <div class="chart-bars" id="chart-bars"></div>
+  <div class="chart-labels" id="chart-labels"></div>
+</div>
+<table id="table" style="display:none">
+  <thead>
+    <tr>
+      <th>#</th>
+      <th>Date</th>
+      <th>Comp</th>
+      <th>Synergies</th>
+      <th>Lv</th>
+      <th>W-L</th>
+      <th>Relic</th>
+      <th>Notes</th>
+    </tr>
+  </thead>
+  <tbody id="tbody"></tbody>
+</table>
+
+<script>
+function parseCSV(text) {
+  const lines = text.trim().split('\n');
+  if (lines.length < 2) return [];
+  const headers = lines[0].split(',').map(h => h.trim());
+  const rows = [];
+  for (let i = 1; i < lines.length; i++) {
+    const vals = [];
+    let current = '';
+    let inQuotes = false;
+    for (const ch of lines[i]) {
+      if (ch === '"') { inQuotes = !inQuotes; }
+      else if (ch === ',' && !inQuotes) { vals.push(current.trim()); current = ''; }
+      else { current += ch; }
+    }
+    vals.push(current.trim());
+    const row = {};
+    headers.forEach((h, j) => row[h] = vals[j] || '');
+    rows.push(row);
+  }
+  return rows;
+}
+
+function formatSynergies(str) {
+  if (!str) return '<span class="empty">-</span>';
+  return str.split('|').map(p => {
+    const [name, count] = p.split(':');
+    return `<span class="synergy">${name} <span class="count">${count || ''}</span></span>`;
+  }).join('');
+}
+
+function formatWL(str) {
+  if (!str) return '<span class="empty">-</span>';
+  const parts = str.split('-');
+  if (parts.length === 2) {
+    return `<span class="wl"><span class="win">${parts[0]}</span>-<span class="loss">${parts[1]}</span></span>`;
+  }
+  return str;
+}
+
+function formatPlacement(p) {
+  const n = parseInt(p) || 0;
+  const cls = n >= 1 && n <= 8 ? `p${n}` : '';
+  return `<span class="placement ${cls}">${p || '?'}</span>`;
+}
+
+function render(rows) {
+  // Stats
+  const statsEl = document.getElementById('stats');
+  const total = rows.length;
+  const placements = rows.map(r => parseInt(r.placement)).filter(n => n >= 1 && n <= 8);
+  const avgPlace = placements.length ? (placements.reduce((a,b) => a+b, 0) / placements.length).toFixed(1) : '-';
+  const top4 = placements.filter(p => p <= 4).length;
+  const top4pct = placements.length ? Math.round(top4 / placements.length * 100) : 0;
+  const wins = placements.filter(p => p === 1).length;
+
+  statsEl.innerHTML = `
+    <div class="stat-card"><div class="label">Games</div><div class="value">${total}</div></div>
+    <div class="stat-card"><div class="label">Avg Place</div><div class="value">${avgPlace}</div></div>
+    <div class="stat-card"><div class="label">Top 4</div><div class="value">${top4pct}%</div><div class="detail">${top4}/${placements.length}</div></div>
+    <div class="stat-card"><div class="label">Wins</div><div class="value">${wins}</div></div>
+  `;
+
+  // Placement chart
+  const chartEl = document.getElementById('chart');
+  const barsEl = document.getElementById('chart-bars');
+  const labelsEl = document.getElementById('chart-labels');
+  const dist = {};
+  for (let i = 1; i <= 8; i++) dist[i] = 0;
+  placements.forEach(p => dist[p]++);
+  const maxCount = Math.max(...Object.values(dist), 1);
+  barsEl.innerHTML = '';
+  labelsEl.innerHTML = '';
+  const colors = ['#ffd700','#c0c0c0','#cd7f32','#238636','#238636','#484f58','#484f58','#484f58'];
+  for (let i = 1; i <= 8; i++) {
+    const pct = dist[i] / maxCount * 100;
+    barsEl.innerHTML += `<div class="chart-bar" style="height:${Math.max(pct,2)}%;background:${colors[i-1]}"><span class="tip">${dist[i]}</span></div>`;
+    labelsEl.innerHTML += `<span>${i}</span>`;
+  }
+  chartEl.style.display = total > 0 ? 'block' : 'none';
+
+  // Table
+  const tbody = document.getElementById('tbody');
+  document.getElementById('table').style.display = total > 0 ? 'table' : 'none';
+  tbody.innerHTML = rows.slice().reverse().map(r => `
+    <tr>
+      <td>${formatPlacement(r.placement)}</td>
+      <td>${r.date ? r.date.replace(' ', '<br><small style="color:#8b949e">') + '</small>' : ''}</td>
+      <td>${r.comp || '<span class="empty">-</span>'}</td>
+      <td>${formatSynergies(r.synergies)}</td>
+      <td>${r.level || '<span class="empty">-</span>'}</td>
+      <td>${formatWL(r.wl)}</td>
+      <td>${r.relic ? r.relic.split('|').join(', ') : '<span class="empty">-</span>'}</td>
+      <td class="notes">${r.notes || ''}</td>
+    </tr>
+  `).join('');
+}
+
+document.getElementById('csv-input').addEventListener('change', (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (ev) => {
+    const rows = parseCSV(ev.target.result);
+    render(rows);
+  };
+  reader.readAsText(file);
+});
+</script>
+</body>
+</html>
