@@ -9,7 +9,7 @@ import anthropic
 from .frame_extractor import ExtractedFrame
 
 PROMPTS_DIR = Path(__file__).parent / "prompts"
-DATA_DIR = Path(__file__).parent / "data"
+DATA_DIR = Path(__file__).parent.parent.parent / "data"
 
 MODEL = "claude-sonnet-4-5-20250929"
 
@@ -33,14 +33,15 @@ def _build_full_analysis_prompt() -> str:
     items_data = _load_json("items.json")
 
     units_list = ", ".join(sorted(units_data["units"].keys()))
-    basic_items = ", ".join(items_data["basic_items"])
-    combined_items = ", ".join(sorted(items_data["combined_items"].keys()))
+    by_tier: dict[int, list[str]] = {}
+    for name, info in items_data["items"].items():
+        by_tier.setdefault(info["tier"], []).append(name)
+    items_list = "\n".join(f"Tier {t}: {', '.join(sorted(by_tier[t]))}" for t in sorted(by_tier))
     synergies = sorted({s for u in units_data["units"].values() for s in u["synergies"]})
     synergies_list = ", ".join(synergies)
 
     prompt = prompt.replace("$UNITS_LIST", units_list)
-    prompt = prompt.replace("$BASIC_ITEMS", basic_items)
-    prompt = prompt.replace("$COMBINED_ITEMS", combined_items)
+    prompt = prompt.replace("$ITEMS_LIST", items_list)
     prompt = prompt.replace("$SYNERGIES_LIST", synergies_list)
     return prompt
 

@@ -4,8 +4,7 @@ You are analyzing a screenshot from a Dota Auto Chess (the Dota 2 mod) game VOD.
 $UNITS_LIST
 
 ## Known Items (for reference)
-Basic: $BASIC_ITEMS
-Combined: $COMBINED_ITEMS
+$ITEMS_LIST
 
 ## Known Synergies (for active_synergies field)
 $SYNERGIES_LIST
