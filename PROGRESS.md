@@ -244,7 +244,27 @@ pak = vpk.open('...1613886175.vpk')
 
 ---
 
-## 9. Immediate Next Steps
+## 9. Installer & Auto-Update (Tomorrow)
+
+### Goal
+Proper Windows installer — no Python, no venv, no manual file copying.
+
+### Plan
+| Task | Status | Notes |
+|------|--------|-------|
+| `tracker/updater.py` | 📋 planned | On startup: hit GitHub releases API, download new exe if newer version |
+| `tracker/build.spec` | 📋 planned | PyInstaller config → single `tracker.exe` |
+| `installer/tracker.iss` | 📋 planned | Inno Setup script → `TrackerSetup.exe` with desktop shortcut |
+| `.github/workflows/build.yml` | 📋 planned | GitHub Actions: on push → PyInstaller → Inno Setup → upload release asset |
+
+### End State
+1. Push code → GitHub Actions builds → uploads `TrackerSetup.exe` as GitHub Release
+2. User runs `TrackerSetup.exe` once → installs to Program Files, creates desktop shortcut
+3. Every launch → checks GitHub API → silently self-updates if new version available
+
+---
+
+## 10. Immediate Next Steps
 
 1. Fix prompt issues (streamer name, synergies, xp) now that we have accurate unit/synergy data
 2. Full end-to-end test run with `--no-adaptive` + a stable Ollama model to get complete output
