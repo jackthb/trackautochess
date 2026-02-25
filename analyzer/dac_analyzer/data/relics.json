@@ -1,558 +1,118 @@
 {
-  "source": "Auto Chess VPK (workshop item 1613886175)",
-  "note": "icon field is the AbilityTextureName from npc_items_custom.txt \u2014 corresponds to Dota spellicon/itemicon texture names",
+  "source": "Auto Chess VPK (workshop item 1613886175) + ref/570_82.jpg",
+  "note": "Player-level relics shown in the Relics column of the in-game item list",
   "relics": {
-    "item_ahalimumojing": {
-      "name": "Aghanims Shard",
-      "icon": "aghanims_shard",
-      "quality": "consumable",
-      "max_tier": 5
+    "item_upgrade_lootbox": {
+      "name": "Weaponsmith",
+      "description": ""
     },
-    "item_ahalimushenzhang": {
-      "name": "Aghanims Scepter",
-      "icon": "ultimate_scepter",
-      "quality": "consumable",
-      "max_tier": 5
+    "item_streak_plus": {
+      "name": "Chiaroscuro Certainty",
+      "description": ""
     },
-    "item_aiweinazhiyu": {
-      "name": "Avianas Feather",
-      "icon": "item_avianas_feather",
-      "quality": "rare",
-      "max_tier": 5
+    "item_conceal_prepare": {
+      "name": "Shroud of Concealment",
+      "description": ""
     },
-    "item_anmie": {
-      "name": "Desolator",
-      "icon": "item_desolator",
-      "quality": "epic",
-      "max_tier": 5
+    "item_free_ban": {
+      "name": "Gaolers Master Key",
+      "description": ""
     },
-    "item_aoshuxie": {
-      "name": "Arcane Boots",
-      "icon": "item_arcane_boots",
-      "quality": "rare",
-      "max_tier": 5
+    "item_second_chance": {
+      "name": "Second Chance",
+      "description": ""
     },
-    "item_baojunwangpao": {
-      "name": "Cloak of Tyrants",
-      "icon": "custom/baojunwangpao",
-      "quality": "common",
-      "max_tier": 5
+    "item_egg": {
+      "name": "Greevil Egg",
+      "description": ""
     },
-    "item_bingyan": {
-      "name": "Eye of Skadi",
-      "icon": "item_skadi",
-      "quality": "rare",
-      "max_tier": 5
+    "item_bench_contract": {
+      "name": "Magic Seed",
+      "description": ""
     },
-    "item_bkb": {
-      "name": "Black King Bar",
-      "icon": "item_black_king_bar",
-      "quality": "rare",
-      "max_tier": 5
+    "item_black_gear": {
+      "name": "Black Phase Gear",
+      "description": ""
+    },
+    "item_rm_wheel_of_wonder": {
+      "name": "Wheel of Wonder",
+      "description": ""
+    },
+    "item_double_coin": {
+      "name": "Doubloon",
+      "description": ""
+    },
+    "item_repeat_relic": {
+      "name": "Time-Space Replica",
+      "description": ""
     },
     "item_both_leaves": {
       "name": "Leafy Essence",
-      "icon": "seeds_of_serenity",
-      "quality": "",
-      "max_tier": 0
-    },
-    "item_buxiuzhishouhu": {
-      "name": "Aegis of Immortal",
-      "icon": "item_aegis",
-      "quality": "rare",
-      "max_tier": 5
-    },
-    "item_cantie": {
-      "name": "Sliver",
-      "icon": "custom/jushencantie",
-      "quality": "rare",
-      "max_tier": 5
-    },
-    "item_changdun": {
-      "name": "Pavise",
-      "icon": "item_pavise",
-      "quality": "consumable",
-      "max_tier": 5
-    },
-    "item_chihongjia": {
-      "name": "Crimson Guard",
-      "icon": "item_crimson_guard",
-      "quality": "rare",
-      "max_tier": 5
-    },
-    "item_dadianchui": {
-      "name": "Mjollnir",
-      "icon": "item_mjollnir",
-      "quality": "artifact",
-      "max_tier": 5
-    },
-    "item_dapao": {
-      "name": "Daedalus",
-      "icon": "item_greater_crit",
-      "quality": "artifact",
-      "max_tier": 5
-    },
-    "item_dayunchui": {
-      "name": "Abyssal Blade",
-      "icon": "abyssal_blade",
-      "quality": "common",
-      "max_tier": 5
-    },
-    "item_dianjinshou": {
-      "name": "Hand of Midas",
-      "icon": "item_hand_of_midas",
-      "quality": "common",
-      "max_tier": 5
-    },
-    "item_dongchayandou": {
-      "name": "Pipe of Insight",
-      "icon": "item_pipe",
-      "quality": "rare",
-      "max_tier": 5
-    },
-    "item_fashulengjing": {
-      "name": "Spell Prism",
-      "icon": "spell_prism",
-      "quality": "common",
-      "max_tier": 5
-    },
-    "item_feijiangxiaomao": {
-      "name": "Ascetics Cap",
-      "icon": "item_ascetic_cap",
-      "quality": "rare",
-      "max_tier": 5
-    },
-    "item_fengkuangmianju": {
-      "name": "Mask of Madness",
-      "icon": "item_mask_of_madness",
-      "quality": "rare",
-      "max_tier": 5
-    },
-    "item_fenzhengmiansha": {
-      "name": "Veil of Discord",
-      "icon": "veil_of_discord",
-      "quality": "common",
-      "max_tier": 5
-    },
-    "item_fulingsuo": {
-      "name": "Gleipnir",
-      "icon": "item_gungir",
-      "quality": "epic",
-      "max_tier": 5
-    },
-    "item_fushizhiqiu": {
-      "name": "Orb of Corrosion",
-      "icon": "orb_of_corrosion",
-      "quality": "consumable",
-      "max_tier": 5
-    },
-    "item_gulonghaojiao": {
-      "name": "Minotaur Horn",
-      "icon": "item_minotaur_horn",
-      "quality": "rare",
-      "max_tier": 5
-    },
-    "item_haojie": {
-      "name": "Havoc",
-      "icon": "custom/haojie",
-      "quality": "rare",
-      "max_tier": 5
-    },
-    "item_hongzhang": {
-      "name": "Dagon",
-      "icon": "item_dagon_4",
-      "quality": "epic",
-      "max_tier": 5
-    },
-    "item_huanyingfu": {
-      "name": "Manta Style",
-      "icon": "item_manta",
-      "quality": "common",
-      "max_tier": 5
-    },
-    "item_hudie": {
-      "name": "Butterfly",
-      "icon": "item_butterfly",
-      "quality": "rare",
-      "max_tier": 5
-    },
-    "item_huiguang": {
-      "name": "Kaya",
-      "icon": "kaya",
-      "quality": "common",
-      "max_tier": 5
-    },
-    "item_huiyao": {
-      "name": "Radiance",
-      "icon": "item_radiance",
-      "quality": "epic",
-      "max_tier": 5
-    },
-    "item_jinghunzhiren": {
-      "name": "Diffusal Blade",
-      "icon": "item_diffusal_blade",
-      "quality": "rare",
-      "max_tier": 5
-    },
-    "item_jingmixie": {
-      "name": "Tranquil Boots",
-      "icon": "item_tranquil_boots",
-      "quality": "rare",
-      "max_tier": 5
-    },
-    "item_jingubang": {
-      "name": "Monkey King Bar",
-      "icon": "item_monkey_king_bar",
-      "quality": "artifact",
-      "max_tier": 5
-    },
-    "item_jipin": {
-      "name": "Vladimirs Offering",
-      "icon": "item_vladmir",
-      "quality": "rare",
-      "max_tier": 5
-    },
-    "item_jufengchangji": {
-      "name": "Hurricane Pike",
-      "icon": "item_hurricane_pike",
-      "quality": "epic",
-      "max_tier": 5
-    },
-    "item_jurenzhijie": {
-      "name": "Giants Ring",
-      "icon": "item_giants_ring",
-      "quality": "rare",
-      "max_tier": 5
-    },
-    "item_konglingguajian": {
-      "name": "Null Talisman",
-      "icon": "null_talisman",
-      "quality": "common",
-      "max_tier": 5
-    },
-    "item_kuangzhanfu": {
-      "name": "Battle Fury",
-      "icon": "item_bfury",
-      "quality": "artifact",
-      "max_tier": 5
-    },
-    "item_lieyingzhanren": {
-      "name": "Falcon Blade",
-      "icon": "falcon_blade",
-      "quality": "common",
-      "max_tier": 5
-    },
-    "item_liliangdatiaodao": {
-      "name": "Overwhelming Blink",
-      "icon": "overwhelming_blink",
-      "quality": "rare",
-      "max_tier": 5
-    },
-    "item_lilianghuwan": {
-      "name": "Bracer",
-      "icon": "bracer",
-      "quality": "common",
-      "max_tier": 5
-    },
-    "item_linglichangbian": {
-      "name": "Bullwhip",
-      "icon": "bullwhip",
-      "quality": "common",
-      "max_tier": 5
-    },
-    "item_linkenfaqiu": {
-      "name": "Linkens Sphere",
-      "icon": "item_sphere",
-      "quality": "rare",
-      "max_tier": 5
-    },
-    "item_longxin": {
-      "name": "Heart of Tarrasque",
-      "icon": "item_heart",
-      "quality": "artifact",
-      "max_tier": 5
-    },
-    "item_meiken": {
-      "name": "Mekansm",
-      "icon": "item_mekansm",
-      "quality": "rare",
-      "max_tier": 5
-    },
-    "item_minglingshu": {
-      "name": "Necronomicon",
-      "icon": "item_necronomicon_3",
-      "quality": "epic",
-      "max_tier": 5
-    },
-    "item_minjiedatiaodao": {
-      "name": "Swift Blink",
-      "icon": "swift_blink",
-      "quality": "rare",
-      "max_tier": 5
-    },
-    "item_molongqiang": {
-      "name": "DragonLance",
-      "icon": "dragon_lance",
-      "quality": "epic",
-      "max_tier": 5
-    },
-    "item_qiangxi": {
-      "name": "Assault Cuirass",
-      "icon": "item_assault",
-      "quality": "artifact",
-      "max_tier": 5
-    },
-    "item_qinwangduandao": {
-      "name": "Princes Knife",
-      "icon": "princes_knife",
-      "quality": "epic",
-      "max_tier": 5
-    },
-    "item_qiongguidun": {
-      "name": "Poor Mans Shield",
-      "icon": "item_poor_mans_shield",
-      "quality": "consumable",
-      "max_tier": 5
-    },
-    "item_qishijian": {
-      "name": "Paladin Sword",
-      "icon": "item_paladin_sword",
-      "quality": "rare",
-      "max_tier": 5
-    },
-    "item_rengu": {
-      "name": "Drum of Endurance",
-      "icon": "item_ancient_janggo",
-      "quality": "rare",
-      "max_tier": 5
-    },
-    "item_renjia": {
-      "name": "Blade Mail",
-      "icon": "item_blade_mail",
-      "quality": "rare",
-      "max_tier": 5
-    },
-    "item_sadan": {
-      "name": "Satanic",
-      "icon": "item_satanic",
-      "quality": "artifact",
-      "max_tier": 5
-    },
-    "item_sanchaji": {
-      "name": "Trident",
-      "icon": "item_trident",
-      "quality": "rare",
-      "max_tier": 5
-    },
-    "item_shanbihufu": {
-      "name": "Talisman of Evasion",
-      "icon": "item_talisman_of_evasion",
-      "quality": "rare",
-      "max_tier": 5
-    },
-    "item_shengjian": {
-      "name": "Rapier",
-      "icon": "item_rapier",
-      "quality": "artifact",
-      "max_tier": 5
-    },
-    "item_shenjingdun": {
-      "name": "Mirror Shield",
-      "icon": "item_mirror_shield",
-      "quality": "rare",
-      "max_tier": 5
-    },
-    "item_shirenmozhimao": {
-      "name": "Ogre Hood",
-      "icon": "custom/shirenmozhimao",
-      "quality": "common",
-      "max_tier": 5
-    },
-    "item_shuaxinqiu": {
-      "name": "Refresher Orb",
-      "icon": "item_refresher",
-      "quality": "rare",
-      "max_tier": 5
-    },
-    "item_shuijingjian": {
-      "name": "Crystalys",
-      "icon": "item_lesser_crit",
-      "quality": "rare",
-      "max_tier": 5
-    },
-    "item_suduzhixue": {
-      "name": "Boots of Speed",
-      "icon": "item_boots",
-      "quality": "consumable",
-      "max_tier": 5
-    },
-    "item_suiluchui": {
-      "name": "Skull Basher",
-      "icon": "basher",
-      "quality": "common",
-      "max_tier": 5
-    },
-    "item_tiantangzhiji": {
-      "name": "Heavens Halberd",
-      "icon": "item_heavens_halberd",
-      "quality": "rare",
-      "max_tier": 5
-    },
-    "item_tiaodao": {
-      "name": "Blink Dagger",
-      "icon": "item_blink",
-      "quality": "rare",
-      "max_tier": 5
-    },
-    "item_tiaozhantoujin": {
-      "name": "Hood of Defiance",
-      "icon": "item_hood_of_defiance",
-      "quality": "rare",
-      "max_tier": 5
-    },
-    "item_wangchongtui": {
-      "name": "Spider Leg",
-      "icon": "item_spider_legs",
-      "quality": "common",
-      "max_tier": 5
-    },
-    "item_wangyuanjing": {
-      "name": "Telescope",
-      "icon": "custom/telescope",
-      "quality": "common",
-      "max_tier": 5
-    },
-    "item_wangzhezhijie": {
-      "name": "Ring of Basilius",
-      "icon": "ring_of_basilius",
-      "quality": "consumable",
-      "max_tier": 5
-    },
-    "item_weiguangpifeng": {
-      "name": "Glimmer Cape",
-      "icon": "glimmer_cape",
-      "quality": "consumable",
-      "max_tier": 5
-    },
-    "item_weishijingjia": {
-      "name": "Guardian Greaves",
-      "icon": "item_guardian_greaves",
-      "quality": "epic",
-      "max_tier": 5
-    },
-    "item_wuzhixiaomao": {
-      "name": "Witless Shako",
-      "icon": "witless_shako",
-      "quality": "common",
-      "max_tier": 5
-    },
-    "item_xianfengdun": {
-      "name": "Vanguard",
-      "icon": "item_vanguard",
-      "quality": "rare",
-      "max_tier": 5
-    },
-    "item_xiangweixie": {
-      "name": "Phase Boots",
-      "icon": "phase_boots",
-      "quality": "consumable",
-      "max_tier": 5
-    },
-    "item_xiwa": {
-      "name": "Shivas Guard",
-      "icon": "item_shivas_guard",
-      "quality": "epic",
-      "max_tier": 5
-    },
-    "item_xuanmingdunpai": {
-      "name": "Buckler",
-      "icon": "buckler",
-      "quality": "consumable",
-      "max_tier": 5
-    },
-    "item_xuanwo": {
-      "name": "Maelstrom",
-      "icon": "item_maelstrom",
-      "quality": "rare",
-      "max_tier": 5
-    },
-    "item_xueji": {
-      "name": "Bloodthorn",
-      "icon": "item_bloodthorn",
-      "quality": "rare",
-      "max_tier": 5
-    },
-    "item_xuejingshi": {
-      "name": "Bloodstone",
-      "icon": "item_bloodstone",
-      "quality": "rare",
-      "max_tier": 5
-    },
-    "item_yangdao": {
-      "name": "Scythe of Vyse",
-      "icon": "item_sheepstick",
-      "quality": "common",
-      "max_tier": 5
-    },
-    "item_yinyuezhijing": {
-      "name": "Moon Shard",
-      "icon": "item_moon_shard",
-      "quality": "epic",
-      "max_tier": 5
-    },
-    "item_yonghengzhipan": {
-      "name": "Aeon Disk",
-      "icon": "item_aeon_disk",
-      "quality": "rare",
-      "max_tier": 5
-    },
-    "item_yongqizhiguang": {
-      "name": "Spark of Courage",
-      "icon": "item_spark_of_courage",
-      "quality": "rare",
-      "max_tier": 5
-    },
-    "item_yuanlifazhang": {
-      "name": "Force Staff",
-      "icon": "item_force_staff",
-      "quality": "common",
-      "max_tier": 5
-    },
-    "item_yuanlingxidai": {
-      "name": "Wraith Band",
-      "icon": "wraith_band",
-      "quality": "common",
-      "max_tier": 5
-    },
-    "item_yuanxingxie": {
-      "name": "Travel Boots",
-      "icon": "item_travel_boots",
-      "quality": "rare",
-      "max_tier": 0
-    },
-    "item_zhaohuanshenshi": {
-      "name": "Summoning Stone",
-      "icon": "custom/zhaohuanshenshi",
-      "quality": "rare",
-      "max_tier": 5
-    },
-    "item_zhilidatiaodao": {
-      "name": "Arcane Blink",
-      "icon": "arcane_blink",
-      "quality": "rare",
-      "max_tier": 5
-    },
-    "item_zhipeitoukui": {
-      "name": "Hell of the Dominator",
-      "icon": "helm_of_the_dominator",
-      "quality": "common",
-      "max_tier": 5
-    },
-    "item_zhusidoupeng": {
-      "name": "Gossamer Cape",
-      "icon": "gossamer_cape",
-      "quality": "rare",
-      "max_tier": 5
+      "description": ""
+    },
+    "item_malefic_rapture": {
+      "name": "Malefic Rapture",
+      "description": ""
+    },
+    "item_more_creep": {
+      "name": "March of the Beasts",
+      "description": ""
+    },
+    "item_magic_box": {
+      "name": "Magic box",
+      "description": ""
+    },
+    "item_double_io": {
+      "name": "Grace of Nature",
+      "description": ""
+    },
+    "item_double_lootbox": {
+      "name": "Captain Greenskins Treasure",
+      "description": ""
+    },
+    "item_destroy_piece": {
+      "name": "Monopoly Contract",
+      "description": ""
+    },
+    "item_copy_synergy": {
+      "name": "Rambling Fatebender",
+      "description": ""
+    },
+    "item_friends_discount": {
+      "name": "Family Discount",
+      "description": ""
+    },
+    "item_more_interest": {
+      "name": "The Great Vault",
+      "description": ""
+    },
+    "item_more_reward": {
+      "name": "Sin Reaper",
+      "description": ""
+    },
+    "item_stolen_vault": {
+      "name": "Stolen Vault",
+      "description": ""
+    },
+    "item_upgrade_roll": {
+      "name": "Elite Recruiter",
+      "description": ""
+    },
+    "item_shrink_meister": {
+      "name": "Unstable Shrink Ray",
+      "description": ""
+    },
+    "item_vampiric_embrace": {
+      "name": "Vampire Fangs",
+      "description": ""
+    },
+    "item_card_chance": {
+      "name": "Card: Chance",
+      "description": ""
+    },
+    "item_card_fate": {
+      "name": "Card: Fate",
+      "description": ""
     }
   }
 }
