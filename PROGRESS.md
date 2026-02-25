@@ -130,9 +130,13 @@ tracker/
 ├── image_utils.py            Synergy icon crops (calibrated for 3440×1440 ultrawide)
 ├── importer.py               Import old match CSV
 ├── prompts/
-│   ├── parse_endgame.txt     (old single-call prompt — unused)
-│   └── parse_endgame_main.txt  Main fields prompt (placement, level, wl, talents, relic)
-└── requirements.txt          mss, pillow, httpx (pynput Windows-only)
+│   ├── parse_endgame.txt       (old single-call prompt — unused)
+│   ├── parse_endgame_main.txt  Main fields prompt (placement, level, wl, talents, relic)
+│   └── parse_history.txt       MY MATCHES history screen prompt
+├── icons/
+│   ├── synergies/              35 PNGs — one per synergy (32 Steam CDN + 3 VPK)
+│   └── relics/                 28 PNGs — one per relic (4 Steam CDN + 24 VPK flash3/)
+└── requirements.txt            mss, pillow, httpx (pynput Windows-only)
 ```
 
 ### CSV Schema
@@ -150,16 +154,29 @@ tracker/
 | Hotkey listener | ✅ done | pynput GlobalHotKeys, configurable |
 | Screenshot capture | ✅ done | mss → JPEG |
 | CSV writer | ✅ done | creates header on first run |
-| Two-call parser | ✅ done | synergy crops + main fields |
+| Two-call Ollama parser | ✅ done | synergy crops + main fields |
 | Importer | ✅ done | `python main.py import <file> [--dry-run]` |
+| History import | ✅ done | `python main.py import-history <screenshot> [--dry-run]` |
+| Synergy + relic icons | ✅ done | 35 synergy + 28 relic PNGs in `tracker/icons/` |
+| CV pipeline (EasyOCR + template match) | 📋 planned | replace Ollama with fast deterministic CV |
 | Live end-to-end test | ⏳ not done | needs Windows + Ollama running |
-| Relic list in prompt | 📋 planned | inject known relic names like we do synergies |
-| Icon extraction | 📋 planned | extract synergy/relic icons from VPK for reference images |
+| Installer + auto-update | 📋 planned | see Section 9 |
+
+### CV Pipeline Plan (replaces Ollama)
+| Field | Method |
+|-------|--------|
+| Placement, level, W-L, gold | EasyOCR |
+| Synergy names + counts | OpenCV template match icons + OCR count numbers |
+| Relic | OpenCV template match against `icons/relics/` |
+| Talents | OpenCV template match |
+
+Zero Ollama calls needed once built. Sub-second per screenshot.
+Dependencies to add: `easyocr`, `opencv-python`
 
 ### Known Issues
-- Relic detection: model guesses freely — need known list injected + reference icons
-- `is_hunter` = Archer/Hunter synergy (not a separate "Archer" name)
-- `is_demonhunter` = Demon Hunter synergy
+- `is_hunter` = Hunter/Archer synergy internally
+- `is_demonhunter` = Demon Hunter synergy internally
+- Harpy synergy icon missing from CDN — needs manual sourcing
 
 ---
 
