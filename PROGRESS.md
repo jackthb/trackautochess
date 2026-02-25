@@ -6,6 +6,7 @@
 dac-tools/
 ├── analyzer/       Python VOD analyzer CLI
 ├── scraper/        Puppeteer scraper for autochess.site
+├── tracker/        Hotkey game tracker (end-of-game screenshot → CSV)
 └── data/           Shared game data (source of truth)
 ```
 
@@ -114,7 +115,109 @@ Accurate per-frame game state extraction from VOD screenshots. Currently uses Cl
 
 ---
 
-## 5. Ideas Backlog
+## 5. Game Tracker (tracker/)
+
+### Goal
+Background app: press hotkey at end of game → screenshot → local Ollama vision parses it → row appended to `~/.dac/games.csv`.
+
+### Files
+```
+tracker/
+├── main.py                   Hotkey listener (pynput), config prompt, import subcommand
+├── capture.py                mss fullscreen → JPEG saved to ~/.dac/screenshots/
+├── csv_writer.py             GameRow dataclass + append/read CSV
+├── parser.py                 Two-call Ollama approach
+├── image_utils.py            Synergy icon crops (calibrated for 3440×1440 ultrawide)
+├── importer.py               Import old match CSV
+├── prompts/
+│   ├── parse_endgame.txt     (old single-call prompt — unused)
+│   └── parse_endgame_main.txt  Main fields prompt (placement, level, wl, talents, relic)
+└── requirements.txt          mss, pillow, httpx (pynput Windows-only)
+```
+
+### CSV Schema
+`date, placement, comp, synergies, talents, relic, level, wl, screenshot, notes`
+
+### Two-call Parse Approach
+1. **Call 1** — send two synergy-area crops → model returns JSON `[{name, count}]`
+   - Crop 1 (GAME OVER table): x 28–52%, y 11–24%
+   - Crop 2 (Final Ranking floating badges): x 12–45%, y 32–58%
+2. **Call 2** — full screenshot + pre-filled synergies → placement/level/wl/talents/relic
+
+### Status
+| Task | Status | Notes |
+|------|--------|-------|
+| Hotkey listener | ✅ done | pynput GlobalHotKeys, configurable |
+| Screenshot capture | ✅ done | mss → JPEG |
+| CSV writer | ✅ done | creates header on first run |
+| Two-call parser | ✅ done | synergy crops + main fields |
+| Importer | ✅ done | `python main.py import <file> [--dry-run]` |
+| Live end-to-end test | ⏳ not done | needs Windows + Ollama running |
+| Relic list in prompt | 📋 planned | inject known relic names like we do synergies |
+| Icon extraction | 📋 planned | extract synergy/relic icons from VPK for reference images |
+
+### Known Issues
+- Relic detection: model guesses freely — need known list injected + reference icons
+- `is_hunter` = Archer/Hunter synergy (not a separate "Archer" name)
+- `is_demonhunter` = Demon Hunter synergy
+
+---
+
+## 6. VPK Datamine
+
+### Auto Chess Workshop VPK
+**Path:** `/mnt/c/Program Files (x86)/Steam/steamapps/workshop/content/570/1613886175/1613886175.vpk`
+
+**Access:**
+```python
+import sys
+sys.path.insert(0, 'tracker/.venv/lib/python3.12/site-packages')
+import vpk
+pak = vpk.open('...1613886175.vpk')
+```
+
+### Key Files Inside VPK
+| File | Contents |
+|------|----------|
+| `scripts/npc/npc_abilities_custom.txt` | 36 synergies + their Dota ability icon texture names |
+| `scripts/npc/npc_units_custom.txt` | All units — HP, attack, synergy assignments (Ability1/2) |
+| `scripts/npc/npc_items_custom.txt` | Chess piece equipment items (NOT player relics — see note) |
+| `resource/addon_english.txt` | English localisation — unit names, item names, rank labels |
+| `panorama/images/custom_game/chess_icon/` | 99 unit portrait `.vtex_c` images |
+| `panorama/images/custom_game/skaters/` | 416 hero portrait `.vtex_c` images (h001–h4xx) |
+
+### Synergy → Dota Icon Texture Mapping (key ones)
+| Synergy | Internal | Dota texture |
+|---------|----------|--------------|
+| Warlock | `is_warlock` | `warlock_upheaval` |
+| Demon Hunter | `is_demonhunter` | `custom/terrorblade_metamorphosis_alt1_png` |
+| Hunter (Archer) | `is_hunter` | `drow_ranger_marksmanship` |
+| Assassin | `is_assassin` | `silencer_gaives_of_wisdom` |
+| Demon | `is_demon` | `custom/nevermore_dark_lord_demon_png` |
+| Knight | `is_knight` | `chaos_knight_phantasm` |
+| Dragon | `is_dragon` | `lina_dragon_slave_alt1` |
+| Mage | `is_mage` | `crystal_maiden_brilliance_aura` |
+
+### Icon Locations
+- **Standard icons** (most synergies + relics): inside Dota 2 main VPK as `.vtex_c`
+  - `/mnt/c/.../dota 2 beta/game/dota/pak01_dir.vpk`
+  - Need VRF decompiler or CDN download to get PNGs
+- **Custom icons** (`custom/` prefix): inside workshop VPK above
+- **No loose PNGs exist** — everything is compiled `.vtex_c`
+
+### Extracted Data
+- `analyzer/dac_analyzer/data/relics.json` — extracted from VPK but **flagged as incorrect by user** (npc_items_custom.txt has chess piece equipment, not player relics)
+- `analyzer/dac_analyzer/data/units.json` — 114 units from scraper (accurate)
+- `analyzer/dac_analyzer/data/items.json` — 76 items from scraper
+
+### TODO
+- [ ] Identify correct source of player relic definitions in VPK
+- [ ] Extract `.vtex_c` icons → PNG (VRF tool or CDN)
+- [ ] Build synergy icon reference sheet for vision model
+
+---
+
+## 7. Ideas Backlog
 
 | Idea | Notes |
 |------|-------|
@@ -128,7 +231,7 @@ Accurate per-frame game state extraction from VOD screenshots. Currently uses Cl
 
 ---
 
-## Known Bugs
+## 8. Known Bugs
 
 | Bug | Severity | Status |
 |-----|----------|--------|
@@ -141,7 +244,7 @@ Accurate per-frame game state extraction from VOD screenshots. Currently uses Cl
 
 ---
 
-## Immediate Next Steps
+## 9. Immediate Next Steps
 
 1. Fix prompt issues (streamer name, synergies, xp) now that we have accurate unit/synergy data
 2. Full end-to-end test run with `--no-adaptive` + a stable Ollama model to get complete output

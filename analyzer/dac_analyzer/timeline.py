@@ -186,12 +186,14 @@ def _detect_level_ups(frames: list[dict]) -> list[GameEvent]:
         if level is None:
             continue
         if prev_level is not None and level > prev_level:
+            gold = frame.get("gold")
+            gold_note = f" | {gold}g" if gold is not None else ""
             events.append(GameEvent(
                 round=frame.get("round"),
                 timestamp_sec=frame["timestamp_sec"],
                 event_type="level_up",
-                description=f"Leveled up to {level}",
-                details={"from_level": prev_level, "to_level": level},
+                description=f"Leveled up {prev_level}→{level}{gold_note}",
+                details={"from_level": prev_level, "to_level": level, "gold": gold},
             ))
         prev_level = level
 

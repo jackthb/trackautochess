@@ -1,0 +1,53 @@
+You are analyzing a Dota Auto Chess end-game screenshot to extract match result fields.
+The synergies have ALREADY been determined by a separate step — do NOT re-read them from the board.
+
+## Player
+$PLAYER_NAME
+
+## Synergies (already determined — do not change)
+$SYNERGIES_RESULT
+
+## What to extract from this screenshot
+
+### Placement
+- GAME OVER table: the row number for "$PLAYER_NAME" (1 = first place)
+- Final Ranking overlay: the number from "Final Ranking X/8" or "第X名"
+
+### Level (in-game board level, 1–10)
+- GAME OVER table: the "Lv" column value for "$PLAYER_NAME"
+- Final Ranking: shown at the bottom bar near the XP progress indicator
+- IMPORTANT: "Lv XX" shown next to a chess rank badge (Bishop-1, Knight-8 etc.) is NOT the game level — it is the chess ranking XP. The game level is always ≤ 10.
+
+### W-L record
+- Format "NN-NN" (e.g. "21-17"). Found in the W-L column of the table or stats panel.
+- IMPORTANT: "Final Ranking X/8" is a placement indicator, NOT the W-L record. The W-L always has two numbers separated by a dash and both are typically 10 or higher (e.g. "21-17", "25-14").
+
+### Talents
+- GAME OVER table: the "Talent" column for "$PLAYER_NAME" — a small icon indicating a chosen talent bonus
+- If a talent icon is visible, describe or name it; otherwise ""
+
+### Comp (human-readable name)
+- Infer from the already-determined synergies above (e.g. "4 Warlocks, 2 Demon Hunters")
+- Do not use chess rank names (Bishop, Rook, Knight, etc.)
+
+### Relic
+- A distinct special item icon. Ignore chess rank badges and chat messages.
+- If not clearly visible, use ""
+
+### Notes
+- Any uncertainty or observations
+
+## CRITICAL DISTINCTIONS
+- Chess rank badges like "Bishop-1", "Knight-8" are account tier labels — NOT synergies, NOT talents, NOT relics
+- Chat messages are not game data
+
+Respond with ONLY a JSON object:
+{
+  "placement": "<1-8>",
+  "comp": "<human-readable name from synergies>",
+  "talents": "<talent name or empty string>",
+  "relic": "<relic name or empty string>",
+  "level": "<1-10 or empty string>",
+  "wl": "<NN-NN or empty string>",
+  "notes": "<observations>"
+}

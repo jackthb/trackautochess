@@ -35,10 +35,13 @@ def _build_full_analysis_prompt() -> str:
     units_list = ", ".join(sorted(units_data["units"].keys()))
     basic_items = ", ".join(items_data["basic_items"])
     combined_items = ", ".join(sorted(items_data["combined_items"].keys()))
+    synergies = sorted({s for u in units_data["units"].values() for s in u["synergies"]})
+    synergies_list = ", ".join(synergies)
 
     prompt = prompt.replace("$UNITS_LIST", units_list)
     prompt = prompt.replace("$BASIC_ITEMS", basic_items)
     prompt = prompt.replace("$COMBINED_ITEMS", combined_items)
+    prompt = prompt.replace("$SYNERGIES_LIST", synergies_list)
     return prompt
 
 

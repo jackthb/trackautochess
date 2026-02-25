@@ -7,3 +7,6 @@ analyzer/**/*.egg-info/
 data/*.png
 data/debug_*.txt
 data/filter_*.txt
+__pycache__/
+*.pyc
+tracker/.venv/

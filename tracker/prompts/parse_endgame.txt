@@ -1,0 +1,84 @@
+You are analyzing screenshots from a Dota Auto Chess game end screen.
+You will receive THREE images:
+- Image 1: full screenshot (GAME OVER table or Final Ranking overlay)
+- Image 2: close-up of the BOTTOM BAR of image 1 — in Final Ranking view, the active synergy panel appears here as a row of icons each with a count badge like (4)(2)(2)(1)
+- Image 3: close-up of the TOP of image 1 — in GAME OVER view, this contains jack's table row with Synergies, Talent, and Relic columns clearly visible
+
+Use images 2 and 3 to read synergy icons at higher resolution. Each synergy badge shows an icon identifying the synergy type alongside its count. Read the icons from image 2 or image 3 — do NOT infer synergies by counting unit models on the board.
+
+## Player Name
+The player to find results for: $PLAYER_NAME
+
+## Known Synergies (use ONLY these names — exact match required)
+$SYNERGIES_LIST
+
+---
+
+## CRITICAL DISTINCTIONS — READ CAREFULLY
+
+### Chess Rank vs Game Level
+Players have a **chess rank badge** showing their account tier: Pawn, Knight, Bishop, Rook, Queen, King.
+This badge often shows "Lv XX" beneath it (e.g. "Bishop-1 / Lv 20") — this is the **chess ranking XP level**, NOT the in-game board level.
+The **in-game board level** (1–10) is shown at the **bottom of the screen** near the XP progress bar (small number, usually 8–11). Report ONLY the in-game board level. Never report the chess rank "Lv XX" as the game level.
+
+### Chess Rank names are NOT synergies and NOT talents
+"Bishop", "Rook", "Queen", "King", "Knight", "Pawn" followed by a dash and number (e.g. "Bishop-1", "Knight-4") are account-tier rank badges. Do NOT list them as synergies or talents. They are irrelevant to the game result.
+
+### Chat messages are NOT relics or game data
+Ignore all text in the in-game chat panel.
+
+### How to read synergies
+Active synergy counts are shown as a row of small badges, each with a synergy icon and a number: e.g. "(4) (2) (2) (1)". This means there are 4 active synergies with those counts. Identify each synergy by its icon.
+**Read those badge numbers directly — do NOT count unit models on the board.** Board unit counts do not equal synergy counts.
+Output ALL synergy badges you can read, not just the top one or two.
+
+### Synergy output format
+Use PIPE "|" as separator. Use EXACT names from the Known Synergies list (e.g. "Troll" not "Trolls", "Knight" not "Knights").
+Example: Knight:4|Troll:2|Demon:2|Warlock:1
+
+### Talents
+Talents are in-game passive bonuses chosen from a talent selection menu during the match. They appear in a "Tal" column in the final scoreboard (dac3-style). They are NOT chess rank names. If no talent column or talent info is visible, output "".
+
+---
+
+## What to Extract
+
+### Type 1: GAME OVER Table
+A results table listing all 8 players. Find the row for "$PLAYER_NAME".
+- **placement**: row number, 1 = first place
+- **synergies**: read the synergy count badges in that row
+- **level**: in-game board level from the Lv column (1–10 range; if value seems >10, it is the chess rank level — use "" instead)
+- **wl**: the W-L column (format "NN-NN")
+- **talents**: any talent icons or names visible for that player's row; else ""
+- **relic**: only if a distinct relic item icon is visible; else ""
+
+### Type 2: Final Ranking Overlay
+Shows "Final Ranking X/8" with the player's board visible.
+- **placement**: X from "Final Ranking X/8"
+- **synergies**: read the "(N)" synergy count badges shown below the player's piece count (NOT by counting board units). Each badge shows the synergy icon + count — identify the synergy name from the icon.
+- **level**: in-game board level shown at the bottom bar near the XP progress bar (1–10 range). Ignore "Lv XX" shown next to the chess rank badge.
+- **wl**: W-L record from any visible stats panel (format "NN-NN"); else ""
+- **talents**: if a Talents column ("Tal") or talent panel is visible, list the chosen talent names pipe-separated; else ""
+- **relic**: distinct relic item icon name if clearly visible; else ""
+
+---
+
+## Output Rules
+- **comp**: human-readable name from dominant synergies (e.g. "6 Knights, 4 Trolls"). No chess rank names.
+- **synergies**: pipe-separated "Name:Count" pairs, highest count first. Only names from the Known Synergies list.
+- **talents**: pipe-separated talent names, or "" if not visible
+- **level**: single integer 1–10, or "" if not clearly readable
+- **wl**: "NN-NN" format, or ""
+- **relic**: item name, or ""
+
+Respond with ONLY a JSON object, no other text:
+{
+  "placement": "<1-8>",
+  "comp": "<human-readable comp name>",
+  "synergies": "<pipe-separated Name:Count pairs>",
+  "talents": "<pipe-separated talent names or empty string>",
+  "relic": "<relic name or empty string>",
+  "level": "<level 1-10 or empty string>",
+  "wl": "<win-loss string e.g. 21-17, or empty string>",
+  "notes": "<any observations or uncertainty>"
+}

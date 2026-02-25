@@ -7,6 +7,9 @@ $UNITS_LIST
 Basic: $BASIC_ITEMS
 Combined: $COMBINED_ITEMS
 
+## Known Synergies (for active_synergies field)
+$SYNERGIES_LIST
+
 ## What to Extract
 
 Look carefully at the entire screenshot and extract:
@@ -15,15 +18,24 @@ Look carefully at the entire screenshot and extract:
 2. **Phase**: "preparation" (shopping/placing), "combat" (fighting), "between" (results)
 3. **Player HP**: The spectated player's health points
 4. **Gold**: Current gold amount (usually bottom of screen near shop)
-5. **Level/XP**: Player level and experience if visible
-6. **Win/Loss streak**: If a streak indicator is visible
-7. **Board units**: All units placed on the chess board. For each unit identify:
+5. **Level/XP**: Level is a single number (e.g., 7). XP shows as a small "current/needed"
+   pair near the level indicator at the bottom (e.g., 3/6 = 3 XP, needs 6 to level).
+   Do NOT confuse with player_hp (large number near the player avatar/heart icon).
+6. **Win/Loss streak**: Streak is a consecutive win or loss COUNT shown as a small badge
+   icon with a number (e.g., a fire icon showing "3" = win_3). Do NOT capture the
+   post-combat result banner (the large "WIN" or "LOSE" text shown after a battle ends).
+7. **Board units**: All units placed on the chess board. Unit names MUST exactly match
+   the Known Units list above — do not include player names, streamer names, or any
+   other on-screen text. For each unit identify:
    - Unit name (match to known units list above)
    - Star level (1, 2, or 3 stars - look for star icons above units)
    - Approximate position (front/mid/back + left/center/right)
    - Any items equipped (glowing effects or item icons on the unit)
-8. **Bench units**: Units sitting on the bench (bottom row, not on the board)
-9. **Active synergies**: Synergy panel usually on the left side of the screen
+8. **Bench units**: Units on the bench (bottom row). Also check any side panel or
+   roster view if visible.
+9. **Active synergies**: The synergy panel on the LEFT side of the screen. Synergy names
+   MUST exactly match the Known Synergies list above (e.g., Elf, Hunter, Warrior).
+   Do NOT list individual unit names here.
 10. **Shop offerings**: The 5 units available in the shop (if visible, usually at the bottom)
 
 ## Important Notes
