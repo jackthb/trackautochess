@@ -242,6 +242,31 @@ class TrayApp:
         else:
             self._notify(APP_NAME, "viewer.html not found.")
 
+    def _import_history(self, _icon=None, _item=None) -> None:
+        """Open file picker, parse MY MATCHES screenshot, import rows."""
+        import tkinter as tk
+        from tkinter import filedialog
+
+        # tkinter needs a root window (hidden)
+        root = tk.Tk()
+        root.withdraw()
+        path = filedialog.askopenfilename(
+            title="Select MY MATCHES screenshot",
+            filetypes=[("Images", "*.jpg *.jpeg *.png"), ("All files", "*.*")],
+            initialdir=str(Path.home() / "Pictures"),
+        )
+        root.destroy()
+
+        if not path:
+            return  # user cancelled
+
+        path = Path(path)
+        print(f"[tray] Import history: {path}")
+        threading.Thread(
+            target=self._do_parse, args=(path, "my_matches"),
+            daemon=True, name="import-history",
+        ).start()
+
     def _check_updates(self, _icon=None, _item=None) -> None:
         """Manual update check."""
         from updater import check_for_update, open_release_page
@@ -268,6 +293,7 @@ class TrayApp:
         """Start the tray app (blocks until quit)."""
         menu = pystray.Menu(
             pystray.MenuItem("Parse Now", self._parse_pending, default=True),
+            pystray.MenuItem("Import History Screenshot...", self._import_history),
             pystray.Menu.SEPARATOR,
             pystray.MenuItem("Open CSV", self._open_csv),
             pystray.MenuItem("Open Viewer", self._open_viewer),
