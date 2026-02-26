@@ -190,6 +190,24 @@ def _find_player_row(img: np.ndarray, player_name: str, debug: bool = False) -> 
         if pname in text2:
             return i
 
+    # Strategy 3: overlapping windows (half-row offset) to catch names
+    # split across row boundaries
+    if debug:
+        print("  Trying overlapping windows...")
+    row_h = (TABLE_Y_END - TABLE_Y_START) / N_ROWS
+    for i in range(N_ROWS - 1):
+        y0 = TABLE_Y_START + (i + 0.5) * row_h
+        y1 = y0 + row_h
+        cell = _crop_row(img, COL_PLAYER, y0, y1)
+        processed = _preprocess_for_ocr(cell, scale=2.0)
+        text = _ocr(processed, psm=6).lower()
+        if debug:
+            print(f"  overlap {i}-{i+1} OCR: {text!r}")
+        if pname in text:
+            # Name straddles boundary — assign to the row with more overlap
+            # (i+1 since name starts at bottom of row i)
+            return i + 1
+
     if debug:
         print(f"  WARNING: player '{player_name}' not found in table")
     return None
@@ -377,7 +395,7 @@ def _ocr_synergy_counts(
 # Each row shows: position, player name, level, rank (e.g. "Bishop-1").
 # We scan rows to find the player name, then extract the adjacent rank.
 RANK_PANEL_X = (0.0, 0.17)
-RANK_PANEL_Y = (0.12, 0.68)
+RANK_PANEL_Y = (0.165, 0.68)
 RANK_PANEL_ROWS = 8
 RANK_NAMES = ("Pawn", "Knight", "Bishop", "Rook", "King", "Queen")
 
@@ -426,17 +444,22 @@ def extract_rank_from_panel(img: np.ndarray, player_name: str, debug: bool = Fal
             print(f"  [rank panel] player '{player_name}' not found in sidebar")
         return ""
 
-    # Try progressively wider windows until we find a rank word
+    # Search for rank text in the player's row, expanding only DOWNWARD
+    # (rank badge sits below the player name in the same row).
+    # Avoid expanding upward — that reads the previous player's rank.
     rank_re = re.compile(
         r"(" + "|".join(RANK_NAMES) + r")[\s\-]*(\d)",
         re.IGNORECASE,
     )
     for extra in (0, 0.5, 1.0):
-        ry0 = max(py0, py0 + int((player_row - extra) * row_h))
+        ry0 = py0 + player_row * row_h
         ry1 = min(py1, py0 + int((player_row + 1 + extra) * row_h))
         text = _ocr_strip(ry0, ry1)
-        m = rank_re.search(text)
-        if m:
+        # Find ALL rank matches and pick the LAST one (closest to player,
+        # since player name is at top and rank badge is below)
+        matches = list(rank_re.finditer(text))
+        if matches:
+            m = matches[-1]
             rank = f"{m.group(1).title()}-{m.group(2)}"
             if debug:
                 print(f"  [rank panel] found rank={rank!r} in: {text!r}")
