@@ -129,10 +129,18 @@ class TrayApp:
         import cv2
         from cv_parser import detect_screen_type
 
+        poll_count = 0
         while not self._stop_event.is_set():
             time.sleep(POLL_INTERVAL)
+            poll_count += 1
 
-            if not is_dota_focused():
+            dota_focused = is_dota_focused()
+            # Log status every 12 polls (60s)
+            if poll_count % 12 == 0:
+                status = "Dota 2 focused" if dota_focused else "waiting for Dota 2"
+                print(f"[tray] alive — {status} (poll #{poll_count})")
+
+            if not dota_focused:
                 continue
             if time.time() < self.cooldown_until:
                 continue
@@ -313,6 +321,9 @@ class TrayApp:
         start_update_loop(self._on_update_available)
 
         print(f"[tray] {APP_NAME} running. Right-click tray icon for menu.")
+        print(f"[tray] CSV: {self.games_csv}")
+        print(f"[tray] Polling every {POLL_INTERVAL}s when Dota 2 is focused.")
+        self._notify(APP_NAME, "Running in system tray.\nWill detect game screens when Dota 2 is focused.")
         icon.run()
 
 
