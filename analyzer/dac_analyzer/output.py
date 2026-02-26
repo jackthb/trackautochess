@@ -4,6 +4,7 @@ import json
 from dataclasses import asdict
 from pathlib import Path
 
+from .helpers import classify_round as _classify_round, format_unit as _format_unit
 from .timeline import GameTimeline
 
 
@@ -35,17 +36,6 @@ def save_json(timeline: GameTimeline, output_path: Path) -> None:
     output_path.write_text(json.dumps(data, indent=2, default=_serialize))
 
 
-def _classify_round(round_num: int | None) -> str:
-    """Classify a round into early/mid/late game."""
-    if round_num is None:
-        return "unknown"
-    if round_num <= 10:
-        return "early"
-    if round_num <= 25:
-        return "mid"
-    return "late"
-
-
 def _get_final_comp(timeline: GameTimeline) -> dict:
     """Extract the final board composition from the last valid frame."""
     for frame in reversed(timeline.frames):
@@ -57,14 +47,6 @@ def _get_final_comp(timeline: GameTimeline) -> dict:
                 "level": frame.get("level"),
             }
     return {}
-
-
-def _format_unit(unit: dict) -> str:
-    star = "*" * unit.get("star_level", 1)
-    items = ""
-    if unit.get("items"):
-        items = f" [{', '.join(unit['items'])}]"
-    return f"{unit['name']}{star}{items}"
 
 
 def generate_summary(timeline: GameTimeline) -> str:

@@ -13,6 +13,8 @@ import subprocess
 import sys
 from pathlib import Path
 
+from utils import unit_stem as _unit_stem
+
 
 # ── Name mapping: DAC unit name → Dota 2 wiki hero name ─────────────────────
 # Only entries that differ from the default transform (spaces→underscores).
@@ -34,11 +36,6 @@ BROWSER_UA = (
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
     "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
 )
-
-
-def _unit_stem(name: str) -> str:
-    """Convert unit name to a safe filename stem (lowercase, spaces→_)."""
-    return name.lower().replace(" ", "_").replace("-", "_").replace("'", "")
 
 
 def _wiki_name(dac_name: str) -> str | None:

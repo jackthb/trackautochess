@@ -20,6 +20,8 @@ try:
 except ImportError:
     pytesseract = None
 
+from utils import crop as _crop, ocr as _ocr, unit_stem as _unit_stem
+
 
 # ── Region constants ─────────────────────────────────────────────────────────
 # All values as fractions of image (width, height).
@@ -81,29 +83,9 @@ UNIT_MATCH_THRESHOLD = 0.65
 
 # ── Helpers ──────────────────────────────────────────────────────────────────
 
-def _crop(img: np.ndarray, x0: float, y0: float, x1: float, y1: float) -> np.ndarray:
-    """Crop image using fractional coords (0..1)."""
-    h, w = img.shape[:2]
-    return img[int(h * y0):int(h * y1), int(w * x0):int(w * x1)]
-
-
 def _crop_row(img: np.ndarray, col: tuple[float, float], row_y0: float, row_y1: float) -> np.ndarray:
     """Crop a cell: column x-extent × row y-extent."""
     return _crop(img, col[0], row_y0, col[1], row_y1)
-
-
-def _ocr(img: np.ndarray, psm: int = 7, whitelist: str = "") -> str:
-    """OCR a small image region. Returns stripped text."""
-    if pytesseract is None:
-        return ""
-    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY) if len(img.shape) == 3 else img
-    config = f"--psm {psm}"
-    if whitelist:
-        config += f" -c tessedit_char_whitelist={whitelist}"
-    try:
-        return pytesseract.image_to_string(gray, config=config).strip()
-    except Exception:
-        return ""
 
 
 def _ocr_data(img: np.ndarray, psm: int = 6) -> dict:
@@ -572,11 +554,6 @@ def parse_game_over(
 
 
 # ── MY MATCHES parser ────────────────────────────────────────────────────────
-
-def _unit_stem(name: str) -> str:
-    """Convert unit name to the filename stem used by download_unit_icons.py."""
-    return name.lower().replace(" ", "_").replace("-", "_").replace("'", "")
-
 
 def _find_my_matches_rows(img: np.ndarray, debug: bool = False) -> list[tuple[float, float]]:
     """Find row y-spans by scanning for dark separator bands, then extrapolating.

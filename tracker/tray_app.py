@@ -9,7 +9,6 @@ Usage:
 """
 
 import ctypes
-import json
 import os
 import subprocess
 import sys
@@ -41,10 +40,7 @@ _setup_tesseract()
 
 # ── Config ────────────────────────────────────────────────────────────────────
 
-DAC_DIR = Path.home() / ".dac"
-CONFIG_PATH = DAC_DIR / "config.json"
-GAMES_CSV = DAC_DIR / "games.csv"
-ICONS_DIR = Path(__file__).parent.parent / "data" / "icons"
+from utils import load_config, DAC_DIR, GAMES_CSV, ICONS_DIR
 
 POLL_INTERVAL = 5       # seconds between screen checks
 COOLDOWN_SECS = 30      # seconds after detection before re-checking
@@ -61,21 +57,6 @@ def is_dota_focused() -> bool:
         return "Dota 2" in buf.value
     except Exception:
         return False
-
-
-# ── Config ────────────────────────────────────────────────────────────────────
-
-def load_config() -> dict:
-    """Load config from ~/.dac/config.json, creating defaults if missing."""
-    if CONFIG_PATH.exists():
-        return json.loads(CONFIG_PATH.read_text())
-    DAC_DIR.mkdir(parents=True, exist_ok=True)
-    config = {
-        "player_name": "jack",
-        "games_csv": str(GAMES_CSV),
-    }
-    CONFIG_PATH.write_text(json.dumps(config, indent=2))
-    return config
 
 
 # ── Tray icon ─────────────────────────────────────────────────────────────────

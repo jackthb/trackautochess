@@ -6,38 +6,11 @@ Usage:
     python main.py import <file> --dry-run
 """
 
-import json
 import sys
 from datetime import datetime
 from pathlib import Path
 
-DAC_DIR = Path.home() / ".dac"
-CONFIG_PATH = DAC_DIR / "config.json"
-GAMES_CSV = DAC_DIR / "games.csv"
-SCREENSHOTS_DIR = DAC_DIR / "screenshots"
-ICONS_DIR = Path(__file__).parent.parent / "data" / "icons"
-
-DEFAULT_CONFIG = {
-    "player_name": "jack",
-    "hotkey": "ctrl+shift+g",
-    "model": "qwen2.5vl:7b",
-    "ollama_url": "http://localhost:11434",
-    "games_csv": str(GAMES_CSV),
-}
-
-
-def load_config() -> dict:
-    if not CONFIG_PATH.exists():
-        DAC_DIR.mkdir(parents=True, exist_ok=True)
-        print("[tracker] First run — creating config.")
-        name = input("  Enter your in-game player name: ").strip()
-        if not name:
-            name = "player"
-        config = {**DEFAULT_CONFIG, "player_name": name}
-        CONFIG_PATH.write_text(json.dumps(config, indent=2))
-        print(f"[tracker] Config saved to {CONFIG_PATH}")
-        return config
-    return json.loads(CONFIG_PATH.read_text())
+from utils import load_config, GAMES_CSV, ICONS_DIR
 
 
 def on_hotkey(config: dict, use_cv: bool = True) -> None:
@@ -360,9 +333,6 @@ def cmd_parse_cv(args: list[str]) -> None:
 
 
 def main() -> None:
-    config = load_config()
-    no_cv = "--no-cv" in sys.argv
-
     if len(sys.argv) > 1 and sys.argv[1] == "import":
         cmd_import(sys.argv[2:])
     elif len(sys.argv) > 1 and sys.argv[1] == "import-history":
@@ -374,6 +344,7 @@ def main() -> None:
     elif len(sys.argv) > 1 and sys.argv[1] == "parse-cv":
         cmd_parse_cv(sys.argv[2:])
     else:
+        config = load_config(interactive=True)
         run_listener(config)
 
 

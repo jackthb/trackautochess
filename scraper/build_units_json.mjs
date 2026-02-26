@@ -1,15 +1,14 @@
 /**
- * Build the canonical units.json from units_by_cost.json and sync to analyzer.
+ * Build the canonical units.json from units_by_cost.json.
  * Format: { "units": { "Name": { "cost": N, "synergies": [...] } }, "_meta": {...} }
  */
 
-import { readFileSync, writeFileSync, copyFileSync } from "fs";
+import { readFileSync, writeFileSync } from "fs";
 import { resolve, dirname } from "path";
 import { fileURLToPath } from "url";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const DATA_DIR = resolve(__dirname, "../data");
-const ANALYZER_DATA = resolve(__dirname, "../analyzer/dac_analyzer/data");
 
 const raw = JSON.parse(readFileSync(resolve(DATA_DIR, "units_by_cost.json"), "utf8"));
 
@@ -40,10 +39,6 @@ const output = {
 // Write to data/
 writeFileSync(resolve(DATA_DIR, "units.json"), JSON.stringify(output, null, 2));
 console.log(`Written: data/units.json (${Object.keys(units).length} units)`);
-
-// Sync to analyzer
-writeFileSync(resolve(ANALYZER_DATA, "units.json"), JSON.stringify(output, null, 2));
-console.log(`Synced: analyzer/dac_analyzer/data/units.json`);
 
 // Print summary
 const costCounts = {};

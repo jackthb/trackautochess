@@ -3,24 +3,7 @@
 import json
 from pathlib import Path
 
-
-def _classify_round(round_num: int | None) -> str:
-    if round_num is None:
-        return "unknown"
-    if round_num <= 10:
-        return "early"
-    if round_num <= 20:
-        return "mid"
-    return "late"
-
-
-def _format_unit(unit: dict) -> str:
-    stars = "*" * unit.get("star_level", 1)
-    name = unit.get("name", "Unknown")
-    items = unit.get("items", [])
-    if items:
-        return f"{name}{stars} ({', '.join(items)})"
-    return f"{name}{stars}"
+from .helpers import classify_round as _classify_round, format_unit as _format_unit
 
 
 def _event_label(event_type: str) -> str:
@@ -108,8 +91,8 @@ def generate_build_guide(data: dict, title: str = "VOD Analysis") -> str:
 
     for heading, phase_events, label in [
         ("### Early Game (Rounds 1–10)", early_events, "No notable events detected."),
-        ("### Mid Game (Rounds 11–20)", mid_events, "No notable events detected."),
-        ("### Late Game (Rounds 21+)", late_events, "No notable events detected."),
+        ("### Mid Game (Rounds 11–25)", mid_events, "No notable events detected."),
+        ("### Late Game (Rounds 26+)", late_events, "No notable events detected."),
     ]:
         lines.append(heading)
         lines.append("")

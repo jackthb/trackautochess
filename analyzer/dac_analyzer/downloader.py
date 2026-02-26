@@ -29,7 +29,10 @@ def download_video(url: str, output_dir: Path | None = None) -> Path:
     # Reuse already-downloaded file if present
     video_id = _video_id_from_url(url)
     if video_id:
-        existing = next(output_dir.glob(f"{video_id}.*"), None)
+        existing = next(
+            (p for p in output_dir.glob(f"{video_id}.*") if p.suffix != ".part"),
+            None,
+        )
         if existing:
             return existing
 
