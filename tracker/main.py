@@ -1,108 +1,18 @@
-"""DAC Game Tracker — hotkey listener entry point.
+"""DAC Game Tracker — CLI entry point.
 
 Usage:
-    python main.py                        # Start hotkey listener
-    python main.py import <file>          # Import old match CSV
-    python main.py import <file> --dry-run
+    python main.py import <file> [--dry-run]
+    python main.py import-history <screenshot> [--dry-run]
+    python main.py import-screenshots [dir] [--dry-run]
+    python main.py import-matches-cv <screenshot> [--dry-run] [--debug]
+    python main.py parse-cv <screenshot> [--debug]
 """
 
 import sys
 from datetime import datetime
 from pathlib import Path
 
-from utils import load_config, GAMES_CSV, ICONS_DIR
-
-
-def on_hotkey(config: dict, use_cv: bool = True) -> None:
-    """Called when the capture hotkey is pressed."""
-    import capture
-    import parser as game_parser
-    import csv_writer
-
-    print("[tracker] Hotkey triggered — capturing screen...")
-    try:
-        screenshot_path = capture.capture_screen()
-    except Exception as e:
-        print(f"[tracker] ERROR capturing screen: {e}")
-        return
-
-    print(f"[tracker] Screenshot saved: {screenshot_path}")
-
-    date_str = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    screenshot_rel = screenshot_path.name
-    games_csv = Path(config.get("games_csv", str(GAMES_CSV))).expanduser()
-    player_name = config.get("player_name", "jack")
-
-    row = None
-
-    # Try CV first (fast, deterministic)
-    if use_cv:
-        print("[tracker] Parsing with CV...")
-        row = game_parser.parse_screenshot_cv(
-            image_path=screenshot_path,
-            player_name=player_name,
-            date_str=date_str,
-            screenshot_rel=screenshot_rel,
-            icons_dir=ICONS_DIR,
-        )
-        if row:
-            print("[tracker] CV parse succeeded.")
-        else:
-            print("[tracker] CV parse returned None, falling back to Ollama...")
-
-    # Fallback to Ollama
-    if row is None:
-        print("[tracker] Sending to Ollama for parsing...")
-        row = game_parser.parse_screenshot(
-            image_path=screenshot_path,
-            player_name=player_name,
-            date_str=date_str,
-            screenshot_rel=screenshot_rel,
-            model=config.get("model", "qwen2.5vl:7b"),
-            ollama_url=config.get("ollama_url", "http://localhost:11434"),
-        )
-
-    if row is None:
-        print("[tracker] Parse failed — screenshot kept, nothing written to CSV.")
-        return
-
-    csv_writer.append_row(row, games_csv)
-    print(f"[tracker] Row appended to {games_csv}")
-    print(f"  placement={row.placement}  comp={row.comp}  synergies={row.synergies}")
-    if row.relic:
-        print(f"  relic={row.relic}")
-    if row.wl:
-        print(f"  wl={row.wl}  level={row.level}")
-
-
-def run_listener(config: dict) -> None:
-    """Start the global hotkey listener (blocks until Ctrl+C)."""
-    from pynput import keyboard
-
-    hotkey_str = config.get("hotkey", "ctrl+shift+g")
-    print(f"[tracker] Listening on {hotkey_str.upper()}  (Ctrl+C to quit)")
-
-    def on_activate():
-        on_hotkey(config)
-
-    # pynput GlobalHotKeys expects format like '<ctrl>+<shift>+g'
-    def _convert_hotkey(s: str) -> str:
-        parts = s.lower().split("+")
-        converted = []
-        for part in parts:
-            part = part.strip()
-            if part in ("ctrl", "alt", "shift", "cmd"):
-                converted.append(f"<{part}>")
-            else:
-                converted.append(part)
-        return "+".join(converted)
-
-    hotkey_pynput = _convert_hotkey(hotkey_str)
-    with keyboard.GlobalHotKeys({hotkey_pynput: on_activate}) as h:
-        try:
-            h.join()
-        except KeyboardInterrupt:
-            print("\n[tracker] Stopped.")
+from utils import GAMES_CSV, ICONS_DIR, load_config
 
 
 def cmd_import(args: list[str]) -> None:
@@ -344,8 +254,8 @@ def main() -> None:
     elif len(sys.argv) > 1 and sys.argv[1] == "parse-cv":
         cmd_parse_cv(sys.argv[2:])
     else:
-        config = load_config(interactive=True)
-        run_listener(config)
+        print(__doc__.strip())
+        sys.exit(1)
 
 
 if __name__ == "__main__":
