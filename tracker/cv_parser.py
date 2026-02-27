@@ -29,6 +29,8 @@ from utils import crop as _crop, ocr as _ocr, unit_stem as _unit_stem
 
 # Title detection crops (x0, y0, x1, y1)
 TITLE_REGION = (0.30, 0.00, 0.70, 0.12)
+FINAL_RANK_REGION = (0.0, 0.24, 0.14, 0.32)  # left panel "Final Ranking" overlay
+ELIMINATED_REGION = (0.0, 0.17, 0.14, 0.25)  # "You have been eliminated" text above
 
 # Column x-extents (x_start, x_end) as fraction of image width
 COL_RANK    = (0.000, 0.025)
@@ -126,6 +128,7 @@ def detect_screen_type(img: np.ndarray) -> str:
 
     Returns: 'game_over', 'final_ranking', 'my_matches', or 'unknown'.
     """
+    # Check center-top title area (Game Over / My Matches headings)
     title_crop = _crop(img, *TITLE_REGION)
     text = _ocr(title_crop, psm=6).upper()
     if "GAME" in text and "OVER" in text:
@@ -134,6 +137,20 @@ def detect_screen_type(img: np.ndarray) -> str:
         return "final_ranking"
     if "MY" in text and "MATCH" in text:
         return "my_matches"
+
+    # Check left panel for "Final Ranking" overlay (appears during gameplay)
+    fr_crop = _crop(img, *FINAL_RANK_REGION)
+    fr_prep = _preprocess_for_ocr(fr_crop)
+    fr_text = _ocr(fr_prep, psm=6).upper()
+    if "FINAL" in fr_text or "RANKING" in fr_text:
+        return "final_ranking"
+    # Fallback: "eliminated" text just above the Final Ranking panel
+    elim_crop = _crop(img, *ELIMINATED_REGION)
+    elim_prep = _preprocess_for_ocr(elim_crop)
+    elim_text = _ocr(elim_prep, psm=6).upper()
+    if "ELIMINATED" in elim_text:
+        return "final_ranking"
+
     # Also scan the narrower tab bar region (MY MATCHES tab is top-left)
     tab_crop = _crop(img, *MM_TAB_REGION)
     tab_text = _ocr(tab_crop, psm=6).upper()

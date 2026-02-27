@@ -166,27 +166,20 @@ def process_screenshot(path: Path) -> GameRow | None:
         return None
 
     date_str = _timestamp_from_filename(path.name)
-    placement = result.get("placement", "")
-    rank = result.get("rank", "")
-    rank_change = result.get("rank_change", "")
-
-    notes_parts = []
-    if rank:
-        notes_parts.append(f"rank:{rank}")
-    if rank_change:
-        notes_parts.append(f"change:{rank_change}")
 
     row = GameRow(
         date=date_str,
-        placement=placement,
-        comp="",
+        placement=result.get("placement", ""),
+        rank=result.get("rank", ""),
+        rank_change=result.get("rank_change", "none"),
+        lineup="",
         synergies=result.get("synergies", ""),
         talents="",
         relic=result.get("relic", ""),
         level=result.get("level", ""),
         wl=result.get("wl", ""),
         screenshot=path.name,
-        notes="|".join(notes_parts),
+        notes="",
     )
     return row
 
@@ -216,7 +209,7 @@ def watch(screenshot_dir: Path, games_csv: Path) -> None:
                 row = process_screenshot(path)
                 if row:
                     append_row(row, games_csv)
-                    print(f"[watcher] ✓ Saved: placement={row.placement} {row.notes}")
+                    print(f"[watcher] ✓ Saved: #{row.placement} {row.rank}")
                 known.add(name)
     except KeyboardInterrupt:
         print("\n[watcher] Stopped.")
@@ -235,7 +228,8 @@ def main():
         if row:
             print(f"\n  date:      {row.date}")
             print(f"  placement: {row.placement}")
-            print(f"  notes:     {row.notes}")
+            print(f"  rank:      {row.rank}")
+            print(f"  change:    {row.rank_change}")
         else:
             print("Could not parse.")
     else:

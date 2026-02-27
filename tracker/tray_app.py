@@ -43,7 +43,6 @@ _setup_tesseract()
 from utils import load_config, DAC_DIR, GAMES_CSV, ICONS_DIR
 
 POLL_INTERVAL = 5       # seconds between screen checks
-COOLDOWN_SECS = 30      # seconds after detection before re-checking
 APP_NAME = "DAC Tracker"
 
 # ── Window detection (ctypes — no pywin32) ────────────────────────────────────
@@ -83,11 +82,9 @@ class TrayApp:
     def __init__(self):
         self.config = load_config()
         self.games_csv = Path(self.config.get("games_csv", str(GAMES_CSV))).expanduser()
-        self.cooldown_until = 0.0
-        self.pending_screenshot = None  # path to screenshot awaiting user action
-        self.pending_screen_type = None
         self._stop_event = threading.Event()
         self._update_info = None  # (tag, url) if update available
+        self._awaiting_reset = False  # require "unknown" before next detection
 
     def _notify(self, title: str, message: str, timeout: int = 5) -> None:
         """Show a desktop toast notification."""
@@ -128,8 +125,6 @@ class TrayApp:
 
             if not dota_focused:
                 continue
-            if time.time() < self.cooldown_until:
-                continue
 
             # Capture and detect
             try:
@@ -144,40 +139,32 @@ class TrayApp:
 
             print(f"[tray] poll #{poll_count}: screen_type={screen_type}")
 
-            if screen_type in ("final_ranking", "game_over", "my_matches"):
-                self.pending_screenshot = screenshot_path
-                self.pending_screen_type = screen_type
-                self.cooldown_until = time.time() + COOLDOWN_SECS
+            if screen_type == "unknown":
+                self._awaiting_reset = False
+                continue
 
-                label = screen_type.replace("_", " ").title()
-                self._notify(
-                    f"{APP_NAME} — {label} detected",
-                    "Use tray menu → Parse Now to import this game.",
-                )
-                print(f"[tray] Detected: {screen_type} → {screenshot_path.name}")
+            if self._awaiting_reset:
+                print(f"[tray] poll #{poll_count}: suppressed (awaiting screen change)")
+                continue
+
+            self._awaiting_reset = True
+
+            label = screen_type.replace("_", " ").title()
+            print(f"[tray] Detected: {screen_type} → {screenshot_path.name}")
+            self._notify(APP_NAME, f"{label} detected — parsing...")
+
+            threading.Thread(
+                target=self._do_parse, args=(screenshot_path, screen_type),
+                daemon=True, name="auto-parse",
+            ).start()
 
     # ── Parse action ──────────────────────────────────────────────────────────
-
-    def _parse_pending(self, _icon=None, _item=None) -> None:
-        """Parse the pending screenshot and append to CSV."""
-        if self.pending_screenshot is None:
-            self._notify(APP_NAME, "No screenshot pending. Play a game first.")
-            return
-
-        path = self.pending_screenshot
-        screen_type = self.pending_screen_type
-        self.pending_screenshot = None
-        self.pending_screen_type = None
-
-        threading.Thread(
-            target=self._do_parse, args=(path, screen_type),
-            daemon=True, name="parser",
-        ).start()
 
     def _do_parse(self, path: Path, screen_type: str) -> None:
         """Run parsing in a background thread."""
         import cv2
         from csv_writer import GameRow, append_row
+        from db import push_game
 
         try:
             if screen_type == "my_matches":
@@ -190,20 +177,22 @@ class TrayApp:
                     return
                 date_str = datetime.now().strftime("%Y-%m-%d")
                 for r in rows:
-                    comp = "|".join(r.get("units", []))
                     game_row = GameRow(
                         date=date_str,
                         placement=r.get("placement", ""),
-                        comp=comp,
+                        rank=r.get("rank", ""),
+                        rank_change="none",
+                        lineup="|".join(r.get("units", [])),
                         synergies=r.get("synergies", ""),
                         talents="",
                         relic="",
                         level=r.get("level", ""),
                         wl=r.get("wl", ""),
                         screenshot=path.name,
-                        notes=f"rank:{r.get('rank', '')}",
+                        notes="",
                     )
                     append_row(game_row, self.games_csv)
+                    push_game(game_row)
                 self._notify(APP_NAME, f"Imported {len(rows)} match(es) from MY MATCHES.")
 
             else:
@@ -214,8 +203,10 @@ class TrayApp:
                     self._notify(APP_NAME, "Could not parse screenshot.")
                     return
                 append_row(row, self.games_csv)
+                push_game(row)
                 place = row.placement or "?"
-                self._notify(APP_NAME, f"Saved: placement #{place} {row.notes}")
+                rank = row.rank or ""
+                self._notify(APP_NAME, f"Saved: #{place} {rank}")
 
         except Exception as e:
             print(f"[tray] parse error: {e}")
@@ -307,9 +298,7 @@ class TrayApp:
     def run(self) -> None:
         """Start the tray app (blocks until quit)."""
         menu = pystray.Menu(
-            pystray.MenuItem("Parse Now", self._parse_pending, default=True),
             pystray.MenuItem("Import History Screenshot...", self._import_history),
-            pystray.Menu.SEPARATOR,
             pystray.MenuItem("Open CSV", self._open_csv),
             pystray.MenuItem("Open Viewer", self._open_viewer),
             pystray.MenuItem("Check for Updates", self._check_updates),

@@ -20,6 +20,9 @@ DEFAULT_CONFIG = {
     "model": "qwen2.5vl:7b",
     "ollama_url": "http://localhost:11434",
     "games_csv": str(GAMES_CSV),
+    "supabase_url": "",
+    "supabase_key": "",
+    "supabase_db_url": "",
 }
 
 
