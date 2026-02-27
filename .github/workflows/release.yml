@@ -1,0 +1,57 @@
+name: Build & Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install Python dependencies
+        run: |
+          pip install pyinstaller
+          pip install -r tracker/requirements.txt
+
+      - name: Download & extract portable Tesseract
+        shell: pwsh
+        run: |
+          $url = "https://digi.bib.uni-mannheim.de/tesseract/tesseract-ocr-w64-setup-5.5.0.20241111.exe"
+          Invoke-WebRequest -Uri $url -OutFile tesseract-installer.exe
+          7z x tesseract-installer.exe -otesseract-portable -y
+          # Ensure tessdata has eng trained data
+          if (-not (Test-Path "tesseract-portable/tessdata/eng.traineddata")) {
+            $engUrl = "https://github.com/tesseract-ocr/tessdata_fast/raw/main/eng.traineddata"
+            Invoke-WebRequest -Uri $engUrl -OutFile "tesseract-portable/tessdata/eng.traineddata"
+          }
+
+      - name: Inject version from tag
+        shell: bash
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          sed -i "s/__version__ = \"0.0.0-dev\"/__version__ = \"${VERSION}\"/" tracker/updater.py
+
+      - name: Build exe with PyInstaller
+        env:
+          DAC_CONSOLE: "0"
+        run: |
+          cd tracker
+          pyinstaller dac_tracker.spec
+
+      - name: Upload release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: tracker/dist/DACTracker.exe
+          generate_release_notes: true

@@ -118,17 +118,13 @@ class TrayApp:
 
             dota_focused = is_dota_focused()
 
-            # Log focus transitions
+            # Notify on focus transitions
             if dota_focused and not was_dota_focused:
                 print(f"[tray] Dota 2 focused (poll #{poll_count})")
+                self._notify(APP_NAME, "Dota 2 detected — tracking screens.", timeout=3)
             elif not dota_focused and was_dota_focused:
                 print(f"[tray] Dota 2 lost focus (poll #{poll_count})")
             was_dota_focused = dota_focused
-
-            # Log status every 12 polls (60s)
-            if poll_count % 12 == 0:
-                status = "Dota 2 focused" if dota_focused else "waiting for Dota 2"
-                print(f"[tray] alive — {status} (poll #{poll_count})")
 
             if not dota_focused:
                 continue
@@ -268,20 +264,39 @@ class TrayApp:
         ).start()
 
     def _check_updates(self, _icon=None, _item=None) -> None:
-        """Manual update check."""
-        from updater import check_for_update, open_release_page
+        """Manual update check — downloads and applies if frozen."""
+        from updater import check_for_update
         result = check_for_update()
-        if result:
-            self._update_info = (result["tag"], result["url"])
-            self._notify(APP_NAME, f"Update available: {result['tag']}")
-            open_release_page(result["url"])
-        else:
+        if not result:
             self._notify(APP_NAME, "You're on the latest version.")
+            return
 
-    def _on_update_available(self, tag: str, url: str) -> None:
+        self._update_info = result
+        self._notify(APP_NAME, f"Update available: {result['tag']}. Downloading...")
+        self._install_update(result)
+
+    def _install_update(self, info: dict) -> None:
+        """Download update and apply (frozen exe only)."""
+        from updater import is_frozen, download_update, apply_update_and_restart
+        if not is_frozen():
+            import webbrowser
+            webbrowser.open(info["html_url"])
+            return
+
+        try:
+            from pathlib import Path
+            new_exe = Path(sys.executable).parent / "DACTracker_new.exe"
+            download_update(info["download_url"], new_exe)
+            self._notify(APP_NAME, f"Downloaded {info['tag']}. Restarting...")
+            apply_update_and_restart(new_exe)
+        except Exception as e:
+            print(f"[tray] update error: {e}")
+            self._notify(APP_NAME, f"Update failed: {e}")
+
+    def _on_update_available(self, info: dict) -> None:
         """Callback from updater background loop."""
-        self._update_info = (tag, url)
-        self._notify(APP_NAME, f"Update available: {tag}\nUse tray menu → Check for Updates.")
+        self._update_info = info
+        self._notify(APP_NAME, f"Update available: {info['tag']}\nUse tray menu → Check for Updates.")
 
     def _quit(self, icon, _item=None) -> None:
         self._stop_event.set()
@@ -302,7 +317,9 @@ class TrayApp:
             pystray.MenuItem("Quit", self._quit),
         )
 
-        icon = pystray.Icon(APP_NAME, _make_icon_image(), APP_NAME, menu)
+        from updater import __version__
+        tooltip = f"{APP_NAME} v{__version__}"
+        icon = pystray.Icon(APP_NAME, _make_icon_image(), tooltip, menu)
 
         # Start poll thread
         poll_thread = threading.Thread(target=self._poll_loop, daemon=True, name="poller")
