@@ -111,11 +111,20 @@ class TrayApp:
         from cv_parser import detect_screen_type
 
         poll_count = 0
+        was_dota_focused = False
         while not self._stop_event.is_set():
             time.sleep(POLL_INTERVAL)
             poll_count += 1
 
             dota_focused = is_dota_focused()
+
+            # Log focus transitions
+            if dota_focused and not was_dota_focused:
+                print(f"[tray] Dota 2 focused (poll #{poll_count})")
+            elif not dota_focused and was_dota_focused:
+                print(f"[tray] Dota 2 lost focus (poll #{poll_count})")
+            was_dota_focused = dota_focused
+
             # Log status every 12 polls (60s)
             if poll_count % 12 == 0:
                 status = "Dota 2 focused" if dota_focused else "waiting for Dota 2"
@@ -136,6 +145,8 @@ class TrayApp:
             except Exception as e:
                 print(f"[tray] capture/detect error: {e}")
                 continue
+
+            print(f"[tray] poll #{poll_count}: screen_type={screen_type}")
 
             if screen_type in ("final_ranking", "game_over", "my_matches"):
                 self.pending_screenshot = screenshot_path
