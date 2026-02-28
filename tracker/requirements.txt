@@ -3,6 +3,5 @@ pillow>=10.0
 httpx>=0.27
 opencv-python>=4.8
 pytesseract>=0.3
-psycopg2-binary>=2.9
 pystray>=0.19; sys_platform == "win32"
 plyer>=2.1; sys_platform == "win32"

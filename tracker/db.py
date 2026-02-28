@@ -1,14 +1,11 @@
 """Supabase database client for DAC Tools.
 
 Pushes game data to a Supabase Postgres database via the PostgREST API.
-Uses httpx for inserts, psycopg2 for schema setup. Fails silently —
-DB errors never block the tracker.
+Fails silently — DB errors never block the tracker.
 
 Config keys in ~/.dac/config.json:
     supabase_url      — project URL (e.g. https://xyz.supabase.co)
     supabase_key      — anon/public API key
-    supabase_db_url   — direct Postgres connection string
-                        (e.g. postgresql://postgres.xxx:pw@host:5432/postgres)
 """
 
 import json
@@ -63,31 +60,6 @@ def _load_config() -> dict:
     except Exception:
         return {}
 
-
-def setup_db() -> bool:
-    """Create the games table if it doesn't exist. Requires supabase_db_url.
-
-    Returns True on success, False on error.
-    """
-    config = _load_config()
-    db_url = config.get("supabase_db_url", "")
-    if not db_url:
-        print("[db] No supabase_db_url configured, skipping setup.")
-        return False
-
-    try:
-        import psycopg2
-        conn = psycopg2.connect(db_url)
-        conn.autocommit = True
-        with conn.cursor() as cur:
-            cur.execute(GAMES_TABLE_SQL)
-            cur.execute("ALTER TABLE games ADD COLUMN IF NOT EXISTS user_id text;")
-        conn.close()
-        print("[db] games table ready.")
-        return True
-    except Exception as e:
-        print(f"[db] setup error: {e}")
-        return False
 
 
 def _get_client():
@@ -166,4 +138,4 @@ def fetch_games(user_id: str, limit: int = 20) -> list[dict] | None:
 
 
 if __name__ == "__main__":
-    setup_db()
+    print("DB module loaded. Use push_game() and fetch_games() via PostgREST.")
