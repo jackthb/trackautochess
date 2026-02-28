@@ -44,6 +44,8 @@ _ssl_binaries = [
     (str(p), ".") for p in _base.glob("libssl*")
 ] + [
     (str(p), ".") for p in _base.glob("libcrypto*")
+] + [
+    (str(p), ".") for p in _base.glob("_ssl*")
 ]
 print(f"[spec] SSL binaries from {_base}: {_ssl_binaries}")
 
