@@ -52,6 +52,8 @@ a = Analysis(
         "mss",
         "mss.windows",
         "PIL",
+        "ssl",
+        "_ssl",
     ],
     hookspath=[],
     hooksconfig={},
