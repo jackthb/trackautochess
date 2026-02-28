@@ -9,6 +9,7 @@ Output: dist/DACTracker.exe
 """
 
 import os
+import sys
 from pathlib import Path
 
 block_cipher = None
@@ -37,10 +38,20 @@ datas = [
 # Filter out missing paths (optional files)
 datas = [(src, dst) for src, dst in datas if os.path.exists(src)]
 
+# Find OpenSSL DLLs from the Python install so HTTPS works in the bundled exe
+_dlls_dir = Path(sys.executable).parent / "DLLs"
+if not _dlls_dir.exists():
+    _dlls_dir = Path(sys.executable).parent
+_ssl_binaries = [
+    (str(p), ".") for p in _dlls_dir.glob("libssl*")
+] + [
+    (str(p), ".") for p in _dlls_dir.glob("libcrypto*")
+]
+
 a = Analysis(
     [os.path.join(TRACKER_DIR, "tray_app.py")],
     pathex=[TRACKER_DIR],
-    binaries=[],
+    binaries=_ssl_binaries,
     datas=datas,
     hiddenimports=[
         "pystray",
