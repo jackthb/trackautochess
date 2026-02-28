@@ -81,6 +81,7 @@ def setup_db() -> bool:
         conn.autocommit = True
         with conn.cursor() as cur:
             cur.execute(GAMES_TABLE_SQL)
+            cur.execute("ALTER TABLE games ADD COLUMN IF NOT EXISTS user_id text;")
         conn.close()
         print("[db] games table ready.")
         return True
@@ -116,7 +117,7 @@ def _get_client():
     return client
 
 
-def push_game(row) -> bool:
+def push_game(row, user_id: str | None = None) -> bool:
     """Insert a GameRow into the Supabase games table.
 
     Returns True on success, False on error. Never raises.
@@ -127,6 +128,8 @@ def push_game(row) -> bool:
 
     try:
         data = {k: str(v) if v else None for k, v in asdict(row).items()}
+        if user_id:
+            data["user_id"] = user_id
         resp = client.post("/rest/v1/games", json=data)
         resp.raise_for_status()
         print(f"[db] pushed game: placement={data.get('placement')}")
@@ -134,6 +137,32 @@ def push_game(row) -> bool:
     except Exception as e:
         print(f"[db] push error: {e}")
         return False
+
+
+def fetch_games(user_id: str, limit: int = 20) -> list[dict] | None:
+    """Fetch recent games for a user from Supabase.
+
+    Returns list of game dicts on success, None on error.
+    """
+    client = _get_client()
+    if client is None:
+        return None
+
+    try:
+        resp = client.get(
+            "/rest/v1/games",
+            params={
+                "user_id": f"eq.{user_id}",
+                "order": "created_at.desc",
+                "limit": str(limit),
+            },
+            headers={"Accept": "application/json"},
+        )
+        resp.raise_for_status()
+        return resp.json()
+    except Exception as e:
+        print(f"[db] fetch error: {e}")
+        return None
 
 
 if __name__ == "__main__":

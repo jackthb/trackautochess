@@ -23,6 +23,8 @@ DEFAULT_CONFIG = {
     "supabase_url": "",
     "supabase_key": "",
     "supabase_db_url": "",
+    "steam_id": "",
+    "steam_name": "",
 }
 
 
@@ -47,6 +49,12 @@ def load_config(interactive: bool = False) -> dict:
     CONFIG_PATH.write_text(json.dumps(config, indent=2))
     print(f"[tracker] Config saved to {CONFIG_PATH}")
     return config
+
+
+def save_config(config: dict) -> None:
+    """Write config dict back to ~/.dac/config.json."""
+    DAC_DIR.mkdir(parents=True, exist_ok=True)
+    CONFIG_PATH.write_text(json.dumps(config, indent=2))
 
 
 # ── Image helpers (lazy imports — cv2/numpy only loaded when called) ──────────

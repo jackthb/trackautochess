@@ -40,7 +40,7 @@ _setup_tesseract()
 
 # ── Config ────────────────────────────────────────────────────────────────────
 
-from utils import load_config, DAC_DIR, GAMES_CSV, ICONS_DIR
+from utils import load_config, save_config, DAC_DIR, GAMES_CSV, ICONS_DIR
 
 POLL_INTERVAL = 5       # seconds between screen checks
 APP_NAME = "DAC Tracker"
@@ -166,6 +166,8 @@ class TrayApp:
         from csv_writer import GameRow, append_row
         from db import push_game
 
+        user_id = self.config.get("steam_id") or None
+
         try:
             if screen_type == "my_matches":
                 from cv_parser import parse_my_matches
@@ -192,7 +194,7 @@ class TrayApp:
                         notes="",
                     )
                     append_row(game_row, self.games_csv)
-                    push_game(game_row)
+                    push_game(game_row, user_id=user_id)
                 self._notify(APP_NAME, f"Imported {len(rows)} match(es) from MY MATCHES.")
 
             else:
@@ -203,7 +205,7 @@ class TrayApp:
                     self._notify(APP_NAME, "Could not parse screenshot.")
                     return
                 append_row(row, self.games_csv)
-                push_game(row)
+                push_game(row, user_id=user_id)
                 place = row.placement or "?"
                 rank = row.rank or ""
                 self._notify(APP_NAME, f"Saved: #{place} {rank}")
@@ -211,6 +213,50 @@ class TrayApp:
         except Exception as e:
             print(f"[tray] parse error: {e}")
             self._notify(APP_NAME, f"Parse error: {e}")
+
+    # ── Steam login & dashboard ─────────────────────────────────────────────
+
+    def _is_logged_in(self) -> bool:
+        return bool(self.config.get("steam_id"))
+
+    def _steam_login_text(self, _item=None) -> str:
+        name = self.config.get("steam_name", "")
+        if name:
+            return f"Signed in: {name}"
+        return "Login with Steam"
+
+    def _steam_login(self, _icon=None, _item=None) -> None:
+        if self._is_logged_in():
+            return
+
+        def _do_login():
+            from steam_auth import steam_login, fetch_steam_name
+            sid = steam_login()
+            if not sid:
+                self._notify(APP_NAME, "Steam login failed or timed out.")
+                return
+            name = fetch_steam_name(sid) or sid
+            self.config["steam_id"] = sid
+            self.config["steam_name"] = name
+            save_config(self.config)
+            self._notify(APP_NAME, f"Logged in as {name}")
+            print(f"[tray] Steam login: {name} ({sid})")
+
+        threading.Thread(target=_do_login, daemon=True, name="steam-login").start()
+
+    def _steam_logout(self, _icon=None, _item=None) -> None:
+        self.config["steam_id"] = ""
+        self.config["steam_name"] = ""
+        save_config(self.config)
+        self._notify(APP_NAME, "Logged out of Steam.")
+
+    def _open_dashboard(self, _icon=None, _item=None) -> None:
+        from dashboard import DashboardWindow
+        DashboardWindow.show(
+            steam_id=self.config.get("steam_id", ""),
+            steam_name=self.config.get("steam_name", ""),
+            games_csv=str(self.games_csv),
+        )
 
     # ── Menu actions ──────────────────────────────────────────────────────────
 
@@ -298,6 +344,18 @@ class TrayApp:
     def run(self) -> None:
         """Start the tray app (blocks until quit)."""
         menu = pystray.Menu(
+            pystray.MenuItem(
+                self._steam_login_text,
+                self._steam_login,
+                enabled=lambda _: not self._is_logged_in(),
+            ),
+            pystray.MenuItem(
+                "Logout",
+                self._steam_logout,
+                visible=lambda _: self._is_logged_in(),
+            ),
+            pystray.MenuItem("Recent Games", self._open_dashboard),
+            pystray.Menu.SEPARATOR,
             pystray.MenuItem("Import History Screenshot...", self._import_history),
             pystray.MenuItem("Open CSV", self._open_csv),
             pystray.MenuItem("Open Viewer", self._open_viewer),
