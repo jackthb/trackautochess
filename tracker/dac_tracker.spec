@@ -38,15 +38,14 @@ datas = [
 # Filter out missing paths (optional files)
 datas = [(src, dst) for src, dst in datas if os.path.exists(src)]
 
-# Find OpenSSL DLLs from the Python install so HTTPS works in the bundled exe
-_dlls_dir = Path(sys.executable).parent / "DLLs"
-if not _dlls_dir.exists():
-    _dlls_dir = Path(sys.executable).parent
+# Find OpenSSL DLLs from the base Python install (not the venv) so HTTPS works
+_base = Path(sys.base_prefix) / "DLLs"
 _ssl_binaries = [
-    (str(p), ".") for p in _dlls_dir.glob("libssl*")
+    (str(p), ".") for p in _base.glob("libssl*")
 ] + [
-    (str(p), ".") for p in _dlls_dir.glob("libcrypto*")
+    (str(p), ".") for p in _base.glob("libcrypto*")
 ]
+print(f"[spec] SSL binaries from {_base}: {_ssl_binaries}")
 
 a = Analysis(
     [os.path.join(TRACKER_DIR, "tray_app.py")],
