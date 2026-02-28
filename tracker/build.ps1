@@ -26,9 +26,15 @@ Write-Host "Installing dependencies..." -ForegroundColor Cyan
 uv pip install --python $Python pyinstaller -r (Join-Path $TrackerDir "requirements.txt")
 if ($LASTEXITCODE -ne 0) { throw "uv pip install failed" }
 
+# Clean previous build cache so PyInstaller picks up all changes
+if (Test-Path $BuildDir) {
+    Write-Host "Cleaning build cache..." -ForegroundColor Cyan
+    Remove-Item -Recurse -Force $BuildDir
+}
+
 # Build
 Write-Host "Building DACTracker.exe..." -ForegroundColor Cyan
-& $PyInstaller $SpecFile --distpath $DistDir --workpath $BuildDir --noconfirm
+& $PyInstaller $SpecFile --distpath $DistDir --workpath $BuildDir --noconfirm --clean
 if ($LASTEXITCODE -ne 0) { throw "PyInstaller build failed" }
 
 Write-Host "Done! DACTracker.exe is on your Desktop." -ForegroundColor Green
