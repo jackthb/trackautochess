@@ -341,6 +341,8 @@ class TrayApp:
             self.config["steam_id"] = sid
             self.config["steam_name"] = name
             save_config(self.config)
+            from db import ensure_user
+            ensure_user(sid)
             self._notify(APP_NAME, f"Logged in as {name}")
             log.info("Steam login: %s (%s)", name, sid)
 
@@ -541,7 +543,33 @@ class TrayApp:
         icon.run()
 
 
+def _kill_existing():
+    """Kill any already-running DACTracker processes (Windows only)."""
+    if sys.platform != "win32":
+        return
+    import subprocess
+    exe_name = os.path.basename(sys.executable)
+    my_pid = str(os.getpid())
+    try:
+        # List all processes with this name, then kill any that aren't us
+        result = subprocess.run(
+            ["tasklist", "/FI", f"IMAGENAME eq {exe_name}", "/FO", "CSV", "/NH"],
+            capture_output=True, text=True, timeout=5,
+        )
+        for line in result.stdout.strip().splitlines():
+            parts = line.strip('"').split('","')
+            if len(parts) >= 2:
+                pid = parts[1]
+                if pid != my_pid:
+                    log.info("Killing existing %s (pid %s)", exe_name, pid)
+                    subprocess.run(["taskkill", "/F", "/PID", pid],
+                                   capture_output=True, timeout=5)
+    except Exception as e:
+        log.warning("Could not kill existing process: %s", e)
+
+
 def main():
+    _kill_existing()
     app = TrayApp()
     app.run()
 

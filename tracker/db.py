@@ -118,6 +118,26 @@ def game_exists(user_id: str, date: str, placement: str, wl: str, level: str) ->
         return False
 
 
+def ensure_user(user_id: str) -> bool:
+    """Upsert a user row so the FK constraint is satisfied. Never raises."""
+    client = _get_client()
+    if client is None:
+        print("[db] ensure_user: no client configured")
+        return False
+    try:
+        resp = client.post(
+            "/rest/v1/users",
+            json={"steam_id": int(user_id)},
+            headers={"Prefer": "resolution=ignore-duplicates,return=minimal"},
+        )
+        resp.raise_for_status()
+        print(f"[db] ensure_user: ok ({user_id})")
+        return True
+    except Exception as e:
+        print(f"[db] ensure_user error: {e}")
+        return False
+
+
 def push_game(row, user_id: str | None = None) -> bool:
     """Insert a GameRow into the Supabase games table.
 
