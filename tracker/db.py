@@ -89,6 +89,35 @@ def _get_client():
     return client
 
 
+def game_exists(user_id: str, date: str, placement: str, wl: str, level: str) -> bool:
+    """Check if a game with these fields already exists in Supabase.
+
+    Returns True if duplicate found, False otherwise. Never raises.
+    """
+    client = _get_client()
+    if client is None:
+        return False
+
+    try:
+        resp = client.get(
+            "/rest/v1/games",
+            params={
+                "user_id": f"eq.{user_id}",
+                "date": f"eq.{date}",
+                "placement": f"eq.{placement}",
+                "wl": f"eq.{wl}",
+                "level": f"eq.{level}",
+                "select": "id",
+                "limit": "1",
+            },
+            headers={"Accept": "application/json"},
+        )
+        resp.raise_for_status()
+        return len(resp.json()) > 0
+    except Exception:
+        return False
+
+
 def push_game(row, user_id: str | None = None) -> bool:
     """Insert a GameRow into the Supabase games table.
 

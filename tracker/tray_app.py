@@ -9,6 +9,7 @@ Usage:
 """
 
 import ctypes
+import logging
 import os
 import subprocess
 import sys
@@ -44,6 +45,19 @@ from utils import load_config, save_config, DAC_DIR, GAMES_CSV, ICONS_DIR
 
 POLL_INTERVAL = 5       # seconds between screen checks
 APP_NAME = "DAC Tracker"
+LOG_PATH = DAC_DIR / "tracker.log"
+
+# ── Logging ──────────────────────────────────────────────────────────────────
+
+DAC_DIR.mkdir(parents=True, exist_ok=True)
+log = logging.getLogger("dac")
+log.setLevel(logging.DEBUG)
+_fh = logging.FileHandler(LOG_PATH, encoding="utf-8")
+_fh.setFormatter(logging.Formatter("%(asctime)s  %(levelname)-5s  %(message)s", datefmt="%Y-%m-%d %H:%M:%S"))
+log.addHandler(_fh)
+_ch = logging.StreamHandler()
+_ch.setFormatter(logging.Formatter("[tray] %(message)s"))
+log.addHandler(_ch)
 
 # ── Window detection (ctypes — no pywin32) ────────────────────────────────────
 
@@ -76,6 +90,68 @@ def _make_icon_image() -> Image.Image:
     return img
 
 
+def _save_icon_file() -> str | None:
+    """Save the app icon as .ico in ~/.dac/ and return the path."""
+    ico_path = DAC_DIR / "icon.ico"
+    if ico_path.exists():
+        return str(ico_path)
+    try:
+        DAC_DIR.mkdir(parents=True, exist_ok=True)
+        img = _make_icon_image()
+        img.save(str(ico_path), format="ICO", sizes=[(64, 64)])
+        return str(ico_path)
+    except Exception:
+        return None
+
+
+# ── Windows autostart (registry) ─────────────────────────────────────────
+
+_AUTOSTART_KEY = r"Software\Microsoft\Windows\CurrentVersion\Run"
+_AUTOSTART_NAME = "DACTracker"
+
+
+def _get_exe_path() -> str:
+    """Return the path to the running exe (frozen) or script."""
+    if getattr(sys, "frozen", False):
+        return sys.executable
+    return str(Path(__file__).resolve())
+
+
+def is_autostart_enabled() -> bool:
+    """Check if autostart registry key exists."""
+    try:
+        import winreg
+        key = winreg.OpenKey(winreg.HKEY_CURRENT_USER, _AUTOSTART_KEY, 0, winreg.KEY_READ)
+        try:
+            winreg.QueryValueEx(key, _AUTOSTART_NAME)
+            return True
+        except FileNotFoundError:
+            return False
+        finally:
+            winreg.CloseKey(key)
+    except Exception:
+        return False
+
+
+def set_autostart(enable: bool) -> None:
+    """Add or remove the autostart registry key."""
+    try:
+        import winreg
+        key = winreg.OpenKey(winreg.HKEY_CURRENT_USER, _AUTOSTART_KEY, 0, winreg.KEY_SET_VALUE)
+        try:
+            if enable:
+                winreg.SetValueEx(key, _AUTOSTART_NAME, 0, winreg.REG_SZ, _get_exe_path())
+            else:
+                try:
+                    winreg.DeleteValue(key, _AUTOSTART_NAME)
+                except FileNotFoundError:
+                    pass
+        finally:
+            winreg.CloseKey(key)
+    except Exception as e:
+        log.error("autostart error: %s", e)
+
+
 class TrayApp:
     """System tray application with background polling."""
 
@@ -85,18 +161,22 @@ class TrayApp:
         self._stop_event = threading.Event()
         self._update_info = None  # (tag, url) if update available
         self._awaiting_reset = False  # require "unknown" before next detection
+        self._icon_path = _save_icon_file()
 
     def _notify(self, title: str, message: str, timeout: int = 5) -> None:
         """Show a desktop toast notification."""
         try:
-            notification.notify(
+            kwargs = dict(
                 title=title,
                 message=message,
                 app_name=APP_NAME,
                 timeout=timeout,
             )
+            if self._icon_path:
+                kwargs["app_icon"] = self._icon_path
+            notification.notify(**kwargs)
         except Exception as e:
-            print(f"[tray] notification error: {e}")
+                log.error("notification error: %s", e)
 
     # ── Polling loop ──────────────────────────────────────────────────────────
 
@@ -117,10 +197,10 @@ class TrayApp:
 
             # Notify on focus transitions
             if dota_focused and not was_dota_focused:
-                print(f"[tray] Dota 2 focused (poll #{poll_count})")
+                log.info("Dota 2 focused (poll #%d)", poll_count)
                 self._notify(APP_NAME, "Dota 2 detected — tracking screens.", timeout=3)
             elif not dota_focused and was_dota_focused:
-                print(f"[tray] Dota 2 lost focus (poll #{poll_count})")
+                log.info("Dota 2 lost focus (poll #%d)", poll_count)
             was_dota_focused = dota_focused
 
             if not dota_focused:
@@ -134,23 +214,25 @@ class TrayApp:
                     continue
                 screen_type = detect_screen_type(img)
             except Exception as e:
-                print(f"[tray] capture/detect error: {e}")
+                log.error("capture/detect error: %s", e)
                 continue
 
-            print(f"[tray] poll #{poll_count}: screen_type={screen_type}")
+            log.debug("poll #%d: screen_type=%s", poll_count, screen_type)
 
             if screen_type == "unknown":
                 self._awaiting_reset = False
+                screenshot_path.unlink(missing_ok=True)
                 continue
 
             if self._awaiting_reset:
-                print(f"[tray] poll #{poll_count}: suppressed (awaiting screen change)")
+                log.debug("poll #%d: suppressed (awaiting screen change)", poll_count)
+                screenshot_path.unlink(missing_ok=True)
                 continue
 
             self._awaiting_reset = True
 
             label = screen_type.replace("_", " ").title()
-            print(f"[tray] Detected: {screen_type} → {screenshot_path.name}")
+            log.info("Detected: %s → %s", screen_type, screenshot_path.name)
             self._notify(APP_NAME, f"{label} detected — parsing...")
 
             threading.Thread(
@@ -175,19 +257,27 @@ class TrayApp:
                 player = self.config.get("player_name", "jack")
                 rows = parse_my_matches(img, player, ICONS_DIR)
                 if not rows:
+                    log.warning("MY MATCHES: no rows parsed from %s", path.name)
                     self._notify(APP_NAME, "MY MATCHES: no rows parsed.")
                     return
+                log.info("Parsed %d row(s) from MY MATCHES: %s", len(rows), path.name)
                 date_str = datetime.now().strftime("%Y-%m-%d")
-                for r in rows:
+                for i, r in enumerate(rows, 1):
+                    lineup = "|".join(r.get("units", []))
+                    log.info(
+                        "  row %d: place=%s level=%s wl=%s rank=%s relic=%s units=[%s] synergies=%s",
+                        i, r.get("placement"), r.get("level"), r.get("wl"),
+                        r.get("rank"), r.get("relic"), lineup, r.get("synergies"),
+                    )
                     game_row = GameRow(
                         date=date_str,
                         placement=r.get("placement", ""),
                         rank=r.get("rank", ""),
                         rank_change="none",
-                        lineup="|".join(r.get("units", [])),
+                        lineup=lineup,
                         synergies=r.get("synergies", ""),
                         talents="",
-                        relic="",
+                        relic=r.get("relic", ""),
                         level=r.get("level", ""),
                         wl=r.get("wl", ""),
                         screenshot=path.name,
@@ -202,8 +292,14 @@ class TrayApp:
                 from watcher import process_screenshot
                 row = process_screenshot(path)
                 if row is None:
+                    log.warning("Could not parse screenshot: %s", path.name)
                     self._notify(APP_NAME, "Could not parse screenshot.")
                     return
+                log.info(
+                    "Parsed %s: place=%s rank=%s level=%s wl=%s lineup=%s synergies=%s",
+                    path.name, row.placement, row.rank, row.level, row.wl,
+                    row.lineup, row.synergies,
+                )
                 append_row(row, self.games_csv)
                 push_game(row, user_id=user_id)
                 place = row.placement or "?"
@@ -211,7 +307,7 @@ class TrayApp:
                 self._notify(APP_NAME, f"Saved: #{place} {rank}")
 
         except Exception as e:
-            print(f"[tray] parse error: {e}")
+            log.error("parse error for %s: %s", path.name, e, exc_info=True)
             self._notify(APP_NAME, f"Parse error: {e}")
 
     # ── Steam login & dashboard ─────────────────────────────────────────────
@@ -240,7 +336,7 @@ class TrayApp:
             self.config["steam_name"] = name
             save_config(self.config)
             self._notify(APP_NAME, f"Logged in as {name}")
-            print(f"[tray] Steam login: {name} ({sid})")
+            log.info("Steam login: %s (%s)", name, sid)
 
         threading.Thread(target=_do_login, daemon=True, name="steam-login").start()
 
@@ -294,7 +390,7 @@ class TrayApp:
             return  # user cancelled
 
         path = Path(path)
-        print(f"[tray] Import history: {path}")
+        log.info("Import history: %s", path)
         threading.Thread(
             target=self._do_parse, args=(path, "my_matches"),
             daemon=True, name="import-history",
@@ -327,13 +423,58 @@ class TrayApp:
             self._notify(APP_NAME, f"Downloaded {info['tag']}. Restarting...")
             apply_update_and_restart(new_exe)
         except Exception as e:
-            print(f"[tray] update error: {e}")
+            log.error("update error: %s", e)
             self._notify(APP_NAME, f"Update failed: {e}")
 
     def _on_update_available(self, info: dict) -> None:
         """Callback from updater background loop."""
         self._update_info = info
         self._notify(APP_NAME, f"Update available: {info['tag']}\nUse tray menu → Check for Updates.")
+
+    def _sync_csv_to_db(self, _icon=None, _item=None) -> None:
+        """Push all CSV rows to Supabase, skipping duplicates."""
+        def _do_sync():
+            from csv_writer import read_all
+            from db import game_exists, push_game
+
+            steam_id = self.config.get("steam_id")
+            if not steam_id:
+                self._notify(APP_NAME, "Not logged in — sync aborted.")
+                return
+
+            if not self.games_csv.exists():
+                self._notify(APP_NAME, "No games.csv found.")
+                return
+
+            rows = read_all(self.games_csv)
+            log.info("Syncing %d CSV row(s) to Supabase...", len(rows))
+
+            pushed = skipped = failed = 0
+            for row in rows:
+                if game_exists(steam_id, row.date, row.placement, row.wl, row.level):
+                    skipped += 1
+                    continue
+                if push_game(row, user_id=steam_id):
+                    pushed += 1
+                else:
+                    failed += 1
+
+            msg = f"Synced {pushed} game(s)"
+            if skipped:
+                msg += f", {skipped} already in DB"
+            if failed:
+                msg += f", {failed} failed"
+            log.info(msg)
+            self._notify(APP_NAME, msg)
+
+        threading.Thread(target=_do_sync, daemon=True, name="sync-db").start()
+
+    def _toggle_autostart(self, _icon=None, _item=None) -> None:
+        """Toggle Windows autostart on/off."""
+        enabled = is_autostart_enabled()
+        set_autostart(not enabled)
+        state = "enabled" if not enabled else "disabled"
+        self._notify(APP_NAME, f"Start with Windows: {state}")
 
     def _quit(self, icon, _item=None) -> None:
         self._stop_event.set()
@@ -357,6 +498,16 @@ class TrayApp:
             pystray.MenuItem("Recent Games", self._open_dashboard),
             pystray.Menu.SEPARATOR,
             pystray.MenuItem("Import History Screenshot...", self._import_history),
+            pystray.MenuItem(
+                "Start with Windows",
+                self._toggle_autostart,
+                checked=lambda _: is_autostart_enabled(),
+            ),
+            pystray.MenuItem(
+                "Sync CSV to DB",
+                self._sync_csv_to_db,
+                visible=lambda _: self._is_logged_in(),
+            ),
             pystray.MenuItem("Open CSV", self._open_csv),
             pystray.MenuItem("Open Viewer", self._open_viewer),
             pystray.MenuItem("Check for Updates", self._check_updates),
@@ -376,9 +527,10 @@ class TrayApp:
         from updater import start_update_loop
         start_update_loop(self._on_update_available)
 
-        print(f"[tray] {APP_NAME} running. Right-click tray icon for menu.")
-        print(f"[tray] CSV: {self.games_csv}")
-        print(f"[tray] Polling every {POLL_INTERVAL}s when Dota 2 is focused.")
+        log.info("%s running. Right-click tray icon for menu.", APP_NAME)
+        log.info("CSV: %s", self.games_csv)
+        log.info("Log: %s", LOG_PATH)
+        log.info("Polling every %ds when Dota 2 is focused.", POLL_INTERVAL)
         self._notify(APP_NAME, "Running in system tray.\nWill detect game screens when Dota 2 is focused.")
         icon.run()
 

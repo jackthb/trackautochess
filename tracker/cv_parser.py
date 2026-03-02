@@ -75,6 +75,7 @@ MM_COL_PLACEMENT = (0.390, 0.436)
 MM_COL_LEVEL     = (0.452, 0.481)
 MM_COL_UNITS     = (0.480, 0.597)
 MM_COL_SYNERGY   = (0.597, 0.692)
+MM_COL_RELIC     = (0.682, 0.738)
 MM_COL_GOLD      = (0.692, 0.752)
 MM_COL_WL        = (0.752, 0.792)
 MM_COL_RANK      = (0.792, 0.863)
@@ -694,6 +695,7 @@ def _parse_my_matches_row(
     row_y0: float,
     row_y1: float,
     unit_templates: dict[str, list[np.ndarray]],
+    relic_templates: dict[str, list[np.ndarray]],
     units_data: dict,
     stem_to_name: dict[str, str],
     debug: bool = False,
@@ -705,6 +707,7 @@ def _parse_my_matches_row(
         "level": "",
         "units": [],
         "synergies": "",
+        "relic": "",
         "wl": "",
         "rank": "",
     }
@@ -724,6 +727,15 @@ def _parse_my_matches_row(
         m2 = re.search(r"(\d)\s*/\s*\d", place_raw)
         if m2:
             result["placement"] = m2.group(1)
+    if not result["placement"]:
+        m3 = re.search(r"#(\d)", place_raw)
+        if m3 and 1 <= int(m3.group(1)) <= 8:
+            result["placement"] = m3.group(1)
+    if not result["placement"]:
+        # Last resort: lone digit 1-8
+        m4 = re.search(r"\b([1-8])\b", place_raw)
+        if m4:
+            result["placement"] = m4.group(1)
     if debug:
         print(f"  [row {row_idx}] placement OCR: {place_raw!r} → {result['placement']!r}")
 
@@ -743,25 +755,83 @@ def _parse_my_matches_row(
 
     # 3. Unit icon matching
     unit_region = _crop(img, MM_COL_UNITS[0], row_y0,
-                        MM_COL_UNITS[1], row_y0 + (row_y1 - row_y0) * 0.70)
+                        MM_COL_UNITS[1], row_y0 + (row_y1 - row_y0) * 0.65)
     _save_debug(f"mm_units_{row_idx}", unit_region, debug)
     matches = _match_templates_multiscale(
         unit_region, unit_templates,
         threshold=UNIT_MATCH_THRESHOLD,
+        y_max_frac=0.60,
         debug=debug,
     )
-    unit_names = [stem_to_name.get(stem, stem) for stem, _, _, _ in matches]
+    unit_names_raw = [stem_to_name.get(stem, stem) for stem, _, _, _ in matches]
+
+    # Detect star levels by counting colored squares below each unit icon
+    unit_names = []
+    ur_h, ur_w = unit_region.shape[:2]
+    hsv_region = cv2.cvtColor(unit_region, cv2.COLOR_BGR2HSV) if len(unit_region.shape) == 3 else None
+    for ui, (stem, score, ux, uy) in enumerate(matches):
+        name = stem_to_name.get(stem, stem)
+        stars = 1  # default
+        if hsv_region is not None:
+            # Estimate icon size from scale list midpoint
+            icon_h = UNIT_ICON_SCALES[len(UNIT_ICON_SCALES) // 2]
+            # Star squares sit just below the icon
+            sy0 = min(uy + icon_h, ur_h)
+            sy1 = min(sy0 + 10, ur_h)
+            sx0 = max(ux - 2, 0)
+            sx1 = min(ux + icon_h + 2, ur_w)
+            if sy1 > sy0 and sx1 > sx0:
+                star_strip = hsv_region[sy0:sy1, sx0:sx1]
+                s_ch = star_strip[:, :, 1]  # saturation
+                v_ch = star_strip[:, :, 2]  # value
+                # Bright saturated pixels = colored squares
+                bright_mask = ((s_ch > 80) & (v_ch > 100)).astype(np.uint8) * 255
+                # Count distinct square blobs via horizontal projection
+                col_sum = bright_mask.mean(axis=0)  # mean brightness per column
+                # Find runs of bright columns (each square is a contiguous run)
+                in_square = False
+                n_squares = 0
+                for val in col_sum:
+                    if val > 80 and not in_square:
+                        in_square = True
+                        n_squares += 1
+                    elif val <= 80:
+                        in_square = False
+                if 1 <= n_squares <= 3:
+                    stars = n_squares
+                if debug:
+                    print(f"    star detect {name}: squares={n_squares} → {stars}★")
+        unit_names.append(f"{name}({stars})" if stars > 1 else name)
+
     result["units"] = unit_names
     if debug:
         print(f"  [row {row_idx}] units ({len(unit_names)}): {unit_names}")
 
-    # 4. Synergies derived from units
-    if unit_names and units_data:
-        result["synergies"] = _synergies_from_units(unit_names, units_data)
+    # 4. Synergies derived from units (use raw names without star suffixes)
+    if unit_names_raw and units_data:
+        result["synergies"] = _synergies_from_units(unit_names_raw, units_data)
     if debug:
         print(f"  [row {row_idx}] synergies: {result['synergies']!r}")
 
-    # 5. W-L OCR — bottom half of cell (top half has gold "$XXX")
+    # 5. Relic icon matching
+    relic_cell = _crop(img, MM_COL_RELIC[0], row_y0, MM_COL_RELIC[1], row_y1)
+    _save_debug(f"mm_relic_{row_idx}", relic_cell, debug)
+    if relic_templates:
+        relic_matches = _match_templates_multiscale(
+            relic_cell, relic_templates, threshold=0.45,
+            color=True, debug=debug,
+        )
+        # Keep best score per unique relic name
+        best_per_name: dict[str, float] = {}
+        for name, score, x, y in relic_matches:
+            if name not in best_per_name or score > best_per_name[name]:
+                best_per_name[name] = score
+        ranked = sorted(best_per_name.items(), key=lambda x: -x[1])[:5]
+        result["relic"] = "|".join(name.replace("_", " ").title() for name, _ in ranked)
+        if debug:
+            print(f"  [row {row_idx}] relics: {[(n, f'{s:.3f}') for n, s in ranked]}")
+
+    # 6. W-L OCR — bottom half of cell (top half has gold "$XXX")
     wl_y0 = row_y0 + (row_y1 - row_y0) * 0.55
     wl_y1 = row_y0 + (row_y1 - row_y0) * 0.95
     wl_cell = _crop(img, MM_COL_WL[0], wl_y0, MM_COL_WL[1], wl_y1)
@@ -774,7 +844,7 @@ def _parse_my_matches_row(
     if debug:
         print(f"  [row {row_idx}] wl OCR: {wl_raw!r} → {result['wl']!r}")
 
-    # 6. Rank OCR
+    # 7. Rank OCR
     rank_y0 = row_y0 + (row_y1 - row_y0) * 0.20
     rank_y1 = row_y0 + (row_y1 - row_y0) * 0.80
     rank_cell = _crop(img, MM_COL_RANK[0], rank_y0, MM_COL_RANK[1], rank_y1)
@@ -831,6 +901,12 @@ def parse_my_matches(
         print(f"[mm] WARNING: no unit icons found in {units_icons_dir}")
         print("     Run: python download_unit_icons.py")
 
+    # Load relic icon templates
+    relic_templates = _load_templates_multiscale(icons_dir / "relics", RELIC_ICON_SCALES,
+                                                  inner_frac=1.0, color=True)
+    if debug:
+        print(f"[mm] Loaded {len(relic_templates)} relic templates")
+
     # Find row boundaries
     rows = _find_my_matches_rows(img, debug=debug)
     print(f"[mm] Detected {len(rows)} rows")
@@ -841,13 +917,13 @@ def parse_my_matches(
             print(f"\n[mm] --- Row {i} (y={y0:.3f}-{y1:.3f}) ---")
         row_data = _parse_my_matches_row(
             img, y0, y1,
-            unit_templates, units_data, stem_to_name,
+            unit_templates, relic_templates, units_data, stem_to_name,
             debug=debug, row_idx=i,
         )
         # Skip rows where we got nothing useful (empty rows at bottom of table)
-        if not any([row_data["placement"], row_data["units"], row_data["wl"]]):
+        if not (row_data["placement"] or (len(row_data["units"]) >= 3 and row_data["wl"])):
             if debug:
-                print(f"  [row {i}] empty row, skipping")
+                print(f"  [row {i}] insufficient data, skipping")
             continue
         parsed.append(row_data)
 

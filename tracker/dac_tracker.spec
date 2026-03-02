@@ -99,5 +99,5 @@ exe = EXE(
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
-    icon=None,  # TODO: add .ico file
+    icon=os.path.join(DATA_DIR, "icons", "dac_tracker.ico"),
 )

@@ -24,8 +24,7 @@
     },
     "item_egg": {
       "name": "Greevil Egg",
-      "description": "",
-      "note": "icon missing — need to source correct image"
+      "description": ""
     },
     "item_bench_contract": {
       "name": "Magic Seed",
