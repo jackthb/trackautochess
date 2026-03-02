@@ -91,12 +91,18 @@ def _make_icon_image() -> Image.Image:
 
 
 def _save_icon_file() -> str | None:
-    """Save the app icon as .ico in ~/.dac/ and return the path."""
+    """Copy the bundled .ico to ~/.dac/ and return the path."""
     ico_path = DAC_DIR / "icon.ico"
-    if ico_path.exists():
-        return str(ico_path)
+    src = ICONS_DIR / "dac_tracker.ico"
     try:
+        import shutil
         DAC_DIR.mkdir(parents=True, exist_ok=True)
+        if src.exists():
+            shutil.copy2(src, ico_path)
+            return str(ico_path)
+        if ico_path.exists():
+            return str(ico_path)
+        # Fallback: generate a simple icon
         img = _make_icon_image()
         img.save(str(ico_path), format="ICO", sizes=[(64, 64)])
         return str(ico_path)
