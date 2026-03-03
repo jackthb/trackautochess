@@ -10,3 +10,7 @@ data/filter_*.txt
 __pycache__/
 *.pyc
 tracker/.venv/
+data/crop_debug/
+data/yolo/
+data/detections.json
+runs/
