@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DAC Manual Game Entry</title>
+<style>
+  :root {
+    --bg: #1a1a2e;
+    --surface: #16213e;
+    --surface2: #0f3460;
+    --accent: #e94560;
+    --text: #eee;
+    --text-dim: #999;
+    --border: #333;
+    --success: #2ecc71;
+    --input-bg: #0d1b2a;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 20px;
+  }
+  h1 { text-align: center; margin-bottom: 24px; font-size: 1.5rem; }
+  .container { max-width: 720px; margin: 0 auto; }
+
+  /* Settings panel */
+  .settings-toggle {
+    display: block; margin: 0 auto 16px; padding: 6px 16px;
+    background: var(--surface2); color: var(--text-dim); border: 1px solid var(--border);
+    border-radius: 4px; cursor: pointer; font-size: .85rem;
+  }
+  .settings-toggle:hover { color: var(--text); }
+  .settings-panel {
+    display: none; background: var(--surface); border: 1px solid var(--border);
+    border-radius: 8px; padding: 16px; margin-bottom: 20px;
+  }
+  .settings-panel.open { display: block; }
+  .settings-panel label { display: block; font-size: .85rem; color: var(--text-dim); margin-bottom: 4px; }
+  .settings-panel input {
+    width: 100%; padding: 6px 8px; margin-bottom: 12px;
+    background: var(--input-bg); color: var(--text); border: 1px solid var(--border);
+    border-radius: 4px; font-family: monospace; font-size: .85rem;
+  }
+
+  /* Form layout */
+  .form-grid {
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 16px; background: var(--surface); padding: 20px;
+    border-radius: 8px; border: 1px solid var(--border);
+  }
+  .form-grid .full { grid-column: 1 / -1; }
+  .field label {
+    display: block; font-size: .8rem; color: var(--text-dim);
+    margin-bottom: 4px; text-transform: uppercase; letter-spacing: .5px;
+  }
+  .field select, .field input, .field textarea {
+    width: 100%; padding: 8px 10px;
+    background: var(--input-bg); color: var(--text); border: 1px solid var(--border);
+    border-radius: 4px; font-size: .9rem;
+  }
+  .field textarea { resize: vertical; min-height: 60px; font-family: inherit; }
+  .inline { display: flex; gap: 8px; align-items: center; }
+  .inline input, .inline select { flex: 1; }
+  .inline span { color: var(--text-dim); font-size: .9rem; }
+
+  /* Radio group */
+  .radio-group { display: flex; gap: 12px; padding-top: 4px; }
+  .radio-group label {
+    display: flex; align-items: center; gap: 4px;
+    text-transform: none; letter-spacing: 0; font-size: .9rem; color: var(--text); cursor: pointer;
+  }
+
+  /* Units section */
+  .units-section { position: relative; }
+  .unit-input-wrap { position: relative; }
+  .unit-input-wrap input { width: 100%; }
+  .autocomplete-list {
+    position: absolute; top: 100%; left: 0; right: 0; z-index: 10;
+    background: var(--surface); border: 1px solid var(--border); border-top: none;
+    border-radius: 0 0 4px 4px; max-height: 200px; overflow-y: auto; display: none;
+  }
+  .autocomplete-list.open { display: block; }
+  .autocomplete-list div {
+    padding: 6px 10px; cursor: pointer; font-size: .85rem;
+  }
+  .autocomplete-list div:hover, .autocomplete-list div.highlighted {
+    background: var(--surface2);
+  }
+  .autocomplete-list div .cost {
+    color: var(--text-dim); font-size: .75rem; margin-left: 4px;
+  }
+  .autocomplete-list div .syns {
+    color: var(--accent); font-size: .75rem; margin-left: 6px;
+  }
+
+  /* Tags */
+  .tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+  .tag {
+    display: inline-flex; align-items: center; gap: 4px;
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 4px; padding: 3px 8px; font-size: .85rem;
+  }
+  .tag select {
+    background: transparent; color: var(--accent); border: none;
+    font-size: .8rem; cursor: pointer; padding: 0;
+  }
+  .tag .remove {
+    cursor: pointer; color: var(--text-dim); font-size: .75rem;
+    margin-left: 2px;
+  }
+  .tag .remove:hover { color: var(--accent); }
+
+  /* Synergies display */
+  .synergies-display {
+    margin-top: 8px; font-size: .85rem; color: var(--text-dim);
+    min-height: 20px;
+  }
+  .synergies-display span {
+    display: inline-block; background: var(--surface2); border-radius: 3px;
+    padding: 2px 6px; margin: 2px; font-size: .8rem;
+  }
+
+  /* Submit */
+  .submit-row { margin-top: 20px; text-align: center; }
+  .submit-btn {
+    padding: 10px 40px; background: var(--accent); color: #fff;
+    border: none; border-radius: 6px; font-size: 1rem; cursor: pointer;
+    font-weight: 600;
+  }
+  .submit-btn:hover { filter: brightness(1.1); }
+  .submit-btn:disabled { opacity: .5; cursor: not-allowed; }
+  .status {
+    margin-top: 12px; text-align: center; font-size: .9rem; min-height: 24px;
+  }
+  .status.error { color: var(--accent); }
+  .status.ok { color: var(--success); }
+
+  /* Recent games */
+  .recent { margin-top: 32px; }
+  .recent h2 { font-size: 1.1rem; margin-bottom: 12px; }
+  .recent table {
+    width: 100%; border-collapse: collapse; font-size: .8rem;
+  }
+  .recent th, .recent td {
+    padding: 6px 8px; text-align: left; border-bottom: 1px solid var(--border);
+  }
+  .recent th { color: var(--text-dim); text-transform: uppercase; font-size: .7rem; }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>DAC Manual Game Entry</h1>
+
+  <button class="settings-toggle" onclick="toggleSettings()">Settings</button>
+  <div class="settings-panel" id="settingsPanel">
+    <label>Supabase URL</label>
+    <input id="cfgUrl" placeholder="https://xyz.supabase.co">
+    <label>Supabase Key (anon)</label>
+    <input id="cfgKey" placeholder="eyJ..." type="password">
+    <label>Steam ID</label>
+    <input id="cfgSteamId" placeholder="76561198...">
+    <button class="settings-toggle" onclick="saveSettings()" style="margin-top:4px">Save</button>
+  </div>
+
+  <div class="form-grid">
+    <!-- Placement -->
+    <div class="field">
+      <label>Placement</label>
+      <select id="placement">
+        <option value="">--</option>
+        <option>1</option><option>2</option><option>3</option><option>4</option>
+        <option>5</option><option>6</option><option>7</option><option>8</option>
+      </select>
+    </div>
+
+    <!-- Level -->
+    <div class="field">
+      <label>Level</label>
+      <input type="number" id="level" min="1" max="25" placeholder="1-25">
+    </div>
+
+    <!-- W-L -->
+    <div class="field">
+      <label>W - L</label>
+      <div class="inline">
+        <input type="number" id="wins" min="0" placeholder="W">
+        <span>-</span>
+        <input type="number" id="losses" min="0" placeholder="L">
+      </div>
+    </div>
+
+    <!-- Rank -->
+    <div class="field">
+      <label>Rank</label>
+      <div class="inline">
+        <select id="rankTier">
+          <option value="">--</option>
+          <option>Pawn</option><option>Knight</option><option>Bishop</option>
+          <option>Rook</option><option>King</option><option>Queen</option>
+        </select>
+        <span>-</span>
+        <select id="rankNum">
+          <option value="">-</option>
+          <option>1</option><option>2</option><option>3</option><option>4</option>
+          <option>5</option><option>6</option><option>7</option><option>8</option><option>9</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Rank Change -->
+    <div class="field full">
+      <label>Rank Change</label>
+      <div class="radio-group">
+        <label><input type="radio" name="rankChange" value="up"> Up</label>
+        <label><input type="radio" name="rankChange" value="down"> Down</label>
+        <label><input type="radio" name="rankChange" value="none" checked> None</label>
+      </div>
+    </div>
+
+    <!-- Units -->
+    <div class="field full units-section">
+      <label>Units</label>
+      <div class="unit-input-wrap">
+        <input type="text" id="unitSearch" placeholder="Type to search units..." autocomplete="off">
+        <div class="autocomplete-list" id="unitDropdown"></div>
+      </div>
+      <div class="tags" id="unitTags"></div>
+      <div class="synergies-display" id="synergiesDisplay"></div>
+    </div>
+
+    <!-- Relics -->
+    <div class="field full units-section">
+      <label>Relics</label>
+      <div class="unit-input-wrap">
+        <input type="text" id="relicSearch" placeholder="Type to search relics..." autocomplete="off">
+        <div class="autocomplete-list" id="relicDropdown"></div>
+      </div>
+      <div class="tags" id="relicTags"></div>
+    </div>
+
+    <!-- Notes -->
+    <div class="field full">
+      <label>Notes</label>
+      <textarea id="notes" placeholder="Optional notes..."></textarea>
+    </div>
+  </div>
+
+  <div class="submit-row">
+    <button class="submit-btn" id="submitBtn" onclick="submitGame()">Submit Game</button>
+    <div class="status" id="status"></div>
+  </div>
+
+  <div class="recent" id="recentSection" style="display:none">
+    <h2>Recent Games</h2>
+    <table>
+      <thead><tr><th>Date</th><th>#</th><th>Rank</th><th>Level</th><th>W-L</th><th>Lineup</th></tr></thead>
+      <tbody id="recentBody"></tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+// ── Data (loaded from JSON files) ──
+let UNITS = {};   // {name: {cost, synergies[]}}
+let RELICS = [];  // ["Weaponsmith", ...]
+
+const selectedUnits = [];  // [{name, stars}]
+const selectedRelics = []; // [name]
+
+// ── Init ──
+document.addEventListener('DOMContentLoaded', async () => {
+  loadSettings();
+  await loadData();
+  setupAutocomplete('unitSearch', 'unitDropdown', getUnitSuggestions, addUnit);
+  setupAutocomplete('relicSearch', 'relicDropdown', getRelicSuggestions, addRelic);
+  loadRecentGames();
+});
+
+async function loadData() {
+  try {
+    // Try loading relative to expected location (tracker/ is sibling to data/)
+    const basePaths = ['../data', './data', 'data'];
+    let unitsData = null, relicsData = null;
+
+    for (const base of basePaths) {
+      try {
+        const [uResp, rResp] = await Promise.all([
+          fetch(`${base}/units.json`),
+          fetch(`${base}/relics.json`)
+        ]);
+        if (uResp.ok && rResp.ok) {
+          unitsData = await uResp.json();
+          relicsData = await rResp.json();
+          break;
+        }
+      } catch (_) {}
+    }
+
+    if (unitsData) {
+      UNITS = unitsData.units || {};
+    } else {
+      console.warn('Could not load units.json — autocomplete disabled');
+    }
+    if (relicsData) {
+      RELICS = Object.values(relicsData.relics || {}).map(r => r.name);
+    } else {
+      console.warn('Could not load relics.json — autocomplete disabled');
+    }
+  } catch (e) {
+    console.error('loadData error:', e);
+  }
+}
+
+// ── Config defaults from ~/.dac/config.json ──
+const DEFAULT_CONFIG = {
+  url: 'https://xkfxykorskdltcmvgihh.supabase.co',
+  key: 'sb_publishable_Tk7hBHGJImbtzxxZzEIgKQ_kwnKuCaK',
+  steamId: '76561198022169086',
+};
+
+// ── Settings ──
+function loadSettings() {
+  document.getElementById('cfgUrl').value = localStorage.getItem('dac_supabase_url') || DEFAULT_CONFIG.url;
+  document.getElementById('cfgKey').value = localStorage.getItem('dac_supabase_key') || DEFAULT_CONFIG.key;
+  document.getElementById('cfgSteamId').value = localStorage.getItem('dac_steam_id') || DEFAULT_CONFIG.steamId;
+}
+function saveSettings() {
+  localStorage.setItem('dac_supabase_url', document.getElementById('cfgUrl').value.trim());
+  localStorage.setItem('dac_supabase_key', document.getElementById('cfgKey').value.trim());
+  localStorage.setItem('dac_steam_id', document.getElementById('cfgSteamId').value.trim());
+  document.getElementById('settingsPanel').classList.remove('open');
+  setStatus('Settings saved', 'ok');
+}
+function toggleSettings() {
+  document.getElementById('settingsPanel').classList.toggle('open');
+}
+function getConfig() {
+  return {
+    url: localStorage.getItem('dac_supabase_url') || DEFAULT_CONFIG.url,
+    key: localStorage.getItem('dac_supabase_key') || DEFAULT_CONFIG.key,
+    steamId: localStorage.getItem('dac_steam_id') || DEFAULT_CONFIG.steamId,
+  };
+}
+
+// ── Autocomplete ──
+function setupAutocomplete(inputId, dropdownId, getSuggestions, onSelect) {
+  const input = document.getElementById(inputId);
+  const dropdown = document.getElementById(dropdownId);
+  let highlightIdx = -1;
+
+  input.addEventListener('input', () => {
+    const q = input.value.trim().toLowerCase();
+    const items = q.length > 0 ? getSuggestions(q) : [];
+    highlightIdx = -1;
+    renderDropdown(dropdown, items, highlightIdx, onSelect, input);
+  });
+
+  input.addEventListener('keydown', (e) => {
+    const items = dropdown.querySelectorAll('div');
+    if (!items.length) return;
+
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      highlightIdx = Math.min(highlightIdx + 1, items.length - 1);
+      updateHighlight(items, highlightIdx);
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      highlightIdx = Math.max(highlightIdx - 1, 0);
+      updateHighlight(items, highlightIdx);
+    } else if (e.key === 'Enter') {
+      e.preventDefault();
+      if (highlightIdx >= 0 && items[highlightIdx]) {
+        items[highlightIdx].click();
+      }
+    } else if (e.key === 'Escape') {
+      dropdown.classList.remove('open');
+    }
+  });
+
+  input.addEventListener('blur', () => {
+    setTimeout(() => dropdown.classList.remove('open'), 150);
+  });
+  input.addEventListener('focus', () => {
+    if (input.value.trim().length > 0) {
+      input.dispatchEvent(new Event('input'));
+    }
+  });
+}
+
+function renderDropdown(dropdown, items, highlightIdx, onSelect, input) {
+  dropdown.innerHTML = '';
+  if (!items.length) { dropdown.classList.remove('open'); return; }
+  items.forEach((item, i) => {
+    const d = document.createElement('div');
+    d.innerHTML = item.html;
+    if (i === highlightIdx) d.classList.add('highlighted');
+    d.addEventListener('mousedown', (e) => {
+      e.preventDefault();
+      onSelect(item.value);
+      input.value = '';
+      dropdown.classList.remove('open');
+    });
+    dropdown.appendChild(d);
+  });
+  dropdown.classList.add('open');
+}
+
+function updateHighlight(items, idx) {
+  items.forEach((el, i) => el.classList.toggle('highlighted', i === idx));
+}
+
+function getUnitSuggestions(q) {
+  const already = new Set(selectedUnits.map(u => u.name));
+  return Object.entries(UNITS)
+    .filter(([name]) => !already.has(name) && name.toLowerCase().includes(q))
+    .slice(0, 12)
+    .map(([name, data]) => ({
+      value: name,
+      html: `${name}<span class="cost">$${data.cost}</span><span class="syns">${data.synergies.join(', ')}</span>`
+    }));
+}
+
+function getRelicSuggestions(q) {
+  const already = new Set(selectedRelics);
+  return RELICS
+    .filter(name => !already.has(name) && name.toLowerCase().includes(q))
+    .slice(0, 10)
+    .map(name => ({ value: name, html: name }));
+}
+
+// ── Unit management ──
+function addUnit(name) {
+  if (selectedUnits.find(u => u.name === name)) return;
+  selectedUnits.push({ name, stars: 1 });
+  renderUnits();
+  updateSynergies();
+}
+
+function removeUnit(name) {
+  const idx = selectedUnits.findIndex(u => u.name === name);
+  if (idx >= 0) selectedUnits.splice(idx, 1);
+  renderUnits();
+  updateSynergies();
+}
+
+function setUnitStars(name, stars) {
+  const u = selectedUnits.find(u => u.name === name);
+  if (u) u.stars = parseInt(stars);
+}
+
+function renderUnits() {
+  const container = document.getElementById('unitTags');
+  container.innerHTML = selectedUnits.map(u => `
+    <span class="tag">
+      ${u.name}
+      <select onchange="setUnitStars('${u.name}', this.value)">
+        <option value="1" ${u.stars===1?'selected':''}>★</option>
+        <option value="2" ${u.stars===2?'selected':''}>★★</option>
+        <option value="3" ${u.stars===3?'selected':''}>★★★</option>
+      </select>
+      <span class="remove" onclick="removeUnit('${u.name}')">&times;</span>
+    </span>
+  `).join('');
+}
+
+function updateSynergies() {
+  const counts = {};
+  for (const u of selectedUnits) {
+    const data = UNITS[u.name];
+    if (!data) continue;
+    for (const syn of data.synergies) {
+      counts[syn] = (counts[syn] || 0) + 1;
+    }
+  }
+  const display = document.getElementById('synergiesDisplay');
+  const entries = Object.entries(counts).sort((a, b) => b[1] - a[1]);
+  if (!entries.length) {
+    display.innerHTML = '';
+    return;
+  }
+  display.innerHTML = entries.map(([syn, count]) =>
+    `<span>${syn}: ${count}</span>`
+  ).join('');
+}
+
+// ── Relic management ──
+function addRelic(name) {
+  if (selectedRelics.includes(name)) return;
+  selectedRelics.push(name);
+  renderRelics();
+}
+
+function removeRelic(name) {
+  const idx = selectedRelics.indexOf(name);
+  if (idx >= 0) selectedRelics.splice(idx, 1);
+  renderRelics();
+}
+
+function renderRelics() {
+  const container = document.getElementById('relicTags');
+  container.innerHTML = selectedRelics.map(name => `
+    <span class="tag">
+      ${name}
+      <span class="remove" onclick="removeRelic('${name}')">&times;</span>
+    </span>
+  `).join('');
+}
+
+// ── Submit ──
+async function submitGame() {
+  const cfg = getConfig();
+  if (!cfg.url || !cfg.key || !cfg.steamId) {
+    setStatus('Configure Supabase URL, Key, and Steam ID in Settings first', 'error');
+    return;
+  }
+
+  const placement = document.getElementById('placement').value;
+  if (!placement) {
+    setStatus('Placement is required', 'error');
+    return;
+  }
+
+  const rankTier = document.getElementById('rankTier').value;
+  const rankNum = document.getElementById('rankNum').value;
+  const rank = rankTier && rankNum ? `${rankTier}-${rankNum}` : (rankTier || '');
+  const rankChange = document.querySelector('input[name="rankChange"]:checked')?.value || 'none';
+
+  const wins = document.getElementById('wins').value;
+  const losses = document.getElementById('losses').value;
+  const wl = wins && losses ? `${wins}-${losses}` : '';
+
+  const level = document.getElementById('level').value;
+
+  // Build lineup string: "Unit1(2)|Unit2(3)"
+  const lineup = selectedUnits.map(u => `${u.name}(${u.stars})`).join('|');
+
+  // Build synergies string
+  const synCounts = {};
+  for (const u of selectedUnits) {
+    const data = UNITS[u.name];
+    if (!data) continue;
+    for (const syn of data.synergies) {
+      synCounts[syn] = (synCounts[syn] || 0) + 1;
+    }
+  }
+  const synergies = Object.entries(synCounts)
+    .sort((a, b) => b[1] - a[1])
+    .map(([s, c]) => `${s}:${c}`)
+    .join('|');
+
+  const relic = selectedRelics.join('|');
+  const notes = document.getElementById('notes').value.trim();
+  const now = new Date();
+  const date = now.getFullYear() + '-' +
+    String(now.getMonth()+1).padStart(2,'0') + '-' +
+    String(now.getDate()).padStart(2,'0') + ' ' +
+    String(now.getHours()).padStart(2,'0') + ':' +
+    String(now.getMinutes()).padStart(2,'0') + ':' +
+    String(now.getSeconds()).padStart(2,'0');
+
+  const row = {
+    date, placement, rank, rank_change: rankChange,
+    lineup: lineup || null,
+    synergies: synergies || null,
+    talents: null,
+    relic: relic || null,
+    level: level || null,
+    wl: wl || null,
+    screenshot: null,
+    notes: notes || null,
+    user_id: cfg.steamId,
+  };
+
+  const btn = document.getElementById('submitBtn');
+  btn.disabled = true;
+  setStatus('Submitting...', '');
+
+  try {
+    const resp = await fetch(`${cfg.url.replace(/\/+$/, '')}/rest/v1/games`, {
+      method: 'POST',
+      headers: {
+        'apikey': cfg.key,
+        'Authorization': `Bearer ${cfg.key}`,
+        'Content-Type': 'application/json',
+        'Prefer': 'return=minimal',
+      },
+      body: JSON.stringify(row),
+    });
+
+    if (!resp.ok) {
+      const text = await resp.text();
+      throw new Error(`${resp.status}: ${text}`);
+    }
+
+    setStatus(`Game saved! Placement: #${placement}`, 'ok');
+    resetForm();
+    loadRecentGames();
+  } catch (e) {
+    setStatus(`Error: ${e.message}`, 'error');
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+function resetForm() {
+  document.getElementById('placement').value = '';
+  document.getElementById('level').value = '';
+  document.getElementById('wins').value = '';
+  document.getElementById('losses').value = '';
+  document.getElementById('rankTier').value = '';
+  document.getElementById('rankNum').value = '';
+  document.querySelector('input[name="rankChange"][value="none"]').checked = true;
+  document.getElementById('notes').value = '';
+  selectedUnits.length = 0;
+  selectedRelics.length = 0;
+  renderUnits();
+  renderRelics();
+  updateSynergies();
+}
+
+// ── Recent games ──
+async function loadRecentGames() {
+  const cfg = getConfig();
+  if (!cfg.url || !cfg.key || !cfg.steamId) return;
+
+  try {
+    const resp = await fetch(
+      `${cfg.url.replace(/\/+$/, '')}/rest/v1/games?user_id=eq.${cfg.steamId}&order=created_at.desc&limit=10`,
+      {
+        headers: {
+          'apikey': cfg.key,
+          'Authorization': `Bearer ${cfg.key}`,
+          'Accept': 'application/json',
+        },
+      }
+    );
+    if (!resp.ok) return;
+
+    const games = await resp.json();
+    if (!games.length) return;
+
+    const body = document.getElementById('recentBody');
+    body.innerHTML = games.map(g => `
+      <tr>
+        <td>${(g.date || '').slice(0, 10)}</td>
+        <td>${g.placement || ''}</td>
+        <td>${g.rank || ''}</td>
+        <td>${g.level || ''}</td>
+        <td>${g.wl || ''}</td>
+        <td>${(g.lineup || '').replace(/\|/g, ', ').slice(0, 60)}</td>
+      </tr>
+    `).join('');
+    document.getElementById('recentSection').style.display = 'block';
+  } catch (_) {}
+}
+
+function setStatus(msg, cls) {
+  const el = document.getElementById('status');
+  el.textContent = msg;
+  el.className = 'status' + (cls ? ' ' + cls : '');
+}
+</script>
+</body>
+</html>

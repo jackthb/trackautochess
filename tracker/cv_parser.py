@@ -73,15 +73,36 @@ MM_SEP_DARK_THRESH = 35            # mean brightness below this → separator ba
 # Calibrated from user pixel measurements on 3440×1440 screenshot.
 MM_COL_PLACEMENT = (0.390, 0.436)
 MM_COL_LEVEL     = (0.452, 0.481)
-MM_COL_UNITS     = (0.480, 0.597)
+MM_COL_UNITS     = (0.4814, 0.5945)
 MM_COL_SYNERGY   = (0.597, 0.692)
-MM_COL_RELIC     = (0.682, 0.738)
-MM_COL_GOLD      = (0.692, 0.752)
+MM_COL_RELIC     = (0.7035, 0.7491)
 MM_COL_WL        = (0.752, 0.792)
 MM_COL_RANK      = (0.792, 0.863)
 
 UNIT_ICON_SCALES    = [24, 28, 32, 36, 40, 44]
 UNIT_MATCH_THRESHOLD = 0.65
+
+# Grid layout for unit icons in MY MATCHES rows.
+# Calibrated on 3440×1440 from manual coordinate picking.
+# Unit column is ~389px wide, 9 slots spaced ~43px apart.
+MM_UNIT_GRID_START_FRAC = 0.0     # grid origin x at column left edge
+MM_UNIT_GRID_SPACING_FRAC = 0.1102 # slot spacing as fraction of unit column width
+MM_UNIT_SPLIT_Y = 0.514            # two-row split point (fraction of row height)
+MM_UNIT_ONE_ROW_Y = (0.215, 0.813) # single-row icon y range (fraction of row height)
+MM_UNIT_MAX_SLOTS = 9              # max slots per sub-row
+
+# Relic grid layout for MY MATCHES rows.
+# Calibrated on 3440×1440 from coord picker measurements.
+# 3 columns × 2 rows = 6 slots max. Positions as fractions of relic cell dims.
+MM_RELIC_COLS = 3
+MM_RELIC_ROWS = 2
+MM_RELIC_SPLIT_Y = 0.49            # row split (fraction of cell height)
+# Column slot x-ranges as fractions of relic cell width (gaps between cols)
+MM_RELIC_COL_RANGES = [
+    (0.000, 0.300),   # col 0: x=0.7035..0.7172
+    (0.351, 0.649),   # col 1: x=0.7195..0.7331
+    (0.702, 1.000),   # col 2: x=0.7355..0.7491
+]
 
 
 # ── Helpers ──────────────────────────────────────────────────────────────────
@@ -346,6 +367,137 @@ def _match_templates_multiscale(
     return kept
 
 
+def _match_unit_grid(
+    unit_region: np.ndarray,
+    templates: dict[str, list[np.ndarray]],
+    threshold: float = UNIT_MATCH_THRESHOLD,
+    debug: bool = False,
+) -> list[tuple[str, float, int, int]]:
+    """Per-slot unit matching against individual grid cells.
+
+    Matches each slot against the full row height. Templates are small
+    enough to find icons whether they're in a single-row or two-row layout.
+    Uses matchTemplate which naturally finds the best y-position within
+    the slot. Assigns to top/bottom zone based on match y-position to
+    allow two units per slot in two-row layouts.
+
+    Returns [(name, score, x, y), ...] sorted by y then x.
+    """
+    region_bgr = unit_region if len(unit_region.shape) == 3 else cv2.cvtColor(unit_region, cv2.COLOR_GRAY2BGR)
+    rh, rw = region_bgr.shape[:2]
+
+    grid_start = int(rw * MM_UNIT_GRID_START_FRAC)
+    grid_spacing = max(int(rw * MM_UNIT_GRID_SPACING_FRAC), 1)
+    y_mid = int(rh * MM_UNIT_SPLIT_Y)
+
+    # Match each slot against full row height
+    # cell_best keyed by (slot_idx, y_zone) to allow two matches per slot
+    cell_best: dict[tuple[int, int], tuple[str, float, int, int]] = {}
+    for slot_idx in range(MM_UNIT_MAX_SLOTS):
+        sx = grid_start + slot_idx * grid_spacing
+        crop_x0 = max(sx - 5, 0)
+        crop_x1 = min(sx + grid_spacing + 5, rw)
+        slot_img = region_bgr[0:rh, crop_x0:crop_x1]
+        if slot_img.size == 0:
+            continue
+
+        for name, tmpls in templates.items():
+            for tmpl in tmpls:
+                th, tw = tmpl.shape[:2]
+                if slot_img.shape[0] < th or slot_img.shape[1] < tw:
+                    continue
+                result = np.zeros((slot_img.shape[0] - th + 1,
+                                   slot_img.shape[1] - tw + 1), dtype=np.float32)
+                for ch in range(3):
+                    result += cv2.matchTemplate(slot_img[:, :, ch], tmpl[:, :, ch],
+                                                cv2.TM_CCOEFF_NORMED)
+                result /= 3.0
+                _, max_val, _, max_loc = cv2.minMaxLoc(result)
+                if max_val < threshold:
+                    continue
+                match_y = max_loc[1]
+                y_zone = 0 if match_y < y_mid else 1
+                key = (slot_idx, y_zone)
+                if key not in cell_best or max_val > cell_best[key][1]:
+                    cell_best[key] = (name, float(max_val), sx, match_y)
+
+    all_matches = []
+    for (slot_idx, y_zone) in sorted(cell_best):
+        name, score, x, y = cell_best[(slot_idx, y_zone)]
+        zone_label = "top" if y_zone == 0 else "bot"
+        all_matches.append((name, score, x, y))
+        if debug:
+            print(f"    slot {zone_label}[{slot_idx}]: {name:20s} score={score:.3f}")
+
+    all_matches.sort(key=lambda m: (m[3], m[2]))
+    return all_matches
+
+
+def _match_relic_grid(
+    relic_region: np.ndarray,
+    templates: dict[str, list[np.ndarray]],
+    threshold: float = 0.55,
+    debug: bool = False,
+) -> list[tuple[str, float, int, int]]:
+    """Per-slot relic matching against a 3-column × 2-row grid.
+
+    Crops each of the 6 slots using calibrated positions (MM_RELIC_COL_RANGES
+    and MM_RELIC_SPLIT_Y), then finds the best template match per slot.
+    Returns [(name, score, x, y), ...] sorted by y then x.
+    """
+    region_bgr = relic_region if len(relic_region.shape) == 3 else cv2.cvtColor(relic_region, cv2.COLOR_GRAY2BGR)
+    rh, rw = region_bgr.shape[:2]
+    y_mid = int(rh * MM_RELIC_SPLIT_Y)
+
+    cell_best: dict[tuple[int, int], tuple[str, float, int, int]] = {}
+    for col_idx, (xf0, xf1) in enumerate(MM_RELIC_COL_RANGES):
+        for row_idx in range(MM_RELIC_ROWS):
+            cx0 = int(rw * xf0)
+            cx1 = int(rw * xf1)
+            cy0 = 0 if row_idx == 0 else y_mid
+            cy1 = y_mid if row_idx == 0 else rh
+            slot_img = region_bgr[cy0:cy1, cx0:cx1]
+            if slot_img.size == 0:
+                continue
+
+            # Skip empty slots: dark background with little colour variation
+            gray_slot = cv2.cvtColor(slot_img, cv2.COLOR_BGR2GRAY)
+            if gray_slot.mean() < 35 and gray_slot.std() < 15:
+                if debug:
+                    print(f"    relic slot {'top' if row_idx == 0 else 'bot'}[{col_idx}]: "
+                          f"empty (mean={gray_slot.mean():.0f} std={gray_slot.std():.1f})")
+                continue
+
+            for name, tmpls in templates.items():
+                for tmpl in tmpls:
+                    th, tw = tmpl.shape[:2]
+                    if slot_img.shape[0] < th or slot_img.shape[1] < tw:
+                        continue
+                    result = np.zeros((slot_img.shape[0] - th + 1,
+                                       slot_img.shape[1] - tw + 1), dtype=np.float32)
+                    for ch in range(3):
+                        result += cv2.matchTemplate(slot_img[:, :, ch], tmpl[:, :, ch],
+                                                    cv2.TM_CCOEFF_NORMED)
+                    result /= 3.0
+                    _, max_val, _, max_loc = cv2.minMaxLoc(result)
+                    if max_val < threshold:
+                        continue
+                    key = (col_idx, row_idx)
+                    if key not in cell_best or max_val > cell_best[key][1]:
+                        cell_best[key] = (name, float(max_val), cx0 + max_loc[0], cy0 + max_loc[1])
+
+    all_matches = []
+    for (col_idx, row_idx) in sorted(cell_best):
+        name, score, x, y = cell_best[(col_idx, row_idx)]
+        zone_label = "top" if row_idx == 0 else "bot"
+        all_matches.append((name, score, x, y))
+        if debug:
+            print(f"    relic slot {zone_label}[{col_idx}]: {name:20s} score={score:.3f}")
+
+    all_matches.sort(key=lambda m: (m[3], m[2]))
+    return all_matches
+
+
 def _ocr_synergy_counts(
     region: np.ndarray,
     matches: list[tuple[str, float, int, int]],
@@ -557,7 +709,7 @@ def parse_game_over(
         # If count OCR failed, still report names with count 0
         synergies = "|".join(f"{name}:0" for name, _, _, _ in syn_matches)
 
-    # 6. Template match relics
+    # 6. Template match relics (global multiscale — Game Over layout differs from MY MATCHES)
     print("[cv] Matching relic icons...")
     relic_cell = _crop_row(img, COL_RELIC, y0, y1)
     _save_debug("relic_cell", relic_cell, debug)
@@ -613,41 +765,57 @@ def _find_my_matches_rows(img: np.ndarray, debug: bool = False) -> list[tuple[fl
     gray = cv2.cvtColor(strip, cv2.COLOR_BGR2GRAY) if len(strip.shape) == 3 else strip
     row_means = gray.mean(axis=1)  # mean brightness per scan-line
 
-    # Find contiguous dark bands (separators)
+    # Find contiguous dark bands, then merge nearby ones into separator zones.
+    # Separator zones in the table often have brief bright-ish gaps (1-2px)
+    # that would fragment them into multiple tiny bands, so we merge bands
+    # whose gap is smaller than merge_gap.
     in_dark = False
     band_start = 0
-    sep_centers: list[int] = []
+    raw_bands: list[tuple[int, int]] = []  # (start, end) in strip coords
     for i, val in enumerate(row_means):
         if val < MM_SEP_DARK_THRESH and not in_dark:
             in_dark = True
             band_start = i
         elif val >= MM_SEP_DARK_THRESH and in_dark:
             in_dark = False
-            band_end = i
-            if band_end - band_start >= 2:
-                sep_centers.append((band_start + band_end) // 2 + y0_px)
+            if i - band_start >= 2:
+                raw_bands.append((band_start, i))
+
+    # Merge bands separated by small gaps
+    merge_gap = 15
+    merged_bands: list[tuple[int, int]] = []
+    for b_start, b_end in raw_bands:
+        if merged_bands and b_start - merged_bands[-1][1] <= merge_gap:
+            merged_bands[-1] = (merged_bands[-1][0], b_end)
+        else:
+            merged_bands.append((b_start, b_end))
+
+    # Convert to absolute pixel coords
+    sep_zones = [(s + y0_px, e + y0_px) for s, e in merged_bands]
 
     if debug:
-        print(f"  [mm rows] found {len(sep_centers)} separators at y={sep_centers}")
+        print(f"  [mm rows] found {len(sep_zones)} separators: {[(s, e, e-s) for s, e in sep_zones]}")
 
     rows: list[tuple[float, float]] = []
-    if len(sep_centers) >= 3:
-        # Compute median row height from detected separators
+    if len(sep_zones) >= 3:
+        # Compute median row height from separator-to-separator distances
+        sep_centers = [(s + e) // 2 for s, e in sep_zones]
         gaps = [sep_centers[i + 1] - sep_centers[i]
                 for i in range(len(sep_centers) - 1)
                 if sep_centers[i + 1] - sep_centers[i] > h * 0.02]
         row_h_px = int(np.median(gaps)) if gaps else int(h * 0.075)
 
-        # Build rows from detected separators
-        for i in range(len(sep_centers) - 1):
-            r_y0 = sep_centers[i] / h
-            r_y1 = sep_centers[i + 1] / h
+        # Build rows using separator band edges (not centers + inset).
+        # Row starts at the end of one separator, ends at the start of the next.
+        for i in range(len(sep_zones) - 1):
+            r_y0 = sep_zones[i][1] / h
+            r_y1 = sep_zones[i + 1][0] / h
             if r_y1 - r_y0 > 0.02:
                 rows.append((r_y0, r_y1))
 
         # Extrapolate beyond last detected separator using median row height.
         # Allow partial rows (at least 50% of row height remaining).
-        last_sep = sep_centers[-1]
+        last_sep = sep_zones[-1][1]  # end of last separator band
         while last_sep + row_h_px * 0.5 < h:
             r_y0 = last_sep / h
             r_y1 = min((last_sep + row_h_px) / h, 1.0)
@@ -690,6 +858,130 @@ def _synergies_from_units(unit_names: list[str], units_data: dict) -> str:
     return "|".join(f"{s}:{c}" for s, c in pairs)
 
 
+STAR_SQUARE_SIZE = 9      # star indicator squares are 9x9 px
+STAR_SQUARE_MIN_AREA = 55  # minimum contour area (perfect 8x8 fill = 64)
+STAR_SQUARE_MAX_GAP = 15   # max x-gap between squares of the same unit
+STAR_UX_OFFSET = 20        # star squares are ~20px right of grid slot origin
+
+
+def _find_star_clusters(
+    unit_region: np.ndarray,
+    debug: bool = False,
+) -> list[list[tuple[int, int]]]:
+    """Find colored star-indicator squares and cluster by x-proximity.
+
+    Scans the unit region for bright saturated 9x9 blobs, then groups
+    them into clusters where squares within 15px x-distance belong to
+    the same unit. Returns list of clusters, each a list of (x, y) centers.
+    """
+    if len(unit_region.shape) < 3:
+        return []
+    hsv = cv2.cvtColor(unit_region, cv2.COLOR_BGR2HSV)
+    s_ch, v_ch = hsv[:, :, 1], hsv[:, :, 2]
+    # Detect both colored (high saturation) and white (low saturation, high value)
+    # star squares — use V > 150 which catches both types
+    mask = (v_ch > 150).astype(np.uint8) * 255
+    # Morphological opening removes stray pixels that merge separate squares
+    kernel = np.ones((3, 3), np.uint8)
+    mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel)
+    contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+
+    # Filter to ~9x9 squares
+    squares: list[tuple[int, int]] = []  # (cx, cy) centers
+    for c in contours:
+        x, y, w, h = cv2.boundingRect(c)
+        area = cv2.contourArea(c)
+        if (STAR_SQUARE_SIZE - 2 <= w <= STAR_SQUARE_SIZE + 2
+                and STAR_SQUARE_SIZE - 2 <= h <= STAR_SQUARE_SIZE + 2
+                and area >= STAR_SQUARE_MIN_AREA):
+            squares.append((x + w // 2, y + h // 2))
+
+    if not squares:
+        return []
+
+    # Cluster by proximity in both x and y
+    # Sort by y then x, group into y-bands first, then cluster within by x
+    squares.sort(key=lambda s: (s[1], s[0]))
+    # Group into y-bands (squares within 5px vertically = same band)
+    y_bands: list[list[tuple[int, int]]] = [[squares[0]]]
+    for sq in squares[1:]:
+        if abs(sq[1] - y_bands[-1][-1][1]) <= 5:
+            y_bands[-1].append(sq)
+        else:
+            y_bands.append([sq])
+
+    # Within each y-band, cluster by x-gap
+    clusters: list[list[tuple[int, int]]] = []
+    for band in y_bands:
+        band.sort(key=lambda s: s[0])
+        cluster = [band[0]]
+        for sq in band[1:]:
+            if sq[0] - cluster[-1][0] <= STAR_SQUARE_MAX_GAP:
+                cluster.append(sq)
+            else:
+                clusters.append(cluster)
+                cluster = [sq]
+        clusters.append(cluster)
+
+    if debug:
+        print(f"    star squares: {len(squares)} found, {len(clusters)} clusters "
+              f"({[len(c) for c in clusters]})")
+    return clusters
+
+
+def _assign_stars(
+    matches: list[tuple[str, float, int, int]],
+    clusters: list[list[tuple[int, int]]],
+) -> dict[int, int]:
+    """Assign each star cluster to its nearest unit (exclusively).
+
+    Each cluster is assigned to the closest unit (by x) that is above
+    the cluster. Returns {match_index: star_count}.
+    """
+    result: dict[int, int] = {}
+    if not clusters or not matches:
+        return result
+    # For each cluster, find the closest unit above it
+    for cluster in clusters:
+        cx = sum(x for x, _ in cluster) / len(cluster)
+        cy = sum(y for _, y in cluster) / len(cluster)
+        count = len(cluster)
+        if count > 3:
+            continue  # noise
+        best_idx = -1
+        best_xdist = float("inf")
+        best_ydist = float("inf")
+        for mi, (_, _, ux, uy) in enumerate(matches):
+            if cy < uy - 10:
+                continue  # cluster must be near/below the unit (10px tolerance)
+            xdist = abs(cx - (ux + STAR_UX_OFFSET))
+            ydist = cy - uy  # positive = cluster below unit (normal case)
+            above = ydist >= 0
+            prev_above = best_ydist >= 0 if best_idx >= 0 else False
+            # Prefer closest by x; break ties: above > tolerance, then
+            # closest above (smallest positive ydist)
+            better = False
+            if xdist < best_xdist:
+                better = True
+            elif xdist == best_xdist:
+                if above and not prev_above:
+                    better = True
+                elif above == prev_above:
+                    if above:
+                        better = ydist < best_ydist
+                    else:
+                        better = ydist > best_ydist
+            if better:
+                best_xdist = xdist
+                best_ydist = ydist
+                best_idx = mi
+        if best_idx >= 0:
+            # Only assign if this cluster has more stars than any previous
+            if count > result.get(best_idx, 0):
+                result[best_idx] = count
+    return result
+
+
 def _parse_my_matches_row(
     img: np.ndarray,
     row_y0: float,
@@ -710,6 +1002,7 @@ def _parse_my_matches_row(
         "relic": "",
         "wl": "",
         "rank": "",
+        "rank_change": "none",
     }
 
     # 1. Placement OCR — "#X/8" text, large digit in bottom half of cell
@@ -753,54 +1046,26 @@ def _parse_my_matches_row(
     if debug:
         print(f"  [row {row_idx}] level OCR: {level_raw!r} → {result['level']!r}")
 
-    # 3. Unit icon matching
+    # 3. Unit icon matching — grid-based (one match per slot)
     unit_region = _crop(img, MM_COL_UNITS[0], row_y0,
-                        MM_COL_UNITS[1], row_y0 + (row_y1 - row_y0) * 0.65)
+                        MM_COL_UNITS[1], row_y1)
     _save_debug(f"mm_units_{row_idx}", unit_region, debug)
-    matches = _match_templates_multiscale(
+    matches = _match_unit_grid(
         unit_region, unit_templates,
         threshold=UNIT_MATCH_THRESHOLD,
-        y_max_frac=0.60,
         debug=debug,
     )
     unit_names_raw = [stem_to_name.get(stem, stem) for stem, _, _, _ in matches]
 
-    # Detect star levels by counting colored squares below each unit icon
+    # Detect star levels by finding colored 9x9 squares in the unit region
+    star_clusters = _find_star_clusters(unit_region, debug=debug)
+    star_map = _assign_stars(matches, star_clusters)
     unit_names = []
-    ur_h, ur_w = unit_region.shape[:2]
-    hsv_region = cv2.cvtColor(unit_region, cv2.COLOR_BGR2HSV) if len(unit_region.shape) == 3 else None
-    for ui, (stem, score, ux, uy) in enumerate(matches):
+    for i, (stem, score, ux, uy) in enumerate(matches):
         name = stem_to_name.get(stem, stem)
-        stars = 1  # default
-        if hsv_region is not None:
-            # Estimate icon size from scale list midpoint
-            icon_h = UNIT_ICON_SCALES[len(UNIT_ICON_SCALES) // 2]
-            # Star squares sit just below the icon
-            sy0 = min(uy + icon_h, ur_h)
-            sy1 = min(sy0 + 10, ur_h)
-            sx0 = max(ux - 2, 0)
-            sx1 = min(ux + icon_h + 2, ur_w)
-            if sy1 > sy0 and sx1 > sx0:
-                star_strip = hsv_region[sy0:sy1, sx0:sx1]
-                s_ch = star_strip[:, :, 1]  # saturation
-                v_ch = star_strip[:, :, 2]  # value
-                # Bright saturated pixels = colored squares
-                bright_mask = ((s_ch > 80) & (v_ch > 100)).astype(np.uint8) * 255
-                # Count distinct square blobs via horizontal projection
-                col_sum = bright_mask.mean(axis=0)  # mean brightness per column
-                # Find runs of bright columns (each square is a contiguous run)
-                in_square = False
-                n_squares = 0
-                for val in col_sum:
-                    if val > 80 and not in_square:
-                        in_square = True
-                        n_squares += 1
-                    elif val <= 80:
-                        in_square = False
-                if 1 <= n_squares <= 3:
-                    stars = n_squares
-                if debug:
-                    print(f"    star detect {name}: squares={n_squares} → {stars}★")
+        stars = star_map.get(i, 1)
+        if debug:
+            print(f"    star detect {name}: {stars}★ (ux={ux})")
         unit_names.append(f"{name}({stars})" if stars > 1 else name)
 
     result["units"] = unit_names
@@ -813,23 +1078,22 @@ def _parse_my_matches_row(
     if debug:
         print(f"  [row {row_idx}] synergies: {result['synergies']!r}")
 
-    # 5. Relic icon matching
+    # 5. Relic icon matching (per-slot grid)
     relic_cell = _crop(img, MM_COL_RELIC[0], row_y0, MM_COL_RELIC[1], row_y1)
     _save_debug(f"mm_relic_{row_idx}", relic_cell, debug)
     if relic_templates:
-        relic_matches = _match_templates_multiscale(
-            relic_cell, relic_templates, threshold=0.45,
-            color=True, debug=debug,
+        relic_matches = _match_relic_grid(
+            relic_cell, relic_templates, threshold=0.55, debug=debug,
         )
-        # Keep best score per unique relic name
-        best_per_name: dict[str, float] = {}
-        for name, score, x, y in relic_matches:
-            if name not in best_per_name or score > best_per_name[name]:
-                best_per_name[name] = score
-        ranked = sorted(best_per_name.items(), key=lambda x: -x[1])[:5]
-        result["relic"] = "|".join(name.replace("_", " ").title() for name, _ in ranked)
+        result["relic"] = "|".join(
+            name.replace("_", " ").title() for name, _, _, _ in relic_matches
+        )
+        result["relic_scores"] = {
+            name.replace("_", " ").title(): round(s, 3)
+            for name, s, _, _ in relic_matches
+        }
         if debug:
-            print(f"  [row {row_idx}] relics: {[(n, f'{s:.3f}') for n, s in ranked]}")
+            print(f"  [row {row_idx}] relics: {[(n.replace('_', ' ').title(), f'{s:.3f}') for n, s, _, _ in relic_matches]}")
 
     # 6. W-L OCR — bottom half of cell (top half has gold "$XXX")
     wl_y0 = row_y0 + (row_y1 - row_y0) * 0.55
@@ -856,8 +1120,24 @@ def _parse_my_matches_row(
     rank_m = rank_re.search(rank_raw)
     if rank_m:
         result["rank"] = f"{rank_m.group(1).title()}-{rank_m.group(2)}"
+    # Detect rank change by color: green ▲ = up, red ▼ = down
+    rc_float = rank_cell.astype(float)
+    b_ch = rc_float[:, :, 0]  # BGR channel 0 = blue
+    g_ch = rc_float[:, :, 1]  # BGR channel 1 = green
+    r_ch = rc_float[:, :, 2]  # BGR channel 2 = red
+    green_mask = (g_ch > 100) & (g_ch > r_ch * 1.3) & (g_ch > b_ch * 1.3)
+    red_mask = (r_ch > 100) & (r_ch > g_ch * 1.3) & (r_ch > b_ch * 1.3)
+    total = rank_cell.shape[0] * rank_cell.shape[1]
+    green_pct = green_mask.sum() / total
+    red_pct = red_mask.sum() / total
+    if green_pct > 0.005:
+        result["rank_change"] = "up"
+    elif red_pct > 0.005:
+        result["rank_change"] = "down"
     if debug:
-        print(f"  [row {row_idx}] rank OCR: {rank_raw!r} → {result['rank']!r}")
+        print(f"  [row {row_idx}] rank color: green={green_pct:.3f} red={red_pct:.3f}")
+    if debug:
+        print(f"  [row {row_idx}] rank OCR: {rank_raw!r} → {result['rank']!r} ({result['rank_change']})")
 
     return result
 
@@ -896,7 +1176,7 @@ def parse_my_matches(
     units_icons_dir = icons_dir / "units"
     print(f"[mm] Loading unit templates from {units_icons_dir}...")
     unit_templates = _load_templates_multiscale(units_icons_dir, UNIT_ICON_SCALES,
-                                                 inner_frac=0.85)
+                                                 inner_frac=0.85, color=True)
     if not unit_templates:
         print(f"[mm] WARNING: no unit icons found in {units_icons_dir}")
         print("     Run: python download_unit_icons.py")
