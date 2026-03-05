@@ -6,7 +6,7 @@ from pathlib import Path
 
 import httpx
 
-from csv_writer import GameRow
+from models import GameRow
 from image_utils import synergy_crops_b64
 
 PROMPTS_DIR = Path(__file__).parent / "prompts"
@@ -156,7 +156,6 @@ def parse_screenshot_cv(
     image_path: Path,
     player_name: str,
     date_str: str,
-    screenshot_rel: str,
     icons_dir: Path,
 ) -> GameRow | None:
     """Parse a screenshot using deterministic CV (no Ollama).
@@ -192,7 +191,7 @@ def parse_screenshot_cv(
         relic=data.get("relic", ""),
         level=level,
         wl=data.get("wl", ""),
-        screenshot=screenshot_rel,
+
         notes="",
     )
 
@@ -203,7 +202,6 @@ def parse_screenshot(
     image_path: Path,
     player_name: str,
     date_str: str,
-    screenshot_rel: str,
     model: str = "qwen2.5vl:7b",
     ollama_url: str = "http://localhost:11434",
 ) -> GameRow | None:
@@ -248,7 +246,7 @@ def parse_screenshot(
         relic=data.get("relic") or "",
         level=level,
         wl=data.get("wl") or "",
-        screenshot=screenshot_rel,
+
         notes=data.get("notes") or "",
     )
 
@@ -313,7 +311,6 @@ def parse_history_screenshot(
             relic="",
             level=level,
             wl=str(d.get("wl") or ""),
-            screenshot=image_path.name,
             notes="|".join(notes_parts),
         ))
 

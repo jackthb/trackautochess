@@ -2,7 +2,7 @@
 
 Monitors the folder for new .jpg files. When one appears, runs CV detection
 to check if it's a Final Ranking or Game Over screen. If so, extracts
-placement and rank, appends to CSV.
+placement and rank, pushes to DB.
 
 Usage:
     python watcher.py                # start watching
@@ -19,8 +19,8 @@ import cv2
 import numpy as np
 import pytesseract
 
-from csv_writer import GameRow, append_row
-from utils import crop as _crop, load_config as _load_config, DAC_DIR, GAMES_CSV
+from models import GameRow
+from utils import crop as _crop, load_config as _load_config, DAC_DIR
 
 # Screenshot directory — local test data + any new screenshots dropped here
 STEAM_SCREENSHOTS = Path(__file__).parent.parent / "data" / "screenshots"
@@ -178,23 +178,26 @@ def process_screenshot(path: Path) -> GameRow | None:
         relic=result.get("relic", ""),
         level=result.get("level", ""),
         wl=result.get("wl", ""),
-        screenshot=path.name,
         notes="",
     )
     return row
 
 
-def watch(screenshot_dir: Path, games_csv: Path) -> None:
+def watch(screenshot_dir: Path) -> None:
     """Watch screenshot directory for new files and process them."""
     if not screenshot_dir.exists():
         print(f"[watcher] ERROR: Screenshot directory not found: {screenshot_dir}")
         sys.exit(1)
 
+    from db import push_game
+
+    config = _load_config()
+    user_id = config.get("steam_id") or None
+
     # Track known files
     known = set(f.name for f in screenshot_dir.glob("*.jpg"))
     print(f"[watcher] Watching {screenshot_dir}")
     print(f"[watcher] {len(known)} existing screenshots (ignored)")
-    print(f"[watcher] CSV: {games_csv}")
     print(f"[watcher] Polling every {POLL_INTERVAL}s... (Ctrl+C to stop)")
 
     try:
@@ -208,7 +211,7 @@ def watch(screenshot_dir: Path, games_csv: Path) -> None:
                 time.sleep(0.5)
                 row = process_screenshot(path)
                 if row:
-                    append_row(row, games_csv)
+                    push_game(row, user_id=user_id)
                     print(f"[watcher] ✓ Saved: #{row.placement} {row.rank}")
                 known.add(name)
     except KeyboardInterrupt:
@@ -233,9 +236,7 @@ def main():
         else:
             print("Could not parse.")
     else:
-        config = _load_config()
-        games_csv = Path(config.get("games_csv", str(GAMES_CSV))).expanduser()
-        watch(STEAM_SCREENSHOTS, games_csv)
+        watch(STEAM_SCREENSHOTS)
 
 
 if __name__ == "__main__":

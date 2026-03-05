@@ -8,7 +8,6 @@ from pathlib import Path
 
 DAC_DIR = Path.home() / ".dac"
 CONFIG_PATH = DAC_DIR / "config.json"
-GAMES_CSV = DAC_DIR / "games.csv"
 ICONS_DIR = Path(__file__).parent.parent / "data" / "icons"
 
 
@@ -16,10 +15,9 @@ ICONS_DIR = Path(__file__).parent.parent / "data" / "icons"
 
 DEFAULT_CONFIG = {
     "player_name": "jack",
-    "hotkey": "ctrl+shift+g",
+    "hotkey": "F3",
     "model": "qwen2.5vl:7b",
     "ollama_url": "http://localhost:11434",
-    "games_csv": str(GAMES_CSV),
     "supabase_url": "",
     "supabase_key": "",
     "supabase_db_url": "",

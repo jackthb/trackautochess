@@ -1,26 +1,21 @@
 """DAC Tracker — Windows system tray app.
 
-Polls for Dota 2 game screens every 5s and notifies when detected.
-User clicks notification to parse and save to CSV.
+Press F3 on the My Matches screen to capture, parse, and save matches.
 
 Usage:
     python tray_app.py          # run tray app
     pythonw tray_app.py         # run without console window
 """
 
-import ctypes
 import logging
 import os
-import subprocess
 import sys
 import threading
-import time
 from datetime import datetime
 from pathlib import Path
 
 import pystray
 from PIL import Image
-from plyer import notification
 
 # ── Tesseract setup (bundled or system) ───────────────────────────────────────
 
@@ -41,9 +36,8 @@ _setup_tesseract()
 
 # ── Config ────────────────────────────────────────────────────────────────────
 
-from utils import load_config, save_config, DAC_DIR, GAMES_CSV, ICONS_DIR
+from utils import load_config, save_config, DAC_DIR, ICONS_DIR
 
-POLL_INTERVAL = 5       # seconds between screen checks
 APP_NAME = "DAC Tracker"
 LOG_PATH = DAC_DIR / "tracker.log"
 
@@ -58,18 +52,6 @@ log.addHandler(_fh)
 _ch = logging.StreamHandler()
 _ch.setFormatter(logging.Formatter("[tray] %(message)s"))
 log.addHandler(_ch)
-
-# ── Window detection (ctypes — no pywin32) ────────────────────────────────────
-
-def is_dota_focused() -> bool:
-    """Check if Dota 2 is the foreground window."""
-    try:
-        hwnd = ctypes.windll.user32.GetForegroundWindow()
-        buf = ctypes.create_unicode_buffer(256)
-        ctypes.windll.user32.GetWindowTextW(hwnd, buf, 256)
-        return "Dota 2" in buf.value
-    except Exception:
-        return False
 
 
 # ── Tray icon ─────────────────────────────────────────────────────────────────
@@ -88,26 +70,6 @@ def _make_icon_image() -> Image.Image:
     except Exception:
         pass
     return img
-
-
-def _save_icon_file() -> str | None:
-    """Copy the bundled .ico to ~/.dac/ and return the path."""
-    ico_path = DAC_DIR / "icon.ico"
-    src = ICONS_DIR / "dac_tracker.ico"
-    try:
-        import shutil
-        DAC_DIR.mkdir(parents=True, exist_ok=True)
-        if src.exists():
-            shutil.copy2(src, ico_path)
-            return str(ico_path)
-        if ico_path.exists():
-            return str(ico_path)
-        # Fallback: generate a simple icon
-        img = _make_icon_image()
-        img.save(str(ico_path), format="ICO", sizes=[(64, 64)])
-        return str(ico_path)
-    except Exception:
-        return None
 
 
 # ── Windows autostart (registry) ─────────────────────────────────────────
@@ -163,160 +125,141 @@ class TrayApp:
 
     def __init__(self):
         self.config = load_config()
-        self.games_csv = Path(self.config.get("games_csv", str(GAMES_CSV))).expanduser()
         self._stop_event = threading.Event()
         self._update_info = None  # (tag, url) if update available
-        self._awaiting_reset = False  # require "unknown" before next detection
-        self._icon_path = _save_icon_file()
+        self._icon = None  # set in run()
+        # Ensure user exists in DB if already logged in
+        sid = self.config.get("steam_id")
+        if sid:
+            from db import ensure_user
+            ensure_user(sid)
 
-    def _notify(self, title: str, message: str, timeout: int = 5) -> None:
-        """Show a desktop toast notification."""
+    def _notify(self, title: str, message: str) -> None:
+        """Show a desktop balloon notification via pystray."""
         try:
-            kwargs = dict(
-                title=title,
-                message=message,
-                app_name=APP_NAME,
-                timeout=timeout,
-            )
-            if self._icon_path:
-                kwargs["app_icon"] = self._icon_path
-            notification.notify(**kwargs)
+            if self._icon:
+                self._icon.notify(message, title)
         except Exception as e:
-                log.error("notification error: %s", e)
+            log.error("notification error: %s", e)
 
-    # ── Polling loop ──────────────────────────────────────────────────────────
+    # ── Hotkey listener ─────────────────────────────────────────────────────
 
-    def _poll_loop(self) -> None:
-        """Background thread: poll for game screens."""
-        # Import heavy deps inside thread to keep startup fast
+    def _register_hotkey(self) -> None:
+        """Register F3 global hotkey (Windows only)."""
+        try:
+            import keyboard
+            hotkey = self.config.get("hotkey", "F3")
+            keyboard.add_hotkey(hotkey, self._on_hotkey, suppress=False)
+            log.info("Registered hotkey: %s", hotkey)
+        except ImportError:
+            log.warning("keyboard module not available — hotkey disabled")
+        except Exception as e:
+            log.error("Failed to register hotkey: %s", e)
+
+    def _on_hotkey(self) -> None:
+        """Handle F3 press: capture screen, detect type, parse if My Matches."""
+        log.info("Hotkey pressed — capturing screen...")
+        threading.Thread(
+            target=self._hotkey_capture, daemon=True, name="hotkey-capture",
+        ).start()
+
+    def _hotkey_capture(self) -> None:
+        """Capture and process in background thread."""
         import capture
-        import cv2
         from cv_parser import detect_screen_type
 
-        poll_count = 0
-        was_dota_focused = False
-        while not self._stop_event.is_set():
-            time.sleep(POLL_INTERVAL)
-            poll_count += 1
+        try:
+            img = capture.capture_screen()
+            if img is None:
+                log.error("Failed to capture screenshot")
+                self._notify(APP_NAME, "Screenshot capture failed.")
+                return
 
-            dota_focused = is_dota_focused()
+            screen_type = detect_screen_type(img)
+            log.info("Detected screen type: %s", screen_type)
 
-            # Notify on focus transitions
-            if dota_focused and not was_dota_focused:
-                log.info("Dota 2 focused (poll #%d)", poll_count)
-                self._notify(APP_NAME, "Dota 2 detected — tracking screens.", timeout=3)
-            elif not dota_focused and was_dota_focused:
-                log.info("Dota 2 lost focus (poll #%d)", poll_count)
-            was_dota_focused = dota_focused
-
-            if not dota_focused:
-                continue
-
-            # Capture and detect
-            try:
-                screenshot_path = capture.capture_screen()
-                img = cv2.imread(str(screenshot_path))
-                if img is None:
-                    continue
-                screen_type = detect_screen_type(img)
-            except Exception as e:
-                log.error("capture/detect error: %s", e)
-                continue
-
-            log.debug("poll #%d: screen_type=%s", poll_count, screen_type)
-
-            if screen_type == "unknown":
-                self._awaiting_reset = False
-                screenshot_path.unlink(missing_ok=True)
-                continue
-
-            if self._awaiting_reset:
-                log.debug("poll #%d: suppressed (awaiting screen change)", poll_count)
-                screenshot_path.unlink(missing_ok=True)
-                continue
-
-            self._awaiting_reset = True
-
-            label = screen_type.replace("_", " ").title()
-            log.info("Detected: %s → %s", screen_type, screenshot_path.name)
-            self._notify(APP_NAME, f"{label} detected — parsing...")
-
-            threading.Thread(
-                target=self._do_parse, args=(screenshot_path, screen_type),
-                daemon=True, name="auto-parse",
-            ).start()
+            if screen_type == "my_matches":
+                self._notify(APP_NAME, "My Matches detected — parsing...")
+                self._do_parse_my_matches(img)
+            else:
+                self._notify(APP_NAME, "Not on My Matches page. Open it and press F3 again.")
+        except Exception as e:
+            log.error("hotkey capture error: %s", e, exc_info=True)
+            self._notify(APP_NAME, f"Capture error: {e}")
 
     # ── Parse action ──────────────────────────────────────────────────────────
 
-    def _do_parse(self, path: Path, screen_type: str) -> None:
-        """Run parsing in a background thread."""
+    def _do_parse_my_matches(self, img) -> None:
+        """Parse a My Matches screen image (numpy array or file path)."""
         import cv2
-        from csv_writer import GameRow, append_row
-        from db import push_game
+        from models import GameRow
+        from db import game_exists, push_game
 
         user_id = self.config.get("steam_id") or None
 
         try:
-            if screen_type == "my_matches":
-                from cv_parser import parse_my_matches
-                img = cv2.imread(str(path))
-                player = self.config.get("player_name", "jack")
-                rows = parse_my_matches(img, player, ICONS_DIR)
-                if not rows:
-                    log.warning("MY MATCHES: no rows parsed from %s", path.name)
-                    self._notify(APP_NAME, "MY MATCHES: no rows parsed.")
+            # If img is a path, read it
+            if isinstance(img, Path):
+                img = cv2.imread(str(img))
+                if img is None:
+                    self._notify(APP_NAME, "Failed to read image.")
                     return
-                log.info("Parsed %d row(s) from MY MATCHES: %s", len(rows), path.name)
-                date_str = datetime.now().strftime("%Y-%m-%d")
-                for i, r in enumerate(rows, 1):
-                    lineup = "|".join(r.get("units", []))
-                    log.info(
-                        "  row %d: place=%s level=%s wl=%s rank=%s relic=%s units=[%s] synergies=%s",
-                        i, r.get("placement"), r.get("level"), r.get("wl"),
-                        r.get("rank"), r.get("relic"), lineup, r.get("synergies"),
-                    )
-                    game_row = GameRow(
-                        date=date_str,
-                        placement=r.get("placement", ""),
-                        rank=r.get("rank", ""),
-                        rank_change="none",
-                        lineup=lineup,
-                        synergies=r.get("synergies", ""),
-                        talents="",
-                        relic=r.get("relic", ""),
-                        level=r.get("level", ""),
-                        wl=r.get("wl", ""),
-                        screenshot=path.name,
-                        notes="",
-                    )
-                    append_row(game_row, self.games_csv)
-                    push_game(game_row, user_id=user_id)
-                self._notify(APP_NAME, f"Imported {len(rows)} match(es) from MY MATCHES.")
 
-            else:
-                # final_ranking or game_over — use watcher's process_screenshot
-                from watcher import process_screenshot
-                row = process_screenshot(path)
-                if row is None:
-                    log.warning("Could not parse screenshot: %s", path.name)
-                    self._notify(APP_NAME, "Could not parse screenshot.")
-                    return
+            from cv_parser import parse_my_matches
+            player = self.config.get("player_name", "jack")
+            rows = parse_my_matches(img, player, ICONS_DIR)
+            if not rows:
+                log.warning("MY MATCHES: no rows parsed")
+                self._notify(APP_NAME, "MY MATCHES: no rows parsed.")
+                return
+            log.info("Parsed %d row(s) from MY MATCHES", len(rows))
+
+            date_str = datetime.now().strftime("%Y-%m-%d")
+            imported = 0
+            skipped = 0
+            for i, r in enumerate(rows, 1):
+                lineup = "|".join(r.get("units", []))
+                placement = r.get("placement", "")
+                wl = r.get("wl", "")
+                level = r.get("level", "")
+
+                # Skip duplicates via DB check
+                if user_id and game_exists(user_id, date_str, placement, wl, level):
+                    log.info("  row %d: SKIP duplicate (place=%s wl=%s level=%s)", i, placement, wl, level)
+                    skipped += 1
+                    continue
+
                 log.info(
-                    "Parsed %s: place=%s rank=%s level=%s wl=%s lineup=%s synergies=%s",
-                    path.name, row.placement, row.rank, row.level, row.wl,
-                    row.lineup, row.synergies,
+                    "  row %d: place=%s level=%s wl=%s rank=%s relic=%s units=[%s] synergies=%s",
+                    i, placement, level, wl,
+                    r.get("rank"), r.get("relic"), lineup, r.get("synergies"),
                 )
-                append_row(row, self.games_csv)
-                push_game(row, user_id=user_id)
-                place = row.placement or "?"
-                rank = row.rank or ""
-                self._notify(APP_NAME, f"Saved: #{place} {rank}")
+                game_row = GameRow(
+                    date=date_str,
+                    placement=placement,
+                    rank=r.get("rank", ""),
+                    rank_change=r.get("rank_change", "none"),
+                    lineup=lineup,
+                    synergies=r.get("synergies", ""),
+                    talents="",
+                    relic=r.get("relic", ""),
+                    level=level,
+                    wl=wl,
+                    notes="",
+                )
+                push_game(game_row, user_id=user_id)
+                imported += 1
+
+            msg = f"Imported {imported} match(es)"
+            if skipped:
+                msg += f", {skipped} duplicate(s) skipped"
+            self._notify(APP_NAME, msg)
 
         except Exception as e:
-            log.error("parse error for %s: %s", path.name, e, exc_info=True)
+            log.error("parse error: %s", e, exc_info=True)
             self._notify(APP_NAME, f"Parse error: {e}")
 
-    # ── Steam login & dashboard ─────────────────────────────────────────────
+    # ── Steam login ──────────────────────────────────────────────────────────
 
     def _is_logged_in(self) -> bool:
         return bool(self.config.get("steam_id"))
@@ -354,30 +297,7 @@ class TrayApp:
         save_config(self.config)
         self._notify(APP_NAME, "Logged out of Steam.")
 
-    def _open_dashboard(self, _icon=None, _item=None) -> None:
-        from dashboard import DashboardWindow
-        DashboardWindow.show(
-            steam_id=self.config.get("steam_id", ""),
-            steam_name=self.config.get("steam_name", ""),
-            games_csv=str(self.games_csv),
-        )
-
     # ── Menu actions ──────────────────────────────────────────────────────────
-
-    def _open_csv(self, _icon=None, _item=None) -> None:
-        """Open the games CSV in the default app."""
-        if self.games_csv.exists():
-            os.startfile(str(self.games_csv))
-        else:
-            self._notify(APP_NAME, "No games.csv yet — play a game first.")
-
-    def _open_viewer(self, _icon=None, _item=None) -> None:
-        """Open viewer.html in the default browser."""
-        viewer = Path(__file__).parent / "viewer.html"
-        if viewer.exists():
-            os.startfile(str(viewer))
-        else:
-            self._notify(APP_NAME, "viewer.html not found.")
 
     def _import_history(self, _icon=None, _item=None) -> None:
         """Open file picker, parse MY MATCHES screenshot, import rows."""
@@ -400,7 +320,7 @@ class TrayApp:
         path = Path(path)
         log.info("Import history: %s", path)
         threading.Thread(
-            target=self._do_parse, args=(path, "my_matches"),
+            target=self._do_parse_my_matches, args=(path,),
             daemon=True, name="import-history",
         ).start()
 
@@ -439,44 +359,6 @@ class TrayApp:
         self._update_info = info
         self._notify(APP_NAME, f"Update available: {info['tag']}\nUse tray menu → Check for Updates.")
 
-    def _sync_csv_to_db(self, _icon=None, _item=None) -> None:
-        """Push all CSV rows to Supabase, skipping duplicates."""
-        def _do_sync():
-            from csv_writer import read_all
-            from db import game_exists, push_game
-
-            steam_id = self.config.get("steam_id")
-            if not steam_id:
-                self._notify(APP_NAME, "Not logged in — sync aborted.")
-                return
-
-            if not self.games_csv.exists():
-                self._notify(APP_NAME, "No games.csv found.")
-                return
-
-            rows = read_all(self.games_csv)
-            log.info("Syncing %d CSV row(s) to Supabase...", len(rows))
-
-            pushed = skipped = failed = 0
-            for row in rows:
-                if game_exists(steam_id, row.date, row.placement, row.wl, row.level):
-                    skipped += 1
-                    continue
-                if push_game(row, user_id=steam_id):
-                    pushed += 1
-                else:
-                    failed += 1
-
-            msg = f"Synced {pushed} game(s)"
-            if skipped:
-                msg += f", {skipped} already in DB"
-            if failed:
-                msg += f", {failed} failed"
-            log.info(msg)
-            self._notify(APP_NAME, msg)
-
-        threading.Thread(target=_do_sync, daemon=True, name="sync-db").start()
-
     def _toggle_autostart(self, _icon=None, _item=None) -> None:
         """Toggle Windows autostart on/off."""
         enabled = is_autostart_enabled()
@@ -486,6 +368,11 @@ class TrayApp:
 
     def _quit(self, icon, _item=None) -> None:
         self._stop_event.set()
+        try:
+            import keyboard
+            keyboard.unhook_all()
+        except Exception:
+            pass
         icon.stop()
 
     # ── Run ───────────────────────────────────────────────────────────────────
@@ -503,7 +390,6 @@ class TrayApp:
                 self._steam_logout,
                 visible=lambda _: self._is_logged_in(),
             ),
-            pystray.MenuItem("Recent Games", self._open_dashboard),
             pystray.Menu.SEPARATOR,
             pystray.MenuItem("Import History Screenshot...", self._import_history),
             pystray.MenuItem(
@@ -511,13 +397,6 @@ class TrayApp:
                 self._toggle_autostart,
                 checked=lambda _: is_autostart_enabled(),
             ),
-            pystray.MenuItem(
-                "Sync CSV to DB",
-                self._sync_csv_to_db,
-                visible=lambda _: self._is_logged_in(),
-            ),
-            pystray.MenuItem("Open CSV", self._open_csv),
-            pystray.MenuItem("Open Viewer", self._open_viewer),
             pystray.MenuItem("Check for Updates", self._check_updates),
             pystray.Menu.SEPARATOR,
             pystray.MenuItem("Quit", self._quit),
@@ -525,22 +404,20 @@ class TrayApp:
 
         from updater import __version__
         tooltip = f"{APP_NAME} v{__version__}"
-        icon = pystray.Icon(APP_NAME, _make_icon_image(), tooltip, menu)
+        self._icon = pystray.Icon(APP_NAME, _make_icon_image(), tooltip, menu)
 
-        # Start poll thread
-        poll_thread = threading.Thread(target=self._poll_loop, daemon=True, name="poller")
-        poll_thread.start()
+        # Register F3 hotkey
+        self._register_hotkey()
 
         # Start update checker
         from updater import start_update_loop
         start_update_loop(self._on_update_available)
 
-        log.info("%s running. Right-click tray icon for menu.", APP_NAME)
-        log.info("CSV: %s", self.games_csv)
+        hotkey = self.config.get("hotkey", "F3")
+        log.info("%s running. Press %s on My Matches to import.", APP_NAME, hotkey)
         log.info("Log: %s", LOG_PATH)
-        log.info("Polling every %ds when Dota 2 is focused.", POLL_INTERVAL)
-        self._notify(APP_NAME, "Running in system tray.\nWill detect game screens when Dota 2 is focused.")
-        icon.run()
+        self._notify(APP_NAME, f"Running in system tray.\nPress {hotkey} on My Matches to import.")
+        self._icon.run()
 
 
 def _kill_existing():

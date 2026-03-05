@@ -22,7 +22,7 @@ def cmd_import_matches_cv(args: list[str]) -> None:
     synergy members (Minotaur Horn, Spider Legs, Wheel, etc.) will cause the
     real in-game counts to be higher than what is recorded here.
     """
-    from csv_writer import GameRow
+    from models import GameRow
     from cv_parser import parse_my_matches, detect_screen_type
     from db import game_exists, push_game
     from utils import save_config
@@ -109,7 +109,6 @@ def cmd_import_matches_cv(args: list[str]) -> None:
             relic=r.get("relic", ""),
             level=level,
             wl=wl,
-            screenshot=screenshot_path.name,
             notes="cv:unit_match",
         )
         if push_game(game_row, user_id=steam_id):

@@ -57,12 +57,11 @@ a = Analysis(
     hiddenimports=[
         "pystray",
         "pystray._win32",
-        "plyer",
-        "plyer.platforms.win.notification",
         "cv2",
         "pytesseract",
         "mss",
         "mss.windows",
+        "keyboard",
         "PIL",
         "ssl",
         "_ssl",
