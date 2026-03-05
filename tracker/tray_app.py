@@ -56,8 +56,17 @@ log.addHandler(_ch)
 
 # ── Tray icon ─────────────────────────────────────────────────────────────────
 
-def _make_icon_image() -> Image.Image:
-    """Create a simple tray icon (green square with 'D')."""
+def _load_icon_image() -> Image.Image:
+    """Load the bundled .ico, falling back to a generated placeholder."""
+    ico_path = ICONS_DIR / "dac_tracker.ico"
+    if ico_path.exists():
+        try:
+            img = Image.open(ico_path)
+            img.load()
+            return img
+        except Exception:
+            pass
+    # Fallback: generate a simple icon
     img = Image.new("RGB", (64, 64), color=(30, 80, 30))
     try:
         from PIL import ImageDraw, ImageFont
@@ -70,6 +79,15 @@ def _make_icon_image() -> Image.Image:
     except Exception:
         pass
     return img
+
+
+def _set_app_model_id():
+    """Set Windows AppUserModelID so notifications show our app name."""
+    try:
+        import ctypes
+        ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(APP_NAME)
+    except Exception:
+        pass
 
 
 # ── Windows autostart (registry) ─────────────────────────────────────────
@@ -373,7 +391,10 @@ class TrayApp:
             keyboard.unhook_all()
         except Exception:
             pass
-        icon.stop()
+        try:
+            icon.stop()
+        except Exception:
+            os._exit(0)
 
     # ── Run ───────────────────────────────────────────────────────────────────
 
@@ -404,7 +425,8 @@ class TrayApp:
 
         from updater import __version__
         tooltip = f"{APP_NAME} v{__version__}"
-        self._icon = pystray.Icon(APP_NAME, _make_icon_image(), tooltip, menu)
+        _set_app_model_id()
+        self._icon = pystray.Icon(APP_NAME, _load_icon_image(), tooltip, menu)
 
         # Register F3 hotkey
         self._register_hotkey()
