@@ -41,7 +41,7 @@ def img_to_b64(img, scale=1):
     return base64.b64encode(buf).decode()
 
 
-def render_row_card(rd, img=None, row_y0=None, row_y1=None):
+def render_row_card(rd, img=None, row_y0=None, row_y1=None, row_id=""):
     """Render a single result dict as an HTML card."""
     placement = rd.get("placement", "?")
     level = rd.get("level", "?")
@@ -160,9 +160,11 @@ def render_row_card(rd, img=None, row_y0=None, row_y1=None):
   <div class="lbl">Rank crop (3x)</div>
   <div class="strip"><img src="data:image/png;base64,{img_to_b64(rank_region, 3)}"></div>"""
 
+    row_id_html = f'<span class="row-id">{row_id}</span>' if row_id else ""
     return f"""
-<div class="card">
+<div class="card" id="row-{row_id}">
   <div class="hdr">
+    {row_id_html}
     <span class="place">#{placement}</span>
     <span class="tag">Lv {level}</span>
     <span class="tag">{wl}</span>
@@ -178,7 +180,7 @@ def render_row_card(rd, img=None, row_y0=None, row_y1=None):
 </div>"""
 
 
-def process_screenshot(path):
+def process_screenshot(path, ss_num=1):
     """Parse a single screenshot, return (screen_type, section_html)."""
     img = cv2.imread(str(path))
     if img is None:
@@ -209,11 +211,12 @@ def process_screenshot(path):
             rd["_relic_grid_matches"] = _match_relic_grid(
                 relic_region, RELIC_TMPLS, threshold=0.55
             )
-        cards += render_row_card(rd, img, y0, y1)
+        row_id = f"{ss_num}.{i+1}"
+        cards += render_row_card(rd, img, y0, y1, row_id=row_id)
 
     section = f"""
 <div class="section">
-  <h2>{path.name} <span class="meta">({w}x{h}) — {screen_type}</span></h2>
+  <h2><span class="ss-num">#{ss_num}</span> {path.name} <span class="meta">({w}x{h}) — {screen_type}</span></h2>
   <div class="strip"><img src="data:image/png;base64,{thumb_b64}" style="height:200px"></div>
   {cards}
 </div>"""
@@ -228,7 +231,7 @@ def main():
     mm_count = 0
 
     for path in screenshots:
-        stype, section = process_screenshot(path)
+        stype, section = process_screenshot(path, mm_count + 1)
         if stype is None:
             continue
         mm_count += 1
@@ -260,6 +263,8 @@ h2 {{ color: #e94560; font-size: 15px; margin: 24px 0 8px; border-top: 1px solid
 .relic-grid {{ display: flex; flex-wrap: wrap; gap: 8px; margin: 8px 0; }}
 .relic-slot {{ display: flex; align-items: center; gap: 6px; background: #0d1b2a; border: 1px solid #333; border-radius: 6px; padding: 6px 8px; }}
 .rslbl {{ font-size: 9px; color: #666; min-width: 40px; }}
+.ss-num {{ background: #e94560; color: #fff; padding: 2px 8px; border-radius: 4px; font-size: 13px; margin-right: 4px; }}
+.row-id {{ background: #e94560; color: #fff; padding: 2px 8px; border-radius: 4px; font-size: 13px; font-weight: bold; min-width: 36px; text-align: center; }}
 </style></head><body>
 <h1>Parse Results — {mm_count} my_matches screenshots</h1>
 {sections_html}

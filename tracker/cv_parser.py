@@ -486,10 +486,66 @@ def _match_relic_grid(
                     if key not in cell_best or max_val > cell_best[key][1]:
                         cell_best[key] = (name, float(max_val), cx0 + max_loc[0], cy0 + max_loc[1])
 
+    # Single-relic detection: when a column has only weak half-slot matches
+    # (both < 0.80), try matching the full-height column. A single relic sits
+    # centered vertically and gets split across both halves, producing two
+    # low-confidence matches. A full-height match captures the whole icon.
+    SINGLE_RELIC_THRESH = 0.80
+    for col_idx, (xf0, xf1) in enumerate(MM_RELIC_COL_RANGES):
+        top_match = cell_best.get((col_idx, 0))
+        bot_match = cell_best.get((col_idx, 1))
+        top_score = top_match[1] if top_match else 0
+        bot_score = bot_match[1] if bot_match else 0
+
+        # Skip if either half already has a strong match (2-relic column)
+        if top_score >= SINGLE_RELIC_THRESH or bot_score >= SINGLE_RELIC_THRESH:
+            continue
+        # Skip if neither half matched at all
+        if not top_match and not bot_match:
+            continue
+
+        # Try full-height match for this column
+        cx0 = int(rw * xf0)
+        cx1 = int(rw * xf1)
+        full_slot = region_bgr[0:rh, cx0:cx1]
+        if full_slot.size == 0:
+            continue
+
+        best_name, best_score, best_x, best_y = "", 0.0, 0, 0
+        for name, tmpls in templates.items():
+            for tmpl in tmpls:
+                th, tw = tmpl.shape[:2]
+                if full_slot.shape[0] < th or full_slot.shape[1] < tw:
+                    continue
+                result = np.zeros((full_slot.shape[0] - th + 1,
+                                   full_slot.shape[1] - tw + 1), dtype=np.float32)
+                for ch in range(3):
+                    result += cv2.matchTemplate(full_slot[:, :, ch], tmpl[:, :, ch],
+                                                cv2.TM_CCOEFF_NORMED)
+                result /= 3.0
+                _, max_val, _, max_loc = cv2.minMaxLoc(result)
+                if max_val > best_score:
+                    best_score = float(max_val)
+                    best_name = name
+                    best_x = cx0 + max_loc[0]
+                    best_y = max_loc[1]
+
+        if best_score > max(top_score, bot_score) and best_score >= threshold:
+            # Full-height match is better — replace both half-slots with single match
+            cell_best.pop((col_idx, 0), None)
+            cell_best.pop((col_idx, 1), None)
+            cell_best[(col_idx, -1)] = (best_name, best_score, best_x, best_y)
+            if debug:
+                print(f"    relic slot full[{col_idx}]: {best_name:20s} score={best_score:.3f} "
+                      f"(was top={top_score:.3f} bot={bot_score:.3f})")
+
     all_matches = []
     for (col_idx, row_idx) in sorted(cell_best):
         name, score, x, y = cell_best[(col_idx, row_idx)]
-        zone_label = "top" if row_idx == 0 else "bot"
+        if row_idx == -1:
+            zone_label = "full"
+        else:
+            zone_label = "top" if row_idx == 0 else "bot"
         all_matches.append((name, score, x, y))
         if debug:
             print(f"    relic slot {zone_label}[{col_idx}]: {name:20s} score={score:.3f}")
@@ -807,10 +863,35 @@ def _find_my_matches_rows(img: np.ndarray, debug: bool = False) -> list[tuple[fl
 
         # Build rows using separator band edges (not centers + inset).
         # Row starts at the end of one separator, ends at the start of the next.
+        # False separators sometimes split a real row, producing short fragments.
+        # Merge adjacent short fragments when their combined height is close to
+        # the expected row height (within 40%). Drop remaining short fragments.
+        min_row_h = row_h_px * 0.6 / h
+        max_merged_h = row_h_px * 1.4 / h
+        raw_rows: list[tuple[float, float]] = []
         for i in range(len(sep_zones) - 1):
             r_y0 = sep_zones[i][1] / h
             r_y1 = sep_zones[i + 1][0] / h
-            if r_y1 - r_y0 > 0.02:
+            if r_y1 - r_y0 > 0.01:
+                raw_rows.append((r_y0, r_y1))
+
+        # Merge consecutive short fragments when combined height is reasonable,
+        # then drop any remaining short fragments.
+        pending_short = None  # buffered short fragment awaiting merge
+        for r_y0, r_y1 in raw_rows:
+            cur_h = r_y1 - r_y0
+            if cur_h < min_row_h:
+                if pending_short is not None:
+                    # Try merging with buffered short
+                    combined = r_y1 - pending_short[0]
+                    if combined <= max_merged_h:
+                        rows.append((pending_short[0], r_y1))
+                        pending_short = None
+                        continue
+                # Buffer this short fragment
+                pending_short = (r_y0, r_y1)
+            else:
+                pending_short = None
                 rows.append((r_y0, r_y1))
 
         # Extrapolate beyond last detected separator using median row height.
