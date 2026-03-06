@@ -810,18 +810,25 @@
         "Monk",
         "Naga"
       ]
+    },
+    "IO": {
+      "cost": 5,
+      "synergies": [
+        "Elf"
+      ],
+      "note": "Wild card unit. Can substitute for any unit when combining (e.g. 2 Dragon Knights + 1 IO = 2-star Dragon Knight). Also functions as a healer on the board."
     }
   },
   "_meta": {
-    "source": "autochess.site board builder cost/synergy filters",
+    "source": "autochess.site board builder cost/synergy filters + VPK datamine",
     "scraped": "2026-02-23",
-    "totalUnits": 114,
+    "totalUnits": 115,
     "byCost": {
       "$1": 22,
       "$2": 23,
       "$3": 23,
       "$4": 24,
-      "$5": 22
+      "$5": 23
     }
   }
 }

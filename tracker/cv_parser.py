@@ -1084,6 +1084,7 @@ def _parse_my_matches_row(
         "wl": "",
         "rank": "",
         "rank_change": "none",
+        "time_ago": "",
     }
 
     # 1. Placement OCR — "#X/8" text, large digit in bottom half of cell

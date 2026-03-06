@@ -4,83 +4,103 @@
   "relics": {
     "item_upgrade_lootbox": {
       "name": "Weaponsmith",
-      "description": ""
+      "description": "You gain +1 to the level of loot tokens you get for recasting equipment. After recasting 2 pieces of Spoil tokens, the weapon smith will disappear.",
+      "lore": "From Relicbox"
     },
     "item_streak_plus": {
       "name": "Chiaroscuro Certainty",
-      "description": ""
+      "description": "Your win or lose streak will not be terminated and when the relic disappears, you will receive a corresponding level loot token based on the highest reward/compensation held during that time.",
+      "lore": "From Relicbox"
     },
     "item_conceal_prepare": {
       "name": "Shroud of Concealment",
-      "description": ""
+      "description": "Conceal your chessboard in the Preparation Phase. Hide your courier also to skip the next PVP battle after your courier takes damage.",
+      "lore": "From Relicbox"
     },
     "item_free_ban": {
       "name": "Gaolers Master Key",
-      "description": ""
+      "description": "You can freely dismiss any race/class. If already dismissed, the spent gold will be refunded.",
+      "lore": "From Relicbox"
     },
     "item_second_chance": {
       "name": "Second Chance",
-      "description": ""
+      "description": "When you use consumable items of the choice category, you can refresh the selection panel and acquire different options.",
+      "lore": "From Relicbox"
     },
     "item_egg": {
       "name": "Greevil Egg",
-      "description": ""
+      "description": "Relic Consumable: Click to Use Put a piece into an egg which has a chance to grow once every round. You can break it anytime, hatching a piece according to the points.",
+      "lore": "From Relic Box"
     },
     "item_bench_contract": {
       "name": "Magic Seed",
-      "description": ""
+      "description": "Fill your bench with magic vegetable sprouts. The sell value of these sprouts has a dynamic chance to increase by 1 at the beginning of every round. You can sell the sprouts any time to reuse the bench.",
+      "lore": "From Relic Box"
     },
     "item_rm_wheel_of_wonder": {
       "name": "Wheel of Wonder",
-      "description": ""
+      "description": "Relic Consumable: Click to UseChoose an ally piece and put it into the wheel of wonder, DISCOVER a special version of it with an extra random synergy.",
+      "lore": "From: Relicbox"
     },
     "item_double_coin": {
       "name": "Doubloon",
-      "description": ""
+      "description": "Relic Consumable: Click to UseTransfer 20% of the higher one of your Health and Mana into another. Can be used twice",
+      "lore": "From: Relicbox"
     },
     "item_repeat_relic": {
       "name": "Time-Space Replica",
-      "description": ""
+      "description": "Replicate your last relic.",
+      "lore": "From: Relicbox"
     },
     "item_both_leaves": {
       "name": "Leafy Essence",
-      "description": ""
+      "description": "All offside branches unlock automatically in this single game.",
+      "lore": "From: Relicbox"
     },
     "item_malefic_rapture": {
       "name": "Malefic Rapture",
-      "description": ""
+      "description": "When your courier takes damage, you immediately gain the corresponding (damage taken) amount of experience.",
+      "lore": "From Relic Box"
     },
     "item_more_creep": {
       "name": "March of the Beasts",
-      "description": ""
+      "description": "All creeps duplicate themselves and counted as level +1.",
+      "lore": "From Relic Box"
     },
     "item_magic_box": {
       "name": "Magic box",
-      "description": ""
+      "description": "Packs an ally piece, at the beginning of next round, transforms it into a randon new piece of the same Level and Rank. 12 times available.",
+      "lore": "From: Relicbox"
     },
     "item_double_io": {
       "name": "Grace of Nature",
-      "description": ""
+      "description": "Every IO recruited will reduce 2x this chance",
+      "lore": "From Relicbox"
     },
     "item_more_interest": {
       "name": "The Great Vault",
-      "description": ""
+      "description": "Will not be restricted to a max interest of 4.",
+      "lore": "From Relicbox"
     },
     "item_more_reward": {
       "name": "Sin Reaper",
-      "description": ""
+      "description": "Gains 4 XP for every visiting victory, and extra XP equals to Awardx2 when terminating an winning streak or eliminating a player.",
+      "lore": "From Relicbox"
     },
     "item_stolen_vault": {
       "name": "Stolen Vault",
-      "description": ""
+      "description": "Discard all 3 relics and get a Stolen Vault with random 10 ~ 15 gold.",
+      "lore": "From: Relicbox"
     },
     "item_upgrade_roll": {
       "name": "Elite Recruiter",
-      "description": ""
+      "description": "Use probability tables for a higher courier level when recruiting.",
+      "lore": "From Relicbox"
     },
     "item_vampiric_embrace": {
       "name": "Vampire Fangs",
-      "description": ""
+      "description": "Your Courier has +40% lifesteal when dealing Courier damage to other players. You’ll get a Tango instead if your HP will be more than 100 after lifesteal.",
+      "lore": "From Relicbox"
     }
   }
 }
