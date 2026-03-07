@@ -14,3 +14,5 @@ data/crop_debug/
 data/yolo/
 data/detections.json
 runs/
+data/screenshots/
+*.pt

@@ -1,0 +1,5499 @@
+{
+  "Abaddon": {
+    "id": "chess_abaddon",
+    "cost": 1,
+    "synergies": [
+      "Knight",
+      "Undead"
+    ],
+    "attack_type": "melee",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 700,
+        "mana": 100,
+        "atk": [
+          45,
+          55
+        ],
+        "armor": 3,
+        "magic_resist": 20,
+        "atk_rate": 1.3,
+        "atk_range": 205
+      },
+      "2_star": {
+        "hp": 1400,
+        "mana": 100,
+        "atk": [
+          90,
+          110
+        ],
+        "armor": 3,
+        "magic_resist": 20,
+        "atk_rate": 1.3,
+        "atk_range": 205
+      },
+      "3_star": {
+        "hp": 2800,
+        "mana": 100,
+        "atk": [
+          180,
+          220
+        ],
+        "armor": 3,
+        "magic_resist": 20,
+        "atk_rate": 1.3,
+        "atk_range": 205
+      }
+    }
+  },
+  "Anti-mage": {
+    "id": "chess_am",
+    "cost": 4,
+    "synergies": [
+      "Demon Hunter",
+      "Elf"
+    ],
+    "attack_type": "melee",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 850,
+        "mana": 0,
+        "atk": [
+          80,
+          110
+        ],
+        "armor": 7,
+        "magic_resist": 30,
+        "atk_rate": 0.9,
+        "atk_range": 205
+      },
+      "2_star": {
+        "hp": 1700,
+        "mana": 0,
+        "atk": [
+          160,
+          220
+        ],
+        "armor": 7,
+        "magic_resist": 30,
+        "atk_rate": 0.9,
+        "atk_range": 205
+      },
+      "3_star": {
+        "hp": 3400,
+        "mana": 0,
+        "atk": [
+          320,
+          440
+        ],
+        "armor": 7,
+        "magic_resist": 30,
+        "atk_rate": 0.9,
+        "atk_range": 205
+      }
+    }
+  },
+  "Shadow Fiend": {
+    "id": "chess_au",
+    "cost": 3,
+    "synergies": [
+      "Demon",
+      "Warlock"
+    ],
+    "attack_type": "melee",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 1250,
+        "mana": 0,
+        "atk": [
+          100,
+          160
+        ],
+        "armor": 10,
+        "magic_resist": 20,
+        "atk_rate": 1.5,
+        "atk_range": 205
+      },
+      "2_star": {
+        "hp": 2500,
+        "mana": 0,
+        "atk": [
+          200,
+          320
+        ],
+        "armor": 10,
+        "magic_resist": 20,
+        "atk_rate": 1.5,
+        "atk_range": 205
+      },
+      "3_star": {
+        "hp": 5000,
+        "mana": 0,
+        "atk": [
+          400,
+          640
+        ],
+        "armor": 10,
+        "magic_resist": 20,
+        "atk_rate": 1.5,
+        "atk_range": 205
+      }
+    }
+  },
+  "Arc Warden": {
+    "id": "chess_aw",
+    "cost": 5,
+    "synergies": [
+      "Kobold",
+      "Shaman"
+    ],
+    "attack_type": "ranged",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 900,
+        "mana": 0,
+        "atk": [
+          90,
+          150
+        ],
+        "armor": 7,
+        "magic_resist": 0,
+        "atk_rate": 1.0,
+        "atk_range": 600
+      },
+      "2_star": {
+        "hp": 1700,
+        "mana": 0,
+        "atk": [
+          180,
+          300
+        ],
+        "armor": 7,
+        "magic_resist": 0,
+        "atk_rate": 1.1,
+        "atk_range": 600
+      },
+      "3_star": {
+        "hp": 3400,
+        "mana": 0,
+        "atk": [
+          360,
+          600
+        ],
+        "armor": 7,
+        "magic_resist": 0,
+        "atk_rate": 1.1,
+        "atk_range": 600
+      }
+    }
+  },
+  "Axe": {
+    "id": "chess_axe",
+    "cost": 1,
+    "synergies": [
+      "Orc",
+      "Warrior"
+    ],
+    "attack_type": "melee",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 750,
+        "mana": 100,
+        "atk": [
+          50,
+          70
+        ],
+        "armor": 4,
+        "magic_resist": 0,
+        "atk_rate": 1.5,
+        "atk_range": 205
+      },
+      "2_star": {
+        "hp": 1500,
+        "mana": 100,
+        "atk": [
+          100,
+          140
+        ],
+        "armor": 4,
+        "magic_resist": 0,
+        "atk_rate": 1.5,
+        "atk_range": 205
+      },
+      "3_star": {
+        "hp": 3000,
+        "mana": 100,
+        "atk": [
+          200,
+          280
+        ],
+        "armor": 4,
+        "magic_resist": 0,
+        "atk_rate": 1.5,
+        "atk_range": 205
+      }
+    }
+  },
+  "Bane": {
+    "id": "chess_bane",
+    "cost": 1,
+    "synergies": [
+      "Faceless",
+      "Satyr",
+      "Warlock"
+    ],
+    "attack_type": "ranged",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 550,
+        "mana": 100,
+        "atk": [
+          40,
+          50
+        ],
+        "armor": 2,
+        "magic_resist": 10,
+        "atk_rate": 1.5,
+        "atk_range": 400
+      },
+      "2_star": {
+        "hp": 1100,
+        "mana": 100,
+        "atk": [
+          80,
+          100
+        ],
+        "armor": 2,
+        "magic_resist": 10,
+        "atk_rate": 1.5,
+        "atk_range": 400
+      },
+      "3_star": {
+        "hp": 2200,
+        "mana": 100,
+        "atk": [
+          160,
+          200
+        ],
+        "armor": 2,
+        "magic_resist": 10,
+        "atk_rate": 1.5,
+        "atk_range": 400
+      }
+    }
+  },
+  "Batrider": {
+    "id": "chess_bat",
+    "cost": 2,
+    "synergies": [
+      "Knight",
+      "Troll"
+    ],
+    "attack_type": "ranged",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 600,
+        "mana": 100,
+        "atk": [
+          40,
+          55
+        ],
+        "armor": 4,
+        "magic_resist": 0,
+        "atk_rate": 1.3,
+        "atk_range": 400
+      },
+      "2_star": {
+        "hp": 1200,
+        "mana": 100,
+        "atk": [
+          80,
+          110
+        ],
+        "armor": 4,
+        "magic_resist": 0,
+        "atk_rate": 1.3,
+        "atk_range": 400
+      },
+      "3_star": {
+        "hp": 2400,
+        "mana": 100,
+        "atk": [
+          160,
+          220
+        ],
+        "armor": 4,
+        "magic_resist": 0,
+        "atk_rate": 1.3,
+        "atk_range": 400
+      }
+    }
+  },
+  "Bounty Hunter": {
+    "id": "chess_bh",
+    "cost": 1,
+    "synergies": [
+      "Draenei",
+      "Goblin",
+      "Hunter"
+    ],
+    "attack_type": "melee",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 500,
+        "mana": 100,
+        "atk": [
+          50,
+          70
+        ],
+        "armor": 1,
+        "magic_resist": 0,
+        "atk_rate": 1.0,
+        "atk_range": 205
+      },
+      "2_star": {
+        "hp": 1000,
+        "mana": 100,
+        "atk": [
+          100,
+          140
+        ],
+        "armor": 1,
+        "magic_resist": 0,
+        "atk_rate": 1.0,
+        "atk_range": 205
+      },
+      "3_star": {
+        "hp": 2000,
+        "mana": 100,
+        "atk": [
+          200,
+          280
+        ],
+        "armor": 1,
+        "magic_resist": 0,
+        "atk_rate": 1.0,
+        "atk_range": 205
+      }
+    }
+  },
+  "Beastmaster": {
+    "id": "chess_bm",
+    "cost": 2,
+    "synergies": [
+      "Hunter",
+      "Orc"
+    ],
+    "attack_type": "melee",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 650,
+        "mana": 100,
+        "atk": [
+          60,
+          70
+        ],
+        "armor": 6,
+        "magic_resist": 0,
+        "atk_rate": 1.4,
+        "atk_range": 205
+      },
+      "2_star": {
+        "hp": 1300,
+        "mana": 100,
+        "atk": [
+          120,
+          140
+        ],
+        "armor": 6,
+        "magic_resist": 0,
+        "atk_rate": 1.4,
+        "atk_range": 205
+      },
+      "3_star": {
+        "hp": 2600,
+        "mana": 100,
+        "atk": [
+          240,
+          280
+        ],
+        "armor": 6,
+        "magic_resist": 0,
+        "atk_rate": 1.4,
+        "atk_range": 205
+      }
+    }
+  },
+  "Broodmother": {
+    "id": "chess_br",
+    "cost": 4,
+    "synergies": [
+      "Aqir",
+      "Hunter"
+    ],
+    "attack_type": "melee",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 950,
+        "mana": 0,
+        "atk": [
+          80,
+          110
+        ],
+        "armor": 10,
+        "magic_resist": 20,
+        "atk_rate": 1.1,
+        "atk_range": 205
+      },
+      "2_star": {
+        "hp": 1900,
+        "mana": 0,
+        "atk": [
+          160,
+          220
+        ],
+        "armor": 10,
+        "magic_resist": 20,
+        "atk_rate": 1.1,
+        "atk_range": 205
+      },
+      "3_star": {
+        "hp": 3800,
+        "mana": 0,
+        "atk": [
+          320,
+          440
+        ],
+        "armor": 10,
+        "magic_resist": 20,
+        "atk_rate": 1.1,
+        "atk_range": 205
+      }
+    }
+  },
+  "Brewmaster": {
+    "id": "chess_brew",
+    "cost": 1,
+    "synergies": [
+      "Monk",
+      "Pandaren"
+    ],
+    "attack_type": "melee",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 600,
+        "mana": 100,
+        "atk": [
+          50,
+          60
+        ],
+        "armor": 3,
+        "magic_resist": 20,
+        "atk_rate": 1.5,
+        "atk_range": 205
+      },
+      "2_star": {
+        "hp": 1200,
+        "mana": 100,
+        "atk": [
+          100,
+          120
+        ],
+        "armor": 3,
+        "magic_resist": 20,
+        "atk_rate": 1.5,
+        "atk_range": 205
+      },
+      "3_star": {
+        "hp": 2400,
+        "mana": 100,
+        "atk": [
+          200,
+          240
+        ],
+        "armor": 3,
+        "magic_resist": 20,
+        "atk_rate": 1.5,
+        "atk_range": 205
+      }
+    }
+  },
+  "Bloodseeker": {
+    "id": "chess_bs",
+    "cost": 2,
+    "synergies": [
+      "Orc",
+      "Shaman"
+    ],
+    "attack_type": "melee",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 600,
+        "mana": 100,
+        "atk": [
+          55,
+          60
+        ],
+        "armor": 3,
+        "magic_resist": 10,
+        "atk_rate": 1.1,
+        "atk_range": 205
+      },
+      "2_star": {
+        "hp": 1200,
+        "mana": 100,
+        "atk": [
+          110,
+          120
+        ],
+        "armor": 3,
+        "magic_resist": 10,
+        "atk_rate": 1.1,
+        "atk_range": 205
+      },
+      "3_star": {
+        "hp": 2400,
+        "mana": 100,
+        "atk": [
+          220,
+          240
+        ],
+        "armor": 3,
+        "magic_resist": 10,
+        "atk_rate": 1.1,
+        "atk_range": 205
+      }
+    }
+  },
+  "Chen": {
+    "id": "chess_chen",
+    "cost": 4,
+    "synergies": [
+      "Orc",
+      "Priest"
+    ],
+    "attack_type": "ranged",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 900,
+        "mana": 100,
+        "atk": [
+          40,
+          60
+        ],
+        "armor": 6,
+        "magic_resist": 10,
+        "atk_rate": 1.4,
+        "atk_range": 400
+      },
+      "2_star": {
+        "hp": 1800,
+        "mana": 100,
+        "atk": [
+          80,
+          120
+        ],
+        "armor": 6,
+        "magic_resist": 10,
+        "atk_rate": 1.4,
+        "atk_range": 400
+      },
+      "3_star": {
+        "hp": 3600,
+        "mana": 100,
+        "atk": [
+          160,
+          240
+        ],
+        "armor": 6,
+        "magic_resist": 10,
+        "atk_rate": 1.4,
+        "atk_range": 400
+      }
+    }
+  },
+  "Chaos Knight": {
+    "id": "chess_ck",
+    "cost": 2,
+    "synergies": [
+      "Demon",
+      "Knight"
+    ],
+    "attack_type": "melee",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 650,
+        "mana": 0,
+        "atk": [
+          40,
+          160
+        ],
+        "armor": 6,
+        "magic_resist": 0,
+        "atk_rate": 1.5,
+        "atk_range": 205
+      },
+      "2_star": {
+        "hp": 1300,
+        "mana": 0,
+        "atk": [
+          80,
+          320
+        ],
+        "armor": 6,
+        "magic_resist": 0,
+        "atk_rate": 1.5,
+        "atk_range": 205
+      },
+      "3_star": {
+        "hp": 2600,
+        "mana": 0,
+        "atk": [
+          160,
+          640
+        ],
+        "armor": 6,
+        "magic_resist": 0,
+        "atk_rate": 1.5,
+        "atk_range": 205
+      }
+    }
+  },
+  "Clinkz": {
+    "id": "chess_clinkz",
+    "cost": 1,
+    "synergies": [
+      "Hunter",
+      "Undead"
+    ],
+    "attack_type": "ranged",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 500,
+        "mana": 100,
+        "atk": [
+          40,
+          60
+        ],
+        "armor": 2,
+        "magic_resist": 0,
+        "atk_rate": 1.2,
+        "atk_range": 600
+      },
+      "2_star": {
+        "hp": 1000,
+        "mana": 100,
+        "atk": [
+          80,
+          120
+        ],
+        "armor": 2,
+        "magic_resist": 0,
+        "atk_rate": 1.2,
+        "atk_range": 600
+      },
+      "3_star": {
+        "hp": 2000,
+        "mana": 100,
+        "atk": [
+          160,
+          240
+        ],
+        "armor": 2,
+        "magic_resist": 0,
+        "atk_rate": 1.2,
+        "atk_range": 600
+      }
+    }
+  },
+  "Clockwerk": {
+    "id": "chess_clock",
+    "cost": 1,
+    "synergies": [
+      "Goblin",
+      "Mech"
+    ],
+    "attack_type": "melee",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 700,
+        "mana": 100,
+        "atk": [
+          45,
+          55
+        ],
+        "armor": 4,
+        "magic_resist": 0,
+        "atk_rate": 1.4,
+        "atk_range": 205
+      },
+      "2_star": {
+        "hp": 1400,
+        "mana": 100,
+        "atk": [
+          90,
+          110
+        ],
+        "armor": 4,
+        "magic_resist": 0,
+        "atk_rate": 1.4,
+        "atk_range": 205
+      },
+      "3_star": {
+        "hp": 2800,
+        "mana": 100,
+        "atk": [
+          180,
+          220
+        ],
+        "armor": 4,
+        "magic_resist": 0,
+        "atk_rate": 1.4,
+        "atk_range": 205
+      }
+    }
+  },
+  "Crystal Maiden": {
+    "id": "chess_cm",
+    "cost": 1,
+    "synergies": [
+      "Human",
+      "Mage"
+    ],
+    "attack_type": "ranged",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 450,
+        "mana": 0,
+        "atk": [
+          40,
+          45
+        ],
+        "armor": 1,
+        "magic_resist": 5,
+        "atk_rate": 1.7,
+        "atk_range": 600
+      },
+      "2_star": {
+        "hp": 900,
+        "mana": 0,
+        "atk": [
+          80,
+          90
+        ],
+        "armor": 1,
+        "magic_resist": 5,
+        "atk_rate": 1.7,
+        "atk_range": 600
+      },
+      "3_star": {
+        "hp": 1800,
+        "mana": 0,
+        "atk": [
+          160,
+          180
+        ],
+        "armor": 1,
+        "magic_resist": 5,
+        "atk_rate": 1.7,
+        "atk_range": 600
+      }
+    }
+  },
+  "Centaur Warrunner": {
+    "id": "chess_ct",
+    "cost": 2,
+    "synergies": [
+      "Centaur",
+      "Warrior"
+    ],
+    "attack_type": "melee",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 850,
+        "mana": 0,
+        "atk": [
+          55,
+          60
+        ],
+        "armor": 4,
+        "magic_resist": 15,
+        "atk_rate": 1.1,
+        "atk_range": 205
+      },
+      "2_star": {
+        "hp": 1700,
+        "mana": 0,
+        "atk": [
+          110,
+          120
+        ],
+        "armor": 4,
+        "magic_resist": 15,
+        "atk_rate": 1.1,
+        "atk_range": 205
+      },
+      "3_star": {
+        "hp": 3400,
+        "mana": 0,
+        "atk": [
+          220,
+          240
+        ],
+        "armor": 4,
+        "magic_resist": 15,
+        "atk_rate": 1.1,
+        "atk_range": 205
+      }
+    }
+  },
+  "Dazzle": {
+    "id": "chess_dazzle",
+    "cost": 1,
+    "synergies": [
+      "Priest",
+      "Troll"
+    ],
+    "attack_type": "ranged",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 450,
+        "mana": 100,
+        "atk": [
+          45,
+          60
+        ],
+        "armor": 1,
+        "magic_resist": 10,
+        "atk_rate": 1.2,
+        "atk_range": 400
+      },
+      "2_star": {
+        "hp": 900,
+        "mana": 100,
+        "atk": [
+          90,
+          120
+        ],
+        "armor": 1,
+        "magic_resist": 10,
+        "atk_rate": 1.2,
+        "atk_range": 400
+      },
+      "3_star": {
+        "hp": 1800,
+        "mana": 100,
+        "atk": [
+          180,
+          240
+        ],
+        "armor": 1,
+        "magic_resist": 10,
+        "atk_rate": 1.2,
+        "atk_range": 400
+      }
+    }
+  },
+  "Dawnbreaker": {
+    "id": "chess_db",
+    "cost": 3,
+    "synergies": [
+      "Draenei",
+      "Knight"
+    ],
+    "attack_type": "melee",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 700,
+        "mana": 100,
+        "atk": [
+          70,
+          110
+        ],
+        "armor": 7,
+        "magic_resist": 0,
+        "atk_rate": 1.6,
+        "atk_range": 205
+      },
+      "2_star": {
+        "hp": 1400,
+        "mana": 100,
+        "atk": [
+          140,
+          220
+        ],
+        "armor": 7,
+        "magic_resist": 0,
+        "atk_rate": 1.6,
+        "atk_range": 205
+      },
+      "3_star": {
+        "hp": 2800,
+        "mana": 100,
+        "atk": [
+          280,
+          440
+        ],
+        "armor": 7,
+        "magic_resist": 0,
+        "atk_rate": 1.6,
+        "atk_range": 205
+      }
+    }
+  },
+  "Disruptor": {
+    "id": "chess_disruptor",
+    "cost": 5,
+    "synergies": [
+      "Orc",
+      "Shaman"
+    ],
+    "attack_type": "ranged",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 1000,
+        "mana": 100,
+        "atk": [
+          50,
+          70
+        ],
+        "armor": 6,
+        "magic_resist": 20,
+        "atk_rate": 1.5,
+        "atk_range": 600
+      },
+      "2_star": {
+        "hp": 2000,
+        "mana": 100,
+        "atk": [
+          100,
+          140
+        ],
+        "armor": 6,
+        "magic_resist": 20,
+        "atk_rate": 1.5,
+        "atk_range": 600
+      },
+      "3_star": {
+        "hp": 4000,
+        "mana": 100,
+        "atk": [
+          200,
+          280
+        ],
+        "armor": 6,
+        "magic_resist": 20,
+        "atk_rate": 1.5,
+        "atk_range": 600
+      }
+    }
+  },
+  "Dragon Knight": {
+    "id": "chess_dk",
+    "cost": 4,
+    "synergies": [
+      "Dragon",
+      "Human",
+      "Knight"
+    ],
+    "attack_type": "melee",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 900,
+        "mana": 100,
+        "atk": [
+          80,
+          90
+        ],
+        "armor": 12,
+        "magic_resist": 0,
+        "atk_rate": 1.5,
+        "atk_range": 205
+      },
+      "2_star": {
+        "hp": 1800,
+        "mana": 100,
+        "atk": [
+          160,
+          180
+        ],
+        "armor": 12,
+        "magic_resist": 0,
+        "atk_rate": 1.5,
+        "atk_range": 205
+      },
+      "3_star": {
+        "hp": 3600,
+        "mana": 100,
+        "atk": [
+          320,
+          360
+        ],
+        "armor": 12,
+        "magic_resist": 0,
+        "atk_rate": 1.5,
+        "atk_range": 205
+      }
+    }
+  },
+  "Doom": {
+    "id": "chess_doom",
+    "cost": 4,
+    "synergies": [
+      "Demon",
+      "Warrior"
+    ],
+    "attack_type": "melee",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 1050,
+        "mana": 100,
+        "atk": [
+          110,
+          120
+        ],
+        "armor": 10,
+        "magic_resist": 0,
+        "atk_rate": 1.3,
+        "atk_range": 205
+      },
+      "2_star": {
+        "hp": 2100,
+        "mana": 100,
+        "atk": [
+          220,
+          240
+        ],
+        "armor": 10,
+        "magic_resist": 0,
+        "atk_rate": 1.3,
+        "atk_range": 205
+      },
+      "3_star": {
+        "hp": 4200,
+        "mana": 100,
+        "atk": [
+          440,
+          480
+        ],
+        "armor": 10,
+        "magic_resist": 0,
+        "atk_rate": 1.3,
+        "atk_range": 205
+      }
+    }
+  },
+  "Death Prophet": {
+    "id": "chess_dp",
+    "cost": 4,
+    "synergies": [
+      "Undead",
+      "Warlock"
+    ],
+    "attack_type": "ranged",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 900,
+        "mana": 100,
+        "atk": [
+          50,
+          60
+        ],
+        "armor": 6,
+        "magic_resist": 30,
+        "atk_rate": 1.4,
+        "atk_range": 400
+      },
+      "2_star": {
+        "hp": 1800,
+        "mana": 100,
+        "atk": [
+          100,
+          120
+        ],
+        "armor": 6,
+        "magic_resist": 30,
+        "atk_rate": 1.4,
+        "atk_range": 400
+      },
+      "3_star": {
+        "hp": 3600,
+        "mana": 100,
+        "atk": [
+          200,
+          240
+        ],
+        "armor": 6,
+        "magic_resist": 30,
+        "atk_rate": 1.4,
+        "atk_range": 400
+      }
+    }
+  },
+  "Muerta": {
+    "id": "chess_muerta",
+    "cost": 2,
+    "synergies": [
+      "Hunter",
+      "Undead"
+    ],
+    "attack_type": "ranged",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 600,
+        "mana": 100,
+        "atk": [
+          50,
+          100
+        ],
+        "armor": 3,
+        "magic_resist": 0,
+        "atk_rate": 1.1,
+        "atk_range": 400
+      },
+      "2_star": {
+        "hp": 1200,
+        "mana": 100,
+        "atk": [
+          100,
+          200
+        ],
+        "armor": 3,
+        "magic_resist": 0,
+        "atk_rate": 1.1,
+        "atk_range": 400
+      },
+      "3_star": {
+        "hp": 2200,
+        "mana": 100,
+        "atk": [
+          200,
+          400
+        ],
+        "armor": 3,
+        "magic_resist": 0,
+        "atk_rate": 1.1,
+        "atk_range": 400
+      }
+    }
+  },
+  "Dark Seer": {
+    "id": "chess_ds",
+    "cost": 2,
+    "synergies": [
+      "Draenei",
+      "Warlock"
+    ],
+    "attack_type": "melee",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 700,
+        "mana": 100,
+        "atk": [
+          50,
+          90
+        ],
+        "armor": 4,
+        "magic_resist": 10,
+        "atk_rate": 1.6,
+        "atk_range": 205
+      },
+      "2_star": {
+        "hp": 1400,
+        "mana": 100,
+        "atk": [
+          100,
+          180
+        ],
+        "armor": 4,
+        "magic_resist": 10,
+        "atk_rate": 1.6,
+        "atk_range": 205
+      },
+      "3_star": {
+        "hp": 2800,
+        "mana": 100,
+        "atk": [
+          200,
+          360
+        ],
+        "armor": 4,
+        "magic_resist": 10,
+        "atk_rate": 1.6,
+        "atk_range": 205
+      }
+    }
+  },
+  "Dark Willow": {
+    "id": "chess_dw",
+    "cost": 1,
+    "synergies": [
+      "Elf",
+      "Wizard"
+    ],
+    "attack_type": "ranged",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 450,
+        "mana": 0,
+        "atk": [
+          40,
+          70
+        ],
+        "armor": 1,
+        "magic_resist": 0,
+        "atk_rate": 1.1,
+        "atk_range": 400
+      },
+      "2_star": {
+        "hp": 900,
+        "mana": 0,
+        "atk": [
+          80,
+          140
+        ],
+        "armor": 1,
+        "magic_resist": 0,
+        "atk_rate": 1.1,
+        "atk_range": 400
+      },
+      "3_star": {
+        "hp": 1800,
+        "mana": 0,
+        "atk": [
+          160,
+          280
+        ],
+        "armor": 1,
+        "magic_resist": 0,
+        "atk_rate": 1.1,
+        "atk_range": 400
+      }
+    }
+  },
+  "Earth Spirit": {
+    "id": "chess_earth",
+    "cost": 4,
+    "synergies": [
+      "Pandaren",
+      "Shaman"
+    ],
+    "attack_type": "melee",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 900,
+        "mana": 100,
+        "atk": [
+          40,
+          70
+        ],
+        "armor": 9,
+        "magic_resist": 0,
+        "atk_rate": 1.5,
+        "atk_range": 205
+      },
+      "2_star": {
+        "hp": 1800,
+        "mana": 100,
+        "atk": [
+          80,
+          140
+        ],
+        "armor": 9,
+        "magic_resist": 0,
+        "atk_rate": 1.5,
+        "atk_range": 205
+      },
+      "3_star": {
+        "hp": 3600,
+        "mana": 100,
+        "atk": [
+          160,
+          320
+        ],
+        "armor": 9,
+        "magic_resist": 0,
+        "atk_rate": 1.5,
+        "atk_range": 205
+      }
+    }
+  },
+  "Enchantress": {
+    "id": "chess_eh",
+    "cost": 1,
+    "synergies": [
+      "Beast",
+      "Centaur",
+      "Druid"
+    ],
+    "attack_type": "ranged",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 400,
+        "mana": 0,
+        "atk": [
+          50,
+          60
+        ],
+        "armor": 2,
+        "magic_resist": 10,
+        "atk_rate": 1.5,
+        "atk_range": 400
+      },
+      "2_star": {
+        "hp": 800,
+        "mana": 0,
+        "atk": [
+          100,
+          120
+        ],
+        "armor": 2,
+        "magic_resist": 10,
+        "atk_rate": 1.5,
+        "atk_range": 400
+      },
+      "3_star": {
+        "hp": 1500,
+        "mana": 0,
+        "atk": [
+          200,
+          240
+        ],
+        "armor": 2,
+        "magic_resist": 10,
+        "atk_rate": 1.5,
+        "atk_range": 400
+      }
+    }
+  },
+  "Ember Spirit": {
+    "id": "chess_ember",
+    "cost": 4,
+    "synergies": [
+      "Assassin",
+      "Pandaren"
+    ],
+    "attack_type": "melee",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 700,
+        "mana": 100,
+        "atk": [
+          50,
+          80
+        ],
+        "armor": 4,
+        "magic_resist": 0,
+        "atk_rate": 1.2,
+        "atk_range": 205
+      },
+      "2_star": {
+        "hp": 1400,
+        "mana": 100,
+        "atk": [
+          100,
+          160
+        ],
+        "armor": 4,
+        "magic_resist": 0,
+        "atk_rate": 1.2,
+        "atk_range": 205
+      },
+      "3_star": {
+        "hp": 2800,
+        "mana": 100,
+        "atk": [
+          200,
+          320
+        ],
+        "armor": 4,
+        "magic_resist": 0,
+        "atk_rate": 1.2,
+        "atk_range": 205
+      }
+    }
+  },
+  "Enigma": {
+    "id": "chess_enigma",
+    "cost": 3,
+    "synergies": [
+      "Elemental",
+      "Warlock"
+    ],
+    "attack_type": "ranged",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 700,
+        "mana": 100,
+        "atk": [
+          45,
+          55
+        ],
+        "armor": 4,
+        "magic_resist": 10,
+        "atk_rate": 1.5,
+        "atk_range": 400
+      },
+      "2_star": {
+        "hp": 1400,
+        "mana": 100,
+        "atk": [
+          90,
+          110
+        ],
+        "armor": 4,
+        "magic_resist": 10,
+        "atk_rate": 1.5,
+        "atk_range": 400
+      },
+      "3_star": {
+        "hp": 2800,
+        "mana": 100,
+        "atk": [
+          180,
+          220
+        ],
+        "armor": 4,
+        "magic_resist": 10,
+        "atk_rate": 1.5,
+        "atk_range": 400
+      }
+    }
+  },
+  "Earthshaker": {
+    "id": "chess_es",
+    "cost": 3,
+    "synergies": [
+      "Shaman",
+      "Tauren"
+    ],
+    "attack_type": "melee",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 700,
+        "mana": 100,
+        "atk": [
+          80,
+          120
+        ],
+        "armor": 6,
+        "magic_resist": 0,
+        "atk_rate": 1.4,
+        "atk_range": 205
+      },
+      "2_star": {
+        "hp": 1400,
+        "mana": 100,
+        "atk": [
+          160,
+          240
+        ],
+        "armor": 6,
+        "magic_resist": 0,
+        "atk_rate": 1.4,
+        "atk_range": 205
+      },
+      "3_star": {
+        "hp": 2800,
+        "mana": 100,
+        "atk": [
+          320,
+          480
+        ],
+        "armor": 6,
+        "magic_resist": 0,
+        "atk_rate": 1.4,
+        "atk_range": 205
+      }
+    }
+  },
+  "Elder Titan": {
+    "id": "chess_et",
+    "cost": 4,
+    "synergies": [
+      "Druid",
+      "God",
+      "Tauren"
+    ],
+    "attack_type": "melee",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 900,
+        "mana": 100,
+        "atk": [
+          100,
+          130
+        ],
+        "armor": 7,
+        "magic_resist": 0,
+        "atk_rate": 1.5,
+        "atk_range": 205
+      },
+      "2_star": {
+        "hp": 1800,
+        "mana": 100,
+        "atk": [
+          200,
+          260
+        ],
+        "armor": 7,
+        "magic_resist": 0,
+        "atk_rate": 1.5,
+        "atk_range": 205
+      },
+      "3_star": {
+        "hp": 3100,
+        "mana": 100,
+        "atk": [
+          400,
+          520
+        ],
+        "armor": 7,
+        "magic_resist": 0,
+        "atk_rate": 1.5,
+        "atk_range": 205
+      }
+    }
+  },
+  "Furion": {
+    "id": "chess_fur",
+    "cost": 2,
+    "synergies": [
+      "Druid",
+      "Elf"
+    ],
+    "attack_type": "ranged",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 500,
+        "mana": 100,
+        "atk": [
+          45,
+          50
+        ],
+        "armor": 4,
+        "magic_resist": 5,
+        "atk_rate": 1.4,
+        "atk_range": 400
+      },
+      "2_star": {
+        "hp": 1000,
+        "mana": 100,
+        "atk": [
+          90,
+          100
+        ],
+        "armor": 4,
+        "magic_resist": 5,
+        "atk_rate": 1.4,
+        "atk_range": 400
+      },
+      "3_star": {
+        "hp": 1900,
+        "mana": 100,
+        "atk": [
+          180,
+          200
+        ],
+        "armor": 4,
+        "magic_resist": 5,
+        "atk_rate": 1.4,
+        "atk_range": 400
+      }
+    }
+  },
+  "Faceless Void": {
+    "id": "chess_fv",
+    "cost": 2,
+    "synergies": [
+      "Assassin",
+      "Faceless"
+    ],
+    "attack_type": "melee",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 550,
+        "mana": 100,
+        "atk": [
+          50,
+          80
+        ],
+        "armor": 4,
+        "magic_resist": 0,
+        "atk_rate": 1.3,
+        "atk_range": 205
+      },
+      "2_star": {
+        "hp": 1100,
+        "mana": 100,
+        "atk": [
+          120,
+          180
+        ],
+        "armor": 4,
+        "magic_resist": 0,
+        "atk_rate": 1.3,
+        "atk_range": 205
+      },
+      "3_star": {
+        "hp": 2200,
+        "mana": 100,
+        "atk": [
+          240,
+          360
+        ],
+        "armor": 4,
+        "magic_resist": 0,
+        "atk_rate": 1.3,
+        "atk_range": 205
+      }
+    }
+  },
+  "Alchemist": {
+    "id": "chess_ga",
+    "cost": 4,
+    "synergies": [
+      "Goblin",
+      "Ogre",
+      "Warlock"
+    ],
+    "attack_type": "melee",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 1050,
+        "mana": 100,
+        "atk": [
+          50,
+          110
+        ],
+        "armor": 6,
+        "magic_resist": 0,
+        "atk_rate": 1.3,
+        "atk_range": 205
+      },
+      "2_star": {
+        "hp": 2100,
+        "mana": 100,
+        "atk": [
+          100,
+          220
+        ],
+        "armor": 6,
+        "magic_resist": 0,
+        "atk_rate": 1.3,
+        "atk_range": 205
+      },
+      "3_star": {
+        "hp": 4200,
+        "mana": 100,
+        "atk": [
+          200,
+          440
+        ],
+        "armor": 6,
+        "magic_resist": 0,
+        "atk_rate": 1.3,
+        "atk_range": 205
+      }
+    }
+  },
+  "Lion": {
+    "id": "chess_lion",
+    "cost": 4,
+    "synergies": [
+      "Demon",
+      "Wizard"
+    ],
+    "attack_type": "ranged",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 750,
+        "mana": 100,
+        "atk": [
+          45,
+          55
+        ],
+        "armor": 3,
+        "magic_resist": 20,
+        "atk_rate": 1.6,
+        "atk_range": 400
+      },
+      "2_star": {
+        "hp": 1500,
+        "mana": 100,
+        "atk": [
+          90,
+          110
+        ],
+        "armor": 3,
+        "magic_resist": 20,
+        "atk_rate": 1.6,
+        "atk_range": 400
+      },
+      "3_star": {
+        "hp": 3000,
+        "mana": 100,
+        "atk": [
+          180,
+          220
+        ],
+        "armor": 3,
+        "magic_resist": 20,
+        "atk_rate": 1.6,
+        "atk_range": 400
+      }
+    }
+  },
+  "Gyrocopter": {
+    "id": "chess_gyro",
+    "cost": 5,
+    "synergies": [
+      "Dwarf",
+      "Mech"
+    ],
+    "attack_type": "ranged",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 900,
+        "mana": 0,
+        "atk": [
+          75,
+          100
+        ],
+        "armor": 12,
+        "magic_resist": 0,
+        "atk_rate": 0.9,
+        "atk_range": 400
+      },
+      "2_star": {
+        "hp": 1800,
+        "mana": 0,
+        "atk": [
+          150,
+          200
+        ],
+        "armor": 12,
+        "magic_resist": 0,
+        "atk_rate": 0.9,
+        "atk_range": 400
+      },
+      "3_star": {
+        "hp": 3600,
+        "mana": 0,
+        "atk": [
+          300,
+          400
+        ],
+        "armor": 12,
+        "magic_resist": 0,
+        "atk_rate": 0.9,
+        "atk_range": 400
+      }
+    }
+  },
+  "Huskar": {
+    "id": "chess_huskar",
+    "cost": 3,
+    "synergies": [
+      "Troll",
+      "Warrior"
+    ],
+    "attack_type": "ranged",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 700,
+        "mana": 0,
+        "atk": [
+          70,
+          100
+        ],
+        "armor": 6,
+        "magic_resist": 25,
+        "atk_rate": 1.3,
+        "atk_range": 400
+      },
+      "2_star": {
+        "hp": 1400,
+        "mana": 0,
+        "atk": [
+          140,
+          200
+        ],
+        "armor": 6,
+        "magic_resist": 25,
+        "atk_rate": 1.3,
+        "atk_range": 400
+      },
+      "3_star": {
+        "hp": 2800,
+        "mana": 0,
+        "atk": [
+          280,
+          400
+        ],
+        "armor": 6,
+        "magic_resist": 25,
+        "atk_rate": 1.3,
+        "atk_range": 400
+      }
+    }
+  },
+  "Hoodwink": {
+    "id": "chess_hw",
+    "cost": 1,
+    "synergies": [
+      "Beast",
+      "Hunter"
+    ],
+    "attack_type": "ranged",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 550,
+        "mana": 0,
+        "atk": [
+          40,
+          60
+        ],
+        "armor": 2,
+        "magic_resist": 0,
+        "atk_rate": 1.2,
+        "atk_range": 400
+      },
+      "2_star": {
+        "hp": 1100,
+        "mana": 0,
+        "atk": [
+          80,
+          120
+        ],
+        "armor": 2,
+        "magic_resist": 0,
+        "atk_rate": 1.2,
+        "atk_range": 400
+      },
+      "3_star": {
+        "hp": 2200,
+        "mana": 0,
+        "atk": [
+          160,
+          240
+        ],
+        "armor": 2,
+        "magic_resist": 0,
+        "atk_rate": 1.2,
+        "atk_range": 400
+      }
+    }
+  },
+  "IO": {
+    "id": "chess_io",
+    "cost": null,
+    "synergies": [
+      "Elf"
+    ],
+    "attack_type": "ranged",
+    "abilities": [
+      {
+        "id": "wisp_wildcard",
+        "name": "Indiscriminate Relocate",
+        "description": "Passive AbilityIO★ can combine with other pieces as any ★ piece on the board.\nIO★★ can combine with other pieces as any ★★ piece on the board."
+      }
+    ],
+    "stats": {
+      "1_star": {
+        "hp": 700,
+        "mana": 0,
+        "atk": [
+          40,
+          60
+        ],
+        "armor": 5,
+        "magic_resist": 30,
+        "atk_rate": 1.3,
+        "atk_range": 400
+      },
+      "2_star": {
+        "hp": 1400,
+        "mana": 0,
+        "atk": [
+          80,
+          120
+        ],
+        "armor": 5,
+        "magic_resist": 30,
+        "atk_rate": 1.3,
+        "atk_range": 400
+      },
+      "3_star": {
+        "hp": 2800,
+        "mana": 0,
+        "atk": [
+          160,
+          240
+        ],
+        "armor": 5,
+        "magic_resist": 30,
+        "atk_rate": 1.3,
+        "atk_range": 400
+      }
+    }
+  },
+  "Juggernaut": {
+    "id": "chess_jugg",
+    "cost": 2,
+    "synergies": [
+      "Orc",
+      "Warrior"
+    ],
+    "attack_type": "melee",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 600,
+        "mana": 100,
+        "atk": [
+          65,
+          70
+        ],
+        "armor": 4,
+        "magic_resist": 0,
+        "atk_rate": 1.1,
+        "atk_range": 205
+      },
+      "2_star": {
+        "hp": 1200,
+        "mana": 100,
+        "atk": [
+          130,
+          140
+        ],
+        "armor": 4,
+        "magic_resist": 0,
+        "atk_rate": 1.1,
+        "atk_range": 205
+      },
+      "3_star": {
+        "hp": 2400,
+        "mana": 100,
+        "atk": [
+          260,
+          280
+        ],
+        "armor": 4,
+        "magic_resist": 0,
+        "atk_rate": 1.1,
+        "atk_range": 205
+      }
+    }
+  },
+  "Invoker": {
+    "id": "chess_kael",
+    "cost": 5,
+    "synergies": [
+      "Elf",
+      "Mage"
+    ],
+    "attack_type": "ranged",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 900,
+        "mana": 100,
+        "atk": [
+          70,
+          80
+        ],
+        "armor": 7,
+        "magic_resist": 30,
+        "atk_rate": 1.1,
+        "atk_range": 600
+      },
+      "2_star": {
+        "hp": 1800,
+        "mana": 100,
+        "atk": [
+          140,
+          160
+        ],
+        "armor": 7,
+        "magic_resist": 30,
+        "atk_rate": 1.1,
+        "atk_range": 600
+      },
+      "3_star": {
+        "hp": 3600,
+        "mana": 100,
+        "atk": [
+          280,
+          320
+        ],
+        "armor": 7,
+        "magic_resist": 30,
+        "atk_rate": 1.1,
+        "atk_range": 600
+      }
+    }
+  },
+  "Kez": {
+    "id": "chess_kez",
+    "cost": 3,
+    "synergies": [
+      "Assassin",
+      "Harpy"
+    ],
+    "attack_type": "ranged",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 650,
+        "mana": 100,
+        "atk": [
+          60,
+          100
+        ],
+        "armor": 6,
+        "magic_resist": 10,
+        "atk_rate": 1.1,
+        "atk_range": 205
+      },
+      "2_star": {
+        "hp": 1300,
+        "mana": 100,
+        "atk": [
+          120,
+          200
+        ],
+        "armor": 6,
+        "magic_resist": 10,
+        "atk_rate": 1.1,
+        "atk_range": 205
+      },
+      "3_star": {
+        "hp": 2600,
+        "mana": 100,
+        "atk": [
+          240,
+          400
+        ],
+        "armor": 6,
+        "magic_resist": 10,
+        "atk_rate": 1.1,
+        "atk_range": 205
+      }
+    }
+  },
+  "Kunkka": {
+    "id": "chess_kunkka",
+    "cost": 4,
+    "synergies": [
+      "Human",
+      "Warrior"
+    ],
+    "attack_type": "melee",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 950,
+        "mana": 100,
+        "atk": [
+          80,
+          100
+        ],
+        "armor": 10,
+        "magic_resist": 0,
+        "atk_rate": 1.3,
+        "atk_range": 205
+      },
+      "2_star": {
+        "hp": 1900,
+        "mana": 100,
+        "atk": [
+          160,
+          200
+        ],
+        "armor": 10,
+        "magic_resist": 0,
+        "atk_rate": 1.3,
+        "atk_range": 205
+      },
+      "3_star": {
+        "hp": 3800,
+        "mana": 100,
+        "atk": [
+          320,
+          400
+        ],
+        "armor": 10,
+        "magic_resist": 0,
+        "atk_rate": 1.3,
+        "atk_range": 205
+      }
+    }
+  },
+  "Largo": {
+    "id": "chess_largo",
+    "cost": 2,
+    "synergies": [
+      "Monk",
+      "Naga"
+    ],
+    "attack_type": "melee",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 800,
+        "mana": 100,
+        "atk": [
+          50,
+          60
+        ],
+        "armor": 5,
+        "magic_resist": 20,
+        "atk_rate": 1.3,
+        "atk_range": 205
+      },
+      "2_star": {
+        "hp": 1600,
+        "mana": 100,
+        "atk": [
+          100,
+          120
+        ],
+        "armor": 5,
+        "magic_resist": 20,
+        "atk_rate": 1.3,
+        "atk_range": 205
+      },
+      "3_star": {
+        "hp": 3200,
+        "mana": 100,
+        "atk": [
+          200,
+          240
+        ],
+        "armor": 5,
+        "magic_resist": 20,
+        "atk_rate": 1.3,
+        "atk_range": 205
+      }
+    }
+  },
+  "Legion Commander": {
+    "id": "chess_lc",
+    "cost": 3,
+    "synergies": [
+      "Human",
+      "Knight"
+    ],
+    "attack_type": "melee",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 800,
+        "mana": 0,
+        "atk": [
+          70,
+          100
+        ],
+        "armor": 7,
+        "magic_resist": 0,
+        "atk_rate": 1.2,
+        "atk_range": 205
+      },
+      "2_star": {
+        "hp": 1600,
+        "mana": 0,
+        "atk": [
+          140,
+          200
+        ],
+        "armor": 7,
+        "magic_resist": 0,
+        "atk_rate": 1.2,
+        "atk_range": 205
+      },
+      "3_star": {
+        "hp": 3200,
+        "mana": 0,
+        "atk": [
+          280,
+          400
+        ],
+        "armor": 7,
+        "magic_resist": 0,
+        "atk_rate": 1.2,
+        "atk_range": 205
+      }
+    }
+  },
+  "Lone Druid": {
+    "id": "chess_ld",
+    "cost": 4,
+    "synergies": [
+      "Beast",
+      "Druid"
+    ],
+    "attack_type": "ranged",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 800,
+        "mana": 100,
+        "atk": [
+          50,
+          60
+        ],
+        "armor": 7,
+        "magic_resist": 0,
+        "atk_rate": 1.3,
+        "atk_range": 400
+      },
+      "2_star": {
+        "hp": 1600,
+        "mana": 100,
+        "atk": [
+          100,
+          120
+        ],
+        "armor": 7,
+        "magic_resist": 0,
+        "atk_rate": 1.3,
+        "atk_range": 400
+      },
+      "3_star": {
+        "hp": 2800,
+        "mana": 100,
+        "atk": [
+          200,
+          240
+        ],
+        "armor": 7,
+        "magic_resist": 0,
+        "atk_rate": 1.3,
+        "atk_range": 400
+      }
+    }
+  },
+  "Lich": {
+    "id": "chess_lich",
+    "cost": 4,
+    "synergies": [
+      "Mage",
+      "Undead"
+    ],
+    "attack_type": "ranged",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 800,
+        "mana": 100,
+        "atk": [
+          50,
+          70
+        ],
+        "armor": 8,
+        "magic_resist": 30,
+        "atk_rate": 1.5,
+        "atk_range": 400
+      },
+      "2_star": {
+        "hp": 1600,
+        "mana": 100,
+        "atk": [
+          100,
+          140
+        ],
+        "armor": 8,
+        "magic_resist": 30,
+        "atk_rate": 1.5,
+        "atk_range": 400
+      },
+      "3_star": {
+        "hp": 3200,
+        "mana": 100,
+        "atk": [
+          200,
+          280
+        ],
+        "armor": 8,
+        "magic_resist": 30,
+        "atk_rate": 1.5,
+        "atk_range": 400
+      }
+    }
+  },
+  "Lina": {
+    "id": "chess_lina",
+    "cost": 2,
+    "synergies": [
+      "Human",
+      "Mage"
+    ],
+    "attack_type": "ranged",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 500,
+        "mana": 100,
+        "atk": [
+          50,
+          55
+        ],
+        "armor": 2,
+        "magic_resist": 10,
+        "atk_rate": 1.3,
+        "atk_range": 600
+      },
+      "2_star": {
+        "hp": 1000,
+        "mana": 100,
+        "atk": [
+          100,
+          110
+        ],
+        "armor": 2,
+        "magic_resist": 10,
+        "atk_rate": 1.3,
+        "atk_range": 600
+      },
+      "3_star": {
+        "hp": 2000,
+        "mana": 100,
+        "atk": [
+          200,
+          220
+        ],
+        "armor": 2,
+        "magic_resist": 10,
+        "atk_rate": 1.3,
+        "atk_range": 600
+      }
+    }
+  },
+  "Luna": {
+    "id": "chess_luna",
+    "cost": 2,
+    "synergies": [
+      "Elf",
+      "Knight"
+    ],
+    "attack_type": "ranged",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 600,
+        "mana": 0,
+        "atk": [
+          60,
+          70
+        ],
+        "armor": 3,
+        "magic_resist": 0,
+        "atk_rate": 1.3,
+        "atk_range": 400
+      },
+      "2_star": {
+        "hp": 1200,
+        "mana": 0,
+        "atk": [
+          120,
+          140
+        ],
+        "armor": 3,
+        "magic_resist": 0,
+        "atk_rate": 1.3,
+        "atk_range": 400
+      },
+      "3_star": {
+        "hp": 2400,
+        "mana": 0,
+        "atk": [
+          240,
+          280
+        ],
+        "armor": 3,
+        "magic_resist": 0,
+        "atk_rate": 1.3,
+        "atk_range": 400
+      }
+    }
+  },
+  "Lycan": {
+    "id": "chess_lyc",
+    "cost": 3,
+    "synergies": [
+      "Beast",
+      "Human",
+      "Warrior"
+    ],
+    "attack_type": "melee",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 700,
+        "mana": 100,
+        "atk": [
+          50,
+          60
+        ],
+        "armor": 4,
+        "magic_resist": 0,
+        "atk_rate": 1.3,
+        "atk_range": 205
+      },
+      "2_star": {
+        "hp": 1400,
+        "mana": 100,
+        "atk": [
+          100,
+          120
+        ],
+        "armor": 4,
+        "magic_resist": 0,
+        "atk_rate": 1.3,
+        "atk_range": 205
+      },
+      "3_star": {
+        "hp": 2800,
+        "mana": 100,
+        "atk": [
+          200,
+          240
+        ],
+        "armor": 4,
+        "magic_resist": 0,
+        "atk_rate": 1.3,
+        "atk_range": 205
+      }
+    }
+  },
+  "Magnus": {
+    "id": "chess_mag",
+    "cost": 4,
+    "synergies": [
+      "Assassin",
+      "Centaur"
+    ],
+    "attack_type": "melee",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 900,
+        "mana": 100,
+        "atk": [
+          65,
+          75
+        ],
+        "armor": 7,
+        "magic_resist": 5,
+        "atk_rate": 1.5,
+        "atk_range": 205
+      },
+      "2_star": {
+        "hp": 1800,
+        "mana": 100,
+        "atk": [
+          130,
+          150
+        ],
+        "armor": 7,
+        "magic_resist": 5,
+        "atk_rate": 1.5,
+        "atk_range": 205
+      },
+      "3_star": {
+        "hp": 3600,
+        "mana": 100,
+        "atk": [
+          260,
+          300
+        ],
+        "armor": 7,
+        "magic_resist": 5,
+        "atk_rate": 1.5,
+        "atk_range": 205
+      }
+    }
+  },
+  "Marci": {
+    "id": "chess_marci",
+    "cost": 3,
+    "synergies": [
+      "Elf",
+      "Monk"
+    ],
+    "attack_type": "ranged",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 700,
+        "mana": 100,
+        "atk": [
+          70,
+          90
+        ],
+        "armor": 4,
+        "magic_resist": 10,
+        "atk_rate": 1.1,
+        "atk_range": 205
+      },
+      "2_star": {
+        "hp": 1400,
+        "mana": 100,
+        "atk": [
+          140,
+          180
+        ],
+        "armor": 4,
+        "magic_resist": 10,
+        "atk_rate": 1.1,
+        "atk_range": 205
+      },
+      "3_star": {
+        "hp": 2800,
+        "mana": 100,
+        "atk": [
+          280,
+          360
+        ],
+        "armor": 4,
+        "magic_resist": 10,
+        "atk_rate": 1.1,
+        "atk_range": 205
+      }
+    }
+  },
+  "Mars": {
+    "id": "chess_mars",
+    "cost": 1,
+    "synergies": [
+      "God",
+      "Warrior"
+    ],
+    "attack_type": "melee",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 700,
+        "mana": 0,
+        "atk": [
+          50,
+          80
+        ],
+        "armor": 6,
+        "magic_resist": 0,
+        "atk_rate": 1.9,
+        "atk_range": 205
+      },
+      "2_star": {
+        "hp": 1400,
+        "mana": 0,
+        "atk": [
+          100,
+          160
+        ],
+        "armor": 6,
+        "magic_resist": 0,
+        "atk_rate": 1.9,
+        "atk_range": 205
+      },
+      "3_star": {
+        "hp": 2800,
+        "mana": 0,
+        "atk": [
+          200,
+          320
+        ],
+        "armor": 6,
+        "magic_resist": 0,
+        "atk_rate": 1.9,
+        "atk_range": 205
+      }
+    }
+  },
+  "Medusa": {
+    "id": "chess_medusa",
+    "cost": 4,
+    "synergies": [
+      "Hunter",
+      "Naga"
+    ],
+    "attack_type": "ranged",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 750,
+        "mana": 100,
+        "atk": [
+          25,
+          40
+        ],
+        "armor": 7,
+        "magic_resist": 10,
+        "atk_rate": 1.0,
+        "atk_range": 400
+      },
+      "2_star": {
+        "hp": 1500,
+        "mana": 100,
+        "atk": [
+          50,
+          80
+        ],
+        "armor": 7,
+        "magic_resist": 10,
+        "atk_rate": 1.0,
+        "atk_range": 400
+      },
+      "3_star": {
+        "hp": 3000,
+        "mana": 100,
+        "atk": [
+          100,
+          160
+        ],
+        "armor": 7,
+        "magic_resist": 10,
+        "atk_rate": 1.0,
+        "atk_range": 400
+      }
+    }
+  },
+  "Meepo": {
+    "id": "chess_meepo",
+    "cost": 2,
+    "synergies": [
+      "Kobold",
+      "Mech"
+    ],
+    "attack_type": "melee",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 600,
+        "mana": 100,
+        "atk": [
+          50,
+          60
+        ],
+        "armor": 4,
+        "magic_resist": 10,
+        "atk_rate": 1.0,
+        "atk_range": 205
+      },
+      "2_star": {
+        "hp": 1200,
+        "mana": 100,
+        "atk": [
+          100,
+          120
+        ],
+        "armor": 4,
+        "magic_resist": 10,
+        "atk_rate": 1.0,
+        "atk_range": 205
+      },
+      "3_star": {
+        "hp": 1800,
+        "mana": 100,
+        "atk": [
+          200,
+          240
+        ],
+        "armor": 4,
+        "magic_resist": 10,
+        "atk_rate": 1.0,
+        "atk_range": 205
+      }
+    }
+  },
+  "Monkey King": {
+    "id": "chess_mk",
+    "cost": 4,
+    "synergies": [
+      "Beast",
+      "Monk"
+    ],
+    "attack_type": "melee",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 900,
+        "mana": 0,
+        "atk": [
+          70,
+          90
+        ],
+        "armor": 8,
+        "magic_resist": 0,
+        "atk_rate": 1.2,
+        "atk_range": 205
+      },
+      "2_star": {
+        "hp": 1800,
+        "mana": 0,
+        "atk": [
+          140,
+          180
+        ],
+        "armor": 8,
+        "magic_resist": 0,
+        "atk_rate": 1.2,
+        "atk_range": 205
+      },
+      "3_star": {
+        "hp": 3600,
+        "mana": 0,
+        "atk": [
+          280,
+          360
+        ],
+        "armor": 8,
+        "magic_resist": 0,
+        "atk_rate": 1.2,
+        "atk_range": 205
+      }
+    }
+  },
+  "Morphling": {
+    "id": "chess_morph",
+    "cost": 5,
+    "synergies": [
+      "Assassin",
+      "Elemental",
+      "Elf"
+    ],
+    "attack_type": "ranged",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 1000,
+        "mana": 0,
+        "atk": [
+          70,
+          80
+        ],
+        "armor": 5,
+        "magic_resist": 10,
+        "atk_rate": 1.4,
+        "atk_range": 400
+      },
+      "2_star": {
+        "hp": 2000,
+        "mana": 0,
+        "atk": [
+          140,
+          160
+        ],
+        "armor": 5,
+        "magic_resist": 10,
+        "atk_rate": 1.4,
+        "atk_range": 400
+      },
+      "3_star": {
+        "hp": 4000,
+        "mana": 0,
+        "atk": [
+          280,
+          320
+        ],
+        "armor": 5,
+        "magic_resist": 10,
+        "atk_rate": 1.4,
+        "atk_range": 400
+      }
+    }
+  },
+  "Nyx Assassin": {
+    "id": "chess_na",
+    "cost": 4,
+    "synergies": [
+      "Aqir",
+      "Assassin",
+      "Undead"
+    ],
+    "attack_type": "melee",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 950,
+        "mana": 100,
+        "atk": [
+          45,
+          90
+        ],
+        "armor": 10,
+        "magic_resist": 20,
+        "atk_rate": 1.3,
+        "atk_range": 205
+      },
+      "2_star": {
+        "hp": 1900,
+        "mana": 100,
+        "atk": [
+          90,
+          180
+        ],
+        "armor": 10,
+        "magic_resist": 20,
+        "atk_rate": 1.3,
+        "atk_range": 205
+      },
+      "3_star": {
+        "hp": 3800,
+        "mana": 100,
+        "atk": [
+          180,
+          360
+        ],
+        "armor": 10,
+        "magic_resist": 20,
+        "atk_rate": 1.3,
+        "atk_range": 205
+      }
+    }
+  },
+  "Naga Siren": {
+    "id": "chess_naga",
+    "cost": 3,
+    "synergies": [
+      "Naga",
+      "Wizard"
+    ],
+    "attack_type": "melee",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 650,
+        "mana": 100,
+        "atk": [
+          50,
+          90
+        ],
+        "armor": 5,
+        "magic_resist": 20,
+        "atk_rate": 1.2,
+        "atk_range": 205
+      },
+      "2_star": {
+        "hp": 1300,
+        "mana": 100,
+        "atk": [
+          100,
+          180
+        ],
+        "armor": 5,
+        "magic_resist": 20,
+        "atk_rate": 1.2,
+        "atk_range": 205
+      },
+      "3_star": {
+        "hp": 2600,
+        "mana": 100,
+        "atk": [
+          200,
+          360
+        ],
+        "armor": 5,
+        "magic_resist": 20,
+        "atk_rate": 1.2,
+        "atk_range": 205
+      }
+    }
+  },
+  "Lifestealer": {
+    "id": "chess_naix",
+    "cost": 2,
+    "synergies": [
+      "Kobold",
+      "Undead",
+      "Wizard"
+    ],
+    "attack_type": "melee",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 700,
+        "mana": 0,
+        "atk": [
+          50,
+          80
+        ],
+        "armor": 6,
+        "magic_resist": 50,
+        "atk_rate": 1.1,
+        "atk_range": 205
+      },
+      "2_star": {
+        "hp": 1400,
+        "mana": 0,
+        "atk": [
+          100,
+          160
+        ],
+        "armor": 5,
+        "magic_resist": 30,
+        "atk_rate": 1.1,
+        "atk_range": 205
+      },
+      "3_star": {
+        "hp": 2800,
+        "mana": 0,
+        "atk": [
+          200,
+          320
+        ],
+        "armor": 5,
+        "magic_resist": 30,
+        "atk_rate": 1.1,
+        "atk_range": 205
+      }
+    }
+  },
+  "Necrophos": {
+    "id": "chess_nec",
+    "cost": 5,
+    "synergies": [
+      "Undead",
+      "Warlock"
+    ],
+    "attack_type": "ranged",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 1000,
+        "mana": 100,
+        "atk": [
+          50,
+          100
+        ],
+        "armor": 6,
+        "magic_resist": 30,
+        "atk_rate": 1.2,
+        "atk_range": 400
+      },
+      "2_star": {
+        "hp": 2000,
+        "mana": 100,
+        "atk": [
+          100,
+          200
+        ],
+        "armor": 6,
+        "magic_resist": 30,
+        "atk_rate": 1.2,
+        "atk_range": 400
+      },
+      "3_star": {
+        "hp": 4000,
+        "mana": 100,
+        "atk": [
+          200,
+          400
+        ],
+        "armor": 6,
+        "magic_resist": 30,
+        "atk_rate": 1.2,
+        "atk_range": 400
+      }
+    }
+  },
+  "Omniknight": {
+    "id": "chess_ok",
+    "cost": 5,
+    "synergies": [
+      "Human",
+      "Knight"
+    ],
+    "attack_type": "melee",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 1100,
+        "mana": 0,
+        "atk": [
+          90,
+          120
+        ],
+        "armor": 10,
+        "magic_resist": 20,
+        "atk_rate": 1.4,
+        "atk_range": 205
+      },
+      "2_star": {
+        "hp": 2200,
+        "mana": 0,
+        "atk": [
+          180,
+          240
+        ],
+        "armor": 10,
+        "magic_resist": 20,
+        "atk_rate": 1.4,
+        "atk_range": 205
+      },
+      "3_star": {
+        "hp": 4400,
+        "mana": 0,
+        "atk": [
+          360,
+          480
+        ],
+        "armor": 10,
+        "magic_resist": 20,
+        "atk_rate": 1.4,
+        "atk_range": 205
+      }
+    }
+  },
+  "Ogre Magi": {
+    "id": "chess_om",
+    "cost": 3,
+    "synergies": [
+      "Mage",
+      "Ogre"
+    ],
+    "attack_type": "melee",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 950,
+        "mana": 0,
+        "atk": [
+          55,
+          75
+        ],
+        "armor": 3,
+        "magic_resist": 20,
+        "atk_rate": 1.5,
+        "atk_range": 205
+      },
+      "2_star": {
+        "hp": 1900,
+        "mana": 0,
+        "atk": [
+          110,
+          150
+        ],
+        "armor": 3,
+        "magic_resist": 20,
+        "atk_rate": 1.5,
+        "atk_range": 205
+      },
+      "3_star": {
+        "hp": 3800,
+        "mana": 0,
+        "atk": [
+          220,
+          300
+        ],
+        "armor": 3,
+        "magic_resist": 20,
+        "atk_rate": 1.5,
+        "atk_range": 205
+      }
+    }
+  },
+  "Oracle": {
+    "id": "chess_oracle",
+    "cost": 2,
+    "synergies": [
+      "God",
+      "Priest"
+    ],
+    "attack_type": "ranged",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 550,
+        "mana": 100,
+        "atk": [
+          40,
+          60
+        ],
+        "armor": 1,
+        "magic_resist": 10,
+        "atk_rate": 1.6,
+        "atk_range": 400
+      },
+      "2_star": {
+        "hp": 1100,
+        "mana": 100,
+        "atk": [
+          80,
+          120
+        ],
+        "armor": 1,
+        "magic_resist": 10,
+        "atk_rate": 1.6,
+        "atk_range": 400
+      },
+      "3_star": {
+        "hp": 2200,
+        "mana": 100,
+        "atk": [
+          160,
+          240
+        ],
+        "armor": 1,
+        "magic_resist": 10,
+        "atk_rate": 1.6,
+        "atk_range": 400
+      }
+    }
+  },
+  "Phantom Assassin": {
+    "id": "chess_pa",
+    "cost": 4,
+    "synergies": [
+      "Assassin",
+      "Elf"
+    ],
+    "attack_type": "melee",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 800,
+        "mana": 0,
+        "atk": [
+          90,
+          100
+        ],
+        "armor": 5,
+        "magic_resist": 20,
+        "atk_rate": 0.9,
+        "atk_range": 205
+      },
+      "2_star": {
+        "hp": 1600,
+        "mana": 0,
+        "atk": [
+          180,
+          200
+        ],
+        "armor": 5,
+        "magic_resist": 20,
+        "atk_rate": 0.9,
+        "atk_range": 205
+      },
+      "3_star": {
+        "hp": 3200,
+        "mana": 0,
+        "atk": [
+          360,
+          400
+        ],
+        "armor": 5,
+        "magic_resist": 20,
+        "atk_rate": 0.9,
+        "atk_range": 205
+      }
+    }
+  },
+  "Pangolier": {
+    "id": "chess_pangolier",
+    "cost": 4,
+    "synergies": [
+      "Assassin",
+      "Beast"
+    ],
+    "attack_type": "melee",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 850,
+        "mana": 100,
+        "atk": [
+          60,
+          100
+        ],
+        "armor": 8,
+        "magic_resist": 0,
+        "atk_rate": 1.0,
+        "atk_range": 205
+      },
+      "2_star": {
+        "hp": 1700,
+        "mana": 100,
+        "atk": [
+          120,
+          200
+        ],
+        "armor": 8,
+        "magic_resist": 0,
+        "atk_rate": 1.0,
+        "atk_range": 205
+      },
+      "3_star": {
+        "hp": 3400,
+        "mana": 100,
+        "atk": [
+          240,
+          400
+        ],
+        "armor": 8,
+        "magic_resist": 0,
+        "atk_rate": 1.0,
+        "atk_range": 205
+      }
+    }
+  },
+  "Primal Beast": {
+    "id": "chess_pb",
+    "cost": 5,
+    "synergies": [
+      "Beast",
+      "Warrior"
+    ],
+    "attack_type": "ranged",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 1300,
+        "mana": 100,
+        "atk": [
+          150,
+          200
+        ],
+        "armor": 11,
+        "magic_resist": 10,
+        "atk_rate": 1.8,
+        "atk_range": 205
+      },
+      "2_star": {
+        "hp": 2600,
+        "mana": 100,
+        "atk": [
+          300,
+          400
+        ],
+        "armor": 11,
+        "magic_resist": 10,
+        "atk_rate": 1.8,
+        "atk_range": 205
+      },
+      "3_star": {
+        "hp": 5200,
+        "mana": 100,
+        "atk": [
+          600,
+          800
+        ],
+        "armor": 11,
+        "magic_resist": 10,
+        "atk_rate": 1.8,
+        "atk_range": 205
+      }
+    }
+  },
+  "Mirana": {
+    "id": "chess_pom",
+    "cost": 1,
+    "synergies": [
+      "Elf",
+      "Hunter"
+    ],
+    "attack_type": "ranged",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 450,
+        "mana": 100,
+        "atk": [
+          40,
+          50
+        ],
+        "armor": 0,
+        "magic_resist": 0,
+        "atk_rate": 1.0,
+        "atk_range": 600
+      },
+      "2_star": {
+        "hp": 900,
+        "mana": 100,
+        "atk": [
+          80,
+          100
+        ],
+        "armor": 0,
+        "magic_resist": 0,
+        "atk_rate": 1.0,
+        "atk_range": 600
+      },
+      "3_star": {
+        "hp": 1800,
+        "mana": 100,
+        "atk": [
+          160,
+          200
+        ],
+        "armor": 2,
+        "magic_resist": 0,
+        "atk_rate": 1.0,
+        "atk_range": 600
+      }
+    }
+  },
+  "Puck": {
+    "id": "chess_puck",
+    "cost": 2,
+    "synergies": [
+      "Dragon",
+      "Elf",
+      "Mage"
+    ],
+    "attack_type": "ranged",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 450,
+        "mana": 100,
+        "atk": [
+          40,
+          50
+        ],
+        "armor": 2,
+        "magic_resist": 50,
+        "atk_rate": 1.7,
+        "atk_range": 400
+      },
+      "2_star": {
+        "hp": 900,
+        "mana": 100,
+        "atk": [
+          80,
+          100
+        ],
+        "armor": 2,
+        "magic_resist": 50,
+        "atk_rate": 1.7,
+        "atk_range": 400
+      },
+      "3_star": {
+        "hp": 1800,
+        "mana": 100,
+        "atk": [
+          160,
+          200
+        ],
+        "armor": 2,
+        "magic_resist": 50,
+        "atk_rate": 1.7,
+        "atk_range": 400
+      }
+    }
+  },
+  "Pudge": {
+    "id": "chess_pudge",
+    "cost": 3,
+    "synergies": [
+      "Undead",
+      "Warrior"
+    ],
+    "attack_type": "melee",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 1000,
+        "mana": 0,
+        "atk": [
+          60,
+          90
+        ],
+        "armor": 6,
+        "magic_resist": 30,
+        "atk_rate": 2.0,
+        "atk_range": 205
+      },
+      "2_star": {
+        "hp": 2000,
+        "mana": 0,
+        "atk": [
+          120,
+          180
+        ],
+        "armor": 6,
+        "magic_resist": 30,
+        "atk_rate": 2.0,
+        "atk_range": 205
+      },
+      "3_star": {
+        "hp": 4000,
+        "mana": 0,
+        "atk": [
+          240,
+          360
+        ],
+        "armor": 6,
+        "magic_resist": 30,
+        "atk_rate": 2.0,
+        "atk_range": 205
+      }
+    }
+  },
+  "Queen Of Pain": {
+    "id": "chess_qop",
+    "cost": 5,
+    "synergies": [
+      "Assassin",
+      "Demon"
+    ],
+    "attack_type": "ranged",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 950,
+        "mana": 100,
+        "atk": [
+          75,
+          100
+        ],
+        "armor": 6,
+        "magic_resist": 20,
+        "atk_rate": 1.2,
+        "atk_range": 400
+      },
+      "2_star": {
+        "hp": 1900,
+        "mana": 100,
+        "atk": [
+          150,
+          200
+        ],
+        "armor": 6,
+        "magic_resist": 20,
+        "atk_rate": 1.2,
+        "atk_range": 400
+      },
+      "3_star": {
+        "hp": 3800,
+        "mana": 100,
+        "atk": [
+          300,
+          400
+        ],
+        "armor": 6,
+        "magic_resist": 20,
+        "atk_rate": 1.2,
+        "atk_range": 400
+      }
+    }
+  },
+  "Razor": {
+    "id": "chess_razor",
+    "cost": 3,
+    "synergies": [
+      "Elemental",
+      "Mage"
+    ],
+    "attack_type": "ranged",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 650,
+        "mana": 100,
+        "atk": [
+          50,
+          60
+        ],
+        "armor": 4,
+        "magic_resist": 0,
+        "atk_rate": 1.1,
+        "atk_range": 400
+      },
+      "2_star": {
+        "hp": 1300,
+        "mana": 100,
+        "atk": [
+          100,
+          120
+        ],
+        "armor": 4,
+        "magic_resist": 0,
+        "atk_rate": 1.1,
+        "atk_range": 400
+      },
+      "3_star": {
+        "hp": 2600,
+        "mana": 100,
+        "atk": [
+          200,
+          240
+        ],
+        "armor": 4,
+        "magic_resist": 0,
+        "atk_rate": 1.1,
+        "atk_range": 400
+      }
+    }
+  },
+  "Riki": {
+    "id": "chess_riki",
+    "cost": 3,
+    "synergies": [
+      "Assassin",
+      "Satyr"
+    ],
+    "attack_type": "melee",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 500,
+        "mana": 0,
+        "atk": [
+          45,
+          95
+        ],
+        "armor": 5,
+        "magic_resist": 0,
+        "atk_rate": 0.9,
+        "atk_range": 205
+      },
+      "2_star": {
+        "hp": 1000,
+        "mana": 0,
+        "atk": [
+          90,
+          190
+        ],
+        "armor": 5,
+        "magic_resist": 0,
+        "atk_rate": 0.9,
+        "atk_range": 205
+      },
+      "3_star": {
+        "hp": 2000,
+        "mana": 0,
+        "atk": [
+          180,
+          380
+        ],
+        "armor": 5,
+        "magic_resist": 0,
+        "atk_rate": 0.9,
+        "atk_range": 205
+      }
+    }
+  },
+  "Ringmaster": {
+    "id": "chess_rm",
+    "cost": 5,
+    "synergies": [],
+    "attack_type": "ranged",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 1050,
+        "mana": 0,
+        "atk": [
+          80,
+          130
+        ],
+        "armor": 10,
+        "magic_resist": 10,
+        "atk_rate": 1.7,
+        "atk_range": 400
+      },
+      "2_star": {
+        "hp": 2100,
+        "mana": 0,
+        "atk": [
+          160,
+          260
+        ],
+        "armor": 10,
+        "magic_resist": 10,
+        "atk_rate": 1.7,
+        "atk_range": 400
+      },
+      "3_star": {
+        "hp": 4200,
+        "mana": 0,
+        "atk": [
+          320,
+          520
+        ],
+        "armor": 10,
+        "magic_resist": 10,
+        "atk_rate": 1.7,
+        "atk_range": 400
+      }
+    }
+  },
+  "Rubick": {
+    "id": "chess_rubick",
+    "cost": 3,
+    "synergies": [
+      "God",
+      "Wizard"
+    ],
+    "attack_type": "ranged",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 550,
+        "mana": 100,
+        "atk": [
+          50,
+          60
+        ],
+        "armor": 2,
+        "magic_resist": 20,
+        "atk_rate": 1.4,
+        "atk_range": 205
+      },
+      "2_star": {
+        "hp": 1100,
+        "mana": 100,
+        "atk": [
+          100,
+          120
+        ],
+        "armor": 2,
+        "magic_resist": 20,
+        "atk_rate": 1.4,
+        "atk_range": 205
+      },
+      "3_star": {
+        "hp": 2200,
+        "mana": 100,
+        "atk": [
+          200,
+          240
+        ],
+        "armor": 2,
+        "magic_resist": 20,
+        "atk_rate": 1.4,
+        "atk_range": 205
+      }
+    }
+  },
+  "Spirit Breaker": {
+    "id": "chess_sb",
+    "cost": 1,
+    "synergies": [
+      "Assassin",
+      "Tauren"
+    ],
+    "attack_type": "melee",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 600,
+        "mana": 0,
+        "atk": [
+          40,
+          60
+        ],
+        "armor": 3,
+        "magic_resist": 0,
+        "atk_rate": 1.4,
+        "atk_range": 205
+      },
+      "2_star": {
+        "hp": 1200,
+        "mana": 0,
+        "atk": [
+          80,
+          120
+        ],
+        "armor": 3,
+        "magic_resist": 0,
+        "atk_rate": 1.4,
+        "atk_range": 205
+      },
+      "3_star": {
+        "hp": 2400,
+        "mana": 0,
+        "atk": [
+          160,
+          240
+        ],
+        "armor": 3,
+        "magic_resist": 0,
+        "atk_rate": 1.4,
+        "atk_range": 205
+      }
+    }
+  },
+  "Shadow Demon": {
+    "id": "chess_sd",
+    "cost": 1,
+    "synergies": [
+      "Demon",
+      "Draenei",
+      "Priest"
+    ],
+    "attack_type": "ranged",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 500,
+        "mana": 0,
+        "atk": [
+          40,
+          70
+        ],
+        "armor": 2,
+        "magic_resist": 10,
+        "atk_rate": 1.7,
+        "atk_range": 400
+      },
+      "2_star": {
+        "hp": 1000,
+        "mana": 0,
+        "atk": [
+          80,
+          140
+        ],
+        "armor": 2,
+        "magic_resist": 10,
+        "atk_rate": 1.7,
+        "atk_range": 400
+      },
+      "3_star": {
+        "hp": 2000,
+        "mana": 0,
+        "atk": [
+          160,
+          280
+        ],
+        "armor": 2,
+        "magic_resist": 10,
+        "atk_rate": 1.7,
+        "atk_range": 400
+      }
+    }
+  },
+  "Abyssal Underlord": {
+    "id": "chess_sf",
+    "cost": 5,
+    "synergies": [
+      "Demon",
+      "Warlock"
+    ],
+    "attack_type": "ranged",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 600,
+        "mana": 100,
+        "atk": [
+          70,
+          100
+        ],
+        "armor": 3,
+        "magic_resist": 20,
+        "atk_rate": 1.2,
+        "atk_range": 600
+      },
+      "2_star": {
+        "hp": 1200,
+        "mana": 100,
+        "atk": [
+          140,
+          200
+        ],
+        "armor": 3,
+        "magic_resist": 20,
+        "atk_rate": 1.2,
+        "atk_range": 600
+      },
+      "3_star": {
+        "hp": 2400,
+        "mana": 100,
+        "atk": [
+          280,
+          400
+        ],
+        "armor": 3,
+        "magic_resist": 20,
+        "atk_rate": 1.2,
+        "atk_range": 600
+      }
+    }
+  },
+  "Tinker": {
+    "id": "chess_shredder",
+    "cost": 1,
+    "synergies": [
+      "Goblin",
+      "Mech"
+    ],
+    "attack_type": "melee",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 750,
+        "mana": 100,
+        "atk": [
+          55,
+          60
+        ],
+        "armor": 7,
+        "magic_resist": 0,
+        "atk_rate": 1.4,
+        "atk_range": 205
+      },
+      "2_star": {
+        "hp": 1500,
+        "mana": 100,
+        "atk": [
+          110,
+          120
+        ],
+        "armor": 7,
+        "magic_resist": 0,
+        "atk_rate": 1.4,
+        "atk_range": 205
+      },
+      "3_star": {
+        "hp": 3000,
+        "mana": 100,
+        "atk": [
+          220,
+          240
+        ],
+        "armor": 7,
+        "magic_resist": 0,
+        "atk_rate": 1.4,
+        "atk_range": 205
+      }
+    }
+  },
+  "Sand King": {
+    "id": "chess_sk",
+    "cost": 3,
+    "synergies": [
+      "Aqir",
+      "Assassin"
+    ],
+    "attack_type": "melee",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 600,
+        "mana": 100,
+        "atk": [
+          45,
+          60
+        ],
+        "armor": 6,
+        "magic_resist": 0,
+        "atk_rate": 1.4,
+        "atk_range": 205
+      },
+      "2_star": {
+        "hp": 1200,
+        "mana": 100,
+        "atk": [
+          90,
+          120
+        ],
+        "armor": 6,
+        "magic_resist": 0,
+        "atk_rate": 1.4,
+        "atk_range": 205
+      },
+      "3_star": {
+        "hp": 2400,
+        "mana": 100,
+        "atk": [
+          180,
+          240
+        ],
+        "armor": 6,
+        "magic_resist": 0,
+        "atk_rate": 1.4,
+        "atk_range": 205
+      }
+    }
+  },
+  "Slardar": {
+    "id": "chess_slardar",
+    "cost": 3,
+    "synergies": [
+      "Naga",
+      "Warrior"
+    ],
+    "attack_type": "melee",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 800,
+        "mana": 100,
+        "atk": [
+          80,
+          110
+        ],
+        "armor": 6,
+        "magic_resist": 10,
+        "atk_rate": 1.5,
+        "atk_range": 205
+      },
+      "2_star": {
+        "hp": 1600,
+        "mana": 100,
+        "atk": [
+          160,
+          220
+        ],
+        "armor": 6,
+        "magic_resist": 0,
+        "atk_rate": 1.5,
+        "atk_range": 205
+      },
+      "3_star": {
+        "hp": 3200,
+        "mana": 100,
+        "atk": [
+          320,
+          440
+        ],
+        "armor": 6,
+        "magic_resist": 0,
+        "atk_rate": 1.5,
+        "atk_range": 205
+      }
+    }
+  },
+  "Slark": {
+    "id": "chess_slark",
+    "cost": 2,
+    "synergies": [
+      "Assassin",
+      "Naga"
+    ],
+    "attack_type": "melee",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 600,
+        "mana": 0,
+        "atk": [
+          60,
+          80
+        ],
+        "armor": 5,
+        "magic_resist": 0,
+        "atk_rate": 1.0,
+        "atk_range": 205
+      },
+      "2_star": {
+        "hp": 1200,
+        "mana": 0,
+        "atk": [
+          120,
+          160
+        ],
+        "armor": 5,
+        "magic_resist": 0,
+        "atk_rate": 1.0,
+        "atk_range": 205
+      },
+      "3_star": {
+        "hp": 2400,
+        "mana": 0,
+        "atk": [
+          240,
+          320
+        ],
+        "armor": 5,
+        "magic_resist": 0,
+        "atk_rate": 1.0,
+        "atk_range": 205
+      }
+    }
+  },
+  "Skywrath Mage": {
+    "id": "chess_sm",
+    "cost": 1,
+    "synergies": [
+      "Harpy",
+      "Mage"
+    ],
+    "attack_type": "ranged",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 550,
+        "mana": 0,
+        "atk": [
+          40,
+          60
+        ],
+        "armor": 1,
+        "magic_resist": 10,
+        "atk_rate": 1.5,
+        "atk_range": 600
+      },
+      "2_star": {
+        "hp": 1100,
+        "mana": 0,
+        "atk": [
+          80,
+          120
+        ],
+        "armor": 1,
+        "magic_resist": 10,
+        "atk_rate": 1.5,
+        "atk_range": 600
+      },
+      "3_star": {
+        "hp": 2200,
+        "mana": 0,
+        "atk": [
+          160,
+          240
+        ],
+        "armor": 1,
+        "magic_resist": 10,
+        "atk_rate": 1.5,
+        "atk_range": 600
+      }
+    }
+  },
+  "Snapfire": {
+    "id": "chess_snap",
+    "cost": 4,
+    "synergies": [
+      "Goblin",
+      "Knight"
+    ],
+    "attack_type": "ranged",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 800,
+        "mana": 100,
+        "atk": [
+          70,
+          110
+        ],
+        "armor": 9,
+        "magic_resist": 0,
+        "atk_rate": 1.2,
+        "atk_range": 600
+      },
+      "2_star": {
+        "hp": 1600,
+        "mana": 100,
+        "atk": [
+          140,
+          220
+        ],
+        "armor": 9,
+        "magic_resist": 0,
+        "atk_rate": 1.2,
+        "atk_range": 600
+      },
+      "3_star": {
+        "hp": 3200,
+        "mana": 100,
+        "atk": [
+          280,
+          440
+        ],
+        "armor": 9,
+        "magic_resist": 0,
+        "atk_rate": 1.2,
+        "atk_range": 600
+      }
+    }
+  },
+  "Sniper": {
+    "id": "chess_sniper",
+    "cost": 2,
+    "synergies": [
+      "Dwarf",
+      "Hunter"
+    ],
+    "attack_type": "ranged",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 450,
+        "mana": 100,
+        "atk": [
+          55,
+          65
+        ],
+        "armor": 4,
+        "magic_resist": 0,
+        "atk_rate": 1.3,
+        "atk_range": 600
+      },
+      "2_star": {
+        "hp": 900,
+        "mana": 100,
+        "atk": [
+          110,
+          130
+        ],
+        "armor": 4,
+        "magic_resist": 0,
+        "atk_rate": 1.3,
+        "atk_range": 600
+      },
+      "3_star": {
+        "hp": 1800,
+        "mana": 100,
+        "atk": [
+          220,
+          260
+        ],
+        "armor": 4,
+        "magic_resist": 0,
+        "atk_rate": 1.3,
+        "atk_range": 600
+      }
+    }
+  },
+  "Wraith King": {
+    "id": "chess_snk",
+    "cost": 5,
+    "synergies": [
+      "Undead",
+      "Warrior"
+    ],
+    "attack_type": "melee",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 1300,
+        "mana": 0,
+        "atk": [
+          150,
+          200
+        ],
+        "armor": 10,
+        "magic_resist": 20,
+        "atk_rate": 1.7,
+        "atk_range": 205
+      },
+      "2_star": {
+        "hp": 2600,
+        "mana": 0,
+        "atk": [
+          300,
+          400
+        ],
+        "armor": 10,
+        "magic_resist": 20,
+        "atk_rate": 1.7,
+        "atk_range": 205
+      },
+      "3_star": {
+        "hp": 5200,
+        "mana": 0,
+        "atk": [
+          600,
+          800
+        ],
+        "armor": 10,
+        "magic_resist": 20,
+        "atk_rate": 1.7,
+        "atk_range": 205
+      }
+    }
+  },
+  "Spectre": {
+    "id": "chess_spe",
+    "cost": 5,
+    "synergies": [
+      "Demon Hunter",
+      "Undead"
+    ],
+    "attack_type": "melee",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 1000,
+        "mana": 100,
+        "atk": [
+          80,
+          120
+        ],
+        "armor": 8,
+        "magic_resist": 30,
+        "atk_rate": 1.0,
+        "atk_range": 205
+      },
+      "2_star": {
+        "hp": 2000,
+        "mana": 100,
+        "atk": [
+          160,
+          240
+        ],
+        "armor": 8,
+        "magic_resist": 30,
+        "atk_rate": 1.0,
+        "atk_range": 205
+      },
+      "3_star": {
+        "hp": 4000,
+        "mana": 100,
+        "atk": [
+          320,
+          480
+        ],
+        "armor": 8,
+        "magic_resist": 30,
+        "atk_rate": 1.0,
+        "atk_range": 205
+      }
+    }
+  },
+  "Shadow Shaman": {
+    "id": "chess_ss",
+    "cost": 1,
+    "synergies": [
+      "Shaman",
+      "Troll"
+    ],
+    "attack_type": "ranged",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 550,
+        "mana": 100,
+        "atk": [
+          40,
+          50
+        ],
+        "armor": 0,
+        "magic_resist": 10,
+        "atk_rate": 1.2,
+        "atk_range": 400
+      },
+      "2_star": {
+        "hp": 1100,
+        "mana": 100,
+        "atk": [
+          80,
+          100
+        ],
+        "armor": 0,
+        "magic_resist": 10,
+        "atk_rate": 1.2,
+        "atk_range": 400
+      },
+      "3_star": {
+        "hp": 2200,
+        "mana": 100,
+        "atk": [
+          160,
+          200
+        ],
+        "armor": 0,
+        "magic_resist": 10,
+        "atk_rate": 1.2,
+        "atk_range": 400
+      }
+    }
+  },
+  "Storm Spirit": {
+    "id": "chess_storm",
+    "cost": 4,
+    "synergies": [
+      "Mage",
+      "Pandaren"
+    ],
+    "attack_type": "ranged",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 700,
+        "mana": 100,
+        "atk": [
+          60,
+          70
+        ],
+        "armor": 4,
+        "magic_resist": 10,
+        "atk_rate": 1.4,
+        "atk_range": 400
+      },
+      "2_star": {
+        "hp": 1400,
+        "mana": 100,
+        "atk": [
+          120,
+          140
+        ],
+        "armor": 4,
+        "magic_resist": 10,
+        "atk_rate": 1.4,
+        "atk_range": 400
+      },
+      "3_star": {
+        "hp": 2800,
+        "mana": 100,
+        "atk": [
+          240,
+          280
+        ],
+        "armor": 4,
+        "magic_resist": 10,
+        "atk_rate": 1.4,
+        "atk_range": 400
+      }
+    }
+  },
+  "Sven": {
+    "id": "chess_sven",
+    "cost": 5,
+    "synergies": [
+      "Demon",
+      "Warrior"
+    ],
+    "attack_type": "melee",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 1200,
+        "mana": 100,
+        "atk": [
+          150,
+          210
+        ],
+        "armor": 12,
+        "magic_resist": 0,
+        "atk_rate": 1.6,
+        "atk_range": 205
+      },
+      "2_star": {
+        "hp": 2400,
+        "mana": 100,
+        "atk": [
+          300,
+          420
+        ],
+        "armor": 12,
+        "magic_resist": 0,
+        "atk_rate": 1.6,
+        "atk_range": 205
+      },
+      "3_star": {
+        "hp": 4800,
+        "mana": 100,
+        "atk": [
+          600,
+          840
+        ],
+        "armor": 12,
+        "magic_resist": 0,
+        "atk_rate": 1.6,
+        "atk_range": 205
+      }
+    }
+  },
+  "Templar Assassin": {
+    "id": "chess_ta",
+    "cost": 5,
+    "synergies": [
+      "Assassin",
+      "Elf"
+    ],
+    "attack_type": "ranged",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 950,
+        "mana": 100,
+        "atk": [
+          90,
+          120
+        ],
+        "armor": 8,
+        "magic_resist": 0,
+        "atk_rate": 0.9,
+        "atk_range": 400
+      },
+      "2_star": {
+        "hp": 1900,
+        "mana": 100,
+        "atk": [
+          180,
+          240
+        ],
+        "armor": 8,
+        "magic_resist": 0,
+        "atk_rate": 0.9,
+        "atk_range": 400
+      },
+      "3_star": {
+        "hp": 3800,
+        "mana": 100,
+        "atk": [
+          360,
+          480
+        ],
+        "armor": 8,
+        "magic_resist": 0,
+        "atk_rate": 0.9,
+        "atk_range": 400
+      }
+    }
+  },
+  "Terrorblade": {
+    "id": "chess_tb",
+    "cost": 3,
+    "synergies": [
+      "Demon",
+      "Demon Hunter"
+    ],
+    "attack_type": "melee",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 700,
+        "mana": 100,
+        "atk": [
+          40,
+          80
+        ],
+        "armor": 5,
+        "magic_resist": 20,
+        "atk_rate": 1.1,
+        "atk_range": 205
+      },
+      "2_star": {
+        "hp": 1400,
+        "mana": 100,
+        "atk": [
+          80,
+          160
+        ],
+        "armor": 5,
+        "magic_resist": 20,
+        "atk_rate": 1.1,
+        "atk_range": 205
+      },
+      "3_star": {
+        "hp": 2800,
+        "mana": 100,
+        "atk": [
+          160,
+          320
+        ],
+        "armor": 5,
+        "magic_resist": 20,
+        "atk_rate": 1.1,
+        "atk_range": 205
+      }
+    }
+  },
+  "Timbersaw": {
+    "id": "chess_tech",
+    "cost": 2,
+    "synergies": [
+      "Goblin",
+      "Mech"
+    ],
+    "attack_type": "ranged",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 1000,
+        "mana": 100,
+        "atk": [
+          45,
+          55
+        ],
+        "armor": 10,
+        "magic_resist": 0,
+        "atk_rate": 1.5,
+        "atk_range": 600
+      },
+      "2_star": {
+        "hp": 2000,
+        "mana": 100,
+        "atk": [
+          90,
+          110
+        ],
+        "armor": 10,
+        "magic_resist": 0,
+        "atk_rate": 1.5,
+        "atk_range": 600
+      },
+      "3_star": {
+        "hp": 4000,
+        "mana": 100,
+        "atk": [
+          180,
+          220
+        ],
+        "armor": 10,
+        "magic_resist": 0,
+        "atk_rate": 1.5,
+        "atk_range": 600
+      }
+    }
+  },
+  "Tidehunter": {
+    "id": "chess_th",
+    "cost": 5,
+    "synergies": [
+      "Hunter",
+      "Naga"
+    ],
+    "attack_type": "melee",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 1100,
+        "mana": 100,
+        "atk": [
+          65,
+          75
+        ],
+        "armor": 10,
+        "magic_resist": 15,
+        "atk_rate": 2.0,
+        "atk_range": 205
+      },
+      "2_star": {
+        "hp": 2200,
+        "mana": 100,
+        "atk": [
+          130,
+          150
+        ],
+        "armor": 10,
+        "magic_resist": 15,
+        "atk_rate": 2.0,
+        "atk_range": 205
+      },
+      "3_star": {
+        "hp": 4400,
+        "mana": 100,
+        "atk": [
+          260,
+          300
+        ],
+        "armor": 10,
+        "magic_resist": 15,
+        "atk_rate": 2.0,
+        "atk_range": 205
+      }
+    }
+  },
+  "Jakiro": {
+    "id": "chess_thd",
+    "cost": 5,
+    "synergies": [
+      "Dragon",
+      "Mage"
+    ],
+    "attack_type": "ranged",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 1000,
+        "mana": 100,
+        "atk": [
+          30,
+          100
+        ],
+        "armor": 9,
+        "magic_resist": 20,
+        "atk_rate": 1.3,
+        "atk_range": 400
+      },
+      "2_star": {
+        "hp": 2000,
+        "mana": 100,
+        "atk": [
+          60,
+          200
+        ],
+        "armor": 9,
+        "magic_resist": 20,
+        "atk_rate": 1.3,
+        "atk_range": 400
+      },
+      "3_star": {
+        "hp": 4000,
+        "mana": 100,
+        "atk": [
+          120,
+          400
+        ],
+        "armor": 9,
+        "magic_resist": 20,
+        "atk_rate": 1.3,
+        "atk_range": 400
+      }
+    }
+  },
+  "Tiny": {
+    "id": "chess_tiny",
+    "cost": 2,
+    "synergies": [
+      "Elemental",
+      "Warrior"
+    ],
+    "attack_type": "melee",
+    "abilities": [
+      {
+        "id": "tiny_grow_new",
+        "name": "Grow",
+        "description": "Gains 100 max health permanently if killed in a home battle."
+      }
+    ],
+    "stats": {
+      "1_star": {
+        "hp": 700,
+        "mana": 100,
+        "atk": [
+          60,
+          100
+        ],
+        "armor": 7,
+        "magic_resist": 20,
+        "atk_rate": 1.9,
+        "atk_range": 205
+      },
+      "2_star": {
+        "hp": 1400,
+        "mana": 100,
+        "atk": [
+          120,
+          200
+        ],
+        "armor": 7,
+        "magic_resist": 20,
+        "atk_rate": 1.9,
+        "atk_range": 205
+      },
+      "3_star": {
+        "hp": 2800,
+        "mana": 100,
+        "atk": [
+          240,
+          400
+        ],
+        "armor": 7,
+        "magic_resist": 20,
+        "atk_rate": 1.9,
+        "atk_range": 205
+      }
+    }
+  },
+  "Techies": {
+    "id": "chess_tk",
+    "cost": 5,
+    "synergies": [
+      "Goblin",
+      "Mech"
+    ],
+    "attack_type": "ranged",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 500,
+        "mana": 100,
+        "atk": [
+          40,
+          50
+        ],
+        "armor": 3,
+        "magic_resist": 0,
+        "atk_rate": 1.5,
+        "atk_range": 600
+      },
+      "2_star": {
+        "hp": 1000,
+        "mana": 100,
+        "atk": [
+          80,
+          100
+        ],
+        "armor": 3,
+        "magic_resist": 0,
+        "atk_rate": 1.5,
+        "atk_range": 600
+      },
+      "3_star": {
+        "hp": 2000,
+        "mana": 100,
+        "atk": [
+          160,
+          200
+        ],
+        "armor": 3,
+        "magic_resist": 0,
+        "atk_rate": 1.5,
+        "atk_range": 600
+      }
+    }
+  },
+  "Treant Protector": {
+    "id": "chess_tp",
+    "cost": 3,
+    "synergies": [
+      "Druid",
+      "Elf"
+    ],
+    "attack_type": "melee",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 700,
+        "mana": 100,
+        "atk": [
+          80,
+          90
+        ],
+        "armor": 5,
+        "magic_resist": 0,
+        "atk_rate": 2.0,
+        "atk_range": 205
+      },
+      "2_star": {
+        "hp": 1400,
+        "mana": 100,
+        "atk": [
+          160,
+          180
+        ],
+        "armor": 5,
+        "magic_resist": 0,
+        "atk_rate": 2.0,
+        "atk_range": 205
+      },
+      "3_star": {
+        "hp": 2450,
+        "mana": 100,
+        "atk": [
+          320,
+          360
+        ],
+        "armor": 5,
+        "magic_resist": 0,
+        "atk_rate": 2.0,
+        "atk_range": 205
+      }
+    }
+  },
+  "Troll Warlord": {
+    "id": "chess_troll",
+    "cost": 5,
+    "synergies": [
+      "Troll",
+      "Warrior"
+    ],
+    "attack_type": "ranged",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 1000,
+        "mana": 0,
+        "atk": [
+          90,
+          130
+        ],
+        "armor": 10,
+        "magic_resist": 10,
+        "atk_rate": 0.8,
+        "atk_range": 400
+      },
+      "2_star": {
+        "hp": 2000,
+        "mana": 0,
+        "atk": [
+          180,
+          260
+        ],
+        "armor": 10,
+        "magic_resist": 10,
+        "atk_rate": 0.8,
+        "atk_range": 400
+      },
+      "3_star": {
+        "hp": 4000,
+        "mana": 0,
+        "atk": [
+          360,
+          520
+        ],
+        "armor": 10,
+        "magic_resist": 10,
+        "atk_rate": 0.8,
+        "atk_range": 400
+      }
+    }
+  },
+  "Leshrac": {
+    "id": "chess_ts",
+    "cost": 5,
+    "synergies": [
+      "Centaur",
+      "Druid",
+      "God"
+    ],
+    "attack_type": "ranged",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 900,
+        "mana": 100,
+        "atk": [
+          60,
+          110
+        ],
+        "armor": 6,
+        "magic_resist": 20,
+        "atk_rate": 1.2,
+        "atk_range": 400
+      },
+      "2_star": {
+        "hp": 1800,
+        "mana": 100,
+        "atk": [
+          120,
+          220
+        ],
+        "armor": 6,
+        "magic_resist": 20,
+        "atk_rate": 1.2,
+        "atk_range": 400
+      },
+      "3_star": {
+        "hp": 3150,
+        "mana": 100,
+        "atk": [
+          240,
+          440
+        ],
+        "armor": 6,
+        "magic_resist": 20,
+        "atk_rate": 1.2,
+        "atk_range": 400
+      }
+    }
+  },
+  "Tusk": {
+    "id": "chess_tusk",
+    "cost": 1,
+    "synergies": [
+      "Beast",
+      "Warrior"
+    ],
+    "attack_type": "melee",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 600,
+        "mana": 100,
+        "atk": [
+          40,
+          100
+        ],
+        "armor": 2,
+        "magic_resist": 0,
+        "atk_rate": 1.2,
+        "atk_range": 205
+      },
+      "2_star": {
+        "hp": 1200,
+        "mana": 100,
+        "atk": [
+          80,
+          200
+        ],
+        "armor": 2,
+        "magic_resist": 0,
+        "atk_rate": 1.2,
+        "atk_range": 205
+      },
+      "3_star": {
+        "hp": 2400,
+        "mana": 100,
+        "atk": [
+          160,
+          400
+        ],
+        "armor": 2,
+        "magic_resist": 0,
+        "atk_rate": 1.2,
+        "atk_range": 205
+      }
+    }
+  },
+  "Undying": {
+    "id": "chess_ud",
+    "cost": 3,
+    "synergies": [
+      "Priest",
+      "Undead"
+    ],
+    "attack_type": "melee",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 900,
+        "mana": 100,
+        "atk": [
+          60,
+          90
+        ],
+        "armor": 5,
+        "magic_resist": 20,
+        "atk_rate": 1.7,
+        "atk_range": 205
+      },
+      "2_star": {
+        "hp": 1800,
+        "mana": 100,
+        "atk": [
+          120,
+          180
+        ],
+        "armor": 5,
+        "magic_resist": 20,
+        "atk_rate": 1.7,
+        "atk_range": 205
+      },
+      "3_star": {
+        "hp": 3600,
+        "mana": 100,
+        "atk": [
+          240,
+          360
+        ],
+        "armor": 5,
+        "magic_resist": 20,
+        "atk_rate": 1.7,
+        "atk_range": 205
+      }
+    }
+  },
+  "Venomancer": {
+    "id": "chess_veno",
+    "cost": 3,
+    "synergies": [
+      "Aqir",
+      "Beast",
+      "Warlock"
+    ],
+    "attack_type": "ranged",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 550,
+        "mana": 100,
+        "atk": [
+          50,
+          60
+        ],
+        "armor": 4,
+        "magic_resist": 30,
+        "atk_rate": 1.2,
+        "atk_range": 400
+      },
+      "2_star": {
+        "hp": 1100,
+        "mana": 100,
+        "atk": [
+          100,
+          120
+        ],
+        "armor": 4,
+        "magic_resist": 30,
+        "atk_rate": 1.2,
+        "atk_range": 400
+      },
+      "3_star": {
+        "hp": 2200,
+        "mana": 100,
+        "atk": [
+          200,
+          240
+        ],
+        "armor": 4,
+        "magic_resist": 30,
+        "atk_rate": 1.2,
+        "atk_range": 400
+      }
+    }
+  },
+  "Viper": {
+    "id": "chess_viper",
+    "cost": 3,
+    "synergies": [
+      "Assassin",
+      "Dragon"
+    ],
+    "attack_type": "ranged",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 650,
+        "mana": 100,
+        "atk": [
+          50,
+          60
+        ],
+        "armor": 6,
+        "magic_resist": 0,
+        "atk_rate": 1.0,
+        "atk_range": 400
+      },
+      "2_star": {
+        "hp": 1300,
+        "mana": 100,
+        "atk": [
+          100,
+          120
+        ],
+        "armor": 6,
+        "magic_resist": 0,
+        "atk_rate": 1.0,
+        "atk_range": 400
+      },
+      "3_star": {
+        "hp": 2600,
+        "mana": 100,
+        "atk": [
+          200,
+          240
+        ],
+        "armor": 6,
+        "magic_resist": 0,
+        "atk_rate": 1.0,
+        "atk_range": 400
+      }
+    }
+  },
+  "Visage": {
+    "id": "chess_visage",
+    "cost": null,
+    "synergies": [
+      "Dragon",
+      "Hunter",
+      "Undead"
+    ],
+    "attack_type": "ranged",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 500,
+        "mana": 100,
+        "atk": [
+          45,
+          65
+        ],
+        "armor": 2,
+        "magic_resist": 20,
+        "atk_rate": 1.4,
+        "atk_range": 600
+      },
+      "2_star": {
+        "hp": 1000,
+        "mana": 100,
+        "atk": [
+          90,
+          130
+        ],
+        "armor": 2,
+        "magic_resist": 20,
+        "atk_rate": 1.4,
+        "atk_range": 600
+      },
+      "3_star": {
+        "hp": 2000,
+        "mana": 100,
+        "atk": [
+          180,
+          260
+        ],
+        "armor": 2,
+        "magic_resist": 20,
+        "atk_rate": 1.4,
+        "atk_range": 600
+      }
+    }
+  },
+  "Void Spirit": {
+    "id": "chess_void",
+    "cost": 4,
+    "synergies": [
+      "Monk",
+      "Pandaren"
+    ],
+    "attack_type": "melee",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 750,
+        "mana": 100,
+        "atk": [
+          60,
+          70
+        ],
+        "armor": 4,
+        "magic_resist": 0,
+        "atk_rate": 1.3,
+        "atk_range": 205
+      },
+      "2_star": {
+        "hp": 1500,
+        "mana": 100,
+        "atk": [
+          120,
+          140
+        ],
+        "armor": 4,
+        "magic_resist": 0,
+        "atk_rate": 1.3,
+        "atk_range": 205
+      },
+      "3_star": {
+        "hp": 3000,
+        "mana": 100,
+        "atk": [
+          240,
+          280
+        ],
+        "armor": 4,
+        "magic_resist": 0,
+        "atk_rate": 1.3,
+        "atk_range": 205
+      }
+    }
+  },
+  "Vengeful Spirit": {
+    "id": "chess_vs",
+    "cost": 2,
+    "synergies": [
+      "Demon Hunter",
+      "Harpy",
+      "Undead"
+    ],
+    "attack_type": "ranged",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 500,
+        "mana": 0,
+        "atk": [
+          40,
+          80
+        ],
+        "armor": 2,
+        "magic_resist": 0,
+        "atk_rate": 1.3,
+        "atk_range": 400
+      },
+      "2_star": {
+        "hp": 1000,
+        "mana": 0,
+        "atk": [
+          80,
+          160
+        ],
+        "armor": 2,
+        "magic_resist": 0,
+        "atk_rate": 1.3,
+        "atk_range": 400
+      },
+      "3_star": {
+        "hp": 2000,
+        "mana": 0,
+        "atk": [
+          160,
+          320
+        ],
+        "armor": 2,
+        "magic_resist": 0,
+        "atk_rate": 1.3,
+        "atk_range": 400
+      }
+    }
+  },
+  "Witch Doctor": {
+    "id": "chess_wd",
+    "cost": 1,
+    "synergies": [
+      "Troll",
+      "Warlock"
+    ],
+    "attack_type": "ranged",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 550,
+        "mana": 100,
+        "atk": [
+          40,
+          50
+        ],
+        "armor": 0,
+        "magic_resist": 10,
+        "atk_rate": 1.5,
+        "atk_range": 400
+      },
+      "2_star": {
+        "hp": 1100,
+        "mana": 100,
+        "atk": [
+          80,
+          100
+        ],
+        "armor": 0,
+        "magic_resist": 10,
+        "atk_rate": 1.5,
+        "atk_range": 400
+      },
+      "3_star": {
+        "hp": 2200,
+        "mana": 100,
+        "atk": [
+          160,
+          200
+        ],
+        "armor": 0,
+        "magic_resist": 10,
+        "atk_rate": 1.5,
+        "atk_range": 400
+      }
+    }
+  },
+  "Warlock": {
+    "id": "chess_wl",
+    "cost": 5,
+    "synergies": [
+      "Orc",
+      "Warlock"
+    ],
+    "attack_type": "ranged",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 850,
+        "mana": 100,
+        "atk": [
+          60,
+          120
+        ],
+        "armor": 6,
+        "magic_resist": 25,
+        "atk_rate": 1.5,
+        "atk_range": 600
+      },
+      "2_star": {
+        "hp": 1700,
+        "mana": 100,
+        "atk": [
+          120,
+          240
+        ],
+        "armor": 6,
+        "magic_resist": 25,
+        "atk_rate": 1.5,
+        "atk_range": 600
+      },
+      "3_star": {
+        "hp": 3400,
+        "mana": 100,
+        "atk": [
+          240,
+          480
+        ],
+        "armor": 6,
+        "magic_resist": 25,
+        "atk_rate": 1.5,
+        "atk_range": 600
+      }
+    }
+  },
+  "Windranger": {
+    "id": "chess_wr",
+    "cost": 2,
+    "synergies": [
+      "Elf",
+      "Hunter"
+    ],
+    "attack_type": "ranged",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 550,
+        "mana": 100,
+        "atk": [
+          50,
+          70
+        ],
+        "armor": 3,
+        "magic_resist": 0,
+        "atk_rate": 1.0,
+        "atk_range": 600
+      },
+      "2_star": {
+        "hp": 1100,
+        "mana": 100,
+        "atk": [
+          100,
+          140
+        ],
+        "armor": 3,
+        "magic_resist": 0,
+        "atk_rate": 1.0,
+        "atk_range": 600
+      },
+      "3_star": {
+        "hp": 2200,
+        "mana": 100,
+        "atk": [
+          200,
+          280
+        ],
+        "armor": 3,
+        "magic_resist": 0,
+        "atk_rate": 1.0,
+        "atk_range": 600
+      }
+    }
+  },
+  "Winter Wyvern": {
+    "id": "chess_ww",
+    "cost": 1,
+    "synergies": [
+      "Dragon",
+      "Mage",
+      "Undead"
+    ],
+    "attack_type": "ranged",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 550,
+        "mana": 100,
+        "atk": [
+          40,
+          55
+        ],
+        "armor": 0,
+        "magic_resist": 10,
+        "atk_rate": 1.4,
+        "atk_range": 400
+      },
+      "2_star": {
+        "hp": 1100,
+        "mana": 100,
+        "atk": [
+          80,
+          110
+        ],
+        "armor": 0,
+        "magic_resist": 10,
+        "atk_rate": 1.4,
+        "atk_range": 400
+      },
+      "3_star": {
+        "hp": 2200,
+        "mana": 100,
+        "atk": [
+          160,
+          220
+        ],
+        "armor": 0,
+        "magic_resist": 10,
+        "atk_rate": 1.4,
+        "atk_range": 400
+      }
+    }
+  },
+  "Zeus": {
+    "id": "chess_zeus",
+    "cost": 5,
+    "synergies": [
+      "God",
+      "Mage"
+    ],
+    "attack_type": "ranged",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 950,
+        "mana": 100,
+        "atk": [
+          50,
+          70
+        ],
+        "armor": 7,
+        "magic_resist": 40,
+        "atk_rate": 1.4,
+        "atk_range": 400
+      },
+      "2_star": {
+        "hp": 1900,
+        "mana": 100,
+        "atk": [
+          100,
+          140
+        ],
+        "armor": 7,
+        "magic_resist": 40,
+        "atk_rate": 1.4,
+        "atk_range": 400
+      },
+      "3_star": {
+        "hp": 3800,
+        "mana": 100,
+        "atk": [
+          200,
+          280
+        ],
+        "armor": 7,
+        "magic_resist": 40,
+        "atk_rate": 1.4,
+        "atk_range": 400
+      }
+    }
+  }
+}
