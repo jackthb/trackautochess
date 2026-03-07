@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><title>Sentinel Region Picker</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&display=swap');
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: #0a0a0a; color: #c8c8c8; font-family: 'JetBrains Mono', monospace; overflow: hidden; height: 100vh; }
+
+#toolbar { position: fixed; top: 0; left: 0; right: 0; background: #0d0d0d;
+  border-bottom: 1px solid #1a1a1a; padding: 0 16px; z-index: 20;
+  display: flex; gap: 20px; align-items: center; font-size: 12px; height: 40px; }
+#toolbar .sep { color: #2a2a2a; }
+#toolbar .label { color: #555; }
+#toolbar .val { color: #4ade80; }
+#toolbar .val.rgb { color: #f97316; }
+#toolbar button { background: #161616; color: #aaa; border: 1px solid #2a2a2a; padding: 4px 12px;
+  cursor: pointer; font-family: inherit; font-size: 11px; border-radius: 2px; transition: all 0.15s; }
+#toolbar button:hover { background: #222; color: #fff; border-color: #444; }
+#toolbar .drop-hint { color: #333; font-size: 11px; margin-left: auto; }
+
+#viewport { position: absolute; top: 40px; left: 0; right: 320px; bottom: 0; overflow: hidden; cursor: crosshair; background: #080808; }
+#viewport.empty { display: flex; align-items: center; justify-content: center; cursor: default; }
+#viewport.empty::after { content: 'Drop screenshot here or click Load'; color: #222; font-size: 14px; }
+canvas { position: absolute; top: 0; left: 0; }
+#overlay { position: absolute; top: 0; left: 0; pointer-events: none; }
+
+#panel { position: fixed; top: 40px; right: 0; width: 320px; bottom: 0;
+  background: #0d0d0d; border-left: 1px solid #1a1a1a; display: flex; flex-direction: column; }
+#panel-header { padding: 12px 14px 8px; border-bottom: 1px solid #1a1a1a; }
+#panel-header h2 { font-size: 11px; font-weight: 600; color: #555; text-transform: uppercase; letter-spacing: 1.5px; }
+#regions-list { flex: 1; overflow-y: auto; padding: 6px 0; }
+#regions-list::-webkit-scrollbar { width: 4px; }
+#regions-list::-webkit-scrollbar-track { background: transparent; }
+#regions-list::-webkit-scrollbar-thumb { background: #222; border-radius: 2px; }
+
+.region-entry { padding: 10px 14px; border-bottom: 1px solid #111; transition: background 0.1s; }
+.region-entry:hover { background: #141414; }
+.region-entry .top-row { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+.region-entry .swatch { width: 14px; height: 14px; border: 1px solid #333; border-radius: 1px; flex-shrink: 0; }
+.region-entry .name-input { background: none; border: none; border-bottom: 1px solid #222; color: #e0e0e0;
+  font-family: inherit; font-size: 12px; flex: 1; padding: 1px 0; outline: none; }
+.region-entry .name-input:focus { border-color: #4ade80; }
+.region-entry .name-input::placeholder { color: #333; }
+.region-entry .del-btn { background: none; border: none; color: #333; cursor: pointer;
+  font-size: 14px; padding: 0 2px; transition: color 0.15s; }
+.region-entry .del-btn:hover { color: #ef4444; }
+.region-entry .meta { font-size: 10px; color: #444; line-height: 1.6; }
+.region-entry .meta span { color: #666; }
+
+#panel-footer { padding: 10px 14px; border-top: 1px solid #1a1a1a; display: flex; gap: 8px; }
+#panel-footer button { flex: 1; background: #161616; color: #aaa; border: 1px solid #2a2a2a; padding: 6px 0;
+  cursor: pointer; font-family: inherit; font-size: 11px; border-radius: 2px; transition: all 0.15s; }
+#panel-footer button:hover { background: #222; color: #fff; border-color: #444; }
+#panel-footer button.primary { background: #14532d; color: #4ade80; border-color: #166534; }
+#panel-footer button.primary:hover { background: #166534; }
+
+.toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #166534;
+  color: #4ade80; padding: 8px 20px; border-radius: 3px; font-size: 12px; font-family: inherit;
+  opacity: 0; transition: opacity 0.3s; pointer-events: none; z-index: 100; }
+.toast.show { opacity: 1; }
+
+.loupe { position: fixed; width: 140px; height: 140px; border: 1px solid #2a2a2a; background: #000;
+  pointer-events: none; z-index: 15; image-rendering: pixelated; display: none;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.8); }
+.loupe canvas { width: 100%; height: 100%; image-rendering: pixelated; }
+.loupe-crosshair-h, .loupe-crosshair-v { position: absolute; background: rgba(74,222,128,0.3); pointer-events: none; }
+.loupe-crosshair-h { left: 0; right: 0; top: 50%; height: 1px; }
+.loupe-crosshair-v { top: 0; bottom: 0; left: 50%; width: 1px; }
+
+.sel-rect { position: absolute; border: 1.5px solid #4ade80; background: rgba(74,222,128,0.08); pointer-events: none; }
+.sel-rect.existing { border-color: #f97316; background: rgba(249,115,22,0.06); }
+.sel-rect .sel-label { position: absolute; top: -18px; left: 0; font-size: 9px; color: #f97316;
+  background: rgba(0,0,0,0.7); padding: 1px 4px; white-space: nowrap; border-radius: 1px; }
+
+input[type="file"] { display: none; }
+</style></head><body>
+
+<div id="toolbar">
+  <button onclick="fileInput.click()">Load</button>
+  <span class="sep">│</span>
+  <span class="label">Pixel:</span> <span class="val" id="px">—</span>
+  <span class="sep">│</span>
+  <span class="label">Frac:</span> <span class="val" id="frac">—</span>
+  <span class="sep">│</span>
+  <span class="label">RGB:</span> <span class="val rgb" id="rgb">—</span>
+  <span class="sep">│</span>
+  <span class="label">Zoom:</span> <span class="val" id="zlevel">1×</span>
+  <button onclick="setZoom(zoom * 1.5)">+</button>
+  <button onclick="setZoom(zoom / 1.5)">−</button>
+  <button onclick="setZoom(fitZoom())">Fit</button>
+  <span class="drop-hint" id="dropHint">drag & drop screenshot</span>
+</div>
+
+<div id="viewport" class="empty">
+  <canvas id="imgCanvas"></canvas>
+  <div id="overlay"></div>
+</div>
+
+<div id="panel">
+  <div id="panel-header"><h2>Sentinel Regions</h2></div>
+  <div id="regions-list"></div>
+  <div id="panel-footer">
+    <button onclick="clearAll()">Clear</button>
+    <button class="primary" onclick="exportJSON()">Export JSON</button>
+  </div>
+</div>
+
+<div class="loupe" id="loupe">
+  <canvas id="loupeCanvas" width="140" height="140"></canvas>
+  <div class="loupe-crosshair-h"></div>
+  <div class="loupe-crosshair-v"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+<input type="file" id="fileInput" accept="image/*">
+
+<script>
+const viewport = document.getElementById('viewport');
+const imgCanvas = document.getElementById('imgCanvas');
+const imgCtx = imgCanvas.getContext('2d', { willReadFrequently: true });
+const overlay = document.getElementById('overlay');
+const loupeEl = document.getElementById('loupe');
+const loupeCanvas = document.getElementById('loupeCanvas');
+const loupeCtx = loupeCanvas.getContext('2d');
+const regionsList = document.getElementById('regions-list');
+const fileInput = document.getElementById('fileInput');
+
+let img = null;
+let imgW = 0, imgH = 0;
+let zoom = 1, panX = 0, panY = 0;
+let regions = [];
+let dragging = false, dragStartX = 0, dragStartY = 0;
+let selDiv = null;
+let isPanning = false, panStartMX = 0, panStartMY = 0, panStartPX = 0, panStartPY = 0;
+
+// --- Image loading ---
+
+function loadImage(src) {
+  const i = new Image();
+  i.onload = () => {
+    img = i; imgW = i.width; imgH = i.height;
+    imgCanvas.width = imgW; imgCanvas.height = imgH;
+    imgCtx.drawImage(i, 0, 0);
+    viewport.classList.remove('empty');
+    document.getElementById('dropHint').textContent = `${imgW}×${imgH}`;
+    setZoom(fitZoom());
+  };
+  i.src = src;
+}
+
+fileInput.onchange = e => { if (e.target.files[0]) loadFile(e.target.files[0]); };
+function loadFile(f) { const r = new FileReader(); r.onload = e => loadImage(e.target.result); r.readAsDataURL(f); }
+
+viewport.addEventListener('dragover', e => { e.preventDefault(); e.dataTransfer.dropEffect = 'copy'; });
+viewport.addEventListener('drop', e => { e.preventDefault(); if (e.dataTransfer.files[0]) loadFile(e.dataTransfer.files[0]); });
+
+// --- Zoom & pan ---
+
+function fitZoom() {
+  if (!img) return 1;
+  const vw = viewport.clientWidth, vh = viewport.clientHeight;
+  return Math.min(vw / imgW, vh / imgH, 1);
+}
+
+function setZoom(z) {
+  const vw = viewport.clientWidth, vh = viewport.clientHeight;
+  // Zoom toward center
+  const cx = vw / 2, cy = vh / 2;
+  const imgCX = (cx - panX) / zoom, imgCY = (cy - panY) / zoom;
+  zoom = Math.max(0.05, Math.min(z, 20));
+  panX = cx - imgCX * zoom;
+  panY = cy - imgCY * zoom;
+  applyTransform();
+  document.getElementById('zlevel').textContent = zoom < 1 ? zoom.toFixed(2) + '×' : zoom.toFixed(1) + '×';
+}
+
+function applyTransform() {
+  const t = `translate(${panX}px, ${panY}px) scale(${zoom})`;
+  imgCanvas.style.transform = t;
+  imgCanvas.style.transformOrigin = '0 0';
+  overlay.style.transform = t;
+  overlay.style.transformOrigin = '0 0';
+  overlay.style.width = imgW + 'px';
+  overlay.style.height = imgH + 'px';
+  renderRegionRects();
+}
+
+viewport.addEventListener('wheel', e => {
+  e.preventDefault();
+  const factor = e.deltaY < 0 ? 1.15 : 1 / 1.15;
+  const rect = viewport.getBoundingClientRect();
+  const mx = e.clientX - rect.left, my = e.clientY - rect.top;
+  const imgX = (mx - panX) / zoom, imgY = (my - panY) / zoom;
+  zoom = Math.max(0.05, Math.min(zoom * factor, 20));
+  panX = mx - imgX * zoom;
+  panY = my - imgY * zoom;
+  applyTransform();
+  document.getElementById('zlevel').textContent = zoom < 1 ? zoom.toFixed(2) + '×' : zoom.toFixed(1) + '×';
+}, { passive: false });
+
+// --- Mouse → image coords ---
+
+function mouseToImg(e) {
+  const rect = viewport.getBoundingClientRect();
+  const mx = e.clientX - rect.left, my = e.clientY - rect.top;
+  const ix = (mx - panX) / zoom, iy = (my - panY) / zoom;
+  return { mx, my, ix: Math.round(ix), iy: Math.round(iy), ixf: ix, iyf: iy };
+}
+
+// --- Loupe ---
+
+function updateLoupe(e, pos) {
+  if (!img) { loupeEl.style.display = 'none'; return; }
+  loupeEl.style.display = 'block';
+  const lx = e.clientX + 20, ly = e.clientY - 150;
+  loupeEl.style.left = lx + 'px';
+  loupeEl.style.top = ly + 'px';
+
+  const loupeZoom = 8;
+  const sw = 140 / loupeZoom, sh = 140 / loupeZoom;
+  loupeCtx.imageSmoothingEnabled = false;
+  loupeCtx.clearRect(0, 0, 140, 140);
+  loupeCtx.drawImage(imgCanvas, pos.ixf - sw / 2, pos.iyf - sh / 2, sw, sh, 0, 0, 140, 140);
+}
+
+// --- Info bar ---
+
+function updateInfo(pos) {
+  if (!img || pos.ix < 0 || pos.iy < 0 || pos.ix >= imgW || pos.iy >= imgH) {
+    document.getElementById('px').textContent = '—';
+    document.getElementById('frac').textContent = '—';
+    document.getElementById('rgb').textContent = '—';
+    return;
+  }
+  document.getElementById('px').textContent = `${pos.ix}, ${pos.iy}`;
+  document.getElementById('frac').textContent = `${(pos.ix / imgW).toFixed(4)}, ${(pos.iy / imgH).toFixed(4)}`;
+  const d = imgCtx.getImageData(pos.ix, pos.iy, 1, 1).data;
+  document.getElementById('rgb').textContent = `${d[0]}, ${d[1]}, ${d[2]}`;
+  document.getElementById('rgb').style.color = `rgb(${d[0]},${d[1]},${d[2]})`;
+}
+
+// --- Region drawing ---
+
+viewport.addEventListener('mousedown', e => {
+  if (!img) return;
+  if (e.button === 1 || (e.button === 0 && e.altKey)) {
+    // Middle-click or alt+click: pan
+    isPanning = true;
+    panStartMX = e.clientX; panStartMY = e.clientY;
+    panStartPX = panX; panStartPY = panY;
+    viewport.style.cursor = 'grabbing';
+    e.preventDefault();
+    return;
+  }
+  if (e.button !== 0) return;
+  const pos = mouseToImg(e);
+  dragging = true;
+  dragStartX = pos.ixf; dragStartY = pos.iyf;
+  selDiv = document.createElement('div');
+  selDiv.className = 'sel-rect';
+  overlay.appendChild(selDiv);
+});
+
+viewport.addEventListener('mousemove', e => {
+  if (isPanning) {
+    panX = panStartPX + (e.clientX - panStartMX);
+    panY = panStartPY + (e.clientY - panStartMY);
+    applyTransform();
+    return;
+  }
+  const pos = mouseToImg(e);
+  updateInfo(pos);
+  updateLoupe(e, pos);
+  if (dragging && selDiv) {
+    const x0 = Math.min(dragStartX, pos.ixf), y0 = Math.min(dragStartY, pos.iyf);
+    const x1 = Math.max(dragStartX, pos.ixf), y1 = Math.max(dragStartY, pos.iyf);
+    selDiv.style.left = x0 + 'px'; selDiv.style.top = y0 + 'px';
+    selDiv.style.width = (x1 - x0) + 'px'; selDiv.style.height = (y1 - y0) + 'px';
+  }
+});
+
+viewport.addEventListener('mouseup', e => {
+  if (isPanning) {
+    isPanning = false;
+    viewport.style.cursor = 'crosshair';
+    return;
+  }
+  if (!dragging || !selDiv) return;
+  dragging = false;
+  const pos = mouseToImg(e);
+  let x0 = Math.min(dragStartX, pos.ixf), y0 = Math.min(dragStartY, pos.iyf);
+  let x1 = Math.max(dragStartX, pos.ixf), y1 = Math.max(dragStartY, pos.iyf);
+  // Clamp
+  x0 = Math.max(0, Math.round(x0)); y0 = Math.max(0, Math.round(y0));
+  x1 = Math.min(imgW, Math.round(x1)); y1 = Math.min(imgH, Math.round(y1));
+
+  overlay.removeChild(selDiv);
+  selDiv = null;
+
+  if (x1 - x0 < 3 || y1 - y0 < 3) return; // too small
+
+  // Sample average color
+  const data = imgCtx.getImageData(x0, y0, x1 - x0, y1 - y0).data;
+  let rSum = 0, gSum = 0, bSum = 0, count = 0;
+  for (let i = 0; i < data.length; i += 4) {
+    rSum += data[i]; gSum += data[i + 1]; bSum += data[i + 2]; count++;
+  }
+  const avgR = Math.round(rSum / count), avgG = Math.round(gSum / count), avgB = Math.round(bSum / count);
+
+  const region = {
+    name: 'region_' + regions.length,
+    x0: +(x0 / imgW).toFixed(5), y0: +(y0 / imgH).toFixed(5),
+    x1: +(x1 / imgW).toFixed(5), y1: +(y1 / imgH).toFixed(5),
+    px: { x0, y0, x1, y1 },
+    avg_rgb: [avgR, avgG, avgB]
+  };
+  regions.push(region);
+  renderPanel();
+  renderRegionRects();
+});
+
+viewport.addEventListener('mouseleave', () => { loupeEl.style.display = 'none'; });
+
+// --- Render region rects on overlay ---
+
+function renderRegionRects() {
+  overlay.querySelectorAll('.sel-rect.existing').forEach(el => el.remove());
+  regions.forEach((r, i) => {
+    const div = document.createElement('div');
+    div.className = 'sel-rect existing';
+    div.style.left = r.px.x0 + 'px'; div.style.top = r.px.y0 + 'px';
+    div.style.width = (r.px.x1 - r.px.x0) + 'px';
+    div.style.height = (r.px.y1 - r.px.y0) + 'px';
+    const label = document.createElement('span');
+    label.className = 'sel-label';
+    label.textContent = r.name;
+    div.appendChild(label);
+    overlay.appendChild(div);
+  });
+}
+
+// --- Panel ---
+
+function renderPanel() {
+  regionsList.innerHTML = '';
+  regions.forEach((r, i) => {
+    const entry = document.createElement('div');
+    entry.className = 'region-entry';
+    const [ar, ag, ab] = r.avg_rgb;
+    entry.innerHTML = `
+      <div class="top-row">
+        <div class="swatch" style="background:rgb(${ar},${ag},${ab})"></div>
+        <input class="name-input" value="${r.name}" placeholder="name..." data-idx="${i}">
+        <button class="del-btn" data-idx="${i}">×</button>
+      </div>
+      <div class="meta">
+        frac: <span>${r.x0.toFixed(4)}, ${r.y0.toFixed(4)} → ${r.x1.toFixed(4)}, ${r.y1.toFixed(4)}</span><br>
+        px: <span>${r.px.x0}, ${r.px.y0} → ${r.px.x1}, ${r.px.y1}</span><br>
+        avg: <span style="color:rgb(${ar},${ag},${ab})">${ar}, ${ag}, ${ab}</span>
+      </div>`;
+    entry.querySelector('.name-input').addEventListener('input', e => {
+      regions[i].name = e.target.value;
+      renderRegionRects();
+    });
+    entry.querySelector('.del-btn').addEventListener('click', () => {
+      regions.splice(i, 1);
+      renderPanel();
+      renderRegionRects();
+    });
+    regionsList.appendChild(entry);
+  });
+}
+
+// --- Export ---
+
+function exportJSON() {
+  const out = {
+    sentinels: regions.map(r => ({
+      name: r.name,
+      x0: r.x0, y0: r.y0, x1: r.x1, y1: r.y1,
+      avg_rgb: r.avg_rgb
+    }))
+  };
+  const json = JSON.stringify(out, null, 2);
+  navigator.clipboard.writeText(json).then(() => showToast('Copied to clipboard'));
+}
+
+function clearAll() { regions = []; renderPanel(); renderRegionRects(); }
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 1500);
+}
+</script>
+</body></html>

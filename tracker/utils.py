@@ -15,7 +15,7 @@ ICONS_DIR = Path(__file__).parent.parent / "data" / "icons"
 
 DEFAULT_CONFIG = {
     "player_name": "jack",
-    "hotkey": "F3",
+    "hotkey": "F6",
     "model": "qwen2.5vl:7b",
     "ollama_url": "http://localhost:11434",
     "supabase_url": "",

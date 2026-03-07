@@ -1,6 +1,7 @@
 """DAC Tracker — Windows system tray app.
 
-Press F3 on the My Matches screen to capture, parse, and save matches.
+Auto-captures Final Ranking screen via sentinel pixel polling.
+Press F6 on the My Matches screen for manual capture.
 
 Usage:
     python tray_app.py          # run tray app
@@ -139,13 +140,14 @@ def set_autostart(enable: bool) -> None:
 
 
 class TrayApp:
-    """System tray application with background polling."""
+    """System tray application with sentinel-based auto-capture."""
 
     def __init__(self):
         self.config = load_config()
         self._stop_event = threading.Event()
         self._update_info = None  # (tag, url) if update available
         self._icon = None  # set in run()
+        self._sentinel = None  # set in run()
         # Ensure user exists in DB if already logged in
         sid = self.config.get("steam_id")
         if sid:
@@ -160,13 +162,42 @@ class TrayApp:
         except Exception as e:
             log.error("notification error: %s", e)
 
+    # ── Sentinel poller ─────────────────────────────────────────────────────
+
+    def _start_sentinel(self) -> None:
+        """Start lightweight screen polling for Final Ranking detection."""
+        from sentinel import SentinelPoller
+        self._sentinel = SentinelPoller(on_match=self._on_sentinel_match)
+        self._sentinel.start()
+
+    def _on_sentinel_match(self) -> None:
+        """Called when the sentinel detects a Final Ranking screen."""
+        log.info("Sentinel: Final Ranking detected — capturing full screen...")
+        self._notify(APP_NAME, "Final Ranking detected — capturing...")
+        threading.Thread(
+            target=self._sentinel_capture, daemon=True, name="sentinel-capture",
+        ).start()
+
+    def _sentinel_capture(self) -> None:
+        """Full capture + parse after sentinel triggers."""
+        import capture
+
+        try:
+            img = capture.capture_screen()
+            if img is None:
+                log.error("Sentinel capture: screenshot failed")
+                return
+            self._do_parse_my_matches(img)
+        except Exception as e:
+            log.error("Sentinel capture error: %s", e, exc_info=True)
+
     # ── Hotkey listener ─────────────────────────────────────────────────────
 
     def _register_hotkey(self) -> None:
-        """Register F3 global hotkey (Windows only)."""
+        """Register global hotkey (Windows only)."""
         try:
             import keyboard
-            hotkey = self.config.get("hotkey", "F3")
+            hotkey = self.config.get("hotkey", "F6")
             keyboard.add_hotkey(hotkey, self._on_hotkey, suppress=False)
             log.info("Registered hotkey: %s", hotkey)
         except ImportError:
@@ -175,7 +206,7 @@ class TrayApp:
             log.error("Failed to register hotkey: %s", e)
 
     def _on_hotkey(self) -> None:
-        """Handle F3 press: capture screen, detect type, parse if My Matches."""
+        """Handle hotkey press: capture screen, detect type, parse if My Matches."""
         log.info("Hotkey pressed — capturing screen...")
         threading.Thread(
             target=self._hotkey_capture, daemon=True, name="hotkey-capture",
@@ -200,7 +231,8 @@ class TrayApp:
                 self._notify(APP_NAME, "My Matches detected — parsing...")
                 self._do_parse_my_matches(img)
             else:
-                self._notify(APP_NAME, "Not on My Matches page. Open it and press F3 again.")
+                hotkey = self.config.get("hotkey", "F6")
+                self._notify(APP_NAME, f"Not on My Matches page. Open it and press {hotkey} again.")
         except Exception as e:
             log.error("hotkey capture error: %s", e, exc_info=True)
             self._notify(APP_NAME, f"Capture error: {e}")
@@ -386,6 +418,11 @@ class TrayApp:
 
     def _quit(self, icon, _item=None) -> None:
         self._stop_event.set()
+        if self._sentinel:
+            try:
+                self._sentinel.stop()
+            except Exception:
+                pass
         try:
             import keyboard
             keyboard.unhook_all()
@@ -428,17 +465,20 @@ class TrayApp:
         _set_app_model_id()
         self._icon = pystray.Icon(APP_NAME, _load_icon_image(), tooltip, menu)
 
-        # Register F3 hotkey
+        # Register hotkey
         self._register_hotkey()
+
+        # Start sentinel poller (auto-detect Final Ranking)
+        self._start_sentinel()
 
         # Start update checker
         from updater import start_update_loop
         start_update_loop(self._on_update_available)
 
-        hotkey = self.config.get("hotkey", "F3")
-        log.info("%s running. Press %s on My Matches to import.", APP_NAME, hotkey)
+        hotkey = self.config.get("hotkey", "F6")
+        log.info("%s running. Sentinel active, hotkey %s for manual capture.", APP_NAME, hotkey)
         log.info("Log: %s", LOG_PATH)
-        self._notify(APP_NAME, f"Running in system tray.\nPress {hotkey} on My Matches to import.")
+        self._notify(APP_NAME, f"Running — auto-detect Final Ranking.\nPress {hotkey} on My Matches for manual import.")
         self._icon.run()
 
 
