@@ -95,17 +95,18 @@ class GameEndOverlay:
         except Exception:
             pass
 
-        # Canvas for arrow pointing left toward the icon
+        # Arrow pointing left, outside the box (negative x offset)
+        # Arrow sits at 25% height
+        arrow_y = int(h * 0.25)
         arrow_canvas = tk.Canvas(
-            root, width=arrow_w, height=h, bg="#1a1a2e",
+            root, width=w, height=h, bg="#1a1a2e",
             highlightthickness=0, bd=0,
         )
         arrow_canvas.place(x=0, y=0)
-        mid_y = h // 2
         arrow_canvas.create_polygon(
-            0, mid_y,           # tip (pointing left)
-            arrow_w, mid_y - 14,  # top-right
-            arrow_w, mid_y + 14,  # bottom-right
+            0, arrow_y,              # tip (pointing left)
+            arrow_w, arrow_y - 14,   # top-right
+            arrow_w, arrow_y + 14,   # bottom-right
             fill="#4a6fa5", outline="",
         )
 
@@ -131,20 +132,21 @@ class GameEndOverlay:
         btn_frame = tk.Frame(frame, bg="#1a1a2e")
         btn_frame.pack(fill=tk.X)
 
+        btn_w = 12  # character width — same for both
         capture_btn = tk.Button(
             btn_frame, text="Capture",
-            font=("Segoe UI", 11, "bold"),
+            font=("Segoe UI", 10, "bold"), width=btn_w,
             bg="#4a6fa5", fg="white", activebackground="#5a8fd5",
-            relief=tk.FLAT, padx=16, pady=4,
+            relief=tk.FLAT, pady=4,
             command=self._on_capture_click,
         )
         capture_btn.pack(side=tk.LEFT)
 
         dismiss_btn = tk.Button(
             btn_frame, text="Dismiss",
-            font=("Segoe UI", 10),
+            font=("Segoe UI", 10), width=btn_w,
             bg="#333", fg="#aaa", activebackground="#555",
-            relief=tk.FLAT, padx=10, pady=4,
+            relief=tk.FLAT, pady=4,
             command=self._on_dismiss_click,
         )
         dismiss_btn.pack(side=tk.RIGHT)
