@@ -40,6 +40,39 @@ function rankTier(rank: string | null): string {
   return rank.split("-")[0];
 }
 
+function unitStem(name: string): string {
+  return name.toLowerCase().replace(/ /g, "_").replace(/-/g, "_").replace(/'/g, "");
+}
+
+function parseLineup(lineup: string | null): { name: string; stars: number }[] {
+  if (!lineup) return [];
+  return lineup.split("|").filter(Boolean).map((entry) => {
+    const m = entry.match(/^(.+?)(?:\((\d)\))?$/);
+    if (!m) return { name: entry, stars: 1 };
+    return { name: m[1], stars: m[2] ? parseInt(m[2]) : 1 };
+  });
+}
+
+const SYN_ICON_MAP: Record<string, string> = {
+  "Demon Hunter": "demonhunter",
+  "Elemental": "element",
+  "Faceless": "nraqi",
+  "Pandaren": "pandaman",
+};
+
+function synIconName(name: string): string {
+  if (SYN_ICON_MAP[name]) return SYN_ICON_MAP[name];
+  return name.toLowerCase().replace(/ /g, "");
+}
+
+function parseSynergies(syn: string | null): { name: string; count: number }[] {
+  if (!syn) return [];
+  return syn.split("|").filter(Boolean).map((entry) => {
+    const [name, count] = entry.split(":");
+    return { name, count: parseInt(count) || 0 };
+  }).filter((s) => s.count > 0).sort((a, b) => b.count - a.count);
+}
+
 function parseWL(wl: string | null): { w: number; l: number } | null {
   if (!wl) return null;
   const parts = wl.split("-");
@@ -266,7 +299,7 @@ export default function Home({ supabase }: HomeProps) {
 
         /* ── Dashboard ── */
         .dashboard {
-          max-width: 920px;
+          max-width: 1040px;
           margin: 0 auto;
           padding: 32px 24px 64px;
         }
@@ -319,16 +352,18 @@ export default function Home({ supabase }: HomeProps) {
           color: var(--text-muted);
           padding: 12px 4px;
         }
+        .game-entry {
+          border-bottom: 1px solid var(--border-subtle);
+          transition: background 0.15s;
+        }
+        .game-entry:last-child { border-bottom: none; }
+        .game-entry:hover { background: var(--bg-hover); }
         .game-row {
           display: grid;
           grid-template-columns: 56px 1fr 100px 80px 80px 100px;
           padding: 0 16px;
-          border-bottom: 1px solid var(--border-subtle);
-          transition: background 0.15s;
           align-items: center;
         }
-        .game-row:last-child { border-bottom: none; }
-        .game-row:hover { background: var(--bg-hover); }
         .cell {
           padding: 14px 4px;
           font-size: 13px;
@@ -380,6 +415,76 @@ export default function Home({ supabase }: HomeProps) {
         .level-cell {
           font-size: 13px;
           color: var(--text-secondary);
+        }
+
+        /* ── Lineup & Synergies row ── */
+        .detail-row {
+          display: flex;
+          align-items: center;
+          gap: 16px;
+          padding: 0 16px 10px 76px;
+          flex-wrap: wrap;
+        }
+        .lineup {
+          display: flex;
+          gap: 2px;
+          align-items: center;
+          flex-wrap: wrap;
+        }
+        .unit-icon-wrap {
+          position: relative;
+          width: 28px;
+          height: 28px;
+        }
+        .unit-icon {
+          width: 28px;
+          height: 28px;
+          border-radius: 4px;
+          border: 1px solid var(--border);
+          object-fit: cover;
+          background: var(--bg-surface);
+        }
+        .unit-icon.stars-2 { border-color: #5a8fd5; }
+        .unit-icon.stars-3 { border-color: var(--gold); }
+        .unit-stars {
+          position: absolute;
+          bottom: -2px;
+          right: -2px;
+          font-size: 7px;
+          line-height: 1;
+          background: var(--bg-deep);
+          border-radius: 2px;
+          padding: 1px 2px;
+        }
+        .unit-stars.s2 { color: #5a8fd5; }
+        .unit-stars.s3 { color: var(--gold); }
+        .synergies {
+          display: flex;
+          gap: 6px;
+          align-items: center;
+          flex-wrap: wrap;
+          margin-left: auto;
+        }
+        .syn-badge {
+          display: flex;
+          align-items: center;
+          gap: 3px;
+          font-size: 10px;
+          color: var(--text-muted);
+          background: var(--bg-surface);
+          border: 1px solid var(--border-subtle);
+          border-radius: 3px;
+          padding: 2px 5px 2px 3px;
+        }
+        .syn-icon {
+          width: 14px;
+          height: 14px;
+          border-radius: 2px;
+          object-fit: cover;
+        }
+        .syn-count {
+          color: var(--text-secondary);
+          font-weight: 600;
         }
         .empty-state {
           text-align: center;
@@ -500,53 +605,95 @@ export default function Home({ supabase }: HomeProps) {
                     const wl = parseWL(g.wl);
                     const tier = rankTier(g.rank);
                     const rankNum = g.rank?.split("-")[1] || "";
+                    const lineup = parseLineup(g.lineup);
+                    const syns = parseSynergies(g.synergies);
                     return (
                       <div
                         key={g.id}
-                        className="game-row"
+                        className="game-entry"
                         style={{ background: placementBg(p) }}
                       >
-                        <div className="cell">
-                          <div
-                            className="placement"
-                            style={{
-                              color: placementColor(p),
-                              borderColor: placementColor(p),
-                            }}
-                          >
-                            {g.placement}
+                        <div className="game-row">
+                          <div className="cell">
+                            <div
+                              className="placement"
+                              style={{
+                                color: placementColor(p),
+                                borderColor: placementColor(p),
+                              }}
+                            >
+                              {g.placement}
+                            </div>
+                          </div>
+                          <div className="cell rank-cell">
+                            <span className="rank-tier">{tier}</span>
+                            <span className="rank-num">{rankNum}</span>
+                            {g.rank_change === "up" && (
+                              <span className="arrow-up">▲</span>
+                            )}
+                            {g.rank_change === "down" && (
+                              <span className="arrow-down">▼</span>
+                            )}
+                          </div>
+                          <div className="cell wl">
+                            {wl ? (
+                              <>
+                                <span className="wl-w">{wl.w}</span>
+                                <span className="wl-sep"> – </span>
+                                <span className="wl-l">{wl.l}</span>
+                              </>
+                            ) : (
+                              <span style={{ color: "var(--text-muted)" }}>—</span>
+                            )}
+                          </div>
+                          <div className="cell level-cell">
+                            {g.level || "—"}
+                          </div>
+                          <div className="cell" style={{ fontSize: 11, color: "var(--text-muted)" }}>
+                            {g.relic || "—"}
+                          </div>
+                          <div className="cell date-cell">
+                            {g.date}
                           </div>
                         </div>
-                        <div className="cell rank-cell">
-                          <span className="rank-tier">{tier}</span>
-                          <span className="rank-num">{rankNum}</span>
-                          {g.rank_change === "up" && (
-                            <span className="arrow-up">▲</span>
-                          )}
-                          {g.rank_change === "down" && (
-                            <span className="arrow-down">▼</span>
-                          )}
-                        </div>
-                        <div className="cell wl">
-                          {wl ? (
-                            <>
-                              <span className="wl-w">{wl.w}</span>
-                              <span className="wl-sep"> – </span>
-                              <span className="wl-l">{wl.l}</span>
-                            </>
-                          ) : (
-                            <span style={{ color: "var(--text-muted)" }}>—</span>
-                          )}
-                        </div>
-                        <div className="cell level-cell">
-                          {g.level || "—"}
-                        </div>
-                        <div className="cell" style={{ fontSize: 11, color: "var(--text-muted)" }}>
-                          {g.relic || "—"}
-                        </div>
-                        <div className="cell date-cell">
-                          {g.date}
-                        </div>
+                        {(lineup.length > 0 || syns.length > 0) && (
+                          <div className="detail-row">
+                            {lineup.length > 0 && (
+                              <div className="lineup">
+                                {lineup.map((u, i) => (
+                                  <div key={i} className="unit-icon-wrap" title={`${u.name}${u.stars > 1 ? ` ★${u.stars}` : ""}`}>
+                                    <img
+                                      className={`unit-icon${u.stars >= 3 ? " stars-3" : u.stars === 2 ? " stars-2" : ""}`}
+                                      src={`/icons/units/${unitStem(u.name)}.png`}
+                                      alt={u.name}
+                                      loading="lazy"
+                                      onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
+                                    />
+                                    {u.stars > 1 && (
+                                      <span className={`unit-stars s${u.stars}`}>{"★".repeat(u.stars)}</span>
+                                    )}
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                            {syns.length > 0 && (
+                              <div className="synergies">
+                                {syns.slice(0, 5).map((s, i) => (
+                                  <div key={i} className="syn-badge" title={`${s.name}: ${s.count}`}>
+                                    <img
+                                      className="syn-icon"
+                                      src={`/icons/synergies/${synIconName(s.name)}.png`}
+                                      alt={s.name}
+                                      loading="lazy"
+                                      onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
+                                    />
+                                    <span className="syn-count">{s.count}</span>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        )}
                       </div>
                     );
                   })}
