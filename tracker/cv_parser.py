@@ -8,6 +8,7 @@ Usage (dev test):
     python cv_parser.py /path/to/screenshot.jpg [player_name] [--debug]
 """
 
+import logging
 import re
 import sys
 from pathlib import Path
@@ -21,6 +22,8 @@ except ImportError:
     pytesseract = None
 
 from utils import crop as _crop, ocr as _ocr, unit_stem as _unit_stem
+
+log = logging.getLogger("dac")
 
 
 # ── Region constants ─────────────────────────────────────────────────────────
@@ -217,22 +220,19 @@ def _find_player_row(img: np.ndarray, player_name: str, debug: bool = False) -> 
         processed = _preprocess_for_ocr(cell, scale=2.0)
         _save_debug(f"player_row{i}", processed, debug)
         text = _ocr(processed, psm=6).lower()
-        if debug:
-            print(f"  row {i} OCR (thresh): {text!r}")
+        log.debug(f"  row {i} OCR (thresh): {text!r}")
         if pname in text:
             return i
 
         # Strategy 2: raw grayscale upscale (no binarisation)
         text2 = _ocr_cell(cell)
-        if debug:
-            print(f"  row {i} OCR (raw):    {text2!r}")
+        log.debug(f"  row {i} OCR (raw):    {text2!r}")
         if pname in text2:
             return i
 
     # Strategy 3: overlapping windows (half-row offset) to catch names
     # split across row boundaries
-    if debug:
-        print("  Trying overlapping windows...")
+    log.debug("  Trying overlapping windows...")
     row_h = (TABLE_Y_END - TABLE_Y_START) / N_ROWS
     for i in range(N_ROWS - 1):
         y0 = TABLE_Y_START + (i + 0.5) * row_h
@@ -240,15 +240,13 @@ def _find_player_row(img: np.ndarray, player_name: str, debug: bool = False) -> 
         cell = _crop_row(img, COL_PLAYER, y0, y1)
         processed = _preprocess_for_ocr(cell, scale=2.0)
         text = _ocr(processed, psm=6).lower()
-        if debug:
-            print(f"  overlap {i}-{i+1} OCR: {text!r}")
+        log.debug(f"  overlap {i}-{i+1} OCR: {text!r}")
         if pname in text:
             # Name straddles boundary — assign to the row with more overlap
             # (i+1 since name starts at bottom of row i)
             return i + 1
 
-    if debug:
-        print(f"  WARNING: player '{player_name}' not found in table")
+    log.debug(f"  WARNING: player '{player_name}' not found in table")
     return None
 
 
@@ -361,9 +359,8 @@ def _match_templates_multiscale(
             used_positions.append((x, y))
 
     kept.sort(key=lambda m: m[2])  # sort left to right
-    if debug:
-        for name, score, x, y in kept:
-            print(f"    match: {name:20s} score={score:.3f} pos=({x},{y})")
+    for name, score, x, y in kept:
+        log.debug(f"    match: {name:20s} score={score:.3f} pos=({x},{y})")
     return kept
 
 
@@ -426,9 +423,7 @@ def _match_unit_grid(
         name, score, x, y = cell_best[(slot_idx, y_zone)]
         zone_label = "top" if y_zone == 0 else "bot"
         all_matches.append((name, score, x, y))
-        if debug:
-            print(f"    slot {zone_label}[{slot_idx}]: {name:20s} score={score:.3f}")
-
+        log.debug(f"    slot {zone_label}[{slot_idx}]: {name:20s} score={score:.3f}")
     all_matches.sort(key=lambda m: (m[3], m[2]))
     return all_matches
 
@@ -463,9 +458,8 @@ def _match_relic_grid(
             # Skip empty slots: dark background with little colour variation
             gray_slot = cv2.cvtColor(slot_img, cv2.COLOR_BGR2GRAY)
             if gray_slot.mean() < 35 and gray_slot.std() < 15:
-                if debug:
-                    print(f"    relic slot {'top' if row_idx == 0 else 'bot'}[{col_idx}]: "
-                          f"empty (mean={gray_slot.mean():.0f} std={gray_slot.std():.1f})")
+                log.debug(f"    relic slot {'top' if row_idx == 0 else 'bot'}[{col_idx}]: "
+                         f"empty (mean={gray_slot.mean():.0f} std={gray_slot.std():.1f})")
                 continue
 
             for name, tmpls in templates.items():
@@ -535,9 +529,8 @@ def _match_relic_grid(
             cell_best.pop((col_idx, 0), None)
             cell_best.pop((col_idx, 1), None)
             cell_best[(col_idx, -1)] = (best_name, best_score, best_x, best_y)
-            if debug:
-                print(f"    relic slot full[{col_idx}]: {best_name:20s} score={best_score:.3f} "
-                      f"(was top={top_score:.3f} bot={bot_score:.3f})")
+            log.debug(f"    relic slot full[{col_idx}]: {best_name:20s} score={best_score:.3f} "
+                     f"(was top={top_score:.3f} bot={bot_score:.3f})")
 
     all_matches = []
     for (col_idx, row_idx) in sorted(cell_best):
@@ -547,9 +540,7 @@ def _match_relic_grid(
         else:
             zone_label = "top" if row_idx == 0 else "bot"
         all_matches.append((name, score, x, y))
-        if debug:
-            print(f"    relic slot {zone_label}[{col_idx}]: {name:20s} score={score:.3f}")
-
+        log.debug(f"    relic slot {zone_label}[{col_idx}]: {name:20s} score={score:.3f}")
     all_matches.sort(key=lambda m: (m[3], m[2]))
     return all_matches
 
@@ -595,22 +586,17 @@ def _ocr_synergy_counts(
 
     # OCR as sparse text with OSD (psm 12 catches isolated characters better)
     raw = _ocr(scaled, psm=12)
-    if debug:
-        print(f"    Count strip OCR raw: {raw!r}")
-
+    log.debug(f"    Count strip OCR raw: {raw!r}")
     # Extract all digits from "(N)" patterns
     # The OCR may mangle parentheses, so just find all isolated digits
     all_counts = re.findall(r"\d+", raw)
     counts = [int(d) for d in all_counts if 1 <= int(d) <= 12]
-    if debug:
-        print(f"    Parsed counts: {counts}")
-
+    log.debug(f"    Parsed counts: {counts}")
     # Associate counts left-to-right with matches left-to-right
     results = []
     for i, (name, score, x, y) in enumerate(matches):
         count = counts[i] if i < len(counts) else 0
-        if debug:
-            print(f"    {name} → count={count}")
+        log.debug(f"    {name} → count={count}")
         results.append((name, count))
     return results
 
@@ -659,15 +645,13 @@ def extract_rank_from_panel(img: np.ndarray, player_name: str, debug: bool = Fal
         ry0 = py0 + i * row_h
         ry1 = ry0 + row_h
         text = _ocr_strip(ry0, ry1)
-        if debug:
-            print(f"  [rank panel] row {i}: {text!r}")
+        log.debug(f"  [rank panel] row {i}: {text!r}")
         if pname in text.lower():
             player_row = i
             break
 
     if player_row is None:
-        if debug:
-            print(f"  [rank panel] player '{player_name}' not found in sidebar")
+        log.debug(f"  [rank panel] player '{player_name}' not found in sidebar")
         return ""
 
     # Search for rank text in the player's row, expanding only DOWNWARD
@@ -687,12 +671,10 @@ def extract_rank_from_panel(img: np.ndarray, player_name: str, debug: bool = Fal
         if matches:
             m = matches[-1]
             rank = f"{m.group(1).title()}-{m.group(2)}"
-            if debug:
-                print(f"  [rank panel] found rank={rank!r} in: {text!r}")
+            log.debug(f"  [rank panel] found rank={rank!r} in: {text!r}")
             return rank
 
-    if debug:
-        print("  [rank panel] rank word not found near player row")
+    log.debug("  [rank panel] rank word not found near player row")
     return ""
 
 
@@ -710,17 +692,15 @@ def parse_game_over(
     or None on failure.
     """
     h, w = img.shape[:2]
-    if debug:
-        print(f"Image: {w}×{h}")
-
+    log.debug(f"Image: {w}×{h}")
     # 1. Find player row
-    print("[cv] Finding player row...")
+    log.info("[cv] Finding player row...")
     row_idx = _find_player_row(img, player_name, debug=debug)
     if row_idx is None:
-        print(f"[cv] ERROR: could not find player '{player_name}' in table")
+        log.error(f"[cv] ERROR: could not find player '{player_name}' in table")
         return None
     y0, y1 = _row_y_extent(row_idx)
-    print(f"[cv] Player found in row {row_idx + 1} (y={y0:.3f}-{y1:.3f})")
+    log.info(f"[cv] Player found in row {row_idx + 1} (y={y0:.3f}-{y1:.3f})")
 
     # 2. Placement = row index + 1 (table is ordered by placement)
     placement = row_idx + 1
@@ -735,9 +715,7 @@ def parse_game_over(
     if digits:
         lv = int(digits[0])
         level = str(lv) if 1 <= lv <= 15 else ""
-    if debug:
-        print(f"  Level OCR: {level_raw!r} → {level!r}")
-
+    log.debug(f"  Level OCR: {level_raw!r} → {level!r}")
     # 4. OCR W-L
     wl_cell = _crop_row(img, COL_WL, y0, y1)
     wl_proc = _preprocess_for_ocr(wl_cell, scale=3.0)
@@ -745,16 +723,13 @@ def parse_game_over(
     wl_raw = _ocr(wl_proc, psm=7, whitelist="0123456789-")
     wl_match = re.search(r"(\d{1,3})\s*[-–]\s*(\d{1,3})", wl_raw)
     wl = f"{wl_match.group(1)}-{wl_match.group(2)}" if wl_match else ""
-    if debug:
-        print(f"  W-L OCR: {wl_raw!r} → {wl!r}")
-
+    log.debug(f"  W-L OCR: {wl_raw!r} → {wl!r}")
     # 5. Template match synergies
-    print("[cv] Matching synergy icons...")
+    log.info("[cv] Matching synergy icons...")
     syn_cell = _crop_row(img, COL_SYNERGY, y0, y1)
     _save_debug("synergy_cell", syn_cell, debug)
     syn_templates = _load_templates_multiscale(icons_dir / "synergies", SYNERGY_ICON_SCALES)
-    if debug:
-        print(f"  Loaded {len(syn_templates)} synergy templates at scales {SYNERGY_ICON_SCALES}")
+    log.debug(f"  Loaded {len(syn_templates)} synergy templates at scales {SYNERGY_ICON_SCALES}")
     syn_matches = _match_templates_multiscale(syn_cell, syn_templates,
                                                y_max_frac=SYNERGY_BADGE_Y_MAX_FRAC,
                                                debug=debug)
@@ -766,13 +741,12 @@ def parse_game_over(
         synergies = "|".join(f"{name}:0" for name, _, _, _ in syn_matches)
 
     # 6. Template match relics (global multiscale — Game Over layout differs from MY MATCHES)
-    print("[cv] Matching relic icons...")
+    log.info("[cv] Matching relic icons...")
     relic_cell = _crop_row(img, COL_RELIC, y0, y1)
     _save_debug("relic_cell", relic_cell, debug)
     relic_templates = _load_templates_multiscale(icons_dir / "relics", RELIC_ICON_SCALES,
                                                   inner_frac=1.0, color=True)
-    if debug:
-        print(f"  Loaded {len(relic_templates)} relic templates at scales {RELIC_ICON_SCALES}")
+    log.debug(f"  Loaded {len(relic_templates)} relic templates at scales {RELIC_ICON_SCALES}")
     relic_matches = _match_templates_multiscale(relic_cell, relic_templates, threshold=0.45,
                                                  color=True, debug=debug)
     # Keep best score per unique relic name, take top 5
@@ -782,14 +756,10 @@ def parse_game_over(
             best_per_name[name] = score
     ranked = sorted(best_per_name.items(), key=lambda x: -x[1])[:5]
     relic = "|".join(name.replace("_", " ").title() for name, score in ranked)
-    if debug:
-        print(f"  Relic ranking: {[(n, f'{s:.3f}') for n, s in ranked]}")
-
+    log.debug(f"  Relic ranking: {[(n, f'{s:.3f}') for n, s in ranked]}")
     # 7. Extract rank from left sidebar
     rank = extract_rank_from_panel(img, player_name, debug=debug)
-    if debug:
-        print(f"  Rank: {rank!r}")
-
+    log.debug(f"  Rank: {rank!r}")
     result = {
         "placement": str(placement),
         "level": level,
@@ -798,7 +768,7 @@ def parse_game_over(
         "relic": relic,
         "rank": rank,
     }
-    print(f"[cv] Result: {result}")
+    log.info(f"[cv] Result: {result}")
     return result
 
 
@@ -849,9 +819,7 @@ def _find_my_matches_rows(img: np.ndarray, debug: bool = False) -> list[tuple[fl
     # Convert to absolute pixel coords
     sep_zones = [(s + y0_px, e + y0_px) for s, e in merged_bands]
 
-    if debug:
-        print(f"  [mm rows] found {len(sep_zones)} separators: {[(s, e, e-s) for s, e in sep_zones]}")
-
+    log.debug(f"  [mm rows] found {len(sep_zones)} separators: {[(s, e, e-s) for s, e in sep_zones]}")
     rows: list[tuple[float, float]] = []
     if len(sep_zones) >= 3:
         # Compute median row height from separator-to-separator distances
@@ -903,13 +871,10 @@ def _find_my_matches_rows(img: np.ndarray, debug: bool = False) -> list[tuple[fl
             rows.append((r_y0, r_y1))
             last_sep += row_h_px
 
-        if debug:
-            print(f"  [mm rows] row height={row_h_px}px, extrapolated to {len(rows)} total rows")
-
+        log.debug(f"  [mm rows] row height={row_h_px}px, extrapolated to {len(rows)} total rows")
     # Fallback: fixed geometry (assume 8 rows of equal height)
     if len(rows) < 3:
-        if debug:
-            print("  [mm rows] scan failed, using fixed 8-row geometry")
+        log.debug("  [mm rows] scan failed, using fixed 8-row geometry")
         row_h = (MM_TABLE_Y_END - MM_TABLE_Y_START) / 8
         rows = [(MM_TABLE_Y_START + i * row_h,
                  MM_TABLE_Y_START + (i + 1) * row_h) for i in range(8)]
@@ -1004,8 +969,7 @@ def _find_star_clusters(
                 cluster = [sq]
         clusters.append(cluster)
 
-    if debug:
-        print(f"    star squares: {len(squares)} found, {len(clusters)} clusters "
+    log.debug(f"    star squares: {len(squares)} found, {len(clusters)} clusters "
               f"({[len(c) for c in clusters]})")
     return clusters
 
@@ -1111,9 +1075,7 @@ def _parse_my_matches_row(
         m4 = re.search(r"\b([1-8])\b", place_raw)
         if m4:
             result["placement"] = m4.group(1)
-    if debug:
-        print(f"  [row {row_idx}] placement OCR: {place_raw!r} → {result['placement']!r}")
-
+    log.debug(f"  [row {row_idx}] placement OCR: {place_raw!r} → {result['placement']!r}")
     # 2. Level OCR — "LvXX" or just the digit
     level_cell = _crop(img, MM_COL_LEVEL[0], row_y0 + (row_y1 - row_y0) * 0.30,
                        MM_COL_LEVEL[1], row_y0 + (row_y1 - row_y0) * 0.75)
@@ -1125,9 +1087,7 @@ def _parse_my_matches_row(
         lv = int(level_digits[0])
         if 1 <= lv <= 15:
             result["level"] = str(lv)
-    if debug:
-        print(f"  [row {row_idx}] level OCR: {level_raw!r} → {result['level']!r}")
-
+    log.debug(f"  [row {row_idx}] level OCR: {level_raw!r} → {result['level']!r}")
     # 3. Unit icon matching — grid-based (one match per slot)
     unit_region = _crop(img, MM_COL_UNITS[0], row_y0,
                         MM_COL_UNITS[1], row_y1)
@@ -1146,20 +1106,15 @@ def _parse_my_matches_row(
     for i, (stem, score, ux, uy) in enumerate(matches):
         name = stem_to_name.get(stem, stem)
         stars = star_map.get(i, 1)
-        if debug:
-            print(f"    star detect {name}: {stars}★ (ux={ux})")
+        log.debug(f"    star detect {name}: {stars}★ (ux={ux})")
         unit_names.append(f"{name}({stars})" if stars > 1 else name)
 
     result["units"] = unit_names
-    if debug:
-        print(f"  [row {row_idx}] units ({len(unit_names)}): {unit_names}")
-
+    log.debug(f"  [row {row_idx}] units ({len(unit_names)}): {unit_names}")
     # 4. Synergies derived from units (use raw names without star suffixes)
     if unit_names_raw and units_data:
         result["synergies"] = _synergies_from_units(unit_names_raw, units_data)
-    if debug:
-        print(f"  [row {row_idx}] synergies: {result['synergies']!r}")
-
+    log.debug(f"  [row {row_idx}] synergies: {result['synergies']!r}")
     # 5. Relic icon matching (per-slot grid)
     relic_cell = _crop(img, MM_COL_RELIC[0], row_y0, MM_COL_RELIC[1], row_y1)
     _save_debug(f"mm_relic_{row_idx}", relic_cell, debug)
@@ -1174,9 +1129,7 @@ def _parse_my_matches_row(
             name.replace("_", " ").title(): round(s, 3)
             for name, s, _, _ in relic_matches
         }
-        if debug:
-            print(f"  [row {row_idx}] relics: {[(n.replace('_', ' ').title(), f'{s:.3f}') for n, s, _, _ in relic_matches]}")
-
+        log.debug(f"  [row {row_idx}] relics: {[(n.replace('_', ' ').title(), f'{s:.3f}') for n, s, _, _ in relic_matches]}")
     # 6. W-L OCR — bottom half of cell (top half has gold "$XXX")
     wl_y0 = row_y0 + (row_y1 - row_y0) * 0.55
     wl_y1 = row_y0 + (row_y1 - row_y0) * 0.95
@@ -1187,9 +1140,7 @@ def _parse_my_matches_row(
     wl_m = re.search(r"(\d{1,3})\s*[-–]\s*(\d{1,3})", wl_raw)
     if wl_m:
         result["wl"] = f"{wl_m.group(1)}-{wl_m.group(2)}"
-    if debug:
-        print(f"  [row {row_idx}] wl OCR: {wl_raw!r} → {result['wl']!r}")
-
+    log.debug(f"  [row {row_idx}] wl OCR: {wl_raw!r} → {result['wl']!r}")
     # 7. Rank OCR
     rank_y0 = row_y0 + (row_y1 - row_y0) * 0.20
     rank_y1 = row_y0 + (row_y1 - row_y0) * 0.80
@@ -1216,11 +1167,8 @@ def _parse_my_matches_row(
         result["rank_change"] = "up"
     elif red_pct > 0.005:
         result["rank_change"] = "down"
-    if debug:
-        print(f"  [row {row_idx}] rank color: green={green_pct:.3f} red={red_pct:.3f}")
-    if debug:
-        print(f"  [row {row_idx}] rank OCR: {rank_raw!r} → {result['rank']!r} ({result['rank_change']})")
-
+    log.debug(f"  [row {row_idx}] rank color: green={green_pct:.3f} red={red_pct:.3f}")
+    log.debug(f"  [row {row_idx}] rank OCR: {rank_raw!r} → {result['rank']!r} ({result['rank_change']})")
     return result
 
 
@@ -1238,9 +1186,7 @@ def parse_my_matches(
     Returns empty list on failure.
     """
     h, w = img.shape[:2]
-    if debug:
-        print(f"[mm] Image: {w}×{h}")
-
+    log.debug(f"[mm] Image: {w}×{h}")
     # Load units data if not provided
     if units_data is None:
         data_dir = Path(__file__).parent.parent / "data"
@@ -1256,27 +1202,24 @@ def parse_my_matches(
 
     # Load unit icon templates
     units_icons_dir = icons_dir / "units"
-    print(f"[mm] Loading unit templates from {units_icons_dir}...")
+    log.info(f"[mm] Loading unit templates from {units_icons_dir}...")
     unit_templates = _load_templates_multiscale(units_icons_dir, UNIT_ICON_SCALES,
                                                  inner_frac=0.85, color=True)
     if not unit_templates:
-        print(f"[mm] WARNING: no unit icons found in {units_icons_dir}")
-        print("     Run: python download_unit_icons.py")
+        log.warning(f"[mm] WARNING: no unit icons found in {units_icons_dir}")
+        log.info("     Run: python download_unit_icons.py")
 
     # Load relic icon templates
     relic_templates = _load_templates_multiscale(icons_dir / "relics", RELIC_ICON_SCALES,
                                                   inner_frac=1.0, color=True)
-    if debug:
-        print(f"[mm] Loaded {len(relic_templates)} relic templates")
-
+    log.debug(f"[mm] Loaded {len(relic_templates)} relic templates")
     # Find row boundaries
     rows = _find_my_matches_rows(img, debug=debug)
-    print(f"[mm] Detected {len(rows)} rows")
+    log.info(f"[mm] Detected {len(rows)} rows")
 
     parsed = []
     for i, (y0, y1) in enumerate(rows):
-        if debug:
-            print(f"\n[mm] --- Row {i} (y={y0:.3f}-{y1:.3f}) ---")
+        log.debug(f"\n[mm] --- Row {i} (y={y0:.3f}-{y1:.3f}) ---")
         row_data = _parse_my_matches_row(
             img, y0, y1,
             unit_templates, relic_templates, units_data, stem_to_name,
@@ -1284,12 +1227,11 @@ def parse_my_matches(
         )
         # Skip rows where we got nothing useful (empty rows at bottom of table)
         if not (row_data["placement"] or (len(row_data["units"]) >= 3 and row_data["wl"])):
-            if debug:
-                print(f"  [row {i}] insufficient data, skipping")
+            log.debug(f"  [row {i}] insufficient data, skipping")
             continue
         parsed.append(row_data)
 
-    print(f"[mm] Parsed {len(parsed)} non-empty rows")
+    log.info(f"[mm] Parsed {len(parsed)} non-empty rows")
     return parsed
 
 
