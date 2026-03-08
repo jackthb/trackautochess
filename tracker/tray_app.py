@@ -148,6 +148,7 @@ class TrayApp:
         self._update_info = None  # (tag, url) if update available
         self._icon = None  # set in run()
         self._sentinel = None  # set in run()
+        self._overlay = None  # GameEndOverlay instance
         # Ensure user exists in DB if already logged in
         sid = self.config.get("steam_id")
         if sid:
@@ -172,38 +173,72 @@ class TrayApp:
 
     def _on_sentinel_match(self) -> None:
         """Called when the sentinel detects a Final Ranking screen."""
-        log.info("Sentinel: Final Ranking detected — capturing full screen...")
-        self._notify(APP_NAME, "Final Ranking detected — capturing...")
-        threading.Thread(
-            target=self._sentinel_capture, daemon=True, name="sentinel-capture",
-        ).start()
+        log.info("Sentinel: Final Ranking detected — showing overlay")
+        self._notify(APP_NAME, "Game ended! Open Match History and click Capture.")
+        self._show_overlay()
 
-    def _sentinel_capture(self) -> None:
-        """Full capture + parse after sentinel triggers."""
+    def _show_overlay(self) -> None:
+        """Show the game-end overlay prompting user to open Match History."""
+        from overlay import GameEndOverlay
+        # Dismiss any existing overlay
+        if self._overlay and self._overlay._alive:
+            self._overlay.dismiss()
+        self._overlay = GameEndOverlay(
+            on_capture=self._overlay_capture,
+            on_dismiss=lambda: log.info("Overlay dismissed without capture"),
+        )
+        self._overlay.show()
+
+    def _overlay_capture(self) -> None:
+        """Capture My Matches screen after user clicks overlay button."""
+        import time
         import capture
+        from cv_parser import detect_screen_type
 
         try:
+            # Brief delay to let user's click settle and screen render
+            time.sleep(0.5)
             img = capture.capture_screen()
             if img is None:
-                log.error("Sentinel capture: screenshot failed")
+                log.error("Overlay capture: screenshot failed")
+                self._notify(APP_NAME, "Screenshot capture failed.")
                 return
-            self._do_parse_my_matches(img)
+
+            screen_type = detect_screen_type(img)
+            log.info("Overlay capture: detected screen type '%s'", screen_type)
+
+            if screen_type == "my_matches":
+                self._notify(APP_NAME, "My Matches detected — parsing...")
+                self._do_parse_my_matches(img)
+            else:
+                self._notify(
+                    APP_NAME,
+                    f"Not on My Matches page (detected: {screen_type}).\n"
+                    f"Navigate to My Matches and press {self.config.get('hotkey', 'F6')}.",
+                )
         except Exception as e:
-            log.error("Sentinel capture error: %s", e, exc_info=True)
+            log.error("Overlay capture error: %s", e, exc_info=True)
+            self._notify(APP_NAME, f"Capture error: {e}")
 
     # ── Hotkey listener ─────────────────────────────────────────────────────
 
     def _register_hotkey(self) -> None:
-        """Register global hotkey (Windows only)."""
+        """Register global hotkeys (Windows only)."""
         try:
             import keyboard
             hotkey = self.config.get("hotkey", "F6")
             keyboard.add_hotkey(hotkey, self._on_hotkey, suppress=False)
-            log.info("Registered hotkey: %s", hotkey)
+            keyboard.add_hotkey("F5", self._on_test_overlay, suppress=False)
+            log.info("Registered hotkeys: %s (capture), F5 (test overlay)", hotkey)
         except ImportError:
             log.warning("keyboard module not available — hotkey disabled")
         except Exception as e:
             log.error("Failed to register hotkey: %s", e)
+
+    def _on_test_overlay(self) -> None:
+        """Test hotkey: show the game-end overlay without sentinel trigger."""
+        log.info("F5 pressed — showing overlay (test)")
+        self._show_overlay()
 
     def _on_hotkey(self) -> None:
         """Handle hotkey press: capture screen, detect type, parse if My Matches."""
@@ -418,6 +453,11 @@ class TrayApp:
 
     def _quit(self, icon, _item=None) -> None:
         self._stop_event.set()
+        if self._overlay:
+            try:
+                self._overlay.dismiss()
+            except Exception:
+                pass
         if self._sentinel:
             try:
                 self._sentinel.stop()

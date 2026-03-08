@@ -6,6 +6,7 @@ to a reference. When the sentinel matches, fires a callback.
 Much cheaper than full-screen capture + OCR every poll cycle.
 """
 
+import ctypes
 import logging
 import threading
 import time
@@ -15,7 +16,31 @@ import numpy as np
 
 log = logging.getLogger("dac")
 
-POLL_INTERVAL = 3  # seconds between checks
+POLL_INTERVAL = 2  # seconds — tiny region sample is negligible CPU
+CONFIRM_DELAY = 2  # seconds to wait and re-check before firing (rendering delay)
+
+# Window title substring that identifies Dota 2
+GAME_WINDOW_TITLE = "Dota 2"
+
+
+def _get_foreground_window_title() -> str:
+    """Return the title of the currently focused window (Windows only)."""
+    try:
+        hwnd = ctypes.windll.user32.GetForegroundWindow()
+        length = ctypes.windll.user32.GetWindowTextLengthW(hwnd)
+        if length == 0:
+            return ""
+        buf = ctypes.create_unicode_buffer(length + 1)
+        ctypes.windll.user32.GetWindowTextW(hwnd, buf, length + 1)
+        return buf.value
+    except Exception:
+        return ""
+
+
+def is_game_focused() -> bool:
+    """Check if the Dota 2 window is currently in the foreground."""
+    title = _get_foreground_window_title()
+    return GAME_WINDOW_TITLE in title
 
 # Final Ranking sentinel — left-side panel element.
 # Coordinates as fractions of screen dimensions.
@@ -90,19 +115,43 @@ class SentinelPoller:
     def _poll_loop(self):
         with mss.mss() as sct:
             monitor = sct.monitors[1]
+            was_focused = False
             while not self._stop_event.is_set():
                 time.sleep(self._interval)
+
+                # Only check sentinel when Dota 2 is in the foreground
+                focused = is_game_focused()
+                if focused and not was_focused:
+                    log.info("Dota 2 focused — sentinel active")
+                elif not focused and was_focused:
+                    log.info("Dota 2 lost focus — sentinel paused")
+                was_focused = focused
+
+                if not focused:
+                    continue
                 try:
                     avg_rgb = _sample_region(sct, monitor, self._sentinel)
                     sim = _rgb_similarity(avg_rgb, self._sentinel["avg_rgb"])
 
                     if sim >= self._threshold:
                         if not self._fired:
-                            log.info("Sentinel '%s' matched (similarity=%.1f%%, rgb=[%d,%d,%d])",
-                                     self._sentinel["name"], sim * 100,
-                                     int(avg_rgb[0]), int(avg_rgb[1]), int(avg_rgb[2]))
-                            self._fired = True
-                            self._on_match()
+                            # Wait and re-check to avoid firing on partially rendered screens
+                            log.debug("Sentinel '%s' preliminary match (%.1f%%) — confirming...",
+                                      self._sentinel["name"], sim * 100)
+                            time.sleep(CONFIRM_DELAY)
+                            if self._stop_event.is_set():
+                                break
+                            avg_rgb2 = _sample_region(sct, monitor, self._sentinel)
+                            sim2 = _rgb_similarity(avg_rgb2, self._sentinel["avg_rgb"])
+                            if sim2 >= self._threshold:
+                                log.info("Sentinel '%s' confirmed (similarity=%.1f%%, rgb=[%d,%d,%d])",
+                                         self._sentinel["name"], sim2 * 100,
+                                         int(avg_rgb2[0]), int(avg_rgb2[1]), int(avg_rgb2[2]))
+                                self._fired = True
+                                self._on_match()
+                            else:
+                                log.debug("Sentinel '%s' confirmation failed (%.1f%%)",
+                                          self._sentinel["name"], sim2 * 100)
                     else:
                         self._fired = False
                 except Exception as e:
