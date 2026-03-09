@@ -10,9 +10,12 @@ import ctypes
 import logging
 import threading
 import time
+from datetime import datetime
+from pathlib import Path
 
 import mss
 import numpy as np
+from PIL import Image
 
 log = logging.getLogger("dac")
 
@@ -112,6 +115,20 @@ class SentinelPoller:
         """Stop the polling loop."""
         self._stop_event.set()
 
+    def _save_debug_screenshot(self, sct, monitor):
+        """Save a full-screen screenshot when sentinel fires for debugging."""
+        try:
+            debug_dir = Path.home() / ".dac" / "sentinel_debug"
+            debug_dir.mkdir(parents=True, exist_ok=True)
+            ts = datetime.now().strftime("%Y%m%d_%H%M%S")
+            path = debug_dir / f"sentinel_{ts}.png"
+            shot = sct.grab(monitor)
+            img = Image.frombytes("RGB", shot.size, shot.bgra, "raw", "BGRX")
+            img.save(str(path))
+            log.info("Sentinel debug screenshot saved: %s", path)
+        except Exception as e:
+            log.warning("Failed to save debug screenshot: %s", e)
+
     def _poll_loop(self):
         with mss.mss() as sct:
             monitor = sct.monitors[1]
@@ -147,6 +164,8 @@ class SentinelPoller:
                                 log.info("Sentinel '%s' confirmed (similarity=%.1f%%, rgb=[%d,%d,%d])",
                                          self._sentinel["name"], sim2 * 100,
                                          int(avg_rgb2[0]), int(avg_rgb2[1]), int(avg_rgb2[2]))
+                                # Save debug screenshot for verification
+                                self._save_debug_screenshot(sct, monitor)
                                 self._fired = True
                                 self._on_match()
                             else:

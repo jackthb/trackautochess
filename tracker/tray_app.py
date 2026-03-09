@@ -548,9 +548,34 @@ def _kill_existing():
 
 
 def main():
-    _kill_existing()
-    app = TrayApp()
-    app.run()
+    import traceback
+    crash_log = Path.home() / ".dac" / "crash.log"
+    crash_log.parent.mkdir(parents=True, exist_ok=True)
+    try:
+        _kill_existing()
+        # Catch unhandled exceptions so crashes get logged (pythonw has no console)
+        def _excepthook(exc_type, exc_value, exc_tb):
+            log.critical("Unhandled exception", exc_info=(exc_type, exc_value, exc_tb))
+            with open(crash_log, "a", encoding="utf-8") as f:
+                f.write(f"\n{'='*60}\n{datetime.now()}\n")
+                traceback.print_exception(exc_type, exc_value, exc_tb, file=f)
+        sys.excepthook = _excepthook
+        # Also catch unhandled exceptions in threads
+        def _thread_excepthook(args):
+            log.critical("Unhandled thread exception in %s", args.thread.name if args.thread else "unknown",
+                         exc_info=(args.exc_type, args.exc_value, args.exc_traceback))
+            with open(crash_log, "a", encoding="utf-8") as f:
+                f.write(f"\n{'='*60}\n{datetime.now()} [thread: {args.thread.name if args.thread else '?'}]\n")
+                traceback.print_exception(args.exc_type, args.exc_value, args.exc_traceback, file=f)
+        threading.excepthook = _thread_excepthook
+
+        app = TrayApp()
+        app.run()
+    except Exception:
+        with open(crash_log, "a", encoding="utf-8") as f:
+            f.write(f"\n{'='*60}\n{datetime.now()} [FATAL]\n")
+            traceback.print_exc(file=f)
+        raise
 
 
 if __name__ == "__main__":
