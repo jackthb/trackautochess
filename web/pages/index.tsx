@@ -17,6 +17,16 @@ interface Game {
   created_at: string;
 }
 
+interface DrodoProfile {
+  mmr: number | null;
+  max_mmr: number | null;
+  mmr_level: number | null;
+  season: string | null;
+  season_games: number | null;
+  chicken_count: number | null;
+  fetched_at: string | null;
+}
+
 interface HomeProps {
   supabase: SupabaseClient | null;
 }
@@ -42,6 +52,15 @@ function rankTier(rank: string | null): string {
 
 function unitStem(name: string): string {
   return name.toLowerCase().replace(/ /g, "_").replace(/-/g, "_").replace(/'/g, "");
+}
+
+function relicStem(name: string): string {
+  return name.toLowerCase().replace(/ /g, "_").replace(/-/g, "_");
+}
+
+function parseRelics(relic: string | null): string[] {
+  if (!relic) return [];
+  return relic.split("|").filter(Boolean);
 }
 
 function parseLineup(lineup: string | null): { name: string; stars: number }[] {
@@ -85,6 +104,8 @@ export default function Home({ supabase }: HomeProps) {
   const [loading, setLoading] = useState(true);
   const [games, setGames] = useState<Game[]>([]);
   const [gamesLoading, setGamesLoading] = useState(false);
+  const [drodo, setDrodo] = useState<DrodoProfile | null>(null);
+  const [drodoLoading, setDrodoLoading] = useState(false);
 
   useEffect(() => {
     if (!supabase) return;
@@ -99,6 +120,15 @@ export default function Home({ supabase }: HomeProps) {
     });
     return () => subscription.unsubscribe();
   }, [supabase]);
+
+  const fetchDrodo = (steamId: string, refresh?: boolean) => {
+    setDrodoLoading(true);
+    fetch(`/api/drodo/${steamId}${refresh ? "?refresh=1" : ""}`)
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data) => { if (data) setDrodo(data); })
+      .catch(() => {})
+      .finally(() => setDrodoLoading(false));
+  };
 
   useEffect(() => {
     if (!supabase || !user) return;
@@ -115,6 +145,8 @@ export default function Home({ supabase }: HomeProps) {
         setGames((data as Game[]) || []);
         setGamesLoading(false);
       });
+
+    fetchDrodo(steamId);
   }, [supabase, user]);
 
   const handleLogout = async () => {
@@ -135,21 +167,11 @@ export default function Home({ supabase }: HomeProps) {
     const avg = placements.reduce((a, b) => a + b, 0) / placements.length;
     const top4 = placements.filter((p) => p >= 1 && p <= 4).length;
     const top1 = placements.filter((p) => p === 1).length;
-    const totalWins = games.reduce((sum, g) => {
-      const wl = parseWL(g.wl);
-      return sum + (wl?.w || 0);
-    }, 0);
-    const totalLosses = games.reduce((sum, g) => {
-      const wl = parseWL(g.wl);
-      return sum + (wl?.l || 0);
-    }, 0);
     return {
       total: games.length,
       avg: avg.toFixed(1),
       top4pct: ((top4 / games.length) * 100).toFixed(0),
       top1,
-      totalWins,
-      totalLosses,
     };
   }, [games]);
 
@@ -333,6 +355,37 @@ export default function Home({ supabase }: HomeProps) {
           color: var(--text-muted);
         }
 
+        /* ── Refresh row ── */
+        .refresh-row {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          margin-bottom: 24px;
+        }
+        .btn-refresh {
+          font-family: inherit;
+          font-size: 11px;
+          color: var(--text-muted);
+          background: none;
+          border: 1px solid var(--border);
+          padding: 5px 14px;
+          cursor: pointer;
+          letter-spacing: 0.5px;
+          transition: all 0.2s;
+        }
+        .btn-refresh:hover:not(:disabled) {
+          color: var(--text-secondary);
+          border-color: var(--text-muted);
+        }
+        .btn-refresh:disabled {
+          opacity: 0.5;
+          cursor: default;
+        }
+        .refresh-time {
+          font-size: 10px;
+          color: var(--text-muted);
+        }
+
         /* ── Table ── */
         .table-wrap {
           border: 1px solid var(--border);
@@ -340,7 +393,7 @@ export default function Home({ supabase }: HomeProps) {
         }
         .table-header {
           display: grid;
-          grid-template-columns: 56px 1fr 100px 80px 80px 100px;
+          grid-template-columns: 56px 1fr 100px 80px 120px 100px;
           padding: 0 16px;
           background: var(--bg-surface);
           border-bottom: 1px solid var(--border);
@@ -360,7 +413,7 @@ export default function Home({ supabase }: HomeProps) {
         .game-entry:hover { background: var(--bg-hover); }
         .game-row {
           display: grid;
-          grid-template-columns: 56px 1fr 100px 80px 80px 100px;
+          grid-template-columns: 56px 1fr 100px 80px 120px 100px;
           padding: 0 16px;
           align-items: center;
         }
@@ -486,6 +539,23 @@ export default function Home({ supabase }: HomeProps) {
           color: var(--text-secondary);
           font-weight: 600;
         }
+        .relics-cell {
+          display: flex;
+          align-items: center;
+        }
+        .relics {
+          display: flex;
+          gap: 3px;
+          align-items: center;
+        }
+        .relic-icon {
+          width: 22px;
+          height: 22px;
+          border-radius: 3px;
+          border: 1px solid var(--border);
+          object-fit: cover;
+          background: var(--bg-surface);
+        }
         .empty-state {
           text-align: center;
           padding: 64px 24px;
@@ -578,18 +648,37 @@ export default function Home({ supabase }: HomeProps) {
                       <div className="stat-value gold">{stats.top1}</div>
                       <div className="stat-label">Wins</div>
                     </div>
-                    <div className="stat-cell">
-                      <div className="stat-value">{stats.totalWins}</div>
-                      <div className="stat-label">Round W</div>
-                    </div>
-                    <div className="stat-cell">
-                      <div className="stat-value" style={{ color: "var(--red)" }}>
-                        {stats.totalLosses}
+                    {drodo && drodo.mmr != null && (
+                      <div className="stat-cell">
+                        <div className="stat-value">{drodo.mmr}</div>
+                        <div className="stat-label">MMR</div>
                       </div>
-                      <div className="stat-label">Round L</div>
-                    </div>
+                    )}
+                    {drodo && drodo.max_mmr != null && (
+                      <div className="stat-cell">
+                        <div className="stat-value gold">{drodo.max_mmr}</div>
+                        <div className="stat-label">Peak MMR</div>
+                      </div>
+                    )}
                   </div>
                 )}
+                <div className="refresh-row fade-up">
+                  <button
+                    className="btn-refresh"
+                    disabled={drodoLoading}
+                    onClick={() => {
+                      const steamId = user?.user_metadata?.steam_id;
+                      if (steamId) fetchDrodo(steamId, true);
+                    }}
+                  >
+                    {drodoLoading ? "Refreshing..." : "Refresh stats"}
+                  </button>
+                  {drodo?.fetched_at && (
+                    <span className="refresh-time">
+                      Updated {new Date(drodo.fetched_at).toLocaleString()}
+                    </span>
+                  )}
+                </div>
 
                 <div className="table-wrap fade-up delay-1">
                   <div className="table-header">
@@ -649,8 +738,27 @@ export default function Home({ supabase }: HomeProps) {
                           <div className="cell level-cell">
                             {g.level || "—"}
                           </div>
-                          <div className="cell" style={{ fontSize: 11, color: "var(--text-muted)" }}>
-                            {g.relic || "—"}
+                          <div className="cell relics-cell">
+                            {parseRelics(g.relic).length > 0 ? (
+                              <div className="relics">
+                                {parseRelics(g.relic).map((r, i) => (
+                                  <img
+                                    key={i}
+                                    className="relic-icon"
+                                    src={`/icons/relics/${relicStem(r)}.png`}
+                                    alt={r}
+                                    title={r}
+                                    loading="lazy"
+                                    onError={(e) => {
+                                      const el = e.target as HTMLImageElement;
+                                      el.style.display = "none";
+                                    }}
+                                  />
+                                ))}
+                              </div>
+                            ) : (
+                              <span style={{ color: "var(--text-muted)" }}>—</span>
+                            )}
                           </div>
                           <div className="cell date-cell">
                             {g.date}
