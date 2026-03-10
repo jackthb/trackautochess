@@ -452,6 +452,7 @@ class TrayApp:
         self._notify(APP_NAME, f"Start with Windows: {state}")
 
     def _quit(self, icon, _item=None) -> None:
+        log.info("Quit requested — shutting down")
         self._stop_event.set()
         if self._overlay:
             try:
@@ -548,9 +549,18 @@ def _kill_existing():
 
 
 def main():
+    import atexit
     import traceback
     crash_log = Path.home() / ".dac" / "crash.log"
     crash_log.parent.mkdir(parents=True, exist_ok=True)
+
+    def _on_exit():
+        log.info("Process exiting")
+        # Also write to crash.log in case the log handler is gone
+        with open(crash_log, "a", encoding="utf-8") as f:
+            f.write(f"\n{datetime.now()} — process exiting normally\n")
+    atexit.register(_on_exit)
+
     try:
         _kill_existing()
         # Catch unhandled exceptions so crashes get logged (pythonw has no console)
