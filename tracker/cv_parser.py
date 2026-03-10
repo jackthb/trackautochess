@@ -260,11 +260,12 @@ def _load_icon(path: Path, inner_frac: float = 1.0, color: bool = False) -> np.n
     img = cv2.imread(str(path), cv2.IMREAD_UNCHANGED)
     if img is None:
         return None
-    # Convert RGBA → BGR (composite on black)
+    # Convert RGBA → BGR (composite on table background colour)
     if len(img.shape) == 3 and img.shape[2] == 4:
         alpha = img[:, :, 3] / 255.0
         bgr = img[:, :, :3].astype(float)
-        bgr = (bgr * alpha[:, :, np.newaxis]).astype(np.uint8)
+        bg = np.array([57, 39, 38], dtype=np.float64)  # MY MATCHES table bg #262739
+        bgr = (bgr * alpha[:, :, np.newaxis] + bg * (1 - alpha[:, :, np.newaxis])).astype(np.uint8)
         img = bgr
     # Crop inner portion to remove border/edge artifacts
     if inner_frac < 1.0:
@@ -364,6 +365,68 @@ def _match_templates_multiscale(
     return kept
 
 
+def _match_slot_zone(region_bgr, slot_idx, grid_start, grid_spacing, zy0, zy1,
+                     templates, threshold):
+    """Match one slot in a cropped y-zone. Returns (name, score, x, y) or None."""
+    rw = region_bgr.shape[1]
+    sx = grid_start + slot_idx * grid_spacing
+    crop_x0 = max(sx - 5, 0)
+    crop_x1 = min(sx + grid_spacing + 5, rw)
+    slot_img = region_bgr[zy0:zy1, crop_x0:crop_x1]
+    if slot_img.size == 0:
+        return None
+
+    best: tuple[str, float, int, int] | None = None
+    for name, tmpls in templates.items():
+        for tmpl in tmpls:
+            th, tw = tmpl.shape[:2]
+            if slot_img.shape[0] < th or slot_img.shape[1] < tw:
+                continue
+            result = np.zeros((slot_img.shape[0] - th + 1,
+                               slot_img.shape[1] - tw + 1), dtype=np.float32)
+            for ch in range(3):
+                result += cv2.matchTemplate(slot_img[:, :, ch], tmpl[:, :, ch],
+                                            cv2.TM_CCOEFF_NORMED)
+            result /= 3.0
+            _, max_val, _, max_loc = cv2.minMaxLoc(result)
+            if max_val < threshold:
+                continue
+            if best is None or max_val > best[1]:
+                best = (name, float(max_val), sx, zy0 + max_loc[1])
+    return best
+
+
+def _detect_two_row(region_bgr, grid_start, grid_spacing, y_mid, rh,
+                    templates):
+    """Check if slot 0 bottom half has a strong match (>=0.9).
+
+    If the first column's bottom half has a confident unit match, the row
+    has a two-row layout (10+ units). A high threshold avoids false positives
+    from dark templates matching empty background.
+    """
+    rw = region_bgr.shape[1]
+    crop_x0 = max(grid_start - 5, 0)
+    crop_x1 = min(grid_start + grid_spacing + 5, rw)
+    slot_img = region_bgr[y_mid:rh, crop_x0:crop_x1]
+    if slot_img.size == 0:
+        return False
+    for name, tmpls in templates.items():
+        for tmpl in tmpls:
+            th, tw = tmpl.shape[:2]
+            if slot_img.shape[0] < th or slot_img.shape[1] < tw:
+                continue
+            result = np.zeros((slot_img.shape[0] - th + 1,
+                               slot_img.shape[1] - tw + 1), dtype=np.float32)
+            for ch in range(3):
+                result += cv2.matchTemplate(slot_img[:, :, ch], tmpl[:, :, ch],
+                                            cv2.TM_CCOEFF_NORMED)
+            result /= 3.0
+            _, max_val, _, _ = cv2.minMaxLoc(result)
+            if max_val >= 0.80:
+                return True
+    return False
+
+
 def _match_unit_grid(
     unit_region: np.ndarray,
     templates: dict[str, list[np.ndarray]],
@@ -372,11 +435,10 @@ def _match_unit_grid(
 ) -> list[tuple[str, float, int, int]]:
     """Per-slot unit matching against individual grid cells.
 
-    Matches each slot against the full row height. Templates are small
-    enough to find icons whether they're in a single-row or two-row layout.
-    Uses matchTemplate which naturally finds the best y-position within
-    the slot. Assigns to top/bottom zone based on match y-position to
-    allow two units per slot in two-row layouts.
+    Detects one-row vs two-row layout first:
+    - One-row (≤9 units): icons sit in middle band. Match each slot once.
+    - Two-row (10+ units): icons in top and bottom halves. Split at y_mid,
+      match each half independently. One match per slot per half.
 
     Returns [(name, score, x, y), ...] sorted by y then x.
     """
@@ -387,43 +449,28 @@ def _match_unit_grid(
     grid_spacing = max(int(rw * MM_UNIT_GRID_SPACING_FRAC), 1)
     y_mid = int(rh * MM_UNIT_SPLIT_Y)
 
-    # Match each slot against full row height
-    # cell_best keyed by (slot_idx, y_zone) to allow two matches per slot
-    cell_best: dict[tuple[int, int], tuple[str, float, int, int]] = {}
-    for slot_idx in range(MM_UNIT_MAX_SLOTS):
-        sx = grid_start + slot_idx * grid_spacing
-        crop_x0 = max(sx - 5, 0)
-        crop_x1 = min(sx + grid_spacing + 5, rw)
-        slot_img = region_bgr[0:rh, crop_x0:crop_x1]
-        if slot_img.size == 0:
-            continue
+    two_row = _detect_two_row(region_bgr, grid_start, grid_spacing, y_mid, rh,
+                              templates)
 
-        for name, tmpls in templates.items():
-            for tmpl in tmpls:
-                th, tw = tmpl.shape[:2]
-                if slot_img.shape[0] < th or slot_img.shape[1] < tw:
-                    continue
-                result = np.zeros((slot_img.shape[0] - th + 1,
-                                   slot_img.shape[1] - tw + 1), dtype=np.float32)
-                for ch in range(3):
-                    result += cv2.matchTemplate(slot_img[:, :, ch], tmpl[:, :, ch],
-                                                cv2.TM_CCOEFF_NORMED)
-                result /= 3.0
-                _, max_val, _, max_loc = cv2.minMaxLoc(result)
-                if max_val < threshold:
-                    continue
-                match_y = max_loc[1]
-                y_zone = 0 if match_y < y_mid else 1
-                key = (slot_idx, y_zone)
-                if key not in cell_best or max_val > cell_best[key][1]:
-                    cell_best[key] = (name, float(max_val), sx, match_y)
+    if two_row:
+        zones = [(0, y_mid, "top"), (y_mid, rh, "bot")]
+    else:
+        # Single row — icons centred vertically
+        oy0 = int(rh * MM_UNIT_ONE_ROW_Y[0])
+        oy1 = int(rh * MM_UNIT_ONE_ROW_Y[1])
+        zones = [(oy0, oy1, "row")]
+
+    log.debug(f"    layout={'two-row' if two_row else 'one-row'}, zones={[(l, y0, y1) for y0, y1, l in zones]}")
 
     all_matches = []
-    for (slot_idx, y_zone) in sorted(cell_best):
-        name, score, x, y = cell_best[(slot_idx, y_zone)]
-        zone_label = "top" if y_zone == 0 else "bot"
-        all_matches.append((name, score, x, y))
-        log.debug(f"    slot {zone_label}[{slot_idx}]: {name:20s} score={score:.3f}")
+    for zy0, zy1, zone_label in zones:
+        for slot_idx in range(MM_UNIT_MAX_SLOTS):
+            m = _match_slot_zone(region_bgr, slot_idx, grid_start, grid_spacing,
+                                 zy0, zy1, templates, threshold)
+            if m:
+                all_matches.append(m)
+                log.debug(f"    slot {zone_label}[{slot_idx}]: {m[0]:20s} score={m[1]:.3f}")
+
     all_matches.sort(key=lambda m: (m[3], m[2]))
     return all_matches
 
@@ -864,8 +911,9 @@ def _find_my_matches_rows(img: np.ndarray, debug: bool = False) -> list[tuple[fl
 
         # Extrapolate beyond last detected separator using median row height.
         # Allow partial rows (at least 50% of row height remaining).
+        # Cap at 7 rows — MY MATCHES shows 7 opponents max.
         last_sep = sep_zones[-1][1]  # end of last separator band
-        while last_sep + row_h_px * 0.5 < h:
+        while len(rows) < 7 and last_sep + row_h_px * 0.5 < h:
             r_y0 = last_sep / h
             r_y1 = min((last_sep + row_h_px) / h, 1.0)
             rows.append((r_y0, r_y1))

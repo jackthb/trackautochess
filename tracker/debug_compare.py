@@ -13,7 +13,7 @@ from cv_parser import (
     MM_UNIT_MAX_SLOTS, MM_UNIT_SPLIT_Y, MM_UNIT_ONE_ROW_Y,
     UNIT_ICON_SCALES, UNIT_MATCH_THRESHOLD,
     MM_COL_PLACEMENT,
-    _load_templates_multiscale, _find_my_matches_rows,
+    _load_templates_multiscale, _find_my_matches_rows, _detect_two_row,
 )
 from utils import crop as _crop
 
@@ -51,12 +51,13 @@ def match_slot_top5(slot_img, templates):
 def render_row(img, row_idx, row_y0, row_y1, unit_templates, grid_start, grid_spacing):
     """Generate HTML for one row's unit matching debug.
 
-    Uses the same full-height per-slot matching as _match_unit_grid in the parser.
+    Detects one-row vs two-row layout, then crops each zone and matches
+    slots independently — same logic as the parser's _match_unit_grid.
     """
     unit_region = _crop(img, MM_COL_UNITS[0], row_y0, MM_COL_UNITS[1], row_y1)
     context_region = _crop(img, MM_COL_PLACEMENT[0], row_y0, MM_COL_UNITS[1], row_y1)
     ur_h, ur_w = unit_region.shape[:2]
-    y_split = int(ur_h * MM_UNIT_SPLIT_Y)
+    y_mid = int(ur_h * MM_UNIT_SPLIT_Y)
 
     # Context image
     context_b64 = img_to_b64(context_region, scale=3)
@@ -66,34 +67,26 @@ def render_row(img, row_idx, row_y0, row_y1, unit_templates, grid_start, grid_sp
     for slot in range(MM_UNIT_MAX_SLOTS):
         sx = grid_start + slot * grid_spacing
         cv2.line(annotated, (sx, 0), (sx, ur_h), (0, 255, 0), 1)
-    cv2.line(annotated, (0, y_split), (ur_w, y_split), (0, 200, 255), 1)
+    cv2.line(annotated, (0, y_mid), (ur_w, y_mid), (0, 200, 255), 1)
     annotated_b64 = img_to_b64(annotated, scale=3)
 
-    # Determine layout: check if any slot has a match in the bottom half
-    has_bottom = False
-    for slot_idx in range(MM_UNIT_MAX_SLOTS):
-        sx = grid_start + slot_idx * grid_spacing
-        crop_x0 = max(sx - 5, 0)
-        crop_x1 = min(sx + grid_spacing + 5, ur_w)
-        bot_img = unit_region[y_split:ur_h, crop_x0:crop_x1]
-        if bot_img.size == 0:
-            continue
-        top5 = match_slot_top5(bot_img, unit_templates)
-        if top5 and top5[0][1] >= UNIT_MATCH_THRESHOLD:
-            has_bottom = True
-            break
+    # Detect two-row layout using parser's function
+    has_bottom = _detect_two_row(unit_region, grid_start, grid_spacing, y_mid, ur_h,
+                                 unit_templates)
 
     if has_bottom:
-        sub_rows = [("top", 0, y_split), ("bot", y_split, ur_h)]
+        zones = [("top", 0, y_mid), ("bot", y_mid, ur_h)]
         layout_label = "two-row"
     else:
-        sub_rows = [("row", 0, ur_h)]
+        oy0 = int(ur_h * MM_UNIT_ONE_ROW_Y[0])
+        oy1 = int(ur_h * MM_UNIT_ONE_ROW_Y[1])
+        zones = [("row", oy0, oy1)]
         layout_label = "one-row"
 
-    # Per-slot matching
+    # Per-slot matching within each zone
     detected = []
     slots_html = ""
-    for zone_label, zy0, zy1 in sub_rows:
+    for zone_label, zy0, zy1 in zones:
         for slot in range(MM_UNIT_MAX_SLOTS):
             sx = grid_start + slot * grid_spacing
             crop_x0 = max(sx - 5, 0)
@@ -126,7 +119,7 @@ def render_row(img, row_idx, row_y0, row_y1, unit_templates, grid_start, grid_sp
                 <div style="color:#888;margin-bottom:6px">{zone_label}[{slot}] (x={sx}px)</div>
                 <div style="display:flex;gap:20px;align-items:flex-start">
                     <div>
-                        <div style="color:#aaa;font-size:12px;margin-bottom:4px">Actual (4x zoom)</div>
+                        <div style="color:#aaa;font-size:12px;margin-bottom:4px">Crop (4x zoom)</div>
                         <img src="data:image/png;base64,{zone_b64}" style="border:2px solid #666">
                     </div>
                     <div>
@@ -145,14 +138,17 @@ def render_row(img, row_idx, row_y0, row_y1, unit_templates, grid_start, grid_sp
         <p style="color:#0f0">Detected: {detected_str}</p>
         <h3>Context (3x zoom)</h3>
         <img src="data:image/png;base64,{context_b64}" style="border:2px solid #888"><br>
-        <h3>Grid overlay (3x zoom)</h3>
+        <h3>Grid overlay (3x zoom) <span style="color:#0cf;font-size:12px">(orange line = y_mid split)</span></h3>
         <img src="data:image/png;base64,{annotated_b64}" style="border:2px solid #0f0"><br><br>
         <h3>Per-slot comparison</h3>
         {slots_html}
     </div>"""
 
 def main():
-    screenshot = Path(__file__).parent.parent / "data" / "screenshots" / "my_matches.jpg"
+    if len(sys.argv) > 1:
+        screenshot = Path(sys.argv[1])
+    else:
+        screenshot = Path(__file__).parent.parent / "data" / "screenshots" / "my_matches.jpg"
     icons_dir = Path(__file__).parent.parent / "data" / "icons" / "units"
     img = cv2.imread(str(screenshot))
     h, w = img.shape[:2]
