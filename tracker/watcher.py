@@ -74,7 +74,7 @@ def parse_final_ranking(image_path: Path) -> dict | None:
         try:
             from cv_parser import detect_screen_type, parse_game_over
             if detect_screen_type(img) == "game_over":
-                icons_dir = Path(__file__).parent.parent / "data" / "icons"
+                from utils import ICONS_DIR as icons_dir
                 config = _load_config()
                 return parse_game_over(
                     img, config.get("player_name", "jack"), icons_dir

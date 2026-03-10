@@ -17,6 +17,8 @@ import mss
 import numpy as np
 from PIL import Image
 
+from utils import DATA_DIR
+
 log = logging.getLogger("dac")
 
 POLL_INTERVAL = 3  # seconds
@@ -26,8 +28,7 @@ CONFIRM_DELAY = 2  # seconds to wait and re-check before firing
 GAME_WINDOW_TITLE = "Dota 2"
 
 # Reference template image (cropped from a known Final Ranking screenshot)
-_REF_DIR = Path(__file__).resolve().parent.parent / "data"
-TEMPLATE_PATH = _REF_DIR / "sentinel_ref_final_ranking.png"
+TEMPLATE_PATH = DATA_DIR / "sentinel_ref_final_ranking.png"
 
 # Search region as fractions of screen — slightly larger than the template
 # so matchTemplate has room to slide.

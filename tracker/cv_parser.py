@@ -1189,7 +1189,7 @@ def parse_my_matches(
     log.debug(f"[mm] Image: {w}×{h}")
     # Load units data if not provided
     if units_data is None:
-        data_dir = Path(__file__).parent.parent / "data"
+        from utils import DATA_DIR as data_dir
         units_path = data_dir / "units.json"
         if units_path.exists():
             import json

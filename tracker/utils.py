@@ -1,6 +1,7 @@
 """Shared utility functions for the DAC tracker."""
 
 import json
+import sys
 from pathlib import Path
 
 
@@ -8,7 +9,15 @@ from pathlib import Path
 
 DAC_DIR = Path.home() / ".dac"
 CONFIG_PATH = DAC_DIR / "config.json"
-ICONS_DIR = Path(__file__).parent.parent / "data" / "icons"
+
+def _data_dir() -> Path:
+    """Return the data/ directory, works both in dev and PyInstaller bundle."""
+    if getattr(sys, "frozen", False):
+        return Path(sys._MEIPASS) / "data"
+    return Path(__file__).resolve().parent.parent / "data"
+
+DATA_DIR = _data_dir()
+ICONS_DIR = DATA_DIR / "icons"
 
 
 # ── Config ────────────────────────────────────────────────────────────────────
