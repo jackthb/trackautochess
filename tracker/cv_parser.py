@@ -930,25 +930,73 @@ def _find_my_matches_rows(img: np.ndarray, debug: bool = False) -> list[tuple[fl
     return rows
 
 
+def _load_synergy_tiers() -> dict[str, list[int]]:
+    """Load synergy name → tier thresholds from data/synergies.json."""
+    syn_path = Path(__file__).parent.parent / "data" / "synergies.json"
+    if not syn_path.exists():
+        return {}
+    import json
+    raw = json.loads(syn_path.read_text())
+    return {v["name"]: sorted(v["tiers"]) for v in raw.values() if v.get("tiers")}
+
+
+_SYNERGY_TIERS: dict[str, list[int]] | None = None
+
+
+def _get_synergy_tiers() -> dict[str, list[int]]:
+    global _SYNERGY_TIERS
+    if _SYNERGY_TIERS is None:
+        _SYNERGY_TIERS = _load_synergy_tiers()
+    return _SYNERGY_TIERS
+
+
+def _snap_to_tier(count: int, tiers: list[int]) -> int | None:
+    """Snap a raw unit count down to the highest active tier threshold.
+
+    Returns None if count doesn't reach the lowest tier.
+    """
+    active = None
+    for t in tiers:
+        if count >= t:
+            active = t
+        else:
+            break
+    return active
+
+
 def _synergies_from_units(unit_names: list[str], units_data: dict) -> str:
-    """Count synergies by summing each unit's synergy memberships.
+    """Count synergies and snap to active tier thresholds.
 
-    Returns 'Warlock:4|Demon Hunter:2|...' sorted by count descending.
-
-    NOTE: This only counts synergies from the units on board. Certain relics
-    act as phantom synergy contributors (e.g. Minotaur Horn = +1 Tauren,
-    Spider Legs = +1 Aqir, Wheel = varies) and will cause the actual in-game
-    synergy threshold to appear higher than what this function returns.
-    Callers should treat these counts as a lower bound.
+    Returns 'Warlock:4|Demon Hunter:2|...' sorted by tier descending.
+    Only includes synergies that reach at least their lowest tier.
     """
     from collections import Counter
+    # Build lookup: snake_case template name -> units_data entry
+    # units_data keys are display names ("Sand King"), template names are snake_case ("sand_king")
+    _lookup: dict[str, dict] = {}
+    for display_name, data in units_data.items():
+        snake = display_name.lower().replace(" ", "_").replace("-", "_")
+        _lookup[snake] = data
+        _lookup[display_name] = data
     counts: Counter = Counter()
     for name in unit_names:
-        unit = units_data.get(name)
+        unit = _lookup.get(name) or _lookup.get(name.lower().replace(" ", "_").replace("-", "_"))
         if unit:
             for syn in unit.get("synergies", []):
                 counts[syn] += 1
-    pairs = sorted(counts.items(), key=lambda x: -x[1])
+    tiers = _get_synergy_tiers()
+    pairs = []
+    for syn_name, raw_count in counts.items():
+        tier_list = tiers.get(syn_name)
+        if tier_list:
+            active = _snap_to_tier(raw_count, tier_list)
+            if active is not None:
+                pairs.append((syn_name, active))
+        else:
+            # No tier data — include raw count if >= 1
+            if raw_count >= 1:
+                pairs.append((syn_name, raw_count))
+    pairs.sort(key=lambda x: -x[1])
     return "|".join(f"{s}:{c}" for s, c in pairs)
 
 
