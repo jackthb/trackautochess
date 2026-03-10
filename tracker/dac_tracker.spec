@@ -28,6 +28,7 @@ TESSERACT_DIR = os.path.join(os.path.dirname(TRACKER_DIR), "tesseract-portable")
 # Bundled data files: (source, dest_in_bundle)
 datas = [
     (os.path.join(DATA_DIR, "icons"), os.path.join("data", "icons")),
+    (os.path.join(DATA_DIR, "sentinel_ref_final_ranking.png"), "data"),
     (os.path.join(DATA_DIR, "units.json"), "data"),
     (os.path.join(DATA_DIR, "items.json"), "data"),
     (os.path.join(DATA_DIR, "relics.json"), "data"),
