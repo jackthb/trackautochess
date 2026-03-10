@@ -20,6 +20,29 @@ function currentSeason(data: Record<string, unknown>): string | null {
   return season || null;
 }
 
+function extractAllSeasons(
+  steamId: string,
+  data: Record<string, unknown>
+): { steam_id: string; season: string; mmr: number | null; max_mmr: number | null; games_played: number | null; fetched_at: string }[] {
+  const now = new Date().toISOString();
+  const seasons: ReturnType<typeof extractAllSeasons> = [];
+  for (const key of Object.keys(data)) {
+    const m = key.match(/^mmr_s(\d+)$/);
+    if (m) {
+      const n = m[1];
+      seasons.push({
+        steam_id: steamId,
+        season: `s${n}`,
+        mmr: Number(data[`mmr_s${n}`]) || null,
+        max_mmr: Number(data[`max_mmr_s${n}`]) || null,
+        games_played: Number(data[`match_s${n}`]) || null,
+        fetched_at: now,
+      });
+    }
+  }
+  return seasons;
+}
+
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { steamId, refresh } = req.query;
   if (!steamId || typeof steamId !== "string" || !/^\d+$/.test(steamId)) {
@@ -44,7 +67,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       const fetchedDate = new Date(cached.fetched_at).toDateString();
       const today = new Date().toDateString();
       if (fetchedDate === today) {
-        return res.status(200).json(cached);
+        const { data: seasons } = await supabase
+          .from("player_seasons")
+          .select("season, mmr, max_mmr, games_played")
+          .eq("steam_id", steamId)
+          .order("season", { ascending: true });
+        return res.status(200).json({ ...cached, seasons: seasons ?? [] });
       }
     }
   }
@@ -90,5 +118,23 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     console.error("Failed to cache drodo profile:", upsertError.message);
   }
 
-  return res.status(200).json(profile);
+  // Upsert all season snapshots
+  const seasonRows = extractAllSeasons(steamId, drodoData);
+  if (seasonRows.length > 0) {
+    const { error: seasonsError } = await supabase
+      .from("player_seasons")
+      .upsert(seasonRows, { onConflict: "steam_id,season" });
+    if (seasonsError) {
+      console.error("Failed to upsert player_seasons:", seasonsError.message);
+    }
+  }
+
+  // Fetch full season history from DB (includes previously saved seasons)
+  const { data: seasons } = await supabase
+    .from("player_seasons")
+    .select("season, mmr, max_mmr, games_played")
+    .eq("steam_id", steamId)
+    .order("season", { ascending: true });
+
+  return res.status(200).json({ ...profile, seasons: seasons ?? [] });
 }

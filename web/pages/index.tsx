@@ -17,6 +17,13 @@ interface Game {
   created_at: string;
 }
 
+interface SeasonSnapshot {
+  season: string;
+  mmr: number | null;
+  max_mmr: number | null;
+  games_played: number | null;
+}
+
 interface DrodoProfile {
   mmr: number | null;
   max_mmr: number | null;
@@ -25,6 +32,7 @@ interface DrodoProfile {
   season_games: number | null;
   chicken_count: number | null;
   fetched_at: string | null;
+  seasons?: SeasonSnapshot[];
 }
 
 interface HomeProps {
@@ -97,6 +105,14 @@ function parseWL(wl: string | null): { w: number; l: number } | null {
   const parts = wl.split("-");
   if (parts.length !== 2) return null;
   return { w: parseInt(parts[0]) || 0, l: parseInt(parts[1]) || 0 };
+}
+
+const TIER_NAMES = ["Pawn", "Knight", "Rook", "Bishop", "King", "Queen"];
+function mmrLevelToTier(level: number | null): string {
+  if (level == null) return "";
+  const tier = TIER_NAMES[Math.floor(level / 3)] ?? "Queen";
+  const sub = (level % 3) + 1;
+  return `${tier} ${sub}`;
 }
 
 export default function Home({ supabase }: HomeProps) {
@@ -599,6 +615,54 @@ export default function Home({ supabase }: HomeProps) {
         .delay-1 { animation-delay: 0.1s; }
         .delay-2 { animation-delay: 0.2s; }
         .delay-3 { animation-delay: 0.3s; }
+
+        /* ── Season History ── */
+        .section-title {
+          font-size: 10px;
+          letter-spacing: 2px;
+          text-transform: uppercase;
+          color: var(--text-muted);
+          margin: 32px 0 12px;
+          padding-bottom: 8px;
+          border-bottom: 1px solid var(--border-subtle);
+        }
+        .seasons-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+          gap: 1px;
+          background: var(--border-subtle);
+          border: 1px solid var(--border);
+          margin-bottom: 32px;
+        }
+        .season-card {
+          background: var(--bg-surface);
+          padding: 16px;
+        }
+        .season-label {
+          font-size: 10px;
+          letter-spacing: 1.5px;
+          text-transform: uppercase;
+          color: var(--text-muted);
+          margin-bottom: 8px;
+        }
+        .season-mmr {
+          font-size: 22px;
+          font-weight: 700;
+          color: var(--text-primary);
+          margin-bottom: 2px;
+        }
+        .season-tier {
+          font-size: 11px;
+          color: var(--gold-dim);
+          margin-bottom: 6px;
+        }
+        .season-meta {
+          font-size: 10px;
+          color: var(--text-muted);
+        }
+        .season-peak {
+          color: var(--gold);
+        }
       `}</style>
 
       <div className="page">
@@ -651,7 +715,11 @@ export default function Home({ supabase }: HomeProps) {
                     {drodo && drodo.mmr != null && (
                       <div className="stat-cell">
                         <div className="stat-value">{drodo.mmr}</div>
-                        <div className="stat-label">MMR</div>
+                        <div className="stat-label">
+                          {drodo.mmr_level != null
+                            ? mmrLevelToTier(drodo.mmr_level)
+                            : "MMR"}
+                        </div>
                       </div>
                     )}
                     {drodo && drodo.max_mmr != null && (
@@ -662,6 +730,32 @@ export default function Home({ supabase }: HomeProps) {
                     )}
                   </div>
                 )}
+                {drodo?.seasons && drodo.seasons.length > 1 && (
+                  <div className="fade-up delay-1">
+                    <div className="section-title">Season History</div>
+                    <div className="seasons-grid">
+                      {[...drodo.seasons].reverse().map((s) => (
+                        <div key={s.season} className="season-card">
+                          <div className="season-label">{s.season.toUpperCase()}</div>
+                          {s.mmr != null ? (
+                            <div className="season-mmr">{s.mmr}</div>
+                          ) : (
+                            <div className="season-mmr" style={{ color: "var(--text-muted)" }}>—</div>
+                          )}
+                          {s.max_mmr != null && (
+                            <div className="season-meta">
+                              Peak <span className="season-peak">{s.max_mmr}</span>
+                            </div>
+                          )}
+                          {s.games_played != null && (
+                            <div className="season-meta">{s.games_played} games</div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
                 <div className="refresh-row fade-up">
                   <button
                     className="btn-refresh"
