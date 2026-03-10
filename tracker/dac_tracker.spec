@@ -25,19 +25,49 @@ DATA_DIR = os.path.join(ROOT_DIR, "data")
 # Install, then copy the install directory here (or point to it).
 TESSERACT_DIR = os.path.join(os.path.dirname(TRACKER_DIR), "tesseract-portable")
 
-# Bundled data files: (source, dest_in_bundle)
-datas = [
-    (os.path.join(DATA_DIR, "icons"), os.path.join("data", "icons")),
-    (os.path.join(DATA_DIR, "sentinel_ref_final_ranking.png"), "data"),
-    (os.path.join(DATA_DIR, "units.json"), "data"),
-    (os.path.join(DATA_DIR, "items.json"), "data"),
-    (os.path.join(DATA_DIR, "relics.json"), "data"),
-    (os.path.join(TRACKER_DIR, "prompts"), "prompts"),
-    (TESSERACT_DIR, "tesseract"),
+# --- Environment validation — fail early rather than producing a broken build ---
+
+_REQUIRED_PATHS = [
+    (os.path.join(DATA_DIR, "icons"),                          "data/icons directory"),
+    (os.path.join(DATA_DIR, "sentinel_ref_final_ranking.png"), "data/sentinel_ref_final_ranking.png"),
+    (os.path.join(DATA_DIR, "units.json"),                     "data/units.json"),
+    (os.path.join(DATA_DIR, "items.json"),                     "data/items.json"),
+    (os.path.join(DATA_DIR, "relics.json"),                    "data/relics.json"),
+    (os.path.join(TRACKER_DIR, "prompts"),                     "tracker/prompts directory"),
 ]
 
-# Filter out missing paths (optional files)
-datas = [(src, dst) for src, dst in datas if os.path.exists(src)]
+_missing = [label for path, label in _REQUIRED_PATHS if not os.path.exists(path)]
+if _missing:
+    raise SystemExit(
+        "[spec] ERROR: Required paths missing — build aborted.\n"
+        + "\n".join(f"  missing: {label}" for label in _missing)
+    )
+
+_dac_console_raw = os.environ.get("DAC_CONSOLE", "")
+if _dac_console_raw not in ("", "0", "1"):
+    raise SystemExit(
+        f"[spec] ERROR: DAC_CONSOLE must be '0' or '1', got '{_dac_console_raw}'"
+    )
+
+print(f"[spec] Environment OK (DAC_CONSOLE={_dac_console_raw or '<default:1>'})")
+
+# --- Bundled data files: (source, dest_in_bundle) ---
+
+datas = [
+    (os.path.join(DATA_DIR, "icons"),                          os.path.join("data", "icons")),
+    (os.path.join(DATA_DIR, "sentinel_ref_final_ranking.png"), "data"),
+    (os.path.join(DATA_DIR, "units.json"),                     "data"),
+    (os.path.join(DATA_DIR, "items.json"),                     "data"),
+    (os.path.join(DATA_DIR, "relics.json"),                    "data"),
+    (os.path.join(TRACKER_DIR, "prompts"),                     "prompts"),
+]
+
+# Tesseract is optional — present in CI (downloaded before build) and in full local setups.
+# Warn loudly when absent so developers know OCR will not be bundled.
+if os.path.exists(TESSERACT_DIR):
+    datas.append((TESSERACT_DIR, "tesseract"))
+else:
+    print(f"[spec] WARNING: Tesseract not found at {TESSERACT_DIR} — OCR will NOT be bundled")
 
 # Find OpenSSL DLLs from the base Python install (not the venv) so HTTPS works
 _base = Path(sys.base_prefix) / "DLLs"

@@ -9,6 +9,33 @@ $SpecFile = Join-Path $TrackerDir "dac_tracker.spec"
 $BuildDir = Join-Path $TrackerDir "build"
 $DistDir = Join-Path ([Environment]::GetFolderPath("Desktop")) ""
 
+# Validate build environment before starting
+Write-Host "Validating build environment..." -ForegroundColor Cyan
+$RequiredPaths = [ordered]@{
+    "Data directory"    = Join-Path $RepoDir "data"
+    "icons directory"   = Join-Path $RepoDir "data\icons"
+    "units.json"        = Join-Path $RepoDir "data\units.json"
+    "items.json"        = Join-Path $RepoDir "data\items.json"
+    "relics.json"       = Join-Path $RepoDir "data\relics.json"
+    "prompts directory" = Join-Path $TrackerDir "prompts"
+    "spec file"         = $SpecFile
+}
+$ValidationFailed = $false
+foreach ($entry in $RequiredPaths.GetEnumerator()) {
+    if (-not (Test-Path $entry.Value)) {
+        Write-Host "  [MISSING] $($entry.Key): $($entry.Value)" -ForegroundColor Red
+        $ValidationFailed = $true
+    }
+}
+if ($ValidationFailed) { throw "Build environment validation failed — one or more required paths are missing." }
+
+$DacConsoleRaw = $env:DAC_CONSOLE
+if ($DacConsoleRaw -and $DacConsoleRaw -notin @("0", "1")) {
+    throw "DAC_CONSOLE must be '0' or '1', got '$DacConsoleRaw'"
+}
+
+Write-Host "  Environment OK." -ForegroundColor Green
+
 # Pull latest
 Write-Host "Pulling latest changes..." -ForegroundColor Cyan
 git -C $RepoDir pull
