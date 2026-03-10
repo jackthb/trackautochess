@@ -24,8 +24,8 @@ log = logging.getLogger("dac")
 POLL_INTERVAL = 3  # seconds
 CONFIRM_DELAY = 2  # seconds to wait and re-check before firing
 
-# Window title substring that identifies Dota 2
-GAME_WINDOW_TITLE = "Dota 2"
+# Process name that identifies Dota 2
+GAME_PROCESS_NAME = "dota2.exe"
 
 # Reference template image (cropped from a known Final Ranking screenshot)
 TEMPLATE_PATH = DATA_DIR / "sentinel_ref_final_ranking.png"
@@ -43,24 +43,30 @@ SEARCH_REGION = {
 MATCH_THRESHOLD = 0.70
 
 
-def _get_foreground_window_title() -> str:
-    """Return the title of the currently focused window (Windows only)."""
+def _get_foreground_process_name() -> str:
+    """Return the executable name of the currently focused window's process (Windows only)."""
     try:
         hwnd = ctypes.windll.user32.GetForegroundWindow()
-        length = ctypes.windll.user32.GetWindowTextLengthW(hwnd)
-        if length == 0:
+        pid = ctypes.c_ulong()
+        ctypes.windll.user32.GetWindowThreadProcessId(hwnd, ctypes.byref(pid))
+        PROCESS_QUERY_LIMITED_INFORMATION = 0x1000
+        handle = ctypes.windll.kernel32.OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, False, pid.value)
+        if not handle:
             return ""
-        buf = ctypes.create_unicode_buffer(length + 1)
-        ctypes.windll.user32.GetWindowTextW(hwnd, buf, length + 1)
-        return buf.value
+        try:
+            buf = ctypes.create_unicode_buffer(260)
+            size = ctypes.c_ulong(260)
+            ctypes.windll.kernel32.QueryFullProcessImageNameW(handle, 0, buf, ctypes.byref(size))
+            return buf.value.rsplit("\\", 1)[-1].lower()
+        finally:
+            ctypes.windll.kernel32.CloseHandle(handle)
     except Exception:
         return ""
 
 
 def is_game_focused() -> bool:
-    """Check if the Dota 2 window is currently in the foreground."""
-    title = _get_foreground_window_title()
-    return GAME_WINDOW_TITLE in title
+    """Check if the Dota 2 process owns the foreground window."""
+    return _get_foreground_process_name() == GAME_PROCESS_NAME
 
 
 def _grab_region(sct, monitor, region):
