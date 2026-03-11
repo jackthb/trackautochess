@@ -116,7 +116,7 @@ def push_game(row, user_id: str | None = None) -> bool:
     try:
         data = {k: str(v) if v else None for k, v in asdict(row).items()}
         if user_id:
-            data["user_id"] = user_id
+            data["user_id"] = int(user_id)
         resp = client.post("/rest/v1/games", json=data)
         resp.raise_for_status()
         log.info("pushed game: placement=%s", data.get("placement"))
