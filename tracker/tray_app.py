@@ -344,7 +344,7 @@ class TrayApp:
                 played_at = (now - timedelta(hours=i - 1)).isoformat()
 
                 # Skip duplicates via DB check
-                if user_id and game_exists(user_id, played_at, placement, wl, level):
+                if user_id and game_exists(user_id, played_at, placement, wl, level, lineup):
                     log.info("  row %d: SKIP duplicate (place=%s wl=%s level=%s)", i, placement, wl, level)
                     skipped += 1
                     continue

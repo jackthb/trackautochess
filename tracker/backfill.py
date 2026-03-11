@@ -104,7 +104,7 @@ def main():
             rank = r.get("rank", "")
             rank_change = r.get("rank_change", "none")
 
-            if not dry_run and game_exists(steam_id, date_str, placement, wl, level):
+            if not dry_run and game_exists(steam_id, date_str, placement, wl, level, lineup):
                 print(f"    row {j+1}: SKIP duplicate (place={placement} wl={wl} level={level})")
                 total_skipped += 1
                 continue

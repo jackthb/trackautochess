@@ -92,12 +92,11 @@ def cmd_import_matches_cv(args: list[str]) -> None:
         placement = r.get("placement", "")
         level = r.get("level", "")
         wl = r.get("wl", "")
+        lineup = "|".join(r.get("units", []))
 
-        if game_exists(steam_id, date_str, placement, wl, level):
+        if game_exists(steam_id, date_str, placement, wl, level, lineup):
             skipped += 1
             continue
-
-        lineup = "|".join(r.get("units", []))
         game_row = GameRow(
             date=date_str,
             placement=placement,
