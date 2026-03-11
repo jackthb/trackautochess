@@ -84,6 +84,21 @@ MM_COL_RANK      = (0.792, 0.863)
 
 UNIT_ICON_SCALES    = [24, 28, 32, 36, 40, 44]
 UNIT_MATCH_THRESHOLD = 0.65
+MM_SYNERGY_ICON_SCALES = [20, 24, 28, 32]  # smaller than GAME OVER (32-44)
+
+# Synergy icon grid for MY MATCHES rows.
+# Calibrated from sentinel picker on 3440×1440.
+# 5 columns max per sub-row; 6+ synergies → 2 sub-rows (5 top + rest bottom).
+# Synergies appear in decreasing count order (left→right, top→bottom).
+MM_SYN_COLS_X = [0.61308, 0.62645, 0.64070, 0.65407, 0.66773]  # icon x0
+MM_SYN_ICON_W = 0.0125   # icon width (fraction of image width)
+MM_SYN_ICON_H = 0.028    # icon height (fraction of image height)
+# Y position of icon top edge as fraction of row height
+MM_SYN_Y_1ROW = 0.21     # single-row mode
+MM_SYN_Y_2ROW_TOP = 0.0  # 2-row mode, top row (starts at row top)
+MM_SYN_Y_2ROW_BOT = 0.59 # 2-row mode, bottom row
+# Brightness threshold: mean pixel value above this → icon present
+MM_SYN_BRIGHT_THRESH = 40
 
 # Grid layout for unit icons in MY MATCHES rows.
 # Calibrated on 3440×1440 from manual coordinate picking.
@@ -1123,12 +1138,205 @@ def _assign_stars(
     return result
 
 
+def _match_syn_slot(img: np.ndarray, col_x: float, icon_y: float,
+                    syn_templates: dict[str, list[np.ndarray]]) -> tuple[str, float] | None:
+    """Template-match a single synergy grid slot. Returns (name, score) or None."""
+    h, w = img.shape[:2]
+    x0 = max(int(col_x * w) - 2, 0)
+    y0 = max(int(icon_y * h) - 2, 0)
+    x1 = min(int((col_x + MM_SYN_ICON_W) * w) + 2, w)
+    y1 = min(int((icon_y + MM_SYN_ICON_H) * h) + 2, h)
+    crop = img[y0:y1, x0:x1]
+    if crop.size == 0 or crop.mean() < MM_SYN_BRIGHT_THRESH:
+        return None
+    crop_gray = cv2.cvtColor(crop, cv2.COLOR_BGR2GRAY) if len(crop.shape) == 3 else crop
+    best_name, best_score = "", 0.0
+    for name, tmpls in syn_templates.items():
+        for tmpl in tmpls:
+            th, tw = tmpl.shape[:2]
+            if crop_gray.shape[0] < th or crop_gray.shape[1] < tw:
+                continue
+            result = cv2.matchTemplate(crop_gray, tmpl, cv2.TM_CCOEFF_NORMED)
+            _, max_val, _, _ = cv2.minMaxLoc(result)
+            if max_val > best_score:
+                best_score = max_val
+                best_name = name
+    if best_score < 0.60:
+        return None
+    return best_name, best_score
+
+
+def _ocr_mm_syn_counts(img: np.ndarray, row_y0: float, row_y1: float,
+                       n_icons: int, two_row: bool = False,
+                       debug: bool = False, row_idx: int = 0) -> list[int]:
+    """OCR the count numbers below single-row synergy icons.
+
+    Reads "(N)" tokens from a strip below the icons and returns counts
+    matched left-to-right with the icon columns.
+    """
+    h, w = img.shape[:2]
+    row_h = row_y1 - row_y0
+    # Count text position depends on 1-row vs 2-row layout.
+    # Calibrated from sentinel picker on 3440x1440.
+    if two_row:
+        # Counts for top-row icons sit between the two icon rows
+        count_y0 = int((row_y0 + row_h * 0.37) * h)
+        count_y1 = int((row_y0 + row_h * 0.63) * h)
+    else:
+        # Counts sit below the single row of icons
+        count_y0 = int((row_y0 + row_h * 0.58) * h)
+        count_y1 = int((row_y0 + row_h * 0.86) * h)
+    # x spans from first icon to last icon
+    count_x0 = int(0.613 * w)
+    count_x1 = int(0.680 * w)
+    strip = img[count_y0:count_y1, count_x0:count_x1]
+    if strip.size == 0:
+        return []
+    _save_debug(f"mm_syn_count_{row_idx}", strip, debug)
+    gray = cv2.cvtColor(strip, cv2.COLOR_BGR2GRAY) if len(strip.shape) == 3 else strip
+    _, bw = cv2.threshold(gray, 100, 255, cv2.THRESH_BINARY)
+    inv = cv2.bitwise_not(bw)
+    scale = 4
+    scaled = cv2.resize(inv, (inv.shape[1] * scale, inv.shape[0] * scale),
+                        interpolation=cv2.INTER_NEAREST)
+    scaled = cv2.copyMakeBorder(scaled, 20, 20, 20, 20,
+                                cv2.BORDER_CONSTANT, value=255)
+    _save_debug(f"mm_syn_count_proc_{row_idx}", scaled, debug)
+    raw = _ocr(scaled, psm=12)
+    log.debug(f"  [row {row_idx}] syn count OCR raw: {raw!r}")
+    # Extract digits from "(N)" patterns
+    all_counts = re.findall(r"\d+", raw)
+    counts = [int(d) for d in all_counts if 1 <= int(d) <= 12]
+    return counts
+
+
+def _infer_syn_count(name: str, syn_tiers: dict[str, list[int]]) -> int:
+    """Infer synergy count for bottom-row icons (lowest count synergies).
+
+    Returns the lowest tier threshold for this synergy, since bottom-row
+    synergies are in decreasing order and have the fewest units.
+    """
+    tiers = syn_tiers.get(name, [])
+    return tiers[0] if tiers else 1
+
+
+def _load_syn_tiers() -> dict[str, list[int]]:
+    """Load synergy tier thresholds keyed by icon template stem."""
+    import json as _json
+    from utils import DATA_DIR as data_dir
+    syn_path = data_dir / "synergies.json"
+    if not syn_path.exists():
+        return {}
+    data = _json.loads(syn_path.read_text())
+    # Map JSON key (e.g. "is_aqir") to icon stem (e.g. "aqir")
+    stem_map = {
+        "demon hunter": "demonhunter",
+        "elemental": "element",
+        "faceless": "nraqi",
+        "pandaren": "pandaman",
+    }
+    result = {}
+    for v in data.values():
+        name = v["name"].lower()
+        stem = stem_map.get(name, name.replace(" ", ""))
+        result[stem] = v.get("tiers", [])
+    return result
+
+
+def _parse_mm_synergies(
+    img: np.ndarray,
+    row_y0: float,
+    row_y1: float,
+    syn_templates: dict[str, list[np.ndarray]],
+    icons_dir: Path,
+    debug: bool = False,
+    row_idx: int = 0,
+) -> str:
+    """Parse synergy icons + counts from a MY MATCHES row using grid detection.
+
+    Checks 5 fixed column positions at 1 or 2 y-bands. OCRs counts for the
+    top row; infers counts for the bottom row from synergy tier data.
+    Returns formatted "Synergy:count|Synergy:count" string, or "" on failure.
+    """
+    if not syn_templates:
+        return ""
+
+    _save_debug(f"mm_syn_{row_idx}",
+                _crop_row(img, MM_COL_SYNERGY, row_y0, row_y1), debug)
+
+    row_h = row_y1 - row_y0
+
+    # Detect 2-row mode: check column 0 at the bottom y-band with a high
+    # confidence threshold (real icons match at 0.85+, noise at ~0.53).
+    bot_y = row_y0 + row_h * MM_SYN_Y_2ROW_BOT
+    bot_probe = _match_syn_slot(img, MM_SYN_COLS_X[0], bot_y, syn_templates)
+    has_bottom = bot_probe is not None and bot_probe[1] >= 0.80
+
+    two_row = has_bottom
+    top_y = row_y0 + row_h * (MM_SYN_Y_2ROW_TOP if two_row else MM_SYN_Y_1ROW)
+
+    # Match top row (up to 5 icons)
+    top_matches: list[tuple[str, float]] = []
+    for col_x in MM_SYN_COLS_X:
+        m = _match_syn_slot(img, col_x, top_y, syn_templates)
+        if m is not None:
+            top_matches.append(m)
+        else:
+            break  # no more icons in this row
+
+    # Match bottom row if 2-row mode
+    bot_matches: list[tuple[str, float]] = []
+    if two_row:
+        for col_x in MM_SYN_COLS_X:
+            m = _match_syn_slot(img, col_x, bot_y, syn_templates)
+            if m is not None:
+                bot_matches.append(m)
+            else:
+                break
+
+    if not top_matches and not bot_matches:
+        return ""
+
+    log.debug(f"  [row {row_idx}] syn grid: {len(top_matches)} top"
+              f" + {len(bot_matches)} bottom ({'2-row' if two_row else '1-row'})")
+
+    # OCR counts for top row
+    top_counts = _ocr_mm_syn_counts(img, row_y0, row_y1,
+                                    len(top_matches), two_row=two_row,
+                                    debug=debug, row_idx=row_idx)
+    log.debug(f"  [row {row_idx}] syn top counts: {top_counts}")
+
+    # Build results for top row; infer missing counts from tier data
+    syn_tiers = _load_syn_tiers()
+    results: list[tuple[str, int]] = []
+    for i, (name, score) in enumerate(top_matches):
+        count = top_counts[i] if i < len(top_counts) else 0
+        if count == 0:
+            # OCR failed — infer from tier data (lowest tier since order is decreasing)
+            count = _infer_syn_count(name, syn_tiers)
+        log.debug(f"    top[{i}] {name} score={score:.3f} count={count}")
+        results.append((name, count))
+
+    # Infer counts for bottom row
+    if bot_matches:
+        for i, (name, score) in enumerate(bot_matches):
+            inferred = _infer_syn_count(name, syn_tiers)
+            log.debug(f"    bot[{i}] {name} score={score:.3f} inferred={inferred}")
+            results.append((name, inferred))
+
+    synergies = "|".join(f"{name}:{count}" for name, count in results)
+    log.debug(f"  [row {row_idx}] mm_synergies parsed: {synergies!r}")
+    return synergies
+
+
 def _parse_my_matches_row(
     img: np.ndarray,
     row_y0: float,
     row_y1: float,
     unit_templates: dict[str, list[np.ndarray]],
     relic_templates: dict[str, list[np.ndarray]],
+    syn_templates: dict[str, list[np.ndarray]],
+    icons_dir: Path,
     units_data: dict,
     stem_to_name: dict[str, str],
     debug: bool = False,
@@ -1207,8 +1415,13 @@ def _parse_my_matches_row(
 
     result["units"] = unit_names
     log.debug(f"  [row {row_idx}] units ({len(unit_names)}): {unit_names}")
-    # 4. Synergies derived from units (use raw names without star suffixes)
-    if unit_names_raw and units_data:
+    # 4. Synergies — try direct icon parsing first, fall back to unit derivation
+    parsed_syn = _parse_mm_synergies(img, row_y0, row_y1, syn_templates, icons_dir,
+                                     debug=debug, row_idx=row_idx)
+    if parsed_syn:
+        result["synergies"] = parsed_syn
+    elif unit_names_raw and units_data:
+        # Fallback: derive from unit lineup
         result["synergies"] = _synergies_from_units(unit_names_raw, units_data)
     log.debug(f"  [row {row_idx}] synergies: {result['synergies']!r}")
     # 5. Relic icon matching (per-slot grid)
@@ -1309,6 +1522,11 @@ def parse_my_matches(
     relic_templates = _load_templates_multiscale(icons_dir / "relics", RELIC_ICON_SCALES,
                                                   inner_frac=1.0, color=True)
     log.debug(f"[mm] Loaded {len(relic_templates)} relic templates")
+
+    # Load synergy icon templates
+    syn_templates = _load_templates_multiscale(icons_dir / "synergies", MM_SYNERGY_ICON_SCALES)
+    log.debug(f"[mm] Loaded {len(syn_templates)} synergy templates at scales {MM_SYNERGY_ICON_SCALES}")
+
     # Find row boundaries
     rows = _find_my_matches_rows(img, debug=debug)
     log.info(f"[mm] Detected {len(rows)} rows")
@@ -1318,7 +1536,8 @@ def parse_my_matches(
         log.debug(f"\n[mm] --- Row {i} (y={y0:.3f}-{y1:.3f}) ---")
         row_data = _parse_my_matches_row(
             img, y0, y1,
-            unit_templates, relic_templates, units_data, stem_to_name,
+            unit_templates, relic_templates, syn_templates, icons_dir,
+            units_data, stem_to_name,
             debug=debug, row_idx=i,
         )
         # Skip rows where we got nothing useful (empty rows at bottom of table)
