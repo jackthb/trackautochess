@@ -82,6 +82,9 @@ MM_COL_SYNERGY   = (0.597, 0.692)
 MM_COL_RELIC     = (0.7035, 0.7491)
 MM_COL_WL        = (0.752, 0.792)
 MM_COL_RANK      = (0.792, 0.863)
+# "X hrs ago" / "X days ago" text — left panel, below any thumbnail.
+# Calibrated on 3440×1440; adjust if the text lands outside this crop.
+MM_COL_TIME      = (0.200, 0.390)
 
 UNIT_ICON_SCALES    = [24, 28, 32, 36, 40, 44]
 UNIT_MATCH_THRESHOLD = 0.65
@@ -1348,6 +1351,118 @@ def _parse_mm_synergies(
     return synergies
 
 
+# ── Time-ago helpers ──────────────────────────────────────────────────────────
+
+def _normalise_time_ago(raw: str) -> str:
+    """Clean up OCR noise in a relative-time string.
+
+    Accepts strings like "3hrs ago", "2 days ago", "5h", "1d", "just now",
+    "1 min", "45m" — returns a canonical lowercase form or "" if unrecognised.
+    """
+    import re as _re
+    s = raw.strip().lower()
+    # Strip stray punctuation that OCR introduces
+    s = _re.sub(r"[^a-z0-9 ]", " ", s)
+    s = _re.sub(r"\s+", " ", s).strip()
+    # Patterns in order of specificity
+    patterns = [
+        # "just now" / "now"
+        (_re.compile(r"\bjust\s*now\b|\bnow\b"), lambda m: "0m ago"),
+        # "X min(s) ago" / "Xm ago"
+        (_re.compile(r"(\d+)\s*m(?:in(?:s|ute)?s?)?\s*ago"), lambda m: f"{m.group(1)}m ago"),
+        (_re.compile(r"(\d+)\s*m\b"), lambda m: f"{m.group(1)}m ago"),
+        # "X hr(s) ago" / "Xh ago" / "X hours ago"
+        (_re.compile(r"(\d+)\s*h(?:r(?:s)?|our(?:s)?)?\s*ago"), lambda m: f"{m.group(1)}h ago"),
+        (_re.compile(r"(\d+)\s*h\b"), lambda m: f"{m.group(1)}h ago"),
+        # "X day(s) ago" / "Xd ago" / "yesterday"
+        (_re.compile(r"\byesterday\b"), lambda m: "1d ago"),
+        (_re.compile(r"(\d+)\s*d(?:ay(?:s)?)?\s*ago"), lambda m: f"{m.group(1)}d ago"),
+        (_re.compile(r"(\d+)\s*d\b"), lambda m: f"{m.group(1)}d ago"),
+        # "X week(s) ago"
+        (_re.compile(r"(\d+)\s*w(?:eek(?:s)?)?\s*ago"), lambda m: f"{int(m.group(1))*7}d ago"),
+    ]
+    for pat, fmt in patterns:
+        m = pat.search(s)
+        if m:
+            try:
+                return fmt(m)
+            except Exception:
+                pass
+    return ""
+
+
+def parse_time_ago(s: str) -> tuple[str, int]:
+    """Parse a normalised time-ago string into (unit, value).
+
+    Returns:
+        ("minutes", N), ("hours", N), ("days", N), or ("unknown", 0)
+    """
+    import re as _re
+    if not s:
+        return ("unknown", 0)
+    m = _re.match(r"(\d+)([mhd]) ago", s)
+    if not m:
+        return ("unknown", 0)
+    val = int(m.group(1))
+    unit_char = m.group(2)
+    return {"m": "minutes", "h": "hours", "d": "days"}[unit_char], val
+
+
+def infer_timestamps(rows: list[dict], screenshot_time) -> list[str]:
+    """Infer an ISO datetime string for each MY MATCHES row.
+
+    Algorithm:
+    - Rows with an hour-resolution time_ago (e.g. "3h ago") → subtract from
+      screenshot_time, round to the nearest minute.
+    - Rows with a day-resolution time_ago (e.g. "3d ago") or unknown → assign
+      artificial sequential times: 01:00, 02:00, 03:00 … on that day.
+      The ordering follows the row order in the list (top = earliest index).
+
+    Args:
+        rows: list of row dicts from parse_my_matches (each may have "time_ago")
+        screenshot_time: datetime when the screenshot was taken
+
+    Returns:
+        list of ISO-8601 datetime strings, one per row (same length as rows).
+    """
+    from datetime import datetime as _dt, timedelta, date as _date, time as _time
+
+    if not isinstance(screenshot_time, _dt):
+        screenshot_time = _dt.now()
+
+    # First pass: resolve each row to (date, high_res_dt_or_None)
+    resolved: list[tuple[_date, _dt | None]] = []
+    for row in rows:
+        unit, val = parse_time_ago(row.get("time_ago", ""))
+        if unit == "minutes":
+            dt = screenshot_time - timedelta(minutes=val)
+            resolved.append((dt.date(), dt))
+        elif unit == "hours":
+            dt = screenshot_time - timedelta(hours=val)
+            resolved.append((dt.date(), dt))
+        elif unit == "days":
+            target_date = (screenshot_time - timedelta(days=val)).date()
+            resolved.append((target_date, None))
+        else:
+            # Unknown — fall back to screenshot date with no time
+            resolved.append((screenshot_time.date(), None))
+
+    # Second pass: for day-only rows, assign sequential 01:00, 02:00, … per day
+    day_counters: dict[_date, int] = {}
+    result: list[str] = []
+    for target_date, high_res_dt in resolved:
+        if high_res_dt is not None:
+            result.append(high_res_dt.strftime("%Y-%m-%d %H:%M:%S"))
+        else:
+            n = day_counters.get(target_date, 0)
+            day_counters[target_date] = n + 1
+            hour = 1 + n  # 01:00, 02:00, 03:00, …
+            dt = _dt.combine(target_date, _time(min(hour, 23), 0))
+            result.append(dt.strftime("%Y-%m-%d %H:%M:%S"))
+
+    return result
+
+
 def _parse_my_matches_row(
     img: np.ndarray,
     row_y0: float,
@@ -1521,6 +1636,13 @@ def _parse_my_matches_row(
         result["_debug"]["rank_green_pct"] = green_pct
         result["_debug"]["rank_red_pct"] = red_pct
         result["_debug"]["row_strip"] = _crop(img, 0.0, row_y0, 1.0, row_y1)
+    # 8. Time-ago OCR — "3hrs ago", "2 days ago" text in left panel
+    time_cell = _crop_row(img, MM_COL_TIME, row_y0, row_y1)
+    time_proc = _preprocess_for_ocr(time_cell, scale=2.5, invert=True)
+    _save_debug(f"mm_time_{row_idx}", time_proc, debug)
+    time_raw = _ocr(time_proc, psm=6)
+    result["time_ago"] = _normalise_time_ago(time_raw)
+    log.debug(f"  [row {row_idx}] time_ago OCR: {time_raw!r} → {result['time_ago']!r}")
     return result
 
 

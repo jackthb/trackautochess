@@ -323,8 +323,9 @@ class TrayApp:
                     self._notify(APP_NAME, "Failed to read image.")
                     return
 
-            from cv_parser import parse_my_matches
+            from cv_parser import parse_my_matches, infer_timestamps
             player = self.config.get("player_name", "jack")
+            screenshot_time = datetime.now()
             rows = parse_my_matches(img, player, ICONS_DIR, debug=True)
             if not rows:
                 log.warning("MY MATCHES: no rows parsed")
@@ -332,16 +333,14 @@ class TrayApp:
                 return
             log.info("Parsed %d row(s) from MY MATCHES", len(rows))
 
-            now = datetime.now().astimezone()
+            timestamps = infer_timestamps(rows, screenshot_time)
             imported = 0
             skipped = 0
-            for i, r in enumerate(rows, 1):
+            for i, (r, played_at) in enumerate(zip(rows, timestamps), 1):
                 lineup = "|".join(r.get("units", []))
                 placement = r.get("placement", "")
                 wl = r.get("wl", "")
                 level = r.get("level", "")
-                # Row 0 is most recent — offset each row by 1 hour so ordering is preserved
-                played_at = (now - timedelta(hours=i - 1)).isoformat()
 
                 # Skip duplicates via DB check
                 if user_id and game_exists(user_id, played_at, placement, wl, level, lineup):
