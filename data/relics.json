@@ -75,17 +75,20 @@
     "item_double_io": {
       "name": "Grace of Nature",
       "description": "Every IO recruited will reduce 2x this chance",
-      "lore": "From Relicbox"
+      "lore": "From Relicbox",
+      "active": false
     },
     "item_more_interest": {
       "name": "The Great Vault",
       "description": "Will not be restricted to a max interest of 4.",
-      "lore": "From Relicbox"
+      "lore": "From Relicbox",
+      "active": false
     },
     "item_more_reward": {
       "name": "Sin Reaper",
       "description": "Gains 4 XP for every visiting victory, and extra XP equals to Awardx2 when terminating an winning streak or eliminating a player.",
-      "lore": "From Relicbox"
+      "lore": "From Relicbox",
+      "active": false
     },
     "item_stolen_vault": {
       "name": "Stolen Vault",
@@ -95,12 +98,14 @@
     "item_upgrade_roll": {
       "name": "Elite Recruiter",
       "description": "Use probability tables for a higher courier level when recruiting.",
-      "lore": "From Relicbox"
+      "lore": "From Relicbox",
+      "active": false
     },
     "item_vampiric_embrace": {
       "name": "Vampire Fangs",
       "description": "Your Courier has +40% lifesteal when dealing Courier damage to other players. You’ll get a Tango instead if your HP will be more than 100 after lifesteal.",
-      "lore": "From Relicbox"
+      "lore": "From Relicbox",
+      "active": false
     }
   }
 }
