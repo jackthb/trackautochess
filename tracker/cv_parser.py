@@ -8,6 +8,7 @@ Usage (dev test):
     python cv_parser.py /path/to/screenshot.jpg [player_name] [--debug]
 """
 
+import base64
 import logging
 import re
 import sys
@@ -1381,6 +1382,10 @@ def _parse_my_matches_row(
             place_raw = raw
             break
     log.debug(f"  [row {row_idx}] placement OCR: {place_raw!r} → {result['placement']!r}")
+    if debug:
+        result.setdefault("_debug", {})["place_raw"] = place_raw
+        result["_debug"]["place_cell"] = place_cell
+        result["_debug"]["place_proc"] = place_proc
     # 2. Level OCR — "LvXX" or just the digit
     level_cell = _crop(img, MM_COL_LEVEL[0], row_y0 + (row_y1 - row_y0) * 0.30,
                        MM_COL_LEVEL[1], row_y0 + (row_y1 - row_y0) * 0.75)
@@ -1393,6 +1398,10 @@ def _parse_my_matches_row(
         if 1 <= lv <= 15:
             result["level"] = str(lv)
     log.debug(f"  [row {row_idx}] level OCR: {level_raw!r} → {result['level']!r}")
+    if debug:
+        result["_debug"]["level_raw"] = level_raw
+        result["_debug"]["level_cell"] = level_cell
+        result["_debug"]["level_proc"] = level_proc
     # 3. Unit icon matching — grid-based (one match per slot)
     unit_region = _crop(img, MM_COL_UNITS[0], row_y0,
                         MM_COL_UNITS[1], row_y1)
@@ -1416,6 +1425,10 @@ def _parse_my_matches_row(
 
     result["units"] = unit_names
     log.debug(f"  [row {row_idx}] units ({len(unit_names)}): {unit_names}")
+    if debug:
+        result["_debug"]["unit_matches"] = [(stem_to_name.get(s, s), round(sc, 3), ux, uy)
+                                             for s, sc, ux, uy in matches]
+        result["_debug"]["unit_region"] = unit_region
     # 4. Synergies — try direct icon parsing first, fall back to unit derivation
     parsed_syn = _parse_mm_synergies(img, row_y0, row_y1, syn_templates, icons_dir,
                                      debug=debug, row_idx=row_idx)
@@ -1451,6 +1464,10 @@ def _parse_my_matches_row(
     if wl_m:
         result["wl"] = f"{wl_m.group(1)}-{wl_m.group(2)}"
     log.debug(f"  [row {row_idx}] wl OCR: {wl_raw!r} → {result['wl']!r}")
+    if debug:
+        result["_debug"]["wl_raw"] = wl_raw
+        result["_debug"]["wl_cell"] = wl_cell
+        result["_debug"]["wl_proc"] = wl_proc
     # 7. Rank OCR
     rank_y0 = row_y0 + (row_y1 - row_y0) * 0.20
     rank_y1 = row_y0 + (row_y1 - row_y0) * 0.80
@@ -1479,7 +1496,181 @@ def _parse_my_matches_row(
         result["rank_change"] = "down"
     log.debug(f"  [row {row_idx}] rank color: green={green_pct:.3f} red={red_pct:.3f}")
     log.debug(f"  [row {row_idx}] rank OCR: {rank_raw!r} → {result['rank']!r} ({result['rank_change']})")
+    if debug:
+        result["_debug"]["rank_raw"] = rank_raw
+        result["_debug"]["rank_cell"] = rank_cell
+        result["_debug"]["rank_proc"] = rank_proc
+        result["_debug"]["rank_green_pct"] = green_pct
+        result["_debug"]["rank_red_pct"] = red_pct
+        result["_debug"]["row_strip"] = _crop(img, 0.0, row_y0, 1.0, row_y1)
     return result
+
+
+def _img_to_b64(img: np.ndarray) -> str:
+    """Encode an OpenCV image as a base64 data URI."""
+    ok, buf = cv2.imencode(".png", img)
+    return ("data:image/png;base64," + base64.b64encode(buf).decode()) if ok else ""
+
+
+def _generate_debug_html(img: np.ndarray, rows: list[tuple[float, float]],
+                         parsed: list[dict]) -> None:
+    """Generate an HTML debug report from the actual parse results.
+
+    Writes to DEBUG_DIR / report.html with embedded images and OCR data.
+    """
+    h, w = img.shape[:2]
+    parts = []
+
+    # CSS
+    parts.append("""<!DOCTYPE html>
+<html><head><meta charset="utf-8"><title>F7 Debug Report</title>
+<style>
+body { background:#111; color:#eee; font-family:system-ui,monospace; padding:20px; max-width:1400px; margin:0 auto }
+h1 { color:#e94560; font-size:20px; border-bottom:2px solid #333; padding-bottom:10px }
+details { margin-bottom:12px; background:#1a1a1a; padding:4px 16px; border-radius:8px; border:1px solid #222 }
+summary { cursor:pointer; padding:8px 0; font-size:14px; font-weight:bold; border-bottom:1px solid #333; color:#e94560 }
+summary:hover { color:#fff }
+img { vertical-align:middle; image-rendering:pixelated; border:1px solid #444; border-radius:4px }
+.kv { margin:2px 0 }
+.kv .k { color:#888 }
+.kv .v { color:#eee }
+.ok { color:#0f0 }
+.bad { color:#f00 }
+.crop-row { display:flex; gap:8px; flex-wrap:wrap; align-items:flex-start; margin:8px 0 }
+.crop-box { display:inline-block; text-align:center; margin:4px }
+.crop-label { font-size:10px; color:#888; margin-bottom:2px }
+.ocr-table { border-collapse:collapse; width:100%; font-size:12px; margin:8px 0 }
+.ocr-table th { background:#0f3460; padding:6px 8px; text-align:left }
+.ocr-table td { padding:4px 8px }
+.ocr-table tr:nth-child(even) { background:#1a1a2e }
+.ocr-table tr:nth-child(odd) { background:#16213e }
+.summary-bar { margin-top:8px; padding:8px; background:#0f3460; border-radius:6px; font-size:13px }
+</style></head><body>""")
+
+    parts.append(f'<h1>F7 Debug Report ({w}&times;{h})</h1>')
+
+    # Overview — scaled-down screenshot
+    thumb = cv2.resize(img, (w // 3, h // 3))
+    parts.append(f'<details open><summary>Input Screenshot</summary>')
+    parts.append(f'<img src="{_img_to_b64(thumb)}" style="max-height:400px">')
+    parts.append(f'</details>')
+
+    # Row boundaries overview
+    annotated = img.copy()
+    for i, (y0, y1) in enumerate(rows):
+        py0, py1 = int(y0 * h), int(y1 * h)
+        cv2.line(annotated, (0, py0), (w, py0), (0, 255, 0), 2)
+        cv2.line(annotated, (0, py1), (w, py1), (0, 0, 255), 2)
+        cv2.putText(annotated, f"Row {i}", (20, py0 + 25),
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0, 255, 255), 2)
+    ann_thumb = cv2.resize(annotated, (w // 3, h // 3))
+    parts.append(f'<details open><summary>Row Detection ({len(rows)} rows)</summary>')
+    parts.append(f'<img src="{_img_to_b64(ann_thumb)}" style="max-height:400px">')
+    for i, (y0, y1) in enumerate(rows):
+        parts.append(f'<div class="kv"><span class="k">Row {i}:</span> '
+                     f'<span class="v">y={y0:.4f}-{y1:.4f} ({int(y0*h)}-{int(y1*h)}px)</span></div>')
+    parts.append(f'</details>')
+
+    # Per-row details
+    for row_i, rd in enumerate(parsed):
+        dbg = rd.get("_debug", {})
+        parts.append(f'<details open><summary>Row {row_i}: '
+                     f'Place={rd["placement"]} Level={rd["level"]} '
+                     f'W-L={rd["wl"]} Rank={rd["rank"]}</summary>')
+
+        # Row strip
+        row_strip = dbg.get("row_strip")
+        if row_strip is not None:
+            parts.append(f'<img src="{_img_to_b64(row_strip)}" style="max-height:100px;width:100%">')
+
+        # Crops side by side
+        parts.append('<div class="crop-row">')
+        crop_items = [
+            ("Placement (raw)", dbg.get("place_cell")),
+            ("Placement (proc)", dbg.get("place_proc")),
+            ("Level (raw)", dbg.get("level_cell")),
+            ("Level (proc)", dbg.get("level_proc")),
+            ("Units", dbg.get("unit_region")),
+            ("W-L (raw)", dbg.get("wl_cell")),
+            ("W-L (proc)", dbg.get("wl_proc")),
+            ("Rank (raw)", dbg.get("rank_cell")),
+            ("Rank (proc)", dbg.get("rank_proc")),
+        ]
+        for label, crop_img in crop_items:
+            if crop_img is not None:
+                parts.append(f'<div class="crop-box"><div class="crop-label">{label}</div>'
+                             f'<img src="{_img_to_b64(crop_img)}" style="max-height:80px"></div>')
+        parts.append('</div>')
+
+        # OCR results table
+        parts.append('<table class="ocr-table"><tr><th>Field</th><th>Raw OCR</th>'
+                     '<th>Parsed</th></tr>')
+        ocr_fields = [
+            ("Placement", dbg.get("place_raw", ""), rd["placement"]),
+            ("Level", dbg.get("level_raw", ""), rd["level"]),
+            ("W-L", dbg.get("wl_raw", ""), rd["wl"]),
+            ("Rank", dbg.get("rank_raw", ""), rd["rank"]),
+        ]
+        for field, raw, parsed_val in ocr_fields:
+            color = "ok" if parsed_val else "bad"
+            parts.append(f'<tr><td>{field}</td><td><code>{raw!r}</code></td>'
+                         f'<td class="{color}">{parsed_val or "(empty)"}</td></tr>')
+        parts.append('</table>')
+
+        # Unit matches with scores
+        unit_matches = dbg.get("unit_matches", [])
+        if unit_matches:
+            parts.append(f'<div class="kv"><span class="k">Units ({len(unit_matches)}):</span></div>')
+            parts.append('<table class="ocr-table"><tr><th>Unit</th><th>Score</th>'
+                         '<th>Grid X,Y</th></tr>')
+            for name, score, ux, uy in unit_matches:
+                sc_color = "#0f0" if score >= 0.80 else ("#ff0" if score >= 0.70 else "#f00")
+                parts.append(f'<tr><td>{name}</td>'
+                             f'<td style="color:{sc_color}">{score:.3f}</td>'
+                             f'<td>{ux},{uy}</td></tr>')
+            parts.append('</table>')
+
+        # Rank change color info
+        gp = dbg.get("rank_green_pct", 0)
+        rp = dbg.get("rank_red_pct", 0)
+        parts.append(f'<div class="kv"><span class="k">Rank change:</span> '
+                     f'<span class="v">{rd["rank_change"]} '
+                     f'(green={gp:.3f} red={rp:.3f})</span></div>')
+
+        # Other fields
+        parts.append(f'<div class="kv"><span class="k">Synergies:</span> '
+                     f'<span class="v">{rd["synergies"] or "(none)"}</span></div>')
+        parts.append(f'<div class="kv"><span class="k">Relic:</span> '
+                     f'<span class="v">{rd["relic"] or "(none)"}</span></div>')
+
+        # Summary bar
+        units = rd.get("units", [])
+        parts.append(f'<div class="summary-bar"><strong>Row {row_i}:</strong> '
+                     f'Place={rd["placement"]} Level={rd["level"]} '
+                     f'W-L={rd["wl"]} Rank={rd["rank"]}({rd["rank_change"]}) '
+                     f'Units={len(units)} Syn={rd["synergies"] or "-"} '
+                     f'Relics={rd["relic"] or "-"}</div>')
+        parts.append('</details>')
+
+    # Summary table
+    parts.append(f'<details open><summary>Summary ({len(parsed)} rows)</summary>')
+    cols = ["#", "Place", "Level", "W-L", "Rank", "Change", "Units", "Synergies", "Relics"]
+    parts.append('<table class="ocr-table">')
+    parts.append('<tr>' + ''.join(f'<th>{c}</th>' for c in cols) + '</tr>')
+    for i, rd in enumerate(parsed):
+        units = rd.get("units", [])
+        parts.append(f'<tr><td>{i}</td><td>{rd["placement"]}</td><td>{rd["level"]}</td>'
+                     f'<td>{rd["wl"]}</td><td>{rd["rank"]}</td><td>{rd["rank_change"]}</td>'
+                     f'<td style="max-width:200px;word-break:break-word">{", ".join(units)}</td>'
+                     f'<td>{rd["synergies"]}</td><td>{rd["relic"]}</td></tr>')
+    parts.append('</table></details>')
+    parts.append('</body></html>')
+
+    html = "\n".join(parts)
+    DEBUG_DIR.mkdir(parents=True, exist_ok=True)
+    report_path = DEBUG_DIR / "report.html"
+    report_path.write_text(html)
+    log.info(f"[mm] Debug report: {report_path} ({len(html)} bytes)")
 
 
 def parse_my_matches(
@@ -1548,6 +1739,17 @@ def parse_my_matches(
         parsed.append(row_data)
 
     log.info(f"[mm] Parsed {len(parsed)} non-empty rows")
+
+    if debug:
+        try:
+            _generate_debug_html(img, rows, parsed)
+        except Exception as e:
+            log.warning(f"[mm] Failed to generate debug HTML: {e}")
+
+    # Strip _debug data from returned results (it contains large numpy arrays)
+    for rd in parsed:
+        rd.pop("_debug", None)
+
     return parsed
 
 
