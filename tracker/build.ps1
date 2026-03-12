@@ -53,6 +53,14 @@ Write-Host "Installing dependencies..." -ForegroundColor Cyan
 uv pip install --python $Python pyinstaller -r (Join-Path $TrackerDir "requirements.txt")
 if ($LASTEXITCODE -ne 0) { throw "uv pip install failed" }
 
+# Kill running DACTracker so PyInstaller can overwrite the exe
+$running = Get-Process -Name "DACTracker" -ErrorAction SilentlyContinue
+if ($running) {
+    Write-Host "Killing running DACTracker (pid $($running.Id))..." -ForegroundColor Yellow
+    Stop-Process -Name "DACTracker" -Force
+    Start-Sleep -Seconds 1
+}
+
 # Clean previous build cache so PyInstaller picks up all changes
 if (Test-Path $BuildDir) {
     Write-Host "Cleaning build cache..." -ForegroundColor Cyan
