@@ -249,38 +249,24 @@ class TrayApp:
         ).start()
 
     def _test_parse_from_file(self) -> None:
-        """Load a screenshot from disk and run the same flow as hotkey capture."""
+        """Load a hardcoded screenshot and run the full parse+push flow."""
         import cv2
 
-        # Use the most recent my_matches screenshot available
-        test_files = sorted(
-            (DATA_DIR / "screenshots").glob("*.jpg"),
-            reverse=True,
-        )
-        if not test_files:
-            log.error("F7 test: no screenshots found in %s", DATA_DIR / "screenshots")
-            self._notify(APP_NAME, "No test screenshots found.")
-            return
-
-        # Find a my_matches screenshot
-        from cv_parser import detect_screen_type
-        test_path = None
-        for f in test_files:
-            img = cv2.imread(str(f))
-            if img is not None:
-                if detect_screen_type(img) == "my_matches":
-                    test_path = f
-                    break
-
-        if test_path is None:
-            log.error("F7 test: no my_matches screenshot found")
-            self._notify(APP_NAME, "No my_matches screenshot found in test data.")
+        test_path = Path(r"C:\Program Files (x86)\Steam\userdata\61903358\760\remote\570\screenshots\20260308030800_1.jpg")
+        if not test_path.exists():
+            log.error("F7 test: file not found: %s", test_path)
+            self._notify(APP_NAME, f"Test file not found: {test_path}")
             return
 
         log.info("F7 test: using %s", test_path.name)
         self._notify(APP_NAME, f"Test parse: {test_path.name}")
 
         img = cv2.imread(str(test_path))
+        if img is None:
+            log.error("F7 test: failed to read image")
+            self._notify(APP_NAME, "Failed to read test image.")
+            return
+
         try:
             self._do_parse_my_matches(img)
         except Exception as e:
