@@ -60,7 +60,7 @@ ICON_INNER_FRAC = 0.75  # keep central 75% of reference icon
 SYNERGY_BADGE_Y_MAX_FRAC = 0.50
 
 # Debug output directory (created when --debug is used)
-DEBUG_DIR = Path("/tmp/cv_debug")
+DEBUG_DIR = Path.home() / ".dac" / "debug"
 
 
 # ── MY MATCHES screen constants ───────────────────────────────────────────────
@@ -1354,6 +1354,9 @@ def _parse_my_matches_row(
         "rank_change": "none",
         "time_ago": "",
     }
+
+    # Save full row strip for debug
+    _save_debug(f"mm_row_{row_idx}", _crop(img, 0.0, row_y0, 1.0, row_y1), debug)
 
     # 1. Placement OCR — isolate the big yellow digit via HSV color mask
     place_cell = _crop(img, MM_COL_PLACEMENT[0], row_y0 + (row_y1 - row_y0) * 0.15,

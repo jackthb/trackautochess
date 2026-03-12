@@ -325,7 +325,7 @@ class TrayApp:
 
             from cv_parser import parse_my_matches
             player = self.config.get("player_name", "jack")
-            rows = parse_my_matches(img, player, ICONS_DIR)
+            rows = parse_my_matches(img, player, ICONS_DIR, debug=True)
             if not rows:
                 log.warning("MY MATCHES: no rows parsed")
                 self._notify(APP_NAME, "MY MATCHES: no rows parsed.")
