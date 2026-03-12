@@ -3,7 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "predev": "rm -rf public/icons && cp -r ../data/icons public/icons",
     "dev": "next dev",
+    "prebuild": "rm -rf public/icons && cp -r ../data/icons public/icons",
     "build": "next build",
     "start": "next start"
   },
