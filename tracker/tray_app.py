@@ -12,7 +12,7 @@ import logging
 import os
 import sys
 import threading
-from datetime import datetime
+from datetime import datetime, timedelta
 from pathlib import Path
 
 import pystray
@@ -332,7 +332,7 @@ class TrayApp:
                 return
             log.info("Parsed %d row(s) from MY MATCHES", len(rows))
 
-            date_str = datetime.now().strftime("%Y-%m-%d")
+            now = datetime.now().astimezone()
             imported = 0
             skipped = 0
             for i, r in enumerate(rows, 1):
@@ -340,9 +340,11 @@ class TrayApp:
                 placement = r.get("placement", "")
                 wl = r.get("wl", "")
                 level = r.get("level", "")
+                # Row 0 is most recent — offset each row by 1 hour so ordering is preserved
+                played_at = (now - timedelta(hours=i - 1)).isoformat()
 
                 # Skip duplicates via DB check
-                if user_id and game_exists(user_id, date_str, placement, wl, level):
+                if user_id and game_exists(user_id, played_at, placement, wl, level):
                     log.info("  row %d: SKIP duplicate (place=%s wl=%s level=%s)", i, placement, wl, level)
                     skipped += 1
                     continue
@@ -353,7 +355,7 @@ class TrayApp:
                     r.get("rank"), r.get("relic"), lineup, r.get("synergies"),
                 )
                 game_row = GameRow(
-                    date=date_str,
+                    played_at=played_at,
                     placement=placement,
                     rank=r.get("rank", ""),
                     rank_change=r.get("rank_change", "none"),

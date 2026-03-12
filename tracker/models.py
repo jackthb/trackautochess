@@ -12,7 +12,7 @@ class RankChange(str, Enum):
 
 @dataclass
 class GameRow:
-    date: str            # ISO datetime e.g. "2024-01-15 21:34:00"
+    played_at: str       # ISO datetime e.g. "2024-01-15T21:34:00+00:00"
     placement: str       # "1" through "8"
     rank: str            # e.g. "Bishop-1"
     rank_change: str     # RankChange value: "up", "down", "none"

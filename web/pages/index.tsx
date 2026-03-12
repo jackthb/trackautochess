@@ -4,7 +4,7 @@ import type { SupabaseClient, User } from "@supabase/supabase-js";
 
 interface Game {
   id: number;
-  date: string;
+  played_at: string;
   placement: string;
   rank: string | null;
   rank_change: string | null;
@@ -156,7 +156,7 @@ export default function Home({ supabase }: HomeProps) {
       .from("games")
       .select("*")
       .eq("user_id", steamId)
-      .order("created_at", { ascending: false })
+      .order("played_at", { ascending: false })
       .then(({ data }) => {
         setGames((data as Game[]) || []);
         setGamesLoading(false);
@@ -855,7 +855,7 @@ export default function Home({ supabase }: HomeProps) {
                             )}
                           </div>
                           <div className="cell date-cell">
-                            {g.date}
+                            {g.played_at ? new Date(g.played_at).toLocaleDateString() : ""}
                           </div>
                         </div>
                         {(lineup.length > 0 || syns.length > 0) && (

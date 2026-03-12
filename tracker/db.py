@@ -10,6 +10,7 @@ Config keys in ~/.dac/config.json:
 
 import logging
 from dataclasses import asdict
+from datetime import datetime, timedelta
 
 from utils import load_config
 
@@ -47,9 +48,10 @@ def _get_client():
     return client
 
 
-def game_exists(user_id: str, date: str, placement: str, wl: str, level: str) -> bool:
+def game_exists(user_id: str, played_at: str, placement: str, wl: str, level: str) -> bool:
     """Check if a game with these fields already exists in Supabase.
 
+    Uses a +/- 12 hour range around played_at since timestamps are approximate.
     Returns True if duplicate found, False otherwise. Never raises.
     """
     client = _get_client()
@@ -57,11 +59,14 @@ def game_exists(user_id: str, date: str, placement: str, wl: str, level: str) ->
         return False
 
     try:
+        dt = datetime.fromisoformat(played_at)
+        range_start = (dt - timedelta(hours=12)).isoformat()
+        range_end = (dt + timedelta(hours=12)).isoformat()
         resp = client.get(
             "/rest/v1/games",
             params={
+                "and": f"(played_at.gte.{range_start},played_at.lte.{range_end})",
                 "user_id": f"eq.{user_id}",
-                "date": f"eq.{date}",
                 "placement": f"eq.{placement}",
                 "wl": f"eq.{wl}",
                 "level": f"eq.{level}",
@@ -73,7 +78,7 @@ def game_exists(user_id: str, date: str, placement: str, wl: str, level: str) ->
         resp.raise_for_status()
         found = len(resp.json()) > 0
         if found:
-            log.debug("duplicate found: user=%s date=%s place=%s", user_id, date, placement)
+            log.debug("duplicate found: user=%s played_at=%s place=%s", user_id, played_at, placement)
         return found
     except Exception as e:
         log.error("game_exists error: %s", e)
@@ -135,7 +140,7 @@ def fetch_games(user_id: str, limit: int = 20) -> list[dict] | None:
             "/rest/v1/games",
             params={
                 "user_id": f"eq.{user_id}",
-                "order": "created_at.desc",
+                "order": "played_at.desc",
                 "limit": str(limit),
             },
             headers={"Accept": "application/json"},
