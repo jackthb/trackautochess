@@ -571,14 +571,11 @@ class TrayApp:
 
 
 def _kill_existing():
-    """Exit if another DACTracker instance is already running (Windows only).
-
-    Instead of killing the existing instance, we exit the NEW instance
-    so the already-running tracker stays alive.
-    """
+    """Kill any already-running DACTracker processes (Windows only)."""
     if sys.platform != "win32":
         return
     import subprocess
+    import time
     exe_name = os.path.basename(sys.executable)
     my_pid = str(os.getpid())
     try:
@@ -591,10 +588,12 @@ def _kill_existing():
             if len(parts) >= 2:
                 pid = parts[1]
                 if pid != my_pid:
-                    log.info("Another %s already running (pid %s) — exiting this instance", exe_name, pid)
-                    sys.exit(0)
+                    log.info("Killing existing %s (pid %s)", exe_name, pid)
+                    subprocess.run(["taskkill", "/F", "/PID", pid],
+                                   capture_output=True, timeout=5)
+                    time.sleep(1)
     except Exception as e:
-        log.warning("Could not check for existing process: %s", e)
+        log.warning("Could not kill existing process: %s", e)
 
 
 def main():
