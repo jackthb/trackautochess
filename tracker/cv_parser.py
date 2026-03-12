@@ -382,18 +382,26 @@ def _match_templates_multiscale(
 
 
 def _match_slot_zone(region_bgr, slot_idx, grid_start, grid_spacing, zy0, zy1,
-                     templates, threshold):
-    """Match one slot in a cropped y-zone. Returns (name, score, x, y) or None."""
+                     templates, threshold, top_n: int = 1):
+    """Match one slot in a cropped y-zone.
+
+    When top_n=1 (default), returns (name, score, x, y) or None.
+    When top_n>1, returns [(name, score, x, y), ...] sorted by score desc,
+    using a minimum threshold of 0.3 for runner-ups.
+    Also returns the slot crop as second element: (matches, slot_img).
+    """
     rw = region_bgr.shape[1]
     sx = grid_start + slot_idx * grid_spacing
     crop_x0 = max(sx - 5, 0)
     crop_x1 = min(sx + grid_spacing + 5, rw)
     slot_img = region_bgr[zy0:zy1, crop_x0:crop_x1]
     if slot_img.size == 0:
-        return None
+        return None if top_n == 1 else ([], slot_img)
 
-    best: tuple[str, float, int, int] | None = None
+    all_scores: list[tuple[str, float, int, int]] = []
     for name, tmpls in templates.items():
+        best_val = 0.0
+        best_loc = (0, 0)
         for tmpl in tmpls:
             th, tw = tmpl.shape[:2]
             if slot_img.shape[0] < th or slot_img.shape[1] < tw:
@@ -405,11 +413,21 @@ def _match_slot_zone(region_bgr, slot_idx, grid_start, grid_spacing, zy0, zy1,
                                             cv2.TM_CCOEFF_NORMED)
             result /= 3.0
             _, max_val, _, max_loc = cv2.minMaxLoc(result)
-            if max_val < threshold:
-                continue
-            if best is None or max_val > best[1]:
-                best = (name, float(max_val), sx, zy0 + max_loc[1])
-    return best
+            if max_val > best_val:
+                best_val = max_val
+                best_loc = max_loc
+        min_thresh = 0.3 if top_n > 1 else threshold
+        if best_val >= min_thresh:
+            all_scores.append((name, float(best_val), sx, zy0 + best_loc[1]))
+
+    all_scores.sort(key=lambda m: -m[1])
+
+    if top_n == 1:
+        if all_scores and all_scores[0][1] >= threshold:
+            return all_scores[0]
+        return None
+
+    return (all_scores[:top_n], slot_img)
 
 
 def _detect_two_row(region_bgr, grid_start, grid_spacing, y_mid, rh,
@@ -469,7 +487,7 @@ def _match_unit_grid(
                               templates)
 
     if two_row:
-        zones = [(0, y_mid, "top"), (y_mid, rh, "bot")]
+        zones = [(0, y_mid, "top"), (max(y_mid - 8, 0), rh, "bot")]
     else:
         # Single row — icons centred vertically
         oy0 = int(rh * MM_UNIT_ONE_ROW_Y[0])

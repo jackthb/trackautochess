@@ -24,10 +24,15 @@ from cv_parser import (
     _parse_my_matches_row,
     _load_templates_multiscale,
     _crop_row,
+    _detect_two_row,
+    _match_slot_zone,
     MM_COL_PLACEMENT, MM_COL_LEVEL, MM_COL_UNITS, MM_COL_SYNERGY,
     MM_COL_RELIC, MM_COL_WL, MM_COL_RANK,
     UNIT_ICON_SCALES, RELIC_ICON_SCALES, MM_SYNERGY_ICON_SCALES,
     TITLE_REGION, MM_TAB_REGION,
+    MM_UNIT_GRID_START_FRAC, MM_UNIT_GRID_SPACING_FRAC,
+    MM_UNIT_SPLIT_Y, MM_UNIT_ONE_ROW_Y, MM_UNIT_MAX_SLOTS,
+    UNIT_MATCH_THRESHOLD,
 )
 
 SCREENSHOT = Path(__file__).parent.parent / "data" / "screenshots" / "20260308030800_1.jpg"
@@ -153,6 +158,10 @@ def main():
     syn_templates = _load_templates_multiscale(
         ICONS_DIR / "synergies", MM_SYNERGY_ICON_SCALES)
 
+    icon_files = {}
+    for p in (ICONS_DIR / "units").glob("*.png"):
+        icon_files[p.stem] = cv2.imread(str(p))
+
     # ── Step 3: Per-row parsing (calls real _parse_my_matches_row) ────────────
     all_parsed: list[dict] = []
     for row_i, (y0, y1) in enumerate(rows):
@@ -201,6 +210,73 @@ def main():
         # Units with scores
         units = row_data.get("units", [])
         s.kv("Units", f"{len(units)}: {', '.join(units)}" if units else "(none)")
+
+        # Per-slot unit detail using real _match_slot_zone with top_n
+        unit_region = _crop(img, MM_COL_UNITS[0], y0, MM_COL_UNITS[1], y1)
+        urh, urw = unit_region.shape[:2]
+        region_bgr = unit_region if len(unit_region.shape) == 3 else cv2.cvtColor(unit_region, cv2.COLOR_GRAY2BGR)
+        grid_start = int(urw * MM_UNIT_GRID_START_FRAC)
+        grid_spacing = max(int(urw * MM_UNIT_GRID_SPACING_FRAC), 1)
+        y_mid = int(urh * MM_UNIT_SPLIT_Y)
+        two_row = _detect_two_row(region_bgr, grid_start, grid_spacing, y_mid, urh, unit_templates)
+        s.kv("Layout", f"{'two-row' if two_row else 'one-row'}")
+        if two_row:
+            zones = [(0, y_mid, "top"), (max(y_mid - 8, 0), urh, "bot")]
+        else:
+            oy0 = int(urh * MM_UNIT_ONE_ROW_Y[0])
+            oy1 = int(urh * MM_UNIT_ONE_ROW_Y[1])
+            zones = [(oy0, oy1, "row")]
+
+        s.add('<div style="margin:8px 0">')
+        s.add('<table style="border-collapse:collapse;font-size:11px;width:100%">')
+        s.add('<tr style="background:#0f3460"><th>Zone</th><th>Slot</th>'
+              '<th>Crop</th><th>Winner</th><th>Icon</th><th>Score</th>'
+              '<th>Runner-ups</th></tr>')
+        for zy0, zy1, zone_label in zones:
+            for slot_idx in range(MM_UNIT_MAX_SLOTS):
+                result = _match_slot_zone(region_bgr, slot_idx, grid_start, grid_spacing,
+                                          zy0, zy1, unit_templates, UNIT_MATCH_THRESHOLD,
+                                          top_n=5)
+                top_matches, slot_img = result
+                if not top_matches or top_matches[0][1] < 0.5:
+                    continue
+                winner_stem, winner_score, _, _ = top_matches[0]
+                winner_name = stem_to_name.get(winner_stem, winner_stem)
+                sc_color = "#0f0" if winner_score >= 0.80 else ("#ff0" if winner_score >= UNIT_MATCH_THRESHOLD else "#f66")
+                slot_b64 = img_to_b64(slot_img)
+                icon_img = icon_files.get(winner_stem)
+                icon_html = img_tag(icon_img, "", max_h=36) if icon_img is not None else "(no icon)"
+                # Runner-ups with icons
+                runners_html_parts = []
+                for ru_stem, ru_score, _, _ in top_matches[1:4]:
+                    ru_name = stem_to_name.get(ru_stem, ru_stem)
+                    ru_icon = icon_files.get(ru_stem)
+                    ru_icon_html = (f'<img src="{img_to_b64(ru_icon)}" '
+                                    f'style="max-height:28px;image-rendering:pixelated;'
+                                    f'border:1px solid #444;vertical-align:middle">'
+                                    if ru_icon is not None else "")
+                    ru_sc_color = "#0f0" if ru_score >= 0.80 else ("#ff0" if ru_score >= UNIT_MATCH_THRESHOLD else "#f66")
+                    runners_html_parts.append(
+                        f'<div style="display:inline-flex;align-items:center;gap:3px;'
+                        f'margin-right:10px;background:#0a0a2e;padding:2px 6px;'
+                        f'border-radius:4px;border:1px solid #333">'
+                        f'{ru_icon_html}'
+                        f'<span style="color:{ru_sc_color}">{ru_name}</span>'
+                        f'<span style="color:#666;font-size:9px">{ru_score:.3f}</span>'
+                        f'</div>')
+                runners = "".join(runners_html_parts)
+                bg = "#1a1a2e" if slot_idx % 2 == 0 else "#16213e"
+                s.add(f'<tr style="background:{bg}">'
+                      f'<td style="padding:4px">{zone_label}</td>'
+                      f'<td style="padding:4px">{slot_idx}</td>'
+                      f'<td style="padding:4px"><img src="{slot_b64}" style="max-height:40px;image-rendering:pixelated;border:1px solid #444"></td>'
+                      f'<td style="padding:4px;color:{sc_color}">{winner_name}</td>'
+                      f'<td style="padding:4px">{icon_html}</td>'
+                      f'<td style="padding:4px;color:{sc_color}">{winner_score:.3f}</td>'
+                      f'<td style="padding:4px;color:#888;font-size:10px">{runners}</td>'
+                      f'</tr>')
+        s.add('</table>')
+        s.add('</div>')
 
         s.kv("Synergies", row_data.get("synergies", "") or "(none)")
         s.kv("Relics", row_data.get("relic", "") or "(none)")
