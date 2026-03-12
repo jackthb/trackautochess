@@ -27,7 +27,7 @@ foreach ($entry in $RequiredPaths.GetEnumerator()) {
         $ValidationFailed = $true
     }
 }
-if ($ValidationFailed) { throw "Build environment validation failed — one or more required paths are missing." }
+if ($ValidationFailed) { throw "Build environment validation failed - one or more required paths are missing." }
 
 $DacConsoleRaw = $env:DAC_CONSOLE
 if ($DacConsoleRaw -and $DacConsoleRaw -notin @("0", "1")) {
