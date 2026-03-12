@@ -1,6 +1,7 @@
 import Head from "next/head";
 import { useEffect, useState, useMemo } from "react";
 import type { SupabaseClient, User } from "@supabase/supabase-js";
+import unitsData from "../data/units.json";
 
 interface Game {
   id: number;
@@ -37,6 +38,27 @@ interface DrodoProfile {
 
 interface HomeProps {
   supabase: SupabaseClient | null;
+}
+
+// Build cost lookup from units.json
+const UNIT_COSTS: Record<string, number> = {};
+for (const [name, info] of Object.entries(unitsData.units)) {
+  UNIT_COSTS[name] = (info as { cost: number }).cost;
+}
+
+function getUnitCost(name: string): number {
+  return UNIT_COSTS[name] ?? 1;
+}
+
+function costBorderColor(cost: number): string {
+  switch (cost) {
+    case 1: return "#3a3f50";
+    case 2: return "#5a8fd5";
+    case 3: return "#2a4a8a";
+    case 4: return "#c44ea0";
+    case 5: return "#c9a84c";
+    default: return "#3a3f50";
+  }
 }
 
 function placementColor(p: number): string {
@@ -77,7 +99,7 @@ function parseLineup(lineup: string | null): { name: string; stars: number }[] {
     const m = entry.match(/^(.+?)(?:\((\d)\))?$/);
     if (!m) return { name: entry, stars: 1 };
     return { name: m[1], stars: m[2] ? parseInt(m[2]) : 1 };
-  });
+  }).sort((a, b) => b.stars - a.stars || getUnitCost(b.name) - getUnitCost(a.name));
 }
 
 const SYN_ICON_MAP: Record<string, string> = {
@@ -214,7 +236,7 @@ export default function Home({ supabase }: HomeProps) {
           display: flex;
           align-items: center;
           justify-content: space-between;
-          padding: 16px 32px;
+          padding: 20px 40px;
           border-bottom: 1px solid var(--border-subtle);
           background: rgba(8,9,11,0.9);
           backdrop-filter: blur(8px);
@@ -224,7 +246,7 @@ export default function Home({ supabase }: HomeProps) {
         }
         .logo {
           font-family: 'Cinzel', serif;
-          font-size: 15px;
+          font-size: 18px;
           font-weight: 600;
           letter-spacing: 3px;
           text-transform: uppercase;
@@ -236,19 +258,19 @@ export default function Home({ supabase }: HomeProps) {
         .header-right {
           display: flex;
           align-items: center;
-          gap: 16px;
+          gap: 20px;
         }
         .player-name {
-          font-size: 12px;
+          font-size: 15px;
           color: var(--text-secondary);
         }
         .btn-ghost {
           font-family: inherit;
-          font-size: 11px;
+          font-size: 14px;
           color: var(--text-muted);
           background: none;
           border: 1px solid var(--border);
-          padding: 5px 14px;
+          padding: 7px 18px;
           cursor: pointer;
           letter-spacing: 0.5px;
           transition: all 0.2s;
@@ -264,7 +286,7 @@ export default function Home({ supabase }: HomeProps) {
           flex-direction: column;
           align-items: center;
           justify-content: center;
-          min-height: calc(100vh - 53px);
+          min-height: calc(100vh - 61px);
           padding: 60px 32px;
           text-align: center;
         }
@@ -298,7 +320,7 @@ export default function Home({ supabase }: HomeProps) {
           margin: 20px auto 0;
         }
         .hero-sub {
-          font-size: 13px;
+          font-size: 16px;
           color: var(--text-muted);
           max-width: 400px;
           margin-bottom: 48px;
@@ -311,14 +333,14 @@ export default function Home({ supabase }: HomeProps) {
           align-items: center;
           gap: 10px;
           font-family: 'Cinzel', serif;
-          font-size: 13px;
+          font-size: 16px;
           font-weight: 600;
           letter-spacing: 2px;
           text-transform: uppercase;
           color: var(--text-primary);
           background: linear-gradient(135deg, #1b2838 0%, #171a21 100%);
           border: 1px solid #2a3a4e;
-          padding: 14px 32px;
+          padding: 16px 36px;
           cursor: pointer;
           text-decoration: none;
           transition: all 0.3s;
@@ -329,43 +351,43 @@ export default function Home({ supabase }: HomeProps) {
           transform: translateY(-1px);
         }
         .btn-steam svg {
-          width: 18px;
-          height: 18px;
+          width: 22px;
+          height: 22px;
           fill: currentColor;
           opacity: 0.7;
         }
 
         /* ── Dashboard ── */
         .dashboard {
-          max-width: 1040px;
+          max-width: 1200px;
           margin: 0 auto;
-          padding: 32px 24px 64px;
+          padding: 40px 32px 80px;
         }
 
         /* ── Stats Bar ── */
         .stats-bar {
           display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+          grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
           gap: 1px;
           background: var(--border-subtle);
           border: 1px solid var(--border);
-          margin-bottom: 32px;
+          margin-bottom: 40px;
         }
         .stat-cell {
           background: var(--bg-surface);
-          padding: 20px 16px;
+          padding: 24px 20px;
           text-align: center;
         }
         .stat-value {
-          font-size: 24px;
+          font-size: 32px;
           font-weight: 700;
           color: var(--text-primary);
-          margin-bottom: 4px;
+          margin-bottom: 6px;
         }
         .stat-value.gold { color: var(--gold); }
         .stat-value.green { color: var(--green-bright); }
         .stat-label {
-          font-size: 10px;
+          font-size: 13px;
           letter-spacing: 1.5px;
           text-transform: uppercase;
           color: var(--text-muted);
@@ -375,16 +397,16 @@ export default function Home({ supabase }: HomeProps) {
         .refresh-row {
           display: flex;
           align-items: center;
-          gap: 12px;
-          margin-bottom: 24px;
+          gap: 16px;
+          margin-bottom: 28px;
         }
         .btn-refresh {
           font-family: inherit;
-          font-size: 11px;
+          font-size: 14px;
           color: var(--text-muted);
           background: none;
           border: 1px solid var(--border);
-          padding: 5px 14px;
+          padding: 7px 18px;
           cursor: pointer;
           letter-spacing: 0.5px;
           transition: all 0.2s;
@@ -398,7 +420,7 @@ export default function Home({ supabase }: HomeProps) {
           cursor: default;
         }
         .refresh-time {
-          font-size: 10px;
+          font-size: 13px;
           color: var(--text-muted);
         }
 
@@ -409,17 +431,17 @@ export default function Home({ supabase }: HomeProps) {
         }
         .table-header {
           display: grid;
-          grid-template-columns: 56px 1fr 100px 80px 120px 100px;
-          padding: 0 16px;
+          grid-template-columns: 72px 1fr 120px 100px 140px 120px;
+          padding: 0 20px;
           background: var(--bg-surface);
           border-bottom: 1px solid var(--border);
         }
         .th {
-          font-size: 9px;
+          font-size: 13px;
           letter-spacing: 1.5px;
           text-transform: uppercase;
           color: var(--text-muted);
-          padding: 12px 4px;
+          padding: 14px 6px;
         }
         .game-entry {
           border-bottom: 1px solid var(--border-subtle);
@@ -429,20 +451,20 @@ export default function Home({ supabase }: HomeProps) {
         .game-entry:hover { background: var(--bg-hover); }
         .game-row {
           display: grid;
-          grid-template-columns: 56px 1fr 100px 80px 120px 100px;
-          padding: 0 16px;
+          grid-template-columns: 72px 1fr 120px 100px 140px 120px;
+          padding: 0 20px;
           align-items: center;
         }
         .cell {
-          padding: 14px 4px;
-          font-size: 13px;
+          padding: 16px 6px;
+          font-size: 16px;
         }
         .placement {
-          font-size: 22px;
+          font-size: 28px;
           font-weight: 700;
           font-family: 'Cinzel', serif;
-          width: 36px;
-          height: 36px;
+          width: 52px;
+          height: 52px;
           display: flex;
           align-items: center;
           justify-content: center;
@@ -453,36 +475,36 @@ export default function Home({ supabase }: HomeProps) {
         .rank-cell {
           display: flex;
           align-items: center;
-          gap: 6px;
+          gap: 8px;
         }
         .rank-tier {
-          font-size: 12px;
+          font-size: 15px;
           color: var(--text-secondary);
         }
         .rank-num {
-          font-size: 11px;
+          font-size: 14px;
           color: var(--text-muted);
         }
         .arrow-up {
           color: var(--green-bright);
-          font-size: 10px;
+          font-size: 13px;
         }
         .arrow-down {
           color: var(--red-bright);
-          font-size: 10px;
+          font-size: 13px;
         }
         .wl {
-          font-size: 12px;
+          font-size: 15px;
         }
         .wl-w { color: var(--green-bright); }
         .wl-l { color: var(--red-bright); }
         .wl-sep { color: var(--text-muted); }
         .date-cell {
-          font-size: 11px;
+          font-size: 14px;
           color: var(--text-muted);
         }
         .level-cell {
-          font-size: 13px;
+          font-size: 16px;
           color: var(--text-secondary);
         }
 
@@ -490,46 +512,44 @@ export default function Home({ supabase }: HomeProps) {
         .detail-row {
           display: flex;
           align-items: center;
-          gap: 16px;
-          padding: 0 16px 10px 76px;
+          gap: 20px;
+          padding: 0 20px 14px 94px;
           flex-wrap: wrap;
         }
         .lineup {
           display: flex;
-          gap: 2px;
+          gap: 3px;
           align-items: center;
           flex-wrap: wrap;
         }
         .unit-icon-wrap {
           position: relative;
-          width: 28px;
-          height: 28px;
+          width: 42px;
+          height: 42px;
         }
         .unit-icon {
-          width: 28px;
-          height: 28px;
+          width: 42px;
+          height: 42px;
           border-radius: 4px;
-          border: 1px solid var(--border);
+          border: 2px solid var(--border);
           object-fit: cover;
           background: var(--bg-surface);
         }
-        .unit-icon.stars-2 { border-color: #5a8fd5; }
-        .unit-icon.stars-3 { border-color: var(--gold); }
         .unit-stars {
           position: absolute;
-          bottom: -2px;
-          right: -2px;
-          font-size: 7px;
+          bottom: -3px;
+          right: -3px;
+          font-size: 9px;
           line-height: 1;
           background: var(--bg-deep);
           border-radius: 2px;
-          padding: 1px 2px;
+          padding: 1px 3px;
         }
         .unit-stars.s2 { color: #5a8fd5; }
         .unit-stars.s3 { color: var(--gold); }
         .synergies {
           display: flex;
-          gap: 6px;
+          gap: 8px;
           align-items: center;
           flex-wrap: wrap;
           margin-left: auto;
@@ -537,17 +557,17 @@ export default function Home({ supabase }: HomeProps) {
         .syn-badge {
           display: flex;
           align-items: center;
-          gap: 3px;
-          font-size: 10px;
+          gap: 4px;
+          font-size: 13px;
           color: var(--text-muted);
           background: var(--bg-surface);
           border: 1px solid var(--border-subtle);
           border-radius: 3px;
-          padding: 2px 5px 2px 3px;
+          padding: 3px 7px 3px 4px;
         }
         .syn-icon {
-          width: 14px;
-          height: 14px;
+          width: 20px;
+          height: 20px;
           border-radius: 2px;
           object-fit: cover;
         }
@@ -561,22 +581,22 @@ export default function Home({ supabase }: HomeProps) {
         }
         .relics {
           display: flex;
-          gap: 3px;
+          gap: 4px;
           align-items: center;
         }
         .relic-icon {
-          width: 22px;
-          height: 22px;
-          border-radius: 3px;
+          width: 32px;
+          height: 32px;
+          border-radius: 4px;
           border: 1px solid var(--border);
           object-fit: cover;
           background: var(--bg-surface);
         }
         .empty-state {
           text-align: center;
-          padding: 64px 24px;
+          padding: 80px 32px;
           color: var(--text-muted);
-          font-size: 13px;
+          font-size: 16px;
           background: var(--bg-surface);
         }
 
@@ -587,13 +607,13 @@ export default function Home({ supabase }: HomeProps) {
           justify-content: center;
           min-height: 200px;
           color: var(--text-muted);
-          font-size: 12px;
+          font-size: 15px;
           letter-spacing: 1px;
         }
         .loading::after {
           content: '';
-          width: 12px;
-          height: 12px;
+          width: 14px;
+          height: 14px;
           border: 1.5px solid var(--text-muted);
           border-top-color: transparent;
           border-radius: 50%;
@@ -618,46 +638,46 @@ export default function Home({ supabase }: HomeProps) {
 
         /* ── Season History ── */
         .section-title {
-          font-size: 10px;
+          font-size: 13px;
           letter-spacing: 2px;
           text-transform: uppercase;
           color: var(--text-muted);
-          margin: 32px 0 12px;
-          padding-bottom: 8px;
+          margin: 40px 0 16px;
+          padding-bottom: 10px;
           border-bottom: 1px solid var(--border-subtle);
         }
         .seasons-grid {
           display: grid;
-          grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+          grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
           gap: 1px;
           background: var(--border-subtle);
           border: 1px solid var(--border);
-          margin-bottom: 32px;
+          margin-bottom: 40px;
         }
         .season-card {
           background: var(--bg-surface);
-          padding: 16px;
+          padding: 20px;
         }
         .season-label {
-          font-size: 10px;
+          font-size: 13px;
           letter-spacing: 1.5px;
           text-transform: uppercase;
           color: var(--text-muted);
-          margin-bottom: 8px;
+          margin-bottom: 10px;
         }
         .season-mmr {
-          font-size: 22px;
+          font-size: 28px;
           font-weight: 700;
           color: var(--text-primary);
-          margin-bottom: 2px;
+          margin-bottom: 3px;
         }
         .season-tier {
-          font-size: 11px;
+          font-size: 14px;
           color: var(--gold-dim);
-          margin-bottom: 6px;
+          margin-bottom: 8px;
         }
         .season-meta {
-          font-size: 10px;
+          font-size: 13px;
           color: var(--text-muted);
         }
         .season-peak {
@@ -858,7 +878,7 @@ export default function Home({ supabase }: HomeProps) {
                             {g.played_at ? (
                               <>
                                 <div>{new Date(g.played_at).toLocaleDateString(undefined, { month: "short", day: "numeric" })}</div>
-                                <div style={{ fontSize: "10px", opacity: 0.6 }}>{new Date(g.played_at).toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" })}</div>
+                                <div style={{ fontSize: "12px", opacity: 0.6 }}>{new Date(g.played_at).toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" })}</div>
                               </>
                             ) : "—"}
                           </div>
@@ -870,10 +890,11 @@ export default function Home({ supabase }: HomeProps) {
                                 {lineup.map((u, i) => (
                                   <div key={i} className="unit-icon-wrap" title={`${u.name}${u.stars > 1 ? ` ★${u.stars}` : ""}`}>
                                     <img
-                                      className={`unit-icon${u.stars >= 3 ? " stars-3" : u.stars === 2 ? " stars-2" : ""}`}
+                                      className="unit-icon"
                                       src={`/icons/units/${unitStem(u.name)}.png`}
                                       alt={u.name}
                                       loading="lazy"
+                                      style={{ borderColor: costBorderColor(getUnitCost(u.name)) }}
                                       onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
                                     />
                                     {u.stars > 1 && (
