@@ -20,6 +20,9 @@ OVERLAY_TIMEOUT = 120
 ICON_X = 0.087  # center of icon horizontally
 ICON_Y = 0.027  # center of icon vertically
 
+# Transparent key color — Windows will punch through this color
+TRANSPARENT_KEY = "#f0f0f0"
+
 
 class GameEndOverlay:
     """Topmost overlay window shown after game end detection."""
@@ -72,7 +75,7 @@ class GameEndOverlay:
         root.title("DAC Tracker")
         root.attributes("-topmost", True)
         root.overrideredirect(True)  # no title bar
-        root.configure(bg="#1a1a2e")
+        root.configure(bg=TRANSPARENT_KEY)
 
         screen_w = root.winfo_screenwidth()
         screen_h = root.winfo_screenheight()
@@ -89,17 +92,22 @@ class GameEndOverlay:
         y = max(0, icon_py - h // 2)  # vertically centered on icon
         root.geometry(f"{w}x{h}+{x}+{y}")
 
-        # Semi-transparent on Windows
+        # Transparent key color — Windows punches through this
         try:
-            root.attributes("-alpha", 0.92)
+            root.wm_attributes("-transparentcolor", TRANSPARENT_KEY)
         except Exception:
             pass
 
-        # Arrow pointing left, outside the box (negative x offset)
-        # Arrow sits at 25% height
+        # Semi-transparent on Windows
+        try:
+            root.attributes("-alpha", 0.95)
+        except Exception:
+            pass
+
+        # Arrow canvas — background is transparent key, only polygon is opaque
         arrow_y = int(h * 0.25)
         arrow_canvas = tk.Canvas(
-            root, width=w, height=h, bg="#1a1a2e",
+            root, width=w, height=h, bg=TRANSPARENT_KEY,
             highlightthickness=0, bd=0,
         )
         arrow_canvas.place(x=0, y=0)
@@ -111,31 +119,34 @@ class GameEndOverlay:
         )
 
         # Content panel
-        frame = tk.Frame(root, bg="#1a1a2e", padx=10, pady=8)
+        frame = tk.Frame(
+            root, bg="#0e1014", padx=10, pady=8,
+            highlightbackground="#1e2230", highlightthickness=1,
+        )
         frame.place(x=arrow_w, y=0, width=panel_w, height=h)
 
         title_text = "GG!" if self._won else "Game Over!"
-        title_fg = "#4ade80" if self._won else "#e0e0e0"
+        title_fg = "#4eaa62" if self._won else "#c8ccd8"
         title = tk.Label(
-            frame, text=title_text, font=("Segoe UI", 14, "bold"),
-            fg=title_fg, bg="#1a1a2e",
+            frame, text=title_text, font=("Consolas", 14, "bold"),
+            fg=title_fg, bg="#0e1014",
         )
         title.pack(anchor=tk.W)
 
         subtitle = tk.Label(
             frame, text="Click Match History, then Capture.",
-            font=("Segoe UI", 10), fg="#a0a0a0", bg="#1a1a2e",
+            font=("Consolas", 10), fg="#6b7080", bg="#0e1014",
             wraplength=250, justify=tk.LEFT,
         )
         subtitle.pack(anchor=tk.W, pady=(2, 8))
 
-        btn_frame = tk.Frame(frame, bg="#1a1a2e")
+        btn_frame = tk.Frame(frame, bg="#0e1014")
         btn_frame.pack(fill=tk.X)
 
         btn_w = 12  # character width — same for both
         capture_btn = tk.Button(
             btn_frame, text="Capture",
-            font=("Segoe UI", 10, "bold"), width=btn_w,
+            font=("Consolas", 10, "bold"), width=btn_w,
             bg="#4a6fa5", fg="white", activebackground="#5a8fd5",
             relief=tk.FLAT, pady=4,
             command=self._on_capture_click,
@@ -144,8 +155,8 @@ class GameEndOverlay:
 
         dismiss_btn = tk.Button(
             btn_frame, text="Dismiss",
-            font=("Segoe UI", 10), width=btn_w,
-            bg="#333", fg="#aaa", activebackground="#555",
+            font=("Consolas", 10), width=btn_w,
+            bg="#14161c", fg="#3a3f50", activebackground="#1a1d26",
             relief=tk.FLAT, pady=4,
             command=self._on_dismiss_click,
         )
