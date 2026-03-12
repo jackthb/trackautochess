@@ -413,32 +413,32 @@ def _match_slot_zone(region_bgr, slot_idx, grid_start, grid_spacing, zy0, zy1,
 
 def _detect_two_row(region_bgr, grid_start, grid_spacing, y_mid, rh,
                     templates):
-    """Check if slot 0 bottom half has a strong match (>=0.9).
+    """Check if any of the first 3 slots in the bottom half has a match >= 0.70.
 
-    If the first column's bottom half has a confident unit match, the row
-    has a two-row layout (10+ units). A high threshold avoids false positives
-    from dark templates matching empty background.
+    Checks multiple slots because the bottom row may not start at slot 0.
     """
     rw = region_bgr.shape[1]
-    crop_x0 = max(grid_start - 5, 0)
-    crop_x1 = min(grid_start + grid_spacing + 5, rw)
-    slot_img = region_bgr[y_mid:rh, crop_x0:crop_x1]
-    if slot_img.size == 0:
-        return False
-    for name, tmpls in templates.items():
-        for tmpl in tmpls:
-            th, tw = tmpl.shape[:2]
-            if slot_img.shape[0] < th or slot_img.shape[1] < tw:
-                continue
-            result = np.zeros((slot_img.shape[0] - th + 1,
-                               slot_img.shape[1] - tw + 1), dtype=np.float32)
-            for ch in range(3):
-                result += cv2.matchTemplate(slot_img[:, :, ch], tmpl[:, :, ch],
-                                            cv2.TM_CCOEFF_NORMED)
-            result /= 3.0
-            _, max_val, _, _ = cv2.minMaxLoc(result)
-            if max_val >= 0.80:
-                return True
+    for slot_idx in range(3):
+        sx = grid_start + slot_idx * grid_spacing
+        crop_x0 = max(sx - 5, 0)
+        crop_x1 = min(sx + grid_spacing + 5, rw)
+        slot_img = region_bgr[y_mid:rh, crop_x0:crop_x1]
+        if slot_img.size == 0:
+            continue
+        for name, tmpls in templates.items():
+            for tmpl in tmpls:
+                th, tw = tmpl.shape[:2]
+                if slot_img.shape[0] < th or slot_img.shape[1] < tw:
+                    continue
+                result = np.zeros((slot_img.shape[0] - th + 1,
+                                   slot_img.shape[1] - tw + 1), dtype=np.float32)
+                for ch in range(3):
+                    result += cv2.matchTemplate(slot_img[:, :, ch], tmpl[:, :, ch],
+                                                cv2.TM_CCOEFF_NORMED)
+                result /= 3.0
+                _, max_val, _, _ = cv2.minMaxLoc(result)
+                if max_val >= 0.70:
+                    return True
     return False
 
 
