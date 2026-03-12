@@ -37,7 +37,7 @@ _setup_tesseract()
 
 # ── Config ────────────────────────────────────────────────────────────────────
 
-from utils import load_config, save_config, DAC_DIR, ICONS_DIR
+from utils import load_config, save_config, DAC_DIR, DATA_DIR, ICONS_DIR
 
 APP_NAME = "DAC Tracker"
 LOG_PATH = DAC_DIR / "tracker.log"
@@ -229,7 +229,8 @@ class TrayApp:
             hotkey = self.config.get("hotkey", "F6")
             keyboard.add_hotkey(hotkey, self._on_hotkey, suppress=False)
             keyboard.add_hotkey("F5", self._on_test_overlay, suppress=False)
-            log.info("Registered hotkeys: %s (capture), F5 (test overlay)", hotkey)
+            keyboard.add_hotkey("F7", self._on_test_parse, suppress=False)
+            log.info("Registered hotkeys: %s (capture), F5 (test overlay), F7 (test parse)", hotkey)
         except ImportError:
             log.warning("keyboard module not available — hotkey disabled")
         except Exception as e:
@@ -239,6 +240,52 @@ class TrayApp:
         """Test hotkey: show the game-end overlay without sentinel trigger."""
         log.info("F5 pressed — showing overlay (test)")
         self._show_overlay()
+
+    def _on_test_parse(self) -> None:
+        """Test hotkey: load a known my_matches screenshot and run full parse+push flow."""
+        log.info("F7 pressed — test parse from file")
+        threading.Thread(
+            target=self._test_parse_from_file, daemon=True, name="test-parse",
+        ).start()
+
+    def _test_parse_from_file(self) -> None:
+        """Load a screenshot from disk and run the same flow as hotkey capture."""
+        import cv2
+
+        # Use the most recent my_matches screenshot available
+        test_files = sorted(
+            (DATA_DIR / "screenshots").glob("*.jpg"),
+            reverse=True,
+        )
+        if not test_files:
+            log.error("F7 test: no screenshots found in %s", DATA_DIR / "screenshots")
+            self._notify(APP_NAME, "No test screenshots found.")
+            return
+
+        # Find a my_matches screenshot
+        from cv_parser import detect_screen_type
+        test_path = None
+        for f in test_files:
+            img = cv2.imread(str(f))
+            if img is not None:
+                if detect_screen_type(img) == "my_matches":
+                    test_path = f
+                    break
+
+        if test_path is None:
+            log.error("F7 test: no my_matches screenshot found")
+            self._notify(APP_NAME, "No my_matches screenshot found in test data.")
+            return
+
+        log.info("F7 test: using %s", test_path.name)
+        self._notify(APP_NAME, f"Test parse: {test_path.name}")
+
+        img = cv2.imread(str(test_path))
+        try:
+            self._do_parse_my_matches(img)
+        except Exception as e:
+            log.error("F7 test parse error: %s", e, exc_info=True)
+            self._notify(APP_NAME, f"Test parse error: {e}")
 
     def _on_hotkey(self) -> None:
         """Handle hotkey press: capture screen, detect type, parse if My Matches."""
@@ -524,14 +571,17 @@ class TrayApp:
 
 
 def _kill_existing():
-    """Kill any already-running DACTracker processes (Windows only)."""
+    """Exit if another DACTracker instance is already running (Windows only).
+
+    Instead of killing the existing instance, we exit the NEW instance
+    so the already-running tracker stays alive.
+    """
     if sys.platform != "win32":
         return
     import subprocess
     exe_name = os.path.basename(sys.executable)
     my_pid = str(os.getpid())
     try:
-        # List all processes with this name, then kill any that aren't us
         result = subprocess.run(
             ["tasklist", "/FI", f"IMAGENAME eq {exe_name}", "/FO", "CSV", "/NH"],
             capture_output=True, text=True, timeout=5,
@@ -541,11 +591,10 @@ def _kill_existing():
             if len(parts) >= 2:
                 pid = parts[1]
                 if pid != my_pid:
-                    log.info("Killing existing %s (pid %s)", exe_name, pid)
-                    subprocess.run(["taskkill", "/F", "/PID", pid],
-                                   capture_output=True, timeout=5)
+                    log.info("Another %s already running (pid %s) — exiting this instance", exe_name, pid)
+                    sys.exit(0)
     except Exception as e:
-        log.warning("Could not kill existing process: %s", e)
+        log.warning("Could not check for existing process: %s", e)
 
 
 def main():
