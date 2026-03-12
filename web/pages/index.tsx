@@ -855,7 +855,12 @@ export default function Home({ supabase }: HomeProps) {
                             )}
                           </div>
                           <div className="cell date-cell">
-                            {g.played_at ? new Date(g.played_at).toLocaleDateString() : ""}
+                            {g.played_at ? (
+                              <>
+                                <div>{new Date(g.played_at).toLocaleDateString(undefined, { month: "short", day: "numeric" })}</div>
+                                <div style={{ fontSize: "10px", opacity: 0.6 }}>{new Date(g.played_at).toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" })}</div>
+                              </>
+                            ) : "—"}
                           </div>
                         </div>
                         {(lineup.length > 0 || syns.length > 0) && (
