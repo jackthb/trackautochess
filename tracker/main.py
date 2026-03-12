@@ -23,7 +23,7 @@ def cmd_import_matches_cv(args: list[str]) -> None:
     real in-game counts to be higher than what is recorded here.
     """
     from models import GameRow
-    from cv_parser import parse_my_matches, detect_screen_type
+    from cv_parser import parse_my_matches, detect_screen_type, infer_timestamps
     from db import game_exists, push_game
     from utils import save_config
     import cv2
@@ -76,28 +76,28 @@ def cmd_import_matches_cv(args: list[str]) -> None:
         sys.exit(1)
 
     print(f"[tracker] Parsing MY MATCHES: {screenshot_path.name}")
+    screenshot_time = datetime.now()
     rows = parse_my_matches(img, player_name, ICONS_DIR, debug=debug)
 
     if not rows:
         print("[tracker] CV returned no rows.")
         sys.exit(1)
 
-    date_str = datetime.now().strftime("%Y-%m-%d")
+    timestamps = infer_timestamps(rows, screenshot_time)
 
     # Convert CV row dicts to GameRow objects and push to Supabase
     pushed = 0
     skipped = 0
     failed = 0
-    for r in rows:
+    for r, date_str in zip(rows, timestamps):
         placement = r.get("placement", "")
         level = r.get("level", "")
         wl = r.get("wl", "")
+        lineup = "|".join(r.get("units", []))
 
-        if game_exists(steam_id, date_str, placement, wl, level):
+        if game_exists(steam_id, date_str, placement, wl, level, lineup):
             skipped += 1
             continue
-
-        lineup = "|".join(r.get("units", []))
         game_row = GameRow(
             date=date_str,
             placement=placement,

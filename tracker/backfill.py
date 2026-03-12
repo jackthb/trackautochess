@@ -7,6 +7,7 @@ Usage:
 import logging
 import re
 import sys
+from datetime import datetime
 from pathlib import Path
 
 import cv2
@@ -14,7 +15,7 @@ import cv2
 # Add tracker dir to path
 sys.path.insert(0, str(Path(__file__).parent))
 
-from cv_parser import detect_screen_type, parse_my_matches
+from cv_parser import detect_screen_type, parse_my_matches, infer_timestamps
 from db import push_game, game_exists
 from models import GameRow
 from utils import load_config, ICONS_DIR
@@ -29,15 +30,16 @@ log = logging.getLogger("dac")
 log.setLevel(logging.INFO)
 
 
-def date_from_filename(name: str) -> str:
-    """Extract date from Steam screenshot filename like '20260205025343_1.jpg'.
+def datetime_from_filename(name: str) -> datetime | None:
+    """Extract datetime from Steam screenshot filename like '20260205025343_1.jpg'.
 
-    Returns 'YYYY-MM-DD' string.
+    Returns a datetime object, or None if the filename doesn't match.
     """
     m = re.match(r"(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})", name)
     if m:
-        return f"{m.group(1)}-{m.group(2)}-{m.group(3)}"
-    return ""
+        return datetime(int(m.group(1)), int(m.group(2)), int(m.group(3)),
+                        int(m.group(4)), int(m.group(5)), int(m.group(6)))
+    return None
 
 
 def main():
@@ -72,8 +74,8 @@ def main():
     total_not_mm = 0
 
     for i, path in enumerate(screenshots):
-        date_str = date_from_filename(path.name)
-        if not date_str:
+        screenshot_time = datetime_from_filename(path.name)
+        if not screenshot_time:
             print(f"  [{i+1}/{len(screenshots)}] {path.name}: can't parse date, skipping")
             continue
 
@@ -87,14 +89,16 @@ def main():
             total_not_mm += 1
             continue
 
-        print(f"  [{i+1}/{len(screenshots)}] {path.name} — MY MATCHES ({date_str})")
+        print(f"  [{i+1}/{len(screenshots)}] {path.name} — MY MATCHES ({screenshot_time.strftime('%Y-%m-%d %H:%M:%S')})")
 
         rows = parse_my_matches(img, player_name, ICONS_DIR)
         if not rows:
             print(f"    No rows parsed")
             continue
 
-        for j, r in enumerate(rows):
+        timestamps = infer_timestamps(rows, screenshot_time)
+
+        for j, (r, date_str) in enumerate(zip(rows, timestamps)):
             placement = r.get("placement", "")
             level = r.get("level", "")
             wl = r.get("wl", "")
@@ -104,12 +108,12 @@ def main():
             rank = r.get("rank", "")
             rank_change = r.get("rank_change", "none")
 
-            if not dry_run and game_exists(steam_id, date_str, placement, wl, level):
+            if not dry_run and game_exists(steam_id, date_str, placement, wl, level, lineup):
                 print(f"    row {j+1}: SKIP duplicate (place={placement} wl={wl} level={level})")
                 total_skipped += 1
                 continue
 
-            print(f"    row {j+1}: #{placement} Lv{level} {wl} {rank} units={len(r.get('units', []))} relics={relic}")
+            print(f"    row {j+1}: #{placement} Lv{level} {wl} {rank} units={len(r.get('units', []))} relics={relic} time={date_str}")
 
             if not dry_run:
                 game_row = GameRow(

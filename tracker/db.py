@@ -48,10 +48,11 @@ def _get_client():
     return client
 
 
-def game_exists(user_id: str, played_at: str, placement: str, wl: str, level: str) -> bool:
+def game_exists(user_id: str, played_at: str, placement: str, wl: str, level: str, lineup: str = "") -> bool:
     """Check if a game with these fields already exists in Supabase.
 
     Uses a +/- 12 hour range around played_at since timestamps are approximate.
+    Includes lineup when available to distinguish same-session games.
     Returns True if duplicate found, False otherwise. Never raises.
     """
     client = _get_client()
@@ -62,17 +63,20 @@ def game_exists(user_id: str, played_at: str, placement: str, wl: str, level: st
         dt = datetime.fromisoformat(played_at)
         range_start = (dt - timedelta(hours=12)).isoformat()
         range_end = (dt + timedelta(hours=12)).isoformat()
+        params = {
+            "and": f"(played_at.gte.{range_start},played_at.lte.{range_end})",
+            "user_id": f"eq.{user_id}",
+            "placement": f"eq.{placement}",
+            "wl": f"eq.{wl}",
+            "level": f"eq.{level}",
+            "select": "id",
+            "limit": "1",
+        }
+        if lineup:
+            params["lineup"] = f"eq.{lineup}"
         resp = client.get(
             "/rest/v1/games",
-            params={
-                "and": f"(played_at.gte.{range_start},played_at.lte.{range_end})",
-                "user_id": f"eq.{user_id}",
-                "placement": f"eq.{placement}",
-                "wl": f"eq.{wl}",
-                "level": f"eq.{level}",
-                "select": "id",
-                "limit": "1",
-            },
+            params=params,
             headers={"Accept": "application/json"},
         )
         resp.raise_for_status()
@@ -116,7 +120,7 @@ def push_game(row, user_id: str | None = None) -> bool:
     try:
         data = {k: str(v) if v else None for k, v in asdict(row).items()}
         if user_id:
-            data["user_id"] = user_id
+            data["user_id"] = int(user_id)
         resp = client.post("/rest/v1/games", json=data)
         resp.raise_for_status()
         log.info("pushed game: placement=%s", data.get("placement"))
