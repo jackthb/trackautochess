@@ -1355,30 +1355,28 @@ def _parse_my_matches_row(
         "time_ago": "",
     }
 
-    # 1. Placement OCR — "#X/8" text, large digit in bottom half of cell
+    # 1. Placement OCR — isolate the big yellow digit via HSV color mask
     place_cell = _crop(img, MM_COL_PLACEMENT[0], row_y0 + (row_y1 - row_y0) * 0.15,
                        MM_COL_PLACEMENT[1], row_y0 + (row_y1 - row_y0) * 0.75)
-    place_proc = _preprocess_for_ocr(place_cell, scale=3.0)
+    hsv_place = cv2.cvtColor(place_cell, cv2.COLOR_BGR2HSV)
+    yellow_mask = cv2.inRange(hsv_place, (15, 80, 150), (40, 255, 255))
+    yellow_mask = cv2.dilate(yellow_mask, np.ones((2, 2), np.uint8), iterations=1)
+    place_proc = cv2.bitwise_not(yellow_mask)
+    place_proc = cv2.resize(place_proc,
+                            (place_proc.shape[1] * 4, place_proc.shape[0] * 4),
+                            interpolation=cv2.INTER_NEAREST)
+    place_proc = cv2.copyMakeBorder(place_proc, 20, 20, 20, 20,
+                                    cv2.BORDER_CONSTANT, value=255)
     _save_debug(f"mm_place_{row_idx}", place_proc, debug)
-    place_raw = _ocr(place_proc, psm=7, whitelist="0123456789#/")
-    # Parse "#X/Y" pattern — take the first single digit (the placement)
-    m = re.search(r"#?(\d)\s*/", place_raw)
-    if m:
-        result["placement"] = m.group(1)
-    else:
-        # Fallback: find "X/Y" pattern
-        m2 = re.search(r"(\d)\s*/\s*\d", place_raw)
-        if m2:
-            result["placement"] = m2.group(1)
-    if not result["placement"]:
-        m3 = re.search(r"#(\d)", place_raw)
-        if m3 and 1 <= int(m3.group(1)) <= 8:
-            result["placement"] = m3.group(1)
-    if not result["placement"]:
-        # Last resort: lone digit 1-8
-        m4 = re.search(r"\b([1-8])\b", place_raw)
-        if m4:
-            result["placement"] = m4.group(1)
+    # Try multiple psm modes — single-char (13) works best, fallback through others
+    place_raw = ""
+    for _psm in [13, 8, 6, 7]:
+        raw = _ocr(place_proc, psm=_psm, whitelist="12345678").strip()
+        digits = [c for c in raw if c in "12345678"]
+        if digits:
+            result["placement"] = digits[0]
+            place_raw = raw
+            break
     log.debug(f"  [row {row_idx}] placement OCR: {place_raw!r} → {result['placement']!r}")
     # 2. Level OCR — "LvXX" or just the digit
     level_cell = _crop(img, MM_COL_LEVEL[0], row_y0 + (row_y1 - row_y0) * 0.30,
