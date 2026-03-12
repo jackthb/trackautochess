@@ -82,9 +82,9 @@ MM_COL_SYNERGY   = (0.597, 0.692)
 MM_COL_RELIC     = (0.7035, 0.7491)
 MM_COL_WL        = (0.752, 0.792)
 MM_COL_RANK      = (0.792, 0.863)
-# "X hrs ago" / "X days ago" text — left panel, below any thumbnail.
-# Calibrated on 3440×1440; adjust if the text lands outside this crop.
-MM_COL_TIME      = (0.200, 0.390)
+# "X hrs ago" / "X days ago" text — same x as placement, bottom portion of row.
+# Calibrated on 3440×1440.
+MM_COL_TIME      = (0.390, 0.436)
 
 UNIT_ICON_SCALES    = [24, 28, 32, 36, 40, 44]
 UNIT_MATCH_THRESHOLD = 0.65
@@ -444,7 +444,7 @@ def _detect_two_row(region_bgr, grid_start, grid_spacing, y_mid, rh,
         sx = grid_start + slot_idx * grid_spacing
         crop_x0 = max(sx - 5, 0)
         crop_x1 = min(sx + grid_spacing + 5, rw)
-        slot_img = region_bgr[y_mid:rh, crop_x0:crop_x1]
+        slot_img = region_bgr[max(y_mid - 8, 0):rh, crop_x0:crop_x1]
         if slot_img.size == 0:
             continue
         for name, tmpls in templates.items():
@@ -957,6 +957,11 @@ def _find_my_matches_rows(img: np.ndarray, debug: bool = False) -> list[tuple[fl
             last_sep += row_h_px
 
         log.debug(f"  [mm rows] row height={row_h_px}px, extrapolated to {len(rows)} total rows")
+
+        # Normalize all rows to uniform height from their top edge
+        uniform_h = row_h_px / h
+        rows = [(y0, min(y0 + uniform_h, 1.0)) for y0, _ in rows]
+
     # Fallback: fixed geometry (assume 8 rows of equal height)
     if len(rows) < 3:
         log.debug("  [mm rows] scan failed, using fixed 8-row geometry")
@@ -1636,8 +1641,9 @@ def _parse_my_matches_row(
         result["_debug"]["rank_green_pct"] = green_pct
         result["_debug"]["rank_red_pct"] = red_pct
         result["_debug"]["row_strip"] = _crop(img, 0.0, row_y0, 1.0, row_y1)
-    # 8. Time-ago OCR — "3hrs ago", "2 days ago" text in left panel
-    time_cell = _crop_row(img, MM_COL_TIME, row_y0, row_y1)
+    # 8. Time-ago OCR — same x as placement, bottom portion of row
+    rh = row_y1 - row_y0
+    time_cell = _crop(img, MM_COL_TIME[0], row_y0 + rh * 0.65, MM_COL_TIME[1], row_y1)
     time_proc = _preprocess_for_ocr(time_cell, scale=2.5, invert=True)
     _save_debug(f"mm_time_{row_idx}", time_proc, debug)
     time_raw = _ocr(time_proc, psm=6)

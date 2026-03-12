@@ -1,9 +1,9 @@
-"""Debug F7 test screenshot: run the actual parse pipeline, emit HTML report.
+"""Per-screenshot debug: run the full parse pipeline on one screenshot, emit HTML report.
 
 Calls the real cv_parser functions — no reimplementation.
 
 Usage:
-    cd tracker && python debug_f7.py
+    cd tracker && python debug_screenshot.py [path/to/screenshot.jpg]
 """
 
 import base64
@@ -26,8 +26,10 @@ from cv_parser import (
     _crop_row,
     _detect_two_row,
     _match_slot_zone,
+    _preprocess_for_ocr,
+    _normalise_time_ago,
     MM_COL_PLACEMENT, MM_COL_LEVEL, MM_COL_UNITS, MM_COL_SYNERGY,
-    MM_COL_RELIC, MM_COL_WL, MM_COL_RANK,
+    MM_COL_RELIC, MM_COL_WL, MM_COL_RANK, MM_COL_TIME,
     UNIT_ICON_SCALES, RELIC_ICON_SCALES, MM_SYNERGY_ICON_SCALES,
     TITLE_REGION, MM_TAB_REGION,
     MM_UNIT_GRID_START_FRAC, MM_UNIT_GRID_SPACING_FRAC,
@@ -35,8 +37,12 @@ from cv_parser import (
     UNIT_MATCH_THRESHOLD,
 )
 
-SCREENSHOT = Path(__file__).parent.parent / "data" / "screenshots" / "20260308030800_1.jpg"
-OUTPUT = Path(__file__).parent.parent / "data" / "f7_debug.html"
+_default_screenshot = Path(__file__).parent.parent / "data" / "screenshots" / "20260308030800_1.jpg"
+if len(sys.argv) > 1:
+    SCREENSHOT = Path(sys.argv[1])
+else:
+    SCREENSHOT = _default_screenshot
+OUTPUT = Path(__file__).parent.parent / "data" / f"{SCREENSHOT.stem}_debug.html"
 
 log = logging.getLogger("dac")
 logging.basicConfig(level=logging.DEBUG, format="%(message)s")
@@ -195,6 +201,7 @@ def main():
                           MM_COL_WL[1], y0 + rh*0.95)),
             ("Rank", _crop(img, MM_COL_RANK[0], y0 + rh*0.20,
                            MM_COL_RANK[1], y0 + rh*0.80)),
+            ("Time", _crop(img, MM_COL_TIME[0], y0 + rh*0.65, MM_COL_TIME[1], y1)),
         ]
         s.add('<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:flex-start">')
         for label, crop_img in crops:
@@ -284,6 +291,24 @@ def main():
              "#0f0" if row_data.get("wl") else "#f00")
         s.kv("Rank", f"{row_data.get('rank', '')} ({row_data.get('rank_change', 'none')})")
 
+        # Time-ago OCR detail
+        time_cell = _crop(img, MM_COL_TIME[0], y0 + rh * 0.65, MM_COL_TIME[1], y1)
+        time_proc = _preprocess_for_ocr(time_cell, scale=2.5, invert=True)
+        time_raw = _ocr(time_proc, psm=6)
+        time_norm = _normalise_time_ago(time_raw)
+        s.add('<div style="margin:8px 0;padding:8px;background:#0a0a0a;border-radius:6px;border:1px solid #333">')
+        s.add('<div style="font-size:12px;font-weight:bold;color:#4a6fa5;margin-bottom:6px">Time-ago OCR</div>')
+        s.add('<div style="display:flex;gap:12px;align-items:flex-start">')
+        s.add(img_tag(time_cell, "Raw crop", max_h=60))
+        s.add(img_tag(time_proc, "Preprocessed", max_h=60))
+        s.add('</div>')
+        s.kv("Raw OCR", repr(time_raw))
+        s.kv("Normalised", time_norm or "(empty)",
+             "#0f0" if time_norm else "#f00")
+        s.kv("Parsed result", row_data.get("time_ago", "") or "(empty)",
+             "#0f0" if row_data.get("time_ago") else "#f00")
+        s.add('</div>')
+
         # Row summary bar
         s.add(
             f'<div style="margin-top:12px;padding:10px;background:#0f3460;'
@@ -292,7 +317,8 @@ def main():
             f'Place={row_data["placement"]} Level={row_data["level"]} '
             f'W-L={row_data["wl"]} Rank={row_data["rank"]}({row_data["rank_change"]}) '
             f'Units={len(units)} Syn={row_data["synergies"] or "-"} '
-            f'Relics={row_data["relic"] or "-"}'
+            f'Relics={row_data["relic"] or "-"} '
+            f'Time={row_data.get("time_ago") or "-"}'
             f'</div>')
 
         s.logs(log_lines[:])
@@ -303,7 +329,7 @@ def main():
     s = Section("Step 4: Summary", open_=True)
     s.kv("Rows", str(len(all_parsed)))
 
-    cols = ["#", "Place", "Level", "W-L", "Rank", "Change", "Units", "Synergies", "Relics"]
+    cols = ["#", "Place", "Level", "W-L", "Rank", "Change", "Units", "Synergies", "Relics", "Time"]
     t = '<table style="border-collapse:collapse;width:100%;font-size:12px;margin:8px 0">'
     t += '<tr style="background:#0f3460">'
     t += "".join(f'<th style="padding:6px 8px;text-align:left">{c}</th>' for c in cols)
@@ -322,6 +348,7 @@ def main():
               f'{", ".join(units)}</td>'
               f'<td style="padding:4px 8px">{rd["synergies"]}</td>'
               f'<td style="padding:4px 8px">{rd["relic"]}</td>'
+              f'<td style="padding:4px 8px">{rd.get("time_ago","")}</td>'
               f'</tr>')
     t += '</table>'
     s.add(t)
@@ -341,7 +368,7 @@ details {{ margin-bottom:16px; background:#1a1a1a; padding:4px 16px; border-radi
 summary:hover {{ color:#fff }}
 img {{ vertical-align:middle }}
 </style></head><body>
-<h1>F7 Debug Report — {SCREENSHOT.name} ({w}×{h})</h1>
+<h1>Screenshot Debug Report — {SCREENSHOT.name} ({w}×{h})</h1>
 {body}
 </body></html>"""
 

@@ -180,9 +180,14 @@ class TrayApp:
     def _show_overlay(self) -> None:
         """Show the game-end overlay prompting user to open Match History."""
         from overlay import GameEndOverlay
-        # Dismiss any existing overlay
-        if self._overlay and self._overlay._alive:
-            self._overlay.dismiss()
+        # Dismiss any existing overlay and wait for its thread to finish
+        # so the old Tcl interpreter is fully cleaned up before creating
+        # a new tk.Tk() (avoids "Tcl_AsyncDelete: wrong thread" crash).
+        if self._overlay:
+            if self._overlay._alive:
+                self._overlay.dismiss()
+            if self._overlay._thread and self._overlay._thread.is_alive():
+                self._overlay._thread.join(timeout=2)
         self._overlay = GameEndOverlay(
             on_capture=self._overlay_capture,
             on_dismiss=lambda: log.info("Overlay dismissed without capture"),
@@ -311,7 +316,7 @@ class TrayApp:
         """Parse a My Matches screen image (numpy array or file path)."""
         import cv2
         from models import GameRow
-        from db import game_exists, push_game
+        from db import game_exists, push_game, upload_screenshot
 
         user_id = self.config.get("steam_id") or None
 
@@ -334,9 +339,27 @@ class TrayApp:
             log.info("Parsed %d row(s) from MY MATCHES", len(rows))
 
             timestamps = infer_timestamps(rows, screenshot_time)
+
+            # Show confirmation UI — user can edit/exclude rows
+            from confirm_ui import show_confirmation
+            confirmed = show_confirmation(img, rows, timestamps)
+            if confirmed is None:
+                log.info("User cancelled confirmation")
+                self._notify(APP_NAME, "Import cancelled.")
+                return
+            if not confirmed:
+                log.info("No rows selected for import")
+                self._notify(APP_NAME, "No rows selected.")
+                return
+
+            # Upload screenshot once for the whole batch
+            screenshot_url = ""
+            if user_id:
+                screenshot_url = upload_screenshot(img, user_id) or ""
+
             imported = 0
             skipped = 0
-            for i, (r, played_at) in enumerate(zip(rows, timestamps), 1):
+            for i, (r, played_at) in enumerate(confirmed, 1):
                 lineup = "|".join(r.get("units", []))
                 placement = r.get("placement", "")
                 wl = r.get("wl", "")
@@ -364,6 +387,7 @@ class TrayApp:
                     relic=r.get("relic", ""),
                     level=level,
                     wl=wl,
+                    screenshot=screenshot_url,
                     notes="",
                 )
                 push_game(game_row, user_id=user_id)

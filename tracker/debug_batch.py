@@ -1,10 +1,10 @@
-"""Batch debug: run the F7 parse pipeline on every screenshot, emit one HTML report.
+"""Batch debug: run the parse pipeline on all screenshots, emit one HTML report.
 
 Calls the real cv_parser functions — no reimplementation.
-Filters to my_matches screen type, then runs the same debug as debug_f7.py.
+Filters to my_matches screen type.
 
 Usage:
-    cd tracker && python debug_all_screenshots.py
+    cd tracker && python debug_batch.py [--push]
 """
 
 import argparse
@@ -31,7 +31,7 @@ from cv_parser import (
     _detect_two_row,
     _match_slot_zone,
     MM_COL_PLACEMENT, MM_COL_LEVEL, MM_COL_UNITS, MM_COL_SYNERGY,
-    MM_COL_RELIC, MM_COL_WL, MM_COL_RANK,
+    MM_COL_RELIC, MM_COL_WL, MM_COL_RANK, MM_COL_TIME,
     UNIT_ICON_SCALES, RELIC_ICON_SCALES, MM_SYNERGY_ICON_SCALES,
     TITLE_REGION, MM_TAB_REGION,
     MM_UNIT_GRID_START_FRAC, MM_UNIT_GRID_SPACING_FRAC,
@@ -164,6 +164,7 @@ def process_screenshot(filepath: Path, unit_templates, relic_templates, syn_temp
                           MM_COL_WL[1], y0 + rh*0.95)),
             ("Rank", _crop(img, MM_COL_RANK[0], y0 + rh*0.20,
                            MM_COL_RANK[1], y0 + rh*0.80)),
+            ("Time", _crop(img, MM_COL_TIME[0], y0 + rh*0.65, MM_COL_TIME[1], y1)),
         ]
         s.add('<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:flex-start">')
         for label, crop_img in crops:
@@ -250,6 +251,8 @@ def process_screenshot(filepath: Path, unit_templates, relic_templates, syn_temp
         s.kv("W-L", row_data.get("wl", "") or "(empty)",
              "#0f0" if row_data.get("wl") else "#f00")
         s.kv("Rank", f"{row_data.get('rank', '')} ({row_data.get('rank_change', 'none')})")
+        s.kv("Time", row_data.get("time_ago", "") or "(empty)",
+             "#0f0" if row_data.get("time_ago") else "#f00")
 
         # Row summary bar
         s.add(
@@ -259,7 +262,8 @@ def process_screenshot(filepath: Path, unit_templates, relic_templates, syn_temp
             f'Place={row_data["placement"]} Level={row_data["level"]} '
             f'W-L={row_data["wl"]} Rank={row_data["rank"]}({row_data["rank_change"]}) '
             f'Units={len(units)} Syn={row_data["synergies"] or "-"} '
-            f'Relics={row_data["relic"] or "-"}'
+            f'Relics={row_data["relic"] or "-"} '
+            f'Time={row_data.get("time_ago") or "-"}'
             f'</div>')
 
         s.logs(log_lines[:])
@@ -408,7 +412,7 @@ def main():
 
     # Per-my_matches screenshot: condensed results table
     s.add('<h3 style="color:#e94560;margin-top:20px">All Parsed Rows</h3>')
-    cols2 = ["File", "#", "Place", "Level", "W-L", "Rank", "Change", "Units", "Synergies", "Relics"]
+    cols2 = ["File", "#", "Place", "Level", "W-L", "Rank", "Change", "Units", "Synergies", "Relics", "Time"]
     t2 = '<table style="border-collapse:collapse;width:100%;font-size:11px;margin:8px 0">'
     t2 += '<tr style="background:#0f3460">'
     t2 += "".join(f'<th style="padding:4px 6px;text-align:left">{c}</th>' for c in cols2)
@@ -432,6 +436,7 @@ def main():
                    f'{", ".join(units)}</td>'
                    f'<td style="padding:3px 6px">{rd.get("synergies","")}</td>'
                    f'<td style="padding:3px 6px">{rd.get("relic","")}</td>'
+                   f'<td style="padding:3px 6px">{rd.get("time_ago","")}</td>'
                    f'</tr>')
             row_idx += 1
     t2 += '</table>'
