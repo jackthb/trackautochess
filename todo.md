@@ -1,7 +1,7 @@
 # DAC Tools — TODO
 
 ## Parsing Accuracy
-- [ ] Fix web frontend unit icons not displaying
+- [x] Fix web frontend unit icons not displaying (Vercel "Include source files outside Root Directory" + symlink)
 - [ ] Investigate unit matching: some rows showing only 1 unit (e.g. single Faceless Void) — likely row matching or slot detection issue
 - [ ] Fix missing level OCR on some rows
 
