@@ -1,5 +1,6 @@
 @echo off
 cd /d "%~dp0"
+call .venv\Scripts\activate.bat
 echo Building DACTracker...
 echo.
 pyinstaller dac_tracker.spec 2>&1
