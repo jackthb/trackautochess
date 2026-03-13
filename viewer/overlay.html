@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>DAC Overlay</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: transparent;
+      overflow: hidden;
+      font-family: 'Consolas', 'Cascadia Code', monospace;
+      -webkit-app-region: no-drag;
+    }
+
+    .overlay {
+      display: flex;
+      align-items: flex-start;
+      height: 120px;
+    }
+
+    /* Arrow pointing left */
+    .arrow {
+      width: 30px;
+      height: 120px;
+      flex-shrink: 0;
+      position: relative;
+    }
+
+    .arrow svg {
+      position: absolute;
+      top: 20px;
+      left: 0;
+    }
+
+    /* Content panel */
+    .panel {
+      background: #0e1014;
+      border: 1px solid #1e2230;
+      width: 280px;
+      height: 120px;
+      padding: 10px 14px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .title {
+      font-size: 16px;
+      font-weight: bold;
+      color: #c8ccd8;
+    }
+
+    .subtitle {
+      font-size: 12px;
+      color: #6b7080;
+      line-height: 1.4;
+    }
+
+    .buttons {
+      display: flex;
+      gap: 8px;
+    }
+
+    .btn {
+      flex: 1;
+      padding: 6px 0;
+      border: none;
+      border-radius: 4px;
+      font-family: inherit;
+      font-size: 12px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+
+    .btn-capture {
+      background: #4a6fa5;
+      color: white;
+    }
+
+    .btn-capture:hover {
+      background: #5a8fd5;
+    }
+
+    .btn-dismiss {
+      background: #14161c;
+      color: #3a3f50;
+    }
+
+    .btn-dismiss:hover {
+      background: #1a1d26;
+      color: #6b7080;
+    }
+  </style>
+</head>
+<body>
+  <div class="overlay">
+    <div class="arrow">
+      <svg width="30" height="30" viewBox="0 0 30 30">
+        <polygon points="0,15 28,1 28,29" fill="#4a6fa5" />
+      </svg>
+    </div>
+    <div class="panel">
+      <div class="title">Game Over!</div>
+      <div class="subtitle">Click Match History, then Capture.</div>
+      <div class="buttons">
+        <button class="btn btn-capture" id="btn-capture">Capture</button>
+        <button class="btn btn-dismiss" id="btn-dismiss">Dismiss</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.getElementById("btn-capture").addEventListener("click", () => {
+      window.overlay.capture();
+    });
+    document.getElementById("btn-dismiss").addEventListener("click", () => {
+      window.overlay.dismiss();
+    });
+  </script>
+</body>
+</html>

@@ -3,69 +3,143 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>DAC Replay Viewer</title>
+  <title>DAC Tracker</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
     :root {
-      --bg-primary: #0a0c10;
-      --bg-secondary: #0e1117;
-      --bg-tertiary: #161b22;
-      --bg-hover: #1c2128;
-      --border: #21262d;
-      --text-primary: #e6edf3;
-      --text-secondary: #7d8590;
+      --bg-deep: #08090b;
+      --bg-surface: #0e1014;
+      --bg-elevated: #14161c;
+      --bg-hover: #1a1d26;
+      --border: #1e2230;
+      --text-primary: #c8ccd8;
+      --text-secondary: #6b7080;
       --text-tertiary: #484f58;
       --accent: #4a6fa5;
       --accent-hover: #5a8fd5;
       --danger: #da3633;
       --danger-hover: #f85149;
-      --success: #3fb950;
+      --green-bright: #4eaa62;
+      --gold: #c9a84c;
     }
 
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
-      background: var(--bg-primary);
+      background: var(--bg-deep);
       color: var(--text-primary);
       height: 100vh;
       overflow: hidden;
       user-select: none;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── Title bar drag region ──────────────────────────────── */
+
+    .titlebar {
+      height: 36px;
       -webkit-app-region: drag;
+      display: flex;
+      align-items: center;
+      padding-left: 16px;
+      background: var(--bg-deep);
+      flex-shrink: 0;
     }
 
-    /* ── Layout ─────────────────────────────────────────────── */
-
-    .app {
-      display: grid;
-      grid-template-columns: 320px 1fr;
-      height: 100vh;
+    .titlebar-title {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-tertiary);
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
     }
 
-    /* ── Sidebar ────────────────────────────────────────────── */
+    /* ── Tab bar ────────────────────────────────────────────── */
+
+    .tab-bar {
+      display: flex;
+      background: var(--bg-surface);
+      border-bottom: 1px solid var(--border);
+      padding: 0 16px;
+      flex-shrink: 0;
+      -webkit-app-region: no-drag;
+    }
+
+    .tab {
+      padding: 10px 20px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      transition: all 0.15s;
+      position: relative;
+    }
+
+    .tab:hover {
+      color: var(--text-primary);
+    }
+
+    .tab.active {
+      color: var(--text-primary);
+      border-bottom-color: var(--accent);
+    }
+
+    .tab .badge {
+      position: absolute;
+      top: 6px;
+      right: 6px;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--green-bright);
+      display: none;
+    }
+
+    .tab .badge.visible {
+      display: block;
+    }
+
+    /* ── Tab content ───────────────────────────────────────── */
+
+    .tab-content {
+      flex: 1;
+      overflow: hidden;
+      display: none;
+    }
+
+    .tab-content.active {
+      display: flex;
+    }
+
+    /* ── Replays tab ───────────────────────────────────────── */
+
+    #tab-replays {
+      flex-direction: row;
+    }
 
     .sidebar {
-      background: var(--bg-secondary);
+      width: 320px;
+      background: var(--bg-surface);
       border-right: 1px solid var(--border);
       display: flex;
       flex-direction: column;
       overflow: hidden;
-      -webkit-app-region: no-drag;
     }
 
     .sidebar-header {
       padding: 16px 16px 12px;
       border-bottom: 1px solid var(--border);
-      -webkit-app-region: drag;
     }
 
-    .sidebar-header h1 {
-      font-size: 14px;
+    .sidebar-header h2 {
+      font-size: 13px;
       font-weight: 600;
       letter-spacing: 0.5px;
       text-transform: uppercase;
       color: var(--text-secondary);
       margin-bottom: 8px;
-      padding-top: 8px;
     }
 
     .stats-bar {
@@ -75,9 +149,7 @@
       color: var(--text-tertiary);
     }
 
-    .stats-bar span {
-      color: var(--text-secondary);
-    }
+    .stats-bar span { color: var(--text-secondary); }
 
     .sidebar-actions {
       padding: 8px 12px;
@@ -91,7 +163,7 @@
       padding: 4px 10px;
       border-radius: 4px;
       border: 1px solid var(--border);
-      background: var(--bg-tertiary);
+      background: var(--bg-elevated);
       color: var(--text-secondary);
       cursor: pointer;
       transition: all 0.15s;
@@ -109,18 +181,9 @@
       padding: 4px 0;
     }
 
-    .replay-list::-webkit-scrollbar {
-      width: 6px;
-    }
-
-    .replay-list::-webkit-scrollbar-track {
-      background: transparent;
-    }
-
-    .replay-list::-webkit-scrollbar-thumb {
-      background: var(--border);
-      border-radius: 3px;
-    }
+    .replay-list::-webkit-scrollbar { width: 6px; }
+    .replay-list::-webkit-scrollbar-track { background: transparent; }
+    .replay-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
 
     .replay-item {
       padding: 10px 16px;
@@ -132,18 +195,10 @@
       align-items: center;
     }
 
-    .replay-item:hover {
-      background: var(--bg-hover);
-    }
+    .replay-item:hover { background: var(--bg-hover); }
+    .replay-item.active { background: var(--bg-elevated); border-left-color: var(--accent); }
 
-    .replay-item.active {
-      background: var(--bg-tertiary);
-      border-left-color: var(--accent);
-    }
-
-    .replay-item-info {
-      min-width: 0;
-    }
+    .replay-item-info { min-width: 0; }
 
     .replay-item-date {
       font-size: 13px;
@@ -154,21 +209,10 @@
       text-overflow: ellipsis;
     }
 
-    .replay-item-meta {
-      font-size: 11px;
-      color: var(--text-tertiary);
-      margin-top: 2px;
-    }
+    .replay-item-meta { font-size: 11px; color: var(--text-tertiary); margin-top: 2px; }
 
-    .replay-item-actions {
-      opacity: 0;
-      transition: opacity 0.15s;
-      flex-shrink: 0;
-    }
-
-    .replay-item:hover .replay-item-actions {
-      opacity: 1;
-    }
+    .replay-item-actions { opacity: 0; transition: opacity 0.15s; flex-shrink: 0; }
+    .replay-item:hover .replay-item-actions { opacity: 1; }
 
     .btn-delete {
       background: none;
@@ -181,23 +225,13 @@
       line-height: 1;
     }
 
-    .btn-delete:hover {
-      color: var(--danger);
-      background: rgba(218, 54, 51, 0.1);
-    }
-
-    /* ── Player panel ───────────────────────────────────────── */
+    .btn-delete:hover { color: var(--danger); background: rgba(218, 54, 51, 0.1); }
 
     .player-panel {
+      flex: 1;
       display: flex;
       flex-direction: column;
-      background: var(--bg-primary);
-      -webkit-app-region: no-drag;
-    }
-
-    .player-topbar {
-      height: 36px;
-      -webkit-app-region: drag;
+      background: var(--bg-deep);
     }
 
     .player-container {
@@ -208,11 +242,7 @@
       padding: 24px;
     }
 
-    .player-wrapper {
-      width: 100%;
-      max-width: 1200px;
-      position: relative;
-    }
+    .player-wrapper { width: 100%; max-width: 1200px; position: relative; }
 
     video {
       width: 100%;
@@ -220,8 +250,6 @@
       background: #000;
       outline: none;
     }
-
-    /* ── Empty state ────────────────────────────────────────── */
 
     .empty-state {
       display: flex;
@@ -234,25 +262,9 @@
       padding: 24px;
     }
 
-    .empty-state-icon {
-      font-size: 48px;
-      opacity: 0.3;
-    }
-
-    .empty-state-title {
-      font-size: 16px;
-      font-weight: 500;
-      color: var(--text-secondary);
-    }
-
-    .empty-state-desc {
-      font-size: 13px;
-      text-align: center;
-      line-height: 1.5;
-      max-width: 280px;
-    }
-
-    /* ── Replay info bar (below video) ──────────────────────── */
+    .empty-state-icon { font-size: 48px; opacity: 0.3; }
+    .empty-state-title { font-size: 16px; font-weight: 500; color: var(--text-secondary); }
+    .empty-state-desc { font-size: 13px; text-align: center; line-height: 1.5; max-width: 280px; }
 
     .replay-info-bar {
       padding: 12px 24px;
@@ -268,9 +280,267 @@
       color: var(--text-secondary);
     }
 
-    /* ── Confirm dialog ─────────────────────────────────────── */
+    /* ── Confirmation tab ──────────────────────────────────── */
 
-    .confirm-overlay {
+    #tab-confirm {
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .confirm-container {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      padding: 20px;
+      gap: 16px;
+    }
+
+    .confirm-empty {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .confirm-preview {
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+      flex-shrink: 0;
+    }
+
+    .confirm-preview img {
+      max-height: 160px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+    }
+
+    .confirm-preview-info {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .confirm-preview-info h2 {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .confirm-preview-info p {
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+
+    .confirm-table-wrap {
+      flex: 1;
+      overflow-y: auto;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+    }
+
+    .confirm-table-wrap::-webkit-scrollbar { width: 6px; }
+    .confirm-table-wrap::-webkit-scrollbar-track { background: transparent; }
+    .confirm-table-wrap::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+    .confirm-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    .confirm-table th {
+      position: sticky;
+      top: 0;
+      background: var(--bg-elevated);
+      color: var(--accent);
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      text-align: left;
+      padding: 8px 10px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .confirm-table td {
+      padding: 6px 10px;
+      border-bottom: 1px solid var(--border);
+      vertical-align: middle;
+    }
+
+    .confirm-table tr:nth-child(even) td {
+      background: var(--bg-surface);
+    }
+
+    .confirm-table tr:hover td {
+      background: var(--bg-hover);
+    }
+
+    .confirm-table input[type="checkbox"] {
+      accent-color: var(--accent);
+    }
+
+    .confirm-table input[type="text"] {
+      background: var(--bg-deep);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      color: var(--text-primary);
+      padding: 3px 6px;
+      font-size: 12px;
+      font-family: inherit;
+      width: 100%;
+    }
+
+    .confirm-table input[type="text"]:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+
+    .confirm-table .col-check { width: 36px; text-align: center; }
+    .confirm-table .col-num { width: 36px; color: var(--text-tertiary); }
+    .confirm-table .col-place { width: 60px; }
+    .confirm-table .col-level { width: 60px; }
+    .confirm-table .col-wl { width: 80px; }
+    .confirm-table .col-rank { width: 100px; }
+    .confirm-table .col-units { min-width: 200px; }
+    .confirm-table .col-syn { min-width: 140px; color: var(--text-secondary); font-size: 12px; }
+    .confirm-table .col-relic { min-width: 100px; color: var(--text-secondary); font-size: 12px; }
+    .confirm-table .col-time { width: 80px; color: var(--text-secondary); font-size: 12px; }
+
+    .rank-up { color: #4ade80; }
+    .rank-down { color: var(--danger); }
+
+    .confirm-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      flex-shrink: 0;
+    }
+
+    .btn {
+      padding: 8px 20px;
+      border-radius: 6px;
+      border: none;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .btn-primary {
+      background: var(--green-bright);
+      color: white;
+    }
+
+    .btn-primary:hover { background: #5bc06e; }
+
+    .btn-secondary {
+      background: var(--bg-elevated);
+      color: var(--text-secondary);
+      border: 1px solid var(--border);
+    }
+
+    .btn-secondary:hover {
+      background: var(--bg-hover);
+      color: var(--text-primary);
+    }
+
+    /* ── Settings tab ──────────────────────────────────────── */
+
+    #tab-settings {
+      flex-direction: column;
+      overflow-y: auto;
+    }
+
+    .settings-container {
+      max-width: 600px;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    .settings-section {
+      background: var(--bg-surface);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 20px;
+    }
+
+    .settings-section h3 {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-primary);
+      margin-bottom: 12px;
+    }
+
+    .settings-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 0;
+    }
+
+    .settings-row + .settings-row {
+      border-top: 1px solid var(--border);
+    }
+
+    .settings-label {
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+
+    .settings-value {
+      font-size: 13px;
+      color: var(--text-primary);
+      font-family: 'SF Mono', 'Cascadia Code', 'Consolas', monospace;
+    }
+
+    .settings-value.dimmed { color: var(--text-tertiary); }
+
+    /* ── Status bar ────────────────────────────────────────── */
+
+    .status-bar {
+      height: 28px;
+      background: var(--bg-surface);
+      border-top: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      padding: 0 16px;
+      gap: 16px;
+      font-size: 11px;
+      color: var(--text-tertiary);
+      flex-shrink: 0;
+      -webkit-app-region: no-drag;
+    }
+
+    .status-indicator {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .status-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--text-tertiary);
+    }
+
+    .status-dot.active { background: var(--green-bright); }
+    .status-dot.recording { background: var(--danger); animation: pulse 1.5s infinite; }
+    .status-dot.warning { background: var(--gold); }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+
+    /* ── Delete confirmation modal ─────────────────────────── */
+
+    .modal-overlay {
       position: fixed;
       inset: 0;
       background: rgba(0, 0, 0, 0.6);
@@ -280,32 +550,20 @@
       z-index: 100;
     }
 
-    .confirm-dialog {
-      background: var(--bg-tertiary);
+    .modal-dialog {
+      background: var(--bg-elevated);
       border: 1px solid var(--border);
       border-radius: 8px;
       padding: 20px 24px;
       max-width: 360px;
     }
 
-    .confirm-dialog h3 {
-      font-size: 14px;
-      margin-bottom: 8px;
-    }
+    .modal-dialog h3 { font-size: 14px; margin-bottom: 8px; }
+    .modal-dialog p { font-size: 13px; color: var(--text-secondary); margin-bottom: 16px; }
 
-    .confirm-dialog p {
-      font-size: 13px;
-      color: var(--text-secondary);
-      margin-bottom: 16px;
-    }
+    .modal-actions { display: flex; justify-content: flex-end; gap: 8px; }
 
-    .confirm-actions {
-      display: flex;
-      justify-content: flex-end;
-      gap: 8px;
-    }
-
-    .btn-confirm {
+    .btn-modal {
       font-size: 12px;
       padding: 6px 14px;
       border-radius: 4px;
@@ -314,30 +572,39 @@
       font-weight: 500;
     }
 
-    .btn-cancel {
+    .btn-modal-cancel {
       background: var(--bg-hover);
       color: var(--text-secondary);
       border: 1px solid var(--border);
     }
 
-    .btn-danger {
-      background: var(--danger);
-      color: white;
-    }
-
-    .btn-danger:hover {
-      background: var(--danger-hover);
-    }
+    .btn-modal-danger { background: var(--danger); color: white; }
+    .btn-modal-danger:hover { background: var(--danger-hover); }
 
     .hidden { display: none !important; }
   </style>
 </head>
 <body>
-  <div class="app">
-    <!-- Sidebar -->
+  <!-- Title bar -->
+  <div class="titlebar">
+    <span class="titlebar-title">DAC Tracker</span>
+  </div>
+
+  <!-- Tab bar -->
+  <div class="tab-bar">
+    <div class="tab active" data-tab="replays">Replays</div>
+    <div class="tab" data-tab="confirm">
+      Confirmation
+      <span class="badge" id="confirm-badge"></span>
+    </div>
+    <div class="tab" data-tab="settings">Settings</div>
+  </div>
+
+  <!-- ═══ Replays tab ═══ -->
+  <div class="tab-content active" id="tab-replays">
     <div class="sidebar">
       <div class="sidebar-header">
-        <h1>Replays</h1>
+        <h2>Replays</h2>
         <div class="stats-bar">
           <div><span id="replay-count">0</span> replays</div>
           <div><span id="replay-size">0</span> GB used</div>
@@ -351,11 +618,7 @@
       <div class="replay-list" id="replay-list"></div>
     </div>
 
-    <!-- Player -->
     <div class="player-panel">
-      <div class="player-topbar"></div>
-
-      <!-- Empty state (no replay selected) -->
       <div class="empty-state" id="empty-state">
         <div class="empty-state-icon">&#9654;</div>
         <div class="empty-state-title">No replay selected</div>
@@ -365,7 +628,6 @@
         </div>
       </div>
 
-      <!-- Video player -->
       <div class="player-container hidden" id="player-container">
         <div class="player-wrapper">
           <video id="video" controls></video>
@@ -379,33 +641,158 @@
     </div>
   </div>
 
-  <!-- Delete confirmation -->
-  <div class="confirm-overlay hidden" id="confirm-overlay">
-    <div class="confirm-dialog">
+  <!-- ═══ Confirmation tab ═══ -->
+  <div class="tab-content" id="tab-confirm">
+    <div class="confirm-container">
+      <!-- Empty state (no parse result) -->
+      <div class="confirm-empty" id="confirm-empty">
+        <div class="empty-state">
+          <div class="empty-state-icon">&#128269;</div>
+          <div class="empty-state-title">No matches to confirm</div>
+          <div class="empty-state-desc">
+            Capture a screenshot (F6) or wait for auto-detection.
+            Parsed matches will appear here for review.
+          </div>
+        </div>
+      </div>
+
+      <!-- Parse result content -->
+      <div class="hidden" id="confirm-content">
+        <div class="confirm-preview">
+          <img id="confirm-screenshot" src="" alt="Screenshot preview">
+          <div class="confirm-preview-info">
+            <h2><span id="confirm-row-count">0</span> rows parsed</h2>
+            <p>Edit fields below, uncheck rows to exclude, then Confirm.</p>
+          </div>
+        </div>
+
+        <div class="confirm-table-wrap">
+          <table class="confirm-table">
+            <thead>
+              <tr>
+                <th class="col-check"><input type="checkbox" id="check-all" checked></th>
+                <th class="col-num">#</th>
+                <th class="col-place">Place</th>
+                <th class="col-level">Level</th>
+                <th class="col-wl">W-L</th>
+                <th class="col-rank">Rank</th>
+                <th class="col-units">Units</th>
+                <th class="col-syn">Synergies</th>
+                <th class="col-relic">Relic</th>
+                <th class="col-time">Time</th>
+              </tr>
+            </thead>
+            <tbody id="confirm-tbody"></tbody>
+          </table>
+        </div>
+
+        <div class="confirm-actions">
+          <button class="btn btn-secondary" id="btn-cancel-confirm">Cancel</button>
+          <button class="btn btn-primary" id="btn-confirm">Confirm (0)</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ Settings tab ═══ -->
+  <div class="tab-content" id="tab-settings">
+    <div class="settings-container">
+      <div class="settings-section">
+        <h3>Steam Account</h3>
+        <div class="settings-row">
+          <span class="settings-label">Status</span>
+          <span class="settings-value" id="settings-steam-status">Not logged in</span>
+        </div>
+        <div class="settings-row">
+          <span class="settings-label">Steam ID</span>
+          <span class="settings-value dimmed" id="settings-steam-id">-</span>
+        </div>
+      </div>
+
+      <div class="settings-section">
+        <h3>Replay Recording</h3>
+        <div class="settings-row">
+          <span class="settings-label">Recording enabled</span>
+          <span class="settings-value" id="settings-replay-enabled">Yes</span>
+        </div>
+        <div class="settings-row">
+          <span class="settings-label">Storage used</span>
+          <span class="settings-value" id="settings-storage-used">-</span>
+        </div>
+      </div>
+
+      <div class="settings-section">
+        <h3>About</h3>
+        <div class="settings-row">
+          <span class="settings-label">Version</span>
+          <span class="settings-value dimmed" id="settings-version">-</span>
+        </div>
+        <div class="settings-row">
+          <span class="settings-label">Backend</span>
+          <span class="settings-value" id="settings-backend">Disconnected</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Status bar -->
+  <div class="status-bar">
+    <div class="status-indicator">
+      <div class="status-dot" id="status-dot-backend"></div>
+      <span id="status-backend-text">Backend: connecting...</span>
+    </div>
+    <div class="status-indicator">
+      <div class="status-dot" id="status-dot-recording"></div>
+      <span id="status-recording-text">Not recording</span>
+    </div>
+    <div class="status-indicator">
+      <div class="status-dot" id="status-dot-focus"></div>
+      <span id="status-focus-text">Dota: inactive</span>
+    </div>
+  </div>
+
+  <!-- Delete confirmation modal -->
+  <div class="modal-overlay hidden" id="delete-modal">
+    <div class="modal-dialog">
       <h3>Delete replay?</h3>
-      <p id="confirm-text">This cannot be undone.</p>
-      <div class="confirm-actions">
-        <button class="btn-confirm btn-cancel" id="btn-confirm-cancel">Cancel</button>
-        <button class="btn-confirm btn-danger" id="btn-confirm-delete">Delete</button>
+      <p id="delete-modal-text">This cannot be undone.</p>
+      <div class="modal-actions">
+        <button class="btn-modal btn-modal-cancel" id="btn-delete-cancel">Cancel</button>
+        <button class="btn-modal btn-modal-danger" id="btn-delete-confirm">Delete</button>
       </div>
     </div>
   </div>
 
   <script>
-    const replayList = document.getElementById("replay-list");
-    const emptyState = document.getElementById("empty-state");
-    const playerContainer = document.getElementById("player-container");
-    const video = document.getElementById("video");
-    const replayInfoBar = document.getElementById("replay-info-bar");
-    const replayFilename = document.getElementById("replay-filename");
-    const replayFilesize = document.getElementById("replay-filesize");
-    const confirmOverlay = document.getElementById("confirm-overlay");
-    const confirmText = document.getElementById("confirm-text");
-
+    // ── State ──────────────────────────────────────────────────
     let currentReplay = null;
     let pendingDelete = null;
+    let pendingParseResult = null;
 
-    // ── Formatting helpers ──────────────────────────────────
+    // ── DOM refs ───────────────────────────────────────────────
+    const $ = (sel) => document.querySelector(sel);
+    const $$ = (sel) => document.querySelectorAll(sel);
+
+    // ── Tab switching ──────────────────────────────────────────
+
+    $$(".tab").forEach((tab) => {
+      tab.addEventListener("click", () => {
+        const target = tab.dataset.tab;
+        $$(".tab").forEach((t) => t.classList.toggle("active", t.dataset.tab === target));
+        $$(".tab-content").forEach((tc) =>
+          tc.classList.toggle("active", tc.id === `tab-${target}`)
+        );
+      });
+    });
+
+    function switchToTab(name) {
+      $$(".tab").forEach((t) => t.classList.toggle("active", t.dataset.tab === name));
+      $$(".tab-content").forEach((tc) =>
+        tc.classList.toggle("active", tc.id === `tab-${name}`)
+      );
+    }
+
+    // ── Formatting helpers ─────────────────────────────────────
 
     function formatSize(bytes) {
       if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(0) + " KB";
@@ -417,36 +804,27 @@
       const d = new Date(ms);
       const now = new Date();
       const diffDays = Math.floor((now - d) / 86400000);
-
       const time = d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-
       if (diffDays === 0) return `Today ${time}`;
       if (diffDays === 1) return `Yesterday ${time}`;
       if (diffDays < 7) return `${d.toLocaleDateString([], { weekday: "short" })} ${time}`;
       return d.toLocaleDateString([], { month: "short", day: "numeric" }) + ` ${time}`;
     }
 
-    function parseDateFromFilename(name) {
-      // Filename format: YYYYMMDD_HHMMSS.mp4
-      const m = name.match(/^(\d{4})(\d{2})(\d{2})_(\d{2})(\d{2})(\d{2})/);
-      if (!m) return null;
-      return new Date(+m[1], +m[2] - 1, +m[3], +m[4], +m[5], +m[6]);
-    }
-
-    // ── Load and render ─────────────────────────────────────
+    // ── Replays ────────────────────────────────────────────────
 
     async function loadReplays() {
       const replays = await window.replays.list();
       const stats = await window.replays.stats();
 
-      document.getElementById("replay-count").textContent = stats.count;
-      document.getElementById("replay-size").textContent =
-        (stats.totalBytes / (1024 ** 3)).toFixed(1);
+      $("#replay-count").textContent = stats.count;
+      $("#replay-size").textContent = (stats.totalBytes / (1024 ** 3)).toFixed(1);
 
-      replayList.innerHTML = "";
+      const list = $("#replay-list");
+      list.innerHTML = "";
 
       if (replays.length === 0) {
-        replayList.innerHTML = `
+        list.innerHTML = `
           <div class="empty-state" style="padding-top:60px">
             <div class="empty-state-desc">
               No replays yet. Play a game with the tracker running to record your first replay.
@@ -460,13 +838,10 @@
         item.className = "replay-item" + (currentReplay === r.name ? " active" : "");
         item.dataset.name = r.name;
 
-        const dateStr = formatDate(r.mtime);
-        const sizeStr = formatSize(r.size);
-
         item.innerHTML = `
           <div class="replay-item-info">
-            <div class="replay-item-date">${dateStr}</div>
-            <div class="replay-item-meta">${sizeStr}</div>
+            <div class="replay-item-date">${formatDate(r.mtime)}</div>
+            <div class="replay-item-meta">${formatSize(r.size)}</div>
           </div>
           <div class="replay-item-actions">
             <button class="btn-delete" title="Delete replay">&times;</button>
@@ -481,85 +856,327 @@
           selectReplay(r);
         });
 
-        replayList.appendChild(item);
+        list.appendChild(item);
       }
+
+      // Update settings storage
+      $("#settings-storage-used").textContent =
+        `${(stats.totalBytes / (1024 ** 3)).toFixed(1)} GB (${stats.count} replays)`;
     }
 
     function selectReplay(replay) {
       currentReplay = replay.name;
 
-      // Update sidebar selection
-      document.querySelectorAll(".replay-item").forEach((el) => {
+      $$(".replay-item").forEach((el) => {
         el.classList.toggle("active", el.dataset.name === replay.name);
       });
 
-      // Show player
-      emptyState.classList.add("hidden");
-      playerContainer.classList.remove("hidden");
-      replayInfoBar.classList.remove("hidden");
+      $("#empty-state").classList.add("hidden");
+      $("#player-container").classList.remove("hidden");
+      $("#replay-info-bar").classList.remove("hidden");
 
-      // Load video via custom protocol
+      const video = $("#video");
       video.src = `replay://video/${encodeURIComponent(replay.name)}`;
       video.load();
 
-      replayFilename.textContent = replay.name;
-      replayFilesize.textContent = formatSize(replay.size);
+      $("#replay-filename").textContent = replay.name;
+      $("#replay-filesize").textContent = formatSize(replay.size);
     }
 
-    // ── Delete flow ─────────────────────────────────────────
+    // ── Delete modal ───────────────────────────────────────────
 
     function showDeleteConfirm(filename) {
       pendingDelete = filename;
-      confirmText.textContent = `Delete "${filename}"? This cannot be undone.`;
-      confirmOverlay.classList.remove("hidden");
+      $("#delete-modal-text").textContent = `Delete "${filename}"? This cannot be undone.`;
+      $("#delete-modal").classList.remove("hidden");
     }
 
-    document.getElementById("btn-confirm-cancel").addEventListener("click", () => {
-      confirmOverlay.classList.add("hidden");
+    $("#btn-delete-cancel").addEventListener("click", () => {
+      $("#delete-modal").classList.add("hidden");
       pendingDelete = null;
     });
 
-    document.getElementById("btn-confirm-delete").addEventListener("click", async () => {
+    $("#btn-delete-confirm").addEventListener("click", async () => {
       if (pendingDelete) {
         await window.replays.delete(pendingDelete);
         if (currentReplay === pendingDelete) {
           currentReplay = null;
-          video.src = "";
-          emptyState.classList.remove("hidden");
-          playerContainer.classList.add("hidden");
-          replayInfoBar.classList.add("hidden");
+          $("#video").src = "";
+          $("#empty-state").classList.remove("hidden");
+          $("#player-container").classList.add("hidden");
+          $("#replay-info-bar").classList.add("hidden");
         }
         pendingDelete = null;
       }
-      confirmOverlay.classList.add("hidden");
+      $("#delete-modal").classList.add("hidden");
       loadReplays();
     });
 
-    confirmOverlay.addEventListener("click", (e) => {
-      if (e.target === confirmOverlay) {
-        confirmOverlay.classList.add("hidden");
+    $("#delete-modal").addEventListener("click", (e) => {
+      if (e.target === $("#delete-modal")) {
+        $("#delete-modal").classList.add("hidden");
         pendingDelete = null;
       }
     });
 
-    // ── Buttons ─────────────────────────────────────────────
+    // ── Replay buttons ─────────────────────────────────────────
 
-    document.getElementById("btn-open-folder").addEventListener("click", () => {
-      window.replays.openFolder();
+    $("#btn-open-folder").addEventListener("click", () => window.replays.openFolder());
+    $("#btn-refresh").addEventListener("click", loadReplays);
+
+    // ── Confirmation tab ───────────────────────────────────────
+
+    function showParseResult(data) {
+      pendingParseResult = data;
+      const { rows, timestamps, screenshot_b64 } = data;
+
+      // Show badge
+      $("#confirm-badge").classList.add("visible");
+
+      // Switch to confirm tab
+      switchToTab("confirm");
+
+      // Hide empty, show content
+      $("#confirm-empty").classList.add("hidden");
+      $("#confirm-content").classList.remove("hidden");
+
+      // Screenshot preview
+      if (screenshot_b64) {
+        $("#confirm-screenshot").src = `data:image/jpeg;base64,${screenshot_b64}`;
+        $("#confirm-screenshot").classList.remove("hidden");
+      } else {
+        $("#confirm-screenshot").classList.add("hidden");
+      }
+
+      $("#confirm-row-count").textContent = rows.length;
+
+      // Build table
+      const tbody = $("#confirm-tbody");
+      tbody.innerHTML = "";
+
+      for (let i = 0; i < rows.length; i++) {
+        const r = rows[i];
+        const tr = document.createElement("tr");
+
+        // Rank display
+        let rankDisplay = r.rank || "";
+        let rankClass = "";
+        if (r.rank_change === "up") { rankDisplay += " (+)"; rankClass = "rank-up"; }
+        else if (r.rank_change === "down") { rankDisplay += " (-)"; rankClass = "rank-down"; }
+
+        // Synergies
+        const synDisplay = r.synergies ? r.synergies.replace(/\|/g, ", ").replace(/:/g, " ") : "-";
+
+        // Relic
+        let relicDisplay = r.relic || "-";
+        if (relicDisplay.length > 30) relicDisplay = relicDisplay.slice(0, 27) + "...";
+
+        tr.innerHTML = `
+          <td class="col-check"><input type="checkbox" class="row-check" data-idx="${i}" checked></td>
+          <td class="col-num">${i + 1}</td>
+          <td class="col-place"><input type="text" class="edit-field" data-idx="${i}" data-field="placement" value="${escapeAttr(r.placement || "")}"></td>
+          <td class="col-level"><input type="text" class="edit-field" data-idx="${i}" data-field="level" value="${escapeAttr(r.level || "")}"></td>
+          <td class="col-wl"><input type="text" class="edit-field" data-idx="${i}" data-field="wl" value="${escapeAttr(r.wl || "")}"></td>
+          <td class="col-rank"><span class="${rankClass}">${escapeHtml(rankDisplay)}</span></td>
+          <td class="col-units"><input type="text" class="edit-field" data-idx="${i}" data-field="units" value="${escapeAttr((r.units || []).join(", "))}"></td>
+          <td class="col-syn">${escapeHtml(synDisplay)}</td>
+          <td class="col-relic">${escapeHtml(relicDisplay)}</td>
+          <td class="col-time">${escapeHtml(r.time_ago || "-")}</td>
+        `;
+
+        tbody.appendChild(tr);
+      }
+
+      updateConfirmCount();
+    }
+
+    function escapeHtml(s) {
+      const div = document.createElement("div");
+      div.textContent = s;
+      return div.innerHTML;
+    }
+
+    function escapeAttr(s) {
+      return s.replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    }
+
+    function updateConfirmCount() {
+      const checks = $$(".row-check:checked");
+      $("#btn-confirm").textContent = `Confirm (${checks.length})`;
+    }
+
+    // Check-all toggle
+    $("#check-all").addEventListener("change", (e) => {
+      $$(".row-check").forEach((cb) => { cb.checked = e.target.checked; });
+      updateConfirmCount();
     });
 
-    document.getElementById("btn-refresh").addEventListener("click", loadReplays);
+    // Individual checkbox changes
+    document.addEventListener("change", (e) => {
+      if (e.target.classList.contains("row-check")) {
+        updateConfirmCount();
+      }
+    });
 
-    // ── Keyboard shortcuts ──────────────────────────────────
+    // Confirm button
+    $("#btn-confirm").addEventListener("click", () => {
+      if (!pendingParseResult) return;
+
+      const selected = [];
+      const edits = {};
+
+      $$(".row-check").forEach((cb) => {
+        if (!cb.checked) return;
+        const idx = parseInt(cb.dataset.idx);
+        selected.push(idx);
+      });
+
+      // Gather edits
+      $$(".edit-field").forEach((input) => {
+        const idx = input.dataset.idx;
+        const field = input.dataset.field;
+        const origRow = pendingParseResult.rows[parseInt(idx)];
+        let origVal;
+        if (field === "units") {
+          origVal = (origRow.units || []).join(", ");
+        } else {
+          origVal = origRow[field] || "";
+        }
+
+        if (input.value !== origVal) {
+          if (!edits[idx]) edits[idx] = {};
+          if (field === "units") {
+            edits[idx][field] = input.value.split(",").map((s) => s.trim()).filter(Boolean);
+          } else {
+            edits[idx][field] = input.value;
+          }
+        }
+      });
+
+      window.tracker.sendCommand({ cmd: "confirm", selected, edits });
+      clearConfirmation();
+    });
+
+    // Cancel button
+    $("#btn-cancel-confirm").addEventListener("click", () => {
+      window.tracker.sendCommand({ cmd: "cancel_confirm" });
+      clearConfirmation();
+    });
+
+    function clearConfirmation() {
+      pendingParseResult = null;
+      $("#confirm-badge").classList.remove("visible");
+      $("#confirm-empty").classList.remove("hidden");
+      $("#confirm-content").classList.add("hidden");
+      $("#confirm-tbody").innerHTML = "";
+    }
+
+    // ── Tracker events ─────────────────────────────────────────
+
+    function updateStatus(msg) {
+      // Backend dot
+      const backendDot = $("#status-dot-backend");
+      const backendText = $("#status-backend-text");
+      backendDot.className = "status-dot active";
+      backendText.textContent = `Backend: v${msg.version || "?"}`;
+      $("#settings-backend").textContent = "Connected";
+      $("#settings-version").textContent = msg.version || "-";
+
+      // Recording
+      const recDot = $("#status-dot-recording");
+      const recText = $("#status-recording-text");
+      if (msg.recording) {
+        recDot.className = "status-dot recording";
+        recText.textContent = "Recording";
+      } else {
+        recDot.className = "status-dot";
+        recText.textContent = "Not recording";
+      }
+
+      // Focus
+      const focusDot = $("#status-dot-focus");
+      const focusText = $("#status-focus-text");
+      if (msg.focused) {
+        focusDot.className = "status-dot active";
+        focusText.textContent = "Dota: active";
+      } else {
+        focusDot.className = "status-dot";
+        focusText.textContent = "Dota: inactive";
+      }
+
+      // Settings
+      if (msg.steam_name) {
+        $("#settings-steam-status").textContent = msg.steam_name;
+        $("#settings-steam-status").classList.remove("dimmed");
+      } else {
+        $("#settings-steam-status").textContent = "Not logged in";
+        $("#settings-steam-status").classList.add("dimmed");
+      }
+      $("#settings-steam-id").textContent = msg.steam_id || "-";
+      $("#settings-replay-enabled").textContent = msg.replay_enabled ? "Yes" : "No";
+    }
+
+    if (window.tracker) {
+      window.tracker.onEvent((msg) => {
+        switch (msg.type) {
+          case "status":
+            updateStatus(msg);
+            break;
+
+          case "parse_result":
+            showParseResult(msg);
+            break;
+
+          case "import_result":
+            clearConfirmation();
+            break;
+
+          case "focus_gained":
+            $("#status-dot-focus").className = "status-dot active";
+            $("#status-focus-text").textContent = "Dota: active";
+            break;
+
+          case "focus_lost":
+            $("#status-dot-focus").className = "status-dot";
+            $("#status-focus-text").textContent = "Dota: inactive";
+            break;
+
+          case "replay_started":
+            $("#status-dot-recording").className = "status-dot recording";
+            $("#status-recording-text").textContent = "Recording";
+            break;
+
+          case "replay_saved":
+            $("#status-dot-recording").className = "status-dot";
+            $("#status-recording-text").textContent = "Not recording";
+            loadReplays(); // refresh list
+            break;
+
+          case "error":
+            console.error("[tracker]", msg.message);
+            // Show backend disconnected if process died
+            if (msg.message && msg.message.includes("exited")) {
+              $("#status-dot-backend").className = "status-dot warning";
+              $("#status-backend-text").textContent = "Backend: disconnected";
+              $("#settings-backend").textContent = "Disconnected";
+            }
+            break;
+        }
+      });
+    }
+
+    // ── Keyboard shortcuts ─────────────────────────────────────
 
     document.addEventListener("keydown", (e) => {
-      if (e.key === "Escape" && !confirmOverlay.classList.contains("hidden")) {
-        confirmOverlay.classList.add("hidden");
-        pendingDelete = null;
+      if (e.key === "Escape") {
+        if (!$("#delete-modal").classList.contains("hidden")) {
+          $("#delete-modal").classList.add("hidden");
+          pendingDelete = null;
+        }
       }
     });
 
-    // ── Init ────────────────────────────────────────────────
+    // ── Init ───────────────────────────────────────────────────
 
     loadReplays();
   </script>

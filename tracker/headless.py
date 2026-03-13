@@ -1,0 +1,546 @@
+"""DAC Tracker — Headless JSON Lines backend for Electron.
+
+Communicates via stdin/stdout using JSON lines protocol.
+Electron spawns this as a subprocess.
+
+Usage:
+    python headless.py
+"""
+
+import base64
+import json
+import logging
+import os
+import sys
+import threading
+from datetime import datetime
+from pathlib import Path
+
+# ── Tesseract setup (bundled or system) ───────────────────────────────────────
+
+def _setup_tesseract():
+    import pytesseract
+    if getattr(sys, 'frozen', False):
+        base = Path(sys._MEIPASS)
+        tess_exe = base / "tesseract" / "tesseract.exe"
+        if tess_exe.exists():
+            pytesseract.pytesseract.tesseract_cmd = str(tess_exe)
+            os.environ["TESSDATA_PREFIX"] = str(base / "tesseract" / "tessdata")
+
+_setup_tesseract()
+
+# ── Config & paths ────────────────────────────────────────────────────────────
+
+from utils import load_config, save_config, DAC_DIR, DATA_DIR, ICONS_DIR
+
+APP_NAME = "DAC Tracker"
+LOG_PATH = DAC_DIR / "tracker.log"
+
+# ── Logging (file only — stdout is reserved for JSON protocol) ────────────────
+
+DAC_DIR.mkdir(parents=True, exist_ok=True)
+log = logging.getLogger("dac")
+log.setLevel(logging.DEBUG)
+_fh = logging.FileHandler(LOG_PATH, encoding="utf-8")
+_fh.setFormatter(logging.Formatter("%(asctime)s  %(levelname)-5s  %(message)s", datefmt="%Y-%m-%d %H:%M:%S"))
+log.addHandler(_fh)
+# NO StreamHandler — stdout is for JSON only
+
+
+class HeadlessBackend:
+    """Headless backend that communicates via JSON lines over stdin/stdout."""
+
+    def __init__(self):
+        self.config = load_config()
+        self._stop_event = threading.Event()
+        self._sentinel = None
+        self._replay_recorder = None
+        self._focus_lost_timer = None
+        self._game_focused = False
+        self._pending_rows = None
+        self._pending_timestamps = None
+        self._pending_img = None
+
+        # Ensure user exists in DB if already logged in
+        sid = self.config.get("steam_id")
+        if sid:
+            from db import ensure_user
+            ensure_user(sid)
+
+        # Init replay system
+        if self.config.get("replay_enabled", True):
+            self._init_replay()
+
+    # ── JSON protocol ────────────────────────────────────────────────────────
+
+    def _emit(self, msg: dict) -> None:
+        """Send a JSON line to stdout (Electron reads this)."""
+        line = json.dumps(msg, ensure_ascii=False)
+        sys.stdout.buffer.write(line.encode("utf-8") + b"\n")
+        sys.stdout.buffer.flush()
+
+    def _emit_error(self, message: str) -> None:
+        self._emit({"type": "error", "message": message})
+
+    def _emit_notification(self, title: str, message: str) -> None:
+        self._emit({"type": "notification", "title": title, "message": message})
+
+    def _emit_status(self) -> None:
+        from updater import __version__
+        recording = bool(self._replay_recorder and self._replay_recorder.recording)
+        focused = self._game_focused
+        logged_in = bool(self.config.get("steam_id"))
+        self._emit({
+            "type": "status",
+            "recording": recording,
+            "focused": focused,
+            "logged_in": logged_in,
+            "version": __version__,
+            "steam_id": self.config.get("steam_id", ""),
+            "steam_name": self.config.get("steam_name", ""),
+            "replay_enabled": self.config.get("replay_enabled", True),
+        })
+
+    # ── Replay recording ────────────────────────────────────────────────────
+
+    def _init_replay(self) -> None:
+        from replay import ReplayRecorder, ReplayStore
+        max_gb = self.config.get("replay_max_gb", 15)
+        store = ReplayStore(max_gb=max_gb)
+        self._replay_recorder = ReplayRecorder(store)
+        log.info("Replay system ready (max %.0f GB, dir: %s)", max_gb, store.replay_dir)
+
+    def _on_game_focus_gained(self) -> None:
+        if self._focus_lost_timer:
+            self._focus_lost_timer.cancel()
+            self._focus_lost_timer = None
+
+        self._game_focused = True
+        self._emit({"type": "focus_gained"})
+
+        if not self._replay_recorder or not self.config.get("replay_enabled", True):
+            return
+        if self._replay_recorder.recording:
+            return
+
+        if self._replay_recorder.start():
+            log.info("Replay: recording started (Dota 2 focused)")
+            self._emit({"type": "replay_started"})
+
+    def _on_game_focus_lost(self) -> None:
+        self._game_focused = False
+        self._emit({"type": "focus_lost"})
+
+        if not self._replay_recorder or not self._replay_recorder.recording:
+            return
+
+        def _delayed_stop():
+            if self._replay_recorder and self._replay_recorder.recording:
+                log.info("Replay: Dota 2 unfocused for 5 min — stopping recording")
+                path = self._replay_recorder.stop()
+                if path:
+                    size_mb = path.stat().st_size / (1024 * 1024)
+                    self._emit({"type": "replay_saved", "name": path.name, "size_mb": round(size_mb, 1)})
+                    self._emit_notification(APP_NAME, f"Replay saved: {path.name}")
+
+        self._focus_lost_timer = threading.Timer(300, _delayed_stop)
+        self._focus_lost_timer.daemon = True
+        self._focus_lost_timer.start()
+
+    # ── Sentinel poller ─────────────────────────────────────────────────────
+
+    def _start_sentinel(self) -> None:
+        from sentinel import SentinelPoller
+        self._sentinel = SentinelPoller(
+            on_match=self._on_sentinel_match,
+            on_focus_gained=self._on_game_focus_gained,
+            on_focus_lost=self._on_game_focus_lost,
+        )
+        self._sentinel.start()
+
+    def _on_sentinel_match(self) -> None:
+        log.info("Sentinel: Final Ranking detected")
+
+        # Stop replay recording (game ended)
+        if self._replay_recorder and self._replay_recorder.recording:
+            if self._focus_lost_timer:
+                self._focus_lost_timer.cancel()
+                self._focus_lost_timer = None
+            path = self._replay_recorder.stop()
+            if path:
+                size_mb = path.stat().st_size / (1024 * 1024)
+                self._emit({"type": "replay_saved", "name": path.name, "size_mb": round(size_mb, 1)})
+                self._emit_notification(APP_NAME, f"Replay saved: {path.name}")
+
+        self._emit({"type": "sentinel_match"})
+        self._emit_notification(APP_NAME, "Game ended! Open Match History and click Capture.")
+
+    # ── Capture + Parse ─────────────────────────────────────────────────────
+
+    def _do_capture(self) -> None:
+        """Screenshot + detect + parse, emitting results."""
+        import capture
+        from cv_parser import detect_screen_type
+
+        try:
+            img = capture.capture_screen()
+            if img is None:
+                self._emit_error("Screenshot capture failed")
+                self._emit_notification(APP_NAME, "Screenshot capture failed.")
+                return
+
+            screen_type = detect_screen_type(img)
+            log.info("Capture: detected screen type '%s'", screen_type)
+
+            if screen_type == "my_matches":
+                self._emit_notification(APP_NAME, "My Matches detected — parsing...")
+                self._do_parse_my_matches(img)
+            else:
+                hotkey = self.config.get("hotkey", "F6")
+                self._emit_notification(
+                    APP_NAME,
+                    f"Not on My Matches page (detected: {screen_type}). "
+                    f"Navigate to My Matches and press {hotkey}.",
+                )
+        except Exception as e:
+            log.error("capture error: %s", e, exc_info=True)
+            self._emit_error(f"Capture error: {e}")
+
+    def _do_parse_my_matches(self, img) -> None:
+        """Parse a My Matches screen image and emit parse_result."""
+        import cv2
+        from cv_parser import parse_my_matches, infer_timestamps
+
+        try:
+            if isinstance(img, Path):
+                img = cv2.imread(str(img))
+                if img is None:
+                    self._emit_error("Failed to read image")
+                    return
+
+            player = self.config.get("player_name", "jack")
+            screenshot_time = datetime.now()
+            rows = parse_my_matches(img, player, ICONS_DIR, debug=True)
+            if not rows:
+                log.warning("MY MATCHES: no rows parsed")
+                self._emit_notification(APP_NAME, "MY MATCHES: no rows parsed.")
+                return
+            log.info("Parsed %d row(s) from MY MATCHES", len(rows))
+
+            timestamps = infer_timestamps(rows, screenshot_time)
+
+            # Store pending data for confirmation
+            self._pending_rows = rows
+            self._pending_timestamps = timestamps
+            self._pending_img = img
+
+            # Encode screenshot as base64 JPEG for renderer preview
+            screenshot_b64 = ""
+            try:
+                from PIL import Image as PILImage
+                import io
+                import numpy as np
+                rgb = img[:, :, ::-1] if isinstance(img, np.ndarray) else img
+                pil_img = PILImage.fromarray(rgb)
+                # Resize for preview
+                max_w = 800
+                if pil_img.width > max_w:
+                    ratio = max_w / pil_img.width
+                    pil_img = pil_img.resize((max_w, int(pil_img.height * ratio)), PILImage.LANCZOS)
+                buf = io.BytesIO()
+                pil_img.save(buf, format="JPEG", quality=70)
+                screenshot_b64 = base64.b64encode(buf.getvalue()).decode("ascii")
+            except Exception as e:
+                log.warning("Failed to encode screenshot preview: %s", e)
+
+            self._emit({
+                "type": "parse_result",
+                "rows": rows,
+                "timestamps": timestamps,
+                "screenshot_b64": screenshot_b64,
+            })
+
+        except Exception as e:
+            log.error("parse error: %s", e, exc_info=True)
+            self._emit_error(f"Parse error: {e}")
+
+    def _do_confirm(self, selected: list, edits: dict) -> None:
+        """Push confirmed rows to DB."""
+        from models import GameRow
+        from db import game_exists, push_game
+
+        if self._pending_rows is None:
+            self._emit_error("No pending parse result to confirm")
+            return
+
+        rows = self._pending_rows
+        timestamps = self._pending_timestamps
+        img = self._pending_img
+        user_id = self.config.get("steam_id") or None
+
+        try:
+            # Upload screenshot once for the whole batch
+            screenshot_url = ""
+            if user_id and img is not None:
+                try:
+                    from db import upload_screenshot
+                    screenshot_url = upload_screenshot(img, user_id) or ""
+                except ImportError:
+                    screenshot_url = ""
+
+            imported = 0
+            skipped = 0
+
+            for idx in selected:
+                if idx < 0 or idx >= len(rows):
+                    continue
+                r = dict(rows[idx])
+                played_at = timestamps[idx] if idx < len(timestamps) else ""
+
+                # Apply edits if provided
+                idx_str = str(idx)
+                if idx_str in edits:
+                    for key, val in edits[idx_str].items():
+                        r[key] = val
+
+                lineup = "|".join(r.get("units", []))
+                placement = r.get("placement", "")
+                wl = r.get("wl", "")
+                level = r.get("level", "")
+
+                # Skip duplicates
+                if user_id and game_exists(user_id, played_at, placement, wl, level, lineup):
+                    log.info("  row %d: SKIP duplicate (place=%s wl=%s level=%s)", idx, placement, wl, level)
+                    skipped += 1
+                    continue
+
+                log.info(
+                    "  row %d: place=%s level=%s wl=%s rank=%s units=[%s]",
+                    idx, placement, level, wl, r.get("rank"), lineup,
+                )
+                game_row = GameRow(
+                    played_at=played_at,
+                    placement=placement,
+                    rank=r.get("rank", ""),
+                    rank_change=r.get("rank_change", "none"),
+                    lineup=lineup,
+                    synergies=r.get("synergies", ""),
+                    talents="",
+                    relic=r.get("relic", ""),
+                    level=level,
+                    wl=wl,
+                    screenshot=screenshot_url,
+                    notes="",
+                )
+                push_game(game_row, user_id=user_id)
+                imported += 1
+
+            msg = f"Imported {imported} match(es)"
+            if skipped:
+                msg += f", {skipped} duplicate(s) skipped"
+            self._emit({"type": "import_result", "imported": imported, "skipped": skipped})
+            self._emit_notification(APP_NAME, msg)
+
+        except Exception as e:
+            log.error("confirm error: %s", e, exc_info=True)
+            self._emit_error(f"Confirm error: {e}")
+        finally:
+            self._pending_rows = None
+            self._pending_timestamps = None
+            self._pending_img = None
+
+    def _do_cancel_confirm(self) -> None:
+        self._pending_rows = None
+        self._pending_timestamps = None
+        self._pending_img = None
+        log.info("Confirmation cancelled")
+
+    # ── Import file ─────────────────────────────────────────────────────────
+
+    def _do_import_file(self, path_str: str) -> None:
+        import cv2
+        path = Path(path_str)
+        if not path.exists():
+            self._emit_error(f"File not found: {path}")
+            return
+
+        log.info("Import file: %s", path)
+        img = cv2.imread(str(path))
+        if img is None:
+            self._emit_error(f"Failed to read image: {path}")
+            return
+
+        self._do_parse_my_matches(img)
+
+    # ── Steam login ─────────────────────────────────────────────────────────
+
+    def _do_steam_login(self) -> None:
+        if self.config.get("steam_id"):
+            return
+
+        def _login():
+            from steam_auth import steam_login, fetch_steam_name
+            sid = steam_login()
+            if not sid:
+                self._emit_notification(APP_NAME, "Steam login failed or timed out.")
+                return
+            name = fetch_steam_name(sid) or sid
+            self.config["steam_id"] = sid
+            self.config["steam_name"] = name
+            save_config(self.config)
+            from db import ensure_user
+            ensure_user(sid)
+            self._emit({"type": "steam_login", "steam_id": sid, "steam_name": name})
+            self._emit_notification(APP_NAME, f"Logged in as {name}")
+            log.info("Steam login: %s (%s)", name, sid)
+
+        threading.Thread(target=_login, daemon=True, name="steam-login").start()
+
+    def _do_steam_logout(self) -> None:
+        self.config["steam_id"] = ""
+        self.config["steam_name"] = ""
+        save_config(self.config)
+        self._emit_notification(APP_NAME, "Logged out of Steam.")
+        self._emit_status()
+
+    # ── Config ──────────────────────────────────────────────────────────────
+
+    def _do_set_config(self, key: str, value) -> None:
+        self.config[key] = value
+        save_config(self.config)
+        log.info("Config: %s = %s", key, value)
+
+        # Handle side effects
+        if key == "replay_enabled":
+            if value and not self._replay_recorder:
+                self._init_replay()
+            elif not value and self._replay_recorder and self._replay_recorder.recording:
+                self._replay_recorder.stop()
+
+        self._emit_status()
+
+    # ── Shutdown ────────────────────────────────────────────────────────────
+
+    def _shutdown(self) -> None:
+        log.info("Quit requested — shutting down")
+        self._stop_event.set()
+
+        if self._replay_recorder and self._replay_recorder.recording:
+            try:
+                self._replay_recorder.stop()
+            except Exception:
+                pass
+        if self._focus_lost_timer:
+            self._focus_lost_timer.cancel()
+        if self._sentinel:
+            try:
+                self._sentinel.stop()
+            except Exception:
+                pass
+
+    # ── Command dispatch ────────────────────────────────────────────────────
+
+    def _handle_command(self, msg: dict) -> None:
+        cmd = msg.get("cmd")
+        if cmd == "capture":
+            threading.Thread(target=self._do_capture, daemon=True, name="capture").start()
+        elif cmd == "confirm":
+            selected = msg.get("selected", [])
+            edits = msg.get("edits", {})
+            threading.Thread(
+                target=self._do_confirm, args=(selected, edits),
+                daemon=True, name="confirm",
+            ).start()
+        elif cmd == "cancel_confirm":
+            self._do_cancel_confirm()
+        elif cmd == "import_file":
+            path = msg.get("path", "")
+            threading.Thread(
+                target=self._do_import_file, args=(path,),
+                daemon=True, name="import-file",
+            ).start()
+        elif cmd == "steam_login":
+            self._do_steam_login()
+        elif cmd == "steam_logout":
+            self._do_steam_logout()
+        elif cmd == "set_config":
+            self._do_set_config(msg.get("key", ""), msg.get("value"))
+        elif cmd == "status":
+            self._emit_status()
+        elif cmd == "quit":
+            self._shutdown()
+        else:
+            self._emit_error(f"Unknown command: {cmd}")
+
+    # ── Main loop ───────────────────────────────────────────────────────────
+
+    def run(self) -> None:
+        """Start sentinel, then read stdin commands until quit or EOF."""
+        self._start_sentinel()
+
+        from updater import __version__
+        log.info("%s headless backend v%s running", APP_NAME, __version__)
+
+        # Emit initial status
+        self._emit_status()
+
+        # Read stdin line by line
+        try:
+            for line in sys.stdin:
+                line = line.strip()
+                if not line:
+                    continue
+                try:
+                    msg = json.loads(line)
+                except json.JSONDecodeError as e:
+                    self._emit_error(f"Invalid JSON: {e}")
+                    continue
+
+                self._handle_command(msg)
+
+                if self._stop_event.is_set():
+                    break
+        except EOFError:
+            log.info("stdin EOF — Electron process likely crashed, shutting down")
+        except KeyboardInterrupt:
+            log.info("KeyboardInterrupt — shutting down")
+        finally:
+            self._shutdown()
+
+
+def main():
+    import atexit
+    import traceback
+    crash_log = Path.home() / ".dac" / "crash.log"
+    crash_log.parent.mkdir(parents=True, exist_ok=True)
+
+    def _on_exit():
+        log.info("Headless process exiting")
+
+    atexit.register(_on_exit)
+
+    try:
+        def _excepthook(exc_type, exc_value, exc_tb):
+            log.critical("Unhandled exception", exc_info=(exc_type, exc_value, exc_tb))
+            with open(crash_log, "a", encoding="utf-8") as f:
+                f.write(f"\n{'='*60}\n{datetime.now()}\n")
+                traceback.print_exception(exc_type, exc_value, exc_tb, file=f)
+        sys.excepthook = _excepthook
+
+        def _thread_excepthook(args):
+            log.critical("Unhandled thread exception in %s",
+                         args.thread.name if args.thread else "unknown",
+                         exc_info=(args.exc_type, args.exc_value, args.exc_traceback))
+        threading.excepthook = _thread_excepthook
+
+        backend = HeadlessBackend()
+        backend.run()
+    except Exception:
+        with open(crash_log, "a", encoding="utf-8") as f:
+            f.write(f"\n{'='*60}\n{datetime.now()} [FATAL]\n")
+            traceback.print_exc(file=f)
+        raise
+
+
+if __name__ == "__main__":
+    main()
