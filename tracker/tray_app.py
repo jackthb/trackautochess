@@ -316,7 +316,7 @@ class TrayApp:
         """Parse a My Matches screen image (numpy array or file path)."""
         import cv2
         from models import GameRow
-        from db import game_exists, push_game, upload_screenshot
+        from db import game_exists, push_game
 
         user_id = self.config.get("steam_id") or None
 
@@ -355,7 +355,12 @@ class TrayApp:
             # Upload screenshot once for the whole batch
             screenshot_url = ""
             if user_id:
-                screenshot_url = upload_screenshot(img, user_id) or ""
+                try:
+                    from db import upload_screenshot
+                    screenshot_url = upload_screenshot(img, user_id) or ""
+                except ImportError:
+                    log.warning("upload_screenshot not available, skipping")
+                    screenshot_url = ""
 
             imported = 0
             skipped = 0

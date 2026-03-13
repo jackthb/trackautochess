@@ -53,9 +53,11 @@ class GameEndOverlay:
 
     def dismiss(self):
         """Dismiss the overlay from any thread."""
-        if self._root and self._alive:
+        self._alive = False
+        if self._root:
             try:
-                self._root.after(0, self._close)
+                # quit() stops mainloop (thread-safe), then _run cleans up
+                self._root.quit()
             except Exception:
                 pass
 
@@ -67,6 +69,10 @@ class GameEndOverlay:
             log.error("Overlay error: %s", e)
         finally:
             self._alive = False
+            try:
+                self._root.destroy()
+            except Exception:
+                pass
 
     def _build_window(self):
         root = tk.Tk()
@@ -187,8 +193,9 @@ class GameEndOverlay:
                 self._on_dismiss()
 
     def _close(self):
+        """Close from the overlay thread (button click / timeout)."""
         self._alive = False
         try:
-            self._root.destroy()
+            self._root.quit()
         except Exception:
             pass
