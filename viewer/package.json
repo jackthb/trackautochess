@@ -1,0 +1,16 @@
+{
+  "name": "dac-replay-viewer",
+  "version": "0.1.0",
+  "description": "Dota Auto Chess replay viewer",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "dev": "electron . --dev"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": ["electron"]
+  },
+  "devDependencies": {
+    "electron": "^33.0.0"
+  }
+}

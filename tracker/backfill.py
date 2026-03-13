@@ -1,7 +1,7 @@
 """Backfill: scan Steam screenshots, parse My Matches, push to Supabase.
 
 Usage:
-    python backfill.py <screenshot_dir> [--dry-run]
+    python backfill.py <screenshot_dir> [--dry-run] [--cleanup]
 """
 
 import logging
@@ -16,7 +16,7 @@ import cv2
 sys.path.insert(0, str(Path(__file__).parent))
 
 from cv_parser import detect_screen_type, parse_my_matches, infer_timestamps
-from db import push_game, game_exists
+from db import push_game, game_exists, upload_screenshot
 from models import GameRow
 from utils import load_config, ICONS_DIR
 
@@ -44,7 +44,7 @@ def datetime_from_filename(name: str) -> datetime | None:
 
 def main():
     if len(sys.argv) < 2:
-        print("Usage: python backfill.py <screenshot_dir> [--dry-run]")
+        print("Usage: python backfill.py <screenshot_dir> [--dry-run] [--cleanup]")
         sys.exit(1)
 
     screenshot_dir = Path(sys.argv[1])
@@ -71,7 +71,8 @@ def main():
 
     total_imported = 0
     total_skipped = 0
-    total_not_mm = 0
+    total_deleted = 0
+    cleanup = "--cleanup" in sys.argv
 
     for i, path in enumerate(screenshots):
         screenshot_time = datetime_from_filename(path.name)
@@ -85,8 +86,18 @@ def main():
             continue
 
         screen_type = detect_screen_type(img)
-        if screen_type != "my_matches":
-            total_not_mm += 1
+        if screen_type not in ("my_matches", "game_over"):
+            if cleanup and not dry_run:
+                path.unlink()
+                print(f"  [{i+1}/{len(screenshots)}] {path.name}: {screen_type} — DELETED")
+                total_deleted += 1
+            else:
+                print(f"  [{i+1}/{len(screenshots)}] {path.name}: {screen_type} — skipped")
+            continue
+
+        if screen_type == "game_over":
+            # Keep game_over screenshots but don't parse them
+            print(f"  [{i+1}/{len(screenshots)}] {path.name}: game_over — kept")
             continue
 
         print(f"  [{i+1}/{len(screenshots)}] {path.name} — MY MATCHES ({screenshot_time.strftime('%Y-%m-%d %H:%M:%S')})")
@@ -97,6 +108,11 @@ def main():
             continue
 
         timestamps = infer_timestamps(rows, screenshot_time)
+
+        # Upload screenshot once for the whole batch
+        screenshot_url = ""
+        if not dry_run:
+            screenshot_url = upload_screenshot(img, steam_id) or ""
 
         for j, (r, date_str) in enumerate(zip(rows, timestamps)):
             placement = r.get("placement", "")
@@ -117,7 +133,7 @@ def main():
 
             if not dry_run:
                 game_row = GameRow(
-                    date=date_str,
+                    played_at=date_str,
                     placement=placement,
                     rank=rank,
                     rank_change=rank_change,
@@ -127,6 +143,7 @@ def main():
                     relic=relic,
                     level=level,
                     wl=wl,
+                    screenshot=screenshot_url,
                     notes="backfill:steam_screenshots",
                 )
                 if push_game(game_row, user_id=steam_id):
@@ -136,8 +153,9 @@ def main():
             else:
                 total_imported += 1
 
-    print(f"\nDone. {total_imported} imported, {total_skipped} skipped, "
-          f"{total_not_mm} non-My Matches screenshots ignored.")
+    print(f"\nDone. {total_imported} imported, {total_skipped} skipped"
+          + (f", {total_deleted} non-game screenshots deleted" if total_deleted else "")
+          + ".")
 
 
 if __name__ == "__main__":

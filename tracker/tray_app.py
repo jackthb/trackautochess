@@ -149,11 +149,16 @@ class TrayApp:
         self._icon = None  # set in run()
         self._sentinel = None  # set in run()
         self._overlay = None  # GameEndOverlay instance
+        self._replay_recorder = None  # ReplayRecorder instance
+        self._focus_lost_timer = None  # timer for delayed stop on focus loss
         # Ensure user exists in DB if already logged in
         sid = self.config.get("steam_id")
         if sid:
             from db import ensure_user
             ensure_user(sid)
+        # Init replay system
+        if self.config.get("replay_enabled", True):
+            self._init_replay()
 
     def _notify(self, title: str, message: str) -> None:
         """Show a desktop balloon notification via pystray."""
@@ -163,17 +168,78 @@ class TrayApp:
         except Exception as e:
             log.error("notification error: %s", e)
 
+    # ── Replay recording ────────────────────────────────────────────────────
+
+    def _init_replay(self) -> None:
+        """Initialise the replay recorder and store."""
+        from replay import ReplayRecorder, ReplayStore
+        max_gb = self.config.get("replay_max_gb", 15)
+        store = ReplayStore(max_gb=max_gb)
+        self._replay_recorder = ReplayRecorder(store)
+        log.info("Replay system ready (max %.0f GB, dir: %s)", max_gb, store.replay_dir)
+
+    def _on_game_focus_gained(self) -> None:
+        """Called when Dota 2 gains foreground focus."""
+        # Cancel any pending focus-loss stop timer
+        if self._focus_lost_timer:
+            self._focus_lost_timer.cancel()
+            self._focus_lost_timer = None
+
+        if not self._replay_recorder or not self.config.get("replay_enabled", True):
+            return
+        if self._replay_recorder.recording:
+            return  # already recording
+
+        if self._replay_recorder.start():
+            log.info("Replay: recording started (Dota 2 focused)")
+
+    def _on_game_focus_lost(self) -> None:
+        """Called when Dota 2 loses foreground focus.
+
+        Starts a 5-minute timer — if focus isn't regained, stop recording.
+        This handles alt-tabs gracefully while still cleaning up if the
+        player quits Dota without triggering Final Ranking.
+        """
+        if not self._replay_recorder or not self._replay_recorder.recording:
+            return
+
+        def _delayed_stop():
+            if self._replay_recorder and self._replay_recorder.recording:
+                log.info("Replay: Dota 2 unfocused for 5 min — stopping recording")
+                path = self._replay_recorder.stop()
+                if path:
+                    self._notify(APP_NAME, f"Replay saved: {path.name}")
+
+        self._focus_lost_timer = threading.Timer(300, _delayed_stop)
+        self._focus_lost_timer.daemon = True
+        self._focus_lost_timer.start()
+
     # ── Sentinel poller ─────────────────────────────────────────────────────
 
     def _start_sentinel(self) -> None:
         """Start lightweight screen polling for Final Ranking detection."""
         from sentinel import SentinelPoller
-        self._sentinel = SentinelPoller(on_match=self._on_sentinel_match)
+        self._sentinel = SentinelPoller(
+            on_match=self._on_sentinel_match,
+            on_focus_gained=self._on_game_focus_gained,
+            on_focus_lost=self._on_game_focus_lost,
+        )
         self._sentinel.start()
 
     def _on_sentinel_match(self) -> None:
         """Called when the sentinel detects a Final Ranking screen."""
         log.info("Sentinel: Final Ranking detected — showing overlay")
+
+        # Stop replay recording (game ended)
+        if self._replay_recorder and self._replay_recorder.recording:
+            # Cancel any pending focus-loss timer
+            if self._focus_lost_timer:
+                self._focus_lost_timer.cancel()
+                self._focus_lost_timer = None
+            path = self._replay_recorder.stop()
+            if path:
+                self._notify(APP_NAME, f"Replay saved: {path.name}")
+
         self._notify(APP_NAME, "Game ended! Open Match History and click Capture.")
         self._show_overlay()
 
@@ -514,9 +580,31 @@ class TrayApp:
         state = "enabled" if not enabled else "disabled"
         self._notify(APP_NAME, f"Start with Windows: {state}")
 
+    def _toggle_replay(self, _icon=None, _item=None) -> None:
+        """Toggle replay recording on/off."""
+        enabled = not self.config.get("replay_enabled", True)
+        self.config["replay_enabled"] = enabled
+        save_config(self.config)
+
+        if enabled and not self._replay_recorder:
+            self._init_replay()
+        elif not enabled and self._replay_recorder and self._replay_recorder.recording:
+            self._replay_recorder.stop()
+
+        state = "enabled" if enabled else "disabled"
+        self._notify(APP_NAME, f"Replay recording: {state}")
+        log.info("Replay recording %s", state)
+
     def _quit(self, icon, _item=None) -> None:
         log.info("Quit requested — shutting down")
         self._stop_event.set()
+        if self._replay_recorder and self._replay_recorder.recording:
+            try:
+                self._replay_recorder.stop()
+            except Exception:
+                pass
+        if self._focus_lost_timer:
+            self._focus_lost_timer.cancel()
         if self._overlay:
             try:
                 self._overlay.dismiss()
@@ -554,6 +642,11 @@ class TrayApp:
             ),
             pystray.Menu.SEPARATOR,
             pystray.MenuItem("Import History Screenshot...", self._import_history),
+            pystray.MenuItem(
+                "Record Replays",
+                self._toggle_replay,
+                checked=lambda _: self.config.get("replay_enabled", True),
+            ),
             pystray.MenuItem(
                 "Start with Windows",
                 self._toggle_autostart,

@@ -130,6 +130,50 @@ def push_game(row, user_id: str | None = None) -> bool:
         return False
 
 
+def upload_screenshot(img, user_id: str) -> str | None:
+    """Compress a CV2 image to JPEG and upload to Supabase Storage.
+
+    Returns the public URL on success, None on failure. Never raises.
+    """
+    client = _get_client()
+    if client is None:
+        return None
+
+    try:
+        from PIL import Image as PILImage
+        import io
+        import numpy as np
+
+        # Convert BGR (cv2) to RGB for Pillow
+        rgb = img[:, :, ::-1] if isinstance(img, np.ndarray) else img
+        pil_img = PILImage.fromarray(rgb)
+        buf = io.BytesIO()
+        pil_img.save(buf, format="JPEG", quality=60)
+        jpeg_bytes = buf.getvalue()
+
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        path = f"{user_id}/{timestamp}.jpg"
+
+        resp = client.post(
+            f"/storage/v1/object/screenshots/{path}",
+            content=jpeg_bytes,
+            headers={
+                "Content-Type": "image/jpeg",
+                "Prefer": "",  # override default return=minimal
+            },
+        )
+        resp.raise_for_status()
+
+        # Build public URL
+        base_url = client.base_url
+        public_url = f"{base_url}/storage/v1/object/public/screenshots/{path}"
+        log.info("uploaded screenshot: %s (%d KB)", path, len(jpeg_bytes) // 1024)
+        return str(public_url)
+    except Exception as e:
+        log.error("upload_screenshot error: %s", e)
+        return None
+
+
 def fetch_games(user_id: str, limit: int = 20) -> list[dict] | None:
     """Fetch recent games for a user from Supabase.
 

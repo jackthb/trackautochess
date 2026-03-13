@@ -32,6 +32,8 @@ DEFAULT_CONFIG = {
     "supabase_db_url": "",
     "steam_id": "",
     "steam_name": "",
+    "replay_enabled": True,
+    "replay_max_gb": 15,
 }
 
 

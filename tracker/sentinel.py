@@ -99,8 +99,11 @@ def _load_template(path, target_h):
 class SentinelPoller:
     """Polls screen for template matches."""
 
-    def __init__(self, on_match, template_path=None, interval=POLL_INTERVAL, threshold=MATCH_THRESHOLD):
+    def __init__(self, on_match, template_path=None, interval=POLL_INTERVAL, threshold=MATCH_THRESHOLD,
+                 on_focus_gained=None, on_focus_lost=None):
         self._on_match = on_match
+        self._on_focus_gained = on_focus_gained
+        self._on_focus_lost = on_focus_lost
         self._template_path = Path(template_path or TEMPLATE_PATH)
         self._interval = interval
         self._threshold = threshold
@@ -198,8 +201,18 @@ class SentinelPoller:
                 focused = is_game_focused()
                 if focused and not was_focused:
                     log.info("Dota 2 focused — sentinel active")
+                    if self._on_focus_gained:
+                        try:
+                            self._on_focus_gained()
+                        except Exception as e:
+                            log.warning("on_focus_gained callback error: %s", e)
                 elif not focused and was_focused:
                     log.info("Dota 2 lost focus — sentinel paused")
+                    if self._on_focus_lost:
+                        try:
+                            self._on_focus_lost()
+                        except Exception as e:
+                            log.warning("on_focus_lost callback error: %s", e)
                 was_focused = focused
 
                 if not focused:

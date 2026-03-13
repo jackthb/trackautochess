@@ -22,4 +22,5 @@ class GameRow:
     relic: str           # final relic name if visible (nullable)
     level: str           # player level at game end (nullable)
     wl: str              # win-loss record e.g. "21-17" (nullable)
-    notes: str           # free-form notes
+    screenshot: str = "" # public URL of the source screenshot (nullable)
+    notes: str = ""      # free-form notes
