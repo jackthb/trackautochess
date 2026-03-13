@@ -89,7 +89,7 @@ def _build_and_run(img: np.ndarray, rows: list[dict], timestamps: list[str]):
     scale = preview_h / h_img
     preview_w = int(w_img * scale)
     pil_img = Image.fromarray(rgb).resize((preview_w, preview_h), Image.LANCZOS)
-    tk_img = ImageTk.PhotoImage(pil_img)
+    tk_img = ImageTk.PhotoImage(pil_img, master=root)
 
     img_label = tk.Label(preview_frame, image=tk_img, bg=BG, bd=1, relief=tk.SOLID)
     img_label.image = tk_img  # prevent GC
