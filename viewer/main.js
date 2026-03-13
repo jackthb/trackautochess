@@ -420,6 +420,57 @@ ipcMain.handle("app:getVersion", () => {
   return app.getVersion();
 });
 
+// ── Games IPC (fetch from Supabase) ──────────────────────────────────────────
+
+function loadTrackerConfig() {
+  const configPath = path.join(DAC_DIR, "config.json");
+  if (!fs.existsSync(configPath)) return {};
+  try {
+    return JSON.parse(fs.readFileSync(configPath, "utf-8"));
+  } catch {
+    return {};
+  }
+}
+
+ipcMain.handle("games:fetch", async () => {
+  const config = loadTrackerConfig();
+  const url = config.supabase_url;
+  const key = config.supabase_key;
+  const steamId = config.steam_id;
+
+  if (!url || !key || !steamId) return [];
+
+  try {
+    const resp = await net.fetch(
+      `${url}/rest/v1/games?user_id=eq.${steamId}&order=played_at.desc&limit=100`,
+      {
+        headers: {
+          apikey: key,
+          Authorization: `Bearer ${key}`,
+          Accept: "application/json",
+        },
+      }
+    );
+    if (!resp.ok) return [];
+    return await resp.json();
+  } catch (e) {
+    console.error("games:fetch error:", e);
+    return [];
+  }
+});
+
+// ── Units data IPC ───────────────────────────────────────────────────────────
+
+ipcMain.handle("data:units", async () => {
+  const unitsPath = path.join(__dirname, "..", "data", "units.json");
+  if (!fs.existsSync(unitsPath)) return {};
+  try {
+    return JSON.parse(fs.readFileSync(unitsPath, "utf-8"));
+  } catch {
+    return {};
+  }
+});
+
 // ── Replay protocol ──────────────────────────────────────────────────────────
 
 protocol.registerSchemesAsPrivileged([
@@ -429,6 +480,14 @@ protocol.registerSchemesAsPrivileged([
       standard: true,
       supportFetchAPI: true,
       stream: true,
+      bypassCSP: true,
+    },
+  },
+  {
+    scheme: "icons",
+    privileges: {
+      standard: true,
+      supportFetchAPI: true,
       bypassCSP: true,
     },
   },
@@ -443,6 +502,26 @@ app.whenReady().then(() => {
       request.url.replace("replay://video/", "")
     );
     const filePath = path.join(REPLAY_DIR, filename);
+
+    if (!fs.existsSync(filePath)) {
+      return new Response("Not found", { status: 404 });
+    }
+
+    return net.fetch(`file://${filePath}`);
+  });
+
+  // Handle icons:// protocol for serving local icon files
+  protocol.handle("icons", (request) => {
+    // icons://type/name.png → data/icons/type/name.png
+    const urlPath = decodeURIComponent(
+      request.url.replace("icons://", "")
+    );
+    const filePath = path.join(ICONS_DIR, urlPath);
+
+    // Prevent path traversal
+    if (!filePath.startsWith(ICONS_DIR)) {
+      return new Response("Forbidden", { status: 403 });
+    }
 
     if (!fs.existsSync(filePath)) {
       return new Response("Not found", { status: 404 });

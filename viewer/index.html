@@ -3,9 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: icons:; media-src 'self' replay:; connect-src 'self'; font-src https://fonts.gstatic.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=Cinzel:wght@400;600;700&display=swap">
   <title>DAC Tracker</title>
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
       --bg-deep: #08090b;
@@ -13,19 +15,24 @@
       --bg-elevated: #14161c;
       --bg-hover: #1a1d26;
       --border: #1e2230;
+      --border-subtle: #151820;
       --text-primary: #c8ccd8;
       --text-secondary: #6b7080;
-      --text-tertiary: #484f58;
+      --text-muted: #3a3f50;
+      --gold: #c9a84c;
+      --gold-dim: #8a7234;
+      --silver: #8a92a8;
+      --bronze: #8b6d4f;
+      --red: #9b3a3a;
+      --red-bright: #c44e4e;
+      --green: #3a7a4a;
+      --green-bright: #4eaa62;
       --accent: #4a6fa5;
       --accent-hover: #5a8fd5;
-      --danger: #da3633;
-      --danger-hover: #f85149;
-      --green-bright: #4eaa62;
-      --gold: #c9a84c;
     }
 
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+      font-family: 'IBM Plex Mono', monospace;
       background: var(--bg-deep);
       color: var(--text-primary);
       height: 100vh;
@@ -33,9 +40,26 @@
       user-select: none;
       display: flex;
       flex-direction: column;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      line-height: 1.5;
     }
 
-    /* ── Title bar drag region ──────────────────────────────── */
+    /* Noise texture overlay */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      opacity: 0.03;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      background-size: 256px 256px;
+    }
+
+    body > * { position: relative; z-index: 1; }
+
+    /* ── Title bar ─────────────────────────────────────────── */
 
     .titlebar {
       height: 36px;
@@ -45,15 +69,19 @@
       padding-left: 16px;
       background: var(--bg-deep);
       flex-shrink: 0;
+      border-bottom: 1px solid var(--border-subtle);
     }
 
-    .titlebar-title {
-      font-size: 12px;
+    .titlebar-logo {
+      font-family: 'Cinzel', serif;
+      font-size: 13px;
       font-weight: 600;
-      color: var(--text-tertiary);
-      letter-spacing: 0.5px;
+      letter-spacing: 3px;
       text-transform: uppercase;
+      color: var(--text-secondary);
     }
+
+    .titlebar-logo span { color: var(--gold-dim); }
 
     /* ── Tab bar ────────────────────────────────────────────── */
 
@@ -67,19 +95,20 @@
     }
 
     .tab {
-      padding: 10px 20px;
+      padding: 11px 20px;
+      font-family: 'IBM Plex Mono', monospace;
       font-size: 13px;
       font-weight: 500;
-      color: var(--text-secondary);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: var(--text-muted);
       cursor: pointer;
       border-bottom: 2px solid transparent;
-      transition: all 0.15s;
+      transition: all 0.2s;
       position: relative;
     }
 
-    .tab:hover {
-      color: var(--text-primary);
-    }
+    .tab:hover { color: var(--text-secondary); }
 
     .tab.active {
       color: var(--text-primary);
@@ -88,18 +117,16 @@
 
     .tab .badge {
       position: absolute;
-      top: 6px;
-      right: 6px;
-      width: 8px;
-      height: 8px;
+      top: 8px;
+      right: 8px;
+      width: 7px;
+      height: 7px;
       border-radius: 50%;
       background: var(--green-bright);
       display: none;
     }
 
-    .tab .badge.visible {
-      display: block;
-    }
+    .tab .badge.visible { display: block; }
 
     /* ── Tab content ───────────────────────────────────────── */
 
@@ -109,15 +136,300 @@
       display: none;
     }
 
-    .tab-content.active {
-      display: flex;
+    .tab-content.active { display: flex; }
+
+    /* ── Shared: btn-ghost ─────────────────────────────────── */
+
+    .btn-ghost {
+      font-family: inherit;
+      font-size: 13px;
+      color: var(--text-muted);
+      background: none;
+      border: 1px solid var(--border);
+      padding: 6px 16px;
+      cursor: pointer;
+      letter-spacing: 0.5px;
+      transition: all 0.2s;
     }
+
+    .btn-ghost:hover {
+      color: var(--text-secondary);
+      border-color: var(--text-muted);
+    }
+
+    .btn-ghost:disabled {
+      opacity: 0.5;
+      cursor: default;
+    }
+
+    /* ── History tab ───────────────────────────────────────── */
+
+    #tab-history {
+      flex-direction: column;
+      overflow-y: auto;
+    }
+
+    #tab-history::-webkit-scrollbar { width: 6px; }
+    #tab-history::-webkit-scrollbar-track { background: transparent; }
+    #tab-history::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+    .history-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 32px 32px 80px;
+      width: 100%;
+    }
+
+    /* Stats bar */
+    .stats-bar {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 1px;
+      background: var(--border-subtle);
+      border: 1px solid var(--border);
+      margin-bottom: 32px;
+    }
+
+    .stat-cell {
+      background: var(--bg-surface);
+      padding: 24px 20px;
+      text-align: center;
+    }
+
+    .stat-value {
+      font-size: 32px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 6px;
+    }
+
+    .stat-value.gold { color: var(--gold); }
+    .stat-value.green { color: var(--green-bright); }
+
+    .stat-label {
+      font-size: 13px;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+    }
+
+    /* Games table */
+    .table-wrap {
+      border: 1px solid var(--border);
+      overflow: hidden;
+    }
+
+    .table-header {
+      display: grid;
+      grid-template-columns: 72px 1fr 120px 100px 140px 120px;
+      padding: 0 20px;
+      background: var(--bg-surface);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .th {
+      font-size: 13px;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      padding: 14px 6px;
+    }
+
+    .game-entry {
+      border-bottom: 1px solid var(--border-subtle);
+      transition: background 0.15s;
+    }
+
+    .game-entry:last-child { border-bottom: none; }
+    .game-entry:hover { background: var(--bg-hover); }
+
+    .game-row {
+      display: grid;
+      grid-template-columns: 72px 1fr 120px 100px 140px 120px;
+      padding: 0 20px;
+      align-items: center;
+    }
+
+    .cell {
+      padding: 16px 6px;
+      font-size: 16px;
+    }
+
+    .placement {
+      font-size: 28px;
+      font-weight: 700;
+      font-family: 'Cinzel', serif;
+      width: 52px;
+      height: 52px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid;
+      opacity: 0.9;
+    }
+
+    .rank-cell {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .rank-tier { font-size: 15px; color: var(--text-secondary); }
+    .rank-num { font-size: 14px; color: var(--text-muted); }
+    .arrow-up { color: var(--green-bright); font-size: 13px; }
+    .arrow-down { color: var(--red-bright); font-size: 13px; }
+
+    .wl { font-size: 15px; }
+    .wl-w { color: var(--green-bright); }
+    .wl-l { color: var(--red-bright); }
+    .wl-sep { color: var(--text-muted); }
+
+    .level-cell { font-size: 16px; color: var(--text-secondary); }
+
+    .date-cell { font-size: 14px; color: var(--text-muted); }
+    .date-cell div:last-child { font-size: 12px; opacity: 0.6; }
+
+    .relics-cell { display: flex; align-items: center; }
+
+    .relics { display: flex; gap: 4px; align-items: center; }
+
+    .relic-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 4px;
+      border: 1px solid var(--border);
+      object-fit: cover;
+      background: var(--bg-surface);
+    }
+
+    /* Detail row (lineup + synergies) */
+    .detail-row {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      padding: 0 20px 14px 94px;
+      flex-wrap: wrap;
+    }
+
+    .lineup {
+      display: flex;
+      gap: 3px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .unit-icon-wrap {
+      position: relative;
+      width: 42px;
+      height: 42px;
+    }
+
+    .unit-icon {
+      width: 42px;
+      height: 42px;
+      border-radius: 4px;
+      border: 2px solid var(--border);
+      object-fit: cover;
+      background: var(--bg-surface);
+    }
+
+    .unit-stars {
+      position: absolute;
+      bottom: -3px;
+      right: -3px;
+      font-size: 9px;
+      line-height: 1;
+      background: var(--bg-deep);
+      border-radius: 2px;
+      padding: 1px 3px;
+    }
+
+    .unit-stars.s2 { color: #5a8fd5; }
+    .unit-stars.s3 { color: var(--gold); }
+
+    .synergies {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-left: auto;
+    }
+
+    .syn-badge {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 13px;
+      color: var(--text-muted);
+      background: var(--bg-surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: 3px;
+      padding: 3px 7px 3px 4px;
+    }
+
+    .syn-icon {
+      width: 20px;
+      height: 20px;
+      border-radius: 2px;
+      object-fit: cover;
+    }
+
+    .syn-count { color: var(--text-secondary); font-weight: 600; }
+
+    .history-empty {
+      text-align: center;
+      padding: 80px 32px;
+      color: var(--text-muted);
+      font-size: 16px;
+      background: var(--bg-surface);
+    }
+
+    .history-refresh {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .refresh-time { font-size: 13px; color: var(--text-muted); }
+
+    /* Loading spinner */
+    .loading {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 200px;
+      color: var(--text-muted);
+      font-size: 15px;
+      letter-spacing: 1px;
+    }
+
+    .loading::after {
+      content: '';
+      width: 14px;
+      height: 14px;
+      border: 1.5px solid var(--text-muted);
+      border-top-color: transparent;
+      border-radius: 50%;
+      margin-left: 10px;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Animations */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .fade-up { animation: fadeUp 0.4s ease-out both; }
+    .delay-1 { animation-delay: 0.1s; }
+    .delay-2 { animation-delay: 0.2s; }
 
     /* ── Replays tab ───────────────────────────────────────── */
 
-    #tab-replays {
-      flex-direction: row;
-    }
+    #tab-replays { flex-direction: row; }
 
     .sidebar {
       width: 320px;
@@ -136,43 +448,26 @@
     .sidebar-header h2 {
       font-size: 13px;
       font-weight: 600;
-      letter-spacing: 0.5px;
+      letter-spacing: 1.5px;
       text-transform: uppercase;
-      color: var(--text-secondary);
+      color: var(--text-muted);
       margin-bottom: 8px;
     }
 
-    .stats-bar {
+    .sidebar-stats {
       display: flex;
       gap: 16px;
       font-size: 12px;
-      color: var(--text-tertiary);
+      color: var(--text-muted);
     }
 
-    .stats-bar span { color: var(--text-secondary); }
+    .sidebar-stats span { color: var(--text-secondary); }
 
     .sidebar-actions {
       padding: 8px 12px;
       border-bottom: 1px solid var(--border);
       display: flex;
       gap: 6px;
-    }
-
-    .btn-small {
-      font-size: 11px;
-      padding: 4px 10px;
-      border-radius: 4px;
-      border: 1px solid var(--border);
-      background: var(--bg-elevated);
-      color: var(--text-secondary);
-      cursor: pointer;
-      transition: all 0.15s;
-    }
-
-    .btn-small:hover {
-      background: var(--bg-hover);
-      color: var(--text-primary);
-      border-color: var(--text-tertiary);
     }
 
     .replay-list {
@@ -209,15 +504,15 @@
       text-overflow: ellipsis;
     }
 
-    .replay-item-meta { font-size: 11px; color: var(--text-tertiary); margin-top: 2px; }
+    .replay-item-meta { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
 
     .replay-item-actions { opacity: 0; transition: opacity 0.15s; flex-shrink: 0; }
     .replay-item:hover .replay-item-actions { opacity: 1; }
 
-    .btn-delete {
+    .btn-delete-replay {
       background: none;
       border: none;
-      color: var(--text-tertiary);
+      color: var(--text-muted);
       cursor: pointer;
       padding: 4px 6px;
       border-radius: 4px;
@@ -225,7 +520,7 @@
       line-height: 1;
     }
 
-    .btn-delete:hover { color: var(--danger); background: rgba(218, 54, 51, 0.1); }
+    .btn-delete-replay:hover { color: var(--red-bright); background: rgba(155,58,58,0.1); }
 
     .player-panel {
       flex: 1;
@@ -257,7 +552,7 @@
       align-items: center;
       justify-content: center;
       height: 100%;
-      color: var(--text-tertiary);
+      color: var(--text-muted);
       gap: 12px;
       padding: 24px;
     }
@@ -272,13 +567,10 @@
       justify-content: space-between;
       align-items: center;
       font-size: 12px;
-      color: var(--text-tertiary);
+      color: var(--text-muted);
     }
 
-    .replay-filename {
-      font-family: 'SF Mono', 'Cascadia Code', 'Consolas', monospace;
-      color: var(--text-secondary);
-    }
+    .replay-filename { color: var(--text-secondary); }
 
     /* ── Confirmation tab ──────────────────────────────────── */
 
@@ -337,7 +629,6 @@
       flex: 1;
       overflow-y: auto;
       border: 1px solid var(--border);
-      border-radius: 6px;
     }
 
     .confirm-table-wrap::-webkit-scrollbar { width: 6px; }
@@ -353,42 +644,34 @@
     .confirm-table th {
       position: sticky;
       top: 0;
-      background: var(--bg-elevated);
-      color: var(--accent);
-      font-size: 11px;
+      background: var(--bg-surface);
+      color: var(--text-muted);
+      font-size: 12px;
       font-weight: 600;
       text-transform: uppercase;
-      letter-spacing: 0.5px;
+      letter-spacing: 1px;
       text-align: left;
-      padding: 8px 10px;
+      padding: 10px 10px;
       border-bottom: 1px solid var(--border);
     }
 
     .confirm-table td {
-      padding: 6px 10px;
-      border-bottom: 1px solid var(--border);
+      padding: 8px 10px;
+      border-bottom: 1px solid var(--border-subtle);
       vertical-align: middle;
     }
 
-    .confirm-table tr:nth-child(even) td {
-      background: var(--bg-surface);
-    }
+    .confirm-table tr:nth-child(even) td { background: var(--bg-surface); }
+    .confirm-table tr:hover td { background: var(--bg-hover); }
 
-    .confirm-table tr:hover td {
-      background: var(--bg-hover);
-    }
-
-    .confirm-table input[type="checkbox"] {
-      accent-color: var(--accent);
-    }
+    .confirm-table input[type="checkbox"] { accent-color: var(--accent); }
 
     .confirm-table input[type="text"] {
       background: var(--bg-deep);
       border: 1px solid var(--border);
-      border-radius: 4px;
       color: var(--text-primary);
-      padding: 3px 6px;
-      font-size: 12px;
+      padding: 4px 6px;
+      font-size: 13px;
       font-family: inherit;
       width: 100%;
     }
@@ -399,7 +682,7 @@
     }
 
     .confirm-table .col-check { width: 36px; text-align: center; }
-    .confirm-table .col-num { width: 36px; color: var(--text-tertiary); }
+    .confirm-table .col-num { width: 36px; color: var(--text-muted); }
     .confirm-table .col-place { width: 60px; }
     .confirm-table .col-level { width: 60px; }
     .confirm-table .col-wl { width: 80px; }
@@ -409,8 +692,8 @@
     .confirm-table .col-relic { min-width: 100px; color: var(--text-secondary); font-size: 12px; }
     .confirm-table .col-time { width: 80px; color: var(--text-secondary); font-size: 12px; }
 
-    .rank-up { color: #4ade80; }
-    .rank-down { color: var(--danger); }
+    .rank-up { color: var(--green-bright); }
+    .rank-down { color: var(--red-bright); }
 
     .confirm-actions {
       display: flex;
@@ -419,32 +702,34 @@
       flex-shrink: 0;
     }
 
-    .btn {
-      padding: 8px 20px;
-      border-radius: 6px;
+    .btn-confirm {
+      padding: 8px 24px;
       border: none;
+      font-family: inherit;
       font-size: 13px;
       font-weight: 600;
       cursor: pointer;
-      transition: all 0.15s;
+      letter-spacing: 0.5px;
+      transition: all 0.2s;
     }
 
-    .btn-primary {
-      background: var(--green-bright);
-      color: white;
+    .btn-confirm-primary {
+      background: var(--green);
+      color: var(--text-primary);
+      border: 1px solid var(--green-bright);
     }
 
-    .btn-primary:hover { background: #5bc06e; }
+    .btn-confirm-primary:hover { background: var(--green-bright); }
 
-    .btn-secondary {
-      background: var(--bg-elevated);
-      color: var(--text-secondary);
+    .btn-confirm-cancel {
+      background: none;
+      color: var(--text-muted);
       border: 1px solid var(--border);
     }
 
-    .btn-secondary:hover {
-      background: var(--bg-hover);
-      color: var(--text-primary);
+    .btn-confirm-cancel:hover {
+      color: var(--text-secondary);
+      border-color: var(--text-muted);
     }
 
     /* ── Settings tab ──────────────────────────────────────── */
@@ -456,49 +741,40 @@
 
     .settings-container {
       max-width: 600px;
-      padding: 24px;
+      padding: 32px;
       display: flex;
       flex-direction: column;
       gap: 24px;
     }
 
     .settings-section {
-      background: var(--bg-surface);
       border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 20px;
+      overflow: hidden;
     }
 
-    .settings-section h3 {
-      font-size: 14px;
-      font-weight: 600;
-      color: var(--text-primary);
-      margin-bottom: 12px;
+    .settings-section-title {
+      font-size: 13px;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      padding: 14px 20px;
+      background: var(--bg-surface);
+      border-bottom: 1px solid var(--border);
     }
 
     .settings-row {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 8px 0;
+      padding: 14px 20px;
+      border-bottom: 1px solid var(--border-subtle);
     }
 
-    .settings-row + .settings-row {
-      border-top: 1px solid var(--border);
-    }
+    .settings-row:last-child { border-bottom: none; }
 
-    .settings-label {
-      font-size: 13px;
-      color: var(--text-secondary);
-    }
-
-    .settings-value {
-      font-size: 13px;
-      color: var(--text-primary);
-      font-family: 'SF Mono', 'Cascadia Code', 'Consolas', monospace;
-    }
-
-    .settings-value.dimmed { color: var(--text-tertiary); }
+    .settings-label { font-size: 14px; color: var(--text-secondary); }
+    .settings-value { font-size: 14px; color: var(--text-primary); }
+    .settings-value.dim { color: var(--text-muted); }
 
     /* ── Status bar ────────────────────────────────────────── */
 
@@ -509,9 +785,9 @@
       display: flex;
       align-items: center;
       padding: 0 16px;
-      gap: 16px;
+      gap: 20px;
       font-size: 11px;
-      color: var(--text-tertiary);
+      color: var(--text-muted);
       flex-shrink: 0;
       -webkit-app-region: no-drag;
     }
@@ -526,11 +802,11 @@
       width: 6px;
       height: 6px;
       border-radius: 50%;
-      background: var(--text-tertiary);
+      background: var(--text-muted);
     }
 
     .status-dot.active { background: var(--green-bright); }
-    .status-dot.recording { background: var(--danger); animation: pulse 1.5s infinite; }
+    .status-dot.recording { background: var(--red-bright); animation: pulse 1.5s infinite; }
     .status-dot.warning { background: var(--gold); }
 
     @keyframes pulse {
@@ -538,7 +814,7 @@
       50% { opacity: 0.4; }
     }
 
-    /* ── Delete confirmation modal ─────────────────────────── */
+    /* ── Modal ─────────────────────────────────────────────── */
 
     .modal-overlay {
       position: fixed;
@@ -553,33 +829,36 @@
     .modal-dialog {
       background: var(--bg-elevated);
       border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 20px 24px;
+      padding: 24px;
       max-width: 360px;
     }
 
-    .modal-dialog h3 { font-size: 14px; margin-bottom: 8px; }
-    .modal-dialog p { font-size: 13px; color: var(--text-secondary); margin-bottom: 16px; }
+    .modal-dialog h3 { font-size: 15px; margin-bottom: 8px; }
+    .modal-dialog p { font-size: 13px; color: var(--text-secondary); margin-bottom: 20px; }
 
-    .modal-actions { display: flex; justify-content: flex-end; gap: 8px; }
+    .modal-actions { display: flex; justify-content: flex-end; gap: 10px; }
 
     .btn-modal {
-      font-size: 12px;
-      padding: 6px 14px;
-      border-radius: 4px;
+      font-family: inherit;
+      font-size: 13px;
+      padding: 6px 16px;
       border: none;
       cursor: pointer;
-      font-weight: 500;
     }
 
     .btn-modal-cancel {
-      background: var(--bg-hover);
-      color: var(--text-secondary);
+      background: none;
+      color: var(--text-muted);
       border: 1px solid var(--border);
     }
 
-    .btn-modal-danger { background: var(--danger); color: white; }
-    .btn-modal-danger:hover { background: var(--danger-hover); }
+    .btn-modal-danger {
+      background: var(--red);
+      color: var(--text-primary);
+      border: 1px solid var(--red-bright);
+    }
+
+    .btn-modal-danger:hover { background: var(--red-bright); }
 
     .hidden { display: none !important; }
   </style>
@@ -587,12 +866,13 @@
 <body>
   <!-- Title bar -->
   <div class="titlebar">
-    <span class="titlebar-title">DAC Tracker</span>
+    <span class="titlebar-logo"><span>DAC</span> Tracker</span>
   </div>
 
   <!-- Tab bar -->
   <div class="tab-bar">
-    <div class="tab active" data-tab="replays">Replays</div>
+    <div class="tab active" data-tab="history">History</div>
+    <div class="tab" data-tab="replays">Replays</div>
     <div class="tab" data-tab="confirm">
       Confirmation
       <span class="badge" id="confirm-badge"></span>
@@ -600,20 +880,40 @@
     <div class="tab" data-tab="settings">Settings</div>
   </div>
 
+  <!-- ═══ History tab ═══ -->
+  <div class="tab-content active" id="tab-history">
+    <div class="history-container">
+      <div id="history-loading" class="loading">Fetching matches</div>
+      <div id="history-content" class="hidden">
+        <div id="history-stats" class="stats-bar fade-up"></div>
+        <div class="history-refresh fade-up">
+          <button class="btn-ghost" id="btn-refresh-history">Refresh</button>
+          <span class="refresh-time" id="history-refresh-time"></span>
+        </div>
+        <div id="history-table" class="table-wrap fade-up delay-1"></div>
+      </div>
+      <div id="history-empty" class="hidden">
+        <div class="history-empty">
+          No matches recorded yet. Use the tracker to capture games.
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- ═══ Replays tab ═══ -->
-  <div class="tab-content active" id="tab-replays">
+  <div class="tab-content" id="tab-replays">
     <div class="sidebar">
       <div class="sidebar-header">
         <h2>Replays</h2>
-        <div class="stats-bar">
+        <div class="sidebar-stats">
           <div><span id="replay-count">0</span> replays</div>
           <div><span id="replay-size">0</span> GB used</div>
           <div><span id="replay-limit">15</span> GB limit</div>
         </div>
       </div>
       <div class="sidebar-actions">
-        <button class="btn-small" id="btn-open-folder">Open folder</button>
-        <button class="btn-small" id="btn-refresh">Refresh</button>
+        <button class="btn-ghost" id="btn-open-folder">Open folder</button>
+        <button class="btn-ghost" id="btn-refresh-replays">Refresh</button>
       </div>
       <div class="replay-list" id="replay-list"></div>
     </div>
@@ -644,7 +944,6 @@
   <!-- ═══ Confirmation tab ═══ -->
   <div class="tab-content" id="tab-confirm">
     <div class="confirm-container">
-      <!-- Empty state (no parse result) -->
       <div class="confirm-empty" id="confirm-empty">
         <div class="empty-state">
           <div class="empty-state-icon">&#128269;</div>
@@ -656,7 +955,6 @@
         </div>
       </div>
 
-      <!-- Parse result content -->
       <div class="hidden" id="confirm-content">
         <div class="confirm-preview">
           <img id="confirm-screenshot" src="" alt="Screenshot preview">
@@ -687,8 +985,8 @@
         </div>
 
         <div class="confirm-actions">
-          <button class="btn btn-secondary" id="btn-cancel-confirm">Cancel</button>
-          <button class="btn btn-primary" id="btn-confirm">Confirm (0)</button>
+          <button class="btn-confirm btn-confirm-cancel" id="btn-cancel-confirm">Cancel</button>
+          <button class="btn-confirm btn-confirm-primary" id="btn-confirm">Confirm (0)</button>
         </div>
       </div>
     </div>
@@ -698,34 +996,34 @@
   <div class="tab-content" id="tab-settings">
     <div class="settings-container">
       <div class="settings-section">
-        <h3>Steam Account</h3>
+        <div class="settings-section-title">Steam Account</div>
         <div class="settings-row">
           <span class="settings-label">Status</span>
           <span class="settings-value" id="settings-steam-status">Not logged in</span>
         </div>
         <div class="settings-row">
           <span class="settings-label">Steam ID</span>
-          <span class="settings-value dimmed" id="settings-steam-id">-</span>
+          <span class="settings-value dim" id="settings-steam-id">&mdash;</span>
         </div>
       </div>
 
       <div class="settings-section">
-        <h3>Replay Recording</h3>
+        <div class="settings-section-title">Replay Recording</div>
         <div class="settings-row">
           <span class="settings-label">Recording enabled</span>
           <span class="settings-value" id="settings-replay-enabled">Yes</span>
         </div>
         <div class="settings-row">
           <span class="settings-label">Storage used</span>
-          <span class="settings-value" id="settings-storage-used">-</span>
+          <span class="settings-value dim" id="settings-storage-used">&mdash;</span>
         </div>
       </div>
 
       <div class="settings-section">
-        <h3>About</h3>
+        <div class="settings-section-title">About</div>
         <div class="settings-row">
           <span class="settings-label">Version</span>
-          <span class="settings-value dimmed" id="settings-version">-</span>
+          <span class="settings-value dim" id="settings-version">&mdash;</span>
         </div>
         <div class="settings-row">
           <span class="settings-label">Backend</span>
@@ -751,7 +1049,7 @@
     </div>
   </div>
 
-  <!-- Delete confirmation modal -->
+  <!-- Delete modal -->
   <div class="modal-overlay hidden" id="delete-modal">
     <div class="modal-dialog">
       <h3>Delete replay?</h3>
@@ -768,10 +1066,101 @@
     let currentReplay = null;
     let pendingDelete = null;
     let pendingParseResult = null;
+    let gamesData = [];
+    let unitCosts = {};
+    let historyLastRefresh = null;
 
-    // ── DOM refs ───────────────────────────────────────────────
     const $ = (sel) => document.querySelector(sel);
     const $$ = (sel) => document.querySelectorAll(sel);
+
+    // ── Synergy icon map (matches web frontend) ────────────────
+    const SYN_ICON_MAP = {
+      "Demon Hunter": "demonhunter",
+      "Elemental": "element",
+      "Faceless": "nraqi",
+      "Pandaren": "pandaman",
+    };
+
+    function synIconName(name) {
+      if (SYN_ICON_MAP[name]) return SYN_ICON_MAP[name];
+      return name.toLowerCase().replace(/ /g, "");
+    }
+
+    // ── Helper functions (match web frontend) ──────────────────
+
+    function placementColor(p) {
+      if (p === 1) return "var(--gold)";
+      if (p <= 3) return "var(--silver)";
+      if (p === 4) return "var(--text-secondary)";
+      return "var(--red-bright)";
+    }
+
+    function placementBg(p) {
+      if (p === 1) return "rgba(201,168,76,0.08)";
+      if (p <= 3) return "rgba(138,146,168,0.05)";
+      if (p === 4) return "transparent";
+      return "rgba(155,58,58,0.05)";
+    }
+
+    function costBorderColor(cost) {
+      switch (cost) {
+        case 1: return "#3a3f50";
+        case 2: return "#5a8fd5";
+        case 3: return "#2a4a8a";
+        case 4: return "#c44ea0";
+        case 5: return "#c9a84c";
+        default: return "#3a3f50";
+      }
+    }
+
+    function unitStem(name) {
+      return name.toLowerCase().replace(/ /g, "_").replace(/-/g, "_").replace(/'/g, "");
+    }
+
+    function relicStem(name) {
+      return name.toLowerCase().replace(/ /g, "_").replace(/-/g, "_");
+    }
+
+    function parseLineup(lineup) {
+      if (!lineup) return [];
+      return lineup.split("|").filter(Boolean).map((entry) => {
+        const m = entry.match(/^(.+?)(?:\((\d)\))?$/);
+        if (!m) return { name: entry, stars: 1 };
+        return { name: m[1], stars: m[2] ? parseInt(m[2]) : 1 };
+      }).sort((a, b) =>
+        b.stars - a.stars || (unitCosts[b.name] || 1) - (unitCosts[a.name] || 1)
+      );
+    }
+
+    function parseSynergies(syn) {
+      if (!syn) return [];
+      return syn.split("|").filter(Boolean).map((entry) => {
+        const [name, count] = entry.split(":");
+        return { name, count: parseInt(count) || 0 };
+      }).filter((s) => s.count > 0).sort((a, b) => b.count - a.count);
+    }
+
+    function parseRelics(relic) {
+      if (!relic) return [];
+      return relic.split("|").filter(Boolean);
+    }
+
+    function parseWL(wl) {
+      if (!wl) return null;
+      const parts = wl.split("-");
+      if (parts.length !== 2) return null;
+      return { w: parseInt(parts[0]) || 0, l: parseInt(parts[1]) || 0 };
+    }
+
+    function escapeHtml(s) {
+      const div = document.createElement("div");
+      div.textContent = s;
+      return div.innerHTML;
+    }
+
+    function escapeAttr(s) {
+      return String(s).replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    }
 
     // ── Tab switching ──────────────────────────────────────────
 
@@ -792,7 +1181,7 @@
       );
     }
 
-    // ── Formatting helpers ─────────────────────────────────────
+    // ── Formatting ─────────────────────────────────────────────
 
     function formatSize(bytes) {
       if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(0) + " KB";
@@ -811,7 +1200,187 @@
       return d.toLocaleDateString([], { month: "short", day: "numeric" }) + ` ${time}`;
     }
 
-    // ── Replays ────────────────────────────────────────────────
+    // ═══════════════════════════════════════════════════════════
+    // ── History tab
+    // ═══════════════════════════════════════════════════════════
+
+    async function loadHistory() {
+      $("#history-loading").classList.remove("hidden");
+      $("#history-content").classList.add("hidden");
+      $("#history-empty").classList.add("hidden");
+
+      // Load units data for cost borders
+      if (Object.keys(unitCosts).length === 0) {
+        try {
+          const data = await window.appApi.fetchUnitsData();
+          if (data && data.units) {
+            for (const [name, info] of Object.entries(data.units)) {
+              unitCosts[name] = info.cost || 1;
+            }
+          }
+        } catch (e) {
+          console.error("Failed to load units data:", e);
+        }
+      }
+
+      const games = await window.appApi.fetchGames();
+      gamesData = games;
+      historyLastRefresh = new Date();
+
+      $("#history-loading").classList.add("hidden");
+
+      if (!games || games.length === 0) {
+        $("#history-empty").classList.remove("hidden");
+        return;
+      }
+
+      $("#history-content").classList.remove("hidden");
+      renderStats(games);
+      renderGamesTable(games);
+      $("#history-refresh-time").textContent =
+        `Updated ${historyLastRefresh.toLocaleTimeString()}`;
+    }
+
+    function renderStats(games) {
+      const placements = games.map((g) => parseInt(g.placement) || 0);
+      const avg = (placements.reduce((a, b) => a + b, 0) / placements.length).toFixed(1);
+      const top4 = placements.filter((p) => p >= 1 && p <= 4).length;
+      const top4pct = ((top4 / games.length) * 100).toFixed(0);
+      const wins = placements.filter((p) => p === 1).length;
+
+      $("#history-stats").innerHTML = `
+        <div class="stat-cell">
+          <div class="stat-value">${games.length}</div>
+          <div class="stat-label">Games</div>
+        </div>
+        <div class="stat-cell">
+          <div class="stat-value gold">${avg}</div>
+          <div class="stat-label">Avg Place</div>
+        </div>
+        <div class="stat-cell">
+          <div class="stat-value green">${top4pct}%</div>
+          <div class="stat-label">Top 4 Rate</div>
+        </div>
+        <div class="stat-cell">
+          <div class="stat-value gold">${wins}</div>
+          <div class="stat-label">Wins</div>
+        </div>
+      `;
+    }
+
+    function renderGamesTable(games) {
+      const container = $("#history-table");
+
+      let html = `
+        <div class="table-header">
+          <div class="th">#</div>
+          <div class="th">Rank</div>
+          <div class="th">W &ndash; L</div>
+          <div class="th">Level</div>
+          <div class="th">Relic</div>
+          <div class="th">Date</div>
+        </div>
+      `;
+
+      for (const g of games) {
+        const p = parseInt(g.placement) || 0;
+        const wl = parseWL(g.wl);
+        const rankParts = g.rank ? g.rank.split("-") : [];
+        const tier = rankParts[0] || "";
+        const rankNum = rankParts[1] || "";
+        const lineup = parseLineup(g.lineup);
+        const syns = parseSynergies(g.synergies);
+        const relics = parseRelics(g.relic);
+        const pColor = placementColor(p);
+        const pBg = placementBg(p);
+
+        let dateHtml = "&mdash;";
+        if (g.played_at) {
+          const d = new Date(g.played_at);
+          dateHtml = `
+            <div>${d.toLocaleDateString(undefined, { month: "short", day: "numeric" })}</div>
+            <div>${d.toLocaleTimeString(undefined, { hour: "2-digit", minute: "2-digit" })}</div>
+          `;
+        }
+
+        let wlHtml = '<span style="color:var(--text-muted)">&mdash;</span>';
+        if (wl) {
+          wlHtml = `<span class="wl-w">${wl.w}</span><span class="wl-sep"> &ndash; </span><span class="wl-l">${wl.l}</span>`;
+        }
+
+        let relicHtml = '<span style="color:var(--text-muted)">&mdash;</span>';
+        if (relics.length > 0) {
+          relicHtml = '<div class="relics">' + relics.map((r) =>
+            `<img class="relic-icon" src="icons://relics/${relicStem(r)}.png"
+                  alt="${escapeAttr(r)}" title="${escapeAttr(r)}"
+                  loading="lazy"
+                  onerror="this.style.display='none'">`
+          ).join("") + '</div>';
+        }
+
+        let arrowHtml = "";
+        if (g.rank_change === "up") arrowHtml = ' <span class="arrow-up">&#9650;</span>';
+        if (g.rank_change === "down") arrowHtml = ' <span class="arrow-down">&#9660;</span>';
+
+        html += `<div class="game-entry" style="background:${pBg}">`;
+        html += `<div class="game-row">`;
+        html += `<div class="cell"><div class="placement" style="color:${pColor};border-color:${pColor}">${g.placement}</div></div>`;
+        html += `<div class="cell rank-cell"><span class="rank-tier">${escapeHtml(tier)}</span> <span class="rank-num">${escapeHtml(rankNum)}</span>${arrowHtml}</div>`;
+        html += `<div class="cell wl">${wlHtml}</div>`;
+        html += `<div class="cell level-cell">${g.level || "&mdash;"}</div>`;
+        html += `<div class="cell relics-cell">${relicHtml}</div>`;
+        html += `<div class="cell date-cell">${dateHtml}</div>`;
+        html += `</div>`;
+
+        // Detail row with lineup + synergies
+        if (lineup.length > 0 || syns.length > 0) {
+          html += `<div class="detail-row">`;
+
+          if (lineup.length > 0) {
+            html += `<div class="lineup">`;
+            for (const u of lineup) {
+              const cost = unitCosts[u.name] || 1;
+              const borderColor = costBorderColor(cost);
+              html += `<div class="unit-icon-wrap" title="${escapeAttr(u.name)}${u.stars > 1 ? ` ★${u.stars}` : ""}">`;
+              html += `<img class="unit-icon" src="icons://units/${unitStem(u.name)}.png"
+                            alt="${escapeAttr(u.name)}" loading="lazy"
+                            style="border-color:${borderColor}"
+                            onerror="this.style.display='none'">`;
+              if (u.stars > 1) {
+                html += `<span class="unit-stars s${u.stars}">${"★".repeat(u.stars)}</span>`;
+              }
+              html += `</div>`;
+            }
+            html += `</div>`;
+          }
+
+          if (syns.length > 0) {
+            html += `<div class="synergies">`;
+            for (const s of syns.slice(0, 5)) {
+              html += `<div class="syn-badge" title="${escapeAttr(s.name)}: ${s.count}">`;
+              html += `<img class="syn-icon" src="icons://synergies/${synIconName(s.name)}.png"
+                            alt="${escapeAttr(s.name)}" loading="lazy"
+                            onerror="this.style.display='none'">`;
+              html += `<span class="syn-count">${s.count}</span>`;
+              html += `</div>`;
+            }
+            html += `</div>`;
+          }
+
+          html += `</div>`;
+        }
+
+        html += `</div>`;
+      }
+
+      container.innerHTML = html;
+    }
+
+    $("#btn-refresh-history").addEventListener("click", loadHistory);
+
+    // ═══════════════════════════════════════════════════════════
+    // ── Replays tab
+    // ═══════════════════════════════════════════════════════════
 
     async function loadReplays() {
       const replays = await window.replays.list();
@@ -844,11 +1413,11 @@
             <div class="replay-item-meta">${formatSize(r.size)}</div>
           </div>
           <div class="replay-item-actions">
-            <button class="btn-delete" title="Delete replay">&times;</button>
+            <button class="btn-delete-replay" title="Delete replay">&times;</button>
           </div>`;
 
         item.addEventListener("click", (e) => {
-          if (e.target.closest(".btn-delete")) {
+          if (e.target.closest(".btn-delete-replay")) {
             e.stopPropagation();
             showDeleteConfirm(r.name);
             return;
@@ -859,32 +1428,26 @@
         list.appendChild(item);
       }
 
-      // Update settings storage
       $("#settings-storage-used").textContent =
         `${(stats.totalBytes / (1024 ** 3)).toFixed(1)} GB (${stats.count} replays)`;
     }
 
     function selectReplay(replay) {
       currentReplay = replay.name;
-
       $$(".replay-item").forEach((el) => {
         el.classList.toggle("active", el.dataset.name === replay.name);
       });
-
       $("#empty-state").classList.add("hidden");
       $("#player-container").classList.remove("hidden");
       $("#replay-info-bar").classList.remove("hidden");
-
       const video = $("#video");
       video.src = `replay://video/${encodeURIComponent(replay.name)}`;
       video.load();
-
       $("#replay-filename").textContent = replay.name;
       $("#replay-filesize").textContent = formatSize(replay.size);
     }
 
-    // ── Delete modal ───────────────────────────────────────────
-
+    // Delete modal
     function showDeleteConfirm(filename) {
       pendingDelete = filename;
       $("#delete-modal-text").textContent = `Delete "${filename}"? This cannot be undone.`;
@@ -919,28 +1482,23 @@
       }
     });
 
-    // ── Replay buttons ─────────────────────────────────────────
-
     $("#btn-open-folder").addEventListener("click", () => window.replays.openFolder());
-    $("#btn-refresh").addEventListener("click", loadReplays);
+    $("#btn-refresh-replays").addEventListener("click", loadReplays);
 
-    // ── Confirmation tab ───────────────────────────────────────
+    // ═══════════════════════════════════════════════════════════
+    // ── Confirmation tab
+    // ═══════════════════════════════════════════════════════════
 
     function showParseResult(data) {
       pendingParseResult = data;
       const { rows, timestamps, screenshot_b64 } = data;
 
-      // Show badge
       $("#confirm-badge").classList.add("visible");
-
-      // Switch to confirm tab
       switchToTab("confirm");
 
-      // Hide empty, show content
       $("#confirm-empty").classList.add("hidden");
       $("#confirm-content").classList.remove("hidden");
 
-      // Screenshot preview
       if (screenshot_b64) {
         $("#confirm-screenshot").src = `data:image/jpeg;base64,${screenshot_b64}`;
         $("#confirm-screenshot").classList.remove("hidden");
@@ -950,7 +1508,6 @@
 
       $("#confirm-row-count").textContent = rows.length;
 
-      // Build table
       const tbody = $("#confirm-tbody");
       tbody.innerHTML = "";
 
@@ -958,17 +1515,13 @@
         const r = rows[i];
         const tr = document.createElement("tr");
 
-        // Rank display
         let rankDisplay = r.rank || "";
         let rankClass = "";
         if (r.rank_change === "up") { rankDisplay += " (+)"; rankClass = "rank-up"; }
         else if (r.rank_change === "down") { rankDisplay += " (-)"; rankClass = "rank-down"; }
 
-        // Synergies
-        const synDisplay = r.synergies ? r.synergies.replace(/\|/g, ", ").replace(/:/g, " ") : "-";
-
-        // Relic
-        let relicDisplay = r.relic || "-";
+        const synDisplay = r.synergies ? r.synergies.replace(/\|/g, ", ").replace(/:/g, " ") : "&mdash;";
+        let relicDisplay = r.relic || "&mdash;";
         if (relicDisplay.length > 30) relicDisplay = relicDisplay.slice(0, 27) + "...";
 
         tr.innerHTML = `
@@ -979,9 +1532,9 @@
           <td class="col-wl"><input type="text" class="edit-field" data-idx="${i}" data-field="wl" value="${escapeAttr(r.wl || "")}"></td>
           <td class="col-rank"><span class="${rankClass}">${escapeHtml(rankDisplay)}</span></td>
           <td class="col-units"><input type="text" class="edit-field" data-idx="${i}" data-field="units" value="${escapeAttr((r.units || []).join(", "))}"></td>
-          <td class="col-syn">${escapeHtml(synDisplay)}</td>
+          <td class="col-syn">${synDisplay}</td>
           <td class="col-relic">${escapeHtml(relicDisplay)}</td>
-          <td class="col-time">${escapeHtml(r.time_ago || "-")}</td>
+          <td class="col-time">${escapeHtml(r.time_ago || "&mdash;")}</td>
         `;
 
         tbody.appendChild(tr);
@@ -990,35 +1543,20 @@
       updateConfirmCount();
     }
 
-    function escapeHtml(s) {
-      const div = document.createElement("div");
-      div.textContent = s;
-      return div.innerHTML;
-    }
-
-    function escapeAttr(s) {
-      return s.replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-    }
-
     function updateConfirmCount() {
       const checks = $$(".row-check:checked");
       $("#btn-confirm").textContent = `Confirm (${checks.length})`;
     }
 
-    // Check-all toggle
     $("#check-all").addEventListener("change", (e) => {
       $$(".row-check").forEach((cb) => { cb.checked = e.target.checked; });
       updateConfirmCount();
     });
 
-    // Individual checkbox changes
     document.addEventListener("change", (e) => {
-      if (e.target.classList.contains("row-check")) {
-        updateConfirmCount();
-      }
+      if (e.target.classList.contains("row-check")) updateConfirmCount();
     });
 
-    // Confirm button
     $("#btn-confirm").addEventListener("click", () => {
       if (!pendingParseResult) return;
 
@@ -1027,11 +1565,9 @@
 
       $$(".row-check").forEach((cb) => {
         if (!cb.checked) return;
-        const idx = parseInt(cb.dataset.idx);
-        selected.push(idx);
+        selected.push(parseInt(cb.dataset.idx));
       });
 
-      // Gather edits
       $$(".edit-field").forEach((input) => {
         const idx = input.dataset.idx;
         const field = input.dataset.field;
@@ -1057,7 +1593,6 @@
       clearConfirmation();
     });
 
-    // Cancel button
     $("#btn-cancel-confirm").addEventListener("click", () => {
       window.tracker.sendCommand({ cmd: "cancel_confirm" });
       clearConfirmation();
@@ -1071,18 +1606,18 @@
       $("#confirm-tbody").innerHTML = "";
     }
 
-    // ── Tracker events ─────────────────────────────────────────
+    // ═══════════════════════════════════════════════════════════
+    // ── Tracker events
+    // ═══════════════════════════════════════════════════════════
 
     function updateStatus(msg) {
-      // Backend dot
       const backendDot = $("#status-dot-backend");
       const backendText = $("#status-backend-text");
       backendDot.className = "status-dot active";
       backendText.textContent = `Backend: v${msg.version || "?"}`;
       $("#settings-backend").textContent = "Connected";
-      $("#settings-version").textContent = msg.version || "-";
+      $("#settings-version").textContent = msg.version || "&mdash;";
 
-      // Recording
       const recDot = $("#status-dot-recording");
       const recText = $("#status-recording-text");
       if (msg.recording) {
@@ -1093,7 +1628,6 @@
         recText.textContent = "Not recording";
       }
 
-      // Focus
       const focusDot = $("#status-dot-focus");
       const focusText = $("#status-focus-text");
       if (msg.focused) {
@@ -1104,15 +1638,12 @@
         focusText.textContent = "Dota: inactive";
       }
 
-      // Settings
       if (msg.steam_name) {
         $("#settings-steam-status").textContent = msg.steam_name;
-        $("#settings-steam-status").classList.remove("dimmed");
       } else {
         $("#settings-steam-status").textContent = "Not logged in";
-        $("#settings-steam-status").classList.add("dimmed");
       }
-      $("#settings-steam-id").textContent = msg.steam_id || "-";
+      $("#settings-steam-id").textContent = msg.steam_id || "\u2014";
       $("#settings-replay-enabled").textContent = msg.replay_enabled ? "Yes" : "No";
     }
 
@@ -1122,39 +1653,33 @@
           case "status":
             updateStatus(msg);
             break;
-
           case "parse_result":
             showParseResult(msg);
             break;
-
           case "import_result":
             clearConfirmation();
+            // Refresh history after import
+            loadHistory();
             break;
-
           case "focus_gained":
             $("#status-dot-focus").className = "status-dot active";
             $("#status-focus-text").textContent = "Dota: active";
             break;
-
           case "focus_lost":
             $("#status-dot-focus").className = "status-dot";
             $("#status-focus-text").textContent = "Dota: inactive";
             break;
-
           case "replay_started":
             $("#status-dot-recording").className = "status-dot recording";
             $("#status-recording-text").textContent = "Recording";
             break;
-
           case "replay_saved":
             $("#status-dot-recording").className = "status-dot";
             $("#status-recording-text").textContent = "Not recording";
-            loadReplays(); // refresh list
+            loadReplays();
             break;
-
           case "error":
             console.error("[tracker]", msg.message);
-            // Show backend disconnected if process died
             if (msg.message && msg.message.includes("exited")) {
               $("#status-dot-backend").className = "status-dot warning";
               $("#status-backend-text").textContent = "Backend: disconnected";
@@ -1168,16 +1693,15 @@
     // ── Keyboard shortcuts ─────────────────────────────────────
 
     document.addEventListener("keydown", (e) => {
-      if (e.key === "Escape") {
-        if (!$("#delete-modal").classList.contains("hidden")) {
-          $("#delete-modal").classList.add("hidden");
-          pendingDelete = null;
-        }
+      if (e.key === "Escape" && !$("#delete-modal").classList.contains("hidden")) {
+        $("#delete-modal").classList.add("hidden");
+        pendingDelete = null;
       }
     });
 
     // ── Init ───────────────────────────────────────────────────
 
+    loadHistory();
     loadReplays();
   </script>
 </body>

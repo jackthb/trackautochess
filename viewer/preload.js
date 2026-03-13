@@ -17,4 +17,6 @@ contextBridge.exposeInMainWorld("tracker", {
 contextBridge.exposeInMainWorld("appApi", {
   openFileDialog: () => ipcRenderer.invoke("app:openFileDialog"),
   getVersion: () => ipcRenderer.invoke("app:getVersion"),
+  fetchGames: () => ipcRenderer.invoke("games:fetch"),
+  fetchUnitsData: () => ipcRenderer.invoke("data:units"),
 });
