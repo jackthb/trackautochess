@@ -19,4 +19,7 @@ contextBridge.exposeInMainWorld("appApi", {
   getVersion: () => ipcRenderer.invoke("app:getVersion"),
   fetchGames: () => ipcRenderer.invoke("games:fetch"),
   fetchUnitsData: () => ipcRenderer.invoke("data:units"),
+  fetchUnitsFull: () => ipcRenderer.invoke("data:units_full"),
+  fetchSynergies: () => ipcRenderer.invoke("data:synergies"),
+  fetchRelics: () => ipcRenderer.invoke("data:relics"),
 });

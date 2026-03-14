@@ -372,12 +372,19 @@ function createWindow() {
     },
   });
 
-  mainWindow.loadFile("index.html");
-  mainWindow.once("ready-to-show", () => mainWindow.show());
+  const isDev = process.argv.includes("--dev");
 
-  if (process.argv.includes("--dev")) {
+  if (isDev) {
+    // Try Vite dev server first, fall back to dist build
+    mainWindow
+      .loadURL("http://localhost:5173")
+      .catch(() => mainWindow.loadFile(path.join(__dirname, "dist", "index.html")));
     mainWindow.webContents.openDevTools();
+  } else {
+    mainWindow.loadFile(path.join(__dirname, "dist", "index.html"));
   }
+
+  mainWindow.once("ready-to-show", () => mainWindow.show());
 
   // Hide instead of close (tray keeps running)
   mainWindow.on("close", (e) => {
@@ -471,6 +478,42 @@ ipcMain.handle("data:units", async () => {
   }
 });
 
+// ── Synergies data IPC ────────────────────────────────────────────────────────
+
+ipcMain.handle("data:synergies", async () => {
+  const synPath = path.join(__dirname, "..", "data", "synergies.json");
+  if (!fs.existsSync(synPath)) return {};
+  try {
+    return JSON.parse(fs.readFileSync(synPath, "utf-8"));
+  } catch {
+    return {};
+  }
+});
+
+// ── Relics data IPC ──────────────────────────────────────────────────────────
+
+ipcMain.handle("data:relics", async () => {
+  const relicPath = path.join(__dirname, "..", "data", "relics.json");
+  if (!fs.existsSync(relicPath)) return {};
+  try {
+    return JSON.parse(fs.readFileSync(relicPath, "utf-8"));
+  } catch {
+    return {};
+  }
+});
+
+// ── Full units data IPC ──────────────────────────────────────────────────────
+
+ipcMain.handle("data:units_full", async () => {
+  const fullPath = path.join(__dirname, "..", "data", "units_full.json");
+  if (!fs.existsSync(fullPath)) return {};
+  try {
+    return JSON.parse(fs.readFileSync(fullPath, "utf-8"));
+  } catch {
+    return {};
+  }
+});
+
 // ── Replay protocol ──────────────────────────────────────────────────────────
 
 protocol.registerSchemesAsPrivileged([
@@ -529,6 +572,9 @@ app.whenReady().then(() => {
 
     return net.fetch(`file://${filePath}`);
   });
+
+  // Remove the default menu bar (File, Edit, View, etc.)
+  Menu.setApplicationMenu(null);
 
   createWindow();
   createTray();

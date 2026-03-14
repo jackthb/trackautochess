@@ -1,0 +1,69 @@
+import { useState, useCallback, useRef, useEffect } from "react";
+import { TitleBar } from "./components/TitleBar";
+import { TabBar } from "./components/TabBar";
+import { StatusBar } from "./components/StatusBar";
+import { HistoryTab } from "./components/HistoryTab";
+import { ReplaysTab } from "./components/ReplaysTab";
+import { ConfirmationTab } from "./components/ConfirmationTab";
+import { SettingsTab } from "./components/SettingsTab";
+import { useTrackerEvents } from "./hooks/useTrackerEvents";
+import { useGames } from "./hooks/useGames";
+import { useReplays } from "./hooks/useReplays";
+import "./styles/app.css";
+
+type TabId = "history" | "replays" | "confirm" | "settings";
+
+export default function App() {
+  const [activeTab, setActiveTab] = useState<TabId>("history");
+
+  const gamesState = useGames();
+  const replaysState = useReplays();
+
+  const handleImportResult = useCallback(() => {
+    gamesState.refresh();
+  }, [gamesState.refresh]);
+
+  const tracker = useTrackerEvents(handleImportResult, replaysState.refresh);
+
+  const hasParseResult = tracker.pendingParseResult !== null;
+  const prevHasResult = useRef(false);
+
+  useEffect(() => {
+    if (hasParseResult && !prevHasResult.current) {
+      setActiveTab("confirm");
+    }
+    prevHasResult.current = hasParseResult;
+  }, [hasParseResult]);
+
+  const handleTabChange = useCallback((tab: string) => {
+    setActiveTab(tab as TabId);
+  }, []);
+
+  return (
+    <>
+      <TitleBar />
+      <TabBar
+        active={activeTab}
+        onChange={handleTabChange}
+        showConfirmBadge={hasParseResult}
+      />
+      <div style={{ flex: 1, overflow: "hidden", display: "flex" }}>
+        {activeTab === "history" && <HistoryTab {...gamesState} />}
+        {activeTab === "replays" && <ReplaysTab {...replaysState} />}
+        {activeTab === "confirm" && (
+          <ConfirmationTab
+            parseResult={tracker.pendingParseResult}
+            onClear={tracker.clearParseResult}
+          />
+        )}
+        {activeTab === "settings" && (
+          <SettingsTab
+            status={tracker.status}
+            replayStats={replaysState.stats}
+          />
+        )}
+      </div>
+      <StatusBar status={tracker.status} />
+    </>
+  );
+}
