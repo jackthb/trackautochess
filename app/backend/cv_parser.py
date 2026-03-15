@@ -974,7 +974,8 @@ def _find_my_matches_rows(img: np.ndarray, debug: bool = False) -> list[tuple[fl
 
 def _load_synergy_tiers() -> dict[str, list[int]]:
     """Load synergy name → tier thresholds from data/synergies.json."""
-    syn_path = Path(__file__).parent.parent / "data" / "synergies.json"
+    from utils import DATA_DIR
+    syn_path = DATA_DIR / "synergies.json"
     if not syn_path.exists():
         return {}
     import json
@@ -1939,7 +1940,7 @@ def main():
     player_name = sys.argv[2] if len(sys.argv) > 2 and not sys.argv[2].startswith("-") else "jack"
     debug = "--debug" in sys.argv
 
-    icons_dir = Path(__file__).parent.parent / "data" / "icons"
+    from utils import ICONS_DIR as icons_dir
     print(f"Image:  {image_path}")
     print(f"Player: {player_name}")
     print(f"Icons:  {icons_dir}")

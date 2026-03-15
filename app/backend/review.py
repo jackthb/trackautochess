@@ -20,7 +20,7 @@ import urllib.parse
 from http.server import HTTPServer, BaseHTTPRequestHandler
 from pathlib import Path
 
-DATA_DIR = Path(__file__).parent.parent / "data"
+DATA_DIR = Path(__file__).parent.parent.parent / "data"
 DETECTIONS_PATH = DATA_DIR / "detections.json"
 SCREENSHOTS_DIR = DATA_DIR / "screenshots"
 ICONS_DIR = DATA_DIR / "icons" / "units"

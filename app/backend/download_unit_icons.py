@@ -84,7 +84,7 @@ def download_minimap_icon(unit_name: str, out_path: Path) -> bool:
 
 
 def main() -> None:
-    data_dir = Path(__file__).parent.parent / "data"
+    data_dir = Path(__file__).parent.parent.parent / "data"
     units_path = data_dir / "units.json"
     out_dir = data_dir / "icons" / "units"
     out_dir.mkdir(parents=True, exist_ok=True)

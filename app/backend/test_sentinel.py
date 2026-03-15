@@ -16,7 +16,7 @@ import cv2
 import numpy as np
 from PIL import Image
 
-REF_DIR = Path(__file__).resolve().parent.parent / "data"
+REF_DIR = Path(__file__).resolve().parent.parent.parent / "data"
 TEMPLATE_PATH = REF_DIR / "sentinel_ref_final_ranking.png"
 MATCH_THRESHOLD = 0.70
 

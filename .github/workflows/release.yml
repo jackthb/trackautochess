@@ -23,7 +23,7 @@ jobs:
       - name: Install Python dependencies
         run: |
           pip install pyinstaller
-          pip install -r tracker/requirements.txt
+          pip install -r app/backend/requirements.txt
 
       - name: Download & extract portable Tesseract
         shell: pwsh
@@ -31,27 +31,40 @@ jobs:
           $url = "https://digi.bib.uni-mannheim.de/tesseract/tesseract-ocr-w64-setup-5.5.0.20241111.exe"
           Invoke-WebRequest -Uri $url -OutFile tesseract-installer.exe
           7z x tesseract-installer.exe -otesseract-portable -y
-          # Ensure tessdata has eng trained data
           if (-not (Test-Path "tesseract-portable/tessdata/eng.traineddata")) {
             $engUrl = "https://github.com/tesseract-ocr/tessdata_fast/raw/main/eng.traineddata"
             Invoke-WebRequest -Uri $engUrl -OutFile "tesseract-portable/tessdata/eng.traineddata"
           }
 
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install pnpm
+        run: npm install -g pnpm
+
       - name: Inject version from tag
         shell: bash
         run: |
           VERSION="${GITHUB_REF_NAME#v}"
-          sed -i "s/__version__ = \"0.0.0-dev\"/__version__ = \"${VERSION}\"/" tracker/updater.py
+          sed -i "s/__version__ = \"0.0.0-dev\"/__version__ = \"${VERSION}\"/" app/backend/updater.py
 
-      - name: Build exe with PyInstaller
-        env:
-          DAC_CONSOLE: "0"
+      - name: Build headless backend
         run: |
-          cd tracker
-          pyinstaller dac_tracker.spec
+          cd app/backend
+          pyinstaller dac_tracker.spec --noconfirm --clean
+
+      - name: Build Electron app & installer
+        shell: pwsh
+        run: |
+          cd app
+          pnpm install
+          pnpm run build
+          pnpm exec electron-builder --win --config electron-builder.json
 
       - name: Upload release
         uses: softprops/action-gh-release@v2
         with:
-          files: tracker/dist/DACTracker.exe
+          files: app/release/*.exe
           generate_release_notes: true

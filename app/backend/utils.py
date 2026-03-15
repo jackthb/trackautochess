@@ -14,7 +14,8 @@ def _data_dir() -> Path:
     """Return the data/ directory, works both in dev and PyInstaller bundle."""
     if getattr(sys, "frozen", False):
         return Path(sys._MEIPASS) / "data"
-    return Path(__file__).resolve().parent.parent / "data"
+    # backend/ → app/ → repo root
+    return Path(__file__).resolve().parent.parent.parent / "data"
 
 DATA_DIR = _data_dir()
 ICONS_DIR = DATA_DIR / "icons"

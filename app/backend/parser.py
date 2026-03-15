@@ -10,7 +10,7 @@ from models import GameRow
 from image_utils import synergy_crops_b64
 
 PROMPTS_DIR = Path(__file__).parent / "prompts"
-_ANALYZER_DATA = Path(__file__).parent.parent / "analyzer" / "dac_analyzer" / "data"
+_ANALYZER_DATA = Path(__file__).parent.parent.parent / "analyzer" / "dac_analyzer" / "data"
 
 
 # ── helpers ──────────────────────────────────────────────────────────────────

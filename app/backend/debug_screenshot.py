@@ -37,12 +37,12 @@ from cv_parser import (
     UNIT_MATCH_THRESHOLD,
 )
 
-_default_screenshot = Path(__file__).parent.parent / "data" / "screenshots" / "20260308030800_1.jpg"
+_default_screenshot = Path(__file__).parent.parent.parent / "data" / "screenshots" / "20260308030800_1.jpg"
 if len(sys.argv) > 1:
     SCREENSHOT = Path(sys.argv[1])
 else:
     SCREENSHOT = _default_screenshot
-OUTPUT = Path(__file__).parent.parent / "data" / f"{SCREENSHOT.stem}_debug.html"
+OUTPUT = Path(__file__).parent.parent.parent / "data" / f"{SCREENSHOT.stem}_debug.html"
 
 log = logging.getLogger("dac")
 logging.basicConfig(level=logging.DEBUG, format="%(message)s")

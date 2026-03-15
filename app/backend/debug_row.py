@@ -29,10 +29,10 @@ from cv_parser import (
     MM_UNIT_SPLIT_Y, MM_UNIT_ONE_ROW_Y, MM_UNIT_MAX_SLOTS,
 )
 
-_default_screenshot = Path(__file__).parent.parent / "data" / "screenshots" / "20260308030800_1.jpg"
+_default_screenshot = Path(__file__).parent.parent.parent / "data" / "screenshots" / "20260308030800_1.jpg"
 SCREENSHOT = Path(sys.argv[1]) if len(sys.argv) > 1 else _default_screenshot
 TARGET_ROW = int(sys.argv[2]) if len(sys.argv) > 2 else 6
-OUTPUT = Path(__file__).parent.parent / "data" / f"{SCREENSHOT.stem}_row{TARGET_ROW}.html"
+OUTPUT = Path(__file__).parent.parent.parent / "data" / f"{SCREENSHOT.stem}_row{TARGET_ROW}.html"
 
 
 def main():

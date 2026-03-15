@@ -20,8 +20,16 @@ const readline = require("readline");
 
 const DAC_DIR = path.join(os.homedir(), ".dac");
 const REPLAY_DIR = path.join(DAC_DIR, "replays");
-const TRACKER_DIR = path.join(__dirname, "..", "tracker");
-const ICONS_DIR = path.join(__dirname, "..", "data", "icons");
+const IS_PACKAGED = app.isPackaged;
+const RESOURCES_DIR = IS_PACKAGED
+  ? process.resourcesPath
+  : path.join(__dirname, "..");
+const TRACKER_DIR = IS_PACKAGED
+  ? path.join(RESOURCES_DIR, "headless")
+  : path.join(__dirname, "backend");
+const ICONS_DIR = IS_PACKAGED
+  ? path.join(RESOURCES_DIR, "data", "icons")
+  : path.join(__dirname, "..", "data", "icons");
 
 // Ensure dirs exist
 for (const dir of [DAC_DIR, REPLAY_DIR]) {
@@ -46,26 +54,33 @@ let trackerStatus = {
 
 // ── Python subprocess ────────────────────────────────────────────────────────
 
-function getPythonPath() {
-  if (process.platform === "win32") {
-    return path.join(TRACKER_DIR, ".venv", "Scripts", "python.exe");
+function getBackendCommand() {
+  if (IS_PACKAGED) {
+    // Production: use PyInstaller-bundled headless.exe
+    const exe = path.join(TRACKER_DIR, "headless.exe");
+    return { command: exe, args: [], cwd: TRACKER_DIR };
   }
-  return path.join(TRACKER_DIR, ".venv", "bin", "python");
+  // Dev: use Python from venv
+  const pythonPath =
+    process.platform === "win32"
+      ? path.join(TRACKER_DIR, ".venv", "Scripts", "python.exe")
+      : path.join(TRACKER_DIR, ".venv", "bin", "python");
+  const scriptPath = path.join(TRACKER_DIR, "headless.py");
+  return { command: pythonPath, args: [scriptPath], cwd: TRACKER_DIR };
 }
 
 function startPython() {
-  const pythonPath = getPythonPath();
-  const scriptPath = path.join(TRACKER_DIR, "headless.py");
+  const { command, args, cwd } = getBackendCommand();
 
-  if (!fs.existsSync(pythonPath)) {
-    console.error(`Python not found at ${pythonPath}`);
+  if (!fs.existsSync(command)) {
+    console.error(`Backend not found at ${command}`);
     return;
   }
 
-  console.log(`Starting Python: ${pythonPath} ${scriptPath}`);
+  console.log(`Starting backend: ${command} ${args.join(" ")}`);
 
-  pythonProcess = spawn(pythonPath, [scriptPath], {
-    cwd: TRACKER_DIR,
+  pythonProcess = spawn(command, args, {
+    cwd,
     env: { ...process.env, PYTHONUNBUFFERED: "1" },
     stdio: ["pipe", "pipe", "pipe"],
   });
@@ -469,7 +484,7 @@ ipcMain.handle("games:fetch", async () => {
 // ── Units data IPC ───────────────────────────────────────────────────────────
 
 ipcMain.handle("data:units", async () => {
-  const unitsPath = path.join(__dirname, "..", "data", "units.json");
+  const unitsPath = path.join(RESOURCES_DIR, "data", "units.json");
   if (!fs.existsSync(unitsPath)) return {};
   try {
     return JSON.parse(fs.readFileSync(unitsPath, "utf-8"));
@@ -481,7 +496,7 @@ ipcMain.handle("data:units", async () => {
 // ── Synergies data IPC ────────────────────────────────────────────────────────
 
 ipcMain.handle("data:synergies", async () => {
-  const synPath = path.join(__dirname, "..", "data", "synergies.json");
+  const synPath = path.join(RESOURCES_DIR, "data", "synergies.json");
   if (!fs.existsSync(synPath)) return {};
   try {
     return JSON.parse(fs.readFileSync(synPath, "utf-8"));
@@ -493,7 +508,7 @@ ipcMain.handle("data:synergies", async () => {
 // ── Relics data IPC ──────────────────────────────────────────────────────────
 
 ipcMain.handle("data:relics", async () => {
-  const relicPath = path.join(__dirname, "..", "data", "relics.json");
+  const relicPath = path.join(RESOURCES_DIR, "data", "relics.json");
   if (!fs.existsSync(relicPath)) return {};
   try {
     return JSON.parse(fs.readFileSync(relicPath, "utf-8"));
@@ -505,7 +520,7 @@ ipcMain.handle("data:relics", async () => {
 // ── Full units data IPC ──────────────────────────────────────────────────────
 
 ipcMain.handle("data:units_full", async () => {
-  const fullPath = path.join(__dirname, "..", "data", "units_full.json");
+  const fullPath = path.join(RESOURCES_DIR, "data", "units_full.json");
   if (!fs.existsSync(fullPath)) return {};
   try {
     return JSON.parse(fs.readFileSync(fullPath, "utf-8"));

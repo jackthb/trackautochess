@@ -1,14 +1,17 @@
 {
-  "name": "dac-replay-viewer",
+  "name": "dac-tracker",
   "version": "0.1.0",
-  "description": "Dota Auto Chess replay viewer",
+  "description": "Dota Auto Chess game tracker",
   "main": "main.js",
   "scripts": {
     "start": "vite build && electron .",
     "dev:vite": "vite",
     "dev:electron": "electron . --dev",
     "dev": "vite build && electron . --dev",
-    "build": "vite build"
+    "build": "vite build",
+    "build:backend": "cd backend && pyinstaller dac_tracker.spec --noconfirm --clean",
+    "build:installer": "vite build && electron-builder --win --config electron-builder.json",
+    "build:all": "pnpm run build:backend && pnpm run build:installer"
   },
   "pnpm": {
     "onlyBuiltDependencies": [
@@ -20,6 +23,7 @@
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^6.0.1",
     "electron": "^33.0.0",
+    "electron-builder": "^26.8.1",
     "typescript": "^5.9.3",
     "vite": "^8.0.0"
   },

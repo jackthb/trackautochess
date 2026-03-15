@@ -31,7 +31,7 @@ from cv_parser import (
 )
 from utils import ICONS_DIR
 
-DATA_DIR = Path(__file__).parent.parent / "data"
+DATA_DIR = Path(__file__).parent.parent.parent / "data"
 SCREENSHOTS_DIR = DATA_DIR / "screenshots"
 OUTPUT_PATH = DATA_DIR / "detections.json"
 

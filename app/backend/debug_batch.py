@@ -39,8 +39,8 @@ from cv_parser import (
     UNIT_MATCH_THRESHOLD,
 )
 
-SCREENSHOTS_DIR = Path(__file__).parent.parent / "data" / "screenshots"
-OUTPUT = Path(__file__).parent.parent / "data" / "all_screenshots_debug.html"
+SCREENSHOTS_DIR = Path(__file__).parent.parent.parent / "data" / "screenshots"
+OUTPUT = Path(__file__).parent.parent.parent / "data" / "all_screenshots_debug.html"
 
 log = logging.getLogger("dac")
 logging.basicConfig(level=logging.DEBUG, format="%(message)s")
