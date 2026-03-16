@@ -119,7 +119,7 @@ export function GameRow({
         </div>
       </div>
 
-      {(lineup.length > 0 || syns.length > 0 || relics.length > 0) && (
+      {(lineup.length > 0 || syns.length > 0) && (
         <div className="detail-row">
           {lineup.length > 0 && (
             <div className="lineup">
@@ -157,58 +157,33 @@ export function GameRow({
             </div>
           )}
 
-          {(syns.length > 0 || relics.length > 0) && (
+          {syns.length > 0 && (
             <div className="detail-right">
-              {syns.length > 0 && (
-                <div className="synergies">
-                  {syns.map((s, i) => (
-                    <Tooltip
-                      key={i}
-                      type="synergy"
-                      name={s.name}
-                      count={s.count}
-                      synergiesData={synergiesData}
-                    >
-                      <div className="syn-badge">
-                        <img
-                          className="syn-icon"
-                          src={`icons://synergies/${synIconName(s.name)}.png`}
-                          alt={s.name}
-                          loading="lazy"
-                          onError={(e) => {
-                            (e.target as HTMLImageElement).style.display =
-                              "none";
-                          }}
-                        />
-                        <span className="syn-count">{s.count}</span>
-                      </div>
-                    </Tooltip>
-                  ))}
-                </div>
-              )}
-
-              {relics.length > 0 && (
-                <div className="detail-relics">
-                  {relics.map((r, i) => (
-                    <Tooltip
-                      key={i}
-                      type="relic"
-                      name={r}
-                      relicsData={relicsData}
-                    >
+              <div className="synergies">
+                {syns.map((s, i) => (
+                  <Tooltip
+                    key={i}
+                    type="synergy"
+                    name={s.name}
+                    count={s.count}
+                    synergiesData={synergiesData}
+                  >
+                    <div className="syn-badge">
                       <img
-                        className="detail-relic-icon"
-                        src={`icons://relics/${relicStem(r)}.png`}
-                        alt={r}
+                        className="syn-icon"
+                        src={`icons://synergies/${synIconName(s.name)}.png`}
+                        alt={s.name}
                         loading="lazy"
                         onError={(e) => {
-                          (e.target as HTMLImageElement).style.display = "none";
+                          (e.target as HTMLImageElement).style.display =
+                            "none";
                         }}
                       />
-                    </Tooltip>
-                  ))}
-                </div>
-              )}
+                      <span className="syn-count">{s.count}</span>
+                    </div>
+                  </Tooltip>
+                ))}
+              </div>
             </div>
           )}
         </div>

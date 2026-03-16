@@ -69,7 +69,7 @@ export function Tooltip({
     <div
       onMouseEnter={show}
       onMouseLeave={hide}
-      style={{ display: "contents" }}
+      style={{ display: "inline-flex", position: "relative" }}
     >
       {children}
       {visible &&
