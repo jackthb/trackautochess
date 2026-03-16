@@ -217,9 +217,9 @@
 .date-cell { font-size: 14px; color: var(--text-muted); }
 .date-cell div:last-child { font-size: 12px; opacity: 0.6; }
 
-.relics-cell { display: flex; align-items: center; }
+.relics-cell { display: flex; align-items: center; overflow: hidden; }
 
-.relics { display: flex; gap: 4px; align-items: center; }
+.relics { display: flex; gap: 4px; align-items: center; flex-wrap: wrap; }
 
 .relic-icon {
   width: 32px;
@@ -236,12 +236,15 @@
   transform: scale(1.15);
 }
 
-/* Detail row (lineup + synergies + relics) */
+/* Detail row (lineup + synergies) */
 .detail-row {
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
   padding: 0 20px 14px 94px;
+}
+
+.detail-column {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 }
 
 .lineup {
@@ -289,15 +292,6 @@
 .unit-stars.s2 { color: #5a8fd5; }
 .unit-stars.s3 { color: var(--gold); }
 
-.detail-right {
-  display: flex;
-  gap: 8px;
-  align-items: flex-start;
-  flex-wrap: wrap;
-  margin-left: auto;
-  justify-content: flex-end;
-}
-
 .synergies {
   display: flex;
   gap: 4px;
@@ -332,29 +326,6 @@
 }
 
 .syn-count { color: var(--text-secondary); font-weight: 600; }
-
-.detail-relics {
-  display: flex;
-  gap: 4px;
-  align-items: center;
-  flex-shrink: 0;
-}
-
-.detail-relic-icon {
-  width: 28px;
-  height: 28px;
-  border-radius: 4px;
-  border: 1px solid var(--border);
-  object-fit: cover;
-  background: var(--bg-surface);
-  cursor: pointer;
-  transition: transform 0.12s, box-shadow 0.12s;
-}
-
-.detail-relic-icon:hover {
-  transform: scale(1.15);
-  box-shadow: 0 0 8px rgba(0,0,0,0.5);
-}
 
 /* ── Tooltip ─────────────────────────────────────────────── */
 

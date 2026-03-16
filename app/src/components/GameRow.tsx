@@ -121,44 +121,44 @@ export function GameRow({
 
       {(lineup.length > 0 || syns.length > 0) && (
         <div className="detail-row">
-          {lineup.length > 0 && (
-            <div className="lineup">
-              {lineup.map((u, i) => {
-                const cost = unitCosts[u.name] || 1;
-                return (
-                  <Tooltip
-                    key={i}
-                    type="unit"
-                    name={u.name}
-                    stars={u.stars}
-                    unitCosts={unitCosts}
-                    unitsFull={unitsFull}
-                  >
-                    <div className="unit-icon-wrap">
-                      <img
-                        className="unit-icon"
-                        src={`icons://units/${unitStem(u.name)}.png`}
-                        alt={u.name}
-                        loading="lazy"
-                        style={{ borderColor: costBorderColor(cost) }}
-                        onError={(e) => {
-                          (e.target as HTMLImageElement).style.display = "none";
-                        }}
-                      />
-                      {u.stars > 1 && (
-                        <span className={`unit-stars s${u.stars}`}>
-                          {"★".repeat(u.stars)}
-                        </span>
-                      )}
-                    </div>
-                  </Tooltip>
-                );
-              })}
-            </div>
-          )}
+          <div className="detail-column">
+            {lineup.length > 0 && (
+              <div className="lineup">
+                {lineup.map((u, i) => {
+                  const cost = unitCosts[u.name] || 1;
+                  return (
+                    <Tooltip
+                      key={i}
+                      type="unit"
+                      name={u.name}
+                      stars={u.stars}
+                      unitCosts={unitCosts}
+                      unitsFull={unitsFull}
+                    >
+                      <div className="unit-icon-wrap">
+                        <img
+                          className="unit-icon"
+                          src={`icons://units/${unitStem(u.name)}.png`}
+                          alt={u.name}
+                          loading="lazy"
+                          style={{ borderColor: costBorderColor(cost) }}
+                          onError={(e) => {
+                            (e.target as HTMLImageElement).style.display = "none";
+                          }}
+                        />
+                        {u.stars > 1 && (
+                          <span className={`unit-stars s${u.stars}`}>
+                            {"★".repeat(u.stars)}
+                          </span>
+                        )}
+                      </div>
+                    </Tooltip>
+                  );
+                })}
+              </div>
+            )}
 
-          {syns.length > 0 && (
-            <div className="detail-right">
+            {syns.length > 0 && (
               <div className="synergies">
                 {syns.map((s, i) => (
                   <Tooltip
@@ -184,8 +184,8 @@ export function GameRow({
                   </Tooltip>
                 ))}
               </div>
-            </div>
-          )}
+            )}
+          </div>
         </div>
       )}
     </div>
