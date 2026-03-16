@@ -53,7 +53,6 @@ datas = [
     (os.path.join(DATA_DIR, "items.json"),                     "data"),
     (os.path.join(DATA_DIR, "relics.json"),                    "data"),
     (os.path.join(DATA_DIR, "synergies.json"),                 "data"),
-    (os.path.join(DATA_DIR, "detections.json"),                "data"),
     (os.path.join(BACKEND_DIR, "prompts"),                     "prompts"),
 ]
 
