@@ -4,12 +4,10 @@ const {
   ipcMain,
   protocol,
   net,
-  Tray,
   Menu,
   Notification,
   globalShortcut,
   dialog,
-  nativeImage,
   screen,
 } = require("electron");
 const path = require("path");
@@ -38,7 +36,6 @@ for (const dir of [DAC_DIR, REPLAY_DIR]) {
 
 let mainWindow = null;
 let overlayWindow = null;
-let tray = null;
 let pythonProcess = null;
 let pythonRL = null;
 let overlayTimeout = null;
@@ -138,7 +135,6 @@ function handlePythonEvent(msg) {
   switch (msg.type) {
     case "status":
       trackerStatus = { ...trackerStatus, ...msg };
-      updateTrayMenu();
       break;
 
     case "sentinel_match":
@@ -153,17 +149,14 @@ function handlePythonEvent(msg) {
       trackerStatus.logged_in = true;
       trackerStatus.steam_id = msg.steam_id;
       trackerStatus.steam_name = msg.steam_name;
-      updateTrayMenu();
       break;
 
     case "replay_started":
       trackerStatus.recording = true;
-      updateTrayMenu();
       break;
 
     case "replay_saved":
       trackerStatus.recording = false;
-      updateTrayMenu();
       break;
 
     case "focus_gained":
@@ -269,101 +262,6 @@ ipcMain.on("overlay:dismiss", () => {
   dismissOverlay();
 });
 
-// ── System tray ──────────────────────────────────────────────────────────────
-
-function createTray() {
-  const iconPath = path.join(ICONS_DIR, "dac_tracker.ico");
-  let trayIcon;
-  if (fs.existsSync(iconPath)) {
-    trayIcon = nativeImage.createFromPath(iconPath);
-  } else {
-    // Fallback: 16x16 green square
-    trayIcon = nativeImage.createEmpty();
-  }
-
-  tray = new Tray(trayIcon);
-  tray.setToolTip("DAC Tracker");
-
-  tray.on("click", () => {
-    if (mainWindow) {
-      if (mainWindow.isVisible()) {
-        mainWindow.focus();
-      } else {
-        mainWindow.show();
-      }
-    }
-  });
-
-  updateTrayMenu();
-}
-
-function updateTrayMenu() {
-  if (!tray) return;
-
-  const loginLabel = trackerStatus.steam_name
-    ? `Signed in: ${trackerStatus.steam_name}`
-    : "Login with Steam";
-
-  const contextMenu = Menu.buildFromTemplate([
-    {
-      label: loginLabel,
-      enabled: !trackerStatus.logged_in,
-      click: () => sendToPython({ cmd: "steam_login" }),
-    },
-    {
-      label: "Logout",
-      visible: trackerStatus.logged_in,
-      click: () => sendToPython({ cmd: "steam_logout" }),
-    },
-    { type: "separator" },
-    {
-      label: "Import History Screenshot...",
-      click: async () => {
-        const result = await dialog.showOpenDialog({
-          title: "Select MY MATCHES screenshot",
-          filters: [
-            { name: "Images", extensions: ["jpg", "jpeg", "png"] },
-            { name: "All files", extensions: ["*"] },
-          ],
-        });
-        if (!result.canceled && result.filePaths.length > 0) {
-          sendToPython({ cmd: "import_file", path: result.filePaths[0] });
-        }
-      },
-    },
-    {
-      label: "Record Replays",
-      type: "checkbox",
-      checked: trackerStatus.replay_enabled,
-      click: (item) => {
-        sendToPython({
-          cmd: "set_config",
-          key: "replay_enabled",
-          value: item.checked,
-        });
-      },
-    },
-    {
-      label: "Start with Windows",
-      type: "checkbox",
-      checked: app.getLoginItemSettings().openAtLogin,
-      click: (item) => {
-        app.setLoginItemSettings({ openAtLogin: item.checked });
-      },
-    },
-    { type: "separator" },
-    {
-      label: "Quit",
-      click: () => {
-        sendToPython({ cmd: "quit" });
-        setTimeout(() => app.quit(), 1500);
-      },
-    },
-  ]);
-
-  tray.setContextMenu(contextMenu);
-}
-
 // ── Main window ──────────────────────────────────────────────────────────────
 
 function createWindow() {
@@ -400,14 +298,6 @@ function createWindow() {
   }
 
   mainWindow.once("ready-to-show", () => mainWindow.show());
-
-  // Hide instead of close (tray keeps running)
-  mainWindow.on("close", (e) => {
-    if (!app.isQuitting) {
-      e.preventDefault();
-      mainWindow.hide();
-    }
-  });
 }
 
 // ── Global shortcuts ─────────────────────────────────────────────────────────
@@ -592,7 +482,6 @@ app.whenReady().then(() => {
   Menu.setApplicationMenu(null);
 
   createWindow();
-  createTray();
   registerShortcuts();
   startPython();
 
@@ -601,10 +490,6 @@ app.whenReady().then(() => {
       mainWindow.show();
     }
   });
-});
-
-app.on("before-quit", () => {
-  app.isQuitting = true;
 });
 
 app.on("will-quit", () => {
@@ -622,10 +507,10 @@ app.on("will-quit", () => {
 });
 
 app.on("window-all-closed", () => {
-  // Don't quit — tray keeps running
+  app.quit();
 });
 
-// ── Replay IPC handlers (unchanged) ─────────────────────────────────────────
+// ── Replay IPC handlers ─────────────────────────────────────────────────────
 
 ipcMain.handle("replays:list", async () => {
   if (!fs.existsSync(REPLAY_DIR)) return [];
