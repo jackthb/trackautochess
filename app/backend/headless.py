@@ -55,7 +55,6 @@ class HeadlessBackend:
         self._stop_event = threading.Event()
         self._sentinel = None
         self._replay_recorder = None
-        self._focus_lost_timer = None
         self._game_focused = False
         self._pending_rows = None
         self._pending_timestamps = None
@@ -111,41 +110,35 @@ class HeadlessBackend:
         log.info("Replay system ready (max %.0f GB, dir: %s)", max_gb, store.replay_dir)
 
     def _on_game_focus_gained(self) -> None:
-        if self._focus_lost_timer:
-            self._focus_lost_timer.cancel()
-            self._focus_lost_timer = None
-
         self._game_focused = True
         self._emit({"type": "focus_gained"})
-
-        if not self._replay_recorder or not self.config.get("replay_enabled", True):
-            return
-        if self._replay_recorder.recording:
-            return
-
-        if self._replay_recorder.start():
-            log.info("Replay: recording started (Dota 2 focused)")
-            self._emit({"type": "replay_started"})
 
     def _on_game_focus_lost(self) -> None:
         self._game_focused = False
         self._emit({"type": "focus_lost"})
 
-        if not self._replay_recorder or not self._replay_recorder.recording:
-            return
+    def _do_toggle_recording(self) -> None:
+        """Toggle replay recording on/off via hotkey or UI command."""
+        if not self._replay_recorder:
+            if not self.config.get("replay_enabled", True):
+                self._emit_notification(APP_NAME, "Replay recording is disabled in settings.")
+                return
+            self._init_replay()
 
-        def _delayed_stop():
-            if self._replay_recorder and self._replay_recorder.recording:
-                log.info("Replay: Dota 2 unfocused for 5 min — stopping recording")
-                path = self._replay_recorder.stop()
-                if path:
-                    size_mb = path.stat().st_size / (1024 * 1024)
-                    self._emit({"type": "replay_saved", "name": path.name, "size_mb": round(size_mb, 1)})
-                    self._emit_notification(APP_NAME, f"Replay saved: {path.name}")
+        if self._replay_recorder.recording:
+            path = self._replay_recorder.stop()
+            if path:
+                size_mb = path.stat().st_size / (1024 * 1024)
+                self._emit({"type": "replay_saved", "name": path.name, "size_mb": round(size_mb, 1)})
+                self._emit_notification(APP_NAME, f"Replay saved: {path.name} ({size_mb:.0f} MB)")
+            log.info("Replay: recording stopped (manual)")
+        else:
+            if self._replay_recorder.start():
+                log.info("Replay: recording started (manual)")
+                self._emit({"type": "replay_started"})
+                self._emit_notification(APP_NAME, "Recording started")
 
-        self._focus_lost_timer = threading.Timer(300, _delayed_stop)
-        self._focus_lost_timer.daemon = True
-        self._focus_lost_timer.start()
+        self._emit_status()
 
     # ── Sentinel poller ─────────────────────────────────────────────────────
 
@@ -163,9 +156,6 @@ class HeadlessBackend:
 
         # Stop replay recording (game ended)
         if self._replay_recorder and self._replay_recorder.recording:
-            if self._focus_lost_timer:
-                self._focus_lost_timer.cancel()
-                self._focus_lost_timer = None
             path = self._replay_recorder.stop()
             if path:
                 size_mb = path.stat().st_size / (1024 * 1024)
@@ -430,8 +420,6 @@ class HeadlessBackend:
                 self._replay_recorder.stop()
             except Exception:
                 pass
-        if self._focus_lost_timer:
-            self._focus_lost_timer.cancel()
         if self._sentinel:
             try:
                 self._sentinel.stop()
@@ -463,6 +451,8 @@ class HeadlessBackend:
             self._do_steam_login()
         elif cmd == "steam_logout":
             self._do_steam_logout()
+        elif cmd == "toggle_recording":
+            self._do_toggle_recording()
         elif cmd == "set_config":
             self._do_set_config(msg.get("key", ""), msg.get("value"))
         elif cmd == "status":

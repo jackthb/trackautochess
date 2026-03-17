@@ -149,7 +149,7 @@
 
 .table-header {
   display: grid;
-  grid-template-columns: 72px 1fr 120px 100px 140px 120px;
+  grid-template-columns: 72px 1fr 120px 80px 60px 120px 100px;
   padding: 0 20px;
   background: var(--bg-surface);
   border-bottom: 1px solid var(--border);
@@ -173,14 +173,21 @@
 
 .game-row {
   display: grid;
-  grid-template-columns: 72px 1fr 120px 100px 140px 120px;
+  grid-template-columns: 72px 1fr 120px 80px 60px 120px 100px;
   padding: 0 20px;
   align-items: center;
 }
 
 .cell {
-  padding: 16px 6px;
+  padding: 12px 6px;
   font-size: 16px;
+  min-width: 0;
+}
+
+.units-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 
 .placement {
@@ -222,8 +229,8 @@
 .relics { display: flex; gap: 4px; align-items: center; flex-wrap: wrap; }
 
 .relic-icon {
-  width: 32px;
-  height: 32px;
+  width: 28px;
+  height: 28px;
   border-radius: 4px;
   border: 1px solid var(--border);
   object-fit: cover;
@@ -236,17 +243,6 @@
   transform: scale(1.15);
 }
 
-/* Detail row (lineup + synergies) */
-.detail-row {
-  padding: 0 20px 14px 94px;
-}
-
-.detail-column {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
 .lineup {
   display: flex;
   gap: 3px;
@@ -257,14 +253,14 @@
 
 .unit-icon-wrap {
   position: relative;
-  width: 42px;
-  height: 42px;
+  width: 34px;
+  height: 34px;
   cursor: pointer;
 }
 
 .unit-icon {
-  width: 42px;
-  height: 42px;
+  width: 34px;
+  height: 34px;
   border-radius: 4px;
   border: 2px solid var(--border);
   object-fit: cover;

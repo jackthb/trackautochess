@@ -63,6 +63,10 @@ export function parseLineup(
     );
 }
 
+function capitalize(s: string): string {
+  return s.replace(/\b\w/g, (c) => c.toUpperCase());
+}
+
 export function parseSynergies(
   syn: string | null
 ): { name: string; count: number }[] {
@@ -72,7 +76,7 @@ export function parseSynergies(
     .filter(Boolean)
     .map((entry) => {
       const [name, count] = entry.split(":");
-      return { name, count: parseInt(count) || 0 };
+      return { name: capitalize(name), count: parseInt(count) || 0 };
     })
     .filter((s) => s.count > 0)
     .sort((a, b) => b.count - a.count);

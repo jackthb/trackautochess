@@ -16,3 +16,4 @@ data/detections.json
 runs/
 data/screenshots/
 *.pt
+ffmpeg/

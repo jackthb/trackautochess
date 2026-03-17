@@ -62,6 +62,13 @@ if os.path.exists(TESSERACT_DIR):
 else:
     print(f"[spec] WARNING: Tesseract not found at {TESSERACT_DIR} — OCR will NOT be bundled")
 
+# ffmpeg for replay recording (AV1/H.264)
+FFMPEG_DIR = os.path.join(ROOT_DIR, "ffmpeg")
+if os.path.exists(FFMPEG_DIR):
+    datas.append((FFMPEG_DIR, "ffmpeg"))
+else:
+    print(f"[spec] WARNING: ffmpeg not found at {FFMPEG_DIR} — replay recording will use system ffmpeg")
+
 # Find OpenSSL DLLs from the base Python install so HTTPS works
 _base = Path(sys.base_prefix) / "DLLs"
 _ssl_binaries = [

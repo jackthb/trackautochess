@@ -306,6 +306,9 @@ function registerShortcuts() {
   globalShortcut.register("F6", () => {
     sendToPython({ cmd: "capture" });
   });
+  globalShortcut.register("F7", () => {
+    sendToPython({ cmd: "toggle_recording" });
+  });
 }
 
 // ── Tracker IPC (renderer → main → Python) ──────────────────────────────────

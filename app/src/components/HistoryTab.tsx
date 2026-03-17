@@ -62,9 +62,10 @@ export function HistoryTab({
         <div className="table-wrap fade-up delay-1">
           <div className="table-header">
             <div className="th">#</div>
+            <div className="th">Lineup</div>
             <div className="th">Rank</div>
             <div className="th">W &ndash; L</div>
-            <div className="th">Level</div>
+            <div className="th">Lvl</div>
             <div className="th">Relic</div>
             <div className="th">Date</div>
           </div>

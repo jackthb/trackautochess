@@ -49,6 +49,69 @@ export function GameRow({
             {game.placement}
           </div>
         </div>
+        <div className="cell units-cell">
+          {lineup.length > 0 && (
+            <div className="lineup">
+              {lineup.map((u, i) => {
+                const cost = unitCosts[u.name] || 1;
+                return (
+                  <Tooltip
+                    key={i}
+                    type="unit"
+                    name={u.name}
+                    stars={u.stars}
+                    unitCosts={unitCosts}
+                    unitsFull={unitsFull}
+                  >
+                    <div className="unit-icon-wrap">
+                      <img
+                        className="unit-icon"
+                        src={`icons://units/${unitStem(u.name)}.png`}
+                        alt={u.name}
+                        loading="lazy"
+                        style={{ borderColor: costBorderColor(cost) }}
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).style.display = "none";
+                        }}
+                      />
+                      {u.stars > 1 && (
+                        <span className={`unit-stars s${u.stars}`}>
+                          {"★".repeat(u.stars)}
+                        </span>
+                      )}
+                    </div>
+                  </Tooltip>
+                );
+              })}
+            </div>
+          )}
+          {syns.length > 0 && (
+            <div className="synergies">
+              {syns.map((s, i) => (
+                <Tooltip
+                  key={i}
+                  type="synergy"
+                  name={s.name}
+                  count={s.count}
+                  synergiesData={synergiesData}
+                >
+                  <div className="syn-badge">
+                    <img
+                      className="syn-icon"
+                      src={`icons://synergies/${synIconName(s.name)}.png`}
+                      alt={s.name}
+                      loading="lazy"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).style.display = "none";
+                      }}
+                    />
+                    <span className="syn-count">{s.count}</span>
+                  </div>
+                </Tooltip>
+              ))}
+            </div>
+          )}
+        </div>
         <div className="cell rank-cell">
           <span className="rank-tier">{tier}</span>{" "}
           <span className="rank-num">{rankNum}</span>
@@ -118,76 +181,6 @@ export function GameRow({
           )}
         </div>
       </div>
-
-      {(lineup.length > 0 || syns.length > 0) && (
-        <div className="detail-row">
-          <div className="detail-column">
-            {lineup.length > 0 && (
-              <div className="lineup">
-                {lineup.map((u, i) => {
-                  const cost = unitCosts[u.name] || 1;
-                  return (
-                    <Tooltip
-                      key={i}
-                      type="unit"
-                      name={u.name}
-                      stars={u.stars}
-                      unitCosts={unitCosts}
-                      unitsFull={unitsFull}
-                    >
-                      <div className="unit-icon-wrap">
-                        <img
-                          className="unit-icon"
-                          src={`icons://units/${unitStem(u.name)}.png`}
-                          alt={u.name}
-                          loading="lazy"
-                          style={{ borderColor: costBorderColor(cost) }}
-                          onError={(e) => {
-                            (e.target as HTMLImageElement).style.display = "none";
-                          }}
-                        />
-                        {u.stars > 1 && (
-                          <span className={`unit-stars s${u.stars}`}>
-                            {"★".repeat(u.stars)}
-                          </span>
-                        )}
-                      </div>
-                    </Tooltip>
-                  );
-                })}
-              </div>
-            )}
-
-            {syns.length > 0 && (
-              <div className="synergies">
-                {syns.map((s, i) => (
-                  <Tooltip
-                    key={i}
-                    type="synergy"
-                    name={s.name}
-                    count={s.count}
-                    synergiesData={synergiesData}
-                  >
-                    <div className="syn-badge">
-                      <img
-                        className="syn-icon"
-                        src={`icons://synergies/${synIconName(s.name)}.png`}
-                        alt={s.name}
-                        loading="lazy"
-                        onError={(e) => {
-                          (e.target as HTMLImageElement).style.display =
-                            "none";
-                        }}
-                      />
-                      <span className="syn-count">{s.count}</span>
-                    </div>
-                  </Tooltip>
-                ))}
-              </div>
-            )}
-          </div>
-        </div>
-      )}
     </div>
   );
 }
