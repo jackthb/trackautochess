@@ -1,8 +1,8 @@
-"""Lightweight screen sentinel — polls a region for template match.
+"""Lightweight screen sentinel — polls regions for template matches.
 
-Captures a screen region using mss and compares it to a reference image
+Captures screen regions using mss and compares them to reference images
 via OpenCV template matching. When similarity exceeds the threshold,
-fires a callback.
+fires a callback. Supports multiple sentinels with independent callbacks.
 """
 
 import ctypes
@@ -27,19 +27,24 @@ CONFIRM_DELAY = 2  # seconds to wait and re-check before firing
 # Process name that identifies Dota 2
 GAME_PROCESS_NAME = "dota2.exe"
 
-# Reference template image (cropped from a known Final Ranking screenshot)
-TEMPLATE_PATH = DATA_DIR / "sentinel_ref_final_ranking.png"
-
-# Search region as fractions of screen — slightly larger than the template
-# so matchTemplate has room to slide.
-SEARCH_REGION = {
+# Final Ranking sentinel (game end)
+FINAL_RANKING_TEMPLATE = DATA_DIR / "sentinel_ref_final_ranking.png"
+FINAL_RANKING_REGION = {
     "x0": 0.0,
     "y0": 0.20,
     "x1": 0.15,
     "y1": 0.35,
 }
 
-# Template match threshold (0.0–1.0). TM_CCOEFF_NORMED: 1.0 = perfect match.
+# Round Start sentinel (0 STARTING countdown)
+ROUND_START_TEMPLATE = DATA_DIR / "sentinel_ref_round_start.png"
+ROUND_START_REGION = {
+    "x0": 0.80,
+    "y0": 0.15,
+    "x1": 0.95,
+    "y1": 0.35,
+}
+
 MATCH_THRESHOLD = 0.70
 
 
@@ -88,7 +93,6 @@ def _load_template(path, target_h):
     tmpl = cv2.imread(str(path))
     if tmpl is None:
         raise FileNotFoundError(f"Template not found: {path}")
-    # Scale template to match target height proportionally
     th, tw = tmpl.shape[:2]
     scale = target_h / th if target_h != th else 1.0
     if abs(scale - 1.0) > 0.01:
@@ -96,43 +100,54 @@ def _load_template(path, target_h):
     return tmpl
 
 
-class SentinelPoller:
-    """Polls screen for template matches."""
+class SentinelTarget:
+    """A single sentinel target with its own template, region, and callback."""
 
-    def __init__(self, on_match, template_path=None, interval=POLL_INTERVAL, threshold=MATCH_THRESHOLD,
+    def __init__(self, name, template_path, search_region, on_match, threshold=MATCH_THRESHOLD,
+                 ref_height=None):
+        self.name = name
+        self.template_path = Path(template_path)
+        self.search_region = search_region
+        self.on_match = on_match
+        self.threshold = threshold
+        self.ref_height = ref_height  # template height at reference resolution (1440p)
+        self.fired = False
+        self.tmpl = None  # loaded at poll start
+
+
+class SentinelPoller:
+    """Polls screen for template matches across multiple sentinel targets."""
+
+    def __init__(self, targets=None, interval=POLL_INTERVAL,
                  on_focus_gained=None, on_focus_lost=None):
-        self._on_match = on_match
+        self._targets = targets or []
         self._on_focus_gained = on_focus_gained
         self._on_focus_lost = on_focus_lost
-        self._template_path = Path(template_path or TEMPLATE_PATH)
         self._interval = interval
-        self._threshold = threshold
         self._stop_event = threading.Event()
         self._thread = None
-        self._fired = False
 
     def start(self):
         self._thread = threading.Thread(
             target=self._poll_loop, daemon=True, name="sentinel-poller",
         )
         self._thread.start()
-        log.info("Sentinel poller started (interval=%ds, threshold=%.0f%%, template=%s)",
-                 self._interval, self._threshold * 100, self._template_path.name)
+        names = ", ".join(t.name for t in self._targets)
+        log.info("Sentinel poller started (interval=%ds, targets: %s)", self._interval, names)
 
     def stop(self):
         self._stop_event.set()
 
-    def _match_template(self, sct, monitor, tmpl):
+    def _match_template(self, sct, monitor, target):
         """Grab search region, run template match, return (score, region_img)."""
-        region_img = _grab_region(sct, monitor, SEARCH_REGION)
-        # Convert both to grayscale for more robust matching
+        region_img = _grab_region(sct, monitor, target.search_region)
         region_gray = cv2.cvtColor(region_img, cv2.COLOR_BGR2GRAY)
-        tmpl_gray = cv2.cvtColor(tmpl, cv2.COLOR_BGR2GRAY)
+        tmpl_gray = cv2.cvtColor(target.tmpl, cv2.COLOR_BGR2GRAY)
         result = cv2.matchTemplate(region_gray, tmpl_gray, cv2.TM_CCOEFF_NORMED)
         _, max_val, _, _ = cv2.minMaxLoc(result)
         return max_val, region_img
 
-    def _save_debug(self, region_img, tmpl, score, matched):
+    def _save_debug(self, target, region_img, score, matched):
         """Save a debug HTML showing the search region and template."""
         try:
             import base64
@@ -149,14 +164,14 @@ class SentinelPoller:
                 return base64.b64encode(buf.getvalue()).decode()
 
             region_b64 = arr_to_b64(region_img)
-            tmpl_b64 = arr_to_b64(tmpl)
+            tmpl_b64 = arr_to_b64(target.tmpl)
             status = "MATCH" if matched else "NO MATCH"
             color = "#4a4" if matched else "#a44"
 
             html = f"""<!DOCTYPE html>
-<html><head><title>Sentinel Debug {ts}</title></head>
+<html><head><title>Sentinel Debug {ts} — {target.name}</title></head>
 <body style="background:#1a1a1a;color:#eee;font-family:monospace;padding:20px">
-<h1 style="color:{color}">Sentinel Debug — {status} (score={score:.3f}, threshold={self._threshold:.2f})</h1>
+<h1 style="color:{color}">{target.name} — {status} (score={score:.3f}, threshold={target.threshold:.2f})</h1>
 <p>{datetime.now().isoformat()}</p>
 <div style="display:flex;gap:40px;align-items:start">
   <div>
@@ -164,13 +179,13 @@ class SentinelPoller:
     <img src="data:image/png;base64,{region_b64}" style="max-width:600px;border:2px solid #666">
   </div>
   <div>
-    <h3>Template ({self._template_path.name}):</h3>
+    <h3>Template ({target.template_path.name}):</h3>
     <img src="data:image/png;base64,{tmpl_b64}" style="image-rendering:pixelated;border:2px solid #666;min-width:200px">
   </div>
 </div>
 </body></html>"""
 
-            path = debug_dir / f"sentinel_{ts}.html"
+            path = debug_dir / f"sentinel_{target.name}_{ts}.html"
             path.write_text(html, encoding="utf-8")
             log.info("Sentinel debug saved: %s", path)
         except Exception as e:
@@ -181,18 +196,24 @@ class SentinelPoller:
             monitor = sct.monitors[1]
             mw, mh = monitor["width"], monitor["height"]
 
-            # Calculate expected template height based on screen resolution
-            region_h = int((SEARCH_REGION["y1"] - SEARCH_REGION["y0"]) * mh)
-            # Template was captured at 3440x1440 — the sentinel region is ~47px tall at that res.
-            # Scale proportionally to current resolution.
-            template_scale_h = int(47 * mh / 1440)
-            tmpl = _load_template(self._template_path, template_scale_h)
+            # Load and scale templates
+            for t in self._targets:
+                if not t.template_path.exists():
+                    log.warning("Sentinel template not found, skipping: %s", t.template_path)
+                    continue
+                ref_h = t.ref_height or 47
+                scale_h = int(ref_h * mh / 1440)
+                t.tmpl = _load_template(t.template_path, scale_h)
+                log.info("Sentinel '%s': region=(%d,%d)-(%d,%d), template=%dx%d",
+                         t.name,
+                         int(t.search_region["x0"] * mw), int(t.search_region["y0"] * mh),
+                         int(t.search_region["x1"] * mw), int(t.search_region["y1"] * mh),
+                         t.tmpl.shape[1], t.tmpl.shape[0])
 
-            log.info("Sentinel: monitor=%dx%d, search region=(%d,%d)-(%d,%d), template=%dx%d",
-                     mw, mh,
-                     int(SEARCH_REGION["x0"] * mw), int(SEARCH_REGION["y0"] * mh),
-                     int(SEARCH_REGION["x1"] * mw), int(SEARCH_REGION["y1"] * mh),
-                     tmpl.shape[1], tmpl.shape[0])
+            active_targets = [t for t in self._targets if t.tmpl is not None]
+            if not active_targets:
+                log.error("No sentinel targets loaded — poller exiting")
+                return
 
             was_focused = False
             while not self._stop_event.is_set():
@@ -218,26 +239,31 @@ class SentinelPoller:
                 if not focused:
                     continue
 
-                try:
-                    score, region_img = self._match_template(sct, monitor, tmpl)
-                    log.info("Sentinel poll: score=%.3f (need %.2f)", score, self._threshold)
+                for target in active_targets:
+                    try:
+                        score, region_img = self._match_template(sct, monitor, target)
+                        log.debug("Sentinel '%s': score=%.3f (need %.2f)",
+                                  target.name, score, target.threshold)
 
-                    if score >= self._threshold:
-                        if not self._fired:
-                            log.info("Sentinel preliminary match (%.3f) — confirming...", score)
-                            time.sleep(CONFIRM_DELAY)
-                            if self._stop_event.is_set():
-                                break
-                            score2, region_img2 = self._match_template(sct, monitor, tmpl)
-                            if score2 >= self._threshold:
-                                log.info("Sentinel confirmed (score=%.3f)", score2)
-                                self._save_debug(region_img2, tmpl, score2, True)
-                                self._fired = True
-                                self._on_match()
-                            else:
-                                log.info("Sentinel confirmation failed (score=%.3f)", score2)
-                                self._save_debug(region_img2, tmpl, score2, False)
-                    else:
-                        self._fired = False
-                except Exception as e:
-                    log.warning("Sentinel poll error: %s", e)
+                        if score >= target.threshold:
+                            if not target.fired:
+                                log.info("Sentinel '%s' preliminary match (%.3f) — confirming...",
+                                         target.name, score)
+                                time.sleep(CONFIRM_DELAY)
+                                if self._stop_event.is_set():
+                                    break
+                                score2, region_img2 = self._match_template(sct, monitor, target)
+                                if score2 >= target.threshold:
+                                    log.info("Sentinel '%s' confirmed (score=%.3f)",
+                                             target.name, score2)
+                                    self._save_debug(target, region_img2, score2, True)
+                                    target.fired = True
+                                    target.on_match()
+                                else:
+                                    log.info("Sentinel '%s' confirmation failed (score=%.3f)",
+                                             target.name, score2)
+                                    self._save_debug(target, region_img2, score2, False)
+                        else:
+                            target.fired = False
+                    except Exception as e:
+                        log.warning("Sentinel '%s' poll error: %s", target.name, e)

@@ -143,24 +143,58 @@ class HeadlessBackend:
     # ── Sentinel poller ─────────────────────────────────────────────────────
 
     def _start_sentinel(self) -> None:
-        from sentinel import SentinelPoller
+        from sentinel import (
+            SentinelPoller, SentinelTarget,
+            FINAL_RANKING_TEMPLATE, FINAL_RANKING_REGION,
+            ROUND_START_TEMPLATE, ROUND_START_REGION,
+        )
+
+        targets = [
+            SentinelTarget(
+                name="final_ranking",
+                template_path=FINAL_RANKING_TEMPLATE,
+                search_region=FINAL_RANKING_REGION,
+                on_match=self._on_game_end,
+                ref_height=47,  # template height at 1440p
+            ),
+            SentinelTarget(
+                name="round_start",
+                template_path=ROUND_START_TEMPLATE,
+                search_region=ROUND_START_REGION,
+                on_match=self._on_round_start,
+                ref_height=134,  # template is 134px at 1440p
+            ),
+        ]
+
         self._sentinel = SentinelPoller(
-            on_match=self._on_sentinel_match,
+            targets=targets,
             on_focus_gained=self._on_game_focus_gained,
             on_focus_lost=self._on_game_focus_lost,
         )
         self._sentinel.start()
 
-    def _on_sentinel_match(self) -> None:
+    def _on_round_start(self) -> None:
+        """Round starting — begin replay recording if not already recording."""
+        log.info("Sentinel: Round start detected")
+        if self._replay_recorder and not self._replay_recorder.recording:
+            if self._replay_recorder.start():
+                log.info("Auto-started replay recording")
+                self._emit({"type": "replay_started"})
+                self._emit_notification(APP_NAME, "Game started — recording replay")
+
+    def _on_game_end(self) -> None:
+        """Final Ranking detected — stop recording and prompt capture."""
         log.info("Sentinel: Final Ranking detected")
 
         # Stop replay recording (game ended)
         if self._replay_recorder and self._replay_recorder.recording:
             path = self._replay_recorder.stop()
-            if path:
+            if path and path.exists():
                 size_mb = path.stat().st_size / (1024 * 1024)
                 self._emit({"type": "replay_saved", "name": path.name, "size_mb": round(size_mb, 1)})
                 self._emit_notification(APP_NAME, f"Replay saved: {path.name}")
+            else:
+                self._emit({"type": "replay_saved", "name": "", "size_mb": 0})
 
         self._emit({"type": "sentinel_match"})
         self._emit_notification(APP_NAME, "Game ended! Open Match History and click Capture.")
