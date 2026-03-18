@@ -1,0 +1,10 @@
+# Force LF in the repo, let git handle conversion on checkout
+* text=auto eol=lf
+
+# Keep these as binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.ico binary
+*.vpk binary
+*.dat binary
