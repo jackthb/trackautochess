@@ -935,12 +935,12 @@ video {
 }
 
 .game-screenshot-thumb {
-  max-width: 300px;
-  max-height: 200px;
+  max-width: 280px;
+  max-height: 180px;
   border-radius: 6px;
   border: 1px solid var(--border);
-  cursor: pointer;
-  transition: max-width 0.25s ease, max-height 0.25s ease;
+  cursor: zoom-in;
+  transition: border-color 0.15s;
   object-fit: contain;
 }
 
@@ -948,9 +948,44 @@ video {
   border-color: var(--accent);
 }
 
-.game-screenshot-thumb.full {
-  max-width: 600px;
-  max-height: 500px;
+/* Screenshot lightbox */
+.screenshot-lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 300;
+  background: rgba(0, 0, 0, 0.85);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: zoom-out;
+  animation: fadeUp 0.15s ease-out;
+}
+
+.screenshot-lightbox-img {
+  max-width: 90vw;
+  max-height: 90vh;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  object-fit: contain;
+  cursor: default;
+  box-shadow: 0 16px 64px rgba(0, 0, 0, 0.6);
+}
+
+.screenshot-lightbox-close {
+  position: absolute;
+  top: 16px;
+  right: 24px;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 32px;
+  cursor: pointer;
+  line-height: 1;
+  transition: color 0.1s;
+}
+
+.screenshot-lightbox-close:hover {
+  color: var(--text-primary);
 }
 
 .edit-fields-grid {
@@ -1193,4 +1228,31 @@ select.edit-field:focus {
   object-fit: cover;
   border: 1px solid var(--border-subtle);
   flex-shrink: 0;
+}
+
+/* Relic reorder arrows */
+.tag-chip-arrows {
+  display: inline-flex;
+  gap: 1px;
+  margin-left: 2px;
+}
+
+.tag-chip-arrow {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 8px;
+  padding: 0 2px;
+  line-height: 1;
+  transition: color 0.1s;
+}
+
+.tag-chip-arrow:hover:not(:disabled) {
+  color: var(--accent-hover);
+}
+
+.tag-chip-arrow:disabled {
+  opacity: 0.25;
+  cursor: default;
 }
