@@ -52,7 +52,8 @@ def game_exists(user_id: str, played_at: str, placement: str, wl: str, level: st
     """Check if a game with these fields already exists in Supabase.
 
     Uses a +/- 12 hour range around played_at since timestamps are approximate.
-    Includes lineup when available to distinguish same-session games.
+    Matches on placement + wl + level only (not lineup) to catch duplicates
+    even when OCR produces slightly different unit names between captures.
     Returns True if duplicate found, False otherwise. Never raises.
     """
     client = _get_client()
@@ -72,8 +73,6 @@ def game_exists(user_id: str, played_at: str, placement: str, wl: str, level: st
             "select": "id",
             "limit": "1",
         }
-        if lineup:
-            params["lineup"] = f"eq.{lineup}"
         resp = client.get(
             "/rest/v1/games",
             params=params,

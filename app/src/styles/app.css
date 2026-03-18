@@ -459,20 +459,13 @@
 
 .refresh-time { font-size: 13px; color: var(--text-muted); }
 
-.pagination {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 16px;
-  margin-top: 20px;
+.infinite-scroll-sentinel {
+  padding: 20px 0;
 }
 
-.pagination-info {
+.infinite-scroll-sentinel .loading {
+  min-height: 40px;
   font-size: 13px;
-  color: var(--text-muted);
-  letter-spacing: 1px;
-  min-width: 60px;
-  text-align: center;
 }
 
 /* Loading spinner */

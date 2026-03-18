@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import type { Game, UnitFullInfo, SynergyInfo, RelicInfo } from "../types";
 import { StatsBar } from "./StatsBar";
 import { GameRow } from "./GameRow";
@@ -30,9 +30,36 @@ export function HistoryTab({
   updateGame,
   deleteGame,
 }: HistoryTabProps) {
-  const [page, setPage] = useState(0);
-  const totalPages = Math.max(1, Math.ceil(games.length / PAGE_SIZE));
-  const pageGames = games.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
+  const sentinelRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  const hasMore = visibleCount < games.length;
+
+  const loadMore = useCallback(() => {
+    if (hasMore) {
+      setVisibleCount((prev) => Math.min(prev + PAGE_SIZE, games.length));
+    }
+  }, [hasMore, games.length]);
+
+  useEffect(() => {
+    const sentinel = sentinelRef.current;
+    if (!sentinel) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) loadMore();
+      },
+      { rootMargin: "200px" }
+    );
+    observer.observe(sentinel);
+    return () => observer.disconnect();
+  }, [loadMore]);
+
+  // Reset visible count when games list changes (refresh/delete)
+  useEffect(() => {
+    setVisibleCount((prev) => Math.min(prev, Math.max(PAGE_SIZE, games.length)));
+  }, [games.length]);
 
   if (loading) {
     return (
@@ -56,8 +83,10 @@ export function HistoryTab({
     );
   }
 
+  const visibleGames = games.slice(0, visibleCount);
+
   return (
-    <div className="history-tab">
+    <div className="history-tab" ref={containerRef}>
       <div className="history-container">
         <StatsBar games={games} />
         <div className="history-refresh fade-up">
@@ -80,7 +109,7 @@ export function HistoryTab({
             <div className="th">Relic</div>
             <div className="th">Date</div>
           </div>
-          {pageGames.map((g) => (
+          {visibleGames.map((g) => (
             <GameRow
               key={g.id}
               game={g}
@@ -93,25 +122,9 @@ export function HistoryTab({
             />
           ))}
         </div>
-        {totalPages > 1 && (
-          <div className="pagination">
-            <button
-              className="btn-ghost"
-              onClick={() => setPage((p) => Math.max(0, p - 1))}
-              disabled={page === 0}
-            >
-              Prev
-            </button>
-            <span className="pagination-info">
-              {page + 1} / {totalPages}
-            </span>
-            <button
-              className="btn-ghost"
-              onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
-              disabled={page >= totalPages - 1}
-            >
-              Next
-            </button>
+        {hasMore && (
+          <div ref={sentinelRef} className="infinite-scroll-sentinel">
+            <div className="loading">Loading more</div>
           </div>
         )}
       </div>
