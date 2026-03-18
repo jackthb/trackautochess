@@ -173,12 +173,10 @@ function handlePythonEvent(msg) {
 
     case "focus_gained":
       trackerStatus.focused = true;
-      if (widgetWindow && !widgetWindow.isDestroyed()) widgetWindow.show();
       break;
 
     case "focus_lost":
       trackerStatus.focused = false;
-      if (widgetWindow && !widgetWindow.isDestroyed()) widgetWindow.hide();
       break;
 
     case "parse_result":
@@ -287,7 +285,7 @@ function createWidget() {
     height: 44,
     x: screenW - 140,
     y: 20,
-    show: false,
+    show: true,
     frame: false,
     transparent: true,
     alwaysOnTop: true,
