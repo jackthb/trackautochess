@@ -995,10 +995,6 @@ video {
   gap: 10px;
 }
 
-.edit-fields-grid > :nth-child(-n+3) {
-  /* First 3 children (placement, level, W-L) in a row */
-}
-
 .edit-fields-row {
   display: flex;
   gap: 10px;
@@ -1042,6 +1038,15 @@ select.edit-field {
 select.edit-field:focus {
   outline: none;
   border-color: var(--accent);
+}
+
+.edit-rank-pair {
+  display: flex;
+  gap: 6px;
+}
+
+.edit-rank-pair select {
+  flex: 1;
 }
 
 .edit-wl-pair {

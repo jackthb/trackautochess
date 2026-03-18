@@ -357,7 +357,11 @@ export function GameRow({
   const [editL, setEditL] = useState(0);
   const [editUnits, setEditUnits] = useState<CountedTag[]>([]);
   const [editSynergies, setEditSynergies] = useState<CountedTag[]>([]);
+  const [editRankTier, setEditRankTier] = useState("");
+  const [editRankNum, setEditRankNum] = useState("");
   const [editRelics, setEditRelics] = useState<string[]>([]);
+
+  const RANK_TIERS = ["Pawn", "Knight", "Bishop", "Rook", "King", "Queen"];
 
   const p = parseInt(game.placement) || 0;
   const wl = parseWL(game.wl);
@@ -384,6 +388,9 @@ export function GameRow({
   const resetEditState = useCallback(() => {
     setEditPlacement(game.placement || "");
     setEditLevel(game.level || "");
+    const parsedRank = game.rank ? game.rank.split("-") : [];
+    setEditRankTier(parsedRank[0] || "");
+    setEditRankNum(parsedRank[1] || "");
     const parsedWL = parseWL(game.wl);
     setEditW(parsedWL?.w ?? 0);
     setEditL(parsedWL?.l ?? 0);
@@ -426,9 +433,16 @@ export function GameRow({
     const relicStr = editRelics.join("|") || null;
     const wlStr = editW || editL ? `${editW}-${editL}` : null;
 
+    const rankStr = editRankTier
+      ? editRankNum
+        ? `${editRankTier}-${editRankNum}`
+        : editRankTier
+      : null;
+
     const ok = await onUpdate(game.id, {
       placement: editPlacement,
       level: editLevel || null,
+      rank: rankStr,
       wl: wlStr,
       lineup: lineupStr,
       synergies: synStr,
@@ -601,6 +615,7 @@ export function GameRow({
               </div>
             )}
             <div className="edit-fields-grid">
+              <div className="edit-fields-row">
               <label className="edit-label">
                 <span>Placement</span>
                 <select
@@ -631,6 +646,33 @@ export function GameRow({
                 </select>
               </label>
               <div className="edit-label">
+                <span>Rank</span>
+                <div className="edit-rank-pair">
+                  <select
+                    className="edit-field"
+                    value={editRankTier}
+                    onChange={(e) => setEditRankTier(e.target.value)}
+                  >
+                    <option value="">&mdash;</option>
+                    {RANK_TIERS.map((t) => (
+                      <option key={t} value={t}>{t}</option>
+                    ))}
+                  </select>
+                  {editRankTier && editRankTier !== "Queen" && (
+                    <select
+                      className="edit-field"
+                      value={editRankNum}
+                      onChange={(e) => setEditRankNum(e.target.value)}
+                    >
+                      <option value="">&mdash;</option>
+                      {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((n) => (
+                        <option key={n} value={String(n)}>{n}</option>
+                      ))}
+                    </select>
+                  )}
+                </div>
+              </div>
+              <div className="edit-label">
                 <span>W &ndash; L</span>
                 <div className="edit-wl-pair">
                   <input
@@ -651,6 +693,7 @@ export function GameRow({
                     onChange={(e) => setEditL(parseInt(e.target.value) || 0)}
                   />
                 </div>
+              </div>
               </div>
 
               <div className="edit-label edit-label-wide">
