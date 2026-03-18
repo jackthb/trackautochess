@@ -99,17 +99,20 @@ export function Tooltip({
   );
 }
 
+function normalizeSynName(s: string): string {
+  return s.toLowerCase().replace(/[\s-]+/g, "");
+}
+
 function findSynergyData(
   name: string,
   data: Record<string, SynergyInfo>
 ): SynergyInfo | null {
-  // Try exact match first, then case-insensitive
   for (const val of Object.values(data)) {
     if (val.name === name) return val;
   }
-  const lower = name.toLowerCase();
+  const norm = normalizeSynName(name);
   for (const val of Object.values(data)) {
-    if (val.name.toLowerCase() === lower) return val;
+    if (normalizeSynName(val.name) === norm) return val;
   }
   return null;
 }

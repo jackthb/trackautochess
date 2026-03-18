@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from "react";
+import { createPortal } from "react-dom";
 import type { Game, UnitFullInfo, SynergyInfo, RelicInfo } from "../types";
 import {
   placementColor,
@@ -319,7 +320,15 @@ function ScreenshotLightbox({
   src: string;
   onClose: () => void;
 }) {
-  return (
+  useEffect(() => {
+    function onKey(e: KeyboardEvent) {
+      if (e.key === "Escape") onClose();
+    }
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [onClose]);
+
+  return createPortal(
     <div className="screenshot-lightbox" onClick={onClose}>
       <img
         className="screenshot-lightbox-img"
@@ -330,7 +339,8 @@ function ScreenshotLightbox({
       <button className="screenshot-lightbox-close" onClick={onClose}>
         &times;
       </button>
-    </div>
+    </div>,
+    document.body
   );
 }
 

@@ -1,6 +1,9 @@
+import { useState } from "react";
 import type { Game, UnitFullInfo, SynergyInfo, RelicInfo } from "../types";
 import { StatsBar } from "./StatsBar";
 import { GameRow } from "./GameRow";
+
+const PAGE_SIZE = 20;
 
 interface HistoryTabProps {
   games: Game[];
@@ -27,6 +30,10 @@ export function HistoryTab({
   updateGame,
   deleteGame,
 }: HistoryTabProps) {
+  const [page, setPage] = useState(0);
+  const totalPages = Math.max(1, Math.ceil(games.length / PAGE_SIZE));
+  const pageGames = games.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
+
   if (loading) {
     return (
       <div className="history-tab">
@@ -73,7 +80,7 @@ export function HistoryTab({
             <div className="th">Relic</div>
             <div className="th">Date</div>
           </div>
-          {games.map((g) => (
+          {pageGames.map((g) => (
             <GameRow
               key={g.id}
               game={g}
@@ -86,6 +93,27 @@ export function HistoryTab({
             />
           ))}
         </div>
+        {totalPages > 1 && (
+          <div className="pagination">
+            <button
+              className="btn-ghost"
+              onClick={() => setPage((p) => Math.max(0, p - 1))}
+              disabled={page === 0}
+            >
+              Prev
+            </button>
+            <span className="pagination-info">
+              {page + 1} / {totalPages}
+            </span>
+            <button
+              className="btn-ghost"
+              onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
+              disabled={page >= totalPages - 1}
+            >
+              Next
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );
