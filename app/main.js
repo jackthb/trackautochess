@@ -326,12 +326,7 @@ function createWindow() {
     minWidth: 800,
     minHeight: 600,
     backgroundColor: "#08090b",
-    titleBarStyle: "hiddenInset",
-    titleBarOverlay: {
-      color: "#08090b",
-      symbolColor: "#6b7080",
-      height: 36,
-    },
+    frame: false,
     show: false,
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
@@ -365,6 +360,26 @@ function registerShortcuts() {
     sendToPython({ cmd: "toggle_recording" });
   });
 }
+
+// ── Window controls IPC ──────────────────────────────────────────────────
+
+ipcMain.on("window:minimize", () => {
+  if (mainWindow && !mainWindow.isDestroyed()) mainWindow.minimize();
+});
+
+ipcMain.on("window:maximize", () => {
+  if (mainWindow && !mainWindow.isDestroyed()) {
+    if (mainWindow.isMaximized()) {
+      mainWindow.unmaximize();
+    } else {
+      mainWindow.maximize();
+    }
+  }
+});
+
+ipcMain.on("window:close", () => {
+  if (mainWindow && !mainWindow.isDestroyed()) mainWindow.close();
+});
 
 // ── Tracker IPC (renderer → main → Python) ──────────────────────────────────
 

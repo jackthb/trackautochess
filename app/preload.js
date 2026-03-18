@@ -14,6 +14,12 @@ contextBridge.exposeInMainWorld("tracker", {
   },
 });
 
+contextBridge.exposeInMainWorld("windowControls", {
+  minimize: () => ipcRenderer.send("window:minimize"),
+  maximize: () => ipcRenderer.send("window:maximize"),
+  close: () => ipcRenderer.send("window:close"),
+});
+
 contextBridge.exposeInMainWorld("appApi", {
   openFileDialog: () => ipcRenderer.invoke("app:openFileDialog"),
   getVersion: () => ipcRenderer.invoke("app:getVersion"),

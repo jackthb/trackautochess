@@ -109,6 +109,11 @@ export interface RelicInfo {
 // Window API types from preload.js
 declare global {
   interface Window {
+    windowControls: {
+      minimize: () => void;
+      maximize: () => void;
+      close: () => void;
+    };
     replays: {
       list: () => Promise<Replay[]>;
       delete: (filename: string) => Promise<boolean>;

@@ -22,6 +22,36 @@
 
 .titlebar-logo span { color: var(--gold-dim); }
 
+.titlebar-controls {
+  display: flex;
+  margin-left: auto;
+  height: 100%;
+  -webkit-app-region: no-drag;
+}
+
+.titlebar-btn {
+  width: 46px;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: background 0.1s, color 0.1s;
+}
+
+.titlebar-btn:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.titlebar-btn-close:hover {
+  background: #c42b1c;
+  color: #fff;
+}
+
 /* ── Tab bar ────────────────────────────────────────────── */
 
 .tab-bar {
