@@ -74,6 +74,7 @@ export interface UnitInfo {
 
 export interface UnitsData {
   units: Record<string, UnitInfo>;
+  aliases?: Record<string, string>;
 }
 
 export interface UnitFullInfo {
@@ -91,6 +92,7 @@ export interface UnitFullInfo {
 
 export interface SynergyInfo {
   name: string;
+  description?: string;
   tiers?: number[];
   lore?: string;
   [key: string]: unknown;

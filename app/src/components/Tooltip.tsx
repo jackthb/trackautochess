@@ -15,11 +15,14 @@ interface TooltipProps {
   name: string;
   stars?: number;
   count?: number;
+  relicIndex?: number;
   unitCosts?: Record<string, number>;
   unitsFull?: Record<string, UnitFullInfo>;
   synergiesData?: Record<string, SynergyInfo>;
   relicsData?: Record<string, RelicInfo>;
 }
+
+const ORDINALS = ["1st", "2nd", "3rd", "4th", "5th", "6th", "7th", "8th"];
 
 export function Tooltip({
   children,
@@ -27,6 +30,7 @@ export function Tooltip({
   name,
   stars = 1,
   count = 0,
+  relicIndex,
   unitCosts = {},
   unitsFull = {},
   synergiesData = {},
@@ -59,6 +63,7 @@ export function Tooltip({
     name,
     stars,
     count,
+    relicIndex,
     unitCosts,
     unitsFull,
     synergiesData,
@@ -98,8 +103,13 @@ function findSynergyData(
   name: string,
   data: Record<string, SynergyInfo>
 ): SynergyInfo | null {
+  // Try exact match first, then case-insensitive
   for (const val of Object.values(data)) {
     if (val.name === name) return val;
+  }
+  const lower = name.toLowerCase();
+  for (const val of Object.values(data)) {
+    if (val.name.toLowerCase() === lower) return val;
   }
   return null;
 }
@@ -119,6 +129,7 @@ function buildContent(
   name: string,
   stars: number,
   count: number,
+  relicIndex: number | undefined,
   unitCosts: Record<string, number>,
   unitsFull: Record<string, UnitFullInfo>,
   synergiesData: Record<string, SynergyInfo>,
@@ -190,7 +201,7 @@ function buildContent(
           />
           <div>
             <div className="tooltip-name">{info?.name || name}</div>
-            <div className="tooltip-sub">{count} active</div>
+            <div className="tooltip-sub">{count} units</div>
           </div>
         </div>
         {info?.tiers && info.tiers.length > 0 && (
@@ -205,13 +216,16 @@ function buildContent(
             ))}
           </div>
         )}
-        {info?.lore && <div className="tooltip-desc">{info.lore}</div>}
+        {(info?.description || info?.lore) && (
+          <div className="tooltip-desc">{info.description || info.lore}</div>
+        )}
       </>
     );
   }
 
   if (type === "relic") {
     const info = findRelicData(name, relicsData);
+    const ordinal = relicIndex !== undefined ? ORDINALS[relicIndex] || `${relicIndex + 1}th` : undefined;
     return (
       <>
         <div className="tooltip-header">
@@ -224,6 +238,9 @@ function buildContent(
           />
           <div>
             <div className="tooltip-name">{info?.name || name}</div>
+            {ordinal && (
+              <div className="tooltip-sub">{ordinal} pick</div>
+            )}
           </div>
         </div>
         {info?.description && (

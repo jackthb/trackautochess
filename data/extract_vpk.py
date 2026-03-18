@@ -520,12 +520,34 @@ def extract_all(pak):
             'names': names,
         }
 
+    # Build aliases: common/community names → canonical VPK names
+    # These handle Drodo's quirky localisation vs what players actually say
+    KNOWN_ALIASES = {
+        'Spectre': 'Spectres',
+        'Blood Seeker': 'Bloodseeker',
+        'Bloodseeker': 'Blood Seeker',
+        'Dark Seer': 'DarkSeer',
+        'DarkSeer': 'Dark Seer',
+        'IO': 'Io',
+        'Io': 'IO',
+        'Keeper Of The Light': 'Keeper of the Light',
+        'Keeper of the Light': 'Keeper Of The Light',
+        'Queen Of Pain': 'Queen of Pain',
+        'Queen of Pain': 'Queen Of Pain',
+    }
+    # Only include aliases where the target exists and the alias doesn't
+    aliases = {}
+    all_names = set(units_full.keys())
+    for alias, canonical in KNOWN_ALIASES.items():
+        if canonical in all_names and alias not in all_names:
+            aliases[alias] = canonical
+
     return {
         'synergies': synergies,
         'items_full': items,
         'relics': {'relics': relics},
         'units_full': units_full,
-        'units': {'units': units_simple},
+        'units': {'units': units_simple, 'aliases': aliases},
     }
 
 

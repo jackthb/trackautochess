@@ -46,9 +46,25 @@ export function useGames(): GamesState {
           for (const [name, info] of Object.entries(unitsRes.units)) {
             costs[name] = info.cost || 1;
           }
+          // Expand aliases so both names resolve
+          const aliases = unitsRes.aliases || {};
+          for (const [alias, canonical] of Object.entries(aliases)) {
+            if (costs[canonical] !== undefined) {
+              costs[alias] = costs[canonical];
+            }
+          }
           setUnitCosts(costs);
         }
-        if (fullRes) setUnitsFull(fullRes);
+        if (fullRes) {
+          // Expand aliases into unitsFull too
+          const aliases = unitsRes?.aliases || {};
+          for (const [alias, canonical] of Object.entries(aliases)) {
+            if (fullRes[canonical] && !fullRes[alias]) {
+              fullRes[alias] = fullRes[canonical];
+            }
+          }
+          setUnitsFull(fullRes);
+        }
         if (synRes) setSynergiesData(synRes);
         if (relRes?.relics) setRelicsData(relRes.relics);
       } catch (e) {
