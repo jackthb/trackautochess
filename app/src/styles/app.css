@@ -935,6 +935,7 @@ video {
 
 .edit-panel-body {
   display: flex;
+  flex-direction: row-reverse;
   gap: 20px;
   align-items: flex-start;
 }
