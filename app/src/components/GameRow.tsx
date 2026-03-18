@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import type { Game, UnitFullInfo, SynergyInfo, RelicInfo } from "../types";
 import {
   placementColor,
@@ -24,8 +24,202 @@ interface GameRowProps {
   onDelete: (gameId: number) => Promise<boolean>;
 }
 
-const SUPABASE_STORAGE_URL =
-  "https://xkfxykorskdltcmvgihh.supabase.co/storage/v1/object/public/screenshots/";
+// ── Tag picker with autocomplete ────────────────────────────────────────────
+
+interface TagPickerProps {
+  tags: string[];
+  onChange: (tags: string[]) => void;
+  suggestions: string[];
+  iconPrefix?: string;
+  iconStem?: (name: string) => string;
+  placeholder?: string;
+}
+
+function TagPicker({ tags, onChange, suggestions, iconPrefix, iconStem, placeholder }: TagPickerProps) {
+  const [query, setQuery] = useState("");
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const wrapRef = useRef<HTMLDivElement>(null);
+
+  const filtered = query
+    ? suggestions.filter(
+        (s) =>
+          s.toLowerCase().includes(query.toLowerCase()) &&
+          !tags.includes(s)
+      ).slice(0, 8)
+    : [];
+
+  useEffect(() => {
+    function handleClick(e: MouseEvent) {
+      if (wrapRef.current && !wrapRef.current.contains(e.target as Node)) {
+        setShowSuggestions(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, []);
+
+  function addTag(name: string) {
+    if (!tags.includes(name)) {
+      onChange([...tags, name]);
+    }
+    setQuery("");
+    setShowSuggestions(false);
+    inputRef.current?.focus();
+  }
+
+  function removeTag(name: string) {
+    onChange(tags.filter((t) => t !== name));
+  }
+
+  return (
+    <div className="tag-picker" ref={wrapRef}>
+      <div className="tag-picker-tags">
+        {tags.map((t) => (
+          <span key={t} className="tag-chip">
+            {iconPrefix && iconStem && (
+              <img
+                className="tag-chip-icon"
+                src={`icons://${iconPrefix}/${iconStem(t)}.png`}
+                alt=""
+                onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
+              />
+            )}
+            <span className="tag-chip-name">{t}</span>
+            <button className="tag-chip-remove" onClick={() => removeTag(t)}>&times;</button>
+          </span>
+        ))}
+        <input
+          ref={inputRef}
+          className="tag-picker-input"
+          value={query}
+          onChange={(e) => { setQuery(e.target.value); setShowSuggestions(true); }}
+          onFocus={() => setShowSuggestions(true)}
+          placeholder={tags.length === 0 ? placeholder : ""}
+        />
+      </div>
+      {showSuggestions && filtered.length > 0 && (
+        <div className="tag-picker-dropdown">
+          {filtered.map((s) => (
+            <button key={s} className="tag-picker-option" onClick={() => addTag(s)}>
+              {iconPrefix && iconStem && (
+                <img
+                  className="tag-picker-option-icon"
+                  src={`icons://${iconPrefix}/${iconStem(s)}.png`}
+                  alt=""
+                  onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
+                />
+              )}
+              {s}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ── Synergy tag with count ──────────────────────────────────────────────────
+
+interface SynergyTagPickerProps {
+  synergies: { name: string; count: number }[];
+  onChange: (syns: { name: string; count: number }[]) => void;
+  allSynergies: string[];
+}
+
+function SynergyTagPicker({ synergies, onChange, allSynergies }: SynergyTagPickerProps) {
+  const [query, setQuery] = useState("");
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const wrapRef = useRef<HTMLDivElement>(null);
+
+  const currentNames = synergies.map((s) => s.name);
+  const filtered = query
+    ? allSynergies.filter(
+        (s) =>
+          s.toLowerCase().includes(query.toLowerCase()) &&
+          !currentNames.includes(s)
+      ).slice(0, 8)
+    : [];
+
+  useEffect(() => {
+    function handleClick(e: MouseEvent) {
+      if (wrapRef.current && !wrapRef.current.contains(e.target as Node)) {
+        setShowSuggestions(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, []);
+
+  function addSynergy(name: string) {
+    onChange([...synergies, { name, count: 1 }]);
+    setQuery("");
+    setShowSuggestions(false);
+    inputRef.current?.focus();
+  }
+
+  function removeSynergy(name: string) {
+    onChange(synergies.filter((s) => s.name !== name));
+  }
+
+  function updateCount(name: string, count: number) {
+    onChange(synergies.map((s) => (s.name === name ? { ...s, count } : s)));
+  }
+
+  return (
+    <div className="tag-picker" ref={wrapRef}>
+      <div className="tag-picker-tags">
+        {synergies.map((s) => (
+          <span key={s.name} className="tag-chip">
+            <img
+              className="tag-chip-icon"
+              src={`icons://synergies/${synIconName(s.name)}.png`}
+              alt=""
+              onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
+            />
+            <span className="tag-chip-name">{s.name}</span>
+            <input
+              className="tag-chip-count"
+              type="number"
+              min="1"
+              max="20"
+              value={s.count}
+              onChange={(e) => updateCount(s.name, parseInt(e.target.value) || 1)}
+              onClick={(e) => e.stopPropagation()}
+            />
+            <button className="tag-chip-remove" onClick={() => removeSynergy(s.name)}>&times;</button>
+          </span>
+        ))}
+        <input
+          ref={inputRef}
+          className="tag-picker-input"
+          value={query}
+          onChange={(e) => { setQuery(e.target.value); setShowSuggestions(true); }}
+          onFocus={() => setShowSuggestions(true)}
+          placeholder={synergies.length === 0 ? "Add synergy..." : ""}
+        />
+      </div>
+      {showSuggestions && filtered.length > 0 && (
+        <div className="tag-picker-dropdown">
+          {filtered.map((s) => (
+            <button key={s} className="tag-picker-option" onClick={() => addSynergy(s)}>
+              <img
+                className="tag-picker-option-icon"
+                src={`icons://synergies/${synIconName(s)}.png`}
+                alt=""
+                onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
+              />
+              {s}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ── Main GameRow ────────────────────────────────────────────────────────────
 
 export function GameRow({
   game,
@@ -39,14 +233,15 @@ export function GameRow({
   const [expanded, setExpanded] = useState(false);
   const [saving, setSaving] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
-  const [editFields, setEditFields] = useState({
-    placement: game.placement || "",
-    level: game.level || "",
-    wl: game.wl || "",
-    lineup: game.lineup || "",
-    synergies: game.synergies || "",
-    relic: game.relic || "",
-  });
+
+  // Structured edit state
+  const [editPlacement, setEditPlacement] = useState(game.placement || "");
+  const [editLevel, setEditLevel] = useState(game.level || "");
+  const [editW, setEditW] = useState(0);
+  const [editL, setEditL] = useState(0);
+  const [editUnits, setEditUnits] = useState<string[]>([]);
+  const [editSynergies, setEditSynergies] = useState<{ name: string; count: number }[]>([]);
+  const [editRelics, setEditRelics] = useState<string[]>([]);
   const [screenshotFull, setScreenshotFull] = useState(false);
 
   const p = parseInt(game.placement) || 0;
@@ -59,39 +254,52 @@ export function GameRow({
   const relics = parseRelics(game.relic);
   const pColor = placementColor(p);
 
-  const screenshotUrl = game.screenshot
-    ? `${SUPABASE_STORAGE_URL}${game.screenshot}`
-    : null;
+  // Screenshot is already a full URL from Supabase
+  const screenshotUrl = game.screenshot || null;
+
+  // Build suggestion lists from reference data
+  const allUnitNames = Object.keys(unitCosts).sort();
+  const allSynergyNames = Object.values(synergiesData).map((s) => s.name).sort();
+  const allRelicNames = Object.values(relicsData).map((r) => r.name).sort();
+
+  const resetEditState = useCallback(() => {
+    setEditPlacement(game.placement || "");
+    setEditLevel(game.level || "");
+    const parsedWL = parseWL(game.wl);
+    setEditW(parsedWL?.w ?? 0);
+    setEditL(parsedWL?.l ?? 0);
+    // Parse lineup into unit names (strip star notation)
+    const parsedLineup = (game.lineup || "").split("|").filter(Boolean).map((e) => {
+      const m = e.match(/^(.+?)(?:\(\d\))?$/);
+      return m ? m[1] : e;
+    });
+    setEditUnits(parsedLineup);
+    setEditSynergies(parseSynergies(game.synergies));
+    setEditRelics(parseRelics(game.relic));
+    setScreenshotFull(false);
+    setConfirmDelete(false);
+  }, [game]);
 
   function handleToggle() {
-    if (!expanded) {
-      // Reset edit fields to current game values when opening
-      setEditFields({
-        placement: game.placement || "",
-        level: game.level || "",
-        wl: game.wl || "",
-        lineup: game.lineup || "",
-        synergies: game.synergies || "",
-        relic: game.relic || "",
-      });
-      setScreenshotFull(false);
-    }
+    if (!expanded) resetEditState();
     setExpanded(!expanded);
-  }
-
-  function handleChange(field: string, value: string) {
-    setEditFields((prev) => ({ ...prev, [field]: value }));
   }
 
   async function handleSave() {
     setSaving(true);
+    // Rebuild pipe-separated strings from structured state
+    const lineupStr = editUnits.join("|") || null;
+    const synStr = editSynergies.map((s) => `${s.name}:${s.count}`).join("|") || null;
+    const relicStr = editRelics.join("|") || null;
+    const wlStr = (editW || editL) ? `${editW}-${editL}` : null;
+
     const ok = await onUpdate(game.id, {
-      placement: editFields.placement,
-      level: editFields.level || null,
-      wl: editFields.wl || null,
-      lineup: editFields.lineup || null,
-      synergies: editFields.synergies || null,
-      relic: editFields.relic || null,
+      placement: editPlacement,
+      level: editLevel || null,
+      wl: wlStr,
+      lineup: lineupStr,
+      synergies: synStr,
+      relic: relicStr,
     });
     setSaving(false);
     if (ok) setExpanded(false);
@@ -255,54 +463,90 @@ export function GameRow({
               </div>
             )}
             <div className="edit-fields-grid">
+              {/* Row 1: Placement, Level, W-L */}
               <label className="edit-label">
                 <span>Placement</span>
-                <input
+                <select
                   className="edit-field"
-                  value={editFields.placement}
-                  onChange={(e) => handleChange("placement", e.target.value)}
-                />
+                  value={editPlacement}
+                  onChange={(e) => setEditPlacement(e.target.value)}
+                >
+                  {[1, 2, 3, 4, 5, 6, 7, 8].map((n) => (
+                    <option key={n} value={String(n)}>{n}</option>
+                  ))}
+                </select>
               </label>
               <label className="edit-label">
                 <span>Level</span>
-                <input
+                <select
                   className="edit-field"
-                  value={editFields.level}
-                  onChange={(e) => handleChange("level", e.target.value)}
-                />
+                  value={editLevel}
+                  onChange={(e) => setEditLevel(e.target.value)}
+                >
+                  <option value="">—</option>
+                  {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((n) => (
+                    <option key={n} value={String(n)}>{n}</option>
+                  ))}
+                </select>
               </label>
-              <label className="edit-label">
-                <span>W-L</span>
-                <input
-                  className="edit-field"
-                  value={editFields.wl}
-                  onChange={(e) => handleChange("wl", e.target.value)}
-                />
-              </label>
-              <label className="edit-label">
+              <div className="edit-label">
+                <span>W – L</span>
+                <div className="edit-wl-pair">
+                  <input
+                    className="edit-field edit-wl-input"
+                    type="number"
+                    min="0"
+                    max="99"
+                    value={editW}
+                    onChange={(e) => setEditW(parseInt(e.target.value) || 0)}
+                  />
+                  <span className="edit-wl-dash">–</span>
+                  <input
+                    className="edit-field edit-wl-input"
+                    type="number"
+                    min="0"
+                    max="99"
+                    value={editL}
+                    onChange={(e) => setEditL(parseInt(e.target.value) || 0)}
+                  />
+                </div>
+              </div>
+
+              {/* Row 2: Lineup (full width) */}
+              <div className="edit-label edit-label-wide">
                 <span>Lineup</span>
-                <input
-                  className="edit-field"
-                  value={editFields.lineup}
-                  onChange={(e) => handleChange("lineup", e.target.value)}
+                <TagPicker
+                  tags={editUnits}
+                  onChange={setEditUnits}
+                  suggestions={allUnitNames}
+                  iconPrefix="units"
+                  iconStem={unitStem}
+                  placeholder="Add unit..."
                 />
-              </label>
-              <label className="edit-label">
+              </div>
+
+              {/* Row 3: Synergies (full width) */}
+              <div className="edit-label edit-label-wide">
                 <span>Synergies</span>
-                <input
-                  className="edit-field"
-                  value={editFields.synergies}
-                  onChange={(e) => handleChange("synergies", e.target.value)}
+                <SynergyTagPicker
+                  synergies={editSynergies}
+                  onChange={setEditSynergies}
+                  allSynergies={allSynergyNames}
                 />
-              </label>
-              <label className="edit-label">
+              </div>
+
+              {/* Row 4: Relic */}
+              <div className="edit-label edit-label-wide">
                 <span>Relic</span>
-                <input
-                  className="edit-field"
-                  value={editFields.relic}
-                  onChange={(e) => handleChange("relic", e.target.value)}
+                <TagPicker
+                  tags={editRelics}
+                  onChange={setEditRelics}
+                  suggestions={allRelicNames}
+                  iconPrefix="relics"
+                  iconStem={relicStem}
+                  placeholder="Add relic..."
                 />
-              </label>
+              </div>
             </div>
           </div>
           <div className="edit-panel-actions">
