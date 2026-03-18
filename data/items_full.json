@@ -248,7 +248,7 @@
   },
   "item_fengkuangmianju": {
     "name": "Mask of Madness",
-    "description": "+15%% attack speed, lifesteal +25%%, but silences the carrier.",
+    "description": "+15%% attack speed, lifesteal +20%%, but silences the carrier.",
     "lore": "Once this mask is worn, its bearer becomes an uncontrollable aggressive force.",
     "quality": "rare",
     "texture": "item_mask_of_madness",
@@ -945,7 +945,7 @@
   },
   "item_wangyuanjing": {
     "name": "Telescope",
-    "description": "Ranged carrier +200 attack range, and counts as Dwarf.",
+    "description": "Ranged carriers will be counted as Dwarf.",
     "lore": "",
     "quality": "common",
     "texture": "custom/telescope",
@@ -1045,7 +1045,7 @@
   },
   "item_xuejingshi": {
     "name": "Bloodstone",
-    "description": "+600 Health.\nIf an enemy chess piece on the hosts side is killed, the holder has a 20%% chance of gaining 1 energy point. Each energy point will increase the magic damage the holder inflicts by 10%%.\nIf the holder is killed, half of the energy points will be lost.",
+    "description": "+600 Health.\nIf an enemy chess piece on the hosts side is killed, the holder has a 15%% chance of gaining 1 energy point. Each energy point will increase the magic damage the holder inflicts by 10%%.\nIf the holder is killed, half of the energy points will be lost.",
     "lore": "The Bloodstones bright ruby color is unmistakable on the battlefield, as the owner seems to have infinite vitality and spirit.",
     "quality": "rare",
     "texture": "item_bloodstone",

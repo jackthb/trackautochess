@@ -1,834 +1,1887 @@
 {
   "units": {
-    "Mirana": {
+    "Ancient Apparition": {
       "cost": 1,
+      "pool": "standard",
       "synergies": [
-        "Elf",
-        "Hunter"
-      ]
-    },
-    "Dark Willow": {
-      "cost": 1,
-      "synergies": [
-        "Elf",
-        "Wizard"
-      ]
-    },
-    "Witch Doctor": {
-      "cost": 1,
-      "synergies": [
-        "Troll",
-        "Warlock"
-      ]
-    },
-    "Shadow Shaman": {
-      "cost": 1,
-      "synergies": [
-        "Shaman",
-        "Troll"
-      ]
-    },
-    "Dazzle": {
-      "cost": 1,
-      "synergies": [
-        "Priest",
-        "Troll"
-      ]
-    },
-    "Tusk": {
-      "cost": 1,
-      "synergies": [
-        "Beast",
-        "Warrior"
-      ]
-    },
-    "Hoodwink": {
-      "cost": 1,
-      "synergies": [
-        "Beast",
-        "Hunter"
-      ]
-    },
-    "Enchantress": {
-      "cost": 1,
-      "synergies": [
-        "Beast",
-        "Centaur",
-        "Druid"
-      ]
-    },
-    "Crystal Maiden": {
-      "cost": 1,
-      "synergies": [
-        "Human",
+        "Elemental",
         "Mage"
-      ]
+      ],
+      "names": {
+        "en": "Ancient Apparition",
+        "lore": "Kaldr",
+        "ko": "고대 영혼",
+        "zh-cn": "极寒幽魂",
+        "zh-tw": "極寒幽魂"
+      }
+    },
+    "Abaddon": {
+      "cost": 1,
+      "pool": "undead",
+      "synergies": [
+        "Knight",
+        "Undead"
+      ],
+      "names": {
+        "en": "Abaddon",
+        "lore": "Abaddon",
+        "ko": "아바돈",
+        "ru": "Abaddon",
+        "zh-cn": "死亡骑士",
+        "zh-tw": "死亡騎士"
+      }
+    },
+    "Anti-mage": {
+      "cost": 4,
+      "pool": "standard",
+      "synergies": [
+        "Demon Hunter",
+        "Elf"
+      ],
+      "names": {
+        "en": "Anti-mage",
+        "lore": "Magina",
+        "ko": "항마사",
+        "ru": "Anti-mage",
+        "zh-cn": "敌法师",
+        "zh-tw": "敵法師"
+      }
+    },
+    "Abyssal Underlord": {
+      "cost": 5,
+      "pool": "standard",
+      "synergies": [
+        "Demon",
+        "Warlock"
+      ],
+      "names": {
+        "en": "Abyssal Underlord",
+        "lore": "Vrogros",
+        "ko": "지하군주",
+        "ru": "Abyssal Underlord",
+        "zh-cn": "孽主",
+        "zh-tw": "孽主"
+      }
+    },
+    "Arc Warden": {
+      "cost": 5,
+      "pool": "standard",
+      "synergies": [
+        "Kobold",
+        "Shaman"
+      ],
+      "names": {
+        "en": "Arc Warden",
+        "lore": "Zet",
+        "ko": "번개 감시자",
+        "ru": "Arc Warden",
+        "zh-cn": "天穹守望者",
+        "zh-tw": "天穹守望者"
+      }
     },
     "Axe": {
       "cost": 1,
+      "pool": "standard",
       "synergies": [
         "Orc",
         "Warrior"
-      ]
-    },
-    "Clockwerk": {
-      "cost": 1,
-      "synergies": [
-        "Goblin",
-        "Mech"
-      ]
-    },
-    "Tinker": {
-      "cost": 1,
-      "synergies": [
-        "Goblin",
-        "Mech"
-      ]
-    },
-    "Tiny": {
-      "cost": 2,
-      "synergies": [
-        "Elemental",
-        "Warrior"
-      ]
-    },
-    "Mars": {
-      "cost": 1,
-      "synergies": [
-        "God",
-        "Warrior"
-      ]
-    },
-    "Spirit Breaker": {
-      "cost": 1,
-      "synergies": [
-        "Assassin",
-        "Tauren"
-      ]
+      ],
+      "names": {
+        "en": "Axe",
+        "lore": "MogulKahn",
+        "ko": "도끼전사",
+        "ru": "Axe",
+        "zh-cn": "斧王",
+        "zh-tw": "斧王"
+      }
     },
     "Bane": {
       "cost": 1,
+      "pool": "standard",
       "synergies": [
         "Faceless",
         "Satyr",
         "Warlock"
-      ]
-    },
-    "Bounty Hunter": {
-      "cost": 1,
-      "synergies": [
-        "Draenei",
-        "Goblin",
-        "Hunter"
-      ]
-    },
-    "Shadow Demon": {
-      "cost": 1,
-      "synergies": [
-        "Demon",
-        "Draenei",
-        "Priest"
-      ]
-    },
-    "Skywrath Mage": {
-      "cost": 1,
-      "synergies": [
-        "Harpy",
-        "Mage"
-      ]
-    },
-    "Clinkz": {
-      "cost": 1,
-      "synergies": [
-        "Hunter",
-        "Undead"
-      ]
-    },
-    "Abaddon": {
-      "cost": 1,
-      "synergies": [
-        "Knight",
-        "Undead"
-      ]
-    },
-    "Winter Wyvern": {
-      "cost": 1,
-      "synergies": [
-        "Dragon",
-        "Mage",
-        "Undead"
-      ]
-    },
-    "Windranger": {
-      "cost": 2,
-      "synergies": [
-        "Elf",
-        "Hunter"
-      ]
-    },
-    "Luna": {
-      "cost": 2,
-      "synergies": [
-        "Elf",
-        "Knight"
-      ]
-    },
-    "Puck": {
-      "cost": 2,
-      "synergies": [
-        "Dragon",
-        "Elf",
-        "Mage"
-      ]
-    },
-    "Furion": {
-      "cost": 2,
-      "synergies": [
-        "Druid",
-        "Elf"
-      ]
+      ],
+      "names": {
+        "en": "Bane",
+        "lore": "Atropos",
+        "ko": "악몽의 그림자",
+        "ru": "Bane",
+        "zh-cn": "祸乱之源",
+        "zh-tw": "禍亂之源"
+      }
     },
     "Batrider": {
       "cost": 2,
+      "pool": "standard",
       "synergies": [
         "Knight",
         "Troll"
-      ]
+      ],
+      "names": {
+        "en": "Batrider",
+        "lore": "Kin۰zaka",
+        "ko": "박쥐기수",
+        "ru": "Batrider",
+        "zh-cn": "蝙蝠骑士",
+        "zh-tw": "蝙蝠騎士"
+      }
     },
-    "Lina": {
-      "cost": 2,
+    "Bounty Hunter": {
+      "cost": 1,
+      "pool": "standard",
       "synergies": [
-        "Human",
-        "Mage"
-      ]
-    },
-    "Juggernaut": {
-      "cost": 2,
-      "synergies": [
-        "Orc",
-        "Warrior"
-      ]
+        "Draenei",
+        "Goblin",
+        "Hunter"
+      ],
+      "names": {
+        "en": "Bounty Hunter",
+        "lore": "Gondar",
+        "ko": "현상금 사냥꾼",
+        "ru": "Bounty Hunter",
+        "zh-cn": "赏金猎人",
+        "zh-tw": "賞金獵人"
+      }
     },
     "Beastmaster": {
       "cost": 2,
+      "pool": "standard",
       "synergies": [
         "Hunter",
         "Orc"
-      ]
+      ],
+      "names": {
+        "en": "Beastmaster",
+        "lore": "Karroch",
+        "ko": "야수지배자",
+        "ru": "Beastmaster",
+        "zh-cn": "兽王",
+        "zh-tw": "獸王"
+      }
     },
-    "Bloodseeker": {
-      "cost": 2,
+    "Broodmother": {
+      "cost": 4,
+      "pool": "standard",
       "synergies": [
-        "Orc",
-        "Shaman"
-      ]
-    },
-    "Timbersaw": {
-      "cost": 2,
-      "synergies": [
-        "Goblin",
-        "Mech"
-      ]
-    },
-    "Slark": {
-      "cost": 2,
-      "synergies": [
-        "Assassin",
-        "Naga"
-      ]
-    },
-    "Naga Siren": {
-      "cost": 3,
-      "synergies": [
-        "Naga",
-        "Wizard"
-      ]
-    },
-    "Oracle": {
-      "cost": 2,
-      "synergies": [
-        "God",
-        "Priest"
-      ]
+        "Aqir",
+        "Hunter"
+      ],
+      "names": {
+        "en": "Broodmother",
+        "lore": "Black۰Arachnia",
+        "ko": "거미여왕",
+        "ru": "Broodmother",
+        "zh-cn": "育母蜘蛛",
+        "zh-tw": "育母蜘蛛"
+      }
     },
     "Brewmaster": {
       "cost": 1,
+      "pool": "standard",
       "synergies": [
         "Monk",
         "Pandaren"
-      ]
+      ],
+      "names": {
+        "en": "Brewmaster",
+        "lore": "Mangix",
+        "ko": "취권도사",
+        "ru": "Brewmaster",
+        "zh-cn": "熊猫酒仙",
+        "zh-tw": "熊貓酒仙"
+      }
     },
-    "Sniper": {
+    "Blood Seeker": {
       "cost": 2,
+      "pool": "standard",
       "synergies": [
-        "Dwarf",
-        "Hunter"
-      ]
+        "Orc",
+        "Shaman"
+      ],
+      "names": {
+        "en": "Blood Seeker",
+        "lore": "Strygwyr",
+        "ko": "혈귀",
+        "ru": "Blood Seeker",
+        "zh-cn": "血魔",
+        "zh-tw": "血魔"
+      }
+    },
+    "Chen": {
+      "cost": 4,
+      "pool": "standard",
+      "synergies": [
+        "Orc",
+        "Priest"
+      ],
+      "names": {
+        "en": "Chen",
+        "lore": "Chen",
+        "ko": "첸",
+        "ru": "Chen",
+        "zh-cn": "上帝之手",
+        "zh-tw": "上帝之手"
+      }
     },
     "Chaos Knight": {
       "cost": 2,
+      "pool": "standard",
       "synergies": [
         "Demon",
         "Knight"
-      ]
+      ],
+      "names": {
+        "en": "Chaos Knight",
+        "lore": "Nessaj",
+        "ko": "혼돈 기사",
+        "ru": "Chaos Knight",
+        "zh-cn": "混沌骑士",
+        "zh-tw": "混噸騎士"
+      }
     },
-    "Meepo": {
-      "cost": 2,
+    "Clinkz": {
+      "cost": 1,
+      "pool": "undead",
       "synergies": [
-        "Kobold",
+        "Hunter",
+        "Undead"
+      ],
+      "names": {
+        "en": "Clinkz",
+        "lore": "Clinkz",
+        "ko": "클링츠",
+        "ru": "Clinkz",
+        "zh-cn": "骷髅弓箭手",
+        "zh-tw": "骷髅弓箭手"
+      }
+    },
+    "Clockwerk": {
+      "cost": 1,
+      "pool": "standard",
+      "synergies": [
+        "Goblin",
         "Mech"
-      ]
+      ],
+      "names": {
+        "en": "Clockwerk",
+        "lore": "Rattletra",
+        "ko": "태엽장이",
+        "ru": "Clockwerk",
+        "zh-cn": "发条技师",
+        "zh-tw": "發條技師"
+      }
     },
-    "Faceless Void": {
-      "cost": 2,
+    "Crystal Maiden": {
+      "cost": 1,
+      "pool": "standard",
       "synergies": [
-        "Assassin",
-        "Faceless"
-      ]
-    },
-    "Dark Seer": {
-      "cost": 2,
-      "synergies": [
-        "Draenei",
-        "Warlock"
-      ]
+        "Human",
+        "Mage"
+      ],
+      "names": {
+        "en": "Crystal Maiden",
+        "lore": "Rylai",
+        "ko": "수정의 여인",
+        "ru": "Crystal Maiden",
+        "zh-cn": "水晶室女",
+        "zh-tw": "水晶室女"
+      }
     },
     "Centaur Warrunner": {
       "cost": 2,
+      "pool": "standard",
       "synergies": [
         "Centaur",
         "Warrior"
-      ]
+      ],
+      "names": {
+        "en": "Centaur Warrunner",
+        "lore": "Bradwarden",
+        "ko": "켄타우로스 전쟁용사",
+        "ru": "Centaur Warrunner",
+        "zh-cn": "半人马战行者",
+        "zh-tw": "半人馬戰行者"
+      }
     },
-    "Muerta": {
-      "cost": 2,
+    "Dazzle": {
+      "cost": 1,
+      "pool": "standard",
       "synergies": [
-        "Hunter",
-        "Undead"
-      ]
-    },
-    "Lifestealer": {
-      "cost": 2,
-      "synergies": [
-        "Kobold",
-        "Undead",
-        "Wizard"
-      ]
-    },
-    "Vengeful Spirit": {
-      "cost": 2,
-      "synergies": [
-        "Demon Hunter",
-        "Harpy",
-        "Undead"
-      ]
-    },
-    "Treant Protector": {
-      "cost": 3,
-      "synergies": [
-        "Druid",
-        "Elf"
-      ]
-    },
-    "Marci": {
-      "cost": 3,
-      "synergies": [
-        "Elf",
-        "Monk"
-      ]
-    },
-    "Huskar": {
-      "cost": 3,
-      "synergies": [
-        "Troll",
-        "Warrior"
-      ]
-    },
-    "Venomancer": {
-      "cost": 3,
-      "synergies": [
-        "Aqir",
-        "Beast",
-        "Warlock"
-      ]
-    },
-    "Lycan": {
-      "cost": 3,
-      "synergies": [
-        "Beast",
-        "Human",
-        "Warrior"
-      ]
-    },
-    "Legion Commander": {
-      "cost": 3,
-      "synergies": [
-        "Human",
-        "Knight"
-      ]
-    },
-    "Viper": {
-      "cost": 3,
-      "synergies": [
-        "Assassin",
-        "Dragon"
-      ]
-    },
-    "Slardar": {
-      "cost": 3,
-      "synergies": [
-        "Naga",
-        "Warrior"
-      ]
-    },
-    "Razor": {
-      "cost": 3,
-      "synergies": [
-        "Elemental",
-        "Mage"
-      ]
-    },
-    "Enigma": {
-      "cost": 3,
-      "synergies": [
-        "Elemental",
-        "Warlock"
-      ]
-    },
-    "Rubick": {
-      "cost": 3,
-      "synergies": [
-        "God",
-        "Wizard"
-      ]
-    },
-    "Sand King": {
-      "cost": 3,
-      "synergies": [
-        "Aqir",
-        "Assassin"
-      ]
-    },
-    "Ogre Magi": {
-      "cost": 3,
-      "synergies": [
-        "Mage",
-        "Ogre"
-      ]
-    },
-    "Shadow Fiend": {
-      "cost": 3,
-      "synergies": [
-        "Demon",
-        "Warlock"
-      ]
-    },
-    "Terrorblade": {
-      "cost": 3,
-      "synergies": [
-        "Demon",
-        "Demon Hunter"
-      ]
-    },
-    "Earthshaker": {
-      "cost": 3,
-      "synergies": [
-        "Shaman",
-        "Tauren"
-      ]
-    },
-    "Riki": {
-      "cost": 3,
-      "synergies": [
-        "Assassin",
-        "Satyr"
-      ]
+        "Priest",
+        "Troll"
+      ],
+      "names": {
+        "en": "Dazzle",
+        "lore": "Dazzle",
+        "ko": "대즐",
+        "ru": "Dazzle",
+        "zh-cn": "暗影牧师",
+        "zh-tw": "暗影牧師"
+      }
     },
     "Dawnbreaker": {
       "cost": 3,
+      "pool": "standard",
       "synergies": [
         "Draenei",
         "Knight"
-      ]
+      ],
+      "names": {
+        "en": "Dawnbreaker",
+        "lore": "Valora",
+        "ko": "여명의 파괴자",
+        "ru": "Dawnbreaker",
+        "zh-cn": "破晓辰星",
+        "zh-tw": "破曉辰星"
+      }
     },
-    "Kez": {
-      "cost": 3,
+    "Disruptor": {
+      "cost": 5,
+      "pool": "standard",
       "synergies": [
-        "Assassin",
-        "Harpy"
-      ]
-    },
-    "Pudge": {
-      "cost": 3,
-      "synergies": [
-        "Undead",
-        "Warrior"
-      ]
-    },
-    "Drow Ranger": {
-      "cost": 3,
-      "synergies": [
-        "Hunter",
-        "Undead"
-      ]
-    },
-    "Undying": {
-      "cost": 3,
-      "synergies": [
-        "Priest",
-        "Undead"
-      ]
-    },
-    "Phantom Assassin": {
-      "cost": 4,
-      "synergies": [
-        "Assassin",
-        "Elf"
-      ]
-    },
-    "Anti-mage": {
-      "cost": 4,
-      "synergies": [
-        "Demon Hunter",
-        "Elf"
-      ]
-    },
-    "Pangolier": {
-      "cost": 4,
-      "synergies": [
-        "Assassin",
-        "Beast"
-      ]
-    },
-    "Lone Druid": {
-      "cost": 4,
-      "synergies": [
-        "Beast",
-        "Druid"
-      ]
-    },
-    "Monkey King": {
-      "cost": 4,
-      "synergies": [
-        "Beast",
-        "Monk"
-      ]
-    },
-    "Kunkka": {
-      "cost": 4,
-      "synergies": [
-        "Human",
-        "Warrior"
-      ]
-    },
-    "Keeper Of The Light": {
-      "cost": 4,
-      "synergies": [
-        "Human",
-        "Mage"
-      ]
+        "Orc",
+        "Shaman"
+      ],
+      "names": {
+        "en": "Disruptor",
+        "lore": "Thrall",
+        "ko": "디스럽터",
+        "ru": "Disruptor",
+        "zh-cn": "干扰者",
+        "zh-tw": "幹擾者"
+      }
     },
     "Dragon Knight": {
       "cost": 4,
+      "pool": "standard",
       "synergies": [
         "Dragon",
         "Human",
         "Knight"
-      ]
+      ],
+      "names": {
+        "en": "Dragon Knight",
+        "lore": "Davion",
+        "ko": "용기사",
+        "ru": "Dragon Knight",
+        "zh-cn": "龙骑士",
+        "zh-tw": "龍騎士"
+      }
     },
-    "Chen": {
+    "Doom": {
       "cost": 4,
+      "pool": "standard",
       "synergies": [
-        "Orc",
-        "Priest"
-      ]
+        "Demon",
+        "Warrior"
+      ],
+      "names": {
+        "en": "Doom",
+        "lore": "Lucifer",
+        "ko": "파멸의 사도",
+        "ru": "Doom",
+        "zh-cn": "末日使者",
+        "zh-tw": "末日使者"
+      }
     },
-    "Snapfire": {
+    "Death Prophet": {
       "cost": 4,
+      "pool": "undead",
       "synergies": [
-        "Goblin",
-        "Knight"
-      ]
+        "Undead",
+        "Warlock"
+      ],
+      "names": {
+        "en": "Death Prophet",
+        "lore": "Krobelus",
+        "ko": "죽음의 예언자",
+        "ru": "Death Prophet",
+        "zh-cn": "死亡先知",
+        "zh-tw": "死亡先知"
+      }
+    },
+    "Drow Ranger": {
+      "cost": 3,
+      "pool": "undead",
+      "synergies": [
+        "Hunter",
+        "Undead"
+      ],
+      "names": {
+        "en": "Drow Ranger",
+        "lore": "Traxex",
+        "ko": "드로우 레인저",
+        "ru": "Drow Ranger",
+        "zh-cn": "卓尔游侠",
+        "zh-tw": "卓爾遊俠"
+      }
+    },
+    "DarkSeer": {
+      "cost": 2,
+      "pool": "standard",
+      "synergies": [
+        "Draenei",
+        "Warlock"
+      ],
+      "names": {
+        "en": "DarkSeer",
+        "lore": "Ish'kafel",
+        "ko": "어둠 현자",
+        "ru": "DarkSeer",
+        "zh-cn": "黑暗贤者",
+        "zh-tw": "黑暗賢者"
+      }
+    },
+    "Dark Willow": {
+      "cost": 1,
+      "pool": "standard",
+      "synergies": [
+        "Elf",
+        "Wizard"
+      ],
+      "names": {
+        "en": "Dark Willow",
+        "lore": "Mireska",
+        "ko": "흑버들",
+        "ru": "Dark Willow",
+        "zh-cn": "邪影芳灵",
+        "zh-tw": "邪影芳靈"
+      }
+    },
+    "Earth Spirit": {
+      "cost": 4,
+      "pool": "special",
+      "synergies": [
+        "Pandaren",
+        "Shaman"
+      ],
+      "names": {
+        "en": "Earth Spirit",
+        "lore": "Kaolin",
+        "ko": "대지령",
+        "ru": "Earth Spirit",
+        "zh-cn": "大地之灵",
+        "zh-tw": "大地之靈"
+      }
+    },
+    "Enchantress": {
+      "cost": 1,
+      "pool": "standard",
+      "synergies": [
+        "Beast",
+        "Centaur",
+        "Druid"
+      ],
+      "names": {
+        "en": "Enchantress",
+        "lore": "Aiushtha",
+        "ko": "요술사",
+        "ru": "Enchantress",
+        "zh-cn": "魅惑魔女",
+        "zh-tw": "魅惑魔女"
+      }
+    },
+    "Ember Spirit": {
+      "cost": 4,
+      "pool": "special",
+      "synergies": [
+        "Assassin",
+        "Pandaren"
+      ],
+      "names": {
+        "en": "Ember Spirit",
+        "lore": "Xin",
+        "ko": "불꽃령",
+        "ru": "Ember Spirit",
+        "zh-cn": "灰烬之灵",
+        "zh-tw": "灰燼之靈"
+      }
+    },
+    "Enigma": {
+      "cost": 3,
+      "pool": "standard",
+      "synergies": [
+        "Elemental",
+        "Warlock"
+      ],
+      "names": {
+        "en": "Enigma",
+        "lore": "Darchro",
+        "ko": "에니그마",
+        "ru": "Enigma",
+        "zh-cn": "谜团",
+        "zh-tw": "謎團"
+      }
+    },
+    "Earthshaker": {
+      "cost": 3,
+      "pool": "standard",
+      "synergies": [
+        "Shaman",
+        "Tauren"
+      ],
+      "names": {
+        "en": "Earthshaker",
+        "lore": "Raigor۰Stonehoof",
+        "ko": "지진술사",
+        "ru": "Earthshaker",
+        "zh-cn": "撼地神牛",
+        "zh-tw": "撼地神牛"
+      }
+    },
+    "Elder Titan": {
+      "cost": 4,
+      "pool": "standard",
+      "synergies": [
+        "Druid",
+        "God",
+        "Tauren"
+      ],
+      "names": {
+        "en": "Elder Titan",
+        "lore": "Worldsmith",
+        "ko": "고대 티탄",
+        "ru": "Elder Titan",
+        "zh-cn": "上古巨神",
+        "zh-tw": "上古巨神"
+      }
+    },
+    "Furion": {
+      "cost": 2,
+      "pool": "standard",
+      "synergies": [
+        "Druid",
+        "Elf"
+      ],
+      "names": {
+        "en": "Furion",
+        "lore": "Furion",
+        "ko": "자연의 예언자",
+        "ru": "Furion",
+        "zh-cn": "先知",
+        "zh-tw": "先知"
+      }
+    },
+    "Faceless Void": {
+      "cost": 2,
+      "pool": "standard",
+      "synergies": [
+        "Assassin",
+        "Faceless"
+      ],
+      "names": {
+        "en": "Faceless Void",
+        "lore": "Darkterror",
+        "ko": "얼굴없는 전사",
+        "ru": "Faceless Void",
+        "zh-cn": "虚空假面",
+        "zh-tw": "虛空假面"
+      }
     },
     "Alchemist": {
       "cost": 4,
+      "pool": "standard",
       "synergies": [
         "Goblin",
         "Ogre",
         "Warlock"
-      ]
+      ],
+      "names": {
+        "en": "Alchemist",
+        "lore": "Razzil۰Darkbrew",
+        "ko": "연금술사",
+        "ru": "Alchemist",
+        "zh-cn": "炼金术士",
+        "zh-tw": "煉金術士"
+      }
     },
-    "Medusa": {
-      "cost": 4,
-      "synergies": [
-        "Hunter",
-        "Naga"
-      ]
-    },
-    "Elder Titan": {
-      "cost": 4,
-      "synergies": [
-        "Druid",
-        "God",
-        "Tauren"
-      ]
-    },
-    "Broodmother": {
-      "cost": 4,
-      "synergies": [
-        "Aqir",
-        "Hunter"
-      ]
-    },
-    "Doom": {
-      "cost": 4,
-      "synergies": [
-        "Demon",
-        "Warrior"
-      ]
-    },
-    "Lion": {
-      "cost": 4,
-      "synergies": [
-        "Demon",
-        "Wizard"
-      ]
-    },
-    "Magnus": {
-      "cost": 4,
-      "synergies": [
-        "Assassin",
-        "Centaur"
-      ]
-    },
-    "Lich": {
-      "cost": 4,
-      "synergies": [
-        "Mage",
-        "Undead"
-      ]
-    },
-    "Death Prophet": {
-      "cost": 4,
-      "synergies": [
-        "Undead",
-        "Warlock"
-      ]
-    },
-    "Nyx Assassin": {
-      "cost": 4,
-      "synergies": [
-        "Aqir",
-        "Assassin",
-        "Undead"
-      ]
-    },
-    "Ember Spirit": {
-      "cost": 4,
-      "synergies": [
-        "Assassin",
-        "Pandaren"
-      ]
-    },
-    "Earth Spirit": {
-      "cost": 4,
-      "synergies": [
-        "Pandaren",
-        "Shaman"
-      ]
-    },
-    "Storm Spirit": {
-      "cost": 4,
-      "synergies": [
-        "Mage",
-        "Pandaren"
-      ]
-    },
-    "Void Spirit": {
-      "cost": 4,
-      "synergies": [
-        "Monk",
-        "Pandaren"
-      ]
-    },
-    "Templar Assassin": {
+    "Gyrocopter": {
       "cost": 5,
+      "pool": "standard",
       "synergies": [
-        "Assassin",
-        "Elf"
-      ]
+        "Dwarf",
+        "Mech"
+      ],
+      "names": {
+        "en": "Gyrocopter",
+        "lore": "Aurel",
+        "ko": "자이로콥터",
+        "ru": "Gyrocopter",
+        "zh-cn": "矮人直升机",
+        "zh-tw": "矮人直升機"
+      }
     },
-    "Invoker": {
-      "cost": 5,
-      "synergies": [
-        "Elf",
-        "Mage"
-      ]
-    },
-    "Troll Warlord": {
-      "cost": 5,
+    "Huskar": {
+      "cost": 3,
+      "pool": "standard",
       "synergies": [
         "Troll",
         "Warrior"
-      ]
+      ],
+      "names": {
+        "en": "Huskar",
+        "lore": "Huskar",
+        "ko": "하스카",
+        "ru": "Huskar",
+        "zh-cn": "神灵武士",
+        "zh-tw": "神靈武士"
+      }
     },
-    "Primal Beast": {
-      "cost": 5,
+    "Hoodwink": {
+      "cost": 1,
+      "pool": "standard",
       "synergies": [
         "Beast",
-        "Warrior"
-      ]
+        "Hunter"
+      ],
+      "names": {
+        "en": "Hoodwink",
+        "lore": "Hoodwink",
+        "ko": "후드윙크",
+        "ru": "Hoodwink",
+        "zh-cn": "森海飞霞",
+        "zh-tw": "森海飛霞"
+      }
     },
-    "Omniknight": {
+    "Io": {
       "cost": 5,
+      "pool": "special",
+      "synergies": [
+        "Elf"
+      ],
+      "names": {
+        "en": "Io",
+        "lore": "IO",
+        "ko": "이오",
+        "ru": "Io",
+        "zh-cn": "精灵守卫",
+        "zh-tw": "精靈守衛"
+      }
+    },
+    "Juggernaut": {
+      "cost": 2,
+      "pool": "standard",
+      "synergies": [
+        "Orc",
+        "Warrior"
+      ],
+      "names": {
+        "en": "Juggernaut",
+        "lore": "Yurnero",
+        "ko": "가면무사",
+        "ru": "Juggernaut",
+        "zh-cn": "剑圣",
+        "zh-tw": "劍聖"
+      }
+    },
+    "Invoker": {
+      "cost": 5,
+      "pool": "standard",
+      "synergies": [
+        "Elf",
+        "Mage"
+      ],
+      "names": {
+        "en": "Invoker",
+        "lore": "Kael",
+        "ko": "원소술사",
+        "ru": "Invoker",
+        "zh-cn": "祈求者",
+        "zh-tw": "祈求者"
+      }
+    },
+    "Kez": {
+      "cost": 3,
+      "pool": "standard",
+      "synergies": [
+        "Assassin",
+        "Harpy"
+      ],
+      "names": {
+        "en": "Kez",
+        "lore": "Kestrel",
+        "ko": "케즈",
+        "ru": "Kez",
+        "zh-cn": "影武者",
+        "zh-tw": "影武者"
+      }
+    },
+    "Kunkka": {
+      "cost": 4,
+      "pool": "standard",
+      "synergies": [
+        "Human",
+        "Warrior"
+      ],
+      "names": {
+        "en": "Kunkka",
+        "lore": "Kunkka",
+        "ko": "컨카",
+        "ru": "Kunkka",
+        "zh-cn": "海军上将",
+        "zh-tw": "海軍上將"
+      }
+    },
+    "Largo": {
+      "cost": 2,
+      "pool": "standard",
+      "synergies": [
+        "Monk",
+        "Naga"
+      ],
+      "names": {
+        "en": "Largo",
+        "lore": "Largo",
+        "ko": "라르고",
+        "ru": "Largo",
+        "zh-cn": "云游乐手",
+        "zh-tw": "雲遊樂手"
+      }
+    },
+    "Legion Commander": {
+      "cost": 3,
+      "pool": "standard",
       "synergies": [
         "Human",
         "Knight"
-      ]
+      ],
+      "names": {
+        "en": "Legion Commander",
+        "lore": "Tresdin",
+        "ko": "군단 사령관",
+        "ru": "Legion Commander",
+        "zh-cn": "军团指挥官",
+        "zh-tw": "軍團指揮官"
+      }
     },
-    "Warlock": {
-      "cost": 5,
+    "Lone Druid": {
+      "cost": 4,
+      "pool": "standard",
       "synergies": [
-        "Orc",
-        "Warlock"
-      ]
+        "Beast",
+        "Druid"
+      ],
+      "names": {
+        "en": "Lone Druid",
+        "lore": "Syllabear",
+        "ko": "고독한 드루이드",
+        "ru": "Lone Druid",
+        "zh-cn": "利爪德鲁伊",
+        "zh-tw": "利爪德魯伊"
+      }
     },
-    "Disruptor": {
-      "cost": 5,
+    "Lich": {
+      "cost": 4,
+      "pool": "undead",
       "synergies": [
-        "Orc",
-        "Shaman"
-      ]
+        "Mage",
+        "Undead"
+      ],
+      "names": {
+        "en": "Lich",
+        "lore": "Ethreain",
+        "ko": "리치",
+        "ru": "Lich",
+        "zh-cn": "巫妖",
+        "zh-tw": "巫妖"
+      }
     },
-    "Techies": {
-      "cost": 5,
+    "Keeper of the Light": {
+      "cost": 4,
+      "pool": "standard",
       "synergies": [
-        "Goblin",
-        "Mech"
-      ]
-    },
-    "Jakiro": {
-      "cost": 5,
-      "synergies": [
-        "Dragon",
+        "Human",
         "Mage"
-      ]
+      ],
+      "names": {
+        "en": "Keeper of the Light",
+        "lore": "Ezalor",
+        "ko": "빛의 수호자",
+        "ru": "Keeper of the Light",
+        "zh-cn": "光之守卫",
+        "zh-tw": "光之守衛"
+      }
     },
-    "Ringmaster": {
-      "cost": 5,
-      "synergies": []
+    "Lina": {
+      "cost": 2,
+      "pool": "standard",
+      "synergies": [
+        "Human",
+        "Mage"
+      ],
+      "names": {
+        "en": "Lina",
+        "lore": "Lina",
+        "ko": "리나",
+        "ru": "Lina",
+        "zh-cn": "秀逗魔导士",
+        "zh-tw": "秀逗魔導士"
+      }
     },
-    "Tidehunter": {
-      "cost": 5,
+    "Lion": {
+      "cost": 4,
+      "pool": "standard",
+      "synergies": [
+        "Demon",
+        "Wizard"
+      ],
+      "names": {
+        "en": "Lion",
+        "lore": "Lion",
+        "ko": "라이온",
+        "ru": "Lion",
+        "zh-cn": "恶魔巫师",
+        "zh-tw": "惡魔巫師"
+      }
+    },
+    "Luna": {
+      "cost": 2,
+      "pool": "standard",
+      "synergies": [
+        "Elf",
+        "Knight"
+      ],
+      "names": {
+        "en": "Luna",
+        "lore": "Luna",
+        "ko": "루나",
+        "ru": "Luna",
+        "zh-cn": "月之骑士",
+        "zh-tw": "月之騎士"
+      }
+    },
+    "Lycan": {
+      "cost": 3,
+      "pool": "standard",
+      "synergies": [
+        "Beast",
+        "Human",
+        "Warrior"
+      ],
+      "names": {
+        "en": "Lycan",
+        "lore": "Banehallow",
+        "ko": "늑대인간",
+        "ru": "Lycan",
+        "zh-cn": "狼人",
+        "zh-tw": "狼人"
+      }
+    },
+    "Magnus": {
+      "cost": 4,
+      "pool": "standard",
+      "synergies": [
+        "Assassin",
+        "Centaur"
+      ],
+      "names": {
+        "en": "Magnus",
+        "lore": "Magnus",
+        "ko": "마그누스",
+        "ru": "Magnus",
+        "zh-cn": "半人猛犸",
+        "zh-tw": "半人猛瑪"
+      }
+    },
+    "Marci": {
+      "cost": 3,
+      "pool": "standard",
+      "synergies": [
+        "Elf",
+        "Monk"
+      ],
+      "names": {
+        "en": "Marci",
+        "lore": "Marci",
+        "ko": "마르시",
+        "ru": "Marci",
+        "zh-cn": "月之哨卫",
+        "zh-tw": "月之哨衛"
+      }
+    },
+    "Mars": {
+      "cost": 1,
+      "pool": "standard",
+      "synergies": [
+        "God",
+        "Warrior"
+      ],
+      "names": {
+        "en": "Mars",
+        "lore": "Mars",
+        "ko": "마르스",
+        "ru": "Mars",
+        "zh-cn": "天界战神",
+        "zh-tw": "天界戰神"
+      }
+    },
+    "Medusa": {
+      "cost": 4,
+      "pool": "standard",
       "synergies": [
         "Hunter",
         "Naga"
-      ]
+      ],
+      "names": {
+        "en": "Medusa",
+        "lore": "Medusa",
+        "ko": "메두사",
+        "ru": "Medusa",
+        "zh-cn": "蛇发女妖",
+        "zh-tw": "蛇發女妖"
+      }
+    },
+    "Meepo": {
+      "cost": 2,
+      "pool": "standard",
+      "synergies": [
+        "Kobold",
+        "Mech"
+      ],
+      "names": {
+        "en": "Meepo",
+        "lore": "Meepo",
+        "ko": "미포",
+        "ru": "Meepo",
+        "zh-cn": "地卜师",
+        "zh-tw": "地蔔師"
+      }
+    },
+    "Monkey King": {
+      "cost": 4,
+      "pool": "standard",
+      "synergies": [
+        "Beast",
+        "Monk"
+      ],
+      "names": {
+        "en": "Monkey King",
+        "lore": "Wu۰kong",
+        "ko": "원숭이 왕",
+        "ru": "Monkey King",
+        "zh-cn": "齐天大圣",
+        "zh-tw": "齊天大聖"
+      }
     },
     "Morphling": {
       "cost": 5,
+      "pool": "standard",
       "synergies": [
         "Assassin",
         "Elemental",
         "Elf"
-      ]
+      ],
+      "names": {
+        "en": "Morphling",
+        "lore": "Morphling",
+        "ko": "모플링",
+        "ru": "Morphling",
+        "zh-cn": "变体精灵",
+        "zh-tw": "變體精靈"
+      }
     },
-    "Zeus": {
+    "Muerta": {
+      "cost": 2,
+      "pool": "undead",
+      "synergies": [
+        "Hunter",
+        "Undead"
+      ],
+      "names": {
+        "en": "Muerta",
+        "lore": "Muerta",
+        "ko": "무에르타",
+        "ru": "Muerta",
+        "zh-cn": "琼英碧灵",
+        "zh-tw": "瓊英碧靈"
+      }
+    },
+    "Nyx Assassin": {
+      "cost": 4,
+      "pool": "undead",
+      "synergies": [
+        "Aqir",
+        "Assassin",
+        "Undead"
+      ],
+      "names": {
+        "en": "Nyx Assassin",
+        "lore": "Anub۰arak",
+        "ko": "닉스 암살자",
+        "ru": "Nyx Assassin",
+        "zh-cn": "司夜刺客",
+        "zh-tw": "司夜刺客"
+      }
+    },
+    "Naga Siren": {
+      "cost": 3,
+      "pool": "standard",
+      "synergies": [
+        "Naga",
+        "Wizard"
+      ],
+      "names": {
+        "en": "Naga Siren",
+        "lore": "Slithice",
+        "ko": "나가 세이렌",
+        "ru": "Naga Siren",
+        "zh-cn": "娜迦海妖",
+        "zh-tw": "娜迦海妖"
+      }
+    },
+    "Lifestealer": {
+      "cost": 2,
+      "pool": "undead",
+      "synergies": [
+        "Kobold",
+        "Undead",
+        "Wizard"
+      ],
+      "names": {
+        "en": "Lifestealer",
+        "lore": "Naix",
+        "ko": "흡혈마",
+        "ru": "Lifestealer",
+        "zh-cn": "噬魂鬼",
+        "zh-tw": "噬魂鬼"
+      }
+    },
+    "Necrophos": {
       "cost": 5,
+      "pool": "undead",
+      "synergies": [
+        "Undead",
+        "Warlock"
+      ],
+      "names": {
+        "en": "Necrophos",
+        "lore": "Rotund۰jere",
+        "ko": "강령사제",
+        "ru": "Necrophos",
+        "zh-cn": "死灵法师",
+        "zh-tw": "死靈法師"
+      }
+    },
+    "Omniknight": {
+      "cost": 5,
+      "pool": "standard",
+      "synergies": [
+        "Human",
+        "Knight"
+      ],
+      "names": {
+        "en": "Omniknight",
+        "lore": "Purist۰Thunderwrath",
+        "ko": "전능기사",
+        "ru": "Omniknight",
+        "zh-cn": "全能骑士",
+        "zh-tw": "全能騎士"
+      }
+    },
+    "Ogre Magi": {
+      "cost": 3,
+      "pool": "standard",
+      "synergies": [
+        "Mage",
+        "Ogre"
+      ],
+      "names": {
+        "en": "Ogre Magi",
+        "lore": "Aggron۰Stonebreaker",
+        "ko": "오거마법사",
+        "ru": "Ogre Magi",
+        "zh-cn": "食人魔魔法师",
+        "zh-tw": "食人魔魔法師"
+      }
+    },
+    "Oracle": {
+      "cost": 2,
+      "pool": "standard",
       "synergies": [
         "God",
+        "Priest"
+      ],
+      "names": {
+        "en": "Oracle",
+        "lore": "Nerif",
+        "ko": "예지자",
+        "ru": "Oracle",
+        "zh-cn": "神谕者",
+        "zh-tw": "神谕者"
+      }
+    },
+    "Phantom Assassin": {
+      "cost": 4,
+      "pool": "standard",
+      "synergies": [
+        "Assassin",
+        "Elf"
+      ],
+      "names": {
+        "en": "Phantom Assassin",
+        "lore": "Mortred",
+        "ko": "유령 자객",
+        "ru": "Phantom Assassin",
+        "zh-cn": "幻影刺客",
+        "zh-tw": "幻影刺客"
+      }
+    },
+    "Pangolier": {
+      "cost": 4,
+      "pool": "standard",
+      "synergies": [
+        "Assassin",
+        "Beast"
+      ],
+      "names": {
+        "en": "Pangolier",
+        "lore": "Donté۰Panlin",
+        "ko": "천갑검사",
+        "ru": "Pangolier",
+        "zh-cn": "石鳞剑士",
+        "zh-tw": "石鱗劍士"
+      }
+    },
+    "Primal Beast": {
+      "cost": 5,
+      "pool": "standard",
+      "synergies": [
+        "Beast",
+        "Warrior"
+      ],
+      "names": {
+        "en": "Primal Beast",
+        "lore": "Beast",
+        "ko": "원시 야수",
+        "ru": "Primal Beast",
+        "zh-cn": "原始巨兽",
+        "zh-tw": "原始巨獸"
+      }
+    },
+    "Phoenix": {
+      "cost": 4,
+      "pool": "standard",
+      "synergies": [
+        "Elemental",
         "Mage"
-      ]
+      ],
+      "names": {
+        "en": "Phoenix",
+        "lore": "Icarus",
+        "ko": "불사조",
+        "ru": "Phoenix",
+        "zh-cn": "凤凰",
+        "zh-tw": "鳳凰"
+      }
+    },
+    "Mirana": {
+      "cost": 1,
+      "pool": "standard",
+      "synergies": [
+        "Elf",
+        "Hunter"
+      ],
+      "names": {
+        "en": "Mirana",
+        "lore": "Mirana",
+        "ko": "미라나",
+        "ru": "Mirana",
+        "zh-cn": "月之女祭司",
+        "zh-tw": "月之女祭司"
+      }
+    },
+    "Puck": {
+      "cost": 2,
+      "pool": "standard",
+      "synergies": [
+        "Dragon",
+        "Elf",
+        "Mage"
+      ],
+      "names": {
+        "en": "Puck",
+        "lore": "Puck",
+        "ko": "퍽",
+        "ru": "Puck",
+        "zh-cn": "仙女龙",
+        "zh-tw": "仙女龍"
+      }
+    },
+    "Pudge": {
+      "cost": 3,
+      "pool": "undead",
+      "synergies": [
+        "Undead",
+        "Warrior"
+      ],
+      "names": {
+        "en": "Pudge",
+        "lore": "Pudge",
+        "ko": "퍼지",
+        "ru": "Pudge",
+        "zh-cn": "屠夫",
+        "zh-tw": "屠夫"
+      }
+    },
+    "Queen of Pain": {
+      "cost": 5,
+      "pool": "standard",
+      "synergies": [
+        "Assassin",
+        "Demon"
+      ],
+      "names": {
+        "en": "Queen of Pain",
+        "lore": "Clinkz",
+        "ko": "고통의 여왕",
+        "ru": "Queen of Pain",
+        "zh-cn": "痛苦女王",
+        "zh-tw": "痛苦女王"
+      }
+    },
+    "Razor": {
+      "cost": 3,
+      "pool": "standard",
+      "synergies": [
+        "Elemental",
+        "Shaman"
+      ],
+      "names": {
+        "en": "Razor",
+        "lore": "Razor",
+        "ko": "레이저",
+        "ru": "Razor",
+        "zh-cn": "闪电幽魂",
+        "zh-tw": "閃電幽魂"
+      }
+    },
+    "Riki": {
+      "cost": 3,
+      "pool": "standard",
+      "synergies": [
+        "Assassin",
+        "Satyr"
+      ],
+      "names": {
+        "en": "Riki",
+        "lore": "Rikimaru",
+        "ko": "리키",
+        "ru": "Riki",
+        "zh-cn": "隐形刺客",
+        "zh-tw": "隱形刺客"
+      }
+    },
+    "Ringmaster": {
+      "cost": 5,
+      "pool": "standard",
+      "synergies": [],
+      "names": {
+        "en": "Ringmaster",
+        "lore": "Cogliostro Kettle",
+        "ko": "곡예단장",
+        "ru": "Ringmaster",
+        "zh-cn": "百戏大王",
+        "zh-tw": "百戲大王"
+      }
+    },
+    "Rubick": {
+      "cost": 3,
+      "pool": "standard",
+      "synergies": [
+        "God",
+        "Wizard"
+      ],
+      "names": {
+        "en": "Rubick",
+        "lore": "Rubick",
+        "ko": "루빅",
+        "ru": "Rubick",
+        "zh-cn": "大魔导师",
+        "zh-tw": "大魔導師"
+      }
+    },
+    "Spirit Breaker": {
+      "cost": 1,
+      "pool": "standard",
+      "synergies": [
+        "Assassin",
+        "Tauren"
+      ],
+      "names": {
+        "en": "Spirit Breaker",
+        "lore": "Barathrum",
+        "ko": "영혼 파괴자",
+        "ru": "Spirit Breaker",
+        "zh-cn": "裂魂人",
+        "zh-tw": "裂魂人"
+      }
+    },
+    "Shadow Demon": {
+      "cost": 1,
+      "pool": "standard",
+      "synergies": [
+        "Demon",
+        "Draenei",
+        "Priest"
+      ],
+      "names": {
+        "en": "Shadow Demon",
+        "lore": "Eredar",
+        "ko": "그림자 악마",
+        "ru": "Shadow Demon",
+        "zh-cn": "暗影恶魔",
+        "zh-tw": "暗影惡魔"
+      }
+    },
+    "Shadow Fiend": {
+      "cost": 3,
+      "pool": "standard",
+      "synergies": [
+        "Demon",
+        "Warlock"
+      ],
+      "names": {
+        "en": "Shadow Fiend",
+        "lore": "Nevermore",
+        "ko": "그림자 마귀",
+        "ru": "Shadow Fiend",
+        "zh-cn": "影魔",
+        "zh-tw": "影魔"
+      }
+    },
+    "Timbersaw": {
+      "cost": 2,
+      "pool": "standard",
+      "synergies": [
+        "Goblin",
+        "Mech"
+      ],
+      "names": {
+        "en": "Timbersaw",
+        "lore": "Rizzrack",
+        "ko": "벌목꾼",
+        "ru": "Timbersaw",
+        "zh-cn": "伐木机",
+        "zh-tw": "伐木機"
+      }
+    },
+    "Sand King": {
+      "cost": 3,
+      "pool": "standard",
+      "synergies": [
+        "Aqir",
+        "Assassin"
+      ],
+      "names": {
+        "en": "Sand King",
+        "lore": "Crixalis",
+        "ko": "모래 제왕",
+        "ru": "Sand King",
+        "zh-cn": "沙王",
+        "zh-tw": "沙王"
+      }
+    },
+    "Slardar": {
+      "cost": 3,
+      "pool": "standard",
+      "synergies": [
+        "Naga",
+        "Warrior"
+      ],
+      "names": {
+        "en": "Slardar",
+        "lore": "Slardar",
+        "ko": "슬라다",
+        "ru": "Slardar",
+        "zh-cn": "鱼人守卫",
+        "zh-tw": "魚人守衛"
+      }
+    },
+    "Slark": {
+      "cost": 2,
+      "pool": "standard",
+      "synergies": [
+        "Assassin",
+        "Naga"
+      ],
+      "names": {
+        "en": "Slark",
+        "lore": "Slark",
+        "ko": "슬라크",
+        "ru": "Slark",
+        "zh-cn": "鱼人夜行者",
+        "zh-tw": "魚人夜行者"
+      }
+    },
+    "Skywrath Mage": {
+      "cost": 1,
+      "pool": "standard",
+      "synergies": [
+        "Harpy",
+        "Mage"
+      ],
+      "names": {
+        "en": "Skywrath Mage",
+        "lore": "Zagnas",
+        "ko": "하늘분노 마법사",
+        "ru": "Skywrath Mage",
+        "zh-cn": "天怒法师",
+        "zh-tw": "天怒法師"
+      }
+    },
+    "Snapfire": {
+      "cost": 4,
+      "pool": "standard",
+      "synergies": [
+        "Goblin",
+        "Knight"
+      ],
+      "names": {
+        "en": "Snapfire",
+        "lore": "Beatrix",
+        "ko": "스냅파이어",
+        "ru": "Snapfire",
+        "zh-cn": "电炎绝手",
+        "zh-tw": "電炎絕手"
+      }
+    },
+    "Sniper": {
+      "cost": 2,
+      "pool": "standard",
+      "synergies": [
+        "Dwarf",
+        "Hunter"
+      ],
+      "names": {
+        "en": "Sniper",
+        "lore": "Kardel۰Sharpeye",
+        "ko": "저격수",
+        "ru": "Sniper",
+        "zh-cn": "狙击手",
+        "zh-tw": "狙擊手"
+      }
+    },
+    "Wraith King": {
+      "cost": 5,
+      "pool": "undead",
+      "synergies": [
+        "Undead",
+        "Warrior"
+      ],
+      "names": {
+        "en": "Wraith King",
+        "lore": "King۰Ostarion",
+        "ko": "망령 제왕",
+        "ru": "Wraith King",
+        "zh-cn": "冥魂大帝",
+        "zh-tw": "冥魂大帝"
+      }
+    },
+    "Spectres": {
+      "cost": 5,
+      "pool": "undead",
+      "synergies": [
+        "Demon Hunter",
+        "Undead"
+      ],
+      "names": {
+        "en": "Spectres",
+        "lore": "Mercurial",
+        "ko": "악령",
+        "ru": "Spectres",
+        "zh-cn": "幽鬼",
+        "zh-tw": "幽鬼"
+      }
+    },
+    "Shadow Shaman": {
+      "cost": 1,
+      "pool": "standard",
+      "synergies": [
+        "Shaman",
+        "Troll"
+      ],
+      "names": {
+        "en": "Shadow Shaman",
+        "lore": "Rhasta",
+        "ko": "그림자 주술사",
+        "ru": "Shadow Shaman",
+        "zh-cn": "暗影萨满",
+        "zh-tw": "暗影薩滿"
+      }
+    },
+    "Storm Spirit": {
+      "cost": 4,
+      "pool": "special",
+      "synergies": [
+        "Mage",
+        "Pandaren"
+      ],
+      "names": {
+        "en": "Storm Spirit",
+        "lore": "Raijin۰Thunderkeg",
+        "ko": "폭풍령",
+        "ru": "Storm Spirit",
+        "zh-cn": "风暴之灵",
+        "zh-tw": "風暴之靈"
+      }
+    },
+    "Sven": {
+      "cost": 5,
+      "pool": "standard",
+      "synergies": [
+        "Demon",
+        "Warrior"
+      ],
+      "names": {
+        "en": "Sven",
+        "lore": "Sven",
+        "ko": "스벤",
+        "ru": "Sven",
+        "zh-cn": "流浪剑客",
+        "zh-tw": "流浪劍客"
+      }
+    },
+    "Templar Assassin": {
+      "cost": 5,
+      "pool": "standard",
+      "synergies": [
+        "Assassin",
+        "Elf"
+      ],
+      "names": {
+        "en": "Templar Assassin",
+        "lore": "Lanaya",
+        "ko": "암살 기사",
+        "ru": "Templar Assassin",
+        "zh-cn": "圣堂刺客",
+        "zh-tw": "聖堂刺客"
+      }
+    },
+    "Terrorblade": {
+      "cost": 3,
+      "pool": "standard",
+      "synergies": [
+        "Demon",
+        "Demon Hunter"
+      ],
+      "names": {
+        "en": "Terrorblade",
+        "lore": "Terrorblade",
+        "ko": "테러블레이드",
+        "ru": "Terrorblade",
+        "zh-cn": "灵魂守卫",
+        "zh-tw": "靈魂守衛"
+      }
+    },
+    "Techies": {
+      "cost": 5,
+      "pool": "standard",
+      "synergies": [
+        "Goblin",
+        "Mech"
+      ],
+      "names": {
+        "en": "Techies",
+        "lore": "Squee۰Spleen۰Spoon",
+        "ko": "기술단",
+        "ru": "Techies",
+        "zh-cn": "地精工程师",
+        "zh-tw": "地精工程師"
+      }
+    },
+    "Tidehunter": {
+      "cost": 5,
+      "pool": "standard",
+      "synergies": [
+        "Hunter",
+        "Naga"
+      ],
+      "names": {
+        "en": "Tidehunter",
+        "lore": "Leviathan",
+        "ko": "파도사냥꾼",
+        "ru": "Tidehunter",
+        "zh-cn": "潮汐猎人",
+        "zh-tw": "潮汐獵人"
+      }
+    },
+    "Jakiro": {
+      "cost": 5,
+      "pool": "standard",
+      "synergies": [
+        "Dragon",
+        "Mage"
+      ],
+      "names": {
+        "en": "Jakiro",
+        "lore": "Rexxar",
+        "ko": "자키로",
+        "ru": "Jakiro",
+        "zh-cn": "双头龙",
+        "zh-tw": "雙頭龍"
+      }
+    },
+    "Tiny": {
+      "cost": 2,
+      "pool": "standard",
+      "synergies": [
+        "Elemental",
+        "Warrior"
+      ],
+      "names": {
+        "en": "Tiny",
+        "lore": "Tiny",
+        "ko": "타이니",
+        "ru": "Tiny",
+        "zh-cn": "山岭巨人",
+        "zh-tw": "山嶺巨人"
+      }
+    },
+    "Tinker": {
+      "cost": 1,
+      "pool": "standard",
+      "synergies": [
+        "Goblin",
+        "Mech"
+      ],
+      "names": {
+        "en": "Tinker",
+        "lore": "Boush",
+        "ko": "땜장이",
+        "ru": "Tinker",
+        "zh-cn": "修补匠",
+        "zh-tw": "修補匠"
+      }
+    },
+    "Treant Protector": {
+      "cost": 3,
+      "pool": "standard",
+      "synergies": [
+        "Druid",
+        "Elf"
+      ],
+      "names": {
+        "en": "Treant Protector",
+        "lore": "Rooftrellen",
+        "ko": "나무정령 수호자",
+        "ru": "Treant Protector",
+        "zh-cn": "树精卫士",
+        "zh-tw": "樹精衛士"
+      }
+    },
+    "Troll Warlord": {
+      "cost": 5,
+      "pool": "standard",
+      "synergies": [
+        "Troll",
+        "Warrior"
+      ],
+      "names": {
+        "en": "Troll Warlord",
+        "lore": "Jah۰rakal",
+        "ko": "트롤 전쟁군주",
+        "ru": "Troll Warlord",
+        "zh-cn": "巨魔战将",
+        "zh-tw": "巨魔戰將"
+      }
     },
     "Leshrac": {
       "cost": 5,
+      "pool": "standard",
       "synergies": [
         "Centaur",
         "Druid",
         "God"
-      ]
+      ],
+      "names": {
+        "en": "Leshrac",
+        "lore": "Leshrac",
+        "ko": "레슈락",
+        "ru": "Leshrac",
+        "zh-cn": "受折磨的灵魂",
+        "zh-tw": "受折磨的靈魂"
+      }
     },
-    "Gyrocopter": {
-      "cost": 5,
+    "Tusk": {
+      "cost": 1,
+      "pool": "standard",
       "synergies": [
-        "Dwarf",
-        "Mech"
-      ]
-    },
-    "Sven": {
-      "cost": 5,
-      "synergies": [
-        "Demon",
+        "Beast",
         "Warrior"
-      ]
+      ],
+      "names": {
+        "en": "Tusk",
+        "lore": "Ymir",
+        "ko": "얼음폭군",
+        "ru": "Tusk",
+        "zh-cn": "巨牙海民",
+        "zh-tw": "巨牙海民"
+      }
     },
-    "Queen Of Pain": {
-      "cost": 5,
+    "Undying": {
+      "cost": 3,
+      "pool": "undead",
+      "synergies": [
+        "Priest",
+        "Undead"
+      ],
+      "names": {
+        "en": "Undying",
+        "lore": "Dirge",
+        "ko": "언다잉",
+        "ru": "Undying",
+        "zh-cn": "不朽尸王",
+        "zh-tw": "不朽屍王"
+      }
+    },
+    "Venomancer": {
+      "cost": 3,
+      "pool": "standard",
+      "synergies": [
+        "Aqir",
+        "Beast",
+        "Warlock"
+      ],
+      "names": {
+        "en": "Venomancer",
+        "lore": "Lesale",
+        "ko": "맹독사",
+        "ru": "Venomancer",
+        "zh-cn": "剧毒术士",
+        "zh-tw": "劇毒術士"
+      }
+    },
+    "Viper": {
+      "cost": 3,
+      "pool": "standard",
       "synergies": [
         "Assassin",
-        "Demon"
-      ]
+        "Dragon"
+      ],
+      "names": {
+        "en": "Viper",
+        "lore": "Viper",
+        "ko": "바이퍼",
+        "ru": "Viper",
+        "zh-cn": "冥界亚龙",
+        "zh-tw": "冥界亞龍"
+      }
     },
-    "Abyssal Underlord": {
-      "cost": 5,
-      "synergies": [
-        "Demon",
-        "Warlock"
-      ]
-    },
-    "Arc Warden": {
-      "cost": 5,
-      "synergies": [
-        "Kobold",
-        "Shaman"
-      ]
-    },
-    "Wraith King": {
-      "cost": 5,
-      "synergies": [
-        "Undead",
-        "Warrior"
-      ]
-    },
-    "Necrophos": {
-      "cost": 5,
-      "synergies": [
-        "Undead",
-        "Warlock"
-      ]
-    },
-    "Spectre": {
-      "cost": 5,
-      "synergies": [
-        "Demon Hunter",
-        "Undead"
-      ]
-    },
-    "Largo": {
-      "cost": 2,
+    "Void Spirit": {
+      "cost": 4,
+      "pool": "special",
       "synergies": [
         "Monk",
-        "Naga"
-      ]
-    },
-    "IO": {
-      "cost": 5,
-      "synergies": [
-        "Elf"
+        "Pandaren"
       ],
-      "note": "Wild card unit. Can substitute for any unit when combining (e.g. 2 Dragon Knights + 1 IO = 2-star Dragon Knight). Also functions as a healer on the board."
-    }
-  },
-  "_meta": {
-    "source": "autochess.site board builder cost/synergy filters + VPK datamine",
-    "scraped": "2026-02-23",
-    "totalUnits": 115,
-    "byCost": {
-      "$1": 22,
-      "$2": 23,
-      "$3": 23,
-      "$4": 24,
-      "$5": 23
+      "names": {
+        "en": "Void Spirit",
+        "lore": "Inai",
+        "ko": "공허령",
+        "ru": "Void Spirit",
+        "zh-cn": "虚无之灵",
+        "zh-tw": "虛無之靈"
+      }
+    },
+    "Vengeful Spirit": {
+      "cost": 2,
+      "pool": "undead",
+      "synergies": [
+        "Demon Hunter",
+        "Harpy",
+        "Undead"
+      ],
+      "names": {
+        "en": "Vengeful Spirit",
+        "lore": "Shendelzare",
+        "ko": "복수 혼령",
+        "ru": "Vengeful Spirit",
+        "zh-cn": "复仇之魂",
+        "zh-tw": "複仇之魂"
+      }
+    },
+    "Witch Doctor": {
+      "cost": 1,
+      "pool": "standard",
+      "synergies": [
+        "Troll",
+        "Warlock"
+      ],
+      "names": {
+        "en": "Witch Doctor",
+        "lore": "Zharvakko",
+        "ko": "저주술사",
+        "ru": "Witch Doctor",
+        "zh-cn": "巫医",
+        "zh-tw": "巫醫"
+      }
+    },
+    "Warlock": {
+      "cost": 5,
+      "pool": "standard",
+      "synergies": [
+        "Orc",
+        "Warlock"
+      ],
+      "names": {
+        "en": "Warlock",
+        "lore": "Demnok۰Lannik",
+        "ko": "흑마법사",
+        "ru": "Warlock",
+        "zh-cn": "术士",
+        "zh-tw": "術士"
+      }
+    },
+    "Windranger": {
+      "cost": 2,
+      "pool": "standard",
+      "synergies": [
+        "Elf",
+        "Hunter"
+      ],
+      "names": {
+        "en": "Windranger",
+        "lore": "Lyralei",
+        "ko": "바람순찰자",
+        "ru": "Windranger",
+        "zh-cn": "风行者",
+        "zh-tw": "風行者"
+      }
+    },
+    "Winter Wyvern": {
+      "cost": 1,
+      "pool": "undead",
+      "synergies": [
+        "Dragon",
+        "Mage",
+        "Undead"
+      ],
+      "names": {
+        "en": "Winter Wyvern",
+        "lore": "Auroth",
+        "ko": "겨울 비룡",
+        "ru": "Winter Wyvern",
+        "zh-cn": "寒冬飞龙",
+        "zh-tw": "寒冬飛龍"
+      }
+    },
+    "Zeus": {
+      "cost": 5,
+      "pool": "standard",
+      "synergies": [
+        "God",
+        "Mage"
+      ],
+      "names": {
+        "en": "Zeus",
+        "lore": "Zeus",
+        "ko": "제우스",
+        "ru": "Zeus",
+        "zh-cn": "众神之王",
+        "zh-tw": "衆神之王"
+      }
     }
   }
 }

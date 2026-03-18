@@ -36,6 +36,7 @@ for (const dir of [DAC_DIR, REPLAY_DIR]) {
 
 let mainWindow = null;
 let overlayWindow = null;
+let widgetWindow = null;
 let pythonProcess = null;
 let pythonRL = null;
 let overlayTimeout = null;
@@ -132,6 +133,17 @@ function handlePythonEvent(msg) {
     mainWindow.webContents.send("tracker:event", msg);
   }
 
+  // Forward status to widget
+  if (widgetWindow && !widgetWindow.isDestroyed()) {
+    if (msg.type === "status" || msg.type === "replay_started" || msg.type === "replay_saved") {
+      widgetWindow.webContents.send("widget:status", {
+        recording: msg.type === "replay_started" ? true :
+                   msg.type === "replay_saved" ? false :
+                   msg.recording || false,
+      });
+    }
+  }
+
   switch (msg.type) {
     case "status":
       trackerStatus = { ...trackerStatus, ...msg };
@@ -161,10 +173,12 @@ function handlePythonEvent(msg) {
 
     case "focus_gained":
       trackerStatus.focused = true;
+      if (widgetWindow && !widgetWindow.isDestroyed()) widgetWindow.show();
       break;
 
     case "focus_lost":
       trackerStatus.focused = false;
+      if (widgetWindow && !widgetWindow.isDestroyed()) widgetWindow.hide();
       break;
 
     case "parse_result":
@@ -260,6 +274,47 @@ ipcMain.on("overlay:capture", () => {
 
 ipcMain.on("overlay:dismiss", () => {
   dismissOverlay();
+});
+
+// ── Widget window (Discord-style floating controls) ─────────────────────────
+
+function createWidget() {
+  const primaryDisplay = screen.getPrimaryDisplay();
+  const { width: screenW } = primaryDisplay.size;
+
+  widgetWindow = new BrowserWindow({
+    width: 120,
+    height: 44,
+    x: screenW - 140,
+    y: 20,
+    show: false,
+    frame: false,
+    transparent: true,
+    alwaysOnTop: true,
+    skipTaskbar: true,
+    resizable: false,
+    hasShadow: false,
+    webPreferences: {
+      preload: path.join(__dirname, "preload-widget.js"),
+      contextIsolation: true,
+      nodeIntegration: false,
+    },
+  });
+
+  widgetWindow.loadFile(path.join(__dirname, "widget.html"));
+  widgetWindow.setAlwaysOnTop(true, "screen-saver");
+
+  widgetWindow.on("closed", () => {
+    widgetWindow = null;
+  });
+}
+
+ipcMain.on("widget:toggle-recording", () => {
+  sendToPython({ cmd: "toggle_recording" });
+});
+
+ipcMain.on("widget:capture", () => {
+  sendToPython({ cmd: "capture" });
 });
 
 // ── Main window ──────────────────────────────────────────────────────────────
@@ -485,6 +540,7 @@ app.whenReady().then(() => {
   Menu.setApplicationMenu(null);
 
   createWindow();
+  createWidget();
   registerShortcuts();
   startPython();
 

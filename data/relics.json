@@ -1,6 +1,4 @@
 {
-  "source": "Auto Chess VPK (workshop item 1613886175) + ref/570_82.jpg",
-  "note": "Player-level relics shown in the Relics column of the in-game item list",
   "relics": {
     "item_upgrade_lootbox": {
       "name": "Weaponsmith",
@@ -37,9 +35,34 @@
       "description": "Fill your bench with magic vegetable sprouts. The sell value of these sprouts has a dynamic chance to increase by 1 at the beginning of every round. You can sell the sprouts any time to reuse the bench.",
       "lore": "From Relic Box"
     },
+    "item_mangotree": {
+      "name": "Mango Tree",
+      "description": "Plants a Mango Tree by the side of your Chessboard.Drops an Enchanted Mango whenever your home battle result differs from the last round. The tree wilts after 8 drops. A Golden Mango will be dropped if the mango tree is still alive at Relic expiration.",
+      "lore": "From Relicbox"
+    },
+    "item_more_creep": {
+      "name": "March of The Beasts",
+      "description": "All creeps duplicate themselves and counted as level +1.",
+      "lore": "From Relic Box"
+    },
+    "item_malefic_rapture": {
+      "name": "Malefic Rapture",
+      "description": "When your courier takes damage, you immediately gain the corresponding (damage taken) amount of experience.",
+      "lore": "From Relic Box"
+    },
     "item_rm_wheel_of_wonder": {
       "name": "Wheel of Wonder",
       "description": "Relic Consumable: Click to UseChoose an ally piece and put it into the wheel of wonder, DISCOVER a special version of it with an extra random synergy.",
+      "lore": "From: Relicbox"
+    },
+    "item_both_leaves": {
+      "name": "Leafy Essence",
+      "description": "All offside branches unlock automatically in this single game.",
+      "lore": "From: Relicbox"
+    },
+    "item_magic_box": {
+      "name": "Magic box",
+      "description": "Packs an ally piece, at the beginning of next round, transforms it into a randon new piece of the same Level and Rank. 12 times available.",
       "lore": "From: Relicbox"
     },
     "item_double_coin": {
@@ -52,60 +75,10 @@
       "description": "Replicate your last relic.",
       "lore": "From: Relicbox"
     },
-    "item_both_leaves": {
-      "name": "Leafy Essence",
-      "description": "All offside branches unlock automatically in this single game.",
-      "lore": "From: Relicbox"
-    },
-    "item_malefic_rapture": {
-      "name": "Malefic Rapture",
-      "description": "When your courier takes damage, you immediately gain the corresponding (damage taken) amount of experience.",
-      "lore": "From Relic Box"
-    },
-    "item_more_creep": {
-      "name": "March of the Beasts",
-      "description": "All creeps duplicate themselves and counted as level +1.",
-      "lore": "From Relic Box"
-    },
-    "item_magic_box": {
-      "name": "Magic box",
-      "description": "Packs an ally piece, at the beginning of next round, transforms it into a randon new piece of the same Level and Rank. 12 times available.",
-      "lore": "From: Relicbox"
-    },
-    "item_double_io": {
-      "name": "Grace of Nature",
-      "description": "Every IO recruited will reduce 2x this chance",
-      "lore": "From Relicbox",
-      "active": false
-    },
-    "item_more_interest": {
-      "name": "The Great Vault",
-      "description": "Will not be restricted to a max interest of 4.",
-      "lore": "From Relicbox",
-      "active": false
-    },
-    "item_more_reward": {
-      "name": "Sin Reaper",
-      "description": "Gains 4 XP for every visiting victory, and extra XP equals to Awardx2 when terminating an winning streak or eliminating a player.",
-      "lore": "From Relicbox",
-      "active": false
-    },
     "item_stolen_vault": {
       "name": "Stolen Vault",
       "description": "Discard all 3 relics and get a Stolen Vault with random 10 ~ 15 gold.",
       "lore": "From: Relicbox"
-    },
-    "item_upgrade_roll": {
-      "name": "Elite Recruiter",
-      "description": "Use probability tables for a higher courier level when recruiting.",
-      "lore": "From Relicbox",
-      "active": false
-    },
-    "item_vampiric_embrace": {
-      "name": "Vampire Fangs",
-      "description": "Your Courier has +40% lifesteal when dealing Courier damage to other players. You’ll get a Tango instead if your HP will be more than 100 after lifesteal.",
-      "lore": "From Relicbox",
-      "active": false
     }
   }
 }
