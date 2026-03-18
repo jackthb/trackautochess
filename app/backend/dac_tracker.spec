@@ -29,6 +29,7 @@ TESSERACT_DIR = os.path.join(ROOT_DIR, "tesseract-portable")
 _REQUIRED_PATHS = [
     (os.path.join(DATA_DIR, "icons"),                          "data/icons directory"),
     (os.path.join(DATA_DIR, "sentinel_ref_final_ranking.png"), "data/sentinel_ref_final_ranking.png"),
+    (os.path.join(DATA_DIR, "sentinel_ref_round_start.png"),  "data/sentinel_ref_round_start.png"),
     (os.path.join(DATA_DIR, "units.json"),                     "data/units.json"),
     (os.path.join(DATA_DIR, "items.json"),                     "data/items.json"),
     (os.path.join(DATA_DIR, "relics.json"),                    "data/relics.json"),
@@ -49,6 +50,7 @@ print("[spec] Environment OK")
 datas = [
     (os.path.join(DATA_DIR, "icons"),                          os.path.join("data", "icons")),
     (os.path.join(DATA_DIR, "sentinel_ref_final_ranking.png"), "data"),
+    (os.path.join(DATA_DIR, "sentinel_ref_round_start.png"),  "data"),
     (os.path.join(DATA_DIR, "units.json"),                     "data"),
     (os.path.join(DATA_DIR, "items.json"),                     "data"),
     (os.path.join(DATA_DIR, "relics.json"),                    "data"),
