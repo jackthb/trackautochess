@@ -126,3 +126,29 @@ Get-ChildItem $ReleaseDir -Filter "*.exe" | ForEach-Object {
     $sizeMB = [math]::Round($_.Length / 1MB, 1)
     Write-Host "  $($_.Name) ($sizeMB MB)" -ForegroundColor White
 }
+
+# ── Publish release to public repo ──────────────────────────────────────────
+
+$PackageJson = Get-Content (Join-Path $AppDir "package.json") -Raw | ConvertFrom-Json
+$Version = "v$($PackageJson.version)"
+$PublicRepo = "jackthb/dac-tracker"
+
+Write-Host ""
+Write-Host "Publish $Version to $PublicRepo? (y/N)" -ForegroundColor Yellow -NoNewline
+$answer = Read-Host " "
+if ($answer -eq "y" -or $answer -eq "Y") {
+    Write-Host "Publishing $Version to $PublicRepo..." -ForegroundColor Cyan
+    $installers = Get-ChildItem $ReleaseDir -Filter "*.exe"
+    $ghArgs = @("release", "create", $Version, "--repo", $PublicRepo, "--title", $Version, "--generate-notes")
+    foreach ($file in $installers) {
+        $ghArgs += $file.FullName
+    }
+    & gh @ghArgs
+    if ($LASTEXITCODE -ne 0) {
+        Write-Host "  Release publish failed." -ForegroundColor Red
+    } else {
+        Write-Host "  Published: https://github.com/$PublicRepo/releases/tag/$Version" -ForegroundColor Green
+    }
+} else {
+    Write-Host "  Skipped release publish." -ForegroundColor Gray
+}
