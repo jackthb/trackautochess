@@ -11,6 +11,8 @@ interface HistoryTabProps {
   relicsData: Record<string, RelicInfo>;
   lastRefresh: Date | null;
   refresh: () => Promise<void>;
+  updateGame: (gameId: number, fields: Partial<Game>) => Promise<boolean>;
+  deleteGame: (gameId: number) => Promise<boolean>;
 }
 
 export function HistoryTab({
@@ -22,6 +24,8 @@ export function HistoryTab({
   relicsData,
   lastRefresh,
   refresh,
+  updateGame,
+  deleteGame,
 }: HistoryTabProps) {
   if (loading) {
     return (
@@ -77,6 +81,8 @@ export function HistoryTab({
               unitsFull={unitsFull}
               synergiesData={synergiesData}
               relicsData={relicsData}
+              onUpdate={updateGame}
+              onDelete={deleteGame}
             />
           ))}
         </div>

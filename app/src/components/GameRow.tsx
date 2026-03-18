@@ -1,3 +1,4 @@
+import { useState } from "react";
 import type { Game, UnitFullInfo, SynergyInfo, RelicInfo } from "../types";
 import {
   placementColor,
@@ -19,7 +20,12 @@ interface GameRowProps {
   unitsFull: Record<string, UnitFullInfo>;
   synergiesData: Record<string, SynergyInfo>;
   relicsData: Record<string, RelicInfo>;
+  onUpdate: (gameId: number, fields: Partial<Game>) => Promise<boolean>;
+  onDelete: (gameId: number) => Promise<boolean>;
 }
+
+const SUPABASE_STORAGE_URL =
+  "https://xkfxykorskdltcmvgihh.supabase.co/storage/v1/object/public/screenshots/";
 
 export function GameRow({
   game,
@@ -27,7 +33,22 @@ export function GameRow({
   unitsFull,
   synergiesData,
   relicsData,
+  onUpdate,
+  onDelete,
 }: GameRowProps) {
+  const [expanded, setExpanded] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false);
+  const [editFields, setEditFields] = useState({
+    placement: game.placement || "",
+    level: game.level || "",
+    wl: game.wl || "",
+    lineup: game.lineup || "",
+    synergies: game.synergies || "",
+    relic: game.relic || "",
+  });
+  const [screenshotFull, setScreenshotFull] = useState(false);
+
   const p = parseInt(game.placement) || 0;
   const wl = parseWL(game.wl);
   const rankParts = game.rank ? game.rank.split("-") : [];
@@ -38,9 +59,47 @@ export function GameRow({
   const relics = parseRelics(game.relic);
   const pColor = placementColor(p);
 
+  const screenshotUrl = game.screenshot
+    ? `${SUPABASE_STORAGE_URL}${game.screenshot}`
+    : null;
+
+  function handleToggle() {
+    if (!expanded) {
+      // Reset edit fields to current game values when opening
+      setEditFields({
+        placement: game.placement || "",
+        level: game.level || "",
+        wl: game.wl || "",
+        lineup: game.lineup || "",
+        synergies: game.synergies || "",
+        relic: game.relic || "",
+      });
+      setScreenshotFull(false);
+    }
+    setExpanded(!expanded);
+  }
+
+  function handleChange(field: string, value: string) {
+    setEditFields((prev) => ({ ...prev, [field]: value }));
+  }
+
+  async function handleSave() {
+    setSaving(true);
+    const ok = await onUpdate(game.id, {
+      placement: editFields.placement,
+      level: editFields.level || null,
+      wl: editFields.wl || null,
+      lineup: editFields.lineup || null,
+      synergies: editFields.synergies || null,
+      relic: editFields.relic || null,
+    });
+    setSaving(false);
+    if (ok) setExpanded(false);
+  }
+
   return (
     <div className="game-entry" style={{ background: placementBg(p) }}>
-      <div className="game-row">
+      <div className="game-row" onClick={handleToggle} style={{ cursor: "pointer" }}>
         <div className="cell">
           <div
             className="placement"
@@ -63,7 +122,7 @@ export function GameRow({
                     unitCosts={unitCosts}
                     unitsFull={unitsFull}
                   >
-                    <div className="unit-icon-wrap">
+                    <div className="unit-icon-wrap" onClick={(e) => e.stopPropagation()}>
                       <img
                         className="unit-icon"
                         src={`icons://units/${unitStem(u.name)}.png`}
@@ -95,7 +154,7 @@ export function GameRow({
                   count={s.count}
                   synergiesData={synergiesData}
                 >
-                  <div className="syn-badge">
+                  <div className="syn-badge" onClick={(e) => e.stopPropagation()}>
                     <img
                       className="syn-icon"
                       src={`icons://synergies/${synIconName(s.name)}.png`}
@@ -115,10 +174,10 @@ export function GameRow({
         <div className="cell rank-cell">
           <span className="rank-tier">{tier}</span>{" "}
           <span className="rank-num">{rankNum}</span>
-          {game.rank_change === "up" && (
+          {game.rank && game.rank_change === "up" && (
             <span className="arrow-up">&#9650;</span>
           )}
-          {game.rank_change === "down" && (
+          {game.rank && game.rank_change === "down" && (
             <span className="arrow-down">&#9660;</span>
           )}
         </div>
@@ -181,6 +240,104 @@ export function GameRow({
           )}
         </div>
       </div>
+
+      {expanded && (
+        <div className="game-edit-panel" onClick={(e) => e.stopPropagation()}>
+          <div className="edit-panel-body">
+            {screenshotUrl && (
+              <div className="edit-screenshot-col">
+                <img
+                  className={`game-screenshot-thumb ${screenshotFull ? "full" : ""}`}
+                  src={screenshotUrl}
+                  alt="Game screenshot"
+                  onClick={() => setScreenshotFull(!screenshotFull)}
+                />
+              </div>
+            )}
+            <div className="edit-fields-grid">
+              <label className="edit-label">
+                <span>Placement</span>
+                <input
+                  className="edit-field"
+                  value={editFields.placement}
+                  onChange={(e) => handleChange("placement", e.target.value)}
+                />
+              </label>
+              <label className="edit-label">
+                <span>Level</span>
+                <input
+                  className="edit-field"
+                  value={editFields.level}
+                  onChange={(e) => handleChange("level", e.target.value)}
+                />
+              </label>
+              <label className="edit-label">
+                <span>W-L</span>
+                <input
+                  className="edit-field"
+                  value={editFields.wl}
+                  onChange={(e) => handleChange("wl", e.target.value)}
+                />
+              </label>
+              <label className="edit-label">
+                <span>Lineup</span>
+                <input
+                  className="edit-field"
+                  value={editFields.lineup}
+                  onChange={(e) => handleChange("lineup", e.target.value)}
+                />
+              </label>
+              <label className="edit-label">
+                <span>Synergies</span>
+                <input
+                  className="edit-field"
+                  value={editFields.synergies}
+                  onChange={(e) => handleChange("synergies", e.target.value)}
+                />
+              </label>
+              <label className="edit-label">
+                <span>Relic</span>
+                <input
+                  className="edit-field"
+                  value={editFields.relic}
+                  onChange={(e) => handleChange("relic", e.target.value)}
+                />
+              </label>
+            </div>
+          </div>
+          <div className="edit-panel-actions">
+            {!confirmDelete ? (
+              <button
+                className="btn-confirm btn-confirm-cancel btn-delete-game"
+                onClick={() => setConfirmDelete(true)}
+              >
+                Delete
+              </button>
+            ) : (
+              <button
+                className="btn-confirm btn-modal-danger"
+                onClick={() => onDelete(game.id)}
+              >
+                Confirm delete
+              </button>
+            )}
+            <div style={{ flex: 1 }} />
+            <button
+              className="btn-confirm btn-confirm-cancel"
+              onClick={() => { setExpanded(false); setConfirmDelete(false); }}
+            >
+              Cancel
+            </button>
+            <button
+              className="btn-confirm btn-confirm-primary"
+              onClick={handleSave}
+              disabled={saving}
+            >
+              {saving ? "Saving..." : "Save"}
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

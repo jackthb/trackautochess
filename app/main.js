@@ -429,6 +429,60 @@ ipcMain.handle("games:fetch", async () => {
   }
 });
 
+ipcMain.handle("games:update", async (_event, gameId, fields) => {
+  const config = loadTrackerConfig();
+  const url = config.supabase_url;
+  const key = config.supabase_key;
+
+  if (!url || !key) return false;
+
+  try {
+    const resp = await net.fetch(
+      `${url}/rest/v1/games?id=eq.${gameId}`,
+      {
+        method: "PATCH",
+        headers: {
+          apikey: key,
+          Authorization: `Bearer ${key}`,
+          "Content-Type": "application/json",
+          Prefer: "return=minimal",
+        },
+        body: JSON.stringify(fields),
+      }
+    );
+    return resp.ok;
+  } catch (e) {
+    console.error("games:update error:", e);
+    return false;
+  }
+});
+
+ipcMain.handle("games:delete", async (_event, gameId) => {
+  const config = loadTrackerConfig();
+  const url = config.supabase_url;
+  const key = config.supabase_key;
+
+  if (!url || !key) return false;
+
+  try {
+    const resp = await net.fetch(
+      `${url}/rest/v1/games?id=eq.${gameId}`,
+      {
+        method: "DELETE",
+        headers: {
+          apikey: key,
+          Authorization: `Bearer ${key}`,
+          Prefer: "return=minimal",
+        },
+      }
+    );
+    return resp.ok;
+  } catch (e) {
+    console.error("games:delete error:", e);
+    return false;
+  }
+});
+
 // ── Units data IPC ───────────────────────────────────────────────────────────
 
 ipcMain.handle("data:units", async () => {

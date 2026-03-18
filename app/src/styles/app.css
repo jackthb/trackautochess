@@ -884,3 +884,73 @@ video {
 }
 
 .btn-modal-danger:hover { background: var(--red-bright); }
+
+/* ── Game edit panel ──────────────────────────────────── */
+
+.game-edit-panel {
+  border-top: 1px solid var(--border);
+  padding: 16px 20px;
+  background: var(--bg-surface);
+}
+
+.edit-panel-body {
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+}
+
+.edit-screenshot-col {
+  flex-shrink: 0;
+}
+
+.game-screenshot-thumb {
+  max-width: 300px;
+  max-height: 200px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  cursor: pointer;
+  transition: max-width 0.2s, max-height 0.2s;
+  object-fit: contain;
+}
+
+.game-screenshot-thumb.full {
+  max-width: 600px;
+  max-height: 500px;
+}
+
+.edit-fields-grid {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 10px;
+}
+
+.edit-label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 12px;
+  color: var(--text-muted);
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.edit-label .edit-field {
+  width: 100%;
+}
+
+/* Lineup and synergies span full width */
+.edit-label:nth-child(4),
+.edit-label:nth-child(5) {
+  grid-column: span 2;
+}
+
+.edit-panel-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.btn-delete-game { color: var(--red-bright); border-color: var(--red); }
+.btn-delete-game:hover { background: rgba(155,58,58,0.1); }

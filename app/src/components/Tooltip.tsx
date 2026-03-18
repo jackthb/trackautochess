@@ -114,12 +114,22 @@ function findSynergyData(
   return null;
 }
 
+function normalizeRelicName(name: string): string {
+  return name.toLowerCase().replace(/[-\s]+/g, " ").trim();
+}
+
 function findRelicData(
   name: string,
   data: Record<string, RelicInfo>
 ): RelicInfo | null {
+  // Exact match
   for (const val of Object.values(data)) {
     if (val.name === name) return val;
+  }
+  // Normalized match (case, hyphens, spacing)
+  const norm = normalizeRelicName(name);
+  for (const val of Object.values(data)) {
+    if (normalizeRelicName(val.name) === norm) return val;
   }
   return null;
 }
@@ -216,8 +226,10 @@ function buildContent(
             ))}
           </div>
         )}
-        {(info?.description || info?.lore) && (
-          <div className="tooltip-desc">{info.description || info.lore}</div>
+        {(info?.formatted || info?.description) && (
+          <div className="tooltip-desc" style={{ whiteSpace: "pre-line" }}>
+            {info.formatted || info.description}
+          </div>
         )}
       </>
     );

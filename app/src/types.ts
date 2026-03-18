@@ -9,6 +9,7 @@ export interface Game {
   relic: string | null;
   level: string | null;
   wl: string | null;
+  screenshot: string | null;
   user_id: string;
   created_at: string;
 }
@@ -93,6 +94,7 @@ export interface UnitFullInfo {
 export interface SynergyInfo {
   name: string;
   description?: string;
+  formatted?: string;
   tiers?: number[];
   lore?: string;
   [key: string]: unknown;
@@ -121,6 +123,8 @@ declare global {
       openFileDialog: () => Promise<string | null>;
       getVersion: () => Promise<string>;
       fetchGames: () => Promise<Game[]>;
+      updateGame: (gameId: number, fields: Partial<Game>) => Promise<boolean>;
+      deleteGame: (gameId: number) => Promise<boolean>;
       fetchUnitsData: () => Promise<UnitsData>;
       fetchUnitsFull: () => Promise<Record<string, UnitFullInfo>>;
       fetchSynergies: () => Promise<Record<string, SynergyInfo>>;

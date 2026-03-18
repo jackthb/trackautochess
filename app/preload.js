@@ -18,6 +18,8 @@ contextBridge.exposeInMainWorld("appApi", {
   openFileDialog: () => ipcRenderer.invoke("app:openFileDialog"),
   getVersion: () => ipcRenderer.invoke("app:getVersion"),
   fetchGames: () => ipcRenderer.invoke("games:fetch"),
+  updateGame: (gameId, fields) => ipcRenderer.invoke("games:update", gameId, fields),
+  deleteGame: (gameId) => ipcRenderer.invoke("games:delete", gameId),
   fetchUnitsData: () => ipcRenderer.invoke("data:units"),
   fetchUnitsFull: () => ipcRenderer.invoke("data:units_full"),
   fetchSynergies: () => ipcRenderer.invoke("data:synergies"),

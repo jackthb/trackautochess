@@ -16,6 +16,8 @@ interface GamesState {
   relicsData: Record<string, RelicInfo>;
   lastRefresh: Date | null;
   refresh: () => Promise<void>;
+  updateGame: (gameId: number, fields: Partial<Game>) => Promise<boolean>;
+  deleteGame: (gameId: number) => Promise<boolean>;
 }
 
 export function useGames(): GamesState {
@@ -78,6 +80,27 @@ export function useGames(): GamesState {
     setLoading(false);
   }, [unitCosts]);
 
+  const deleteGame = useCallback(async (gameId: number): Promise<boolean> => {
+    const ok = await window.appApi.deleteGame(gameId);
+    if (ok) {
+      setGames((prev) => prev.filter((g) => g.id !== gameId));
+    }
+    return ok;
+  }, []);
+
+  const updateGame = useCallback(
+    async (gameId: number, fields: Partial<Game>): Promise<boolean> => {
+      const ok = await window.appApi.updateGame(gameId, fields);
+      if (ok) {
+        setGames((prev) =>
+          prev.map((g) => (g.id === gameId ? { ...g, ...fields } : g))
+        );
+      }
+      return ok;
+    },
+    []
+  );
+
   useEffect(() => {
     refresh();
   }, []);
@@ -91,5 +114,7 @@ export function useGames(): GamesState {
     relicsData,
     lastRefresh,
     refresh,
+    updateGame,
+    deleteGame,
   };
 }
