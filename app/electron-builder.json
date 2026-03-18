@@ -8,7 +8,9 @@
     "main.js",
     "preload.js",
     "preload-overlay.js",
+    "preload-widget.js",
     "overlay.html",
+    "widget.html",
     "dist/**/*",
     "!node_modules/**/*"
   ],
@@ -42,6 +44,14 @@
     {
       "from": "../data/items.json",
       "to": "data/items.json"
+    },
+    {
+      "from": "../data/sentinel_ref_final_ranking.png",
+      "to": "data/sentinel_ref_final_ranking.png"
+    },
+    {
+      "from": "../data/sentinel_ref_round_start.png",
+      "to": "data/sentinel_ref_round_start.png"
     }
   ],
   "win": {
