@@ -126,18 +126,25 @@ class HeadlessBackend:
             self._init_replay()
 
         if self._replay_recorder.recording:
-            path = self._replay_recorder.stop()
-            if path:
-                size_mb = path.stat().st_size / (1024 * 1024)
-                self._emit({"type": "replay_saved", "name": path.name, "size_mb": round(size_mb, 1)})
-                self._emit_notification(APP_NAME, f"Replay saved: {path.name} ({size_mb:.0f} MB)")
-            log.info("Replay: recording stopped (manual)")
+            # Stop in background thread so we don't block the command loop
+            threading.Thread(target=self._stop_recording, daemon=True, name="stop-rec").start()
         else:
             if self._replay_recorder.start():
                 log.info("Replay: recording started (manual)")
                 self._emit({"type": "replay_started"})
                 self._emit_notification(APP_NAME, "Recording started")
+                self._emit_status()
 
+    def _stop_recording(self) -> None:
+        """Stop replay recording (runs in background thread)."""
+        path = self._replay_recorder.stop()
+        if path and path.exists():
+            size_mb = path.stat().st_size / (1024 * 1024)
+            self._emit({"type": "replay_saved", "name": path.name, "size_mb": round(size_mb, 1)})
+            self._emit_notification(APP_NAME, f"Replay saved: {path.name} ({size_mb:.0f} MB)")
+        else:
+            self._emit({"type": "replay_saved", "name": "", "size_mb": 0})
+        log.info("Replay: recording stopped (manual)")
         self._emit_status()
 
     # ── Sentinel poller ─────────────────────────────────────────────────────
@@ -186,15 +193,9 @@ class HeadlessBackend:
         """Final Ranking detected — stop recording and prompt capture."""
         log.info("Sentinel: Final Ranking detected")
 
-        # Stop replay recording (game ended)
+        # Stop replay recording in background (game ended)
         if self._replay_recorder and self._replay_recorder.recording:
-            path = self._replay_recorder.stop()
-            if path and path.exists():
-                size_mb = path.stat().st_size / (1024 * 1024)
-                self._emit({"type": "replay_saved", "name": path.name, "size_mb": round(size_mb, 1)})
-                self._emit_notification(APP_NAME, f"Replay saved: {path.name}")
-            else:
-                self._emit({"type": "replay_saved", "name": "", "size_mb": 0})
+            threading.Thread(target=self._stop_recording, daemon=True, name="stop-rec").start()
 
         self._emit({"type": "sentinel_match"})
         self._emit_notification(APP_NAME, "Game ended! Open Match History and click Capture.")
