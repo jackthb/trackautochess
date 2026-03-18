@@ -464,6 +464,7 @@ class HeadlessBackend:
 
     def _handle_command(self, msg: dict) -> None:
         cmd = msg.get("cmd")
+        log.info("Command received: %s", cmd)
         if cmd == "capture":
             threading.Thread(target=self._do_capture, daemon=True, name="capture").start()
         elif cmd == "confirm":

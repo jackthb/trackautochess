@@ -120,10 +120,11 @@ function startPython() {
 
 function sendToPython(cmd) {
   if (!pythonProcess || !pythonProcess.stdin.writable) {
-    console.error("Python process not running");
+    console.error("Python process not running — cannot send:", cmd);
     return;
   }
   const line = JSON.stringify(cmd) + "\n";
+  console.log("sendToPython:", line.trim());
   pythonProcess.stdin.write(line);
 }
 
