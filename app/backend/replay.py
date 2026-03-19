@@ -145,17 +145,20 @@ class _FFmpegRecorder:
 
         proc = self._proc
         if proc:
-            # Terminate ffmpeg gracefully (CTRL_BREAK on Windows)
+            # Send CTRL_BREAK_EVENT for graceful ffmpeg shutdown (finalizes moov atom)
+            # Ref: https://github.com/kkroening/ffmpeg-python/issues/162
+            import signal
             try:
-                proc.terminate()
-            except Exception:
-                pass
+                proc.send_signal(signal.CTRL_BREAK_EVENT)
+                log.info("Sent CTRL_BREAK to ffmpeg")
+            except Exception as e:
+                log.warning("Failed to send CTRL_BREAK: %s", e)
             # Wait for ffmpeg to finalize the file
             try:
-                proc.wait(timeout=5)
+                proc.wait(timeout=8)
                 log.info("Recording stopped, ffmpeg exited cleanly")
             except subprocess.TimeoutExpired:
-                log.warning("ffmpeg didn't exit in 5s — killing")
+                log.warning("ffmpeg didn't exit in 8s — killing")
                 proc.kill()
                 try:
                     proc.wait(timeout=3)
@@ -253,12 +256,14 @@ class _FFmpegRecorder:
                 str(self._output_path),
             ]
             try:
+                # CREATE_NEW_PROCESS_GROUP lets us send CTRL_BREAK_EVENT for graceful stop
+                flags = getattr(subprocess, "CREATE_NO_WINDOW", 0) | getattr(subprocess, "CREATE_NEW_PROCESS_GROUP", 0)
                 self._proc = subprocess.Popen(
                     cmd,
                     stdin=subprocess.PIPE,
                     stdout=subprocess.DEVNULL,
                     stderr=subprocess.PIPE,
-                    creationflags=getattr(subprocess, "CREATE_NO_WINDOW", 0),
+                    creationflags=flags,
                 )
                 # Give it a moment to fail if codec is missing
                 time.sleep(0.3)
