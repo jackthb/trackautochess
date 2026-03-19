@@ -142,14 +142,28 @@ class _FFmpegRecorder:
     def stop(self) -> Path | None:
         """Stop recording. Returns output file path."""
         self._stop_event.set()
-        # Close ffmpeg stdin to signal EOF
-        if self._proc and self._proc.stdin:
+
+        proc = self._proc
+        if proc:
+            # Close stdin first to unblock any pending write
             try:
-                self._proc.stdin.close()
+                proc.stdin.close()
             except Exception:
                 pass
+            # Give ffmpeg a moment to flush, then kill it
+            try:
+                proc.wait(timeout=3)
+            except subprocess.TimeoutExpired:
+                log.warning("ffmpeg didn't exit in 3s — killing")
+                proc.kill()
+                try:
+                    proc.wait(timeout=3)
+                except Exception:
+                    pass
+            log.info("Recording stopped, ffmpeg exited")
+
         if self._thread:
-            self._thread.join(timeout=15)
+            self._thread.join(timeout=5)
         return self._output_path
 
     def _record_loop(self):
