@@ -200,8 +200,13 @@ class _FFmpegRecorder:
                     self._proc.stdin.close()
                 except Exception:
                     pass
-                self._proc.wait(timeout=10)
-                log.info("Recording stopped, file saved")
+                try:
+                    self._proc.wait(timeout=5)
+                except subprocess.TimeoutExpired:
+                    log.warning("ffmpeg didn't exit in 5s — killing")
+                    self._proc.kill()
+                    self._proc.wait(timeout=3)
+                log.info("Recording stopped, ffmpeg exited")
 
     def _build_ffmpeg_args(self, w: int, h: int) -> bool:
         """Try to start ffmpeg with AV1, fall back to H.264."""
