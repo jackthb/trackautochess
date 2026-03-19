@@ -155,10 +155,10 @@ class _FFmpegRecorder:
                 log.warning("Failed to send CTRL_BREAK: %s", e)
             # Wait for ffmpeg to finalize the file
             try:
-                proc.wait(timeout=8)
+                proc.wait(timeout=2)
                 log.info("Recording stopped, ffmpeg exited cleanly")
             except subprocess.TimeoutExpired:
-                log.warning("ffmpeg didn't exit in 8s — killing")
+                log.warning("ffmpeg didn't exit in 2s — killing")
                 proc.kill()
                 try:
                     proc.wait(timeout=3)
@@ -296,6 +296,7 @@ class ReplayRecorder:
         self._store = store
         self._recorder = _FFmpegRecorder()
         self._recording = False
+        self._stopping = False
         self._lock = threading.Lock()
         self._session_start: datetime | None = None
 
@@ -306,7 +307,7 @@ class ReplayRecorder:
     def start(self) -> bool:
         """Start recording. Returns True if recording began."""
         with self._lock:
-            if self._recording:
+            if self._recording or self._stopping:
                 return False
 
             if not self._recorder.is_available():
@@ -332,7 +333,13 @@ class ReplayRecorder:
                 return None
 
             self._recording = False
-            result_path = self._recorder.stop()
+            self._stopping = True
+
+        # Run stop outside the lock (it blocks waiting for ffmpeg)
+        result_path = self._recorder.stop()
+
+        with self._lock:
+            self._stopping = False
 
             # Enforce storage limit
             self._store.enforce_limit()
