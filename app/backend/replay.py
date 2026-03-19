@@ -145,22 +145,27 @@ class _FFmpegRecorder:
 
         proc = self._proc
         if proc:
-            # Close stdin first to unblock any pending write
+            # Terminate ffmpeg gracefully (CTRL_BREAK on Windows)
             try:
-                proc.stdin.close()
+                proc.terminate()
             except Exception:
                 pass
-            # Give ffmpeg a moment to flush, then kill it
+            # Wait for ffmpeg to finalize the file
             try:
-                proc.wait(timeout=3)
+                proc.wait(timeout=5)
+                log.info("Recording stopped, ffmpeg exited cleanly")
             except subprocess.TimeoutExpired:
-                log.warning("ffmpeg didn't exit in 3s — killing")
+                log.warning("ffmpeg didn't exit in 5s — killing")
                 proc.kill()
                 try:
                     proc.wait(timeout=3)
                 except Exception:
                     pass
-            log.info("Recording stopped, ffmpeg exited")
+            # Close stdin to unblock any stuck write in the recording thread
+            try:
+                proc.stdin.close()
+            except Exception:
+                pass
 
         if self._thread:
             self._thread.join(timeout=5)
