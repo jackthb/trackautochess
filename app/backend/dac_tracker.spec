@@ -103,6 +103,7 @@ a = Analysis(
         "mss",
         "mss.windows",
         "PIL",
+        "av",
         "ssl",
         "_ssl",
         "httpx",

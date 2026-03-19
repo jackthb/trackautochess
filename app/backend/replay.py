@@ -1,6 +1,6 @@
 """Game replay recording and local storage management.
 
-Records screen during active games by piping mss frames to ffmpeg (AV1/SVT-AV1).
+Records screen during active games using PyAV (libav bindings) with AV1/H.264.
 Manages local replay storage with configurable size limit and LRU eviction.
 
 Storage: ~/.dac/replays/
@@ -8,8 +8,6 @@ Config keys: replay_max_gb (default 15), replay_enabled (default true)
 """
 
 import logging
-import shutil
-import subprocess
 import threading
 import time
 from datetime import datetime
@@ -22,24 +20,6 @@ log = logging.getLogger("dac")
 REPLAY_DIR = DAC_DIR / "replays"
 DEFAULT_MAX_GB = 15
 FALLBACK_FPS = 5
-
-
-def _find_ffmpeg() -> str | None:
-    """Find ffmpeg executable — bundled or system."""
-    import sys
-
-    if getattr(sys, "frozen", False):
-        # PyInstaller bundle: check next to the exe
-        bundled = Path(sys._MEIPASS) / "ffmpeg" / "ffmpeg.exe"
-        if bundled.exists():
-            return str(bundled)
-
-    # System ffmpeg
-    path = shutil.which("ffmpeg")
-    if path:
-        return path
-
-    return None
 
 
 # ── Replay storage management ────────────────────────────────────────────────
@@ -98,13 +78,14 @@ class ReplayStore:
         ]
 
 
-# ── ffmpeg + mss recorder ───────────────────────────────────────────────────
+# ── PyAV screen recorder ────────────────────────────────────────────────────
 
 
-class _FFmpegRecorder:
-    """Record screen to MP4 using mss capture piped to ffmpeg (AV1).
+class _PyAVRecorder:
+    """Record screen to MP4 using mss capture + PyAV encoding.
 
-    Falls back to H.264 if SVT-AV1 is not available.
+    Tries AV1 (libsvtav1) first, falls back to H.264 (libx264).
+    Stop is instant — just container.close().
     """
 
     def __init__(self, fps: int = FALLBACK_FPS):
@@ -112,12 +93,16 @@ class _FFmpegRecorder:
         self._stop_event = threading.Event()
         self._thread: threading.Thread | None = None
         self._output_path: Path | None = None
-        self._ffmpeg_path: str | None = None
-        self._proc: subprocess.Popen | None = None
+        self._container = None
+        self._stream = None
 
     def is_available(self) -> bool:
-        self._ffmpeg_path = _find_ffmpeg()
-        return self._ffmpeg_path is not None
+        try:
+            import av
+            return True
+        except ImportError:
+            log.error("PyAV not installed — cannot record")
+            return False
 
     def start(self, output_path: Path) -> bool:
         """Start recording to the given path."""
@@ -125,16 +110,10 @@ class _FFmpegRecorder:
             log.warning("Recorder already running")
             return False
 
-        if not self._ffmpeg_path:
-            self._ffmpeg_path = _find_ffmpeg()
-        if not self._ffmpeg_path:
-            log.error("ffmpeg not found")
-            return False
-
         self._output_path = output_path
         self._stop_event.clear()
         self._thread = threading.Thread(
-            target=self._record_loop, daemon=True, name="ffmpeg-recorder"
+            target=self._record_loop, daemon=True, name="pyav-recorder"
         )
         self._thread.start()
         return True
@@ -142,72 +121,71 @@ class _FFmpegRecorder:
     def stop(self) -> Path | None:
         """Stop recording. Returns output file path."""
         self._stop_event.set()
-
-        proc = self._proc
-        if proc:
-            # Send CTRL_BREAK_EVENT for graceful ffmpeg shutdown (finalizes moov atom)
-            # Ref: https://github.com/kkroening/ffmpeg-python/issues/162
-            import signal
-            try:
-                proc.send_signal(signal.CTRL_BREAK_EVENT)
-                log.info("Sent CTRL_BREAK to ffmpeg")
-            except Exception as e:
-                log.warning("Failed to send CTRL_BREAK: %s", e)
-            # Wait for ffmpeg to finalize the file
-            try:
-                proc.wait(timeout=2)
-                log.info("Recording stopped, ffmpeg exited cleanly")
-            except subprocess.TimeoutExpired:
-                log.warning("ffmpeg didn't exit in 2s — killing")
-                proc.kill()
-                try:
-                    proc.wait(timeout=3)
-                except Exception:
-                    pass
-            # Close stdin to unblock any stuck write in the recording thread
-            try:
-                proc.stdin.close()
-            except Exception:
-                pass
-
         if self._thread:
-            self._thread.join(timeout=5)
+            self._thread.join(timeout=10)
         return self._output_path
 
+    def _pick_codec(self) -> str:
+        """Pick best available codec: AV1 first, H.264 fallback."""
+        import av
+
+        for codec_name in ["libsvtav1", "libx264"]:
+            try:
+                av.Codec(codec_name, "w")
+                log.info("Using codec: %s", codec_name)
+                return codec_name
+            except av.FFmpegError:
+                log.info("Codec %s not available, trying next", codec_name)
+        raise RuntimeError("No suitable video codec found")
+
     def _record_loop(self):
+        import av
         import mss
         import numpy as np
 
         frame_interval = 1.0 / self._fps
+        container = None
 
         try:
+            codec_name = self._pick_codec()
+
             with mss.mss() as sct:
                 monitor = sct.monitors[1]
                 w = monitor["width"]
                 h = monitor["height"]
 
-                # Try AV1 first, fall back to H.264
-                codec_args = self._build_ffmpeg_args(w, h)
-                if not codec_args:
-                    log.error("No working ffmpeg codec found")
-                    return
+                container = av.open(str(self._output_path), "w")
+                stream = container.add_stream(codec_name, rate=self._fps)
+                stream.width = w
+                stream.height = h
+                stream.pix_fmt = "yuv420p"
 
-                log.info(
-                    "Recording: %dx%d @ %d fps → %s",
-                    w, h, self._fps, self._output_path.name,
-                )
+                # Codec-specific options
+                if codec_name == "libsvtav1":
+                    stream.options = {"preset": "8", "crf": "38"}
+                elif codec_name == "libx264":
+                    stream.options = {"preset": "ultrafast", "crf": "28"}
 
+                self._container = container
+                self._stream = stream
+
+                log.info("Recording: %dx%d @ %d fps → %s", w, h, self._fps, self._output_path.name)
+
+                frame_idx = 0
                 while not self._stop_event.is_set():
                     t0 = time.monotonic()
 
                     shot = sct.grab(monitor)
-                    frame = np.array(shot)[:, :, :3]  # BGRA → BGR
+                    img = np.array(shot)[:, :, :3]  # BGRA → BGR
+                    # BGR → RGB for PyAV
+                    img = img[:, :, ::-1]
 
-                    try:
-                        self._proc.stdin.write(frame.tobytes())
-                    except (BrokenPipeError, OSError):
-                        log.warning("ffmpeg pipe broken, stopping")
-                        break
+                    frame = av.VideoFrame.from_ndarray(img, format="rgb24")
+                    frame.pts = frame_idx
+                    frame_idx += 1
+
+                    for packet in stream.encode(frame):
+                        container.mux(packet)
 
                     elapsed = time.monotonic() - t0
                     sleep_time = frame_interval - elapsed
@@ -217,74 +195,24 @@ class _FFmpegRecorder:
         except Exception as e:
             log.error("Recorder error: %s", e, exc_info=True)
         finally:
-            if self._proc:
+            if container:
                 try:
-                    self._proc.stdin.close()
-                except Exception:
-                    pass
-                try:
-                    self._proc.wait(timeout=5)
-                except subprocess.TimeoutExpired:
-                    log.warning("ffmpeg didn't exit in 5s — killing")
-                    self._proc.kill()
-                    self._proc.wait(timeout=3)
-                log.info("Recording stopped, ffmpeg exited")
-
-    def _build_ffmpeg_args(self, w: int, h: int) -> bool:
-        """Try to start ffmpeg with AV1, fall back to H.264."""
-        codec_options = [
-            # AV1 via SVT-AV1: fast preset, good quality, small files
-            ["-c:v", "libsvtav1", "-preset", "8", "-crf", "38"],
-            # H.264 fallback: ultrafast for real-time, reasonable quality
-            ["-c:v", "libx264", "-preset", "ultrafast", "-crf", "28"],
-        ]
-
-        base_args = [
-            self._ffmpeg_path,
-            "-y",
-            "-f", "rawvideo",
-            "-pix_fmt", "bgr24",
-            "-s", f"{w}x{h}",
-            "-r", str(self._fps),
-            "-i", "pipe:0",
-        ]
-
-        for codec in codec_options:
-            cmd = base_args + codec + [
-                "-pix_fmt", "yuv420p",
-                "-movflags", "+faststart",
-                str(self._output_path),
-            ]
-            try:
-                # CREATE_NEW_PROCESS_GROUP lets us send CTRL_BREAK_EVENT for graceful stop
-                flags = getattr(subprocess, "CREATE_NO_WINDOW", 0) | getattr(subprocess, "CREATE_NEW_PROCESS_GROUP", 0)
-                self._proc = subprocess.Popen(
-                    cmd,
-                    stdin=subprocess.PIPE,
-                    stdout=subprocess.DEVNULL,
-                    stderr=subprocess.PIPE,
-                    creationflags=flags,
-                )
-                # Give it a moment to fail if codec is missing
-                time.sleep(0.3)
-                if self._proc.poll() is None:
-                    codec_name = codec[1]
-                    log.info("Using codec: %s", codec_name)
-                    return True
-                else:
-                    stderr = self._proc.stderr.read().decode(errors="replace")
-                    log.warning("Codec %s failed: %s", codec[1], stderr[:200])
-            except Exception as e:
-                log.warning("Failed to start ffmpeg with %s: %s", codec[1], e)
-
-        return False
+                    # Flush encoder
+                    for packet in stream.encode(None):
+                        container.mux(packet)
+                    container.close()
+                    log.info("Recording stopped, file finalized")
+                except Exception as e:
+                    log.warning("Error closing container: %s", e)
+            self._container = None
+            self._stream = None
 
 
 # ── Main replay recorder ────────────────────────────────────────────────────
 
 
 class ReplayRecorder:
-    """High-level replay recorder using ffmpeg.
+    """High-level replay recorder using PyAV.
 
     Usage:
         recorder = ReplayRecorder(store)
@@ -294,7 +222,7 @@ class ReplayRecorder:
 
     def __init__(self, store: ReplayStore):
         self._store = store
-        self._recorder = _FFmpegRecorder()
+        self._recorder = _PyAVRecorder()
         self._recording = False
         self._stopping = False
         self._lock = threading.Lock()
@@ -311,7 +239,6 @@ class ReplayRecorder:
                 return False
 
             if not self._recorder.is_available():
-                log.error("Replay: ffmpeg not found — cannot record")
                 return False
 
             self._session_start = datetime.now()
@@ -335,7 +262,7 @@ class ReplayRecorder:
             self._recording = False
             self._stopping = True
 
-        # Run stop outside the lock (it blocks waiting for ffmpeg)
+        # Run stop outside the lock (waits for thread to finish)
         result_path = self._recorder.stop()
 
         with self._lock:
