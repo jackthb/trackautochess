@@ -1,5 +1,5 @@
 import { useState } from "react";
-import type { Replay, ReplayStats } from "../types";
+import type { Replay, ReplayStats, RecordingStats } from "../types";
 import { formatSize, formatDate } from "../lib/game-utils";
 
 interface ReplaysTabProps {
@@ -7,12 +7,22 @@ interface ReplaysTabProps {
   stats: ReplayStats;
   loading: boolean;
   refresh: () => Promise<void>;
+  recording: boolean;
+  recordingStats: RecordingStats | null;
+}
+
+function formatElapsed(seconds: number): string {
+  const m = Math.floor(seconds / 60);
+  const s = Math.floor(seconds % 60);
+  return `${m}:${s.toString().padStart(2, "0")}`;
 }
 
 export function ReplaysTab({
   replays,
   stats,
   refresh,
+  recording,
+  recordingStats,
 }: ReplaysTabProps) {
   const [currentReplay, setCurrentReplay] = useState<string | null>(null);
   const [pendingDelete, setPendingDelete] = useState<string | null>(null);
@@ -63,8 +73,38 @@ export function ReplaysTab({
               Refresh
             </button>
           </div>
+          {recording && (
+            <div style={{
+              padding: "10px 14px",
+              margin: "0 0 8px 0",
+              background: "rgba(229, 62, 62, 0.12)",
+              border: "1px solid rgba(229, 62, 62, 0.3)",
+              borderRadius: "6px",
+              display: "flex",
+              alignItems: "center",
+              gap: "10px",
+            }}>
+              <div style={{
+                width: 8,
+                height: 8,
+                borderRadius: "50%",
+                background: "#e53e3e",
+                animation: "pulse 1.5s ease-in-out infinite",
+              }} />
+              <div style={{ flex: 1 }}>
+                <div style={{ color: "#e53e3e", fontWeight: 600, fontSize: "12px" }}>
+                  Recording in progress
+                </div>
+                {recordingStats && (
+                  <div style={{ color: "var(--text-muted)", fontSize: "11px", marginTop: 2 }}>
+                    {formatElapsed(recordingStats.elapsed)} &middot; {recordingStats.size_mb} MB &middot; {recordingStats.frames} frames
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
           <div className="replay-list">
-            {replays.length === 0 ? (
+            {replays.length === 0 && !recording ? (
               <div className="empty-state" style={{ paddingTop: 60 }}>
                 <div className="empty-state-desc">
                   No replays yet. Play a game with the tracker running to record

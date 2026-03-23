@@ -979,7 +979,7 @@ def _load_synergy_tiers() -> dict[str, list[int]]:
     if not syn_path.exists():
         return {}
     import json
-    raw = json.loads(syn_path.read_text())
+    raw = json.loads(syn_path.read_text(encoding="utf-8"))
     return {v["name"]: sorted(v["tiers"]) for v in raw.values() if v.get("tiers")}
 
 
@@ -1255,7 +1255,7 @@ def _load_syn_tiers() -> dict[str, list[int]]:
     syn_path = data_dir / "synergies.json"
     if not syn_path.exists():
         return {}
-    data = _json.loads(syn_path.read_text())
+    data = _json.loads(syn_path.read_text(encoding="utf-8"))
     # Map JSON key (e.g. "is_aqir") to icon stem (e.g. "aqir")
     stem_map = {
         "demon hunter": "demonhunter",
@@ -1841,7 +1841,7 @@ def parse_my_matches(
         units_path = data_dir / "units.json"
         if units_path.exists():
             import json
-            units_data = json.loads(units_path.read_text())["units"]
+            units_data = json.loads(units_path.read_text(encoding="utf-8"))["units"]
         else:
             units_data = {}
 

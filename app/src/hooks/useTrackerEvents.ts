@@ -1,10 +1,13 @@
 import { useEffect, useRef, useState, useCallback } from "react";
-import type { TrackerEvent, TrackerStatus, ParseResult } from "../types";
+import type { TrackerEvent, TrackerStatus, ParseResult, LogEntry } from "../types";
+
+const MAX_LOG_ENTRIES = 500;
 
 interface TrackerState {
   status: TrackerStatus | null;
   pendingParseResult: ParseResult | null;
   clearParseResult: () => void;
+  logEntries: LogEntry[];
 }
 
 export function useTrackerEvents(
@@ -14,6 +17,7 @@ export function useTrackerEvents(
   const [status, setStatus] = useState<TrackerStatus | null>(null);
   const [pendingParseResult, setPendingParseResult] =
     useState<ParseResult | null>(null);
+  const [logEntries, setLogEntries] = useState<LogEntry[]>([]);
   const registered = useRef(false);
   const callbacksRef = useRef({ onImportResult, onReplaySaved });
   callbacksRef.current = { onImportResult, onReplaySaved };
@@ -24,6 +28,12 @@ export function useTrackerEvents(
 
     window.tracker.onEvent((msg: TrackerEvent) => {
       switch (msg.type) {
+        case "log":
+          setLogEntries((prev) => {
+            const next = [...prev, msg];
+            return next.length > MAX_LOG_ENTRIES ? next.slice(-MAX_LOG_ENTRIES) : next;
+          });
+          break;
         case "status":
           setStatus(msg);
           break;
@@ -62,5 +72,5 @@ export function useTrackerEvents(
     setPendingParseResult(null);
   }, []);
 
-  return { status, pendingParseResult, clearParseResult };
+  return { status, pendingParseResult, clearParseResult, logEntries };
 }

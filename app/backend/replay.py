@@ -81,11 +81,56 @@ class ReplayStore:
 # ── PyAV screen recorder ────────────────────────────────────────────────────
 
 
+def _find_dota_window() -> dict | None:
+    """Find the Dota 2 window rect. Returns mss-compatible monitor dict or None."""
+    try:
+        import ctypes
+        from ctypes import wintypes
+
+        EnumWindows = ctypes.windll.user32.EnumWindows
+        GetWindowTextW = ctypes.windll.user32.GetWindowTextW
+        GetWindowRect = ctypes.windll.user32.GetWindowRect
+        IsWindowVisible = ctypes.windll.user32.IsWindowVisible
+
+        WNDENUMPROC = ctypes.WINFUNCTYPE(ctypes.c_bool, ctypes.POINTER(ctypes.c_int), ctypes.POINTER(ctypes.c_int))
+        result = []
+
+        def callback(hwnd, _):
+            if IsWindowVisible(hwnd):
+                buf = ctypes.create_unicode_buffer(256)
+                GetWindowTextW(hwnd, buf, 256)
+                title = buf.value
+                if title and "dota 2" in title.lower():
+                    rect = wintypes.RECT()
+                    GetWindowRect(hwnd, ctypes.byref(rect))
+                    w = rect.right - rect.left
+                    h = rect.bottom - rect.top
+                    if w > 100 and h > 100:
+                        result.append({
+                            "left": rect.left,
+                            "top": rect.top,
+                            "width": w,
+                            "height": h,
+                        })
+            return True
+
+        EnumWindows(WNDENUMPROC(callback), 0)
+        if result:
+            log.info("Found Dota 2 window: %dx%d at (%d,%d)",
+                     result[0]["width"], result[0]["height"],
+                     result[0]["left"], result[0]["top"])
+            return result[0]
+    except Exception as e:
+        log.warning("Could not find Dota window: %s", e)
+    return None
+
+
 class _PyAVRecorder:
     """Record screen to MP4 using mss capture + PyAV encoding.
 
     Tries AV1 (libsvtav1) first, falls back to H.264 (libx264).
     Stop is instant — just container.close().
+    Captures the Dota 2 window if found, otherwise falls back to full screen.
     """
 
     def __init__(self, fps: int = FALLBACK_FPS):
@@ -95,6 +140,8 @@ class _PyAVRecorder:
         self._output_path: Path | None = None
         self._container = None
         self._stream = None
+        self._frame_count = 0
+        self._start_time: float | None = None
 
     def is_available(self) -> bool:
         try:
@@ -104,6 +151,20 @@ class _PyAVRecorder:
             log.error("PyAV not installed — cannot record")
             return False
 
+    @property
+    def stats(self) -> dict:
+        """Return current recording stats."""
+        if not self._start_time:
+            return {"elapsed": 0, "frames": 0, "size_mb": 0}
+        elapsed = time.monotonic() - self._start_time
+        size_mb = 0
+        if self._output_path and self._output_path.exists():
+            try:
+                size_mb = self._output_path.stat().st_size / (1024 * 1024)
+            except OSError:
+                pass
+        return {"elapsed": elapsed, "frames": self._frame_count, "size_mb": round(size_mb, 1)}
+
     def start(self, output_path: Path) -> bool:
         """Start recording to the given path."""
         if self._thread and self._thread.is_alive():
@@ -112,6 +173,8 @@ class _PyAVRecorder:
 
         self._output_path = output_path
         self._stop_event.clear()
+        self._frame_count = 0
+        self._start_time = time.monotonic()
         self._thread = threading.Thread(
             target=self._record_loop, daemon=True, name="pyav-recorder"
         )
@@ -150,9 +213,20 @@ class _PyAVRecorder:
             codec_name = self._pick_codec()
 
             with mss.mss() as sct:
-                monitor = sct.monitors[1]
+                # Try to capture just the Dota 2 window
+                dota_rect = _find_dota_window()
+                if dota_rect:
+                    monitor = dota_rect
+                    log.info("Recording Dota 2 window: %dx%d", monitor["width"], monitor["height"])
+                else:
+                    monitor = sct.monitors[1]
+                    log.info("Dota 2 window not found — recording full screen")
+
                 w = monitor["width"]
                 h = monitor["height"]
+                # Ensure even dimensions (required by most codecs)
+                w = w - (w % 2)
+                h = h - (h % 2)
 
                 container = av.open(str(self._output_path), "w")
                 stream = container.add_stream(codec_name, rate=self._fps)
@@ -177,12 +251,15 @@ class _PyAVRecorder:
 
                     shot = sct.grab(monitor)
                     img = np.array(shot)[:, :, :3]  # BGRA → BGR
+                    # Crop to even dimensions if needed
+                    img = img[:h, :w]
                     # BGR → RGB for PyAV
                     img = img[:, :, ::-1]
 
                     frame = av.VideoFrame.from_ndarray(img, format="rgb24")
                     frame.pts = frame_idx
                     frame_idx += 1
+                    self._frame_count = frame_idx
 
                     for packet in stream.encode(frame):
                         container.mux(packet)
@@ -231,6 +308,10 @@ class ReplayRecorder:
     @property
     def recording(self) -> bool:
         return self._recording
+
+    @property
+    def recorder_stats(self) -> dict:
+        return self._recorder.stats
 
     def start(self) -> bool:
         """Start recording. Returns True if recording began."""

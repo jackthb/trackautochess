@@ -45,6 +45,12 @@ export interface ParseResult {
   screenshot_b64?: string;
 }
 
+export interface RecordingStats {
+  elapsed: number;
+  frames: number;
+  size_mb: number;
+}
+
 export interface TrackerStatus {
   type: "status";
   recording: boolean;
@@ -54,11 +60,20 @@ export interface TrackerStatus {
   steam_id: string;
   steam_name: string;
   replay_enabled: boolean;
+  recording_stats: RecordingStats | null;
+}
+
+export interface LogEntry {
+  type: "log";
+  ts: number;
+  level: string;
+  msg: string;
 }
 
 export type TrackerEvent =
   | ParseResult
   | TrackerStatus
+  | LogEntry
   | { type: "import_result" }
   | { type: "focus_gained" }
   | { type: "focus_lost" }

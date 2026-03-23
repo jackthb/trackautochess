@@ -6,12 +6,13 @@ import { HistoryTab } from "./components/HistoryTab";
 import { ReplaysTab } from "./components/ReplaysTab";
 import { ConfirmationTab } from "./components/ConfirmationTab";
 import { SettingsTab } from "./components/SettingsTab";
+import { LogTab } from "./components/LogTab";
 import { useTrackerEvents } from "./hooks/useTrackerEvents";
 import { useGames } from "./hooks/useGames";
 import { useReplays } from "./hooks/useReplays";
 import "./styles/app.css";
 
-type TabId = "history" | "replays" | "confirm" | "settings";
+type TabId = "history" | "replays" | "confirm" | "settings" | "log";
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<TabId>("history");
@@ -49,7 +50,13 @@ export default function App() {
       />
       <div style={{ flex: 1, overflow: "hidden", display: "flex" }}>
         {activeTab === "history" && <HistoryTab {...gamesState} />}
-        {activeTab === "replays" && <ReplaysTab {...replaysState} />}
+        {activeTab === "replays" && (
+          <ReplaysTab
+            {...replaysState}
+            recording={tracker.status?.recording ?? false}
+            recordingStats={tracker.status?.recording_stats ?? null}
+          />
+        )}
         {activeTab === "confirm" && (
           <ConfirmationTab
             parseResult={tracker.pendingParseResult}
@@ -62,6 +69,7 @@ export default function App() {
             replayStats={replaysState.stats}
           />
         )}
+        {activeTab === "log" && <LogTab entries={tracker.logEntries} />}
       </div>
       <StatusBar status={tracker.status} />
     </>

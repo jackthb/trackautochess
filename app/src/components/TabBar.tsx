@@ -9,6 +9,7 @@ const TABS = [
   { id: "replays", label: "Replays" },
   { id: "confirm", label: "Confirmation" },
   { id: "settings", label: "Settings" },
+  { id: "log", label: "Log" },
 ];
 
 export function TabBar({ active, onChange, showConfirmBadge }: TabBarProps) {

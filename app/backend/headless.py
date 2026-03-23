@@ -47,6 +47,30 @@ log.addHandler(_fh)
 # NO StreamHandler — stdout is for JSON only
 
 
+class _JsonLogHandler(logging.Handler):
+    """Emit log records as JSON events on stdout for the Electron renderer."""
+
+    def emit(self, record):
+        try:
+            entry = {
+                "type": "log",
+                "ts": record.created,
+                "level": record.levelname,
+                "msg": self.format(record),
+            }
+            line = json.dumps(entry, ensure_ascii=False)
+            sys.stdout.buffer.write(line.encode("utf-8") + b"\n")
+            sys.stdout.buffer.flush()
+        except Exception:
+            pass
+
+
+_jh = _JsonLogHandler()
+_jh.setLevel(logging.DEBUG)
+_jh.setFormatter(logging.Formatter("%(message)s"))
+log.addHandler(_jh)
+
+
 class HeadlessBackend:
     """Headless backend that communicates via JSON lines over stdin/stdout."""
 
@@ -59,6 +83,8 @@ class HeadlessBackend:
         self._pending_rows = None
         self._pending_timestamps = None
         self._pending_img = None
+        self._pending_screenshot_path = None
+        self._status_timer = None
 
         # Ensure user exists in DB if already logged in
         sid = self.config.get("steam_id")
@@ -89,6 +115,12 @@ class HeadlessBackend:
         recording = bool(self._replay_recorder and self._replay_recorder.recording)
         focused = self._game_focused
         logged_in = bool(self.config.get("steam_id"))
+        rec_stats = None
+        if recording and self._replay_recorder:
+            try:
+                rec_stats = self._replay_recorder.recorder_stats
+            except Exception:
+                pass
         self._emit({
             "type": "status",
             "recording": recording,
@@ -98,6 +130,7 @@ class HeadlessBackend:
             "steam_id": self.config.get("steam_id", ""),
             "steam_name": self.config.get("steam_name", ""),
             "replay_enabled": self.config.get("replay_enabled", True),
+            "recording_stats": rec_stats,
         })
 
     # ── Replay recording ────────────────────────────────────────────────────
@@ -134,9 +167,29 @@ class HeadlessBackend:
                 self._emit({"type": "replay_started"})
                 self._emit_notification(APP_NAME, "Recording started")
                 self._emit_status()
+                self._start_status_timer()
+
+    def _start_status_timer(self) -> None:
+        """Emit status every 2s while recording so the UI shows live stats."""
+        self._stop_status_timer()
+        def tick():
+            if self._replay_recorder and self._replay_recorder.recording:
+                self._emit_status()
+                self._status_timer = threading.Timer(2.0, tick)
+                self._status_timer.daemon = True
+                self._status_timer.start()
+        self._status_timer = threading.Timer(2.0, tick)
+        self._status_timer.daemon = True
+        self._status_timer.start()
+
+    def _stop_status_timer(self) -> None:
+        if self._status_timer:
+            self._status_timer.cancel()
+            self._status_timer = None
 
     def _stop_recording(self) -> None:
         """Stop replay recording (runs in background thread)."""
+        self._stop_status_timer()
         path = self._replay_recorder.stop()
         if path and path.exists():
             size_mb = path.stat().st_size / (1024 * 1024)
@@ -188,6 +241,7 @@ class HeadlessBackend:
                 log.info("Auto-started replay recording")
                 self._emit({"type": "replay_started"})
                 self._emit_notification(APP_NAME, "Game started — recording replay")
+                self._start_status_timer()
 
     def _on_game_end(self) -> None:
         """Final Ranking detected — stop recording and prompt capture."""
@@ -202,6 +256,17 @@ class HeadlessBackend:
 
     # ── Capture + Parse ─────────────────────────────────────────────────────
 
+    def _save_screenshot_local(self, img) -> str:
+        """Save screenshot to ~/.dac/screenshots/. Returns the file path."""
+        import cv2
+        ss_dir = DAC_DIR / "screenshots"
+        ss_dir.mkdir(parents=True, exist_ok=True)
+        ts = datetime.now().strftime("%Y%m%d_%H%M%S")
+        path = ss_dir / f"{ts}.png"
+        cv2.imwrite(str(path), img)
+        log.info("Screenshot saved locally: %s", path)
+        return str(path)
+
     def _do_capture(self) -> None:
         """Screenshot + detect + parse, emitting results."""
         import capture
@@ -214,12 +279,15 @@ class HeadlessBackend:
                 self._emit_notification(APP_NAME, "Screenshot capture failed.")
                 return
 
+            # Always save locally first
+            local_path = self._save_screenshot_local(img)
+
             screen_type = detect_screen_type(img)
             log.info("Capture: detected screen type '%s'", screen_type)
 
             if screen_type == "my_matches":
                 self._emit_notification(APP_NAME, "My Matches detected — parsing...")
-                self._do_parse_my_matches(img)
+                self._do_parse_my_matches(img, screenshot_path=local_path)
             else:
                 hotkey = self.config.get("hotkey", "F6")
                 self._emit_notification(
@@ -231,7 +299,7 @@ class HeadlessBackend:
             log.error("capture error: %s", e, exc_info=True)
             self._emit_error(f"Capture error: {e}")
 
-    def _do_parse_my_matches(self, img) -> None:
+    def _do_parse_my_matches(self, img, screenshot_path: str = "") -> None:
         """Parse a My Matches screen image and emit parse_result."""
         import cv2
         from cv_parser import parse_my_matches, infer_timestamps
@@ -258,6 +326,7 @@ class HeadlessBackend:
             self._pending_rows = rows
             self._pending_timestamps = timestamps
             self._pending_img = img
+            self._pending_screenshot_path = screenshot_path
 
             # Encode screenshot as base64 JPEG for renderer preview
             screenshot_b64 = ""
@@ -312,6 +381,9 @@ class HeadlessBackend:
                     screenshot_url = upload_screenshot(img, user_id) or ""
                 except ImportError:
                     screenshot_url = ""
+            # Fall back to local path if upload failed or no user
+            if not screenshot_url and self._pending_screenshot_path:
+                screenshot_url = self._pending_screenshot_path
 
             imported = 0
             skipped = 0
@@ -373,11 +445,13 @@ class HeadlessBackend:
             self._pending_rows = None
             self._pending_timestamps = None
             self._pending_img = None
+            self._pending_screenshot_path = None
 
     def _do_cancel_confirm(self) -> None:
         self._pending_rows = None
         self._pending_timestamps = None
         self._pending_img = None
+        self._pending_screenshot_path = None
         log.info("Confirmation cancelled")
 
     # ── Import file ─────────────────────────────────────────────────────────

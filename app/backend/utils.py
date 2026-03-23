@@ -45,7 +45,7 @@ def load_config(interactive: bool = False) -> dict:
     Otherwise creates defaults silently.
     """
     if CONFIG_PATH.exists():
-        return json.loads(CONFIG_PATH.read_text())
+        return json.loads(CONFIG_PATH.read_text(encoding="utf-8"))
 
     DAC_DIR.mkdir(parents=True, exist_ok=True)
     config = dict(DEFAULT_CONFIG)
