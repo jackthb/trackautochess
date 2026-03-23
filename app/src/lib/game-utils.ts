@@ -67,6 +67,16 @@ function capitalize(s: string): string {
   return s.replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
+// Map CV parser stem names to display names
+// The CV parser outputs icon stems (demonhunter, nraqi, pandaman, element)
+// but the UI needs the display names from synergies.json
+const SYNERGY_STEM_TO_NAME: Record<string, string> = {
+  demonhunter: "Demon Hunter",
+  nraqi: "Faceless",
+  pandaman: "Pandaren",
+  element: "Elemental",
+};
+
 export function parseSynergies(
   syn: string | null
 ): { name: string; count: number }[] {
@@ -75,8 +85,9 @@ export function parseSynergies(
     .split("|")
     .filter(Boolean)
     .map((entry) => {
-      const [name, count] = entry.split(":");
-      return { name: capitalize(name), count: parseInt(count) || 0 };
+      const [raw, count] = entry.split(":");
+      const name = SYNERGY_STEM_TO_NAME[raw.toLowerCase()] || capitalize(raw);
+      return { name, count: parseInt(count) || 0 };
     })
     .filter((s) => s.count > 0)
     .sort((a, b) => b.count - a.count);

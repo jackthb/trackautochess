@@ -57,11 +57,20 @@
   "win": {
     "target": [
       {
-        "target": "dir",
+        "target": "nsis",
         "arch": ["x64"]
       }
     ],
     "icon": "../data/icons/dac_tracker.ico"
+  },
+  "nsis": {
+    "oneClick": true,
+    "perMachine": false,
+    "allowToChangeInstallationDirectory": false,
+    "deleteAppDataOnUninstall": false,
+    "createDesktopShortcut": true,
+    "installerIcon": "../data/icons/dac_tracker.ico",
+    "uninstallerIcon": "../data/icons/dac_tracker.ico"
   },
   "publish": {
     "provider": "github",

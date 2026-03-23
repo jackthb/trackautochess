@@ -356,6 +356,17 @@ def main():
             if not ss_time:
                 print(f"  WARNING: can't derive timestamp from {filepath.name}, skipping push")
                 continue
+
+            # Upload screenshot once per file
+            screenshot_url = ""
+            try:
+                img_for_upload = cv2.imread(str(filepath))
+                if img_for_upload is not None:
+                    from db import upload_screenshot
+                    screenshot_url = upload_screenshot(img_for_upload, str(user_id)) or ""
+            except Exception as e:
+                print(f"  WARNING: screenshot upload failed: {e}")
+
             imported = 0
             for row_i, rd in enumerate(parsed_rows):
                 # Row 0 is most recent — offset each row by 1 hour
@@ -376,6 +387,7 @@ def main():
                     relic=rd.get("relic", ""),
                     level=level,
                     wl=wl,
+                    screenshot=screenshot_url,
                     notes="",
                 )
                 push_game(game_row, user_id=str(user_id))
