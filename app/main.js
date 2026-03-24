@@ -683,3 +683,10 @@ ipcMain.handle("replays:openFolder", async () => {
   const { shell } = require("electron");
   shell.openPath(REPLAY_DIR);
 });
+
+ipcMain.handle("replays:exists", async (_event, filename) => {
+  if (!filename) return false;
+  const filePath = path.join(REPLAY_DIR, filename);
+  if (!filePath.startsWith(REPLAY_DIR)) return false;
+  return fs.existsSync(filePath);
+});

@@ -140,5 +140,5 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     type: "magiclink",
   }).toString();
 
-  res.redirect(`${siteUrl}/#${hash}`);
+  res.redirect(`${siteUrl}/dashboard#${hash}`);
 }

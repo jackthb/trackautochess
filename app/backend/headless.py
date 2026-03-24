@@ -84,6 +84,7 @@ class HeadlessBackend:
         self._pending_timestamps = None
         self._pending_img = None
         self._pending_screenshot_path = None
+        self._last_replay_filename = None
         self._status_timer = None
 
         # Ensure user exists in DB if already logged in
@@ -193,9 +194,11 @@ class HeadlessBackend:
         path = self._replay_recorder.stop()
         if path and path.exists():
             size_mb = path.stat().st_size / (1024 * 1024)
+            self._last_replay_filename = path.name
             self._emit({"type": "replay_saved", "name": path.name, "size_mb": round(size_mb, 1)})
             self._emit_notification(APP_NAME, f"Replay saved: {path.name} ({size_mb:.0f} MB)")
         else:
+            self._last_replay_filename = None
             self._emit({"type": "replay_saved", "name": "", "size_mb": 0})
         log.info("Replay: recording stopped (manual)")
         self._emit_status()
@@ -428,6 +431,7 @@ class HeadlessBackend:
                     wl=wl,
                     screenshot=screenshot_url,
                     notes="",
+                    replay=self._last_replay_filename or "",
                 )
                 push_game(game_row, user_id=user_id)
                 imported += 1
@@ -446,6 +450,7 @@ class HeadlessBackend:
             self._pending_timestamps = None
             self._pending_img = None
             self._pending_screenshot_path = None
+            self._last_replay_filename = None
 
     def _do_cancel_confirm(self) -> None:
         self._pending_rows = None

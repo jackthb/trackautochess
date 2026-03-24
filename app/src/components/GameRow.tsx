@@ -359,6 +359,8 @@ export function GameRow({
   const [saving, setSaving] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [lightbox, setLightbox] = useState(false);
+  const [replayExists, setReplayExists] = useState(false);
+  const [showReplay, setShowReplay] = useState(false);
 
   // Structured edit state — units have stars, synergies have counts
   const [editPlacement, setEditPlacement] = useState(game.placement || "");
@@ -382,6 +384,13 @@ export function GameRow({
   const syns = parseSynergies(game.synergies);
   const relics = parseRelics(game.relic);
   const pColor = placementColor(p);
+
+  // Check if linked replay file exists locally
+  useEffect(() => {
+    if (game.replay) {
+      window.replays.exists(game.replay).then(setReplayExists);
+    }
+  }, [game.replay]);
 
   // Screenshot is already a full URL from Supabase
   const screenshotUrl = game.screenshot || null;
@@ -608,11 +617,39 @@ export function GameRow({
           ) : (
             "\u2014"
           )}
+          {replayExists && (
+            <button
+              className="btn-play-replay"
+              title="Watch replay"
+              onClick={(e) => {
+                e.stopPropagation();
+                setShowReplay(true);
+                setExpanded(true);
+              }}
+            >
+              &#9654;
+            </button>
+          )}
         </div>
       </div>
 
       {expanded && (
         <div className="game-edit-panel" onClick={(e) => e.stopPropagation()}>
+          {showReplay && replayExists && game.replay && (
+            <div className="replay-player-inline">
+              <video
+                controls
+                autoPlay
+                src={`replay://video/${encodeURIComponent(game.replay)}`}
+              />
+              <button
+                className="btn-replay-hide"
+                onClick={() => setShowReplay(false)}
+              >
+                Hide replay
+              </button>
+            </div>
+          )}
           <div className="edit-panel-body">
             {screenshotUrl && (
               <div className="edit-screenshot-col">

@@ -998,6 +998,47 @@ video {
   color: var(--text-primary);
 }
 
+/* Replay play button in date cell */
+.btn-play-replay {
+  background: none;
+  border: none;
+  color: var(--accent);
+  cursor: pointer;
+  font-size: 11px;
+  padding: 2px 4px;
+  opacity: 0.6;
+  transition: opacity 0.15s;
+}
+.btn-play-replay:hover { opacity: 1; }
+
+/* Inline replay player in edit panel */
+.replay-player-inline {
+  padding: 0 0 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.replay-player-inline video {
+  width: 100%;
+  max-height: 400px;
+  border-radius: 6px;
+  background: #000;
+}
+.btn-replay-hide {
+  align-self: flex-start;
+  background: none;
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  padding: 4px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+}
+.btn-replay-hide:hover {
+  color: var(--text-primary);
+  border-color: var(--text-muted);
+}
+
 .edit-fields-grid {
   flex: 1;
   display: flex;

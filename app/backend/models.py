@@ -24,3 +24,4 @@ class GameRow:
     wl: str              # win-loss record e.g. "21-17" (nullable)
     screenshot: str = "" # public URL of the source screenshot (nullable)
     notes: str = ""      # free-form notes
+    replay: str = ""     # replay filename e.g. "20260324_193500.mp4"

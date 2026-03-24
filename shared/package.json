@@ -1,0 +1,7 @@
+{
+  "name": "@dac/shared",
+  "version": "0.0.1",
+  "private": true,
+  "main": "game-utils.ts",
+  "types": "game-utils.ts"
+}

@@ -5,6 +5,7 @@ contextBridge.exposeInMainWorld("replays", {
   delete: (filename) => ipcRenderer.invoke("replays:delete", filename),
   stats: () => ipcRenderer.invoke("replays:stats"),
   openFolder: () => ipcRenderer.invoke("replays:openFolder"),
+  exists: (filename) => ipcRenderer.invoke("replays:exists", filename),
 });
 
 contextBridge.exposeInMainWorld("tracker", {

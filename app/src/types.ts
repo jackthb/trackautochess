@@ -10,6 +10,7 @@ export interface Game {
   level: string | null;
   wl: string | null;
   screenshot: string | null;
+  replay: string | null;
   user_id: string;
   created_at: string;
 }
@@ -134,6 +135,7 @@ declare global {
       delete: (filename: string) => Promise<boolean>;
       stats: () => Promise<ReplayStats>;
       openFolder: () => Promise<void>;
+      exists: (filename: string) => Promise<boolean>;
     };
     tracker: {
       sendCommand: (cmd: Record<string, unknown>) => void;

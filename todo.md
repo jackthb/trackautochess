@@ -5,7 +5,6 @@
 - [ ] **Round-start sentinel untested** — template bundled in PyInstaller spec, region configured. Needs a live game to verify detection.
 
 ## Next Up
-- [ ] Link replays to game rows — add `replay` text column to `games` table in Supabase, store filename on game end. UI shows play button if local file exists.
 - [ ] Sentinel should poll while Dota process is running, not just when focused — so recordings work when alt-tabbed.
 
 ## In Progress
