@@ -17,3 +17,11 @@ runs/
 data/screenshots/
 *.pt
 ffmpeg/
+app/backend/build/
+app/backend/dist/
+app/dist/
+app/release/
+tesseract-portable/
+tracker/build/
+tracker/dist/
+.venv/
