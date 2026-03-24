@@ -1,4 +1,4 @@
-scraper/node_modules/
+node_modules/
 analyzer/.venv/
 analyzer/**/__pycache__/
 analyzer/**/*.pyc
