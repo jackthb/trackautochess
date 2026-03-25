@@ -40,6 +40,8 @@ let widgetWindow = null;
 let pythonProcess = null;
 let pythonRL = null;
 let overlayTimeout = null;
+let dotaPollInterval = null;
+let dotaOpen = false;
 let trackerStatus = {
   recording: false,
   focused: false,
@@ -275,6 +277,37 @@ ipcMain.on("overlay:dismiss", () => {
   dismissOverlay();
 });
 
+// ── Dota 2 process detection ─────────────────────────────────────────────────
+
+function startDotaPoller() {
+  const { execFile } = require("child_process");
+
+  function checkDota() {
+    // tasklist is fast with /FI filter — only matches dota2.exe
+    execFile(
+      "tasklist",
+      ["/FI", "IMAGENAME eq dota2.exe", "/NH", "/FO", "CSV"],
+      { windowsHide: true },
+      (err, stdout) => {
+        const isOpen = !err && stdout.toLowerCase().includes("dota2.exe");
+        if (isOpen !== dotaOpen) {
+          dotaOpen = isOpen;
+          if (widgetWindow && !widgetWindow.isDestroyed()) {
+            if (dotaOpen) {
+              widgetWindow.show();
+            } else {
+              widgetWindow.hide();
+            }
+          }
+        }
+      }
+    );
+  }
+
+  checkDota();
+  dotaPollInterval = setInterval(checkDota, 3000);
+}
+
 // ── Widget window (Discord-style floating controls) ─────────────────────────
 
 function createWidget() {
@@ -286,7 +319,7 @@ function createWidget() {
     height: 44,
     x: screenW - 140,
     y: 20,
-    show: true,
+    show: false,
     frame: false,
     transparent: true,
     alwaysOnTop: true,
@@ -639,6 +672,7 @@ app.whenReady().then(() => {
 
   createWindow();
   createWidget();
+  startDotaPoller();
   registerShortcuts();
   startPython();
 
@@ -651,6 +685,7 @@ app.whenReady().then(() => {
 
 app.on("will-quit", () => {
   globalShortcut.unregisterAll();
+  if (dotaPollInterval) clearInterval(dotaPollInterval);
 
   // Shut down Python
   if (pythonProcess) {
