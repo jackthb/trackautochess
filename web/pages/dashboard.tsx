@@ -93,15 +93,65 @@ export default function Dashboard({ supabase }: DashboardProps) {
     const steamId = user.user_metadata?.steam_id;
     if (!steamId) return;
 
+    const cacheKey = `dac_games_${steamId}`;
+
+    // Load cached games immediately
+    try {
+      const cached = localStorage.getItem(cacheKey);
+      if (cached) {
+        const { games: cachedGames } = JSON.parse(cached);
+        if (cachedGames?.length) setGames(cachedGames);
+      }
+    } catch {}
+
+    // Check if data changed: count + latest played_at
     setGamesLoading(true);
     supabase
       .from("games")
-      .select("*")
+      .select("id, played_at")
       .eq("user_id", steamId)
       .order("played_at", { ascending: false })
-      .then(({ data }) => {
-        setGames((data as Game[]) || []);
+      .limit(1)
+      .then(async ({ data: latest }) => {
+        const cachedRaw = localStorage.getItem(cacheKey);
+        if (cachedRaw) {
+          try {
+            const { count, newest } = JSON.parse(cachedRaw);
+            const serverNewest = latest?.[0]?.played_at ?? null;
+            // Also do a count check
+            const { count: serverCount } = await supabase
+              .from("games")
+              .select("*", { count: "exact", head: true })
+              .eq("user_id", steamId);
+            if (count === serverCount && newest === serverNewest) {
+              // Cache is current
+              setGamesLoading(false);
+              return;
+            }
+          } catch {}
+        }
+
+        // Cache miss or stale — full fetch
+        const { data } = await supabase
+          .from("games")
+          .select("*")
+          .eq("user_id", steamId)
+          .order("played_at", { ascending: false });
+
+        const freshGames = (data as Game[]) || [];
+        setGames(freshGames);
         setGamesLoading(false);
+
+        try {
+          localStorage.setItem(
+            cacheKey,
+            JSON.stringify({
+              games: freshGames,
+              count: freshGames.length,
+              newest: freshGames[0]?.played_at ?? null,
+            })
+          );
+        } catch {}
       });
 
     fetchDrodo(steamId);

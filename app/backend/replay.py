@@ -233,6 +233,8 @@ class _PyAVRecorder:
                 stream.width = w
                 stream.height = h
                 stream.pix_fmt = "yuv420p"
+                # Keyframe every 1 second for fast seeking/scrubbing
+                stream.gop_size = self._fps
 
                 # Codec-specific options
                 if codec_name == "libsvtav1":

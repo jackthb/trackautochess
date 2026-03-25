@@ -570,7 +570,7 @@ protocol.registerSchemesAsPrivileged([
 // ── App lifecycle ────────────────────────────────────────────────────────────
 
 app.whenReady().then(() => {
-  // Handle replay:// protocol
+  // Handle replay:// protocol with Range request support for fast seeking
   protocol.handle("replay", (request) => {
     const filename = decodeURIComponent(
       request.url.replace("replay://video/", "")
@@ -581,7 +581,37 @@ app.whenReady().then(() => {
       return new Response("Not found", { status: 404 });
     }
 
-    return net.fetch(`file://${filePath}`);
+    const stat = fs.statSync(filePath);
+    const fileSize = stat.size;
+    const range = request.headers.get("Range");
+
+    if (range) {
+      const match = range.match(/bytes=(\d+)-(\d*)/);
+      if (match) {
+        const start = parseInt(match[1], 10);
+        const end = match[2] ? parseInt(match[2], 10) : fileSize - 1;
+        const chunkSize = end - start + 1;
+
+        return new Response(fs.createReadStream(filePath, { start, end }), {
+          status: 206,
+          headers: {
+            "Content-Range": `bytes ${start}-${end}/${fileSize}`,
+            "Accept-Ranges": "bytes",
+            "Content-Length": String(chunkSize),
+            "Content-Type": "video/mp4",
+          },
+        });
+      }
+    }
+
+    return new Response(fs.createReadStream(filePath), {
+      status: 200,
+      headers: {
+        "Accept-Ranges": "bytes",
+        "Content-Length": String(fileSize),
+        "Content-Type": "video/mp4",
+      },
+    });
   });
 
   // Handle icons:// protocol for serving local icon files
