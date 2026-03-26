@@ -76,7 +76,7 @@ export function useGames(): GamesState {
 
     const data = await window.appApi.fetchGames();
     const sorted = (data || []).slice().sort(
-      (a, b) => new Date(a.played_at).getTime() - new Date(b.played_at).getTime()
+      (a, b) => new Date(b.played_at).getTime() - new Date(a.played_at).getTime()
     );
     setGames(sorted);
     setLastRefresh(new Date());
@@ -98,7 +98,7 @@ export function useGames(): GamesState {
         setGames((prev) => {
           const updated = prev.map((g) => (g.id === gameId ? { ...g, ...fields } : g));
           return updated.slice().sort(
-            (a, b) => new Date(a.played_at).getTime() - new Date(b.played_at).getTime()
+            (a, b) => new Date(b.played_at).getTime() - new Date(a.played_at).getTime()
           );
         });
       }
