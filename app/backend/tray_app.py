@@ -524,7 +524,7 @@ class TrayApp:
         path = filedialog.askopenfilename(
             title="Select MY MATCHES screenshot",
             filetypes=[("Images", "*.jpg *.jpeg *.png"), ("All files", "*.*")],
-            initialdir=str(Path.home() / "Pictures"),
+            initialdir=str(DAC_DIR / "screenshots"),
         )
         root.destroy()
 
