@@ -1421,8 +1421,10 @@ def infer_timestamps(rows: list[dict], screenshot_time) -> list[str]:
     - Rows with an hour-resolution time_ago (e.g. "3h ago") → subtract from
       screenshot_time, round to the nearest minute.
     - Rows with a day-resolution time_ago (e.g. "3d ago") or unknown → assign
-      artificial sequential times: 01:00, 02:00, 03:00 … on that day.
-      The ordering follows the row order in the list (top = earliest index).
+      artificial sequential times: …03:00, 02:00, 01:00 on that day (reversed).
+      The MY MATCHES screen shows the most recent game at the top (row 0), so
+      row 0 gets the highest hour and the last row gets 01:00, so that an
+      ascending sort by played_at produces the correct soonest-to-latest order.
 
     Args:
         rows: list of row dicts from parse_my_matches (each may have "time_ago")
@@ -1453,7 +1455,16 @@ def infer_timestamps(rows: list[dict], screenshot_time) -> list[str]:
             # Unknown — fall back to screenshot date with no time
             resolved.append((screenshot_time.date(), None))
 
-    # Second pass: for day-only rows, assign sequential 01:00, 02:00, … per day
+    # Pre-count day-resolution rows per date so we can assign hours in reverse.
+    # The screenshot lists newest game first (row 0 = top = most recent), so we
+    # assign the highest hour to the first occurrence and 01:00 to the last,
+    # giving correct ascending-sort order (oldest first).
+    day_totals: dict[_date, int] = {}
+    for target_date, high_res_dt in resolved:
+        if high_res_dt is None:
+            day_totals[target_date] = day_totals.get(target_date, 0) + 1
+
+    # Second pass: for day-only rows, assign hours in descending order per day
     day_counters: dict[_date, int] = {}
     result: list[str] = []
     for target_date, high_res_dt in resolved:
@@ -1462,7 +1473,8 @@ def infer_timestamps(rows: list[dict], screenshot_time) -> list[str]:
         else:
             n = day_counters.get(target_date, 0)
             day_counters[target_date] = n + 1
-            hour = 1 + n  # 01:00, 02:00, 03:00, …
+            total = day_totals[target_date]
+            hour = total - n  # first row gets `total`, last row gets 1
             dt = _dt.combine(target_date, _time(min(hour, 23), 0))
             result.append(dt.strftime("%Y-%m-%d %H:%M:%S"))
 
