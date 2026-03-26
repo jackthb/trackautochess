@@ -82,38 +82,49 @@ class ReplayStore:
 
 
 def _find_dota_window() -> dict | None:
-    """Find the Dota 2 window rect. Returns mss-compatible monitor dict or None."""
+    """Find the Dota 2 window rect by process name. Returns mss-compatible monitor dict or None."""
     try:
         import ctypes
         from ctypes import wintypes
 
-        EnumWindows = ctypes.windll.user32.EnumWindows
-        GetWindowTextW = ctypes.windll.user32.GetWindowTextW
-        GetWindowRect = ctypes.windll.user32.GetWindowRect
-        IsWindowVisible = ctypes.windll.user32.IsWindowVisible
+        user32 = ctypes.windll.user32
+        kernel32 = ctypes.windll.kernel32
 
         WNDENUMPROC = ctypes.WINFUNCTYPE(ctypes.c_bool, ctypes.POINTER(ctypes.c_int), ctypes.POINTER(ctypes.c_int))
+        PROCESS_QUERY_LIMITED_INFORMATION = 0x1000
         result = []
 
         def callback(hwnd, _):
-            if IsWindowVisible(hwnd):
-                buf = ctypes.create_unicode_buffer(256)
-                GetWindowTextW(hwnd, buf, 256)
-                title = buf.value
-                if title and "dota 2" in title.lower():
-                    rect = wintypes.RECT()
-                    GetWindowRect(hwnd, ctypes.byref(rect))
-                    w = rect.right - rect.left
-                    h = rect.bottom - rect.top
-                    if w > 100 and h > 100:
-                        result.append({
-                            "left": rect.left,
-                            "top": rect.top,
-                            "width": w,
-                            "height": h,
-                        })
+            if not user32.IsWindowVisible(hwnd):
+                return True
+            pid = ctypes.c_ulong()
+            user32.GetWindowThreadProcessId(hwnd, ctypes.byref(pid))
+            handle = kernel32.OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, False, pid.value)
+            if not handle:
+                return True
+            try:
+                buf = ctypes.create_unicode_buffer(260)
+                size = ctypes.c_ulong(260)
+                kernel32.QueryFullProcessImageNameW(handle, 0, buf, ctypes.byref(size))
+                exe = buf.value.rsplit("\\", 1)[-1].lower()
+            finally:
+                kernel32.CloseHandle(handle)
+
+            if exe == "dota2.exe":
+                rect = wintypes.RECT()
+                user32.GetWindowRect(hwnd, ctypes.byref(rect))
+                w = rect.right - rect.left
+                h = rect.bottom - rect.top
+                if w > 100 and h > 100:
+                    result.append({
+                        "left": rect.left,
+                        "top": rect.top,
+                        "width": w,
+                        "height": h,
+                    })
             return True
 
+        EnumWindows = ctypes.windll.user32.EnumWindows
         EnumWindows(WNDENUMPROC(callback), 0)
         if result:
             log.info("Found Dota 2 window: %dx%d at (%d,%d)",
