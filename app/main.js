@@ -422,6 +422,7 @@ ipcMain.on("tracker:command", (_event, cmd) => {
 ipcMain.handle("app:openFileDialog", async () => {
   const result = await dialog.showOpenDialog({
     title: "Select MY MATCHES screenshot",
+    defaultPath: path.join(DAC_DIR, "screenshots"),
     filters: [
       { name: "Images", extensions: ["jpg", "jpeg", "png"] },
       { name: "All files", extensions: ["*"] },
