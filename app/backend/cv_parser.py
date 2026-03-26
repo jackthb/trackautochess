@@ -1418,11 +1418,14 @@ def infer_timestamps(rows: list[dict], screenshot_time) -> list[str]:
     """Infer an ISO datetime string for each MY MATCHES row.
 
     Algorithm:
-    - Rows with an hour-resolution time_ago (e.g. "3h ago") → subtract from
-      screenshot_time, round to the nearest minute.
-    - Rows with a day-resolution time_ago (e.g. "3d ago") or unknown → assign
-      artificial sequential times: 01:00, 02:00, 03:00 … on that day.
-      The ordering follows the row order in the list (top = earliest index).
+    - Rows with a minute/hour-resolution time_ago (e.g. "3h ago") → subtract
+      directly from screenshot_time.
+    - Rows with a day-resolution time_ago (e.g. "3d ago") or unknown → use
+      screenshot_time - N days as the base, then subtract 1 hr per position
+      within the same-day group.  MY MATCHES shows the most recent game at the
+      top (row 0), so row 0 of a group gets the base time and each subsequent
+      row is 1 hr older.  A descending sort by played_at then reproduces the
+      screenshot order (newest first).
 
     Args:
         rows: list of row dicts from parse_my_matches (each may have "time_ago")
@@ -1431,39 +1434,39 @@ def infer_timestamps(rows: list[dict], screenshot_time) -> list[str]:
     Returns:
         list of ISO-8601 datetime strings, one per row (same length as rows).
     """
-    from datetime import datetime as _dt, timedelta, date as _date, time as _time
+    from datetime import datetime as _dt, timedelta, date as _date
 
     if not isinstance(screenshot_time, _dt):
         screenshot_time = _dt.now()
 
-    # First pass: resolve each row to (date, high_res_dt_or_None)
-    resolved: list[tuple[_date, _dt | None]] = []
+    # First pass: resolve each row to (target_date, high_res_dt_or_None, base_dt_for_day)
+    resolved: list[tuple[_date, _dt | None, _dt | None]] = []
     for row in rows:
         unit, val = parse_time_ago(row.get("time_ago", ""))
         if unit == "minutes":
             dt = screenshot_time - timedelta(minutes=val)
-            resolved.append((dt.date(), dt))
+            resolved.append((dt.date(), dt, None))
         elif unit == "hours":
             dt = screenshot_time - timedelta(hours=val)
-            resolved.append((dt.date(), dt))
+            resolved.append((dt.date(), dt, None))
         elif unit == "days":
-            target_date = (screenshot_time - timedelta(days=val)).date()
-            resolved.append((target_date, None))
+            base_dt = screenshot_time - timedelta(days=val)
+            resolved.append((base_dt.date(), None, base_dt))
         else:
-            # Unknown — fall back to screenshot date with no time
-            resolved.append((screenshot_time.date(), None))
+            # Unknown — fall back to screenshot time as base
+            resolved.append((screenshot_time.date(), None, screenshot_time))
 
-    # Second pass: for day-only rows, assign sequential 01:00, 02:00, … per day
+    # Second pass: for day-only rows, each successive row in the same group is
+    # 1 hr older than the previous (row 0 of a group = newest = base_dt).
     day_counters: dict[_date, int] = {}
     result: list[str] = []
-    for target_date, high_res_dt in resolved:
+    for target_date, high_res_dt, base_dt in resolved:
         if high_res_dt is not None:
             result.append(high_res_dt.strftime("%Y-%m-%d %H:%M:%S"))
         else:
             n = day_counters.get(target_date, 0)
             day_counters[target_date] = n + 1
-            hour = 1 + n  # 01:00, 02:00, 03:00, …
-            dt = _dt.combine(target_date, _time(min(hour, 23), 0))
+            dt = base_dt - timedelta(hours=n)
             result.append(dt.strftime("%Y-%m-%d %H:%M:%S"))
 
     return result
