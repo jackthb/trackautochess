@@ -372,6 +372,7 @@ export function GameRow({
   const [editRankTier, setEditRankTier] = useState("");
   const [editRankNum, setEditRankNum] = useState("");
   const [editRelics, setEditRelics] = useState<string[]>([]);
+  const [editPlayedAt, setEditPlayedAt] = useState("");
 
   const RANK_TIERS = ["Pawn", "Knight", "Bishop", "Rook", "King", "Queen"];
 
@@ -404,6 +405,12 @@ export function GameRow({
     .map((r) => r.name)
     .sort();
 
+  function toDatetimeLocal(isoStr: string) {
+    const d = new Date(isoStr);
+    const pad = (n: number) => String(n).padStart(2, "0");
+    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  }
+
   const resetEditState = useCallback(() => {
     setEditPlacement(game.placement || "");
     setEditLevel(game.level || "");
@@ -413,6 +420,7 @@ export function GameRow({
     const parsedWL = parseWL(game.wl);
     setEditW(parsedWL?.w ?? 0);
     setEditL(parsedWL?.l ?? 0);
+    setEditPlayedAt(game.played_at ? toDatetimeLocal(game.played_at) : "");
     // Parse lineup preserving star data as counted tags
     const parsedLineup = (game.lineup || "")
       .split("|")
@@ -466,6 +474,7 @@ export function GameRow({
       lineup: lineupStr,
       synergies: synStr,
       relic: relicStr,
+      played_at: editPlayedAt ? new Date(editPlayedAt).toISOString() : game.played_at,
     });
     setSaving(false);
     if (ok) setExpanded(false);
@@ -741,6 +750,15 @@ export function GameRow({
                   />
                 </div>
               </div>
+              <label className="edit-label">
+                <span>Time</span>
+                <input
+                  className="edit-field"
+                  type="datetime-local"
+                  value={editPlayedAt}
+                  onChange={(e) => setEditPlayedAt(e.target.value)}
+                />
+              </label>
               </div>
 
               <div className="edit-label edit-label-wide">

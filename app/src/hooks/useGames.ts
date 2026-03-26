@@ -75,7 +75,10 @@ export function useGames(): GamesState {
     }
 
     const data = await window.appApi.fetchGames();
-    setGames(data || []);
+    const sorted = (data || []).slice().sort(
+      (a, b) => new Date(b.played_at).getTime() - new Date(a.played_at).getTime()
+    );
+    setGames(sorted);
     setLastRefresh(new Date());
     setLoading(false);
   }, [unitCosts]);
@@ -92,9 +95,12 @@ export function useGames(): GamesState {
     async (gameId: number, fields: Partial<Game>): Promise<boolean> => {
       const ok = await window.appApi.updateGame(gameId, fields);
       if (ok) {
-        setGames((prev) =>
-          prev.map((g) => (g.id === gameId ? { ...g, ...fields } : g))
-        );
+        setGames((prev) => {
+          const updated = prev.map((g) => (g.id === gameId ? { ...g, ...fields } : g));
+          return updated.slice().sort(
+            (a, b) => new Date(b.played_at).getTime() - new Date(a.played_at).getTime()
+          );
+        });
       }
       return ok;
     },
