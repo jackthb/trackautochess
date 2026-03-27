@@ -1,20 +1,11 @@
 import Head from "next/head";
+import Link from "next/link";
 import { useEffect, useState, useMemo } from "react";
 import { useRouter } from "next/router";
 import type { SupabaseClient, User } from "@supabase/supabase-js";
 import unitsData from "../data/units.json";
-import {
-  placementColor,
-  placementBg,
-  costBorderColor,
-  unitStem,
-  relicStem,
-  synIconName,
-  parseLineup,
-  parseSynergies,
-  parseRelics,
-  parseWL,
-} from "@dac/shared/game-utils";
+import { parseWL } from "@dac/shared/game-utils";
+import { GameRowDisplay } from "@dac/shared/GameRowDisplay";
 import type { Game } from "@dac/shared/types";
 
 interface SeasonSnapshot {
@@ -339,7 +330,7 @@ export default function Dashboard({ supabase }: DashboardProps) {
         }
         .table-header {
           display: grid;
-          grid-template-columns: 72px 1fr 120px 100px 140px 120px;
+          grid-template-columns: 72px 1fr 120px 80px 60px 120px 100px;
           padding: 0 20px;
           background: var(--bg-surface);
           border-bottom: 1px solid var(--border);
@@ -353,114 +344,8 @@ export default function Dashboard({ supabase }: DashboardProps) {
         }
         .game-entry {
           border-bottom: 1px solid var(--border-subtle);
-          transition: background 0.15s;
         }
         .game-entry:last-child { border-bottom: none; }
-        .game-entry:hover { background: var(--bg-hover); }
-        .game-row {
-          display: grid;
-          grid-template-columns: 72px 1fr 120px 100px 140px 120px;
-          padding: 0 20px;
-          align-items: center;
-        }
-        .cell { padding: 16px 6px; font-size: 16px; }
-        .placement {
-          font-size: 28px;
-          font-weight: 700;
-          font-family: 'Cinzel', serif;
-          width: 52px;
-          height: 52px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          border: 1px solid;
-          border-color: inherit;
-          opacity: 0.9;
-        }
-        .rank-cell { display: flex; align-items: center; gap: 8px; }
-        .rank-tier { font-size: 15px; color: var(--text-secondary); }
-        .rank-num { font-size: 14px; color: var(--text-muted); }
-        .arrow-up { color: var(--green-bright); font-size: 13px; }
-        .arrow-down { color: var(--red-bright); font-size: 13px; }
-        .wl { font-size: 15px; }
-        .wl-w { color: var(--green-bright); }
-        .wl-l { color: var(--red-bright); }
-        .wl-sep { color: var(--text-muted); }
-        .date-cell { font-size: 14px; color: var(--text-muted); }
-        .level-cell { font-size: 16px; color: var(--text-secondary); }
-        .detail-row {
-          display: flex;
-          align-items: center;
-          gap: 20px;
-          padding: 0 20px 14px 94px;
-          flex-wrap: wrap;
-        }
-        .lineup {
-          display: flex;
-          gap: 3px;
-          align-items: center;
-          flex-wrap: wrap;
-        }
-        .unit-icon-wrap {
-          position: relative;
-          width: 42px;
-          height: 42px;
-        }
-        .unit-icon {
-          width: 42px;
-          height: 42px;
-          border-radius: 4px;
-          border: 2px solid var(--border);
-          object-fit: cover;
-          background: var(--bg-surface);
-        }
-        .unit-stars {
-          position: absolute;
-          bottom: -3px;
-          right: -3px;
-          font-size: 9px;
-          line-height: 1;
-          background: var(--bg-deep);
-          border-radius: 2px;
-          padding: 1px 3px;
-        }
-        .unit-stars.s2 { color: #5a8fd5; }
-        .unit-stars.s3 { color: var(--gold); }
-        .synergies {
-          display: flex;
-          gap: 8px;
-          align-items: center;
-          flex-wrap: wrap;
-          margin-left: auto;
-        }
-        .syn-badge {
-          display: flex;
-          align-items: center;
-          gap: 4px;
-          font-size: 13px;
-          color: var(--text-muted);
-          background: var(--bg-surface);
-          border: 1px solid var(--border-subtle);
-          border-radius: 3px;
-          padding: 3px 7px 3px 4px;
-        }
-        .syn-icon {
-          width: 20px;
-          height: 20px;
-          border-radius: 2px;
-          object-fit: cover;
-        }
-        .syn-count { color: var(--text-secondary); font-weight: 600; }
-        .relics-cell { display: flex; align-items: center; }
-        .relics { display: flex; gap: 4px; align-items: center; }
-        .relic-icon {
-          width: 32px;
-          height: 32px;
-          border-radius: 4px;
-          border: 1px solid var(--border);
-          object-fit: cover;
-          background: var(--bg-surface);
-        }
         .empty-state {
           text-align: center;
           padding: 80px 32px;
@@ -611,158 +496,24 @@ export default function Dashboard({ supabase }: DashboardProps) {
                 <div className="table-wrap fade-up delay-1">
                   <div className="table-header">
                     <div className="th">#</div>
+                    <div className="th">Lineup</div>
                     <div className="th">Rank</div>
                     <div className="th">W – L</div>
-                    <div className="th">Level</div>
+                    <div className="th">Lv</div>
                     <div className="th">Relic</div>
                     <div className="th">Date</div>
                   </div>
-                  {games.map((g) => {
-                    const p = parseInt(g.placement) || 0;
-                    const wl = parseWL(g.wl);
-                    const rankParts = g.rank ? g.rank.split("-") : [];
-                    const tier = rankParts[0] || "";
-                    const rankNum = rankParts[1] || "";
-                    const lineup = parseLineup(g.lineup, UNIT_COSTS);
-                    const syns = parseSynergies(g.synergies);
-                    return (
-                      <div
-                        key={g.id}
-                        className="game-entry"
-                        style={{ background: placementBg(p) }}
-                      >
-                        <div className="game-row">
-                          <div className="cell">
-                            <div
-                              className="placement"
-                              style={{
-                                color: placementColor(p),
-                                borderColor: placementColor(p),
-                              }}
-                            >
-                              {g.placement}
-                            </div>
-                          </div>
-                          <div className="cell rank-cell">
-                            <span className="rank-tier">{tier}</span>
-                            <span className="rank-num">{rankNum}</span>
-                            {g.rank && g.rank_change === "up" && (
-                              <span className="arrow-up">&#9650;</span>
-                            )}
-                            {g.rank && g.rank_change === "down" && (
-                              <span className="arrow-down">&#9660;</span>
-                            )}
-                          </div>
-                          <div className="cell wl">
-                            {wl ? (
-                              <>
-                                <span className="wl-w">{wl.w}</span>
-                                <span className="wl-sep"> &ndash; </span>
-                                <span className="wl-l">{wl.l}</span>
-                              </>
-                            ) : (
-                              <span style={{ color: "var(--text-muted)" }}>&mdash;</span>
-                            )}
-                          </div>
-                          <div className="cell level-cell">
-                            {g.level || "\u2014"}
-                          </div>
-                          <div className="cell relics-cell">
-                            {parseRelics(g.relic).length > 0 ? (
-                              <div className="relics">
-                                {parseRelics(g.relic).map((r, i) => (
-                                  <img
-                                    key={i}
-                                    className="relic-icon"
-                                    src={`/icons/relics/${relicStem(r)}.png`}
-                                    alt={r}
-                                    title={r}
-                                    loading="lazy"
-                                    onError={(e) => {
-                                      (e.target as HTMLImageElement).style.display = "none";
-                                    }}
-                                  />
-                                ))}
-                              </div>
-                            ) : (
-                              <span style={{ color: "var(--text-muted)" }}>&mdash;</span>
-                            )}
-                          </div>
-                          <div className="cell date-cell">
-                            {g.played_at ? (
-                              <>
-                                <div>
-                                  {new Date(g.played_at).toLocaleDateString(undefined, {
-                                    month: "short",
-                                    day: "numeric",
-                                  })}
-                                </div>
-                                <div style={{ fontSize: "12px", opacity: 0.6 }}>
-                                  {new Date(g.played_at).toLocaleTimeString(undefined, {
-                                    hour: "2-digit",
-                                    minute: "2-digit",
-                                  })}
-                                </div>
-                              </>
-                            ) : "\u2014"}
-                          </div>
-                        </div>
-                        {(lineup.length > 0 || syns.length > 0) && (
-                          <div className="detail-row">
-                            {lineup.length > 0 && (
-                              <div className="lineup">
-                                {lineup.map((u, i) => (
-                                  <div
-                                    key={i}
-                                    className="unit-icon-wrap"
-                                    title={`${u.name}${u.stars > 1 ? ` ${"\u2605"}${u.stars}` : ""}`}
-                                  >
-                                    <img
-                                      className="unit-icon"
-                                      src={`/icons/units/${unitStem(u.name)}.png`}
-                                      alt={u.name}
-                                      loading="lazy"
-                                      style={{ borderColor: costBorderColor(UNIT_COSTS[u.name] || 1) }}
-                                      onError={(e) => {
-                                        (e.target as HTMLImageElement).style.display = "none";
-                                      }}
-                                    />
-                                    {u.stars > 1 && (
-                                      <span className={`unit-stars s${u.stars}`}>
-                                        {"\u2605".repeat(u.stars)}
-                                      </span>
-                                    )}
-                                  </div>
-                                ))}
-                              </div>
-                            )}
-                            {syns.length > 0 && (
-                              <div className="synergies">
-                                {syns.slice(0, 5).map((s, i) => (
-                                  <div
-                                    key={i}
-                                    className="syn-badge"
-                                    title={`${s.name}: ${s.count}`}
-                                  >
-                                    <img
-                                      className="syn-icon"
-                                      src={`/icons/synergies/${synIconName(s.name)}.png`}
-                                      alt={s.name}
-                                      loading="lazy"
-                                      onError={(e) => {
-                                        (e.target as HTMLImageElement).style.display = "none";
-                                      }}
-                                    />
-                                    <span className="syn-count">{s.count}</span>
-                                  </div>
-                                ))}
-                              </div>
-                            )}
-                          </div>
-                        )}
-                      </div>
-                    );
-                  })}
+                  {games.map((g) => (
+                    <div key={g.id} className="game-entry">
+                      <Link href={`/games/${g.id}`} style={{ display: "block", color: "inherit" }}>
+                        <GameRowDisplay
+                          game={g}
+                          unitCosts={UNIT_COSTS}
+                          iconUrl={(type, stem) => `/icons/${type}/${stem}.png`}
+                        />
+                      </Link>
+                    </div>
+                  ))}
                 </div>
               </>
             )}

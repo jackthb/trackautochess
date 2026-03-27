@@ -3,5 +3,11 @@
   "version": "0.0.1",
   "private": true,
   "main": "game-utils.ts",
-  "types": "game-utils.ts"
+  "types": "game-utils.ts",
+  "peerDependencies": {
+    "react": ">=18"
+  },
+  "devDependencies": {
+    "@types/react": "^19"
+  }
 }
