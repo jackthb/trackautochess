@@ -13,9 +13,11 @@ for (const [name, info] of Object.entries(unitsData.units)) {
 
 interface GamePageProps {
   game: Game;
+  playerName: string | null;
 }
 
-export default function GamePage({ game }: GamePageProps) {
+export default function GamePage({ game, playerName }: GamePageProps) {
+  const displayName = playerName || game.user_id;
   return (
     <>
       <Head>
@@ -65,6 +67,26 @@ export default function GamePage({ game }: GamePageProps) {
           padding: 0 32px 80px;
           border: 1px solid var(--border);
         }
+        .match-meta {
+          padding: 24px 20px;
+          border-bottom: 1px solid var(--border-subtle);
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          font-size: 14px;
+          color: var(--text-muted);
+        }
+        .match-meta .placement {
+          font-size: 18px;
+          font-weight: 700;
+        }
+        .match-meta a {
+          color: var(--text-secondary);
+          transition: color 0.15s;
+        }
+        .match-meta a:hover {
+          color: var(--text-primary);
+        }
       `}</style>
 
       <div className="page">
@@ -78,6 +100,13 @@ export default function GamePage({ game }: GamePageProps) {
         </header>
 
         <div className="container">
+          <div className="match-meta">
+            {game.placement && (
+              <span className="placement">#{game.placement}</span>
+            )}
+            <span>—</span>
+            <Link href={`/players/${game.user_id}`}>{displayName}</Link>
+          </div>
           <GameRowDisplay
             game={game}
             unitCosts={UNIT_COSTS}
@@ -87,6 +116,19 @@ export default function GamePage({ game }: GamePageProps) {
       </div>
     </>
   );
+}
+
+async function fetchSteamName(steamId: string): Promise<string | null> {
+  try {
+    const resp = await fetch(
+      `https://steamcommunity.com/profiles/${steamId}/?xml=1`
+    );
+    const xml = await resp.text();
+    const match = xml.match(/<steamID><!\[CDATA\[(.+?)\]\]><\/steamID>/);
+    return match ? match[1] : null;
+  } catch {
+    return null;
+  }
 }
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
@@ -105,5 +147,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
   if (!data) return { notFound: true };
 
-  return { props: { game: data } };
+  const playerName = data.user_id ? await fetchSteamName(data.user_id) : null;
+
+  return { props: { game: data, playerName } };
 };

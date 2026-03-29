@@ -37,3 +37,10 @@
 - [ ] rank_change editing (up/down/none toggle or auto-calc from previous game)
 - [ ] Delete the 2 existing duplicate games (IDs 393/381 and 392/363)
 - [ ] Fix missing level OCR on some rows (mid-scroll screenshots)
+
+## Roadmap / Future
+- [ ] **Listen for F3 presses and capture** — detect F3 keypress as a trigger to capture the current screen state (in addition to sentinel-based auto-capture)
+- [ ] **Prioritise Game Over screen parsing** — the full 8-player table has richer data (all placements, player names). Focus CV efforts here over Final Ranking.
+- [ ] **Sentinel HTML page multi-resolution support** — `data/sentinel_picker.html` currently assumes one resolution. Make it work across common resolutions (1920x1080, 2560x1440, etc.)
+- [ ] **Capture more game state per match** — parse other players from the Game Over screen (who was 1st, last, etc.). Store per-match leaderboard, not just our own placement.
+- [ ] **Build up player database** — as we capture other players' names/placements from Game Over screens, upsert them into a players table. Over time this builds a social graph of opponents and their stats.
