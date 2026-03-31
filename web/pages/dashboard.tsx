@@ -1,12 +1,13 @@
 import Head from "next/head";
-import Link from "next/link";
 import { useEffect, useState, useMemo } from "react";
 import { useRouter } from "next/router";
 import type { SupabaseClient, User } from "@supabase/supabase-js";
 import unitsData from "../data/units.json";
 import { parseWL } from "@dac/shared/game-utils";
-import { GameRowDisplay } from "@dac/shared/GameRowDisplay";
-import type { PlayerGame } from "@dac/shared/types";
+import { GameRow } from "../components/GameRow";
+import type { Game } from "@dac/shared/types";
+import synergiesData from "../data/synergies.json";
+import relicsData from "../data/relics.json";
 
 interface SeasonSnapshot {
   season: string;
@@ -36,6 +37,17 @@ for (const [name, info] of Object.entries(unitsData.units)) {
   UNIT_COSTS[name] = (info as { cost: number }).cost;
 }
 
+// Build suggestion lists from data files
+const ALL_UNIT_NAMES = Object.keys(unitsData.units).sort();
+const ALL_SYNERGY_NAMES = Object.values(synergiesData)
+  .map((s: any) => s.name)
+  .filter(Boolean)
+  .sort();
+const ALL_RELIC_NAMES = Object.values((relicsData as any).relics)
+  .map((r: any) => r.name)
+  .filter(Boolean)
+  .sort();
+
 const TIER_NAMES = ["Pawn", "Knight", "Rook", "Bishop", "King", "Queen"];
 function mmrLevelToTier(level: number | null): string {
   if (level == null) return "";
@@ -48,7 +60,7 @@ export default function Dashboard({ supabase }: DashboardProps) {
   const router = useRouter();
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
-  const [games, setGames] = useState<PlayerGame[]>([]);
+  const [games, setGames] = useState<Game[]>([]);
   const [gamesLoading, setGamesLoading] = useState(false);
   const [drodo, setDrodo] = useState<DrodoProfile | null>(null);
   const [drodoLoading, setDrodoLoading] = useState(false);
@@ -127,7 +139,7 @@ export default function Dashboard({ supabase }: DashboardProps) {
           .eq("user_id", steamId)
           .order("created_at", { ascending: false });
 
-        const freshGames = (data as PlayerGame[]) || [];
+        const freshGames = (data as Game[]) || [];
         setGames(freshGames);
         setGamesLoading(false);
 
@@ -145,6 +157,49 @@ export default function Dashboard({ supabase }: DashboardProps) {
 
     fetchDrodo(steamId);
   }, [supabase, user]);
+
+  const handleUpdate = async (
+    gameId: number,
+    fields: Partial<Game>
+  ): Promise<boolean> => {
+    if (!supabase) return false;
+    const { error } = await supabase
+      .from("games")
+      .update(fields)
+      .eq("id", gameId);
+    if (error) {
+      console.error("Update failed:", error);
+      return false;
+    }
+    // Update local state
+    setGames((prev) =>
+      prev.map((g) => (g.id === gameId ? { ...g, ...fields } : g))
+    );
+    // Invalidate cache
+    const steamId = user?.user_metadata?.steam_id;
+    if (steamId) {
+      try { localStorage.removeItem(`dac_games_${steamId}`); } catch {}
+    }
+    return true;
+  };
+
+  const handleDelete = async (gameId: number): Promise<boolean> => {
+    if (!supabase) return false;
+    const { error } = await supabase
+      .from("games")
+      .delete()
+      .eq("id", gameId);
+    if (error) {
+      console.error("Delete failed:", error);
+      return false;
+    }
+    setGames((prev) => prev.filter((g) => g.id !== gameId));
+    const steamId = user?.user_metadata?.steam_id;
+    if (steamId) {
+      try { localStorage.removeItem(`dac_games_${steamId}`); } catch {}
+    }
+    return true;
+  };
 
   const handleLogout = async () => {
     if (!supabase) return;
@@ -502,16 +557,16 @@ export default function Dashboard({ supabase }: DashboardProps) {
                     <div className="th">Date</div>
                   </div>
                   {games.map((g) => (
-                    <div key={g.id} className="game-entry">
-                      <Link href={`/games/${g.id}`} style={{ display: "block", color: "inherit" }}>
-                        <GameRowDisplay
-                          game={g}
-                          unitCosts={UNIT_COSTS}
-                          iconUrl={(type, stem) => `/icons/${type}/${stem}.png`}
-                          shareUrl={`/games/${g.id}`}
-                        />
-                      </Link>
-                    </div>
+                    <GameRow
+                      key={g.id}
+                      game={g}
+                      unitCosts={UNIT_COSTS}
+                      allUnitNames={ALL_UNIT_NAMES}
+                      allSynergyNames={ALL_SYNERGY_NAMES}
+                      allRelicNames={ALL_RELIC_NAMES}
+                      onUpdate={handleUpdate}
+                      onDelete={handleDelete}
+                    />
                   ))}
                 </div>
               </>
