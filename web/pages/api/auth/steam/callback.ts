@@ -131,7 +131,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
   // Redirect with tokens in hash fragment — Supabase JS client picks these up
   // automatically via onAuthStateChange
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+  const proto = req.headers["x-forwarded-proto"] || "http";
+  const host = req.headers["x-forwarded-host"] || req.headers.host || "localhost:3000";
+  const origin = `${proto}://${host}`;
   const hash = new URLSearchParams({
     access_token: session.access_token,
     refresh_token: session.refresh_token,
@@ -140,5 +142,5 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     type: "magiclink",
   }).toString();
 
-  res.redirect(`${siteUrl}/dashboard#${hash}`);
+  res.redirect(`${origin}/dashboard#${hash}`);
 }

@@ -76,7 +76,7 @@ a { color: inherit; text-decoration: none; }
   flex-shrink: 0;
 }
 
-.unit-icon-wrap { position: relative; width: 34px; height: 34px; }
+.unit-icon-wrap { position: relative; width: 34px; height: 34px; cursor: pointer; }
 
 .unit-icon {
   width: 34px;
@@ -87,7 +87,11 @@ a { color: inherit; text-decoration: none; }
   background: var(--bg-surface);
   transition: transform 0.12s;
 }
-.unit-icon-wrap:hover .unit-icon { transform: scale(1.1); }
+.unit-icon-wrap:hover .unit-icon {
+  transform: scale(1.1);
+  box-shadow: 0 0 8px rgba(0,0,0,0.5);
+  z-index: 2;
+}
 
 .unit-stars {
   position: absolute;
@@ -114,6 +118,12 @@ a { color: inherit; text-decoration: none; }
   border: 1px solid var(--border-subtle);
   border-radius: 3px;
   padding: 3px 6px 3px 4px;
+  cursor: pointer;
+  transition: border-color 0.12s, background 0.12s;
+}
+.syn-badge:hover {
+  border-color: var(--border);
+  background: var(--bg-elevated);
 }
 .syn-icon { width: 18px; height: 18px; border-radius: 2px; object-fit: cover; }
 .syn-count { color: var(--text-secondary); font-weight: 600; }
