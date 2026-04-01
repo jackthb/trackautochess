@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from "react";
-import type { Game } from "@dac/shared/types";
+import type { PlayerGame } from "@dac/shared/types";
 import {
   placementBg,
   unitStem,
@@ -7,17 +7,16 @@ import {
   synIconName,
   parseSynergies,
   parseRelics,
-  parseWL,
 } from "@dac/shared/game-utils";
 import { GameRowDisplay } from "@dac/shared/GameRowDisplay";
 
 interface GameRowProps {
-  game: Game;
+  game: PlayerGame;
   unitCosts: Record<string, number>;
   allUnitNames: string[];
   allSynergyNames: string[];
   allRelicNames: string[];
-  onUpdate: (gameId: number, fields: Partial<Game>) => Promise<boolean>;
+  onUpdate: (gameId: number, fields: Partial<PlayerGame>) => Promise<boolean>;
   onDelete: (gameId: number) => Promise<boolean>;
 }
 
@@ -279,8 +278,8 @@ export function GameRow({
   const [saving, setSaving] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
 
-  const [editPlacement, setEditPlacement] = useState(game.placement || "");
-  const [editLevel, setEditLevel] = useState(game.level || "");
+  const [editPlacement, setEditPlacement] = useState(String(game.placement ?? ""));
+  const [editLevel, setEditLevel] = useState(String(game.level ?? ""));
   const [editW, setEditW] = useState(0);
   const [editL, setEditL] = useState(0);
   const [editUnits, setEditUnits] = useState<CountedTag[]>([]);
@@ -290,7 +289,7 @@ export function GameRow({
   const [editRelics, setEditRelics] = useState<string[]>([]);
   const [editPlayedAt, setEditPlayedAt] = useState("");
 
-  const p = parseInt(game.placement) || 0;
+  const p = game.placement ?? 0;
 
   function toDatetimeLocal(isoStr: string) {
     const d = new Date(isoStr);
@@ -299,15 +298,15 @@ export function GameRow({
   }
 
   const resetEditState = useCallback(() => {
-    setEditPlacement(game.placement || "");
-    setEditLevel(game.level || "");
+    setEditPlacement(String(game.placement ?? ""));
+    setEditLevel(String(game.level ?? ""));
     const parsedRank = game.rank ? game.rank.split("-") : [];
     setEditRankTier(parsedRank[0] || "");
     setEditRankNum(parsedRank[1] || "");
-    const parsedWL = parseWL(game.wl);
-    setEditW(parsedWL?.w ?? 0);
-    setEditL(parsedWL?.l ?? 0);
-    setEditPlayedAt(game.played_at ? toDatetimeLocal(game.played_at) : "");
+    setEditW(game.wins ?? 0);
+    setEditL(game.losses ?? 0);
+    const playedAt = game.game?.played_at;
+    setEditPlayedAt(playedAt ? toDatetimeLocal(playedAt) : "");
     const parsedLineup = (game.lineup || "")
       .split("|")
       .filter(Boolean)
@@ -351,16 +350,14 @@ export function GameRow({
       : null;
 
     const ok = await onUpdate(game.id, {
-      placement: editPlacement,
-      level: editLevel || null,
+      placement: parseInt(editPlacement) || game.placement,
+      level: editLevel ? parseInt(editLevel) : null,
       rank: rankStr,
-      wl: wlStr,
+      wins: editW || null,
+      losses: editL || null,
       lineup: lineupStr,
       synergies: synStr,
       relic: relicStr,
-      played_at: editPlayedAt
-        ? new Date(editPlayedAt).toISOString()
-        : game.played_at,
     });
     setSaving(false);
     if (ok) setExpanded(false);
