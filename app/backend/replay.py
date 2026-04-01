@@ -214,8 +214,9 @@ class _PyAVRecorder:
 
     def _record_loop(self):
         import av
-        import mss
         import numpy as np
+
+        import screen_capture
 
         frame_interval = 1.0 / self._fps
         container = None
@@ -223,64 +224,62 @@ class _PyAVRecorder:
         try:
             codec_name = self._pick_codec()
 
-            with mss.mss() as sct:
-                # Try to capture just the Dota 2 window
-                dota_rect = _find_dota_window()
-                if dota_rect:
-                    monitor = dota_rect
-                    log.info("Recording Dota 2 window: %dx%d", monitor["width"], monitor["height"])
-                else:
-                    monitor = sct.monitors[1]
-                    log.info("Dota 2 window not found — recording full screen")
+            # Try to capture just the Dota 2 window
+            dota_rect = _find_dota_window()
+            if dota_rect:
+                monitor = dota_rect
+                log.info("Recording Dota 2 window: %dx%d", monitor["width"], monitor["height"])
+            else:
+                monitor = screen_capture.monitors()[1]
+                log.info("Dota 2 window not found — recording full screen")
 
-                w = monitor["width"]
-                h = monitor["height"]
-                # Ensure even dimensions (required by most codecs)
-                w = w - (w % 2)
-                h = h - (h % 2)
+            w = monitor["width"]
+            h = monitor["height"]
+            # Ensure even dimensions (required by most codecs)
+            w = w - (w % 2)
+            h = h - (h % 2)
 
-                container = av.open(str(self._output_path), "w")
-                stream = container.add_stream(codec_name, rate=self._fps)
-                stream.width = w
-                stream.height = h
-                stream.pix_fmt = "yuv420p"
-                # Keyframe every 1 second for fast seeking/scrubbing
-                stream.gop_size = self._fps
+            container = av.open(str(self._output_path), "w")
+            stream = container.add_stream(codec_name, rate=self._fps)
+            stream.width = w
+            stream.height = h
+            stream.pix_fmt = "yuv420p"
+            # Keyframe every 1 second for fast seeking/scrubbing
+            stream.gop_size = self._fps
 
-                # Codec-specific options
-                if codec_name == "libsvtav1":
-                    stream.options = {"preset": "8", "crf": "38"}
-                elif codec_name == "libx264":
-                    stream.options = {"preset": "ultrafast", "crf": "28"}
+            # Codec-specific options
+            if codec_name == "libsvtav1":
+                stream.options = {"preset": "8", "crf": "38"}
+            elif codec_name == "libx264":
+                stream.options = {"preset": "ultrafast", "crf": "28"}
 
-                self._container = container
-                self._stream = stream
+            self._container = container
+            self._stream = stream
 
-                log.info("Recording: %dx%d @ %d fps → %s", w, h, self._fps, self._output_path.name)
+            log.info("Recording: %dx%d @ %d fps → %s", w, h, self._fps, self._output_path.name)
 
-                frame_idx = 0
-                while not self._stop_event.is_set():
-                    t0 = time.monotonic()
+            frame_idx = 0
+            while not self._stop_event.is_set():
+                t0 = time.monotonic()
 
-                    shot = sct.grab(monitor)
-                    img = np.array(shot)[:, :, :3]  # BGRA → BGR
-                    # Crop to even dimensions if needed
-                    img = img[:h, :w]
-                    # BGR → RGB for PyAV
-                    img = img[:, :, ::-1]
+                img = screen_capture.grab(monitor)[:, :, :3]  # BGRA → BGR
+                # Crop to even dimensions if needed
+                img = img[:h, :w]
+                # BGR → RGB for PyAV
+                img = img[:, :, ::-1]
 
-                    frame = av.VideoFrame.from_ndarray(img, format="rgb24")
-                    frame.pts = frame_idx
-                    frame_idx += 1
-                    self._frame_count = frame_idx
+                frame = av.VideoFrame.from_ndarray(img, format="rgb24")
+                frame.pts = frame_idx
+                frame_idx += 1
+                self._frame_count = frame_idx
 
-                    for packet in stream.encode(frame):
-                        container.mux(packet)
+                for packet in stream.encode(frame):
+                    container.mux(packet)
 
-                    elapsed = time.monotonic() - t0
-                    sleep_time = frame_interval - elapsed
-                    if sleep_time > 0:
-                        self._stop_event.wait(sleep_time)
+                elapsed = time.monotonic() - t0
+                sleep_time = frame_interval - elapsed
+                if sleep_time > 0:
+                    self._stop_event.wait(sleep_time)
 
         except Exception as e:
             log.error("Recorder error: %s", e, exc_info=True)

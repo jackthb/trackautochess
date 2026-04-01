@@ -13,9 +13,10 @@ from datetime import datetime
 from pathlib import Path
 
 import cv2
-import mss
 import numpy as np
 from PIL import Image
+
+import screen_capture
 
 from utils import DATA_DIR
 
@@ -74,7 +75,7 @@ def is_game_focused() -> bool:
     return _get_foreground_process_name() == GAME_PROCESS_NAME
 
 
-def _grab_region(sct, monitor, region):
+def _grab_region(monitor, region):
     """Grab a screen region and return as BGR numpy array."""
     mw = monitor["width"]
     mh = monitor["height"]
@@ -84,8 +85,7 @@ def _grab_region(sct, monitor, region):
     y1 = int(region["y1"] * mh) + monitor["top"]
 
     rect = {"left": x0, "top": y0, "width": x1 - x0, "height": y1 - y0}
-    shot = sct.grab(rect)
-    return np.array(shot)[:, :, :3]  # BGRA → BGR
+    return screen_capture.grab(rect)[:, :, :3]  # BGRA → BGR
 
 
 def _load_template(path, target_h):
@@ -138,9 +138,9 @@ class SentinelPoller:
     def stop(self):
         self._stop_event.set()
 
-    def _match_template(self, sct, monitor, target):
+    def _match_template(self, monitor, target):
         """Grab search region, run template match, return (score, region_img)."""
-        region_img = _grab_region(sct, monitor, target.search_region)
+        region_img = _grab_region(monitor, target.search_region)
         region_gray = cv2.cvtColor(region_img, cv2.COLOR_BGR2GRAY)
         tmpl_gray = cv2.cvtColor(target.tmpl, cv2.COLOR_BGR2GRAY)
         result = cv2.matchTemplate(region_gray, tmpl_gray, cv2.TM_CCOEFF_NORMED)
@@ -192,78 +192,77 @@ class SentinelPoller:
             log.warning("Failed to save debug: %s", e)
 
     def _poll_loop(self):
-        with mss.mss() as sct:
-            monitor = sct.monitors[1]
-            mw, mh = monitor["width"], monitor["height"]
+        monitor = screen_capture.monitors()[1]
+        mw, mh = monitor["width"], monitor["height"]
 
-            # Load and scale templates
-            for t in self._targets:
-                if not t.template_path.exists():
-                    log.warning("Sentinel template not found, skipping: %s", t.template_path)
-                    continue
-                ref_h = t.ref_height or 47
-                scale_h = int(ref_h * mh / 1440)
-                t.tmpl = _load_template(t.template_path, scale_h)
-                log.info("Sentinel '%s': region=(%d,%d)-(%d,%d), template=%dx%d",
-                         t.name,
-                         int(t.search_region["x0"] * mw), int(t.search_region["y0"] * mh),
-                         int(t.search_region["x1"] * mw), int(t.search_region["y1"] * mh),
-                         t.tmpl.shape[1], t.tmpl.shape[0])
+        # Load and scale templates
+        for t in self._targets:
+            if not t.template_path.exists():
+                log.warning("Sentinel template not found, skipping: %s", t.template_path)
+                continue
+            ref_h = t.ref_height or 47
+            scale_h = int(ref_h * mh / 1440)
+            t.tmpl = _load_template(t.template_path, scale_h)
+            log.info("Sentinel '%s': region=(%d,%d)-(%d,%d), template=%dx%d",
+                     t.name,
+                     int(t.search_region["x0"] * mw), int(t.search_region["y0"] * mh),
+                     int(t.search_region["x1"] * mw), int(t.search_region["y1"] * mh),
+                     t.tmpl.shape[1], t.tmpl.shape[0])
 
-            active_targets = [t for t in self._targets if t.tmpl is not None]
-            if not active_targets:
-                log.error("No sentinel targets loaded — poller exiting")
-                return
+        active_targets = [t for t in self._targets if t.tmpl is not None]
+        if not active_targets:
+            log.error("No sentinel targets loaded — poller exiting")
+            return
 
-            was_focused = False
-            while not self._stop_event.is_set():
-                time.sleep(self._interval)
+        was_focused = False
+        while not self._stop_event.is_set():
+            time.sleep(self._interval)
 
-                focused = is_game_focused()
-                if focused and not was_focused:
-                    log.info("Dota 2 focused — sentinel active")
-                    if self._on_focus_gained:
-                        try:
-                            self._on_focus_gained()
-                        except Exception as e:
-                            log.warning("on_focus_gained callback error: %s", e)
-                elif not focused and was_focused:
-                    log.info("Dota 2 lost focus — sentinel paused")
-                    if self._on_focus_lost:
-                        try:
-                            self._on_focus_lost()
-                        except Exception as e:
-                            log.warning("on_focus_lost callback error: %s", e)
-                was_focused = focused
-
-                if not focused:
-                    continue
-
-                for target in active_targets:
+            focused = is_game_focused()
+            if focused and not was_focused:
+                log.info("Dota 2 focused — sentinel active")
+                if self._on_focus_gained:
                     try:
-                        score, region_img = self._match_template(sct, monitor, target)
-                        log.debug("Sentinel '%s': score=%.3f (need %.2f)",
-                                  target.name, score, target.threshold)
-
-                        if score >= target.threshold:
-                            if not target.fired:
-                                log.info("Sentinel '%s' preliminary match (%.3f) — confirming...",
-                                         target.name, score)
-                                time.sleep(CONFIRM_DELAY)
-                                if self._stop_event.is_set():
-                                    break
-                                score2, region_img2 = self._match_template(sct, monitor, target)
-                                if score2 >= target.threshold:
-                                    log.info("Sentinel '%s' confirmed (score=%.3f)",
-                                             target.name, score2)
-                                    self._save_debug(target, region_img2, score2, True)
-                                    target.fired = True
-                                    target.on_match()
-                                else:
-                                    log.info("Sentinel '%s' confirmation failed (score=%.3f)",
-                                             target.name, score2)
-                                    self._save_debug(target, region_img2, score2, False)
-                        else:
-                            target.fired = False
+                        self._on_focus_gained()
                     except Exception as e:
-                        log.warning("Sentinel '%s' poll error: %s", target.name, e)
+                        log.warning("on_focus_gained callback error: %s", e)
+            elif not focused and was_focused:
+                log.info("Dota 2 lost focus — sentinel paused")
+                if self._on_focus_lost:
+                    try:
+                        self._on_focus_lost()
+                    except Exception as e:
+                        log.warning("on_focus_lost callback error: %s", e)
+            was_focused = focused
+
+            if not focused:
+                continue
+
+            for target in active_targets:
+                try:
+                    score, region_img = self._match_template(monitor, target)
+                    log.debug("Sentinel '%s': score=%.3f (need %.2f)",
+                              target.name, score, target.threshold)
+
+                    if score >= target.threshold:
+                        if not target.fired:
+                            log.info("Sentinel '%s' preliminary match (%.3f) — confirming...",
+                                     target.name, score)
+                            time.sleep(CONFIRM_DELAY)
+                            if self._stop_event.is_set():
+                                break
+                            score2, region_img2 = self._match_template(monitor, target)
+                            if score2 >= target.threshold:
+                                log.info("Sentinel '%s' confirmed (score=%.3f)",
+                                         target.name, score2)
+                                self._save_debug(target, region_img2, score2, True)
+                                target.fired = True
+                                target.on_match()
+                            else:
+                                log.info("Sentinel '%s' confirmation failed (score=%.3f)",
+                                         target.name, score2)
+                                self._save_debug(target, region_img2, score2, False)
+                    else:
+                        target.fired = False
+                except Exception as e:
+                    log.warning("Sentinel '%s' poll error: %s", target.name, e)

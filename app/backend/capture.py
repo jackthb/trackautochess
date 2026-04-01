@@ -4,7 +4,7 @@ import ctypes
 import logging
 from ctypes import wintypes
 
-import mss
+import screen_capture
 
 log = logging.getLogger("dac")
 
@@ -51,10 +51,6 @@ def _find_dota_window() -> dict | None:
 
 def capture_screen():
     """Capture the Dota 2 window (or fullscreen fallback) as a BGR numpy array (cv2-compatible)."""
-    import numpy as np
-
-    with mss.mss() as sct:
-        monitor = _find_dota_window() or sct.monitors[1]
-        screenshot = sct.grab(monitor)
-        img = np.array(screenshot)[:, :, :3].copy()
+    monitor = _find_dota_window() or screen_capture.monitors()[1]
+    img = screen_capture.grab(monitor)[:, :, :3].copy()
     return img
