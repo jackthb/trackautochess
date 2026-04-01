@@ -99,7 +99,7 @@ def cmd_import_matches_cv(args: list[str]) -> None:
             skipped += 1
             continue
         game_row = GameRow(
-            date=date_str,
+            played_at=date_str,
             placement=placement,
             rank=r.get("rank", ""),
             rank_change="",

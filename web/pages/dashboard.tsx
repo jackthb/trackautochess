@@ -6,7 +6,7 @@ import type { SupabaseClient, User } from "@supabase/supabase-js";
 import unitsData from "../data/units.json";
 import { parseWL } from "@dac/shared/game-utils";
 import { GameRowDisplay } from "@dac/shared/GameRowDisplay";
-import type { Game } from "@dac/shared/types";
+import type { PlayerGame } from "@dac/shared/types";
 
 interface SeasonSnapshot {
   season: string;
@@ -48,7 +48,7 @@ export default function Dashboard({ supabase }: DashboardProps) {
   const router = useRouter();
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
-  const [games, setGames] = useState<Game[]>([]);
+  const [games, setGames] = useState<PlayerGame[]>([]);
   const [gamesLoading, setGamesLoading] = useState(false);
   const [drodo, setDrodo] = useState<DrodoProfile | null>(null);
   const [drodoLoading, setDrodoLoading] = useState(false);
@@ -95,27 +95,25 @@ export default function Dashboard({ supabase }: DashboardProps) {
       }
     } catch {}
 
-    // Check if data changed: count + latest played_at
+    // Check if data changed: count + latest created_at
     setGamesLoading(true);
     supabase
-      .from("games")
-      .select("id, played_at")
+      .from("player_games")
+      .select("id, created_at")
       .eq("user_id", steamId)
-      .order("played_at", { ascending: false })
+      .order("created_at", { ascending: false })
       .limit(1)
       .then(async ({ data: latest }) => {
         const cachedRaw = localStorage.getItem(cacheKey);
         if (cachedRaw) {
           try {
             const { count, newest } = JSON.parse(cachedRaw);
-            const serverNewest = latest?.[0]?.played_at ?? null;
-            // Also do a count check
+            const serverNewest = latest?.[0]?.created_at ?? null;
             const { count: serverCount } = await supabase
-              .from("games")
+              .from("player_games")
               .select("*", { count: "exact", head: true })
               .eq("user_id", steamId);
             if (count === serverCount && newest === serverNewest) {
-              // Cache is current
               setGamesLoading(false);
               return;
             }
@@ -124,12 +122,12 @@ export default function Dashboard({ supabase }: DashboardProps) {
 
         // Cache miss or stale — full fetch
         const { data } = await supabase
-          .from("games")
-          .select("*")
+          .from("player_games")
+          .select("*, game:games(played_at)")
           .eq("user_id", steamId)
-          .order("played_at", { ascending: false });
+          .order("created_at", { ascending: false });
 
-        const freshGames = (data as Game[]) || [];
+        const freshGames = (data as PlayerGame[]) || [];
         setGames(freshGames);
         setGamesLoading(false);
 
@@ -139,7 +137,7 @@ export default function Dashboard({ supabase }: DashboardProps) {
             JSON.stringify({
               games: freshGames,
               count: freshGames.length,
-              newest: freshGames[0]?.played_at ?? null,
+              newest: freshGames[0]?.created_at ?? null,
             })
           );
         } catch {}
@@ -163,7 +161,7 @@ export default function Dashboard({ supabase }: DashboardProps) {
 
   const stats = useMemo(() => {
     if (!games.length) return null;
-    const placements = games.map((g) => parseInt(g.placement) || 0);
+    const placements = games.map((g) => g.placement ?? 0);
     const avg = placements.reduce((a, b) => a + b, 0) / placements.length;
     const top4 = placements.filter((p) => p >= 1 && p <= 4).length;
     const top1 = placements.filter((p) => p === 1).length;

@@ -48,12 +48,11 @@ def _get_client():
     return client
 
 
-def game_exists(user_id: str, played_at: str, placement: str, wl: str, level: str, lineup: str = "") -> bool:
-    """Check if a game with these fields already exists in Supabase.
+def game_exists(user_id: str, played_at: str, placement: str, wl: str = "", level: str = "", lineup: str = "") -> bool:
+    """Check if a player_game with these fields already exists.
 
     Uses a +/- 12 hour range around played_at since timestamps are approximate.
-    Matches on placement + wl + level only (not lineup) to catch duplicates
-    even when OCR produces slightly different unit names between captures.
+    Accepts string args for backwards compat with call sites.
     Returns True if duplicate found, False otherwise. Never raises.
     """
     client = _get_client()
@@ -64,22 +63,30 @@ def game_exists(user_id: str, played_at: str, placement: str, wl: str, level: st
         dt = datetime.fromisoformat(played_at)
         range_start = (dt - timedelta(hours=12)).isoformat()
         range_end = (dt + timedelta(hours=12)).isoformat()
+        placement_int = _safe_int(placement, 1, 8)
+        if placement_int is None:
+            return False
+
         params = {
-            "and": f"(played_at.gte.{range_start},played_at.lte.{range_end})",
             "user_id": f"eq.{user_id}",
-            "placement": f"eq.{placement}",
-            "wl": f"eq.{wl}",
-            "level": f"eq.{level}",
-            "select": "id",
+            "placement": f"eq.{placement_int}",
+            "select": "id,game:games!inner(played_at)",
+            "game.played_at": f"gte.{range_start}",
             "limit": "1",
         }
+        level_int = _safe_int(level, 1, 15)
+        if level_int is not None:
+            params["level"] = f"eq.{level_int}"
+
         resp = client.get(
-            "/rest/v1/games",
+            "/rest/v1/player_games",
             params=params,
             headers={"Accept": "application/json"},
         )
         resp.raise_for_status()
-        found = len(resp.json()) > 0
+        results = [r for r in resp.json()
+                   if r.get("game", {}).get("played_at", "") <= range_end]
+        found = len(results) > 0
         if found:
             log.debug("duplicate found: user=%s played_at=%s place=%s", user_id, played_at, placement)
         return found
@@ -107,9 +114,24 @@ def ensure_user(user_id: str) -> bool:
         return False
 
 
-def push_game(row, user_id: str | None = None) -> bool:
-    """Insert a GameRow into the Supabase games table.
+def _safe_int(val, lo=None, hi=None):
+    """Convert to int or return None. Optionally clamp to [lo, hi]."""
+    try:
+        n = int(str(val).strip())
+        if lo is not None and n < lo:
+            return None
+        if hi is not None and n > hi:
+            return None
+        return n
+    except (ValueError, TypeError):
+        return None
 
+
+def push_game(row, user_id: str | None = None) -> bool:
+    """Insert a game + player_game into Supabase.
+
+    Creates a game (the match) first, then a player_game (the player's result).
+    Handles string→int conversion for placement, level, and wl splitting.
     Returns True on success, False on error. Never raises.
     """
     client = _get_client()
@@ -117,12 +139,50 @@ def push_game(row, user_id: str | None = None) -> bool:
         return False
 
     try:
-        data = {k: str(v) if v else None for k, v in asdict(row).items()}
-        if user_id:
-            data["user_id"] = int(user_id)
-        resp = client.post("/rest/v1/games", json=data)
+        # 1. Create the game (match)
+        game_data = {"played_at": row.played_at}
+        resp = client.post(
+            "/rest/v1/games",
+            json=game_data,
+            headers={"Prefer": "return=representation"},
+        )
         resp.raise_for_status()
-        log.info("pushed game: placement=%s", data.get("placement"))
+        game_id = resp.json()[0]["id"]
+
+        # 2. Convert types
+        placement = _safe_int(row.placement, 1, 8)
+        level = _safe_int(row.level, 1, 15)
+        wins, losses = None, None
+        wl = getattr(row, "wl", "")
+        if wl and "-" in str(wl):
+            parts = str(wl).split("-", 1)
+            wins = _safe_int(parts[0])
+            losses = _safe_int(parts[1])
+
+        rank_change = row.rank_change if row.rank_change in ("up", "down", "none") else None
+
+        # 3. Create the player_game
+        pg_data = {
+            "game_id": game_id,
+            "placement": placement,
+            "rank": row.rank or None,
+            "rank_change": rank_change,
+            "lineup": row.lineup or None,
+            "synergies": row.synergies or None,
+            "talents": row.talents or None,
+            "relic": row.relic or None,
+            "level": level,
+            "wins": wins,
+            "losses": losses,
+            "screenshot": row.screenshot or None,
+            "replay": row.replay or None,
+            "notes": row.notes or None,
+        }
+        if user_id:
+            pg_data["user_id"] = int(user_id)
+        resp = client.post("/rest/v1/player_games", json=pg_data)
+        resp.raise_for_status()
+        log.info("pushed game %d: placement=%s", game_id, row.placement)
         return True
     except Exception as e:
         log.error("push_game error: %s", e)

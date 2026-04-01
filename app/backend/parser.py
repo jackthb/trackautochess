@@ -6,7 +6,7 @@ from pathlib import Path
 
 import httpx
 
-from models import GameRow
+from models import GameRow  # alias for PlayerGameRow
 from image_utils import synergy_crops_b64
 
 PROMPTS_DIR = Path(__file__).parent / "prompts"
@@ -183,15 +183,14 @@ def parse_screenshot_cv(
         level = ""
 
     return GameRow(
-        date=date_str,
+        played_at=date_str,
         placement=data.get("placement", ""),
-        comp=comp,
+        lineup=data.get("lineup", "") or comp,
         synergies=synergies_str,
         talents="",
         relic=data.get("relic", ""),
         level=level,
         wl=data.get("wl", ""),
-
         notes="",
     )
 
@@ -303,9 +302,9 @@ def parse_history_screenshot(
             notes_parts.append(f"rank:{d.get('rank')}")
 
         rows.append(GameRow(
-            date=date_str,
+            played_at=date_str,
             placement=str(d.get("placement") or ""),
-            comp=comp,
+            lineup=comp,
             synergies=synergies_str,
             talents="",
             relic="",

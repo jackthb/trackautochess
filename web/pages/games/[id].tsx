@@ -4,7 +4,7 @@ import { createClient } from "@supabase/supabase-js";
 import type { GetServerSideProps } from "next";
 import unitsData from "../../data/units.json";
 import { GameRowDisplay } from "@dac/shared/GameRowDisplay";
-import type { Game } from "@dac/shared/types";
+import type { PlayerGame } from "@dac/shared/types";
 
 const UNIT_COSTS: Record<string, number> = {};
 for (const [name, info] of Object.entries(unitsData.units)) {
@@ -12,7 +12,7 @@ for (const [name, info] of Object.entries(unitsData.units)) {
 }
 
 interface GamePageProps {
-  game: Game;
+  game: PlayerGame;
   playerName: string | null;
 }
 
@@ -140,8 +140,8 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
   const supabase = createClient(url, key);
   const { data } = await supabase
-    .from("games")
-    .select("*")
+    .from("player_games")
+    .select("*, game:games(played_at)")
     .eq("id", id)
     .single();
 

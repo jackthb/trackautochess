@@ -1,5 +1,5 @@
 import type { ReactNode, CSSProperties, MouseEventHandler } from "react";
-import type { Game } from "./types";
+import type { PlayerGame } from "./types";
 import {
   placementColor,
   placementBg,
@@ -10,11 +10,10 @@ import {
   parseLineup,
   parseSynergies,
   parseRelics,
-  parseWL,
 } from "./game-utils";
 
 export interface GameRowDisplayProps {
-  game: Game;
+  game: PlayerGame;
   unitCosts: Record<string, number>;
   /** Resolve an icon URL. type = "units" | "synergies" | "relics" */
   iconUrl: (type: string, stem: string) => string;
@@ -32,8 +31,10 @@ export function GameRowDisplay({
   style,
   dateExtra,
 }: GameRowDisplayProps) {
-  const p = parseInt(game.placement) || 0;
-  const wl = parseWL(game.wl);
+  const p = game.placement ?? 0;
+  const wl = game.wins != null && game.losses != null
+    ? { w: game.wins, l: game.losses }
+    : null;
   const rankParts = game.rank ? game.rank.split("-") : [];
   const tier = rankParts[0] || "";
   const rankNum = rankParts[1] || "";
@@ -50,7 +51,7 @@ export function GameRowDisplay({
     >
       <div className="cell">
         <div className="placement" style={{ color: pColor, borderColor: pColor }}>
-          {game.placement}
+          {game.placement ?? "\u2014"}
         </div>
       </div>
 
@@ -150,16 +151,16 @@ export function GameRowDisplay({
       </div>
 
       <div className="cell date-cell">
-        {game.played_at ? (
+        {game.game?.played_at ? (
           <>
             <div>
-              {new Date(game.played_at).toLocaleDateString(undefined, {
+              {new Date(game.game.played_at).toLocaleDateString(undefined, {
                 month: "short",
                 day: "numeric",
               })}
             </div>
             <div>
-              {new Date(game.played_at).toLocaleTimeString(undefined, {
+              {new Date(game.game.played_at).toLocaleTimeString(undefined, {
                 hour: "2-digit",
                 minute: "2-digit",
               })}
