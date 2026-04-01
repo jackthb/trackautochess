@@ -1,32 +1,27 @@
-/** A match — shared across all players. */
+/** A row from the `games` table — one player's result in a match. */
 export interface Game {
   id: number;
-  played_at: string;
-  created_at: string;
-}
-
-/** One player's result in a match. */
-export interface PlayerGame {
-  id: number;
-  game_id: number;
   user_id: number;
-  placement: number;
+  placement: string;
   rank: string | null;
   rank_change: "up" | "down" | "none" | null;
   lineup: string | null;
   synergies: string | null;
   talents: string | null;
   relic: string | null;
-  level: number | null;
+  level: string | null;
+  wl: string | null;
   wins: number | null;
   losses: number | null;
   screenshot: string | null;
   replay: string | null;
   notes: string | null;
+  played_at: string;
   created_at: string;
-  /** Embedded game data from PostgREST join */
-  game?: Game;
 }
+
+/** @deprecated Use Game instead — the table is flat, not split. */
+export type PlayerGame = Game;
 
 export interface Replay {
   name: string;
@@ -157,8 +152,8 @@ declare global {
     appApi: {
       openFileDialog: () => Promise<string | null>;
       getVersion: () => Promise<string>;
-      fetchGames: () => Promise<PlayerGame[]>;
-      updateGame: (gameId: number, fields: Partial<PlayerGame>) => Promise<boolean>;
+      fetchGames: () => Promise<Game[]>;
+      updateGame: (gameId: number, fields: Partial<Game>) => Promise<boolean>;
       deleteGame: (gameId: number) => Promise<boolean>;
       fetchUnitsData: () => Promise<UnitsData>;
       fetchUnitsFull: () => Promise<Record<string, UnitFullInfo>>;

@@ -48,6 +48,8 @@ export function LogTab({ entries }: LogTabProps) {
         fontSize: "12px",
         lineHeight: "1.6",
         background: "var(--bg-deep)",
+        userSelect: "text",
+        cursor: "text",
       }}
     >
       {entries.length === 0 && (

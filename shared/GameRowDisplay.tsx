@@ -1,5 +1,5 @@
 import type { ReactNode, CSSProperties, MouseEventHandler } from "react";
-import type { PlayerGame } from "./types";
+import type { Game } from "./types";
 import {
   placementColor,
   placementBg,
@@ -13,7 +13,7 @@ import {
 } from "./game-utils";
 
 export interface GameRowDisplayProps {
-  game: PlayerGame;
+  game: Game;
   unitCosts: Record<string, number>;
   /** Resolve an icon URL. type = "units" | "synergies" | "relics" */
   iconUrl: (type: string, stem: string) => string;
@@ -31,7 +31,7 @@ export function GameRowDisplay({
   style,
   dateExtra,
 }: GameRowDisplayProps) {
-  const p = game.placement ?? 0;
+  const p = parseInt(game.placement) || 0;
   const wl = game.wins != null && game.losses != null
     ? { w: game.wins, l: game.losses }
     : null;
@@ -151,16 +151,16 @@ export function GameRowDisplay({
       </div>
 
       <div className="cell date-cell">
-        {game.game?.played_at ? (
+        {game.played_at ? (
           <>
             <div>
-              {new Date(game.game.played_at).toLocaleDateString(undefined, {
+              {new Date(game.played_at).toLocaleDateString(undefined, {
                 month: "short",
                 day: "numeric",
               })}
             </div>
             <div>
-              {new Date(game.game.played_at).toLocaleTimeString(undefined, {
+              {new Date(game.played_at).toLocaleTimeString(undefined, {
                 hour: "2-digit",
                 minute: "2-digit",
               })}
