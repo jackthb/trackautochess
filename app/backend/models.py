@@ -11,17 +11,26 @@ class RankChange(str, Enum):
 
 
 @dataclass
-class GameRow:
-    played_at: str       # ISO datetime e.g. "2024-01-15T21:34:00+00:00"
-    placement: str       # "1" through "8"
-    rank: str            # e.g. "Bishop-1"
-    rank_change: str     # RankChange value: "up", "down", "none"
-    lineup: str          # pipe-separated unit names (nullable)
-    synergies: str       # pipe-separated e.g. "Knight:6|Troll:4" (nullable)
-    talents: str         # pipe-separated talent names (nullable)
-    relic: str           # final relic name if visible (nullable)
-    level: str           # player level at game end (nullable)
-    wl: str              # win-loss record e.g. "21-17" (nullable)
-    screenshot: str = "" # public URL of the source screenshot (nullable)
-    notes: str = ""      # free-form notes
-    replay: str = ""     # replay filename e.g. "20260324_193500.mp4"
+class PlayerGameRow:
+    """One player's result in a match.
+
+    Accepts strings for placement/level/wl for convenience — push_game()
+    converts to the proper DB types (smallint, wins/losses split).
+    """
+    played_at: str           # ISO datetime — used to create the parent game
+    placement: str           # "1" through "8" (stored as smallint in DB)
+    rank: str = ""           # e.g. "Bishop-1"
+    rank_change: str = ""    # "up", "down", "none"
+    lineup: str = ""         # pipe-separated unit names
+    synergies: str = ""      # pipe-separated e.g. "Knight:6|Troll:4"
+    talents: str = ""        # pipe-separated talent names
+    relic: str = ""          # final relic name
+    level: str = ""          # player level at game end (stored as smallint)
+    wl: str = ""             # win-loss record e.g. "21-17" (split to wins/losses in DB)
+    screenshot: str = ""     # public URL
+    replay: str = ""         # replay filename
+    notes: str = ""
+
+
+# Backwards-compatible alias — all existing call sites use `GameRow`
+GameRow = PlayerGameRow

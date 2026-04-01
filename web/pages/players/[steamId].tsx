@@ -5,7 +5,7 @@ import { createClient } from "@supabase/supabase-js";
 import type { GetServerSideProps } from "next";
 import unitsData from "../../data/units.json";
 import { GameRowDisplay } from "@dac/shared/GameRowDisplay";
-import type { Game } from "@dac/shared/types";
+import type { PlayerGame } from "@dac/shared/types";
 
 const UNIT_COSTS: Record<string, number> = {};
 for (const [name, info] of Object.entries(unitsData.units)) {
@@ -23,7 +23,7 @@ function mmrLevelToTier(level: number | null): string {
 interface PlayerPageProps {
   steamId: string;
   steamName: string | null;
-  games: Game[];
+  games: PlayerGame[];
   drodo: {
     mmr: number | null;
     max_mmr: number | null;
@@ -316,10 +316,10 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
   const [gamesResult, steamName] = await Promise.all([
     supabase
-      .from("games")
-      .select("*")
+      .from("player_games")
+      .select("*, game:games(played_at)")
       .eq("user_id", steamId)
-      .order("played_at", { ascending: false }),
+      .order("created_at", { ascending: false }),
     fetchSteamName(steamId),
   ]);
 
@@ -342,7 +342,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     props: {
       steamId,
       steamName,
-      games: (gamesResult.data as Game[]) || [],
+      games: (gamesResult.data as PlayerGame[]) || [],
       drodo,
     },
   };
