@@ -10,7 +10,7 @@ importers:
     dependencies:
       '@dac/shared':
         specifier: file:../shared
-        version: file:../shared
+        version: file:../shared(react@19.2.3)
       '@supabase/ssr':
         specifier: ^0.9.0
         version: 0.9.0(@supabase/supabase-js@2.98.0)
@@ -53,6 +53,8 @@ packages:
 
   '@dac/shared@file:../shared':
     resolution: {directory: ../shared, type: directory}
+    peerDependencies:
+      react: '>=18'
 
   '@emnapi/runtime@1.8.1':
     resolution: {integrity: sha512-mehfKSMWjjNol8659Z8KxEMrdSJDDot5SXMq00dM8BN4o+CLNXQ0xH2V7EchNHV4RmbZLmmPdEaXZc5H2FXmDg==}
@@ -452,7 +454,9 @@ packages:
 
 snapshots:
 
-  '@dac/shared@file:../shared': {}
+  '@dac/shared@file:../shared(react@19.2.3)':
+    dependencies:
+      react: 19.2.3
 
   '@emnapi/runtime@1.8.1':
     dependencies:

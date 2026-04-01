@@ -234,9 +234,9 @@ def upload_screenshot(img, user_id: str) -> str | None:
 
 
 def fetch_games(user_id: str, limit: int = 20) -> list[dict] | None:
-    """Fetch recent games for a user from Supabase.
+    """Fetch recent player_games for a user, with game details embedded.
 
-    Returns list of game dicts on success, None on error.
+    Returns list of player_game dicts (with nested game.played_at) on success, None on error.
     """
     client = _get_client()
     if client is None:
@@ -244,10 +244,11 @@ def fetch_games(user_id: str, limit: int = 20) -> list[dict] | None:
 
     try:
         resp = client.get(
-            "/rest/v1/games",
+            "/rest/v1/player_games",
             params={
                 "user_id": f"eq.{user_id}",
-                "order": "played_at.desc",
+                "select": "*,game:games(played_at)",
+                "order": "created_at.desc",
                 "limit": str(limit),
             },
             headers={"Accept": "application/json"},
