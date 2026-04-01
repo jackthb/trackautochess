@@ -42,7 +42,7 @@ export default function PlayerPage({
 
   const stats = useMemo(() => {
     if (!games.length) return null;
-    const placements = games.map((g) => parseInt(g.placement) || 0);
+    const placements = games.map((g) => g.placement ?? 0);
     const avg = placements.reduce((a, b) => a + b, 0) / placements.length;
     const top4 = placements.filter((p) => p >= 1 && p <= 4).length;
     const top1 = placements.filter((p) => p === 1).length;
