@@ -160,11 +160,11 @@ export default function Dashboard({ supabase }: DashboardProps) {
 
   const handleUpdate = async (
     gameId: number,
-    fields: Partial<Game>
+    fields: Partial<PlayerGame>
   ): Promise<boolean> => {
     if (!supabase) return false;
     const { error } = await supabase
-      .from("games")
+      .from("player_games")
       .update(fields)
       .eq("id", gameId);
     if (error) {
@@ -186,7 +186,7 @@ export default function Dashboard({ supabase }: DashboardProps) {
   const handleDelete = async (gameId: number): Promise<boolean> => {
     if (!supabase) return false;
     const { error } = await supabase
-      .from("games")
+      .from("player_games")
       .delete()
       .eq("id", gameId);
     if (error) {
