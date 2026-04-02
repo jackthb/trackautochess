@@ -237,15 +237,14 @@ def parse_screenshot(
         level = ""
 
     return GameRow(
-        date=date_str,
+        played_at=date_str,
         placement=placement,
-        comp=comp,
+        lineup=comp,
         synergies=synergies_str,
         talents=data.get("talents") or "",
         relic=data.get("relic") or "",
         level=level,
         wl=data.get("wl") or "",
-
         notes=data.get("notes") or "",
     )
 

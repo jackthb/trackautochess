@@ -4,6 +4,11 @@
   "private": true,
   "main": "game-utils.ts",
   "types": "game-utils.ts",
+  "exports": {
+    "./game-utils": "./game-utils.ts",
+    "./GameRowDisplay": "./GameRowDisplay.tsx",
+    "./types": "./types.ts"
+  },
   "peerDependencies": {
     "react": ">=18",
     "react-dom": ">=18"
