@@ -475,6 +475,9 @@ export function GameRow({
       <GameRowDisplay
         game={game}
         unitCosts={unitCosts}
+        unitsFull={unitsFull}
+        synergiesData={synergiesData}
+        relicsData={relicsData}
         iconUrl={(type, stem) => `icons://${type}/${stem}.png`}
         onClick={handleToggle}
         style={{ cursor: "pointer" }}

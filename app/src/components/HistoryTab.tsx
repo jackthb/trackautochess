@@ -16,6 +16,8 @@ interface HistoryTabProps {
   refresh: () => Promise<void>;
   updateGame: (gameId: number, fields: Partial<Game>) => Promise<boolean>;
   deleteGame: (gameId: number) => Promise<boolean>;
+  focusGameId?: number | null;
+  onFocusHandled?: () => void;
 }
 
 export function HistoryTab({
@@ -29,10 +31,36 @@ export function HistoryTab({
   refresh,
   updateGame,
   deleteGame,
+  focusGameId,
+  onFocusHandled,
 }: HistoryTabProps) {
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
+  const [highlightId, setHighlightId] = useState<number | null>(null);
   const sentinelRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const gameRefs = useRef<Map<number, HTMLDivElement>>(new Map());
+
+  // Handle focus request from replays tab
+  useEffect(() => {
+    if (!focusGameId) return;
+    // Ensure enough games are visible
+    const idx = games.findIndex((g) => g.id === focusGameId);
+    if (idx === -1) {
+      onFocusHandled?.();
+      return;
+    }
+    setVisibleCount((prev) => Math.max(prev, idx + 1));
+    // Wait for render, then scroll
+    requestAnimationFrame(() => {
+      const el = gameRefs.current.get(focusGameId);
+      if (el) {
+        el.scrollIntoView({ behavior: "smooth", block: "center" });
+        setHighlightId(focusGameId);
+        setTimeout(() => setHighlightId(null), 2000);
+      }
+      onFocusHandled?.();
+    });
+  }, [focusGameId, games, onFocusHandled]);
 
   const hasMore = visibleCount < games.length;
 
@@ -110,16 +138,24 @@ export function HistoryTab({
             <div className="th">Date</div>
           </div>
           {visibleGames.map((g) => (
-            <GameRow
+            <div
               key={g.id}
-              game={g}
-              unitCosts={unitCosts}
-              unitsFull={unitsFull}
-              synergiesData={synergiesData}
-              relicsData={relicsData}
-              onUpdate={updateGame}
-              onDelete={deleteGame}
-            />
+              ref={(el) => {
+                if (el) gameRefs.current.set(g.id, el);
+                else gameRefs.current.delete(g.id);
+              }}
+              className={highlightId === g.id ? "game-entry-highlight" : undefined}
+            >
+              <GameRow
+                game={g}
+                unitCosts={unitCosts}
+                unitsFull={unitsFull}
+                synergiesData={synergiesData}
+                relicsData={relicsData}
+                onUpdate={updateGame}
+                onDelete={deleteGame}
+              />
+            </div>
           ))}
         </div>
         {hasMore && (

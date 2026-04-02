@@ -1,5 +1,5 @@
-import { useState } from "react";
-import type { Replay, ReplayStats, RecordingStats } from "../types";
+import { useState, useMemo } from "react";
+import type { Replay, ReplayStats, RecordingStats, Game } from "../types";
 import { formatSize, formatDate } from "../lib/game-utils";
 
 interface ReplaysTabProps {
@@ -9,6 +9,8 @@ interface ReplaysTabProps {
   refresh: () => Promise<void>;
   recording: boolean;
   recordingStats: RecordingStats | null;
+  games: Game[];
+  onViewGame: (gameId: number) => void;
 }
 
 function formatElapsed(seconds: number): string {
@@ -23,7 +25,17 @@ export function ReplaysTab({
   refresh,
   recording,
   recordingStats,
+  games,
+  onViewGame,
 }: ReplaysTabProps) {
+  // Build a map of replay filename -> game for quick lookup
+  const replayToGame = useMemo(() => {
+    const map = new Map<string, Game>();
+    for (const g of games) {
+      if (g.replay) map.set(g.replay, g);
+    }
+    return map;
+  }, [games]);
   const [currentReplay, setCurrentReplay] = useState<string | null>(null);
   const [pendingDelete, setPendingDelete] = useState<string | null>(null);
 
@@ -172,6 +184,14 @@ export function ReplaysTab({
               <div className="replay-info-bar">
                 <span className="replay-filename">{selectedReplay.name}</span>
                 <span>{formatSize(selectedReplay.size)}</span>
+                {replayToGame.has(selectedReplay.name) && (
+                  <button
+                    className="btn-ghost"
+                    onClick={() => onViewGame(replayToGame.get(selectedReplay.name)!.id)}
+                  >
+                    View game
+                  </button>
+                )}
               </div>
             </>
           )}

@@ -1,5 +1,5 @@
 import type { ReactNode, CSSProperties, MouseEventHandler } from "react";
-import type { Game } from "./types";
+import type { Game, UnitFullInfo, SynergyInfo, RelicInfo } from "./types";
 import {
   placementColor,
   placementBg,
@@ -11,6 +11,7 @@ import {
   parseSynergies,
   parseRelics,
 } from "./game-utils";
+import { TooltipWrap, type TooltipData } from "./Tooltip";
 
 export interface GameRowDisplayProps {
   game: Game;
@@ -21,6 +22,10 @@ export interface GameRowDisplayProps {
   style?: CSSProperties;
   /** Extra content appended inside the date cell (e.g. replay button) */
   dateExtra?: ReactNode;
+  /** Pass these to enable rich tooltips on hover */
+  unitsFull?: Record<string, UnitFullInfo>;
+  synergiesData?: Record<string, SynergyInfo>;
+  relicsData?: Record<string, RelicInfo>;
 }
 
 export function GameRowDisplay({
@@ -30,7 +35,14 @@ export function GameRowDisplay({
   onClick,
   style,
   dateExtra,
+  unitsFull,
+  synergiesData,
+  relicsData,
 }: GameRowDisplayProps) {
+  const tooltipData: TooltipData | null =
+    unitsFull || synergiesData || relicsData
+      ? { unitCosts, unitsFull, synergiesData, relicsData, iconUrl }
+      : null;
   const p = parseInt(game.placement) || 0;
   const wl = game.wins != null && game.losses != null
     ? { w: game.wins, l: game.losses }
@@ -58,47 +70,61 @@ export function GameRowDisplay({
       <div className="cell units-cell">
         {lineup.length > 0 && (
           <div className="lineup">
-            {lineup.map((u, i) => (
-              <div
-                key={i}
-                className="unit-icon-wrap"
-                title={`${u.name}${u.stars > 1 ? ` ${"★".repeat(u.stars)}` : ""}`}
-              >
-                <img
-                  className="unit-icon"
-                  src={iconUrl("units", unitStem(u.name))}
-                  alt={u.name}
-                  loading="lazy"
-                  style={{ borderColor: costBorderColor(unitCosts[u.name] || 1) }}
-                  onError={(e) => {
-                    (e.target as HTMLImageElement).style.display = "none";
-                  }}
-                />
-                {u.stars > 1 && (
-                  <span className={`unit-stars s${u.stars}`}>
-                    {"★".repeat(u.stars)}
-                  </span>
-                )}
-              </div>
-            ))}
+            {lineup.map((u, i) => {
+              const icon = (
+                <div
+                  key={i}
+                  className="unit-icon-wrap"
+                  title={tooltipData ? undefined : `${u.name}${u.stars > 1 ? ` ${"★".repeat(u.stars)}` : ""}`}
+                >
+                  <img
+                    className="unit-icon"
+                    src={iconUrl("units", unitStem(u.name))}
+                    alt={u.name}
+                    loading="lazy"
+                    style={{ borderColor: costBorderColor(unitCosts[u.name] || 1) }}
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).style.display = "none";
+                    }}
+                  />
+                  {u.stars > 1 && (
+                    <span className={`unit-stars s${u.stars}`}>
+                      {"★".repeat(u.stars)}
+                    </span>
+                  )}
+                </div>
+              );
+              return tooltipData ? (
+                <TooltipWrap key={i} type="unit" name={u.name} stars={u.stars} data={tooltipData}>
+                  {icon}
+                </TooltipWrap>
+              ) : icon;
+            })}
           </div>
         )}
         {syns.length > 0 && (
           <div className="synergies">
-            {syns.map((s, i) => (
-              <div key={i} className="syn-badge" title={`${s.name}: ${s.count}`}>
-                <img
-                  className="syn-icon"
-                  src={iconUrl("synergies", synIconName(s.name))}
-                  alt={s.name}
-                  loading="lazy"
-                  onError={(e) => {
-                    (e.target as HTMLImageElement).style.display = "none";
-                  }}
-                />
-                <span className="syn-count">{s.count}</span>
-              </div>
-            ))}
+            {syns.map((s, i) => {
+              const badge = (
+                <div key={i} className="syn-badge" title={tooltipData ? undefined : `${s.name}: ${s.count}`}>
+                  <img
+                    className="syn-icon"
+                    src={iconUrl("synergies", synIconName(s.name))}
+                    alt={s.name}
+                    loading="lazy"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).style.display = "none";
+                    }}
+                  />
+                  <span className="syn-count">{s.count}</span>
+                </div>
+              );
+              return tooltipData ? (
+                <TooltipWrap key={i} type="synergy" name={s.name} count={s.count} data={tooltipData}>
+                  {badge}
+                </TooltipWrap>
+              ) : badge;
+            })}
           </div>
         )}
       </div>
@@ -131,19 +157,26 @@ export function GameRowDisplay({
       <div className="cell relics-cell">
         {relics.length > 0 ? (
           <div className="relics">
-            {relics.map((r, i) => (
-              <img
-                key={i}
-                className="relic-icon"
-                src={iconUrl("relics", relicStem(r))}
-                alt={r}
-                title={r}
-                loading="lazy"
-                onError={(e) => {
-                  (e.target as HTMLImageElement).style.display = "none";
-                }}
-              />
-            ))}
+            {relics.map((r, i) => {
+              const icon = (
+                <img
+                  key={i}
+                  className="relic-icon"
+                  src={iconUrl("relics", relicStem(r))}
+                  alt={r}
+                  title={tooltipData ? undefined : r}
+                  loading="lazy"
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).style.display = "none";
+                  }}
+                />
+              );
+              return tooltipData ? (
+                <TooltipWrap key={i} type="relic" name={r} relicIndex={i} data={tooltipData}>
+                  {icon}
+                </TooltipWrap>
+              ) : icon;
+            })}
           </div>
         ) : (
           <span style={{ color: "var(--text-muted)" }}>&mdash;</span>

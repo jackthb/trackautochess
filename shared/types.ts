@@ -22,3 +22,31 @@ export interface Game {
 
 /** @deprecated Use Game instead — the table is flat, not split. */
 export type PlayerGame = Game;
+
+export interface UnitFullInfo {
+  synergies?: string[];
+  stats?: Record<string, {
+    hp: number;
+    atk: number | number[];
+    armor: number;
+    magic_resist: number;
+    mana: number;
+    atk_rate: number;
+  }>;
+  [key: string]: unknown;
+}
+
+export interface SynergyInfo {
+  name: string;
+  description?: string;
+  formatted?: string;
+  tiers?: number[];
+  lore?: string;
+  [key: string]: unknown;
+}
+
+export interface RelicInfo {
+  name: string;
+  description?: string;
+  [key: string]: unknown;
+}

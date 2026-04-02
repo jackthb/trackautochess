@@ -16,6 +16,7 @@ type TabId = "history" | "replays" | "confirm" | "settings" | "log";
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<TabId>("history");
+  const [focusGameId, setFocusGameId] = useState<number | null>(null);
 
   const gamesState = useGames();
   const replaysState = useReplays();
@@ -40,6 +41,11 @@ export default function App() {
     setActiveTab(tab as TabId);
   }, []);
 
+  const handleViewGame = useCallback((gameId: number) => {
+    setFocusGameId(gameId);
+    setActiveTab("history");
+  }, []);
+
   return (
     <>
       <TitleBar />
@@ -49,12 +55,20 @@ export default function App() {
         showConfirmBadge={hasParseResult}
       />
       <div style={{ flex: 1, overflow: "hidden", display: "flex" }}>
-        {activeTab === "history" && <HistoryTab {...gamesState} />}
+        {activeTab === "history" && (
+          <HistoryTab
+            {...gamesState}
+            focusGameId={focusGameId}
+            onFocusHandled={() => setFocusGameId(null)}
+          />
+        )}
         {activeTab === "replays" && (
           <ReplaysTab
             {...replaysState}
             recording={tracker.status?.recording ?? false}
             recordingStats={tracker.status?.recording_stats ?? null}
+            games={gamesState.games}
+            onViewGame={handleViewGame}
           />
         )}
         {activeTab === "confirm" && (
