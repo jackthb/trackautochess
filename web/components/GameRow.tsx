@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from "react";
-import type { PlayerGame } from "@dac/shared/types";
+import type { Game } from "@dac/shared/types";
 import {
   placementBg,
   unitStem,
@@ -7,16 +7,17 @@ import {
   synIconName,
   parseSynergies,
   parseRelics,
+  parseWL,
 } from "@dac/shared/game-utils";
 import { GameRowDisplay } from "@dac/shared/GameRowDisplay";
 
 interface GameRowProps {
-  game: PlayerGame;
+  game: Game;
   unitCosts: Record<string, number>;
   allUnitNames: string[];
   allSynergyNames: string[];
   allRelicNames: string[];
-  onUpdate: (gameId: number, fields: Partial<PlayerGame>) => Promise<boolean>;
+  onUpdate: (gameId: number, fields: Partial<Game>) => Promise<boolean>;
   onDelete: (gameId: number) => Promise<boolean>;
 }
 
@@ -289,7 +290,7 @@ export function GameRow({
   const [editRelics, setEditRelics] = useState<string[]>([]);
   const [editPlayedAt, setEditPlayedAt] = useState("");
 
-  const p = game.placement ?? 0;
+  const p = parseInt(game.placement) || 0;
 
   function toDatetimeLocal(isoStr: string) {
     const d = new Date(isoStr);
@@ -303,9 +304,10 @@ export function GameRow({
     const parsedRank = game.rank ? game.rank.split("-") : [];
     setEditRankTier(parsedRank[0] || "");
     setEditRankNum(parsedRank[1] || "");
-    setEditW(game.wins ?? 0);
-    setEditL(game.losses ?? 0);
-    const playedAt = game.game?.played_at;
+    const parsedWL = parseWL(game.wl);
+    setEditW(parsedWL?.w ?? 0);
+    setEditL(parsedWL?.l ?? 0);
+    const playedAt = game.played_at;
     setEditPlayedAt(playedAt ? toDatetimeLocal(playedAt) : "");
     const parsedLineup = (game.lineup || "")
       .split("|")
@@ -350,14 +352,16 @@ export function GameRow({
       : null;
 
     const ok = await onUpdate(game.id, {
-      placement: parseInt(editPlacement) || game.placement,
-      level: editLevel ? parseInt(editLevel) : null,
+      placement: editPlacement || game.placement,
+      level: editLevel || null,
       rank: rankStr,
-      wins: editW || null,
-      losses: editL || null,
+      wl: wlStr,
       lineup: lineupStr,
       synergies: synStr,
       relic: relicStr,
+      played_at: editPlayedAt
+        ? new Date(editPlayedAt).toISOString()
+        : game.played_at,
     });
     setSaving(false);
     if (ok) setExpanded(false);

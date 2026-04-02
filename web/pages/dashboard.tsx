@@ -160,7 +160,7 @@ export default function Dashboard({ supabase }: DashboardProps) {
 
   const handleUpdate = async (
     gameId: number,
-    fields: Partial<PlayerGame>
+    fields: Partial<Game>
   ): Promise<boolean> => {
     if (!supabase) return false;
     const { error } = await supabase
