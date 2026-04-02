@@ -273,6 +273,7 @@ export default function PlayerPage({
                       game={g}
                       unitCosts={UNIT_COSTS}
                       iconUrl={(type, stem) => `/icons/${type}/${stem}.png`}
+                      shareUrl={`/games/${g.id}`}
                     />
                   </Link>
                 </div>

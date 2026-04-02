@@ -246,6 +246,18 @@ a { color: inherit; text-decoration: none; }
   border-color: var(--accent);
 }
 
+/* ── Share button ── */
+
+.btn-share {
+  display: inline-flex;
+  align-items: center;
+  color: var(--text-muted);
+  opacity: 0.5;
+  transition: opacity 0.15s, color 0.15s;
+  padding: 2px;
+}
+.btn-share:hover { opacity: 1; color: var(--accent); }
+
 /* ── Noise texture overlay ── */
 body::before {
   content: '';
