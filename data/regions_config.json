@@ -1,0 +1,92 @@
+{
+  "screen_types": {
+    "game_over": {
+      "description": "GAME OVER / Final results table",
+      "regions": {
+        "title_region": { "description": "Title text area" },
+        "final_rank_region": { "description": "Left panel Final Ranking overlay" },
+        "eliminated_region": { "description": "You have been eliminated text" },
+        "col_rank": { "description": "Rank column" },
+        "col_player": { "description": "Player name column" },
+        "col_level": { "description": "Level circle column" },
+        "col_synergy": { "description": "Synergy badges column" },
+        "col_relic": { "description": "Relic icons column" },
+        "col_wl": { "description": "Win-Loss column" },
+        "table_area": { "description": "Full table area (y_start to y_end)" }
+      }
+    },
+    "my_matches": {
+      "description": "MY MATCHES history screen",
+      "regions": {
+        "tab_region": { "description": "Tab bar with MY MATCHES text" },
+        "table_area": { "description": "Full table area" },
+        "sep_scan_band": { "description": "X-band scanned for dark row separators" },
+        "col_placement": { "description": "Placement column" },
+        "col_level": { "description": "Level column" },
+        "col_units": { "description": "Unit icons column" },
+        "col_synergy": { "description": "Synergy icons column" },
+        "col_relic": { "description": "Relic icons column" },
+        "col_wl": { "description": "Win-Loss column" },
+        "col_rank": { "description": "Rank change column" },
+        "col_time": { "description": "Time ago text" }
+      }
+    },
+    "sentinel_final_ranking": {
+      "description": "Sentinel: detects Final Ranking screen",
+      "regions": {
+        "search_region": { "description": "Region to search for template match" }
+      }
+    },
+    "sentinel_round_start": {
+      "description": "Sentinel: detects round start countdown",
+      "regions": {
+        "search_region": { "description": "Region to search for template match" }
+      }
+    }
+  },
+  "aspect_ratios": {
+    "21:9": {
+      "reference_resolution": "3440x1440",
+      "game_over": {
+        "title_region": [0.30, 0.00, 0.70, 0.12],
+        "final_rank_region": [0.0, 0.24, 0.14, 0.32],
+        "eliminated_region": [0.0, 0.17, 0.14, 0.25],
+        "col_rank": [0.000, 0.025],
+        "col_player": [0.025, 0.155],
+        "col_level": [0.130, 0.165],
+        "col_synergy": [0.390, 0.500],
+        "col_relic": [0.485, 0.555],
+        "col_wl": [0.573, 0.612],
+        "table_area": [0.0, 0.155, 1.0, 0.97]
+      },
+      "my_matches": {
+        "tab_region": [0.30, 0.12, 0.55, 0.20],
+        "table_area": [0.0, 0.33, 1.0, 0.90],
+        "sep_scan_band": [0.60, 0.70],
+        "col_placement": [0.390, 0.436],
+        "col_level": [0.452, 0.481],
+        "col_units": [0.4814, 0.5945],
+        "col_synergy": [0.597, 0.692],
+        "col_relic": [0.7035, 0.7491],
+        "col_wl": [0.752, 0.792],
+        "col_rank": [0.792, 0.863],
+        "col_time": [0.390, 0.436]
+      },
+      "sentinel_final_ranking": {
+        "search_region": [0.0, 0.20, 0.15, 0.35]
+      },
+      "sentinel_round_start": {
+        "search_region": [0.80, 0.15, 0.95, 0.35]
+      },
+      "screenshots": {}
+    },
+    "16:9": {
+      "reference_resolution": "1920x1080",
+      "game_over": {},
+      "my_matches": {},
+      "sentinel_final_ranking": {},
+      "sentinel_round_start": {},
+      "screenshots": {}
+    }
+  }
+}

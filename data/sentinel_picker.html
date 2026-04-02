@@ -1,57 +1,107 @@
 <!DOCTYPE html>
-<html><head><meta charset="utf-8"><title>Sentinel Region Picker</title>
+<html><head><meta charset="utf-8"><title>DAC Region Calibration</title>
 <style>
 @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&display=swap');
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { background: #0a0a0a; color: #c8c8c8; font-family: 'JetBrains Mono', monospace; overflow: hidden; height: 100vh; }
 
+/* ── Toolbar ─────────────────────────────────────── */
 #toolbar { position: fixed; top: 0; left: 0; right: 0; background: #0d0d0d;
   border-bottom: 1px solid #1a1a1a; padding: 0 16px; z-index: 20;
-  display: flex; gap: 20px; align-items: center; font-size: 12px; height: 40px; }
+  display: flex; gap: 12px; align-items: center; font-size: 12px; height: 40px; }
 #toolbar .sep { color: #2a2a2a; }
 #toolbar .label { color: #555; }
 #toolbar .val { color: #4ade80; }
 #toolbar .val.rgb { color: #f97316; }
-#toolbar button { background: #161616; color: #aaa; border: 1px solid #2a2a2a; padding: 4px 12px;
+#toolbar button, #toolbar select { background: #161616; color: #aaa; border: 1px solid #2a2a2a; padding: 4px 10px;
   cursor: pointer; font-family: inherit; font-size: 11px; border-radius: 2px; transition: all 0.15s; }
-#toolbar button:hover { background: #222; color: #fff; border-color: #444; }
+#toolbar button:hover, #toolbar select:hover { background: #222; color: #fff; border-color: #444; }
+#toolbar select { padding: 4px 6px; }
 #toolbar .drop-hint { color: #333; font-size: 11px; margin-left: auto; }
 
-#viewport { position: absolute; top: 40px; left: 0; right: 320px; bottom: 0; overflow: hidden; cursor: crosshair; background: #080808; }
+/* ── Left sidebar ────────────────────────────────── */
+#left-panel { position: fixed; top: 40px; left: 0; width: 220px; bottom: 0;
+  background: #0d0d0d; border-right: 1px solid #1a1a1a; display: flex; flex-direction: column; z-index: 10; }
+#left-panel h2 { font-size: 10px; font-weight: 600; color: #444; text-transform: uppercase;
+  letter-spacing: 1.5px; padding: 12px 12px 6px; }
+
+.screen-list { flex: 1; overflow-y: auto; padding: 0 0 8px; }
+.screen-item { padding: 8px 12px; cursor: pointer; font-size: 11px; border-left: 3px solid transparent;
+  transition: all 0.1s; display: flex; align-items: center; gap: 8px; }
+.screen-item:hover { background: #141414; }
+.screen-item.active { background: #0f1f0f; border-left-color: #4ade80; color: #4ade80; }
+.screen-item .dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+.screen-item .dot.empty { background: #333; }
+.screen-item .dot.partial { background: #f97316; }
+.screen-item .dot.complete { background: #4ade80; }
+
+.ar-toggle { display: flex; margin: 0 12px 8px; border: 1px solid #2a2a2a; border-radius: 2px; overflow: hidden; }
+.ar-toggle button { flex: 1; background: #111; color: #666; border: none; padding: 6px 0;
+  cursor: pointer; font-family: inherit; font-size: 11px; transition: all 0.15s; }
+.ar-toggle button.active { background: #14532d; color: #4ade80; }
+.ar-toggle button:hover:not(.active) { background: #1a1a1a; color: #aaa; }
+
+.screenshot-section { padding: 8px 12px; border-top: 1px solid #1a1a1a; }
+.screenshot-section h3 { font-size: 10px; color: #444; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
+.screenshot-thumb { width: 100%; aspect-ratio: 16/9; background: #111; border: 1px solid #222; border-radius: 2px;
+  cursor: pointer; display: flex; align-items: center; justify-content: center; color: #333; font-size: 10px;
+  overflow: hidden; position: relative; margin-bottom: 4px; }
+.screenshot-thumb img { width: 100%; height: 100%; object-fit: cover; }
+.screenshot-thumb:hover { border-color: #444; }
+.screenshot-btns { display: flex; gap: 4px; }
+.screenshot-btns button { flex: 1; background: #161616; color: #888; border: 1px solid #222; padding: 4px 0;
+  cursor: pointer; font-family: inherit; font-size: 10px; border-radius: 2px; }
+.screenshot-btns button:hover { background: #222; color: #fff; border-color: #444; }
+
+/* ── Viewport ────────────────────────────────────── */
+#viewport { position: absolute; top: 40px; left: 220px; right: 320px; bottom: 0; overflow: hidden; cursor: crosshair; background: #080808; }
 #viewport.empty { display: flex; align-items: center; justify-content: center; cursor: default; }
 #viewport.empty::after { content: 'Drop screenshot here or click Load'; color: #222; font-size: 14px; }
 canvas { position: absolute; top: 0; left: 0; }
 #overlay { position: absolute; top: 0; left: 0; pointer-events: none; }
 
+/* ── Right panel ─────────────────────────────────── */
 #panel { position: fixed; top: 40px; right: 0; width: 320px; bottom: 0;
   background: #0d0d0d; border-left: 1px solid #1a1a1a; display: flex; flex-direction: column; }
-#panel-header { padding: 12px 14px 8px; border-bottom: 1px solid #1a1a1a; }
+#panel-header { padding: 12px 14px 8px; border-bottom: 1px solid #1a1a1a; display: flex; align-items: center; justify-content: space-between; }
 #panel-header h2 { font-size: 11px; font-weight: 600; color: #555; text-transform: uppercase; letter-spacing: 1.5px; }
-#regions-list { flex: 1; overflow-y: auto; padding: 6px 0; }
-#regions-list::-webkit-scrollbar { width: 4px; }
-#regions-list::-webkit-scrollbar-track { background: transparent; }
-#regions-list::-webkit-scrollbar-thumb { background: #222; border-radius: 2px; }
+#panel-header .count { font-size: 10px; color: #444; }
 
-.region-entry { padding: 10px 14px; border-bottom: 1px solid #111; transition: background 0.1s; }
+.expected-regions { flex: 1; overflow-y: auto; padding: 6px 0; }
+.expected-regions::-webkit-scrollbar { width: 4px; }
+.expected-regions::-webkit-scrollbar-track { background: transparent; }
+.expected-regions::-webkit-scrollbar-thumb { background: #222; border-radius: 2px; }
+
+.region-entry { padding: 8px 14px; border-bottom: 1px solid #111; transition: background 0.1s; }
 .region-entry:hover { background: #141414; }
-.region-entry .top-row { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
-.region-entry .swatch { width: 14px; height: 14px; border: 1px solid #333; border-radius: 1px; flex-shrink: 0; }
-.region-entry .name-input { background: none; border: none; border-bottom: 1px solid #222; color: #e0e0e0;
-  font-family: inherit; font-size: 12px; flex: 1; padding: 1px 0; outline: none; }
-.region-entry .name-input:focus { border-color: #4ade80; }
-.region-entry .name-input::placeholder { color: #333; }
+.region-entry .top-row { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
+.region-entry .swatch { width: 12px; height: 12px; border: 1px solid #333; border-radius: 1px; flex-shrink: 0; }
+.region-entry .region-name { font-size: 12px; color: #e0e0e0; flex: 1; }
+.region-entry .region-name.uncalibrated { color: #555; font-style: italic; }
 .region-entry .del-btn { background: none; border: none; color: #333; cursor: pointer;
   font-size: 14px; padding: 0 2px; transition: color 0.15s; }
 .region-entry .del-btn:hover { color: #ef4444; }
 .region-entry .meta { font-size: 10px; color: #444; line-height: 1.6; }
 .region-entry .meta span { color: #666; }
+.region-entry .assign-hint { font-size: 10px; color: #2a6; cursor: pointer; }
+.region-entry .assign-hint:hover { color: #4ade80; }
+.region-entry.assigning { background: #0f1f0f; border-left: 3px solid #4ade80; }
+.region-entry .desc { font-size: 10px; color: #444; margin-bottom: 4px; }
 
-#panel-footer { padding: 10px 14px; border-top: 1px solid #1a1a1a; display: flex; gap: 8px; }
+.custom-region-entry { padding: 8px 14px; border-bottom: 1px solid #111; }
+.custom-region-entry .top-row { display: flex; align-items: center; gap: 8px; }
+.custom-region-entry .name-input { background: none; border: none; border-bottom: 1px solid #222; color: #e0e0e0;
+  font-family: inherit; font-size: 12px; flex: 1; padding: 1px 0; outline: none; }
+.custom-region-entry .name-input:focus { border-color: #4ade80; }
+
+#panel-footer { padding: 10px 14px; border-top: 1px solid #1a1a1a; display: flex; gap: 6px; flex-wrap: wrap; }
 #panel-footer button { flex: 1; background: #161616; color: #aaa; border: 1px solid #2a2a2a; padding: 6px 0;
-  cursor: pointer; font-family: inherit; font-size: 11px; border-radius: 2px; transition: all 0.15s; }
+  cursor: pointer; font-family: inherit; font-size: 11px; border-radius: 2px; transition: all 0.15s; min-width: 80px; }
 #panel-footer button:hover { background: #222; color: #fff; border-color: #444; }
 #panel-footer button.primary { background: #14532d; color: #4ade80; border-color: #166534; }
 #panel-footer button.primary:hover { background: #166534; }
+#panel-footer button.danger { color: #f87171; border-color: #7f1d1d; }
+#panel-footer button.danger:hover { background: #1f0d0d; border-color: #991b1b; }
 
 .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #166534;
   color: #4ade80; padding: 8px 20px; border-radius: 3px; font-size: 12px; font-family: inherit;
@@ -68,26 +118,49 @@ canvas { position: absolute; top: 0; left: 0; }
 
 .sel-rect { position: absolute; border: 1.5px solid #4ade80; background: rgba(74,222,128,0.08); pointer-events: none; }
 .sel-rect.existing { border-color: #f97316; background: rgba(249,115,22,0.06); }
+.sel-rect.assigning { border-color: #38bdf8; background: rgba(56,189,248,0.08); }
 .sel-rect .sel-label { position: absolute; top: -18px; left: 0; font-size: 9px; color: #f97316;
   background: rgba(0,0,0,0.7); padding: 1px 4px; white-space: nowrap; border-radius: 1px; }
+.sel-rect.assigning .sel-label { color: #38bdf8; }
 
 input[type="file"] { display: none; }
 </style></head><body>
 
 <div id="toolbar">
   <button onclick="fileInput.click()">Load</button>
-  <span class="sep">│</span>
-  <span class="label">Pixel:</span> <span class="val" id="px">—</span>
-  <span class="sep">│</span>
-  <span class="label">Frac:</span> <span class="val" id="frac">—</span>
-  <span class="sep">│</span>
-  <span class="label">RGB:</span> <span class="val rgb" id="rgb">—</span>
-  <span class="sep">│</span>
-  <span class="label">Zoom:</span> <span class="val" id="zlevel">1×</span>
+  <span class="sep">|</span>
+  <span class="label">Pixel:</span> <span class="val" id="px">--</span>
+  <span class="sep">|</span>
+  <span class="label">Frac:</span> <span class="val" id="frac">--</span>
+  <span class="sep">|</span>
+  <span class="label">RGB:</span> <span class="val rgb" id="rgb">--</span>
+  <span class="sep">|</span>
+  <span class="label">Zoom:</span> <span class="val" id="zlevel">1x</span>
   <button onclick="setZoom(zoom * 1.5)">+</button>
-  <button onclick="setZoom(zoom / 1.5)">−</button>
+  <button onclick="setZoom(zoom / 1.5)">-</button>
   <button onclick="setZoom(fitZoom())">Fit</button>
   <span class="drop-hint" id="dropHint">drag & drop screenshot</span>
+</div>
+
+<div id="left-panel">
+  <h2>Aspect Ratio</h2>
+  <div class="ar-toggle">
+    <button class="active" onclick="setAspectRatio('21:9')">21:9</button>
+    <button onclick="setAspectRatio('16:9')">16:9</button>
+  </div>
+  <h2>Screen Type</h2>
+  <div class="screen-list" id="screenList"></div>
+  <div class="screenshot-section">
+    <h3>Screenshot</h3>
+    <div class="screenshot-thumb" id="screenshotThumb" onclick="screenshotFileInput.click()">
+      No screenshot
+    </div>
+    <div class="screenshot-btns">
+      <button onclick="screenshotFileInput.click()">Upload</button>
+      <button onclick="useLoadedAsScreenshot()">Use Current</button>
+      <button onclick="clearScreenshot()">Clear</button>
+    </div>
+  </div>
 </div>
 
 <div id="viewport" class="empty">
@@ -96,11 +169,16 @@ input[type="file"] { display: none; }
 </div>
 
 <div id="panel">
-  <div id="panel-header"><h2>Sentinel Regions</h2></div>
-  <div id="regions-list"></div>
+  <div id="panel-header">
+    <h2 id="panelTitle">Regions</h2>
+    <span class="count" id="regionCount"></span>
+  </div>
+  <div class="expected-regions" id="regionsList"></div>
   <div id="panel-footer">
-    <button onclick="clearAll()">Clear</button>
-    <button class="primary" onclick="exportJSON()">Export JSON</button>
+    <button onclick="importConfig()">Import</button>
+    <button class="primary" onclick="exportConfig()">Export JSON</button>
+    <button class="danger" onclick="clearCurrentRegions()">Clear</button>
+    <button onclick="saveToStorage()">Save</button>
   </div>
 </div>
 
@@ -112,8 +190,16 @@ input[type="file"] { display: none; }
 
 <div class="toast" id="toast"></div>
 <input type="file" id="fileInput" accept="image/*">
+<input type="file" id="screenshotFileInput" accept="image/*">
 
 <script>
+// ── State ───────────────────────────────────────────────────────────────────
+
+let config = null;
+let currentAR = '21:9';
+let currentScreen = 'game_over';
+let assigningRegion = null; // region name we're assigning next drawn rect to
+
 const viewport = document.getElementById('viewport');
 const imgCanvas = document.getElementById('imgCanvas');
 const imgCtx = imgCanvas.getContext('2d', { willReadFrequently: true });
@@ -121,18 +207,210 @@ const overlay = document.getElementById('overlay');
 const loupeEl = document.getElementById('loupe');
 const loupeCanvas = document.getElementById('loupeCanvas');
 const loupeCtx = loupeCanvas.getContext('2d');
-const regionsList = document.getElementById('regions-list');
+const regionsList = document.getElementById('regionsList');
 const fileInput = document.getElementById('fileInput');
+const screenshotFileInput = document.getElementById('screenshotFileInput');
 
 let img = null;
 let imgW = 0, imgH = 0;
 let zoom = 1, panX = 0, panY = 0;
-let regions = [];
 let dragging = false, dragStartX = 0, dragStartY = 0;
 let selDiv = null;
 let isPanning = false, panStartMX = 0, panStartMY = 0, panStartPX = 0, panStartPY = 0;
 
-// --- Image loading ---
+const DB_NAME = 'DACCalibration';
+const DB_VERSION = 1;
+const STORE_NAME = 'screenshots';
+const CONFIG_STORE = 'config';
+
+// ── IndexedDB for screenshots ───────────────────────────────────────────────
+
+function openDB() {
+  return new Promise((resolve, reject) => {
+    const req = indexedDB.open(DB_NAME, DB_VERSION);
+    req.onupgradeneeded = e => {
+      const db = e.target.result;
+      if (!db.objectStoreNames.contains(STORE_NAME)) db.createObjectStore(STORE_NAME);
+      if (!db.objectStoreNames.contains(CONFIG_STORE)) db.createObjectStore(CONFIG_STORE);
+    };
+    req.onsuccess = e => resolve(e.target.result);
+    req.onerror = e => reject(e.target.error);
+  });
+}
+
+async function dbPut(store, key, value) {
+  const db = await openDB();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(store, 'readwrite');
+    tx.objectStore(store).put(value, key);
+    tx.oncomplete = () => resolve();
+    tx.onerror = e => reject(e.target.error);
+  });
+}
+
+async function dbGet(store, key) {
+  const db = await openDB();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(store, 'readonly');
+    const req = tx.objectStore(store).get(key);
+    req.onsuccess = () => resolve(req.result);
+    req.onerror = e => reject(e.target.error);
+  });
+}
+
+async function dbDelete(store, key) {
+  const db = await openDB();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(store, 'readwrite');
+    tx.objectStore(store).delete(key);
+    tx.oncomplete = () => resolve();
+    tx.onerror = e => reject(e.target.error);
+  });
+}
+
+// ── Config management ───────────────────────────────────────────────────────
+
+async function loadConfig() {
+  // Try IndexedDB first, then fetch default
+  let saved = await dbGet(CONFIG_STORE, 'regions_config');
+  if (saved) {
+    config = saved;
+  } else {
+    try {
+      const resp = await fetch('regions_config.json');
+      config = await resp.json();
+    } catch (e) {
+      // Fallback minimal config
+      config = {
+        screen_types: {},
+        aspect_ratios: { '21:9': {}, '16:9': {} }
+      };
+    }
+  }
+  renderScreenList();
+  renderPanel();
+}
+
+async function saveToStorage() {
+  await dbPut(CONFIG_STORE, 'regions_config', config);
+  showToast('Saved to browser storage');
+}
+
+function getARData() {
+  return config.aspect_ratios[currentAR] || {};
+}
+
+function getScreenRegions() {
+  const arData = getARData();
+  return arData[currentScreen] || {};
+}
+
+function setScreenRegions(regions) {
+  if (!config.aspect_ratios[currentAR]) config.aspect_ratios[currentAR] = {};
+  config.aspect_ratios[currentAR][currentScreen] = regions;
+}
+
+function getExpectedRegions() {
+  const st = config.screen_types[currentScreen];
+  return st ? st.regions : {};
+}
+
+function getScreenshotKey() {
+  return `${currentAR}__${currentScreen}`;
+}
+
+// ── Aspect ratio & screen selection ─────────────────────────────────────────
+
+function setAspectRatio(ar) {
+  currentAR = ar;
+  document.querySelectorAll('.ar-toggle button').forEach(b => {
+    b.classList.toggle('active', b.textContent.trim() === ar);
+  });
+  renderScreenList();
+  renderPanel();
+  loadScreenshot();
+}
+
+function setScreen(screen) {
+  currentScreen = screen;
+  assigningRegion = null;
+  renderScreenList();
+  renderPanel();
+  loadScreenshot();
+}
+
+function renderScreenList() {
+  const list = document.getElementById('screenList');
+  list.innerHTML = '';
+  const types = config.screen_types || {};
+  for (const [key, info] of Object.entries(types)) {
+    const item = document.createElement('div');
+    item.className = 'screen-item' + (key === currentScreen ? ' active' : '');
+    item.onclick = () => setScreen(key);
+
+    // Status dot
+    const expected = Object.keys(info.regions || {});
+    const calibrated = config.aspect_ratios[currentAR]?.[key] || {};
+    const calibratedCount = Object.keys(calibrated).filter(k => k !== 'screenshots').length;
+    let dotClass = 'empty';
+    if (calibratedCount > 0 && calibratedCount >= expected.length) dotClass = 'complete';
+    else if (calibratedCount > 0) dotClass = 'partial';
+
+    item.innerHTML = `<div class="dot ${dotClass}"></div><span>${info.description || key}</span>`;
+    list.appendChild(item);
+  }
+}
+
+// ── Screenshot persistence ──────────────────────────────────────────────────
+
+async function loadScreenshot() {
+  const key = getScreenshotKey();
+  const data = await dbGet(STORE_NAME, key);
+  const thumb = document.getElementById('screenshotThumb');
+  if (data) {
+    thumb.innerHTML = `<img src="${data}">`;
+    loadImage(data);
+  } else {
+    thumb.innerHTML = 'No screenshot';
+    // Don't clear viewport if user has manually loaded an image
+  }
+}
+
+async function saveScreenshot(dataUrl) {
+  const key = getScreenshotKey();
+  await dbPut(STORE_NAME, key, dataUrl);
+  const thumb = document.getElementById('screenshotThumb');
+  thumb.innerHTML = `<img src="${dataUrl}">`;
+}
+
+async function clearScreenshot() {
+  const key = getScreenshotKey();
+  await dbDelete(STORE_NAME, key);
+  document.getElementById('screenshotThumb').innerHTML = 'No screenshot';
+}
+
+function useLoadedAsScreenshot() {
+  if (!img) return showToast('No image loaded');
+  const c = document.createElement('canvas');
+  c.width = imgW; c.height = imgH;
+  c.getContext('2d').drawImage(img, 0, 0);
+  const dataUrl = c.toDataURL('image/png');
+  saveScreenshot(dataUrl);
+  showToast('Screenshot saved');
+}
+
+screenshotFileInput.onchange = e => {
+  if (e.target.files[0]) {
+    const r = new FileReader();
+    r.onload = ev => {
+      saveScreenshot(ev.target.result);
+      loadImage(ev.target.result);
+    };
+    r.readAsDataURL(e.target.files[0]);
+  }
+};
+
+// ── Image loading ───────────────────────────────────────────────────────────
 
 function loadImage(src) {
   const i = new Image();
@@ -141,8 +419,9 @@ function loadImage(src) {
     imgCanvas.width = imgW; imgCanvas.height = imgH;
     imgCtx.drawImage(i, 0, 0);
     viewport.classList.remove('empty');
-    document.getElementById('dropHint').textContent = `${imgW}×${imgH}`;
+    document.getElementById('dropHint').textContent = `${imgW}x${imgH}`;
     setZoom(fitZoom());
+    renderRegionRects();
   };
   i.src = src;
 }
@@ -153,7 +432,7 @@ function loadFile(f) { const r = new FileReader(); r.onload = e => loadImage(e.t
 viewport.addEventListener('dragover', e => { e.preventDefault(); e.dataTransfer.dropEffect = 'copy'; });
 viewport.addEventListener('drop', e => { e.preventDefault(); if (e.dataTransfer.files[0]) loadFile(e.dataTransfer.files[0]); });
 
-// --- Zoom & pan ---
+// ── Zoom & pan ──────────────────────────────────────────────────────────────
 
 function fitZoom() {
   if (!img) return 1;
@@ -163,14 +442,13 @@ function fitZoom() {
 
 function setZoom(z) {
   const vw = viewport.clientWidth, vh = viewport.clientHeight;
-  // Zoom toward center
   const cx = vw / 2, cy = vh / 2;
   const imgCX = (cx - panX) / zoom, imgCY = (cy - panY) / zoom;
   zoom = Math.max(0.05, Math.min(z, 20));
   panX = cx - imgCX * zoom;
   panY = cy - imgCY * zoom;
   applyTransform();
-  document.getElementById('zlevel').textContent = zoom < 1 ? zoom.toFixed(2) + '×' : zoom.toFixed(1) + '×';
+  document.getElementById('zlevel').textContent = zoom < 1 ? zoom.toFixed(2) + 'x' : zoom.toFixed(1) + 'x';
 }
 
 function applyTransform() {
@@ -194,10 +472,10 @@ viewport.addEventListener('wheel', e => {
   panX = mx - imgX * zoom;
   panY = my - imgY * zoom;
   applyTransform();
-  document.getElementById('zlevel').textContent = zoom < 1 ? zoom.toFixed(2) + '×' : zoom.toFixed(1) + '×';
+  document.getElementById('zlevel').textContent = zoom < 1 ? zoom.toFixed(2) + 'x' : zoom.toFixed(1) + 'x';
 }, { passive: false });
 
-// --- Mouse → image coords ---
+// ── Mouse -> image coords ───────────────────────────────────────────────────
 
 function mouseToImg(e) {
   const rect = viewport.getBoundingClientRect();
@@ -206,7 +484,7 @@ function mouseToImg(e) {
   return { mx, my, ix: Math.round(ix), iy: Math.round(iy), ixf: ix, iyf: iy };
 }
 
-// --- Loupe ---
+// ── Loupe ───────────────────────────────────────────────────────────────────
 
 function updateLoupe(e, pos) {
   if (!img) { loupeEl.style.display = 'none'; return; }
@@ -214,7 +492,6 @@ function updateLoupe(e, pos) {
   const lx = e.clientX + 20, ly = e.clientY - 150;
   loupeEl.style.left = lx + 'px';
   loupeEl.style.top = ly + 'px';
-
   const loupeZoom = 8;
   const sw = 140 / loupeZoom, sh = 140 / loupeZoom;
   loupeCtx.imageSmoothingEnabled = false;
@@ -222,13 +499,13 @@ function updateLoupe(e, pos) {
   loupeCtx.drawImage(imgCanvas, pos.ixf - sw / 2, pos.iyf - sh / 2, sw, sh, 0, 0, 140, 140);
 }
 
-// --- Info bar ---
+// ── Info bar ────────────────────────────────────────────────────────────────
 
 function updateInfo(pos) {
   if (!img || pos.ix < 0 || pos.iy < 0 || pos.ix >= imgW || pos.iy >= imgH) {
-    document.getElementById('px').textContent = '—';
-    document.getElementById('frac').textContent = '—';
-    document.getElementById('rgb').textContent = '—';
+    document.getElementById('px').textContent = '--';
+    document.getElementById('frac').textContent = '--';
+    document.getElementById('rgb').textContent = '--';
     return;
   }
   document.getElementById('px').textContent = `${pos.ix}, ${pos.iy}`;
@@ -238,12 +515,11 @@ function updateInfo(pos) {
   document.getElementById('rgb').style.color = `rgb(${d[0]},${d[1]},${d[2]})`;
 }
 
-// --- Region drawing ---
+// ── Region drawing ──────────────────────────────────────────────────────────
 
 viewport.addEventListener('mousedown', e => {
   if (!img) return;
   if (e.button === 1 || (e.button === 0 && e.altKey)) {
-    // Middle-click or alt+click: pan
     isPanning = true;
     panStartMX = e.clientX; panStartMY = e.clientY;
     panStartPX = panX; panStartPY = panY;
@@ -256,7 +532,7 @@ viewport.addEventListener('mousedown', e => {
   dragging = true;
   dragStartX = pos.ixf; dragStartY = pos.iyf;
   selDiv = document.createElement('div');
-  selDiv.className = 'sel-rect';
+  selDiv.className = 'sel-rect' + (assigningRegion ? ' assigning' : '');
   overlay.appendChild(selDiv);
 });
 
@@ -289,107 +565,228 @@ viewport.addEventListener('mouseup', e => {
   const pos = mouseToImg(e);
   let x0 = Math.min(dragStartX, pos.ixf), y0 = Math.min(dragStartY, pos.iyf);
   let x1 = Math.max(dragStartX, pos.ixf), y1 = Math.max(dragStartY, pos.iyf);
-  // Clamp
   x0 = Math.max(0, Math.round(x0)); y0 = Math.max(0, Math.round(y0));
   x1 = Math.min(imgW, Math.round(x1)); y1 = Math.min(imgH, Math.round(y1));
 
   overlay.removeChild(selDiv);
   selDiv = null;
 
-  if (x1 - x0 < 3 || y1 - y0 < 3) return; // too small
+  if (x1 - x0 < 3 || y1 - y0 < 3) return;
 
-  // Sample average color
-  const data = imgCtx.getImageData(x0, y0, x1 - x0, y1 - y0).data;
-  let rSum = 0, gSum = 0, bSum = 0, count = 0;
-  for (let i = 0; i < data.length; i += 4) {
-    rSum += data[i]; gSum += data[i + 1]; bSum += data[i + 2]; count++;
+  const coords = [
+    +(x0 / imgW).toFixed(5),
+    +(y0 / imgH).toFixed(5),
+    +(x1 / imgW).toFixed(5),
+    +(y1 / imgH).toFixed(5)
+  ];
+
+  if (assigningRegion) {
+    // Assign to expected region
+    const regions = getScreenRegions();
+    regions[assigningRegion] = coords;
+    setScreenRegions(regions);
+    assigningRegion = null;
+    renderPanel();
+    renderRegionRects();
+    renderScreenList();
+  } else {
+    // Prompt for name
+    const name = prompt('Region name:');
+    if (!name) return;
+    const regions = getScreenRegions();
+    regions[name] = coords;
+    setScreenRegions(regions);
+    renderPanel();
+    renderRegionRects();
+    renderScreenList();
   }
-  const avgR = Math.round(rSum / count), avgG = Math.round(gSum / count), avgB = Math.round(bSum / count);
-
-  const region = {
-    name: 'region_' + regions.length,
-    x0: +(x0 / imgW).toFixed(5), y0: +(y0 / imgH).toFixed(5),
-    x1: +(x1 / imgW).toFixed(5), y1: +(y1 / imgH).toFixed(5),
-    px: { x0, y0, x1, y1 },
-    avg_rgb: [avgR, avgG, avgB]
-  };
-  regions.push(region);
-  renderPanel();
-  renderRegionRects();
 });
 
 viewport.addEventListener('mouseleave', () => { loupeEl.style.display = 'none'; });
 
-// --- Render region rects on overlay ---
+// ── Render region rects on overlay ──────────────────────────────────────────
+
+const REGION_COLORS = [
+  '#f97316', '#38bdf8', '#a78bfa', '#f472b6', '#facc15',
+  '#4ade80', '#fb923c', '#818cf8', '#e879f9', '#34d399'
+];
 
 function renderRegionRects() {
-  overlay.querySelectorAll('.sel-rect.existing').forEach(el => el.remove());
-  regions.forEach((r, i) => {
+  overlay.querySelectorAll('.sel-rect').forEach(el => el.remove());
+  const regions = getScreenRegions();
+  let i = 0;
+  for (const [name, coords] of Object.entries(regions)) {
+    if (!Array.isArray(coords) || coords.length < 4) continue;
+    const color = REGION_COLORS[i % REGION_COLORS.length];
     const div = document.createElement('div');
     div.className = 'sel-rect existing';
-    div.style.left = r.px.x0 + 'px'; div.style.top = r.px.y0 + 'px';
-    div.style.width = (r.px.x1 - r.px.x0) + 'px';
-    div.style.height = (r.px.y1 - r.px.y0) + 'px';
+    div.style.borderColor = color;
+    const px0 = coords[0] * imgW, py0 = coords[1] * imgH;
+    const px1 = coords[2] * imgW, py1 = coords[3] * imgH;
+    div.style.left = px0 + 'px'; div.style.top = py0 + 'px';
+    div.style.width = (px1 - px0) + 'px'; div.style.height = (py1 - py0) + 'px';
     const label = document.createElement('span');
     label.className = 'sel-label';
-    label.textContent = r.name;
+    label.style.color = color;
+    label.textContent = name;
     div.appendChild(label);
     overlay.appendChild(div);
-  });
+    i++;
+  }
 }
 
-// --- Panel ---
+// ── Panel ───────────────────────────────────────────────────────────────────
 
 function renderPanel() {
+  const expected = getExpectedRegions();
+  const calibrated = getScreenRegions();
+  const expectedNames = Object.keys(expected);
+  const calibratedCount = Object.keys(calibrated).filter(k => expectedNames.includes(k)).length;
+
+  document.getElementById('panelTitle').textContent =
+    (config.screen_types[currentScreen]?.description || currentScreen) + ` (${currentAR})`;
+  document.getElementById('regionCount').textContent = `${calibratedCount}/${expectedNames.length}`;
+
   regionsList.innerHTML = '';
-  regions.forEach((r, i) => {
+
+  // Expected regions
+  for (const [name, info] of Object.entries(expected)) {
+    const coords = calibrated[name];
     const entry = document.createElement('div');
-    entry.className = 'region-entry';
-    const [ar, ag, ab] = r.avg_rgb;
+    entry.className = 'region-entry' + (assigningRegion === name ? ' assigning' : '');
+
+    const hasCoords = Array.isArray(coords) && coords.length >= 4;
+    const idx = Object.keys(expected).indexOf(name);
+    const color = REGION_COLORS[idx % REGION_COLORS.length];
+
+    let meta = '';
+    if (hasCoords) {
+      meta = `<div class="meta">frac: <span>${coords[0].toFixed(4)}, ${coords[1].toFixed(4)} -> ${coords[2].toFixed(4)}, ${coords[3].toFixed(4)}</span></div>`;
+    }
+
     entry.innerHTML = `
+      <div class="desc">${info.description || ''}</div>
       <div class="top-row">
-        <div class="swatch" style="background:rgb(${ar},${ag},${ab})"></div>
-        <input class="name-input" value="${r.name}" placeholder="name..." data-idx="${i}">
-        <button class="del-btn" data-idx="${i}">×</button>
+        <div class="swatch" style="background:${hasCoords ? color : '#222'}"></div>
+        <span class="region-name ${hasCoords ? '' : 'uncalibrated'}">${name}</span>
+        ${hasCoords
+          ? `<button class="del-btn" data-name="${name}">x</button>`
+          : `<span class="assign-hint" data-name="${name}">[draw]</span>`
+        }
       </div>
-      <div class="meta">
-        frac: <span>${r.x0.toFixed(4)}, ${r.y0.toFixed(4)} → ${r.x1.toFixed(4)}, ${r.y1.toFixed(4)}</span><br>
-        px: <span>${r.px.x0}, ${r.px.y0} → ${r.px.x1}, ${r.px.y1}</span><br>
-        avg: <span style="color:rgb(${ar},${ag},${ab})">${ar}, ${ag}, ${ab}</span>
-      </div>`;
-    entry.querySelector('.name-input').addEventListener('input', e => {
-      regions[i].name = e.target.value;
-      renderRegionRects();
-    });
-    entry.querySelector('.del-btn').addEventListener('click', () => {
-      regions.splice(i, 1);
+      ${meta}`;
+
+    if (hasCoords) {
+      entry.querySelector('.del-btn').addEventListener('click', () => {
+        delete calibrated[name];
+        setScreenRegions(calibrated);
+        renderPanel();
+        renderRegionRects();
+        renderScreenList();
+      });
+    } else {
+      entry.querySelector('.assign-hint').addEventListener('click', () => {
+        assigningRegion = assigningRegion === name ? null : name;
+        renderPanel();
+      });
+    }
+
+    // Click region entry to start assigning
+    entry.addEventListener('click', e => {
+      if (e.target.closest('.del-btn') || e.target.closest('.assign-hint')) return;
+      assigningRegion = assigningRegion === name ? null : name;
       renderPanel();
-      renderRegionRects();
     });
+
     regionsList.appendChild(entry);
-  });
+  }
+
+  // Custom (non-expected) regions
+  const customNames = Object.keys(calibrated).filter(k => !expectedNames.includes(k) && k !== 'screenshots');
+  if (customNames.length > 0) {
+    const divider = document.createElement('div');
+    divider.style.cssText = 'padding: 8px 14px; font-size: 10px; color: #444; text-transform: uppercase; letter-spacing: 1px; border-top: 1px solid #1a1a1a;';
+    divider.textContent = 'Custom regions';
+    regionsList.appendChild(divider);
+
+    customNames.forEach((name, i) => {
+      const coords = calibrated[name];
+      if (!Array.isArray(coords)) return;
+      const color = REGION_COLORS[(expectedNames.length + i) % REGION_COLORS.length];
+      const entry = document.createElement('div');
+      entry.className = 'custom-region-entry';
+      entry.innerHTML = `
+        <div class="top-row">
+          <div class="swatch" style="background:${color}; width:12px; height:12px; border:1px solid #333; border-radius:1px; flex-shrink:0;"></div>
+          <input class="name-input" value="${name}" data-old="${name}">
+          <button class="del-btn" style="background:none;border:none;color:#333;cursor:pointer;font-size:14px;" data-name="${name}">x</button>
+        </div>
+        <div style="font-size:10px;color:#444;margin-top:4px;">frac: <span style="color:#666;">${coords[0].toFixed(4)}, ${coords[1].toFixed(4)} -> ${coords[2].toFixed(4)}, ${coords[3].toFixed(4)}</span></div>`;
+
+      entry.querySelector('.name-input').addEventListener('change', e => {
+        const oldName = e.target.dataset.old;
+        const newName = e.target.value.trim();
+        if (newName && newName !== oldName) {
+          calibrated[newName] = calibrated[oldName];
+          delete calibrated[oldName];
+          setScreenRegions(calibrated);
+          renderPanel();
+          renderRegionRects();
+        }
+      });
+      entry.querySelector('.del-btn').addEventListener('click', () => {
+        delete calibrated[name];
+        setScreenRegions(calibrated);
+        renderPanel();
+        renderRegionRects();
+        renderScreenList();
+      });
+      regionsList.appendChild(entry);
+    });
+  }
 }
 
-// --- Export ---
+// ── Import / Export ─────────────────────────────────────────────────────────
 
-function exportJSON() {
-  const out = {
-    sentinels: regions.map(r => ({
-      name: r.name,
-      x0: r.x0, y0: r.y0, x1: r.x1, y1: r.y1,
-      avg_rgb: r.avg_rgb
-    }))
-  };
-  const json = JSON.stringify(out, null, 2);
-  navigator.clipboard.writeText(json).then(() => showToast('Copied to clipboard'));
+function exportConfig() {
+  const json = JSON.stringify(config, null, 2);
+  navigator.clipboard.writeText(json).then(() => showToast('Config copied to clipboard'));
 }
 
-function clearAll() { regions = []; renderPanel(); renderRegionRects(); }
+function importConfig() {
+  const json = prompt('Paste regions_config.json content:');
+  if (!json) return;
+  try {
+    config = JSON.parse(json);
+    renderScreenList();
+    renderPanel();
+    renderRegionRects();
+    showToast('Config imported');
+  } catch (e) {
+    showToast('Invalid JSON: ' + e.message);
+  }
+}
+
+function clearCurrentRegions() {
+  if (!confirm(`Clear all ${currentAR} regions for ${currentScreen}?`)) return;
+  setScreenRegions({});
+  renderPanel();
+  renderRegionRects();
+  renderScreenList();
+}
+
+// ── Toast ───────────────────────────────────────────────────────────────────
 
 function showToast(msg) {
   const t = document.getElementById('toast');
   t.textContent = msg; t.classList.add('show');
   setTimeout(() => t.classList.remove('show'), 1500);
 }
+
+// ── Init ────────────────────────────────────────────────────────────────────
+
+loadConfig().then(() => {
+  loadScreenshot();
+});
 </script>
 </body></html>
