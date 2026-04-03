@@ -353,9 +353,9 @@ const DEFAULT_CONFIG = {
       },
       "screenshots": {
         "game_over": "screenshots/20260205145859_1.jpg",
-        "my_matches": null,
-        "sentinel_final_ranking": "screenshots/20260205145859_1.jpg",
-        "sentinel_round_start": "screenshots/20260205145859_1.jpg"
+        "my_matches": "screenshots/ref_my_matches_21x9.png",
+        "sentinel_final_ranking": "screenshots/ref_final_ranking_21x9.jpg",
+        "sentinel_round_start": "screenshots/ref_round_start_21x9.jpg"
       }
     },
     "16:9": {
@@ -517,6 +517,26 @@ async function loadScreenshot() {
 
 async function saveScreenshot(dataUrl) {
   const key = getScreenshotKey();
+  // Try saving to disk via local server
+  const filename = `${currentAR.replace(':', 'x')}_${currentScreen}.jpg`;
+  try {
+    const resp = await fetch('/save-screenshot', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ filename, dataUrl })
+    });
+    if (resp.ok) {
+      const { path } = await resp.json();
+      setConfigScreenshot(path);
+      // Reload from file path to verify
+      const thumb = document.getElementById('screenshotThumb');
+      thumb.innerHTML = `<img src="${path}">`;
+      showToast(`Saved to ${path}`);
+      return;
+    }
+  } catch (e) {
+    // No server running, fall back to IndexedDB
+  }
   await dbPut(STORE_NAME, key, dataUrl);
   const thumb = document.getElementById('screenshotThumb');
   thumb.innerHTML = `<img src="${dataUrl}">`;

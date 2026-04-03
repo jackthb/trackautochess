@@ -80,9 +80,9 @@
       },
       "screenshots": {
         "game_over": "screenshots/20260205145859_1.jpg",
-        "my_matches": null,
-        "sentinel_final_ranking": "screenshots/20260205145859_1.jpg",
-        "sentinel_round_start": "screenshots/20260205145859_1.jpg"
+        "my_matches": "screenshots/ref_my_matches_21x9.png",
+        "sentinel_final_ranking": "screenshots/ref_final_ranking_21x9.jpg",
+        "sentinel_round_start": "screenshots/ref_round_start_21x9.jpg"
       }
     },
     "16:9": {
