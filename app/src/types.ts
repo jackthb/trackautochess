@@ -152,6 +152,8 @@ declare global {
     appApi: {
       openFileDialog: () => Promise<string | null>;
       getVersion: () => Promise<string>;
+      getCloseToTray: () => Promise<boolean>;
+      setCloseToTray: (value: boolean) => Promise<boolean>;
       fetchGames: () => Promise<Game[]>;
       updateGame: (gameId: number, fields: Partial<Game>) => Promise<boolean>;
       deleteGame: (gameId: number) => Promise<boolean>;

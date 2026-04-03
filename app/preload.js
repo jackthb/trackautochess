@@ -24,6 +24,8 @@ contextBridge.exposeInMainWorld("windowControls", {
 contextBridge.exposeInMainWorld("appApi", {
   openFileDialog: () => ipcRenderer.invoke("app:openFileDialog"),
   getVersion: () => ipcRenderer.invoke("app:getVersion"),
+  getCloseToTray: () => ipcRenderer.invoke("app:getCloseToTray"),
+  setCloseToTray: (value) => ipcRenderer.invoke("app:setCloseToTray", value),
   fetchGames: () => ipcRenderer.invoke("games:fetch"),
   updateGame: (gameId, fields) => ipcRenderer.invoke("games:update", gameId, fields),
   deleteGame: (gameId) => ipcRenderer.invoke("games:delete", gameId),

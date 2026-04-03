@@ -8,9 +8,11 @@ interface SettingsTabProps {
 
 export function SettingsTab({ status, replayStats }: SettingsTabProps) {
   const [version, setVersion] = useState("\u2014");
+  const [closeToTray, setCloseToTray] = useState(true);
 
   useEffect(() => {
     window.appApi.getVersion().then(setVersion);
+    window.appApi.getCloseToTray().then(setCloseToTray);
   }, []);
 
   const loggedIn = !!status?.steam_name;
@@ -30,6 +32,22 @@ export function SettingsTab({ status, replayStats }: SettingsTabProps) {
   return (
     <div className="settings-tab">
       <div className="settings-container">
+        <div className="settings-section">
+          <div className="settings-section-title">General</div>
+          <div className="settings-row">
+            <span className="settings-label">Close to tray</span>
+            <button
+              className="btn-ghost"
+              onClick={async () => {
+                const newVal = await window.appApi.setCloseToTray(!closeToTray);
+                setCloseToTray(newVal);
+              }}
+            >
+              {closeToTray ? "Enabled" : "Disabled"}
+            </button>
+          </div>
+        </div>
+
         <div className="settings-section">
           <div className="settings-section-title">Steam Account</div>
           <div className="settings-row">
