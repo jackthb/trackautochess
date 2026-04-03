@@ -179,6 +179,7 @@ input[type="file"] { display: none; }
     <button class="primary" onclick="exportConfig()">Export JSON</button>
     <button class="danger" onclick="clearCurrentRegions()">Clear</button>
     <button onclick="saveToStorage()">Save</button>
+    <button class="danger" onclick="resetConfig()">Reset Config</button>
   </div>
 </div>
 
@@ -270,22 +271,124 @@ async function dbDelete(store, key) {
 
 // ── Config management ───────────────────────────────────────────────────────
 
+const DEFAULT_CONFIG = {
+  "screen_types": {
+    "game_over": {
+      "description": "GAME OVER / Final results table",
+      "regions": {
+        "title_region": { "description": "Title text area" },
+        "final_rank_region": { "description": "Left panel Final Ranking overlay" },
+        "eliminated_region": { "description": "You have been eliminated text" },
+        "col_rank": { "description": "Rank column" },
+        "col_player": { "description": "Player name column" },
+        "col_level": { "description": "Level circle column" },
+        "col_synergy": { "description": "Synergy badges column" },
+        "col_relic": { "description": "Relic icons column" },
+        "col_wl": { "description": "Win-Loss column" },
+        "table_area": { "description": "Full table area (y_start to y_end)" }
+      }
+    },
+    "my_matches": {
+      "description": "MY MATCHES history screen",
+      "regions": {
+        "tab_region": { "description": "Tab bar with MY MATCHES text" },
+        "table_area": { "description": "Full table area" },
+        "sep_scan_band": { "description": "X-band scanned for dark row separators" },
+        "col_placement": { "description": "Placement column" },
+        "col_level": { "description": "Level column" },
+        "col_units": { "description": "Unit icons column" },
+        "col_synergy": { "description": "Synergy icons column" },
+        "col_relic": { "description": "Relic icons column" },
+        "col_wl": { "description": "Win-Loss column" },
+        "col_rank": { "description": "Rank change column" },
+        "col_time": { "description": "Time ago text" }
+      }
+    },
+    "sentinel_final_ranking": {
+      "description": "Sentinel: detects Final Ranking screen",
+      "regions": {
+        "search_region": { "description": "Region to search for template match" }
+      }
+    },
+    "sentinel_round_start": {
+      "description": "Sentinel: detects round start countdown",
+      "regions": {
+        "search_region": { "description": "Region to search for template match" }
+      }
+    }
+  },
+  "aspect_ratios": {
+    "21:9": {
+      "reference_resolution": "3440x1440",
+      "game_over": {
+        "title_region": [0.30, 0.00, 0.70, 0.12],
+        "final_rank_region": [0.0, 0.24, 0.14, 0.32],
+        "eliminated_region": [0.0, 0.17, 0.14, 0.25],
+        "col_rank": [0.000, 0.025],
+        "col_player": [0.025, 0.155],
+        "col_level": [0.130, 0.165],
+        "col_synergy": [0.390, 0.500],
+        "col_relic": [0.485, 0.555],
+        "col_wl": [0.573, 0.612],
+        "table_area": [0.0, 0.155, 1.0, 0.97]
+      },
+      "my_matches": {
+        "tab_region": [0.30, 0.12, 0.55, 0.20],
+        "table_area": [0.0, 0.33, 1.0, 0.90],
+        "sep_scan_band": [0.60, 0.70],
+        "col_placement": [0.390, 0.436],
+        "col_level": [0.452, 0.481],
+        "col_units": [0.4814, 0.5945],
+        "col_synergy": [0.597, 0.692],
+        "col_relic": [0.7035, 0.7491],
+        "col_wl": [0.752, 0.792],
+        "col_rank": [0.792, 0.863],
+        "col_time": [0.390, 0.436]
+      },
+      "sentinel_final_ranking": {
+        "search_region": [0.0, 0.20, 0.15, 0.35]
+      },
+      "sentinel_round_start": {
+        "search_region": [0.80, 0.15, 0.95, 0.35]
+      },
+      "screenshots": {
+        "game_over": "screenshots/20260205145859_1.jpg",
+        "my_matches": null,
+        "sentinel_final_ranking": "screenshots/20260205145859_1.jpg",
+        "sentinel_round_start": "screenshots/20260205145859_1.jpg"
+      }
+    },
+    "16:9": {
+      "reference_resolution": "1920x1080",
+      "game_over": {},
+      "my_matches": {},
+      "sentinel_final_ranking": {},
+      "sentinel_round_start": {},
+      "screenshots": {}
+    }
+  }
+};
+
+function mergeConfig(saved, defaults) {
+  // Ensure saved config always has all screen_types from defaults
+  if (!saved.screen_types) saved.screen_types = {};
+  for (const [key, val] of Object.entries(defaults.screen_types)) {
+    if (!saved.screen_types[key]) saved.screen_types[key] = val;
+  }
+  // Ensure all aspect ratios exist
+  if (!saved.aspect_ratios) saved.aspect_ratios = {};
+  for (const [ar, arData] of Object.entries(defaults.aspect_ratios)) {
+    if (!saved.aspect_ratios[ar]) saved.aspect_ratios[ar] = arData;
+  }
+  return saved;
+}
+
 async function loadConfig() {
-  // Try IndexedDB first, then fetch default
   let saved = await dbGet(CONFIG_STORE, 'regions_config');
   if (saved) {
-    config = saved;
+    config = mergeConfig(saved, JSON.parse(JSON.stringify(DEFAULT_CONFIG)));
   } else {
-    try {
-      const resp = await fetch('regions_config.json');
-      config = await resp.json();
-    } catch (e) {
-      // Fallback minimal config
-      config = {
-        screen_types: {},
-        aspect_ratios: { '21:9': {}, '16:9': {} }
-      };
-    }
+    config = JSON.parse(JSON.stringify(DEFAULT_CONFIG));
   }
   renderScreenList();
   renderPanel();
@@ -294,6 +397,15 @@ async function loadConfig() {
 async function saveToStorage() {
   await dbPut(CONFIG_STORE, 'regions_config', config);
   showToast('Saved to browser storage');
+}
+
+async function resetConfig() {
+  if (!confirm('Reset config to defaults? This clears any saved calibration data.')) return;
+  await dbDelete(CONFIG_STORE, 'regions_config');
+  config = JSON.parse(JSON.stringify(DEFAULT_CONFIG));
+  renderScreenList();
+  renderPanel();
+  showToast('Config reset to defaults');
 }
 
 function getARData() {
@@ -363,16 +475,35 @@ function renderScreenList() {
 
 // ── Screenshot persistence ──────────────────────────────────────────────────
 
+function getConfigScreenshot() {
+  const arData = config.aspect_ratios[currentAR];
+  if (!arData || !arData.screenshots) return null;
+  return arData.screenshots[currentScreen] || null;
+}
+
+function setConfigScreenshot(path) {
+  const arData = config.aspect_ratios[currentAR];
+  if (!arData.screenshots) arData.screenshots = {};
+  arData.screenshots[currentScreen] = path;
+}
+
 async function loadScreenshot() {
-  const key = getScreenshotKey();
-  const data = await dbGet(STORE_NAME, key);
   const thumb = document.getElementById('screenshotThumb');
-  if (data) {
-    thumb.innerHTML = `<img src="${data}">`;
-    loadImage(data);
+  // Check IndexedDB override first
+  const key = getScreenshotKey();
+  const dbData = await dbGet(STORE_NAME, key);
+  if (dbData) {
+    thumb.innerHTML = `<img src="${dbData}">`;
+    loadImage(dbData);
+    return;
+  }
+  // Fall back to config file path
+  const filePath = getConfigScreenshot();
+  if (filePath) {
+    thumb.innerHTML = `<img src="${filePath}">`;
+    loadImage(filePath);
   } else {
     thumb.innerHTML = 'No screenshot';
-    // Don't clear viewport if user has manually loaded an image
   }
 }
 
@@ -386,6 +517,7 @@ async function saveScreenshot(dataUrl) {
 async function clearScreenshot() {
   const key = getScreenshotKey();
   await dbDelete(STORE_NAME, key);
+  setConfigScreenshot(null);
   document.getElementById('screenshotThumb').innerHTML = 'No screenshot';
 }
 

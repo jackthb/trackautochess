@@ -78,7 +78,12 @@
       "sentinel_round_start": {
         "search_region": [0.80, 0.15, 0.95, 0.35]
       },
-      "screenshots": {}
+      "screenshots": {
+        "game_over": "screenshots/20260205145859_1.jpg",
+        "my_matches": null,
+        "sentinel_final_ranking": "screenshots/20260205145859_1.jpg",
+        "sentinel_round_start": "screenshots/20260205145859_1.jpg"
+      }
     },
     "16:9": {
       "reference_resolution": "1920x1080",
