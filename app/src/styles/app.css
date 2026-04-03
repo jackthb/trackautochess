@@ -614,9 +614,112 @@
 
 video {
   width: 100%;
-  border-radius: 8px;
+  border-radius: 8px 8px 0 0;
   background: #000;
   outline: none;
+  cursor: pointer;
+  display: block;
+}
+
+/* ── Player controls ─────────────────────────────────── */
+
+.player-controls {
+  background: var(--bg-surface);
+  border-radius: 0 0 8px 8px;
+  border: 1px solid var(--border);
+  border-top: none;
+}
+
+.player-progress {
+  height: 4px;
+  background: var(--bg-elevated);
+  cursor: pointer;
+  transition: height 0.1s;
+  position: relative;
+}
+
+.player-progress:hover { height: 6px; }
+
+.player-progress-fill {
+  height: 100%;
+  background: var(--accent);
+  border-radius: 0 2px 2px 0;
+  pointer-events: none;
+  transition: width 0.1s linear;
+}
+
+.player-controls-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 12px;
+  gap: 12px;
+}
+
+.player-controls-left,
+.player-controls-right {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.player-btn {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1;
+  transition: all 0.12s;
+}
+
+.player-btn:hover { background: var(--bg-hover); color: var(--text-primary); }
+
+.player-time {
+  font-size: 11px;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+  margin-left: 4px;
+}
+
+.speed-controls {
+  display: flex;
+  gap: 2px;
+  background: var(--bg-elevated);
+  border-radius: 4px;
+  padding: 2px;
+}
+
+.speed-btn {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 3px 6px;
+  border-radius: 3px;
+  font-size: 11px;
+  font-weight: 500;
+  transition: all 0.12s;
+}
+
+.speed-btn:hover { color: var(--text-primary); }
+.speed-btn.active { background: var(--accent); color: #fff; }
+
+.player-shortcuts-hint {
+  text-align: center;
+  font-size: 11px;
+  color: var(--text-muted);
+  opacity: 0.6;
+  padding: 4px 24px 12px;
+}
+
+.replay-info-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 
 .empty-state {

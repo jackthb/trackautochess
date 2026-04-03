@@ -19,7 +19,9 @@ log = logging.getLogger("dac")
 
 REPLAY_DIR = DAC_DIR / "replays"
 DEFAULT_MAX_GB = 15
-FALLBACK_FPS = 5
+FALLBACK_FPS = 3
+MAX_WIDTH = 1280
+MAX_HEIGHT = 720
 
 
 # ── Replay storage management ────────────────────────────────────────────────
@@ -214,7 +216,6 @@ class _PyAVRecorder:
 
     def _record_loop(self):
         import av
-        import numpy as np
 
         import screen_capture
 
@@ -233,11 +234,20 @@ class _PyAVRecorder:
                 monitor = screen_capture.monitors()[1]
                 log.info("Dota 2 window not found — recording full screen")
 
-            w = monitor["width"]
-            h = monitor["height"]
+            cap_w = monitor["width"]
+            cap_h = monitor["height"]
+
+            # Downscale to save space — cap at MAX_WIDTH x MAX_HEIGHT
+            scale = min(1.0, MAX_WIDTH / cap_w, MAX_HEIGHT / cap_h)
+            w = int(cap_w * scale)
+            h = int(cap_h * scale)
             # Ensure even dimensions (required by most codecs)
             w = w - (w % 2)
             h = h - (h % 2)
+            needs_resize = scale < 1.0
+
+            if needs_resize:
+                log.info("Downscaling %dx%d → %dx%d (%.0f%%)", cap_w, cap_h, w, h, scale * 100)
 
             container = av.open(str(self._output_path), "w")
             stream = container.add_stream(codec_name, rate=self._fps)
@@ -247,24 +257,32 @@ class _PyAVRecorder:
             # Keyframe every 1 second for fast seeking/scrubbing
             stream.gop_size = self._fps
 
-            # Codec-specific options
+            # Codec-specific options — tuned for small file size at low fps
             if codec_name == "libsvtav1":
-                stream.options = {"preset": "8", "crf": "38"}
+                stream.options = {"preset": "8", "crf": "42"}
             elif codec_name == "libx264":
-                stream.options = {"preset": "ultrafast", "crf": "28"}
+                stream.options = {"preset": "faster", "crf": "32"}
 
             self._container = container
             self._stream = stream
 
             log.info("Recording: %dx%d @ %d fps → %s", w, h, self._fps, self._output_path.name)
 
+            if needs_resize:
+                import cv2
+
             frame_idx = 0
             while not self._stop_event.is_set():
                 t0 = time.monotonic()
 
                 img = screen_capture.grab(monitor)[:, :, :3]  # BGRA → BGR
-                # Crop to even dimensions if needed
-                img = img[:h, :w]
+
+                if needs_resize:
+                    img = cv2.resize(img, (w, h), interpolation=cv2.INTER_AREA)
+                else:
+                    # Crop to even dimensions if needed
+                    img = img[:h, :w]
+
                 # BGR → RGB for PyAV
                 img = img[:, :, ::-1]
 
