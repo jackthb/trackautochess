@@ -563,6 +563,10 @@ function loadImage(src) {
     setZoom(fitZoom());
     renderRegionRects();
   };
+  i.onerror = () => {
+    console.error('Failed to load image:', src);
+    showToast('Failed to load: ' + src.substring(0, 60));
+  };
   i.src = src;
 }
 
@@ -756,15 +760,23 @@ function renderRegionRects() {
   const regions = getScreenRegions();
   let i = 0;
   for (const [name, coords] of Object.entries(regions)) {
-    if (!Array.isArray(coords) || coords.length < 4) continue;
+    if (!Array.isArray(coords) || coords.length < 2) continue;
     const color = REGION_COLORS[i % REGION_COLORS.length];
     const div = document.createElement('div');
     div.className = 'sel-rect existing';
     div.style.borderColor = color;
-    const px0 = coords[0] * imgW, py0 = coords[1] * imgH;
-    const px1 = coords[2] * imgW, py1 = coords[3] * imgH;
-    div.style.left = px0 + 'px'; div.style.top = py0 + 'px';
-    div.style.width = (px1 - px0) + 'px'; div.style.height = (py1 - py0) + 'px';
+    if (coords.length >= 4) {
+      // 4-value region: [x0, y0, x1, y1]
+      const px0 = coords[0] * imgW, py0 = coords[1] * imgH;
+      const px1 = coords[2] * imgW, py1 = coords[3] * imgH;
+      div.style.left = px0 + 'px'; div.style.top = py0 + 'px';
+      div.style.width = (px1 - px0) + 'px'; div.style.height = (py1 - py0) + 'px';
+    } else {
+      // 2-value column range: [x_start, x_end] — render as full-height band
+      const px0 = coords[0] * imgW, px1 = coords[1] * imgW;
+      div.style.left = px0 + 'px'; div.style.top = '0px';
+      div.style.width = (px1 - px0) + 'px'; div.style.height = imgH + 'px';
+    }
     const label = document.createElement('span');
     label.className = 'sel-label';
     label.style.color = color;
@@ -795,13 +807,15 @@ function renderPanel() {
     const entry = document.createElement('div');
     entry.className = 'region-entry' + (assigningRegion === name ? ' assigning' : '');
 
-    const hasCoords = Array.isArray(coords) && coords.length >= 4;
+    const hasCoords = Array.isArray(coords) && coords.length >= 2;
     const idx = Object.keys(expected).indexOf(name);
     const color = REGION_COLORS[idx % REGION_COLORS.length];
 
     let meta = '';
-    if (hasCoords) {
+    if (hasCoords && coords.length >= 4) {
       meta = `<div class="meta">frac: <span>${coords[0].toFixed(4)}, ${coords[1].toFixed(4)} -> ${coords[2].toFixed(4)}, ${coords[3].toFixed(4)}</span></div>`;
+    } else if (hasCoords) {
+      meta = `<div class="meta">range: <span>${coords[0].toFixed(4)} -> ${coords[1].toFixed(4)}</span></div>`;
     }
 
     entry.innerHTML = `
