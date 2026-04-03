@@ -375,10 +375,18 @@ function mergeConfig(saved, defaults) {
   for (const [key, val] of Object.entries(defaults.screen_types)) {
     if (!saved.screen_types[key]) saved.screen_types[key] = val;
   }
-  // Ensure all aspect ratios exist
+  // Ensure all aspect ratios and their screenshots exist
   if (!saved.aspect_ratios) saved.aspect_ratios = {};
-  for (const [ar, arData] of Object.entries(defaults.aspect_ratios)) {
-    if (!saved.aspect_ratios[ar]) saved.aspect_ratios[ar] = arData;
+  for (const [ar, defaultAR] of Object.entries(defaults.aspect_ratios)) {
+    if (!saved.aspect_ratios[ar]) {
+      saved.aspect_ratios[ar] = defaultAR;
+    } else {
+      // Backfill screenshots from defaults if missing in saved
+      const savedAR = saved.aspect_ratios[ar];
+      if (!savedAR.screenshots || Object.keys(savedAR.screenshots).length === 0) {
+        savedAR.screenshots = defaultAR.screenshots;
+      }
+    }
   }
   return saved;
 }
