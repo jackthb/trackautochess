@@ -7,7 +7,7 @@ interface TabBarProps {
 const TABS = [
   { id: "history", label: "History" },
   { id: "replays", label: "Replays" },
-  { id: "confirm", label: "Confirmation" },
+  { id: "confirm", label: "Screenshots" },
   { id: "settings", label: "Settings" },
   { id: "log", label: "Log" },
 ];

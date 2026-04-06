@@ -270,6 +270,22 @@ class HeadlessBackend:
         log.info("Screenshot saved locally: %s", path)
         return str(path)
 
+    def _mark_screenshot_uploaded(self, screenshot_path: str) -> None:
+        """Record that a screenshot has been uploaded to the database."""
+        manifest_path = DAC_DIR / "screenshots" / "manifest.json"
+        manifest = {}
+        if manifest_path.exists():
+            try:
+                manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+            except Exception:
+                pass
+        filename = Path(screenshot_path).name
+        manifest[filename] = {"uploaded_at": datetime.now().isoformat()}
+        try:
+            manifest_path.write_text(json.dumps(manifest, indent=2), encoding="utf-8")
+        except Exception as e:
+            log.warning("Failed to update screenshot manifest: %s", e)
+
     def _do_capture(self) -> None:
         """Screenshot + detect + parse, emitting results."""
         import capture
@@ -435,6 +451,10 @@ class HeadlessBackend:
                 )
                 push_game(game_row, user_id=user_id)
                 imported += 1
+
+            # Mark screenshot as uploaded if we got a remote URL
+            if screenshot_url and self._pending_screenshot_path and not screenshot_url.startswith(str(DAC_DIR)):
+                self._mark_screenshot_uploaded(self._pending_screenshot_path)
 
             msg = f"Imported {imported} match(es)"
             if skipped:

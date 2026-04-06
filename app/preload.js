@@ -8,6 +8,13 @@ contextBridge.exposeInMainWorld("replays", {
   exists: (filename) => ipcRenderer.invoke("replays:exists", filename),
 });
 
+contextBridge.exposeInMainWorld("screenshots", {
+  list: () => ipcRenderer.invoke("screenshots:list"),
+  delete: (filename) => ipcRenderer.invoke("screenshots:delete", filename),
+  openFolder: () => ipcRenderer.invoke("screenshots:openFolder"),
+  thumbnail: (filename) => ipcRenderer.invoke("screenshots:thumbnail", filename),
+});
+
 contextBridge.exposeInMainWorld("tracker", {
   sendCommand: (cmd) => ipcRenderer.send("tracker:command", cmd),
   onEvent: (callback) => {

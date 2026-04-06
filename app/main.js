@@ -20,6 +20,8 @@ const readline = require("readline");
 
 const DAC_DIR = path.join(os.homedir(), ".dac");
 const REPLAY_DIR = path.join(DAC_DIR, "replays");
+const SCREENSHOT_DIR = path.join(DAC_DIR, "screenshots");
+const SCREENSHOT_MANIFEST = path.join(SCREENSHOT_DIR, "manifest.json");
 const IS_PACKAGED = app.isPackaged;
 const RESOURCES_DIR = IS_PACKAGED
   ? process.resourcesPath
@@ -32,7 +34,7 @@ const ICONS_DIR = IS_PACKAGED
   : path.join(__dirname, "..", "data", "icons");
 
 // Ensure dirs exist
-for (const dir of [DAC_DIR, REPLAY_DIR]) {
+for (const dir of [DAC_DIR, REPLAY_DIR, SCREENSHOT_DIR]) {
   if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
 }
 
@@ -866,4 +868,69 @@ ipcMain.handle("replays:exists", async (_event, filename) => {
   const filePath = path.join(REPLAY_DIR, filename);
   if (!filePath.startsWith(REPLAY_DIR)) return false;
   return fs.existsSync(filePath);
+});
+
+// ── Screenshot IPC handlers ────────────────────────────────────────────────
+
+function loadScreenshotManifest() {
+  if (!fs.existsSync(SCREENSHOT_MANIFEST)) return {};
+  try {
+    return JSON.parse(fs.readFileSync(SCREENSHOT_MANIFEST, "utf-8"));
+  } catch {
+    return {};
+  }
+}
+
+ipcMain.handle("screenshots:list", async () => {
+  if (!fs.existsSync(SCREENSHOT_DIR)) return [];
+
+  const manifest = loadScreenshotManifest();
+  const files = fs
+    .readdirSync(SCREENSHOT_DIR)
+    .filter((f) => /\.(png|jpg|jpeg)$/i.test(f));
+
+  return files
+    .map((name) => {
+      const filePath = path.join(SCREENSHOT_DIR, name);
+      const stat = fs.statSync(filePath);
+      return {
+        name,
+        path: filePath,
+        size: stat.size,
+        mtime: stat.mtimeMs,
+        uploaded: !!manifest[name],
+      };
+    })
+    .sort((a, b) => b.mtime - a.mtime);
+});
+
+ipcMain.handle("screenshots:delete", async (_event, filename) => {
+  const filePath = path.join(SCREENSHOT_DIR, filename);
+  if (!filePath.startsWith(SCREENSHOT_DIR)) return false;
+  if (fs.existsSync(filePath)) {
+    fs.unlinkSync(filePath);
+    // Also remove from manifest
+    const manifest = loadScreenshotManifest();
+    if (manifest[filename]) {
+      delete manifest[filename];
+      fs.writeFileSync(SCREENSHOT_MANIFEST, JSON.stringify(manifest, null, 2));
+    }
+    return true;
+  }
+  return false;
+});
+
+ipcMain.handle("screenshots:openFolder", async () => {
+  const { shell } = require("electron");
+  shell.openPath(SCREENSHOT_DIR);
+});
+
+ipcMain.handle("screenshots:thumbnail", async (_event, filename) => {
+  const filePath = path.join(SCREENSHOT_DIR, filename);
+  if (!filePath.startsWith(SCREENSHOT_DIR)) return null;
+  if (!fs.existsSync(filePath)) return null;
+  const buf = fs.readFileSync(filePath);
+  const ext = path.extname(filename).toLowerCase();
+  const mime = ext === ".png" ? "image/png" : "image/jpeg";
+  return `data:${mime};base64,${buf.toString("base64")}`;
 });

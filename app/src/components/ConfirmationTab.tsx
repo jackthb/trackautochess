@@ -1,4 +1,5 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
+import { ScreenshotHistory } from "./ScreenshotHistory";
 import type { ParseResult } from "../types";
 
 interface ConfirmationTabProps {
@@ -22,20 +23,15 @@ export function ConfirmationTab({
     }
   }, [parseResult]);
 
+  const handleImportFile = useCallback((filePath: string) => {
+    window.tracker.sendCommand({ cmd: "import_file", path: filePath });
+  }, []);
+
   if (!parseResult) {
     return (
       <div className="confirm-tab">
         <div className="confirm-container">
-          <div className="confirm-empty">
-            <div className="empty-state">
-              <div className="empty-state-icon">&#128269;</div>
-              <div className="empty-state-title">No matches to confirm</div>
-              <div className="empty-state-desc">
-                Capture a screenshot (F6) or wait for auto-detection. Parsed
-                matches will appear here for review.
-              </div>
-            </div>
-          </div>
+          <ScreenshotHistory onImportFile={handleImportFile} />
         </div>
       </div>
     );
@@ -247,6 +243,8 @@ export function ConfirmationTab({
             Confirm ({checkedCount})
           </button>
         </div>
+
+        <ScreenshotHistory onImportFile={handleImportFile} />
       </div>
     </div>
   );

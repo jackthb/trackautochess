@@ -30,6 +30,14 @@ export interface Replay {
   mtime: number;
 }
 
+export interface Screenshot {
+  name: string;
+  path: string;
+  size: number;
+  mtime: number;
+  uploaded: boolean;
+}
+
 export interface ReplayStats {
   count: number;
   totalBytes: number;
@@ -137,6 +145,12 @@ declare global {
       minimize: () => void;
       maximize: () => void;
       close: () => void;
+    };
+    screenshots: {
+      list: () => Promise<Screenshot[]>;
+      delete: (filename: string) => Promise<boolean>;
+      openFolder: () => Promise<void>;
+      thumbnail: (filename: string) => Promise<string | null>;
     };
     replays: {
       list: () => Promise<Replay[]>;
