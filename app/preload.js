@@ -18,7 +18,9 @@ contextBridge.exposeInMainWorld("screenshots", {
 contextBridge.exposeInMainWorld("tracker", {
   sendCommand: (cmd) => ipcRenderer.send("tracker:command", cmd),
   onEvent: (callback) => {
-    ipcRenderer.on("tracker:event", (_event, msg) => callback(msg));
+    const handler = (_event, msg) => callback(msg);
+    ipcRenderer.on("tracker:event", handler);
+    return () => ipcRenderer.removeListener("tracker:event", handler);
   },
 });
 

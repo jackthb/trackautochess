@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, useCallback } from "react";
+import { useEffect, useRef, useCallback, useState } from "react";
 import type { TrackerEvent, TrackerStatus, ParseResult, LogEntry } from "../types";
 
 const MAX_LOG_ENTRIES = 500;
@@ -18,15 +18,13 @@ export function useTrackerEvents(
   const [pendingParseResult, setPendingParseResult] =
     useState<ParseResult | null>(null);
   const [logEntries, setLogEntries] = useState<LogEntry[]>([]);
-  const registered = useRef(false);
   const callbacksRef = useRef({ onImportResult, onReplaySaved });
   callbacksRef.current = { onImportResult, onReplaySaved };
 
   useEffect(() => {
-    if (registered.current || !window.tracker) return;
-    registered.current = true;
+    if (!window.tracker) return;
 
-    window.tracker.onEvent((msg: TrackerEvent) => {
+    const unsubscribe = window.tracker.onEvent((msg: TrackerEvent) => {
       switch (msg.type) {
         case "log":
           setLogEntries((prev) => {
@@ -66,6 +64,10 @@ export function useTrackerEvents(
           break;
       }
     });
+
+    window.tracker.sendCommand({ cmd: "status" });
+
+    return unsubscribe;
   }, []);
 
   const clearParseResult = useCallback(() => {

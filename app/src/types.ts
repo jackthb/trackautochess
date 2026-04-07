@@ -161,7 +161,7 @@ declare global {
     };
     tracker: {
       sendCommand: (cmd: Record<string, unknown>) => void;
-      onEvent: (callback: (msg: TrackerEvent) => void) => void;
+      onEvent: (callback: (msg: TrackerEvent) => void) => () => void;
     };
     appApi: {
       openFileDialog: () => Promise<string | null>;
