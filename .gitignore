@@ -25,3 +25,4 @@ tesseract-portable/
 tracker/build/
 tracker/dist/
 .venv/
+.claude/
