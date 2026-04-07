@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import type { Replay, ReplayStats, RecordingStats, Game } from "../types";
 import { formatSize, formatDate } from "../lib/game-utils";
 import { VideoPlayer } from "./VideoPlayer";

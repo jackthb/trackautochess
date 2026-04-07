@@ -563,7 +563,7 @@ ipcMain.handle("games:fetch", async () => {
 
   try {
     const resp = await net.fetch(
-      `${url}/rest/v1/player_games?select=*,game:games(played_at)&user_id=eq.${steamId}&order=created_at.desc&limit=100`,
+      `${url}/rest/v1/games?select=*&user_id=eq.${steamId}&order=played_at.desc&limit=100`,
       {
         headers: {
           apikey: key,
@@ -573,11 +573,7 @@ ipcMain.handle("games:fetch", async () => {
       }
     );
     if (!resp.ok) return [];
-    const rows = await resp.json();
-    return rows.map(({ game: g, ...rest }) => ({
-      ...rest,
-      played_at: g?.played_at ?? rest.created_at,
-    }));
+    return await resp.json();
   } catch (e) {
     console.error("games:fetch error:", e);
     return [];
@@ -593,7 +589,7 @@ ipcMain.handle("games:update", async (_event, gameId, fields) => {
 
   try {
     const resp = await net.fetch(
-      `${url}/rest/v1/player_games?id=eq.${gameId}`,
+      `${url}/rest/v1/games?id=eq.${gameId}`,
       {
         method: "PATCH",
         headers: {
@@ -621,7 +617,7 @@ ipcMain.handle("games:delete", async (_event, gameId) => {
 
   try {
     const resp = await net.fetch(
-      `${url}/rest/v1/player_games?id=eq.${gameId}`,
+      `${url}/rest/v1/games?id=eq.${gameId}`,
       {
         method: "DELETE",
         headers: {

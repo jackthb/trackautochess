@@ -70,8 +70,8 @@ def game_exists(user_id: str, played_at: str, placement: str, wl: str = "", leve
         params = {
             "user_id": f"eq.{user_id}",
             "placement": f"eq.{placement_int}",
-            "select": "id,game:games!inner(played_at)",
-            "game.played_at": f"gte.{range_start}",
+            "select": "id,played_at",
+            "played_at": f"gte.{range_start}",
             "limit": "1",
         }
         level_int = _safe_int(level, 1, 15)
@@ -79,13 +79,13 @@ def game_exists(user_id: str, played_at: str, placement: str, wl: str = "", leve
             params["level"] = f"eq.{level_int}"
 
         resp = client.get(
-            "/rest/v1/player_games",
+            "/rest/v1/games",
             params=params,
             headers={"Accept": "application/json"},
         )
         resp.raise_for_status()
         results = [r for r in resp.json()
-                   if r.get("game", {}).get("played_at", "") <= range_end]
+                   if r.get("played_at", "") <= range_end]
         found = len(results) > 0
         if found:
             log.debug("duplicate found: user=%s played_at=%s place=%s", user_id, played_at, placement)
@@ -128,9 +128,8 @@ def _safe_int(val, lo=None, hi=None):
 
 
 def push_game(row, user_id: str | None = None) -> bool:
-    """Insert a game + player_game into Supabase.
+    """Insert a game into Supabase.
 
-    Creates a game (the match) first, then a player_game (the player's result).
     Handles string→int conversion for placement, level, and wl splitting.
     Returns True on success, False on error. Never raises.
     """
@@ -139,17 +138,6 @@ def push_game(row, user_id: str | None = None) -> bool:
         return False
 
     try:
-        # 1. Create the game (match)
-        game_data = {"played_at": row.played_at}
-        resp = client.post(
-            "/rest/v1/games",
-            json=game_data,
-            headers={"Prefer": "return=representation"},
-        )
-        resp.raise_for_status()
-        game_id = resp.json()[0]["id"]
-
-        # 2. Convert types
         placement = _safe_int(row.placement, 1, 8)
         level = _safe_int(row.level, 1, 15)
         wins, losses = None, None
@@ -161,9 +149,8 @@ def push_game(row, user_id: str | None = None) -> bool:
 
         rank_change = row.rank_change if row.rank_change in ("up", "down", "none") else None
 
-        # 3. Create the player_game
-        pg_data = {
-            "game_id": game_id,
+        game_data = {
+            "played_at": row.played_at,
             "placement": placement,
             "rank": row.rank or None,
             "rank_change": rank_change,
@@ -179,9 +166,14 @@ def push_game(row, user_id: str | None = None) -> bool:
             "notes": row.notes or None,
         }
         if user_id:
-            pg_data["user_id"] = int(user_id)
-        resp = client.post("/rest/v1/player_games", json=pg_data)
+            game_data["user_id"] = int(user_id)
+        resp = client.post(
+            "/rest/v1/games",
+            json=game_data,
+            headers={"Prefer": "return=representation"},
+        )
         resp.raise_for_status()
+        game_id = resp.json()[0]["id"]
         log.info("pushed game %d: placement=%s", game_id, row.placement)
         return True
     except Exception as e:
@@ -234,9 +226,9 @@ def upload_screenshot(img, user_id: str) -> str | None:
 
 
 def fetch_games(user_id: str, limit: int = 20) -> list[dict] | None:
-    """Fetch recent player_games for a user, with game details embedded.
+    """Fetch recent games for a user.
 
-    Returns list of player_game dicts (with nested game.played_at) on success, None on error.
+    Returns list of game dicts on success, None on error.
     """
     client = _get_client()
     if client is None:
@@ -244,11 +236,11 @@ def fetch_games(user_id: str, limit: int = 20) -> list[dict] | None:
 
     try:
         resp = client.get(
-            "/rest/v1/player_games",
+            "/rest/v1/games",
             params={
                 "user_id": f"eq.{user_id}",
-                "select": "*,game:games(played_at)",
-                "order": "created_at.desc",
+                "select": "*",
+                "order": "played_at.desc",
                 "limit": str(limit),
             },
             headers={"Accept": "application/json"},
