@@ -41,6 +41,12 @@ export function ReplaysTab({
   const [currentReplay, setCurrentReplay] = useState<string | null>(null);
   const [pendingDelete, setPendingDelete] = useState<string | null>(null);
 
+  useEffect(() => {
+    if (!currentReplay && replays.length > 0) {
+      setCurrentReplay(replays[0].name);
+    }
+  }, [replays, currentReplay]);
+
   const selectedReplay = replays.find((r) => r.name === currentReplay);
 
   const handleSelect = (replay: Replay) => {
