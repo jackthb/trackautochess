@@ -11,6 +11,7 @@ const {
   globalShortcut,
   dialog,
   screen,
+  shell,
 } = require("electron");
 const path = require("path");
 const fs = require("fs");
@@ -460,6 +461,11 @@ function createWindow() {
 
   mainWindow.once("ready-to-show", () => mainWindow.show());
 
+  mainWindow.webContents.setWindowOpenHandler(({ url }) => {
+    shell.openExternal(url);
+    return { action: "deny" };
+  });
+
   // Intercept close: minimize to tray instead of quitting
   mainWindow.on("close", (e) => {
     if (!isQuitting && closeToTray) {
@@ -557,7 +563,7 @@ ipcMain.handle("games:fetch", async () => {
 
   try {
     const resp = await net.fetch(
-      `${url}/rest/v1/games?user_id=eq.${steamId}&order=played_at.desc&limit=100`,
+      `${url}/rest/v1/player_games?select=*,game:games(played_at)&user_id=eq.${steamId}&order=created_at.desc&limit=100`,
       {
         headers: {
           apikey: key,
@@ -567,7 +573,11 @@ ipcMain.handle("games:fetch", async () => {
       }
     );
     if (!resp.ok) return [];
-    return await resp.json();
+    const rows = await resp.json();
+    return rows.map(({ game: g, ...rest }) => ({
+      ...rest,
+      played_at: g?.played_at ?? rest.created_at,
+    }));
   } catch (e) {
     console.error("games:fetch error:", e);
     return [];
@@ -583,7 +593,7 @@ ipcMain.handle("games:update", async (_event, gameId, fields) => {
 
   try {
     const resp = await net.fetch(
-      `${url}/rest/v1/games?id=eq.${gameId}`,
+      `${url}/rest/v1/player_games?id=eq.${gameId}`,
       {
         method: "PATCH",
         headers: {
@@ -611,7 +621,7 @@ ipcMain.handle("games:delete", async (_event, gameId) => {
 
   try {
     const resp = await net.fetch(
-      `${url}/rest/v1/games?id=eq.${gameId}`,
+      `${url}/rest/v1/player_games?id=eq.${gameId}`,
       {
         method: "DELETE",
         headers: {
