@@ -1,15 +1,23 @@
 import { useState, useEffect, useCallback } from "react";
 import { ScreenshotHistory } from "./ScreenshotHistory";
-import type { ParseResult } from "../types";
+import type { ParseResult, UnitFullInfo, SynergyInfo, RelicInfo } from "../types";
 
 interface ConfirmationTabProps {
   parseResult: ParseResult | null;
   onClear: () => void;
+  unitCosts: Record<string, number>;
+  unitsFull: Record<string, UnitFullInfo>;
+  synergiesData: Record<string, SynergyInfo>;
+  relicsData: Record<string, RelicInfo>;
 }
 
 export function ConfirmationTab({
   parseResult,
   onClear,
+  unitCosts,
+  unitsFull,
+  synergiesData,
+  relicsData,
 }: ConfirmationTabProps) {
   const [checked, setChecked] = useState<boolean[]>([]);
   const [edits, setEdits] = useState<
@@ -31,7 +39,13 @@ export function ConfirmationTab({
     return (
       <div className="confirm-tab">
         <div className="confirm-container">
-          <ScreenshotHistory onImportFile={handleImportFile} />
+          <ScreenshotHistory
+            onImportFile={handleImportFile}
+            unitCosts={unitCosts}
+            unitsFull={unitsFull}
+            synergiesData={synergiesData}
+            relicsData={relicsData}
+          />
         </div>
       </div>
     );
@@ -244,7 +258,13 @@ export function ConfirmationTab({
           </button>
         </div>
 
-        <ScreenshotHistory onImportFile={handleImportFile} />
+        <ScreenshotHistory
+            onImportFile={handleImportFile}
+            unitCosts={unitCosts}
+            unitsFull={unitsFull}
+            synergiesData={synergiesData}
+            relicsData={relicsData}
+          />
       </div>
     </div>
   );

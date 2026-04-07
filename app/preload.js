@@ -13,6 +13,8 @@ contextBridge.exposeInMainWorld("screenshots", {
   delete: (filename) => ipcRenderer.invoke("screenshots:delete", filename),
   openFolder: () => ipcRenderer.invoke("screenshots:openFolder"),
   thumbnail: (filename) => ipcRenderer.invoke("screenshots:thumbnail", filename),
+  getParseResult: (filename) => ipcRenderer.invoke("screenshots:getParseResult", filename),
+  updateParseRow: (filename, rowIndex, fields) => ipcRenderer.invoke("screenshots:updateParseRow", filename, rowIndex, fields),
 });
 
 contextBridge.exposeInMainWorld("tracker", {

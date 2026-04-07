@@ -286,6 +286,18 @@ class HeadlessBackend:
         except Exception as e:
             log.warning("Failed to update screenshot manifest: %s", e)
 
+    def _save_parse_result(self, screenshot_path: str, rows: list, timestamps: list) -> None:
+        stem = Path(screenshot_path).stem
+        parse_path = DAC_DIR / "screenshots" / f"{stem}.parse.json"
+        try:
+            parse_path.write_text(json.dumps({
+                "rows": rows,
+                "timestamps": timestamps,
+            }, indent=2), encoding="utf-8")
+            log.info("Saved parse result: %s", parse_path)
+        except Exception as e:
+            log.warning("Failed to save parse result: %s", e)
+
     def _do_capture(self) -> None:
         """Screenshot + detect + parse, emitting results."""
         import capture
@@ -372,6 +384,9 @@ class HeadlessBackend:
                 "timestamps": timestamps,
                 "screenshot_b64": screenshot_b64,
             })
+
+            if screenshot_path:
+                self._save_parse_result(screenshot_path, rows, timestamps)
 
         except Exception as e:
             log.error("parse error: %s", e, exc_info=True)

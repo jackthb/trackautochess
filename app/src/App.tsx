@@ -75,6 +75,10 @@ export default function App() {
           <ConfirmationTab
             parseResult={tracker.pendingParseResult}
             onClear={tracker.clearParseResult}
+            unitCosts={gamesState.unitCosts}
+            unitsFull={gamesState.unitsFull}
+            synergiesData={gamesState.synergiesData}
+            relicsData={gamesState.relicsData}
           />
         )}
         {activeTab === "settings" && (

@@ -903,12 +903,15 @@ ipcMain.handle("screenshots:list", async () => {
     .map((name) => {
       const filePath = path.join(SCREENSHOT_DIR, name);
       const stat = fs.statSync(filePath);
+      const stem = path.basename(name, path.extname(name));
+      const parsePath = path.join(SCREENSHOT_DIR, `${stem}.parse.json`);
       return {
         name,
         path: filePath,
         size: stat.size,
         mtime: stat.mtimeMs,
         uploaded: !!manifest[name],
+        hasParsed: fs.existsSync(parsePath),
       };
     })
     .sort((a, b) => b.mtime - a.mtime);
@@ -919,6 +922,10 @@ ipcMain.handle("screenshots:delete", async (_event, filename) => {
   if (!filePath.startsWith(SCREENSHOT_DIR)) return false;
   if (fs.existsSync(filePath)) {
     fs.unlinkSync(filePath);
+    // Also remove parse result
+    const stem = path.basename(filename, path.extname(filename));
+    const parsePath = path.join(SCREENSHOT_DIR, `${stem}.parse.json`);
+    if (fs.existsSync(parsePath)) fs.unlinkSync(parsePath);
     // Also remove from manifest
     const manifest = loadScreenshotManifest();
     if (manifest[filename]) {
@@ -943,4 +950,30 @@ ipcMain.handle("screenshots:thumbnail", async (_event, filename) => {
   const ext = path.extname(filename).toLowerCase();
   const mime = ext === ".png" ? "image/png" : "image/jpeg";
   return `data:${mime};base64,${buf.toString("base64")}`;
+});
+
+ipcMain.handle("screenshots:getParseResult", async (_event, filename) => {
+  const stem = path.basename(filename, path.extname(filename));
+  const parsePath = path.join(SCREENSHOT_DIR, `${stem}.parse.json`);
+  if (!fs.existsSync(parsePath)) return null;
+  try {
+    return JSON.parse(fs.readFileSync(parsePath, "utf-8"));
+  } catch {
+    return null;
+  }
+});
+
+ipcMain.handle("screenshots:updateParseRow", async (_event, filename, rowIndex, fields) => {
+  const stem = path.basename(filename, path.extname(filename));
+  const parsePath = path.join(SCREENSHOT_DIR, `${stem}.parse.json`);
+  if (!fs.existsSync(parsePath)) return false;
+  try {
+    const data = JSON.parse(fs.readFileSync(parsePath, "utf-8"));
+    if (!data.rows || rowIndex < 0 || rowIndex >= data.rows.length) return false;
+    Object.assign(data.rows[rowIndex], fields);
+    fs.writeFileSync(parsePath, JSON.stringify(data, null, 2));
+    return true;
+  } catch {
+    return false;
+  }
 });

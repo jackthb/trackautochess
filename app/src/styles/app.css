@@ -1056,6 +1056,26 @@ video {
   border: 1px solid var(--border);
 }
 
+.ss-item-expanded {
+  padding: 0 12px 12px;
+}
+
+.ss-parsed-badge {
+  color: var(--accent);
+  font-weight: 500;
+}
+
+.ss-parsed-rows {
+  margin-top: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.ss-parsed-rows .game-entry {
+  border-radius: 4px;
+}
+
 /* ── Settings tab ──────────────────────────────────────── */
 
 .settings-tab {

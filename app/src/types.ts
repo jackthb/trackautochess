@@ -36,6 +36,12 @@ export interface Screenshot {
   size: number;
   mtime: number;
   uploaded: boolean;
+  hasParsed: boolean;
+}
+
+export interface SavedParseResult {
+  rows: ParseResultRow[];
+  timestamps: string[];
 }
 
 export interface ReplayStats {
@@ -151,6 +157,8 @@ declare global {
       delete: (filename: string) => Promise<boolean>;
       openFolder: () => Promise<void>;
       thumbnail: (filename: string) => Promise<string | null>;
+      getParseResult: (filename: string) => Promise<SavedParseResult | null>;
+      updateParseRow: (filename: string, rowIndex: number, fields: Partial<ParseResultRow>) => Promise<boolean>;
     };
     replays: {
       list: () => Promise<Replay[]>;
