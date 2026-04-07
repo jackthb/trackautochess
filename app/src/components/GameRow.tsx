@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { createPortal } from "react-dom";
 import type { Game, UnitFullInfo, SynergyInfo, RelicInfo } from "../types";
+import { VideoPlayer } from "./VideoPlayer";
 import {
   placementBg,
   unitStem,
@@ -21,6 +22,8 @@ interface GameRowProps {
   relicsData: Record<string, RelicInfo>;
   onUpdate: (gameId: number, fields: Partial<Game>) => Promise<boolean>;
   onDelete: (gameId: number) => Promise<boolean>;
+  expanded: boolean;
+  onToggle: () => void;
 }
 
 // ── Generic counted tag picker (used for lineup + synergies) ────────────────
@@ -352,8 +355,9 @@ export function GameRow({
   relicsData,
   onUpdate,
   onDelete,
+  expanded,
+  onToggle,
 }: GameRowProps) {
-  const [expanded, setExpanded] = useState(false);
   const [saving, setSaving] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [lightbox, setLightbox] = useState(false);
@@ -435,7 +439,7 @@ export function GameRow({
 
   function handleToggle() {
     if (!expanded) resetEditState();
-    setExpanded(!expanded);
+    onToggle();
   }
 
   async function handleSave() {
@@ -467,7 +471,7 @@ export function GameRow({
       played_at: editPlayedAt ? new Date(editPlayedAt).toISOString() : game.played_at,
     });
     setSaving(false);
-    if (ok) setExpanded(false);
+    if (ok) onToggle();
   }
 
   return (
@@ -490,7 +494,7 @@ export function GameRow({
               onClick={(e) => {
                 e.stopPropagation();
                 setShowReplay(true);
-                setExpanded(true);
+                if (!expanded) onToggle();
               }}
             >
               &#9654;
@@ -503,10 +507,9 @@ export function GameRow({
         <div className="game-edit-panel" onClick={(e) => e.stopPropagation()}>
           {showReplay && replayExists && game.replay && (
             <div className="replay-player-inline">
-              <video
-                controls
-                autoPlay
+              <VideoPlayer
                 src={`replay://video/${encodeURIComponent(game.replay)}`}
+                autoPlay
               />
               <button
                 className="btn-replay-hide"
@@ -683,7 +686,7 @@ export function GameRow({
             <button
               className="btn-confirm btn-confirm-cancel"
               onClick={() => {
-                setExpanded(false);
+                onToggle();
                 setConfirmDelete(false);
               }}
             >

@@ -36,6 +36,7 @@ export function HistoryTab({
 }: HistoryTabProps) {
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
   const [highlightId, setHighlightId] = useState<number | null>(null);
+  const [expandedId, setExpandedId] = useState<number | null>(null);
   const sentinelRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const gameRefs = useRef<Map<number, HTMLDivElement>>(new Map());
@@ -154,6 +155,8 @@ export function HistoryTab({
                 relicsData={relicsData}
                 onUpdate={updateGame}
                 onDelete={deleteGame}
+                expanded={expandedId === g.id}
+                onToggle={() => setExpandedId(expandedId === g.id ? null : g.id)}
               />
             </div>
           ))}
