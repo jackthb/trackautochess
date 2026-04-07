@@ -140,8 +140,8 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
   const supabase = createClient(url, key);
   const { data } = await supabase
-    .from("player_games")
-    .select("*, game:games(played_at)")
+    .from("games")
+    .select("*")
     .eq("id", id)
     .single();
 

@@ -110,7 +110,7 @@ export default function Dashboard({ supabase }: DashboardProps) {
     // Check if data changed: count + latest created_at
     setGamesLoading(true);
     supabase
-      .from("player_games")
+      .from("games")
       .select("id, created_at")
       .eq("user_id", steamId)
       .order("created_at", { ascending: false })
@@ -122,7 +122,7 @@ export default function Dashboard({ supabase }: DashboardProps) {
             const { count, newest } = JSON.parse(cachedRaw);
             const serverNewest = latest?.[0]?.created_at ?? null;
             const { count: serverCount } = await supabase
-              .from("player_games")
+              .from("games")
               .select("*", { count: "exact", head: true })
               .eq("user_id", steamId);
             if (count === serverCount && newest === serverNewest) {
@@ -134,8 +134,8 @@ export default function Dashboard({ supabase }: DashboardProps) {
 
         // Cache miss or stale — full fetch
         const { data } = await supabase
-          .from("player_games")
-          .select("*, game:games(played_at)")
+          .from("games")
+          .select("*")
           .eq("user_id", steamId)
           .order("created_at", { ascending: false });
 
@@ -164,7 +164,7 @@ export default function Dashboard({ supabase }: DashboardProps) {
   ): Promise<boolean> => {
     if (!supabase) return false;
     const { error } = await supabase
-      .from("player_games")
+      .from("games")
       .update(fields)
       .eq("id", gameId);
     if (error) {
@@ -186,7 +186,7 @@ export default function Dashboard({ supabase }: DashboardProps) {
   const handleDelete = async (gameId: number): Promise<boolean> => {
     if (!supabase) return false;
     const { error } = await supabase
-      .from("player_games")
+      .from("games")
       .delete()
       .eq("id", gameId);
     if (error) {

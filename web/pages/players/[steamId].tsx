@@ -317,10 +317,10 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
   const [gamesResult, steamName] = await Promise.all([
     supabase
-      .from("player_games")
-      .select("*, game:games(played_at)")
+      .from("games")
+      .select("*")
       .eq("user_id", steamId)
-      .order("created_at", { ascending: false }),
+      .order("played_at", { ascending: false }),
     fetchSteamName(steamId),
   ]);
 
