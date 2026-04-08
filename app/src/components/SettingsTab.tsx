@@ -126,6 +126,19 @@ export function SettingsTab({ status, replayStats }: SettingsTabProps) {
         </div>
 
         <div className="settings-section">
+          <div className="settings-section-title">Tools</div>
+          <div className="settings-row">
+            <span className="settings-label">Region calibration</span>
+            <button
+              className="btn-ghost"
+              onClick={() => window.appApi.openCalibration()}
+            >
+              Open
+            </button>
+          </div>
+        </div>
+
+        <div className="settings-section">
           <div className="settings-section-title">About</div>
           <div className="settings-row">
             <span className="settings-label">Version</span>

@@ -607,10 +607,123 @@ class HeadlessBackend:
             self._do_set_config(msg.get("key", ""), msg.get("value"))
         elif cmd == "status":
             self._emit_status()
+        elif cmd == "debug_screenshot":
+            img_path = msg.get("path", "")
+            threading.Thread(
+                target=self._do_debug_screenshot, args=(img_path,),
+                daemon=True, name="debug-screenshot",
+            ).start()
+        elif cmd == "sentinel_test":
+            img_path = msg.get("path", "")
+            region = msg.get("region", {})
+            threading.Thread(
+                target=self._do_sentinel_test, args=(img_path, region),
+                daemon=True, name="sentinel-test",
+            ).start()
         elif cmd == "quit":
             self._shutdown()
         else:
             self._emit_error(f"Unknown command: {cmd}")
+
+    # ── Debug / Calibration ──────────────────────────────────────────────────
+
+    def _do_debug_screenshot(self, img_path: str) -> None:
+        try:
+            import cv2
+            from cv_parser import detect_screen_type
+
+            img = cv2.imread(img_path)
+            if img is None:
+                self._emit({"type": "debug_result", "data": {"error": f"Cannot read {img_path}"}})
+                return
+
+            h, w = img.shape[:2]
+            screen_type = detect_screen_type(img)
+            result = {"width": w, "height": h, "screen_type": screen_type, "rows": []}
+
+            if screen_type == "my_matches":
+                from cv_parser import (
+                    _find_my_matches_rows, _parse_my_matches_row,
+                    _load_templates_multiscale,
+                    UNIT_ICON_SCALES, RELIC_ICON_SCALES, MM_SYNERGY_ICON_SCALES,
+                )
+                from utils import ICONS_DIR, DATA_DIR, unit_stem as _unit_stem
+                import json as _json
+
+                units_path = DATA_DIR / "units.json"
+                units_data = _json.loads(units_path.read_text())["units"] if units_path.exists() else {}
+                stem_to_name = {_unit_stem(name): name for name in units_data}
+
+                unit_templates = _load_templates_multiscale(
+                    ICONS_DIR / "units", UNIT_ICON_SCALES, inner_frac=0.85, color=True)
+                relic_templates = _load_templates_multiscale(
+                    ICONS_DIR / "relics", RELIC_ICON_SCALES, inner_frac=1.0, color=True)
+                syn_templates = _load_templates_multiscale(
+                    ICONS_DIR / "synergies", MM_SYNERGY_ICON_SCALES)
+
+                rows = _find_my_matches_rows(img)
+                for i, (y0, y1) in enumerate(rows):
+                    row_data = _parse_my_matches_row(
+                        img, y0, y1,
+                        unit_templates, relic_templates, syn_templates, ICONS_DIR,
+                        units_data, stem_to_name,
+                        debug=False, row_idx=i,
+                    )
+                    row_data["y0"] = y0
+                    row_data["y1"] = y1
+                    result["rows"].append(row_data)
+
+            elif screen_type == "game_over":
+                from cv_parser import parse_game_over
+                game_data = parse_game_over(img)
+                result["game_data"] = game_data
+
+            self._emit({"type": "debug_result", "data": result})
+        except Exception as e:
+            log.exception("debug_screenshot error")
+            self._emit({"type": "debug_result", "data": {"error": str(e)}})
+
+    def _do_sentinel_test(self, img_path: str, region: dict) -> None:
+        try:
+            import cv2
+            import base64
+
+            img = cv2.imread(img_path)
+            if img is None:
+                self._emit({"type": "sentinel_result", "data": {"error": f"Cannot read {img_path}"}})
+                return
+
+            h, w = img.shape[:2]
+            x0 = int(region.get("x0", 0) * w)
+            y0 = int(region.get("y0", 0) * h)
+            x1 = int(region.get("x1", 1) * w)
+            y1 = int(region.get("y1", 1) * h)
+            crop = img[y0:y1, x0:x1]
+
+            from utils import DATA_DIR
+            results = {}
+            for tpl_name in ["sentinel_ref_final_ranking.png", "sentinel_ref_round_start.png"]:
+                tpl_path = DATA_DIR / tpl_name
+                if not tpl_path.exists():
+                    continue
+                template = cv2.imread(str(tpl_path), cv2.IMREAD_GRAYSCALE)
+                crop_gray = cv2.cvtColor(crop, cv2.COLOR_BGR2GRAY)
+                th, tw = template.shape[:2]
+                ch, cw = crop_gray.shape[:2]
+                if tw > cw or th > ch:
+                    results[tpl_name] = {"score": 0, "error": "template larger than crop"}
+                    continue
+                match = cv2.matchTemplate(crop_gray, template, cv2.TM_CCOEFF_NORMED)
+                _, max_val, _, max_loc = cv2.minMaxLoc(match)
+                results[tpl_name] = {"score": round(float(max_val), 4), "location": list(max_loc)}
+
+            ok, buf = cv2.imencode(".jpg", crop, [cv2.IMWRITE_JPEG_QUALITY, 85])
+            crop_b64 = base64.b64encode(buf).decode() if ok else ""
+
+            self._emit({"type": "sentinel_result", "data": {"results": results, "crop": crop_b64}})
+        except Exception as e:
+            log.exception("sentinel_test error")
+            self._emit({"type": "sentinel_result", "data": {"error": str(e)}})
 
     # ── Main loop ───────────────────────────────────────────────────────────
 

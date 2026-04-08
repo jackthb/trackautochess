@@ -44,4 +44,5 @@ contextBridge.exposeInMainWorld("appApi", {
   fetchUnitsFull: () => ipcRenderer.invoke("data:units_full"),
   fetchSynergies: () => ipcRenderer.invoke("data:synergies"),
   fetchRelics: () => ipcRenderer.invoke("data:relics"),
+  openCalibration: () => ipcRenderer.invoke("app:openCalibration"),
 });

@@ -183,6 +183,7 @@ declare global {
       fetchUnitsFull: () => Promise<Record<string, UnitFullInfo>>;
       fetchSynergies: () => Promise<Record<string, SynergyInfo>>;
       fetchRelics: () => Promise<{ relics: Record<string, RelicInfo> }>;
+      openCalibration: () => Promise<void>;
     };
   }
 }

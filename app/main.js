@@ -42,6 +42,7 @@ for (const dir of [DAC_DIR, REPLAY_DIR, SCREENSHOT_DIR]) {
 let mainWindow = null;
 let overlayWindow = null;
 let widgetWindow = null;
+let calibrationWindow = null;
 let tray = null;
 let pythonProcess = null;
 let pythonRL = null;
@@ -267,6 +268,14 @@ function handlePythonEvent(msg) {
       if (mainWindow && !mainWindow.isDestroyed()) {
         mainWindow.show();
         mainWindow.focus();
+      }
+      break;
+
+    case "debug_result":
+    case "sentinel_result":
+      if (debugResolve) {
+        debugResolve(msg.data || { error: msg.error || "Unknown error" });
+        debugResolve = null;
       }
       break;
   }
@@ -972,4 +981,141 @@ ipcMain.handle("screenshots:updateParseRow", async (_event, filename, rowIndex, 
   } catch {
     return false;
   }
+});
+
+// ── Calibration window ──────────────────────────────────────────────────────
+
+const DATA_DIR = path.join(RESOURCES_DIR, "data");
+const CALIBRATION_SCREENSHOTS = path.join(DATA_DIR, "screenshots");
+const STEAM_BASE = "C:\\Program Files (x86)\\Steam\\userdata";
+
+function openCalibrationWindow() {
+  if (calibrationWindow && !calibrationWindow.isDestroyed()) {
+    calibrationWindow.focus();
+    return;
+  }
+  calibrationWindow = new BrowserWindow({
+    width: 1400,
+    height: 900,
+    title: "DAC Calibration",
+    webPreferences: {
+      preload: path.join(__dirname, "preload-calibration.js"),
+      contextIsolation: true,
+      nodeIntegration: false,
+    },
+  });
+  calibrationWindow.loadFile(path.join(__dirname, "calibration.html"));
+  calibrationWindow.on("closed", () => { calibrationWindow = null; });
+}
+
+ipcMain.handle("app:openCalibration", () => {
+  openCalibrationWindow();
+});
+
+function detectAR(filePath) {
+  try {
+    const buf = Buffer.alloc(32);
+    const fd = fs.openSync(filePath, "r");
+    fs.readSync(fd, buf, 0, 32, 0);
+    fs.closeSync(fd);
+    let w, h;
+    if (buf[0] === 0x89 && buf[1] === 0x50) {
+      w = buf.readUInt32BE(16);
+      h = buf.readUInt32BE(20);
+    } else if (buf[0] === 0xFF && buf[1] === 0xD8) {
+      const full = fs.readFileSync(filePath);
+      let offset = 2;
+      while (offset < full.length - 8) {
+        if (full[offset] !== 0xFF) break;
+        const marker = full[offset + 1];
+        if (marker === 0xC0 || marker === 0xC2) {
+          h = full.readUInt16BE(offset + 5);
+          w = full.readUInt16BE(offset + 7);
+          break;
+        }
+        const segLen = full.readUInt16BE(offset + 2);
+        offset += 2 + segLen;
+      }
+    }
+    if (w && h) return (w / h) > 2.0 ? "21:9" : "16:9";
+    return null;
+  } catch { return null; }
+}
+
+ipcMain.handle("calibration:listScreenshots", async (_event, arFilter) => {
+  const groups = [];
+  function scanDir(dir, label) {
+    if (!fs.existsSync(dir)) return;
+    const items = [];
+    for (const name of fs.readdirSync(dir)) {
+      if (!/\.(jpg|jpeg|png)$/i.test(name)) continue;
+      const filePath = path.join(dir, name);
+      const ar = detectAR(filePath);
+      if (arFilter && ar && ar !== arFilter) continue;
+      const stat = fs.statSync(filePath);
+      items.push({ name, path: filePath, size: stat.size, mtime: stat.mtimeMs });
+    }
+    items.sort((a, b) => b.mtime - a.mtime);
+    if (items.length > 0) groups.push({ label, files: items });
+  }
+  scanDir(CALIBRATION_SCREENSHOTS, "Reference");
+  scanDir(SCREENSHOT_DIR, "DAC Tracker");
+  if (fs.existsSync(STEAM_BASE)) {
+    for (const user of fs.readdirSync(STEAM_BASE)) {
+      const ssDir = path.join(STEAM_BASE, user, "760", "remote", "570", "screenshots");
+      scanDir(ssDir, `Steam`);
+    }
+  }
+  return groups;
+});
+
+ipcMain.handle("calibration:getScreenshot", async (_event, filePath) => {
+  if (!fs.existsSync(filePath)) return null;
+  const buf = fs.readFileSync(filePath);
+  const ext = path.extname(filePath).toLowerCase();
+  const mime = ext === ".png" ? "image/png" : "image/jpeg";
+  return `data:${mime};base64,${buf.toString("base64")}`;
+});
+
+ipcMain.handle("calibration:loadConfig", async () => {
+  const configPath = path.join(DATA_DIR, "regions_config.json");
+  if (!fs.existsSync(configPath)) return null;
+  try {
+    return JSON.parse(fs.readFileSync(configPath, "utf-8"));
+  } catch { return null; }
+});
+
+ipcMain.handle("calibration:saveConfig", async (_event, config) => {
+  const configPath = path.join(DATA_DIR, "regions_config.json");
+  fs.writeFileSync(configPath, JSON.stringify(config, null, 2));
+  return true;
+});
+
+let debugResolve = null;
+
+ipcMain.handle("calibration:runDebug", async (_event, screenshotPath) => {
+  return new Promise((resolve) => {
+    debugResolve = resolve;
+    sendToPython({ cmd: "debug_screenshot", path: screenshotPath });
+    setTimeout(() => {
+      if (debugResolve === resolve) {
+        debugResolve = null;
+        resolve({ error: "Debug timed out (30s)" });
+      }
+    }, 30000);
+  });
+});
+
+ipcMain.handle("calibration:sentinelTest", async (_event, screenshotPath, region) => {
+  return new Promise((resolve) => {
+    const prevResolve = debugResolve;
+    debugResolve = resolve;
+    sendToPython({ cmd: "sentinel_test", path: screenshotPath, region });
+    setTimeout(() => {
+      if (debugResolve === resolve) {
+        debugResolve = null;
+        resolve({ error: "Sentinel test timed out (15s)" });
+      }
+    }, 15000);
+  });
 });
