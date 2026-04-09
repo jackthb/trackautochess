@@ -1,8 +1,9 @@
-"""Thread-safe screen capture singleton.
+"""Thread-safe screen capture using per-thread mss instances.
 
-All screen grabs go through a single mss instance protected by a lock.
-This prevents concurrent GDI access from multiple threads, which causes
-resource contention and interferes with external recorders like Medal.
+MSS binds GDI device contexts to the thread that creates them (via
+thread-local storage on Windows).  A single shared instance fails when
+accessed from a different thread.  We therefore keep one mss instance per
+thread, with a lock to serialise GDI access across threads.
 """
 
 import threading
@@ -11,21 +12,23 @@ import mss
 import numpy as np
 
 _lock = threading.Lock()
-_sct: mss.mss | None = None
+_local = threading.local()
 
 
 def _get_sct() -> mss.mss:
-    """Lazy-init the global mss instance (must be called under _lock)."""
-    global _sct
-    if _sct is None:
-        _sct = mss.mss()
-    return _sct
+    """Return the mss instance for the current thread, creating if needed."""
+    sct = getattr(_local, "sct", None)
+    if sct is None:
+        sct = mss.mss()
+        _local.sct = sct
+    return sct
 
 
 def grab(monitor: dict) -> np.ndarray:
     """Grab a screen region. Returns BGRA numpy array (same as mss.grab).
 
-    Thread-safe — serialises access to the underlying GDI device context.
+    Thread-safe — each thread owns its own GDI context, and a lock
+    serialises access to prevent resource contention.
     """
     with _lock:
         sct = _get_sct()
