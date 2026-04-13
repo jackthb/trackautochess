@@ -20,8 +20,8 @@ log = logging.getLogger("dac")
 REPLAY_DIR = DAC_DIR / "replays"
 DEFAULT_MAX_GB = 15
 FALLBACK_FPS = 3
-MAX_WIDTH = 1280
-MAX_HEIGHT = 720
+MAX_WIDTH = 1920
+MAX_HEIGHT = 1080
 
 
 # ── Replay storage management ────────────────────────────────────────────────
@@ -261,11 +261,11 @@ class _PyAVRecorder:
             # Keyframe every 1 second for fast seeking/scrubbing
             stream.gop_size = self._fps
 
-            # Codec-specific options — tuned for small file size at low fps
+            # Codec-specific quality options
             if codec_name == "libsvtav1":
-                stream.options = {"preset": "8", "crf": "42"}
+                stream.options = {"preset": "8", "crf": "32"}
             elif codec_name == "libx264":
-                stream.options = {"preset": "faster", "crf": "32"}
+                stream.options = {"preset": "faster", "crf": "23"}
 
             self._container = container
             self._stream = stream

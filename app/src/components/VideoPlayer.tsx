@@ -14,7 +14,7 @@ function formatTimestamp(seconds: number): string {
 }
 
 export function VideoPlayer({ src, autoPlay = false }: VideoPlayerProps) {
-  const [playbackSpeed, setPlaybackSpeed] = useState(1);
+  const [playbackSpeed, setPlaybackSpeed] = useState(2);
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
