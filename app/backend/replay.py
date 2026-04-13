@@ -216,11 +216,14 @@ class _PyAVRecorder:
 
     def _record_loop(self):
         import av
+        import cv2
 
         import screen_capture
 
         frame_interval = 1.0 / self._fps
         container = None
+        # Re-detect window bounds every 5 seconds to track movement/resize
+        redetect_interval = 5.0
 
         try:
             codec_name = self._pick_codec()
@@ -229,7 +232,9 @@ class _PyAVRecorder:
             dota_rect = _find_dota_window()
             if dota_rect:
                 monitor = dota_rect
-                log.info("Recording Dota 2 window: %dx%d", monitor["width"], monitor["height"])
+                log.info("Recording Dota 2 window: %dx%d at (%d,%d)",
+                         monitor["width"], monitor["height"],
+                         monitor["left"], monitor["top"])
             else:
                 monitor = screen_capture.monitors()[1]
                 log.info("Dota 2 window not found — recording full screen")
@@ -244,9 +249,8 @@ class _PyAVRecorder:
             # Ensure even dimensions (required by most codecs)
             w = w - (w % 2)
             h = h - (h % 2)
-            needs_resize = scale < 1.0
 
-            if needs_resize:
+            if scale < 1.0:
                 log.info("Downscaling %dx%d → %dx%d (%.0f%%)", cap_w, cap_h, w, h, scale * 100)
 
             container = av.open(str(self._output_path), "w")
@@ -268,20 +272,31 @@ class _PyAVRecorder:
 
             log.info("Recording: %dx%d @ %d fps → %s", w, h, self._fps, self._output_path.name)
 
-            if needs_resize:
-                import cv2
-
             frame_idx = 0
+            last_detect_time = time.monotonic()
+
             while not self._stop_event.is_set():
                 t0 = time.monotonic()
 
+                # Periodically re-detect the Dota 2 window
+                if t0 - last_detect_time >= redetect_interval:
+                    new_rect = _find_dota_window()
+                    if new_rect:
+                        if (new_rect["left"] != monitor.get("left") or
+                                new_rect["top"] != monitor.get("top") or
+                                new_rect["width"] != monitor.get("width") or
+                                new_rect["height"] != monitor.get("height")):
+                            monitor = new_rect
+                            log.info("Recording: Dota window moved → %dx%d at (%d,%d)",
+                                     monitor["width"], monitor["height"],
+                                     monitor["left"], monitor["top"])
+                    last_detect_time = t0
+
                 img = screen_capture.grab(monitor)[:, :, :3]  # BGRA → BGR
 
-                if needs_resize:
+                # Always resize to stream dimensions (capture region may change)
+                if img.shape[1] != w or img.shape[0] != h:
                     img = cv2.resize(img, (w, h), interpolation=cv2.INTER_AREA)
-                else:
-                    # Crop to even dimensions if needed
-                    img = img[:h, :w]
 
                 # BGR → RGB for PyAV
                 img = img[:, :, ::-1]
