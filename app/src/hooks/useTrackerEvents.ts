@@ -3,10 +3,17 @@ import type { TrackerEvent, TrackerStatus, ParseResult, LogEntry } from "../type
 
 const MAX_LOG_ENTRIES = 500;
 
+export interface ImportResult {
+  imported: number;
+  skipped: number;
+}
+
 interface TrackerState {
   status: TrackerStatus | null;
   pendingParseResult: ParseResult | null;
   clearParseResult: () => void;
+  lastImportResult: ImportResult | null;
+  clearImportResult: () => void;
   logEntries: LogEntry[];
 }
 
@@ -17,6 +24,7 @@ export function useTrackerEvents(
   const [status, setStatus] = useState<TrackerStatus | null>(null);
   const [pendingParseResult, setPendingParseResult] =
     useState<ParseResult | null>(null);
+  const [lastImportResult, setLastImportResult] = useState<ImportResult | null>(null);
   const [logEntries, setLogEntries] = useState<LogEntry[]>([]);
   const callbacksRef = useRef({ onImportResult, onReplaySaved });
   callbacksRef.current = { onImportResult, onReplaySaved };
@@ -40,6 +48,7 @@ export function useTrackerEvents(
           break;
         case "import_result":
           setPendingParseResult(null);
+          setLastImportResult({ imported: msg.imported, skipped: msg.skipped });
           callbacksRef.current.onImportResult?.();
           break;
         case "focus_gained":
@@ -74,5 +83,9 @@ export function useTrackerEvents(
     setPendingParseResult(null);
   }, []);
 
-  return { status, pendingParseResult, clearParseResult, logEntries };
+  const clearImportResult = useCallback(() => {
+    setLastImportResult(null);
+  }, []);
+
+  return { status, pendingParseResult, clearParseResult, lastImportResult, clearImportResult, logEntries };
 }

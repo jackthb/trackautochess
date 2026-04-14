@@ -1,10 +1,13 @@
 import { useState, useEffect, useCallback } from "react";
 import { ScreenshotHistory, ParsedRowEdit } from "./ScreenshotHistory";
 import type { ParseResult, ParseResultRow, UnitFullInfo, SynergyInfo, RelicInfo } from "../types";
+import type { ImportResult } from "../hooks/useTrackerEvents";
 
 interface ConfirmationTabProps {
   parseResult: ParseResult | null;
   onClear: () => void;
+  lastImportResult: ImportResult | null;
+  onClearImportResult: () => void;
   unitCosts: Record<string, number>;
   unitsFull: Record<string, UnitFullInfo>;
   synergiesData: Record<string, SynergyInfo>;
@@ -14,6 +17,8 @@ interface ConfirmationTabProps {
 export function ConfirmationTab({
   parseResult,
   onClear,
+  lastImportResult,
+  onClearImportResult,
   unitCosts,
   unitsFull,
   synergiesData,
@@ -39,6 +44,8 @@ export function ConfirmationTab({
         <div className="confirm-container">
           <ScreenshotHistory
             onImportFile={handleImportFile}
+            lastImportResult={lastImportResult}
+            onClearImportResult={onClearImportResult}
             unitCosts={unitCosts}
             unitsFull={unitsFull}
             synergiesData={synergiesData}
@@ -173,6 +180,8 @@ export function ConfirmationTab({
 
         <ScreenshotHistory
             onImportFile={handleImportFile}
+            lastImportResult={lastImportResult}
+            onClearImportResult={onClearImportResult}
             unitCosts={unitCosts}
             unitsFull={unitsFull}
             synergiesData={synergiesData}

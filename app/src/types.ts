@@ -37,6 +37,8 @@ export interface Screenshot {
   mtime: number;
   uploaded: boolean;
   hasParsed: boolean;
+  hasImported: boolean;
+  screenType: "my_matches" | "game_over" | "final_ranking" | "unknown" | null;
 }
 
 export interface SavedParseResult {
@@ -97,7 +99,7 @@ export type TrackerEvent =
   | ParseResult
   | TrackerStatus
   | LogEntry
-  | { type: "import_result" }
+  | { type: "import_result"; imported: number; skipped: number }
   | { type: "focus_gained" }
   | { type: "focus_lost" }
   | { type: "replay_started" }
