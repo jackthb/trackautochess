@@ -76,6 +76,7 @@ export function NavBar({ supabase }: NavBarProps) {
           gap: 10px;
           text-decoration: none;
           flex-shrink: 0;
+          line-height: 1;
         }
         .nav-logo b {
           color: var(--accent-dim);
@@ -83,6 +84,7 @@ export function NavBar({ supabase }: NavBarProps) {
         .nav-logo img {
           width: 28px;
           height: 28px;
+          display: block;
         }
         .nav-center {
           flex: 1;
@@ -156,9 +158,9 @@ export function NavBar({ supabase }: NavBarProps) {
         }
       `}</style>
       <nav>
-        <Link href="/" className="nav-logo">
+        <Link href="/" className="nav-logo" style={{ display: "flex", alignItems: "center" }}>
           <img src="/logo.svg" alt="" />
-          <b>DAC</b> Tools
+          <span><b>DAC</b> Tools</span>
         </Link>
         <div className="nav-center">
           <form className="search-form" onSubmit={handleSearch}>
