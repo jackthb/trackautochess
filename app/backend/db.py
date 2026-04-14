@@ -177,7 +177,13 @@ def push_game(row, user_id: str | None = None) -> bool:
         log.info("pushed game %d: placement=%s", game_id, row.placement)
         return True
     except Exception as e:
-        log.error("push_game error: %s", e)
+        body = ""
+        if hasattr(e, "response") and e.response is not None:
+            try:
+                body = e.response.text
+            except Exception:
+                pass
+        log.error("push_game error: %s | body: %s", e, body)
         return False
 
 
