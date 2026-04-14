@@ -83,7 +83,7 @@ export function HistoryTab({
     );
     observer.observe(sentinel);
     return () => observer.disconnect();
-  }, [loadMore]);
+  }, [loadMore, visibleCount]);
 
   // Reset visible count when games list changes (refresh/delete)
   useEffect(() => {

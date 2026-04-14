@@ -10,6 +10,7 @@ import {
   parseLineup,
   parseSynergies,
   parseRelics,
+  parseWL,
 } from "./game-utils";
 import { TooltipWrap, type TooltipData } from "./Tooltip";
 
@@ -49,7 +50,7 @@ export function GameRowDisplay({
   const p = parseInt(game.placement) || 0;
   const wl = game.wins != null && game.losses != null
     ? { w: game.wins, l: game.losses }
-    : null;
+    : parseWL(game.wl);
   const rankParts = game.rank ? game.rank.split("-") : [];
   const tier = rankParts[0] || "";
   const rankNum = rankParts[1] || "";
