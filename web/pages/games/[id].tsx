@@ -3,13 +3,19 @@ import Link from "next/link";
 import { createClient } from "@supabase/supabase-js";
 import type { GetServerSideProps } from "next";
 import unitsData from "../../data/units.json";
+import unitsFullData from "@data/units_full.json";
+import synergiesData from "../../data/synergies.json";
+import relicsData from "../../data/relics.json";
 import { GameRowDisplay } from "@dac/shared/GameRowDisplay";
-import type { PlayerGame } from "@dac/shared/types";
+import type { PlayerGame, UnitFullInfo, SynergyInfo, RelicInfo } from "@dac/shared/types";
 
 const UNIT_COSTS: Record<string, number> = {};
 for (const [name, info] of Object.entries(unitsData.units)) {
   UNIT_COSTS[name] = (info as { cost: number }).cost;
 }
+const UNITS_FULL = unitsFullData as Record<string, UnitFullInfo>;
+const SYNERGIES_DATA = synergiesData as Record<string, SynergyInfo>;
+const RELICS_DATA = (relicsData as any).relics as Record<string, RelicInfo>;
 
 interface GamePageProps {
   game: PlayerGame;
@@ -115,6 +121,9 @@ export default function GamePage({ game, playerName }: GamePageProps) {
           <GameRowDisplay
             game={game}
             unitCosts={UNIT_COSTS}
+            unitsFull={UNITS_FULL}
+            synergiesData={SYNERGIES_DATA}
+            relicsData={RELICS_DATA}
             iconUrl={(type, stem) => `/icons/${type}/${stem}.png`}
           />
         </div>

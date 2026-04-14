@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from "react";
-import type { Game } from "@dac/shared/types";
+import type { Game, UnitFullInfo, SynergyInfo, RelicInfo } from "@dac/shared/types";
 import {
   placementBg,
   unitStem,
@@ -14,6 +14,9 @@ import { GameRowDisplay } from "@dac/shared/GameRowDisplay";
 interface GameRowProps {
   game: Game;
   unitCosts: Record<string, number>;
+  unitsFull: Record<string, UnitFullInfo>;
+  synergiesData: Record<string, SynergyInfo>;
+  relicsData: Record<string, RelicInfo>;
   allUnitNames: string[];
   allSynergyNames: string[];
   allRelicNames: string[];
@@ -269,6 +272,9 @@ const RANK_TIERS = ["Pawn", "Knight", "Bishop", "Rook", "King", "Queen"];
 export function GameRow({
   game,
   unitCosts,
+  unitsFull,
+  synergiesData,
+  relicsData,
   allUnitNames,
   allSynergyNames,
   allRelicNames,
@@ -373,6 +379,9 @@ export function GameRow({
         <GameRowDisplay
           game={game}
           unitCosts={unitCosts}
+          unitsFull={unitsFull}
+          synergiesData={synergiesData}
+          relicsData={relicsData}
           iconUrl={(type, stem) => `/icons/${type}/${stem}.png`}
           onClick={handleToggle}
           style={{ cursor: "pointer" }}

@@ -3,9 +3,10 @@ import { useEffect, useState, useMemo } from "react";
 import { useRouter } from "next/router";
 import type { SupabaseClient, User } from "@supabase/supabase-js";
 import unitsData from "../data/units.json";
+import unitsFullData from "@data/units_full.json";
 import { parseWL } from "@dac/shared/game-utils";
 import { GameRow } from "../components/GameRow";
-import type { Game } from "@dac/shared/types";
+import type { Game, UnitFullInfo, SynergyInfo, RelicInfo } from "@dac/shared/types";
 import synergiesData from "../data/synergies.json";
 import relicsData from "../data/relics.json";
 
@@ -36,6 +37,11 @@ const UNIT_COSTS: Record<string, number> = {};
 for (const [name, info] of Object.entries(unitsData.units)) {
   UNIT_COSTS[name] = (info as { cost: number }).cost;
 }
+
+// Build tooltip data lookups
+const UNITS_FULL = unitsFullData as Record<string, UnitFullInfo>;
+const SYNERGIES_DATA = synergiesData as Record<string, SynergyInfo>;
+const RELICS_DATA = (relicsData as any).relics as Record<string, RelicInfo>;
 
 // Build suggestion lists from data files
 const ALL_UNIT_NAMES = Object.keys(unitsData.units).sort();
@@ -566,6 +572,9 @@ export default function Dashboard({ supabase }: DashboardProps) {
                       key={g.id}
                       game={g}
                       unitCosts={UNIT_COSTS}
+                      unitsFull={UNITS_FULL}
+                      synergiesData={SYNERGIES_DATA}
+                      relicsData={RELICS_DATA}
                       allUnitNames={ALL_UNIT_NAMES}
                       allSynergyNames={ALL_SYNERGY_NAMES}
                       allRelicNames={ALL_RELIC_NAMES}
