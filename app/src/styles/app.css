@@ -636,6 +636,26 @@ video {
 .rank-up { color: var(--green-bright); }
 .rank-down { color: var(--red-bright); }
 
+.confirm-rows {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.confirm-row-check {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  flex-shrink: 0;
+}
+
+.confirm-row-check input[type="checkbox"] {
+  accent-color: var(--accent);
+}
+
 .confirm-actions {
   display: flex;
   justify-content: flex-end;
