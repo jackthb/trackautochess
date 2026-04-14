@@ -60,7 +60,7 @@ def cmd_import_matches_cv(args: list[str]) -> None:
             print(f"[tracker] Logged in as {steam_id}")
         save_config(config)
         from db import ensure_user
-        ensure_user(steam_id)
+        ensure_user(steam_id, name=display_name)
 
     img = cv2.imread(str(screenshot_path))
     if img is None:

@@ -54,6 +54,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   const email = `${steamId}@steam.local`;
   console.log("Steam verified:", steamId, steamName);
 
+  // Persist Steam display name in the public users table
+  await supabaseAdmin
+    .from("users")
+    .upsert(
+      { steam_id: Number(steamId), name: steamName === steamId ? null : steamName },
+      { onConflict: "steam_id" }
+    );
+
   // Find or create user
   const { data: users, error: listError } = await supabaseAdmin.auth.admin.listUsers();
   if (listError) {
