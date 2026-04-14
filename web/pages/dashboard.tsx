@@ -8,6 +8,7 @@ import { parseWL } from "@dac/shared/game-utils";
 import { GameRow } from "../components/GameRow";
 import type { Game, UnitFullInfo, SynergyInfo, RelicInfo } from "@dac/shared/types";
 import synergiesData from "../data/synergies.json";
+import { NavBar } from "../components/NavBar";
 import relicsData from "../data/relics.json";
 
 interface SeasonSnapshot {
@@ -207,18 +208,6 @@ export default function Dashboard({ supabase }: DashboardProps) {
     return true;
   };
 
-  const handleLogout = async () => {
-    if (!supabase) return;
-    await supabase.auth.signOut();
-    setUser(null);
-    setGames([]);
-    router.replace("/");
-  };
-
-  const displayName =
-    user?.user_metadata?.steam_name ||
-    user?.user_metadata?.full_name ||
-    "Player";
 
   const stats = useMemo(() => {
     if (!games.length) return null;
@@ -248,56 +237,6 @@ export default function Dashboard({ supabase }: DashboardProps) {
           position: relative;
           z-index: 1;
           min-height: 100vh;
-        }
-        .header {
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          padding: 20px 40px;
-          border-bottom: 1px solid var(--border-subtle);
-          background: rgba(8,9,11,0.9);
-          backdrop-filter: blur(8px);
-          position: sticky;
-          top: 0;
-          z-index: 10;
-        }
-        .logo {
-          font-family: 'Cinzel', serif;
-          font-size: 18px;
-          font-weight: 600;
-          letter-spacing: 3px;
-          text-transform: uppercase;
-          color: var(--text-secondary);
-          text-decoration: none;
-          display: flex;
-          align-items: center;
-          gap: 10px;
-        }
-        .logo b { color: var(--accent-dim); }
-        .logo img { width: 28px; height: 28px; }
-        .header-right {
-          display: flex;
-          align-items: center;
-          gap: 20px;
-        }
-        .player-name {
-          font-size: 15px;
-          color: var(--text-secondary);
-        }
-        .btn-ghost {
-          font-family: inherit;
-          font-size: 14px;
-          color: var(--text-muted);
-          background: none;
-          border: 1px solid var(--border);
-          padding: 7px 18px;
-          cursor: pointer;
-          letter-spacing: 0.5px;
-          transition: all 0.2s;
-        }
-        .btn-ghost:hover {
-          color: var(--text-secondary);
-          border-color: var(--text-muted);
         }
         .dashboard {
           max-width: 1200px;
@@ -445,20 +384,7 @@ export default function Dashboard({ supabase }: DashboardProps) {
       `}</style>
 
       <div className="page">
-        <header className="header">
-          <a href="/" className="logo">
-            <img src="/logo.svg" alt="" />
-            <b>DAC</b> Tools
-          </a>
-          {user && (
-            <div className="header-right">
-              <span className="player-name">{displayName}</span>
-              <button className="btn-ghost" onClick={handleLogout}>
-                Sign out
-              </button>
-            </div>
-          )}
-        </header>
+        <NavBar supabase={supabase} />
 
         {!isReady || loading ? (
           <div className="loading">Loading</div>
