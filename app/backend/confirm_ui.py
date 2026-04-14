@@ -20,19 +20,25 @@ import threading
 import tkinter as tk
 from tkinter import ttk
 
+import json
+from pathlib import Path
+
 import cv2
 import numpy as np
 from PIL import Image, ImageTk
 
 log = logging.getLogger("dac")
 
-# ── Theme ────────────────────────────────────────────────────────────────────
+# ── Theme (loaded from shared design tokens) ─────────────────────────────────
+_colors = json.loads(
+    (Path(__file__).resolve().parent.parent.parent / "shared" / "colors.json").read_text()
+)
 BG = "#1a1a2e"
 BG_ALT = "#16213e"
-ACCENT = "#E0402A"
+ACCENT = _colors["accent"]
 FONT = "Segoe UI"
-FG = "#e0e0e0"
-FG_DIM = "#888888"
+FG = _colors["text_primary"]
+FG_DIM = _colors["text_secondary"]
 FG_ERR = "#e94560"
 BTN_CONFIRM_BG = "#2d6a4f"
 BTN_CANCEL_BG = "#333333"

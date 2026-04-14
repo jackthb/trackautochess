@@ -1,0 +1,35 @@
+/* ── Design tokens ─ single source of truth for the DAC design system ── */
+
+:root {
+  /* Backgrounds */
+  --bg-deep: #08090b;
+  --bg-surface: #0e1014;
+  --bg-elevated: #14161c;
+  --bg-hover: #1a1d26;
+
+  /* Borders */
+  --border: #1e2230;
+  --border-subtle: #151820;
+
+  /* Text */
+  --text-primary: #c8ccd8;
+  --text-secondary: #6b7080;
+  --text-muted: #3a3f50;
+
+  /* Placement / game tiers */
+  --gold: #c9a84c;
+  --gold-dim: #8a7234;
+  --silver: #8a92a8;
+  --bronze: #8b6d4f;
+
+  /* Status */
+  --red: #9b3a3a;
+  --red-bright: #c44e4e;
+  --green: #3a7a4a;
+  --green-bright: #4eaa62;
+
+  /* Accent — derived from logo (#FF6046 → #E0402A → #CC3520 → #B02A18) */
+  --accent: #E0402A;
+  --accent-hover: #FF6046;
+  --accent-dim: #CC3520;
+}
