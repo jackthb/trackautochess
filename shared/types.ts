@@ -16,6 +16,7 @@ export interface Game {
   screenshot: string | null;
   replay: string | null;
   notes: string | null;
+  match_id: string | null;
   played_at: string;
   created_at: string;
 }

@@ -30,6 +30,7 @@ class PlayerGameRow:
     screenshot: str = ""     # public URL
     replay: str = ""         # replay filename
     notes: str = ""
+    match_id: str = ""        # groups all players from the same lobby
 
 
 # Backwards-compatible alias — all existing call sites use `GameRow`
