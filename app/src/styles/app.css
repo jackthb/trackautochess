@@ -899,6 +899,42 @@ video {
   font-weight: 500;
 }
 
+.ss-imported-badge {
+  color: var(--green-bright);
+  font-weight: 600;
+}
+
+.ss-type-badge {
+  color: var(--text-muted);
+  font-weight: 400;
+}
+
+.ss-success-toast {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  margin: 0 0 8px;
+  background: color-mix(in srgb, var(--green-bright) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--green-bright) 30%, transparent);
+  border-radius: 6px;
+  color: var(--green-bright);
+  font-size: 13px;
+  font-weight: 500;
+  animation: ss-toast-in 0.25s ease-out;
+}
+
+.ss-success-icon {
+  font-size: 15px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+@keyframes ss-toast-in {
+  from { opacity: 0; transform: translateY(-6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
 .ss-parsed-rows {
   margin-top: 8px;
   display: flex;

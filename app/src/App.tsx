@@ -80,6 +80,8 @@ export default function App() {
           <ConfirmationTab
             parseResult={tracker.pendingParseResult}
             onClear={tracker.clearParseResult}
+            lastImportResult={tracker.lastImportResult}
+            onClearImportResult={tracker.clearImportResult}
             unitCosts={gamesState.unitCosts}
             unitsFull={gamesState.unitsFull}
             synergiesData={gamesState.synergiesData}

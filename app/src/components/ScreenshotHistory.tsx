@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import type {
   Screenshot,
   SavedParseResult,
@@ -7,6 +7,7 @@ import type {
   SynergyInfo,
   RelicInfo,
 } from "../types";
+import type { ImportResult } from "../hooks/useTrackerEvents";
 import type { Game } from "../../../shared/types";
 import { GameRowDisplay } from "@dac/shared/GameRowDisplay";
 import {
@@ -23,6 +24,8 @@ import type { CountedTag } from "./TagPickers";
 
 interface ScreenshotHistoryProps {
   onImportFile?: (path: string) => void;
+  lastImportResult?: ImportResult | null;
+  onClearImportResult?: () => void;
   unitCosts: Record<string, number>;
   unitsFull: Record<string, UnitFullInfo>;
   synergiesData: Record<string, SynergyInfo>;
@@ -33,7 +36,7 @@ export function parseRowToGame(row: ParseResultRow, timestamp: string): Game {
   const wl = parseWL(row.wl);
   return {
     id: 0,
-    user_id: 0,
+    user_id: "",
     placement: row.placement || "",
     rank: row.rank || null,
     rank_change: (row.rank_change as Game["rank_change"]) || null,
@@ -360,8 +363,16 @@ export function ParsedRowEdit({
   );
 }
 
+const SCREEN_TYPE_LABELS: Record<string, string> = {
+  my_matches: "History",
+  game_over: "Game Over",
+  final_ranking: "Final Ranking",
+};
+
 export function ScreenshotHistory({
   onImportFile,
+  lastImportResult,
+  onClearImportResult,
   unitCosts,
   unitsFull,
   synergiesData,
@@ -377,6 +388,8 @@ export function ScreenshotHistory({
     Record<string, SavedParseResult>
   >({});
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
+  const [successToast, setSuccessToast] = useState<string | null>(null);
+  const toastTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const refresh = useCallback(async () => {
     setLoading(true);
@@ -392,6 +405,25 @@ export function ScreenshotHistory({
   useEffect(() => {
     refresh();
   }, [refresh]);
+
+  // Show success toast and refresh list when import completes
+  useEffect(() => {
+    if (lastImportResult) {
+      const { imported, skipped } = lastImportResult;
+      let msg = `Game successfully imported (${imported} match${imported !== 1 ? "es" : ""})`;
+      if (skipped) msg += `, ${skipped} duplicate${skipped !== 1 ? "s" : ""} skipped`;
+      setSuccessToast(msg);
+      refresh();
+      if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
+      toastTimerRef.current = setTimeout(() => {
+        setSuccessToast(null);
+        onClearImportResult?.();
+      }, 5000);
+    }
+    return () => {
+      if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
+    };
+  }, [lastImportResult]);
 
   const loadThumbnail = useCallback(
     async (name: string) => {
@@ -507,6 +539,13 @@ export function ScreenshotHistory({
         </div>
       </div>
 
+      {successToast && (
+        <div className="ss-success-toast">
+          <span className="ss-success-icon">&#10003;</span>
+          {successToast}
+        </div>
+      )}
+
       {screenshots.length === 0 ? (
         <div className="ss-history-empty">
           No screenshots yet. Capture a screenshot (F6) to get started.
@@ -525,7 +564,13 @@ export function ScreenshotHistory({
                     </span>
                     <span className="ss-item-meta">
                       {formatDate(ss.mtime)} &middot; {formatSize(ss.size)}
-                      {ss.hasParsed && <span className="ss-parsed-badge" title="Has parsed data"> &middot; Parsed</span>}
+                      {ss.screenType && SCREEN_TYPE_LABELS[ss.screenType] && (
+                        <span className="ss-type-badge" title={`Screen type: ${ss.screenType}`}> &middot; {SCREEN_TYPE_LABELS[ss.screenType]}</span>
+                      )}
+                      {ss.hasImported
+                        ? <span className="ss-imported-badge" title="Game imported"> &middot; &#10003; Imported</span>
+                        : ss.hasParsed && <span className="ss-parsed-badge" title="Has parsed data"> &middot; Parsed</span>
+                      }
                     </span>
                   </div>
                   <div className="ss-item-buttons">

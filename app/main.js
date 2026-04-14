@@ -1066,13 +1066,16 @@ ipcMain.handle("screenshots:list", async () => {
       const stat = fs.statSync(filePath);
       const stem = path.basename(name, path.extname(name));
       const parsePath = path.join(SCREENSHOT_DIR, `${stem}.parse.json`);
+      const entry = manifest[name] || {};
       return {
         name,
         path: filePath,
         size: stat.size,
         mtime: stat.mtimeMs,
-        uploaded: !!manifest[name],
+        uploaded: !!entry.uploaded_at,
         hasParsed: fs.existsSync(parsePath),
+        hasImported: !!entry.imported_at,
+        screenType: entry.screen_type || null,
       };
     })
     .sort((a, b) => b.mtime - a.mtime);

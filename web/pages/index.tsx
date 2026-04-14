@@ -1,24 +1,12 @@
 import Head from "next/head";
-import Link from "next/link";
-import { useEffect, useState } from "react";
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { NavBar } from "../components/NavBar";
 
 interface HomeProps {
   supabase: SupabaseClient | null;
 }
 
 export default function Home({ supabase }: HomeProps) {
-  const [loggedIn, setLoggedIn] = useState(false);
-  const [ready, setReady] = useState(false);
-
-  useEffect(() => {
-    if (!supabase) return;
-    supabase.auth.getUser().then(({ data: { user } }) => {
-      if (user) setLoggedIn(true);
-      setReady(true);
-    });
-  }, [supabase]);
-
   return (
     <>
       <Head>
@@ -39,20 +27,36 @@ export default function Home({ supabase }: HomeProps) {
           overflow: hidden;
           display: flex;
           flex-direction: column;
+        }
+
+        .hero {
+          flex: 1;
+          display: flex;
           align-items: center;
           justify-content: center;
+          position: relative;
         }
 
         /* Grid — faint chessboard echo */
         .grid {
           position: absolute;
           inset: 0;
-          background-image:
-            linear-gradient(var(--border-subtle) 1px, transparent 1px),
+          background-image: linear-gradient(
+              var(--border-subtle) 1px,
+              transparent 1px
+            ),
             linear-gradient(90deg, var(--border-subtle) 1px, transparent 1px);
           background-size: 64px 64px;
-          mask-image: radial-gradient(ellipse at center, black 0%, transparent 65%);
-          -webkit-mask-image: radial-gradient(ellipse at center, black 0%, transparent 65%);
+          mask-image: radial-gradient(
+            ellipse at center,
+            black 0%,
+            transparent 65%
+          );
+          -webkit-mask-image: radial-gradient(
+            ellipse at center,
+            black 0%,
+            transparent 65%
+          );
           pointer-events: none;
         }
 
@@ -62,7 +66,11 @@ export default function Home({ supabase }: HomeProps) {
           width: 480px;
           height: 480px;
           border-radius: 50%;
-          background: radial-gradient(circle, rgba(201,168,76,0.04) 0%, transparent 70%);
+          background: radial-gradient(
+            circle,
+            rgba(224, 64, 42, 0.04) 0%,
+            transparent 70%
+          );
           pointer-events: none;
           filter: blur(40px);
         }
@@ -76,16 +84,8 @@ export default function Home({ supabase }: HomeProps) {
           gap: 0;
         }
 
-        .hero-logo {
-          width: 80px;
-          height: 80px;
-          margin-bottom: 32px;
-          opacity: 0;
-          animation: arrive 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0s forwards;
-        }
-
         .title {
-          font-family: 'Cinzel', serif;
+          font-family: "Cinzel", serif;
           font-size: clamp(42px, 7vw, 72px);
           font-weight: 700;
           letter-spacing: 10px;
@@ -95,7 +95,7 @@ export default function Home({ supabase }: HomeProps) {
           animation: arrive 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.1s forwards;
         }
         .title-dac {
-          color: var(--gold);
+          color: var(--accent);
         }
         .title-tools {
           color: var(--text-secondary);
@@ -134,7 +134,7 @@ export default function Home({ supabase }: HomeProps) {
         }
 
         .btn-download {
-          font-family: 'Cinzel', serif;
+          font-family: "Cinzel", serif;
           font-size: 13px;
           font-weight: 600;
           letter-spacing: 2.5px;
@@ -149,13 +149,13 @@ export default function Home({ supabase }: HomeProps) {
         }
 
         .btn-download::after {
-          content: 'coming soon';
+          content: "coming soon";
           position: absolute;
           inset: 0;
           display: flex;
           align-items: center;
           justify-content: center;
-          font-family: 'IBM Plex Mono', monospace;
+          font-family: "IBM Plex Mono", monospace;
           font-size: 11px;
           font-weight: 400;
           letter-spacing: 2px;
@@ -169,24 +169,6 @@ export default function Home({ supabase }: HomeProps) {
           opacity: 1;
         }
 
-        .divider {
-          width: 1px;
-          height: 20px;
-          background: var(--border);
-        }
-
-        .btn-sign-in {
-          font-family: 'IBM Plex Mono', monospace;
-          font-size: 13px;
-          color: var(--text-secondary);
-          letter-spacing: 0.5px;
-          padding: 14px 0;
-          transition: color 0.2s;
-        }
-        .btn-sign-in:hover {
-          color: var(--text-primary);
-        }
-
         /* Corner marks — subtle geometric detail */
         .corner {
           position: absolute;
@@ -198,10 +180,30 @@ export default function Home({ supabase }: HomeProps) {
           opacity: 0;
           animation: arrive 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.9s forwards;
         }
-        .corner-tl { top: 32px; left: 32px; border-top-width: 1px; border-left-width: 1px; }
-        .corner-tr { top: 32px; right: 32px; border-top-width: 1px; border-right-width: 1px; }
-        .corner-bl { bottom: 32px; left: 32px; border-bottom-width: 1px; border-left-width: 1px; }
-        .corner-br { bottom: 32px; right: 32px; border-bottom-width: 1px; border-right-width: 1px; }
+        .corner-tl {
+          top: 32px;
+          left: 32px;
+          border-top-width: 1px;
+          border-left-width: 1px;
+        }
+        .corner-tr {
+          top: 32px;
+          right: 32px;
+          border-top-width: 1px;
+          border-right-width: 1px;
+        }
+        .corner-bl {
+          bottom: 32px;
+          left: 32px;
+          border-bottom-width: 1px;
+          border-left-width: 1px;
+        }
+        .corner-br {
+          bottom: 32px;
+          right: 32px;
+          border-bottom-width: 1px;
+          border-right-width: 1px;
+        }
 
         @keyframes arrive {
           from {
@@ -216,45 +218,32 @@ export default function Home({ supabase }: HomeProps) {
       `}</style>
 
       <div className="page">
-        <div className="grid" />
-        <div className="glow" />
+        <NavBar supabase={supabase} />
 
-        <div className="corner corner-tl" />
-        <div className="corner corner-tr" />
-        <div className="corner corner-bl" />
-        <div className="corner corner-br" />
+        <div className="hero">
+          <div className="grid" />
+          <div className="glow" />
 
-        <div className="content">
-          <img src="/logo.svg" alt="DAC Tools" className="hero-logo" />
-          <h1 className="title">
-            <span className="title-dac">DAC</span>
-            <span className="title-tools">Tools</span>
-          </h1>
+          <div className="corner corner-tl" />
+          <div className="corner corner-tr" />
+          <div className="corner corner-bl" />
+          <div className="corner corner-br" />
 
-          <div className="rule" />
+          <div className="content">
+            <h1 className="title">
+              <span className="title-dac">DAC</span>
+              <span className="title-tools">Tools</span>
+            </h1>
 
-          <p className="tagline">
-            Match tracker for Dota Auto Chess
-          </p>
+            <div className="rule" />
 
-          <div className="actions">
-            <button className="btn-download" disabled>
-              Download
-            </button>
+            <p className="tagline">Match tracker for Dota Auto Chess</p>
 
-            <div className="divider" />
-
-            {ready && (
-              loggedIn ? (
-                <Link href="/dashboard" className="btn-sign-in">
-                  Dashboard
-                </Link>
-              ) : (
-                <a href="/api/auth/steam" className="btn-sign-in">
-                  Sign in
-                </a>
-              )
-            )}
+            <div className="actions">
+              <button className="btn-download" disabled>
+                Download
+              </button>
+            </div>
           </div>
         </div>
       </div>

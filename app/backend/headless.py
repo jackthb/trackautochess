@@ -270,8 +270,8 @@ class HeadlessBackend:
         log.info("Screenshot saved locally: %s", path)
         return str(path)
 
-    def _mark_screenshot_uploaded(self, screenshot_path: str) -> None:
-        """Record that a screenshot has been uploaded to the database."""
+    def _update_manifest(self, screenshot_path: str, **fields) -> None:
+        """Update manifest.json entry for a screenshot with arbitrary fields."""
         manifest_path = DAC_DIR / "screenshots" / "manifest.json"
         manifest = {}
         if manifest_path.exists():
@@ -280,11 +280,17 @@ class HeadlessBackend:
             except Exception:
                 pass
         filename = Path(screenshot_path).name
-        manifest[filename] = {"uploaded_at": datetime.now().isoformat()}
+        entry = manifest.get(filename, {})
+        entry.update(fields)
+        manifest[filename] = entry
         try:
             manifest_path.write_text(json.dumps(manifest, indent=2), encoding="utf-8")
         except Exception as e:
             log.warning("Failed to update screenshot manifest: %s", e)
+
+    def _mark_screenshot_uploaded(self, screenshot_path: str) -> None:
+        """Record that a screenshot has been uploaded to the database."""
+        self._update_manifest(screenshot_path, uploaded_at=datetime.now().isoformat())
 
     def _save_parse_result(self, screenshot_path: str, rows: list, timestamps: list) -> None:
         stem = Path(screenshot_path).stem
@@ -315,6 +321,9 @@ class HeadlessBackend:
 
             screen_type = detect_screen_type(img)
             log.info("Capture: detected screen type '%s'", screen_type)
+
+            # Store screen type in manifest for future reference
+            self._update_manifest(local_path, screen_type=screen_type)
 
             if screen_type == "my_matches":
                 self._emit_notification(APP_NAME, "My Matches detected — parsing...")
@@ -467,6 +476,10 @@ class HeadlessBackend:
                 push_game(game_row, user_id=user_id)
                 imported += 1
 
+            # Mark screenshot as imported (games saved)
+            if self._pending_screenshot_path and imported > 0:
+                self._update_manifest(self._pending_screenshot_path, imported_at=datetime.now().isoformat())
+
             # Mark screenshot as uploaded if we got a remote URL
             if screenshot_url and self._pending_screenshot_path and not screenshot_url.startswith(str(DAC_DIR)):
                 self._mark_screenshot_uploaded(self._pending_screenshot_path)
@@ -509,7 +522,7 @@ class HeadlessBackend:
             self._emit_error(f"Failed to read image: {path}")
             return
 
-        self._do_parse_my_matches(img)
+        self._do_parse_my_matches(img, screenshot_path=path_str)
 
     # ── Steam login ─────────────────────────────────────────────────────────
 
