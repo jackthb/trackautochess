@@ -7,11 +7,18 @@ parse, and push results to DB.
 Requires: tkinter (stdlib on Windows Python).
 """
 
+import json
 import logging
 import threading
 import tkinter as tk
+from pathlib import Path
 
 log = logging.getLogger("dac")
+
+# ── Shared design tokens ─────────────────────────────────────────────────────
+_colors = json.loads(
+    (Path(__file__).resolve().parent.parent.parent / "shared" / "colors.json").read_text()
+)
 
 # How long the overlay stays visible before auto-dismissing (seconds)
 OVERLAY_TIMEOUT = 120
@@ -121,39 +128,39 @@ class GameEndOverlay:
             0, arrow_y,              # tip (pointing left)
             arrow_w, arrow_y - 14,   # top-right
             arrow_w, arrow_y + 14,   # bottom-right
-            fill="#4a6fa5", outline="",
+            fill=_colors["accent"], outline="",
         )
 
         # Content panel
         frame = tk.Frame(
-            root, bg="#0e1014", padx=10, pady=8,
-            highlightbackground="#1e2230", highlightthickness=1,
+            root, bg=_colors["bg_surface"], padx=10, pady=8,
+            highlightbackground=_colors["border"], highlightthickness=1,
         )
         frame.place(x=arrow_w, y=0, width=panel_w, height=h)
 
         title_text = "GG!" if self._won else "Game Over!"
-        title_fg = "#4eaa62" if self._won else "#c8ccd8"
+        title_fg = _colors["green_bright"] if self._won else _colors["text_primary"]
         title = tk.Label(
             frame, text=title_text, font=("Consolas", 14, "bold"),
-            fg=title_fg, bg="#0e1014",
+            fg=title_fg, bg=_colors["bg_surface"],
         )
         title.pack(anchor=tk.W)
 
         subtitle = tk.Label(
             frame, text="Click Match History, then Capture.",
-            font=("Consolas", 10), fg="#6b7080", bg="#0e1014",
+            font=("Consolas", 10), fg=_colors["text_secondary"], bg=_colors["bg_surface"],
             wraplength=250, justify=tk.LEFT,
         )
         subtitle.pack(anchor=tk.W, pady=(2, 8))
 
-        btn_frame = tk.Frame(frame, bg="#0e1014")
+        btn_frame = tk.Frame(frame, bg=_colors["bg_surface"])
         btn_frame.pack(fill=tk.X)
 
         btn_w = 12  # character width — same for both
         capture_btn = tk.Button(
             btn_frame, text="Capture",
             font=("Consolas", 10, "bold"), width=btn_w,
-            bg="#4a6fa5", fg="white", activebackground="#5a8fd5",
+            bg=_colors["accent"], fg="white", activebackground=_colors["accent_hover"],
             relief=tk.FLAT, pady=4,
             command=self._on_capture_click,
         )

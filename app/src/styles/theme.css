@@ -1,26 +1,6 @@
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+@import '../../../shared/tokens.css';
 
-:root {
-  --bg-deep: #08090b;
-  --bg-surface: #0e1014;
-  --bg-elevated: #14161c;
-  --bg-hover: #1a1d26;
-  --border: #1e2230;
-  --border-subtle: #151820;
-  --text-primary: #c8ccd8;
-  --text-secondary: #6b7080;
-  --text-muted: #3a3f50;
-  --gold: #c9a84c;
-  --gold-dim: #8a7234;
-  --silver: #8a92a8;
-  --bronze: #8b6d4f;
-  --red: #9b3a3a;
-  --red-bright: #c44e4e;
-  --green: #3a7a4a;
-  --green-bright: #4eaa62;
-  --accent: #4a6fa5;
-  --accent-hover: #5a8fd5;
-}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {
   font-family: 'IBM Plex Mono', monospace;

@@ -267,7 +267,7 @@ export default function Dashboard({ supabase }: DashboardProps) {
           align-items: center;
           gap: 10px;
         }
-        .logo b { color: var(--gold-dim); }
+        .logo b { color: var(--accent-dim); }
         .logo img { width: 28px; height: 28px; }
         .header-right {
           display: flex;

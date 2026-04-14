@@ -92,7 +92,7 @@ export default function PlayerPage({
           gap: 10px;
         }
         .logo b {
-          color: var(--gold-dim);
+          color: var(--accent-dim);
         }
         .logo img { width: 28px; height: 28px; }
         .dashboard {

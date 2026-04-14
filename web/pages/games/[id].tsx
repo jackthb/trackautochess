@@ -56,7 +56,7 @@ export default function GamePage({ game, playerName }: GamePageProps) {
           align-items: center;
           gap: 10px;
         }
-        .logo b { color: var(--gold-dim); }
+        .logo b { color: var(--accent-dim); }
         .logo img { width: 28px; height: 28px; }
         .back-link {
           font-size: 13px;

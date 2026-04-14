@@ -7,7 +7,10 @@
   "exports": {
     "./game-utils": "./game-utils.ts",
     "./GameRowDisplay": "./GameRowDisplay.tsx",
-    "./types": "./types.ts"
+    "./types": "./types.ts",
+    "./tokens.css": "./tokens.css",
+    "./components.css": "./components.css",
+    "./colors.json": "./colors.json"
   },
   "peerDependencies": {
     "react": ">=18",
