@@ -165,12 +165,16 @@ function saveCloseToTray(value) {
 // ── System tray ─────────────────────────────────────────────────────────────
 
 function createTray() {
-  const iconPath = path.join(ICONS_DIR, "dac_tracker.ico");
+  const iconExt = process.platform === "win32" ? "dac_tracker.ico" : "dac_tracker.png";
+  const iconPath = path.join(ICONS_DIR, iconExt);
   let icon;
   if (fs.existsSync(iconPath)) {
     icon = nativeImage.createFromPath(iconPath);
+    // Resize for tray: 16x16 on most platforms
+    if (!icon.isEmpty()) {
+      icon = icon.resize({ width: 16, height: 16 });
+    }
   } else {
-    // Fallback: 16x16 empty icon
     icon = nativeImage.createEmpty();
   }
 
@@ -441,12 +445,14 @@ ipcMain.on("widget:capture", () => {
 // ── Main window ──────────────────────────────────────────────────────────────
 
 function createWindow() {
+  const iconExt = process.platform === "win32" ? "dac_tracker.ico" : "dac_tracker.png";
   mainWindow = new BrowserWindow({
     width: 1200,
     height: 800,
     minWidth: 800,
     minHeight: 600,
     backgroundColor: "#08090b",
+    icon: path.join(ICONS_DIR, iconExt),
     frame: false,
     show: false,
     webPreferences: {
