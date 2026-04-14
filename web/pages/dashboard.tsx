@@ -54,11 +54,11 @@ const ALL_RELIC_NAMES = Object.values((relicsData as any).relics)
   .filter(Boolean)
   .sort();
 
-const TIER_NAMES = ["Pawn", "Knight", "Rook", "Bishop", "King", "Queen"];
+const TIER_NAMES = ["Pawn", "Knight", "Bishop", "Rook", "King", "Queen"];
 function mmrLevelToTier(level: number | null): string {
   if (level == null) return "";
-  const tier = TIER_NAMES[Math.floor(level / 3)] ?? "Queen";
-  const sub = (level % 3) + 1;
+  const tier = TIER_NAMES[Math.floor(level / 9)] ?? "Queen";
+  const sub = (level % 9) + 1;
   return `${tier} ${sub}`;
 }
 

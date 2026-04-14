@@ -9,6 +9,7 @@ import { SettingsTab } from "./components/SettingsTab";
 import { LogTab } from "./components/LogTab";
 import { useTrackerEvents } from "./hooks/useTrackerEvents";
 import { useGames } from "./hooks/useGames";
+import { useDrodo } from "./hooks/useDrodo";
 import { useReplays } from "./hooks/useReplays";
 import "./styles/app.css";
 
@@ -19,6 +20,7 @@ export default function App() {
   const [focusGameId, setFocusGameId] = useState<number | null>(null);
 
   const gamesState = useGames();
+  const drodoState = useDrodo();
   const replaysState = useReplays();
 
   const handleImportResult = useCallback(() => {
@@ -58,6 +60,9 @@ export default function App() {
         {activeTab === "history" && (
           <HistoryTab
             {...gamesState}
+            drodo={drodoState.drodo}
+            drodoLoading={drodoState.loading}
+            refreshDrodo={drodoState.refresh}
             focusGameId={focusGameId}
             onFocusHandled={() => setFocusGameId(null)}
           />
