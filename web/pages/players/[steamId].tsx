@@ -369,7 +369,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       .select("*")
       .eq("user_id", steamId)
       .order("played_at", { ascending: false }),
-    fetchSteamProfile(steamId),
+    fetchSteamProfile(steamId, supabase),
   ]);
 
   // Fetch drodo profile and season history (using service key for cached data)

@@ -155,7 +155,7 @@ class TrayApp:
         sid = self.config.get("steam_id")
         if sid:
             from db import ensure_user
-            ensure_user(sid)
+            ensure_user(sid, name=self.config.get("steam_name"))
         # Init replay system
         if self.config.get("replay_enabled", True):
             self._init_replay()
@@ -499,7 +499,7 @@ class TrayApp:
             self.config["steam_name"] = name
             save_config(self.config)
             from db import ensure_user
-            ensure_user(sid)
+            ensure_user(sid, name=name)
             self._notify(APP_NAME, f"Logged in as {name}")
             log.info("Steam login: %s (%s)", name, sid)
 

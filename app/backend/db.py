@@ -95,19 +95,32 @@ def game_exists(user_id: str, played_at: str, placement: str, wl: str = "", leve
         return False
 
 
-def ensure_user(user_id: str) -> bool:
-    """Upsert a user row so the FK constraint is satisfied. Never raises."""
+def ensure_user(user_id: str, name: str | None = None, custom_url: str | None = None) -> bool:
+    """Upsert a user row so the FK constraint is satisfied.
+
+    If *name* or *custom_url* are provided the row is updated on conflict so the
+    stored Steam metadata stays fresh. Never raises.
+    """
     client = _get_client()
     if client is None:
         return False
     try:
+        row: dict = {"steam_id": int(user_id)}
+        if name:
+            row["name"] = name
+        if custom_url:
+            row["custom_url"] = custom_url
+
+        # merge-duplicates will UPDATE the name/custom_url columns when the
+        # steam_id already exists; ignore-duplicates would skip the update.
+        resolution = "merge-duplicates" if name or custom_url else "ignore-duplicates"
         resp = client.post(
             "/rest/v1/users",
-            json={"steam_id": int(user_id)},
-            headers={"Prefer": "resolution=ignore-duplicates,return=minimal"},
+            json=row,
+            headers={"Prefer": f"resolution={resolution},return=minimal"},
         )
         resp.raise_for_status()
-        log.info("ensure_user: ok (%s)", user_id)
+        log.info("ensure_user: ok (%s, name=%s)", user_id, name)
         return True
     except Exception as e:
         log.error("ensure_user error: %s", e)

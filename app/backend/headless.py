@@ -91,7 +91,7 @@ class HeadlessBackend:
         sid = self.config.get("steam_id")
         if sid:
             from db import ensure_user
-            ensure_user(sid)
+            ensure_user(sid, name=self.config.get("steam_name"))
 
         # Init replay system
         if self.config.get("replay_enabled", True):
@@ -541,7 +541,7 @@ class HeadlessBackend:
             self.config["steam_name"] = name
             save_config(self.config)
             from db import ensure_user
-            ensure_user(sid)
+            ensure_user(sid, name=name)
             self._emit({"type": "steam_login", "steam_id": sid, "steam_name": name})
             self._emit_notification(APP_NAME, f"Logged in as {name}")
             log.info("Steam login: %s (%s)", name, sid)

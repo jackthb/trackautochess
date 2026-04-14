@@ -435,7 +435,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   if (!data) return { notFound: true };
 
   const steamProfile = data.user_id
-    ? await fetchSteamProfile(String(data.user_id))
+    ? await fetchSteamProfile(String(data.user_id), supabase)
     : { name: null, customUrl: null };
 
   return { props: { game: data, steamProfile } };
