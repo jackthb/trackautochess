@@ -3,12 +3,19 @@ import Link from "next/link";
 import { useMemo } from "react";
 import { createClient } from "@supabase/supabase-js";
 import type { GetServerSideProps } from "next";
+import type { SupabaseClient } from "@supabase/supabase-js";
 import unitsData from "../../data/units.json";
 import unitsFullData from "@data/units_full.json";
 import synergiesData from "../../data/synergies.json";
 import relicsData from "../../data/relics.json";
 import { GameRowDisplay } from "@dac/shared/GameRowDisplay";
 import type { PlayerGame, UnitFullInfo, SynergyInfo, RelicInfo } from "@dac/shared/types";
+import { NavBar } from "../../components/NavBar";
+import {
+  fetchSteamProfile,
+  steamProfileUrl,
+  type SteamProfile,
+} from "../../lib/steam";
 
 const UNIT_COSTS: Record<string, number> = {};
 for (const [name, info] of Object.entries(unitsData.units)) {
@@ -28,7 +35,7 @@ function mmrLevelToTier(level: number | null): string {
 
 interface PlayerPageProps {
   steamId: string;
-  steamName: string | null;
+  steamProfile: SteamProfile;
   games: PlayerGame[];
   drodo: {
     mmr: number | null;
@@ -36,15 +43,18 @@ interface PlayerPageProps {
     mmr_level: number | null;
     season: string | null;
   } | null;
+  supabase: SupabaseClient | null;
 }
 
 export default function PlayerPage({
   steamId,
-  steamName,
+  steamProfile,
   games,
   drodo,
+  supabase,
 }: PlayerPageProps) {
-  const displayName = steamName || steamId;
+  const displayName = steamProfile.name || steamId;
+  const profileUrl = steamProfileUrl(steamId, steamProfile.customUrl);
 
   const stats = useMemo(() => {
     if (!games.length) return null;
@@ -73,34 +83,6 @@ export default function PlayerPage({
           z-index: 1;
           min-height: 100vh;
         }
-        .header {
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          padding: 20px 40px;
-          border-bottom: 1px solid var(--border-subtle);
-          background: rgba(8, 9, 11, 0.9);
-          backdrop-filter: blur(8px);
-          position: sticky;
-          top: 0;
-          z-index: 10;
-        }
-        .logo {
-          font-family: "Cinzel", serif;
-          font-size: 18px;
-          font-weight: 600;
-          letter-spacing: 3px;
-          text-transform: uppercase;
-          color: var(--text-secondary);
-          text-decoration: none;
-          display: flex;
-          align-items: center;
-          gap: 10px;
-        }
-        .logo b {
-          color: var(--accent-dim);
-        }
-        .logo img { width: 28px; height: 28px; }
         .dashboard {
           max-width: 1200px;
           margin: 0 auto;
@@ -193,29 +175,24 @@ export default function PlayerPage({
       `}</style>
 
       <div className="page">
-        <header className="header">
-          <Link href="/" className="logo">
-            <img src="/logo.svg" alt="" />
-            <b>DAC</b> Tools
-          </Link>
-        </header>
+        <NavBar supabase={supabase} />
 
         <div className="dashboard">
           <div className="player-header">
             <div className="player-name">{displayName}</div>
             <div className="player-meta">
-              Steam ID: {steamId}
-              {" · "}
               <a
-                href={`https://steamcommunity.com/profiles/${steamId}`}
+                href={profileUrl}
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                Steam Profile
+                {steamProfile.customUrl
+                  ? `steamcommunity.com/id/${steamProfile.customUrl}`
+                  : `Steam ID: ${steamId}`}
               </a>
               {drodo && drodo.mmr_level != null && (
                 <>
-                  {" · "}
+                  {" \u00B7 "}
                   {mmrLevelToTier(drodo.mmr_level)}
                 </>
               )}
@@ -261,7 +238,9 @@ export default function PlayerPage({
 
           {games.length === 0 ? (
             <div className="table-wrap">
-              <div className="empty-state">No matches recorded for this player.</div>
+              <div className="empty-state">
+                No matches recorded for this player.
+              </div>
             </div>
           ) : (
             <div className="table-wrap">
@@ -269,7 +248,7 @@ export default function PlayerPage({
                 <div className="th">#</div>
                 <div className="th">Lineup</div>
                 <div className="th">Rank</div>
-                <div className="th">W – L</div>
+                <div className="th">W &ndash; L</div>
                 <div className="th">Lv</div>
                 <div className="th">Relic</div>
                 <div className="th">Date</div>
@@ -300,19 +279,6 @@ export default function PlayerPage({
   );
 }
 
-async function fetchSteamName(steamId: string): Promise<string | null> {
-  try {
-    const resp = await fetch(
-      `https://steamcommunity.com/profiles/${steamId}/?xml=1`
-    );
-    const xml = await resp.text();
-    const match = xml.match(/<steamID><!\[CDATA\[(.+?)\]\]><\/steamID>/);
-    return match ? match[1] : null;
-  } catch {
-    return null;
-  }
-}
-
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const { steamId } = context.params!;
   if (
@@ -329,13 +295,13 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
   const supabase = createClient(url, key);
 
-  const [gamesResult, steamName] = await Promise.all([
+  const [gamesResult, steamProfile] = await Promise.all([
     supabase
       .from("games")
       .select("*")
       .eq("user_id", steamId)
       .order("played_at", { ascending: false }),
-    fetchSteamName(steamId),
+    fetchSteamProfile(steamId),
   ]);
 
   // Fetch drodo profile if available (using service key for cached data)
@@ -356,7 +322,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   return {
     props: {
       steamId,
-      steamName,
+      steamProfile,
       games: (gamesResult.data as PlayerGame[]) || [],
       drodo,
     },

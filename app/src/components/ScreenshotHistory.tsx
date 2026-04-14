@@ -36,7 +36,7 @@ export function parseRowToGame(row: ParseResultRow, timestamp: string): Game {
   const wl = parseWL(row.wl);
   return {
     id: 0,
-    user_id: 0,
+    user_id: "",
     placement: row.placement || "",
     rank: row.rank || null,
     rank_change: (row.rank_change as Game["rank_change"]) || null,

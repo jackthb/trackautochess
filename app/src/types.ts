@@ -1,7 +1,7 @@
 /** A row from the `games` table — one player's result in a match. */
 export interface Game {
   id: number;
-  user_id: number;
+  user_id: string;
   placement: string;
   rank: string | null;
   rank_change: "up" | "down" | "none" | null;
