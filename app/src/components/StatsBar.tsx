@@ -1,12 +1,12 @@
 import { useMemo } from "react";
 import type { Game, DrodoProfile } from "../types";
 
-const TIER_NAMES = ["Pawn", "Knight", "Bishop", "Rook", "King", "Queen"];
+const TIER_NAMES = ["Pawn", "Knight", "Bishop", "Rook", "King"];
 function mmrLevelToTier(level: number | null): string {
   if (level == null) return "";
-  const tier = TIER_NAMES[Math.floor(level / 9)] ?? "Queen";
-  const sub = (level % 9) + 1;
-  return `${tier} ${sub}`;
+  const tierIdx = Math.floor(level / 9);
+  if (tierIdx >= TIER_NAMES.length) return "Queen";
+  return `${TIER_NAMES[tierIdx]} ${(level % 9) + 1}`;
 }
 
 interface StatsBarProps {

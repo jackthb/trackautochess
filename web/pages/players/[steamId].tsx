@@ -18,12 +18,12 @@ const UNITS_FULL = unitsFullData as Record<string, UnitFullInfo>;
 const SYNERGIES_DATA = synergiesData as Record<string, SynergyInfo>;
 const RELICS_DATA = (relicsData as any).relics as Record<string, RelicInfo>;
 
-const TIER_NAMES = ["Pawn", "Knight", "Bishop", "Rook", "King", "Queen"];
+const TIER_NAMES = ["Pawn", "Knight", "Bishop", "Rook", "King"];
 function mmrLevelToTier(level: number | null): string {
   if (level == null) return "";
-  const tier = TIER_NAMES[Math.floor(level / 9)] ?? "Queen";
-  const sub = (level % 9) + 1;
-  return `${tier} ${sub}`;
+  const tierIdx = Math.floor(level / 9);
+  if (tierIdx >= TIER_NAMES.length) return "Queen";
+  return `${TIER_NAMES[tierIdx]} ${(level % 9) + 1}`;
 }
 
 interface SeasonSnapshot {
