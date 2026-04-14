@@ -11,8 +11,15 @@ import type { Game } from "../../../shared/types";
 import { GameRowDisplay } from "@dac/shared/GameRowDisplay";
 import {
   placementBg,
+  unitStem,
+  relicStem,
+  synIconName,
+  parseSynergies,
+  parseRelics,
   parseWL,
 } from "../lib/game-utils";
+import { CountedTagPicker, ReorderableTagPicker } from "./TagPickers";
+import type { CountedTag } from "./TagPickers";
 
 interface ScreenshotHistoryProps {
   onImportFile?: (path: string) => void;
@@ -22,7 +29,7 @@ interface ScreenshotHistoryProps {
   relicsData: Record<string, RelicInfo>;
 }
 
-function parseRowToGame(row: ParseResultRow, timestamp: string): Game {
+export function parseRowToGame(row: ParseResultRow, timestamp: string): Game {
   const wl = parseWL(row.wl);
   return {
     id: 0,
@@ -53,7 +60,13 @@ function parseRowToGame(row: ParseResultRow, timestamp: string): Game {
 
 const RANK_TIERS = ["Pawn", "Knight", "Bishop", "Rook", "King", "Queen"];
 
-function ParsedRowEdit({
+function toDatetimeLocal(isoStr: string) {
+  const d = new Date(isoStr);
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+
+export function ParsedRowEdit({
   row,
   timestamp,
   unitCosts,
@@ -61,6 +74,8 @@ function ParsedRowEdit({
   synergiesData,
   relicsData,
   onSave,
+  checked,
+  onToggleCheck,
 }: {
   row: ParseResultRow;
   timestamp: string;
@@ -69,6 +84,8 @@ function ParsedRowEdit({
   synergiesData: Record<string, SynergyInfo>;
   relicsData: Record<string, RelicInfo>;
   onSave: (fields: Partial<ParseResultRow>) => Promise<void>;
+  checked?: boolean;
+  onToggleCheck?: () => void;
 }) {
   const [expanded, setExpanded] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -78,9 +95,21 @@ function ParsedRowEdit({
   const [editRankNum, setEditRankNum] = useState("");
   const [editW, setEditW] = useState(0);
   const [editL, setEditL] = useState(0);
+  const [editUnits, setEditUnits] = useState<CountedTag[]>([]);
+  const [editSynergies, setEditSynergies] = useState<CountedTag[]>([]);
+  const [editRelics, setEditRelics] = useState<string[]>([]);
+  const [editPlayedAt, setEditPlayedAt] = useState("");
 
   const game = parseRowToGame(row, timestamp);
   const p = parseInt(game.placement) || 0;
+
+  const allUnitNames = Object.keys(unitCosts).sort();
+  const allSynergyNames = Object.values(synergiesData)
+    .map((s) => s.name)
+    .sort();
+  const allRelicNames = Object.values(relicsData)
+    .map((r) => r.name)
+    .sort();
 
   function resetEditState() {
     setEditPlacement(row.placement || "");
@@ -91,6 +120,23 @@ function ParsedRowEdit({
     const parsedWL = parseWL(row.wl);
     setEditW(parsedWL?.w ?? 0);
     setEditL(parsedWL?.l ?? 0);
+    setEditPlayedAt(timestamp ? toDatetimeLocal(timestamp) : "");
+    // Parse units preserving star data
+    const parsedUnits = (row.units || []).map((u) => {
+      const m = u.match(/^(.+?)(?:\((\d)\))?$/);
+      return {
+        name: m ? m[1] : u,
+        count: m && m[2] ? parseInt(m[2]) : 1,
+      };
+    });
+    setEditUnits(parsedUnits);
+    setEditSynergies(
+      parseSynergies(row.synergies).map((s) => ({
+        name: s.name,
+        count: s.count,
+      }))
+    );
+    setEditRelics(parseRelics(row.relic));
   }
 
   function handleToggle() {
@@ -106,11 +152,20 @@ function ParsedRowEdit({
         : editRankTier
       : "";
     const wlStr = editW || editL ? `${editW}-${editL}` : "";
+    const unitsArr = editUnits.map((u) =>
+      u.count > 1 ? `${u.name}(${u.count})` : u.name
+    );
+    const synStr = editSynergies.map((s) => `${s.name}:${s.count}`).join("|");
+    const relicStr = editRelics.join("|");
     await onSave({
       placement: editPlacement,
       level: editLevel,
       rank: rankStr,
       wl: wlStr,
+      units: unitsArr,
+      synergies: synStr,
+      relic: relicStr,
+      time_ago: editPlayedAt ? new Date(editPlayedAt).toISOString() : row.time_ago,
     });
     setSaving(false);
     setExpanded(false);
@@ -118,16 +173,32 @@ function ParsedRowEdit({
 
   return (
     <div className="game-entry" style={{ background: placementBg(p) }}>
-      <GameRowDisplay
-        game={game}
-        unitCosts={unitCosts}
-        unitsFull={unitsFull}
-        synergiesData={synergiesData}
-        relicsData={relicsData}
-        iconUrl={(type, stem) => `icons://${type}/${stem}.png`}
-        onClick={handleToggle}
-        style={{ cursor: "pointer" }}
-      />
+      <div style={{ display: "flex", alignItems: "stretch" }}>
+        {onToggleCheck !== undefined && (
+          <div
+            className="confirm-row-check"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <input
+              type="checkbox"
+              checked={checked}
+              onChange={onToggleCheck}
+            />
+          </div>
+        )}
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <GameRowDisplay
+            game={game}
+            unitCosts={unitCosts}
+            unitsFull={unitsFull}
+            synergiesData={synergiesData}
+            relicsData={relicsData}
+            iconUrl={(type, stem) => `icons://${type}/${stem}.png`}
+            onClick={handleToggle}
+            style={{ cursor: "pointer" }}
+          />
+        </div>
+      </div>
       {expanded && (
         <div className="game-edit-panel" onClick={(e) => e.stopPropagation()}>
           <div className="edit-panel-body">
@@ -211,6 +282,59 @@ function ParsedRowEdit({
                     />
                   </div>
                 </div>
+                <label className="edit-label">
+                  <span>Time</span>
+                  <input
+                    className="edit-field"
+                    type="datetime-local"
+                    value={editPlayedAt}
+                    onChange={(e) => setEditPlayedAt(e.target.value)}
+                  />
+                </label>
+              </div>
+
+              <div className="edit-label edit-label-wide">
+                <span>Lineup</span>
+                <CountedTagPicker
+                  tags={editUnits}
+                  onChange={setEditUnits}
+                  suggestions={allUnitNames}
+                  iconPrefix="units"
+                  iconStem={unitStem}
+                  placeholder="Add unit..."
+                  countLabel="Stars"
+                  minCount={1}
+                  maxCount={3}
+                  defaultCount={1}
+                />
+              </div>
+
+              <div className="edit-label edit-label-wide">
+                <span>Synergies</span>
+                <CountedTagPicker
+                  tags={editSynergies}
+                  onChange={setEditSynergies}
+                  suggestions={allSynergyNames}
+                  iconPrefix="synergies"
+                  iconStem={synIconName}
+                  placeholder="Add synergy..."
+                  countLabel="Count"
+                  minCount={1}
+                  maxCount={20}
+                  defaultCount={1}
+                />
+              </div>
+
+              <div className="edit-label edit-label-wide">
+                <span>Relic</span>
+                <ReorderableTagPicker
+                  tags={editRelics}
+                  onChange={setEditRelics}
+                  suggestions={allRelicNames}
+                  iconPrefix="relics"
+                  iconStem={relicStem}
+                  placeholder="Add relic..."
+                />
               </div>
             </div>
           </div>

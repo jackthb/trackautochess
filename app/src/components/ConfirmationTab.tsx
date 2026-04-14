@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
-import { ScreenshotHistory } from "./ScreenshotHistory";
-import type { ParseResult, UnitFullInfo, SynergyInfo, RelicInfo } from "../types";
+import { ScreenshotHistory, ParsedRowEdit } from "./ScreenshotHistory";
+import type { ParseResult, ParseResultRow, UnitFullInfo, SynergyInfo, RelicInfo } from "../types";
 
 interface ConfirmationTabProps {
   parseResult: ParseResult | null;
@@ -20,14 +20,12 @@ export function ConfirmationTab({
   relicsData,
 }: ConfirmationTabProps) {
   const [checked, setChecked] = useState<boolean[]>([]);
-  const [edits, setEdits] = useState<
-    Record<number, Record<string, string>>
-  >({});
+  const [editedRows, setEditedRows] = useState<ParseResultRow[]>([]);
 
   useEffect(() => {
     if (parseResult) {
       setChecked(parseResult.rows.map(() => true));
-      setEdits({});
+      setEditedRows([...parseResult.rows]);
     }
   }, [parseResult]);
 
@@ -51,7 +49,7 @@ export function ConfirmationTab({
     );
   }
 
-  const { rows, screenshot_b64 } = parseResult;
+  const { rows, timestamps, screenshot_b64 } = parseResult;
   const checkedCount = checked.filter(Boolean).length;
 
   const toggleAll = (val: boolean) => {
@@ -66,15 +64,12 @@ export function ConfirmationTab({
     });
   };
 
-  const setField = (idx: number, field: string, value: string) => {
-    setEdits((prev) => ({
-      ...prev,
-      [idx]: { ...prev[idx], [field]: value },
-    }));
-  };
-
-  const getField = (idx: number, field: string, original: string) => {
-    return edits[idx]?.[field] ?? original;
+  const handleRowSave = async (idx: number, fields: Partial<ParseResultRow>) => {
+    setEditedRows((prev) => {
+      const next = [...prev];
+      next[idx] = { ...next[idx], ...fields };
+      return next;
+    });
   };
 
   const handleConfirm = () => {
@@ -84,27 +79,26 @@ export function ConfirmationTab({
     });
 
     const editPayload: Record<string, Record<string, string | string[]>> = {};
-    for (const [idxStr, fields] of Object.entries(edits)) {
-      const idx = parseInt(idxStr);
-      const orig = rows[idx];
-      for (const [field, value] of Object.entries(fields)) {
-        let origVal: string;
-        if (field === "units") {
-          origVal = (orig.units || []).join(", ");
-        } else {
-          origVal = (orig as unknown as Record<string, string>)[field] || "";
-        }
-        if (value !== origVal) {
-          if (!editPayload[idxStr]) editPayload[idxStr] = {};
-          if (field === "units") {
-            editPayload[idxStr][field] = value
-              .split(",")
-              .map((s) => s.trim())
-              .filter(Boolean);
-          } else {
-            editPayload[idxStr][field] = value;
-          }
-        }
+    for (let i = 0; i < rows.length; i++) {
+      const orig = rows[i];
+      const edited = editedRows[i];
+      if (!edited) continue;
+      const diff: Record<string, string | string[]> = {};
+
+      if (edited.placement !== orig.placement) diff.placement = edited.placement;
+      if (edited.level !== orig.level) diff.level = edited.level;
+      if (edited.rank !== orig.rank) diff.rank = edited.rank;
+      if (edited.wl !== orig.wl) diff.wl = edited.wl;
+      if (edited.synergies !== orig.synergies) diff.synergies = edited.synergies;
+      if (edited.relic !== orig.relic) diff.relic = edited.relic;
+      if (edited.time_ago !== orig.time_ago) diff.time_ago = edited.time_ago;
+
+      const origUnits = (orig.units || []).join(",");
+      const editedUnits = (edited.units || []).join(",");
+      if (editedUnits !== origUnits) diff.units = edited.units || [];
+
+      if (Object.keys(diff).length > 0) {
+        editPayload[String(i)] = diff;
       }
     }
 
@@ -133,114 +127,33 @@ export function ConfirmationTab({
           )}
           <div className="confirm-preview-info">
             <h2>{rows.length} rows parsed</h2>
-            <p>Edit fields below, uncheck rows to exclude, then Confirm.</p>
+            <p>Click a row to edit, uncheck to exclude, then Confirm.</p>
+            <label style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 13 }}>
+              <input
+                type="checkbox"
+                checked={checked.every(Boolean)}
+                onChange={(e) => toggleAll(e.target.checked)}
+              />
+              Select all
+            </label>
           </div>
         </div>
 
-        <div className="confirm-table-wrap">
-          <table className="confirm-table">
-            <thead>
-              <tr>
-                <th className="col-check">
-                  <input
-                    type="checkbox"
-                    checked={checked.every(Boolean)}
-                    onChange={(e) => toggleAll(e.target.checked)}
-                  />
-                </th>
-                <th className="col-num">#</th>
-                <th className="col-place">Place</th>
-                <th className="col-level">Level</th>
-                <th className="col-wl">W-L</th>
-                <th className="col-rank">Rank</th>
-                <th className="col-units">Units</th>
-                <th className="col-syn">Synergies</th>
-                <th className="col-relic">Relic</th>
-                <th className="col-time">Time</th>
-              </tr>
-            </thead>
-            <tbody>
-              {rows.map((r, i) => {
-                let rankDisplay = r.rank || "";
-                let rankClass = "";
-                if (r.rank_change === "up") {
-                  rankDisplay += " (+)";
-                  rankClass = "rank-up";
-                } else if (r.rank_change === "down") {
-                  rankDisplay += " (-)";
-                  rankClass = "rank-down";
-                }
-
-                const synDisplay = r.synergies
-                  ? r.synergies.replace(/\|/g, ", ").replace(/:/g, " ")
-                  : "\u2014";
-                let relicDisplay = r.relic || "\u2014";
-                if (relicDisplay.length > 30)
-                  relicDisplay = relicDisplay.slice(0, 27) + "...";
-
-                return (
-                  <tr key={i}>
-                    <td className="col-check">
-                      <input
-                        type="checkbox"
-                        checked={checked[i] ?? true}
-                        onChange={() => toggleRow(i)}
-                      />
-                    </td>
-                    <td className="col-num">{i + 1}</td>
-                    <td className="col-place">
-                      <input
-                        type="text"
-                        className="edit-field"
-                        value={getField(i, "placement", r.placement || "")}
-                        onChange={(e) =>
-                          setField(i, "placement", e.target.value)
-                        }
-                      />
-                    </td>
-                    <td className="col-level">
-                      <input
-                        type="text"
-                        className="edit-field"
-                        value={getField(i, "level", r.level || "")}
-                        onChange={(e) =>
-                          setField(i, "level", e.target.value)
-                        }
-                      />
-                    </td>
-                    <td className="col-wl">
-                      <input
-                        type="text"
-                        className="edit-field"
-                        value={getField(i, "wl", r.wl || "")}
-                        onChange={(e) => setField(i, "wl", e.target.value)}
-                      />
-                    </td>
-                    <td className="col-rank">
-                      <span className={rankClass}>{rankDisplay}</span>
-                    </td>
-                    <td className="col-units">
-                      <input
-                        type="text"
-                        className="edit-field"
-                        value={getField(
-                          i,
-                          "units",
-                          (r.units || []).join(", ")
-                        )}
-                        onChange={(e) =>
-                          setField(i, "units", e.target.value)
-                        }
-                      />
-                    </td>
-                    <td className="col-syn">{synDisplay}</td>
-                    <td className="col-relic">{relicDisplay}</td>
-                    <td className="col-time">{r.time_ago || "\u2014"}</td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+        <div className="confirm-rows">
+          {editedRows.map((row, i) => (
+            <ParsedRowEdit
+              key={i}
+              row={row}
+              timestamp={timestamps[i] || ""}
+              unitCosts={unitCosts}
+              unitsFull={unitsFull}
+              synergiesData={synergiesData}
+              relicsData={relicsData}
+              onSave={(fields) => handleRowSave(i, fields)}
+              checked={checked[i] ?? true}
+              onToggleCheck={() => toggleRow(i)}
+            />
+          ))}
         </div>
 
         <div className="confirm-actions">
