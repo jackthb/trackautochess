@@ -297,7 +297,7 @@ def main():
         time_raw = _ocr(time_proc, psm=6)
         time_norm = _normalise_time_ago(time_raw)
         s.add('<div style="margin:8px 0;padding:8px;background:#0a0a0a;border-radius:6px;border:1px solid #333">')
-        s.add('<div style="font-size:12px;font-weight:bold;color:#4a6fa5;margin-bottom:6px">Time-ago OCR</div>')
+        s.add('<div style="font-size:12px;font-weight:bold;color:#E0402A;margin-bottom:6px">Time-ago OCR</div>')
         s.add('<div style="display:flex;gap:12px;align-items:flex-start">')
         s.add(img_tag(time_cell, "Raw crop", max_h=60))
         s.add(img_tag(time_proc, "Preprocessed", max_h=60))

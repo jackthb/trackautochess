@@ -121,7 +121,7 @@ class GameEndOverlay:
             0, arrow_y,              # tip (pointing left)
             arrow_w, arrow_y - 14,   # top-right
             arrow_w, arrow_y + 14,   # bottom-right
-            fill="#4a6fa5", outline="",
+            fill="#E0402A", outline="",
         )
 
         # Content panel
@@ -153,7 +153,7 @@ class GameEndOverlay:
         capture_btn = tk.Button(
             btn_frame, text="Capture",
             font=("Consolas", 10, "bold"), width=btn_w,
-            bg="#4a6fa5", fg="white", activebackground="#5a8fd5",
+            bg="#E0402A", fg="white", activebackground="#FF6046",
             relief=tk.FLAT, pady=4,
             command=self._on_capture_click,
         )

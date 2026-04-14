@@ -106,7 +106,7 @@ export default function Home({ supabase }: HomeProps) {
         .rule {
           width: 48px;
           height: 1px;
-          background: var(--gold-dim);
+          background: var(--accent-dim);
           margin: 28px 0 24px;
           opacity: 0;
           animation: arrive 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.35s forwards;

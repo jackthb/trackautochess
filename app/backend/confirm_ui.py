@@ -29,7 +29,7 @@ log = logging.getLogger("dac")
 # ── Theme ────────────────────────────────────────────────────────────────────
 BG = "#1a1a2e"
 BG_ALT = "#16213e"
-ACCENT = "#4a6fa5"
+ACCENT = "#E0402A"
 FONT = "Segoe UI"
 FG = "#e0e0e0"
 FG_DIM = "#888888"

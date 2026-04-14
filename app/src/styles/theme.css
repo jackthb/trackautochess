@@ -18,8 +18,9 @@
   --red-bright: #c44e4e;
   --green: #3a7a4a;
   --green-bright: #4eaa62;
-  --accent: #4a6fa5;
-  --accent-hover: #5a8fd5;
+  --accent: #E0402A;
+  --accent-hover: #FF6046;
+  --accent-dim: #CC3520;
 }
 
 body {
