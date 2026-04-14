@@ -159,8 +159,7 @@ export function NavBar({ supabase }: NavBarProps) {
       `}</style>
       <nav>
         <Link href="/" className="nav-logo" style={{ display: "flex", alignItems: "center" }}>
-          <img src="/logo.svg" alt="" />
-          <span><b>DAC</b> Tools</span>
+          <img src="/logo.svg" alt="DAC Tools" />
         </Link>
         <div className="nav-center">
           <form className="search-form" onSubmit={handleSearch}>
