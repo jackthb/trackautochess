@@ -52,8 +52,12 @@ export default function GamePage({ game, playerName }: GamePageProps) {
           letter-spacing: 3px;
           text-transform: uppercase;
           color: var(--text-secondary);
+          display: flex;
+          align-items: center;
+          gap: 10px;
         }
         .logo b { color: var(--gold-dim); }
+        .logo img { width: 28px; height: 28px; }
         .back-link {
           font-size: 13px;
           color: var(--text-muted);
@@ -92,6 +96,7 @@ export default function GamePage({ game, playerName }: GamePageProps) {
       <div className="page">
         <header className="header">
           <Link href="/" className="logo">
+            <img src="/logo.svg" alt="" />
             <b>DAC</b> Tools
           </Link>
           <Link href="/dashboard" className="back-link">

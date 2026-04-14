@@ -87,10 +87,14 @@ export default function PlayerPage({
           text-transform: uppercase;
           color: var(--text-secondary);
           text-decoration: none;
+          display: flex;
+          align-items: center;
+          gap: 10px;
         }
         .logo b {
           color: var(--gold-dim);
         }
+        .logo img { width: 28px; height: 28px; }
         .dashboard {
           max-width: 1200px;
           margin: 0 auto;
@@ -185,6 +189,7 @@ export default function PlayerPage({
       <div className="page">
         <header className="header">
           <Link href="/" className="logo">
+            <img src="/logo.svg" alt="" />
             <b>DAC</b> Tools
           </Link>
         </header>

@@ -263,8 +263,12 @@ export default function Dashboard({ supabase }: DashboardProps) {
           text-transform: uppercase;
           color: var(--text-secondary);
           text-decoration: none;
+          display: flex;
+          align-items: center;
+          gap: 10px;
         }
         .logo b { color: var(--gold-dim); }
+        .logo img { width: 28px; height: 28px; }
         .header-right {
           display: flex;
           align-items: center;
@@ -437,6 +441,7 @@ export default function Dashboard({ supabase }: DashboardProps) {
       <div className="page">
         <header className="header">
           <a href="/" className="logo">
+            <img src="/logo.svg" alt="" />
             <b>DAC</b> Tools
           </a>
           {user && (

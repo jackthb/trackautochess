@@ -28,7 +28,7 @@ export default function Home({ supabase }: HomeProps) {
           content="Match tracker for Dota Auto Chess."
         />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <link rel="icon" href="/favicon.ico" />
+        <link rel="icon" href="/logo.svg" type="image/svg+xml" />
       </Head>
 
       <style jsx>{`
@@ -74,6 +74,14 @@ export default function Home({ supabase }: HomeProps) {
           flex-direction: column;
           align-items: center;
           gap: 0;
+        }
+
+        .hero-logo {
+          width: 80px;
+          height: 80px;
+          margin-bottom: 32px;
+          opacity: 0;
+          animation: arrive 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0s forwards;
         }
 
         .title {
@@ -217,6 +225,7 @@ export default function Home({ supabase }: HomeProps) {
         <div className="corner corner-br" />
 
         <div className="content">
+          <img src="/logo.svg" alt="DAC Tools" className="hero-logo" />
           <h1 className="title">
             <span className="title-dac">DAC</span>
             <span className="title-tools">Tools</span>

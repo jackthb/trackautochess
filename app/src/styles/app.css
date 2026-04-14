@@ -18,6 +18,9 @@
   letter-spacing: 3px;
   text-transform: uppercase;
   color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .titlebar-logo span { color: var(--gold-dim); }
