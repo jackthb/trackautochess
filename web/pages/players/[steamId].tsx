@@ -25,12 +25,19 @@ const UNITS_FULL = unitsFullData as Record<string, UnitFullInfo>;
 const SYNERGIES_DATA = synergiesData as Record<string, SynergyInfo>;
 const RELICS_DATA = (relicsData as any).relics as Record<string, RelicInfo>;
 
-const TIER_NAMES = ["Pawn", "Knight", "Rook", "Bishop", "King", "Queen"];
+const TIER_NAMES = ["Pawn", "Knight", "Bishop", "Rook", "King"];
 function mmrLevelToTier(level: number | null): string {
   if (level == null) return "";
-  const tier = TIER_NAMES[Math.floor(level / 3)] ?? "Queen";
-  const sub = (level % 3) + 1;
-  return `${tier} ${sub}`;
+  const tierIdx = Math.floor(level / 9);
+  if (tierIdx >= TIER_NAMES.length) return "Queen";
+  return `${TIER_NAMES[tierIdx]} ${(level % 9) + 1}`;
+}
+
+interface SeasonSnapshot {
+  season: string;
+  mmr: number | null;
+  max_mmr: number | null;
+  games_played: number | null;
 }
 
 interface PlayerPageProps {
@@ -43,6 +50,7 @@ interface PlayerPageProps {
     mmr_level: number | null;
     season: string | null;
   } | null;
+  seasons: SeasonSnapshot[];
   supabase: SupabaseClient | null;
 }
 
@@ -51,6 +59,7 @@ export default function PlayerPage({
   steamProfile,
   games,
   drodo,
+  seasons,
   supabase,
 }: PlayerPageProps) {
   const displayName = steamProfile.name || steamId;
@@ -165,6 +174,39 @@ export default function PlayerPage({
         .game-entry:last-child {
           border-bottom: none;
         }
+        .section-title {
+          font-size: 13px;
+          letter-spacing: 2px;
+          text-transform: uppercase;
+          color: var(--text-muted);
+          margin: 0 0 16px;
+          padding-bottom: 10px;
+          border-bottom: 1px solid var(--border-subtle);
+        }
+        .seasons-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+          gap: 1px;
+          background: var(--border-subtle);
+          border: 1px solid var(--border);
+          margin-bottom: 40px;
+        }
+        .season-card { background: var(--bg-surface); padding: 20px; }
+        .season-label {
+          font-size: 13px;
+          letter-spacing: 1.5px;
+          text-transform: uppercase;
+          color: var(--text-muted);
+          margin-bottom: 10px;
+        }
+        .season-mmr {
+          font-size: 28px;
+          font-weight: 700;
+          color: var(--text-primary);
+          margin-bottom: 3px;
+        }
+        .season-meta { font-size: 13px; color: var(--text-muted); }
+        .season-peak { color: var(--gold); }
         .empty-state {
           text-align: center;
           padding: 80px 32px;
@@ -236,6 +278,32 @@ export default function PlayerPage({
             </div>
           )}
 
+          {seasons.length > 1 && (
+            <>
+              <div className="section-title">Season History</div>
+              <div className="seasons-grid">
+                {[...seasons].reverse().map((s) => (
+                  <div key={s.season} className="season-card">
+                    <div className="season-label">{s.season.toUpperCase()}</div>
+                    {s.mmr != null ? (
+                      <div className="season-mmr">{s.mmr}</div>
+                    ) : (
+                      <div className="season-mmr" style={{ color: "var(--text-muted)" }}>—</div>
+                    )}
+                    {s.max_mmr != null && (
+                      <div className="season-meta">
+                        Peak <span className="season-peak">{s.max_mmr}</span>
+                      </div>
+                    )}
+                    {s.games_played != null && (
+                      <div className="season-meta">{s.games_played} games</div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </>
+          )}
+
           {games.length === 0 ? (
             <div className="table-wrap">
               <div className="empty-state">
@@ -304,19 +372,28 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     fetchSteamProfile(steamId),
   ]);
 
-  // Fetch drodo profile if available (using service key for cached data)
+  // Fetch drodo profile and season history (using service key for cached data)
   const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
   let drodo = null;
+  let seasons: SeasonSnapshot[] = [];
   if (serviceKey) {
     const adminClient = createClient(url, serviceKey, {
       auth: { autoRefreshToken: false, persistSession: false },
     });
-    const { data } = await adminClient
-      .from("drodo_profiles")
-      .select("mmr, max_mmr, mmr_level, season")
-      .eq("steam_id", steamId)
-      .single();
-    if (data) drodo = data;
+    const [profileResult, seasonsResult] = await Promise.all([
+      adminClient
+        .from("drodo_profiles")
+        .select("mmr, max_mmr, mmr_level, season")
+        .eq("steam_id", steamId)
+        .single(),
+      adminClient
+        .from("player_seasons")
+        .select("season, mmr, max_mmr, games_played")
+        .eq("steam_id", steamId)
+        .order("season", { ascending: true }),
+    ]);
+    if (profileResult.data) drodo = profileResult.data;
+    if (seasonsResult.data) seasons = seasonsResult.data;
   }
 
   return {
@@ -325,6 +402,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       steamProfile,
       games: (gamesResult.data as PlayerGame[]) || [],
       drodo,
+      seasons,
     },
   };
 };

@@ -649,6 +649,162 @@ ipcMain.handle("games:delete", async (_event, gameId) => {
   }
 });
 
+// ── Drodo profile IPC (fetch from Supabase + Drodo API) ─────────────────────
+
+const DRODO_BASE = "http://autochess.ppbizon.com";
+
+ipcMain.handle("drodo:fetch", async () => {
+  const config = loadTrackerConfig();
+  const url = config.supabase_url;
+  const key = config.supabase_key;
+  const steamId = config.steam_id;
+
+  if (!url || !key || !steamId) return null;
+
+  try {
+    const [profileResp, seasonsResp] = await Promise.all([
+      net.fetch(
+        `${url}/rest/v1/drodo_profiles?select=mmr,max_mmr,mmr_level,season,season_games,chicken_count,fetched_at&steam_id=eq.${steamId}`,
+        {
+          headers: {
+            apikey: key,
+            Authorization: `Bearer ${key}`,
+            Accept: "application/json",
+          },
+        }
+      ),
+      net.fetch(
+        `${url}/rest/v1/player_seasons?select=season,mmr,max_mmr,games_played&steam_id=eq.${steamId}&order=season.asc`,
+        {
+          headers: {
+            apikey: key,
+            Authorization: `Bearer ${key}`,
+            Accept: "application/json",
+          },
+        }
+      ),
+    ]);
+
+    const profiles = profileResp.ok ? await profileResp.json() : [];
+    const seasons = seasonsResp.ok ? await seasonsResp.json() : [];
+    const profile = profiles[0] || null;
+
+    if (!profile) return null;
+    return { ...profile, seasons };
+  } catch (e) {
+    console.error("drodo:fetch error:", e);
+    return null;
+  }
+});
+
+ipcMain.handle("drodo:refresh", async () => {
+  const config = loadTrackerConfig();
+  const url = config.supabase_url;
+  const key = config.supabase_key;
+  const steamId = config.steam_id;
+
+  if (!url || !key || !steamId) return null;
+
+  // Fetch from Drodo API
+  let drodoData;
+  try {
+    const resp = await net.fetch(`${DRODO_BASE}/courier/get/@${steamId}`);
+    if (!resp.ok) return null;
+    const json = await resp.json();
+    if (json.err !== 0 || !json.user_info?.[steamId]) return null;
+    drodoData = json.user_info[steamId];
+  } catch (e) {
+    console.error("drodo:refresh API error:", e);
+    return null;
+  }
+
+  // Find current season
+  let maxSeason = 0;
+  let season = "";
+  for (const k of Object.keys(drodoData)) {
+    const m = k.match(/^mmr_s(\d+)$/);
+    if (m) {
+      const n = parseInt(m[1]);
+      if (n > maxSeason) { maxSeason = n; season = `s${n}`; }
+    }
+  }
+
+  const mmrKey = season ? `mmr_${season}` : null;
+  const maxMmrKey = season ? `max_mmr_${season}` : null;
+  const matchKey = season ? `match_${season}` : null;
+  const now = new Date().toISOString();
+
+  const profile = {
+    steam_id: steamId,
+    mmr: mmrKey ? Number(drodoData[mmrKey]) || null : null,
+    max_mmr: maxMmrKey ? Number(drodoData[maxMmrKey]) || null : null,
+    mmr_level: Number(drodoData.mmr_level) || null,
+    season: season || null,
+    season_games: matchKey ? Number(drodoData[matchKey]) || null : null,
+    chicken_count: Number(drodoData.chicken_count) || 0,
+    fetched_at: now,
+  };
+
+  // Upsert profile into Supabase
+  try {
+    await net.fetch(
+      `${url}/rest/v1/drodo_profiles`,
+      {
+        method: "POST",
+        headers: {
+          apikey: key,
+          Authorization: `Bearer ${key}`,
+          "Content-Type": "application/json",
+          Prefer: "resolution=merge-duplicates",
+        },
+        body: JSON.stringify(profile),
+      }
+    );
+  } catch (e) {
+    console.error("drodo:refresh upsert profile error:", e);
+  }
+
+  // Extract and upsert all season snapshots
+  const seasonRows = [];
+  for (const k of Object.keys(drodoData)) {
+    const m = k.match(/^mmr_s(\d+)$/);
+    if (m) {
+      const n = m[1];
+      seasonRows.push({
+        steam_id: steamId,
+        season: `s${n}`,
+        mmr: Number(drodoData[`mmr_s${n}`]) || null,
+        max_mmr: Number(drodoData[`max_mmr_s${n}`]) || null,
+        games_played: Number(drodoData[`match_s${n}`]) || null,
+        fetched_at: now,
+      });
+    }
+  }
+
+  if (seasonRows.length > 0) {
+    try {
+      await net.fetch(
+        `${url}/rest/v1/player_seasons`,
+        {
+          method: "POST",
+          headers: {
+            apikey: key,
+            Authorization: `Bearer ${key}`,
+            "Content-Type": "application/json",
+            Prefer: "resolution=merge-duplicates",
+          },
+          body: JSON.stringify(seasonRows),
+        }
+      );
+    } catch (e) {
+      console.error("drodo:refresh upsert seasons error:", e);
+    }
+  }
+
+  // Return the fresh data
+  return { ...profile, seasons: seasonRows };
+});
+
 // ── Units data IPC ───────────────────────────────────────────────────────────
 
 ipcMain.handle("data:units", async () => {

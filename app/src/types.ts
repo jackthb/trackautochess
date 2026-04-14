@@ -146,6 +146,24 @@ export interface RelicInfo {
   [key: string]: unknown;
 }
 
+export interface SeasonSnapshot {
+  season: string;
+  mmr: number | null;
+  max_mmr: number | null;
+  games_played: number | null;
+}
+
+export interface DrodoProfile {
+  mmr: number | null;
+  max_mmr: number | null;
+  mmr_level: number | null;
+  season: string | null;
+  season_games: number | null;
+  chicken_count: number | null;
+  fetched_at: string | null;
+  seasons?: SeasonSnapshot[];
+}
+
 // Window API types from preload.js
 declare global {
   interface Window {
@@ -186,6 +204,8 @@ declare global {
       fetchSynergies: () => Promise<Record<string, SynergyInfo>>;
       fetchRelics: () => Promise<{ relics: Record<string, RelicInfo> }>;
       openCalibration: () => Promise<void>;
+      fetchDrodo: () => Promise<DrodoProfile | null>;
+      refreshDrodo: () => Promise<DrodoProfile | null>;
     };
   }
 }

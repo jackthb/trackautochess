@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from "react";
-import type { Game, UnitFullInfo, SynergyInfo, RelicInfo } from "../types";
+import type { Game, UnitFullInfo, SynergyInfo, RelicInfo, DrodoProfile } from "../types";
 import { StatsBar } from "./StatsBar";
 import { GameRow } from "./GameRow";
 
@@ -16,6 +16,9 @@ interface HistoryTabProps {
   refresh: () => Promise<void>;
   updateGame: (gameId: number, fields: Partial<Game>) => Promise<boolean>;
   deleteGame: (gameId: number) => Promise<boolean>;
+  drodo?: DrodoProfile | null;
+  drodoLoading?: boolean;
+  refreshDrodo?: () => Promise<void>;
   focusGameId?: number | null;
   onFocusHandled?: () => void;
 }
@@ -31,6 +34,9 @@ export function HistoryTab({
   refresh,
   updateGame,
   deleteGame,
+  drodo,
+  drodoLoading,
+  refreshDrodo,
   focusGameId,
   onFocusHandled,
 }: HistoryTabProps) {
@@ -117,14 +123,55 @@ export function HistoryTab({
   return (
     <div className="history-tab" ref={containerRef}>
       <div className="history-container">
-        <StatsBar games={games} />
+        <StatsBar games={games} drodo={drodo} />
+
+        {drodo?.seasons && drodo.seasons.length > 1 && (
+          <div className="fade-up">
+            <div className="section-title">Season History</div>
+            <div className="seasons-grid">
+              {[...drodo.seasons].reverse().map((s) => (
+                <div key={s.season} className="season-card">
+                  <div className="season-label">{s.season.toUpperCase()}</div>
+                  {s.mmr != null ? (
+                    <div className="season-mmr">{s.mmr}</div>
+                  ) : (
+                    <div className="season-mmr dim">—</div>
+                  )}
+                  {s.max_mmr != null && (
+                    <div className="season-meta">
+                      Peak <span className="season-peak">{s.max_mmr}</span>
+                    </div>
+                  )}
+                  {s.games_played != null && (
+                    <div className="season-meta">{s.games_played} games</div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
         <div className="history-refresh fade-up">
           <button className="btn-ghost" onClick={refresh}>
             Refresh
           </button>
+          {refreshDrodo && (
+            <button
+              className="btn-ghost"
+              disabled={drodoLoading}
+              onClick={refreshDrodo}
+            >
+              {drodoLoading ? "Refreshing..." : "Refresh stats"}
+            </button>
+          )}
           {lastRefresh && (
             <span className="refresh-time">
               Updated {lastRefresh.toLocaleTimeString()}
+            </span>
+          )}
+          {drodo?.fetched_at && (
+            <span className="refresh-time">
+              Stats {new Date(drodo.fetched_at).toLocaleString()}
             </span>
           )}
         </div>
