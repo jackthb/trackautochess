@@ -369,6 +369,9 @@ class TrayApp:
             if screen_type == "my_matches":
                 self._notify(APP_NAME, "My Matches detected — parsing...")
                 self._do_parse_my_matches(img)
+            elif screen_type == "game_over":
+                self._notify(APP_NAME, "Game Over detected — parsing all players...")
+                self._do_parse_game_over(img)
             else:
                 hotkey = self.config.get("hotkey", "F6")
                 self._notify(APP_NAME, f"Not on My Matches page. Open it and press {hotkey} again.")
@@ -472,6 +475,94 @@ class TrayApp:
         except Exception as e:
             log.error("parse error: %s", e, exc_info=True)
             self._notify(APP_NAME, f"Parse error: {e}")
+
+    def _do_parse_game_over(self, img) -> None:
+        """Parse a Game Over screen — extract all 8 players and push to DB."""
+        import cv2
+        from cv_parser import parse_game_over_all
+        from models import GameRow
+        from db import push_game, game_exists, lookup_users_by_name, generate_match_id
+
+        try:
+            if isinstance(img, Path):
+                img = cv2.imread(str(img))
+                if img is None:
+                    self._notify(APP_NAME, "Failed to read image.")
+                    return
+
+            all_rows = parse_game_over_all(img, ICONS_DIR, debug=True)
+            if not all_rows:
+                log.warning("GAME OVER: no rows parsed")
+                self._notify(APP_NAME, "GAME OVER: no rows parsed.")
+                return
+            log.info("Parsed %d player(s) from GAME OVER", len(all_rows))
+
+            played_at = datetime.now().isoformat()
+            my_user_id = self.config.get("steam_id") or None
+
+            # Upload screenshot once
+            screenshot_url = ""
+            if my_user_id:
+                try:
+                    from db import upload_screenshot
+                    screenshot_url = upload_screenshot(img, my_user_id) or ""
+                except ImportError:
+                    screenshot_url = ""
+
+            # Look up player names against existing users
+            ocr_names = [r.get("player_name", "") for r in all_rows]
+            name_to_steam_id = lookup_users_by_name(ocr_names)
+            log.info("User lookup: matched %d/%d names", len(name_to_steam_id), len(ocr_names))
+
+            match_id = generate_match_id()
+            imported = 0
+            skipped = 0
+
+            for r in all_rows:
+                player_name = r.get("player_name", "")
+                placement = r.get("placement", "")
+                wl = r.get("wl", "")
+                level = r.get("level", "")
+
+                # Determine user_id: match by name against existing users
+                user_id = None
+                if player_name:
+                    steam_id = name_to_steam_id.get(player_name.lower().strip())
+                    if steam_id:
+                        user_id = str(steam_id)
+
+                # Skip duplicates for known users
+                if user_id and game_exists(user_id, played_at, placement, wl, level):
+                    log.info("  row %s: SKIP duplicate (user=%s)", placement, user_id)
+                    skipped += 1
+                    continue
+
+                game_row = GameRow(
+                    played_at=played_at,
+                    placement=placement,
+                    rank=r.get("rank", ""),
+                    rank_change="none",
+                    lineup="",
+                    synergies=r.get("synergies", ""),
+                    talents="",
+                    relic=r.get("relic", ""),
+                    level=level,
+                    wl=wl,
+                    screenshot=screenshot_url,
+                    notes="",
+                    match_id=match_id,
+                )
+                push_game(game_row, user_id=user_id)
+                imported += 1
+
+            msg = f"Game Over: imported {imported} player(s)"
+            if skipped:
+                msg += f", {skipped} duplicate(s) skipped"
+            self._notify(APP_NAME, msg)
+
+        except Exception as e:
+            log.error("parse_game_over error: %s", e, exc_info=True)
+            self._notify(APP_NAME, f"Game Over parse error: {e}")
 
     # ── Steam login ──────────────────────────────────────────────────────────
 

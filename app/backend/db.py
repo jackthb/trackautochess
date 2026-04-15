@@ -201,6 +201,55 @@ def push_game(row, user_id: str | None = None) -> bool:
         return False
 
 
+def generate_match_id() -> str:
+    """Generate a unique match_id for linking all players in a match."""
+    import uuid
+    return str(uuid.uuid4())[:12]
+
+
+def lookup_users_by_name(names: list[str]) -> dict[str, int]:
+    """Look up existing users by display name (case-insensitive).
+
+    Returns dict mapping lowercased name → steam_id for names that matched.
+    Only matches users that already exist in the database.
+    """
+    client = _get_client()
+    if client is None or not names:
+        return {}
+
+    try:
+        # Fetch all users that have a name set
+        resp = client.get(
+            "/rest/v1/users",
+            params={
+                "name": f"not.is.null",
+                "select": "steam_id,name",
+            },
+            headers={"Accept": "application/json"},
+        )
+        resp.raise_for_status()
+        users = resp.json()
+
+        # Build a lookup: lowercased DB name → steam_id
+        db_lookup: dict[str, int] = {}
+        for u in users:
+            if u.get("name"):
+                db_lookup[u["name"].lower()] = u["steam_id"]
+
+        # Match OCR'd names against DB names
+        result: dict[str, int] = {}
+        for name in names:
+            if not name:
+                continue
+            key = name.lower().strip()
+            if key in db_lookup:
+                result[key] = db_lookup[key]
+        return result
+    except Exception as e:
+        log.error("lookup_users_by_name error: %s", e)
+        return {}
+
+
 def upload_screenshot(img, user_id: str) -> str | None:
     """Compress a CV2 image to JPEG and upload to Supabase Storage.
 
