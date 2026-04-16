@@ -177,8 +177,10 @@ def push_game(row, user_id: str | None = None) -> bool:
             "screenshot": row.screenshot or None,
             "replay": row.replay or None,
             "notes": row.notes or None,
-            "match_id": getattr(row, "match_id", "") or None,
         }
+        match_id = getattr(row, "match_id", "") or None
+        if match_id:
+            game_data["match_id"] = match_id
         if user_id:
             game_data["user_id"] = int(user_id)
         resp = client.post(
