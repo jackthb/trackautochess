@@ -118,16 +118,16 @@ export default function Dashboard({ supabase }: DashboardProps) {
     setGamesLoading(true);
     supabase
       .from("games")
-      .select("id, created_at")
+      .select("id, played_at")
       .eq("user_id", steamId)
-      .order("created_at", { ascending: false })
+      .order("played_at", { ascending: false })
       .limit(1)
       .then(async ({ data: latest }) => {
         const cachedRaw = localStorage.getItem(cacheKey);
         if (cachedRaw) {
           try {
             const { count, newest } = JSON.parse(cachedRaw);
-            const serverNewest = latest?.[0]?.created_at ?? null;
+            const serverNewest = latest?.[0]?.played_at ?? null;
             const { count: serverCount } = await supabase
               .from("games")
               .select("*", { count: "exact", head: true })
@@ -144,7 +144,7 @@ export default function Dashboard({ supabase }: DashboardProps) {
           .from("games")
           .select("*")
           .eq("user_id", steamId)
-          .order("created_at", { ascending: false });
+          .order("played_at", { ascending: false });
 
         const freshGames = (data as Game[]) || [];
         setGames(freshGames);
@@ -156,7 +156,7 @@ export default function Dashboard({ supabase }: DashboardProps) {
             JSON.stringify({
               games: freshGames,
               count: freshGames.length,
-              newest: freshGames[0]?.created_at ?? null,
+              newest: freshGames[0]?.played_at ?? null,
             })
           );
         } catch {}
