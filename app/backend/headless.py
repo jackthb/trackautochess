@@ -366,6 +366,23 @@ class HeadlessBackend:
 
             timestamps = infer_timestamps(rows, screenshot_time)
 
+            # Mark duplicates so the confirmation UI can highlight them
+            try:
+                from db import game_exists as _game_exists
+                _user_id = self.config.get("steam_id") or None
+                if _user_id:
+                    for r, ts in zip(rows, timestamps):
+                        lineup = "|".join(r.get("units", []))
+                        r["is_duplicate"] = _game_exists(
+                            _user_id, ts,
+                            r.get("placement", ""),
+                            r.get("wl", ""),
+                            r.get("level", ""),
+                            lineup,
+                        )
+            except Exception as _e:
+                log.warning("Pre-import duplicate check failed: %s", _e)
+
             # Store pending data for confirmation
             self._pending_rows = rows
             self._pending_timestamps = timestamps

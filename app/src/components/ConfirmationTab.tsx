@@ -30,7 +30,7 @@ export function ConfirmationTab({
 
   useEffect(() => {
     if (parseResult) {
-      setChecked(parseResult.rows.map(() => true));
+      setChecked(parseResult.rows.map((r) => !r.is_duplicate));
       setEditedRows([...parseResult.rows]);
     }
   }, [parseResult]);
@@ -59,6 +59,7 @@ export function ConfirmationTab({
 
   const { rows, timestamps, screenshot_b64 } = parseResult;
   const checkedCount = checked.filter(Boolean).length;
+  const duplicateCount = rows.filter((r) => r.is_duplicate).length;
 
   const toggleAll = (val: boolean) => {
     setChecked(rows.map(() => val));
@@ -135,7 +136,14 @@ export function ConfirmationTab({
             />
           )}
           <div className="confirm-preview-info">
-            <h2>{rows.length} rows parsed</h2>
+            <h2>
+              {rows.length} rows parsed
+              {duplicateCount > 0 && (
+                <span className="duplicate-count-badge">
+                  {duplicateCount} duplicate{duplicateCount !== 1 ? "s" : ""}
+                </span>
+              )}
+            </h2>
             <p>Click a row to edit, uncheck to exclude, then Confirm.</p>
             <label style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 13 }}>
               <input

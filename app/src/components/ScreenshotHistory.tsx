@@ -175,7 +175,7 @@ export function ParsedRowEdit({
   }
 
   return (
-    <div className="game-entry" style={{ background: placementBg(p) }}>
+    <div className={`game-entry${row.is_duplicate ? " game-entry-duplicate" : ""}`} style={{ background: placementBg(p) }}>
       <div style={{ display: "flex", alignItems: "stretch" }}>
         {onToggleCheck !== undefined && (
           <div
@@ -189,7 +189,10 @@ export function ParsedRowEdit({
             />
           </div>
         )}
-        <div style={{ flex: 1, minWidth: 0 }}>
+        <div style={{ flex: 1, minWidth: 0, position: "relative" }}>
+          {row.is_duplicate && (
+            <span className="duplicate-badge">Already imported</span>
+          )}
           <GameRowDisplay
             game={game}
             unitCosts={unitCosts}

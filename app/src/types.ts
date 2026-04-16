@@ -61,6 +61,7 @@ export interface ParseResultRow {
   synergies: string;
   relic: string;
   time_ago: string;
+  is_duplicate?: boolean;
 }
 
 export interface ParseResult {
