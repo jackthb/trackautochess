@@ -28,6 +28,7 @@ interface ScreenshotHistoryProps {
   unitsFull: Record<string, UnitFullInfo>;
   synergiesData: Record<string, SynergyInfo>;
   relicsData: Record<string, RelicInfo>;
+  importing?: boolean;
 }
 
 export function parseRowToGame(row: ParseResultRow, timestamp: string): Game {
@@ -252,6 +253,7 @@ export function ScreenshotHistory({
   unitsFull,
   synergiesData,
   relicsData,
+  importing = false,
 }: ScreenshotHistoryProps) {
   const [screenshots, setScreenshots] = useState<Screenshot[]>([]);
   const [loading, setLoading] = useState(true);
@@ -303,6 +305,16 @@ export function ScreenshotHistory({
       if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
     };
   }, [lastImportResult]);
+
+  // When the global import flag clears (success, error, or timeout),
+  // also clear the per-row "Importing" highlight and refresh the list so
+  // the newly-detected screen_type badge shows up.
+  useEffect(() => {
+    if (!importing) {
+      setImportingPath(null);
+      refresh();
+    }
+  }, [importing, refresh]);
 
   const loadThumbnail = useCallback(
     async (name: string) => {
@@ -460,10 +472,15 @@ export function ScreenshotHistory({
                     {onImportFile && (
                       <button
                         className={`btn-ss-small${importingPath === ss.path ? " btn-loading" : ""}`}
-                        title="Import this screenshot"
-                        disabled={importingPath === ss.path}
+                        title={
+                          importing && importingPath !== ss.path
+                            ? "Another import is in progress"
+                            : "Import this screenshot"
+                        }
+                        disabled={importing}
                         onClick={(e) => {
                           e.stopPropagation();
+                          if (importing) return;
                           setImportingPath(ss.path);
                           onImportFile(ss.path);
                         }}

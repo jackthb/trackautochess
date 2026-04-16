@@ -101,6 +101,7 @@ export type TrackerEvent =
   | TrackerStatus
   | LogEntry
   | { type: "import_result"; imported: number; skipped: number }
+  | { type: "import_finished" }
   | { type: "focus_gained" }
   | { type: "focus_lost" }
   | { type: "replay_started" }

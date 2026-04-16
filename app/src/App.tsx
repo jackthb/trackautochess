@@ -86,6 +86,8 @@ export default function App() {
             unitsFull={gamesState.unitsFull}
             synergiesData={gamesState.synergiesData}
             relicsData={gamesState.relicsData}
+            importing={tracker.importing}
+            onBeginImport={tracker.beginImport}
           />
         )}
         {activeTab === "settings" && (

@@ -15,7 +15,13 @@ interface TrackerState {
   lastImportResult: ImportResult | null;
   clearImportResult: () => void;
   logEntries: LogEntry[];
+  importing: boolean;
+  beginImport: () => void;
 }
+
+// Safety net: if the backend never replies, drop the busy flag eventually.
+// Slightly longer than the backend's IMPORT_TIMEOUT_SEC (90s).
+const IMPORT_SAFETY_TIMEOUT_MS = 100_000;
 
 export function useTrackerEvents(
   onImportResult?: () => void,
@@ -26,8 +32,31 @@ export function useTrackerEvents(
     useState<ParseResult | null>(null);
   const [lastImportResult, setLastImportResult] = useState<ImportResult | null>(null);
   const [logEntries, setLogEntries] = useState<LogEntry[]>([]);
+  const [importing, setImporting] = useState(false);
+  const importTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const callbacksRef = useRef({ onImportResult, onReplaySaved });
   callbacksRef.current = { onImportResult, onReplaySaved };
+
+  const clearImportTimer = useCallback(() => {
+    if (importTimeoutRef.current) {
+      clearTimeout(importTimeoutRef.current);
+      importTimeoutRef.current = null;
+    }
+  }, []);
+
+  const finishImport = useCallback(() => {
+    clearImportTimer();
+    setImporting(false);
+  }, [clearImportTimer]);
+
+  const beginImport = useCallback(() => {
+    clearImportTimer();
+    setImporting(true);
+    importTimeoutRef.current = setTimeout(() => {
+      importTimeoutRef.current = null;
+      setImporting(false);
+    }, IMPORT_SAFETY_TIMEOUT_MS);
+  }, [clearImportTimer]);
 
   useEffect(() => {
     if (!window.tracker) return;
@@ -45,11 +74,16 @@ export function useTrackerEvents(
           break;
         case "parse_result":
           setPendingParseResult(msg);
+          finishImport();
           break;
         case "import_result":
           setPendingParseResult(null);
           setLastImportResult({ imported: msg.imported, skipped: msg.skipped });
+          finishImport();
           callbacksRef.current.onImportResult?.();
+          break;
+        case "import_finished":
+          finishImport();
           break;
         case "focus_gained":
           setStatus((prev) => prev ? { ...prev, focused: true } : prev);
@@ -70,14 +104,20 @@ export function useTrackerEvents(
               prev ? { ...prev, type: "status" } : prev
             );
           }
+          // Most error paths in the backend already emit import_finished,
+          // but clear the busy flag here too so the UI never sticks.
+          finishImport();
           break;
       }
     });
 
     window.tracker.sendCommand({ cmd: "status" });
 
-    return unsubscribe;
-  }, []);
+    return () => {
+      unsubscribe();
+      clearImportTimer();
+    };
+  }, [finishImport, clearImportTimer]);
 
   const clearParseResult = useCallback(() => {
     setPendingParseResult(null);
@@ -87,5 +127,14 @@ export function useTrackerEvents(
     setLastImportResult(null);
   }, []);
 
-  return { status, pendingParseResult, clearParseResult, lastImportResult, clearImportResult, logEntries };
+  return {
+    status,
+    pendingParseResult,
+    clearParseResult,
+    lastImportResult,
+    clearImportResult,
+    logEntries,
+    importing,
+    beginImport,
+  };
 }

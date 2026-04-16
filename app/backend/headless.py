@@ -36,6 +36,10 @@ from utils import load_config, save_config, DAC_DIR, DATA_DIR, ICONS_DIR
 APP_NAME = "DAC Tracker"
 LOG_PATH = DAC_DIR / "tracker.log"
 
+# Maximum seconds an import is allowed to run before we abandon it and
+# release the import lock so the user can retry.
+IMPORT_TIMEOUT_SEC = 90
+
 # ── Logging (file only — stdout is reserved for JSON protocol) ────────────────
 
 DAC_DIR.mkdir(parents=True, exist_ok=True)
@@ -86,6 +90,12 @@ class HeadlessBackend:
         self._pending_screenshot_path = None
         self._last_replay_filename = None
         self._status_timer = None
+
+        # Serialise screenshot imports — concurrent imports race on the
+        # _pending_* state above and corrupt the confirmation flow.
+        self._import_lock = threading.Lock()
+        self._import_in_progress = False
+        self._import_generation = 0
 
         # Ensure user exists in DB if already logged in
         sid = self.config.get("steam_id")
@@ -627,8 +637,81 @@ class HeadlessBackend:
 
     # ── Import file ─────────────────────────────────────────────────────────
 
+    def _emit_import_finished(self) -> None:
+        self._emit({"type": "import_finished"})
+
+    def _dispatch_import(self, path_str: str) -> None:
+        """Serialise import requests and arm a watchdog so a hung CV pass
+        cannot wedge the backend forever."""
+        with self._import_lock:
+            if self._import_in_progress:
+                self._emit_error(
+                    "An import is already in progress. Please wait for it to finish."
+                )
+                self._emit_notification(
+                    APP_NAME, "Import already in progress — please wait."
+                )
+                self._emit_import_finished()
+                return
+            self._import_in_progress = True
+            self._import_generation += 1
+            gen = self._import_generation
+
+        threading.Thread(
+            target=self._run_import_file,
+            args=(path_str, gen),
+            daemon=True,
+            name="import-file",
+        ).start()
+
+    def _run_import_file(self, path_str: str, gen: int) -> None:
+        timed_out = threading.Event()
+
+        def _on_timeout():
+            timed_out.set()
+            log.error(
+                "Import timed out after %ds: %s", IMPORT_TIMEOUT_SEC, path_str
+            )
+            self._emit_error(
+                f"Import timed out after {IMPORT_TIMEOUT_SEC}s. The screenshot may be corrupted or unsupported."
+            )
+            self._emit_notification(
+                APP_NAME,
+                f"Import timed out — try a different screenshot.",
+            )
+            with self._import_lock:
+                # Only release if our generation is still the latest;
+                # otherwise a newer import has already taken the slot.
+                if self._import_generation == gen:
+                    self._import_in_progress = False
+                    self._pending_rows = None
+                    self._pending_timestamps = None
+                    self._pending_img = None
+                    self._pending_screenshot_path = None
+            self._emit_import_finished()
+
+        timer = threading.Timer(IMPORT_TIMEOUT_SEC, _on_timeout)
+        timer.daemon = True
+        timer.start()
+        try:
+            self._do_import_file(path_str)
+        except Exception as e:
+            log.error("import error: %s", e, exc_info=True)
+            if not timed_out.is_set():
+                self._emit_error(f"Import error: {e}")
+        finally:
+            timer.cancel()
+            with self._import_lock:
+                still_current = self._import_generation == gen
+                if still_current and not timed_out.is_set():
+                    self._import_in_progress = False
+            if not timed_out.is_set():
+                self._emit_import_finished()
+
     def _do_import_file(self, path_str: str) -> None:
         import cv2
+        from cv_parser import detect_screen_type
+
         path = Path(path_str)
         if not path.exists():
             self._emit_error(f"File not found: {path}")
@@ -652,9 +735,27 @@ class HeadlessBackend:
             self._emit_error(f"Failed to read image: {path}")
             return
 
+        # Detect screen type so the manifest stays in sync with what was
+        # captured (and so re-imports update an out-of-date entry).
+        screen_type = detect_screen_type(img)
+        log.info("Import: detected screen type '%s'", screen_type)
+        self._update_manifest(path_str, screen_type=screen_type)
+
         # Use file modification time instead of current time for date inference
         file_mtime = datetime.fromtimestamp(path.stat().st_mtime)
-        self._do_parse_my_matches(img, screenshot_path=path_str, screenshot_time=file_mtime)
+
+        if screen_type == "my_matches":
+            self._do_parse_my_matches(img, screenshot_path=path_str, screenshot_time=file_mtime)
+        elif screen_type == "game_over":
+            self._do_parse_game_over(img, screenshot_path=path_str)
+        else:
+            self._emit_error(
+                f"Cannot import — screen type '{screen_type}' is not supported."
+            )
+            self._emit_notification(
+                APP_NAME,
+                f"Cannot import: screen not recognised (detected '{screen_type}').",
+            )
 
     # ── Steam login ─────────────────────────────────────────────────────────
 
@@ -737,11 +838,7 @@ class HeadlessBackend:
         elif cmd == "cancel_confirm":
             self._do_cancel_confirm()
         elif cmd == "import_file":
-            path = msg.get("path", "")
-            threading.Thread(
-                target=self._do_import_file, args=(path,),
-                daemon=True, name="import-file",
-            ).start()
+            self._dispatch_import(msg.get("path", ""))
         elif cmd == "steam_login":
             self._do_steam_login()
         elif cmd == "steam_logout":

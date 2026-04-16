@@ -12,6 +12,8 @@ interface ConfirmationTabProps {
   unitsFull: Record<string, UnitFullInfo>;
   synergiesData: Record<string, SynergyInfo>;
   relicsData: Record<string, RelicInfo>;
+  importing: boolean;
+  onBeginImport: () => void;
 }
 
 export function ConfirmationTab({
@@ -23,10 +25,12 @@ export function ConfirmationTab({
   unitsFull,
   synergiesData,
   relicsData,
+  importing,
+  onBeginImport,
 }: ConfirmationTabProps) {
   const [checked, setChecked] = useState<boolean[]>([]);
   const [editedRows, setEditedRows] = useState<ParseResultRow[]>([]);
-  const [importing, setImporting] = useState(false);
+  const [confirming, setConfirming] = useState(false);
 
   useEffect(() => {
     if (parseResult) {
@@ -35,9 +39,17 @@ export function ConfirmationTab({
     }
   }, [parseResult]);
 
+  // Reset the local confirming flag once the parse result is cleared
+  // (which happens on import_result) so a fresh confirmation is enabled.
+  useEffect(() => {
+    if (!parseResult) setConfirming(false);
+  }, [parseResult]);
+
   const handleImportFile = useCallback((filePath: string) => {
+    if (importing) return;
+    onBeginImport();
     window.tracker.sendCommand({ cmd: "import_file", path: filePath });
-  }, []);
+  }, [importing, onBeginImport]);
 
   if (!parseResult) {
     return (
@@ -51,6 +63,7 @@ export function ConfirmationTab({
             unitsFull={unitsFull}
             synergiesData={synergiesData}
             relicsData={relicsData}
+            importing={importing}
           />
         </div>
       </div>
@@ -111,7 +124,7 @@ export function ConfirmationTab({
       }
     }
 
-    setImporting(true);
+    setConfirming(true);
     window.tracker.sendCommand({
       cmd: "confirm",
       selected,
@@ -177,16 +190,16 @@ export function ConfirmationTab({
           <button
             className="btn-confirm btn-confirm-cancel"
             onClick={handleCancel}
-            disabled={importing}
+            disabled={confirming}
           >
             Cancel
           </button>
           <button
-            className={`btn-confirm btn-confirm-primary${importing ? " btn-loading" : ""}`}
+            className={`btn-confirm btn-confirm-primary${confirming ? " btn-loading" : ""}`}
             onClick={handleConfirm}
-            disabled={importing}
+            disabled={confirming}
           >
-            {importing ? "Importing" : `Confirm (${checkedCount})`}
+            {confirming ? "Importing" : `Confirm (${checkedCount})`}
           </button>
         </div>
 
@@ -198,6 +211,7 @@ export function ConfirmationTab({
             unitsFull={unitsFull}
             synergiesData={synergiesData}
             relicsData={relicsData}
+            importing={importing}
           />
       </div>
     </div>
