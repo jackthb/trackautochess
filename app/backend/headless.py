@@ -342,7 +342,7 @@ class HeadlessBackend:
             log.error("capture error: %s", e, exc_info=True)
             self._emit_error(f"Capture error: {e}")
 
-    def _do_parse_my_matches(self, img, screenshot_path: str = "") -> None:
+    def _do_parse_my_matches(self, img, screenshot_path: str = "", screenshot_time=None) -> None:
         """Parse a My Matches screen image and emit parse_result."""
         import cv2
         from cv_parser import parse_my_matches, infer_timestamps
@@ -355,7 +355,8 @@ class HeadlessBackend:
                     return
 
             player = self.config.get("player_name", "jack")
-            screenshot_time = datetime.now()
+            if screenshot_time is None:
+                screenshot_time = datetime.now()
             rows = parse_my_matches(img, player, ICONS_DIR, debug=True)
             if not rows:
                 log.warning("MY MATCHES: no rows parsed")
@@ -615,13 +616,27 @@ class HeadlessBackend:
             self._emit_error(f"File not found: {path}")
             return
 
+        # Skip if already imported
+        manifest_path = DAC_DIR / "screenshots" / "manifest.json"
+        if manifest_path.exists():
+            try:
+                manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+                entry = manifest.get(path.name, {})
+                if entry.get("imported_at"):
+                    self._emit_notification(APP_NAME, "Screenshot already imported, skipping.")
+                    return
+            except Exception:
+                pass
+
         log.info("Import file: %s", path)
         img = cv2.imread(str(path))
         if img is None:
             self._emit_error(f"Failed to read image: {path}")
             return
 
-        self._do_parse_my_matches(img, screenshot_path=path_str)
+        # Use file modification time instead of current time for date inference
+        file_mtime = datetime.fromtimestamp(path.stat().st_mtime)
+        self._do_parse_my_matches(img, screenshot_path=path_str, screenshot_time=file_mtime)
 
     # ── Steam login ─────────────────────────────────────────────────────────
 
