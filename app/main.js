@@ -873,6 +873,14 @@ protocol.registerSchemesAsPrivileged([
       bypassCSP: true,
     },
   },
+  {
+    scheme: "screenshot",
+    privileges: {
+      standard: true,
+      supportFetchAPI: true,
+      bypassCSP: true,
+    },
+  },
 ]);
 
 // ── App lifecycle ────────────────────────────────────────────────────────────
@@ -940,6 +948,27 @@ app.whenReady().then(() => {
     }
 
     return net.fetch(`file://${filePath}`);
+  });
+
+  // Handle screenshot:// protocol for serving local screenshot files
+  protocol.handle("screenshot", (request) => {
+    const filePath = decodeURIComponent(request.url.replace("screenshot://", ""));
+
+    if (filePath.includes("..")) {
+      return new Response("Forbidden", { status: 403 });
+    }
+
+    if (!fs.existsSync(filePath)) {
+      return new Response("Not found", { status: 404 });
+    }
+
+    const buf = fs.readFileSync(filePath);
+    const ext = path.extname(filePath).toLowerCase();
+    const mime = ext === ".png" ? "image/png" : "image/jpeg";
+    return new Response(buf, {
+      status: 200,
+      headers: { "Content-Type": mime },
+    });
   });
 
   // Remove the default menu bar (File, Edit, View, etc.)

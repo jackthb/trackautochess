@@ -526,7 +526,8 @@ class HeadlessBackend:
                     screenshot_url = ""
             # Fall back to local path if upload failed or no user
             if not screenshot_url and self._pending_screenshot_path:
-                screenshot_url = self._pending_screenshot_path
+                from urllib.parse import quote
+                screenshot_url = "screenshot://" + quote(str(self._pending_screenshot_path), safe="")
 
             imported = 0
             skipped = 0
@@ -580,8 +581,8 @@ class HeadlessBackend:
             if self._pending_screenshot_path and imported > 0:
                 self._update_manifest(self._pending_screenshot_path, imported_at=datetime.now().isoformat())
 
-            # Mark screenshot as uploaded if we got a remote URL
-            if screenshot_url and self._pending_screenshot_path and not screenshot_url.startswith(str(DAC_DIR)):
+            # Mark screenshot as uploaded if we got a remote URL (not local fallback)
+            if screenshot_url and self._pending_screenshot_path and not screenshot_url.startswith("screenshot://"):
                 self._mark_screenshot_uploaded(self._pending_screenshot_path)
 
             msg = f"Imported {imported} match(es)"
