@@ -388,6 +388,9 @@ export function ScreenshotHistory({
     Record<string, SavedParseResult>
   >({});
   const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null);
+  const [deletingName, setDeletingName] = useState<string | null>(null);
+  const [importingPath, setImportingPath] = useState<string | null>(null);
+  const [loadingThumbnail, setLoadingThumbnail] = useState<string | null>(null);
   const [successToast, setSuccessToast] = useState<string | null>(null);
   const toastTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -409,6 +412,7 @@ export function ScreenshotHistory({
   // Show success toast and refresh list when import completes
   useEffect(() => {
     if (lastImportResult) {
+      setImportingPath(null);
       const { imported, skipped } = lastImportResult;
       let msg = `Game successfully imported (${imported} match${imported !== 1 ? "es" : ""})`;
       if (skipped) msg += `, ${skipped} duplicate${skipped !== 1 ? "s" : ""} skipped`;
@@ -448,6 +452,7 @@ export function ScreenshotHistory({
   );
 
   const handleDelete = async (name: string) => {
+    setDeletingName(name);
     const ok = await window.screenshots.delete(name);
     if (ok) {
       setScreenshots((prev) => prev.filter((s) => s.name !== name));
@@ -459,6 +464,7 @@ export function ScreenshotHistory({
         return next;
       });
     }
+    setDeletingName(null);
   };
 
   const handleExpand = async (name: string) => {
@@ -467,7 +473,9 @@ export function ScreenshotHistory({
       return;
     }
     if (!thumbnailCache[name]) {
+      setLoadingThumbnail(name);
       await loadThumbnail(name);
+      setLoadingThumbnail(null);
     }
     setExpandedImage(name);
   };
@@ -576,29 +584,33 @@ export function ScreenshotHistory({
                   <div className="ss-item-buttons">
                     {onImportFile && (
                       <button
-                        className="btn-ss-small"
+                        className={`btn-ss-small${importingPath === ss.path ? " btn-loading" : ""}`}
                         title="Import this screenshot"
+                        disabled={importingPath === ss.path}
                         onClick={(e) => {
                           e.stopPropagation();
+                          setImportingPath(ss.path);
                           onImportFile(ss.path);
                         }}
                       >
-                        Import
+                        {importingPath === ss.path ? "Importing" : "Import"}
                       </button>
                     )}
                     {deleteConfirm === ss.name ? (
                       <>
                         <button
-                          className="btn-ss-small btn-ss-danger"
+                          className={`btn-ss-small btn-ss-danger${deletingName === ss.name ? " btn-loading" : ""}`}
+                          disabled={deletingName === ss.name}
                           onClick={(e) => {
                             e.stopPropagation();
                             handleDelete(ss.name);
                           }}
                         >
-                          Confirm
+                          {deletingName === ss.name ? "Deleting" : "Confirm"}
                         </button>
                         <button
                           className="btn-ss-small"
+                          disabled={deletingName === ss.name}
                           onClick={(e) => {
                             e.stopPropagation();
                             setDeleteConfirm(null);
@@ -623,6 +635,9 @@ export function ScreenshotHistory({
                 </div>
                 {expandedImage === ss.name && (
                   <div className="ss-item-expanded">
+                    {loadingThumbnail === ss.name && (
+                      <div className="ss-history-loading">Loading preview...</div>
+                    )}
                     {thumbnailCache[ss.name] && (
                       <div className="ss-item-preview">
                         <img src={thumbnailCache[ss.name]} alt={ss.name} />

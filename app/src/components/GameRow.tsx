@@ -74,6 +74,7 @@ export function GameRow({
   onToggle,
 }: GameRowProps) {
   const [saving, setSaving] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [lightbox, setLightbox] = useState(false);
   const [replayExists, setReplayExists] = useState(false);
@@ -386,15 +387,21 @@ export function GameRow({
               <button
                 className="btn-confirm btn-confirm-cancel btn-delete-game"
                 onClick={() => setConfirmDelete(true)}
+                disabled={saving}
               >
                 Delete
               </button>
             ) : (
               <button
-                className="btn-confirm btn-modal-danger"
-                onClick={() => onDelete(game.id)}
+                className={`btn-confirm btn-modal-danger${deleting ? " btn-loading" : ""}`}
+                disabled={deleting}
+                onClick={async () => {
+                  setDeleting(true);
+                  await onDelete(game.id);
+                  setDeleting(false);
+                }}
               >
-                Confirm delete
+                {deleting ? "Deleting" : "Confirm delete"}
               </button>
             )}
             <div style={{ flex: 1 }} />

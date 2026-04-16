@@ -8,6 +8,7 @@ const PAGE_SIZE = 20;
 interface HistoryTabProps {
   games: Game[];
   loading: boolean;
+  refreshing: boolean;
   unitCosts: Record<string, number>;
   unitsFull: Record<string, UnitFullInfo>;
   synergiesData: Record<string, SynergyInfo>;
@@ -26,6 +27,7 @@ interface HistoryTabProps {
 export function HistoryTab({
   games,
   loading,
+  refreshing,
   unitCosts,
   unitsFull,
   synergiesData,
@@ -152,8 +154,12 @@ export function HistoryTab({
         )}
 
         <div className="history-refresh fade-up">
-          <button className="btn-ghost" onClick={refresh}>
-            Refresh
+          <button
+            className={`btn-ghost${refreshing ? " btn-loading" : ""}`}
+            disabled={refreshing}
+            onClick={refresh}
+          >
+            {refreshing ? "Refreshing" : "Refresh"}
           </button>
           {refreshDrodo && (
             <button

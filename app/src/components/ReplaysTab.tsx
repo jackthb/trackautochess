@@ -40,6 +40,8 @@ export function ReplaysTab({
   }, [games]);
   const [currentReplay, setCurrentReplay] = useState<string | null>(null);
   const [pendingDelete, setPendingDelete] = useState<string | null>(null);
+  const [deleting, setDeleting] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
     if (!currentReplay && replays.length > 0) {
@@ -55,12 +57,20 @@ export function ReplaysTab({
 
   const handleDelete = async () => {
     if (!pendingDelete) return;
+    setDeleting(true);
     await window.replays.delete(pendingDelete);
     if (currentReplay === pendingDelete) {
       setCurrentReplay(null);
     }
     setPendingDelete(null);
+    setDeleting(false);
     refresh();
+  };
+
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    await refresh();
+    setRefreshing(false);
   };
 
   return (
@@ -89,8 +99,12 @@ export function ReplaysTab({
             >
               Open folder
             </button>
-            <button className="btn-ghost" onClick={refresh}>
-              Refresh
+            <button
+              className={`btn-ghost${refreshing ? " btn-loading" : ""}`}
+              disabled={refreshing}
+              onClick={handleRefresh}
+            >
+              {refreshing ? "Refreshing" : "Refresh"}
             </button>
           </div>
           {recording && (
@@ -220,14 +234,16 @@ export function ReplaysTab({
               <button
                 className="btn-modal btn-modal-cancel"
                 onClick={() => setPendingDelete(null)}
+                disabled={deleting}
               >
                 Cancel
               </button>
               <button
-                className="btn-modal btn-modal-danger"
+                className={`btn-modal btn-modal-danger${deleting ? " btn-loading" : ""}`}
                 onClick={handleDelete}
+                disabled={deleting}
               >
-                Delete
+                {deleting ? "Deleting" : "Delete"}
               </button>
             </div>
           </div>

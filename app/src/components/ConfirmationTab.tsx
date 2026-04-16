@@ -26,6 +26,7 @@ export function ConfirmationTab({
 }: ConfirmationTabProps) {
   const [checked, setChecked] = useState<boolean[]>([]);
   const [editedRows, setEditedRows] = useState<ParseResultRow[]>([]);
+  const [importing, setImporting] = useState(false);
 
   useEffect(() => {
     if (parseResult) {
@@ -109,12 +110,13 @@ export function ConfirmationTab({
       }
     }
 
+    setImporting(true);
     window.tracker.sendCommand({
       cmd: "confirm",
       selected,
       edits: editPayload,
     });
-    onClear();
+    // Don't call onClear() — the import_result event will clear pendingParseResult
   };
 
   const handleCancel = () => {
@@ -167,14 +169,16 @@ export function ConfirmationTab({
           <button
             className="btn-confirm btn-confirm-cancel"
             onClick={handleCancel}
+            disabled={importing}
           >
             Cancel
           </button>
           <button
-            className="btn-confirm btn-confirm-primary"
+            className={`btn-confirm btn-confirm-primary${importing ? " btn-loading" : ""}`}
             onClick={handleConfirm}
+            disabled={importing}
           >
-            Confirm ({checkedCount})
+            {importing ? "Importing" : `Confirm (${checkedCount})`}
           </button>
         </div>
 

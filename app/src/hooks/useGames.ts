@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import type {
   Game,
   UnitsData,
@@ -10,6 +10,7 @@ import type {
 interface GamesState {
   games: Game[];
   loading: boolean;
+  refreshing: boolean;
   unitCosts: Record<string, number>;
   unitsFull: Record<string, UnitFullInfo>;
   synergiesData: Record<string, SynergyInfo>;
@@ -23,6 +24,8 @@ interface GamesState {
 export function useGames(): GamesState {
   const [games, setGames] = useState<Game[]>([]);
   const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
+  const initialLoadDone = useRef(false);
   const [unitCosts, setUnitCosts] = useState<Record<string, number>>({});
   const [unitsFull, setUnitsFull] = useState<Record<string, UnitFullInfo>>({});
   const [synergiesData, setSynergiesData] = useState<
@@ -32,7 +35,10 @@ export function useGames(): GamesState {
   const [lastRefresh, setLastRefresh] = useState<Date | null>(null);
 
   const refresh = useCallback(async () => {
-    setLoading(true);
+    if (!initialLoadDone.current) {
+      setLoading(true);
+    }
+    setRefreshing(true);
 
     // Load reference data if needed
     if (Object.keys(unitCosts).length === 0) {
@@ -80,7 +86,9 @@ export function useGames(): GamesState {
     );
     setGames(sorted);
     setLastRefresh(new Date());
+    initialLoadDone.current = true;
     setLoading(false);
+    setRefreshing(false);
   }, [unitCosts]);
 
   const deleteGame = useCallback(async (gameId: number): Promise<boolean> => {
@@ -114,6 +122,7 @@ export function useGames(): GamesState {
   return {
     games,
     loading,
+    refreshing,
     unitCosts,
     unitsFull,
     synergiesData,

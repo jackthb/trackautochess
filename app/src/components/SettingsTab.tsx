@@ -9,11 +9,18 @@ interface SettingsTabProps {
 export function SettingsTab({ status, replayStats }: SettingsTabProps) {
   const [version, setVersion] = useState("\u2014");
   const [closeToTray, setCloseToTray] = useState(true);
+  const [importing, setImporting] = useState(false);
+  const [loggingIn, setLoggingIn] = useState(false);
 
   useEffect(() => {
     window.appApi.getVersion().then(setVersion);
     window.appApi.getCloseToTray().then(setCloseToTray);
   }, []);
+
+  // Clear login loading when steam status changes
+  useEffect(() => {
+    if (status?.steam_name) setLoggingIn(false);
+  }, [status?.steam_name]);
 
   const loggedIn = !!status?.steam_name;
   const steamName = status?.steam_name || "Not logged in";
@@ -71,10 +78,14 @@ export function SettingsTab({ status, replayStats }: SettingsTabProps) {
               </button>
             ) : (
               <button
-                className="btn-ghost"
-                onClick={() => sendCommand({ cmd: "steam_login" })}
+                className={`btn-ghost${loggingIn ? " btn-loading" : ""}`}
+                disabled={loggingIn}
+                onClick={() => {
+                  setLoggingIn(true);
+                  sendCommand({ cmd: "steam_login" });
+                }}
               >
-                Login with Steam
+                {loggingIn ? "Logging in" : "Login with Steam"}
               </button>
             )}
           </div>
@@ -108,15 +119,17 @@ export function SettingsTab({ status, replayStats }: SettingsTabProps) {
           <div className="settings-row">
             <span className="settings-label">Import screenshot</span>
             <button
-              className="btn-ghost"
+              className={`btn-ghost${importing ? " btn-loading" : ""}`}
+              disabled={importing}
               onClick={async () => {
                 const filePath = await window.appApi.openFileDialog();
                 if (filePath) {
+                  setImporting(true);
                   sendCommand({ cmd: "import_file", path: filePath });
                 }
               }}
             >
-              Choose file...
+              {importing ? "Processing" : "Choose file..."}
             </button>
           </div>
           <div className="settings-row">
