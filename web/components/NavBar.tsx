@@ -43,7 +43,10 @@ export function NavBar({ supabase }: NavBarProps) {
   // Debounced lookup: queries as the user types, caps at 8 matches.
   useEffect(() => {
     const val = searchValue.trim();
-    if (!val || /^\d+$/.test(val) || !supabase) {
+    // Skip text lookup for numeric IDs and full Steam URLs — those are handled
+    // on submit.
+    const looksLikeUrl = /steamcommunity\.com\//i.test(val);
+    if (!val || /^\d+$/.test(val) || looksLikeUrl || !supabase) {
       setResults([]);
       setDropdownOpen(false);
       setHighlightedIndex(-1);
@@ -108,6 +111,28 @@ export function NavBar({ supabase }: NavBarProps) {
     setHighlightedIndex(-1);
   };
 
+  // Pull an ID or a custom URL slug out of anything a user might paste:
+  //   https://steamcommunity.com/id/agit142/
+  //   https://steamcommunity.com/profiles/76561198000000000
+  //   agit142
+  //   76561198000000000
+  const parseSteamInput = (
+    raw: string
+  ): { kind: "id" | "slug"; value: string } | null => {
+    const val = raw.trim();
+    if (!val) return null;
+    const profileMatch = val.match(
+      /steamcommunity\.com\/profiles\/(\d{17})/i
+    );
+    if (profileMatch) return { kind: "id", value: profileMatch[1] };
+    const idMatch = val.match(
+      /steamcommunity\.com\/id\/([A-Za-z0-9_-]+)/i
+    );
+    if (idMatch) return { kind: "slug", value: idMatch[1] };
+    if (/^\d{17}$/.test(val)) return { kind: "id", value: val };
+    return null;
+  };
+
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     const val = searchValue.trim();
@@ -118,8 +143,10 @@ export function NavBar({ supabase }: NavBarProps) {
       return;
     }
 
-    if (/^\d+$/.test(val)) {
-      selectResult(val);
+    const parsed = parseSteamInput(val);
+    if (parsed) {
+      // /players/[steamId] resolves slugs against Steam's XML API on the server.
+      selectResult(parsed.value);
       return;
     }
 

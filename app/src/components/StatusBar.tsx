@@ -7,7 +7,6 @@ interface StatusBarProps {
 export function StatusBar({ status }: StatusBarProps) {
   const backendConnected = status !== null;
   const recording = status?.recording ?? false;
-  const focused = status?.focused ?? false;
 
   return (
     <div className="status-bar">
@@ -26,10 +25,6 @@ export function StatusBar({ status }: StatusBarProps) {
           className={`status-dot ${recording ? "recording" : ""}`}
         />
         <span>{recording ? "Recording" : "Not recording"}</span>
-      </div>
-      <div className="status-indicator">
-        <div className={`status-dot ${focused ? "active" : ""}`} />
-        <span>{focused ? "Dota: active" : "Dota: inactive"}</span>
       </div>
     </div>
   );

@@ -80,3 +80,37 @@ export function steamProfileUrl(
   if (customUrl) return `https://steamcommunity.com/id/${customUrl}`;
   return `https://steamcommunity.com/profiles/${steamId}`;
 }
+
+/**
+ * Resolve a vanity URL slug (e.g. "agit142" from steamcommunity.com/id/agit142)
+ * to a numeric SteamID64. Checks the local users table first, then falls back
+ * to Steam's public XML profile endpoint.
+ */
+export async function resolveSteamId(
+  slug: string,
+  supabase?: SupabaseClient
+): Promise<string | null> {
+  const clean = slug.trim();
+  if (!clean) return null;
+
+  if (supabase) {
+    const { data } = await supabase
+      .from("users")
+      .select("steam_id")
+      .eq("custom_url", clean)
+      .single();
+    if (data?.steam_id) return String(data.steam_id);
+  }
+
+  try {
+    const resp = await fetch(
+      `https://steamcommunity.com/id/${encodeURIComponent(clean)}/?xml=1`
+    );
+    if (!resp.ok) return null;
+    const xml = await resp.text();
+    const match = xml.match(/<steamID64>(\d+)<\/steamID64>/);
+    return match ? match[1] : null;
+  } catch {
+    return null;
+  }
+}

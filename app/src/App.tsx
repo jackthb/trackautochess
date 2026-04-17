@@ -73,6 +73,7 @@ export default function App() {
             recording={tracker.status?.recording ?? false}
             recordingStats={tracker.status?.recording_stats ?? null}
             games={gamesState.games}
+            updateGame={gamesState.updateGame}
             onViewGame={handleViewGame}
           />
         )}

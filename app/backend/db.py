@@ -48,11 +48,19 @@ def _get_client():
     return client
 
 
-def game_exists(user_id: str, played_at: str, placement: str, wl: str = "", level: str = "", lineup: str = "") -> bool:
-    """Check if a player_game with these fields already exists.
+DUPLICATE_WINDOW_DAYS = 3
 
-    Uses a +/- 12 hour range around played_at since timestamps are approximate.
-    Accepts string args for backwards compat with call sites.
+
+def game_exists(user_id: str, played_at: str, placement: str, wl: str = "", level: str = "", lineup: str = "") -> bool:
+    """Check if a duplicate player game already exists.
+
+    A match is a duplicate when the *same player* has another game within
+    DUPLICATE_WINDOW_DAYS that agrees on placement AND (W-L or level or lineup).
+    This catches the case where the same MY MATCHES row is re-imported from
+    multiple screenshots: the inferred ``played_at`` can drift by more than a
+    day because we subtract whole days from the screenshot timestamp, so the
+    previous ±12h window wasn't enough.
+
     Returns True if duplicate found, False otherwise. Never raises.
     """
     client = _get_client()
@@ -61,8 +69,8 @@ def game_exists(user_id: str, played_at: str, placement: str, wl: str = "", leve
 
     try:
         dt = datetime.fromisoformat(played_at)
-        range_start = (dt - timedelta(hours=12)).isoformat()
-        range_end = (dt + timedelta(hours=12)).isoformat()
+        range_start = (dt - timedelta(days=DUPLICATE_WINDOW_DAYS)).isoformat()
+        range_end = (dt + timedelta(days=DUPLICATE_WINDOW_DAYS)).isoformat()
         placement_int = _safe_int(placement, 1, 8)
         if placement_int is None:
             return False
@@ -70,13 +78,9 @@ def game_exists(user_id: str, played_at: str, placement: str, wl: str = "", leve
         params = {
             "user_id": f"eq.{user_id}",
             "placement": f"eq.{placement_int}",
-            "select": "id,played_at",
+            "select": "id,played_at,level,wins,losses,lineup",
             "played_at": f"gte.{range_start}",
-            "limit": "1",
         }
-        level_int = _safe_int(level, 1, 15)
-        if level_int is not None:
-            params["level"] = f"eq.{level_int}"
 
         resp = client.get(
             "/rest/v1/games",
@@ -84,12 +88,42 @@ def game_exists(user_id: str, played_at: str, placement: str, wl: str = "", leve
             headers={"Accept": "application/json"},
         )
         resp.raise_for_status()
-        results = [r for r in resp.json()
-                   if r.get("played_at", "") <= range_end]
-        found = len(results) > 0
-        if found:
-            log.debug("duplicate found: user=%s played_at=%s place=%s", user_id, played_at, placement)
-        return found
+        candidates = [
+            r for r in resp.json() if r.get("played_at", "") <= range_end
+        ]
+
+        if not candidates:
+            return False
+
+        level_int = _safe_int(level, 1, 15)
+        wins, losses = None, None
+        if wl and "-" in str(wl):
+            w_str, l_str = str(wl).split("-", 1)
+            wins = _safe_int(w_str)
+            losses = _safe_int(l_str)
+
+        wanted_lineup = (lineup or "").strip()
+
+        for r in candidates:
+            matched_field = False
+            if level_int is not None and r.get("level") == level_int:
+                matched_field = True
+            if (
+                wins is not None
+                and losses is not None
+                and r.get("wins") == wins
+                and r.get("losses") == losses
+            ):
+                matched_field = True
+            if wanted_lineup and (r.get("lineup") or "").strip() == wanted_lineup:
+                matched_field = True
+            if matched_field:
+                log.debug(
+                    "duplicate found: user=%s played_at=%s place=%s match=%s",
+                    user_id, played_at, placement, r.get("id"),
+                )
+                return True
+        return False
     except Exception as e:
         log.error("game_exists error: %s", e)
         return False

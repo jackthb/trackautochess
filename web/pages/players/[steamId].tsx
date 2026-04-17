@@ -13,6 +13,7 @@ import type { PlayerGame, UnitFullInfo, SynergyInfo, RelicInfo } from "@dac/shar
 import { NavBar } from "../../components/NavBar";
 import {
   fetchSteamProfile,
+  resolveSteamId,
   steamProfileUrl,
   type SteamProfile,
 } from "../../lib/steam";
@@ -241,24 +242,28 @@ export default function PlayerPage({
             </div>
           </div>
 
-          {stats && (
+          {(stats || (drodo && (drodo.mmr != null || drodo.max_mmr != null))) && (
             <div className="stats-bar">
-              <div className="stat-cell">
-                <div className="stat-value">{stats.total}</div>
-                <div className="stat-label">Games</div>
-              </div>
-              <div className="stat-cell">
-                <div className="stat-value gold">{stats.avg}</div>
-                <div className="stat-label">Avg Place</div>
-              </div>
-              <div className="stat-cell">
-                <div className="stat-value green">{stats.top4pct}%</div>
-                <div className="stat-label">Top 4 Rate</div>
-              </div>
-              <div className="stat-cell">
-                <div className="stat-value gold">{stats.top1}</div>
-                <div className="stat-label">Wins</div>
-              </div>
+              {stats && (
+                <>
+                  <div className="stat-cell">
+                    <div className="stat-value">{stats.total}</div>
+                    <div className="stat-label">Games</div>
+                  </div>
+                  <div className="stat-cell">
+                    <div className="stat-value gold">{stats.avg}</div>
+                    <div className="stat-label">Avg Place</div>
+                  </div>
+                  <div className="stat-cell">
+                    <div className="stat-value green">{stats.top4pct}%</div>
+                    <div className="stat-label">Top 4 Rate</div>
+                  </div>
+                  <div className="stat-cell">
+                    <div className="stat-value gold">{stats.top1}</div>
+                    <div className="stat-label">Wins</div>
+                  </div>
+                </>
+              )}
               {drodo && drodo.mmr != null && (
                 <div className="stat-cell">
                   <div className="stat-value">{drodo.mmr}</div>
@@ -348,12 +353,8 @@ export default function PlayerPage({
 }
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  const { steamId } = context.params!;
-  if (
-    !steamId ||
-    typeof steamId !== "string" ||
-    !/^\d+$/.test(steamId)
-  ) {
+  const { steamId: rawSteamId } = context.params!;
+  if (!rawSteamId || typeof rawSteamId !== "string") {
     return { notFound: true };
   }
 
@@ -362,6 +363,20 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   if (!url || !key) return { notFound: true };
 
   const supabase = createClient(url, key);
+
+  // Accept numeric SteamID64 or a vanity slug (/id/agit142). Redirect slugs to
+  // the canonical numeric URL once we resolve them via Steam's XML API.
+  let steamId = rawSteamId;
+  if (!/^\d+$/.test(rawSteamId)) {
+    const resolved = await resolveSteamId(rawSteamId, supabase);
+    if (!resolved) return { notFound: true };
+    return {
+      redirect: {
+        destination: `/players/${resolved}`,
+        permanent: false,
+      },
+    };
+  }
 
   const [gamesResult, steamProfile] = await Promise.all([
     supabase
@@ -394,6 +409,32 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     ]);
     if (profileResult.data) drodo = profileResult.data;
     if (seasonsResult.data) seasons = seasonsResult.data;
+
+    // Cache miss? Pull fresh from Drodo and re-fetch — this lets newly looked
+    // up players (e.g. pasted Steam URLs) see their MMR immediately instead of
+    // waiting for a manual refresh.
+    if (!drodo) {
+      try {
+        const proto = context.req.headers["x-forwarded-proto"] ?? "http";
+        const host = context.req.headers.host;
+        if (host) {
+          const base = `${proto}://${host}`;
+          const resp = await fetch(`${base}/api/drodo/${steamId}`);
+          if (resp.ok) {
+            const data = await resp.json();
+            drodo = {
+              mmr: data.mmr ?? null,
+              max_mmr: data.max_mmr ?? null,
+              mmr_level: data.mmr_level ?? null,
+              season: data.season ?? null,
+            };
+            if (Array.isArray(data.seasons)) seasons = data.seasons;
+          }
+        }
+      } catch {
+        // Drodo API unreachable — fall through with no stats.
+      }
+    }
   }
 
   return {

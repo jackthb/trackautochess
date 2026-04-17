@@ -11,8 +11,14 @@ interface ReplaysTabProps {
   recording: boolean;
   recordingStats: RecordingStats | null;
   games: Game[];
+  updateGame: (gameId: number, fields: Partial<Game>) => Promise<boolean>;
   onViewGame: (gameId: number) => void;
 }
+
+// Games shown in the manual-assignment dropdown must have been played within
+// this many days of the replay's recorded mtime. Matches the user's "within
+// one or two days" request.
+const ASSIGN_WINDOW_DAYS = 2;
 
 function formatElapsed(seconds: number): string {
   const m = Math.floor(seconds / 60);
@@ -28,6 +34,7 @@ export function ReplaysTab({
   recording,
   recordingStats,
   games,
+  updateGame,
   onViewGame,
 }: ReplaysTabProps) {
   // Build a map of replay filename -> game for quick lookup
@@ -42,6 +49,7 @@ export function ReplaysTab({
   const [pendingDelete, setPendingDelete] = useState<string | null>(null);
   const [deleting, setDeleting] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
+  const [assigning, setAssigning] = useState(false);
 
   useEffect(() => {
     if (!currentReplay && replays.length > 0) {
@@ -50,9 +58,46 @@ export function ReplaysTab({
   }, [replays, currentReplay]);
 
   const selectedReplay = replays.find((r) => r.name === currentReplay);
+  const linkedGame = selectedReplay ? replayToGame.get(selectedReplay.name) : null;
+
+  // Games played within ±ASSIGN_WINDOW_DAYS of the replay's mtime that aren't
+  // already linked to a different replay. Used to populate the "Link to game"
+  // dropdown.
+  const candidateGames = useMemo(() => {
+    if (!selectedReplay) return [];
+    const replayTime = selectedReplay.mtime;
+    const windowMs = ASSIGN_WINDOW_DAYS * 24 * 60 * 60 * 1000;
+    return games
+      .filter((g) => {
+        if (g.replay && g.replay !== selectedReplay.name) return false;
+        const played = new Date(g.played_at).getTime();
+        if (!Number.isFinite(played)) return false;
+        return Math.abs(played - replayTime) <= windowMs;
+      })
+      .sort((a, b) => {
+        const da = Math.abs(new Date(a.played_at).getTime() - replayTime);
+        const db = Math.abs(new Date(b.played_at).getTime() - replayTime);
+        return da - db;
+      })
+      .slice(0, 15);
+  }, [games, selectedReplay]);
 
   const handleSelect = (replay: Replay) => {
     setCurrentReplay(replay.name);
+  };
+
+  const handleAssign = async (gameId: number) => {
+    if (!selectedReplay || assigning) return;
+    setAssigning(true);
+    await updateGame(gameId, { replay: selectedReplay.name });
+    setAssigning(false);
+  };
+
+  const handleUnassign = async () => {
+    if (!linkedGame || assigning) return;
+    setAssigning(true);
+    await updateGame(linkedGame.id, { replay: null });
+    setAssigning(false);
   };
 
   const handleDelete = async () => {
@@ -201,13 +246,52 @@ export function ReplaysTab({
                 <span className="replay-filename">{selectedReplay.name}</span>
                 <div className="replay-info-right">
                   <span>{formatSize(selectedReplay.size)}</span>
-                  {replayToGame.has(selectedReplay.name) && (
-                    <button
+                  {linkedGame ? (
+                    <>
+                      <button
+                        className="btn-ghost"
+                        onClick={() => onViewGame(linkedGame.id)}
+                      >
+                        View game
+                      </button>
+                      <button
+                        className="btn-ghost"
+                        disabled={assigning}
+                        onClick={handleUnassign}
+                        title="Remove the link between this replay and its game"
+                      >
+                        Unlink
+                      </button>
+                    </>
+                  ) : candidateGames.length > 0 ? (
+                    <select
                       className="btn-ghost"
-                      onClick={() => onViewGame(replayToGame.get(selectedReplay.name)!.id)}
+                      disabled={assigning}
+                      defaultValue=""
+                      onChange={(e) => {
+                        const id = parseInt(e.target.value, 10);
+                        if (!Number.isNaN(id)) handleAssign(id);
+                        e.currentTarget.value = "";
+                      }}
                     >
-                      View game
-                    </button>
+                      <option value="" disabled>
+                        Link to game…
+                      </option>
+                      {candidateGames.map((g) => {
+                        const played = new Date(g.played_at);
+                        const label = `#${g.placement ?? "?"} · ${played.toLocaleString()}${g.rank ? ` · ${g.rank}` : ""}`;
+                        return (
+                          <option key={g.id} value={g.id}>
+                            {label}
+                          </option>
+                        );
+                      })}
+                    </select>
+                  ) : (
+                    <span style={{ color: "var(--text-muted)", fontSize: 12 }}>
+                      No games within {ASSIGN_WINDOW_DAYS} day
+                      {ASSIGN_WINDOW_DAYS === 1 ? "" : "s"}
+                    </span>
                   )}
                 </div>
               </div>

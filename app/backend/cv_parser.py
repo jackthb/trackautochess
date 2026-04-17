@@ -171,16 +171,29 @@ def detect_screen_type(img: np.ndarray) -> str:
     """Detect which end-screen type this is.
 
     Returns: 'game_over', 'final_ranking', 'my_matches', or 'unknown'.
+
+    Priority: when both the My Matches tab bar and an in-game "Final Ranking"
+    overlay appear in the same image (happens if the player opened My Matches
+    before the post-game ranking card dismissed), we import from the My Matches
+    history rather than the less-structured Final Ranking overlay.
     """
     # Check center-top title area (Game Over / My Matches headings)
     title_crop = _crop(img, *TITLE_REGION)
     text = _ocr(title_crop, psm=6).upper()
     if "GAME" in text and "OVER" in text:
         return "game_over"
-    if "FINAL" in text or "RANKING" in text:
-        return "final_ranking"
     if "MY" in text and "MATCH" in text:
         return "my_matches"
+
+    # Check the narrower tab bar region (MY MATCHES tab is top-left) BEFORE
+    # the Final Ranking overlay check — if history is visible, prefer it.
+    tab_crop = _crop(img, *MM_TAB_REGION)
+    tab_text = _ocr(tab_crop, psm=6).upper()
+    if "MY" in tab_text and "MATCH" in tab_text:
+        return "my_matches"
+
+    if "FINAL" in text or "RANKING" in text:
+        return "final_ranking"
 
     # Check left panel for "Final Ranking" overlay (appears during gameplay)
     fr_crop = _crop(img, *FINAL_RANK_REGION)
@@ -195,11 +208,6 @@ def detect_screen_type(img: np.ndarray) -> str:
     if "ELIMINATED" in elim_text:
         return "final_ranking"
 
-    # Also scan the narrower tab bar region (MY MATCHES tab is top-left)
-    tab_crop = _crop(img, *MM_TAB_REGION)
-    tab_text = _ocr(tab_crop, psm=6).upper()
-    if "MY" in tab_text and "MATCH" in tab_text:
-        return "my_matches"
     return "unknown"
 
 
