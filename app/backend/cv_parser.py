@@ -22,7 +22,13 @@ try:
 except ImportError:
     pytesseract = None
 
-from utils import crop as _crop, ocr as _ocr, unit_stem as _unit_stem
+from utils import (
+    crop as _crop,
+    infer_aspect_ratio,
+    load_regions_config,
+    ocr as _ocr,
+    unit_stem as _unit_stem,
+)
 
 log = logging.getLogger("dac")
 
@@ -125,6 +131,103 @@ MM_RELIC_COL_RANGES = [
     (0.351, 0.649),   # col 1: x=0.7195..0.7331
     (0.702, 1.000),   # col 2: x=0.7355..0.7491
 ]
+
+
+DEFAULT_REGIONS = {
+    "TITLE_REGION": TITLE_REGION,
+    "FINAL_RANK_REGION": FINAL_RANK_REGION,
+    "ELIMINATED_REGION": ELIMINATED_REGION,
+    "COL_RANK": COL_RANK,
+    "COL_PLAYER": COL_PLAYER,
+    "COL_LEVEL": COL_LEVEL,
+    "COL_SYNERGY": COL_SYNERGY,
+    "COL_RELIC": COL_RELIC,
+    "COL_WL": COL_WL,
+    "TABLE_Y_START": TABLE_Y_START,
+    "TABLE_Y_END": TABLE_Y_END,
+    "MM_TAB_REGION": MM_TAB_REGION,
+    "MM_TABLE_Y_START": MM_TABLE_Y_START,
+    "MM_TABLE_Y_END": MM_TABLE_Y_END,
+    "MM_SEP_SCAN_X": MM_SEP_SCAN_X,
+    "MM_COL_PLACEMENT": MM_COL_PLACEMENT,
+    "MM_COL_LEVEL": MM_COL_LEVEL,
+    "MM_COL_UNITS": MM_COL_UNITS,
+    "MM_COL_SYNERGY": MM_COL_SYNERGY,
+    "MM_COL_RELIC": MM_COL_RELIC,
+    "MM_COL_WL": MM_COL_WL,
+    "MM_COL_RANK": MM_COL_RANK,
+    "MM_COL_TIME": MM_COL_TIME,
+}
+
+
+def reset_calibration() -> None:
+    """Restore built-in parser regions."""
+    globals().update(DEFAULT_REGIONS)
+
+
+def apply_calibration(
+    img: np.ndarray | None = None,
+    *,
+    aspect_ratio: str | None = None,
+    regions_config: dict | None = None,
+) -> str:
+    """Apply picker calibration overrides to parser globals and return the AR key used."""
+    reset_calibration()
+
+    if regions_config is None:
+        regions_config = load_regions_config()
+    if not isinstance(regions_config, dict) or not regions_config:
+        return aspect_ratio or "16:9"
+
+    if aspect_ratio is None:
+        if img is not None:
+            h, w = img.shape[:2]
+            aspect_ratio = infer_aspect_ratio(w, h, list(regions_config.keys()))
+        else:
+            aspect_ratio = "16:9"
+
+    ar_data = regions_config.get(aspect_ratio) or {}
+    game_over = ar_data.get("game_over") or {}
+    my_matches = ar_data.get("my_matches") or {}
+
+    if len(game_over.get("title_region", [])) == 4:
+        globals()["TITLE_REGION"] = tuple(game_over["title_region"])
+    if len(game_over.get("table_area", [])) == 4:
+        table = game_over["table_area"]
+        globals()["TABLE_Y_START"] = table[1]
+        globals()["TABLE_Y_END"] = table[3]
+    for src, dest in {
+        "col_player": "COL_PLAYER",
+        "col_level": "COL_LEVEL",
+        "col_synergy": "COL_SYNERGY",
+        "col_relic": "COL_RELIC",
+        "col_wl": "COL_WL",
+    }.items():
+        if len(game_over.get(src, [])) == 2:
+            globals()[dest] = tuple(game_over[src])
+
+    if len(my_matches.get("tab_region", [])) == 4:
+        globals()["MM_TAB_REGION"] = tuple(my_matches["tab_region"])
+    if len(my_matches.get("table_area", [])) == 4:
+        table = my_matches["table_area"]
+        globals()["MM_TABLE_Y_START"] = table[1]
+        globals()["MM_TABLE_Y_END"] = table[3]
+    if len(my_matches.get("sep_scan_band", [])) == 2:
+        globals()["MM_SEP_SCAN_X"] = tuple(my_matches["sep_scan_band"])
+    for src, dest in {
+        "col_placement": "MM_COL_PLACEMENT",
+        "col_level": "MM_COL_LEVEL",
+        "col_units": "MM_COL_UNITS",
+        "col_synergy": "MM_COL_SYNERGY",
+        "col_relic": "MM_COL_RELIC",
+        "col_wl": "MM_COL_WL",
+        "col_rank": "MM_COL_RANK",
+        "col_time": "MM_COL_TIME",
+    }.items():
+        if len(my_matches.get(src, [])) == 2:
+            globals()[dest] = tuple(my_matches[src])
+
+    return aspect_ratio
 
 
 # ── Helpers ──────────────────────────────────────────────────────────────────
@@ -783,6 +886,7 @@ def parse_game_over(
     Returns dict with keys: placement, level, wl, synergies, relic
     or None on failure.
     """
+    apply_calibration(img)
     h, w = img.shape[:2]
     log.debug(f"Image: {w}×{h}")
     # 1. Find player row
@@ -1011,6 +1115,7 @@ def parse_game_over_all(
         player_name, placement, level, wl, synergies, relic, rank
     or None on failure.
     """
+    apply_calibration(img)
     h, w = img.shape[:2]
     log.info(f"[cv] parse_game_over_all: {w}x{h}")
 
@@ -2018,6 +2123,7 @@ def parse_my_matches(
       placement, level, units (list), synergies, wl, rank.
     Returns empty list on failure.
     """
+    apply_calibration(img)
     h, w = img.shape[:2]
     log.debug(f"[mm] Image: {w}×{h}")
     # Load units data if not provided
@@ -2103,6 +2209,7 @@ def parse_screenshot_cv(
         print(f"[cv] ERROR: cannot read image: {image_path}")
         return None
 
+    apply_calibration(img)
     screen_type = detect_screen_type(img)
     print(f"[cv] Screen type: {screen_type}")
 

@@ -11,6 +11,7 @@
         "en": "Ancient Apparition",
         "lore": "Kaldr",
         "ko": "고대 영혼",
+        "ru": "Ancient Apparition",
         "zh-cn": "极寒幽魂",
         "zh-tw": "極寒幽魂"
       }
@@ -238,7 +239,7 @@
         "ko": "혼돈 기사",
         "ru": "Chaos Knight",
         "zh-cn": "混沌骑士",
-        "zh-tw": "混噸騎士"
+        "zh-tw": "混沌騎士"
       }
     },
     "Clinkz": {
@@ -254,7 +255,7 @@
         "ko": "클링츠",
         "ru": "Clinkz",
         "zh-cn": "骷髅弓箭手",
-        "zh-tw": "骷髅弓箭手"
+        "zh-tw": "骷髏弓箭手"
       }
     },
     "Clockwerk": {
@@ -882,7 +883,7 @@
         "ko": "마그누스",
         "ru": "Magnus",
         "zh-cn": "半人猛犸",
-        "zh-tw": "半人猛瑪"
+        "zh-tw": "半人猛獁"
       }
     },
     "Marci": {
@@ -1109,7 +1110,7 @@
         "ko": "예지자",
         "ru": "Oracle",
         "zh-cn": "神谕者",
-        "zh-tw": "神谕者"
+        "zh-tw": "神諭者"
       }
     },
     "Phantom Assassin": {
@@ -1799,7 +1800,7 @@
         "ko": "복수 혼령",
         "ru": "Vengeful Spirit",
         "zh-cn": "复仇之魂",
-        "zh-tw": "複仇之魂"
+        "zh-tw": "復仇之魂"
       }
     },
     "Witch Doctor": {
@@ -1880,7 +1881,7 @@
         "ko": "제우스",
         "ru": "Zeus",
         "zh-cn": "众神之王",
-        "zh-tw": "衆神之王"
+        "zh-tw": "眾神之王"
       }
     }
   },

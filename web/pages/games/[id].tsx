@@ -2,10 +2,10 @@ import Head from "next/head";
 import { createClient } from "@supabase/supabase-js";
 import type { GetServerSideProps } from "next";
 import type { SupabaseClient } from "@supabase/supabase-js";
-import unitsData from "../../data/units.json";
+import unitsData from "@data/units.json";
 import unitsFullData from "@data/units_full.json";
-import synergiesData from "../../data/synergies.json";
-import relicsData from "../../data/relics.json";
+import synergiesData from "@data/synergies.json";
+import relicsData from "@data/relics.json";
 import type { Game, UnitFullInfo, SynergyInfo, RelicInfo } from "@dac/shared/types";
 import {
   parseLineup,
@@ -29,6 +29,13 @@ import {
 const UNIT_COSTS: Record<string, number> = {};
 for (const [name, info] of Object.entries(unitsData.units)) {
   UNIT_COSTS[name] = (info as { cost: number }).cost;
+}
+for (const [alias, canonical] of Object.entries(
+  (unitsData as { aliases?: Record<string, string> }).aliases ?? {}
+)) {
+  if (UNIT_COSTS[canonical] !== undefined) {
+    UNIT_COSTS[alias] = UNIT_COSTS[canonical];
+  }
 }
 const UNITS_FULL = unitsFullData as Record<string, UnitFullInfo>;
 const SYNERGIES_DATA = synergiesData as Record<string, SynergyInfo>;

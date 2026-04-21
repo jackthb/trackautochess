@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { useRouter } from "next/router";
 import { useState, useEffect, useRef } from "react";
 import type { SupabaseClient, User } from "@supabase/supabase-js";
@@ -222,6 +221,25 @@ export function NavBar({ supabase }: NavBarProps) {
           height: 28px;
           display: block;
         }
+        .nav-links {
+          display: flex;
+          align-items: center;
+          gap: 22px;
+          margin-left: 28px;
+          flex-shrink: 0;
+        }
+        .nav-link {
+          font-family: "IBM Plex Mono", monospace;
+          font-size: 12px;
+          letter-spacing: 1.5px;
+          text-transform: uppercase;
+          color: var(--text-muted);
+          text-decoration: none;
+          transition: color 0.15s;
+        }
+        .nav-link:hover {
+          color: var(--text-primary);
+        }
         .nav-center {
           flex: 1;
           display: flex;
@@ -340,9 +358,14 @@ export function NavBar({ supabase }: NavBarProps) {
         }
       `}</style>
       <nav>
-        <Link href="/" className="nav-logo" style={{ display: "flex", alignItems: "center" }}>
+        <a href="/" className="nav-logo" style={{ display: "flex", alignItems: "center" }}>
           <img src="/logo.svg" alt="DAC Tools" />
-        </Link>
+        </a>
+        <div className="nav-links">
+          <a href="/items" className="nav-link">Items</a>
+          <a href="/relics" className="nav-link">Relics</a>
+          <a href="/patch-notes" className="nav-link">Patch Notes</a>
+        </div>
         <div className="nav-center" ref={containerRef}>
           <form className="search-form" onSubmit={handleSearch}>
             <input
@@ -394,9 +417,9 @@ export function NavBar({ supabase }: NavBarProps) {
           {ready ? (
             user ? (
               <>
-                <Link href="/dashboard" className="nav-user">
+                <a href="/dashboard" className="nav-user">
                   {displayName}
-                </Link>
+                </a>
                 <button className="nav-btn" onClick={handleLogout}>
                   Sign out
                 </button>

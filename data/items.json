@@ -24,19 +24,19 @@
       "tier": 1,
       "icon": "buckler.png"
     },
-    "Gossamar Cape": {
+    "Gossamer Cape": {
       "tier": 1,
       "icon": "gossamar_cape.png"
     },
-    "Ring Of Basilius": {
+    "Ring of Basilius": {
       "tier": 1,
       "icon": "ring_of_basilius.png"
     },
-    "Orb Of Corrosion": {
+    "Orb of Corrosion": {
       "tier": 1,
       "icon": "orb_of_corrosion.png"
     },
-    "Spark Of Courage": {
+    "Spark of Courage": {
       "tier": 1,
       "icon": "spark_of_courage.png"
     },
@@ -48,7 +48,7 @@
       "tier": 1,
       "icon": "bullwhip.png"
     },
-    "Hand Of Midas": {
+    "Hand of Midas": {
       "tier": 1,
       "icon": "hand_of_midas.png"
     },
@@ -80,7 +80,7 @@
       "tier": 2,
       "icon": "aghanims_shard.png"
     },
-    "Mask Of Madness": {
+    "Mask of Madness": {
       "tier": 2,
       "icon": "mask_of_madness.png"
     },
@@ -96,11 +96,11 @@
       "tier": 2,
       "icon": "pavise.png"
     },
-    "Hood Of Defiance": {
+    "Hood of Defiance": {
       "tier": 2,
       "icon": "hood_of_defiance.png"
     },
-    "Vladmirs Offering": {
+    "Vladimirs Offering": {
       "tier": 2,
       "icon": "vladmirs_offering.png"
     },
@@ -116,7 +116,7 @@
       "tier": 2,
       "icon": "telescope.png"
     },
-    "Spider Legs": {
+    "Spider Leg": {
       "tier": 2,
       "icon": "spider_legs.png"
     },
@@ -164,11 +164,11 @@
       "tier": 3,
       "icon": "crimson_guard.png"
     },
-    "Pipe Of Insight": {
+    "Pipe of Insight": {
       "tier": 3,
       "icon": "pipe_of_insight.png"
     },
-    "Drum Of Endurance": {
+    "Drum of Endurance": {
       "tier": 3,
       "icon": "drum_of_endurance.png"
     },
@@ -184,7 +184,7 @@
       "tier": 3,
       "icon": "bloodstone.png"
     },
-    "Aegis Of Immortal": {
+    "Aegis of Immortal": {
       "tier": 3,
       "icon": "aegis_of_immortal.png"
     },
@@ -272,7 +272,7 @@
       "tier": 5,
       "icon": "havoc.png"
     },
-    "Eye Of Skadi": {
+    "Eye of Skadi": {
       "tier": 5,
       "icon": "eye_of_skadi.png"
     },
@@ -280,7 +280,7 @@
       "tier": 5,
       "icon": "aghanims_scepter.png"
     },
-    "Scythe Of Vyse": {
+    "Scythe of Vyse": {
       "tier": 5,
       "icon": "scythe_of_vyse.png"
     },

@@ -147,6 +147,11 @@ def parse_kv(text):
 WORKSHOP_ID = '1613886175'
 
 STEAM_SEARCH_PATHS = [
+    # Windows native
+    Path(f'C:/Program Files (x86)/Steam/steamapps/workshop/content/570/{WORKSHOP_ID}/{WORKSHOP_ID}.vpk'),
+    Path(f'C:/Program Files/Steam/steamapps/workshop/content/570/{WORKSHOP_ID}/{WORKSHOP_ID}.vpk'),
+    Path(f'D:/Steam/steamapps/workshop/content/570/{WORKSHOP_ID}/{WORKSHOP_ID}.vpk'),
+    Path(f'E:/Steam/steamapps/workshop/content/570/{WORKSHOP_ID}/{WORKSHOP_ID}.vpk'),
     # WSL -> Windows
     Path(f'/mnt/c/Program Files (x86)/Steam/steamapps/workshop/content/570/{WORKSHOP_ID}/{WORKSHOP_ID}.vpk'),
     Path(f'/mnt/d/Steam/steamapps/workshop/content/570/{WORKSHOP_ID}/{WORKSHOP_ID}.vpk'),
@@ -168,8 +173,49 @@ def find_vpk():
 # Helpers
 # ════════════════════════════════════════════════════════════════════
 
+def unescape_kv(s):
+    """Undo Valve KV1 literal-percent escape: "%%" -> "%"."""
+    return s.replace('%%', '%') if s else s
+
+
+_BLOCK_TAGS = r'h\d|p|div|li|ul|ol'
+
+
 def strip_html(s):
-    return re.sub(r'<[^>]+>', '', s).strip()
+    """Turn a VPK tooltip string into readable plain text.
+
+    VPK descriptions use block-level tags like <h1>Active Ability:</h1> to
+    separate a heading from the rule text. A naive tag-strip fuses them
+    together ("<h1>Active ability: Instant</h1>Entangle..." -> "Active
+    ability: InstantEntangle..."), which is the specific formatting rot on
+    the /items page. We translate block tags and <br> into newlines before
+    deleting the rest, then tighten a couple of cosmetic spacing cases.
+    """
+    if not s:
+        return s
+    s = unescape_kv(s)
+    s = re.sub(r'<br\s*/?>', '\n', s, flags=re.IGNORECASE)
+    s = re.sub(r'<\s*/?(?:' + _BLOCK_TAGS + r')(?:\s[^>]*)?>', '\n', s, flags=re.IGNORECASE)
+    # Colored <font> tags wrap keyword labels (e.g. "Disarm", "Silence") that
+    # are conceptually a separate clause — break before them so they don't
+    # fuse onto the preceding word.
+    s = re.sub(r'<font\s+color=[^>]*>', '\n', s, flags=re.IGNORECASE)
+    # Inline <img> icons (e.g. cooldown indicator followed by a number) add
+    # no textual meaning — drop the tag plus any trailing whitespace + digits.
+    s = re.sub(r"<img\s+src=[^>]*>\s*\d*\s*\.?", '', s, flags=re.IGNORECASE)
+    s = re.sub(r'<[^>]+>', '', s)
+    # Add a space where a word butts against +/- and a digit ("speed+30%" -> "speed +30%").
+    s = re.sub(r'([A-Za-z])([+\-])(\d)', r'\1 \2\3', s)
+    # Tighten whitespace before punctuation ("attack , lasting" -> "attack, lasting").
+    s = re.sub(r'\s+([,.;:!?])', r'\1', s)
+    s = re.sub(r'[ \t]+', ' ', s)
+    s = re.sub(r'\n{3,}', '\n\n', s)
+    return s.strip()
+
+
+def clean_html_keep(s):
+    """Strip KV escapes but keep HTML tags (for *_html fields)."""
+    return unescape_kv(s).strip() if s else s
 
 
 def get_notes(prefix, loc):
@@ -177,7 +223,7 @@ def get_notes(prefix, loc):
     for i in range(10):
         nk = f'{prefix}_Note{i}'
         if nk in loc and loc[nk].strip():
-            notes.append(loc[nk])
+            notes.append(unescape_kv(loc[nk]))
     return notes
 
 
@@ -286,8 +332,8 @@ def extract_all(pak):
         synergies[sid] = {
             'name': name,
             'description': strip_html(desc_html),
-            'description_html': desc_html,
-            'lore': lore,
+            'description_html': clean_html_keep(desc_html),
+            'lore': unescape_kv(lore),
             'notes': notes,
             'tiers': tiers,
             'ability_special': special,
@@ -318,7 +364,7 @@ def extract_all(pak):
         items[iid] = {
             'name': name,
             'description': desc,
-            'lore': lore,
+            'lore': unescape_kv(lore),
             'quality': quality,
             'texture': texture,
             'notes': notes,
@@ -352,7 +398,7 @@ def extract_all(pak):
         relics[iid] = {
             'name': name,
             'description': desc,
-            'lore': lore,
+            'lore': unescape_kv(lore),
         }
 
     # ════════════════════════════════════════════════════════════════
@@ -542,13 +588,188 @@ def extract_all(pak):
         if canonical in all_names and alias not in all_names:
             aliases[alias] = canonical
 
+    # ════════════════════════════════════════════════════════════════
+    # 5. ABILITIES (non-synergy active abilities used by active units)
+    # ════════════════════════════════════════════════════════════════
+
+    def flatten_ability_special(block):
+        """Flatten AbilitySpecial dict into {field: value}."""
+        out = {}
+        ab_special = block.get('AbilitySpecial', {})
+        if isinstance(ab_special, dict):
+            for _, fields in ab_special.items():
+                if isinstance(fields, dict):
+                    for fk, fv in fields.items():
+                        if fk != 'var_type':
+                            out[fk] = fv
+        return out
+
+    abilities_out = {}
+    seen_abilities = set()
+    for base_id, stars in base_units.items():
+        if active_unit_ids and base_id not in active_unit_ids:
+            continue
+        for sl, sdata in stars.items():
+            for ab in sdata.get('abilities', []):
+                if ab.startswith('is_') or ab in ('no_collision', 'dac_guai_base', '') or ab in seen_abilities:
+                    continue
+                seen_abilities.add(ab)
+                ab_block = abilities_kv.get(ab, {})
+                if not isinstance(ab_block, dict):
+                    continue
+                name = strip_html(loc.get(f'DOTA_Tooltip_ability_{ab}', ''))
+                if not name:
+                    continue
+                desc_html = loc.get(f'DOTA_Tooltip_ability_{ab}_Description', '')
+                cooldown = ab_block.get('AbilityCooldown', '')
+                mana = ab_block.get('AbilityManaCost', '')
+                cast = ab_block.get('AbilityCastRange', '')
+                abilities_out[ab] = {
+                    'name': name,
+                    'description': strip_html(desc_html),
+                    'cooldown': cooldown,
+                    'mana_cost': mana,
+                    'cast_range': cast,
+                    'ability_special': flatten_ability_special(ab_block),
+                }
+
+    # ════════════════════════════════════════════════════════════════
+    # 6. TALENTS (from localization talent_<tier><slot>_<field>)
+    # ════════════════════════════════════════════════════════════════
+
+    talents_out = {}
+    for k, v in loc.items():
+        m = re.match(r'^talent_(\d+[ab])_(title|description)$', k)
+        if not m:
+            continue
+        slot, field = m.group(1), m.group(2)
+        talents_out.setdefault(slot, {})[field] = v
+
+    # ════════════════════════════════════════════════════════════════
+    # 7. GAME MODE CONSTANTS (from addon_game_mode.lua)
+    # ════════════════════════════════════════════════════════════════
+
+    def extract_lua_list(name):
+        m = re.search(re.escape(name) + r'\s*=\s*\{', raw_lua)
+        if not m:
+            return None
+        start = m.end()
+        depth = 1
+        i = start
+        while i < len(raw_lua) and depth > 0:
+            if raw_lua[i] == '{': depth += 1
+            elif raw_lua[i] == '}': depth -= 1
+            i += 1
+        block = re.sub(r'--.*', '', raw_lua[start:i - 1])
+        return re.findall(r'"(item_\w+)"|\'(item_\w+)\'', block)
+
+    def extract_lua_number(name):
+        m = re.search(re.escape(name) + r'\s*=\s*(-?\d+\.?\d*)', raw_lua)
+        return float(m.group(1)) if m else None
+
+    drop_relic_list = []
+    quest_relic_list = []
+    for m in re.finditer(r'DROP_RELIC_LIST\s*=\s*\{([^}]*)\}', raw_lua):
+        block = re.sub(r'--.*', '', m.group(1))
+        drop_relic_list = re.findall(r'"(item_\w+)"', block)
+    for m in re.finditer(r'quest_2_relic_list\s*=\s*\{([^}]*)\}', raw_lua):
+        block = re.sub(r'--.*', '', m.group(1))
+        quest_relic_list = re.findall(r'"(item_\w+)"', block)
+
+    game_mode_out = {
+        'drop_relic_list': drop_relic_list,
+        'quest_2_relic_list': quest_relic_list,
+        'prepare_timer': extract_lua_number('_G.prepare_timer'),
+        'battle_timer': extract_lua_number('_G.battle_timer'),
+    }
+
     return {
         'synergies': synergies,
         'items_full': items,
         'relics': {'relics': relics},
         'units_full': units_full,
         'units': {'units': units_simple, 'aliases': aliases},
+        'abilities': abilities_out,
+        'talents': talents_out,
+        'game_mode': game_mode_out,
     }
+
+
+# ════════════════════════════════════════════════════════════════════
+# items.json reconciliation
+# ════════════════════════════════════════════════════════════════════
+
+def reconcile_items_json(out_dir, items_full):
+    """Reconcile the hand-curated items.json tier list against VPK canonical
+    names. items.json is the source of truth for *which* items the game
+    actually uses (the VPK contains unused/test items too, so we don't
+    auto-generate it). But its keys drift from the VPK localization over time
+    — "Gossamar Cape" vs "Gossamer Cape", "Spider Legs" vs "Spider Leg" — and
+    every drifted key silently breaks the /items page join that fetches
+    descriptions.
+
+    On each extraction, auto-rename any items.json key whose normalized form
+    matches a VPK name via a fuzzy heuristic (normalized equality, trailing
+    's' toggle, difflib close match). Warn loudly about anything that can't
+    be reconciled so the curator can investigate.
+    """
+    import difflib
+    items_path = Path(out_dir) / 'items.json'
+    if not items_path.exists():
+        return
+    data = json.loads(items_path.read_text(encoding='utf-8'))
+    simple = data.get('items', data)
+
+    def norm(s):
+        return s.lower().replace(' ', '').replace("'", '')
+
+    full_by_norm = {}
+    for v in items_full.values():
+        if v.get('name'):
+            full_by_norm[norm(v['name'])] = v['name']
+
+    renames = {}
+    orphans = []
+    for name in list(simple.keys()):
+        n = norm(name)
+        # 1. exact normalized match
+        if n in full_by_norm:
+            canonical = full_by_norm[n]
+            if canonical != name:
+                renames[name] = canonical
+            continue
+        # 2. toggle trailing 's' ("Spider Legs" -> "Spider Leg")
+        alt = n[:-1] if n.endswith('s') else n + 's'
+        if alt in full_by_norm:
+            renames[name] = full_by_norm[alt]
+            continue
+        # 3. fuzzy close-match as last resort
+        close = difflib.get_close_matches(n, full_by_norm.keys(), n=1, cutoff=0.85)
+        if close:
+            renames[name] = full_by_norm[close[0]]
+            continue
+        orphans.append(name)
+
+    if renames:
+        print(f"\nitems.json reconcile: renaming {len(renames)} drifted key(s)")
+        new_items = {}
+        for k, v in simple.items():
+            new_items[renames.get(k, k)] = v
+        if 'items' in data:
+            data['items'] = new_items
+        else:
+            data = new_items
+        items_path.write_text(
+            json.dumps(data, indent=2, ensure_ascii=False) + '\n',
+            encoding='utf-8',
+        )
+        for old, new in renames.items():
+            print(f"  {old!r:<30s} -> {new!r}")
+
+    if orphans:
+        print(f"\nitems.json orphans ({len(orphans)}) — no VPK match, check manually:")
+        for o in orphans:
+            print(f"  {o!r}")
 
 
 # ════════════════════════════════════════════════════════════════════
@@ -614,7 +835,7 @@ def print_diff(category, old_data, new_data):
                     # Truncate long values
                     os = str(oval)[:80]
                     ns = str(nval)[:80]
-                    print(f"        {path}: {os} → {ns}")
+                    print(f"        {path}: {os} -> {ns}")
                 elif ctype == 'added':
                     print(f"        {path}: + {str(nval)[:80]}")
                 elif ctype == 'removed':
@@ -674,12 +895,15 @@ def main():
         'items_full': 'items_full.json',
         'relics': 'relics.json',
         'units_full': 'units_full.json',
+        'abilities': 'abilities.json',
+        'talents': 'talents.json',
+        'game_mode': 'game_mode.json',
         'units': 'units.json',
     }
 
     for key, filename in file_map.items():
         out_path = out_dir / filename
-        with open(out_path, 'w') as f:
+        with open(out_path, 'w', encoding='utf-8') as f:
             json.dump(data[key], f, indent=2, ensure_ascii=False)
 
     # Summary
@@ -699,6 +923,13 @@ def main():
     print(f"  By cost: {dict(sorted(by_cost.items()))}")
 
     print(f"\nunits.json:       {len(data['units']['units'])} units")
+    print(f"\nabilities.json:   {len(data['abilities'])} active abilities")
+    print(f"talents.json:     {len(data['talents'])} talent slots")
+    gm = data['game_mode']
+    print(f"game_mode.json:   {len(gm['drop_relic_list'])} drop relics, prepare_timer={gm['prepare_timer']}, battle_timer={gm['battle_timer']}")
+
+    # ── Audit hand-curated items.json against VPK canonical names ──
+    reconcile_items_json(out_dir, data['items_full'])
 
     # ── Diff ──
     if args.diff:
@@ -713,7 +944,7 @@ def main():
                 print(f"\n  {filename}: no previous file")
                 continue
 
-            with open(old_path) as f:
+            with open(old_path, encoding='utf-8') as f:
                 old_data = json.load(f)
 
             new_data = data[key]

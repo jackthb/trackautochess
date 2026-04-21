@@ -22,7 +22,16 @@ from pathlib import Path
 
 DATA_DIR = Path(__file__).parent
 ICONS_DIR = DATA_DIR / "icons"
-VPK_PATH = Path("/mnt/c/Program Files (x86)/Steam/steamapps/workshop/content/570/1613886175/1613886175.vpk")
+
+WORKSHOP_ID = "1613886175"
+_VPK_CANDIDATES = [
+    Path(f"C:/Program Files (x86)/Steam/steamapps/workshop/content/570/{WORKSHOP_ID}/{WORKSHOP_ID}.vpk"),
+    Path(f"C:/Program Files/Steam/steamapps/workshop/content/570/{WORKSHOP_ID}/{WORKSHOP_ID}.vpk"),
+    Path(f"D:/Steam/steamapps/workshop/content/570/{WORKSHOP_ID}/{WORKSHOP_ID}.vpk"),
+    Path(f"/mnt/c/Program Files (x86)/Steam/steamapps/workshop/content/570/{WORKSHOP_ID}/{WORKSHOP_ID}.vpk"),
+    Path(f"{Path.home()}/.steam/steam/steamapps/workshop/content/570/{WORKSHOP_ID}/{WORKSHOP_ID}.vpk"),
+]
+VPK_PATH = next((p for p in _VPK_CANDIDATES if p.exists()), _VPK_CANDIDATES[0])
 
 STEAM_CDN = "https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react"
 BROWSER_UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
@@ -128,7 +137,7 @@ def _extract_vpk_png(pak, vpk_path: str, dest: Path) -> bool:
 
 def extract_units(force: bool, dry_run: bool) -> tuple[int, int, int]:
     """Extract unit minimap icons from Steam CDN."""
-    units = json.loads((DATA_DIR / "units.json").read_text())["units"]
+    units = json.loads((DATA_DIR / "units.json").read_text(encoding="utf-8"))["units"]
     out_dir = ICONS_DIR / "units"
     out_dir.mkdir(parents=True, exist_ok=True)
 
@@ -171,7 +180,7 @@ def extract_units(force: bool, dry_run: bool) -> tuple[int, int, int]:
 
 def extract_synergies(force: bool, dry_run: bool, pak) -> tuple[int, int, int]:
     """Extract synergy icons from VPK custom spellicons or CDN."""
-    synergies = json.loads((DATA_DIR / "synergies.json").read_text())
+    synergies = json.loads((DATA_DIR / "synergies.json").read_text(encoding="utf-8"))
     out_dir = ICONS_DIR / "synergies"
     out_dir.mkdir(parents=True, exist_ok=True)
 
@@ -251,8 +260,8 @@ def extract_synergies(force: bool, dry_run: bool, pak) -> tuple[int, int, int]:
 
 def extract_items(force: bool, dry_run: bool, pak) -> tuple[int, int, int]:
     """Extract item icons from VPK or Steam CDN."""
-    items = json.loads((DATA_DIR / "items.json").read_text())["items"]
-    items_full = json.loads((DATA_DIR / "items_full.json").read_text())
+    items = json.loads((DATA_DIR / "items.json").read_text(encoding="utf-8"))["items"]
+    items_full = json.loads((DATA_DIR / "items_full.json").read_text(encoding="utf-8"))
     out_dir = ICONS_DIR / "items"
     out_dir.mkdir(parents=True, exist_ok=True)
 
@@ -317,8 +326,8 @@ def extract_items(force: bool, dry_run: bool, pak) -> tuple[int, int, int]:
 
 def extract_relics(force: bool, dry_run: bool, pak) -> tuple[int, int, int]:
     """Extract relic icons from VPK or Steam CDN."""
-    relics = json.loads((DATA_DIR / "relics.json").read_text())["relics"]
-    items_full = json.loads((DATA_DIR / "items_full.json").read_text())
+    relics = json.loads((DATA_DIR / "relics.json").read_text(encoding="utf-8"))["relics"]
+    items_full = json.loads((DATA_DIR / "items_full.json").read_text(encoding="utf-8"))
     out_dir = ICONS_DIR / "relics"
     out_dir.mkdir(parents=True, exist_ok=True)
 
@@ -383,7 +392,7 @@ def audit():
     print("=== Icon Audit ===\n")
 
     # Units
-    units = json.loads((DATA_DIR / "units.json").read_text())["units"]
+    units = json.loads((DATA_DIR / "units.json").read_text(encoding="utf-8"))["units"]
     unit_dir = ICONS_DIR / "units"
     missing_units = []
     for name in sorted(units):
@@ -395,7 +404,7 @@ def audit():
         print(f"  MISSING: {m}")
 
     # Synergies
-    synergies = json.loads((DATA_DIR / "synergies.json").read_text())
+    synergies = json.loads((DATA_DIR / "synergies.json").read_text(encoding="utf-8"))
     syn_dir = ICONS_DIR / "synergies"
     missing_syns = []
     for sid, sdata in sorted(synergies.items()):
@@ -407,7 +416,7 @@ def audit():
         print(f"  MISSING: {m}")
 
     # Items
-    items = json.loads((DATA_DIR / "items.json").read_text())["items"]
+    items = json.loads((DATA_DIR / "items.json").read_text(encoding="utf-8"))["items"]
     item_dir = ICONS_DIR / "items"
     missing_items = []
     for name, idata in sorted(items.items()):
@@ -419,7 +428,7 @@ def audit():
         print(f"  MISSING: {m}")
 
     # Relics
-    relics = json.loads((DATA_DIR / "relics.json").read_text())["relics"]
+    relics = json.loads((DATA_DIR / "relics.json").read_text(encoding="utf-8"))["relics"]
     relic_dir = ICONS_DIR / "relics"
     missing_relics = []
     for rid, rdata in sorted(relics.items()):

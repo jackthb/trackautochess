@@ -11,6 +11,7 @@
       "en": "Ancient Apparition",
       "lore": "Kaldr",
       "ko": "고대 영혼",
+      "ru": "Ancient Apparition",
       "zh-cn": "极寒幽魂",
       "zh-tw": "極寒幽魂"
     },
@@ -26,7 +27,7 @@
         ],
         "armor": 2,
         "magic_resist": 10,
-        "atk_rate": 1.7,
+        "atk_rate": 1.5,
         "atk_range": 400
       },
       "2_star": {
@@ -38,7 +39,7 @@
         ],
         "armor": 2,
         "magic_resist": 10,
-        "atk_rate": 1.7,
+        "atk_rate": 1.5,
         "atk_range": 600
       },
       "3_star": {
@@ -50,7 +51,7 @@
         ],
         "armor": 2,
         "magic_resist": 10,
-        "atk_rate": 1.7,
+        "atk_rate": 1.5,
         "atk_range": 800
       }
     }
@@ -812,7 +813,7 @@
       "ko": "혼돈 기사",
       "ru": "Chaos Knight",
       "zh-cn": "混沌骑士",
-      "zh-tw": "混噸騎士"
+      "zh-tw": "混沌騎士"
     },
     "attack_type": "melee",
     "abilities": null,
@@ -869,7 +870,7 @@
       "ko": "클링츠",
       "ru": "Clinkz",
       "zh-cn": "骷髅弓箭手",
-      "zh-tw": "骷髅弓箭手"
+      "zh-tw": "骷髏弓箭手"
     },
     "attack_type": "ranged",
     "abilities": null,
@@ -2136,8 +2137,8 @@
         "hp": 900,
         "mana": 0,
         "atk": [
-          75,
-          100
+          65,
+          85
         ],
         "armor": 12,
         "magic_resist": 0,
@@ -2148,8 +2149,8 @@
         "hp": 1800,
         "mana": 0,
         "atk": [
-          150,
-          200
+          130,
+          170
         ],
         "armor": 12,
         "magic_resist": 0,
@@ -2160,8 +2161,8 @@
         "hp": 3600,
         "mana": 0,
         "atk": [
-          300,
-          400
+          260,
+          340
         ],
         "armor": 12,
         "magic_resist": 0,
@@ -2198,7 +2199,7 @@
         ],
         "armor": 6,
         "magic_resist": 25,
-        "atk_rate": 1.3,
+        "atk_rate": 1.1,
         "atk_range": 400
       },
       "2_star": {
@@ -2210,7 +2211,7 @@
         ],
         "armor": 6,
         "magic_resist": 25,
-        "atk_rate": 1.3,
+        "atk_rate": 1.1,
         "atk_range": 400
       },
       "3_star": {
@@ -2222,7 +2223,7 @@
         ],
         "armor": 6,
         "magic_resist": 25,
-        "atk_rate": 1.3,
+        "atk_rate": 1.1,
         "atk_range": 400
       }
     }
@@ -2304,7 +2305,7 @@
       {
         "id": "wisp_wildcard",
         "name": "Indiscriminate Relocate",
-        "description": "Passive AbilityIO★ can combine with other pieces as any ★ piece on the board.\nIO★★ can combine with other pieces as any ★★ piece on the board."
+        "description": "Passive Ability\nIO★ can combine with other pieces as any ★ piece on the board.\nIO★★ can combine with other pieces as any ★★ piece on the board."
       }
     ],
     "stats": {
@@ -3001,7 +3002,7 @@
         ],
         "armor": 3,
         "magic_resist": 0,
-        "atk_rate": 1.3,
+        "atk_rate": 1.2,
         "atk_range": 400
       },
       "2_star": {
@@ -3013,7 +3014,7 @@
         ],
         "armor": 3,
         "magic_resist": 0,
-        "atk_rate": 1.3,
+        "atk_rate": 1.2,
         "atk_range": 400
       },
       "3_star": {
@@ -3025,7 +3026,7 @@
         ],
         "armor": 3,
         "magic_resist": 0,
-        "atk_rate": 1.3,
+        "atk_rate": 1.2,
         "atk_range": 400
       }
     }
@@ -3102,7 +3103,7 @@
       "ko": "마그누스",
       "ru": "Magnus",
       "zh-cn": "半人猛犸",
-      "zh-tw": "半人猛瑪"
+      "zh-tw": "半人猛獁"
     },
     "attack_type": "melee",
     "abilities": null,
@@ -3903,7 +3904,7 @@
       "ko": "예지자",
       "ru": "Oracle",
       "zh-cn": "神谕者",
-      "zh-tw": "神谕者"
+      "zh-tw": "神諭者"
     },
     "attack_type": "ranged",
     "abilities": null,
@@ -6362,7 +6363,7 @@
       "ko": "복수 혼령",
       "ru": "Vengeful Spirit",
       "zh-cn": "复仇之魂",
-      "zh-tw": "複仇之魂"
+      "zh-tw": "復仇之魂"
     },
     "attack_type": "ranged",
     "abilities": null,
@@ -6648,7 +6649,7 @@
       "ko": "제우스",
       "ru": "Zeus",
       "zh-cn": "众神之王",
-      "zh-tw": "衆神之王"
+      "zh-tw": "眾神之王"
     },
     "attack_type": "ranged",
     "abilities": null,

@@ -19,6 +19,7 @@ def _data_dir() -> Path:
 
 DATA_DIR = _data_dir()
 ICONS_DIR = DATA_DIR / "icons"
+REGIONS_CONFIG_PATH = DATA_DIR / "regions_config.json"
 
 
 # ── Config ────────────────────────────────────────────────────────────────────
@@ -65,6 +66,34 @@ def save_config(config: dict) -> None:
     """Write config dict back to ~/.dac/config.json."""
     DAC_DIR.mkdir(parents=True, exist_ok=True)
     CONFIG_PATH.write_text(json.dumps(config, indent=2))
+
+
+def load_regions_config() -> dict:
+    """Load picker calibration regions from data/regions_config.json."""
+    if not REGIONS_CONFIG_PATH.exists():
+        return {}
+    try:
+        data = json.loads(REGIONS_CONFIG_PATH.read_text(encoding="utf-8"))
+        if isinstance(data, dict) and "aspect_ratios" in data:
+            data = data["aspect_ratios"]
+        return data if isinstance(data, dict) else {}
+    except Exception:
+        return {}
+
+
+def infer_aspect_ratio(width: int, height: int, available: list[str] | None = None) -> str:
+    """Pick the nearest configured aspect ratio label for an image size."""
+    if width <= 0 or height <= 0:
+        return "16:9"
+
+    ratio = width / height
+    known = {
+        "16:9": 16 / 9,
+        "21:9": 21 / 9,
+    }
+    if available:
+        known = {k: v for k, v in known.items() if k in available} or known
+    return min(known, key=lambda key: abs(known[key] - ratio))
 
 
 # ── Image helpers (lazy imports — cv2/numpy only loaded when called) ──────────

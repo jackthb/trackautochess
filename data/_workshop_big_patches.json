@@ -1,0 +1,219 @@
+[
+  {
+    "date_raw": "15 Mar @ 11:03pm",
+    "author": "Ijichi Nijika",
+    "pid": "1773640995",
+    "gdoc": "https://docs.google.com/document/d/e/2PACX-1vT8-BwsAjs58bEpkHXTQ6lZXlq0KUKyAy8alWpwmbHPQu2f6DpBi8sDzWd4n0FyG6_PqpfeE5sTXLrs/pub",
+    "summary": "Song of ice and flame\n\n\n● New Chess Piece: Ancient Apparition($1/Element/Mage), ability - Chilling touch\n● New Chess Piece: Phoenix($4/Element/Mage), ability - Sun Ray\n● Razor($3/Element/Shaman): Class changed from Mage to Shaman\n● Element - Elemental Essence: (6) added and chances for (2)(4) decreased.\n● Telescope: +200 attack range removed\n● New Pass Quests and removed Pass Quests\n● Fix bugs\n\nClick the title link to check the full update details!"
+  },
+  {
+    "date_raw": "20 Dec, 2025 @ 5:54am",
+    "author": "Ijichi Nijika",
+    "pid": "1766238852",
+    "gdoc": "https://docs.google.com/document/d/e/2PACX-1vT7jfkG5Rm5XvDjsNPAo6WDcKtGUsK4wx9zXFH4mqQavuEU-k3ArsVadxuffIjTd8ZPYzCDdBpS_nTS/pub",
+    "summary": "Rock! Croak!\n\n\n\n● 3 New Leaderboards arrived\n● New Chess Piece: Largo ($2/Naga/Monk), Ability<Frogstomp>\n● Brewmaster: Downgraded from $2 to $1\n● Pandaren - Hospitality\n● Minotaur Horn: Upgraded from T3 to T4.\n● Mango Tree: Reworked. A Golden Mango will be dropped only when the mango tree is still alive at Relic expiration.(opposite to the previous condition). Mango tree’s health increased from 7 to 8.\n● Magic Box: Stacks decreased from 15 to 12.\n● Talent2B - Ascendency: Chances for +1 level recruitment decreased from 75% to 60%\n● Fix bugs\n\nClick the title link to check the full update details!"
+  },
+  {
+    "date_raw": "27 Nov, 2025 @ 5:28am",
+    "author": "Ijichi Nijika",
+    "pid": "1764250136",
+    "gdoc": "https://docs.google.com/document/d/e/2PACX-1vQKZSZYqYep3ZOVasa1sMlGeOtTLIMUE8PZdkRvNNb9lijVO8nJ0yQ7seFehwehHhQJRriCcSoxTVcp/pub",
+    "summary": "Unstoppable Waveform!\n\n\n\n● Morphling ($5/Element/Elf/Assassin): Upgraded from $2 to $5, and gained Elf.\n● Morphling - Waveform: Reworked\n● Ogre Magi ($3/Ogre/Mage):  Upgraded from $1 to $3, Multicast reworked into an aura effect.\n● Meepo ($2/Kobold/Mech): Downgraded from $3 to $2.\n● Magic Seed: Chances for turnips’ growing up every round is now dynamic. Chances are much higher in later games.\n● Fix bugs\n\nClick the title link to check the full update details!"
+  },
+  {
+    "date_raw": "14 Oct, 2025 @ 10:54pm",
+    "author": "Ijichi Nijika",
+    "pid": "1760507655",
+    "gdoc": "https://docs.google.com/document/d/e/2PACX-1vSYC2Fo5qpofWkhl12HP0h2kEUI1zuVtjjb0xzBllWrJKJdoQk8g43fzEHSJamiwzwL7mKb7pkMSNZX/pub",
+    "summary": "Havoc from the dark portal\n\n\n\n● Loading optimization: Available for reconnection for most conditions. And fixed some freezing problems.\n● Relic history is now available in Match History.\n● New Piece: Abyssal Underlord ($5, Demon/Warlock), Ability - Fiend’s Gate\n● Witless Shako: Downgraded from Tier 2 to Tier 1\n● Tranquil Boot: Upgraded from Tier 1 to Tier 2\n● Fix bugs\n\nClick the title link to check the full update details!"
+  },
+  {
+    "date_raw": "17 Sep, 2025 @ 6:53am",
+    "author": "Ijichi Nijika",
+    "pid": "1758117228",
+    "gdoc": "https://docs.google.com/document/d/e/2PACX-1vRHBr4Zv6ehYQJqAgz4IYyEkBVzwF6-XQDGy2J8u7SxTDQTFXtTUbqdAB-GVnffRORzQgZf28n56iAt/pub",
+    "summary": "Stealing and stealed - N’aix\n\n\n\n● New Chess Piece: Lifestealer ($2, Kobold/Undead/Wizard)\n● Abaddon ($1, Undead/Knight): Downgraded from $2 to $1\n● Necrolyte: A passive heartstopper aura added, and damage to the reaper's scythe decreased, while cooldown increased.\n● Kobold - Divided we stand: Reworked into (1)(2)(3).\n● Ascetic‘s Cap: Reworked\n● Congratulations to the Falcons for winning the championship of TI14. \n● Fix bugs\n\nClick the title link to check the full update details!"
+  },
+  {
+    "date_raw": "25 Aug, 2025 @ 2:49am",
+    "author": "Ijichi Nijika",
+    "pid": "1756115393",
+    "gdoc": "https://docs.google.com/document/d/e/2PACX-1vR_dpyheKRI0kgqlAO1CpvuBn47rm2A23JlU0SDYHD09cpe5rJV9qhWYNEFNkP8Ywp3Fpr1HVbV4zB4/pub",
+    "summary": "Turn out in full force!\n\n\n\n● A great improvement in chances for successfully reconnecting\n● Outdated Gamerules removed: You cannot recruit a certain piece when you have a Rank 3 piece of it already.\n● Hoodwink - Acorn Shot: Reworked\n● Hunter - Aimed Shot: Reworked.\n● Warlock - Soul Leech: (4) strengthened and (6) reworked.\n● New Tier 3 Item: Drum of Endurance\n● Temporarily removed item: Glimmer Cape, Dragon Lance, Cloak of Tyrants\n● Stolen Vault: Randomly gets 10~15 gold instead of 10~20\n● Talent4A - Radiance: IO extra chance initiates from +800% instead of +1000%, and still decreases processively by 200% per IO recruited.\n● Season Award Preview\n● Fix bugs\n\nClick the title link to check the full update details!"
+  },
+  {
+    "date_raw": "21 Jul, 2025 @ 1:00am",
+    "author": "ss.waiting",
+    "pid": "1753084851",
+    "gdoc": "https://docs.google.com/document/d/e/2PACX-1vSvGFvru_USbcGZCY1HyDEVwh2E82eN1MV8p5GjF9b8aC4s_1FjPl13cCNkF6B_KPPGpRgVoj2ccHMd/pub",
+    "summary": "Unsettled Spirits (Part 2)\n\n\n\n● New ★★★ Chess pieces: Altar of Spirits♥♥♥.\n● New Class Specialty - Druid: Druid pieces will not be destroyed on a ★★★ piece combined.\n● Druid - Synergy: (6) Added.\n● New Tier 1 Item: Spark of Courage\n● New Tier 2 Item: Sliver\n● New Tier 3 Tiem: Aviana’s Feather\n● Eye of Skadi: Upgraded from T3 to T5\n● Temporarily removed Items: Falcon Blade, Hell of the Dominator\n● Fix bugs\n\nClick the title link to check the full update details!"
+  },
+  {
+    "date_raw": "21 Jun, 2025 @ 11:06pm",
+    "author": "Ijichi Nijika",
+    "pid": "1750572369",
+    "gdoc": "https://docs.google.com/document/d/e/2PACX-1vQ2v1Z1iicx-nMtGpD8QLxmkIyGYHoL0NIswK7Hrx4nE_BWadVZ-QEuUcmIOEUYq4sSkMtSAJGxQ6xw/pub",
+    "summary": "Unsettled Spirits (Part 1)\n\n\n\n● IO - Tether: Reworked. \n● $ adjustments: Shadow demon ($1), Slark ($2), Slardar ($3), Earth Shaker ($3), Elder Titan ($4)\n● Meepo: Cancelled the extra one when combined into Rank 3.\n● Kobold - Divided We Stand:(2) Reworked.\n● Harpy - Windfury: Simplified.\n● Season Award Preview\n● Fix bugs\n\nClick the title link to check the full update details!"
+  },
+  {
+    "date_raw": "25 May, 2025 @ 10:18pm",
+    "author": "Ijichi Nijika",
+    "pid": "1748236713",
+    "gdoc": "https://docs.google.com/document/d/e/2PACX-1vQpixLFa-W-7VBmeI7YI0pwJQYJvou8LKZ-px54J0UHz69gTUGuArBBRQoKpCuDppdGoL2I_K8EGHak/pub",
+    "summary": "Relic Merry-go-round\n\n\n\n● 10 random relics will be settled from all 15 relics for a single match.\n● A special choice of Stolen Vault is provided instead of Discard in the relic box. A bag of random 10 ~ 20 gold will be dropped as a Stolen Vault.\n● Recruiting Probability Table slightly changed\n● Doubloon: New coming Relic!\n● Time-Space Replica: New coming Relic!\n● Stolen Vault: New coming Relic!\n● Magic Seed, Shroud of Concealment, Second Chance: returned.\n● Pandaren - Hospitality: Invitation cannot be affected by Dismiss.\n● Paladin Sword: Tier 3 New Item.\n● Manta Style: Upgraded from Tier 3 to Tier 4.\n● Fix bugs\n\nClick the title link to check the full update details!"
+  },
+  {
+    "date_raw": "26 Apr, 2025 @ 11:55pm",
+    "author": "Ijichi Nijika",
+    "pid": "1745736957",
+    "gdoc": "https://docs.google.com/document/d/e/2PACX-1vQgiWdyNOpFsT8svPUVc9xBLYpQ_3-BG_aXVq4LoxJydEjd06q5HyvbacodLrnW0Tbk8TSutFamqHe7/pub",
+    "summary": "Immortal King (Part 2)\n\n\n\n● Wraith King($5, Undead/Warrior): Reworked.\n● Lich: Downgraded from $5 to $4\n● Primal Beast - Pulverize: Reworked into targeted spell\n● Tango: Restores 1 ~ 7 Health instead of 1 ~ 8\n● Magic box: Reworked. All pieces can all count as targets.\n● Wheel of Wonder: Reworked.\n● Season Award Preview\n● Fix bugs\n\nClick the title link to check the full update details!"
+  },
+  {
+    "date_raw": "27 Mar, 2025 @ 6:19am",
+    "author": "Ijichi Nijika",
+    "pid": "1743081585",
+    "gdoc": "https://docs.google.com/document/d/e/2PACX-1vRp9NsXD2kMO_NazzGDO8A9qlosdrGEkiWXbvL-TD7MvfPlBHPf7WcNy3yX4EJi2Ib6xjfGAL-mTvdS/pub",
+    "summary": "Ascension Night\n\n\n\n● New Chess Piece: Kez($3, Harpy/Assassin) - Kazurai Katana\n● Phantom Assassin: Upgraded from $3 to $4\n● Bounty Hunter: Class changed from Assassin into Hunter.\n● Harpy - Windfury: Reworked into (2)(4)\n● Demon Hunter: (4) Demon Hunters reworked\n● Trident: Reworked\n● Leafy Essence: Adjusted into Passive Effect.\n● Chiaroscuro Certainty: Higher Rank token granted in later rounds.\n● March of the Beasts: Reworked.\n● All Creeps from Round 10 has approximate -20% Health and -20% Attack damage\n\nClick the title link to check the full update details!"
+  },
+  {
+    "date_raw": "25 Feb, 2025 @ 6:35am",
+    "author": "Ijichi Nijika",
+    "pid": "1740494105",
+    "gdoc": "https://docs.google.com/document/d/e/2PACX-1vT_nlV-tfeCOOK79itHKzn7hafSM_MlR0tBppdkc-FizVMISsApSffTMSfc_3voeaYXH1tqOXRfmaHJ/pub",
+    "summary": "Nature Power & Magic Mystery\n\n● New Relic - Leafy Essence\n● New Relic - Magic Box\n● Relics temporarily removed: Magic Seed, Second Chance.\n● Season Award Preview\n\nClick the title link to check the full update details!"
+  },
+  {
+    "date_raw": "19 Feb, 2025 @ 6:05am",
+    "author": "Ijichi Nijika",
+    "pid": "1739973908",
+    "gdoc": "https://docs.google.com/document/d/e/2PACX-1vSLaSLcft7zfWQ3eBtc6h6jYGlzjxJtiaUfUh5b-NtnS_cueY8DQvLndjltjFzZAlixLduetfpWkYWB/pub",
+    "summary": "Rebalance Patch\n\n● Rank Mode opens up now\n● Muerta: $2 instead of $3, and adjusted accordingly\n● Pudge: $3 instead of $2,and adjusted accordingly\n● Frenzy(Talent 3A): Lifesteal percentage increased from 20% to 25%\n● (Keep up with Dota2) Pure Damage cannot have lifesteal.\n● Due to Dota2 Precache problems, all Arcana decorations are removed to ensure loading stability. We made our best effort to redecorate all the chess pieces with nice looks.\n● Now Relic will be shown in item slots due to Dota2 New Mechanism.\n\nClick the title link to check the full update details!"
+  },
+  {
+    "date_raw": "25 Jan, 2025 @ 11:46pm",
+    "author": "Ijichi Nijika",
+    "pid": "1737877584",
+    "gdoc": "https://docs.google.com/document/d/e/2PACX-1vTdR5jBvk3snZfYDfBYy73mtyBPJMmFb4KmFZ-JRzftx35_dtO-gc81NbxkHuRPukhR1WA6_nuvRG-J/pub",
+    "summary": "New Bloom Festival 2025\n\n\n\n● Skywrath Mage: Downgraded from $2 to $1, and adjusted accordingly.\n● Luna: Upgraded from $1 to $2, and adjusted accordingly.\n● New Item: Pavise\n● Tranquil Boots: Downgraded from T2 to T1\n● Spider Leg: Downgraded from T3 to T2\n● Aegis of Immortal: Downgraded from T4 to T3\n● Radiance: Downgraded from T5 to T4\n● Havoc: Upgraded from T4 to T5\n● Almost all decorations are available now!\n● During the New Bloom Festival(Jan 27th, 2025 0:00 - Feb 5th, 2025 0:00，CET+8), daily victory award +50% and mmr bonus +25% while mmr deduction stays the same. All couriers, Gatcha, effects, chess boards in Decorations Gallery enjoy a 20% discount.\n\nClick the title link to check the full update details!"
+  },
+  {
+    "date_raw": "30 Dec, 2024 @ 7:50am",
+    "author": "Ijichi Nijika",
+    "pid": "1735573826",
+    "gdoc": "https://docs.google.com/document/d/e/2PACX-1vRqA3LzMAq-9YU4U1Vq-ROuDv0dNpOKPk5i-JNNMU5rrgSTpQDnDAycXnT7h8icXmy8d57HsmLy_Iem/pub",
+    "summary": "Spinning Wheel of Wonder & Season Award preview\n\n\n\n● New Relic: Wheel of Wonder\n● Temporarily removed Relic: Rambling Fatebender\n● Greevil’s Egg: Reworked. \n● Chiaroscuro Certainty: Reworked.\n● Mech - Heart of the Machines: Golden Heart of the Machines Reworked\n● Diffusal Blade: Reworked\n● Bug fix\n● Season Award Preview\n\nClick the title link to check the full update details!"
+  },
+  {
+    "date_raw": "5 Dec, 2024 @ 5:27am",
+    "author": "Ijichi Nijika",
+    "pid": "1733405259",
+    "gdoc": "https://docs.google.com/document/d/e/2PACX-1vR5OYQR97DWTEFk6YiXahYwTMFuOs7DqDxy38h7e-_Jo5oeHyNZr5-hoCW66MmkK-FcvbzjXQE-wH98/pub",
+    "summary": "● Amazing news: Reconnection in-game is available now !\n● Relaunching DOTA2 client after 3 or 4 matches is strongly recommended to avoid crash problems of DOTA2 new version.\n—————————————————————\nRebalance Patch 3\n● Recruit Probability slightly adjusted, details are in the table above.\n● Round 25 talent Frenzy: Lifesteal decreased from 25% to 20%\n● Clinkz - Burning Barrage: CD decreased from 10/8/6 to 8/7/6 secs, arrow count decreased from 5/6/6 to 3/4/5, damage percentage decreased from 50%/75%/125% to 50%/75%/100%\n● Muerta: Attack interval increased from 1 to 1.2 secs, base attack damage decreased from 65 to 60\n● Drow Ranger - Gust: Silence duration decreased from 2/3/5 to 2/3/4 secs\n● Undying - Decay: CD increased from 8/6/4 to 10/8/6 secs\n● Priest - Salvation: Tango restores 1~7 HP instead of 1~8\n● Undead - Plague: (6) Undeads - Reduces 40% HP of enemies instead of 45%\n● Hands of Midas: Targets only illusions or summoned pieces\n● Melafic Rapture: EXP gained equals to 1x damage taken instead of 0.75x\n● Fix bugs"
+  },
+  {
+    "date_raw": "3 Dec, 2024 @ 2:55am",
+    "author": "Ijichi Nijika",
+    "pid": "1733223352",
+    "gdoc": "https://docs.google.com/document/d/e/2PACX-1vR5OYQR97DWTEFk6YiXahYwTMFuOs7DqDxy38h7e-_Jo5oeHyNZr5-hoCW66MmkK-FcvbzjXQE-wH98/pub",
+    "summary": "● Amazing news: Reconnection in-game is available now !\n—————————————————————\nRebalance Patch 2\n\n● Monk - Drunken Stagger: (2) Monks - Now only valid on melee allies\n● Undead - Plague: (3)(6) Undeads - Max HP decreased by 10%/45% instead of 5%/40%\n● Satyr - Fear: Internal CD decreased from 4-8 secs to 4-6 secs\n● Warrior - Fortified Armor: (9) Warriors - Reflection multiplier decreased from 1.7 to 1.5\n● Troll - Voodoo Frenzy: (6) Trolls - Maximum stack decreased from 8 to 7\n● Bane - Fiend's Grip: Damage per seconde increased from 50/75/125 to 75/100/150\n● Skywrath Mage - Arcane Bolt: Magical damage increased from 150/250/350 to 150/250/400\n● Pangolier: Base damage increased from 65 to 80\n● Medusa - Stone Gaze: Duration increased from 3/4/5 secs to 4/5/6 secs\n● Templar Assassin - Refraction: Shield increased from 30/40/50 to 40/60/80\n● Havoc: Attack bonus decreased from 50 to 25\n● Scythe of Vyse: Duration decreased from 6 secs to 5 secs"
+  },
+  {
+    "date_raw": "2 Dec, 2024 @ 2:37am",
+    "author": "Ijichi Nijika",
+    "pid": "1733135829",
+    "gdoc": "https://docs.google.com/document/d/e/2PACX-1vR5OYQR97DWTEFk6YiXahYwTMFuOs7DqDxy38h7e-_Jo5oeHyNZr5-hoCW66MmkK-FcvbzjXQE-wH98/pub",
+    "summary": "Rebalance Patch 1\n\n● Talent Tree UI optimization: Talent Panel will pop up at round 5/15/25/35, and shut down after your talents are settled.\n● Recruit Probability slightly adjusted, details are in the table above.\n● Luna - Moonglaive: Bounce time decreased from 3/5/7 to 3/4/5\n● Medusa - Stone Gaze: Split shot count decreased from 3/4/5 to 2/3/4, gaze duration decreased from 4/5/6 secs to 3/4/5 secs\n● fix bug"
+  },
+  {
+    "date_raw": "30 Nov, 2024 @ 9:29pm",
+    "author": "Ijichi Nijika",
+    "pid": "1733030972",
+    "gdoc": "https://docs.google.com/document/d/e/2PACX-1vR5OYQR97DWTEFk6YiXahYwTMFuOs7DqDxy38h7e-_Jo5oeHyNZr5-hoCW66MmkK-FcvbzjXQE-wH98/pub",
+    "summary": "Talent Tree\n\n● New feature: Talent Tree. Unlocks at Round 5, 15, 25, 35. You can choose 1 from 2 permanent effects on your courier. All talents will be settled automatically at Round 45.\n● Relic Pool now has only 10 Relics and will rotate among seasons.\n● All remained pieces of the same name will be immediately removed from chesspool on ★★★ combination and cannot be refilled when discarded until the monopolist is eliminated. \n● Recruit Probablity Table slightly changed\n● Bug fix\n\nClick the title link to check the full update details!"
+  },
+  {
+    "date_raw": "23 Oct, 2024 @ 10:22pm",
+    "author": "Ijichi Nijika",
+    "pid": "1729747378",
+    "gdoc": "https://docs.google.com/document/d/e/2PACX-1vTw-IezCGdK6pHcRmGdLxsWl9yvOhun-J8H3pVAmKUlqzvjh-McSE1YsVuVyip1kpQJzxUVTqHVaCxu/pub",
+    "summary": "Lucid Nightmare\n\n\n\n● New Chess Piece: Bane($1, Satyr/Warlock)\n● Reworked Racial Skill: Satyr - Fear\n● Chiaroscuro Certainty: Effect reworked\n● Gaoler's Master Key: An additional effect added\n● Bug fix\n● End-of-Season Reward Preview \n\nClick the title link to check the full update details!"
+  },
+  {
+    "date_raw": "8 Sep, 2024 @ 11:40pm",
+    "author": "Ijichi Nijika",
+    "pid": "1725864017",
+    "gdoc": "https://docs.google.com/document/d/1XAKBDx7GjBJ3k2kZ1Vj2l02L7o_BRkZOveOEk3wqebg/pub",
+    "summary": "Dramatic Entrance!\n\n\n\n● Ringmaster ($5, ?/?/?): Ability Spotlight\n● Naga - Scale Armor: Simplified.\n● Diffusal Blade: Reworked\n● Bug fix\n\nClick the title link to check the full update details!"
+  },
+  {
+    "date_raw": "26 Aug, 2024 @ 8:02am",
+    "author": "Ijichi Nijika",
+    "pid": "1724684551",
+    "gdoc": "https://docs.google.com/document/d/1EQ5bHm2Tm8I8e99WJqUXIdY6-PcQEXMyST0BDJ5v8Lc/pub",
+    "summary": "Skyfall: The Ascendant Conflict (Part I)\n\n\n\n● All pieces that are replaced will now be shuffled back into the deck\n● Skywrath Mage ($2, Harpy/Mage): Skill <Arcane Bolt> \n● Vengeful Spirit ($1, Harpy/Undead/Demon Hunter): Updated race to Harpy/Undead.\n● Viper: Skill reworked to <Viper Strike>\n● New Race: Harpy (Current members include Vengeful Spirit, Skywrath Mage)\n● Elf - Evasion: (9) Elves: When elves create illusions, they now gain a brief invisibility effect, causing enemies to temporarily lose their attack target.\n● End-of-Season Reward Preview \n● Bug fix\n\nClick the title link to check the full update details!"
+  },
+  {
+    "date_raw": "27 Jul, 2024 @ 10:29pm",
+    "author": "Ijichi Nijika",
+    "pid": "1722144556",
+    "gdoc": "https://docs.google.com/document/d/e/2PACX-1vSqL-jwk09HyR6a4Nq4UlZoLRXG0jhckuQo6w3J1vn___kkfe19iFFgJGGpbK4zP7DE0sU2oQkhZsjT/pub",
+    "summary": "Blessing of the Naaru (Part 3)\n\n\n\n● Bounty Hunter: Synergies updated from Goblin/Assassin to Goblin/Draenei/Assassin.\n● Faceless Void: Ability Reworked into Time Zone \n● Terrorblade - Metamorphosis: Now demonic Terrorblade will be no higher than the rank of Terrorblade.\n● Draenei - Blessing of the Naaru: (2) Draeneis: steal a combined fixed and percentage health from the enemy instead of a fixed health.\n● Demon Hunter - Shuttered Soul: (4) Demon Hunters: Allies don’t count as demons any more\n● New Tier 3 Item - Minotaur Horn\n● New Tier 4 Item - Havoc\n● Bug fix\n\nClick the title link to check the full update details!"
+  },
+  {
+    "date_raw": "21 Jun, 2024 @ 9:10pm",
+    "author": "Ijichi Nijika",
+    "pid": "1719029405",
+    "gdoc": "https://docs.google.com/document/d/e/2PACX-1vQcMxRouZByJ4f1GbWMX4sDUVquOaL40P68gd4JMEtTCjAY4BkGO_3sCYq034AArL_H9Fu3blJ4hqSg/pub",
+    "summary": "Rebirth & Reclaim\n\n● Returned Chess Piece:Wraith King($4, Undead/Warrior)\n● Returned Chess Piece:Clinkz($2, Undead/Hunter)\n● Undead - Plague: Reworked\n● Ascetic’s Cap, now Tier 1 instead of Tier 2: Reworked\n● New Tier 4 Item - Aegis of Immortal\n● DragonLance, now Tier 2 instead of Tier 1\n● End-of-Season Reward Preview\n● Bug fix\n\nClick the title link to check the full update details!"
+  },
+  {
+    "date_raw": "26 May, 2024 @ 8:26am",
+    "author": "Ijichi Nijika",
+    "pid": "1716737207",
+    "gdoc": "https://docs.google.com/document/d/e/2PACX-1vRO9szOfNZPWOrLvk3YihwidhAEn3aRjjqZ4V1Tw-5QVgBbY5uXp2hifDhUr8uUP_SZDlYfBGpR3ryF/pub",
+    "summary": "Retired King & Lethal Plague\n\n\n\n● Dark Willow: Ability Reworked into Bramble Maze\n● Invoker: Tornado Hurricane Removed and replaced by Ice Wall\n● Chess pieces temporarily removed: Wraith King, Clinkz, Visage\n● Undead - Plague: Reworked\n● Ascetics Cap: Multiple Caps not stackable\n● Aeon Disk: Carrier and its minions will be a permanent chess piece.\n● Monopoly Contract: Reworked\n● Chiaroscuro Certainty: Reworked\n● Bug fix\n\nClick the title link to check the full update details!"
+  },
+  {
+    "date_raw": "27 Apr, 2024 @ 6:47am",
+    "author": "Ijichi Nijika",
+    "pid": "1714225661",
+    "gdoc": "https://docs.google.com/document/d/e/2PACX-1vRXiGNip4-WoTU5CGyWxiQfqPGYB3VUY0mA6hmGqZDUh_fdbP_buJ6goCa8Bv4O8orjcpGFlo_O5f-3/pub",
+    "summary": "Blessing of the Naaru (Part 2)\n\n\n\n● New Chess Piece-Shadow Demon: Disseminate ($3, Demon/Draenei/Priest)\n● Lion: Finger of Death(Upgraded from $1 to $4)\n● Slardar: Downgraded from $3 to $2,\n● Slark: Downgraded from $2 to $1\n● Grimstroke: Downgraded from $4 to $1\n● Draenei - Blessing of the Naaru: Synergy Update to(2)(4)\n● New Tier 3 Item - Diffusal Blade \n● Bug fix\n● End-of-Season Reward Preview \n\nClick the title link to check the full update details!"
+  },
+  {
+    "date_raw": "30 Mar, 2024 @ 7:12am",
+    "author": "Ijichi Nijika",
+    "pid": "1711807935",
+    "gdoc": "https://docs.google.com/document/d/e/2PACX-1vThtllygZx8MYErA5mYO751i6_8tFY2bI_Zo9UPiY6iGJR9lU1n9UwjfKslNW7DdztBzUW20cgqC9NZ/pub",
+    "summary": "Veiled in Mysterys Whisper\n\n\n● Only 5 of them will be revealed, and the rest of the legendary chess pieces will be revealed when a player recruits them for the first time.\n● Non-permanent chess pieces deal half damage to the courier\n● Shaman - Hex: Adjusted from (2) (4) to (3) (6).\n● New T3 Equipment: Vladmir's Offering \n● Temporarily removed equipment: Summoning Stone (T1), Phase Boots (T2), Arcane Blink (T3).\n● Bug fix\n\nClick the title link to check the full update details!"
+  },
+  {
+    "date_raw": "28 Feb, 2024 @ 7:51am",
+    "author": "Ijichi Nijika",
+    "pid": "1709135476",
+    "gdoc": "https://docs.google.com/document/d/e/2PACX-1vSZmin5fikmgbu98cPyqW8pYW7iSSxVqpg209PLlDhNOb9bfL3ObptKmE1-Y5eriCZpjiYm0iHJLBfH/pub",
+    "summary": "Mana Void\n\n\n\n● Anti-Mage: Upgraded from $1 to $4, \"Mana Break\" skill reworked.\n● Demon Hunter - Shuttered soul: (4) Demon Hunter effects adjusted\n● New Tier 3 Item: Heaven's Halberd\n● End-of-Season Reward Preview \n● Bug fix\n\nClick the title link to check the full update details!"
+  },
+  {
+    "date_raw": "28 Jan, 2024 @ 10:41pm",
+    "author": "Ijichi Nijika",
+    "pid": "1706510461",
+    "gdoc": "https://docs.google.com/document/d/e/2PACX-1vTPBgy4ZOFgfDvGYkcwFQb-ZS9IV31A2Tx_5PQ2rYchJdzvhgMS1x1J-FVSpjriARR-qyGi9LzP2tr2/pub",
+    "summary": "Blessing of the Naaru (Part 1)\n\n\n\n● New Chess Piece:Dark Seer ($2, Draenei/Warlock)\n● New Chess Piece:Dawnbreaker($3, Draenei/Knight)\n● New Race: Draenei <Race Abilities: Blessing of the Naaru>\n● Undead - Plague: Effect fine-tuned\n● New Item: Ascetic's Cap (T2)\n● Adjusted item: Maelstrom upgraded from T2 to T3\n● Adjusted relics: Second Chance, Mango Tree, WeaponSmith\n● Bug fix\n\nClick the title link to check the full update details!"
+  },
+  {
+    "date_raw": "26 Dec, 2023 @ 8:33am",
+    "author": "Ijichi Nijika",
+    "pid": "1703608396",
+    "gdoc": "https://docs.google.com/document/d/e/2PACX-1vTi_vU3HZAqggmz4bE587Ly7snUJi-ILKAHAAUFisErsc1tEO1zRapyshNvBseq_D51HhB1Beeqa4px/pub",
+    "summary": "New year! New Chance!\n\n\n\n● Adjustment to Relic Duration and Rules\n● Reset of \"Taunt\" Mechanism\n● Second Chance: Reworked Effect\n● New Item: Phase Boots, Giant's Ring\n● Added a lineup box\n● Rebalance Patch\n● End of Season Reward Preview \n\nClick the title link to check the full update details!"
+  },
+  {
+    "date_raw": "29 Nov, 2023 @ 7:53pm",
+    "author": "Ijichi Nijika",
+    "pid": "1701316417",
+    "gdoc": "https://docs.google.com/document/d/e/2PACX-1vTdf36SqW-pSGs4MsiRalPCo95NDaZEjKOojNdUDZsbgJpsbDpCWRLB2w5f0yBjseRkUIQaY0a8aB8u/pub",
+    "summary": "The Hoodienauts\n\n\n\n● Hoodwink - Acorn Shot: The Boomerang has been reworked to Acorn Shot.\n● Shadow Fiend - Requiem of Souls: Now, every 2 layers of demonic power will add an additional +1 shadow energy (originally every 1 layer).\n● Human - Spark of Mind: Now directly grants 2/6 experience points to the courier (originally gained 1/3 Knowledge Books)\n● Goblins - Nanobots: (3) Goblins now target random melee allies (previously random allies).\n● New Items: Force Staff (T1), Hand of Midas(T2)\n● Modified Items: Spider Legs(T3), Prince's Knife(T2)\n\nClick the title link to check the full update details!"
+  }
+]

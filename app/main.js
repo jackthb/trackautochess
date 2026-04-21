@@ -1287,29 +1287,21 @@ ipcMain.handle("calibration:saveConfig", async (_event, config) => {
 
 let debugResolve = null;
 
-ipcMain.handle("calibration:runDebug", async (_event, screenshotPath) => {
+ipcMain.handle("calibration:debugView", async (_event, payload) => {
   return new Promise((resolve) => {
     debugResolve = resolve;
-    sendToPython({ cmd: "debug_screenshot", path: screenshotPath });
+    sendToPython({
+      cmd: "debug_view",
+      path: payload?.screenshotPath,
+      screen: payload?.screen,
+      regions: payload?.regions || {},
+      aspect_ratio: payload?.aspectRatio || null,
+    });
     setTimeout(() => {
       if (debugResolve === resolve) {
         debugResolve = null;
-        resolve({ error: "Debug timed out (30s)" });
+        resolve({ error: "View debug timed out (30s)" });
       }
     }, 30000);
-  });
-});
-
-ipcMain.handle("calibration:sentinelTest", async (_event, screenshotPath, region) => {
-  return new Promise((resolve) => {
-    const prevResolve = debugResolve;
-    debugResolve = resolve;
-    sendToPython({ cmd: "sentinel_test", path: screenshotPath, region });
-    setTimeout(() => {
-      if (debugResolve === resolve) {
-        debugResolve = null;
-        resolve({ error: "Sentinel test timed out (15s)" });
-      }
-    }, 15000);
   });
 });

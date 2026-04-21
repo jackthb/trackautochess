@@ -5,8 +5,7 @@ contextBridge.exposeInMainWorld("calibration", {
   getScreenshot: (filePath) => ipcRenderer.invoke("calibration:getScreenshot", filePath),
   loadConfig: () => ipcRenderer.invoke("calibration:loadConfig"),
   saveConfig: (config) => ipcRenderer.invoke("calibration:saveConfig", config),
-  runDebug: (screenshotPath) => ipcRenderer.invoke("calibration:runDebug", screenshotPath),
-  runSentinelTest: (screenshotPath, region) => ipcRenderer.invoke("calibration:sentinelTest", screenshotPath, region),
+  runViewDebug: (payload) => ipcRenderer.invoke("calibration:debugView", payload),
 });
 
 contextBridge.exposeInMainWorld("windowControls", {

@@ -297,8 +297,7 @@ input[type="file"] { display: none; }
   <button class="bb-btn primary" onclick="saveConfig()">Save Config</button>
   <button class="bb-btn danger" onclick="clearRegions()">Clear</button>
   <span class="bb-spacer"></span>
-  <button class="bb-btn" id="btn-debug" onclick="runDebug()" disabled>Run Debug</button>
-  <button class="bb-btn" id="btn-sentinel" onclick="runSentinelTest()" disabled>Test Sentinel</button>
+  <button class="bb-btn" id="btn-debug" onclick="runDebug()" disabled>Test View</button>
   <span id="bb-status"></span>
 </div>
 
@@ -515,7 +514,7 @@ function buildScreenshotList() {
         if (dataUrl) loadImage(dataUrl);
         buildScreenshotList();
         document.getElementById('btn-debug').disabled = false;
-        updateSentinelBtn();
+        updateDebugButton();
       };
       el.appendChild(item);
     }
@@ -930,9 +929,9 @@ function updateModeTag() {
   }
 }
 
-function updateSentinelBtn() {
-  const btn = document.getElementById('btn-sentinel');
-  btn.disabled = !currentScreenshotPath || !currentScreen.startsWith('sentinel_');
+function updateDebugButton() {
+  const btn = document.getElementById('btn-debug');
+  btn.disabled = !currentScreenshotPath;
 }
 
 // ── Config save/load ────────────────────────────────────────────────────────
@@ -992,12 +991,17 @@ async function runDebug() {
   if (!currentScreenshotPath) return;
   const panel = document.getElementById('debug-panel');
   const content = document.getElementById('debug-content');
-  content.innerHTML = '<div class="d-section"><div class="d-label">Running debug pipeline...</div></div>';
+  content.innerHTML = '<div class="d-section"><div class="d-label">Running view test...</div></div>';
   panel.classList.add('open');
   document.getElementById('bb-status').textContent = 'Running...';
 
   try {
-    const data = await window.calibration.runDebug(currentScreenshotPath);
+    const data = await window.calibration.runViewDebug({
+      screenshotPath: currentScreenshotPath,
+      screen: currentScreen,
+      regions: getScreenRegions(),
+      aspectRatio: currentAR,
+    });
     renderDebug(data);
   } catch (e) {
     content.innerHTML = `<div class="d-section"><div class="d-error">Error: ${e.message}</div></div>`;
@@ -1010,37 +1014,72 @@ function renderDebug(data) {
   let html = '';
 
   if (data.error) {
-    html = `<div class="d-section"><div class="d-error">${data.error}</div></div>`;
-    content.innerHTML = html;
+    content.innerHTML = `<div class="d-section"><div class="d-error">${data.error}</div></div>`;
     return;
   }
 
   html += `<div class="d-section">
     <div class="d-row"><span class="d-label">Image:</span> <span class="d-value">${data.width}&times;${data.height}</span></div>
-    <div class="d-row"><span class="d-label">Screen type:</span> <span class="d-value">${data.screen_type}</span></div>
+    <div class="d-row"><span class="d-label">View:</span> <span class="d-value">${data.screen_type}</span></div>
+    ${data.aspect_ratio ? `<div class="d-row"><span class="d-label">Aspect Ratio:</span> <span class="d-value">${data.aspect_ratio}</span></div>` : ''}
   </div>`;
 
-  if (data.rows && data.rows.length > 0) {
+  if (data.region_crops && data.region_crops.length) {
+    html += `<div class="d-section"><div class="d-label">Configured Region Crops</div>`;
+    for (const crop of data.region_crops) {
+      html += `<div class="d-row" style="display:block;margin-bottom:10px">
+        <div class="d-label">${crop.name}</div>
+        <div class="d-value" style="margin-bottom:4px">${(crop.coords || []).join(', ')}</div>
+        <img src="data:image/jpeg;base64,${crop.image}" style="max-width:100%;border:1px solid var(--border);border-radius:3px;image-rendering:pixelated;">
+      </div>`;
+    }
+    html += `</div>`;
+  }
+
+  if (data.results) {
+    html += `<div class="d-section"><div class="d-label">Sentinel Test Result</div>`;
+    if (data.crop) {
+      html += `<div class="d-row"><img src="data:image/jpeg;base64,${data.crop}" style="max-width:100%;border:1px solid var(--border);border-radius:3px;margin:4px 0;image-rendering:pixelated;"></div>`;
+    }
+    for (const [tpl, res] of Object.entries(data.results)) {
+      const scoreColor = res.score >= 0.7 ? 'var(--green)' : (res.score >= 0.5 ? 'var(--yellow)' : 'var(--red)');
+      html += `<div class="d-row">${tpl}: <span style="color:${scoreColor};font-weight:600">${res.score}</span></div>`;
+      if (res.location) {
+        html += `<div class="d-row"><span class="d-label">Match location:</span> <span class="d-value">${res.location.join(', ')}</span></div>`;
+      }
+    }
+    html += `</div>`;
+  }
+
+  if (data.rows && data.rows.length) {
     html += `<div class="d-section"><div class="d-label">Rows detected: ${data.rows.length}</div></div>`;
     for (const [i, row] of data.rows.entries()) {
       html += `<div class="d-section">
         <div class="d-label">Row ${i}</div>
+        ${row.row_image ? `<div class="d-row"><img src="data:image/jpeg;base64,${row.row_image}" style="max-width:100%;border:1px solid var(--border);border-radius:3px;margin:4px 0;image-rendering:pixelated;"></div>` : ''}
+        ${row.player_name ? `<div class="d-row">Player: <span class="d-value">${row.player_name}</span></div>` : ''}
+        ${typeof row.db_match === 'boolean' ? `<div class="d-row">DB Match: <span class="d-value">${row.db_match ? `yes (${row.matched_user_id})` : 'no'}</span></div>` : ''}
         <div class="d-row">Placement: <span class="d-value">${row.placement || '-'}</span></div>
         <div class="d-row">Level: <span class="d-value">${row.level || '-'}</span></div>
         <div class="d-row">W-L: <span class="d-value">${row.wl || '-'}</span></div>
-        <div class="d-row">Rank: <span class="d-value">${row.rank || '-'} (${row.rank_change || '-'})</span></div>
-        <div class="d-row">Units: <span class="d-value">${(row.units || []).join(', ') || '-'}</span></div>
+        ${row.rank || row.rank_change ? `<div class="d-row">Rank: <span class="d-value">${row.rank || '-'}${row.rank_change ? ` (${row.rank_change})` : ''}</span></div>` : ''}
+        ${row.units ? `<div class="d-row">Units: <span class="d-value">${(row.units || []).join(', ') || '-'}</span></div>` : ''}
         <div class="d-row">Synergies: <span class="d-value">${row.synergies || '-'}</span></div>
         <div class="d-row">Relics: <span class="d-value">${row.relic || '-'}</span></div>
-        <div class="d-row">Time: <span class="d-value">${row.time_ago || '-'}</span></div>
+        ${row.time_ago ? `<div class="d-row">Time: <span class="d-value">${row.time_ago || '-'}</span></div>` : ''}
+        <div class="d-row" style="display:flex;gap:8px;flex-wrap:wrap">
+          ${row.player_crop ? `<img src="data:image/jpeg;base64,${row.player_crop}" title="player" style="max-height:80px;border:1px solid var(--border);border-radius:3px;image-rendering:pixelated;">` : ''}
+          ${row.placement_crop ? `<img src="data:image/jpeg;base64,${row.placement_crop}" title="placement" style="max-height:80px;border:1px solid var(--border);border-radius:3px;image-rendering:pixelated;">` : ''}
+          ${row.level_crop ? `<img src="data:image/jpeg;base64,${row.level_crop}" title="level" style="max-height:80px;border:1px solid var(--border);border-radius:3px;image-rendering:pixelated;">` : ''}
+          ${row.units_crop ? `<img src="data:image/jpeg;base64,${row.units_crop}" title="units" style="max-height:80px;border:1px solid var(--border);border-radius:3px;image-rendering:pixelated;">` : ''}
+          ${row.synergy_crop ? `<img src="data:image/jpeg;base64,${row.synergy_crop}" title="synergy" style="max-height:80px;border:1px solid var(--border);border-radius:3px;image-rendering:pixelated;">` : ''}
+          ${row.relic_crop ? `<img src="data:image/jpeg;base64,${row.relic_crop}" title="relic" style="max-height:80px;border:1px solid var(--border);border-radius:3px;image-rendering:pixelated;">` : ''}
+          ${row.wl_crop ? `<img src="data:image/jpeg;base64,${row.wl_crop}" title="wl" style="max-height:80px;border:1px solid var(--border);border-radius:3px;image-rendering:pixelated;">` : ''}
+          ${row.rank_crop ? `<img src="data:image/jpeg;base64,${row.rank_crop}" title="rank" style="max-height:80px;border:1px solid var(--border);border-radius:3px;image-rendering:pixelated;">` : ''}
+          ${row.time_crop ? `<img src="data:image/jpeg;base64,${row.time_crop}" title="time" style="max-height:80px;border:1px solid var(--border);border-radius:3px;image-rendering:pixelated;">` : ''}
+        </div>
       </div>`;
     }
-  }
-
-  if (data.game_data) {
-    html += `<div class="d-section"><div class="d-label">Game Over Parse</div>
-      <pre>${JSON.stringify(data.game_data, null, 2)}</pre>
-    </div>`;
   }
 
   content.innerHTML = html;
@@ -1048,45 +1087,6 @@ function renderDebug(data) {
 
 function closeDebug() {
   document.getElementById('debug-panel').classList.remove('open');
-}
-
-async function runSentinelTest() {
-  if (!currentScreenshotPath) return;
-  const regions = getScreenRegions();
-  const sr = regions.search_region;
-  if (!sr || sr.length < 4) { toast('No search_region defined'); return; }
-
-  document.getElementById('bb-status').textContent = 'Testing sentinel...';
-  try {
-    const data = await window.calibration.runSentinelTest(
-      currentScreenshotPath,
-      { x0: sr[0], y0: sr[1], x1: sr[2], y1: sr[3] },
-    );
-    const panel = document.getElementById('debug-panel');
-    const content = document.getElementById('debug-content');
-    let html = '';
-
-    if (data.error) {
-      html = `<div class="d-section"><div class="d-error">${data.error}</div></div>`;
-    } else {
-      html += `<div class="d-section"><div class="d-label">Sentinel Test Results</div>`;
-      if (data.crop) {
-        html += `<div class="d-row"><img src="data:image/jpeg;base64,${data.crop}" style="max-width:100%;border:1px solid var(--border);border-radius:3px;margin:4px 0;image-rendering:pixelated;"></div>`;
-      }
-      for (const [tpl, res] of Object.entries(data.results || {})) {
-        const name = tpl.replace('sentinel_ref_', '').replace('.png', '');
-        const scoreColor = res.score >= 0.7 ? 'var(--green)' : (res.score >= 0.5 ? 'var(--yellow)' : 'var(--red)');
-        html += `<div class="d-row">${name}: <span style="color:${scoreColor};font-weight:600">${res.score}</span></div>`;
-      }
-      html += `</div>`;
-    }
-
-    content.innerHTML = html;
-    panel.classList.add('open');
-  } catch (e) {
-    toast('Sentinel test failed: ' + e.message);
-  }
-  document.getElementById('bb-status').textContent = '';
 }
 
 // ── Toast ───────────────────────────────────────────────────────────────────
@@ -1133,11 +1133,11 @@ async function loadSavedScreenshot() {
       if (dataUrl) loadImage(dataUrl);
       buildScreenshotList();
       document.getElementById('btn-debug').disabled = false;
-      updateSentinelBtn();
+      updateDebugButton();
       return;
     }
   }
-  updateSentinelBtn();
+  updateDebugButton();
 }
 
 const DEFAULT_SCREENSHOTS = {

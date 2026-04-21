@@ -1,0 +1,281 @@
+VPK: C:\Program Files (x86)\Steam\steamapps\workshop\content\570\1613886175\1613886175.vpk
+Size: 894.0 MB
+Files in VPK: 7919
+
+synergies.json:   36 synergies
+  Aqir: tiers=[2, 4]
+  Assassin: tiers=[3, 6, 9]
+  Beast: tiers=[2, 4, 6]
+  Centaur: tiers=[2, 4]
+  Demon: tiers=[1]
+  Demon Hunter: tiers=[2, 4]
+  Draenei: tiers=[2, 4]
+  Dragon: tiers=[3, 5]
+  Druid: tiers=[2, 4, 6]
+  Dwarf: tiers=[2]
+  Elemental: tiers=[2, 4, 6]
+  Elf: tiers=[3, 6, 9]
+  Goblin: tiers=[3, 6]
+  God: tiers=[2, 4, 6]
+  Harpy: tiers=[2, 4]
+  Human: tiers=[3, 6]
+  Hunter: tiers=[3, 6, 9]
+  Knight: tiers=[2, 4, 6]
+  Kobold: tiers=[1, 2, 3]
+  Mage: tiers=[3, 6, 9]
+  Mech: tiers=[3, 6]
+  Monk: tiers=[2, 4]
+  Naga: tiers=[2, 4, 6]
+  Faceless: tiers=[2]
+  Ogre: tiers=[2]
+  Orc: tiers=[2, 4, 6]
+  Pandaren: tiers=[1, 2]
+  Priest: tiers=[2, 4]
+  Satyr: tiers=[2]
+  Shaman: tiers=[3, 6]
+  Tauren: tiers=[2, 4]
+  Troll: tiers=[2, 4, 6]
+  Undead: tiers=[3, 6, 9]
+  Warlock: tiers=[2, 4, 6]
+  Warrior: tiers=[3, 6, 9]
+  Wizard: tiers=[2, 4]
+
+items_full.json:  140 items
+  By quality: {'consumable': 36, 'rare': 46, 'epic': 12, 'common': 19, '': 19, 'artifact': 8}
+
+relics.json:      19 relics
+
+units_full.json:  117 units
+  By cost: {1: 23, 2: 23, 3: 23, 4: 25, 5: 23}
+
+units.json:       117 units
+
+abilities.json:   2 active abilities
+talents.json:     8 talent slots
+game_mode.json:   17 drop relics, prepare_timer=40.0, battle_timer=50.0
+
+============================================================
+DIFF vs C:\Users\jackc\code\dac-tools\data\_prev_patch
+============================================================
+
+  synergies.json — CHANGED:
+    ~ Aqir:
+        formatted: - Infection
+
+Active when there are at least (N) different Aqir chess pieces on the
+    ~ Assassin:
+        description: The first movement of Assassin pieces in each round causes Assassins to leap ove -> The first movement of Assassin pieces in each round causes Assassins to leap ove
+        description_html: The first movement of Assassin pieces in each round causes Assassins to leap ove -> The first movement of Assassin pieces in each round causes Assassins to leap ove
+        formatted: - The first movement of Assassin pieces in each round causes Assassins to leap ove
+    ~ Beast:
+        formatted: - Power of the Wild
+
+Active when you have at least (N) different Beast pieces on b
+    ~ Centaur:
+        formatted: - Stampede
+
+Active when you have at least (N) different pieces of this species on 
+    ~ Demon:
+        formatted: - Fel Power
+
+Active when you control only 1 type of Demon on the chessboard.
+
+(1) 
+    ~ Demon Hunter:
+        formatted: - Counts as a different enemy Demon type.
+
+Shuttered Soul
+
+Active when you have at
+    ~ Draenei:
+        formatted: - Blessing of the Naaru
+
+Active when you have at least (N) different pieces of thi
+    ~ Dragon:
+        formatted: - Attunement
+
+Active when you have at least (N) different pieces of this species o
+    ~ Druid:
+        formatted: - Druid pieces will not be destroyed on a ★★★ piece combined.
+
+Synergy
+
+Active whe
+    ~ Dwarf:
+        formatted: - Take Aim
+
+Active when you have at least (N) different Dwarf pieces on board. (Mu
+    ~ Elemental:
+        formatted: - Elemental Essence
+
+Active when you have at least (N) different Element pieces on
+    ~ Elf:
+        formatted: - Evasion
+
+Active when you have at least (N) different Elf pieces on board. (Multi
+    ~ Goblin:
+        formatted: - Species Perk: Nanobots
+
+Active when you have at least (N) different goblin piece
+    ~ God:
+        formatted: - Overweening superiority
+
+Active when you have at least (N) different pieces of t
+    ~ Harpy:
+        formatted: - Windfury
+
+Active when you have at least (N) different pieces of this species on 
+    ~ Human:
+        formatted: - Species Perk: Spark of Mind
+
+Active when you have at least (N) different human p
+    ~ Hunter:
+        formatted: - Hunter pieces always focus on attacking the lowest health enemy within attack ra
+    ~ Knight:
+        formatted: - Knight pieces who have nearby allies will gain a Divine Protection shield immedi
+    ~ Kobold:
+        formatted: - Divided we stand
+
+Active when you have at least (N) different Naga pieces on boa
+        notes: ['Due to the specialities of the species, Kobold will not benefit from Auto Comb -> ['Due to the specialities of the species, Kobold will not benefit from Auto Comb
+    ~ Mage:
+        description: 场For every standing friendly Mage on the chessboard, Mage pieces receive +10%% b -> For every standing friendly Mage on the chessboard, Mage pieces receive +10%% bo
+        description_html: 场For every standing friendly Mage on the chessboard, Mage pieces receive +10%% b -> For every standing friendly Mage on the chessboard, Mage pieces receive +10%% bo
+        formatted: - 场For every standing friendly Mage on the chessboard, Mage pieces receive +10% bo
+        notes: ['Freeze duration equals to magical damage/300 with a minimum of 0.5s.'] -> ['Freeze duration equals to magical damage/400 with a minimum of 0.5s.']
+    ~ Mech:
+        formatted: - Inventors arm themselves with the latest technology that allows them to receive 
+    ~ Monk:
+        formatted: - Drunken Stagger
+
+Active when you have at least (N) different Monk pieces on boar
+    ~ Naga:
+        description: Species Trait: Scale ArmorActive when you have at least (N) different Naga piece -> Species Trait: Scale ArmorActive when you have at least (N) different Naga piece
+        description_html: <h1>Species Trait: Scale Armor</h1><font color="#656585">Active when you have at -> <h1>Species Trait: Scale Armor</h1><font color="#656585">Active when you have at
+        formatted: - Scale Armor
+
+Active when you have at least (N) different Naga pieces on board. (
+    ~ Faceless:
+        formatted: - Whisper of Darkness
+
+Active when you have at least (N) different Faceless pieces
+    ~ Ogre:
+        formatted: - Iron Fist
+
+Active when you have at least (N) different pieces of this species on
+    ~ Orc:
+        formatted: - Battle Hardened
+
+Active when you have at least (N) different pieces of this spec
+    ~ Pandaren:
+        formatted: - Hospitality
+
+Active when you have at least (N) different pieces of this species 
+    ~ Priest:
+        formatted: - Priest Pieces are determined, and cannot be mind controlled.
+
+Salvation
+
+Active 
+    ~ Satyr:
+        formatted: - Fear
+
+Active when you have at least (N) different pieces on board. (Multiple eff
+    ~ Shaman:
+        formatted: - Shaman pieces spend 25% less mana when casting spells.
+
+Hex
+
+Active when you hav
+    ~ Tauren:
+        formatted: - Totem of the Clan
+
+Active when you have at least (N) different pieces of this sp
+    ~ Troll:
+        formatted: - Voodoo Frenzy
+
+Active when you have at least (N) different pieces of this specie
+    ~ Undead:
+        formatted: - Plague
+
+Active when you have at least (N) different Undead pieces on board. (Mul
+        notes: ['Base HP and bonus HP are both affected by the effect of the reduction in maxim -> ['Only Base HP is affected by the effect of the reduction in maximum HP.', 'Plag
+    ~ Warlock:
+        formatted: - Warlock pieces convert 25% of their health into 50% mana when a battle starts.
+
+
+    ~ Warrior:
+        formatted: - Warriors have a double bonus from Fortified Armor while below 50% health.
+
+Forti
+    ~ Wizard:
+        formatted: - Wizard chess pieces are never considered priority targets by enemies.
+
+Something
+
+  items_full.json — ADDED (3):
+    + Weighted Dice
+    + Defiant Shell
+    + Lucid Star
+
+  items_full.json — CHANGED:
+    ~ Ascetics Cap:
+        description: +25% magical resistance. A non-Undead carrier has a chance to be reborn into an  -> +25%% magical resistance. A non-Undead carrier has a chance to be reborn into an
+
+  relics.json — ADDED (3):
+    + Weighted Dice
+    + Defiant Shell
+    + Lucid Star
+
+  units_full.json — CHANGED:
+    ~ Ancient Apparition:
+        names.ru: + Ancient Apparition
+        stats.1_star.atk_rate: 1.7 -> 1.5
+        stats.2_star.atk_rate: 1.7 -> 1.5
+        stats.3_star.atk_rate: 1.7 -> 1.5
+    ~ Chaos Knight:
+        names.zh-tw: 混噸騎士 -> 混沌騎士
+    ~ Clinkz:
+        names.zh-tw: 骷髅弓箭手 -> 骷髏弓箭手
+    ~ Gyrocopter:
+        stats.1_star.atk: [75, 100] -> [65, 85]
+        stats.2_star.atk: [150, 200] -> [130, 170]
+        stats.3_star.atk: [300, 400] -> [260, 340]
+    ~ Huskar:
+        stats.1_star.atk_rate: 1.3 -> 1.1
+        stats.2_star.atk_rate: 1.3 -> 1.1
+        stats.3_star.atk_rate: 1.3 -> 1.1
+    ~ Luna:
+        stats.1_star.atk_rate: 1.3 -> 1.2
+        stats.2_star.atk_rate: 1.3 -> 1.2
+        stats.3_star.atk_rate: 1.3 -> 1.2
+    ~ Magnus:
+        names.zh-tw: 半人猛瑪 -> 半人猛獁
+    ~ Oracle:
+        names.zh-tw: 神谕者 -> 神諭者
+    ~ Vengeful Spirit:
+        names.zh-tw: 複仇之魂 -> 復仇之魂
+    ~ Zeus:
+        names.zh-tw: 衆神之王 -> 眾神之王
+
+  abilities.json: no previous file
+
+  talents.json: no previous file
+
+  game_mode.json: no previous file
+
+  units.json — CHANGED:
+    ~ Ancient Apparition:
+        names.ru: + Ancient Apparition
+    ~ Chaos Knight:
+        names.zh-tw: 混噸騎士 -> 混沌騎士
+    ~ Clinkz:
+        names.zh-tw: 骷髅弓箭手 -> 骷髏弓箭手
+    ~ Magnus:
+        names.zh-tw: 半人猛瑪 -> 半人猛獁
+    ~ Oracle:
+        names.zh-tw: 神谕者 -> 神諭者
+    ~ Vengeful Spirit:
+        names.zh-tw: 複仇之魂 -> 復仇之魂
+    ~ Zeus:
+        names.zh-tw: 衆神之王 -> 眾神之王

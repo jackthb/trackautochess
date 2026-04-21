@@ -31,7 +31,15 @@ _setup_tesseract()
 
 # ── Config & paths ────────────────────────────────────────────────────────────
 
-from utils import load_config, save_config, DAC_DIR, DATA_DIR, ICONS_DIR
+from utils import (
+    DAC_DIR,
+    DATA_DIR,
+    ICONS_DIR,
+    infer_aspect_ratio,
+    load_config,
+    load_regions_config,
+    save_config,
+)
 
 APP_NAME = "DAC Tracker"
 LOG_PATH = DAC_DIR / "tracker.log"
@@ -221,19 +229,38 @@ class HeadlessBackend:
             FINAL_RANKING_TEMPLATE, FINAL_RANKING_REGION,
             ROUND_START_TEMPLATE, ROUND_START_REGION,
         )
+        import screen_capture
+
+        regions_config = load_regions_config()
+        try:
+            monitor = screen_capture.monitors()[1]
+            ar_key = infer_aspect_ratio(monitor["width"], monitor["height"], list(regions_config.keys()))
+        except Exception:
+            ar_key = "16:9"
+
+        ar_data = regions_config.get(ar_key) or {}
+
+        def _search_region(screen_key: str, fallback: dict) -> dict:
+            region = (ar_data.get(screen_key) or {}).get("search_region") or []
+            if len(region) == 4:
+                return {"x0": region[0], "y0": region[1], "x1": region[2], "y1": region[3]}
+            return dict(fallback)
+
+        final_region = _search_region("sentinel_final_ranking", FINAL_RANKING_REGION)
+        round_region = _search_region("sentinel_round_start", ROUND_START_REGION)
 
         targets = [
             SentinelTarget(
                 name="final_ranking",
                 template_path=FINAL_RANKING_TEMPLATE,
-                search_region=FINAL_RANKING_REGION,
+                search_region=final_region,
                 on_match=self._on_game_end,
                 ref_height=47,  # template height at 1440p
             ),
             SentinelTarget(
                 name="round_start",
                 template_path=ROUND_START_TEMPLATE,
-                search_region=ROUND_START_REGION,
+                search_region=round_region,
                 on_match=self._on_round_start,
                 ref_height=134,  # template is 134px at 1440p
             ),
@@ -855,12 +882,16 @@ class HeadlessBackend:
                 target=self._do_debug_screenshot, args=(img_path,),
                 daemon=True, name="debug-screenshot",
             ).start()
-        elif cmd == "sentinel_test":
+        elif cmd == "debug_view":
             img_path = msg.get("path", "")
-            region = msg.get("region", {})
+            screen = msg.get("screen", "")
+            regions = msg.get("regions", {}) or {}
+            aspect_ratio = msg.get("aspect_ratio")
             threading.Thread(
-                target=self._do_sentinel_test, args=(img_path, region),
-                daemon=True, name="sentinel-test",
+                target=self._do_debug_view,
+                args=(img_path, screen, regions, aspect_ratio),
+                daemon=True,
+                name="debug-view",
             ).start()
         elif cmd == "quit":
             self._shutdown()
@@ -869,16 +900,44 @@ class HeadlessBackend:
 
     # ── Debug / Calibration ──────────────────────────────────────────────────
 
+    @staticmethod
+    def _img_b64(img, ext: str = ".jpg") -> str:
+        import cv2
+
+        if img is None or getattr(img, "size", 0) == 0:
+            return ""
+        params = [cv2.IMWRITE_JPEG_QUALITY, 88] if ext == ".jpg" else []
+        ok, buf = cv2.imencode(ext, img, params)
+        return base64.b64encode(buf).decode() if ok else ""
+
+    def _regions_to_crops(self, img, regions: dict) -> list[dict]:
+        h, w = img.shape[:2]
+        crops = []
+        for name, coords in (regions or {}).items():
+            if not isinstance(coords, list):
+                continue
+            if len(coords) >= 4:
+                x0, y0, x1, y1 = coords[:4]
+                crop = img[int(y0 * h):int(y1 * h), int(x0 * w):int(x1 * w)]
+            elif len(coords) == 2:
+                x0, x1 = coords
+                crop = img[:, int(x0 * w):int(x1 * w)]
+            else:
+                continue
+            crops.append({"name": name, "image": self._img_b64(crop), "coords": coords})
+        return crops
+
     def _do_debug_screenshot(self, img_path: str) -> None:
         try:
             import cv2
-            from cv_parser import detect_screen_type
+            from cv_parser import apply_calibration, detect_screen_type
 
             img = cv2.imread(img_path)
             if img is None:
                 self._emit({"type": "debug_result", "data": {"error": f"Cannot read {img_path}"}})
                 return
 
+            apply_calibration(img)
             h, w = img.shape[:2]
             screen_type = detect_screen_type(img)
             result = {"width": w, "height": h, "screen_type": screen_type, "rows": []}
@@ -925,47 +984,163 @@ class HeadlessBackend:
             log.exception("debug_screenshot error")
             self._emit({"type": "debug_result", "data": {"error": str(e)}})
 
-    def _do_sentinel_test(self, img_path: str, region: dict) -> None:
+    def _do_debug_view(
+        self,
+        img_path: str,
+        screen: str,
+        regions: dict,
+        aspect_ratio: str | None = None,
+    ) -> None:
         try:
             import cv2
-            import base64
+            from cv_parser import (
+                COL_LEVEL,
+                COL_PLAYER,
+                COL_RELIC,
+                COL_SYNERGY,
+                COL_WL,
+                MM_COL_LEVEL,
+                MM_COL_PLACEMENT,
+                MM_COL_RANK,
+                MM_COL_RELIC,
+                MM_COL_SYNERGY,
+                MM_COL_TIME,
+                MM_COL_UNITS,
+                MM_COL_WL,
+                _crop_row,
+                _find_my_matches_rows,
+                _parse_my_matches_row,
+                _row_y_extent,
+                _load_templates_multiscale,
+                apply_calibration,
+                parse_game_over_all,
+            )
+            from db import lookup_users_by_name
+            from utils import DATA_DIR, crop as _crop, unit_stem as _unit_stem
+            import json as _json
 
             img = cv2.imread(img_path)
             if img is None:
-                self._emit({"type": "sentinel_result", "data": {"error": f"Cannot read {img_path}"}})
+                self._emit({"type": "debug_result", "data": {"error": f"Cannot read {img_path}"}})
                 return
 
+            regions_config = load_regions_config()
+            if not aspect_ratio:
+                h, w = img.shape[:2]
+                aspect_ratio = infer_aspect_ratio(w, h, list(regions_config.keys()))
+            apply_calibration(img, aspect_ratio=aspect_ratio, regions_config=regions_config)
+
             h, w = img.shape[:2]
-            x0 = int(region.get("x0", 0) * w)
-            y0 = int(region.get("y0", 0) * h)
-            x1 = int(region.get("x1", 1) * w)
-            y1 = int(region.get("y1", 1) * h)
-            crop = img[y0:y1, x0:x1]
+            result = {
+                "width": w,
+                "height": h,
+                "screen_type": screen,
+                "aspect_ratio": aspect_ratio,
+                "region_crops": self._regions_to_crops(img, regions),
+            }
 
-            from utils import DATA_DIR
-            results = {}
-            for tpl_name in ["sentinel_ref_final_ranking.png", "sentinel_ref_round_start.png"]:
-                tpl_path = DATA_DIR / tpl_name
-                if not tpl_path.exists():
-                    continue
-                template = cv2.imread(str(tpl_path), cv2.IMREAD_GRAYSCALE)
-                crop_gray = cv2.cvtColor(crop, cv2.COLOR_BGR2GRAY)
-                th, tw = template.shape[:2]
-                ch, cw = crop_gray.shape[:2]
-                if tw > cw or th > ch:
-                    results[tpl_name] = {"score": 0, "error": "template larger than crop"}
-                    continue
-                match = cv2.matchTemplate(crop_gray, template, cv2.TM_CCOEFF_NORMED)
-                _, max_val, _, max_loc = cv2.minMaxLoc(match)
-                results[tpl_name] = {"score": round(float(max_val), 4), "location": list(max_loc)}
+            if screen == "game_over":
+                rows = parse_game_over_all(img, ICONS_DIR, debug=False) or []
+                name_map = lookup_users_by_name([r.get("player_name", "") for r in rows])
+                result["rows"] = []
+                for i, row in enumerate(rows):
+                    y0, y1 = _row_y_extent(i)
+                    row_out = dict(row)
+                    player_name = (row.get("player_name") or "").lower().strip()
+                    matched_user_id = name_map.get(player_name)
+                    row_out["db_match"] = bool(matched_user_id)
+                    row_out["matched_user_id"] = str(matched_user_id) if matched_user_id else ""
+                    row_out["row_image"] = self._img_b64(img[int(y0 * h):int(y1 * h), :])
+                    row_out["player_crop"] = self._img_b64(_crop_row(img, COL_PLAYER, y0, y1))
+                    row_out["level_crop"] = self._img_b64(_crop_row(img, COL_LEVEL, y0, y1))
+                    row_out["synergy_crop"] = self._img_b64(_crop_row(img, COL_SYNERGY, y0, y1))
+                    row_out["relic_crop"] = self._img_b64(_crop_row(img, COL_RELIC, y0, y1))
+                    row_out["wl_crop"] = self._img_b64(_crop_row(img, COL_WL, y0, y1))
+                    result["rows"].append(row_out)
 
-            ok, buf = cv2.imencode(".jpg", crop, [cv2.IMWRITE_JPEG_QUALITY, 85])
-            crop_b64 = base64.b64encode(buf).decode() if ok else ""
+            elif screen == "my_matches":
+                units_path = DATA_DIR / "units.json"
+                units_data = _json.loads(units_path.read_text())["units"] if units_path.exists() else {}
+                stem_to_name = {_unit_stem(name): name for name in units_data}
+                unit_templates = _load_templates_multiscale(
+                    ICONS_DIR / "units", [24, 28, 32, 36, 40, 44], inner_frac=0.85, color=True
+                )
+                relic_templates = _load_templates_multiscale(
+                    ICONS_DIR / "relics", [12, 14, 16, 20, 24, 28, 32, 40, 50, 60], inner_frac=1.0, color=True
+                )
+                syn_templates = _load_templates_multiscale(
+                    ICONS_DIR / "synergies", [20, 24, 28, 32]
+                )
+                parsed_rows = []
+                for i, (y0, y1) in enumerate(_find_my_matches_rows(img, debug=False)):
+                    row_data = _parse_my_matches_row(
+                        img, y0, y1,
+                        unit_templates, relic_templates, syn_templates, ICONS_DIR,
+                        units_data, stem_to_name,
+                        debug=False, row_idx=i,
+                    )
+                    rh = y1 - y0
+                    row_data["row_image"] = self._img_b64(img[int(y0 * h):int(y1 * h), :])
+                    row_data["placement_crop"] = self._img_b64(_crop(img, MM_COL_PLACEMENT[0], y0 + rh * 0.15, MM_COL_PLACEMENT[1], y0 + rh * 0.75))
+                    row_data["level_crop"] = self._img_b64(_crop(img, MM_COL_LEVEL[0], y0 + rh * 0.30, MM_COL_LEVEL[1], y0 + rh * 0.75))
+                    row_data["units_crop"] = self._img_b64(_crop(img, MM_COL_UNITS[0], y0, MM_COL_UNITS[1], y1))
+                    row_data["synergy_crop"] = self._img_b64(_crop_row(img, MM_COL_SYNERGY, y0, y1))
+                    row_data["relic_crop"] = self._img_b64(_crop(img, MM_COL_RELIC[0], y0, MM_COL_RELIC[1], y1))
+                    row_data["wl_crop"] = self._img_b64(_crop(img, MM_COL_WL[0], y0 + rh * 0.55, MM_COL_WL[1], y0 + rh * 0.95))
+                    row_data["rank_crop"] = self._img_b64(_crop(img, MM_COL_RANK[0], y0 + rh * 0.20, MM_COL_RANK[1], y0 + rh * 0.80))
+                    row_data["time_crop"] = self._img_b64(_crop(img, MM_COL_TIME[0], y0 + rh * 0.65, MM_COL_TIME[1], y1))
+                    parsed_rows.append(row_data)
+                result["rows"] = parsed_rows
 
-            self._emit({"type": "sentinel_result", "data": {"results": results, "crop": crop_b64}})
+            elif screen.startswith("sentinel_"):
+                self._emit({"type": "debug_result", "data": self._run_sentinel_debug(img, screen, regions, result)})
+                return
+
+            self._emit({"type": "debug_result", "data": result})
         except Exception as e:
-            log.exception("sentinel_test error")
-            self._emit({"type": "sentinel_result", "data": {"error": str(e)}})
+            log.exception("debug_view error")
+            self._emit({"type": "debug_result", "data": {"error": str(e)}})
+
+    def _run_sentinel_debug(self, img, screen: str, regions: dict, result: dict) -> dict:
+        import cv2
+
+        h, w = img.shape[:2]
+        search = (regions or {}).get("search_region") or []
+        if len(search) < 4:
+            return {"error": "No search_region defined"}
+
+        x0 = int(search[0] * w)
+        y0 = int(search[1] * h)
+        x1 = int(search[2] * w)
+        y1 = int(search[3] * h)
+        crop = img[y0:y1, x0:x1]
+
+        template_name = (
+            "sentinel_ref_final_ranking.png"
+            if screen == "sentinel_final_ranking"
+            else "sentinel_ref_round_start.png"
+        )
+        template = cv2.imread(str(DATA_DIR / template_name), cv2.IMREAD_GRAYSCALE)
+        crop_gray = cv2.cvtColor(crop, cv2.COLOR_BGR2GRAY)
+        if template is None:
+            return {"error": f"Template not found: {template_name}"}
+        th, tw = template.shape[:2]
+        ch, cw = crop_gray.shape[:2]
+        if tw > cw or th > ch:
+            return {"error": "Template larger than crop", "crop": self._img_b64(crop)}
+
+        match = cv2.matchTemplate(crop_gray, template, cv2.TM_CCOEFF_NORMED)
+        _, max_val, _, max_loc = cv2.minMaxLoc(match)
+        return {
+            **result,
+            "crop": self._img_b64(crop),
+            "results": {
+                template_name: {
+                    "score": round(float(max_val), 4),
+                    "location": list(max_loc),
+                }
+            },
+        }
 
     # ── Main loop ───────────────────────────────────────────────────────────
 

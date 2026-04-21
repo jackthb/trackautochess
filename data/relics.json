@@ -2,7 +2,7 @@
   "relics": {
     "item_upgrade_lootbox": {
       "name": "Weaponsmith",
-      "description": "You gain +1 to the level of loot tokens you get for recasting equipment. After recasting 2 pieces of Spoil tokens, the weapon smith will disappear.",
+      "description": "You gain +1 to the level of loot tokens you get for recasting equipment.\n After recasting 2 pieces of Spoil tokens, the weapon smith will disappear.",
       "lore": "From Relicbox"
     },
     "item_streak_plus": {
@@ -27,7 +27,7 @@
     },
     "item_egg": {
       "name": "Greevil Egg",
-      "description": "Relic Consumable: Click to Use Put a piece into an egg which has a chance to grow once every round. You can break it anytime, hatching a piece according to the points.",
+      "description": "Relic Consumable: Click to Use\n Put a piece into an egg which has a chance to grow once every round. You can break it anytime, hatching a piece according to the points.",
       "lore": "From Relic Box"
     },
     "item_bench_contract": {
@@ -37,7 +37,7 @@
     },
     "item_mangotree": {
       "name": "Mango Tree",
-      "description": "Plants a Mango Tree by the side of your Chessboard.Drops an Enchanted Mango whenever your home battle result differs from the last round. The tree wilts after 8 drops. A Golden Mango will be dropped if the mango tree is still alive at Relic expiration.",
+      "description": "Plants a Mango Tree by the side of your Chessboard.\nDrops an Enchanted Mango whenever your home battle result differs from the last round. The tree wilts after 8 drops. A Golden Mango will be dropped if the mango tree is still alive at Relic expiration.",
       "lore": "From Relicbox"
     },
     "item_more_creep": {
@@ -52,7 +52,7 @@
     },
     "item_rm_wheel_of_wonder": {
       "name": "Wheel of Wonder",
-      "description": "Relic Consumable: Click to UseChoose an ally piece and put it into the wheel of wonder, DISCOVER a special version of it with an extra random synergy.",
+      "description": "Relic Consumable: Click to Use\nChoose an ally piece and put it into the wheel of wonder, DISCOVER a special version of it with an extra random synergy.",
       "lore": "From: Relicbox"
     },
     "item_both_leaves": {
@@ -67,13 +67,28 @@
     },
     "item_double_coin": {
       "name": "Doubloon",
-      "description": "Relic Consumable: Click to UseTransfer 20% of the higher one of your Health and Mana into another. Can be used twice",
+      "description": "Relic Consumable: Click to Use\nTransfer 20% of the higher one of your Health and Mana into another. Can be used twice",
       "lore": "From: Relicbox"
     },
     "item_repeat_relic": {
       "name": "Time-Space Replica",
       "description": "Replicate your last relic.",
       "lore": "From: Relicbox"
+    },
+    "item_free_draw": {
+      "name": "Weighted Dice",
+      "description": "Refund 1~2 random Gold if you fail to recruit any owned chess piece.",
+      "lore": ""
+    },
+    "item_super_uprank": {
+      "name": "Lucid Star",
+      "description": "There is a 20% chance to directly obtain a ★★ piece on purchase if you already owned one.",
+      "lore": ""
+    },
+    "item_rank_damage": {
+      "name": "Defiant Shell",
+      "description": "Reduces damage taken from home defeats or increases damage dealt in away-home victories by 1~10 based on your courier's lost health",
+      "lore": ""
     },
     "item_stolen_vault": {
       "name": "Stolen Vault",

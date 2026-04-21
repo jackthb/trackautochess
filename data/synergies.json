@@ -1,7 +1,7 @@
 {
   "is_aqir": {
     "name": "Aqir",
-    "description": "Species Trait: InfectionActive when there are at least (N) different Aqir chess pieces on the chessboard. (Multiple effects stack)(2) Aqirs: Grants all non-Aqir allies: Upon death, if there is any Infected friendly piece of the same name on the chessboard, immediately hatches a random Aqir piece.(4) Aqirs: Rank 1 effect now also applies to all friendly Aqir pieces , and will hatch a random higher-level Aqir piece.",
+    "description": "Species Trait: Infection\n\nActive when there are at least (N) different Aqir chess pieces on the chessboard. (Multiple effects stack)\n\n(2) Aqirs: Grants all non-Aqir allies: Upon death, if there is any Infected friendly piece of the same name on the chessboard, immediately hatches a random Aqir piece.\n(4) Aqirs: Rank 1 effect now also applies to all friendly Aqir pieces, and will hatch a random higher-level Aqir piece.",
     "description_html": "<h1>Species Trait: Infection</h1><font color=\"#656585\">Active when there are at least (N) different Aqir chess pieces on the chessboard. (Multiple effects stack)</font><br><br>(2) Aqirs: Grants all non-Aqir allies: Upon death, if there is any Infected friendly piece of the same name on the chessboard, immediately hatches a random Aqir piece.<br>(4) Aqirs: Rank 1 effect now also applies to all friendly Aqir pieces , and will hatch a random higher-level Aqir piece.",
     "lore": "From time to time, the Aqirs dwelled on and beneath the ancient land of Drodo Island. Though most of their powers are sealed by the holy Gods, remained powers from the insanity within the Aqir blood draws their insectoid instinct to reside on the flesh of other creatures.",
     "notes": [
@@ -12,13 +12,12 @@
       2,
       4
     ],
-    "ability_special": {},
-    "formatted": "Infection\n\nActive when there are at least (N) different Aqir chess pieces on the chessboard.\n\n(Multiple effects stack)\n(2) Aqirs: Grants all non-Aqir allies: Upon death, if there is any Infected friendly piece of the same name on the chessboard, immediately hatches a random Aqir piece.\n(4) Aqirs: Rank 1 effect now also applies to all friendly Aqir pieces , and will hatch a random higher-level Aqir piece."
+    "ability_special": {}
   },
   "is_assassin": {
     "name": "Assassin",
-    "description": "The first movement of Assassin pieces in each round causes Assassins to leap over to the back of the enemy lineup. The first blow after Backstab Leap is always a critical strike with a random bonus damage amplifier.\nClass Perk: Coup de GraceActive when you have at least (N) different Assassin pieces on board. (Multiple effects stack)(3) Assassins: All friendly assassins have 15%% chance to critical hit for 300%% damage.(6) Assassins: All assassins have 15%% chance to critical hit for 400%% damage.(9) Assassins: All assassins gain a Backstab Leap move after killing an enemy. This Backstab Leap always deals the maximum possible critical damage.",
-    "description_html": "The first movement of Assassin pieces in each round causes Assassins to leap over to the back of the enemy lineup. The first blow after Backstab Leap is always a critical strike with a random bonus damage amplifier.\n<h1>Class Perk: Coup de Grace</h1><font color=\"#656585\">Active when you have at least (N) different Assassin pieces on board. (Multiple effects stack)</font><br><br>(3) Assassins: All friendly assassins have 15%% chance to critical hit for 300%% damage.<br>(6) Assassins: All assassins have 15%% chance to critical hit for 400%% damage.<br>(9) Assassins: All assassins gain a Backstab Leap move after killing an enemy. This Backstab Leap always deals the maximum possible critical damage.",
+    "description": "The first movement of Assassin pieces in each round causes Assassins to leap over to the back of the enemy lineup. The first blow after Backstab Leap is always a critical strike with a random bonus damage amplifier.\n\nClass Perk: Coup de Grace\n\nActive when you have at least (N) different Assassin pieces on board. (Multiple effects stack)\n\n(3) Assassins: All friendly assassins have 15% chance to critical hit for 300% damage.\n(6) Assassins: All assassins have 15% chance to critical hit for 400% damage.\n(9) Assassins: All assassins refresh a Backstab Leap move after killing an enemy or a certain duration. This Backstab Leap always deals the maximum possible critical damage.",
+    "description_html": "The first movement of Assassin pieces in each round causes Assassins to leap over to the back of the enemy lineup. The first blow after Backstab Leap is always a critical strike with a random bonus damage amplifier.\n<h1>Class Perk: Coup de Grace</h1><font color=\"#656585\">Active when you have at least (N) different Assassin pieces on board. (Multiple effects stack)</font><br><br>(3) Assassins: All friendly assassins have 15% chance to critical hit for 300% damage.<br>(6) Assassins: All assassins have 15% chance to critical hit for 400% damage.<br>(9) Assassins: All assassins refresh a Backstab Leap move after killing an enemy or a certain duration. This Backstab Leap always deals the maximum possible critical damage.",
     "lore": "Assassins are skilled executioners that leap into enemy backlines. Together, they gain a keen eye for weaknesses in enemy armor, gaining the ability to deliver devastating critical hits.",
     "notes": [],
     "tiers": [
@@ -26,13 +25,12 @@
       6,
       9
     ],
-    "ability_special": {},
-    "formatted": "The first movement of Assassin pieces in each round causes Assassins to leap over to the back of the enemy lineup. The first blow after Backstab Leap is always a critical strike with a random bonus damage amplifier.\n\nCoup de Grace\n\nActive when you have at least (N) different Assassin pieces on board. (Multiple effects stack)\n\n(3) Assassins: All friendly assassins have 15% chance to critical hit for 300% damage.\n(6) Assassins: All assassins have 15% chance to critical hit for 400% damage.\n(9) Assassins: All assassins gain a Backstab Leap move after killing an enemy. This Backstab Leap always deals the maximum possible critical damage."
+    "ability_special": {}
   },
   "is_beast": {
     "name": "Beast",
-    "description": "Species Trait: Power of the WildActive when you have at least (N) different Beast pieces on board. (Multiple effects stack)(2) Beasts: All allies have +10%% attack damage, including summoned units.(4) Beasts: All allies have +25%% attack damage, including summoned units.(6) Beasts: Attacks from all allies increase physical damage taken by the target by 10%%. This effect stacks up to a maximum of 10 and can be applied by friendly summoned units.",
-    "description_html": "<h1>Species Trait: Power of the Wild</h1><font color=\"#656585\">Active when you have at least (N) different Beast pieces on board. (Multiple effects stack)</font><br><br>(2) Beasts: All allies have +10%% attack damage, including summoned units.<br>(4) Beasts: All allies have +25%% attack damage, including summoned units.<br>(6) Beasts: Attacks from all allies increase physical damage taken by the target by 10%%. This effect stacks up to a maximum of 10 and can be applied by friendly summoned units.",
+    "description": "Species Trait: Power of the Wild\n\nActive when you have at least (N) different Beast pieces on board. (Multiple effects stack)\n\n(2) Beasts: All allies have +10% attack damage, including summoned units.\n(4) Beasts: All allies have +25% attack damage, including summoned units.\n(6) Beasts: Attacks from all allies increase physical damage taken by the target by 10%. This effect stacks up to a maximum of 10 and can be applied by friendly summoned units.",
+    "description_html": "<h1>Species Trait: Power of the Wild</h1><font color=\"#656585\">Active when you have at least (N) different Beast pieces on board. (Multiple effects stack)</font><br><br>(2) Beasts: All allies have +10% attack damage, including summoned units.<br>(4) Beasts: All allies have +25% attack damage, including summoned units.<br>(6) Beasts: Attacks from all allies increase physical damage taken by the target by 10%. This effect stacks up to a maximum of 10 and can be applied by friendly summoned units.",
     "lore": "Beasts have superhuman strength, stamina and speed, and are good at group predation.",
     "notes": [],
     "tiers": [
@@ -40,12 +38,11 @@
       4,
       6
     ],
-    "ability_special": {},
-    "formatted": "Power of the Wild\n\nActive when you have at least (N) different Beast pieces on board. (Multiple effects stack)\n\n(2) Beasts: All allies have +10% attack damage, including summoned units.\n(4) Beasts: All allies have +25% attack damage, including summoned units.\n(6) Beasts: Attacks from all allies increase physical damage taken by the target by 10%. This effect stacks up to a maximum of 10 and can be applied by friendly summoned units."
+    "ability_special": {}
   },
   "is_centaur": {
     "name": "Centaur",
-    "description": "SPECIES TRAIT: StampedeActive when you have at least (N) different pieces of this species on board. (Multiple effects stack).(2)Centaurs: All friendly Centaurs gain the effect: when starting a battle, immediately charge to the target grid with the most enemy pieces around, and stun the enemy pieces on the path.(4)Centaurs:  Every move of all melee-friendly pieces is a Stampede.",
+    "description": "SPECIES TRAIT: Stampede\n\nActive when you have at least (N) different pieces of this species on board. (Multiple effects stack).\n\n(2)Centaurs: All friendly Centaurs gain the effect: when starting a battle, immediately charge to the target grid with the most enemy pieces around, and stun the enemy pieces on the path.\n(4)Centaurs: Every move of all melee-friendly pieces is a Stampede.",
     "description_html": "<h1>SPECIES TRAIT: Stampede</h1><font color=\"#656585\">Active when you have at least (N) different pieces of this species on board. (Multiple effects stack).</font><br><br>(2)Centaurs: All friendly Centaurs gain the effect: when starting a battle, immediately charge to the target grid with the most enemy pieces around, and stun the enemy pieces on the path.<br>(4)Centaurs:  Every move of all melee-friendly pieces is a Stampede.",
     "lore": "Centaurs are of noble blood, they are given birth by Half-god’s elder son Zaetar and only daughter of Princess Theradras. Cruelty and fierceness fill their blood, generation by generation.",
     "notes": [
@@ -55,24 +52,22 @@
       2,
       4
     ],
-    "ability_special": {},
-    "formatted": "Stampede\n\nActive when you have at least (N) different pieces of this species on board. (Multiple effects stack).\n\n(2)Centaurs: All friendly Centaurs gain the effect: when starting a battle, immediately charge to the target grid with the most enemy pieces around, and stun the enemy pieces on the path.\n(4)Centaurs:  Every move of all melee-friendly pieces is a Stampede."
+    "ability_special": {}
   },
   "is_demon": {
     "name": "Demon",
-    "description": "SPECIES TRAIT: Fel PowerActive when you control only 1 type of Demon on the chessboard.(1) Demon: Normal attack damage caused by allied demon chess pieces is settled as pure damage. Fel Powers damage is increased by 15%,with a maximum stack count of 7.",
+    "description": "SPECIES TRAIT: Fel Power\n\nActive when you control only 1 type of Demon on the chessboard.\n\n(1) Demon: Normal attack damage caused by allied demon chess pieces is settled as pure damage. Fel Powers damage is increased by 15%,with a maximum stack count of 7.",
     "description_html": "<h1>SPECIES TRAIT: Fel Power</h1><font color=\"#656585\">Active when you control only 1 type of Demon on the chessboard.</font><br><br>(1) Demon: Normal attack damage caused by allied demon chess pieces is settled as pure damage. Fel Powers damage is increased by 15%,with a maximum stack count of 7.",
     "lore": "Chaotic beings that emerged from a dimensional fissure.",
     "notes": [],
     "tiers": [
       1
     ],
-    "ability_special": {},
-    "formatted": "Fel Power\n\nActive when you control only 1 type of Demon on the chessboard.\n\n(1) Demon: Normal attack damage caused by allied demon chess pieces is settled as pure damage. Fel Powers damage is increased by 15%,with a maximum stack count of 7."
+    "ability_special": {}
   },
   "is_demonhunter": {
     "name": "Demon Hunter",
-    "description": "Counts as a different enemy Demon type.\nCLASS PERK: Shuttered SoulActive when you have at least (N) different Demon Hunter pieces on board. (Multiple effects stack)(2) Demon Hunters: All friendly demons are considered the same type.(4) Demon Hunters: All damage dealt is settled as Pure Damage.",
+    "description": "Counts as a different enemy Demon type.\n\nCLASS PERK: Shuttered Soul\n\nActive when you have at least (N) different Demon Hunter pieces on board. (Multiple effects stack)\n(2) Demon Hunters: All friendly demons are considered the same type.\n(4) Demon Hunters: All damage dealt is settled as Pure Damage.",
     "description_html": "Counts as a different enemy Demon type.\n<h1>CLASS PERK: Shuttered Soul</h1><font color=\"#656585\">Active when you have at least (N) different Demon Hunter pieces on board. (Multiple effects stack)</font><br>(2) Demon Hunters: All friendly demons are considered the same type.<br>(4) Demon Hunters: All damage dealt is settled as Pure Damage.",
     "lore": "Demon hunters ritually trade their normal form in exchange for the mastery of demonic powers that enables them to deliver devastating strikes to their prey. This enhanced strength, together with their great agility and magical prowess, makes demon hunters unsuppressible.",
     "notes": [],
@@ -80,12 +75,11 @@
       2,
       4
     ],
-    "ability_special": {},
-    "formatted": "Counts as a different enemy Demon type.\n\nShuttered Soul\n\nActive when you have at least (N) different Demon Hunter pieces on board. (Multiple effects stack)\n\n(2) Demon Hunters: All friendly demons are considered the same type.\n(4) Demon Hunters: All damage dealt is settled as Pure Damage."
+    "ability_special": {}
   },
   "is_draenei": {
     "name": "Draenei",
-    "description": "SPECIES TRAIT: Blessing of the NaaruActive when you have at least (N) different pieces of this species on board. (Multiple effects stack)(2) Draeneis: All friendly Draenei gain the effect: Every 4 seconds, steal 50+2% max health from the nearest enemy chess piece to heal themselves.(4) Draeneis: All friendly pieces gain effects: Whenever a cumulative total of more than 100 points of healing is taken it is split (cumulative healing) points of pure damage among the surrounding enemies.",
+    "description": "SPECIES TRAIT: Blessing of the Naaru\n\nActive when you have at least (N) different pieces of this species on board. (Multiple effects stack)\n\n(2) Draeneis: All friendly Draenei gain the effect: Every 4 seconds, steal 50+2% max health from the nearest enemy chess piece to heal themselves.\n(4) Draeneis: All friendly pieces gain effects: Whenever a cumulative total of more than 100 points of healing is taken it is split (cumulative healing) points of pure damage among the surrounding enemies.",
     "description_html": "<h1>SPECIES TRAIT: Blessing of the Naaru</h1><font color=\"#656585\">Active when you have at least (N) different pieces of this species on board. (Multiple effects stack)</font><br><br>(2) Draeneis: All friendly Draenei gain the effect: Every 4 seconds, steal 50+2% max health from the nearest enemy chess piece to heal themselves.<br>(4) Draeneis: All friendly pieces gain effects: Whenever a cumulative total of more than 100 points of healing is taken it is split (cumulative healing) points of pure damage among the surrounding enemies.",
     "lore": "To evade the Burning Legions clutches, a congregation led by the Farseer fled their homelands, faithful to the Naaru and the Holy Light. They named themselves Draenei, the Exiled Ones.",
     "notes": [
@@ -96,12 +90,11 @@
       2,
       4
     ],
-    "ability_special": {},
-    "formatted": "Blessing of the Naaru\n\nActive when you have at least (N) different pieces of this species on board. (Multiple effects stack)\n\n(2) Draeneis: All friendly Draenei gain the effect: Every 4 seconds, steal 50+2% max health from the nearest enemy chess piece to heal themselves.\n(4) Draeneis: All friendly pieces gain effects: Whenever a cumulative total of more than 100 points of healing is taken it is split (cumulative healing) points of pure damage among the surrounding enemies."
+    "ability_special": {}
   },
   "is_dragon": {
     "name": "Dragon",
-    "description": "Species Trait:  AttunementActive when you have at least (N) different pieces of this species on board. (Multiple effects stack).(3) Dragons: All friendly Dragons have an initial mana value of 100.(5) Dragons: All allies have an initial mana value of 100.",
+    "description": "Species Trait: Attunement\n\nActive when you have at least (N) different pieces of this species on board. (Multiple effects stack).\n\n(3) Dragons: All friendly Dragons have an initial mana value of 100.\n(5) Dragons: All allies have an initial mana value of 100.",
     "description_html": "<h1>Species Trait:  Attunement</h1><font color=\"#656585\">Active when you have at least (N) different pieces of this species on board. (Multiple effects stack).</font><br><br>(3) Dragons: All friendly Dragons have an initial mana value of 100.<br>(5) Dragons: All allies have an initial mana value of 100.",
     "lore": "Dragons were among the first creatures to exist on this ancient land. They possess unimaginable powers, deep within, which they like to show off when they commune together.",
     "notes": [],
@@ -109,12 +102,11 @@
       3,
       5
     ],
-    "ability_special": {},
-    "formatted": "Attunement\n\nActive when you have at least (N) different pieces of this species on board. (Multiple effects stack).\n\n(3) Dragons: All friendly Dragons have an initial mana value of 100.\n(5) Dragons: All allies have an initial mana value of 100."
+    "ability_special": {}
   },
   "is_druid": {
     "name": "Druid",
-    "description": "Druid pieces will not be destroyed on a ★★★ piece combined.\nCLASS PERK: SynergyActive when you have at least (N) different pieces of this class on board. (Multiple effects stack)(2) Druids: Two identical Druid★ can promote to a Druid★★.(4) Druids: Two identical Druid★★ can promote to a Druid★★★.(6) Druids: Two identical Druid★★★ can promote to the great Altar of Spirits♥♥♥, and gain several(equal to the level of Druid★★★) stack of Altar Power, and destroy all Druid pieces in the chess pool.",
+    "description": "Druid pieces will not be destroyed on a ★★★ piece combined.\n\nCLASS PERK: Synergy\n\nActive when you have at least (N) different pieces of this class on board. (Multiple effects stack)\n\n(2) Druids: Two identical Druid★ can promote to a Druid★★.\n(4) Druids: Two identical Druid★★ can promote to a Druid★★★.\n(6) Druids: Two identical Druid★★★ can promote to the great Altar of Spirits♥♥♥, and gain several(equal to the level of Druid★★★) stack of Altar Power, and destroy all Druid pieces in the chess pool.",
     "description_html": "Druid pieces will not be destroyed on a ★★★ piece combined.\n<h1>CLASS PERK: Synergy</h1><font color=\"#656585\">Active when you have at least (N) different pieces of this class on board. (Multiple effects stack)</font><br><br>(2) Druids: Two identical Druid★ can promote to a Druid★★.<br>(4) Druids: Two identical Druid★★ can promote to a Druid★★★.<br>(6) Druids: Two identical Druid★★★ can promote to the great Altar of Spirits♥♥♥, and gain several(equal to the level of Druid★★★) stack of Altar Power, and destroy all Druid pieces in the chess pool.",
     "lore": "Druids can control great power of Nature to protect spirits and balance.",
     "notes": [
@@ -126,25 +118,23 @@
       4,
       6
     ],
-    "ability_special": {},
-    "formatted": "Druid pieces will not be destroyed on a ★★★ piece combined.\n\nSynergy\n\nActive when you have at least (N) different pieces of this class on board. (Multiple effects stack)\n\n(2) Druids: Two identical Druid★ can promote to a Druid★★.\n(4) Druids: Two identical Druid★★ can promote to a Druid★★★.\n(6) Druids: Two identical Druid★★★ can promote to the great Altar of Spirits♥♥♥, and gain several(equal to the level of Druid★★★) stack of Altar Power, and destroy all Druid pieces in the chess pool."
+    "ability_special": {}
   },
   "is_dwarf": {
     "name": "Dwarf",
-    "description": "Species Trait: Take AimActive when you have at least (N) different Dwarf pieces on board. (Multiple effects stack)(2) Dwarves: All dwarves’ attack range +200, physical damage deals 15%% increased damage for every 1 square away from the target.",
-    "description_html": "<h1>Species Trait: Take Aim</h1><font color=\"#656585\">Active when you have at least (N) different Dwarf pieces on board. (Multiple effects stack)</font><br><br>(2) Dwarves: All dwarves’ attack range +200, physical damage deals 15%% increased damage for every 1 square away from the target.",
+    "description": "Species Trait: Take Aim\n\nActive when you have at least (N) different Dwarf pieces on board. (Multiple effects stack)\n\n(2) Dwarves: All dwarves’ attack range +200, physical damage deals 15% increased damage for every 1 square away from the target.",
+    "description_html": "<h1>Species Trait: Take Aim</h1><font color=\"#656585\">Active when you have at least (N) different Dwarf pieces on board. (Multiple effects stack)</font><br><br>(2) Dwarves: All dwarves’ attack range +200, physical damage deals 15% increased damage for every 1 square away from the target.",
     "lore": "Dwarves are a bold and courageous species of humanoids that excel in creating and refining weapons and gadgets, allowing them to slay their foes from afar.",
     "notes": [],
     "tiers": [
       2
     ],
-    "ability_special": {},
-    "formatted": "Take Aim\n\nActive when you have at least (N) different Dwarf pieces on board. (Multiple effects stack)\n\n(2) Dwarves: All dwarves’ attack range +200, physical damage deals 15% increased damage for every 1 square away from the target."
+    "ability_special": {}
   },
   "is_element": {
     "name": "Elemental",
-    "description": "Elemental EssenceActive when you have at least (N) different Element pieces on board. (Multiple effects stack)(2) Elements: All friendly elementals have +15%% chance to turn melee aggressors into stone for 3 sec.(4) Elements: All allies have +15%% chance to turn melee and ranged aggressors into stone for 3 sec.(6) Elements: Aggressors are stoned for 1 sec longer and take +100% damage.",
-    "description_html": "<h1>Elemental Essence</h1><font color=\"#656585\">Active when you have at least (N) different Element pieces on board. (Multiple effects stack)</font><br><br>(2) Elements: All friendly elementals have +15%% chance to turn melee aggressors into stone for 3 sec.<br>(4) Elements: All allies have +15%% chance to turn melee and ranged aggressors into stone for 3 sec.<br>(6) Elements: Aggressors are stoned for 1 sec longer and take +100% damage.",
+    "description": "Elemental Essence\n\nActive when you have at least (N) different Element pieces on board. (Multiple effects stack)\n\n(2) Elements: All friendly elementals have +15% chance to turn melee aggressors into stone for 3 sec.\n(4) Elements: All allies have +15% chance to turn melee and ranged aggressors into stone for 3 sec.\n(6) Elements: Aggressors are stoned for 1 sec longer and take +100% damage.",
+    "description_html": "<h1>Elemental Essence</h1><font color=\"#656585\">Active when you have at least (N) different Element pieces on board. (Multiple effects stack)</font><br><br>(2) Elements: All friendly elementals have +15% chance to turn melee aggressors into stone for 3 sec.<br>(4) Elements: All allies have +15% chance to turn melee and ranged aggressors into stone for 3 sec.<br>(6) Elements: Aggressors are stoned for 1 sec longer and take +100% damage.",
     "lore": "Elementals are unstable beings that radiate mysterious energy when attacked. This gives them a chance to turn their melee aggressors to stone.",
     "notes": [],
     "tiers": [
@@ -152,13 +142,12 @@
       4,
       6
     ],
-    "ability_special": {},
-    "formatted": "Elemental Essence\n\nActive when you have at least (N) different Element pieces on board. (Multiple effects stack)\n\n(2) Elements: All friendly elementals have +15% chance to turn melee aggressors into stone for 3 sec.\n(4) Elements: All allies have +15% chance to turn melee and ranged aggressors into stone for 3 sec.\n(6) Elements: Aggressors are stoned for 1 sec longer and take +100% damage."
+    "ability_special": {}
   },
   "is_elf": {
     "name": "Elf",
-    "description": "Species Trait: EvasionActive when you have at least (N) different Elf pieces on board. (Multiple effects stack)(3) Elves: All friendly elves have +25%% evasion.(6) Elves: All friendly elves have +40%% evasion.(9) Elves: Friendly elves gain the effect: Dodging any attack will conceal itself for 1 second and create a mirrored attack from the attacker, targeting the enemy.",
-    "description_html": "<h1>Species Trait: Evasion</h1><font color=\"#656585\">Active when you have at least (N) different Elf pieces on board. (Multiple effects stack)</font><br><br>(3) Elves: All friendly elves have +25%% evasion.<br>(6) Elves: All friendly elves have +40%% evasion.<br>(9) Elves: Friendly elves gain the effect: Dodging any attack will conceal itself for 1 second and create a mirrored attack from the attacker, targeting the enemy.",
+    "description": "Species Trait: Evasion\n\nActive when you have at least (N) different Elf pieces on board. (Multiple effects stack)\n\n(3) Elves: All friendly elves have +25% evasion.\n(6) Elves: All friendly elves have +40% evasion.\n(9) Elves: Friendly elves gain the effect: Dodging any attack will conceal itself for 1 second and create a mirrored attack from the attacker, targeting the enemy.",
+    "description_html": "<h1>Species Trait: Evasion</h1><font color=\"#656585\">Active when you have at least (N) different Elf pieces on board. (Multiple effects stack)</font><br><br>(3) Elves: All friendly elves have +25% evasion.<br>(6) Elves: All friendly elves have +40% evasion.<br>(9) Elves: Friendly elves gain the effect: Dodging any attack will conceal itself for 1 second and create a mirrored attack from the attacker, targeting the enemy.",
     "lore": "Nimble Elves who live on the crown of the World Tree are one of the most important primal protectors of Drodo Island. Their belief in the Goddess of the Moon and natural harmony has profoundly affected their lifestyle.",
     "notes": [],
     "tiers": [
@@ -166,12 +155,11 @@
       6,
       9
     ],
-    "ability_special": {},
-    "formatted": "Evasion\n\nActive when you have at least (N) different Elf pieces on board. (Multiple effects stack)\n\n(3) Elves: All friendly elves have +25% evasion.\n(6) Elves: All friendly elves have +40% evasion.\n(9) Elves: Friendly elves gain the effect: Dodging any attack will conceal itself for 1 second and create a mirrored attack from the attacker, targeting the enemy."
+    "ability_special": {}
   },
   "is_goblin": {
     "name": "Goblin",
-    "description": "Species Perk: NanobotsActive when you have at least (N) different goblin pieces on board. (Multiple effects stack) (3)Goblins: Grants a random melee ally +10 armour and +20 health regeneration.(6)Goblins: Grants all allies+10 armor and +20 health regeneration.",
+    "description": "Species Perk: Nanobots\n\nActive when you have at least (N) different goblin pieces on board. (Multiple effects stack) \n\n(3)Goblins: Grants a random melee ally +10 armour and +20 health regeneration.\n(6)Goblins: Grants all allies +10 armor and +20 health regeneration.",
     "description_html": "<h1>Species Perk: Nanobots</h1><font color=\"#656585\">Active when you have at least (N) different goblin pieces on board. (Multiple effects stack) </font><br><br>(3)Goblins: Grants a random melee ally +10 armour and +20 health regeneration.<br>(6)Goblins: Grants all allies+10 armor and +20 health regeneration.",
     "lore": "Goblins are a cunning species with a love for money, explosives, and less-than-reliable technology. Their drive to invent fuels them, giving the brightest among them a boost in stamina and fortitude.",
     "notes": [],
@@ -179,13 +167,12 @@
       3,
       6
     ],
-    "ability_special": {},
-    "formatted": "Species Perk: Nanobots\n\nActive when you have at least (N) different goblin pieces on board. (Multiple effects stack)\n\n(3)Goblins: Grants a random melee ally +10 armour and +20 health regeneration.\n(6)Goblins: Grants all allies+10 armor and +20 health regeneration."
+    "ability_special": {}
   },
   "is_god": {
     "name": "God",
-    "description": "SPECIES TRAIT: Overweening superiorityActive when you have at least (N) different pieces of this species on board. (Multiple effects stack)(2)Gods: All allies get the effect: skill cooldown time -30%%.(4)Gods: All allies get the effect: skill cooldown time -30%%.(6) Gods: All allies get the effect: Using skills that consume mana  will reduce the current remaining cooldown time of active abilities and items by 60%%.",
-    "description_html": "<h1>SPECIES TRAIT: Overweening superiority</h1><font color=\"#656585\">Active when you have at least (N) different pieces of this species on board. (Multiple effects stack)</font><br><br>(2)Gods: All allies get the effect: skill cooldown time -30%%.<br>(4)Gods: All allies get the effect: skill cooldown time -30%%.<br>(6) Gods: All allies get the effect: Using skills that consume mana  will reduce the current remaining cooldown time of active abilities and items by 60%%.",
+    "description": "SPECIES TRAIT: Overweening superiority\n\nActive when you have at least (N) different pieces of this species on board. (Multiple effects stack)\n\n(2)Gods: All allies get the effect: skill cooldown time -30%.\n(4)Gods: All allies get the effect: skill cooldown time -30%.\n(6) Gods: All allies get the effect: Using skills that consume mana will reduce the current remaining cooldown time of active abilities and items by 60%.",
+    "description_html": "<h1>SPECIES TRAIT: Overweening superiority</h1><font color=\"#656585\">Active when you have at least (N) different pieces of this species on board. (Multiple effects stack)</font><br><br>(2)Gods: All allies get the effect: skill cooldown time -30%.<br>(4)Gods: All allies get the effect: skill cooldown time -30%.<br>(6) Gods: All allies get the effect: Using skills that consume mana  will reduce the current remaining cooldown time of active abilities and items by 60%.",
     "lore": "The highly worshipped Gods are considered as the creators of Drodo Island. Being both arrogant and prideful, the loyal beliefs from their creations have forged the supreme powers that Gods possess, granting them the most significant potential among all creatures which can completely change the outcome of a battle.",
     "notes": [
       "Overweening superiority does not reduce the cooldown time of passive items."
@@ -195,12 +182,11 @@
       4,
       6
     ],
-    "ability_special": {},
-    "formatted": "Overweening superiority\n\nActive when you have at least (N) different pieces of this species on board. (Multiple effects stack)\n\n(2)Gods: All allies get the effect: skill cooldown time -30%.\n(4)Gods: All allies get the effect: skill cooldown time -30%.\n(6) Gods: All allies get the effect: Using skills that consume mana  will reduce the current remaining cooldown time of active abilities and items by 60%."
+    "ability_special": {}
   },
   "is_harpy": {
     "name": "Harpy",
-    "description": "Species Trait: WindfuryActive when you have at least (N) different pieces of this species on board. (Multiple effects stack).(2) Harpies: All allies gain the effect - Targeted spells +1 additional targets.(4) Harpies: All allies gain the effect - Targeted spells +1 additional targets.",
+    "description": "Species Trait: Windfury\n\nActive when you have at least (N) different pieces of this species on board. (Multiple effects stack).\n\n(2) Harpies: All allies gain the effect - Targeted spells +1 additional targets.\n(4) Harpies: All allies gain the effect - Targeted spells +1 additional targets.",
     "description_html": "<h1>Species Trait: Windfury</h1><font color=\"#656585\">Active when you have at least (N) different pieces of this species on board. (Multiple effects stack).</font><br><br>(2) Harpies: All allies gain the effect - Targeted spells +1 additional targets.<br>(4) Harpies: All allies gain the effect - Targeted spells +1 additional targets.",
     "lore": "Harpies believe they survived from an ancient age. Their ancestors are transformed into bird-like bodies after betraying the Night Elves Queen.",
     "notes": [],
@@ -208,12 +194,11 @@
       2,
       4
     ],
-    "ability_special": {},
-    "formatted": "Windfury\n\nActive when you have at least (N) different pieces of this species on board. (Multiple effects stack).\n\n(2) Harpies: All allies gain the effect - Targeted spells +1 additional targets.\n(4) Harpies: All allies gain the effect - Targeted spells +1 additional targets."
+    "ability_special": {}
   },
   "is_human": {
     "name": "Human",
-    "description": "Species Perk: Spark of MindActive when you have at least (N) different human pieces on board. (Multiple effects stack) (3) Humans: Gain 2 experience points at the start of each round.(6) Humans: Gain (Courier Level - 2) points of experience points at the start of each round if you won your last home battle.",
+    "description": "Species Perk: Spark of Mind\n\nActive when you have at least (N) different human pieces on board. (Multiple effects stack) \n\n(3) Humans: Gain 2 experience points at the start of each round.\n(6) Humans: Gain (Courier Level - 2) points of experience points at the start of each round if you won your last home battle.",
     "description_html": "<h1>Species Perk: Spark of Mind</h1><font color=\"#656585\">Active when you have at least (N) different human pieces on board. (Multiple effects stack) </font><br><br>(3) Humans: Gain 2 experience points at the start of each round.<br>(6) Humans: Gain (Courier Level - 2) points of experience points at the start of each round if you won your last home battle.",
     "lore": "Humans are an intelligent species that values kindness and cooperation, and silences any who they deem unworthy.",
     "notes": [
@@ -223,13 +208,12 @@
       3,
       6
     ],
-    "ability_special": {},
-    "formatted": "Species Perk: Spark of Mind\n\nActive when you have at least (N) different human pieces on board. (Multiple effects stack)\n\n(3) Humans: Gain 2 experience points at the start of each round.\n(6) Humans: Gain (Courier Level - 2) points of experience points at the start of each round if you won your last home battle."
+    "ability_special": {}
   },
   "is_hunter": {
     "name": "Hunter",
-    "description": "Hunter pieces always focus on attacking the lowest health enemy within attack range.\nClass Perk: Aimed ShotActive when you have at least (N) different Hunter pieces on board. (Multiple effects stack)(3) Hunters: Every attack of all ally hunters has a 50%% chance to perform a precise shot, penetrates evasion and -5 armor, lasts for 5 seconds.(6) Hunters: Every attack of all ally hunters has a 100%% chance to perform a precise shot, penetrates evasion and -10 armor, lasts for 10 seconds.(9) Hunters: Every precise shot will knock back the victim for 1 grid on hit and perform an extra attack.",
-    "description_html": "Hunter pieces always focus on attacking the lowest health enemy within attack range.\n<h1>Class Perk: Aimed Shot</h1><font color=\"#656585\">Active when you have at least (N) different Hunter pieces on board. (Multiple effects stack)</font><br><br>(3) Hunters: Every attack of all ally hunters has a 50%% chance to perform a precise shot, penetrates evasion and -5 armor, lasts for 5 seconds.<br>(6) Hunters: Every attack of all ally hunters has a 100%% chance to perform a precise shot, penetrates evasion and -10 armor, lasts for 10 seconds.<br>(9) Hunters: Every precise shot will knock back the victim for 1 grid on hit and perform an extra attack.",
+    "description": "Hunter pieces always focus on attacking the lowest health enemy within attack range.\n\nClass Perk: Aimed Shot\n\nActive when you have at least (N) different Hunter pieces on board. (Multiple effects stack)\n\n(3) Hunters: Every attack of all ally hunters has a 50% chance to perform a precise shot, penetrates evasion and -5 armor, lasts for 5 seconds.\n(6) Hunters: Every attack of all ally hunters has a 100% chance to perform a precise shot, penetrates evasion and -10 armor, lasts for 10 seconds.\n(9) Hunters: Every precise shot will knock back the victim for 1 grid on hit and perform an extra attack.",
+    "description_html": "Hunter pieces always focus on attacking the lowest health enemy within attack range.\n<h1>Class Perk: Aimed Shot</h1><font color=\"#656585\">Active when you have at least (N) different Hunter pieces on board. (Multiple effects stack)</font><br><br>(3) Hunters: Every attack of all ally hunters has a 50% chance to perform a precise shot, penetrates evasion and -5 armor, lasts for 5 seconds.<br>(6) Hunters: Every attack of all ally hunters has a 100% chance to perform a precise shot, penetrates evasion and -10 armor, lasts for 10 seconds.<br>(9) Hunters: Every precise shot will knock back the victim for 1 grid on hit and perform an extra attack.",
     "lore": "Since time immemorial, the call of the wild has driven some adventurers from the comfort of their home to venture into unforgiving primeval worlds. Those who persist become hunters.",
     "notes": [],
     "tiers": [
@@ -237,16 +221,15 @@
       6,
       9
     ],
-    "ability_special": {},
-    "formatted": "Hunter pieces always focus on attacking the lowest health enemy within attack range.\n\nAimed Shot\n\nActive when you have at least (N) different Hunter pieces on board. (Multiple effects stack)\n\n(3) Hunters: Every attack of all ally hunters has a 50% chance to perform a precise shot, penetrates evasion and -5 armor, lasts for 5 seconds.\n(6) Hunters: Every attack of all ally hunters has a 100% chance to perform a precise shot, penetrates evasion and -10 armor, lasts for 10 seconds.\n(9) Hunters: Every precise shot will knock back the victim for 1 grid on hit and perform an extra attack."
+    "ability_special": {}
   },
   "is_knight": {
     "name": "Knight",
-    "description": "Knight pieces who have nearby allies will gain a Divine Protection shield immediately.\nClass Perk: Divine Protection Active when you have at least (N) different Knight pieces on board. (Multiple effects stack)(2) Knights: All friendly knights have a 25%% chance to procure a shield every 3 seconds in combat for 3 seconds.(4) Knights: All allies have a +25%% chance to procure a shield every 3 seconds in combat.(6) Knights: All allies have a +25%% chance to procure a shield every 3 seconds in combat. Procing a shield instantly heals for 400.",
-    "description_html": "Knight pieces who have nearby allies will gain a Divine Protection shield immediately.\n<h1>Class Perk: Divine Protection</h1> <font color=\"#656585\">Active when you have at least (N) different Knight pieces on board. (Multiple effects stack)</font><br><br>(2) Knights: All friendly knights have a 25%% chance to procure a shield every 3 seconds in combat for 3 seconds.<br>(4) Knights: All allies have a +25%% chance to procure a shield every 3 seconds in combat.<br>(6) Knights: All allies have a +25%% chance to procure a shield every 3 seconds in combat. Procing a shield instantly heals for 400.",
+    "description": "Knight pieces who have nearby allies will gain a Divine Protection shield immediately.\n\nClass Perk: Divine Protection\n \nActive when you have at least (N) different Knight pieces on board. (Multiple effects stack)\n\n(2) Knights: All friendly knights have a 25% chance to procure a shield every 3 seconds in combat for 3 seconds.\n(4) Knights: All allies have a +25% chance to procure a shield every 3 seconds in combat.\n(6) Knights: All allies have a +25% chance to procure a shield every 3 seconds in combat. Procing a shield instantly heals for 400.",
+    "description_html": "Knight pieces who have nearby allies will gain a Divine Protection shield immediately.\n<h1>Class Perk: Divine Protection</h1> <font color=\"#656585\">Active when you have at least (N) different Knight pieces on board. (Multiple effects stack)</font><br><br>(2) Knights: All friendly knights have a 25% chance to procure a shield every 3 seconds in combat for 3 seconds.<br>(4) Knights: All allies have a +25% chance to procure a shield every 3 seconds in combat.<br>(6) Knights: All allies have a +25% chance to procure a shield every 3 seconds in combat. Procing a shield instantly heals for 400.",
     "lore": "Knights are respected defenders of the realm. As they engage in battle, the Omniscience may bless them with a divine shield.",
     "notes": [
-      "A Divine Protection shield reduces incoming physical and magical damage by 50%%. Does not work on pure damage.",
+      "A Divine Protection shield reduces incoming physical and magical damage by 50%. Does not work on pure damage.",
       "Divine Protection activates per 3s and cannot protect knights hexed."
     ],
     "tiers": [
@@ -254,47 +237,44 @@
       4,
       6
     ],
-    "ability_special": {},
-    "formatted": "Knight pieces who have nearby allies will gain a Divine Protection shield immediately.\n\nDivine Protection\n\nActive when you have at least (N) different Knight pieces on board. (Multiple effects stack)\n\n(2) Knights: All friendly knights have a 25% chance to procure a shield every 3 seconds in combat for 3 seconds.\n(4) Knights: All allies have a +25% chance to procure a shield every 3 seconds in combat.\n(6) Knights: All allies have a +25% chance to procure a shield every 3 seconds in combat. Procing a shield instantly heals for 400."
+    "ability_special": {}
   },
   "is_kobold": {
     "name": "Kobold",
-    "description": "SPECIES TRAIT: Divided we standActive when you have at least (N) different Naga pieces on board. (Multiple effects stack)(1) Kobold: Each two paired Kobold pieces on board will summon a replica when battle starts.(2) Kobolds: Each two paired ally pieces on board will summon a replica when battle starts.(3) Kobolds: Every unpaired Kobold piece will reshape itself into a non-Kobold ally of the same rank before battle starts.",
+    "description": "SPECIES TRAIT: Divided we stand\n\nActive when you have at least (N) different Naga pieces on board. (Multiple effects stack)\n\n(1) Kobold: Each two paired Kobold pieces on board will summon a replica when battle starts.\n(2) Kobolds: Each two paired ally pieces on board will summon a replica when battle starts.\n(3) Kobolds: Every unpaired Kobold piece will reshape itself into a non-Kobold ally of the same rank before battle starts.",
     "description_html": "<h1>SPECIES TRAIT: Divided we stand</h1><font color=\"#656585\">Active when you have at least (N) different Naga pieces on board. (Multiple effects stack)<br><br>(1) Kobold: Each two paired Kobold pieces on board will summon a replica when battle starts.<br>(2) Kobolds: Each two paired ally pieces on board will summon a replica when battle starts.<br>(3) Kobolds: Every unpaired Kobold piece will reshape itself into a non-Kobold ally of the same rank before battle starts.",
     "lore": "Aggressive, xenophobic, yet industrious small humanoid creatures living in tunnels and caves deep below the surface. Known for not particularly intelligent, notoriously cowardly and individually weak, the dimunitive beings possess great potential in group combats. A candle on top of the head distinguishes the Kobolds.",
     "notes": [
       "Due to the specialities of the species, Kobold will not benefit from Auto Combine on Bench.",
-      "Paired Kobolds will keep themselves.",
-      "Unpaired Kobolds will reshape into random allies of the same rank."
+      "Paired Kobolds will keep themselves,while unpaired Kobolds will reshape into random allies of the same rank.",
+      "The piece will be frozen in wax when reshaping."
     ],
     "tiers": [
       1,
       2,
       3
     ],
-    "ability_special": {},
-    "formatted": "Divided we stand\n\nActive when you have at least (N) different Naga pieces on board. (Multiple effects stack)\n\n(1) Kobold: Each two paired Kobold pieces on board will summon a replica when battle starts.\n(2) Kobolds: Each two paired ally pieces on board will summon a replica when battle starts.\n(3) Kobolds: Every unpaired Kobold piece will reshape itself into a non-Kobold ally of the same rank before battle starts."
+    "ability_special": {}
   },
   "is_mage": {
     "name": "Mage",
-    "description": "场For every standing friendly Mage on the chessboard, Mage pieces receive +10%% bonus mana restoration, up to a maximum of 60%%.\nClass Perk: Magical VulnerabilityActive when you have at least (N) different mage pieces on board. (Multiple effects stack) (3) Mages: All enemies suffer -30%% magic resistance.(6) Mages: All enemies suffer -35%% magic resistance.(9) Mages: All enemies are cursed with frost incantation, which freezes them upon receiving magical damage. Lasts longer for more increased damage taken.",
-    "description_html": "场For every standing friendly Mage on the chessboard, Mage pieces receive +10%% bonus mana restoration, up to a maximum of 60%%.\n<h1>Class Perk: Magical Vulnerability</h1><font color=\"#656585\">Active when you have at least (N) different mage pieces on board. (Multiple effects stack) </font><br><br>(3) Mages: All enemies suffer -30%% magic resistance.<br>(6) Mages: All enemies suffer -35%% magic resistance.<br>(9) Mages: All enemies are cursed with frost incantation, which freezes them upon receiving magical damage. Lasts longer for more increased damage taken.  ",
+    "description": "For every standing friendly Mage on the chessboard, Mage pieces receive +10% bonus mana restoration, up to a maximum of 60%.\n\nClass Perk: Magical Vulnerability\n\nActive when you have at least (N) different mage pieces on board. (Multiple effects stack) \n\n(3) Mages: All enemies suffer -30% magic resistance.\n(6) Mages: All enemies suffer -35% magic resistance.\n(9) Mages: All enemies are cursed with frost incantation, which freezes them upon receiving magical damage. Lasts longer for more increased damage taken.",
+    "description_html": "For every standing friendly Mage on the chessboard, Mage pieces receive +10% bonus mana restoration, up to a maximum of 60%.\n<h1>Class Perk: Magical Vulnerability</h1><font color=\"#656585\">Active when you have at least (N) different mage pieces on board. (Multiple effects stack) </font><br><br>(3) Mages: All enemies suffer -30% magic resistance.<br>(6) Mages: All enemies suffer -35% magic resistance.<br>(9) Mages: All enemies are cursed with frost incantation, which freezes them upon receiving magical damage. Lasts longer for more increased damage taken.",
     "lore": "Mages are keen intellectuals who have spent years studying arcane knowledge. This allows them to make their victims more vulnerable to magic damage.",
     "notes": [
-      "Freeze duration equals to magical damage/300 with a minimum of 0.5s."
+      "Freeze duration equals to magical damage/400 with a minimum of 0.5s."
     ],
     "tiers": [
       3,
       6,
       9
     ],
-    "ability_special": {},
-    "formatted": "场For every standing friendly Mage on the chessboard, Mage pieces receive +10% bonus mana restoration, up to a maximum of 60%.\n\nMagical Vulnerability\n\nActive when you have at least (N) different mage pieces on board. (Multiple effects stack)\n\n(3) Mages: All enemies suffer -30% magic resistance.\n(6) Mages: All enemies suffer -35% magic resistance.\n(9) Mages: All enemies are cursed with frost incantation, which freezes them upon receiving magical damage. Lasts longer for more increased damage taken."
+    "ability_special": {}
   },
   "is_mech": {
     "name": "Mech",
-    "description": "Inventors arm themselves with the latest technology that allows them to receive +50%% healing from other sources.\nClass Perk: Heart of the MachineActive when you have at least (N) different Inventor pieces on board. (Multiple effects stack)(3) Inventors: Summon an AWESOME Invention after winning a home battle last round with at least 1 friendly Inventor who survived.(6) Inventors: Heart of the Machine now summons a Golden AWESOME Invention.",
-    "description_html": "Inventors arm themselves with the latest technology that allows them to receive +50%% healing from other sources.\n<h1>Class Perk: Heart of the Machine</h1><font color=\"#656585\">Active when you have at least (N) different Inventor pieces on board. (Multiple effects stack)</font><br><br>(3) Inventors: Summon an AWESOME Invention after winning a home battle last round with at least 1 friendly Inventor who survived.<br>(6) Inventors: Heart of the Machine now summons a Golden AWESOME Invention.",
+    "description": "Inventors arm themselves with the latest technology that allows them to receive +50% healing from other sources.\n\nClass Perk: Heart of the Machine\n\nActive when you have at least (N) different Inventor pieces on board. (Multiple effects stack)\n\n(3) Inventors: Summon an AWESOME Invention after winning a home battle last round with at least 1 friendly Inventor who survived.\n(6) Inventors: Heart of the Machine now summons a Golden AWESOME Invention.",
+    "description_html": "Inventors arm themselves with the latest technology that allows them to receive +50% healing from other sources.\n<h1>Class Perk: Heart of the Machine</h1><font color=\"#656585\">Active when you have at least (N) different Inventor pieces on board. (Multiple effects stack)</font><br><br>(3) Inventors: Summon an AWESOME Invention after winning a home battle last round with at least 1 friendly Inventor who survived.<br>(6) Inventors: Heart of the Machine now summons a Golden AWESOME Invention.",
     "lore": "Inventors are usually the ones within a race who possess the most profound knowledge, and the are ambitious in discover new methods and creations. Though most of the time the inventions are problematic and not-so-reliable, they do invoke miracles sometimes.",
     "notes": [
       "Heart of the Machine: Refresh your recruitment panel for free.",
@@ -304,12 +284,11 @@
       3,
       6
     ],
-    "ability_special": {},
-    "formatted": "Inventors arm themselves with the latest technology that allows them to receive +50% healing from other sources.\n\nHeart of the Machine\n\nActive when you have at least (N) different Inventor pieces on board. (Multiple effects stack)\n\n(3) Inventors: Summon an AWESOME Invention after winning a home battle last round with at least 1 friendly Inventor who survived.\n(6) Inventors: Heart of the Machine now summons a Golden AWESOME Invention."
+    "ability_special": {}
   },
   "is_monk": {
     "name": "Monk",
-    "description": "Class Perk: Drunken StaggerActive when you have at least (N) different Monk pieces on board. (Multiple effects stack)(2) Monks: All friendly melee Monks have a chance on dealing damage to instantly eliminate the target enemy with a low health.(4) Monks: All friendly Monks have a chance on dealing damage to reduce the current health of the target enemy by half.",
+    "description": "Class Perk: Drunken Stagger\n\nActive when you have at least (N) different Monk pieces on board. (Multiple effects stack)\n\n(2) Monks: All friendly melee Monks have a chance on dealing damage to instantly eliminate the target enemy with a low health.\n(4) Monks: All friendly Monks have a chance on dealing damage to reduce the current health of the target enemy by half.",
     "description_html": "<h1>Class Perk: Drunken Stagger</h1><font color=\"#656585\">Active when you have at least (N) different Monk pieces on board. (Multiple effects stack)</font><br><br>(2) Monks: All friendly melee Monks have a chance on dealing damage to instantly eliminate the target enemy with a low health.<br>(4) Monks: All friendly Monks have a chance on dealing damage to reduce the current health of the target enemy by half.",
     "lore": "When the Pandaren were subjugated centuries ago, it was the monks that brought hope to a seemingly dim future. Restricted from using weapons by their slave masters, these Pandaren instead focused on harnessing their physical ability and learning weaponless combat. When the opportunity for revolution struck, they were well-trained to throw off the yoke of oppression.",
     "notes": [
@@ -319,13 +298,12 @@
       2,
       4
     ],
-    "ability_special": {},
-    "formatted": "Drunken Stagger\n\nActive when you have at least (N) different Monk pieces on board. (Multiple effects stack)\n\n(2) Monks: All friendly melee Monks have a chance on dealing damage to instantly eliminate the target enemy with a low health.\n(4) Monks: All friendly Monks have a chance on dealing damage to reduce the current health of the target enemy by half."
+    "ability_special": {}
   },
   "is_naga": {
     "name": "Naga",
-    "description": "Species Trait: Scale ArmorActive when you have at least (N) different Naga pieces on board. (Multiple effects stack)(2) Nagas: All allies gain a shield that absorbs 15% ability damage.(4) Nagas: All allies gain a shield that absorbs 30% ability damage.(6) Nagas: All Nagas detonate their shield every 3 secs to deal (1x damage absorbed)Magical damage to enemies.",
-    "description_html": "<h1>Species Trait: Scale Armor</h1><font color=\"#656585\">Active when you have at least (N) different Naga pieces on board. (Multiple effects stack)</font><br><br>(2) Nagas: All allies gain a shield that absorbs 15% ability damage.<br>(4) Nagas: All allies gain a shield that absorbs 30% ability damage.<br>(6) Nagas: All Nagas detonate their shield every 3 secs to deal (1x damage absorbed)<font color=\"#5bc0de\">Magical</font> damage to enemies.",
+    "description": "Species Trait: Scale Armor\n\nActive when you have at least (N) different Naga pieces on board. (Multiple effects stack)\n\n(2) Naga: Grants allies 15% magic resistance.\n(4) Naga: Grants allies 35% magic resistance.\n(6) Naga: When taking non-pure damage, reflect 1.5 times the damage reduced by magic resistance.",
+    "description_html": "<h1>Species Trait: Scale Armor</h1><font color=\"#656585\">Active when you have at least (N) different Naga pieces on board. (Multiple effects stack)</font><br><br>(2) Naga: Grants allies 15% magic resistance.<br>(4) Naga: Grants allies 35% magic resistance.<br>(6) Naga: When taking non-pure damage, reflect 1.5 times the damage reduced by magic resistance.",
     "lore": "Nagas are cursed sea-dwellers that haunt the ocean floor. Their hardened, scaly skin acts as an effective defense against spells.",
     "notes": [
       "Scale Armors can absorb all kinds of damage(including pure damage).",
@@ -336,25 +314,23 @@
       4,
       6
     ],
-    "ability_special": {},
-    "formatted": "Scale Armor\n\nActive when you have at least (N) different Naga pieces on board. (Multiple effects stack)\n\n(2) Nagas: All allies gain a shield that absorbs 15% ability damage.\n(4) Nagas: All allies gain a shield that absorbs 30% ability damage.\n(6) Nagas: All Nagas detonate their shield every 3 secs to deal (1x damage absorbed)Magical damage to enemies."
+    "ability_special": {}
   },
   "is_nraqi": {
     "name": "Faceless",
-    "description": "Species Trait: Whisper of DarknessActive when you have at least (N) different Faceless pieces on board. (Multiple effects stack)(2) Facelesses: If you have no other active synergies except Whisper of Darkness, all friendly chess pieces are immune to all negative effects during combat.",
+    "description": "Species Trait: Whisper of Darkness\n\nActive when you have at least (N) different Faceless pieces on board. (Multiple effects stack)\n\n(2) Facelesses: If you have no other active synergies except Whisper of Darkness, all friendly chess pieces are immune to all negative effects during combat.",
     "description_html": "<h1>Species Trait: Whisper of Darkness</h1><font color=\"#656585\">Active when you have at least (N) different Faceless pieces on board. (Multiple effects stack)</font><br><br>(2) Facelesses: If you have no other active synergies except Whisper of Darkness, all friendly chess pieces are immune to all negative effects during combat.",
     "lore": "The Faceless, otherwise known as the Faceless Ones or N'raqi, are a monstrous race that arose from the organic matter that seeped from the Old Gods' blighted forms during the primordial era of Drodo Island. Cunning and intelligent, they serve their eldritch masters with fanatical loyalty and possess the power from the Void.",
     "notes": [],
     "tiers": [
       2
     ],
-    "ability_special": {},
-    "formatted": "Whisper of Darkness\n\nActive when you have at least (N) different Faceless pieces on board. (Multiple effects stack)\n\n(2) Facelesses: If you have no other active synergies except Whisper of Darkness, all friendly chess pieces are immune to all negative effects during combat."
+    "ability_special": {}
   },
   "is_ogre": {
     "name": "Ogre",
-    "description": "SPECIES TRAIT: Iron FistActive when you have at least (N) different pieces of this species on board. (Multiple effects stack)(2) Ogres:  Each ogre can eat up allies nearby (A cross of 4 grids) whose level is lower than itself and gains their 60%% HP and Damage. Deals extra damage to enemys courier equals to the sum of all its victims when winning an away-home battle.",
-    "description_html": "<h1>SPECIES TRAIT: Iron Fist</h1><font color=\"#656585\">Active when you have at least (N) different pieces of this species on board. (Multiple effects stack)</font><br><br>(2) Ogres:  Each ogre can eat up allies nearby (A cross of 4 grids) whose level is lower than itself and gains their 60%% HP and Damage. Deals extra damage to enemys courier equals to the sum of all its victims when winning an away-home battle.",
+    "description": "SPECIES TRAIT: Iron Fist\n\nActive when you have at least (N) different pieces of this species on board. (Multiple effects stack)\n\n(2) Ogres: Each ogre can eat up allies nearby (A cross of 4 grids) whose level is lower than itself and gains their 60% HP and Damage. Deals extra damage to enemys courier equals to the sum of all its victims when winning an away-home battle.",
+    "description_html": "<h1>SPECIES TRAIT: Iron Fist</h1><font color=\"#656585\">Active when you have at least (N) different pieces of this species on board. (Multiple effects stack)</font><br><br>(2) Ogres:  Each ogre can eat up allies nearby (A cross of 4 grids) whose level is lower than itself and gains their 60% HP and Damage. Deals extra damage to enemys courier equals to the sum of all its victims when winning an away-home battle.",
     "lore": "Ogres have two heads, or was it three? More heads, more stamina!",
     "notes": [
       "Deals extra damage to enemys courier equals to the sum of all its victims when winning an away-home battle."
@@ -362,12 +338,11 @@
     "tiers": [
       2
     ],
-    "ability_special": {},
-    "formatted": "Iron Fist\n\nActive when you have at least (N) different pieces of this species on board. (Multiple effects stack)\n\n(2) Ogres:  Each ogre can eat up allies nearby (A cross of 4 grids) whose level is lower than itself and gains their 60% HP and Damage. Deals extra damage to enemys courier equals to the sum of all its victims when winning an away-home battle."
+    "ability_special": {}
   },
   "is_orc": {
     "name": "Orc",
-    "description": "SPECIES TRAIT: Battle HardenedActive when you have at least (N) different pieces of this species on board. (Multiple effects stack)(2) Orcs: All allies have +100 Health.(4) Orcs: All allies have +300 Health.(6) Orcs: All allies have +10x(Courier health lost) Health.",
+    "description": "SPECIES TRAIT: Battle Hardened\n\nActive when you have at least (N) different pieces of this species on board. (Multiple effects stack)\n\n(2) Orcs: All allies have +100 Health.\n(4) Orcs: All allies have +300 Health.\n(6) Orcs: All allies have +10x(Courier health lost) Health.",
     "description_html": "<h1>SPECIES TRAIT: Battle Hardened</h1><font color=\"#656585\">Active when you have at least (N) different pieces of this species on board. (Multiple effects stack)</font><br><br>(2) Orcs: All allies have +100 Health.<br>(4) Orcs: All allies have +300 Health.<br>(6) Orcs: All allies have +10x(Courier health lost) Health.",
     "lore": "The Orcs are a prolific and physically powerful race, excellent at tolerating pain and injury. Being exotic to Drodolands, their home was a once-lush world but now a shattered realm. They abandoned their peaceful culture when the demon lord cunningly corrupted the Orcs and used them in his vengeful plot against the his own people.",
     "notes": [],
@@ -376,12 +351,11 @@
       4,
       6
     ],
-    "ability_special": {},
-    "formatted": "Battle Hardened\n\nActive when you have at least (N) different pieces of this species on board. (Multiple effects stack)\n\n(2) Orcs: All allies have +100 Health.\n(4) Orcs: All allies have +300 Health.\n(6) Orcs: All allies have +10x(Courier health lost) Health."
+    "ability_special": {}
   },
   "is_pandaman": {
     "name": "Pandaren",
-    "description": "SPECIES TRAIT: HospitalityActive when you have at least (N) different pieces of this species on board. (Multiple effects stack)(1) Pandaren: Have a chance to invite a random un-emerged chess piece of the same species with a chess piece on the board from the chess piece pool to join the team at the beginning of the round.(2) Pandaren: Each Pandaren chess piece on board has a chance to invite a piece of the same name with it.",
+    "description": "SPECIES TRAIT: Hospitality\n\nActive when you have at least (N) different pieces of this species on board. (Multiple effects stack)\n\n(1) Pandaren: Have a chance to invite a random un-emerged chess piece of the same species with a chess piece on the board from the chess piece pool to join the team at the beginning of the round.\n(2) Pandaren: Each Pandaren chess piece on board has a chance to invite a piece of the same name with it.",
     "description_html": "<h1>SPECIES TRAIT: Hospitality</h1><font color=\"#656585\">Active when you have at least (N) different pieces of this species on board. (Multiple effects stack)</font><br><br>(1) Pandaren: Have a chance to invite a random un-emerged chess piece of the same species with a chess piece on the board from the chess piece pool to join the team at the beginning of the round.<br>(2) Pandaren: Each Pandaren chess piece on board has a chance to invite a piece of the same name with it.",
     "lore": "Ten thousand years ago the last emperor of the Pandaren Empire surrounded his entire territory in the misty protection in order to save his people from the Great Havoc. Now the ancient species has once again revealed themselves and they are literally a mist to the others.",
     "notes": [
@@ -391,12 +365,11 @@
       1,
       2
     ],
-    "ability_special": {},
-    "formatted": "Hospitality\n\nActive when you have at least (N) different pieces of this species on board. (Multiple effects stack)\n\n(1) Pandaren: Have a chance to invite a random un-emerged chess piece of the same species with a chess piece on the board from the chess piece pool to join the team at the beginning of the round.\n(2) Pandaren: Each Pandaren chess piece on board has a chance to invite a piece of the same name with it."
+    "ability_special": {}
   },
   "is_priest": {
     "name": "Priest",
-    "description": "Priest Pieces are determined, and cannot be mind controlled.Class Perk: SalvationActive when you have at least (N) different Priest pieces on board. (Multiple effects stack)(2) Priests: Get a Tango when defeated in a home battle with courier health lost if your pieces on board are less than your max pieces capacity.(4) Priest: Every Priest piece will Mind Control an enemy whose level equals to or less than itself if your pieces on board are less than your max pieces capacity. (Max control count = Your capacity - Your pieces on board)",
+    "description": "Priest Pieces are determined, and cannot be mind controlled.\nClass Perk: Salvation\n\nActive when you have at least (N) different Priest pieces on board. (Multiple effects stack)\n\n(2) Priests: Get a Tango when defeated in a home battle with courier health lost if your pieces on board are less than your max pieces capacity.\n(4) Priest: Every Priest piece will Mind Control an enemy whose level equals to or less than itself if your pieces on board are less than your max pieces capacity. (Max control count = Your capacity - Your pieces on board)",
     "description_html": "Priest Pieces are determined, and cannot be mind controlled.<h1>Class Perk: Salvation</h1><font color=\"#656585\">Active when you have at least (N) different Priest pieces on board. (Multiple effects stack)</font><br><br>(2) Priests: Get a Tango when defeated in a home battle with courier health lost if your pieces on board are less than your max pieces capacity.<br>(4) Priest: Every Priest piece will Mind Control an enemy whose level equals to or less than itself if your pieces on board are less than your max pieces capacity. (Max control count = Your capacity - Your pieces on board)",
     "lore": "Priests are blessed invokers of light and darkness, who express their determined spirits through dedicated service to the people. For numerous battles, with the mastery of light and shadow energies they have weaved the most reliable life-saving protections for their allies.",
     "notes": [
@@ -406,12 +379,11 @@
       2,
       4
     ],
-    "ability_special": {},
-    "formatted": "Priest Pieces are determined, and cannot be mind controlled.\n\nSalvation\n\nActive when you have at least (N) different Priest pieces on board. (Multiple effects stack)\n\n(2) Priests: Get a Tango when defeated in a home battle with courier health lost if your pieces on board are less than your max pieces capacity.\n(4) Priest: Every Priest piece will Mind Control an enemy whose level equals to or less than itself if your pieces on board are less than your max pieces capacity. (Max control count = Your capacity - Your pieces on board)"
+    "ability_special": {}
   },
   "is_satyr": {
     "name": "Satyr",
-    "description": "SPECIES TRAIT: Fear Active when you have at least (N) different pieces on board. (Multiple effects stack.)(2) Satyr: Allied Satyr chess pieces gain the effect: If there is more than 1 enemy nearby, they cause those enemies to lose control due to fear.",
+    "description": "SPECIES TRAIT: Fear \n\nActive when you have at least (N) different pieces on board. (Multiple effects stack.)\n\n(2) Satyr: Allied Satyr chess pieces gain the effect: If there is more than 1 enemy nearby, they cause those enemies to lose control due to fear.",
     "description_html": "<h1>SPECIES TRAIT: Fear </h1><font color=\"#656585\">Active when you have at least (N) different pieces on board. (Multiple effects stack.)</font><br><br>(2) Satyr: Allied Satyr chess pieces gain the effect: If there is more than 1 enemy nearby, they cause those enemies to lose control due to fear.",
     "lore": "Demonic species rose from twisted elves, experts at concealing themselves in nightmares, and fanatics in spreading blood and agony.",
     "notes": [
@@ -420,13 +392,12 @@
     "tiers": [
       2
     ],
-    "ability_special": {},
-    "formatted": "Fear\n\nActive when you have at least (N) different pieces on board. (Multiple effects stack.)\n\n(2) Satyr: Allied Satyr chess pieces gain the effect: If there is more than 1 enemy nearby, they cause those enemies to lose control due to fear."
+    "ability_special": {}
   },
   "is_shaman": {
     "name": "Shaman",
-    "description": "Shaman pieces spend 25%% less mana when casting spells.\nClass Perk: HexActive when you have at least (N) different Shaman pieces on board. (Multiple effects stack)(3)All friendly Shaman chess pieces gain the effect: Transform into a random chess piece of +2 levels after casting an active skill or using an active item.(6)Shaman: Equipped items carried by transformed chess pieces will also transform into random items of +2 levels.",
-    "description_html": "Shaman pieces spend 25%% less mana when casting spells.\n<h1>Class Perk: Hex</h1><font color=\"#656585\">Active when you have at least (N) different Shaman pieces on board. (Multiple effects stack)</font><br><br>(3)All friendly Shaman chess pieces gain the effect: Transform into a random chess piece of +2 levels after casting an active skill or using an active item.<br>(6)Shaman: Equipped items carried by transformed chess pieces will also transform into random items of +2 levels.",
+    "description": "Shaman pieces spend 25% less mana when casting spells.\n\nClass Perk: Hex\n\nActive when you have at least (N) different Shaman pieces on board. (Multiple effects stack)\n\n(3)All friendly Shaman chess pieces gain the effect: Transform into a random chess piece of +2 levels after casting an active skill or using an active item.\n(6)Shaman: Equipped items carried by transformed chess pieces will also transform into random items of +2 levels.",
+    "description_html": "Shaman pieces spend 25% less mana when casting spells.\n<h1>Class Perk: Hex</h1><font color=\"#656585\">Active when you have at least (N) different Shaman pieces on board. (Multiple effects stack)</font><br><br>(3)All friendly Shaman chess pieces gain the effect: Transform into a random chess piece of +2 levels after casting an active skill or using an active item.<br>(6)Shaman: Equipped items carried by transformed chess pieces will also transform into random items of +2 levels.",
     "lore": "Mortal mediators of the ancient elements. Following the guide of ancestral spirits, Shaman learn to wield unseemingly mysterious power over generations to protect their family and clans.",
     "notes": [
       "Transformed chess pieces levels will not exceed the current level of the courier. Transformation takes 1.5 seconds to cast.",
@@ -437,12 +408,11 @@
       3,
       6
     ],
-    "ability_special": {},
-    "formatted": "Shaman pieces spend 25% less mana when casting spells.\n\nHex\n\nActive when you have at least (N) different Shaman pieces on board. (Multiple effects stack)\n\n(3)All friendly Shaman chess pieces gain the effect: Transform into a random chess piece of +2 levels after casting an active skill or using an active item.\n(6)Shaman: Equipped items carried by transformed chess pieces will also transform into random items of +2 levels."
+    "ability_special": {}
   },
   "is_tauren": {
     "name": "Tauren",
-    "description": "SPECIES TRAIT: Totem of the ClanActive when you have at least (N) different pieces of this species on board. (Multiple effects stack)(2) Taurens: Summons a Taunt Totem at the start of the battle.(4) Taurens: Summons a Woodpecker Totem and a Horn Totem at the start of the battle.",
+    "description": "SPECIES TRAIT: Totem of the Clan\n\nActive when you have at least (N) different pieces of this species on board. (Multiple effects stack)\n\n(2) Taurens: Summons a Taunt Totem at the start of the battle.\n(4) Taurens: Summons a Woodpecker Totem and a Horn Totem at the start of the battle.",
     "description_html": "<h1>SPECIES TRAIT: Totem of the Clan</h1><font color=\"#656585\">Active when you have at least (N) different pieces of this species on board. (Multiple effects stack)</font><br><br>(2) Taurens: Summons a Taunt Totem at the start of the battle.<br>(4) Taurens: Summons a Woodpecker Totem and a Horn Totem at the start of the battle.",
     "lore": "Peace-loving Taurens live on mountain-high plateaus of the barren Drodoland. They strive to preserve the balance of nature at the behest of the Earth Mother.",
     "notes": [],
@@ -450,12 +420,11 @@
       2,
       4
     ],
-    "ability_special": {},
-    "formatted": "Totem of the Clan\n\nActive when you have at least (N) different pieces of this species on board. (Multiple effects stack)\n\n(2) Taurens: Summons a Taunt Totem at the start of the battle.\n(4) Taurens: Summons a Woodpecker Totem and a Horn Totem at the start of the battle."
+    "ability_special": {}
   },
   "is_troll": {
     "name": "Troll",
-    "description": "SPECIES TRAIT: Voodoo FrenzyActive when you have at least (N) different pieces of this species on board. (Multiple effects stack)(2) Trolls: Increases the attack speed of all allies by 20.(4) Trolls: Increases the attack speed of all allies by 50.(6) Trolls: All allies gain +20 attack speed for each successful attack. Maximum 7 stacks.",
+    "description": "SPECIES TRAIT: Voodoo Frenzy\n\nActive when you have at least (N) different pieces of this species on board. (Multiple effects stack)\n\n(2) Trolls: Increases the attack speed of all allies by 20.\n(4) Trolls: Increases the attack speed of all allies by 50.\n(6) Trolls: All allies gain +20 attack speed for each successful attack. Maximum 7 stacks.",
     "description_html": "<h1>SPECIES TRAIT: Voodoo Frenzy</h1><font color=\"#656585\">Active when you have at least (N) different pieces of this species on board. (Multiple effects stack)</font><br><br>(2) Trolls: Increases the attack speed of all allies by 20.<br>(4) Trolls: Increases the attack speed of all allies by 50.<br>(6) Trolls: All allies gain +20 attack speed for each successful attack. Maximum 7 stacks.",
     "lore": "Savage trolls are notorious for their cruelty, dark occult religion, and fierce hatred of other races.",
     "notes": [],
@@ -464,16 +433,15 @@
       4,
       6
     ],
-    "ability_special": {},
-    "formatted": "Voodoo Frenzy\n\nActive when you have at least (N) different pieces of this species on board. (Multiple effects stack)\n\n(2) Trolls: Increases the attack speed of all allies by 20.\n(4) Trolls: Increases the attack speed of all allies by 50.\n(6) Trolls: All allies gain +20 attack speed for each successful attack. Maximum 7 stacks."
+    "ability_special": {}
   },
   "is_undead": {
     "name": "Undead",
-    "description": "Species Trait: PlagueActive when you have at least (N) different Undead pieces on board. (Multiple effects stack)(3) Undeads: All non-undead pieces of both sides in the battle gain the plague effect: maximum health -10%%.(6) Undeads: All non-undead pieces of both sides in the battle gain the plague effect: maximum health -40%%.(9) Undeads: All plague-infected pieces lose 5% max health per 2.5 secs (no less than 5%).",
-    "description_html": "<h1>Species Trait: Plague</h1><font color=\"#656585\">Active when you have at least (N) different Undead pieces on board. (Multiple effects stack)</font><br><br>(3) Undeads: All non-undead pieces of both sides in the battle gain the plague effect: maximum health -10%%.<br>(6) Undeads: All non-undead pieces of both sides in the battle gain the plague effect: maximum health -40%%.<br>(9) Undeads: All plague-infected pieces lose 5% max health per 2.5 secs (no less than 5%).",
+    "description": "Species Trait: Plague\n\nActive when you have at least (N) different Undead pieces on board. (Multiple effects stack)\n\n(3) Undeads: All non-undead pieces of both sides in the battle gain the plague effect: maximum health -10%.\n(6) Undeads: All non-undead pieces of both sides in the battle gain the plague effect: maximum health -40%.\n(9) Undeads: All plague-infected pieces lose 5% max health per 2.5 secs (no less than 5%).",
+    "description_html": "<h1>Species Trait: Plague</h1><font color=\"#656585\">Active when you have at least (N) different Undead pieces on board. (Multiple effects stack)</font><br><br>(3) Undeads: All non-undead pieces of both sides in the battle gain the plague effect: maximum health -10%.<br>(6) Undeads: All non-undead pieces of both sides in the battle gain the plague effect: maximum health -40%.<br>(9) Undeads: All plague-infected pieces lose 5% max health per 2.5 secs (no less than 5%).",
     "lore": "Many humans had unfortunately lost their life to the Scourge King during his conquest of his homeland. The victims were raised as Undeads with cruelty, turned into minions of the fleshless legion, and were forced to destroy their own kingdom under the command of the Fallen Prince.",
     "notes": [
-      "Base HP and bonus HP are both affected by the effect of the reduction in maximum HP.",
+      "Only Base HP is affected by the effect of the reduction in maximum HP.",
       "Plague-infected pieces will have at least 5% max HP."
     ],
     "tiers": [
@@ -481,13 +449,12 @@
       6,
       9
     ],
-    "ability_special": {},
-    "formatted": "Plague\n\nActive when you have at least (N) different Undead pieces on board. (Multiple effects stack)\n\n(3) Undeads: All non-undead pieces of both sides in the battle gain the plague effect: maximum health -10%.\n(6) Undeads: All non-undead pieces of both sides in the battle gain the plague effect: maximum health -40%.\n(9) Undeads: All plague-infected pieces lose 5% max health per 2.5 secs (no less than 5%)."
+    "ability_special": {}
   },
   "is_warlock": {
     "name": "Warlock",
-    "description": "Warlock pieces convert 25%% of their health into 50%% mana when a battle starts.\nClass Perk: Soul LeechActive when you have at least (N) different Warlock pieces on board. (Multiple effects stack)(2) Warlocks: All allies have All allies have +5%% lifesteal from all damage dealt.(4) Warlocks: All allies have All allies have +20%% lifesteal from all damage dealt.(6) Warlocks: All ally warlocks steal a max health of 0.5x damage on every attack.",
-    "description_html": "Warlock pieces convert 25%% of their health into 50%% mana when a battle starts.\n<h1>Class Perk: Soul Leech</h1><font color=\"#656585\">Active when you have at least (N) different Warlock pieces on board. (Multiple effects stack)</font><br><br>(2) Warlocks: All allies have All allies have +5%% lifesteal from all damage dealt.<br>(4) Warlocks: All allies have All allies have +20%% lifesteal from all damage dealt.<br>(6) Warlocks: All ally warlocks steal a max health of 0.5x damage on every attack.",
+    "description": "Warlock pieces convert 25% of their health into 50% mana when a battle starts.\n\nClass Perk: Soul Leech\n\nActive when you have at least (N) different Warlock pieces on board. (Multiple effects stack)\n\n(2) Warlocks: All allies have All allies have +5% lifesteal from all damage dealt.\n(4) Warlocks: All allies have All allies have +20% lifesteal from all damage dealt.\n(6) Warlocks: All ally warlocks steal a max health of 0.5x damage on every attack.",
+    "description_html": "Warlock pieces convert 25% of their health into 50% mana when a battle starts.\n<h1>Class Perk: Soul Leech</h1><font color=\"#656585\">Active when you have at least (N) different Warlock pieces on board. (Multiple effects stack)</font><br><br>(2) Warlocks: All allies have All allies have +5% lifesteal from all damage dealt.<br>(4) Warlocks: All allies have All allies have +20% lifesteal from all damage dealt.<br>(6) Warlocks: All ally warlocks steal a max health of 0.5x damage on every attack.",
     "lore": "Warlocks are cursed sorcerers who use demonic power to drain the life force from their enemies, restoring themselves to continue their cursed battle.",
     "notes": [],
     "tiers": [
@@ -495,13 +462,12 @@
       4,
       6
     ],
-    "ability_special": {},
-    "formatted": "Warlock pieces convert 25% of their health into 50% mana when a battle starts.\n\nSoul Leech\n\nActive when you have at least (N) different Warlock pieces on board. (Multiple effects stack)\n\n(2) Warlocks: All allies have All allies have +5% lifesteal from all damage dealt.\n(4) Warlocks: All allies have All allies have +20% lifesteal from all damage dealt.\n(6) Warlocks: All ally warlocks steal a max health of 0.5x damage on every attack."
+    "ability_special": {}
   },
   "is_warrior": {
     "name": "Warrior",
-    "description": "Warriors have a double bonus from Fortified Armor while below 50%% health.\nClass Perk: Fortified ArmorActive when you have at least (N) different Warrior pieces on board. (Multiple effects stack) (3) Warriors: All friendly warriors have +3 armour.(6) Warriors: All friendly warriors have +11 armour.(9) Warriors: Reflect pure damage equivalent to (1.5x current armour) when taking physical and magical damage.",
-    "description_html": "Warriors have a double bonus from Fortified Armor while below 50%% health.\n<h1>Class Perk: Fortified Armor</h1><font color=\"#656585\">Active when you have at least (N) different Warrior pieces on board. (Multiple effects stack) </font><br><br>(3) Warriors: All friendly warriors have +3 armour.<br>(6) Warriors: All friendly warriors have +11 armour.<br>(9) Warriors: Reflect pure damage equivalent to (1.5x current armour) when taking physical and magical damage.",
+    "description": "Warriors have a double bonus from Fortified Armor while below 50% health.\n\nClass Perk: Fortified Armor\n\nActive when you have at least (N) different Warrior pieces on board. (Multiple effects stack) \n\n(3) Warriors: All friendly warriors have +3 armour.\n(6) Warriors: All friendly warriors have +11 armour.\n(9) Warriors: Reflect pure damage equivalent to (1.5x current armour) when taking physical and magical damage.",
+    "description_html": "Warriors have a double bonus from Fortified Armor while below 50% health.\n<h1>Class Perk: Fortified Armor</h1><font color=\"#656585\">Active when you have at least (N) different Warrior pieces on board. (Multiple effects stack) </font><br><br>(3) Warriors: All friendly warriors have +3 armour.<br>(6) Warriors: All friendly warriors have +11 armour.<br>(9) Warriors: Reflect pure damage equivalent to (1.5x current armour) when taking physical and magical damage.",
     "lore": "",
     "notes": [],
     "tiers": [
@@ -509,12 +475,11 @@
       6,
       9
     ],
-    "ability_special": {},
-    "formatted": "Warriors have a double bonus from Fortified Armor while below 50% health.\n\nFortified Armor\n\nActive when you have at least (N) different Warrior pieces on board. (Multiple effects stack)\n\n(3) Warriors: All friendly warriors have +3 armour.\n(6) Warriors: All friendly warriors have +11 armour.\n(9) Warriors: Reflect pure damage equivalent to (1.5x current armour) when taking physical and magical damage."
+    "ability_special": {}
   },
   "is_wizard": {
     "name": "Wizard",
-    "description": "Wizard chess pieces are never considered priority targets by enemies.\nClass Perk: Something from NothingActive when you have at least (N) different Wizard pieces on board. (Multiple effects stack)(2) Wizards: During the combat round, reduce the required number of chess pieces for the activation of race/class skills by 1, if there are (4) or more chess pieces needed.(4) Wizards: If you trigger the unique non-Wizard race/class skill during the combat round, unlock all of its layers.",
+    "description": "Wizard chess pieces are never considered priority targets by enemies.\n\nClass Perk: Something from Nothing\n\nActive when you have at least (N) different Wizard pieces on board. (Multiple effects stack)\n\n(2) Wizards: During the combat round, reduce the required number of chess pieces for the activation of race/class skills by 1, if there are (4) or more chess pieces needed.\n(4) Wizards: If you trigger the unique non-Wizard race/class skill during the combat round, unlock all of its layers.",
     "description_html": "Wizard chess pieces are never considered priority targets by enemies.\n<h1>Class Perk: Something from Nothing</h1><font color=\"#656585\">Active when you have at least (N) different Wizard pieces on board. (Multiple effects stack)</font><br><br>(2) Wizards: During the combat round, reduce the required number of chess pieces for the activation of race/class skills by 1, if there are (4) or more chess pieces needed.<br>(4) Wizards: If you trigger the unique non-Wizard race/class skill during the combat round, unlock all of its layers.",
     "lore": "Wizards play an ancient yet mysterious role. Even though they mostly comprehend oracles and do minor entertaining tricks, Wizards are regarded as evil by many others because of the uncertainty of their purpose of action. The unique power Wizards possess awakes the inner potential of others, leading to a more united alliance.",
     "notes": [],
@@ -522,7 +487,6 @@
       2,
       4
     ],
-    "ability_special": {},
-    "formatted": "Wizard chess pieces are never considered priority targets by enemies.\n\nSomething from Nothing\n\nActive when you have at least (N) different Wizard pieces on board. (Multiple effects stack)\n\n(2) Wizards: During the combat round, reduce the required number of chess pieces for the activation of race/class skills by 1, if there are\n(4) or more chess pieces needed.\n(4) Wizards: If you trigger the unique non-Wizard race/class skill during the combat round, unlock all of its layers."
+    "ability_special": {}
   }
 }

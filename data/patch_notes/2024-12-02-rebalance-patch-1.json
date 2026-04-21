@@ -1,0 +1,8 @@
+{
+  "date": "2024-12-02",
+  "title": "Rebalance Patch 1",
+  "source": "https://docs.google.com/document/d/e/2PACX-1vR5OYQR97DWTEFk6YiXahYwTMFuOs7DqDxy38h7e-_Jo5oeHyNZr5-hoCW66MmkK-FcvbzjXQE-wH98/pub",
+  "workshop_url": "https://steamcommunity.com/sharedfiles/filedetails/changelog/1613886175?p=1#post1733135829",
+  "summary": "Rebalance Patch 1\n\n● Talent Tree UI optimization: Talent Panel will pop up at round 5/15/25/35, and shut down after your talents are settled.\n● Recruit Probability slightly adjusted, details are in the table above.\n● Luna - Moonglaive: Bounce time decreased from 3/5/7 to 3/4/5\n● Medusa - Stone Gaze: Split shot count decreased from 3/4/5 to 2/3/4, gaze duration decreased from 4/5/6 secs to 3/4/5 secs\n● fix bug",
+  "sections": []
+}

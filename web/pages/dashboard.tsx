@@ -2,14 +2,14 @@ import Head from "next/head";
 import { useEffect, useState, useMemo } from "react";
 import { useRouter } from "next/router";
 import type { SupabaseClient, User } from "@supabase/supabase-js";
-import unitsData from "../data/units.json";
+import unitsData from "@data/units.json";
 import unitsFullData from "@data/units_full.json";
 import { parseWL } from "@dac/shared/game-utils";
 import { GameRow } from "../components/GameRow";
 import type { Game, UnitFullInfo, SynergyInfo, RelicInfo } from "@dac/shared/types";
-import synergiesData from "../data/synergies.json";
+import synergiesData from "@data/synergies.json";
 import { NavBar } from "../components/NavBar";
-import relicsData from "../data/relics.json";
+import relicsData from "@data/relics.json";
 
 interface SeasonSnapshot {
   season: string;
@@ -33,10 +33,18 @@ interface DashboardProps {
   supabase: SupabaseClient | null;
 }
 
-// Build cost lookup from units.json
+// Build cost lookup from units.json; include aliases so games saved under
+// older name spellings (e.g. "Bloodseeker", "IO") still resolve.
 const UNIT_COSTS: Record<string, number> = {};
 for (const [name, info] of Object.entries(unitsData.units)) {
   UNIT_COSTS[name] = (info as { cost: number }).cost;
+}
+for (const [alias, canonical] of Object.entries(
+  (unitsData as { aliases?: Record<string, string> }).aliases ?? {}
+)) {
+  if (UNIT_COSTS[canonical] !== undefined) {
+    UNIT_COSTS[alias] = UNIT_COSTS[canonical];
+  }
 }
 
 // Build tooltip data lookups
