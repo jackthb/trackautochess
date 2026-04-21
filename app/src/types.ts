@@ -16,6 +16,7 @@ export interface Game {
   screenshot: string | null;
   replay: string | null;
   notes: string | null;
+  match_id: string | null;
   played_at: string;
   created_at: string;
 }
@@ -69,6 +70,52 @@ export interface ParseResult {
   rows: ParseResultRow[];
   timestamps: string[];
   screenshot_b64?: string;
+  screenshot_name?: string;
+  screenshot_path?: string;
+  screen_type?: "my_matches" | "game_over" | "final_ranking" | "unknown";
+}
+
+export interface ProcessingScreenshot {
+  type: "processing_screenshot";
+  screenshot_b64?: string;
+  screenshot_name?: string;
+  screenshot_path?: string;
+  screen_type?: "my_matches" | "game_over" | "final_ranking" | "unknown";
+  message?: string;
+}
+
+export interface DebugRegionCrop {
+  name: string;
+  image: string;
+  coords: number[];
+}
+
+export interface ScreenshotDebugRow extends Partial<ParseResultRow> {
+  player_name?: string;
+  db_match?: boolean;
+  matched_user_id?: string;
+  row_image?: string;
+  player_crop?: string;
+  placement_crop?: string;
+  level_crop?: string;
+  units_crop?: string;
+  synergy_crop?: string;
+  relic_crop?: string;
+  wl_crop?: string;
+  rank_crop?: string;
+  time_crop?: string;
+}
+
+export interface ScreenshotDebugResult {
+  width: number;
+  height: number;
+  screen_type: string;
+  aspect_ratio?: string;
+  crop?: string;
+  region_crops?: DebugRegionCrop[];
+  rows?: ScreenshotDebugRow[];
+  results?: Record<string, { score: number; location?: number[] }>;
+  error?: string;
 }
 
 export interface RecordingStats {
@@ -98,6 +145,7 @@ export interface LogEntry {
 
 export type TrackerEvent =
   | ParseResult
+  | ProcessingScreenshot
   | TrackerStatus
   | LogEntry
   | { type: "import_result"; imported: number; skipped: number }
@@ -179,6 +227,8 @@ declare global {
       delete: (filename: string) => Promise<boolean>;
       openFolder: () => Promise<void>;
       thumbnail: (filename: string) => Promise<string | null>;
+      canAccessDebug: () => Promise<boolean>;
+      debug: (filename: string, screenType?: string | null) => Promise<ScreenshotDebugResult>;
       getParseResult: (filename: string) => Promise<SavedParseResult | null>;
       updateParseRow: (filename: string, rowIndex: number, fields: Partial<ParseResultRow>) => Promise<boolean>;
     };

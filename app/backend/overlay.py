@@ -169,7 +169,7 @@ class GameEndOverlay:
         dismiss_btn = tk.Button(
             btn_frame, text="Dismiss",
             font=("Consolas", 10), width=btn_w,
-            bg="#14161c", fg="#3a3f50", activebackground="#1a1d26",
+            bg="#2f3346", fg="#5c6278", activebackground="#383d52",
             relief=tk.FLAT, pady=4,
             command=self._on_dismiss_click,
         )

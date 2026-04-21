@@ -19,6 +19,7 @@ type TabId = "history" | "replays" | "confirm" | "settings" | "log";
 export default function App() {
   const [activeTab, setActiveTab] = useState<TabId>("history");
   const [focusGameId, setFocusGameId] = useState<number | null>(null);
+  const [debugEnabled, setDebugEnabled] = useState(false);
 
   const gamesState = useGames();
   const drodoState = useDrodo();
@@ -32,14 +33,19 @@ export default function App() {
   const showLoginScreen = !tracker.status?.logged_in;
 
   const hasParseResult = tracker.pendingParseResult !== null;
+  const hasProcessingScreenshot = tracker.processingScreenshot !== null;
   const prevHasResult = useRef(false);
 
   useEffect(() => {
-    if (hasParseResult && !prevHasResult.current) {
+    window.screenshots.canAccessDebug().then(setDebugEnabled).catch(() => setDebugEnabled(false));
+  }, []);
+
+  useEffect(() => {
+    if ((hasParseResult || hasProcessingScreenshot) && !prevHasResult.current) {
       setActiveTab("confirm");
     }
-    prevHasResult.current = hasParseResult;
-  }, [hasParseResult]);
+    prevHasResult.current = hasParseResult || hasProcessingScreenshot;
+  }, [hasParseResult, hasProcessingScreenshot]);
 
   const handleTabChange = useCallback((tab: string) => {
     setActiveTab(tab as TabId);
@@ -89,6 +95,7 @@ export default function App() {
             )}
             {activeTab === "confirm" && (
               <ConfirmationTab
+                processingScreenshot={tracker.processingScreenshot}
                 parseResult={tracker.pendingParseResult}
                 onClear={tracker.clearParseResult}
                 lastImportResult={tracker.lastImportResult}
@@ -99,6 +106,7 @@ export default function App() {
                 relicsData={gamesState.relicsData}
                 importing={tracker.importing}
                 onBeginImport={tracker.beginImport}
+                debugEnabled={debugEnabled}
               />
             )}
             {activeTab === "settings" && (

@@ -1,0 +1,25 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><link rel="stylesheet" href="card-base.css"></head>
+<body><div class="card" style="padding:0">
+<style>
+.tb { height: 36px; background: #1e2130; border-bottom: 1px solid #2f3346; display:flex; align-items:center; padding-left: 16px; }
+.lg { font-family:'Cinzel',serif; font-size: 13px; font-weight: 600; letter-spacing: 3px; text-transform: uppercase; color: #9096ac; }
+.lg b { color: #CC3520; font-weight: 600; }
+.ctrls { margin-left:auto; display:flex; height:100%; }
+.ctrl { width: 46px; height: 100%; display:flex; align-items:center; justify-content:center; color: #5c6278; cursor:pointer; }
+.ctrl:hover { background: #383d52; color: #e4e7ee; }
+.ctrl.close:hover { background: #c42b1c; color: #fff; }
+.stat-bar { height: 28px; background: #262a3a; border-top: 1px solid #3a405a; display:flex; align-items:center; padding: 0 16px; gap: 20px; font-size: 11px; color: #5c6278; }
+.dot { width: 6px; height: 6px; border-radius: 50%; background: #5c6278; display:inline-block; margin-right: 5px; }
+.dot.on { background: #4eaa62; }
+.dot.rec { background: #c44e4e; }
+.mid { padding: 14px 16px; font-size: 11px; color: var(--text-secondary); line-height: 1.6; }
+</style>
+<div class="tb"><span class="lg"><b>DAC</b> Tracker</span><div class="ctrls"><div class="ctrl">−</div><div class="ctrl">□</div><div class="ctrl close">×</div></div></div>
+<div class="mid">Custom 36px titlebar (Electron) — drag region, Cinzel logo, Windows-style controls. Close-button hover is the one place red is used as a background fill.</div>
+<div class="stat-bar">
+  <span><span class="dot on"></span>Tracker</span>
+  <span><span class="dot rec"></span>Recording · 12:04</span>
+  <span style="margin-left:auto">127 matches · Updated 14:32</span>
+</div>
+</div></body></html>

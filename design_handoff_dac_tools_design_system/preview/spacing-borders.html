@@ -1,0 +1,22 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><link rel="stylesheet" href="card-base.css"></head>
+<body><div class="card">
+<style>
+.grid { display:grid; grid-template-columns: repeat(5,1fr); gap:10px; }
+.box { background: var(--bg-surface); border: 1px solid var(--border); padding: 10px 8px; text-align:center; }
+.swatch { height: 28px; background: #3a405a; margin-bottom: 8px; border-radius: 4px; }
+.swatch.sub { background: #2f3346; }
+.name { font-size: 10px; color: var(--text-primary); letter-spacing: 0.5px; }
+.val { font-size: 9px; color: var(--text-muted); margin-top:2px; font-family: monospace; }
+</style>
+<div class="grid">
+  <div class="box"><div class="swatch" style="height:2px;margin-top:13px;margin-bottom:13px;border-radius:0"></div><div class="name">border hairline</div><div class="val">1px #3A405A</div></div>
+  <div class="box"><div class="swatch sub" style="height:2px;margin-top:13px;margin-bottom:13px;border-radius:0"></div><div class="name">border-subtle</div><div class="val">1px #2F3346</div></div>
+  <div class="box"><div class="swatch" style="border-radius:2px"></div><div class="name">r-0 default</div><div class="val">2px</div></div>
+  <div class="box"><div class="swatch" style="border-radius:8px"></div><div class="name">r-4 icons</div><div class="val">8px</div></div>
+  <div class="box"><div class="swatch" style="border-radius:12px"></div><div class="name">r-8 card/video</div><div class="val">12px</div></div>
+</div>
+<div style="margin-top:14px; font-size:11px; color: var(--text-secondary); line-height:1.6">
+  <b style="color:var(--text-primary)">Softly rounded by default.</b> Tables, buttons, rows, and tabs get a 2px base; chips and icon tiles sit at 6–8px; cards and lightboxes at 12px. Corners are always present — never sharp, never pill-like except on marketing CTAs.ps (2–4px), tooltip (6px), video/lightbox (8px).
+</div>
+</div></body></html>

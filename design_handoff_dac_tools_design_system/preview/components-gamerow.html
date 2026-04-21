@@ -1,0 +1,23 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><link rel="stylesheet" href="card-base.css"></head>
+<body><div class="card" style="padding:0">
+<style>
+.th { display: grid; grid-template-columns: 72px 1fr 120px 80px 60px 100px; padding: 0 20px; background: #262a3a; border-bottom: 1px solid #3a405a; }
+.th div { font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; color: #5c6278; padding: 14px 6px; }
+.tr { display: grid; grid-template-columns: 72px 1fr 120px 80px 60px 100px; padding: 0 20px; align-items:center; border-bottom: 1px solid #2f3346; }
+.cell { padding: 12px 6px; font-size: 16px; color: var(--text-primary); }
+.plate { font-family:'Cinzel',serif; font-size:28px; font-weight:700; width:52px; height:52px; display:flex; align-items:center; justify-content:center; border:1px solid; opacity:0.9; }
+.lineup { display:flex; gap: 3px; }
+.u { width: 28px; height: 28px; border-radius: 6px; border: 2px solid; background: #2f3346; }
+.wl-w { color: #4eaa62; } .wl-l { color: #c44e4e; } .sep { color: #5c6278; }
+.rank-cell { font-size: 14px; color: var(--text-secondary); }
+.rank-arrow { color: #4eaa62; font-size: 11px; margin-left: 4px; }
+.date { font-size: 13px; color: #5c6278; }
+.hover { background: #383d52; }
+.gold-bg { background: rgba(201,168,76,0.04); }
+</style>
+<div class="th"><div>#</div><div>Lineup</div><div>Rank</div><div>W – L</div><div>Lvl</div><div>Date</div></div>
+<div class="tr gold-bg"><div class="cell"><div class="plate" style="color:#c9a84c;border-color:#c9a84c">1</div></div><div class="cell"><div class="lineup"><div class="u" style="border-color:#8a7234"></div><div class="u" style="border-color:#c9a84c"></div><div class="u" style="border-color:#5a8fd5"></div><div class="u" style="border-color:#c9a84c"></div><div class="u" style="border-color:#8a7234"></div></div></div><div class="cell rank-cell">Bishop-5<span class="rank-arrow">▲</span></div><div class="cell"><span class="wl-w">7</span><span class="sep"> – </span><span class="wl-l">2</span></div><div class="cell">9</div><div class="cell date">Apr 21 · 14:02</div></div>
+<div class="tr hover"><div class="cell"><div class="plate" style="color:#8a92a8;border-color:#8a92a8">2</div></div><div class="cell"><div class="lineup"><div class="u" style="border-color:#8a92a8"></div><div class="u" style="border-color:#8a7234"></div><div class="u" style="border-color:#8a7234"></div><div class="u" style="border-color:#c9a84c"></div></div></div><div class="cell rank-cell">Bishop-4</div><div class="cell"><span class="wl-w">6</span><span class="sep"> – </span><span class="wl-l">3</span></div><div class="cell">8</div><div class="cell date">Apr 20 · 22:14</div></div>
+<div class="tr"><div class="cell"><div class="plate" style="color:#e4e7ee;border-color:#e4e7ee">5</div></div><div class="cell"><div class="lineup"><div class="u" style="border-color:#8a7234"></div><div class="u" style="border-color:#8a7234"></div><div class="u" style="border-color:#5a8fd5"></div></div></div><div class="cell rank-cell">Bishop-3<span class="rank-arrow" style="color:#c44e4e">▼</span></div><div class="cell"><span class="wl-w">3</span><span class="sep"> – </span><span class="wl-l">5</span></div><div class="cell">7</div><div class="cell date">Apr 20 · 19:48</div></div>
+</div></body></html>

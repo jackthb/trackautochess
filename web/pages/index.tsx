@@ -155,7 +155,7 @@ export default function Home({ supabase }: HomeProps) {
           display: flex;
           align-items: center;
           justify-content: center;
-          font-family: "IBM Plex Mono", monospace;
+          font-family: var(--font-mono);
           font-size: 11px;
           font-weight: 400;
           letter-spacing: 2px;

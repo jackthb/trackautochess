@@ -1,0 +1,26 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><link rel="stylesheet" href="card-base.css"></head>
+<body><div class="card">
+<style>
+.bar { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: #2f3346; border: 1px solid #3a405a; border-radius: 8px; overflow: hidden; }
+.cell { background: #262a3a; padding: 20px 16px; text-align: center; }
+.val {
+  font-size: 34px;
+  font-weight: 800;
+  color: var(--text-primary);
+  line-height: 1;
+  margin-bottom: 6px;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.5px;
+}
+.val.gold { color: #c9a84c; }
+.val.green { color: #4eaa62; }
+.lbl { font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--text-muted); }
+</style>
+<div class="bar">
+  <div class="cell"><div class="val">127</div><div class="lbl">Games</div></div>
+  <div class="cell"><div class="val gold">3.8</div><div class="lbl">Avg Place</div></div>
+  <div class="cell"><div class="val green">62%</div><div class="lbl">Top 4 Rate</div></div>
+  <div class="cell"><div class="val gold">18</div><div class="lbl">Wins</div></div>
+</div>
+</div></body></html>

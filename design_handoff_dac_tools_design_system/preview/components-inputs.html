@@ -1,0 +1,36 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><link rel="stylesheet" href="card-base.css"></head>
+<body><div class="card">
+<style>
+.col { display:flex; flex-direction:column; gap: 10px; max-width: 420px; }
+input, select { font-family:'JetBrains Mono',monospace; font-size: 13px; color: var(--text-primary); background: #1e2130; border: 1px solid var(--border); padding: 7px 10px; width: 100%; box-sizing: border-box; border-radius: 6px; }
+.misc { display: none; /* placeholder to keep layout stable if truncarder-box; }
+input::placeholder { color: var(--text-muted); }
+input:focus, select:focus { outline: none; border-color: #E0402A; }
+.focused { border-color: #E0402A !important; }
+.lbl { font-size: 10px; color: var(--text-muted); letter-spacing: 1px; text-transform: uppercase; }
+.field { display: flex; flex-direction: column; gap: 4px; }
+.chip-row { display: flex; flex-wrap: wrap; gap: 6px; padding: 6px; background: #1e2130; border: 1px solid var(--border); min-height: 38px; align-items: center; border-radius: 6px; }
+.chip { display: inline-flex; align-items:center; gap: 4px; background: #2f3346; border: 1px solid var(--border); border-radius: 6px; padding: 3px 6px; font-size: 12px; color: var(--text-secondary); }
+.chip-cost { background: #1e2130; border: 1px solid var(--border); color: #c9a84c; font-size: 11px; font-weight: 600; padding: 1px 4px; border-radius: 4px; }
+.chip-x { color: var(--text-muted); cursor: pointer; padding: 0 2px; }
+</style>
+<div class="col">
+  <div class="field">
+    <div class="lbl">Player</div>
+    <input type="text" placeholder="Look up Steam ID or name..." />
+  </div>
+  <div class="field">
+    <div class="lbl">Rank (focused)</div>
+    <input class="focused" type="text" value="Bishop 5" />
+  </div>
+  <div class="field">
+    <div class="lbl">Synergies</div>
+    <div class="chip-row">
+      <span class="chip">Hunter <span class="chip-cost">2</span><span class="chip-x">×</span></span>
+      <span class="chip">Warlock <span class="chip-cost">4</span><span class="chip-x">×</span></span>
+      <span class="chip">Demon <span class="chip-cost">1</span><span class="chip-x">×</span></span>
+    </div>
+  </div>
+</div>
+</div></body></html>

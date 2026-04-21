@@ -14,12 +14,12 @@ export function placementBg(p: number): string {
 
 export function costBorderColor(cost: number): string {
   switch (cost) {
-    case 1: return "#3a3f50";
+    case 1: return "#5c6278";
     case 2: return "#5a8fd5";
     case 3: return "#2a4a8a";
     case 4: return "#c44ea0";
     case 5: return "#c9a84c";
-    default: return "#3a3f50";
+    default: return "#5c6278";
   }
 }
 

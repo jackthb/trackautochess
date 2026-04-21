@@ -229,7 +229,7 @@ export function NavBar({ supabase }: NavBarProps) {
           flex-shrink: 0;
         }
         .nav-link {
-          font-family: "IBM Plex Mono", monospace;
+          font-family: var(--font-mono);
           font-size: 12px;
           letter-spacing: 1.5px;
           text-transform: uppercase;
@@ -270,7 +270,7 @@ export function NavBar({ supabase }: NavBarProps) {
           align-items: baseline;
           gap: 8px;
           padding: 8px 14px;
-          font-family: "IBM Plex Mono", monospace;
+          font-family: var(--font-mono);
           font-size: 13px;
           color: var(--text-primary);
           cursor: pointer;
@@ -292,21 +292,22 @@ export function NavBar({ supabase }: NavBarProps) {
         }
         .search-empty {
           padding: 10px 14px;
-          font-family: "IBM Plex Mono", monospace;
+          font-family: var(--font-mono);
           font-size: 12px;
           color: var(--text-muted);
           letter-spacing: 0.5px;
         }
         .search-input {
           width: 100%;
-          font-family: "IBM Plex Mono", monospace;
-          font-size: 13px;
+          font-family: var(--font-mono);
+          font-size: var(--fs-13);
           color: var(--text-primary);
           background: var(--bg-surface);
           border: 1px solid var(--border);
+          border-radius: var(--r-3);
           padding: 7px 14px;
-          letter-spacing: 0.5px;
-          transition: border-color 0.15s;
+          letter-spacing: var(--tr-body);
+          transition: border-color var(--t-base) var(--t-easing);
         }
         .search-input::placeholder {
           color: var(--text-muted);
@@ -331,22 +332,23 @@ export function NavBar({ supabase }: NavBarProps) {
           color: var(--text-primary);
         }
         .nav-btn {
-          font-family: "IBM Plex Mono", monospace;
-          font-size: 13px;
+          font-family: var(--font-mono);
+          font-size: var(--fs-13);
           color: var(--text-muted);
           background: none;
           border: 1px solid var(--border);
-          padding: 6px 16px;
+          border-radius: var(--r-4);
+          padding: 7px 18px;
           cursor: pointer;
-          letter-spacing: 0.5px;
-          transition: all 0.15s;
+          letter-spacing: var(--tr-body);
+          transition: color var(--t-base) var(--t-easing), border-color var(--t-base) var(--t-easing), background var(--t-base) var(--t-easing);
         }
         .nav-btn:hover {
           color: var(--text-secondary);
           border-color: var(--text-muted);
         }
         .nav-signin {
-          font-family: "IBM Plex Mono", monospace;
+          font-family: var(--font-mono);
           font-size: 13px;
           color: var(--text-secondary);
           letter-spacing: 0.5px;

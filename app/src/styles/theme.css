@@ -3,7 +3,8 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {
-  font-family: 'IBM Plex Mono', monospace;
+  font-family: var(--font-mono);
+  font-size: var(--fs-14);
   background: var(--bg-deep);
   color: var(--text-primary);
   height: 100vh;
@@ -13,7 +14,7 @@ body {
   flex-direction: column;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  line-height: 1.5;
+  line-height: var(--lh-body);
 }
 
 /* Noise texture overlay */

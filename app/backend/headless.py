@@ -361,6 +361,16 @@ class HeadlessBackend:
 
             # Store screen type in manifest for future reference
             self._update_manifest(local_path, screen_type=screen_type)
+            if screen_type in ("my_matches", "game_over"):
+                label = "My Matches" if screen_type == "my_matches" else "Game Over"
+                self._emit({
+                    "type": "processing_screenshot",
+                    "screenshot_b64": self._preview_b64(img),
+                    "screenshot_name": Path(local_path).name,
+                    "screenshot_path": local_path,
+                    "screen_type": screen_type,
+                    "message": f"Loading screenshot and processing {label}...",
+                })
 
             if screen_type == "my_matches":
                 self._emit_notification(APP_NAME, "My Matches detected — parsing...")
@@ -426,30 +436,16 @@ class HeadlessBackend:
             self._pending_img = img
             self._pending_screenshot_path = screenshot_path
 
-            # Encode screenshot as base64 JPEG for renderer preview
-            screenshot_b64 = ""
-            try:
-                from PIL import Image as PILImage
-                import io
-                import numpy as np
-                rgb = img[:, :, ::-1] if isinstance(img, np.ndarray) else img
-                pil_img = PILImage.fromarray(rgb)
-                # Resize for preview
-                max_w = 800
-                if pil_img.width > max_w:
-                    ratio = max_w / pil_img.width
-                    pil_img = pil_img.resize((max_w, int(pil_img.height * ratio)), PILImage.LANCZOS)
-                buf = io.BytesIO()
-                pil_img.save(buf, format="JPEG", quality=70)
-                screenshot_b64 = base64.b64encode(buf.getvalue()).decode("ascii")
-            except Exception as e:
-                log.warning("Failed to encode screenshot preview: %s", e)
+            screenshot_b64 = self._preview_b64(img)
 
             self._emit({
                 "type": "parse_result",
                 "rows": rows,
                 "timestamps": timestamps,
                 "screenshot_b64": screenshot_b64,
+                "screenshot_name": Path(screenshot_path).name if screenshot_path else "",
+                "screenshot_path": screenshot_path,
+                "screen_type": "my_matches",
             })
 
             if screenshot_path:
@@ -893,6 +889,15 @@ class HeadlessBackend:
                 daemon=True,
                 name="debug-view",
             ).start()
+        elif cmd == "debug_saved_screenshot":
+            img_path = msg.get("path", "")
+            screen_type = msg.get("screen_type")
+            threading.Thread(
+                target=self._do_debug_saved_screenshot,
+                args=(img_path, screen_type),
+                daemon=True,
+                name="debug-saved-screenshot",
+            ).start()
         elif cmd == "quit":
             self._shutdown()
         else:
@@ -926,6 +931,35 @@ class HeadlessBackend:
                 continue
             crops.append({"name": name, "image": self._img_b64(crop), "coords": coords})
         return crops
+
+    def _preview_b64(self, img, max_w: int = 900) -> str:
+        try:
+            from PIL import Image as PILImage
+            import io
+            import numpy as np
+
+            rgb = img[:, :, ::-1] if isinstance(img, np.ndarray) else img
+            pil_img = PILImage.fromarray(rgb)
+            if pil_img.width > max_w:
+                ratio = max_w / pil_img.width
+                pil_img = pil_img.resize((max_w, int(pil_img.height * ratio)), PILImage.LANCZOS)
+            buf = io.BytesIO()
+            pil_img.save(buf, format="JPEG", quality=80)
+            return base64.b64encode(buf.getvalue()).decode("ascii")
+        except Exception as e:
+            log.warning("Failed to encode preview image: %s", e)
+            return ""
+
+    def _resolve_debug_regions(self, screen: str, aspect_ratio: str, regions_config: dict) -> dict:
+        ar_data = regions_config.get(aspect_ratio) or {}
+        key_map = {
+            "game_over": "game_over",
+            "my_matches": "my_matches",
+            "final_ranking": "sentinel_final_ranking",
+            "sentinel_final_ranking": "sentinel_final_ranking",
+            "sentinel_round_start": "sentinel_round_start",
+        }
+        return dict(ar_data.get(key_map.get(screen, screen)) or {})
 
     def _do_debug_screenshot(self, img_path: str) -> None:
         try:
@@ -1028,6 +1062,8 @@ class HeadlessBackend:
             if not aspect_ratio:
                 h, w = img.shape[:2]
                 aspect_ratio = infer_aspect_ratio(w, h, list(regions_config.keys()))
+            if not regions:
+                regions = self._resolve_debug_regions(screen, aspect_ratio, regions_config)
             apply_calibration(img, aspect_ratio=aspect_ratio, regions_config=regions_config)
 
             h, w = img.shape[:2]
@@ -1099,6 +1135,34 @@ class HeadlessBackend:
             self._emit({"type": "debug_result", "data": result})
         except Exception as e:
             log.exception("debug_view error")
+            self._emit({"type": "debug_result", "data": {"error": str(e)}})
+
+    def _do_debug_saved_screenshot(self, img_path: str, screen_type: str | None = None) -> None:
+        try:
+            import cv2
+            from cv_parser import apply_calibration, detect_screen_type
+
+            img = cv2.imread(img_path)
+            if img is None:
+                self._emit({"type": "debug_result", "data": {"error": f"Cannot read {img_path}"}})
+                return
+
+            regions_config = load_regions_config()
+            h, w = img.shape[:2]
+            aspect_ratio = infer_aspect_ratio(w, h, list(regions_config.keys()))
+            apply_calibration(img, aspect_ratio=aspect_ratio, regions_config=regions_config)
+            screen = detect_screen_type(img) if not screen_type or screen_type == "unknown" else screen_type
+            if screen == "final_ranking":
+                screen = "sentinel_final_ranking"
+
+            self._do_debug_view(
+                img_path,
+                screen,
+                self._resolve_debug_regions(screen, aspect_ratio, regions_config),
+                aspect_ratio,
+            )
+        except Exception as e:
+            log.exception("debug_saved_screenshot error")
             self._emit({"type": "debug_result", "data": {"error": str(e)}})
 
     def _run_sentinel_debug(self, img, screen: str, regions: dict, result: dict) -> dict:

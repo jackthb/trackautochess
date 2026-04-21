@@ -137,7 +137,7 @@ export default function ItemsPage({ supabase }: ItemsPageProps) {
         .search {
           width: 100%;
           max-width: 360px;
-          font-family: "IBM Plex Mono", monospace;
+          font-family: var(--font-mono);
           font-size: 13px;
           color: var(--text-primary);
           background: var(--bg-surface);

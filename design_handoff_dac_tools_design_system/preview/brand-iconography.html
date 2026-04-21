@@ -1,0 +1,19 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><link rel="stylesheet" href="card-base.css"></head>
+<body><div class="card">
+<style>
+.wrap { display:flex; flex-direction:column; gap: 12px; }
+.row { display: flex; gap: 14px; align-items: center; }
+.icon-box { display: inline-flex; align-items:center; justify-content:center; width: 32px; height: 32px; background: var(--bg-surface); border: 1px solid var(--border); color: var(--text-secondary); }
+.desc { font-size: 11px; color: var(--text-secondary); line-height: 1.5; flex: 1; }
+.glyph { font-family: 'JetBrains Mono',monospace; font-size: 14px; }
+.glyph-up { color: #4eaa62; } .glyph-down { color: #c44e4e; }
+.star-2 { color: #5a8fd5; } .star-3 { color: #c9a84c; }
+</style>
+<div class="wrap">
+  <div class="row"><span class="icon-box"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg></span><div class="desc"><b style="color:var(--text-primary)">Share</b> — inline 14×14 SVG, stroke 2, round caps. The only UI icon shipped as SVG inline.</div></div>
+  <div class="row"><span class="icon-box"><svg width="10" height="1" viewBox="0 0 10 1"><rect width="10" height="1" fill="currentColor"/></svg></span><span class="icon-box"><svg width="10" height="10" viewBox="0 0 10 10"><rect x="0.5" y="0.5" width="9" height="9" fill="none" stroke="currentColor"/></svg></span><span class="icon-box"><svg width="10" height="10" viewBox="0 0 10 10"><line x1="0" y1="0" x2="10" y2="10" stroke="currentColor" stroke-width="1.2"/><line x1="10" y1="0" x2="0" y2="10" stroke="currentColor" stroke-width="1.2"/></svg></span><div class="desc"><b style="color:var(--text-primary)">Window controls</b> — bespoke 10×10 hairline SVGs. Minimize, maximize, close.</div></div>
+  <div class="row"><span class="icon-box"><span class="glyph glyph-up">▲</span></span><span class="icon-box"><span class="glyph glyph-down">▼</span></span><div class="desc"><b style="color:var(--text-primary)">Unicode glyphs</b> — rank change arrows (▲ U+25B2, ▼ U+25BC), colored green/red-bright.</div></div>
+  <div class="row"><span class="icon-box"><span class="glyph star-2">★★</span></span><span class="icon-box"><span class="glyph star-3">★★★</span></span><div class="desc"><b style="color:var(--text-primary)">Stars</b> — ★ U+2605 unicode, 2★ blue / 3★ gold.</div></div>
+</div>
+</div></body></html>

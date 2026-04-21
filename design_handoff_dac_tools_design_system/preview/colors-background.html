@@ -1,0 +1,18 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><link rel="stylesheet" href="card-base.css"></head>
+<body><div class="card">
+<style>
+.swatches { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+.sw { border: 1px solid var(--border); }
+.sw-chip { height: 60px; }
+.sw-meta { padding: 8px 10px; display: flex; flex-direction: column; gap: 2px; background: var(--bg-surface); border-top: 1px solid var(--border-subtle); }
+.sw-name { font-size: 11px; color: var(--text-primary); letter-spacing: 0.5px; }
+.sw-hex { font-size: 10px; color: var(--text-muted); letter-spacing: 0.3px; }
+</style>
+<div class="swatches">
+  <div class="sw"><div class="sw-chip" style="background:#1e2130"></div><div class="sw-meta"><div class="sw-name">bg-deep</div><div class="sw-hex">#1E2130</div></div></div>
+  <div class="sw"><div class="sw-chip" style="background:#262a3a"></div><div class="sw-meta"><div class="sw-name">bg-surface</div><div class="sw-hex">#262A3A</div></div></div>
+  <div class="sw"><div class="sw-chip" style="background:#2f3346"></div><div class="sw-meta"><div class="sw-name">bg-elevated</div><div class="sw-hex">#2F3346</div></div></div>
+  <div class="sw"><div class="sw-chip" style="background:#383d52"></div><div class="sw-meta"><div class="sw-name">bg-hover</div><div class="sw-hex">#383D52</div></div></div>
+</div>
+</div></body></html>

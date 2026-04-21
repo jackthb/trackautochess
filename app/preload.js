@@ -13,6 +13,8 @@ contextBridge.exposeInMainWorld("screenshots", {
   delete: (filename) => ipcRenderer.invoke("screenshots:delete", filename),
   openFolder: () => ipcRenderer.invoke("screenshots:openFolder"),
   thumbnail: (filename) => ipcRenderer.invoke("screenshots:thumbnail", filename),
+  canAccessDebug: () => ipcRenderer.invoke("screenshots:canAccessDebug"),
+  debug: (filename, screenType) => ipcRenderer.invoke("screenshots:debug", filename, screenType),
   getParseResult: (filename) => ipcRenderer.invoke("screenshots:getParseResult", filename),
   updateParseRow: (filename, rowIndex, fields) => ipcRenderer.invoke("screenshots:updateParseRow", filename, rowIndex, fields),
 });

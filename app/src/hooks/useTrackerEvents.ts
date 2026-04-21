@@ -1,5 +1,11 @@
 import { useEffect, useRef, useCallback, useState } from "react";
-import type { TrackerEvent, TrackerStatus, ParseResult, LogEntry } from "../types";
+import type {
+  TrackerEvent,
+  TrackerStatus,
+  ParseResult,
+  ProcessingScreenshot,
+  LogEntry,
+} from "../types";
 
 const MAX_LOG_ENTRIES = 500;
 
@@ -10,6 +16,7 @@ export interface ImportResult {
 
 interface TrackerState {
   status: TrackerStatus | null;
+  processingScreenshot: ProcessingScreenshot | null;
   pendingParseResult: ParseResult | null;
   clearParseResult: () => void;
   lastImportResult: ImportResult | null;
@@ -30,6 +37,8 @@ export function useTrackerEvents(
   onReplaySaved?: () => void
 ): TrackerState {
   const [status, setStatus] = useState<TrackerStatus | null>(null);
+  const [processingScreenshot, setProcessingScreenshot] =
+    useState<ProcessingScreenshot | null>(null);
   const [pendingParseResult, setPendingParseResult] =
     useState<ParseResult | null>(null);
   const [lastImportResult, setLastImportResult] = useState<ImportResult | null>(null);
@@ -97,17 +106,23 @@ export function useTrackerEvents(
             setAuthError(msg.message);
           }
           break;
+        case "processing_screenshot":
+          setProcessingScreenshot(msg);
+          break;
         case "parse_result":
+          setProcessingScreenshot(null);
           setPendingParseResult(msg);
           finishImport();
           break;
         case "import_result":
+          setProcessingScreenshot(null);
           setPendingParseResult(null);
           setLastImportResult({ imported: msg.imported, skipped: msg.skipped });
           finishImport();
           callbacksRef.current.onImportResult?.();
           break;
         case "import_finished":
+          setProcessingScreenshot(null);
           finishImport();
           break;
         case "focus_gained":
@@ -124,6 +139,7 @@ export function useTrackerEvents(
           callbacksRef.current.onReplaySaved?.();
           break;
         case "error":
+          setProcessingScreenshot(null);
           if (msg.message?.includes("exited")) {
             setStatus((prev) =>
               prev ? { ...prev, type: "status" } : prev
@@ -158,6 +174,7 @@ export function useTrackerEvents(
 
   return {
     status,
+    processingScreenshot,
     pendingParseResult,
     clearParseResult,
     lastImportResult,

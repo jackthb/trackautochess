@@ -259,6 +259,7 @@ function handlePythonEvent(msg) {
       trackerStatus.focused = false;
       break;
 
+    case "processing_screenshot":
     case "parse_result":
       // Switch to confirmation tab
       if (mainWindow && !mainWindow.isDestroyed()) {
@@ -442,7 +443,7 @@ function createWindow() {
     height: 800,
     minWidth: 800,
     minHeight: 600,
-    backgroundColor: "#08090b",
+    backgroundColor: "#1e2130",
     icon: path.join(ICONS_DIR, ICON_FILENAME),
     frame: false,
     show: false,
@@ -1140,6 +1141,36 @@ ipcMain.handle("screenshots:thumbnail", async (_event, filename) => {
   const ext = path.extname(filename).toLowerCase();
   const mime = ext === ".png" ? "image/png" : "image/jpeg";
   return `data:${mime};base64,${buf.toString("base64")}`;
+});
+
+ipcMain.handle("screenshots:canAccessDebug", async () => {
+  return canAccessCalibration();
+});
+
+ipcMain.handle("screenshots:debug", async (_event, filename, screenType) => {
+  if (!canAccessCalibration()) {
+    return { error: "Debug access is not enabled for this user." };
+  }
+
+  const filePath = path.join(SCREENSHOT_DIR, filename);
+  if (!filePath.startsWith(SCREENSHOT_DIR) || !fs.existsSync(filePath)) {
+    return { error: "Screenshot not found." };
+  }
+
+  return new Promise((resolve) => {
+    debugResolve = resolve;
+    sendToPython({
+      cmd: "debug_saved_screenshot",
+      path: filePath,
+      screen_type: screenType || null,
+    });
+    setTimeout(() => {
+      if (debugResolve === resolve) {
+        debugResolve = null;
+        resolve({ error: "Screenshot debug timed out (30s)" });
+      }
+    }, 30000);
+  });
 });
 
 ipcMain.handle("screenshots:getParseResult", async (_event, filename) => {

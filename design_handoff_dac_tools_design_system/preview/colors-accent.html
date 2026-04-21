@@ -1,0 +1,25 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><link rel="stylesheet" href="card-base.css"></head>
+<body><div class="card">
+<style>
+.accents { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.sw { border: 1px solid var(--border); background: var(--bg-surface); }
+.sw-chip { height: 62px; position: relative; }
+.sw-meta { padding: 8px 10px; display: flex; flex-direction: column; gap: 2px; border-top: 1px solid var(--border-subtle); }
+.sw-name { font-size: 11px; color: var(--text-primary); letter-spacing: 0.5px; }
+.sw-role { font-size: 10px; color: var(--text-muted); letter-spacing: 1px; text-transform: uppercase; }
+.sw-hex { font-size: 10px; color: var(--text-secondary); }
+.logo-grad {
+  margin-top: 12px; height: 12px; border: 1px solid var(--border);
+  background: linear-gradient(90deg, #FF6046 0%, #E0402A 33%, #CC3520 66%, #B02A18 100%);
+}
+.logo-label { margin-top:6px; font-size: 10px; color: var(--text-muted); letter-spacing: 1px; text-transform: uppercase; }
+</style>
+<div class="accents">
+  <div class="sw"><div class="sw-chip" style="background:#FF6046"></div><div class="sw-meta"><div class="sw-name">accent-hover</div><div class="sw-role">Focus / tooltip active</div><div class="sw-hex">#FF6046</div></div></div>
+  <div class="sw"><div class="sw-chip" style="background:#E0402A"></div><div class="sw-meta"><div class="sw-name">accent</div><div class="sw-role">Primary CTA / active tab</div><div class="sw-hex">#E0402A</div></div></div>
+  <div class="sw"><div class="sw-chip" style="background:#CC3520"></div><div class="sw-meta"><div class="sw-name">accent-dim</div><div class="sw-role">Rule / subtle accent</div><div class="sw-hex">#CC3520</div></div></div>
+</div>
+<div class="logo-grad"></div>
+<div class="logo-label">Logo gradient — derived from chess-bishop mark</div>
+</div></body></html>

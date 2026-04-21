@@ -3,12 +3,15 @@ import type {
   Screenshot,
   SavedParseResult,
   ParseResultRow,
+  ScreenshotDebugResult,
   UnitFullInfo,
   SynergyInfo,
   RelicInfo,
 } from "../types";
 import type { ImportResult } from "../hooks/useTrackerEvents";
 import type { Game } from "../../../shared/types";
+import { ZoomableImageModal } from "./ZoomableImageModal";
+import { ScreenshotDebugModal } from "./ScreenshotDebugModal";
 import { GameRowDisplay } from "@dac/shared/GameRowDisplay";
 import {
   placementBg,
@@ -29,6 +32,7 @@ interface ScreenshotHistoryProps {
   synergiesData: Record<string, SynergyInfo>;
   relicsData: Record<string, RelicInfo>;
   importing?: boolean;
+  debugEnabled?: boolean;
 }
 
 export function parseRowToGame(row: ParseResultRow, timestamp: string): Game {
@@ -55,6 +59,7 @@ export function parseRowToGame(row: ParseResultRow, timestamp: string): Game {
     screenshot: null,
     replay: null,
     notes: null,
+    match_id: null,
     played_at: timestamp || "",
     created_at: "",
   };
@@ -254,6 +259,7 @@ export function ScreenshotHistory({
   synergiesData,
   relicsData,
   importing = false,
+  debugEnabled = false,
 }: ScreenshotHistoryProps) {
   const [screenshots, setScreenshots] = useState<Screenshot[]>([]);
   const [loading, setLoading] = useState(true);
@@ -269,6 +275,9 @@ export function ScreenshotHistory({
   const [importingPath, setImportingPath] = useState<string | null>(null);
   const [loadingThumbnail, setLoadingThumbnail] = useState<string | null>(null);
   const [successToast, setSuccessToast] = useState<string | null>(null);
+  const [debugLoadingFor, setDebugLoadingFor] = useState<string | null>(null);
+  const [debugData, setDebugData] = useState<ScreenshotDebugResult | null>(null);
+  const [zoomSrc, setZoomSrc] = useState<string | null>(null);
   const toastTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const refresh = useCallback(async () => {
@@ -366,6 +375,17 @@ export function ScreenshotHistory({
     }
     setExpandedImage(name);
   };
+
+  const handleDebug = useCallback(async (name: string, screenType: string | null) => {
+    setDebugLoadingFor(name);
+    setDebugData(null);
+    try {
+      const data = await window.screenshots.debug(name, screenType);
+      setDebugData(data);
+    } finally {
+      setDebugLoadingFor(null);
+    }
+  }, []);
 
   const handleUpdateRow = useCallback(
     async (screenshotName: string, rowIndex: number, fields: Partial<ParseResultRow>) => {
@@ -488,6 +508,18 @@ export function ScreenshotHistory({
                         {importingPath === ss.path ? "Importing" : "Import"}
                       </button>
                     )}
+                    {debugEnabled && (
+                      <button
+                        className={`btn-ss-small${debugLoadingFor === ss.name ? " btn-loading" : ""}`}
+                        disabled={!!debugLoadingFor}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleDebug(ss.name, ss.screenType);
+                        }}
+                      >
+                        {debugLoadingFor === ss.name ? "Debugging" : "Debug"}
+                      </button>
+                    )}
                     {deleteConfirm === ss.name ? (
                       <>
                         <button
@@ -532,7 +564,12 @@ export function ScreenshotHistory({
                     )}
                     {thumbnailCache[ss.name] && (
                       <div className="ss-item-preview">
-                        <img src={thumbnailCache[ss.name]} alt={ss.name} />
+                        <img
+                          src={thumbnailCache[ss.name]}
+                          alt={ss.name}
+                          onClick={() => setZoomSrc(thumbnailCache[ss.name])}
+                          style={{ cursor: "zoom-in" }}
+                        />
                       </div>
                     )}
                     {parsed && parsed.rows.length > 0 && (
@@ -559,6 +596,18 @@ export function ScreenshotHistory({
             );
           })}
         </div>
+      )}
+      {zoomSrc && <ZoomableImageModal src={zoomSrc} alt="Screenshot preview" onClose={() => setZoomSrc(null)} />}
+      {(debugLoadingFor || debugData) && (
+        <ScreenshotDebugModal
+          title="Deep Debug"
+          debugData={debugData}
+          loading={!!debugLoadingFor}
+          onClose={() => {
+            setDebugLoadingFor(null);
+            setDebugData(null);
+          }}
+        />
       )}
     </div>
   );
