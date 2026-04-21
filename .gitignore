@@ -26,3 +26,10 @@ tracker/build/
 tracker/dist/
 .venv/
 .claude/
+.codex
+.dac-local/
+.uv-cache/
+.electron-builder-cache/
+/.local-bin/
+/build/
+/dist/

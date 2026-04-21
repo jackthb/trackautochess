@@ -7,6 +7,7 @@ import { ReplaysTab } from "./components/ReplaysTab";
 import { ConfirmationTab } from "./components/ConfirmationTab";
 import { SettingsTab } from "./components/SettingsTab";
 import { LogTab } from "./components/LogTab";
+import { LoginScreen } from "./components/LoginScreen";
 import { useTrackerEvents } from "./hooks/useTrackerEvents";
 import { useGames } from "./hooks/useGames";
 import { useDrodo } from "./hooks/useDrodo";
@@ -28,6 +29,7 @@ export default function App() {
   }, [gamesState.refresh]);
 
   const tracker = useTrackerEvents(handleImportResult, replaysState.refresh);
+  const showLoginScreen = !tracker.status?.logged_in;
 
   const hasParseResult = tracker.pendingParseResult !== null;
   const prevHasResult = useRef(false);
@@ -51,55 +53,65 @@ export default function App() {
   return (
     <>
       <TitleBar />
-      <TabBar
-        active={activeTab}
-        onChange={handleTabChange}
-        showConfirmBadge={hasParseResult}
-      />
-      <div style={{ flex: 1, overflow: "hidden", display: "flex" }}>
-        {activeTab === "history" && (
-          <HistoryTab
-            {...gamesState}
-            drodo={drodoState.drodo}
-            drodoLoading={drodoState.loading}
-            refreshDrodo={drodoState.refresh}
-            focusGameId={focusGameId}
-            onFocusHandled={() => setFocusGameId(null)}
+      {showLoginScreen ? (
+        <LoginScreen
+          status={tracker.status}
+          authError={tracker.authError}
+          onClearAuthError={tracker.clearAuthError}
+        />
+      ) : (
+        <>
+          <TabBar
+            active={activeTab}
+            onChange={handleTabChange}
+            showConfirmBadge={hasParseResult}
           />
-        )}
-        {activeTab === "replays" && (
-          <ReplaysTab
-            {...replaysState}
-            recording={tracker.status?.recording ?? false}
-            recordingStats={tracker.status?.recording_stats ?? null}
-            games={gamesState.games}
-            updateGame={gamesState.updateGame}
-            onViewGame={handleViewGame}
-          />
-        )}
-        {activeTab === "confirm" && (
-          <ConfirmationTab
-            parseResult={tracker.pendingParseResult}
-            onClear={tracker.clearParseResult}
-            lastImportResult={tracker.lastImportResult}
-            onClearImportResult={tracker.clearImportResult}
-            unitCosts={gamesState.unitCosts}
-            unitsFull={gamesState.unitsFull}
-            synergiesData={gamesState.synergiesData}
-            relicsData={gamesState.relicsData}
-            importing={tracker.importing}
-            onBeginImport={tracker.beginImport}
-          />
-        )}
-        {activeTab === "settings" && (
-          <SettingsTab
-            status={tracker.status}
-            replayStats={replaysState.stats}
-          />
-        )}
-        {activeTab === "log" && <LogTab entries={tracker.logEntries} />}
-      </div>
-      <StatusBar status={tracker.status} />
+          <div style={{ flex: 1, overflow: "hidden", display: "flex" }}>
+            {activeTab === "history" && (
+              <HistoryTab
+                {...gamesState}
+                drodo={drodoState.drodo}
+                drodoLoading={drodoState.loading}
+                refreshDrodo={drodoState.refresh}
+                focusGameId={focusGameId}
+                onFocusHandled={() => setFocusGameId(null)}
+              />
+            )}
+            {activeTab === "replays" && (
+              <ReplaysTab
+                {...replaysState}
+                recording={tracker.status?.recording ?? false}
+                recordingStats={tracker.status?.recording_stats ?? null}
+                games={gamesState.games}
+                updateGame={gamesState.updateGame}
+                onViewGame={handleViewGame}
+              />
+            )}
+            {activeTab === "confirm" && (
+              <ConfirmationTab
+                parseResult={tracker.pendingParseResult}
+                onClear={tracker.clearParseResult}
+                lastImportResult={tracker.lastImportResult}
+                onClearImportResult={tracker.clearImportResult}
+                unitCosts={gamesState.unitCosts}
+                unitsFull={gamesState.unitsFull}
+                synergiesData={gamesState.synergiesData}
+                relicsData={gamesState.relicsData}
+                importing={tracker.importing}
+                onBeginImport={tracker.beginImport}
+              />
+            )}
+            {activeTab === "settings" && (
+              <SettingsTab
+                status={tracker.status}
+                replayStats={replaysState.stats}
+              />
+            )}
+            {activeTab === "log" && <LogTab entries={tracker.logEntries} />}
+          </div>
+          <StatusBar status={tracker.status} />
+        </>
+      )}
     </>
   );
 }

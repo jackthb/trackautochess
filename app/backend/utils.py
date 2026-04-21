@@ -1,13 +1,14 @@
 """Shared utility functions for the DAC tracker."""
 
 import json
+import os
 import sys
 from pathlib import Path
 
 
 # ── Paths ─────────────────────────────────────────────────────────────────────
 
-DAC_DIR = Path.home() / ".dac"
+DAC_DIR = Path(os.environ.get("DAC_DIR") or (Path.home() / ".dac"))
 CONFIG_PATH = DAC_DIR / "config.json"
 
 def _data_dir() -> Path:
@@ -19,7 +20,8 @@ def _data_dir() -> Path:
 
 DATA_DIR = _data_dir()
 ICONS_DIR = DATA_DIR / "icons"
-REGIONS_CONFIG_PATH = DATA_DIR / "regions_config.json"
+DEFAULT_REGIONS_CONFIG_PATH = DATA_DIR / "regions_config.json"
+REGIONS_CONFIG_PATH = DAC_DIR / "regions_config.json"
 
 
 # ── Config ────────────────────────────────────────────────────────────────────
@@ -69,16 +71,18 @@ def save_config(config: dict) -> None:
 
 
 def load_regions_config() -> dict:
-    """Load picker calibration regions from data/regions_config.json."""
-    if not REGIONS_CONFIG_PATH.exists():
-        return {}
-    try:
-        data = json.loads(REGIONS_CONFIG_PATH.read_text(encoding="utf-8"))
-        if isinstance(data, dict) and "aspect_ratios" in data:
-            data = data["aspect_ratios"]
-        return data if isinstance(data, dict) else {}
-    except Exception:
-        return {}
+    """Load picker calibration regions, preferring the user override in DAC_DIR."""
+    for path in (REGIONS_CONFIG_PATH, DEFAULT_REGIONS_CONFIG_PATH):
+        if not path.exists():
+            continue
+        try:
+            data = json.loads(path.read_text(encoding="utf-8"))
+            if isinstance(data, dict) and "aspect_ratios" in data:
+                data = data["aspect_ratios"]
+            return data if isinstance(data, dict) else {}
+        except Exception:
+            continue
+    return {}
 
 
 def infer_aspect_ratio(width: int, height: int, available: list[str] | None = None) -> str:

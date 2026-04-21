@@ -14,6 +14,8 @@ interface TrackerState {
   clearParseResult: () => void;
   lastImportResult: ImportResult | null;
   clearImportResult: () => void;
+  authError: string | null;
+  clearAuthError: () => void;
   logEntries: LogEntry[];
   importing: boolean;
   beginImport: () => void;
@@ -31,6 +33,7 @@ export function useTrackerEvents(
   const [pendingParseResult, setPendingParseResult] =
     useState<ParseResult | null>(null);
   const [lastImportResult, setLastImportResult] = useState<ImportResult | null>(null);
+  const [authError, setAuthError] = useState<string | null>(null);
   const [logEntries, setLogEntries] = useState<LogEntry[]>([]);
   const [importing, setImporting] = useState(false);
   const importTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -71,6 +74,28 @@ export function useTrackerEvents(
           break;
         case "status":
           setStatus(msg);
+          if (msg.logged_in) {
+            setAuthError(null);
+          }
+          break;
+        case "steam_login":
+          setAuthError(null);
+          setStatus((prev) => ({
+            type: "status",
+            recording: prev?.recording ?? false,
+            focused: prev?.focused ?? false,
+            version: prev?.version ?? "",
+            replay_enabled: prev?.replay_enabled ?? true,
+            recording_stats: prev?.recording_stats ?? null,
+            logged_in: true,
+            steam_id: msg.steam_id,
+            steam_name: msg.steam_name,
+          }));
+          break;
+        case "notification":
+          if (msg.message?.toLowerCase().includes("steam login failed")) {
+            setAuthError(msg.message);
+          }
           break;
         case "parse_result":
           setPendingParseResult(msg);
@@ -127,12 +152,18 @@ export function useTrackerEvents(
     setLastImportResult(null);
   }, []);
 
+  const clearAuthError = useCallback(() => {
+    setAuthError(null);
+  }, []);
+
   return {
     status,
     pendingParseResult,
     clearParseResult,
     lastImportResult,
     clearImportResult,
+    authError,
+    clearAuthError,
     logEntries,
     importing,
     beginImport,

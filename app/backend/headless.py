@@ -803,7 +803,7 @@ class HeadlessBackend:
             from db import ensure_user
             ensure_user(sid, name=name)
             self._emit({"type": "steam_login", "steam_id": sid, "steam_name": name})
-            self._emit_notification(APP_NAME, f"Logged in as {name}")
+            self._emit_status()
             log.info("Steam login: %s (%s)", name, sid)
 
         threading.Thread(target=_login, daemon=True, name="steam-login").start()
@@ -1181,7 +1181,7 @@ class HeadlessBackend:
 def main():
     import atexit
     import traceback
-    crash_log = Path.home() / ".dac" / "crash.log"
+    crash_log = DAC_DIR / "crash.log"
     crash_log.parent.mkdir(parents=True, exist_ok=True)
 
     def _on_exit():

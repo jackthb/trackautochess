@@ -18,21 +18,25 @@ const fs = require("fs");
 const os = require("os");
 const { spawn } = require("child_process");
 const readline = require("readline");
+const { getElectronDesktopPaths } = require("./desktop-paths.cjs");
 
-const DAC_DIR = path.join(os.homedir(), ".dac");
-const REPLAY_DIR = path.join(DAC_DIR, "replays");
-const SCREENSHOT_DIR = path.join(DAC_DIR, "screenshots");
-const SCREENSHOT_MANIFEST = path.join(SCREENSHOT_DIR, "manifest.json");
 const IS_PACKAGED = app.isPackaged;
 const RESOURCES_DIR = IS_PACKAGED
   ? process.resourcesPath
   : path.join(__dirname, "..");
-const TRACKER_DIR = IS_PACKAGED
-  ? path.join(RESOURCES_DIR, "headless")
-  : path.join(__dirname, "backend");
-const ICONS_DIR = IS_PACKAGED
-  ? path.join(RESOURCES_DIR, "data", "icons")
-  : path.join(__dirname, "..", "data", "icons");
+const DESKTOP_PATHS = getElectronDesktopPaths(__dirname, {
+  dacDir: process.env.DAC_DIR,
+  defaultDacDir: path.join(os.homedir(), ".dac"),
+  isPackaged: IS_PACKAGED,
+  resourcesDir: RESOURCES_DIR,
+});
+const DAC_DIR = DESKTOP_PATHS.dacDir;
+const REPLAY_DIR = DESKTOP_PATHS.replayDir;
+const SCREENSHOT_DIR = DESKTOP_PATHS.screenshotDir;
+const SCREENSHOT_MANIFEST = DESKTOP_PATHS.screenshotManifest;
+const TRACKER_DIR = DESKTOP_PATHS.trackerDir;
+const ICONS_DIR = DESKTOP_PATHS.iconsDir;
+const ICON_FILENAME = DESKTOP_PATHS.iconFilename;
 
 // Ensure dirs exist
 for (const dir of [DAC_DIR, REPLAY_DIR, SCREENSHOT_DIR]) {
@@ -64,18 +68,7 @@ let trackerStatus = {
 // ── Python subprocess ────────────────────────────────────────────────────────
 
 function getBackendCommand() {
-  if (IS_PACKAGED) {
-    // Production: use PyInstaller-bundled headless.exe
-    const exe = path.join(TRACKER_DIR, "headless.exe");
-    return { command: exe, args: [], cwd: TRACKER_DIR };
-  }
-  // Dev: use Python from venv
-  const pythonPath =
-    process.platform === "win32"
-      ? path.join(TRACKER_DIR, ".venv", "Scripts", "python.exe")
-      : path.join(TRACKER_DIR, ".venv", "bin", "python");
-  const scriptPath = path.join(TRACKER_DIR, "headless.py");
-  return { command: pythonPath, args: [scriptPath], cwd: TRACKER_DIR };
+  return DESKTOP_PATHS.backendCommand;
 }
 
 function startPython() {
@@ -165,8 +158,7 @@ function saveCloseToTray(value) {
 // ── System tray ─────────────────────────────────────────────────────────────
 
 function createTray() {
-  const iconExt = process.platform === "win32" ? "dac_tracker.ico" : "dac_tracker.png";
-  const iconPath = path.join(ICONS_DIR, iconExt);
+  const iconPath = path.join(ICONS_DIR, ICON_FILENAME);
   let icon;
   if (fs.existsSync(iconPath)) {
     icon = nativeImage.createFromPath(iconPath);
@@ -445,14 +437,13 @@ ipcMain.on("widget:capture", () => {
 // ── Main window ──────────────────────────────────────────────────────────────
 
 function createWindow() {
-  const iconExt = process.platform === "win32" ? "dac_tracker.ico" : "dac_tracker.png";
   mainWindow = new BrowserWindow({
     width: 1200,
     height: 800,
     minWidth: 800,
     minHeight: 600,
     backgroundColor: "#08090b",
-    icon: path.join(ICONS_DIR, iconExt),
+    icon: path.join(ICONS_DIR, ICON_FILENAME),
     frame: false,
     show: false,
     webPreferences: {
@@ -1181,7 +1172,21 @@ ipcMain.handle("screenshots:updateParseRow", async (_event, filename, rowIndex, 
 
 const DATA_DIR = path.join(RESOURCES_DIR, "data");
 const CALIBRATION_SCREENSHOTS = path.join(DATA_DIR, "screenshots");
+const DEFAULT_REGIONS_CONFIG_PATH = path.join(DATA_DIR, "regions_config.json");
+const USER_REGIONS_CONFIG_PATH = path.join(DAC_DIR, "regions_config.json");
 const STEAM_BASE = "C:\\Program Files (x86)\\Steam\\userdata";
+const CALIBRATION_OWNER_STEAM_ID = "76561198022169086";
+
+function canAccessCalibration() {
+  const configPath = path.join(DAC_DIR, "config.json");
+  if (!fs.existsSync(configPath)) return false;
+  try {
+    const config = JSON.parse(fs.readFileSync(configPath, "utf-8"));
+    return String(config.steam_id || "") === CALIBRATION_OWNER_STEAM_ID;
+  } catch {
+    return false;
+  }
+}
 
 function openCalibrationWindow() {
   if (calibrationWindow && !calibrationWindow.isDestroyed()) {
@@ -1203,7 +1208,11 @@ function openCalibrationWindow() {
 }
 
 ipcMain.handle("app:openCalibration", () => {
+  if (!canAccessCalibration()) {
+    return false;
+  }
   openCalibrationWindow();
+  return true;
 });
 
 function detectAR(filePath) {
@@ -1272,16 +1281,18 @@ ipcMain.handle("calibration:getScreenshot", async (_event, filePath) => {
 });
 
 ipcMain.handle("calibration:loadConfig", async () => {
-  const configPath = path.join(DATA_DIR, "regions_config.json");
-  if (!fs.existsSync(configPath)) return null;
-  try {
-    return JSON.parse(fs.readFileSync(configPath, "utf-8"));
-  } catch { return null; }
+  for (const configPath of [USER_REGIONS_CONFIG_PATH, DEFAULT_REGIONS_CONFIG_PATH]) {
+    if (!fs.existsSync(configPath)) continue;
+    try {
+      return JSON.parse(fs.readFileSync(configPath, "utf-8"));
+    } catch {}
+  }
+  return null;
 });
 
 ipcMain.handle("calibration:saveConfig", async (_event, config) => {
-  const configPath = path.join(DATA_DIR, "regions_config.json");
-  fs.writeFileSync(configPath, JSON.stringify(config, null, 2));
+  fs.mkdirSync(DAC_DIR, { recursive: true });
+  fs.writeFileSync(USER_REGIONS_CONFIG_PATH, JSON.stringify(config, null, 2));
   return true;
 });
 

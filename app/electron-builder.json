@@ -6,6 +6,7 @@
   },
   "files": [
     "main.js",
+    "desktop-paths.cjs",
     "preload.js",
     "preload-overlay.js",
     "preload-widget.js",
@@ -62,6 +63,10 @@
       }
     ],
     "icon": "../data/icons/dac_tracker.ico"
+  },
+  "linux": {
+    "category": "Utility",
+    "icon": "../data/icons/dac_tracker.png"
   },
   "nsis": {
     "oneClick": true,

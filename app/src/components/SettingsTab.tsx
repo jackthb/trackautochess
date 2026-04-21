@@ -6,6 +6,8 @@ interface SettingsTabProps {
   replayStats: ReplayStats;
 }
 
+const CALIBRATION_OWNER_STEAM_ID = "76561198022169086";
+
 export function SettingsTab({ status, replayStats }: SettingsTabProps) {
   const [version, setVersion] = useState("\u2014");
   const [closeToTray, setCloseToTray] = useState(true);
@@ -27,6 +29,7 @@ export function SettingsTab({ status, replayStats }: SettingsTabProps) {
   const steamId = status?.steam_id || "\u2014";
   const replayEnabled = status?.replay_enabled ?? true;
   const backendStatus = status ? "Connected" : "Disconnected";
+  const canAccessCalibration = status?.steam_id === CALIBRATION_OWNER_STEAM_ID;
   const storageUsed =
     replayStats.count > 0
       ? `${(replayStats.totalBytes / 1024 ** 3).toFixed(1)} GB (${replayStats.count} replays)`
@@ -138,18 +141,20 @@ export function SettingsTab({ status, replayStats }: SettingsTabProps) {
           </div>
         </div>
 
-        <div className="settings-section">
-          <div className="settings-section-title">Tools</div>
-          <div className="settings-row">
-            <span className="settings-label">Region calibration</span>
-            <button
-              className="btn-ghost"
-              onClick={() => window.appApi.openCalibration()}
-            >
-              Open
-            </button>
+        {canAccessCalibration && (
+          <div className="settings-section">
+            <div className="settings-section-title">Tools</div>
+            <div className="settings-row">
+              <span className="settings-label">Region calibration</span>
+              <button
+                className="btn-ghost"
+                onClick={() => window.appApi.openCalibration()}
+              >
+                Open
+              </button>
+            </div>
           </div>
-        </div>
+        )}
 
         <div className="settings-section">
           <div className="settings-section-title">About</div>
