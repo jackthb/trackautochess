@@ -3,6 +3,177 @@
   "title": "Spinning Wheel of Wonder & Season Award preview",
   "source": "https://docs.google.com/document/d/e/2PACX-1vRqA3LzMAq-9YU4U1Vq-ROuDv0dNpOKPk5i-JNNMU5rrgSTpQDnDAycXnT7h8icXmy8d57HsmLy_Iem/pub",
   "workshop_url": "https://steamcommunity.com/sharedfiles/filedetails/changelog/1613886175?p=1#post1735573826",
-  "summary": "Spinning Wheel of Wonder & Season Award preview\n\n\n\n● New Relic: Wheel of Wonder\n● Temporarily removed Relic: Rambling Fatebender\n● Greevil’s Egg: Reworked. \n● Chiaroscuro Certainty: Reworked.\n● Mech - Heart of the Machines: Golden Heart of the Machines Reworked\n● Diffusal Blade: Reworked\n● Bug fix\n● Season Award Preview\n\nClick the title link to check the full update details!",
-  "sections": []
+  "flavor": "We’ve all heard about children’s Circus Story after running away from home. But I never had an interest in children. It’s far easier to take so-called heroes away. And they are exactly the right people to be trained. Arrogance always plays a role in their fantastic show. Uhu, a new victim appears...  by Cogliostro Kettle",
+  "sections": [
+    {
+      "heading": "Relics",
+      "entries": [
+        {
+          "kind": "added",
+          "name": "Wheel of Wonder",
+          "detail": "New relic. <Relic Consumable: Click to Use> Choose an ally piece, DISCOVER a special duplicate of it with an extra random synergy. * Recruit the discovered pieces with the only Token granted by Wheel of Wonder, no gold required. * Extra synergy can be any of the existing synergy in game. * The target can be any of your pieces, including Undead, Pandaren, IO etc."
+        },
+        {
+          "kind": "removed",
+          "name": "Rambling Fatebender",
+          "detail": "Temporarily removed."
+        },
+        {
+          "kind": "rework",
+          "name": "Greevil’s Egg",
+          "detail": "Reworked. Nest was cancelled and remade into a CLICK-To-USE relic. The egg will not stop growing after the relic terminates. Chances for growing every round decreased to 50%. <Relic Consumable: Click to Use> Put a piece into an egg which has a chance to grow once every round. You can break it anytime, hatching a piece according to the points. * ★★ for no less than 3 points, ★★★ for no less than 9 points. * Hatching points deduct pieces from the chess pool and will stop growing when there are no pieces in the chess pool."
+        },
+        {
+          "kind": "rework",
+          "name": "Chiaroscuro Certainty",
+          "detail": "Reworked. Win or lose streak will not be terminated with this relic. +1 Award removed. Your win or lose streak will not be terminated and when the relic disappears, you will receive a corresponding level loot token based on the highest reward/compensation held during that time."
+        },
+        {
+          "kind": "change",
+          "name": "Weaponsmith",
+          "detail": "Remaining chance for reforger shown in the relic slot."
+        },
+        {
+          "kind": "change",
+          "name": "Mango Tree",
+          "detail": "Remaining chance for mango shown in the relic slot."
+        }
+      ]
+    },
+    {
+      "heading": "Game UI",
+      "entries": [
+        {
+          "kind": "change",
+          "name": "Synergies are shown in Icons instead of Texts in Recruit Panel",
+          "detail": ""
+        },
+        {
+          "kind": "change",
+          "name": "Win or lose streak always shown in the top bar now (Only no less than 2 streak can be shown previously)",
+          "detail": ""
+        }
+      ]
+    },
+    {
+      "heading": "Chess Pieces",
+      "entries": [
+        {
+          "kind": "change",
+          "name": "Redecorated Marci",
+          "detail": ""
+        },
+        {
+          "kind": "change",
+          "name": "Redecorated Antimage",
+          "detail": ""
+        }
+      ]
+    },
+    {
+      "heading": "Synergies",
+      "entries": [
+        {
+          "kind": "rework",
+          "name": "Mech - Heart of the Machines",
+          "detail": "Golden Heart of the Machines Reworked <Courier consumable: Click to use>DISCOVER a panel of 5 random Legendary chess pieces. * Recruit the discovered pieces with Tokens granted by Heart of the Machines, no gold required. Tokens can be keeped for the following discoveries. * Each piece costs 1 token, and benefits from Talent Greedy."
+        }
+      ]
+    },
+    {
+      "heading": "Items",
+      "entries": [
+        {
+          "kind": "rework",
+          "name": "Diffusal Blade",
+          "detail": "Reworked Attack speed + 20%. When attacking a new target, purify the victim by removing all its synergy buffs."
+        }
+      ]
+    },
+    {
+      "heading": "Bug Fixes",
+      "entries": [
+        {
+          "kind": "fix",
+          "name": "General",
+          "detail": "Various bug fixes."
+        }
+      ]
+    },
+    {
+      "heading": "Season Awards",
+      "entries": [
+        {
+          "kind": "change",
+          "name": "S34 Christmas(Nov, 1st - Dec 31st) Awards will be granted as follows",
+          "detail": "♕Queen Top 20: Badge for S34 ♕Queen: 320 Candies and Crown(Valid in S35) + Xmas Envoy♦White(Legendary) ♔King: 320 Candies + Xmas Envoy♦Red(Mythical) ♖Rook: 160 Candies + Xmas Envoy♦Orange(Rare) ♗Bishop: 80 Candies + Xmas Envoy♦Grey(Rare) ♘Knight: 40 Candies ♙Pawn: 20 Candies"
+        },
+        {
+          "kind": "change",
+          "name": "Badges will be settled by the final ranking of the Season. All other awards will be settled by the highest rank in Season",
+          "detail": ""
+        },
+        {
+          "kind": "change",
+          "name": "The last day of the season will be a casual day to settle the awards. You can play casual games without rankings. New Season S35 Takoyaki will be kicked off on Jan 1st",
+          "detail": ""
+        }
+      ]
+    },
+    {
+      "heading": "Rebalance",
+      "entries": [
+        {
+          "kind": "change",
+          "name": "Relaunching dota2 after 3-4 games to prevent crashing is highly recommended due to the instability of the dota2 client",
+          "detail": ""
+        },
+        {
+          "kind": "change",
+          "name": "S35 Takoyaki has been kicked off! Enjoy the new season and claim your S34 Award in Event Panel",
+          "detail": ""
+        },
+        {
+          "kind": "change",
+          "name": "You’ll need 5 games to settle your ranking as usual",
+          "detail": ""
+        },
+        {
+          "kind": "change",
+          "name": "Diffusal Blade",
+          "detail": "Remade into an active one. Attack speed +20%. Purify the victim by removing all its synergy buffs. Cool Down: 8 secs"
+        },
+        {
+          "kind": "change",
+          "name": "Fix bugs",
+          "detail": "New Decorations Arrived!"
+        },
+        {
+          "kind": "change",
+          "name": "Deer Mage(Mythical/Courier)",
+          "detail": ""
+        },
+        {
+          "kind": "change",
+          "name": "Wolf Granny(Mythical/Courier)",
+          "detail": ""
+        },
+        {
+          "kind": "change",
+          "name": "Donkey Mage♦Gold(Rare/Courier)",
+          "detail": ""
+        },
+        {
+          "kind": "change",
+          "name": "Blueheart Wolfpup(Rare/Pet)",
+          "detail": ""
+        },
+        {
+          "kind": "change",
+          "name": "Granny Wolf(Mythical/Pet)",
+          "detail": ""
+        }
+      ]
+    }
+  ]
 }

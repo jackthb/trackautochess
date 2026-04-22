@@ -3,6 +3,212 @@
   "title": "Immortal King (Part 2)",
   "source": "https://docs.google.com/document/d/e/2PACX-1vQgiWdyNOpFsT8svPUVc9xBLYpQ_3-BG_aXVq4LoxJydEjd06q5HyvbacodLrnW0Tbk8TSutFamqHe7/pub",
   "workshop_url": "https://steamcommunity.com/sharedfiles/filedetails/changelog/1613886175?p=1#post1745736957",
-  "summary": "Immortal King (Part 2)\n\n\n\n● Wraith King($5, Undead/Warrior): Reworked.\n● Lich: Downgraded from $5 to $4\n● Primal Beast - Pulverize: Reworked into targeted spell\n● Tango: Restores 1 ~ 7 Health instead of 1 ~ 8\n● Magic box: Reworked. All pieces can all count as targets.\n● Wheel of Wonder: Reworked.\n● Season Award Preview\n● Fix bugs\n\nClick the title link to check the full update details!",
-  "sections": []
+  "flavor": "For untold years, King Ostarion built a kingdom from the remains of his enemies. It was an obsessive errand, done to pass the long eternities of a monarchy that seemed fated never to end. Deeply mistrustful of flesh, he sought a more permanent way of extending his reign, and at last settled on pursuit of wraith energy, a form of pure spirit given off by certain dark souls at death. He infused himself and his warriors with Wraith Essence, creating bodies as luminous and eternal as his ego.",
+  "sections": [
+    {
+      "heading": "Chess Pieces",
+      "entries": [
+        {
+          "kind": "rework",
+          "name": "Wraith King($5, Undead/Warrior)",
+          "detail": "Reworked. Upgraded from $4 to $5, and adjusted accordingly. Spectral Blade removed, and Reincarnation reworked into aura. Base damage increased from 115 to 175. <Aura> Grants deathrattle to all nearby allies whose level is no more than Wraith King: Reincarnation once directly on death. P.S. Non-permanent pieces cannot reincarnate. And pieces after reincarnation will be non-permanent pieces."
+        },
+        {
+          "kind": "nerf",
+          "name": "Lich",
+          "detail": "Downgraded from $5 to $4, and adjusted accordingly. Chain Frost’s bounces decreased from 6/8/12 to 4/5/7."
+        },
+        {
+          "kind": "rework",
+          "name": "Primal Beast - Pulverize",
+          "detail": "Reworked into targeted spell (can be duplicated by Harpies Synergy). Damage per slamming increased from 100/150/200 to 150/200/300, interval increased from 0.75s to 0.9s, stun duration increased from 0.3/0.4/0.5s to 0.5/0.75/1s, channel time decreased from 4/5/6s to 3.7/4.6/5.5s <Active ability: Activates on full mana> Primal Beast channels his rage, grabbing a nearby victim with highest HP and slamming them into the ground repeatedly, damaging and ministunning any enemy caught in the AoE."
+        },
+        {
+          "kind": "rework",
+          "name": "Hoodwink - Acorn Shot",
+          "detail": "Removed physical vulnerability and taunt, reworked into armor reduction. Targets decreased from 3/5/8 to 3/4/5, CD decreased from 25/20/10s to 20/15/10s"
+        },
+        {
+          "kind": "buff",
+          "name": "Bane - Fiend's Grip",
+          "detail": "Damage per second increased from 50/75/10 to 75/100/125"
+        },
+        {
+          "kind": "buff",
+          "name": "Muerta - Pierce The Veil",
+          "detail": "Duration increased from 2/3/4s to 3/3.5/4s"
+        },
+        {
+          "kind": "buff",
+          "name": "Viper - Viper Strike",
+          "detail": "CD decreased from 15/12/8s to 10/8/6s"
+        },
+        {
+          "kind": "nerf",
+          "name": "Phantom Assassin - Coup de Grace",
+          "detail": "Crit multiplier decreased from 300%/450%/600% to 300%/400%/500%"
+        },
+        {
+          "kind": "nerf",
+          "name": "Ringmaster -Spotlight",
+          "detail": "Damage on non-permanent pieces decreased from 15%/20%/30% to 10%/15%/25%"
+        },
+        {
+          "kind": "buff",
+          "name": "Templar Assassin - Refraction",
+          "detail": "Absorption per stack increased from 40/60/80 to 60/90/120, stack count increased from 3/5/7 to 4/6/8, damage bonus increased from 60/90/150 to 80/120/160"
+        }
+      ]
+    },
+    {
+      "heading": "Synergies",
+      "entries": [
+        {
+          "kind": "change",
+          "name": "Priest - Salvation",
+          "detail": "Tango granted only when your courier takes damage."
+        },
+        {
+          "kind": "change",
+          "name": "Tango",
+          "detail": "Restores 1 ~ 7 Health instead of 1 ~ 8"
+        },
+        {
+          "kind": "nerf",
+          "name": "Hunter - Aimed Shot",
+          "detail": "(9) Hunter: Extra damage decreased from 100 to 50"
+        },
+        {
+          "kind": "nerf",
+          "name": "Centaur - Stampede",
+          "detail": "Stun duration decreased from 1s to 0.75s"
+        }
+      ]
+    },
+    {
+      "heading": "Items",
+      "entries": [
+        {
+          "kind": "change",
+          "name": "Manta Style",
+          "detail": "Illusions last for 7s instead of 8s."
+        }
+      ]
+    },
+    {
+      "heading": "Relics",
+      "entries": [
+        {
+          "kind": "rework",
+          "name": "Magic box",
+          "detail": "Reworked. All pieces can all count as targets. Consumes 1/3/9 stacks per Rank 1/2/3 pieces and transforms into new pieces of the same Level and Rank. <Relic Consumable: Click to Use> Packs an ally piece, at the beginning of next round, transforms it into a randon new piece of the same Level and Rank. 12 times available. P.S. Consumes 1/3/9 stacks per Rank 1/2/3 pieces. P.S. Packed pieces can be transformed into any piece of the same cost, despite the chess pool limit. P.S. Packed pieces will not transform into pieces you packed into before."
+        },
+        {
+          "kind": "rework",
+          "name": "Wheel of Wonder",
+          "detail": "Reworked. Now put the target piece into the wheel of wonder and consume it in discovery. <Relic Consumable: Click to Use> Choose an ally piece and put it into the wheel of wonder, DISCOVER a special version of it with an extra random synergy. P.S. Discovered pieces are of the same Rank. P.S. Combining 2 pieces with extra synergy collects both extra synergies. P.S. Discovery will remove the settled extra synergy."
+        }
+      ]
+    },
+    {
+      "heading": "Season Awards",
+      "entries": [
+        {
+          "kind": "change",
+          "name": "S36 Worm Sheriff(March, 1st - April 30th) Awards will be granted as follows",
+          "detail": "♕Queen Top 20: Badge for S36 ♕Queen: 320 Candies and Crown(Valid in S37) +Worm Sheriff♦ (Legendary) ♔King: 320 Candies + Worm Sheriff♦(Mythical) ♖Rook: 160 Candies + Worm Sheriff♦(Rare) ♗Bishop: 80 Candies + Worm Sheriff♦(Common) ♘Knight: 40 Candies ♙Pawn: 20 Candies"
+        },
+        {
+          "kind": "change",
+          "name": "Badges will be settled by the final ranking of the Season. All other awards will be settled by the highest rank in Season",
+          "detail": ""
+        },
+        {
+          "kind": "change",
+          "name": "The last day of the season will be a casual day to settle the awards. You can play casual games without rankings. New Season S36 Thunder Trace will be kicked off on May 1st",
+          "detail": ""
+        }
+      ]
+    },
+    {
+      "heading": "Bug Fixes",
+      "entries": [
+        {
+          "kind": "fix",
+          "name": "General",
+          "detail": "Various bug fixes."
+        }
+      ]
+    },
+    {
+      "heading": "Rebalance",
+      "entries": [
+        {
+          "kind": "change",
+          "name": "The last day of the season will be a casual day to settle the awards. You can play casual games without rankings. New Season S37 Thunder Trace will be kicked off on May 1st",
+          "detail": ""
+        },
+        {
+          "kind": "change",
+          "name": "Magic Box",
+          "detail": "Now has 15 available stacks instead of 12"
+        },
+        {
+          "kind": "change",
+          "name": "Knight - Divine Protection",
+          "detail": "(6) Knights - Heal 300 Health instead of 250 per shield."
+        },
+        {
+          "kind": "nerf",
+          "name": "Priest - Salvation",
+          "detail": "(4) Priests - Control time decreased from (caster's level*2 + 2) secs to (caster's level*2 + 1) secs"
+        },
+        {
+          "kind": "buff",
+          "name": "Morphling - Waveform",
+          "detail": "Damage increased from 150/250/350 to 200/300/400"
+        },
+        {
+          "kind": "change",
+          "name": "Fix bugs",
+          "detail": ""
+        }
+      ]
+    },
+    {
+      "heading": "Rebalance",
+      "entries": [
+        {
+          "kind": "buff",
+          "name": "Bane - Fiend's Grasp",
+          "detail": "CD decreased from 8/7/6s to 6s"
+        },
+        {
+          "kind": "buff",
+          "name": "Jakiro - Ice Path",
+          "detail": "Duration increased from 2/2.5/3s to 2.5/3/3.5s"
+        },
+        {
+          "kind": "buff",
+          "name": "Jakiro - Macropyre",
+          "detail": "Dps increased from 100/150/250 to 150/200/300"
+        },
+        {
+          "kind": "change",
+          "name": "Wraith King - Reincarnation",
+          "detail": "Reincarnated pieces last for 20/25/30s"
+        },
+        {
+          "kind": "change",
+          "name": "Manta Style",
+          "detail": "+25 Damage removed"
+        },
+        {
+          "kind": "change",
+          "name": "Fix bugs",
+          "detail": ""
+        }
+      ]
+    }
+  ]
 }

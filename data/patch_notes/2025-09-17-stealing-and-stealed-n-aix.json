@@ -3,6 +3,177 @@
   "title": "Stealing and stealed - N’aix",
   "source": "https://docs.google.com/document/d/e/2PACX-1vRHBr4Zv6ehYQJqAgz4IYyEkBVzwF6-XQDGy2J8u7SxTDQTFXtTUbqdAB-GVnffRORzQgZf28n56iAt/pub",
   "workshop_url": "https://steamcommunity.com/sharedfiles/filedetails/changelog/1613886175?p=1#post1758117228",
-  "summary": "Stealing and stealed - N’aix\n\n\n\n● New Chess Piece: Lifestealer ($2, Kobold/Undead/Wizard)\n● Abaddon ($1, Undead/Knight): Downgraded from $2 to $1\n● Necrolyte: A passive heartstopper aura added, and damage to the reaper's scythe decreased, while cooldown increased.\n● Kobold - Divided we stand: Reworked into (1)(2)(3).\n● Ascetic‘s Cap: Reworked\n● Congratulations to the Falcons for winning the championship of TI14. \n● Fix bugs\n\nClick the title link to check the full update details!",
-  "sections": []
+  "flavor": "In the dungeons of Devarque, a vengeful wizard lay in shackles, plotting his escape. He shared his cell with a gibbering creature known as N'aix, a thief cursed by the Vile Council with longevity, so that its life-sentence for theft and cozening might be as punishing as possible. N'aix retained no memory of its former life and no longer dreamt of escape. The wizard saw a perfect vessel for his plans, he wove a spell of Infestation and cast his life-force into N'aix's body, intending to compel N'aix to sacrifice itself in a frenzy of violence while the mage returned to his body and crept away unnoticed. But finally both of them failed. Until today the lifestealer, N'aix still wears the broken shackles as a warning that none may hold him, but on the inside remains a prisoner.",
+  "sections": [
+    {
+      "heading": "Chess Pieces",
+      "entries": [
+        {
+          "kind": "added",
+          "name": "Lifestealer ($2, Kobold/Undead/Wizard)",
+          "detail": "New chess piece. <Active Ability: Activate Instant> Launch into a maddened rage, becoming Debuff Immune and increasing magic resistance. Duration: 4/6/9s Magical resistance increased:80% Cooldown: 12s The madness and brutality of N'aix makes him a vicious and unrelenting foe in combat."
+        },
+        {
+          "kind": "nerf",
+          "name": "Abaddon ($1, Undead/Knight)",
+          "detail": "Downgraded from $2 to $1, properties adjusted accordingly."
+        },
+        {
+          "kind": "nerf",
+          "name": "Necrolyte",
+          "detail": "A passive heartstopper aura added, and damage to the reaper's scythe decreased, while cooldown increased. Emits an aura that stops the heartbeat of his enemies around, dealing percentage damage based on their max health. <Targeted Active ability: Activates on full mana>Deals (base + percentage of max health) pure damage to an enemy with his Reaper’s Scythe and prevents its victim from deathrattle."
+        },
+        {
+          "kind": "nerf",
+          "name": "Wraith King - Reincarnation",
+          "detail": "Reincarnated pieces’ last duration decreased from 20/25/30s to 15/20/25s"
+        },
+        {
+          "kind": "nerf",
+          "name": "Spectre - Haunt",
+          "detail": "Haunt duration decreased from 5/6/7s to 4/5/6s"
+        }
+      ]
+    },
+    {
+      "heading": "Synergies",
+      "entries": [
+        {
+          "kind": "rework",
+          "name": "Kobold - Divided we stand",
+          "detail": "Reworked into (1)(2)(3). (1) Kobold: Each two paired Kobold pieces on board will summon a replica when battle starts. (2) Kobolds: Each two paired ally pieces on board will summon a replica when battle starts. (3) Kobolds: Every unpaired Kobold piece will reshape itself into a non-Kobold ally of the same rank before battle starts."
+        },
+        {
+          "kind": "buff",
+          "name": "Pandaren - Hospitality",
+          "detail": "(2) Pandarens now have bad luck comfort as (1) pandaren: The possibility increases gradually before a Pandaren is invited."
+        }
+      ]
+    },
+    {
+      "heading": "Items",
+      "entries": [
+        {
+          "kind": "rework",
+          "name": "Ascetic‘s Cap",
+          "detail": "Reworked A non-Undead carrier has a 50% chance to be reborn into an undead piece of the same rank.(Level and Victory restriction both removed.) TI Congratulation!"
+        },
+        {
+          "kind": "change",
+          "name": "Congratulations to the Falcons for winning the championship of TI14. Fans predicted for their championship can claim your reward of 300 Candy in the event panel",
+          "detail": ""
+        }
+      ]
+    },
+    {
+      "heading": "Bug Fixes",
+      "entries": [
+        {
+          "kind": "fix",
+          "name": "General",
+          "detail": "Various bug fixes."
+        }
+      ]
+    },
+    {
+      "heading": "Rebalance",
+      "entries": [
+        {
+          "kind": "change",
+          "name": "Welcome to ALFK’s tournament on Sep, 20th!",
+          "detail": ""
+        },
+        {
+          "kind": "change",
+          "name": "Fix Kobold Synergy bug in away home battle",
+          "detail": ""
+        },
+        {
+          "kind": "buff",
+          "name": "Knight - Divine Protection",
+          "detail": "Chance for shield increased from 20% to 25%"
+        },
+        {
+          "kind": "buff",
+          "name": "Troll - Voodoo Frenzy",
+          "detail": "(6) Trolls' maximum stack increased from 7 to 8"
+        },
+        {
+          "kind": "nerf",
+          "name": "Lich - Chain Frost",
+          "detail": "Damage bonus per bounce decreased from 30/40/50 to 25"
+        },
+        {
+          "kind": "nerf",
+          "name": "Wraith King - Reincarnation",
+          "detail": "Duration for reincarnated pieces decreased from 15/20/25s to 10/15/20s"
+        },
+        {
+          "kind": "nerf",
+          "name": "Spectre",
+          "detail": "Base damage decreased from 120 to 100"
+        },
+        {
+          "kind": "buff",
+          "name": "Undying",
+          "detail": "Armor increased from 2 to 5"
+        },
+        {
+          "kind": "buff",
+          "name": "Drow Ranger",
+          "detail": "Base damage increased from 80 to 85"
+        },
+        {
+          "kind": "buff",
+          "name": "Muerta",
+          "detail": "Base damage increased from 55 to 65"
+        },
+        {
+          "kind": "buff",
+          "name": "Lifestealer",
+          "detail": "Magical resistance increased from 30 to 50, armor increased from 5 to 6"
+        },
+        {
+          "kind": "buff",
+          "name": "Blademail",
+          "detail": "Duration increased from 5s to 7s"
+        },
+        {
+          "kind": "change",
+          "name": "Fix bugs",
+          "detail": ""
+        }
+      ]
+    },
+    {
+      "heading": "Rebalance",
+      "entries": [
+        {
+          "kind": "nerf",
+          "name": "Ascetics Cap",
+          "detail": "Chance for reborn is now dynamic, higher cost pieces have lower chance for reborn. Chance for reborn from $1-$5 varies from 80% to 40%"
+        },
+        {
+          "kind": "buff",
+          "name": "Marci - Unleash",
+          "detail": "Magical damage increased from 50/75/125 to 100/150/250, radius increased from 128/256/384 to 200/300/400. Strikes decreased from 4/5/6 times per 1.75 secs to 3/4/5 times per 2 secs"
+        },
+        {
+          "kind": "buff",
+          "name": "Arc Warden",
+          "detail": "Base Health increased from 850 to 900, attack interval decreased from 1.1 to 1.0, attack range increased from 400 to 600"
+        },
+        {
+          "kind": "change",
+          "name": "Lifestealer - Rage",
+          "detail": "Immune to Pure damage when activated"
+        },
+        {
+          "kind": "change",
+          "name": "Fix bugs",
+          "detail": ""
+        }
+      ]
+    }
+  ]
 }

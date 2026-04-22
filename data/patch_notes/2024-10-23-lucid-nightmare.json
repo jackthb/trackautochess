@@ -3,6 +3,242 @@
   "title": "Lucid Nightmare",
   "source": "https://docs.google.com/document/d/e/2PACX-1vTw-IezCGdK6pHcRmGdLxsWl9yvOhun-J8H3pVAmKUlqzvjh-McSE1YsVuVyip1kpQJzxUVTqHVaCxu/pub",
   "workshop_url": "https://steamcommunity.com/sharedfiles/filedetails/changelog/1613886175?p=1#post1729747378",
-  "summary": "Lucid Nightmare\n\n\n\n● New Chess Piece: Bane($1, Satyr/Warlock)\n● Reworked Racial Skill: Satyr - Fear\n● Chiaroscuro Certainty: Effect reworked\n● Gaoler's Master Key: An additional effect added\n● Bug fix\n● End-of-Season Reward Preview \n\nClick the title link to check the full update details!",
-  "sections": []
+  "flavor": "When the gods have nightmares, it is Bane Elemental who brings them. Also known as Atropos, Bane was born from the midnight terrors of the goddess Nyctasha. A force of terror too powerful to be contained by sleep, he surfaced from her slumbers, fed upon her immortality, and stole his vaporous form from her inky blood. He is the essence of fear.",
+  "sections": [
+    {
+      "heading": "Game UI",
+      "entries": [
+        {
+          "kind": "change",
+          "name": "Added a bar graph of economic results to show players, allowing a clear view of lineup value on the right-side player detail panel and the endgame panel",
+          "detail": ""
+        }
+      ]
+    },
+    {
+      "heading": "Chess Pieces",
+      "entries": [
+        {
+          "kind": "added",
+          "name": "Bane($1, Satyr/Warlock)",
+          "detail": "New chess piece. <Active Skill: Activates on Full Mana> Casting Spell: Grabs a random enemy chess piece, rendering it unable to act and dealing pure damage over time. Victims of Atropos often suffer excruciating agony from the vivid illusions in their nightmares."
+        },
+        {
+          "kind": "nerf",
+          "name": "Clinkz ($1, Undead/Hunter)",
+          "detail": "Downgraded from $2 to $1"
+        },
+        {
+          "kind": "buff",
+          "name": "Vengeful Spirit ($2, Undead/Harpy/Demon Hunter)",
+          "detail": "Upgraded from $1 to $2"
+        },
+        {
+          "kind": "buff",
+          "name": "Mars",
+          "detail": "Base health increased from 600 to 700"
+        },
+        {
+          "kind": "buff",
+          "name": "Tusk - Walrus Punch",
+          "detail": "Cooldown reduced from 6/5/4 seconds to 5/4/3 seconds"
+        },
+        {
+          "kind": "buff",
+          "name": "Shadow Shaman - Hex",
+          "detail": "Duration increased from 4/5/6 seconds to 4/5/7 seconds, cooldown reduced from 8/6/4 seconds to 7/5/4 seconds"
+        },
+        {
+          "kind": "change",
+          "name": "Lina - Laguna Blade",
+          "detail": "Magic damage reduced from 500/750/1250 to 500/750/1000, cooldown reduced from 9/7/5 seconds to 8/6/4 seconds"
+        },
+        {
+          "kind": "buff",
+          "name": "Pudge",
+          "detail": "Base health increased from 850 to 900"
+        },
+        {
+          "kind": "buff",
+          "name": "Abaddon - Aphotic Shield",
+          "detail": "Absorption increased from 250/350/450 to 300/400/600"
+        },
+        {
+          "kind": "buff",
+          "name": "Huskar",
+          "detail": "Magic resistance increased from 20% to 25%"
+        },
+        {
+          "kind": "change",
+          "name": "Riki - Smoke Screen",
+          "detail": "Added effect \"Hides own position during preparation phase\" (formerly (1) Satyr effect)"
+        },
+        {
+          "kind": "buff",
+          "name": "Muerta - Pierce the Veil",
+          "detail": "Bonus damage increased from 50/75/125 to 50/100/200"
+        },
+        {
+          "kind": "buff",
+          "name": "Drow Ranger",
+          "detail": "Base attack increased from 60 to 75"
+        },
+        {
+          "kind": "buff",
+          "name": "Undying",
+          "detail": "Base health increased from 900 to 1000"
+        },
+        {
+          "kind": "nerf",
+          "name": "Lion - Finger of Death",
+          "detail": "Pure damage reduced from 500/750/1250 to 500/750/1000, bonus damage per stack reduced from 200/250/350 to 150/200/250"
+        },
+        {
+          "kind": "buff",
+          "name": "Lich - Chain Frost",
+          "detail": "Base damage increased from 100 to 100/150/200"
+        },
+        {
+          "kind": "nerf",
+          "name": "Necrophos - Reaper's Scythe",
+          "detail": "Base damage reduced from 500/700/900 to 300/400/600, percentage damage reduced from 50%/70%/90% to 40%/50%/70%"
+        }
+      ]
+    },
+    {
+      "heading": "Synergies",
+      "entries": [
+        {
+          "kind": "rework",
+          "name": "Satyr - Fear",
+          "detail": "Reworked racial skill. (Previously Stealth: (1) Satyr becomes invisible during the preparation phase) (2) Satyr: Allied Satyr chess pieces gain the effect: If there is more than 1 enemy  nearby, they cause those enemies to lose control due to fear. Note: The fear effect has an internal cooldown of 6-10 seconds and cannot trigger continuously."
+        },
+        {
+          "kind": "nerf",
+          "name": "Aqir - Infection",
+          "detail": "The duration of spawned insect chess pieces has been reduced from 15-20 seconds to 12-20 seconds."
+        },
+        {
+          "kind": "nerf",
+          "name": "Elf - Evasion",
+          "detail": "(9) Elves: Illusion duration decreased from 8 secs to 6 secs."
+        }
+      ]
+    },
+    {
+      "heading": "Items",
+      "entries": [
+        {
+          "kind": "buff",
+          "name": "Bottle",
+          "detail": "Upgraded from T1 to T2, grants 50 mana (30 mana in the previous version)"
+        },
+        {
+          "kind": "nerf",
+          "name": "Bullwhip",
+          "detail": "Downgraded from T2 to T1, removed effects on its owner (only have effects on summoned units now)"
+        },
+        {
+          "kind": "nerf",
+          "name": "Blink Dagger",
+          "detail": "Max distance decreased from 800 to 600"
+        },
+        {
+          "kind": "change",
+          "name": "Minotaur Horn",
+          "detail": "Now immune to mana break"
+        },
+        {
+          "kind": "buff",
+          "name": "Butterfly",
+          "detail": "Attack speed bonus increased from 20% to 30%"
+        },
+        {
+          "kind": "buff",
+          "name": "Abyssal Blade",
+          "detail": "CD decreased from 7 secs to 6 secs"
+        },
+        {
+          "kind": "nerf",
+          "name": "Scythe of Vyse",
+          "detail": "Cooldown increased from 15 seconds to 20 seconds."
+        },
+        {
+          "kind": "buff",
+          "name": "Daedalus",
+          "detail": "Critical strike chance increased from 15% to 20%."
+        }
+      ]
+    },
+    {
+      "heading": "Relics",
+      "entries": [
+        {
+          "kind": "rework",
+          "name": "Chiaroscuro Certainty",
+          "detail": "Effect reworked Grant loot tokens when the relic disappears, with token level determined by the highest reward/compensation during the holding period (removed the restriction of not being able to obtain level 3 tokens before round 25). Your win/loss streak will additionally earn 1 gold, and when the relic disappears, you will receive a corresponding level loot token based on the highest reward/compensation held during that time. Note: 2-4 win/loss streak corresponds to level 1 loot token, 5-9 win/loss streak corresponds to level 2 loot token, and 10+ win/loss streak corresponds to level 3 loot token."
+        },
+        {
+          "kind": "change",
+          "name": "Gaoler's Master Key",
+          "detail": "If this relic is chosen after a race/class already dismissed, the gold spent will be refunded. You can freely dismiss any race/class. If already dismissed, the spent gold will be refunded."
+        }
+      ]
+    },
+    {
+      "heading": "Bug Fixes",
+      "entries": [
+        {
+          "kind": "fix",
+          "name": "Fix a bug of Linken Sphere",
+          "detail": ""
+        },
+        {
+          "kind": "fix",
+          "name": "Fixed a bug that allowed Undead chess pieces to monopolize",
+          "detail": ""
+        },
+        {
+          "kind": "fix",
+          "name": "Fixed a bug where the debuff description for Viper - Strike was missing",
+          "detail": ""
+        },
+        {
+          "kind": "fix",
+          "name": "Fixed a bug where continuously filtering the chess collection could reveal the profession of the Ringmaster",
+          "detail": ""
+        },
+        {
+          "kind": "fix",
+          "name": "Fixed a bug that allowed the Undead race to be banned",
+          "detail": ""
+        },
+        {
+          "kind": "fix",
+          "name": "Fixed a bug where the Ringmaster obtained from the Golden Heart of the Machine could not gain Druid effects",
+          "detail": ""
+        }
+      ]
+    },
+    {
+      "heading": "Season Awards",
+      "entries": [
+        {
+          "kind": "change",
+          "name": "The EoS rewards for S33 Champion(01/09 to 31/10) are based on the following",
+          "detail": "♕Top 20 Queens (on Leaderboard): S33 Badge + ♕Queen rewards. ♕Queen: 320 Candies + Crown (valid for S34) + Presenter♦Champion. ♔King: 320 Candies + Presenter♦White. ♖Rook: 160 Candies + Presenter♦Blue. ♗Bishop: 80 Candies + Presenter♦Yellow. ♘Knight: 40 Candies. ♙Pawn: 20 Candies."
+        },
+        {
+          "kind": "change",
+          "name": "Top 20 Queens are rewarded based on their final places and the other ranks for the highest rank achieved in the season",
+          "detail": ""
+        },
+        {
+          "kind": "change",
+          "name": "As usual, the last day of the season will be the off-season break to award the excellent players. Games played on the day do not affect Rankings. The new season of S34 Christmas starts on 01/11/2024!",
+          "detail": ""
+        }
+      ]
+    }
+  ]
 }

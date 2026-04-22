@@ -3,6 +3,267 @@
   "title": "Ascension Night",
   "source": "https://docs.google.com/document/d/e/2PACX-1vRp9NsXD2kMO_NazzGDO8A9qlosdrGEkiWXbvL-TD7MvfPlBHPf7WcNy3yX4EJi2Ib6xjfGAL-mTvdS/pub",
   "workshop_url": "https://steamcommunity.com/sharedfiles/filedetails/changelog/1613886175?p=1#post1743081585",
-  "summary": "Ascension Night\n\n\n\n● New Chess Piece: Kez($3, Harpy/Assassin) - Kazurai Katana\n● Phantom Assassin: Upgraded from $3 to $4\n● Bounty Hunter: Class changed from Assassin into Hunter.\n● Harpy - Windfury: Reworked into (2)(4)\n● Demon Hunter: (4) Demon Hunters reworked\n● Trident: Reworked\n● Leafy Essence: Adjusted into Passive Effect.\n● Chiaroscuro Certainty: Higher Rank token granted in later rounds.\n● March of the Beasts: Reworked.\n● All Creeps from Round 10 has approximate -20% Health and -20% Attack damage\n\nClick the title link to check the full update details!",
-  "sections": []
+  "flavor": "Before he was a leader of the Kazurai, Kez was a young bird with a quick tongue, a talent for getting into trouble, and a half-baked plan to help out a friend on the busiest night of the year. \"I was born with a price on my head. As I got better at causing trouble, that price went up. Every time Queen Imperia raised the bounty, I knew I must have done something right. I think that's the worst part about being gone so long in Icewrack... I've got to get that price back up to a respectable number.\"",
+  "sections": [
+    {
+      "heading": "Chess Pieces",
+      "entries": [
+        {
+          "kind": "added",
+          "name": "Kez($3, Harpy/Assassin) - Kazurai Katana",
+          "detail": "New chess piece. <Targeted Active ability:Activates on full mana> Kez attacks with his Kanata, stuns the victim and deals Physical Damage equals to a percentage of the victim's Max Health. Stab forward and back each deals half the damage and affiliates his base attack damage. To fight back against the reach of Imperia and her Queensguard, the Kazurai had to become skilled in the ways of attrition."
+        },
+        {
+          "kind": "buff",
+          "name": "Phantom Assassin",
+          "detail": "Upgraded from $3 to $4 and adjusted accordingly. Has a chance to evade Ability Damage. <Passive Ability> Phantom Assassin refines her combat abilities, gaining a chance of delivering a devastating critical strike to enemy units and evading Ability Damage."
+        },
+        {
+          "kind": "change",
+          "name": "Bounty Hunter",
+          "detail": "Class changed from Assassin into Hunter."
+        },
+        {
+          "kind": "removed",
+          "name": "Grimstroke",
+          "detail": "Temporarily removed from chess pool."
+        },
+        {
+          "kind": "nerf",
+          "name": "Bane - Fiend Grip",
+          "detail": "Damage per second decreased from 75/100/150 to 50/75/100"
+        },
+        {
+          "kind": "nerf",
+          "name": "Oracle - Rain of Destiny",
+          "detail": "Heal per second decreased from 100/125/150 to 100/100/100"
+        },
+        {
+          "kind": "nerf",
+          "name": "Luna - Moon Glaive",
+          "detail": "Bounce times decreased from 3/4/5 to 2/3/4"
+        },
+        {
+          "kind": "nerf",
+          "name": "Naga Siren - Siren Song",
+          "detail": "CD increased from 25/20/15s to 30s"
+        },
+        {
+          "kind": "nerf",
+          "name": "Riki - Smoke Screen",
+          "detail": "Duration decreased from 2/3/4s to 1.5/2.5/3.5s"
+        },
+        {
+          "kind": "buff",
+          "name": "Legion Commander - Press the Attack",
+          "detail": "Chance for counterattack increased from 15/20/30% to 15/25/35% and lifesteal increased from 15% to 20%"
+        },
+        {
+          "kind": "nerf",
+          "name": "Shadow Demon - Disseminate",
+          "detail": "CD increased from 2s to 3s, damage diffusion percentage decreased from 25%/40%/70% to 30%/40%/60%● Shadow Demon - Disseminate: CD increased from 2s to 3s, diffusion percentage increased from 25%/40%/70% to 30%/40%/60%"
+        },
+        {
+          "kind": "nerf",
+          "name": "Spectre - Haunt",
+          "detail": "Illusion amount decreased from 4/6/8 to 3/5/7"
+        },
+        {
+          "kind": "change",
+          "name": "Invoker",
+          "detail": "All abilities cost 50 mana instead of 100"
+        }
+      ]
+    },
+    {
+      "heading": "Synergies",
+      "entries": [
+        {
+          "kind": "rework",
+          "name": "Harpy - Windfury",
+          "detail": "Reworked into (2)(4) (2) Harpies: All Non-harpy allies gain the effect: Targeted spells +1 additional target. (4) Harpies: All allies gain the effect: Targeted spells +2 additional targets."
+        },
+        {
+          "kind": "rework",
+          "name": "Demon Hunter",
+          "detail": "(4) Demon Hunters reworked (2) Demon Hunters: All friendly demons now have Fel Power. (4) Demon Hunters: All friendly pieces now deal Pure Damage."
+        },
+        {
+          "kind": "change",
+          "name": "Elf - Evasion",
+          "detail": "(9) Elves’ Illusion now hides for 1s instead of 0.5s."
+        },
+        {
+          "kind": "buff",
+          "name": "Mage - Magical Vulnerability",
+          "detail": "(3) Mages: Enemies suffer a higher magical vulnerability of 30% instead of 25%, (9) Mages: Frozen duration increased from 1/400*damage to 1/300*damage (3) Mages: All enemies suffer -30% magic resistance. (6) Mages: All enemies suffer -40% magic resistance. (9) Mages: All enemies are cursed with frost incantation, which freezes them upon receiving magical damage. Lasts longer for more increased damage taken."
+        },
+        {
+          "kind": "change",
+          "name": "Naga - Scale Armor",
+          "detail": "Shield explosion deals 1.5x damage absorbed instead of 1x."
+        },
+        {
+          "kind": "nerf",
+          "name": "God - Overweening",
+          "detail": "(6) Gods: CD reduction after casting ability increased from 50% to 60%"
+        },
+        {
+          "kind": "nerf",
+          "name": "Orc - Battle Hardened",
+          "detail": "(4) Max Health bonus decreased from 400 to 300"
+        },
+        {
+          "kind": "change",
+          "name": "Priest - Salvation",
+          "detail": "Tango now restores random 1-8 Health instead of 1-7"
+        }
+      ]
+    },
+    {
+      "heading": "Items",
+      "entries": [
+        {
+          "kind": "rework",
+          "name": "Trident",
+          "detail": "Reworked Attack speed +20. All damage increases by 20%, and deals each 50% additional damage to at most 2 same-name pieces."
+        },
+        {
+          "kind": "change",
+          "name": "Necronomicon",
+          "detail": "Now “Summons 2 necro creeps” instead of “Summons 1 necro warrior and 1 necro archer” P.S. Melee carrier summons 2 necro warriors while Ranged carrier summons 2 necro archers."
+        },
+        {
+          "kind": "nerf",
+          "name": "Tranquil Boot",
+          "detail": "Health restoration per 2s decreased from 20 to 15"
+        },
+        {
+          "kind": "change",
+          "name": "Gossamer Cape",
+          "detail": "+25% Evasion removed"
+        },
+        {
+          "kind": "nerf",
+          "name": "Arcane Boot",
+          "detail": "Mana initiation decreased from +25 to +20"
+        },
+        {
+          "kind": "buff",
+          "name": "Diffusal Blade",
+          "detail": "Attack speed bonus increased from +25 to +30, CD decreased from 7s to 5s"
+        },
+        {
+          "kind": "nerf",
+          "name": "Rapier",
+          "detail": "Base damage bonus decreased from +400 to +350"
+        },
+        {
+          "kind": "nerf",
+          "name": "Scythe of Vyse",
+          "detail": "CD increased from 20s to 25s"
+        }
+      ]
+    },
+    {
+      "heading": "Relics",
+      "entries": [
+        {
+          "kind": "change",
+          "name": "Leafy Essence",
+          "detail": "Adjusted into Passive Effect. All offside branches unlock automatically in this single game."
+        },
+        {
+          "kind": "change",
+          "name": "Chiaroscuro Certainty",
+          "detail": "Higher Rank token granted in later rounds. Your win or lose streak will not be terminated and when the relic disappears, you will receive a corresponding level loot token based on the highest reward/compensation held during that time. P.S. 2-4 win/loss streak corresponds to level (lapsed relic count) loot token, 5-9 win/loss streak corresponds to level (lapsed relic count+1) loot token, and 10+ win/loss streak corresponds to level (lapsed relic count+2) loot token. The Maximum level of this token is level 5."
+        },
+        {
+          "kind": "change",
+          "name": "Magic box",
+          "detail": "Will not transform into pieces that you’ve packed before."
+        },
+        {
+          "kind": "rework",
+          "name": "March of the Beasts",
+          "detail": "Reworked. Removed the reduction of creeps’ Health and Damage and the extra token. Now all creeps duplicate themselves and counted as level +1."
+        }
+      ]
+    },
+    {
+      "heading": "Loot Round Update",
+      "entries": [
+        {
+          "kind": "change",
+          "name": "All Creeps from Round 10 has approximate -20% Health and -20% Attack damage",
+          "detail": "Round Level Creep Name Health New Health Prev Damage New Damage Prev 10 4 Huge Golem 1400 1400 100 125 10 3 Golem 800 800 80 100 15 5 Alpha Wolf 1600 2000 100 120 15 3 Wolf 1200 1500 80 100 15 2 Little Wolf 800 1000 60 75 20 5 Hellbear 1600 2000 0.65 (Speed) 0.55 (Speed) 25 6 Wildwing 3600 4500 340 425 30 6 Pine Cone 3600 4500 360 450 35 8 Black Dragon 8000 10000 700 850 40 7 Troll Foreman 4000 5000 300 350 40 3 Troll Axe 4800 6000 200 250 45 9 Year Beast 16000 20000 1000 1250 50 9 Roshan 24000 30000 1600 2000 Probability Table for Creep’s Treasure Creep Level Tier 1 Item Tier 2 Item Tier 3 Item 1 0% 0% 0% 2 0% 0% 0% 3 0% 0% 0% 4 20% 0% 0% 5 30% 5% 0% 6 30% 10% 0% 7 30% 25% 5% 8 30% 40% 10% 9 30% 40% 30%"
+        }
+      ]
+    },
+    {
+      "heading": "Talent Tree",
+      "entries": [
+        {
+          "kind": "buff",
+          "name": "Talent 2B - Ascendency",
+          "detail": "Chance for +1 Level in recruitment increased from 50% to 60%"
+        }
+      ]
+    },
+    {
+      "heading": "Bug Fixes",
+      "entries": [
+        {
+          "kind": "fix",
+          "name": "General",
+          "detail": "Various bug fixes."
+        }
+      ]
+    },
+    {
+      "heading": "Rebalance",
+      "entries": [
+        {
+          "kind": "change",
+          "name": "Harpy - Windfury",
+          "detail": "(4) Harpies adjusted (2) Harpies: All Non-harpy allies gain the effect: Targeted spells +1 additional target. (4) Harpies: All allies gain the effect: Targeted spells +1 additional target. harpies +1 additional target."
+        },
+        {
+          "kind": "buff",
+          "name": "Shaman - Hex",
+          "detail": "Channeling duration increased from 1.5s to 2s"
+        },
+        {
+          "kind": "buff",
+          "name": "Tiny",
+          "detail": "Base Health increased from 600 to 650"
+        },
+        {
+          "kind": "buff",
+          "name": "Nyx Assassin",
+          "detail": "Base Health increased from 800 to 950"
+        },
+        {
+          "kind": "buff",
+          "name": "Nyx Assassin - Spiked Carapace",
+          "detail": "Stun duration increased from 2s to 1.5/2/3/s"
+        },
+        {
+          "kind": "nerf",
+          "name": "Phantom Assassin - Coup de Grace",
+          "detail": "Evasion chance decreased from 30%/40%/50% to 20%/30%/40%"
+        },
+        {
+          "kind": "nerf",
+          "name": "Spectre - Haunt",
+          "detail": "Illusion amount decreased from 3/5/7 to 为3/4/6"
+        },
+        {
+          "kind": "change",
+          "name": "Mango Tree",
+          "detail": "Enchanted Mango grants randomly 2 - Current Level Gold and XP instead of 3 - Current Level"
+        }
+      ]
+    }
+  ]
 }

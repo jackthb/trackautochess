@@ -3,6 +3,187 @@
   "title": "Song of ice and flame",
   "source": "https://docs.google.com/document/d/e/2PACX-1vT8-BwsAjs58bEpkHXTQ6lZXlq0KUKyAy8alWpwmbHPQu2f6DpBi8sDzWd4n0FyG6_PqpfeE5sTXLrs/pub",
   "workshop_url": "https://steamcommunity.com/sharedfiles/filedetails/changelog/1613886175?p=1#post1773640995",
-  "summary": "Song of ice and flame\n\n\n● New Chess Piece: Ancient Apparition($1/Element/Mage), ability - Chilling touch\n● New Chess Piece: Phoenix($4/Element/Mage), ability - Sun Ray\n● Razor($3/Element/Shaman): Class changed from Mage to Shaman\n● Element - Elemental Essence: (6) added and chances for (2)(4) decreased.\n● Telescope: +200 attack range removed\n● New Pass Quests and removed Pass Quests\n● Fix bugs\n\nClick the title link to check the full update details!",
-  "sections": []
+  "flavor": "Icarus, the Primordial Flame of Creation, reborn through a supernova, burning and rising in an eternal cycle. Kaldr, the Frost Wraith of Terminus, forged from the void’s silence, wielding the power of annihilation. Flame or ice, genesis or terminus, they counter each other, yet stand as the twin poles that hold the cosmos in balance. Upon the battlefield, fire erupts and frost descends.These most ancient Elemental Twins write the ultimate tale of opposition and coexistence between life and extinction across all heaven and earth.",
+  "sections": [
+    {
+      "heading": "Chess Pieces",
+      "entries": [
+        {
+          "kind": "added",
+          "name": "Ancient Apparition($1/Element/Mage), ability - Chilling touch",
+          "detail": "New chess piece. <Passive Ability> Grant Ancient Apparition attack speed bonus and trap its target in chilling frost with attack speed decreased and health recharge prevented. The ancient apparition’s eternal knowledge brings a frigid enchantment to his attacks."
+        },
+        {
+          "kind": "added",
+          "name": "Phoenix($4/Element/Mage), ability - Sun Ray",
+          "detail": "New chess piece. <Active Ability: Activate Instant> Phoenix expels a beam of light at the cost of its own health. The beam damages enemies and heals allies for a base amount plus a percentage of their health. The percentage increases as the beam continues to fire. The vent through which such stellar energy flows is mere atoms wide."
+        },
+        {
+          "kind": "change",
+          "name": "Razor($3/Element/Shaman)",
+          "detail": "Class changed from Mage to Shaman"
+        },
+        {
+          "kind": "change",
+          "name": "Ogre Magi - Multicast",
+          "detail": "A single ally will have an internal cd for recasting its ability."
+        },
+        {
+          "kind": "buff",
+          "name": "Legion Commander - Press the Attack",
+          "detail": "Chances for moment of courage increased from 20% to 25%"
+        },
+        {
+          "kind": "buff",
+          "name": "Axe - Berserker’s Call",
+          "detail": "CD adjusted from 10/8/6s to 8s, duration increased from 2/3/5s to 4/6/8s"
+        },
+        {
+          "kind": "buff",
+          "name": "Clinkz",
+          "detail": "Attack interval decreased from 1.2s to 1.0s"
+        }
+      ]
+    },
+    {
+      "heading": "Synergies",
+      "entries": [
+        {
+          "kind": "nerf",
+          "name": "Element - Elemental Essence",
+          "detail": "(6) added and chances for (2)(4) decreased. (2) Elements: All friendly elements have +15% chance to turn melee aggressors into stone for 3 sec. (4) Elements: All allies have +15% chance to turn melee and ranged aggressors into stone for 3 sec. (6) Elements: Aggressors are stoned for 1 sec longer and take +100% damage."
+        },
+        {
+          "kind": "buff",
+          "name": "Dwarf - Take Aim",
+          "detail": "Attack range bonus added. (2) Dwarves: Attack range +200. All dwarves’ physical damage deals 15% increased damage for every 1 square away from the target."
+        },
+        {
+          "kind": "nerf",
+          "name": "Mage - Magical Vulnerability",
+          "detail": "（6）Mages - Magical resistance reduction decreased from 40% to 35%"
+        },
+        {
+          "kind": "nerf",
+          "name": "Naga - Scale Armor",
+          "detail": "(4) Naga absorption decreased from 35% to 30%"
+        },
+        {
+          "kind": "nerf",
+          "name": "Kobold - Divided we stand",
+          "detail": "(3) Kobolds - reshaped pieces’ lifespan decreased from 20s to 15~20s"
+        },
+        {
+          "kind": "buff",
+          "name": "Satyr - Horror",
+          "detail": "(2) Satyrs: Internal CD decreased from 5~10s to 4~8s"
+        },
+        {
+          "kind": "buff",
+          "name": "Draenei - Blessing of the Naaru",
+          "detail": "(2)Draeneis: Interval decreased from 5s to 4s"
+        }
+      ]
+    },
+    {
+      "heading": "Items",
+      "entries": [
+        {
+          "kind": "change",
+          "name": "Ascetics Cap",
+          "detail": "Chances for transform increased from 40%~80% to 50~90%(decreased by cost)"
+        },
+        {
+          "kind": "buff",
+          "name": "Mask of Madness",
+          "detail": "Attack speed bonus increased from 15% to 20%"
+        },
+        {
+          "kind": "change",
+          "name": "Telescope",
+          "detail": "+200 attack range removed Ranged carriers will be counted as Dwarf."
+        },
+        {
+          "kind": "nerf",
+          "name": "Bloodstone",
+          "detail": "Chances for gaining energy point decreased from 20% to 15%"
+        }
+      ]
+    },
+    {
+      "heading": "Quest Update",
+      "entries": [
+        {
+          "kind": "change",
+          "name": "Goblin Bounty: Greed, Goblin Bounty: Hoarder, Goblin Bounty: Fortune, Blow up!, Win Streak!, Artifact: Legendary, Artifact: Epic, Big Three, War Hero: Strike, War Hero: Shatter, War Hero: Annihilation, Fishing Contest, Team Recruitment: Squad, Team Recruitment: Rally, Team Recruitment: Horde, Four Titans, Eight Immortals",
+          "detail": "New pass quests."
+        },
+        {
+          "kind": "change",
+          "name": "Paycheck to Paycheck, A Winning Start, Crisis Spotter",
+          "detail": "Removed pass quests."
+        }
+      ]
+    },
+    {
+      "heading": "Bug Fixes",
+      "entries": [
+        {
+          "kind": "fix",
+          "name": "General",
+          "detail": "Various bug fixes."
+        }
+      ]
+    },
+    {
+      "heading": "Rebalance",
+      "entries": [
+        {
+          "kind": "change",
+          "name": "Drodo Notice",
+          "detail": "Unknown bugs sprang up due to new dota2 patch. Any bugs please contact 527980259@qq.com"
+        },
+        {
+          "kind": "change",
+          "name": "Assassin - Coup de Grâce",
+          "detail": "(9) Assassins will refresh their bachstab leap automatically every 15s. (3) Assassins: All friendly assassins have 15%% chance to critical hit for 300%% damage. (6) Assassins: All assassins have 15%% chance to critical hit for 400%% damage. (9) Assassins: All assassins refresh a Backstab Leap move after killing an enemy or 15s. This Backstab Leap always deals the maximum possible critical damage."
+        },
+        {
+          "kind": "change",
+          "name": "Kobold - Divided We Stand",
+          "detail": "(3) Kobolds - The piece will be frozen in wax for 5s when reshaping."
+        },
+        {
+          "kind": "nerf",
+          "name": "Mage - Magical Vulnerability",
+          "detail": "(9) Mages - Frozen duration decreased from damage/300 to damage/400"
+        },
+        {
+          "kind": "nerf",
+          "name": "Nage - Scaled Armor",
+          "detail": "(2) Nagas - Absorption decreased from 15% to 10%"
+        },
+        {
+          "kind": "buff",
+          "name": "Ancient Apparition",
+          "detail": "Attack interval decreased from 1.7s to 1.5s"
+        },
+        {
+          "kind": "buff",
+          "name": "Batrider - Firefly",
+          "detail": "Damage per second increased from 40/60/80 to 50/75/100"
+        },
+        {
+          "kind": "buff",
+          "name": "Huskar",
+          "detail": "Base attack interval decreased from 1.3s to 1.1s, health regen increased from 0.3% to 0.4% per stack"
+        },
+        {
+          "kind": "change",
+          "name": "Fix bugs",
+          "detail": ""
+        }
+      ]
+    }
+  ]
 }

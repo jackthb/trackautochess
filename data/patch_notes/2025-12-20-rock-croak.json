@@ -3,6 +3,316 @@
   "title": "Rock! Croak!",
   "source": "https://docs.google.com/document/d/e/2PACX-1vT7jfkG5Rm5XvDjsNPAo6WDcKtGUsK4wx9zXFH4mqQavuEU-k3ArsVadxuffIjTd8ZPYzCDdBpS_nTS/pub",
   "workshop_url": "https://steamcommunity.com/sharedfiles/filedetails/changelog/1613886175?p=1#post1766238852",
-  "summary": "Rock! Croak!\n\n\n\n● 3 New Leaderboards arrived\n● New Chess Piece: Largo ($2/Naga/Monk), Ability<Frogstomp>\n● Brewmaster: Downgraded from $2 to $1\n● Pandaren - Hospitality\n● Minotaur Horn: Upgraded from T3 to T4.\n● Mango Tree: Reworked. A Golden Mango will be dropped only when the mango tree is still alive at Relic expiration.(opposite to the previous condition). Mango tree’s health increased from 7 to 8.\n● Magic Box: Stacks decreased from 15 to 12.\n● Talent2B - Ascendency: Chances for +1 level recruitment decreased from 75% to 60%\n● Fix bugs\n\nClick the title link to check the full update details!",
-  "sections": []
+  "sections": [
+    {
+      "heading": "Обновление от 22 Декабря 2025",
+      "entries": [
+        {
+          "kind": "change",
+          "name": "Перевод от aPossum",
+          "detail": "Изгнанный бард-нага обнаружил живой континент Зерума в отдаленной и необитаемой стране. В отличие от бардов, обладающих какими-либо традиционными бардовскими способностями, Ларго является главой ордена бардмонков. Он приспосабливает каждую песню к конкретным обстоятельствам, поднимая настроение своим союзникам или, при необходимости, увеличивая скорость их бега навстречу битве. Как у лягушки, его цепкий язык, скажем так, способен на всевозможные трюки."
+        }
+      ]
+    },
+    {
+      "heading": "Leaderboards",
+      "entries": [
+        {
+          "kind": "change",
+          "name": "Более подробная информация о вашей истории матчей отображается на панели \"История игроков\". ",
+          "detail": ""
+        },
+        {
+          "kind": "change",
+          "name": "3 Новые Таблицы Лидеров",
+          "detail": "Championship Tops Ранжирует по количеству первых мест в сезоне. Greatest Lineup Tops Ранжирует по самым дорогим столам. (только столы вошедшие Top-3) Damage Star Tops Ранжирует по самому большому урону за раунд. (только столы вошедшие Top-3)"
+        }
+      ]
+    },
+    {
+      "heading": "Chess Pieces",
+      "entries": [
+        {
+          "kind": "change",
+          "name": "Новая Фигура",
+          "detail": "Largo ($2/Naga/Monk), Ability Frogstomp Largo бросает лягушат по области, где они прыгают каждую секунду, нанося урон и министаны, а так же замедляя врагов. Большинство бард-музыкантов тратят десятилетия на овладение музыкальным искусством, но даже топовый frog Largo вынужден признать, что его юные ученики уже потрясающе хорошо умеют отбивать нужный ритм."
+        },
+        {
+          "kind": "change",
+          "name": "Brewmaster",
+          "detail": "Стоимость была понижена с 2 до 1 золота, статы скорректированы в соответствии."
+        },
+        {
+          "kind": "change",
+          "name": "Ringmaster",
+          "detail": "Изменен внешний вид."
+        }
+      ]
+    },
+    {
+      "heading": "Synergies",
+      "entries": [
+        {
+          "kind": "change",
+          "name": "Pandaren - Hospitality",
+          "detail": "(1)(2) Вероятность призыв Пандарена увеличена с 12%/12% до 10%/15%"
+        },
+        {
+          "kind": "change",
+          "name": "Monk - Drunken Stagger",
+          "detail": "(2) Monks: Порог уничтожения снижен с 30% до 20% (4) Monks: Шансы сократить вдвое здоровье врагов уменьшено с 20% до 15%"
+        },
+        {
+          "kind": "change",
+          "name": "Assassin - Coup de Grace",
+          "detail": "(9) Assassins: Множитель критического удара уменьшен с 600% до 500%"
+        }
+      ]
+    },
+    {
+      "heading": "Items",
+      "entries": [
+        {
+          "kind": "change",
+          "name": "Minotaur Horn",
+          "detail": "Повышена с T3 до T4. Владелец становится Дракономи получает 100 маны."
+        },
+        {
+          "kind": "change",
+          "name": "Necronomicon",
+          "detail": "Necro Warrior и Necro Archer живут = 5 + Уровень курьера*3 секунды, вместо 5 + Уровень курьера*2 секунды."
+        },
+        {
+          "kind": "change",
+          "name": "Tango",
+          "detail": "Восстанавливает 1-8 ХП, вместо 1-7."
+        }
+      ]
+    },
+    {
+      "heading": "Relics",
+      "entries": [
+        {
+          "kind": "change",
+          "name": "Mango Tree",
+          "detail": "Переработано. Золотое манго выпадет только в том случае, если по истечении срока действия реликвии манговое дерево все еще будет живым.(в отличие от предыдущего условия). Запас здоровья мангового дерева увеличен с 7 до 8. Сажает Дерево Манго у Вашей доски. Дает зачарованное манго всегда, когда результат вашей домашней битвы отличается от предыдущей. Дерево увядает после 8 выпаданий. Золотое Манго выпадет, если манговое дерево все еще будет живым по истечении срока действия реликвии."
+        },
+        {
+          "kind": "change",
+          "name": "Magic Box",
+          "detail": "Количество уменьшилось с 15 до 12. В начале следующего раунда, когда игрок собирает фигуру союзника, он превращает ее в случайную новую фигуру того же уровня и ранга. Доступно 12 попыток."
+        }
+      ]
+    },
+    {
+      "heading": "Talent Tree",
+      "entries": [
+        {
+          "kind": "change",
+          "name": "Талант 2B - Элитка",
+          "detail": "Шанс на фигуры выше на 1 уровень уменьшен с 75% до 60%."
+        }
+      ]
+    },
+    {
+      "heading": "Season Awards",
+      "entries": [
+        {
+          "kind": "change",
+          "name": "S40 Dryad Season(Nov, 1st - Dec 31st) Awards will be granted as follows",
+          "detail": "♕Queen Top 20: Badge for S40 ♕Queen: 320 Candies and Crown(Valid in S41) +Dryad(Legendary) ♔King: 320 Candies + Dryad(Mythical) ♖Rook: 160 Candies + Dryad(Rare) ♗Bishop: 80 Candies + Dryad(Common) ♘Knight: 40 Candies ♙Pawn: 20 Candies"
+        },
+        {
+          "kind": "change",
+          "name": "Badges will be settled by the final ranking of the Season. All other awards will be settled by the highest rank in Season",
+          "detail": ""
+        },
+        {
+          "kind": "change",
+          "name": "The last day of the season will be a casual day to settle the awards. You can play casual games without rankings. New Season S41 Floral Firefly Season will be kicked off on Jan 1st, 2026",
+          "detail": ""
+        }
+      ]
+    },
+    {
+      "heading": "Bug Fixes",
+      "entries": [
+        {
+          "kind": "fix",
+          "name": "General",
+          "detail": "Various bug fixes."
+        }
+      ]
+    },
+    {
+      "heading": "Rebalance",
+      "entries": [
+        {
+          "kind": "change",
+          "name": "Tusk",
+          "detail": "Базовый урон увеличен с 60 до 70"
+        },
+        {
+          "kind": "change",
+          "name": "Muerta",
+          "detail": "Базовый урон увеличен с 65 до 75"
+        },
+        {
+          "kind": "change",
+          "name": "Enigma - Midnight Pulse",
+          "detail": "Радиус увеличен с 300/350/400 до 350/400/450"
+        },
+        {
+          "kind": "change",
+          "name": "Lycan - Shapeshift",
+          "detail": "Урон волчков увеличен с 75/125/175 до 75/150/225"
+        },
+        {
+          "kind": "change",
+          "name": "Warrior - Fortified Armor",
+          "detail": "(6) Воины - Бонус к броне увеличен с 9 до 10"
+        },
+        {
+          "kind": "change",
+          "name": "Pandaren - Hospitality",
+          "detail": "Призванные фигуры могут быть проданы только за половину стоисмости вместо полной цены."
+        },
+        {
+          "kind": "change",
+          "name": "Assassin - Coup de Grace",
+          "detail": "(9) Assassins - 5% шанс критического удара устранен."
+        },
+        {
+          "kind": "change",
+          "name": "Kobold - Divided we stand",
+          "detail": "(3) Kobolds - Превращенные Кобольды теперь живут 30 секунд."
+        },
+        {
+          "kind": "change",
+          "name": "Bloodstone",
+          "detail": "Бонус к здоровью увеличен с 300 до 600."
+        },
+        {
+          "kind": "change",
+          "name": "Drum of Endurance",
+          "detail": "Бонус к скорости атаки увеличен с 30% до 35%"
+        },
+        {
+          "kind": "change",
+          "name": "Manta Style",
+          "detail": "Перезарядка увеличена с 25 до 30 секунд"
+        },
+        {
+          "kind": "change",
+          "name": "Gleipnir",
+          "detail": "Магический урон уменьшен с 200 до 100"
+        },
+        {
+          "kind": "change",
+          "name": "Исправление багов",
+          "detail": ""
+        },
+        {
+          "kind": "added",
+          "name": "New arrival in Candy Collection",
+          "detail": "Xmas Eve (Rare/Chessboard)"
+        }
+      ]
+    },
+    {
+      "heading": "Rebalance",
+      "entries": [
+        {
+          "kind": "change",
+          "name": "S41 has been kicked off! Enjoy the new season and claim your S40 Award in Event Panel",
+          "detail": ""
+        },
+        {
+          "kind": "change",
+          "name": "You’ll need 5 games to settle your ranking as usual",
+          "detail": "—————————————————————"
+        }
+      ]
+    },
+    {
+      "heading": "Rebalance",
+      "entries": [
+        {
+          "kind": "change",
+          "name": "Largo",
+          "detail": "Базовое здоровье уменьшено с 850 до 800."
+        },
+        {
+          "kind": "change",
+          "name": "Faceless Void - Time Zone",
+          "detail": "Бонус к скорости атаки уменьшен с 30%/40%/50% до 20%/30%/40%."
+        },
+        {
+          "kind": "change",
+          "name": "Oracle - Rain of Destiny",
+          "detail": "время перезарядки уменьшено с 15/12/10 секунд до 12/10/8 секунд."
+        },
+        {
+          "kind": "change",
+          "name": "Treant Protector - Leech Seed",
+          "detail": "Продолжительность увеличена с 4 до 5 секунд, перезарядка уменьшена с 8 до 8/7/6 секунд."
+        },
+        {
+          "kind": "change",
+          "name": "Venomancer",
+          "detail": "Интервал атаки вардов уменьшен с 1,4 до 1,2 секунды."
+        },
+        {
+          "kind": "change",
+          "name": "Broodmother",
+          "detail": "Базовый урон паучат увеличен с 70/90/130 до 80/120/160. Интервал между базовыми атаками уменьшен с 1,5 до 1,2 с."
+        },
+        {
+          "kind": "change",
+          "name": "Snapfire - Lil Shredder",
+          "detail": "урон за выстрел увеличен со 100/150/200 до 150/200/300."
+        },
+        {
+          "kind": "change",
+          "name": "Antimage",
+          "detail": "коэффициент сжигания маны уменьшен с 3/5/8 до 2/4/8."
+        },
+        {
+          "kind": "change",
+          "name": "Morphling",
+          "detail": "интервал базовой атаки увеличен с 1,3 до 1,4 секунды."
+        },
+        {
+          "kind": "change",
+          "name": "Warlock",
+          "detail": "предметы чернокнижника изначально переводят 25%/50% здоровья в ману вместо 20%/40%."
+        },
+        {
+          "kind": "change",
+          "name": "Naga - Scale Armor",
+          "detail": "(6) Nagas - Множитель урона от поглощения Нагами уменьшен со 150% до 100%."
+        },
+        {
+          "kind": "change",
+          "name": "Monk - Drunken Stagger",
+          "detail": "(4) Monks - Действует только для врагов с процентом здоровья выше 40%."
+        },
+        {
+          "kind": "change",
+          "name": "Mekansm",
+          "detail": "перезарядка уменьшена с 12 до 10 единиц"
+        },
+        {
+          "kind": "change",
+          "name": "Witless Shako, Ascetics Cap, Ogre Hood",
+          "detail": "Магический резист +25%"
+        },
+        {
+          "kind": "change",
+          "name": "Исправление багов",
+          "detail": ""
+        }
+      ]
+    }
+  ]
 }

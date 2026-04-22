@@ -3,6 +3,62 @@
   "title": "Dramatic Entrance!",
   "source": "https://docs.google.com/document/d/1XAKBDx7GjBJ3k2kZ1Vj2l02L7o_BRkZOveOEk3wqebg/pub",
   "workshop_url": "https://steamcommunity.com/sharedfiles/filedetails/changelog/1613886175?p=1#post1725864017",
-  "summary": "Dramatic Entrance!\n\n\n\n● Ringmaster ($5, ?/?/?): Ability Spotlight\n● Naga - Scale Armor: Simplified.\n● Diffusal Blade: Reworked\n● Bug fix\n\nClick the title link to check the full update details!",
-  "sections": []
+  "flavor": "Welcome, welcome, one and all - to a stage-lit extravaganza for the ages! Prepare to have your senses shattered! Your expectations are demolished! Your Ancients smashed to ruins! Witness the impossible feats and derring-do of the one and only clockwork marvel, the Great Cogliostro Kettle - Ringmaster, torture artist, genius in his own time - here now for the sole agony and entertainment of any hero bold enough to draw back the crimson carnival curtain and behold what mysteries await inside.",
+  "sections": [
+    {
+      "heading": "Chess Pieces",
+      "entries": [
+        {
+          "kind": "change",
+          "name": "Ringmaster ($5, ?/?/?)",
+          "detail": "Ability Spotlight <Active Ability: Instant> Ringmaster shines a spotlight that sweeps an area. Enemies in the light have a chance to miss their attacks and are revealed if invisible. Non-permanent pieces and illusion pieces hit by the beam will fade away, by taking a PURE damage equal to a percentage of their health each second. P.S. Ringmaster is a special Legendary piece with no Race but 3 Random Classes! The classes keep in one single match, but vary among matches."
+        },
+        {
+          "kind": "change",
+          "name": "Lion - Finger of Death",
+          "detail": "Base damage increased from 300/500/900 to 500/750/1250, CD increased from 7/5/3 secs to 8/6/4 secs."
+        }
+      ]
+    },
+    {
+      "heading": "Synergies",
+      "entries": [
+        {
+          "kind": "change",
+          "name": "Naga - Scale Armor",
+          "detail": "Simplified. (2) Nagas: All allies gain a shield that absorbs 20% ability damage. (4) Nagas: All allies gain a shield that absorbs 30% ability damage (6) Nagas: All Nagas detonate their shield every 3 secs to deal MAGICAL damage to enemies according to damage absorbed. P.S. Scale Armors cannot absorb PURE damage. P.S. (6) Nagas detonation has a trigger threshold of 100. Less than 100 absorbed damage will not detonate but accumulate into the next detonation."
+        },
+        {
+          "kind": "buff",
+          "name": "Harpy - WIndfury",
+          "detail": "(2) Harpies: Chance for an extra target increased from 75% to 100%."
+        },
+        {
+          "kind": "nerf",
+          "name": "Aqir - Infection",
+          "detail": "Delay increased from 0.1 sec to 1 sec. (4) Aqirs now summon +1 Level Aqir (Chance for +2 Level canceled)"
+        }
+      ]
+    },
+    {
+      "heading": "Items",
+      "entries": [
+        {
+          "kind": "rework",
+          "name": "Diffusal Blade",
+          "detail": "Reworked Attack damage + 20% Attack prevents target from mana recharging and Deathrattle triggering. P.S. Only one Initial target affected by Diffusal debuff on Split Shot."
+        }
+      ]
+    },
+    {
+      "heading": "Bug Fixes",
+      "entries": [
+        {
+          "kind": "fix",
+          "name": "General",
+          "detail": "Various bug fixes."
+        }
+      ]
+    }
+  ]
 }

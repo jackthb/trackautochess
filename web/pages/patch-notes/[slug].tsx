@@ -147,7 +147,8 @@ export default function PatchDetailPage({ supabase, patch }: PatchPageProps) {
           padding: 8px 0;
           border-bottom: 1px solid var(--border-subtle);
         }
-        .summary-line:last-of-type {
+        .summary-line:last-child,
+        .summary-line:has(+ .summary-footer) {
           border-bottom: none;
         }
         .summary-line.bullet {
