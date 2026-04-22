@@ -87,4 +87,4 @@ npm run scrape:items    # Items only
 ## Workflow
 
 - **Solo project, no code review needed.** Commit and push directly to `main`. You don't need to confirm direct-to-main pushes or open PRs by default.
-- **Use a PR only when a change might plausibly need to be reverted** — e.g. risky refactors, schema migrations, anything that could silently break the app for existing users. In those cases, open a PR so there's a clean revert handle.
+- **Use a PR only when** (a) the change might plausibly need to be reverted — risky refactors, schema migrations, anything that could silently break the app for existing users — or (b) the change is in `web/` and you want the Vercel preview deployment to test it in a live environment before it hits production.
