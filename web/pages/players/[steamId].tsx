@@ -13,7 +13,7 @@ import type { PlayerGame, UnitFullInfo, SynergyInfo, RelicInfo } from "@dac/shar
 import { NavBar } from "../../components/NavBar";
 import {
   fetchSteamProfile,
-  resolveSteamId,
+  resolveSteamInput,
   steamProfileUrl,
   type SteamProfile,
 } from "../../lib/steam";
@@ -371,15 +371,16 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
   const supabase = createClient(url, key);
 
-  // Accept numeric SteamID64 or a vanity slug (/id/agit142). Redirect slugs to
-  // the canonical numeric URL once we resolve them via Steam's XML API.
-  let steamId = rawSteamId;
-  if (!/^\d+$/.test(rawSteamId)) {
-    const resolved = await resolveSteamId(rawSteamId, supabase);
-    if (!resolved) return { notFound: true };
+  // Accept numeric Steam IDs, vanity slugs, or pasted Steam community URLs.
+  // Redirect anything non-canonical to the numeric player route once resolved.
+  const steamId = await resolveSteamInput(rawSteamId, supabase);
+  if (!steamId) {
+    return { notFound: true };
+  }
+  if (steamId !== rawSteamId) {
     return {
       redirect: {
-        destination: `/players/${resolved}`,
+        destination: `/players/${steamId}`,
         permanent: false,
       },
     };

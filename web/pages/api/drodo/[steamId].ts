@@ -1,5 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { createClient } from "@supabase/supabase-js";
+import { fetchSteamProfile, resolveSteamInput } from "../../../lib/steam";
 
 const DRODO_BASE = "http://autochess.ppbizon.com";
 
@@ -44,8 +45,8 @@ function extractAllSeasons(
 }
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  const { steamId, refresh } = req.query;
-  if (!steamId || typeof steamId !== "string" || !/^\d+$/.test(steamId)) {
+  const { steamId: rawSteamId, refresh } = req.query;
+  if (!rawSteamId || typeof rawSteamId !== "string") {
     return res.status(400).json({ error: "Invalid steam ID" });
   }
 
@@ -54,6 +55,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     process.env.SUPABASE_SERVICE_ROLE_KEY!,
     { auth: { autoRefreshToken: false, persistSession: false } }
   );
+  const steamId = await resolveSteamInput(rawSteamId, supabase);
+  if (!steamId) {
+    return res.status(400).json({ error: "Invalid steam ID" });
+  }
+
+  await fetchSteamProfile(steamId, supabase);
 
   // Check cache unless force refresh
   if (refresh !== "1") {

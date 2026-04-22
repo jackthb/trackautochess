@@ -1,5 +1,5 @@
 /**
- * Steam profile utilities — server-side only (used in getServerSideProps).
+ * Steam profile utilities used by the web app.
  */
 
 import type { SupabaseClient } from "@supabase/supabase-js";
@@ -9,6 +9,90 @@ export interface SteamProfile {
   customUrl: string | null;
 }
 
+export interface ParsedSteamInput {
+  kind: "id" | "slug";
+  value: string;
+}
+
+interface SteamApiProfile extends SteamProfile {
+  steamId: string | null;
+}
+
+function parseSteamProfileXml(xml: string): SteamApiProfile {
+  const steamIdMatch = xml.match(/<steamID64>(\d+)<\/steamID64>/);
+  const nameMatch = xml.match(/<steamID><!\[CDATA\[(.+?)\]\]><\/steamID>/);
+  const customUrlMatch = xml.match(
+    /<customURL><!\[CDATA\[(.+?)\]\]><\/customURL>/
+  );
+
+  return {
+    steamId: steamIdMatch ? steamIdMatch[1] : null,
+    name: nameMatch ? nameMatch[1] : null,
+    customUrl: customUrlMatch ? customUrlMatch[1] : null,
+  };
+}
+
+async function fetchSteamProfileXml(url: string): Promise<SteamApiProfile> {
+  try {
+    const resp = await fetch(url);
+    if (!resp.ok) {
+      return { steamId: null, name: null, customUrl: null };
+    }
+    const xml = await resp.text();
+    return parseSteamProfileXml(xml);
+  } catch {
+    return { steamId: null, name: null, customUrl: null };
+  }
+}
+
+export function parseSteamInput(raw: string): ParsedSteamInput | null {
+  const trimmed = raw.trim();
+  if (!trimmed) return null;
+
+  let decoded = trimmed;
+  try {
+    decoded = decodeURIComponent(trimmed);
+  } catch {
+    decoded = trimmed;
+  }
+
+  const profileMatch = decoded.match(
+    /^(?:https?:\/\/)?(?:www\.)?steamcommunity\.com\/profiles\/(\d+)(?:[/?#].*)?$/i
+  );
+  if (profileMatch) return { kind: "id", value: profileMatch[1] };
+
+  const customUrlMatch = decoded.match(
+    /^(?:https?:\/\/)?(?:www\.)?steamcommunity\.com\/id\/([A-Za-z0-9_-]+)(?:[/?#].*)?$/i
+  );
+  if (customUrlMatch) return { kind: "slug", value: customUrlMatch[1] };
+
+  if (/^\d+$/.test(decoded)) return { kind: "id", value: decoded };
+  if (/^[A-Za-z0-9_-]+$/.test(decoded)) {
+    return { kind: "slug", value: decoded };
+  }
+
+  return null;
+}
+
+export async function upsertSteamUser(
+  steamId: string,
+  supabase?: SupabaseClient,
+  profile?: SteamProfile | null
+): Promise<void> {
+  if (!supabase || !steamId) return;
+
+  const payload: {
+    steam_id: string;
+    name?: string;
+    custom_url?: string;
+  } = { steam_id: steamId };
+
+  if (profile?.name) payload.name = profile.name;
+  if (profile?.customUrl) payload.custom_url = profile.customUrl;
+
+  await supabase.from("users").upsert(payload, { onConflict: "steam_id" });
+}
+
 /**
  * Fetch a Steam user's display name and custom URL from the community XML API.
  * No API key required.
@@ -16,24 +100,10 @@ export interface SteamProfile {
 export async function fetchSteamProfileFromApi(
   steamId: string
 ): Promise<SteamProfile> {
-  try {
-    const resp = await fetch(
-      `https://steamcommunity.com/profiles/${steamId}/?xml=1`
-    );
-    const xml = await resp.text();
-    const nameMatch = xml.match(
-      /<steamID><!\[CDATA\[(.+?)\]\]><\/steamID>/
-    );
-    const customUrlMatch = xml.match(
-      /<customURL><!\[CDATA\[(.+?)\]\]><\/customURL>/
-    );
-    return {
-      name: nameMatch ? nameMatch[1] : null,
-      customUrl: customUrlMatch ? customUrlMatch[1] : null,
-    };
-  } catch {
-    return { name: null, customUrl: null };
-  }
+  const profile = await fetchSteamProfileXml(
+    `https://steamcommunity.com/profiles/${steamId}/?xml=1`
+  );
+  return { name: profile.name, customUrl: profile.customUrl };
 }
 
 /**
@@ -44,31 +114,33 @@ export async function fetchSteamProfile(
   steamId: string,
   supabase?: SupabaseClient
 ): Promise<SteamProfile> {
-  // 1. Try the DB first
+  let cachedProfile: SteamProfile | null = null;
+
   if (supabase) {
     const { data } = await supabase
       .from("users")
       .select("name, custom_url")
       .eq("steam_id", steamId)
-      .single();
+      .maybeSingle();
 
-    if (data?.name) {
-      return { name: data.name, customUrl: data.custom_url ?? null };
+    if (data) {
+      cachedProfile = {
+        name: data.name ?? null,
+        customUrl: data.custom_url ?? null,
+      };
+      if (cachedProfile.name && cachedProfile.customUrl) {
+        return cachedProfile;
+      }
     }
   }
 
-  // 2. Fall back to Steam API
-  const profile = await fetchSteamProfileFromApi(steamId);
+  const apiProfile = await fetchSteamProfileFromApi(steamId);
+  const profile = {
+    name: apiProfile.name ?? cachedProfile?.name ?? null,
+    customUrl: apiProfile.customUrl ?? cachedProfile?.customUrl ?? null,
+  };
 
-  // 3. Cache the result in the DB (best-effort, don't block on failure)
-  if (supabase && profile.name) {
-    supabase
-      .from("users")
-      .update({ name: profile.name, custom_url: profile.customUrl })
-      .eq("steam_id", steamId)
-      .then(() => {});
-  }
-
+  await upsertSteamUser(steamId, supabase, profile);
   return profile;
 }
 
@@ -90,27 +162,40 @@ export async function resolveSteamId(
   slug: string,
   supabase?: SupabaseClient
 ): Promise<string | null> {
-  const clean = slug.trim();
-  if (!clean) return null;
+  const parsed = parseSteamInput(slug);
+  if (!parsed) return null;
+  if (parsed.kind === "id") return parsed.value;
+
+  const clean = parsed.value;
 
   if (supabase) {
     const { data } = await supabase
       .from("users")
       .select("steam_id")
-      .eq("custom_url", clean)
-      .single();
+      .ilike("custom_url", clean)
+      .maybeSingle();
     if (data?.steam_id) return String(data.steam_id);
   }
 
-  try {
-    const resp = await fetch(
-      `https://steamcommunity.com/id/${encodeURIComponent(clean)}/?xml=1`
-    );
-    if (!resp.ok) return null;
-    const xml = await resp.text();
-    const match = xml.match(/<steamID64>(\d+)<\/steamID64>/);
-    return match ? match[1] : null;
-  } catch {
-    return null;
-  }
+  const profile = await fetchSteamProfileXml(
+    `https://steamcommunity.com/id/${encodeURIComponent(clean)}/?xml=1`
+  );
+  if (!profile.steamId) return null;
+
+  await upsertSteamUser(profile.steamId, supabase, {
+    name: profile.name,
+    customUrl: profile.customUrl ?? clean,
+  });
+
+  return profile.steamId;
+}
+
+export async function resolveSteamInput(
+  raw: string,
+  supabase?: SupabaseClient
+): Promise<string | null> {
+  const parsed = parseSteamInput(raw);
+  if (!parsed) return null;
+  if (parsed.kind === "id") return parsed.value;
+  return resolveSteamId(parsed.value, supabase);
 }

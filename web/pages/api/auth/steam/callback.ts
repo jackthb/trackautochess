@@ -1,5 +1,9 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { createClient } from "@supabase/supabase-js";
+import {
+  fetchSteamProfileFromApi,
+  upsertSteamUser,
+} from "../../../../lib/steam";
 
 const STEAM_OPENID_URL = "https://steamcommunity.com/openid/login";
 
@@ -26,24 +30,14 @@ async function verifySteamAssertion(query: Record<string, string | string[] | un
   return match ? match[1] : null;
 }
 
-async function fetchSteamName(steamId: string): Promise<string | null> {
-  try {
-    const resp = await fetch(`https://steamcommunity.com/profiles/${steamId}/?xml=1`);
-    const xml = await resp.text();
-    const match = xml.match(/<steamID><!\[CDATA\[(.+?)\]\]><\/steamID>/);
-    return match ? match[1] : null;
-  } catch {
-    return null;
-  }
-}
-
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const steamId = await verifySteamAssertion(req.query);
   if (!steamId) {
     return res.redirect("/?error=steam_auth_failed");
   }
 
-  const steamName = await fetchSteamName(steamId) || steamId;
+  const steamProfile = await fetchSteamProfileFromApi(steamId);
+  const steamName = steamProfile.name || steamId;
 
   const supabaseAdmin = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -55,12 +49,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   console.log("Steam verified:", steamId, steamName);
 
   // Persist Steam display name in the public users table
-  await supabaseAdmin
-    .from("users")
-    .upsert(
-      { steam_id: Number(steamId), name: steamName === steamId ? null : steamName },
-      { onConflict: "steam_id" }
-    );
+  await upsertSteamUser(steamId, supabaseAdmin, {
+    name: steamName === steamId ? null : steamName,
+    customUrl: steamProfile.customUrl,
+  });
 
   // Find or create user
   const { data: users, error: listError } = await supabaseAdmin.auth.admin.listUsers();
