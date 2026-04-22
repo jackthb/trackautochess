@@ -83,3 +83,8 @@ npm run scrape:items    # Items only
 - **Runtime config**: stored in `~/.dac/config.json` (player name, hotkey, Supabase URL)
 - **Database**: Supabase (PostgreSQL) with RLS policies
 - **`tracker/`** is legacy — its functionality has been merged into `app/backend/`
+
+## Workflow
+
+- **Solo project, no code review needed.** Commit and push directly to `main`. You don't need to confirm direct-to-main pushes or open PRs by default.
+- **Use a PR only when a change might plausibly need to be reverted** — e.g. risky refactors, schema migrations, anything that could silently break the app for existing users. In those cases, open a PR so there's a clean revert handle.
