@@ -36,7 +36,7 @@
   },
   "item_aoshuxie": {
     "name": "Arcane Boots",
-    "description": "Fast movement.\n\nActive ability: Instant\nRestores 40 mana for all allies within the range.\n\nRange: %max_distance%",
+    "description": "Fast movement.\n\nActive ability: Instant\nRestores 40 mana for all allies within the range.\n\nRange: 400",
     "lore": "",
     "quality": "rare",
     "texture": "item_arcane_boots",
@@ -128,7 +128,7 @@
   },
   "item_chihongjia": {
     "name": "Crimson Guard",
-    "description": "+5 armor, Block 30 damage.\n\nActive ability: Activates when taking damage\nGrants all allies within the range 50% chance to block 100 damage for melee pieces and 30 damage for ranged pieces. Lasts 8 sec.\n\nRange: %max_distance%",
+    "description": "+5 armor, Block 30 damage.\n\nActive ability: Activates when taking damage\nGrants all allies within the range 50% chance to block 100 damage for melee pieces and 30 damage for ranged pieces. Lasts 8 sec.\n\nRange: 400",
     "lore": "A cuirass originally built to protect against the dreaded Year Beast.",
     "quality": "rare",
     "texture": "item_crimson_guard",
@@ -200,7 +200,7 @@
   },
   "item_dongchayandou": {
     "name": "Pipe of Insight",
-    "description": "+10 health regeneration, +50% magic resistance.\n\nActive ability: Activates when taking damage\nGrants ranged allies with +10 health regeneration, +50% magic resistance for 10 sec.\n\nRange:%max_distance%",
+    "description": "+10 health regeneration, +50% magic resistance.\n\nActive ability: Activates when taking damage\nGrants ranged allies with +10 health regeneration, +50% magic resistance for 10 sec.\n\nRange:500",
     "lore": "A powerful artifact of mysterious origin, it creates barriers against magical forces.",
     "quality": "rare",
     "texture": "item_pipe",
@@ -458,7 +458,7 @@
   },
   "item_liliangdatiaodao": {
     "name": "Overwhelming Blink",
-    "description": "Active ability: Instant\nInstantly teleports off the farest square that allows it to attack an enemy. Generates 30 on activation.+ 30% HP per activation.\n\nMax Blink Distance: %max_blink_distance%",
+    "description": "Active ability: Instant\nInstantly teleports off the farest square that allows it to attack an enemy. Generates 30 on activation.+ 30% HP per activation.\n\nMax Blink Distance: 800",
     "lore": "",
     "quality": "rare",
     "texture": "overwhelming_blink",
@@ -490,7 +490,7 @@
   },
   "item_longxin": {
     "name": "Heart of Tarrasque",
-    "description": "Fast movement, +60% health, +10 health regeneration.\n\nAura:\nAllies within the range gain healing per sec equal to 1.5% of the carriers maximum health.\n\nRange: %max_distance%",
+    "description": "Fast movement, +60% health, +10 health regeneration.\n\nAura:\nAllies within the range gain healing per sec equal to 1.5% of the carriers maximum health.\n\nRange:?",
     "lore": "",
     "quality": "artifact",
     "texture": "item_heart",
@@ -582,7 +582,7 @@
   },
   "item_meiken": {
     "name": "Mekansm",
-    "description": "Active ability: Activate when most allies are wounded\nHeals 500 health to all allied units within the range. \n\nRange:%max_distance%",
+    "description": "Active ability: Activate when most allies are wounded\nHeals 500 health to all allied units within the range. \n\nRange:400",
     "lore": "A glowing jewel formed out of assorted parts that somehow fit together perfectly.",
     "quality": "rare",
     "texture": "item_mekansm",
@@ -600,7 +600,7 @@
   },
   "item_minjiedatiaodao": {
     "name": "Swift Blink",
-    "description": "Active ability: Instant Cast\nInstantly move to the farthest grid within the range that can attack the enemy, gain 30 mana, and a stackable effect of +20% attack speed.\n\nmaximum distance: %max_blink_distance%",
+    "description": "Active ability: Instant Cast\nInstantly move to the farthest grid within the range that can attack the enemy, gain 30 mana, and a stackable effect of +20% attack speed.\n\nmaximum distance: 800",
     "lore": "",
     "quality": "rare",
     "texture": "swift_blink",
@@ -668,7 +668,7 @@
   },
   "item_qiangxi": {
     "name": "Assault Cuirass",
-    "description": "+15 Armor.+20 Attack speed.\n\nAura\nGrants +10 armor to allies nearby.\n\nAura\nEnemies nearby suffer -10 armor.",
+    "description": "+15 Armor.+20 Attack speed.\n\nAura\nGrants +10 armor to allies nearby.\nEnemies nearby suffer -10 armor.",
     "lore": "",
     "quality": "artifact",
     "texture": "item_assault",
@@ -939,7 +939,7 @@
   },
   "item_tiaodao": {
     "name": "Blink Dagger",
-    "description": "Active ability: Instant\nInstantly teleports off the farest square that allows it to attack an enemy. \n\nRange: %max_blink_distance%",
+    "description": "Active ability: Instant\nInstantly teleports off the farest square that allows it to attack an enemy. \n\nRange: 800",
     "lore": "The fabled dagger used by the fastest assassin ever to walk the lands.",
     "quality": "rare",
     "texture": "item_blink",
@@ -999,7 +999,7 @@
   },
   "item_weishijingjia": {
     "name": "Guardian Greaves",
-    "description": "Enables quick movement\n\nActive ability: Activates when many allied chess pieces are injured.\nGrants 500 maximum health and 30 mana to all allied units in the area and dispels negative effects incurred during battle.\n\nEffect Range:%max_distance%",
+    "description": "Enables quick movement\n\nActive ability: Activates when many allied chess pieces are injured.\nGrants 500 maximum health and 30 mana to all allied units in the area and dispels negative effects incurred during battle.\n\nEffect Range:500",
     "lore": "One of many holy instruments constructed to honor the Omniscience.",
     "quality": "epic",
     "texture": "item_guardian_greaves",
@@ -1025,7 +1025,7 @@
   },
   "item_xiangweixie": {
     "name": "Phase Boots",
-    "description": "Enables quick movement.\n\nActive ability: Instant Activation\nMelee carriers will phase through obstacles, swiftly moving to the vicinity of an enemy chess piece with lower health in the range and prioritizing an attack on it.\n\nEffect Range:%max_distance%",
+    "description": "Enables quick movement.\n\nActive ability: Instant Activation\nMelee carriers will phase through obstacles, swiftly moving to the vicinity of an enemy chess piece with lower health in the range and prioritizing an attack on it.\n\nEffect Range:600",
     "lore": "Boots that allow the wearer to travel between the ether.",
     "quality": "consumable",
     "texture": "phase_boots",
@@ -1129,7 +1129,7 @@
   },
   "item_yuanxingxie": {
     "name": "Travel Boots",
-    "description": "Fast Movement\nTeleports its owner to help the home/away battle if the owner survives the current battle.\n\nActive ability: Instant\nInstantly teleports off the farthest square that allows it to attack an enemy. Generates 20 on activation.\n\nMax distance: %max_blink_distance%",
+    "description": "Fast Movement\nTeleports its owner to help the home/away battle if the owner survives the current battle.\n\nActive ability: Instant\nInstantly teleports off the farthest square that allows it to attack an enemy. Generates 20 on activation.\n\nMax distance: 800",
     "lore": "",
     "quality": "rare",
     "texture": "item_travel_boots",
@@ -1145,7 +1145,7 @@
   },
   "item_zhilidatiaodao": {
     "name": "Arcane Blink",
-    "description": "Active ability: On ability cooling down\nInstantly move to the farthest grid within the range that can attack the enemy, gain 25 mana and +20% magical damage amplification, and reduce ability CD by 5 sec.\n\nmaximum distance:%max_blink_distance%",
+    "description": "Active ability: On ability cooling down\nInstantly move to the farthest grid within the range that can attack the enemy, gain 25 mana and +20% magical damage amplification, and reduce ability CD by 5 sec.\n\nmaximum distance:800",
     "lore": "",
     "quality": "rare",
     "texture": "arcane_blink",

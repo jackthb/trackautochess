@@ -194,6 +194,15 @@ def strip_html(s):
     if not s:
         return s
     s = unescape_kv(s)
+    # Collapse consecutive identical headings (e.g. Assault Cuirass has two
+    # "<h1>Aura</h1>" blocks in a row) so the rendered text reads as one
+    # section with two lines instead of a repeated heading.
+    h1_dup = re.compile(r'(<h1>([^<]+)</h1>[^<]*?)\s*<h1>\2</h1>', re.IGNORECASE)
+    while True:
+        new_s = h1_dup.sub(r'\1\n', s)
+        if new_s == s:
+            break
+        s = new_s
     s = re.sub(r'<br\s*/?>', '\n', s, flags=re.IGNORECASE)
     s = re.sub(r'<\s*/?(?:' + _BLOCK_TAGS + r')(?:\s[^>]*)?>', '\n', s, flags=re.IGNORECASE)
     # Colored <font> tags wrap keyword labels (e.g. "Disarm", "Silence") that
@@ -344,6 +353,30 @@ def extract_all(pak):
     # 2. ITEMS
     # ════════════════════════════════════════════════════════════════
 
+    def _item_values(block):
+        """Flatten AbilityValues and AbilitySpecial into a {name: value} map.
+
+        VPK tooltips contain tokens like "%max_blink_distance%" that the game
+        engine substitutes at render time from these blocks. We do the same so
+        the exported description reads "Range: 800" instead of a raw token.
+        """
+        vals = {}
+        av = block.get('AbilityValues')
+        if isinstance(av, dict):
+            for k, v in av.items():
+                if not isinstance(v, dict):
+                    vals[k] = v
+        ab_special = block.get('AbilitySpecial')
+        if isinstance(ab_special, dict):
+            for _, fields in ab_special.items():
+                if isinstance(fields, dict):
+                    for fk, fv in fields.items():
+                        if fk != 'var_type' and not isinstance(fv, dict):
+                            vals[fk] = fv
+        return vals
+
+    _placeholder = re.compile(r'%([A-Za-z_][A-Za-z0-9_]*)%')
+
     items = {}
     for iid, idata in sorted(items_kv.items()):
         if not iid.startswith('item_') or not isinstance(idata, dict):
@@ -355,7 +388,14 @@ def extract_all(pak):
         if not name or name == iid:
             continue
 
-        desc = strip_html(loc.get(f'{prefix}_Description', ''))
+        values = _item_values(idata)
+        raw_desc = loc.get(f'{prefix}_Description', '')
+        # Unresolved tokens (values not declared on the item block) render as
+        # "?" — a visible gap beats silently dropping the sentence.
+        raw_desc = _placeholder.sub(
+            lambda m: str(values.get(m.group(1), '?')), raw_desc,
+        )
+        desc = strip_html(raw_desc)
         lore = loc.get(f'{prefix}_Lore', '')
         notes = get_notes(prefix, loc)
         quality = idata.get('ItemQuality', '')
