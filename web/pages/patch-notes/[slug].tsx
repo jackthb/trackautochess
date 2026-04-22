@@ -1,10 +1,13 @@
 import fs from "fs";
 import path from "path";
-import Head from "next/head";
 import Link from "next/link";
 import type { GetStaticPaths, GetStaticProps } from "next";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import patchIndex from "@data/patch_notes/index.json";
+import { SeoHead } from "@/lib/seo";
+import { getItemSlugByName } from "@/lib/items";
+import { getRelicSlugByName } from "@/lib/relics";
+import { absoluteUrl, SITE_NAME } from "@/lib/site";
 
 type EntryKind =
   | "added"
@@ -42,6 +45,12 @@ interface IndexPatch {
   slug: string;
 }
 
+interface PatchPageProps {
+  patch: Patch;
+  slug: string;
+  supabase: SupabaseClient | null;
+}
+
 const KIND_COLOR: Record<EntryKind, string> = {
   added: "var(--green-bright)",
   removed: "var(--red-bright)",
@@ -62,18 +71,117 @@ const KIND_LABEL: Record<EntryKind, string> = {
   fix: "FIX",
 };
 
-interface PatchPageProps {
-  supabase: SupabaseClient | null;
-  patch: Patch;
+function cleanText(value: string): string {
+  return value.replace(/\s+/g, " ").trim();
 }
 
-export default function PatchDetailPage({ supabase, patch }: PatchPageProps) {
+function truncate(value: string, maxLength: number): string {
+  if (value.length <= maxLength) return value;
+  return `${value.slice(0, maxLength - 3).trimEnd()}...`;
+}
+
+function buildPatchDescription(patch: Patch): string {
+  const summaryLines = (patch.summary || "")
+    .split("\n")
+    .map((line) => cleanText(line))
+    .filter(Boolean)
+    .filter(
+      (line) => line !== patch.title && !/^click the title link/i.test(line)
+    );
+
+  if (summaryLines.length > 0) {
+    return truncate(
+      `${patch.title} patch notes for Dota Auto Chess. ${summaryLines
+        .slice(0, 2)
+        .join(" ")}`,
+      158
+    );
+  }
+
+  const firstEntries = patch.sections
+    .flatMap((section) => section.entries)
+    .slice(0, 2)
+    .map((entry) => cleanText(`${entry.name}: ${entry.detail}`))
+    .join(" ");
+
+  return truncate(
+    `${patch.title} patch notes for Dota Auto Chess. ${firstEntries || "Read new relics, new items, and balance changes."}`,
+    158
+  );
+}
+
+function resolveEntryHref(name: string): string | null {
+  const itemSlug = getItemSlugByName(name);
+  if (itemSlug) return `/items/${itemSlug}`;
+
+  const relicSlug = getRelicSlugByName(name);
+  if (relicSlug) return `/relics/${relicSlug}`;
+
+  return null;
+}
+
+export default function PatchDetailPage({
+  patch,
+  slug,
+  supabase,
+}: PatchPageProps) {
+  const title = `${patch.title} | Dota Auto Chess Patch Notes | ${SITE_NAME}`;
+  const description = buildPatchDescription(patch);
+  const pagePath = `/patch-notes/${slug}`;
+  const pageUrl = absoluteUrl(pagePath);
+  const patchIndexUrl = absoluteUrl("/patch-notes");
+  const structuredData = [
+    {
+      "@context": "https://schema.org",
+      "@type": "Article",
+      headline: patch.title,
+      description,
+      datePublished: patch.date,
+      dateModified: patch.date,
+      ...(pageUrl ? { url: pageUrl, mainEntityOfPage: pageUrl } : {}),
+      publisher: {
+        "@type": "Organization",
+        name: SITE_NAME,
+      },
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        {
+          "@type": "ListItem",
+          position: 1,
+          name: "Patch Notes",
+          ...(patchIndexUrl ? { item: patchIndexUrl } : {}),
+        },
+        {
+          "@type": "ListItem",
+          position: 2,
+          name: patch.title,
+          ...(pageUrl ? { item: pageUrl } : {}),
+        },
+      ],
+    },
+  ];
+
+  const summaryLines = (patch.summary || "")
+    .split("\n")
+    .map((line) => line.trim())
+    .filter(Boolean)
+    .filter(
+      (line) => line !== patch.title && !/^click the title link/i.test(line)
+    );
+
   return (
     <>
-      <Head>
-        <title>{patch.title} — Patch Notes — DAC Tools</title>
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-      </Head>
+      <SeoHead
+        title={title}
+        description={description}
+        path={pagePath}
+        type="article"
+        publishedTime={patch.date}
+        structuredData={structuredData}
+      />
 
       <style jsx>{`
         .page {
@@ -86,16 +194,20 @@ export default function PatchDetailPage({ supabase, patch }: PatchPageProps) {
           margin: 0 auto;
           padding: 40px 32px 80px;
         }
-        .back {
-          display: inline-block;
+        .breadcrumbs {
+          display: flex;
+          gap: 10px;
+          flex-wrap: wrap;
+          margin-bottom: 22px;
           font-size: 12px;
           letter-spacing: 1.5px;
           text-transform: uppercase;
           color: var(--text-muted);
-          margin-bottom: 20px;
-          transition: color 0.15s;
         }
-        .back:hover {
+        .breadcrumbs a {
+          color: var(--text-muted);
+        }
+        .breadcrumbs a:hover {
           color: var(--text-secondary);
         }
         .date {
@@ -112,14 +224,21 @@ export default function PatchDetailPage({ supabase, patch }: PatchPageProps) {
           letter-spacing: 5px;
           text-transform: uppercase;
           color: var(--accent);
-          margin-bottom: 24px;
+          margin-bottom: 18px;
         }
-        .source-row {
+        .lede {
+          font-size: 15px;
+          line-height: 1.7;
+          color: var(--text-secondary);
+          margin-bottom: 20px;
+        }
+        .link-row {
           display: flex;
           gap: 10px;
           flex-wrap: wrap;
           margin-bottom: 24px;
         }
+        .chip,
         .source {
           display: inline-block;
           font-size: 11px;
@@ -130,9 +249,11 @@ export default function PatchDetailPage({ supabase, patch }: PatchPageProps) {
           padding: 6px 12px;
           transition: all 0.15s;
         }
+        .chip:hover,
         .source:hover {
           color: var(--text-secondary);
           border-color: var(--text-muted);
+          background: var(--bg-hover);
         }
         .summary {
           padding: 20px 24px;
@@ -148,7 +269,7 @@ export default function PatchDetailPage({ supabase, patch }: PatchPageProps) {
           border-bottom: 1px solid var(--border-subtle);
         }
         .summary-line:last-child,
-        .summary-line:has(+ .summary-footer) {
+        .summary-line.summary-last {
           border-bottom: none;
         }
         .summary-line.bullet {
@@ -156,7 +277,7 @@ export default function PatchDetailPage({ supabase, patch }: PatchPageProps) {
           padding-left: 20px;
         }
         .summary-line.bullet::before {
-          content: "●";
+          content: "*";
           position: absolute;
           left: 0;
           top: 8px;
@@ -224,6 +345,13 @@ export default function PatchDetailPage({ supabase, patch }: PatchPageProps) {
           font-weight: 500;
           margin-bottom: 4px;
         }
+        .entry-link {
+          text-decoration: underline;
+          text-underline-offset: 2px;
+        }
+        .entry-link:hover {
+          color: var(--accent-dim);
+        }
         .entry-detail {
           font-size: 13px;
           line-height: 1.55;
@@ -233,12 +361,28 @@ export default function PatchDetailPage({ supabase, patch }: PatchPageProps) {
 
       <div className="page">
         <div className="container">
-          <Link href="/patch-notes" className="back">
-            ← All patches
-          </Link>
+          <nav className="breadcrumbs" aria-label="Breadcrumb">
+            <Link href="/">Home</Link>
+            <span>/</span>
+            <Link href="/patch-notes">Patch Notes</Link>
+            <span>/</span>
+            <span>{patch.title}</span>
+          </nav>
           <div className="date">{patch.date}</div>
           <h1 className="title">{patch.title}</h1>
-          <div className="source-row">
+          <div className="lede">
+            Read this Dota Auto Chess update in a cleaner format, then jump into
+            linked item and relic pages where the patch introduces or changes
+            named content.
+          </div>
+
+          <div className="link-row">
+            <Link href="/items" className="chip">
+              Item library
+            </Link>
+            <Link href="/relics" className="chip">
+              Relic library
+            </Link>
             {patch.source && (
               <a
                 className="source"
@@ -246,7 +390,7 @@ export default function PatchDetailPage({ supabase, patch }: PatchPageProps) {
                 target="_blank"
                 rel="noreferrer"
               >
-                Official notes ↗
+                Official notes
               </a>
             )}
             {patch.workshop_url && (
@@ -256,37 +400,38 @@ export default function PatchDetailPage({ supabase, patch }: PatchPageProps) {
                 target="_blank"
                 rel="noreferrer"
               >
-                Workshop changelog ↗
+                Workshop changelog
               </a>
             )}
           </div>
+
           {patch.flavor && <div className="flavor">{patch.flavor}</div>}
 
-          {patch.sections.length === 0 && patch.summary && (
+          {patch.sections.length === 0 && summaryLines.length > 0 && (
             <div className="summary">
-              {patch.summary
-                .split("\n")
-                .map((l) => l.trim())
-                .filter(Boolean)
-                // Drop the repeated title line and Drodo's trailing "click the
-                // title link" footer — we already render both via the big
-                // title and the "Official notes" button.
-                .filter(
-                  (l) =>
-                    l !== patch.title &&
-                    !/^click the title link/i.test(l)
-                )
-                .map((line, i) => {
-                  const isBullet = /^[●•·-]/.test(line);
-                  return (
-                    <div
-                      key={i}
-                      className={"summary-line" + (isBullet ? " bullet" : "")}
-                    >
-                      {isBullet ? line.replace(/^[●•·-]\s*/, "") : line}
-                    </div>
-                  );
-                })}
+              {summaryLines.map((line, index) => {
+                const isBullet = /^[\u2022\u00B7*-]/.test(line);
+                const cleanedLine = isBullet
+                  ? line.replace(/^[\u2022\u00B7*-]\s*/, "")
+                  : line;
+
+                return (
+                  <div
+                    key={index}
+                    className={[
+                      "summary-line",
+                      isBullet ? "bullet" : "",
+                      index === summaryLines.length - 1 && !patch.source
+                        ? "summary-last"
+                        : "",
+                    ]
+                      .filter(Boolean)
+                      .join(" ")}
+                  >
+                    {cleanedLine}
+                  </div>
+                );
+              })}
               {patch.source && (
                 <div className="summary-footer">
                   Full prose lives in the{" "}
@@ -302,20 +447,30 @@ export default function PatchDetailPage({ supabase, patch }: PatchPageProps) {
           {patch.sections.map((section) => (
             <div key={section.heading} className="section">
               <div className="section-heading">{section.heading}</div>
-              {section.entries.map((entry, i) => (
-                <div key={i} className="entry">
-                  <span
-                    className="kind"
-                    style={{ color: KIND_COLOR[entry.kind] }}
-                  >
-                    {KIND_LABEL[entry.kind]}
-                  </span>
-                  <div>
-                    <div className="entry-name">{entry.name}</div>
-                    <div className="entry-detail">{entry.detail}</div>
+              {section.entries.map((entry, index) => {
+                const entryHref = resolveEntryHref(entry.name);
+
+                return (
+                  <div key={index} className="entry">
+                    <span
+                      className="kind"
+                      style={{ color: KIND_COLOR[entry.kind] }}
+                    >
+                      {KIND_LABEL[entry.kind]}
+                    </span>
+                    <div>
+                      {entryHref ? (
+                        <Link href={entryHref} className="entry-name entry-link">
+                          {entry.name}
+                        </Link>
+                      ) : (
+                        <div className="entry-name">{entry.name}</div>
+                      )}
+                      <div className="entry-detail">{entry.detail}</div>
+                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           ))}
         </div>
@@ -326,8 +481,8 @@ export default function PatchDetailPage({ supabase, patch }: PatchPageProps) {
 
 export const getStaticPaths: GetStaticPaths = async () => {
   return {
-    paths: (patchIndex.patches as IndexPatch[]).map((p) => ({
-      params: { slug: p.slug },
+    paths: (patchIndex.patches as IndexPatch[]).map((patch) => ({
+      params: { slug: patch.slug },
     })),
     fallback: false,
   };
@@ -335,7 +490,19 @@ export const getStaticPaths: GetStaticPaths = async () => {
 
 export const getStaticProps: GetStaticProps = async ({ params }) => {
   const slug = params?.slug as string;
-  const filePath = path.join(process.cwd(), "..", "data", "patch_notes", `${slug}.json`);
+  const filePath = path.join(
+    process.cwd(),
+    "..",
+    "data",
+    "patch_notes",
+    `${slug}.json`
+  );
   const patch: Patch = JSON.parse(fs.readFileSync(filePath, "utf-8"));
-  return { props: { patch } };
+
+  return {
+    props: {
+      patch,
+      slug,
+    },
+  };
 };

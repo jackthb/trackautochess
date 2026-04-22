@@ -1,117 +1,67 @@
-import Head from "next/head";
-import { useMemo, useState } from "react";
+import Link from "next/link";
+import { useEffect, useMemo, useState } from "react";
+import { useRouter } from "next/router";
 import type { SupabaseClient } from "@supabase/supabase-js";
-import itemsFull from "@data/items_full.json";
-import itemsSimple from "@data/items.json";
-
-interface FullItem {
-  name: string;
-  description: string;
-  lore: string;
-  quality: string;
-  texture: string;
-  notes: string[];
-}
-
-interface SimpleItem {
-  tier: number;
-  icon: string;
-}
-
-interface DisplayItem {
-  name: string;
-  description: string;
-  tier: number;
-  icon: string;
-  texture: string;
-}
-
-const TIER_LABEL: Record<number, string> = {
-  1: "Tier 1",
-  2: "Tier 2",
-  3: "Tier 3",
-  4: "Tier 4",
-  5: "Tier 5",
-};
-
-const TIER_COLOR: Record<number, string> = {
-  1: "var(--text-secondary)",
-  2: "#5a8fd5",
-  3: "#4eaa62",
-  4: "#a85fd2",
-  5: "var(--gold)",
-};
-
-function norm(s: string): string {
-  return s.toLowerCase().replace(/\s+/g, "").replace(/'/g, "");
-}
-
-function iconUrl(item: DisplayItem): string {
-  // Prefer the explicit icon filename from items.json; fall back to a stem
-  // derived from the VPK texture path for items that slipped through.
-  if (item.icon) return `/icons/items/${item.icon}`;
-  const stem = (item.texture || "")
-    .replace(/^item_custom\//, "")
-    .replace(/^custom\//, "")
-    .replace(/^item_/, "");
-  return stem ? `/icons/items/${stem}.png` : "";
-}
+import { SeoHead } from "@/lib/seo";
+import {
+  getAllItems,
+  iconUrl,
+  TIER_COLOR,
+  TIER_LABEL,
+} from "@/lib/items";
+import { SITE_NAME } from "@/lib/site";
 
 interface ItemsPageProps {
   supabase: SupabaseClient | null;
 }
 
+const ALL_ITEMS = getAllItems();
+
 export default function ItemsPage({ supabase }: ItemsPageProps) {
+  const router = useRouter();
   const [query, setQuery] = useState("");
 
-  // Build tier-joined item list once: walk items.json (the canonical in-game
-  // 76-item list) and look up each one in items_full.json for VPK metadata.
-  const allItems = useMemo<DisplayItem[]>(() => {
-    const simple = (itemsSimple as { items: Record<string, SimpleItem> }).items;
-    const fullByNorm = new Map<string, [string, FullItem]>();
-    for (const [iid, v] of Object.entries(itemsFull as Record<string, FullItem>)) {
-      if (!v.name?.trim()) continue;
-      fullByNorm.set(norm(v.name), [iid, v]);
+  useEffect(() => {
+    const search = router.query.q;
+    if (typeof search === "string") {
+      setQuery(search);
     }
-
-    const out: DisplayItem[] = [];
-    for (const [simpleName, s] of Object.entries(simple)) {
-      const match = fullByNorm.get(norm(simpleName));
-      const full = match?.[1];
-      out.push({
-        // Prefer the VPK's canonical name (fixes items.json casing drift like
-        // "Gossamar Cape" -> "Gossamer Cape", "Vladmirs Offering", etc.)
-        name: full?.name ?? simpleName,
-        description: full?.description ?? "",
-        tier: s.tier,
-        icon: s.icon,
-        texture: full?.texture ?? "",
-      });
-    }
-    return out;
-  }, []);
+  }, [router.query.q]);
 
   const grouped = useMemo(() => {
-    const filtered = allItems.filter((i) => {
+    const filtered = ALL_ITEMS.filter((item) => {
       if (!query) return true;
-      const q = query.toLowerCase();
+      const normalizedQuery = query.toLowerCase();
       return (
-        i.name.toLowerCase().includes(q) ||
-        i.description.toLowerCase().includes(q)
+        item.name.toLowerCase().includes(normalizedQuery) ||
+        item.description.toLowerCase().includes(normalizedQuery)
       );
     });
-    const byTier: Record<number, DisplayItem[]> = {};
-    for (const i of filtered) (byTier[i.tier] ??= []).push(i);
-    for (const t in byTier) byTier[t].sort((a, b) => a.name.localeCompare(b.name));
+
+    const byTier: Record<number, typeof ALL_ITEMS> = {};
+    for (const item of filtered) (byTier[item.tier] ??= []).push(item);
     return byTier;
-  }, [allItems, query]);
+  }, [query]);
+
+  const title = `Dota Auto Chess Items | ${SITE_NAME}`;
+  const description =
+    "Browse every Dota Auto Chess item by tier, search specific items like Vanguard, and open dedicated item pages on DAC Tools.";
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    name: "Dota Auto Chess items",
+    description,
+    about: "Dota Auto Chess items",
+  };
 
   return (
     <>
-      <Head>
-        <title>Items — DAC Tools</title>
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-      </Head>
+      <SeoHead
+        title={title}
+        description={description}
+        path="/items"
+        structuredData={structuredData}
+      />
 
       <style jsx>{`
         .page {
@@ -131,7 +81,35 @@ export default function ItemsPage({ supabase }: ItemsPageProps) {
           letter-spacing: 4px;
           text-transform: uppercase;
           color: var(--text-primary);
-          margin-bottom: 24px;
+          margin-bottom: 14px;
+        }
+        .intro {
+          max-width: 720px;
+          font-size: 14px;
+          line-height: 1.7;
+          color: var(--text-secondary);
+          margin-bottom: 16px;
+        }
+        .intro-links {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 12px;
+          margin-bottom: 32px;
+        }
+        .intro-link {
+          font-family: var(--font-mono);
+          font-size: 11px;
+          letter-spacing: 1.4px;
+          text-transform: uppercase;
+          color: var(--text-secondary);
+          border: 1px solid var(--border);
+          padding: 8px 12px;
+          transition: color 0.15s, border-color 0.15s, background 0.15s;
+        }
+        .intro-link:hover {
+          color: var(--text-primary);
+          border-color: var(--text-muted);
+          background: var(--bg-hover);
         }
         .search {
           width: 100%;
@@ -174,6 +152,9 @@ export default function ItemsPage({ supabase }: ItemsPageProps) {
           display: flex;
           gap: 12px;
           align-items: flex-start;
+          color: inherit;
+          text-decoration: none;
+          transition: background 0.15s;
         }
         .card:hover {
           background: var(--bg-hover);
@@ -207,39 +188,53 @@ export default function ItemsPage({ supabase }: ItemsPageProps) {
       <div className="page">
         <div className="container">
           <h1 className="page-title">Items</h1>
+          <p className="intro">
+            Browse every Dota Auto Chess item in one place. Search for specific
+            items like Vanguard, compare tiers, and open dedicated item pages
+            that can rank for long-tail item searches.
+          </p>
+          <div className="intro-links">
+            <Link href="/patch-notes" className="intro-link">
+              Latest item updates
+            </Link>
+            <Link href="/relics" className="intro-link">
+              Browse relics
+            </Link>
+          </div>
           <input
             className="search"
             placeholder="Search items..."
             value={query}
-            onChange={(e) => setQuery(e.target.value)}
+            onChange={(event) => setQuery(event.target.value)}
           />
 
           {[1, 2, 3, 4, 5]
-            .filter((t) => grouped[t]?.length)
-            .map((t) => (
-              <div key={t} className="tier-section">
-                <div
-                  className="tier-header"
-                  style={{ color: TIER_COLOR[t] }}
-                >
-                  {TIER_LABEL[t]} ({grouped[t].length})
+            .filter((tier) => grouped[tier]?.length)
+            .map((tier) => (
+              <div key={tier} className="tier-section">
+                <div className="tier-header" style={{ color: TIER_COLOR[tier] }}>
+                  {TIER_LABEL[tier]} ({grouped[tier].length})
                 </div>
                 <div className="grid">
-                  {grouped[t].map((item) => (
-                    <div key={item.name} className="card">
+                  {grouped[tier].map((item) => (
+                    <Link
+                      key={item.slug}
+                      href={`/items/${item.slug}`}
+                      className="card"
+                    >
                       <img
                         className="icon"
                         src={iconUrl(item)}
                         alt={item.name}
-                        onError={(e) => {
-                          (e.currentTarget as HTMLImageElement).style.visibility = "hidden";
+                        onError={(event) => {
+                          event.currentTarget.style.visibility = "hidden";
                         }}
                       />
                       <div className="body">
                         <div className="name">{item.name}</div>
-                        <div className="desc">{item.description || "—"}</div>
+                        <div className="desc">{item.description || "-"}</div>
                       </div>
-                    </div>
+                    </Link>
                   ))}
                 </div>
               </div>

@@ -1,4 +1,3 @@
-import Head from "next/head";
 import { useEffect, useState, useMemo } from "react";
 import { useRouter } from "next/router";
 import type { SupabaseClient, User } from "@supabase/supabase-js";
@@ -9,6 +8,7 @@ import { GameRow } from "../components/GameRow";
 import type { Game, UnitFullInfo, SynergyInfo, RelicInfo } from "@dac/shared/types";
 import synergiesData from "@data/synergies.json";
 import relicsData from "@data/relics.json";
+import { SeoHead } from "@/lib/seo";
 
 interface SeasonSnapshot {
   season: string;
@@ -234,10 +234,12 @@ export default function Dashboard({ supabase }: DashboardProps) {
 
   return (
     <>
-      <Head>
-        <title>Dashboard — DAC Tools</title>
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-      </Head>
+      <SeoHead
+        title="Dashboard | DAC Tools"
+        description="Signed-in DAC Tools dashboard."
+        path="/dashboard"
+        noindex
+      />
 
       <style jsx>{`
         .page {

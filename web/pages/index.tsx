@@ -1,16 +1,44 @@
-import Head from "next/head";
-export default function Home() {
+import Link from "next/link";
+import type { SupabaseClient } from "@supabase/supabase-js";
+import { SeoHead } from "@/lib/seo";
+import { absoluteUrl, SITE_DESCRIPTION, SITE_NAME } from "@/lib/site";
+
+interface HomeProps {
+  supabase: SupabaseClient | null;
+}
+
+export default function Home({ supabase }: HomeProps) {
+  const title = `${SITE_NAME} | Dota Auto Chess items, relics, patch notes, and match tracker`;
+  const description =
+    "Browse Dota Auto Chess items and relics, follow the latest patch notes, and track matches with DAC Tools.";
+  const siteUrl = absoluteUrl("/");
+  const itemSearchUrl = absoluteUrl("/items");
+
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: SITE_NAME,
+    description: SITE_DESCRIPTION,
+    ...(siteUrl ? { url: siteUrl } : {}),
+    ...(itemSearchUrl
+      ? {
+          potentialAction: {
+            "@type": "SearchAction",
+            target: `${itemSearchUrl}?q={search_term_string}`,
+            "query-input": "required name=search_term_string",
+          },
+        }
+      : {}),
+  };
+
   return (
     <>
-      <Head>
-        <title>DAC Tools</title>
-        <meta
-          name="description"
-          content="Match tracker for Dota Auto Chess."
-        />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <link rel="icon" href="/logo.svg" type="image/svg+xml" />
-      </Head>
+      <SeoHead
+        title={title}
+        description={description}
+        path="/"
+        structuredData={structuredData}
+      />
 
       <style jsx>{`
         .page {
@@ -110,10 +138,37 @@ export default function Home() {
           color: var(--text-muted);
           letter-spacing: 1.5px;
           text-align: center;
-          max-width: 340px;
+          max-width: 560px;
           line-height: 1.7;
           opacity: 0;
           animation: arrive 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.5s forwards;
+        }
+
+        .quick-links {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 12px;
+          justify-content: center;
+          margin-top: 28px;
+          opacity: 0;
+          animation: arrive 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.6s forwards;
+        }
+
+        .quick-link {
+          font-family: var(--font-mono);
+          font-size: 11px;
+          letter-spacing: 1.4px;
+          text-transform: uppercase;
+          color: var(--text-secondary);
+          border: 1px solid var(--border);
+          padding: 8px 12px;
+          transition: border-color 0.15s, color 0.15s, background 0.15s;
+        }
+
+        .quick-link:hover {
+          color: var(--text-primary);
+          border-color: var(--text-muted);
+          background: var(--bg-hover);
         }
 
         /* Actions */
@@ -228,7 +283,23 @@ export default function Home() {
 
             <div className="rule" />
 
-            <p className="tagline">Match tracker for Dota Auto Chess</p>
+            <p className="tagline">
+              Match tracker for Dota Auto Chess with searchable item and relic
+              libraries, plus patch notes for new updates, new relics, and item
+              changes.
+            </p>
+
+            <div className="quick-links">
+              <Link href="/items" className="quick-link">
+                Browse items
+              </Link>
+              <Link href="/relics" className="quick-link">
+                Browse relics
+              </Link>
+              <Link href="/patch-notes" className="quick-link">
+                Latest patch notes
+              </Link>
+            </div>
 
             <div className="actions">
               <button className="btn-download" disabled>

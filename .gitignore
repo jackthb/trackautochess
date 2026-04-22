@@ -33,3 +33,4 @@ tracker/dist/
 /.local-bin/
 /build/
 /dist/
+.pnpm-store/

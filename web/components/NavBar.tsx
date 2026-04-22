@@ -364,9 +364,15 @@ export function NavBar({ supabase }: NavBarProps) {
           <img src="/logo.svg" alt="DAC Tools" />
         </Link>
         <div className="nav-links">
-          <Link href="/items" className="nav-link">Items</Link>
-          <Link href="/relics" className="nav-link">Relics</Link>
-          <Link href="/patch-notes" className="nav-link">Patch Notes</Link>
+          <Link href="/items" className="nav-link">
+            Items
+          </Link>
+          <Link href="/relics" className="nav-link">
+            Relics
+          </Link>
+          <Link href="/patch-notes" className="nav-link">
+            Patch Notes
+          </Link>
         </div>
         <div className="nav-center" ref={containerRef}>
           <form className="search-form" onSubmit={handleSearch}>

@@ -7,6 +7,7 @@
   "exports": {
     "./game-utils": "./game-utils.ts",
     "./GameRowDisplay": "./GameRowDisplay.tsx",
+    "./Tooltip": "./Tooltip.tsx",
     "./types": "./types.ts",
     "./tokens.css": "./tokens.css",
     "./components.css": "./components.css",

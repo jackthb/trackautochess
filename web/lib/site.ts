@@ -1,0 +1,46 @@
+import type { IncomingHttpHeaders } from "http";
+
+export const SITE_NAME = "DAC Tools";
+export const SITE_DESCRIPTION =
+  "DAC Tools helps Dota Auto Chess players browse items and relics, read patch notes, and track matches.";
+
+function normalizeUrl(raw: string | null | undefined): string | null {
+  if (!raw) return null;
+  const trimmed = raw.trim();
+  if (!trimmed) return null;
+  const withProtocol = /^https?:\/\//i.test(trimmed)
+    ? trimmed
+    : `https://${trimmed}`;
+  return withProtocol.replace(/\/+$/, "");
+}
+
+export function getSiteUrl(): string | null {
+  return normalizeUrl(process.env.NEXT_PUBLIC_SITE_URL);
+}
+
+export function getRequestSiteUrl(headers: IncomingHttpHeaders): string | null {
+  const forwardedProto = headers["x-forwarded-proto"];
+  const forwardedHost = headers["x-forwarded-host"];
+  const proto = Array.isArray(forwardedProto)
+    ? forwardedProto[0]
+    : forwardedProto || "https";
+  const host = Array.isArray(forwardedHost)
+    ? forwardedHost[0]
+    : forwardedHost || headers.host;
+
+  if (host) {
+    const normalized = normalizeUrl(`${proto}://${host}`);
+    if (normalized) return normalized;
+  }
+
+  return getSiteUrl();
+}
+
+export function absoluteUrl(
+  pathname: string,
+  baseUrl: string | null = getSiteUrl()
+): string | null {
+  if (!baseUrl) return null;
+  const normalizedPath = pathname.startsWith("/") ? pathname : `/${pathname}`;
+  return `${baseUrl}${normalizedPath}`;
+}

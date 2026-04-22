@@ -15,8 +15,7 @@
     "incremental": true,
     "paths": {
       "@/*": ["./*"],
-      "@data/*": ["../data/*"],
-      "@dac/shared/*": ["../shared/*"]
+      "@data/*": ["../data/*"]
     }
   },
   "include": [
