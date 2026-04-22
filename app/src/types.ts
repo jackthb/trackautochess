@@ -118,6 +118,11 @@ export interface ScreenshotDebugResult {
   error?: string;
 }
 
+export interface CalibrationOpenResult {
+  ok: boolean;
+  error?: string;
+}
+
 export interface RecordingStats {
   elapsed: number;
   frames: number;
@@ -255,7 +260,7 @@ declare global {
       fetchUnitsFull: () => Promise<Record<string, UnitFullInfo>>;
       fetchSynergies: () => Promise<Record<string, SynergyInfo>>;
       fetchRelics: () => Promise<{ relics: Record<string, RelicInfo> }>;
-      openCalibration: () => Promise<void>;
+      openCalibration: () => Promise<CalibrationOpenResult>;
       fetchDrodo: () => Promise<DrodoProfile | null>;
       refreshDrodo: () => Promise<DrodoProfile | null>;
     };

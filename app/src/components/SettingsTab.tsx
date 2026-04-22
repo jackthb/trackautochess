@@ -13,6 +13,8 @@ export function SettingsTab({ status, replayStats }: SettingsTabProps) {
   const [closeToTray, setCloseToTray] = useState(true);
   const [importing, setImporting] = useState(false);
   const [loggingIn, setLoggingIn] = useState(false);
+  const [openingCalibration, setOpeningCalibration] = useState(false);
+  const [calibrationError, setCalibrationError] = useState<string | null>(null);
 
   useEffect(() => {
     window.appApi.getVersion().then(setVersion);
@@ -37,6 +39,21 @@ export function SettingsTab({ status, replayStats }: SettingsTabProps) {
 
   const sendCommand = (cmd: Record<string, unknown>) => {
     window.tracker.sendCommand(cmd);
+  };
+
+  const handleOpenCalibration = async () => {
+    setOpeningCalibration(true);
+    setCalibrationError(null);
+    try {
+      const result = await window.appApi.openCalibration();
+      if (!result.ok) {
+        setCalibrationError(result.error || "Calibration tool could not be opened.");
+      }
+    } catch {
+      setCalibrationError("Calibration tool could not be opened.");
+    } finally {
+      setOpeningCalibration(false);
+    }
   };
 
   return (
@@ -147,12 +164,21 @@ export function SettingsTab({ status, replayStats }: SettingsTabProps) {
             <div className="settings-row">
               <span className="settings-label">Region calibration</span>
               <button
-                className="btn-ghost"
-                onClick={() => window.appApi.openCalibration()}
+                className={`btn-ghost${openingCalibration ? " btn-loading" : ""}`}
+                disabled={openingCalibration}
+                onClick={handleOpenCalibration}
               >
-                Open
+                {openingCalibration ? "Opening" : "Open"}
               </button>
             </div>
+            {calibrationError && (
+              <div className="settings-row">
+                <span className="settings-label">Status</span>
+                <span className="settings-value" style={{ color: "var(--red-bright)" }}>
+                  {calibrationError}
+                </span>
+              </div>
+            )}
           </div>
         )}
 

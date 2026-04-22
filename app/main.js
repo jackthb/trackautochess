@@ -1381,31 +1381,48 @@ function canAccessCalibration() {
   }
 }
 
-function openCalibrationWindow() {
+async function openCalibrationWindow() {
   if (calibrationWindow && !calibrationWindow.isDestroyed()) {
+    calibrationWindow.show();
     calibrationWindow.focus();
-    return;
+    return { ok: true };
   }
   calibrationWindow = new BrowserWindow({
     width: 1400,
     height: 900,
     title: "DAC Calibration",
+    show: false,
     webPreferences: {
       preload: path.join(__dirname, "preload-calibration.js"),
       contextIsolation: true,
       nodeIntegration: false,
     },
   });
-  calibrationWindow.loadFile(path.join(__dirname, "calibration.html"));
+  const windowRef = calibrationWindow;
   calibrationWindow.on("closed", () => { calibrationWindow = null; });
+  try {
+    await windowRef.loadFile(path.join(__dirname, "calibration.html"));
+    if (!windowRef.isDestroyed()) {
+      windowRef.show();
+      windowRef.focus();
+    }
+    return { ok: true };
+  } catch (error) {
+    console.error("Failed to open calibration window:", error);
+    if (!windowRef.isDestroyed()) windowRef.destroy();
+    calibrationWindow = null;
+    return {
+      ok: false,
+      error: "Calibration tool assets could not be loaded. Reinstall or rebuild the app.",
+    };
+  }
 }
 
-ipcMain.handle("app:openCalibration", () => {
+ipcMain.handle("app:openCalibration", async () => {
   if (!canAccessCalibration()) {
-    return false;
+    return { ok: false, error: "Calibration tool is not enabled for this account." };
   }
-  openCalibrationWindow();
-  return true;
+  return openCalibrationWindow();
 });
 
 function detectAR(filePath) {

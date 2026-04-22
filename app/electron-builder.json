@@ -11,9 +11,11 @@
     "preload-overlay.js",
     "preload-widget.js",
     "preload-notification.js",
+    "preload-calibration.js",
     "overlay.html",
     "notification.html",
     "widget.html",
+    "calibration.html",
     "dist/**/*",
     "!node_modules/**/*"
   ],
@@ -47,6 +49,15 @@
     {
       "from": "../data/items.json",
       "to": "data/items.json"
+    },
+    {
+      "from": "../data/regions_config.json",
+      "to": "data/regions_config.json"
+    },
+    {
+      "from": "../data/screenshots",
+      "to": "data/screenshots",
+      "filter": ["**/*"]
     },
     {
       "from": "../data/sentinel_ref_final_ranking.png",
