@@ -148,12 +148,25 @@ export interface LogEntry {
   msg: string;
 }
 
+export type ImportResultTone = "success" | "warning" | "error";
+
+export interface ImportResultEvent {
+  type: "import_result";
+  imported: number;
+  skipped: number;
+  failed?: number;
+  message?: string;
+  tone?: ImportResultTone;
+  screen_type?: "my_matches" | "game_over" | "final_ranking" | "unknown";
+  linked_to_user?: number;
+}
+
 export type TrackerEvent =
   | ParseResult
   | ProcessingScreenshot
   | TrackerStatus
   | LogEntry
-  | { type: "import_result"; imported: number; skipped: number }
+  | ImportResultEvent
   | { type: "import_finished" }
   | { type: "focus_gained" }
   | { type: "focus_lost" }

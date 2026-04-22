@@ -1073,22 +1073,37 @@ video {
   font-weight: 400;
 }
 
-.ss-success-toast {
+.ss-result-toast {
   display: flex;
   align-items: center;
   gap: 8px;
   padding: 8px 14px;
   margin: 0 0 8px;
-  background: color-mix(in srgb, var(--green-bright) 12%, transparent);
-  border: 1px solid color-mix(in srgb, var(--green-bright) 30%, transparent);
   border-radius: 6px;
-  color: var(--green-bright);
   font-size: 13px;
   font-weight: 500;
   animation: ss-toast-in 0.25s ease-out;
 }
 
-.ss-success-icon {
+.ss-result-toast-success {
+  background: color-mix(in srgb, var(--green-bright) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--green-bright) 30%, transparent);
+  color: var(--green-bright);
+}
+
+.ss-result-toast-warning {
+  background: color-mix(in srgb, var(--gold) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--gold) 30%, transparent);
+  color: var(--gold);
+}
+
+.ss-result-toast-error {
+  background: color-mix(in srgb, var(--red-bright) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--red-bright) 30%, transparent);
+  color: var(--red-bright);
+}
+
+.ss-result-icon {
   font-size: 15px;
   font-weight: 700;
   flex-shrink: 0;

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useCallback, useState } from "react";
 import type {
+  ImportResultTone,
   TrackerEvent,
   TrackerStatus,
   ParseResult,
@@ -12,6 +13,11 @@ const MAX_LOG_ENTRIES = 500;
 export interface ImportResult {
   imported: number;
   skipped: number;
+  failed: number;
+  message?: string;
+  tone?: ImportResultTone;
+  screenType?: "my_matches" | "game_over" | "final_ranking" | "unknown";
+  linkedToUser?: number;
 }
 
 interface TrackerState {
@@ -117,7 +123,15 @@ export function useTrackerEvents(
         case "import_result":
           setProcessingScreenshot(null);
           setPendingParseResult(null);
-          setLastImportResult({ imported: msg.imported, skipped: msg.skipped });
+          setLastImportResult({
+            imported: msg.imported,
+            skipped: msg.skipped,
+            failed: msg.failed ?? 0,
+            message: msg.message,
+            tone: msg.tone,
+            screenType: msg.screen_type,
+            linkedToUser: msg.linked_to_user,
+          });
           finishImport();
           callbacksRef.current.onImportResult?.();
           break;

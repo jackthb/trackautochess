@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import type {
+  ImportResultTone,
   Screenshot,
   SavedParseResult,
   ParseResultRow,
@@ -250,6 +251,33 @@ const SCREEN_TYPE_LABELS: Record<string, string> = {
   final_ranking: "Final Ranking",
 };
 
+interface ResultToast {
+  message: string;
+  tone: ImportResultTone;
+}
+
+function fallbackImportMessage(result: ImportResult): string {
+  const singular = result.screenType === "game_over" ? "player row" : "match";
+  const plural = result.screenType === "game_over" ? "player rows" : "matches";
+  const details: string[] = [];
+  if (result.skipped) details.push(`${result.skipped} duplicate(s) skipped`);
+  if (result.failed) details.push(`${result.failed} failed to save`);
+
+  let message = result.imported > 0
+    ? `Imported ${result.imported} ${result.imported === 1 ? singular : plural}`
+    : `No ${plural} were imported`;
+  if (details.length > 0) {
+    message += ` (${details.join(", ")})`;
+  }
+  return message;
+}
+
+function importToneIcon(tone: ImportResultTone): string {
+  if (tone === "error") return "\u00d7";
+  if (tone === "warning") return "!";
+  return "\u2713";
+}
+
 export function ScreenshotHistory({
   onImportFile,
   lastImportResult,
@@ -274,7 +302,7 @@ export function ScreenshotHistory({
   const [deletingName, setDeletingName] = useState<string | null>(null);
   const [importingPath, setImportingPath] = useState<string | null>(null);
   const [loadingThumbnail, setLoadingThumbnail] = useState<string | null>(null);
-  const [successToast, setSuccessToast] = useState<string | null>(null);
+  const [resultToast, setResultToast] = useState<ResultToast | null>(null);
   const [debugLoadingFor, setDebugLoadingFor] = useState<string | null>(null);
   const [debugData, setDebugData] = useState<ScreenshotDebugResult | null>(null);
   const [zoomSrc, setZoomSrc] = useState<string | null>(null);
@@ -295,18 +323,18 @@ export function ScreenshotHistory({
     refresh();
   }, [refresh]);
 
-  // Show success toast and refresh list when import completes
+  // Show import result toast and refresh list when import completes
   useEffect(() => {
     if (lastImportResult) {
       setImportingPath(null);
-      const { imported, skipped } = lastImportResult;
-      let msg = `Game successfully imported (${imported} match${imported !== 1 ? "es" : ""})`;
-      if (skipped) msg += `, ${skipped} duplicate${skipped !== 1 ? "s" : ""} skipped`;
-      setSuccessToast(msg);
+      setResultToast({
+        message: lastImportResult.message ?? fallbackImportMessage(lastImportResult),
+        tone: lastImportResult.tone ?? (lastImportResult.imported > 0 ? "success" : "warning"),
+      });
       refresh();
       if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
       toastTimerRef.current = setTimeout(() => {
-        setSuccessToast(null);
+        setResultToast(null);
         onClearImportResult?.();
       }, 5000);
     }
@@ -454,10 +482,10 @@ export function ScreenshotHistory({
         </div>
       </div>
 
-      {successToast && (
-        <div className="ss-success-toast">
-          <span className="ss-success-icon">&#10003;</span>
-          {successToast}
+      {resultToast && (
+        <div className={`ss-result-toast ss-result-toast-${resultToast.tone}`}>
+          <span className="ss-result-icon">{importToneIcon(resultToast.tone)}</span>
+          {resultToast.message}
         </div>
       )}
 

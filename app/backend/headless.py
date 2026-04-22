@@ -493,22 +493,53 @@ class HeadlessBackend:
             name_to_steam_id = lookup_users_by_name(ocr_names)
             log.info("User lookup: matched %d/%d names", len(name_to_steam_id), len(ocr_names))
 
+            def _norm_name(value: str) -> str:
+                return str(value or "").strip().lower()
+
+            my_name_key = _norm_name(self.config.get("steam_name", ""))
+            resolved_rows: list[tuple[dict, str | None]] = []
+            linked_detected = 0
+
+            for row in all_rows:
+                user_id = None
+                normalized_name = _norm_name(row.get("player_name", ""))
+                if normalized_name:
+                    steam_id = name_to_steam_id.get(normalized_name)
+                    if steam_id:
+                        user_id = str(steam_id)
+                    elif my_user_id and my_name_key and normalized_name == my_name_key:
+                        user_id = str(my_user_id)
+                if my_user_id and user_id == my_user_id:
+                    linked_detected += 1
+                resolved_rows.append((row, user_id))
+
+            if my_user_id and linked_detected == 0:
+                self._emit_import_result(
+                    imported=0,
+                    skipped=0,
+                    failed=0,
+                    message=(
+                        "Game Over import stopped: none of the parsed player names matched "
+                        "your account. Check Screenshot Debug or recalibrate the Game Over regions."
+                    ),
+                    tone="warning",
+                    screen_type="game_over",
+                    linked_to_user=0,
+                )
+                return
+
             match_id = generate_match_id()
             imported = 0
             skipped = 0
-
-            for r in all_rows:
-                player_name = r.get("player_name", "")
+            failed = 0
+            linked_imported = 0
+            linked_skipped = 0
+            linked_failed = 0
+            for r, user_id in resolved_rows:
                 placement = r.get("placement", "")
                 wl = r.get("wl", "")
                 level = r.get("level", "")
-
-                # Determine user_id: match by name or fall back to self for own row
-                user_id = None
-                if player_name:
-                    steam_id = name_to_steam_id.get(player_name.lower().strip())
-                    if steam_id:
-                        user_id = str(steam_id)
+                linked_to_user = bool(my_user_id and user_id == my_user_id)
 
                 # If no user matched, this row has no owner — still store it
                 # (match_id links it to the match)
@@ -517,8 +548,9 @@ class HeadlessBackend:
                 if user_id and game_exists(user_id, played_at, placement, wl, level):
                     log.info("  row %s: SKIP duplicate (user=%s place=%s)", placement, user_id, placement)
                     skipped += 1
+                    if linked_to_user:
+                        linked_skipped += 1
                     continue
-
                 game_row = GameRow(
                     played_at=played_at,
                     placement=placement,
@@ -535,16 +567,62 @@ class HeadlessBackend:
                     replay=self._last_replay_filename or "",
                     match_id=match_id,
                 )
-                push_game(game_row, user_id=user_id)
-                imported += 1
-
-            msg = f"Game Over: imported {imported} player(s)"
+                if push_game(game_row, user_id=user_id):
+                    imported += 1
+                    if linked_to_user:
+                        linked_imported += 1
+                else:
+                    failed += 1
+                    if linked_to_user:
+                        linked_failed += 1
+            detail_parts: list[str] = []
             if skipped:
-                msg += f", {skipped} duplicate(s) skipped"
-            self._emit({"type": "import_result", "imported": imported, "skipped": skipped})
-            self._emit_notification(APP_NAME, msg)
+                detail_parts.append(f"{skipped} duplicate(s) skipped")
+            if failed:
+                detail_parts.append(f"{failed} failed to save")
 
-            if screenshot_path and imported > 0:
+            if linked_imported > 0:
+                msg = f"Imported {imported} player row(s), including {linked_imported} linked to your account"
+                tone = "success" if failed == 0 else "warning"
+            elif linked_skipped > 0 and linked_failed == 0:
+                if imported > 0:
+                    msg = (
+                        f"Imported {imported} other player row(s), but your row was already "
+                        "in History, so nothing new was added for you"
+                    )
+                else:
+                    msg = "No new player rows imported. Your row was already in History"
+                tone = "warning"
+            elif linked_failed > 0:
+                if imported > 0:
+                    msg = (
+                        f"Imported {imported} other player row(s), but your row could not be "
+                        "saved, so nothing new was added to History"
+                    )
+                else:
+                    msg = "No player rows were imported. Your row could not be saved"
+                tone = "error" if imported == 0 else "warning"
+            elif imported > 0:
+                msg = f"Imported {imported} player row(s)"
+                tone = "success" if failed == 0 else "warning"
+            else:
+                msg = "No player rows were imported"
+                tone = "error" if failed else "warning"
+
+            if detail_parts:
+                msg += f" ({', '.join(detail_parts)})"
+
+            self._emit_import_result(
+                imported=imported,
+                skipped=skipped,
+                failed=failed,
+                message=msg,
+                tone=tone,
+                screen_type="game_over",
+                linked_to_user=linked_imported,
+            )
+
+            if screenshot_path and (linked_imported > 0 or linked_skipped > 0):
                 self._update_manifest(screenshot_path, imported_at=datetime.now().isoformat())
 
         except Exception as e:
@@ -581,6 +659,7 @@ class HeadlessBackend:
 
             imported = 0
             skipped = 0
+            failed = 0
 
             for idx in selected:
                 if idx < 0 or idx >= len(rows):
@@ -624,8 +703,10 @@ class HeadlessBackend:
                     notes="",
                     replay=self._last_replay_filename or "",
                 )
-                push_game(game_row, user_id=user_id)
-                imported += 1
+                if push_game(game_row, user_id=user_id):
+                    imported += 1
+                else:
+                    failed += 1
 
             # Mark screenshot as imported (games saved)
             if self._pending_screenshot_path and imported > 0:
@@ -635,11 +716,34 @@ class HeadlessBackend:
             if screenshot_url and self._pending_screenshot_path and not screenshot_url.startswith("screenshot://"):
                 self._mark_screenshot_uploaded(self._pending_screenshot_path)
 
-            msg = f"Imported {imported} match(es)"
+            detail_parts: list[str] = []
             if skipped:
-                msg += f", {skipped} duplicate(s) skipped"
-            self._emit({"type": "import_result", "imported": imported, "skipped": skipped})
-            self._emit_notification(APP_NAME, msg)
+                detail_parts.append(f"{skipped} duplicate(s) skipped")
+            if failed:
+                detail_parts.append(f"{failed} failed to save")
+
+            if imported > 0:
+                msg = f"Imported {imported} match(es)"
+                tone = "success" if failed == 0 else "warning"
+            elif skipped and not failed:
+                msg = "No new matches imported"
+                tone = "warning"
+            else:
+                msg = "No matches were imported"
+                tone = "error" if failed else "warning"
+
+            if detail_parts:
+                msg += f" ({', '.join(detail_parts)})"
+
+            self._emit_import_result(
+                imported=imported,
+                skipped=skipped,
+                failed=failed,
+                message=msg,
+                tone=tone,
+                screen_type="my_matches",
+                linked_to_user=imported,
+            )
 
         except Exception as e:
             log.error("confirm error: %s", e, exc_info=True)
@@ -662,6 +766,32 @@ class HeadlessBackend:
 
     def _emit_import_finished(self) -> None:
         self._emit({"type": "import_finished"})
+
+    def _emit_import_result(
+        self,
+        *,
+        imported: int,
+        skipped: int = 0,
+        failed: int = 0,
+        message: str,
+        tone: str = "success",
+        screen_type: str = "",
+        linked_to_user: int | None = None,
+    ) -> None:
+        payload = {
+            "type": "import_result",
+            "imported": imported,
+            "skipped": skipped,
+            "failed": failed,
+            "message": message,
+            "tone": tone,
+        }
+        if screen_type:
+            payload["screen_type"] = screen_type
+        if linked_to_user is not None:
+            payload["linked_to_user"] = linked_to_user
+        self._emit(payload)
+        self._emit_notification(APP_NAME, message)
 
     def _dispatch_import(self, path_str: str) -> None:
         """Serialise import requests and arm a watchdog so a hung CV pass
