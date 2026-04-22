@@ -1,7 +1,6 @@
 import Head from "next/head";
 import { useMemo, useState } from "react";
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { NavBar } from "../components/NavBar";
 import itemsFull from "@data/items_full.json";
 import itemsSimple from "@data/items.json";
 
@@ -118,7 +117,7 @@ export default function ItemsPage({ supabase }: ItemsPageProps) {
         .page {
           position: relative;
           z-index: 1;
-          min-height: 100vh;
+          min-height: calc(100vh - var(--nav-height));
         }
         .container {
           max-width: 1200px;
@@ -206,7 +205,6 @@ export default function ItemsPage({ supabase }: ItemsPageProps) {
       `}</style>
 
       <div className="page">
-        <NavBar supabase={supabase} />
         <div className="container">
           <h1 className="page-title">Items</h1>
           <input

@@ -1,6 +1,7 @@
 import "@/styles/globals.css";
 import type { AppProps } from "next/app";
 import { useEffect, useState } from "react";
+import { NavBar } from "@/components/NavBar";
 import { createSupabaseClient } from "@/lib/supabase";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
@@ -12,5 +13,10 @@ export default function App({ Component, pageProps }: AppProps) {
     setSupabase(createSupabaseClient());
   }, []);
 
-  return <Component {...pageProps} supabase={supabase} />;
+  return (
+    <>
+      <NavBar supabase={supabase} />
+      <Component {...pageProps} supabase={supabase} />
+    </>
+  );
 }

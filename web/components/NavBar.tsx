@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { useRouter } from "next/router";
 import { useState, useEffect, useRef } from "react";
 import type { SupabaseClient, User } from "@supabase/supabase-js";
@@ -170,7 +171,7 @@ export function NavBar({ supabase }: NavBarProps) {
           align-items: center;
           justify-content: space-between;
           padding: 0 40px;
-          height: 56px;
+          height: var(--nav-height);
           border-bottom: 1px solid var(--border-subtle);
           background: rgba(8, 9, 11, 0.9);
           backdrop-filter: blur(8px);
@@ -354,13 +355,18 @@ export function NavBar({ supabase }: NavBarProps) {
         }
       `}</style>
       <nav>
-        <a href="/" className="nav-logo" style={{ display: "flex", alignItems: "center" }}>
+        <Link
+          href="/"
+          className="nav-logo"
+          aria-label="DAC Tools home"
+          style={{ display: "flex", alignItems: "center" }}
+        >
           <img src="/logo.svg" alt="DAC Tools" />
-        </a>
+        </Link>
         <div className="nav-links">
-          <a href="/items" className="nav-link">Items</a>
-          <a href="/relics" className="nav-link">Relics</a>
-          <a href="/patch-notes" className="nav-link">Patch Notes</a>
+          <Link href="/items" className="nav-link">Items</Link>
+          <Link href="/relics" className="nav-link">Relics</Link>
+          <Link href="/patch-notes" className="nav-link">Patch Notes</Link>
         </div>
         <div className="nav-center" ref={containerRef}>
           <form className="search-form" onSubmit={handleSearch}>
@@ -413,9 +419,9 @@ export function NavBar({ supabase }: NavBarProps) {
           {ready ? (
             user ? (
               <>
-                <a href="/dashboard" className="nav-user">
+                <Link href="/dashboard" className="nav-user">
                   {displayName}
-                </a>
+                </Link>
                 <button className="nav-btn" onClick={handleLogout}>
                   Sign out
                 </button>

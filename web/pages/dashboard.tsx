@@ -8,7 +8,6 @@ import { parseWL } from "@dac/shared/game-utils";
 import { GameRow } from "../components/GameRow";
 import type { Game, UnitFullInfo, SynergyInfo, RelicInfo } from "@dac/shared/types";
 import synergiesData from "@data/synergies.json";
-import { NavBar } from "../components/NavBar";
 import relicsData from "@data/relics.json";
 
 interface SeasonSnapshot {
@@ -244,7 +243,7 @@ export default function Dashboard({ supabase }: DashboardProps) {
         .page {
           position: relative;
           z-index: 1;
-          min-height: 100vh;
+          min-height: calc(100vh - var(--nav-height));
         }
         .dashboard {
           max-width: 1200px;
@@ -392,8 +391,6 @@ export default function Dashboard({ supabase }: DashboardProps) {
       `}</style>
 
       <div className="page">
-        <NavBar supabase={supabase} />
-
         {!isReady || loading ? (
           <div className="loading">Loading</div>
         ) : !user ? (

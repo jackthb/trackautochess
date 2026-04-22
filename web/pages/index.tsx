@@ -1,12 +1,5 @@
 import Head from "next/head";
-import type { SupabaseClient } from "@supabase/supabase-js";
-import { NavBar } from "../components/NavBar";
-
-interface HomeProps {
-  supabase: SupabaseClient | null;
-}
-
-export default function Home({ supabase }: HomeProps) {
+export default function Home() {
   return (
     <>
       <Head>
@@ -23,7 +16,7 @@ export default function Home({ supabase }: HomeProps) {
         .page {
           position: relative;
           z-index: 1;
-          height: 100vh;
+          min-height: calc(100vh - var(--nav-height));
           overflow: hidden;
           display: flex;
           flex-direction: column;
@@ -218,8 +211,6 @@ export default function Home({ supabase }: HomeProps) {
       `}</style>
 
       <div className="page">
-        <NavBar supabase={supabase} />
-
         <div className="hero">
           <div className="grid" />
           <div className="glow" />

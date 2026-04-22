@@ -1,4 +1,5 @@
 import Head from "next/head";
+import Link from "next/link";
 import { createClient } from "@supabase/supabase-js";
 import type { GetServerSideProps } from "next";
 import type { SupabaseClient } from "@supabase/supabase-js";
@@ -19,7 +20,6 @@ import {
   relicStem,
 } from "@dac/shared/game-utils";
 import { TooltipWrap, type TooltipData } from "@dac/shared/Tooltip";
-import { NavBar } from "../../components/NavBar";
 import {
   fetchSteamProfile,
   steamProfileUrl,
@@ -82,12 +82,12 @@ function MatchPlayerRow({
       <div className="mp-info">
         <div className="mp-name-row">
           {profileUrl ? (
-            <a
+            <Link
               href={`/players/${game.user_id}`}
               className="mp-name"
             >
               {displayName}
-            </a>
+            </Link>
           ) : (
             <span className="mp-name mp-name-unknown">{displayName}</span>
           )}
@@ -221,7 +221,7 @@ export default function GamePage({
         .page {
           position: relative;
           z-index: 1;
-          min-height: 100vh;
+          min-height: calc(100vh - var(--nav-height));
         }
         .container {
           max-width: 900px;
@@ -483,8 +483,6 @@ export default function GamePage({
       `}</style>
 
       <div className="page">
-        <NavBar supabase={null} />
-
         <div className="container">
           <div className="match-card">
             {/* Header: placement + player info */}

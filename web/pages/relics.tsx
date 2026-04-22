@@ -1,7 +1,6 @@
 import Head from "next/head";
 import { useMemo, useState } from "react";
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { NavBar } from "../components/NavBar";
 import { relicStem } from "@dac/shared/game-utils";
 import relicsData from "@data/relics.json";
 
@@ -45,7 +44,7 @@ export default function RelicsPage({ supabase }: RelicsPageProps) {
         .page {
           position: relative;
           z-index: 1;
-          min-height: 100vh;
+          min-height: calc(100vh - var(--nav-height));
         }
         .container {
           max-width: 1200px;
@@ -136,7 +135,6 @@ export default function RelicsPage({ supabase }: RelicsPageProps) {
       `}</style>
 
       <div className="page">
-        <NavBar supabase={supabase} />
         <div className="container">
           <h1 className="page-title">Relics</h1>
           <input

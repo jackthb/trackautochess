@@ -1,9 +1,9 @@
 import fs from "fs";
 import path from "path";
 import Head from "next/head";
+import Link from "next/link";
 import type { GetStaticPaths, GetStaticProps } from "next";
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { NavBar } from "../../components/NavBar";
 import patchIndex from "@data/patch_notes/index.json";
 
 type EntryKind =
@@ -79,7 +79,7 @@ export default function PatchDetailPage({ supabase, patch }: PatchPageProps) {
         .page {
           position: relative;
           z-index: 1;
-          min-height: 100vh;
+          min-height: calc(100vh - var(--nav-height));
         }
         .container {
           max-width: 760px;
@@ -232,11 +232,10 @@ export default function PatchDetailPage({ supabase, patch }: PatchPageProps) {
       `}</style>
 
       <div className="page">
-        <NavBar supabase={supabase} />
         <div className="container">
-          <a href="/patch-notes" className="back">
+          <Link href="/patch-notes" className="back">
             ← All patches
-          </a>
+          </Link>
           <div className="date">{patch.date}</div>
           <h1 className="title">{patch.title}</h1>
           <div className="source-row">

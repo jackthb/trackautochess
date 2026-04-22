@@ -10,7 +10,6 @@ import synergiesData from "@data/synergies.json";
 import relicsData from "@data/relics.json";
 import { GameRowDisplay } from "@dac/shared/GameRowDisplay";
 import type { PlayerGame, UnitFullInfo, SynergyInfo, RelicInfo } from "@dac/shared/types";
-import { NavBar } from "../../components/NavBar";
 import {
   fetchSteamProfile,
   resolveSteamInput,
@@ -98,7 +97,7 @@ export default function PlayerPage({
         .page {
           position: relative;
           z-index: 1;
-          min-height: 100vh;
+          min-height: calc(100vh - var(--nav-height));
         }
         .dashboard {
           max-width: 1200px;
@@ -225,8 +224,6 @@ export default function PlayerPage({
       `}</style>
 
       <div className="page">
-        <NavBar supabase={supabase} />
-
         <div className="dashboard">
           <div className="player-header">
             <div className="player-name">{displayName}</div>

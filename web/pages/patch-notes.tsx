@@ -1,6 +1,6 @@
 import Head from "next/head";
+import Link from "next/link";
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { NavBar } from "../components/NavBar";
 import patchIndex from "@data/patch_notes/index.json";
 
 interface IndexPatch {
@@ -29,7 +29,7 @@ export default function PatchNotesPage({ supabase }: PatchNotesPageProps) {
         .page {
           position: relative;
           z-index: 1;
-          min-height: 100vh;
+          min-height: calc(100vh - var(--nav-height));
         }
         .container {
           max-width: 720px;
@@ -82,12 +82,11 @@ export default function PatchNotesPage({ supabase }: PatchNotesPageProps) {
       `}</style>
 
       <div className="page">
-        <NavBar supabase={supabase} />
         <div className="container">
           <h1 className="page-title">Patch Notes</h1>
           <div className="list">
             {patches.map((p) => (
-              <a
+              <Link
                 key={p.slug}
                 href={`/patch-notes/${p.slug}`}
                 className="entry"
@@ -95,7 +94,7 @@ export default function PatchNotesPage({ supabase }: PatchNotesPageProps) {
                 <span className="date">{p.date}</span>
                 <span className="title">{p.title}</span>
                 <span className="arrow">→</span>
-              </a>
+              </Link>
             ))}
           </div>
         </div>
