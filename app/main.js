@@ -7,7 +7,6 @@ const {
   Menu,
   Tray,
   nativeImage,
-  Notification,
   globalShortcut,
   dialog,
   screen,
@@ -46,6 +45,7 @@ for (const dir of [DAC_DIR, REPLAY_DIR, SCREENSHOT_DIR]) {
 let mainWindow = null;
 let overlayWindow = null;
 let widgetWindow = null;
+let notificationWindow = null;
 let calibrationWindow = null;
 let tray = null;
 let pythonProcess = null;
@@ -53,8 +53,12 @@ let pythonRL = null;
 let overlayTimeout = null;
 let dotaPollInterval = null;
 let dotaOpen = false;
+let notificationReady = false;
+let nextNotificationId = 1;
 let closeToTray = true; // default: minimize to tray on close
 let isQuitting = false; // true when quitting from tray or app.quit()
+const notificationItems = [];
+const notificationTimers = new Map();
 let trackerStatus = {
   recording: false,
   focused: false,
@@ -64,6 +68,22 @@ let trackerStatus = {
   steam_name: "",
   replay_enabled: true,
 };
+
+const NOTIFICATION_WINDOW_WIDTH = 340;
+const NOTIFICATION_WINDOW_MARGIN = 20;
+const NOTIFICATION_WINDOW_TOP = 76;
+const NOTIFICATION_CARD_HEIGHT = 96;
+const NOTIFICATION_CARD_GAP = 10;
+const NOTIFICATION_WINDOW_PADDING = 8;
+const MAX_VISIBLE_NOTIFICATIONS = 4;
+const SUPPRESSED_NOTIFICATION_PATTERNS = [
+  /^Recording started$/i,
+  /^Game started.*recording replay$/i,
+  /^Game ended! Open Match History and click Capture\.$/i,
+  /^My Matches detected.*parsing/i,
+  /^Game Over detected.*parsing all players/i,
+  /^Logged out of Steam\.$/i,
+];
 
 // ── Python subprocess ────────────────────────────────────────────────────────
 
@@ -234,7 +254,7 @@ function handlePythonEvent(msg) {
       break;
 
     case "notification":
-      showNotification(msg.title, msg.message);
+      enqueueNotification(msg.title, msg.message);
       break;
 
     case "steam_login":
@@ -280,10 +300,142 @@ function handlePythonEvent(msg) {
 
 // ── Notifications ────────────────────────────────────────────────────────────
 
-function showNotification(title, body) {
-  if (Notification.isSupported()) {
-    new Notification({ title, body }).show();
+function shouldShowNotification(body = "") {
+  return !SUPPRESSED_NOTIFICATION_PATTERNS.some((pattern) => pattern.test(body));
+}
+
+function getNotificationTone(body = "") {
+  if (/failed|error|timed out|cannot import|not recognised|not recognized|no rows/i.test(body)) {
+    return "error";
   }
+  if (/disabled|already imported|already in progress|not on my matches|skipping/i.test(body)) {
+    return "warning";
+  }
+  if (/saved|imported/i.test(body)) {
+    return "success";
+  }
+  return "info";
+}
+
+function getNotificationTimeoutMs(tone) {
+  switch (tone) {
+    case "error":
+      return 7000;
+    case "warning":
+      return 6000;
+    case "success":
+      return 5000;
+    default:
+      return 4500;
+  }
+}
+
+function getNotificationWindowBounds(count) {
+  const display = screen.getPrimaryDisplay().workArea;
+  const height = Math.max(
+    1,
+    NOTIFICATION_WINDOW_PADDING * 2 +
+      count * NOTIFICATION_CARD_HEIGHT +
+      Math.max(0, count - 1) * NOTIFICATION_CARD_GAP
+  );
+
+  return {
+    width: NOTIFICATION_WINDOW_WIDTH,
+    height,
+    x: display.x + display.width - NOTIFICATION_WINDOW_WIDTH - NOTIFICATION_WINDOW_MARGIN,
+    y: display.y + NOTIFICATION_WINDOW_TOP,
+  };
+}
+
+function syncNotificationWindow() {
+  if (!notificationWindow || notificationWindow.isDestroyed()) {
+    return;
+  }
+
+  if (!notificationItems.length) {
+    notificationWindow.hide();
+    return;
+  }
+
+  const visibleItems = notificationItems.slice(-MAX_VISIBLE_NOTIFICATIONS).reverse();
+  notificationWindow.setBounds(getNotificationWindowBounds(visibleItems.length), false);
+
+  if (!notificationReady) {
+    return;
+  }
+
+  notificationWindow.webContents.send("notification:update", visibleItems);
+  notificationWindow.showInactive();
+}
+
+function removeNotification(id) {
+  const timer = notificationTimers.get(id);
+  if (timer) {
+    clearTimeout(timer);
+    notificationTimers.delete(id);
+  }
+
+  const index = notificationItems.findIndex((item) => item.id === id);
+  if (index !== -1) {
+    notificationItems.splice(index, 1);
+    syncNotificationWindow();
+  }
+}
+
+function enqueueNotification(title, body) {
+  if (!shouldShowNotification(body)) {
+    return;
+  }
+
+  const tone = getNotificationTone(body);
+  const id = `notification-${nextNotificationId++}`;
+  const item = {
+    id,
+    title: title || "DAC Tracker",
+    body,
+    tone,
+  };
+
+  notificationItems.push(item);
+
+  while (notificationItems.length > MAX_VISIBLE_NOTIFICATIONS) {
+    removeNotification(notificationItems[0].id);
+  }
+
+  const timer = setTimeout(() => removeNotification(id), getNotificationTimeoutMs(tone));
+  notificationTimers.set(id, timer);
+  syncNotificationWindow();
+}
+
+function createNotificationWindow() {
+  notificationWindow = new BrowserWindow({
+    ...getNotificationWindowBounds(1),
+    show: false,
+    frame: false,
+    transparent: true,
+    alwaysOnTop: true,
+    skipTaskbar: true,
+    resizable: false,
+    hasShadow: false,
+    webPreferences: {
+      preload: path.join(__dirname, "preload-notification.js"),
+      contextIsolation: true,
+      nodeIntegration: false,
+    },
+  });
+
+  notificationWindow.loadFile(path.join(__dirname, "notification.html"));
+  notificationWindow.setAlwaysOnTop(true, "screen-saver");
+
+  notificationWindow.webContents.on("did-finish-load", () => {
+    notificationReady = true;
+    syncNotificationWindow();
+  });
+
+  notificationWindow.on("closed", () => {
+    notificationReady = false;
+    notificationWindow = null;
+  });
 }
 
 // ── Overlay window ───────────────────────────────────────────────────────────
@@ -433,6 +585,10 @@ ipcMain.on("widget:toggle-recording", () => {
 
 ipcMain.on("widget:capture", () => {
   sendToPython({ cmd: "capture" });
+});
+
+ipcMain.on("notification:dismiss", (_event, id) => {
+  removeNotification(id);
 });
 
 // ── Main window ──────────────────────────────────────────────────────────────
@@ -971,6 +1127,7 @@ app.whenReady().then(() => {
   createTray();
   createWindow();
   createWidget();
+  createNotificationWindow();
   startDotaPoller();
   registerShortcuts();
   startPython();
@@ -989,6 +1146,11 @@ app.on("before-quit", () => {
 app.on("will-quit", () => {
   globalShortcut.unregisterAll();
   if (dotaPollInterval) clearInterval(dotaPollInterval);
+  for (const timer of notificationTimers.values()) {
+    clearTimeout(timer);
+  }
+  notificationTimers.clear();
+  notificationItems.length = 0;
 
   // Destroy tray
   if (tray) {

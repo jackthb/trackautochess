@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>DAC Notifications</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: transparent;
+      overflow: hidden;
+      font-family: "Segoe UI", sans-serif;
+      user-select: none;
+    }
+
+    .stack {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      padding: 8px;
+    }
+
+    .notice {
+      min-height: 96px;
+      padding: 12px 12px 12px 14px;
+      border-radius: 10px;
+      border: 1px solid #3a405a;
+      background: rgba(29, 33, 47, 0.96);
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.28);
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 10px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .notice::before {
+      content: "";
+      position: absolute;
+      inset: 0 auto 0 0;
+      width: 3px;
+      background: #6e7999;
+    }
+
+    .notice.success::before { background: #4ebf72; }
+    .notice.warning::before { background: #f0a84b; }
+    .notice.error::before { background: #e35d5b; }
+    .notice.info::before { background: #6e7999; }
+
+    .notice-copy {
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .notice-title {
+      font-size: 11px;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+      color: #8f98b2;
+    }
+
+    .notice-body {
+      font-size: 13px;
+      line-height: 1.4;
+      color: #e3e8f6;
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    .notice-dismiss {
+      width: 24px;
+      height: 24px;
+      border: none;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.05);
+      color: #9199af;
+      cursor: pointer;
+      font-size: 15px;
+      line-height: 1;
+      transition: background 0.15s ease, color 0.15s ease;
+    }
+
+    .notice-dismiss:hover {
+      background: rgba(255, 255, 255, 0.12);
+      color: #eef2fb;
+    }
+  </style>
+</head>
+<body>
+  <div class="stack" id="stack"></div>
+
+  <script>
+    const stack = document.getElementById("stack");
+
+    function render(items) {
+      stack.replaceChildren();
+
+      for (const item of items) {
+        const card = document.createElement("article");
+        card.className = `notice ${item.tone || "info"}`;
+
+        const copy = document.createElement("div");
+        copy.className = "notice-copy";
+
+        const title = document.createElement("div");
+        title.className = "notice-title";
+        title.textContent = item.title || "DAC Tracker";
+
+        const body = document.createElement("div");
+        body.className = "notice-body";
+        body.textContent = item.body || "";
+
+        const dismiss = document.createElement("button");
+        dismiss.className = "notice-dismiss";
+        dismiss.type = "button";
+        dismiss.setAttribute("aria-label", "Dismiss notification");
+        dismiss.textContent = "x";
+        dismiss.addEventListener("click", () => {
+          window.notifications.dismiss(item.id);
+        });
+
+        copy.append(title, body);
+        card.append(copy, dismiss);
+        stack.append(card);
+      }
+    }
+
+    window.notifications.onUpdate(render);
+  </script>
+</body>
+</html>

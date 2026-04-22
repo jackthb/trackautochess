@@ -10,7 +10,9 @@
     "preload.js",
     "preload-overlay.js",
     "preload-widget.js",
+    "preload-notification.js",
     "overlay.html",
+    "notification.html",
     "widget.html",
     "dist/**/*",
     "!node_modules/**/*"
