@@ -16,6 +16,15 @@ export interface DisplayRelic {
   iconStem: string;
 }
 
+// Most entries carry a placeholder "From Relicbox" lore line that just
+// restates the source; strip it so the UI doesn't render empty noise.
+const RELIC_BOX_LORE = /^\s*from:?\s*relic\s*box\s*$/i;
+
+function cleanLore(value: string): string {
+  if (!value) return "";
+  return RELIC_BOX_LORE.test(value) ? "" : value;
+}
+
 function buildRelics(): DisplayRelic[] {
   return Object.values(
     (relicsData as { relics: Record<string, RelicInfo> }).relics
@@ -25,7 +34,7 @@ function buildRelics(): DisplayRelic[] {
       slug: slugifyName(relic.name),
       name: relic.name,
       description: relic.description,
-      lore: relic.lore,
+      lore: cleanLore(relic.lore),
       iconStem: relicStem(relic.name),
     }))
     .sort((a, b) => a.name.localeCompare(b.name));

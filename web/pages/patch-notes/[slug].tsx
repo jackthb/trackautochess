@@ -192,80 +192,77 @@ export default function PatchDetailPage({
         .container {
           max-width: 760px;
           margin: 0 auto;
-          padding: 40px 32px 80px;
+          padding: var(--s-40) var(--s-32) var(--s-48);
         }
         .breadcrumbs {
           display: flex;
-          gap: 10px;
+          gap: var(--s-10);
           flex-wrap: wrap;
-          margin-bottom: 22px;
-          font-size: 12px;
-          letter-spacing: 1.5px;
+          margin-bottom: var(--s-20);
+          font-size: var(--fs-12);
+          letter-spacing: var(--tr-upper);
           text-transform: uppercase;
           color: var(--text-muted);
         }
         .breadcrumbs a {
           color: var(--text-muted);
+          transition: color var(--t-base) var(--t-easing);
         }
         .breadcrumbs a:hover {
           color: var(--text-secondary);
         }
         .date {
-          font-size: 12px;
-          letter-spacing: 2px;
+          font-size: var(--fs-12);
+          letter-spacing: var(--tr-upper-wide);
           color: var(--text-muted);
           text-transform: uppercase;
-          margin-bottom: 8px;
+          margin-bottom: var(--s-8);
         }
         .title {
-          font-family: "Cinzel", serif;
-          font-size: 36px;
-          font-weight: 700;
-          letter-spacing: 5px;
+          font-family: var(--font-display);
+          font-size: var(--fs-32);
+          font-weight: var(--fw-bold);
+          letter-spacing: var(--tr-display);
           text-transform: uppercase;
           color: var(--accent);
-          margin-bottom: 18px;
-        }
-        .lede {
-          font-size: 15px;
-          line-height: 1.7;
-          color: var(--text-secondary);
-          margin-bottom: 20px;
+          margin-bottom: var(--s-20);
         }
         .link-row {
           display: flex;
-          gap: 10px;
+          gap: var(--s-10);
           flex-wrap: wrap;
-          margin-bottom: 24px;
+          margin-bottom: var(--s-24);
         }
-        .chip,
         .source {
           display: inline-block;
-          font-size: 11px;
-          letter-spacing: 1.5px;
+          font-size: var(--fs-11);
+          letter-spacing: var(--tr-upper);
           text-transform: uppercase;
           color: var(--text-muted);
           border: 1px solid var(--border);
-          padding: 6px 12px;
-          transition: all 0.15s;
+          border-radius: var(--r-3);
+          padding: var(--s-6) var(--s-12);
+          transition: color var(--t-base) var(--t-easing),
+            border-color var(--t-base) var(--t-easing),
+            background var(--t-base) var(--t-easing);
         }
-        .chip:hover,
         .source:hover {
           color: var(--text-secondary);
           border-color: var(--text-muted);
           background: var(--bg-hover);
         }
         .summary {
-          padding: 20px 24px;
+          padding: var(--s-20) var(--s-24);
           background: var(--bg-surface);
           border: 1px solid var(--border);
-          margin-bottom: 32px;
+          border-radius: var(--r-8);
+          margin-bottom: var(--s-32);
         }
         .summary-line {
-          font-size: 14px;
-          line-height: 1.6;
+          font-size: var(--fs-14);
+          line-height: var(--lh-relaxed);
           color: var(--text-primary);
-          padding: 8px 0;
+          padding: var(--s-8) 0;
           border-bottom: 1px solid var(--border-subtle);
         }
         .summary-line:last-child,
@@ -274,87 +271,90 @@ export default function PatchDetailPage({
         }
         .summary-line.bullet {
           position: relative;
-          padding-left: 20px;
+          padding-left: var(--s-20);
         }
         .summary-line.bullet::before {
           content: "*";
           position: absolute;
           left: 0;
-          top: 8px;
+          top: var(--s-8);
           color: var(--accent-dim);
-          font-size: 8px;
-          line-height: 1.6;
+          font-size: var(--fs-11);
+          line-height: var(--lh-body);
         }
         .summary-footer {
-          margin-top: 18px;
-          padding-top: 14px;
+          margin-top: var(--s-16);
+          padding-top: var(--s-14);
           border-top: 1px solid var(--border-subtle);
-          font-size: 12px;
+          font-size: var(--fs-12);
           color: var(--text-muted);
-          letter-spacing: 0.5px;
+          letter-spacing: var(--tr-body);
         }
         .summary-footer a {
           color: var(--accent-dim);
           text-decoration: underline;
+          transition: color var(--t-base) var(--t-easing);
         }
         .summary-footer a:hover {
           color: var(--accent);
         }
         .flavor {
-          font-size: 14px;
-          line-height: 1.7;
+          font-size: var(--fs-14);
+          line-height: var(--lh-relaxed);
           color: var(--text-secondary);
           font-style: italic;
-          padding: 18px 20px;
+          padding: var(--s-16) var(--s-20);
           border-left: 2px solid var(--accent-dim);
           background: var(--bg-surface);
-          margin-bottom: 40px;
+          border-radius: 0 var(--r-8) var(--r-8) 0;
+          margin-bottom: var(--s-40);
         }
         .section {
-          margin-bottom: 36px;
+          margin-bottom: var(--s-32);
         }
         .section-heading {
-          font-family: "Cinzel", serif;
-          font-size: 15px;
-          letter-spacing: 3px;
+          font-family: var(--font-display);
+          font-size: var(--fs-14);
+          letter-spacing: var(--tr-display);
           text-transform: uppercase;
           color: var(--text-primary);
-          padding-bottom: 10px;
+          padding-bottom: var(--s-10);
           border-bottom: 1px solid var(--border);
-          margin-bottom: 16px;
+          margin-bottom: var(--s-16);
         }
         .entry {
           display: grid;
           grid-template-columns: 90px 1fr;
-          gap: 16px;
-          padding: 12px 0;
+          gap: var(--s-16);
+          padding: var(--s-12) 0;
           border-bottom: 1px solid var(--border-subtle);
         }
         .entry:last-child {
           border-bottom: none;
         }
         .kind {
-          font-size: 10px;
-          letter-spacing: 1.5px;
-          font-weight: 600;
+          font-size: var(--fs-11);
+          letter-spacing: var(--tr-upper);
+          font-weight: var(--fw-semibold);
           padding-top: 2px;
         }
         .entry-name {
-          font-size: 14px;
+          font-size: var(--fs-14);
           color: var(--text-primary);
-          font-weight: 500;
-          margin-bottom: 4px;
+          font-weight: var(--fw-medium);
+          margin-bottom: var(--s-4);
         }
         .entry-link {
           text-decoration: underline;
           text-underline-offset: 2px;
+          transition: color var(--t-base) var(--t-easing);
         }
         .entry-link:hover {
           color: var(--accent-dim);
         }
         .entry-detail {
-          font-size: 13px;
-          line-height: 1.55;
+          font-size: var(--fs-13);
+          line-height: var(--lh-body);
           color: var(--text-secondary);
         }
       `}</style>
@@ -370,40 +370,31 @@ export default function PatchDetailPage({
           </nav>
           <div className="date">{patch.date}</div>
           <h1 className="title">{patch.title}</h1>
-          <div className="lede">
-            Read this Dota Auto Chess update in a cleaner format, then jump into
-            linked item and relic pages where the patch introduces or changes
-            named content.
-          </div>
 
-          <div className="link-row">
-            <Link href="/items" className="chip">
-              Item library
-            </Link>
-            <Link href="/relics" className="chip">
-              Relic library
-            </Link>
-            {patch.source && (
-              <a
-                className="source"
-                href={patch.source}
-                target="_blank"
-                rel="noreferrer"
-              >
-                Official notes
-              </a>
-            )}
-            {patch.workshop_url && (
-              <a
-                className="source"
-                href={patch.workshop_url}
-                target="_blank"
-                rel="noreferrer"
-              >
-                Workshop changelog
-              </a>
-            )}
-          </div>
+          {(patch.source || patch.workshop_url) && (
+            <div className="link-row">
+              {patch.source && (
+                <a
+                  className="source"
+                  href={patch.source}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Official notes
+                </a>
+              )}
+              {patch.workshop_url && (
+                <a
+                  className="source"
+                  href={patch.workshop_url}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Workshop changelog
+                </a>
+              )}
+            </div>
+          )}
 
           {patch.flavor && <div className="flavor">{patch.flavor}</div>}
 

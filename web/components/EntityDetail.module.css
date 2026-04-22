@@ -1,0 +1,108 @@
+.page {
+  position: relative;
+  z-index: 1;
+  min-height: 100vh;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--s-40) var(--s-32) var(--s-48);
+}
+
+.breadcrumbs {
+  display: flex;
+  gap: var(--s-10);
+  flex-wrap: wrap;
+  margin-bottom: var(--s-20);
+  font-size: var(--fs-12);
+  letter-spacing: var(--tr-upper);
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+.breadcrumbs a {
+  color: var(--text-muted);
+  transition: color var(--t-base) var(--t-easing);
+}
+.breadcrumbs a:hover {
+  color: var(--text-secondary);
+}
+
+.hero {
+  display: flex;
+  gap: var(--s-20);
+  align-items: flex-start;
+  padding: var(--s-24);
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-8);
+  margin-bottom: var(--s-16);
+}
+
+.title {
+  font-family: var(--font-display);
+  font-size: var(--fs-32);
+  font-weight: var(--fw-bold);
+  letter-spacing: var(--tr-display);
+  margin: 0 0 var(--s-12);
+}
+.titleItem { color: var(--text-primary); }
+.titleRelic { color: var(--gold); }
+
+.tier {
+  display: inline-flex;
+  align-items: center;
+  font-family: var(--font-mono);
+  font-size: var(--fs-11);
+  letter-spacing: var(--tr-upper);
+  text-transform: uppercase;
+  padding: var(--s-6) var(--s-10);
+  border: 1px solid currentColor;
+  border-radius: var(--r-3);
+  margin-bottom: var(--s-16);
+}
+
+.lede {
+  font-size: var(--fs-14);
+  line-height: var(--lh-relaxed);
+  color: var(--text-secondary);
+  max-width: 720px;
+  white-space: pre-line;
+}
+
+.section {
+  padding: var(--s-24);
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-8);
+  margin-bottom: var(--s-16);
+}
+
+.sectionTitle {
+  font-family: var(--font-display);
+  font-size: var(--fs-14);
+  letter-spacing: var(--tr-upper-wide);
+  text-transform: uppercase;
+  color: var(--text-primary);
+  margin: 0 0 var(--s-14);
+}
+
+.bodyCopy {
+  font-size: var(--fs-14);
+  line-height: var(--lh-relaxed);
+  color: var(--text-secondary);
+  white-space: pre-line;
+}
+
+.notes {
+  margin: 0;
+  padding-left: var(--s-20);
+  color: var(--text-secondary);
+  line-height: var(--lh-relaxed);
+}
+
+.relatedGrid {
+  display: grid;
+  gap: var(--s-10);
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+}

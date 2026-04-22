@@ -23,7 +23,6 @@ export function NavBar({ supabase }: NavBarProps) {
   const [results, setResults] = useState<SearchResult[]>([]);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [highlightedIndex, setHighlightedIndex] = useState(-1);
-  const [queriedValue, setQueriedValue] = useState("");
   const searchReqRef = useRef(0);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -81,8 +80,7 @@ export function NavBar({ supabase }: NavBarProps) {
       });
 
       setResults(rows);
-      setQueriedValue(val);
-      setDropdownOpen(true);
+      setDropdownOpen(rows.length > 0);
       setHighlightedIndex(rows.length > 0 ? 0 : -1);
       setSearching(false);
     }, 200);
@@ -238,11 +236,12 @@ export function NavBar({ supabase }: NavBarProps) {
           top: 100%;
           left: 0;
           right: 0;
-          margin-top: 2px;
+          margin-top: 4px;
           background: var(--bg-surface);
           border: 1px solid var(--border);
+          border-radius: var(--r-3);
           max-height: 320px;
-          overflow-y: auto;
+          overflow: hidden auto;
           z-index: 20;
         }
         .search-result {
@@ -267,13 +266,6 @@ export function NavBar({ supabase }: NavBarProps) {
         }
         .result-meta {
           font-size: 11px;
-          color: var(--text-muted);
-          letter-spacing: 0.5px;
-        }
-        .search-empty {
-          padding: 10px 14px;
-          font-family: var(--font-mono);
-          font-size: 12px;
           color: var(--text-muted);
           letter-spacing: 0.5px;
         }
@@ -379,7 +371,7 @@ export function NavBar({ supabase }: NavBarProps) {
             <input
               className="search-input"
               type="text"
-              placeholder="Look up Steam ID, URL, vanity, or name..."
+              placeholder="Look up your profile"
               value={searchValue}
               onChange={(e) => setSearchValue(e.target.value)}
               onKeyDown={handleKeyDown}
@@ -389,35 +381,29 @@ export function NavBar({ supabase }: NavBarProps) {
               autoComplete="off"
             />
           </form>
-          {dropdownOpen && (
+          {dropdownOpen && results.length > 0 && (
             <div className="search-dropdown">
-              {results.length > 0 ? (
-                results.map((r, i) => (
-                  <div
-                    key={r.steam_id}
-                    className={
-                      "search-result" +
-                      (i === highlightedIndex ? " highlighted" : "")
-                    }
-                    onMouseEnter={() => setHighlightedIndex(i)}
-                    onMouseDown={(e) => {
-                      e.preventDefault();
-                      selectResult(r.steam_id);
-                    }}
-                  >
-                    <span className="result-name">
-                      {r.name || r.custom_url || r.steam_id}
-                    </span>
-                    {r.custom_url && r.name && (
-                      <span className="result-meta">/{r.custom_url}</span>
-                    )}
-                  </div>
-                ))
-              ) : !searching && queriedValue ? (
-                <div className="search-empty">
-                  No players matching &ldquo;{queriedValue}&rdquo;
+              {results.map((r, i) => (
+                <div
+                  key={r.steam_id}
+                  className={
+                    "search-result" +
+                    (i === highlightedIndex ? " highlighted" : "")
+                  }
+                  onMouseEnter={() => setHighlightedIndex(i)}
+                  onMouseDown={(e) => {
+                    e.preventDefault();
+                    selectResult(r.steam_id);
+                  }}
+                >
+                  <span className="result-name">
+                    {r.name || r.custom_url || r.steam_id}
+                  </span>
+                  {r.custom_url && r.name && (
+                    <span className="result-meta">/{r.custom_url}</span>
+                  )}
                 </div>
-              ) : null}
+              ))}
             </div>
           )}
         </div>

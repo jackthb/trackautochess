@@ -48,6 +48,26 @@ function norm(value: string): string {
   return value.toLowerCase().replace(/\s+/g, "").replace(/'/g, "");
 }
 
+// Raw descriptions still carry fullwidth CJK punctuation from the VPK extract
+// (e.g. "Armor +5。"). Map the punctuation we see in practice back to ASCII.
+const CJK_PUNCT: Record<string, string> = {
+  "。": ".",
+  "，": ",",
+  "、": ",",
+  "！": "!",
+  "？": "?",
+  "：": ":",
+  "；": ";",
+  "（": "(",
+  "）": ")",
+};
+
+function normalizePunct(value: string): string {
+  return value
+    .replace(/[　-〿＀-￯]/g, (ch) => CJK_PUNCT[ch] ?? ch)
+    .replace(/\.\s*\./g, ".");
+}
+
 function buildItems(): DisplayItem[] {
   const simple = (itemsSimple as { items: Record<string, SimpleItem> }).items;
   const fullByNorm = new Map<string, FullItem>();
@@ -65,10 +85,10 @@ function buildItems(): DisplayItem[] {
       return {
         slug: slugifyName(name),
         name,
-        description: full?.description ?? "",
-        lore: full?.lore ?? "",
+        description: normalizePunct(full?.description ?? ""),
+        lore: normalizePunct(full?.lore ?? ""),
         quality: full?.quality ?? "",
-        notes: full?.notes ?? [],
+        notes: (full?.notes ?? []).map(normalizePunct),
         tier: basic.tier,
         icon: basic.icon,
         texture: full?.texture ?? "",

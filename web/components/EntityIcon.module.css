@@ -1,0 +1,18 @@
+.icon {
+  display: block;
+  flex-shrink: 0;
+  background: var(--bg-deep);
+  border: 1px solid var(--entity-icon-border, var(--border));
+  border-radius: var(--r-4);
+  transition: border-color var(--t-base) var(--t-easing);
+}
+
+.sm {
+  width: 64px;
+  height: auto;
+}
+
+.lg {
+  width: 96px;
+  height: auto;
+}

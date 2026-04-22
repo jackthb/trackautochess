@@ -1,0 +1,61 @@
+import type { CSSProperties } from "react";
+import Link from "next/link";
+import { EntityIcon } from "@/components/EntityIcon";
+import styles from "./EntityCard.module.css";
+
+export type EntityCardVariant = "item" | "relic";
+
+interface EntityCardProps {
+  href: string;
+  iconSrc: string;
+  iconAlt: string;
+  name: string;
+  description?: string;
+  lore?: string;
+  variant: EntityCardVariant;
+  /** Small label rendered in the top-right corner (e.g. tier). */
+  level?: string | number;
+  /** Hover border/glow color. Defaults by variant. */
+  accentColor?: string;
+}
+
+const DEFAULT_ACCENT: Record<EntityCardVariant, string> = {
+  item: "var(--accent)",
+  relic: "var(--gold)",
+};
+
+export function EntityCard({
+  href,
+  iconSrc,
+  iconAlt,
+  name,
+  description,
+  lore,
+  variant,
+  level,
+  accentColor,
+}: EntityCardProps) {
+  const accent = accentColor ?? DEFAULT_ACCENT[variant];
+
+  return (
+    <Link
+      href={href}
+      className={`${styles.card} ${styles[variant]}`}
+      style={{ "--card-accent": accent } as CSSProperties}
+    >
+      <EntityIcon src={iconSrc} alt={iconAlt} size="sm" />
+      <div className={styles.body}>
+        <div className={styles.name}>{name}</div>
+        {description !== undefined && (
+          <div className={styles.desc}>{description || "-"}</div>
+        )}
+        {lore && (
+          <div className={styles.lore}>&ldquo;{lore}&rdquo;</div>
+        )}
+      </div>
+      {level !== undefined && (
+        <div className={styles.level}>{level}</div>
+      )}
+    </Link>
+  );
+}
