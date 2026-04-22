@@ -319,17 +319,32 @@ export function NavBar({ supabase }: NavBarProps) {
         .nav-right {
           display: flex;
           align-items: center;
+          justify-content: flex-end;
           gap: 20px;
           flex-shrink: 0;
+          min-width: 272px;
         }
         .nav-user {
+          display: block;
+          max-width: 152px;
           font-size: 14px;
           color: var(--text-secondary);
           text-decoration: none;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          text-align: right;
           transition: color 0.15s;
         }
         .nav-user:hover {
           color: var(--text-primary);
+        }
+        .nav-auth-placeholder {
+          display: flex;
+          align-items: center;
+          gap: 20px;
+          visibility: hidden;
+          pointer-events: none;
         }
         .nav-btn {
           font-family: var(--font-mono);
@@ -431,6 +446,11 @@ export function NavBar({ supabase }: NavBarProps) {
                 Sign in with Steam
               </a>
             )
+          ) : supabase ? (
+            <div className="nav-auth-placeholder" aria-hidden="true">
+              <span className="nav-user">Steam Player Name</span>
+              <span className="nav-btn">Sign out</span>
+            </div>
           ) : null}
         </div>
       </nav>
