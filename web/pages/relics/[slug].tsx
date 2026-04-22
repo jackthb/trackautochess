@@ -1,4 +1,5 @@
 import type { GetStaticPaths, GetStaticProps } from "next";
+import Link from "next/link";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { EntityDetail, type RelatedEntity } from "@/components/EntityDetail";
 import { SeoHead } from "@/lib/seo";
@@ -75,9 +76,17 @@ export default function RelicDetailPage({
   const lede =
     cleanText(relic.description) ||
     `${relic.name} is a Dota Auto Chess relic.`;
-  const overview =
+  const baseOverview =
     cleanText(relic.description) ||
     `${relic.name} is a relic in Dota Auto Chess.`;
+  const overview = (
+    <>
+      {baseOverview}{" "}
+      Browse the full <Link href="/relics">relic library</Link> or check the
+      latest <Link href="/patch-notes">patch notes</Link> to see which relics
+      were added recently.
+    </>
+  );
 
   const relatedEntities: RelatedEntity[] = related.map((r) => ({
     slug: r.slug,

@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import Link from "next/link";
 import { EntityCard, type EntityCardVariant } from "@/components/EntityCard";
 import { EntityIcon } from "@/components/EntityIcon";
@@ -15,8 +16,9 @@ interface EntityDetailProps {
   name: string;
   iconSrc: string;
   lede?: string;
-  /** Body copy for the "Overview" section. */
-  overview?: string;
+  /** Body copy for the "Overview" section. ReactNode so callers can
+   *  embed contextual links with natural anchor text for SEO. */
+  overview?: ReactNode;
   /** Optional bullet list (items). */
   notes?: string[];
   /** Flavor lore. */

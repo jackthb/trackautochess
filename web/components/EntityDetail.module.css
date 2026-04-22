@@ -93,6 +93,16 @@
   color: var(--text-secondary);
   white-space: pre-line;
 }
+.bodyCopy a {
+  color: var(--accent-dim);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  text-decoration-thickness: 1px;
+  transition: color var(--t-base) var(--t-easing);
+}
+.bodyCopy a:hover {
+  color: var(--accent);
+}
 
 .notes {
   margin: 0;
