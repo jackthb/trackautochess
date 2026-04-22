@@ -14,6 +14,10 @@ export interface ParsedSteamInput {
   value: string;
 }
 
+interface SteamLookupOptions {
+  persist?: boolean;
+}
+
 interface SteamApiProfile extends SteamProfile {
   steamId: string | null;
 }
@@ -112,7 +116,8 @@ export async function fetchSteamProfileFromApi(
  */
 export async function fetchSteamProfile(
   steamId: string,
-  supabase?: SupabaseClient
+  supabase?: SupabaseClient,
+  options: SteamLookupOptions = {}
 ): Promise<SteamProfile> {
   let cachedProfile: SteamProfile | null = null;
 
@@ -140,7 +145,9 @@ export async function fetchSteamProfile(
     customUrl: apiProfile.customUrl ?? cachedProfile?.customUrl ?? null,
   };
 
-  await upsertSteamUser(steamId, supabase, profile);
+  if (options.persist !== false) {
+    await upsertSteamUser(steamId, supabase, profile);
+  }
   return profile;
 }
 
@@ -160,7 +167,8 @@ export function steamProfileUrl(
  */
 export async function resolveSteamId(
   slug: string,
-  supabase?: SupabaseClient
+  supabase?: SupabaseClient,
+  options: SteamLookupOptions = {}
 ): Promise<string | null> {
   const parsed = parseSteamInput(slug);
   if (!parsed) return null;
@@ -182,20 +190,23 @@ export async function resolveSteamId(
   );
   if (!profile.steamId) return null;
 
-  await upsertSteamUser(profile.steamId, supabase, {
-    name: profile.name,
-    customUrl: profile.customUrl ?? clean,
-  });
+  if (options.persist !== false) {
+    await upsertSteamUser(profile.steamId, supabase, {
+      name: profile.name,
+      customUrl: profile.customUrl ?? clean,
+    });
+  }
 
   return profile.steamId;
 }
 
 export async function resolveSteamInput(
   raw: string,
-  supabase?: SupabaseClient
+  supabase?: SupabaseClient,
+  options: SteamLookupOptions = {}
 ): Promise<string | null> {
   const parsed = parseSteamInput(raw);
   if (!parsed) return null;
   if (parsed.kind === "id") return parsed.value;
-  return resolveSteamId(parsed.value, supabase);
+  return resolveSteamId(parsed.value, supabase, options);
 }

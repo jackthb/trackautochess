@@ -370,7 +370,9 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
   // Accept numeric Steam IDs, vanity slugs, or pasted Steam community URLs.
   // Redirect anything non-canonical to the numeric player route once resolved.
-  const steamId = await resolveSteamInput(rawSteamId, supabase);
+  const steamId = await resolveSteamInput(rawSteamId, supabase, {
+    persist: false,
+  });
   if (!steamId) {
     return { notFound: true };
   }
@@ -383,14 +385,11 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     };
   }
 
-  const [gamesResult, steamProfile] = await Promise.all([
-    supabase
-      .from("games")
-      .select("*")
-      .eq("user_id", steamId)
-      .order("played_at", { ascending: false }),
-    fetchSteamProfile(steamId, supabase),
-  ]);
+  const gamesResult = await supabase
+    .from("games")
+    .select("*")
+    .eq("user_id", steamId)
+    .order("played_at", { ascending: false });
 
   // Fetch drodo profile and season history (using service key for cached data)
   const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -441,6 +440,12 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       }
     }
   }
+
+  const hasGames = Boolean(gamesResult.data?.length);
+  const shouldPersistSteamProfile = hasGames || drodo !== null || seasons.length > 0;
+  const steamProfile = await fetchSteamProfile(steamId, supabase, {
+    persist: shouldPersistSteamProfile,
+  });
 
   return {
     props: {

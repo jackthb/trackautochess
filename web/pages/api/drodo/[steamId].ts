@@ -1,8 +1,31 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { createClient } from "@supabase/supabase-js";
+import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { fetchSteamProfile, resolveSteamInput } from "../../../lib/steam";
 
 const DRODO_BASE = "http://autochess.ppbizon.com";
+const EMPTY_DRODO_PROFILE_ERROR =
+  "Steam account has no Dota Auto Chess MMR or stats.";
+
+interface SeasonSnapshotRow {
+  steam_id: string;
+  season: string;
+  mmr: number | null;
+  max_mmr: number | null;
+  games_played: number | null;
+  fetched_at: string;
+}
+
+interface DrodoProfileRow {
+  steam_id: string;
+  mmr: number | null;
+  max_mmr: number | null;
+  mmr_level: number | null;
+  season: string | null;
+  season_games: number | null;
+  chicken_count: number;
+  raw_data: Record<string, unknown>;
+  fetched_at: string;
+}
 
 function currentSeason(data: Record<string, unknown>): string | null {
   // Find the highest season number in the response keys (mmr_s42, mmr_s41, etc.)
@@ -24,9 +47,9 @@ function currentSeason(data: Record<string, unknown>): string | null {
 function extractAllSeasons(
   steamId: string,
   data: Record<string, unknown>
-): { steam_id: string; season: string; mmr: number | null; max_mmr: number | null; games_played: number | null; fetched_at: string }[] {
+): SeasonSnapshotRow[] {
   const now = new Date().toISOString();
-  const seasons: ReturnType<typeof extractAllSeasons> = [];
+  const seasons: SeasonSnapshotRow[] = [];
   for (const key of Object.keys(data)) {
     const m = key.match(/^mmr_s(\d+)$/);
     if (m) {
@@ -41,7 +64,82 @@ function extractAllSeasons(
       });
     }
   }
-  return seasons;
+  return seasons.sort(
+    (a, b) =>
+      Number(a.season.slice(1)) - Number(b.season.slice(1))
+  );
+}
+
+function buildDrodoProfile(
+  steamId: string,
+  drodoData: Record<string, unknown>
+): { profile: DrodoProfileRow; seasonRows: SeasonSnapshotRow[] } {
+  const season = currentSeason(drodoData);
+  const mmrKey = season ? `mmr_${season}` : null;
+  const maxMmrKey = season ? `max_mmr_${season}` : null;
+  const matchKey = season ? `match_${season}` : null;
+
+  return {
+    profile: {
+      steam_id: steamId,
+      mmr: mmrKey ? Number(drodoData[mmrKey]) || null : null,
+      max_mmr: maxMmrKey ? Number(drodoData[maxMmrKey]) || null : null,
+      mmr_level: Number(drodoData.mmr_level) || null,
+      season,
+      season_games: matchKey ? Number(drodoData[matchKey]) || null : null,
+      chicken_count: Number(drodoData.chicken_count) || 0,
+      raw_data: drodoData,
+      fetched_at: new Date().toISOString(),
+    },
+    seasonRows: extractAllSeasons(steamId, drodoData),
+  };
+}
+
+function hasDrodoStats(
+  profile: Pick<
+    DrodoProfileRow,
+    "mmr" | "max_mmr" | "season_games" | "chicken_count"
+  >,
+  seasonRows: Array<
+    Pick<SeasonSnapshotRow, "mmr" | "max_mmr" | "games_played">
+  >
+): boolean {
+  if (
+    profile.mmr != null ||
+    profile.max_mmr != null ||
+    profile.season_games != null ||
+    profile.chicken_count > 0
+  ) {
+    return true;
+  }
+
+  return seasonRows.some(
+    (row) =>
+      row.mmr != null ||
+      row.max_mmr != null ||
+      row.games_played != null
+  );
+}
+
+async function purgeDrodoCache(
+  steamId: string,
+  supabase: SupabaseClient
+): Promise<void> {
+  const { error: seasonsError } = await supabase
+    .from("player_seasons")
+    .delete()
+    .eq("steam_id", steamId);
+  if (seasonsError) {
+    console.error("Failed to delete stale player_seasons:", seasonsError.message);
+  }
+
+  const { error: profileError } = await supabase
+    .from("drodo_profiles")
+    .delete()
+    .eq("steam_id", steamId);
+  if (profileError) {
+    console.error("Failed to delete stale drodo profile:", profileError.message);
+  }
 }
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -55,12 +153,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     process.env.SUPABASE_SERVICE_ROLE_KEY!,
     { auth: { autoRefreshToken: false, persistSession: false } }
   );
-  const steamId = await resolveSteamInput(rawSteamId, supabase);
+  const steamId = await resolveSteamInput(rawSteamId, supabase, {
+    persist: false,
+  });
   if (!steamId) {
     return res.status(400).json({ error: "Invalid steam ID" });
   }
-
-  await fetchSteamProfile(steamId, supabase);
 
   // Check cache unless force refresh
   if (refresh !== "1") {
@@ -79,7 +177,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           .select("season, mmr, max_mmr, games_played")
           .eq("steam_id", steamId)
           .order("season", { ascending: true });
-        return res.status(200).json({ ...cached, seasons: seasons ?? [] });
+
+        if (hasDrodoStats(cached, seasons ?? [])) {
+          return res.status(200).json({ ...cached, seasons: seasons ?? [] });
+        }
+
+        await purgeDrodoCache(steamId, supabase);
       }
     }
   }
@@ -100,22 +203,14 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(502).json({ error: "Failed to reach Drodo API" });
   }
 
-  const season = currentSeason(drodoData);
-  const mmrKey = season ? `mmr_${season}` : null;
-  const maxMmrKey = season ? `max_mmr_${season}` : null;
-  const matchKey = season ? `match_${season}` : null;
+  const { profile, seasonRows } = buildDrodoProfile(steamId, drodoData);
 
-  const profile = {
-    steam_id: steamId,
-    mmr: mmrKey ? Number(drodoData[mmrKey]) || null : null,
-    max_mmr: maxMmrKey ? Number(drodoData[maxMmrKey]) || null : null,
-    mmr_level: Number(drodoData.mmr_level) || null,
-    season,
-    season_games: matchKey ? Number(drodoData[matchKey]) || null : null,
-    chicken_count: Number(drodoData.chicken_count) || 0,
-    raw_data: drodoData,
-    fetched_at: new Date().toISOString(),
-  };
+  if (!hasDrodoStats(profile, seasonRows)) {
+    await purgeDrodoCache(steamId, supabase);
+    return res.status(404).json({ error: EMPTY_DRODO_PROFILE_ERROR });
+  }
+
+  await fetchSteamProfile(steamId, supabase);
 
   const { error: upsertError } = await supabase
     .from("drodo_profiles")
@@ -126,7 +221,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   // Upsert all season snapshots
-  const seasonRows = extractAllSeasons(steamId, drodoData);
   if (seasonRows.length > 0) {
     const { error: seasonsError } = await supabase
       .from("player_seasons")

@@ -20,11 +20,23 @@ export function NavBar({ supabase }: NavBarProps) {
   const [ready, setReady] = useState(false);
   const [searchValue, setSearchValue] = useState("");
   const [searching, setSearching] = useState(false);
+  const [lookupLoading, setLookupLoading] = useState(false);
+  const [showLookupBar, setShowLookupBar] = useState(false);
+  const [lookupError, setLookupError] = useState<string | null>(null);
   const [results, setResults] = useState<SearchResult[]>([]);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [highlightedIndex, setHighlightedIndex] = useState(-1);
   const searchReqRef = useRef(0);
+  const lookupReqRef = useRef(0);
+  const lookupBarTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+
+  const clearLookupBarTimer = () => {
+    if (lookupBarTimerRef.current) {
+      clearTimeout(lookupBarTimerRef.current);
+      lookupBarTimerRef.current = null;
+    }
+  };
 
   useEffect(() => {
     if (!supabase) return;
@@ -102,12 +114,89 @@ export function NavBar({ supabase }: NavBarProps) {
     return () => document.removeEventListener("mousedown", handler);
   }, []);
 
-  const selectResult = (steamId: string) => {
-    router.push(`/players/${steamId}`);
+  useEffect(() => {
+    return () => {
+      clearLookupBarTimer();
+    };
+  }, []);
+
+  const navigateToPlayer = async (steamId: string) => {
     setSearchValue("");
     setResults([]);
     setDropdownOpen(false);
     setHighlightedIndex(-1);
+    setLookupError(null);
+    await router.push(`/players/${steamId}`);
+  };
+
+  const warmLookupAndNavigate = async (
+    lookupValue: string,
+    fallbackSteamId?: string
+  ) => {
+    const reqId = ++lookupReqRef.current;
+    clearLookupBarTimer();
+    setLookupError(null);
+    setLookupLoading(true);
+    setShowLookupBar(false);
+    setDropdownOpen(false);
+    setHighlightedIndex(-1);
+
+    lookupBarTimerRef.current = setTimeout(() => {
+      if (reqId === lookupReqRef.current) {
+        setShowLookupBar(true);
+      }
+    }, 160);
+
+    try {
+      const resp = await fetch(`/api/drodo/${encodeURIComponent(lookupValue)}`);
+      if (reqId !== lookupReqRef.current) return;
+
+      if (resp.ok) {
+        const data = await resp.json();
+        const resolvedSteamId =
+          data?.steam_id != null ? String(data.steam_id) : fallbackSteamId;
+        if (resolvedSteamId) {
+          await navigateToPlayer(resolvedSteamId);
+          return;
+        }
+      } else if (fallbackSteamId) {
+        await navigateToPlayer(fallbackSteamId);
+        return;
+      } else {
+        let errorMessage = "No Dota Auto Chess profile found for that Steam account.";
+        try {
+          const data = await resp.json();
+          if (typeof data?.error === "string" && data.error.trim()) {
+            errorMessage = data.error;
+          }
+        } catch {}
+        setLookupError(errorMessage);
+        return;
+      }
+
+      if (fallbackSteamId) {
+        await navigateToPlayer(fallbackSteamId);
+        return;
+      }
+      setLookupError("Unable to resolve that player.");
+    } catch {
+      if (reqId !== lookupReqRef.current) return;
+      if (fallbackSteamId) {
+        await navigateToPlayer(fallbackSteamId);
+        return;
+      }
+      setLookupError("Lookup failed. Try again.");
+    } finally {
+      if (reqId === lookupReqRef.current) {
+        clearLookupBarTimer();
+        setShowLookupBar(false);
+        setLookupLoading(false);
+      }
+    }
+  };
+
+  const selectResult = (steamId: string) => {
+    void warmLookupAndNavigate(steamId, steamId);
   };
 
   const handleSearch = (e: React.FormEvent) => {
@@ -120,16 +209,18 @@ export function NavBar({ supabase }: NavBarProps) {
       return;
     }
 
-    const parsed = parseSteamInput(val);
-    if (parsed) {
-      // /players/[steamId] resolves slugs against Steam's XML API on the server.
-      selectResult(parsed.value);
+    if (results.length > 0) {
+      selectResult(results[0].steam_id);
       return;
     }
 
-    if (results.length > 0) {
-      selectResult(results[0].steam_id);
+    const parsed = parseSteamInput(val);
+    if (parsed) {
+      void warmLookupAndNavigate(parsed.value);
+      return;
     }
+
+    setLookupError("Enter a Steam profile URL, vanity name, or Steam ID.");
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -231,17 +322,56 @@ export function NavBar({ supabase }: NavBarProps) {
           display: flex;
           width: 100%;
         }
+        .search-shell {
+          position: relative;
+          width: 100%;
+        }
         .search-dropdown {
           position: absolute;
-          top: 100%;
+          top: calc(100% + 10px);
           left: 0;
           right: 0;
-          margin-top: 4px;
           background: var(--bg-surface);
           border: 1px solid var(--border);
           border-radius: var(--r-3);
           max-height: 320px;
           overflow: hidden auto;
+          z-index: 20;
+        }
+        .search-progress {
+          position: absolute;
+          top: calc(100% + 3px);
+          left: 10px;
+          right: 10px;
+          height: 2px;
+          overflow: hidden;
+          pointer-events: none;
+        }
+        .search-progress-bar {
+          width: 34%;
+          height: 100%;
+          background: linear-gradient(
+            90deg,
+            transparent,
+            var(--accent-dim),
+            var(--accent),
+            transparent
+          );
+          animation: lookupBar 1s ease-in-out infinite;
+        }
+        .search-status {
+          position: absolute;
+          top: calc(100% + 10px);
+          left: 0;
+          right: 0;
+          padding: 8px 12px;
+          background: var(--bg-surface);
+          border: 1px solid var(--border);
+          border-radius: var(--r-3);
+          font-family: var(--font-mono);
+          font-size: 11px;
+          color: var(--text-muted);
+          letter-spacing: 0.4px;
           z-index: 20;
         }
         .search-result {
@@ -280,6 +410,12 @@ export function NavBar({ supabase }: NavBarProps) {
           padding: 7px 14px;
           letter-spacing: var(--tr-body);
           transition: border-color var(--t-base) var(--t-easing);
+        }
+        .search-input.loading {
+          border-color: var(--accent-dim);
+        }
+        .search-input.error {
+          border-color: var(--accent);
         }
         .search-input::placeholder {
           color: var(--text-muted);
@@ -345,6 +481,14 @@ export function NavBar({ supabase }: NavBarProps) {
         .nav-signin:hover {
           color: var(--text-primary);
         }
+        @keyframes lookupBar {
+          0% {
+            transform: translateX(-120%);
+          }
+          100% {
+            transform: translateX(320%);
+          }
+        }
       `}</style>
       <nav>
         <Link
@@ -367,45 +511,61 @@ export function NavBar({ supabase }: NavBarProps) {
           </Link>
         </div>
         <div className="nav-center" ref={containerRef}>
-          <form className="search-form" onSubmit={handleSearch}>
-            <input
-              className="search-input"
-              type="text"
-              placeholder="Look up your profile"
-              value={searchValue}
-              onChange={(e) => setSearchValue(e.target.value)}
-              onKeyDown={handleKeyDown}
-              onFocus={() => {
-                if (results.length > 0) setDropdownOpen(true);
-              }}
-              autoComplete="off"
-            />
-          </form>
-          {dropdownOpen && results.length > 0 && (
-            <div className="search-dropdown">
-              {results.map((r, i) => (
-                <div
-                  key={r.steam_id}
-                  className={
-                    "search-result" +
-                    (i === highlightedIndex ? " highlighted" : "")
-                  }
-                  onMouseEnter={() => setHighlightedIndex(i)}
-                  onMouseDown={(e) => {
-                    e.preventDefault();
-                    selectResult(r.steam_id);
-                  }}
-                >
-                  <span className="result-name">
-                    {r.name || r.custom_url || r.steam_id}
-                  </span>
-                  {r.custom_url && r.name && (
-                    <span className="result-meta">/{r.custom_url}</span>
-                  )}
-                </div>
-              ))}
-            </div>
-          )}
+          <div className="search-shell">
+            <form className="search-form" onSubmit={handleSearch}>
+              <input
+                className={`search-input${
+                  lookupLoading ? " loading" : ""
+                }${lookupError ? " error" : ""}`}
+                type="text"
+                placeholder="Look up your profile"
+                value={searchValue}
+                onChange={(e) => {
+                  setSearchValue(e.target.value);
+                  if (lookupError) setLookupError(null);
+                }}
+                onKeyDown={handleKeyDown}
+                onFocus={() => {
+                  if (results.length > 0) setDropdownOpen(true);
+                  if (lookupError) setLookupError(null);
+                }}
+                autoComplete="off"
+                aria-busy={lookupLoading}
+                aria-invalid={Boolean(lookupError)}
+              />
+            </form>
+            {showLookupBar && (
+              <div className="search-progress" aria-hidden="true">
+                <div className="search-progress-bar" />
+              </div>
+            )}
+            {lookupError && <div className="search-status">{lookupError}</div>}
+            {dropdownOpen && results.length > 0 && (
+              <div className="search-dropdown">
+                {results.map((r, i) => (
+                  <div
+                    key={r.steam_id}
+                    className={
+                      "search-result" +
+                      (i === highlightedIndex ? " highlighted" : "")
+                    }
+                    onMouseEnter={() => setHighlightedIndex(i)}
+                    onMouseDown={(e) => {
+                      e.preventDefault();
+                      selectResult(r.steam_id);
+                    }}
+                  >
+                    <span className="result-name">
+                      {r.name || r.custom_url || r.steam_id}
+                    </span>
+                    {r.custom_url && r.name && (
+                      <span className="result-meta">/{r.custom_url}</span>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
         <div className="nav-right">
           {ready ? (

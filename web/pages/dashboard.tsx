@@ -100,7 +100,9 @@ export default function Dashboard({ supabase }: DashboardProps) {
     setDrodoLoading(true);
     fetch(`/api/drodo/${steamId}${refresh ? "?refresh=1" : ""}`)
       .then((r) => (r.ok ? r.json() : null))
-      .then((data) => { if (data) setDrodo(data); })
+      .then((data) => {
+        setDrodo(data);
+      })
       .catch(() => {})
       .finally(() => setDrodoLoading(false));
   };

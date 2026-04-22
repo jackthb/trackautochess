@@ -1,5 +1,4 @@
 import type { GetStaticPaths, GetStaticProps } from "next";
-import Link from "next/link";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { EntityDetail, type RelatedEntity } from "@/components/EntityDetail";
 import { SeoHead } from "@/lib/seo";
@@ -87,10 +86,7 @@ export default function ItemDetailPage({
       {item.name} is a {TIER_LABEL[item.tier]} item in Dota Auto Chess.
       {cleanedDesc
         ? ` ${cleanedDesc}`
-        : " A fuller in-game description is not available in the current data export."}{" "}
-      Browse the full <Link href="/items">item library</Link> or check the
-      latest <Link href="/patch-notes">patch notes</Link> for recent item
-      changes.
+        : " A fuller in-game description is not available in the current data export."}
     </>
   );
 
