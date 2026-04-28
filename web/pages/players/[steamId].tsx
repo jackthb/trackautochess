@@ -466,6 +466,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   // Fetch drodo profile and season history (using service key for cached data)
   const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
   let drodo = null;
+  let staleDrodo = null;
   let seasons: SeasonSnapshot[] = [];
   if (url && serviceKey && !forceRefresh) {
     const adminClient = createClient(url, serviceKey, {
@@ -483,11 +484,15 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         .eq("steam_id", steamId)
         .order("season", { ascending: true }),
     ]);
-    if (
-      profileResult.data &&
-      isFreshDrodoCache((profileResult.data as { fetched_at?: string }).fetched_at)
-    ) {
-      drodo = profileResult.data;
+    if (profileResult.data) {
+      staleDrodo = profileResult.data;
+      if (
+        isFreshDrodoCache(
+          (profileResult.data as { fetched_at?: string }).fetched_at
+        )
+      ) {
+        drodo = profileResult.data;
+      }
     }
     if (seasonsResult.data) seasons = seasonsResult.data;
 
@@ -521,15 +526,15 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     }
   }
 
-  if (!drodo) {
+  if (!drodo && !staleDrodo) {
     try {
       const proto = context.req.headers["x-forwarded-proto"] ?? "http";
       const host = context.req.headers.host;
       if (host) {
         const base = `${proto}://${host}`;
-          const resp = await fetch(
-            `${base}/api/drodo/${steamId}${forceRefresh ? "?refresh=1" : ""}`
-          );
+        const resp = await fetch(
+          `${base}/api/drodo/${steamId}${forceRefresh ? "?refresh=1" : ""}`
+        );
         if (resp.ok) {
           const data = await resp.json();
           drodo = {
@@ -549,10 +554,12 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     }
   }
 
-  const hasGames = Boolean(gamesResult.data?.length);
-  if (!drodo && !hasGames) {
-    return { notFound: true };
+  // Keep rendering using stale cached Drodo stats if the refresh path fails.
+  if (!drodo && staleDrodo) {
+    drodo = staleDrodo;
   }
+
+  const hasGames = Boolean(gamesResult.data?.length);
 
   const shouldPersistSteamProfile = hasGames || drodo !== null || seasons.length > 0;
   const steamProfile = await fetchSteamProfile(steamId, supabase ?? undefined, {

@@ -120,6 +120,15 @@ export function ProfileSearch({
     lookupValue: string,
     fallbackSteamId?: string
   ) => {
+    // If we already have a canonical Steam ID from search results, navigate
+    // immediately and warm Drodo in the background so the destination page
+    // can render without waiting on a potentially flaky upstream API call.
+    if (fallbackSteamId) {
+      await navigateToPlayer(fallbackSteamId);
+      void fetch(`/api/drodo/${encodeURIComponent(lookupValue)}`).catch(() => {});
+      return;
+    }
+
     const reqId = ++lookupReqRef.current;
     clearLookupBarTimer();
     setLookupError(null);
