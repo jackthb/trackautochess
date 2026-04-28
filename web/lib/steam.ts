@@ -7,6 +7,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 export interface SteamProfile {
   name: string | null;
   customUrl: string | null;
+  avatarUrl?: string | null;
 }
 
 export interface ParsedSteamInput {
@@ -22,30 +23,89 @@ interface SteamApiProfile extends SteamProfile {
   steamId: string | null;
 }
 
+interface SteamVanityResponse {
+  response?: {
+    success?: number;
+    steamid?: string;
+  };
+}
+
 function parseSteamProfileXml(xml: string): SteamApiProfile {
   const steamIdMatch = xml.match(/<steamID64>(\d+)<\/steamID64>/);
   const nameMatch = xml.match(/<steamID><!\[CDATA\[(.+?)\]\]><\/steamID>/);
   const customUrlMatch = xml.match(
     /<customURL><!\[CDATA\[(.+?)\]\]><\/customURL>/
   );
+  const avatarFullMatch = xml.match(
+    /<avatarFull><!\[CDATA\[(.+?)\]\]><\/avatarFull>/
+  );
+  const avatarMediumMatch = xml.match(
+    /<avatarMedium><!\[CDATA\[(.+?)\]\]><\/avatarMedium>/
+  );
 
   return {
     steamId: steamIdMatch ? steamIdMatch[1] : null,
     name: nameMatch ? nameMatch[1] : null,
     customUrl: customUrlMatch ? customUrlMatch[1] : null,
+    avatarUrl: avatarFullMatch?.[1] ?? avatarMediumMatch?.[1] ?? null,
   };
 }
 
 async function fetchSteamProfileXml(url: string): Promise<SteamApiProfile> {
   try {
-    const resp = await fetch(url);
+    const resp = await fetch(url, {
+      headers: {
+        Accept: "application/xml,text/xml,text/html;q=0.9,*/*;q=0.8",
+        "User-Agent": "DAC Tools profile resolver",
+      },
+      redirect: "follow",
+    });
     if (!resp.ok) {
       return { steamId: null, name: null, customUrl: null };
     }
     const xml = await resp.text();
-    return parseSteamProfileXml(xml);
+    const profile = parseSteamProfileXml(xml);
+    if (profile.steamId) return profile;
+
+    const canonicalProfile = resp.url.match(
+      /steamcommunity\.com\/profiles\/(\d+)/i
+    );
+    if (canonicalProfile) {
+      return { ...profile, steamId: canonicalProfile[1] };
+    }
+
+    return profile;
   } catch {
     return { steamId: null, name: null, customUrl: null };
+  }
+}
+
+async function resolveSteamVanityWithApi(slug: string): Promise<string | null> {
+  const key = process.env.STEAM_WEB_API_KEY || process.env.STEAM_API_KEY;
+  if (!key) return null;
+
+  try {
+    const params = new URLSearchParams({
+      key,
+      vanityurl: slug,
+      url_type: "1",
+    });
+    const resp = await fetch(
+      `https://api.steampowered.com/ISteamUser/ResolveVanityURL/v1/?${params}`,
+      {
+        headers: {
+          Accept: "application/json",
+          "User-Agent": "DAC Tools profile resolver",
+        },
+      }
+    );
+    if (!resp.ok) return null;
+    const data = (await resp.json()) as SteamVanityResponse;
+    return data.response?.success === 1 && data.response.steamid
+      ? data.response.steamid
+      : null;
+  } catch {
+    return null;
   }
 }
 
@@ -107,7 +167,11 @@ export async function fetchSteamProfileFromApi(
   const profile = await fetchSteamProfileXml(
     `https://steamcommunity.com/profiles/${steamId}/?xml=1`
   );
-  return { name: profile.name, customUrl: profile.customUrl };
+  return {
+    name: profile.name,
+    customUrl: profile.customUrl,
+    avatarUrl: profile.avatarUrl,
+  };
 }
 
 /**
@@ -143,6 +207,7 @@ export async function fetchSteamProfile(
   const profile = {
     name: apiProfile.name ?? cachedProfile?.name ?? null,
     customUrl: apiProfile.customUrl ?? cachedProfile?.customUrl ?? null,
+    avatarUrl: apiProfile.avatarUrl ?? cachedProfile?.avatarUrl ?? null,
   };
 
   if (options.persist !== false) {
@@ -180,9 +245,21 @@ export async function resolveSteamId(
     const { data } = await supabase
       .from("users")
       .select("steam_id")
-      .ilike("custom_url", clean)
+      .or(`custom_url.ilike.${clean},name.ilike.${clean}`)
       .maybeSingle();
     if (data?.steam_id) return String(data.steam_id);
+  }
+
+  const apiSteamId = await resolveSteamVanityWithApi(clean);
+  if (apiSteamId) {
+    if (options.persist !== false) {
+      const apiProfile = await fetchSteamProfileFromApi(apiSteamId);
+      await upsertSteamUser(apiSteamId, supabase, {
+        name: apiProfile.name,
+        customUrl: apiProfile.customUrl ?? clean,
+      });
+    }
+    return apiSteamId;
   }
 
   const profile = await fetchSteamProfileXml(

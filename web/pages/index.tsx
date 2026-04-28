@@ -1,17 +1,12 @@
-import type { SupabaseClient } from "@supabase/supabase-js";
+import { ProfileSearch } from "@/components/ProfileSearch";
 import { SeoHead } from "@/lib/seo";
 import { absoluteUrl, SITE_DESCRIPTION, SITE_NAME } from "@/lib/site";
 
-interface HomeProps {
-  supabase: SupabaseClient | null;
-}
-
-export default function Home({ supabase }: HomeProps) {
-  const title = `${SITE_NAME} | Dota Auto Chess items, relics, patch notes, and match tracker`;
+export default function Home() {
+  const title = `${SITE_NAME} | Dota Auto Chess player lookup`;
   const description =
-    "Browse Dota Auto Chess items and relics, follow the latest patch notes, and track matches with DAC Tools.";
+    "Look up Dota Auto Chess player MMR, season history, and tracked match stats by Steam vanity URL or Steam ID.";
   const siteUrl = absoluteUrl("/");
-  const itemSearchUrl = absoluteUrl("/items");
 
   const structuredData = {
     "@context": "https://schema.org",
@@ -19,11 +14,11 @@ export default function Home({ supabase }: HomeProps) {
     name: SITE_NAME,
     description: SITE_DESCRIPTION,
     ...(siteUrl ? { url: siteUrl } : {}),
-    ...(itemSearchUrl
+    ...(siteUrl
       ? {
           potentialAction: {
             "@type": "SearchAction",
-            target: `${itemSearchUrl}?q={search_term_string}`,
+            target: `${siteUrl}players/{search_term_string}`,
             "query-input": "required name=search_term_string",
           },
         }
@@ -48,16 +43,13 @@ export default function Home({ supabase }: HomeProps) {
           display: flex;
           flex-direction: column;
         }
-
         .hero {
           flex: 1;
-          display: flex;
-          align-items: center;
-          justify-content: center;
+          display: grid;
+          place-items: center;
           position: relative;
+          padding: 48px 24px;
         }
-
-        /* Grid — faint chessboard echo */
         .grid {
           position: absolute;
           inset: 0;
@@ -79,117 +71,19 @@ export default function Home({ supabase }: HomeProps) {
           );
           pointer-events: none;
         }
-
-        /* Warm glow behind content */
         .glow {
           position: absolute;
-          width: 480px;
-          height: 480px;
+          width: 520px;
+          height: 520px;
           border-radius: 50%;
           background: radial-gradient(
             circle,
-            rgba(224, 64, 42, 0.04) 0%,
+            rgba(224, 64, 42, 0.05) 0%,
             transparent 70%
           );
           pointer-events: none;
-          filter: blur(40px);
+          filter: blur(42px);
         }
-
-        /* Content stack */
-        .content {
-          position: relative;
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          gap: 0;
-        }
-
-        .title {
-          font-family: "Cinzel", serif;
-          font-size: clamp(42px, 7vw, 72px);
-          font-weight: 700;
-          letter-spacing: 10px;
-          text-transform: uppercase;
-          line-height: 1;
-          opacity: 0;
-          animation: arrive 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.1s forwards;
-        }
-        .title-dac {
-          color: var(--accent);
-        }
-        .title-tools {
-          color: var(--text-secondary);
-          margin-left: 0.15em;
-        }
-
-        /* Thin rule */
-        .rule {
-          width: 48px;
-          height: 1px;
-          background: var(--accent-dim);
-          margin: 28px 0 24px;
-          opacity: 0;
-          animation: arrive 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.35s forwards;
-        }
-
-        .tagline {
-          font-size: 14px;
-          color: var(--text-muted);
-          letter-spacing: 1.5px;
-          text-align: center;
-          max-width: 340px;
-          line-height: 1.7;
-          opacity: 0;
-          animation: arrive 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.5s forwards;
-        }
-
-        /* Actions */
-        .actions {
-          display: flex;
-          gap: 20px;
-          margin-top: 44px;
-          align-items: center;
-          opacity: 0;
-          animation: arrive 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.7s forwards;
-        }
-
-        .btn-download {
-          font-family: "Cinzel", serif;
-          font-size: 13px;
-          font-weight: 600;
-          letter-spacing: 2.5px;
-          text-transform: uppercase;
-          color: var(--text-muted);
-          background: none;
-          border: 1px solid var(--border);
-          padding: 14px 28px;
-          cursor: default;
-          position: relative;
-          overflow: hidden;
-        }
-
-        .btn-download::after {
-          content: "coming soon";
-          position: absolute;
-          inset: 0;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          font-family: var(--font-mono);
-          font-size: 11px;
-          font-weight: 400;
-          letter-spacing: 2px;
-          text-transform: uppercase;
-          color: var(--text-muted);
-          background: var(--bg-surface);
-          opacity: 0;
-          transition: opacity 0.25s;
-        }
-        .btn-download:hover::after {
-          opacity: 1;
-        }
-
-        /* Corner marks — subtle geometric detail */
         .corner {
           position: absolute;
           width: 24px;
@@ -224,7 +118,104 @@ export default function Home({ supabase }: HomeProps) {
           border-bottom-width: 1px;
           border-right-width: 1px;
         }
-
+        .content {
+          position: relative;
+          width: min(100%, 720px);
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          text-align: center;
+        }
+        .title {
+          font-family: "Cinzel", serif;
+          font-size: clamp(42px, 7vw, 72px);
+          font-weight: 700;
+          letter-spacing: 10px;
+          text-transform: uppercase;
+          line-height: 1;
+          opacity: 0;
+          animation: arrive 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.1s forwards;
+        }
+        .title-dac {
+          color: var(--accent);
+        }
+        .title-tools {
+          color: var(--text-secondary);
+          margin-left: 0.15em;
+        }
+        .rule {
+          width: 48px;
+          height: 1px;
+          background: var(--accent-dim);
+          margin: 28px 0 24px;
+          opacity: 0;
+          animation: arrive 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.35s forwards;
+        }
+        .tagline {
+          font-size: 14px;
+          color: var(--text-muted);
+          letter-spacing: 1.5px;
+          max-width: 440px;
+          line-height: 1.7;
+          opacity: 0;
+          animation: arrive 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.5s forwards;
+        }
+        .search-wrap {
+          position: relative;
+          z-index: 5;
+          width: min(100%, 560px);
+          margin-top: 38px;
+          opacity: 0;
+          animation: arrive 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.65s forwards;
+        }
+        .preview {
+          position: relative;
+          z-index: 1;
+          width: min(100%, 560px);
+          margin-top: 30px;
+          border: 1px solid var(--border);
+          background: rgba(13, 15, 18, 0.74);
+          text-align: left;
+          opacity: 0;
+          animation: arrive 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.8s forwards;
+        }
+        .preview-head,
+        .preview-row {
+          display: grid;
+          grid-template-columns: 1fr auto;
+          gap: 18px;
+          align-items: center;
+        }
+        .preview-head {
+          padding: 16px 18px;
+          border-bottom: 1px solid var(--border-subtle);
+        }
+        .preview-title {
+          font-size: 12px;
+          letter-spacing: 1.6px;
+          text-transform: uppercase;
+          color: var(--text-muted);
+        }
+        .preview-season {
+          font-size: 12px;
+          color: var(--gold);
+        }
+        .preview-row {
+          padding: 14px 18px;
+          border-bottom: 1px solid var(--border-subtle);
+        }
+        .preview-row:last-child {
+          border-bottom: none;
+        }
+        .preview-label {
+          color: var(--text-secondary);
+          font-size: 13px;
+        }
+        .preview-value {
+          color: var(--text-primary);
+          font-size: 13px;
+          font-weight: 700;
+        }
         @keyframes arrive {
           from {
             opacity: 0;
@@ -233,6 +224,19 @@ export default function Home({ supabase }: HomeProps) {
           to {
             opacity: 1;
             transform: translateY(0);
+          }
+        }
+        @media (max-width: 620px) {
+          .hero {
+            padding: 42px 18px;
+          }
+          .title {
+            letter-spacing: 6px;
+          }
+          .preview-head,
+          .preview-row {
+            grid-template-columns: 1fr;
+            gap: 6px;
           }
         }
       `}</style>
@@ -247,7 +251,7 @@ export default function Home({ supabase }: HomeProps) {
           <div className="corner corner-bl" />
           <div className="corner corner-br" />
 
-          <div className="content">
+          <main className="content">
             <h1 className="title">
               <span className="title-dac">DAC</span>
               <span className="title-tools">Tools</span>
@@ -255,14 +259,30 @@ export default function Home({ supabase }: HomeProps) {
 
             <div className="rule" />
 
-            <p className="tagline">Match tracker for Dota Auto Chess</p>
+            <p className="tagline">
+              Search any Steam profile to surface Auto Chess MMR, rank, season
+              history, and tracked match stats.
+            </p>
 
-            <div className="actions">
-              <button className="btn-download" disabled>
-                Download
-              </button>
+            <div className="search-wrap">
+              <ProfileSearch autoFocus />
             </div>
-          </div>
+
+            <div className="preview" aria-hidden="true">
+              <div className="preview-head">
+                <div className="preview-title">Player Snapshot</div>
+                <div className="preview-season">Current season</div>
+              </div>
+              <div className="preview-row">
+                <span className="preview-label">Live MMR and rank bracket</span>
+                <span className="preview-value">Queen 3380+</span>
+              </div>
+              <div className="preview-row">
+                <span className="preview-label">Season history</span>
+                <span className="preview-value">MMR peaks and games</span>
+              </div>
+            </div>
+          </main>
         </div>
       </div>
     </>

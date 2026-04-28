@@ -8,6 +8,8 @@ import {
   parseSynergies,
   parseRelics,
   parseWL,
+  RANK_TIERS,
+  NUMBERED_RANK_TIERS,
 } from "@dac/shared/game-utils";
 import { GameRowDisplay } from "@dac/shared/GameRowDisplay";
 
@@ -267,8 +269,6 @@ function SimpleTagPicker({
   );
 }
 
-const RANK_TIERS = ["Pawn", "Knight", "Bishop", "Rook", "King", "Queen"];
-
 export function GameRow({
   game,
   unitCosts,
@@ -452,7 +452,7 @@ export function GameRow({
                       </option>
                     ))}
                   </select>
-                  {editRankTier && editRankTier !== "Queen" && (
+                  {NUMBERED_RANK_TIERS.includes(editRankTier as typeof NUMBERED_RANK_TIERS[number]) && (
                     <select
                       className="edit-field"
                       value={editRankNum}

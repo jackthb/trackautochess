@@ -1,13 +1,6 @@
 import { useMemo } from "react";
 import type { Game, DrodoProfile } from "../types";
-
-const TIER_NAMES = ["Pawn", "Knight", "Bishop", "Rook", "King"];
-function mmrLevelToTier(level: number | null): string {
-  if (level == null) return "";
-  const tierIdx = Math.floor(level / 9);
-  if (tierIdx >= TIER_NAMES.length) return "Queen";
-  return `${TIER_NAMES[tierIdx]} ${(level % 9) + 1}`;
-}
+import { mmrToRank } from "../lib/game-utils";
 
 interface StatsBarProps {
   games: Game[];
@@ -50,9 +43,7 @@ export function StatsBar({ games, drodo }: StatsBarProps) {
       {drodo && drodo.mmr != null && (
         <div className="stat-cell">
           <div className="stat-value">{drodo.mmr}</div>
-          <div className="stat-label">
-            {drodo.mmr_level != null ? mmrLevelToTier(drodo.mmr_level) : "MMR"}
-          </div>
+          <div className="stat-label">{mmrToRank(drodo.mmr) || "MMR"}</div>
         </div>
       )}
       {drodo && drodo.max_mmr != null && (

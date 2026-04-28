@@ -1,14 +1,7 @@
 import Link from "next/link";
 import { useRouter } from "next/router";
-import { useState, useEffect, useRef } from "react";
+import { useEffect, useState } from "react";
 import type { SupabaseClient, User } from "@supabase/supabase-js";
-import { parseSteamInput } from "../lib/steam";
-
-interface SearchResult {
-  steam_id: string;
-  name: string | null;
-  custom_url: string | null;
-}
 
 interface NavBarProps {
   supabase?: SupabaseClient | null;
@@ -18,25 +11,6 @@ export function NavBar({ supabase }: NavBarProps) {
   const router = useRouter();
   const [user, setUser] = useState<User | null>(null);
   const [ready, setReady] = useState(false);
-  const [searchValue, setSearchValue] = useState("");
-  const [searching, setSearching] = useState(false);
-  const [lookupLoading, setLookupLoading] = useState(false);
-  const [showLookupBar, setShowLookupBar] = useState(false);
-  const [lookupError, setLookupError] = useState<string | null>(null);
-  const [results, setResults] = useState<SearchResult[]>([]);
-  const [dropdownOpen, setDropdownOpen] = useState(false);
-  const [highlightedIndex, setHighlightedIndex] = useState(-1);
-  const searchReqRef = useRef(0);
-  const lookupReqRef = useRef(0);
-  const lookupBarTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
-
-  const clearLookupBarTimer = () => {
-    if (lookupBarTimerRef.current) {
-      clearTimeout(lookupBarTimerRef.current);
-      lookupBarTimerRef.current = null;
-    }
-  };
 
   useEffect(() => {
     if (!supabase) return;
@@ -51,194 +25,6 @@ export function NavBar({ supabase }: NavBarProps) {
     });
     return () => subscription.unsubscribe();
   }, [supabase]);
-
-  // Debounced lookup: queries as the user types, caps at 8 matches.
-  useEffect(() => {
-    const val = searchValue.trim();
-    // Skip text lookup for numeric IDs and full Steam URLs — those are handled
-    // on submit.
-    const looksLikeUrl = /steamcommunity\.com\//i.test(val);
-    if (!val || /^\d+$/.test(val) || looksLikeUrl || !supabase) {
-      setResults([]);
-      setDropdownOpen(false);
-      setHighlightedIndex(-1);
-      setSearching(false);
-      return;
-    }
-
-    // PostgREST .or() uses commas/parens as separators; strip conflicting chars.
-    const safe = val.replace(/[,()%*]/g, "");
-    if (!safe) return;
-
-    const reqId = ++searchReqRef.current;
-    setSearching(true);
-    const timeout = setTimeout(async () => {
-      const { data } = await supabase
-        .from("users")
-        .select("steam_id, name, custom_url")
-        .or(`name.ilike.*${safe}*,custom_url.ilike.*${safe}*`)
-        .limit(8);
-
-      if (reqId !== searchReqRef.current) return; // stale response
-
-      const rows = (data ?? []) as SearchResult[];
-      const lower = val.toLowerCase();
-      rows.sort((a, b) => {
-        const aExact =
-          a.custom_url === val || a.name?.toLowerCase() === lower ? 0 : 1;
-        const bExact =
-          b.custom_url === val || b.name?.toLowerCase() === lower ? 0 : 1;
-        return aExact - bExact;
-      });
-
-      setResults(rows);
-      setDropdownOpen(rows.length > 0);
-      setHighlightedIndex(rows.length > 0 ? 0 : -1);
-      setSearching(false);
-    }, 200);
-
-    return () => clearTimeout(timeout);
-  }, [searchValue, supabase]);
-
-  // Click outside closes the dropdown.
-  useEffect(() => {
-    const handler = (e: MouseEvent) => {
-      if (
-        containerRef.current &&
-        !containerRef.current.contains(e.target as Node)
-      ) {
-        setDropdownOpen(false);
-      }
-    };
-    document.addEventListener("mousedown", handler);
-    return () => document.removeEventListener("mousedown", handler);
-  }, []);
-
-  useEffect(() => {
-    return () => {
-      clearLookupBarTimer();
-    };
-  }, []);
-
-  const navigateToPlayer = async (steamId: string) => {
-    setSearchValue("");
-    setResults([]);
-    setDropdownOpen(false);
-    setHighlightedIndex(-1);
-    setLookupError(null);
-    await router.push(`/players/${steamId}`);
-  };
-
-  const warmLookupAndNavigate = async (
-    lookupValue: string,
-    fallbackSteamId?: string
-  ) => {
-    const reqId = ++lookupReqRef.current;
-    clearLookupBarTimer();
-    setLookupError(null);
-    setLookupLoading(true);
-    setShowLookupBar(false);
-    setDropdownOpen(false);
-    setHighlightedIndex(-1);
-
-    lookupBarTimerRef.current = setTimeout(() => {
-      if (reqId === lookupReqRef.current) {
-        setShowLookupBar(true);
-      }
-    }, 160);
-
-    try {
-      const resp = await fetch(`/api/drodo/${encodeURIComponent(lookupValue)}`);
-      if (reqId !== lookupReqRef.current) return;
-
-      if (resp.ok) {
-        const data = await resp.json();
-        const resolvedSteamId =
-          data?.steam_id != null ? String(data.steam_id) : fallbackSteamId;
-        if (resolvedSteamId) {
-          await navigateToPlayer(resolvedSteamId);
-          return;
-        }
-      } else if (fallbackSteamId) {
-        await navigateToPlayer(fallbackSteamId);
-        return;
-      } else {
-        let errorMessage = "No Dota Auto Chess profile found for that Steam account.";
-        try {
-          const data = await resp.json();
-          if (typeof data?.error === "string" && data.error.trim()) {
-            errorMessage = data.error;
-          }
-        } catch {}
-        setLookupError(errorMessage);
-        return;
-      }
-
-      if (fallbackSteamId) {
-        await navigateToPlayer(fallbackSteamId);
-        return;
-      }
-      setLookupError("Unable to resolve that player.");
-    } catch {
-      if (reqId !== lookupReqRef.current) return;
-      if (fallbackSteamId) {
-        await navigateToPlayer(fallbackSteamId);
-        return;
-      }
-      setLookupError("Lookup failed. Try again.");
-    } finally {
-      if (reqId === lookupReqRef.current) {
-        clearLookupBarTimer();
-        setShowLookupBar(false);
-        setLookupLoading(false);
-      }
-    }
-  };
-
-  const selectResult = (steamId: string) => {
-    void warmLookupAndNavigate(steamId, steamId);
-  };
-
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    const val = searchValue.trim();
-    if (!val) return;
-
-    if (dropdownOpen && highlightedIndex >= 0 && results[highlightedIndex]) {
-      selectResult(results[highlightedIndex].steam_id);
-      return;
-    }
-
-    if (results.length > 0) {
-      selectResult(results[0].steam_id);
-      return;
-    }
-
-    const parsed = parseSteamInput(val);
-    if (parsed) {
-      void warmLookupAndNavigate(parsed.value);
-      return;
-    }
-
-    setLookupError("Enter a Steam profile URL, vanity name, or Steam ID.");
-  };
-
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Escape") {
-      setDropdownOpen(false);
-      return;
-    }
-    if (!dropdownOpen || results.length === 0) return;
-    if (e.key === "ArrowDown") {
-      e.preventDefault();
-      setHighlightedIndex((i) => (i + 1) % results.length);
-    } else if (e.key === "ArrowUp") {
-      e.preventDefault();
-      setHighlightedIndex(
-        (i) => (i - 1 + results.length) % results.length
-      );
-    }
-  };
 
   const handleLogout = async () => {
     if (!supabase) return;
@@ -268,6 +54,11 @@ export function NavBar({ supabase }: NavBarProps) {
           top: 0;
           z-index: 10;
         }
+        .nav-left {
+          display: flex;
+          align-items: center;
+          min-width: 0;
+        }
         .nav-logo {
           font-family: "Cinzel", serif;
           font-size: 18px;
@@ -281,9 +72,6 @@ export function NavBar({ supabase }: NavBarProps) {
           text-decoration: none;
           flex-shrink: 0;
           line-height: 1;
-        }
-        .nav-logo b {
-          color: var(--accent-dim);
         }
         .nav-logo img {
           width: 28px;
@@ -309,128 +97,13 @@ export function NavBar({ supabase }: NavBarProps) {
         .nav-link:hover {
           color: var(--text-primary);
         }
-        .nav-center {
-          flex: 1;
-          display: flex;
-          flex-direction: column;
-          justify-content: center;
-          max-width: 360px;
-          margin: 0 32px;
-          position: relative;
-        }
-        .search-form {
-          display: flex;
-          width: 100%;
-        }
-        .search-shell {
-          position: relative;
-          width: 100%;
-        }
-        .search-dropdown {
-          position: absolute;
-          top: calc(100% + 10px);
-          left: 0;
-          right: 0;
-          background: var(--bg-surface);
-          border: 1px solid var(--border);
-          border-radius: var(--r-3);
-          max-height: 320px;
-          overflow: hidden auto;
-          z-index: 20;
-        }
-        .search-progress {
-          position: absolute;
-          top: calc(100% + 3px);
-          left: 10px;
-          right: 10px;
-          height: 2px;
-          overflow: hidden;
-          pointer-events: none;
-        }
-        .search-progress-bar {
-          width: 34%;
-          height: 100%;
-          background: linear-gradient(
-            90deg,
-            transparent,
-            var(--accent-dim),
-            var(--accent),
-            transparent
-          );
-          animation: lookupBar 1s ease-in-out infinite;
-        }
-        .search-status {
-          position: absolute;
-          top: calc(100% + 10px);
-          left: 0;
-          right: 0;
-          padding: 8px 12px;
-          background: var(--bg-surface);
-          border: 1px solid var(--border);
-          border-radius: var(--r-3);
-          font-family: var(--font-mono);
-          font-size: 11px;
-          color: var(--text-muted);
-          letter-spacing: 0.4px;
-          z-index: 20;
-        }
-        .search-result {
-          display: flex;
-          align-items: baseline;
-          gap: 8px;
-          padding: 8px 14px;
-          font-family: var(--font-mono);
-          font-size: 13px;
-          color: var(--text-primary);
-          cursor: pointer;
-          border-bottom: 1px solid var(--border-subtle);
-        }
-        .search-result:last-child {
-          border-bottom: none;
-        }
-        .search-result.highlighted {
-          background: var(--bg-elevated, rgba(255, 255, 255, 0.04));
-        }
-        .result-name {
-          color: var(--text-primary);
-        }
-        .result-meta {
-          font-size: 11px;
-          color: var(--text-muted);
-          letter-spacing: 0.5px;
-        }
-        .search-input {
-          width: 100%;
-          font-family: var(--font-mono);
-          font-size: var(--fs-13);
-          color: var(--text-primary);
-          background: var(--bg-surface);
-          border: 1px solid var(--border);
-          border-radius: var(--r-3);
-          padding: 7px 14px;
-          letter-spacing: var(--tr-body);
-          transition: border-color var(--t-base) var(--t-easing);
-        }
-        .search-input.loading {
-          border-color: var(--accent-dim);
-        }
-        .search-input.error {
-          border-color: var(--accent);
-        }
-        .search-input::placeholder {
-          color: var(--text-muted);
-        }
-        .search-input:focus {
-          outline: none;
-          border-color: var(--accent-dim);
-        }
         .nav-right {
           display: flex;
           align-items: center;
           justify-content: flex-end;
           gap: 20px;
           flex-shrink: 0;
-          min-width: 272px;
+          min-width: 220px;
         }
         .nav-user {
           display: block;
@@ -481,90 +154,40 @@ export function NavBar({ supabase }: NavBarProps) {
         .nav-signin:hover {
           color: var(--text-primary);
         }
-        @keyframes lookupBar {
-          0% {
-            transform: translateX(-120%);
+        @media (max-width: 760px) {
+          nav {
+            padding: 0 18px;
           }
-          100% {
-            transform: translateX(320%);
+          .nav-links {
+            gap: 14px;
+            margin-left: 18px;
+          }
+          .nav-right {
+            min-width: 0;
+            gap: 12px;
+          }
+          .nav-link,
+          .nav-signin,
+          .nav-btn {
+            font-size: 11px;
           }
         }
       `}</style>
       <nav>
-        <Link
-          href="/"
-          className="nav-logo"
-          aria-label="DAC Tools home"
-          style={{ display: "flex", alignItems: "center" }}
-        >
-          <img src="/logo.svg" alt="DAC Tools" />
-        </Link>
-        <div className="nav-links">
-          <Link href="/items" className="nav-link">
-            Items
+        <div className="nav-left">
+          <Link href="/" className="nav-logo" aria-label="DAC Tools home">
+            <img src="/logo.svg" alt="DAC Tools" />
           </Link>
-          <Link href="/relics" className="nav-link">
-            Relics
-          </Link>
-          <Link href="/patch-notes" className="nav-link">
-            Patch Notes
-          </Link>
-        </div>
-        <div className="nav-center" ref={containerRef}>
-          <div className="search-shell">
-            <form className="search-form" onSubmit={handleSearch}>
-              <input
-                className={`search-input${
-                  lookupLoading ? " loading" : ""
-                }${lookupError ? " error" : ""}`}
-                type="text"
-                placeholder="Look up your profile"
-                value={searchValue}
-                onChange={(e) => {
-                  setSearchValue(e.target.value);
-                  if (lookupError) setLookupError(null);
-                }}
-                onKeyDown={handleKeyDown}
-                onFocus={() => {
-                  if (results.length > 0) setDropdownOpen(true);
-                  if (lookupError) setLookupError(null);
-                }}
-                autoComplete="off"
-                aria-busy={lookupLoading}
-                aria-invalid={Boolean(lookupError)}
-              />
-            </form>
-            {showLookupBar && (
-              <div className="search-progress" aria-hidden="true">
-                <div className="search-progress-bar" />
-              </div>
-            )}
-            {lookupError && <div className="search-status">{lookupError}</div>}
-            {dropdownOpen && results.length > 0 && (
-              <div className="search-dropdown">
-                {results.map((r, i) => (
-                  <div
-                    key={r.steam_id}
-                    className={
-                      "search-result" +
-                      (i === highlightedIndex ? " highlighted" : "")
-                    }
-                    onMouseEnter={() => setHighlightedIndex(i)}
-                    onMouseDown={(e) => {
-                      e.preventDefault();
-                      selectResult(r.steam_id);
-                    }}
-                  >
-                    <span className="result-name">
-                      {r.name || r.custom_url || r.steam_id}
-                    </span>
-                    {r.custom_url && r.name && (
-                      <span className="result-meta">/{r.custom_url}</span>
-                    )}
-                  </div>
-                ))}
-              </div>
-            )}
+          <div className="nav-links">
+            <Link href="/items" className="nav-link">
+              Items
+            </Link>
+            <Link href="/relics" className="nav-link">
+              Relics
+            </Link>
+            <Link href="/patch-notes" className="nav-link">
+              Patch Notes
+            </Link>
           </div>
         </div>
         <div className="nav-right">

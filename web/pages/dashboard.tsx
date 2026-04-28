@@ -3,7 +3,7 @@ import { useRouter } from "next/router";
 import type { SupabaseClient, User } from "@supabase/supabase-js";
 import unitsData from "@data/units.json";
 import unitsFullData from "@data/units_full.json";
-import { parseWL } from "@dac/shared/game-utils";
+import { parseWL, mmrToRank } from "@dac/shared/game-utils";
 import { GameRow } from "../components/GameRow";
 import type { Game, UnitFullInfo, SynergyInfo, RelicInfo } from "@dac/shared/types";
 import synergiesData from "@data/synergies.json";
@@ -61,14 +61,6 @@ const ALL_RELIC_NAMES = Object.values((relicsData as any).relics)
   .map((r: any) => r.name)
   .filter(Boolean)
   .sort();
-
-const TIER_NAMES = ["Pawn", "Knight", "Bishop", "Rook", "King"];
-function mmrLevelToTier(level: number | null): string {
-  if (level == null) return "";
-  const tierIdx = Math.floor(level / 9);
-  if (tierIdx >= TIER_NAMES.length) return "Queen";
-  return `${TIER_NAMES[tierIdx]} ${(level % 9) + 1}`;
-}
 
 export default function Dashboard({ supabase }: DashboardProps) {
   const router = useRouter();
@@ -433,9 +425,7 @@ export default function Dashboard({ supabase }: DashboardProps) {
                       <div className="stat-cell">
                         <div className="stat-value">{drodo.mmr}</div>
                         <div className="stat-label">
-                          {drodo.mmr_level != null
-                            ? mmrLevelToTier(drodo.mmr_level)
-                            : "MMR"}
+                          {mmrToRank(drodo.mmr) || "MMR"}
                         </div>
                       </div>
                     )}

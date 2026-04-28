@@ -3,6 +3,7 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { fetchSteamProfile, resolveSteamInput } from "../../../lib/steam";
 
 const DRODO_BASE = "http://autochess.ppbizon.com";
+const DRODO_CACHE_TTL_MS = 12 * 60 * 60 * 1000;
 const EMPTY_DRODO_PROFILE_ERROR =
   "Steam account has no Dota Auto Chess MMR or stats.";
 
@@ -22,6 +23,7 @@ interface DrodoProfileRow {
   mmr_level: number | null;
   season: string | null;
   season_games: number | null;
+  candy: number | null;
   chicken_count: number;
   raw_data: Record<string, unknown>;
   fetched_at: string;
@@ -87,6 +89,7 @@ function buildDrodoProfile(
       mmr_level: Number(drodoData.mmr_level) || null,
       season,
       season_games: matchKey ? Number(drodoData[matchKey]) || null : null,
+      candy: Number(drodoData.candy) || null,
       chicken_count: Number(drodoData.chicken_count) || 0,
       raw_data: drodoData,
       fetched_at: new Date().toISOString(),
@@ -121,6 +124,12 @@ function hasDrodoStats(
   );
 }
 
+function isFreshCache(fetchedAt: string | null | undefined): boolean {
+  if (!fetchedAt) return false;
+  const fetchedTime = new Date(fetchedAt).getTime();
+  return Number.isFinite(fetchedTime) && Date.now() - fetchedTime < DRODO_CACHE_TTL_MS;
+}
+
 async function purgeDrodoCache(
   steamId: string,
   supabase: SupabaseClient
@@ -148,12 +157,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(400).json({ error: "Invalid steam ID" });
   }
 
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!,
-    { auth: { autoRefreshToken: false, persistSession: false } }
-  );
-  const steamId = await resolveSteamInput(rawSteamId, supabase, {
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  const supabase =
+    supabaseUrl && serviceKey
+      ? createClient(supabaseUrl, serviceKey, {
+          auth: { autoRefreshToken: false, persistSession: false },
+        })
+      : null;
+
+  const steamId = await resolveSteamInput(rawSteamId, supabase ?? undefined, {
     persist: false,
   });
   if (!steamId) {
@@ -161,29 +174,25 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   // Check cache unless force refresh
-  if (refresh !== "1") {
+  if (supabase && refresh !== "1") {
     const { data: cached } = await supabase
       .from("drodo_profiles")
       .select("*")
       .eq("steam_id", steamId)
       .single();
 
-    if (cached?.fetched_at) {
-      const fetchedDate = new Date(cached.fetched_at).toDateString();
-      const today = new Date().toDateString();
-      if (fetchedDate === today) {
-        const { data: seasons } = await supabase
-          .from("player_seasons")
-          .select("season, mmr, max_mmr, games_played")
-          .eq("steam_id", steamId)
-          .order("season", { ascending: true });
+    if (isFreshCache(cached?.fetched_at)) {
+      const { data: seasons } = await supabase
+        .from("player_seasons")
+        .select("season, mmr, max_mmr, games_played")
+        .eq("steam_id", steamId)
+        .order("season", { ascending: true });
 
-        if (hasDrodoStats(cached, seasons ?? [])) {
-          return res.status(200).json({ ...cached, seasons: seasons ?? [] });
-        }
-
-        await purgeDrodoCache(steamId, supabase);
+      if (hasDrodoStats(cached, seasons ?? [])) {
+        return res.status(200).json({ ...cached, seasons: seasons ?? [] });
       }
+
+      await purgeDrodoCache(steamId, supabase);
     }
   }
 
@@ -206,11 +215,15 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   const { profile, seasonRows } = buildDrodoProfile(steamId, drodoData);
 
   if (!hasDrodoStats(profile, seasonRows)) {
-    await purgeDrodoCache(steamId, supabase);
+    if (supabase) await purgeDrodoCache(steamId, supabase);
     return res.status(404).json({ error: EMPTY_DRODO_PROFILE_ERROR });
   }
 
-  await fetchSteamProfile(steamId, supabase);
+  await fetchSteamProfile(steamId, supabase ?? undefined);
+
+  if (!supabase) {
+    return res.status(200).json({ ...profile, seasons: seasonRows });
+  }
 
   const { error: upsertError } = await supabase
     .from("drodo_profiles")

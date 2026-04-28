@@ -104,6 +104,60 @@ export function parseWL(
   return { w: parseInt(parts[0]) || 0, l: parseInt(parts[1]) || 0 };
 }
 
+export const RANK_BRACKETS = [
+  { rank: "Pawn-1", mmr: 0 },
+  { rank: "Pawn-2", mmr: 500 },
+  { rank: "Pawn-3", mmr: 580 },
+  { rank: "Pawn-4", mmr: 660 },
+  { rank: "Pawn-5", mmr: 740 },
+  { rank: "Pawn-6", mmr: 820 },
+  { rank: "Pawn-7", mmr: 900 },
+  { rank: "Pawn-8", mmr: 980 },
+  { rank: "Pawn-9", mmr: 1060 },
+  { rank: "Knight-1", mmr: 1140 },
+  { rank: "Knight-2", mmr: 1220 },
+  { rank: "Knight-3", mmr: 1300 },
+  { rank: "Knight-4", mmr: 1380 },
+  { rank: "Knight-5", mmr: 1460 },
+  { rank: "Knight-6", mmr: 1540 },
+  { rank: "Knight-7", mmr: 1620 },
+  { rank: "Knight-8", mmr: 1700 },
+  { rank: "Knight-9", mmr: 1780 },
+  { rank: "Bishop-1", mmr: 1860 },
+  { rank: "Bishop-2", mmr: 1940 },
+  { rank: "Bishop-3", mmr: 2020 },
+  { rank: "Bishop-4", mmr: 2100 },
+  { rank: "Bishop-5", mmr: 2180 },
+  { rank: "Bishop-6", mmr: 2260 },
+  { rank: "Bishop-7", mmr: 2340 },
+  { rank: "Bishop-8", mmr: 2420 },
+  { rank: "Bishop-9", mmr: 2500 },
+  { rank: "Rook-1", mmr: 2580 },
+  { rank: "Rook-2", mmr: 2660 },
+  { rank: "Rook-3", mmr: 2740 },
+  { rank: "Rook-4", mmr: 2820 },
+  { rank: "Rook-5", mmr: 2900 },
+  { rank: "Rook-6", mmr: 2980 },
+  { rank: "Rook-7", mmr: 3060 },
+  { rank: "Rook-8", mmr: 3140 },
+  { rank: "Rook-9", mmr: 3220 },
+  { rank: "King", mmr: 3300 },
+  { rank: "Queen", mmr: 3380 },
+] as const;
+
+export const RANK_TIERS = ["Pawn", "Knight", "Bishop", "Rook", "King", "Queen"] as const;
+export const NUMBERED_RANK_TIERS = ["Pawn", "Knight", "Bishop", "Rook"] as const;
+
+export function mmrToRank(mmr: number | null | undefined): string {
+  if (mmr == null || !Number.isFinite(mmr)) return "";
+  let rank: string = RANK_BRACKETS[0].rank;
+  for (const bracket of RANK_BRACKETS) {
+    if (mmr < bracket.mmr) break;
+    rank = bracket.rank;
+  }
+  return rank.replace("-", " ");
+}
+
 export function formatSize(bytes: number): string {
   if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(0) + " KB";
   if (bytes < 1024 * 1024 * 1024)

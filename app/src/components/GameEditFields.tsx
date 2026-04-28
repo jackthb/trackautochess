@@ -1,9 +1,13 @@
 import { CountedTagPicker, ReorderableTagPicker } from "./TagPickers";
 import type { CountedTag } from "./TagPickers";
 import type { SynergyInfo, RelicInfo } from "../types";
-import { unitStem, relicStem, synIconName } from "../lib/game-utils";
-
-const RANK_TIERS = ["Pawn", "Knight", "Bishop", "Rook", "King", "Queen"];
+import {
+  unitStem,
+  relicStem,
+  synIconName,
+  RANK_TIERS,
+  NUMBERED_RANK_TIERS,
+} from "../lib/game-utils";
 
 interface GameEditFieldsProps {
   editPlacement: string;
@@ -105,7 +109,7 @@ export function GameEditFields({
                 <option key={t} value={t}>{t}</option>
               ))}
             </select>
-            {editRankTier && editRankTier !== "Queen" && (
+            {NUMBERED_RANK_TIERS.includes(editRankTier as typeof NUMBERED_RANK_TIERS[number]) && (
               <select
                 className="edit-field"
                 value={editRankNum}

@@ -4,12 +4,14 @@ import { useMemo } from "react";
 import { createClient } from "@supabase/supabase-js";
 import type { GetServerSideProps } from "next";
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { absoluteUrl, getRequestSiteUrl } from "@/lib/site";
 import unitsData from "@data/units.json";
 import unitsFullData from "@data/units_full.json";
 import synergiesData from "@data/synergies.json";
 import relicsData from "@data/relics.json";
 import { GameRowDisplay } from "@dac/shared/GameRowDisplay";
 import type { PlayerGame, UnitFullInfo, SynergyInfo, RelicInfo } from "@dac/shared/types";
+import { mmrToRank } from "@dac/shared/game-utils";
 import {
   fetchSteamProfile,
   resolveSteamInput,
@@ -31,13 +33,12 @@ for (const [alias, canonical] of Object.entries(
 const UNITS_FULL = unitsFullData as Record<string, UnitFullInfo>;
 const SYNERGIES_DATA = synergiesData as Record<string, SynergyInfo>;
 const RELICS_DATA = (relicsData as any).relics as Record<string, RelicInfo>;
+const DRODO_CACHE_TTL_MS = 12 * 60 * 60 * 1000;
 
-const TIER_NAMES = ["Pawn", "Knight", "Bishop", "Rook", "King"];
-function mmrLevelToTier(level: number | null): string {
-  if (level == null) return "";
-  const tierIdx = Math.floor(level / 9);
-  if (tierIdx >= TIER_NAMES.length) return "Queen";
-  return `${TIER_NAMES[tierIdx]} ${(level % 9) + 1}`;
+function isFreshDrodoCache(fetchedAt: string | null | undefined): boolean {
+  if (!fetchedAt) return false;
+  const fetchedTime = new Date(fetchedAt).getTime();
+  return Number.isFinite(fetchedTime) && Date.now() - fetchedTime < DRODO_CACHE_TTL_MS;
 }
 
 interface SeasonSnapshot {
@@ -56,8 +57,13 @@ interface PlayerPageProps {
     max_mmr: number | null;
     mmr_level: number | null;
     season: string | null;
+    season_games: number | null;
+    candy: number | null;
+    chicken_count: number | null;
   } | null;
   seasons: SeasonSnapshot[];
+  ogImageUrl: string | null;
+  canonicalUrl: string | null;
   supabase: SupabaseClient | null;
 }
 
@@ -67,10 +73,16 @@ export default function PlayerPage({
   games,
   drodo,
   seasons,
+  ogImageUrl,
+  canonicalUrl,
   supabase,
 }: PlayerPageProps) {
   const displayName = steamProfile.name || steamId;
   const profileUrl = steamProfileUrl(steamId, steamProfile.customUrl);
+  const title = `${displayName} - DAC Tools`;
+  const description = drodo?.mmr
+    ? `${displayName} is ${mmrToRank(drodo.mmr)} at ${drodo.mmr.toLocaleString("en-US")} MMR.`
+    : `Dota Auto Chess profile for ${displayName}.`;
 
   const stats = useMemo(() => {
     if (!games.length) return null;
@@ -89,8 +101,19 @@ export default function PlayerPage({
   return (
     <>
       <Head>
-        <title>{displayName} — DAC Tools</title>
+        <title>{title}</title>
+        <meta name="description" content={description} />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta property="og:title" content={title} />
+        <meta property="og:description" content={description} />
+        <meta property="og:type" content="profile" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content={title} />
+        <meta name="twitter:description" content={description} />
+        {canonicalUrl && <link rel="canonical" href={canonicalUrl} />}
+        {canonicalUrl && <meta property="og:url" content={canonicalUrl} />}
+        {ogImageUrl && <meta property="og:image" content={ogImageUrl} />}
+        {ogImageUrl && <meta name="twitter:image" content={ogImageUrl} />}
       </Head>
 
       <style jsx>{`
@@ -105,8 +128,13 @@ export default function PlayerPage({
           padding: 40px 32px 80px;
         }
         .player-header {
+          display: flex;
+          align-items: flex-start;
+          justify-content: space-between;
+          gap: 24px;
           margin-bottom: 32px;
         }
+        .player-heading { min-width: 0; }
         .player-name {
           font-family: "Cinzel", serif;
           font-size: 28px;
@@ -125,6 +153,22 @@ export default function PlayerPage({
         }
         .player-meta a:hover {
           color: var(--text-secondary);
+        }
+        .refresh-link {
+          flex-shrink: 0;
+          font-family: var(--font-mono);
+          font-size: 12px;
+          letter-spacing: 1.2px;
+          text-transform: uppercase;
+          color: var(--text-muted);
+          border: 1px solid var(--border);
+          border-radius: var(--r-3);
+          padding: 8px 12px;
+          transition: color 0.15s, border-color 0.15s;
+        }
+        .refresh-link:hover {
+          color: var(--text-secondary);
+          border-color: var(--text-muted);
         }
         .stats-bar {
           display: grid;
@@ -221,29 +265,39 @@ export default function PlayerPage({
           font-size: 16px;
           background: var(--bg-surface);
         }
+        @media (max-width: 620px) {
+          .player-header {
+            flex-direction: column;
+          }
+        }
       `}</style>
 
       <div className="page">
         <div className="dashboard">
           <div className="player-header">
-            <div className="player-name">{displayName}</div>
-            <div className="player-meta">
-              <a
-                href={profileUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                {steamProfile.customUrl
-                  ? `steamcommunity.com/id/${steamProfile.customUrl}`
-                  : `Steam ID: ${steamId}`}
-              </a>
-              {drodo && drodo.mmr_level != null && (
-                <>
-                  {" \u00B7 "}
-                  {mmrLevelToTier(drodo.mmr_level)}
-                </>
-              )}
+            <div className="player-heading">
+              <div className="player-name">{displayName}</div>
+              <div className="player-meta">
+                <a
+                  href={profileUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {steamProfile.customUrl
+                    ? `steamcommunity.com/id/${steamProfile.customUrl}`
+                    : `Steam ID: ${steamId}`}
+                </a>
+                {drodo && drodo.mmr != null && (
+                  <>
+                    {" \u00B7 "}
+                    {mmrToRank(drodo.mmr)}
+                  </>
+                )}
+              </div>
             </div>
+            <Link href={`/players/${steamId}?refresh=1`} className="refresh-link">
+              Refresh MMR
+            </Link>
           </div>
 
           {(stats || (drodo && (drodo.mmr != null || drodo.max_mmr != null))) && (
@@ -272,9 +326,7 @@ export default function PlayerPage({
                 <div className="stat-cell">
                   <div className="stat-value">{drodo.mmr}</div>
                   <div className="stat-label">
-                    {drodo.mmr_level != null
-                      ? mmrLevelToTier(drodo.mmr_level)
-                      : "MMR"}
+                    {mmrToRank(drodo.mmr) || "MMR"}
                   </div>
                 </div>
               )}
@@ -282,6 +334,24 @@ export default function PlayerPage({
                 <div className="stat-cell">
                   <div className="stat-value gold">{drodo.max_mmr}</div>
                   <div className="stat-label">Peak MMR</div>
+                </div>
+              )}
+              {drodo && drodo.season_games != null && (
+                <div className="stat-cell">
+                  <div className="stat-value">{drodo.season_games}</div>
+                  <div className="stat-label">Season Games</div>
+                </div>
+              )}
+              {drodo && drodo.candy != null && (
+                <div className="stat-cell">
+                  <div className="stat-value gold">{drodo.candy}</div>
+                  <div className="stat-label">Candies</div>
+                </div>
+              )}
+              {drodo && drodo.chicken_count != null && (
+                <div className="stat-cell">
+                  <div className="stat-value gold">{drodo.chicken_count}</div>
+                  <div className="stat-label">Wins</div>
                 </div>
               )}
             </div>
@@ -364,13 +434,13 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-  if (!url || !key) return { notFound: true };
-
-  const supabase = createClient(url, key);
+  const forceRefresh = context.query.refresh === "1";
+  const supabase = url && key ? createClient(url, key) : null;
+  const baseUrl = getRequestSiteUrl(context.req.headers);
 
   // Accept numeric Steam IDs, vanity slugs, or pasted Steam community URLs.
   // Redirect anything non-canonical to the numeric player route once resolved.
-  const steamId = await resolveSteamInput(rawSteamId, supabase, {
+  const steamId = await resolveSteamInput(rawSteamId, supabase ?? undefined, {
     persist: false,
   });
   if (!steamId) {
@@ -385,24 +455,26 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     };
   }
 
-  const gamesResult = await supabase
-    .from("games")
-    .select("*")
-    .eq("user_id", steamId)
-    .order("played_at", { ascending: false });
+  const gamesResult = supabase
+    ? await supabase
+        .from("games")
+        .select("*")
+        .eq("user_id", steamId)
+        .order("played_at", { ascending: false })
+    : { data: [] };
 
   // Fetch drodo profile and season history (using service key for cached data)
   const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
   let drodo = null;
   let seasons: SeasonSnapshot[] = [];
-  if (serviceKey) {
+  if (url && serviceKey && !forceRefresh) {
     const adminClient = createClient(url, serviceKey, {
       auth: { autoRefreshToken: false, persistSession: false },
     });
     const [profileResult, seasonsResult] = await Promise.all([
       adminClient
         .from("drodo_profiles")
-        .select("mmr, max_mmr, mmr_level, season")
+        .select("mmr, max_mmr, mmr_level, season, season_games, candy, chicken_count, fetched_at")
         .eq("steam_id", steamId)
         .single(),
       adminClient
@@ -411,7 +483,12 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         .eq("steam_id", steamId)
         .order("season", { ascending: true }),
     ]);
-    if (profileResult.data) drodo = profileResult.data;
+    if (
+      profileResult.data &&
+      isFreshDrodoCache((profileResult.data as { fetched_at?: string }).fetched_at)
+    ) {
+      drodo = profileResult.data;
+    }
     if (seasonsResult.data) seasons = seasonsResult.data;
 
     // Cache miss? Pull fresh from Drodo and re-fetch — this lets newly looked
@@ -431,6 +508,9 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
               max_mmr: data.max_mmr ?? null,
               mmr_level: data.mmr_level ?? null,
               season: data.season ?? null,
+              season_games: data.season_games ?? null,
+              candy: data.candy ?? null,
+              chicken_count: data.chicken_count ?? null,
             };
             if (Array.isArray(data.seasons)) seasons = data.seasons;
           }
@@ -441,9 +521,41 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     }
   }
 
+  if (!drodo) {
+    try {
+      const proto = context.req.headers["x-forwarded-proto"] ?? "http";
+      const host = context.req.headers.host;
+      if (host) {
+        const base = `${proto}://${host}`;
+          const resp = await fetch(
+            `${base}/api/drodo/${steamId}${forceRefresh ? "?refresh=1" : ""}`
+          );
+        if (resp.ok) {
+          const data = await resp.json();
+          drodo = {
+            mmr: data.mmr ?? null,
+            max_mmr: data.max_mmr ?? null,
+            mmr_level: data.mmr_level ?? null,
+            season: data.season ?? null,
+            season_games: data.season_games ?? null,
+            candy: data.candy ?? null,
+            chicken_count: data.chicken_count ?? null,
+          };
+          if (Array.isArray(data.seasons)) seasons = data.seasons;
+        }
+      }
+    } catch {
+      // Drodo API unreachable; still render the Steam profile shell.
+    }
+  }
+
   const hasGames = Boolean(gamesResult.data?.length);
+  if (!drodo && !hasGames) {
+    return { notFound: true };
+  }
+
   const shouldPersistSteamProfile = hasGames || drodo !== null || seasons.length > 0;
-  const steamProfile = await fetchSteamProfile(steamId, supabase, {
+  const steamProfile = await fetchSteamProfile(steamId, supabase ?? undefined, {
     persist: shouldPersistSteamProfile,
   });
 
@@ -454,6 +566,8 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       games: (gamesResult.data as PlayerGame[]) || [],
       drodo,
       seasons,
+      ogImageUrl: absoluteUrl(`/api/og/player/${steamId}`, baseUrl),
+      canonicalUrl: absoluteUrl(`/players/${steamId}`, baseUrl),
     },
   };
 };
