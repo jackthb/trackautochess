@@ -15,7 +15,6 @@ interface EntityDetailProps {
   variant: EntityCardVariant;
   name: string;
   iconSrc: string;
-  lede?: string;
   /** Body copy for the "Overview" section. ReactNode so callers can
    *  embed contextual links with natural anchor text for SEO. */
   overview?: ReactNode;
@@ -50,7 +49,6 @@ export function EntityDetail({
   variant,
   name,
   iconSrc,
-  lede,
   overview,
   notes,
   lore,
@@ -86,7 +84,6 @@ export function EntityDetail({
                 {tag.label}
               </div>
             )}
-            {lede && <div className={styles.lede}>{lede}</div>}
           </div>
         </section>
 

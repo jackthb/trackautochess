@@ -76,10 +76,6 @@ export default function ItemDetailPage({
     },
   ];
 
-  const lede =
-    cleanText(item.description) ||
-    `${item.name} is a ${TIER_LABEL[item.tier]} item in Dota Auto Chess.`;
-
   const cleanedDesc = cleanText(item.description);
   const overview = (
     <>
@@ -109,7 +105,6 @@ export default function ItemDetailPage({
         variant="item"
         name={item.name}
         iconSrc={iconUrl(item)}
-        lede={lede}
         overview={overview}
         notes={item.notes.map(cleanText)}
         lore={item.lore ? cleanText(item.lore) : undefined}

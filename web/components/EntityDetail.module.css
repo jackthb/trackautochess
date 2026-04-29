@@ -62,14 +62,6 @@
   margin-bottom: var(--s-16);
 }
 
-.lede {
-  font-size: var(--fs-14);
-  line-height: var(--lh-relaxed);
-  color: var(--text-secondary);
-  max-width: 720px;
-  white-space: pre-line;
-}
-
 .section {
   padding: var(--s-24);
   background: var(--bg-surface);

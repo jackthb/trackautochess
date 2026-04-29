@@ -560,10 +560,17 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   }
 
   const hasGames = Boolean(gamesResult.data?.length);
+  const hasDrodo = drodo !== null;
+  const hasSeasons = seasons.length > 0;
 
-  const shouldPersistSteamProfile = hasGames || drodo !== null || seasons.length > 0;
+  // Don't expose hollow profile pages — if a Steam ID has no games, no MMR,
+  // and no season history, there's nothing meaningful to show.
+  if (!hasGames && !hasDrodo && !hasSeasons) {
+    return { notFound: true };
+  }
+
   const steamProfile = await fetchSteamProfile(steamId, supabase ?? undefined, {
-    persist: shouldPersistSteamProfile,
+    persist: true,
   });
 
   return {

@@ -72,9 +72,6 @@ export default function RelicDetailPage({
     },
   ];
 
-  const lede =
-    cleanText(relic.description) ||
-    `${relic.name} is a Dota Auto Chess relic.`;
   const baseOverview =
     cleanText(relic.description) ||
     `${relic.name} is a relic in Dota Auto Chess.`;
@@ -103,7 +100,6 @@ export default function RelicDetailPage({
         variant="relic"
         name={relic.name}
         iconSrc={`/icons/relics/${relic.iconStem}.png`}
-        lede={lede}
         overview={overview}
         lore={relic.lore ? cleanText(relic.lore) : undefined}
         relatedTitle="More Relics"
