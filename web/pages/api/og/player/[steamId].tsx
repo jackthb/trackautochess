@@ -1,4 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from "next";
+import type { ReactNode } from "react";
 import { ImageResponse } from "@vercel/og";
 import { createClient } from "@supabase/supabase-js";
 import { readFile } from "node:fs/promises";
@@ -39,6 +40,7 @@ interface CachedDrodoOgRow {
 
 const fontDir = path.join(process.cwd(), "public", "fonts");
 const fontData = Promise.all([
+  readFile(path.join(fontDir, "Cinzel-wght.ttf")),
   readFile(path.join(fontDir, "JetBrainsMono-Regular.ttf")),
   readFile(path.join(fontDir, "JetBrainsMono-Bold.ttf")),
 ]);
@@ -75,7 +77,7 @@ function Stat({
   value,
 }: {
   label: string;
-  value: string;
+  value: string | ReactNode;
 }) {
   return (
     <div
@@ -111,6 +113,8 @@ function Stat({
           fontSize: 30,
           fontWeight: 700,
           marginTop: 8,
+          whiteSpace: "nowrap",
+          alignItems: "center",
         }}
       >
         {value}
@@ -215,7 +219,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(404).send("Player not found");
   }
 
-  const [steamProfile, drodoResult, fonts] = await Promise.all([
+  const [steamProfile, drodoResult, seasonsResult, fonts] = await Promise.all([
     fetchSteamProfile(steamId, supabase, { persist: false }),
     supabase
       ? supabase
@@ -224,6 +228,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           .eq("steam_id", steamId)
           .maybeSingle()
       : Promise.resolve({ data: null }),
+    supabase
+      ? supabase
+          .from("player_seasons")
+          .select("season, mmr, max_mmr, games_played")
+          .eq("steam_id", steamId)
+          .order("season", { ascending: false })
+      : Promise.resolve({ data: [] }),
     fontData,
   ]);
 
@@ -238,6 +249,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           season_games: cachedDrodo.drodo_season_games,
           candy: cachedDrodo.drodo_candy,
           chicken_count: cachedDrodo.drodo_chicken_count,
+          seasons: (seasonsResult.data as DrodoOgData["seasons"]) ?? [],
         }
       : null;
   const displayName = steamProfile.name || steamId;
@@ -248,6 +260,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   );
   const rank = mmrToRank(drodo?.mmr) || "Unranked";
   const season = drodo?.season?.toUpperCase() || "CURRENT";
+  const lastSeason = (drodo?.seasons ?? []).find((s) => s.season !== drodo?.season);
+  const lastSeasonDisplay = lastSeason
+    ? `${lastSeason.season.toUpperCase()} ${mmrToRank(lastSeason.mmr) || "Unranked"}`
+    : "-";
 
   const image = new ImageResponse(
     (
@@ -309,7 +325,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           style={{
             display: "flex",
             color: "#c94f3d",
-                fontFamily: "JetBrains Mono",
+                fontFamily: "Cinzel",
                 fontSize: 18,
                 fontWeight: 700,
                 letterSpacing: 5,
@@ -387,9 +403,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             </div>
 
             <div style={{ display: "flex", gap: 18, marginTop: 40 }}>
-              <Stat label="PEAK" value={fmt(drodo?.max_mmr)} />
+              <Stat label="PEAK MMR" value={fmt(drodo?.max_mmr)} />
               <Stat label="GAMES" value={fmt(drodo?.season_games)} />
-              <Stat label="CANDY" value={fmt(drodo?.candy)} />
+              <Stat label="LAST SEASON" value={lastSeasonDisplay} />
               <Stat label="WINS" value={fmt(drodo?.chicken_count)} />
             </div>
           </div>
@@ -418,9 +434,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 padding: 10,
               }}
             >
-              {avatarDataUrl ? (
+              {avatarDataUrl || steamProfile.avatarUrl ? (
                 <img
-                  src={avatarDataUrl}
+                  src={avatarDataUrl || steamProfile.avatarUrl || ""}
                   width={280}
                   height={280}
                   style={{
@@ -456,7 +472,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       height: 630,
       fonts: [
         {
-          name: "JetBrains Mono",
+          name: "Cinzel",
           data: fonts[0],
           weight: 400,
           style: "normal",
@@ -464,6 +480,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         {
           name: "JetBrains Mono",
           data: fonts[1],
+          weight: 400,
+          style: "normal",
+        },
+        {
+          name: "JetBrains Mono",
+          data: fonts[2],
           weight: 700,
           style: "normal",
         },
