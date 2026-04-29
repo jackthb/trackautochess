@@ -87,7 +87,7 @@
     },
     "item_rank_damage": {
       "name": "Defiant Shell",
-      "description": "Reduces damage taken from home defeats or increases damage dealt in away-home victories by 1~10 based on your courier's lost health",
+      "description": "Reduces damage taken from home defeats or increases damage dealt in away-home victories by your current rank + 1.",
       "lore": ""
     },
     "item_stolen_vault": {

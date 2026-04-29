@@ -1,6 +1,11 @@
 {
   "patches": [
     {
+      "date": "2026-04-29",
+      "title": "Rebalance Patch 1",
+      "slug": "2026-04-29-rebalance-patch-1"
+    },
+    {
       "date": "2026-04-20",
       "title": "Starlight & Beacon",
       "slug": "2026-04-20"

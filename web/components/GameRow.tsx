@@ -350,7 +350,9 @@ export function GameRow({
     const synStr =
       editSynergies.map((s) => `${s.name}:${s.count}`).join("|") || null;
     const relicStr = editRelics.join("|") || null;
-    const wlStr = editW || editL ? `${editW}-${editL}` : null;
+    const safeW = Math.max(0, Math.min(99, Number.isFinite(editW) ? editW : 0));
+    const safeL = Math.max(0, Math.min(99, Number.isFinite(editL) ? editL : 0));
+    const wlStr = safeW || safeL ? `${safeW}-${safeL}` : null;
     const rankStr = editRankTier
       ? editRankNum
         ? `${editRankTier}-${editRankNum}`

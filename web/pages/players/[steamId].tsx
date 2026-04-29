@@ -1,6 +1,8 @@
 import Head from "next/head";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
+import { useRouter } from "next/router";
+import type { SupabaseClient } from "@supabase/supabase-js";
 import { createClient } from "@supabase/supabase-js";
 import type { GetServerSideProps } from "next";
 import { absoluteUrl, getRequestSiteUrl, SITE_NAME } from "@/lib/site";
@@ -11,6 +13,7 @@ import relicsData from "@data/relics.json";
 import { GameRowDisplay } from "@dac/shared/GameRowDisplay";
 import type { PlayerGame, UnitFullInfo, SynergyInfo, RelicInfo } from "@dac/shared/types";
 import { mmrToRank } from "@dac/shared/game-utils";
+import { StatsGrid, type StatItem } from "@/components/StatsGrid";
 import {
   fetchSteamProfile,
   playerProfilePath,
@@ -66,6 +69,7 @@ interface CachedUserDrodoRow {
 }
 
 interface PlayerPageProps {
+  supabase?: SupabaseClient | null;
   steamId: string;
   steamProfile: SteamProfile;
   games: PlayerGame[];
@@ -97,7 +101,9 @@ export default function PlayerPage({
   forceRefresh,
   ogImageUrl,
   canonicalUrl,
+  supabase,
 }: PlayerPageProps) {
+  const router = useRouter();
   const [drodo, setDrodo] = useState(initialDrodo);
   const [seasons, setSeasons] = useState(initialSeasons);
   const [drodoProfileMissing, setDrodoProfileMissing] = useState(
@@ -126,6 +132,37 @@ export default function PlayerPage({
       top1,
     };
   }, [games]);
+
+
+  const statItems = useMemo<StatItem[]>(() => {
+    const items: StatItem[] = [];
+    if (stats) {
+      items.push(
+        { key: "games", value: stats.total, label: "Games", source: "tracked" },
+        { key: "avg", value: stats.avg, label: "Avg Place", tone: "gold", source: "tracked" },
+        { key: "top4", value: `${stats.top4pct}%`, label: "Top 4 Rate", tone: "green", source: "tracked" },
+        { key: "wins", value: stats.top1, label: "Wins", tone: "gold", source: "tracked" },
+      );
+    }
+    if (drodo?.mmr != null) items.push({ key: "drodo-mmr", value: drodo.mmr, label: mmrToRank(drodo.mmr) || "MMR", source: "drodo" });
+    if (drodo?.max_mmr != null) items.push({ key: "drodo-peak", value: drodo.max_mmr, label: "Peak MMR", tone: "gold", source: "drodo" });
+    if (drodo?.season_games != null) items.push({ key: "drodo-season-games", value: drodo.season_games, label: "Season Games", source: "drodo" });
+    if (drodo?.candy != null) items.push({ key: "drodo-candy", value: drodo.candy, label: "Candies", tone: "gold", source: "drodo" });
+    if (drodo?.chicken_count != null) items.push({ key: "drodo-chickens", value: drodo.chicken_count, label: "Chickens (Wins)", tone: "gold", source: "drodo" });
+    return items;
+  }, [stats, drodo]);
+
+  // TODO: ingest total matches / avg rank / wins / preferred lineup / max damage from history pages for server-side season snapshots.
+  useEffect(() => {
+    if (!supabase) return;
+    supabase.auth.getUser().then(({ data: { user } }) => {
+      if (!user) return;
+      const ownSteamId = user.user_metadata?.steam_id;
+      if (ownSteamId && ownSteamId === steamId) {
+        router.replace("/dashboard");
+      }
+    });
+  }, [supabase, steamId, router]);
 
   useEffect(() => {
     const fetchedTime = drodoLastFetchedAt
@@ -246,37 +283,6 @@ export default function PlayerPage({
           color: var(--text-secondary);
           border-color: var(--text-muted);
         }
-        .stats-bar {
-          display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-          gap: 1px;
-          background: var(--border-subtle);
-          border: 1px solid var(--border);
-          margin-bottom: 40px;
-        }
-        .stat-cell {
-          background: var(--bg-surface);
-          padding: 24px 20px;
-          text-align: center;
-        }
-        .stat-value {
-          font-size: 32px;
-          font-weight: 700;
-          color: var(--text-primary);
-          margin-bottom: 6px;
-        }
-        .stat-value.gold {
-          color: var(--gold);
-        }
-        .stat-value.green {
-          color: var(--green-bright);
-        }
-        .stat-label {
-          font-size: 13px;
-          letter-spacing: 1.5px;
-          text-transform: uppercase;
-          color: var(--text-muted);
-        }
         .table-wrap {
           border: 1px solid var(--border);
           overflow: hidden;
@@ -387,62 +393,7 @@ export default function PlayerPage({
             </div>
           )}
 
-          {(stats || (drodo && (drodo.mmr != null || drodo.max_mmr != null))) && (
-            <div className="stats-bar">
-              {stats && (
-                <>
-                  <div className="stat-cell">
-                    <div className="stat-value">{stats.total}</div>
-                    <div className="stat-label">Games</div>
-                  </div>
-                  <div className="stat-cell">
-                    <div className="stat-value gold">{stats.avg}</div>
-                    <div className="stat-label">Avg Place</div>
-                  </div>
-                  <div className="stat-cell">
-                    <div className="stat-value green">{stats.top4pct}%</div>
-                    <div className="stat-label">Top 4 Rate</div>
-                  </div>
-                  <div className="stat-cell">
-                    <div className="stat-value gold">{stats.top1}</div>
-                    <div className="stat-label">Wins</div>
-                  </div>
-                </>
-              )}
-              {drodo && drodo.mmr != null && (
-                <div className="stat-cell">
-                  <div className="stat-value">{drodo.mmr}</div>
-                  <div className="stat-label">
-                    {mmrToRank(drodo.mmr) || "MMR"}
-                  </div>
-                </div>
-              )}
-              {drodo && drodo.max_mmr != null && (
-                <div className="stat-cell">
-                  <div className="stat-value gold">{drodo.max_mmr}</div>
-                  <div className="stat-label">Peak MMR</div>
-                </div>
-              )}
-              {drodo && drodo.season_games != null && (
-                <div className="stat-cell">
-                  <div className="stat-value">{drodo.season_games}</div>
-                  <div className="stat-label">Season Games</div>
-                </div>
-              )}
-              {drodo && drodo.candy != null && (
-                <div className="stat-cell">
-                  <div className="stat-value gold">{drodo.candy}</div>
-                  <div className="stat-label">Candies</div>
-                </div>
-              )}
-              {drodo && drodo.chicken_count != null && (
-                <div className="stat-cell">
-                  <div className="stat-value gold">{drodo.chicken_count}</div>
-                  <div className="stat-label">Wins</div>
-                </div>
-              )}
-            </div>
-          )}
+          {statItems.length > 0 && <StatsGrid items={statItems} />}
 
           {seasons.length > 1 && (
             <>
