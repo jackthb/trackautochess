@@ -117,6 +117,11 @@ def process_screenshot(filepath: Path, unit_templates, relic_templates, syn_temp
     screen_type = detect_screen_type(img)
     if screen_type != "my_matches":
         return [], [], screen_type
+    from cv_parser import (
+        MM_COL_PLACEMENT, MM_COL_LEVEL, MM_COL_UNITS, MM_COL_SYNERGY,
+        MM_COL_RELIC, MM_COL_WL, MM_COL_RANK, MM_COL_TIME,
+        MM_UNIT_GRID_START_FRAC, MM_UNIT_GRID_SPACING_FRAC,
+    )
 
     # Overview
     s = Section(f"{filepath.name} — Overview", open_=False)
@@ -308,7 +313,7 @@ def main():
 
     # Load templates once
     units_path = DATA_DIR / "units.json"
-    units_data = json.loads(units_path.read_text())["units"] if units_path.exists() else {}
+    units_data = json.loads(units_path.read_text(encoding="utf-8"))["units"] if units_path.exists() else {}
     stem_to_name = {_unit_stem(name): name for name in units_data}
 
     unit_templates = _load_templates_multiscale(
@@ -473,7 +478,7 @@ img {{ vertical-align:middle }}
 {body}
 </body></html>"""
 
-    OUTPUT.write_text(html)
+    OUTPUT.write_text(html, encoding="utf-8")
     print(f"\nWrote {OUTPUT} ({len(html) / 1024 / 1024:.1f} MB)")
 
 

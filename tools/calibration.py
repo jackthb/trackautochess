@@ -23,6 +23,8 @@ BACKEND = ROOT / "app" / "backend"
 DATA = ROOT / "data"
 SCREENSHOTS = DATA / "screenshots"
 DAC_SCREENSHOTS = Path.home() / ".dac" / "screenshots"
+DATA_REGIONS = DATA / "regions_config.json"
+USER_REGIONS = Path.home() / ".dac" / "regions_config.json"
 
 STEAM_SCREENSHOT_DIRS = []
 steam_base = Path("C:/Program Files (x86)/Steam/userdata")
@@ -46,13 +48,14 @@ logging.basicConfig(level=logging.INFO, format="%(message)s")
 def run_debug(screenshot_path: str) -> dict:
     import cv2
     import numpy as np
-    from cv_parser import detect_screen_type
+    from cv_parser import apply_calibration, detect_screen_type
 
     img = cv2.imread(screenshot_path)
     if img is None:
         return {"error": f"Cannot read {screenshot_path}"}
 
     h, w = img.shape[:2]
+    apply_calibration(img)
     screen_type = detect_screen_type(img)
 
     result = {
@@ -97,9 +100,10 @@ def run_debug(screenshot_path: str) -> dict:
             result["rows"].append(row_data)
 
     elif screen_type == "game_over":
-        from cv_parser import parse_game_over
-        game_data = parse_game_over(img)
-        result["game_data"] = game_data
+        from cv_parser import parse_game_over_all
+        from utils import ICONS_DIR
+        rows = parse_game_over_all(img, ICONS_DIR)
+        result["rows"] = rows or []
 
     return result
 
@@ -160,6 +164,34 @@ class CalibrationHandler(SimpleHTTPRequestHandler):
             self.send_header("Content-Type", "text/html; charset=utf-8")
             self.end_headers()
             self.wfile.write(html_path.read_bytes())
+
+        elif parsed.path == "/editor":
+            html_path = ROOT / "tools" / "region_editor.html"
+            self.send_response(200)
+            self.send_header("Content-Type", "text/html; charset=utf-8")
+            self.end_headers()
+            self.wfile.write(html_path.read_bytes())
+
+        elif parsed.path == "/api/regions":
+            # Returns {config, defaults}. Prefers USER_REGIONS, falls back to DATA_REGIONS.
+            cfg = {}
+            for p in (USER_REGIONS, DATA_REGIONS):
+                if p.exists():
+                    try:
+                        cfg = json.loads(p.read_text(encoding="utf-8"))
+                        break
+                    except Exception:
+                        pass
+            defaults = {}
+            if DATA_REGIONS.exists():
+                try:
+                    defaults = json.loads(DATA_REGIONS.read_text(encoding="utf-8"))
+                except Exception:
+                    pass
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json")
+            self.end_headers()
+            self.wfile.write(json.dumps({"config": cfg, "defaults": defaults}).encode())
 
         elif parsed.path == "/api/screenshots":
             import struct
@@ -274,6 +306,26 @@ class CalibrationHandler(SimpleHTTPRequestHandler):
         parsed = urlparse(self.path)
         content_len = int(self.headers.get("Content-Length", 0))
         body = json.loads(self.rfile.read(content_len)) if content_len else {}
+
+        if parsed.path == "/api/regions":
+            # Save to BOTH the user override (~/.dac) and the repo defaults (data/).
+            written = []
+            try:
+                USER_REGIONS.parent.mkdir(parents=True, exist_ok=True)
+                USER_REGIONS.write_text(json.dumps(body, indent=2), encoding="utf-8")
+                written.append(str(USER_REGIONS))
+                DATA_REGIONS.write_text(json.dumps(body, indent=2), encoding="utf-8")
+                written.append(str(DATA_REGIONS))
+                self.send_response(200)
+                self.send_header("Content-Type", "application/json")
+                self.end_headers()
+                self.wfile.write(json.dumps({"ok": True, "paths": written}).encode())
+            except Exception as e:
+                self.send_response(500)
+                self.send_header("Content-Type", "application/json")
+                self.end_headers()
+                self.wfile.write(json.dumps({"error": str(e), "paths": written}).encode())
+            return
 
         if parsed.path == "/api/config":
             config_path = DATA / "regions_config.json"

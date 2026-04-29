@@ -1195,6 +1195,21 @@ class HeadlessBackend:
             if not regions:
                 regions = self._resolve_debug_regions(screen, aspect_ratio, regions_config)
             apply_calibration(img, aspect_ratio=aspect_ratio, regions_config=regions_config)
+            from cv_parser import (
+                COL_LEVEL,
+                COL_PLAYER,
+                COL_RELIC,
+                COL_SYNERGY,
+                COL_WL,
+                MM_COL_LEVEL,
+                MM_COL_PLACEMENT,
+                MM_COL_RANK,
+                MM_COL_RELIC,
+                MM_COL_SYNERGY,
+                MM_COL_TIME,
+                MM_COL_UNITS,
+                MM_COL_WL,
+            )
 
             h, w = img.shape[:2]
             result = {

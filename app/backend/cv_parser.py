@@ -17,18 +17,21 @@ from pathlib import Path
 import cv2
 import numpy as np
 
-try:
-    import pytesseract
-except ImportError:
-    pytesseract = None
-
 from utils import (
+    DAC_DIR,
     crop as _crop,
     infer_aspect_ratio,
     load_regions_config,
     ocr as _ocr,
+    setup_tesseract,
     unit_stem as _unit_stem,
 )
+
+setup_tesseract()
+try:
+    import pytesseract
+except ImportError:
+    pytesseract = None
 
 log = logging.getLogger("dac")
 
@@ -61,13 +64,39 @@ MATCH_THRESHOLD = 0.70
 # We try multiple scales to find best match
 SYNERGY_ICON_SCALES = [32, 36, 40, 44]
 RELIC_ICON_SCALES = [12, 14, 16, 20, 24, 28, 32, 40, 50, 60]
+GO_RELIC_ICON_SCALES = [20, 24, 28, 32, 36, 40, 44, 50, 60]
 # Crop inner portion of reference icon (remove border area)
 ICON_INNER_FRAC = 0.75  # keep central 75% of reference icon
 # Synergy badges occupy the top ~45% of each row cell
 SYNERGY_BADGE_Y_MAX_FRAC = 0.50
 
+# Game Over table slots are stable once the aspect-specific columns are
+# calibrated. Slot parsing is more reliable than global template matching:
+# otherwise count glyphs and the "no relic" placeholder produce false matches.
+GO_SYN_SLOT_X_RANGES = [
+    (0.00, 0.22),
+    (0.15, 0.37),
+    (0.30, 0.52),
+    (0.45, 0.67),
+    (0.60, 0.82),
+    (0.75, 0.97),
+]
+GO_SYN_SLOT_Y_RANGE = (0.03, 0.58)
+GO_SYN_MATCH_THRESHOLD = 0.65
+GO_SYN_FALLBACK_THRESHOLD = 0.48
+GO_SYN_FALLBACK_INNER_FRAC = 0.45
+GO_SYN_GLOBAL_Y_MAX_FRAC = 0.46
+
+GO_RELIC_SLOTS = [
+    ("top_left", (0.00, 0.30, 0.22, 0.62), 0.75, 0),
+    ("bottom_left", (0.00, 0.30, 0.43, 0.86), 0.70, 0),
+    ("middle", (0.16, 0.42, 0.35, 0.75), 0.55, 0),
+    ("large", (0.35, 0.82, 0.18, 0.88), 0.80, 32),
+]
+GO_RELIC_INNER_FRAC = 0.60
+
 # Debug output directory (created when --debug is used)
-DEBUG_DIR = Path.home() / ".dac" / "debug"
+DEBUG_DIR = DAC_DIR / "debug"
 
 
 # ── MY MATCHES screen constants ───────────────────────────────────────────────
@@ -77,6 +106,7 @@ MM_TAB_REGION     = (0.30, 0.12, 0.55, 0.20)  # tab bar containing "MY MATCHES"
 MM_TABLE_Y_START  = 0.33   # top of first data row
 MM_TABLE_Y_END    = 0.90   # bottom of last data row
 MM_SEP_SCAN_X     = (0.60, 0.70)   # x-band scanned for dark row separators
+MM_ROW_DIVIDERS: list[float] | None = None
 MM_SEP_DARK_THRESH = 35            # mean brightness below this → separator band
 
 # Per-row column extents (x_start, x_end as fraction of image width)
@@ -133,6 +163,11 @@ MM_RELIC_COL_RANGES = [
 ]
 
 
+# Optional per-row y-bounds for game_over (length N_ROWS+1 = 9). When set
+# (via calibration), `_row_y_extent` reads from this and ignores TABLE_Y_*.
+ROW_DIVIDERS: list[float] | None = None
+
+
 DEFAULT_REGIONS = {
     "TITLE_REGION": TITLE_REGION,
     "FINAL_RANK_REGION": FINAL_RANK_REGION,
@@ -145,10 +180,12 @@ DEFAULT_REGIONS = {
     "COL_WL": COL_WL,
     "TABLE_Y_START": TABLE_Y_START,
     "TABLE_Y_END": TABLE_Y_END,
+    "ROW_DIVIDERS": None,
     "MM_TAB_REGION": MM_TAB_REGION,
     "MM_TABLE_Y_START": MM_TABLE_Y_START,
     "MM_TABLE_Y_END": MM_TABLE_Y_END,
     "MM_SEP_SCAN_X": MM_SEP_SCAN_X,
+    "MM_ROW_DIVIDERS": None,
     "MM_COL_PLACEMENT": MM_COL_PLACEMENT,
     "MM_COL_LEVEL": MM_COL_LEVEL,
     "MM_COL_UNITS": MM_COL_UNITS,
@@ -157,6 +194,13 @@ DEFAULT_REGIONS = {
     "MM_COL_WL": MM_COL_WL,
     "MM_COL_RANK": MM_COL_RANK,
     "MM_COL_TIME": MM_COL_TIME,
+    "MM_SYN_COLS_X": MM_SYN_COLS_X,
+    "MM_SYN_ICON_W": MM_SYN_ICON_W,
+    "MM_SYN_ICON_H": MM_SYN_ICON_H,
+    "MM_UNIT_GRID_START_FRAC": MM_UNIT_GRID_START_FRAC,
+    "MM_UNIT_GRID_SPACING_FRAC": MM_UNIT_GRID_SPACING_FRAC,
+    "MM_RELIC_COL_RANGES": MM_RELIC_COL_RANGES,
+    "MM_RELIC_SPLIT_Y": MM_RELIC_SPLIT_Y,
 }
 
 
@@ -196,6 +240,10 @@ def apply_calibration(
         table = game_over["table_area"]
         globals()["TABLE_Y_START"] = table[1]
         globals()["TABLE_Y_END"] = table[3]
+    rd = game_over.get("row_dividers")
+    if isinstance(rd, list) and len(rd) == N_ROWS + 1 \
+            and all(isinstance(v, (int, float)) for v in rd):
+        globals()["ROW_DIVIDERS"] = [float(v) for v in rd]
     for src, dest in {
         "col_player": "COL_PLAYER",
         "col_level": "COL_LEVEL",
@@ -214,6 +262,10 @@ def apply_calibration(
         globals()["MM_TABLE_Y_END"] = table[3]
     if len(my_matches.get("sep_scan_band", [])) == 2:
         globals()["MM_SEP_SCAN_X"] = tuple(my_matches["sep_scan_band"])
+    rd = my_matches.get("row_dividers")
+    if isinstance(rd, list) and len(rd) >= 2 \
+            and all(isinstance(v, (int, float)) for v in rd):
+        globals()["MM_ROW_DIVIDERS"] = [float(v) for v in rd]
     for src, dest in {
         "col_placement": "MM_COL_PLACEMENT",
         "col_level": "MM_COL_LEVEL",
@@ -226,6 +278,23 @@ def apply_calibration(
     }.items():
         if len(my_matches.get(src, [])) == 2:
             globals()[dest] = tuple(my_matches[src])
+    if len(my_matches.get("syn_cols_x", [])) >= 1:
+        globals()["MM_SYN_COLS_X"] = [float(v) for v in my_matches["syn_cols_x"]]
+    for src, dest in {
+        "syn_icon_w": "MM_SYN_ICON_W",
+        "syn_icon_h": "MM_SYN_ICON_H",
+        "unit_grid_start_frac": "MM_UNIT_GRID_START_FRAC",
+        "unit_grid_spacing_frac": "MM_UNIT_GRID_SPACING_FRAC",
+        "relic_split_y": "MM_RELIC_SPLIT_Y",
+    }.items():
+        if isinstance(my_matches.get(src), (int, float)):
+            globals()[dest] = float(my_matches[src])
+    relic_ranges = my_matches.get("relic_col_ranges")
+    if isinstance(relic_ranges, list) and relic_ranges \
+            and all(isinstance(v, list) and len(v) == 2 for v in relic_ranges):
+        globals()["MM_RELIC_COL_RANGES"] = [
+            (float(v[0]), float(v[1])) for v in relic_ranges
+        ]
 
     return aspect_ratio
 
@@ -270,7 +339,13 @@ def _save_debug(name: str, img: np.ndarray, debug: bool) -> None:
 
 # ── Screen type detection ────────────────────────────────────────────────────
 
-def detect_screen_type(img: np.ndarray) -> str:
+def detect_screen_type(
+    img: np.ndarray,
+    *,
+    apply_regions: bool = True,
+    aspect_ratio: str | None = None,
+    regions_config: dict | None = None,
+) -> str:
     """Detect which end-screen type this is.
 
     Returns: 'game_over', 'final_ranking', 'my_matches', or 'unknown'.
@@ -280,6 +355,9 @@ def detect_screen_type(img: np.ndarray) -> str:
     before the post-game ranking card dismissed), we import from the My Matches
     history rather than the less-structured Final Ranking overlay.
     """
+    if apply_regions:
+        apply_calibration(img, aspect_ratio=aspect_ratio, regions_config=regions_config)
+
     # Check center-top title area (Game Over / My Matches headings)
     title_crop = _crop(img, *TITLE_REGION)
     text = _ocr(title_crop, psm=6).upper()
@@ -317,7 +395,13 @@ def detect_screen_type(img: np.ndarray) -> str:
 # ── Row geometry ─────────────────────────────────────────────────────────────
 
 def _row_y_extent(row_idx: int) -> tuple[float, float]:
-    """Return (y_start, y_end) fractions for a given row index (0-based)."""
+    """Return (y_start, y_end) fractions for a given row index (0-based).
+
+    If ROW_DIVIDERS is calibrated (length N_ROWS+1), use those exact splits.
+    Otherwise fall back to even division of TABLE_Y_START..TABLE_Y_END.
+    """
+    if ROW_DIVIDERS is not None and len(ROW_DIVIDERS) == N_ROWS + 1:
+        return (ROW_DIVIDERS[row_idx], ROW_DIVIDERS[row_idx + 1])
     row_h = (TABLE_Y_END - TABLE_Y_START) / N_ROWS
     y0 = TABLE_Y_START + row_idx * row_h
     return (y0, y0 + row_h)
@@ -493,6 +577,41 @@ def _match_templates_multiscale(
     for name, score, x, y in kept:
         log.debug(f"    match: {name:20s} score={score:.3f} pos=({x},{y})")
     return kept
+
+
+def _best_template_match(
+    region: np.ndarray,
+    templates: dict[str, list[np.ndarray]],
+    *,
+    color: bool = False,
+) -> tuple[str, float, tuple[int, int], tuple[int, int]] | None:
+    """Return the single best template match in a small, known slot."""
+    if region.size == 0:
+        return None
+    if color:
+        region_match = region if len(region.shape) == 3 else cv2.cvtColor(region, cv2.COLOR_GRAY2BGR)
+    else:
+        region_match = cv2.cvtColor(region, cv2.COLOR_BGR2GRAY) if len(region.shape) == 3 else region
+
+    rh, rw = region_match.shape[:2]
+    best: tuple[str, float, tuple[int, int], tuple[int, int]] | None = None
+    for name, tmpls in templates.items():
+        for tmpl in tmpls:
+            th, tw = tmpl.shape[:2]
+            if rh < th or rw < tw:
+                continue
+            if color:
+                result = np.zeros((rh - th + 1, rw - tw + 1), dtype=np.float32)
+                for ch in range(3):
+                    result += cv2.matchTemplate(region_match[:, :, ch], tmpl[:, :, ch],
+                                                cv2.TM_CCOEFF_NORMED)
+                result /= 3
+            else:
+                result = cv2.matchTemplate(region_match, tmpl, cv2.TM_CCOEFF_NORMED)
+            _, max_val, _, max_loc = cv2.minMaxLoc(result)
+            if best is None or max_val > best[1]:
+                best = (name, float(max_val), max_loc, (th, tw))
+    return best
 
 
 def _match_slot_zone(region_bgr, slot_idx, grid_start, grid_spacing, zy0, zy1,
@@ -796,6 +915,127 @@ def _ocr_synergy_counts(
     return results
 
 
+def _ocr_game_over_synergy_counts(region: np.ndarray, debug: bool = False) -> list[int]:
+    """OCR visible Game Over synergy counts left-to-right."""
+    h, w = region.shape[:2]
+    count_strip = region[int(h * 0.42):int(h * 0.78), 0:int(w * 0.70)]
+    _save_debug("go_synergy_count_strip", count_strip, debug)
+
+    gray = cv2.cvtColor(count_strip, cv2.COLOR_BGR2GRAY) if len(count_strip.shape) == 3 else count_strip
+    _, bw = cv2.threshold(gray, 150, 255, cv2.THRESH_BINARY)
+    inv = cv2.bitwise_not(bw)
+    scaled = cv2.resize(inv, (inv.shape[1] * 4, inv.shape[0] * 4),
+                        interpolation=cv2.INTER_NEAREST)
+    scaled = cv2.copyMakeBorder(scaled, 20, 20, 20, 20,
+                                cv2.BORDER_CONSTANT, value=255)
+    _save_debug("go_synergy_count_strip_proc", scaled, debug)
+
+    raw = _ocr(scaled, psm=12)
+    counts = [int(d) for d in re.findall(r"\d+", raw) if 1 <= int(d) <= 12]
+    log.debug(f"    Game Over count OCR raw: {raw!r}")
+    log.debug(f"    Game Over counts: {counts}")
+    return counts
+
+
+def _parse_game_over_synergies(
+    region: np.ndarray,
+    icons_dir: Path,
+    syn_templates: dict[str, list[np.ndarray]] | None = None,
+    debug: bool = False,
+) -> str:
+    """Parse Game Over synergy icons using fixed table slots plus OCR counts."""
+    counts = _ocr_game_over_synergy_counts(region, debug=debug)
+    if not counts:
+        if syn_templates is None:
+            syn_templates = _load_templates_multiscale(icons_dir / "synergies", SYNERGY_ICON_SCALES)
+        syn_matches = _match_templates_multiscale(region, syn_templates,
+                                                  y_max_frac=SYNERGY_BADGE_Y_MAX_FRAC,
+                                                  debug=debug)
+        avg_icon_px = SYNERGY_ICON_SCALES[len(SYNERGY_ICON_SCALES) // 2]
+        syn_counts = _ocr_synergy_counts(region, syn_matches, avg_icon_px, debug=debug)
+        if syn_counts:
+            return "|".join(f"{name}:{count}" for name, count in syn_counts if count > 0)
+        return "|".join(f"{name}:0" for name, _, _, _ in syn_matches)
+
+    if syn_templates is None:
+        syn_templates = _load_templates_multiscale(icons_dir / "synergies", SYNERGY_ICON_SCALES)
+    fallback_templates = _load_templates_multiscale(
+        icons_dir / "synergies",
+        SYNERGY_ICON_SCALES,
+        inner_frac=GO_SYN_FALLBACK_INNER_FRAC,
+    )
+
+    h, w = region.shape[:2]
+    matches = _match_templates_multiscale(
+        region,
+        syn_templates,
+        threshold=MATCH_THRESHOLD,
+        y_max_frac=GO_SYN_GLOBAL_Y_MAX_FRAC,
+        debug=debug,
+    )
+
+    # Some current screenshots use a low-scoring Naga icon variant. If OCR sees
+    # a leading count but global matching starts at the second slot, patch only
+    # that missing first slot from the shape-only fallback templates.
+    if counts and len(matches) < len(counts):
+        first_x = matches[0][2] if matches else w
+        if first_x > w * 0.12:
+            sx0, sx1 = GO_SYN_SLOT_X_RANGES[0]
+            sy0, sy1 = GO_SYN_SLOT_Y_RANGE
+            slot = region[int(h * sy0):int(h * sy1), int(w * sx0):int(w * sx1)]
+            fallback = _best_template_match(slot, fallback_templates)
+            if fallback and fallback[1] >= GO_SYN_FALLBACK_THRESHOLD:
+                name, score, _, _ = fallback
+                matches.insert(0, (name, score, int(w * sx0), int(h * sy0)))
+                log.debug(f"    go syn leading fallback: {name:20s} score={score:.3f}")
+
+    parsed: list[tuple[str, int]] = []
+    for (name, score, x, y), count in zip(matches, counts):
+        parsed.append((name, count))
+        log.debug(f"    go syn: {name:20s} score={score:.3f} pos=({x},{y}) count={count}")
+
+    return "|".join(f"{name}:{count}" for name, count in parsed)
+
+
+def _parse_game_over_relics(
+    region: np.ndarray,
+    relic_templates: dict[str, list[np.ndarray]] | None,
+    icons_dir: Path,
+    debug: bool = False,
+) -> str:
+    """Parse Game Over relics from known slots, conservatively skipping noise."""
+    if relic_templates is None:
+        relic_templates = _load_templates_multiscale(
+            icons_dir / "relics",
+            GO_RELIC_ICON_SCALES,
+            inner_frac=GO_RELIC_INNER_FRAC,
+            color=True,
+        )
+
+    h, w = region.shape[:2]
+    relics: list[str] = []
+    seen: set[str] = set()
+    for label, (x0f, x1f, y0f, y1f), threshold, min_h in GO_RELIC_SLOTS:
+        slot = region[int(h * y0f):int(h * y1f), int(w * x0f):int(w * x1f)]
+        match = _best_template_match(slot, relic_templates, color=True)
+        if match is None:
+            continue
+        name, score, _, tmpl_shape = match
+        if score < threshold:
+            log.debug(f"    go relic {label}: {name:20s} score={score:.3f} below threshold")
+            continue
+        if min_h and tmpl_shape[0] < min_h:
+            log.debug(f"    go relic {label}: {name:20s} score={score:.3f} too small")
+            continue
+        if name in seen:
+            continue
+        seen.add(name)
+        relics.append(name.replace("_", " ").title())
+        log.debug(f"    go relic {label}: {name:20s} score={score:.3f}")
+
+    return "|".join(relics)
+
+
 # ── Left-panel rank extraction ────────────────────────────────────────────────
 
 # The Game Over screen has a player list in the left sidebar (x=0..17%).
@@ -926,35 +1166,23 @@ def parse_game_over(
     _save_debug("synergy_cell", syn_cell, debug)
     syn_templates = _load_templates_multiscale(icons_dir / "synergies", SYNERGY_ICON_SCALES)
     log.debug(f"  Loaded {len(syn_templates)} synergy templates at scales {SYNERGY_ICON_SCALES}")
-    syn_matches = _match_templates_multiscale(syn_cell, syn_templates,
-                                               y_max_frac=SYNERGY_BADGE_Y_MAX_FRAC,
-                                               debug=debug)
-    avg_icon_px = SYNERGY_ICON_SCALES[len(SYNERGY_ICON_SCALES) // 2]
-    syn_counts = _ocr_synergy_counts(syn_cell, syn_matches, avg_icon_px, debug=debug)
-    synergies = "|".join(f"{name}:{count}" for name, count in syn_counts if count > 0)
-    if not synergies:
-        # If count OCR failed, still report names with count 0
-        synergies = "|".join(f"{name}:0" for name, _, _, _ in syn_matches)
+    synergies = _parse_game_over_synergies(
+        syn_cell, icons_dir, syn_templates=syn_templates, debug=debug)
 
-    # 6. Template match relics (global multiscale — Game Over layout differs from MY MATCHES)
+    # 6. Template match relics using fixed Game Over slots.
     log.info("[cv] Matching relic icons...")
     relic_cell = _crop_row(img, COL_RELIC, y0, y1)
     _save_debug("relic_cell", relic_cell, debug)
-    relic_templates = _load_templates_multiscale(icons_dir / "relics", RELIC_ICON_SCALES,
-                                                  inner_frac=1.0, color=True)
-    log.debug(f"  Loaded {len(relic_templates)} relic templates at scales {RELIC_ICON_SCALES}")
-    relic_matches = _match_templates_multiscale(relic_cell, relic_templates, threshold=0.45,
-                                                 color=True, debug=debug)
-    # Keep best score per unique relic name, take top 5
-    best_per_name: dict[str, float] = {}
-    for name, score, x, y in relic_matches:
-        if name not in best_per_name or score > best_per_name[name]:
-            best_per_name[name] = score
-    ranked = sorted(best_per_name.items(), key=lambda x: -x[1])[:5]
-    relic = "|".join(name.replace("_", " ").title() for name, score in ranked)
-    log.debug(f"  Relic ranking: {[(n, f'{s:.3f}') for n, s in ranked]}")
-    # 7. Extract rank from left sidebar
-    rank = extract_rank_from_panel(img, player_name, debug=debug)
+    relic_templates = _load_templates_multiscale(
+        icons_dir / "relics",
+        GO_RELIC_ICON_SCALES,
+        inner_frac=GO_RELIC_INNER_FRAC,
+        color=True,
+    )
+    log.debug(f"  Loaded {len(relic_templates)} relic templates at scales {GO_RELIC_ICON_SCALES}")
+    relic = _parse_game_over_relics(relic_cell, relic_templates, icons_dir, debug=debug)
+    # 7. Extract rank from this player's own row (below the player name)
+    rank = _ocr_player_rank(img, row_idx, debug=debug)
     log.debug(f"  Rank: {rank!r}")
     result = {
         "placement": str(placement),
@@ -968,35 +1196,70 @@ def parse_game_over(
     return result
 
 
+_RANK_RE = re.compile(
+    r"(" + "|".join(RANK_NAMES) + r")[\s\-_]*(\d)",
+    re.IGNORECASE,
+)
+
+
 def _ocr_player_name(img: np.ndarray, row_idx: int, debug: bool = False) -> str:
-    """OCR the player name from the given row of the game over table."""
+    """OCR the player name from the top of one game-over row's COL_PLAYER cell."""
     y0, y1 = _row_y_extent(row_idx)
-    cell = _crop_row(img, COL_PLAYER, y0, y1)
-    processed = _preprocess_for_ocr(cell, scale=2.0)
+    rh = y1 - y0
+    # Name occupies the upper portion of the cell; rank sits below it.
+    cell = _crop(img, COL_PLAYER[0], y0 + rh * 0.05, COL_PLAYER[1], y0 + rh * 0.55)
+    processed = _preprocess_for_ocr(cell, scale=2.5)
     _save_debug(f"player_name_row{row_idx}", processed, debug)
-    text = _ocr(processed, psm=6).strip()
-    # Also try raw grayscale (no binarisation) — sometimes works better
+    text = _ocr(processed, psm=7).strip()
     if not text:
         gray = cv2.cvtColor(cell, cv2.COLOR_BGR2GRAY) if len(cell.shape) == 3 else cell
-        h, w = gray.shape[:2]
-        scaled = cv2.resize(gray, (w * 3, h * 3), interpolation=cv2.INTER_CUBIC)
+        ch, cw = gray.shape[:2]
+        scaled = cv2.resize(gray, (cw * 3, ch * 3), interpolation=cv2.INTER_CUBIC)
         try:
-            text = pytesseract.image_to_string(scaled, config="--psm 6").strip()
+            text = pytesseract.image_to_string(scaled, config="--psm 7").strip()
         except Exception:
             text = ""
-    # Clean up: take first line, strip non-alphanumeric edges
     if text:
         text = text.split("\n")[0].strip()
     log.debug(f"  [player name] row {row_idx}: {text!r}")
     return text
 
 
+def _ocr_player_rank(img: np.ndarray, row_idx: int, debug: bool = False) -> str:
+    """OCR the rank ("Bishop-7", "Knight-3", "Unranked", ...) from the bottom
+    of one game-over row's COL_PLAYER cell.
+    """
+    y0, y1 = _row_y_extent(row_idx)
+    rh = y1 - y0
+    cell = _crop(img, COL_PLAYER[0], y0 + rh * 0.55, COL_PLAYER[1], y0 + rh * 0.98)
+    processed = _preprocess_for_ocr(cell, scale=3.0)
+    _save_debug(f"player_rank_row{row_idx}", processed, debug)
+    text = _ocr(processed, psm=7).strip()
+    if not text:
+        gray = cv2.cvtColor(cell, cv2.COLOR_BGR2GRAY) if len(cell.shape) == 3 else cell
+        ch, cw = gray.shape[:2]
+        scaled = cv2.resize(gray, (cw * 3, ch * 3), interpolation=cv2.INTER_CUBIC)
+        try:
+            text = pytesseract.image_to_string(scaled, config="--psm 7").strip()
+        except Exception:
+            text = ""
+    m = _RANK_RE.search(text)
+    if m:
+        rank = f"{m.group(1).title()}-{m.group(2)}"
+    elif "unrank" in text.lower():
+        rank = "Unranked"
+    else:
+        rank = ""
+    log.debug(f"  [player rank] row {row_idx}: raw={text!r} -> {rank!r}")
+    return rank
+
+
 def _parse_row_data(
     img: np.ndarray,
     row_idx: int,
     icons_dir: Path,
-    syn_templates: list | None = None,
-    relic_templates: list | None = None,
+    syn_templates: dict[str, list[np.ndarray]] | None = None,
+    relic_templates: dict[str, list[np.ndarray]] | None = None,
     debug: bool = False,
 ) -> dict:
     """Extract level, wl, synergies, relic for a single row of the game over table."""
@@ -1023,28 +1286,13 @@ def _parse_row_data(
     if syn_templates is None:
         syn_templates = _load_templates_multiscale(icons_dir / "synergies", SYNERGY_ICON_SCALES)
     syn_cell = _crop_row(img, COL_SYNERGY, y0, y1)
-    syn_matches = _match_templates_multiscale(syn_cell, syn_templates,
-                                               y_max_frac=SYNERGY_BADGE_Y_MAX_FRAC,
-                                               debug=debug)
-    avg_icon_px = SYNERGY_ICON_SCALES[len(SYNERGY_ICON_SCALES) // 2]
-    syn_counts = _ocr_synergy_counts(syn_cell, syn_matches, avg_icon_px, debug=debug)
-    synergies = "|".join(f"{name}:{count}" for name, count in syn_counts if count > 0)
-    if not synergies:
-        synergies = "|".join(f"{name}:0" for name, _, _, _ in syn_matches)
+    synergies = _parse_game_over_synergies(
+        syn_cell, icons_dir, syn_templates=syn_templates, debug=debug)
 
-    # Template match relics
-    if relic_templates is None:
-        relic_templates = _load_templates_multiscale(icons_dir / "relics", RELIC_ICON_SCALES,
-                                                      inner_frac=1.0, color=True)
+    # Relic parsing is slot-based to avoid matching fragments in empty cells.
     relic_cell = _crop_row(img, COL_RELIC, y0, y1)
-    relic_matches = _match_templates_multiscale(relic_cell, relic_templates, threshold=0.45,
-                                                 color=True, debug=debug)
-    best_per_name: dict[str, float] = {}
-    for name, score, x, y in relic_matches:
-        if name not in best_per_name or score > best_per_name[name]:
-            best_per_name[name] = score
-    ranked = sorted(best_per_name.items(), key=lambda x: -x[1])[:5]
-    relic = "|".join(name.replace("_", " ").title() for name, score in ranked)
+    relic = _parse_game_over_relics(
+        relic_cell, relic_templates, icons_dir, debug=debug)
 
     return {
         "placement": str(row_idx + 1),
@@ -1053,55 +1301,6 @@ def _parse_row_data(
         "synergies": synergies,
         "relic": relic,
     }
-
-
-def _extract_all_ranks_from_panel(img: np.ndarray, debug: bool = False) -> list[str]:
-    """Extract rank strings for all 8 rows from the left sidebar panel.
-
-    Returns a list of 8 rank strings (e.g. 'Bishop-1') indexed by placement (0-based).
-    Empty string if rank cannot be read for a row.
-    """
-    h, w = img.shape[:2]
-    px0, px1 = int(w * RANK_PANEL_X[0]), int(w * RANK_PANEL_X[1])
-    py0, py1 = int(h * RANK_PANEL_Y[0]), int(h * RANK_PANEL_Y[1])
-    panel_h = py1 - py0
-    row_h = panel_h // RANK_PANEL_ROWS
-
-    def _ocr_strip(y0: int, y1: int) -> str:
-        strip = img[y0:y1, px0:px1]
-        gray = cv2.cvtColor(strip, cv2.COLOR_BGR2GRAY) if len(strip.shape) == 3 else strip
-        _, bright = cv2.threshold(gray, 140, 255, cv2.THRESH_BINARY)
-        scaled = cv2.resize(bright, (bright.shape[1] * 3, bright.shape[0] * 3),
-                            interpolation=cv2.INTER_CUBIC)
-        inv = cv2.bitwise_not(scaled)
-        try:
-            import pytesseract as _pt
-            return _pt.image_to_string(inv, config="--psm 6").strip().replace("\n", " ")
-        except Exception:
-            return ""
-
-    rank_re = re.compile(
-        r"(" + "|".join(RANK_NAMES) + r")[\s\-]*(\d)",
-        re.IGNORECASE,
-    )
-
-    ranks = []
-    for i in range(RANK_PANEL_ROWS):
-        # Try the row, then expand downward to catch rank badge below name
-        found_rank = ""
-        for extra in (0, 0.5, 1.0):
-            ry0 = py0 + i * row_h
-            ry1 = min(py1, py0 + int((i + 1 + extra) * row_h))
-            text = _ocr_strip(ry0, ry1)
-            matches = list(rank_re.finditer(text))
-            if matches:
-                m = matches[-1]
-                found_rank = f"{m.group(1).title()}-{m.group(2)}"
-                break
-        ranks.append(found_rank)
-        log.debug(f"  [rank panel all] row {i}: {found_rank!r}")
-
-    return ranks
 
 
 def parse_game_over_all(
@@ -1121,21 +1320,23 @@ def parse_game_over_all(
 
     # Pre-load templates once for all rows
     syn_templates = _load_templates_multiscale(icons_dir / "synergies", SYNERGY_ICON_SCALES)
-    relic_templates = _load_templates_multiscale(icons_dir / "relics", RELIC_ICON_SCALES,
-                                                  inner_frac=1.0, color=True)
-
-    # Extract ranks for all rows from sidebar
-    ranks = _extract_all_ranks_from_panel(img, debug=debug)
+    relic_templates = _load_templates_multiscale(
+        icons_dir / "relics",
+        GO_RELIC_ICON_SCALES,
+        inner_frac=GO_RELIC_INNER_FRAC,
+        color=True,
+    )
 
     results = []
     for i in range(N_ROWS):
         player_name = _ocr_player_name(img, i, debug=debug)
+        rank = _ocr_player_rank(img, i, debug=debug)
         row_data = _parse_row_data(img, i, icons_dir,
                                     syn_templates=syn_templates,
                                     relic_templates=relic_templates,
                                     debug=debug)
         row_data["player_name"] = player_name
-        row_data["rank"] = ranks[i] if i < len(ranks) else ""
+        row_data["rank"] = rank
         results.append(row_data)
         log.info(f"[cv] Row {i+1}: name={player_name!r} place={row_data['placement']} "
                  f"level={row_data['level']} wl={row_data['wl']} rank={row_data['rank']}")
@@ -1152,6 +1353,10 @@ def _find_my_matches_rows(img: np.ndarray, debug: bool = False) -> list[tuple[fl
     row height from the first few separators and extrapolate to fill the table.
     Returns list of (y0, y1) fractions.
     """
+    if MM_ROW_DIVIDERS is not None and len(MM_ROW_DIVIDERS) >= 2:
+        return [(MM_ROW_DIVIDERS[i], MM_ROW_DIVIDERS[i + 1])
+                for i in range(len(MM_ROW_DIVIDERS) - 1)]
+
     h, w = img.shape[:2]
     x0_px = int(w * MM_SEP_SCAN_X[0])
     x1_px = int(w * MM_SEP_SCAN_X[1])
@@ -1502,8 +1707,8 @@ def _ocr_mm_syn_counts(img: np.ndarray, row_y0: float, row_y1: float,
         count_y0 = int((row_y0 + row_h * 0.58) * h)
         count_y1 = int((row_y0 + row_h * 0.86) * h)
     # x spans from first icon to last icon
-    count_x0 = int(0.613 * w)
-    count_x1 = int(0.680 * w)
+    count_x0 = int(MM_SYN_COLS_X[0] * w)
+    count_x1 = int((MM_SYN_COLS_X[-1] + MM_SYN_ICON_W) * w)
     strip = img[count_y0:count_y1, count_x0:count_x1]
     if strip.size == 0:
         return []

@@ -24,6 +24,52 @@ DEFAULT_REGIONS_CONFIG_PATH = DATA_DIR / "regions_config.json"
 REGIONS_CONFIG_PATH = DAC_DIR / "regions_config.json"
 
 
+_TESSERACT_SETUP_DONE = False
+
+
+def setup_tesseract() -> None:
+    """Point pytesseract at a bundled Tesseract binary when one is available."""
+    global _TESSERACT_SETUP_DONE
+    if _TESSERACT_SETUP_DONE:
+        return
+    _TESSERACT_SETUP_DONE = True
+
+    try:
+        import pytesseract
+    except ImportError:
+        return
+
+    backend_dir = Path(__file__).resolve().parent
+    app_dir = backend_dir.parent
+    root_dir = app_dir.parent
+
+    candidates: list[Path] = []
+    env_cmd = os.environ.get("TESSERACT_CMD")
+    if env_cmd:
+        candidates.append(Path(env_cmd))
+
+    if getattr(sys, "frozen", False):
+        candidates.append(Path(sys._MEIPASS) / "tesseract" / "tesseract.exe")
+
+    candidates.extend([
+        backend_dir / "tesseract-portable" / "tesseract.exe",
+        root_dir / "tesseract-portable" / "tesseract.exe",
+        backend_dir / "dist" / "headless" / "_internal" / "tesseract" / "tesseract.exe",
+        app_dir / "release" / "win-unpacked" / "resources" / "headless" / "_internal" / "tesseract" / "tesseract.exe",
+    ])
+
+    for tess_exe in candidates:
+        if not tess_exe.exists():
+            continue
+        tess_dir = tess_exe.parent
+        pytesseract.pytesseract.tesseract_cmd = str(tess_exe)
+        os.environ["PATH"] = str(tess_dir) + os.pathsep + os.environ.get("PATH", "")
+        tessdata = tess_dir / "tessdata"
+        if tessdata.exists() and not os.environ.get("TESSDATA_PREFIX"):
+            os.environ["TESSDATA_PREFIX"] = str(tessdata)
+        return
+
+
 # ── Config ────────────────────────────────────────────────────────────────────
 
 DEFAULT_CONFIG = {
@@ -71,18 +117,30 @@ def save_config(config: dict) -> None:
 
 
 def load_regions_config() -> dict:
-    """Load picker calibration regions, preferring the user override in DAC_DIR."""
-    for path in (REGIONS_CONFIG_PATH, DEFAULT_REGIONS_CONFIG_PATH):
+    """Load picker calibration regions, merging user overrides onto defaults."""
+    def _read(path: Path) -> dict:
         if not path.exists():
-            continue
+            return {}
         try:
             data = json.loads(path.read_text(encoding="utf-8"))
             if isinstance(data, dict) and "aspect_ratios" in data:
                 data = data["aspect_ratios"]
             return data if isinstance(data, dict) else {}
         except Exception:
-            continue
-    return {}
+            return {}
+
+    def _merge(base: dict, override: dict) -> dict:
+        merged = dict(base)
+        for key, value in override.items():
+            if isinstance(value, dict) and isinstance(merged.get(key), dict):
+                merged[key] = _merge(merged[key], value)
+            else:
+                merged[key] = value
+        return merged
+
+    defaults = _read(DEFAULT_REGIONS_CONFIG_PATH)
+    overrides = _read(REGIONS_CONFIG_PATH)
+    return _merge(defaults, overrides) if defaults else overrides
 
 
 def infer_aspect_ratio(width: int, height: int, available: list[str] | None = None) -> str:
@@ -111,6 +169,7 @@ def crop(img, x0: float, y0: float, x1: float, y1: float):
 def ocr(img, psm: int = 7, whitelist: str = "") -> str:
     """OCR a small image region. Returns stripped text."""
     import cv2
+    setup_tesseract()
     try:
         import pytesseract
     except ImportError:

@@ -19,6 +19,7 @@ sys.path.insert(0, str(Path(__file__).parent))
 
 from utils import ICONS_DIR, DATA_DIR, crop as _crop, ocr as _ocr, unit_stem as _unit_stem
 from cv_parser import (
+    apply_calibration,
     detect_screen_type,
     _find_my_matches_rows,
     _parse_my_matches_row,
@@ -28,13 +29,20 @@ from cv_parser import (
     _match_slot_zone,
     _preprocess_for_ocr,
     _normalise_time_ago,
+    _row_y_extent,
+    _ocr_player_name,
+    _ocr_player_rank,
+    _parse_row_data,
     MM_COL_PLACEMENT, MM_COL_LEVEL, MM_COL_UNITS, MM_COL_SYNERGY,
     MM_COL_RELIC, MM_COL_WL, MM_COL_RANK, MM_COL_TIME,
-    UNIT_ICON_SCALES, RELIC_ICON_SCALES, MM_SYNERGY_ICON_SCALES,
+    UNIT_ICON_SCALES, RELIC_ICON_SCALES, GO_RELIC_ICON_SCALES,
+    GO_RELIC_INNER_FRAC, MM_SYNERGY_ICON_SCALES,
+    SYNERGY_ICON_SCALES,
     TITLE_REGION, MM_TAB_REGION,
     MM_UNIT_GRID_START_FRAC, MM_UNIT_GRID_SPACING_FRAC,
     MM_UNIT_SPLIT_Y, MM_UNIT_ONE_ROW_Y, MM_UNIT_MAX_SLOTS,
     UNIT_MATCH_THRESHOLD,
+    N_ROWS,
 )
 
 _default_screenshot = Path(__file__).parent.parent.parent / "data" / "screenshots" / "20260308030800_1.jpg"
@@ -104,6 +112,134 @@ class Section:
                 f'{self.title}</summary><div style="padding:12px 0">{inner}</div></details>')
 
 
+def _render_game_over(img: np.ndarray, sections: list) -> None:
+    """Append game_over debug sections (crops + parsed values per row)."""
+    from cv_parser import (
+        TITLE_REGION as GO_TITLE, COL_PLAYER, COL_LEVEL,
+        COL_SYNERGY, COL_RELIC, COL_WL,
+        TABLE_Y_START, TABLE_Y_END,
+    )
+    h, w = img.shape[:2]
+
+    syn_templates = _load_templates_multiscale(ICONS_DIR / "synergies", SYNERGY_ICON_SCALES)
+    relic_templates = _load_templates_multiscale(
+        ICONS_DIR / "relics", GO_RELIC_ICON_SCALES,
+        inner_frac=GO_RELIC_INNER_FRAC, color=True)
+
+    # ── Row layout overlay ────────────────────────────────────────────────────
+    s = Section("Step 2: Row Layout (calibrated row slices)", open_=True)
+    annotated = img.copy()
+    cols = {
+        "PLAYER": COL_PLAYER, "LEVEL": COL_LEVEL, "SYNERGY": COL_SYNERGY,
+        "RELIC": COL_RELIC, "WL": COL_WL,
+    }
+    for name, (x0f, x1f) in cols.items():
+        cv2.rectangle(annotated,
+                      (int(x0f * w), int(TABLE_Y_START * h)),
+                      (int(x1f * w), int(TABLE_Y_END * h)),
+                      (255, 200, 0), 2)
+        cv2.putText(annotated, name, (int(x0f * w) + 4, int(TABLE_Y_START * h) - 6),
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 200, 0), 1)
+    for i in range(N_ROWS):
+        y0f, y1f = _row_y_extent(i)
+        py0, py1 = int(y0f * h), int(y1f * h)
+        cv2.line(annotated, (0, py0), (w, py0), (0, 255, 0), 2)
+        cv2.line(annotated, (0, py1), (w, py1), (0, 0, 255), 2)
+        cv2.putText(annotated, f"R{i}", (8, py0 + 28),
+                    cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 255), 2)
+    s.img(cv2.resize(annotated, (w // 3, h // 3)),
+          "Row boundaries (green=top, red=bottom) + column ranges (yellow)",
+          max_h=400)
+    s.kv("TABLE_Y_START", f"{TABLE_Y_START:.5f} ({int(TABLE_Y_START*h)}px)")
+    s.kv("TABLE_Y_END", f"{TABLE_Y_END:.5f} ({int(TABLE_Y_END*h)}px)")
+    s.kv("Row height", f"{(TABLE_Y_END-TABLE_Y_START)/N_ROWS:.5f} ({int((TABLE_Y_END-TABLE_Y_START)*h/N_ROWS)}px)")
+    sections.append(s)
+
+    # ── Per-row: crops + parsed values ────────────────────────────────────────
+    summary_rows = []
+    for i in range(N_ROWS):
+        y0f, y1f = _row_y_extent(i)
+        py0, py1 = int(y0f * h), int(y1f * h)
+        rh = y1f - y0f
+
+        s = Section(f"Step 3.{i}: Row {i} (placement {i+1}, y={py0}–{py1}px)", open_=True)
+        s.img(img[py0:py1, :], f"Full row strip", max_h=110)
+
+        # Player name (top half of COL_PLAYER cell) and rank (bottom half)
+        name_cell = _crop(img, COL_PLAYER[0], y0f + rh*0.05, COL_PLAYER[1], y0f + rh*0.55)
+        name_proc = _preprocess_for_ocr(name_cell, scale=2.5)
+        rank_cell = _crop(img, COL_PLAYER[0], y0f + rh*0.55, COL_PLAYER[1], y0f + rh*0.98)
+        rank_proc = _preprocess_for_ocr(rank_cell, scale=3.0)
+        log_lines.clear()
+        player_name = _ocr_player_name(img, i)
+        player_rank = _ocr_player_rank(img, i)
+        # Level
+        level_cell = _crop_row(img, COL_LEVEL, y0f, y1f)
+        level_proc = _preprocess_for_ocr(level_cell, scale=3.0)
+        # W-L
+        wl_cell = _crop_row(img, COL_WL, y0f, y1f)
+        wl_proc = _preprocess_for_ocr(wl_cell, scale=3.0)
+        # Synergy + Relic crops (template-matched)
+        syn_cell = _crop_row(img, COL_SYNERGY, y0f, y1f)
+        relic_cell = _crop_row(img, COL_RELIC, y0f, y1f)
+
+        s.add('<div style="display:flex;gap:8px;flex-wrap:wrap;align-items:flex-start">')
+        s.add(img_tag(name_cell, "Name (raw)", max_h=60))
+        s.add(img_tag(name_proc, "Name (preproc)", max_h=60))
+        s.add(img_tag(rank_cell, "Rank (raw)", max_h=60))
+        s.add(img_tag(rank_proc, "Rank (preproc)", max_h=60))
+        s.add(img_tag(level_cell, "Level (raw)", max_h=80))
+        s.add(img_tag(level_proc, "Level (preproc)", max_h=80))
+        s.add(img_tag(wl_cell, "W-L (raw)", max_h=80))
+        s.add(img_tag(wl_proc, "W-L (preproc)", max_h=80))
+        s.add(img_tag(syn_cell, "Synergy", max_h=80))
+        s.add(img_tag(relic_cell, "Relics", max_h=80))
+        s.add('</div>')
+
+        # Run the real parser for this row
+        row_data = _parse_row_data(img, i, ICONS_DIR,
+                                    syn_templates=syn_templates,
+                                    relic_templates=relic_templates)
+        row_data["player_name"] = player_name
+        row_data["rank"] = player_rank
+        summary_rows.append(row_data)
+
+        s.kv("Player name", player_name or "(empty)", "#0f0" if player_name else "#f66")
+        s.kv("Rank", player_rank or "(empty)", "#0f0" if player_rank else "#f66")
+        s.kv("Level", row_data["level"] or "(empty)", "#0f0" if row_data["level"] else "#f66")
+        s.kv("W-L", row_data["wl"] or "(empty)", "#0f0" if row_data["wl"] else "#f66")
+        s.kv("Synergies", row_data["synergies"] or "(none)")
+        s.kv("Relics", row_data["relic"] or "(none)")
+        s.logs(log_lines[:])
+        sections.append(s)
+
+    # ── Summary table ─────────────────────────────────────────────────────────
+    s = Section("Step 5: Summary", open_=True)
+    cols = ["#", "Place", "Player", "Lvl", "W-L", "Rank", "Synergies", "Relics"]
+    t = '<table style="border-collapse:collapse;width:100%;font-size:12px;margin:8px 0">'
+    t += '<tr style="background:#0f3460">'
+    t += "".join(f'<th style="padding:6px 8px;text-align:left">{c}</th>' for c in cols)
+    t += '</tr>'
+    for i, rd in enumerate(summary_rows):
+        bg = "#1a1a2e" if i % 2 == 0 else "#16213e"
+        t += (f'<tr style="background:{bg}">'
+              f'<td style="padding:4px 8px">{i}</td>'
+              f'<td style="padding:4px 8px">{rd["placement"]}</td>'
+              f'<td style="padding:4px 8px">{rd["player_name"]}</td>'
+              f'<td style="padding:4px 8px">{rd["level"]}</td>'
+              f'<td style="padding:4px 8px">{rd["wl"]}</td>'
+              f'<td style="padding:4px 8px">{rd["rank"]}</td>'
+              f'<td style="padding:4px 8px">{rd["synergies"]}</td>'
+              f'<td style="padding:4px 8px">{rd["relic"]}</td>'
+              f'</tr>')
+    t += '</table>'
+    s.add(t)
+    s.add(f'<pre style="background:#0a0a0a;padding:10px;border-radius:4px;'
+          f'font-size:11px;max-height:400px;overflow:auto">'
+          f'{json.dumps(summary_rows, indent=2)}</pre>')
+    sections.append(s)
+
+
 def main():
     img = cv2.imread(str(SCREENSHOT))
     if img is None:
@@ -113,24 +249,55 @@ def main():
     h, w = img.shape[:2]
     sections: list[Section] = []
 
+    # Apply calibration so TITLE_REGION etc. match the image's aspect ratio
+    ar = apply_calibration(img)
+    from cv_parser import (
+        MM_COL_PLACEMENT, MM_COL_LEVEL, MM_COL_UNITS, MM_COL_SYNERGY,
+        MM_COL_RELIC, MM_COL_WL, MM_COL_RANK, MM_COL_TIME,
+        MM_UNIT_GRID_START_FRAC, MM_UNIT_GRID_SPACING_FRAC,
+    )
+
     # ── Step 0: Overview ──────────────────────────────────────────────────────
     s = Section("Step 0: Input Screenshot", open_=True)
     s.kv("File", SCREENSHOT.name)
     s.kv("Size", f"{w}×{h}")
+    s.kv("Aspect ratio", ar)
     s.img(cv2.resize(img, (w // 3, h // 3)), "Full screenshot", max_h=400)
     sections.append(s)
 
     # ── Step 1: Screen type detection ─────────────────────────────────────────
     s = Section("Step 1: Screen Type Detection", open_=True)
     log_lines.clear()
-    title_crop = _crop(img, *TITLE_REGION)
+    # Re-import after apply_calibration so we pick up updated region globals
+    from cv_parser import TITLE_REGION as _TITLE, MM_TAB_REGION as _MMTAB
+    title_crop = _crop(img, *_TITLE)
     s.img(title_crop, f"Title region", max_h=80)
-    tab_crop = _crop(img, *MM_TAB_REGION)
+    tab_crop = _crop(img, *_MMTAB)
     s.img(tab_crop, f"Tab region", max_h=80)
     screen_type = detect_screen_type(img)
-    s.kv("Detected type", screen_type, "#0f0" if screen_type == "my_matches" else "#f00")
+    ok = screen_type in ("my_matches", "game_over")
+    s.kv("Detected type", screen_type, "#0f0" if ok else "#f66")
     s.logs(log_lines[:])
     sections.append(s)
+
+    if screen_type == "game_over":
+        _render_game_over(img, sections)
+        body = "\n".join(sec.render() for sec in sections)
+        html = f"""<!DOCTYPE html>
+<html><head><meta charset="utf-8"><title>Debug — {SCREENSHOT.name}</title>
+<style>
+body {{ background:#111; color:#eee; font-family:system-ui,monospace; padding:20px; max-width:1400px; margin:0 auto }}
+h1 {{ color:#e94560; font-size:20px; border-bottom:2px solid #333; padding-bottom:10px }}
+details {{ margin-bottom:16px; background:#1a1a1a; padding:4px 16px; border-radius:8px; border:1px solid #222 }}
+summary:hover {{ color:#fff }}
+img {{ vertical-align:middle }}
+</style></head><body>
+<h1>Game Over Debug — {SCREENSHOT.name} ({w}×{h}, {ar})</h1>
+{body}
+</body></html>"""
+        OUTPUT.write_text(html, encoding="utf-8")
+        print(f"Wrote {OUTPUT} ({len(html)} bytes)")
+        return
 
     # ── Step 2: Row detection ─────────────────────────────────────────────────
     s = Section("Step 2: Row Detection", open_=True)
@@ -154,7 +321,7 @@ def main():
 
     # ── Load templates once ───────────────────────────────────────────────────
     units_path = DATA_DIR / "units.json"
-    units_data = json.loads(units_path.read_text())["units"] if units_path.exists() else {}
+    units_data = json.loads(units_path.read_text(encoding="utf-8"))["units"] if units_path.exists() else {}
     stem_to_name = {_unit_stem(name): name for name in units_data}
 
     unit_templates = _load_templates_multiscale(
@@ -372,7 +539,7 @@ img {{ vertical-align:middle }}
 {body}
 </body></html>"""
 
-    OUTPUT.write_text(html)
+    OUTPUT.write_text(html, encoding="utf-8")
     print(f"Wrote {OUTPUT} ({len(html)} bytes)")
 
 
