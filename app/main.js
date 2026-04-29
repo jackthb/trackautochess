@@ -36,6 +36,11 @@ const SCREENSHOT_MANIFEST = DESKTOP_PATHS.screenshotManifest;
 const TRACKER_DIR = DESKTOP_PATHS.trackerDir;
 const ICONS_DIR = DESKTOP_PATHS.iconsDir;
 const ICON_FILENAME = DESKTOP_PATHS.iconFilename;
+const gotSingleInstanceLock = app.requestSingleInstanceLock();
+
+if (!gotSingleInstanceLock) {
+  app.quit();
+}
 
 // Ensure dirs exist
 for (const dir of [DAC_DIR, REPLAY_DIR, SCREENSHOT_DIR]) {
@@ -68,6 +73,17 @@ let trackerStatus = {
   steam_name: "",
   replay_enabled: true,
 };
+
+function focusMainWindow() {
+  if (!mainWindow || mainWindow.isDestroyed()) return;
+
+  if (mainWindow.isMinimized()) {
+    mainWindow.restore();
+  }
+
+  mainWindow.show();
+  mainWindow.focus();
+}
 
 const NOTIFICATION_WINDOW_WIDTH = 340;
 const NOTIFICATION_WINDOW_MARGIN = 20;
@@ -1033,7 +1049,17 @@ protocol.registerSchemesAsPrivileged([
 
 // ── App lifecycle ────────────────────────────────────────────────────────────
 
+app.on("second-instance", () => {
+  if (app.isReady()) {
+    focusMainWindow();
+  } else {
+    app.whenReady().then(() => setTimeout(focusMainWindow, 0));
+  }
+});
+
 app.whenReady().then(() => {
+  if (!gotSingleInstanceLock) return;
+
   // Handle replay:// protocol with Range request support for fast seeking
   protocol.handle("replay", (request) => {
     const filename = decodeURIComponent(
@@ -1133,9 +1159,7 @@ app.whenReady().then(() => {
   startPython();
 
   app.on("activate", () => {
-    if (mainWindow) {
-      mainWindow.show();
-    }
+    focusMainWindow();
   });
 });
 
