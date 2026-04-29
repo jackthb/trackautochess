@@ -25,6 +25,7 @@ interface DrodoProfile {
   season: string | null;
   season_games: number | null;
   chicken_count: number | null;
+  candy?: number | null;
   fetched_at: string | null;
   seasons?: SeasonSnapshot[];
 }
@@ -89,15 +90,43 @@ export default function Dashboard({ supabase }: DashboardProps) {
     return () => subscription.unsubscribe();
   }, [supabase, router]);
 
-  const fetchDrodo = (steamId: string, refresh?: boolean) => {
+  const fetchCachedDrodo = async (steamId: string) => {
+    if (!supabase) return;
     setDrodoLoading(true);
-    fetch(`/api/drodo/${steamId}${refresh ? "?refresh=1" : ""}`)
-      .then((r) => (r.ok ? r.json() : null))
-      .then((data) => {
-        setDrodo(data);
-      })
-      .catch(() => {})
-      .finally(() => setDrodoLoading(false));
+    try {
+      const [profileResult, seasonsResult] = await Promise.all([
+        supabase
+          .from("users")
+          .select(
+            "drodo_mmr, drodo_max_mmr, drodo_mmr_level, drodo_season, drodo_season_games, drodo_candy, drodo_chicken_count, drodo_last_fetched_at, drodo_profile_missing"
+          )
+          .eq("steam_id", steamId)
+          .maybeSingle(),
+        supabase
+          .from("player_seasons")
+          .select("season, mmr, max_mmr, games_played")
+          .eq("steam_id", steamId)
+          .order("season", { ascending: true }),
+      ]);
+      const row = profileResult.data;
+      if (!row || row.drodo_profile_missing || !row.drodo_last_fetched_at) {
+        setDrodo(null);
+        return;
+      }
+      setDrodo({
+        mmr: row.drodo_mmr,
+        max_mmr: row.drodo_max_mmr,
+        mmr_level: row.drodo_mmr_level,
+        season: row.drodo_season,
+        season_games: row.drodo_season_games,
+        candy: row.drodo_candy,
+        chicken_count: row.drodo_chicken_count,
+        fetched_at: row.drodo_last_fetched_at,
+        seasons: (seasonsResult.data as SeasonSnapshot[]) ?? [],
+      });
+    } finally {
+      setDrodoLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -164,7 +193,7 @@ export default function Dashboard({ supabase }: DashboardProps) {
         } catch {}
       });
 
-    fetchDrodo(steamId);
+    void fetchCachedDrodo(steamId);
   }, [supabase, user]);
 
   const handleUpdate = async (
@@ -471,10 +500,10 @@ export default function Dashboard({ supabase }: DashboardProps) {
                     disabled={drodoLoading}
                     onClick={() => {
                       const steamId = user?.user_metadata?.steam_id;
-                      if (steamId) fetchDrodo(steamId, true);
+                      if (steamId) router.push(`/players/${steamId}?refresh=1`);
                     }}
                   >
-                    {drodoLoading ? "Refreshing..." : "Refresh stats"}
+                    {drodoLoading ? "Loading..." : "Refresh stats"}
                   </button>
                   {drodo?.fetched_at && (
                     <span className="refresh-time">

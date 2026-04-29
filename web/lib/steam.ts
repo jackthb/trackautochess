@@ -197,7 +197,7 @@ export async function fetchSteamProfile(
         name: data.name ?? null,
         customUrl: data.custom_url ?? null,
       };
-      if (cachedProfile.name && cachedProfile.customUrl) {
+      if (cachedProfile.name || cachedProfile.customUrl) {
         return cachedProfile;
       }
     }
@@ -245,7 +245,7 @@ export async function resolveSteamId(
     const { data } = await supabase
       .from("users")
       .select("steam_id")
-      .or(`custom_url.ilike.${clean},name.ilike.${clean}`)
+      .ilike("custom_url", clean)
       .maybeSingle();
     if (data?.steam_id) return String(data.steam_id);
   }

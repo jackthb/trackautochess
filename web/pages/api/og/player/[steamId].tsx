@@ -4,7 +4,6 @@ import { createClient } from "@supabase/supabase-js";
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { mmrToRank } from "@dac/shared/game-utils";
-import { getRequestSiteUrl } from "@/lib/site";
 import {
   fetchSteamProfile,
   resolveSteamInput,
@@ -27,11 +26,32 @@ interface DrodoOgData {
   }>;
 }
 
+interface CachedDrodoOgRow {
+  steam_id: string;
+  drodo_mmr: number | null;
+  drodo_max_mmr: number | null;
+  drodo_season: string | null;
+  drodo_season_games: number | null;
+  drodo_candy: number | null;
+  drodo_chicken_count: number | null;
+  drodo_profile_missing: boolean | null;
+}
+
 const fontDir = path.join(process.cwd(), "public", "fonts");
 const fontData = Promise.all([
   readFile(path.join(fontDir, "JetBrainsMono-Regular.ttf")),
   readFile(path.join(fontDir, "JetBrainsMono-Bold.ttf")),
 ]);
+const USER_DRODO_SELECT = [
+  "steam_id",
+  "drodo_mmr",
+  "drodo_max_mmr",
+  "drodo_season",
+  "drodo_season_games",
+  "drodo_candy",
+  "drodo_chicken_count",
+  "drodo_profile_missing",
+].join(", ");
 
 function fmt(value: number | null | undefined): string {
   return value == null ? "-" : value.toLocaleString("en-US");
@@ -195,19 +215,31 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(404).send("Player not found");
   }
 
-  const baseUrl = getRequestSiteUrl(req.headers);
-  const [steamProfile, drodoResp, fonts] = await Promise.all([
+  const [steamProfile, drodoResult, fonts] = await Promise.all([
     fetchSteamProfile(steamId, supabase, { persist: false }),
-    baseUrl
-      ? fetch(`${baseUrl}/api/drodo/${encodeURIComponent(steamId)}`).catch(
-          () => null
-        )
-      : Promise.resolve(null),
+    supabase
+      ? supabase
+          .from("users")
+          .select(USER_DRODO_SELECT)
+          .eq("steam_id", steamId)
+          .maybeSingle()
+      : Promise.resolve({ data: null }),
     fontData,
   ]);
 
+  const cachedDrodo = drodoResult.data as CachedDrodoOgRow | null;
   const drodo: DrodoOgData | null =
-    drodoResp?.ok ? ((await drodoResp.json()) as DrodoOgData) : null;
+    cachedDrodo && !cachedDrodo.drodo_profile_missing
+      ? {
+          steam_id: String(cachedDrodo.steam_id),
+          mmr: cachedDrodo.drodo_mmr,
+          max_mmr: cachedDrodo.drodo_max_mmr,
+          season: cachedDrodo.drodo_season,
+          season_games: cachedDrodo.drodo_season_games,
+          candy: cachedDrodo.drodo_candy,
+          chicken_count: cachedDrodo.drodo_chicken_count,
+        }
+      : null;
   const displayName = steamProfile.name || steamId;
   const avatarDataUrl = await imageToDataUrl(steamProfile.avatarUrl);
   const profileUrl = steamProfileUrl(steamId, steamProfile.customUrl).replace(

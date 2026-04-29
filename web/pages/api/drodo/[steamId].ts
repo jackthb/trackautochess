@@ -3,7 +3,7 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { fetchSteamProfile, resolveSteamInput } from "../../../lib/steam";
 
 const DRODO_BASE = "http://autochess.ppbizon.com";
-const DRODO_CACHE_TTL_MS = 12 * 60 * 60 * 1000;
+const DRODO_CACHE_TTL_MS = 24 * 60 * 60 * 1000;
 const EMPTY_DRODO_PROFILE_ERROR =
   "Steam account has no Dota Auto Chess MMR or stats.";
 
@@ -28,6 +28,34 @@ interface DrodoProfileRow {
   raw_data: Record<string, unknown>;
   fetched_at: string;
 }
+
+interface CachedUserDrodoRow {
+  steam_id: string;
+  drodo_mmr: number | null;
+  drodo_max_mmr: number | null;
+  drodo_mmr_level: number | null;
+  drodo_season: string | null;
+  drodo_season_games: number | null;
+  drodo_candy: number | null;
+  drodo_chicken_count: number | null;
+  drodo_raw_data: Record<string, unknown> | null;
+  drodo_last_fetched_at: string | null;
+  drodo_profile_missing: boolean | null;
+}
+
+const USER_DRODO_SELECT = [
+  "steam_id",
+  "drodo_mmr",
+  "drodo_max_mmr",
+  "drodo_mmr_level",
+  "drodo_season",
+  "drodo_season_games",
+  "drodo_candy",
+  "drodo_chicken_count",
+  "drodo_raw_data",
+  "drodo_last_fetched_at",
+  "drodo_profile_missing",
+].join(", ");
 
 function currentSeason(data: Record<string, unknown>): string | null {
   // Find the highest season number in the response keys (mmr_s42, mmr_s41, etc.)
@@ -130,6 +158,67 @@ function isFreshCache(fetchedAt: string | null | undefined): boolean {
   return Number.isFinite(fetchedTime) && Date.now() - fetchedTime < DRODO_CACHE_TTL_MS;
 }
 
+function cachedUserToDrodoProfile(row: CachedUserDrodoRow): DrodoProfileRow {
+  return {
+    steam_id: String(row.steam_id),
+    mmr: row.drodo_mmr,
+    max_mmr: row.drodo_max_mmr,
+    mmr_level: row.drodo_mmr_level,
+    season: row.drodo_season,
+    season_games: row.drodo_season_games,
+    candy: row.drodo_candy,
+    chicken_count: row.drodo_chicken_count ?? 0,
+    raw_data: row.drodo_raw_data ?? {},
+    fetched_at: row.drodo_last_fetched_at ?? new Date(0).toISOString(),
+  };
+}
+
+function drodoProfileToUserPayload(
+  profile: DrodoProfileRow
+): Record<string, unknown> {
+  return {
+    steam_id: profile.steam_id,
+    drodo_mmr: profile.mmr,
+    drodo_max_mmr: profile.max_mmr,
+    drodo_mmr_level: profile.mmr_level,
+    drodo_season: profile.season,
+    drodo_season_games: profile.season_games,
+    drodo_candy: profile.candy,
+    drodo_chicken_count: profile.chicken_count,
+    drodo_raw_data: profile.raw_data,
+    drodo_last_fetched_at: profile.fetched_at,
+    drodo_profile_missing: false,
+  };
+}
+
+async function markDrodoMissing(
+  steamId: string,
+  supabase?: SupabaseClient | null
+): Promise<string> {
+  const fetchedAt = new Date().toISOString();
+  if (!supabase) return fetchedAt;
+  const { error } = await supabase.from("users").upsert(
+    {
+      steam_id: steamId,
+      drodo_mmr: null,
+      drodo_max_mmr: null,
+      drodo_mmr_level: null,
+      drodo_season: null,
+      drodo_season_games: null,
+      drodo_candy: null,
+      drodo_chicken_count: 0,
+      drodo_raw_data: null,
+      drodo_last_fetched_at: fetchedAt,
+      drodo_profile_missing: true,
+    },
+    { onConflict: "steam_id" }
+  );
+  if (error) {
+    console.error("Failed to cache missing Drodo profile:", error.message);
+  }
+  return fetchedAt;
+}
+
 async function purgeDrodoCache(
   steamId: string,
   supabase: SupabaseClient
@@ -143,8 +232,19 @@ async function purgeDrodoCache(
   }
 
   const { error: profileError } = await supabase
-    .from("drodo_profiles")
-    .delete()
+    .from("users")
+    .update({
+      drodo_mmr: null,
+      drodo_max_mmr: null,
+      drodo_mmr_level: null,
+      drodo_season: null,
+      drodo_season_games: null,
+      drodo_candy: null,
+      drodo_chicken_count: 0,
+      drodo_raw_data: null,
+      drodo_last_fetched_at: new Date().toISOString(),
+      drodo_profile_missing: true,
+    })
     .eq("steam_id", steamId);
   if (profileError) {
     console.error("Failed to delete stale drodo profile:", profileError.message);
@@ -176,20 +276,31 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   // Check cache unless force refresh
   if (supabase && refresh !== "1") {
     const { data: cached } = await supabase
-      .from("drodo_profiles")
-      .select("*")
+      .from("users")
+      .select(USER_DRODO_SELECT)
       .eq("steam_id", steamId)
-      .single();
+      .maybeSingle<CachedUserDrodoRow>();
 
-    if (isFreshCache(cached?.fetched_at)) {
+    if (
+      cached?.drodo_profile_missing &&
+      isFreshCache(cached.drodo_last_fetched_at)
+    ) {
+      return res.status(404).json({
+        error: EMPTY_DRODO_PROFILE_ERROR,
+        fetched_at: cached.drodo_last_fetched_at,
+      });
+    }
+
+    if (cached && isFreshCache(cached.drodo_last_fetched_at)) {
+      const cachedProfile = cachedUserToDrodoProfile(cached);
       const { data: seasons } = await supabase
         .from("player_seasons")
         .select("season, mmr, max_mmr, games_played")
         .eq("steam_id", steamId)
         .order("season", { ascending: true });
 
-      if (hasDrodoStats(cached, seasons ?? [])) {
-        return res.status(200).json({ ...cached, seasons: seasons ?? [] });
+      if (hasDrodoStats(cachedProfile, seasons ?? [])) {
+        return res.status(200).json({ ...cachedProfile, seasons: seasons ?? [] });
       }
 
       await purgeDrodoCache(steamId, supabase);
@@ -205,7 +316,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
     const json = await resp.json();
     if (json.err !== 0 || !json.user_info?.[steamId]) {
-      return res.status(404).json({ error: "Player not found on Drodo" });
+      const fetchedAt = await markDrodoMissing(steamId, supabase);
+      return res.status(404).json({
+        error: "Player not found on Drodo",
+        fetched_at: fetchedAt,
+      });
     }
     drodoData = json.user_info[steamId];
   } catch (e) {
@@ -215,8 +330,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   const { profile, seasonRows } = buildDrodoProfile(steamId, drodoData);
 
   if (!hasDrodoStats(profile, seasonRows)) {
-    if (supabase) await purgeDrodoCache(steamId, supabase);
-    return res.status(404).json({ error: EMPTY_DRODO_PROFILE_ERROR });
+    const fetchedAt = await markDrodoMissing(steamId, supabase);
+    return res.status(404).json({
+      error: EMPTY_DRODO_PROFILE_ERROR,
+      fetched_at: fetchedAt,
+    });
   }
 
   await fetchSteamProfile(steamId, supabase ?? undefined);
@@ -226,11 +344,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   const { error: upsertError } = await supabase
-    .from("drodo_profiles")
-    .upsert(profile, { onConflict: "steam_id" });
+    .from("users")
+    .upsert(drodoProfileToUserPayload(profile), { onConflict: "steam_id" });
 
   if (upsertError) {
-    console.error("Failed to cache drodo profile:", upsertError.message);
+    console.error("Failed to cache Drodo profile:", upsertError.message);
   }
 
   // Upsert all season snapshots

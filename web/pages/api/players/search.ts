@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { createClient } from "@supabase/supabase-js";
+import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import {
   fetchSteamProfile,
   parseSteamInput,
@@ -10,6 +10,35 @@ interface SearchResult {
   steam_id: string;
   name: string | null;
   custom_url: string | null;
+  has_autochess_profile?: boolean;
+  drodo_profile_missing?: boolean;
+}
+
+async function findAutoChessProfileIds(
+  supabase: SupabaseClient | undefined,
+  steamIds: string[]
+): Promise<Set<string>> {
+  if (!supabase || steamIds.length === 0) return new Set();
+
+  const uniqueSteamIds = [...new Set(steamIds.map(String))];
+  const [usersResult, seasonsResult, gamesResult] = await Promise.all([
+    supabase
+      .from("users")
+      .select("steam_id, drodo_last_fetched_at, drodo_profile_missing")
+      .in("steam_id", uniqueSteamIds),
+    supabase.from("player_seasons").select("steam_id").in("steam_id", uniqueSteamIds),
+    supabase.from("games").select("user_id").in("user_id", uniqueSteamIds),
+  ]);
+
+  const ids = new Set<string>();
+  for (const row of usersResult.data ?? []) {
+    if (row.drodo_last_fetched_at && !row.drodo_profile_missing) {
+      ids.add(String(row.steam_id));
+    }
+  }
+  for (const row of seasonsResult.data ?? []) ids.add(String(row.steam_id));
+  for (const row of gamesResult.data ?? []) ids.add(String(row.user_id));
+  return ids;
 }
 
 export default async function handler(
@@ -83,6 +112,15 @@ export default async function handler(
       });
     }
   }
+
+  const autoChessIds = await findAutoChessProfileIds(
+    supabase,
+    rows.map((row) => String(row.steam_id))
+  );
+  rows = rows.map((row) => ({
+    ...row,
+    has_autochess_profile: autoChessIds.has(String(row.steam_id)),
+  }));
 
   return res.status(200).json(rows);
 }

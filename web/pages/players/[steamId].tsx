@@ -1,9 +1,8 @@
 import Head from "next/head";
 import Link from "next/link";
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { createClient } from "@supabase/supabase-js";
 import type { GetServerSideProps } from "next";
-import type { SupabaseClient } from "@supabase/supabase-js";
 import { absoluteUrl, getRequestSiteUrl, SITE_NAME } from "@/lib/site";
 import unitsData from "@data/units.json";
 import unitsFullData from "@data/units_full.json";
@@ -33,19 +32,36 @@ for (const [alias, canonical] of Object.entries(
 const UNITS_FULL = unitsFullData as Record<string, UnitFullInfo>;
 const SYNERGIES_DATA = synergiesData as Record<string, SynergyInfo>;
 const RELICS_DATA = (relicsData as any).relics as Record<string, RelicInfo>;
-const DRODO_CACHE_TTL_MS = 12 * 60 * 60 * 1000;
-
-function isFreshDrodoCache(fetchedAt: string | null | undefined): boolean {
-  if (!fetchedAt) return false;
-  const fetchedTime = new Date(fetchedAt).getTime();
-  return Number.isFinite(fetchedTime) && Date.now() - fetchedTime < DRODO_CACHE_TTL_MS;
-}
+const USER_DRODO_SELECT = [
+  "drodo_mmr",
+  "drodo_max_mmr",
+  "drodo_mmr_level",
+  "drodo_season",
+  "drodo_season_games",
+  "drodo_candy",
+  "drodo_chicken_count",
+  "drodo_last_fetched_at",
+  "drodo_profile_missing",
+].join(", ");
+const DRODO_CACHE_TTL_MS = 24 * 60 * 60 * 1000;
 
 interface SeasonSnapshot {
   season: string;
   mmr: number | null;
   max_mmr: number | null;
   games_played: number | null;
+}
+
+interface CachedUserDrodoRow {
+  drodo_mmr: number | null;
+  drodo_max_mmr: number | null;
+  drodo_mmr_level: number | null;
+  drodo_season: string | null;
+  drodo_season_games: number | null;
+  drodo_candy: number | null;
+  drodo_chicken_count: number | null;
+  drodo_last_fetched_at: string | null;
+  drodo_profile_missing: boolean | null;
 }
 
 interface PlayerPageProps {
@@ -62,21 +78,33 @@ interface PlayerPageProps {
     chicken_count: number | null;
   } | null;
   seasons: SeasonSnapshot[];
+  drodoProfileMissing: boolean;
+  drodoLastFetchedAt: string | null;
+  forceRefresh: boolean;
   ogImageUrl: string | null;
   canonicalUrl: string | null;
-  supabase: SupabaseClient | null;
 }
 
 export default function PlayerPage({
   steamId,
   steamProfile,
   games,
-  drodo,
-  seasons,
+  drodo: initialDrodo,
+  seasons: initialSeasons,
+  drodoProfileMissing: initialDrodoProfileMissing,
+  drodoLastFetchedAt: initialDrodoLastFetchedAt,
+  forceRefresh,
   ogImageUrl,
   canonicalUrl,
-  supabase,
 }: PlayerPageProps) {
+  const [drodo, setDrodo] = useState(initialDrodo);
+  const [seasons, setSeasons] = useState(initialSeasons);
+  const [drodoProfileMissing, setDrodoProfileMissing] = useState(
+    initialDrodoProfileMissing
+  );
+  const [drodoLastFetchedAt, setDrodoLastFetchedAt] = useState(
+    initialDrodoLastFetchedAt
+  );
   const displayName = steamProfile.name || steamId;
   const profileUrl = steamProfileUrl(steamId, steamProfile.customUrl);
   const title = `${displayName} - ${SITE_NAME}`;
@@ -97,6 +125,53 @@ export default function PlayerPage({
       top1,
     };
   }, [games]);
+
+  useEffect(() => {
+    const fetchedTime = drodoLastFetchedAt
+      ? new Date(drodoLastFetchedAt).getTime()
+      : NaN;
+    const hasFreshCache =
+      Number.isFinite(fetchedTime) &&
+      Date.now() - fetchedTime < DRODO_CACHE_TTL_MS;
+    if (!forceRefresh && hasFreshCache) return;
+
+    let cancelled = false;
+    const refresh = forceRefresh ? "?refresh=1" : "";
+    fetch(`/api/drodo/${encodeURIComponent(steamId)}${refresh}`)
+      .then(async (resp) => {
+        const data = await resp.json().catch(() => null);
+        if (resp.ok) return data;
+        if (resp.status === 404 && !cancelled) {
+          setDrodoProfileMissing(true);
+          if (typeof data?.fetched_at === "string") {
+            setDrodoLastFetchedAt(data.fetched_at);
+          }
+        }
+        return null;
+      })
+      .then((data) => {
+        if (!data || cancelled) return;
+        setDrodoProfileMissing(false);
+        setDrodo({
+          mmr: data.mmr ?? null,
+          max_mmr: data.max_mmr ?? null,
+          mmr_level: data.mmr_level ?? null,
+          season: data.season ?? null,
+          season_games: data.season_games ?? null,
+          candy: data.candy ?? null,
+          chicken_count: data.chicken_count ?? null,
+        });
+        if (typeof data.fetched_at === "string") {
+          setDrodoLastFetchedAt(data.fetched_at);
+        }
+        if (Array.isArray(data.seasons)) setSeasons(data.seasons);
+      })
+      .catch(() => {});
+
+    return () => {
+      cancelled = true;
+    };
+  }, [drodoLastFetchedAt, forceRefresh, steamId]);
 
   return (
     <>
@@ -300,6 +375,14 @@ export default function PlayerPage({
             </Link>
           </div>
 
+          {drodoProfileMissing && !drodo && (
+            <div className="table-wrap" style={{ marginBottom: 32 }}>
+              <div className="empty-state">
+                This player doesn't play Drodo.
+              </div>
+            </div>
+          )}
+
           {(stats || (drodo && (drodo.mmr != null || drodo.max_mmr != null))) && (
             <div className="stats-bar">
               {stats && (
@@ -463,100 +546,40 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         .order("played_at", { ascending: false })
     : { data: [] };
 
-  // Fetch drodo profile and season history (using service key for cached data)
-  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  // Fetch cached Drodo profile and season history from public Supabase rows.
   let drodo = null;
-  let staleDrodo = null;
+  let drodoProfileMissing = false;
+  let drodoLastFetchedAt = null;
   let seasons: SeasonSnapshot[] = [];
-  if (url && serviceKey && !forceRefresh) {
-    const adminClient = createClient(url, serviceKey, {
-      auth: { autoRefreshToken: false, persistSession: false },
-    });
+  if (supabase && !forceRefresh) {
     const [profileResult, seasonsResult] = await Promise.all([
-      adminClient
-        .from("drodo_profiles")
-        .select("mmr, max_mmr, mmr_level, season, season_games, candy, chicken_count, fetched_at")
+      supabase
+        .from("users")
+        .select(USER_DRODO_SELECT)
         .eq("steam_id", steamId)
-        .single(),
-      adminClient
+        .maybeSingle<CachedUserDrodoRow>(),
+      supabase
         .from("player_seasons")
         .select("season, mmr, max_mmr, games_played")
         .eq("steam_id", steamId)
         .order("season", { ascending: true }),
     ]);
     if (profileResult.data) {
-      staleDrodo = profileResult.data;
-      if (
-        isFreshDrodoCache(
-          (profileResult.data as { fetched_at?: string }).fetched_at
-        )
-      ) {
-        drodo = profileResult.data;
+      drodoProfileMissing = Boolean(profileResult.data.drodo_profile_missing);
+      drodoLastFetchedAt = profileResult.data.drodo_last_fetched_at;
+      if (profileResult.data.drodo_last_fetched_at && !drodoProfileMissing) {
+        drodo = {
+          mmr: profileResult.data.drodo_mmr,
+          max_mmr: profileResult.data.drodo_max_mmr,
+          mmr_level: profileResult.data.drodo_mmr_level,
+          season: profileResult.data.drodo_season,
+          season_games: profileResult.data.drodo_season_games,
+          candy: profileResult.data.drodo_candy,
+          chicken_count: profileResult.data.drodo_chicken_count,
+        };
       }
     }
     if (seasonsResult.data) seasons = seasonsResult.data;
-
-    // Cache miss? Pull fresh from Drodo and re-fetch — this lets newly looked
-    // up players (e.g. pasted Steam URLs) see their MMR immediately instead of
-    // waiting for a manual refresh.
-    if (!drodo) {
-      try {
-        const proto = context.req.headers["x-forwarded-proto"] ?? "http";
-        const host = context.req.headers.host;
-        if (host) {
-          const base = `${proto}://${host}`;
-          const resp = await fetch(`${base}/api/drodo/${steamId}`);
-          if (resp.ok) {
-            const data = await resp.json();
-            drodo = {
-              mmr: data.mmr ?? null,
-              max_mmr: data.max_mmr ?? null,
-              mmr_level: data.mmr_level ?? null,
-              season: data.season ?? null,
-              season_games: data.season_games ?? null,
-              candy: data.candy ?? null,
-              chicken_count: data.chicken_count ?? null,
-            };
-            if (Array.isArray(data.seasons)) seasons = data.seasons;
-          }
-        }
-      } catch {
-        // Drodo API unreachable — fall through with no stats.
-      }
-    }
-  }
-
-  if (!drodo && !staleDrodo) {
-    try {
-      const proto = context.req.headers["x-forwarded-proto"] ?? "http";
-      const host = context.req.headers.host;
-      if (host) {
-        const base = `${proto}://${host}`;
-        const resp = await fetch(
-          `${base}/api/drodo/${steamId}${forceRefresh ? "?refresh=1" : ""}`
-        );
-        if (resp.ok) {
-          const data = await resp.json();
-          drodo = {
-            mmr: data.mmr ?? null,
-            max_mmr: data.max_mmr ?? null,
-            mmr_level: data.mmr_level ?? null,
-            season: data.season ?? null,
-            season_games: data.season_games ?? null,
-            candy: data.candy ?? null,
-            chicken_count: data.chicken_count ?? null,
-          };
-          if (Array.isArray(data.seasons)) seasons = data.seasons;
-        }
-      }
-    } catch {
-      // Drodo API unreachable; still render the Steam profile shell.
-    }
-  }
-
-  // Keep rendering using stale cached Drodo stats if the refresh path fails.
-  if (!drodo && staleDrodo) {
-    drodo = staleDrodo;
   }
 
   const steamProfile = await fetchSteamProfile(steamId, supabase ?? undefined, {
@@ -579,6 +602,9 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       games: (gamesResult.data as PlayerGame[]) || [],
       drodo,
       seasons,
+      drodoProfileMissing,
+      drodoLastFetchedAt,
+      forceRefresh,
       ogImageUrl: absoluteUrl(`/api/og/player/${steamId}`, baseUrl),
       canonicalUrl: absoluteUrl(`/players/${steamId}`, baseUrl),
     },

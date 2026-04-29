@@ -6,6 +6,7 @@ interface SearchResult {
   steam_id: string;
   name: string | null;
   custom_url: string | null;
+  has_autochess_profile?: boolean;
 }
 
 interface ProfileSearchProps {
@@ -115,19 +116,7 @@ export function ProfileSearch({
     await router.push(`/players/${steamId}`);
   };
 
-  const warmLookupAndNavigate = async (
-    lookupValue: string,
-    fallbackSteamId?: string
-  ) => {
-    // If we already have a canonical Steam ID from search results, navigate
-    // immediately and warm Drodo in the background so the destination page
-    // can render without waiting on a potentially flaky upstream API call.
-    if (fallbackSteamId) {
-      await navigateToPlayer(fallbackSteamId);
-      void fetch(`/api/drodo/${encodeURIComponent(lookupValue)}`).catch(() => {});
-      return;
-    }
-
+  const resolveLookupAndNavigate = async (lookupValue: string) => {
     const reqId = ++lookupReqRef.current;
     clearLookupBarTimer();
     setLookupError(null);
@@ -141,44 +130,23 @@ export function ProfileSearch({
     }, 160);
 
     try {
-      const resp = await fetch(`/api/drodo/${encodeURIComponent(lookupValue)}`);
+      const resp = await fetch(
+        `/api/players/search?q=${encodeURIComponent(lookupValue)}`
+      );
       if (reqId !== lookupReqRef.current) return;
 
       if (resp.ok) {
-        const data = await resp.json();
-        const resolvedSteamId =
-          data?.steam_id != null ? String(data.steam_id) : fallbackSteamId;
-        if (resolvedSteamId) {
-          await navigateToPlayer(resolvedSteamId);
+        const data = (await resp.json()) as SearchResult[];
+        const first = data[0];
+        if (first?.steam_id) {
+          await navigateToPlayer(first.steam_id);
           return;
         }
-      } else if (fallbackSteamId) {
-        await navigateToPlayer(fallbackSteamId);
-        return;
-      } else {
-        let errorMessage =
-          "No Dota Auto Chess profile found for that Steam account.";
-        try {
-          const data = await resp.json();
-          if (typeof data?.error === "string" && data.error.trim()) {
-            errorMessage = data.error;
-          }
-        } catch {}
-        setLookupError(errorMessage);
-        return;
       }
 
-      if (fallbackSteamId) {
-        await navigateToPlayer(fallbackSteamId);
-        return;
-      }
       setLookupError("Unable to resolve that Steam profile.");
     } catch {
       if (reqId !== lookupReqRef.current) return;
-      if (fallbackSteamId) {
-        await navigateToPlayer(fallbackSteamId);
-        return;
-      }
       setLookupError("Lookup failed. Try again.");
     } finally {
       if (reqId === lookupReqRef.current) {
@@ -189,8 +157,8 @@ export function ProfileSearch({
     }
   };
 
-  const selectResult = (steamId: string) => {
-    void warmLookupAndNavigate(steamId, steamId);
+  const selectResult = (result: SearchResult) => {
+    void navigateToPlayer(result.steam_id);
   };
 
   const handleSearch = (e: React.FormEvent) => {
@@ -199,18 +167,18 @@ export function ProfileSearch({
     if (!val) return;
 
     if (dropdownOpen && highlightedIndex >= 0 && results[highlightedIndex]) {
-      selectResult(results[highlightedIndex].steam_id);
+      selectResult(results[highlightedIndex]);
       return;
     }
 
     if (results.length > 0) {
-      selectResult(results[0].steam_id);
+      selectResult(results[0]);
       return;
     }
 
     const parsed = parseSteamInput(val);
     if (parsed) {
-      void warmLookupAndNavigate(parsed.value);
+      void resolveLookupAndNavigate(val);
       return;
     }
 
@@ -386,7 +354,7 @@ export function ProfileSearch({
                 onMouseEnter={() => setHighlightedIndex(i)}
                 onMouseDown={(e) => {
                   e.preventDefault();
-                  selectResult(r.steam_id);
+                  selectResult(r);
                 }}
               >
                 <span>{r.name || r.custom_url || r.steam_id}</span>
