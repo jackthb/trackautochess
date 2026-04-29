@@ -500,7 +500,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       drodoProfileMissing,
       drodoLastFetchedAt,
       forceRefresh,
-      ogImageUrl: absoluteUrl(`/api/og/player/${steamId}`, baseUrl),
+      ogImageUrl: absoluteUrl(`/api/og/player/${encodeURIComponent(rawSteamId)}`, baseUrl),
       canonicalUrl: absoluteUrl(
         playerProfilePath(steamId, steamProfile.customUrl),
         baseUrl
