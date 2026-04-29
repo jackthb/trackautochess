@@ -13,7 +13,9 @@ import relicsData from "@data/relics.json";
 import { GameRowDisplay } from "@dac/shared/GameRowDisplay";
 import type { PlayerGame, UnitFullInfo, SynergyInfo, RelicInfo } from "@dac/shared/types";
 import { mmrToRank } from "@dac/shared/game-utils";
-import { StatsGrid, type StatItem } from "@/components/StatsGrid";
+import { Button } from "@dac/shared/Button";
+import { StatsGrid, type StatItem } from "@dac/shared/StatsGrid";
+import { SeasonHistoryGrid, type SeasonSnapshot } from "@dac/shared/SeasonHistoryGrid";
 import {
   fetchSteamProfile,
   playerProfilePath,
@@ -48,13 +50,6 @@ const USER_DRODO_SELECT = [
   "drodo_profile_missing",
 ].join(", ");
 const DRODO_CACHE_TTL_MS = 24 * 60 * 60 * 1000;
-
-interface SeasonSnapshot {
-  season: string;
-  mmr: number | null;
-  max_mmr: number | null;
-  games_played: number | null;
-}
 
 interface CachedUserDrodoRow {
   drodo_mmr: number | null;
@@ -238,14 +233,14 @@ export default function PlayerPage({
         .dashboard {
           max-width: 1200px;
           margin: 0 auto;
-          padding: 40px 32px 80px;
+          padding: 32px 32px 72px;
         }
         .player-header {
           display: flex;
           align-items: flex-start;
           justify-content: space-between;
           gap: 24px;
-          margin-bottom: 32px;
+          margin-bottom: 24px;
         }
         .player-heading { min-width: 0; }
         .player-name {
@@ -266,22 +261,6 @@ export default function PlayerPage({
         }
         .player-meta a:hover {
           color: var(--text-secondary);
-        }
-        .refresh-link {
-          flex-shrink: 0;
-          font-family: var(--font-mono);
-          font-size: 12px;
-          letter-spacing: 1.2px;
-          text-transform: uppercase;
-          color: var(--text-muted);
-          border: 1px solid var(--border);
-          border-radius: var(--r-3);
-          padding: 8px 12px;
-          transition: color 0.15s, border-color 0.15s;
-        }
-        .refresh-link:hover {
-          color: var(--text-secondary);
-          border-color: var(--text-muted);
         }
         .table-wrap {
           border: 1px solid var(--border);
@@ -307,39 +286,6 @@ export default function PlayerPage({
         .game-entry:last-child {
           border-bottom: none;
         }
-        .section-title {
-          font-size: 13px;
-          letter-spacing: 2px;
-          text-transform: uppercase;
-          color: var(--text-muted);
-          margin: 0 0 16px;
-          padding-bottom: 10px;
-          border-bottom: 1px solid var(--border-subtle);
-        }
-        .seasons-grid {
-          display: grid;
-          grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-          gap: 1px;
-          background: var(--border-subtle);
-          border: 1px solid var(--border);
-          margin-bottom: 40px;
-        }
-        .season-card { background: var(--bg-surface); padding: 20px; }
-        .season-label {
-          font-size: 13px;
-          letter-spacing: 1.5px;
-          text-transform: uppercase;
-          color: var(--text-muted);
-          margin-bottom: 10px;
-        }
-        .season-mmr {
-          font-size: 28px;
-          font-weight: 700;
-          color: var(--text-primary);
-          margin-bottom: 3px;
-        }
-        .season-meta { font-size: 13px; color: var(--text-muted); }
-        .season-peak { color: var(--gold); }
         .empty-state {
           text-align: center;
           padding: 80px 32px;
@@ -377,12 +323,12 @@ export default function PlayerPage({
                 )}
               </div>
             </div>
-            <Link
+            <Button
+              as="a"
               href={`${playerProfilePath(steamId, steamProfile.customUrl)}?refresh=1`}
-              className="refresh-link"
             >
               Refresh MMR
-            </Link>
+            </Button>
           </div>
 
           {drodoProfileMissing && !drodo && (
@@ -395,31 +341,7 @@ export default function PlayerPage({
 
           {statItems.length > 0 && <StatsGrid items={statItems} />}
 
-          {seasons.length > 1 && (
-            <>
-              <div className="section-title">Season History</div>
-              <div className="seasons-grid">
-                {[...seasons].reverse().map((s) => (
-                  <div key={s.season} className="season-card">
-                    <div className="season-label">{s.season.toUpperCase()}</div>
-                    {s.mmr != null ? (
-                      <div className="season-mmr">{s.mmr}</div>
-                    ) : (
-                      <div className="season-mmr" style={{ color: "var(--text-muted)" }}>—</div>
-                    )}
-                    {s.max_mmr != null && (
-                      <div className="season-meta">
-                        Peak <span className="season-peak">{s.max_mmr}</span>
-                      </div>
-                    )}
-                    {s.games_played != null && (
-                      <div className="season-meta">{s.games_played} games</div>
-                    )}
-                  </div>
-                ))}
-              </div>
-            </>
-          )}
+          <SeasonHistoryGrid seasons={seasons} />
 
           {games.length === 0 ? (
             <div className="table-wrap">

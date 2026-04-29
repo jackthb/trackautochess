@@ -6,6 +6,9 @@
   "types": "game-utils.ts",
   "exports": {
     "./game-utils": "./game-utils.ts",
+    "./Button": "./Button.tsx",
+    "./StatsGrid": "./StatsGrid.tsx",
+    "./SeasonHistoryGrid": "./SeasonHistoryGrid.tsx",
     "./GameRowDisplay": "./GameRowDisplay.tsx",
     "./Tooltip": "./Tooltip.tsx",
     "./types": "./types.ts",

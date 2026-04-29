@@ -11,14 +11,9 @@ import relicsData from "@data/relics.json";
 import { SeoHead } from "@/lib/seo";
 import { SITE_NAME } from "@/lib/site";
 import { playerProfilePath } from "@/lib/steam";
-import { StatsGrid, type StatItem } from "@/components/StatsGrid";
-
-interface SeasonSnapshot {
-  season: string;
-  mmr: number | null;
-  max_mmr: number | null;
-  games_played: number | null;
-}
+import { Button } from "@dac/shared/Button";
+import { StatsGrid, type StatItem } from "@dac/shared/StatsGrid";
+import { SeasonHistoryGrid, type SeasonSnapshot } from "@dac/shared/SeasonHistoryGrid";
 
 interface DrodoProfile {
   mmr: number | null;
@@ -298,64 +293,15 @@ export default function Dashboard({ supabase }: DashboardProps) {
         .dashboard {
           max-width: 1200px;
           margin: 0 auto;
-          padding: 40px 32px 80px;
+          padding: 32px 32px 72px;
         }
         .refresh-row {
           display: flex;
           align-items: center;
           gap: 16px;
-          margin-bottom: 28px;
+          margin-bottom: 24px;
         }
-        .btn-refresh {
-          font-family: inherit;
-          font-size: 14px;
-          color: var(--text-muted);
-          background: none;
-          border: 1px solid var(--border);
-          padding: 7px 18px;
-          cursor: pointer;
-          letter-spacing: 0.5px;
-          transition: all 0.2s;
-        }
-        .btn-refresh:hover:not(:disabled) {
-          color: var(--text-secondary);
-          border-color: var(--text-muted);
-        }
-        .btn-refresh:disabled { opacity: 0.5; cursor: default; }
         .refresh-time { font-size: 13px; color: var(--text-muted); }
-        .section-title {
-          font-size: 13px;
-          letter-spacing: 2px;
-          text-transform: uppercase;
-          color: var(--text-muted);
-          margin: 40px 0 16px;
-          padding-bottom: 10px;
-          border-bottom: 1px solid var(--border-subtle);
-        }
-        .seasons-grid {
-          display: grid;
-          grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-          gap: 1px;
-          background: var(--border-subtle);
-          border: 1px solid var(--border);
-          margin-bottom: 40px;
-        }
-        .season-card { background: var(--bg-surface); padding: 20px; }
-        .season-label {
-          font-size: 13px;
-          letter-spacing: 1.5px;
-          text-transform: uppercase;
-          color: var(--text-muted);
-          margin-bottom: 10px;
-        }
-        .season-mmr {
-          font-size: 28px;
-          font-weight: 700;
-          color: var(--text-primary);
-          margin-bottom: 3px;
-        }
-        .season-meta { font-size: 13px; color: var(--text-muted); }
-        .season-peak { color: var(--gold); }
         .table-wrap {
           border: 1px solid var(--border);
           overflow: hidden;
@@ -432,35 +378,10 @@ export default function Dashboard({ supabase }: DashboardProps) {
               <>
                 {statItems.length > 0 && <div className="fade-up"><StatsGrid items={statItems} /></div>}
 
-                {drodo?.seasons && drodo.seasons.length > 1 && (
-                  <div className="fade-up delay-1">
-                    <div className="section-title">Season History</div>
-                    <div className="seasons-grid">
-                      {[...drodo.seasons].reverse().map((s) => (
-                        <div key={s.season} className="season-card">
-                          <div className="season-label">{s.season.toUpperCase()}</div>
-                          {s.mmr != null ? (
-                            <div className="season-mmr">{s.mmr}</div>
-                          ) : (
-                            <div className="season-mmr" style={{ color: "var(--text-muted)" }}>—</div>
-                          )}
-                          {s.max_mmr != null && (
-                            <div className="season-meta">
-                              Peak <span className="season-peak">{s.max_mmr}</span>
-                            </div>
-                          )}
-                          {s.games_played != null && (
-                            <div className="season-meta">{s.games_played} games</div>
-                          )}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
+                {drodo?.seasons && <div className="fade-up delay-1"><SeasonHistoryGrid seasons={drodo.seasons} /></div>}
 
                 <div className="refresh-row fade-up">
-                  <button
-                    className="btn-refresh"
+                  <Button
                     disabled={drodoLoading}
                     onClick={() => {
                       const steamId = user?.user_metadata?.steam_id;
@@ -471,7 +392,7 @@ export default function Dashboard({ supabase }: DashboardProps) {
                     }}
                   >
                     {drodoLoading ? "Loading..." : "Refresh stats"}
-                  </button>
+                  </Button>
                   {drodo?.fetched_at && (
                     <span className="refresh-time">
                       Updated {new Date(drodo.fetched_at).toLocaleString()}

@@ -1,4 +1,6 @@
 import { useState, useRef, useEffect, useCallback } from "react";
+import { Button } from "@dac/shared/Button";
+import { SeasonHistoryGrid } from "@dac/shared/SeasonHistoryGrid";
 import type { Game, UnitFullInfo, SynergyInfo, RelicInfo, DrodoProfile } from "../types";
 import { StatsBar } from "./StatsBar";
 import { GameRow } from "./GameRow";
@@ -127,48 +129,27 @@ export function HistoryTab({
       <div className="history-container">
         <StatsBar games={games} drodo={drodo} />
 
-        {drodo?.seasons && drodo.seasons.length > 1 && (
+        {drodo?.seasons && (
           <div className="fade-up">
-            <div className="section-title">Season History</div>
-            <div className="seasons-grid">
-              {[...drodo.seasons].reverse().map((s) => (
-                <div key={s.season} className="season-card">
-                  <div className="season-label">{s.season.toUpperCase()}</div>
-                  {s.mmr != null ? (
-                    <div className="season-mmr">{s.mmr}</div>
-                  ) : (
-                    <div className="season-mmr dim">—</div>
-                  )}
-                  {s.max_mmr != null && (
-                    <div className="season-meta">
-                      Peak <span className="season-peak">{s.max_mmr}</span>
-                    </div>
-                  )}
-                  {s.games_played != null && (
-                    <div className="season-meta">{s.games_played} games</div>
-                  )}
-                </div>
-              ))}
-            </div>
+            <SeasonHistoryGrid seasons={drodo.seasons} />
           </div>
         )}
 
         <div className="history-refresh fade-up">
-          <button
-            className={`btn-ghost${refreshing ? " btn-loading" : ""}`}
+          <Button
+            className={refreshing ? "btn-loading" : undefined}
             disabled={refreshing}
             onClick={refresh}
           >
             {refreshing ? "Refreshing" : "Refresh"}
-          </button>
+          </Button>
           {refreshDrodo && (
-            <button
-              className="btn-ghost"
+            <Button
               disabled={drodoLoading}
               onClick={refreshDrodo}
             >
               {drodoLoading ? "Refreshing..." : "Refresh stats"}
-            </button>
+            </Button>
           )}
           {lastRefresh && (
             <span className="refresh-time">

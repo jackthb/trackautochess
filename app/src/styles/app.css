@@ -127,6 +127,7 @@
   cursor: default;
 }
 
+
 /* ── Login screen ─────────────────────────────────────── */
 
 .login-screen {
@@ -231,88 +232,6 @@
   width: 100%;
 }
 
-/* Stats bar */
-.stats-bar {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-  gap: 1px;
-  background: var(--border-subtle);
-  border: 1px solid var(--border);
-  margin-bottom: 32px;
-}
-
-.stat-cell {
-  background: var(--bg-surface);
-  padding: 24px 20px;
-  text-align: center;
-}
-
-.stat-value {
-  font-size: 32px;
-  font-weight: 700;
-  color: var(--text-primary);
-  margin-bottom: 6px;
-}
-
-.stat-value.gold { color: var(--gold); }
-.stat-value.green { color: var(--green-bright); }
-
-.stat-label {
-  font-size: 13px;
-  letter-spacing: 1.5px;
-  text-transform: uppercase;
-  color: var(--text-muted);
-}
-
-/* Section title */
-.section-title {
-  font-size: 13px;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  color: var(--text-muted);
-  margin: 0 0 16px;
-  padding-bottom: 10px;
-  border-bottom: 1px solid var(--border-subtle);
-}
-
-/* Season history grid */
-.seasons-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-  gap: 1px;
-  background: var(--border-subtle);
-  border: 1px solid var(--border);
-  margin-bottom: 32px;
-}
-
-.season-card {
-  background: var(--bg-surface);
-  padding: 16px;
-}
-
-.season-label {
-  font-size: 13px;
-  letter-spacing: 1.5px;
-  text-transform: uppercase;
-  color: var(--text-muted);
-  margin-bottom: 8px;
-}
-
-.season-mmr {
-  font-size: 24px;
-  font-weight: 700;
-  color: var(--text-primary);
-  margin-bottom: 3px;
-}
-
-.season-mmr.dim { color: var(--text-muted); }
-
-.season-meta {
-  font-size: 13px;
-  color: var(--text-muted);
-}
-
-.season-peak { color: var(--gold); }
 
 /* Games table */
 .table-wrap {
