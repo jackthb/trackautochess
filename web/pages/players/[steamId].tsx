@@ -4,7 +4,7 @@ import { useMemo } from "react";
 import { createClient } from "@supabase/supabase-js";
 import type { GetServerSideProps } from "next";
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { absoluteUrl, getRequestSiteUrl } from "@/lib/site";
+import { absoluteUrl, getRequestSiteUrl, SITE_NAME } from "@/lib/site";
 import unitsData from "@data/units.json";
 import unitsFullData from "@data/units_full.json";
 import synergiesData from "@data/synergies.json";
@@ -79,7 +79,7 @@ export default function PlayerPage({
 }: PlayerPageProps) {
   const displayName = steamProfile.name || steamId;
   const profileUrl = steamProfileUrl(steamId, steamProfile.customUrl);
-  const title = `${displayName} - DAC Tools`;
+  const title = `${displayName} - ${SITE_NAME}`;
   const description = drodo?.mmr
     ? `${displayName} is ${mmrToRank(drodo.mmr)} at ${drodo.mmr.toLocaleString("en-US")} MMR.`
     : `Dota Auto Chess profile for ${displayName}.`;
@@ -559,19 +559,18 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     drodo = staleDrodo;
   }
 
-  const hasGames = Boolean(gamesResult.data?.length);
-  const hasDrodo = drodo !== null;
-  const hasSeasons = seasons.length > 0;
-
-  // Don't expose hollow profile pages — if a Steam ID has no games, no MMR,
-  // and no season history, there's nothing meaningful to show.
-  if (!hasGames && !hasDrodo && !hasSeasons) {
-    return { notFound: true };
-  }
-
   const steamProfile = await fetchSteamProfile(steamId, supabase ?? undefined, {
     persist: true,
   });
+
+  const hasGames = Boolean(gamesResult.data?.length);
+  const hasDrodo = drodo !== null;
+  const hasSeasons = seasons.length > 0;
+  const hasSteamProfile = Boolean(steamProfile.name || steamProfile.customUrl);
+
+  if (!hasGames && !hasDrodo && !hasSeasons && !hasSteamProfile) {
+    return { notFound: true };
+  }
 
   return {
     props: {

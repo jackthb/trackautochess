@@ -1,8 +1,8 @@
 import type { IncomingHttpHeaders } from "http";
 
-export const SITE_NAME = "DAC Tools";
+export const SITE_NAME = "track.autochess";
 export const SITE_DESCRIPTION =
-  "DAC Tools helps Dota Auto Chess players browse items and relics, read patch notes, and track matches.";
+  "track.autochess helps Dota Auto Chess players browse items and relics, read patch notes, and track matches.";
 
 function normalizeUrl(raw: string | null | undefined): string | null {
   if (!raw) return null;

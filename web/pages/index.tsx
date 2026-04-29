@@ -136,10 +136,10 @@ export default function Home() {
           opacity: 0;
           animation: arrive 0.8s cubic-bezier(0.16, 1, 0.3, 1) 0.1s forwards;
         }
-        .title-dac {
+        .title-track {
           color: var(--accent);
         }
-        .title-tools {
+        .title-autochess {
           color: var(--text-secondary);
           margin-left: 0.15em;
         }
@@ -253,8 +253,8 @@ export default function Home() {
 
           <main className="content">
             <h1 className="title">
-              <span className="title-dac">DAC</span>
-              <span className="title-tools">Tools</span>
+              <span className="title-track">Track</span>{" "}
+              <span className="title-autochess">Autochess</span>
             </h1>
 
             <div className="rule" />

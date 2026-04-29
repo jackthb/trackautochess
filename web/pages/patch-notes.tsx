@@ -47,7 +47,7 @@ export default function PatchNotesPage({ supabase }: PatchNotesPageProps) {
   );
   const title = `Dota Auto Chess Patch Notes | ${SITE_NAME}`;
   const description =
-    "Read the latest Dota Auto Chess patch notes, including new relics, new items, balance changes, and update history on DAC Tools.";
+    "Read the latest Dota Auto Chess patch notes, including new relics, new items, balance changes, and update history on track.autochess.";
   const structuredData = {
     "@context": "https://schema.org",
     "@type": "CollectionPage",

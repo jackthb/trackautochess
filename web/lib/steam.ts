@@ -56,7 +56,7 @@ async function fetchSteamProfileXml(url: string): Promise<SteamApiProfile> {
     const resp = await fetch(url, {
       headers: {
         Accept: "application/xml,text/xml,text/html;q=0.9,*/*;q=0.8",
-        "User-Agent": "DAC Tools profile resolver",
+        "User-Agent": "track.autochess profile resolver",
       },
       redirect: "follow",
     });
@@ -95,7 +95,7 @@ async function resolveSteamVanityWithApi(slug: string): Promise<string | null> {
       {
         headers: {
           Accept: "application/json",
-          "User-Agent": "DAC Tools profile resolver",
+          "User-Agent": "track.autochess profile resolver",
         },
       }
     );

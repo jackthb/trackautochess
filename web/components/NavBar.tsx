@@ -2,6 +2,7 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import type { SupabaseClient, User } from "@supabase/supabase-js";
+import { SITE_NAME } from "@/lib/site";
 
 interface NavBarProps {
   supabase?: SupabaseClient | null;
@@ -175,8 +176,8 @@ export function NavBar({ supabase }: NavBarProps) {
       `}</style>
       <nav>
         <div className="nav-left">
-          <Link href="/" className="nav-logo" aria-label="DAC Tools home">
-            <img src="/logo.svg" alt="DAC Tools" />
+          <Link href="/" className="nav-logo" aria-label={`${SITE_NAME} home`}>
+            <img src="/logo.svg" alt={SITE_NAME} />
           </Link>
           <div className="nav-links">
             <Link href="/items" className="nav-link">

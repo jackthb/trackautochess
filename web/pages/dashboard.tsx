@@ -9,6 +9,7 @@ import type { Game, UnitFullInfo, SynergyInfo, RelicInfo } from "@dac/shared/typ
 import synergiesData from "@data/synergies.json";
 import relicsData from "@data/relics.json";
 import { SeoHead } from "@/lib/seo";
+import { SITE_NAME } from "@/lib/site";
 
 interface SeasonSnapshot {
   season: string;
@@ -229,8 +230,8 @@ export default function Dashboard({ supabase }: DashboardProps) {
   return (
     <>
       <SeoHead
-        title="Dashboard | DAC Tools"
-        description="Signed-in DAC Tools dashboard."
+        title={`Dashboard | ${SITE_NAME}`}
+        description="Signed-in track.autochess dashboard."
         path="/dashboard"
         noindex
       />

@@ -40,8 +40,7 @@ export function ProfileSearch({
 
   useEffect(() => {
     const val = searchValue.trim();
-    const looksLikeUrl = /steamcommunity\.com\//i.test(val);
-    if (!val || /^\d+$/.test(val) || looksLikeUrl) {
+    if (!val) {
       setResults([]);
       setDropdownOpen(false);
       setHighlightedIndex(-1);

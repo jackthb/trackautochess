@@ -283,7 +283,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 letterSpacing: 5,
               }}
             >
-              DAC TOOLS
+              track.autochess
             </div>
             <div
               style={{

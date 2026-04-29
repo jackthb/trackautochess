@@ -19,7 +19,7 @@ const ALL_RELICS: BrowsableEntity[] = getAllRelics().map((relic) => ({
 export default function RelicsPage({ supabase }: RelicsPageProps) {
   const title = `Dota Auto Chess Relics | ${SITE_NAME}`;
   const description =
-    "Browse every Dota Auto Chess relic, search recent additions, and open dedicated relic pages on DAC Tools.";
+    "Browse every Dota Auto Chess relic, search recent additions, and open dedicated relic pages on track.autochess.";
   const structuredData = {
     "@context": "https://schema.org",
     "@type": "CollectionPage",
