@@ -44,7 +44,7 @@ interface CachedUserDrodoRow {
 }
 
 const USER_DRODO_SELECT = [
-  "steam_id",
+  "steam_id::text",
   "drodo_mmr",
   "drodo_max_mmr",
   "drodo_mmr_level",

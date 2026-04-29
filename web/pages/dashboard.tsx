@@ -175,7 +175,7 @@ export default function Dashboard({ supabase }: DashboardProps) {
         // Cache miss or stale — full fetch
         const { data } = await supabase
           .from("games")
-          .select("*")
+          .select("*, user_id::text")
           .eq("user_id", steamId)
           .order("played_at", { ascending: false });
 

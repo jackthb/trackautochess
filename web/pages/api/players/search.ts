@@ -16,7 +16,7 @@ interface SearchResult {
 }
 
 interface UserSearchRow {
-  steam_id: string | number;
+  steam_id: string;
   name: string | null;
   custom_url: string | null;
   drodo_last_fetched_at: string | null;
@@ -24,7 +24,7 @@ interface UserSearchRow {
 }
 
 const USER_SEARCH_SELECT =
-  "steam_id, name, custom_url, drodo_last_fetched_at, drodo_profile_missing";
+  "steam_id::text, name, custom_url, drodo_last_fetched_at, drodo_profile_missing";
 
 function toSearchResult(row: UserSearchRow): SearchResult {
   return {
@@ -94,12 +94,12 @@ async function markRowsWithGames(
 
   const { data } = await supabase
     .from("games")
-    .select("user_id")
+    .select("user_id::text")
     .in("user_id", ids)
     .limit(1000);
 
   const idsWithGames = new Set(
-    ((data ?? []) as Array<{ user_id: string | number }>).map((row) =>
+    ((data ?? []) as Array<{ user_id: string }>).map((row) =>
       String(row.user_id)
     )
   );
@@ -116,6 +116,7 @@ export default async function handler(
 ) {
   const rawQuery = Array.isArray(req.query.q) ? req.query.q[0] : req.query.q;
   const query = rawQuery?.trim().replace(/[,()%*]/g, "") ?? "";
+  const shouldSearchSteam = req.query.steam === "1";
 
   if (!query || query.length < 2) {
     return res.status(200).json([]);
@@ -188,10 +189,12 @@ export default async function handler(
   }
 
   const parsed = parseSteamInput(query);
-  if (parsed && rows.length === 0) {
+  let authoritativeSteamId: string | null = null;
+  if (parsed && shouldSearchSteam) {
     const resolvedSteamId = await resolveSteamInput(query, supabase, {
       persist: false,
     });
+    authoritativeSteamId = resolvedSteamId;
     if (
       resolvedSteamId &&
       !rows.some((row) => String(row.steam_id) === resolvedSteamId)
@@ -206,6 +209,19 @@ export default async function handler(
         has_autochess_profile: false,
         drodo_profile_missing: false,
       });
+    }
+  }
+
+  rows = sortSearchResults(mergeSearchResults(rows), query);
+  if (authoritativeSteamId) {
+    const authoritative = rows.find(
+      (row) => String(row.steam_id) === authoritativeSteamId
+    );
+    if (authoritative) {
+      rows = [
+        authoritative,
+        ...rows.filter((row) => String(row.steam_id) !== authoritativeSteamId),
+      ];
     }
   }
 

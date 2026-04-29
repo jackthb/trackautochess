@@ -13,11 +13,13 @@ interface SearchResult {
 interface ProfileSearchProps {
   autoFocus?: boolean;
   className?: string;
+  placeholder?: string;
 }
 
 export function ProfileSearch({
   autoFocus = false,
   className = "",
+  placeholder = "Steam vanity URL, profile URL, or Steam ID",
 }: ProfileSearchProps) {
   const router = useRouter();
   const [searchValue, setSearchValue] = useState("");
@@ -26,6 +28,7 @@ export function ProfileSearch({
   const [showLookupBar, setShowLookupBar] = useState(false);
   const [lookupError, setLookupError] = useState<string | null>(null);
   const [results, setResults] = useState<SearchResult[]>([]);
+  const [searchedValue, setSearchedValue] = useState("");
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [highlightedIndex, setHighlightedIndex] = useState(-1);
   const searchReqRef = useRef(0);
@@ -44,6 +47,7 @@ export function ProfileSearch({
     const val = searchValue.trim();
     if (!val) {
       setResults([]);
+      setSearchedValue("");
       setDropdownOpen(false);
       setHighlightedIndex(-1);
       setSearching(false);
@@ -51,7 +55,14 @@ export function ProfileSearch({
     }
 
     const safe = val.replace(/[,()%*]/g, "");
-    if (!safe) return;
+    if (!safe) {
+      setResults([]);
+      setSearchedValue(val);
+      setDropdownOpen(true);
+      setHighlightedIndex(-1);
+      setSearching(false);
+      return;
+    }
 
     const reqId = ++searchReqRef.current;
     setSearching(true);
@@ -85,7 +96,8 @@ export function ProfileSearch({
       });
 
       setResults(rows);
-      setDropdownOpen(rows.length > 0);
+      setSearchedValue(val);
+      setDropdownOpen(true);
       setHighlightedIndex(rows.length > 0 ? 0 : -1);
       setSearching(false);
     }, 200);
@@ -113,13 +125,14 @@ export function ProfileSearch({
   ) => {
     setSearchValue("");
     setResults([]);
+    setSearchedValue("");
     setDropdownOpen(false);
     setHighlightedIndex(-1);
     setLookupError(null);
     await router.push(playerProfilePath(result.steam_id, result.custom_url));
   };
 
-  const resolveLookupAndNavigate = async (lookupValue: string) => {
+  const resolveSteamAndNavigate = async (lookupValue: string) => {
     const reqId = ++lookupReqRef.current;
     clearLookupBarTimer();
     setLookupError(null);
@@ -134,7 +147,7 @@ export function ProfileSearch({
 
     try {
       const resp = await fetch(
-        `/api/players/search?q=${encodeURIComponent(lookupValue)}`
+        `/api/players/search?q=${encodeURIComponent(lookupValue)}&steam=1`
       );
       if (reqId !== lookupReqRef.current) return;
 
@@ -164,6 +177,14 @@ export function ProfileSearch({
     void navigateToPlayer(result);
   };
 
+  const canSearchSteam = Boolean(parseSteamInput(searchValue));
+  const steamActionIndex = results.length;
+  const showSteamAction =
+    dropdownOpen &&
+    canSearchSteam &&
+    !searching &&
+    searchedValue === searchValue.trim();
+
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     const val = searchValue.trim();
@@ -174,14 +195,19 @@ export function ProfileSearch({
       return;
     }
 
+    if (highlightedIndex === steamActionIndex && canSearchSteam) {
+      void resolveSteamAndNavigate(val);
+      return;
+    }
+
     if (results.length > 0) {
       selectResult(results[0]);
       return;
     }
 
-    const parsed = parseSteamInput(val);
-    if (parsed) {
-      void resolveLookupAndNavigate(val);
+    if (canSearchSteam) {
+      setDropdownOpen(true);
+      setHighlightedIndex(steamActionIndex);
       return;
     }
 
@@ -193,13 +219,15 @@ export function ProfileSearch({
       setDropdownOpen(false);
       return;
     }
-    if (!dropdownOpen || results.length === 0) return;
+    if (!dropdownOpen) return;
+    const itemCount = results.length + (showSteamAction ? 1 : 0);
+    if (itemCount === 0) return;
     if (e.key === "ArrowDown") {
       e.preventDefault();
-      setHighlightedIndex((i) => (i + 1) % results.length);
+      setHighlightedIndex((i) => (i + 1) % itemCount);
     } else if (e.key === "ArrowUp") {
       e.preventDefault();
-      setHighlightedIndex((i) => (i - 1 + results.length) % results.length);
+      setHighlightedIndex((i) => (i - 1 + itemCount) % itemCount);
     }
   };
 
@@ -285,6 +313,14 @@ export function ProfileSearch({
           max-height: 320px;
           overflow: hidden auto;
         }
+        .search-empty {
+          padding: 9px 14px;
+          font-family: var(--font-mono);
+          font-size: 12px;
+          color: var(--text-muted);
+          letter-spacing: 0.4px;
+          border-bottom: 1px solid var(--border-subtle);
+        }
         .search-result {
           display: flex;
           align-items: baseline;
@@ -302,10 +338,21 @@ export function ProfileSearch({
         .search-result.highlighted {
           background: var(--bg-elevated, rgba(255, 255, 255, 0.04));
         }
+        .search-steam {
+          justify-content: space-between;
+        }
         .result-meta {
           font-size: 11px;
           color: var(--text-muted);
           letter-spacing: 0.5px;
+        }
+        .search-divider {
+          padding: 8px 14px;
+          border-top: 1px solid var(--border-subtle);
+          font-family: var(--font-mono);
+          font-size: 11px;
+          color: var(--text-muted);
+          letter-spacing: 0.4px;
         }
         @keyframes lookupBar {
           0% {
@@ -323,7 +370,7 @@ export function ProfileSearch({
               lookupError ? " error" : ""
             }`}
             type="text"
-            placeholder="Steam vanity URL, profile URL, or Steam ID"
+            placeholder={placeholder}
             value={searchValue}
             onChange={(e) => {
               setSearchValue(e.target.value);
@@ -346,24 +393,57 @@ export function ProfileSearch({
           </div>
         )}
         {lookupError && <div className="search-status">{lookupError}</div>}
-        {dropdownOpen && results.length > 0 && (
+        {dropdownOpen && (
           <div className="search-dropdown">
-            {results.map((r, i) => (
+            {results.length === 0 &&
+            !searching &&
+            searchedValue === searchValue.trim() ? (
+              <div className="search-empty">
+                We didn't find any users in Track Auto Chess.
+              </div>
+            ) : null}
+            {results.length > 0
+              ? (
+              results.map((r, i) => (
+                <div
+                  key={r.steam_id}
+                  className={
+                    "search-result" +
+                    (i === highlightedIndex ? " highlighted" : "")
+                  }
+                  onMouseEnter={() => setHighlightedIndex(i)}
+                  onMouseDown={(e) => {
+                    e.preventDefault();
+                    selectResult(r);
+                  }}
+                >
+                  <span>{r.name || r.custom_url || r.steam_id}</span>
+                  {r.custom_url && (
+                    <span className="result-meta">/{r.custom_url}</span>
+                  )}
+                </div>
+              ))
+                )
+              : null}
+            {showSteamAction && results.length > 0 && (
+              <div className="search-divider">Not the right player?</div>
+            )}
+            {showSteamAction && (
               <div
-                key={r.steam_id}
                 className={
-                  "search-result" + (i === highlightedIndex ? " highlighted" : "")
+                  "search-result search-steam" +
+                  (highlightedIndex === steamActionIndex ? " highlighted" : "")
                 }
-                onMouseEnter={() => setHighlightedIndex(i)}
+                onMouseEnter={() => setHighlightedIndex(steamActionIndex)}
                 onMouseDown={(e) => {
                   e.preventDefault();
-                  selectResult(r);
+                  void resolveSteamAndNavigate(searchValue.trim());
                 }}
               >
-                <span>{r.name || r.custom_url || r.steam_id}</span>
-                {r.custom_url && <span className="result-meta">/{r.custom_url}</span>}
+                <span>Search Steam?</span>
+                <span className="result-meta">{searchValue.trim()}</span>
               </div>
-            ))}
+            )}
           </div>
         )}
       </div>
