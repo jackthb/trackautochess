@@ -1,6 +1,7 @@
 import type { IncomingHttpHeaders } from "http";
 
 export const SITE_NAME = "Track Auto Chess";
+export const SITE_TITLE = "Track Dota Auto Chess.";
 export const SITE_DESCRIPTION =
   "Track Auto Chess helps Dota Auto Chess players browse items and relics, read patch notes, and track matches.";
 

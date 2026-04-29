@@ -3,7 +3,7 @@ import Link from "next/link";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import patchIndex from "@data/patch_notes/index.json";
 import { SeoHead } from "@/lib/seo";
-import { SITE_NAME } from "@/lib/site";
+import { SITE_TITLE } from "@/lib/site";
 import styles from "./patch-notes.module.css";
 
 interface IndexPatch {
@@ -45,7 +45,7 @@ export default function PatchNotesPage({ supabase }: PatchNotesPageProps) {
   const patches = [...(patchIndex.patches as IndexPatch[])].sort((a, b) =>
     b.date.localeCompare(a.date)
   );
-  const title = `Dota Auto Chess Patch Notes | ${SITE_NAME}`;
+  const title = `Patch Notes | ${SITE_TITLE}`;
   const description =
     "Read the latest Dota Auto Chess patch notes, including new relics, new items, balance changes, and update history on Track Auto Chess.";
   const structuredData = {

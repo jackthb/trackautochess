@@ -26,7 +26,7 @@ import {
   steamProfileUrl,
   type SteamProfile,
 } from "../../lib/steam";
-import { SITE_NAME } from "@/lib/site";
+import { SITE_TITLE } from "@/lib/site";
 
 const UNIT_COSTS: Record<string, number> = {};
 for (const [name, info] of Object.entries(unitsData.units)) {
@@ -214,8 +214,8 @@ export default function GamePage({
     <>
       <Head>
         <title>
-          {game.placement ? `#${game.placement} — ` : ""}
-          {displayName} — {SITE_NAME}
+          {game.placement ? `#${game.placement} | ` : ""}
+          {displayName} | {SITE_TITLE}
         </title>
         <meta name="viewport" content="width=device-width, initial-scale=1" />
       </Head>

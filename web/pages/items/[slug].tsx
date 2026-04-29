@@ -10,7 +10,7 @@ import {
   TIER_COLOR,
   TIER_LABEL,
 } from "@/lib/items";
-import { absoluteUrl, SITE_NAME } from "@/lib/site";
+import { absoluteUrl, SITE_TITLE } from "@/lib/site";
 
 interface ItemDetailPageProps {
   item: DisplayItem;
@@ -41,7 +41,7 @@ export default function ItemDetailPage({
   related,
   supabase,
 }: ItemDetailPageProps) {
-  const title = `${item.name} Dota Auto Chess Item Guide | ${SITE_NAME}`;
+  const title = `${item.name} Item Guide | ${SITE_TITLE}`;
   const description = buildDescription(item);
   const pageUrl = absoluteUrl(`/items/${item.slug}`);
   const itemsUrl = absoluteUrl("/items");

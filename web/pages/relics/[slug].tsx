@@ -7,7 +7,7 @@ import {
   getRelicBySlug,
   type DisplayRelic,
 } from "@/lib/relics";
-import { absoluteUrl, SITE_NAME } from "@/lib/site";
+import { absoluteUrl, SITE_TITLE } from "@/lib/site";
 
 interface RelicDetailPageProps {
   relic: DisplayRelic;
@@ -38,7 +38,7 @@ export default function RelicDetailPage({
   related,
   supabase,
 }: RelicDetailPageProps) {
-  const title = `${relic.name} Dota Auto Chess Relic Guide | ${SITE_NAME}`;
+  const title = `${relic.name} Relic Guide | ${SITE_TITLE}`;
   const description = buildDescription(relic);
   const pageUrl = absoluteUrl(`/relics/${relic.slug}`);
   const relicsUrl = absoluteUrl("/relics");
