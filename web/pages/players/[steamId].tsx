@@ -13,6 +13,7 @@ import type { PlayerGame, UnitFullInfo, SynergyInfo, RelicInfo } from "@dac/shar
 import { mmrToRank } from "@dac/shared/game-utils";
 import {
   fetchSteamProfile,
+  playerProfilePath,
   resolveSteamInput,
   steamProfileUrl,
   type SteamProfile,
@@ -105,7 +106,7 @@ export default function PlayerPage({
   const [drodoLastFetchedAt, setDrodoLastFetchedAt] = useState(
     initialDrodoLastFetchedAt
   );
-  const displayName = steamProfile.name || steamId;
+  const displayName = steamProfile.name || steamProfile.customUrl || steamId;
   const profileUrl = steamProfileUrl(steamId, steamProfile.customUrl);
   const title = `${displayName} - ${SITE_NAME}`;
   const description = drodo?.mmr
@@ -370,7 +371,10 @@ export default function PlayerPage({
                 )}
               </div>
             </div>
-            <Link href={`/players/${steamId}?refresh=1`} className="refresh-link">
+            <Link
+              href={`${playerProfilePath(steamId, steamProfile.customUrl)}?refresh=1`}
+              className="refresh-link"
+            >
               Refresh MMR
             </Link>
           </div>
@@ -378,7 +382,7 @@ export default function PlayerPage({
           {drodoProfileMissing && !drodo && (
             <div className="table-wrap" style={{ marginBottom: 32 }}>
               <div className="empty-state">
-                This player doesn't play Drodo.
+                No public Auto Chess stats found for this Steam profile.
               </div>
             </div>
           )}
@@ -521,30 +525,14 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   const supabase = url && key ? createClient(url, key) : null;
   const baseUrl = getRequestSiteUrl(context.req.headers);
 
-  // Accept numeric Steam IDs, vanity slugs, or pasted Steam community URLs.
-  // Redirect anything non-canonical to the numeric player route once resolved.
+  // Accept numeric Steam IDs or vanity slugs. Keep vanity slugs in the URL
+  // when present; they are the preferred public profile route.
   const steamId = await resolveSteamInput(rawSteamId, supabase ?? undefined, {
     persist: false,
   });
   if (!steamId) {
     return { notFound: true };
   }
-  if (steamId !== rawSteamId) {
-    return {
-      redirect: {
-        destination: `/players/${steamId}`,
-        permanent: false,
-      },
-    };
-  }
-
-  const gamesResult = supabase
-    ? await supabase
-        .from("games")
-        .select("*")
-        .eq("user_id", steamId)
-        .order("played_at", { ascending: false })
-    : { data: [] };
 
   // Fetch cached Drodo profile and season history from public Supabase rows.
   let drodo = null;
@@ -586,13 +574,47 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     persist: true,
   });
 
-  const hasGames = Boolean(gamesResult.data?.length);
-  const hasDrodo = drodo !== null;
-  const hasSeasons = seasons.length > 0;
-  const hasSteamProfile = Boolean(steamProfile.name || steamProfile.customUrl);
+  let profileUserIds = [steamId];
+  if (supabase) {
+    const vanityKeys = [
+      steamProfile.customUrl,
+      !/^\d+$/.test(rawSteamId) ? rawSteamId : null,
+    ].filter(Boolean) as string[];
 
-  if (!hasGames && !hasDrodo && !hasSeasons && !hasSteamProfile) {
-    return { notFound: true };
+    if (vanityKeys.length > 0) {
+      const { data: vanityUsers } = await supabase
+        .from("users")
+        .select("steam_id")
+        .in("custom_url", [...new Set(vanityKeys)]);
+
+      const vanityIds = (vanityUsers ?? [])
+        .map((row) => String(row.steam_id))
+        .filter(Boolean);
+      profileUserIds = [...new Set([steamId, ...vanityIds])];
+    }
+  }
+
+  const gamesResult = supabase
+    ? await supabase
+        .from("games")
+        .select("*")
+        .in("user_id", profileUserIds)
+        .order("played_at", { ascending: false })
+    : { data: [] };
+
+  if (
+    steamProfile.customUrl &&
+    rawSteamId !== steamProfile.customUrl &&
+    rawSteamId === steamId
+  ) {
+    return {
+      redirect: {
+        destination: `${playerProfilePath(steamId, steamProfile.customUrl)}${
+          forceRefresh ? "?refresh=1" : ""
+        }`,
+        permanent: false,
+      },
+    };
   }
 
   return {
@@ -606,7 +628,10 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       drodoLastFetchedAt,
       forceRefresh,
       ogImageUrl: absoluteUrl(`/api/og/player/${steamId}`, baseUrl),
-      canonicalUrl: absoluteUrl(`/players/${steamId}`, baseUrl),
+      canonicalUrl: absoluteUrl(
+        playerProfilePath(steamId, steamProfile.customUrl),
+        baseUrl
+      ),
     },
   };
 };

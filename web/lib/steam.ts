@@ -23,11 +23,10 @@ interface SteamApiProfile extends SteamProfile {
   steamId: string | null;
 }
 
-interface SteamVanityResponse {
-  response?: {
-    success?: number;
-    steamid?: string;
-  };
+interface CachedSteamUserRow {
+  steam_id: string | number;
+  drodo_last_fetched_at: string | null;
+  drodo_profile_missing: boolean | null;
 }
 
 function parseSteamProfileXml(xml: string): SteamApiProfile {
@@ -56,7 +55,7 @@ async function fetchSteamProfileXml(url: string): Promise<SteamApiProfile> {
     const resp = await fetch(url, {
       headers: {
         Accept: "application/xml,text/xml,text/html;q=0.9,*/*;q=0.8",
-        "User-Agent": "track.autochess profile resolver",
+        "User-Agent": "Track Auto Chess profile resolver",
       },
       redirect: "follow",
     });
@@ -77,35 +76,6 @@ async function fetchSteamProfileXml(url: string): Promise<SteamApiProfile> {
     return profile;
   } catch {
     return { steamId: null, name: null, customUrl: null };
-  }
-}
-
-async function resolveSteamVanityWithApi(slug: string): Promise<string | null> {
-  const key = process.env.STEAM_WEB_API_KEY || process.env.STEAM_API_KEY;
-  if (!key) return null;
-
-  try {
-    const params = new URLSearchParams({
-      key,
-      vanityurl: slug,
-      url_type: "1",
-    });
-    const resp = await fetch(
-      `https://api.steampowered.com/ISteamUser/ResolveVanityURL/v1/?${params}`,
-      {
-        headers: {
-          Accept: "application/json",
-          "User-Agent": "track.autochess profile resolver",
-        },
-      }
-    );
-    if (!resp.ok) return null;
-    const data = (await resp.json()) as SteamVanityResponse;
-    return data.response?.success === 1 && data.response.steamid
-      ? data.response.steamid
-      : null;
-  } catch {
-    return null;
   }
 }
 
@@ -225,6 +195,14 @@ export function steamProfileUrl(
   return `https://steamcommunity.com/profiles/${steamId}`;
 }
 
+/** Build the public Track Auto Chess player route, preferring vanity URLs. */
+export function playerProfilePath(
+  steamId: string,
+  customUrl?: string | null
+): string {
+  return `/players/${encodeURIComponent(customUrl || steamId)}`;
+}
+
 /**
  * Resolve a vanity URL slug (e.g. "agit142" from steamcommunity.com/id/agit142)
  * to a numeric SteamID64. Checks the local users table first, then falls back
@@ -244,22 +222,16 @@ export async function resolveSteamId(
   if (supabase) {
     const { data } = await supabase
       .from("users")
-      .select("steam_id")
+      .select("steam_id, drodo_last_fetched_at, drodo_profile_missing")
       .ilike("custom_url", clean)
-      .maybeSingle();
-    if (data?.steam_id) return String(data.steam_id);
-  }
-
-  const apiSteamId = await resolveSteamVanityWithApi(clean);
-  if (apiSteamId) {
-    if (options.persist !== false) {
-      const apiProfile = await fetchSteamProfileFromApi(apiSteamId);
-      await upsertSteamUser(apiSteamId, supabase, {
-        name: apiProfile.name,
-        customUrl: apiProfile.customUrl ?? clean,
-      });
-    }
-    return apiSteamId;
+      .limit(8);
+    const cachedRows = (data ?? []) as CachedSteamUserRow[];
+    const preferred = cachedRows.sort((a, b) => {
+      const aRank = a.drodo_last_fetched_at && !a.drodo_profile_missing ? 0 : 1;
+      const bRank = b.drodo_last_fetched_at && !b.drodo_profile_missing ? 0 : 1;
+      return aRank - bRank || String(a.steam_id).localeCompare(String(b.steam_id));
+    })[0];
+    if (preferred?.steam_id) return String(preferred.steam_id);
   }
 
   const profile = await fetchSteamProfileXml(

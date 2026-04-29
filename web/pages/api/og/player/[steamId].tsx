@@ -315,7 +315,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 letterSpacing: 5,
               }}
             >
-              track.autochess
+              Track Auto Chess
             </div>
             <div
               style={{

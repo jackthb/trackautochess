@@ -10,6 +10,7 @@ import synergiesData from "@data/synergies.json";
 import relicsData from "@data/relics.json";
 import { SeoHead } from "@/lib/seo";
 import { SITE_NAME } from "@/lib/site";
+import { playerProfilePath } from "@/lib/steam";
 
 interface SeasonSnapshot {
   season: string;
@@ -260,7 +261,7 @@ export default function Dashboard({ supabase }: DashboardProps) {
     <>
       <SeoHead
         title={`Dashboard | ${SITE_NAME}`}
-        description="Signed-in track.autochess dashboard."
+        description="Signed-in Track Auto Chess dashboard."
         path="/dashboard"
         noindex
       />
@@ -500,7 +501,10 @@ export default function Dashboard({ supabase }: DashboardProps) {
                     disabled={drodoLoading}
                     onClick={() => {
                       const steamId = user?.user_metadata?.steam_id;
-                      if (steamId) router.push(`/players/${steamId}?refresh=1`);
+                      const customUrl = user?.user_metadata?.custom_url;
+                      if (steamId) {
+                        router.push(`${playerProfilePath(steamId, customUrl)}?refresh=1`);
+                      }
                     }}
                   >
                     {drodoLoading ? "Loading..." : "Refresh stats"}

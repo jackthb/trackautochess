@@ -22,6 +22,7 @@ import {
 import { TooltipWrap, type TooltipData } from "@dac/shared/Tooltip";
 import {
   fetchSteamProfile,
+  playerProfilePath,
   steamProfileUrl,
   type SteamProfile,
 } from "../../lib/steam";
@@ -84,7 +85,7 @@ function MatchPlayerRow({
         <div className="mp-name-row">
           {profileUrl ? (
             <Link
-              href={`/players/${game.user_id}`}
+              href={playerProfilePath(String(game.user_id), profile.customUrl)}
               className="mp-name"
             >
               {displayName}
@@ -191,6 +192,7 @@ export default function GamePage({
 
   const displayName = steamProfile.name || game.user_id;
   const profileUrl = steamProfileUrl(String(game.user_id), steamProfile.customUrl);
+  const playerPath = playerProfilePath(String(game.user_id), steamProfile.customUrl);
 
   const tooltipData: TooltipData = {
     unitCosts: UNIT_COSTS,
@@ -496,14 +498,12 @@ export default function GamePage({
               </div>
               <div className="header-info">
                 <div className="player-row">
-                  <a
-                    href={profileUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
+                  <Link
+                    href={playerPath}
                     className="player-name"
                   >
                     {displayName}
-                  </a>
+                  </Link>
                   {game.rank && (
                     <span className="rank">
                       {tier}

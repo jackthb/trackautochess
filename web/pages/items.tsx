@@ -36,7 +36,7 @@ const TIERED_ITEMS = buildTieredItems();
 export default function ItemsPage({ supabase }: ItemsPageProps) {
   const title = `Dota Auto Chess Items | ${SITE_NAME}`;
   const description =
-    "Browse every Dota Auto Chess item by tier, search specific items like Vanguard, and open dedicated item pages on track.autochess.";
+    "Browse every Dota Auto Chess item by tier, search specific items like Vanguard, and open dedicated item pages on Track Auto Chess.";
   const structuredData = {
     "@context": "https://schema.org",
     "@type": "CollectionPage",

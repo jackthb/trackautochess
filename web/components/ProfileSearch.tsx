@@ -1,12 +1,13 @@
 import { useRouter } from "next/router";
 import { useEffect, useRef, useState } from "react";
-import { parseSteamInput } from "../lib/steam";
+import { parseSteamInput, playerProfilePath } from "../lib/steam";
 
 interface SearchResult {
   steam_id: string;
   name: string | null;
   custom_url: string | null;
   has_autochess_profile?: boolean;
+  has_games?: boolean;
 }
 
 interface ProfileSearchProps {
@@ -69,18 +70,18 @@ export function ProfileSearch({
       if (reqId !== searchReqRef.current) return;
 
       const lower = val.toLowerCase();
+      const resultRank = (row: SearchResult) => {
+        if (row.has_autochess_profile) return 0;
+        if (row.has_games) return 1;
+        return 2;
+      };
+      const exactRank = (row: SearchResult) => {
+        if (row.custom_url?.toLowerCase() === lower) return 0;
+        if (row.name?.toLowerCase() === lower) return 1;
+        return 2;
+      };
       rows.sort((a, b) => {
-        const aExact =
-          a.custom_url?.toLowerCase() === lower ||
-          a.name?.toLowerCase() === lower
-            ? 0
-            : 1;
-        const bExact =
-          b.custom_url?.toLowerCase() === lower ||
-          b.name?.toLowerCase() === lower
-            ? 0
-            : 1;
-        return aExact - bExact;
+        return resultRank(a) - resultRank(b) || exactRank(a) - exactRank(b);
       });
 
       setResults(rows);
@@ -107,13 +108,15 @@ export function ProfileSearch({
 
   useEffect(() => clearLookupBarTimer, []);
 
-  const navigateToPlayer = async (steamId: string) => {
+  const navigateToPlayer = async (
+    result: Pick<SearchResult, "steam_id" | "custom_url">
+  ) => {
     setSearchValue("");
     setResults([]);
     setDropdownOpen(false);
     setHighlightedIndex(-1);
     setLookupError(null);
-    await router.push(`/players/${steamId}`);
+    await router.push(playerProfilePath(result.steam_id, result.custom_url));
   };
 
   const resolveLookupAndNavigate = async (lookupValue: string) => {
@@ -139,7 +142,7 @@ export function ProfileSearch({
         const data = (await resp.json()) as SearchResult[];
         const first = data[0];
         if (first?.steam_id) {
-          await navigateToPlayer(first.steam_id);
+          await navigateToPlayer(first);
           return;
         }
       }
@@ -158,7 +161,7 @@ export function ProfileSearch({
   };
 
   const selectResult = (result: SearchResult) => {
-    void navigateToPlayer(result.steam_id);
+    void navigateToPlayer(result);
   };
 
   const handleSearch = (e: React.FormEvent) => {

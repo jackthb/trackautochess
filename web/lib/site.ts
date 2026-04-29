@@ -1,8 +1,8 @@
 import type { IncomingHttpHeaders } from "http";
 
-export const SITE_NAME = "track.autochess";
+export const SITE_NAME = "Track Auto Chess";
 export const SITE_DESCRIPTION =
-  "track.autochess helps Dota Auto Chess players browse items and relics, read patch notes, and track matches.";
+  "Track Auto Chess helps Dota Auto Chess players browse items and relics, read patch notes, and track matches.";
 
 function normalizeUrl(raw: string | null | undefined): string | null {
   if (!raw) return null;

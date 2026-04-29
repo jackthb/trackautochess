@@ -254,7 +254,7 @@ export default function Home() {
           <main className="content">
             <h1 className="title">
               <span className="title-track">Track</span>{" "}
-              <span className="title-autochess">Autochess</span>
+              <span className="title-autochess">Auto Chess</span>
             </h1>
 
             <div className="rule" />

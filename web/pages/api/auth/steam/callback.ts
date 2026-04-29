@@ -70,6 +70,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       user_metadata: {
         steam_id: steamId,
         steam_name: steamName,
+        custom_url: steamProfile.customUrl,
         full_name: steamName,
       },
     });
@@ -83,6 +84,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       user_metadata: {
         steam_id: steamId,
         steam_name: steamName,
+        custom_url: steamProfile.customUrl,
         full_name: steamName,
       },
     });
