@@ -711,7 +711,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   const supabase = createClient(url, key);
   const { data } = await supabase
     .from("games")
-    .select("*")
+    .select("*, user_id::text")
     .eq("id", id)
     .single();
 
@@ -728,7 +728,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   if (data.match_id) {
     const { data: matchData } = await supabase
       .from("games")
-      .select("*")
+      .select("*, user_id::text")
       .eq("match_id", data.match_id)
       .order("placement", { ascending: true });
 

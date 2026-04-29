@@ -43,7 +43,7 @@ const fontData = Promise.all([
   readFile(path.join(fontDir, "JetBrainsMono-Bold.ttf")),
 ]);
 const USER_DRODO_SELECT = [
-  "steam_id",
+  "steam_id::text",
   "drodo_mmr",
   "drodo_max_mmr",
   "drodo_season",

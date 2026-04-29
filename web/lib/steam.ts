@@ -23,12 +23,6 @@ interface SteamApiProfile extends SteamProfile {
   steamId: string | null;
 }
 
-interface CachedSteamUserRow {
-  steam_id: string | number;
-  drodo_last_fetched_at: string | null;
-  drodo_profile_missing: boolean | null;
-}
-
 function parseSteamProfileXml(xml: string): SteamApiProfile {
   const steamIdMatch = xml.match(/<steamID64>(\d+)<\/steamID64>/);
   const nameMatch = xml.match(/<steamID><!\[CDATA\[(.+?)\]\]><\/steamID>/);
@@ -205,8 +199,8 @@ export function playerProfilePath(
 
 /**
  * Resolve a vanity URL slug (e.g. "agit142" from steamcommunity.com/id/agit142)
- * to a numeric SteamID64. Checks the local users table first, then falls back
- * to Steam's public XML profile endpoint.
+ * to a numeric SteamID64. Steam is the authority for vanity URLs; cached
+ * custom_url rows can go stale when users rename or transfer vanity slugs.
  */
 export async function resolveSteamId(
   slug: string,
@@ -218,21 +212,6 @@ export async function resolveSteamId(
   if (parsed.kind === "id") return parsed.value;
 
   const clean = parsed.value;
-
-  if (supabase) {
-    const { data } = await supabase
-      .from("users")
-      .select("steam_id, drodo_last_fetched_at, drodo_profile_missing")
-      .ilike("custom_url", clean)
-      .limit(8);
-    const cachedRows = (data ?? []) as CachedSteamUserRow[];
-    const preferred = cachedRows.sort((a, b) => {
-      const aRank = a.drodo_last_fetched_at && !a.drodo_profile_missing ? 0 : 1;
-      const bRank = b.drodo_last_fetched_at && !b.drodo_profile_missing ? 0 : 1;
-      return aRank - bRank || String(a.steam_id).localeCompare(String(b.steam_id));
-    })[0];
-    if (preferred?.steam_id) return String(preferred.steam_id);
-  }
 
   const profile = await fetchSteamProfileXml(
     `https://steamcommunity.com/id/${encodeURIComponent(clean)}/?xml=1`

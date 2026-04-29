@@ -584,7 +584,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     if (vanityKeys.length > 0) {
       const { data: vanityUsers } = await supabase
         .from("users")
-        .select("steam_id")
+        .select("steam_id::text")
         .in("custom_url", [...new Set(vanityKeys)]);
 
       const vanityIds = (vanityUsers ?? [])
@@ -597,7 +597,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   const gamesResult = supabase
     ? await supabase
         .from("games")
-        .select("*")
+        .select("*, user_id::text")
         .in("user_id", profileUserIds)
         .order("played_at", { ascending: false })
     : { data: [] };
