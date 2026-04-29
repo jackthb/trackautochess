@@ -149,7 +149,7 @@ export default function PlayerPage({
 
   // TODO: ingest total matches / avg rank / wins / preferred lineup / max damage from history pages for server-side season snapshots.
   useEffect(() => {
-    if (!supabase) return;
+    if (!supabase || forceRefresh) return;
     supabase.auth.getUser().then(({ data: { user } }) => {
       if (!user) return;
       const ownSteamId = user.user_metadata?.steam_id;
@@ -157,7 +157,7 @@ export default function PlayerPage({
         router.replace("/dashboard");
       }
     });
-  }, [supabase, steamId, router]);
+  }, [supabase, forceRefresh, steamId, router]);
 
   useEffect(() => {
     const fetchedTime = drodoLastFetchedAt
