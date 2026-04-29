@@ -2,7 +2,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import { EntityBrowser, type BrowsableEntity } from "@/components/EntityBrowser";
 import { SeoHead } from "@/lib/seo";
 import { getAllRelics } from "@/lib/relics";
-import { SITE_NAME } from "@/lib/site";
+import { SITE_TITLE } from "@/lib/site";
 
 interface RelicsPageProps {
   supabase: SupabaseClient | null;
@@ -17,7 +17,7 @@ const ALL_RELICS: BrowsableEntity[] = getAllRelics().map((relic) => ({
 }));
 
 export default function RelicsPage({ supabase }: RelicsPageProps) {
-  const title = `Dota Auto Chess Relics | ${SITE_NAME}`;
+  const title = `Relics | ${SITE_TITLE}`;
   const description =
     "Browse every Dota Auto Chess relic, search recent additions, and open dedicated relic pages on Track Auto Chess.";
   const structuredData = {

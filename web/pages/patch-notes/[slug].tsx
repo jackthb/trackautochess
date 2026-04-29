@@ -7,7 +7,7 @@ import patchIndex from "@data/patch_notes/index.json";
 import { SeoHead } from "@/lib/seo";
 import { getItemSlugByName } from "@/lib/items";
 import { getRelicSlugByName } from "@/lib/relics";
-import { absoluteUrl, SITE_NAME } from "@/lib/site";
+import { absoluteUrl, SITE_NAME, SITE_TITLE } from "@/lib/site";
 
 type EntryKind =
   | "added"
@@ -125,7 +125,7 @@ export default function PatchDetailPage({
   slug,
   supabase,
 }: PatchPageProps) {
-  const title = `${patch.title} | Dota Auto Chess Patch Notes | ${SITE_NAME}`;
+  const title = `${patch.title} | Patch Notes | ${SITE_TITLE}`;
   const description = buildPatchDescription(patch);
   const pagePath = `/patch-notes/${slug}`;
   const pageUrl = absoluteUrl(pagePath);

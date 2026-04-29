@@ -9,7 +9,7 @@ import type { Game, UnitFullInfo, SynergyInfo, RelicInfo } from "@dac/shared/typ
 import synergiesData from "@data/synergies.json";
 import relicsData from "@data/relics.json";
 import { SeoHead } from "@/lib/seo";
-import { SITE_NAME } from "@/lib/site";
+import { SITE_TITLE } from "@/lib/site";
 import { playerProfilePath } from "@/lib/steam";
 import { StatsGrid, type StatItem } from "@/components/StatsGrid";
 
@@ -283,7 +283,7 @@ export default function Dashboard({ supabase }: DashboardProps) {
   return (
     <>
       <SeoHead
-        title={`Dashboard | ${SITE_NAME}`}
+        title={`Dashboard | ${SITE_TITLE}`}
         description="Signed-in Track Auto Chess dashboard."
         path="/dashboard"
         noindex

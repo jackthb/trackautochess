@@ -7,7 +7,7 @@ import {
   TIER_COLOR,
   TIER_LABEL,
 } from "@/lib/items";
-import { SITE_NAME } from "@/lib/site";
+import { SITE_TITLE } from "@/lib/site";
 
 interface ItemsPageProps {
   supabase: SupabaseClient | null;
@@ -34,7 +34,7 @@ function buildTieredItems(): BrowsableEntity[][] {
 const TIERED_ITEMS = buildTieredItems();
 
 export default function ItemsPage({ supabase }: ItemsPageProps) {
-  const title = `Dota Auto Chess Items | ${SITE_NAME}`;
+  const title = `Items | ${SITE_TITLE}`;
   const description =
     "Browse every Dota Auto Chess item by tier, search specific items like Vanguard, and open dedicated item pages on Track Auto Chess.";
   const structuredData = {

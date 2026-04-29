@@ -5,7 +5,7 @@ import { useRouter } from "next/router";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { createClient } from "@supabase/supabase-js";
 import type { GetServerSideProps } from "next";
-import { absoluteUrl, getRequestSiteUrl, SITE_NAME } from "@/lib/site";
+import { absoluteUrl, getRequestSiteUrl, SITE_TITLE } from "@/lib/site";
 import unitsData from "@data/units.json";
 import unitsFullData from "@data/units_full.json";
 import synergiesData from "@data/synergies.json";
@@ -114,7 +114,7 @@ export default function PlayerPage({
   );
   const displayName = steamProfile.name || steamProfile.customUrl || steamId;
   const profileUrl = steamProfileUrl(steamId, steamProfile.customUrl);
-  const title = `${displayName} - ${SITE_NAME}`;
+  const title = `${displayName} | ${SITE_TITLE}`;
   const description = drodo?.mmr
     ? `${displayName} is ${mmrToRank(drodo.mmr)} at ${drodo.mmr.toLocaleString("en-US")} MMR.`
     : `Dota Auto Chess profile for ${displayName}.`;

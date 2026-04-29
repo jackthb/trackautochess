@@ -1,9 +1,9 @@
 import { ProfileSearch } from "@/components/ProfileSearch";
 import { SeoHead } from "@/lib/seo";
-import { absoluteUrl, SITE_DESCRIPTION, SITE_NAME } from "@/lib/site";
+import { absoluteUrl, SITE_DESCRIPTION, SITE_NAME, SITE_TITLE } from "@/lib/site";
 
 export default function Home() {
-  const title = `${SITE_NAME} | Dota Auto Chess player lookup`;
+  const title = SITE_TITLE;
   const description =
     "Look up Dota Auto Chess player MMR, season history, and tracked match stats by Steam vanity URL or Steam ID.";
   const siteUrl = absoluteUrl("/");
