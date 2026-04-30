@@ -3,7 +3,8 @@ import { useRouter } from "next/router";
 import type { SupabaseClient, User } from "@supabase/supabase-js";
 import unitsData from "@data/units.json";
 import unitsFullData from "@data/units_full.json";
-import { parseWL, mmrToRank } from "@dac/shared/game-utils";
+import { parseWL } from "@dac/shared/game-utils";
+import { buildStatItems } from "@dac/shared/buildStatItems";
 import { GameRow } from "../components/GameRow";
 import type { Game, UnitFullInfo, SynergyInfo, RelicInfo } from "@dac/shared/types";
 import synergiesData from "@data/synergies.json";
@@ -12,7 +13,7 @@ import { SeoHead } from "@/lib/seo";
 import { SITE_TITLE } from "@/lib/site";
 import { playerProfilePath } from "@/lib/steam";
 import { Button } from "@dac/shared/Button";
-import { StatsGrid, type StatItem } from "@dac/shared/StatsGrid";
+import { StatsGrid } from "@dac/shared/StatsGrid";
 import { SeasonHistoryGrid, type SeasonSnapshot } from "@dac/shared/SeasonHistoryGrid";
 
 interface DrodoProfile {
@@ -237,43 +238,12 @@ export default function Dashboard({ supabase }: DashboardProps) {
   };
 
 
-  const stats = useMemo(() => {
-    if (!games.length) return null;
-    const placements = games.map((g) => parseInt(g.placement) || 0);
-    const avg = placements.reduce((a, b) => a + b, 0) / placements.length;
-    const top4 = placements.filter((p) => p >= 1 && p <= 4).length;
-    const top1 = placements.filter((p) => p === 1).length;
-    return {
-      total: games.length,
-      avg: avg.toFixed(1),
-      top4pct: ((top4 / games.length) * 100).toFixed(0),
-      top1,
-    };
-  }, [games]);
-
   const isReady = supabase !== null;
 
-  const statItems = useMemo<StatItem[]>(() => {
-    const items: StatItem[] = [];
-    if (stats) {
-      items.push(
-        { key: "games", value: stats.total, label: "Games", source: "tracked" },
-        { key: "avg", value: stats.avg, label: "Avg Place", tone: "gold", source: "tracked" },
-        { key: "top4", value: `${stats.top4pct}%`, label: "Top 4 Rate", tone: "green", source: "tracked" },
-        { key: "wins", value: stats.top1, label: "Wins", tone: "gold", source: "tracked" },
-      );
-    }
-    if (drodo?.mmr != null) {
-      items.push({ key: "drodo-mmr", value: drodo.mmr, label: mmrToRank(drodo.mmr) || "MMR", source: "drodo" });
-    }
-    if (drodo?.max_mmr != null) {
-      items.push({ key: "drodo-peak", value: drodo.max_mmr, label: "Peak MMR", tone: "gold", source: "drodo" });
-    }
-    if (drodo?.chicken_count != null) {
-      items.push({ key: "drodo-chickens", value: drodo.chicken_count, label: "Chickens (Wins)", tone: "gold", source: "drodo" });
-    }
-    return items;
-  }, [stats, drodo]);
+  const { tracked: trackedItems, drodo: drodoItems } = useMemo(
+    () => buildStatItems(games, drodo),
+    [games, drodo]
+  );
 
   return (
     <>
@@ -376,7 +346,18 @@ export default function Dashboard({ supabase }: DashboardProps) {
               </div>
             ) : (
               <>
-                {statItems.length > 0 && <div className="fade-up"><StatsGrid items={statItems} /></div>}
+                {trackedItems.length > 0 && (
+                  <div className="fade-up">
+                    <div className="section-title">Tracked</div>
+                    <StatsGrid items={trackedItems} />
+                  </div>
+                )}
+                {drodoItems.length > 0 && (
+                  <div className="fade-up">
+                    <div className="section-title">Auto Chess</div>
+                    <StatsGrid items={drodoItems} />
+                  </div>
+                )}
 
                 {drodo?.seasons && <div className="fade-up delay-1"><SeasonHistoryGrid seasons={drodo.seasons} /></div>}
 

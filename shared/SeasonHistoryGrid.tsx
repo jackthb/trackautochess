@@ -1,3 +1,5 @@
+import { mmrToRank } from "./game-utils";
+
 export interface SeasonSnapshot {
   season: string;
   mmr: number | null;
@@ -15,14 +17,20 @@ export function SeasonHistoryGrid({ seasons }: { seasons: SeasonSnapshot[] }) {
           <div key={season.season} className="season-card">
             <div className="season-label">{season.season.toUpperCase()}</div>
             {season.mmr != null ? (
-              <div className="season-mmr">{season.mmr}</div>
+              <>
+                <div className="season-mmr">{season.mmr}</div>
+                <div className="season-meta season-rank">{mmrToRank(season.mmr) || "Unranked"}</div>
+              </>
             ) : (
               <div className="season-mmr dim">-</div>
             )}
             {season.max_mmr != null && (
-              <div className="season-meta">
-                Peak <span className="season-peak">{season.max_mmr}</span>
-              </div>
+              <>
+                <div className="season-meta">
+                  Peak <span className="season-peak">{season.max_mmr}</span>
+                </div>
+                <div className="season-meta">{mmrToRank(season.max_mmr) || "Unranked"}</div>
+              </>
             )}
             {season.games_played != null && (
               <div className="season-meta">{season.games_played} games</div>

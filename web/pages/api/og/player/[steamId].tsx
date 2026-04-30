@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import type { ReactNode } from "react";
-import { ImageResponse } from "@vercel/og";
+import { ImageResponse } from "next/og";
 import { createClient } from "@supabase/supabase-js";
 import { readFile } from "node:fs/promises";
 import path from "node:path";
@@ -194,6 +194,15 @@ function PreviousSeasons({ drodo }: { drodo: DrodoOgData | null }) {
 }
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+  try {
+    return await ogHandler(req, res);
+  } catch (err) {
+    console.error("[OG] handler error:", err);
+    return res.status(500).send(String(err));
+  }
+}
+
+async function ogHandler(req: NextApiRequest, res: NextApiResponse) {
   const rawSteamId = Array.isArray(req.query.steamId)
     ? req.query.steamId[0]
     : req.query.steamId;

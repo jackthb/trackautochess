@@ -141,7 +141,7 @@ export default function Home() {
         }
         .title-autochess {
           color: var(--text-secondary);
-          margin-left: 0.15em;
+          display: block;
         }
         .rule {
           width: 48px;
@@ -253,7 +253,7 @@ export default function Home() {
 
           <main className="content">
             <h1 className="title">
-              <span className="title-track">Track</span>{" "}
+              <span className="title-track">Track</span>
               <span className="title-autochess">Auto Chess</span>
             </h1>
 

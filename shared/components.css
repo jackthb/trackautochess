@@ -560,6 +560,7 @@ select.edit-field { cursor: pointer; }
 
 .season-mmr.dim { color: var(--text-muted); }
 .season-meta { font-size: 13px; color: var(--text-muted); }
+.season-meta.season-rank { font-size: 12px; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 6px; }
 .season-peak { color: var(--gold); }
 
 @media (max-width: 720px) {

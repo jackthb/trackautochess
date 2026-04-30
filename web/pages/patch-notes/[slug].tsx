@@ -1,3 +1,4 @@
+import type React from "react";
 import fs from "fs";
 import path from "path";
 import Link from "next/link";
@@ -5,8 +6,8 @@ import type { GetStaticPaths, GetStaticProps } from "next";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import patchIndex from "@data/patch_notes/index.json";
 import { SeoHead } from "@/lib/seo";
-import { getItemSlugByName } from "@/lib/items";
-import { getRelicSlugByName } from "@/lib/relics";
+import { getItemSlugByName, getItemBySlug, iconUrl } from "@/lib/items";
+import { getRelicSlugByName, getRelicBySlug } from "@/lib/relics";
 import { absoluteUrl, SITE_NAME, SITE_TITLE } from "@/lib/site";
 
 type EntryKind =
@@ -110,14 +111,31 @@ function buildPatchDescription(patch: Patch): string {
   );
 }
 
-function resolveEntryHref(name: string): string | null {
+interface EntryMeta {
+  href: string | null;
+  iconSrc: string | null;
+}
+
+function resolveEntryMeta(name: string): EntryMeta {
   const itemSlug = getItemSlugByName(name);
-  if (itemSlug) return `/items/${itemSlug}`;
+  if (itemSlug) {
+    const item = getItemBySlug(itemSlug);
+    return {
+      href: `/items/${itemSlug}`,
+      iconSrc: item ? iconUrl(item) : null,
+    };
+  }
 
   const relicSlug = getRelicSlugByName(name);
-  if (relicSlug) return `/relics/${relicSlug}`;
+  if (relicSlug) {
+    const relic = getRelicBySlug(relicSlug);
+    return {
+      href: `/relics/${relicSlug}`,
+      iconSrc: relic ? `/icons/relics/${relic.iconStem}.png` : null,
+    };
+  }
 
-  return null;
+  return { href: null, iconSrc: null };
 }
 
 export default function PatchDetailPage({
@@ -338,11 +356,25 @@ export default function PatchDetailPage({
           font-weight: var(--fw-semibold);
           padding-top: 2px;
         }
+        .entry-name-row {
+          display: flex;
+          align-items: center;
+          gap: var(--s-10);
+          margin-bottom: var(--s-4);
+        }
+        .entry-icon {
+          flex-shrink: 0;
+          width: 44px;
+          height: 32px;
+          object-fit: contain;
+          border: 1px solid var(--border);
+          border-radius: var(--r-4);
+          background: var(--bg-deep);
+        }
         .entry-name {
           font-size: var(--fs-14);
           color: var(--text-primary);
           font-weight: var(--fw-medium);
-          margin-bottom: var(--s-4);
         }
         .entry-link {
           text-decoration: underline;
@@ -439,7 +471,7 @@ export default function PatchDetailPage({
             <div key={section.heading} className="section">
               <div className="section-heading">{section.heading}</div>
               {section.entries.map((entry, index) => {
-                const entryHref = resolveEntryHref(entry.name);
+                const { href, iconSrc } = resolveEntryMeta(entry.name);
 
                 return (
                   <div key={index} className="entry">
@@ -450,13 +482,27 @@ export default function PatchDetailPage({
                       {KIND_LABEL[entry.kind]}
                     </span>
                     <div>
-                      {entryHref ? (
-                        <Link href={entryHref} className="entry-name entry-link">
-                          {entry.name}
-                        </Link>
-                      ) : (
-                        <div className="entry-name">{entry.name}</div>
-                      )}
+                      <div className="entry-name-row">
+                        {iconSrc && (
+                          <img
+                            className="entry-icon"
+                            src={iconSrc}
+                            alt=""
+                            width={44}
+                            height={32}
+                            onError={(e: React.SyntheticEvent<HTMLImageElement>) => {
+                              e.currentTarget.style.display = "none";
+                            }}
+                          />
+                        )}
+                        {href ? (
+                          <Link href={href} className="entry-name entry-link">
+                            {entry.name}
+                          </Link>
+                        ) : (
+                          <span className="entry-name">{entry.name}</span>
+                        )}
+                      </div>
                       <div className="entry-detail">{entry.detail}</div>
                     </div>
                   </div>
