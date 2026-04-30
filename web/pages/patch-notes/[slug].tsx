@@ -8,6 +8,7 @@ import patchIndex from "@data/patch_notes/index.json";
 import { SeoHead } from "@/lib/seo";
 import { getItemSlugByName, getItemBySlug, iconUrl } from "@/lib/items";
 import { getRelicSlugByName, getRelicBySlug } from "@/lib/relics";
+import { getTalentByName } from "@/lib/talents";
 import { absoluteUrl, SITE_NAME, SITE_TITLE } from "@/lib/site";
 
 type EntryKind =
@@ -114,6 +115,7 @@ function buildPatchDescription(patch: Patch): string {
 interface EntryMeta {
   href: string | null;
   iconSrc: string | null;
+  tooltip: string | null;
 }
 
 function resolveEntryMeta(name: string): EntryMeta {
@@ -123,6 +125,7 @@ function resolveEntryMeta(name: string): EntryMeta {
     return {
       href: `/items/${itemSlug}`,
       iconSrc: item ? iconUrl(item) : null,
+      tooltip: item ? `${item.name}: ${item.description}` : null,
     };
   }
 
@@ -132,10 +135,20 @@ function resolveEntryMeta(name: string): EntryMeta {
     return {
       href: `/relics/${relicSlug}`,
       iconSrc: relic ? `/icons/relics/${relic.iconStem}.png` : null,
+      tooltip: relic ? `${relic.name}: ${relic.description}` : null,
     };
   }
 
-  return { href: null, iconSrc: null };
+  const talent = getTalentByName(name.replace(/^\d+[ab]\s*[—-]\s*/i, ""));
+  if (talent) {
+    return {
+      href: "/talents",
+      iconSrc: null,
+      tooltip: `${talent.key} ${talent.name}: ${talent.description}`,
+    };
+  }
+
+  return { href: null, iconSrc: null, tooltip: null };
 }
 
 export default function PatchDetailPage({
@@ -384,6 +397,28 @@ export default function PatchDetailPage({
         .entry-link:hover {
           color: var(--accent-dim);
         }
+        .entry-tooltip {
+          position: relative;
+        }
+        .entry-tooltip:hover::after {
+          content: attr(data-tooltip);
+          position: absolute;
+          left: 0;
+          top: calc(100% + 6px);
+          z-index: 20;
+          max-width: 420px;
+          width: max-content;
+          background: var(--bg-elevated, #11161d);
+          border: 1px solid var(--border);
+          border-radius: var(--r-6);
+          padding: var(--s-8) var(--s-10);
+          color: var(--text-primary);
+          font-size: var(--fs-12);
+          line-height: 1.45;
+          text-transform: none;
+          letter-spacing: normal;
+          white-space: normal;
+        }
         .entry-detail {
           font-size: var(--fs-13);
           line-height: var(--lh-body);
@@ -471,7 +506,7 @@ export default function PatchDetailPage({
             <div key={section.heading} className="section">
               <div className="section-heading">{section.heading}</div>
               {section.entries.map((entry, index) => {
-                const { href, iconSrc } = resolveEntryMeta(entry.name);
+                const { href, iconSrc, tooltip } = resolveEntryMeta(entry.name);
 
                 return (
                   <div key={index} className="entry">
@@ -501,6 +536,11 @@ export default function PatchDetailPage({
                           </Link>
                         ) : (
                           <span className="entry-name">{entry.name}</span>
+                        )}
+                        {tooltip && (
+                          <span className="entry-tooltip" data-tooltip={tooltip}>
+                            ⓘ
+                          </span>
                         )}
                       </div>
                       <div className="entry-detail">{entry.detail}</div>

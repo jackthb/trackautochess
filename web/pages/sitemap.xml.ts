@@ -46,6 +46,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
     { path: "/" },
     { path: "/items" },
     { path: "/relics" },
+    { path: "/talents" },
     { path: "/patch-notes" },
     ...getAllItems().map((item) => ({ path: `/items/${item.slug}` })),
     ...getAllRelics().map((relic) => ({ path: `/relics/${relic.slug}` })),
