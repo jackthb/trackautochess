@@ -1,7 +1,6 @@
 {
   "name": "@dac-tools/scraper",
   "version": "0.1.0",
-  "description": "Scrape autochess.site for current patch unit/item data",
   "type": "module",
   "scripts": {
     "scrape": "node scrape.js",

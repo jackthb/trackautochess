@@ -1,0 +1,9 @@
+{application,ingester,
+             [{modules,['Elixir.Ingester.Application',
+                        'Elixir.Ingester.Poller']},
+              {optional_applications,[]},
+              {applications,[kernel,stdlib,elixir,logger,req,jason]},
+              {description,"ingester"},
+              {registered,[]},
+              {vsn,"0.1.0"},
+              {mod,{'Elixir.Ingester.Application',[]}}]}.

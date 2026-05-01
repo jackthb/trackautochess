@@ -20,7 +20,7 @@ DAC Tools is a monorepo for Dota Auto Chess game tracking and analysis. It inclu
 
 **Web Viewer (`web/`)** — Next.js 16 app for browsing analyzed games from Supabase.
 
-**Scraper (`scraper/`)** — Node.js/Puppeteer scraper for autochess.site game data.
+**Scraper (`scraper/`)** — Node.js/Puppeteer scraper for game data.
 
 **Translator (`translator/`)** — Firefox WebExtension + Python whisper server for real-time stream translation.
 
