@@ -129,13 +129,11 @@ export function ConfirmationTab({
               </div>
             </div>
           )}
-          {debugEnabled && (
-            <div style={{ padding: "8px 0" }}>
-              <button className="btn-confirm btn-confirm-primary" onClick={handleLoadTestFile}>
-                Load & Parse File
-              </button>
-            </div>
-          )}
+          <div style={{ padding: "8px 0" }}>
+            <button className="btn-confirm btn-confirm-primary" onClick={handleLoadTestFile}>
+              Load & Parse File
+            </button>
+          </div>
           <ScreenshotHistory
             onImportFile={handleImportFile}
             lastImportResult={lastImportResult}
@@ -288,11 +286,9 @@ export function ConfirmationTab({
         </div>
 
         <div className="confirm-actions">
-          {debugEnabled && (
-            <button className="btn-confirm btn-confirm-cancel" onClick={handleSaveFixture}>
-              {fixtureSaved ? "Saved!" : "Save Fixture"}
-            </button>
-          )}
+          <button className="btn-confirm btn-confirm-cancel" onClick={handleSaveFixture}>
+            {fixtureSaved ? "Saved!" : "Save Fixture"}
+          </button>
           <button
             className="btn-confirm btn-confirm-cancel"
             onClick={handleCancel}
