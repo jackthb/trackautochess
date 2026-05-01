@@ -7,6 +7,8 @@ import {
   type SearchResult,
 } from "@/lib/playerSearch";
 
+const MAX_VISIBLE_RESULTS = 5;
+
 interface ProfileSearchProps {
   autoFocus?: boolean;
   className?: string;
@@ -30,12 +32,8 @@ export function ProfileSearch({
     useState<SearchResult[]>(initialResults);
   const [results, setResults] = useState<SearchResult[]>(initialResults);
   const [searchedValue, setSearchedValue] = useState("");
-  const [dropdownOpen, setDropdownOpen] = useState(
-    autoFocus && initialResults.length > 0
-  );
-  const [highlightedIndex, setHighlightedIndex] = useState(
-    initialResults.length > 0 ? 0 : -1
-  );
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [highlightedIndex, setHighlightedIndex] = useState(-1);
   const searchReqRef = useRef(0);
   const defaultReqRef = useRef(0);
   const lookupReqRef = useRef(0);
@@ -49,8 +47,6 @@ export function ProfileSearch({
       lookupBarTimerRef.current = null;
     }
   };
-
-  const isInputFocused = () => document.activeElement === inputRef.current;
 
   const localMatches = (value: string): SearchResult[] => {
     const lower = value.toLowerCase();
@@ -79,14 +75,11 @@ export function ProfileSearch({
         setDefaultResults(rows);
         if (!searchValue.trim()) {
           setResults(rows);
-          setHighlightedIndex(rows.length > 0 ? 0 : -1);
-          if ((autoFocus || isInputFocused()) && rows.length > 0) {
-            setDropdownOpen(true);
-          }
+          setHighlightedIndex(-1);
         }
       })
       .catch(() => {});
-  }, [autoFocus, defaultResults.length, searchValue]);
+  }, [defaultResults.length, searchValue]);
 
   useEffect(() => {
     const val = searchValue.trim();
@@ -94,8 +87,8 @@ export function ProfileSearch({
       searchReqRef.current += 1;
       setResults(defaultResults);
       setSearchedValue("");
-      setDropdownOpen((autoFocus || isInputFocused()) && defaultResults.length > 0);
-      setHighlightedIndex(defaultResults.length > 0 ? 0 : -1);
+      setDropdownOpen(false);
+      setHighlightedIndex(-1);
       setSearching(false);
       return;
     }
@@ -144,7 +137,7 @@ export function ProfileSearch({
     }, 80);
 
     return () => clearTimeout(timeout);
-  }, [autoFocus, defaultResults, searchValue]);
+  }, [defaultResults, searchValue]);
 
   useEffect(() => {
     const handler = (e: MouseEvent) => {
@@ -218,8 +211,9 @@ export function ProfileSearch({
     void navigateToPlayer(result);
   };
 
+  const visibleResults = results.slice(0, MAX_VISIBLE_RESULTS);
   const canSearchSteam = Boolean(parseSteamInput(searchValue));
-  const steamActionIndex = results.length;
+  const steamActionIndex = visibleResults.length;
   const showSteamAction =
     dropdownOpen &&
     canSearchSteam &&
@@ -231,8 +225,12 @@ export function ProfileSearch({
     const val = searchValue.trim();
     if (!val) return;
 
-    if (dropdownOpen && highlightedIndex >= 0 && results[highlightedIndex]) {
-      selectResult(results[highlightedIndex]);
+    if (
+      dropdownOpen &&
+      highlightedIndex >= 0 &&
+      visibleResults[highlightedIndex]
+    ) {
+      selectResult(visibleResults[highlightedIndex]);
       return;
     }
 
@@ -261,7 +259,7 @@ export function ProfileSearch({
       return;
     }
     if (!dropdownOpen) return;
-    const itemCount = results.length + (showSteamAction ? 1 : 0);
+    const itemCount = visibleResults.length + (showSteamAction ? 1 : 0);
     if (itemCount === 0) return;
     if (e.key === "ArrowDown") {
       e.preventDefault();
@@ -283,6 +281,27 @@ export function ProfileSearch({
         .search-form {
           display: flex;
           width: 100%;
+        }
+        .search-help {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 12px;
+          padding: 9px 0 0;
+          font-family: var(--font-mono);
+          font-size: 11px;
+          color: var(--text-muted);
+          letter-spacing: 0.35px;
+          text-align: left;
+        }
+        .search-help a {
+          flex-shrink: 0;
+          color: var(--accent-dim);
+          text-decoration: none;
+          transition: color 0.15s;
+        }
+        .search-help a:hover {
+          color: var(--accent);
         }
         .search-input {
           width: 100%;
@@ -382,14 +401,6 @@ export function ProfileSearch({
         .search-steam {
           justify-content: space-between;
         }
-        .search-signin {
-          justify-content: space-between;
-          color: var(--accent-dim);
-          text-decoration: none;
-        }
-        .search-signin:hover {
-          color: var(--accent);
-        }
         .result-meta {
           font-size: 11px;
           color: var(--text-muted);
@@ -411,6 +422,13 @@ export function ProfileSearch({
             transform: translateX(320%);
           }
         }
+        @media (max-width: 520px) {
+          .search-help {
+            align-items: flex-start;
+            flex-direction: column;
+            gap: 4px;
+          }
+        }
       `}</style>
       <div className={`profile-search ${className}`} ref={containerRef}>
         <form className="search-form" onSubmit={handleSearch}>
@@ -428,11 +446,7 @@ export function ProfileSearch({
             }}
             onKeyDown={handleKeyDown}
             onFocus={() => {
-              if (!searchValue.trim() && defaultResults.length > 0) {
-                setResults(defaultResults);
-                setHighlightedIndex(0);
-                setDropdownOpen(true);
-              } else if (results.length > 0) {
+              if (searchValue.trim() && results.length > 0) {
                 setDropdownOpen(true);
               }
               if (lookupError) setLookupError(null);
@@ -443,6 +457,12 @@ export function ProfileSearch({
             aria-invalid={Boolean(lookupError)}
           />
         </form>
+        <div className="search-help">
+          <span>Paste your Steam profile URL, vanity URL, or SteamID64.</span>
+          <a href="https://steamcommunity.com/my/" target="_blank" rel="noreferrer">
+            Open your Steam profile
+          </a>
+        </div>
         {showLookupBar && (
           <div className="search-progress" aria-hidden="true">
             <div className="search-progress-bar" />
@@ -459,9 +479,9 @@ export function ProfileSearch({
                 We didn't find any users in Track Auto Chess.
               </div>
             ) : null}
-            {results.length > 0
+            {visibleResults.length > 0
               ? (
-              results.map((r, i) => (
+              visibleResults.map((r, i) => (
                 <div
                   key={r.steam_id}
                   className={
@@ -482,17 +502,8 @@ export function ProfileSearch({
               ))
                 )
               : null}
-            {showSteamAction && results.length > 0 && (
+            {showSteamAction && visibleResults.length > 0 && (
               <div className="search-divider">Not the right player?</div>
-            )}
-            {showSteamAction && (
-              <a
-                href="/api/auth/steam"
-                className="search-result search-signin"
-              >
-                <span>Sign in via Steam</span>
-                <span className="result-meta">see your stats</span>
-              </a>
             )}
             {showSteamAction && (
               <div

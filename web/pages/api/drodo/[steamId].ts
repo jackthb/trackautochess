@@ -2,6 +2,10 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { checkBotId } from "botid/server";
 import { fetchSteamProfile, resolveSteamInput } from "../../../lib/steam";
+import {
+  consumeManualRefreshQuota,
+  type ManualRefreshQuota,
+} from "@/lib/manualRefreshQuota";
 
 const DRODO_BASE = "http://autochess.ppbizon.com";
 const DRODO_CACHE_TTL_MS = 24 * 60 * 60 * 1000;
@@ -12,30 +16,6 @@ const EMPTY_DRODO_PROFILE_ERROR =
 
 const BOT_UA_RE =
   /bot|crawl|spider|slurp|python|curl|wget|java|scrapy|httpclient|go-http|okhttp|libwww|axios|node-fetch/i;
-
-// One forced refresh per IP per 5 minutes.
-const REFRESH_RATE_LIMIT_MS = 5 * 60 * 1000;
-const refreshLastSeen = new Map<string, number>();
-
-function getClientIp(req: NextApiRequest): string {
-  const forwarded = req.headers["x-forwarded-for"];
-  if (typeof forwarded === "string") return forwarded.split(",")[0].trim();
-  return req.socket?.remoteAddress ?? "unknown";
-}
-
-function isRefreshRateLimited(ip: string): boolean {
-  const now = Date.now();
-  const last = refreshLastSeen.get(ip) ?? 0;
-  if (now - last < REFRESH_RATE_LIMIT_MS) return true;
-  refreshLastSeen.set(ip, now);
-  // Prune stale entries to avoid unbounded growth.
-  if (refreshLastSeen.size > 10_000) {
-    for (const [k, v] of refreshLastSeen) {
-      if (now - v > REFRESH_RATE_LIMIT_MS) refreshLastSeen.delete(k);
-    }
-  }
-  return false;
-}
 
 interface SeasonSnapshotRow {
   steam_id: string;
@@ -298,16 +278,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   const ua = req.headers["user-agent"] ?? "";
-  const ip = getClientIp(req);
 
   // Reject obvious automation on forced-refresh calls.
   if (refresh === "1") {
     if (BOT_UA_RE.test(ua)) {
       return res.status(403).json({ error: "Forbidden" });
-    }
-    if (isRefreshRateLimited(ip)) {
-      res.setHeader("Retry-After", "300");
-      return res.status(429).json({ error: "Too many requests" });
     }
   }
 
@@ -328,6 +303,27 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   const forceRefresh = refresh === "1" && req.method === "POST";
+  let refreshQuota: ManualRefreshQuota | undefined;
+  if (forceRefresh) {
+    const quotaResult = consumeManualRefreshQuota(req.headers.cookie);
+    refreshQuota = quotaResult.quota;
+    res.setHeader("Set-Cookie", quotaResult.cookie);
+    if (!quotaResult.allowed) {
+      res.setHeader(
+        "Retry-After",
+        Math.max(
+          1,
+          Math.ceil(
+            (new Date(refreshQuota.reset_at).getTime() - Date.now()) / 1000
+          )
+        ).toString()
+      );
+      return res.status(429).json({
+        error: "Daily manual refresh limit reached",
+        refresh_quota: refreshQuota,
+      });
+    }
+  }
 
   // Check cache unless a user-triggered POST force refresh is requested.
   if (supabase && !forceRefresh) {
@@ -368,7 +364,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   try {
     const resp = await fetch(`${DRODO_BASE}/courier/get/@${steamId}`);
     if (!resp.ok) {
-      return res.status(502).json({ error: "Drodo API error", status: resp.status });
+      return res.status(502).json({
+        error: "Drodo API error",
+        status: resp.status,
+        ...(refreshQuota ? { refresh_quota: refreshQuota } : {}),
+      });
     }
     const json = await resp.json();
     if (json.err !== 0 || !json.user_info?.[steamId]) {
@@ -376,11 +376,15 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return res.status(404).json({
         error: "Player not found on Drodo",
         fetched_at: fetchedAt,
+        ...(refreshQuota ? { refresh_quota: refreshQuota } : {}),
       });
     }
     drodoData = json.user_info[steamId];
   } catch (e) {
-    return res.status(502).json({ error: "Failed to reach Drodo API" });
+    return res.status(502).json({
+      error: "Failed to reach Drodo API",
+      ...(refreshQuota ? { refresh_quota: refreshQuota } : {}),
+    });
   }
 
   const { profile, seasonRows } = buildDrodoProfile(steamId, drodoData);
@@ -390,13 +394,18 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(404).json({
       error: EMPTY_DRODO_PROFILE_ERROR,
       fetched_at: fetchedAt,
+      ...(refreshQuota ? { refresh_quota: refreshQuota } : {}),
     });
   }
 
   await fetchSteamProfile(steamId, supabase ?? undefined);
 
   if (!supabase) {
-    return res.status(200).json({ ...profile, seasons: seasonRows });
+    return res.status(200).json({
+      ...profile,
+      seasons: seasonRows,
+      ...(refreshQuota ? { refresh_quota: refreshQuota } : {}),
+    });
   }
 
   const { error: upsertError } = await supabase
@@ -424,5 +433,9 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     .eq("steam_id", steamId)
     .order("season", { ascending: true });
 
-  return res.status(200).json({ ...profile, seasons: seasons ?? [] });
+  return res.status(200).json({
+    ...profile,
+    seasons: seasons ?? [],
+    ...(refreshQuota ? { refresh_quota: refreshQuota } : {}),
+  });
 }

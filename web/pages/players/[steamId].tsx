@@ -1,7 +1,5 @@
 import Head from "next/head";
 import { useEffect, useMemo, useState } from "react";
-import { useRouter } from "next/router";
-import type { SupabaseClient } from "@supabase/supabase-js";
 import { createClient } from "@supabase/supabase-js";
 import type { GetServerSideProps } from "next";
 import { absoluteUrl, getRequestSiteUrl, SITE_TITLE } from "@/lib/site";
@@ -12,6 +10,10 @@ import { buildStatItems } from "@dac/shared/buildStatItems";
 import { Button } from "@dac/shared/Button";
 import { StatsGrid } from "@dac/shared/StatsGrid";
 import { SeasonHistoryGrid, type SeasonSnapshot } from "@dac/shared/SeasonHistoryGrid";
+import {
+  getManualRefreshQuota,
+  type ManualRefreshQuota,
+} from "@/lib/manualRefreshQuota";
 import {
   fetchSteamProfile,
   playerProfilePath,
@@ -42,7 +44,7 @@ const USER_DRODO_SELECT = [
   "drodo_last_fetched_at",
   "drodo_profile_missing",
 ].join(", ");
-const DRODO_CACHE_TTL_MS = 24 * 60 * 60 * 1000;
+const LAST_FETCHED_TICK_MS = 1000;
 
 interface CachedUserDrodoRow {
   drodo_mmr: number | null;
@@ -57,7 +59,6 @@ interface CachedUserDrodoRow {
 }
 
 interface PlayerPageProps {
-  supabase?: SupabaseClient | null;
   steamId: string;
   steamProfile: SteamProfile;
   games: PlayerGame[];
@@ -73,9 +74,39 @@ interface PlayerPageProps {
   seasons: SeasonSnapshot[];
   drodoProfileMissing: boolean;
   drodoLastFetchedAt: string | null;
-  forceRefresh: boolean;
+  manualRefreshQuota: ManualRefreshQuota;
   ogImageUrl: string | null;
   canonicalUrl: string | null;
+}
+
+function formatLastFetchedTimestamp(value: string | null): string {
+  if (!value) return "Not fetched yet";
+  const date = new Date(value);
+  if (!Number.isFinite(date.getTime())) return "Unknown";
+
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `${date.getUTCFullYear()}-${pad(date.getUTCMonth() + 1)}-${pad(
+    date.getUTCDate()
+  )} ${pad(date.getUTCHours())}:${pad(date.getUTCMinutes())}:${pad(
+    date.getUTCSeconds()
+  )} UTC`;
+}
+
+function formatLastFetchedAge(value: string | null, nowMs: number | null) {
+  if (!value || nowMs == null) return null;
+  const fetchedMs = new Date(value).getTime();
+  if (!Number.isFinite(fetchedMs)) return null;
+
+  const seconds = Math.max(0, Math.floor((nowMs - fetchedMs) / 1000));
+  if (seconds < 60) return `${seconds}s ago`;
+
+  const minutes = Math.floor(seconds / 60);
+  if (minutes < 60) return `${minutes}m ${seconds % 60}s ago`;
+
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return `${hours}h ${minutes % 60}m ago`;
+
+  return `${Math.floor(hours / 24)}d ${hours % 24}h ago`;
 }
 
 export default function PlayerPage({
@@ -86,12 +117,10 @@ export default function PlayerPage({
   seasons: initialSeasons,
   drodoProfileMissing: initialDrodoProfileMissing,
   drodoLastFetchedAt: initialDrodoLastFetchedAt,
-  forceRefresh,
+  manualRefreshQuota: initialManualRefreshQuota,
   ogImageUrl,
   canonicalUrl,
-  supabase,
 }: PlayerPageProps) {
-  const router = useRouter();
   const [drodo, setDrodo] = useState(initialDrodo);
   const [seasons, setSeasons] = useState(initialSeasons);
   const [drodoProfileMissing, setDrodoProfileMissing] = useState(
@@ -100,6 +129,11 @@ export default function PlayerPage({
   const [drodoLastFetchedAt, setDrodoLastFetchedAt] = useState(
     initialDrodoLastFetchedAt
   );
+  const [manualRefreshQuota, setManualRefreshQuota] = useState(
+    initialManualRefreshQuota
+  );
+  const [refreshError, setRefreshError] = useState<string | null>(null);
+  const [nowMs, setNowMs] = useState<number | null>(null);
   const [refreshing, setRefreshing] = useState(false);
   const [avatarFailed, setAvatarFailed] = useState(false);
   const displayName = steamProfile.name || steamProfile.customUrl || steamId;
@@ -119,54 +153,29 @@ export default function PlayerPage({
     setAvatarFailed(false);
   }, [steamProfile.avatarUrl]);
 
-
   useEffect(() => {
-    const fetchedTime = drodoLastFetchedAt
-      ? new Date(drodoLastFetchedAt).getTime()
-      : NaN;
-    const hasFreshCache =
-      Number.isFinite(fetchedTime) &&
-      Date.now() - fetchedTime < DRODO_CACHE_TTL_MS;
-    if (!forceRefresh && hasFreshCache) return;
+    setNowMs(Date.now());
+    const timer = setInterval(() => setNowMs(Date.now()), LAST_FETCHED_TICK_MS);
+    return () => clearInterval(timer);
+  }, []);
 
-    let cancelled = false;
-    fetch(`/api/drodo/${encodeURIComponent(steamId)}`)
-      .then(async (resp) => {
-        const data = await resp.json().catch(() => null);
-        if (resp.ok) return data;
-        if (resp.status === 404 && !cancelled) {
-          setDrodoProfileMissing(true);
-          if (typeof data?.fetched_at === "string") {
-            setDrodoLastFetchedAt(data.fetched_at);
-          }
-        }
-        return null;
-      })
-      .then((data) => {
-        if (!data || cancelled) return;
-        setDrodoProfileMissing(false);
-        setDrodo({
-          mmr: data.mmr ?? null,
-          max_mmr: data.max_mmr ?? null,
-          mmr_level: data.mmr_level ?? null,
-          season: data.season ?? null,
-          season_games: data.season_games ?? null,
-          candy: data.candy ?? null,
-          chicken_count: data.chicken_count ?? null,
-        });
-        if (typeof data.fetched_at === "string") {
-          setDrodoLastFetchedAt(data.fetched_at);
-        }
-        if (Array.isArray(data.seasons)) setSeasons(data.seasons);
-      })
-      .catch(() => {});
-
-    return () => {
-      cancelled = true;
-    };
-  }, [drodoLastFetchedAt, forceRefresh, steamId]);
+  const lastFetchedTimestamp = formatLastFetchedTimestamp(drodoLastFetchedAt);
+  const lastFetchedAge = formatLastFetchedAge(drodoLastFetchedAt, nowMs);
+  const refreshDisabled = refreshing || manualRefreshQuota.remaining <= 0;
+  const refreshQuotaLabel = `${manualRefreshQuota.remaining}/${manualRefreshQuota.limit}`;
 
   const handleRefresh = async () => {
+    if (manualRefreshQuota.remaining <= 0) {
+      setRefreshError("Daily manual refresh limit reached.");
+      return;
+    }
+
+    setManualRefreshQuota((quota) => ({
+      ...quota,
+      used: Math.min(quota.limit, quota.used + 1),
+      remaining: Math.max(0, quota.remaining - 1),
+    }));
+    setRefreshError(null);
     setRefreshing(true);
     try {
       const resp = await fetch(
@@ -174,6 +183,9 @@ export default function PlayerPage({
         { method: "POST" }
       );
       const data = await resp.json().catch(() => null);
+      if (data?.refresh_quota) {
+        setManualRefreshQuota(data.refresh_quota);
+      }
       if (!resp.ok) {
         if (resp.status === 404) {
           setDrodoProfileMissing(true);
@@ -181,6 +193,10 @@ export default function PlayerPage({
           if (typeof data?.fetched_at === "string") {
             setDrodoLastFetchedAt(data.fetched_at);
           }
+        } else if (resp.status === 429) {
+          setRefreshError("Daily manual refresh limit reached.");
+        } else {
+          setRefreshError(data?.error || "Refresh failed. Try again later.");
         }
         return;
       }
@@ -199,6 +215,8 @@ export default function PlayerPage({
         setDrodoLastFetchedAt(data.fetched_at);
       }
       if (Array.isArray(data.seasons)) setSeasons(data.seasons);
+    } catch {
+      setRefreshError("Refresh failed. Try again later.");
     } finally {
       setRefreshing(false);
     }
@@ -285,6 +303,53 @@ export default function PlayerPage({
         .player-meta a:hover {
           color: var(--text-secondary);
         }
+        .player-actions {
+          display: flex;
+          flex-direction: column;
+          align-items: flex-end;
+          gap: 10px;
+          flex-shrink: 0;
+        }
+        .last-fetched {
+          display: grid;
+          gap: 3px;
+          text-align: right;
+          font-size: 11px;
+          color: var(--text-muted);
+          letter-spacing: 0.4px;
+        }
+        .last-fetched-label {
+          text-transform: uppercase;
+          letter-spacing: 1.2px;
+        }
+        .last-fetched-value,
+        .last-fetched-age {
+          font-family: var(--font-mono), ui-monospace, SFMono-Regular, Consolas,
+            "Liberation Mono", monospace;
+        }
+        .last-fetched-value {
+          color: var(--text-secondary);
+        }
+        .refresh-quota {
+          display: grid;
+          gap: 3px;
+          text-align: right;
+          font-size: 11px;
+          color: var(--text-muted);
+          letter-spacing: 0.4px;
+        }
+        .refresh-quota-value {
+          font-family: var(--font-mono), ui-monospace, SFMono-Regular, Consolas,
+            "Liberation Mono", monospace;
+          color: var(--text-secondary);
+        }
+        .refresh-error {
+          max-width: 220px;
+          text-align: right;
+          font-size: 11px;
+          color: var(--accent);
+          letter-spacing: 0.35px;
+        }
         .table-wrap {
           border: 1px solid var(--border);
           overflow: hidden;
@@ -322,6 +387,13 @@ export default function PlayerPage({
           }
           .player-identity {
             align-items: flex-start;
+          }
+          .player-actions,
+          .last-fetched,
+          .refresh-quota,
+          .refresh-error {
+            align-items: flex-start;
+            text-align: left;
           }
         }
       `}</style>
@@ -366,12 +438,32 @@ export default function PlayerPage({
                 </div>
               </div>
             </div>
-            <Button
-              disabled={refreshing}
-              onClick={handleRefresh}
-            >
-              {refreshing ? "Refreshing..." : "Refresh MMR"}
-            </Button>
+            <div className="player-actions">
+              <Button disabled={refreshDisabled} onClick={handleRefresh}>
+                {refreshing ? "Refreshing..." : "Refresh MMR"}
+              </Button>
+              <div className="refresh-quota">
+                <span>Manual refreshes</span>
+                <span className="refresh-quota-value">
+                  {refreshQuotaLabel} left today
+                </span>
+              </div>
+              {refreshError && (
+                <div className="refresh-error">{refreshError}</div>
+              )}
+              <div className="last-fetched">
+                <span className="last-fetched-label">Last fetched</span>
+                <time
+                  className="last-fetched-value"
+                  dateTime={drodoLastFetchedAt ?? undefined}
+                >
+                  {lastFetchedTimestamp}
+                </time>
+                {lastFetchedAge && (
+                  <span className="last-fetched-age">{lastFetchedAge}</span>
+                )}
+              </div>
+            </div>
           </div>
 
           {drodoProfileMissing && !drodo && (
@@ -404,15 +496,9 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-  // Only honour ?refresh=1 when the request came from within the site.
-  // Direct hits (bots, curl, shared links) have no same-origin Referer, so we
-  // silently ignore the parameter rather than burning upstream API quota.
-  const host = context.req.headers.host ?? "";
-  const referer = context.req.headers.referer ?? "";
-  const isSameOriginReferer = host.length > 0 && referer.includes(host);
-  const forceRefresh = isSameOriginReferer && context.query.refresh === "1";
   const supabase = url && key ? createClient(url, key) : null;
   const baseUrl = getRequestSiteUrl(context.req.headers);
+  const manualRefreshQuota = getManualRefreshQuota(context.req.headers.cookie);
 
   // Accept numeric Steam IDs or vanity slugs. Keep vanity slugs in the URL
   // when present; they are the preferred public profile route.
@@ -500,9 +586,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   ) {
     return {
       redirect: {
-        destination: `${playerProfilePath(steamId, steamProfile.customUrl)}${
-          forceRefresh ? "?refresh=1" : ""
-        }`,
+        destination: playerProfilePath(steamId, steamProfile.customUrl),
         permanent: false,
       },
     };
@@ -517,7 +601,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       seasons,
       drodoProfileMissing,
       drodoLastFetchedAt,
-      forceRefresh,
+      manualRefreshQuota,
       ogImageUrl: absoluteUrl(`/api/og/player/${steamId}`, baseUrl),
       canonicalUrl: absoluteUrl(
         playerProfilePath(steamId, steamProfile.customUrl),

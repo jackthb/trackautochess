@@ -113,7 +113,7 @@ export async function markRowsWithGames(
 
 export async function getDefaultPlayerSearchResults(
   supabase: SupabaseClient,
-  limit = 24
+  limit = 5
 ): Promise<SearchResult[]> {
   const { data, error } = await supabase
     .from("users")

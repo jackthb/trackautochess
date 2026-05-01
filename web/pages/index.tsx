@@ -17,6 +17,8 @@ export default function Home({ initialSearchResults }: HomeProps) {
   const description =
     "Look up Dota Auto Chess player MMR, season history, and tracked match stats by Steam vanity URL or Steam ID.";
   const siteUrl = absoluteUrl("/");
+  const exampleSteamUrl =
+    "https://steamcommunity.com/profiles/76561198022169086";
 
   const structuredData = {
     "@context": "https://schema.org",
@@ -178,6 +180,25 @@ export default function Home({ initialSearchResults }: HomeProps) {
           opacity: 0;
           animation: arrive 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.65s forwards;
         }
+        .search-guidance {
+          margin-bottom: 12px;
+          text-align: left;
+        }
+        .search-guidance-label {
+          font-size: 12px;
+          color: var(--text-secondary);
+          letter-spacing: 0.8px;
+        }
+        .search-example {
+          margin-top: 5px;
+          font-size: 11px;
+          color: var(--text-muted);
+          letter-spacing: 0.35px;
+          overflow-wrap: anywhere;
+        }
+        .search-example span {
+          color: var(--gold);
+        }
         .preview {
           position: relative;
           z-index: 1;
@@ -275,9 +296,17 @@ export default function Home({ initialSearchResults }: HomeProps) {
             </p>
 
             <div className="search-wrap">
+              <div className="search-guidance">
+                <div className="search-guidance-label">
+                  Paste a Steam profile URL or SteamID64
+                </div>
+                <div className="search-example">
+                  Example: <span>{exampleSteamUrl}</span>
+                </div>
+              </div>
               <ProfileSearch
-                autoFocus
                 initialResults={initialSearchResults}
+                placeholder="Steam profile URL or SteamID64"
               />
             </div>
 
