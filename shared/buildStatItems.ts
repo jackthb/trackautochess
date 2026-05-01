@@ -11,6 +11,7 @@ interface DrodoForStats {
   season_games?: number | null;
   candy?: number | null;
   chicken_count?: number | null;
+  total_chicken_count?: number | null;
 }
 
 export interface StatGroups {
@@ -43,7 +44,8 @@ export function buildStatItems(
   if (drodo?.max_mmr != null) drodoItems.push({ key: "drodo-peak", value: drodo.max_mmr, label: "Peak MMR", tone: "gold", source: "drodo" });
   if (drodo?.season_games != null) drodoItems.push({ key: "drodo-season-games", value: drodo.season_games, label: "Season Games", source: "drodo" });
   if (drodo?.candy != null) drodoItems.push({ key: "drodo-candy", value: drodo.candy, label: "Candies", tone: "gold", source: "drodo" });
-  if (drodo?.chicken_count != null) drodoItems.push({ key: "drodo-chickens", value: drodo.chicken_count, label: "Chickens (Wins)", tone: "gold", source: "drodo" });
+  if (drodo?.chicken_count != null) drodoItems.push({ key: "drodo-chickens", value: drodo.chicken_count, label: "Season Wins", tone: "gold", source: "drodo" });
+  if (drodo?.total_chicken_count != null && drodo.total_chicken_count !== drodo.chicken_count) drodoItems.push({ key: "drodo-total-chickens", value: drodo.total_chicken_count, label: "Total Wins", tone: "gold", source: "drodo" });
 
   return { tracked, drodo: drodoItems };
 }

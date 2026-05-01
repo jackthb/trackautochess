@@ -80,6 +80,7 @@ export function NavBar({ supabase }: NavBarProps) {
       <style jsx>{`
         nav {
           display: flex;
+          flex-direction: row;
           align-items: center;
           justify-content: space-between;
           padding: 0 40px;
@@ -261,12 +262,6 @@ export function NavBar({ supabase }: NavBarProps) {
             </Link>
             <Link href="/relics" className="nav-link">
               Relics
-            </Link>
-            <Link href="/units" className="nav-link">
-              Units
-            </Link>
-            <Link href="/synergies" className="nav-link">
-              Synergies
             </Link>
             <Link href="/talents" className="nav-link">
               Talents

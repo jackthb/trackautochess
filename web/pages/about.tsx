@@ -18,8 +18,8 @@ export default function AboutPage() {
     setStatus(null);
     setError(null);
 
-    if (!message.trim()) {
-      setError("Tell us what you need help with.");
+    if (!message.trim() || message.trim().length < 20) {
+      setError("Message must be at least 20 characters.");
       return;
     }
 

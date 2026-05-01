@@ -23,6 +23,7 @@ interface SeasonSnapshotRow {
   mmr: number | null;
   max_mmr: number | null;
   games_played: number | null;
+  chicken_count: number | null;
   fetched_at: string;
 }
 
@@ -86,7 +87,8 @@ function currentSeason(data: Record<string, unknown>): string | null {
 
 function extractAllSeasons(
   steamId: string,
-  data: Record<string, unknown>
+  data: Record<string, unknown>,
+  currentSeasonKey: string | null
 ): SeasonSnapshotRow[] {
   const now = new Date().toISOString();
   const seasons: SeasonSnapshotRow[] = [];
@@ -94,12 +96,16 @@ function extractAllSeasons(
     const m = key.match(/^mmr_s(\d+)$/);
     if (m) {
       const n = m[1];
+      const seasonKey = `s${n}`;
       seasons.push({
         steam_id: steamId,
-        season: `s${n}`,
+        season: seasonKey,
         mmr: Number(data[`mmr_s${n}`]) || null,
         max_mmr: Number(data[`max_mmr_s${n}`]) || null,
         games_played: Number(data[`match_s${n}`]) || null,
+        // chicken_count is a running total on Drodo — only valid for the current season.
+        // Historical seasons keep whatever we last stored; null here means "don't overwrite".
+        chicken_count: seasonKey === currentSeasonKey ? (Number(data.chicken_count) || null) : null,
         fetched_at: now,
       });
     }
@@ -132,7 +138,7 @@ function buildDrodoProfile(
       raw_data: drodoData,
       fetched_at: new Date().toISOString(),
     },
-    seasonRows: extractAllSeasons(steamId, drodoData),
+    seasonRows: extractAllSeasons(steamId, drodoData, season),
   };
 }
 
@@ -347,7 +353,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       const cachedProfile = cachedUserToDrodoProfile(cached);
       const { data: seasons } = await supabase
         .from("player_seasons")
-        .select("season, mmr, max_mmr, games_played")
+        .select("season, mmr, max_mmr, games_played, chicken_count")
         .eq("steam_id", steamId)
         .order("season", { ascending: true });
 
@@ -416,11 +422,24 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     console.error("Failed to cache Drodo profile:", upsertError.message);
   }
 
-  // Upsert all season snapshots
+  // Upsert season snapshots, preserving chicken_count for historical seasons.
+  // Drodo only returns the current season's chicken_count so we must not overwrite
+  // previously saved values for older seasons with null.
   if (seasonRows.length > 0) {
+    const { data: existingSeasons } = await supabase
+      .from("player_seasons")
+      .select("season, chicken_count")
+      .eq("steam_id", steamId);
+    const existingChickenCounts = new Map(
+      (existingSeasons ?? []).map((r) => [r.season, r.chicken_count as number | null])
+    );
+    const mergedRows = seasonRows.map((row) => ({
+      ...row,
+      chicken_count: row.chicken_count ?? existingChickenCounts.get(row.season) ?? null,
+    }));
     const { error: seasonsError } = await supabase
       .from("player_seasons")
-      .upsert(seasonRows, { onConflict: "steam_id,season" });
+      .upsert(mergedRows, { onConflict: "steam_id,season" });
     if (seasonsError) {
       console.error("Failed to upsert player_seasons:", seasonsError.message);
     }
@@ -429,7 +448,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   // Fetch full season history from DB (includes previously saved seasons)
   const { data: seasons } = await supabase
     .from("player_seasons")
-    .select("season, mmr, max_mmr, games_played")
+    .select("season, mmr, max_mmr, games_played, chicken_count")
     .eq("steam_id", steamId)
     .order("season", { ascending: true });
 

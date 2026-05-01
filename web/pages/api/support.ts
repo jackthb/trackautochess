@@ -1,4 +1,11 @@
 import type { NextApiRequest, NextApiResponse } from "next";
+import { checkBotId } from "botid/server";
+import { RateLimiterMemory } from "rate-limiter-flexible";
+
+const rateLimiter = new RateLimiterMemory({
+  points: 3,
+  duration: 10 * 60,
+});
 
 interface SupportRequest {
   contact?: string;
@@ -31,12 +38,26 @@ export default async function handler(
     return res.status(200).json({ ok: true });
   }
 
+  const botCheck = await checkBotId({ advancedOptions: { headers: req.headers } });
+  if (botCheck.isBot && !botCheck.isVerifiedBot) {
+    return res.status(403).json({ ok: false, error: "Forbidden" });
+  }
+
+  const ip = (req.headers["x-forwarded-for"] as string | undefined)?.split(",")[0].trim()
+    ?? req.socket?.remoteAddress
+    ?? "unknown";
+  try {
+    await rateLimiter.consume(ip);
+  } catch {
+    return res.status(429).json({ ok: false, error: "Too many requests. Please wait before sending another message." });
+  }
+
   const contact = clean(body.contact, 160);
   const message = clean(body.message, 1800);
   const page = clean(body.page, 240);
 
-  if (!message) {
-    return res.status(400).json({ ok: false, error: "Message is required" });
+  if (!message || message.length < 20) {
+    return res.status(400).json({ ok: false, error: "Message must be at least 20 characters" });
   }
 
   const webhookUrl = process.env.DISCORD_SUPPORT_WEBHOOK_URL;

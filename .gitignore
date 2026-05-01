@@ -34,3 +34,4 @@ tracker/dist/
 /build/
 /dist/
 .pnpm-store/
+data/vscript_diffs/

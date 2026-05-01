@@ -22,6 +22,8 @@ export default function App({ Component, pageProps }: AppProps) {
       <BotIdClient
         protect={[
           { path: "/api/drodo/*", method: "GET" },
+          { path: "/api/players/search", method: "GET" },
+          { path: "/api/support", method: "POST" },
         ]}
       />
       <NavBar supabase={supabase} />

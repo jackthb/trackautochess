@@ -1,11 +1,16 @@
 import Head from "next/head";
+import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { createClient } from "@supabase/supabase-js";
 import type { GetServerSideProps } from "next";
 import { absoluteUrl, getRequestSiteUrl, SITE_TITLE } from "@/lib/site";
 import unitsData from "@data/units.json";
-import type { PlayerGame } from "@dac/shared/types";
+import unitsFullData from "@data/units_full.json";
+import synergiesData from "@data/synergies.json";
+import relicsData from "@data/relics.json";
+import type { PlayerGame, UnitFullInfo, SynergyInfo, RelicInfo } from "@dac/shared/types";
 import { mmrToRank } from "@dac/shared/game-utils";
+import { GameRowDisplay } from "@dac/shared/GameRowDisplay";
 import { buildStatItems } from "@dac/shared/buildStatItems";
 import { Button } from "@dac/shared/Button";
 import { StatsGrid } from "@dac/shared/StatsGrid";
@@ -21,6 +26,10 @@ import {
   steamProfileUrl,
   type SteamProfile,
 } from "../../lib/steam";
+
+const UNITS_FULL = unitsFullData as Record<string, UnitFullInfo>;
+const SYNERGIES_DATA = synergiesData as Record<string, SynergyInfo>;
+const RELICS_DATA = (relicsData as any).relics as Record<string, RelicInfo>;
 
 const UNIT_COSTS: Record<string, number> = {};
 for (const [name, info] of Object.entries(unitsData.units)) {
@@ -76,6 +85,7 @@ interface PlayerPageProps {
   drodoLastFetchedAt: string | null;
   manualRefreshQuota: ManualRefreshQuota;
   ogImageUrl: string | null;
+  twitchOgUrl: string | null;
   canonicalUrl: string | null;
 }
 
@@ -119,6 +129,7 @@ export default function PlayerPage({
   drodoLastFetchedAt: initialDrodoLastFetchedAt,
   manualRefreshQuota: initialManualRefreshQuota,
   ogImageUrl,
+  twitchOgUrl,
   canonicalUrl,
 }: PlayerPageProps) {
   const [drodo, setDrodo] = useState(initialDrodo);
@@ -143,9 +154,14 @@ export default function PlayerPage({
     ? `${displayName} is ${mmrToRank(drodo.mmr)} at ${drodo.mmr.toLocaleString("en-US")} MMR.`
     : `Dota Auto Chess profile for ${displayName}.`;
 
-  const { drodo: drodoItems } = useMemo(
-    () => buildStatItems(games, drodo),
-    [games, drodo]
+  const totalChickenCount = useMemo(() => {
+    const sum = seasons.reduce((acc, s) => acc + (s.chicken_count ?? 0), 0);
+    return sum > 0 ? sum : null;
+  }, [seasons]);
+
+  const { tracked: trackedItems, drodo: drodoItems } = useMemo(
+    () => buildStatItems(games, drodo ? { ...drodo, total_chicken_count: totalChickenCount } : null),
+    [games, drodo, totalChickenCount]
   );
 
   // TODO: ingest total matches / avg rank / wins / preferred lineup / max damage from history pages for server-side season snapshots.
@@ -429,12 +445,6 @@ export default function PlayerPage({
                       ? `steamcommunity.com/id/${steamProfile.customUrl}`
                       : `Steam ID: ${steamId}`}
                   </a>
-                  {drodo && drodo.mmr != null && (
-                    <>
-                      {" \u00B7 "}
-                      {mmrToRank(drodo.mmr)}
-                    </>
-                  )}
                 </div>
               </div>
             </div>
@@ -463,6 +473,11 @@ export default function PlayerPage({
                   <span className="last-fetched-age">{lastFetchedAge}</span>
                 )}
               </div>
+              {twitchOgUrl && (
+                <a href={twitchOgUrl} target="_blank" rel="noopener noreferrer" style={{ fontSize: 12, color: "var(--text-muted)", letterSpacing: "0.5px" }}>
+                  Twitch overlay link ↗
+                </a>
+              )}
             </div>
           </div>
 
@@ -474,6 +489,13 @@ export default function PlayerPage({
             </div>
           )}
 
+          {trackedItems.length > 0 && (
+            <>
+              <div className="section-title">Tracked Games</div>
+              <StatsGrid items={trackedItems} />
+            </>
+          )}
+
           {drodoItems.length > 0 && (
             <>
               <div className="section-title">Auto Chess</div>
@@ -482,6 +504,38 @@ export default function PlayerPage({
           )}
 
           <SeasonHistoryGrid seasons={seasons} />
+
+          {games.length > 0 && (
+            <>
+              <div className="section-title">Matches</div>
+              <div className="table-wrap">
+                <div className="table-header">
+                  <div className="th">#</div>
+                  <div className="th">Lineup</div>
+                  <div className="th">Rank</div>
+                  <div className="th">W &ndash; L</div>
+                  <div className="th">Lv</div>
+                  <div className="th">Relic</div>
+                  <div className="th">Date</div>
+                </div>
+                {games.map((g) => (
+                  <div key={g.id} className="game-entry">
+                    <Link href={`/games/${g.id}`} style={{ display: "block", color: "inherit" }}>
+                      <GameRowDisplay
+                        game={g}
+                        unitCosts={UNIT_COSTS}
+                        unitsFull={UNITS_FULL}
+                        synergiesData={SYNERGIES_DATA}
+                        relicsData={RELICS_DATA}
+                        iconUrl={(type, stem) => `/icons/${type}/${stem}.png`}
+                        shareUrl={`/games/${g.id}`}
+                      />
+                    </Link>
+                  </div>
+                ))}
+              </div>
+            </>
+          )}
         </div>
       </div>
     </>
@@ -523,7 +577,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         .maybeSingle<CachedUserDrodoRow>(),
       supabase
         .from("player_seasons")
-        .select("season, mmr, max_mmr, games_played")
+        .select("season, mmr, max_mmr, games_played, chicken_count")
         .eq("steam_id", steamId)
         .order("season", { ascending: true }),
     ]);
@@ -603,6 +657,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       drodoLastFetchedAt,
       manualRefreshQuota,
       ogImageUrl: absoluteUrl(`/api/og/player/${steamId}`, baseUrl),
+      twitchOgUrl: absoluteUrl(`/api/og/twitch/${steamId}`, baseUrl),
       canonicalUrl: absoluteUrl(
         playerProfilePath(steamId, steamProfile.customUrl),
         baseUrl

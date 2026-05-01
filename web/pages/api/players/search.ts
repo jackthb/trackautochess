@@ -1,5 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { createClient } from "@supabase/supabase-js";
+import { checkBotId } from "botid/server";
+import { RateLimiterMemory } from "rate-limiter-flexible";
 import {
   fetchSteamProfile,
   parseSteamInput,
@@ -16,10 +18,26 @@ import {
   type UserSearchRow,
 } from "@/lib/playerSearch";
 
+const rateLimiter = new RateLimiterMemory({ points: 60, duration: 60 });
+
 export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<SearchResult[] | { error: string }>
 ) {
+  const botCheck = await checkBotId({ advancedOptions: { headers: req.headers } });
+  if (botCheck.isBot && !botCheck.isVerifiedBot) {
+    return res.status(403).json({ error: "Forbidden" });
+  }
+
+  const ip = (req.headers["x-forwarded-for"] as string | undefined)?.split(",")[0].trim()
+    ?? req.socket?.remoteAddress
+    ?? "unknown";
+  try {
+    await rateLimiter.consume(ip);
+  } catch {
+    return res.status(429).json({ error: "Too many requests" });
+  }
+
   const rawQuery = Array.isArray(req.query.q) ? req.query.q[0] : req.query.q;
   const query = rawQuery?.trim().replace(/[,()%*]/g, "") ?? "";
   const shouldSearchSteam = req.query.steam === "1";
