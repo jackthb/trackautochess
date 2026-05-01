@@ -143,7 +143,7 @@ class _PyAVRecorder:
 
     Tries AV1 (libsvtav1) first, falls back to H.264 (libx264).
     Stop is instant — just container.close().
-    Captures the Dota 2 window if found, otherwise falls back to full screen.
+    Captures only the Dota 2 window.
     """
 
     def __init__(self, fps: int = FALLBACK_FPS):
@@ -228,16 +228,16 @@ class _PyAVRecorder:
         try:
             codec_name = self._pick_codec()
 
-            # Try to capture just the Dota 2 window
+            # Capture strictly the Dota 2 window (never full screen).
             dota_rect = _find_dota_window()
-            if dota_rect:
-                monitor = dota_rect
-                log.info("Recording Dota 2 window: %dx%d at (%d,%d)",
-                         monitor["width"], monitor["height"],
-                         monitor["left"], monitor["top"])
-            else:
-                monitor = screen_capture.monitors()[1]
-                log.info("Dota 2 window not found — recording full screen")
+            if not dota_rect:
+                log.warning("Dota 2 window not found — recording not started")
+                return
+
+            monitor = dota_rect
+            log.info("Recording Dota 2 window: %dx%d at (%d,%d)",
+                     monitor["width"], monitor["height"],
+                     monitor["left"], monitor["top"])
 
             cap_w = monitor["width"]
             cap_h = monitor["height"]
@@ -281,15 +281,19 @@ class _PyAVRecorder:
                 # Periodically re-detect the Dota 2 window
                 if t0 - last_detect_time >= redetect_interval:
                     new_rect = _find_dota_window()
-                    if new_rect:
-                        if (new_rect["left"] != monitor.get("left") or
-                                new_rect["top"] != monitor.get("top") or
-                                new_rect["width"] != monitor.get("width") or
-                                new_rect["height"] != monitor.get("height")):
-                            monitor = new_rect
-                            log.info("Recording: Dota window moved → %dx%d at (%d,%d)",
-                                     monitor["width"], monitor["height"],
-                                     monitor["left"], monitor["top"])
+                    if not new_rect:
+                        log.info("Recording: Dota 2 window no longer detected — stopping")
+                        self._stop_event.set()
+                        break
+
+                    if (new_rect["left"] != monitor.get("left") or
+                            new_rect["top"] != monitor.get("top") or
+                            new_rect["width"] != monitor.get("width") or
+                            new_rect["height"] != monitor.get("height")):
+                        monitor = new_rect
+                        log.info("Recording: Dota window moved → %dx%d at (%d,%d)",
+                                 monitor["width"], monitor["height"],
+                                 monitor["left"], monitor["top"])
                     last_detect_time = t0
 
                 img = screen_capture.grab(monitor)[:, :, :3]  # BGRA → BGR

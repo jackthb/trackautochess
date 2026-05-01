@@ -3,7 +3,7 @@ import Link from "next/link";
 import { EntityIcon } from "@/components/EntityIcon";
 import styles from "./EntityCard.module.css";
 
-export type EntityCardVariant = "item" | "relic";
+export type EntityCardVariant = "item" | "relic" | "unit" | "synergy";
 
 interface EntityCardProps {
   href: string;
@@ -22,6 +22,8 @@ interface EntityCardProps {
 const DEFAULT_ACCENT: Record<EntityCardVariant, string> = {
   item: "var(--accent)",
   relic: "var(--gold)",
+  unit: "var(--text-primary)",
+  synergy: "var(--text-secondary)",
 };
 
 export function EntityCard({

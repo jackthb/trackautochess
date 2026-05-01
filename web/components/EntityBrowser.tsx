@@ -24,6 +24,12 @@ interface EntityBrowserProps {
   /** Returns a CSS color expression for the tier. */
   tierColor?: (tier: number) => string;
 }
+const ENTITY_PATH: Record<EntityCardVariant, string> = {
+  item: "items",
+  relic: "relics",
+  unit: "units",
+  synergy: "synergies",
+};
 
 function isTiered(
   data: BrowsableEntity[] | BrowsableEntity[][]
@@ -70,7 +76,7 @@ export function EntityBrowser({
   const gridClass = `${styles.grid} ${
     variant === "relic" ? styles.gridRelic : styles.gridItem
   }`;
-  const placeholder = `Search ${variant}s...`;
+  const placeholder = `Search ${ENTITY_PATH[variant]}...`;
   const total = filteredTiered
     ? filteredTiered.reduce((sum, tier) => sum + tier.length, 0)
     : filteredFlat?.length ?? 0;
@@ -86,7 +92,7 @@ export function EntityBrowser({
           onChange={(event) => setQuery(event.target.value)}
         />
         <div className={styles.total}>
-          {total} {variant}s
+          {total} {ENTITY_PATH[variant]}
         </div>
 
         {filteredTiered &&
@@ -107,7 +113,7 @@ export function EntityBrowser({
                     {entities.map((entity) => (
                       <EntityCard
                         key={entity.slug}
-                        href={`/${variant}s/${entity.slug}`}
+                        href={`/${ENTITY_PATH[variant]}/${entity.slug}`}
                         iconSrc={entity.iconSrc}
                         iconAlt={entity.name}
                         name={entity.name}
@@ -131,7 +137,7 @@ export function EntityBrowser({
                 {filteredFlat.map((entity) => (
                   <EntityCard
                     key={entity.slug}
-                    href={`/${variant}s/${entity.slug}`}
+                    href={`/${ENTITY_PATH[variant]}/${entity.slug}`}
                     iconSrc={entity.iconSrc}
                     iconAlt={entity.name}
                     name={entity.name}

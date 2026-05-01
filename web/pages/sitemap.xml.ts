@@ -2,6 +2,8 @@ import type { GetServerSideProps } from "next";
 import patchIndex from "@data/patch_notes/index.json";
 import { getAllItems } from "@/lib/items";
 import { getAllRelics } from "@/lib/relics";
+import { getAllUnits } from "@/lib/units";
+import { getAllSynergies } from "@/lib/synergies";
 import { getRequestSiteUrl } from "@/lib/site";
 
 interface IndexPatch {
@@ -46,10 +48,14 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
     { path: "/" },
     { path: "/items" },
     { path: "/relics" },
+    { path: "/units" },
+    { path: "/synergies" },
     { path: "/talents" },
     { path: "/patch-notes" },
     ...getAllItems().map((item) => ({ path: `/items/${item.slug}` })),
     ...getAllRelics().map((relic) => ({ path: `/relics/${relic.slug}` })),
+    ...getAllUnits().map((unit) => ({ path: `/units/${unit.slug}` })),
+    ...getAllSynergies().map((synergy) => ({ path: `/synergies/${synergy.slug}` })),
     ...(patchIndex.patches as IndexPatch[]).map((patch) => ({
       path: `/patch-notes/${patch.slug}`,
       lastmod: patch.date,

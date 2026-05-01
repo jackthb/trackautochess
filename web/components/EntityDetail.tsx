@@ -38,11 +38,21 @@ interface EntityDetailProps {
 const INDEX_LABEL: Record<EntityCardVariant, string> = {
   item: "Items",
   relic: "Relics",
+  unit: "Units",
+  synergy: "Synergies",
 };
 
 const OVERVIEW_LABEL: Record<EntityCardVariant, string> = {
   item: "Item Overview",
   relic: "Relic Overview",
+  unit: "Unit Overview",
+  synergy: "Synergy Overview",
+};
+const ENTITY_PATH: Record<EntityCardVariant, string> = {
+  item: "items",
+  relic: "relics",
+  unit: "units",
+  synergy: "synergies",
 };
 
 export function EntityDetail({
@@ -62,7 +72,7 @@ export function EntityDetail({
   const titleClass = `${styles.title} ${
     variant === "relic" ? styles.titleRelic : styles.titleItem
   }`;
-  const indexPath = `/${variant}s`;
+  const indexPath = `/${ENTITY_PATH[variant]}`;
 
   return (
     <div className={styles.page}>
@@ -119,7 +129,7 @@ export function EntityDetail({
               {related.map((r) => (
                 <EntityCard
                   key={r.slug}
-                  href={`/${variant}s/${r.slug}`}
+                  href={`/${ENTITY_PATH[variant]}/${r.slug}`}
                   iconSrc={r.iconSrc}
                   iconAlt={r.name}
                   name={r.name}
