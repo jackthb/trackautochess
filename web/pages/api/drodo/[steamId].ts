@@ -1,5 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
+import { checkBotId } from "botid/server";
 import { fetchSteamProfile, resolveSteamInput } from "../../../lib/steam";
 
 const DRODO_BASE = "http://autochess.ppbizon.com";
@@ -281,6 +282,11 @@ async function purgeDrodoCache(
 }
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+  const botCheck = await checkBotId({ advancedOptions: { headers: req.headers } });
+  if (botCheck.isBot && !botCheck.isVerifiedBot) {
+    return res.status(403).json({ error: "Forbidden" });
+  }
+
   const { steamId: rawSteamId, refresh } = req.query;
   if (!rawSteamId || typeof rawSteamId !== "string") {
     return res.status(400).json({ error: "Invalid steam ID" });

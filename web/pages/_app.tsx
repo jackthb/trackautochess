@@ -3,6 +3,7 @@ import type { AppProps } from "next/app";
 import { useEffect, useState } from "react";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
+import { BotIdClient } from "botid/client";
 import { NavBar } from "@/components/NavBar";
 import { createSupabaseClient } from "@/lib/supabase";
 import type { SupabaseClient } from "@supabase/supabase-js";
@@ -17,6 +18,11 @@ export default function App({ Component, pageProps }: AppProps) {
 
   return (
     <>
+      <BotIdClient
+        protect={[
+          { path: "/api/drodo/*", method: "GET" },
+        ]}
+      />
       <NavBar supabase={supabase} />
       <Component {...pageProps} supabase={supabase} />
       <Analytics />
