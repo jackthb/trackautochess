@@ -249,6 +249,8 @@ declare global {
       debug: (filename: string, screenType?: string | null) => Promise<ScreenshotDebugResult>;
       getParseResult: (filename: string) => Promise<SavedParseResult | null>;
       updateParseRow: (filename: string, rowIndex: number, fields: Partial<ParseResultRow>) => Promise<boolean>;
+      parseTestFile: () => Promise<string | null>;
+      saveFixture: (name: string, data: unknown) => Promise<string>;
     };
     replays: {
       list: () => Promise<Replay[]>;

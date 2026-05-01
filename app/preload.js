@@ -17,6 +17,8 @@ contextBridge.exposeInMainWorld("screenshots", {
   debug: (filename, screenType) => ipcRenderer.invoke("screenshots:debug", filename, screenType),
   getParseResult: (filename) => ipcRenderer.invoke("screenshots:getParseResult", filename),
   updateParseRow: (filename, rowIndex, fields) => ipcRenderer.invoke("screenshots:updateParseRow", filename, rowIndex, fields),
+  parseTestFile: () => ipcRenderer.invoke("screenshots:parseTestFile"),
+  saveFixture: (name, data) => ipcRenderer.invoke("screenshots:saveFixture", name, data),
 });
 
 contextBridge.exposeInMainWorld("tracker", {

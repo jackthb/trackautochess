@@ -1028,6 +1028,14 @@ class HeadlessBackend:
                 daemon=True,
                 name="debug-saved-screenshot",
             ).start()
+        elif cmd == "parse_test_file":
+            img_path = msg.get("path", "")
+            threading.Thread(
+                target=self._do_parse_test_file,
+                args=(img_path,),
+                daemon=True,
+                name="parse-test-file",
+            ).start()
         elif cmd == "quit":
             self._shutdown()
         else:
@@ -1309,6 +1317,32 @@ class HeadlessBackend:
         except Exception as e:
             log.exception("debug_saved_screenshot error")
             self._emit({"type": "debug_result", "data": {"error": str(e)}})
+
+    def _do_parse_test_file(self, img_path: str) -> None:
+        """Parse any screenshot file and emit parse_result into the confirmation flow."""
+        import cv2
+        from cv_parser import apply_calibration, detect_screen_type, load_regions_config, infer_aspect_ratio
+
+        try:
+            img = cv2.imread(img_path)
+            if img is None:
+                self._emit_error(f"Cannot read image: {img_path}")
+                return
+            regions_config = load_regions_config()
+            h, w = img.shape[:2]
+            aspect_ratio = infer_aspect_ratio(w, h, list(regions_config.keys()))
+            apply_calibration(img, aspect_ratio=aspect_ratio, regions_config=regions_config)
+            screen = detect_screen_type(img)
+            log.info("parse_test_file: %s detected as %s", img_path, screen)
+            if screen == "my_matches":
+                self._do_parse_my_matches(img, screenshot_path=img_path)
+            elif screen in ("game_over", "final_ranking"):
+                self._do_parse_game_over(img, screenshot_path=img_path)
+            else:
+                self._emit_error(f"Unrecognised screen type '{screen}' — open a MY MATCHES or GAME OVER screenshot")
+        except Exception as e:
+            log.exception("parse_test_file error")
+            self._emit_error(f"Parse error: {e}")
 
     def _run_sentinel_debug(self, img, screen: str, regions: dict, result: dict) -> dict:
         import cv2

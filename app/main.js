@@ -1385,6 +1385,28 @@ ipcMain.handle("screenshots:updateParseRow", async (_event, filename, rowIndex, 
   }
 });
 
+// ── Parser test fixtures ─────────────────────────────────────────────────────
+
+const FIXTURES_DIR = path.join(__dirname, "..", "backend", "tests", "fixtures");
+
+ipcMain.handle("screenshots:parseTestFile", async () => {
+  const result = await dialog.showOpenDialog({
+    title: "Select screenshot to parse",
+    filters: [{ name: "Images", extensions: ["jpg", "jpeg", "png"] }],
+  });
+  if (result.canceled || !result.filePaths.length) return null;
+  const filePath = result.filePaths[0];
+  sendToPython({ cmd: "parse_test_file", path: filePath });
+  return filePath;
+});
+
+ipcMain.handle("screenshots:saveFixture", async (_event, fixtureName, data) => {
+  fs.mkdirSync(FIXTURES_DIR, { recursive: true });
+  const outPath = path.join(FIXTURES_DIR, `${fixtureName}.json`);
+  fs.writeFileSync(outPath, JSON.stringify(data, null, 2));
+  return outPath;
+});
+
 // ── Calibration window ──────────────────────────────────────────────────────
 
 const DATA_DIR = path.join(RESOURCES_DIR, "data");

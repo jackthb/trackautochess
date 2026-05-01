@@ -62,11 +62,31 @@ export function ConfirmationTab({
     if (!parseResult) setConfirming(false);
   }, [parseResult]);
 
+  const [fixtureSaved, setFixtureSaved] = useState<string | null>(null);
+
   const handleImportFile = useCallback((filePath: string) => {
     if (importing) return;
     onBeginImport();
     window.tracker.sendCommand({ cmd: "import_file", path: filePath });
   }, [importing, onBeginImport]);
+
+  const handleLoadTestFile = useCallback(async () => {
+    await window.screenshots.parseTestFile();
+  }, []);
+
+  const handleSaveFixture = useCallback(async () => {
+    if (!parseResult) return;
+    const screenshotPath = parseResult.screenshot_path || parseResult.screenshot_name || "unknown";
+    const stem = screenshotPath.replace(/\\/g, "/").split("/").pop()?.replace(/\.[^.]+$/, "") ?? "fixture";
+    const data = {
+      screenshot_path: screenshotPath,
+      screen_type: parseResult.screen_type,
+      rows: editedRows.map(({ is_duplicate: _dup, ...r }) => r),
+    };
+    const savedPath = await window.screenshots.saveFixture(stem, data);
+    setFixtureSaved(savedPath);
+    setTimeout(() => setFixtureSaved(null), 3000);
+  }, [parseResult, editedRows]);
 
   const runDebug = useCallback(async () => {
     const screenshotName = parseResult?.screenshot_name || processingScreenshot?.screenshot_name;
@@ -107,6 +127,13 @@ export function ConfirmationTab({
                   )}
                 </div>
               </div>
+            </div>
+          )}
+          {debugEnabled && (
+            <div style={{ padding: "8px 0" }}>
+              <button className="btn-confirm btn-confirm-primary" onClick={handleLoadTestFile}>
+                Load & Parse File
+              </button>
             </div>
           )}
           <ScreenshotHistory
@@ -261,6 +288,11 @@ export function ConfirmationTab({
         </div>
 
         <div className="confirm-actions">
+          {debugEnabled && (
+            <button className="btn-confirm btn-confirm-cancel" onClick={handleSaveFixture}>
+              {fixtureSaved ? "Saved!" : "Save Fixture"}
+            </button>
+          )}
           <button
             className="btn-confirm btn-confirm-cancel"
             onClick={handleCancel}
