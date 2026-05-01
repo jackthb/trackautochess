@@ -287,6 +287,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(403).json({ error: "Forbidden" });
   }
 
+  if (req.method !== "GET" && req.method !== "POST") {
+    res.setHeader("Allow", "GET, POST");
+    return res.status(405).json({ error: "Method not allowed" });
+  }
+
   const { steamId: rawSteamId, refresh } = req.query;
   if (!rawSteamId || typeof rawSteamId !== "string") {
     return res.status(400).json({ error: "Invalid steam ID" });
@@ -322,8 +327,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(400).json({ error: "Invalid steam ID" });
   }
 
-  // Check cache unless force refresh
-  if (supabase && refresh !== "1") {
+  const forceRefresh = refresh === "1" && req.method === "POST";
+
+  // Check cache unless a user-triggered POST force refresh is requested.
+  if (supabase && !forceRefresh) {
     const { data: cached } = await supabase
       .from("users")
       .select(USER_DRODO_SELECT)

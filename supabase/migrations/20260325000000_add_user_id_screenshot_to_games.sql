@@ -1,0 +1,2 @@
+ALTER TABLE games ADD COLUMN IF NOT EXISTS user_id bigint;
+ALTER TABLE games ADD COLUMN IF NOT EXISTS screenshot text;

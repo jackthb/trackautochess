@@ -7,8 +7,9 @@ import path from "node:path";
 import { mmrToRank } from "@dac/shared/game-utils";
 import {
   fetchSteamProfile,
+  parseSteamInput,
+  playerProfilePath,
   resolveSteamInput,
-  steamProfileUrl,
 } from "@/lib/steam";
 
 interface DrodoOgData {
@@ -40,7 +41,7 @@ interface CachedDrodoOgRow {
 
 const fontDir = path.join(process.cwd(), "public", "fonts");
 const fontData = Promise.all([
-  readFile(path.join(fontDir, "Cinzel-wght.ttf")),
+  readFile(path.join(fontDir, "Cinzel-Bold.woff")),
   readFile(path.join(fontDir, "JetBrainsMono-Regular.ttf")),
   readFile(path.join(fontDir, "JetBrainsMono-Bold.ttf")),
 ]);
@@ -57,6 +58,12 @@ const USER_DRODO_SELECT = [
 
 function fmt(value: number | null | undefined): string {
   return value == null ? "-" : value.toLocaleString("en-US");
+}
+
+function getSiteHost(): string {
+  return (process.env.NEXT_PUBLIC_SITE_URL || "https://trackautochess.com")
+    .replace(/^https?:\/\//, "")
+    .replace(/\/+$/, "");
 }
 
 async function imageToDataUrl(url: string | null | undefined): Promise<string | null> {
@@ -123,14 +130,20 @@ function Stat({
   );
 }
 
-function PreviousSeasons({ drodo }: { drodo: DrodoOgData | null }) {
-  const currentSeason = drodo?.season;
-  const seasons = (drodo?.seasons ?? [])
-    .filter((season) => season.season !== currentSeason && season.mmr != null)
-    .slice(-3)
-    .reverse();
+type OgSeason = NonNullable<DrodoOgData["seasons"]>[number];
 
-  if (seasons.length === 0) return null;
+function PreviousSeasons({
+  currentSeason,
+  seasons,
+}: {
+  currentSeason: string | null | undefined;
+  seasons: OgSeason[];
+}) {
+  const previous = seasons
+    .filter((season) => season.season !== currentSeason && season.mmr != null)
+    .slice(0, 3);
+
+  if (previous.length === 0) return null;
 
   return (
     <div style={{ display: "flex", flexDirection: "column", marginTop: 32 }}>
@@ -147,7 +160,7 @@ function PreviousSeasons({ drodo }: { drodo: DrodoOgData | null }) {
         PREVIOUS SEASONS
       </div>
       <div style={{ display: "flex", gap: 12, marginTop: 12 }}>
-        {seasons.map((season) => (
+        {previous.map((season) => (
           <div
             key={season.season}
             style={{
@@ -209,6 +222,7 @@ async function ogHandler(req: NextApiRequest, res: NextApiResponse) {
   if (!rawSteamId) {
     return res.status(400).send("Missing player");
   }
+  const parsedRawSteamId = parseSteamInput(rawSteamId);
 
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseKey =
@@ -229,7 +243,11 @@ async function ogHandler(req: NextApiRequest, res: NextApiResponse) {
   }
 
   const [steamProfile, drodoResult, seasonsResult, fonts] = await Promise.all([
-    fetchSteamProfile(steamId, supabase, { persist: false }),
+    fetchSteamProfile(steamId, supabase, {
+      persist: true,
+      requireAvatar: true,
+      requireCustomUrl: parsedRawSteamId?.kind === "id",
+    }),
     supabase
       ? supabase
           .from("users")
@@ -248,6 +266,9 @@ async function ogHandler(req: NextApiRequest, res: NextApiResponse) {
   ]);
 
   const cachedDrodo = drodoResult.data as CachedDrodoOgRow | null;
+  const seasons = ((seasonsResult.data as DrodoOgData["seasons"]) ?? []).filter(
+    (season): season is OgSeason => Boolean(season)
+  );
   const drodo: DrodoOgData | null =
     cachedDrodo && !cachedDrodo.drodo_profile_missing
       ? {
@@ -258,21 +279,27 @@ async function ogHandler(req: NextApiRequest, res: NextApiResponse) {
           season_games: cachedDrodo.drodo_season_games,
           candy: cachedDrodo.drodo_candy,
           chicken_count: cachedDrodo.drodo_chicken_count,
-          seasons: (seasonsResult.data as DrodoOgData["seasons"]) ?? [],
+          seasons,
         }
       : null;
   const displayName = steamProfile.name || steamId;
   const avatarDataUrl = await imageToDataUrl(steamProfile.avatarUrl);
-  const profileUrl = steamProfileUrl(steamId, steamProfile.customUrl).replace(
-    /^https?:\/\//,
-    ""
+  const siteHost = getSiteHost();
+  const profileUrl = `${siteHost}${playerProfilePath(
+    steamId,
+    steamProfile.customUrl
+  )}`;
+  const latestRecordedSeason = seasons.find(
+    (season) =>
+      season.mmr != null || season.max_mmr != null || season.games_played != null
   );
-  const rank = mmrToRank(drodo?.mmr) || "Unranked";
-  const season = drodo?.season?.toUpperCase() || "CURRENT";
-  const lastSeason = (drodo?.seasons ?? []).find((s) => s.season !== drodo?.season);
-  const lastSeasonDisplay = lastSeason
-    ? `${lastSeason.season.toUpperCase()} ${mmrToRank(lastSeason.mmr) || "Unranked"}`
-    : "-";
+  const hasCurrentStats = drodo?.mmr != null;
+  const primaryMmr = hasCurrentStats ? drodo?.mmr : latestRecordedSeason?.mmr;
+  const rank = primaryMmr != null ? mmrToRank(primaryMmr) || "Unranked" : "No Data";
+  const season = hasCurrentStats
+    ? drodo?.season?.toUpperCase() || "CURRENT"
+    : latestRecordedSeason?.season.toUpperCase() || "CURRENT";
+  const rankLabel = hasCurrentStats ? `${season} RANK` : "LATEST RECORDED SEASON";
 
   const image = new ImageResponse(
     (
@@ -331,16 +358,16 @@ async function ogHandler(req: NextApiRequest, res: NextApiResponse) {
             }}
           >
             <div
-          style={{
-            display: "flex",
-            color: "#c94f3d",
-                fontFamily: "Cinzel",
+              style={{
+                display: "flex",
+                color: "#c94f3d",
+                fontFamily: "JetBrains Mono",
                 fontSize: 18,
                 fontWeight: 700,
-                letterSpacing: 5,
+                letterSpacing: 1.2,
               }}
             >
-              Track Auto Chess
+              trackautochess.com
             </div>
             <div
               style={{
@@ -381,9 +408,9 @@ async function ogHandler(req: NextApiRequest, res: NextApiResponse) {
                   fontSize: 18,
                   fontWeight: 700,
                   letterSpacing: 2,
-                }}
-              >
-                {season} RANK
+              }}
+            >
+              {rankLabel}
               </div>
               <div
                 style={{
@@ -393,30 +420,43 @@ async function ogHandler(req: NextApiRequest, res: NextApiResponse) {
                   fontWeight: 700,
                   lineHeight: 1,
                   marginTop: 10,
-                }}
-              >
-                {rank}
-              </div>
-              <div
-                style={{
-                  display: "flex",
-                  color: "#c9a84c",
-                  fontFamily: "JetBrains Mono",
-                  fontSize: 44,
-                  fontWeight: 700,
-                  marginTop: 8,
-                }}
-              >
-                {fmt(drodo?.mmr)} MMR
-              </div>
+              }}
+            >
+              {rank}
+            </div>
+              {primaryMmr != null && (
+                <div
+                  style={{
+                    display: "flex",
+                    color: "#c9a84c",
+                    fontFamily: "JetBrains Mono",
+                    fontSize: 44,
+                    fontWeight: 700,
+                    marginTop: 8,
+                  }}
+                >
+                  {fmt(primaryMmr)} MMR
+                </div>
+              )}
             </div>
 
-            <div style={{ display: "flex", gap: 18, marginTop: 40 }}>
-              <Stat label="PEAK MMR" value={fmt(drodo?.max_mmr)} />
-              <Stat label="GAMES" value={fmt(drodo?.season_games)} />
-              <Stat label="LAST SEASON" value={lastSeasonDisplay} />
-              <Stat label="WINS" value={fmt(drodo?.chicken_count)} />
-            </div>
+            {hasCurrentStats ? (
+              <div style={{ display: "flex", gap: 18, marginTop: 40 }}>
+                <Stat label="PEAK MMR" value={fmt(drodo?.max_mmr)} />
+                <Stat label="GAMES" value={fmt(drodo?.season_games)} />
+                <Stat label="WINS" value={fmt(drodo?.chicken_count)} />
+                <Stat label="CANDY" value={fmt(drodo?.candy)} />
+              </div>
+            ) : latestRecordedSeason ? (
+              <div style={{ display: "flex", gap: 18, marginTop: 40 }}>
+                <Stat
+                  label="SEASON"
+                  value={latestRecordedSeason.season.toUpperCase()}
+                />
+                <Stat label="PEAK MMR" value={fmt(latestRecordedSeason.max_mmr)} />
+                <Stat label="GAMES" value={fmt(latestRecordedSeason.games_played)} />
+              </div>
+            ) : null}
           </div>
 
           <div
@@ -470,7 +510,9 @@ async function ogHandler(req: NextApiRequest, res: NextApiResponse) {
               )}
             </div>
 
-            <PreviousSeasons drodo={drodo} />
+            {hasCurrentStats && (
+              <PreviousSeasons currentSeason={drodo?.season} seasons={seasons} />
+            )}
 
           </div>
         </div>
@@ -483,7 +525,7 @@ async function ogHandler(req: NextApiRequest, res: NextApiResponse) {
         {
           name: "Cinzel",
           data: fonts[0],
-          weight: 400,
+          weight: 700,
           style: "normal",
         },
         {

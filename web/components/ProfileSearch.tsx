@@ -1,24 +1,23 @@
 import { useRouter } from "next/router";
 import { useEffect, useRef, useState } from "react";
 import { parseSteamInput, playerProfilePath } from "../lib/steam";
-
-interface SearchResult {
-  steam_id: string;
-  name: string | null;
-  custom_url: string | null;
-  has_autochess_profile?: boolean;
-  has_games?: boolean;
-}
+import {
+  mergeSearchResults,
+  sortSearchResults,
+  type SearchResult,
+} from "@/lib/playerSearch";
 
 interface ProfileSearchProps {
   autoFocus?: boolean;
   className?: string;
+  initialResults?: SearchResult[];
   placeholder?: string;
 }
 
 export function ProfileSearch({
   autoFocus = false,
   className = "",
+  initialResults = [],
   placeholder = "Steam vanity URL, profile URL, or Steam ID",
 }: ProfileSearchProps) {
   const router = useRouter();
@@ -27,14 +26,22 @@ export function ProfileSearch({
   const [lookupLoading, setLookupLoading] = useState(false);
   const [showLookupBar, setShowLookupBar] = useState(false);
   const [lookupError, setLookupError] = useState<string | null>(null);
-  const [results, setResults] = useState<SearchResult[]>([]);
+  const [defaultResults, setDefaultResults] =
+    useState<SearchResult[]>(initialResults);
+  const [results, setResults] = useState<SearchResult[]>(initialResults);
   const [searchedValue, setSearchedValue] = useState("");
-  const [dropdownOpen, setDropdownOpen] = useState(false);
-  const [highlightedIndex, setHighlightedIndex] = useState(-1);
+  const [dropdownOpen, setDropdownOpen] = useState(
+    autoFocus && initialResults.length > 0
+  );
+  const [highlightedIndex, setHighlightedIndex] = useState(
+    initialResults.length > 0 ? 0 : -1
+  );
   const searchReqRef = useRef(0);
+  const defaultReqRef = useRef(0);
   const lookupReqRef = useRef(0);
   const lookupBarTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const clearLookupBarTimer = () => {
     if (lookupBarTimerRef.current) {
@@ -43,13 +50,52 @@ export function ProfileSearch({
     }
   };
 
+  const isInputFocused = () => document.activeElement === inputRef.current;
+
+  const localMatches = (value: string): SearchResult[] => {
+    const lower = value.toLowerCase();
+    if (!lower) return defaultResults;
+    return sortSearchResults(
+      defaultResults.filter((row) => {
+        return (
+          row.steam_id.includes(lower) ||
+          row.name?.toLowerCase().includes(lower) ||
+          row.custom_url?.toLowerCase().includes(lower)
+        );
+      }),
+      value
+    );
+  };
+
+  useEffect(() => {
+    if (defaultResults.length > 0) return;
+
+    const reqId = ++defaultReqRef.current;
+    fetch("/api/players/search")
+      .then(async (resp) => (resp.ok ? resp.json() : []))
+      .then((data) => {
+        if (reqId !== defaultReqRef.current) return;
+        const rows = Array.isArray(data) ? (data as SearchResult[]) : [];
+        setDefaultResults(rows);
+        if (!searchValue.trim()) {
+          setResults(rows);
+          setHighlightedIndex(rows.length > 0 ? 0 : -1);
+          if ((autoFocus || isInputFocused()) && rows.length > 0) {
+            setDropdownOpen(true);
+          }
+        }
+      })
+      .catch(() => {});
+  }, [autoFocus, defaultResults.length, searchValue]);
+
   useEffect(() => {
     const val = searchValue.trim();
     if (!val) {
-      setResults([]);
+      searchReqRef.current += 1;
+      setResults(defaultResults);
       setSearchedValue("");
-      setDropdownOpen(false);
-      setHighlightedIndex(-1);
+      setDropdownOpen((autoFocus || isInputFocused()) && defaultResults.length > 0);
+      setHighlightedIndex(defaultResults.length > 0 ? 0 : -1);
       setSearching(false);
       return;
     }
@@ -63,6 +109,12 @@ export function ProfileSearch({
       setSearching(false);
       return;
     }
+
+    const localRows = localMatches(safe);
+    setResults(localRows);
+    setSearchedValue(val);
+    setDropdownOpen(true);
+    setHighlightedIndex(localRows.length > 0 ? 0 : -1);
 
     const reqId = ++searchReqRef.current;
     setSearching(true);
@@ -80,30 +132,19 @@ export function ProfileSearch({
 
       if (reqId !== searchReqRef.current) return;
 
-      const lower = val.toLowerCase();
-      const resultRank = (row: SearchResult) => {
-        if (row.has_autochess_profile) return 0;
-        if (row.has_games) return 1;
-        return 2;
-      };
-      const exactRank = (row: SearchResult) => {
-        if (row.custom_url?.toLowerCase() === lower) return 0;
-        if (row.name?.toLowerCase() === lower) return 1;
-        return 2;
-      };
-      rows.sort((a, b) => {
-        return resultRank(a) - resultRank(b) || exactRank(a) - exactRank(b);
-      });
-
-      setResults(rows);
+      const mergedRows = sortSearchResults(
+        mergeSearchResults([...rows, ...localRows]),
+        val
+      );
+      setResults(mergedRows);
       setSearchedValue(val);
       setDropdownOpen(true);
-      setHighlightedIndex(rows.length > 0 ? 0 : -1);
+      setHighlightedIndex(mergedRows.length > 0 ? 0 : -1);
       setSearching(false);
-    }, 200);
+    }, 80);
 
     return () => clearTimeout(timeout);
-  }, [searchValue]);
+  }, [autoFocus, defaultResults, searchValue]);
 
   useEffect(() => {
     const handler = (e: MouseEvent) => {
@@ -341,6 +382,14 @@ export function ProfileSearch({
         .search-steam {
           justify-content: space-between;
         }
+        .search-signin {
+          justify-content: space-between;
+          color: var(--accent-dim);
+          text-decoration: none;
+        }
+        .search-signin:hover {
+          color: var(--accent);
+        }
         .result-meta {
           font-size: 11px;
           color: var(--text-muted);
@@ -366,6 +415,7 @@ export function ProfileSearch({
       <div className={`profile-search ${className}`} ref={containerRef}>
         <form className="search-form" onSubmit={handleSearch}>
           <input
+            ref={inputRef}
             className={`search-input${lookupLoading ? " loading" : ""}${
               lookupError ? " error" : ""
             }`}
@@ -378,7 +428,13 @@ export function ProfileSearch({
             }}
             onKeyDown={handleKeyDown}
             onFocus={() => {
-              if (results.length > 0) setDropdownOpen(true);
+              if (!searchValue.trim() && defaultResults.length > 0) {
+                setResults(defaultResults);
+                setHighlightedIndex(0);
+                setDropdownOpen(true);
+              } else if (results.length > 0) {
+                setDropdownOpen(true);
+              }
               if (lookupError) setLookupError(null);
             }}
             autoComplete="off"
@@ -396,6 +452,7 @@ export function ProfileSearch({
         {dropdownOpen && (
           <div className="search-dropdown">
             {results.length === 0 &&
+            searchValue.trim() &&
             !searching &&
             searchedValue === searchValue.trim() ? (
               <div className="search-empty">
@@ -429,6 +486,15 @@ export function ProfileSearch({
               <div className="search-divider">Not the right player?</div>
             )}
             {showSteamAction && (
+              <a
+                href="/api/auth/steam"
+                className="search-result search-signin"
+              >
+                <span>Sign in via Steam</span>
+                <span className="result-meta">see your stats</span>
+              </a>
+            )}
+            {showSteamAction && (
               <div
                 className={
                   "search-result search-steam" +
@@ -440,7 +506,7 @@ export function ProfileSearch({
                   void resolveSteamAndNavigate(searchValue.trim());
                 }}
               >
-                <span>Search Steam?</span>
+                <span>Search with Steam</span>
                 <span className="result-meta">{searchValue.trim()}</span>
               </div>
             )}

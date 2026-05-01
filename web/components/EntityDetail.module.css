@@ -48,6 +48,7 @@
 }
 .titleItem { color: var(--text-primary); }
 .titleRelic { color: var(--gold); }
+.titleSynergy { color: #8bbf9f; }
 
 .tier {
   display: inline-flex;

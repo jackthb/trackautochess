@@ -1,8 +1,18 @@
+import { createClient } from "@supabase/supabase-js";
+import type { GetServerSideProps } from "next";
 import { ProfileSearch } from "@/components/ProfileSearch";
+import {
+  getDefaultPlayerSearchResults,
+  type SearchResult,
+} from "@/lib/playerSearch";
 import { SeoHead } from "@/lib/seo";
 import { absoluteUrl, SITE_DESCRIPTION, SITE_NAME, SITE_TITLE } from "@/lib/site";
 
-export default function Home() {
+interface HomeProps {
+  initialSearchResults: SearchResult[];
+}
+
+export default function Home({ initialSearchResults }: HomeProps) {
   const title = SITE_TITLE;
   const description =
     "Look up Dota Auto Chess player MMR, season history, and tracked match stats by Steam vanity URL or Steam ID.";
@@ -265,7 +275,10 @@ export default function Home() {
             </p>
 
             <div className="search-wrap">
-              <ProfileSearch autoFocus />
+              <ProfileSearch
+                autoFocus
+                initialResults={initialSearchResults}
+              />
             </div>
 
             <div className="preview" aria-hidden="true">
@@ -288,3 +301,25 @@ export default function Home() {
     </>
   );
 }
+
+export const getServerSideProps: GetServerSideProps<HomeProps> = async () => {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key =
+    process.env.SUPABASE_SERVICE_ROLE_KEY ||
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+  if (!url || !key) {
+    return { props: { initialSearchResults: [] } };
+  }
+
+  const supabase = createClient(url, key, {
+    auth: { autoRefreshToken: false, persistSession: false },
+  });
+
+  try {
+    const initialSearchResults = await getDefaultPlayerSearchResults(supabase);
+    return { props: { initialSearchResults } };
+  } catch {
+    return { props: { initialSearchResults: [] } };
+  }
+};

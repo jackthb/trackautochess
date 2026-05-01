@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { BotIdClient } from "botid/client";
+import { Footer } from "@/components/Footer";
 import { NavBar } from "@/components/NavBar";
 import { createSupabaseClient } from "@/lib/supabase";
 import type { SupabaseClient } from "@supabase/supabase-js";
@@ -25,6 +26,7 @@ export default function App({ Component, pageProps }: AppProps) {
       />
       <NavBar supabase={supabase} />
       <Component {...pageProps} supabase={supabase} />
+      <Footer />
       <Analytics />
       <SpeedInsights />
     </>

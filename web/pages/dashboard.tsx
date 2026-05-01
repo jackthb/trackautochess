@@ -1,86 +1,37 @@
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import type { SupabaseClient, User } from "@supabase/supabase-js";
-import unitsData from "@data/units.json";
-import unitsFullData from "@data/units_full.json";
-import { parseWL } from "@dac/shared/game-utils";
-import { buildStatItems } from "@dac/shared/buildStatItems";
-import { GameRow } from "../components/GameRow";
-import type { Game, UnitFullInfo, SynergyInfo, RelicInfo } from "@dac/shared/types";
-import synergiesData from "@data/synergies.json";
-import relicsData from "@data/relics.json";
 import { SeoHead } from "@/lib/seo";
 import { SITE_TITLE } from "@/lib/site";
 import { playerProfilePath } from "@/lib/steam";
-import { Button } from "@dac/shared/Button";
-import { StatsGrid } from "@dac/shared/StatsGrid";
-import { SeasonHistoryGrid, type SeasonSnapshot } from "@dac/shared/SeasonHistoryGrid";
-
-interface DrodoProfile {
-  mmr: number | null;
-  max_mmr: number | null;
-  mmr_level: number | null;
-  season: string | null;
-  season_games: number | null;
-  chicken_count: number | null;
-  candy?: number | null;
-  fetched_at: string | null;
-  seasons?: SeasonSnapshot[];
-}
 
 interface DashboardProps {
   supabase: SupabaseClient | null;
 }
 
-// Build cost lookup from units.json; include aliases so games saved under
-// older name spellings (e.g. "Bloodseeker", "IO") still resolve.
-const UNIT_COSTS: Record<string, number> = {};
-for (const [name, info] of Object.entries(unitsData.units)) {
-  UNIT_COSTS[name] = (info as { cost: number }).cost;
-}
-for (const [alias, canonical] of Object.entries(
-  (unitsData as { aliases?: Record<string, string> }).aliases ?? {}
-)) {
-  if (UNIT_COSTS[canonical] !== undefined) {
-    UNIT_COSTS[alias] = UNIT_COSTS[canonical];
-  }
-}
-
-// Build tooltip data lookups
-const UNITS_FULL = unitsFullData as Record<string, UnitFullInfo>;
-const SYNERGIES_DATA = synergiesData as Record<string, SynergyInfo>;
-const RELICS_DATA = (relicsData as any).relics as Record<string, RelicInfo>;
-
-// Build suggestion lists from data files
-const ALL_UNIT_NAMES = Object.keys(unitsData.units).sort();
-const ALL_SYNERGY_NAMES = Object.values(synergiesData)
-  .map((s: any) => s.name)
-  .filter(Boolean)
-  .sort();
-const ALL_RELIC_NAMES = Object.values((relicsData as any).relics)
-  .map((r: any) => r.name)
-  .filter(Boolean)
-  .sort();
-
 export default function Dashboard({ supabase }: DashboardProps) {
   const router = useRouter();
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
-  const [games, setGames] = useState<Game[]>([]);
-  const [gamesLoading, setGamesLoading] = useState(false);
-  const [drodo, setDrodo] = useState<DrodoProfile | null>(null);
-  const [drodoLoading, setDrodoLoading] = useState(false);
 
   useEffect(() => {
     if (!supabase) return;
     supabase.auth.getUser().then(({ data: { user } }) => {
       setUser(user);
       setLoading(false);
-      if (!user) router.replace("/");
+      if (!user) {
+        router.replace("/");
+      } else {
+        const steamId = user.user_metadata?.steam_id;
+        const customUrl = user.user_metadata?.custom_url;
+        if (steamId) {
+          router.replace(playerProfilePath(steamId, customUrl));
+        } else {
+          router.replace("/");
+        }
+      }
     });
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       const u = session?.user ?? null;
       setUser(u);
       if (!u) router.replace("/");
@@ -88,224 +39,22 @@ export default function Dashboard({ supabase }: DashboardProps) {
     return () => subscription.unsubscribe();
   }, [supabase, router]);
 
-  const fetchCachedDrodo = async (steamId: string) => {
-    if (!supabase) return;
-    setDrodoLoading(true);
-    try {
-      const [profileResult, seasonsResult] = await Promise.all([
-        supabase
-          .from("users")
-          .select(
-            "drodo_mmr, drodo_max_mmr, drodo_mmr_level, drodo_season, drodo_season_games, drodo_candy, drodo_chicken_count, drodo_last_fetched_at, drodo_profile_missing"
-          )
-          .eq("steam_id", steamId)
-          .maybeSingle(),
-        supabase
-          .from("player_seasons")
-          .select("season, mmr, max_mmr, games_played")
-          .eq("steam_id", steamId)
-          .order("season", { ascending: true }),
-      ]);
-      const row = profileResult.data;
-      if (!row || row.drodo_profile_missing || !row.drodo_last_fetched_at) {
-        setDrodo(null);
-        return;
-      }
-      setDrodo({
-        mmr: row.drodo_mmr,
-        max_mmr: row.drodo_max_mmr,
-        mmr_level: row.drodo_mmr_level,
-        season: row.drodo_season,
-        season_games: row.drodo_season_games,
-        candy: row.drodo_candy,
-        chicken_count: row.drodo_chicken_count,
-        fetched_at: row.drodo_last_fetched_at,
-        seasons: (seasonsResult.data as SeasonSnapshot[]) ?? [],
-      });
-    } finally {
-      setDrodoLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    if (!supabase || !user) return;
-    const steamId = user.user_metadata?.steam_id;
-    if (!steamId) return;
-
-    const cacheKey = `dac_games_${steamId}`;
-
-    // Load cached games immediately
-    try {
-      const cached = localStorage.getItem(cacheKey);
-      if (cached) {
-        const { games: cachedGames } = JSON.parse(cached);
-        if (cachedGames?.length) setGames(cachedGames);
-      }
-    } catch {}
-
-    // Check if data changed: count + latest created_at
-    setGamesLoading(true);
-    supabase
-      .from("games")
-      .select("id, played_at")
-      .eq("user_id", steamId)
-      .order("played_at", { ascending: false })
-      .limit(1)
-      .then(async ({ data: latest }) => {
-        const cachedRaw = localStorage.getItem(cacheKey);
-        if (cachedRaw) {
-          try {
-            const { count, newest } = JSON.parse(cachedRaw);
-            const serverNewest = latest?.[0]?.played_at ?? null;
-            const { count: serverCount } = await supabase
-              .from("games")
-              .select("*", { count: "exact", head: true })
-              .eq("user_id", steamId);
-            if (count === serverCount && newest === serverNewest) {
-              setGamesLoading(false);
-              return;
-            }
-          } catch {}
-        }
-
-        // Cache miss or stale — full fetch
-        const { data } = await supabase
-          .from("games")
-          .select("*, user_id::text")
-          .eq("user_id", steamId)
-          .order("played_at", { ascending: false });
-
-        const freshGames = (data as Game[]) || [];
-        setGames(freshGames);
-        setGamesLoading(false);
-
-        try {
-          localStorage.setItem(
-            cacheKey,
-            JSON.stringify({
-              games: freshGames,
-              count: freshGames.length,
-              newest: freshGames[0]?.played_at ?? null,
-            })
-          );
-        } catch {}
-      });
-
-    void fetchCachedDrodo(steamId);
-  }, [supabase, user]);
-
-  const handleUpdate = async (
-    gameId: number,
-    fields: Partial<Game>
-  ): Promise<boolean> => {
-    if (!supabase) return false;
-    const { error } = await supabase
-      .from("games")
-      .update(fields)
-      .eq("id", gameId);
-    if (error) {
-      console.error("Update failed:", error);
-      return false;
-    }
-    // Update local state
-    setGames((prev) =>
-      prev.map((g) => (g.id === gameId ? { ...g, ...fields } : g))
-    );
-    // Invalidate cache
-    const steamId = user?.user_metadata?.steam_id;
-    if (steamId) {
-      try { localStorage.removeItem(`dac_games_${steamId}`); } catch {}
-    }
-    return true;
-  };
-
-  const handleDelete = async (gameId: number): Promise<boolean> => {
-    if (!supabase) return false;
-    const { error } = await supabase
-      .from("games")
-      .delete()
-      .eq("id", gameId);
-    if (error) {
-      console.error("Delete failed:", error);
-      return false;
-    }
-    setGames((prev) => prev.filter((g) => g.id !== gameId));
-    const steamId = user?.user_metadata?.steam_id;
-    if (steamId) {
-      try { localStorage.removeItem(`dac_games_${steamId}`); } catch {}
-    }
-    return true;
-  };
-
-
-  const isReady = supabase !== null;
-
-  const { tracked: trackedItems, drodo: drodoItems } = useMemo(
-    () => buildStatItems(games, drodo),
-    [games, drodo]
-  );
+  void user;
 
   return (
     <>
       <SeoHead
         title={`Dashboard | ${SITE_TITLE}`}
-        description="Signed-in Track Auto Chess dashboard."
+        description="Track Auto Chess dashboard."
         path="/dashboard"
         noindex
       />
-
       <style jsx>{`
-        .page {
-          position: relative;
-          z-index: 1;
-          min-height: calc(100vh - var(--nav-height));
-        }
-        .dashboard {
-          max-width: 1200px;
-          margin: 0 auto;
-          padding: 32px 32px 72px;
-        }
-        .refresh-row {
-          display: flex;
-          align-items: center;
-          gap: 16px;
-          margin-bottom: 24px;
-        }
-        .refresh-time { font-size: 13px; color: var(--text-muted); }
-        .table-wrap {
-          border: 1px solid var(--border);
-          overflow: hidden;
-        }
-        .table-header {
-          display: grid;
-          grid-template-columns: 72px 1fr 120px 80px 60px 120px 100px;
-          padding: 0 20px;
-          background: var(--bg-surface);
-          border-bottom: 1px solid var(--border);
-        }
-        .th {
-          font-size: 13px;
-          letter-spacing: 1.5px;
-          text-transform: uppercase;
-          color: var(--text-muted);
-          padding: 14px 6px;
-        }
-        .game-entry {
-          border-bottom: 1px solid var(--border-subtle);
-        }
-        .game-entry:last-child { border-bottom: none; }
-        .empty-state {
-          text-align: center;
-          padding: 80px 32px;
-          color: var(--text-muted);
-          font-size: 16px;
-          background: var(--bg-surface);
-        }
         .loading {
           display: flex;
           align-items: center;
           justify-content: center;
-          min-height: 200px;
+          min-height: calc(100vh - var(--nav-height));
           color: var(--text-muted);
           font-size: 15px;
           letter-spacing: 1px;
@@ -321,97 +70,8 @@ export default function Dashboard({ supabase }: DashboardProps) {
           animation: spin 0.8s linear infinite;
         }
         @keyframes spin { to { transform: rotate(360deg); } }
-        @keyframes fadeUp {
-          from { opacity: 0; transform: translateY(12px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-        .fade-up { animation: fadeUp 0.4s ease-out both; }
-        .delay-1 { animation-delay: 0.1s; }
       `}</style>
-
-      <div className="page">
-        {!isReady || loading ? (
-          <div className="loading">Loading</div>
-        ) : !user ? (
-          <div className="loading">Redirecting...</div>
-        ) : (
-          <div className="dashboard">
-            {gamesLoading ? (
-              <div className="loading">Fetching matches</div>
-            ) : games.length === 0 ? (
-              <div className="table-wrap fade-up">
-                <div className="empty-state">
-                  No matches recorded yet. Use the tracker to import games.
-                </div>
-              </div>
-            ) : (
-              <>
-                {trackedItems.length > 0 && (
-                  <div className="fade-up">
-                    <div className="section-title">Tracked</div>
-                    <StatsGrid items={trackedItems} />
-                  </div>
-                )}
-                {drodoItems.length > 0 && (
-                  <div className="fade-up">
-                    <div className="section-title">Auto Chess</div>
-                    <StatsGrid items={drodoItems} />
-                  </div>
-                )}
-
-                {drodo?.seasons && <div className="fade-up delay-1"><SeasonHistoryGrid seasons={drodo.seasons} /></div>}
-
-                <div className="refresh-row fade-up">
-                  <Button
-                    disabled={drodoLoading}
-                    onClick={() => {
-                      const steamId = user?.user_metadata?.steam_id;
-                      const customUrl = user?.user_metadata?.custom_url;
-                      if (steamId) {
-                        router.push(`${playerProfilePath(steamId, customUrl)}?refresh=1`);
-                      }
-                    }}
-                  >
-                    {drodoLoading ? "Loading..." : "Refresh stats"}
-                  </Button>
-                  {drodo?.fetched_at && (
-                    <span className="refresh-time">
-                      Updated {new Date(drodo.fetched_at).toLocaleString()}
-                    </span>
-                  )}
-                </div>
-
-                <div className="table-wrap fade-up delay-1">
-                  <div className="table-header">
-                    <div className="th">#</div>
-                    <div className="th">Lineup</div>
-                    <div className="th">Rank</div>
-                    <div className="th">W – L</div>
-                    <div className="th">Lv</div>
-                    <div className="th">Relic</div>
-                    <div className="th">Date</div>
-                  </div>
-                  {games.map((g) => (
-                    <GameRow
-                      key={g.id}
-                      game={g}
-                      unitCosts={UNIT_COSTS}
-                      unitsFull={UNITS_FULL}
-                      synergiesData={SYNERGIES_DATA}
-                      relicsData={RELICS_DATA}
-                      allUnitNames={ALL_UNIT_NAMES}
-                      allSynergyNames={ALL_SYNERGY_NAMES}
-                      allRelicNames={ALL_RELIC_NAMES}
-                      onUpdate={handleUpdate}
-                      onDelete={handleDelete}
-                    />
-                  ))}
-                </div>
-              </>
-            )}
-          </div>
-        )}
-      </div>
+      <div className="loading">{loading ? "Loading" : "Redirecting"}</div>
     </>
   );
 }

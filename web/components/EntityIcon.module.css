@@ -1,6 +1,8 @@
 .icon {
   display: block;
   flex-shrink: 0;
+  width: auto;
+  height: auto;
   background: var(--bg-deep);
   border: 1px solid var(--entity-icon-border, var(--border));
   border-radius: var(--r-4);
@@ -8,15 +10,17 @@
   transition: border-color var(--t-base) var(--t-easing);
 }
 
-/* Landscape 11:8 ratio matches the 88x64 / 132x96 game icons.
-   Fixed width + height reserves layout space before the image
-   loads (no CLS on refresh). */
+.borderless {
+  border: none;
+  background: transparent;
+}
+
 .sm {
-  width: 88px;
-  height: 64px;
+  max-width: 88px;
+  max-height: 88px;
 }
 
 .lg {
-  width: 132px;
-  height: 96px;
+  max-width: 132px;
+  max-height: 132px;
 }

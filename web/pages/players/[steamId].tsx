@@ -1,5 +1,4 @@
 import Head from "next/head";
-import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/router";
 import type { SupabaseClient } from "@supabase/supabase-js";
@@ -7,11 +6,7 @@ import { createClient } from "@supabase/supabase-js";
 import type { GetServerSideProps } from "next";
 import { absoluteUrl, getRequestSiteUrl, SITE_TITLE } from "@/lib/site";
 import unitsData from "@data/units.json";
-import unitsFullData from "@data/units_full.json";
-import synergiesData from "@data/synergies.json";
-import relicsData from "@data/relics.json";
-import { GameRowDisplay } from "@dac/shared/GameRowDisplay";
-import type { PlayerGame, UnitFullInfo, SynergyInfo, RelicInfo } from "@dac/shared/types";
+import type { PlayerGame } from "@dac/shared/types";
 import { mmrToRank } from "@dac/shared/game-utils";
 import { buildStatItems } from "@dac/shared/buildStatItems";
 import { Button } from "@dac/shared/Button";
@@ -36,9 +31,6 @@ for (const [alias, canonical] of Object.entries(
     UNIT_COSTS[alias] = UNIT_COSTS[canonical];
   }
 }
-const UNITS_FULL = unitsFullData as Record<string, UnitFullInfo>;
-const SYNERGIES_DATA = synergiesData as Record<string, SynergyInfo>;
-const RELICS_DATA = (relicsData as any).relics as Record<string, RelicInfo>;
 const USER_DRODO_SELECT = [
   "drodo_mmr",
   "drodo_max_mmr",
@@ -108,6 +100,8 @@ export default function PlayerPage({
   const [drodoLastFetchedAt, setDrodoLastFetchedAt] = useState(
     initialDrodoLastFetchedAt
   );
+  const [refreshing, setRefreshing] = useState(false);
+  const [avatarFailed, setAvatarFailed] = useState(false);
   const displayName = steamProfile.name || steamProfile.customUrl || steamId;
   const profileUrl = steamProfileUrl(steamId, steamProfile.customUrl);
   const title = `${displayName} | ${SITE_TITLE}`;
@@ -115,22 +109,16 @@ export default function PlayerPage({
     ? `${displayName} is ${mmrToRank(drodo.mmr)} at ${drodo.mmr.toLocaleString("en-US")} MMR.`
     : `Dota Auto Chess profile for ${displayName}.`;
 
-  const { tracked: trackedItems, drodo: drodoItems } = useMemo(
+  const { drodo: drodoItems } = useMemo(
     () => buildStatItems(games, drodo),
     [games, drodo]
   );
 
   // TODO: ingest total matches / avg rank / wins / preferred lineup / max damage from history pages for server-side season snapshots.
   useEffect(() => {
-    if (!supabase || forceRefresh) return;
-    supabase.auth.getUser().then(({ data: { user } }) => {
-      if (!user) return;
-      const ownSteamId = user.user_metadata?.steam_id;
-      if (ownSteamId && ownSteamId === steamId) {
-        router.replace("/dashboard");
-      }
-    });
-  }, [supabase, forceRefresh, steamId, router]);
+    setAvatarFailed(false);
+  }, [steamProfile.avatarUrl]);
+
 
   useEffect(() => {
     const fetchedTime = drodoLastFetchedAt
@@ -142,8 +130,7 @@ export default function PlayerPage({
     if (!forceRefresh && hasFreshCache) return;
 
     let cancelled = false;
-    const refresh = forceRefresh ? "?refresh=1" : "";
-    fetch(`/api/drodo/${encodeURIComponent(steamId)}${refresh}`)
+    fetch(`/api/drodo/${encodeURIComponent(steamId)}`)
       .then(async (resp) => {
         const data = await resp.json().catch(() => null);
         if (resp.ok) return data;
@@ -178,6 +165,44 @@ export default function PlayerPage({
       cancelled = true;
     };
   }, [drodoLastFetchedAt, forceRefresh, steamId]);
+
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    try {
+      const resp = await fetch(
+        `/api/drodo/${encodeURIComponent(steamId)}?refresh=1`,
+        { method: "POST" }
+      );
+      const data = await resp.json().catch(() => null);
+      if (!resp.ok) {
+        if (resp.status === 404) {
+          setDrodoProfileMissing(true);
+          setDrodo(null);
+          if (typeof data?.fetched_at === "string") {
+            setDrodoLastFetchedAt(data.fetched_at);
+          }
+        }
+        return;
+      }
+
+      setDrodoProfileMissing(false);
+      setDrodo({
+        mmr: data.mmr ?? null,
+        max_mmr: data.max_mmr ?? null,
+        mmr_level: data.mmr_level ?? null,
+        season: data.season ?? null,
+        season_games: data.season_games ?? null,
+        candy: data.candy ?? null,
+        chicken_count: data.chicken_count ?? null,
+      });
+      if (typeof data.fetched_at === "string") {
+        setDrodoLastFetchedAt(data.fetched_at);
+      }
+      if (Array.isArray(data.seasons)) setSeasons(data.seasons);
+    } finally {
+      setRefreshing(false);
+    }
+  };
 
   return (
     <>
@@ -214,6 +239,31 @@ export default function PlayerPage({
           justify-content: space-between;
           gap: 24px;
           margin-bottom: 24px;
+        }
+        .player-identity {
+          display: flex;
+          align-items: center;
+          gap: 18px;
+          min-width: 0;
+        }
+        .player-avatar {
+          width: 72px;
+          height: 72px;
+          flex-shrink: 0;
+          border: 1px solid var(--border);
+          border-radius: var(--r-8);
+          background: var(--bg-surface);
+          object-fit: cover;
+        }
+        .player-avatar-fallback {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-family: var(--font-mono);
+          font-size: 30px;
+          font-weight: var(--fw-bold);
+          color: var(--text-muted);
+          text-transform: uppercase;
         }
         .player-heading { min-width: 0; }
         .player-name {
@@ -270,37 +320,57 @@ export default function PlayerPage({
           .player-header {
             flex-direction: column;
           }
+          .player-identity {
+            align-items: flex-start;
+          }
         }
       `}</style>
 
       <div className="page">
         <div className="dashboard">
           <div className="player-header">
-            <div className="player-heading">
-              <div className="player-name">{displayName}</div>
-              <div className="player-meta">
-                <a
-                  href={profileUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  {steamProfile.customUrl
-                    ? `steamcommunity.com/id/${steamProfile.customUrl}`
-                    : `Steam ID: ${steamId}`}
-                </a>
-                {drodo && drodo.mmr != null && (
-                  <>
-                    {" \u00B7 "}
-                    {mmrToRank(drodo.mmr)}
-                  </>
-                )}
+            <div className="player-identity">
+              {steamProfile.avatarUrl && !avatarFailed ? (
+                <img
+                  className="player-avatar"
+                  src={steamProfile.avatarUrl}
+                  alt={`${displayName} Steam avatar`}
+                  width={72}
+                  height={72}
+                  referrerPolicy="no-referrer"
+                  onError={() => setAvatarFailed(true)}
+                />
+              ) : (
+                <div className="player-avatar player-avatar-fallback" aria-hidden="true">
+                  {displayName.charAt(0) || "?"}
+                </div>
+              )}
+              <div className="player-heading">
+                <div className="player-name">{displayName}</div>
+                <div className="player-meta">
+                  <a
+                    href={profileUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {steamProfile.customUrl
+                      ? `steamcommunity.com/id/${steamProfile.customUrl}`
+                      : `Steam ID: ${steamId}`}
+                  </a>
+                  {drodo && drodo.mmr != null && (
+                    <>
+                      {" \u00B7 "}
+                      {mmrToRank(drodo.mmr)}
+                    </>
+                  )}
+                </div>
               </div>
             </div>
             <Button
-              as="a"
-              href={`${playerProfilePath(steamId, steamProfile.customUrl)}?refresh=1`}
+              disabled={refreshing}
+              onClick={handleRefresh}
             >
-              Refresh MMR
+              {refreshing ? "Refreshing..." : "Refresh MMR"}
             </Button>
           </div>
 
@@ -312,12 +382,6 @@ export default function PlayerPage({
             </div>
           )}
 
-          {trackedItems.length > 0 && (
-            <>
-              <div className="section-title">Tracked</div>
-              <StatsGrid items={trackedItems} />
-            </>
-          )}
           {drodoItems.length > 0 && (
             <>
               <div className="section-title">Auto Chess</div>
@@ -326,44 +390,6 @@ export default function PlayerPage({
           )}
 
           <SeasonHistoryGrid seasons={seasons} />
-
-          {games.length === 0 ? (
-            <div className="table-wrap">
-              <div className="empty-state">
-                No matches recorded for this player.
-              </div>
-            </div>
-          ) : (
-            <div className="table-wrap">
-              <div className="table-header">
-                <div className="th">#</div>
-                <div className="th">Lineup</div>
-                <div className="th">Rank</div>
-                <div className="th">W &ndash; L</div>
-                <div className="th">Lv</div>
-                <div className="th">Relic</div>
-                <div className="th">Date</div>
-              </div>
-              {games.map((g) => (
-                <div key={g.id} className="game-entry">
-                  <Link
-                    href={`/games/${g.id}`}
-                    style={{ display: "block", color: "inherit" }}
-                  >
-                    <GameRowDisplay
-                      game={g}
-                      unitCosts={UNIT_COSTS}
-                      unitsFull={UNITS_FULL}
-                      synergiesData={SYNERGIES_DATA}
-                      relicsData={RELICS_DATA}
-                      iconUrl={(type, stem) => `/icons/${type}/${stem}.png`}
-                      shareUrl={`/games/${g.id}`}
-                    />
-                  </Link>
-                </div>
-              ))}
-            </div>
-          )}
         </div>
       </div>
     </>
@@ -402,7 +428,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   let drodoProfileMissing = false;
   let drodoLastFetchedAt = null;
   let seasons: SeasonSnapshot[] = [];
-  if (supabase && !forceRefresh) {
+  if (supabase) {
     const [profileResult, seasonsResult] = await Promise.all([
       supabase
         .from("users")
@@ -435,6 +461,8 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
   const steamProfile = await fetchSteamProfile(steamId, supabase ?? undefined, {
     persist: true,
+    requireAvatar: true,
+    requireCustomUrl: /^\d+$/.test(rawSteamId),
   });
 
   let profileUserIds = [steamId];

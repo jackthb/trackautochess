@@ -16,13 +16,20 @@ export interface DisplaySynergy {
   iconStem: string;
 }
 
+function normalizeDescription(desc: string): string {
+  return desc
+    .replace(/\bspecies perk\b/gi, "SPECIES TRAIT")
+    .replace(/\bspecies trait\b/gi, "SPECIES TRAIT")
+    .replace(/\bclass perk\b/gi, "CLASS PERK");
+}
+
 function buildSynergies(): DisplaySynergy[] {
   return Object.values(synergiesData as Record<string, SynergyInfo>)
     .filter((syn) => syn.name && syn.name.trim())
     .map((syn) => ({
       slug: slugifyName(syn.name),
       name: syn.name,
-      description: syn.description ?? "",
+      description: normalizeDescription(syn.description ?? ""),
       lore: syn.lore ?? "",
       iconStem: synIconName(syn.name),
     }))

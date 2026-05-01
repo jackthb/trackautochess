@@ -52,6 +52,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   await upsertSteamUser(steamId, supabaseAdmin, {
     name: steamName === steamId ? null : steamName,
     customUrl: steamProfile.customUrl,
+    avatarUrl: steamProfile.avatarUrl,
   });
 
   // Find or create user
@@ -71,6 +72,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         steam_id: steamId,
         steam_name: steamName,
         custom_url: steamProfile.customUrl,
+        avatar_url: steamProfile.avatarUrl,
         full_name: steamName,
       },
     });
@@ -85,6 +87,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         steam_id: steamId,
         steam_name: steamName,
         custom_url: steamProfile.customUrl,
+        avatar_url: steamProfile.avatarUrl,
         full_name: steamName,
       },
     });

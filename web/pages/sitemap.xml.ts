@@ -46,16 +46,19 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
 
   const entries: SitemapEntry[] = [
     { path: "/" },
+    { path: "/about" },
     { path: "/items" },
-    { path: "/relics" },
     { path: "/units" },
     { path: "/synergies" },
+    { path: "/relics" },
     { path: "/talents" },
     { path: "/patch-notes" },
     ...getAllItems().map((item) => ({ path: `/items/${item.slug}` })),
-    ...getAllRelics().map((relic) => ({ path: `/relics/${relic.slug}` })),
     ...getAllUnits().map((unit) => ({ path: `/units/${unit.slug}` })),
-    ...getAllSynergies().map((synergy) => ({ path: `/synergies/${synergy.slug}` })),
+    ...getAllSynergies().map((synergy) => ({
+      path: `/synergies/${synergy.slug}`,
+    })),
+    ...getAllRelics().map((relic) => ({ path: `/relics/${relic.slug}` })),
     ...(patchIndex.patches as IndexPatch[]).map((patch) => ({
       path: `/patch-notes/${patch.slug}`,
       lastmod: patch.date,

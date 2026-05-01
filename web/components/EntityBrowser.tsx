@@ -31,6 +31,20 @@ const ENTITY_PATH: Record<EntityCardVariant, string> = {
   synergy: "synergies",
 };
 
+const ENTITY_COLLECTION_PATH: Record<EntityCardVariant, string> = {
+  item: "/items",
+  relic: "/relics",
+  unit: "/units",
+  synergy: "/synergies",
+};
+
+const ENTITY_COUNT_LABEL: Record<EntityCardVariant, string> = {
+  item: "items",
+  relic: "relics",
+  unit: "units",
+  synergy: "synergies",
+};
+
 function isTiered(
   data: BrowsableEntity[] | BrowsableEntity[][]
 ): data is BrowsableEntity[][] {
@@ -74,9 +88,12 @@ export function EntityBrowser({
   }, [data, lowered]);
 
   const gridClass = `${styles.grid} ${
-    variant === "relic" ? styles.gridRelic : styles.gridItem
+    variant === "relic" || variant === "synergy"
+      ? styles.gridRelic
+      : styles.gridItem
   }`;
-  const placeholder = `Search ${ENTITY_PATH[variant]}...`;
+  const placeholder = `Search ${ENTITY_COUNT_LABEL[variant]}...`;
+  const collectionPath = ENTITY_COLLECTION_PATH[variant];
   const total = filteredTiered
     ? filteredTiered.reduce((sum, tier) => sum + tier.length, 0)
     : filteredFlat?.length ?? 0;
@@ -92,7 +109,7 @@ export function EntityBrowser({
           onChange={(event) => setQuery(event.target.value)}
         />
         <div className={styles.total}>
-          {total} {ENTITY_PATH[variant]}
+          {total} {ENTITY_COUNT_LABEL[variant]}
         </div>
 
         {filteredTiered &&
@@ -113,12 +130,12 @@ export function EntityBrowser({
                     {entities.map((entity) => (
                       <EntityCard
                         key={entity.slug}
-                        href={`/${ENTITY_PATH[variant]}/${entity.slug}`}
+                        href={`${collectionPath}/${entity.slug}`}
                         iconSrc={entity.iconSrc}
                         iconAlt={entity.name}
                         name={entity.name}
                         description={entity.description}
-                        lore={entity.lore}
+
                         variant={variant}
                         accentColor={color}
                       />
@@ -137,12 +154,11 @@ export function EntityBrowser({
                 {filteredFlat.map((entity) => (
                   <EntityCard
                     key={entity.slug}
-                    href={`/${ENTITY_PATH[variant]}/${entity.slug}`}
+                    href={`${collectionPath}/${entity.slug}`}
                     iconSrc={entity.iconSrc}
                     iconAlt={entity.name}
                     name={entity.name}
                     description={entity.description}
-                    lore={entity.lore}
                     variant={variant}
                   />
                 ))}

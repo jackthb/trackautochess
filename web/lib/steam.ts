@@ -17,6 +17,8 @@ export interface ParsedSteamInput {
 
 interface SteamLookupOptions {
   persist?: boolean;
+  requireAvatar?: boolean;
+  requireCustomUrl?: boolean;
 }
 
 interface SteamApiProfile extends SteamProfile {
@@ -113,12 +115,23 @@ export async function upsertSteamUser(
     steam_id: string;
     name?: string;
     custom_url?: string;
+    avatar_url?: string;
   } = { steam_id: steamId };
 
   if (profile?.name) payload.name = profile.name;
   if (profile?.customUrl) payload.custom_url = profile.customUrl;
+  if (profile?.avatarUrl) payload.avatar_url = profile.avatarUrl;
 
-  await supabase.from("users").upsert(payload, { onConflict: "steam_id" });
+  const { error } = await supabase
+    .from("users")
+    .upsert(payload, { onConflict: "steam_id" });
+
+  if (error && payload.avatar_url) {
+    const { avatar_url, ...withoutAvatar } = payload;
+    await supabase.from("users").upsert(withoutAvatar, {
+      onConflict: "steam_id",
+    });
+  }
 }
 
 /**
@@ -152,7 +165,7 @@ export async function fetchSteamProfile(
   if (supabase) {
     const { data } = await supabase
       .from("users")
-      .select("name, custom_url")
+      .select("name, custom_url, avatar_url")
       .eq("steam_id", steamId)
       .maybeSingle();
 
@@ -160,8 +173,15 @@ export async function fetchSteamProfile(
       cachedProfile = {
         name: data.name ?? null,
         customUrl: data.custom_url ?? null,
+        avatarUrl: data.avatar_url ?? null,
       };
-      if (cachedProfile.name || cachedProfile.customUrl) {
+      const hasCachedProfile =
+        cachedProfile.name || cachedProfile.customUrl || cachedProfile.avatarUrl;
+      if (
+        hasCachedProfile &&
+        (!options.requireAvatar || cachedProfile.avatarUrl) &&
+        (!options.requireCustomUrl || cachedProfile.customUrl)
+      ) {
         return cachedProfile;
       }
     }
@@ -222,6 +242,7 @@ export async function resolveSteamId(
     await upsertSteamUser(profile.steamId, supabase, {
       name: profile.name,
       customUrl: profile.customUrl ?? clean,
+      avatarUrl: profile.avatarUrl,
     });
   }
 

@@ -23,7 +23,16 @@ export function costBorderColor(cost: number): string {
   }
 }
 
+// Canonical unit name → icon filename stem overrides.
+// Add entries here whenever the scraper's canonical name doesn't match the icon file.
+const UNIT_STEM_MAP: Record<string, string> = {
+  "Blood Seeker": "bloodseeker",
+  "Spectres": "spectre",
+  "DarkSeer": "dark_seer",
+};
+
 export function unitStem(name: string): string {
+  if (UNIT_STEM_MAP[name]) return UNIT_STEM_MAP[name];
   return name.toLowerCase().replace(/ /g, "_").replace(/-/g, "_").replace(/'/g, "");
 }
 

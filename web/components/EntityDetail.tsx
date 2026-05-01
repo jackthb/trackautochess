@@ -9,6 +9,9 @@ export interface RelatedEntity {
   name: string;
   description?: string;
   iconSrc: string;
+  variant?: EntityCardVariant;
+  level?: string | number;
+  accentColor?: string;
 }
 
 interface EntityDetailProps {
@@ -48,11 +51,12 @@ const OVERVIEW_LABEL: Record<EntityCardVariant, string> = {
   unit: "Unit Overview",
   synergy: "Synergy Overview",
 };
-const ENTITY_PATH: Record<EntityCardVariant, string> = {
-  item: "items",
-  relic: "relics",
-  unit: "units",
-  synergy: "synergies",
+
+const ENTITY_COLLECTION_PATH: Record<EntityCardVariant, string> = {
+  item: "/items",
+  relic: "/relics",
+  unit: "/units",
+  synergy: "/synergies",
 };
 
 export function EntityDetail({
@@ -70,9 +74,13 @@ export function EntityDetail({
   relatedLevel,
 }: EntityDetailProps) {
   const titleClass = `${styles.title} ${
-    variant === "relic" ? styles.titleRelic : styles.titleItem
+    variant === "relic"
+      ? styles.titleRelic
+      : variant === "synergy"
+        ? styles.titleSynergy
+        : styles.titleItem
   }`;
-  const indexPath = `/${ENTITY_PATH[variant]}`;
+  const indexPath = ENTITY_COLLECTION_PATH[variant];
 
   return (
     <div className={styles.page}>
@@ -86,7 +94,7 @@ export function EntityDetail({
         </nav>
 
         <section className={styles.hero}>
-          <EntityIcon src={iconSrc} alt={name} size="lg" />
+          <EntityIcon src={iconSrc} alt={name} size="lg" bordered={variant !== "unit"} />
           <div>
             <h1 className={titleClass}>{name}</h1>
             {tag && (
@@ -126,19 +134,22 @@ export function EntityDetail({
           <section className={styles.section}>
             <h2 className={styles.sectionTitle}>{relatedTitle}</h2>
             <div className={styles.relatedGrid}>
-              {related.map((r) => (
-                <EntityCard
-                  key={r.slug}
-                  href={`/${ENTITY_PATH[variant]}/${r.slug}`}
-                  iconSrc={r.iconSrc}
-                  iconAlt={r.name}
-                  name={r.name}
-                  description={r.description}
-                  variant={variant}
-                  accentColor={relatedAccentColor?.(r) ?? accentColor}
-                  level={relatedLevel?.(r)}
-                />
-              ))}
+              {related.map((r) => {
+                const cardVariant = r.variant ?? variant;
+                return (
+                  <EntityCard
+                    key={`${cardVariant}-${r.slug}`}
+                    href={`${ENTITY_COLLECTION_PATH[cardVariant]}/${r.slug}`}
+                    iconSrc={r.iconSrc}
+                    iconAlt={r.name}
+                    name={r.name}
+                    description={r.description}
+                    variant={cardVariant}
+                    accentColor={relatedAccentColor?.(r) ?? r.accentColor ?? accentColor}
+                    level={relatedLevel?.(r) ?? r.level}
+                  />
+                );
+              })}
             </div>
           </section>
         )}

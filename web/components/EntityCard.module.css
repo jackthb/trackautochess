@@ -53,11 +53,25 @@
   color: var(--card-accent);
 }
 
+.unit .name {
+  color: var(--text-primary);
+}
+.unit:hover .name {
+  color: var(--card-accent);
+}
+
 .relic .name {
   color: var(--gold);
 }
 .synergy .name {
   color: var(--text-secondary);
+}
+.synergy:hover .name {
+  color: var(--card-accent);
+}
+
+.synergy .name {
+  color: #8bbf9f;
 }
 .synergy:hover .name {
   color: var(--card-accent);

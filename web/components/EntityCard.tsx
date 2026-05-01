@@ -11,7 +11,6 @@ interface EntityCardProps {
   iconAlt: string;
   name: string;
   description?: string;
-  lore?: string;
   variant: EntityCardVariant;
   /** Small label rendered in the top-right corner (e.g. tier). */
   level?: string | number;
@@ -22,8 +21,8 @@ interface EntityCardProps {
 const DEFAULT_ACCENT: Record<EntityCardVariant, string> = {
   item: "var(--accent)",
   relic: "var(--gold)",
-  unit: "var(--text-primary)",
-  synergy: "var(--text-secondary)",
+  unit: "var(--accent)",
+  synergy: "#8bbf9f",
 };
 
 export function EntityCard({
@@ -32,7 +31,6 @@ export function EntityCard({
   iconAlt,
   name,
   description,
-  lore,
   variant,
   level,
   accentColor,
@@ -45,14 +43,11 @@ export function EntityCard({
       className={`${styles.card} ${styles[variant]}`}
       style={{ "--card-accent": accent } as CSSProperties}
     >
-      <EntityIcon src={iconSrc} alt={iconAlt} size="sm" />
+      <EntityIcon src={iconSrc} alt={iconAlt} size="sm" bordered={variant !== "unit"} />
       <div className={styles.body}>
         <div className={styles.name}>{name}</div>
         {description !== undefined && (
           <div className={styles.desc}>{description || "-"}</div>
-        )}
-        {lore && (
-          <div className={styles.lore}>&ldquo;{lore}&rdquo;</div>
         )}
       </div>
       {level !== undefined && (

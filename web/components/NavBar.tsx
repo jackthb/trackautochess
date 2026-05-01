@@ -12,6 +12,7 @@ export function NavBar({ supabase }: NavBarProps) {
   const router = useRouter();
   const [user, setUser] = useState<User | null>(null);
   const [ready, setReady] = useState(false);
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
 
   useEffect(() => {
     if (!supabase) return;
@@ -26,6 +27,41 @@ export function NavBar({ supabase }: NavBarProps) {
     });
     return () => subscription.unsubscribe();
   }, [supabase]);
+
+  useEffect(() => {
+    if (!supabase || !user) {
+      setAvatarUrl(null);
+      return;
+    }
+
+    const metadataAvatar =
+      typeof user.user_metadata?.avatar_url === "string"
+        ? user.user_metadata.avatar_url
+        : typeof user.user_metadata?.picture === "string"
+          ? user.user_metadata.picture
+          : null;
+    setAvatarUrl(metadataAvatar);
+
+    const steamId = user.user_metadata?.steam_id;
+    if (!steamId) return;
+
+    let cancelled = false;
+    supabase
+      .from("users")
+      .select("avatar_url")
+      .eq("steam_id", steamId)
+      .maybeSingle()
+      .then(({ data }) => {
+        if (cancelled) return;
+        if (typeof data?.avatar_url === "string" && data.avatar_url) {
+          setAvatarUrl(data.avatar_url);
+        }
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [supabase, user]);
 
   const handleLogout = async () => {
     if (!supabase) return;
@@ -59,6 +95,7 @@ export function NavBar({ supabase }: NavBarProps) {
           display: flex;
           align-items: center;
           min-width: 0;
+          flex: 1;
         }
         .nav-logo {
           font-family: "Cinzel", serif;
@@ -84,7 +121,12 @@ export function NavBar({ supabase }: NavBarProps) {
           align-items: center;
           gap: 22px;
           margin-left: 28px;
-          flex-shrink: 0;
+          min-width: 0;
+          overflow-x: auto;
+          scrollbar-width: none;
+        }
+        .nav-links::-webkit-scrollbar {
+          display: none;
         }
         .nav-link {
           font-family: var(--font-mono);
@@ -111,15 +153,43 @@ export function NavBar({ supabase }: NavBarProps) {
           max-width: 152px;
           font-size: 14px;
           color: var(--text-secondary);
-          text-decoration: none;
           white-space: nowrap;
           overflow: hidden;
           text-overflow: ellipsis;
           text-align: right;
           transition: color 0.15s;
         }
-        .nav-user:hover {
+        .nav-user-link {
+          display: flex;
+          align-items: center;
+          gap: 9px;
+          color: var(--text-secondary);
+          text-decoration: none;
+          min-width: 0;
+          transition: color 0.15s;
+        }
+        .nav-user-link:hover,
+        .nav-user-link:hover .nav-user {
           color: var(--text-primary);
+        }
+        .nav-avatar {
+          width: 26px;
+          height: 26px;
+          flex-shrink: 0;
+          border: 1px solid var(--border);
+          border-radius: 50%;
+          background: var(--bg-surface);
+          object-fit: cover;
+        }
+        .nav-avatar-fallback {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-family: var(--font-mono);
+          font-size: 12px;
+          font-weight: var(--fw-bold);
+          color: var(--text-muted);
+          text-transform: uppercase;
         }
         .nav-auth-placeholder {
           display: flex;
@@ -183,6 +253,12 @@ export function NavBar({ supabase }: NavBarProps) {
             <Link href="/items" className="nav-link">
               Items
             </Link>
+            <Link href="/units" className="nav-link">
+              Units
+            </Link>
+            <Link href="/synergies" className="nav-link">
+              Synergies
+            </Link>
             <Link href="/relics" className="nav-link">
               Relics
             </Link>
@@ -204,8 +280,23 @@ export function NavBar({ supabase }: NavBarProps) {
           {ready ? (
             user ? (
               <>
-                <Link href="/dashboard" className="nav-user">
-                  {displayName}
+                <Link href="/dashboard" className="nav-user-link">
+                  {avatarUrl ? (
+                    <img
+                      className="nav-avatar"
+                      src={avatarUrl}
+                      alt=""
+                      width={26}
+                      height={26}
+                      referrerPolicy="no-referrer"
+                      onError={() => setAvatarUrl(null)}
+                    />
+                  ) : (
+                    <span className="nav-avatar nav-avatar-fallback" aria-hidden="true">
+                      {displayName.charAt(0) || "?"}
+                    </span>
+                  )}
+                  <span className="nav-user">{displayName}</span>
                 </Link>
                 <button className="nav-btn" onClick={handleLogout}>
                   Sign out

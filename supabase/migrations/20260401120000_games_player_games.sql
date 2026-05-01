@@ -39,15 +39,14 @@ INSERT INTO games (id, played_at, created_at)
 SELECT
     id,
     COALESCE(
-        played_at::timestamptz,
         date::timestamptz,
         created_at
     ),
     COALESCE(created_at, now())
 FROM games_old;
 
--- Advance the sequence past existing IDs
-SELECT setval('games_id_seq', COALESCE((SELECT MAX(id) FROM games), 0));
+-- Advance the sequence past existing IDs (minimum value is 1)
+SELECT setval('games_id_seq', GREATEST(COALESCE((SELECT MAX(id) FROM games), 1), 1));
 
 INSERT INTO player_games (game_id, user_id, placement, rank, rank_change, lineup, synergies, talents, relic, level, wins, losses, screenshot, replay, notes, created_at)
 SELECT
