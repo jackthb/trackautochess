@@ -9,6 +9,13 @@ import { NavBar } from "@/components/NavBar";
 import { createSupabaseClient } from "@/lib/supabase";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
+const BOT_ID_PROTECTED_ROUTES = [
+  { path: "/api/drodo/*", method: "GET" },
+  { path: "/api/drodo/*", method: "POST" },
+  { path: "/api/players/search", method: "GET" },
+  { path: "/api/support", method: "POST" },
+];
+
 export default function App({ Component, pageProps }: AppProps) {
   const [supabase, setSupabase] = useState<SupabaseClient | null>(null);
 
@@ -19,13 +26,9 @@ export default function App({ Component, pageProps }: AppProps) {
 
   return (
     <>
-      <BotIdClient
-        protect={[
-          { path: "/api/drodo/*", method: "GET" },
-          { path: "/api/players/search", method: "GET" },
-          { path: "/api/support", method: "POST" },
-        ]}
-      />
+      {process.env.NODE_ENV === "production" && (
+        <BotIdClient protect={BOT_ID_PROTECTED_ROUTES} />
+      )}
       <NavBar supabase={supabase} />
       <Component {...pageProps} supabase={supabase} />
       <Footer />

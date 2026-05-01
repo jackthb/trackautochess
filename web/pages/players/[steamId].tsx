@@ -1,5 +1,5 @@
 import Head from "next/head";
-import Link from "next/link";
+import { useRouter } from "next/router";
 import { useEffect, useMemo, useState } from "react";
 import { createClient } from "@supabase/supabase-js";
 import type { GetServerSideProps } from "next";
@@ -132,6 +132,7 @@ export default function PlayerPage({
   twitchOgUrl,
   canonicalUrl,
 }: PlayerPageProps) {
+  const router = useRouter();
   const [drodo, setDrodo] = useState(initialDrodo);
   const [seasons, setSeasons] = useState(initialSeasons);
   const [drodoProfileMissing, setDrodoProfileMissing] = useState(
@@ -186,11 +187,6 @@ export default function PlayerPage({
       return;
     }
 
-    setManualRefreshQuota((quota) => ({
-      ...quota,
-      used: Math.min(quota.limit, quota.used + 1),
-      remaining: Math.max(0, quota.remaining - 1),
-    }));
     setRefreshError(null);
     setRefreshing(true);
     try {
@@ -211,8 +207,12 @@ export default function PlayerPage({
           }
         } else if (resp.status === 429) {
           setRefreshError("Daily manual refresh limit reached.");
+        } else if (resp.status === 403) {
+          setRefreshError("Refresh blocked by anti-bot verification.");
         } else {
-          setRefreshError(data?.error || "Refresh failed. Try again later.");
+          setRefreshError(
+            data?.error || `Refresh failed with HTTP ${resp.status}.`
+          );
         }
         return;
       }
@@ -231,8 +231,12 @@ export default function PlayerPage({
         setDrodoLastFetchedAt(data.fetched_at);
       }
       if (Array.isArray(data.seasons)) setSeasons(data.seasons);
-    } catch {
-      setRefreshError("Refresh failed. Try again later.");
+    } catch (error) {
+      const detail =
+        error instanceof Error && error.message ? ` (${error.message})` : "";
+      setRefreshError(
+        `Refresh request failed before the server responded${detail}.`
+      );
     } finally {
       setRefreshing(false);
     }
@@ -390,6 +394,15 @@ export default function PlayerPage({
         .game-entry:last-child {
           border-bottom: none;
         }
+        .game-row-link {
+          display: block;
+          color: inherit;
+          cursor: pointer;
+        }
+        .game-row-link:focus-visible {
+          outline: 1px solid var(--accent);
+          outline-offset: -1px;
+        }
         .empty-state {
           text-align: center;
           padding: 80px 32px;
@@ -520,7 +533,18 @@ export default function PlayerPage({
                 </div>
                 {games.map((g) => (
                   <div key={g.id} className="game-entry">
-                    <Link href={`/games/${g.id}`} style={{ display: "block", color: "inherit" }}>
+                    <div
+                      className="game-row-link"
+                      role="link"
+                      tabIndex={0}
+                      onClick={() => router.push(`/games/${g.id}`)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" || e.key === " ") {
+                          e.preventDefault();
+                          router.push(`/games/${g.id}`);
+                        }
+                      }}
+                    >
                       <GameRowDisplay
                         game={g}
                         unitCosts={UNIT_COSTS}
@@ -529,8 +553,9 @@ export default function PlayerPage({
                         relicsData={RELICS_DATA}
                         iconUrl={(type, stem) => `/icons/${type}/${stem}.png`}
                         shareUrl={`/games/${g.id}`}
+                        style={{ cursor: "pointer" }}
                       />
-                    </Link>
+                    </div>
                   </div>
                 ))}
               </div>

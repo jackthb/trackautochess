@@ -3,6 +3,7 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import type { SupabaseClient, User } from "@supabase/supabase-js";
 import { SITE_NAME } from "@/lib/site";
+import styles from "./NavBar.module.css";
 
 interface NavBarProps {
   supabase?: SupabaseClient | null;
@@ -77,208 +78,40 @@ export function NavBar({ supabase }: NavBarProps) {
 
   return (
     <>
-      <style jsx>{`
-        nav {
-          display: flex;
-          flex-direction: row;
-          align-items: center;
-          justify-content: space-between;
-          padding: 0 40px;
-          height: var(--nav-height);
-          border-bottom: 1px solid var(--border-subtle);
-          background: rgba(8, 9, 11, 0.9);
-          backdrop-filter: blur(8px);
-          position: sticky;
-          top: 0;
-          z-index: 10;
-        }
-        .nav-left {
-          display: flex;
-          align-items: center;
-          min-width: 0;
-          flex: 1;
-        }
-        .nav-logo {
-          font-family: "Cinzel", serif;
-          font-size: 18px;
-          font-weight: 600;
-          letter-spacing: 3px;
-          text-transform: uppercase;
-          color: var(--text-secondary);
-          display: flex;
-          align-items: center;
-          gap: 10px;
-          text-decoration: none;
-          flex-shrink: 0;
-          line-height: 1;
-        }
-        .nav-logo img {
-          width: 28px;
-          height: 28px;
-          display: block;
-        }
-        .nav-links {
-          display: flex;
-          align-items: center;
-          gap: 22px;
-          margin-left: 28px;
-          min-width: 0;
-          overflow-x: auto;
-          scrollbar-width: none;
-        }
-        .nav-links::-webkit-scrollbar {
-          display: none;
-        }
-        .nav-link {
-          font-family: var(--font-mono);
-          font-size: 12px;
-          letter-spacing: 1.5px;
-          text-transform: uppercase;
-          color: var(--text-muted);
-          text-decoration: none;
-          transition: color 0.15s;
-        }
-        .nav-link:hover {
-          color: var(--text-primary);
-        }
-        .nav-right {
-          display: flex;
-          align-items: center;
-          justify-content: flex-end;
-          gap: 20px;
-          flex-shrink: 0;
-          min-width: 220px;
-        }
-        .nav-user {
-          display: block;
-          max-width: 152px;
-          font-size: 14px;
-          color: var(--text-secondary);
-          white-space: nowrap;
-          overflow: hidden;
-          text-overflow: ellipsis;
-          text-align: right;
-          transition: color 0.15s;
-        }
-        .nav-user-link {
-          display: flex;
-          align-items: center;
-          gap: 9px;
-          color: var(--text-secondary);
-          text-decoration: none;
-          min-width: 0;
-          transition: color 0.15s;
-        }
-        .nav-user-link:hover,
-        .nav-user-link:hover .nav-user {
-          color: var(--text-primary);
-        }
-        .nav-avatar {
-          width: 26px;
-          height: 26px;
-          flex-shrink: 0;
-          border: 1px solid var(--border);
-          border-radius: 50%;
-          background: var(--bg-surface);
-          object-fit: cover;
-        }
-        .nav-avatar-fallback {
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          font-family: var(--font-mono);
-          font-size: 12px;
-          font-weight: var(--fw-bold);
-          color: var(--text-muted);
-          text-transform: uppercase;
-        }
-        .nav-auth-placeholder {
-          display: flex;
-          align-items: center;
-          gap: 20px;
-          visibility: hidden;
-          pointer-events: none;
-        }
-        .nav-btn {
-          font-family: var(--font-mono);
-          font-size: var(--fs-13);
-          color: var(--text-muted);
-          background: none;
-          border: 1px solid var(--border);
-          border-radius: var(--r-4);
-          padding: 7px 18px;
-          cursor: pointer;
-          letter-spacing: var(--tr-body);
-          transition: color var(--t-base) var(--t-easing), border-color var(--t-base) var(--t-easing), background var(--t-base) var(--t-easing);
-        }
-        .nav-btn:hover {
-          color: var(--text-secondary);
-          border-color: var(--text-muted);
-        }
-        .nav-signin {
-          font-family: var(--font-mono);
-          font-size: 13px;
-          color: var(--text-secondary);
-          letter-spacing: 0.5px;
-          text-decoration: none;
-          transition: color 0.15s;
-        }
-        .nav-signin:hover {
-          color: var(--text-primary);
-        }
-        @media (max-width: 760px) {
-          nav {
-            padding: 0 18px;
-          }
-          .nav-links {
-            gap: 14px;
-            margin-left: 18px;
-          }
-          .nav-right {
-            min-width: 0;
-            gap: 12px;
-          }
-          .nav-link,
-          .nav-signin,
-          .nav-btn {
-            font-size: 11px;
-          }
-        }
-      `}</style>
-      <nav>
-        <div className="nav-left">
-          <Link href="/" className="nav-logo" aria-label={`${SITE_NAME} home`}>
+      <nav className={styles.nav}>
+        <div className={styles.navLeft}>
+          <Link href="/" className={styles.navLogo} aria-label={`${SITE_NAME} home`}>
             <img src="/logo.svg" alt={SITE_NAME} />
           </Link>
-          <div className="nav-links">
-            <Link href="/items" className="nav-link">
+          <div className={styles.navLinks}>
+            <Link href="/items" className={styles.navLink}>
               Items
             </Link>
-            <Link href="/units" className="nav-link">
+            <Link href="/units" className={styles.navLink}>
               Units
             </Link>
-            <Link href="/synergies" className="nav-link">
+            <Link href="/synergies" className={styles.navLink}>
               Synergies
             </Link>
-            <Link href="/relics" className="nav-link">
+            <Link href="/relics" className={styles.navLink}>
               Relics
             </Link>
-            <Link href="/talents" className="nav-link">
+            <Link href="/talents" className={styles.navLink}>
               Talents
             </Link>
-            <Link href="/patch-notes" className="nav-link">
+            <Link href="/patch-notes" className={styles.navLink}>
               Patch Notes
             </Link>
           </div>
         </div>
-        <div className="nav-right">
+        <div className={styles.navRight}>
           {ready ? (
             user ? (
               <>
-                <Link href="/dashboard" className="nav-user-link">
+                <Link href="/dashboard" className={styles.navUserLink}>
                   {avatarUrl ? (
                     <img
-                      className="nav-avatar"
+                      className={styles.navAvatar}
                       src={avatarUrl}
                       alt=""
                       width={26}
@@ -287,25 +120,28 @@ export function NavBar({ supabase }: NavBarProps) {
                       onError={() => setAvatarUrl(null)}
                     />
                   ) : (
-                    <span className="nav-avatar nav-avatar-fallback" aria-hidden="true">
+                    <span
+                      className={`${styles.navAvatar} ${styles.navAvatarFallback}`}
+                      aria-hidden="true"
+                    >
                       {displayName.charAt(0) || "?"}
                     </span>
                   )}
-                  <span className="nav-user">{displayName}</span>
+                  <span className={styles.navUser}>{displayName}</span>
                 </Link>
-                <button className="nav-btn" onClick={handleLogout}>
+                <button className={styles.navBtn} onClick={handleLogout}>
                   Sign out
                 </button>
               </>
             ) : (
-              <a href="/api/auth/steam" className="nav-signin">
+              <a href="/api/auth/steam" className={styles.navSignin}>
                 Sign in with Steam
               </a>
             )
           ) : supabase ? (
-            <div className="nav-auth-placeholder" aria-hidden="true">
-              <span className="nav-user">Steam Player Name</span>
-              <span className="nav-btn">Sign out</span>
+            <div className={styles.navAuthPlaceholder} aria-hidden="true">
+              <span className={styles.navUser}>Steam Player Name</span>
+              <span className={styles.navBtn}>Sign out</span>
             </div>
           ) : null}
         </div>

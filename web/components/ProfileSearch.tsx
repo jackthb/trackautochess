@@ -177,7 +177,7 @@ export function ProfileSearch({
 
     lookupBarTimerRef.current = setTimeout(() => {
       if (reqId === lookupReqRef.current) setShowLookupBar(true);
-    }, 160);
+    }, 600);
 
     try {
       const resp = await fetch(
@@ -280,6 +280,7 @@ export function ProfileSearch({
         }
         .search-form {
           display: flex;
+          position: relative;
           width: 100%;
         }
         .search-help {
@@ -332,9 +333,9 @@ export function ProfileSearch({
         }
         .search-progress {
           position: absolute;
-          top: calc(100% + 3px);
-          left: 10px;
-          right: 10px;
+          left: 12px;
+          right: 12px;
+          bottom: -1px;
           height: 2px;
           overflow: hidden;
           pointer-events: none;
@@ -456,6 +457,11 @@ export function ProfileSearch({
             aria-busy={lookupLoading || searching}
             aria-invalid={Boolean(lookupError)}
           />
+          {showLookupBar && (
+            <div className="search-progress" aria-hidden="true">
+              <div className="search-progress-bar" />
+            </div>
+          )}
         </form>
         <div className="search-help">
           <span>Paste your Steam profile URL, vanity URL, or SteamID64.</span>
@@ -463,11 +469,6 @@ export function ProfileSearch({
             Open your Steam profile
           </a>
         </div>
-        {showLookupBar && (
-          <div className="search-progress" aria-hidden="true">
-            <div className="search-progress-bar" />
-          </div>
-        )}
         {lookupError && <div className="search-status">{lookupError}</div>}
         {dropdownOpen && (
           <div className="search-dropdown">

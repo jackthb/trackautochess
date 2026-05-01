@@ -384,7 +384,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                 letterSpacing: 1,
               }}
             >
-              View full profile & match history
+              View profile
             </div>
             <div
               style={{
