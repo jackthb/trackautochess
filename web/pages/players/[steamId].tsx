@@ -378,7 +378,13 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-  const forceRefresh = context.query.refresh === "1";
+  // Only honour ?refresh=1 when the request came from within the site.
+  // Direct hits (bots, curl, shared links) have no same-origin Referer, so we
+  // silently ignore the parameter rather than burning upstream API quota.
+  const host = context.req.headers.host ?? "";
+  const referer = context.req.headers.referer ?? "";
+  const isSameOriginReferer = host.length > 0 && referer.includes(host);
+  const forceRefresh = isSameOriginReferer && context.query.refresh === "1";
   const supabase = url && key ? createClient(url, key) : null;
   const baseUrl = getRequestSiteUrl(context.req.headers);
 

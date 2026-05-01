@@ -9,6 +9,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
     "Allow: /",
     "Disallow: /api/",
     "Disallow: /dashboard",
+    "Disallow: /*?refresh=1",
     `Sitemap: ${sitemapUrl}`,
   ].join("\n");
 

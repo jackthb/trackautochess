@@ -7,6 +7,35 @@ const DRODO_CACHE_TTL_MS = 24 * 60 * 60 * 1000;
 const EMPTY_DRODO_PROFILE_ERROR =
   "Steam account has no Dota Auto Chess MMR or stats.";
 
+// --- Bot / rate-limit protection ---
+
+const BOT_UA_RE =
+  /bot|crawl|spider|slurp|python|curl|wget|java|scrapy|httpclient|go-http|okhttp|libwww|axios|node-fetch/i;
+
+// One forced refresh per IP per 5 minutes.
+const REFRESH_RATE_LIMIT_MS = 5 * 60 * 1000;
+const refreshLastSeen = new Map<string, number>();
+
+function getClientIp(req: NextApiRequest): string {
+  const forwarded = req.headers["x-forwarded-for"];
+  if (typeof forwarded === "string") return forwarded.split(",")[0].trim();
+  return req.socket?.remoteAddress ?? "unknown";
+}
+
+function isRefreshRateLimited(ip: string): boolean {
+  const now = Date.now();
+  const last = refreshLastSeen.get(ip) ?? 0;
+  if (now - last < REFRESH_RATE_LIMIT_MS) return true;
+  refreshLastSeen.set(ip, now);
+  // Prune stale entries to avoid unbounded growth.
+  if (refreshLastSeen.size > 10_000) {
+    for (const [k, v] of refreshLastSeen) {
+      if (now - v > REFRESH_RATE_LIMIT_MS) refreshLastSeen.delete(k);
+    }
+  }
+  return false;
+}
+
 interface SeasonSnapshotRow {
   steam_id: string;
   season: string;
@@ -255,6 +284,20 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   const { steamId: rawSteamId, refresh } = req.query;
   if (!rawSteamId || typeof rawSteamId !== "string") {
     return res.status(400).json({ error: "Invalid steam ID" });
+  }
+
+  const ua = req.headers["user-agent"] ?? "";
+  const ip = getClientIp(req);
+
+  // Reject obvious automation on forced-refresh calls.
+  if (refresh === "1") {
+    if (BOT_UA_RE.test(ua)) {
+      return res.status(403).json({ error: "Forbidden" });
+    }
+    if (isRefreshRateLimited(ip)) {
+      res.setHeader("Retry-After", "300");
+      return res.status(429).json({ error: "Too many requests" });
+    }
   }
 
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
