@@ -4,6 +4,8 @@ import { EntityDetail, type RelatedEntity } from "@/components/EntityDetail";
 import { SeoHead } from "@/lib/seo";
 import { SITE_TITLE } from "@/lib/site";
 import { getAllUnits, getUnitBySlug, type DisplayUnit } from "@/lib/units";
+import { getAllSynergies } from "@/lib/synergies";
+import { slugifyName } from "@/lib/slugs";
 
 interface UnitDetailPageProps {
   unit: DisplayUnit;
@@ -13,11 +15,20 @@ interface UnitDetailPageProps {
 
 export default function UnitDetailPage({ unit, related }: UnitDetailPageProps) {
   const description = `${unit.name} is a cost ${unit.cost} unit in Dota Auto Chess.`;
+  const synergies = getAllSynergies();
+  const synergyByName = new Map(synergies.map((syn) => [syn.name, syn]));
   const relatedEntities: RelatedEntity[] = related.map((u) => ({
     slug: u.slug,
     name: u.name,
     description: `Cost ${u.cost}`,
     iconSrc: `/icons/units/${u.iconStem}.png`,
+  }));
+  const synergyEntities: RelatedEntity[] = unit.synergies.map((syn) => ({
+    slug: slugifyName(syn),
+    name: syn,
+    description: `${unit.name} activates this synergy.`,
+    iconSrc: `/icons/synergies/${synergyByName.get(syn)?.iconStem ?? ""}.png`,
+    variant: "synergy",
   }));
 
   return (
@@ -29,6 +40,8 @@ export default function UnitDetailPage({ unit, related }: UnitDetailPageProps) {
         iconSrc={`/icons/units/${unit.iconStem}.png`}
         overview={<>{description} {unit.synergies.length ? `Synergies: ${unit.synergies.join(", ")}.` : ""}</>}
         tag={{ label: `Cost ${unit.cost}` }}
+        extraRelatedTitle="Unit Synergies"
+        extraRelated={synergyEntities}
         relatedTitle="More Units"
         related={relatedEntities}
       />

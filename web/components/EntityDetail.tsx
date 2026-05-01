@@ -36,6 +36,8 @@ interface EntityDetailProps {
   relatedAccentColor?: (item: RelatedEntity) => string | undefined;
   /** Level badge for related cards. */
   relatedLevel?: (item: RelatedEntity) => string | number | undefined;
+  extraRelatedTitle?: string;
+  extraRelated?: RelatedEntity[];
 }
 
 const INDEX_LABEL: Record<EntityCardVariant, string> = {
@@ -72,6 +74,8 @@ export function EntityDetail({
   accentColor,
   relatedAccentColor,
   relatedLevel,
+  extraRelatedTitle,
+  extraRelated,
 }: EntityDetailProps) {
   const titleClass = `${styles.title} ${
     variant === "relic"
@@ -135,6 +139,30 @@ export function EntityDetail({
             <h2 className={styles.sectionTitle}>{relatedTitle}</h2>
             <div className={styles.relatedGrid}>
               {related.map((r) => {
+                const cardVariant = r.variant ?? variant;
+                return (
+                  <EntityCard
+                    key={`${cardVariant}-${r.slug}`}
+                    href={`${ENTITY_COLLECTION_PATH[cardVariant]}/${r.slug}`}
+                    iconSrc={r.iconSrc}
+                    iconAlt={r.name}
+                    name={r.name}
+                    description={r.description}
+                    variant={cardVariant}
+                    accentColor={relatedAccentColor?.(r) ?? r.accentColor ?? accentColor}
+                    level={relatedLevel?.(r) ?? r.level}
+                  />
+                );
+              })}
+            </div>
+          </section>
+        )}
+
+        {extraRelated && extraRelated.length > 0 && extraRelatedTitle && (
+          <section className={styles.section}>
+            <h2 className={styles.sectionTitle}>{extraRelatedTitle}</h2>
+            <div className={styles.relatedGrid}>
+              {extraRelated.map((r) => {
                 const cardVariant = r.variant ?? variant;
                 return (
                   <EntityCard

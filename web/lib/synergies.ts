@@ -14,6 +14,7 @@ export interface DisplaySynergy {
   description: string;
   lore: string;
   iconStem: string;
+  category: "species" | "class" | "other";
 }
 
 function normalizeDescription(desc: string): string {
@@ -32,8 +33,16 @@ function buildSynergies(): DisplaySynergy[] {
       description: normalizeDescription(syn.description ?? ""),
       lore: syn.lore ?? "",
       iconStem: synIconName(syn.name),
+      category: inferCategory(syn.description ?? ""),
     }))
     .sort((a, b) => a.name.localeCompare(b.name));
+}
+
+function inferCategory(description: string): "species" | "class" | "other" {
+  const lower = description.toLowerCase();
+  if (lower.includes("species trait")) return "species";
+  if (lower.includes("class perk")) return "class";
+  return "other";
 }
 
 const ALL_SYNERGIES = buildSynergies();
@@ -45,4 +54,12 @@ export function getAllSynergies(): DisplaySynergy[] {
 
 export function getSynergyBySlug(slug: string): DisplaySynergy | null {
   return SYNERGIES_BY_SLUG.get(slug) ?? null;
+}
+
+export function getSpecies(): DisplaySynergy[] {
+  return ALL_SYNERGIES.filter((syn) => syn.category === "species");
+}
+
+export function getClasses(): DisplaySynergy[] {
+  return ALL_SYNERGIES.filter((syn) => syn.category === "class");
 }

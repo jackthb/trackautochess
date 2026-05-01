@@ -90,8 +90,16 @@ export function NavBar({ supabase }: NavBarProps) {
             <Link href="/units" className={styles.navLink}>
               Units
             </Link>
+<<<<<<< codex/enhance-seo-and-unit-display-layout
+            <Link href="/classes" className="nav-link">
+              Classes
+            </Link>
+            <Link href="/species" className="nav-link">
+              Species
+=======
             <Link href="/synergies" className={styles.navLink}>
               Synergies
+>>>>>>> main
             </Link>
             <Link href="/relics" className={styles.navLink}>
               Relics

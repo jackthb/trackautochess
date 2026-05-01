@@ -4,6 +4,7 @@ import { EntityDetail, type RelatedEntity } from "@/components/EntityDetail";
 import { SeoHead } from "@/lib/seo";
 import { SITE_TITLE } from "@/lib/site";
 import { getAllSynergies, getSynergyBySlug, type DisplaySynergy } from "@/lib/synergies";
+import { getAllUnits } from "@/lib/units";
 
 interface SynergyDetailPageProps {
   synergy: DisplaySynergy;
@@ -19,6 +20,15 @@ export default function SynergyDetailPage({ synergy, related }: SynergyDetailPag
     description: s.description,
     iconSrc: `/icons/synergies/${s.iconStem}.png`,
   }));
+  const unitsForSynergy: RelatedEntity[] = getAllUnits()
+    .filter((unit) => unit.synergies.includes(synergy.name))
+    .map((unit) => ({
+      slug: unit.slug,
+      name: unit.name,
+      description: `Cost ${unit.cost} • ${unit.synergies.join(", ")}`,
+      iconSrc: `/icons/units/${unit.iconStem}.png`,
+      variant: "unit",
+    }));
 
   return (
     <>
@@ -29,6 +39,8 @@ export default function SynergyDetailPage({ synergy, related }: SynergyDetailPag
         iconSrc={`/icons/synergies/${synergy.iconStem}.png`}
         overview={<>{synergy.description || description}</>}
         lore={synergy.lore || undefined}
+        extraRelatedTitle={`${synergy.name} Units`}
+        extraRelated={unitsForSynergy}
         relatedTitle="More Synergies"
         related={relatedEntities}
       />
