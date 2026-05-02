@@ -102,6 +102,9 @@ export function NavBar({ supabase }: NavBarProps) {
             <Link href="/talents" className={styles.navLink}>
               Talents
             </Link>
+            <Link href="/ranks" className={styles.navLink}>
+              Ranks
+            </Link>
             <Link href="/patch-notes" className={styles.navLink}>
               Patch Notes
             </Link>

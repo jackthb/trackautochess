@@ -41,7 +41,9 @@ export default function RelicsPage({ supabase }: RelicsPageProps) {
         title="Relics"
         variant="relic"
         data={ALL_RELICS}
-        sidebar={<BannerAd slot="sidebar" />}
+        sidebarLeft={<BannerAd slot="sidebar-left" />}
+        sidebarRight={<BannerAd slot="sidebar" />}
+        topAd={<BannerAd slot="in-content" />}
       />
     </>
   );

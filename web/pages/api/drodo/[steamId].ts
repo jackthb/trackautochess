@@ -422,6 +422,24 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     console.error("Failed to cache Drodo profile:", upsertError.message);
   }
 
+  // Piggyback: on intentional manual refresh, append a snapshot row.
+  // We store the raw Drodo response so we keep every field that comes
+  // back, not just the ones we render today. Skipped on passive page
+  // loads so the table doesn't fill with duplicate noise.
+  if (forceRefresh) {
+    const { error: snapshotError } = await supabase
+      .from("mmr_snapshots")
+      .insert({
+        steam_id: profile.steam_id,
+        mmr: profile.mmr,
+        season: profile.season,
+        raw: drodoData,
+      });
+    if (snapshotError) {
+      console.error("Failed to insert mmr_snapshot:", snapshotError.message);
+    }
+  }
+
   // Upsert season snapshots, preserving chicken_count for historical seasons.
   // Drodo only returns the current season's chicken_count so we must not overwrite
   // previously saved values for older seasons with null.

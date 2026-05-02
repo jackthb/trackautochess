@@ -29,7 +29,9 @@ export default function ClassesPage({ supabase }: ClassesPageProps) {
         title="Classes"
         variant="synergy"
         data={ALL_CLASSES}
-        sidebar={<BannerAd slot="sidebar" />}
+        sidebarLeft={<BannerAd slot="sidebar-left" />}
+        sidebarRight={<BannerAd slot="sidebar" />}
+        topAd={<BannerAd slot="in-content" />}
       />
     </>
   );

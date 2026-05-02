@@ -108,8 +108,22 @@ export default function PrivacyPage() {
             public Auto Chess endpoints to populate match history.
           </p>
 
+          <h2>Trademarks &amp; affiliation</h2>
+          <p>
+            Track Auto Chess is an independent fan project. It is not
+            affiliated with, endorsed by, or sponsored by Valve Corporation or
+            Drodo Studio. Dota, Dota 2, and Dota Auto Chess are trademarks of
+            their respective owners. Game icons, names, and statistical data
+            shown on this site are property of their respective owners and are
+            used for informational and analytical purposes only.
+          </p>
+
           <h2>Contact</h2>
-          <p>Questions about this policy? Please visit the support page.</p>
+          <p>
+            Questions about this policy, or requests relating to your data,
+            can be sent through the{" "}
+            <a href="/about#support">support form</a> on the about page.
+          </p>
         </div>
       </div>
     </>

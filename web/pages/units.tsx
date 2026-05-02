@@ -34,7 +34,9 @@ export default function UnitsPage({ supabase }: UnitsPageProps) {
         data={TIERED_UNITS}
         tierLabel={(tier) => COST_LABEL[tier]}
         tierColor={(tier) => COST_COLOR[tier]}
-        sidebar={<BannerAd slot="sidebar" />}
+        sidebarLeft={<BannerAd slot="sidebar-left" />}
+        sidebarRight={<BannerAd slot="sidebar" />}
+        topAd={<BannerAd slot="in-content" />}
       />
     </>
   );

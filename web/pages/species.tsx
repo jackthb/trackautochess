@@ -29,7 +29,9 @@ export default function SpeciesPage({ supabase }: SpeciesPageProps) {
         title="Species"
         variant="synergy"
         data={ALL_SPECIES}
-        sidebar={<BannerAd slot="sidebar" />}
+        sidebarLeft={<BannerAd slot="sidebar-left" />}
+        sidebarRight={<BannerAd slot="sidebar" />}
+        topAd={<BannerAd slot="in-content" />}
       />
     </>
   );

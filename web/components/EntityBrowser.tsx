@@ -23,8 +23,12 @@ interface EntityBrowserProps {
   tierLabel?: (tier: number) => string;
   /** Returns a CSS color expression for the tier. */
   tierColor?: (tier: number) => string;
+  /** Optional left-rail content (rendered desktop-only). */
+  sidebarLeft?: ReactNode;
   /** Optional right-rail content (rendered desktop-only). */
-  sidebar?: ReactNode;
+  sidebarRight?: ReactNode;
+  /** Optional in-content content rendered between the title block and the grid. */
+  topAd?: ReactNode;
 }
 const ENTITY_PATH: Record<EntityCardVariant, string> = {
   item: "items",
@@ -68,8 +72,11 @@ export function EntityBrowser({
   data,
   tierLabel,
   tierColor,
-  sidebar,
+  sidebarLeft,
+  sidebarRight,
+  topAd,
 }: EntityBrowserProps) {
+  const hasSidebar = Boolean(sidebarLeft || sidebarRight);
   const router = useRouter();
   const [query, setQuery] = useState("");
 
@@ -103,7 +110,10 @@ export function EntityBrowser({
 
   return (
     <div className={styles.page}>
-      <div className={sidebar ? styles.layoutWithSidebar : styles.layout}>
+      <div className={hasSidebar ? styles.layoutWithSidebar : styles.layout}>
+        {hasSidebar && (
+          <aside className={styles.sidebarLeft}>{sidebarLeft}</aside>
+        )}
         <div className={styles.container}>
           <h1 className={styles.pageTitle}>{title}</h1>
         <input
@@ -115,6 +125,8 @@ export function EntityBrowser({
         <div className={styles.total}>
           {total} {ENTITY_COUNT_LABEL[variant]}
         </div>
+
+        {topAd && <div className={styles.topAd}>{topAd}</div>}
 
         {filteredTiered &&
           filteredTiered
@@ -171,7 +183,9 @@ export function EntityBrowser({
           </section>
         )}
         </div>
-        {sidebar && <aside className={styles.sidebar}>{sidebar}</aside>}
+        {hasSidebar && (
+          <aside className={styles.sidebarRight}>{sidebarRight}</aside>
+        )}
       </div>
     </div>
   );

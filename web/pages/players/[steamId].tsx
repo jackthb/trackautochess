@@ -15,6 +15,7 @@ import { buildStatItems } from "@dac/shared/buildStatItems";
 import { Button } from "@dac/shared/Button";
 import { StatsGrid } from "@dac/shared/StatsGrid";
 import { SeasonHistoryGrid, type SeasonSnapshot } from "@dac/shared/SeasonHistoryGrid";
+import { MmrSparkline, type MmrSnapshot } from "@/components/MmrSparkline";
 import {
   getManualRefreshQuota,
   type ManualRefreshQuota,
@@ -81,6 +82,7 @@ interface PlayerPageProps {
     chicken_count: number | null;
   } | null;
   seasons: SeasonSnapshot[];
+  mmrHistory: MmrSnapshot[];
   drodoProfileMissing: boolean;
   drodoLastFetchedAt: string | null;
   manualRefreshQuota: ManualRefreshQuota;
@@ -125,6 +127,7 @@ export default function PlayerPage({
   games,
   drodo: initialDrodo,
   seasons: initialSeasons,
+  mmrHistory,
   drodoProfileMissing: initialDrodoProfileMissing,
   drodoLastFetchedAt: initialDrodoLastFetchedAt,
   manualRefreshQuota: initialManualRefreshQuota,
@@ -516,6 +519,8 @@ export default function PlayerPage({
             </>
           )}
 
+          <MmrSparkline snapshots={mmrHistory} />
+
           <SeasonHistoryGrid seasons={seasons} />
 
           {games.length > 0 && (
@@ -593,8 +598,9 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   let drodoProfileMissing = false;
   let drodoLastFetchedAt = null;
   let seasons: SeasonSnapshot[] = [];
+  let mmrHistory: MmrSnapshot[] = [];
   if (supabase) {
-    const [profileResult, seasonsResult] = await Promise.all([
+    const [profileResult, seasonsResult, snapshotsResult] = await Promise.all([
       supabase
         .from("users")
         .select(USER_DRODO_SELECT)
@@ -605,7 +611,18 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         .select("season, mmr, max_mmr, games_played, chicken_count")
         .eq("steam_id", steamId)
         .order("season", { ascending: true }),
+      supabase
+        .from("mmr_snapshots")
+        .select("mmr, snapshotted_at")
+        .eq("steam_id", steamId)
+        .not("mmr", "is", null)
+        .order("snapshotted_at", { ascending: false })
+        .limit(60),
     ]);
+    mmrHistory = (snapshotsResult.data ?? []).map((row) => ({
+      mmr: row.mmr as number | null,
+      snapshotted_at: row.snapshotted_at as string,
+    }));
     if (profileResult.data) {
       drodoProfileMissing = Boolean(profileResult.data.drodo_profile_missing);
       drodoLastFetchedAt = profileResult.data.drodo_last_fetched_at;
@@ -678,6 +695,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       games: (gamesResult.data as PlayerGame[]) || [],
       drodo,
       seasons,
+      mmrHistory,
       drodoProfileMissing,
       drodoLastFetchedAt,
       manualRefreshQuota,

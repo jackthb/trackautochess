@@ -60,7 +60,9 @@ export default function ItemsPage({ supabase }: ItemsPageProps) {
         data={TIERED_ITEMS}
         tierLabel={(tier) => TIER_LABEL[tier]}
         tierColor={(tier) => TIER_COLOR[tier]}
-        sidebar={<BannerAd slot="sidebar" />}
+        sidebarLeft={<BannerAd slot="sidebar-left" />}
+        sidebarRight={<BannerAd slot="sidebar" />}
+        topAd={<BannerAd slot="in-content" />}
       />
     </>
   );
