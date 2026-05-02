@@ -5,6 +5,8 @@ import type {
   UnitFullInfo,
   SynergyInfo,
   RelicInfo,
+  ItemInfo,
+  TalentInfo,
 } from "../types";
 
 interface GamesState {
@@ -15,6 +17,8 @@ interface GamesState {
   unitsFull: Record<string, UnitFullInfo>;
   synergiesData: Record<string, SynergyInfo>;
   relicsData: Record<string, RelicInfo>;
+  itemsData: Record<string, ItemInfo>;
+  talentsData: Record<string, TalentInfo>;
   lastRefresh: Date | null;
   refresh: () => Promise<void>;
   updateGame: (gameId: number, fields: Partial<Game>) => Promise<boolean>;
@@ -32,6 +36,8 @@ export function useGames(): GamesState {
     Record<string, SynergyInfo>
   >({});
   const [relicsData, setRelicsData] = useState<Record<string, RelicInfo>>({});
+  const [itemsData, setItemsData] = useState<Record<string, ItemInfo>>({});
+  const [talentsData, setTalentsData] = useState<Record<string, TalentInfo>>({});
   const [lastRefresh, setLastRefresh] = useState<Date | null>(null);
 
   const refresh = useCallback(async () => {
@@ -43,11 +49,13 @@ export function useGames(): GamesState {
     // Load reference data if needed
     if (Object.keys(unitCosts).length === 0) {
       try {
-        const [unitsRes, fullRes, synRes, relRes] = await Promise.all([
+        const [unitsRes, fullRes, synRes, relRes, itemsRes, talentsRes] = await Promise.all([
           window.appApi.fetchUnitsData(),
           window.appApi.fetchUnitsFull(),
           window.appApi.fetchSynergies(),
           window.appApi.fetchRelics(),
+          window.appApi.fetchItems(),
+          window.appApi.fetchTalents(),
         ]);
         if (unitsRes?.units) {
           const costs: Record<string, number> = {};
@@ -75,6 +83,8 @@ export function useGames(): GamesState {
         }
         if (synRes) setSynergiesData(synRes);
         if (relRes?.relics) setRelicsData(relRes.relics);
+        if (itemsRes?.items) setItemsData(itemsRes.items);
+        if (talentsRes) setTalentsData(talentsRes);
       } catch (e) {
         console.error("Failed to load reference data:", e);
       }
@@ -127,6 +137,8 @@ export function useGames(): GamesState {
     unitsFull,
     synergiesData,
     relicsData,
+    itemsData,
+    talentsData,
     lastRefresh,
     refresh,
     updateGame,

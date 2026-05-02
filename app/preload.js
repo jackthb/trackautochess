@@ -63,6 +63,8 @@ contextBridge.exposeInMainWorld("appApi", {
   fetchUnitsFull: () => ipcRenderer.invoke("data:units_full"),
   fetchSynergies: () => ipcRenderer.invoke("data:synergies"),
   fetchRelics: () => ipcRenderer.invoke("data:relics"),
+  fetchItems: () => ipcRenderer.invoke("data:items"),
+  fetchTalents: () => ipcRenderer.invoke("data:talents"),
   fetchDrodo: () => ipcRenderer.invoke("drodo:fetch"),
   refreshDrodo: () => ipcRenderer.invoke("drodo:refresh"),
 });

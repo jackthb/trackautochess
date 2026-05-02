@@ -251,6 +251,24 @@ export interface RelicInfo {
   [key: string]: unknown;
 }
 
+export interface ItemInfo {
+  tier: number;
+  icon?: string;
+  description?: string;
+  [key: string]: unknown;
+}
+
+export interface ItemsData {
+  items: Record<string, ItemInfo>;
+  total?: number;
+}
+
+export interface TalentInfo {
+  title: string;
+  description?: string;
+  [key: string]: unknown;
+}
+
 export interface SeasonSnapshot {
   season: string;
   mmr: number | null;
@@ -309,6 +327,8 @@ declare global {
       fetchUnitsFull: () => Promise<Record<string, UnitFullInfo>>;
       fetchSynergies: () => Promise<Record<string, SynergyInfo>>;
       fetchRelics: () => Promise<{ relics: Record<string, RelicInfo> }>;
+      fetchItems: () => Promise<ItemsData>;
+      fetchTalents: () => Promise<Record<string, TalentInfo>>;
       fetchDrodo: () => Promise<DrodoProfile | null>;
       refreshDrodo: () => Promise<DrodoProfile | null>;
     };

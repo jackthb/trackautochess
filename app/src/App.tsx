@@ -9,6 +9,7 @@ import { LabTab } from "./components/LabTab";
 import { SettingsTab } from "./components/SettingsTab";
 import { LogTab } from "./components/LogTab";
 import { LoginScreen } from "./components/LoginScreen";
+import { GlobalSearch } from "./components/GlobalSearch";
 import { useTrackerEvents } from "./hooks/useTrackerEvents";
 import { useGames } from "./hooks/useGames";
 import { useDrodo } from "./hooks/useDrodo";
@@ -20,6 +21,7 @@ type TabId = "history" | "replays" | "confirm" | "lab" | "settings" | "log";
 export default function App() {
   const [activeTab, setActiveTab] = useState<TabId>("history");
   const [focusGameId, setFocusGameId] = useState<number | null>(null);
+  const [searchOpen, setSearchOpen] = useState(false);
 
   const gamesState = useGames();
   const drodoState = useDrodo();
@@ -42,6 +44,21 @@ export default function App() {
     }
     prevHasResult.current = hasParseResult || hasProcessingScreenshot;
   }, [hasParseResult, hasProcessingScreenshot]);
+
+  useEffect(() => {
+    if (showLoginScreen) {
+      setSearchOpen(false);
+      return;
+    }
+    function onKey(e: KeyboardEvent) {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
+        e.preventDefault();
+        setSearchOpen((o) => !o);
+      }
+    }
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [showLoginScreen]);
 
   const handleTabChange = useCallback((tab: string) => {
     setActiveTab(tab as TabId);
@@ -114,6 +131,16 @@ export default function App() {
             {activeTab === "log" && <LogTab entries={tracker.logEntries} />}
           </div>
           <StatusBar status={tracker.status} />
+          <GlobalSearch
+            open={searchOpen}
+            onClose={() => setSearchOpen(false)}
+            unitsFull={gamesState.unitsFull}
+            unitCosts={gamesState.unitCosts}
+            synergiesData={gamesState.synergiesData}
+            relicsData={gamesState.relicsData}
+            itemsData={gamesState.itemsData}
+            talentsData={gamesState.talentsData}
+          />
         </>
       )}
     </>

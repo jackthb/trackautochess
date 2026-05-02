@@ -1032,6 +1032,30 @@ ipcMain.handle("data:units_full", async () => {
   }
 });
 
+// ── Items data IPC ───────────────────────────────────────────────────────────
+
+ipcMain.handle("data:items", async () => {
+  const itemsPath = path.join(RESOURCES_DIR, "data", "items.json");
+  if (!fs.existsSync(itemsPath)) return {};
+  try {
+    return JSON.parse(fs.readFileSync(itemsPath, "utf-8"));
+  } catch {
+    return {};
+  }
+});
+
+// ── Talents data IPC ─────────────────────────────────────────────────────────
+
+ipcMain.handle("data:talents", async () => {
+  const talentsPath = path.join(RESOURCES_DIR, "data", "talents.json");
+  if (!fs.existsSync(talentsPath)) return {};
+  try {
+    return JSON.parse(fs.readFileSync(talentsPath, "utf-8"));
+  } catch {
+    return {};
+  }
+});
+
 // ── Replay protocol ──────────────────────────────────────────────────────────
 
 protocol.registerSchemesAsPrivileged([

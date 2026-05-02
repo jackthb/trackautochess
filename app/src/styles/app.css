@@ -1934,3 +1934,126 @@ select.edit-field:focus {
   white-space: pre-wrap;
   color: #cbd5e1;
 }
+
+/* ── Global search (Cmd+K / Ctrl+K) ───────────────────────────────────────── */
+
+.gsearch-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  z-index: 9999;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding-top: 12vh;
+  animation: fadeUp 0.15s ease-out both;
+}
+
+.gsearch-panel {
+  width: min(640px, 92vw);
+  max-height: 70vh;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--r-8);
+  box-shadow: var(--shadow-lightbox);
+  overflow: hidden;
+}
+
+.gsearch-input-row {
+  display: flex;
+  align-items: center;
+  gap: var(--s-8);
+  padding: var(--s-12) var(--s-14);
+  border-bottom: 1px solid var(--border);
+}
+
+.gsearch-input {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  font-size: var(--fs-14);
+}
+
+.gsearch-input::placeholder {
+  color: var(--text-muted);
+}
+
+.gsearch-hint {
+  font-size: var(--fs-11);
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+  border-radius: var(--r-3);
+  padding: 1px var(--s-6);
+  letter-spacing: var(--tr-ui);
+  text-transform: uppercase;
+}
+
+.gsearch-results {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--s-6) 0;
+}
+
+.gsearch-empty {
+  padding: var(--s-16) var(--s-14);
+  color: var(--text-muted);
+  font-size: var(--fs-13);
+  text-align: center;
+}
+
+.gsearch-group {
+  padding: var(--s-4) 0;
+}
+
+.gsearch-group-header {
+  padding: var(--s-6) var(--s-14) var(--s-3);
+  font-size: var(--fs-11);
+  letter-spacing: var(--tr-upper);
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.gsearch-result {
+  display: flex;
+  align-items: center;
+  gap: var(--s-10);
+  width: 100%;
+  padding: var(--s-8) var(--s-14);
+  border: none;
+  background: transparent;
+  color: var(--text-primary);
+  font-family: var(--font-mono);
+  font-size: var(--fs-13);
+  text-align: left;
+  cursor: pointer;
+}
+
+.gsearch-result.is-active {
+  background: var(--bg-hover);
+}
+
+.gsearch-result-icon {
+  width: 22px;
+  height: 22px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.gsearch-result-name {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.gsearch-result-kind {
+  font-size: var(--fs-11);
+  color: var(--text-muted);
+  letter-spacing: var(--tr-ui);
+  text-transform: uppercase;
+}
