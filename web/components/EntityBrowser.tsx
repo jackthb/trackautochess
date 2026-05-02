@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { useRouter } from "next/router";
 import { EntityCard, type EntityCardVariant } from "@/components/EntityCard";
 import styles from "./EntityBrowser.module.css";
@@ -23,6 +23,8 @@ interface EntityBrowserProps {
   tierLabel?: (tier: number) => string;
   /** Returns a CSS color expression for the tier. */
   tierColor?: (tier: number) => string;
+  /** Optional right-rail content (rendered desktop-only). */
+  sidebar?: ReactNode;
 }
 const ENTITY_PATH: Record<EntityCardVariant, string> = {
   item: "items",
@@ -66,6 +68,7 @@ export function EntityBrowser({
   data,
   tierLabel,
   tierColor,
+  sidebar,
 }: EntityBrowserProps) {
   const router = useRouter();
   const [query, setQuery] = useState("");
@@ -100,8 +103,9 @@ export function EntityBrowser({
 
   return (
     <div className={styles.page}>
-      <div className={styles.container}>
-        <h1 className={styles.pageTitle}>{title}</h1>
+      <div className={sidebar ? styles.layoutWithSidebar : styles.layout}>
+        <div className={styles.container}>
+          <h1 className={styles.pageTitle}>{title}</h1>
         <input
           className={styles.search}
           placeholder={placeholder}
@@ -166,6 +170,8 @@ export function EntityBrowser({
             )}
           </section>
         )}
+        </div>
+        {sidebar && <aside className={styles.sidebar}>{sidebar}</aside>}
       </div>
     </div>
   );

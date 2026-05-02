@@ -1,4 +1,5 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { BannerAd } from "@/components/BannerAd";
 import { EntityBrowser, type BrowsableEntity } from "@/components/EntityBrowser";
 import { SeoHead } from "@/lib/seo";
 import {
@@ -59,6 +60,7 @@ export default function ItemsPage({ supabase }: ItemsPageProps) {
         data={TIERED_ITEMS}
         tierLabel={(tier) => TIER_LABEL[tier]}
         tierColor={(tier) => TIER_COLOR[tier]}
+        sidebar={<BannerAd slot="sidebar" />}
       />
     </>
   );

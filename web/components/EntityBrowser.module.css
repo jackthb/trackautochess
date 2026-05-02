@@ -4,10 +4,37 @@
   min-height: calc(100vh - var(--nav-height));
 }
 
-.container {
+.layout {
   max-width: 1200px;
   margin: 0 auto;
+}
+
+.layoutWithSidebar {
+  max-width: 1400px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 184px;
+  gap: var(--s-24);
+  align-items: start;
+}
+
+.container {
+  min-width: 0;
   padding: var(--s-40) var(--s-32) var(--s-48);
+}
+
+.sidebar {
+  padding: var(--s-40) var(--s-32) var(--s-48) 0;
+}
+
+@media (max-width: 1023px) {
+  .layoutWithSidebar {
+    display: block;
+    max-width: 1200px;
+  }
+  .sidebar {
+    display: none;
+  }
 }
 
 .pageTitle {

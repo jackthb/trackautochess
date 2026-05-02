@@ -62,6 +62,9 @@ export function Footer() {
             <Link href="/about#support" className="link">
               Support
             </Link>
+            <Link href="/privacy" className="link">
+              Privacy
+            </Link>
           </nav>
         </div>
       </footer>

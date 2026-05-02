@@ -1,4 +1,5 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { BannerAd } from "@/components/BannerAd";
 import { EntityBrowser, type BrowsableEntity } from "@/components/EntityBrowser";
 import { SeoHead } from "@/lib/seo";
 import { getAllRelics } from "@/lib/relics";
@@ -36,7 +37,12 @@ export default function RelicsPage({ supabase }: RelicsPageProps) {
         path="/relics"
         structuredData={structuredData}
       />
-      <EntityBrowser title="Relics" variant="relic" data={ALL_RELICS} />
+      <EntityBrowser
+        title="Relics"
+        variant="relic"
+        data={ALL_RELICS}
+        sidebar={<BannerAd slot="sidebar" />}
+      />
     </>
   );
 }

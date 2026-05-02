@@ -1,4 +1,5 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { BannerAd } from "@/components/BannerAd";
 import { EntityBrowser, type BrowsableEntity } from "@/components/EntityBrowser";
 import { SeoHead } from "@/lib/seo";
 import { SITE_TITLE } from "@/lib/site";
@@ -24,7 +25,12 @@ export default function SpeciesPage({ supabase }: SpeciesPageProps) {
   return (
     <>
       <SeoHead title={title} description={description} path="/species" />
-      <EntityBrowser title="Species" variant="synergy" data={ALL_SPECIES} />
+      <EntityBrowser
+        title="Species"
+        variant="synergy"
+        data={ALL_SPECIES}
+        sidebar={<BannerAd slot="sidebar" />}
+      />
     </>
   );
 }
