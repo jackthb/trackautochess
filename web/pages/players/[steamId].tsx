@@ -16,6 +16,7 @@ import { Button } from "@dac/shared/Button";
 import { StatsGrid } from "@dac/shared/StatsGrid";
 import { SeasonHistoryGrid, type SeasonSnapshot } from "@dac/shared/SeasonHistoryGrid";
 import { MmrSparkline, type MmrSnapshot } from "@/components/MmrSparkline";
+import { RankLadder } from "@/components/RankLadder";
 import {
   getManualRefreshQuota,
   type ManualRefreshQuota,
@@ -273,6 +274,18 @@ export default function PlayerPage({
           max-width: 1200px;
           margin: 0 auto;
           padding: 32px 32px 72px;
+          position: relative;
+        }
+        .rank-ladder {
+          position: absolute;
+          top: 32px;
+          left: -176px;
+          width: 156px;
+        }
+        @media (max-width: 1552px) {
+          .rank-ladder {
+            display: none;
+          }
         }
         .player-header {
           display: flex;
@@ -432,6 +445,11 @@ export default function PlayerPage({
 
       <div className="page">
         <div className="dashboard">
+          {drodo?.mmr != null && (
+            <div className="rank-ladder">
+              <RankLadder mmr={drodo.mmr} />
+            </div>
+          )}
           <div className="player-header">
             <div className="player-identity">
               {steamProfile.avatarUrl && !avatarFailed ? (
