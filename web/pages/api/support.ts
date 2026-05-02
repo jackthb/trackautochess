@@ -60,7 +60,7 @@ export default async function handler(
     return res.status(400).json({ ok: false, error: "Message must be at least 20 characters" });
   }
 
-  const webhookUrl = process.env.DISCORD_SUPPORT_WEBHOOK_URL;
+  const webhookUrl = process.env.DISCORD_WEBHOOK_URL;
   if (!webhookUrl) {
     return res.status(503).json({
       ok: false,
