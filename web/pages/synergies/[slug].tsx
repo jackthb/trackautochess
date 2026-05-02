@@ -14,7 +14,7 @@ interface SynergyDetailPageProps {
 
 export default function SynergyDetailPage({ synergy, related }: SynergyDetailPageProps) {
   const description = `See what ${synergy.name} does in Dota Auto Chess.`;
-  const relatedEntities: RelatedEntity[] = related.map((s) => ({
+  const moreSynergies: RelatedEntity[] = related.map((s) => ({
     slug: s.slug,
     name: s.name,
     description: s.description,
@@ -30,6 +30,9 @@ export default function SynergyDetailPage({ synergy, related }: SynergyDetailPag
       variant: "unit",
     }));
 
+  const indexLabel = synergy.category === "species" ? "Species" : "Classes";
+  const indexPath = synergy.category === "species" ? "/species" : "/classes";
+
   return (
     <>
       <SeoHead title={`${synergy.name} Synergy Guide | ${SITE_TITLE}`} description={description} path={`/synergies/${synergy.slug}`} />
@@ -39,10 +42,12 @@ export default function SynergyDetailPage({ synergy, related }: SynergyDetailPag
         iconSrc={`/icons/synergies/${synergy.iconStem}.png`}
         overview={<>{synergy.description || description}</>}
         lore={synergy.lore || undefined}
-        extraRelatedTitle={`${synergy.name} Units`}
-        extraRelated={unitsForSynergy}
-        relatedTitle="More Synergies"
-        related={relatedEntities}
+        indexLabel={indexLabel}
+        indexPath={indexPath}
+        relatedTitle={`${synergy.name} Units`}
+        related={unitsForSynergy}
+        extraRelatedTitle="More Synergies"
+        extraRelated={moreSynergies}
       />
     </>
   );
@@ -60,7 +65,7 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
   if (!synergy) return { notFound: true };
 
   const related = getAllSynergies()
-    .filter((candidate) => candidate.slug !== synergy.slug)
+    .filter((candidate) => candidate.slug !== synergy.slug && candidate.category === synergy.category)
     .slice(0, 8);
 
   return { props: { synergy, related } };

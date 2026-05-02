@@ -38,6 +38,10 @@ interface EntityDetailProps {
   relatedLevel?: (item: RelatedEntity) => string | number | undefined;
   extraRelatedTitle?: string;
   extraRelated?: RelatedEntity[];
+  /** Override the breadcrumb label for the index page. Defaults by variant. */
+  indexLabel?: string;
+  /** Override the breadcrumb path for the index page. Defaults by variant. */
+  indexPath?: string;
 }
 
 const INDEX_LABEL: Record<EntityCardVariant, string> = {
@@ -76,6 +80,8 @@ export function EntityDetail({
   relatedLevel,
   extraRelatedTitle,
   extraRelated,
+  indexLabel,
+  indexPath,
 }: EntityDetailProps) {
   const titleClass = `${styles.title} ${
     variant === "relic"
@@ -84,7 +90,8 @@ export function EntityDetail({
         ? styles.titleSynergy
         : styles.titleItem
   }`;
-  const indexPath = ENTITY_COLLECTION_PATH[variant];
+  const resolvedIndexPath = indexPath ?? ENTITY_COLLECTION_PATH[variant];
+  const resolvedIndexLabel = indexLabel ?? INDEX_LABEL[variant];
 
   return (
     <div className={styles.page}>
@@ -92,7 +99,7 @@ export function EntityDetail({
         <nav className={styles.breadcrumbs} aria-label="Breadcrumb">
           <Link href="/">Home</Link>
           <span>/</span>
-          <Link href={indexPath}>{INDEX_LABEL[variant]}</Link>
+          <Link href={resolvedIndexPath}>{resolvedIndexLabel}</Link>
           <span>/</span>
           <span>{name}</span>
         </nav>
