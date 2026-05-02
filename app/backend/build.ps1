@@ -20,7 +20,6 @@ $RequiredPaths = [ordered]@{
     "units.json"        = Join-Path $RepoDir "data\units.json"
     "items.json"        = Join-Path $RepoDir "data\items.json"
     "relics.json"       = Join-Path $RepoDir "data\relics.json"
-    "prompts directory" = Join-Path $BackendDir "prompts"
     "spec file"         = $SpecFile
     "app directory"     = $AppDir
     "package.json"      = Join-Path $AppDir "package.json"
