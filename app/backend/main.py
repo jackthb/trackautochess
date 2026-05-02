@@ -2,7 +2,6 @@
 
 Usage:
     python main.py import-matches-cv <screenshot> [--debug]
-    python main.py parse-cv <screenshot> [--debug]
 """
 
 import sys
@@ -124,40 +123,9 @@ def cmd_import_matches_cv(args: list[str]) -> None:
     print()
 
 
-def cmd_parse_cv(args: list[str]) -> None:
-    """Handle: python main.py parse-cv <screenshot> [--debug]
-
-    Parse a single screenshot with CV and print results (does not write CSV).
-    """
-    import parser as game_parser
-
-    if not args:
-        print("Usage: python main.py parse-cv <screenshot.jpg> [--debug]")
-        sys.exit(1)
-
-    screenshot_path = Path(args[0])
-    debug = "--debug" in args
-
-    if not screenshot_path.exists():
-        print(f"[tracker] ERROR: File not found: {screenshot_path}")
-        sys.exit(1)
-
-    config = load_config()
-    player_name = config.get("player_name", "jack")
-    date_str = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-
-    from cv_parser import parse_screenshot_cv as cv_parse
-    result = cv_parse(screenshot_path, player_name, ICONS_DIR, debug=debug)
-    if result is None:
-        print("[tracker] CV parse failed.")
-        sys.exit(1)
-
-
 def main() -> None:
     if len(sys.argv) > 1 and sys.argv[1] == "import-matches-cv":
         cmd_import_matches_cv(sys.argv[2:])
-    elif len(sys.argv) > 1 and sys.argv[1] == "parse-cv":
-        cmd_parse_cv(sys.argv[2:])
     else:
         print(__doc__.strip())
         sys.exit(1)

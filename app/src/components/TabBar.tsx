@@ -8,6 +8,7 @@ const TABS = [
   { id: "history", label: "History" },
   { id: "replays", label: "Replays" },
   { id: "confirm", label: "Screenshots" },
+  { id: "lab", label: "Lab" },
   { id: "settings", label: "Settings" },
   { id: "log", label: "Log" },
 ];

@@ -1,12 +1,10 @@
 import { useState, useEffect, useCallback } from "react";
 import { ScreenshotHistory, ParsedRowEdit } from "./ScreenshotHistory";
 import { ZoomableImageModal } from "./ZoomableImageModal";
-import { ScreenshotDebugModal } from "./ScreenshotDebugModal";
 import type {
   ParseResult,
   ParseResultRow,
   ProcessingScreenshot,
-  ScreenshotDebugResult,
   UnitFullInfo,
   SynergyInfo,
   RelicInfo,
@@ -25,7 +23,6 @@ interface ConfirmationTabProps {
   relicsData: Record<string, RelicInfo>;
   importing: boolean;
   onBeginImport: () => void;
-  debugEnabled: boolean;
 }
 
 export function ConfirmationTab({
@@ -40,14 +37,11 @@ export function ConfirmationTab({
   relicsData,
   importing,
   onBeginImport,
-  debugEnabled,
 }: ConfirmationTabProps) {
   const [checked, setChecked] = useState<boolean[]>([]);
   const [editedRows, setEditedRows] = useState<ParseResultRow[]>([]);
   const [confirming, setConfirming] = useState(false);
   const [zoomSrc, setZoomSrc] = useState<string | null>(null);
-  const [debugLoading, setDebugLoading] = useState(false);
-  const [debugData, setDebugData] = useState<ScreenshotDebugResult | null>(null);
 
   useEffect(() => {
     if (parseResult) {
@@ -56,51 +50,15 @@ export function ConfirmationTab({
     }
   }, [parseResult]);
 
-  // Reset the local confirming flag once the parse result is cleared
-  // (which happens on import_result) so a fresh confirmation is enabled.
   useEffect(() => {
     if (!parseResult) setConfirming(false);
   }, [parseResult]);
-
-  const [fixtureSaved, setFixtureSaved] = useState<string | null>(null);
 
   const handleImportFile = useCallback((filePath: string) => {
     if (importing) return;
     onBeginImport();
     window.tracker.sendCommand({ cmd: "import_file", path: filePath });
   }, [importing, onBeginImport]);
-
-  const handleLoadTestFile = useCallback(async () => {
-    await window.screenshots.parseTestFile();
-  }, []);
-
-  const handleSaveFixture = useCallback(async () => {
-    if (!parseResult) return;
-    const screenshotPath = parseResult.screenshot_path || parseResult.screenshot_name || "unknown";
-    const stem = screenshotPath.replace(/\\/g, "/").split("/").pop()?.replace(/\.[^.]+$/, "") ?? "fixture";
-    const data = {
-      screenshot_path: screenshotPath,
-      screen_type: parseResult.screen_type,
-      rows: editedRows.map(({ is_duplicate: _dup, ...r }) => r),
-    };
-    const savedPath = await window.screenshots.saveFixture(stem, data);
-    setFixtureSaved(savedPath);
-    setTimeout(() => setFixtureSaved(null), 3000);
-  }, [parseResult, editedRows]);
-
-  const runDebug = useCallback(async () => {
-    const screenshotName = parseResult?.screenshot_name || processingScreenshot?.screenshot_name;
-    const screenType = parseResult?.screen_type || processingScreenshot?.screen_type || null;
-    if (!screenshotName) return;
-    setDebugLoading(true);
-    setDebugData(null);
-    try {
-      const data = await window.screenshots.debug(screenshotName, screenType);
-      setDebugData(data);
-    } finally {
-      setDebugLoading(false);
-    }
-  }, [parseResult, processingScreenshot]);
 
   if (!parseResult) {
     return (
@@ -120,20 +78,10 @@ export function ConfirmationTab({
                 <div className="confirm-preview-info">
                   <h2>{processingScreenshot.message || "Loading screenshot and processing..."}</h2>
                   <p>The screenshot has been captured and we’re parsing it now.</p>
-                  {debugEnabled && processingScreenshot.screenshot_name && (
-                    <button className="btn-confirm btn-confirm-primary" onClick={runDebug} disabled={debugLoading}>
-                      {debugLoading ? "Running Debug" : "Run Deep Debug"}
-                    </button>
-                  )}
                 </div>
               </div>
             </div>
           )}
-          <div style={{ padding: "8px 0" }}>
-            <button className="btn-confirm btn-confirm-primary" onClick={handleLoadTestFile}>
-              Load & Parse File
-            </button>
-          </div>
           <ScreenshotHistory
             onImportFile={handleImportFile}
             lastImportResult={lastImportResult}
@@ -143,20 +91,8 @@ export function ConfirmationTab({
             synergiesData={synergiesData}
             relicsData={relicsData}
             importing={importing}
-            debugEnabled={debugEnabled}
           />
           {zoomSrc && <ZoomableImageModal src={zoomSrc} alt="Processing screenshot" onClose={() => setZoomSrc(null)} />}
-          {(debugLoading || debugData) && (
-            <ScreenshotDebugModal
-              title="Deep Debug"
-              debugData={debugData}
-              loading={debugLoading}
-              onClose={() => {
-                setDebugLoading(false);
-                setDebugData(null);
-              }}
-            />
-          )}
         </div>
       </div>
     );
@@ -260,11 +196,6 @@ export function ConfirmationTab({
               />
               Select all
             </label>
-            {debugEnabled && parseResult.screenshot_name && (
-              <button className="btn-confirm btn-confirm-primary" onClick={runDebug} disabled={debugLoading}>
-                {debugLoading ? "Running Debug" : "Run Deep Debug"}
-              </button>
-            )}
           </div>
         </div>
 
@@ -286,9 +217,6 @@ export function ConfirmationTab({
         </div>
 
         <div className="confirm-actions">
-          <button className="btn-confirm btn-confirm-cancel" onClick={handleSaveFixture}>
-            {fixtureSaved ? "Saved!" : "Save Fixture"}
-          </button>
           <button
             className="btn-confirm btn-confirm-cancel"
             onClick={handleCancel}
@@ -314,20 +242,8 @@ export function ConfirmationTab({
             synergiesData={synergiesData}
             relicsData={relicsData}
             importing={importing}
-            debugEnabled={debugEnabled}
           />
         {zoomSrc && <ZoomableImageModal src={zoomSrc} alt="Screenshot preview" onClose={() => setZoomSrc(null)} />}
-        {(debugLoading || debugData) && (
-          <ScreenshotDebugModal
-            title="Deep Debug"
-            debugData={debugData}
-            loading={debugLoading}
-            onClose={() => {
-              setDebugLoading(false);
-              setDebugData(null);
-            }}
-          />
-        )}
       </div>
     </div>
   );

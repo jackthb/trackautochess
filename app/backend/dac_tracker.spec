@@ -33,7 +33,6 @@ _REQUIRED_PATHS = [
     (os.path.join(DATA_DIR, "units.json"),                     "data/units.json"),
     (os.path.join(DATA_DIR, "items.json"),                     "data/items.json"),
     (os.path.join(DATA_DIR, "relics.json"),                    "data/relics.json"),
-    (os.path.join(BACKEND_DIR, "prompts"),                     "tracker/prompts directory"),
 ]
 
 _missing = [label for path, label in _REQUIRED_PATHS if not os.path.exists(path)]
@@ -55,7 +54,6 @@ datas = [
     (os.path.join(DATA_DIR, "items.json"),                     "data"),
     (os.path.join(DATA_DIR, "relics.json"),                    "data"),
     (os.path.join(DATA_DIR, "synergies.json"),                 "data"),
-    (os.path.join(BACKEND_DIR, "prompts"),                     "prompts"),
 ]
 
 # Tesseract is optional — present in CI (downloaded before build) and in full local setups.
@@ -91,7 +89,6 @@ a = Analysis(
         "capture",
         "cv_parser",
         "db",
-        "image_utils",
         "models",
         "replay",
         "sentinel",

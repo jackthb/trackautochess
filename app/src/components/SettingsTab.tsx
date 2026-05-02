@@ -6,15 +6,11 @@ interface SettingsTabProps {
   replayStats: ReplayStats;
 }
 
-const CALIBRATION_OWNER_STEAM_ID = "76561198022169086";
-
 export function SettingsTab({ status, replayStats }: SettingsTabProps) {
   const [version, setVersion] = useState("\u2014");
   const [closeToTray, setCloseToTray] = useState(true);
   const [importing, setImporting] = useState(false);
   const [loggingIn, setLoggingIn] = useState(false);
-  const [openingCalibration, setOpeningCalibration] = useState(false);
-  const [calibrationError, setCalibrationError] = useState<string | null>(null);
 
   useEffect(() => {
     window.appApi.getVersion().then(setVersion);
@@ -31,7 +27,6 @@ export function SettingsTab({ status, replayStats }: SettingsTabProps) {
   const steamId = status?.steam_id || "\u2014";
   const replayEnabled = status?.replay_enabled ?? true;
   const backendStatus = status ? "Connected" : "Disconnected";
-  const canAccessCalibration = status?.steam_id === CALIBRATION_OWNER_STEAM_ID;
   const storageUsed =
     replayStats.count > 0
       ? `${(replayStats.totalBytes / 1024 ** 3).toFixed(1)} GB (${replayStats.count} replays)`
@@ -39,21 +34,6 @@ export function SettingsTab({ status, replayStats }: SettingsTabProps) {
 
   const sendCommand = (cmd: Record<string, unknown>) => {
     window.tracker.sendCommand(cmd);
-  };
-
-  const handleOpenCalibration = async () => {
-    setOpeningCalibration(true);
-    setCalibrationError(null);
-    try {
-      const result = await window.appApi.openCalibration();
-      if (!result.ok) {
-        setCalibrationError(result.error || "Calibration tool could not be opened.");
-      }
-    } catch {
-      setCalibrationError("Calibration tool could not be opened.");
-    } finally {
-      setOpeningCalibration(false);
-    }
   };
 
   return (
@@ -157,30 +137,6 @@ export function SettingsTab({ status, replayStats }: SettingsTabProps) {
             <span className="settings-value dim">F6</span>
           </div>
         </div>
-
-        {canAccessCalibration && (
-          <div className="settings-section">
-            <div className="settings-section-title">Tools</div>
-            <div className="settings-row">
-              <span className="settings-label">Region calibration</span>
-              <button
-                className={`btn-ghost${openingCalibration ? " btn-loading" : ""}`}
-                disabled={openingCalibration}
-                onClick={handleOpenCalibration}
-              >
-                {openingCalibration ? "Opening" : "Open"}
-              </button>
-            </div>
-            {calibrationError && (
-              <div className="settings-row">
-                <span className="settings-label">Status</span>
-                <span className="settings-value" style={{ color: "var(--red-bright)" }}>
-                  {calibrationError}
-                </span>
-              </div>
-            )}
-          </div>
-        )}
 
         <div className="settings-section">
           <div className="settings-section-title">About</div>

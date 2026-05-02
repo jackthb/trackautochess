@@ -1,277 +1,98 @@
 {
-  "21:9": {
-    "reference_resolution": "3440x1440",
-    "game_over": {
-      "final_rank_region": [
-        0,
-        0.24,
-        0.14,
-        0.32
-      ],
-      "eliminated_region": [
-        0,
-        0.17,
-        0.14,
-        0.25
-      ],
-      "col_rank": [
-        0,
-        0.025
-      ],
-      "col_player": [
-        0.05863,
-        0.13272
-      ],
-      "col_level": [
-        0.13308,
-        0.16621
-      ],
-      "col_synergy": [
-        0.38672,
-        0.48972
-      ],
-      "col_relic": [
-        0.48466,
-        0.54395
-      ],
-      "col_wl": [
-        0.56886,
-        0.61667
-      ],
-      "table_area": [
-        0,
-        0.12585,
-        0.74419,
-        0.9051
-      ],
-      "title_region": [
-        0.2947,
-        0.05288,
-        0.45099,
-        0.11973
-      ],
-      "row_dividers": [
-        0.12585,
-        0.24868,
-        0.34711,
-        0.43414,
-        0.53094,
-        0.62447,
-        0.71313,
-        0.80668,
-        0.9051
-      ]
+  "reference_resolution": "2560x1440",
+  "aspect_ratio": "16:9",
+  "game_over": {
+    "title_region": [0.39165, 0.05601, 0.60905, 0.12006],
+    "final_rank_region": [0.0, 0.24, 0.14, 0.32],
+    "eliminated_region": [0.0, 0.17, 0.14, 0.25],
+    "table_area": [0.0, 0.12585, 1.0, 0.90038],
+    "row_dividers": [0.12585, 0.25527, 0.34781, 0.44035, 0.5342, 0.62541, 0.71531, 0.81311, 0.90038],
+    "n_rows": 8,
+    "col_rank": [0.0, 0.025],
+    "col_player": [0.07879, 0.18658],
+    "col_level": [0.17883, 0.22335],
+    "col_synergy": [0.51966, 0.65806],
+    "col_relic": [0.65126, 0.73093],
+    "col_wl": [0.76441, 0.82865],
+    "ocr_offsets": {
+      "player_name_y_in_row": [0.05, 0.55],
+      "rank_y_in_row": [0.55, 0.98]
     },
-    "my_matches": {
-      "tab_region": [
-        0.3,
-        0.12,
-        0.55,
-        0.2
-      ],
-      "table_area": [
-        0,
-        0.33,
-        1,
-        0.9
-      ],
-      "sep_scan_band": [
-        0.6,
-        0.7
-      ],
-      "col_placement": [
-        0.39,
-        0.436
-      ],
-      "col_level": [
-        0.452,
-        0.481
-      ],
-      "col_units": [
-        0.4814,
-        0.5945
-      ],
-      "col_synergy": [
-        0.597,
-        0.692
-      ],
-      "col_relic": [
-        0.7035,
-        0.7491
-      ],
-      "col_wl": [
-        0.752,
-        0.792
-      ],
-      "col_rank": [
-        0.792,
-        0.863
-      ],
-      "col_time": [
-        0.39,
-        0.436
-      ]
-    },
-    "sentinel_final_ranking": {
-      "search_region": [
-        0,
-        0.2,
-        0.15,
-        0.35
-      ]
-    },
-    "sentinel_round_start": {
-      "search_region": [
-        0.8,
-        0.15,
-        0.95,
-        0.35
-      ]
-    },
-    "_screenshots": {
-      "game_over": "20260218012801_1.jpg",
-      "my_matches": "ref_my_matches_with_ranking_21x9.png",
-      "sentinel_final_ranking": "screenshots/ref_final_ranking_21x9.jpg",
-      "sentinel_round_start": "ref_round_start_pve_21x9.jpg"
-    }
+    "syn_slot_x_ranges": [
+      [0.00, 0.22],
+      [0.15, 0.37],
+      [0.30, 0.52],
+      [0.45, 0.67],
+      [0.60, 0.82],
+      [0.75, 0.97]
+    ],
+    "syn_slot_y_range": [0.03, 0.58],
+    "syn_match_threshold": 0.65,
+    "syn_fallback_threshold": 0.48,
+    "syn_fallback_inner_frac": 0.45,
+    "syn_global_y_max_frac": 0.46,
+    "syn_badge_y_max_frac": 0.50,
+    "syn_icon_scales": [32, 36, 40, 44],
+    "relic_slots": [
+      { "name": "top_left",    "rect": [0.00, 0.30, 0.22, 0.62], "inner_frac": 0.75, "min_size": 0 },
+      { "name": "bottom_left", "rect": [0.00, 0.30, 0.43, 0.86], "inner_frac": 0.70, "min_size": 0 },
+      { "name": "middle",      "rect": [0.16, 0.42, 0.35, 0.75], "inner_frac": 0.55, "min_size": 0 },
+      { "name": "large",       "rect": [0.35, 0.82, 0.18, 0.88], "inner_frac": 0.80, "min_size": 32 }
+    ],
+    "relic_inner_frac": 0.60,
+    "relic_icon_scales": [20, 24, 28, 32, 36, 40, 44, 50, 60],
+    "icon_inner_frac": 0.75,
+    "match_threshold": 0.70
   },
-  "16:9": {
-    "reference_resolution": "1920x1080",
-    "game_over": {
-      "col_player": [
-        0.07879,
-        0.18658
-      ],
-      "col_level": [
-        0.17883,
-        0.22335
-      ],
-      "table_area": [
-        0,
-        0.12585,
-        1,
-        0.90038
-      ],
-      "col_wl": [
-        0.76441,
-        0.82865
-      ],
-      "col_relic": [
-        0.65126,
-        0.73093
-      ],
-      "col_synergy": [
-        0.51966,
-        0.65806
-      ],
-      "title_region": [
-        0.39165,
-        0.05601,
-        0.60905,
-        0.12006
-      ],
-      "row_dividers": [
-        0.12585,
-        0.25527,
-        0.34781,
-        0.44035,
-        0.5342,
-        0.62541,
-        0.71531,
-        0.81311,
-        0.90038
-      ]
+  "my_matches": {
+    "tab_region": [0.34, 0.13, 0.56, 0.20],
+    "table_area": [0.0, 0.38, 1.0, 0.94],
+    "sep_scan_band": [0.84, 0.89],
+    "sep_dark_thresh": 35,
+    "row_dividers": [0.3806, 0.4597, 0.5389, 0.6181, 0.6972, 0.7764, 0.8556, 0.9347],
+    "col_placement": [0.352, 0.411],
+    "col_level": [0.438, 0.47],
+    "col_units": [0.474, 0.647],
+    "col_synergy": [0.65, 0.75],
+    "col_relic": [0.77, 0.835],
+    "col_wl": [0.86, 0.905],
+    "col_rank": [0.895, 0.98],
+    "col_time": [0.352, 0.411],
+    "ocr_offsets": {
+      "placement_y_in_row": [0.15, 0.75],
+      "level_y_in_row": [0.30, 0.75],
+      "wl_y_in_row": [0.55, 0.95],
+      "rank_y_in_row": [0.20, 0.80],
+      "time_y_in_row": [0.65, 1.0]
     },
-    "my_matches": {
-      "tab_region": [
-        0.34,
-        0.13,
-        0.56,
-        0.2
-      ],
-      "table_area": [
-        0,
-        0.38,
-        1,
-        0.94
-      ],
-      "sep_scan_band": [
-        0.84,
-        0.89
-      ],
-      "row_dividers": [
-        0.3806,
-        0.4597,
-        0.5389,
-        0.6181,
-        0.6972,
-        0.7764,
-        0.8556,
-        0.9347
-      ],
-      "col_placement": [
-        0.352,
-        0.411
-      ],
-      "col_level": [
-        0.438,
-        0.47
-      ],
-      "col_units": [
-        0.474,
-        0.647
-      ],
-      "col_synergy": [
-        0.65,
-        0.75
-      ],
-      "col_relic": [
-        0.77,
-        0.835
-      ],
-      "col_wl": [
-        0.86,
-        0.905
-      ],
-      "col_rank": [
-        0.895,
-        0.98
-      ],
-      "col_time": [
-        0.352,
-        0.411
-      ],
-      "syn_cols_x": [
-        0.651,
-        0.674,
-        0.697,
-        0.72,
-        0.743
-      ],
-      "syn_icon_w": 0.015,
-      "syn_icon_h": 0.028,
-      "unit_grid_start_frac": 0.02,
-      "unit_grid_spacing_frac": 0.101,
-      "relic_col_ranges": [
-        [
-          0,
-          0.35
-        ],
-        [
-          0.35,
-          0.7
-        ],
-        [
-          0.7,
-          1
-        ]
-      ]
-    },
-    "sentinel_final_ranking": {},
-    "sentinel_round_start": {},
-    "_screenshots": {
-      "game_over": "20260205145859_1.jpg",
-      "my_matches": "20260418021049_1.jpg"
-    }
+    "syn_cols_x": [0.651, 0.674, 0.697, 0.72, 0.743],
+    "syn_icon_w": 0.015,
+    "syn_icon_h": 0.028,
+    "syn_y_1row": 0.21,
+    "syn_y_2row_top": 0.0,
+    "syn_y_2row_bot": 0.59,
+    "syn_bright_thresh": 40,
+    "syn_count_y_1row": [0.37, 0.63],
+    "syn_count_y_2row_bot": [0.58, 0.86],
+    "syn_icon_scales": [20, 24, 28, 32],
+    "unit_grid_start_frac": 0.02,
+    "unit_grid_spacing_frac": 0.101,
+    "unit_split_y": 0.514,
+    "unit_one_row_y": [0.215, 0.813],
+    "unit_max_slots": 9,
+    "unit_icon_scales": [24, 28, 32, 36, 40, 44],
+    "unit_match_threshold": 0.65,
+    "relic_split_y": 0.49,
+    "relic_col_ranges": [[0.0, 0.35], [0.35, 0.7], [0.7, 1.0]]
+  },
+  "sentinel_final_ranking": {
+    "search_region": [0.0, 0.2, 0.15, 0.35]
+  },
+  "sentinel_round_start": {
+    "search_region": [0.8, 0.15, 0.95, 0.35]
+  },
+  "_screenshots": {
+    "game_over": "20260205145859_1.jpg",
+    "my_matches": "20260418021049_1.jpg"
   }
 }

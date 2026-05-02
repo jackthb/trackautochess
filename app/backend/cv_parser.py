@@ -20,7 +20,6 @@ import numpy as np
 from utils import (
     DAC_DIR,
     crop as _crop,
-    infer_aspect_ratio,
     load_regions_config,
     ocr as _ocr,
     setup_tesseract,
@@ -38,48 +37,45 @@ log = logging.getLogger("dac")
 
 # ── Region constants ─────────────────────────────────────────────────────────
 # All values as fractions of image (width, height).
-# Calibrated on 3440×1440 GAME OVER table (dac1.jpg).
+# Calibrated for 16:9 (2560×1440 reference).
+# Values here are defaults — runtime config in data/regions_config.json
+# (and ~/.dac/regions_config.json overrides) replaces them via apply_calibration().
 
 # Title detection crops (x0, y0, x1, y1)
 TITLE_REGION = (0.30, 0.00, 0.70, 0.12)
-FINAL_RANK_REGION = (0.0, 0.24, 0.14, 0.32)  # left panel "Final Ranking" overlay
-ELIMINATED_REGION = (0.0, 0.17, 0.14, 0.25)  # "You have been eliminated" text above
+FINAL_RANK_REGION = (0.0, 0.24, 0.14, 0.32)
+ELIMINATED_REGION = (0.0, 0.17, 0.14, 0.25)
 
-# Column x-extents (x_start, x_end) as fraction of image width
+# GAME OVER column x-extents (x_start, x_end) as fraction of image width
 COL_RANK    = (0.000, 0.025)
 COL_PLAYER  = (0.025, 0.155)
-COL_LEVEL   = (0.130, 0.165)   # gold circle with level number
-COL_SYNERGY = (0.390, 0.500)   # 5 synergy badge icons with counts
-COL_RELIC   = (0.485, 0.555)   # relic reward icons (2x2 grid + large icon)
-COL_WL      = (0.573, 0.612)   # W-L column only (not Gold/Damage)
+COL_LEVEL   = (0.130, 0.165)
+COL_SYNERGY = (0.390, 0.500)
+COL_RELIC   = (0.485, 0.555)
+COL_WL      = (0.573, 0.612)
 
-# Table row geometry
-TABLE_Y_START = 0.155   # where row 1 data begins (below header)
+# GAME OVER row-relative OCR y-offsets within COL_PLAYER cell
+GO_PLAYER_NAME_Y = (0.05, 0.55)
+GO_RANK_Y_IN_PLAYER = (0.55, 0.98)
+
+# GAME OVER table row geometry
+TABLE_Y_START = 0.155
 TABLE_Y_END   = 0.97
 N_ROWS = 8
+ROW_DIVIDERS: list[float] | None = None
 
 # Template matching
 MATCH_THRESHOLD = 0.70
-# On-screen synergy badge icon is ~45px at 3440px wide
-# We try multiple scales to find best match
 SYNERGY_ICON_SCALES = [32, 36, 40, 44]
 RELIC_ICON_SCALES = [12, 14, 16, 20, 24, 28, 32, 40, 50, 60]
 GO_RELIC_ICON_SCALES = [20, 24, 28, 32, 36, 40, 44, 50, 60]
-# Crop inner portion of reference icon (remove border area)
-ICON_INNER_FRAC = 0.75  # keep central 75% of reference icon
-# Synergy badges occupy the top ~45% of each row cell
+ICON_INNER_FRAC = 0.75
 SYNERGY_BADGE_Y_MAX_FRAC = 0.50
 
-# Game Over table slots are stable once the aspect-specific columns are
-# calibrated. Slot parsing is more reliable than global template matching:
-# otherwise count glyphs and the "no relic" placeholder produce false matches.
+# GAME OVER synergy slot geometry
 GO_SYN_SLOT_X_RANGES = [
-    (0.00, 0.22),
-    (0.15, 0.37),
-    (0.30, 0.52),
-    (0.45, 0.67),
-    (0.60, 0.82),
-    (0.75, 0.97),
+    (0.00, 0.22), (0.15, 0.37), (0.30, 0.52),
+    (0.45, 0.67), (0.60, 0.82), (0.75, 0.97),
 ]
 GO_SYN_SLOT_Y_RANGE = (0.03, 0.58)
 GO_SYN_MATCH_THRESHOLD = 0.65
@@ -87,30 +83,28 @@ GO_SYN_FALLBACK_THRESHOLD = 0.48
 GO_SYN_FALLBACK_INNER_FRAC = 0.45
 GO_SYN_GLOBAL_Y_MAX_FRAC = 0.46
 
+# GAME OVER relic slot geometry: (name, rect, inner_frac, min_size_px)
 GO_RELIC_SLOTS = [
-    ("top_left", (0.00, 0.30, 0.22, 0.62), 0.75, 0),
+    ("top_left",    (0.00, 0.30, 0.22, 0.62), 0.75, 0),
     ("bottom_left", (0.00, 0.30, 0.43, 0.86), 0.70, 0),
-    ("middle", (0.16, 0.42, 0.35, 0.75), 0.55, 0),
-    ("large", (0.35, 0.82, 0.18, 0.88), 0.80, 32),
+    ("middle",      (0.16, 0.42, 0.35, 0.75), 0.55, 0),
+    ("large",       (0.35, 0.82, 0.18, 0.88), 0.80, 32),
 ]
 GO_RELIC_INNER_FRAC = 0.60
 
-# Debug output directory (created when --debug is used)
 DEBUG_DIR = DAC_DIR / "debug"
 
 
 # ── MY MATCHES screen constants ───────────────────────────────────────────────
-# Calibrated on 3440×1440. All values as fractions of image dimensions.
 
-MM_TAB_REGION     = (0.30, 0.12, 0.55, 0.20)  # tab bar containing "MY MATCHES"
-MM_TABLE_Y_START  = 0.33   # top of first data row
-MM_TABLE_Y_END    = 0.90   # bottom of last data row
-MM_SEP_SCAN_X     = (0.60, 0.70)   # x-band scanned for dark row separators
+MM_TAB_REGION     = (0.30, 0.12, 0.55, 0.20)
+MM_TABLE_Y_START  = 0.33
+MM_TABLE_Y_END    = 0.90
+MM_SEP_SCAN_X     = (0.60, 0.70)
 MM_ROW_DIVIDERS: list[float] | None = None
-MM_SEP_DARK_THRESH = 35            # mean brightness below this → separator band
+MM_SEP_DARK_THRESH = 35
 
-# Per-row column extents (x_start, x_end as fraction of image width)
-# Calibrated from user pixel measurements on 3440×1440 screenshot.
+# MY MATCHES per-row column extents
 MM_COL_PLACEMENT = (0.390, 0.436)
 MM_COL_LEVEL     = (0.452, 0.481)
 MM_COL_UNITS     = (0.4814, 0.5945)
@@ -118,54 +112,47 @@ MM_COL_SYNERGY   = (0.597, 0.692)
 MM_COL_RELIC     = (0.7035, 0.7491)
 MM_COL_WL        = (0.752, 0.792)
 MM_COL_RANK      = (0.792, 0.863)
-# "X hrs ago" / "X days ago" text — same x as placement, bottom portion of row.
-# Calibrated on 3440×1440.
 MM_COL_TIME      = (0.390, 0.436)
+
+# MY MATCHES row-relative OCR y-offsets within their column cells
+MM_PLACEMENT_Y_IN_ROW = (0.15, 0.75)
+MM_LEVEL_Y_IN_ROW     = (0.30, 0.75)
+MM_WL_Y_IN_ROW        = (0.55, 0.95)
+MM_RANK_Y_IN_ROW      = (0.20, 0.80)
+MM_TIME_Y_IN_ROW      = (0.65, 1.0)
 
 UNIT_ICON_SCALES    = [24, 28, 32, 36, 40, 44]
 UNIT_MATCH_THRESHOLD = 0.65
-MM_SYNERGY_ICON_SCALES = [20, 24, 28, 32]  # smaller than GAME OVER (32-44)
+MM_SYNERGY_ICON_SCALES = [20, 24, 28, 32]
 
-# Synergy icon grid for MY MATCHES rows.
-# Calibrated from sentinel picker on 3440×1440.
-# 5 columns max per sub-row; 6+ synergies → 2 sub-rows (5 top + rest bottom).
-# Synergies appear in decreasing count order (left→right, top→bottom).
-MM_SYN_COLS_X = [0.61308, 0.62645, 0.64070, 0.65407, 0.66773]  # icon x0
-MM_SYN_ICON_W = 0.0125   # icon width (fraction of image width)
-MM_SYN_ICON_H = 0.028    # icon height (fraction of image height)
-# Y position of icon top edge as fraction of row height
-MM_SYN_Y_1ROW = 0.21     # single-row mode
-MM_SYN_Y_2ROW_TOP = 0.0  # 2-row mode, top row (starts at row top)
-MM_SYN_Y_2ROW_BOT = 0.59 # 2-row mode, bottom row
-# Brightness threshold: mean pixel value above this → icon present
+# MY MATCHES synergy grid
+MM_SYN_COLS_X = [0.61308, 0.62645, 0.64070, 0.65407, 0.66773]
+MM_SYN_ICON_W = 0.0125
+MM_SYN_ICON_H = 0.028
+MM_SYN_Y_1ROW = 0.21
+MM_SYN_Y_2ROW_TOP = 0.0
+MM_SYN_Y_2ROW_BOT = 0.59
 MM_SYN_BRIGHT_THRESH = 40
+# Y range (fraction of row height) where the (count) numerals sit
+MM_SYN_COUNT_Y_1ROW = (0.58, 0.86)
+MM_SYN_COUNT_Y_2ROW_BOT = (0.37, 0.63)
 
-# Grid layout for unit icons in MY MATCHES rows.
-# Calibrated on 3440×1440 from manual coordinate picking.
-# Unit column is ~389px wide, 9 slots spaced ~43px apart.
-MM_UNIT_GRID_START_FRAC = 0.0     # grid origin x at column left edge
-MM_UNIT_GRID_SPACING_FRAC = 0.1102 # slot spacing as fraction of unit column width
-MM_UNIT_SPLIT_Y = 0.514            # two-row split point (fraction of row height)
-MM_UNIT_ONE_ROW_Y = (0.215, 0.813) # single-row icon y range (fraction of row height)
-MM_UNIT_MAX_SLOTS = 9              # max slots per sub-row
+# MY MATCHES unit grid
+MM_UNIT_GRID_START_FRAC = 0.0
+MM_UNIT_GRID_SPACING_FRAC = 0.1102
+MM_UNIT_SPLIT_Y = 0.514
+MM_UNIT_ONE_ROW_Y = (0.215, 0.813)
+MM_UNIT_MAX_SLOTS = 9
 
-# Relic grid layout for MY MATCHES rows.
-# Calibrated on 3440×1440 from coord picker measurements.
-# 3 columns × 2 rows = 6 slots max. Positions as fractions of relic cell dims.
+# MY MATCHES relic grid
 MM_RELIC_COLS = 3
 MM_RELIC_ROWS = 2
-MM_RELIC_SPLIT_Y = 0.49            # row split (fraction of cell height)
-# Column slot x-ranges as fractions of relic cell width (gaps between cols)
+MM_RELIC_SPLIT_Y = 0.49
 MM_RELIC_COL_RANGES = [
-    (0.000, 0.300),   # col 0: x=0.7035..0.7172
-    (0.351, 0.649),   # col 1: x=0.7195..0.7331
-    (0.702, 1.000),   # col 2: x=0.7355..0.7491
+    (0.000, 0.300),
+    (0.351, 0.649),
+    (0.702, 1.000),
 ]
-
-
-# Optional per-row y-bounds for game_over (length N_ROWS+1 = 9). When set
-# (via calibration), `_row_y_extent` reads from this and ignores TABLE_Y_*.
-ROW_DIVIDERS: list[float] | None = None
 
 
 DEFAULT_REGIONS = {
@@ -178,13 +165,24 @@ DEFAULT_REGIONS = {
     "COL_SYNERGY": COL_SYNERGY,
     "COL_RELIC": COL_RELIC,
     "COL_WL": COL_WL,
+    "GO_PLAYER_NAME_Y": GO_PLAYER_NAME_Y,
+    "GO_RANK_Y_IN_PLAYER": GO_RANK_Y_IN_PLAYER,
     "TABLE_Y_START": TABLE_Y_START,
     "TABLE_Y_END": TABLE_Y_END,
     "ROW_DIVIDERS": None,
+    "GO_SYN_SLOT_X_RANGES": GO_SYN_SLOT_X_RANGES,
+    "GO_SYN_SLOT_Y_RANGE": GO_SYN_SLOT_Y_RANGE,
+    "GO_SYN_MATCH_THRESHOLD": GO_SYN_MATCH_THRESHOLD,
+    "GO_SYN_FALLBACK_THRESHOLD": GO_SYN_FALLBACK_THRESHOLD,
+    "GO_SYN_FALLBACK_INNER_FRAC": GO_SYN_FALLBACK_INNER_FRAC,
+    "GO_SYN_GLOBAL_Y_MAX_FRAC": GO_SYN_GLOBAL_Y_MAX_FRAC,
+    "GO_RELIC_SLOTS": GO_RELIC_SLOTS,
+    "GO_RELIC_INNER_FRAC": GO_RELIC_INNER_FRAC,
     "MM_TAB_REGION": MM_TAB_REGION,
     "MM_TABLE_Y_START": MM_TABLE_Y_START,
     "MM_TABLE_Y_END": MM_TABLE_Y_END,
     "MM_SEP_SCAN_X": MM_SEP_SCAN_X,
+    "MM_SEP_DARK_THRESH": MM_SEP_DARK_THRESH,
     "MM_ROW_DIVIDERS": None,
     "MM_COL_PLACEMENT": MM_COL_PLACEMENT,
     "MM_COL_LEVEL": MM_COL_LEVEL,
@@ -194,11 +192,25 @@ DEFAULT_REGIONS = {
     "MM_COL_WL": MM_COL_WL,
     "MM_COL_RANK": MM_COL_RANK,
     "MM_COL_TIME": MM_COL_TIME,
+    "MM_PLACEMENT_Y_IN_ROW": MM_PLACEMENT_Y_IN_ROW,
+    "MM_LEVEL_Y_IN_ROW": MM_LEVEL_Y_IN_ROW,
+    "MM_WL_Y_IN_ROW": MM_WL_Y_IN_ROW,
+    "MM_RANK_Y_IN_ROW": MM_RANK_Y_IN_ROW,
+    "MM_TIME_Y_IN_ROW": MM_TIME_Y_IN_ROW,
     "MM_SYN_COLS_X": MM_SYN_COLS_X,
     "MM_SYN_ICON_W": MM_SYN_ICON_W,
     "MM_SYN_ICON_H": MM_SYN_ICON_H,
+    "MM_SYN_Y_1ROW": MM_SYN_Y_1ROW,
+    "MM_SYN_Y_2ROW_TOP": MM_SYN_Y_2ROW_TOP,
+    "MM_SYN_Y_2ROW_BOT": MM_SYN_Y_2ROW_BOT,
+    "MM_SYN_BRIGHT_THRESH": MM_SYN_BRIGHT_THRESH,
+    "MM_SYN_COUNT_Y_1ROW": MM_SYN_COUNT_Y_1ROW,
+    "MM_SYN_COUNT_Y_2ROW_BOT": MM_SYN_COUNT_Y_2ROW_BOT,
     "MM_UNIT_GRID_START_FRAC": MM_UNIT_GRID_START_FRAC,
     "MM_UNIT_GRID_SPACING_FRAC": MM_UNIT_GRID_SPACING_FRAC,
+    "MM_UNIT_SPLIT_Y": MM_UNIT_SPLIT_Y,
+    "MM_UNIT_ONE_ROW_Y": MM_UNIT_ONE_ROW_Y,
+    "MM_UNIT_MAX_SLOTS": MM_UNIT_MAX_SLOTS,
     "MM_RELIC_COL_RANGES": MM_RELIC_COL_RANGES,
     "MM_RELIC_SPLIT_Y": MM_RELIC_SPLIT_Y,
 }
@@ -209,94 +221,202 @@ def reset_calibration() -> None:
     globals().update(DEFAULT_REGIONS)
 
 
+def _as_tuple_or_none(value, length: int):
+    if isinstance(value, list) and len(value) == length \
+            and all(isinstance(v, (int, float)) for v in value):
+        return tuple(float(v) for v in value)
+    return None
+
+
+def _as_list_of_pairs(value):
+    if isinstance(value, list) and value \
+            and all(isinstance(v, list) and len(v) == 2
+                    and all(isinstance(c, (int, float)) for c in v)
+                    for v in value):
+        return [(float(v[0]), float(v[1])) for v in value]
+    return None
+
+
 def apply_calibration(
     img: np.ndarray | None = None,
     *,
-    aspect_ratio: str | None = None,
     regions_config: dict | None = None,
+    **_legacy_kwargs,  # absorb dropped aspect_ratio kwarg
 ) -> str:
-    """Apply picker calibration overrides to parser globals and return the AR key used."""
+    """Load flat regions config and patch parser globals.
+
+    Schema is single-profile (16:9 only). Returns "16:9" for compat with callers
+    that still expect an aspect-ratio string back.
+    """
     reset_calibration()
 
     if regions_config is None:
         regions_config = load_regions_config()
     if not isinstance(regions_config, dict) or not regions_config:
-        return aspect_ratio or "16:9"
+        return "16:9"
 
-    if aspect_ratio is None:
-        if img is not None:
-            h, w = img.shape[:2]
-            aspect_ratio = infer_aspect_ratio(w, h, list(regions_config.keys()))
-        else:
-            aspect_ratio = "16:9"
+    game_over = regions_config.get("game_over") or {}
+    my_matches = regions_config.get("my_matches") or {}
 
-    ar_data = regions_config.get(aspect_ratio) or {}
-    game_over = ar_data.get("game_over") or {}
-    my_matches = ar_data.get("my_matches") or {}
-
-    if len(game_over.get("title_region", [])) == 4:
-        globals()["TITLE_REGION"] = tuple(game_over["title_region"])
+    # ── GAME OVER ────────────────────────────────────────────────────────────
+    for src, dest, length in [
+        ("title_region", "TITLE_REGION", 4),
+        ("final_rank_region", "FINAL_RANK_REGION", 4),
+        ("eliminated_region", "ELIMINATED_REGION", 4),
+        ("col_rank", "COL_RANK", 2),
+        ("col_player", "COL_PLAYER", 2),
+        ("col_level", "COL_LEVEL", 2),
+        ("col_synergy", "COL_SYNERGY", 2),
+        ("col_relic", "COL_RELIC", 2),
+        ("col_wl", "COL_WL", 2),
+        ("syn_slot_y_range", "GO_SYN_SLOT_Y_RANGE", 2),
+    ]:
+        v = _as_tuple_or_none(game_over.get(src), length)
+        if v is not None:
+            globals()[dest] = v
     if len(game_over.get("table_area", [])) == 4:
-        table = game_over["table_area"]
-        globals()["TABLE_Y_START"] = table[1]
-        globals()["TABLE_Y_END"] = table[3]
+        ta = game_over["table_area"]
+        globals()["TABLE_Y_START"] = float(ta[1])
+        globals()["TABLE_Y_END"] = float(ta[3])
     rd = game_over.get("row_dividers")
     if isinstance(rd, list) and len(rd) == N_ROWS + 1 \
             and all(isinstance(v, (int, float)) for v in rd):
         globals()["ROW_DIVIDERS"] = [float(v) for v in rd]
-    for src, dest in {
-        "col_player": "COL_PLAYER",
-        "col_level": "COL_LEVEL",
-        "col_synergy": "COL_SYNERGY",
-        "col_relic": "COL_RELIC",
-        "col_wl": "COL_WL",
-    }.items():
-        if len(game_over.get(src, [])) == 2:
-            globals()[dest] = tuple(game_over[src])
 
+    # GAME OVER OCR offsets
+    go_off = game_over.get("ocr_offsets") or {}
+    for src, dest in [
+        ("player_name_y_in_row", "GO_PLAYER_NAME_Y"),
+        ("rank_y_in_row", "GO_RANK_Y_IN_PLAYER"),
+    ]:
+        v = _as_tuple_or_none(go_off.get(src), 2)
+        if v is not None:
+            globals()[dest] = v
+
+    # GAME OVER synergy slot ranges
+    go_slot_x = _as_list_of_pairs(game_over.get("syn_slot_x_ranges"))
+    if go_slot_x:
+        globals()["GO_SYN_SLOT_X_RANGES"] = go_slot_x
+
+    for src, dest in [
+        ("syn_match_threshold", "GO_SYN_MATCH_THRESHOLD"),
+        ("syn_fallback_threshold", "GO_SYN_FALLBACK_THRESHOLD"),
+        ("syn_fallback_inner_frac", "GO_SYN_FALLBACK_INNER_FRAC"),
+        ("syn_global_y_max_frac", "GO_SYN_GLOBAL_Y_MAX_FRAC"),
+        ("syn_badge_y_max_frac", "SYNERGY_BADGE_Y_MAX_FRAC"),
+        ("relic_inner_frac", "GO_RELIC_INNER_FRAC"),
+        ("icon_inner_frac", "ICON_INNER_FRAC"),
+        ("match_threshold", "MATCH_THRESHOLD"),
+    ]:
+        if isinstance(game_over.get(src), (int, float)):
+            globals()[dest] = float(game_over[src])
+
+    if isinstance(game_over.get("syn_icon_scales"), list):
+        globals()["SYNERGY_ICON_SCALES"] = [int(s) for s in game_over["syn_icon_scales"]]
+    if isinstance(game_over.get("relic_icon_scales"), list):
+        globals()["GO_RELIC_ICON_SCALES"] = [int(s) for s in game_over["relic_icon_scales"]]
+
+    # GAME OVER relic slots
+    rs = game_over.get("relic_slots")
+    if isinstance(rs, list) and rs:
+        slots = []
+        for entry in rs:
+            if not isinstance(entry, dict):
+                continue
+            rect = entry.get("rect")
+            if not (isinstance(rect, list) and len(rect) == 4):
+                continue
+            slots.append((
+                str(entry.get("name", "")),
+                tuple(float(v) for v in rect),
+                float(entry.get("inner_frac", 0.75)),
+                int(entry.get("min_size", 0)),
+            ))
+        if slots:
+            globals()["GO_RELIC_SLOTS"] = slots
+
+    # ── MY MATCHES ───────────────────────────────────────────────────────────
     if len(my_matches.get("tab_region", [])) == 4:
-        globals()["MM_TAB_REGION"] = tuple(my_matches["tab_region"])
+        globals()["MM_TAB_REGION"] = tuple(float(v) for v in my_matches["tab_region"])
     if len(my_matches.get("table_area", [])) == 4:
-        table = my_matches["table_area"]
-        globals()["MM_TABLE_Y_START"] = table[1]
-        globals()["MM_TABLE_Y_END"] = table[3]
-    if len(my_matches.get("sep_scan_band", [])) == 2:
-        globals()["MM_SEP_SCAN_X"] = tuple(my_matches["sep_scan_band"])
+        ta = my_matches["table_area"]
+        globals()["MM_TABLE_Y_START"] = float(ta[1])
+        globals()["MM_TABLE_Y_END"] = float(ta[3])
+    v = _as_tuple_or_none(my_matches.get("sep_scan_band"), 2)
+    if v is not None:
+        globals()["MM_SEP_SCAN_X"] = v
+    if isinstance(my_matches.get("sep_dark_thresh"), (int, float)):
+        globals()["MM_SEP_DARK_THRESH"] = float(my_matches["sep_dark_thresh"])
     rd = my_matches.get("row_dividers")
     if isinstance(rd, list) and len(rd) >= 2 \
             and all(isinstance(v, (int, float)) for v in rd):
         globals()["MM_ROW_DIVIDERS"] = [float(v) for v in rd]
-    for src, dest in {
-        "col_placement": "MM_COL_PLACEMENT",
-        "col_level": "MM_COL_LEVEL",
-        "col_units": "MM_COL_UNITS",
-        "col_synergy": "MM_COL_SYNERGY",
-        "col_relic": "MM_COL_RELIC",
-        "col_wl": "MM_COL_WL",
-        "col_rank": "MM_COL_RANK",
-        "col_time": "MM_COL_TIME",
-    }.items():
-        if len(my_matches.get(src, [])) == 2:
-            globals()[dest] = tuple(my_matches[src])
-    if len(my_matches.get("syn_cols_x", [])) >= 1:
+    for src, dest in [
+        ("col_placement", "MM_COL_PLACEMENT"),
+        ("col_level", "MM_COL_LEVEL"),
+        ("col_units", "MM_COL_UNITS"),
+        ("col_synergy", "MM_COL_SYNERGY"),
+        ("col_relic", "MM_COL_RELIC"),
+        ("col_wl", "MM_COL_WL"),
+        ("col_rank", "MM_COL_RANK"),
+        ("col_time", "MM_COL_TIME"),
+    ]:
+        v = _as_tuple_or_none(my_matches.get(src), 2)
+        if v is not None:
+            globals()[dest] = v
+
+    # MY MATCHES OCR offsets
+    mm_off = my_matches.get("ocr_offsets") or {}
+    for src, dest in [
+        ("placement_y_in_row", "MM_PLACEMENT_Y_IN_ROW"),
+        ("level_y_in_row", "MM_LEVEL_Y_IN_ROW"),
+        ("wl_y_in_row", "MM_WL_Y_IN_ROW"),
+        ("rank_y_in_row", "MM_RANK_Y_IN_ROW"),
+        ("time_y_in_row", "MM_TIME_Y_IN_ROW"),
+    ]:
+        v = _as_tuple_or_none(mm_off.get(src), 2)
+        if v is not None:
+            globals()[dest] = v
+
+    # MY MATCHES synergy grid
+    if len(my_matches.get("syn_cols_x", [])) >= 1 \
+            and all(isinstance(v, (int, float)) for v in my_matches["syn_cols_x"]):
         globals()["MM_SYN_COLS_X"] = [float(v) for v in my_matches["syn_cols_x"]]
-    for src, dest in {
-        "syn_icon_w": "MM_SYN_ICON_W",
-        "syn_icon_h": "MM_SYN_ICON_H",
-        "unit_grid_start_frac": "MM_UNIT_GRID_START_FRAC",
-        "unit_grid_spacing_frac": "MM_UNIT_GRID_SPACING_FRAC",
-        "relic_split_y": "MM_RELIC_SPLIT_Y",
-    }.items():
+    for src, dest in [
+        ("syn_icon_w", "MM_SYN_ICON_W"),
+        ("syn_icon_h", "MM_SYN_ICON_H"),
+        ("syn_y_1row", "MM_SYN_Y_1ROW"),
+        ("syn_y_2row_top", "MM_SYN_Y_2ROW_TOP"),
+        ("syn_y_2row_bot", "MM_SYN_Y_2ROW_BOT"),
+        ("syn_bright_thresh", "MM_SYN_BRIGHT_THRESH"),
+        ("unit_grid_start_frac", "MM_UNIT_GRID_START_FRAC"),
+        ("unit_grid_spacing_frac", "MM_UNIT_GRID_SPACING_FRAC"),
+        ("unit_split_y", "MM_UNIT_SPLIT_Y"),
+        ("unit_match_threshold", "UNIT_MATCH_THRESHOLD"),
+        ("relic_split_y", "MM_RELIC_SPLIT_Y"),
+    ]:
         if isinstance(my_matches.get(src), (int, float)):
             globals()[dest] = float(my_matches[src])
-    relic_ranges = my_matches.get("relic_col_ranges")
-    if isinstance(relic_ranges, list) and relic_ranges \
-            and all(isinstance(v, list) and len(v) == 2 for v in relic_ranges):
-        globals()["MM_RELIC_COL_RANGES"] = [
-            (float(v[0]), float(v[1])) for v in relic_ranges
-        ]
+    if isinstance(my_matches.get("unit_max_slots"), int):
+        globals()["MM_UNIT_MAX_SLOTS"] = my_matches["unit_max_slots"]
+    if isinstance(my_matches.get("syn_icon_scales"), list):
+        globals()["MM_SYNERGY_ICON_SCALES"] = [int(s) for s in my_matches["syn_icon_scales"]]
+    if isinstance(my_matches.get("unit_icon_scales"), list):
+        globals()["UNIT_ICON_SCALES"] = [int(s) for s in my_matches["unit_icon_scales"]]
+    v = _as_tuple_or_none(my_matches.get("unit_one_row_y"), 2)
+    if v is not None:
+        globals()["MM_UNIT_ONE_ROW_Y"] = v
+    v = _as_tuple_or_none(my_matches.get("syn_count_y_1row"), 2)
+    if v is not None:
+        globals()["MM_SYN_COUNT_Y_1ROW"] = v
+    v = _as_tuple_or_none(my_matches.get("syn_count_y_2row_bot"), 2)
+    if v is not None:
+        globals()["MM_SYN_COUNT_Y_2ROW_BOT"] = v
+    relic_ranges = _as_list_of_pairs(my_matches.get("relic_col_ranges"))
+    if relic_ranges:
+        globals()["MM_RELIC_COL_RANGES"] = relic_ranges
 
-    return aspect_ratio
+    return "16:9"
 
 
 # ── Helpers ──────────────────────────────────────────────────────────────────
@@ -343,20 +463,15 @@ def detect_screen_type(
     img: np.ndarray,
     *,
     apply_regions: bool = True,
-    aspect_ratio: str | None = None,
     regions_config: dict | None = None,
+    **_legacy_kwargs,
 ) -> str:
     """Detect which end-screen type this is.
 
     Returns: 'game_over', 'final_ranking', 'my_matches', or 'unknown'.
-
-    Priority: when both the My Matches tab bar and an in-game "Final Ranking"
-    overlay appear in the same image (happens if the player opened My Matches
-    before the post-game ranking card dismissed), we import from the My Matches
-    history rather than the less-structured Final Ranking overlay.
     """
     if apply_regions:
-        apply_calibration(img, aspect_ratio=aspect_ratio, regions_config=regions_config)
+        apply_calibration(img, regions_config=regions_config)
 
     # Check center-top title area (Game Over / My Matches headings)
     title_crop = _crop(img, *TITLE_REGION)
@@ -1207,7 +1322,8 @@ def _ocr_player_name(img: np.ndarray, row_idx: int, debug: bool = False) -> str:
     y0, y1 = _row_y_extent(row_idx)
     rh = y1 - y0
     # Name occupies the upper portion of the cell; rank sits below it.
-    cell = _crop(img, COL_PLAYER[0], y0 + rh * 0.05, COL_PLAYER[1], y0 + rh * 0.55)
+    cell = _crop(img, COL_PLAYER[0], y0 + rh * GO_PLAYER_NAME_Y[0],
+                 COL_PLAYER[1], y0 + rh * GO_PLAYER_NAME_Y[1])
     processed = _preprocess_for_ocr(cell, scale=2.5)
     _save_debug(f"player_name_row{row_idx}", processed, debug)
     text = _ocr(processed, psm=7).strip()
@@ -1231,7 +1347,8 @@ def _ocr_player_rank(img: np.ndarray, row_idx: int, debug: bool = False) -> str:
     """
     y0, y1 = _row_y_extent(row_idx)
     rh = y1 - y0
-    cell = _crop(img, COL_PLAYER[0], y0 + rh * 0.55, COL_PLAYER[1], y0 + rh * 0.98)
+    cell = _crop(img, COL_PLAYER[0], y0 + rh * GO_RANK_Y_IN_PLAYER[0],
+                 COL_PLAYER[1], y0 + rh * GO_RANK_Y_IN_PLAYER[1])
     processed = _preprocess_for_ocr(cell, scale=3.0)
     _save_debug(f"player_rank_row{row_idx}", processed, debug)
     text = _ocr(processed, psm=7).strip()
@@ -1697,15 +1814,14 @@ def _ocr_mm_syn_counts(img: np.ndarray, row_y0: float, row_y1: float,
     h, w = img.shape[:2]
     row_h = row_y1 - row_y0
     # Count text position depends on 1-row vs 2-row layout.
-    # Calibrated from sentinel picker on 3440x1440.
     if two_row:
         # Counts for top-row icons sit between the two icon rows
-        count_y0 = int((row_y0 + row_h * 0.37) * h)
-        count_y1 = int((row_y0 + row_h * 0.63) * h)
+        count_y0 = int((row_y0 + row_h * MM_SYN_COUNT_Y_2ROW_BOT[0]) * h)
+        count_y1 = int((row_y0 + row_h * MM_SYN_COUNT_Y_2ROW_BOT[1]) * h)
     else:
         # Counts sit below the single row of icons
-        count_y0 = int((row_y0 + row_h * 0.58) * h)
-        count_y1 = int((row_y0 + row_h * 0.86) * h)
+        count_y0 = int((row_y0 + row_h * MM_SYN_COUNT_Y_1ROW[0]) * h)
+        count_y1 = int((row_y0 + row_h * MM_SYN_COUNT_Y_1ROW[1]) * h)
     # x spans from first icon to last icon
     count_x0 = int(MM_SYN_COLS_X[0] * w)
     count_x1 = int((MM_SYN_COLS_X[-1] + MM_SYN_ICON_W) * w)
@@ -1994,8 +2110,8 @@ def _parse_my_matches_row(
     _save_debug(f"mm_row_{row_idx}", _crop(img, 0.0, row_y0, 1.0, row_y1), debug)
 
     # 1. Placement OCR — isolate the big yellow digit via HSV color mask
-    place_cell = _crop(img, MM_COL_PLACEMENT[0], row_y0 + (row_y1 - row_y0) * 0.15,
-                       MM_COL_PLACEMENT[1], row_y0 + (row_y1 - row_y0) * 0.75)
+    place_cell = _crop(img, MM_COL_PLACEMENT[0], row_y0 + (row_y1 - row_y0) * MM_PLACEMENT_Y_IN_ROW[0],
+                       MM_COL_PLACEMENT[1], row_y0 + (row_y1 - row_y0) * MM_PLACEMENT_Y_IN_ROW[1])
     hsv_place = cv2.cvtColor(place_cell, cv2.COLOR_BGR2HSV)
     yellow_mask = cv2.inRange(hsv_place, (15, 80, 150), (40, 255, 255))
     yellow_mask = cv2.dilate(yellow_mask, np.ones((2, 2), np.uint8), iterations=1)
@@ -2021,8 +2137,8 @@ def _parse_my_matches_row(
         result["_debug"]["place_cell"] = place_cell
         result["_debug"]["place_proc"] = place_proc
     # 2. Level OCR — "LvXX" or just the digit
-    level_cell = _crop(img, MM_COL_LEVEL[0], row_y0 + (row_y1 - row_y0) * 0.30,
-                       MM_COL_LEVEL[1], row_y0 + (row_y1 - row_y0) * 0.75)
+    level_cell = _crop(img, MM_COL_LEVEL[0], row_y0 + (row_y1 - row_y0) * MM_LEVEL_Y_IN_ROW[0],
+                       MM_COL_LEVEL[1], row_y0 + (row_y1 - row_y0) * MM_LEVEL_Y_IN_ROW[1])
     level_proc = _preprocess_for_ocr(level_cell, scale=3.0)
     _save_debug(f"mm_level_{row_idx}", level_proc, debug)
     level_raw = _ocr(level_proc, psm=7, whitelist="0123456789Lv")
@@ -2088,8 +2204,8 @@ def _parse_my_matches_row(
         }
         log.debug(f"  [row {row_idx}] relics: {[(n.replace('_', ' ').title(), f'{s:.3f}') for n, s, _, _ in relic_matches]}")
     # 6. W-L OCR — bottom half of cell (top half has gold "$XXX")
-    wl_y0 = row_y0 + (row_y1 - row_y0) * 0.55
-    wl_y1 = row_y0 + (row_y1 - row_y0) * 0.95
+    wl_y0 = row_y0 + (row_y1 - row_y0) * MM_WL_Y_IN_ROW[0]
+    wl_y1 = row_y0 + (row_y1 - row_y0) * MM_WL_Y_IN_ROW[1]
     wl_cell = _crop(img, MM_COL_WL[0], wl_y0, MM_COL_WL[1], wl_y1)
     wl_proc = _preprocess_for_ocr(wl_cell, scale=3.0)
     _save_debug(f"mm_wl_{row_idx}", wl_proc, debug)
@@ -2103,8 +2219,8 @@ def _parse_my_matches_row(
         result["_debug"]["wl_cell"] = wl_cell
         result["_debug"]["wl_proc"] = wl_proc
     # 7. Rank OCR
-    rank_y0 = row_y0 + (row_y1 - row_y0) * 0.20
-    rank_y1 = row_y0 + (row_y1 - row_y0) * 0.80
+    rank_y0 = row_y0 + (row_y1 - row_y0) * MM_RANK_Y_IN_ROW[0]
+    rank_y1 = row_y0 + (row_y1 - row_y0) * MM_RANK_Y_IN_ROW[1]
     rank_cell = _crop(img, MM_COL_RANK[0], rank_y0, MM_COL_RANK[1], rank_y1)
     rank_proc = _preprocess_for_ocr(rank_cell, scale=3.0)
     _save_debug(f"mm_rank_{row_idx}", rank_proc, debug)
@@ -2139,7 +2255,8 @@ def _parse_my_matches_row(
         result["_debug"]["row_strip"] = _crop(img, 0.0, row_y0, 1.0, row_y1)
     # 8. Time-ago OCR — same x as placement, bottom portion of row
     rh = row_y1 - row_y0
-    time_cell = _crop(img, MM_COL_TIME[0], row_y0 + rh * 0.65, MM_COL_TIME[1], row_y1)
+    time_cell = _crop(img, MM_COL_TIME[0], row_y0 + rh * MM_TIME_Y_IN_ROW[0],
+                      MM_COL_TIME[1], row_y0 + rh * MM_TIME_Y_IN_ROW[1])
     time_proc = _preprocess_for_ocr(time_cell, scale=2.5, invert=True)
     _save_debug(f"mm_time_{row_idx}", time_proc, debug)
     time_raw = _ocr(time_proc, psm=6)

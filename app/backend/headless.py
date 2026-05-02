@@ -35,7 +35,6 @@ from utils import (
     DAC_DIR,
     DATA_DIR,
     ICONS_DIR,
-    infer_aspect_ratio,
     load_config,
     load_regions_config,
     save_config,
@@ -232,16 +231,9 @@ class HeadlessBackend:
         import screen_capture
 
         regions_config = load_regions_config()
-        try:
-            monitor = screen_capture.monitors()[1]
-            ar_key = infer_aspect_ratio(monitor["width"], monitor["height"], list(regions_config.keys()))
-        except Exception:
-            ar_key = "16:9"
-
-        ar_data = regions_config.get(ar_key) or {}
 
         def _search_region(screen_key: str, fallback: dict) -> dict:
-            region = (ar_data.get(screen_key) or {}).get("search_region") or []
+            region = (regions_config.get(screen_key) or {}).get("search_region") or []
             if len(region) == 4:
                 return {"x0": region[0], "y0": region[1], "x1": region[2], "y1": region[3]}
             return dict(fallback)
@@ -1012,10 +1004,9 @@ class HeadlessBackend:
             img_path = msg.get("path", "")
             screen = msg.get("screen", "")
             regions = msg.get("regions", {}) or {}
-            aspect_ratio = msg.get("aspect_ratio")
             threading.Thread(
                 target=self._do_debug_view,
-                args=(img_path, screen, regions, aspect_ratio),
+                args=(img_path, screen, regions),
                 daemon=True,
                 name="debug-view",
             ).start()
@@ -1035,6 +1026,28 @@ class HeadlessBackend:
                 args=(img_path,),
                 daemon=True,
                 name="parse-test-file",
+            ).start()
+        elif cmd == "lab_parse_full":
+            img_path = msg.get("path", "")
+            req_id = msg.get("req_id", "")
+            threading.Thread(
+                target=self._do_lab_parse_full,
+                args=(img_path, req_id),
+                daemon=True,
+                name="lab-parse-full",
+            ).start()
+        elif cmd == "lab_parse_region":
+            threading.Thread(
+                target=self._do_lab_parse_region,
+                args=(
+                    msg.get("path", ""),
+                    msg.get("name", ""),
+                    msg.get("category", ""),
+                    msg.get("bbox", []),
+                    msg.get("req_id", ""),
+                ),
+                daemon=True,
+                name="lab-parse-region",
             ).start()
         elif cmd == "quit":
             self._shutdown()
@@ -1088,8 +1101,7 @@ class HeadlessBackend:
             log.warning("Failed to encode preview image: %s", e)
             return ""
 
-    def _resolve_debug_regions(self, screen: str, aspect_ratio: str, regions_config: dict) -> dict:
-        ar_data = regions_config.get(aspect_ratio) or {}
+    def _resolve_debug_regions(self, screen: str, regions_config: dict) -> dict:
         key_map = {
             "game_over": "game_over",
             "my_matches": "my_matches",
@@ -1097,7 +1109,7 @@ class HeadlessBackend:
             "sentinel_final_ranking": "sentinel_final_ranking",
             "sentinel_round_start": "sentinel_round_start",
         }
-        return dict(ar_data.get(key_map.get(screen, screen)) or {})
+        return dict(regions_config.get(key_map.get(screen, screen)) or {})
 
     def _do_debug_screenshot(self, img_path: str) -> None:
         try:
@@ -1161,7 +1173,6 @@ class HeadlessBackend:
         img_path: str,
         screen: str,
         regions: dict,
-        aspect_ratio: str | None = None,
     ) -> None:
         try:
             import cv2
@@ -1197,12 +1208,9 @@ class HeadlessBackend:
                 return
 
             regions_config = load_regions_config()
-            if not aspect_ratio:
-                h, w = img.shape[:2]
-                aspect_ratio = infer_aspect_ratio(w, h, list(regions_config.keys()))
             if not regions:
-                regions = self._resolve_debug_regions(screen, aspect_ratio, regions_config)
-            apply_calibration(img, aspect_ratio=aspect_ratio, regions_config=regions_config)
+                regions = self._resolve_debug_regions(screen, regions_config)
+            apply_calibration(img, regions_config=regions_config)
             from cv_parser import (
                 COL_LEVEL,
                 COL_PLAYER,
@@ -1224,7 +1232,6 @@ class HeadlessBackend:
                 "width": w,
                 "height": h,
                 "screen_type": screen,
-                "aspect_ratio": aspect_ratio,
                 "region_crops": self._regions_to_crops(img, regions),
             }
 
@@ -1269,15 +1276,19 @@ class HeadlessBackend:
                         debug=False, row_idx=i,
                     )
                     rh = y1 - y0
+                    from cv_parser import (
+                        MM_PLACEMENT_Y_IN_ROW, MM_LEVEL_Y_IN_ROW,
+                        MM_WL_Y_IN_ROW, MM_RANK_Y_IN_ROW, MM_TIME_Y_IN_ROW,
+                    )
                     row_data["row_image"] = self._img_b64(img[int(y0 * h):int(y1 * h), :])
-                    row_data["placement_crop"] = self._img_b64(_crop(img, MM_COL_PLACEMENT[0], y0 + rh * 0.15, MM_COL_PLACEMENT[1], y0 + rh * 0.75))
-                    row_data["level_crop"] = self._img_b64(_crop(img, MM_COL_LEVEL[0], y0 + rh * 0.30, MM_COL_LEVEL[1], y0 + rh * 0.75))
+                    row_data["placement_crop"] = self._img_b64(_crop(img, MM_COL_PLACEMENT[0], y0 + rh * MM_PLACEMENT_Y_IN_ROW[0], MM_COL_PLACEMENT[1], y0 + rh * MM_PLACEMENT_Y_IN_ROW[1]))
+                    row_data["level_crop"] = self._img_b64(_crop(img, MM_COL_LEVEL[0], y0 + rh * MM_LEVEL_Y_IN_ROW[0], MM_COL_LEVEL[1], y0 + rh * MM_LEVEL_Y_IN_ROW[1]))
                     row_data["units_crop"] = self._img_b64(_crop(img, MM_COL_UNITS[0], y0, MM_COL_UNITS[1], y1))
                     row_data["synergy_crop"] = self._img_b64(_crop_row(img, MM_COL_SYNERGY, y0, y1))
                     row_data["relic_crop"] = self._img_b64(_crop(img, MM_COL_RELIC[0], y0, MM_COL_RELIC[1], y1))
-                    row_data["wl_crop"] = self._img_b64(_crop(img, MM_COL_WL[0], y0 + rh * 0.55, MM_COL_WL[1], y0 + rh * 0.95))
-                    row_data["rank_crop"] = self._img_b64(_crop(img, MM_COL_RANK[0], y0 + rh * 0.20, MM_COL_RANK[1], y0 + rh * 0.80))
-                    row_data["time_crop"] = self._img_b64(_crop(img, MM_COL_TIME[0], y0 + rh * 0.65, MM_COL_TIME[1], y1))
+                    row_data["wl_crop"] = self._img_b64(_crop(img, MM_COL_WL[0], y0 + rh * MM_WL_Y_IN_ROW[0], MM_COL_WL[1], y0 + rh * MM_WL_Y_IN_ROW[1]))
+                    row_data["rank_crop"] = self._img_b64(_crop(img, MM_COL_RANK[0], y0 + rh * MM_RANK_Y_IN_ROW[0], MM_COL_RANK[1], y0 + rh * MM_RANK_Y_IN_ROW[1]))
+                    row_data["time_crop"] = self._img_b64(_crop(img, MM_COL_TIME[0], y0 + rh * MM_TIME_Y_IN_ROW[0], MM_COL_TIME[1], y0 + rh * MM_TIME_Y_IN_ROW[1]))
                     parsed_rows.append(row_data)
                 result["rows"] = parsed_rows
 
@@ -1301,9 +1312,7 @@ class HeadlessBackend:
                 return
 
             regions_config = load_regions_config()
-            h, w = img.shape[:2]
-            aspect_ratio = infer_aspect_ratio(w, h, list(regions_config.keys()))
-            apply_calibration(img, aspect_ratio=aspect_ratio, regions_config=regions_config)
+            apply_calibration(img, regions_config=regions_config)
             screen = detect_screen_type(img) if not screen_type or screen_type == "unknown" else screen_type
             if screen == "final_ranking":
                 screen = "sentinel_final_ranking"
@@ -1311,17 +1320,48 @@ class HeadlessBackend:
             self._do_debug_view(
                 img_path,
                 screen,
-                self._resolve_debug_regions(screen, aspect_ratio, regions_config),
-                aspect_ratio,
+                self._resolve_debug_regions(screen, regions_config),
             )
         except Exception as e:
             log.exception("debug_saved_screenshot error")
             self._emit({"type": "debug_result", "data": {"error": str(e)}})
 
+    # ── Parser Lab ──────────────────────────────────────────────────────────
+
+    def _do_lab_parse_full(self, img_path: str, req_id: str) -> None:
+        try:
+            from lab_parse import parse_full
+            result = parse_full(img_path)
+        except Exception as e:
+            log.exception("lab_parse_full error")
+            result = {"ok": False, "error": f"{type(e).__name__}: {e}"}
+        result["req_id"] = req_id
+        self._emit({"type": "lab_parse_full_result", "data": result})
+
+    def _do_lab_parse_region(
+        self,
+        img_path: str,
+        name: str,
+        category: str,
+        bbox: list,
+        req_id: str,
+    ) -> None:
+        try:
+            from lab_parse import parse_region
+            if not (isinstance(bbox, list) and len(bbox) == 4):
+                result = {"ok": False, "error": "bbox must be [x0,y0,x1,y1]"}
+            else:
+                result = parse_region(img_path, name, category, tuple(float(v) for v in bbox))
+        except Exception as e:
+            log.exception("lab_parse_region error")
+            result = {"ok": False, "error": f"{type(e).__name__}: {e}"}
+        result["req_id"] = req_id
+        self._emit({"type": "lab_parse_region_result", "data": result})
+
     def _do_parse_test_file(self, img_path: str) -> None:
         """Parse any screenshot file and emit parse_result into the confirmation flow."""
         import cv2
-        from cv_parser import apply_calibration, detect_screen_type, load_regions_config, infer_aspect_ratio
+        from cv_parser import apply_calibration, detect_screen_type, load_regions_config
 
         try:
             img = cv2.imread(img_path)
@@ -1329,9 +1369,7 @@ class HeadlessBackend:
                 self._emit_error(f"Cannot read image: {img_path}")
                 return
             regions_config = load_regions_config()
-            h, w = img.shape[:2]
-            aspect_ratio = infer_aspect_ratio(w, h, list(regions_config.keys()))
-            apply_calibration(img, aspect_ratio=aspect_ratio, regions_config=regions_config)
+            apply_calibration(img, regions_config=regions_config)
             screen = detect_screen_type(img)
             log.info("parse_test_file: %s detected as %s", img_path, screen)
             if screen == "my_matches":

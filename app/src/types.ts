@@ -84,43 +84,80 @@ export interface ProcessingScreenshot {
   message?: string;
 }
 
-export interface DebugRegionCrop {
+// ── Parser Lab ───────────────────────────────────────────────────────────────
+
+export type LabRegionKind = "ocr" | "template" | "grid" | "band";
+
+export interface LabRegion {
   name: string;
-  image: string;
-  coords: number[];
+  kind: LabRegionKind;
+  category: string;
+  bbox: [number, number, number, number];
+  label: string;
+  row_index: number | null;
 }
 
-export interface ScreenshotDebugRow extends Partial<ParseResultRow> {
-  player_name?: string;
-  db_match?: boolean;
-  matched_user_id?: string;
-  row_image?: string;
-  player_crop?: string;
-  placement_crop?: string;
-  level_crop?: string;
-  units_crop?: string;
-  synergy_crop?: string;
-  relic_crop?: string;
-  wl_crop?: string;
-  rank_crop?: string;
-  time_crop?: string;
-}
-
-export interface ScreenshotDebugResult {
-  width: number;
-  height: number;
-  screen_type: string;
-  aspect_ratio?: string;
-  crop?: string;
-  region_crops?: DebugRegionCrop[];
-  rows?: ScreenshotDebugRow[];
-  results?: Record<string, { score: number; location?: number[] }>;
-  error?: string;
-}
-
-export interface CalibrationOpenResult {
+export interface LabParseFullResult {
   ok: boolean;
   error?: string;
+  screen_type?: "my_matches" | "game_over" | "final_ranking" | "unknown";
+  width?: number;
+  height?: number;
+  regions?: LabRegion[];
+}
+
+export interface LabParseRegionResult {
+  ok: boolean;
+  error?: string;
+  name?: string;
+  category?: string;
+  bbox?: [number, number, number, number];
+  label?: string;
+  crop_b64?: string;
+}
+
+export interface LabScreenshotGroup {
+  label: string;
+  files: Array<{ name: string; path: string; size: number; mtime: number }>;
+}
+
+export interface LabFixture {
+  name: string;
+  path: string;
+  screenshot_path: string;
+  screen_type: string;
+  row_count: number;
+}
+
+export interface LabConfigBundle {
+  defaults: Record<string, unknown> | null;
+  overrides: Record<string, unknown> | null;
+}
+
+export interface LabPytestEvent {
+  seq: number;
+  kind: "stdout" | "stderr" | "exit" | "error";
+  text: string;
+}
+
+export interface LabApi {
+  listScreenshots: () => Promise<LabScreenshotGroup[]>;
+  loadConfig: () => Promise<LabConfigBundle>;
+  saveConfig: (config: Record<string, unknown>) => Promise<{ ok: boolean; path?: string }>;
+  resetConfig: () => Promise<{ ok: boolean }>;
+  parseFull: (payload: { path: string }) => Promise<LabParseFullResult>;
+  parseRegion: (payload: {
+    path: string;
+    name: string;
+    category: string;
+    bbox: [number, number, number, number];
+  }) => Promise<LabParseRegionResult>;
+  listFixtures: () => Promise<LabFixture[]>;
+  saveFixture: (name: string, data: unknown) => Promise<{ ok: boolean; path?: string }>;
+  deleteFixture: (name: string) => Promise<{ ok: boolean; error?: string }>;
+  imageData: (filePath: string) => Promise<string | null>;
+  runFixtures: () => Promise<{ ok: boolean; seq: number }>;
+  onPytestOutput: (callback: (msg: LabPytestEvent) => void) => () => void;
 }
 
 export interface RecordingStats {
@@ -245,12 +282,8 @@ declare global {
       delete: (filename: string) => Promise<boolean>;
       openFolder: () => Promise<void>;
       thumbnail: (filename: string) => Promise<string | null>;
-      canAccessDebug: () => Promise<boolean>;
-      debug: (filename: string, screenType?: string | null) => Promise<ScreenshotDebugResult>;
       getParseResult: (filename: string) => Promise<SavedParseResult | null>;
       updateParseRow: (filename: string, rowIndex: number, fields: Partial<ParseResultRow>) => Promise<boolean>;
-      parseTestFile: () => Promise<string | null>;
-      saveFixture: (name: string, data: unknown) => Promise<string>;
     };
     replays: {
       list: () => Promise<Replay[]>;
@@ -263,6 +296,7 @@ declare global {
       sendCommand: (cmd: Record<string, unknown>) => void;
       onEvent: (callback: (msg: TrackerEvent) => void) => () => void;
     };
+    lab: LabApi;
     appApi: {
       openFileDialog: () => Promise<string | null>;
       getVersion: () => Promise<string>;
@@ -275,7 +309,6 @@ declare global {
       fetchUnitsFull: () => Promise<Record<string, UnitFullInfo>>;
       fetchSynergies: () => Promise<Record<string, SynergyInfo>>;
       fetchRelics: () => Promise<{ relics: Record<string, RelicInfo> }>;
-      openCalibration: () => Promise<CalibrationOpenResult>;
       fetchDrodo: () => Promise<DrodoProfile | null>;
       refreshDrodo: () => Promise<DrodoProfile | null>;
     };

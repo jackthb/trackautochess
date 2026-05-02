@@ -36,7 +36,6 @@ def test_fixture(fixture_path: Path):
     from cv_parser import (
         apply_calibration,
         detect_screen_type,
-        infer_aspect_ratio,
         load_regions_config,
         parse_my_matches,
         parse_game_over_all,
@@ -54,9 +53,7 @@ def test_fixture(fixture_path: Path):
     assert img is not None, f"Failed to read image: {screenshot_path}"
 
     regions_config = load_regions_config()
-    h, w = img.shape[:2]
-    aspect_ratio = infer_aspect_ratio(w, h, list(regions_config.keys()))
-    apply_calibration(img, aspect_ratio=aspect_ratio, regions_config=regions_config)
+    apply_calibration(img, regions_config=regions_config)
 
     screen_type = fixture.get("screen_type", "my_matches")
     expected_rows = fixture["rows"]
@@ -64,8 +61,7 @@ def test_fixture(fixture_path: Path):
     if screen_type == "my_matches":
         actual_rows = parse_my_matches(img, player_name="", icons_dir=ICONS_DIR, debug=False)
     elif screen_type in ("game_over", "final_ranking"):
-        all_players = parse_game_over_all(img, debug=False)
-        actual_rows = all_players
+        actual_rows = parse_game_over_all(img, ICONS_DIR, debug=False) or []
     else:
         pytest.skip(f"Unknown screen_type: {screen_type}")
 

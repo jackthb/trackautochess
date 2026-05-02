@@ -117,14 +117,15 @@ def save_config(config: dict) -> None:
 
 
 def load_regions_config() -> dict:
-    """Load picker calibration regions, merging user overrides onto defaults."""
+    """Load Parser Lab regions, merging user overrides onto defaults.
+
+    Schema is flat — single 16:9 profile, no aspect-ratio dispatch.
+    """
     def _read(path: Path) -> dict:
         if not path.exists():
             return {}
         try:
             data = json.loads(path.read_text(encoding="utf-8"))
-            if isinstance(data, dict) and "aspect_ratios" in data:
-                data = data["aspect_ratios"]
             return data if isinstance(data, dict) else {}
         except Exception:
             return {}
@@ -141,21 +142,6 @@ def load_regions_config() -> dict:
     defaults = _read(DEFAULT_REGIONS_CONFIG_PATH)
     overrides = _read(REGIONS_CONFIG_PATH)
     return _merge(defaults, overrides) if defaults else overrides
-
-
-def infer_aspect_ratio(width: int, height: int, available: list[str] | None = None) -> str:
-    """Pick the nearest configured aspect ratio label for an image size."""
-    if width <= 0 or height <= 0:
-        return "16:9"
-
-    ratio = width / height
-    known = {
-        "16:9": 16 / 9,
-        "21:9": 21 / 9,
-    }
-    if available:
-        known = {k: v for k, v in known.items() if k in available} or known
-    return min(known, key=lambda key: abs(known[key] - ratio))
 
 
 # ── Image helpers (lazy imports — cv2/numpy only loaded when called) ──────────

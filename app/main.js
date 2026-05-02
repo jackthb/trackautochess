@@ -51,10 +51,13 @@ let mainWindow = null;
 let overlayWindow = null;
 let widgetWindow = null;
 let notificationWindow = null;
-let calibrationWindow = null;
 let tray = null;
 let pythonProcess = null;
 let pythonRL = null;
+let debugResolve = null;
+const labResolvers = new Map();
+let nextLabReqId = 1;
+function nextReqId() { return `lab-${nextLabReqId++}-${Date.now()}`; }
 let overlayTimeout = null;
 let dotaPollInterval = null;
 let dotaOpen = false;
@@ -311,6 +314,18 @@ function handlePythonEvent(msg) {
         debugResolve = null;
       }
       break;
+
+    case "lab_parse_full_result":
+    case "lab_parse_region_result": {
+      const data = msg.data || {};
+      const reqId = data.req_id;
+      if (reqId && labResolvers.has(reqId)) {
+        const resolve = labResolvers.get(reqId);
+        labResolvers.delete(reqId);
+        resolve(data);
+      }
+      break;
+    }
   }
 }
 
@@ -1330,14 +1345,10 @@ ipcMain.handle("screenshots:thumbnail", async (_event, filename) => {
 });
 
 ipcMain.handle("screenshots:canAccessDebug", async () => {
-  return canAccessCalibration();
+  return true;
 });
 
 ipcMain.handle("screenshots:debug", async (_event, filename, screenType) => {
-  if (!canAccessCalibration()) {
-    return { error: "Debug access is not enabled for this user." };
-  }
-
   const filePath = path.join(SCREENSHOT_DIR, filename);
   if (!filePath.startsWith(SCREENSHOT_DIR) || !fs.existsSync(filePath)) {
     return { error: "Screenshot not found." };
@@ -1407,101 +1418,15 @@ ipcMain.handle("screenshots:saveFixture", async (_event, fixtureName, data) => {
   return outPath;
 });
 
-// ── Calibration window ──────────────────────────────────────────────────────
+// ── Parser Lab (regions config + screenshot listing) ───────────────────────
 
 const DATA_DIR = path.join(RESOURCES_DIR, "data");
-const CALIBRATION_SCREENSHOTS = path.join(DATA_DIR, "screenshots");
+const LAB_SCREENSHOTS = path.join(DATA_DIR, "screenshots");
 const DEFAULT_REGIONS_CONFIG_PATH = path.join(DATA_DIR, "regions_config.json");
 const USER_REGIONS_CONFIG_PATH = path.join(DAC_DIR, "regions_config.json");
 const STEAM_BASE = "C:\\Program Files (x86)\\Steam\\userdata";
-const CALIBRATION_OWNER_STEAM_ID = "76561198022169086";
 
-function canAccessCalibration() {
-  const configPath = path.join(DAC_DIR, "config.json");
-  if (!fs.existsSync(configPath)) return false;
-  try {
-    const config = JSON.parse(fs.readFileSync(configPath, "utf-8"));
-    return String(config.steam_id || "") === CALIBRATION_OWNER_STEAM_ID;
-  } catch {
-    return false;
-  }
-}
-
-async function openCalibrationWindow() {
-  if (calibrationWindow && !calibrationWindow.isDestroyed()) {
-    calibrationWindow.show();
-    calibrationWindow.focus();
-    return { ok: true };
-  }
-  calibrationWindow = new BrowserWindow({
-    width: 1400,
-    height: 900,
-    title: "DAC Calibration",
-    show: false,
-    webPreferences: {
-      preload: path.join(__dirname, "preload-calibration.js"),
-      contextIsolation: true,
-      nodeIntegration: false,
-    },
-  });
-  const windowRef = calibrationWindow;
-  calibrationWindow.on("closed", () => { calibrationWindow = null; });
-  try {
-    await windowRef.loadFile(path.join(__dirname, "calibration.html"));
-    if (!windowRef.isDestroyed()) {
-      windowRef.show();
-      windowRef.focus();
-    }
-    return { ok: true };
-  } catch (error) {
-    console.error("Failed to open calibration window:", error);
-    if (!windowRef.isDestroyed()) windowRef.destroy();
-    calibrationWindow = null;
-    return {
-      ok: false,
-      error: "Calibration tool assets could not be loaded. Reinstall or rebuild the app.",
-    };
-  }
-}
-
-ipcMain.handle("app:openCalibration", async () => {
-  if (!canAccessCalibration()) {
-    return { ok: false, error: "Calibration tool is not enabled for this account." };
-  }
-  return openCalibrationWindow();
-});
-
-function detectAR(filePath) {
-  try {
-    const buf = Buffer.alloc(32);
-    const fd = fs.openSync(filePath, "r");
-    fs.readSync(fd, buf, 0, 32, 0);
-    fs.closeSync(fd);
-    let w, h;
-    if (buf[0] === 0x89 && buf[1] === 0x50) {
-      w = buf.readUInt32BE(16);
-      h = buf.readUInt32BE(20);
-    } else if (buf[0] === 0xFF && buf[1] === 0xD8) {
-      const full = fs.readFileSync(filePath);
-      let offset = 2;
-      while (offset < full.length - 8) {
-        if (full[offset] !== 0xFF) break;
-        const marker = full[offset + 1];
-        if (marker === 0xC0 || marker === 0xC2) {
-          h = full.readUInt16BE(offset + 5);
-          w = full.readUInt16BE(offset + 7);
-          break;
-        }
-        const segLen = full.readUInt16BE(offset + 2);
-        offset += 2 + segLen;
-      }
-    }
-    if (w && h) return (w / h) > 2.0 ? "21:9" : "16:9";
-    return null;
-  } catch { return null; }
-}
-
-ipcMain.handle("calibration:listScreenshots", async (_event, arFilter) => {
+ipcMain.handle("lab:listScreenshots", async () => {
   const groups = [];
   function scanDir(dir, label) {
     if (!fs.existsSync(dir)) return;
@@ -1509,66 +1434,163 @@ ipcMain.handle("calibration:listScreenshots", async (_event, arFilter) => {
     for (const name of fs.readdirSync(dir)) {
       if (!/\.(jpg|jpeg|png)$/i.test(name)) continue;
       const filePath = path.join(dir, name);
-      const ar = detectAR(filePath);
-      if (arFilter && ar && ar !== arFilter) continue;
-      const stat = fs.statSync(filePath);
+      let stat;
+      try { stat = fs.statSync(filePath); } catch { continue; }
       items.push({ name, path: filePath, size: stat.size, mtime: stat.mtimeMs });
     }
     items.sort((a, b) => b.mtime - a.mtime);
     if (items.length > 0) groups.push({ label, files: items });
   }
-  scanDir(CALIBRATION_SCREENSHOTS, "Reference");
+  scanDir(LAB_SCREENSHOTS, "Reference");
   scanDir(SCREENSHOT_DIR, "DAC Tracker");
   if (fs.existsSync(STEAM_BASE)) {
     for (const user of fs.readdirSync(STEAM_BASE)) {
       const ssDir = path.join(STEAM_BASE, user, "760", "remote", "570", "screenshots");
-      scanDir(ssDir, `Steam`);
+      scanDir(ssDir, "Steam");
     }
   }
   return groups;
 });
 
-ipcMain.handle("calibration:getScreenshot", async (_event, filePath) => {
-  if (!fs.existsSync(filePath)) return null;
+ipcMain.handle("lab:loadConfig", async () => {
+  const result = { defaults: null, overrides: null };
+  try {
+    if (fs.existsSync(DEFAULT_REGIONS_CONFIG_PATH)) {
+      result.defaults = JSON.parse(fs.readFileSync(DEFAULT_REGIONS_CONFIG_PATH, "utf-8"));
+    }
+  } catch {}
+  try {
+    if (fs.existsSync(USER_REGIONS_CONFIG_PATH)) {
+      result.overrides = JSON.parse(fs.readFileSync(USER_REGIONS_CONFIG_PATH, "utf-8"));
+    }
+  } catch {}
+  return result;
+});
+
+ipcMain.handle("lab:saveConfig", async (_event, config) => {
+  fs.mkdirSync(DAC_DIR, { recursive: true });
+  fs.writeFileSync(USER_REGIONS_CONFIG_PATH, JSON.stringify(config, null, 2));
+  return { ok: true, path: USER_REGIONS_CONFIG_PATH };
+});
+
+ipcMain.handle("lab:resetConfig", async () => {
+  if (fs.existsSync(USER_REGIONS_CONFIG_PATH)) {
+    fs.unlinkSync(USER_REGIONS_CONFIG_PATH);
+  }
+  return { ok: true };
+});
+
+ipcMain.handle("lab:parseFull", async (_event, payload) => {
+  const reqId = nextReqId();
+  return new Promise((resolve) => {
+    labResolvers.set(reqId, resolve);
+    sendToPython({ cmd: "lab_parse_full", path: payload?.path || "", req_id: reqId });
+    setTimeout(() => {
+      if (labResolvers.has(reqId)) {
+        labResolvers.delete(reqId);
+        resolve({ ok: false, error: "lab_parse_full timed out (60s)" });
+      }
+    }, 60000);
+  });
+});
+
+ipcMain.handle("lab:parseRegion", async (_event, payload) => {
+  const reqId = nextReqId();
+  return new Promise((resolve) => {
+    labResolvers.set(reqId, resolve);
+    sendToPython({
+      cmd: "lab_parse_region",
+      path: payload?.path || "",
+      name: payload?.name || "",
+      category: payload?.category || "",
+      bbox: payload?.bbox || [],
+      req_id: reqId,
+    });
+    setTimeout(() => {
+      if (labResolvers.has(reqId)) {
+        labResolvers.delete(reqId);
+        resolve({ ok: false, error: "lab_parse_region timed out (30s)" });
+      }
+    }, 30000);
+  });
+});
+
+ipcMain.handle("lab:listFixtures", async () => {
+  if (!fs.existsSync(FIXTURES_DIR)) return [];
+  const files = [];
+  for (const name of fs.readdirSync(FIXTURES_DIR)) {
+    if (!name.endsWith(".json")) continue;
+    const filePath = path.join(FIXTURES_DIR, name);
+    let body;
+    try { body = JSON.parse(fs.readFileSync(filePath, "utf-8")); } catch { continue; }
+    files.push({
+      name,
+      path: filePath,
+      screenshot_path: body?.screenshot_path || "",
+      screen_type: body?.screen_type || "",
+      row_count: Array.isArray(body?.rows) ? body.rows.length : 0,
+    });
+  }
+  files.sort((a, b) => a.name.localeCompare(b.name));
+  return files;
+});
+
+ipcMain.handle("lab:saveFixture", async (_event, fixtureName, data) => {
+  fs.mkdirSync(FIXTURES_DIR, { recursive: true });
+  const outPath = path.join(FIXTURES_DIR, `${fixtureName}.json`);
+  fs.writeFileSync(outPath, JSON.stringify(data, null, 2));
+  return { ok: true, path: outPath };
+});
+
+ipcMain.handle("lab:deleteFixture", async (_event, fixtureName) => {
+  const target = path.join(FIXTURES_DIR, `${fixtureName}.json`);
+  if (target.startsWith(FIXTURES_DIR) && fs.existsSync(target)) {
+    fs.unlinkSync(target);
+    return { ok: true };
+  }
+  return { ok: false, error: "fixture not found" };
+});
+
+ipcMain.handle("lab:imageData", async (_event, filePath) => {
+  if (!filePath || !fs.existsSync(filePath)) return null;
   const buf = fs.readFileSync(filePath);
   const ext = path.extname(filePath).toLowerCase();
   const mime = ext === ".png" ? "image/png" : "image/jpeg";
   return `data:${mime};base64,${buf.toString("base64")}`;
 });
 
-ipcMain.handle("calibration:loadConfig", async () => {
-  for (const configPath of [USER_REGIONS_CONFIG_PATH, DEFAULT_REGIONS_CONFIG_PATH]) {
-    if (!fs.existsSync(configPath)) continue;
-    try {
-      return JSON.parse(fs.readFileSync(configPath, "utf-8"));
-    } catch {}
+let pytestProc = null;
+let pytestSeq = 0;
+
+ipcMain.handle("lab:runFixtures", async (_event) => {
+  const { spawn } = require("child_process");
+  if (pytestProc) {
+    try { pytestProc.kill(); } catch {}
+    pytestProc = null;
   }
-  return null;
-});
-
-ipcMain.handle("calibration:saveConfig", async (_event, config) => {
-  fs.mkdirSync(DAC_DIR, { recursive: true });
-  fs.writeFileSync(USER_REGIONS_CONFIG_PATH, JSON.stringify(config, null, 2));
-  return true;
-});
-
-let debugResolve = null;
-
-ipcMain.handle("calibration:debugView", async (_event, payload) => {
-  return new Promise((resolve) => {
-    debugResolve = resolve;
-    sendToPython({
-      cmd: "debug_view",
-      path: payload?.screenshotPath,
-      screen: payload?.screen,
-      regions: payload?.regions || {},
-      aspect_ratio: payload?.aspectRatio || null,
-    });
-    setTimeout(() => {
-      if (debugResolve === resolve) {
-        debugResolve = null;
-        resolve({ error: "View debug timed out (30s)" });
-      }
-    }, 30000);
+  pytestSeq++;
+  const seq = pytestSeq;
+  const cwd = path.join(__dirname, "backend");
+  const py = process.env.DAC_PYTHON || "python";
+  const proc = spawn(py, ["-m", "pytest", "tests/test_fixtures.py", "-v", "--no-header", "--tb=short"], {
+    cwd,
+    env: { ...process.env, PYTHONUNBUFFERED: "1" },
   });
+  pytestProc = proc;
+
+  const broadcast = (kind, text) => {
+    if (mainWindow && !mainWindow.isDestroyed()) {
+      mainWindow.webContents.send("lab:pytestOutput", { seq, kind, text });
+    }
+  };
+  proc.stdout.on("data", (d) => broadcast("stdout", d.toString()));
+  proc.stderr.on("data", (d) => broadcast("stderr", d.toString()));
+  proc.on("close", (code) => {
+    broadcast("exit", `\n[exit code ${code}]\n`);
+    if (pytestProc === proc) pytestProc = null;
+  });
+  proc.on("error", (err) => broadcast("error", `\n[spawn error: ${err.message}]\n`));
+
+  return { ok: true, seq };
 });
+

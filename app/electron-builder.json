@@ -11,11 +11,9 @@
     "preload-overlay.js",
     "preload-widget.js",
     "preload-notification.js",
-    "preload-calibration.js",
     "overlay.html",
     "notification.html",
     "widget.html",
-    "calibration.html",
     "dist/**/*",
     "!node_modules/**/*"
   ],

@@ -5,6 +5,7 @@ import { StatusBar } from "./components/StatusBar";
 import { HistoryTab } from "./components/HistoryTab";
 import { ReplaysTab } from "./components/ReplaysTab";
 import { ConfirmationTab } from "./components/ConfirmationTab";
+import { LabTab } from "./components/LabTab";
 import { SettingsTab } from "./components/SettingsTab";
 import { LogTab } from "./components/LogTab";
 import { LoginScreen } from "./components/LoginScreen";
@@ -14,12 +15,11 @@ import { useDrodo } from "./hooks/useDrodo";
 import { useReplays } from "./hooks/useReplays";
 import "./styles/app.css";
 
-type TabId = "history" | "replays" | "confirm" | "settings" | "log";
+type TabId = "history" | "replays" | "confirm" | "lab" | "settings" | "log";
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<TabId>("history");
   const [focusGameId, setFocusGameId] = useState<number | null>(null);
-  const [debugEnabled, setDebugEnabled] = useState(false);
 
   const gamesState = useGames();
   const drodoState = useDrodo();
@@ -35,10 +35,6 @@ export default function App() {
   const hasParseResult = tracker.pendingParseResult !== null;
   const hasProcessingScreenshot = tracker.processingScreenshot !== null;
   const prevHasResult = useRef(false);
-
-  useEffect(() => {
-    window.screenshots.canAccessDebug().then(setDebugEnabled).catch(() => setDebugEnabled(false));
-  }, []);
 
   useEffect(() => {
     if ((hasParseResult || hasProcessingScreenshot) && !prevHasResult.current) {
@@ -106,9 +102,9 @@ export default function App() {
                 relicsData={gamesState.relicsData}
                 importing={tracker.importing}
                 onBeginImport={tracker.beginImport}
-                debugEnabled={debugEnabled}
               />
             )}
+            {activeTab === "lab" && <LabTab />}
             {activeTab === "settings" && (
               <SettingsTab
                 status={tracker.status}
