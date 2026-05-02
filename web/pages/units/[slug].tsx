@@ -40,10 +40,10 @@ export default function UnitDetailPage({ unit, related }: UnitDetailPageProps) {
         iconSrc={`/icons/units/${unit.iconStem}.png`}
         overview={<>{description} {unit.synergies.length ? `Synergies: ${unit.synergies.join(", ")}.` : ""}</>}
         tag={{ label: `Cost ${unit.cost}` }}
-        extraRelatedTitle="Unit Synergies"
-        extraRelated={synergyEntities}
-        relatedTitle="More Units"
-        related={relatedEntities}
+        relatedTitle={`${unit.name} Synergies`}
+        related={synergyEntities}
+        extraRelatedTitle="More Units"
+        extraRelated={relatedEntities}
       />
     </>
   );
