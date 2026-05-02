@@ -240,6 +240,10 @@ export default function AboutPage() {
               Drodo data is not available, we fall back to manually tracked or
               imported match history.
             </p>
+            <p>
+              We run light advertisements to help cover hosting costs and
+              support continued development of the tracker.
+            </p>
           </div>
 
           <section className="panel">
