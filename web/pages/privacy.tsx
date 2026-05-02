@@ -109,10 +109,7 @@ export default function PrivacyPage() {
           </p>
 
           <h2>Contact</h2>
-          <p>
-            Questions about this policy? Email{" "}
-            <a href="mailto:jackcburgess@gmail.com">jackcburgess@gmail.com</a>.
-          </p>
+          <p>Questions about this policy? Please visit the support page.</p>
         </div>
       </div>
     </>
