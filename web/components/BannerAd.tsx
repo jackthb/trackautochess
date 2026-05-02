@@ -48,13 +48,6 @@ function wrapClassFor(slot: Slot): string {
   return "ad-sidebar";
 }
 
-function slotCode(slot: Slot): string {
-  if (slot === "bottom") return "BCAST/01";
-  if (slot === "in-content") return "INSERT/02";
-  if (slot === "sidebar-left") return "RAIL/L03";
-  return "RAIL/R04";
-}
-
 export function BannerAd({ slot }: BannerAdProps) {
   const [mounted, setMounted] = useState(false);
   const [viewportWidth, setViewportWidth] = useState(0);
@@ -83,123 +76,44 @@ export function BannerAd({ slot }: BannerAdProps) {
           display: flex;
           flex-direction: column;
           align-items: center;
+          gap: 6px;
         }
         .ad-bottom {
-          padding: 44px 24px 32px;
+          padding: 32px 24px 24px;
         }
         .ad-sidebar {
           position: sticky;
           top: 96px;
         }
         .ad-incontent {
-          padding: 8px 0 24px;
+          padding: 8px 0 20px;
           margin: 0 auto;
-        }
-
-        .shell {
-          display: inline-flex;
-          flex-direction: column;
-          gap: 9px;
-          align-items: stretch;
-        }
-
-        .meta {
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          padding: 0 2px;
-          line-height: 1;
         }
         .label {
           font-family: var(--font-mono);
-          font-size: 9px;
-          letter-spacing: 3px;
-          text-transform: uppercase;
-          color: var(--accent-dim);
-          opacity: 0.55;
-        }
-        .code {
-          font-family: var(--font-mono);
-          font-size: 9px;
-          letter-spacing: 1.5px;
+          font-size: 11px;
           color: var(--text-muted);
-          opacity: 0.32;
+          opacity: 0.6;
         }
-
-        .frame-wrap {
-          position: relative;
-          display: inline-block;
-          line-height: 0;
-        }
-
-        .frame-wrap > .corner {
-          position: absolute;
-          width: 9px;
-          height: 9px;
-          border: 1px solid var(--accent-dim);
-          opacity: 0.5;
-          pointer-events: none;
-          transition: opacity 280ms ease;
-        }
-        .corner-tl {
-          top: -5px;
-          left: -5px;
-          border-right: 0;
-          border-bottom: 0;
-        }
-        .corner-tr {
-          top: -5px;
-          right: -5px;
-          border-left: 0;
-          border-bottom: 0;
-        }
-        .corner-bl {
-          bottom: -5px;
-          left: -5px;
-          border-right: 0;
-          border-top: 0;
-        }
-        .corner-br {
-          bottom: -5px;
-          right: -5px;
-          border-left: 0;
-          border-top: 0;
-        }
-        .frame-wrap:hover > .corner {
-          opacity: 0.9;
-        }
-
         .frame {
           display: block;
           border: 0;
-          background: transparent;
         }
       `}</style>
       <div
         className={`ad-wrap ${wrapClassFor(slot)}`}
         aria-label="Advertisement"
       >
-        <div className="shell">
-          <div className="meta">
-            <span className="label">Sponsor</span>
-            <span className="code">{slotCode(slot)}</span>
-          </div>
-          <div className="frame-wrap">
-            <span className="corner corner-tl" />
-            <span className="corner corner-tr" />
-            <span className="corner corner-bl" />
-            <span className="corner corner-br" />
-            <iframe
-              className="frame"
-              srcDoc={srcDoc}
-              width={dims.width}
-              height={dims.height}
-              scrolling="no"
-              title="Advertisement"
-              sandbox="allow-scripts allow-popups allow-same-origin"
-            />
-          </div>
-        </div>
+        <span className="label">Advertisement</span>
+        <iframe
+          className="frame"
+          srcDoc={srcDoc}
+          width={dims.width}
+          height={dims.height}
+          scrolling="no"
+          title="Advertisement"
+          sandbox="allow-scripts allow-popups allow-same-origin"
+        />
       </div>
     </>
   );
