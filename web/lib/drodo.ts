@@ -12,6 +12,14 @@ export const DRODO_MISSING_TTL_MS = 7 * 24 * 60 * 60 * 1000;
 export const EMPTY_DRODO_PROFILE_ERROR =
   "Steam account has no Dota Auto Chess MMR or stats.";
 
+// Adaptive polling: when the cron tick finds no change we multiply the
+// interval, otherwise we reset to the floor. Manual refreshes always
+// reset (the user just expressed interest). Missing profiles park at
+// the cap until the next manual refresh.
+export const POLL_MIN_INTERVAL_SECONDS = 60 * 60; // 1 hour
+export const POLL_MAX_INTERVAL_SECONDS = 7 * 24 * 60 * 60; // 7 days
+export const POLL_BACKOFF_FACTOR = 1.5;
+
 export interface SeasonSnapshotRow {
   steam_id: string;
   season: string;
@@ -201,12 +209,89 @@ function drodoProfileToUserPayload(
   };
 }
 
+interface PollSchedule {
+  next_poll_at: string;
+  poll_interval_seconds: number;
+}
+
+interface PollSnapshot {
+  drodo_mmr: number | null;
+  drodo_season_games: number | null;
+  drodo_chicken_count: number | null;
+  poll_interval_seconds: number | null;
+}
+
+function clampInterval(seconds: number): number {
+  if (!Number.isFinite(seconds) || seconds < POLL_MIN_INTERVAL_SECONDS) {
+    return POLL_MIN_INTERVAL_SECONDS;
+  }
+  if (seconds > POLL_MAX_INTERVAL_SECONDS) return POLL_MAX_INTERVAL_SECONDS;
+  return Math.round(seconds);
+}
+
+export function nextPollSchedule(input: {
+  mode: "reset" | "adaptive";
+  changed: boolean;
+  prevIntervalSeconds: number | null;
+  missing?: boolean;
+}): PollSchedule {
+  const { mode, changed, prevIntervalSeconds, missing = false } = input;
+  let intervalSeconds: number;
+
+  if (missing) {
+    intervalSeconds = POLL_MAX_INTERVAL_SECONDS;
+  } else if (mode === "reset" || changed) {
+    intervalSeconds = POLL_MIN_INTERVAL_SECONDS;
+  } else {
+    const prev = prevIntervalSeconds ?? POLL_MIN_INTERVAL_SECONDS;
+    intervalSeconds = clampInterval(prev * POLL_BACKOFF_FACTOR);
+  }
+
+  intervalSeconds = clampInterval(intervalSeconds);
+  return {
+    next_poll_at: new Date(Date.now() + intervalSeconds * 1000).toISOString(),
+    poll_interval_seconds: intervalSeconds,
+  };
+}
+
+async function loadPollSnapshot(
+  steamId: string,
+  supabase: SupabaseClient
+): Promise<PollSnapshot | null> {
+  const { data } = await supabase
+    .from("users")
+    .select(
+      "drodo_mmr, drodo_season_games, drodo_chicken_count, poll_interval_seconds"
+    )
+    .eq("steam_id", steamId)
+    .maybeSingle<PollSnapshot>();
+  return data ?? null;
+}
+
+function profileChanged(
+  prev: PollSnapshot | null,
+  next: DrodoProfileRow
+): boolean {
+  if (!prev) return true;
+  return (
+    prev.drodo_mmr !== next.mmr ||
+    prev.drodo_season_games !== next.season_games ||
+    prev.drodo_chicken_count !== next.chicken_count
+  );
+}
+
 export async function markDrodoMissing(
   steamId: string,
   supabase?: SupabaseClient | null
 ): Promise<string> {
   const fetchedAt = new Date().toISOString();
   if (!supabase) return fetchedAt;
+  const schedule = nextPollSchedule({
+    mode: "adaptive",
+    changed: false,
+    prevIntervalSeconds: null,
+    missing: true,
+  });
   const { error } = await supabase.from("users").upsert(
     {
       steam_id: steamId,
@@ -220,6 +305,8 @@ export async function markDrodoMissing(
       drodo_raw_data: null,
       drodo_last_fetched_at: fetchedAt,
       drodo_profile_missing: true,
+      next_poll_at: schedule.next_poll_at,
+      poll_interval_seconds: schedule.poll_interval_seconds,
     },
     { onConflict: "steam_id" }
   );
@@ -291,8 +378,17 @@ export type FetchDrodoResult =
 export async function fetchAndCacheDrodo(
   steamId: string,
   supabase: SupabaseClient | null,
-  options: { snapshotOnSuccess?: boolean } = {}
+  options: {
+    snapshotOnSuccess?: boolean;
+    /** "adaptive" backs off when nothing changed; "reset" always returns to the floor (manual refresh, first-pull). */
+    pollMode?: "adaptive" | "reset";
+  } = {}
 ): Promise<FetchDrodoResult> {
+  const pollMode = options.pollMode ?? "reset";
+  const prevSnapshot =
+    supabase && pollMode === "adaptive"
+      ? await loadPollSnapshot(steamId, supabase)
+      : null;
   let drodoData: Record<string, unknown>;
   try {
     const resp = await fetch(`${DRODO_BASE}/courier/get/@${steamId}`);
@@ -339,9 +435,22 @@ export async function fetchAndCacheDrodo(
     return { ok: true, profile, seasonRows };
   }
 
+  const changed = profileChanged(prevSnapshot, profile);
+  const schedule = nextPollSchedule({
+    mode: pollMode,
+    changed,
+    prevIntervalSeconds: prevSnapshot?.poll_interval_seconds ?? null,
+  });
   const { error: upsertError } = await supabase
     .from("users")
-    .upsert(drodoProfileToUserPayload(profile), { onConflict: "steam_id" });
+    .upsert(
+      {
+        ...drodoProfileToUserPayload(profile),
+        next_poll_at: schedule.next_poll_at,
+        poll_interval_seconds: schedule.poll_interval_seconds,
+      },
+      { onConflict: "steam_id" }
+    );
   if (upsertError) {
     console.error("Failed to cache Drodo profile:", upsertError.message);
   }

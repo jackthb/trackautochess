@@ -1,3 +1,9 @@
 {
-  "ignoreCommand": "git diff --quiet HEAD^ HEAD -- . ../data/"
+  "ignoreCommand": "git diff --quiet HEAD^ HEAD -- . ../data/",
+  "crons": [
+    {
+      "path": "/api/cron/poll-drodo",
+      "schedule": "*/30 * * * *"
+    }
+  ]
 }
