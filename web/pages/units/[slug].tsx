@@ -4,18 +4,27 @@ import { EntityDetail, type RelatedEntity } from "@/components/EntityDetail";
 import { SeoHead } from "@/lib/seo";
 import { SITE_TITLE } from "@/lib/site";
 import { getAllUnits, getUnitBySlug, type DisplayUnit } from "@/lib/units";
-import { getAllSynergies } from "@/lib/synergies";
+import { getAllSynergies, type DisplaySynergy } from "@/lib/synergies";
 import { slugifyName } from "@/lib/slugs";
+import {
+  loadDraftUnits,
+  loadDraftSynergies,
+} from "@/lib/sanity/draftLoaders";
 
 interface UnitDetailPageProps {
   unit: DisplayUnit;
   related: DisplayUnit[];
+  synergies: DisplaySynergy[];
+  draftMode: boolean;
   supabase: SupabaseClient | null;
 }
 
-export default function UnitDetailPage({ unit, related }: UnitDetailPageProps) {
+export default function UnitDetailPage({
+  unit,
+  related,
+  synergies,
+}: UnitDetailPageProps) {
   const description = `${unit.name} is a cost ${unit.cost} unit in Dota Auto Chess.`;
-  const synergies = getAllSynergies();
   const synergyByName = new Map(synergies.map((syn) => [syn.name, syn]));
   const relatedEntities: RelatedEntity[] = related.map((u) => ({
     slug: u.slug,
@@ -54,18 +63,40 @@ export default function UnitDetailPage({ unit, related }: UnitDetailPageProps) {
 
 export const getStaticPaths: GetStaticPaths = async () => ({
   paths: getAllUnits().map((unit) => ({ params: { slug: unit.slug } })),
-  fallback: false,
+  // 'blocking' so new draft-only documents render in Presentation without
+  // a rebuild. Production traffic for unknown slugs still 404s via the
+  // notFound branch in getStaticProps.
+  fallback: "blocking",
 });
 
-export const getStaticProps: GetStaticProps = async ({ params }) => {
+export const getStaticProps: GetStaticProps<UnitDetailPageProps> = async ({
+  params,
+  draftMode = false,
+}) => {
   const slug = params?.slug;
   if (typeof slug !== "string") return { notFound: true };
-  const unit = getUnitBySlug(slug);
+
+  const allUnits = draftMode ? await loadDraftUnits(true) : getAllUnits();
+  const unit = draftMode
+    ? allUnits.find((u) => u.slug === slug) ?? null
+    : getUnitBySlug(slug);
   if (!unit) return { notFound: true };
 
-  const related = getAllUnits()
+  const related = allUnits
     .filter((candidate) => candidate.cost === unit.cost && candidate.slug !== unit.slug)
     .slice(0, 8);
 
-  return { props: { unit, related } };
+  const synergies = draftMode
+    ? await loadDraftSynergies(true)
+    : getAllSynergies();
+
+  return {
+    props: {
+      unit,
+      related,
+      synergies,
+      draftMode,
+      supabase: null,
+    },
+  };
 };

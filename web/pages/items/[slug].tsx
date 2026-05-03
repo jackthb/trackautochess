@@ -11,10 +11,12 @@ import {
   TIER_LABEL,
 } from "@/lib/items";
 import { absoluteUrl, SITE_TITLE } from "@/lib/site";
+import { loadDraftItems } from "@/lib/sanity/draftLoaders";
 
 interface ItemDetailPageProps {
   item: DisplayItem;
   related: DisplayItem[];
+  draftMode: boolean;
   supabase: SupabaseClient | null;
 }
 
@@ -39,7 +41,6 @@ function buildDescription(item: DisplayItem): string {
 export default function ItemDetailPage({
   item,
   related,
-  supabase,
 }: ItemDetailPageProps) {
   const title = `${item.name} Item Guide | ${SITE_TITLE}`;
   const description = buildDescription(item);
@@ -117,23 +118,36 @@ export default function ItemDetailPage({
   );
 }
 
-export const getStaticPaths: GetStaticPaths = async () => {
-  return {
-    paths: getAllItems().map((item) => ({ params: { slug: item.slug } })),
-    fallback: false,
-  };
-};
+export const getStaticPaths: GetStaticPaths = async () => ({
+  paths: getAllItems().map((item) => ({ params: { slug: item.slug } })),
+  fallback: "blocking",
+});
 
-export const getStaticProps: GetStaticProps = async ({ params }) => {
+export const getStaticProps: GetStaticProps<ItemDetailPageProps> = async ({
+  params,
+  draftMode = false,
+}) => {
   const slug = params?.slug;
   if (typeof slug !== "string") return { notFound: true };
 
-  const item = getItemBySlug(slug);
+  const allItems = draftMode ? await loadDraftItems(true) : getAllItems();
+  const item = draftMode
+    ? allItems.find((i) => i.slug === slug) ?? null
+    : getItemBySlug(slug);
   if (!item) return { notFound: true };
 
-  const related = getAllItems()
-    .filter((candidate) => candidate.tier === item.tier && candidate.slug !== item.slug)
+  const related = allItems
+    .filter(
+      (candidate) => candidate.tier === item.tier && candidate.slug !== item.slug
+    )
     .slice(0, 8);
 
-  return { props: { item, related } };
+  return {
+    props: {
+      item,
+      related,
+      draftMode,
+      supabase: null,
+    },
+  };
 };

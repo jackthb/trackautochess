@@ -10,6 +10,7 @@ import { getItemSlugByName, getItemBySlug, iconUrl } from "@/lib/items";
 import { getRelicSlugByName, getRelicBySlug } from "@/lib/relics";
 import { getTalentByName } from "@/lib/talents";
 import { absoluteUrl, SITE_NAME, SITE_TITLE } from "@/lib/site";
+import { loadDraftPatchNote } from "@/lib/sanity/draftLoaders";
 
 type EntryKind =
   | "added"
@@ -50,6 +51,7 @@ interface IndexPatch {
 interface PatchPageProps {
   patch: Patch;
   slug: string;
+  draftMode: boolean;
   supabase: SupabaseClient | null;
 }
 
@@ -561,12 +563,39 @@ export const getStaticPaths: GetStaticPaths = async () => {
     paths: (patchIndex.patches as IndexPatch[]).map((patch) => ({
       params: { slug: patch.slug },
     })),
-    fallback: false,
+    fallback: "blocking",
   };
 };
 
-export const getStaticProps: GetStaticProps = async ({ params }) => {
-  const slug = params?.slug as string;
+export const getStaticProps: GetStaticProps<PatchPageProps> = async ({
+  params,
+  draftMode = false,
+}) => {
+  const slug = params?.slug;
+  if (typeof slug !== "string") return { notFound: true };
+
+  if (draftMode) {
+    const draft = await loadDraftPatchNote(slug, true);
+    if (!draft) return { notFound: true };
+    const patch: Patch = {
+      date: draft.date,
+      title: draft.title,
+      source: draft.source,
+      flavor: draft.flavor,
+      sections: draft.sections.map((s) => ({
+        heading: s.heading,
+        entries: s.entries.map((e) => ({
+          kind: e.kind as EntryKind,
+          name: e.name,
+          detail: e.detail,
+        })),
+      })),
+    };
+    return {
+      props: { patch, slug, draftMode: true, supabase: null },
+    };
+  }
+
   const filePath = path.join(
     process.cwd(),
     "..",
@@ -574,12 +603,10 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
     "patch_notes",
     `${slug}.json`
   );
+  if (!fs.existsSync(filePath)) return { notFound: true };
   const patch: Patch = JSON.parse(fs.readFileSync(filePath, "utf-8"));
 
   return {
-    props: {
-      patch,
-      slug,
-    },
+    props: { patch, slug, draftMode: false, supabase: null },
   };
 };

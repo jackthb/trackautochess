@@ -1,5 +1,6 @@
 import "@/styles/globals.css";
 import type { AppProps } from "next/app";
+import dynamic from "next/dynamic";
 import { useEffect, useState } from "react";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
@@ -10,6 +11,11 @@ import { NavBar } from "@/components/NavBar";
 import { createSupabaseClient } from "@/lib/supabase";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
+const SanityVisualEditing = dynamic(
+  () => import("@/components/SanityVisualEditing"),
+  { ssr: false }
+);
+
 const BOT_ID_PROTECTED_ROUTES = [
   { path: "/api/drodo/*", method: "GET" },
   { path: "/api/drodo/*", method: "POST" },
@@ -17,11 +23,15 @@ const BOT_ID_PROTECTED_ROUTES = [
   { path: "/api/support", method: "POST" },
 ];
 
-export default function App({ Component, pageProps }: AppProps) {
+interface AppPageProps {
+  draftMode?: boolean;
+  [key: string]: unknown;
+}
+
+export default function App({ Component, pageProps }: AppProps<AppPageProps>) {
   const [supabase, setSupabase] = useState<SupabaseClient | null>(null);
 
   useEffect(() => {
-    // Only create the Supabase client on the browser side
     setSupabase(createSupabaseClient());
   }, []);
 
@@ -36,6 +46,7 @@ export default function App({ Component, pageProps }: AppProps) {
       <Footer />
       <Analytics />
       <SpeedInsights />
+      {pageProps?.draftMode && <SanityVisualEditing />}
     </>
   );
 }

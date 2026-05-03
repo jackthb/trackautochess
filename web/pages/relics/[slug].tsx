@@ -8,10 +8,12 @@ import {
   type DisplayRelic,
 } from "@/lib/relics";
 import { absoluteUrl, SITE_TITLE } from "@/lib/site";
+import { loadDraftRelics } from "@/lib/sanity/draftLoaders";
 
 interface RelicDetailPageProps {
   relic: DisplayRelic;
   related: DisplayRelic[];
+  draftMode: boolean;
   supabase: SupabaseClient | null;
 }
 
@@ -36,7 +38,6 @@ function buildDescription(relic: DisplayRelic): string {
 export default function RelicDetailPage({
   relic,
   related,
-  supabase,
 }: RelicDetailPageProps) {
   const title = `${relic.name} Relic Guide | ${SITE_TITLE}`;
   const description = buildDescription(relic);
@@ -109,23 +110,34 @@ export default function RelicDetailPage({
   );
 }
 
-export const getStaticPaths: GetStaticPaths = async () => {
-  return {
-    paths: getAllRelics().map((relic) => ({ params: { slug: relic.slug } })),
-    fallback: false,
-  };
-};
+export const getStaticPaths: GetStaticPaths = async () => ({
+  paths: getAllRelics().map((relic) => ({ params: { slug: relic.slug } })),
+  fallback: "blocking",
+});
 
-export const getStaticProps: GetStaticProps = async ({ params }) => {
+export const getStaticProps: GetStaticProps<RelicDetailPageProps> = async ({
+  params,
+  draftMode = false,
+}) => {
   const slug = params?.slug;
   if (typeof slug !== "string") return { notFound: true };
 
-  const relic = getRelicBySlug(slug);
+  const allRelics = draftMode ? await loadDraftRelics(true) : getAllRelics();
+  const relic = draftMode
+    ? allRelics.find((r) => r.slug === slug) ?? null
+    : getRelicBySlug(slug);
   if (!relic) return { notFound: true };
 
-  const related = getAllRelics()
+  const related = allRelics
     .filter((candidate) => candidate.slug !== relic.slug)
     .slice(0, 8);
 
-  return { props: { relic, related } };
+  return {
+    props: {
+      relic,
+      related,
+      draftMode,
+      supabase: null,
+    },
+  };
 };
