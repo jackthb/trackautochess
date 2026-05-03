@@ -1,4 +1,5 @@
 import { unitStem, synIconName, relicStem } from "@dac/shared/game-utils";
+import { stegaClean } from "next-sanity";
 import { slugifyName } from "@/lib/slugs";
 import type { DisplayUnit } from "@/lib/units";
 import type { DisplaySynergy } from "@/lib/synergies";
@@ -138,7 +139,7 @@ export async function loadDraftUnits(draftMode: boolean): Promise<DisplayUnit[]>
         cost: u.cost ?? 0,
         synergies: u.synergies ?? [],
         iconStem: stem,
-        iconUrl: u.icon_url || `/icons/units/${stem}.png`,
+        iconUrl: stegaClean(u.icon_url ?? "") || `/icons/units/${stem}.png`,
         iconDimensions: u.icon_dimensions ?? null,
       };
     })
@@ -164,7 +165,7 @@ export async function loadDraftSynergies(
         description,
         lore: s.lore ?? "",
         iconStem: stem,
-        iconUrl: s.icon_url || `/icons/synergies/${stem}.png`,
+        iconUrl: stegaClean(s.icon_url ?? "") || `/icons/synergies/${stem}.png`,
         iconDimensions: s.icon_dimensions ?? null,
         category: inferSynergyCategory(description),
       };
@@ -190,7 +191,7 @@ export async function loadDraftItems(draftMode: boolean): Promise<DisplayItem[]>
         tier: i.tier as number,
         icon,
         texture,
-        iconUrl: i.icon_url || legacyItemIconUrl(icon, texture),
+        iconUrl: stegaClean(i.icon_url ?? "") || legacyItemIconUrl(icon, texture),
         iconDimensions: i.icon_dimensions ?? null,
       };
     })
@@ -213,7 +214,7 @@ export async function loadDraftRelics(draftMode: boolean): Promise<DisplayRelic[
         description: r.description ?? "",
         lore: cleanRelicLore(r.lore ?? ""),
         iconStem: stem,
-        iconUrl: r.icon_url || `/icons/relics/${stem}.png`,
+        iconUrl: stegaClean(r.icon_url ?? "") || `/icons/relics/${stem}.png`,
         iconDimensions: r.icon_dimensions ?? null,
       };
     })

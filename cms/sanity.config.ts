@@ -15,7 +15,7 @@ const dataset =
 
 // Web frontend that the Presentation tool iframes. Local dev defaults to
 // localhost:3000; production deploys should set SANITY_STUDIO_PREVIEW_ORIGIN
-// to https://trackautochess.com so the deployed Studio loads the live site.
+// to https://www.trackautochess.com so the deployed Studio loads the live site.
 const previewOrigin = process.env.SANITY_STUDIO_PREVIEW_ORIGIN || 'http://localhost:3000'
 
 export default defineConfig({
@@ -34,6 +34,11 @@ export default defineConfig({
           disable: '/api/draft/disable',
         },
       },
+      allowOrigins: [
+        'https://www.trackautochess.com',
+        'https://trackautochess.com',
+        'http://localhost:3000',
+      ],
     }),
     structureTool({structure: deskStructure}),
     visionTool(),
