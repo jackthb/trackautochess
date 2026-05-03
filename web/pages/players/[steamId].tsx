@@ -21,6 +21,9 @@ import {
   getManualRefreshQuota,
   type ManualRefreshQuota,
 } from "@/lib/manualRefreshQuota";
+import { isAdminSteamId } from "@/lib/admin";
+import { createSupabaseClient } from "@/lib/supabase";
+import { fetchAndCacheDrodo } from "@/lib/drodo";
 import {
   fetchSteamProfile,
   playerProfilePath,
@@ -152,6 +155,45 @@ export default function PlayerPage({
   const [nowMs, setNowMs] = useState<number | null>(null);
   const [refreshing, setRefreshing] = useState(false);
   const [avatarFailed, setAvatarFailed] = useState(false);
+  const [sessionSteamId, setSessionSteamId] = useState<string | null>(null);
+  const [accessToken, setAccessToken] = useState<string | null>(null);
+
+  useEffect(() => {
+    const supabase = createSupabaseClient();
+    if (!supabase) return;
+    let cancelled = false;
+    supabase.auth.getSession().then(({ data }) => {
+      if (cancelled) return;
+      const meta = data.session?.user?.user_metadata as
+        | { steam_id?: unknown }
+        | null
+        | undefined;
+      setSessionSteamId(
+        meta && typeof meta.steam_id === "string" ? meta.steam_id : null
+      );
+      setAccessToken(data.session?.access_token ?? null);
+    });
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      const meta = session?.user?.user_metadata as
+        | { steam_id?: unknown }
+        | null
+        | undefined;
+      setSessionSteamId(
+        meta && typeof meta.steam_id === "string" ? meta.steam_id : null
+      );
+      setAccessToken(session?.access_token ?? null);
+    });
+    return () => {
+      cancelled = true;
+      subscription.unsubscribe();
+    };
+  }, []);
+
+  const isAdmin = isAdminSteamId(sessionSteamId);
+  const isOwnProfile = sessionSteamId !== null && sessionSteamId === steamId;
+  const canRefresh = isAdmin || isOwnProfile;
   const displayName = steamProfile.name || steamProfile.customUrl || steamId;
   const profileUrl = steamProfileUrl(steamId, steamProfile.customUrl);
   const title = `${displayName} | ${SITE_TITLE}`;
@@ -182,11 +224,19 @@ export default function PlayerPage({
 
   const lastFetchedTimestamp = formatLastFetchedTimestamp(drodoLastFetchedAt);
   const lastFetchedAge = formatLastFetchedAge(drodoLastFetchedAt, nowMs);
-  const refreshDisabled = refreshing || manualRefreshQuota.remaining <= 0;
+  const showQuota = canRefresh && !isAdmin;
+  const refreshDisabled =
+    !canRefresh ||
+    refreshing ||
+    (showQuota && manualRefreshQuota.remaining <= 0);
   const refreshQuotaLabel = `${manualRefreshQuota.remaining}/${manualRefreshQuota.limit}`;
 
   const handleRefresh = async () => {
-    if (manualRefreshQuota.remaining <= 0) {
+    if (!canRefresh) {
+      setRefreshError("Sign in with Steam to refresh your own profile.");
+      return;
+    }
+    if (showQuota && manualRefreshQuota.remaining <= 0) {
       setRefreshError("Daily manual refresh limit reached.");
       return;
     }
@@ -196,7 +246,12 @@ export default function PlayerPage({
     try {
       const resp = await fetch(
         `/api/drodo/${encodeURIComponent(steamId)}?refresh=1`,
-        { method: "POST" }
+        {
+          method: "POST",
+          headers: accessToken
+            ? { Authorization: `Bearer ${accessToken}` }
+            : undefined,
+        }
       );
       const data = await resp.json().catch(() => null);
       if (data?.refresh_quota) {
@@ -483,15 +538,19 @@ export default function PlayerPage({
               </div>
             </div>
             <div className="player-actions">
-              <Button disabled={refreshDisabled} onClick={handleRefresh}>
-                {refreshing ? "Refreshing..." : "Refresh MMR"}
-              </Button>
-              <div className="refresh-quota">
-                <span>Manual refreshes</span>
-                <span className="refresh-quota-value">
-                  {refreshQuotaLabel} left today
-                </span>
-              </div>
+              {canRefresh && (
+                <Button disabled={refreshDisabled} onClick={handleRefresh}>
+                  {refreshing ? "Refreshing..." : "Refresh MMR"}
+                </Button>
+              )}
+              {showQuota && (
+                <div className="refresh-quota">
+                  <span>Manual refreshes</span>
+                  <span className="refresh-quota-value">
+                    {refreshQuotaLabel} left today
+                  </span>
+                </div>
+              )}
               {refreshError && (
                 <div className="refresh-error">{refreshError}</div>
               )}
@@ -598,7 +657,14 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
   const supabase = url && key ? createClient(url, key) : null;
+  const supabaseAdmin =
+    url && serviceKey
+      ? createClient(url, serviceKey, {
+          auth: { autoRefreshToken: false, persistSession: false },
+        })
+      : null;
   const baseUrl = getRequestSiteUrl(context.req.headers);
   const manualRefreshQuota = getManualRefreshQuota(context.req.headers.cookie);
 
@@ -657,6 +723,35 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       }
     }
     if (seasonsResult.data) seasons = seasonsResult.data;
+
+    // First-time profile view: kick off a Drodo pull so the page lands
+    // with data instead of an empty MMR card. The cooldown logic in
+    // fetchAndCacheDrodo + isFreshCache prevents repeat pulls.
+    if (drodoLastFetchedAt === null && supabaseAdmin) {
+      const result = await fetchAndCacheDrodo(steamId, supabaseAdmin);
+      if (result.ok) {
+        drodo = {
+          mmr: result.profile.mmr,
+          max_mmr: result.profile.max_mmr,
+          mmr_level: result.profile.mmr_level,
+          season: result.profile.season,
+          season_games: result.profile.season_games,
+          candy: result.profile.candy,
+          chicken_count: result.profile.chicken_count,
+        };
+        drodoProfileMissing = false;
+        drodoLastFetchedAt = result.profile.fetched_at;
+        const { data: refreshedSeasons } = await supabaseAdmin
+          .from("player_seasons")
+          .select("season, mmr, max_mmr, games_played, chicken_count")
+          .eq("steam_id", steamId)
+          .order("season", { ascending: true });
+        if (refreshedSeasons) seasons = refreshedSeasons;
+      } else if (result.kind === "missing") {
+        drodoProfileMissing = true;
+        drodoLastFetchedAt = result.fetchedAt ?? new Date().toISOString();
+      }
+    }
   }
 
   const steamProfile = await fetchSteamProfile(steamId, supabase ?? undefined, {

@@ -29,6 +29,8 @@ interface EntityBrowserProps {
   sidebarRight?: ReactNode;
   /** Optional in-content content rendered between the title block and the grid. */
   topAd?: ReactNode;
+  /** Optional in-content content rendered after the grid. */
+  bottomAd?: ReactNode;
 }
 const ENTITY_PATH: Record<EntityCardVariant, string> = {
   item: "items",
@@ -75,6 +77,7 @@ export function EntityBrowser({
   sidebarLeft,
   sidebarRight,
   topAd,
+  bottomAd,
 }: EntityBrowserProps) {
   const hasSidebar = Boolean(sidebarLeft || sidebarRight);
   const router = useRouter();
@@ -182,6 +185,8 @@ export function EntityBrowser({
             )}
           </section>
         )}
+
+        {bottomAd && <div className={styles.topAd}>{bottomAd}</div>}
         </div>
         {hasSidebar && (
           <aside className={styles.sidebarRight}>{sidebarRight}</aside>

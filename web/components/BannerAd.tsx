@@ -1,6 +1,11 @@
 import { useEffect, useState } from "react";
 
-type Slot = "bottom" | "sidebar" | "sidebar-left" | "in-content";
+type Slot =
+  | "bottom"
+  | "sidebar"
+  | "sidebar-left"
+  | "in-content"
+  | "in-content-2";
 
 interface BannerAdProps {
   slot: Slot;
@@ -21,7 +26,7 @@ function pickDims(slot: Slot, viewportWidth: number): Dims | null {
   if (slot === "bottom") {
     return viewportWidth < 728 ? BOTTOM_MOBILE : BOTTOM_DESKTOP;
   }
-  if (slot === "in-content") {
+  if (slot === "in-content" || slot === "in-content-2") {
     return IN_CONTENT;
   }
   if (viewportWidth < 1280) return null;
@@ -34,6 +39,8 @@ function pickKey(slot: Slot): string | undefined {
     return process.env.NEXT_PUBLIC_ADSTERRA_KEY_SIDEBAR_LEFT;
   if (slot === "in-content")
     return process.env.NEXT_PUBLIC_ADSTERRA_KEY_INCONTENT;
+  if (slot === "in-content-2")
+    return process.env.NEXT_PUBLIC_ADSTERRA_KEY_INCONTENT_2;
   return process.env.NEXT_PUBLIC_ADSTERRA_KEY_SIDEBAR;
 }
 
@@ -44,7 +51,7 @@ function buildSrcDoc(adKey: string, dims: Dims): string {
 
 function wrapClassFor(slot: Slot): string {
   if (slot === "bottom") return "ad-bottom";
-  if (slot === "in-content") return "ad-incontent";
+  if (slot === "in-content" || slot === "in-content-2") return "ad-incontent";
   return "ad-sidebar";
 }
 

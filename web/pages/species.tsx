@@ -32,6 +32,7 @@ export default function SpeciesPage({ supabase }: SpeciesPageProps) {
         sidebarLeft={<BannerAd slot="sidebar-left" />}
         sidebarRight={<BannerAd slot="sidebar" />}
         topAd={<BannerAd slot="in-content" />}
+        bottomAd={<BannerAd slot="in-content-2" />}
       />
     </>
   );
