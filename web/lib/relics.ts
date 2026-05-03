@@ -6,6 +6,8 @@ interface RelicInfo {
   name: string;
   description: string;
   lore: string;
+  icon_url?: string | null;
+  icon_dimensions?: { width: number; height: number } | null;
 }
 
 export interface DisplayRelic {
@@ -14,6 +16,8 @@ export interface DisplayRelic {
   description: string;
   lore: string;
   iconStem: string;
+  iconUrl: string;
+  iconDimensions: { width: number; height: number } | null;
 }
 
 // Most entries carry a placeholder "From Relicbox" lore line that just
@@ -30,13 +34,18 @@ function buildRelics(): DisplayRelic[] {
     (relicsData as { relics: Record<string, RelicInfo> }).relics
   )
     .filter((relic) => relic.name && relic.name.trim())
-    .map((relic) => ({
-      slug: slugifyName(relic.name),
-      name: relic.name,
-      description: relic.description,
-      lore: cleanLore(relic.lore),
-      iconStem: relicStem(relic.name),
-    }))
+    .map((relic) => {
+      const stem = relicStem(relic.name);
+      return {
+        slug: slugifyName(relic.name),
+        name: relic.name,
+        description: relic.description,
+        lore: cleanLore(relic.lore),
+        iconStem: stem,
+        iconUrl: relic.icon_url || `/icons/relics/${stem}.png`,
+        iconDimensions: relic.icon_dimensions ?? null,
+      };
+    })
     .sort((a, b) => a.name.localeCompare(b.name));
 }
 

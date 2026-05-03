@@ -18,7 +18,7 @@ export default function SynergyDetailPage({ synergy, related }: SynergyDetailPag
     slug: s.slug,
     name: s.name,
     description: s.description,
-    iconSrc: `/icons/synergies/${s.iconStem}.png`,
+    iconSrc: s.iconUrl,
   }));
   const unitsForSynergy: RelatedEntity[] = getAllUnits()
     .filter((unit) => unit.synergies.includes(synergy.name))
@@ -26,7 +26,7 @@ export default function SynergyDetailPage({ synergy, related }: SynergyDetailPag
       slug: unit.slug,
       name: unit.name,
       description: `Cost ${unit.cost} • ${unit.synergies.join(", ")}`,
-      iconSrc: `/icons/units/${unit.iconStem}.png`,
+      iconSrc: unit.iconUrl,
       variant: "unit",
     }));
 
@@ -39,7 +39,7 @@ export default function SynergyDetailPage({ synergy, related }: SynergyDetailPag
       <EntityDetail
         variant="synergy"
         name={synergy.name}
-        iconSrc={`/icons/synergies/${synergy.iconStem}.png`}
+        iconSrc={synergy.iconUrl}
         overview={<>{synergy.description || description}</>}
         lore={synergy.lore || undefined}
         indexLabel={indexLabel}

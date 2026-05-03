@@ -1,0 +1,33 @@
+{
+  "name": "dac-cms",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Sanity Studio for Dota Auto Chess game data (units, items, synergies, relics, talents, patch notes)",
+  "type": "module",
+  "scripts": {
+    "dev": "sanity dev",
+    "start": "sanity start",
+    "build": "sanity build",
+    "deploy": "sanity deploy",
+    "deploy-graphql": "sanity graphql deploy",
+    "migrate": "tsx scripts/migrate.ts",
+    "pull": "tsx scripts/pull.ts",
+    "check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@sanity/client": "^6.22.0",
+    "@sanity/image-url": "^1.1.0",
+    "@sanity/vision": "^3.62.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "sanity": "^3.62.0",
+    "styled-components": "^6.1.13"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.12",
+    "@types/node": "^22.9.0",
+    "dotenv": "^16.4.5",
+    "tsx": "^4.19.2",
+    "typescript": "^5.6.3"
+  }
+}

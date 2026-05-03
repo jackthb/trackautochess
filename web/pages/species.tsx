@@ -14,7 +14,7 @@ const ALL_SPECIES: BrowsableEntity[] = getSpecies().map((species) => ({
   name: species.name,
   description: species.description,
   lore: species.lore,
-  iconSrc: `/icons/synergies/${species.iconStem}.png`,
+  iconSrc: species.iconUrl,
 }));
 
 export default function SpeciesPage({ supabase }: SpeciesPageProps) {

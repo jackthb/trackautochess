@@ -31,6 +31,7 @@ import {
   steamProfileUrl,
   type SteamProfile,
 } from "../../lib/steam";
+import { resolveIconUrl } from "@/lib/icons";
 
 const UNITS_FULL = unitsFullData as Record<string, UnitFullInfo>;
 const SYNERGIES_DATA = synergiesData as Record<string, SynergyInfo>;
@@ -681,7 +682,7 @@ export default function PlayerPage({
                         unitsFull={UNITS_FULL}
                         synergiesData={SYNERGIES_DATA}
                         relicsData={RELICS_DATA}
-                        iconUrl={(type, stem) => `/icons/${type}/${stem}.png`}
+                        iconUrl={resolveIconUrl}
                         shareUrl={`/games/${g.id}`}
                         style={{ cursor: "pointer" }}
                       />

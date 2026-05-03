@@ -35,3 +35,9 @@ tracker/dist/
 /dist/
 .pnpm-store/
 data/vscript_diffs/
+
+# Sanity CMS
+cms/node_modules/
+cms/.env
+cms/.sanity/
+cms/dist/

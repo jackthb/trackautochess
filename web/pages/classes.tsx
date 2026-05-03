@@ -14,7 +14,7 @@ const ALL_CLASSES: BrowsableEntity[] = getClasses().map((entry) => ({
   name: entry.name,
   description: entry.description,
   lore: entry.lore,
-  iconSrc: `/icons/synergies/${entry.iconStem}.png`,
+  iconSrc: entry.iconUrl,
 }));
 
 export default function ClassesPage({ supabase }: ClassesPageProps) {

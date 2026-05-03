@@ -6,6 +6,8 @@ interface SynergyInfo {
   name: string;
   description: string;
   lore: string;
+  icon_url?: string | null;
+  icon_dimensions?: { width: number; height: number } | null;
 }
 
 export interface DisplaySynergy {
@@ -14,6 +16,8 @@ export interface DisplaySynergy {
   description: string;
   lore: string;
   iconStem: string;
+  iconUrl: string;
+  iconDimensions: { width: number; height: number } | null;
   category: "species" | "class" | "other";
 }
 
@@ -27,14 +31,19 @@ function normalizeDescription(desc: string): string {
 function buildSynergies(): DisplaySynergy[] {
   return Object.values(synergiesData as Record<string, SynergyInfo>)
     .filter((syn) => syn.name && syn.name.trim())
-    .map((syn) => ({
-      slug: slugifyName(syn.name),
-      name: syn.name,
-      description: normalizeDescription(syn.description ?? ""),
-      lore: syn.lore ?? "",
-      iconStem: synIconName(syn.name),
-      category: inferCategory(syn.description ?? ""),
-    }))
+    .map((syn) => {
+      const stem = synIconName(syn.name);
+      return {
+        slug: slugifyName(syn.name),
+        name: syn.name,
+        description: normalizeDescription(syn.description ?? ""),
+        lore: syn.lore ?? "",
+        iconStem: stem,
+        iconUrl: syn.icon_url || `/icons/synergies/${stem}.png`,
+        iconDimensions: syn.icon_dimensions ?? null,
+        category: inferCategory(syn.description ?? ""),
+      };
+    })
     .sort((a, b) => a.name.localeCompare(b.name));
 }
 

@@ -12,7 +12,12 @@
       2,
       4
     ],
-    "ability_special": {}
+    "ability_special": {},
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/53d6b8caf145127a9ff96daafa029af4dd26a312-128x128.png",
+    "icon_dimensions": {
+      "height": 128,
+      "width": 128
+    }
   },
   "is_assassin": {
     "name": "Assassin",
@@ -25,7 +30,12 @@
       6,
       9
     ],
-    "ability_special": {}
+    "ability_special": {},
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/2fe5d6063ac5ac3b52d01f5b95377a2d5fbbedfe-128x128.png",
+    "icon_dimensions": {
+      "height": 128,
+      "width": 128
+    }
   },
   "is_beast": {
     "name": "Beast",
@@ -38,7 +48,12 @@
       4,
       6
     ],
-    "ability_special": {}
+    "ability_special": {},
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/f992fe9837abde1c87759b52ae3d5be1b47ecff8-128x128.png",
+    "icon_dimensions": {
+      "height": 128,
+      "width": 128
+    }
   },
   "is_centaur": {
     "name": "Centaur",
@@ -52,7 +67,12 @@
       2,
       4
     ],
-    "ability_special": {}
+    "ability_special": {},
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/4b628518ebd0db6ea2408454d7ca758a762bc05e-128x128.png",
+    "icon_dimensions": {
+      "height": 128,
+      "width": 128
+    }
   },
   "is_demon": {
     "name": "Demon",
@@ -63,7 +83,12 @@
     "tiers": [
       1
     ],
-    "ability_special": {}
+    "ability_special": {},
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/ac848a818df3862dff195f4a68f1b46b56f7c687-128x128.png",
+    "icon_dimensions": {
+      "height": 128,
+      "width": 128
+    }
   },
   "is_demonhunter": {
     "name": "Demon Hunter",
@@ -75,7 +100,12 @@
       2,
       4
     ],
-    "ability_special": {}
+    "ability_special": {},
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/db39f718cb0a0b4106dc27bff3a0781d707904c1-128x128.png",
+    "icon_dimensions": {
+      "height": 128,
+      "width": 128
+    }
   },
   "is_draenei": {
     "name": "Draenei",
@@ -90,7 +120,12 @@
       2,
       4
     ],
-    "ability_special": {}
+    "ability_special": {},
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/d6aa4183b6ec1130b75a119ba133300b242369ac-128x128.png",
+    "icon_dimensions": {
+      "height": 128,
+      "width": 128
+    }
   },
   "is_dragon": {
     "name": "Dragon",
@@ -102,7 +137,12 @@
       3,
       5
     ],
-    "ability_special": {}
+    "ability_special": {},
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/7eb363345f0ef700368cd357919c01331a5808ac-128x128.png",
+    "icon_dimensions": {
+      "height": 128,
+      "width": 128
+    }
   },
   "is_druid": {
     "name": "Druid",
@@ -118,7 +158,12 @@
       4,
       6
     ],
-    "ability_special": {}
+    "ability_special": {},
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/f76ffb5b6e4aac0a22ef214b78cfa507712068d5-128x128.png",
+    "icon_dimensions": {
+      "height": 128,
+      "width": 128
+    }
   },
   "is_dwarf": {
     "name": "Dwarf",
@@ -129,7 +174,12 @@
     "tiers": [
       2
     ],
-    "ability_special": {}
+    "ability_special": {},
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/cb9ae4971e180a3946c98f32719ce2cb8774295c-128x128.png",
+    "icon_dimensions": {
+      "height": 128,
+      "width": 128
+    }
   },
   "is_element": {
     "name": "Elemental",
@@ -142,7 +192,12 @@
       4,
       6
     ],
-    "ability_special": {}
+    "ability_special": {},
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/ae3a0138443292a7a783dd41fcc797b53940cda8-128x128.png",
+    "icon_dimensions": {
+      "height": 128,
+      "width": 128
+    }
   },
   "is_elf": {
     "name": "Elf",
@@ -155,7 +210,12 @@
       6,
       9
     ],
-    "ability_special": {}
+    "ability_special": {},
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/3c93b09b9c2fe6b918d1ab098ba5ab363d0bc0e7-128x128.png",
+    "icon_dimensions": {
+      "height": 128,
+      "width": 128
+    }
   },
   "is_goblin": {
     "name": "Goblin",
@@ -167,7 +227,12 @@
       3,
       6
     ],
-    "ability_special": {}
+    "ability_special": {},
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/7c057f43269111f1ef8295d7291c98e679018e5a-128x128.png",
+    "icon_dimensions": {
+      "height": 128,
+      "width": 128
+    }
   },
   "is_god": {
     "name": "God",
@@ -182,7 +247,12 @@
       4,
       6
     ],
-    "ability_special": {}
+    "ability_special": {},
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/c5fd331b667ef449b8dd02526800438b095dbca9-128x128.png",
+    "icon_dimensions": {
+      "height": 128,
+      "width": 128
+    }
   },
   "is_harpy": {
     "name": "Harpy",
@@ -194,7 +264,12 @@
       2,
       4
     ],
-    "ability_special": {}
+    "ability_special": {},
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/fdd5ac61a5801fc8a986a13750dc127d6344e9d2-128x128.png",
+    "icon_dimensions": {
+      "height": 128,
+      "width": 128
+    }
   },
   "is_human": {
     "name": "Human",
@@ -208,7 +283,12 @@
       3,
       6
     ],
-    "ability_special": {}
+    "ability_special": {},
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/bacf0b96290f740be2ee6e5f0bfc9a899b2bc8da-128x128.png",
+    "icon_dimensions": {
+      "height": 128,
+      "width": 128
+    }
   },
   "is_hunter": {
     "name": "Hunter",
@@ -221,7 +301,12 @@
       6,
       9
     ],
-    "ability_special": {}
+    "ability_special": {},
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/73c1137a6d5ddefa0d4c76dcfef67f9f9cb0ef8e-128x128.png",
+    "icon_dimensions": {
+      "height": 128,
+      "width": 128
+    }
   },
   "is_knight": {
     "name": "Knight",
@@ -237,7 +322,12 @@
       4,
       6
     ],
-    "ability_special": {}
+    "ability_special": {},
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/983043b417304255f1df823c3d959200074df83b-126x124.png",
+    "icon_dimensions": {
+      "height": 124,
+      "width": 126
+    }
   },
   "is_kobold": {
     "name": "Kobold",
@@ -254,7 +344,12 @@
       2,
       3
     ],
-    "ability_special": {}
+    "ability_special": {},
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/4452c820a1a6e49b4a75e1724a1048af31d4bd59-128x128.png",
+    "icon_dimensions": {
+      "height": 128,
+      "width": 128
+    }
   },
   "is_mage": {
     "name": "Mage",
@@ -269,7 +364,12 @@
       6,
       9
     ],
-    "ability_special": {}
+    "ability_special": {},
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/64b01df7f3c04eb608875e10e5c2058903412e75-128x128.png",
+    "icon_dimensions": {
+      "height": 128,
+      "width": 128
+    }
   },
   "is_mech": {
     "name": "Mech",
@@ -284,7 +384,12 @@
       3,
       6
     ],
-    "ability_special": {}
+    "ability_special": {},
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/a833574eb6279bfaf51e6e5dc6b6c2d9bc9bf485-128x128.png",
+    "icon_dimensions": {
+      "height": 128,
+      "width": 128
+    }
   },
   "is_monk": {
     "name": "Monk",
@@ -298,7 +403,12 @@
       2,
       4
     ],
-    "ability_special": {}
+    "ability_special": {},
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/09cd0cf95fb2b8213cfe941aef4f38d40dd54fee-128x128.png",
+    "icon_dimensions": {
+      "height": 128,
+      "width": 128
+    }
   },
   "is_naga": {
     "name": "Naga",
@@ -314,7 +424,12 @@
       4,
       6
     ],
-    "ability_special": {}
+    "ability_special": {},
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/ee447181867324be5ed9f8080afbd36f587e4daf-128x128.png",
+    "icon_dimensions": {
+      "height": 128,
+      "width": 128
+    }
   },
   "is_nraqi": {
     "name": "Faceless",
@@ -325,7 +440,12 @@
     "tiers": [
       2
     ],
-    "ability_special": {}
+    "ability_special": {},
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/ff6f850671dd65e5d7d7acd1c381f299287dae55-128x128.png",
+    "icon_dimensions": {
+      "height": 128,
+      "width": 128
+    }
   },
   "is_ogre": {
     "name": "Ogre",
@@ -338,7 +458,12 @@
     "tiers": [
       2
     ],
-    "ability_special": {}
+    "ability_special": {},
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/fb0607035ebee547f32afe84025b6de4bd98f29b-128x128.png",
+    "icon_dimensions": {
+      "height": 128,
+      "width": 128
+    }
   },
   "is_orc": {
     "name": "Orc",
@@ -351,7 +476,12 @@
       4,
       6
     ],
-    "ability_special": {}
+    "ability_special": {},
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/8854c44b2e86ea8508d0856d11ef050164e92320-128x128.png",
+    "icon_dimensions": {
+      "height": 128,
+      "width": 128
+    }
   },
   "is_pandaman": {
     "name": "Pandaren",
@@ -365,7 +495,12 @@
       1,
       2
     ],
-    "ability_special": {}
+    "ability_special": {},
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/773c4d3fc822430b2b4c8a27766599d273809c3d-128x128.png",
+    "icon_dimensions": {
+      "height": 128,
+      "width": 128
+    }
   },
   "is_priest": {
     "name": "Priest",
@@ -379,7 +514,12 @@
       2,
       4
     ],
-    "ability_special": {}
+    "ability_special": {},
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/ff5644e5775947dd99f4ce70f15d5a9f3fd0ba99-128x128.png",
+    "icon_dimensions": {
+      "height": 128,
+      "width": 128
+    }
   },
   "is_satyr": {
     "name": "Satyr",
@@ -392,7 +532,12 @@
     "tiers": [
       2
     ],
-    "ability_special": {}
+    "ability_special": {},
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/3dd345b2d021676b7210f479b085b6550155040c-128x128.png",
+    "icon_dimensions": {
+      "height": 128,
+      "width": 128
+    }
   },
   "is_shaman": {
     "name": "Shaman",
@@ -408,7 +553,12 @@
       3,
       6
     ],
-    "ability_special": {}
+    "ability_special": {},
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/5f83ab8cd7e4b799d3608234873f23ac30e1ad15-128x128.png",
+    "icon_dimensions": {
+      "height": 128,
+      "width": 128
+    }
   },
   "is_tauren": {
     "name": "Tauren",
@@ -420,7 +570,12 @@
       2,
       4
     ],
-    "ability_special": {}
+    "ability_special": {},
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/4dd35570c2f89e9b43ca6e770192582342b28b0c-128x128.png",
+    "icon_dimensions": {
+      "height": 128,
+      "width": 128
+    }
   },
   "is_troll": {
     "name": "Troll",
@@ -433,7 +588,12 @@
       4,
       6
     ],
-    "ability_special": {}
+    "ability_special": {},
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/cc329981d07da967f2f53e58292ba48369ca1b62-128x128.png",
+    "icon_dimensions": {
+      "height": 128,
+      "width": 128
+    }
   },
   "is_undead": {
     "name": "Undead",
@@ -449,7 +609,12 @@
       6,
       9
     ],
-    "ability_special": {}
+    "ability_special": {},
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/d8b2df3c945032f554ba95e972cb7b18916a5975-128x128.png",
+    "icon_dimensions": {
+      "height": 128,
+      "width": 128
+    }
   },
   "is_warlock": {
     "name": "Warlock",
@@ -462,7 +627,12 @@
       4,
       6
     ],
-    "ability_special": {}
+    "ability_special": {},
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/52710f4aa749e577f13df39e4331f01555858494-128x128.png",
+    "icon_dimensions": {
+      "height": 128,
+      "width": 128
+    }
   },
   "is_warrior": {
     "name": "Warrior",
@@ -475,7 +645,12 @@
       6,
       9
     ],
-    "ability_special": {}
+    "ability_special": {},
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/8d868c330b3b90f437d7e1189e403bb51c3d5dff-128x128.png",
+    "icon_dimensions": {
+      "height": 128,
+      "width": 128
+    }
   },
   "is_wizard": {
     "name": "Wizard",
@@ -487,6 +662,11 @@
       2,
       4
     ],
-    "ability_special": {}
+    "ability_special": {},
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/3107fdd692b7f37def3c17d4d5f3e10b5663c38e-128x128.png",
+    "icon_dimensions": {
+      "height": 128,
+      "width": 128
+    }
   }
 }

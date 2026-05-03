@@ -12,6 +12,7 @@ import {
   NUMBERED_RANK_TIERS,
 } from "@dac/shared/game-utils";
 import { GameRowDisplay } from "@dac/shared/GameRowDisplay";
+import { resolveIconUrl } from "@/lib/icons";
 
 interface GameRowProps {
   game: Game;
@@ -35,8 +36,7 @@ function CountedTagPicker({
   tags,
   onChange,
   suggestions,
-  iconPrefix,
-  iconStem,
+  iconUrl,
   placeholder,
   countLabel,
   minCount = 1,
@@ -46,8 +46,7 @@ function CountedTagPicker({
   tags: CountedTag[];
   onChange: (tags: CountedTag[]) => void;
   suggestions: string[];
-  iconPrefix: string;
-  iconStem: (name: string) => string;
+  iconUrl: (name: string) => string;
   placeholder?: string;
   countLabel?: string;
   minCount?: number;
@@ -87,7 +86,7 @@ function CountedTagPicker({
           <span key={t.name} className="tag-chip">
             <img
               className="tag-chip-icon"
-              src={`/icons/${iconPrefix}/${iconStem(t.name)}.png`}
+              src={iconUrl(t.name)}
               alt=""
               onError={(e) => {
                 (e.target as HTMLImageElement).style.display = "none";
@@ -151,7 +150,7 @@ function CountedTagPicker({
             >
               <img
                 className="tag-picker-option-icon"
-                src={`/icons/${iconPrefix}/${iconStem(s)}.png`}
+                src={iconUrl(s)}
                 alt=""
                 onError={(e) => {
                   (e.target as HTMLImageElement).style.display = "none";
@@ -170,15 +169,13 @@ function SimpleTagPicker({
   tags,
   onChange,
   suggestions,
-  iconPrefix,
-  iconStem,
+  iconUrl,
   placeholder,
 }: {
   tags: string[];
   onChange: (tags: string[]) => void;
   suggestions: string[];
-  iconPrefix: string;
-  iconStem: (name: string) => string;
+  iconUrl: (name: string) => string;
   placeholder?: string;
 }) {
   const [query, setQuery] = useState("");
@@ -212,7 +209,7 @@ function SimpleTagPicker({
           <span key={t} className="tag-chip">
             <img
               className="tag-chip-icon"
-              src={`/icons/${iconPrefix}/${iconStem(t)}.png`}
+              src={iconUrl(t)}
               alt=""
               onError={(e) => {
                 (e.target as HTMLImageElement).style.display = "none";
@@ -254,7 +251,7 @@ function SimpleTagPicker({
             >
               <img
                 className="tag-picker-option-icon"
-                src={`/icons/${iconPrefix}/${iconStem(s)}.png`}
+                src={iconUrl(s)}
                 alt=""
                 onError={(e) => {
                   (e.target as HTMLImageElement).style.display = "none";
@@ -384,7 +381,7 @@ export function GameRow({
           unitsFull={unitsFull}
           synergiesData={synergiesData}
           relicsData={relicsData}
-          iconUrl={(type, stem) => `/icons/${type}/${stem}.png`}
+          iconUrl={resolveIconUrl}
           onClick={handleToggle}
           style={{ cursor: "pointer" }}
           dateExtra={
@@ -509,8 +506,7 @@ export function GameRow({
                 tags={editUnits}
                 onChange={setEditUnits}
                 suggestions={allUnitNames}
-                iconPrefix="units"
-                iconStem={unitStem}
+                iconUrl={(name) => resolveIconUrl("units", unitStem(name))}
                 placeholder="Add unit..."
                 countLabel="Stars"
                 minCount={1}
@@ -525,8 +521,7 @@ export function GameRow({
                 tags={editSynergies}
                 onChange={setEditSynergies}
                 suggestions={allSynergyNames}
-                iconPrefix="synergies"
-                iconStem={synIconName}
+                iconUrl={(name) => resolveIconUrl("synergies", synIconName(name))}
                 placeholder="Add synergy..."
                 countLabel="Count"
                 minCount={1}
@@ -541,8 +536,7 @@ export function GameRow({
                 tags={editRelics}
                 onChange={setEditRelics}
                 suggestions={allRelicNames}
-                iconPrefix="relics"
-                iconStem={relicStem}
+                iconUrl={(name) => resolveIconUrl("relics", relicStem(name))}
                 placeholder="Add relic..."
               />
             </div>

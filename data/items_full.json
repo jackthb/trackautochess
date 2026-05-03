@@ -8,7 +8,12 @@
     "notes": [
       "The carrier must have mana for Aghanims Shard.",
       "Additional skill will be removed after chess pieces upgraded."
-    ]
+    ],
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/1941fbc42371f9885eb8485c181b83732feb064e-85x62.png",
+    "icon_dimensions": {
+      "height": 62,
+      "width": 85
+    }
   },
   "item_ahalimushenzhang": {
     "name": "Aghanims Scepter",
@@ -16,7 +21,12 @@
     "lore": "The scepter of a wizard with demigod-like powers.",
     "quality": "consumable",
     "texture": "ultimate_scepter",
-    "notes": []
+    "notes": [],
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/355c7da2889c624aa217bbd74ba153be9d00d405-85x64.png",
+    "icon_dimensions": {
+      "height": 64,
+      "width": 85
+    }
   },
   "item_aiweinazhiyu": {
     "name": "Avianas Feather",
@@ -24,7 +34,12 @@
     "lore": "",
     "quality": "rare",
     "texture": "item_avianas_feather",
-    "notes": []
+    "notes": [],
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/d0337bc142ffe686d8381e7f90bc2fc8932c29df-85x62.png",
+    "icon_dimensions": {
+      "height": 62,
+      "width": 85
+    }
   },
   "item_anmie": {
     "name": "Desolator",
@@ -32,7 +47,12 @@
     "lore": "A wicked weapon, used in torturing political criminals.",
     "quality": "epic",
     "texture": "item_desolator",
-    "notes": []
+    "notes": [],
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/50e6ea742707605eb1540d58d3a684cb946edee1-85x64.png",
+    "icon_dimensions": {
+      "height": 64,
+      "width": 85
+    }
   },
   "item_aoshuxie": {
     "name": "Arcane Boots",
@@ -42,7 +62,12 @@
     "texture": "item_arcane_boots",
     "notes": [
       "Immune to attack and ability when jumping"
-    ]
+    ],
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/6b18c05fe1cc4c1b8e4a7e7d3a2342eeabe75bef-85x64.png",
+    "icon_dimensions": {
+      "height": 64,
+      "width": 85
+    }
   },
   "item_baojunwangpao": {
     "name": "Cloak of Tyrants",
@@ -50,7 +75,9 @@
     "lore": "Only the fool shall question the authority of the Emperor.",
     "quality": "common",
     "texture": "custom/baojunwangpao",
-    "notes": []
+    "notes": [],
+    "icon_url": null,
+    "icon_dimensions": null
   },
   "item_bench_contract": {
     "name": "Magic Seed",
@@ -60,7 +87,12 @@
     "texture": "item_custom/item_magic_seed",
     "notes": [
       "Initial chance at Round 10 is 40% and increases 2% per round."
-    ]
+    ],
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/7850b75af42238d316080620aba606e20ac22ced-88x64.png",
+    "icon_dimensions": {
+      "height": 64,
+      "width": 88
+    }
   },
   "item_bingyan": {
     "name": "Eye of Skadi",
@@ -68,7 +100,12 @@
     "lore": "Extremely rare artifact, guarded by the azure dragons.",
     "quality": "rare",
     "texture": "item_skadi",
-    "notes": []
+    "notes": [],
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/71e09d8b07234ff602b483482f036d41e41c0dd2-85x64.png",
+    "icon_dimensions": {
+      "height": 64,
+      "width": 85
+    }
   },
   "item_bkb": {
     "name": "Black King Bar",
@@ -76,7 +113,12 @@
     "lore": "A powerful staff imbued with the strength of giants.",
     "quality": "rare",
     "texture": "item_black_king_bar",
-    "notes": []
+    "notes": [],
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/0a1353427bd0c7119dd70f18b772b0872a768bfa-85x64.png",
+    "icon_dimensions": {
+      "height": 64,
+      "width": 85
+    }
   },
   "item_both_leaves": {
     "name": "Leafy Essence",
@@ -84,7 +126,9 @@
     "lore": "From: Relicbox",
     "quality": "",
     "texture": "seeds_of_serenity",
-    "notes": []
+    "notes": [],
+    "icon_url": null,
+    "icon_dimensions": null
   },
   "item_buxiuzhishouhu": {
     "name": "Aegis of Immortal",
@@ -92,7 +136,12 @@
     "lore": "Immortals used to have a magical shield to prevent them from death.",
     "quality": "rare",
     "texture": "item_aegis",
-    "notes": []
+    "notes": [],
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/873554f4e3153f77e66c026aef9240c9671ef891-85x64.png",
+    "icon_dimensions": {
+      "height": 64,
+      "width": 85
+    }
   },
   "item_cantie": {
     "name": "Sliver",
@@ -100,7 +149,12 @@
     "lore": "",
     "quality": "rare",
     "texture": "custom/jushencantie",
-    "notes": []
+    "notes": [],
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/7102e80488dcf28526bd0a6c9101f1b9fa3c880f-88x64.png",
+    "icon_dimensions": {
+      "height": 64,
+      "width": 88
+    }
   },
   "item_card_chance": {
     "name": "Card: Chance",
@@ -108,7 +162,12 @@
     "lore": "",
     "quality": "consumable",
     "texture": "custom/card_chance",
-    "notes": []
+    "notes": [],
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/b93cb5fb12534d76cabd32b25a517738c06c10e4-88x64.png",
+    "icon_dimensions": {
+      "height": 64,
+      "width": 88
+    }
   },
   "item_card_fate": {
     "name": "Card: Fate",
@@ -116,7 +175,12 @@
     "lore": "",
     "quality": "consumable",
     "texture": "custom/card_fate",
-    "notes": []
+    "notes": [],
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/a708973ee3c8813df9870eae92af0e8bcd32a59c-88x64.png",
+    "icon_dimensions": {
+      "height": 64,
+      "width": 88
+    }
   },
   "item_changdun": {
     "name": "Pavise",
@@ -124,7 +188,12 @@
     "lore": "",
     "quality": "consumable",
     "texture": "item_pavise",
-    "notes": []
+    "notes": [],
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/2234f9246f9dbd9b969fde07925251f8b3235ef4-85x62.png",
+    "icon_dimensions": {
+      "height": 62,
+      "width": 85
+    }
   },
   "item_chihongjia": {
     "name": "Crimson Guard",
@@ -132,7 +201,12 @@
     "lore": "A cuirass originally built to protect against the dreaded Year Beast.",
     "quality": "rare",
     "texture": "item_crimson_guard",
-    "notes": []
+    "notes": [],
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/45dbf93ec668ca77d2e1f6dce7def38cf5e277a8-85x64.png",
+    "icon_dimensions": {
+      "height": 64,
+      "width": 85
+    }
   },
   "item_chishu": {
     "name": "Tango",
@@ -140,7 +214,12 @@
     "lore": "From: Blessing of Priests",
     "quality": "consumable",
     "texture": "item_tango",
-    "notes": []
+    "notes": [],
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/a34754fe3f80dda29f220638fcf84c35b2d54c66-88x64.png",
+    "icon_dimensions": {
+      "height": 64,
+      "width": 88
+    }
   },
   "item_chishu_new": {
     "name": "Tango",
@@ -148,7 +227,12 @@
     "lore": "",
     "quality": "consumable",
     "texture": "item_tango_single",
-    "notes": []
+    "notes": [],
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/a34754fe3f80dda29f220638fcf84c35b2d54c66-88x64.png",
+    "icon_dimensions": {
+      "height": 64,
+      "width": 88
+    }
   },
   "item_common_token": {
     "name": "Machine Token",
@@ -156,7 +240,9 @@
     "lore": "From: Heart of the Machine",
     "quality": "consumable",
     "texture": "custom/common_token",
-    "notes": []
+    "notes": [],
+    "icon_url": null,
+    "icon_dimensions": null
   },
   "item_conceal_prepare": {
     "name": "Shroud of Concealment",
@@ -164,7 +250,9 @@
     "lore": "From Relicbox",
     "quality": "",
     "texture": "item_custom/帷幕2",
-    "notes": []
+    "notes": [],
+    "icon_url": null,
+    "icon_dimensions": null
   },
   "item_dadianchui": {
     "name": "Mjollnir",
@@ -172,7 +260,12 @@
     "lore": "",
     "quality": "artifact",
     "texture": "item_mjollnir",
-    "notes": []
+    "notes": [],
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/d5025a233dbd13582087a702904df29296e3e99a-85x64.png",
+    "icon_dimensions": {
+      "height": 64,
+      "width": 85
+    }
   },
   "item_dapao": {
     "name": "Daedalus",
@@ -180,7 +273,12 @@
     "lore": "",
     "quality": "artifact",
     "texture": "item_greater_crit",
-    "notes": []
+    "notes": [],
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/1a2412a99a05cc47fd9d609a4ea482151726bf14-85x64.png",
+    "icon_dimensions": {
+      "height": 64,
+      "width": 85
+    }
   },
   "item_dayunchui": {
     "name": "Abyssal Blade",
@@ -188,7 +286,12 @@
     "lore": "The lost blade of the Commander of the Abyss, this edge cuts into the enemy’s soul.",
     "quality": "common",
     "texture": "abyssal_blade",
-    "notes": []
+    "notes": [],
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/c433e2c38e8c546fd35a875b68abee8f5ba3bbfc-85x64.png",
+    "icon_dimensions": {
+      "height": 64,
+      "width": 85
+    }
   },
   "item_dianjinshou": {
     "name": "Hand of Midas",
@@ -196,7 +299,12 @@
     "lore": "Preserved through unknown magical means, the Hand of Midas is a weapon of greed, sacrificing animals to line the owners pockets.",
     "quality": "common",
     "texture": "item_hand_of_midas",
-    "notes": []
+    "notes": [],
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/5b00005741bcd1f2c3782bef488cfd6eee6b0153-85x64.png",
+    "icon_dimensions": {
+      "height": 64,
+      "width": 85
+    }
   },
   "item_dongchayandou": {
     "name": "Pipe of Insight",
@@ -204,7 +312,12 @@
     "lore": "A powerful artifact of mysterious origin, it creates barriers against magical forces.",
     "quality": "rare",
     "texture": "item_pipe",
-    "notes": []
+    "notes": [],
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/def75c7ef6202cfa582a2f49fba20bcca14380ff-85x64.png",
+    "icon_dimensions": {
+      "height": 64,
+      "width": 85
+    }
   },
   "item_double_coin": {
     "name": "Doubloon",
@@ -212,7 +325,12 @@
     "lore": "From: Relicbox",
     "quality": "",
     "texture": "item_doubloon",
-    "notes": []
+    "notes": [],
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/b22a3ad136ecaabc95b675327376941b6cad702e-88x64.png",
+    "icon_dimensions": {
+      "height": 64,
+      "width": 88
+    }
   },
   "item_egg": {
     "name": "Greevil Egg",
@@ -223,7 +341,9 @@
     "notes": [
       "★★ for no less than 3 points, ★★★ for no less than 9 points.",
       "Hatching points deduct pieces from the chess pool and will stop growing when there are no pieces in the chess pool."
-    ]
+    ],
+    "icon_url": null,
+    "icon_dimensions": null
   },
   "item_fashulengjing": {
     "name": "Spell Prism",
@@ -233,7 +353,12 @@
     "texture": "spell_prism",
     "notes": [
       "Casting skills and certain special target selection targeted spells are ineffective."
-    ]
+    ],
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/bac646545eacf35f1f88579e667fecdbbe321fb9-85x62.png",
+    "icon_dimensions": {
+      "height": 62,
+      "width": 85
+    }
   },
   "item_feijiangxiaomao": {
     "name": "Ascetics Cap",
@@ -244,7 +369,12 @@
     "notes": [
       "At most 1 undead piece can resurrect each round.",
       "IO cannot resurrect. Independent with Dismiss."
-    ]
+    ],
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/a3dbd5e8b9ccec85923937e3976d82bfaad3e048-88x64.png",
+    "icon_dimensions": {
+      "height": 64,
+      "width": 88
+    }
   },
   "item_fengkuangmianju": {
     "name": "Mask of Madness",
@@ -252,7 +382,12 @@
     "lore": "Once this mask is worn, its bearer becomes an uncontrollable aggressive force.",
     "quality": "rare",
     "texture": "item_mask_of_madness",
-    "notes": []
+    "notes": [],
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/777942ae5c0fa3e6d4ecf0c8f7a552422b82a574-85x64.png",
+    "icon_dimensions": {
+      "height": 64,
+      "width": 85
+    }
   },
   "item_fengwangjiang": {
     "name": "Royal Jelly Shield",
@@ -262,7 +397,9 @@
     "texture": "item_royal_jelly",
     "notes": [
       "Move into Backpack slots if you don't wish to use this item for the round."
-    ]
+    ],
+    "icon_url": null,
+    "icon_dimensions": null
   },
   "item_free_ban": {
     "name": "Gaolers Master Key",
@@ -270,7 +407,9 @@
     "lore": "From Relicbox",
     "quality": "",
     "texture": "item_custom/狱卒的钥匙2",
-    "notes": []
+    "notes": [],
+    "icon_url": null,
+    "icon_dimensions": null
   },
   "item_free_draw": {
     "name": "Weighted Dice",
@@ -280,7 +419,12 @@
     "texture": "weighted_dice",
     "notes": [
       "Consecutive recruitment failures will gradually raise the chance of receiving 2 Gold."
-    ]
+    ],
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/708b74fe2b1917348cd97e002a89a7655539e660-88x64.png",
+    "icon_dimensions": {
+      "height": 64,
+      "width": 88
+    }
   },
   "item_fulingsuo": {
     "name": "Gleipnir",
@@ -288,7 +432,12 @@
     "lore": "Bindings forged by impossible means to leash an ancient evil.",
     "quality": "epic",
     "texture": "item_gungir",
-    "notes": []
+    "notes": [],
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/92696685cbd7508b79b62ae11da05ab32a41a730-88x64.png",
+    "icon_dimensions": {
+      "height": 64,
+      "width": 88
+    }
   },
   "item_fushizhiqiu": {
     "name": "Orb of Corrosion",
@@ -296,7 +445,12 @@
     "lore": "",
     "quality": "consumable",
     "texture": "orb_of_corrosion",
-    "notes": []
+    "notes": [],
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/e47fef2396c94891e63956431008f530fb0adb6e-85x62.png",
+    "icon_dimensions": {
+      "height": 62,
+      "width": 85
+    }
   },
   "item_gold_token": {
     "name": "Golden Machine Token",
@@ -304,7 +458,9 @@
     "lore": "From: Golden Heart of the Machine",
     "quality": "consumable",
     "texture": "custom/gold_token",
-    "notes": []
+    "notes": [],
+    "icon_url": null,
+    "icon_dimensions": null
   },
   "item_gulonghaojiao": {
     "name": "Minotaur Horn",
@@ -312,7 +468,12 @@
     "lore": "",
     "quality": "rare",
     "texture": "item_minotaur_horn",
-    "notes": []
+    "notes": [],
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/ee4bf9bc446b4572ce9142d2f744983c5fc91d90-85x62.png",
+    "icon_dimensions": {
+      "height": 62,
+      "width": 85
+    }
   },
   "item_haojie": {
     "name": "Havoc",
@@ -320,7 +481,12 @@
     "lore": "",
     "quality": "rare",
     "texture": "custom/haojie",
-    "notes": []
+    "notes": [],
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/aa8c6b389b298334e816ca4e06237c855161a93b-88x64.png",
+    "icon_dimensions": {
+      "height": 64,
+      "width": 88
+    }
   },
   "item_hongzhang": {
     "name": "Dagon",
@@ -328,7 +494,12 @@
     "lore": "A powerful secondary staff that allows the wielders magic to surge from their fingertips.",
     "quality": "epic",
     "texture": "item_dagon_4",
-    "notes": []
+    "notes": [],
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/a3c77e1df7e91ef119b3660cd9d67e40393619a1-85x64.png",
+    "icon_dimensions": {
+      "height": 64,
+      "width": 85
+    }
   },
   "item_huanyingfu": {
     "name": "Manta Style",
@@ -338,7 +509,12 @@
     "texture": "item_manta",
     "notes": [
       "Mirror chess pieces inherit passive effects from the carriers equipment."
-    ]
+    ],
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/e51534ce23dc7695e826bdd597f0ada1c0d4e0d4-85x64.png",
+    "icon_dimensions": {
+      "height": 64,
+      "width": 85
+    }
   },
   "item_hudie": {
     "name": "Butterfly",
@@ -346,7 +522,12 @@
     "lore": "Only the mightiest and most experienced of warriors can wield the Butterfly, but it provides incredible dexterity in combat.",
     "quality": "rare",
     "texture": "item_butterfly",
-    "notes": []
+    "notes": [],
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/9604a461af6188dcfdb65efc09f7eb1cd47d67c0-85x64.png",
+    "icon_dimensions": {
+      "height": 64,
+      "width": 85
+    }
   },
   "item_huiguang": {
     "name": "Kaya",
@@ -354,7 +535,12 @@
     "lore": "",
     "quality": "common",
     "texture": "kaya",
-    "notes": []
+    "notes": [],
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/60e899fe285f566685f3c2693f54abbada111086-85x62.png",
+    "icon_dimensions": {
+      "height": 62,
+      "width": 85
+    }
   },
   "item_huiyao": {
     "name": "Radiance",
@@ -362,7 +548,12 @@
     "lore": "A divine weapon that causes damage and a bright burning effect that lays waste to nearby enemies.",
     "quality": "epic",
     "texture": "item_radiance",
-    "notes": []
+    "notes": [],
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/21b30e97f6bb517bbcc5b1528fd312f7024f38df-85x64.png",
+    "icon_dimensions": {
+      "height": 64,
+      "width": 85
+    }
   },
   "item_jinghunzhiren": {
     "name": "Diffusal Blade",
@@ -370,7 +561,12 @@
     "lore": "An enchanted blade that allows the user to cut straight into the enemys soul.",
     "quality": "rare",
     "texture": "item_diffusal_blade",
-    "notes": []
+    "notes": [],
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/7d11f022d29db612b58cd02e1e56ae71ca291a23-85x64.png",
+    "icon_dimensions": {
+      "height": 64,
+      "width": 85
+    }
   },
   "item_jingmixie": {
     "name": "Tranquil Boots",
@@ -380,7 +576,12 @@
     "texture": "item_tranquil_boots",
     "notes": [
       "Immune to attack and ability when jumping"
-    ]
+    ],
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/5f8b9646c6716a3b798a42adbb738ddabdbcaa19-85x64.png",
+    "icon_dimensions": {
+      "height": 64,
+      "width": 85
+    }
   },
   "item_jingubang": {
     "name": "Monkey King Bar",
@@ -388,7 +589,12 @@
     "lore": "",
     "quality": "artifact",
     "texture": "item_monkey_king_bar",
-    "notes": []
+    "notes": [],
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/6e3723bc033c1178144408d9ffb60981966def9d-85x64.png",
+    "icon_dimensions": {
+      "height": 64,
+      "width": 85
+    }
   },
   "item_jipin": {
     "name": "Vladimirs Offering",
@@ -396,7 +602,12 @@
     "lore": "",
     "quality": "rare",
     "texture": "item_vladmir",
-    "notes": []
+    "notes": [],
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/55e53cec920b6c4f2e357dd2266a231f45cd6f31-85x64.png",
+    "icon_dimensions": {
+      "height": 64,
+      "width": 85
+    }
   },
   "item_jixiezhixin": {
     "name": "Heart of the Machine",
@@ -404,7 +615,9 @@
     "lore": "Proundly presented by Heart of the Machine.",
     "quality": "consumable",
     "texture": "custom/ex_machina_lg",
-    "notes": []
+    "notes": [],
+    "icon_url": null,
+    "icon_dimensions": null
   },
   "item_jixiezhixin_gold": {
     "name": "Golden Heart of the Machine",
@@ -412,7 +625,9 @@
     "lore": "The finest product from Heart of the Machine.",
     "quality": "consumable",
     "texture": "custom/golden_machina_lg",
-    "notes": []
+    "notes": [],
+    "icon_url": null,
+    "icon_dimensions": null
   },
   "item_jufengchangji": {
     "name": "Hurricane Pike",
@@ -422,7 +637,12 @@
     "texture": "item_hurricane_pike",
     "notes": [
       "Attack range bonus not stackable."
-    ]
+    ],
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/39a7b9055b1141431c42792a3409b6f7c778af47-88x64.png",
+    "icon_dimensions": {
+      "height": 64,
+      "width": 88
+    }
   },
   "item_jurenzhijie": {
     "name": "Giants Ring",
@@ -430,7 +650,12 @@
     "lore": "Prized procurement of an otherwise unremarkable ruler of Elze who abdicated his position and vanished.",
     "quality": "rare",
     "texture": "item_giants_ring",
-    "notes": []
+    "notes": [],
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/78a745f10224c01774d5d56d612509694c5bf26f-85x62.png",
+    "icon_dimensions": {
+      "height": 62,
+      "width": 85
+    }
   },
   "item_konglingguajian": {
     "name": "Null Talisman",
@@ -438,7 +663,12 @@
     "lore": "",
     "quality": "common",
     "texture": "null_talisman",
-    "notes": []
+    "notes": [],
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/a825f0a8a52a5c7edff44c4dd179d9c66e30d69d-85x64.png",
+    "icon_dimensions": {
+      "height": 64,
+      "width": 85
+    }
   },
   "item_kuangzhanfu": {
     "name": "Battle Fury",
@@ -446,7 +676,12 @@
     "lore": "The Drodo Island Committee has banned private tree-cutting activities here, with permission granted to a small batch of contractors. This decent replica of the legendary tool is offered for entertainment purposes only.",
     "quality": "artifact",
     "texture": "item_bfury",
-    "notes": []
+    "notes": [],
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/5541858603dbede2ac5c945d4527bd37a914383d-85x64.png",
+    "icon_dimensions": {
+      "height": 64,
+      "width": 85
+    }
   },
   "item_lieyingzhanren": {
     "name": "Falcon Blade",
@@ -454,7 +689,12 @@
     "lore": "",
     "quality": "common",
     "texture": "falcon_blade",
-    "notes": []
+    "notes": [],
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/2baa2ec65cfd899ce82032520bc8e6c9690f82ab-88x64.png",
+    "icon_dimensions": {
+      "height": 64,
+      "width": 88
+    }
   },
   "item_liliangdatiaodao": {
     "name": "Overwhelming Blink",
@@ -462,7 +702,12 @@
     "lore": "",
     "quality": "rare",
     "texture": "overwhelming_blink",
-    "notes": []
+    "notes": [],
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/29c636114bea282e89f650cdbb8db3a2ec329a4c-88x64.png",
+    "icon_dimensions": {
+      "height": 64,
+      "width": 88
+    }
   },
   "item_lilianghuwan": {
     "name": "Bracer",
@@ -470,7 +715,12 @@
     "lore": "",
     "quality": "common",
     "texture": "bracer",
-    "notes": []
+    "notes": [],
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/d0a8ff8951e4f6265127fa601787f13b299acd7c-85x64.png",
+    "icon_dimensions": {
+      "height": 64,
+      "width": 85
+    }
   },
   "item_linglichangbian": {
     "name": "Bullwhip",
@@ -478,7 +728,12 @@
     "lore": "",
     "quality": "common",
     "texture": "bullwhip",
-    "notes": []
+    "notes": [],
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/a19f1cbf09fd38552730731395c693655cab82dd-85x62.png",
+    "icon_dimensions": {
+      "height": 62,
+      "width": 85
+    }
   },
   "item_linkenfaqiu": {
     "name": "Linkens Sphere",
@@ -486,7 +741,12 @@
     "lore": "This magical sphere once protected one of the most famous heroes in history.",
     "quality": "rare",
     "texture": "item_sphere",
-    "notes": []
+    "notes": [],
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/635eadc420ccf59fd0058e01acc7c03179cbcb64-85x64.png",
+    "icon_dimensions": {
+      "height": 64,
+      "width": 85
+    }
   },
   "item_longxin": {
     "name": "Heart of Tarrasque",
@@ -494,7 +754,9 @@
     "lore": "",
     "quality": "artifact",
     "texture": "item_heart",
-    "notes": []
+    "notes": [],
+    "icon_url": null,
+    "icon_dimensions": null
   },
   "item_lootbox_lv1": {
     "name": "Spoil Token Level 1",
@@ -502,7 +764,9 @@
     "lore": "",
     "quality": "consumable",
     "texture": "tier1_token",
-    "notes": []
+    "notes": [],
+    "icon_url": null,
+    "icon_dimensions": null
   },
   "item_lootbox_lv2": {
     "name": "Spoil Token Level 2",
@@ -510,7 +774,9 @@
     "lore": "",
     "quality": "consumable",
     "texture": "custom/item_lootbox_lv2",
-    "notes": []
+    "notes": [],
+    "icon_url": null,
+    "icon_dimensions": null
   },
   "item_lootbox_lv3": {
     "name": "Spoil Token Level 3",
@@ -518,7 +784,9 @@
     "lore": "",
     "quality": "consumable",
     "texture": "tier3_token",
-    "notes": []
+    "notes": [],
+    "icon_url": null,
+    "icon_dimensions": null
   },
   "item_lootbox_lv4": {
     "name": "Spoil Token Level 4",
@@ -526,7 +794,9 @@
     "lore": "",
     "quality": "consumable",
     "texture": "tier4_token",
-    "notes": []
+    "notes": [],
+    "icon_url": null,
+    "icon_dimensions": null
   },
   "item_lootbox_lv5": {
     "name": "Spoil Token Level 5",
@@ -534,7 +804,9 @@
     "lore": "",
     "quality": "consumable",
     "texture": "tier5_token",
-    "notes": []
+    "notes": [],
+    "icon_url": null,
+    "icon_dimensions": null
   },
   "item_magic_box": {
     "name": "Magic box",
@@ -546,7 +818,12 @@
       "Consumes 1/3/9 stacks per Rank 1/2/3 pieces.",
       "Packed piece can be transformed into any piece of the same cost, despite the chess pool limit.",
       "Packed pieces will not transform into pieces you packed into before."
-    ]
+    ],
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/85cf9390b9d1037a326262287d97d343e5ab7324-88x64.png",
+    "icon_dimensions": {
+      "height": 64,
+      "width": 88
+    }
   },
   "item_magic_card": {
     "name": "Magic Card",
@@ -554,7 +831,9 @@
     "lore": "From Rambling Fatebender",
     "quality": "consumable",
     "texture": "item_creed_of_omniscience",
-    "notes": []
+    "notes": [],
+    "icon_url": null,
+    "icon_dimensions": null
   },
   "item_malefic_rapture": {
     "name": "Malefic Rapture",
@@ -562,7 +841,9 @@
     "lore": "From Relic Box",
     "quality": "",
     "texture": "item_custom/zainankuanghuan",
-    "notes": []
+    "notes": [],
+    "icon_url": null,
+    "icon_dimensions": null
   },
   "item_mangguo": {
     "name": "Enchanted Mango",
@@ -570,7 +851,12 @@
     "lore": "From: Mango Tree",
     "quality": "consumable",
     "texture": "item_enchanted_mango",
-    "notes": []
+    "notes": [],
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/1edce445da3aefc37f3c727ff23c752031703ecb-88x64.png",
+    "icon_dimensions": {
+      "height": 64,
+      "width": 88
+    }
   },
   "item_mangotree": {
     "name": "Mango Tree",
@@ -578,7 +864,12 @@
     "lore": "From Relicbox",
     "quality": "",
     "texture": "item_mango_tree",
-    "notes": []
+    "notes": [],
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/eb6d466d89871234eb28da4261a9d3e7b404a29e-88x64.png",
+    "icon_dimensions": {
+      "height": 64,
+      "width": 88
+    }
   },
   "item_meiken": {
     "name": "Mekansm",
@@ -586,7 +877,12 @@
     "lore": "A glowing jewel formed out of assorted parts that somehow fit together perfectly.",
     "quality": "rare",
     "texture": "item_mekansm",
-    "notes": []
+    "notes": [],
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/196c0705e45295f8489773cf906441e7ec22408d-85x64.png",
+    "icon_dimensions": {
+      "height": 64,
+      "width": 85
+    }
   },
   "item_minglingshu": {
     "name": "Necronomicon",
@@ -596,7 +892,12 @@
     "texture": "item_necronomicon_3",
     "notes": [
       "Melee carrier summons 2 necro warriors while Ranged carrier summons 2 necro archers."
-    ]
+    ],
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/275ac231c23bbaa9f3bfd7f0f7ce859b02c2f386-85x64.png",
+    "icon_dimensions": {
+      "height": 64,
+      "width": 85
+    }
   },
   "item_minjiedatiaodao": {
     "name": "Swift Blink",
@@ -604,7 +905,12 @@
     "lore": "",
     "quality": "rare",
     "texture": "swift_blink",
-    "notes": []
+    "notes": [],
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/787f124b703cc1b06d152b253602fc5b0c64db65-88x64.png",
+    "icon_dimensions": {
+      "height": 64,
+      "width": 88
+    }
   },
   "item_molongqiang": {
     "name": "DragonLance",
@@ -614,7 +920,9 @@
     "texture": "dragon_lance",
     "notes": [
       "Attack range bonus not stackable."
-    ]
+    ],
+    "icon_url": null,
+    "icon_dimensions": null
   },
   "item_money": {
     "name": "A Bag of Coins",
@@ -622,7 +930,9 @@
     "lore": "",
     "quality": "consumable",
     "texture": "custom/coin",
-    "notes": []
+    "notes": [],
+    "icon_url": null,
+    "icon_dimensions": null
   },
   "item_moping": {
     "name": "Bottle",
@@ -630,7 +940,12 @@
     "lore": "",
     "quality": "rare",
     "texture": "bottle",
-    "notes": []
+    "notes": [],
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/02079ccf654800b42f2e6ac9f449351c35b2d389-85x64.png",
+    "icon_dimensions": {
+      "height": 64,
+      "width": 85
+    }
   },
   "item_moping_kong": {
     "name": "Bottle",
@@ -638,7 +953,12 @@
     "lore": "",
     "quality": "rare",
     "texture": "bottle_empty",
-    "notes": []
+    "notes": [],
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/02079ccf654800b42f2e6ac9f449351c35b2d389-85x64.png",
+    "icon_dimensions": {
+      "height": 64,
+      "width": 85
+    }
   },
   "item_more_creep": {
     "name": "March of The Beasts",
@@ -646,7 +966,9 @@
     "lore": "From Relic Box",
     "quality": "",
     "texture": "item_custom/more_creep",
-    "notes": []
+    "notes": [],
+    "icon_url": null,
+    "icon_dimensions": null
   },
   "item_null": {
     "name": "UNAVAILABLE",
@@ -654,7 +976,9 @@
     "lore": "",
     "quality": "consumable",
     "texture": "item_default",
-    "notes": []
+    "notes": [],
+    "icon_url": null,
+    "icon_dimensions": null
   },
   "item_pingguo": {
     "name": "Golden Enchanted Mango",
@@ -664,7 +988,9 @@
     "texture": "custom/golden_mango2",
     "notes": [
       "Move into Backpack slots if you don't wish to use this item for the round."
-    ]
+    ],
+    "icon_url": null,
+    "icon_dimensions": null
   },
   "item_qiangxi": {
     "name": "Assault Cuirass",
@@ -672,7 +998,12 @@
     "lore": "",
     "quality": "artifact",
     "texture": "item_assault",
-    "notes": []
+    "notes": [],
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/198370ca65f3e81849a1de8c330f5959bb6d0f1e-85x64.png",
+    "icon_dimensions": {
+      "height": 64,
+      "width": 85
+    }
   },
   "item_qinwangduandao": {
     "name": "Princes Knife",
@@ -680,7 +1011,12 @@
     "lore": "",
     "quality": "epic",
     "texture": "princes_knife",
-    "notes": []
+    "notes": [],
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/c825d8b7dcc614a332baaf94fd10948798ab90ae-85x62.png",
+    "icon_dimensions": {
+      "height": 62,
+      "width": 85
+    }
   },
   "item_qiongguidun": {
     "name": "Poor Mans Shield",
@@ -688,7 +1024,12 @@
     "lore": "",
     "quality": "consumable",
     "texture": "item_poor_mans_shield",
-    "notes": []
+    "notes": [],
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/0bae4187f9346076769e326d1b8c850e151fe5af-88x64.png",
+    "icon_dimensions": {
+      "height": 64,
+      "width": 88
+    }
   },
   "item_qishijian": {
     "name": "Paladin Sword",
@@ -696,7 +1037,12 @@
     "lore": "A legendary Sword owned by a divine Paladin before he was exiled.",
     "quality": "rare",
     "texture": "item_paladin_sword",
-    "notes": []
+    "notes": [],
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/9761acb02de29d3b41b04d6cff8007f738d225db-85x62.png",
+    "icon_dimensions": {
+      "height": 62,
+      "width": 85
+    }
   },
   "item_rank_damage": {
     "name": "Defiant Shell",
@@ -706,7 +1052,12 @@
     "texture": "defiant_shell",
     "notes": [
       "Modified from the previous courier-lost-health scaling formula."
-    ]
+    ],
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/01c1c3c75559fcc46a08d3b438818701fe2d78a3-88x64.png",
+    "icon_dimensions": {
+      "height": 64,
+      "width": 88
+    }
   },
   "item_relicbox": {
     "name": "Relicbox",
@@ -717,7 +1068,12 @@
     "notes": [
       "Relic equipped will expire at next relic round.",
       "Exclusive, new relic will replace the former one."
-    ]
+    ],
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/56c0d1487bb72221f502cf09de537930c5dd3da6-88x64.png",
+    "icon_dimensions": {
+      "height": 64,
+      "width": 88
+    }
   },
   "item_rengu": {
     "name": "Drum of Endurance",
@@ -725,7 +1081,12 @@
     "lore": "",
     "quality": "rare",
     "texture": "item_ancient_janggo",
-    "notes": []
+    "notes": [],
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/d9c4a7918a816d9760841bdabda80628a1a30899-85x64.png",
+    "icon_dimensions": {
+      "height": 64,
+      "width": 85
+    }
   },
   "item_renjia": {
     "name": "Blade Mail",
@@ -733,7 +1094,12 @@
     "lore": "",
     "quality": "rare",
     "texture": "item_blade_mail",
-    "notes": []
+    "notes": [],
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/8a8802bac31caf3588fc8d68a244f491c8853fc3-85x64.png",
+    "icon_dimensions": {
+      "height": 64,
+      "width": 85
+    }
   },
   "item_repeat_relic": {
     "name": "Time-Space Replica",
@@ -744,7 +1110,9 @@
     "notes": [
       "A random relic will be settled if it is your first relic, and this randomed one will not be counted as used (still available later).",
       "Time-Space Replica is not in the relic random pool when you random a relic."
-    ]
+    ],
+    "icon_url": null,
+    "icon_dimensions": null
   },
   "item_rm_token": {
     "name": "Wheel of Wonder Token",
@@ -752,7 +1120,9 @@
     "lore": "From: Wheel of Wonder",
     "quality": "consumable",
     "texture": "custom/rm_token",
-    "notes": []
+    "notes": [],
+    "icon_url": null,
+    "icon_dimensions": null
   },
   "item_rm_wheel_of_wonder": {
     "name": "Wheel of Wonder",
@@ -762,7 +1132,9 @@
     "texture": "custom/rm_wheel_of_wonder",
     "notes": [
       "Discovered pieces with Kobold or Dwarfs may not work due to their species constraints."
-    ]
+    ],
+    "icon_url": null,
+    "icon_dimensions": null
   },
   "item_sadan": {
     "name": "Satanic",
@@ -770,7 +1142,12 @@
     "lore": "Immense power at the cost of your soul.",
     "quality": "artifact",
     "texture": "item_satanic",
-    "notes": []
+    "notes": [],
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/91ae5fcb163991df27cdcfc38d8a79eb4a3d212d-85x64.png",
+    "icon_dimensions": {
+      "height": 64,
+      "width": 85
+    }
   },
   "item_sanchaji": {
     "name": "Trident",
@@ -778,7 +1155,12 @@
     "lore": "",
     "quality": "rare",
     "texture": "item_trident",
-    "notes": []
+    "notes": [],
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/1d4882444ae94aceda64610db6b06f2fcf7dee02-85x62.png",
+    "icon_dimensions": {
+      "height": 62,
+      "width": 85
+    }
   },
   "item_second_chance": {
     "name": "Second Chance",
@@ -786,7 +1168,9 @@
     "lore": "From Relicbox",
     "quality": "",
     "texture": "item_custom/第二次机会",
-    "notes": []
+    "notes": [],
+    "icon_url": null,
+    "icon_dimensions": null
   },
   "item_shanbihufu": {
     "name": "Talisman of Evasion",
@@ -794,7 +1178,12 @@
     "lore": "",
     "quality": "rare",
     "texture": "item_talisman_of_evasion",
-    "notes": []
+    "notes": [],
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/fa18078b4d379302d89b9c3fe6b3bcda2442ab43-88x64.png",
+    "icon_dimensions": {
+      "height": 64,
+      "width": 88
+    }
   },
   "item_shengjian": {
     "name": "Rapier",
@@ -802,7 +1191,12 @@
     "lore": "So powerful, it cannot have a single owner.",
     "quality": "artifact",
     "texture": "item_rapier",
-    "notes": []
+    "notes": [],
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/9019a1c3012cf78d7d828175f56fff1b6fa988c5-85x64.png",
+    "icon_dimensions": {
+      "height": 64,
+      "width": 85
+    }
   },
   "item_shenjingdun": {
     "name": "Mirror Shield",
@@ -810,7 +1204,12 @@
     "lore": "",
     "quality": "rare",
     "texture": "item_mirror_shield",
-    "notes": []
+    "notes": [],
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/c4e03c22b1d83a910442130440f508b8c6d62662-85x62.png",
+    "icon_dimensions": {
+      "height": 62,
+      "width": 85
+    }
   },
   "item_shirenmozhimao": {
     "name": "Ogre Hood",
@@ -820,7 +1219,12 @@
     "texture": "custom/shirenmozhimao",
     "notes": [
       "The bearer retains its original Species as well."
-    ]
+    ],
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/9deda6113fd23a6eb007ce5d8c6abcfcd3b433de-88x64.png",
+    "icon_dimensions": {
+      "height": 64,
+      "width": 88
+    }
   },
   "item_shuaxinqiu": {
     "name": "Refresher Orb",
@@ -828,7 +1232,12 @@
     "lore": "A powerful artifact created for wizards.",
     "quality": "rare",
     "texture": "item_refresher",
-    "notes": []
+    "notes": [],
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/5519f0467fa03796806981fd33c20417f0feaade-85x64.png",
+    "icon_dimensions": {
+      "height": 64,
+      "width": 85
+    }
   },
   "item_shuijingjian": {
     "name": "Crystalys",
@@ -836,7 +1245,12 @@
     "lore": "",
     "quality": "rare",
     "texture": "item_lesser_crit",
-    "notes": []
+    "notes": [],
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/6c219c117632dafcafe63b79baf3a42a9dc5b2d6-85x64.png",
+    "icon_dimensions": {
+      "height": 64,
+      "width": 85
+    }
   },
   "item_stolen_vault": {
     "name": "Stolen Vault",
@@ -844,7 +1258,9 @@
     "lore": "From: Relicbox",
     "quality": "",
     "texture": "custom/coin",
-    "notes": []
+    "notes": [],
+    "icon_url": null,
+    "icon_dimensions": null
   },
   "item_streak_plus": {
     "name": "Chiaroscuro Certainty",
@@ -855,7 +1271,9 @@
     "notes": [
       "2-4 win/loss streak corresponds to level (lapsed relic count) loot token, 5-9 win/loss streak corresponds to level (lapsed relic count+1) loot token, and 10+ win/loss streak corresponds to level (lapsed relic count+2) loot token.",
       "The Maximum level of this token is level 5."
-    ]
+    ],
+    "icon_url": null,
+    "icon_dimensions": null
   },
   "item_suduzhixue": {
     "name": "Boots of Speed",
@@ -863,7 +1281,9 @@
     "lore": "",
     "quality": "consumable",
     "texture": "item_boots",
-    "notes": []
+    "notes": [],
+    "icon_url": null,
+    "icon_dimensions": null
   },
   "item_suiluchui": {
     "name": "Skull Basher",
@@ -871,7 +1291,12 @@
     "lore": "A feared weapon in the right hands, this maul’s ability to shatter the defenses of its opponents should not be underestimated.",
     "quality": "common",
     "texture": "basher",
-    "notes": []
+    "notes": [],
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/7da56115d82fa98a1055bc27e1b7c2e518f05182-85x64.png",
+    "icon_dimensions": {
+      "height": 64,
+      "width": 85
+    }
   },
   "item_super_uprank": {
     "name": "Lucid Star",
@@ -879,7 +1304,9 @@
     "lore": "",
     "quality": "",
     "texture": "item_custom/super_uprank",
-    "notes": []
+    "notes": [],
+    "icon_url": null,
+    "icon_dimensions": null
   },
   "item_test_dafali": {
     "name": "Test item: +100 mana",
@@ -887,7 +1314,9 @@
     "lore": "",
     "quality": "rare",
     "texture": "arcane_ring",
-    "notes": []
+    "notes": [],
+    "icon_url": null,
+    "icon_dimensions": null
   },
   "item_test_dahujia": {
     "name": "Test item: +999 armor",
@@ -895,7 +1324,9 @@
     "lore": "",
     "quality": "consumable",
     "texture": "item_carapace_of_qaldin",
-    "notes": []
+    "notes": [],
+    "icon_url": null,
+    "icon_dimensions": null
   },
   "item_test_damokang": {
     "name": "Test item: +100% magic resistance",
@@ -903,7 +1334,9 @@
     "lore": "",
     "quality": "consumable",
     "texture": "item_eternal_shroud",
-    "notes": []
+    "notes": [],
+    "icon_url": null,
+    "icon_dimensions": null
   },
   "item_test_dashanbi": {
     "name": "Test item: +100% evasion",
@@ -911,7 +1344,9 @@
     "lore": "",
     "quality": "rare",
     "texture": "item_force_field",
-    "notes": []
+    "notes": [],
+    "icon_url": null,
+    "icon_dimensions": null
   },
   "item_test_pomokang": {
     "name": "Test item: -50% magic resistance",
@@ -919,7 +1354,9 @@
     "lore": "",
     "quality": "consumable",
     "texture": "item_vengeances_shadow",
-    "notes": []
+    "notes": [],
+    "icon_url": null,
+    "icon_dimensions": null
   },
   "item_test_poyinyue": {
     "name": "Test item: -200% attack speed",
@@ -927,7 +1364,9 @@
     "lore": "",
     "quality": "epic",
     "texture": "item_unstable_wand",
-    "notes": []
+    "notes": [],
+    "icon_url": null,
+    "icon_dimensions": null
   },
   "item_tiantangzhiji": {
     "name": "Heavens Halberd",
@@ -935,7 +1374,12 @@
     "lore": "",
     "quality": "rare",
     "texture": "item_heavens_halberd",
-    "notes": []
+    "notes": [],
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/ee16ec6ee2ba97be68ff6a85de0717b22e69af45-85x64.png",
+    "icon_dimensions": {
+      "height": 64,
+      "width": 85
+    }
   },
   "item_tiaodao": {
     "name": "Blink Dagger",
@@ -945,7 +1389,12 @@
     "texture": "item_blink",
     "notes": [
       "Chess Pieces with fast movement can be immune to attacks and projectiles."
-    ]
+    ],
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/a7f0a86f566983fb8646d526186ff26d9ce89c34-85x64.png",
+    "icon_dimensions": {
+      "height": 64,
+      "width": 85
+    }
   },
   "item_tiaozhantoujin": {
     "name": "Hood of Defiance",
@@ -953,7 +1402,12 @@
     "lore": "",
     "quality": "rare",
     "texture": "item_hood_of_defiance",
-    "notes": []
+    "notes": [],
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/32f406353b09ec3d30caf8def4a43b5b95d17cff-85x64.png",
+    "icon_dimensions": {
+      "height": 64,
+      "width": 85
+    }
   },
   "item_upgrade_lootbox": {
     "name": "Weaponsmith",
@@ -961,7 +1415,9 @@
     "lore": "From Relicbox",
     "quality": "",
     "texture": "item_custom/哼哼井武器匠",
-    "notes": []
+    "notes": [],
+    "icon_url": null,
+    "icon_dimensions": null
   },
   "item_wangchongtui": {
     "name": "Spider Leg",
@@ -969,7 +1425,12 @@
     "lore": "A horrifying yet useful mixture of necromancy and artifice.",
     "quality": "common",
     "texture": "item_spider_legs",
-    "notes": []
+    "notes": [],
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/6a47f99367d80058075d894a9d1558cd4791f1cb-85x62.png",
+    "icon_dimensions": {
+      "height": 62,
+      "width": 85
+    }
   },
   "item_wangyuanjing": {
     "name": "Telescope",
@@ -979,7 +1440,12 @@
     "texture": "custom/telescope",
     "notes": [
       "The bearer retains its original Species as well."
-    ]
+    ],
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/78fa07e7fff71befaebae25d413c181b955aa63f-85x62.jpg",
+    "icon_dimensions": {
+      "height": 62,
+      "width": 85
+    }
   },
   "item_wangzhezhijie": {
     "name": "Ring of Basilius",
@@ -987,7 +1453,12 @@
     "lore": "",
     "quality": "consumable",
     "texture": "ring_of_basilius",
-    "notes": []
+    "notes": [],
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/90df533aadf25fe675cf774b735a629d158cb738-85x64.png",
+    "icon_dimensions": {
+      "height": 64,
+      "width": 85
+    }
   },
   "item_weiguangpifeng": {
     "name": "Glimmer Cape",
@@ -995,7 +1466,12 @@
     "lore": "",
     "quality": "consumable",
     "texture": "glimmer_cape",
-    "notes": []
+    "notes": [],
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/32bffe43a4ec6f2e7741246887b189f1594a7f30-88x62.png",
+    "icon_dimensions": {
+      "height": 62,
+      "width": 88
+    }
   },
   "item_weishijingjia": {
     "name": "Guardian Greaves",
@@ -1003,7 +1479,12 @@
     "lore": "One of many holy instruments constructed to honor the Omniscience.",
     "quality": "epic",
     "texture": "item_guardian_greaves",
-    "notes": []
+    "notes": [],
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/a467df04fbc8756026050e06b8a8a701d99ac253-85x62.png",
+    "icon_dimensions": {
+      "height": 62,
+      "width": 85
+    }
   },
   "item_wuzhixiaomao": {
     "name": "Witless Shako",
@@ -1013,7 +1494,12 @@
     "texture": "witless_shako",
     "notes": [
       "+1 Level Only valid on chess pieces."
-    ]
+    ],
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/e775eefab33910611620cc351e42336554c3c383-85x62.png",
+    "icon_dimensions": {
+      "height": 62,
+      "width": 85
+    }
   },
   "item_xianfengdun": {
     "name": "Vanguard",
@@ -1021,7 +1507,12 @@
     "lore": "",
     "quality": "rare",
     "texture": "item_vanguard",
-    "notes": []
+    "notes": [],
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/71cfb079d0d214e61692a8efb58e20ccc77da9d1-85x64.png",
+    "icon_dimensions": {
+      "height": 64,
+      "width": 85
+    }
   },
   "item_xiangweixie": {
     "name": "Phase Boots",
@@ -1029,7 +1520,12 @@
     "lore": "Boots that allow the wearer to travel between the ether.",
     "quality": "consumable",
     "texture": "phase_boots",
-    "notes": []
+    "notes": [],
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/a8d2dba6e893a7924cabd3e9369102cbbce5e65e-88x64.png",
+    "icon_dimensions": {
+      "height": 64,
+      "width": 88
+    }
   },
   "item_xingyunguazhui": {
     "name": "Lucky Pendant",
@@ -1037,7 +1533,12 @@
     "lore": "",
     "quality": "consumable",
     "texture": "item_custom/item_slark_fish_bait",
-    "notes": []
+    "notes": [],
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/20af7fee44015fc624ce362999691064e3a2fd23-88x64.png",
+    "icon_dimensions": {
+      "height": 64,
+      "width": 88
+    }
   },
   "item_xiwa": {
     "name": "Shivas Guard",
@@ -1045,7 +1546,12 @@
     "lore": "Said to have belonged to a goddess, today it retains much of its former power.",
     "quality": "epic",
     "texture": "item_shivas_guard",
-    "notes": []
+    "notes": [],
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/6517b67475d4f33956282f8305a78005c677bdaf-85x64.png",
+    "icon_dimensions": {
+      "height": 64,
+      "width": 85
+    }
   },
   "item_xuanmingdunpai": {
     "name": "Buckler",
@@ -1053,7 +1559,12 @@
     "lore": "",
     "quality": "consumable",
     "texture": "buckler",
-    "notes": []
+    "notes": [],
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/49e3328b9feecf1a566c32accdab90a304f72d2c-85x62.png",
+    "icon_dimensions": {
+      "height": 62,
+      "width": 85
+    }
   },
   "item_xuanwo": {
     "name": "Maelstrom",
@@ -1061,7 +1572,12 @@
     "lore": "",
     "quality": "rare",
     "texture": "item_maelstrom",
-    "notes": []
+    "notes": [],
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/b3425810d20859502a3d7d9ddf2815dd819c0240-85x64.png",
+    "icon_dimensions": {
+      "height": 64,
+      "width": 85
+    }
   },
   "item_xueji": {
     "name": "Bloodthorn",
@@ -1069,7 +1585,12 @@
     "lore": "A reviled blade that bites deeper with each wriggle of its victims final throes.",
     "quality": "rare",
     "texture": "item_bloodthorn",
-    "notes": []
+    "notes": [],
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/6041e58218c6db15950f26098b6ad5871a18b0ad-85x62.png",
+    "icon_dimensions": {
+      "height": 62,
+      "width": 85
+    }
   },
   "item_xuejingshi": {
     "name": "Bloodstone",
@@ -1077,7 +1598,12 @@
     "lore": "The Bloodstones bright ruby color is unmistakable on the battlefield, as the owner seems to have infinite vitality and spirit.",
     "quality": "rare",
     "texture": "item_bloodstone",
-    "notes": []
+    "notes": [],
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/19d4d037befef42e1010e929ad054ad20bc9c88a-85x64.png",
+    "icon_dimensions": {
+      "height": 64,
+      "width": 85
+    }
   },
   "item_yangdao": {
     "name": "Scythe of Vyse",
@@ -1085,7 +1611,12 @@
     "lore": "The most guarded relic among the cult of Vyse, it is the most coveted weapon among magi.",
     "quality": "common",
     "texture": "item_sheepstick",
-    "notes": []
+    "notes": [],
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/587be960ff3c463b337b8b7c1a9533c91af85542-85x64.png",
+    "icon_dimensions": {
+      "height": 64,
+      "width": 85
+    }
   },
   "item_yinyuezhijing": {
     "name": "Moon Shard",
@@ -1093,7 +1624,12 @@
     "lore": "Said to be a tear from the lunar goddess Selemene.",
     "quality": "epic",
     "texture": "item_moon_shard",
-    "notes": []
+    "notes": [],
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/473844f3cd568f41a226719422f37e3e8be652b7-85x62.png",
+    "icon_dimensions": {
+      "height": 62,
+      "width": 85
+    }
   },
   "item_yonghengzhipan": {
     "name": "Aeon Disk",
@@ -1101,7 +1637,12 @@
     "lore": "A powerful artifact long ago smuggled out of the Ivory Incubarium. Or so many believe.",
     "quality": "rare",
     "texture": "item_aeon_disk",
-    "notes": []
+    "notes": [],
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/5afa27b82342063366dfff3da6877806a49547ad-85x62.png",
+    "icon_dimensions": {
+      "height": 62,
+      "width": 85
+    }
   },
   "item_yongqizhiguang": {
     "name": "Spark of Courage",
@@ -1109,7 +1650,12 @@
     "lore": "",
     "quality": "rare",
     "texture": "item_spark_of_courage",
-    "notes": []
+    "notes": [],
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/5660880d87634bddd84a0190eef8ac7466afd172-85x62.png",
+    "icon_dimensions": {
+      "height": 62,
+      "width": 85
+    }
   },
   "item_yuanlifazhang": {
     "name": "Force Staff",
@@ -1117,7 +1663,12 @@
     "lore": "Allows you to manipulate others, for good or evil.",
     "quality": "common",
     "texture": "item_force_staff",
-    "notes": []
+    "notes": [],
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/96fb7aeac4e408b4c1337c929f6c78933e0b63f9-85x64.png",
+    "icon_dimensions": {
+      "height": 64,
+      "width": 85
+    }
   },
   "item_yuanlingxidai": {
     "name": "Wraith Band",
@@ -1125,7 +1676,12 @@
     "lore": "",
     "quality": "common",
     "texture": "wraith_band",
-    "notes": []
+    "notes": [],
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/8a56ea4f5b4c6b39d364d388c847add3cea45cdb-85x64.png",
+    "icon_dimensions": {
+      "height": 64,
+      "width": 85
+    }
   },
   "item_yuanxingxie": {
     "name": "Travel Boots",
@@ -1133,7 +1689,12 @@
     "lore": "",
     "quality": "rare",
     "texture": "item_travel_boots",
-    "notes": []
+    "notes": [],
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/484f53b6e67cf9a27f2cdb5609e36517313a84de-88x64.png",
+    "icon_dimensions": {
+      "height": 64,
+      "width": 88
+    }
   },
   "item_zhaohuanshenshi": {
     "name": "Summoning Stone",
@@ -1141,7 +1702,9 @@
     "lore": "Crush your enemies with ruthless tides of minions. Yeah Minions!",
     "quality": "rare",
     "texture": "custom/zhaohuanshenshi",
-    "notes": []
+    "notes": [],
+    "icon_url": null,
+    "icon_dimensions": null
   },
   "item_zhilidatiaodao": {
     "name": "Arcane Blink",
@@ -1149,7 +1712,12 @@
     "lore": "",
     "quality": "rare",
     "texture": "arcane_blink",
-    "notes": []
+    "notes": [],
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/ba42698b00386fb3223f3fad0a705a28b659d542-88x64.png",
+    "icon_dimensions": {
+      "height": 64,
+      "width": 88
+    }
   },
   "item_zhipeitoukui": {
     "name": "Hell of the Dominator",
@@ -1159,7 +1727,9 @@
     "texture": "helm_of_the_dominator",
     "notes": [
       "The duration of Mind Control is now equal to pieces level ×2 + 1."
-    ]
+    ],
+    "icon_url": null,
+    "icon_dimensions": null
   },
   "item_zhishizhishu": {
     "name": "Tome of Knowledge",
@@ -1167,7 +1737,12 @@
     "lore": "From: Spark of Mind",
     "quality": "consumable",
     "texture": "item_tome_of_knowledge",
-    "notes": []
+    "notes": [],
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/6587789e8e062a964a1a8c6b107453f2ac62f377-88x64.png",
+    "icon_dimensions": {
+      "height": 64,
+      "width": 88
+    }
   },
   "item_zhusidoupeng": {
     "name": "Gossamer Cape",
@@ -1175,6 +1750,11 @@
     "lore": "",
     "quality": "rare",
     "texture": "gossamer_cape",
-    "notes": []
+    "notes": [],
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/c7f62f021bec515c8f02394d8027ce78ccbfa257-85x62.png",
+    "icon_dimensions": {
+      "height": 62,
+      "width": 85
+    }
   }
 }

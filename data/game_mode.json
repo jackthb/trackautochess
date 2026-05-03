@@ -19,6 +19,6 @@
     "item_rank_damage"
   ],
   "quest_2_relic_list": [],
-  "prepare_timer": 40.0,
-  "battle_timer": 50.0
+  "prepare_timer": 40,
+  "battle_timer": 50
 }

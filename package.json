@@ -14,6 +14,11 @@
     "install:desktop": "npm run install:desktop:app && npm run install:desktop:backend",
     "install:desktop:app": "corepack pnpm --dir app install --frozen-lockfile",
     "install:desktop:backend": "node tools/setup-desktop-backend.mjs",
-    "verify:desktop:backend": "node tools/verify-desktop-backend.mjs"
+    "verify:desktop:backend": "node tools/verify-desktop-backend.mjs",
+    "cms:install": "corepack pnpm --dir cms install",
+    "cms:dev": "corepack pnpm --dir cms run dev",
+    "cms:pull": "corepack pnpm --dir cms run pull",
+    "cms:migrate": "corepack pnpm --dir cms run migrate",
+    "cms:check": "corepack pnpm --dir cms run check"
   }
 }

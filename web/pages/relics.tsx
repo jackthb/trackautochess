@@ -14,7 +14,7 @@ const ALL_RELICS: BrowsableEntity[] = getAllRelics().map((relic) => ({
   name: relic.name,
   description: relic.description,
   lore: relic.lore,
-  iconSrc: `/icons/relics/${relic.iconStem}.png`,
+  iconSrc: relic.iconUrl,
 }));
 
 export default function RelicsPage({ supabase }: RelicsPageProps) {

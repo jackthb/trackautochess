@@ -9,11 +9,15 @@ interface FullItem {
   quality: string;
   texture: string;
   notes: string[];
+  icon_url?: string | null;
+  icon_dimensions?: { width: number; height: number } | null;
 }
 
 interface SimpleItem {
   tier: number;
   icon: string;
+  icon_url?: string | null;
+  icon_dimensions?: { width: number; height: number } | null;
 }
 
 export interface DisplayItem {
@@ -26,6 +30,12 @@ export interface DisplayItem {
   tier: number;
   icon: string;
   texture: string;
+  /**
+   * Resolved icon URL: Sanity CDN URL when uploaded, otherwise the local
+   * `/icons/items/<file>.png` fallback (synced from data/icons at build time).
+   */
+  iconUrl: string;
+  iconDimensions: { width: number; height: number } | null;
 }
 
 export const TIER_LABEL: Record<number, string> = {
@@ -81,6 +91,8 @@ function buildItems(): DisplayItem[] {
     .map(([simpleName, basic]) => {
       const full = fullByNorm.get(norm(simpleName));
       const name = full?.name ?? simpleName;
+      const sanityUrl = basic.icon_url || full?.icon_url || null;
+      const localUrl = legacyIconUrl({ icon: basic.icon, texture: full?.texture ?? "" });
 
       return {
         slug: slugifyName(name),
@@ -92,6 +104,8 @@ function buildItems(): DisplayItem[] {
         tier: basic.tier,
         icon: basic.icon,
         texture: full?.texture ?? "",
+        iconUrl: sanityUrl || localUrl,
+        iconDimensions: basic.icon_dimensions ?? full?.icon_dimensions ?? null,
       };
     })
     .sort((a, b) => {
@@ -116,7 +130,22 @@ export function getItemSlugByName(name: string): string | null {
   return ITEMS_BY_SLUG.has(slug) ? slug : null;
 }
 
-export function iconUrl(item: Pick<DisplayItem, "icon" | "texture">): string {
+/**
+ * Resolve an icon URL. Prefers the Sanity-hosted URL when `iconUrl` is set on
+ * the DisplayItem, falls back to the local `/icons/items/<file>.png` path
+ * (synced from data/icons at build time) otherwise.
+ *
+ * Accepts either a full DisplayItem (uses its precomputed iconUrl) or a
+ * lighter shape derived from raw items_full / items.json data.
+ */
+export function iconUrl(
+  item: Partial<Pick<DisplayItem, "iconUrl">> & Pick<DisplayItem, "icon" | "texture">
+): string {
+  if (item.iconUrl) return item.iconUrl;
+  return legacyIconUrl(item);
+}
+
+function legacyIconUrl(item: Pick<DisplayItem, "icon" | "texture">): string {
   if (item.icon) return `/icons/items/${item.icon}`;
   const stem = (item.texture || "")
     .replace(/^item_custom\//, "")

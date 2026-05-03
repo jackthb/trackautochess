@@ -27,6 +27,7 @@ import {
   type SteamProfile,
 } from "../../lib/steam";
 import { SITE_TITLE } from "@/lib/site";
+import { resolveIconUrl } from "@/lib/icons";
 
 const UNIT_COSTS: Record<string, number> = {};
 for (const [name, info] of Object.entries(unitsData.units)) {
@@ -43,7 +44,7 @@ const UNITS_FULL = unitsFullData as Record<string, UnitFullInfo>;
 const SYNERGIES_DATA = synergiesData as Record<string, SynergyInfo>;
 const RELICS_DATA = (relicsData as any).relics as Record<string, RelicInfo>;
 
-const iconUrl = (type: string, stem: string) => `/icons/${type}/${stem}.png`;
+const iconUrl = resolveIconUrl;
 
 interface GamePageProps {
   game: Game;

@@ -16,7 +16,7 @@ const TIERED_UNITS: BrowsableEntity[][] = getUnitsByCost().map((tier) =>
     description: unit.synergies.length
       ? `${unit.synergies.join(", ")} • Cost ${unit.cost}`
       : `Cost ${unit.cost}`,
-    iconSrc: `/icons/units/${unit.iconStem}.png`,
+    iconSrc: unit.iconUrl,
   }))
 );
 

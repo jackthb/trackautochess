@@ -21,15 +21,18 @@ export default function UnitDetailPage({ unit, related }: UnitDetailPageProps) {
     slug: u.slug,
     name: u.name,
     description: `Cost ${u.cost}`,
-    iconSrc: `/icons/units/${u.iconStem}.png`,
+    iconSrc: u.iconUrl,
   }));
-  const synergyEntities: RelatedEntity[] = unit.synergies.map((syn) => ({
-    slug: slugifyName(syn),
-    name: syn,
-    description: `${unit.name} activates this synergy.`,
-    iconSrc: `/icons/synergies/${synergyByName.get(syn)?.iconStem ?? ""}.png`,
-    variant: "synergy",
-  }));
+  const synergyEntities: RelatedEntity[] = unit.synergies.map((syn) => {
+    const matched = synergyByName.get(syn);
+    return {
+      slug: slugifyName(syn),
+      name: syn,
+      description: `${unit.name} activates this synergy.`,
+      iconSrc: matched?.iconUrl ?? `/icons/synergies/${matched?.iconStem ?? ""}.png`,
+      variant: "synergy",
+    };
+  });
 
   return (
     <>
@@ -37,7 +40,7 @@ export default function UnitDetailPage({ unit, related }: UnitDetailPageProps) {
       <EntityDetail
         variant="unit"
         name={unit.name}
-        iconSrc={`/icons/units/${unit.iconStem}.png`}
+        iconSrc={unit.iconUrl}
         overview={<>{description} {unit.synergies.length ? `Synergies: ${unit.synergies.join(", ")}.` : ""}</>}
         tag={{ label: `Cost ${unit.cost}` }}
         relatedTitle={`${unit.name} Synergies`}

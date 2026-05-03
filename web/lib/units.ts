@@ -5,6 +5,8 @@ import { slugifyName } from "@/lib/slugs";
 interface UnitInfo {
   cost: number;
   synergies?: string[];
+  icon_url?: string | null;
+  icon_dimensions?: { width: number; height: number } | null;
 }
 
 export interface DisplayUnit {
@@ -13,17 +15,29 @@ export interface DisplayUnit {
   cost: number;
   synergies: string[];
   iconStem: string;
+  /**
+   * Resolved icon URL: Sanity CDN URL when uploaded, otherwise the local
+   * `/icons/units/<stem>.png` path served from web/public/icons (synced from
+   * data/icons by web/scripts/sync-icons.mjs).
+   */
+  iconUrl: string;
+  iconDimensions: { width: number; height: number } | null;
 }
 
 function buildUnits(): DisplayUnit[] {
   return Object.entries(unitsFullData as Record<string, UnitInfo>)
-    .map(([name, data]) => ({
-      slug: slugifyName(name),
-      name,
-      cost: data.cost ?? 0,
-      synergies: data.synergies ?? [],
-      iconStem: unitStem(name),
-    }))
+    .map(([name, data]) => {
+      const stem = unitStem(name);
+      return {
+        slug: slugifyName(name),
+        name,
+        cost: data.cost ?? 0,
+        synergies: data.synergies ?? [],
+        iconStem: stem,
+        iconUrl: data.icon_url || `/icons/units/${stem}.png`,
+        iconDimensions: data.icon_dimensions ?? null,
+      };
+    })
     .sort((a, b) => {
       if (a.cost !== b.cost) return a.cost - b.cost;
       return a.name.localeCompare(b.name);

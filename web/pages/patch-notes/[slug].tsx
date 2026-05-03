@@ -134,7 +134,7 @@ function resolveEntryMeta(name: string): EntryMeta {
     const relic = getRelicBySlug(relicSlug);
     return {
       href: `/relics/${relicSlug}`,
-      iconSrc: relic ? `/icons/relics/${relic.iconStem}.png` : null,
+      iconSrc: relic ? relic.iconUrl : null,
       tooltip: relic ? `${relic.name}: ${relic.description}` : null,
     };
   }

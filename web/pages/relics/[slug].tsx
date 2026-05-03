@@ -85,7 +85,7 @@ export default function RelicDetailPage({
     slug: r.slug,
     name: r.name,
     description: cleanText(r.description),
-    iconSrc: `/icons/relics/${r.iconStem}.png`,
+    iconSrc: r.iconUrl,
   }));
 
   return (
@@ -99,7 +99,7 @@ export default function RelicDetailPage({
       <EntityDetail
         variant="relic"
         name={relic.name}
-        iconSrc={`/icons/relics/${relic.iconStem}.png`}
+        iconSrc={relic.iconUrl}
         overview={overview}
         lore={relic.lore ? cleanText(relic.lore) : undefined}
         relatedTitle="More Relics"
