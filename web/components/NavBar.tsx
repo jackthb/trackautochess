@@ -3,6 +3,7 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import type { SupabaseClient, User } from "@supabase/supabase-js";
 import { SITE_NAME } from "@/lib/site";
+import { isAdminSteamId } from "@/lib/admin";
 import styles from "./NavBar.module.css";
 
 interface NavBarProps {
@@ -76,6 +77,12 @@ export function NavBar({ supabase }: NavBarProps) {
     user?.user_metadata?.full_name ||
     "Player";
 
+  const sessionSteamId =
+    typeof user?.user_metadata?.steam_id === "string"
+      ? user.user_metadata.steam_id
+      : null;
+  const isAdmin = isAdminSteamId(sessionSteamId);
+
   return (
     <>
       <nav className={styles.nav}>
@@ -105,6 +112,11 @@ export function NavBar({ supabase }: NavBarProps) {
             <Link href="/ranks" className={styles.navLink}>
               Ranks
             </Link>
+            {isAdmin && (
+              <Link href="/leaderboard" className={styles.navLink}>
+                Leaderboard
+              </Link>
+            )}
             <Link href="/patch-notes" className={styles.navLink}>
               Patch Notes
             </Link>

@@ -5,8 +5,26 @@ export interface MmrSnapshot {
   snapshotted_at: string;
 }
 
+export interface MmrSeasonAnchor {
+  season: string;
+  mmr: number | null;
+  max_mmr?: number | null;
+}
+
+export interface MmrPoint {
+  mmr: number;
+  label: string;
+  kind: "season" | "snapshot";
+}
+
 interface MmrSparklineProps {
-  snapshots: MmrSnapshot[];
+  /**
+   * Per-season historical MMR (S41, S42…). Used as anchors so the graph
+   * renders something even before snapshots accumulate.
+   */
+  seasons?: MmrSeasonAnchor[];
+  /** Snapshot points captured each time the user refreshed Drodo. */
+  snapshots?: MmrSnapshot[];
 }
 
 const WIDTH = 560;
@@ -23,19 +41,35 @@ function formatDate(iso: string): string {
   });
 }
 
-export function MmrSparkline({ snapshots }: MmrSparklineProps) {
-  const points = useMemo(
-    () =>
-      snapshots
-        .filter((s): s is MmrSnapshot & { mmr: number } => typeof s.mmr === "number")
-        .slice()
-        .sort(
-          (a, b) =>
-            new Date(a.snapshotted_at).getTime() -
-            new Date(b.snapshotted_at).getTime()
-        ),
-    [snapshots]
-  );
+function buildPoints(
+  seasons: MmrSeasonAnchor[],
+  snapshots: MmrSnapshot[]
+): MmrPoint[] {
+  const seasonPoints: MmrPoint[] = seasons
+    .filter((s): s is MmrSeasonAnchor & { mmr: number } => typeof s.mmr === "number")
+    .slice()
+    .sort((a, b) => a.season.localeCompare(b.season))
+    .map((s) => ({ mmr: s.mmr, label: s.season.toUpperCase(), kind: "season" }));
+
+  const snapshotPoints: MmrPoint[] = snapshots
+    .filter((s): s is MmrSnapshot & { mmr: number } => typeof s.mmr === "number")
+    .slice()
+    .sort(
+      (a, b) =>
+        new Date(a.snapshotted_at).getTime() -
+        new Date(b.snapshotted_at).getTime()
+    )
+    .map((s) => ({
+      mmr: s.mmr,
+      label: formatDate(s.snapshotted_at),
+      kind: "snapshot",
+    }));
+
+  return [...seasonPoints, ...snapshotPoints];
+}
+
+export function MmrSparkline({ seasons = [], snapshots = [] }: MmrSparklineProps) {
+  const points = useMemo(() => buildPoints(seasons, snapshots), [seasons, snapshots]);
 
   if (points.length < 2) return null;
 
@@ -50,12 +84,18 @@ export function MmrSparkline({ snapshots }: MmrSparklineProps) {
   const coords = points.map((p, i) => {
     const x = PAD_X + (i / (points.length - 1)) * innerW;
     const y = PAD_Y + innerH - ((p.mmr - minMmr) / range) * innerH;
-    return { x, y, mmr: p.mmr, at: p.snapshotted_at };
+    return { x, y, mmr: p.mmr, label: p.label, kind: p.kind };
   });
 
   const polylinePoints = coords.map((c) => `${c.x},${c.y}`).join(" ");
   const last = coords[coords.length - 1];
   const first = coords[0];
+
+  const seasonCount = points.filter((p) => p.kind === "season").length;
+  const snapshotCount = points.length - seasonCount;
+  const metaParts: string[] = [];
+  if (seasonCount > 0) metaParts.push(`${seasonCount} season${seasonCount === 1 ? "" : "s"}`);
+  if (snapshotCount > 0) metaParts.push(`${snapshotCount} snapshot${snapshotCount === 1 ? "" : "s"}`);
 
   return (
     <>
@@ -107,6 +147,13 @@ export function MmrSparkline({ snapshots }: MmrSparklineProps) {
           stroke: currentColor;
           stroke-width: 1.5;
         }
+        .dot {
+          fill: currentColor;
+          opacity: 0.6;
+        }
+        .dot.season {
+          opacity: 0.85;
+        }
         .last-dot {
           fill: currentColor;
         }
@@ -124,15 +171,11 @@ export function MmrSparkline({ snapshots }: MmrSparklineProps) {
           line-height: 1.5;
         }
       `}</style>
-      <section
-        className="wrap"
-        aria-label="MMR history"
-        title="Snapshots are added only when you press refresh on this profile. Visit and refresh daily to keep adding points."
-      >
+      <section className="wrap" aria-label="MMR history">
         <div className="head">
           <span className="label">MMR History</span>
           <span className="meta">
-            <strong>{points.length}</strong> snapshots · range{" "}
+            {metaParts.join(" · ")} · range{" "}
             <strong>{minMmr}</strong>–<strong>{maxMmr}</strong>
           </span>
         </div>
@@ -143,7 +186,16 @@ export function MmrSparkline({ snapshots }: MmrSparklineProps) {
               points={`${first.x},${HEIGHT - PAD_Y} ${polylinePoints} ${last.x},${HEIGHT - PAD_Y}`}
             />
             <polyline className="line" points={polylinePoints} />
-            <circle className="last-dot" cx={last.x} cy={last.y} r={2.5} />
+            {coords.slice(0, -1).map((c, i) => (
+              <circle
+                key={i}
+                className={`dot ${c.kind}`}
+                cx={c.x}
+                cy={c.y}
+                r={c.kind === "season" ? 2.5 : 1.8}
+              />
+            ))}
+            <circle className="last-dot" cx={last.x} cy={last.y} r={2.8} />
             <text
               className="axis"
               x={last.x - 4}
@@ -153,7 +205,7 @@ export function MmrSparkline({ snapshots }: MmrSparklineProps) {
               {last.mmr}
             </text>
             <text className="axis" x={PAD_X} y={HEIGHT - 2}>
-              {formatDate(first.at)}
+              {first.label}
             </text>
             <text
               className="axis"
@@ -161,14 +213,14 @@ export function MmrSparkline({ snapshots }: MmrSparklineProps) {
               y={HEIGHT - 2}
               textAnchor="end"
             >
-              {formatDate(last.at)}
+              {last.label}
             </text>
           </svg>
         </div>
         <p className="note">
-          Snapshots are added only when you press refresh on this profile —
-          updates do not happen automatically. Check back and refresh daily
-          to keep adding points.
+          Season anchors come from your end-of-season MMR. New points are added
+          each time you press refresh on this profile — check back daily to
+          build out the recent trend.
         </p>
       </section>
     </>

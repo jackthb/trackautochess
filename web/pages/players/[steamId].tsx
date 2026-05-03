@@ -72,6 +72,11 @@ interface CachedUserDrodoRow {
   drodo_profile_missing: boolean | null;
 }
 
+interface LeaderboardPosition {
+  rank: number;
+  total: number;
+}
+
 interface PlayerPageProps {
   steamId: string;
   steamProfile: SteamProfile;
@@ -87,6 +92,7 @@ interface PlayerPageProps {
   } | null;
   seasons: SeasonSnapshot[];
   mmrHistory: MmrSnapshot[];
+  leaderboardPosition: LeaderboardPosition | null;
   drodoProfileMissing: boolean;
   drodoLastFetchedAt: string | null;
   manualRefreshQuota: ManualRefreshQuota;
@@ -132,6 +138,7 @@ export default function PlayerPage({
   drodo: initialDrodo,
   seasons: initialSeasons,
   mmrHistory,
+  leaderboardPosition,
   drodoProfileMissing: initialDrodoProfileMissing,
   drodoLastFetchedAt: initialDrodoLastFetchedAt,
   manualRefreshQuota: initialManualRefreshQuota,
@@ -394,6 +401,34 @@ export default function PlayerPage({
         .player-meta a:hover {
           color: var(--text-secondary);
         }
+        .leaderboard-rank {
+          display: inline-flex;
+          align-items: baseline;
+          gap: 6px;
+          margin-top: 8px;
+          padding: 4px 10px;
+          font-family: var(--font-mono);
+          font-size: 12px;
+          color: var(--text-secondary);
+          background: var(--bg-surface);
+          border: 1px solid var(--border-subtle);
+          border-radius: var(--r-3);
+          letter-spacing: 0.6px;
+        }
+        .leaderboard-rank a {
+          color: var(--text-secondary);
+          text-decoration: none;
+        }
+        .leaderboard-rank a:hover {
+          color: var(--text-primary);
+        }
+        .leaderboard-rank-num {
+          color: var(--text-primary);
+          font-weight: 600;
+        }
+        .leaderboard-rank-total {
+          color: var(--text-muted);
+        }
         .player-actions {
           display: flex;
           flex-direction: column;
@@ -535,6 +570,19 @@ export default function PlayerPage({
                       : `Steam ID: ${steamId}`}
                   </a>
                 </div>
+                {isAdmin && leaderboardPosition && (
+                  <div className="leaderboard-rank">
+                    <a href="/leaderboard">
+                      Rank{" "}
+                      <span className="leaderboard-rank-num">
+                        #{leaderboardPosition.rank}
+                      </span>{" "}
+                      <span className="leaderboard-rank-total">
+                        of {leaderboardPosition.total}
+                      </span>
+                    </a>
+                  </div>
+                )}
               </div>
             </div>
             <div className="player-actions">
@@ -596,7 +644,7 @@ export default function PlayerPage({
             </>
           )}
 
-          <MmrSparkline snapshots={mmrHistory} />
+          <MmrSparkline seasons={seasons} snapshots={mmrHistory} />
 
           <SeasonHistoryGrid seasons={seasons} />
 
@@ -788,6 +836,30 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         .order("played_at", { ascending: false })
     : { data: [] };
 
+  let leaderboardPosition: LeaderboardPosition | null = null;
+  if (supabase && drodo?.mmr != null) {
+    const [{ count: higherCount }, { count: totalRanked }] = await Promise.all([
+      supabase
+        .from("users")
+        .select("steam_id", { count: "exact", head: true })
+        .not("drodo_last_fetched_at", "is", null)
+        .eq("drodo_profile_missing", false)
+        .gt("drodo_mmr", drodo.mmr),
+      supabase
+        .from("users")
+        .select("steam_id", { count: "exact", head: true })
+        .not("drodo_last_fetched_at", "is", null)
+        .eq("drodo_profile_missing", false)
+        .not("drodo_mmr", "is", null),
+    ]);
+    if (typeof higherCount === "number" && typeof totalRanked === "number") {
+      leaderboardPosition = {
+        rank: higherCount + 1,
+        total: totalRanked,
+      };
+    }
+  }
+
   if (
     steamProfile.customUrl &&
     rawSteamId !== steamProfile.customUrl &&
@@ -809,6 +881,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       drodo,
       seasons,
       mmrHistory,
+      leaderboardPosition,
       drodoProfileMissing,
       drodoLastFetchedAt,
       manualRefreshQuota,
