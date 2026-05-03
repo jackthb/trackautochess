@@ -456,16 +456,22 @@ export async function fetchAndCacheDrodo(
   }
 
   if (options.snapshotOnSuccess) {
+    // Upsert on (steam_id, season, mmr, chicken_count): if the same observation
+    // already exists, only bump snapshotted_at instead of inserting a duplicate.
     const { error: snapshotError } = await supabase
       .from("mmr_snapshots")
-      .insert({
-        steam_id: profile.steam_id,
-        mmr: profile.mmr,
-        season: profile.season,
-        chicken_count: profile.chicken_count,
-      });
+      .upsert(
+        {
+          steam_id: profile.steam_id,
+          mmr: profile.mmr,
+          season: profile.season,
+          chicken_count: profile.chicken_count,
+          snapshotted_at: new Date().toISOString(),
+        },
+        { onConflict: "steam_id,season,mmr,chicken_count" }
+      );
     if (snapshotError) {
-      console.error("Failed to insert mmr_snapshot:", snapshotError.message);
+      console.error("Failed to upsert mmr_snapshot:", snapshotError.message);
     }
   }
 
