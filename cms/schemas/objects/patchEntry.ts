@@ -10,12 +10,13 @@ export const patchEntry = defineType({
       type: 'string',
       options: {
         list: [
+          {title: 'Added', value: 'added'},
+          {title: 'Removed', value: 'removed'},
           {title: 'Buff', value: 'buff'},
           {title: 'Nerf', value: 'nerf'},
           {title: 'Change', value: 'change'},
-          {title: 'New', value: 'new'},
-          {title: 'Removed', value: 'removed'},
-          {title: 'Note', value: 'note'},
+          {title: 'Rework', value: 'rework'},
+          {title: 'Fix', value: 'fix'},
         ],
       },
       validation: (r) => r.required(),
