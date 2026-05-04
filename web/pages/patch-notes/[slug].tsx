@@ -214,6 +214,7 @@ export default function PatchDetailPage({
         type="article"
         publishedTime={patch.date}
         structuredData={structuredData}
+        localized={false}
       />
 
       <style jsx>{`

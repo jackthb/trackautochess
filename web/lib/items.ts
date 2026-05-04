@@ -1,6 +1,7 @@
 import itemsFull from "@data/items_full.json";
 import itemsSimple from "@data/items.json";
 import { slugifyName } from "@/lib/slugs";
+import { DEFAULT_LOCALE, type Locale, pickLocalized } from "@/lib/i18n";
 
 interface FullItem {
   name: string;
@@ -9,6 +10,9 @@ interface FullItem {
   quality: string;
   texture: string;
   notes: string[];
+  names?: Record<string, string>;
+  descriptions?: Record<string, string>;
+  lore_i18n?: Record<string, string>;
   icon_url?: string | null;
   icon_dimensions?: { width: number; height: number } | null;
 }
@@ -78,7 +82,7 @@ function normalizePunct(value: string): string {
     .replace(/\.\s*\./g, ".");
 }
 
-function buildItems(): DisplayItem[] {
+function buildItemsForLocale(locale: Locale): DisplayItem[] {
   const simple = (itemsSimple as { items: Record<string, SimpleItem> }).items;
   const fullByNorm = new Map<string, FullItem>();
 
@@ -90,15 +94,24 @@ function buildItems(): DisplayItem[] {
   return Object.entries(simple)
     .map(([simpleName, basic]) => {
       const full = fullByNorm.get(norm(simpleName));
-      const name = full?.name ?? simpleName;
+      // Slug always uses the English canonical name so URLs are stable
+      // across locales.
+      const canonicalName = full?.name ?? simpleName;
+      const localizedName = full
+        ? pickLocalized(full.names, locale) || full.name
+        : simpleName;
       const sanityUrl = basic.icon_url || full?.icon_url || null;
       const localUrl = legacyIconUrl({ icon: basic.icon, texture: full?.texture ?? "" });
 
       return {
-        slug: slugifyName(name),
-        name,
-        description: normalizePunct(full?.description ?? ""),
-        lore: normalizePunct(full?.lore ?? ""),
+        slug: slugifyName(canonicalName),
+        name: localizedName,
+        description: normalizePunct(
+          pickLocalized(full?.descriptions, locale) || full?.description || "",
+        ),
+        lore: normalizePunct(
+          pickLocalized(full?.lore_i18n, locale) || full?.lore || "",
+        ),
         quality: full?.quality ?? "",
         notes: (full?.notes ?? []).map(normalizePunct),
         tier: basic.tier,
@@ -110,24 +123,38 @@ function buildItems(): DisplayItem[] {
     })
     .sort((a, b) => {
       if (a.tier !== b.tier) return a.tier - b.tier;
-      return a.name.localeCompare(b.name);
+      return a.name.localeCompare(b.name, locale);
     });
 }
 
-const ALL_ITEMS = buildItems();
-const ITEMS_BY_SLUG = new Map(ALL_ITEMS.map((item) => [item.slug, item]));
+const ITEMS_CACHE = new Map<Locale, DisplayItem[]>();
+const ITEMS_BY_SLUG_CACHE = new Map<Locale, Map<string, DisplayItem>>();
 
-export function getAllItems(): DisplayItem[] {
-  return ALL_ITEMS;
+function ensureLoaded(locale: Locale) {
+  if (!ITEMS_CACHE.has(locale)) {
+    const list = buildItemsForLocale(locale);
+    ITEMS_CACHE.set(locale, list);
+    ITEMS_BY_SLUG_CACHE.set(locale, new Map(list.map((item) => [item.slug, item])));
+  }
 }
 
-export function getItemBySlug(slug: string): DisplayItem | null {
-  return ITEMS_BY_SLUG.get(slug) ?? null;
+export function getAllItems(locale: Locale = DEFAULT_LOCALE): DisplayItem[] {
+  ensureLoaded(locale);
+  return ITEMS_CACHE.get(locale)!;
+}
+
+export function getItemBySlug(
+  slug: string,
+  locale: Locale = DEFAULT_LOCALE,
+): DisplayItem | null {
+  ensureLoaded(locale);
+  return ITEMS_BY_SLUG_CACHE.get(locale)!.get(slug) ?? null;
 }
 
 export function getItemSlugByName(name: string): string | null {
+  ensureLoaded(DEFAULT_LOCALE);
   const slug = slugifyName(name);
-  return ITEMS_BY_SLUG.has(slug) ? slug : null;
+  return ITEMS_BY_SLUG_CACHE.get(DEFAULT_LOCALE)!.has(slug) ? slug : null;
 }
 
 /**

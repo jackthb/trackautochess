@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import type { SupabaseClient, User } from "@supabase/supabase-js";
 import { SITE_NAME } from "@/lib/site";
 import { isAdminSteamId } from "@/lib/admin";
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import styles from "./NavBar.module.css";
 
 interface NavBarProps {
@@ -123,6 +124,7 @@ export function NavBar({ supabase }: NavBarProps) {
           </div>
         </div>
         <div className={styles.navRight}>
+          <LanguageSwitcher />
           {ready ? (
             user ? (
               <>

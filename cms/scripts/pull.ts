@@ -81,18 +81,22 @@ async function pullSynergies() {
       ${ICON_PROJECTION}
     }`,
   )
+  const i18n = readExistingI18n('synergies.json')
   const out: Record<string, any> = {}
   for (const r of rows) {
-    out[r.gameId] = {
-      name: r.name,
-      description: r.description ?? '',
-      description_html: r.descriptionHtml ?? '',
-      lore: r.lore ?? '',
-      notes: r.notes ?? [],
-      tiers: r.tiers ?? [],
-      ability_special: r.abilitySpecial ? JSON.parse(r.abilitySpecial) : {},
-      ...iconFields(r),
-    }
+    out[r.gameId] = applyI18n(
+      {
+        name: r.name,
+        description: r.description ?? '',
+        description_html: r.descriptionHtml ?? '',
+        lore: r.lore ?? '',
+        notes: r.notes ?? [],
+        tiers: r.tiers ?? [],
+        ability_special: r.abilitySpecial ? JSON.parse(r.abilitySpecial) : {},
+        ...iconFields(r),
+      },
+      i18n.get(r.gameId),
+    )
   }
   writeJson('synergies.json', out)
 }
@@ -170,6 +174,51 @@ function readExistingAliases(): Record<string, string> {
   }
 }
 
+// Per-record i18n fields (`names`, `descriptions`, `lore_i18n`) are produced
+// by data/enrich_i18n.py against the VPK and aren't editorial — Sanity has
+// no schema for them. To keep them across `pnpm pull` cycles we read the
+// existing JSON, snapshot the i18n maps by id, then re-attach them to each
+// record after the pull.
+type I18nFields = {
+  names?: Record<string, string>
+  descriptions?: Record<string, string>
+  lore_i18n?: Record<string, string>
+}
+
+function readExistingI18n(
+  filename: string,
+  innerKey: string | null = null,
+): Map<string, I18nFields> {
+  try {
+    const raw = fs.readFileSync(path.join(DATA_DIR, filename), 'utf-8')
+    const parsed = JSON.parse(raw)
+    const records: Record<string, any> = innerKey ? parsed?.[innerKey] ?? {} : parsed
+    const out = new Map<string, I18nFields>()
+    for (const [id, rec] of Object.entries(records)) {
+      const fields: I18nFields = {}
+      if (rec?.names) fields.names = rec.names
+      if (rec?.descriptions) fields.descriptions = rec.descriptions
+      if (rec?.lore_i18n) fields.lore_i18n = rec.lore_i18n
+      if (Object.keys(fields).length > 0) out.set(id, fields)
+    }
+    return out
+  } catch {
+    return new Map()
+  }
+}
+
+function applyI18n<T extends Record<string, any>>(
+  rec: T,
+  i18n: I18nFields | undefined,
+): T & I18nFields {
+  if (!i18n) return rec
+  const merged: T & I18nFields = {...rec}
+  if (i18n.names) merged.names = i18n.names
+  if (i18n.descriptions) merged.descriptions = i18n.descriptions
+  if (i18n.lore_i18n) merged.lore_i18n = i18n.lore_i18n
+  return merged
+}
+
 async function pullItems() {
   const rows = await client.fetch<any[]>(
     `*[_type == "item"] | order(gameId asc){
@@ -177,19 +226,23 @@ async function pullItems() {
       ${ICON_PROJECTION}
     }`,
   )
+  const i18n = readExistingI18n('items_full.json')
   const full: Record<string, any> = {}
   const curated: Record<string, any> = {}
   for (const r of rows) {
     const icon = iconFields(r)
-    full[r.gameId] = {
-      name: r.name,
-      description: r.description ?? '',
-      lore: r.lore ?? '',
-      quality: r.quality ?? '',
-      texture: r.texture ?? '',
-      notes: r.notes ?? [],
-      ...icon,
-    }
+    full[r.gameId] = applyI18n(
+      {
+        name: r.name,
+        description: r.description ?? '',
+        lore: r.lore ?? '',
+        quality: r.quality ?? '',
+        texture: r.texture ?? '',
+        notes: r.notes ?? [],
+        ...icon,
+      },
+      i18n.get(r.gameId),
+    )
     if (r.inCuratedSet) {
       curated[r.name] = {
         tier: r.tier,
@@ -209,14 +262,18 @@ async function pullRelics() {
       ${ICON_PROJECTION}
     }`,
   )
+  const i18n = readExistingI18n('relics.json', 'relics')
   const inner: Record<string, any> = {}
   for (const r of rows) {
-    inner[r.gameId] = {
-      name: r.name,
-      description: r.description ?? '',
-      lore: r.lore ?? '',
-      ...iconFields(r),
-    }
+    inner[r.gameId] = applyI18n(
+      {
+        name: r.name,
+        description: r.description ?? '',
+        lore: r.lore ?? '',
+        ...iconFields(r),
+      },
+      i18n.get(r.gameId),
+    )
   }
   writeJson('relics.json', {relics: inner})
 }

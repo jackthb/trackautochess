@@ -8,7 +8,7 @@ export default function PrivacyPage() {
 
   return (
     <>
-      <SeoHead title={title} description={description} path="/privacy" />
+      <SeoHead title={title} description={description} path="/privacy" localized={false} />
 
       <style jsx>{`
         .page {

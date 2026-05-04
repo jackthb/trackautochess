@@ -43,6 +43,7 @@ export default function Home({ initialSearchResults }: HomeProps) {
         title={title}
         description={description}
         path="/"
+        localized={false}
         structuredData={structuredData}
       />
 

@@ -68,7 +68,7 @@ export default function RanksPage() {
 
   return (
     <>
-      <SeoHead title={title} description={description} path="/ranks" />
+      <SeoHead title={title} description={description} path="/ranks" localized={false} />
 
       <style jsx>{`
         .lead {

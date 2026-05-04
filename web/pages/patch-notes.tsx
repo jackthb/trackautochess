@@ -65,6 +65,7 @@ export default function PatchNotesPage({ supabase }: PatchNotesPageProps) {
         description={description}
         path="/patch-notes"
         structuredData={structuredData}
+        localized={false}
       />
 
       <div className={styles.page}>

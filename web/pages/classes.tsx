@@ -1,34 +1,51 @@
-import type { SupabaseClient } from "@supabase/supabase-js";
+import type { GetStaticProps } from "next";
 import { BannerAd } from "@/components/BannerAd";
 import { EntityBrowser, type BrowsableEntity } from "@/components/EntityBrowser";
 import { SeoHead } from "@/lib/seo";
 import { SITE_TITLE } from "@/lib/site";
 import { getClasses } from "@/lib/synergies";
+import { normalizeLocale, type Locale } from "@/lib/i18n";
 
 interface ClassesPageProps {
-  supabase: SupabaseClient | null;
+  locale: Locale;
+  data: BrowsableEntity[];
 }
 
-const ALL_CLASSES: BrowsableEntity[] = getClasses().map((entry) => ({
-  slug: entry.slug,
-  name: entry.name,
-  description: entry.description,
-  lore: entry.lore,
-  iconSrc: entry.iconUrl,
-}));
+const T = {
+  en: {
+    title: `Classes | ${SITE_TITLE}`,
+    description:
+      "Browse all Dota Auto Chess class traits like Warrior and Wizard, then open each class detail page.",
+    heading: "Classes",
+  },
+  ru: {
+    title: `Классы | ${SITE_TITLE}`,
+    description:
+      "Все классы Dota Auto Chess: воины, маги и другие — подробные страницы по каждому классу.",
+    heading: "Классы",
+  },
+  zh: {
+    title: `职业 | ${SITE_TITLE}`,
+    description:
+      "浏览 Dota 自走棋所有职业（战士、法师等），并查看每个职业的详细介绍。",
+    heading: "职业",
+  },
+} as const;
 
-export default function ClassesPage({ supabase }: ClassesPageProps) {
-  const title = `Classes | ${SITE_TITLE}`;
-  const description =
-    "Browse all Dota Auto Chess class traits like Warrior and Wizard, then open each class detail page.";
-
+export default function ClassesPage({ data, locale }: ClassesPageProps) {
+  const t = T[locale];
   return (
     <>
-      <SeoHead title={title} description={description} path="/classes" />
+      <SeoHead
+        title={t.title}
+        description={t.description}
+        path="/classes"
+        locale={locale}
+      />
       <EntityBrowser
-        title="Classes"
+        title={t.heading}
         variant="synergy"
-        data={ALL_CLASSES}
+        data={data}
         sidebarLeft={<BannerAd slot="sidebar-left" />}
         sidebarRight={<BannerAd slot="sidebar" />}
         topAd={<BannerAd slot="in-content" />}
@@ -37,3 +54,17 @@ export default function ClassesPage({ supabase }: ClassesPageProps) {
     </>
   );
 }
+
+export const getStaticProps: GetStaticProps<ClassesPageProps> = async ({
+  locale: rawLocale,
+}) => {
+  const locale = normalizeLocale(rawLocale);
+  const data: BrowsableEntity[] = getClasses(locale).map((entry) => ({
+    slug: entry.slug,
+    name: entry.name,
+    description: entry.description,
+    lore: entry.lore,
+    iconSrc: entry.iconUrl,
+  }));
+  return { props: { locale, data } };
+};

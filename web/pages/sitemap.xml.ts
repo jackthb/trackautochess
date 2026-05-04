@@ -5,15 +5,19 @@ import { getAllRelics } from "@/lib/relics";
 import { getAllUnits } from "@/lib/units";
 import { getAllSynergies } from "@/lib/synergies";
 import { getRequestSiteUrl } from "@/lib/site";
+import { HREFLANG, LOCALES, localePath } from "@/lib/i18n";
 
 interface IndexPatch {
   date: string;
   slug: string;
 }
 
+/** Locale-agnostic path. Patch notes opt out of i18n. */
 interface SitemapEntry {
   path: string;
   lastmod?: string;
+  /** When false, only the unprefixed URL is emitted (no hreflang alts). */
+  localized?: boolean;
 }
 
 function escapeXml(value: string): string {
@@ -26,16 +30,35 @@ function escapeXml(value: string): string {
 }
 
 function renderSitemap(siteUrl: string, entries: SitemapEntry[]): string {
-  const urlset = entries
-    .map((entry) => {
-      const loc = `${siteUrl}${entry.path}`;
-      const lastmod = entry.lastmod ? `<lastmod>${entry.lastmod}</lastmod>` : "";
-      return `<url><loc>${escapeXml(loc)}</loc>${lastmod}</url>`;
-    })
-    .join("");
-
-  return `<?xml version="1.0" encoding="UTF-8"?>` +
-    `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${urlset}</urlset>`;
+  const urls: string[] = [];
+  for (const entry of entries) {
+    const lastmod = entry.lastmod
+      ? `<lastmod>${entry.lastmod}</lastmod>`
+      : "";
+    if (entry.localized === false) {
+      urls.push(
+        `<url><loc>${escapeXml(`${siteUrl}${entry.path}`)}</loc>${lastmod}</url>`,
+      );
+      continue;
+    }
+    // One <url> per locale variant, each carrying the full set of
+    // xhtml:link alternates so any can be the entry point a crawler picks.
+    for (const loc of LOCALES) {
+      const href = `${siteUrl}${localePath(loc, entry.path)}`;
+      const alts = LOCALES.map((alt) => {
+        const altHref = `${siteUrl}${localePath(alt, entry.path)}`;
+        return `<xhtml:link rel="alternate" hreflang="${HREFLANG[alt]}" href="${escapeXml(altHref)}" />`;
+      });
+      const xDefault = `<xhtml:link rel="alternate" hreflang="x-default" href="${escapeXml(`${siteUrl}${entry.path}`)}" />`;
+      urls.push(
+        `<url><loc>${escapeXml(href)}</loc>${lastmod}${alts.join("")}${xDefault}</url>`,
+      );
+    }
+  }
+  return (
+    `<?xml version="1.0" encoding="UTF-8"?>` +
+    `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">${urls.join("")}</urlset>`
+  );
 }
 
 export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
@@ -46,13 +69,14 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
 
   const entries: SitemapEntry[] = [
     { path: "/" },
-    { path: "/about" },
     { path: "/items" },
     { path: "/units" },
     { path: "/synergies" },
     { path: "/relics" },
     { path: "/talents" },
-    { path: "/patch-notes" },
+    // English-only static / app pages — emit a single unprefixed URL.
+    { path: "/about", localized: false },
+    { path: "/patch-notes", localized: false },
     ...getAllItems().map((item) => ({ path: `/items/${item.slug}` })),
     ...getAllUnits().map((unit) => ({ path: `/units/${unit.slug}` })),
     ...getAllSynergies().map((synergy) => ({
@@ -62,6 +86,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
     ...(patchIndex.patches as IndexPatch[]).map((patch) => ({
       path: `/patch-notes/${patch.slug}`,
       lastmod: patch.date,
+      localized: false as const,
     })),
   ];
 

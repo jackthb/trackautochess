@@ -17,6 +17,24 @@
     "icon_dimensions": {
       "height": 128,
       "width": 128
+    },
+    "names": {
+      "en": "Aqir",
+      "ru": "Aqir",
+      "zh-cn": "虫",
+      "zh-tw": "蟲"
+    },
+    "descriptions": {
+      "en": "Species Trait: Infection\n\nActive when there are at least (N) different Aqir chess pieces on the chessboard. (Multiple effects stack)\n\n(2) Aqirs: Grants all non-Aqir allies: Upon death, if there is any Infected friendly piece of the same name on the chessboard, immediately hatches a random Aqir piece.\n(4) Aqirs: Rank 1 effect now also applies to all friendly Aqir pieces, and will hatch a random higher-level Aqir piece.",
+      "ru": "Species Trait: Infection\n\nАктивно когда у вас есть (N) разных Aqir фигур на столе. (Эффекты складываются)\n\n(2) Aqirs: дает всем союзным не-Aqir: при смерти, если на поле есть заражённый союзник с тем же именем, немедленно вылупляется случайная фигура Aqir.\n(4) Aqirs: Акиры могут вылуплятся из союзных Aqir фигур, воскрешая фигуру Aqir более высокого уровня.",
+      "zh-cn": "种族技能：感染\n\n需要己方场上有至少（N）个不同的此种族的棋子来触发效果（触发的多层效果可以叠加）。\n\n（2）虫：使所有非虫族友方棋子获得亡语：如果场上有与它同名的被感染的友方棋子存活，原地孵化一只随机虫族棋子。\n（4）虫：使所有友方虫族棋子也获得该亡语，并且孵化的虫族棋子更加强壮。",
+      "zh-tw": "種族技能：感染\n\n需要己方場上有至少（N）個不同的此種族的棋子來觸發效果（觸發的多層效果可以疊加）。\n\n（2）蟲：使所有非蟲族友方棋子獲得亡語：如果場上有與它同名的被感染的友方棋子存活，原地孵化一只隨機蟲族棋子。\n（4）蟲：使所有友方蟲族棋子也獲得該亡語，並且孵化的蟲族棋子更加強壯。"
+    },
+    "lore_i18n": {
+      "en": "From time to time, the Aqirs dwelled on and beneath the ancient land of Drodo Island. Though most of their powers are sealed by the holy Gods, remained powers from the insanity within the Aqir blood draws their insectoid instinct to reside on the flesh of other creatures.",
+      "ru": "Время от времени Акиры обитали на древней земле Острова Дродо и под ней. Хотя большинство их сил запечатаны святыми богами, оставшиеся силы, вызванные безумием в их крови, побуждают их насекомоподобный инстинкт интересоваться, как же они работают.",
+      "zh-cn": "作为上古时代就存在多多岛的异形生物，亚基虫族早已褪去了克克帝国的辉煌。现在它们分成了不同的部族，被封印在地下世界，或者寄生在别的物种体内。",
+      "zh-tw": "作為上古時代就存在多多島的異形生物，亞基蟲族早已褪去了克克帝國的輝煌。現在它們分成了不同的部族，被封印在地下世界，或者寄生在別的物種體內。"
     }
   },
   "is_assassin": {
@@ -35,6 +53,24 @@
     "icon_dimensions": {
       "height": 128,
       "width": 128
+    },
+    "names": {
+      "en": "Assassin",
+      "ru": "Assassin",
+      "zh-cn": "刺客",
+      "zh-tw": "刺客"
+    },
+    "descriptions": {
+      "en": "The first movement of Assassin pieces in each round causes Assassins to leap over to the back of the enemy lineup. The first blow after Backstab Leap is always a critical strike with a random bonus damage amplifier.\n\nClass Perk: Coup de Grace\n\nActive when you have at least (N) different Assassin pieces on board. (Multiple effects stack)\n\n(3) Assassins: All friendly assassins have 15% chance to critical hit for 300% damage.\n(6) Assassins: All assassins have 15% chance to critical hit for 400% damage.\n(9) Assassins: All assassins refresh a Backstab Leap move after killing an enemy or a certain duration. This Backstab Leap always deals the maximum possible critical damage.",
+      "ru": "Первым движением фигуры ассасинов в каждом раунде прыгают за врагов. Первый удар после прыжка с ударом в спину всегда является критическим ударом, который увеличивает случайный дополнительный урон.\n\nClass Perk: Coup de Grace\n\nАктивен, когда у вас на столе есть минимум (N) различных фигур Ассасинов. (Эффекты складываются)\n\n(3) Ассасины: Все дружественные Ассасины имеют 15% шанс нанести критический удар, наносящий 300% урона.\n(6) Ассасины: Все дружественные Ассасины имеют 15% шанс нанести критический удар, наносящий 400% урона.\n(9) Ассасины: Все ассасины обновляют Удар в спину после убийства врага или по истечении определенного времени. Удар в спину всегда наносит максимально возможный критический урон.",
+      "zh-cn": "刺客棋子开始战斗时会直接背刺跳跃到敌方阵型后方，背刺跳跃后的第一次攻击必造成随机可能倍数的暴击伤害。\n\n职业技能：致命一击\n\n需要己方场上有至少（N）个不同的此职业的棋子来触发效果（触发的多层效果可以叠加）。\n\n（3）刺客：所有友方刺客的攻击有15%概率造成3倍伤害。\n（6）刺客：所有友方刺客的攻击有15%概率造成4倍伤害。\n（9）刺客：所有友方刺客的背刺跳跃总是造成最高可能倍数的暴击伤害，每当击杀敌人或隔一段时间获得一次额外的背刺跳跃。",
+      "zh-tw": "刺客棋子開始戰鬥時會直接背刺跳躍到敵方陣型後方，背刺跳躍後的第一次攻擊必造成隨機可能倍數的暴擊傷害。\n\n職業技能：致命一擊\n\n需要己方場上有至少（N）個不同的此職業的棋子來觸發效果（觸發的多層效果可以疊加）。\n\n（3）刺客：所有友方刺客的攻擊有15%概率造成3倍傷害。\n（6）刺客：所有友方刺客的攻擊有15%概率造成4倍傷害。\n（9）刺客：所有友方刺客的背刺跳躍總是造成最高可能倍數的暴擊傷害，每當擊殺敵人或隔一段时间獲得一次額外的背刺跳躍。"
+    },
+    "lore_i18n": {
+      "en": "Assassins are skilled executioners that leap into enemy backlines. Together, they gain a keen eye for weaknesses in enemy armor, gaining the ability to deliver devastating critical hits.",
+      "ru": "Assassins are skilled executioners that leap into enemy backlines. Together, they gain a keen eye for weaknesses in enemy armor, gaining the ability to deliver devastating critical hits.",
+      "zh-cn": "刺客的信条就是契约，而荣誉则可以用金钱来交易。这些雇佣兵们不会被良知束缚，习惯依赖于残忍而高效的战术。",
+      "zh-tw": "刺客的信條就是契約，而榮譽則可以用金錢來交易。這些雇傭兵們不會被良知束縛，習慣依賴於殘忍而高效的戰術。"
     }
   },
   "is_beast": {
@@ -53,6 +89,24 @@
     "icon_dimensions": {
       "height": 128,
       "width": 128
+    },
+    "names": {
+      "en": "Beast",
+      "ru": "Beast",
+      "zh-cn": "野兽",
+      "zh-tw": "野獸"
+    },
+    "descriptions": {
+      "en": "Species Trait: Power of the Wild\n\nActive when you have at least (N) different Beast pieces on board. (Multiple effects stack)\n\n(2) Beasts: All allies have +10% attack damage, including summoned units.\n(4) Beasts: All allies have +25% attack damage, including summoned units.\n(6) Beasts: Attacks from all allies increase physical damage taken by the target by 10%. This effect stacks up to a maximum of 10 and can be applied by friendly summoned units.",
+      "ru": "Species Trait: Power of the Wild\n\nАктивна, когда минимум (N) разных Beast на столе.(Эффекты складываются)\n\n(2) Beasts: Все союзники получают +10% урона атаки, включая призывных юнитов.\n(4) Beasts: Все союзники получают +25% урона атаки, включая призывных юнитов.\n(6) Beasts: Атаки от всех союзников увеличивают физический урон целью на 10%. Этот эффект суммируется максимум до 10 и работает на дружественных призванных юнитов.",
+      "zh-cn": "种族技能：野性之力\n\n需要己方场上有至少（N）个不同的此种族的棋子来触发效果（触发的多层效果可以叠加）。\n\n（2）野兽：所有友军的攻击力+10%，可以被召唤物继承。\n（4）野兽：所有友军的攻击力+25%，可以被召唤物继承。\n（6）野兽：所有友军获得效果：造成物理伤害会使敌人永久叠加10%的物理易伤，最多叠加10层。",
+      "zh-tw": "種族技能：野性之力\n\n需要己方場上有至少（N）個不同的此種族的棋子來觸發效果（觸發的多層效果可以疊加）。\n\n（2）野獸：所有友軍的攻擊力+10%，可以被召喚物繼承。\n（4）野獸：所有友軍的攻擊力+25%，可以被召喚物繼承。\n（6）野獸：所有友軍獲得效果：造成物理傷害會使敵人永久疊加10%的物理易傷，最多疊加10層。"
+    },
+    "lore_i18n": {
+      "en": "Beasts have superhuman strength, stamina and speed, and are good at group predation.",
+      "ru": "Beasts have superhuman strength, stamina and speed, and are good at group predation.",
+      "zh-cn": "野兽拥有超人的力量、耐力和速度，擅长群体捕食。",
+      "zh-tw": "野獸擁有超人的力量、耐力和速度，擅長群體捕食。"
     }
   },
   "is_centaur": {
@@ -72,6 +126,24 @@
     "icon_dimensions": {
       "height": 128,
       "width": 128
+    },
+    "names": {
+      "en": "Centaur",
+      "ru": "Centaur",
+      "zh-cn": "半人马",
+      "zh-tw": "半人馬"
+    },
+    "descriptions": {
+      "en": "SPECIES TRAIT: Stampede\n\nActive when you have at least (N) different pieces of this species on board. (Multiple effects stack).\n\n(2)Centaurs: All friendly Centaurs gain the effect: when starting a battle, immediately charge to the target grid with the most enemy pieces around, and stun the enemy pieces on the path.\n(4)Centaurs: Every move of all melee-friendly pieces is a Stampede.",
+      "ru": "SPECIES TRAIT: Stampede\n\nActive when you have at least (N) different pieces of this species on board. (Multiple effects stack).\n\n(2)Centaurs: Все союзные Кентавры получают эффект: при начале битвы они немедленно мчатся к клетке с наибольшим количеством вражеских фигур вокруг и оглушают врагов на пути.\n(4)Centaurs: Каждое движение всех ближних союзных фигур является Stampede.",
+      "zh-cn": "种族技能：奔袭冲撞\n\n需要己方场上有至少（N）个不同的此种族的棋子来触发效果（触发的多层效果可以叠加）。\n\n（2）半人马：所有友方半人马棋子获得效果：开始战斗时立即冲锋到周围敌方棋子最多的目标格子，并撞晕路径上的敌方棋子。\n（4）半人马：所有近战友方棋子的每次移动都是奔袭冲撞。",
+      "zh-tw": "種族技能：奔襲沖撞\n\n需要己方場上有至少（N）個不同的此種族的棋子來觸發效果（觸發的多層效果可以疊加）。\n\n（2）半人馬：所有友方半人馬棋子獲得效果：開始戰鬥時立即沖鋒到周圍敵方棋子最多的目標格子，並撞暈路徑上的敵方棋子。\n（4）半人馬：所有近戰友方棋子的每次移動都是奔襲沖撞。"
+    },
+    "lore_i18n": {
+      "en": "Centaurs are of noble blood, they are given birth by Half-god’s elder son Zaetar and only daughter of Princess Theradras. Cruelty and fierceness fill their blood, generation by generation.",
+      "ru": "Centaurs are of noble blood, they are given birth by Half-god’s elder son Zaetar and only daughter of Princess Theradras. Cruelty and fierceness fill their blood, generation by generation.",
+      "zh-cn": "半人马族的种族基因其实异常高贵，它们是由半神德鲁伊的长子扎尔塔与石母唯一的女儿瑟莱德丝公主结合而诞生。半人马整个种族都异常残暴，具有非常强的侵略性和攻击性。",
+      "zh-tw": "半人馬族的種族基因其實異常高貴，它們是由半神德魯伊的長子紮爾塔與石母唯一的女兒瑟萊德絲公主結合而誕生。半人馬整個種族都異常殘暴，具有非常強的侵略性和攻擊性。"
     }
   },
   "is_demon": {
@@ -88,6 +160,24 @@
     "icon_dimensions": {
       "height": 128,
       "width": 128
+    },
+    "names": {
+      "en": "Demon",
+      "ru": "Demon",
+      "zh-cn": "恶魔",
+      "zh-tw": "惡魔"
+    },
+    "descriptions": {
+      "en": "SPECIES TRAIT: Fel Power\n\nActive when you control only 1 type of Demon on the chessboard.\n\n(1) Demon: Normal attack damage caused by allied demon chess pieces is settled as pure damage. Fel Powers damage is increased by 15%,with a maximum stack count of 7.",
+      "ru": "Species Trait: Fel Power\n\nАктивен, если на поле только один Demon. Допускаются несколько одинаковых.\n\n(1) Demon: Урон от обычных атак, наносимый союзными демоническими фигурами, считается чистым уроном. Урон Fel Powers увеличивается на 15%, с максимальным кол-во стаков 7.",
+      "zh-cn": "种族技能：邪能之力\n\n需要己方场上有唯一一种恶魔来触发效果。\n\n（1）恶魔：友方恶魔棋子造成的普通攻击伤害都结算为纯粹伤害。每有一个同种类的友方恶魔棋子，邪能之力的伤害都会提高15%，最多叠加7层。",
+      "zh-tw": "種族技能：邪能之力\n\n需要己方場上有唯一一種惡魔來觸發效果。\n\n（1）惡魔：友方惡魔棋子造成的普通攻擊傷害都結算為純粹傷害。每有一個同種類的友方惡魔棋子，邪能之力的傷害都會提高15%，最多疊加7層。"
+    },
+    "lore_i18n": {
+      "en": "Chaotic beings that emerged from a dimensional fissure.",
+      "ru": "Лови момент и помни о смерти.",
+      "zh-cn": "来自次元裂隙中的拥有强大邪能力量的扭曲生物。",
+      "zh-tw": "來自次元裂隙中的擁有強大邪能力量的扭曲生物。"
     }
   },
   "is_demonhunter": {
@@ -105,6 +195,24 @@
     "icon_dimensions": {
       "height": 128,
       "width": 128
+    },
+    "names": {
+      "en": "Demon Hunter",
+      "ru": "Demon Hunter",
+      "zh-cn": "恶魔猎手",
+      "zh-tw": "惡魔獵手"
+    },
+    "descriptions": {
+      "en": "Counts as a different enemy Demon type.\n\nCLASS PERK: Shuttered Soul\n\nActive when you have at least (N) different Demon Hunter pieces on board. (Multiple effects stack)\n(2) Demon Hunters: All friendly demons are considered the same type.\n(4) Demon Hunters: All damage dealt is settled as Pure Damage.",
+      "ru": "Считается как демон для противника.\n\nCLASS PERK: Shuttered Soul\n\nАктивно когда у вас есть (N) разных Demon Hunter на столе. (Эффекты складываются)\n(2) Demon Hunters: Все союзные демоны считаются одним типом. \n(4) Demon Hunters: Весь урон становится Чистым Уроном.",
+      "zh-cn": "恶魔猎手棋子会被同时视为敌方恶魔。\n\n职业技能：破碎灵魂\n\n需要己方场上有至少（N）个不同的此职业的棋子来触发效果（触发的多层效果可以叠加）。\n\n（2）恶魔猎手：所有友方恶魔棋子都视为同一种类。\n（4）恶魔猎手：友方棋子造成的所有伤害都结算为纯粹伤害。",
+      "zh-tw": "惡魔獵手棋子會被同時視為敵方惡魔。\n\n職業技能：破碎靈魂\n\n需要己方場上有至少（N）個不同的此職業的棋子來觸發效果（觸發的多層效果可以疊加）。\n\n（2）惡魔獵手：所有友方惡魔棋子都視為同一種類。\n（4）惡魔獵手：友方棋子造成的所有傷害都結算為純粹傷害。"
+    },
+    "lore_i18n": {
+      "en": "Demon hunters ritually trade their normal form in exchange for the mastery of demonic powers that enables them to deliver devastating strikes to their prey. This enhanced strength, together with their great agility and magical prowess, makes demon hunters unsuppressible.",
+      "ru": "Demon hunters ritually trade their normal form in exchange for the mastery of demonic powers that enables them to deliver devastating strikes to their prey. This enhanced strength, together with their great agility and magical prowess, makes demon hunters unsuppressible.",
+      "zh-cn": "伊利达雷自愿接受了邪能和混乱魔法，正是这样的能量长期威胁着多多岛，但他们相信这是抗击敌人所必需的。",
+      "zh-tw": "伊利達雷自願接受了邪能和混亂魔法，正是這樣的能量長期威脅著多多島，但他們相信這是抗擊敵人所必需的。"
     }
   },
   "is_draenei": {
@@ -125,6 +233,24 @@
     "icon_dimensions": {
       "height": 128,
       "width": 128
+    },
+    "names": {
+      "en": "Draenei",
+      "ru": "Draenei",
+      "zh-cn": "德莱尼",
+      "zh-tw": "德萊尼"
+    },
+    "descriptions": {
+      "en": "SPECIES TRAIT: Blessing of the Naaru\n\nActive when you have at least (N) different pieces of this species on board. (Multiple effects stack)\n\n(2) Draeneis: All friendly Draenei gain the effect: Every 4 seconds, steal 50+2% max health from the nearest enemy chess piece to heal themselves.\n(4) Draeneis: All friendly pieces gain effects: Whenever a cumulative total of more than 100 points of healing is taken it is split (cumulative healing) points of pure damage among the surrounding enemies.",
+      "ru": "SPECIES TRAIT: Blessing of the Naaru\n\nАктивна, когда минимум (N) разных Draenei на столе.(Эффекты складываются)\n\n(2) Draeneis: Дренеи получают эффект: каждые 4 секунд крадут 50+2% от максимального здоровья ближайшей вражеской фигуры, чтобы исцелить себя.\n(4) Draeneis: Все дружественные фигуры получают эффект благославения: когда общее исцеление превышает 100 очков, оно превращается в чистый урон, который наносится ближайшим врагам.",
+      "zh-cn": "种族技能：纳鲁的洗礼\n\n需要己方场上有至少（N）个不同的此种族的棋子来触发效果（触发的多层效果可以叠加）。\n\n（2）德莱尼：每4秒从最近的敌方棋子偷取（50+2%最大生命值）点生命值治疗自己。\n（4）德莱尼：所有友方棋子获得效果：每当累计受到超过100点治疗会对周围敌人造成等于（累计治疗量）的纯粹伤害。",
+      "zh-tw": "種族技能：納魯的洗禮\n\n需要己方場上有至少（N）個不同的此種族的棋子來觸發效果（觸發的多層效果可以疊加）。\n\n（2）德萊尼：每4秒從最近的敵方棋子偷取（50+2%最大生命值）點生命值治療自己。\n（4）德萊尼：所有友方棋子獲得效果：每當累計受到超過100點治療會對周圍敵人造成等於（累計治療量）的純粹傷害。"
+    },
+    "lore_i18n": {
+      "en": "To evade the Burning Legions clutches, a congregation led by the Farseer fled their homelands, faithful to the Naaru and the Holy Light. They named themselves Draenei, the Exiled Ones.",
+      "ru": "Чтобы избежать хватки Пылающих Легионов, конгрегация, возглавляемая Провидцем, покинула свои родные земли, веруя в Наару и Священный Свет. Они назвали себя Дренеями, народ прозвал их Жижей.",
+      "zh-cn": "为了避免被燃烧军团奴役为恶魔，在大先知的带领下逃离了自己家园的这群信仰纳鲁和圣光的异族生物，将自己称为德莱尼，或者“流亡者”。",
+      "zh-tw": "為了避免被燃燒軍團奴役為惡魔，在大先知的帶領下逃離了自己家園的這群信仰納魯和聖光的異族生物，將自己稱為德萊尼，或者「流亡者」。"
     }
   },
   "is_dragon": {
@@ -142,6 +268,24 @@
     "icon_dimensions": {
       "height": 128,
       "width": 128
+    },
+    "names": {
+      "en": "Dragon",
+      "ru": "Dragon",
+      "zh-cn": "龙",
+      "zh-tw": "龍"
+    },
+    "descriptions": {
+      "en": "Species Trait: Attunement\n\nActive when you have at least (N) different pieces of this species on board. (Multiple effects stack).\n\n(3) Dragons: All friendly Dragons have an initial mana value of 100.\n(5) Dragons: All allies have an initial mana value of 100.",
+      "ru": "Species Trait: Attunement\n\nActive when you have at least (N) different pieces of this species on board. (Multiple effects stack).\n\n(3) Dragons: Все дружественные Драконы начинают бой со 100 маны.\n(5) Драконы: Все союзники начинают бой с 100 маны.",
+      "zh-cn": "种族技能：战吼\n\n需要己方场上有至少（N）个不同的此种族的棋子来触发效果（触发的多层效果可以叠加）。\n\n（3）龙：所有友方龙棋子的初始法力值为100。\n（5）龙：所有友军的初始法力值为100。",
+      "zh-tw": "種族技能：戰吼\n\n需要己方場上有至少（N）個不同的此種族的棋子來觸發效果（觸發的多層效果可以疊加）。\n\n（3）龍：所有友方龍棋子的初始法力值為100。\n（5）龍：所有友軍的初始法力值為100。"
+    },
+    "lore_i18n": {
+      "en": "Dragons were among the first creatures to exist on this ancient land. They possess unimaginable powers, deep within, which they like to show off when they commune together.",
+      "ru": "Dragons were among the first creatures to exist on this ancient land. They possess unimaginable powers, deep within, which they like to show off when they commune together.",
+      "zh-cn": "龙族是多多岛上古老的住民，它们拥有庞大的身躯、超乎想象的力量，被视为神圣而强大的存在。",
+      "zh-tw": "龍族是多多島上古老的住民，它們擁有龐大的身軀、超乎想象的力量，被視為神聖而強大的存在。"
     }
   },
   "is_druid": {
@@ -163,6 +307,24 @@
     "icon_dimensions": {
       "height": 128,
       "width": 128
+    },
+    "names": {
+      "en": "Druid",
+      "ru": "Druid",
+      "zh-cn": "德鲁伊",
+      "zh-tw": "德魯伊"
+    },
+    "descriptions": {
+      "en": "Druid pieces will not be destroyed on a ★★★ piece combined.\n\nCLASS PERK: Synergy\n\nActive when you have at least (N) different pieces of this class on board. (Multiple effects stack)\n\n(2) Druids: Two identical Druid★ can promote to a Druid★★.\n(4) Druids: Two identical Druid★★ can promote to a Druid★★★.\n(6) Druids: Two identical Druid★★★ can promote to the great Altar of Spirits♥♥♥, and gain several(equal to the level of Druid★★★) stack of Altar Power, and destroy all Druid pieces in the chess pool.",
+      "ru": "фигуры друидов не монополятся при создании ★★★ фигуры.\n\nCLASS PERK: Synergy\n\nАктивна, когда минимум (N) разных Druids на столе.(Эффекты складываются)\n\n(2) Druids: Два идентичных Друида★ могут быть улучшены до Друида★★.\n (4) Druids: Два идентичных Друида★★ могут быть улучшены до Друида★★★.(6) Druids: две одинаковые Druid★★★ могут улучшиться до великого Легендарного Виспа ♥♥♥ и получить несколько (равное уровню Druid★★★) зарядов Легендарного Виспа, а все фигуры Druid в пуле будут уничтожены.",
+      "zh-cn": "德鲁伊棋子合成★★★时不会摧毁棋库中的同名棋子。\n\n职业技能：野性成长\n\n需要己方场上有至少（N）个不同的此职业的棋子来触发效果（触发的多层效果可以叠加）。\n\n（2）德鲁伊：场上有2个相同的★德鲁伊就可以升级为★★德鲁伊。\n（4）德鲁伊：场上有2个相同的★★德鲁伊就可以升级为★★★德鲁伊。\n（6）德鲁伊：场上有2个相同的★★★德鲁伊就可以升级为伟大的万灵祭坛♥♥♥，获得相当于（★★★德鲁伊棋子等级）层的「祭坛之力」加成，并摧毁棋库中的所有德鲁伊棋子。",
+      "zh-tw": "德魯伊棋子合成★★★時不會摧毀棋庫中的同名棋子。\n\n職業技能：野性成長\n\n需要己方場上有至少（N）個不同的此職業的棋子來觸發效果（觸發的多層效果可以疊加）。\n\n（2）德魯伊：場上有2個相同的★德魯伊就可以升級為★★德魯伊。\n（4）德魯伊：場上有2個相同的★★德魯伊就可以升級為★★★德魯伊。\n（6）德魯伊：場上有2個相同的★★★德魯伊就可以升級為偉大的萬靈祭壇♥♥♥，獲得相當於（★★★德魯伊棋子等級）層的「祭壇之力」加成，並摧毀棋庫中的所有德魯伊棋子。"
+    },
+    "lore_i18n": {
+      "en": "Druids can control great power of Nature to protect spirits and balance.",
+      "ru": "Druids могут контролировать силу природы, чтобы защищать духов и поддерживать равновесие.",
+      "zh-cn": "德鲁伊能驾驭强大的自然力量来维护平衡、保护生命。",
+      "zh-tw": "德魯伊能駕馭強大的自然力量來維護平衡、保護生命。"
     }
   },
   "is_dwarf": {
@@ -179,6 +341,24 @@
     "icon_dimensions": {
       "height": 128,
       "width": 128
+    },
+    "names": {
+      "en": "Dwarf",
+      "ru": "Dwarf",
+      "zh-cn": "矮人",
+      "zh-tw": "矮人"
+    },
+    "descriptions": {
+      "en": "Species Trait: Take Aim\n\nActive when you have at least (N) different Dwarf pieces on board. (Multiple effects stack)\n\n(2) Dwarves: All dwarves’ attack range +200, physical damage deals 15% increased damage for every 1 square away from the target.",
+      "ru": "Species Trait: Take Aim\n\nАктивируется, когда на поле есть хотя бы (N) разных Dwarf фигур. (Эффекты складываются)\n\n(2) Dwarves: Все физические атаки дворфов наносят на 15% больше урона за каждые 1 клетку расстояния до цели.",
+      "zh-cn": "种族技能：硬化氪金狗眼\n\n需要己方场上有至少（N）个不同的此种族的远程棋子来触发效果（触发的多层效果可以叠加）。\n\n（2）矮人：所有友方远程矮人棋子获得效果：攻击距离+200，对敌人造成的任何物理伤害都会有每1格距离+15%的伤害加成。",
+      "zh-tw": "種族技能：硬化氪金狗眼\n\n需要己方場上有至少（N）個不同的此種族的遠程棋子來觸發效果（觸發的多層效果可以疊加）。\n\n（2）矮人：所有友方遠程矮人棋子獲得效果：攻擊距離+200，對敵人造成的任何物理傷害都會有每1格距離+15%的傷害加成。"
+    },
+    "lore_i18n": {
+      "en": "Dwarves are a bold and courageous species of humanoids that excel in creating and refining weapons and gadgets, allowing them to slay their foes from afar.",
+      "ru": "Dwarves are a bold and courageous species of humanoids that excel in creating and refining weapons and gadgets, allowing them to slay their foes from afar.",
+      "zh-cn": "大胆而勇敢的矮人族是一支古老的种族，它起源于早期多多岛的神明用具有活力的石头创造的土灵。擅长采矿和制造的矮人在这个世界上寻找泰坦的遗产，因为他们坚信是泰坦在创世之初用石头创造了矮人。",
+      "zh-tw": "大膽而勇敢的矮人族是一支古老的種族，它起源於早期多多島的神明用具有活力的石頭創造的土靈。擅長采礦和製造的矮人在這個世界上尋找泰坦的遺產，因為他們堅信是泰坦在創世之初用石頭創造了矮人。"
     }
   },
   "is_element": {
@@ -197,6 +377,24 @@
     "icon_dimensions": {
       "height": 128,
       "width": 128
+    },
+    "names": {
+      "en": "Elemental",
+      "ru": "Elemental",
+      "zh-cn": "元素",
+      "zh-tw": "元素"
+    },
+    "descriptions": {
+      "en": "Elemental Essence\n\nActive when you have at least (N) different Element pieces on board. (Multiple effects stack)\n\n(2) Elements: All friendly elementals have +15% chance to turn melee aggressors into stone for 3 sec.\n(4) Elements: All allies have +15% chance to turn melee and ranged aggressors into stone for 3 sec.\n(6) Elements: Aggressors are stoned for 1 sec longer and take +100% damage.",
+      "ru": "Elemental Essence\n\nАктивна, когда минимум (N) разных Element на столе.(Эффекты складываются)\n\n(2) Element: Все союзные Element имеют 15% шанс превратить врага ближнего боя в камень на 3 сек.\n(4) Element: Все союзные Element имеют 15% шанс превратить любого врага в камень на 3 сек.\n(6) Element: Все враги превращаются в камень на 1 сек дольше и получают +100% урона.",
+      "zh-cn": "种族技能：大地灵气\n\n需要己方场上有至少（N）个不同的此种族的棋子来触发效果（触发的多层效果可以叠加）。\n\n（2）元素：所有友方元素获得效果：被近战攻击的时候有15%概率使攻击者石化3秒。\n（4）元素：所有友军获得效果：被近战或远程攻击的时候有10%概率使攻击者石化3秒。\n（6）元素：石化的持续时间增加1秒，被石化的敌人受到的所有伤害+100%。",
+      "zh-tw": "種族技能：大地靈氣\n\n需要己方場上有至少（N）個不同的此種族的棋子來觸發效果（觸發的多層效果可以疊加）。\n\n（2）元素：所有友方元素獲得效果：被近戰攻擊的時候有15%概率使攻擊者石化3秒。\n（4）元素：所有友軍獲得效果：被近戰或遠程攻擊的時候有10%概率使攻擊者石化3秒。\n（6）元素：石化的持續時間增加1秒，被石化的敵人受到的所有傷害+100%。"
+    },
+    "lore_i18n": {
+      "en": "Elementals are unstable beings that radiate mysterious energy when attacked. This gives them a chance to turn their melee aggressors to stone.",
+      "ru": "Elementals are unstable beings that radiate mysterious energy when attacked. This gives them a chance to turn their melee aggressors to stone.",
+      "zh-cn": "元素位面是一处充满暴力且危险的地方，在那里每一种元素都和其他元素战斗着，在永无止境的冲突中试图扩展自己的疆土。",
+      "zh-tw": "元素位面是一處充滿暴力且危險的地方，在那裏每一種元素都和其他元素戰鬥著，在永無止境的沖突中試圖擴展自己的疆土。"
     }
   },
   "is_elf": {
@@ -215,6 +413,24 @@
     "icon_dimensions": {
       "height": 128,
       "width": 128
+    },
+    "names": {
+      "en": "Elf",
+      "ru": "Elf",
+      "zh-cn": "精灵",
+      "zh-tw": "精靈"
+    },
+    "descriptions": {
+      "en": "Species Trait: Evasion\n\nActive when you have at least (N) different Elf pieces on board. (Multiple effects stack)\n\n(3) Elves: All friendly elves have +25% evasion.\n(6) Elves: All friendly elves have +40% evasion.\n(9) Elves: Friendly elves gain the effect: Dodging any attack will conceal itself for 1 second and create a mirrored attack from the attacker, targeting the enemy.",
+      "ru": "Species Trait: Evasion\n\nАктивируется, когда на поле есть хотя бы (N) разных Elf фигур. (Эффекты складываются)\n\n(3) Elves: Все дружественные Elves получают +25% уклонения.\n(6) Elves: Все дружественные Elves получают +40% уклонения.\n(9) Elves: Дружественные Elves получают эффект: уклоняясь от любой атаки, фигура скрывается на 1 секунду и создаёт зеркальную атаку от атакующего, нацеливая её на врага.",
+      "zh-cn": "种族技能：隐蔽\n\n需要己方场上有至少（N）个不同的此种族的棋子来触发效果（触发的多层效果可以叠加）。\n\n（3）精灵：所有友方精灵有25%几率闪避敌人的攻击。\n（6）精灵：所有友方精灵有40%几率闪避敌人的攻击。\n（9）精灵：所有友方精灵获得效果：任何闪避都会隐身1秒，并复制一个攻击者的镜像攻击敌人。",
+      "zh-tw": "種族技能：隱蔽\n\n需要己方場上有至少（N）個不同的此種族的棋子來觸發效果（觸發的多層效果可以疊加）。\n\n（3）精靈：所有友方精靈有25%幾率閃避敵人的攻擊。\n（6）精靈：所有友方精靈有40%幾率閃避敵人的攻擊。\n（9）精靈：所有友方精靈獲得效果：任何閃避都會隱身1秒，並復製一個攻擊者的鏡像攻擊敵人。"
+    },
+    "lore_i18n": {
+      "en": "Nimble Elves who live on the crown of the World Tree are one of the most important primal protectors of Drodo Island. Their belief in the Goddess of the Moon and natural harmony has profoundly affected their lifestyle.",
+      "ru": "Nimble Elves who live on the crown of the World Tree are one of the most important primal protectors of Drodo Island. Their belief in the Goddess of the Moon and natural harmony has profoundly affected their lifestyle.",
+      "zh-cn": "生活在世界之树之上的精灵们，是多多岛最重要的保护者之一，其月神信仰与自然平衡信仰渗透在生活之中点点滴滴。",
+      "zh-tw": "生活在世界之樹之上的精靈們，是多多島最重要的保護者之一，其月神信仰與自然平衡信仰滲透在生活之中點點滴滴。"
     }
   },
   "is_goblin": {
@@ -232,6 +448,24 @@
     "icon_dimensions": {
       "height": 128,
       "width": 128
+    },
+    "names": {
+      "en": "Goblin",
+      "ru": "Goblin",
+      "zh-cn": "地精",
+      "zh-tw": "地精"
+    },
+    "descriptions": {
+      "en": "Species Perk: Nanobots\n\nActive when you have at least (N) different goblin pieces on board. (Multiple effects stack) \n\n(3)Goblins: Grants a random melee ally +10 armour and +20 health regeneration.\n(6)Goblins: Grants all allies +10 armor and +20 health regeneration.",
+      "ru": "Species Perk: Nanobots\n\nActive when you have at least (N) different goblin pieces on board. (Multiple effects stack) \n\n(3)Goblins: Даёт случайному союзнику ближнего боя +10 брони и +20 восстановления здоровья.\n(6)Goblins: Даёт всем союзникам +10 брони и +20 восстановления здоровья.",
+      "zh-cn": "种族技能：活体装甲\n\n需要己方场上有至少（N）个不同的此种族的棋子来触发效果（触发的多层效果可以叠加）。\n\n（3）地精：使一个随机近战友军的护甲+10，生命回复+20。\n（6）地精：使所有友军护甲+10，生命回复+20。",
+      "zh-tw": "種族技能：活體裝甲\n\n需要己方場上有至少（N）個不同的此種族的棋子來觸發效果（觸發的多層效果可以疊加）。\n\n（3）地精：使一個隨機近戰友軍的護甲+10，生命回復+20。\n（6）地精：使所有友軍護甲+10，生命回復+20。"
+    },
+    "lore_i18n": {
+      "en": "Goblins are a cunning species with a love for money, explosives, and less-than-reliable technology. Their drive to invent fuels them, giving the brightest among them a boost in stamina and fortitude.",
+      "ru": "Goblins are a cunning species with a love for money, explosives, and less-than-reliable technology. Their drive to invent fuels them, giving the brightest among them a boost in stamina and fortitude.",
+      "zh-cn": "地精们起初是科科岛上丛林巨魔的奴隶，而卡加矿石使得地精种族变得令人吃惊的狡猾和聪明。",
+      "zh-tw": "地精們起初是科科島上叢林巨魔的奴隸，而卡加礦石使得地精種族變得令人吃驚的狡猾和聰明。"
     }
   },
   "is_god": {
@@ -252,6 +486,24 @@
     "icon_dimensions": {
       "height": 128,
       "width": 128
+    },
+    "names": {
+      "en": "God",
+      "ru": "God",
+      "zh-cn": "神",
+      "zh-tw": "神"
+    },
+    "descriptions": {
+      "en": "SPECIES TRAIT: Overweening superiority\n\nActive when you have at least (N) different pieces of this species on board. (Multiple effects stack)\n\n(2)Gods: All allies get the effect: skill cooldown time -30%.\n(4)Gods: All allies get the effect: skill cooldown time -30%.\n(6) Gods: All allies get the effect: Using skills that consume mana will reduce the current remaining cooldown time of active abilities and items by 60%.",
+      "ru": "SPECIES TRAIT: Overweening superiority\n\nАктивируется, когда на поле есть хотя бы (N) разных фигур этого вида. (Эффекты складываются)\n\n(2) Gods: Все союзники получают эффект: время перезарядки навыков -30%.\n(4) Gods: Все союзники получают эффект: время перезарядки навыков -30%.\n(6) Gods: Все союзники получают эффект: использование навыков, которые требуют маны, уменьшает оставшееся время перезарядки активных способностей и предметов на 60%.",
+      "zh-cn": "种族技能：独尊\n\n需要己方场上有至少（N）个不同的此种族的棋子来触发效果（触发的多层效果可以叠加）。\n\n（2）神：所有友方棋子获得效果：技能冷却时间-30%。\n（4）神：所有友方棋子获得效果：技能冷却时间-30%。\n（6）神：所有友方棋子获得效果：消耗法力值释放的技能会使主动技能和物品的当前剩余冷却时间-60%。",
+      "zh-tw": "種族技能：獨尊\n\n需要己方場上有至少（N）個不同的此種族的棋子來觸發效果（觸發的多層效果可以疊加）。\n\n（2）神：所有友方棋子獲得效果：技能冷卻時間-30%。\n（4）神：所有友方棋子獲得效果：技能冷卻時間-30%。\n（6）神：所有友方棋子獲得效果：消耗法力值釋放的技能會使主動技能和物品的當前剩余冷卻時間-60%。"
+    },
+    "lore_i18n": {
+      "en": "The highly worshipped Gods are considered as the creators of Drodo Island. Being both arrogant and prideful, the loyal beliefs from their creations have forged the supreme powers that Gods possess, granting them the most significant potential among all creatures which can completely change the outcome of a battle.",
+      "ru": "The highly worshipped Gods are considered as the creators of Drodo Island. Being both arrogant and prideful, the loyal beliefs from their creations have forged the supreme powers that Gods possess, granting them the most significant potential among all creatures which can completely change the outcome of a battle.",
+      "zh-cn": "高高在上的神明被认为是多多岛的造物者。在将神力赐予了守护巨龙之后，神明们很少亲自涉事凡人的世界，直到多多岛遇到了来自扭曲虚空的空前危机。",
+      "zh-tw": "高高在上的神明被認為是多多島的造物者。在將神力賜予了守護巨龍之後，神明們很少親自涉事凡人的世界，直到多多島遇到了來自扭曲虛空的空前危機。"
     }
   },
   "is_harpy": {
@@ -269,6 +521,24 @@
     "icon_dimensions": {
       "height": 128,
       "width": 128
+    },
+    "names": {
+      "en": "Harpy",
+      "ru": "Harpy",
+      "zh-cn": "鹰身人",
+      "zh-tw": "鷹身人"
+    },
+    "descriptions": {
+      "en": "Species Trait: Windfury\n\nActive when you have at least (N) different pieces of this species on board. (Multiple effects stack).\n\n(2) Harpies: All allies gain the effect - Targeted spells +1 additional targets.\n(4) Harpies: All allies gain the effect - Targeted spells +1 additional targets.",
+      "ru": "Species Trait: Windfury\n\nАктивен, когда хотя бы (N) разных Harpy на доске. (Эффекты складываются).\n\n(2) Harpies: Все союзники получают эффект - целевые заклинания по +1 доп. цель.\n(4) Harpies: Все союзники получают эффект - целевые заклинания по +1 доп. цель.",
+      "zh-cn": "种族技能：风怒\n\n需要己方场上有至少（N）个不同的此种族的棋子来触发效果（触发的多层效果可以叠加）。\n\n（2）鹰身人：所有友方棋子获得效果：对敌人施放的指向性法术+1目标数量。\n（4）鹰身人：所有友方棋子获得效果：对敌人施放的指向性法术+1目标数量。",
+      "zh-tw": "種族技能：風怒\n\n需要己方場上有至少（N）個不同的此種族的棋子來觸發效果（觸發的多層效果可以疊加）。\n\n（2）鷹身人：所有友方棋子獲得效果：對敵人施放的指向性法術+1目標數量。\n（4）鷹身人：所有友方棋子獲得效果：對敵人施放的指向性法術+1目標數量。"
+    },
+    "lore_i18n": {
+      "en": "Harpies believe they survived from an ancient age. Their ancestors are transformed into bird-like bodies after betraying the Night Elves Queen.",
+      "ru": "Harpies верят, что они сохранились с незапамятных времен. Их предки превратились в птицеподобных после того, как предали королеву Ночных эльфов.",
+      "zh-cn": "鹰身人相信她们的血脉可以上溯到远古时代，由于她们背叛了玩弄巫术的暗夜精灵女王，而被罚变成了丑陋的鸟形生物。",
+      "zh-tw": "鷹身人相信她們的血脈可以上溯到遠古時代，由於她們背叛了玩弄巫術的暗夜精靈女王，而被罰變成了醜陋的鳥形生物。"
     }
   },
   "is_human": {
@@ -288,6 +558,24 @@
     "icon_dimensions": {
       "height": 128,
       "width": 128
+    },
+    "names": {
+      "en": "Human",
+      "ru": "Human",
+      "zh-cn": "人类",
+      "zh-tw": "人類"
+    },
+    "descriptions": {
+      "en": "Species Perk: Spark of Mind\n\nActive when you have at least (N) different human pieces on board. (Multiple effects stack) \n\n(3) Humans: Gain 2 experience points at the start of each round.\n(6) Humans: Gain (Courier Level - 2) points of experience points at the start of each round if you won your last home battle.",
+      "ru": "Species Perk: Spark of Mind\n\nActive when you have at least (N) different human pieces on board. (Multiple effects stack) \n\n(3) Humans: Получаете 2 опыта в начале каждого раунда.\n(6) Humans: Получаете (Уровень Курьера -2) очков опыта в начале каждого раунда, если вы выиграли последнюю домашнюю битву.",
+      "zh-cn": "种族技能：思想火花\n\n需要己方场上有至少（N）个不同的此种族的棋子来触发效果（触发的多层效果可以叠加）。\n\n（3）人类：准备回合开始时获得2点经验值。\n（6）人类：如果主场战斗获胜有至少1个友方人类存活，额外获得（信使等级-2）点经验值。",
+      "zh-tw": "種族技能：思想火花\n\n需要己方場上有至少（N）個不同的此種族的棋子來觸發效果（觸發的多層效果可以疊加）。\n\n（3）人類：準備回合開始時獲得2點經驗值。\n（6）人類：如果主場戰鬥獲勝有至少1個友方人類存活，額外獲得（信使等級-2）點經驗值。"
+    },
+    "lore_i18n": {
+      "en": "Humans are an intelligent species that values kindness and cooperation, and silences any who they deem unworthy.",
+      "ru": "Humans are an intelligent species that values kindness and cooperation, and silences any who they deem unworthy.",
+      "zh-cn": "人类是受到尤导血肉诅咒的野蛮维库人退化的后代。几千年以来，早期的人类主要是以分散的部落形式生活的，直到逐渐增长的外界压力迫使他们统一起来。",
+      "zh-tw": "人類是受到尤導血肉詛咒的野蠻維庫人退化的後代。幾千年以來，早期的人類主要是以分散的部落形式生活的，直到逐漸增長的外界壓力迫使他們統一起來。"
     }
   },
   "is_hunter": {
@@ -306,6 +594,24 @@
     "icon_dimensions": {
       "height": 128,
       "width": 128
+    },
+    "names": {
+      "en": "Hunter",
+      "ru": "Hunter",
+      "zh-cn": "猎人",
+      "zh-tw": "獵人"
+    },
+    "descriptions": {
+      "en": "Hunter pieces always focus on attacking the lowest health enemy within attack range.\n\nClass Perk: Aimed Shot\n\nActive when you have at least (N) different Hunter pieces on board. (Multiple effects stack)\n\n(3) Hunters: Every attack of all ally hunters has a 50% chance to perform a precise shot, penetrates evasion and -5 armor, lasts for 5 seconds.\n(6) Hunters: Every attack of all ally hunters has a 100% chance to perform a precise shot, penetrates evasion and -10 armor, lasts for 10 seconds.\n(9) Hunters: Every precise shot will knock back the victim for 1 grid on hit and perform an extra attack.",
+      "ru": "Охотники всегда фокусируются на атаке противника с наименьшим здоровьем в радиусе атаки.\n\nClass Perk: Aimed Shot\n\nActive when you have at least (N) different Hunter pieces on board. (Бонусы синергий складываются)\n\n(3) Hunters: Каждая атака всех союзных охотников имеет 50% шанс произвести точный выстрел, пробивающий уклонение и снижающий -5 брони, длится 5 секунд, может складываться.\n(6) Hunters: Каждая атака всех союзных охотников имеет 100% шанс произвести точный выстрел, пробивающий уклонение и снижающий -10 брони, длится 10 секунд, может складываться.\n(9) Hunters: Каждый точный выстрел оттолкнет жертву на 1 клетки при попадании и произведет дополнительную атаку.",
+      "zh-cn": "猎人棋子总是优先攻击攻击距离内的生命值较少的敌人。\n\n职业技能：精准射击\n\n需要己方场上有至少（N）个不同的此职业的棋子来触发效果（触发的多层效果可以叠加）。\n\n（3）猎人：所有友方猎人的攻击有50%概率发动一次精准射击，无视闪避并使目标护甲-5，持续5秒。\n（6）猎人：所有友方猎人的攻击有100%概率发动一次精准射击，无视闪避并使目标护甲-10，持续10秒。\n（9）猎人：精准射击会同时击退敌人1格，并且发动一次额外攻击。",
+      "zh-tw": "獵人棋子總是優先攻擊攻擊距離內的生命值較少的敵人。\n\n職業技能：精準射擊\n\n需要己方場上有至少（N）個不同的此職業的棋子來觸發效果（觸發的多層效果可以疊加）。\n\n（3）獵人：所有友方獵人的攻擊有50%概率發動一次精準射擊，無視閃避並使目標護甲-5，持續5秒。\n（6）獵人：所有友方獵人的攻擊有100%概率發動一次精準射擊，無視閃避並使目標護甲-10，持續10秒。\n（9）獵人：精準射擊會同時擊退敵人1格，並且發動一次額外攻擊。"
+    },
+    "lore_i18n": {
+      "en": "Since time immemorial, the call of the wild has driven some adventurers from the comfort of their home to venture into unforgiving primeval worlds. Those who persist become hunters.",
+      "ru": "Since time immemorial, the call of the wild has driven some adventurers from the comfort of their home to venture into unforgiving primeval worlds. Those who persist become hunters.",
+      "zh-cn": "自远古以来，荒野的召唤就会让一些冒险者离开舒适的家，到无情的原始世界冒险。那些坚持下来的人就成为了猎人。",
+      "zh-tw": "自遠古以來，荒野的召喚就會讓一些冒險者離開舒適的家，到無情的原始世界冒險。那些堅持下來的人就成為了獵人。"
     }
   },
   "is_knight": {
@@ -327,6 +633,24 @@
     "icon_dimensions": {
       "height": 124,
       "width": 126
+    },
+    "names": {
+      "en": "Knight",
+      "ru": "Knight",
+      "zh-cn": "骑士",
+      "zh-tw": "騎士"
+    },
+    "descriptions": {
+      "en": "Knight pieces who have nearby allies will gain a Divine Protection shield immediately.\n\nClass Perk: Divine Protection\n \nActive when you have at least (N) different Knight pieces on board. (Multiple effects stack)\n\n(2) Knights: All friendly knights have a 25% chance to procure a shield every 3 seconds in combat for 3 seconds.\n(4) Knights: All allies have a +25% chance to procure a shield every 3 seconds in combat.\n(6) Knights: All allies have a +25% chance to procure a shield every 3 seconds in combat. Procing a shield instantly heals for 400.",
+      "ru": "Рыцари, находящиеся рядом с союзниками, незамедлительно обретают щит Божественной Защиты.\n\nClass Perk: Divine Protection\n \nActive when you have at least (N) different Knight pieces on board. (Мульти-эффекты складываются)\n\n(2) Knights: Все рыцари имеют 25% шанс получить щит каждые 3 секунды в бою на 3 секунды.\n(4) Knights: Все союзники имеют +25% шанс получать щит каждые 3 секунды в бою.\n(6) Knights: Все союзники имеют шанс +25% Шанс получить щит каждые 3 секунды в бою. При получении щита моментально восстанавливает 400 здоровья.",
+      "zh-cn": "有相邻骑士友军的骑士棋子在开始战斗后会立即开启一层王者祝福减伤护盾。\n\n职业技能：王者祝福\n\n需要己方场上有至少（N）个不同的此职业的棋子来触发效果（触发的多层效果可以叠加）。\n\n（2）骑士：所有友方骑士每3秒有25%概率开启一层减伤护盾。\n（4）骑士：所有友军每3秒有25%概率开启一层减伤护盾。\n（6）骑士：所有友军每3秒有25%概率开启一层减伤护盾，开启任何一层减伤护盾的时候都会获得300点治疗。",
+      "zh-tw": "有相鄰騎士友軍的騎士棋子在開始戰鬥後會立即開啟一層王者祝福減傷護盾。\n\n職業技能：王者祝福\n\n需要己方場上有至少（N）個不同的此職業的棋子來觸發效果（觸發的多層效果可以疊加）。\n\n（2）騎士：所有友方騎士每3秒有25%概率開啟一層減傷護盾。\n（4）騎士：所有友軍每3秒有25%概率開啟一層減傷護盾。\n（6）騎士：所有友軍每3秒有25%概率開啟一層減傷護盾，開啟任何一層減傷護盾的時候都會獲得300點治療。"
+    },
+    "lore_i18n": {
+      "en": "Knights are respected defenders of the realm. As they engage in battle, the Omniscience may bless them with a divine shield.",
+      "ru": "Knights are respected defenders of the realm. As they engage in battle, the Omniscience may bless them with a divine shield.",
+      "zh-cn": "骑士的天职：匡扶弱小，伸张正义，消灭来自世界最黑暗角落的邪恶力量。这些神圣的战士们身着板甲，以对抗最强大的敌人。",
+      "zh-tw": "騎士的天職：匡扶弱小，伸張正義，消滅來自世界最黑暗角落的邪惡力量。這些神聖的戰士們身著板甲，以對抗最強大的敵人。"
     }
   },
   "is_kobold": {
@@ -349,6 +673,24 @@
     "icon_dimensions": {
       "height": 128,
       "width": 128
+    },
+    "names": {
+      "en": "Kobold",
+      "ru": "Kobold",
+      "zh-cn": "狗头人",
+      "zh-tw": "狗頭人"
+    },
+    "descriptions": {
+      "en": "SPECIES TRAIT: Divided we stand\n\nActive when you have at least (N) different Kobold pieces on board. (Multiple effects stack)\n\n(1) Kobold: Each two paired Kobold pieces on board will summon a replica when battle starts.\n(2) Kobolds: Each two paired ally pieces on board will summon a replica when battle starts.\n(3) Kobolds: Every unpaired Kobold piece will reshape itself into a non-Kobold ally of the same rank before battle starts.",
+      "ru": "SPECIES TRAIT: Divided we stand\n\nАктивна, когда минимум (N) разных Kobold на столе.(Эффекты складываются)\n\n(1) Kobold: Парные фигуры кобольда на столе вызовут копию, в начала раунда.\n(2) Kobold: Все парные фигуры на столе вызовут копию, в начала раунда.\n(3) Kobold: Каждый непарный Kobold превратиться союзного непарного не-Kobold того же уровня, в начале раунда.",
+      "zh-cn": "种族技能：分则能成\n\n需要己方场上有至少（N）个不同的此种族的棋子来触发效果（触发的多层效果可以叠加）。\n\n（1）狗头人：为每种两两相同的友方狗头人棋子召唤一个复制品。\n（2）狗头人：为每种两两相同的友方非狗头人棋子召唤一个复制品。\n（3）狗头人：友方狗头人棋子会将自己塑形为一个同星的非狗头人友方棋子，以凑成两两相同。",
+      "zh-tw": "種族技能：分則能成\n\n需要己方場上有至少（N）個不同的此種族的棋子來觸發效果（觸發的多層效果可以疊加）。\n\n（1）狗頭人：為每種兩兩相同的友方狗頭人棋子召喚一個復製品。\n（2）狗頭人：為每種兩兩相同的友方非狗頭人棋子召喚一個復製品。\n（3）狗頭人：友方狗頭人棋子會將自己塑形為一個同星的非狗頭人友方棋子，以湊成兩兩相同。"
+    },
+    "lore_i18n": {
+      "en": "Aggressive, xenophobic, yet industrious small humanoid creatures living in tunnels and caves deep below the surface. Known for not particularly intelligent, notoriously cowardly and individually weak, the dimunitive beings possess great potential in group combats. A candle on top of the head distinguishes the Kobolds.",
+      "ru": "Aggressive, xenophobic, yet industrious small humanoid creatures living in tunnels and caves deep below the surface. Known for not particularly intelligent, notoriously cowardly and individually weak, the dimunitive beings possess great potential in group combats. A candle on top of the head distinguishes the Kobolds.",
+      "zh-cn": "生活在地穴之中的一类生物，矮小龌龊。为了适应阴暗的环境，它们的头上经常顶着燃烧的蜡烛行走。",
+      "zh-tw": "生活在地穴之中的一類生物，矮小齷齪。為了適應陰暗的環境，它們的頭上經常頂著燃燒的蠟燭行走。"
     }
   },
   "is_mage": {
@@ -369,6 +711,24 @@
     "icon_dimensions": {
       "height": 128,
       "width": 128
+    },
+    "names": {
+      "en": "Mage",
+      "ru": "Mage",
+      "zh-cn": "法师",
+      "zh-tw": "法師"
+    },
+    "descriptions": {
+      "en": "For every standing friendly Mage on the chessboard, Mage pieces receive +10% bonus mana restoration, up to a maximum of 60%.\n\nClass Perk: Magical Vulnerability\n\nActive when you have at least (N) different mage pieces on board. (Multiple effects stack) \n\n(3) Mages: All enemies suffer -30% magic resistance.\n(6) Mages: All enemies suffer -35% magic resistance.\n(9) Mages: All enemies are cursed with frost incantation, which freezes them upon receiving magical damage. Lasts longer for more increased damage taken.",
+      "ru": "За каждого стоящего на доске дружественного Мага фигуры Магов получают бонус к восстановлению маны +10%, максимум до 60%.\n\nClass Perk: Magical Vulnerability\n\nАктивна, когда минимум (N) разных Магов на столе.(Эффекты складываются) \n\n(3) Mages: Магический резист врагов снижен на 30%.\n(6) Mages: Магический резист врагов снижен на 35%.\n(9) Mages: Все враги заражены чумой, которая замораживает их при получении маг. урона. Длительность зависит от кол-ва полученного урона.",
+      "zh-cn": "场上每有一个存活的友方法师棋子，法师棋子就获得+10%的法力获取，最多+60%。\n\n职业技能：法术易伤\n\n需要己方场上有至少（N）个不同的此职业的棋子来触发效果（触发的多层效果可以叠加）。\n\n（3）法师：使所有敌军的魔法抗性-30%。\n（6）法师：使所有敌军的魔法抗性-35%。\n（9）法师：使所有敌军获得效果：受到魔法伤害时冻结，魔法伤害越高，冻结时间越长。",
+      "zh-tw": "場上每有一個存活的友方法師棋子，法師棋子就獲得+10%的法力獲取，最多+60%。\n\n職業技能：法術易傷\n\n需要己方場上有至少（N）個不同的此職業的棋子來觸發效果（觸發的多層效果可以疊加）。\n\n（3）法師：使所有敵軍的魔法抗性-30%。\n（6）法師：使所有敵軍的魔法抗性-35%。\n（9）法師：使所有敵軍獲得效果：受到魔法傷害時凍結，魔法傷害越高，凍結時間越長。"
+    },
+    "lore_i18n": {
+      "en": "Mages are keen intellectuals who have spent years studying arcane knowledge. This allows them to make their victims more vulnerable to magic damage.",
+      "ru": "Mages are keen intellectuals who have spent years studying arcane knowledge. This allows them to make their victims more vulnerable to magic damage.",
+      "zh-cn": "只有最敏锐、聪慧、严于律己的学生才能够走上法师之路。法师所能够掌握的奥术魔法太过强大而危险，只有最专注的研习者才能够窥见其中的奥秘。",
+      "zh-tw": "只有最敏銳、聰慧、嚴於律己的學生才能夠走上法師之路。法師所能夠掌握的奧術魔法太過強大而危險，只有最專註的研習者才能夠窺見其中的奧秘。"
     }
   },
   "is_mech": {
@@ -389,6 +749,24 @@
     "icon_dimensions": {
       "height": 128,
       "width": 128
+    },
+    "names": {
+      "en": "Mech",
+      "ru": "Mech",
+      "zh-cn": "工匠",
+      "zh-tw": "工匠"
+    },
+    "descriptions": {
+      "en": "Inventors arm themselves with the latest technology that allows them to receive +50% healing from other sources.\n\nClass Perk: Heart of the Machine\n\nActive when you have at least (N) different Inventor pieces on board. (Multiple effects stack)\n\n(3) Inventors: Summon an AWESOME Invention after winning a home battle last round with at least 1 friendly Inventor who survived.\n(6) Inventors: Heart of the Machine now summons a Golden AWESOME Invention.",
+      "ru": "Inventors arm themselves with the latest technology that allows them to receive +50% healing from other sources.\n\nClass Perk: Heart of the Machine\n\nActive when you have at least (N) different Inventor pieces on board. (Multiple effects stack)\n\n(3) Меха: Вы получаете бесплатный ролл после победы в домашней битве, если хотя бы 1 мех выжил.\n(6) Мехов: Вы получаете золотой ролл после победы в домашней битве, если хотя бы 1 мех выжил.",
+      "zh-cn": "工匠棋子具有自我修复能力，受到的治疗或生命值回复效果+50%。\n\n职业技能：机械之心\n\n需要己方场上有至少（N）个不同的此职业的棋子来触发效果（触发的多层效果可以叠加）。\n\n（3）工匠：如果主场战斗获胜有至少1个友方工匠存活，在下回合的准备回合开始时进行一次伟大的发明。\n（6）工匠：将伟大发明升级为金色！",
+      "zh-tw": "工匠棋子具有自我修復能力，受到的治療或生命值回復效果+50%。\n\n職業技能：機械之心\n\n需要己方場上有至少（N）個不同的此職業的棋子來觸發效果（觸發的多層效果可以疊加）。\n\n（3）工匠：如果主場戰鬥獲勝有至少1個友方工匠存活，在下回合的準備回合開始時進行一次偉大的發明。\n（6）工匠：將偉大發明升級為金色！"
+    },
+    "lore_i18n": {
+      "en": "Inventors are usually the ones within a race who possess the most profound knowledge, and the are ambitious in discover new methods and creations. Though most of the time the inventions are problematic and not-so-reliable, they do invoke miracles sometimes.",
+      "ru": "Inventors are usually the ones within a race who possess the most profound knowledge, and the are ambitious in discover new methods and creations. Though most of the time the inventions are problematic and not-so-reliable, they do invoke miracles sometimes.",
+      "zh-cn": "钻研工程学的地精、侏儒、矮人工匠制造了无数的震撼人心的发明。",
+      "zh-tw": "鉆研工程學的地精、侏儒、矮人工匠製造了無數的震撼人心的發明。"
     }
   },
   "is_monk": {
@@ -408,6 +786,24 @@
     "icon_dimensions": {
       "height": 128,
       "width": 128
+    },
+    "names": {
+      "en": "Monk",
+      "ru": "Monk",
+      "zh-cn": "武僧",
+      "zh-tw": "武僧"
+    },
+    "descriptions": {
+      "en": "Class Perk: Drunken Stagger\n\nActive when you have at least (N) different Monk pieces on board. (Multiple effects stack)\n\n(2) Monks: All friendly melee Monks have a chance on dealing damage to instantly eliminate the target enemy with a low health.\n(4) Monks: All friendly Monks have a chance on dealing damage to reduce the current health of the target enemy by half.",
+      "ru": "Class Perk: Drunken Stagger\n\nАктивна, когда минимум (N) разных Monk на столе.(Эффекты складываются)\n\n(2) Monks: Все союзные Монки ближнего боя имеют шанс при нанесении урона мгновенно уничтожить врага с низким здоровьем.\n(4) Monks: Все союзные Монки имеют шанс при нанесении урона уменьшить текущее здоровье врага в два раза.",
+      "zh-cn": "职业技能：醉拳\n\n需要己方场上有至少（N）个不同的此职业的棋子来触发效果（触发的多层效果可以叠加）。\n\n（2）武僧：所有友方近战武僧棋子造成伤害有概率立即消灭生命值过低的敌方棋子。\n（4）武僧：所有友方武僧棋子造成伤害有概率使生命值较高的敌方棋子当前生命值减半。",
+      "zh-tw": "職業技能：醉拳\n\n需要己方場上有至少（N）個不同的此職業的棋子來觸發效果（觸發的多層效果可以疊加）。\n\n（2）武僧：所有友方近戰武僧棋子造成傷害有概率立即消滅生命值過低的敵方棋子。\n（4）武僧：所有友方武僧棋子造成傷害有概率使生命值較高的敵方棋子當前生命值減半。"
+    },
+    "lore_i18n": {
+      "en": "When the Pandaren were subjugated centuries ago, it was the monks that brought hope to a seemingly dim future. Restricted from using weapons by their slave masters, these Pandaren instead focused on harnessing their physical ability and learning weaponless combat. When the opportunity for revolution struck, they were well-trained to throw off the yoke of oppression.",
+      "ru": "When the Pandaren were subjugated centuries ago, it was the monks that brought hope to a seemingly dim future. Restricted from using weapons by their slave masters, these Pandaren instead focused on harnessing their physical ability and learning weaponless combat. When the opportunity for revolution struck, they were well-trained to throw off the yoke of oppression.",
+      "zh-cn": "在熊猫人被奴役的时代，统治者们剥夺了它们使用武器的权利。熊猫人们专注于练习运用真气，使用随手捡起的道具甚至徒手战斗。这项技能使得训练有素的熊猫人们有了足够的能力粉碎奴役的枷锁。",
+      "zh-tw": "在熊貓人被奴役的時代，統治者們剝奪了它們使用武器的權利。熊貓人們專註於練習運用真氣，使用隨手撿起的道具甚至徒手戰鬥。這項技能使得訓練有素的熊貓人們有了足夠的能力粉碎奴役的枷鎖。"
     }
   },
   "is_naga": {
@@ -429,6 +825,24 @@
     "icon_dimensions": {
       "height": 128,
       "width": 128
+    },
+    "names": {
+      "en": "Naga",
+      "ru": "Naga",
+      "zh-cn": "娜迦",
+      "zh-tw": "娜迦"
+    },
+    "descriptions": {
+      "en": "Species Trait: Scale Armor\n\nActive when you have at least (N) different Naga pieces on board. (Multiple effects stack)\n\n(2) Naga: Grants allies 15% magic resistance.\n(4) Naga: Grants allies 35% magic resistance.\n(6) Naga: When taking non-pure damage, reflect 1.5 times the magical resistance.",
+      "ru": "Species Trait: Scale Armor\n\nАктивна, когда минимум (N) разных Наг на столе.(Эффекты складываются)\n\n(2) Naga: Дает союзникам 15% маг.резиста.\n(4) Naga: Дает союзникам 35% маг.резиста.\n(6) Naga: При получении нечистого урона, отражает в 1.5 раза больше урона, уменьшенного маг.резистом.",
+      "zh-cn": "种族技能：鳞甲\n\n需要己方场上有至少（N）个不同的此种族的棋子来触发效果（触发的多层效果可以叠加）。\n\n（2）娜迦：所有友军的魔法抗性+15%。\n（4）娜迦：所有友军的魔法抗性+35%。\n（6）娜迦：所有友方娜迦棋子获得效果：每次受到非纯粹伤害时，会反弹（自身魔法抗性×1.5）点纯粹伤害。",
+      "zh-tw": "種族技能：鱗甲\n\n需要己方場上有至少（N）個不同的此種族的棋子來觸發效果（觸發的多層效果可以疊加）。\n\n（2）娜迦：所有友軍的魔法抗性+15%。\n（4）娜迦：所有友軍的魔法抗性+35%。\n（6）娜迦：所有友方娜迦棋子獲得效果：每次受到非純粹傷害時，會反彈（自身魔法抗性所減免的傷害量×1.5）點傷害。"
+    },
+    "lore_i18n": {
+      "en": "Nagas are cursed sea-dwellers that haunt the ocean floor. Their hardened, scaly skin acts as an effective defense against spells.",
+      "ru": "Nagas are cursed sea-dwellers that haunt the ocean floor. Their hardened, scaly skin acts as an effective defense against spells.",
+      "zh-cn": "娜迦族原本是暗夜精灵的贵族，这些权贵们被哼哼井的能量所迷惑而无节制地滥用魔法。上古之战哼哼井崩塌后，沉入海底的上层精灵因受到永远的诅咒而变型为妖怪一般的娜迦。",
+      "zh-tw": "娜迦族原本是暗夜精靈的貴族，這些權貴們被哼哼井的能量所迷惑而無節製地濫用魔法。上古之戰哼哼井崩塌後，沈入海底的上層精靈因受到永遠的詛咒而變型為妖怪一般的娜迦。"
     }
   },
   "is_nraqi": {
@@ -445,6 +859,24 @@
     "icon_dimensions": {
       "height": 128,
       "width": 128
+    },
+    "names": {
+      "en": "Faceless",
+      "ru": "Faceless",
+      "zh-cn": "无面者",
+      "zh-tw": "無面者"
+    },
+    "descriptions": {
+      "en": "Species Trait: Whisper of Darkness\n\nActive when you have at least (N) different Faceless pieces on board. (Multiple effects stack)\n\n(2) Facelesses: If you have no other active synergies except Whisper of Darkness, all friendly chess pieces are immune to all negative effects during combat.",
+      "ru": "Species Trait: Whisper of Darkness\n\nАктивен, когда хотя бы (N) разных Faceless на доске. (Эффекты складываются)\n\n(2) Facelesses: Если нет других активных синергиий, все союзные фигуры получают иммунитет ко всем негативным эффектам во время раунда.",
+      "zh-cn": "种族技能：黑暗低语\n\n需要己方场上有至少（N）个不同的此种族的棋子来触发效果（触发的多层效果可以叠加）。\n\n（2）无面者：除无面者以外，如果你没有触发任何种族/职业技能，全体友军获得效果：免疫所有战斗时产生的不良状态。",
+      "zh-tw": "種族技能：黑暗低語\n\n需要己方場上有至少（N）個不同的此種族的棋子來觸發效果（觸發的多層效果可以疊加）。\n\n（2）無面者：除無面者以外，如果你沒有觸發任何種族/職業技能，全體友軍獲得效果：免疫所有戰鬥時產生的不良狀態。"
+    },
+    "lore_i18n": {
+      "en": "The Faceless, otherwise known as the Faceless Ones or N'raqi, are a monstrous race that arose from the organic matter that seeped from the Old Gods' blighted forms during the primordial era of Drodo Island. Cunning and intelligent, they serve their eldritch masters with fanatical loyalty and possess the power from the Void.",
+      "ru": "The Faceless, otherwise known as the Faceless Ones or N'raqi, are a monstrous race that arose from the organic matter that seeped from the Old Gods' blighted forms during the primordial era of Drodo Island. Cunning and intelligent, they serve their eldritch masters with fanatical loyalty and possess the power from the Void.",
+      "zh-cn": "恩拉基俗称无面之物或无面者，是从上古之神的枯萎形态中渗出的有机物质催生出的种族。他们狡诈而聪明，作为上古之神的肉体形态，他们狂热地效忠于他们的虚空主人。",
+      "zh-tw": "恩拉基俗稱無面之物或無面者，是從上古之神的枯萎形態中滲出的有機物質催生出的種族。他們狡詐而聰明，作為上古之神的肉體形態，他們狂熱地效忠於他們的虛空主人。"
     }
   },
   "is_ogre": {
@@ -463,6 +895,24 @@
     "icon_dimensions": {
       "height": 128,
       "width": 128
+    },
+    "names": {
+      "en": "Ogre",
+      "ru": "Ogre",
+      "zh-cn": "食人魔",
+      "zh-tw": "食人魔"
+    },
+    "descriptions": {
+      "en": "SPECIES TRAIT: Iron Fist\n\nActive when you have at least (N) different pieces of this species on board. (Multiple effects stack)\n\n(2) Ogres: Each ogre can eat up allies nearby (A cross of 4 grids) whose level is lower than itself and gains their 60% HP and Damage. Deals extra damage to enemys courier equals to the sum of all its victims when winning an away-home battle.",
+      "ru": "SPECIES TRAIT: Iron Fist\n\nActive when you have at least (N) different pieces of this species on board. (Multiple effects stack)\n\n(2) Ogres: Каждый огр может съедать союзников, находящихся рядом (крест из 4 клеток), чьи уровни ниже его, и получает 60% их здоровья и урона. Наносит дополнительный урон курьеру врага, равный сумме всех его жертв, при победе на вражеском поле.",
+      "zh-cn": "种族技能：高丽亚铁腕\n\n需要己方场上有至少（N）个不同的此种族的棋子来触发效果（触发的多层效果可以叠加）。\n\n（2）食人魔：所有食人魔棋子获得效果：开始战斗前吞食上下左右四个格子的等级不高于自己的友方棋子，获得它们60%的生命值和攻击力。",
+      "zh-tw": "種族技能：高麗亞鐵腕\n\n需要己方場上有至少（N）個不同的此種族的棋子來觸發效果（觸發的多層效果可以疊加）。\n\n（2）食人魔：所有食人魔棋子獲得效果：開始戰鬥前吞食上下左右四個格子的等級不高於自己的友方棋子，獲得它們60%的生命值和攻擊力。"
+    },
+    "lore_i18n": {
+      "en": "Ogres have two heads, or was it three? More heads, more stamina!",
+      "ru": "Ogres have two heads, or was it three? More heads, more stamina!",
+      "zh-cn": "食人魔是一个曾经统治啦啦星球的拥有部分双头成员的强大种族，他们拥有自己的文化和城市，他们有不亚于兽人的种群和氏族。",
+      "zh-tw": "食人魔是一個曾經統治啦啦星球的擁有部分雙頭成員的強大種族，他們擁有自己的文化和城市，他們有不亞於獸人的種群和氏族。"
     }
   },
   "is_orc": {
@@ -481,6 +931,24 @@
     "icon_dimensions": {
       "height": 128,
       "width": 128
+    },
+    "names": {
+      "en": "Orc",
+      "ru": "Orc",
+      "zh-cn": "兽人",
+      "zh-tw": "獸人"
+    },
+    "descriptions": {
+      "en": "SPECIES TRAIT: Battle Hardened\n\nActive when you have at least (N) different pieces of this species on board. (Multiple effects stack)\n\n(2) Orcs: All allies have +100 Health.\n(4) Orcs: All allies have +300 Health.\n(6) Orcs: All allies have +10x(Courier health lost) Health.",
+      "ru": "SPECIES TRAIT: Battle Hardened\n\nАктивна, когда минимум (N) разных Orcs на столе.(Эффекты складываются)\n\n(2) Orcs: +100 HP союзным фигурам.\n(4) Orcs: +300 HP союзным фигурам. \n(6) Orcs: Все союзные фигуры получают +10x(потерянное здоровье курьера).",
+      "zh-cn": "种族技能：强壮身躯\n\n需要己方场上有至少（N）个不同的此种族的棋子来触发效果（触发的多层效果可以叠加）。\n\n（2）兽人：所有友军的最大生命值+100。\n（4）兽人：所有友军的最大生命值+300。\n（6）兽人：所有友军获得最大生命值+（你的信使当前已损失的生命值×10）。",
+      "zh-tw": "種族技能：強壯身軀\n\n需要己方場上有至少（N）個不同的此種族的棋子來觸發效果（觸發的多層效果可以疊加）。\n\n（2）獸人：所有友軍的最大生命值+100。\n（4）獸人：所有友軍的最大生命值+300。\n（6）獸人：所有友軍獲得最大生命值+（你的信使當前已損失的生命值×10）。"
+    },
+    "lore_i18n": {
+      "en": "The Orcs are a prolific and physically powerful race, excellent at tolerating pain and injury. Being exotic to Drodolands, their home was a once-lush world but now a shattered realm. They abandoned their peaceful culture when the demon lord cunningly corrupted the Orcs and used them in his vengeful plot against the his own people.",
+      "ru": "The Orcs are a prolific and physically powerful race, excellent at tolerating pain and injury. Being exotic to Drodolands, their home was a once-lush world but now a shattered realm. They abandoned their peaceful culture when the demon lord cunningly corrupted the Orcs and used them in his vengeful plot against the his own people.",
+      "zh-cn": "兽人不是多多岛的原住民。起初，他们以萨满部族的身份居住在苍翠繁茂的啦啦星球。当恶魔领主腐化兽人，利用他们对抗从鸡蛋的家园逃离的德国人以完成自己的复仇阴谋时，兽人抛弃了他们原本和平生活的文化。",
+      "zh-tw": "獸人不是多多島的原住民。起初，他們以薩滿部族的身份居住在蒼翠繁茂的啦啦星球。當惡魔領主腐化獸人，利用他們對抗從雞蛋的家園逃離的德國人以完成自己的復仇陰謀時，獸人拋棄了他們原本和平生活的文化。"
     }
   },
   "is_pandaman": {
@@ -500,6 +968,24 @@
     "icon_dimensions": {
       "height": 128,
       "width": 128
+    },
+    "names": {
+      "en": "Pandaren",
+      "ru": "Pandaren",
+      "zh-cn": "熊猫人",
+      "zh-tw": "熊貓人"
+    },
+    "descriptions": {
+      "en": "SPECIES TRAIT: Hospitality\n\nActive when you have at least (N) different pieces of this species on board. (Multiple effects stack)\n\n(1) Pandaren: Have a chance to invite a random un-emerged chess piece of the same species with a chess piece on the board from the chess piece pool to join the team at the beginning of the round.\n(2) Pandaren: Each Pandaren chess piece on board has a chance to invite a piece of the same name with it.",
+      "ru": "SPECIES TRAIT: Hospitality\n\nАктивен, когда хотя бы (N) разных Pandaren на доске. (Эффекты складываются)\n\n(1) Pandaren: В начале раунда есть шанс призвать случайную невыставленную фигуру той же расы из пула, что и одна из фигур на поле.\n(2) Pandaren: Каждая фигура Pandaren на поле имеет шанс призвать копию себя.",
+      "zh-cn": "种族技能：好客\n\n需要己方场上有至少（N）个不同的此种族的棋子来触发效果（触发的多层效果可以叠加）。\n\n（1）熊猫人：回合开始时有10%的概率邀请一个与场上友方棋子同种族的不在场棋子。\n（2）熊猫人：回合开始时场上每个友方熊猫人棋子都有15%的概率邀请一个同名熊猫人棋子。",
+      "zh-tw": "種族技能：好客\n\n需要己方場上有至少（N）個不同的此種族的棋子來觸發效果（觸發的多層效果可以疊加）。\n\n（1）熊貓人：回合開始時有10%的概率邀請一個與場上友方棋子同種族的不在場棋子。\n（2）熊貓人：回合開始時場上每個友方熊貓人棋子都有15%的概率邀請一個同名熊貓人棋子。"
+    },
+    "lore_i18n": {
+      "en": "Ten thousand years ago the last emperor of the Pandaren Empire surrounded his entire territory in the misty protection in order to save his people from the Great Havoc. Now the ancient species has once again revealed themselves and they are literally a mist to the others.",
+      "ru": "Ten thousand years ago the last emperor of the Pandaren Empire surrounded his entire territory in the misty protection in order to save his people from the Great Havoc. Now the ancient species has once again revealed themselves and they are literally a mist to the others.",
+      "zh-cn": "一万年之前世界将要分裂之际，熊猫人帝国的最后一位皇帝将整个潘潘大陆笼罩在云雾中从而逃过了劫难。所以直到现在它们重见天日的时候，对世界上的其他种族来说，熊猫人的一切都是谜。",
+      "zh-tw": "一萬年之前世界將要分裂之際，熊貓人帝國的最後一位皇帝將整個潘潘大陸籠罩在雲霧中從而逃過了劫難。所以直到現在它們重見天日的時候，對世界上的其他種族來說，熊貓人的一切都是謎。"
     }
   },
   "is_priest": {
@@ -519,6 +1005,24 @@
     "icon_dimensions": {
       "height": 128,
       "width": 128
+    },
+    "names": {
+      "en": "Priest",
+      "ru": "Priest",
+      "zh-cn": "牧师",
+      "zh-tw": "牧師"
+    },
+    "descriptions": {
+      "en": "Priest Pieces are determined, and cannot be mind controlled.\nClass Perk: Salvation\n\nActive when you have at least (N) different Priest pieces on board. (Multiple effects stack)\n\n(2) Priests: Get a Tango when defeated in a home battle with courier health lost if your pieces on board are less than your max pieces capacity.\n(4) Priest: Every Priest piece will Mind Control an enemy whose level equals to or less than itself if your pieces on board are less than your max pieces capacity. (Max control count = Your capacity - Your pieces on board)",
+      "ru": "Priest фигуры не могут быть под контролем разума.\nClass Perk: Salvation\n\nАктивна, когда минимум (N) разных Priest на столе.(Эффекты складываются)\n\n(2) Priests: Получите Тангo, если вас победили в домашнем бою, при этом здоровье курьера теряется, если на поле меньше фигур, чем ваша максимальная вместимость.\n(4) Priest: Каждая фигура Priest будет контролировать разум врага, уровень которого равен или ниже её собственного, если на поле меньше фигур, чем ваша максимальная вместимость. (Максимальное количество контролируемых = Ваша вместимость - Ваши фигуры на поле)",
+      "zh-cn": "牧师棋子信仰坚定，不会因为被精神控制而改变所属权。\n\n职业技能：救赎\n\n需要己方场上有至少（N）个不同的此职业的棋子来触发效果（触发的多层效果可以叠加）。\n\n（2）牧师：如果你场上棋子未满，每当主场战败信使受到伤害时会获得一个树之祭祀。\n（4）牧师：每个牧师棋子战斗开始后都会精神控制一个不高于自己等级的敌方棋子，最多控制（场上未满棋子数）个。",
+      "zh-tw": "牧師棋子信仰堅定，不會因為被精神控製而改變所屬權。\n\n職業技能：救贖\n\n需要己方場上有至少（N）個不同的此職業的棋子來觸發效果（觸發的多層效果可以疊加）。\n\n（2）牧師：如果你場上棋子未滿，每當主場戰敗信使受到傷害時會獲得一個樹之祭祀。\n（4）牧師：每個牧師棋子戰鬥開始後都會精神控製一個不高於自己等級的敵方棋子，最多控製（場上未滿棋子數）個。"
+    },
+    "lore_i18n": {
+      "en": "Priests are blessed invokers of light and darkness, who express their determined spirits through dedicated service to the people. For numerous battles, with the mastery of light and shadow energies they have weaved the most reliable life-saving protections for their allies.",
+      "ru": "Priests are blessed invokers of light and darkness, who express their determined spirits through dedicated service to the people. For numerous battles, with the mastery of light and shadow energies they have weaved the most reliable life-saving protections for their allies.",
+      "zh-cn": "牧师致力于升华他们的精神，通过造福大众来表达他们坚定不移的信念。 在过去的千百年中，每当多多岛遭受战火、盟友需要他们支援的时候，他们都会抛开舒适的生活，离开与世隔绝的神殿。",
+      "zh-tw": "牧師致力於升華他們的精神，通過造福大眾來表達他們堅定不移的信念。 在過去的千百年中，每當多多島遭受戰火、盟友需要他們支援的時候，他們都會拋開舒適的生活，離開與世隔絕的神殿。"
     }
   },
   "is_satyr": {
@@ -537,6 +1041,24 @@
     "icon_dimensions": {
       "height": 128,
       "width": 128
+    },
+    "names": {
+      "en": "Satyr",
+      "ru": "Satyr",
+      "zh-cn": "萨特",
+      "zh-tw": "薩特"
+    },
+    "descriptions": {
+      "en": "SPECIES TRAIT: Fear \n\nActive when you have at least (N) different pieces on board. (Multiple effects stack.)\n\n(2) Satyr: Allied Satyr chess pieces gain the effect: If there is more than 1 enemy nearby, they cause those enemies to lose control due to fear.",
+      "ru": "SPECIES TRAIT: Fear \n\nАктивна, когда минимум (N) разных Satyr на столе.(Эффекты складываются)\n\n(2) Satyr: Союзные Сатиры имеют эффект: если поблизости больше одного врага, они заставляют их потерять контроль от страха.",
+      "zh-cn": "种族技能：恐惧\n\n需要己方场上有至少（N）个不同的此种族的棋子来触发效果（触发的多层效果可以叠加）。\n\n（2）萨特：友方萨特棋子获得效果：如果身边有超过1个敌人，会使它们由于害怕而失去控制。",
+      "zh-tw": "種族技能：恐懼\n\n需要己方場上有至少（N）個不同的此種族的棋子來觸發效果（觸發的多層效果可以疊加）。\n\n（2）薩特：友方薩特棋子獲得效果：如果身邊有超過1個敵人，會使它們由於害怕而失去控製。"
+    },
+    "lore_i18n": {
+      "en": "Demonic species rose from twisted elves, experts at concealing themselves in nightmares, and fanatics in spreading blood and agony.",
+      "ru": "Demonic species rose from twisted elves, experts at concealing themselves in nightmares, and fanatics in spreading blood and agony.",
+      "zh-cn": "一种由精灵被扭曲而诞生的堕落恶魔。萨特擅长把自己隐藏在梦魇中，热衷于制造血腥与痛苦。",
+      "zh-tw": "一種由精靈被扭曲而誕生的墮落惡魔。薩特擅長把自己隱藏在夢魘中，熱衷於製造血腥與痛苦。"
     }
   },
   "is_shaman": {
@@ -558,6 +1080,24 @@
     "icon_dimensions": {
       "height": 128,
       "width": 128
+    },
+    "names": {
+      "en": "Shaman",
+      "ru": "Shaman",
+      "zh-cn": "萨满祭司",
+      "zh-tw": "薩滿祭司"
+    },
+    "descriptions": {
+      "en": "Shaman pieces spend 25% less mana when casting spells.\n\nClass Perk: Hex\n\nActive when you have at least (N) different Shaman pieces on board. (Multiple effects stack)\n\n(3)All friendly Shaman chess pieces gain the effect: Transform into a random chess piece of +2 levels after casting an active skill or using an active item.\n(6)Shaman: Equipped items carried by transformed chess pieces will also transform into random items of +2 levels.",
+      "ru": "Шаманы тратят на 25% меньше маны при применении заклинаний.\n\nClass Perk: Hex\n\nАктивна, когда минимум (N) разных Shamans на столе.(Эффекты складываются)\n\n(3)Все дружественные фигуры Шаманов получают эффект: превращаются в случайную фигуру на +2 уровня выше после использования активного навыка или предмета.\n(6)Shaman: Экипированные предметы у превращённых фигур также трансформируются в случайные предметы на +2 уровня выше.",
+      "zh-cn": "萨满祭司棋子技能的法力值消耗-25%。\n\n职业技能：妖术\n\n需要己方场上有至少（N）个不同的此职业的棋子来触发效果（触发的多层效果可以叠加）。\n\n（3）萨满：所有友方萨满祭司棋子获得效果：施放主动技能或主动物品后会变形为等级+2的随机棋子。\n（6）萨满：变形棋子携带的装备也会变形为等级+2的随机装备。",
+      "zh-tw": "薩滿祭司棋子技能的法力值消耗-25%。\n\n職業技能：妖術\n\n需要己方場上有至少（N）個不同的此職業的棋子來觸發效果（觸發的多層效果可以疊加）。\n\n（3）薩滿：所有友方薩滿祭司棋子獲得效果：施放主動技能或主動物品後會變形為等級+2的隨機棋子。\n（6）薩滿：變形棋子攜帶的裝備也會變形為等級+2的隨機裝備。"
+    },
+    "lore_i18n": {
+      "en": "Mortal mediators of the ancient elements. Following the guide of ancestral spirits, Shaman learn to wield unseemingly mysterious power over generations to protect their family and clans.",
+      "ru": "Mortal mediators of the ancient elements. Following the guide of ancestral spirits, Shaman learn to wield unseemingly mysterious power over generations to protect their family and clans.",
+      "zh-cn": "萨满祭司是灵魂的指引者，他们侍奉的不是神灵，而是每一种元素。",
+      "zh-tw": "薩滿祭司是靈魂的指引者，他們侍奉的不是神靈，而是每一種元素。"
     }
   },
   "is_tauren": {
@@ -575,6 +1115,24 @@
     "icon_dimensions": {
       "height": 128,
       "width": 128
+    },
+    "names": {
+      "en": "Tauren",
+      "ru": "Tauren",
+      "zh-cn": "牛头人",
+      "zh-tw": "牛頭人"
+    },
+    "descriptions": {
+      "en": "SPECIES TRAIT: Totem of the Clan\n\nActive when you have at least (N) different pieces of this species on board. (Multiple effects stack)\n\n(2) Taurens: Summons a Taunt Totem at the start of the battle.\n(4) Taurens: Summons a Woodpecker Totem and a Horn Totem at the start of the battle.",
+      "ru": "SPECIES TRAIT: Totem of the Clan\n\nActive when you have at least (N) different pieces of this species on board. (Multiple effects stack)\n\n(2) Taurens: Призывает Totem Taunt в начале битвы.\n(4) Taurens: Призывает Totem Woodpecker и Totem Horn в начале битвы.",
+      "zh-cn": "种族技能：高岭图腾\n\n需要己方场上有至少（N）个不同的此种族的棋子来触发效果（触发的多层效果可以叠加）。\n\n（2）牛头人：战斗开始时召唤一个稻草人图腾。\n（4）牛头人：战斗开始时召唤一个啄木鸟图腾和一个蛮牛角图腾。",
+      "zh-tw": "種族技能：高嶺圖騰\n\n需要己方場上有至少（N）個不同的此種族的棋子來觸發效果（觸發的多層效果可以疊加）。\n\n（2）牛頭人：戰鬥開始時召喚一個稻草人圖騰。\n（4）牛頭人：戰鬥開始時召喚一個啄木鳥圖騰和一個蠻牛角圖騰。"
+    },
+    "lore_i18n": {
+      "en": "Peace-loving Taurens live on mountain-high plateaus of the barren Drodoland. They strive to preserve the balance of nature at the behest of the Earth Mother.",
+      "ru": "Peace-loving Taurens live on mountain-high plateaus of the barren Drodoland. They strive to preserve the balance of nature at the behest of the Earth Mother.",
+      "zh-cn": "爱好和平的牛头人长期居住在多多大陆贫瘠地区的高山上，它们在大地母亲的护佑下，努力保护大自然的平衡。",
+      "zh-tw": "愛好和平的牛頭人長期居住在多多大陸貧瘠地區的高山上，它們在大地母親的護佑下，努力保護大自然的平衡。"
     }
   },
   "is_troll": {
@@ -593,6 +1151,24 @@
     "icon_dimensions": {
       "height": 128,
       "width": 128
+    },
+    "names": {
+      "en": "Troll",
+      "ru": "Troll",
+      "zh-cn": "巨魔",
+      "zh-tw": "巨魔"
+    },
+    "descriptions": {
+      "en": "SPECIES TRAIT: Voodoo Frenzy\n\nActive when you have at least (N) different pieces of this species on board. (Multiple effects stack)\n\n(2) Trolls: Increases the attack speed of all allies by 20.\n(4) Trolls: Increases the attack speed of all allies by 50.\n(6) Trolls: All allies gain +20 attack speed for each successful attack. Maximum 7 stacks.",
+      "ru": "SPECIES TRAIT: Voodoo Frenzy\n\nActive when you have at least (N) different pieces of this species on board. (Multiple effects stack)\n\n(2) Trolls: Увеличивает скорость атаки всех союзников на 20.\n(4) Trolls: Увеличивает скорость атаки всех союзников на 50.\n(6) Trolls: Все союзники получают +20 скорости атаки за каждый успешный удар. Максимум 7 стаков.",
+      "zh-cn": "种族技能：巫毒狂暴\n\n需要己方场上有至少（N）个不同的此种族的棋子来触发效果（触发的多层效果可以叠加）。\n\n（2）巨魔：所有友军的攻击速度+20%。\n（4）巨魔：所有友军的攻击速度+50%。\n（6）巨魔：所有友军获得效果：每次攻击命中都会使攻击速度增加20%，最多可叠加7次。",
+      "zh-tw": "種族技能：巫毒狂暴\n\n需要己方場上有至少（N）個不同的此種族的棋子來觸發效果（觸發的多層效果可以疊加）。\n\n（2）巨魔：所有友軍的攻擊速度+20%。\n（4）巨魔：所有友軍的攻擊速度+50%。\n（6）巨魔：所有友軍獲得效果：每次攻擊命中都會使攻擊速度增加20%，最多可疊加7次。"
+    },
+    "lore_i18n": {
+      "en": "Savage trolls are notorious for their cruelty, dark occult religion, and fierce hatred of other races.",
+      "ru": "Savage trolls are notorious for their cruelty, dark occult religion, and fierce hatred of other races.",
+      "zh-cn": "野蛮的巨魔因其残忍、黑暗的神秘宗教以及对其他种族的强烈仇恨而臭名昭着。",
+      "zh-tw": "野蠻的巨魔因其殘忍、黑暗的神秘宗教以及對其他種族的強烈仇恨而臭名昭著。"
     }
   },
   "is_undead": {
@@ -614,6 +1190,24 @@
     "icon_dimensions": {
       "height": 128,
       "width": 128
+    },
+    "names": {
+      "en": "Undead",
+      "ru": "Undead",
+      "zh-cn": "亡灵",
+      "zh-tw": "亡靈"
+    },
+    "descriptions": {
+      "en": "Species Trait: Plague\n\nActive when you have at least (N) different Undead pieces on board. (Multiple effects stack)\n\n(3) Undeads: All non-undead pieces of both sides in the battle gain the plague effect: maximum health -10%.\n(6) Undeads: All non-undead pieces of both sides in the battle gain the plague effect: maximum health -40%.\n(9) Undeads: All plague-infected pieces lose 5% max health per 2.5 secs (no less than 5%).",
+      "ru": "Свойство Расы: Чума\n\nАктивна, когда минимум (N) разных Undead на столе.(Эффекты складываются)\n\n(3) Undeads: Все фигуры не-нежити с обеих сторон в битве получают эффект чумы: максимальное здоровье -10%.\n(6) Undeads: Все фигуры не-нежити с обеих сторон в битве получают эффект чумы: максимальное здоровье -40%.\n(9) Undeads: Все зараженные чумой фигуры теряют 5% от максимального здоровья каждые 2.5 секунды (не менее 5%).",
+      "zh-cn": "种族技能：瘟疫\n\n需要己方场上有至少（N）个不同的此种族的棋子来触发效果（触发的多层效果可以叠加）。\n\n（3）亡灵：战斗双方所有非亡灵棋子获得瘟疫效果：生命值上限-10%。\n（6）亡灵：战斗双方所有非亡灵棋子获得瘟疫效果：生命值上限-35%。\n（9）亡灵：感染瘟疫的棋子每2秒生命值上限都会-5%。",
+      "zh-tw": "種族技能：瘟疫\n\n需要己方場上有至少（N）個不同的此種族的棋子來觸發效果（觸發的多層效果可以疊加）。\n\n（3）亡靈：戰鬥雙方所有非亡靈棋子獲得瘟疫效果：生命值上限-10%。\n（6）亡靈：戰鬥雙方所有非亡靈棋子獲得瘟疫效果：生命值上限-35%。\n（9）亡靈：感染瘟疫的棋子每2秒生命值上限都會-5%。"
+    },
+    "lore_i18n": {
+      "en": "Many humans had unfortunately lost their life to the Scourge King during his conquest of his homeland. The victims were raised as Undeads with cruelty, turned into minions of the fleshless legion, and were forced to destroy their own kingdom under the command of the Fallen Prince.",
+      "ru": "Many humans had unfortunately lost their life to the Scourge King during his conquest of his homeland. The victims were raised as Undeads with cruelty, turned into minions of the fleshless legion, and were forced to destroy their own kingdom under the command of the Fallen Prince.",
+      "zh-cn": "天灾亡灵是一股强大的邪恶力量，它们在生灵中传播邪恶、恐怖和不死状态。这支军队最初由燃烧军团所创建，并在第二次军团入侵失败后脱离了恶魔的掌控，但它们仍旧怀有与过去的主子同样邪恶的目的——让艾艾星球陷入混乱并走向毁灭。",
+      "zh-tw": "天災亡靈是一股強大的邪惡力量，它們在生靈中傳播邪惡、恐怖和不死狀態。這支軍隊最初由燃燒軍團所創建，並在第二次軍團入侵失敗後脫離了惡魔的掌控，但它們仍舊懷有與過去的主子同樣邪惡的目的——讓艾艾星球陷入混亂並走向毀滅。"
     }
   },
   "is_warlock": {
@@ -632,6 +1226,24 @@
     "icon_dimensions": {
       "height": 128,
       "width": 128
+    },
+    "names": {
+      "en": "Warlock",
+      "ru": "Warlock",
+      "zh-cn": "术士",
+      "zh-tw": "術士"
+    },
+    "descriptions": {
+      "en": "Warlock pieces convert 25% of their health into 50% mana when a battle starts.\n\nClass Perk: Soul Leech\n\nActive when you have at least (N) different Warlock pieces on board. (Multiple effects stack)\n\n(2) Warlocks: All allies have All allies have +5% lifesteal from all damage dealt.\n(4) Warlocks: All allies have All allies have +20% lifesteal from all damage dealt.\n(6) Warlocks: All ally warlocks steal a max health of 0.5x damage on every attack.",
+      "ru": "Варлоки обменивают 25% своего здоровья в 50% маны в начале боя.\n\nClass Perk: Soul Leech\n\nАктивен, когда хотя бы (N) разных Warlocks на доске. (Эффекты складываются)\n\n(2) Warlocks: Все союзники получают +5% вампиризма от всего нанесенного урона.\n(4) Warlocks: Все союзники получают +20% вампиризма от всего нанесенного урона.\n(6) Warlocks: Все союзные варлоки крадут максимальное здоровье, равное нанесенному урону, 0.5x при каждой атаке.",
+      "zh-cn": "术士棋子会在开始战斗时将自己的25%生命值转换为50%的法力值。\n\n职业技能：灵魂榨取\n\n需要己方场上有至少（N）个不同的此职业的棋子来触发效果（触发的多层效果可以叠加）。\n\n（2）术士：使所有友军获得效果：造成的所有伤害+5%吸血。\n（4）术士：使所有友军获得效果：造成的所有伤害+20%吸血。\n（6）术士：友方术士棋子造成的所有伤害会同时吸取目标（伤害量×0.5）点生命值上限。",
+      "zh-tw": "術士棋子會在開始戰鬥時將自己的25%生命值轉換為50%的法力值。\n\n職業技能：靈魂榨取\n\n需要己方場上有至少（N）個不同的此職業的棋子來觸發效果（觸發的多層效果可以疊加）。\n\n（2）術士：使所有友軍獲得效果：造成的所有傷害+5%吸血。\n（4）術士：使所有友軍獲得效果：造成的所有傷害+20%吸血。\n（6）術士：友方術士棋子造成的所有傷害會同時吸取目標（傷害量×0.5）點生命值上限。"
+    },
+    "lore_i18n": {
+      "en": "Warlocks are cursed sorcerers who use demonic power to drain the life force from their enemies, restoring themselves to continue their cursed battle.",
+      "ru": "Warlocks are cursed sorcerers who use demonic power to drain the life force from their enemies, restoring themselves to continue their cursed battle.",
+      "zh-cn": "面对恶魔的力量时，大多数英雄只看到了死亡。但术士看到的却只有机遇。他们的目标是支配这样的力量，并且在黑暗魔法中找到了手段。",
+      "zh-tw": "面對惡魔的力量時，大多數英雄只看到了死亡。但術士看到的卻只有機遇。他們的目標是支配這樣的力量，並且在黑暗魔法中找到了手段。"
     }
   },
   "is_warrior": {
@@ -650,6 +1262,22 @@
     "icon_dimensions": {
       "height": 128,
       "width": 128
+    },
+    "names": {
+      "en": "Warrior",
+      "ru": "Warrior",
+      "zh-cn": "战士",
+      "zh-tw": "戰士"
+    },
+    "descriptions": {
+      "en": "Warriors have a double bonus from Fortified Armor while below 50% health.\n\nClass Perk: Fortified Armor\n\nActive when you have at least (N) different Warrior pieces on board. (Multiple effects stack) \n\n(3) Warriors: All friendly warriors have +3 armour.\n(6) Warriors: All friendly warriors have +11 armour.\n(9) Warriors: Reflect pure damage equivalent to (1.5x current armour) when taking physical and magical damage.",
+      "ru": "Бонус Воинов удваивается, если здоровье ниже 50%.\n\nClass Perk: Fortified Armor\n\nАктивен, когда хотя бы (N) разных Воинов на доске. (Эффекты складываются) \n\n(3) Warrior: Все союзные войны получают +3 брони.\n(6) Warrior: Все союзные войны получают +11 брони.\n(9) Warrior: Отражаeт чистый урон, эквивалентный (в 1,5 раза больше текущей брони) при получении физического и магического урона.",
+      "zh-cn": "战士棋子在生命值低于50%的时候铜皮铁甲的效果翻倍。\n\n职业技能：铜皮铁甲\n\n需要己方场上有至少（N）个不同的此职业的棋子来触发效果（触发的多层效果可以叠加）。\n\n（3）战士：所有友方战士的护甲+3。\n（6）战士：所有友方战士的护甲+11。\n（9）战士：所有友军获得效果：受到物理或魔法伤害时会反弹（当前护甲×1.5）点纯粹伤害。",
+      "zh-tw": "戰士棋子在生命值低於50%的時候銅皮鐵甲的效果翻倍。\n\n職業技能：銅皮鐵甲\n\n需要己方場上有至少（N）個不同的此職業的棋子來觸發效果（觸發的多層效果可以疊加）。\n\n（3）戰士：所有友方戰士的護甲+3。\n（6）戰士：所有友方戰士的護甲+11。\n（9）戰士：所有友軍獲得效果：受到物理或魔法傷害時會反彈（當前護甲×1.5）點純粹傷害。"
+    },
+    "lore_i18n": {
+      "zh-cn": "战士将力量、领导才能和对武器盔甲的了解结合在一起，在光荣的战斗中一展身手。",
+      "zh-tw": "戰士將力量、領導才能和對武器盔甲的了解結合在一起，在光榮的戰鬥中一展身手。"
     }
   },
   "is_wizard": {
@@ -667,6 +1295,24 @@
     "icon_dimensions": {
       "height": 128,
       "width": 128
+    },
+    "names": {
+      "en": "Wizard",
+      "ru": "Wizard",
+      "zh-cn": "巫师",
+      "zh-tw": "巫師"
+    },
+    "descriptions": {
+      "en": "Wizard chess pieces are never considered priority targets by enemies.\n\nClass Perk: Something from Nothing\n\nActive when you have at least (N) different Wizard pieces on board. (Multiple effects stack)\n\n(2) Wizards: During the combat round, reduce the required number of chess pieces for the activation of race/class skills by 1, if there are (4) or more chess pieces needed.\n(4) Wizards: If you trigger the unique non-Wizard race/class skill during the combat round, unlock all of its layers.",
+      "ru": "Wizard chess pieces are never considered priority targets by enemies.\n\nClass Perk: Something from Nothing\n\nActive when you have at least (N) different Wizard pieces on board. (Multiple effects stack)\n\n(2) Wizards: Во время раунда боя уменьшает необходимое количество фигур для активации навыков расы/класса на 1, если требуется 4 или более фигур.\n(4) Wizards: Если во время раунда-боя активен только один уникальный навык расы/класса (не Волшебник), активируются все его уровни.",
+      "zh-cn": "巫师棋子始终不会被敌人视为优先攻击的目标。\n\n职业技能：无中生有\n\n需要己方场上有至少（N）个不同的此职业的棋子来触发效果（触发的多层效果可以叠加）。\n\n（2）巫师：在战斗回合使需要（4）个及以上棋子的种族/职业技能触发所需要的棋子数-1。\n（4）巫师：如果你只触发了唯一一个的非巫师的种族/职业技能，在战斗回合解锁它的所有层数。",
+      "zh-tw": "巫師棋子始終不會被敵人視為優先攻擊的目標。\n\n職業技能：無中生有\n\n需要己方場上有至少（N）個不同的此職業的棋子來觸發效果（觸發的多層效果可以疊加）。\n\n（2）巫師：在戰鬥回合使需要（4）個及以上棋子的種族/職業技能觸發所需要的棋子數-1。\n（4）巫師：如果你只觸發了唯一一個的非巫師的種族/職業技能，在戰鬥回合解鎖它的所有層數。"
+    },
+    "lore_i18n": {
+      "en": "Wizards play an ancient yet mysterious role. Even though they mostly comprehend oracles and do minor entertaining tricks, Wizards are regarded as evil by many others because of the uncertainty of their purpose of action. The unique power Wizards possess awakes the inner potential of others, leading to a more united alliance.",
+      "ru": "Wizards play an ancient yet mysterious role. Even though they mostly comprehend oracles and do minor entertaining tricks, Wizards are regarded as evil by many others because of the uncertainty of their purpose of action. The unique power Wizards possess awakes the inner potential of others, leading to a more united alliance.",
+      "zh-cn": "巫师是一个古老而又神秘的职业，虽然他们从事的是传示神谕，解读魔术牌，玩弄戏法等一些类似的活动，巫师们还是因为装神弄鬼经常被人们与邪恶画上等号。",
+      "zh-tw": "巫師是一個古老而又神秘的職業，雖然他們從事的是傳示神諭，解讀魔術牌，玩弄戲法等一些類似的活動，巫師們還是因為裝神弄鬼經常被人們與邪惡畫上等號。"
     }
   }
 }

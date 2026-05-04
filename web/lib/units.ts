@@ -1,10 +1,12 @@
 import { unitStem } from "@dac/shared/game-utils";
 import unitsFullData from "@data/units_full.json";
 import { slugifyName } from "@/lib/slugs";
+import { DEFAULT_LOCALE, type Locale, pickLocalized } from "@/lib/i18n";
 
 interface UnitInfo {
   cost: number;
   synergies?: string[];
+  names?: Record<string, string>;
   icon_url?: string | null;
   icon_dimensions?: { width: number; height: number } | null;
 }
@@ -24,13 +26,15 @@ export interface DisplayUnit {
   iconDimensions: { width: number; height: number } | null;
 }
 
-function buildUnits(): DisplayUnit[] {
+function buildUnitsForLocale(locale: Locale): DisplayUnit[] {
   return Object.entries(unitsFullData as Record<string, UnitInfo>)
-    .map(([name, data]) => {
-      const stem = unitStem(name);
+    .map(([canonicalName, data]) => {
+      const stem = unitStem(canonicalName);
+      // Slug uses the English canonical name for stable URLs across locales.
+      const localizedName = pickLocalized(data.names, locale) || canonicalName;
       return {
-        slug: slugifyName(name),
-        name,
+        slug: slugifyName(canonicalName),
+        name: localizedName,
         cost: data.cost ?? 0,
         synergies: data.synergies ?? [],
         iconStem: stem,
@@ -40,12 +44,20 @@ function buildUnits(): DisplayUnit[] {
     })
     .sort((a, b) => {
       if (a.cost !== b.cost) return a.cost - b.cost;
-      return a.name.localeCompare(b.name);
+      return a.name.localeCompare(b.name, locale);
     });
 }
 
-const ALL_UNITS = buildUnits();
-const UNITS_BY_SLUG = new Map(ALL_UNITS.map((unit) => [unit.slug, unit]));
+const UNIT_CACHE = new Map<Locale, DisplayUnit[]>();
+const UNIT_BY_SLUG_CACHE = new Map<Locale, Map<string, DisplayUnit>>();
+
+function ensureLoaded(locale: Locale) {
+  if (!UNIT_CACHE.has(locale)) {
+    const list = buildUnitsForLocale(locale);
+    UNIT_CACHE.set(locale, list);
+    UNIT_BY_SLUG_CACHE.set(locale, new Map(list.map((unit) => [unit.slug, unit])));
+  }
+}
 
 export const COST_LABEL: Record<number, string> = {
   1: "Cost 1",
@@ -63,19 +75,26 @@ export const COST_COLOR: Record<number, string> = {
   5: "#f2bc64",
 };
 
-export function getAllUnits(): DisplayUnit[] {
-  return ALL_UNITS;
+export function getAllUnits(locale: Locale = DEFAULT_LOCALE): DisplayUnit[] {
+  ensureLoaded(locale);
+  return UNIT_CACHE.get(locale)!;
 }
 
-export function getUnitsByCost(): DisplayUnit[][] {
+export function getUnitsByCost(
+  locale: Locale = DEFAULT_LOCALE,
+): DisplayUnit[][] {
   const tiers: DisplayUnit[][] = [[], [], [], [], []];
-  for (const unit of ALL_UNITS) {
+  for (const unit of getAllUnits(locale)) {
     if (unit.cost < 1 || unit.cost > 5) continue;
     tiers[unit.cost - 1].push(unit);
   }
   return tiers;
 }
 
-export function getUnitBySlug(slug: string): DisplayUnit | null {
-  return UNITS_BY_SLUG.get(slug) ?? null;
+export function getUnitBySlug(
+  slug: string,
+  locale: Locale = DEFAULT_LOCALE,
+): DisplayUnit | null {
+  ensureLoaded(locale);
+  return UNIT_BY_SLUG_CACHE.get(locale)!.get(slug) ?? null;
 }

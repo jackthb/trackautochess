@@ -275,6 +275,43 @@ def extract_all(pak):
 
     loc = all_loc.get('en', {})
 
+    # ── Localized-string helper ──
+    # Locales we surface in the JSON cache. Korean parses fine but isn't part
+    # of the SEO target right now, so we drop it from the output to keep file
+    # sizes down. Add more entries here to expand language support.
+    LOCALE_KEYS = ('en', 'ru', 'zh-cn', 'zh-tw')
+    _placeholder = re.compile(r'%([A-Za-z_][A-Za-z0-9_]*)%')
+
+    def loc_strings(prefix, suffixes=('',), process=None, placeholders=None):
+        """Return {locale: text} for a `DOTA_Tooltip_ability_*` style key.
+
+        `suffixes` is iterated in order; the first non-empty hit per locale
+        wins (handles `_Description` vs `_description` casing drift in the
+        VPK). `process` defaults to `strip_html`. `placeholders` is the
+        `_item_values` map for resolving `%token%` substitutions in item
+        descriptions; passed through unchanged when None.
+        """
+        proc = process if process is not None else strip_html
+        out = {}
+        for lang in LOCALE_KEYS:
+            lang_loc = all_loc.get(lang)
+            if lang_loc is None:
+                continue
+            raw = ''
+            for sfx in suffixes:
+                v = lang_loc.get(f'{prefix}{sfx}', '')
+                if v:
+                    raw = v
+                    break
+            if not raw:
+                continue
+            if placeholders is not None:
+                raw = _placeholder.sub(
+                    lambda m: str(placeholders.get(m.group(1), '?')), raw,
+                )
+            out[lang] = proc(raw)
+        return out
+
     # ── Parse game data files ──
     raw_abilities = pak['scripts/npc/npc_abilities_custom.txt'].read().decode('utf-8')
     raw_items = pak['scripts/npc/npc_items_custom.txt'].read().decode('utf-8')
@@ -338,11 +375,18 @@ def extract_all(pak):
                 tiers.append(count)
                 seen.add(count)
 
+        names_i18n = loc_strings(prefix)
+        descs_i18n = loc_strings(prefix, ('_Description', '_description'))
+        lore_i18n = loc_strings(prefix, ('_Lore',), process=unescape_kv)
+
         synergies[sid] = {
             'name': name,
+            'names': names_i18n,
             'description': strip_html(desc_html),
+            'descriptions': descs_i18n,
             'description_html': clean_html_keep(desc_html),
             'lore': unescape_kv(lore),
+            'lore_i18n': lore_i18n,
             'notes': notes,
             'tiers': tiers,
             'ability_special': special,
@@ -375,8 +419,6 @@ def extract_all(pak):
                             vals[fk] = fv
         return vals
 
-    _placeholder = re.compile(r'%([A-Za-z_][A-Za-z0-9_]*)%')
-
     items = {}
     for iid, idata in sorted(items_kv.items()):
         if not iid.startswith('item_') or not isinstance(idata, dict):
@@ -401,10 +443,19 @@ def extract_all(pak):
         quality = idata.get('ItemQuality', '')
         texture = idata.get('AbilityTextureName', '')
 
+        names_i18n = loc_strings(prefix)
+        descs_i18n = loc_strings(
+            prefix, ('_Description',), placeholders=values,
+        )
+        lore_i18n = loc_strings(prefix, ('_Lore',), process=unescape_kv)
+
         items[iid] = {
             'name': name,
+            'names': names_i18n,
             'description': desc,
+            'descriptions': descs_i18n,
             'lore': unescape_kv(lore),
+            'lore_i18n': lore_i18n,
             'quality': quality,
             'texture': texture,
             'notes': notes,
@@ -435,10 +486,17 @@ def extract_all(pak):
         desc = strip_html(loc.get(f'{prefix}_Description', loc.get(f'{prefix}_description', '')))
         lore = loc.get(f'{prefix}_Lore', '')
 
+        names_i18n = loc_strings(prefix)
+        descs_i18n = loc_strings(prefix, ('_Description', '_description'))
+        lore_i18n = loc_strings(prefix, ('_Lore',), process=unescape_kv)
+
         relics[iid] = {
             'name': name,
+            'names': names_i18n,
             'description': desc,
+            'descriptions': descs_i18n,
             'lore': unescape_kv(lore),
+            'lore_i18n': lore_i18n,
         }
 
     # ════════════════════════════════════════════════════════════════

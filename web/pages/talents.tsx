@@ -26,7 +26,7 @@ export default function TalentsPage({ supabase }: TalentsPageProps) {
 
   return (
     <>
-      <SeoHead title={title} description={description} path="/talents" />
+      <SeoHead title={title} description={description} path="/talents" localized={false} />
       <div className={browserStyles.page}>
         <div className={browserStyles.container}>
           <h1 className={browserStyles.pageTitle}>Talents</h1>

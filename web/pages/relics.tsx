@@ -1,46 +1,66 @@
-import type { SupabaseClient } from "@supabase/supabase-js";
+import type { GetStaticProps } from "next";
 import { BannerAd } from "@/components/BannerAd";
 import { EntityBrowser, type BrowsableEntity } from "@/components/EntityBrowser";
 import { SeoHead } from "@/lib/seo";
 import { getAllRelics } from "@/lib/relics";
 import { SITE_TITLE } from "@/lib/site";
+import { normalizeLocale, type Locale } from "@/lib/i18n";
 
 interface RelicsPageProps {
-  supabase: SupabaseClient | null;
+  locale: Locale;
+  data: BrowsableEntity[];
 }
 
-const ALL_RELICS: BrowsableEntity[] = getAllRelics().map((relic) => ({
-  slug: relic.slug,
-  name: relic.name,
-  description: relic.description,
-  lore: relic.lore,
-  iconSrc: relic.iconUrl,
-}));
+const T = {
+  en: {
+    title: `Relics | ${SITE_TITLE}`,
+    description:
+      "Browse every Dota Auto Chess relic, search recent additions, and open dedicated relic pages on Track Auto Chess.",
+    heading: "Relics",
+    structuredName: "Dota Auto Chess relics",
+    structuredAbout: "Dota Auto Chess relics",
+  },
+  ru: {
+    title: `Реликвии | ${SITE_TITLE}`,
+    description:
+      "Просматривайте все реликвии Dota Auto Chess и открывайте отдельные страницы на Track Auto Chess.",
+    heading: "Реликвии",
+    structuredName: "Реликвии Dota Auto Chess",
+    structuredAbout: "Реликвии Dota Auto Chess",
+  },
+  zh: {
+    title: `圣物 | ${SITE_TITLE}`,
+    description:
+      "浏览所有 Dota 自走棋圣物，并在 Track Auto Chess 查看每个圣物的详情。",
+    heading: "圣物",
+    structuredName: "Dota 自走棋圣物",
+    structuredAbout: "Dota 自走棋圣物",
+  },
+} as const;
 
-export default function RelicsPage({ supabase }: RelicsPageProps) {
-  const title = `Relics | ${SITE_TITLE}`;
-  const description =
-    "Browse every Dota Auto Chess relic, search recent additions, and open dedicated relic pages on Track Auto Chess.";
+export default function RelicsPage({ data, locale }: RelicsPageProps) {
+  const t = T[locale];
   const structuredData = {
     "@context": "https://schema.org",
     "@type": "CollectionPage",
-    name: "Dota Auto Chess relics",
-    description,
-    about: "Dota Auto Chess relics",
+    name: t.structuredName,
+    description: t.description,
+    about: t.structuredAbout,
   };
 
   return (
     <>
       <SeoHead
-        title={title}
-        description={description}
+        title={t.title}
+        description={t.description}
         path="/relics"
+        locale={locale}
         structuredData={structuredData}
       />
       <EntityBrowser
-        title="Relics"
+        title={t.heading}
         variant="relic"
-        data={ALL_RELICS}
+        data={data}
         sidebarLeft={<BannerAd slot="sidebar-left" />}
         sidebarRight={<BannerAd slot="sidebar" />}
         topAd={<BannerAd slot="in-content" />}
@@ -49,3 +69,17 @@ export default function RelicsPage({ supabase }: RelicsPageProps) {
     </>
   );
 }
+
+export const getStaticProps: GetStaticProps<RelicsPageProps> = async ({
+  locale: rawLocale,
+}) => {
+  const locale = normalizeLocale(rawLocale);
+  const data: BrowsableEntity[] = getAllRelics(locale).map((relic) => ({
+    slug: relic.slug,
+    name: relic.name,
+    description: relic.description,
+    lore: relic.lore,
+    iconSrc: relic.iconUrl,
+  }));
+  return { props: { locale, data } };
+};

@@ -60,6 +60,7 @@ export default function AboutPage() {
         title={title}
         description={description}
         path="/about"
+        localized={false}
         structuredData={{
           "@context": "https://schema.org",
           "@type": "AboutPage",

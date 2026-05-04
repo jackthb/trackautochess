@@ -1,11 +1,15 @@
 import { relicStem } from "@dac/shared/game-utils";
 import relicsData from "@data/relics.json";
 import { slugifyName } from "@/lib/slugs";
+import { DEFAULT_LOCALE, type Locale, pickLocalized } from "@/lib/i18n";
 
 interface RelicInfo {
   name: string;
   description: string;
   lore: string;
+  names?: Record<string, string>;
+  descriptions?: Record<string, string>;
+  lore_i18n?: Record<string, string>;
   icon_url?: string | null;
   icon_dimensions?: { width: number; height: number } | null;
 }
@@ -21,46 +25,66 @@ export interface DisplayRelic {
 }
 
 // Most entries carry a placeholder "From Relicbox" lore line that just
-// restates the source; strip it so the UI doesn't render empty noise.
-const RELIC_BOX_LORE = /^\s*from:?\s*relic\s*box\s*$/i;
+// restates the source; strip it so the UI doesn't render empty noise. The
+// localized fallback hits the same way ("来自：圣物宝箱" etc.).
+const RELIC_BOX_LORE = /^\s*from:?\s*relic\s*box\s*$|^\s*来自[:：]?\s*圣物宝箱\s*$/i;
 
 function cleanLore(value: string): string {
   if (!value) return "";
   return RELIC_BOX_LORE.test(value) ? "" : value;
 }
 
-function buildRelics(): DisplayRelic[] {
+function buildRelicsForLocale(locale: Locale): DisplayRelic[] {
   return Object.values(
     (relicsData as { relics: Record<string, RelicInfo> }).relics
   )
     .filter((relic) => relic.name && relic.name.trim())
     .map((relic) => {
       const stem = relicStem(relic.name);
+      const localizedName = pickLocalized(relic.names, locale) || relic.name;
+      const description =
+        pickLocalized(relic.descriptions, locale) || relic.description;
+      const lore = pickLocalized(relic.lore_i18n, locale) || relic.lore;
       return {
+        // Slug always uses the English canonical name.
         slug: slugifyName(relic.name),
-        name: relic.name,
-        description: relic.description,
-        lore: cleanLore(relic.lore),
+        name: localizedName,
+        description,
+        lore: cleanLore(lore),
         iconStem: stem,
         iconUrl: relic.icon_url || `/icons/relics/${stem}.png`,
         iconDimensions: relic.icon_dimensions ?? null,
       };
     })
-    .sort((a, b) => a.name.localeCompare(b.name));
+    .sort((a, b) => a.name.localeCompare(b.name, locale));
 }
 
-const ALL_RELICS = buildRelics();
-const RELICS_BY_SLUG = new Map(ALL_RELICS.map((relic) => [relic.slug, relic]));
+const RELICS_CACHE = new Map<Locale, DisplayRelic[]>();
+const RELICS_BY_SLUG_CACHE = new Map<Locale, Map<string, DisplayRelic>>();
 
-export function getAllRelics(): DisplayRelic[] {
-  return ALL_RELICS;
+function ensureLoaded(locale: Locale) {
+  if (!RELICS_CACHE.has(locale)) {
+    const list = buildRelicsForLocale(locale);
+    RELICS_CACHE.set(locale, list);
+    RELICS_BY_SLUG_CACHE.set(locale, new Map(list.map((r) => [r.slug, r])));
+  }
 }
 
-export function getRelicBySlug(slug: string): DisplayRelic | null {
-  return RELICS_BY_SLUG.get(slug) ?? null;
+export function getAllRelics(locale: Locale = DEFAULT_LOCALE): DisplayRelic[] {
+  ensureLoaded(locale);
+  return RELICS_CACHE.get(locale)!;
+}
+
+export function getRelicBySlug(
+  slug: string,
+  locale: Locale = DEFAULT_LOCALE,
+): DisplayRelic | null {
+  ensureLoaded(locale);
+  return RELICS_BY_SLUG_CACHE.get(locale)!.get(slug) ?? null;
 }
 
 export function getRelicSlugByName(name: string): string | null {
+  ensureLoaded(DEFAULT_LOCALE);
   const slug = slugifyName(name);
-  return RELICS_BY_SLUG.has(slug) ? slug : null;
+  return RELICS_BY_SLUG_CACHE.get(DEFAULT_LOCALE)!.has(slug) ? slug : null;
 }

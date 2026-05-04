@@ -1,11 +1,15 @@
 import { synIconName } from "@dac/shared/game-utils";
 import synergiesData from "@data/synergies.json";
 import { slugifyName } from "@/lib/slugs";
+import { DEFAULT_LOCALE, type Locale, pickLocalized } from "@/lib/i18n";
 
 interface SynergyInfo {
   name: string;
   description: string;
   lore: string;
+  names?: Record<string, string>;
+  descriptions?: Record<string, string>;
+  lore_i18n?: Record<string, string>;
   icon_url?: string | null;
   icon_dimensions?: { width: number; height: number } | null;
 }
@@ -28,23 +32,33 @@ function normalizeDescription(desc: string): string {
     .replace(/\bclass perk\b/gi, "CLASS PERK");
 }
 
-function buildSynergies(): DisplaySynergy[] {
+function buildSynergiesForLocale(locale: Locale): DisplaySynergy[] {
   return Object.values(synergiesData as Record<string, SynergyInfo>)
     .filter((syn) => syn.name && syn.name.trim())
     .map((syn) => {
       const stem = synIconName(syn.name);
+      // Slug always derives from the English canonical name so URLs are
+      // stable across locales.
+      const slug = slugifyName(syn.name);
+      const description = normalizeDescription(
+        pickLocalized(syn.descriptions, locale) || syn.description || "",
+      );
+      const localizedName = pickLocalized(syn.names, locale) || syn.name;
+      const lore = pickLocalized(syn.lore_i18n, locale) || syn.lore || "";
       return {
-        slug: slugifyName(syn.name),
-        name: syn.name,
-        description: normalizeDescription(syn.description ?? ""),
-        lore: syn.lore ?? "",
+        slug,
+        name: localizedName,
+        description,
+        lore,
         iconStem: stem,
         iconUrl: syn.icon_url || `/icons/synergies/${stem}.png`,
         iconDimensions: syn.icon_dimensions ?? null,
+        // Category infers from English description so it doesn't drift
+        // when a description happens to translate "class perk" loosely.
         category: inferCategory(syn.description ?? ""),
       };
     })
-    .sort((a, b) => a.name.localeCompare(b.name));
+    .sort((a, b) => a.name.localeCompare(b.name, locale));
 }
 
 function inferCategory(description: string): "species" | "class" | "other" {
@@ -54,21 +68,56 @@ function inferCategory(description: string): "species" | "class" | "other" {
   return "other";
 }
 
-const ALL_SYNERGIES = buildSynergies();
-const SYNERGIES_BY_SLUG = new Map(ALL_SYNERGIES.map((syn) => [syn.slug, syn]));
+const SYNERGY_CACHE = new Map<Locale, DisplaySynergy[]>();
+const SLUG_CACHE = new Map<Locale, Map<string, DisplaySynergy>>();
 
-export function getAllSynergies(): DisplaySynergy[] {
-  return ALL_SYNERGIES;
+function ensureLoaded(locale: Locale) {
+  if (!SYNERGY_CACHE.has(locale)) {
+    const list = buildSynergiesForLocale(locale);
+    SYNERGY_CACHE.set(locale, list);
+    SLUG_CACHE.set(locale, new Map(list.map((syn) => [syn.slug, syn])));
+  }
 }
 
-export function getSynergyBySlug(slug: string): DisplaySynergy | null {
-  return SYNERGIES_BY_SLUG.get(slug) ?? null;
+export function getAllSynergies(locale: Locale = DEFAULT_LOCALE): DisplaySynergy[] {
+  ensureLoaded(locale);
+  return SYNERGY_CACHE.get(locale)!;
 }
 
-export function getSpecies(): DisplaySynergy[] {
-  return ALL_SYNERGIES.filter((syn) => syn.category === "species");
+export function getSynergyBySlug(
+  slug: string,
+  locale: Locale = DEFAULT_LOCALE,
+): DisplaySynergy | null {
+  ensureLoaded(locale);
+  return SLUG_CACHE.get(locale)!.get(slug) ?? null;
 }
 
-export function getClasses(): DisplaySynergy[] {
-  return ALL_SYNERGIES.filter((syn) => syn.category === "class");
+export function getSpecies(locale: Locale = DEFAULT_LOCALE): DisplaySynergy[] {
+  return getAllSynergies(locale).filter((syn) => syn.category === "species");
+}
+
+export function getClasses(locale: Locale = DEFAULT_LOCALE): DisplaySynergy[] {
+  return getAllSynergies(locale).filter((syn) => syn.category === "class");
+}
+
+/**
+ * Returns a function that maps an English synergy name (the form units
+ * store in their `synergies` array) to the active locale's display name.
+ * Use at render time to show localized synergy names alongside units —
+ * the unit's stored synergies stay English-canonical so cross-language
+ * lookups remain stable.
+ */
+export function getSynergyNameTranslator(
+  locale: Locale,
+): (englishName: string) => string {
+  if (locale === DEFAULT_LOCALE) return (n) => n;
+  const localizedBySlug = new Map(
+    getAllSynergies(locale).map((s) => [s.slug, s]),
+  );
+  const map = new Map<string, string>();
+  for (const e of getAllSynergies(DEFAULT_LOCALE)) {
+    const l = localizedBySlug.get(e.slug);
+    if (l) map.set(e.name, l.name);
+  }
+  return (en) => map.get(en) ?? en;
 }
