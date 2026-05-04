@@ -1,7 +1,7 @@
 /**
- * Locale wiring for the public site. Three locales are exposed: English
- * (default, no URL prefix), Russian (`/ru/...`), and Simplified Chinese
- * (`/zh/...`). Patch notes and other long-form static content stay English.
+ * Locale wiring for the public site. Two locales are exposed: English
+ * (default, no URL prefix) and Russian (`/ru/...`). Patch notes and other
+ * long-form static content stay English-only and opt out via `localized`.
  *
  * The data layer (units / items / synergies / relics) carries an English
  * canonical record plus optional `names` / `descriptions` / `lore_i18n`
@@ -10,43 +10,38 @@
  * given default if no locale has the string.
  *
  * Slugs intentionally stay English across locales so `/ru/units/abaddon`
- * routes to the same record as `/units/abaddon` — better link sharing,
- * simpler hreflang alternates, and avoids URL-encoded CJK paths.
+ * routes to the same record as `/units/abaddon` — better link sharing
+ * and simpler hreflang alternates.
  */
-export const LOCALES = ["en", "ru", "zh"] as const;
+export const LOCALES = ["en", "ru"] as const;
 export type Locale = (typeof LOCALES)[number];
 
 export const DEFAULT_LOCALE: Locale = "en";
 
-// Maps the runtime URL locale to the JSON `*_i18n` map key. The data layer
-// stores Simplified Chinese under `zh-cn` (matching the VPK's
-// `addon_schinese.txt`); we surface it under the shorter `zh` URL prefix.
+// Maps the runtime URL locale to the JSON `*_i18n` map key. Identity for
+// now; left as an indirection so the URL form and JSON form can diverge
+// (e.g. `zh` URL → `zh-cn` JSON key) without rewriting callers.
 const DATA_LOCALE_KEY: Record<Locale, string> = {
   en: "en",
   ru: "ru",
-  zh: "zh-cn",
 };
 
-// hreflang code emitted to crawlers. Russian and English use the ISO 639-1
-// short codes; Chinese is `zh-Hans` since the source data is Simplified.
+// hreflang code emitted to crawlers. ISO 639-1 short codes.
 export const HREFLANG: Record<Locale, string> = {
   en: "en",
   ru: "ru",
-  zh: "zh-Hans",
 };
 
-// `<html lang>` value. Same considerations as HREFLANG.
+// `<html lang>` value.
 export const HTML_LANG: Record<Locale, string> = {
   en: "en",
   ru: "ru",
-  zh: "zh-Hans",
 };
 
 // Display label for the language switcher, in the language itself.
 export const LOCALE_LABEL: Record<Locale, string> = {
   en: "English",
   ru: "Русский",
-  zh: "中文",
 };
 
 export function isLocale(value: unknown): value is Locale {

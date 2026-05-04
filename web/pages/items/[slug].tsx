@@ -39,20 +39,11 @@ const T = {
     moreOf: (t: string) => `Ещё предметы ${t}`,
     fallbackTier: (n: string, t: string) => `${n} — предмет ${t} в Dota Auto Chess.`,
   },
-  zh: {
-    title: (n: string) => `${n} 装备指南 | ${SITE_TITLE}`,
-    descriptionPrefix: (n: string) => `了解 ${n} 在 Dota 自走棋中的效果。`,
-    fallbackOverview: " 当前数据中没有更完整的游戏内描述。",
-    overviewPrefix: (n: string, t: string) => `${n} 是 Dota 自走棋中的${t}装备。`,
-    moreOf: (t: string) => `更多${t}装备`,
-    fallbackTier: (n: string, t: string) => `${n} 是 Dota 自走棋中的${t}装备。`,
-  },
 } as const;
 
 const TIER_LABEL_LOCALIZED: Record<Locale, Record<number, string>> = {
   en: TIER_LABEL,
   ru: { 1: "Уровень 1", 2: "Уровень 2", 3: "Уровень 3", 4: "Уровень 4", 5: "Уровень 5" },
-  zh: { 1: "1 级", 2: "2 级", 3: "3 级", 4: "4 级", 5: "5 级" },
 };
 
 function cleanText(value: string): string {

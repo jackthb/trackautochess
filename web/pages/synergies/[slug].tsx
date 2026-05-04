@@ -44,15 +44,6 @@ const T = {
     nUnits: (n: string) => `Фигуры ${n}`,
     moreSynergies: "Ещё синергии",
   },
-  zh: {
-    title: (n: string) => `${n} 羁绊指南 | ${SITE_TITLE}`,
-    description: (n: string) => `了解 ${n} 在 Dota 自走棋中的效果。`,
-    species: "种族",
-    classes: "职业",
-    cost: (c: number) => `${c} 费`,
-    nUnits: (n: string) => `${n} 棋子`,
-    moreSynergies: "更多羁绊",
-  },
 } as const;
 
 export default function SynergyDetailPage({

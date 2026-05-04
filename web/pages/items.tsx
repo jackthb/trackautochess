@@ -35,15 +35,6 @@ const T = {
     structuredAbout: "Предметы Dota Auto Chess",
     tierLabel: { 1: "Уровень 1", 2: "Уровень 2", 3: "Уровень 3", 4: "Уровень 4", 5: "Уровень 5" },
   },
-  zh: {
-    title: `装备 | ${SITE_TITLE}`,
-    description:
-      "按等级浏览所有 Dota 自走棋装备，搜索特定装备，在 Track Auto Chess 查看每件装备的详情。",
-    heading: "装备",
-    structuredName: "Dota 自走棋装备",
-    structuredAbout: "Dota 自走棋装备",
-    tierLabel: { 1: "1 级", 2: "2 级", 3: "3 级", 4: "4 级", 5: "5 级" },
-  },
 } as const;
 
 export default function ItemsPage({ data, locale }: ItemsPageProps) {

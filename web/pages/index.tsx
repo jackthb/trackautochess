@@ -1,5 +1,6 @@
 import { createClient } from "@supabase/supabase-js";
 import type { GetServerSideProps } from "next";
+import { useRouter } from "next/router";
 import { ProfileSearch } from "@/components/ProfileSearch";
 import {
   getDefaultPlayerSearchResults,
@@ -7,15 +8,51 @@ import {
 } from "@/lib/playerSearch";
 import { SeoHead } from "@/lib/seo";
 import { absoluteUrl, SITE_DESCRIPTION, SITE_NAME, SITE_TITLE } from "@/lib/site";
+import { normalizeLocale } from "@/lib/i18n";
 
 interface HomeProps {
   initialSearchResults: SearchResult[];
 }
 
+const T = {
+  en: {
+    description:
+      "Look up Dota Auto Chess player MMR, season history, and tracked match stats by Steam vanity URL or Steam ID.",
+    tagline:
+      "Search any Steam profile to surface Auto Chess MMR, rank, season history, and tracked match stats.",
+    pasteLabel: "Paste a Steam profile URL or SteamID64",
+    exampleLabel: "Example:",
+    placeholder: "Steam profile URL or SteamID64",
+    snapshot: "Player Snapshot",
+    currentSeason: "Current season",
+    liveLabel: "Live MMR and rank bracket",
+    liveValue: "Queen 3380+",
+    historyLabel: "Season history",
+    historyValue: "MMR peaks and games",
+  },
+  ru: {
+    description:
+      "Узнавайте MMR игроков Dota Auto Chess, историю сезонов и статистику матчей по ссылке Steam или SteamID.",
+    tagline:
+      "Найдите любой Steam-профиль, чтобы увидеть MMR Auto Chess, ранг, историю сезонов и статистику матчей.",
+    pasteLabel: "Вставьте URL Steam-профиля или SteamID64",
+    exampleLabel: "Пример:",
+    placeholder: "URL Steam-профиля или SteamID64",
+    snapshot: "Карточка игрока",
+    currentSeason: "Текущий сезон",
+    liveLabel: "Текущий MMR и ранг",
+    liveValue: "Queen 3380+",
+    historyLabel: "История сезонов",
+    historyValue: "Пики MMR и сыгранные игры",
+  },
+} as const;
+
 export default function Home({ initialSearchResults }: HomeProps) {
+  const router = useRouter();
+  const locale = normalizeLocale(router.locale ?? router.defaultLocale ?? undefined);
+  const t = T[locale];
   const title = SITE_TITLE;
-  const description =
-    "Look up Dota Auto Chess player MMR, season history, and tracked match stats by Steam vanity URL or Steam ID.";
+  const description = t.description;
   const siteUrl = absoluteUrl("/");
   const exampleSteamUrl =
     "https://steamcommunity.com/profiles/76561198022169086";
@@ -43,7 +80,7 @@ export default function Home({ initialSearchResults }: HomeProps) {
         title={title}
         description={description}
         path="/"
-        localized={false}
+        locale={locale}
         structuredData={structuredData}
       />
 
@@ -291,38 +328,33 @@ export default function Home({ initialSearchResults }: HomeProps) {
 
             <div className="rule" />
 
-            <p className="tagline">
-              Search any Steam profile to surface Auto Chess MMR, rank, season
-              history, and tracked match stats.
-            </p>
+            <p className="tagline">{t.tagline}</p>
 
             <div className="search-wrap">
               <div className="search-guidance">
-                <div className="search-guidance-label">
-                  Paste a Steam profile URL or SteamID64
-                </div>
+                <div className="search-guidance-label">{t.pasteLabel}</div>
                 <div className="search-example">
-                  Example: <span>{exampleSteamUrl}</span>
+                  {t.exampleLabel} <span>{exampleSteamUrl}</span>
                 </div>
               </div>
               <ProfileSearch
                 initialResults={initialSearchResults}
-                placeholder="Steam profile URL or SteamID64"
+                placeholder={t.placeholder}
               />
             </div>
 
             <div className="preview" aria-hidden="true">
               <div className="preview-head">
-                <div className="preview-title">Player Snapshot</div>
-                <div className="preview-season">Current season</div>
+                <div className="preview-title">{t.snapshot}</div>
+                <div className="preview-season">{t.currentSeason}</div>
               </div>
               <div className="preview-row">
-                <span className="preview-label">Live MMR and rank bracket</span>
-                <span className="preview-value">Queen 3380+</span>
+                <span className="preview-label">{t.liveLabel}</span>
+                <span className="preview-value">{t.liveValue}</span>
               </div>
               <div className="preview-row">
-                <span className="preview-label">Season history</span>
-                <span className="preview-value">MMR peaks and games</span>
+                <span className="preview-label">{t.historyLabel}</span>
+                <span className="preview-value">{t.historyValue}</span>
               </div>
             </div>
           </main>

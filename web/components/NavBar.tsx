@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import type { SupabaseClient, User } from "@supabase/supabase-js";
 import { SITE_NAME } from "@/lib/site";
 import { isAdminSteamId } from "@/lib/admin";
+import { normalizeLocale } from "@/lib/i18n";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import styles from "./NavBar.module.css";
 
@@ -11,8 +12,45 @@ interface NavBarProps {
   supabase?: SupabaseClient | null;
 }
 
+const T = {
+  en: {
+    items: "Items",
+    units: "Units",
+    classes: "Classes",
+    species: "Species",
+    relics: "Relics",
+    talents: "Talents",
+    ranks: "Ranks",
+    leaderboard: "Leaderboard",
+    patchNotes: "Patch Notes",
+    signOut: "Sign out",
+    signIn: "Sign in with Steam",
+    placeholderName: "Steam Player Name",
+    home: (n: string) => `${n} home`,
+    fallbackPlayer: "Player",
+  },
+  ru: {
+    items: "Предметы",
+    units: "Фигуры",
+    classes: "Классы",
+    species: "Расы",
+    relics: "Реликвии",
+    talents: "Таланты",
+    ranks: "Ранги",
+    leaderboard: "Таблица лидеров",
+    patchNotes: "Патчноуты",
+    signOut: "Выйти",
+    signIn: "Войти через Steam",
+    placeholderName: "Имя игрока Steam",
+    home: (n: string) => `Главная ${n}`,
+    fallbackPlayer: "Игрок",
+  },
+} as const;
+
 export function NavBar({ supabase }: NavBarProps) {
   const router = useRouter();
+  const locale = normalizeLocale(router.locale ?? router.defaultLocale ?? undefined);
+  const t = T[locale];
   const [user, setUser] = useState<User | null>(null);
   const [ready, setReady] = useState(false);
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
@@ -76,7 +114,7 @@ export function NavBar({ supabase }: NavBarProps) {
   const displayName =
     user?.user_metadata?.steam_name ||
     user?.user_metadata?.full_name ||
-    "Player";
+    t.fallbackPlayer;
 
   const sessionSteamId =
     typeof user?.user_metadata?.steam_id === "string"
@@ -88,38 +126,38 @@ export function NavBar({ supabase }: NavBarProps) {
     <>
       <nav className={styles.nav}>
         <div className={styles.navLeft}>
-          <Link href="/" className={styles.navLogo} aria-label={`${SITE_NAME} home`}>
+          <Link href="/" className={styles.navLogo} aria-label={t.home(SITE_NAME)}>
             <img src="/logo.svg" alt={SITE_NAME} />
           </Link>
           <div className={styles.navLinks}>
             <Link href="/items" className={styles.navLink}>
-              Items
+              {t.items}
             </Link>
             <Link href="/units" className={styles.navLink}>
-              Units
+              {t.units}
             </Link>
             <Link href="/classes" className={styles.navLink}>
-              Classes
+              {t.classes}
             </Link>
             <Link href="/species" className={styles.navLink}>
-              Species
+              {t.species}
             </Link>
             <Link href="/relics" className={styles.navLink}>
-              Relics
+              {t.relics}
             </Link>
             <Link href="/talents" className={styles.navLink}>
-              Talents
+              {t.talents}
             </Link>
             <Link href="/ranks" className={styles.navLink}>
-              Ranks
+              {t.ranks}
             </Link>
             {isAdmin && (
               <Link href="/leaderboard" className={styles.navLink}>
-                Leaderboard
+                {t.leaderboard}
               </Link>
             )}
-            <Link href="/patch-notes" className={styles.navLink}>
-              Patch Notes
+            <Link href="/patch-notes" className={styles.navLink} locale={false}>
+              {t.patchNotes}
             </Link>
           </div>
         </div>
@@ -150,18 +188,18 @@ export function NavBar({ supabase }: NavBarProps) {
                   <span className={styles.navUser}>{displayName}</span>
                 </Link>
                 <button className={styles.navBtn} onClick={handleLogout}>
-                  Sign out
+                  {t.signOut}
                 </button>
               </>
             ) : (
               <a href="/api/auth/steam" className={styles.navSignin}>
-                Sign in with Steam
+                {t.signIn}
               </a>
             )
           ) : supabase ? (
             <div className={styles.navAuthPlaceholder} aria-hidden="true">
-              <span className={styles.navUser}>Steam Player Name</span>
-              <span className={styles.navBtn}>Sign out</span>
+              <span className={styles.navUser}>{t.placeholderName}</span>
+              <span className={styles.navBtn}>{t.signOut}</span>
             </div>
           ) : null}
         </div>

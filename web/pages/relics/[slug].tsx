@@ -39,15 +39,6 @@ const T = {
     fallback: (n: string) => `${n} — реликвия в Dota Auto Chess.`,
     overviewFallback: (n: string) => `${n} — реликвия в Dota Auto Chess.`,
   },
-  zh: {
-    title: (n: string) => `${n} 圣物指南 | ${SITE_TITLE}`,
-    descriptionPrefix: (n: string) => `了解 ${n} 在 Dota 自走棋中的效果。`,
-    relicsLabel: "圣物",
-    relicGuide: (n: string) => `${n} 圣物指南`,
-    moreRelics: "更多圣物",
-    fallback: (n: string) => `${n} 是 Dota 自走棋中的圣物。`,
-    overviewFallback: (n: string) => `${n} 是 Dota 自走棋中的圣物。`,
-  },
 } as const;
 
 function cleanText(value: string): string {

@@ -28,14 +28,6 @@ const T = {
     structuredName: "Реликвии Dota Auto Chess",
     structuredAbout: "Реликвии Dota Auto Chess",
   },
-  zh: {
-    title: `圣物 | ${SITE_TITLE}`,
-    description:
-      "浏览所有 Dota 自走棋圣物，并在 Track Auto Chess 查看每个圣物的详情。",
-    heading: "圣物",
-    structuredName: "Dota 自走棋圣物",
-    structuredAbout: "Dota 自走棋圣物",
-  },
 } as const;
 
 export default function RelicsPage({ data, locale }: RelicsPageProps) {

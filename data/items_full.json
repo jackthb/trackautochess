@@ -16,21 +16,15 @@
     },
     "names": {
       "en": "Aghanims Shard",
-      "ru": "Aghanims Shard",
-      "zh-cn": "阿哈利姆魔晶",
-      "zh-tw": "阿哈利姆魔晶"
+      "ru": "Aghanims Shard"
     },
     "descriptions": {
       "en": "Magic Regen +75%.\nThe carrier permanently gains a random enemy chess pieces active skill as an additional skill.",
-      "ru": "Мана реген +75%.\nНоситель навсегда получает активный навык случайной враждебной шахматной фигуры как дополнительный навык.",
-      "zh-cn": "法力获取+75%。\n携带者会永久获得一个随机的敌方棋子的主动技能作为自己的额外技能。",
-      "zh-tw": "法力獲取+75%。\n攜帶者會永久獲得一個隨機的敵方棋子的主動技能作為自己的額外技能。"
+      "ru": "Мана реген +75%.\nНоситель навсегда получает активный навык случайной враждебной шахматной фигуры как дополнительный навык."
     },
     "lore_i18n": {
       "en": "With origins known only to a single wizard, fragments of this impossible crystal are nearly as coveted as the renowned scepter itself.",
-      "ru": "With origins known only to a single wizard, fragments of this impossible crystal are nearly as coveted as the renowned scepter itself.",
-      "zh-cn": "这块不可思议的水晶只有一名巫师知道它的起源，而水晶的碎片几乎与赫赫有名的神杖一样让人梦寐以求。",
-      "zh-tw": "這塊不可思議的水晶只有一名巫師知道它的起源，而水晶的碎片幾乎與赫赫有名的神杖一樣讓人夢寐以求。"
+      "ru": "With origins known only to a single wizard, fragments of this impossible crystal are nearly as coveted as the renowned scepter itself."
     }
   },
   "item_ahalimushenzhang": {
@@ -47,21 +41,15 @@
     },
     "names": {
       "en": "Aghanims Scepter",
-      "ru": "Aghanims Scepter",
-      "zh-cn": "阿哈利姆神杖",
-      "zh-tw": "阿哈利姆神杖"
+      "ru": "Aghanims Scepter"
     },
     "descriptions": {
       "en": "+40% Magic Damage.\nChess piece skill level +1 of the carrier.",
-      "ru": "+40% Magic Damage.\nПоднимает уровень способности фигуры на +1",
-      "zh-cn": "魔法伤害+40%。\n携带者的棋子技能等级+1。",
-      "zh-tw": "魔法傷害+40%。\n攜帶者的棋子技能等級+1。"
+      "ru": "+40% Magic Damage.\nПоднимает уровень способности фигуры на +1"
     },
     "lore_i18n": {
       "en": "The scepter of a wizard with demigod-like powers.",
-      "ru": "The scepter of a wizard with demigod-like powers.",
-      "zh-cn": "这把权杖属于拥有半神之力的法师。",
-      "zh-tw": "這把權杖屬於擁有半神之力的法師。"
+      "ru": "The scepter of a wizard with demigod-like powers."
     }
   },
   "item_aiweinazhiyu": {
@@ -78,15 +66,11 @@
     },
     "names": {
       "en": "Avianas Feather",
-      "ru": "Avianas Feather",
-      "zh-cn": "艾维娜之羽",
-      "zh-tw": "艾維娜之羽"
+      "ru": "Avianas Feather"
     },
     "descriptions": {
       "en": "All damage dealt by carriers is considered as Magical damage.",
-      "ru": "Весь урон нанесенный владельцем считается Магическим.",
-      "zh-cn": "携带者造成的所有伤害都视为魔法伤害。",
-      "zh-tw": "攜帶者造成的所有傷害都視為魔法傷害。"
+      "ru": "Весь урон нанесенный владельцем считается Магическим."
     },
     "lore_i18n": {}
   },
@@ -104,21 +88,15 @@
     },
     "names": {
       "en": "Desolator",
-      "ru": "Desolator",
-      "zh-cn": "黯灭",
-      "zh-tw": "黯滅"
+      "ru": "Desolator"
     },
     "descriptions": {
       "en": "+25 damage.\nArmor -10 to the target on attacks.",
-      "ru": "+25 урона.\nБроня цели снижена на 10.",
-      "zh-cn": "攻击力+25。\n使被攻击的敌人护甲-10。",
-      "zh-tw": "攻擊力+25。\n使被攻擊的敵人護甲-10。"
+      "ru": "+25 урона.\nБроня цели снижена на 10."
     },
     "lore_i18n": {
       "en": "A wicked weapon, used in torturing political criminals.",
-      "ru": "A wicked weapon, used in torturing political criminals.",
-      "zh-cn": "这件邪恶并且嗜血的武器，通常用于拷打政治犯。",
-      "zh-tw": "這件邪惡並且嗜血的武器，通常用於拷打政治犯。"
+      "ru": "A wicked weapon, used in torturing political criminals."
     }
   },
   "item_aoshuxie": {
@@ -137,15 +115,11 @@
     },
     "names": {
       "en": "Arcane Boots",
-      "ru": "Arcane Boots",
-      "zh-cn": "奥术鞋",
-      "zh-tw": "奧術鞋"
+      "ru": "Arcane Boots"
     },
     "descriptions": {
       "en": "Fast movement.\n\nActive ability: Instant\nRestores 40 mana for all allies within the range.\n\nRange: 400",
-      "ru": "Ускоренное передвижение.\n\nАктивка: Мгновенная\nДает 40 маны всем союзникам в области.\n\nРадиус: 400",
-      "zh-cn": "快速移动。\n\n主动技能：立即激活\n为范围内全体友军回复40点法力值。",
-      "zh-tw": "快速移動。\n\n主動技能：立即激活\n為範圍內全體友軍回復40點法力值。"
+      "ru": "Ускоренное передвижение.\n\nАктивка: Мгновенная\nДает 40 маны всем союзникам в области.\n\nРадиус: 400"
     },
     "lore_i18n": {}
   },
@@ -168,9 +142,7 @@
     },
     "lore_i18n": {
       "en": "Only the fool shall question the authority of the Emperor.",
-      "ru": "Only the fool shall question the authority of the Emperor.",
-      "zh-cn": "索瑞森大帝拥有绝对统治，只有傻子才会反抗。",
-      "zh-tw": "索瑞森大帝擁有絕對統治，只有傻子才會反抗。"
+      "ru": "Only the fool shall question the authority of the Emperor."
     }
   },
   "item_bench_contract": {
@@ -189,21 +161,15 @@
     },
     "names": {
       "en": "Magic Seed",
-      "ru": "Magic Seed",
-      "zh-cn": "魔法种子",
-      "zh-tw": "魔法種子"
+      "ru": "Magic Seed"
     },
     "descriptions": {
       "en": "Fill your bench with magic vegetable sprouts. The sell value of these sprouts has a dynamic chance to increase by 1 at the beginning of every round. You can sell the sprouts any time to reuse the bench.",
-      "ru": "Заполняет лавку магическими репками. Их цена продажи имеет шанс увеличиться на 1 в начале каждого раунда. Репки можно продать в любой момент, чтобы освободить лавку.",
-      "zh-cn": "用菜苗填满你的等待席，回合开始时每颗菜的出售价值都有概率+1。你可以随时出售它们而启用等待席。",
-      "zh-tw": "用菜苗填滿你的等待席，回合開始時每顆菜的出售價值都有概率+1。你可以隨時出售它們而啟用等待席。"
+      "ru": "Заполняет лавку магическими репками. Их цена продажи имеет шанс увеличиться на 1 в начале каждого раунда. Репки можно продать в любой момент, чтобы освободить лавку."
     },
     "lore_i18n": {
       "en": "From Relic Box",
-      "ru": "From Relic Box",
-      "zh-cn": "来自：圣物宝箱",
-      "zh-tw": "來自：聖物寶箱"
+      "ru": "From Relic Box"
     }
   },
   "item_bingyan": {
@@ -220,21 +186,15 @@
     },
     "names": {
       "en": "Eye of Skadi",
-      "ru": "Eye of Skadi",
-      "zh-cn": "斯嘉蒂之眼",
-      "zh-tw": "斯嘉蒂之眼"
+      "ru": "Eye of Skadi"
     },
     "descriptions": {
       "en": "+600 max health.\nAttack speed, Attack damage, Move speed, mana restoration and healing effectiveness -50%.",
-      "ru": "+600 здоровья.\nПоражённые цели: скорость атаки, урона, скорость передвижения, восстановление маны и эффективность лечения - снижены на 50%.",
-      "zh-cn": "生命值+600。\n任何受到持有者伤害的目标都会获得效果：攻击速度、攻击力、移动速度、法力获取和受到治疗-50%。",
-      "zh-tw": "生命值+600。\n任何受到持有者傷害的目標都會獲得效果：攻擊速度、攻擊力、移動速度、法力獲取和受到治療-50%。"
+      "ru": "+600 здоровья.\nПоражённые цели: скорость атаки, урона, скорость передвижения, восстановление маны и эффективность лечения - снижены на 50%."
     },
     "lore_i18n": {
       "en": "Extremely rare artifact, guarded by the azure dragons.",
-      "ru": "Extremely rare artifact, guarded by the azure dragons.",
-      "zh-cn": "极度罕见的古物，由苍空之龙看管。",
-      "zh-tw": "極度罕見的古物，由蒼空之龍看管。"
+      "ru": "Extremely rare artifact, guarded by the azure dragons."
     }
   },
   "item_bkb": {
@@ -251,21 +211,15 @@
     },
     "names": {
       "en": "Black King Bar",
-      "ru": "Black King Bar",
-      "zh-cn": "黑皇杖",
-      "zh-tw": "黑皇杖"
+      "ru": "Black King Bar"
     },
     "descriptions": {
       "en": "+600 HP. \n\nActive ability: Activates when taking damage\nGrants spell immunity and 75% magic resistance for 4 sec. Dispels negative statuses from the caster on activation.",
-      "ru": "+600 к Здоровью. \n\nАктивка: Активируется при получении урона\nДаёт иммунитет к заклинаниям и 75% сопротивления магии на 4 секунды. Снимает отрицательные статусы с заклинателя при активации.",
-      "zh-cn": "生命值+600。\n\n主动技能：受伤时激活\n驱散自身的不良状态，并获得75%魔法抗性和技能免疫，持续4秒。",
-      "zh-tw": "生命值+600。\n\n主動技能：受傷時激活\n驅散自身的不良狀態，並獲得75%魔法抗性和技能免疫，持續4秒。"
+      "ru": "+600 к Здоровью. \n\nАктивка: Активируется при получении урона\nДаёт иммунитет к заклинаниям и 75% сопротивления магии на 4 секунды. Снимает отрицательные статусы с заклинателя при активации."
     },
     "lore_i18n": {
       "en": "A powerful staff imbued with the strength of giants.",
-      "ru": "A powerful staff imbued with the strength of giants.",
-      "zh-cn": "渗透了巨人之力的强大法杖。",
-      "zh-tw": "滲透了巨人之力的強大法杖。"
+      "ru": "A powerful staff imbued with the strength of giants."
     }
   },
   "item_both_leaves": {
@@ -279,21 +233,15 @@
     "icon_dimensions": null,
     "names": {
       "en": "Leafy Essence",
-      "ru": "Leafy Essence",
-      "zh-cn": "复叶精魂",
-      "zh-tw": "復葉精魂"
+      "ru": "Leafy Essence"
     },
     "descriptions": {
       "en": "All offside branches unlock automatically in this single game.",
-      "ru": "Все боковые ветки талантов будут разблокированы автоматически в этой игре.",
-      "zh-cn": "在本局游戏中，你会自动解锁天赋树的另一边天赋。",
-      "zh-tw": "在本局遊戲中，你會自動解鎖天賦樹的另一邊天賦。"
+      "ru": "Все боковые ветки талантов будут разблокированы автоматически в этой игре."
     },
     "lore_i18n": {
       "en": "From: Relicbox",
-      "ru": "From: Relicbox",
-      "zh-cn": "来自：圣物宝箱",
-      "zh-tw": "來自：聖物寶箱"
+      "ru": "From: Relicbox"
     }
   },
   "item_buxiuzhishouhu": {
@@ -310,21 +258,15 @@
     },
     "names": {
       "en": "Aegis of Immortal",
-      "ru": "Aegis of Immortal",
-      "zh-cn": "不朽之守护",
-      "zh-tw": "不朽之守護"
+      "ru": "Aegis of Immortal"
     },
     "descriptions": {
       "en": "+600 HP.\nDeathrattle: Resurrect once.",
-      "ru": "+600 Здоровья.\nСмертельный хрип: Воскрешается один раз.",
-      "zh-cn": "生命值+600。\n亡语：原地复活一次。",
-      "zh-tw": "生命值+600。\n亡語：原地復活一次。"
+      "ru": "+600 Здоровья.\nСмертельный хрип: Воскрешается один раз."
     },
     "lore_i18n": {
       "en": "Immortals used to have a magical shield to prevent them from death.",
-      "ru": "Immortals used to have a magical shield to prevent them from death.",
-      "zh-cn": "据说不朽者拥有一面能帮他躲过死亡的盾牌。",
-      "zh-tw": "據說不朽者擁有一面能幫他躲過死亡的盾牌。"
+      "ru": "Immortals used to have a magical shield to prevent them from death."
     }
   },
   "item_cantie": {
@@ -341,15 +283,11 @@
     },
     "names": {
       "en": "Sliver",
-      "ru": "Sliver",
-      "zh-cn": "残铁",
-      "zh-tw": "殘鐵"
+      "ru": "Sliver"
     },
     "descriptions": {
       "en": "+25 damage.\nConsidered as Tier 3 Item.",
-      "ru": "+25 урона.\nСчитается предметом Т3.",
-      "zh-cn": "攻击力+25。\n该物品等级视为3。",
-      "zh-tw": "攻擊力+25。\n該物品等級視為3。"
+      "ru": "+25 урона.\nСчитается предметом Т3."
     },
     "lore_i18n": {}
   },
@@ -367,20 +305,13 @@
     },
     "names": {
       "en": "Card: Chance",
-      "ru": "Card: Chance",
-      "zh-cn": "魔术卡牌：机会",
-      "zh-tw": "魔術卡牌：機會"
+      "ru": "Card: Chance"
     },
     "descriptions": {
       "en": "Courier Consumable: Click to use\nYou can designate a chess piece to gain an additional class from the nearest other class permanently.",
-      "ru": "Courier Consumable: Click to use\nYou can designate a chess piece to gain an additional class from the nearest other class permanently.",
-      "zh-cn": "信使消耗品：点击使用\n准备回合对一个棋子使用，使它从最近的其他职业棋子永久获得一个额外的职业。",
-      "zh-tw": "信使消耗品：點擊使用\n準備回合對一個棋子使用，使它從最近的其他職業棋子永久獲得一個額外的職業。"
+      "ru": "Courier Consumable: Click to use\nYou can designate a chess piece to gain an additional class from the nearest other class permanently."
     },
-    "lore_i18n": {
-      "zh-cn": "来自：大魔导师的袖里乾坤",
-      "zh-tw": "來自：大魔導師的袖裏乾坤"
-    }
+    "lore_i18n": {}
   },
   "item_card_fate": {
     "name": "Card: Fate",
@@ -396,20 +327,13 @@
     },
     "names": {
       "en": "Card: Fate",
-      "ru": "Card: Fate",
-      "zh-cn": "魔术卡牌：命运",
-      "zh-tw": "魔術卡牌：命運"
+      "ru": "Card: Fate"
     },
     "descriptions": {
       "en": "Courier Consumable: Click to use\nYou can designate a chess piece to permanently gain an additional race from the nearest other race",
-      "ru": "Courier Consumable: Click to use\nYou can designate a chess piece to permanently gain an additional race from the nearest other race",
-      "zh-cn": "信使消耗品：点击使用\n准备回合对一个棋子使用，使它从最近的其他种族棋子永久获得一个额外的种族。",
-      "zh-tw": "信使消耗品：點擊使用\n準備回合對一個棋子使用，使它從最近的其他種族棋子永久獲得一個額外的種族。"
+      "ru": "Courier Consumable: Click to use\nYou can designate a chess piece to permanently gain an additional race from the nearest other race"
     },
-    "lore_i18n": {
-      "zh-cn": "来自：大魔导师的袖里乾坤",
-      "zh-tw": "來自：大魔導師的袖裏乾坤"
-    }
+    "lore_i18n": {}
   },
   "item_changdun": {
     "name": "Pavise",
@@ -425,15 +349,11 @@
     },
     "names": {
       "en": "Pavise",
-      "ru": "Pavise",
-      "zh-cn": "长盾",
-      "zh-tw": "長盾"
+      "ru": "Pavise"
     },
     "descriptions": {
       "en": "+5 Armor.\nChances to gain +1 armor permanently on its carrier on damage taken in home battle.",
-      "ru": "+5 брони.\nШанс получить +1 брони носителю навсегда, при получении урона в домашнем бою.",
-      "zh-cn": "护甲+5。\n每当主场战斗时持有者首次受到伤害，有概率永久获得+1护甲。",
-      "zh-tw": "護甲+5。\n每當主場戰鬥時持有者首次受到傷害，有概率永久獲得+1護甲。"
+      "ru": "+5 брони.\nШанс получить +1 брони носителю навсегда, при получении урона в домашнем бою."
     },
     "lore_i18n": {}
   },
@@ -451,21 +371,15 @@
     },
     "names": {
       "en": "Crimson Guard",
-      "ru": "Crimson Guard",
-      "zh-cn": "赤红甲",
-      "zh-tw": "赤紅甲"
+      "ru": "Crimson Guard"
     },
     "descriptions": {
       "en": "+5 armor, Block 30 damage.\n\nActive ability: Activates when taking damage\nGrants all allies within the range 50% chance to block 100 damage for melee pieces and 30 damage for ranged pieces. Lasts 8 sec.\n\nRange: 400",
-      "ru": "+5 брони, Блокирует 30 урона.\n\nАктивируется при получении урона\nДаёт всем союзникам в радиусе 50% шанс блокировать 100 урона для ближних фигур и 30 урона для дальних. Длится 8 секунд.\n\nРадиус: 400",
-      "zh-cn": "护甲+5，物理格挡+25。\n\n主动技能：受伤时激活\n使范围内所有友军护甲+5，物理格挡+50，持续8秒。",
-      "zh-tw": "護甲+5，物理格擋+25。\n\n主動技能：受傷時激活\n使範圍內所有友軍護甲+5，物理格擋+50，持續8秒。"
+      "ru": "+5 брони, Блокирует 30 урона.\n\nАктивируется при получении урона\nДаёт всем союзникам в радиусе 50% шанс блокировать 100 урона для ближних фигур и 30 урона для дальних. Длится 8 секунд.\n\nРадиус: 400"
     },
     "lore_i18n": {
       "en": "A cuirass originally built to protect against the dreaded Year Beast.",
-      "ru": "A cuirass originally built to protect against the dreaded Year Beast.",
-      "zh-cn": "原为低于可怕的年兽所打造的铠甲。",
-      "zh-tw": "原為低於可怕的年獸所打造的鎧甲。"
+      "ru": "A cuirass originally built to protect against the dreaded Year Beast."
     }
   },
   "item_chishu": {
@@ -482,21 +396,15 @@
     },
     "names": {
       "en": "Tango",
-      "ru": "Tango",
-      "zh-cn": "树之祭祀",
-      "zh-tw": "樹之祭祀"
+      "ru": "Tango"
     },
     "descriptions": {
       "en": "Courier consumable: Click to use\nKnock down a tree and randomly restore up to 8 health for your Courier.",
-      "ru": "Courier consumable: Click to use\nСлучайным образом восстанавливает до 8 здоровья, ломая ближайшее дерево.",
-      "zh-cn": "信使消耗品：点击食用\n摧毁一棵树木，为你的信使随机回复（1～8）点生命值。",
-      "zh-tw": "信使消耗品：點擊食用\n摧毀一棵樹木，為你的信使隨機回復（1～8）點生命值。"
+      "ru": "Courier consumable: Click to use\nСлучайным образом восстанавливает до 8 здоровья, ломая ближайшее дерево."
     },
     "lore_i18n": {
       "en": "From: Blessing of Priests",
-      "ru": "From: Blessing of Priests",
-      "zh-cn": "来自：牧师的祈祷",
-      "zh-tw": "來自：牧師的祈禱"
+      "ru": "From: Blessing of Priests"
     }
   },
   "item_chishu_new": {
@@ -513,20 +421,13 @@
     },
     "names": {
       "en": "Tango",
-      "ru": "Tango",
-      "zh-cn": "树之祭祀",
-      "zh-tw": "樹之祭祀"
+      "ru": "Tango"
     },
     "descriptions": {
       "en": "Courier consumable: Click to use\nKnock down a tree and randomly restore up to 8 health for your Courier.",
-      "ru": "Courier consumable: Click to use\nСлучайным образом восстанавливает до 8 здоровья, ломая ближайшее дерево.",
-      "zh-cn": "信使消耗品：点击食用\n摧毁一棵树木，为你的信使随机回复（1～8）点生命值。",
-      "zh-tw": "信使消耗品：點擊食用\n摧毀一棵樹木，為你的信使隨機回復（1～8）點生命值。"
+      "ru": "Courier consumable: Click to use\nСлучайным образом восстанавливает до 8 здоровья, ломая ближайшее дерево."
     },
-    "lore_i18n": {
-      "zh-cn": "来自：牧师的祈祷",
-      "zh-tw": "來自：牧師的祈禱"
-    }
+    "lore_i18n": {}
   },
   "item_common_token": {
     "name": "Machine Token",
@@ -539,21 +440,15 @@
     "icon_dimensions": null,
     "names": {
       "en": "Machine Token",
-      "ru": "Machine Token",
-      "zh-cn": "机械代币",
-      "zh-tw": "機械代幣"
+      "ru": "Machine Token"
     },
     "descriptions": {
       "en": "A special Token for recruiting Discovered pieces, granted by Heart of the Machine.",
-      "ru": "Специальный токен для покупки фигур из голден-ролла.",
-      "zh-cn": "一种特殊的代币，可以用来发现机械之心招募到的棋子。",
-      "zh-tw": "一種特殊的代幣，可以用來發現機械之心招募到的棋子。"
+      "ru": "Специальный токен для покупки фигур из голден-ролла."
     },
     "lore_i18n": {
       "en": "From: Heart of the Machine",
-      "ru": "From: Heart of the Machine",
-      "zh-cn": "来自：机械之心",
-      "zh-tw": "來自：機械之心"
+      "ru": "From: Heart of the Machine"
     }
   },
   "item_conceal_prepare": {
@@ -567,21 +462,15 @@
     "icon_dimensions": null,
     "names": {
       "en": "Shroud of Concealment",
-      "ru": "Shroud of Concealment",
-      "zh-cn": "帷幕",
-      "zh-tw": "帷幕"
+      "ru": "Shroud of Concealment"
     },
     "descriptions": {
       "en": "Conceal your chessboard in the Preparation Phase. Hide your courier also to skip the next PVP battle after your courier takes damage.",
-      "ru": "Скрывает доску на фазе подготовки. Позволяет пропустить следующий PvP-раунд после получения урона курьером.",
-      "zh-cn": "在准备回合隐匿棋盘上的棋子。当你的信使受到伤害时，下个非战利品回合会同时隐匿信使并跳过战斗阶段。",
-      "zh-tw": "在準備回合隱匿棋盤上的棋子。當你的信使受到傷害時，下個非戰利品回合會同時隱匿信使並跳過戰鬥階段。"
+      "ru": "Скрывает доску на фазе подготовки. Позволяет пропустить следующий PvP-раунд после получения урона курьером."
     },
     "lore_i18n": {
       "en": "From Relicbox",
-      "ru": "From Relicbox",
-      "zh-cn": "来自：圣物宝箱",
-      "zh-tw": "來自：聖物寶箱"
+      "ru": "From Relicbox"
     }
   },
   "item_dadianchui": {
@@ -598,15 +487,11 @@
     },
     "names": {
       "en": "Mjollnir",
-      "ru": "Mjollnir",
-      "zh-cn": "雷神之锤",
-      "zh-tw": "雷神之錘"
+      "ru": "Mjollnir"
     },
     "descriptions": {
       "en": "+60% attack speed.\n20% chance when attacking or being attacked to release a bolt of electricity that leaps between 5 targets, dealing 100 magical damage to each.",
-      "ru": "+60% скорости атаки.\n20% шанс при атаке или получении урона выпустить заряд молнии, который прыгает между 5 целями, нанося 100 магического урона каждой.",
-      "zh-cn": "攻击速度+60%。\n攻击或被攻击有20%概率打出一道叉状闪电，对最多5个敌人造成200点魔法伤害。",
-      "zh-tw": "攻擊速度+60%。\n攻擊或被攻擊有20%概率打出一道叉狀閃電，對最多5個敵人造成200點魔法傷害。"
+      "ru": "+60% скорости атаки.\n20% шанс при атаке или получении урона выпустить заряд молнии, который прыгает между 5 целями, нанося 100 магического урона каждой."
     },
     "lore_i18n": {}
   },
@@ -624,15 +509,11 @@
     },
     "names": {
       "en": "Daedalus",
-      "ru": "Daedalus",
-      "zh-cn": "代达罗斯之殇",
-      "zh-tw": "代達羅斯之殤"
+      "ru": "Daedalus"
     },
     "descriptions": {
       "en": "+75 damage.\nAttacks have a 20% chance to critically strike for 400% damage.",
-      "ru": "+75 damage.\nАтаки имеют 20% шанс на критический удар, наносящий 400% урона.",
-      "zh-cn": "攻击力+75。\n攻击有20%概率造成4倍暴击。",
-      "zh-tw": "攻擊力+75。\n攻擊有20%概率造成4倍暴擊。"
+      "ru": "+75 damage.\nАтаки имеют 20% шанс на критический удар, наносящий 400% урона."
     },
     "lore_i18n": {}
   },
@@ -650,21 +531,15 @@
     },
     "names": {
       "en": "Abyssal Blade",
-      "ru": "Abyssal Blade",
-      "zh-cn": "深渊之刃",
-      "zh-tw": "深淵之刃"
+      "ru": "Abyssal Blade"
     },
     "descriptions": {
       "en": "+50 damage.\n\nActive ability: Instant\nStun a nearby enemy piece for 5s, and deal 100 pure damage, ignores skill immunity.",
-      "ru": "+50 к урону.\n\nActive ability: Instant\nОглушает ближайшую вражескую фигуру на 5 секунд и наносит 100 чистого урона, игнорируя иммунитет к умениям.",
-      "zh-cn": "攻击力+50。\n\n主动技能：立即激活\n将一个近身的敌方棋子击晕5秒，并造成100点纯粹伤害，无视技能免疫！",
-      "zh-tw": "攻擊力+50。\n\n主動技能：立即激活\n將一個近身的敵方棋子擊暈5秒，並造成100點純粹傷害，無視技能免疫！"
+      "ru": "+50 к урону.\n\nActive ability: Instant\nОглушает ближайшую вражескую фигуру на 5 секунд и наносит 100 чистого урона, игнорируя иммунитет к умениям."
     },
     "lore_i18n": {
       "en": "The lost blade of the Commander of the Abyss, this edge cuts into the enemy’s soul.",
-      "ru": "The lost blade of the Commander of the Abyss, this edge cuts into the enemy’s soul.",
-      "zh-cn": "深渊指挥官的失落宝剑，能够轻易刺穿敌人的灵魂。",
-      "zh-tw": "深淵指揮官的失落寶劍，能夠輕易刺穿敵人的靈魂。"
+      "ru": "The lost blade of the Commander of the Abyss, this edge cuts into the enemy’s soul."
     }
   },
   "item_dianjinshou": {
@@ -681,21 +556,15 @@
     },
     "names": {
       "en": "Hand of Midas",
-      "ru": "Hand of Midas",
-      "zh-cn": "迈达斯之手",
-      "zh-tw": "邁達斯之手"
+      "ru": "Hand of Midas"
     },
     "descriptions": {
       "en": "Active ability: Instant Activation\n Immediately eliminates a summoned or illusion piece with health lower than the carrier. In-home battles, drops 1 gold coins.",
-      "ru": "Active ability: Instant Activation\n Немедленно уничтожает призванную или иллюзорную фигуру с меньшим здоровьем, чем у носителя. В домашних битвах дает 1 золотую монету.",
-      "zh-cn": "主动技能：立即激活\n立即消灭一个生命值低于携带者的召唤物或幻象。如果是主场作战，同时会掉落1个金币。",
-      "zh-tw": "主動技能：立即激活\n立即消滅一個生命值低於攜帶者的召喚物或幻象。如果是主場作戰，同時會掉落1個金幣。"
+      "ru": "Active ability: Instant Activation\n Немедленно уничтожает призванную или иллюзорную фигуру с меньшим здоровьем, чем у носителя. В домашних битвах дает 1 золотую монету."
     },
     "lore_i18n": {
       "en": "Preserved through unknown magical means, the Hand of Midas is a weapon of greed, sacrificing animals to line the owners pockets.",
-      "ru": "Preserved through unknown magical means, the Hand of Midas is a weapon of greed, sacrificing animals to line the owners pockets.",
-      "zh-cn": "以未知的魔法手段维持着的迈达斯之手，是件贪婪的武器，通过炼化生灵来装满持有者的腰包。",
-      "zh-tw": "以未知的魔法手段維持著的邁達斯之手，是件貪婪的武器，通過煉化生靈來裝滿持有者的腰包。"
+      "ru": "Preserved through unknown magical means, the Hand of Midas is a weapon of greed, sacrificing animals to line the owners pockets."
     }
   },
   "item_dongchayandou": {
@@ -712,21 +581,15 @@
     },
     "names": {
       "en": "Pipe of Insight",
-      "ru": "Pipe of Insight",
-      "zh-cn": "洞察烟斗",
-      "zh-tw": "洞察煙鬥"
+      "ru": "Pipe of Insight"
     },
     "descriptions": {
       "en": "+10 health regeneration, +50% magic resistance.\n\nActive ability: Activates when taking damage\nGrants ranged allies with +10 health regeneration, +50% magic resistance for 10 sec.\n\nRange:500",
-      "ru": "+10 health regeneration, +50% magic resistance.\n\nActive ability: Activates when taking damage\nДаёт союзникам +10 к регенерации здоровья, +50% сопротивления магии на 10 секунд, в радусе действия. \n\nРадиус:500",
-      "zh-cn": "魔法抗性+50%，生命回复+10。\n\n主动技能：受伤时激活\n使范围内所有友军获得：魔法抗性+50%，生命回复+10，持续10秒。",
-      "zh-tw": "魔法抗性+50%，生命回復+10。\n\n主動技能：受傷時激活\n使範圍內所有友軍獲得：魔法抗性+50%，生命回復+10，持續10秒。"
+      "ru": "+10 health regeneration, +50% magic resistance.\n\nActive ability: Activates when taking damage\nДаёт союзникам +10 к регенерации здоровья, +50% сопротивления магии на 10 секунд, в радусе действия. \n\nРадиус:500"
     },
     "lore_i18n": {
       "en": "A powerful artifact of mysterious origin, it creates barriers against magical forces.",
-      "ru": "A powerful artifact of mysterious origin, it creates barriers against magical forces.",
-      "zh-cn": "一件来源神秘的强大古物，能制造出抵挡法术攻击的护盾。",
-      "zh-tw": "一件來源神秘的強大古物，能製造出抵擋法術攻擊的護盾。"
+      "ru": "A powerful artifact of mysterious origin, it creates barriers against magical forces."
     }
   },
   "item_double_coin": {
@@ -743,21 +606,15 @@
     },
     "names": {
       "en": "Doubloon",
-      "ru": "Doubloon",
-      "zh-cn": "双面币",
-      "zh-tw": "雙面幣"
+      "ru": "Doubloon"
     },
     "descriptions": {
       "en": "Relic Consumable: Click to Use\nTransfer 20% of the higher one of your Health and Mana into another. Can be used twice",
-      "ru": "Нажмите для использования\nТрансформирует 20% от вашего наивысшего показателя Здоровья или Маны в другой. Доступно 2 применения.",
-      "zh-cn": "圣物消耗品：点击使用\n如果你的生命值大于金币数，将当前生命值的20%转化为金币；如果你的生命值小于金币数，将当前金币的20%转化为生命值。可以使用2次。",
-      "zh-tw": "聖物消耗品：點擊使用\n如果你的生命值大於金幣數，將當前生命值的20%轉化為金幣；如果你的生命值小於金幣數，將當前金幣的20%轉化為生命值。可以使用2次。"
+      "ru": "Нажмите для использования\nТрансформирует 20% от вашего наивысшего показателя Здоровья или Маны в другой. Доступно 2 применения."
     },
     "lore_i18n": {
       "en": "From: Relicbox",
-      "ru": "From: Relicbox",
-      "zh-cn": "来自：圣物宝箱",
-      "zh-tw": "來自：聖物寶箱"
+      "ru": "From: Relicbox"
     }
   },
   "item_egg": {
@@ -774,21 +631,15 @@
     "icon_dimensions": null,
     "names": {
       "en": "Greevil Egg",
-      "ru": "Greevil Egg",
-      "zh-cn": "贪魔蛋",
-      "zh-tw": "貪魔蛋"
+      "ru": "Greevil Egg"
     },
     "descriptions": {
       "en": "Relic Consumable: Click to Use\n Put a piece into an egg which has a chance to grow once every round. You can break it anytime, hatching a piece according to the points.",
-      "ru": "Нажмите для использования релика\n Поместите фигуру в яйцо, которое имеет шанс вырасти каждую волну. Вы можете разбить его в любое время, чтобы достать фигуру в зависимости от очков роста.",
-      "zh-cn": "圣物消耗品：点击使用\n将一个棋子放进蛋中，每个回合开始时蛋都有概率长大，你可以随时出售蛋并重新孵化出该棋子，它的星级取决于蛋的大小。",
-      "zh-tw": "聖物消耗品：點擊使用\n將一個棋子放進蛋中，每個回合開始時蛋都有概率長大，你可以隨時出售蛋並重新孵化出該棋子，它的星級取決於蛋的大小。"
+      "ru": "Нажмите для использования релика\n Поместите фигуру в яйцо, которое имеет шанс вырасти каждую волну. Вы можете разбить его в любое время, чтобы достать фигуру в зависимости от очков роста."
     },
     "lore_i18n": {
       "en": "From Relic Box",
-      "ru": "From Relic Box",
-      "zh-cn": "来自：圣物宝箱",
-      "zh-tw": "來自：聖物寶箱"
+      "ru": "From Relic Box"
     }
   },
   "item_fashulengjing": {
@@ -807,15 +658,11 @@
     },
     "names": {
       "en": "Spell Prism",
-      "ru": "Spell Prism",
-      "zh-cn": "法术棱镜",
-      "zh-tw": "法術棱鏡"
+      "ru": "Spell Prism"
     },
     "descriptions": {
       "en": "magical damage +20%。\n Target quantity of enemy-directed targeted spells or items +1.",
-      "ru": "Магический урон +20%。\n Количество заклинаний или предметов, направленных на цель, +1 (удваивается).",
-      "zh-cn": "魔法伤害+20%。\n对敌方施放的指向性法术或物品的目标数量+1。",
-      "zh-tw": "魔法傷害+20%。\n對敵方施放的指向性法術或物品的目標數量+1。"
+      "ru": "Магический урон +20%。\n Количество заклинаний или предметов, направленных на цель, +1 (удваивается)."
     },
     "lore_i18n": {}
   },
@@ -836,21 +683,15 @@
     },
     "names": {
       "en": "Ascetics Cap",
-      "ru": "Ascetics Cap",
-      "zh-cn": "飞僵小帽",
-      "zh-tw": "飛僵小帽"
+      "ru": "Ascetics Cap"
     },
     "descriptions": {
       "en": "+25% magical resistance. A non-Undead carrier has a chance to be reborn into an undead piece of the same rank and level.",
-      "ru": "+25% маг.резиста. Носитель не-Undead имеет шанс переродиться в фигуру Undead с тем же рангом и уровнем.",
-      "zh-cn": "魔法抗性+25%，非亡灵携带者获得效果：回合开始时有概率被转化为一个同等级同星的随机亡灵棋子。",
-      "zh-tw": "魔法抗性+25%，非亡靈攜帶者獲得效果：回合開始時有概率被轉化為一個同等級同星的隨機亡靈棋子。"
+      "ru": "+25% маг.резиста. Носитель не-Undead имеет шанс переродиться в фигуру Undead с тем же рангом и уровнем."
     },
     "lore_i18n": {
       "en": "An austere cap from Undery.",
-      "ru": "Шляпа Аскета",
-      "zh-cn": "一顶朴素的帽子，看上去源自幽幽城。",
-      "zh-tw": "一頂樸素的帽子，看上去源自幽幽城。"
+      "ru": "Шляпа Аскета"
     }
   },
   "item_fengkuangmianju": {
@@ -867,21 +708,15 @@
     },
     "names": {
       "en": "Mask of Madness",
-      "ru": "Mask of Madness",
-      "zh-cn": "疯狂面具",
-      "zh-tw": "瘋狂面具"
+      "ru": "Mask of Madness"
     },
     "descriptions": {
       "en": "+15% attack speed, lifesteal +20%, but silences the carrier.",
-      "ru": "+15% скорости атаки, лайфстил +20%, но обезмалвливает носителя.",
-      "zh-cn": "沉默自己，攻击吸血+25%，攻击速度+20%。",
-      "zh-tw": "沈默自己，攻擊吸血+25%，攻擊速度+20%。"
+      "ru": "+15% скорости атаки, лайфстил +20%, но обезмалвливает носителя."
     },
     "lore_i18n": {
       "en": "Once this mask is worn, its bearer becomes an uncontrollable aggressive force.",
-      "ru": "Once this mask is worn, its bearer becomes an uncontrollable aggressive force.",
-      "zh-cn": "我发起疯来连自己都害怕。",
-      "zh-tw": "我發起瘋來連自己都害怕。"
+      "ru": "Once this mask is worn, its bearer becomes an uncontrollable aggressive force."
     }
   },
   "item_fengwangjiang": {
@@ -897,21 +732,15 @@
     "icon_dimensions": null,
     "names": {
       "en": "Royal Jelly Shield",
-      "ru": "Royal Jelly Shield",
-      "zh-cn": "蜂王浆护盾",
-      "zh-tw": "蜂王漿護盾"
+      "ru": "Royal Jelly Shield"
     },
     "descriptions": {
       "en": "Courier consumable: Activate when at least 1 damage taken is blockable\nConsumes 1 charge of Royal Jelly Shield and reduces Courier damage taken by 20% for this round.",
-      "ru": "Courier consumable: Activate when at least 1 damage taken is blockable\nConsumes 1 charge of Royal Jelly Shield and reduces Courier damage taken by 20% for this round.",
-      "zh-cn": "信使消耗品：能抵挡至少1点伤害时自动激活\n消耗一个蜂王浆护盾，使你的信使本回合内受到的伤害-20%。",
-      "zh-tw": "信使消耗品：能抵擋至少1點傷害時自動激活\n消耗一個蜂王漿護盾，使你的信使本回合內受到的傷害-20%。"
+      "ru": "Courier consumable: Activate when at least 1 damage taken is blockable\nConsumes 1 charge of Royal Jelly Shield and reduces Courier damage taken by 20% for this round."
     },
     "lore_i18n": {
       "en": "From: Blessing of Priests",
-      "ru": "From: Blessing of Priests",
-      "zh-cn": "来自：牧师的祈祷",
-      "zh-tw": "來自：牧師的祈禱"
+      "ru": "From: Blessing of Priests"
     }
   },
   "item_free_ban": {
@@ -925,21 +754,15 @@
     "icon_dimensions": null,
     "names": {
       "en": "Gaolers Master Key",
-      "ru": "Gaolers Master Key",
-      "zh-cn": "狱卒的钥匙",
-      "zh-tw": "獄卒的鑰匙"
+      "ru": "Gaolers Master Key"
     },
     "descriptions": {
       "en": "You can freely dismiss any race/class. If already dismissed, the spent gold will be refunded.",
-      "ru": "Вы можете бесплатно забанить любую расу/класс (для себя). Если уже забанили, потраченное золото будет возвращено.",
-      "zh-cn": "你可以免费屏蔽任意种族/职业。如果已经屏蔽，则返还所花费的金币。",
-      "zh-tw": "你可以免費屏蔽任意種族/職業。如果已經屏蔽，則返還所花費的金幣。"
+      "ru": "Вы можете бесплатно забанить любую расу/класс (для себя). Если уже забанили, потраченное золото будет возвращено."
     },
     "lore_i18n": {
       "en": "From Relicbox",
-      "ru": "From Relicbox",
-      "zh-cn": "来自：圣物宝箱",
-      "zh-tw": "來自：聖物寶箱"
+      "ru": "From Relicbox"
     }
   },
   "item_free_draw": {
@@ -958,15 +781,11 @@
     },
     "names": {
       "en": "Weighted Dice",
-      "ru": "Weighted Dice",
-      "zh-cn": "加重骰子",
-      "zh-tw": "加重骰子"
+      "ru": "Weighted Dice"
     },
     "descriptions": {
       "en": "Refund 1~2 random Gold if you fail to recruit any owned chess piece.",
-      "ru": "Возвращает 1-2 Золота, если ролл не содержит ни одной имеющейся фигуры.",
-      "zh-cn": "招募棋子时如果未招募到已有棋子，会返还随机（1~2）金币。",
-      "zh-tw": "招募棋子時如果未招募到已有棋子，會返還隨機（1~2）金幣。"
+      "ru": "Возвращает 1-2 Золота, если ролл не содержит ни одной имеющейся фигуры."
     },
     "lore_i18n": {}
   },
@@ -984,21 +803,15 @@
     },
     "names": {
       "en": "Gleipnir",
-      "ru": "Gleipnir",
-      "zh-cn": "缚灵索",
-      "zh-tw": "縛靈索"
+      "ru": "Gleipnir"
     },
     "descriptions": {
       "en": "Attack speed +30%.\n\nActive ability: Instant\nEntangle the highest-level enemy piece within a 2-grid radius, immobilizing all enemy pieces in that range for 4 seconds and dealing 100 points of magical damage.",
-      "ru": "Скорость атаки+30%.\n\nАктивка: Мгновенная\nПривязывает фигуру противника самого высокого уровня в радиусе 2 клеток, обездвиживая все вражеские фигуры в этом радиусе на 4 секунды и нанося 100 магического урона.",
-      "zh-cn": "攻击速度+30%。\n\n主动技能：立即激活\n缠绕等级最高的敌方棋子2格范围的所有敌方棋子，使其不能移动，持续4秒，并造成100点魔法伤害。",
-      "zh-tw": "攻擊速度+30%。\n\n主動技能：立即激活\n纏繞等級最高的敵方棋子2格範圍的所有敵方棋子，使其不能移動，持續4秒，並造成100點魔法傷害。"
+      "ru": "Скорость атаки+30%.\n\nАктивка: Мгновенная\nПривязывает фигуру противника самого высокого уровня в радиусе 2 клеток, обездвиживая все вражеские фигуры в этом радиусе на 4 секунды и нанося 100 магического урона."
     },
     "lore_i18n": {
       "en": "Bindings forged by impossible means to leash an ancient evil.",
-      "ru": "Bindings forged by impossible means to leash an ancient evil.",
-      "zh-cn": "以不可能的手段铸就的束缚之物，为了绑住一个上古邪灵。",
-      "zh-tw": "以不可能的手段鑄就的束縛之物，為了綁住一個上古邪靈。"
+      "ru": "Bindings forged by impossible means to leash an ancient evil."
     }
   },
   "item_fushizhiqiu": {
@@ -1015,15 +828,11 @@
     },
     "names": {
       "en": "Orb of Corrosion",
-      "ru": "Orb of Corrosion",
-      "zh-cn": "腐蚀之球",
-      "zh-tw": "腐蝕之球"
+      "ru": "Orb of Corrosion"
     },
     "descriptions": {
       "en": "Target armor -5.",
-      "ru": "Броня цели -5.",
-      "zh-cn": "攻击目标护甲-5。",
-      "zh-tw": "攻擊目標護甲-5。"
+      "ru": "Броня цели -5."
     },
     "lore_i18n": {}
   },
@@ -1038,21 +847,15 @@
     "icon_dimensions": null,
     "names": {
       "en": "Golden Machine Token",
-      "ru": "Golden Machine Token",
-      "zh-cn": "金色机械代币",
-      "zh-tw": "金色機械代幣"
+      "ru": "Golden Machine Token"
     },
     "descriptions": {
       "en": "A special Token for recruiting Discovered pieces, granted by Golden Heart of the Machine.",
-      "ru": "Особый токен для покупки фигур, полученных от Golden Heart of the Machine.",
-      "zh-cn": "一种特殊的代币，可以用来发现金色机械之心招募到的传说棋子。",
-      "zh-tw": "一種特殊的代幣，可以用來發現金色機械之心招募到的傳說棋子。"
+      "ru": "Особый токен для покупки фигур, полученных от Golden Heart of the Machine."
     },
     "lore_i18n": {
       "en": "From: Golden Heart of the Machine",
-      "ru": "From: Golden Heart of the Machine",
-      "zh-cn": "来自：金色机械之心",
-      "zh-tw": "來自：金色機械之心"
+      "ru": "From: Golden Heart of the Machine"
     }
   },
   "item_gulonghaojiao": {
@@ -1069,15 +872,11 @@
     },
     "names": {
       "en": "Minotaur Horn",
-      "ru": "Minotaur Horn",
-      "zh-cn": "古龙号角",
-      "zh-tw": "古龍號角"
+      "ru": "Minotaur Horn"
     },
     "descriptions": {
       "en": "Carrier counts as Dragon and has 100 initial mana.",
-      "ru": "Владелец становится \nДраконом и получает 100 маны.",
-      "zh-cn": "携带者视为龙，并且初始法力值为100。",
-      "zh-tw": "攜帶者視為龍，並且初始法力值為100。"
+      "ru": "Владелец становится \nДраконом и получает 100 маны."
     },
     "lore_i18n": {}
   },
@@ -1095,15 +894,11 @@
     },
     "names": {
       "en": "Havoc",
-      "ru": "Havoc",
-      "zh-cn": "浩劫",
-      "zh-tw": "浩劫"
+      "ru": "Havoc"
     },
     "descriptions": {
       "en": "Attack damage +50.\n All carriers damage settled as Pure Damage.",
-      "ru": "Урон атаки +50.\n Весь урон носителя становится чистым.",
-      "zh-cn": "攻击力+50。\n携带者造成的所有伤害都结算为纯粹伤害。",
-      "zh-tw": "攻擊力+50。\n攜帶者造成的所有傷害都結算為純粹傷害。"
+      "ru": "Урон атаки +50.\n Весь урон носителя становится чистым."
     },
     "lore_i18n": {}
   },
@@ -1121,21 +916,15 @@
     },
     "names": {
       "en": "Dagon",
-      "ru": "Dagon",
-      "zh-cn": "达贡之神力",
-      "zh-tw": "達貢之神力"
+      "ru": "Dagon"
     },
     "descriptions": {
       "en": "+40% magical damage.\n\nActive ability: Instant\nDeals 700 magical damage to a random enemy chess piece.",
-      "ru": "Магический урон +40%。\n\nActive ability: Instant\nНаносит 700 магического урона случайной вражеской фигуре.",
-      "zh-cn": "魔法伤害+40%。\n\n主动技能：立即激活\n对一个随机敌方棋子造成700点魔法伤害。",
-      "zh-tw": "魔法傷害+40%。\n\n主動技能：立即激活\n對一個隨機敵方棋子造成700點魔法傷害。"
+      "ru": "Магический урон +40%。\n\nActive ability: Instant\nНаносит 700 магического урона случайной вражеской фигуре."
     },
     "lore_i18n": {
       "en": "A powerful secondary staff that allows the wielders magic to surge from their fingertips.",
-      "ru": "A powerful secondary staff that allows the wielders magic to surge from their fingertips.",
-      "zh-cn": "威力强大的次级法杖，让持有者的魔法从指间喷涌而出。",
-      "zh-tw": "威力強大的次級法杖，讓持有者的魔法從指間噴湧而出。"
+      "ru": "A powerful secondary staff that allows the wielders magic to surge from their fingertips."
     }
   },
   "item_huanyingfu": {
@@ -1154,21 +943,15 @@
     },
     "names": {
       "en": "Manta Style",
-      "ru": "Manta Style",
-      "zh-cn": "幻影斧",
-      "zh-tw": "幻影斧"
+      "ru": "Manta Style"
     },
     "descriptions": {
       "en": "Damage +25.\nActive ability: Instant\nCreates 2 images of the caster that last 7 seconds.",
-      "ru": "Урон +25.\nActive ability: Instant\nСоздаёт 2 копии заклинателя, которые длятся 7 секунд.",
-      "zh-cn": "攻击力+25。\n\n主动技能：立即激活\n复制两个自身的镜像棋子，持续7秒。",
-      "zh-tw": "攻擊力+25。\n\n主動技能：立即激活\n復製兩個自身的鏡像棋子，持續7秒。"
+      "ru": "Урон +25.\nActive ability: Instant\nСоздаёт 2 копии заклинателя, которые длятся 7 секунд."
     },
     "lore_i18n": {
       "en": "An axe made of reflective materials that confuse enemy ranks.",
-      "ru": "An axe made of reflective materials that confuse enemy ranks.",
-      "zh-cn": "用反光材料制成的斧头，能够混淆敌军。",
-      "zh-tw": "用反光材料製成的斧頭，能夠混淆敵軍。"
+      "ru": "An axe made of reflective materials that confuse enemy ranks."
     }
   },
   "item_hudie": {
@@ -1185,21 +968,15 @@
     },
     "names": {
       "en": "Butterfly",
-      "ru": "Butterfly",
-      "zh-cn": "蝴蝶",
-      "zh-tw": "蝴蝶"
+      "ru": "Butterfly"
     },
     "descriptions": {
       "en": "Evasion +40%，Attack Speed +20%.\n\nActive ability: Activates upon taking damage\nThe bonuses provided by Butterfly are doubled for 6 seconds.",
-      "ru": "Уклонения +40%，Скорость атаки +20%.\n\nАктивка: Активируется при получении урона\nБонусы от Butterfly удваиваются на 6 секунд.",
-      "zh-cn": "闪避+40%，攻击速度+30%。\n\n主动技能：受伤时激活\n在6秒内蝴蝶提供的加成翻倍。",
-      "zh-tw": "閃避+40%，攻擊速度+30%。\n\n主動技能：受傷時激活\n在6秒內蝴蝶提供的加成翻倍。"
+      "ru": "Уклонения +40%，Скорость атаки +20%.\n\nАктивка: Активируется при получении урона\nБонусы от Butterfly удваиваются на 6 секунд."
     },
     "lore_i18n": {
       "en": "Only the mightiest and most experienced of warriors can wield the Butterfly, but it provides incredible dexterity in combat.",
-      "ru": "Only the mightiest and most experienced of warriors can wield the Butterfly, but it provides incredible dexterity in combat.",
-      "zh-cn": "只有最强大最老练的战士才能携带蝴蝶，但它也提供无可比拟的战斗灵活力作为回报。",
-      "zh-tw": "只有最強大最老練的戰士才能攜帶蝴蝶，但它也提供無可比擬的戰鬥靈活力作為回報。"
+      "ru": "Only the mightiest and most experienced of warriors can wield the Butterfly, but it provides incredible dexterity in combat."
     }
   },
   "item_huiguang": {
@@ -1216,15 +993,11 @@
     },
     "names": {
       "en": "Kaya",
-      "ru": "Kaya",
-      "zh-cn": "慧光",
-      "zh-tw": "慧光"
+      "ru": "Kaya"
     },
     "descriptions": {
       "en": "Mana restoration + 25%. Magical damage +30%.",
-      "ru": "Восстановление маны + 25%. Магический урон +30%.",
-      "zh-cn": "法力获取+25%，魔法伤害+30%。",
-      "zh-tw": "法力獲取+25%，魔法傷害+30%。"
+      "ru": "Восстановление маны + 25%. Магический урон +30%."
     },
     "lore_i18n": {}
   },
@@ -1242,21 +1015,15 @@
     },
     "names": {
       "en": "Radiance",
-      "ru": "Radiance",
-      "zh-cn": "辉耀",
-      "zh-tw": "輝耀"
+      "ru": "Radiance"
     },
     "descriptions": {
       "en": "+25% Evasion.\n\nAura\nDeals 100 pure damage to surrounding enemies every 3 secs and forces them to have a 25% chance to miss the attack.",
-      "ru": "+25% уклонения.\n\nAura\nНаносит 100 чистого урона врагам в радиусе каждые 3 секунды и заставляет их с шансом в 25% промахиваться атакой.",
-      "zh-cn": "闪避+25%。\n\n光环效果\n对周围的敌人每3秒造成100点纯粹伤害并使其有25%概率攻击落空。",
-      "zh-tw": "閃避+25%。\n\n光環效果\n對周圍的敵人每3秒造成100點純粹傷害並使其有25%概率攻擊落空。"
+      "ru": "+25% уклонения.\n\nAura\nНаносит 100 чистого урона врагам в радиусе каждые 3 секунды и заставляет их с шансом в 25% промахиваться атакой."
     },
     "lore_i18n": {
       "en": "A divine weapon that causes damage and a bright burning effect that lays waste to nearby enemies.",
-      "ru": "A divine weapon that causes damage and a bright burning effect that lays waste to nearby enemies.",
-      "zh-cn": "一把神圣的武器，剑身的耀眼光芒能将敌人化为灰烬。",
-      "zh-tw": "一把神聖的武器，劍身的耀眼光芒能將敵人化為灰燼。"
+      "ru": "A divine weapon that causes damage and a bright burning effect that lays waste to nearby enemies."
     }
   },
   "item_jinghunzhiren": {
@@ -1273,21 +1040,15 @@
     },
     "names": {
       "en": "Diffusal Blade",
-      "ru": "Diffusal Blade",
-      "zh-cn": "净魂之刃",
-      "zh-tw": "凈魂之刃"
+      "ru": "Diffusal Blade"
     },
     "descriptions": {
       "en": "Attack speed + 20%.\n\nActive Ability: Instant\nPurify the attack target by removing all its synergy buffs.",
-      "ru": "Скорость атаки + 30%.\n\nАктивка: Мгновенная\nСнимает с цели атаки все её бонусы от синергий.",
-      "zh-cn": "攻击速度+30%。\n\n主动技能：立即激活\n对当前攻击目标施加净化，移除所有种族/职业增益效果。",
-      "zh-tw": "攻擊速度+30%。\n\n主動技能：立即激活\n對當前攻擊目標施加凈化，移除所有種族/職業增益效果。"
+      "ru": "Скорость атаки + 30%.\n\nАктивка: Мгновенная\nСнимает с цели атаки все её бонусы от синергий."
     },
     "lore_i18n": {
       "en": "An enchanted blade that allows the user to cut straight into the enemys soul.",
-      "ru": "An enchanted blade that allows the user to cut straight into the enemys soul.",
-      "zh-cn": "一把直接切入敌人灵魂的魔力之刃。",
-      "zh-tw": "一把直接切入敵人靈魂的魔力之刃。"
+      "ru": "An enchanted blade that allows the user to cut straight into the enemys soul."
     }
   },
   "item_jingmixie": {
@@ -1306,15 +1067,11 @@
     },
     "names": {
       "en": "Tranquil Boots",
-      "ru": "Tranquil Boots",
-      "zh-cn": "静谧鞋",
-      "zh-tw": "靜謐鞋"
+      "ru": "Tranquil Boots"
     },
     "descriptions": {
       "en": "Fast movement. Recharges 20 health for allies around per 2 seconds.",
-      "ru": "Быстрое передвижение. Восстанавливает 20 здоровья союзникам раз в 2 секунды.",
-      "zh-cn": "快速移动，携带者使范围内的友军每2秒获得20点治疗。",
-      "zh-tw": "快速移動，攜帶者使範圍內的友軍每2秒獲得20點治療。"
+      "ru": "Быстрое передвижение. Восстанавливает 20 здоровья союзникам раз в 2 секунды."
     },
     "lore_i18n": {}
   },
@@ -1332,15 +1089,11 @@
     },
     "names": {
       "en": "Monkey King Bar",
-      "ru": "Monkey King Bar",
-      "zh-cn": "金箍棒",
-      "zh-tw": "金箍棒"
+      "ru": "Monkey King Bar"
     },
     "descriptions": {
       "en": "+40% attack speed.\nAttacks pierce through evasion and deal an extra 50 magical damage.",
-      "ru": "+40% скорости атаки.\nАтаки проходят сквозь уклонение и наносят дополнительно 50 магического урона.",
-      "zh-cn": "攻击速度+40%。\n攻击无法被闪避并额外造成50点魔法伤害。",
-      "zh-tw": "攻擊速度+40%。\n攻擊無法被閃避並額外造成50點魔法傷害。"
+      "ru": "+40% скорости атаки.\nАтаки проходят сквозь уклонение и наносят дополнительно 50 магического урона."
     },
     "lore_i18n": {}
   },
@@ -1358,15 +1111,11 @@
     },
     "names": {
       "en": "Vladimirs Offering",
-      "ru": "Vladimirs Offering",
-      "zh-cn": "弗拉迪米尔的祭品",
-      "zh-tw": "弗拉迪米爾的祭品"
+      "ru": "Vladimirs Offering"
     },
     "descriptions": {
       "en": "Aura Effect\nAllied units in the surrounding area gain the effect: Lifesteal +25%.",
-      "ru": "Aura Effect\nСоюзные юниты в радиусе получают эффект: Вампиризм +25%.",
-      "zh-cn": "光环效果\n周围范围内的友军获得效果：攻击吸血+25%。",
-      "zh-tw": "光環效果\n周圍範圍內的友軍獲得效果：攻擊吸血+25%。"
+      "ru": "Aura Effect\nСоюзные юниты в радиусе получают эффект: Вампиризм +25%."
     },
     "lore_i18n": {}
   },
@@ -1381,21 +1130,15 @@
     "icon_dimensions": null,
     "names": {
       "en": "Heart of the Machine",
-      "ru": "Heart of the Machine",
-      "zh-cn": "机械之心",
-      "zh-tw": "機械之心"
+      "ru": "Heart of the Machine"
     },
     "descriptions": {
       "en": "Courier consumable: Click to use\nRefresh your recruitment panel for free.",
-      "ru": "Courier consumable: Нажмите чтобы использовать\nОбнови ролл покупки юнитов бесплатно",
-      "zh-cn": "信使消耗品：点击使用\n进行一次免费的棋子超募。",
-      "zh-tw": "信使消耗品：點擊使用\n進行一次免費的棋子超募。"
+      "ru": "Courier consumable: Нажмите чтобы использовать\nОбнови ролл покупки юнитов бесплатно"
     },
     "lore_i18n": {
       "en": "Proundly presented by Heart of the Machine.",
-      "ru": "Proundly presented by Heart of the Machine.",
-      "zh-cn": "来自：工匠的伟大发明",
-      "zh-tw": "來自：工匠的偉大發明"
+      "ru": "Proundly presented by Heart of the Machine."
     }
   },
   "item_jixiezhixin_gold": {
@@ -1409,21 +1152,15 @@
     "icon_dimensions": null,
     "names": {
       "en": "Golden Heart of the Machine",
-      "ru": "Golden Heart of the Machine",
-      "zh-cn": "金色机械之心",
-      "zh-tw": "金色機械之心"
+      "ru": "Golden Heart of the Machine"
     },
     "descriptions": {
       "en": "Courier consumable: Click to use\nDISCOVER a panel of 5 random Legendary chess pieces.",
-      "ru": "Courier consumable: Нажмите чтобы использовать\nОткройте ролл с 5 легендарными юнитами фигурами.",
-      "zh-cn": "信使消耗品：点击使用\n从五个随机传说棋子中进行一次发现。",
-      "zh-tw": "信使消耗品：點擊使用\n從五個隨機傳說棋子中進行一次發現。"
+      "ru": "Courier consumable: Нажмите чтобы использовать\nОткройте ролл с 5 легендарными юнитами фигурами."
     },
     "lore_i18n": {
       "en": "The finest product from Heart of the Machine.",
-      "ru": "The finest product from Heart of the Machine.",
-      "zh-cn": "来自：工匠的伟大发明",
-      "zh-tw": "來自：工匠的偉大發明"
+      "ru": "The finest product from Heart of the Machine."
     }
   },
   "item_jufengchangji": {
@@ -1442,21 +1179,15 @@
     },
     "names": {
       "en": "Hurricane Pike",
-      "ru": "Hurricane Pike",
-      "zh-cn": "飓风长戟",
-      "zh-tw": "颶風長戟"
+      "ru": "Hurricane Pike"
     },
     "descriptions": {
       "en": "+20% Attack speed, +200 ranged carrier‘s attack range.\n\nActive ability: Activated when there is an enemy chess piece in close proximity\nPush nearby enemy to the farthest grid in the opposite direction, and push oneself to the farthest grid. Ranged carriers will also immediately perform 4 distance-ignoring attacks on the target.",
-      "ru": "+20% Attack speed, +200 ranged carrier‘s attack range.\n\nActive ability: Activated when there is an enemy chess piece in close proximity\nPush nearby enemy to the farthest grid in the opposite direction, and push oneself to the farthest grid. Ranged carriers will also immediately perform 4 distance-ignoring attacks on the target.",
-      "zh-cn": "攻击速度+20%，远程携带者的攻击距离+200。\n\n主动技能：有近身敌方棋子时激活\n将近身敌人击退到远离自己方向最远的格子，并将自己反向击退到最远的格子。远程携带者还会立即对目标进行4次无视距离的攻击。",
-      "zh-tw": "攻擊速度+20%，遠程攜帶者的攻擊距離+200。\n\n主動技能：有近身敵方棋子時激活\n將近身敵人擊退到遠離自己方向最遠的格子，並將自己反向擊退到最遠的格子。遠程攜帶者還會立即對目標進行4次無視距離的攻擊。"
+      "ru": "+20% Attack speed, +200 ranged carrier‘s attack range.\n\nActive ability: Activated when there is an enemy chess piece in close proximity\nPush nearby enemy to the farthest grid in the opposite direction, and push oneself to the farthest grid. Ranged carriers will also immediately perform 4 distance-ignoring attacks on the target."
     },
     "lore_i18n": {
       "en": "A legendary pike once held as royal sigil of the ancient wyvern riders.",
-      "ru": "A legendary pike once held as royal sigil of the ancient wyvern riders.",
-      "zh-cn": "一柄传奇战戟，曾是远古飞龙骑士的皇家印记。",
-      "zh-tw": "一柄傳奇戰戟，曾是遠古飛龍騎士的皇家印記。"
+      "ru": "A legendary pike once held as royal sigil of the ancient wyvern riders."
     }
   },
   "item_jurenzhijie": {
@@ -1473,21 +1204,15 @@
     },
     "names": {
       "en": "Giants Ring",
-      "ru": "Giants Ring",
-      "zh-cn": "巨人之戒",
-      "zh-tw": "巨人之戒"
+      "ru": "Giants Ring"
     },
     "descriptions": {
       "en": "+30 health regeneration, +100 physical block, permanent taunt.",
-      "ru": "+30 регенерации здоровья, +100 физической блокировки, постоянный taunt(агр).",
-      "zh-cn": "魔法抗性+25%，物理格挡+100，永久嘲讽。",
-      "zh-tw": "魔法抗性+25%，物理格擋+100，永久嘲諷。"
+      "ru": "+30 регенерации здоровья, +100 физической блокировки, постоянный taunt(агр)."
     },
     "lore_i18n": {
       "en": "Prized procurement of an otherwise unremarkable ruler of Elze who abdicated his position and vanished.",
-      "ru": "Prized procurement of an otherwise unremarkable ruler of Elze who abdicated his position and vanished.",
-      "zh-cn": "出价购得的珍贵之物，卖家是厄泽王庭本来并不起眼的统治者，他放弃自己的王位后消失得无影无踪。",
-      "zh-tw": "出價購得的珍貴之物，賣家是厄澤王庭本來並不起眼的統治者，他放棄自己的王位後消失得無影無蹤。"
+      "ru": "Prized procurement of an otherwise unremarkable ruler of Elze who abdicated his position and vanished."
     }
   },
   "item_konglingguajian": {
@@ -1504,15 +1229,11 @@
     },
     "names": {
       "en": "Null Talisman",
-      "ru": "Null Talisman",
-      "zh-cn": "空灵挂件",
-      "zh-tw": "空靈掛件"
+      "ru": "Null Talisman"
     },
     "descriptions": {
       "en": "Magical damage +20%。",
-      "ru": "Магический урон +20%。",
-      "zh-cn": "魔法伤害+20%。",
-      "zh-tw": "魔法傷害+20%。"
+      "ru": "Магический урон +20%。"
     },
     "lore_i18n": {}
   },
@@ -1530,21 +1251,15 @@
     },
     "names": {
       "en": "Battle Fury",
-      "ru": "Battle Fury",
-      "zh-cn": "狂战斧",
-      "zh-tw": "狂戰斧"
+      "ru": "Battle Fury"
     },
     "descriptions": {
       "en": "+50 damage.\nMelee attacks deal 50% cleave damage in a range of 1 square.",
-      "ru": "+50 к урону.\nАтаки в ближнем бою наносят 50% урона по области в радиусе 1 клетки.",
-      "zh-cn": "攻击力+50。\n近战攻击会对1格范围内的其他敌人造成50%的溅射伤害。",
-      "zh-tw": "攻擊力+50。\n近戰攻擊會對1格範圍內的其他敵人造成50%的濺射傷害。"
+      "ru": "+50 к урону.\nАтаки в ближнем бою наносят 50% урона по области в радиусе 1 клетки."
     },
     "lore_i18n": {
       "en": "The Drodo Island Committee has banned private tree-cutting activities here, with permission granted to a small batch of contractors. This decent replica of the legendary tool is offered for entertainment purposes only.",
-      "ru": "The Drodo Island Committee has banned private tree-cutting activities here, with permission granted to a small batch of contractors. This decent replica of the legendary tool is offered for entertainment purposes only.",
-      "zh-cn": "近战不出狂战斧，不如回家卖红薯！",
-      "zh-tw": "近戰不出狂戰斧，不如回家賣紅薯！"
+      "ru": "The Drodo Island Committee has banned private tree-cutting activities here, with permission granted to a small batch of contractors. This decent replica of the legendary tool is offered for entertainment purposes only."
     }
   },
   "item_lieyingzhanren": {
@@ -1561,15 +1276,11 @@
     },
     "names": {
       "en": "Falcon Blade",
-      "ru": "Falcon Blade",
-      "zh-cn": "猎鹰战刃",
-      "zh-tw": "獵鷹戰刃"
+      "ru": "Falcon Blade"
     },
     "descriptions": {
       "en": "Attack damage +25。",
-      "ru": "Урон атаки +25。",
-      "zh-cn": "攻击力+25。",
-      "zh-tw": "攻擊力+25。"
+      "ru": "Урон атаки +25。"
     },
     "lore_i18n": {}
   },
@@ -1587,15 +1298,11 @@
     },
     "names": {
       "en": "Overwhelming Blink",
-      "ru": "Overwhelming Blink",
-      "zh-cn": "盛势闪光",
-      "zh-tw": "盛勢閃光"
+      "ru": "Overwhelming Blink"
     },
     "descriptions": {
       "en": "Active ability: Instant\nInstantly teleports off the farest square that allows it to attack an enemy. Generates 30 on activation.+ 30% HP per activation.\n\nMax Blink Distance: 800",
-      "ru": "Active ability: Instant\nInstantly teleports off the farest square that allows it to attack an enemy. Generates 30 on activation.+ 30% HP per activation.\n\nMax Blink Distance: 800",
-      "zh-cn": "主动技能：立即激活\n瞬间移动到范围内能攻击到敌人的最远的格子，并获得30点法力值，以及生命值+30%的可叠加效果。\n\n最远距离：800",
-      "zh-tw": "主動技能：立即激活\n瞬間移動到範圍內能攻擊到敵人的最遠的格子，並獲得30點法力值，以及生命值+30%的可疊加效果。\n\n最遠距離：800"
+      "ru": "Active ability: Instant\nInstantly teleports off the farest square that allows it to attack an enemy. Generates 30 on activation.+ 30% HP per activation.\n\nMax Blink Distance: 800"
     },
     "lore_i18n": {}
   },
@@ -1613,15 +1320,11 @@
     },
     "names": {
       "en": "Bracer",
-      "ru": "Bracer",
-      "zh-cn": "力量护腕",
-      "zh-tw": "力量護腕"
+      "ru": "Bracer"
     },
     "descriptions": {
       "en": "HP +300.",
-      "ru": "Здоровье +300.",
-      "zh-cn": "生命值+300。",
-      "zh-tw": "生命值+300。"
+      "ru": "Здоровье +300."
     },
     "lore_i18n": {}
   },
@@ -1639,15 +1342,11 @@
     },
     "names": {
       "en": "Bullwhip",
-      "ru": "Bullwhip",
-      "zh-cn": "凌厉长鞭",
-      "zh-tw": "淩厲長鞭"
+      "ru": "Bullwhip"
     },
     "descriptions": {
       "en": "Chess pieces summoned by the carrier gain: Attack speed +100%, duration +100%",
-      "ru": "Фигуры, призванные носителем, получают: скорость атаки +100%, продолжительность жизни +100%.",
-      "zh-cn": "携带者召唤的棋子获得效果：攻击速度+100%，持续时间+100%。",
-      "zh-tw": "攜帶者召喚的棋子獲得效果：攻擊速度+100%，持續時間+100%。"
+      "ru": "Фигуры, призванные носителем, получают: скорость атаки +100%, продолжительность жизни +100%."
     },
     "lore_i18n": {}
   },
@@ -1665,21 +1364,15 @@
     },
     "names": {
       "en": "Linkens Sphere",
-      "ru": "Linkens Sphere",
-      "zh-cn": "林肯法球",
-      "zh-tw": "林肯法球"
+      "ru": "Linkens Sphere"
     },
     "descriptions": {
       "en": "+300 health, +100% mana regeneration.\nBlocks targeted spell or item.",
-      "ru": "+300 ХП, +100% мана герен.\nБлокирует целевое заклинание или предмет.",
-      "zh-cn": "生命值+300，法力获取+100%。\n抵挡指向性法术或物品。",
-      "zh-tw": "生命值+300，法力獲取+100%。\n抵擋指向性法術或物品。"
+      "ru": "+300 ХП, +100% мана герен.\nБлокирует целевое заклинание или предмет."
     },
     "lore_i18n": {
       "en": "This magical sphere once protected one of the most famous heroes in history.",
-      "ru": "This magical sphere once protected one of the most famous heroes in history.",
-      "zh-cn": "这个有魔力的球体曾经保护了一位历史上最有名的英雄。",
-      "zh-tw": "這個有魔力的球體曾經保護了一位歷史上最有名的英雄。"
+      "ru": "This magical sphere once protected one of the most famous heroes in history."
     }
   },
   "item_longxin": {
@@ -1712,15 +1405,11 @@
     "icon_dimensions": null,
     "names": {
       "en": "Spoil Token Level 1",
-      "ru": "Жетон ур. 1",
-      "zh-cn": "战利品代币 等级1",
-      "zh-tw": "戰利品代幣 等級1"
+      "ru": "Жетон ур. 1"
     },
     "descriptions": {
       "en": "Courier consumable: Click to open\nSelect one from three random items to your inventory.",
-      "ru": "Courier consumable: Click to open\nSelect one from three random items to your inventory.",
-      "zh-cn": "信使消耗品：点击打开\n获得随机的3件当前等级的物品，你可以从中挑选1件加入你的背包。",
-      "zh-tw": "信使消耗品：點擊打開\n獲得隨機的3件當前等級的物品，你可以從中挑選1件加入你的背包。"
+      "ru": "Courier consumable: Click to open\nSelect one from three random items to your inventory."
     },
     "lore_i18n": {}
   },
@@ -1735,15 +1424,11 @@
     "icon_dimensions": null,
     "names": {
       "en": "Spoil Token Level 2",
-      "ru": "Жетон ур. 2",
-      "zh-cn": "战利品代币 等级2",
-      "zh-tw": "戰利品代幣 等級2"
+      "ru": "Жетон ур. 2"
     },
     "descriptions": {
       "en": "Courier consumable: Click to open\nSelect one from three random items to your inventory.",
-      "ru": "Courier consumable: Click to open\nSelect one from three random items to your inventory.",
-      "zh-cn": "信使消耗品：点击打开\n获得随机的3件当前等级的物品，你可以从中挑选1件加入你的背包。",
-      "zh-tw": "信使消耗品：點擊打開\n獲得隨機的3件當前等級的物品，你可以從中挑選1件加入你的背包。"
+      "ru": "Courier consumable: Click to open\nSelect one from three random items to your inventory."
     },
     "lore_i18n": {}
   },
@@ -1758,15 +1443,11 @@
     "icon_dimensions": null,
     "names": {
       "en": "Spoil Token Level 3",
-      "ru": "Жетон ур. 3",
-      "zh-cn": "战利品代币 等级3",
-      "zh-tw": "戰利品代幣 等級3"
+      "ru": "Жетон ур. 3"
     },
     "descriptions": {
       "en": "Courier consumable: Click to open\nSelect one from three random items to your inventory.",
-      "ru": "Courier consumable: Click to open\nSelect one from three random items to your inventory.",
-      "zh-cn": "信使消耗品：点击打开\n获得随机的3件当前等级的物品，你可以从中挑选1件加入你的背包。",
-      "zh-tw": "信使消耗品：點擊打開\n獲得隨機的3件當前等級的物品，你可以從中挑選1件加入你的背包。"
+      "ru": "Courier consumable: Click to open\nSelect one from three random items to your inventory."
     },
     "lore_i18n": {}
   },
@@ -1781,15 +1462,11 @@
     "icon_dimensions": null,
     "names": {
       "en": "Spoil Token Level 4",
-      "ru": "Жетон ур. 4",
-      "zh-cn": "战利品代币 等级4",
-      "zh-tw": "戰利品代幣 等級4"
+      "ru": "Жетон ур. 4"
     },
     "descriptions": {
       "en": "Courier consumable: Click to open\nSelect one from three random items to your inventory.",
-      "ru": "Courier consumable: Click to open\nSelect one from three random items to your inventory.",
-      "zh-cn": "信使消耗品：点击打开\n获得随机的3件当前等级的物品，你可以从中挑选1件加入你的背包。",
-      "zh-tw": "信使消耗品：點擊打開\n獲得隨機的3件當前等級的物品，你可以從中挑選1件加入你的背包。"
+      "ru": "Courier consumable: Click to open\nSelect one from three random items to your inventory."
     },
     "lore_i18n": {}
   },
@@ -1804,15 +1481,11 @@
     "icon_dimensions": null,
     "names": {
       "en": "Spoil Token Level 5",
-      "ru": "Жетон ур. 5",
-      "zh-cn": "战利品代币 等级5",
-      "zh-tw": "戰利品代幣 等級5"
+      "ru": "Жетон ур. 5"
     },
     "descriptions": {
       "en": "Courier consumable: Click to open\nSelect one from three random items to your inventory.",
-      "ru": "Courier consumable: Click to open\nSelect one from three random items to your inventory.",
-      "zh-cn": "信使消耗品：点击打开\n获得随机的3件当前等级的物品，你可以从中挑选1件加入你的背包。",
-      "zh-tw": "信使消耗品：點擊打開\n獲得隨機的3件當前等級的物品，你可以從中挑選1件加入你的背包。"
+      "ru": "Courier consumable: Click to open\nSelect one from three random items to your inventory."
     },
     "lore_i18n": {}
   },
@@ -1834,21 +1507,15 @@
     },
     "names": {
       "en": "Magic box",
-      "ru": "Magic box",
-      "zh-cn": "魔术箱",
-      "zh-tw": "魔術箱"
+      "ru": "Magic box"
     },
     "descriptions": {
       "en": "Packs an ally piece, at the beginning of next round, transforms it into a randon new piece of the same Level and Rank. 12 times available.",
-      "ru": "Упаковывает союзную фигуру, и в начале следующего раунда превращает её в случайную фигуру того же уровня и ранга. Доступно 12 зарядов.",
-      "zh-cn": "圣物消耗品：点击使用\n指定一个等待席上的友方棋子，在下一回合开始时将它们变成同等级同星的其他棋子。可以使用12次。",
-      "zh-tw": "聖物消耗品：點擊使用\n指定一個等待席上的友方棋子，在下一回合開始時將它們變成同等級同星的其他棋子。可以使用12次。"
+      "ru": "Упаковывает союзную фигуру, и в начале следующего раунда превращает её в случайную фигуру того же уровня и ранга. Доступно 12 зарядов."
     },
     "lore_i18n": {
       "en": "From: Relicbox",
-      "ru": "From: Relicbox",
-      "zh-cn": "来自：圣物宝箱",
-      "zh-tw": "來自：聖物寶箱"
+      "ru": "From: Relicbox"
     }
   },
   "item_magic_card": {
@@ -1862,9 +1529,7 @@
     "icon_dimensions": null,
     "names": {
       "en": "Magic Card",
-      "ru": "Magic Card",
-      "zh-cn": "魔术卡牌",
-      "zh-tw": "魔術卡牌"
+      "ru": "Magic Card"
     },
     "descriptions": {
       "en": "Courier Consumable: Click to use\nPerform a free recruitment to recruit chess pieces from the line up of the last opponent you lost to.",
@@ -1872,9 +1537,7 @@
     },
     "lore_i18n": {
       "en": "From Rambling Fatebender",
-      "ru": "From Rambling Fatebender",
-      "zh-cn": "来自：大魔导师的袖里乾坤",
-      "zh-tw": "來自：大魔導師的袖裏乾坤"
+      "ru": "From Rambling Fatebender"
     }
   },
   "item_malefic_rapture": {
@@ -1888,21 +1551,15 @@
     "icon_dimensions": null,
     "names": {
       "en": "Malefic Rapture",
-      "ru": "Malefic Rapture",
-      "zh-cn": "灾难狂欢",
-      "zh-tw": "災難狂歡"
+      "ru": "Malefic Rapture"
     },
     "descriptions": {
       "en": "When your courier takes damage, you immediately gain the corresponding (damage taken) amount of experience.",
-      "ru": "Когда ваш курьер получает урон, вы сразу получаете опыт, соответствующий полученному урону.",
-      "zh-cn": "当你的信使受到伤害时，立即获得（受到的伤害）点经验值。",
-      "zh-tw": "當你的信使受到傷害時，立即獲得（受到的傷害）點經驗值。"
+      "ru": "Когда ваш курьер получает урон, вы сразу получаете опыт, соответствующий полученному урону."
     },
     "lore_i18n": {
       "en": "From Relic Box",
-      "ru": "From Relic Box",
-      "zh-cn": "来自：圣物宝箱",
-      "zh-tw": "來自：聖物寶箱"
+      "ru": "From Relic Box"
     }
   },
   "item_mangguo": {
@@ -1919,21 +1576,15 @@
     },
     "names": {
       "en": "Enchanted Mango",
-      "ru": "Enchanted Mango",
-      "zh-cn": "魔法芒果",
-      "zh-tw": "魔法芒果"
+      "ru": "Enchanted Mango"
     },
     "descriptions": {
       "en": "Consumable: Click to use\nRandomly grants Gold and Courier XP up to currnet Courier level.",
-      "ru": "Расходуемый: Нажмите, чтобы использовать\nРандомно даёт золото и опыт курьера до текущего уровня курьера.",
-      "zh-cn": "信使消耗品：点击食用\n为你的信使随机获得（1～信使当前等级）的金币和经验值。",
-      "zh-tw": "信使消耗品：點擊食用\n為你的信使隨機獲得（1～信使當前等級）的金幣和經驗值。"
+      "ru": "Расходуемый: Нажмите, чтобы использовать\nРандомно даёт золото и опыт курьера до текущего уровня курьера."
     },
     "lore_i18n": {
       "en": "From: Mango Tree",
-      "ru": "From: Mango Tree",
-      "zh-cn": "来自：芒果树",
-      "zh-tw": "來自：芒果樹"
+      "ru": "From: Mango Tree"
     }
   },
   "item_mangotree": {
@@ -1950,21 +1601,15 @@
     },
     "names": {
       "en": "Mango Tree",
-      "ru": "Mango Tree",
-      "zh-cn": "芒果树",
-      "zh-tw": "芒果樹"
+      "ru": "Mango Tree"
     },
     "descriptions": {
       "en": "Plants a Mango Tree by the side of your Chessboard.\nDrops an Enchanted Mango whenever your home battle result differs from the last round. The tree wilts after 8 drops. A Golden Mango will be dropped if the mango tree is still alive at Relic expiration.",
-      "ru": "Сажает Дерево Манго у Вашей доски.\nДает зачарованное манго всегда, когда результат вашей домашней битвы отличается от предыдущей. Дерево увядает после 8 выпаданий. Золотое Манго выпадет, если манговое дерево все еще будет живым по истечении срока действия реликвии.",
-      "zh-cn": "在你的棋盘旁边种植一棵芒果树。\n每当你主场的战斗结果和上一回合不同，就会掉落1个魔法芒果，累计掉落8个后芒果树会枯萎。圣物消失时还存在的芒果树将转换为1个金色魔法芒果。",
-      "zh-tw": "在你的棋盤旁邊種植一棵芒果樹。\n每當你主場的戰鬥結果和上一回合不同，就會掉落1個魔法芒果，累計掉落8個後芒果樹會枯萎。聖物消失時還存在的芒果樹將轉換為1個金色魔法芒果。"
+      "ru": "Сажает Дерево Манго у Вашей доски.\nДает зачарованное манго всегда, когда результат вашей домашней битвы отличается от предыдущей. Дерево увядает после 8 выпаданий. Золотое Манго выпадет, если манговое дерево все еще будет живым по истечении срока действия реликвии."
     },
     "lore_i18n": {
       "en": "From Relicbox",
-      "ru": "From Relicbox",
-      "zh-cn": "来自：圣物宝箱",
-      "zh-tw": "來自：聖物寶箱"
+      "ru": "From Relicbox"
     }
   },
   "item_meiken": {
@@ -1981,21 +1626,15 @@
     },
     "names": {
       "en": "Mekansm",
-      "ru": "Mekansm",
-      "zh-cn": "梅肯斯姆",
-      "zh-tw": "梅肯斯姆"
+      "ru": "Mekansm"
     },
     "descriptions": {
       "en": "Active ability: Activate when most allies are wounded\nHeals 500 health to all allied units within the range. \n\nRange:400",
-      "ru": "Active ability: Activate when most allies are wounded\nИсцеляет 500 здоровья всем союзным юнитам в радиусе.",
-      "zh-cn": "主动技能：友方棋子有较多受伤时激活\n范围内所有友军获得500点治疗。",
-      "zh-tw": "主動技能：友方棋子有較多受傷時激活\n範圍內所有友軍獲得500點治療。"
+      "ru": "Active ability: Activate when most allies are wounded\nИсцеляет 500 здоровья всем союзным юнитам в радиусе."
     },
     "lore_i18n": {
       "en": "A glowing jewel formed out of assorted parts that somehow fit together perfectly.",
-      "ru": "A glowing jewel formed out of assorted parts that somehow fit together perfectly.",
-      "zh-cn": "各种散件不知是怎样完美地组合起来，形成的散发着光芒的珠宝。",
-      "zh-tw": "各種散件不知是怎樣完美地組合起來，形成的散發著光芒的珠寶。"
+      "ru": "A glowing jewel formed out of assorted parts that somehow fit together perfectly."
     }
   },
   "item_minglingshu": {
@@ -2014,21 +1653,15 @@
     },
     "names": {
       "en": "Necronomicon",
-      "ru": "Necronomicon",
-      "zh-cn": "死灵书",
-      "zh-tw": "死靈書"
+      "ru": "Necronomicon"
     },
     "descriptions": {
       "en": "Summons 2 necro creeps",
-      "ru": "Призывает 2 некро-крипа. Удваивает кол-во призываемых юнитов.",
-      "zh-cn": "使你的召唤物获得效果：召唤数量+1。\n\n主动技能：立即激活\n召唤2个死灵士兵为你战斗。",
-      "zh-tw": "使你的召喚物獲得效果：召喚數量+1。\n\n主動技能：立即激活\n召喚2個死靈士兵為你戰鬥。"
+      "ru": "Призывает 2 некро-крипа. Удваивает кол-во призываемых юнитов."
     },
     "lore_i18n": {
       "en": "A record of the final reckoning. With one page torn out.",
-      "ru": "A record of the final reckoning. With one page torn out.",
-      "zh-cn": "记载着最终之战，其中的一页被人撕下。",
-      "zh-tw": "記載著最終之戰，其中的一頁被人撕下。"
+      "ru": "A record of the final reckoning. With one page torn out."
     }
   },
   "item_minjiedatiaodao": {
@@ -2045,15 +1678,11 @@
     },
     "names": {
       "en": "Swift Blink",
-      "ru": "Swift Blink",
-      "zh-cn": "迅疾闪光",
-      "zh-tw": "迅疾閃光"
+      "ru": "Swift Blink"
     },
     "descriptions": {
       "en": "Active ability: Instant Cast\nInstantly move to the farthest grid within the range that can attack the enemy, gain 30 mana, and a stackable effect of +20% attack speed.\n\nmaximum distance: 800",
-      "ru": "Active ability: Instant Cast\nInstantly move to the farthest grid within the range that can attack the enemy, gain 30 mana, and a stackable effect of +20% attack speed.\n\nmaximum distance: 800",
-      "zh-cn": "主动技能：立即激活\n瞬间移动到范围内能攻击到敌人的最远的格子，并获得30点法力值，以及攻击速度+20%的可叠加效果。\n\n最远距离：800",
-      "zh-tw": "主動技能：立即激活\n瞬間移動到範圍內能攻擊到敵人的最遠的格子，並獲得30點法力值，以及攻擊速度+20%的可疊加效果。\n\n最遠距離：800"
+      "ru": "Active ability: Instant Cast\nInstantly move to the farthest grid within the range that can attack the enemy, gain 30 mana, and a stackable effect of +20% attack speed.\n\nmaximum distance: 800"
     },
     "lore_i18n": {}
   },
@@ -2089,15 +1718,11 @@
     "icon_dimensions": null,
     "names": {
       "en": "A Bag of Coins",
-      "ru": "A Bag of Coins",
-      "zh-cn": "一袋金币",
-      "zh-tw": "一袋金幣"
+      "ru": "A Bag of Coins"
     },
     "descriptions": {
       "en": "Courier consumable: Activate on pick up\nGrants some Gold.",
-      "ru": "Courier consumable: Activate on pick up\nGrants some Gold.",
-      "zh-cn": "信使消耗品：拾取激活\n获得一定数量的金币。",
-      "zh-tw": "信使消耗品：拾取激活\n獲得一定數量的金幣。"
+      "ru": "Courier consumable: Activate on pick up\nGrants some Gold."
     },
     "lore_i18n": {}
   },
@@ -2115,15 +1740,11 @@
     },
     "names": {
       "en": "Bottle",
-      "ru": "Bottle",
-      "zh-cn": "魔瓶",
-      "zh-tw": "魔瓶"
+      "ru": "Bottle"
     },
     "descriptions": {
       "en": "MP +50.",
-      "ru": "Мана +50.",
-      "zh-cn": "法力值+50。",
-      "zh-tw": "法力值+50。"
+      "ru": "Мана +50."
     },
     "lore_i18n": {}
   },
@@ -2141,15 +1762,11 @@
     },
     "names": {
       "en": "Bottle",
-      "ru": "Bottle",
-      "zh-cn": "魔瓶",
-      "zh-tw": "魔瓶"
+      "ru": "Bottle"
     },
     "descriptions": {
       "en": "MP +50.",
-      "ru": "Мана +50.",
-      "zh-cn": "法力值+50。",
-      "zh-tw": "法力值+50。"
+      "ru": "Мана +50."
     },
     "lore_i18n": {}
   },
@@ -2164,21 +1781,15 @@
     "icon_dimensions": null,
     "names": {
       "en": "March of The Beasts",
-      "ru": "March of The Beasts",
-      "zh-cn": "百兽大游行",
-      "zh-tw": "百獸大遊行"
+      "ru": "March of The Beasts"
     },
     "descriptions": {
       "en": "All creeps duplicate themselves and counted as level +1.",
-      "ru": "Все крипы удваиваются и считаются на один уровень выше.",
-      "zh-cn": "你在战利品回合迎战的野怪数量×2，并且视为等级+1。",
-      "zh-tw": "你在戰利品回合迎戰的野怪數量×2，並且視為等級+1。"
+      "ru": "Все крипы удваиваются и считаются на один уровень выше."
     },
     "lore_i18n": {
       "en": "From Relic Box",
-      "ru": "From Relic Box",
-      "zh-cn": "来自：圣物宝箱",
-      "zh-tw": "來自：聖物寶箱"
+      "ru": "From Relic Box"
     }
   },
   "item_null": {
@@ -2192,15 +1803,11 @@
     "icon_dimensions": null,
     "names": {
       "en": "UNAVAILABLE",
-      "ru": "UNAVAILABLE",
-      "zh-cn": "占位符",
-      "zh-tw": "占位符"
+      "ru": "UNAVAILABLE"
     },
     "descriptions": {
       "en": "This item slot is unavailable.",
-      "ru": "This item slot is unavailable.",
-      "zh-cn": "这个物品栏位不可使用。",
-      "zh-tw": "這個物品欄位不可使用。"
+      "ru": "This item slot is unavailable."
     },
     "lore_i18n": {}
   },
@@ -2217,21 +1824,15 @@
     "icon_dimensions": null,
     "names": {
       "en": "Golden Enchanted Mango",
-      "ru": "Golden Enchanted Mango",
-      "zh-cn": "金色魔法芒果",
-      "zh-tw": "金色魔法芒果"
+      "ru": "Golden Enchanted Mango"
     },
     "descriptions": {
       "en": "Courier consumable: Activate when taking fatal damage\nConsumes 1 charge of Golden Enchanted Mango and protects your Courier from fatal damage for this round.",
-      "ru": "Потребляемый предмет курьера: активируется при получении фатального урона.\nПотребляет 1 заряд Золотого Зачарованного Манго и защищает вашего курьера от фатального урона в этом раунде.",
-      "zh-cn": "信使消耗品：受到致死伤害时自动激活\n消耗一个金色魔法芒果，使你的信使本回合免疫致死伤害。",
-      "zh-tw": "信使消耗品：受到致死傷害時自動激活\n消耗一個金色魔法芒果，使你的信使本回合免疫致死傷害。"
+      "ru": "Потребляемый предмет курьера: активируется при получении фатального урона.\nПотребляет 1 заряд Золотого Зачарованного Манго и защищает вашего курьера от фатального урона в этом раунде."
     },
     "lore_i18n": {
       "en": "From: Mango Tree",
-      "ru": "From: Mango Tree",
-      "zh-cn": "来自：芒果树",
-      "zh-tw": "來自：芒果樹"
+      "ru": "From: Mango Tree"
     }
   },
   "item_qiangxi": {
@@ -2248,15 +1849,11 @@
     },
     "names": {
       "en": "Assault Cuirass",
-      "ru": "Assault Cuirass",
-      "zh-cn": "强袭胸甲",
-      "zh-tw": "強襲胸甲"
+      "ru": "Assault Cuirass"
     },
     "descriptions": {
       "en": "+15 Armor.+20 Attack speed.\n\nAura\nGrants +10 armor to allies nearby.\nEnemies nearby suffer -10 armor.",
-      "ru": "+15 брони. +20 скорости атаки.\n\nАура\nДаёт +10 брони союзникам поблизости.\nВраги поблизости теряют -10 брони.",
-      "zh-cn": "护甲+15，攻击速度+20%。\n\n光环效果\n周围友军护甲+10。\n周围敌军护甲-10。",
-      "zh-tw": "護甲+15，攻擊速度+20%。\n\n光環效果\n周圍友軍護甲+10。\n周圍敵軍護甲-10。"
+      "ru": "+15 брони. +20 скорости атаки.\n\nАура\nДаёт +10 брони союзникам поблизости.\nВраги поблизости теряют -10 брони."
     },
     "lore_i18n": {}
   },
@@ -2274,15 +1871,11 @@
     },
     "names": {
       "en": "Princes Knife",
-      "ru": "Princes Knife",
-      "zh-cn": "亲王短刀",
-      "zh-tw": "親王短刀"
+      "ru": "Princes Knife"
     },
     "descriptions": {
       "en": "Damage +25。\nThe carrier deals increased damage to enemy chess pieces of the same species/class +50%。",
-      "ru": "Урон+25。\nНоситель наносит увеличенный урон враждебным фигурам той же расы/класса на 50%.",
-      "zh-cn": "攻击力+25。\n携带者对同种族/职业的敌方棋子造成的伤害+50%。",
-      "zh-tw": "攻擊力+25。\n攜帶者對同種族/職業的敵方棋子造成的傷害+50%。"
+      "ru": "Урон+25。\nНоситель наносит увеличенный урон враждебным фигурам той же расы/класса на 50%."
     },
     "lore_i18n": {}
   },
@@ -2322,21 +1915,15 @@
     },
     "names": {
       "en": "Paladin Sword",
-      "ru": "Paladin Sword",
-      "zh-cn": "骑士剑",
-      "zh-tw": "騎士劍"
+      "ru": "Paladin Sword"
     },
     "descriptions": {
       "en": "Damage +25, Lifesteal + 20%.\nCarrier deals +50% damage to Undead and Demon pieces.",
-      "ru": "Урон +25, Вампиризм + 20%.\nВладелец наносит на 50% больше урона нежити и демонам.",
-      "zh-cn": "攻击力+25，攻击吸血+25%。\n携带者对恶魔和亡灵造成的伤害+50%。",
-      "zh-tw": "攻擊力+25，攻擊吸血+25%。\n攜帶者對惡魔和亡靈造成的傷害+50%。"
+      "ru": "Урон +25, Вампиризм + 20%.\nВладелец наносит на 50% больше урона нежити и демонам."
     },
     "lore_i18n": {
       "en": "A legendary Sword owned by a divine Paladin before he was exiled.",
-      "ru": "Легендарный меч, принадлежавший божественному Палладину Мигелю до его изгнания.",
-      "zh-cn": "这把徽记之剑曾为一代传奇——高斯瑞的伊荷斯修士所有，后来他遭到排挤被逐出教会时长剑也失去了剑鞘。",
-      "zh-tw": "這把徽記之劍曾為一代傳奇——高斯瑞的伊荷斯修士所有，後來他遭到排擠被逐出教會時長劍也失去了劍鞘。"
+      "ru": "Легендарный меч, принадлежавший божественному Палладину Мигелю до его изгнания."
     }
   },
   "item_rank_damage": {
@@ -2355,15 +1942,11 @@
     },
     "names": {
       "en": "Defiant Shell",
-      "ru": "Defiant Shell",
-      "zh-cn": "不羁甲壳",
-      "zh-tw": "不羈甲殼"
+      "ru": "Defiant Shell"
     },
     "descriptions": {
       "en": "Reduces damage taken from home defeats or increases damage dealt in away-home victories by your (current rank + 1)",
-      "ru": "Уменьшает урон, получаемый при домашних поражениях, или увеличивает урон, наносимый при выездных победах на Позицию в игре+1 (по здоровью)",
-      "zh-cn": "根据你的（当前排名+1），降低主场战败受到的伤害和提高客场战胜造成的伤害。",
-      "zh-tw": "根據你的信使已損失的生命值，主場戰敗受到的傷害減少（1~10）點，客場戰勝造成的傷害提高（1~10）點。"
+      "ru": "Уменьшает урон, получаемый при домашних поражениях, или увеличивает урон, наносимый при выездных победах на Позицию в игре+1 (по здоровью)"
     },
     "lore_i18n": {}
   },
@@ -2384,21 +1967,15 @@
     },
     "names": {
       "en": "Relicbox",
-      "ru": "Сокровищница",
-      "zh-cn": "圣物宝箱",
-      "zh-tw": "聖物寶箱"
+      "ru": "Сокровищница"
     },
     "descriptions": {
       "en": "Courier consumable: Click to open\nSelect one from three random relics to your inventory.",
-      "ru": "Courier consumable: Click to open\nВыберите одну из трёх случайных реликвий.",
-      "zh-cn": "信使消耗品：点击打开\n获得随机的3件圣物，你可以从中挑选1件加入你的背包。",
-      "zh-tw": "信使消耗品：點擊打開\n獲得隨機的3件聖物，你可以從中挑選1件加入你的背包。"
+      "ru": "Courier consumable: Click to open\nВыберите одну из трёх случайных реликвий."
     },
     "lore_i18n": {
       "en": "Long long ago, a dragon appeared and took away all relic treasures...",
-      "ru": "Long long ago, a dragon appeared and took away all relic treasures...",
-      "zh-cn": "很久很久以前，巨龙突然出现，带来灾难带走了圣物又消失不见...",
-      "zh-tw": "很久很久以前，巨龍突然出現，帶來災難帶走了聖物又消失不見..."
+      "ru": "Long long ago, a dragon appeared and took away all relic treasures..."
     }
   },
   "item_rengu": {
@@ -2415,15 +1992,11 @@
     },
     "names": {
       "en": "Drum of Endurance",
-      "ru": "Drum of Endurance",
-      "zh-cn": "韧鼓",
-      "zh-tw": "韌鼓"
+      "ru": "Drum of Endurance"
     },
     "descriptions": {
       "en": "Aura Effect\nAllied units in the surrounding area gain the effect: Attack speed +35%.",
-      "ru": "Aura Effect\nСоюзные юниты в радиусе получают эффект: Скорость атаки +35%.",
-      "zh-cn": "光环效果\n周围范围内的友军获得效果：攻击速度+35%。",
-      "zh-tw": "光環效果\n周圍範圍內的友軍獲得效果：攻擊速度+35%。"
+      "ru": "Aura Effect\nСоюзные юниты в радиусе получают эффект: Скорость атаки +35%."
     },
     "lore_i18n": {}
   },
@@ -2441,15 +2014,11 @@
     },
     "names": {
       "en": "Blade Mail",
-      "ru": "Blade Mail",
-      "zh-cn": "刃甲",
-      "zh-tw": "刃甲"
+      "ru": "Blade Mail"
     },
     "descriptions": {
       "en": "+5 armor.\n\nActive ability: Activates when taking damage\nDuplicates 50% of the damage taken back to the unit that dealt the damage for 7 sec.",
-      "ru": "+5 брони.\n\nActive ability: Активируется когда получает урон\nВозвращает 50% полученного урона в юнита нанесшего урон в течении 7 секунд.",
-      "zh-cn": "护甲+5。\n\n主动技能：受伤时激活\n开启尖刺，将受到的所有伤害反弹为50%的纯粹伤害，持续7秒。",
-      "zh-tw": "護甲+5。\n\n主動技能：受傷時激活\n開啟尖刺，將受到的所有傷害反彈為50%的純粹傷害，持續7秒。"
+      "ru": "+5 брони.\n\nActive ability: Активируется когда получает урон\nВозвращает 50% полученного урона в юнита нанесшего урон в течении 7 секунд."
     },
     "lore_i18n": {}
   },
@@ -2467,21 +2036,15 @@
     "icon_dimensions": null,
     "names": {
       "en": "Time-Space Replica",
-      "ru": "Time-Space Replica",
-      "zh-cn": "复刻时空",
-      "zh-tw": "復刻時空"
+      "ru": "Time-Space Replica"
     },
     "descriptions": {
       "en": "Replicate your last relic.",
-      "ru": "Повторите свою прошлую реликвию.",
-      "zh-cn": "重复使用你的上一个圣物。",
-      "zh-tw": "重復使用你的上一個聖物。"
+      "ru": "Повторите свою прошлую реликвию."
     },
     "lore_i18n": {
       "en": "From: Relicbox",
-      "ru": "From: Relicbox",
-      "zh-cn": "来自：圣物宝箱",
-      "zh-tw": "來自：聖物寶箱"
+      "ru": "From: Relicbox"
     }
   },
   "item_rm_token": {
@@ -2495,21 +2058,15 @@
     "icon_dimensions": null,
     "names": {
       "en": "Wheel of Wonder Token",
-      "ru": "Wheel of Wonder Token",
-      "zh-cn": "奇观轮代币",
-      "zh-tw": "奇觀輪代幣"
+      "ru": "Wheel of Wonder Token"
     },
     "descriptions": {
       "en": "A special Token for recruiting Discovered pieces, granted by Wheel of Wonder.",
-      "ru": "Специальный токен для набора открытых фигур, предоставляемый Колесом Чудес.",
-      "zh-cn": "一种特殊的代币，可以用来发现奇观轮招募到的特殊棋子。",
-      "zh-tw": "一種特殊的代幣，可以用來發現奇觀輪招募到的特殊棋子。"
+      "ru": "Специальный токен для набора открытых фигур, предоставляемый Колесом Чудес."
     },
     "lore_i18n": {
       "en": "From: Wheel of Wonder",
-      "ru": "From: Wheel of Wonder",
-      "zh-cn": "来自：奇观轮",
-      "zh-tw": "來自：奇觀輪"
+      "ru": "From: Wheel of Wonder"
     }
   },
   "item_rm_wheel_of_wonder": {
@@ -2525,21 +2082,15 @@
     "icon_dimensions": null,
     "names": {
       "en": "Wheel of Wonder",
-      "ru": "Wheel of Wonder",
-      "zh-cn": "奇观轮",
-      "zh-tw": "奇觀輪"
+      "ru": "Wheel of Wonder"
     },
     "descriptions": {
       "en": "Relic Consumable: Click to Use\nChoose an ally piece and put it into the wheel of wonder, DISCOVER a special version of it with an extra random synergy.",
-      "ru": "Нажмите для использования\nВыберите союзную фигуру и откройте уникальную версию с дополнительной случайной синергией.",
-      "zh-cn": "圣物消耗品：点击使用\n指定一个友方棋子投入奇观轮，从它的五个获得额外种族或职业的同名棋子中进行一次发现。",
-      "zh-tw": "聖物消耗品：點擊使用\n指定一個友方棋子投入奇觀輪，從它的五個獲得額外種族或職業的同名棋子中進行一次發現。"
+      "ru": "Нажмите для использования\nВыберите союзную фигуру и откройте уникальную версию с дополнительной случайной синергией."
     },
     "lore_i18n": {
       "en": "From: Relicbox",
-      "ru": "From: Relicbox",
-      "zh-cn": "来自：圣物宝箱",
-      "zh-tw": "來自：聖物寶箱"
+      "ru": "From: Relicbox"
     }
   },
   "item_sadan": {
@@ -2556,21 +2107,15 @@
     },
     "names": {
       "en": "Satanic",
-      "ru": "Satanic",
-      "zh-cn": "撒旦之邪力",
-      "zh-tw": "撒旦之邪力"
+      "ru": "Satanic"
     },
     "descriptions": {
       "en": "+600HP, +50% lifesteal.\n\nActive ability: Activates when taking damage\nGains +150% Lifesteal for 6 sec.",
-      "ru": "+600HP, +50% вампиризма.\n\nАктивируется при получении урона\nПолучает +150% вампиризма на 6 секунд.",
-      "zh-cn": "生命值+600，攻击吸血+50%。\n\n主动技能：受伤时激活\n在6秒内+150%吸血。",
-      "zh-tw": "生命值+600，攻擊吸血+50%。\n\n主動技能：受傷時激活\n在6秒內+150%吸血。"
+      "ru": "+600HP, +50% вампиризма.\n\nАктивируется при получении урона\nПолучает +150% вампиризма на 6 секунд."
     },
     "lore_i18n": {
       "en": "Immense power at the cost of your soul.",
-      "ru": "Immense power at the cost of your soul.",
-      "zh-cn": "无穷的力量，需要你付出灵魂作为代价。",
-      "zh-tw": "無窮的力量，需要你付出靈魂作為代價。"
+      "ru": "Immense power at the cost of your soul."
     }
   },
   "item_sanchaji": {
@@ -2587,15 +2132,11 @@
     },
     "names": {
       "en": "Trident",
-      "ru": "Trident",
-      "zh-cn": "三叉戟",
-      "zh-tw": "三叉戟"
+      "ru": "Trident"
     },
     "descriptions": {
       "en": "Attack damage +25.\nDeals each 50% additional damage to at most 2 same-name pieces.",
-      "ru": "Урон от атаки +25.\nНаносит по 50% дополнительного урона максимум двум фигурам с одинаковым именем.",
-      "zh-cn": "攻击力+25。\n同时对最多2个伤害目标的同名棋子造成50%的伤害。",
-      "zh-tw": "攻擊力+25。\n同時對最多2個傷害目標的同名棋子造成50%的傷害。"
+      "ru": "Урон от атаки +25.\nНаносит по 50% дополнительного урона максимум двум фигурам с одинаковым именем."
     },
     "lore_i18n": {}
   },
@@ -2610,21 +2151,15 @@
     "icon_dimensions": null,
     "names": {
       "en": "Second Chance",
-      "ru": "Second Chance",
-      "zh-cn": "第二次机会",
-      "zh-tw": "第二次機會"
+      "ru": "Second Chance"
     },
     "descriptions": {
       "en": "When you use consumable items of the choice category, you can refresh the selection panel and acquire different options.",
-      "ru": "Позволяет обновить выбор в сундуке - вместо случайного предмета вы снова получаете 3 новых варианта на выбор.",
-      "zh-cn": "当你使用选项类消耗性物品，或每回合开始自动招募棋子时有机会刷新一次选项面板，获取其他的选择。",
-      "zh-tw": "當你使用選項類消耗性物品，或每回合開始自動招募棋子時有機會刷新一次選項面板，獲取其他的選擇。"
+      "ru": "Позволяет обновить выбор в сундуке - вместо случайного предмета вы снова получаете 3 новых варианта на выбор."
     },
     "lore_i18n": {
       "en": "From Relicbox",
-      "ru": "From Relicbox",
-      "zh-cn": "来自：圣物宝箱",
-      "zh-tw": "來自：聖物寶箱"
+      "ru": "From Relicbox"
     }
   },
   "item_shanbihufu": {
@@ -2663,21 +2198,15 @@
     },
     "names": {
       "en": "Rapier",
-      "ru": "Rapier",
-      "zh-cn": "圣剑",
-      "zh-tw": "聖劍"
+      "ru": "Rapier"
     },
     "descriptions": {
       "en": "Basic Attack Damage: +350, Skill Damage: +25%.\n If defeated on home battle and the courier takes damage, it drops to a random other player. Cannot be reforged.",
-      "ru": "Урон от базовой атаки: +350, урон от навыков: +25%.\n Если курьер получает урон при поражении на домашнем поле, он передается случайному игроку. Перековке не подлежит.",
-      "zh-cn": "基础攻击力+350，技能伤害+25%。\n如果主场战败且信使受到伤害，则会掉落给一个随机其他玩家。不可被重铸。",
-      "zh-tw": "基礎攻擊力+350，技能傷害+25%。\n如果主場戰敗且信使受到傷害，則會掉落給一個隨機其他玩家。不可被重鑄。"
+      "ru": "Урон от базовой атаки: +350, урон от навыков: +25%.\n Если курьер получает урон при поражении на домашнем поле, он передается случайному игроку. Перековке не подлежит."
     },
     "lore_i18n": {
       "en": "So powerful, it cannot have a single owner.",
-      "ru": "So powerful, it cannot have a single owner.",
-      "zh-cn": "它强横无匹，并不满足于侍奉唯一的主人。",
-      "zh-tw": "它強橫無匹，並不滿足於侍奉唯一的主人。"
+      "ru": "So powerful, it cannot have a single owner."
     }
   },
   "item_shenjingdun": {
@@ -2694,15 +2223,11 @@
     },
     "names": {
       "en": "Mirror Shield",
-      "ru": "Mirror Shield",
-      "zh-cn": "神镜盾",
-      "zh-tw": "神鏡盾"
+      "ru": "Mirror Shield"
     },
     "descriptions": {
       "en": "Physical Block +60. \n50% probability of rebounding all damage and directional spells taken.",
-      "ru": "Блокировка физического урона +60. \n50% шанс отразить весь получаемый урон и направленные заклинания.",
-      "zh-cn": "物理格挡+60。\n50%概率反弹受到的所有伤害和指向性法术。",
-      "zh-tw": "物理格擋+60。\n50%概率反彈受到的所有傷害和指向性法術。"
+      "ru": "Блокировка физического урона +60. \n50% шанс отразить весь получаемый урон и направленные заклинания."
     },
     "lore_i18n": {}
   },
@@ -2722,21 +2247,15 @@
     },
     "names": {
       "en": "Ogre Hood",
-      "ru": "Ogre Hood",
-      "zh-cn": "食人魔之帽",
-      "zh-tw": "食人魔之帽"
+      "ru": "Ogre Hood"
     },
     "descriptions": {
       "en": "+900 HP, +25% magical resistance.\nThe carrier also counts as\nOgre and +2 level.",
-      "ru": "HP +900, +25% сопротивления магии.\nНоситель также становится\nOgre и получает +2 уровня.",
-      "zh-cn": "生命值+900，魔法抗性+25%。\n携带者视为+2等级的\n食人魔。",
-      "zh-tw": "生命值+900，魔法抗性+25%。\n攜帶者視為+2等級的\n食人魔。"
+      "ru": "HP +900, +25% сопротивления магии.\nНоситель также становится\nOgre и получает +2 уровня."
     },
     "lore_i18n": {
       "en": "Not only one Ogre knows what proper strength is.",
-      "ru": "Not only one Ogre knows what proper strength is.",
-      "zh-cn": "不是只有古加尔一人知道怎样才能强大。",
-      "zh-tw": "不是只有古加爾一人知道怎樣才能強大。"
+      "ru": "Not only one Ogre knows what proper strength is."
     }
   },
   "item_shuaxinqiu": {
@@ -2753,21 +2272,15 @@
     },
     "names": {
       "en": "Refresher Orb",
-      "ru": "Refresher Orb",
-      "zh-cn": "刷新球",
-      "zh-tw": "刷新球"
+      "ru": "Refresher Orb"
     },
     "descriptions": {
       "en": "+200% mana regeneration\n\nActive ability: Activates when ability or items incur cooldown\nResets the cooldown of abilities and other items.",
-      "ru": "+200% mana regeneration\n\nActive ability: Activates when ability or items incur cooldown\nСбрасывает время перезарядки способностей и других предметов.",
-      "zh-cn": "法力获取+200%。\n\n主动技能：技能或物品冷却时激活\n立即刷新棋子技能和其他物品的冷却时间。",
-      "zh-tw": "法力獲取+200%。\n\n主動技能：技能或物品冷卻時激活\n立即刷新棋子技能和其他物品的冷卻時間。"
+      "ru": "+200% mana regeneration\n\nActive ability: Activates when ability or items incur cooldown\nСбрасывает время перезарядки способностей и других предметов."
     },
     "lore_i18n": {
       "en": "A powerful artifact created for wizards.",
-      "ru": "A powerful artifact created for wizards.",
-      "zh-cn": "一件为巫师量身定做的强力物品。",
-      "zh-tw": "一件為巫師量身定做的強力物品。"
+      "ru": "A powerful artifact created for wizards."
     }
   },
   "item_shuijingjian": {
@@ -2784,15 +2297,11 @@
     },
     "names": {
       "en": "Crystalys",
-      "ru": "Crystalys",
-      "zh-cn": "水晶剑",
-      "zh-tw": "水晶劍"
+      "ru": "Crystalys"
     },
     "descriptions": {
       "en": "Attacks have a 20% chance to cause 200% critical strike damage.",
-      "ru": "Атаки имеют 20% шанс нанести 200% урона от критического удара.",
-      "zh-cn": "攻击有20%概率造成2倍暴击。",
-      "zh-tw": "攻擊有20%概率造成2倍暴擊。"
+      "ru": "Атаки имеют 20% шанс нанести 200% урона от критического удара."
     },
     "lore_i18n": {}
   },
@@ -2807,21 +2316,15 @@
     "icon_dimensions": null,
     "names": {
       "en": "Stolen Vault",
-      "ru": "Stolen Vault",
-      "zh-cn": "失窃的宝库",
-      "zh-tw": "失竊的寶庫"
+      "ru": "Stolen Vault"
     },
     "descriptions": {
       "en": "Discard all 3 relics and get a Stolen Vault with random 10 ~ 15 gold.",
-      "ru": "Отказаться от выбора реликвии и получить Stolen Vault с случайными 10-15 золота.",
-      "zh-cn": "放弃本次选择圣物，立刻随机获得10～15金币。",
-      "zh-tw": "放棄本次選擇聖物，立刻隨機獲得10～15金幣。"
+      "ru": "Отказаться от выбора реликвии и получить Stolen Vault с случайными 10-15 золота."
     },
     "lore_i18n": {
       "en": "From: Relicbox",
-      "ru": "From: Relicbox",
-      "zh-cn": "来自：放弃圣物选择",
-      "zh-tw": "來自：放棄聖物選擇"
+      "ru": "From: Relicbox"
     }
   },
   "item_streak_plus": {
@@ -2838,21 +2341,15 @@
     "icon_dimensions": null,
     "names": {
       "en": "Chiaroscuro Certainty",
-      "ru": "Chiaroscuro Certainty",
-      "zh-cn": "明暗终途",
-      "zh-tw": "明暗終途"
+      "ru": "Chiaroscuro Certainty"
     },
     "descriptions": {
       "en": "Your win or lose streak will not be terminated and when the relic disappears, you will receive a corresponding level loot token based on the highest reward/compensation held during that time.",
-      "ru": "Ваша серия побед или поражений не будет прервана, и когда реликвия исчезнет, вы получите жетон, уровень которого соответствует самой высокой награде/компенсации, полученной за это время.",
-      "zh-cn": "你的连胜/连败不会中断。圣物消失时将根据持有期间最高的奖励/补偿和本局已选取圣物数量获得一个战利品代币。",
-      "zh-tw": "你的連勝/連敗不會中斷。聖物消失時將根據持有期間最高的獎勵/補償和本局已選取聖物數量獲得一個戰利品代幣。"
+      "ru": "Ваша серия побед или поражений не будет прервана, и когда реликвия исчезнет, вы получите жетон, уровень которого соответствует самой высокой награде/компенсации, полученной за это время."
     },
     "lore_i18n": {
       "en": "From Relicbox",
-      "ru": "From Relicbox",
-      "zh-cn": "来自：圣物宝箱",
-      "zh-tw": "來自：聖物寶箱"
+      "ru": "From Relicbox"
     }
   },
   "item_suduzhixue": {
@@ -2888,21 +2385,15 @@
     },
     "names": {
       "en": "Skull Basher",
-      "ru": "Skull Basher",
-      "zh-cn": "碎颅锤",
-      "zh-tw": "碎顱錘"
+      "ru": "Skull Basher"
     },
     "descriptions": {
       "en": "Grants melee hero 20% chance on hit to stun the target for 2s.",
-      "ru": "Предоставляет герою ближнего боя 20% шанс при ударе оглушить цель на 2 секунды.",
-      "zh-cn": "近战携带者攻击有20%概率击晕目标2秒。",
-      "zh-tw": "近戰攜帶者攻擊有20%概率擊暈目標2秒。"
+      "ru": "Предоставляет герою ближнего боя 20% шанс при ударе оглушить цель на 2 секунды."
     },
     "lore_i18n": {
       "en": "A feared weapon in the right hands, this maul’s ability to shatter the defenses of its opponents should not be underestimated.",
-      "ru": "A feared weapon in the right hands, this maul’s ability to shatter the defenses of its opponents should not be underestimated.",
-      "zh-cn": "用对了敌方会让人闻风丧胆的武器，千万不要低估这把大锤粉碎对手防御的能力。",
-      "zh-tw": "用對了敵方會讓人聞風喪膽的武器，千萬不要低估這把大錘粉碎對手防禦的能力。"
+      "ru": "A feared weapon in the right hands, this maul’s ability to shatter the defenses of its opponents should not be underestimated."
     }
   },
   "item_super_uprank": {
@@ -2916,15 +2407,11 @@
     "icon_dimensions": null,
     "names": {
       "en": "Lucid Star",
-      "ru": "Lucid Star",
-      "zh-cn": "启明星",
-      "zh-tw": "啟明星"
+      "ru": "Lucid Star"
     },
     "descriptions": {
       "en": "There is a 20% chance to directly obtain a ★★ piece on purchase if you already owned one.",
-      "ru": "Есть 20% вероятность напрямую получить фигуру ★★ при покупке, если одна уже есть.",
-      "zh-cn": "购买已拥有的棋子时有20%概率直接买到★★棋子。",
-      "zh-tw": "購買已擁有的棋子時有20%概率直接買到★★棋子。"
+      "ru": "Есть 20% вероятность напрямую получить фигуру ★★ при покупке, если одна уже есть."
     },
     "lore_i18n": {}
   },
@@ -2939,9 +2426,7 @@
     "icon_dimensions": null,
     "names": {
       "en": "Test item: +100 mana",
-      "ru": "Test item: +100 mana",
-      "zh-cn": "测试物品：法力值+100",
-      "zh-tw": "測試物品：法力值+100"
+      "ru": "Test item: +100 mana"
     },
     "descriptions": {},
     "lore_i18n": {}
@@ -2957,9 +2442,7 @@
     "icon_dimensions": null,
     "names": {
       "en": "Test item: +999 armor",
-      "ru": "Test item: +999 armor",
-      "zh-cn": "测试物品：护甲+999",
-      "zh-tw": "測試物品：護甲+999"
+      "ru": "Test item: +999 armor"
     },
     "descriptions": {},
     "lore_i18n": {}
@@ -2975,9 +2458,7 @@
     "icon_dimensions": null,
     "names": {
       "en": "Test item: +100% magic resistance",
-      "ru": "Test item: +100% magic resistance",
-      "zh-cn": "测试物品：魔法抗性+100%",
-      "zh-tw": "測試物品：魔法抗性+100%"
+      "ru": "Test item: +100% magic resistance"
     },
     "descriptions": {},
     "lore_i18n": {}
@@ -2993,9 +2474,7 @@
     "icon_dimensions": null,
     "names": {
       "en": "Test item: +100% evasion",
-      "ru": "Test item: +100% evasion",
-      "zh-cn": "测试物品：闪避+100%",
-      "zh-tw": "測試物品：閃避+100%"
+      "ru": "Test item: +100% evasion"
     },
     "descriptions": {},
     "lore_i18n": {}
@@ -3011,9 +2490,7 @@
     "icon_dimensions": null,
     "names": {
       "en": "Test item: -50% magic resistance",
-      "ru": "Test item: -50% magic resistance",
-      "zh-cn": "测试物品：魔法抗性-50%",
-      "zh-tw": "測試物品：魔法抗性-50%"
+      "ru": "Test item: -50% magic resistance"
     },
     "descriptions": {},
     "lore_i18n": {}
@@ -3029,9 +2506,7 @@
     "icon_dimensions": null,
     "names": {
       "en": "Test item: -200% attack speed",
-      "ru": "Test item: -200% attack speed",
-      "zh-cn": "测试物品：攻击速度-200%",
-      "zh-tw": "測試物品：攻擊速度-200%"
+      "ru": "Test item: -200% attack speed"
     },
     "descriptions": {},
     "lore_i18n": {}
@@ -3050,15 +2525,11 @@
     },
     "names": {
       "en": "Heavens Halberd",
-      "ru": "Heavens Halberd",
-      "zh-cn": "天堂之戟",
-      "zh-tw": "天堂之戟"
+      "ru": "Heavens Halberd"
     },
     "descriptions": {
       "en": "Evasion +25%.\n\nActive ability: Instant\nthe enemy chess piece with the highest attack\nDisarm, lasting for 6 seconds.",
-      "ru": "Уклонение +25%.\n\nActive ability: Instant\nФигура противника с самым высоким уроном атаки получает\nDisarm,(обезоруживание) длится 6 секунд.",
-      "zh-cn": "闪避+25%。\n\n主动技能：立即激活\n使一个攻击力最高的敌方棋子\n缴械，持续6秒。",
-      "zh-tw": "閃避+25%。\n\n主動技能：立即激活\n使一個攻擊力最高的敵方棋子\n繳械，持續6秒。"
+      "ru": "Уклонение +25%.\n\nActive ability: Instant\nФигура противника с самым высоким уроном атаки получает\nDisarm,(обезоруживание) длится 6 секунд."
     },
     "lore_i18n": {}
   },
@@ -3078,21 +2549,15 @@
     },
     "names": {
       "en": "Blink Dagger",
-      "ru": "Blink Dagger",
-      "zh-cn": "闪烁匕首",
-      "zh-tw": "閃爍匕首"
+      "ru": "Blink Dagger"
     },
     "descriptions": {
       "en": "Active ability: Instant\nInstantly teleports off the farest square that allows it to attack an enemy. \n\nRange: 800",
-      "ru": "Active ability: Instant\nМгновенно телепортирует на самую дальнюю клетку, с которой можно атаковать врага. \n\nRange: 800",
-      "zh-cn": "主动技能：立即激活\n瞬间移动到范围内能攻击到敌人的最远的格子。\n\n最远距离：800",
-      "zh-tw": "主動技能：立即激活\n瞬間移動到範圍內能攻擊到敵人的最遠的格子。\n\n最遠距離：800"
+      "ru": "Active ability: Instant\nМгновенно телепортирует на самую дальнюю клетку, с которой можно атаковать врага. \n\nRange: 800"
     },
     "lore_i18n": {
       "en": "The fabled dagger used by the fastest assassin ever to walk the lands.",
-      "ru": "The fabled dagger used by the fastest assassin ever to walk the lands.",
-      "zh-cn": "传说中这片大陆上来去如风的刺客使用的匕首。",
-      "zh-tw": "傳說中這片大陸上來去如風的刺客使用的匕首。"
+      "ru": "The fabled dagger used by the fastest assassin ever to walk the lands."
     }
   },
   "item_tiaozhantoujin": {
@@ -3109,15 +2574,11 @@
     },
     "names": {
       "en": "Hood of Defiance",
-      "ru": "Hood of Defiance",
-      "zh-cn": "挑战头巾",
-      "zh-tw": "挑戰頭巾"
+      "ru": "Hood of Defiance"
     },
     "descriptions": {
       "en": "+50% magic resistance.",
-      "ru": "+50% Сопротивления к магии.",
-      "zh-cn": "魔法抗性+50%。",
-      "zh-tw": "魔法抗性+50%。"
+      "ru": "+50% Сопротивления к магии."
     },
     "lore_i18n": {}
   },
@@ -3132,21 +2593,15 @@
     "icon_dimensions": null,
     "names": {
       "en": "Weaponsmith",
-      "ru": "Weaponsmith",
-      "zh-cn": "哼哼井武器匠",
-      "zh-tw": "哼哼井武器匠"
+      "ru": "Weaponsmith"
     },
     "descriptions": {
       "en": "You gain +1 to the level of loot tokens you get for recasting equipment.\n After recasting 2 pieces of Spoil tokens, the weapon smith will disappear.",
-      "ru": "Вы получаете +1 к уровню жетонов при переработке предметов.\n После переработки 2 жетонов Weaponsmith исчезнет.",
-      "zh-cn": "你重铸装备获得的战利品代币的等级+1。\n武器匠累计重铸2次战利品代币后就会离去。",
-      "zh-tw": "你重鑄裝備獲得的戰利品代幣的等級+1。\n武器匠累計重鑄2次戰利品代幣後就會離去。"
+      "ru": "Вы получаете +1 к уровню жетонов при переработке предметов.\n После переработки 2 жетонов Weaponsmith исчезнет."
     },
     "lore_i18n": {
       "en": "From Relicbox",
-      "ru": "From Relicbox",
-      "zh-cn": "来自：圣物宝箱",
-      "zh-tw": "來自：聖物寶箱"
+      "ru": "From Relicbox"
     }
   },
   "item_wangchongtui": {
@@ -3163,21 +2618,15 @@
     },
     "names": {
       "en": "Spider Leg",
-      "ru": "Spider Leg",
-      "zh-cn": "网虫腿",
-      "zh-tw": "網蟲腿"
+      "ru": "Spider Leg"
     },
     "descriptions": {
       "en": "Evasion +25%。\nThe carrier also counts as \nAqir，and is eligible for friendly Infection spawning.",
-      "ru": "Уклонение+25%。\nНоситель также считается как \nAqir，и может быть подвержен дружественному заражению.",
-      "zh-cn": "闪避+25%。\n携带者视为\n虫，并且加入友方虫族感染的随机召唤池。",
-      "zh-tw": "閃避+25%。\n攜帶者視為\n蟲，並且加入友方蟲族感染的隨機召喚池。"
+      "ru": "Уклонение+25%。\nНоситель также считается как \nAqir，и может быть подвержен дружественному заражению."
     },
     "lore_i18n": {
       "en": "A horrifying yet useful mixture of necromancy and artifice.",
-      "ru": "A horrifying yet useful mixture of necromancy and artifice.",
-      "zh-cn": "亡灵术和制宝工艺的结合，令人恶心却很实用。",
-      "zh-tw": "亡靈術和製寶工藝的結合，令人惡心卻很實用。"
+      "ru": "A horrifying yet useful mixture of necromancy and artifice."
     }
   },
   "item_wangyuanjing": {
@@ -3196,15 +2645,11 @@
     },
     "names": {
       "en": "Telescope",
-      "ru": "Telescope",
-      "zh-cn": "望远镜",
-      "zh-tw": "望遠鏡"
+      "ru": "Telescope"
     },
     "descriptions": {
       "en": "Ranged carriers will be counted as \nDwarf.",
-      "ru": "Дальнобойный владелец считается \nDwarf.",
-      "zh-cn": "远程携带者视为\n矮人。",
-      "zh-tw": "遠程攜帶者視為\n矮人。"
+      "ru": "Дальнобойный владелец считается \nDwarf."
     },
     "lore_i18n": {}
   },
@@ -3222,15 +2667,11 @@
     },
     "names": {
       "en": "Ring of Basilius",
-      "ru": "Ring of Basilius",
-      "zh-cn": "王者之戒",
-      "zh-tw": "王者之戒"
+      "ru": "Ring of Basilius"
     },
     "descriptions": {
       "en": "MP regen +50%.",
-      "ru": "Мана реген +50%.",
-      "zh-cn": "法力获取+50%。",
-      "zh-tw": "法力獲取+50%。"
+      "ru": "Мана реген +50%."
     },
     "lore_i18n": {}
   },
@@ -3270,21 +2711,15 @@
     },
     "names": {
       "en": "Guardian Greaves",
-      "ru": "Guardian Greaves",
-      "zh-cn": "卫士胫甲",
-      "zh-tw": "衛士脛甲"
+      "ru": "Guardian Greaves"
     },
     "descriptions": {
       "en": "Enables quick movement\n\nActive ability: Activates when many allied chess pieces are injured.\nGrants 500 maximum health and 30 mana to all allied units in the area and dispels negative effects incurred during battle.\n\nEffect Range:500",
-      "ru": "Enables quick movement\n\nActive ability:Активируется, когда много союзных фигур ранены.\nДарует 500 максимального здоровья и 30 маны всем союзным юнитам в зоне действия и снимает отрицательные эффекты, полученные в бою.\n\nEffect Range:500",
-      "zh-cn": "快速移动。\n\n主动技能：友方棋子有较多受伤时激活\n使范围内所有友军获得500点最大生命值和30点法力值，同时驱散战斗时产生的不良状态。",
-      "zh-tw": "快速移動。\n\n主動技能：友方棋子有較多受傷時激活\n使範圍內所有友軍獲得500點最大生命值和30點法力值，同時驅散戰鬥時產生的不良狀態。"
+      "ru": "Enables quick movement\n\nActive ability:Активируется, когда много союзных фигур ранены.\nДарует 500 максимального здоровья и 30 маны всем союзным юнитам в зоне действия и снимает отрицательные эффекты, полученные в бою.\n\nEffect Range:500"
     },
     "lore_i18n": {
       "en": "One of many holy instruments constructed to honor the Omniscience.",
-      "ru": "One of many holy instruments constructed to honor the Omniscience.",
-      "zh-cn": "为了向全能之神致敬所打造的众多圣器之一。",
-      "zh-tw": "為了向全能之神致敬所打造的眾多聖器之一。"
+      "ru": "One of many holy instruments constructed to honor the Omniscience."
     }
   },
   "item_wuzhixiaomao": {
@@ -3303,15 +2738,11 @@
     },
     "names": {
       "en": "Witless Shako",
-      "ru": "Witless Shako",
-      "zh-cn": "无知小帽",
-      "zh-tw": "無知小帽"
+      "ru": "Witless Shako"
     },
     "descriptions": {
       "en": "+25% magical resistance. The carrier +1 level.",
-      "ru": "+25% сопротивления магии. Носитель считается на 1 уровень выше.",
-      "zh-cn": "魔法抗性+25%，携带者视为+1等级。",
-      "zh-tw": "魔法抗性+25%，攜帶者視為+1等級。"
+      "ru": "+25% сопротивления магии. Носитель считается на 1 уровень выше."
     },
     "lore_i18n": {}
   },
@@ -3329,15 +2760,11 @@
     },
     "names": {
       "en": "Vanguard",
-      "ru": "Vanguard",
-      "zh-cn": "先锋盾",
-      "zh-tw": "先鋒盾"
+      "ru": "Vanguard"
     },
     "descriptions": {
       "en": "Block 40 damage on melee pieces.",
-      "ru": "Блокирует 40 урона на героях ближнего боя.",
-      "zh-cn": "物理格挡+25。近战携带者有50%概率额外+25物理格挡。",
-      "zh-tw": "物理格擋+25。近戰攜帶者有50%概率額外+25物理格擋。"
+      "ru": "Блокирует 40 урона на героях ближнего боя."
     },
     "lore_i18n": {}
   },
@@ -3355,21 +2782,15 @@
     },
     "names": {
       "en": "Phase Boots",
-      "ru": "Phase Boots",
-      "zh-cn": "相位鞋",
-      "zh-tw": "相位鞋"
+      "ru": "Phase Boots"
     },
     "descriptions": {
       "en": "Enables quick movement.\n\nActive ability: Instant Activation\nMelee carriers will phase through obstacles, swiftly moving to the vicinity of an enemy chess piece with lower health in the range and prioritizing an attack on it.\n\nEffect Range:600",
-      "ru": "Enables quick movement.\n\nActive ability: Instant Activation\nMelee carriers will phase through obstacles, swiftly moving to the vicinity of an enemy chess piece with lower health in the range and prioritizing an attack on it.",
-      "zh-cn": "护甲+5，快速移动。\n\n主动技能：立即激活\n近战携带者会无视阻挡，快速移动到范围内生命值较低的敌方棋子附近并优先攻击它。",
-      "zh-tw": "護甲+5，快速移動。\n\n主動技能：立即激活\n近戰攜帶者會無視阻擋，快速移動到範圍內生命值較低的敵方棋子附近並優先攻擊它。"
+      "ru": "Enables quick movement.\n\nActive ability: Instant Activation\nMelee carriers will phase through obstacles, swiftly moving to the vicinity of an enemy chess piece with lower health in the range and prioritizing an attack on it."
     },
     "lore_i18n": {
       "en": "Boots that allow the wearer to travel between the ether.",
-      "ru": "Boots that allow the wearer to travel between the ether.",
-      "zh-cn": "穿着它的人可以穿越虚空。",
-      "zh-tw": "穿著它的人可以穿越虛空。"
+      "ru": "Boots that allow the wearer to travel between the ether."
     }
   },
   "item_xingyunguazhui": {
@@ -3386,15 +2807,11 @@
     },
     "names": {
       "en": "Lucky Pendant",
-      "ru": "Lucky Pendant",
-      "zh-cn": "幸运挂坠",
-      "zh-tw": "幸運掛墜"
+      "ru": "Lucky Pendant"
     },
     "descriptions": {
       "en": "The carrier has additional chances on all probability synergies.",
-      "ru": "Носитель увеличивает вероятность срабатывания всех синергией с шансом.",
-      "zh-cn": "携带者概率触发的种族/职业技能效果触发概率+30%。",
-      "zh-tw": "攜帶者概率觸發的種族/職業技能效果觸發概率+30%。"
+      "ru": "Носитель увеличивает вероятность срабатывания всех синергией с шансом."
     },
     "lore_i18n": {}
   },
@@ -3412,21 +2829,15 @@
     },
     "names": {
       "en": "Shivas Guard",
-      "ru": "Shivas Guard",
-      "zh-cn": "希瓦之守护",
-      "zh-tw": "希瓦之守護"
+      "ru": "Shivas Guard"
     },
     "descriptions": {
       "en": "+10 armor.\n\nActive ability: Instant\n Emits a freezing wave that slows the attack speed and healing effectiveness of enemies within 3 cells by 50% for 5 seconds and deals 100 magical damage.",
-      "ru": "+10 брони.\n\nАктивка: мгновенно\nВыпускает ледяную волну, замедляющую скорость атаки и лечение врагов в радиусе 3 клеток на 50% на 5 секунд и наносящую 100 магического урона.",
-      "zh-cn": "护甲+10。\n\n主动技能：立即激活\n发出一道寒冷的波动，使3格内的敌人攻击速度-50%，受到的治疗-50%，持续5秒，并造成100点魔法伤害。",
-      "zh-tw": "護甲+10。\n\n主動技能：立即激活\n發出一道寒冷的波動，使3格內的敵人攻擊速度-50%，受到的治療-50%，持續5秒，並造成100點魔法傷害。"
+      "ru": "+10 брони.\n\nАктивка: мгновенно\nВыпускает ледяную волну, замедляющую скорость атаки и лечение врагов в радиусе 3 клеток на 50% на 5 секунд и наносящую 100 магического урона."
     },
     "lore_i18n": {
       "en": "Said to have belonged to a goddess, today it retains much of its former power.",
-      "ru": "Said to have belonged to a goddess, today it retains much of its former power.",
-      "zh-cn": "据说曾经属于某位女神，至今仍保持大部分神力。",
-      "zh-tw": "據說曾經屬於某位女神，至今仍保持大部分神力。"
+      "ru": "Said to have belonged to a goddess, today it retains much of its former power."
     }
   },
   "item_xuanmingdunpai": {
@@ -3443,15 +2854,11 @@
     },
     "names": {
       "en": "Buckler",
-      "ru": "Buckler",
-      "zh-cn": "玄冥盾牌",
-      "zh-tw": "玄冥盾牌"
+      "ru": "Buckler"
     },
     "descriptions": {
       "en": "Armor +5。",
-      "ru": "Броня +5。",
-      "zh-cn": "护甲+5。",
-      "zh-tw": "護甲+5。"
+      "ru": "Броня +5。"
     },
     "lore_i18n": {}
   },
@@ -3469,15 +2876,11 @@
     },
     "names": {
       "en": "Maelstrom",
-      "ru": "Maelstrom",
-      "zh-cn": "漩涡",
-      "zh-tw": "漩渦"
+      "ru": "Maelstrom"
     },
     "descriptions": {
       "en": "Attack Speed +10%.\n20% chance on attack to release a forked lightning, dealing 100 magic damage to up to 3 enemies.",
-      "ru": "Скорость атаки +10%.\n20% Шанс при атаке выпустить молнию, наносящую 100 магического урона по 3 врагам.",
-      "zh-cn": "攻击速度+10%。\n攻击有20%概率打出一道叉状闪电，对最多3个敌人造成100点魔法伤害。",
-      "zh-tw": "攻擊速度+10%。\n攻擊有20%概率打出一道叉狀閃電，對最多3個敵人造成100點魔法傷害。"
+      "ru": "Скорость атаки +10%.\n20% Шанс при атаке выпустить молнию, наносящую 100 магического урона по 3 врагам."
     },
     "lore_i18n": {}
   },
@@ -3495,21 +2898,15 @@
     },
     "names": {
       "en": "Bloodthorn",
-      "ru": "Bloodthorn",
-      "zh-cn": "血棘",
-      "zh-tw": "血棘"
+      "ru": "Bloodthorn"
     },
     "descriptions": {
       "en": "+20% Attack speed.\n\nActive ability: Instant\nRoots and \nsilences the highest-level enemy chess piece in the attack range for 6 seconds. Any attacks to the victim causes 200% critical damage and all allies with in the attack range focus attacking the victim within the duration.",
-      "ru": "+20% Скорости атаки.\n\nActive ability: Instant\nНакладывает \nМолчание на вражескую фигуру с самым высоким уровнем в зоне атаки на 6 секунд. Все атаки по цели наносят 200% критического урона, а союзники в радиусе атаки сосредотачиваются на атаке цели в течение действия эффекта.",
-      "zh-cn": "攻击速度+20%。\n\n主动技能：立即激活\n使一个攻击范围内等级最高的敌方棋子\n沉默，并获得效果：受到的任何攻击都会造成2倍的暴击，并使攻击范围内的友方棋子都倾向于攻击此目标，持续6秒。",
-      "zh-tw": "攻擊速度+20%。\n\n主動技能：立即激活\n使一個攻擊範圍內等級最高的敵方棋子\n沈默，並獲得效果：受到的任何攻擊都會造成2倍的暴擊，並使攻擊範圍內的友方棋子都傾向於攻擊此目標，持續6秒。"
+      "ru": "+20% Скорости атаки.\n\nActive ability: Instant\nНакладывает \nМолчание на вражескую фигуру с самым высоким уровнем в зоне атаки на 6 секунд. Все атаки по цели наносят 200% критического урона, а союзники в радиусе атаки сосредотачиваются на атаке цели в течение действия эффекта."
     },
     "lore_i18n": {
       "en": "A reviled blade that bites deeper with each wriggle of its victims final throes.",
-      "ru": "A reviled blade that bites deeper with each wriggle of its victims final throes.",
-      "zh-cn": "一把亵渎之刃，受害者临死前的每次挣扎都会使其砍得更深。",
-      "zh-tw": "一把褻瀆之刃，受害者臨死前的每次掙紮都會使其砍得更深。"
+      "ru": "A reviled blade that bites deeper with each wriggle of its victims final throes."
     }
   },
   "item_xuejingshi": {
@@ -3526,21 +2923,15 @@
     },
     "names": {
       "en": "Bloodstone",
-      "ru": "Bloodstone",
-      "zh-cn": "血精石",
-      "zh-tw": "血精石"
+      "ru": "Bloodstone"
     },
     "descriptions": {
       "en": "+600 Health.\nIf an enemy chess piece on the hosts side is killed, the holder has a 15% chance of gaining 1 energy point. Each energy point will increase the magic damage the holder inflicts by 10%.\nIf the holder is killed, half of the energy points will be lost.",
-      "ru": "+600 Здоровья.\nЕсли вражеская фигура умирает на домашнем столе, то носитель с 15% вероятностью получит заряд. Каждый заряд увиличивает маг. урон владельца на 10%.\nЕсли носитель погибает, то теряет половину зарядов.",
-      "zh-cn": "生命值+600。\n每当主场的敌方棋子阵亡，持有者都有15%的概率获得1点能量点数，每点能量点数会提高10%持有者造成的魔法伤害。\n亡语：损失一半的能量点数。",
-      "zh-tw": "生命值+600。\n每當主場的敵方棋子陣亡，持有者都有15%的概率獲得1點能量點數，每點能量點數會提高10%持有者造成的魔法傷害。\n亡語：損失一半的能量點數。"
+      "ru": "+600 Здоровья.\nЕсли вражеская фигура умирает на домашнем столе, то носитель с 15% вероятностью получит заряд. Каждый заряд увиличивает маг. урон владельца на 10%.\nЕсли носитель погибает, то теряет половину зарядов."
     },
     "lore_i18n": {
       "en": "The Bloodstones bright ruby color is unmistakable on the battlefield, as the owner seems to have infinite vitality and spirit.",
-      "ru": "The Bloodstones bright ruby color is unmistakable on the battlefield, as the owner seems to have infinite vitality and spirit.",
-      "zh-cn": "血精石鲜红的色彩在战场上绝对不会被看错，拥有者似乎有无限的生命力和精力。",
-      "zh-tw": "血精石鮮紅的色彩在戰場上絕對不會被看錯，擁有者似乎有無限的生命力和精力。"
+      "ru": "The Bloodstones bright ruby color is unmistakable on the battlefield, as the owner seems to have infinite vitality and spirit."
     }
   },
   "item_yangdao": {
@@ -3557,21 +2948,15 @@
     },
     "names": {
       "en": "Scythe of Vyse",
-      "ru": "Scythe of Vyse",
-      "zh-cn": "邪恶镰刀",
-      "zh-tw": "邪惡鐮刀"
+      "ru": "Scythe of Vyse"
     },
     "descriptions": {
       "en": "Magic damage +60%。\n\nActive Ability: Instant\nTransforms an enemy piece of the highest level into a harmless animal for 5 sec.",
-      "ru": "Магический урон +60%。\n\nАктивка: Мгновенно\nПревращает фигуру противника самого высокого уровня в безвредное животное на 5 секунд.",
-      "zh-cn": "魔法伤害+60%。\n\n主动技能：立即激活\n使一个等级最高的敌方棋子变成可爱的小动物，持续5秒。",
-      "zh-tw": "魔法傷害+60%。\n\n主動技能：立即激活\n使一個等級最高的敵方棋子變成可愛的小動物，持續5秒。"
+      "ru": "Магический урон +60%。\n\nАктивка: Мгновенно\nПревращает фигуру противника самого высокого уровня в безвредное животное на 5 секунд."
     },
     "lore_i18n": {
       "en": "The most guarded relic among the cult of Vyse, it is the most coveted weapon among magi.",
-      "ru": "The most guarded relic among the cult of Vyse, it is the most coveted weapon among magi.",
-      "zh-cn": "武功再高，也怕羊刀！",
-      "zh-tw": "武功再高，也怕羊刀！"
+      "ru": "The most guarded relic among the cult of Vyse, it is the most coveted weapon among magi."
     }
   },
   "item_yinyuezhijing": {
@@ -3588,21 +2973,15 @@
     },
     "names": {
       "en": "Moon Shard",
-      "ru": "Moon Shard",
-      "zh-cn": "银月之晶",
-      "zh-tw": "銀月之晶"
+      "ru": "Moon Shard"
     },
     "descriptions": {
       "en": "Attack speed +50%.",
-      "ru": "Скорость атаки +50%.",
-      "zh-cn": "攻击速度+50%。",
-      "zh-tw": "攻擊速度+50%。"
+      "ru": "Скорость атаки +50%."
     },
     "lore_i18n": {
       "en": "Said to be a tear from the lunar goddess Selemene.",
-      "ru": "Said to be a tear from the lunar goddess Selemene.",
-      "zh-cn": "相传这是月之女神赛利蒙妮流下的一滴眼泪。",
-      "zh-tw": "相傳這是月之女神賽利蒙妮流下的一滴眼淚。"
+      "ru": "Said to be a tear from the lunar goddess Selemene."
     }
   },
   "item_yonghengzhipan": {
@@ -3619,21 +2998,15 @@
     },
     "names": {
       "en": "Aeon Disk",
-      "ru": "Aeon Disk",
-      "zh-cn": "永恒之盘",
-      "zh-tw": "永恒之盤"
+      "ru": "Aeon Disk"
     },
     "descriptions": {
       "en": "Carrier and its minions will be a\n permanent chess piece.\n\nActive ability: Activates when at low health.\nGrants 100% damage block for 3.5 seconds.",
-      "ru": "Носитель и его призывные юниты\n становятся постояннымми фигурами.\n\nАктивируется при низком HP\nДаёт 100% блокировку урона на 3.5 секунды.",
-      "zh-cn": "携带者和它的变身形态/召唤物始终视为\n永久棋子。\n\n主动技能：濒死时激活\n免疫所有伤害，持续3.5秒。",
-      "zh-tw": "攜帶者和它的變身形態/召喚物始終視為\n永久棋子。\n\n主動技能：瀕死時激活\n免疫所有傷害，持續3.5秒。"
+      "ru": "Носитель и его призывные юниты\n становятся постояннымми фигурами.\n\nАктивируется при низком HP\nДаёт 100% блокировку урона на 3.5 секунды."
     },
     "lore_i18n": {
       "en": "A powerful artifact long ago smuggled out of the Ivory Incubarium. Or so many believe.",
-      "ru": "A powerful artifact long ago smuggled out of the Ivory Incubarium. Or so many believe.",
-      "zh-cn": "一件多年以前被偷偷运出象牙孵巢的强力宝物。很多人都信以为真了。",
-      "zh-tw": "一件多年以前被偷偷運出象牙孵巢的強力寶物。很多人都信以為真了。"
+      "ru": "A powerful artifact long ago smuggled out of the Ivory Incubarium. Or so many believe."
     }
   },
   "item_yongqizhiguang": {
@@ -3650,15 +3023,11 @@
     },
     "names": {
       "en": "Spark of Courage",
-      "ru": "Spark of Courage",
-      "zh-cn": "勇气之光",
-      "zh-tw": "勇氣之光"
+      "ru": "Spark of Courage"
     },
     "descriptions": {
       "en": "Carrier deals +25% damage to enemies level higher than carrier.",
-      "ru": "Наносит +25% урона врагам чей уровень выше носителя.",
-      "zh-cn": "携带者对等级高于自己的敌方棋子造成的伤害+25%。",
-      "zh-tw": "攜帶者對等級高於自己的敵方棋子造成的傷害+25%。"
+      "ru": "Наносит +25% урона врагам чей уровень выше носителя."
     },
     "lore_i18n": {}
   },
@@ -3676,21 +3045,15 @@
     },
     "names": {
       "en": "Force Staff",
-      "ru": "Force Staff",
-      "zh-cn": "原力法杖",
-      "zh-tw": "原力法杖"
+      "ru": "Force Staff"
     },
     "descriptions": {
       "en": "Magic Damage +10%.\n\nActive ability: Activated when Hp is low\nPush the carrier to a safe grid that cannot be reached by enemy attacks, and restore 20 mana immediately.",
-      "ru": "Magic Damage +10%.\n\nАктивируется при низком здоровье\nПеремещает носителя на безопасную клетку, недоступную для вражеских атак, и немедленно восстанавливает 20 маны.",
-      "zh-cn": "魔法伤害+10%。\n\n主动技能：生命值过低或远程被近身时激活\n将携带者推送到一个不能被敌方攻击到的安全格子，并且回复20点法力值。",
-      "zh-tw": "魔法傷害+10%。\n\n主動技能：生命值過低或遠程被近身時激活\n將攜帶者推送到一個不能被敵方攻擊到的安全格子，並且回復20點法力值。"
+      "ru": "Magic Damage +10%.\n\nАктивируется при низком здоровье\nПеремещает носителя на безопасную клетку, недоступную для вражеских атак, и немедленно восстанавливает 20 маны."
     },
     "lore_i18n": {
       "en": "Allows you to manipulate others, for good or evil.",
-      "ru": "Allows you to manipulate others, for good or evil.",
-      "zh-cn": "让你可以操纵自己或他人，无论出于善与恶。",
-      "zh-tw": "讓你可以操縱自己或他人，無論出於善與惡。"
+      "ru": "Allows you to manipulate others, for good or evil."
     }
   },
   "item_yuanlingxidai": {
@@ -3707,15 +3070,11 @@
     },
     "names": {
       "en": "Wraith Band",
-      "ru": "Wraith Band",
-      "zh-cn": "怨灵系带",
-      "zh-tw": "怨靈系帶"
+      "ru": "Wraith Band"
     },
     "descriptions": {
       "en": "Attack speed +20%。",
-      "ru": "Скорость атаки +20%。",
-      "zh-cn": "攻击速度+20%。",
-      "zh-tw": "攻擊速度+20%。"
+      "ru": "Скорость атаки +20%。"
     },
     "lore_i18n": {}
   },
@@ -3733,15 +3092,11 @@
     },
     "names": {
       "en": "Travel Boots",
-      "ru": "Travel Boots",
-      "zh-cn": "远行鞋",
-      "zh-tw": "遠行鞋"
+      "ru": "Travel Boots"
     },
     "descriptions": {
       "en": "Fast Movement\nTeleports its owner to help the home/away battle if the owner survives the current battle.\n\nActive ability: Instant\nInstantly teleports off the farthest square that allows it to attack an enemy. Generates 20 on activation.\n\nMax distance: 800",
-      "ru": "Fast Movement\nTeleports its owner to help the home/away battle if the owner survives the current battle.\n\nActive ability: Instant\nInstantly teleports off the farthest square that allows it to attack an enemy. Generates 20 on activation.\n\nMax distance: 800",
-      "zh-cn": "快速移动。\n携带者如果在战斗结束时存活，会传送到主/客场助战。\n\n主动技能：立即激活\n瞬间移动到范围内能攻击到敌人的最远的格子，并获得20点法力值。\n\n最远距离：800",
-      "zh-tw": "快速移動。\n攜帶者如果在戰鬥結束時存活，會傳送到主/客場助戰。\n\n主動技能：立即激活\n瞬間移動到範圍內能攻擊到敵人的最遠的格子，並獲得20點法力值。\n\n最遠距離：800"
+      "ru": "Fast Movement\nTeleports its owner to help the home/away battle if the owner survives the current battle.\n\nActive ability: Instant\nInstantly teleports off the farthest square that allows it to attack an enemy. Generates 20 on activation.\n\nMax distance: 800"
     },
     "lore_i18n": {}
   },
@@ -3764,9 +3119,7 @@
     },
     "lore_i18n": {
       "en": "Crush your enemies with ruthless tides of minions. Yeah Minions!",
-      "ru": "Crush your enemies with ruthless tides of minions. Yeah Minions!",
-      "zh-cn": "把你的敌人淹没在源源不断的血肉潮水之中。",
-      "zh-tw": "把你的敵人淹沒在源源不斷的血肉潮水之中。"
+      "ru": "Crush your enemies with ruthless tides of minions. Yeah Minions!"
     }
   },
   "item_zhilidatiaodao": {
@@ -3783,15 +3136,11 @@
     },
     "names": {
       "en": "Arcane Blink",
-      "ru": "Arcane Blink",
-      "zh-cn": "秘奥闪光",
-      "zh-tw": "秘奧閃光"
+      "ru": "Arcane Blink"
     },
     "descriptions": {
       "en": "Active ability: On ability cooling down\nInstantly move to the farthest grid within the range that can attack the enemy, gain 25 mana and +20% magical damage amplification, and reduce ability CD by 5 sec.\n\nmaximum distance:800",
-      "ru": "Active ability: On ability cooling down\nInstantly move to the farthest grid within the range that can attack the enemy, gain 25 mana and +20% magical damage amplification, and reduce ability CD by 5 sec.\n\nmaximum distance:800",
-      "zh-cn": "主动技能：棋子技能冷却时激活\n瞬间移动到范围内能攻击到敌人的最远的格子，并获得30点法力值，棋子技能冷却时间-5秒，以及魔法伤害+20%的可叠加效果。\n\n最远距离：800",
-      "zh-tw": "主動技能：棋子技能冷卻時激活\n瞬間移動到範圍內能攻擊到敵人的最遠的格子，並獲得30點法力值，棋子技能冷卻時間-5秒，以及魔法傷害+20%的可疊加效果。\n\n最遠距離：800"
+      "ru": "Active ability: On ability cooling down\nInstantly move to the farthest grid within the range that can attack the enemy, gain 25 mana and +20% magical damage amplification, and reduce ability CD by 5 sec.\n\nmaximum distance:800"
     },
     "lore_i18n": {}
   },
@@ -3808,21 +3157,15 @@
     "icon_dimensions": null,
     "names": {
       "en": "Hell of the Dominator",
-      "ru": "Hell of the Dominator",
-      "zh-cn": "支配头盔",
-      "zh-tw": "支配頭盔"
+      "ru": "Hell of the Dominator"
     },
     "descriptions": {
       "en": "lifesteal + 15%.\n\nActive ability: Instant\nMind Controls a summoned or creep enemy whose level less than its owner’s level for 10 sec.",
-      "ru": "Вампиризм + 15%.\n\nActive ability: Instant\nКонтролирует разум призванного или вражеского крипа, уровень которого ниже уровня владельца, на 10 секунд.",
-      "zh-cn": "攻击吸血+15%。\n\n主动技能：立即激活\n控制一个等级低于携带者的敌方召唤物或野怪。",
-      "zh-tw": "攻擊吸血+15%。\n\n主動技能：立即激活\n控製一個等級低於攜帶者的敵方召喚物或野怪。"
+      "ru": "Вампиризм + 15%.\n\nActive ability: Instant\nКонтролирует разум призванного или вражеского крипа, уровень которого ниже уровня владельца, на 10 секунд."
     },
     "lore_i18n": {
       "en": "The powerful headpiece of a dead necromancer.",
-      "ru": "The powerful headpiece of a dead necromancer.",
-      "zh-cn": "死去的死灵法师留下的可怕头盔。",
-      "zh-tw": "死去的死靈法師留下的可怕頭盔。"
+      "ru": "The powerful headpiece of a dead necromancer."
     }
   },
   "item_zhishizhishu": {
@@ -3839,21 +3182,15 @@
     },
     "names": {
       "en": "Tome of Knowledge",
-      "ru": "Tome of Knowledge",
-      "zh-cn": "知识之书",
-      "zh-tw": "知識之書"
+      "ru": "Tome of Knowledge"
     },
     "descriptions": {
       "en": "Courier consumable: Click to use\nInstantly addeds 2 XP. Bonus Courier XP granted via Tome of Knowledge is unlimited to the maximum Courier Level.",
-      "ru": "Courier consumable: Click to use\nInstantly addeds 2 XP. Bonus Courier XP granted via Tome of Knowledge is unlimited to the maximum Courier Level.",
-      "zh-cn": "信使消耗品：点击激活\n为你的信使增加2点经验值，并且增加的经验值可以突破信使最大等级10的限制。",
-      "zh-tw": "信使消耗品：點擊激活\n為你的信使增加2點經驗值，並且增加的經驗值可以突破信使最大等級10的限製。"
+      "ru": "Courier consumable: Click to use\nInstantly addeds 2 XP. Bonus Courier XP granted via Tome of Knowledge is unlimited to the maximum Courier Level."
     },
     "lore_i18n": {
       "en": "From: Spark of Mind",
-      "ru": "From: Spark of Mind",
-      "zh-cn": "来自：思想火花",
-      "zh-tw": "來自：思想火花"
+      "ru": "From: Spark of Mind"
     }
   },
   "item_zhusidoupeng": {
@@ -3870,15 +3207,11 @@
     },
     "names": {
       "en": "Gossamer Cape",
-      "ru": "Gossamer Cape",
-      "zh-cn": "蛛丝斗篷",
-      "zh-tw": "蛛絲鬥篷"
+      "ru": "Gossamer Cape"
     },
     "descriptions": {
       "en": "+25% magical resistance. Its carrier and all minions are immune to mind control.",
-      "ru": "+25% сопротивления магии. Носитель и призывные существа невосприимчивы к контролю разума.",
-      "zh-cn": "携带者和它的召唤物获得效果：魔法抗性+25%，免疫精神控制。",
-      "zh-tw": "攜帶者和它的召喚物獲得效果：魔法抗性+25%，免疫精神控製。"
+      "ru": "+25% сопротивления магии. Носитель и призывные существа невосприимчивы к контролю разума."
     },
     "lore_i18n": {}
   }

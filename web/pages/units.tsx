@@ -31,14 +31,6 @@ const T = {
     cost: (c: number) => `Цена ${c}`,
     costLabel: { 1: "Цена 1", 2: "Цена 2", 3: "Цена 3", 4: "Цена 4", 5: "Цена 5" },
   },
-  zh: {
-    title: `棋子 | ${SITE_TITLE}`,
-    description:
-      "按费用浏览所有 Dota 自走棋棋子，按名称搜索英雄，在 Track Auto Chess 查看每个棋子的详情。",
-    heading: "棋子",
-    cost: (c: number) => `${c} 费`,
-    costLabel: { 1: "1 费", 2: "2 费", 3: "3 费", 4: "4 费", 5: "5 费" },
-  },
 } as const;
 
 export default function UnitsPage({ data, locale }: UnitsPageProps) {

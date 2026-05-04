@@ -40,13 +40,6 @@ const T = {
     activates: (u: string) => `${u} активирует эту синергию.`,
     cost: (c: number) => `Цена ${c}`,
   },
-  zh: {
-    title: (n: string) => `${n} 棋子指南 | ${SITE_TITLE}`,
-    description: (n: string, c: number) =>
-      `${n} 是 Dota 自走棋中的 ${c} 费棋子。`,
-    activates: (u: string) => `${u} 触发此羁绊。`,
-    cost: (c: number) => `${c} 费`,
-  },
 } as const;
 
 export default function UnitDetailPage({
@@ -115,11 +108,6 @@ const RELATED_LABELS = {
     synergies: "Синергии",
     unitSynergies: (n: string) => `Синергии ${n}`,
     moreUnits: "Ещё фигуры",
-  },
-  zh: {
-    synergies: "羁绊",
-    unitSynergies: (n: string) => `${n} 羁绊`,
-    moreUnits: "更多棋子",
   },
 } as const;
 

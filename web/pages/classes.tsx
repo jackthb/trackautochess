@@ -24,12 +24,6 @@ const T = {
       "Все классы Dota Auto Chess: воины, маги и другие — подробные страницы по каждому классу.",
     heading: "Классы",
   },
-  zh: {
-    title: `职业 | ${SITE_TITLE}`,
-    description:
-      "浏览 Dota 自走棋所有职业（战士、法师等），并查看每个职业的详细介绍。",
-    heading: "职业",
-  },
 } as const;
 
 export default function ClassesPage({ data, locale }: ClassesPageProps) {

@@ -1,7 +1,33 @@
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { useRouter } from "next/router";
 import { EntityCard, type EntityCardVariant } from "@/components/EntityCard";
+import { normalizeLocale, type Locale } from "@/lib/i18n";
 import styles from "./EntityBrowser.module.css";
+
+const COUNT_LABEL: Record<Locale, Record<EntityCardVariant, string>> = {
+  en: { item: "items", relic: "relics", unit: "units", synergy: "synergies" },
+  ru: { item: "предметов", relic: "реликвий", unit: "фигур", synergy: "синергий" },
+};
+
+const SEARCH_PLACEHOLDER: Record<Locale, Record<EntityCardVariant, string>> = {
+  en: {
+    item: "Search items...",
+    relic: "Search relics...",
+    unit: "Search units...",
+    synergy: "Search synergies...",
+  },
+  ru: {
+    item: "Поиск предметов...",
+    relic: "Поиск реликвий...",
+    unit: "Поиск фигур...",
+    synergy: "Поиск синергий...",
+  },
+};
+
+const NO_MATCHES: Record<Locale, string> = {
+  en: "No matches.",
+  ru: "Ничего не найдено.",
+};
 
 export interface BrowsableEntity {
   slug: string;
@@ -46,12 +72,6 @@ const ENTITY_COLLECTION_PATH: Record<EntityCardVariant, string> = {
   synergy: "/synergies",
 };
 
-const ENTITY_COUNT_LABEL: Record<EntityCardVariant, string> = {
-  item: "items",
-  relic: "relics",
-  unit: "units",
-  synergy: "synergies",
-};
 
 function isTiered(
   data: BrowsableEntity[] | BrowsableEntity[][]
@@ -81,6 +101,7 @@ export function EntityBrowser({
 }: EntityBrowserProps) {
   const hasSidebar = Boolean(sidebarLeft || sidebarRight);
   const router = useRouter();
+  const locale = normalizeLocale(router.locale ?? router.defaultLocale ?? undefined);
   const [query, setQuery] = useState("");
 
   useEffect(() => {
@@ -105,7 +126,8 @@ export function EntityBrowser({
       ? styles.gridRelic
       : styles.gridItem
   }`;
-  const placeholder = `Search ${ENTITY_COUNT_LABEL[variant]}...`;
+  const placeholder = SEARCH_PLACEHOLDER[locale][variant];
+  const countWord = COUNT_LABEL[locale][variant];
   const collectionPath = ENTITY_COLLECTION_PATH[variant];
   const total = filteredTiered
     ? filteredTiered.reduce((sum, tier) => sum + tier.length, 0)
@@ -126,7 +148,7 @@ export function EntityBrowser({
           onChange={(event) => setQuery(event.target.value)}
         />
         <div className={styles.total}>
-          {total} {ENTITY_COUNT_LABEL[variant]}
+          {total} {countWord}
         </div>
 
         {topAd && <div className={styles.topAd}>{topAd}</div>}
@@ -167,7 +189,7 @@ export function EntityBrowser({
         {filteredFlat && (
           <section className={styles.panel}>
             {filteredFlat.length === 0 ? (
-              <div className={styles.empty}>No matches.</div>
+              <div className={styles.empty}>{NO_MATCHES[locale]}</div>
             ) : (
               <div className={gridClass}>
                 {filteredFlat.map((entity) => (

@@ -1,17 +1,94 @@
 import { useState } from "react";
+import { useRouter } from "next/router";
 import { SeoHead } from "@/lib/seo";
 import { SITE_TITLE } from "@/lib/site";
+import { normalizeLocale } from "@/lib/i18n";
+
+const T = {
+  en: {
+    title: `About | ${SITE_TITLE}`,
+    description:
+      "How Tracker Autochess surfaces Dota Auto Chess player statistics from Drodo profile data and manually tracked match history.",
+    structuredName: "About Track Auto Chess",
+    eyebrow: "About",
+    heading: "How Tracker Autochess surfaces players’ statistics",
+    copy1pre: "",
+    copy1post:
+      " surfaces Dota Auto Chess player statistics from the best source available for a profile.",
+    copy2:
+      "DAC Tools is currently in pre-release, and this is our tooling to enable tracking in-game statistics.",
+    copy3:
+      "When Drodo exposes public profile data, we use that data. When Drodo data is not available, we fall back to manually tracked or imported match history.",
+    copy4:
+      "We run light advertisements to help cover hosting costs and support continued development of the tracker.",
+    dataSources: "Data Sources",
+    drodoTitle: "Drodo profile data",
+    drodoDesc:
+      "Current rank, MMR, peak MMR, season games, candies, wins, and season snapshots when Drodo returns them publicly.",
+    trackedTitle: "Tracked match history",
+    trackedDesc:
+      "Match-level stats captured or checked manually when public Drodo profile data is missing, stale, or incomplete.",
+    support: "Support",
+    contactLabel: "Contact",
+    contactPlaceholder: "Steam name, Discord, or email",
+    messageLabel: "Message",
+    messagePlaceholder: "Tell us what is broken, missing, or confusing.",
+    companyLabel: "Company",
+    sendBtn: "Send support request",
+    sendingBtn: "Sending...",
+    sentStatus: "Sent. Thanks, we'll take a look.",
+    minLengthError: "Message must be at least 20 characters.",
+    sendFailed: "Support request failed. Try again.",
+  },
+  ru: {
+    title: `О сайте | ${SITE_TITLE}`,
+    description:
+      "Как Tracker Autochess собирает статистику игроков Dota Auto Chess из профилей Drodo и вручную отслеживаемой истории матчей.",
+    structuredName: "О Track Auto Chess",
+    eyebrow: "О сайте",
+    heading: "Как Tracker Autochess показывает статистику игроков",
+    copy1pre: "",
+    copy1post:
+      " собирает статистику игроков Dota Auto Chess из лучшего доступного источника для каждого профиля.",
+    copy2:
+      "DAC Tools сейчас находится в пред-релизе — это наш инструмент для отслеживания внутриигровой статистики.",
+    copy3:
+      "Когда Drodo делает данные профиля публичными, мы используем их. Если данных Drodo нет, мы переключаемся на вручную отслеживаемую или импортированную историю матчей.",
+    copy4:
+      "Мы показываем ненавязчивую рекламу, чтобы покрывать расходы на хостинг и поддерживать дальнейшую разработку трекера.",
+    dataSources: "Источники данных",
+    drodoTitle: "Данные профиля Drodo",
+    drodoDesc:
+      "Текущий ранг, MMR, пиковый MMR, игры за сезон, конфеты, победы и снимки сезонов, когда Drodo предоставляет их публично.",
+    trackedTitle: "Отслеживаемая история матчей",
+    trackedDesc:
+      "Статистика матчей, собираемая или проверяемая вручную, когда данные профиля Drodo отсутствуют, устарели или неполные.",
+    support: "Поддержка",
+    contactLabel: "Контакт",
+    contactPlaceholder: "Steam, Discord или e-mail",
+    messageLabel: "Сообщение",
+    messagePlaceholder: "Опишите, что сломано, чего не хватает или непонятно.",
+    companyLabel: "Компания",
+    sendBtn: "Отправить запрос",
+    sendingBtn: "Отправка...",
+    sentStatus: "Отправлено. Спасибо, мы посмотрим.",
+    minLengthError: "Сообщение должно быть не короче 20 символов.",
+    sendFailed: "Не удалось отправить. Попробуйте ещё раз.",
+  },
+} as const;
 
 export default function AboutPage() {
+  const router = useRouter();
+  const locale = normalizeLocale(router.locale ?? router.defaultLocale ?? undefined);
+  const t = T[locale];
   const [contact, setContact] = useState("");
   const [message, setMessage] = useState("");
   const [company, setCompany] = useState("");
   const [sending, setSending] = useState(false);
   const [status, setStatus] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const title = `About | ${SITE_TITLE}`;
-  const description =
-    "How Tracker Autochess surfaces Dota Auto Chess player statistics from Drodo profile data and manually tracked match history.";
+  const title = t.title;
+  const description = t.description;
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -19,7 +96,7 @@ export default function AboutPage() {
     setError(null);
 
     if (!message.trim() || message.trim().length < 20) {
-      setError("Message must be at least 20 characters.");
+      setError(t.minLengthError);
       return;
     }
 
@@ -42,13 +119,9 @@ export default function AboutPage() {
       setContact("");
       setMessage("");
       setCompany("");
-      setStatus("Sent. Thanks, we'll take a look.");
+      setStatus(t.sentStatus);
     } catch (err) {
-      setError(
-        err instanceof Error
-          ? err.message
-          : "Support request failed. Try again."
-      );
+      setError(err instanceof Error ? err.message : t.sendFailed);
     } finally {
       setSending(false);
     }
@@ -60,11 +133,11 @@ export default function AboutPage() {
         title={title}
         description={description}
         path="/about"
-        localized={false}
+        locale={locale}
         structuredData={{
           "@context": "https://schema.org",
           "@type": "AboutPage",
-          name: "About Track Auto Chess",
+          name: t.structuredName,
           description,
         }}
       />
@@ -223,78 +296,62 @@ export default function AboutPage() {
 
       <main className="page">
         <div className="container">
-          <div className="eyebrow">About</div>
-          <h1>How Tracker Autochess surfaces players&apos; statistics</h1>
+          <div className="eyebrow">{t.eyebrow}</div>
+          <h1>{t.heading}</h1>
 
           <div className="copy">
             <p>
-              <a href="https://trackautochess.com">trackautochess.com</a>{" "}
-              surfaces Dota Auto Chess player statistics from the best source
-              available for a profile.
+              {t.copy1pre}
+              <a href="https://trackautochess.com">trackautochess.com</a>
+              {t.copy1post}
             </p>
-            <p>
-              DAC Tools is currently in pre-release, and this is our tooling to
-              enable tracking in-game statistics.
-            </p>
-            <p>
-              When Drodo exposes public profile data, we use that data. When
-              Drodo data is not available, we fall back to manually tracked or
-              imported match history.
-            </p>
-            <p>
-              We run light advertisements to help cover hosting costs and
-              support continued development of the tracker.
-            </p>
+            <p>{t.copy2}</p>
+            <p>{t.copy3}</p>
+            <p>{t.copy4}</p>
           </div>
 
           <section className="panel">
-            <div className="panel-title">Data Sources</div>
+            <div className="panel-title">{t.dataSources}</div>
             <div className="source-list">
               <div className="source">
-                <div className="source-name">Drodo profile data</div>
-                <div className="source-desc">
-                  Current rank, MMR, peak MMR, season games, candies, wins, and
-                  season snapshots when Drodo returns them publicly.
-                </div>
+                <div className="source-name">{t.drodoTitle}</div>
+                <div className="source-desc">{t.drodoDesc}</div>
               </div>
               <div className="source">
-                <div className="source-name">Tracked match history</div>
-                <div className="source-desc">
-                  Match-level stats captured or checked manually when public
-                  Drodo profile data is missing, stale, or incomplete.
-                </div>
+                <div className="source-name">{t.trackedTitle}</div>
+                <div className="source-desc">{t.trackedDesc}</div>
               </div>
             </div>
           </section>
 
           <section className="panel" id="support">
-            <div className="panel-title">Support</div>
+            <div className="panel-title">{t.support}</div>
             <form className="support-form" onSubmit={handleSubmit}>
               <div className="field">
-                <label htmlFor="support-contact">Contact</label>
+                <label htmlFor="support-contact">{t.contactLabel}</label>
                 <input
                   id="support-contact"
                   name="contact"
                   type="text"
                   autoComplete="email"
-                  placeholder="Steam name, Discord, or email"
+                  placeholder={t.contactPlaceholder}
                   value={contact}
                   onChange={(event) => setContact(event.target.value)}
                 />
               </div>
               <div className="field">
-                <label htmlFor="support-message">Message</label>
+                <label htmlFor="support-message">{t.messageLabel}</label>
                 <textarea
                   id="support-message"
                   name="message"
                   required
-                  placeholder="Tell us what is broken, missing, or confusing."
+                  placeholder={t.messagePlaceholder}
                   value={message}
                   onChange={(event) => setMessage(event.target.value)}
                 />
               </div>
               <div className="honeypot" aria-hidden="true">
-                <label htmlFor="support-company">Company</label>
+                <label htmlFor="support-company">{t.companyLabel}</label>
                 <input
                   id="support-company"
                   name="company"
@@ -310,7 +367,7 @@ export default function AboutPage() {
                 type="submit"
                 disabled={sending}
               >
-                {sending ? "Sending..." : "Send support request"}
+                {sending ? t.sendingBtn : t.sendBtn}
               </button>
               {status && <div className="form-status">{status}</div>}
               {error && (

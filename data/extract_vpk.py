@@ -276,10 +276,10 @@ def extract_all(pak):
     loc = all_loc.get('en', {})
 
     # ── Localized-string helper ──
-    # Locales we surface in the JSON cache. Korean parses fine but isn't part
-    # of the SEO target right now, so we drop it from the output to keep file
-    # sizes down. Add more entries here to expand language support.
-    LOCALE_KEYS = ('en', 'ru', 'zh-cn', 'zh-tw')
+    # Locales we surface in the JSON cache. Korean / Chinese parse fine
+    # but only Russian is part of the SEO target right now. Add more
+    # entries here to expand language support.
+    LOCALE_KEYS = ('en', 'ru')
     _placeholder = re.compile(r'%([A-Za-z_][A-Za-z0-9_]*)%')
 
     def loc_strings(prefix, suffixes=('',), process=None, placeholders=None):

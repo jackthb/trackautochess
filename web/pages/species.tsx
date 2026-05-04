@@ -24,12 +24,6 @@ const T = {
       "Все расовые синергии Dota Auto Chess (Звери, Демоны и др.) с подробными страницами.",
     heading: "Расы",
   },
-  zh: {
-    title: `种族 | ${SITE_TITLE}`,
-    description:
-      "浏览 Dota 自走棋所有种族羁绊（野兽、恶魔等），并查看每个种族的详情。",
-    heading: "种族",
-  },
 } as const;
 
 export default function SpeciesPage({ data, locale }: SpeciesPageProps) {

@@ -30,7 +30,7 @@ from extract_vpk import (
     unescape_kv,
 )
 
-LOCALES = ('en', 'ru', 'zh-cn', 'zh-tw')
+LOCALES = ('en', 'ru')
 PLACEHOLDER = re.compile(r'%([A-Za-z_][A-Za-z0-9_]*)%')
 
 

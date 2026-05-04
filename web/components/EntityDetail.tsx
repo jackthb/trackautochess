@@ -1,8 +1,46 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
+import { useRouter } from "next/router";
 import { EntityCard, type EntityCardVariant } from "@/components/EntityCard";
 import { EntityIcon } from "@/components/EntityIcon";
+import { normalizeLocale, type Locale } from "@/lib/i18n";
 import styles from "./EntityDetail.module.css";
+
+const T: Record<Locale, {
+  home: string;
+  breadcrumb: string;
+  notes: string;
+  lore: string;
+  index: Record<EntityCardVariant, string>;
+  overview: Record<EntityCardVariant, string>;
+}> = {
+  en: {
+    home: "Home",
+    breadcrumb: "Breadcrumb",
+    notes: "Notes",
+    lore: "Lore",
+    index: { item: "Items", relic: "Relics", unit: "Units", synergy: "Synergies" },
+    overview: {
+      item: "Item Overview",
+      relic: "Relic Overview",
+      unit: "Unit Overview",
+      synergy: "Synergy Overview",
+    },
+  },
+  ru: {
+    home: "Главная",
+    breadcrumb: "Хлебные крошки",
+    notes: "Примечания",
+    lore: "Лор",
+    index: { item: "Предметы", relic: "Реликвии", unit: "Фигуры", synergy: "Синергии" },
+    overview: {
+      item: "Описание предмета",
+      relic: "Описание реликвии",
+      unit: "Описание фигуры",
+      synergy: "Описание синергии",
+    },
+  },
+};
 
 export interface RelatedEntity {
   slug: string;
@@ -44,20 +82,6 @@ interface EntityDetailProps {
   indexPath?: string;
 }
 
-const INDEX_LABEL: Record<EntityCardVariant, string> = {
-  item: "Items",
-  relic: "Relics",
-  unit: "Units",
-  synergy: "Synergies",
-};
-
-const OVERVIEW_LABEL: Record<EntityCardVariant, string> = {
-  item: "Item Overview",
-  relic: "Relic Overview",
-  unit: "Unit Overview",
-  synergy: "Synergy Overview",
-};
-
 const ENTITY_COLLECTION_PATH: Record<EntityCardVariant, string> = {
   item: "/items",
   relic: "/relics",
@@ -83,6 +107,9 @@ export function EntityDetail({
   indexLabel,
   indexPath,
 }: EntityDetailProps) {
+  const router = useRouter();
+  const locale = normalizeLocale(router.locale ?? router.defaultLocale ?? undefined);
+  const t = T[locale];
   const titleClass = `${styles.title} ${
     variant === "relic"
       ? styles.titleRelic
@@ -91,13 +118,13 @@ export function EntityDetail({
         : styles.titleItem
   }`;
   const resolvedIndexPath = indexPath ?? ENTITY_COLLECTION_PATH[variant];
-  const resolvedIndexLabel = indexLabel ?? INDEX_LABEL[variant];
+  const resolvedIndexLabel = indexLabel ?? t.index[variant];
 
   return (
     <div className={styles.page}>
       <div className={styles.container}>
-        <nav className={styles.breadcrumbs} aria-label="Breadcrumb">
-          <Link href="/">Home</Link>
+        <nav className={styles.breadcrumbs} aria-label={t.breadcrumb}>
+          <Link href="/">{t.home}</Link>
           <span>/</span>
           <Link href={resolvedIndexPath}>{resolvedIndexLabel}</Link>
           <span>/</span>
@@ -118,14 +145,14 @@ export function EntityDetail({
 
         {overview && (
           <section className={styles.section}>
-            <h2 className={styles.sectionTitle}>{OVERVIEW_LABEL[variant]}</h2>
+            <h2 className={styles.sectionTitle}>{t.overview[variant]}</h2>
             <div className={styles.bodyCopy}>{overview}</div>
           </section>
         )}
 
         {notes && notes.length > 0 && (
           <section className={styles.section}>
-            <h2 className={styles.sectionTitle}>Notes</h2>
+            <h2 className={styles.sectionTitle}>{t.notes}</h2>
             <ul className={styles.notes}>
               {notes.map((note, i) => (
                 <li key={i}>{note}</li>
@@ -136,7 +163,7 @@ export function EntityDetail({
 
         {lore && (
           <section className={styles.section}>
-            <h2 className={styles.sectionTitle}>Lore</h2>
+            <h2 className={styles.sectionTitle}>{t.lore}</h2>
             <div className={styles.bodyCopy}>{lore}</div>
           </section>
         )}

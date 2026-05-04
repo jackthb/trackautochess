@@ -1,7 +1,31 @@
 import Link from "next/link";
+import { useRouter } from "next/router";
 import { SITE_NAME } from "@/lib/site";
+import { normalizeLocale } from "@/lib/i18n";
+
+const T = {
+  en: {
+    about: "About",
+    support: "Support",
+    privacy: "Privacy",
+    footerAria: "Footer",
+    disclaimer:
+      "Not affiliated with or endorsed by Valve Corporation or Drodo Studio. Dota, Dota 2, and Dota Auto Chess are trademarks of their respective owners. Game data and assets are property of their respective owners and are used here for informational purposes only.",
+  },
+  ru: {
+    about: "О сайте",
+    support: "Поддержать",
+    privacy: "Конфиденциальность",
+    footerAria: "Подвал",
+    disclaimer:
+      "Сайт не связан с Valve Corporation или Drodo Studio и не одобрен ими. Dota, Dota 2 и Dota Auto Chess — товарные знаки соответствующих правообладателей. Игровые данные и ресурсы принадлежат их правообладателям и используются исключительно в информационных целях.",
+  },
+} as const;
 
 export function Footer() {
+  const router = useRouter();
+  const locale = normalizeLocale(router.locale ?? router.defaultLocale ?? undefined);
+  const t = T[locale];
   return (
     <>
       <style jsx>{`
@@ -68,24 +92,19 @@ export function Footer() {
       <footer className="footer">
         <div className="inner">
           <div className="brand">{SITE_NAME}</div>
-          <nav className="links" aria-label="Footer">
+          <nav className="links" aria-label={t.footerAria}>
             <Link href="/about" className="link">
-              About
+              {t.about}
             </Link>
             <Link href="/about#support" className="link">
-              Support
+              {t.support}
             </Link>
             <Link href="/privacy" className="link">
-              Privacy
+              {t.privacy}
             </Link>
           </nav>
         </div>
-        <div className="disclaimer">
-          Not affiliated with or endorsed by Valve Corporation or Drodo Studio.
-          Dota, Dota 2, and Dota Auto Chess are trademarks of their respective
-          owners. Game data and assets are property of their respective owners
-          and are used here for informational purposes only.
-        </div>
+        <div className="disclaimer">{t.disclaimer}</div>
       </footer>
     </>
   );

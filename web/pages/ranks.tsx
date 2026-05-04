@@ -1,6 +1,65 @@
+import { useRouter } from "next/router";
 import { SeoHead } from "@/lib/seo";
 import { SITE_TITLE } from "@/lib/site";
+import { normalizeLocale } from "@/lib/i18n";
 import browserStyles from "@/components/EntityBrowser.module.css";
+
+const T = {
+  en: {
+    title: `Ranks | ${SITE_TITLE}`,
+    description:
+      "Dota Auto Chess MMR rank brackets — Pawn through Queen, with the exact MMR thresholds for every step, taken straight from the game's panorama source.",
+    heading: "Ranks",
+    lead:
+      "Every Dota Auto Chess rank, from Pawn-1 up to Queen. The MMR thresholds below are derived from the canonical formula the game client uses to convert your MMR into a rank tier.",
+    formulaPre:
+      "Each tier is 80 MMR wide. Pawn-1 catches everyone below 500 MMR (the clamp), and Queen catches everyone at 3380 or above. New accounts must play at least ",
+    formulaGames: "5 games",
+    formulaPost: " before they get a rank — until then they show as Unranked.",
+    sourcePre: "Source: ",
+    sourceMid: " → ",
+    sourceLabels: "GetMMRLevelByScore()",
+    sourceWith: ", with rank labels from ",
+    sourceFile: "resource/addon_english.txt",
+    sourceDot: ".",
+    unranked: "Unranked",
+    levelZero: "Level 0",
+    unrankedDesc:
+      "Shown to any player with fewer than 5 ranked games this season. No MMR is displayed publicly until placement is complete.",
+    headStep: "Step",
+    headLvl: "Lvl",
+    headMin: "Min MMR",
+    headMax: "Max MMR",
+    noCap: "no cap",
+  },
+  ru: {
+    title: `Ранги | ${SITE_TITLE}`,
+    description:
+      "Ранги Dota Auto Chess по MMR — от Pawn до Queen, с точными порогами MMR на каждой ступени, прямо из исходников клиента.",
+    heading: "Ранги",
+    lead:
+      "Все ранги Dota Auto Chess: от Pawn-1 до Queen. Пороги MMR ниже выведены из канонической формулы, по которой клиент игры превращает MMR в ранг.",
+    formulaPre:
+      "Каждая ступень — 80 MMR. Pawn-1 ловит всех ниже 500 MMR (после clamp), а Queen — всех от 3380 и выше. Новым аккаунтам нужно сыграть минимум ",
+    formulaGames: "5 игр",
+    formulaPost: ", прежде чем им присвоят ранг — до этого они показываются как Unranked.",
+    sourcePre: "Источник: ",
+    sourceMid: " → ",
+    sourceLabels: "GetMMRLevelByScore()",
+    sourceWith: ", названия рангов взяты из ",
+    sourceFile: "resource/addon_english.txt",
+    sourceDot: ".",
+    unranked: "Без ранга",
+    levelZero: "Уровень 0",
+    unrankedDesc:
+      "Показывается игрокам, сыгравшим меньше 5 рейтинговых игр в этом сезоне. MMR публично не отображается, пока не завершится плейсмент.",
+    headStep: "Ступень",
+    headLvl: "Ур.",
+    headMin: "Min MMR",
+    headMax: "Max MMR",
+    noCap: "без потолка",
+  },
+} as const;
 
 // Source of truth: GetMMRLevelByScore in
 // panorama/scripts/custom_game/dac.vjs_c (Dota Auto Chess workshop VPK).
@@ -61,14 +120,16 @@ function buildTierGroups(): { tier: string; color: string; rows: BracketRow[] }[
 }
 
 export default function RanksPage() {
-  const title = `Ranks | ${SITE_TITLE}`;
-  const description =
-    "Dota Auto Chess MMR rank brackets — Pawn through Queen, with the exact MMR thresholds for every step, taken straight from the game's panorama source.";
+  const router = useRouter();
+  const locale = normalizeLocale(router.locale ?? router.defaultLocale ?? undefined);
+  const t = T[locale];
+  const title = t.title;
+  const description = t.description;
   const tierGroups = buildTierGroups();
 
   return (
     <>
-      <SeoHead title={title} description={description} path="/ranks" localized={false} />
+      <SeoHead title={title} description={description} path="/ranks" locale={locale} />
 
       <style jsx>{`
         .lead {
@@ -180,38 +241,32 @@ export default function RanksPage() {
 
       <div className={browserStyles.page}>
         <div className={browserStyles.container}>
-          <h1 className={browserStyles.pageTitle}>Ranks</h1>
+          <h1 className={browserStyles.pageTitle}>{t.heading}</h1>
 
-          <p className="lead">
-            Every Dota Auto Chess rank, from Pawn-1 up to Queen. The MMR
-            thresholds below are derived from the canonical formula the game
-            client uses to convert your MMR into a rank tier.
-          </p>
+          <p className="lead">{t.lead}</p>
 
           <div className="formula">
             <code>mmr_level = clamp(floor((mmr − 340) ÷ 80), 1, 38)</code>
             <br />
-            Each tier is 80 MMR wide. Pawn-1 catches everyone below 500 MMR
-            (the clamp), and Queen catches everyone at 3380 or above.
-            New accounts must play at least <strong>5 games</strong> before
-            they get a rank — until then they show as Unranked.
+            {t.formulaPre}<strong>{t.formulaGames}</strong>{t.formulaPost}
           </div>
 
           <p className="source">
-            Source: <code>panorama/scripts/custom_game/dac.vjs_c</code> →{" "}
-            <code>GetMMRLevelByScore()</code>, with rank labels from{" "}
-            <code>resource/addon_english.txt</code>.
+            {t.sourcePre}
+            <code>panorama/scripts/custom_game/dac.vjs_c</code>
+            {t.sourceMid}
+            <code>{t.sourceLabels}</code>
+            {t.sourceWith}
+            <code>{t.sourceFile}</code>
+            {t.sourceDot}
           </p>
 
           <div className="unranked-card">
             <div className="unranked-head">
-              <span className="unranked-name">Unranked</span>
-              <span className="cell-level">Level 0</span>
+              <span className="unranked-name">{t.unranked}</span>
+              <span className="cell-level">{t.levelZero}</span>
             </div>
-            <div className="unranked-desc">
-              Shown to any player with fewer than 5 ranked games this season.
-              No MMR is displayed publicly until placement is complete.
-            </div>
+            <div className="unranked-desc">{t.unrankedDesc}</div>
           </div>
 
           {tierGroups.map(({ tier, color, rows }) => (
@@ -225,10 +280,10 @@ export default function RanksPage() {
               </div>
               <div className="table">
                 <div className="row header-row">
-                  <div className="cell cell-step">Step</div>
-                  <div className="cell cell-level">Lvl</div>
-                  <div className="cell">Min MMR</div>
-                  <div className="cell">Max MMR</div>
+                  <div className="cell cell-step">{t.headStep}</div>
+                  <div className="cell cell-level">{t.headLvl}</div>
+                  <div className="cell">{t.headMin}</div>
+                  <div className="cell">{t.headMax}</div>
                 </div>
                 {rows.map((r) => (
                   <div key={r.rank} className="row">
@@ -239,7 +294,7 @@ export default function RanksPage() {
                     </div>
                     <div className="cell cell-mmr">
                       {r.maxMmr === null ? (
-                        <span className="open-ended">no cap</span>
+                        <span className="open-ended">{t.noCap}</span>
                       ) : (
                         r.maxMmr.toLocaleString()
                       )}
