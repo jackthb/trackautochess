@@ -33,6 +33,16 @@ from extract_vpk import (
 LOCALES = ('en', 'ru')
 PLACEHOLDER = re.compile(r'%([A-Za-z_][A-Za-z0-9_]*)%')
 
+# Most relic _Lore entries are placeholder "From Relic Box" / "From: Relicbox"
+# noise — drop them at the source so consumers don't filter at render time.
+RELIC_BOX_LORE = re.compile(r'^\s*from:?\s*relic\s*box\s*$', re.IGNORECASE)
+
+
+def _scrub_relic_lore(value):
+    if value and RELIC_BOX_LORE.match(value):
+        return ''
+    return value
+
 
 def loc_strings(all_loc, prefix, suffixes=('',), process=None, placeholders=None):
     proc = process if process is not None else strip_html
@@ -75,17 +85,31 @@ def item_values(block):
     return vals
 
 
-def enrich_record(rec, all_loc, gid, *, placeholders=None):
-    """Add `names`, `descriptions`, `lore_i18n` keys to `rec` in place."""
+def enrich_record(rec, all_loc, gid, *, placeholders=None, is_relic=False):
+    """Add `names`, `descriptions`, `lore_i18n` keys to `rec` in place.
+
+    For relics, drop placeholder lore at the source (`is_relic=True`) so
+    the JSON cache only carries real flavour text.
+    """
     prefix = f'DOTA_Tooltip_ability_{gid}'
     rec['names'] = loc_strings(all_loc, prefix)
     rec['descriptions'] = loc_strings(
         all_loc, prefix, ('_Description', '_description'),
         placeholders=placeholders,
     )
-    rec['lore_i18n'] = loc_strings(
+    lore_i18n = loc_strings(
         all_loc, prefix, ('_Lore',), process=unescape_kv,
     )
+    if is_relic:
+        lore_i18n = {
+            lang: cleaned
+            for lang, v in lore_i18n.items()
+            for cleaned in (_scrub_relic_lore(v),)
+            if cleaned
+        }
+        if 'lore' in rec:
+            rec['lore'] = _scrub_relic_lore(rec['lore'])
+    rec['lore_i18n'] = lore_i18n
 
 
 def main():
@@ -146,7 +170,7 @@ def main():
     rdata = json.loads(p.read_text(encoding='utf-8'))
     relics = rdata.get('relics', rdata)
     for rid, rec in relics.items():
-        enrich_record(rec, all_loc, rid)
+        enrich_record(rec, all_loc, rid, is_relic=True)
     p.write_text(
         json.dumps(rdata, indent=2, ensure_ascii=False) + '\n',
         encoding='utf-8',

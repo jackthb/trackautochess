@@ -255,6 +255,15 @@ async function pullItems() {
   writeJson('items.json', {items: curated, total: Object.keys(curated).length})
 }
 
+// Relic _Lore in the VPK is a placeholder for most relics ("From Relic Box"
+// / "From: Relicbox"). Scrub at write time so the JSON cache only carries
+// real flavour text.
+const RELIC_BOX_LORE = /^\s*from:?\s*relic\s*box\s*$/i
+
+function scrubRelicLore(value: string): string {
+  return value && RELIC_BOX_LORE.test(value) ? '' : value
+}
+
 async function pullRelics() {
   const rows = await client.fetch<any[]>(
     `*[_type == "relic"] | order(gameId asc){
@@ -265,15 +274,24 @@ async function pullRelics() {
   const i18n = readExistingI18n('relics.json', 'relics')
   const inner: Record<string, any> = {}
   for (const r of rows) {
-    inner[r.gameId] = applyI18n(
+    const merged = applyI18n(
       {
         name: r.name,
         description: r.description ?? '',
-        lore: r.lore ?? '',
+        lore: scrubRelicLore(r.lore ?? ''),
         ...iconFields(r),
       },
       i18n.get(r.gameId),
     )
+    if (merged.lore_i18n) {
+      const cleaned: Record<string, string> = {}
+      for (const [lang, v] of Object.entries(merged.lore_i18n)) {
+        const s = scrubRelicLore(v as string)
+        if (s) cleaned[lang] = s
+      }
+      merged.lore_i18n = cleaned
+    }
+    inner[r.gameId] = merged
   }
   writeJson('relics.json', {relics: inner})
 }

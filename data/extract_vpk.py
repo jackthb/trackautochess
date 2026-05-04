@@ -465,6 +465,18 @@ def extract_all(pak):
     # 3. RELICS
     # ════════════════════════════════════════════════════════════════
 
+    # Most relic _Lore entries are just the placeholder "From Relic Box" /
+    # "From: Relicbox" — no real flavour text. Drop those at the source so
+    # consumers don't have to filter empty noise at render time. The
+    # localized files use the same English placeholder, so this English
+    # pattern catches every locale.
+    relic_box_lore = re.compile(r'^\s*from:?\s*relic\s*box\s*$', re.IGNORECASE)
+
+    def clean_relic_lore(value):
+        if value and relic_box_lore.match(value):
+            return ''
+        return value
+
     # Extract relic IDs from DROP_RELIC_LIST in addon_game_mode.lua
     # Note: quest_2_relic_list has seasonal/quest relics — not included
     raw_lua = pak['scripts/vscripts/addon_game_mode.lua'].read().decode('utf-8', errors='replace')
@@ -488,14 +500,23 @@ def extract_all(pak):
 
         names_i18n = loc_strings(prefix)
         descs_i18n = loc_strings(prefix, ('_Description', '_description'))
-        lore_i18n = loc_strings(prefix, ('_Lore',), process=unescape_kv)
+        lore_i18n = {
+            lang: cleaned
+            for lang, cleaned in (
+                (lang, clean_relic_lore(v))
+                for lang, v in loc_strings(
+                    prefix, ('_Lore',), process=unescape_kv,
+                ).items()
+            )
+            if cleaned
+        }
 
         relics[iid] = {
             'name': name,
             'names': names_i18n,
             'description': desc,
             'descriptions': descs_i18n,
-            'lore': unescape_kv(lore),
+            'lore': clean_relic_lore(unescape_kv(lore)),
             'lore_i18n': lore_i18n,
         }
 

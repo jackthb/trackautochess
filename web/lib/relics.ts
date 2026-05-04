@@ -24,16 +24,6 @@ export interface DisplayRelic {
   iconDimensions: { width: number; height: number } | null;
 }
 
-// Most entries carry a placeholder "From Relicbox" lore line that just
-// restates the source; strip it so the UI doesn't render empty noise. The
-// localized fallback hits the same way ("来自：圣物宝箱" etc.).
-const RELIC_BOX_LORE = /^\s*from:?\s*relic\s*box\s*$|^\s*来自[:：]?\s*圣物宝箱\s*$/i;
-
-function cleanLore(value: string): string {
-  if (!value) return "";
-  return RELIC_BOX_LORE.test(value) ? "" : value;
-}
-
 function buildRelicsForLocale(locale: Locale): DisplayRelic[] {
   return Object.values(
     (relicsData as { relics: Record<string, RelicInfo> }).relics
@@ -44,13 +34,13 @@ function buildRelicsForLocale(locale: Locale): DisplayRelic[] {
       const localizedName = pickLocalized(relic.names, locale) || relic.name;
       const description =
         pickLocalized(relic.descriptions, locale) || relic.description;
-      const lore = pickLocalized(relic.lore_i18n, locale) || relic.lore;
+      const lore = pickLocalized(relic.lore_i18n, locale) || relic.lore || "";
       return {
         // Slug always uses the English canonical name.
         slug: slugifyName(relic.name),
         name: localizedName,
         description,
-        lore: cleanLore(lore),
+        lore,
         iconStem: stem,
         iconUrl: relic.icon_url || `/icons/relics/${stem}.png`,
         iconDimensions: relic.icon_dimensions ?? null,
