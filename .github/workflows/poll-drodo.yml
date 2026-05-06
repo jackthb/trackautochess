@@ -2,7 +2,9 @@ name: Poll Drodo (MMR snapshots)
 
 on:
   schedule:
-    - cron: '0 * * * *'
+    # Once a day at 09:47 UTC. Off-aligned minute to avoid the
+    # GitHub-wide :00 thundering-herd that delays jobs by ~10–20 min.
+    - cron: '47 9 * * *'
   workflow_dispatch:
 
 concurrency:
