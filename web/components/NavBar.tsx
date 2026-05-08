@@ -28,6 +28,8 @@ const T = {
     placeholderName: "Steam Player Name",
     home: (n: string) => `${n} home`,
     fallbackPlayer: "Player",
+    openMenu: "Open menu",
+    closeMenu: "Close menu",
   },
   ru: {
     items: "Предметы",
@@ -44,6 +46,8 @@ const T = {
     placeholderName: "Имя игрока Steam",
     home: (n: string) => `Главная ${n}`,
     fallbackPlayer: "Игрок",
+    openMenu: "Открыть меню",
+    closeMenu: "Закрыть меню",
   },
 } as const;
 
@@ -54,6 +58,7 @@ export function NavBar({ supabase }: NavBarProps) {
   const [user, setUser] = useState<User | null>(null);
   const [ready, setReady] = useState(false);
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
     if (!supabase) return;
@@ -68,6 +73,21 @@ export function NavBar({ supabase }: NavBarProps) {
     });
     return () => subscription.unsubscribe();
   }, [supabase]);
+
+  useEffect(() => {
+    const handleRouteChange = () => setMenuOpen(false);
+    router.events.on("routeChangeStart", handleRouteChange);
+    return () => router.events.off("routeChangeStart", handleRouteChange);
+  }, [router.events]);
+
+  useEffect(() => {
+    if (!menuOpen) return;
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setMenuOpen(false);
+    };
+    document.addEventListener("keydown", handleKey);
+    return () => document.removeEventListener("keydown", handleKey);
+  }, [menuOpen]);
 
   useEffect(() => {
     if (!supabase || !user) {
@@ -122,6 +142,40 @@ export function NavBar({ supabase }: NavBarProps) {
       : null;
   const isAdmin = isAdminSteamId(sessionSteamId);
 
+  const navLinks = (
+    <>
+      <Link href="/items" className={styles.navLink}>
+        {t.items}
+      </Link>
+      <Link href="/units" className={styles.navLink}>
+        {t.units}
+      </Link>
+      <Link href="/classes" className={styles.navLink}>
+        {t.classes}
+      </Link>
+      <Link href="/species" className={styles.navLink}>
+        {t.species}
+      </Link>
+      <Link href="/relics" className={styles.navLink}>
+        {t.relics}
+      </Link>
+      <Link href="/talents" className={styles.navLink}>
+        {t.talents}
+      </Link>
+      <Link href="/ranks" className={styles.navLink}>
+        {t.ranks}
+      </Link>
+      {isAdmin && (
+        <Link href="/leaderboard" className={styles.navLink}>
+          {t.leaderboard}
+        </Link>
+      )}
+      <Link href="/patch-notes" className={styles.navLink} locale={false}>
+        {t.patchNotes}
+      </Link>
+    </>
+  );
+
   return (
     <>
       <nav className={styles.nav}>
@@ -129,37 +183,7 @@ export function NavBar({ supabase }: NavBarProps) {
           <Link href="/" className={styles.navLogo} aria-label={t.home(SITE_NAME)}>
             <img src="/logo.svg" alt={SITE_NAME} />
           </Link>
-          <div className={styles.navLinks}>
-            <Link href="/items" className={styles.navLink}>
-              {t.items}
-            </Link>
-            <Link href="/units" className={styles.navLink}>
-              {t.units}
-            </Link>
-            <Link href="/classes" className={styles.navLink}>
-              {t.classes}
-            </Link>
-            <Link href="/species" className={styles.navLink}>
-              {t.species}
-            </Link>
-            <Link href="/relics" className={styles.navLink}>
-              {t.relics}
-            </Link>
-            <Link href="/talents" className={styles.navLink}>
-              {t.talents}
-            </Link>
-            <Link href="/ranks" className={styles.navLink}>
-              {t.ranks}
-            </Link>
-            {isAdmin && (
-              <Link href="/leaderboard" className={styles.navLink}>
-                {t.leaderboard}
-              </Link>
-            )}
-            <Link href="/patch-notes" className={styles.navLink} locale={false}>
-              {t.patchNotes}
-            </Link>
-          </div>
+          <div className={styles.navLinks}>{navLinks}</div>
         </div>
         <div className={styles.navRight}>
           <LanguageSwitcher />
@@ -202,8 +226,41 @@ export function NavBar({ supabase }: NavBarProps) {
               <span className={styles.navBtn}>{t.signOut}</span>
             </div>
           ) : null}
+          <button
+            type="button"
+            className={styles.navHamburger}
+            aria-label={menuOpen ? t.closeMenu : t.openMenu}
+            aria-expanded={menuOpen}
+            aria-controls="mobile-nav-menu"
+            onClick={() => setMenuOpen((v) => !v)}
+          >
+            <span
+              className={`${styles.hamburgerIcon} ${menuOpen ? styles.hamburgerOpen : ""}`}
+              aria-hidden="true"
+            >
+              <span />
+              <span />
+              <span />
+            </span>
+          </button>
         </div>
       </nav>
+      {menuOpen && (
+        <div
+          className={styles.mobileBackdrop}
+          aria-hidden="true"
+          onClick={() => setMenuOpen(false)}
+        />
+      )}
+      <div
+        id="mobile-nav-menu"
+        className={`${styles.mobileMenu} ${menuOpen ? styles.mobileMenuOpen : ""}`}
+        role="dialog"
+        aria-label={t.openMenu}
+        aria-hidden={!menuOpen}
+      >
+        <div className={styles.mobileLinks}>{navLinks}</div>
+      </div>
     </>
   );
 }

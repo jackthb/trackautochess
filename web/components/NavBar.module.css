@@ -171,14 +171,116 @@
   color: var(--text-primary);
 }
 
+.navHamburger {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: var(--r-4);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: color var(--t-base) var(--t-easing),
+    border-color var(--t-base) var(--t-easing);
+}
+
+.navHamburger:hover {
+  color: var(--text-primary);
+  border-color: var(--text-muted);
+}
+
+.hamburgerIcon {
+  position: relative;
+  display: inline-block;
+  width: 18px;
+  height: 14px;
+}
+
+.hamburgerIcon span {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  height: 1.5px;
+  background: currentColor;
+  border-radius: 2px;
+  transition: transform var(--t-base) var(--t-easing),
+    opacity var(--t-base) var(--t-easing),
+    top var(--t-base) var(--t-easing);
+}
+
+.hamburgerIcon span:nth-child(1) { top: 0; }
+.hamburgerIcon span:nth-child(2) { top: 6px; }
+.hamburgerIcon span:nth-child(3) { top: 12px; }
+
+.hamburgerOpen span:nth-child(1) {
+  top: 6px;
+  transform: rotate(45deg);
+}
+
+.hamburgerOpen span:nth-child(2) {
+  opacity: 0;
+}
+
+.hamburgerOpen span:nth-child(3) {
+  top: 6px;
+  transform: rotate(-45deg);
+}
+
+.mobileBackdrop {
+  display: none;
+  position: fixed;
+  inset: var(--nav-height) 0 0 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 9;
+}
+
+.mobileMenu {
+  display: none;
+  position: fixed;
+  top: var(--nav-height);
+  left: 0;
+  right: 0;
+  z-index: 9;
+  background: rgba(8, 9, 11, 0.98);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--border-subtle);
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height var(--t-base) var(--t-easing);
+}
+
+.mobileMenuOpen {
+  max-height: calc(100vh - var(--nav-height));
+  overflow-y: auto;
+}
+
+.mobileLinks {
+  display: flex;
+  flex-direction: column;
+  padding: 8px 0;
+}
+
+.mobileLinks .navLink {
+  padding: 14px 24px;
+  font-size: 14px;
+  letter-spacing: 2px;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.mobileLinks .navLink:last-child {
+  border-bottom: none;
+}
+
 @media (max-width: 760px) {
   .nav {
     padding: 0 18px;
   }
 
   .navLinks {
-    gap: 14px;
-    margin-left: 18px;
+    display: none;
   }
 
   .navRight {
@@ -186,9 +288,22 @@
     gap: 12px;
   }
 
-  .navLink,
+  .navUser {
+    display: none;
+  }
+
   .navSignin,
   .navBtn {
     font-size: 11px;
+    padding: 6px 10px;
+  }
+
+  .navHamburger {
+    display: inline-flex;
+  }
+
+  .mobileMenu,
+  .mobileBackdrop {
+    display: block;
   }
 }
