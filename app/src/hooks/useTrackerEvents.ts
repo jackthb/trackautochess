@@ -18,6 +18,9 @@ export interface ImportResult {
   tone?: ImportResultTone;
   screenType?: "my_matches" | "game_over" | "final_ranking" | "unknown";
   linkedToUser?: number;
+  profileUrl?: string;
+  matchId?: string;
+  screenshotUrl?: string;
 }
 
 interface TrackerState {
@@ -102,6 +105,7 @@ export function useTrackerEvents(
             version: prev?.version ?? "",
             replay_enabled: prev?.replay_enabled ?? true,
             recording_stats: prev?.recording_stats ?? null,
+            admin_mode: prev?.admin_mode ?? false,
             logged_in: true,
             steam_id: msg.steam_id,
             steam_name: msg.steam_name,
@@ -131,6 +135,9 @@ export function useTrackerEvents(
             tone: msg.tone,
             screenType: msg.screen_type,
             linkedToUser: msg.linked_to_user,
+            profileUrl: msg.profile_url,
+            matchId: msg.match_id,
+            screenshotUrl: msg.screenshot_url,
           });
           finishImport();
           callbacksRef.current.onImportResult?.();

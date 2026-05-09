@@ -174,6 +174,7 @@ export interface TrackerStatus {
   version: string;
   steam_id: string;
   steam_name: string;
+  admin_mode: boolean;
   replay_enabled: boolean;
   recording_stats: RecordingStats | null;
 }
@@ -196,6 +197,9 @@ export interface ImportResultEvent {
   tone?: ImportResultTone;
   screen_type?: "my_matches" | "game_over" | "final_ranking" | "unknown";
   linked_to_user?: number;
+  profile_url?: string;
+  match_id?: string;
+  screenshot_url?: string;
 }
 
 export type TrackerEvent =
@@ -317,6 +321,8 @@ declare global {
     lab: LabApi;
     appApi: {
       openFileDialog: () => Promise<string | null>;
+      openGameOverScreenshotDialog: () => Promise<string | null>;
+      openExternal: (url: string) => Promise<boolean>;
       getVersion: () => Promise<string>;
       getCloseToTray: () => Promise<boolean>;
       setCloseToTray: (value: boolean) => Promise<boolean>;

@@ -3,8 +3,10 @@
 The Lab tab uses two RPC commands:
   - `lab_parse_full`:  enumerate every region the parser looks at, with bbox in
                        image-fraction coords and the parsed label per region.
-  - `lab_parse_region`: re-run a single region's detector with a (potentially
-                       moved/resized) bbox override.
+  - `lab_parse_region`: re-run a single MY MATCHES region's detector with a
+                       bbox override. GAME OVER regions are echoed from the
+                       production parser trace so the Lab cannot drift from
+                       import behavior.
 
 Both produce a uniform `RegionEntry` shape so the renderer can draw overlays
 and inspect any region without knowing about the parser internals.
@@ -135,16 +137,6 @@ def _parse_rank(img: np.ndarray, bbox: tuple) -> str:
     return ""
 
 
-def _parse_player_name(img: np.ndarray, bbox: tuple) -> str:
-    from cv_parser import _preprocess_for_ocr
-    cell = _crop_bbox(img, bbox)
-    if cell.size == 0:
-        return ""
-    proc = _preprocess_for_ocr(cell, scale=2.5)
-    raw = _ocr(proc, psm=7).strip()
-    return raw.split("\n")[0].strip() if raw else ""
-
-
 def _parse_time_ago(img: np.ndarray, bbox: tuple) -> str:
     from cv_parser import _preprocess_for_ocr, _normalise_time_ago
     cell = _crop_bbox(img, bbox)
@@ -158,21 +150,17 @@ def _parse_time_ago(img: np.ndarray, bbox: tuple) -> str:
 _UNIT_TEMPLATES_CACHE: dict[str, list[np.ndarray]] | None = None
 _RELIC_TEMPLATES_CACHE: dict[str, list[np.ndarray]] | None = None
 _SYN_TEMPLATES_CACHE: dict[str, list[np.ndarray]] | None = None
-_GO_SYN_TEMPLATES_CACHE: dict[str, list[np.ndarray]] | None = None
-_GO_RELIC_TEMPLATES_CACHE: dict[str, list[np.ndarray]] | None = None
 _STEM_TO_NAME_CACHE: dict[str, str] | None = None
 _UNITS_DATA_CACHE: dict | None = None
 
 
 def _ensure_templates():
     global _UNIT_TEMPLATES_CACHE, _RELIC_TEMPLATES_CACHE, _SYN_TEMPLATES_CACHE
-    global _GO_SYN_TEMPLATES_CACHE, _GO_RELIC_TEMPLATES_CACHE
     global _STEM_TO_NAME_CACHE, _UNITS_DATA_CACHE
     from cv_parser import (
         _load_templates_multiscale,
         UNIT_ICON_SCALES, RELIC_ICON_SCALES,
-        MM_SYNERGY_ICON_SCALES, SYNERGY_ICON_SCALES,
-        GO_RELIC_ICON_SCALES,
+        MM_SYNERGY_ICON_SCALES,
     )
     if _UNIT_TEMPLATES_CACHE is None:
         _UNIT_TEMPLATES_CACHE = _load_templates_multiscale(
@@ -183,12 +171,6 @@ def _ensure_templates():
     if _SYN_TEMPLATES_CACHE is None:
         _SYN_TEMPLATES_CACHE = _load_templates_multiscale(
             ICONS_DIR / "synergies", MM_SYNERGY_ICON_SCALES)
-    if _GO_SYN_TEMPLATES_CACHE is None:
-        _GO_SYN_TEMPLATES_CACHE = _load_templates_multiscale(
-            ICONS_DIR / "synergies", SYNERGY_ICON_SCALES)
-    if _GO_RELIC_TEMPLATES_CACHE is None:
-        _GO_RELIC_TEMPLATES_CACHE = _load_templates_multiscale(
-            ICONS_DIR / "relics", GO_RELIC_ICON_SCALES, inner_frac=1.0, color=True)
     if _STEM_TO_NAME_CACHE is None:
         units_path = DATA_DIR / "units.json"
         if units_path.exists():
@@ -250,24 +232,6 @@ def _parse_mm_synergy_region(img: np.ndarray, bbox: tuple) -> str:
     return ", ".join(names)
 
 
-def _parse_go_synergy_region(img: np.ndarray, bbox: tuple) -> str:
-    from cv_parser import _match_templates_multiscale
-    _ensure_templates()
-    region = _crop_bbox(img, bbox)
-    if region.size == 0:
-        return ""
-    matches = _match_templates_multiscale(
-        region, _GO_SYN_TEMPLATES_CACHE,
-        threshold=0.7, debug=False,
-    )
-    best: dict[str, float] = {}
-    for name, score, _, _ in matches:
-        if score > best.get(name, 0):
-            best[name] = score
-    names = [name for name, _ in sorted(best.items(), key=lambda kv: -kv[1])]
-    return ", ".join(names)
-
-
 def _parse_sentinel_match(img: np.ndarray, bbox: tuple, template_name: str) -> str:
     """Run a template-match for a sentinel anchor; returns score."""
     region = _crop_bbox(img, bbox)
@@ -286,6 +250,8 @@ def _parse_sentinel_match(img: np.ndarray, bbox: tuple, template_name: str) -> s
     return f"score={max_val:.3f}"
 
 
+# Game Over categories (`go_*`) are intentionally absent — `parse_region`
+# short-circuits on those and echoes the production parser trace instead.
 CATEGORY_HANDLERS: dict[str, Any] = {
     "title": _parse_title,
     "mm_tab": _parse_title,
@@ -297,12 +263,6 @@ CATEGORY_HANDLERS: dict[str, Any] = {
     "mm_units": _parse_unit_grid_region,
     "mm_synergies": _parse_mm_synergy_region,
     "mm_relics": _parse_relic_grid_region,
-    "go_player_name": _parse_player_name,
-    "go_player_rank": _parse_rank,
-    "go_level": _parse_mm_level,
-    "go_wl": _parse_wl,
-    "go_synergies": _parse_go_synergy_region,
-    "go_relics": _parse_relic_grid_region,
     "sentinel_final_ranking": lambda img, bbox: _parse_sentinel_match(img, bbox, "sentinel_ref_final_ranking.png"),
     "sentinel_round_start": lambda img, bbox: _parse_sentinel_match(img, bbox, "sentinel_ref_round_start.png"),
     "ocr": _parse_title,  # generic OCR fallback
@@ -382,47 +342,20 @@ def _enumerate_my_matches(img: np.ndarray) -> list[dict]:
 
 
 def _enumerate_game_over(img: np.ndarray) -> list[dict]:
-    from cv_parser import (
-        TITLE_REGION,
-        COL_PLAYER, COL_LEVEL, COL_SYNERGY, COL_RELIC, COL_WL,
-        GO_PLAYER_NAME_Y, GO_RANK_Y_IN_PLAYER,
-        N_ROWS, parse_game_over_all, _row_y_extent,
-    )
-    _ensure_templates()
-    entries: list[dict] = [
-        _entry("title", KIND_OCR, "title", TITLE_REGION),
-    ]
+    from cv_parser import parse_game_over_screenshot
 
-    rows = parse_game_over_all(img, ICONS_DIR, debug=False) or []
-    for i in range(N_ROWS):
-        y0, y1 = _row_y_extent(i)
-        rh = y1 - y0
-        row = rows[i] if i < len(rows) else {}
+    draft = parse_game_over_screenshot(img, icons_dir=ICONS_DIR, debug=False)
+    return draft.get("trace", [])
 
-        name_bbox = (COL_PLAYER[0], y0 + rh * GO_PLAYER_NAME_Y[0],
-                     COL_PLAYER[1], y0 + rh * GO_PLAYER_NAME_Y[1])
-        rank_bbox = (COL_PLAYER[0], y0 + rh * GO_RANK_Y_IN_PLAYER[0],
-                     COL_PLAYER[1], y0 + rh * GO_RANK_Y_IN_PLAYER[1])
-        level_bbox = (COL_LEVEL[0], y0, COL_LEVEL[1], y1)
-        syn_bbox = (COL_SYNERGY[0], y0, COL_SYNERGY[1], y1)
-        relic_bbox = (COL_RELIC[0], y0, COL_RELIC[1], y1)
-        wl_bbox = (COL_WL[0], y0, COL_WL[1], y1)
 
-        entries.extend([
-            _entry(f"row{i}.player", KIND_OCR, "go_player_name", name_bbox,
-                   row.get("player_name", ""), i),
-            _entry(f"row{i}.rank", KIND_OCR, "go_player_rank", rank_bbox,
-                   row.get("rank", ""), i),
-            _entry(f"row{i}.level", KIND_OCR, "go_level", level_bbox,
-                   row.get("level", ""), i),
-            _entry(f"row{i}.synergies", KIND_TEMPLATE, "go_synergies", syn_bbox,
-                   row.get("synergies", ""), i),
-            _entry(f"row{i}.relic", KIND_TEMPLATE, "go_relics", relic_bbox,
-                   row.get("relic", ""), i),
-            _entry(f"row{i}.wl", KIND_OCR, "go_wl", wl_bbox,
-                   row.get("wl", ""), i),
-        ])
-    return entries
+def _production_game_over_region(img: np.ndarray, name: str, category: str) -> dict | None:
+    from cv_parser import parse_game_over_screenshot
+
+    draft = parse_game_over_screenshot(img, icons_dir=ICONS_DIR, debug=False)
+    for entry in draft.get("trace", []):
+        if entry.get("name") == name and entry.get("category") == category:
+            return entry
+    return None
 
 
 def _enumerate_sentinel(img: np.ndarray, key: str) -> list[dict]:
@@ -480,6 +413,23 @@ def parse_region(img_path: str, name: str, category: str,
         return {"ok": False, "error": f"Cannot read image: {img_path}"}
 
     apply_calibration(img)
+
+    if category.startswith("go_"):
+        entry = _production_game_over_region(img, name, category)
+        if entry is None:
+            return {"ok": False, "error": f"Unknown Game Over region: {name}"}
+        # Game Over Lab reparsing is intentionally production-parser only.
+        # The bbox is echoed from the production trace so the Lab cannot imply
+        # a one-off region edit changed real parser behavior.
+        return {
+            "ok": True,
+            "name": name,
+            "category": category,
+            "bbox": entry.get("bbox", []),
+            "label": entry.get("label", ""),
+            "crop_b64": entry.get("crop_b64", ""),
+        }
+
     handler = CATEGORY_HANDLERS.get(category)
     if handler is None:
         return {"ok": False, "error": f"Unknown category: {category}"}

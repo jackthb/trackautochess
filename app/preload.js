@@ -53,6 +53,8 @@ contextBridge.exposeInMainWorld("lab", {
 
 contextBridge.exposeInMainWorld("appApi", {
   openFileDialog: () => ipcRenderer.invoke("app:openFileDialog"),
+  openGameOverScreenshotDialog: () => ipcRenderer.invoke("app:openGameOverScreenshotDialog"),
+  openExternal: (url) => ipcRenderer.invoke("app:openExternal", url),
   getVersion: () => ipcRenderer.invoke("app:getVersion"),
   getCloseToTray: () => ipcRenderer.invoke("app:getCloseToTray"),
   setCloseToTray: (value) => ipcRenderer.invoke("app:setCloseToTray", value),

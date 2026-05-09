@@ -426,18 +426,6 @@ def _crop_row(img: np.ndarray, col: tuple[float, float], row_y0: float, row_y1: 
     return _crop(img, col[0], row_y0, col[1], row_y1)
 
 
-def _ocr_data(img: np.ndarray, psm: int = 6) -> dict:
-    """OCR with bounding box data. Returns pytesseract output dict."""
-    if pytesseract is None:
-        return {"text": [], "top": [], "height": [], "conf": []}
-    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY) if len(img.shape) == 3 else img
-    try:
-        return pytesseract.image_to_data(gray, config=f"--psm {psm}",
-                                          output_type=pytesseract.Output.DICT)
-    except Exception:
-        return {"text": [], "top": [], "height": [], "conf": []}
-
-
 def _preprocess_for_ocr(img: np.ndarray, scale: float = 2.0, invert: bool = True) -> np.ndarray:
     """Upscale and threshold for OCR on game UI text (light text on dark bg)."""
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY) if len(img.shape) == 3 else img
@@ -1151,84 +1139,56 @@ def _parse_game_over_relics(
     return "|".join(relics)
 
 
-# ── Left-panel rank extraction ────────────────────────────────────────────────
-
-# The Game Over screen has a player list in the left sidebar (x=0..17%).
-# Each row shows: position, player name, level, rank (e.g. "Bishop-1").
-# We scan rows to find the player name, then extract the adjacent rank.
-RANK_PANEL_X = (0.0, 0.17)
-RANK_PANEL_Y = (0.165, 0.68)
-RANK_PANEL_ROWS = 8
 RANK_NAMES = ("Pawn", "Knight", "Bishop", "Rook", "King", "Queen")
 
 
-def extract_rank_from_panel(img: np.ndarray, player_name: str, debug: bool = False) -> str:
-    """Extract player rank (e.g. 'Bishop-1') from the left sidebar.
-
-    Scans panel rows for the player name, then reads the rank word+digit
-    on the same row (or ±1 row if not found immediately).
-    Returns empty string if rank cannot be read.
-    """
-    h, w = img.shape[:2]
-    px0, px1 = int(w * RANK_PANEL_X[0]), int(w * RANK_PANEL_X[1])
-    py0, py1 = int(h * RANK_PANEL_Y[0]), int(h * RANK_PANEL_Y[1])
-    panel_h = py1 - py0
-    row_h = panel_h // RANK_PANEL_ROWS
-    pname = player_name.lower()
-
-    def _ocr_strip(y0: int, y1: int) -> str:
-        strip = img[y0:y1, px0:px1]
-        gray = cv2.cvtColor(strip, cv2.COLOR_BGR2GRAY) if len(strip.shape) == 3 else strip
-        _, bright = cv2.threshold(gray, 140, 255, cv2.THRESH_BINARY)
-        scaled = cv2.resize(bright, (bright.shape[1] * 3, bright.shape[0] * 3),
-                            interpolation=cv2.INTER_CUBIC)
-        inv = cv2.bitwise_not(scaled)
-        try:
-            import pytesseract as _pt
-            return _pt.image_to_string(inv, config="--psm 6").strip().replace("\n", " ")
-        except Exception:
-            return ""
-
-    # Find row containing player name
-    player_row = None
-    for i in range(RANK_PANEL_ROWS):
-        ry0 = py0 + i * row_h
-        ry1 = ry0 + row_h
-        text = _ocr_strip(ry0, ry1)
-        log.debug(f"  [rank panel] row {i}: {text!r}")
-        if pname in text.lower():
-            player_row = i
-            break
-
-    if player_row is None:
-        log.debug(f"  [rank panel] player '{player_name}' not found in sidebar")
-        return ""
-
-    # Search for rank text in the player's row, expanding only DOWNWARD
-    # (rank badge sits below the player name in the same row).
-    # Avoid expanding upward — that reads the previous player's rank.
-    rank_re = re.compile(
-        r"(" + "|".join(RANK_NAMES) + r")[\s\-]*(\d)",
-        re.IGNORECASE,
-    )
-    for extra in (0, 0.5, 1.0):
-        ry0 = py0 + player_row * row_h
-        ry1 = min(py1, py0 + int((player_row + 1 + extra) * row_h))
-        text = _ocr_strip(ry0, ry1)
-        # Find ALL rank matches and pick the LAST one (closest to player,
-        # since player name is at top and rank badge is below)
-        matches = list(rank_re.finditer(text))
-        if matches:
-            m = matches[-1]
-            rank = f"{m.group(1).title()}-{m.group(2)}"
-            log.debug(f"  [rank panel] found rank={rank!r} in: {text!r}")
-            return rank
-
-    log.debug("  [rank panel] rank word not found near player row")
-    return ""
-
-
 # ── GAME OVER table parser ───────────────────────────────────────────────────
+
+def _trace_region(
+    name: str,
+    kind: str,
+    category: str,
+    bbox: tuple[float, float, float, float],
+    label: str = "",
+    row_index: int | None = None,
+    crop: np.ndarray | None = None,
+) -> dict:
+    entry = {
+        "name": name,
+        "kind": kind,
+        "category": category,
+        "bbox": [round(float(v), 5) for v in bbox],
+        "label": label or "",
+        "row_index": row_index,
+    }
+    if crop is not None:
+        entry["crop_b64"] = _img_to_b64(crop)
+    return entry
+
+
+def _game_over_row_bboxes(row_idx: int) -> dict[str, tuple[float, float, float, float]]:
+    y0, y1 = _row_y_extent(row_idx)
+    rh = y1 - y0
+    return {
+        "player": (
+            COL_PLAYER[0],
+            y0 + rh * GO_PLAYER_NAME_Y[0],
+            COL_PLAYER[1],
+            y0 + rh * GO_PLAYER_NAME_Y[1],
+        ),
+        "rank": (
+            COL_PLAYER[0],
+            y0 + rh * GO_RANK_Y_IN_PLAYER[0],
+            COL_PLAYER[1],
+            y0 + rh * GO_RANK_Y_IN_PLAYER[1],
+        ),
+        "level": (COL_LEVEL[0], y0, COL_LEVEL[1], y1),
+        "synergies": (COL_SYNERGY[0], y0, COL_SYNERGY[1], y1),
+        "relic": (COL_RELIC[0], y0, COL_RELIC[1], y1),
+        "wl": (COL_WL[0], y0, COL_WL[1], y1),
+        "row": (0.0, y0, 1.0, y1),
+    }
+
 
 def parse_game_over(
     img: np.ndarray,
@@ -1431,9 +1391,27 @@ def parse_game_over_all(
         player_name, placement, level, wl, synergies, relic, rank
     or None on failure.
     """
+    draft = parse_game_over_screenshot(img, icons_dir=icons_dir, debug=debug)
+    return draft["rows"]
+
+
+def parse_game_over_screenshot(
+    img: np.ndarray,
+    *,
+    icons_dir: Path,
+    user_avatar=None,
+    debug: bool = False,
+) -> dict:
+    """Parse a Game Over screenshot into an editable draft plus trace data.
+
+    This is the production Game Over parse surface. Import, Parser Lab, debug
+    views, and fixtures should read this draft rather than reimplementing row
+    parsing field-by-field.
+    """
+    del user_avatar  # Reserved for Steam avatar matching in the next slice.
     apply_calibration(img)
     h, w = img.shape[:2]
-    log.info(f"[cv] parse_game_over_all: {w}x{h}")
+    log.info(f"[cv] parse_game_over_screenshot: {w}x{h}")
 
     # Pre-load templates once for all rows
     syn_templates = _load_templates_multiscale(icons_dir / "synergies", SYNERGY_ICON_SCALES)
@@ -1444,7 +1422,18 @@ def parse_game_over_all(
         color=True,
     )
 
-    results = []
+    rows = []
+    trace = [
+        _trace_region(
+            "title",
+            "ocr",
+            "title",
+            TITLE_REGION,
+            crop=_crop(img, *TITLE_REGION),
+        )
+    ]
+    warnings = []
+
     for i in range(N_ROWS):
         player_name = _ocr_player_name(img, i, debug=debug)
         rank = _ocr_player_rank(img, i, debug=debug)
@@ -1452,13 +1441,101 @@ def parse_game_over_all(
                                     syn_templates=syn_templates,
                                     relic_templates=relic_templates,
                                     debug=debug)
+        bboxes = _game_over_row_bboxes(i)
         row_data["player_name"] = player_name
+        row_data["player_name_raw"] = player_name
+        row_data["player_label"] = f"Player {i + 1}"
         row_data["rank"] = rank
-        results.append(row_data)
+        row_data["row_index"] = i
+        row_data["avatar_match_score"] = None
+        row_data["is_current_user_candidate"] = False
+        row_data["confidence"] = None
+        rows.append(row_data)
+
+        trace.extend([
+            _trace_region(
+                f"row{i}",
+                "band",
+                "go_row",
+                bboxes["row"],
+                f"Player {i + 1}",
+                i,
+                _crop(img, *bboxes["row"]),
+            ),
+            _trace_region(
+                f"row{i}.player",
+                "ocr",
+                "go_player_name",
+                bboxes["player"],
+                player_name,
+                i,
+                _crop(img, *bboxes["player"]),
+            ),
+            _trace_region(
+                f"row{i}.rank",
+                "ocr",
+                "go_player_rank",
+                bboxes["rank"],
+                rank,
+                i,
+                _crop(img, *bboxes["rank"]),
+            ),
+            _trace_region(
+                f"row{i}.level",
+                "ocr",
+                "go_level",
+                bboxes["level"],
+                row_data.get("level", ""),
+                i,
+                _crop(img, *bboxes["level"]),
+            ),
+            _trace_region(
+                f"row{i}.synergies",
+                "template",
+                "go_synergies",
+                bboxes["synergies"],
+                row_data.get("synergies", ""),
+                i,
+                _crop(img, *bboxes["synergies"]),
+            ),
+            _trace_region(
+                f"row{i}.relic",
+                "template",
+                "go_relics",
+                bboxes["relic"],
+                row_data.get("relic", ""),
+                i,
+                _crop(img, *bboxes["relic"]),
+            ),
+            _trace_region(
+                f"row{i}.wl",
+                "ocr",
+                "go_wl",
+                bboxes["wl"],
+                row_data.get("wl", ""),
+                i,
+                _crop(img, *bboxes["wl"]),
+            ),
+        ])
+
+        if not player_name:
+            warnings.append(f"row {i + 1}: player name OCR was empty")
+        if not row_data.get("level"):
+            warnings.append(f"row {i + 1}: level OCR was empty")
+        if not row_data.get("wl"):
+            warnings.append(f"row {i + 1}: W-L OCR was empty")
+
         log.info(f"[cv] Row {i+1}: name={player_name!r} place={row_data['placement']} "
                  f"level={row_data['level']} wl={row_data['wl']} rank={row_data['rank']}")
 
-    return results
+    return {
+        "screen_type": "game_over",
+        "screenshot_width": w,
+        "screenshot_height": h,
+        "rows": rows,
+        "warnings": warnings,
+        "trace": trace,
+    }
 
 
 # ── MY MATCHES parser ────────────────────────────────────────────────────────

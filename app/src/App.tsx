@@ -9,6 +9,7 @@ import { LabTab } from "./components/LabTab";
 import { SettingsTab } from "./components/SettingsTab";
 import { LogTab } from "./components/LogTab";
 import { LoginScreen } from "./components/LoginScreen";
+import { UploadShell } from "./components/UploadShell";
 import { GlobalSearch } from "./components/GlobalSearch";
 import { useTrackerEvents } from "./hooks/useTrackerEvents";
 import { useGames } from "./hooks/useGames";
@@ -33,6 +34,7 @@ export default function App() {
 
   const tracker = useTrackerEvents(handleImportResult, replaysState.refresh);
   const showLoginScreen = !tracker.status?.logged_in;
+  const showUploadShell = Boolean(tracker.status?.logged_in && tracker.status.admin_mode === false);
 
   const hasParseResult = tracker.pendingParseResult !== null;
   const hasProcessingScreenshot = tracker.processingScreenshot !== null;
@@ -77,6 +79,14 @@ export default function App() {
           status={tracker.status}
           authError={tracker.authError}
           onClearAuthError={tracker.clearAuthError}
+        />
+      ) : showUploadShell ? (
+        <UploadShell
+          status={tracker.status}
+          importing={tracker.importing}
+          lastImportResult={tracker.lastImportResult}
+          onBeginImport={tracker.beginImport}
+          onClearImportResult={tracker.clearImportResult}
         />
       ) : (
         <>

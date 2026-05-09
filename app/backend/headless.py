@@ -33,7 +33,6 @@ _setup_tesseract()
 
 from utils import (
     DAC_DIR,
-    DATA_DIR,
     ICONS_DIR,
     load_config,
     load_regions_config,
@@ -147,9 +146,35 @@ class HeadlessBackend:
             "version": __version__,
             "steam_id": self.config.get("steam_id", ""),
             "steam_name": self.config.get("steam_name", ""),
+            "admin_mode": self._is_admin_mode(),
             "replay_enabled": self.config.get("replay_enabled", True),
             "recording_stats": rec_stats,
         })
+
+    def _is_admin_mode(self) -> bool:
+        """Full desktop/debug UI is for dev/admins; packaged users get upload shell."""
+        configured = self.config.get("admin_mode")
+        if isinstance(configured, bool):
+            return configured
+
+        env_flag = os.environ.get("DAC_ADMIN_MODE", "").strip().lower()
+        if env_flag in ("1", "true", "yes", "on"):
+            return True
+
+        steam_id = str(self.config.get("steam_id") or "").strip()
+        allowlist: list[str] = []
+        raw_config = self.config.get("admin_steam_ids", [])
+        if isinstance(raw_config, str):
+            allowlist.extend(raw_config.split(","))
+        elif isinstance(raw_config, list):
+            allowlist.extend(str(v) for v in raw_config)
+        raw_env = os.environ.get("DAC_ADMIN_STEAM_IDS", "")
+        if raw_env:
+            allowlist.extend(raw_env.split(","))
+        if steam_id and steam_id in {v.strip() for v in allowlist if v.strip()}:
+            return True
+
+        return not getattr(sys, "frozen", False)
 
     # ── Replay recording ────────────────────────────────────────────────────
 
@@ -447,12 +472,129 @@ class HeadlessBackend:
             log.error("parse error: %s", e, exc_info=True)
             self._emit_error(f"Parse error: {e}")
 
+    def _parse_game_over_draft(self, img, *, debug: bool = True) -> dict | None:
+        from cv_parser import parse_game_over_screenshot
+
+        draft = parse_game_over_screenshot(img, icons_dir=ICONS_DIR, debug=debug)
+        rows = draft.get("rows", [])
+        if not rows:
+            log.warning("GAME OVER: no rows parsed")
+            return None
+        log.info("Parsed %d player(s) from GAME OVER", len(rows))
+        return draft
+
+    def _upload_game_over_screenshot_asset(self, img, user_id: str | None) -> str:
+        if not user_id:
+            return ""
+        try:
+            from db import upload_screenshot
+
+            return upload_screenshot(img, user_id) or ""
+        except Exception as e:
+            log.warning("Game Over screenshot upload failed: %s", e)
+            return ""
+
+    def _resolve_game_over_users(
+        self,
+        rows: list[dict],
+        my_user_id: str | None,
+    ) -> tuple[list[tuple[dict, str | None]], int]:
+        from db import lookup_users_by_name
+
+        def _norm_name(value: str) -> str:
+            return str(value or "").strip().lower()
+
+        ocr_names = [r.get("player_name", "") for r in rows]
+        name_to_steam_id = lookup_users_by_name(ocr_names)
+        log.info("User lookup: matched %d/%d names", len(name_to_steam_id), len(ocr_names))
+
+        my_name_key = _norm_name(self.config.get("steam_name", ""))
+        resolved_rows: list[tuple[dict, str | None]] = []
+        linked_detected = 0
+
+        for row in rows:
+            user_id = None
+            normalized_name = _norm_name(row.get("player_name", ""))
+            if normalized_name:
+                steam_id = name_to_steam_id.get(normalized_name)
+                if steam_id:
+                    user_id = str(steam_id)
+                elif my_user_id and my_name_key and normalized_name == my_name_key:
+                    user_id = str(my_user_id)
+            if my_user_id and user_id == str(my_user_id):
+                linked_detected += 1
+            resolved_rows.append((row, user_id))
+
+        return resolved_rows, linked_detected
+
+    def _push_game_over_rows(
+        self,
+        resolved_rows: list[tuple[dict, str | None]],
+        *,
+        played_at: str,
+        match_id: str,
+        screenshot_url: str,
+        my_user_id: str | None,
+        preserve_player_note: bool = False,
+    ) -> dict:
+        from db import game_exists, push_game
+        from models import GameRow
+
+        stats = {
+            "imported": 0,
+            "skipped": 0,
+            "failed": 0,
+            "linked_imported": 0,
+            "linked_skipped": 0,
+            "linked_failed": 0,
+        }
+        for row, user_id in resolved_rows:
+            placement = row.get("placement", "")
+            wl = row.get("wl", "")
+            level = row.get("level", "")
+            linked_to_user = bool(my_user_id and user_id == str(my_user_id))
+
+            if user_id and game_exists(user_id, played_at, placement, wl, level):
+                log.info("  row %s: SKIP duplicate (user=%s place=%s)", placement, user_id, placement)
+                stats["skipped"] += 1
+                if linked_to_user:
+                    stats["linked_skipped"] += 1
+                continue
+
+            note = ""
+            if preserve_player_note:
+                note = row.get("player_name") or row.get("player_label") or ""
+
+            game_row = GameRow(
+                played_at=played_at,
+                placement=placement,
+                rank=row.get("rank", ""),
+                rank_change="none",
+                lineup="",
+                synergies=row.get("synergies", ""),
+                talents="",
+                relic=row.get("relic", ""),
+                level=level,
+                wl=wl,
+                screenshot=screenshot_url,
+                notes=note,
+                replay=self._last_replay_filename or "",
+                match_id=match_id,
+            )
+            if push_game(game_row, user_id=user_id):
+                stats["imported"] += 1
+                if linked_to_user:
+                    stats["linked_imported"] += 1
+            else:
+                stats["failed"] += 1
+                if linked_to_user:
+                    stats["linked_failed"] += 1
+        return stats
+
     def _do_parse_game_over(self, img, screenshot_path: str = "") -> None:
         """Parse a Game Over screen — extract all 8 players and push to DB."""
         import cv2
-        from cv_parser import parse_game_over_all
-        from models import GameRow
-        from db import push_game, game_exists, lookup_users_by_name, generate_match_id
+        from db import generate_match_id
 
         try:
             if isinstance(img, Path):
@@ -461,49 +603,19 @@ class HeadlessBackend:
                     self._emit_error("Failed to read image")
                     return
 
-            all_rows = parse_game_over_all(img, ICONS_DIR, debug=True)
-            if not all_rows:
-                log.warning("GAME OVER: no rows parsed")
+            draft = self._parse_game_over_draft(img, debug=True)
+            if not draft:
                 self._emit_notification(APP_NAME, "GAME OVER: no rows parsed.")
                 return
-            log.info("Parsed %d player(s) from GAME OVER", len(all_rows))
 
             played_at = datetime.now().isoformat()
             my_user_id = self.config.get("steam_id") or None
 
-            # Upload screenshot once
-            screenshot_url = ""
-            if my_user_id:
-                try:
-                    from db import upload_screenshot
-                    screenshot_url = upload_screenshot(img, my_user_id) or ""
-                except ImportError:
-                    screenshot_url = ""
-
-            # Look up player names against existing users
-            ocr_names = [r.get("player_name", "") for r in all_rows]
-            name_to_steam_id = lookup_users_by_name(ocr_names)
-            log.info("User lookup: matched %d/%d names", len(name_to_steam_id), len(ocr_names))
-
-            def _norm_name(value: str) -> str:
-                return str(value or "").strip().lower()
-
-            my_name_key = _norm_name(self.config.get("steam_name", ""))
-            resolved_rows: list[tuple[dict, str | None]] = []
-            linked_detected = 0
-
-            for row in all_rows:
-                user_id = None
-                normalized_name = _norm_name(row.get("player_name", ""))
-                if normalized_name:
-                    steam_id = name_to_steam_id.get(normalized_name)
-                    if steam_id:
-                        user_id = str(steam_id)
-                    elif my_user_id and my_name_key and normalized_name == my_name_key:
-                        user_id = str(my_user_id)
-                if my_user_id and user_id == my_user_id:
-                    linked_detected += 1
-                resolved_rows.append((row, user_id))
+            screenshot_url = self._upload_game_over_screenshot_asset(img, my_user_id)
+            resolved_rows, linked_detected = self._resolve_game_over_users(
+                draft.get("rows", []),
+                my_user_id,
+            )
 
             if my_user_id and linked_detected == 0:
                 self._emit_import_result(
@@ -520,53 +632,19 @@ class HeadlessBackend:
                 )
                 return
 
-            match_id = generate_match_id()
-            imported = 0
-            skipped = 0
-            failed = 0
-            linked_imported = 0
-            linked_skipped = 0
-            linked_failed = 0
-            for r, user_id in resolved_rows:
-                placement = r.get("placement", "")
-                wl = r.get("wl", "")
-                level = r.get("level", "")
-                linked_to_user = bool(my_user_id and user_id == my_user_id)
-
-                # If no user matched, this row has no owner — still store it
-                # (match_id links it to the match)
-
-                # Skip duplicates for known users
-                if user_id and game_exists(user_id, played_at, placement, wl, level):
-                    log.info("  row %s: SKIP duplicate (user=%s place=%s)", placement, user_id, placement)
-                    skipped += 1
-                    if linked_to_user:
-                        linked_skipped += 1
-                    continue
-                game_row = GameRow(
-                    played_at=played_at,
-                    placement=placement,
-                    rank=r.get("rank", ""),
-                    rank_change="none",
-                    lineup="",
-                    synergies=r.get("synergies", ""),
-                    talents="",
-                    relic=r.get("relic", ""),
-                    level=level,
-                    wl=wl,
-                    screenshot=screenshot_url,
-                    notes="",
-                    replay=self._last_replay_filename or "",
-                    match_id=match_id,
-                )
-                if push_game(game_row, user_id=user_id):
-                    imported += 1
-                    if linked_to_user:
-                        linked_imported += 1
-                else:
-                    failed += 1
-                    if linked_to_user:
-                        linked_failed += 1
+            stats = self._push_game_over_rows(
+                resolved_rows,
+                played_at=played_at,
+                match_id=generate_match_id(),
+                screenshot_url=screenshot_url,
+                my_user_id=my_user_id,
+            )
+            imported = stats["imported"]
+            skipped = stats["skipped"]
+            failed = stats["failed"]
+            linked_imported = stats["linked_imported"]
+            linked_skipped = stats["linked_skipped"]
+            linked_failed = stats["linked_failed"]
             detail_parts: list[str] = []
             if skipped:
                 detail_parts.append(f"{skipped} duplicate(s) skipped")
@@ -620,6 +698,112 @@ class HeadlessBackend:
         except Exception as e:
             log.error("parse_game_over error: %s", e, exc_info=True)
             self._emit_error(f"Game Over parse error: {e}")
+
+    def _do_upload_game_over_screenshot(self, path_str: str) -> None:
+        """Normal-user flow: local parse, upload rows, and send profile link."""
+        import cv2
+        from cv_parser import detect_screen_type
+        from db import generate_match_id
+
+        path = Path(path_str)
+        if not path.exists():
+            self._emit_error(f"File not found: {path}")
+            return
+
+        my_user_id = self.config.get("steam_id") or None
+        if not my_user_id:
+            self._emit_error("Steam login is required before uploading a Game Over screenshot.")
+            return
+
+        img = cv2.imread(str(path))
+        if img is None:
+            self._emit_error(f"Failed to read image: {path}")
+            return
+
+        screen_type = detect_screen_type(img)
+        if screen_type not in ("game_over", "final_ranking"):
+            self._emit_import_result(
+                imported=0,
+                skipped=0,
+                failed=0,
+                message=f"That screenshot does not look like a Game Over screen (detected '{screen_type}').",
+                tone="warning",
+                screen_type=screen_type,
+            )
+            return
+
+        local_path = str(path)
+        try:
+            screenshots_dir = (DAC_DIR / "screenshots").resolve()
+            if screenshots_dir not in path.resolve().parents:
+                local_path = self._save_screenshot_local(img)
+        except Exception as e:
+            log.warning("Failed to save local Game Over screenshot copy: %s", e)
+
+        draft = self._parse_game_over_draft(img, debug=True)
+        if not draft:
+            self._emit_import_result(
+                imported=0,
+                skipped=0,
+                failed=0,
+                message="Game Over upload failed: no player rows were parsed.",
+                tone="error",
+                screen_type="game_over",
+            )
+            return
+
+        played_at = datetime.now().isoformat()
+        match_id = generate_match_id()
+        screenshot_url = self._upload_game_over_screenshot_asset(img, my_user_id)
+        resolved_rows, _linked_detected = self._resolve_game_over_users(
+            draft.get("rows", []),
+            my_user_id,
+        )
+        stats = self._push_game_over_rows(
+            resolved_rows,
+            played_at=played_at,
+            match_id=match_id,
+            screenshot_url=screenshot_url,
+            my_user_id=my_user_id,
+            preserve_player_note=True,
+        )
+        imported = stats["imported"]
+        skipped = stats["skipped"]
+        failed = stats["failed"]
+        linked_to_user = stats["linked_imported"]
+
+        profile_url = self._profile_url(my_user_id)
+        if imported > 0:
+            msg = "Uploaded Game Over screenshot."
+            if linked_to_user == 0:
+                msg += " We could not confidently link your row yet, so fix it from your profile."
+            tone = "success" if failed == 0 else "warning"
+        else:
+            msg = "Game Over screenshot parsed, but no rows were saved."
+            tone = "error" if failed else "warning"
+
+        self._emit_import_result(
+            imported=imported,
+            skipped=skipped,
+            failed=failed,
+            message=msg,
+            tone=tone,
+            screen_type="game_over",
+            linked_to_user=linked_to_user,
+            profile_url=profile_url,
+            match_id=match_id,
+            screenshot_url=screenshot_url,
+        )
+        self._update_manifest(local_path, screen_type="game_over", imported_at=datetime.now().isoformat())
+
+    def _profile_url(self, steam_id: str) -> str:
+        base_url = (
+            self.config.get("web_profile_base_url")
+            or self.config.get("web_base_url")
+            or os.environ.get("DAC_WEB_BASE_URL")
+            or "https://dac-tracker-web.vercel.app"
+        )
+        return f"{str(base_url).rstrip('/')}/players/{steam_id}"
 
     def _do_confirm(self, selected: list, edits: dict) -> None:
         """Push confirmed rows to DB."""
@@ -769,6 +953,9 @@ class HeadlessBackend:
         tone: str = "success",
         screen_type: str = "",
         linked_to_user: int | None = None,
+        profile_url: str = "",
+        match_id: str = "",
+        screenshot_url: str = "",
     ) -> None:
         payload = {
             "type": "import_result",
@@ -782,10 +969,16 @@ class HeadlessBackend:
             payload["screen_type"] = screen_type
         if linked_to_user is not None:
             payload["linked_to_user"] = linked_to_user
+        if profile_url:
+            payload["profile_url"] = profile_url
+        if match_id:
+            payload["match_id"] = match_id
+        if screenshot_url:
+            payload["screenshot_url"] = screenshot_url
         self._emit(payload)
         self._emit_notification(APP_NAME, message)
 
-    def _dispatch_import(self, path_str: str) -> None:
+    def _dispatch_import(self, path_str: str, mode: str = "auto") -> None:
         """Serialise import requests and arm a watchdog so a hung CV pass
         cannot wedge the backend forever."""
         with self._import_lock:
@@ -804,12 +997,12 @@ class HeadlessBackend:
 
         threading.Thread(
             target=self._run_import_file,
-            args=(path_str, gen),
+            args=(path_str, gen, mode),
             daemon=True,
             name="import-file",
         ).start()
 
-    def _run_import_file(self, path_str: str, gen: int) -> None:
+    def _run_import_file(self, path_str: str, gen: int, mode: str = "auto") -> None:
         timed_out = threading.Event()
 
         def _on_timeout():
@@ -839,7 +1032,10 @@ class HeadlessBackend:
         timer.daemon = True
         timer.start()
         try:
-            self._do_import_file(path_str)
+            if mode == "game_over_upload":
+                self._do_upload_game_over_screenshot(path_str)
+            else:
+                self._do_import_file(path_str)
         except Exception as e:
             log.error("import error: %s", e, exc_info=True)
             if not timed_out.is_set():
@@ -984,6 +1180,8 @@ class HeadlessBackend:
             self._do_cancel_confirm()
         elif cmd == "import_file":
             self._dispatch_import(msg.get("path", ""))
+        elif cmd == "upload_game_over_screenshot":
+            self._dispatch_import(msg.get("path", ""), mode="game_over_upload")
         elif cmd == "steam_login":
             self._do_steam_login()
         elif cmd == "steam_logout":
@@ -994,39 +1192,6 @@ class HeadlessBackend:
             self._do_set_config(msg.get("key", ""), msg.get("value"))
         elif cmd == "status":
             self._emit_status()
-        elif cmd == "debug_screenshot":
-            img_path = msg.get("path", "")
-            threading.Thread(
-                target=self._do_debug_screenshot, args=(img_path,),
-                daemon=True, name="debug-screenshot",
-            ).start()
-        elif cmd == "debug_view":
-            img_path = msg.get("path", "")
-            screen = msg.get("screen", "")
-            regions = msg.get("regions", {}) or {}
-            threading.Thread(
-                target=self._do_debug_view,
-                args=(img_path, screen, regions),
-                daemon=True,
-                name="debug-view",
-            ).start()
-        elif cmd == "debug_saved_screenshot":
-            img_path = msg.get("path", "")
-            screen_type = msg.get("screen_type")
-            threading.Thread(
-                target=self._do_debug_saved_screenshot,
-                args=(img_path, screen_type),
-                daemon=True,
-                name="debug-saved-screenshot",
-            ).start()
-        elif cmd == "parse_test_file":
-            img_path = msg.get("path", "")
-            threading.Thread(
-                target=self._do_parse_test_file,
-                args=(img_path,),
-                daemon=True,
-                name="parse-test-file",
-            ).start()
         elif cmd == "lab_parse_full":
             img_path = msg.get("path", "")
             req_id = msg.get("req_id", "")
@@ -1054,35 +1219,6 @@ class HeadlessBackend:
         else:
             self._emit_error(f"Unknown command: {cmd}")
 
-    # ── Debug / Calibration ──────────────────────────────────────────────────
-
-    @staticmethod
-    def _img_b64(img, ext: str = ".jpg") -> str:
-        import cv2
-
-        if img is None or getattr(img, "size", 0) == 0:
-            return ""
-        params = [cv2.IMWRITE_JPEG_QUALITY, 88] if ext == ".jpg" else []
-        ok, buf = cv2.imencode(ext, img, params)
-        return base64.b64encode(buf).decode() if ok else ""
-
-    def _regions_to_crops(self, img, regions: dict) -> list[dict]:
-        h, w = img.shape[:2]
-        crops = []
-        for name, coords in (regions or {}).items():
-            if not isinstance(coords, list):
-                continue
-            if len(coords) >= 4:
-                x0, y0, x1, y1 = coords[:4]
-                crop = img[int(y0 * h):int(y1 * h), int(x0 * w):int(x1 * w)]
-            elif len(coords) == 2:
-                x0, x1 = coords
-                crop = img[:, int(x0 * w):int(x1 * w)]
-            else:
-                continue
-            crops.append({"name": name, "image": self._img_b64(crop), "coords": coords})
-        return crops
-
     def _preview_b64(self, img, max_w: int = 900) -> str:
         try:
             from PIL import Image as PILImage
@@ -1100,231 +1236,6 @@ class HeadlessBackend:
         except Exception as e:
             log.warning("Failed to encode preview image: %s", e)
             return ""
-
-    def _resolve_debug_regions(self, screen: str, regions_config: dict) -> dict:
-        key_map = {
-            "game_over": "game_over",
-            "my_matches": "my_matches",
-            "final_ranking": "sentinel_final_ranking",
-            "sentinel_final_ranking": "sentinel_final_ranking",
-            "sentinel_round_start": "sentinel_round_start",
-        }
-        return dict(regions_config.get(key_map.get(screen, screen)) or {})
-
-    def _do_debug_screenshot(self, img_path: str) -> None:
-        try:
-            import cv2
-            from cv_parser import apply_calibration, detect_screen_type
-
-            img = cv2.imread(img_path)
-            if img is None:
-                self._emit({"type": "debug_result", "data": {"error": f"Cannot read {img_path}"}})
-                return
-
-            apply_calibration(img)
-            h, w = img.shape[:2]
-            screen_type = detect_screen_type(img)
-            result = {"width": w, "height": h, "screen_type": screen_type, "rows": []}
-
-            if screen_type == "my_matches":
-                from cv_parser import (
-                    _find_my_matches_rows, _parse_my_matches_row,
-                    _load_templates_multiscale,
-                    UNIT_ICON_SCALES, RELIC_ICON_SCALES, MM_SYNERGY_ICON_SCALES,
-                )
-                from utils import ICONS_DIR, DATA_DIR, unit_stem as _unit_stem
-                import json as _json
-
-                units_path = DATA_DIR / "units.json"
-                units_data = _json.loads(units_path.read_text())["units"] if units_path.exists() else {}
-                stem_to_name = {_unit_stem(name): name for name in units_data}
-
-                unit_templates = _load_templates_multiscale(
-                    ICONS_DIR / "units", UNIT_ICON_SCALES, inner_frac=0.85, color=True)
-                relic_templates = _load_templates_multiscale(
-                    ICONS_DIR / "relics", RELIC_ICON_SCALES, inner_frac=1.0, color=True)
-                syn_templates = _load_templates_multiscale(
-                    ICONS_DIR / "synergies", MM_SYNERGY_ICON_SCALES)
-
-                rows = _find_my_matches_rows(img)
-                for i, (y0, y1) in enumerate(rows):
-                    row_data = _parse_my_matches_row(
-                        img, y0, y1,
-                        unit_templates, relic_templates, syn_templates, ICONS_DIR,
-                        units_data, stem_to_name,
-                        debug=False, row_idx=i,
-                    )
-                    row_data["y0"] = y0
-                    row_data["y1"] = y1
-                    result["rows"].append(row_data)
-
-            elif screen_type == "game_over":
-                from cv_parser import parse_game_over
-                game_data = parse_game_over(img)
-                result["game_data"] = game_data
-
-            self._emit({"type": "debug_result", "data": result})
-        except Exception as e:
-            log.exception("debug_screenshot error")
-            self._emit({"type": "debug_result", "data": {"error": str(e)}})
-
-    def _do_debug_view(
-        self,
-        img_path: str,
-        screen: str,
-        regions: dict,
-    ) -> None:
-        try:
-            import cv2
-            from cv_parser import (
-                COL_LEVEL,
-                COL_PLAYER,
-                COL_RELIC,
-                COL_SYNERGY,
-                COL_WL,
-                MM_COL_LEVEL,
-                MM_COL_PLACEMENT,
-                MM_COL_RANK,
-                MM_COL_RELIC,
-                MM_COL_SYNERGY,
-                MM_COL_TIME,
-                MM_COL_UNITS,
-                MM_COL_WL,
-                _crop_row,
-                _find_my_matches_rows,
-                _parse_my_matches_row,
-                _row_y_extent,
-                _load_templates_multiscale,
-                apply_calibration,
-                parse_game_over_all,
-            )
-            from db import lookup_users_by_name
-            from utils import DATA_DIR, crop as _crop, unit_stem as _unit_stem
-            import json as _json
-
-            img = cv2.imread(img_path)
-            if img is None:
-                self._emit({"type": "debug_result", "data": {"error": f"Cannot read {img_path}"}})
-                return
-
-            regions_config = load_regions_config()
-            if not regions:
-                regions = self._resolve_debug_regions(screen, regions_config)
-            apply_calibration(img, regions_config=regions_config)
-            from cv_parser import (
-                COL_LEVEL,
-                COL_PLAYER,
-                COL_RELIC,
-                COL_SYNERGY,
-                COL_WL,
-                MM_COL_LEVEL,
-                MM_COL_PLACEMENT,
-                MM_COL_RANK,
-                MM_COL_RELIC,
-                MM_COL_SYNERGY,
-                MM_COL_TIME,
-                MM_COL_UNITS,
-                MM_COL_WL,
-            )
-
-            h, w = img.shape[:2]
-            result = {
-                "width": w,
-                "height": h,
-                "screen_type": screen,
-                "region_crops": self._regions_to_crops(img, regions),
-            }
-
-            if screen == "game_over":
-                rows = parse_game_over_all(img, ICONS_DIR, debug=False) or []
-                name_map = lookup_users_by_name([r.get("player_name", "") for r in rows])
-                result["rows"] = []
-                for i, row in enumerate(rows):
-                    y0, y1 = _row_y_extent(i)
-                    row_out = dict(row)
-                    player_name = (row.get("player_name") or "").lower().strip()
-                    matched_user_id = name_map.get(player_name)
-                    row_out["db_match"] = bool(matched_user_id)
-                    row_out["matched_user_id"] = str(matched_user_id) if matched_user_id else ""
-                    row_out["row_image"] = self._img_b64(img[int(y0 * h):int(y1 * h), :])
-                    row_out["player_crop"] = self._img_b64(_crop_row(img, COL_PLAYER, y0, y1))
-                    row_out["level_crop"] = self._img_b64(_crop_row(img, COL_LEVEL, y0, y1))
-                    row_out["synergy_crop"] = self._img_b64(_crop_row(img, COL_SYNERGY, y0, y1))
-                    row_out["relic_crop"] = self._img_b64(_crop_row(img, COL_RELIC, y0, y1))
-                    row_out["wl_crop"] = self._img_b64(_crop_row(img, COL_WL, y0, y1))
-                    result["rows"].append(row_out)
-
-            elif screen == "my_matches":
-                units_path = DATA_DIR / "units.json"
-                units_data = _json.loads(units_path.read_text())["units"] if units_path.exists() else {}
-                stem_to_name = {_unit_stem(name): name for name in units_data}
-                unit_templates = _load_templates_multiscale(
-                    ICONS_DIR / "units", [24, 28, 32, 36, 40, 44], inner_frac=0.85, color=True
-                )
-                relic_templates = _load_templates_multiscale(
-                    ICONS_DIR / "relics", [12, 14, 16, 20, 24, 28, 32, 40, 50, 60], inner_frac=1.0, color=True
-                )
-                syn_templates = _load_templates_multiscale(
-                    ICONS_DIR / "synergies", [20, 24, 28, 32]
-                )
-                parsed_rows = []
-                for i, (y0, y1) in enumerate(_find_my_matches_rows(img, debug=False)):
-                    row_data = _parse_my_matches_row(
-                        img, y0, y1,
-                        unit_templates, relic_templates, syn_templates, ICONS_DIR,
-                        units_data, stem_to_name,
-                        debug=False, row_idx=i,
-                    )
-                    rh = y1 - y0
-                    from cv_parser import (
-                        MM_PLACEMENT_Y_IN_ROW, MM_LEVEL_Y_IN_ROW,
-                        MM_WL_Y_IN_ROW, MM_RANK_Y_IN_ROW, MM_TIME_Y_IN_ROW,
-                    )
-                    row_data["row_image"] = self._img_b64(img[int(y0 * h):int(y1 * h), :])
-                    row_data["placement_crop"] = self._img_b64(_crop(img, MM_COL_PLACEMENT[0], y0 + rh * MM_PLACEMENT_Y_IN_ROW[0], MM_COL_PLACEMENT[1], y0 + rh * MM_PLACEMENT_Y_IN_ROW[1]))
-                    row_data["level_crop"] = self._img_b64(_crop(img, MM_COL_LEVEL[0], y0 + rh * MM_LEVEL_Y_IN_ROW[0], MM_COL_LEVEL[1], y0 + rh * MM_LEVEL_Y_IN_ROW[1]))
-                    row_data["units_crop"] = self._img_b64(_crop(img, MM_COL_UNITS[0], y0, MM_COL_UNITS[1], y1))
-                    row_data["synergy_crop"] = self._img_b64(_crop_row(img, MM_COL_SYNERGY, y0, y1))
-                    row_data["relic_crop"] = self._img_b64(_crop(img, MM_COL_RELIC[0], y0, MM_COL_RELIC[1], y1))
-                    row_data["wl_crop"] = self._img_b64(_crop(img, MM_COL_WL[0], y0 + rh * MM_WL_Y_IN_ROW[0], MM_COL_WL[1], y0 + rh * MM_WL_Y_IN_ROW[1]))
-                    row_data["rank_crop"] = self._img_b64(_crop(img, MM_COL_RANK[0], y0 + rh * MM_RANK_Y_IN_ROW[0], MM_COL_RANK[1], y0 + rh * MM_RANK_Y_IN_ROW[1]))
-                    row_data["time_crop"] = self._img_b64(_crop(img, MM_COL_TIME[0], y0 + rh * MM_TIME_Y_IN_ROW[0], MM_COL_TIME[1], y0 + rh * MM_TIME_Y_IN_ROW[1]))
-                    parsed_rows.append(row_data)
-                result["rows"] = parsed_rows
-
-            elif screen.startswith("sentinel_"):
-                self._emit({"type": "debug_result", "data": self._run_sentinel_debug(img, screen, regions, result)})
-                return
-
-            self._emit({"type": "debug_result", "data": result})
-        except Exception as e:
-            log.exception("debug_view error")
-            self._emit({"type": "debug_result", "data": {"error": str(e)}})
-
-    def _do_debug_saved_screenshot(self, img_path: str, screen_type: str | None = None) -> None:
-        try:
-            import cv2
-            from cv_parser import apply_calibration, detect_screen_type
-
-            img = cv2.imread(img_path)
-            if img is None:
-                self._emit({"type": "debug_result", "data": {"error": f"Cannot read {img_path}"}})
-                return
-
-            regions_config = load_regions_config()
-            apply_calibration(img, regions_config=regions_config)
-            screen = detect_screen_type(img) if not screen_type or screen_type == "unknown" else screen_type
-            if screen == "final_ranking":
-                screen = "sentinel_final_ranking"
-
-            self._do_debug_view(
-                img_path,
-                screen,
-                self._resolve_debug_regions(screen, regions_config),
-            )
-        except Exception as e:
-            log.exception("debug_saved_screenshot error")
-            self._emit({"type": "debug_result", "data": {"error": str(e)}})
 
     # ── Parser Lab ──────────────────────────────────────────────────────────
 
@@ -1357,71 +1268,6 @@ class HeadlessBackend:
             result = {"ok": False, "error": f"{type(e).__name__}: {e}"}
         result["req_id"] = req_id
         self._emit({"type": "lab_parse_region_result", "data": result})
-
-    def _do_parse_test_file(self, img_path: str) -> None:
-        """Parse any screenshot file and emit parse_result into the confirmation flow."""
-        import cv2
-        from cv_parser import apply_calibration, detect_screen_type, load_regions_config
-
-        try:
-            img = cv2.imread(img_path)
-            if img is None:
-                self._emit_error(f"Cannot read image: {img_path}")
-                return
-            regions_config = load_regions_config()
-            apply_calibration(img, regions_config=regions_config)
-            screen = detect_screen_type(img)
-            log.info("parse_test_file: %s detected as %s", img_path, screen)
-            if screen == "my_matches":
-                self._do_parse_my_matches(img, screenshot_path=img_path)
-            elif screen in ("game_over", "final_ranking"):
-                self._do_parse_game_over(img, screenshot_path=img_path)
-            else:
-                self._emit_error(f"Unrecognised screen type '{screen}' — open a MY MATCHES or GAME OVER screenshot")
-        except Exception as e:
-            log.exception("parse_test_file error")
-            self._emit_error(f"Parse error: {e}")
-
-    def _run_sentinel_debug(self, img, screen: str, regions: dict, result: dict) -> dict:
-        import cv2
-
-        h, w = img.shape[:2]
-        search = (regions or {}).get("search_region") or []
-        if len(search) < 4:
-            return {"error": "No search_region defined"}
-
-        x0 = int(search[0] * w)
-        y0 = int(search[1] * h)
-        x1 = int(search[2] * w)
-        y1 = int(search[3] * h)
-        crop = img[y0:y1, x0:x1]
-
-        template_name = (
-            "sentinel_ref_final_ranking.png"
-            if screen == "sentinel_final_ranking"
-            else "sentinel_ref_round_start.png"
-        )
-        template = cv2.imread(str(DATA_DIR / template_name), cv2.IMREAD_GRAYSCALE)
-        crop_gray = cv2.cvtColor(crop, cv2.COLOR_BGR2GRAY)
-        if template is None:
-            return {"error": f"Template not found: {template_name}"}
-        th, tw = template.shape[:2]
-        ch, cw = crop_gray.shape[:2]
-        if tw > cw or th > ch:
-            return {"error": "Template larger than crop", "crop": self._img_b64(crop)}
-
-        match = cv2.matchTemplate(crop_gray, template, cv2.TM_CCOEFF_NORMED)
-        _, max_val, _, max_loc = cv2.minMaxLoc(match)
-        return {
-            **result,
-            "crop": self._img_b64(crop),
-            "results": {
-                template_name: {
-                    "score": round(float(max_val), 4),
-                    "location": list(max_loc),
-                }
-            },
-        }
 
     # ── Main loop ───────────────────────────────────────────────────────────
 

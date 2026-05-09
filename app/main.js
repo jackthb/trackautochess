@@ -54,7 +54,6 @@ let notificationWindow = null;
 let tray = null;
 let pythonProcess = null;
 let pythonRL = null;
-let debugResolve = null;
 const labResolvers = new Map();
 let nextLabReqId = 1;
 function nextReqId() { return `lab-${nextLabReqId++}-${Date.now()}`; }
@@ -304,14 +303,6 @@ function handlePythonEvent(msg) {
       if (mainWindow && !mainWindow.isDestroyed()) {
         mainWindow.show();
         mainWindow.focus();
-      }
-      break;
-
-    case "debug_result":
-    case "sentinel_result":
-      if (debugResolve) {
-        debugResolve(msg.data || { error: msg.error || "Unknown error" });
-        debugResolve = null;
       }
       break;
 
@@ -729,6 +720,32 @@ ipcMain.handle("app:openFileDialog", async () => {
     return result.filePaths[0];
   }
   return null;
+});
+
+ipcMain.handle("app:openGameOverScreenshotDialog", async () => {
+  const result = await dialog.showOpenDialog({
+    title: "Select Game Over screenshot",
+    defaultPath: path.join(DAC_DIR, "screenshots"),
+    filters: [
+      { name: "Images", extensions: ["jpg", "jpeg", "png"] },
+    ],
+    properties: ["openFile"],
+  });
+  if (!result.canceled && result.filePaths.length > 0) {
+    return result.filePaths[0];
+  }
+  return null;
+});
+
+ipcMain.handle("app:openExternal", async (_event, url) => {
+  try {
+    const parsed = new URL(String(url || ""));
+    if (parsed.protocol !== "http:" && parsed.protocol !== "https:") return false;
+    await shell.openExternal(parsed.toString());
+    return true;
+  } catch {
+    return false;
+  }
 });
 
 ipcMain.handle("app:getVersion", () => {
@@ -1368,32 +1385,6 @@ ipcMain.handle("screenshots:thumbnail", async (_event, filename) => {
   return `data:${mime};base64,${buf.toString("base64")}`;
 });
 
-ipcMain.handle("screenshots:canAccessDebug", async () => {
-  return true;
-});
-
-ipcMain.handle("screenshots:debug", async (_event, filename, screenType) => {
-  const filePath = path.join(SCREENSHOT_DIR, filename);
-  if (!filePath.startsWith(SCREENSHOT_DIR) || !fs.existsSync(filePath)) {
-    return { error: "Screenshot not found." };
-  }
-
-  return new Promise((resolve) => {
-    debugResolve = resolve;
-    sendToPython({
-      cmd: "debug_saved_screenshot",
-      path: filePath,
-      screen_type: screenType || null,
-    });
-    setTimeout(() => {
-      if (debugResolve === resolve) {
-        debugResolve = null;
-        resolve({ error: "Screenshot debug timed out (30s)" });
-      }
-    }, 30000);
-  });
-});
-
 ipcMain.handle("screenshots:getParseResult", async (_event, filename) => {
   const stem = path.basename(filename, path.extname(filename));
   const parsePath = path.join(SCREENSHOT_DIR, `${stem}.parse.json`);
@@ -1420,30 +1411,9 @@ ipcMain.handle("screenshots:updateParseRow", async (_event, filename, rowIndex, 
   }
 });
 
-// ── Parser test fixtures ─────────────────────────────────────────────────────
-
-const FIXTURES_DIR = path.join(__dirname, "..", "backend", "tests", "fixtures");
-
-ipcMain.handle("screenshots:parseTestFile", async () => {
-  const result = await dialog.showOpenDialog({
-    title: "Select screenshot to parse",
-    filters: [{ name: "Images", extensions: ["jpg", "jpeg", "png"] }],
-  });
-  if (result.canceled || !result.filePaths.length) return null;
-  const filePath = result.filePaths[0];
-  sendToPython({ cmd: "parse_test_file", path: filePath });
-  return filePath;
-});
-
-ipcMain.handle("screenshots:saveFixture", async (_event, fixtureName, data) => {
-  fs.mkdirSync(FIXTURES_DIR, { recursive: true });
-  const outPath = path.join(FIXTURES_DIR, `${fixtureName}.json`);
-  fs.writeFileSync(outPath, JSON.stringify(data, null, 2));
-  return outPath;
-});
-
 // ── Parser Lab (regions config + screenshot listing) ───────────────────────
 
+const FIXTURES_DIR = path.join(__dirname, "..", "backend", "tests", "fixtures");
 const DATA_DIR = path.join(RESOURCES_DIR, "data");
 const LAB_SCREENSHOTS = path.join(DATA_DIR, "screenshots");
 const DEFAULT_REGIONS_CONFIG_PATH = path.join(DATA_DIR, "regions_config.json");
