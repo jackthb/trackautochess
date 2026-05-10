@@ -9,6 +9,7 @@ Usage (dev test):
 """
 
 import base64
+import difflib
 import logging
 import re
 import sys
@@ -1142,6 +1143,71 @@ def _parse_game_over_relics(
 RANK_NAMES = ("Pawn", "Knight", "Bishop", "Rook", "King", "Queen")
 
 
+# ── Identity hint helpers ────────────────────────────────────────────────────
+# Fuzzy-name fallback for the "which row is the logged-in user?" question.
+# The companion avatar-comparison leg (PRD identity strategy step 1) is not
+# yet wired; until it lands, `current_user_name` is the only identity signal
+# the parser uses.
+
+# Strip bracketed clan tags like "[FC4P]" or "(NA)" that often trail a name.
+_NAME_TAG_RE = re.compile(r"[\[\(].*?[\]\)]")
+# Trim leading/trailing OCR noise: pipes, slashes, dashes, periods, commas.
+_NAME_NOISE_RE = re.compile(r"^[\s\|\\/\.,:;\-_'\"`~]+|[\s\|\\/\.,:;\-_'\"`~]+$")
+_NAME_WS_RE = re.compile(r"\s+")
+
+# Minimum SequenceMatcher ratio at which we treat an OCR'd row name as the
+# logged-in user. Tuned conservatively; below this we leave the row unflagged
+# rather than risk linking the wrong row.
+IDENTITY_MATCH_THRESHOLD = 0.72
+
+
+def _normalize_player_name(text: str) -> str:
+    """Lowercase, drop bracketed tags + edge punctuation, collapse whitespace."""
+    if not text:
+        return ""
+    cleaned = _NAME_TAG_RE.sub(" ", str(text))
+    cleaned = _NAME_NOISE_RE.sub("", cleaned)
+    cleaned = _NAME_WS_RE.sub(" ", cleaned).strip().lower()
+    return cleaned
+
+
+def name_match_score(ocr_name: str, target_name: str) -> float:
+    """Return 0.0–1.0 similarity between an OCR'd row name and a target name.
+
+    Returns 1.0 on exact normalized match, 0.0 if either side is empty,
+    otherwise a difflib SequenceMatcher ratio on the normalized strings.
+    """
+    a = _normalize_player_name(ocr_name)
+    b = _normalize_player_name(target_name)
+    if not a or not b:
+        return 0.0
+    if a == b:
+        return 1.0
+    return difflib.SequenceMatcher(None, a, b).ratio()
+
+
+def _row_confidence(row: dict) -> float:
+    """Coarse 0.0–1.0 confidence for a parsed Game Over row.
+
+    Rewards rows where the high-signal fields (level, W-L, synergies, relic,
+    player name) parsed non-empty. Used downstream to surface "needs review"
+    rows in correction UIs without inventing per-field probabilities.
+    """
+    weights = {
+        "level": 1.0,
+        "wl": 1.0,
+        "synergies": 1.0,
+        "relic": 1.0,
+        "player_name": 1.0,
+        "rank": 0.5,
+    }
+    score = 0.0
+    for key, weight in weights.items():
+        if str(row.get(key, "") or "").strip():
+            score += weight
+    return round(score / sum(weights.values()), 3)
+
+
 # ── GAME OVER table parser ───────────────────────────────────────────────────
 
 def _trace_region(
@@ -1400,6 +1466,7 @@ def parse_game_over_screenshot(
     *,
     icons_dir: Path,
     user_avatar=None,
+    current_user_name: str | None = None,
     debug: bool = False,
 ) -> dict:
     """Parse a Game Over screenshot into an editable draft plus trace data.
@@ -1407,8 +1474,14 @@ def parse_game_over_screenshot(
     This is the production Game Over parse surface. Import, Parser Lab, debug
     views, and fixtures should read this draft rather than reimplementing row
     parsing field-by-field.
+
+    `current_user_name`, when supplied, is fuzzy-matched against each row's
+    OCR'd player name; the highest-scoring row above
+    `IDENTITY_MATCH_THRESHOLD` is flagged with `is_current_user_candidate`.
+    `user_avatar` is reserved for the avatar-comparison leg of identity
+    matching (PRD identity strategy step 1) and is currently ignored.
     """
-    del user_avatar  # Reserved for Steam avatar matching in the next slice.
+    del user_avatar
     apply_calibration(img)
     h, w = img.shape[:2]
     log.info(f"[cv] parse_game_over_screenshot: {w}x{h}")
@@ -1447,9 +1520,19 @@ def parse_game_over_screenshot(
         row_data["player_label"] = f"Player {i + 1}"
         row_data["rank"] = rank
         row_data["row_index"] = i
+        # Populated by the avatar-comparison leg of identity matching once
+        # that slice lands; until then it stays None and the fuzzy-name score
+        # below is the only identity signal.
         row_data["avatar_match_score"] = None
+        row_data["identity_match_score"] = (
+            round(name_match_score(player_name, current_user_name), 3)
+            if current_user_name
+            else None
+        )
+        row_data["identity_match_source"] = "name" if current_user_name else None
+        # Set provisionally to False; the best-scoring row is promoted below.
         row_data["is_current_user_candidate"] = False
-        row_data["confidence"] = None
+        row_data["confidence"] = _row_confidence(row_data)
         rows.append(row_data)
 
         trace.extend([
@@ -1527,6 +1610,29 @@ def parse_game_over_screenshot(
 
         log.info(f"[cv] Row {i+1}: name={player_name!r} place={row_data['placement']} "
                  f"level={row_data['level']} wl={row_data['wl']} rank={row_data['rank']}")
+
+    if current_user_name:
+        scored = [
+            (row, row.get("identity_match_score") or 0.0)
+            for row in rows
+        ]
+        best_row, best_score = max(scored, key=lambda item: item[1])
+        if best_score >= IDENTITY_MATCH_THRESHOLD:
+            best_row["is_current_user_candidate"] = True
+            log.info(
+                "[cv] identity hint: row %s flagged as current user "
+                "(score=%.3f, threshold=%.2f, name=%r vs %r)",
+                best_row["row_index"] + 1,
+                best_score,
+                IDENTITY_MATCH_THRESHOLD,
+                best_row.get("player_name"),
+                current_user_name,
+            )
+        else:
+            warnings.append(
+                f"no row name matched current user {current_user_name!r} above "
+                f"threshold {IDENTITY_MATCH_THRESHOLD:.2f} (best={best_score:.2f})"
+            )
 
     return {
         "screen_type": "game_over",

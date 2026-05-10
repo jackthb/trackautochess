@@ -114,3 +114,80 @@ def test_match_history_parser_flow_is_parked_but_detectable():
     img = _load_sample("ref_my_matches_21x9.png")
 
     assert detect_screen_type(img) == "my_matches"
+
+
+def test_game_over_rows_carry_per_row_confidence():
+    """Confidence is a 0..1 float on every row, regardless of identity hint."""
+    from cv_parser import parse_game_over_screenshot
+    from utils import ICONS_DIR
+
+    img = _load_sample("20260205145859_1.jpg")
+    draft = parse_game_over_screenshot(img, icons_dir=ICONS_DIR, debug=False)
+
+    for row in draft["rows"]:
+        c = row.get("confidence")
+        assert isinstance(c, float), f"row {row['row_index']}: confidence not a float"
+        assert 0.0 <= c <= 1.0, f"row {row['row_index']}: confidence out of range: {c}"
+
+
+def test_identity_hint_is_inert_when_no_current_user_provided():
+    """Without a hint, no row should be flagged and identity scores stay None."""
+    from cv_parser import parse_game_over_screenshot
+    from utils import ICONS_DIR
+
+    img = _load_sample("20260205145859_1.jpg")
+    draft = parse_game_over_screenshot(img, icons_dir=ICONS_DIR, debug=False)
+
+    for row in draft["rows"]:
+        assert row["identity_match_score"] is None
+        assert row["identity_match_source"] is None
+        assert row["is_current_user_candidate"] is False
+
+
+def test_identity_hint_promotes_at_most_one_row():
+    """When current_user_name is supplied, scores populate and at most one row
+    is flagged is_current_user_candidate (the highest-scoring row above
+    threshold)."""
+    from cv_parser import parse_game_over_screenshot
+    from utils import ICONS_DIR
+
+    img = _load_sample("20260205145859_1.jpg")
+    draft = parse_game_over_screenshot(
+        img,
+        icons_dir=ICONS_DIR,
+        current_user_name="jack",
+        debug=False,
+    )
+
+    candidates = [r for r in draft["rows"] if r["is_current_user_candidate"]]
+    assert len(candidates) <= 1, "more than one row was flagged as current user"
+
+    for row in draft["rows"]:
+        assert row["identity_match_source"] == "name"
+        score = row["identity_match_score"]
+        assert isinstance(score, float)
+        assert 0.0 <= score <= 1.0
+
+
+def test_identity_hint_links_jack_row_on_known_screenshot():
+    """The 'jack' row in the bundled fixture (placement 2, OCR'd as
+    'jack [FC4P]') is the canonical identity-hint case. After clan-tag
+    stripping we expect an exact match, so this row must be flagged."""
+    from cv_parser import parse_game_over_screenshot
+    from utils import ICONS_DIR
+
+    img = _load_sample("20260205145859_1.jpg")
+    draft = parse_game_over_screenshot(
+        img,
+        icons_dir=ICONS_DIR,
+        current_user_name="jack",
+        debug=False,
+    )
+
+    candidates = [r for r in draft["rows"] if r["is_current_user_candidate"]]
+    assert len(candidates) == 1, (
+        "expected exactly one current-user candidate on this screenshot"
+    )
+    flagged = candidates[0]
+    assert flagged["placement"] == "2"
+    assert flagged["identity_match_score"] >= 0.9

@@ -85,9 +85,11 @@ Each row should include:
 - `wl`
 - `synergies`
 - `relic`
-- `avatar_match_score`
-- `is_current_user_candidate`
-- `confidence`
+- `avatar_match_score` (reserved for the avatar-comparison leg of identity matching; currently `None` until that slice lands)
+- `identity_match_score` (0.0–1.0 fuzzy name score vs. logged-in user, or `None` when no hint)
+- `identity_match_source` (`"name"` when `current_user_name` was supplied, otherwise `None`)
+- `is_current_user_candidate` (true on at most one row, the one above `IDENTITY_MATCH_THRESHOLD`)
+- `confidence` (0.0–1.0 weighted completeness of parsed fields on the row)
 - `crops`
 
 The `trace` is the shared debug surface. Parser Lab, Debug Row, and fixtures should read from this data instead of reimplementing parser logic.
@@ -98,9 +100,11 @@ Identity should not depend on OCR'd names. In this phase, identity hints can be 
 
 Preferred order:
 
-1. Compare the logged-in user's Steam avatar against avatar crops from each Game Over row.
-2. Fall back to exact/fuzzy match against the logged-in Steam display name.
+1. Compare the logged-in user's Steam avatar against avatar crops from each Game Over row. **Not yet implemented.** The 16:9 Game Over screen does include a per-row player portrait inside `COL_PLAYER` — open question #1 stays open pending a separate slice that crops the avatar, runs a perceptual hash / template comparison against the logged-in user's Steam avatar, and populates `avatar_match_score`.
+2. Exact/fuzzy match against the logged-in Steam display name. **Implemented** in `parse_game_over_screenshot(current_user_name=...)`: the parser normalizes both sides (lowercase, strip clan tags like `[FC4P]`, trim edge punctuation), scores each row with `difflib.SequenceMatcher`, and flags the highest-scoring row above `IDENTITY_MATCH_THRESHOLD` as `is_current_user_candidate`. The score lives on each row as `identity_match_score` with `identity_match_source: "name"`.
 3. If still ambiguous, leave the row anonymous and let the user correct it in the web profile/history UI.
+
+The headless backend uses the parser's identity hint as a fallback in `_resolve_game_over_users`: when the exact OCR-name match against the user's `steam_name` misses (typical OCR drift, clan-tag suffix, etc.), a row flagged `is_current_user_candidate` is still linked to `my_user_id`. Once the avatar leg lands, `is_current_user_candidate` should be promoted from the higher of the two scores.
 
 Unknown players are valid. Rows may be uploaded as "Player 1" through "Player 8" with raw OCR text attached separately.
 
@@ -174,10 +178,11 @@ Rows linked to known Steam users should use their real user id. Unknown rows sho
 
 ## Open Questions
 
-- Does the current Game Over screen always include player avatars at a useful resolution?
+- Does the current Game Over screen always include player avatars at a useful resolution? Spot-check on the 2560×1440 fixture (`data/screenshots/20260205145859_1.jpg`) shows a square portrait inside `COL_PLAYER` for at least the first 4 rows; need to confirm consistency across 1920×1080, 3440×1440, and rows with poor lighting before relying on it for identity matching.
 - Should anonymous player rows live in the existing `games` table or a new match participant table?
 - Should the developer/admin gate remain `admin_mode` / Steam ID allowlist / dev build default, or should packaged beta builds expose a hidden override?
 - The first slice opens `/players/{steam_id}` on the configured web base URL; confirm this remains the right correction route once the web editing UI is added.
 - Should screenshot upload happen before or after parser success?
 - What is the minimum acceptable parser accuracy before automatic detection is enabled?
 - Which 16:9 resolutions should be fixture coverage targets first: 1920x1080, 2560x1440, or both?
+- Is `IDENTITY_MATCH_THRESHOLD = 0.72` the right floor, or do we want to expose a per-user override after we've collected real fixture data?

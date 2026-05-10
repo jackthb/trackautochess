@@ -475,7 +475,13 @@ class HeadlessBackend:
     def _parse_game_over_draft(self, img, *, debug: bool = True) -> dict | None:
         from cv_parser import parse_game_over_screenshot
 
-        draft = parse_game_over_screenshot(img, icons_dir=ICONS_DIR, debug=debug)
+        current_user_name = (self.config.get("steam_name") or "").strip() or None
+        draft = parse_game_over_screenshot(
+            img,
+            icons_dir=ICONS_DIR,
+            current_user_name=current_user_name,
+            debug=debug,
+        )
         rows = draft.get("rows", [])
         if not rows:
             log.warning("GAME OVER: no rows parsed")
@@ -521,6 +527,14 @@ class HeadlessBackend:
                     user_id = str(steam_id)
                 elif my_user_id and my_name_key and normalized_name == my_name_key:
                     user_id = str(my_user_id)
+            # Fuzzy fallback: trust the parser's identity hint when exact
+            # OCR comparison didn't find the current user above threshold.
+            if (
+                user_id is None
+                and my_user_id
+                and row.get("is_current_user_candidate")
+            ):
+                user_id = str(my_user_id)
             if my_user_id and user_id == str(my_user_id):
                 linked_detected += 1
             resolved_rows.append((row, user_id))
