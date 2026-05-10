@@ -3,22 +3,23 @@
   "private": true,
   "scripts": {
     "build": "npm run build:desktop",
-    "build:desktop": "corepack pnpm --dir app run build",
-    "build:desktop:backend": "corepack pnpm --dir app run build:backend",
+    "build:desktop": "pnpm --dir app run build",
+    "build:desktop:backend": "pnpm --dir app run build:backend",
     "build:desktop:installer": "node tools/run-electron-builder.mjs --win",
     "build:desktop:installer:linux": "node tools/run-electron-builder.mjs --linux AppImage",
     "build:desktop:installer:dir": "node tools/run-electron-builder.mjs --dir",
-    "build:desktop:all": "corepack pnpm --dir app run build:all",
+    "build:desktop:all": "pnpm --dir app run build:all",
     "dev:desktop": "node tools/run-desktop.mjs dev",
     "start:desktop": "node tools/run-desktop.mjs start",
     "install:desktop": "npm run install:desktop:app && npm run install:desktop:backend",
-    "install:desktop:app": "corepack pnpm --dir app install --frozen-lockfile",
+    "install:desktop:app": "pnpm --dir app install --frozen-lockfile",
     "install:desktop:backend": "node tools/setup-desktop-backend.mjs",
     "verify:desktop:backend": "node tools/verify-desktop-backend.mjs",
-    "cms:install": "corepack pnpm --dir cms install",
-    "cms:dev": "corepack pnpm --dir cms run dev",
-    "cms:pull": "corepack pnpm --dir cms run pull",
-    "cms:migrate": "corepack pnpm --dir cms run migrate",
-    "cms:check": "corepack pnpm --dir cms run check"
+    "cms:install": "pnpm --dir cms install",
+    "cms:dev": "pnpm --dir cms run dev",
+    "cms:pull": "pnpm --dir cms run pull",
+    "cms:migrate": "pnpm --dir cms run migrate",
+    "migrate": "pnpm --dir cms run migrate",
+    "cms:check": "pnpm --dir cms run check"
   }
 }
