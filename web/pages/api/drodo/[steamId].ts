@@ -1,6 +1,8 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { checkBotId } from "botid/server";
+import { RateLimiterMemory } from "rate-limiter-flexible";
+import { getClientIp, getUserAgent, logAbuse } from "@/lib/abuseLog";
 import { fetchSteamProfile, resolveSteamInput } from "../../../lib/steam";
 import {
   consumeManualRefreshQuota,
@@ -24,10 +26,28 @@ import {
 const BOT_UA_RE =
   /bot|crawl|spider|slurp|python|curl|wget|java|scrapy|httpclient|go-http|okhttp|libwww|axios|node-fetch/i;
 
+// Caps how often a single IP can hit this route. Drodo upstream is the
+// upstream cost: even cache hits surface here, but cache misses sweep
+// through fetchAndCacheDrodo. 60/min is generous for normal browsing
+// and cuts off scrape patterns before they reach the upstream.
+const ipRateLimiter = new RateLimiterMemory({ points: 60, duration: 60 });
+
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+  const path = "/api/drodo/[steamId]";
+  const ip = getClientIp(req);
+  const ua = getUserAgent(req);
+
   const botCheck = await checkBotId({ advancedOptions: { headers: req.headers } });
   if (botCheck.isBot && !botCheck.isVerifiedBot) {
+    logAbuse("bot_blocked", { path, ip, ua });
     return res.status(403).json({ error: "Forbidden" });
+  }
+
+  try {
+    await ipRateLimiter.consume(ip);
+  } catch {
+    logAbuse("rate_limit_exceeded", { path, ip, ua });
+    return res.status(429).json({ error: "Too many requests" });
   }
 
   if (req.method !== "GET" && req.method !== "POST") {
@@ -40,11 +60,10 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(400).json({ error: "Invalid steam ID" });
   }
 
-  const ua = req.headers["user-agent"] ?? "";
-
   // Reject obvious automation on forced-refresh calls.
   if (refresh === "1") {
     if (BOT_UA_RE.test(ua)) {
+      logAbuse("bot_blocked", { path, ip, ua, steam_id: rawSteamId, reason: "ua_pattern_on_refresh" });
       return res.status(403).json({ error: "Forbidden" });
     }
   }
@@ -86,6 +105,12 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       refreshQuota = quotaResult.quota;
       res.setHeader("Set-Cookie", quotaResult.cookie);
       if (!quotaResult.allowed) {
+        logAbuse("manual_refresh_quota_exceeded", {
+          path,
+          ip,
+          ua,
+          steam_id: steamId,
+        });
         res.setHeader(
           "Retry-After",
           Math.max(

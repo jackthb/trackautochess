@@ -2,6 +2,7 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import { createClient } from "@supabase/supabase-js";
 import { checkBotId } from "botid/server";
 import { RateLimiterMemory } from "rate-limiter-flexible";
+import { getClientIp, getUserAgent, logAbuse } from "@/lib/abuseLog";
 import {
   fetchSteamProfile,
   parseSteamInput,
@@ -24,17 +25,20 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<SearchResult[] | { error: string }>
 ) {
+  const path = "/api/players/search";
+  const ip = getClientIp(req);
+  const ua = getUserAgent(req);
+
   const botCheck = await checkBotId({ advancedOptions: { headers: req.headers } });
   if (botCheck.isBot && !botCheck.isVerifiedBot) {
+    logAbuse("bot_blocked", { path, ip, ua });
     return res.status(403).json({ error: "Forbidden" });
   }
 
-  const ip = (req.headers["x-forwarded-for"] as string | undefined)?.split(",")[0].trim()
-    ?? req.socket?.remoteAddress
-    ?? "unknown";
   try {
     await rateLimiter.consume(ip);
   } catch {
+    logAbuse("rate_limit_exceeded", { path, ip, ua });
     return res.status(429).json({ error: "Too many requests" });
   }
 

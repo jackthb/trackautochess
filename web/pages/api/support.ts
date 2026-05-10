@@ -1,6 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { checkBotId } from "botid/server";
 import { RateLimiterMemory } from "rate-limiter-flexible";
+import { getClientIp, getUserAgent, logAbuse } from "@/lib/abuseLog";
 
 const rateLimiter = new RateLimiterMemory({
   points: 3,
@@ -38,17 +39,20 @@ export default async function handler(
     return res.status(200).json({ ok: true });
   }
 
+  const path = "/api/support";
+  const ip = getClientIp(req);
+  const ua = getUserAgent(req);
+
   const botCheck = await checkBotId({ advancedOptions: { headers: req.headers } });
   if (botCheck.isBot && !botCheck.isVerifiedBot) {
+    logAbuse("bot_blocked", { path, ip, ua });
     return res.status(403).json({ ok: false, error: "Forbidden" });
   }
 
-  const ip = (req.headers["x-forwarded-for"] as string | undefined)?.split(",")[0].trim()
-    ?? req.socket?.remoteAddress
-    ?? "unknown";
   try {
     await rateLimiter.consume(ip);
   } catch {
+    logAbuse("rate_limit_exceeded", { path, ip, ua });
     return res.status(429).json({ ok: false, error: "Too many requests. Please wait before sending another message." });
   }
 
