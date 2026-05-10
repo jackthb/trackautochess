@@ -2,6 +2,7 @@ import Head from "next/head";
 import { useRouter } from "next/router";
 import { useEffect, useMemo, useState } from "react";
 import { createClient } from "@supabase/supabase-js";
+import { createServerClient } from "@supabase/ssr";
 import type { GetServerSideProps } from "next";
 import { absoluteUrl, getRequestSiteUrl, SITE_TITLE } from "@/lib/site";
 import unitsData from "@data/units.json";
@@ -100,6 +101,7 @@ interface PlayerPageProps {
   ogImageUrl: string | null;
   twitchOgUrl: string | null;
   canonicalUrl: string | null;
+  banned: boolean;
 }
 
 function formatLastFetchedTimestamp(value: string | null): string {
@@ -146,6 +148,7 @@ export default function PlayerPage({
   ogImageUrl,
   twitchOgUrl,
   canonicalUrl,
+  banned: initialBanned,
 }: PlayerPageProps) {
   const router = useRouter();
   const [drodo, setDrodo] = useState(initialDrodo);
@@ -165,6 +168,9 @@ export default function PlayerPage({
   const [avatarFailed, setAvatarFailed] = useState(false);
   const [sessionSteamId, setSessionSteamId] = useState<string | null>(null);
   const [accessToken, setAccessToken] = useState<string | null>(null);
+  const [banned, setBanned] = useState(initialBanned);
+  const [banPending, setBanPending] = useState(false);
+  const [banError, setBanError] = useState<string | null>(null);
 
   useEffect(() => {
     const supabase = createSupabaseClient();
@@ -306,6 +312,41 @@ export default function PlayerPage({
       );
     } finally {
       setRefreshing(false);
+    }
+  };
+
+  const handleToggleBan = async () => {
+    if (!isAdmin) return;
+    const next = !banned;
+    if (
+      next &&
+      !window.confirm(`Ban ${displayName}? They will be hidden from the site and signed out.`)
+    ) {
+      return;
+    }
+    setBanError(null);
+    setBanPending(true);
+    try {
+      const resp = await fetch("/api/admin/ban", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
+        },
+        body: JSON.stringify({ steam_id: steamId, banned: next }),
+      });
+      const data = await resp.json().catch(() => null);
+      if (!resp.ok) {
+        setBanError(data?.error || `Request failed (HTTP ${resp.status}).`);
+        return;
+      }
+      setBanned(Boolean(data?.banned));
+    } catch (error) {
+      const detail =
+        error instanceof Error && error.message ? ` (${error.message})` : "";
+      setBanError(`Ban request failed${detail}.`);
+    } finally {
+      setBanPending(false);
     }
   };
 
@@ -536,6 +577,23 @@ export default function PlayerPage({
 
       <div className="page">
         <div className="dashboard">
+          {banned && (
+            <div
+              style={{
+                marginBottom: 24,
+                padding: "12px 16px",
+                border: "1px solid var(--accent)",
+                borderRadius: "var(--r-3)",
+                background: "var(--bg-surface)",
+                color: "var(--accent)",
+                fontSize: 13,
+                letterSpacing: "0.4px",
+              }}
+            >
+              This player is banned. They are hidden from the public site and
+              blocked from signing in. Only admins see this page.
+            </div>
+          )}
           {drodo?.mmr != null && (
             <div className="rank-ladder">
               <RankLadder mmr={drodo.mmr} />
@@ -592,6 +650,18 @@ export default function PlayerPage({
                   {refreshing ? "Refreshing..." : "Refresh MMR"}
                 </Button>
               )}
+              {isAdmin && (
+                <Button disabled={banPending} onClick={handleToggleBan}>
+                  {banPending
+                    ? banned
+                      ? "Unbanning..."
+                      : "Banning..."
+                    : banned
+                      ? "Unban player"
+                      : "Ban player"}
+                </Button>
+              )}
+              {banError && <div className="refresh-error">{banError}</div>}
               {showQuota && (
                 <div className="refresh-quota">
                   <span>Manual refreshes</span>
@@ -717,12 +787,55 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   const baseUrl = getRequestSiteUrl(context.req.headers);
   const manualRefreshQuota = getManualRefreshQuota(context.req.headers.cookie);
 
+  let viewerSteamId: string | null = null;
+  if (url && key) {
+    try {
+      const ssrSupabase = createServerClient(url, key, {
+        cookies: {
+          getAll() {
+            return Object.entries(context.req.cookies).map(([name, value]) => ({
+              name,
+              value: value ?? "",
+            }));
+          },
+          setAll() {
+            // Read-only for SSR; we don't need to write cookies here.
+          },
+        },
+      });
+      const { data } = await ssrSupabase.auth.getUser();
+      const meta = data.user?.user_metadata as
+        | { steam_id?: unknown }
+        | null
+        | undefined;
+      if (meta && typeof meta.steam_id === "string") {
+        viewerSteamId = meta.steam_id;
+      }
+    } catch {
+      viewerSteamId = null;
+    }
+  }
+  const viewerIsAdmin = isAdminSteamId(viewerSteamId);
+
   // Accept numeric Steam IDs or vanity slugs. Keep vanity slugs in the URL
   // when present; they are the preferred public profile route.
   const steamId = await resolveSteamInput(rawSteamId, supabase ?? undefined, {
     persist: false,
   });
   if (!steamId) {
+    return { notFound: true };
+  }
+
+  let banned = false;
+  if (supabase) {
+    const { data: bannedRow } = await supabase
+      .from("users")
+      .select("banned")
+      .eq("steam_id", steamId)
+      .maybeSingle<{ banned: boolean | null }>();
+    banned = Boolean(bannedRow?.banned);
+  }
+  if (banned && !viewerIsAdmin) {
     return { notFound: true };
   }
 
@@ -845,12 +958,14 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         .select("steam_id", { count: "exact", head: true })
         .not("drodo_last_fetched_at", "is", null)
         .eq("drodo_profile_missing", false)
+        .eq("banned", false)
         .gt("drodo_mmr", drodo.mmr),
       supabase
         .from("users")
         .select("steam_id", { count: "exact", head: true })
         .not("drodo_last_fetched_at", "is", null)
         .eq("drodo_profile_missing", false)
+        .eq("banned", false)
         .not("drodo_mmr", "is", null),
     ]);
     if (typeof higherCount === "number" && typeof totalRanked === "number") {
@@ -892,6 +1007,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         playerProfilePath(steamId, steamProfile.customUrl),
         baseUrl
       ),
+      banned,
     },
   };
 };

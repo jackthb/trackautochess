@@ -45,6 +45,15 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     { auth: { autoRefreshToken: false, persistSession: false } }
   );
 
+  const { data: existingUser } = await supabaseAdmin
+    .from("users")
+    .select("banned")
+    .eq("steam_id", steamId)
+    .maybeSingle<{ banned: boolean | null }>();
+  if (existingUser?.banned) {
+    return res.redirect("/?error=banned");
+  }
+
   const email = `${steamId}@steam.local`;
   console.log("Steam verified:", steamId, steamName);
 

@@ -37,6 +37,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     .select("steam_id::text")
     .lte("next_poll_at", new Date().toISOString())
     .not("drodo_last_fetched_at", "is", null)
+    .eq("banned", false)
     .order("next_poll_at", { ascending: true })
     .limit(POLL_BATCH_SIZE);
 

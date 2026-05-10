@@ -242,6 +242,17 @@ async function ogHandler(req: NextApiRequest, res: NextApiResponse) {
     return res.status(404).send("Player not found");
   }
 
+  if (supabase) {
+    const { data: bannedRow } = await supabase
+      .from("users")
+      .select("banned")
+      .eq("steam_id", steamId)
+      .maybeSingle<{ banned: boolean | null }>();
+    if (bannedRow?.banned) {
+      return res.status(404).send("Player not found");
+    }
+  }
+
   const [steamProfile, drodoResult, seasonsResult, fonts] = await Promise.all([
     fetchSteamProfile(steamId, supabase, {
       persist: true,

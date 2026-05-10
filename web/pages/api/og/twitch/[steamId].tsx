@@ -52,6 +52,17 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const steamId = await resolveSteamInput(raw, supabase, { persist: false });
     if (!steamId) return res.status(404).send("Player not found");
 
+    if (supabase) {
+      const { data: bannedRow } = await supabase
+        .from("users")
+        .select("banned")
+        .eq("steam_id", steamId)
+        .maybeSingle<{ banned: boolean | null }>();
+      if (bannedRow?.banned) {
+        return res.status(404).send("Player not found");
+      }
+    }
+
     const [steamProfile, drodoResult, seasonsResult, fonts] = await Promise.all([
       fetchSteamProfile(steamId, supabase, { persist: false }),
       supabase
