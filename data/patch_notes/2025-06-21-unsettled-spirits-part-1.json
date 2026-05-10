@@ -8,7 +8,7 @@
       "heading": "Chess Pieces",
       "entries": [
         {
-          "kind": "rework",
+          "kind": "change",
           "name": "IO - Tether",
           "detail": "Reworked. <Battlecry Ability: Activates before the battle starts> IO tethers with allies around, granting percentage damage reduction. Health percentage will be distributed equally among all tethered allies at set intervals. P.S. Tether will break when IO dies or is too far from its ally. P.S. Health from redistribution of tether will not be counted as Heal. The benevolent touch of Io brings strength from between the planes."
         },
@@ -43,7 +43,7 @@
       "heading": "Synergies",
       "entries": [
         {
-          "kind": "rework",
+          "kind": "change",
           "name": "Kobold - Divided We Stand",
           "detail": "(2) Reworked. (1) Kobold: If every friendly Kobold piece on board can be paired with another identical same-rank Kobold, summons a replica for each pair when battle starts. (2) Kobolds: Every unpaired Kobold piece will reshape itself into a non-Kobold ally of the same Rank before battle starts. P.S. Paired Kobolds will keep themselves. P.S. Unpaired Kobolds will reshape into highest level allies of the same rank."
         },
@@ -63,7 +63,7 @@
       "heading": "Items",
       "entries": [
         {
-          "kind": "rework",
+          "kind": "change",
           "name": "Tango",
           "detail": "Reworked into a no target item. Click to knock down the nearest tree to heal."
         },
@@ -108,7 +108,7 @@
       "heading": "Bug Fixes",
       "entries": [
         {
-          "kind": "fix",
+          "kind": "note",
           "name": "General",
           "detail": "Various bug fixes."
         }

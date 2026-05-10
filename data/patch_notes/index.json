@@ -2,8 +2,8 @@
   "patches": [
     {
       "date": "2026-04-29",
-      "title": "Rebalance Patch 1",
-      "slug": "2026-04-29-rebalance-patch-1"
+      "title": "Rebalance Patch",
+      "slug": "2026-04-29-rebalance-patch"
     },
     {
       "date": "2026-04-20",
@@ -84,6 +84,11 @@
       "date": "2024-12-30",
       "title": "Spinning Wheel of Wonder & Season Award preview",
       "slug": "2024-12-30-spinning-wheel-of-wonder-season-award-pr"
+    },
+    {
+      "date": "2024-12-02",
+      "title": "Rebalance Patch",
+      "slug": "2024-12-02-rebalance-patch"
     },
     {
       "date": "2024-12-02",
