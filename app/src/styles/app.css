@@ -102,6 +102,27 @@
 
 .tab .badge.visible { display: block; }
 
+.tab-bar-view-toggle {
+  margin-left: auto;
+  align-self: center;
+  padding: 5px 12px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: var(--tr-ui);
+  text-transform: uppercase;
+  color: var(--text-muted);
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: var(--r-4);
+  cursor: pointer;
+  transition: color var(--t-base) var(--t-easing), border-color var(--t-base) var(--t-easing);
+}
+
+.tab-bar-view-toggle:hover {
+  color: var(--text-primary);
+  border-color: var(--text-muted);
+}
+
 /* ── Shared: btn-ghost ─────────────────────────────────── */
 
 .btn-ghost {
@@ -249,6 +270,13 @@
   color: var(--text-primary);
 }
 
+.upload-user-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
 .upload-user {
   flex-shrink: 0;
   max-width: 240px;
@@ -260,6 +288,33 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.upload-admin-toggle {
+  padding: 7px 12px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: var(--tr-ui);
+  text-transform: uppercase;
+  color: var(--accent-dim);
+  background: none;
+  border: 1px solid color-mix(in srgb, var(--accent) 35%, var(--border));
+  border-radius: var(--r-4);
+  cursor: pointer;
+  transition: color var(--t-base) var(--t-easing), border-color var(--t-base) var(--t-easing), background var(--t-base) var(--t-easing);
+}
+
+.upload-admin-toggle:hover:not(:disabled) {
+  color: var(--text-primary);
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+}
+
+.upload-admin-toggle:disabled {
+  cursor: default;
+  opacity: 0.45;
+  border-color: var(--border);
+  color: var(--text-muted);
 }
 
 .upload-drop {

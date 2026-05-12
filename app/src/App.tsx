@@ -19,10 +19,20 @@ import "./styles/app.css";
 
 type TabId = "history" | "replays" | "confirm" | "lab" | "settings" | "log";
 
+const ADMIN_PREVIEW_KEY = "dac.adminPreviewAsUser";
+
 export default function App() {
   const [activeTab, setActiveTab] = useState<TabId>("history");
   const [focusGameId, setFocusGameId] = useState<number | null>(null);
   const [searchOpen, setSearchOpen] = useState(false);
+  const [adminPreviewAsUser, setAdminPreviewAsUser] = useState<boolean>(() => {
+    const saved = localStorage.getItem(ADMIN_PREVIEW_KEY);
+    return saved === null ? true : saved === "true";
+  });
+
+  useEffect(() => {
+    localStorage.setItem(ADMIN_PREVIEW_KEY, String(adminPreviewAsUser));
+  }, [adminPreviewAsUser]);
 
   const gamesState = useGames();
   const drodoState = useDrodo();
@@ -33,8 +43,11 @@ export default function App() {
   }, [gamesState.refresh]);
 
   const tracker = useTrackerEvents(handleImportResult, replaysState.refresh);
+  const isAdmin = tracker.status?.admin_mode === true;
   const showLoginScreen = !tracker.status?.logged_in;
-  const showUploadShell = Boolean(tracker.status?.logged_in && tracker.status.admin_mode === false);
+  const showUploadShell = Boolean(
+    tracker.status?.logged_in && (!isAdmin || adminPreviewAsUser)
+  );
 
   const hasParseResult = tracker.pendingParseResult !== null;
   const hasProcessingScreenshot = tracker.processingScreenshot !== null;
@@ -87,6 +100,8 @@ export default function App() {
           lastImportResult={tracker.lastImportResult}
           onBeginImport={tracker.beginImport}
           onClearImportResult={tracker.clearImportResult}
+          isAdminPreview={isAdmin}
+          onExitAdminPreview={() => setAdminPreviewAsUser(false)}
         />
       ) : (
         <>
@@ -94,6 +109,7 @@ export default function App() {
             active={activeTab}
             onChange={handleTabChange}
             showConfirmBadge={hasParseResult}
+            onPreviewAsUser={isAdmin ? () => setAdminPreviewAsUser(true) : undefined}
           />
           <div style={{ flex: 1, overflow: "hidden", display: "flex" }}>
             {activeTab === "history" && (

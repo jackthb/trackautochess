@@ -174,15 +174,15 @@ def _safe_int(val, lo=None, hi=None):
         return None
 
 
-def push_game(row, user_id: str | None = None) -> bool:
+def push_game(row, user_id: str | None = None) -> int | None:
     """Insert a game into Supabase.
 
     Handles string→int conversion for placement, level, and wl splitting.
-    Returns True on success, False on error. Never raises.
+    Returns the inserted game id on success, or None on error. Never raises.
     """
     client = _get_client()
     if client is None:
-        return False
+        return None
 
     try:
         placement = _safe_int(row.placement, 1, 8)
@@ -225,7 +225,7 @@ def push_game(row, user_id: str | None = None) -> bool:
         resp.raise_for_status()
         game_id = resp.json()[0]["id"]
         log.info("pushed game %d: placement=%s", game_id, row.placement)
-        return True
+        return int(game_id)
     except Exception as e:
         body = ""
         if hasattr(e, "response") and e.response is not None:
@@ -234,7 +234,7 @@ def push_game(row, user_id: str | None = None) -> bool:
             except Exception:
                 pass
         log.error("push_game error: %s | body: %s", e, body)
-        return False
+        return None
 
 
 def generate_match_id() -> str:

@@ -2,6 +2,7 @@ interface TabBarProps {
   active: string;
   onChange: (tab: string) => void;
   showConfirmBadge: boolean;
+  onPreviewAsUser?: () => void;
 }
 
 const TABS = [
@@ -13,7 +14,7 @@ const TABS = [
   { id: "log", label: "Log" },
 ];
 
-export function TabBar({ active, onChange, showConfirmBadge }: TabBarProps) {
+export function TabBar({ active, onChange, showConfirmBadge, onPreviewAsUser }: TabBarProps) {
   return (
     <div className="tab-bar">
       {TABS.map((tab) => (
@@ -28,6 +29,16 @@ export function TabBar({ active, onChange, showConfirmBadge }: TabBarProps) {
           )}
         </div>
       ))}
+      {onPreviewAsUser && (
+        <button
+          type="button"
+          className="tab-bar-view-toggle"
+          onClick={onPreviewAsUser}
+          title="Switch to the upload-only view that non-admin users see"
+        >
+          Preview as user
+        </button>
+      )}
     </div>
   );
 }

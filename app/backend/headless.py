@@ -554,13 +554,15 @@ class HeadlessBackend:
         from db import game_exists, push_game
         from models import GameRow
 
-        stats = {
+        stats: dict = {
             "imported": 0,
             "skipped": 0,
             "failed": 0,
             "linked_imported": 0,
             "linked_skipped": 0,
             "linked_failed": 0,
+            "linked_game_id": None,
+            "any_game_id": None,
         }
         for row, user_id in resolved_rows:
             placement = row.get("placement", "")
@@ -595,10 +597,14 @@ class HeadlessBackend:
                 replay=self._last_replay_filename or "",
                 match_id=match_id,
             )
-            if push_game(game_row, user_id=user_id):
+            inserted_id = push_game(game_row, user_id=user_id)
+            if inserted_id:
                 stats["imported"] += 1
+                if stats["any_game_id"] is None:
+                    stats["any_game_id"] = inserted_id
                 if linked_to_user:
                     stats["linked_imported"] += 1
+                    stats["linked_game_id"] = inserted_id
             else:
                 stats["failed"] += 1
                 if linked_to_user:
@@ -785,8 +791,11 @@ class HeadlessBackend:
         skipped = stats["skipped"]
         failed = stats["failed"]
         linked_to_user = stats["linked_imported"]
+        linked_game_id = stats.get("linked_game_id")
+        match_game_id = linked_game_id or stats.get("any_game_id")
 
         profile_url = self._profile_url(my_user_id)
+        match_url = self._match_url(match_game_id, my_user_id) if match_game_id else ""
         if imported > 0:
             msg = "Uploaded Game Over screenshot."
             if linked_to_user == 0:
@@ -807,17 +816,27 @@ class HeadlessBackend:
             profile_url=profile_url,
             match_id=match_id,
             screenshot_url=screenshot_url,
+            game_id=match_game_id,
+            match_url=match_url,
         )
         self._update_manifest(local_path, screen_type="game_over", imported_at=datetime.now().isoformat())
 
-    def _profile_url(self, steam_id: str) -> str:
-        base_url = (
+    def _web_base_url(self) -> str:
+        return str(
             self.config.get("web_profile_base_url")
             or self.config.get("web_base_url")
             or os.environ.get("DAC_WEB_BASE_URL")
             or "https://dac-tracker-web.vercel.app"
-        )
-        return f"{str(base_url).rstrip('/')}/players/{steam_id}"
+        ).rstrip("/")
+
+    def _profile_url(self, steam_id: str) -> str:
+        return f"{self._web_base_url()}/players/{steam_id}"
+
+    def _match_url(self, game_id: int, highlight_steam_id: str | None = None) -> str:
+        url = f"{self._web_base_url()}/games/{int(game_id)}"
+        if highlight_steam_id:
+            url += f"?player={highlight_steam_id}"
+        return url
 
     def _do_confirm(self, selected: list, edits: dict) -> None:
         """Push confirmed rows to DB."""
@@ -970,6 +989,8 @@ class HeadlessBackend:
         profile_url: str = "",
         match_id: str = "",
         screenshot_url: str = "",
+        game_id: int | None = None,
+        match_url: str = "",
     ) -> None:
         payload = {
             "type": "import_result",
@@ -989,6 +1010,10 @@ class HeadlessBackend:
             payload["match_id"] = match_id
         if screenshot_url:
             payload["screenshot_url"] = screenshot_url
+        if game_id is not None:
+            payload["game_id"] = game_id
+        if match_url:
+            payload["match_url"] = match_url
         self._emit(payload)
         self._emit_notification(APP_NAME, message)
 

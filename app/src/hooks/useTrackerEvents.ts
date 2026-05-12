@@ -21,6 +21,8 @@ export interface ImportResult {
   profileUrl?: string;
   matchId?: string;
   screenshotUrl?: string;
+  gameId?: number;
+  matchUrl?: string;
 }
 
 interface TrackerState {
@@ -138,6 +140,8 @@ export function useTrackerEvents(
             profileUrl: msg.profile_url,
             matchId: msg.match_id,
             screenshotUrl: msg.screenshot_url,
+            gameId: msg.game_id,
+            matchUrl: msg.match_url,
           });
           finishImport();
           callbacksRef.current.onImportResult?.();

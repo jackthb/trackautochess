@@ -8,6 +8,8 @@ interface UploadShellProps {
   lastImportResult: ImportResult | null;
   onBeginImport: () => void;
   onClearImportResult: () => void;
+  isAdminPreview?: boolean;
+  onExitAdminPreview?: () => void;
 }
 
 type ElectronFile = File & { path?: string };
@@ -18,6 +20,8 @@ export function UploadShell({
   lastImportResult,
   onBeginImport,
   onClearImportResult,
+  isAdminPreview,
+  onExitAdminPreview,
 }: UploadShellProps) {
   const [dragActive, setDragActive] = useState(false);
   const [localError, setLocalError] = useState<string | null>(null);
@@ -43,6 +47,11 @@ export function UploadShell({
     if (url) void window.appApi.openExternal(url);
   }, [lastImportResult?.profileUrl]);
 
+  const matchUrl = lastImportResult?.matchUrl;
+  const openMatch = useCallback(() => {
+    if (matchUrl) void window.appApi.openExternal(matchUrl);
+  }, [matchUrl]);
+
   return (
     <div className="upload-shell">
       <div className="upload-shell-header">
@@ -50,8 +59,35 @@ export function UploadShell({
           <div className="upload-eyebrow">DAC Tracker</div>
           <h1>Upload a Game Over screenshot</h1>
         </div>
-        <div className="upload-user">
-          <span>{status?.steam_name || "Steam user"}</span>
+        <div className="upload-user-group">
+          {isAdminPreview && (
+            <button
+              type="button"
+              className="upload-admin-toggle"
+              onClick={openMatch}
+              disabled={!matchUrl}
+              title={
+                matchUrl
+                  ? "Open the most recently uploaded match on the website"
+                  : "No uploaded match yet — upload a screenshot first"
+              }
+            >
+              Open match ↗
+            </button>
+          )}
+          {isAdminPreview && onExitAdminPreview && (
+            <button
+              type="button"
+              className="upload-admin-toggle"
+              onClick={onExitAdminPreview}
+              title="Leave preview and return to the full admin view"
+            >
+              Admin view →
+            </button>
+          )}
+          <div className="upload-user">
+            <span>{status?.steam_name || "Steam user"}</span>
+          </div>
         </div>
       </div>
 

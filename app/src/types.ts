@@ -200,6 +200,8 @@ export interface ImportResultEvent {
   profile_url?: string;
   match_id?: string;
   screenshot_url?: string;
+  game_id?: number;
+  match_url?: string;
 }
 
 export type TrackerEvent =
