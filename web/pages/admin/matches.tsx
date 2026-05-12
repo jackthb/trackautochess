@@ -7,7 +7,7 @@ import { playerProfilePath } from "@/lib/steam";
 import { createSupabaseClient } from "@/lib/supabase";
 import { isAdminSteamId } from "@/lib/admin";
 import browserStyles from "@/components/EntityBrowser.module.css";
-import type { MatchSummary } from "./api/matches";
+import type { MatchSummary } from "../api/admin/matches";
 
 type Phase = "loading" | "forbidden" | "ready" | "error";
 
@@ -43,7 +43,7 @@ export default function MatchesPage() {
         return;
       }
       try {
-        const resp = await fetch("/api/matches", {
+        const resp = await fetch("/api/admin/matches", {
           headers: { Authorization: `Bearer ${token}` },
         });
         if (!resp.ok) {
@@ -86,7 +86,7 @@ export default function MatchesPage() {
       <SeoHead
         title={`Matches | ${SITE_TITLE}`}
         description="All uploaded matches."
-        path="/matches"
+        path="/admin/matches"
         noindex
       />
 

@@ -73,7 +73,10 @@
         "arch": ["x64"]
       }
     ],
-    "icon": "../data/icons/dac_tracker.ico"
+    "icon": "../data/icons/dac_tracker.ico",
+    "signtoolOptions": {
+      "sign": "./scripts/custom-sign.cjs"
+    }
   },
   "linux": {
     "category": "Utility",

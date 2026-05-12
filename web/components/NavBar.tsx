@@ -173,7 +173,7 @@ export function NavBar({ supabase }: NavBarProps) {
         </Link>
       )}
       {isAdmin && (
-        <Link href="/matches" className={styles.navLink}>
+        <Link href="/admin/matches" className={styles.navLink}>
           {t.matches}
         </Link>
       )}

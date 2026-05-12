@@ -52,7 +52,12 @@ interface GamePageProps {
   matchGames: Game[];
   matchProfiles: Record<string, SteamProfile>;
   highlightUserId: string | null;
+  highlightName: string | null;
   supabase: SupabaseClient | null;
+}
+
+function normalizeName(value: string | null | undefined): string {
+  return String(value || "").trim().toLowerCase();
 }
 
 /** Compact row for a player in the match table */
@@ -69,8 +74,16 @@ function MatchPlayerRow({
 }) {
   const p = parseInt(game.placement) || 0;
   const pColor = placementColor(p);
-  const displayName = profile.name || (game.user_id ? String(game.user_id) : `Player #${game.placement}`);
-  const profileUrl = game.user_id
+  // When the upload couldn't link the row to a Steam account, the Game Over
+  // backend stores the OCR'd player name in `notes`. Use that as a fallback
+  // so the row isn't anonymous.
+  const ocrName = game.notes && game.notes.trim() ? game.notes.trim() : null;
+  const displayName =
+    profile.name ||
+    ocrName ||
+    (game.user_id ? String(game.user_id) : `Player #${game.placement}`);
+  const hasProfile = Boolean(game.user_id);
+  const profileUrl = hasProfile
     ? steamProfileUrl(String(game.user_id), profile.customUrl)
     : null;
   const synergies = parseSynergies(game.synergies);
@@ -180,6 +193,7 @@ export default function GamePage({
   matchGames,
   matchProfiles,
   highlightUserId,
+  highlightName,
 }: GamePageProps) {
   const p = parseInt(game.placement) || 0;
   const pColor = placementColor(p);
@@ -208,8 +222,17 @@ export default function GamePage({
     .filter((g) => g.id !== game.id)
     .sort((a, b) => (parseInt(a.placement) || 99) - (parseInt(b.placement) || 99));
 
-  // Determine which user_id to highlight
+  // Determine which user_id to highlight, plus a name fallback for cases
+  // where the Game Over import couldn't link rows to a Steam account.
   const effectiveHighlight = highlightUserId || String(game.user_id);
+  const effectiveHighlightName = normalizeName(highlightName);
+  const isHighlightedRow = (g: Game): boolean => {
+    if (g.user_id && String(g.user_id) === effectiveHighlight) return true;
+    if (effectiveHighlightName && normalizeName(g.notes) === effectiveHighlightName) {
+      return true;
+    }
+    return false;
+  };
 
   return (
     <>
@@ -689,7 +712,7 @@ export default function GamePage({
                     key={g.id}
                     game={g}
                     profile={matchProfiles[String(g.user_id)] || { name: null, customUrl: null }}
-                    highlighted={String(g.user_id) === effectiveHighlight}
+                    highlighted={isHighlightedRow(g)}
                     tooltipData={tooltipData}
                   />
                 ))}
@@ -750,6 +773,25 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     );
   }
 
+  // Look up the highlighted user's Steam name. Game Over uploads often
+  // can't link rows to a Steam account, so we also need to match by the
+  // OCR'd player name stored in `notes`.
+  let highlightName: string | null = null;
+  if (highlightUserId) {
+    if (matchProfiles[highlightUserId]?.name) {
+      highlightName = matchProfiles[highlightUserId].name;
+    } else {
+      try {
+        const profile = await fetchSteamProfile(highlightUserId, supabase, {
+          persist: false,
+        });
+        highlightName = profile.name || null;
+      } catch {
+        highlightName = null;
+      }
+    }
+  }
+
   return {
     props: {
       game: data,
@@ -757,6 +799,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       matchGames,
       matchProfiles,
       highlightUserId,
+      highlightName,
     },
   };
 };
