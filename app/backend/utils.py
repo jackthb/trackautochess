@@ -152,7 +152,7 @@ def crop(img, x0: float, y0: float, x1: float, y1: float):
     return img[int(h * y0):int(h * y1), int(w * x0):int(w * x1)]
 
 
-def ocr(img, psm: int = 7, whitelist: str = "") -> str:
+def ocr(img, psm: int = 7, whitelist: str = "", lang: str = "") -> str:
     """OCR a small image region. Returns stripped text."""
     import cv2
     setup_tesseract()
@@ -164,6 +164,8 @@ def ocr(img, psm: int = 7, whitelist: str = "") -> str:
     config = f"--psm {psm}"
     if whitelist:
         config += f" -c tessedit_char_whitelist={whitelist}"
+    if lang:
+        config += f" -l {lang}"
     try:
         return pytesseract.image_to_string(gray, config=config).strip()
     except Exception:

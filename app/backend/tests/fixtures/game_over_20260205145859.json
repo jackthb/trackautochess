@@ -1,0 +1,186 @@
+{
+  "screenshot_path": "../../data/screenshots/20260205145859_1.jpg",
+  "screen_type": "game_over",
+  "rows": [
+    {
+      "placement": "1",
+      "player_name": "Мангут Рахал",
+      "rank": "Bishop-1",
+      "level": "14",
+      "wl": "21-16",
+      "gold": "$553",
+      "damage": "218-124",
+      "duration": "54:29",
+      "synergies": "mage:9|human:6|dragon:5|wizard:2|knight:2|god:2|demon:1",
+      "relic": "Mango Tree|March Of The Beasts|Magic Box|Leafy Essence",
+      "units": [
+        "Jakiro(2)",
+        "Tidehunter(2)",
+        "Invoker(2)",
+        "Keeper of the Light(2)",
+        "Dragon Knight(2)",
+        "Lion(2)",
+        "Viper(2)",
+        "Rubick(2)",
+        "Lina(2)",
+        "Crystal Maiden(2)",
+        "Omniknight",
+        "Zeus"
+      ]
+    },
+    {
+      "placement": "2",
+      "player_name": "jack",
+      "rank": "Bishop-1",
+      "level": "10",
+      "wl": "25-12",
+      "gold": "$544",
+      "damage": "232-85",
+      "duration": "54:30",
+      "synergies": "naga:6|monk:4|pandaman:1",
+      "relic": "Leafy Essence|Mango Tree|March Of The Beasts",
+      "units": [
+        "Void Spirit(3)",
+        "Naga Siren(3)",
+        "Marci(3)",
+        "Largo(3)",
+        "Medusa(2)",
+        "Slardar(2)",
+        "Slardar(2)",
+        "Monkey King(2)",
+        "Slark(2)",
+        "Tidehunter"
+      ]
+    },
+    {
+      "placement": "3",
+      "player_name": "Martell",
+      "rank": "Unranked",
+      "level": "10",
+      "wl": "15-12",
+      "gold": "$371",
+      "damage": "158-136",
+      "duration": "43:19",
+      "synergies": "aqir:4",
+      "relic": "Magic Seed|Malefic Rapture|Greevil Egg",
+      "units": [
+        "Elder Titan(3)",
+        "Chen(2)",
+        "Broodmother(2)",
+        "Chen(2)",
+        "Broodmother(2)",
+        "Venomancer(2)",
+        "Sand King(2)",
+        "Elder Titan",
+        "Chen",
+        "Elder Titan"
+      ]
+    },
+    {
+      "placement": "4",
+      "player_name": "Penpen",
+      "rank": "Knight-9",
+      "level": "10",
+      "wl": "16-12",
+      "gold": "$348",
+      "damage": "81-106",
+      "duration": "41:48",
+      "synergies": "mage:3|dragon:3|assassin:3|harpy:2",
+      "relic": "Malefic Rapture|Magic Box|Greevil Egg",
+      "units": [
+        "Templar Assassin(2)",
+        "Keeper of the Light(2)",
+        "Dragon Knight(2)",
+        "Puck(2)",
+        "Timbersaw(2)",
+        "Skywrath Mage(2)",
+        "Tidehunter",
+        "Zeus",
+        "Viper",
+        "Kez"
+      ]
+    },
+    {
+      "placement": "5",
+      "player_name": "клапан старши",
+      "rank": "Knight-6",
+      "level": "8",
+      "wl": "8-14",
+      "gold": "$284",
+      "damage": "45-109",
+      "duration": "31:23",
+      "synergies": "goblin:6|mech:3|knight:2|ogre:2",
+      "relic": "Magic Seed|Leafy Essence",
+      "units": [
+        "Tinker(3)",
+        "Ogre Magi(2)",
+        "Timbersaw(2)",
+        "Bounty Hunter(2)",
+        "Clockwerk(2)",
+        "Omniknight",
+        "Snapfire",
+        "Alchemist"
+      ]
+    },
+    {
+      "placement": "6",
+      "player_name": "[-OxoTHuKc-]",
+      "rank": "Knight-8",
+      "level": "7",
+      "wl": "11-10",
+      "gold": "$279",
+      "damage": "73-91",
+      "duration": "30:16",
+      "synergies": "knight:4|troll:4",
+      "relic": "Doubloon|Magic Seed",
+      "units": [
+        "Luna(3)",
+        "Batrider(3)",
+        "Shadow Shaman(3)",
+        "Dazzle(3)",
+        "Witch Doctor(3)",
+        "Dragon Knight",
+        "Dawnbreaker"
+      ]
+    },
+    {
+      "placement": "7",
+      "player_name": "medvagon",
+      "rank": "Knight-3",
+      "level": "9",
+      "wl": "9-10",
+      "gold": "$216",
+      "damage": "65-112",
+      "duration": "27:31",
+      "synergies": "warrior:3|orc:2|beast:2|monk:2",
+      "relic": "Magic Box|March Of The Beasts",
+      "units": [
+        "Marci(2)",
+        "Juggernaut(2)",
+        "Faceless Void(2)",
+        "Tusk(2)",
+        "Spirit Breaker(2)",
+        "Hoodwink(2)",
+        "Monkey King",
+        "Beastmaster",
+        "Axe"
+      ]
+    },
+    {
+      "placement": "8",
+      "player_name": "Linz",
+      "rank": "Unranked",
+      "level": "5",
+      "wl": "0-13",
+      "gold": "$143",
+      "damage": "0-109",
+      "duration": "18:08",
+      "synergies": "priest:2|demon:1",
+      "relic": "",
+      "units": [
+        "Shadow Demon",
+        "Dazzle"
+      ]
+    }
+  ]
+}

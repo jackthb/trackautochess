@@ -55,6 +55,17 @@ COL_SYNERGY = (0.390, 0.500)
 COL_RELIC   = (0.485, 0.555)
 COL_WL      = (0.573, 0.612)
 
+# Placeholder x-extents for the remaining visible Game Over columns.
+# Overwritten at runtime by data/regions_config.json after manual calibration
+# in the Parser Lab against 20260205145859_1.jpg.
+COL_PLACEMENT = (0.000, 0.025)
+COL_AVATAR    = (0.025, 0.078)
+COL_TALENT    = (0.225, 0.275)
+COL_UNITS     = (0.225, 0.515)
+COL_GOLD      = (0.730, 0.765)
+COL_DAMAGE    = (0.830, 0.890)
+COL_DURATION  = (0.890, 0.940)
+
 # GAME OVER row-relative OCR y-offsets within COL_PLAYER cell
 GO_PLAYER_NAME_Y = (0.05, 0.55)
 GO_RANK_Y_IN_PLAYER = (0.55, 0.98)
@@ -166,6 +177,16 @@ DEFAULT_REGIONS = {
     "COL_SYNERGY": COL_SYNERGY,
     "COL_RELIC": COL_RELIC,
     "COL_WL": COL_WL,
+    "COL_PLACEMENT": COL_PLACEMENT,
+    "COL_AVATAR": COL_AVATAR,
+    "COL_TALENT": COL_TALENT,
+    "COL_UNITS": COL_UNITS,
+    "COL_GOLD": COL_GOLD,
+    "COL_DAMAGE": COL_DAMAGE,
+    "COL_DURATION": COL_DURATION,
+    "GO_UNIT_SLOT_XS": [],
+    "GO_UNIT_SLOT_YS": [],
+    "GO_UNIT_SLOT_PAD_PX": 10,
     "GO_PLAYER_NAME_Y": GO_PLAYER_NAME_Y,
     "GO_RANK_Y_IN_PLAYER": GO_RANK_Y_IN_PLAYER,
     "TABLE_Y_START": TABLE_Y_START,
@@ -270,6 +291,13 @@ def apply_calibration(
         ("col_synergy", "COL_SYNERGY", 2),
         ("col_relic", "COL_RELIC", 2),
         ("col_wl", "COL_WL", 2),
+        ("col_placement", "COL_PLACEMENT", 2),
+        ("col_avatar", "COL_AVATAR", 2),
+        ("col_talent", "COL_TALENT", 2),
+        ("col_units", "COL_UNITS", 2),
+        ("col_gold", "COL_GOLD", 2),
+        ("col_damage", "COL_DAMAGE", 2),
+        ("col_duration", "COL_DURATION", 2),
         ("syn_slot_y_range", "GO_SYN_SLOT_Y_RANGE", 2),
     ]:
         v = _as_tuple_or_none(game_over.get(src), length)
@@ -311,6 +339,16 @@ def apply_calibration(
     ]:
         if isinstance(game_over.get(src), (int, float)):
             globals()[dest] = float(game_over[src])
+
+    # Per-slot unit boundaries
+    slot_xs = game_over.get("unit_slot_xs")
+    if isinstance(slot_xs, list) and all(isinstance(v, (int, float)) for v in slot_xs):
+        globals()["GO_UNIT_SLOT_XS"] = [float(v) for v in slot_xs]
+    slot_ys = game_over.get("unit_slot_ys")
+    if isinstance(slot_ys, list) and all(isinstance(v, (int, float)) for v in slot_ys):
+        globals()["GO_UNIT_SLOT_YS"] = [float(v) for v in slot_ys]
+    if isinstance(game_over.get("unit_slot_pad_px"), (int, float)):
+        globals()["GO_UNIT_SLOT_PAD_PX"] = int(game_over["unit_slot_pad_px"])
 
     if isinstance(game_over.get("syn_icon_scales"), list):
         globals()["SYNERGY_ICON_SCALES"] = [int(s) for s in game_over["syn_icon_scales"]]
@@ -1020,24 +1058,43 @@ def _ocr_synergy_counts(
 
 
 def _ocr_game_over_synergy_counts(region: np.ndarray, debug: bool = False) -> list[int]:
-    """OCR visible Game Over synergy counts left-to-right."""
+    """OCR visible Game Over synergy counts left-to-right.
+
+    Single PSM + single threshold misses a count when the digit overlaps
+    icon-bleed colors (e.g. the 3rd "(3)" in a 4-synergy row reads as
+    "GF"/"SP" instead of "3"). Try several (threshold, PSM) combinations
+    and keep the result with the most digits — only the COUNT matters
+    (downstream zips with template matches by position), so picking the
+    OCR with the most numerals reliably gets every synergy a slot.
+    """
     h, w = region.shape[:2]
-    count_strip = region[int(h * 0.42):int(h * 0.78), 0:int(w * 0.70)]
-    _save_debug("go_synergy_count_strip", count_strip, debug)
 
-    gray = cv2.cvtColor(count_strip, cv2.COLOR_BGR2GRAY) if len(count_strip.shape) == 3 else count_strip
-    _, bw = cv2.threshold(gray, 150, 255, cv2.THRESH_BINARY)
-    inv = cv2.bitwise_not(bw)
-    scaled = cv2.resize(inv, (inv.shape[1] * 4, inv.shape[0] * 4),
-                        interpolation=cv2.INTER_NEAREST)
-    scaled = cv2.copyMakeBorder(scaled, 20, 20, 20, 20,
-                                cv2.BORDER_CONSTANT, value=255)
-    _save_debug("go_synergy_count_strip_proc", scaled, debug)
+    def _ocr_band(y0_frac: float, y1_frac: float) -> list[int]:
+        strip = region[int(h * y0_frac):int(h * y1_frac), 0:w]
+        if strip.size == 0:
+            return []
+        gray = cv2.cvtColor(strip, cv2.COLOR_BGR2GRAY) if len(strip.shape) == 3 else strip
+        best: list[int] = []
+        for thresh_val in (150, 180, 140):
+            _, bw = cv2.threshold(gray, thresh_val, 255, cv2.THRESH_BINARY)
+            inv = cv2.bitwise_not(bw)
+            scaled = cv2.resize(inv, (inv.shape[1] * 4, inv.shape[0] * 4),
+                                interpolation=cv2.INTER_NEAREST)
+            scaled = cv2.copyMakeBorder(scaled, 20, 20, 20, 20,
+                                        cv2.BORDER_CONSTANT, value=255)
+            for psm in (6, 12, 11):
+                raw = _ocr(scaled, psm=psm)
+                digits = [int(d) for d in re.findall(r"\d+", raw)
+                          if 1 <= int(d) <= 12]
+                if len(digits) > len(best):
+                    best = digits
+        return best
 
-    raw = _ocr(scaled, psm=12)
-    counts = [int(d) for d in re.findall(r"\d+", raw) if 1 <= int(d) <= 12]
-    log.debug(f"    Game Over count OCR raw: {raw!r}")
-    log.debug(f"    Game Over counts: {counts}")
+    _save_debug("go_synergy_count_strip", region, debug)
+    top_counts = _ocr_band(0.42, 0.78)
+    bot_counts = _ocr_band(0.80, 0.95)
+    counts = top_counts + bot_counts
+    log.debug(f"    Game Over counts: top={top_counts} bot={bot_counts} -> {counts}")
     return counts
 
 
@@ -1070,17 +1127,23 @@ def _parse_game_over_synergies(
     )
 
     h, w = region.shape[:2]
+    # Top row is always present; bottom row only when OCR found >6 counts.
+    # Matching the whole cell on 1-row layouts picks up item-bar noise.
+    if len(counts) > 6:
+        y_max = 0.96
+    else:
+        y_max = GO_SYN_GLOBAL_Y_MAX_FRAC
     matches = _match_templates_multiscale(
         region,
         syn_templates,
         threshold=MATCH_THRESHOLD,
-        y_max_frac=GO_SYN_GLOBAL_Y_MAX_FRAC,
+        y_max_frac=y_max,
         debug=debug,
     )
 
-    # Some current screenshots use a low-scoring Naga icon variant. If OCR sees
-    # a leading count but global matching starts at the second slot, patch only
-    # that missing first slot from the shape-only fallback templates.
+    # Leading-slot fallback (e.g. Naga's icon scores in the 0.40s but OCR
+    # confirms a count is present at the leftmost slot). Keep this BEFORE
+    # the low-threshold retry so naga is detected from the loose templates.
     if counts and len(matches) < len(counts):
         first_x = matches[0][2] if matches else w
         if first_x > w * 0.12:
@@ -1092,6 +1155,33 @@ def _parse_game_over_synergies(
                 name, score, _, _ = fallback
                 matches.insert(0, (name, score, int(w * sx0), int(h * sy0)))
                 log.debug(f"    go syn leading fallback: {name:20s} score={score:.3f}")
+
+    # Still under-detected? Mid-slot icons (e.g. assassin) sometimes score in
+    # the 0.55-0.70 band. Retry at lower threshold and merge in any matches
+    # at unused x-positions, keeping the best score per icon name.
+    if counts and len(matches) < len(counts):
+        extras = _match_templates_multiscale(
+            region,
+            syn_templates,
+            threshold=0.55,
+            y_max_frac=y_max,
+            debug=debug,
+        )
+        used_xs = [m[2] for m in matches]
+        used_names = {m[0] for m in matches}
+        for name, score, x, y in extras:
+            if name in used_names:
+                continue
+            if any(abs(x - ux) < 30 for ux in used_xs):
+                continue
+            matches.append((name, score, x, y))
+            used_xs.append(x)
+            used_names.add(name)
+
+    # _match_templates_multiscale sorts left-to-right which collapses rows.
+    # For 2-row layouts, re-sort by (y_band, x) so top-row icons come first.
+    row_split = int(h * 0.48)
+    matches.sort(key=lambda m: (0 if m[3] < row_split else 1, m[2]))
 
     parsed: list[tuple[str, int]] = []
     for (name, score, x, y), count in zip(matches, counts):
@@ -1253,6 +1343,13 @@ def _game_over_row_bboxes(row_idx: int) -> dict[str, tuple[float, float, float, 
         "relic": (COL_RELIC[0], y0, COL_RELIC[1], y1),
         "wl": (COL_WL[0], y0, COL_WL[1], y1),
         "row": (0.0, y0, 1.0, y1),
+        "placement": (COL_PLACEMENT[0], y0, COL_PLACEMENT[1], y1),
+        "avatar": (COL_AVATAR[0], y0, COL_AVATAR[1], y1),
+        "talent": (COL_TALENT[0], y0, COL_TALENT[1], y1),
+        "units": (COL_UNITS[0], y0, COL_UNITS[1], y1),
+        "gold": (COL_GOLD[0], y0, COL_GOLD[1], y1),
+        "damage": (COL_DAMAGE[0], y0, COL_DAMAGE[1], y1),
+        "duration": (COL_DURATION[0], y0, COL_DURATION[1], y1),
     }
 
 
@@ -1344,7 +1441,12 @@ _RANK_RE = re.compile(
 
 
 def _ocr_player_name(img: np.ndarray, row_idx: int, debug: bool = False) -> str:
-    """OCR the player name from the top of one game-over row's COL_PLAYER cell."""
+    """OCR the player name from the top of one game-over row's COL_PLAYER cell.
+
+    Uses eng+rus when rus.traineddata is available so Cyrillic in-game names
+    (e.g. "Мангут Рахал") come back as Cyrillic instead of garbled Latin.
+    Tesseract silently falls back to English when rus is missing.
+    """
     y0, y1 = _row_y_extent(row_idx)
     rh = y1 - y0
     # Name occupies the upper portion of the cell; rank sits below it.
@@ -1352,13 +1454,13 @@ def _ocr_player_name(img: np.ndarray, row_idx: int, debug: bool = False) -> str:
                  COL_PLAYER[1], y0 + rh * GO_PLAYER_NAME_Y[1])
     processed = _preprocess_for_ocr(cell, scale=2.5)
     _save_debug(f"player_name_row{row_idx}", processed, debug)
-    text = _ocr(processed, psm=7).strip()
+    text = _ocr(processed, psm=7, lang="eng+rus").strip()
     if not text:
         gray = cv2.cvtColor(cell, cv2.COLOR_BGR2GRAY) if len(cell.shape) == 3 else cell
         ch, cw = gray.shape[:2]
         scaled = cv2.resize(gray, (cw * 3, ch * 3), interpolation=cv2.INTER_CUBIC)
         try:
-            text = pytesseract.image_to_string(scaled, config="--psm 7").strip()
+            text = pytesseract.image_to_string(scaled, config="--psm 7 -l eng+rus").strip()
         except Exception:
             text = ""
     if text:
@@ -1370,31 +1472,535 @@ def _ocr_player_name(img: np.ndarray, row_idx: int, debug: bool = False) -> str:
 def _ocr_player_rank(img: np.ndarray, row_idx: int, debug: bool = False) -> str:
     """OCR the rank ("Bishop-7", "Knight-3", "Unranked", ...) from the bottom
     of one game-over row's COL_PLAYER cell.
+
+    Falls through multiple PSM modes — PSM 7 alone misses rows where the
+    rank text shares the cell with avatar bleed or noisy backgrounds; PSM 6
+    and 11/12 catch those.
     """
     y0, y1 = _row_y_extent(row_idx)
     rh = y1 - y0
-    cell = _crop(img, COL_PLAYER[0], y0 + rh * GO_RANK_Y_IN_PLAYER[0],
+    # Skip the leftmost ~25% of the player column — that area holds the rank
+    # icon (chess piece) which Tesseract reads as noise and pollutes the OCR
+    # for the tier text that sits to its right.
+    cw = COL_PLAYER[1] - COL_PLAYER[0]
+    cell_x0 = COL_PLAYER[0] + cw * 0.25
+    cell = _crop(img, cell_x0, y0 + rh * GO_RANK_Y_IN_PLAYER[0],
                  COL_PLAYER[1], y0 + rh * GO_RANK_Y_IN_PLAYER[1])
     processed = _preprocess_for_ocr(cell, scale=3.0)
     _save_debug(f"player_rank_row{row_idx}", processed, debug)
-    text = _ocr(processed, psm=7).strip()
-    if not text:
-        gray = cv2.cvtColor(cell, cv2.COLOR_BGR2GRAY) if len(cell.shape) == 3 else cell
-        ch, cw = gray.shape[:2]
-        scaled = cv2.resize(gray, (cw * 3, ch * 3), interpolation=cv2.INTER_CUBIC)
-        try:
-            text = pytesseract.image_to_string(scaled, config="--psm 7").strip()
-        except Exception:
-            text = ""
-    m = _RANK_RE.search(text)
-    if m:
-        rank = f"{m.group(1).title()}-{m.group(2)}"
-    elif "unrank" in text.lower():
-        rank = "Unranked"
-    else:
-        rank = ""
-    log.debug(f"  [player rank] row {row_idx}: raw={text!r} -> {rank!r}")
-    return rank
+
+    best_text = ""
+    for psm in (7, 6, 11, 12):
+        text = _ocr(processed, psm=psm).strip()
+        if not text:
+            continue
+        best_text = best_text or text
+        m = _RANK_RE.search(text)
+        if m:
+            rank = f"{m.group(1).title()}-{m.group(2)}"
+            log.debug(f"  [player rank] row {row_idx}: psm={psm} raw={text!r} -> {rank!r}")
+            return rank
+        # Lenient unranked match — Tesseract sometimes drops a letter
+        # ("Unranke", "Ynranked"). "rank" alone is safe because none of the
+        # tier names (Pawn/Knight/Bishop/Rook/King/Queen) contain it.
+        if "rank" in text.lower():
+            log.debug(f"  [player rank] row {row_idx}: psm={psm} raw={text!r} -> 'Unranked'")
+            return "Unranked"
+
+    log.debug(f"  [player rank] row {row_idx}: raw={best_text!r} -> ''")
+    return ""
+
+
+# ── Per-column OCR/grid helpers used by both _parse_row_data and the Lab trace ─
+
+_LEVEL_OCR_SUBSTITUTIONS = str.maketrans({
+    # Common Tesseract confusions on the DAC level font (yellow stylized digits).
+    "S": "5", "s": "5",
+    "O": "0", "o": "0",
+    "l": "1", "I": "1",
+    "Z": "2", "z": "2",
+    "B": "8",
+    "G": "6",
+    "T": "7",
+    "q": "9",
+})
+
+
+def _ocr_level_multi_psm(cell: np.ndarray) -> str:
+    """OCR a Game Over level cell.
+
+    The digit is yellow on a varied background and the in-game font is
+    stylised enough that Tesseract often misreads (e.g. "5"→"S"). Pipeline:
+    1. HSV yellow-mask the cell.
+    2. Tight-crop the mask to a single bbox covering all yellow blobs that
+       are large enough to be digit strokes (keeps "14" together).
+    3. Upscale to ~120px tall with white border.
+    4. OCR across PSM modes, first with digit whitelist, then without
+       whitelist + letter→digit substitution.
+    """
+    if cell.size == 0:
+        return ""
+    hsv = cv2.cvtColor(cell, cv2.COLOR_BGR2HSV)
+    mask = cv2.inRange(hsv, (15, 80, 150), (40, 255, 255))
+    cnts, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    if not cnts:
+        return ""
+    big = [c for c in cnts if cv2.contourArea(c) >= 20]
+    if not big:
+        big = cnts
+    xs, ys, xe, ye = [], [], [], []
+    for c in big:
+        x, y, w, h = cv2.boundingRect(c)
+        xs.append(x); ys.append(y); xe.append(x + w); ye.append(y + h)
+    pad = 4
+    mh, mw = mask.shape[:2]
+    x0 = max(min(xs) - pad, 0)
+    y0 = max(min(ys) - pad, 0)
+    x1 = min(max(xe) + pad, mw)
+    y1 = min(max(ye) + pad, mh)
+    digit_mask = mask[y0:y1, x0:x1]
+    if digit_mask.size == 0:
+        return ""
+    inv = cv2.bitwise_not(digit_mask)
+    target_h = 120
+    scale = max(1, target_h // max(inv.shape[0], 1))
+    upscaled = cv2.resize(inv, (inv.shape[1] * scale, inv.shape[0] * scale),
+                          interpolation=cv2.INTER_NEAREST)
+    proc = cv2.copyMakeBorder(upscaled, 40, 40, 40, 40,
+                              cv2.BORDER_CONSTANT, value=255)
+
+    def _parse(text: str) -> str:
+        digits = re.findall(r"\d+", text)
+        if digits:
+            lv = int(digits[0])
+            if 1 <= lv <= 15:
+                return str(lv)
+        return ""
+
+    for psm in (10, 13, 7, 8, 6):
+        raw = _ocr(proc, psm=psm, whitelist="0123456789")
+        out = _parse(raw)
+        if out:
+            return out
+    for psm in (10, 13, 7, 8, 6):
+        raw = _ocr(proc, psm=psm)
+        out = _parse(raw.translate(_LEVEL_OCR_SUBSTITUTIONS))
+        if out:
+            return out
+    return ""
+
+
+def _ocr_go_placement(img: np.ndarray, row_idx: int, debug: bool = False) -> str:
+    """Return placement for a Game Over row.
+
+    Game Over rows are always sorted by placement 1..8 (top to bottom), so
+    the row index uniquely determines the placement. The stylized yellow
+    digits in the cell misread frequently (3→7, 6→7), so trusting row order
+    is both simpler and more reliable than OCR.
+    """
+    return str(row_idx + 1)
+
+
+def _ocr_go_gold(img: np.ndarray, row_idx: int, debug: bool = False) -> str:
+    """OCR the gold column ($NNN). Multi-PSM fallback."""
+    y0, y1 = _row_y_extent(row_idx)
+    cell = _crop_row(img, COL_GOLD, y0, y1)
+    if cell.size == 0:
+        return ""
+    proc = _preprocess_for_ocr(cell, scale=3.0)
+    _save_debug(f"go_gold_row{row_idx}", proc, debug)
+    for psm in (7, 6, 11, 8):
+        raw = _ocr(proc, psm=psm, whitelist="0123456789$")
+        m = re.search(r"\$?(\d{1,4})", raw)
+        if m:
+            return f"${m.group(1)}"
+    return ""
+
+
+def _ocr_go_damage(img: np.ndarray, row_idx: int, debug: bool = False) -> str:
+    """OCR the damage column (NNN-NNN). PSM 7 alone misses some rows; fall
+    through 6/11/7/8 and return the first PSM whose output matches."""
+    y0, y1 = _row_y_extent(row_idx)
+    cell = _crop_row(img, COL_DAMAGE, y0, y1)
+    if cell.size == 0:
+        return ""
+    proc = _preprocess_for_ocr(cell, scale=3.0)
+    _save_debug(f"go_damage_row{row_idx}", proc, debug)
+    for psm in (6, 11, 7, 8):
+        raw = _ocr(proc, psm=psm, whitelist="0123456789-")
+        m = re.search(r"(\d{1,4})\s*[-–]\s*(\d{1,4})", raw)
+        if m:
+            return f"{m.group(1)}-{m.group(2)}"
+    return ""
+
+
+def _ocr_go_duration(img: np.ndarray, row_idx: int, debug: bool = False) -> str:
+    """OCR the duration column (MM:SS). Multi-PSM fallback."""
+    y0, y1 = _row_y_extent(row_idx)
+    cell = _crop_row(img, COL_DURATION, y0, y1)
+    if cell.size == 0:
+        return ""
+    proc = _preprocess_for_ocr(cell, scale=3.0)
+    _save_debug(f"go_duration_row{row_idx}", proc, debug)
+    for psm in (7, 6, 11, 8):
+        raw = _ocr(proc, psm=psm, whitelist="0123456789:")
+        m = re.search(r"(\d{1,3}):(\d{2})", raw)
+        if m:
+            return f"{m.group(1)}:{m.group(2)}"
+    return ""
+
+
+_GO_UNITS_LOOKUP: tuple[dict[str, list[np.ndarray]] | None, dict[str, str] | None] = (None, None)
+_GO_UNITS_COLOR_SIGS: dict[str, np.ndarray] | None = None
+
+GO_UNIT_MAX_SLOTS = 12
+GO_UNIT_Y_BAND = (0.22, 0.62)
+GO_UNIT_THRESHOLD = 0.50
+GO_UNIT_INNER_FRAC = 0.75
+GO_UNIT_COLOR_THRESHOLD = 0.55
+# When non-empty, these x-fractions (of the full image width) define the
+# left edge of each unit slot. Last slot extends to the right edge of
+# col_units. Populated from regions_config.json by apply_calibration.
+GO_UNIT_SLOT_XS: list[float] = []
+# Pairs of y-fractions per row: [row0_top, row0_bot, row1_top, row1_bot, ...].
+# When populated (length == 2 * N_ROWS) overrides the derived y-band.
+GO_UNIT_SLOT_YS: list[float] = []
+GO_UNIT_SLOT_PAD_PX: int = 10
+
+
+def _ensure_go_unit_templates(icons_dir: Path):
+    """Load and cache unit templates + display-name lookup for Game Over.
+
+    Templates are sampled at heights matching the GO icon size (~45px),
+    with a tighter inner crop than MM so the bland icon border doesn't
+    inflate Faceless Void's match score everywhere.
+    """
+    global _GO_UNITS_LOOKUP
+    templates, lookup = _GO_UNITS_LOOKUP
+    if templates is None:
+        templates = _load_templates_multiscale(
+            icons_dir / "units",
+            [36, 40, 44, 48, 52, 56],
+            inner_frac=GO_UNIT_INNER_FRAC,
+            color=True,
+        )
+    if lookup is None:
+        import json as _json
+        from utils import DATA_DIR
+        units_path = DATA_DIR / "units.json"
+        if units_path.exists():
+            data = _json.loads(units_path.read_text(encoding="utf-8")).get("units", {})
+            lookup = {_unit_stem(name): name for name in data}
+        else:
+            lookup = {}
+    _GO_UNITS_LOOKUP = (templates, lookup)
+    return templates, lookup
+
+
+def _go_unit_best_for_slot(slot_img, templates, threshold):
+    """Return (stem, score) best match in a tightly-cropped slot, or
+    ("", best_score) if nothing crosses the threshold."""
+    if slot_img.size == 0:
+        return ("", 0.0)
+    best_name, best_score = "", 0.0
+    for name, tmpls in templates.items():
+        for tmpl in tmpls:
+            th, tw = tmpl.shape[:2]
+            if slot_img.shape[0] < th or slot_img.shape[1] < tw:
+                continue
+            result = np.zeros((slot_img.shape[0] - th + 1,
+                               slot_img.shape[1] - tw + 1), dtype=np.float32)
+            for ch in range(3):
+                result += cv2.matchTemplate(slot_img[:, :, ch], tmpl[:, :, ch],
+                                            cv2.TM_CCOEFF_NORMED)
+            result /= 3.0
+            _, mv, _, _ = cv2.minMaxLoc(result)
+            if mv > best_score:
+                best_score = float(mv)
+                best_name = name
+    if best_score >= threshold:
+        return (best_name, best_score)
+    return ("", best_score)
+
+
+def _compute_unit_color_sig(img_bgr: np.ndarray) -> np.ndarray | None:
+    """Hue-saturation histogram for an icon, normalized to sum=1.
+
+    Game Over icons are tiny and pixelated; the template PNGs are sharper.
+    A small Gaussian blur smooths both sides so the histograms compare on
+    actual color distribution, not aliasing artifacts.
+    """
+    if img_bgr is None or img_bgr.size == 0:
+        return None
+    if len(img_bgr.shape) < 3:
+        img_bgr = cv2.cvtColor(img_bgr, cv2.COLOR_GRAY2BGR)
+    blurred = cv2.GaussianBlur(img_bgr, (5, 5), 0)
+    hsv = cv2.cvtColor(blurred, cv2.COLOR_BGR2HSV)
+    h, w = hsv.shape[:2]
+    m = max(1, int(min(h, w) * 0.15))
+    inner = hsv[m:h - m, m:w - m]
+    if inner.size == 0:
+        inner = hsv
+    hist = cv2.calcHist([inner], [0, 1], None, [16, 16],
+                        [0, 180, 0, 256])
+    cv2.normalize(hist, hist, alpha=1.0, norm_type=cv2.NORM_L1)
+    return hist
+
+
+def _ensure_go_unit_color_sigs(icons_dir: Path) -> dict[str, np.ndarray]:
+    """Load and cache per-unit color signatures from the icon PNGs."""
+    global _GO_UNITS_COLOR_SIGS
+    if _GO_UNITS_COLOR_SIGS is not None:
+        return _GO_UNITS_COLOR_SIGS
+    sigs: dict[str, np.ndarray] = {}
+    units_dir = icons_dir / "units"
+    if units_dir.exists():
+        for p in sorted(units_dir.glob("*.png")):
+            icon = _load_icon(p, color=True)
+            if icon is None:
+                continue
+            sig = _compute_unit_color_sig(icon)
+            if sig is not None:
+                sigs[p.stem] = sig
+    _GO_UNITS_COLOR_SIGS = sigs
+    return sigs
+
+
+def _go_unit_color_match(slot_img: np.ndarray,
+                         sigs: dict[str, np.ndarray],
+                         candidate_stems: list[str] | None = None,
+                         ) -> tuple[str, float]:
+    """Match a slot by color signature. Returns (stem, distance).
+
+    Distance is Bhattacharyya — 0.0 = identical, 1.0 = disjoint.
+    If candidate_stems is given, only compares against those (used as a
+    tiebreaker over the template top-K).
+    """
+    target = _compute_unit_color_sig(slot_img)
+    if target is None or not sigs:
+        return ("", 1.0)
+    stems = candidate_stems if candidate_stems else sigs.keys()
+    best_stem, best_dist = "", 1.0
+    for stem in stems:
+        sig = sigs.get(stem)
+        if sig is None:
+            continue
+        d = cv2.compareHist(sig, target, cv2.HISTCMP_BHATTACHARYYA)
+        if d < best_dist:
+            best_dist = float(d)
+            best_stem = stem
+    return (best_stem, best_dist)
+
+
+def _go_unit_template_top_k(slot_img: np.ndarray,
+                            templates: dict[str, list[np.ndarray]],
+                            k: int = 5,
+                            ) -> list[tuple[str, float]]:
+    """Return the top-k templates by best score, sorted desc."""
+    if slot_img is None or slot_img.size == 0:
+        return []
+    blurred = cv2.GaussianBlur(slot_img, (3, 3), 0)
+    scored: list[tuple[str, float]] = []
+    for name, tmpls in templates.items():
+        best = 0.0
+        for tmpl in tmpls:
+            th, tw = tmpl.shape[:2]
+            if blurred.shape[0] < th or blurred.shape[1] < tw:
+                continue
+            result = np.zeros((blurred.shape[0] - th + 1,
+                               blurred.shape[1] - tw + 1), dtype=np.float32)
+            for ch in range(3):
+                result += cv2.matchTemplate(blurred[:, :, ch],
+                                            tmpl[:, :, ch],
+                                            cv2.TM_CCOEFF_NORMED)
+            result /= 3.0
+            _, mv, _, _ = cv2.minMaxLoc(result)
+            if mv > best:
+                best = float(mv)
+        if best > 0:
+            scored.append((name, best))
+    scored.sort(key=lambda x: -x[1])
+    return scored[:k]
+
+
+def _go_unit_y_band(img_h: int, row_idx: int) -> tuple[int, int]:
+    """Pixel y-range covering the unit icons for one Game Over row.
+
+    Uses GO_UNIT_SLOT_YS pair when populated (calibrated per-row top/bottom
+    rails), otherwise derives the band from _row_y_extent + GO_UNIT_Y_BAND.
+    Symmetric vertical padding with GO_UNIT_SLOT_PAD_PX is added either way.
+    """
+    pad = GO_UNIT_SLOT_PAD_PX
+    if (len(GO_UNIT_SLOT_YS) >= 2 * (row_idx + 1)
+            and row_idx >= 0):
+        top = GO_UNIT_SLOT_YS[2 * row_idx]
+        bot = GO_UNIT_SLOT_YS[2 * row_idx + 1]
+        zy0 = max(0, int(round(top * img_h)) - pad)
+        zy1 = min(img_h, int(round(bot * img_h)) + pad)
+        return (zy0, zy1)
+    y0_frac, y1_frac = _row_y_extent(row_idx)
+    ry0 = int(y0_frac * img_h)
+    ry1 = int(y1_frac * img_h)
+    rh = ry1 - ry0
+    return (ry0 + int(rh * GO_UNIT_Y_BAND[0]),
+            ry0 + int(rh * GO_UNIT_Y_BAND[1]))
+
+
+def _go_unit_slot_ranges(img_w: int) -> list[tuple[int, int]]:
+    """Return [(x0_px, x1_px), ...] for each unit slot, in image coordinates.
+
+    Uses GO_UNIT_SLOT_XS (user-calibrated slot left edges) when available,
+    falling back to an even split of col_units when not. Adds
+    GO_UNIT_SLOT_PAD_PX of padding to each side so icons that sit right at
+    a slot edge aren't clipped.
+    """
+    pad = GO_UNIT_SLOT_PAD_PX
+    if GO_UNIT_SLOT_XS:
+        xs = sorted(GO_UNIT_SLOT_XS)
+        # Last slot's right edge: use next entry, or col_units right edge.
+        right_end = COL_UNITS[1]
+        ranges = []
+        for i, x in enumerate(xs):
+            x_next = xs[i + 1] if i + 1 < len(xs) else right_end
+            x0 = int(round(x * img_w)) - pad
+            x1 = int(round(x_next * img_w)) + pad
+            ranges.append((max(0, x0), min(img_w, x1)))
+        return ranges
+    # Fallback: even-split of col_units
+    col0 = int(round(COL_UNITS[0] * img_w))
+    col1 = int(round(COL_UNITS[1] * img_w))
+    width = (col1 - col0) / GO_UNIT_MAX_SLOTS
+    return [
+        (max(0, col0 + int(round(i * width)) - pad),
+         min(img_w, col0 + int(round((i + 1) * width)) + pad))
+        for i in range(GO_UNIT_MAX_SLOTS)
+    ]
+
+
+GO_UNIT_TEMPLATE_WEIGHT = 0.4   # combined = α·template + (1−α)·(1−color_dist)
+
+
+def _detect_unit_level(img: np.ndarray, sx0: int, sx1: int,
+                       icon_bot_y: int) -> int:
+    """Count star-chip clusters below a Game Over unit icon.
+
+    Reuses _find_star_clusters (the MM star detector). The chip strip sits
+    just below the icon; we feed _find_star_clusters that strip and return
+    the cluster count (== star level).
+    """
+    cy0 = icon_bot_y + 2
+    cy1 = min(icon_bot_y + 18, img.shape[0])
+    if cy1 - cy0 < 3 or sx1 - sx0 < 4:
+        return 0
+    strip = img[cy0:cy1, sx0:sx1]
+    if strip.size == 0:
+        return 0
+    if len(strip.shape) < 3:
+        strip = cv2.cvtColor(strip, cv2.COLOR_GRAY2BGR)
+    clusters = _find_star_clusters(strip)
+    return min(len(clusters), 3)
+
+
+def _match_go_units_trace(img: np.ndarray, row_idx: int, icons_dir: Path
+                          ) -> list[dict]:
+    """Per-slot unit detection trace for one Game Over row.
+
+    Every template gets scored on BOTH signals at once and ranked by a
+    weighted combined score, so neither signal gates the other:
+
+        combined = α · template_score + (1 − α) · (1 − color_dist)
+
+    Template alone over-matches (Faceless Void), color alone is too coarse;
+    combined breaks ties cleanly. Both signals get a small Gaussian blur so
+    GO icon pixelation doesn't sink template correlation.
+
+    Acceptance: the winning combined score must clear GO_UNIT_THRESHOLD.
+
+    Trace entry shape:
+      {"slot_idx", "sx0", "sx1", "zy0", "zy1",
+       "stem", "template_score", "color_dist", "combined",
+       "display_name", "accepted",
+       "candidates": [(stem, template_score, color_dist, combined), ...]}
+    """
+    img_h, img_w = img.shape[:2]
+    zy0, zy1 = _go_unit_y_band(img_h, row_idx)
+    if zy1 - zy0 <= 0:
+        return []
+    templates, lookup = _ensure_go_unit_templates(icons_dir)
+    sigs = _ensure_go_unit_color_sigs(icons_dir)
+    α = GO_UNIT_TEMPLATE_WEIGHT
+
+    trace: list[dict] = []
+    for slot_idx, (sx0, sx1) in enumerate(_go_unit_slot_ranges(img_w)):
+        if sx1 <= sx0:
+            continue
+        slot_img = img[zy0:zy1, sx0:sx1]
+        if slot_img.size == 0:
+            continue
+        if len(slot_img.shape) < 3:
+            slot_img = cv2.cvtColor(slot_img, cv2.COLOR_GRAY2BGR)
+
+        target_sig = _compute_unit_color_sig(slot_img)
+        # Score every template on both signals; rank by combined.
+        all_template_scores = _go_unit_template_top_k(
+            slot_img, templates, k=len(templates),
+        )
+        candidates: list[tuple[str, float, float, float]] = []
+        best_stem, best_tscore, best_dist, best_combined = "", 0.0, 1.0, -1.0
+        for stem, tscore in all_template_scores:
+            sig = sigs.get(stem)
+            if sig is None or target_sig is None:
+                dist = 1.0
+            else:
+                dist = float(cv2.compareHist(sig, target_sig,
+                                             cv2.HISTCMP_BHATTACHARYYA))
+            combined = α * tscore + (1 - α) * (1 - dist)
+            candidates.append((stem, tscore, dist, combined))
+            if combined > best_combined:
+                best_stem, best_tscore, best_dist = stem, tscore, dist
+                best_combined = combined
+        candidates.sort(key=lambda x: -x[3])
+        accepted = bool(best_stem) and best_combined >= GO_UNIT_THRESHOLD
+        level = _detect_unit_level(img, sx0, sx1, zy1) if accepted else 0
+
+        trace.append({
+            "slot_idx": slot_idx,
+            "sx0": sx0, "sx1": sx1,
+            "zy0": zy0, "zy1": zy1,
+            "stem": best_stem,
+            "template_score": best_tscore,
+            "color_dist": best_dist,
+            "combined": best_combined,
+            "display_name": lookup.get(best_stem, best_stem) if best_stem else "",
+            "accepted": accepted,
+            "level": level,
+            "candidates": candidates[:5],
+        })
+    return trace
+
+
+def _match_go_units(img: np.ndarray, row_idx: int, icons_dir: Path,
+                    debug: bool = False) -> list[str]:
+    """Detect units in one Game Over row.
+
+    Returns names in the MY MATCHES format: `"Name"` for 1-star, `"Name(N)"`
+    when level ≥ 2. Reads the same trace the debugger renders, so the two
+    cannot disagree.
+    """
+    trace = _match_go_units_trace(img, row_idx, icons_dir)
+    names: list[str] = []
+    for entry in trace:
+        if entry["accepted"]:
+            name = entry["display_name"]
+            level = entry.get("level", 0)
+            names.append(f"{name}({level})" if level >= 2 else name)
+        if debug:
+            log.debug(f"  [go units] row {row_idx} slot {entry['slot_idx']}: "
+                      f"x=[{entry['sx0']},{entry['sx1']}] "
+                      f"stem={entry['stem']!r} t={entry['template_score']:.3f} "
+                      f"c={entry['color_dist']:.3f} lvl={entry.get('level',0)} "
+                      f"accepted={entry['accepted']}")
+    return names
 
 
 def _parse_row_data(
@@ -1405,18 +2011,12 @@ def _parse_row_data(
     relic_templates: dict[str, list[np.ndarray]] | None = None,
     debug: bool = False,
 ) -> dict:
-    """Extract level, wl, synergies, relic for a single row of the game over table."""
+    """Extract level, wl, synergies, relic, plus the new columns for one row."""
     y0, y1 = _row_y_extent(row_idx)
 
-    # OCR level
+    # OCR level (multi-PSM fallback: bottom rows fail under PSM 7 alone)
     level_cell = _crop_row(img, COL_LEVEL, y0, y1)
-    level_proc = _preprocess_for_ocr(level_cell, scale=3.0)
-    level_raw = _ocr(level_proc, psm=7, whitelist="0123456789")
-    digits = re.findall(r"\d+", level_raw)
-    level = ""
-    if digits:
-        lv = int(digits[0])
-        level = str(lv) if 1 <= lv <= 15 else ""
+    level = _ocr_level_multi_psm(level_cell)
 
     # OCR W-L
     wl_cell = _crop_row(img, COL_WL, y0, y1)
@@ -1437,12 +2037,22 @@ def _parse_row_data(
     relic = _parse_game_over_relics(
         relic_cell, relic_templates, icons_dir, debug=debug)
 
+    placement = _ocr_go_placement(img, row_idx, debug=debug)
+    gold = _ocr_go_gold(img, row_idx, debug=debug)
+    damage = _ocr_go_damage(img, row_idx, debug=debug)
+    duration = _ocr_go_duration(img, row_idx, debug=debug)
+    units = _match_go_units(img, row_idx, icons_dir, debug=debug)
+
     return {
-        "placement": str(row_idx + 1),
+        "placement": placement or str(row_idx + 1),
         "level": level,
         "wl": wl,
         "synergies": synergies,
         "relic": relic,
+        "gold": gold,
+        "damage": damage,
+        "duration": duration,
+        "units": units,
     }
 
 
@@ -1496,13 +2106,17 @@ def parse_game_over_screenshot(
     )
 
     rows = []
+    title_crop = _crop(img, *TITLE_REGION)
+    title_proc = _preprocess_for_ocr(title_crop, scale=2.0, invert=True)
+    title_label = _ocr(title_proc, psm=7, whitelist="GAMEOVERgameover ").strip()
     trace = [
         _trace_region(
             "title",
             "ocr",
             "title",
             TITLE_REGION,
-            crop=_crop(img, *TITLE_REGION),
+            label=title_label,
+            crop=title_crop,
         )
     ]
     warnings = []
@@ -1598,6 +2212,69 @@ def parse_game_over_screenshot(
                 row_data.get("wl", ""),
                 i,
                 _crop(img, *bboxes["wl"]),
+            ),
+            _trace_region(
+                f"row{i}.placement",
+                "ocr",
+                "go_placement",
+                bboxes["placement"],
+                row_data.get("placement", ""),
+                i,
+                _crop(img, *bboxes["placement"]),
+            ),
+            _trace_region(
+                f"row{i}.avatar",
+                "template",
+                "go_avatar",
+                bboxes["avatar"],
+                "",
+                i,
+                _crop(img, *bboxes["avatar"]),
+            ),
+            _trace_region(
+                f"row{i}.talent",
+                "template",
+                "go_talent",
+                bboxes["talent"],
+                "",
+                i,
+                _crop(img, *bboxes["talent"]),
+            ),
+            _trace_region(
+                f"row{i}.units",
+                "grid",
+                "go_units",
+                bboxes["units"],
+                ", ".join(row_data.get("units") or []),
+                i,
+                _crop(img, *bboxes["units"]),
+            ),
+            _trace_region(
+                f"row{i}.gold",
+                "ocr",
+                "go_gold",
+                bboxes["gold"],
+                row_data.get("gold", ""),
+                i,
+                _crop(img, *bboxes["gold"]),
+            ),
+            _trace_region(
+                f"row{i}.damage",
+                "ocr",
+                "go_damage",
+                bboxes["damage"],
+                row_data.get("damage", ""),
+                i,
+                _crop(img, *bboxes["damage"]),
+            ),
+            _trace_region(
+                f"row{i}.duration",
+                "ocr",
+                "go_duration",
+                bboxes["duration"],
+                row_data.get("duration", ""),
+                i,
+                _crop(img, *bboxes["duration"]),
             ),
         ])
 

@@ -35,6 +35,10 @@ jobs:
             $engUrl = "https://github.com/tesseract-ocr/tessdata_fast/raw/main/eng.traineddata"
             Invoke-WebRequest -Uri $engUrl -OutFile "tesseract-portable/tessdata/eng.traineddata"
           }
+          if (-not (Test-Path "tesseract-portable/tessdata/rus.traineddata")) {
+            $rusUrl = "https://github.com/tesseract-ocr/tessdata_fast/raw/main/rus.traineddata"
+            Invoke-WebRequest -Uri $rusUrl -OutFile "tesseract-portable/tessdata/rus.traineddata"
+          }
 
       - name: Set up Node.js
         uses: actions/setup-node@v4

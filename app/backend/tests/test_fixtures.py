@@ -42,7 +42,7 @@ def test_fixture(fixture_path: Path):
     )
     from utils import DATA_DIR, ICONS_DIR
 
-    fixture = json.loads(fixture_path.read_text())
+    fixture = json.loads(fixture_path.read_text(encoding="utf-8"))
     screenshot_path = Path(fixture["screenshot_path"])
     if not screenshot_path.is_absolute():
         screenshot_path = BACKEND_DIR / screenshot_path
@@ -65,39 +65,38 @@ def test_fixture(fixture_path: Path):
     else:
         pytest.skip(f"Unknown screen_type: {screen_type}")
 
-    assert len(actual_rows) == len(expected_rows), (
-        f"Row count mismatch: got {len(actual_rows)}, expected {len(expected_rows)}"
-    )
+    errors: list[str] = []
+    if len(actual_rows) != len(expected_rows):
+        errors.append(
+            f"Row count mismatch: got {len(actual_rows)}, expected {len(expected_rows)}"
+        )
 
     for i, (actual, expected) in enumerate(zip(actual_rows, expected_rows)):
         label = f"row {i}"
 
-        if expected.get("placement"):
-            assert actual.get("placement") == expected["placement"], (
-                f"{label}: placement {actual.get('placement')!r} != {expected['placement']!r}"
-            )
-
-        if expected.get("level"):
-            assert actual.get("level") == expected["level"], (
-                f"{label}: level {actual.get('level')!r} != {expected['level']!r}"
-            )
-
-        if expected.get("wl"):
-            assert actual.get("wl") == expected["wl"], (
-                f"{label}: wl {actual.get('wl')!r} != {expected['wl']!r}"
-            )
+        for field in ("placement", "level", "wl"):
+            if expected.get(field) and actual.get(field) != expected[field]:
+                errors.append(
+                    f"{label}: {field} {actual.get(field)!r} != {expected[field]!r}"
+                )
 
         if expected.get("units"):
             actual_units = set(u.split("(")[0] for u in (actual.get("units") or []))
             expected_units = set(u.split("(")[0] for u in expected["units"])
             missing = expected_units - actual_units
             extra = actual_units - expected_units
-            assert not missing and not extra, (
-                f"{label}: unit mismatch — missing={missing}, extra={extra}"
-            )
+            if missing or extra:
+                errors.append(
+                    f"{label}: unit mismatch — missing={sorted(missing)}, "
+                    f"extra={sorted(extra)}"
+                )
 
         if expected.get("synergies"):
             actual_syns = set(s.split(":")[0] for s in (actual.get("synergies") or "").split("|") if s)
             expected_syns = set(s.split(":")[0] for s in expected["synergies"].split("|") if s)
             missing = expected_syns - actual_syns
-            assert not missing, f"{label}: missing synergies={missing}"
+            if missing:
+                errors.append(f"{label}: missing synergies={sorted(missing)}")
+
+    if errors:
+        pytest.fail("\n  - " + "\n  - ".join(errors), pytrace=False)
