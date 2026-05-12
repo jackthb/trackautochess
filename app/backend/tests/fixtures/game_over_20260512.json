@@ -1,0 +1,180 @@
+{
+  "screenshot_path": "../../data/screenshots/game_over_20260512_jack_knight8.png",
+  "screen_type": "game_over",
+  "rows": [
+    {
+      "placement": "1",
+      "player_name": "Agit wood pc A",
+      "rank": "Bishop-2",
+      "level": "11",
+      "wl": "30-8",
+      "gold": "$538",
+      "damage": "242-78",
+      "duration": "51:34",
+      "synergies": "goblin:4|aqir:4|assassin:4|human:2|demon:2|warrior:1",
+      "relic": "",
+      "units": [
+        "Void Spirit",
+        "Abyssal Underlord",
+        "Ringmaster",
+        "Warlock",
+        "Queen of Pain",
+        "Monkey King",
+        "Shadow Fiend",
+        "Naga Siren"
+      ]
+    },
+    {
+      "placement": "2",
+      "player_name": "GoldGhost",
+      "rank": "Bishop-5",
+      "level": "13",
+      "wl": "23-15",
+      "gold": "$532",
+      "damage": "204-158",
+      "duration": "51:35",
+      "synergies": "mage:9|human:4|demon:3|knight:2|warrior:2|dragon:2|pandaman:1",
+      "relic": "",
+      "units": [
+        "Kez",
+        "Omniknight",
+        "Kunkka",
+        "Doom",
+        "Lycan",
+        "Huskar",
+        "Slardar",
+        "Juggernaut",
+        "Axe",
+        "Warlock",
+        "Primal Beast"
+      ]
+    },
+    {
+      "placement": "3",
+      "player_name": "ebanatiwe [CRE",
+      "rank": "Bishop-1",
+      "level": "10",
+      "wl": "19-15",
+      "gold": "$476",
+      "damage": "127-130",
+      "duration": "46:15",
+      "synergies": "beast:6|element:4|shaman:2",
+      "relic": "Greevil Egg",
+      "units": [
+        "Naga Siren",
+        "Enigma",
+        "Slark",
+        "Largo",
+        "Phoenix",
+        "Slardar"
+      ]
+    },
+    {
+      "placement": "4",
+      "player_name": "KaRBoN",
+      "rank": "Knight-9",
+      "level": "9",
+      "wl": "12-15",
+      "gold": "$390",
+      "damage": "122-103",
+      "duration": "38:44",
+      "synergies": "beast:6|elf:3",
+      "relic": "",
+      "units": [
+        "Windranger",
+        "Sniper",
+        "Hoodwink",
+        "Mirana",
+        "Bounty Hunter",
+        "Broodmother",
+        "Medusa",
+        "Io"
+      ]
+    },
+    {
+      "placement": "5",
+      "player_name": "Monkey bot [Fc",
+      "rank": "Bishop-1",
+      "level": "9",
+      "wl": "5-21",
+      "gold": "$355",
+      "damage": "29-182",
+      "duration": "35:20",
+      "synergies": "assassin:3|tauren:4|god:4|harpy:2|demon:2|warrior:1",
+      "relic": "",
+      "units": [
+        "Elder Titan",
+        "Skywrath Mage",
+        "Lion",
+        "Riki",
+        "Kez",
+        "Mars",
+        "Spirit Breaker"
+      ]
+    },
+    {
+      "placement": "6",
+      "player_name": "Don`t worry, b",
+      "rank": "Knight-6",
+      "level": "10",
+      "wl": "15-10",
+      "gold": "$341",
+      "damage": "120-106",
+      "duration": "35:15",
+      "synergies": "beast:6|harpy:2|element:2|demon:1",
+      "relic": "",
+      "units": [
+        "Lion",
+        "Kez",
+        "Ogre Magi",
+        "Lina",
+        "Puck",
+        "Skywrath Mage",
+        "Ancient Apparition",
+        "Omniknight",
+        "Primal Beast",
+        "Phoenix"
+      ]
+    },
+    {
+      "placement": "7",
+      "player_name": "jack [Fc4P]",
+      "rank": "Knight-8",
+      "level": "9",
+      "wl": "11-10",
+      "gold": "$265",
+      "damage": "32-106",
+      "duration": "28:55",
+      "synergies": "ogre:4|shaman:3|aqir:2",
+      "relic": "",
+      "units": [
+        "Witch Doctor",
+        "Elder Titan",
+        "Juggernaut",
+        "Disruptor"
+      ]
+    },
+    {
+      "placement": "8",
+      "player_name": "detonator",
+      "rank": "Knight-8",
+      "level": "9",
+      "wl": "9-12",
+      "gold": "$275",
+      "damage": "57-70",
+      "duration": "28:54",
+      "synergies": "human:6|demon:4|warrior:1",
+      "relic": "",
+      "units": [
+        "Dragon Knight",
+        "Kunkka",
+        "Lycan",
+        "Legion Commander",
+        "Lina",
+        "Warlock",
+        "Snapfire",
+        "Chaos Knight"
+      ]
+    }
+  ]
+}
