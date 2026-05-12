@@ -22,7 +22,8 @@ const T = {
     h5: "Trademarks & affiliation",
     p5: "Track Auto Chess is an independent fan project. It is not affiliated with, endorsed by, or sponsored by Valve Corporation or Drodo Studio. Dota, Dota 2, and Dota Auto Chess are trademarks of their respective owners. Game icons, names, and statistical data shown on this site are property of their respective owners and are used for informational and analytical purposes only.",
     h6: "Contact",
-    p6pre: "Questions about this policy, or requests relating to your data, can be sent through the ",
+    p6pre:
+      "Questions about this policy, or requests relating to your data, can be sent through the ",
     p6link: "support form",
     p6post: " on the about page.",
   },
@@ -44,7 +45,8 @@ const T = {
     h5: "Товарные знаки и связи",
     p5: "Track Auto Chess — независимый фанатский проект. Он не связан с Valve Corporation или Drodo Studio и не одобрен ими. Dota, Dota 2 и Dota Auto Chess — товарные знаки соответствующих правообладателей. Игровые иконки, названия и статистические данные на этом сайте принадлежат их правообладателям и используются только в информационно-аналитических целях.",
     h6: "Связаться с нами",
-    p6pre: "Вопросы по этой политике или запросы по вашим данным можно отправить через ",
+    p6pre:
+      "Вопросы по этой политике или запросы по вашим данным можно отправить через ",
     p6link: "форму поддержки",
     p6post: " на странице «О сайте».",
   },
@@ -52,12 +54,19 @@ const T = {
 
 export default function PrivacyPage() {
   const router = useRouter();
-  const locale = normalizeLocale(router.locale ?? router.defaultLocale ?? undefined);
+  const locale = normalizeLocale(
+    router.locale ?? router.defaultLocale ?? undefined,
+  );
   const t = T[locale];
 
   return (
     <>
-      <SeoHead title={t.title} description={t.description} path="/privacy" locale={locale} />
+      <SeoHead
+        title={t.title}
+        description={t.description}
+        path="/privacy"
+        locale={locale}
+      />
 
       <style jsx>{`
         .page {

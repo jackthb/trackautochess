@@ -5,7 +5,6 @@
 ```
 dac-tools/
 ├── analyzer/       Python VOD analyzer CLI
-├── scraper/        Puppeteer scraper for autochess.site
 ├── tracker/        Hotkey game tracker (end-of-game screenshot → CSV)
 └── data/           Shared game data (source of truth)
 ```
@@ -24,7 +23,6 @@ dac-tools/
 ## 1. Data Pipeline
 
 ### Goal
-Pull current patch data from autochess.site and build a rich internal DB — units with images at each star level, items, synergies, patch history. Use this to ground the vision prompts with accurate, patch-aware context.
 
 | Task | Status | Notes |
 |------|--------|-------|
@@ -94,26 +92,6 @@ Accurate per-frame game state extraction from VOD screenshots. Currently uses Cl
 
 ---
 
-## 4. Scraper (scraper/)
-
-| Task | Status | Notes |
-|------|--------|-------|
-| Puppeteer scaffold | ✅ done | `scrape.js` — launches browser, dumps raw page content |
-| Install dependencies | ✅ done | `cd scraper && npm install` |
-| Scrape 114 units with costs | ✅ done | `scrape_costs.mjs` — uses `<select>` cost + synergy filters on board builder |
-| Build canonical `units.json` | ✅ done | `build_units_json.mjs` — syncs to analyzer data dir |
-| Scrape 76 items | ✅ done | `items_parsed.json` from items page |
-| Patch version detection | 📋 planned | Compare unit pool to known patches |
-| Scheduled/CI auto-update | 💡 idea | Run scraper on a schedule, PR the data update |
-
-### Key Scraper Findings
-- autochess.site is a React SPA — must navigate from home page, not direct URL
-- Cost filter is a `<select>` element (not buttons) — use `select.value = "1"; dispatchEvent(change)`
-- Synergy filter is also a `<select>` — index 0 on page, cost filter is index 1
-- Unit cards: `.grid.grid-cols-4 .group.cursor-pointer` → `.truncate` div has name
-- Item registry (grid-cols-6) has item cards that look like buttons but are item instances
-
----
 
 ## 5. Game Tracker (tracker/)
 
