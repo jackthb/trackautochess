@@ -127,6 +127,11 @@ export function UploadShell({
         >
           Choose screenshot
         </button>
+        {importing && (
+          <div className="upload-progress" role="progressbar" aria-label="Uploading screenshot">
+            <div className="upload-progress-fill" />
+          </div>
+        )}
       </div>
 
       {(localError || lastImportResult) && (
@@ -137,11 +142,18 @@ export function UploadShell({
             </strong>
             <p>{localError || lastImportResult?.message}</p>
           </div>
-          {lastImportResult?.profileUrl && (
-            <button type="button" className="upload-secondary" onClick={openProfile}>
-              Open profile
-            </button>
-          )}
+          <div className="upload-result-actions">
+            {matchUrl && (
+              <button type="button" className="upload-secondary" onClick={openMatch}>
+                Open match
+              </button>
+            )}
+            {lastImportResult?.profileUrl && (
+              <button type="button" className="upload-secondary" onClick={openProfile}>
+                Open profile
+              </button>
+            )}
+          </div>
         </div>
       )}
     </div>

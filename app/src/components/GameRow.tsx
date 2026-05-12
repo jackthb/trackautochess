@@ -180,7 +180,7 @@ export function GameRow({
         synergiesData={synergiesData}
         relicsData={relicsData}
         iconUrl={(type, stem) => `icons://${type}/${stem}.png`}
-        shareUrl={`https://dac-tracker-web.vercel.app/games/${game.id}`}
+        shareUrl={`https://trackautochess.com/games/${game.id}`}
         onClick={handleToggle}
         style={{ cursor: "pointer" }}
         dateExtra={

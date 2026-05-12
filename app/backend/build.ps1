@@ -1,3 +1,7 @@
+param(
+    [switch]$Clean
+)
+
 $ErrorActionPreference = "Stop"
 
 # ── Paths ────────────────────────────────────────────────────────────────────
@@ -66,12 +70,16 @@ if ($running) {
 Write-Host ""
 Write-Host "=== Step 1/3: Building headless backend ===" -ForegroundColor Magenta
 
-if (Test-Path $BuildDir) {
-    Write-Host "Cleaning build cache..." -ForegroundColor Cyan
+# Keep $BuildDir between runs — it's PyInstaller's incremental analysis cache.
+# Pass -Clean to this script if you suspect a stale cache.
+if ($Clean -and (Test-Path $BuildDir)) {
+    Write-Host "Cleaning build cache (--Clean)..." -ForegroundColor Cyan
     Remove-Item -Recurse -Force $BuildDir
 }
 
-& $PyInstaller $SpecFile --workpath $BuildDir --noconfirm --clean
+$pyInstallerArgs = @($SpecFile, "--workpath", $BuildDir, "--noconfirm")
+if ($Clean) { $pyInstallerArgs += "--clean" }
+& $PyInstaller @pyInstallerArgs
 if ($LASTEXITCODE -ne 0) { throw "PyInstaller build failed" }
 
 $HeadlessDir = Join-Path $BackendDir "dist\headless"

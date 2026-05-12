@@ -22,6 +22,7 @@ const T = {
     talents: "Talents",
     ranks: "Ranks",
     leaderboard: "Leaderboard",
+    matches: "Matches",
     patchNotes: "Patch Notes",
     signOut: "Sign out",
     signIn: "Sign in with Steam",
@@ -40,6 +41,7 @@ const T = {
     talents: "Таланты",
     ranks: "Ранги",
     leaderboard: "Таблица лидеров",
+    matches: "Матчи",
     patchNotes: "Патчноуты",
     signOut: "Выйти",
     signIn: "Войти через Steam",
@@ -168,6 +170,11 @@ export function NavBar({ supabase }: NavBarProps) {
       {isAdmin && (
         <Link href="/leaderboard" className={styles.navLink}>
           {t.leaderboard}
+        </Link>
+      )}
+      {isAdmin && (
+        <Link href="/matches" className={styles.navLink}>
+          {t.matches}
         </Link>
       )}
       <Link href="/patch-notes" className={styles.navLink} locale={false}>

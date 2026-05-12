@@ -826,7 +826,7 @@ class HeadlessBackend:
             self.config.get("web_profile_base_url")
             or self.config.get("web_base_url")
             or os.environ.get("DAC_WEB_BASE_URL")
-            or "https://dac-tracker-web.vercel.app"
+            or "https://trackautochess.com"
         ).rstrip("/")
 
     def _profile_url(self, steam_id: str) -> str:

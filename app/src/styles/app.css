@@ -342,6 +342,35 @@
   opacity: 0.78;
 }
 
+.upload-progress {
+  width: 100%;
+  max-width: 360px;
+  height: 4px;
+  margin-top: 4px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--accent) 14%, var(--bg-surface));
+  overflow: hidden;
+}
+
+.upload-progress-fill {
+  width: 38%;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, transparent, var(--accent), transparent);
+  animation: upload-progress-slide 1.1s linear infinite;
+}
+
+@keyframes upload-progress-slide {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(360%); }
+}
+
+.upload-result-actions {
+  display: flex;
+  flex-shrink: 0;
+  gap: 8px;
+}
+
 .upload-drop-icon {
   width: 54px;
   height: 54px;
