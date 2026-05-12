@@ -15,7 +15,7 @@ const {
 const path = require("path");
 const fs = require("fs");
 const os = require("os");
-const { spawn } = require("child_process");
+const { spawn, execFileSync } = require("child_process");
 const readline = require("readline");
 const { getElectronDesktopPaths } = require("./desktop-paths.cjs");
 
@@ -707,10 +707,75 @@ ipcMain.on("tracker:command", (_event, cmd) => {
   sendToPython(cmd);
 });
 
+// Steam stores Dota 2 screenshots under
+// <SteamRoot>/userdata/<steam32>/760/remote/570/screenshots. Default the
+// upload dialogs there when we can resolve it, since that is where the
+// user's Game Over caps actually live; fall back to the local mirror.
+const DOTA_APP_ID = "570";
+const STEAM64_BASE = 76561197960265728n;
+
+function readSteamPathFromRegistry() {
+  if (process.platform !== "win32") return null;
+  for (const root of ["HKCU\\Software\\Valve\\Steam", "HKLM\\SOFTWARE\\WOW6432Node\\Valve\\Steam"]) {
+    try {
+      const out = execFileSync("reg", ["query", root, "/v", "SteamPath"], {
+        encoding: "utf-8",
+        stdio: ["ignore", "pipe", "ignore"],
+      });
+      const m = out.match(/SteamPath\s+REG_SZ\s+([^\r\n]+)/);
+      if (m) return path.normalize(m[1].trim());
+    } catch {}
+    try {
+      const out = execFileSync("reg", ["query", root, "/v", "InstallPath"], {
+        encoding: "utf-8",
+        stdio: ["ignore", "pipe", "ignore"],
+      });
+      const m = out.match(/InstallPath\s+REG_SZ\s+([^\r\n]+)/);
+      if (m) return path.normalize(m[1].trim());
+    } catch {}
+  }
+  return null;
+}
+
+function findSteamRoot() {
+  const fromReg = readSteamPathFromRegistry();
+  if (fromReg && fs.existsSync(fromReg)) return fromReg;
+  const candidates =
+    process.platform === "win32"
+      ? ["C:\\Program Files (x86)\\Steam", "C:\\Program Files\\Steam"]
+      : process.platform === "darwin"
+        ? [path.join(os.homedir(), "Library", "Application Support", "Steam")]
+        : [path.join(os.homedir(), ".steam", "steam"), path.join(os.homedir(), ".local", "share", "Steam")];
+  for (const p of candidates) {
+    if (fs.existsSync(p)) return p;
+  }
+  return null;
+}
+
+function getDotaScreenshotsDir() {
+  const steamRoot = findSteamRoot();
+  if (!steamRoot) return null;
+  const config = loadTrackerConfig();
+  const steamId = config && config.steam_id;
+  if (!steamId) return null;
+  let steam32;
+  try {
+    steam32 = String(BigInt(String(steamId)) - STEAM64_BASE);
+  } catch {
+    return null;
+  }
+  const dir = path.join(steamRoot, "userdata", steam32, "760", "remote", DOTA_APP_ID, "screenshots");
+  return fs.existsSync(dir) ? dir : null;
+}
+
+function screenshotDialogDefault() {
+  return getDotaScreenshotsDir() || path.join(DAC_DIR, "screenshots");
+}
+
 ipcMain.handle("app:openFileDialog", async () => {
   const result = await dialog.showOpenDialog({
     title: "Select MY MATCHES screenshot",
-    defaultPath: path.join(DAC_DIR, "screenshots"),
+    defaultPath: screenshotDialogDefault(),
     filters: [
       { name: "Images", extensions: ["jpg", "jpeg", "png"] },
       { name: "All files", extensions: ["*"] },
@@ -725,7 +790,7 @@ ipcMain.handle("app:openFileDialog", async () => {
 ipcMain.handle("app:openGameOverScreenshotDialog", async () => {
   const result = await dialog.showOpenDialog({
     title: "Select Game Over screenshot",
-    defaultPath: path.join(DAC_DIR, "screenshots"),
+    defaultPath: screenshotDialogDefault(),
     filters: [
       { name: "Images", extensions: ["jpg", "jpeg", "png"] },
     ],
