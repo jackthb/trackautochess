@@ -4,7 +4,7 @@ on:
   schedule:
     # Once a day at 09:47 UTC. Off-aligned minute to avoid the
     # GitHub-wide :00 thundering-herd that delays jobs by ~10–20 min.
-    - cron: '47 9 * * *'
+    - cron: "47 9 * * *"
   workflow_dispatch:
 
 concurrency:

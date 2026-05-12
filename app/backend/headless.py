@@ -12,10 +12,29 @@ import hashlib
 import json
 import logging
 import os
+import re
 import sys
 import threading
 from datetime import datetime
 from pathlib import Path
+
+
+def _screenshot_taken_at(path: Path) -> datetime:
+    """Best-effort timestamp for when a screenshot was *taken*.
+
+    Steam screenshots are named like ``20260224023809_1.jpg``; prefer that.
+    Fall back to the file's mtime, and finally to ``datetime.now()``.
+    """
+    m = re.match(r"(\d{4})(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})", path.name)
+    if m:
+        try:
+            return datetime(*(int(g) for g in m.groups()))
+        except ValueError:
+            pass
+    try:
+        return datetime.fromtimestamp(path.stat().st_mtime)
+    except OSError:
+        return datetime.now()
 
 # ── Tesseract setup (bundled or system) ───────────────────────────────────────
 
@@ -669,7 +688,10 @@ class HeadlessBackend:
                 self._emit_notification(APP_NAME, "GAME OVER: no rows parsed.")
                 return
 
-            played_at = datetime.now().isoformat()
+            if screenshot_path:
+                played_at = _screenshot_taken_at(Path(screenshot_path)).isoformat()
+            else:
+                played_at = datetime.now().isoformat()
             my_user_id = self.config.get("steam_id") or None
 
             screenshot_url = self._upload_game_over_screenshot_asset(img, my_user_id)
@@ -843,7 +865,7 @@ class HeadlessBackend:
             )
             return
 
-        played_at = datetime.now().isoformat()
+        played_at = _screenshot_taken_at(path).isoformat()
         match_id = generate_match_id()
         self._emit_import_progress(65, "Uploading screenshot")
         screenshot_url = self._upload_game_over_screenshot_asset(img, my_user_id)
