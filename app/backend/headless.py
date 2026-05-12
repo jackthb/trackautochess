@@ -8,6 +8,7 @@ Usage:
 """
 
 import base64
+import hashlib
 import json
 import logging
 import os
@@ -345,6 +346,46 @@ class HeadlessBackend:
     def _mark_screenshot_uploaded(self, screenshot_path: str) -> None:
         """Record that a screenshot has been uploaded to the database."""
         self._update_manifest(screenshot_path, uploaded_at=datetime.now().isoformat())
+
+    def _hash_file(self, path: Path) -> str:
+        """SHA-256 of file bytes, or '' on failure."""
+        try:
+            h = hashlib.sha256()
+            with path.open("rb") as fh:
+                for chunk in iter(lambda: fh.read(65536), b""):
+                    h.update(chunk)
+            return h.hexdigest()
+        except Exception as e:
+            log.warning("Failed to hash %s: %s", path, e)
+            return ""
+
+    def _find_uploaded_by_hash(self, file_hash: str) -> dict | None:
+        """Return the manifest entry of a previously-uploaded Game Over with
+        the same content hash, or None."""
+        if not file_hash:
+            return None
+        manifest_path = DAC_DIR / "screenshots" / "manifest.json"
+        if not manifest_path.exists():
+            return None
+        try:
+            manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        except Exception:
+            return None
+        for entry in manifest.values():
+            if not isinstance(entry, dict):
+                continue
+            if entry.get("hash") != file_hash:
+                continue
+            if entry.get("imported_at"):
+                return entry
+        return None
+
+    def _emit_import_progress(self, progress: int, message: str = "") -> None:
+        """Emit a 0-100 progress event for the current import."""
+        payload = {"type": "import_progress", "progress": max(0, min(100, int(progress)))}
+        if message:
+            payload["message"] = message
+        self._emit(payload)
 
     def _save_parse_result(self, screenshot_path: str, rows: list, timestamps: list) -> None:
         stem = Path(screenshot_path).stem
@@ -735,11 +776,37 @@ class HeadlessBackend:
             self._emit_error("Steam login is required before uploading a Game Over screenshot.")
             return
 
+        self._emit_import_progress(5, "Reading screenshot")
+        file_hash = self._hash_file(path)
+        duplicate_entry = self._find_uploaded_by_hash(file_hash)
+        if duplicate_entry:
+            log.info("Skipping duplicate upload (hash=%s)", file_hash[:12])
+            dup_game_id = duplicate_entry.get("game_id")
+            dup_match_url = duplicate_entry.get("match_url") or ""
+            if not dup_match_url and dup_game_id:
+                dup_match_url = self._match_url(int(dup_game_id), my_user_id)
+            self._emit_import_progress(100, "Already uploaded")
+            self._emit_import_result(
+                imported=0,
+                skipped=1,
+                failed=0,
+                message="This screenshot was already uploaded earlier — skipping.",
+                tone="warning",
+                screen_type="game_over",
+                profile_url=self._profile_url(my_user_id),
+                match_id=duplicate_entry.get("match_id") or "",
+                screenshot_url=duplicate_entry.get("screenshot_url") or "",
+                game_id=int(dup_game_id) if dup_game_id else None,
+                match_url=dup_match_url,
+            )
+            return
+
         img = cv2.imread(str(path))
         if img is None:
             self._emit_error(f"Failed to read image: {path}")
             return
 
+        self._emit_import_progress(15, "Detecting screen type")
         screen_type = detect_screen_type(img)
         if screen_type not in ("game_over", "final_ranking"):
             self._emit_import_result(
@@ -760,6 +827,10 @@ class HeadlessBackend:
         except Exception as e:
             log.warning("Failed to save local Game Over screenshot copy: %s", e)
 
+        if file_hash:
+            self._update_manifest(local_path, hash=file_hash)
+
+        self._emit_import_progress(30, "Parsing players")
         draft = self._parse_game_over_draft(img, debug=True)
         if not draft:
             self._emit_import_result(
@@ -774,11 +845,14 @@ class HeadlessBackend:
 
         played_at = datetime.now().isoformat()
         match_id = generate_match_id()
+        self._emit_import_progress(65, "Uploading screenshot")
         screenshot_url = self._upload_game_over_screenshot_asset(img, my_user_id)
+        self._emit_import_progress(80, "Resolving players")
         resolved_rows, _linked_detected = self._resolve_game_over_users(
             draft.get("rows", []),
             my_user_id,
         )
+        self._emit_import_progress(90, "Saving rows")
         stats = self._push_game_over_rows(
             resolved_rows,
             played_at=played_at,
@@ -805,6 +879,7 @@ class HeadlessBackend:
             msg = "Game Over screenshot parsed, but no rows were saved."
             tone = "error" if failed else "warning"
 
+        self._emit_import_progress(100, "Done")
         self._emit_import_result(
             imported=imported,
             skipped=skipped,
@@ -819,7 +894,22 @@ class HeadlessBackend:
             game_id=match_game_id,
             match_url=match_url,
         )
-        self._update_manifest(local_path, screen_type="game_over", imported_at=datetime.now().isoformat())
+        manifest_fields: dict = {
+            "screen_type": "game_over",
+            "imported_at": datetime.now().isoformat(),
+        }
+        if imported > 0:
+            if file_hash:
+                manifest_fields["hash"] = file_hash
+            if match_id:
+                manifest_fields["match_id"] = match_id
+            if match_game_id is not None:
+                manifest_fields["game_id"] = match_game_id
+            if match_url:
+                manifest_fields["match_url"] = match_url
+            if screenshot_url:
+                manifest_fields["screenshot_url"] = screenshot_url
+        self._update_manifest(local_path, **manifest_fields)
 
     def _web_base_url(self) -> str:
         return str(

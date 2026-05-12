@@ -97,6 +97,7 @@ export default function App() {
         <UploadShell
           status={tracker.status}
           importing={tracker.importing}
+          importProgress={tracker.importProgress}
           lastImportResult={tracker.lastImportResult}
           onBeginImport={tracker.beginImport}
           onClearImportResult={tracker.clearImportResult}

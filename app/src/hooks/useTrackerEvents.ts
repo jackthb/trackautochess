@@ -25,6 +25,11 @@ export interface ImportResult {
   matchUrl?: string;
 }
 
+export interface ImportProgress {
+  progress: number;
+  message?: string;
+}
+
 interface TrackerState {
   status: TrackerStatus | null;
   processingScreenshot: ProcessingScreenshot | null;
@@ -36,6 +41,7 @@ interface TrackerState {
   clearAuthError: () => void;
   logEntries: LogEntry[];
   importing: boolean;
+  importProgress: ImportProgress | null;
   beginImport: () => void;
 }
 
@@ -56,6 +62,7 @@ export function useTrackerEvents(
   const [authError, setAuthError] = useState<string | null>(null);
   const [logEntries, setLogEntries] = useState<LogEntry[]>([]);
   const [importing, setImporting] = useState(false);
+  const [importProgress, setImportProgress] = useState<ImportProgress | null>(null);
   const importTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const callbacksRef = useRef({ onImportResult, onReplaySaved });
   callbacksRef.current = { onImportResult, onReplaySaved };
@@ -70,14 +77,17 @@ export function useTrackerEvents(
   const finishImport = useCallback(() => {
     clearImportTimer();
     setImporting(false);
+    setImportProgress(null);
   }, [clearImportTimer]);
 
   const beginImport = useCallback(() => {
     clearImportTimer();
     setImporting(true);
+    setImportProgress({ progress: 0 });
     importTimeoutRef.current = setTimeout(() => {
       importTimeoutRef.current = null;
       setImporting(false);
+      setImportProgress(null);
     }, IMPORT_SAFETY_TIMEOUT_MS);
   }, [clearImportTimer]);
 
@@ -120,6 +130,12 @@ export function useTrackerEvents(
           break;
         case "processing_screenshot":
           setProcessingScreenshot(msg);
+          break;
+        case "import_progress":
+          setImportProgress({
+            progress: Math.max(0, Math.min(100, msg.progress)),
+            message: msg.message,
+          });
           break;
         case "parse_result":
           setProcessingScreenshot(null);
@@ -208,6 +224,7 @@ export function useTrackerEvents(
     clearAuthError,
     logEntries,
     importing,
+    importProgress,
     beginImport,
   };
 }

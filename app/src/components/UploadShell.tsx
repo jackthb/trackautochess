@@ -1,10 +1,11 @@
 import { useCallback, useState } from "react";
 import type { TrackerStatus } from "../types";
-import type { ImportResult } from "../hooks/useTrackerEvents";
+import type { ImportProgress, ImportResult } from "../hooks/useTrackerEvents";
 
 interface UploadShellProps {
   status: TrackerStatus | null;
   importing: boolean;
+  importProgress: ImportProgress | null;
   lastImportResult: ImportResult | null;
   onBeginImport: () => void;
   onClearImportResult: () => void;
@@ -17,6 +18,7 @@ type ElectronFile = File & { path?: string };
 export function UploadShell({
   status,
   importing,
+  importProgress,
   lastImportResult,
   onBeginImport,
   onClearImportResult,
@@ -114,7 +116,9 @@ export function UploadShell({
       >
         <div className="upload-drop-icon" aria-hidden="true">+</div>
         <div className="upload-drop-title">
-          {importing ? "Uploading..." : "Drop your screenshot here"}
+          {importing
+            ? importProgress?.message || "Uploading..."
+            : "Drop your screenshot here"}
         </div>
         <div className="upload-drop-copy">
           Game Over screenshots are parsed locally by the desktop app before upload.
@@ -128,8 +132,23 @@ export function UploadShell({
           Choose screenshot
         </button>
         {importing && (
-          <div className="upload-progress" role="progressbar" aria-label="Uploading screenshot">
-            <div className="upload-progress-fill" />
+          <div className="upload-progress">
+            <div
+              className="upload-progress-track"
+              role="progressbar"
+              aria-label="Uploading screenshot"
+              aria-valuemin={0}
+              aria-valuemax={100}
+              aria-valuenow={Math.round(importProgress?.progress ?? 0)}
+            >
+              <div
+                className="upload-progress-fill"
+                style={{ width: `${Math.round(importProgress?.progress ?? 0)}%` }}
+              />
+            </div>
+            <div className="upload-progress-label">
+              {Math.round(importProgress?.progress ?? 0)}%
+            </div>
           </div>
         )}
       </div>

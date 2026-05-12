@@ -204,12 +204,19 @@ export interface ImportResultEvent {
   match_url?: string;
 }
 
+export interface ImportProgressEvent {
+  type: "import_progress";
+  progress: number;
+  message?: string;
+}
+
 export type TrackerEvent =
   | ParseResult
   | ProcessingScreenshot
   | TrackerStatus
   | LogEntry
   | ImportResultEvent
+  | ImportProgressEvent
   | { type: "import_finished" }
   | { type: "focus_gained" }
   | { type: "focus_lost" }
