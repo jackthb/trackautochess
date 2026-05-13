@@ -1042,6 +1042,21 @@ class NetTableCapture:
             if not url or not key:
                 raise RuntimeError("supabase_url / key missing from config")
 
+            # Merge into local snapshot FIRST. Capture and ingest are
+            # independent concerns: if Supabase auth fails the data we
+            # decoded is still valid and the live-capture panel should
+            # show it. Re-broadcasting state always.
+            now_iso = datetime.now().isoformat()
+            for r in rows:
+                bucket = self._last_state.setdefault(r["table_name"], {})
+                bucket[r["key"]] = r["raw"]
+            self._last_state_at = now_iso
+            self._emit({
+                "type": "nettable_state",
+                "state": self._last_state,
+                "at": now_iso,
+            })
+
             with httpx.Client(
                 base_url=url.rstrip("/"),
                 headers={
@@ -1054,19 +1069,12 @@ class NetTableCapture:
                 written = insert_dumps(client, rows)
 
             log.info("nettable: ingested %d row(s) across %d table(s)", written, len(tables))
-            now_iso = datetime.now().isoformat()
             self._emit({
                 "type": "nettable_ingest_complete",
                 "rows_written": written,
                 "tables": tables,
                 "at": now_iso,
             })
-
-            # Merge the rows into the live snapshot and broadcast it.
-            for r in rows:
-                bucket = self._last_state.setdefault(r["table_name"], {})
-                bucket[r["key"]] = r["raw"]
-            self._last_state_at = now_iso
             self.emit_state()
         except Exception as e:
             log.warning("nettable: ingest failed: %s", e, exc_info=True)
