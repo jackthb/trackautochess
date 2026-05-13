@@ -1147,10 +1147,20 @@ class NetTableCapture:
             if not url or not key:
                 raise RuntimeError("supabase_url / key missing from config")
 
-            # Merge into local snapshot FIRST. Capture and ingest are
-            # independent concerns: if Supabase auth fails the data we
-            # decoded is still valid and the live-capture panel should
-            # show it. Re-broadcasting state always.
+            # Cross-dump dedupe: only POST rows that actually changed since
+            # the last successful capture. ranking_top alone is ~79 KB and
+            # rarely changes mid-game — without this every dump uploads
+            # the entire leaderboard.
+            changed_rows = [
+                r for r in rows
+                if self._last_state.get(r["table_name"], {}).get(r["key"]) != r["raw"]
+            ]
+            skipped = len(rows) - len(changed_rows)
+
+            # Merge into local snapshot. Capture and ingest are independent
+            # concerns: if Supabase auth fails the data we decoded is still
+            # valid and the live-capture panel should show it. Re-broadcast
+            # always so the UI reflects the latest capture.
             now_iso = datetime.now().isoformat()
             for r in rows:
                 bucket = self._last_state.setdefault(r["table_name"], {})
@@ -1162,18 +1172,23 @@ class NetTableCapture:
                 "at": now_iso,
             })
 
-            with httpx.Client(
-                base_url=url.rstrip("/"),
-                headers={
-                    "apikey": key,
-                    "Authorization": f"Bearer {key}",
-                    "Accept": "application/json",
-                },
-                timeout=60,
-            ) as client:
-                written = insert_dumps(client, rows)
+            written = 0
+            if changed_rows:
+                with httpx.Client(
+                    base_url=url.rstrip("/"),
+                    headers={
+                        "apikey": key,
+                        "Authorization": f"Bearer {key}",
+                        "Accept": "application/json",
+                    },
+                    timeout=60,
+                ) as client:
+                    written = insert_dumps(client, changed_rows)
 
-            log.info("nettable: ingested %d row(s) across %d table(s)", written, len(tables))
+            log.info(
+                "nettable: ingested %d row(s) across %d table(s) (skipped %d unchanged)",
+                written, len(tables), skipped,
+            )
             self._emit({
                 "type": "nettable_ingest_complete",
                 "rows_written": written,
