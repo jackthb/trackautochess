@@ -40,13 +40,13 @@ export function NetTableStatePanel({ state, stateAt }: Props) {
       <header className="nettable-state-panel-header">
         <h2>Current capture</h2>
         <span className="nettable-state-panel-meta">
-          {stateAt ? `last F12 · ${formatTime(stateAt)}` : "no capture yet"}
+          {stateAt ? `last capture · ${formatTime(stateAt)}` : "no capture yet"}
         </span>
       </header>
 
       {empty ? (
         <p className="nettable-state-panel-empty">
-          Press F12 in Dota (or wait for the auto-trigger) to capture the
+          Press Pause in Dota (or wait for the auto-trigger) to capture the
           current lobby state.
         </p>
       ) : (

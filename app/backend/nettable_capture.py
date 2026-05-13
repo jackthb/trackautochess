@@ -1,17 +1,17 @@
 """Automatic NetTable capture from Dota's console.log.
 
 Flow:
-    1. On startup, install autoexec.cfg (binds F12 to dac_dump_all) into
+    1. On startup, install autoexec.cfg (binds dump-key to dac_dump_all) into
        <dota>/game/dota/cfg/.
     2. Tail console.log non-blockingly. Three triggers matter:
-       - DOTA_GAMERULES_STATE_GAME_IN_PROGRESS: schedule mid-game F12 ~30s
+       - DOTA_GAMERULES_STATE_GAME_IN_PROGRESS: schedule mid-game dump-key ~30s
          later (once per game).
-       - DOTA_GAMERULES_STATE_POST_GAME: schedule post-game F12 ~5s later
+       - DOTA_GAMERULES_STATE_POST_GAME: schedule post-game dump-key ~5s later
          (captures `end_board`, once per game).
        - [stringtables] table CustomNetTable_*: collect the dump block;
          when it stabilises (~2s without new [stringtables] lines), ingest
          to Supabase.
-    3. F12 is delivered via PostMessageW so it works without focus.
+    3. dump-key is delivered via PostMessageW so it works without focus.
 
 Emits events via the headless _emit callback:
     nettable_status          — startup + on-demand status snapshot
@@ -47,12 +47,8 @@ log = logging.getLogger("dac")
 AUTOEXEC_CFG_CONTENT = """// DAC NetTable dump trigger — installed by DAC Tracker.
 //
 // Source 2 runs `autoexec.cfg` once at every Dota launch. Defines the
-// dac_dump_all alias and binds it to F8. Pressing F8 in-game writes
-// all six CustomNetTable dumps to console.log.
-//
-// Key choice: F1-F4 select hero, F9 = pause in multiplayer matches,
-// F10 = disconnect menu, F12 = Steam screenshot. F8 has no default
-// Dota binding and is what PostMessageW also sends for auto-triggers.
+// dac_dump_all alias and binds it to PAUSE/BREAK. The Pause key is
+// effectively vestigial on modern keyboards and not bound by Dota.
 //
 // `console.log` writing still requires the `-condebug` launch option —
 // Source 2's `log` cvar turns on server-event logging, not client
@@ -60,7 +56,7 @@ AUTOEXEC_CFG_CONTENT = """// DAC NetTable dump trigger — installed by DAC Trac
 
 alias dac_dump_all "dumpstringtable CustomNetTable_ranking_top_table cl verbose; dumpstringtable CustomNetTable_match_history_table cl verbose; dumpstringtable CustomNetTable_dac_table cl verbose; dumpstringtable CustomNetTable_player_id_table cl verbose; dumpstringtable CustomNetTable_player_info_table cl verbose; dumpstringtable CustomNetTable_game_info cl verbose"
 
-bind "F8" "dac_dump_all"
+bind "PAUSE" "dac_dump_all"
 """
 
 
@@ -526,30 +522,30 @@ def find_dota_hwnd() -> int | None:
         return None
 
 
-# ── F12 keystroke via PostMessageW (works without focus) ─────────────────────
+# ── dump-key keystroke via PostMessageW (works without focus) ─────────────────────
 
 WM_KEYDOWN = 0x0100
 WM_KEYUP = 0x0101
-VK_F8 = 0x77
+VK_PAUSE = 0x13
 
 
-def send_f12_to_dota() -> bool:
-    """PostMessage F12 down+up to the Dota window. Returns True on success."""
+def send_dump_key_to_dota() -> bool:
+    """PostMessage dump-key down+up to the Dota window. Returns True on success."""
     hwnd = find_dota_hwnd()
     if not hwnd:
-        log.warning("send_f12_to_dota: Dota window not found")
+        log.warning("send_dump_key_to_dota: Dota window not found")
         return False
     try:
         user32 = ctypes.windll.user32
         # 0xC0000001 is the standard repeat=1, transition=1, previous-state=1
         # lParam for a keyup. PostMessageW is async, fire-and-forget.
-        user32.PostMessageW(hwnd, WM_KEYDOWN, VK_F12, 0)
+        user32.PostMessageW(hwnd, WM_KEYDOWN, VK_PAUSE, 0)
         time.sleep(0.05)
-        user32.PostMessageW(hwnd, WM_KEYUP, VK_F12, 0xC0000001)
-        log.info("Sent F12 to Dota hwnd=%s", hwnd)
+        user32.PostMessageW(hwnd, WM_KEYUP, VK_PAUSE, 0xC0000001)
+        log.info("Sent dump-key to Dota hwnd=%s", hwnd)
         return True
     except Exception as e:
-        log.warning("send_f12_to_dota failed: %s", e)
+        log.warning("send_dump_key_to_dota failed: %s", e)
         return False
 
 
@@ -627,14 +623,14 @@ GAME_IN_PROGRESS_RE = "DOTA_GAMERULES_STATE_GAME_IN_PROGRESS"
 POST_GAME_RE = "DOTA_GAMERULES_STATE_POST_GAME"
 STRINGTABLE_MARKER = "[stringtables]"
 
-# Wait this long after GAME_IN_PROGRESS before sending F12. Gives the
+# Wait this long after GAME_IN_PROGRESS before sending dump-key. Gives the
 # CustomNetTables time to populate.
-F12_DELAY_SEC = 30.0
+DUMP_DELAY_SEC = 30.0
 
-# Wait this long after POST_GAME before sending F12 again. The `end_board`
+# Wait this long after POST_GAME before sending dump-key again. The `end_board`
 # table is populated server-side at POST_GAME entry; small buffer for the
 # broadcast to land at the client.
-F12_POSTGAME_DELAY_SEC = 5.0
+DUMP_POSTGAME_DELAY_SEC = 5.0
 
 # A dump block is considered stable when no new [stringtables] lines arrive
 # for this many seconds.
@@ -650,7 +646,7 @@ LOG_ACTIVE_WINDOW_SEC = 30.0
 
 
 class NetTableCapture:
-    """Tail Dota's console.log, send F12 mid- and post-game, ingest dumps."""
+    """Tail Dota's console.log, send dump-key mid- and post-game, ingest dumps."""
 
     def __init__(self, emit: Callable[[dict], None], steam_id: str | None = None):
         self._emit = emit
@@ -671,11 +667,11 @@ class NetTableCapture:
         self._file = None  # type: ignore
         self._inode_size = 0  # last-seen size, used to detect truncation
 
-        # Per-game F12 debounce
-        self._f12_armed = False  # set when in-progress seen, cleared after send
-        self._f12_timer: threading.Timer | None = None
-        self._f12_sent_for_game = False
-        self._f12_sent_for_postgame = False
+        # Per-game dump-key debounce
+        self._dump_armed = False  # set when in-progress seen, cleared after send
+        self._dump_timer: threading.Timer | None = None
+        self._dump_sent_for_game = False
+        self._dump_sent_for_postgame = False
 
         # Dump block accumulator
         self._dump_active = False
@@ -813,9 +809,9 @@ class NetTableCapture:
 
     def stop(self) -> None:
         self._stop.set()
-        if self._f12_timer:
+        if self._dump_timer:
             try:
-                self._f12_timer.cancel()
+                self._dump_timer.cancel()
             except Exception:
                 pass
         if self._file:
@@ -912,15 +908,15 @@ class NetTableCapture:
 
     def _reset_per_log_state(self) -> None:
         """Drop game-scoped state when the log file is rewritten."""
-        self._f12_armed = False
-        self._f12_sent_for_game = False
-        self._f12_sent_for_postgame = False
-        if self._f12_timer:
+        self._dump_armed = False
+        self._dump_sent_for_game = False
+        self._dump_sent_for_postgame = False
+        if self._dump_timer:
             try:
-                self._f12_timer.cancel()
+                self._dump_timer.cancel()
             except Exception:
                 pass
-            self._f12_timer = None
+            self._dump_timer = None
         self._dump_active = False
         self._dump_seen_tables = set()
         self._dump_last_line_ts = 0.0
@@ -928,60 +924,60 @@ class NetTableCapture:
     # ── Line handlers ──────────────────────────────────────────────────────
 
     def _handle_line(self, line: str) -> None:
-        # F12 trigger #1: mid-game (once per game, ~30s after GAME_IN_PROGRESS).
-        if not self._f12_sent_for_game and GAME_IN_PROGRESS_RE in line:
-            self._schedule_f12()
+        # dump-key trigger #1: mid-game (once per game, ~30s after GAME_IN_PROGRESS).
+        if not self._dump_sent_for_game and GAME_IN_PROGRESS_RE in line:
+            self._schedule_dump()
             return
 
-        # F12 trigger #2: post-game (captures end_board). Once per game.
-        if not self._f12_sent_for_postgame and POST_GAME_RE in line:
-            self._schedule_postgame_f12()
+        # dump-key trigger #2: post-game (captures end_board). Once per game.
+        if not self._dump_sent_for_postgame and POST_GAME_RE in line:
+            self._schedule_postgame_dump()
             return
 
         # Dump block accumulation
         if STRINGTABLE_MARKER in line:
             self._note_dump_line(line)
 
-    def _schedule_f12(self) -> None:
-        if self._f12_armed or self._f12_sent_for_game:
+    def _schedule_dump(self) -> None:
+        if self._dump_armed or self._dump_sent_for_game:
             return
-        self._f12_armed = True
-        log.info("nettable: GAME_IN_PROGRESS detected — scheduling F12 in %.0fs",
-                 F12_DELAY_SEC)
-        t = threading.Timer(F12_DELAY_SEC, self._do_send_f12)
+        self._dump_armed = True
+        log.info("nettable: GAME_IN_PROGRESS detected — scheduling dump-key in %.0fs",
+                 DUMP_DELAY_SEC)
+        t = threading.Timer(DUMP_DELAY_SEC, self._do_send_dump)
         t.daemon = True
         t.start()
-        self._f12_timer = t
+        self._dump_timer = t
 
-    def _do_send_f12(self) -> None:
-        if self._f12_sent_for_game:
+    def _do_send_dump(self) -> None:
+        if self._dump_sent_for_game:
             return
-        ok = send_f12_to_dota()
-        self._f12_armed = False
+        ok = send_dump_key_to_dota()
+        self._dump_armed = False
         if ok:
-            self._f12_sent_for_game = True
+            self._dump_sent_for_game = True
         else:
-            log.info("nettable: F12 send failed — leaving disarmed for retry")
+            log.info("nettable: dump-key send failed — leaving disarmed for retry")
 
-    def _schedule_postgame_f12(self) -> None:
-        if self._f12_sent_for_postgame:
+    def _schedule_postgame_dump(self) -> None:
+        if self._dump_sent_for_postgame:
             return
         log.info(
-            "nettable: POST_GAME detected — scheduling F12 in %.0fs",
-            F12_POSTGAME_DELAY_SEC,
+            "nettable: POST_GAME detected — scheduling dump-key in %.0fs",
+            DUMP_POSTGAME_DELAY_SEC,
         )
-        t = threading.Timer(F12_POSTGAME_DELAY_SEC, self._do_send_postgame_f12)
+        t = threading.Timer(DUMP_POSTGAME_DELAY_SEC, self._do_send_postgame_dump)
         t.daemon = True
         t.start()
 
-    def _do_send_postgame_f12(self) -> None:
-        if self._f12_sent_for_postgame:
+    def _do_send_postgame_dump(self) -> None:
+        if self._dump_sent_for_postgame:
             return
-        ok = send_f12_to_dota()
+        ok = send_dump_key_to_dota()
         if ok:
-            self._f12_sent_for_postgame = True
+            self._dump_sent_for_postgame = True
         else:
-            log.info("nettable: post-game F12 send failed")
+            log.info("nettable: post-game dump-key send failed")
 
     def _note_dump_line(self, line: str) -> None:
         idx = line.find("table ")
