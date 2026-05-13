@@ -1,5 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
-import type { GetServerSideProps } from "next";
+import type { GetStaticProps } from "next";
 import { useRouter } from "next/router";
 import { ProfileSearch } from "@/components/ProfileSearch";
 import {
@@ -381,14 +381,14 @@ export default function Home({ initialSearchResults }: HomeProps) {
   );
 }
 
-export const getServerSideProps: GetServerSideProps<HomeProps> = async () => {
+export const getStaticProps: GetStaticProps<HomeProps> = async () => {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const key =
     process.env.SUPABASE_SERVICE_ROLE_KEY ||
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
   if (!url || !key) {
-    return { props: { initialSearchResults: [] } };
+    return { props: { initialSearchResults: [] }, revalidate: 300 };
   }
 
   const supabase = createClient(url, key, {
@@ -397,8 +397,8 @@ export const getServerSideProps: GetServerSideProps<HomeProps> = async () => {
 
   try {
     const initialSearchResults = await getDefaultPlayerSearchResults(supabase);
-    return { props: { initialSearchResults } };
+    return { props: { initialSearchResults }, revalidate: 300 };
   } catch {
-    return { props: { initialSearchResults: [] } };
+    return { props: { initialSearchResults: [] }, revalidate: 300 };
   }
 };

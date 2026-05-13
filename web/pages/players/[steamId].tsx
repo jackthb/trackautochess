@@ -1,14 +1,11 @@
 import { useRouter } from "next/router";
 import { useEffect, useMemo, useState } from "react";
-import { createClient } from "@supabase/supabase-js";
+import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { createServerClient } from "@supabase/ssr";
 import type { GetServerSideProps } from "next";
 import { absoluteUrl, getRequestSiteUrl, SITE_TITLE } from "@/lib/site";
 import unitsData from "@data/units.json";
-import unitsFullData from "@data/units_full.json";
-import synergiesData from "@data/synergies.json";
-import relicsData from "@data/relics.json";
-import type { PlayerGame, UnitFullInfo, SynergyInfo, RelicInfo } from "@dac/shared/types";
+import type { PlayerGame } from "@dac/shared/types";
 import { mmrToRank } from "@dac/shared/game-utils";
 import { GameRowDisplay } from "@dac/shared/GameRowDisplay";
 import { buildStatItems } from "@dac/shared/buildStatItems";
@@ -24,20 +21,15 @@ import {
 } from "@/lib/manualRefreshQuota";
 import { isAdminSteamId } from "@/lib/admin";
 import { analyticsRoute, bucketCount, trackEvent } from "@/lib/analytics";
-import { createSupabaseClient } from "@/lib/supabase";
 import { fetchAndCacheDrodo } from "@/lib/drodo";
 import {
   fetchSteamProfile,
+  parseSteamInput,
   playerProfilePath,
   resolveSteamInput,
   steamProfileUrl,
   type SteamProfile,
 } from "../../lib/steam";
-import { resolveIconUrl } from "@/lib/icons";
-
-const UNITS_FULL = unitsFullData as Record<string, UnitFullInfo>;
-const SYNERGIES_DATA = synergiesData as Record<string, SynergyInfo>;
-const RELICS_DATA = (relicsData as any).relics as Record<string, RelicInfo>;
 
 const UNIT_COSTS: Record<string, number> = {};
 for (const [name, info] of Object.entries(unitsData.units)) {
@@ -51,6 +43,10 @@ for (const [alias, canonical] of Object.entries(
   }
 }
 const USER_DRODO_SELECT = [
+  "name",
+  "custom_url",
+  "avatar_url",
+  "banned",
   "drodo_mmr",
   "drodo_max_mmr",
   "drodo_mmr_level",
@@ -64,6 +60,10 @@ const USER_DRODO_SELECT = [
 const LAST_FETCHED_TICK_MS = 1000;
 
 interface CachedUserDrodoRow {
+  name: string | null;
+  custom_url: string | null;
+  avatar_url: string | null;
+  banned: boolean | null;
   drodo_mmr: number | null;
   drodo_max_mmr: number | null;
   drodo_mmr_level: number | null;
@@ -144,6 +144,53 @@ function originFromUrl(value: string | null): string | null {
   }
 }
 
+function localIconUrl(type: string, stem: string): string {
+  return `/icons/${type}/${stem}.png`;
+}
+
+async function resolvePlayerRouteSteamId(
+  rawSteamId: string,
+  supabase: SupabaseClient | null
+): Promise<string | null> {
+  const parsed = parseSteamInput(rawSteamId);
+  if (!parsed) return null;
+  if (parsed.kind === "id") return parsed.value;
+
+  if (supabase) {
+    const { data } = await supabase
+      .from("users")
+      .select("steam_id::text")
+      .eq("custom_url", parsed.value)
+      .eq("banned", false)
+      .maybeSingle<{ steam_id: string }>();
+
+    if (data?.steam_id) return String(data.steam_id);
+  }
+
+  return resolveSteamInput(rawSteamId, supabase ?? undefined, {
+    persist: false,
+  });
+}
+
+function cachedSteamProfile(
+  row: CachedUserDrodoRow | null | undefined,
+  options: { requireAvatar: boolean; requireCustomUrl: boolean }
+): SteamProfile | null {
+  if (!row) return null;
+
+  const profile = {
+    name: row.name ?? null,
+    customUrl: row.custom_url ?? null,
+    avatarUrl: row.avatar_url ?? null,
+  };
+  const hasProfile = profile.name || profile.customUrl || profile.avatarUrl;
+  if (!hasProfile) return null;
+  if (options.requireAvatar && !profile.avatarUrl) return null;
+  if (options.requireCustomUrl && !profile.customUrl) return null;
+
+  return profile;
+}
+
 export default function PlayerPage({
   steamId,
   steamProfile,
@@ -183,35 +230,43 @@ export default function PlayerPage({
   const [banError, setBanError] = useState<string | null>(null);
 
   useEffect(() => {
-    const supabase = createSupabaseClient();
-    if (!supabase) return;
     let cancelled = false;
-    supabase.auth.getSession().then(({ data }) => {
+    let unsubscribe: (() => void) | null = null;
+
+    void import("@/lib/supabase").then(({ createSupabaseClient }) => {
       if (cancelled) return;
-      const meta = data.session?.user?.user_metadata as
-        | { steam_id?: unknown }
-        | null
-        | undefined;
-      setSessionSteamId(
-        meta && typeof meta.steam_id === "string" ? meta.steam_id : null
-      );
-      setAccessToken(data.session?.access_token ?? null);
+      const supabase = createSupabaseClient();
+      if (!supabase) return;
+
+      supabase.auth.getSession().then(({ data }) => {
+        if (cancelled) return;
+        const meta = data.session?.user?.user_metadata as
+          | { steam_id?: unknown }
+          | null
+          | undefined;
+        setSessionSteamId(
+          meta && typeof meta.steam_id === "string" ? meta.steam_id : null
+        );
+        setAccessToken(data.session?.access_token ?? null);
+      });
+      const {
+        data: { subscription },
+      } = supabase.auth.onAuthStateChange((_event, session) => {
+        const meta = session?.user?.user_metadata as
+          | { steam_id?: unknown }
+          | null
+          | undefined;
+        setSessionSteamId(
+          meta && typeof meta.steam_id === "string" ? meta.steam_id : null
+        );
+        setAccessToken(session?.access_token ?? null);
+      });
+      unsubscribe = () => subscription.unsubscribe();
     });
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      const meta = session?.user?.user_metadata as
-        | { steam_id?: unknown }
-        | null
-        | undefined;
-      setSessionSteamId(
-        meta && typeof meta.steam_id === "string" ? meta.steam_id : null
-      );
-      setAccessToken(session?.access_token ?? null);
-    });
+
     return () => {
       cancelled = true;
-      subscription.unsubscribe();
+      unsubscribe?.();
     };
   }, []);
 
@@ -856,10 +911,7 @@ export default function PlayerPage({
                       <GameRowDisplay
                         game={g}
                         unitCosts={UNIT_COSTS}
-                        unitsFull={UNITS_FULL}
-                        synergiesData={SYNERGIES_DATA}
-                        relicsData={RELICS_DATA}
-                        iconUrl={resolveIconUrl}
+                        iconUrl={localIconUrl}
                         shareUrl={`/games/${g.id}`}
                         style={{ cursor: "pointer" }}
                       />
@@ -926,25 +978,13 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
   // Accept numeric Steam IDs or vanity slugs. Keep vanity slugs in the URL
   // when present; they are the preferred public profile route.
-  const steamId = await resolveSteamInput(rawSteamId, supabase ?? undefined, {
-    persist: false,
-  });
+  const steamId = await resolvePlayerRouteSteamId(rawSteamId, supabase);
   if (!steamId) {
     return { notFound: true };
   }
 
   let banned = false;
-  if (supabase) {
-    const { data: bannedRow } = await supabase
-      .from("users")
-      .select("banned")
-      .eq("steam_id", steamId)
-      .maybeSingle<{ banned: boolean | null }>();
-    banned = Boolean(bannedRow?.banned);
-  }
-  if (banned && !viewerIsAdmin) {
-    return { notFound: true };
-  }
+  let cachedProfileRow: CachedUserDrodoRow | null = null;
 
   // Fetch cached Drodo profile and season history from public Supabase rows.
   let drodo = null;
@@ -972,6 +1012,11 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         .order("snapshotted_at", { ascending: false })
         .limit(60),
     ]);
+    cachedProfileRow = profileResult.data ?? null;
+    banned = Boolean(cachedProfileRow?.banned);
+    if (banned && !viewerIsAdmin) {
+      return { notFound: true };
+    }
     mmrHistory = (snapshotsResult.data ?? []).map((row) => ({
       mmr: row.mmr as number | null,
       snapshotted_at: row.snapshotted_at as string,
@@ -1023,11 +1068,16 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     }
   }
 
-  const steamProfile = await fetchSteamProfile(steamId, supabase ?? undefined, {
-    persist: true,
+  const profileRequirements = {
     requireAvatar: true,
     requireCustomUrl: /^\d+$/.test(rawSteamId),
-  });
+  };
+  const steamProfile =
+    cachedSteamProfile(cachedProfileRow, profileRequirements) ??
+    (await fetchSteamProfile(steamId, supabase ?? undefined, {
+      persist: true,
+      ...profileRequirements,
+    }));
 
   let profileUserIds = [steamId];
   if (supabase) {
@@ -1094,6 +1144,13 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         permanent: false,
       },
     };
+  }
+
+  if (!viewerSteamId && !banned) {
+    context.res.setHeader(
+      "Cache-Control",
+      "public, s-maxage=600, stale-while-revalidate=3600"
+    );
   }
 
   return {

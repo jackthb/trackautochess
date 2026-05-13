@@ -5,18 +5,21 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
-import { BotIdClient } from "botid/client";
 import { BannerAd } from "@/components/BannerAd";
 import { Footer } from "@/components/Footer";
 import { NavBar } from "@/components/NavBar";
 import { shouldShowGlobalAd } from "@/lib/ads";
 import { redactAnalyticsEvent } from "@/lib/analytics";
-import { createSupabaseClient } from "@/lib/supabase";
 import { getPostHog, identify, reset } from "@/lib/posthog";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 const SanityVisualEditing = dynamic(
   () => import("@/components/SanityVisualEditing"),
+  { ssr: false }
+);
+
+const BotIdClient = dynamic(
+  () => import("botid/client").then((mod) => mod.BotIdClient),
   { ssr: false }
 );
 
@@ -37,8 +40,29 @@ export default function App({ Component, pageProps }: AppProps<AppPageProps>) {
   const [supabase, setSupabase] = useState<SupabaseClient | null>(null);
 
   useEffect(() => {
-    setSupabase(createSupabaseClient());
-    void getPostHog();
+    let cancelled = false;
+    const loadSessionAndAnalytics = () => {
+      void import("@/lib/supabase").then(({ createSupabaseClient }) => {
+        if (!cancelled) setSupabase(createSupabaseClient());
+      });
+      void getPostHog();
+    };
+
+    const requestIdle = window.requestIdleCallback;
+    const cancelIdle = window.cancelIdleCallback;
+    const idleHandle: number =
+      typeof requestIdle === "function"
+        ? requestIdle.call(window, loadSessionAndAnalytics, { timeout: 1200 })
+        : window.setTimeout(loadSessionAndAnalytics, 0);
+
+    return () => {
+      cancelled = true;
+      if (typeof cancelIdle === "function") {
+        cancelIdle.call(window, idleHandle);
+      } else {
+        window.clearTimeout(idleHandle);
+      }
+    };
   }, []);
 
   // Link PostHog identity to the signed-in Steam user, and reset on sign-out

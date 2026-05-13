@@ -16,6 +16,47 @@ const nextConfig: NextConfig = {
     // the switcher / hreflang alternates.
     localeDetection: false,
   },
+  async headers() {
+    const immutableAssetCache = [
+      {
+        key: "Cache-Control",
+        value: "public, max-age=31536000, immutable",
+      },
+    ];
+
+    return [
+      {
+        source: "/fonts/:path*",
+        locale: false,
+        headers: immutableAssetCache,
+      },
+      {
+        source: "/icons/:path*",
+        locale: false,
+        headers: immutableAssetCache,
+      },
+      {
+        source: "/logo.svg",
+        locale: false,
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, max-age=86400, stale-while-revalidate=604800",
+          },
+        ],
+      },
+      {
+        source: "/favicon.ico",
+        locale: false,
+        headers: [
+          {
+            key: "Cache-Control",
+            value: "public, max-age=86400, stale-while-revalidate=604800",
+          },
+        ],
+      },
+    ];
+  },
   // Proxy PostHog ingest through our own origin so ad blockers don't drop
   // analytics requests targeting eu.i.posthog.com. Matches the rewrites the
   // PostHog setup wizard installs; lib/posthog.ts sets api_host="/ingest".

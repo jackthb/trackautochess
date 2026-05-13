@@ -17,6 +17,20 @@ export default function Document(props: DocumentProps) {
     <Html lang={htmlLang}>
       <Head>
         <link rel="icon" href="/logo.svg" type="image/svg+xml" />
+        <link
+          rel="preload"
+          href="/fonts/JetBrainsMono-Regular.ttf"
+          as="font"
+          type="font/ttf"
+          crossOrigin="anonymous"
+        />
+        <link
+          rel="preload"
+          href="/fonts/Cinzel-Bold.woff"
+          as="font"
+          type="font/woff"
+          crossOrigin="anonymous"
+        />
         <meta
           name="google-site-verification"
           content="Hy5rhjnwS0LRzaYhqAA8Cj3M2Jb1Na2jApcH1lwhvuo"
