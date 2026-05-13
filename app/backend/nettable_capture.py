@@ -155,8 +155,13 @@ def find_active_steam_account_id() -> str | None:
     return None
 
 
-def find_dota_launch_options() -> str | None:
+def find_dota_launch_options(account_id: str | None = None) -> str | None:
     """Return the Dota 2 launch-options string from Steam's localconfig.vdf.
+
+    Pass the logged-in user's AccountID to scope the lookup. Without it
+    we fall back to detecting the active user via the registry / login
+    users file — works but is one step removed from the truth the rest
+    of the backend already knows.
 
     Three-valued return:
         None  — couldn't read localconfig.vdf or no 570 block exists. The
@@ -166,7 +171,7 @@ def find_dota_launch_options() -> str | None:
                 are definitely missing.
         str   — the actual launch-options string.
     """
-    cfg = find_localconfig_vdf()
+    cfg = find_localconfig_vdf(account_id)
     if not cfg:
         return None
     try:
@@ -186,16 +191,16 @@ def _tokenize_launch_options(opts: str) -> set[str]:
     return {tok.lower() for tok in opts.split() if tok}
 
 
-def find_localconfig_vdf() -> Path | None:
-    """Locate the localconfig.vdf for the currently-active Steam account.
+def find_localconfig_vdf(account_id: str | None = None) -> Path | None:
+    """Locate the localconfig.vdf for a specific Steam account.
 
     A machine can have several `userdata/<account>/` dirs left behind by
     past logins; each one has its own copy of `localconfig.vdf` with
-    independent launch options. Prefer the active account (registry's
-    ActiveUser or MostRecent in loginusers.vdf); fall back to scanning
-    all dirs only if we can't resolve the active one.
+    independent launch options. If the caller knows which account is
+    logged in (the rest of the backend does — `config.json` has it),
+    pass it directly. Otherwise we fall back to the active-user heuristic.
     """
-    active = find_active_steam_account_id()
+    active = account_id or find_active_steam_account_id()
     for udir in CANDIDATE_STEAM_USERDATA_DIRS:
         if not udir.exists():
             continue
@@ -327,14 +332,24 @@ def wait_for_steam_exit(timeout_sec: float = 15.0, poll_sec: float = 0.5) -> boo
     return not is_steam_running()
 
 
-def apply_dota_launch_options(flags_to_ensure: list[str]) -> dict:
+def apply_dota_launch_options(
+    flags_to_ensure: list[str], steam_id: str | None = None
+) -> dict:
     """Surgically append missing flags to Dota's LaunchOptions in localconfig.vdf.
+
+    Pass `steam_id` (SteamID64) to scope the edit to the logged-in user's
+    `userdata/<account>/config/localconfig.vdf`. Without it we fall back
+    to active-user detection.
 
     Returns a dict suitable for emitting back to the renderer. Always
     writes a `.bak` next to the original on success.
     """
     if not flags_to_ensure:
         return {"ok": False, "error": "No flags requested"}
+
+    account_id = (
+        str(int(steam_id) - STEAM64_BASE) if steam_id else None
+    )
 
     if is_steam_running():
         return {
@@ -346,7 +361,7 @@ def apply_dota_launch_options(flags_to_ensure: list[str]) -> dict:
             ),
         }
 
-    cfg_path = find_localconfig_vdf()
+    cfg_path = find_localconfig_vdf(account_id)
     if not cfg_path:
         return {
             "ok": False,
@@ -641,11 +656,17 @@ LOG_ACTIVE_WINDOW_SEC = 30.0
 class NetTableCapture:
     """Tail Dota's console.log, send F12 mid- and post-game, ingest dumps."""
 
-    def __init__(self, emit: Callable[[dict], None]):
+    def __init__(self, emit: Callable[[dict], None], steam_id: str | None = None):
         self._emit = emit
         self._stop = threading.Event()
         self._dota_dir = find_dota_dir()
         self._log_path = find_console_log(self._dota_dir) if self._dota_dir else None
+        # The logged-in Steam user. Used to scope localconfig.vdf reads to
+        # the right userdata/<account>/ dir — a machine can have multiple.
+        self._steam_id = steam_id
+        self._account_id = (
+            str(int(steam_id) - STEAM64_BASE) if steam_id else None
+        )
 
         # Status (re-emitted on demand via emit_status())
         self._autoexec_installed = False
@@ -699,7 +720,7 @@ class NetTableCapture:
               doing its job right now". The UI prefers these.
         """
         log_writable = bool(self._log_path and self._log_path.exists())
-        opts = find_dota_launch_options()
+        opts = find_dota_launch_options(self._account_id)
         opts_tokens = _tokenize_launch_options(opts) if opts is not None else None
         dota_running = is_dota_running()
         log_active = self._is_log_active()
@@ -752,7 +773,7 @@ class NetTableCapture:
         UI gets pushed an update the moment Dota starts or stops, and the
         moment console.log starts/stops being written to.
         """
-        opts = find_dota_launch_options()
+        opts = find_dota_launch_options(self._account_id)
         return (
             bool(self._autoexec_installed),
             bool(self._log_path and self._log_path.exists()),

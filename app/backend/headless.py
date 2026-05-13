@@ -137,7 +137,7 @@ class HeadlessBackend:
         self._nettable = None
         try:
             from nettable_capture import NetTableCapture
-            self._nettable = NetTableCapture(self._emit)
+            self._nettable = NetTableCapture(self._emit, steam_id=sid)
         except Exception as e:
             log.warning("NetTable capture init failed: %s", e)
 
@@ -1395,7 +1395,7 @@ class HeadlessBackend:
                 return
 
         _progress("writing", "Writing launch options…")
-        result = apply_dota_launch_options(flags)
+        result = apply_dota_launch_options(flags, self.config.get("steam_id"))
         self._emit({"type": "nettable_launch_options_applied", **result})
         # Re-emit status so the renderer's flags badges refresh.
         if self._nettable:
