@@ -75,17 +75,24 @@ export function NetTableSetupCard({
   const dotaRunning = status?.dota_running === true;
   const logActive = status?.log_active === true;
 
-  // "All good" = autoexec installed AND (Dota is running with -condebug
-  // verified working) OR (Dota isn't running yet — can't disprove anything).
-  const tracking = dotaRunning && logActive;
-  const allOk = Boolean(status && autoexecOk && (tracking || !dotaRunning));
-
-  // Whether the Apply button has work to do (config-derived check is fine
-  // here — we just need to know if the flags would be appended).
   const flagsKnown = status?.has_condebug !== null;
   const condebugSet = status?.has_condebug === true;
   const conclearlogSet = status?.has_conclearlog === true;
-  const needsApply = flagsKnown && (!condebugSet || !conclearlogSet);
+  const flagsSet = condebugSet && conclearlogSet;
+  const needsApply = flagsKnown && !flagsSet;
+
+  // "All good" requires:
+  //   - autoexec installed AND
+  //   - Either Dota is running with -condebug verifiably working
+  //     (empirical: console.log is being written), OR
+  //   - Dota isn't running but config says the flags are set (will work
+  //     when launched).
+  // Crucially: if Dota isn't running AND flags aren't confirmed set in
+  // localconfig, we are NOT done — don't pretend we are.
+  const tracking = dotaRunning && logActive;
+  const allOk = Boolean(
+    status && autoexecOk && (tracking || (!dotaRunning && flagsSet)),
+  );
 
   if (allOk) {
     return (

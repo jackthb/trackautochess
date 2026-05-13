@@ -24,17 +24,22 @@ export function NetTableHome({
     launchOptionsProgress,
     resyncProgress,
   } = useNetTableEvents();
-  // Match the setup card's empirical "all good" calc: autoexec installed AND
-  // (currently tracking OR Dota not running yet — i.e. nothing has falsified
-  // the setup). Lets the layout collapse the setup card to a pill as soon as
-  // we've got a green state.
+  // Match the setup card's "all good" calc — kept in sync with
+  // NetTableSetupCard.tsx. Pill only collapses when we have positive
+  // evidence the setup will work: either tracking is empirically active,
+  // or Dota isn't running yet AND launch options are confirmed set.
   const tracking = Boolean(
     netStatus && netStatus.dota_running && netStatus.log_active,
+  );
+  const flagsSet = Boolean(
+    netStatus &&
+      netStatus.has_condebug === true &&
+      netStatus.has_conclearlog === true,
   );
   const setupComplete = Boolean(
     netStatus &&
       netStatus.autoexec_installed &&
-      (tracking || !netStatus.dota_running),
+      (tracking || (!netStatus.dota_running && flagsSet)),
   );
   // The raw VBKV dump view is admin-only — pre-release debugging tool, not a
   // user-facing feature. Hide for everyone else, including admins previewing
