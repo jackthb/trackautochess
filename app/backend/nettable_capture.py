@@ -46,13 +46,25 @@ log = logging.getLogger("dac")
 
 AUTOEXEC_CFG_CONTENT = """// DAC NetTable dump trigger — installed by DAC Tracker.
 //
-// Source 2 runs `autoexec.cfg` once at every Dota launch. The alias chains
-// the six dumpstringtable calls; F12 fires them all and the engine writes
-// the binary payloads to console.log (requires `-condebug` launch option).
+// Source 2 runs `autoexec.cfg` once at every Dota launch. This file does
+// two things:
+//   1. `echo` a boot marker. After launch, the in-game console (or
+//      vconsole2) should show DAC_TRACKER_AUTOEXEC_LOADED — proof that
+//      this file was sourced.
+//   2. Defines the dac_dump_all alias and binds it to F9. Pressing F9
+//      in-game writes all six CustomNetTable dumps to the log.
+//
+// F9 is chosen because F12 is Steam's screenshot hotkey by default.
+//
+// `console.log` writing still requires the `-condebug` launch option —
+// Source 2's `log` cvar turns on server-event logging, not client
+// console logging, so there's no autoexec workaround.
+
+echo "DAC_TRACKER_AUTOEXEC_LOADED"
 
 alias dac_dump_all "dumpstringtable CustomNetTable_ranking_top_table cl verbose; dumpstringtable CustomNetTable_match_history_table cl verbose; dumpstringtable CustomNetTable_dac_table cl verbose; dumpstringtable CustomNetTable_player_id_table cl verbose; dumpstringtable CustomNetTable_player_info_table cl verbose; dumpstringtable CustomNetTable_game_info cl verbose"
 
-bind "F12" "dac_dump_all"
+bind "F9" "dac_dump_all"
 """
 
 
