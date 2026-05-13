@@ -105,8 +105,54 @@ CANDIDATE_STEAM_USERDATA_DIRS = [
 ]
 
 DOTA_APP_ID = "570"
+STEAM64_BASE = 76561197960265728  # subtract from SteamID64 to get AccountID
 
 _LO_FIELD_RE = re.compile(r'"LaunchOptions"\s*"([^"]*)"')
+_MOST_RECENT_RE = re.compile(
+    r'"(\d{17})"\s*\{[^}]*?"MostRecent"\s*"1"', re.DOTALL
+)
+
+
+def find_active_steam_account_id() -> str | None:
+    """Return the AccountID of the currently-active Steam user.
+
+    Why this matters: a Windows box can have multiple `userdata/<account>/`
+    dirs, each with its own `localconfig.vdf` and per-account launch options.
+    Picking the wrong one means we read someone else's `-condebug` setting
+    and lie to the UI about the active session.
+
+    Strategy:
+        1. `HKCU\\Software\\Valve\\Steam\\ActiveUser` — set while Steam is
+           running. 0 when Steam is closed.
+        2. `Steam/config/loginusers.vdf` `MostRecent "1"` — survives a
+           Steam restart, reflects the last logged-in account.
+
+    Returns the 32-bit AccountID as a string (matches the userdata dir
+    name), or None if neither source resolves.
+    """
+    try:
+        import winreg  # noqa: PLC0415 — Windows-only import
+        with winreg.OpenKey(
+            winreg.HKEY_CURRENT_USER, r"Software\Valve\Steam"
+        ) as k:
+            val, _ = winreg.QueryValueEx(k, "ActiveUser")
+            if val and int(val) != 0:
+                return str(int(val))
+    except (ImportError, OSError, ValueError, TypeError):
+        pass
+
+    for udir in CANDIDATE_STEAM_USERDATA_DIRS:
+        login_file = udir.parent / "config" / "loginusers.vdf"
+        if not login_file.exists():
+            continue
+        try:
+            text = login_file.read_text(encoding="utf-8", errors="replace")
+        except OSError:
+            continue
+        m = _MOST_RECENT_RE.search(text)
+        if m:
+            return str(int(m.group(1)) - STEAM64_BASE)
+    return None
 
 
 def find_dota_launch_options() -> str | None:
@@ -141,15 +187,36 @@ def _tokenize_launch_options(opts: str) -> set[str]:
 
 
 def find_localconfig_vdf() -> Path | None:
-    """Locate the localconfig.vdf that contains the Dota 2 (570) entry."""
+    """Locate the localconfig.vdf for the currently-active Steam account.
+
+    A machine can have several `userdata/<account>/` dirs left behind by
+    past logins; each one has its own copy of `localconfig.vdf` with
+    independent launch options. Prefer the active account (registry's
+    ActiveUser or MostRecent in loginusers.vdf); fall back to scanning
+    all dirs only if we can't resolve the active one.
+    """
+    active = find_active_steam_account_id()
     for udir in CANDIDATE_STEAM_USERDATA_DIRS:
         if not udir.exists():
             continue
+        # 1. Try the active account first — this is the authoritative match.
+        if active:
+            cfg = udir / active / "config" / "localconfig.vdf"
+            if cfg.exists():
+                try:
+                    text = cfg.read_text(encoding="utf-8", errors="replace")
+                except OSError:
+                    text = None
+                if text and _find_app_block_bounds(text, DOTA_APP_ID)[0] is not None:
+                    return cfg
+        # 2. Fallback: scan all user dirs (skip active, we already tried it).
         try:
             children = sorted(udir.iterdir())
         except OSError:
             continue
         for user_dir in children:
+            if active and user_dir.name == active:
+                continue
             cfg = user_dir / "config" / "localconfig.vdf"
             if not cfg.exists():
                 continue
