@@ -30,6 +30,8 @@ export async function getPostHog(): Promise<PostHog | null> {
       person_profiles: "identified_only",
       // Cost + privacy: session replay stays off until explicitly enabled.
       disable_session_recording: true,
+      // Do not set PostHog cookies until the visitor explicitly accepts.
+      cookieless_mode: "on_reject",
       respect_dnt: true,
     });
     initialized = true;

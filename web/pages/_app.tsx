@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { BannerAd } from "@/components/BannerAd";
+import { CookieConsentBanner } from "@/components/CookieConsentBanner";
 import { Footer } from "@/components/Footer";
 import { NavBar } from "@/components/NavBar";
 import { shouldShowGlobalAd } from "@/lib/ads";
@@ -105,6 +106,7 @@ export default function App({ Component, pageProps }: AppProps<AppPageProps>) {
       <Footer />
       <Analytics beforeSend={redactAnalyticsEvent} />
       <SpeedInsights />
+      <CookieConsentBanner />
       {pageProps?.draftMode && <SanityVisualEditing />}
     </>
   );
