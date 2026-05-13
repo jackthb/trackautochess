@@ -520,8 +520,10 @@ def find_dota_hwnd() -> int | None:
     try:
         user32 = ctypes.windll.user32
         kernel32 = ctypes.windll.kernel32
+        # HWND is a 64-bit handle on x64 Windows; using POINTER(c_int) makes
+        # ctypes pass the raw 8 bytes as a bytes object and int(hwnd) fails.
         WNDENUMPROC = ctypes.WINFUNCTYPE(
-            ctypes.c_bool, ctypes.POINTER(ctypes.c_int), ctypes.POINTER(ctypes.c_int)
+            ctypes.c_bool, wintypes.HWND, wintypes.LPARAM
         )
         PROCESS_QUERY_LIMITED_INFORMATION = 0x1000
         result: list[int] = []
