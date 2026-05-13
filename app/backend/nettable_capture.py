@@ -46,17 +46,16 @@ log = logging.getLogger("dac")
 
 AUTOEXEC_CFG_CONTENT = """// DAC NetTable dump trigger — installed by DAC Tracker.
 //
-// Source 2 runs `autoexec.cfg` once at every Dota launch. Defines the
-// dac_dump_all alias and binds it to PAUSE/BREAK. The Pause key is
-// effectively vestigial on modern keyboards and not bound by Dota.
+// Source 2 runs `autoexec.cfg` once at every Dota launch. Binds PAUSE
+// directly to the six dumpstringtable calls — no alias indirection
+// because DAC's custom game mode appears to clear user-defined
+// aliases across map transitions, which leaves the bind pointing at
+// nothing. Binding the commands directly keeps the key working even
+// if aliases get reset.
 //
-// `console.log` writing still requires the `-condebug` launch option —
-// Source 2's `log` cvar turns on server-event logging, not client
-// console logging, so there's no autoexec workaround.
+// `console.log` writing still requires the `-condebug` launch option.
 
-alias dac_dump_all "dumpstringtable CustomNetTable_ranking_top_table cl verbose; dumpstringtable CustomNetTable_match_history_table cl verbose; dumpstringtable CustomNetTable_dac_table cl verbose; dumpstringtable CustomNetTable_player_id_table cl verbose; dumpstringtable CustomNetTable_player_info_table cl verbose; dumpstringtable CustomNetTable_game_info cl verbose"
-
-bind "PAUSE" "dac_dump_all"
+bind "PAUSE" "dumpstringtable CustomNetTable_ranking_top_table cl verbose; dumpstringtable CustomNetTable_match_history_table cl verbose; dumpstringtable CustomNetTable_dac_table cl verbose; dumpstringtable CustomNetTable_player_id_table cl verbose; dumpstringtable CustomNetTable_player_info_table cl verbose; dumpstringtable CustomNetTable_game_info cl verbose"
 """
 
 
