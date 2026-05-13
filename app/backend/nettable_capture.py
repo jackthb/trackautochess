@@ -100,6 +100,41 @@ DOTA_APP_ID = "570"
 STEAM64_BASE = 76561197960265728  # subtract from SteamID64 to get AccountID
 
 _LO_FIELD_RE = re.compile(r'"LaunchOptions"\s*"([^"]*)"')
+
+
+def _load_dotenv_value(name: str) -> str | None:
+    """Read a single var from `.env.local` files at known dev-repo locations.
+
+    Used as a fallback when an env var isn't set in the shell — convenient
+    when running the tracker from source. Returns None for shipped builds
+    where these paths don't exist.
+    """
+    here = Path(__file__).resolve()
+    candidates = [
+        here.parent.parent.parent / "web" / ".env.local",
+        here.parent.parent.parent / ".env.local",
+        here.parent.parent / ".env.local",
+    ]
+    for path in candidates:
+        if not path.exists():
+            continue
+        try:
+            for line in path.read_text(encoding="utf-8", errors="replace").splitlines():
+                line = line.strip()
+                if not line or line.startswith("#"):
+                    continue
+                if "=" not in line:
+                    continue
+                k, v = line.split("=", 1)
+                if k.strip() == name:
+                    v = v.strip()
+                    # Strip surrounding quotes if present.
+                    if len(v) >= 2 and v[0] == v[-1] and v[0] in ("'", '"'):
+                        v = v[1:-1]
+                    return v
+        except OSError:
+            continue
+    return None
 _MOST_RECENT_RE = re.compile(
     r'"(\d{17})"\s*\{[^}]*?"MostRecent"\s*"1"', re.DOTALL
 )
@@ -1034,7 +1069,17 @@ class NetTableCapture:
             from utils import load_config
             cfg = load_config()
             url = cfg.get("supabase_url")
-            key = os.environ.get("SUPABASE_SERVICE_ROLE_KEY") or cfg.get("supabase_key")
+            # Service-role required because dac_nettable_dumps RLS has an
+            # anon SELECT policy but no INSERT — anon key gets 401 on write.
+            # Resolution order: env var (cleanest), .env.local in the dev
+            # repo (convenient when running from source), config.json
+            # supabase_key (publishable, will 401 on insert but lets reads
+            # still work). End-user shipped builds won't have .env.local.
+            key = (
+                os.environ.get("SUPABASE_SERVICE_ROLE_KEY")
+                or _load_dotenv_value("SUPABASE_SERVICE_ROLE_KEY")
+                or cfg.get("supabase_key")
+            )
             if not url or not key:
                 raise RuntimeError("supabase_url / key missing from config")
 
