@@ -90,6 +90,8 @@ a = Analysis(
         "cv_parser",
         "db",
         "models",
+        "nettable_capture",
+        "nettable_parser",
         "replay",
         "sentinel",
         "steam_auth",

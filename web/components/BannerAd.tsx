@@ -247,7 +247,13 @@ export function BannerAd({ slot }: BannerAdProps) {
             height={dims.height}
             scrolling="no"
             title="Advertisement"
-            sandbox="allow-scripts allow-popups"
+            // allow-same-origin is required for Adsterra: invoke.js fetches
+            // ad creative from highperformanceformat.com (set as the iframe's
+            // base href). Without it the iframe loads but the script can't
+            // pull content and the slot renders blank. The srcDoc payload is
+            // built from a sanitized key + fixed-format string, so the same-
+            // origin grant is scoped to the ad iframe alone.
+            sandbox="allow-scripts allow-popups allow-same-origin"
             loading="lazy"
             referrerPolicy="strict-origin-when-cross-origin"
           />

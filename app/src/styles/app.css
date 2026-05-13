@@ -2334,3 +2334,502 @@ select.edit-field:focus {
   letter-spacing: var(--tr-ui);
   text-transform: uppercase;
 }
+
+/* ── NetTable home ───────────────────────────────────────────────────────── */
+
+.nettable-home {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  padding: 32px 40px 24px;
+  gap: 24px;
+  overflow: hidden;
+  background: linear-gradient(180deg, var(--bg-deep) 0%, var(--bg-surface) 100%);
+}
+
+.nettable-home-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.nettable-home-header h1 {
+  font-family: var(--font-display);
+  font-size: var(--fs-24);
+  font-weight: var(--fw-semibold);
+  letter-spacing: var(--tr-display);
+  text-transform: uppercase;
+  color: var(--text-primary);
+  margin-top: 4px;
+}
+
+.nettable-home-grid {
+  flex: 1;
+  display: grid;
+  grid-template-columns: minmax(280px, 360px) 1fr;
+  grid-template-areas:
+    "setup feed"
+    "state state";
+  gap: 24px;
+  overflow: hidden;
+}
+
+.nettable-home-grid.setup-complete {
+  grid-template-columns: 1fr 1fr;
+  grid-template-areas:
+    "feed state"
+    "setup setup";
+}
+
+.nettable-home-grid.setup-complete .nettable-home-setup {
+  align-self: flex-end;
+}
+
+.nettable-home-setup {
+  grid-area: setup;
+  display: flex;
+  flex-direction: column;
+}
+
+.nettable-home-feed {
+  grid-area: feed;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.nettable-home-state {
+  grid-area: state;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* Apply-launch-options affordance inside the setup card */
+
+.nettable-setup-apply {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 8px;
+  flex-wrap: wrap;
+}
+
+.nettable-setup-apply-button {
+  flex-shrink: 0;
+}
+
+.nettable-setup-apply-note {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.nettable-setup-apply-error {
+  margin-top: 8px;
+  padding: 8px 10px;
+  border: 1px solid var(--red-bright, #c0392b);
+  background: rgba(192, 57, 43, 0.08);
+  color: var(--red-bright, #c0392b);
+  font-size: 0.8rem;
+}
+
+.nettable-setup-apply-success {
+  margin-top: 8px;
+  padding: 8px 10px;
+  border: 1px solid var(--green-bright, #27ae60);
+  background: rgba(39, 174, 96, 0.08);
+  color: var(--green-bright, #27ae60);
+  font-size: 0.8rem;
+}
+
+.nettable-setup-launch-detail {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-top: 4px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.nettable-setup-launch-detail code {
+  font-family: var(--font-mono, ui-monospace, monospace);
+  background: var(--bg-inset, rgba(0, 0, 0, 0.2));
+  padding: 1px 4px;
+}
+
+.nettable-setup-resync {
+  margin-top: 6px;
+}
+
+.nettable-setup-resync-link {
+  background: transparent;
+  border: none;
+  padding: 0;
+  font: inherit;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.nettable-setup-resync-link:hover:not(:disabled) {
+  color: var(--text-bright);
+}
+
+.nettable-setup-resync-link:disabled,
+.nettable-setup-resync-link.is-busy {
+  opacity: 0.7;
+  cursor: progress;
+}
+
+/* State panel (admin-only debugging view) */
+
+.nettable-state-panel {
+  border: 1px solid var(--border);
+  background: var(--bg-surface);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  flex: 1;
+  min-height: 0;
+}
+
+.nettable-state-panel-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+.nettable-state-panel-header h2 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.nettable-state-panel-meta {
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.nettable-state-panel-empty {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  margin: 0;
+}
+
+.nettable-state-panel-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  overflow-y: auto;
+  min-height: 0;
+}
+
+.nettable-state-block {
+  border: 1px solid var(--border);
+  background: var(--bg);
+  padding: 10px 12px;
+}
+
+.nettable-state-block-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
+.nettable-state-block-title {
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.nettable-state-block-count {
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.nettable-state-block-empty {
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  font-style: italic;
+}
+
+.nettable-state-keys {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.nettable-state-key {
+  display: flex;
+  flex-direction: column;
+}
+
+.nettable-state-key-toggle {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  background: transparent;
+  border: none;
+  color: inherit;
+  padding: 4px 0;
+  cursor: pointer;
+  text-align: left;
+  font: inherit;
+  gap: 12px;
+}
+
+.nettable-state-key-toggle:hover {
+  color: var(--text-bright);
+}
+
+.nettable-state-key-name {
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 0.8rem;
+}
+
+.nettable-state-key-summary {
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  font-family: var(--font-mono, ui-monospace, monospace);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 50%;
+}
+
+.nettable-state-key-body {
+  margin: 4px 0 8px 0;
+  padding: 8px 10px;
+  background: var(--bg-inset, rgba(0, 0, 0, 0.25));
+  border: 1px solid var(--border);
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 0.75rem;
+  line-height: 1.4;
+  max-height: 320px;
+  overflow: auto;
+  white-space: pre;
+}
+
+/* Setup card */
+
+.nettable-setup-card {
+  border: 1px solid var(--border);
+  background: var(--bg-surface);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.nettable-setup-header {
+  font-size: var(--fs-13);
+  letter-spacing: var(--tr-upper-wide);
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.nettable-setup-step-label {
+  font-size: var(--fs-13);
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+}
+
+.nettable-setup-launch {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.nettable-setup-code {
+  flex: 1;
+  font-family: var(--font-mono);
+  font-size: var(--fs-13);
+  color: var(--text-primary);
+  background: var(--bg-deep);
+  border: 1px solid var(--border-subtle);
+  padding: 8px 10px;
+  user-select: text;
+  cursor: text;
+  white-space: nowrap;
+  overflow-x: auto;
+}
+
+.nettable-setup-copy {
+  flex-shrink: 0;
+  min-width: 64px;
+}
+
+.nettable-setup-status-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+  border-top: 1px solid var(--border-subtle);
+}
+
+.nettable-setup-status-row:first-of-type {
+  border-top: none;
+  padding-top: 4px;
+}
+
+.nettable-setup-status-label {
+  font-size: var(--fs-13);
+  color: var(--text-secondary);
+}
+
+.nettable-setup-path {
+  font-size: var(--fs-11);
+  color: var(--text-muted);
+  user-select: text;
+  cursor: text;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.nettable-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--fs-12);
+  letter-spacing: var(--tr-body);
+  padding: 2px 8px;
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+}
+
+.nettable-status-badge.ok {
+  color: var(--green-bright);
+  border-color: color-mix(in srgb, var(--green-bright) 45%, var(--border));
+}
+
+.nettable-status-badge.bad {
+  color: var(--red-bright);
+  border-color: color-mix(in srgb, var(--red-bright) 45%, var(--border));
+}
+
+.nettable-status-badge.unknown {
+  color: var(--text-muted);
+}
+
+.nettable-status-mark {
+  font-weight: var(--fw-bold);
+  line-height: 1;
+}
+
+/* Collapsed-complete badge */
+
+.nettable-setup-complete {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  align-self: flex-start;
+  font-size: var(--fs-12);
+  letter-spacing: var(--tr-body);
+  color: var(--text-secondary);
+  border: 1px solid color-mix(in srgb, var(--green-bright) 45%, var(--border));
+  padding: 4px 10px;
+}
+
+.nettable-setup-complete-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--green-bright);
+}
+
+/* Activity feed */
+
+.nettable-activity {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--border);
+  background: var(--bg-surface);
+  overflow: hidden;
+}
+
+.nettable-activity-header {
+  font-size: var(--fs-13);
+  letter-spacing: var(--tr-upper-wide);
+  text-transform: uppercase;
+  color: var(--text-muted);
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.nettable-activity-empty {
+  padding: 20px;
+  font-size: var(--fs-13);
+  color: var(--text-muted);
+}
+
+.nettable-activity-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  flex: 1;
+  overflow-y: auto;
+}
+
+.nettable-activity-item {
+  display: grid;
+  grid-template-columns: 90px 1fr;
+  gap: 16px;
+  padding: 12px 20px;
+  border-bottom: 1px solid var(--border-subtle);
+  align-items: baseline;
+}
+
+.nettable-activity-item:last-child {
+  border-bottom: none;
+}
+
+.nettable-activity-time {
+  font-size: var(--fs-11);
+  color: var(--text-muted);
+  letter-spacing: var(--tr-body);
+  font-variant-numeric: tabular-nums;
+}
+
+.nettable-activity-body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.nettable-activity-title {
+  font-size: var(--fs-14);
+  color: var(--text-primary);
+  word-break: break-word;
+}
+
+.nettable-activity-detail {
+  font-size: var(--fs-12);
+  color: var(--text-muted);
+  word-break: break-word;
+}
+
+.nettable-activity-item.tone-success .nettable-activity-title {
+  color: var(--green-bright);
+}
+
+.nettable-activity-item.tone-warning .nettable-activity-title {
+  color: #e8a838;
+}
+
+.nettable-activity-item.tone-error .nettable-activity-title {
+  color: var(--red-bright);
+}

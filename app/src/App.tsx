@@ -10,6 +10,7 @@ import { SettingsTab } from "./components/SettingsTab";
 import { LogTab } from "./components/LogTab";
 import { LoginScreen } from "./components/LoginScreen";
 import { UploadShell } from "./components/UploadShell";
+import { NetTableHome } from "./components/NetTableHome";
 import { GlobalSearch } from "./components/GlobalSearch";
 import { useTrackerEvents } from "./hooks/useTrackerEvents";
 import { useGames } from "./hooks/useGames";
@@ -17,12 +18,20 @@ import { useDrodo } from "./hooks/useDrodo";
 import { useReplays } from "./hooks/useReplays";
 import "./styles/app.css";
 
-type TabId = "history" | "replays" | "confirm" | "lab" | "settings" | "log";
+type TabId =
+  | "home"
+  | "history"
+  | "replays"
+  | "confirm"
+  | "lab"
+  | "settings"
+  | "log"
+  | "upload";
 
 const ADMIN_PREVIEW_KEY = "dac.adminPreviewAsUser";
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState<TabId>("history");
+  const [activeTab, setActiveTab] = useState<TabId>("home");
   const [focusGameId, setFocusGameId] = useState<number | null>(null);
   const [searchOpen, setSearchOpen] = useState(false);
   const [adminPreviewAsUser, setAdminPreviewAsUser] = useState<boolean>(() => {
@@ -45,7 +54,7 @@ export default function App() {
   const tracker = useTrackerEvents(handleImportResult, replaysState.refresh);
   const isAdmin = tracker.status?.admin_mode === true;
   const showLoginScreen = !tracker.status?.logged_in;
-  const showUploadShell = Boolean(
+  const isUserView = Boolean(
     tracker.status?.logged_in && (!isAdmin || adminPreviewAsUser)
   );
 
@@ -93,17 +102,6 @@ export default function App() {
           authError={tracker.authError}
           onClearAuthError={tracker.clearAuthError}
         />
-      ) : showUploadShell ? (
-        <UploadShell
-          status={tracker.status}
-          importing={tracker.importing}
-          importProgress={tracker.importProgress}
-          lastImportResult={tracker.lastImportResult}
-          onBeginImport={tracker.beginImport}
-          onClearImportResult={tracker.clearImportResult}
-          isAdminPreview={isAdmin}
-          onExitAdminPreview={() => setAdminPreviewAsUser(false)}
-        />
       ) : (
         <>
           <TabBar
@@ -113,6 +111,29 @@ export default function App() {
             onPreviewAsUser={isAdmin ? () => setAdminPreviewAsUser(true) : undefined}
           />
           <div style={{ flex: 1, overflow: "hidden", display: "flex" }}>
+            {activeTab === "home" && (
+              <NetTableHome
+                status={tracker.status}
+                isAdminPreview={isUserView && isAdmin}
+                onExitAdminPreview={
+                  isAdmin ? () => setAdminPreviewAsUser(false) : undefined
+                }
+              />
+            )}
+            {activeTab === "upload" && (
+              <UploadShell
+                status={tracker.status}
+                importing={tracker.importing}
+                importProgress={tracker.importProgress}
+                lastImportResult={tracker.lastImportResult}
+                onBeginImport={tracker.beginImport}
+                onClearImportResult={tracker.clearImportResult}
+                isAdminPreview={isAdmin && adminPreviewAsUser}
+                onExitAdminPreview={
+                  isAdmin ? () => setAdminPreviewAsUser(false) : undefined
+                }
+              />
+            )}
             {activeTab === "history" && (
               <HistoryTab
                 {...gamesState}

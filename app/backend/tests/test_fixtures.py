@@ -71,32 +71,47 @@ def test_fixture(fixture_path: Path):
             f"Row count mismatch: got {len(actual_rows)}, expected {len(expected_rows)}"
         )
 
+    # Scalar fields are asserted whenever the fixture has a value. Every field
+    # the fixture records is verified — if it's in the fixture, it's ground
+    # truth.
+    SCALAR_FIELDS = (
+        "placement",
+        "player_name",
+        "rank",
+        "level",
+        "wl",
+        "gold",
+        "damage",
+        "duration",
+        "synergies",
+        "relic",
+    )
+
+    def _strip_stars(unit: str) -> str:
+        # Parser may suffix units with "(N)" for star level; fixture stores
+        # bare names. Strip so the comparison is apples-to-apples.
+        return unit.split("(")[0]
+
     for i, (actual, expected) in enumerate(zip(actual_rows, expected_rows)):
         label = f"row {i}"
 
-        for field in ("placement", "level", "wl"):
-            if expected.get(field) and actual.get(field) != expected[field]:
+        for field in SCALAR_FIELDS:
+            if field not in expected:
+                continue
+            expected_value = expected[field]
+            actual_value = actual.get(field, "")
+            if actual_value != expected_value:
                 errors.append(
-                    f"{label}: {field} {actual.get(field)!r} != {expected[field]!r}"
+                    f"{label}: {field} {actual_value!r} != {expected_value!r}"
                 )
 
-        if expected.get("units"):
-            actual_units = set(u.split("(")[0] for u in (actual.get("units") or []))
-            expected_units = set(u.split("(")[0] for u in expected["units"])
-            missing = expected_units - actual_units
-            extra = actual_units - expected_units
-            if missing or extra:
+        if "units" in expected:
+            actual_units = [_strip_stars(u) for u in (actual.get("units") or [])]
+            expected_units = [_strip_stars(u) for u in expected["units"]]
+            if actual_units != expected_units:
                 errors.append(
-                    f"{label}: unit mismatch — missing={sorted(missing)}, "
-                    f"extra={sorted(extra)}"
+                    f"{label}: units {actual_units!r} != {expected_units!r}"
                 )
-
-        if expected.get("synergies"):
-            actual_syns = set(s.split(":")[0] for s in (actual.get("synergies") or "").split("|") if s)
-            expected_syns = set(s.split(":")[0] for s in expected["synergies"].split("|") if s)
-            missing = expected_syns - actual_syns
-            if missing:
-                errors.append(f"{label}: missing synergies={sorted(missing)}")
 
     if errors:
         pytest.fail("\n  - " + "\n  - ".join(errors), pytrace=False)

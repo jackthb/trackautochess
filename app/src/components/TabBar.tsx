@@ -6,12 +6,14 @@ interface TabBarProps {
 }
 
 const TABS = [
+  { id: "home", label: "Home" },
   { id: "history", label: "History" },
   { id: "replays", label: "Replays" },
   { id: "confirm", label: "Screenshots" },
   { id: "lab", label: "Lab" },
   { id: "settings", label: "Settings" },
   { id: "log", label: "Log" },
+  { id: "upload", label: "Upload" },
 ];
 
 export function TabBar({ active, onChange, showConfirmBadge, onPreviewAsUser }: TabBarProps) {

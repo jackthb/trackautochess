@@ -133,6 +133,14 @@ class HeadlessBackend:
         if self.config.get("replay_enabled", True):
             self._init_replay()
 
+        # NetTable capture (autoexec install + console.log tailer)
+        self._nettable = None
+        try:
+            from nettable_capture import NetTableCapture
+            self._nettable = NetTableCapture(self._emit)
+        except Exception as e:
+            log.warning("NetTable capture init failed: %s", e)
+
     # ── JSON protocol ────────────────────────────────────────────────────────
 
     def _emit(self, msg: dict) -> None:
@@ -1280,6 +1288,119 @@ class HeadlessBackend:
         self._emit_notification(APP_NAME, "Logged out of Steam.")
         self._emit_status()
 
+    def _do_resync_from_steam(self) -> None:
+        """Force Steam to quit so it flushes localconfig.vdf to disk, then
+        re-emit status. Used when the file on disk is stale relative to
+        Steam's in-memory state (e.g. user edited launch options in the
+        Steam UI but didn't restart Steam)."""
+        try:
+            from nettable_capture import (
+                is_steam_running,
+                request_steam_shutdown,
+                wait_for_steam_exit,
+            )
+        except Exception as e:
+            self._emit({
+                "type": "nettable_resync_complete",
+                "ok": False,
+                "error": f"Backend not ready: {e}",
+            })
+            return
+
+        def _progress(stage: str, message: str) -> None:
+            self._emit({
+                "type": "nettable_resync_progress",
+                "stage": stage,
+                "message": message,
+            })
+
+        if not is_steam_running():
+            # Already closed — just bump the status and we're done.
+            if self._nettable:
+                self._nettable.emit_status()
+            self._emit({"type": "nettable_resync_complete", "ok": True, "noop": True})
+            return
+
+        _progress("closing_steam", "Asking Steam to quit…")
+        if not request_steam_shutdown():
+            self._emit({
+                "type": "nettable_resync_complete",
+                "ok": False,
+                "error": "Couldn't find steam.exe to close Steam automatically.",
+            })
+            return
+        _progress("waiting_steam_exit", "Waiting for Steam to flush its state…")
+        if not wait_for_steam_exit(timeout_sec=20.0):
+            self._emit({
+                "type": "nettable_resync_complete",
+                "ok": False,
+                "error": "Steam didn't quit within 20s.",
+            })
+            return
+
+        if self._nettable:
+            self._nettable.emit_status()
+        self._emit({"type": "nettable_resync_complete", "ok": True, "noop": False})
+
+    def _do_apply_launch_options(self, flags: list[str]) -> None:
+        """Close Steam if needed, then surgically add launch flags to Dota's
+        entry in localconfig.vdf. Emits progress events so the UI can show
+        intermediate states."""
+        try:
+            from nettable_capture import (
+                apply_dota_launch_options,
+                is_steam_running,
+                request_steam_shutdown,
+                wait_for_steam_exit,
+            )
+        except Exception as e:
+            self._emit({
+                "type": "nettable_launch_options_applied",
+                "ok": False,
+                "error": f"Backend not ready: {e}",
+            })
+            return
+
+        def _progress(stage: str, message: str) -> None:
+            self._emit({
+                "type": "nettable_launch_options_progress",
+                "stage": stage,
+                "message": message,
+            })
+
+        if is_steam_running():
+            _progress("closing_steam", "Asking Steam to quit…")
+            if not request_steam_shutdown():
+                self._emit({
+                    "type": "nettable_launch_options_applied",
+                    "ok": False,
+                    "error": (
+                        "Couldn't find steam.exe to close Steam automatically. "
+                        "Quit Steam manually (system-tray icon → Exit Steam) "
+                        "and try again."
+                    ),
+                })
+                return
+            _progress("waiting_steam_exit", "Waiting for Steam to finish closing…")
+            if not wait_for_steam_exit(timeout_sec=20.0):
+                self._emit({
+                    "type": "nettable_launch_options_applied",
+                    "ok": False,
+                    "error": (
+                        "Steam didn't quit within 20s — it may still be "
+                        "syncing cloud saves. Quit it from the system tray "
+                        "and try again."
+                    ),
+                })
+                return
+
+        _progress("writing", "Writing launch options…")
+        result = apply_dota_launch_options(flags)
+        self._emit({"type": "nettable_launch_options_applied", **result})
+        # Re-emit status so the renderer's flags badges refresh.
+        if self._nettable:
+            self._nettable.emit_status()
+
     # ── Config ──────────────────────────────────────────────────────────────
 
     def _do_set_config(self, key: str, value) -> None:
@@ -1310,6 +1431,11 @@ class HeadlessBackend:
         if self._sentinel:
             try:
                 self._sentinel.stop()
+            except Exception:
+                pass
+        if self._nettable:
+            try:
+                self._nettable.stop()
             except Exception:
                 pass
 
@@ -1343,6 +1469,26 @@ class HeadlessBackend:
             self._do_set_config(msg.get("key", ""), msg.get("value"))
         elif cmd == "status":
             self._emit_status()
+        elif cmd == "nettable_status":
+            if self._nettable:
+                self._nettable.emit_status()
+        elif cmd == "nettable_get_state":
+            if self._nettable:
+                self._nettable.emit_state()
+        elif cmd == "nettable_apply_launch_options":
+            flags = msg.get("flags") or ["-condebug", "-conclearlog"]
+            threading.Thread(
+                target=self._do_apply_launch_options,
+                args=(flags,),
+                daemon=True,
+                name="nettable-apply-launch-options",
+            ).start()
+        elif cmd == "nettable_resync_from_steam":
+            threading.Thread(
+                target=self._do_resync_from_steam,
+                daemon=True,
+                name="nettable-resync",
+            ).start()
         elif cmd == "lab_parse_full":
             img_path = msg.get("path", "")
             req_id = msg.get("req_id", "")
@@ -1425,6 +1571,13 @@ class HeadlessBackend:
     def run(self) -> None:
         """Start sentinel, then read stdin commands until quit or EOF."""
         self._start_sentinel()
+
+        # Start NetTable capture (autoexec install + console.log tailer)
+        if self._nettable:
+            try:
+                self._nettable.start()
+            except Exception as e:
+                log.warning("NetTable capture start failed: %s", e)
 
         from updater import __version__
         log.info("%s headless backend v%s running", APP_NAME, __version__)

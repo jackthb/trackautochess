@@ -2,12 +2,12 @@
 //
 // Skips vendor binaries (tesseract.exe, ffmpeg.exe) that are already signed
 // by their upstream maintainers — re-signing them is just a slow round-trip
-// to the timestamp server. Everything else falls through to signtool using
-// the same cert resolution electron-builder would have used (env CSC_LINK
-// for a .pfx file, or auto-discovery from the Windows cert store via /a).
+// to the timestamp server. Everything else is signed via signtool using
+// CSC_LINK (.pfx) or WIN_CSC_SHA1 (cert thumbprint in Windows store).
 //
-// Trade-off: vendor binaries keep their original signatures (which is what
-// SmartScreen actually wants for known publishers anyway).
+// If no cert env var is set, signing is skipped entirely — this is the
+// local "unsigned dev build" path. Set WIN_CSC_AUTO=1 to opt into
+// signtool's `/a` auto-discovery from the Windows cert store.
 
 const { execFileSync } = require("child_process");
 const path = require("path");
@@ -35,6 +35,14 @@ exports.default = async function sign(configuration) {
   const certPassword =
     process.env.WIN_CSC_KEY_PASSWORD || process.env.CSC_KEY_PASSWORD;
   const certSha1 = process.env.WIN_CSC_SHA1;
+  const autoDiscover = process.env.WIN_CSC_AUTO === "1";
+
+  if (!certFile && !certSha1 && !autoDiscover) {
+    console.log(
+      `  [custom-sign] skip ${basename} (no cert configured; set WIN_CSC_LINK / WIN_CSC_SHA1 / WIN_CSC_AUTO=1 to sign)`,
+    );
+    return;
+  }
 
   const args = [
     "sign",
@@ -52,7 +60,6 @@ exports.default = async function sign(configuration) {
   } else if (certSha1) {
     args.push("/sha1", certSha1);
   } else {
-    // Auto-select the best signing cert from the Windows cert store.
     args.push("/a");
   }
 
