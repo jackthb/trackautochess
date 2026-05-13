@@ -558,27 +558,90 @@ def find_dota_hwnd() -> int | None:
         return None
 
 
-# ── dump-key keystroke via PostMessageW (works without focus) ─────────────────────
+# ── PostMessageW-based input to Dota (works without focus) ─────────────────────
 
 WM_KEYDOWN = 0x0100
 WM_KEYUP = 0x0101
+WM_CHAR = 0x0102
 VK_PAUSE = 0x13
+VK_RETURN = 0x0D
+VK_OEM_5 = 0xDC  # "\" key — most users have this bound to toggleconsole
+
+# Full command string for one capture. Kept here (not as a Source 2 alias)
+# because custom-game addons reload their own keybinds/aliases on map load
+# (ModDota Default_Keys), so anything we set via autoexec gets clobbered.
+# Typing the commands directly into the console sidesteps that entirely.
+DUMP_COMMAND = (
+    "dumpstringtable CustomNetTable_ranking_top_table cl verbose;"
+    "dumpstringtable CustomNetTable_match_history_table cl verbose;"
+    "dumpstringtable CustomNetTable_dac_table cl verbose;"
+    "dumpstringtable CustomNetTable_player_id_table cl verbose;"
+    "dumpstringtable CustomNetTable_player_info_table cl verbose;"
+    "dumpstringtable CustomNetTable_game_info cl verbose"
+)
+
+
+def _post_key(hwnd: int, vk: int) -> None:
+    user32 = ctypes.windll.user32
+    user32.PostMessageW(hwnd, WM_KEYDOWN, vk, 0)
+    time.sleep(0.02)
+    user32.PostMessageW(hwnd, WM_KEYUP, vk, 0xC0000001)
+
+
+def send_console_command(cmd: str) -> bool:
+    """Programmatically type a command into Dota's in-game console.
+
+    Sequence: open console (`\\` toggleconsole bind) → WM_CHAR each
+    character of cmd → Enter → close console. Each step is PostMessageW,
+    fire-and-forget. Doesn't require Dota to have focus.
+
+    Why this exists: Source 2 aliases/binds set via autoexec get
+    overwritten when DAC's custom game loads (ModDota Default_Keys).
+    Typing the dumpstringtable calls directly each time bypasses that
+    layer — no persistent state to lose.
+    """
+    hwnd = find_dota_hwnd()
+    if not hwnd:
+        log.warning("send_console_command: Dota window not found")
+        return False
+    try:
+        user32 = ctypes.windll.user32
+
+        # Toggle console open.
+        _post_key(hwnd, VK_OEM_5)
+        time.sleep(0.15)  # give the console panel a beat to mount + focus
+
+        # Type each character. WM_CHAR is the message the panorama text
+        # input listens for; small inter-char delay avoids drops.
+        for ch in cmd:
+            user32.PostMessageW(hwnd, WM_CHAR, ord(ch), 0)
+            time.sleep(0.003)
+
+        # Submit + close.
+        time.sleep(0.05)
+        _post_key(hwnd, VK_RETURN)
+        time.sleep(0.05)
+        _post_key(hwnd, VK_OEM_5)
+
+        log.info("send_console_command: posted %d chars to hwnd=%s", len(cmd), hwnd)
+        return True
+    except Exception as e:
+        log.warning("send_console_command failed: %s", e)
+        return False
 
 
 def send_dump_key_to_dota() -> bool:
-    """PostMessage dump-key down+up to the Dota window. Returns True on success."""
+    """Compatibility wrapper — auto-trigger uses send_console_command now,
+    but keep this around in case bind-based capture is needed for testing.
+    PostMessage Pause down+up to the Dota window.
+    """
     hwnd = find_dota_hwnd()
     if not hwnd:
         log.warning("send_dump_key_to_dota: Dota window not found")
         return False
     try:
-        user32 = ctypes.windll.user32
-        # 0xC0000001 is the standard repeat=1, transition=1, previous-state=1
-        # lParam for a keyup. PostMessageW is async, fire-and-forget.
-        user32.PostMessageW(hwnd, WM_KEYDOWN, VK_PAUSE, 0)
-        time.sleep(0.05)
-        user32.PostMessageW(hwnd, WM_KEYUP, VK_PAUSE, 0xC0000001)
-        log.info("Sent dump-key to Dota hwnd=%s", hwnd)
+        _post_key(hwnd, VK_PAUSE)
+        log.info("Sent Pause to Dota hwnd=%s", hwnd)
         return True
     except Exception as e:
         log.warning("send_dump_key_to_dota failed: %s", e)
@@ -988,12 +1051,12 @@ class NetTableCapture:
     def _do_send_dump(self) -> None:
         if self._dump_sent_for_game:
             return
-        ok = send_dump_key_to_dota()
+        ok = send_console_command(DUMP_COMMAND)
         self._dump_armed = False
         if ok:
             self._dump_sent_for_game = True
         else:
-            log.info("nettable: dump-key send failed — leaving disarmed for retry")
+            log.info("nettable: console-type send failed — leaving disarmed for retry")
 
     def _schedule_postgame_dump(self) -> None:
         if self._dump_sent_for_postgame:
@@ -1009,11 +1072,11 @@ class NetTableCapture:
     def _do_send_postgame_dump(self) -> None:
         if self._dump_sent_for_postgame:
             return
-        ok = send_dump_key_to_dota()
+        ok = send_console_command(DUMP_COMMAND)
         if ok:
             self._dump_sent_for_postgame = True
         else:
-            log.info("nettable: post-game dump-key send failed")
+            log.info("nettable: post-game console-type send failed")
 
     def _note_dump_line(self, line: str) -> None:
         idx = line.find("table ")
