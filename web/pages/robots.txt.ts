@@ -1,8 +1,8 @@
 import type { GetServerSideProps } from "next";
-import { getRequestSiteUrl } from "@/lib/site";
+import { getRequestSiteUrl, getSiteUrl } from "@/lib/site";
 
 export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
-  const siteUrl = getRequestSiteUrl(req.headers);
+  const siteUrl = getSiteUrl() ?? getRequestSiteUrl(req.headers);
   const sitemapUrl = siteUrl ? `${siteUrl}/sitemap.xml` : "/sitemap.xml";
   const robots = [
     "User-agent: *",

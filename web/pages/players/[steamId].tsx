@@ -4,7 +4,12 @@ import { useEffect, useMemo, useState } from "react";
 import { createClient } from "@supabase/supabase-js";
 import { createServerClient } from "@supabase/ssr";
 import type { GetServerSideProps } from "next";
-import { absoluteUrl, getRequestSiteUrl, SITE_TITLE } from "@/lib/site";
+import {
+  absoluteUrl,
+  getRequestSiteUrl,
+  getSiteUrl,
+  SITE_TITLE,
+} from "@/lib/site";
 import unitsData from "@data/units.json";
 import unitsFullData from "@data/units_full.json";
 import synergiesData from "@data/synergies.json";
@@ -784,7 +789,8 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
           auth: { autoRefreshToken: false, persistSession: false },
         })
       : null;
-  const baseUrl = getRequestSiteUrl(context.req.headers);
+  const requestBaseUrl = getRequestSiteUrl(context.req.headers);
+  const canonicalBaseUrl = getSiteUrl() ?? requestBaseUrl;
   const manualRefreshQuota = getManualRefreshQuota(context.req.headers.cookie);
 
   let viewerSteamId: string | null = null;
@@ -1001,11 +1007,11 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       drodoProfileMissing,
       drodoLastFetchedAt,
       manualRefreshQuota,
-      ogImageUrl: absoluteUrl(`/api/og/player/${steamId}`, baseUrl),
-      twitchOgUrl: absoluteUrl(`/api/og/twitch/${steamId}`, baseUrl),
+      ogImageUrl: absoluteUrl(`/api/og/player/${steamId}`, canonicalBaseUrl),
+      twitchOgUrl: absoluteUrl(`/api/og/twitch/${steamId}`, canonicalBaseUrl),
       canonicalUrl: absoluteUrl(
         playerProfilePath(steamId, steamProfile.customUrl),
-        baseUrl
+        canonicalBaseUrl
       ),
       banned,
     },

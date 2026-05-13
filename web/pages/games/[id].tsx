@@ -26,7 +26,12 @@ import {
   steamProfileUrl,
   type SteamProfile,
 } from "../../lib/steam";
-import { SITE_TITLE } from "@/lib/site";
+import {
+  absoluteUrl,
+  getRequestSiteUrl,
+  getSiteUrl,
+  SITE_TITLE,
+} from "@/lib/site";
 import { resolveIconUrl } from "@/lib/icons";
 
 const UNIT_COSTS: Record<string, number> = {};
@@ -53,7 +58,28 @@ interface GamePageProps {
   matchProfiles: Record<string, SteamProfile>;
   highlightUserId: string | null;
   highlightName: string | null;
+  canonicalUrl: string | null;
   supabase: SupabaseClient | null;
+}
+
+function formatGameDate(value: string | null | undefined): string | null {
+  if (!value) return null;
+  const date = new Date(value);
+  if (!Number.isFinite(date.getTime())) return null;
+  return date.toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
+}
+
+function buildGameDescription(game: Game, displayName: string): string {
+  const parts = [`${displayName}'s Dota Auto Chess match`];
+  if (game.placement) parts.push(`finished #${game.placement}`);
+  if (game.rank) parts.push(`at ${game.rank}`);
+  const playedAt = formatGameDate(game.played_at);
+  if (playedAt) parts.push(`on ${playedAt}`);
+  return `${parts.join(" ")}. View the lineup, synergies, relics, and match table on Track Auto Chess.`;
 }
 
 function normalizeName(value: string | null | undefined): string {
@@ -194,6 +220,7 @@ export default function GamePage({
   matchProfiles,
   highlightUserId,
   highlightName,
+  canonicalUrl,
 }: GamePageProps) {
   const p = parseInt(game.placement) || 0;
   const pColor = placementColor(p);
@@ -205,9 +232,11 @@ export default function GamePage({
   const tier = rankParts[0] || "";
   const rankNum = rankParts[1] || "";
 
-  const displayName = steamProfile.name || game.user_id;
+  const displayName = steamProfile.name || String(game.user_id || "Player");
   const profileUrl = steamProfileUrl(String(game.user_id), steamProfile.customUrl);
   const playerPath = playerProfilePath(String(game.user_id), steamProfile.customUrl);
+  const title = `${game.placement ? `#${game.placement} | ` : ""}${displayName} | ${SITE_TITLE}`;
+  const description = buildGameDescription(game, displayName);
 
   const tooltipData: TooltipData = {
     unitCosts: UNIT_COSTS,
@@ -237,11 +266,18 @@ export default function GamePage({
   return (
     <>
       <Head>
-        <title>
-          {game.placement ? `#${game.placement} | ` : ""}
-          {displayName} | {SITE_TITLE}
-        </title>
+        <title>{title}</title>
+        <meta name="description" content={description} />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta name="robots" content="index, follow, max-image-preview:large" />
+        <meta property="og:title" content={title} />
+        <meta property="og:description" content={description} />
+        <meta property="og:type" content="website" />
+        <meta name="twitter:card" content="summary" />
+        <meta name="twitter:title" content={title} />
+        <meta name="twitter:description" content={description} />
+        {canonicalUrl && <link rel="canonical" href={canonicalUrl} />}
+        {canonicalUrl && <meta property="og:url" content={canonicalUrl} />}
       </Head>
 
       <style jsx>{`
@@ -726,7 +762,14 @@ export default function GamePage({
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const { id } = context.params!;
-  const highlightUserId = (context.query.player as string) || null;
+  if (!id || typeof id !== "string") {
+    return { notFound: true };
+  }
+
+  const playerParam = context.query.player;
+  const highlightUserId = typeof playerParam === "string" ? playerParam : null;
+  const requestBaseUrl = getRequestSiteUrl(context.req.headers);
+  const canonicalBaseUrl = getSiteUrl() ?? requestBaseUrl;
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
@@ -800,6 +843,10 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       matchProfiles,
       highlightUserId,
       highlightName,
+      canonicalUrl: absoluteUrl(
+        `/games/${encodeURIComponent(id)}`,
+        canonicalBaseUrl
+      ),
     },
   };
 };

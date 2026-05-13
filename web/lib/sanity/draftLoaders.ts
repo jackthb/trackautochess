@@ -5,7 +5,6 @@ import type { DisplayUnit } from "@/lib/units";
 import type { DisplaySynergy } from "@/lib/synergies";
 import type { DisplayItem } from "@/lib/items";
 import type { DisplayRelic } from "@/lib/relics";
-import { loadQuery, loadQueryOptions } from "./ssr";
 import {
   ALL_UNITS_QUERY,
   ALL_SYNERGIES_QUERY,
@@ -23,6 +22,16 @@ import {
  * existing JSON cache is faster and is what's actually deployed. Sanity reads
  * happen only when an editor opens the page in the Presentation iframe.
  */
+
+async function loadDraftQuery<T>(
+  query: string,
+  params: Record<string, unknown>,
+  draftMode: boolean
+) {
+  const { loadQuery, loadQueryOptions } = await import("./ssr");
+  const options = loadQueryOptions({ draftMode });
+  return loadQuery<T>(query, params, options);
+}
 
 interface RawUnit {
   name: string;
@@ -127,8 +136,7 @@ function legacyItemIconUrl(icon: string, texture: string): string {
 }
 
 export async function loadDraftUnits(draftMode: boolean): Promise<DisplayUnit[]> {
-  const options = loadQueryOptions({ draftMode });
-  const result = await loadQuery<RawUnit[]>(ALL_UNITS_QUERY, {}, options);
+  const result = await loadDraftQuery<RawUnit[]>(ALL_UNITS_QUERY, {}, draftMode);
   return (result.data ?? [])
     .filter((u) => u.name?.trim())
     .map((u) => {
@@ -152,8 +160,11 @@ export async function loadDraftUnits(draftMode: boolean): Promise<DisplayUnit[]>
 export async function loadDraftSynergies(
   draftMode: boolean
 ): Promise<DisplaySynergy[]> {
-  const options = loadQueryOptions({ draftMode });
-  const result = await loadQuery<RawSynergy[]>(ALL_SYNERGIES_QUERY, {}, options);
+  const result = await loadDraftQuery<RawSynergy[]>(
+    ALL_SYNERGIES_QUERY,
+    {},
+    draftMode
+  );
   return (result.data ?? [])
     .filter((s) => s.name?.trim())
     .map((s) => {
@@ -174,8 +185,7 @@ export async function loadDraftSynergies(
 }
 
 export async function loadDraftItems(draftMode: boolean): Promise<DisplayItem[]> {
-  const options = loadQueryOptions({ draftMode });
-  const result = await loadQuery<RawItem[]>(ALL_ITEMS_QUERY, {}, options);
+  const result = await loadDraftQuery<RawItem[]>(ALL_ITEMS_QUERY, {}, draftMode);
   return (result.data ?? [])
     .filter((i) => i.inCuratedSet && i.name?.trim() && typeof i.tier === "number")
     .map((i) => {
@@ -202,8 +212,11 @@ export async function loadDraftItems(draftMode: boolean): Promise<DisplayItem[]>
 }
 
 export async function loadDraftRelics(draftMode: boolean): Promise<DisplayRelic[]> {
-  const options = loadQueryOptions({ draftMode });
-  const result = await loadQuery<RawRelic[]>(ALL_RELICS_QUERY, {}, options);
+  const result = await loadDraftQuery<RawRelic[]>(
+    ALL_RELICS_QUERY,
+    {},
+    draftMode
+  );
   return (result.data ?? [])
     .filter((r) => r.name?.trim())
     .map((r) => {
@@ -236,11 +249,10 @@ export async function loadDraftPatchNote(
   slug: string,
   draftMode: boolean
 ): Promise<DraftPatch | null> {
-  const options = loadQueryOptions({ draftMode });
-  const result = await loadQuery<RawPatch | null>(
+  const result = await loadDraftQuery<RawPatch | null>(
     PATCH_NOTE_QUERY,
     { slug },
-    options
+    draftMode
   );
   const patch = result.data;
   if (!patch) return null;

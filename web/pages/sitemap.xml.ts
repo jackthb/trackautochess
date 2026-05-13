@@ -4,7 +4,7 @@ import { getAllItems } from "@/lib/items";
 import { getAllRelics } from "@/lib/relics";
 import { getAllUnits } from "@/lib/units";
 import { getAllSynergies } from "@/lib/synergies";
-import { getRequestSiteUrl } from "@/lib/site";
+import { getRequestSiteUrl, getSiteUrl } from "@/lib/site";
 import { HREFLANG, LOCALES, localePath } from "@/lib/i18n";
 
 interface IndexPatch {
@@ -62,7 +62,7 @@ function renderSitemap(siteUrl: string, entries: SitemapEntry[]): string {
 }
 
 export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
-  const siteUrl = getRequestSiteUrl(req.headers);
+  const siteUrl = getSiteUrl() ?? getRequestSiteUrl(req.headers);
   if (!siteUrl) {
     return { notFound: true };
   }
@@ -71,11 +71,14 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
     { path: "/" },
     { path: "/items" },
     { path: "/units" },
-    { path: "/synergies" },
+    { path: "/classes" },
+    { path: "/species" },
     { path: "/relics" },
     { path: "/talents" },
-    // English-only static / app pages — emit a single unprefixed URL.
-    { path: "/about", localized: false },
+    { path: "/ranks" },
+    { path: "/about" },
+    { path: "/privacy" },
+    // English-only patch notes emit a single unprefixed URL.
     { path: "/patch-notes", localized: false },
     ...getAllItems().map((item) => ({ path: `/items/${item.slug}` })),
     ...getAllUnits().map((unit) => ({ path: `/units/${unit.slug}` })),
