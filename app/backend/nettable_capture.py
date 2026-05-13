@@ -699,6 +699,22 @@ class NetTableCapture:
     def start(self) -> None:
         """Install autoexec, then start the daemon tailer thread."""
         self._autoexec_installed = self._install_autoexec()
+
+        # Visibility log: dump what we resolved at startup so it's obvious
+        # which Steam account / launch options we're reading.
+        cfg_path = find_localconfig_vdf(self._account_id)
+        opts = find_dota_launch_options(self._account_id)
+        log.info(
+            "nettable: steam_id=%s account_id=%s localconfig=%s "
+            "launch_options=%r has_condebug=%s has_conclearlog=%s",
+            self._steam_id,
+            self._account_id,
+            cfg_path,
+            opts,
+            ("-condebug" in (opts or "").split()) if opts is not None else None,
+            ("-conclearlog" in (opts or "").split()) if opts is not None else None,
+        )
+
         self.emit_status()
         self._last_status_signature = self._current_status_signature()
 
