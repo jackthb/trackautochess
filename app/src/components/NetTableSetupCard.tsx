@@ -14,6 +14,23 @@ interface NetTableSetupCardProps {
 const REQUIRED_FLAGS = ["-condebug", "-conclearlog"];
 const LAUNCH_OPTIONS = REQUIRED_FLAGS.join(" ");
 
+/**
+ * Setup card driven by **empirical** signals, not config parsing.
+ *
+ * The old card checked `localconfig.vdf` for `-condebug` / `-conclearlog`
+ * and trusted what it found. Steam Cloud reverts that file, the cvar
+ * parser races against Steam's writes, and the result is a card that
+ * lies about state. So we lean on what's actually observable:
+ *
+ *   - `autoexec.cfg` installed on disk     (real, we wrote it ourselves)
+ *   - Dota running right now                (process check)
+ *   - `console.log` actively being written  (mtime within window) ← the
+ *     real proof `-condebug` is doing its job
+ *
+ * The config-derived flags (`has_condebug`, etc.) are still emitted by
+ * the backend and used to know whether Apply has work to do, but they
+ * don't drive the user-visible status badges any more.
+ */
 export function NetTableSetupCard({
   status,
   lastApply,
@@ -55,28 +72,37 @@ export function NetTableSetupCard({
   }, [lastApply]);
 
   const autoexecOk = status?.autoexec_installed === true;
-  const condebugOk = status?.has_condebug === true;
-  const conclearlogOk = status?.has_conclearlog === true;
+  const dotaRunning = status?.dota_running === true;
+  const logActive = status?.log_active === true;
+
+  // "All good" = autoexec installed AND (Dota is running with -condebug
+  // verified working) OR (Dota isn't running yet — can't disprove anything).
+  const tracking = dotaRunning && logActive;
+  const allOk = Boolean(status && autoexecOk && (tracking || !dotaRunning));
+
+  // Whether the Apply button has work to do (config-derived check is fine
+  // here — we just need to know if the flags would be appended).
   const flagsKnown = status?.has_condebug !== null;
-  const allOk = Boolean(
-    status && autoexecOk && (flagsKnown ? condebugOk && conclearlogOk : true),
-  );
+  const condebugSet = status?.has_condebug === true;
+  const conclearlogSet = status?.has_conclearlog === true;
+  const needsApply = flagsKnown && (!condebugSet || !conclearlogSet);
 
   if (allOk) {
     return (
       <div className="nettable-setup-complete">
         <span className="nettable-setup-complete-dot" aria-hidden="true" />
-        Setup complete
+        {tracking
+          ? "Tracking active"
+          : "Setup complete — launch Dota when ready"}
       </div>
     );
   }
 
-  const showApplyButton = flagsKnown && (!condebugOk || !conclearlogOk);
   const buttonLabel = applying ? "Working…" : "Set them for me";
 
   return (
     <div className="nettable-setup-card">
-      <div className="nettable-setup-header">One-time setup</div>
+      <div className="nettable-setup-header">Setup</div>
 
       <div className="nettable-setup-step">
         <div className="nettable-setup-step-label">
@@ -93,21 +119,21 @@ export function NetTableSetupCard({
             {copied ? "Copied" : "Copy"}
           </button>
         </div>
-        {showApplyButton && (
+        {needsApply && (
           <div className="nettable-setup-apply">
             <button
               type="button"
               className={`btn-ghost${applying ? " btn-loading" : ""}`}
               onClick={applyLaunchOptions}
               disabled={applying}
-              title="We'll close Steam, add the flags, then you relaunch Steam + Dota."
+              title="We close Steam, append the flags to your existing options, you relaunch Steam + Dota."
             >
               {buttonLabel}
             </button>
             <span className="nettable-setup-apply-note">
               {applying && progress
                 ? progress
-                : "We close Steam, edit the config, then you relaunch Steam + Dota."}
+                : "We close Steam, edit the config, then relaunch Steam + Dota."}
             </span>
           </div>
         )}
@@ -123,32 +149,37 @@ export function NetTableSetupCard({
 
       <div className="nettable-setup-status-row">
         <span className="nettable-setup-status-label">autoexec.cfg</span>
-        <StatusBadge ok={autoexecOk} unknown={status === null} />
-      </div>
-
-      <div className="nettable-setup-status-row">
-        <span className="nettable-setup-status-label">-condebug</span>
         <StatusBadge
-          ok={condebugOk}
-          unknown={status === null || !flagsKnown}
-          okLabel="set"
+          ok={autoexecOk}
+          unknown={status === null}
+          okLabel="installed"
           badLabel="missing"
         />
       </div>
 
       <div className="nettable-setup-status-row">
-        <span className="nettable-setup-status-label">-conclearlog</span>
+        <span className="nettable-setup-status-label">Dota running</span>
         <StatusBadge
-          ok={conclearlogOk}
-          unknown={status === null || !flagsKnown}
-          okLabel="set"
-          badLabel="missing"
+          ok={dotaRunning}
+          unknown={status === null}
+          okLabel="running"
+          badLabel="not running"
+        />
+      </div>
+
+      <div className="nettable-setup-status-row">
+        <span className="nettable-setup-status-label">tracking active</span>
+        <StatusBadge
+          ok={tracking}
+          unknown={status === null || (!dotaRunning && !logActive)}
+          okLabel="writing"
+          badLabel={dotaRunning ? "missing -condebug" : "idle"}
         />
       </div>
 
       {status?.launch_options ? (
         <div className="nettable-setup-launch-detail" title={status.launch_options}>
-          current: <code>{status.launch_options}</code>
+          steam config: <code>{status.launch_options}</code>
         </div>
       ) : null}
 
@@ -159,9 +190,11 @@ export function NetTableSetupCard({
             className={`nettable-setup-resync-link${resyncing ? " is-busy" : ""}`}
             onClick={resyncFromSteam}
             disabled={resyncing}
-            title="Quits Steam so it flushes localconfig.vdf, then re-reads"
+            title="Quits Steam so it flushes localconfig.vdf to disk, then we re-read it"
           >
-            {resyncing ? (resyncProgress ?? "Re-syncing…") : "Re-sync from Steam (quits Steam)"}
+            {resyncing
+              ? (resyncProgress ?? "Re-syncing…")
+              : "Re-sync from Steam (quits Steam)"}
           </button>
         </div>
       )}

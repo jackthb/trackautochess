@@ -26,6 +26,12 @@ export interface NetTableStatus {
   has_conclearlog: boolean | null;
   /** True if steam.exe was running at the moment we last checked. */
   steam_running: boolean;
+  /** Empirical: dota2.exe is currently a running process. */
+  dota_running: boolean;
+  /** Empirical: console.log has been written to within the active window. The
+   *  only signal that proves -condebug is actually doing its job right now,
+   *  independent of what Steam's localconfig.vdf claims. */
+  log_active: boolean;
 }
 
 export interface NetTableLaunchOptionsApplied {
@@ -81,6 +87,8 @@ type NetTableStatusEvent = {
   has_condebug: boolean | null;
   has_conclearlog: boolean | null;
   steam_running: boolean;
+  dota_running: boolean;
+  log_active: boolean;
 };
 type NetTableLaunchOptionsAppliedEvent = NetTableLaunchOptionsApplied & {
   type: "nettable_launch_options_applied";
@@ -182,14 +190,36 @@ export function useNetTableEvents(): NetTableActivityState {
     const unsubscribe = window.tracker.onEvent((msg: Incoming) => {
       switch (msg.type) {
         case "nettable_status":
-          setStatus({
-            autoexec_installed: msg.autoexec_installed,
-            log_path: msg.log_path,
-            log_writable: msg.log_writable,
-            launch_options: msg.launch_options ?? null,
-            has_condebug: msg.has_condebug ?? null,
-            has_conclearlog: msg.has_conclearlog ?? null,
-            steam_running: msg.steam_running,
+          setStatus((prev) => {
+            const next: NetTableStatus = {
+              autoexec_installed: msg.autoexec_installed,
+              log_path: msg.log_path,
+              log_writable: msg.log_writable,
+              launch_options: msg.launch_options ?? null,
+              has_condebug: msg.has_condebug ?? null,
+              has_conclearlog: msg.has_conclearlog ?? null,
+              steam_running: msg.steam_running,
+              dota_running: msg.dota_running,
+              log_active: msg.log_active,
+            };
+            // Surface a one-time warning when Dota launches but console.log
+            // doesn't start writing — that's the empirical "you forgot
+            // -condebug" signal.
+            if (
+              prev &&
+              !prev.dota_running &&
+              msg.dota_running &&
+              !msg.log_active
+            ) {
+              push({
+                kind: "nettable_ingest_error",
+                title: "Dota started but tracking isn't active",
+                detail:
+                  "console.log isn't being written. Click 'Set them for me' to add -condebug -conclearlog and relaunch Dota.",
+                tone: "warning",
+              });
+            }
+            return next;
           });
           break;
         case "nettable_dump_captured": {

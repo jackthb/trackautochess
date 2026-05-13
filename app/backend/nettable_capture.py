@@ -200,15 +200,24 @@ def _find_app_block_bounds(text: str, app_id: str) -> tuple[int | None, int | No
 
 def is_steam_running() -> bool:
     """Detect whether steam.exe is currently a running process."""
+    return _is_process_running("steam.exe")
+
+
+def is_dota_running() -> bool:
+    """Detect whether dota2.exe is currently a running process."""
+    return _is_process_running("dota2.exe")
+
+
+def _is_process_running(image_name: str) -> bool:
     try:
         result = subprocess.run(
-            ["tasklist", "/FI", "IMAGENAME eq steam.exe", "/NH"],
+            ["tasklist", "/FI", f"IMAGENAME eq {image_name}", "/NH"],
             capture_output=True,
             text=True,
             timeout=5,
             creationflags=0x08000000,  # CREATE_NO_WINDOW
         )
-        return "steam.exe" in result.stdout.lower()
+        return image_name.lower() in result.stdout.lower()
     except (subprocess.SubprocessError, FileNotFoundError, OSError):
         return False
 
@@ -556,6 +565,11 @@ DUMP_STABILISE_SEC = 2.0
 # How often to poll the log file when no data is arriving.
 POLL_IDLE_SEC = 0.5
 
+# console.log counts as "active" if it was modified within this many seconds.
+# Long enough to bridge the gaps between Dota's normal stdout flushes, short
+# enough to detect "Dota is running but -condebug isn't on" reasonably fast.
+LOG_ACTIVE_WINDOW_SEC = 30.0
+
 
 class NetTableCapture:
     """Tail Dota's console.log, send F12 mid- and post-game, ingest dumps."""
@@ -606,23 +620,55 @@ class NetTableCapture:
         p.start()
 
     def emit_status(self) -> None:
-        """Re-emit current status. Called on demand when the renderer asks."""
+        """Re-emit current status. Called on demand when the renderer asks.
+
+        The status combines:
+            - Config-derived flags (parsed from localconfig.vdf — included
+              but UI shouldn't trust them as ground truth because Steam
+              Cloud can revert them).
+            - Empirical ground-truth signals: dota_running, log_active
+              (console.log was modified within LOG_ACTIVE_WINDOW_SEC).
+              These together are the actual answer to "is -condebug
+              doing its job right now". The UI prefers these.
+        """
         log_writable = bool(self._log_path and self._log_path.exists())
         opts = find_dota_launch_options()
         opts_tokens = _tokenize_launch_options(opts) if opts is not None else None
+        dota_running = is_dota_running()
+        log_active = self._is_log_active()
         self._emit({
             "type": "nettable_status",
             "autoexec_installed": bool(self._autoexec_installed),
             "log_path": str(self._log_path) if self._log_path else "",
             "log_writable": log_writable,
             "dota_dir": str(self._dota_dir) if self._dota_dir else "",
-            # None means "we couldn't read Steam's localconfig" — UI should
-            # treat that as unknown, not as missing.
+            # Empirical ground truth — what's actually happening right now.
+            "dota_running": dota_running,
+            "log_active": log_active,
+            # Config-derived — for the Apply button to know what to write.
+            # None for has_* means "couldn't read localconfig".
             "launch_options": opts,
             "has_condebug": ("-condebug" in opts_tokens) if opts_tokens is not None else None,
             "has_conclearlog": ("-conclearlog" in opts_tokens) if opts_tokens is not None else None,
             "steam_running": is_steam_running(),
         })
+
+    def _is_log_active(self) -> bool:
+        """True if console.log was modified within the active window.
+
+        This is the actual proof that -condebug is doing its job: if Dota
+        is running and the file is being written to, the flag is set.
+        If Dota is running and the file isn't being written, the flag is
+        missing regardless of what Steam's config claims.
+        """
+        if not self._log_path:
+            return False
+        try:
+            mtime = self._log_path.stat().st_mtime
+        except OSError:
+            return False
+        age = time.time() - mtime
+        return age < LOG_ACTIVE_WINDOW_SEC
 
     def emit_state(self) -> None:
         """Re-emit the latest decoded per-(table,key) snapshot."""
@@ -633,13 +679,20 @@ class NetTableCapture:
         })
 
     def _current_status_signature(self) -> tuple:
-        """Snapshot the bits of status that we re-emit when they change."""
+        """Snapshot the bits of status that we re-emit when they change.
+
+        Includes the empirical signals (dota_running, log_active) so the
+        UI gets pushed an update the moment Dota starts or stops, and the
+        moment console.log starts/stops being written to.
+        """
         opts = find_dota_launch_options()
         return (
             bool(self._autoexec_installed),
             bool(self._log_path and self._log_path.exists()),
             opts,
             is_steam_running(),
+            is_dota_running(),
+            self._is_log_active(),
         )
 
     def _run_status_poll(self) -> None:
