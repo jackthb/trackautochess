@@ -57,22 +57,38 @@ export default function Home({ initialSearchResults }: HomeProps) {
   const exampleSteamUrl =
     "https://steamcommunity.com/profiles/76561198022169086";
 
-  const structuredData = {
-    "@context": "https://schema.org",
-    "@type": "WebSite",
-    name: SITE_NAME,
-    description: SITE_DESCRIPTION,
-    ...(siteUrl ? { url: siteUrl } : {}),
-    ...(siteUrl
-      ? {
-          potentialAction: {
-            "@type": "SearchAction",
-            target: `${siteUrl}players/{search_term_string}`,
-            "query-input": "required name=search_term_string",
-          },
-        }
-      : {}),
-  };
+  const structuredData = [
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      name: SITE_NAME,
+      description: SITE_DESCRIPTION,
+      ...(siteUrl ? { url: siteUrl } : {}),
+      ...(siteUrl
+        ? {
+            potentialAction: {
+              "@type": "SearchAction",
+              target: `${siteUrl}/players/{search_term_string}`,
+              "query-input": "required name=search_term_string",
+            },
+          }
+        : {}),
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      name: SITE_NAME,
+      applicationCategory: "GameApplication",
+      operatingSystem: "Web",
+      description: SITE_DESCRIPTION,
+      ...(siteUrl ? { url: siteUrl } : {}),
+      offers: {
+        "@type": "Offer",
+        price: "0",
+        priceCurrency: "USD",
+      },
+    },
+  ];
 
   return (
     <>
@@ -339,6 +355,7 @@ export default function Home({ initialSearchResults }: HomeProps) {
               </div>
               <ProfileSearch
                 initialResults={initialSearchResults}
+                analyticsSource="home_hero"
                 placeholder={t.placeholder}
               />
             </div>

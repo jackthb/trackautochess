@@ -22,8 +22,11 @@ interface SeoHeadProps {
   locale?: Locale;
   /** Pages that aren't translated (patch notes, privacy). Suppresses hreflang. */
   localized?: boolean;
-  type?: "website" | "article";
+  type?: "website" | "article" | "profile";
   imagePath?: string;
+  imageUrl?: string | null;
+  imageAlt?: string;
+  canonicalUrl?: string | null;
   noindex?: boolean;
   publishedTime?: string;
   structuredData?:
@@ -40,6 +43,9 @@ export function SeoHead({
   localized = true,
   type = "website",
   imagePath = "/logo.svg",
+  imageUrl,
+  imageAlt,
+  canonicalUrl,
   noindex = false,
   publishedTime,
   structuredData,
@@ -48,10 +54,9 @@ export function SeoHead({
   // the unprefixed URL regardless of which locale URL the visitor used —
   // so /ru/patch-notes/x and /patch-notes/x both canonicalize to the
   // unprefixed path. Localized pages canonicalize to their own locale.
-  const canonical = absoluteUrl(
-    localized ? localePath(locale, path) : path,
-  );
-  const image = imagePath ? absoluteUrl(imagePath) : null;
+  const canonical =
+    canonicalUrl ?? absoluteUrl(localized ? localePath(locale, path) : path);
+  const image = imageUrl ?? (imagePath ? absoluteUrl(imagePath) : null);
   const robots = noindex
     ? "noindex, nofollow"
     : "index, follow, max-image-preview:large";
@@ -83,6 +88,7 @@ export function SeoHead({
       <meta property="og:type" content={type} />
       <meta property="og:site_name" content={SITE_NAME} />
       <meta property="og:locale" content={ogLocale(locale)} />
+      <meta name="application-name" content={SITE_NAME} />
       <meta name="twitter:card" content="summary_large_image" />
       <meta name="twitter:title" content={title} />
       <meta name="twitter:description" content={description} />
@@ -100,6 +106,8 @@ export function SeoHead({
       {xDefault && <link rel="alternate" hrefLang="x-default" href={xDefault} />}
       {image && <meta property="og:image" content={image} />}
       {image && <meta name="twitter:image" content={image} />}
+      {image && imageAlt && <meta property="og:image:alt" content={imageAlt} />}
+      {image && imageAlt && <meta name="twitter:image:alt" content={imageAlt} />}
       {publishedTime && (
         <meta property="article:published_time" content={publishedTime} />
       )}

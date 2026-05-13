@@ -6,6 +6,7 @@ import {
   sortSearchResults,
   type SearchResult,
 } from "@/lib/playerSearch";
+import { bucketCount, trackEvent } from "@/lib/analytics";
 
 const MAX_VISIBLE_RESULTS = 5;
 
@@ -13,6 +14,7 @@ interface ProfileSearchProps {
   autoFocus?: boolean;
   className?: string;
   initialResults?: SearchResult[];
+  analyticsSource?: string;
   placeholder?: string;
 }
 
@@ -20,6 +22,7 @@ export function ProfileSearch({
   autoFocus = false,
   className = "",
   initialResults = [],
+  analyticsSource = "profile_search",
   placeholder = "Steam vanity URL, profile URL, or Steam ID",
 }: ProfileSearchProps) {
   const router = useRouter();
@@ -168,6 +171,9 @@ export function ProfileSearch({
 
   const resolveSteamAndNavigate = async (lookupValue: string) => {
     const reqId = ++lookupReqRef.current;
+    trackEvent("Profile Steam Lookup Started", {
+      source: analyticsSource,
+    });
     clearLookupBarTimer();
     setLookupError(null);
     setLookupLoading(true);
@@ -189,14 +195,26 @@ export function ProfileSearch({
         const data = (await resp.json()) as SearchResult[];
         const first = data[0];
         if (first?.steam_id) {
+          trackEvent("Profile Steam Lookup Resolved", {
+            source: analyticsSource,
+            result_bucket: bucketCount(data.length),
+          });
           await navigateToPlayer(first);
           return;
         }
       }
 
+      trackEvent("Profile Steam Lookup Failed", {
+        source: analyticsSource,
+        reason: "not_found",
+      });
       setLookupError("Unable to resolve that Steam profile.");
     } catch {
       if (reqId !== lookupReqRef.current) return;
+      trackEvent("Profile Steam Lookup Failed", {
+        source: analyticsSource,
+        reason: "network",
+      });
       setLookupError("Lookup failed. Try again.");
     } finally {
       if (reqId === lookupReqRef.current) {
@@ -207,7 +225,12 @@ export function ProfileSearch({
     }
   };
 
-  const selectResult = (result: SearchResult) => {
+  const selectResult = (result: SearchResult, index: number | null = null) => {
+    trackEvent("Profile Search Result Selected", {
+      source: analyticsSource,
+      position: index == null ? "default" : index + 1,
+      result_bucket: bucketCount(results.length),
+    });
     void navigateToPlayer(result);
   };
 
@@ -225,12 +248,19 @@ export function ProfileSearch({
     const val = searchValue.trim();
     if (!val) return;
 
+    trackEvent("Profile Search Submitted", {
+      source: analyticsSource,
+      can_external_lookup: canSearchSteam,
+      has_cached_results: results.length > 0,
+      result_bucket: bucketCount(results.length),
+    });
+
     if (
       dropdownOpen &&
       highlightedIndex >= 0 &&
       visibleResults[highlightedIndex]
     ) {
-      selectResult(visibleResults[highlightedIndex]);
+      selectResult(visibleResults[highlightedIndex], highlightedIndex);
       return;
     }
 
@@ -240,7 +270,7 @@ export function ProfileSearch({
     }
 
     if (results.length > 0) {
-      selectResult(results[0]);
+      selectResult(results[0], 0);
       return;
     }
 
@@ -482,25 +512,25 @@ export function ProfileSearch({
             ) : null}
             {visibleResults.length > 0
               ? (
-              visibleResults.map((r, i) => (
-                <div
-                  key={r.steam_id}
-                  className={
-                    "search-result" +
-                    (i === highlightedIndex ? " highlighted" : "")
-                  }
-                  onMouseEnter={() => setHighlightedIndex(i)}
-                  onMouseDown={(e) => {
-                    e.preventDefault();
-                    selectResult(r);
-                  }}
-                >
-                  <span>{r.name || r.custom_url || r.steam_id}</span>
-                  {r.custom_url && (
-                    <span className="result-meta">/{r.custom_url}</span>
-                  )}
-                </div>
-              ))
+                visibleResults.map((r, i) => (
+                  <div
+                    key={r.steam_id}
+                    className={
+                      "search-result" +
+                      (i === highlightedIndex ? " highlighted" : "")
+                    }
+                    onMouseEnter={() => setHighlightedIndex(i)}
+                    onMouseDown={(e) => {
+                      e.preventDefault();
+                      selectResult(r, i);
+                    }}
+                  >
+                    <span>{r.name || r.custom_url || r.steam_id}</span>
+                    {r.custom_url && (
+                      <span className="result-meta">/{r.custom_url}</span>
+                    )}
+                  </div>
+                ))
                 )
               : null}
             {showSteamAction && visibleResults.length > 0 && (

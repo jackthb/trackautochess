@@ -71,14 +71,15 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
     { path: "/" },
     { path: "/items" },
     { path: "/units" },
+    { path: "/synergies" },
     { path: "/classes" },
     { path: "/species" },
     { path: "/relics" },
     { path: "/talents" },
     { path: "/ranks" },
-    { path: "/about" },
-    { path: "/privacy" },
-    // English-only patch notes emit a single unprefixed URL.
+    // English-only static / app pages — emit a single unprefixed URL.
+    { path: "/about", localized: false },
+    { path: "/privacy", localized: false },
     { path: "/patch-notes", localized: false },
     ...getAllItems().map((item) => ({ path: `/items/${item.slug}` })),
     ...getAllUnits().map((unit) => ({ path: `/units/${unit.slug}` })),

@@ -1,6 +1,7 @@
 import "@/styles/globals.css";
 import type { AppProps } from "next/app";
 import dynamic from "next/dynamic";
+import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
@@ -8,7 +9,10 @@ import { BotIdClient } from "botid/client";
 import { BannerAd } from "@/components/BannerAd";
 import { Footer } from "@/components/Footer";
 import { NavBar } from "@/components/NavBar";
+import { shouldShowGlobalAd } from "@/lib/ads";
+import { redactAnalyticsEvent } from "@/lib/analytics";
 import { createSupabaseClient } from "@/lib/supabase";
+import { getPostHog, identify, reset } from "@/lib/posthog";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 const SanityVisualEditing = dynamic(
@@ -29,11 +33,42 @@ interface AppPageProps {
 }
 
 export default function App({ Component, pageProps }: AppProps<AppPageProps>) {
+  const router = useRouter();
   const [supabase, setSupabase] = useState<SupabaseClient | null>(null);
 
   useEffect(() => {
     setSupabase(createSupabaseClient());
+    void getPostHog();
   }, []);
+
+  // Link PostHog identity to the signed-in Steam user, and reset on sign-out
+  // so the next anonymous session doesn't inherit the previous distinct_id.
+  useEffect(() => {
+    if (!supabase) return;
+    const apply = (user: { id: string; user_metadata?: Record<string, unknown> } | null) => {
+      if (!user) {
+        reset();
+        return;
+      }
+      const meta = user.user_metadata ?? {};
+      const steamId = typeof meta.steam_id === "string" ? meta.steam_id : null;
+      const steamName =
+        typeof meta.steam_name === "string"
+          ? meta.steam_name
+          : typeof meta.full_name === "string"
+            ? meta.full_name
+            : null;
+      identify(steamId ?? user.id, {
+        ...(steamId ? { steam_id: steamId } : {}),
+        ...(steamName ? { steam_name: steamName } : {}),
+      });
+    };
+    supabase.auth.getUser().then(({ data }) => apply(data.user));
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (_event, session) => apply(session?.user ?? null),
+    );
+    return () => subscription.unsubscribe();
+  }, [supabase]);
 
   return (
     <>
@@ -42,9 +77,9 @@ export default function App({ Component, pageProps }: AppProps<AppPageProps>) {
       )}
       <NavBar supabase={supabase} />
       <Component {...pageProps} supabase={supabase} />
-      <BannerAd slot="bottom" />
+      {shouldShowGlobalAd(router.pathname) && <BannerAd slot="bottom" />}
       <Footer />
-      <Analytics />
+      <Analytics beforeSend={redactAnalyticsEvent} />
       <SpeedInsights />
       {pageProps?.draftMode && <SanityVisualEditing />}
     </>

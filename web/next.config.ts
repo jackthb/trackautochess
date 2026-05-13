@@ -16,6 +16,26 @@ const nextConfig: NextConfig = {
     // the switcher / hreflang alternates.
     localeDetection: false,
   },
+  // Proxy PostHog ingest through our own origin so ad blockers don't drop
+  // analytics requests targeting eu.i.posthog.com. Matches the rewrites the
+  // PostHog setup wizard installs; lib/posthog.ts sets api_host="/ingest".
+  async rewrites() {
+    return [
+      {
+        source: "/ingest/static/:path*",
+        destination: "https://eu-assets.i.posthog.com/static/:path*",
+      },
+      {
+        source: "/ingest/:path*",
+        destination: "https://eu.i.posthog.com/:path*",
+      },
+      {
+        source: "/ingest/decide",
+        destination: "https://eu.i.posthog.com/decide",
+      },
+    ];
+  },
+  skipTrailingSlashRedirect: true,
 };
 
 export default withBotId(nextConfig);

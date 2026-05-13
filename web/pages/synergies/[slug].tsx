@@ -2,7 +2,7 @@ import type { GetStaticPaths, GetStaticProps } from "next";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { EntityDetail, type RelatedEntity } from "@/components/EntityDetail";
 import { SeoHead } from "@/lib/seo";
-import { SITE_TITLE } from "@/lib/site";
+import { absoluteUrl, SITE_TITLE } from "@/lib/site";
 import {
   getAllSynergies,
   getSynergyBySlug,
@@ -71,6 +71,36 @@ export default function SynergyDetailPage({
 
   const indexLabel = synergy.category === "species" ? t.species : t.classes;
   const indexPath = synergy.category === "species" ? "/species" : "/classes";
+  const pageUrl = absoluteUrl(`/synergies/${synergy.slug}`);
+  const indexUrl = absoluteUrl(indexPath);
+  const structuredData = [
+    {
+      "@context": "https://schema.org",
+      "@type": "WebPage",
+      name: `${synergy.name} synergy guide`,
+      description,
+      ...(pageUrl ? { url: pageUrl } : {}),
+      about: { "@type": "Thing", name: synergy.name },
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        {
+          "@type": "ListItem",
+          position: 1,
+          name: indexLabel,
+          ...(indexUrl ? { item: indexUrl } : {}),
+        },
+        {
+          "@type": "ListItem",
+          position: 2,
+          name: synergy.name,
+          ...(pageUrl ? { item: pageUrl } : {}),
+        },
+      ],
+    },
+  ];
 
   return (
     <>
@@ -79,6 +109,7 @@ export default function SynergyDetailPage({
         description={description}
         path={`/synergies/${synergy.slug}`}
         locale={locale}
+        structuredData={structuredData}
       />
       <EntityDetail
         variant="synergy"

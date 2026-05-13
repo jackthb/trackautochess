@@ -1,5 +1,6 @@
-import Head from "next/head";
 import Link from "next/link";
+import { useEffect } from "react";
+import { useRouter } from "next/router";
 import { createClient } from "@supabase/supabase-js";
 import type { GetServerSideProps } from "next";
 import type { SupabaseClient } from "@supabase/supabase-js";
@@ -26,12 +27,9 @@ import {
   steamProfileUrl,
   type SteamProfile,
 } from "../../lib/steam";
-import {
-  absoluteUrl,
-  getRequestSiteUrl,
-  getSiteUrl,
-  SITE_TITLE,
-} from "@/lib/site";
+import { SeoHead } from "@/lib/seo";
+import { absoluteUrl, getRequestSiteUrl, SITE_TITLE } from "@/lib/site";
+import { analyticsRoute, bucketCount, trackEvent } from "@/lib/analytics";
 import { resolveIconUrl } from "@/lib/icons";
 
 const UNIT_COSTS: Record<string, number> = {};
@@ -62,28 +60,17 @@ interface GamePageProps {
   supabase: SupabaseClient | null;
 }
 
-function formatGameDate(value: string | null | undefined): string | null {
-  if (!value) return null;
-  const date = new Date(value);
-  if (!Number.isFinite(date.getTime())) return null;
-  return date.toLocaleDateString("en-US", {
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-  });
-}
-
-function buildGameDescription(game: Game, displayName: string): string {
-  const parts = [`${displayName}'s Dota Auto Chess match`];
-  if (game.placement) parts.push(`finished #${game.placement}`);
-  if (game.rank) parts.push(`at ${game.rank}`);
-  const playedAt = formatGameDate(game.played_at);
-  if (playedAt) parts.push(`on ${playedAt}`);
-  return `${parts.join(" ")}. View the lineup, synergies, relics, and match table on Track Auto Chess.`;
-}
-
 function normalizeName(value: string | null | undefined): string {
   return String(value || "").trim().toLowerCase();
+}
+
+function originFromUrl(value: string | null): string | null {
+  if (!value) return null;
+  try {
+    return new URL(value).origin;
+  } catch {
+    return null;
+  }
 }
 
 /** Compact row for a player in the match table */
@@ -222,6 +209,7 @@ export default function GamePage({
   highlightName,
   canonicalUrl,
 }: GamePageProps) {
+  const router = useRouter();
   const p = parseInt(game.placement) || 0;
   const pColor = placementColor(p);
   const lineup = parseLineup(game.lineup, UNIT_COSTS);
@@ -232,11 +220,15 @@ export default function GamePage({
   const tier = rankParts[0] || "";
   const rankNum = rankParts[1] || "";
 
-  const displayName = steamProfile.name || String(game.user_id || "Player");
+  const displayName = steamProfile.name || game.user_id;
   const profileUrl = steamProfileUrl(String(game.user_id), steamProfile.customUrl);
   const playerPath = playerProfilePath(String(game.user_id), steamProfile.customUrl);
-  const title = `${game.placement ? `#${game.placement} | ` : ""}${displayName} | ${SITE_TITLE}`;
-  const description = buildGameDescription(game, displayName);
+  const playerCanonicalUrl =
+    absoluteUrl(playerPath, originFromUrl(canonicalUrl)) ?? playerPath;
+  const pageTitle = `${game.placement ? `#${game.placement} | ` : ""}${displayName} | ${SITE_TITLE}`;
+  const description = game.placement
+    ? `${displayName} finished #${game.placement} in a Dota Auto Chess match${game.rank ? ` at ${game.rank}` : ""}.`
+    : `Dota Auto Chess match details for ${displayName}.`;
 
   const tooltipData: TooltipData = {
     unitCosts: UNIT_COSTS,
@@ -263,22 +255,62 @@ export default function GamePage({
     return false;
   };
 
+  const structuredData = [
+    {
+      "@context": "https://schema.org",
+      "@type": "WebPage",
+      name: pageTitle,
+      description,
+      ...(canonicalUrl ? { url: canonicalUrl } : {}),
+      about: { "@type": "Thing", name: "Dota Auto Chess match" },
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        {
+          "@type": "ListItem",
+          position: 1,
+          name: displayName,
+          item: playerCanonicalUrl,
+        },
+        {
+          "@type": "ListItem",
+          position: 2,
+          name: "Match",
+          ...(canonicalUrl ? { item: canonicalUrl } : {}),
+        },
+      ],
+    },
+  ];
+
+  useEffect(() => {
+    trackEvent("Game Detail Viewed", {
+      route: analyticsRoute(router.pathname),
+      placement: game.placement ?? "unknown",
+      has_screenshot: Boolean(game.screenshot),
+      has_lineup: lineup.length > 0,
+      player_bucket: bucketCount(matchGames.length || 1),
+    });
+  }, [
+    game.id,
+    game.placement,
+    game.screenshot,
+    lineup.length,
+    matchGames.length,
+    router.pathname,
+  ]);
+
   return (
     <>
-      <Head>
-        <title>{title}</title>
-        <meta name="description" content={description} />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <meta name="robots" content="index, follow, max-image-preview:large" />
-        <meta property="og:title" content={title} />
-        <meta property="og:description" content={description} />
-        <meta property="og:type" content="website" />
-        <meta name="twitter:card" content="summary" />
-        <meta name="twitter:title" content={title} />
-        <meta name="twitter:description" content={description} />
-        {canonicalUrl && <link rel="canonical" href={canonicalUrl} />}
-        {canonicalUrl && <meta property="og:url" content={canonicalUrl} />}
-      </Head>
+      <SeoHead
+        title={pageTitle}
+        description={description}
+        path={`/games/${game.id}`}
+        localized={false}
+        canonicalUrl={canonicalUrl}
+        structuredData={structuredData}
+      />
 
       <style jsx>{`
         .page {
@@ -761,17 +793,13 @@ export default function GamePage({
 }
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
-  const { id } = context.params!;
-  if (!id || typeof id !== "string") {
-    return { notFound: true };
-  }
-
-  const playerParam = context.query.player;
-  const highlightUserId = typeof playerParam === "string" ? playerParam : null;
-  const requestBaseUrl = getRequestSiteUrl(context.req.headers);
-  const canonicalBaseUrl = getSiteUrl() ?? requestBaseUrl;
+  const rawId = context.params?.id;
+  if (typeof rawId !== "string") return { notFound: true };
+  const id = rawId;
+  const highlightUserId = (context.query.player as string) || null;
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  const baseUrl = getRequestSiteUrl(context.req.headers);
 
   if (!url || !key) return { notFound: true };
 
@@ -843,10 +871,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       matchProfiles,
       highlightUserId,
       highlightName,
-      canonicalUrl: absoluteUrl(
-        `/games/${encodeURIComponent(id)}`,
-        canonicalBaseUrl
-      ),
+      canonicalUrl: absoluteUrl(`/games/${id}`, baseUrl),
     },
   };
 };

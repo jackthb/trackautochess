@@ -2,7 +2,7 @@ import type { GetStaticPaths, GetStaticProps } from "next";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { EntityDetail, type RelatedEntity } from "@/components/EntityDetail";
 import { SeoHead } from "@/lib/seo";
-import { SITE_TITLE } from "@/lib/site";
+import { absoluteUrl, SITE_TITLE } from "@/lib/site";
 import { getAllUnits, getUnitBySlug, type DisplayUnit } from "@/lib/units";
 import {
   getAllSynergies,
@@ -32,6 +32,7 @@ const T = {
       `${n} is a cost ${c} unit in Dota Auto Chess.`,
     activates: (u: string) => `${u} activates this synergy.`,
     cost: (c: number) => `Cost ${c}`,
+    crumbUnits: "Units",
   },
   ru: {
     title: (n: string) => `${n} — гайд по фигуре | ${SITE_TITLE}`,
@@ -39,6 +40,7 @@ const T = {
       `${n} — фигура за ${c} золота в Dota Auto Chess.`,
     activates: (u: string) => `${u} активирует эту синергию.`,
     cost: (c: number) => `Цена ${c}`,
+    crumbUnits: "Фигуры",
   },
 } as const;
 
@@ -75,6 +77,37 @@ export default function UnitDetailPage({
     };
   });
 
+  const pageUrl = absoluteUrl(`/units/${unit.slug}`);
+  const unitsUrl = absoluteUrl("/units");
+  const structuredData = [
+    {
+      "@context": "https://schema.org",
+      "@type": "WebPage",
+      name: `${unit.name} unit guide`,
+      description,
+      ...(pageUrl ? { url: pageUrl } : {}),
+      about: { "@type": "Thing", name: unit.name },
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        {
+          "@type": "ListItem",
+          position: 1,
+          name: t.crumbUnits,
+          ...(unitsUrl ? { item: unitsUrl } : {}),
+        },
+        {
+          "@type": "ListItem",
+          position: 2,
+          name: unit.name,
+          ...(pageUrl ? { item: pageUrl } : {}),
+        },
+      ],
+    },
+  ];
+
   return (
     <>
       <SeoHead
@@ -82,6 +115,7 @@ export default function UnitDetailPage({
         description={description}
         path={`/units/${unit.slug}`}
         locale={locale}
+        structuredData={structuredData}
       />
       <EntityDetail
         variant="unit"

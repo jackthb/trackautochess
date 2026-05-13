@@ -22,6 +22,8 @@ const T = {
     heading: "Units",
     cost: (c: number) => `Cost ${c}`,
     costLabel: COST_LABEL,
+    structuredName: "Dota Auto Chess units",
+    structuredAbout: "Dota Auto Chess units",
   },
   ru: {
     title: `Фигуры | ${SITE_TITLE}`,
@@ -30,11 +32,20 @@ const T = {
     heading: "Фигуры",
     cost: (c: number) => `Цена ${c}`,
     costLabel: { 1: "Цена 1", 2: "Цена 2", 3: "Цена 3", 4: "Цена 4", 5: "Цена 5" },
+    structuredName: "Фигуры Dota Auto Chess",
+    structuredAbout: "Фигуры Dota Auto Chess",
   },
 } as const;
 
 export default function UnitsPage({ data, locale }: UnitsPageProps) {
   const t = T[locale];
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    name: t.structuredName,
+    description: t.description,
+    about: t.structuredAbout,
+  };
   return (
     <>
       <SeoHead
@@ -42,6 +53,7 @@ export default function UnitsPage({ data, locale }: UnitsPageProps) {
         description={t.description}
         path="/units"
         locale={locale}
+        structuredData={structuredData}
       />
       <EntityBrowser
         title={t.heading}

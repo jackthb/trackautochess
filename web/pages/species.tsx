@@ -17,17 +17,28 @@ const T = {
     description:
       "Browse all Dota Auto Chess species traits like Beast and Demon, then open each species detail page.",
     heading: "Species",
+    structuredName: "Dota Auto Chess species",
+    structuredAbout: "Dota Auto Chess species synergies",
   },
   ru: {
     title: `Расы | ${SITE_TITLE}`,
     description:
       "Все расовые синергии Dota Auto Chess (Звери, Демоны и др.) с подробными страницами.",
     heading: "Расы",
+    structuredName: "Расы Dota Auto Chess",
+    structuredAbout: "Расовые синергии Dota Auto Chess",
   },
 } as const;
 
 export default function SpeciesPage({ data, locale }: SpeciesPageProps) {
   const t = T[locale];
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    name: t.structuredName,
+    description: t.description,
+    about: t.structuredAbout,
+  };
   return (
     <>
       <SeoHead
@@ -35,6 +46,7 @@ export default function SpeciesPage({ data, locale }: SpeciesPageProps) {
         description={t.description}
         path="/species"
         locale={locale}
+        structuredData={structuredData}
       />
       <EntityBrowser
         title={t.heading}

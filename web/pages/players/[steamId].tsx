@@ -1,15 +1,9 @@
-import Head from "next/head";
 import { useRouter } from "next/router";
 import { useEffect, useMemo, useState } from "react";
 import { createClient } from "@supabase/supabase-js";
 import { createServerClient } from "@supabase/ssr";
 import type { GetServerSideProps } from "next";
-import {
-  absoluteUrl,
-  getRequestSiteUrl,
-  getSiteUrl,
-  SITE_TITLE,
-} from "@/lib/site";
+import { absoluteUrl, getRequestSiteUrl, SITE_TITLE } from "@/lib/site";
 import unitsData from "@data/units.json";
 import unitsFullData from "@data/units_full.json";
 import synergiesData from "@data/synergies.json";
@@ -23,11 +17,13 @@ import { StatsGrid } from "@dac/shared/StatsGrid";
 import { SeasonHistoryGrid, type SeasonSnapshot } from "@dac/shared/SeasonHistoryGrid";
 import { MmrSparkline, type MmrSnapshot } from "@/components/MmrSparkline";
 import { RankLadder } from "@/components/RankLadder";
+import { SeoHead } from "@/lib/seo";
 import {
   getManualRefreshQuota,
   type ManualRefreshQuota,
 } from "@/lib/manualRefreshQuota";
 import { isAdminSteamId } from "@/lib/admin";
+import { analyticsRoute, bucketCount, trackEvent } from "@/lib/analytics";
 import { createSupabaseClient } from "@/lib/supabase";
 import { fetchAndCacheDrodo } from "@/lib/drodo";
 import {
@@ -139,6 +135,15 @@ function formatLastFetchedAge(value: string | null, nowMs: number | null) {
   return `${Math.floor(hours / 24)}d ${hours % 24}h ago`;
 }
 
+function originFromUrl(value: string | null): string | null {
+  if (!value) return null;
+  try {
+    return new URL(value).origin;
+  } catch {
+    return null;
+  }
+}
+
 export default function PlayerPage({
   steamId,
   steamProfile,
@@ -215,10 +220,44 @@ export default function PlayerPage({
   const canRefresh = isAdmin || isOwnProfile;
   const displayName = steamProfile.name || steamProfile.customUrl || steamId;
   const profileUrl = steamProfileUrl(steamId, steamProfile.customUrl);
+  const playerPath = playerProfilePath(steamId, steamProfile.customUrl);
   const title = `${displayName} | ${SITE_TITLE}`;
   const description = drodo?.mmr
     ? `${displayName} is ${mmrToRank(drodo.mmr)} at ${drodo.mmr.toLocaleString("en-US")} MMR.`
     : `Dota Auto Chess profile for ${displayName}.`;
+  const structuredDataBase = originFromUrl(canonicalUrl);
+  const structuredData = [
+    {
+      "@context": "https://schema.org",
+      "@type": "ProfilePage",
+      name: title,
+      description,
+      ...(canonicalUrl ? { url: canonicalUrl } : {}),
+      about: {
+        "@type": "Person",
+        name: displayName,
+        sameAs: profileUrl,
+      },
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        {
+          "@type": "ListItem",
+          position: 1,
+          name: "Track Auto Chess",
+          ...(structuredDataBase ? { item: `${structuredDataBase}/` } : {}),
+        },
+        {
+          "@type": "ListItem",
+          position: 2,
+          name: displayName,
+          ...(canonicalUrl ? { item: canonicalUrl } : {}),
+        },
+      ],
+    },
+  ];
 
   const totalChickenCount = useMemo(() => {
     const sum = seasons.reduce((acc, s) => acc + (s.chicken_count ?? 0), 0);
@@ -241,6 +280,24 @@ export default function PlayerPage({
     return () => clearInterval(timer);
   }, []);
 
+  useEffect(() => {
+    trackEvent("Player Profile Viewed", {
+      route: analyticsRoute(router.pathname),
+      has_mmr: Boolean(initialDrodo?.mmr),
+      has_games: games.length > 0,
+      game_bucket: bucketCount(games.length),
+      season_bucket: bucketCount(initialSeasons.length),
+      has_leaderboard_rank: Boolean(leaderboardPosition),
+    });
+  }, [
+    games.length,
+    initialDrodo?.mmr,
+    initialSeasons.length,
+    leaderboardPosition,
+    router.pathname,
+    steamId,
+  ]);
+
   const lastFetchedTimestamp = formatLastFetchedTimestamp(drodoLastFetchedAt);
   const lastFetchedAge = formatLastFetchedAge(drodoLastFetchedAt, nowMs);
   const showQuota = canRefresh && !isAdmin;
@@ -252,14 +309,28 @@ export default function PlayerPage({
 
   const handleRefresh = async () => {
     if (!canRefresh) {
+      trackEvent("Player Refresh Blocked", {
+        route: analyticsRoute(router.pathname),
+        reason: "not_allowed",
+      });
       setRefreshError("Sign in with Steam to refresh your own profile.");
       return;
     }
     if (showQuota && manualRefreshQuota.remaining <= 0) {
+      trackEvent("Player Refresh Blocked", {
+        route: analyticsRoute(router.pathname),
+        reason: "quota",
+      });
       setRefreshError("Daily manual refresh limit reached.");
       return;
     }
 
+    trackEvent("Player Refresh Started", {
+      route: analyticsRoute(router.pathname),
+      is_admin: isAdmin,
+      is_own_profile: isOwnProfile,
+      quota_bucket: bucketCount(manualRefreshQuota.remaining),
+    });
     setRefreshError(null);
     setRefreshing(true);
     try {
@@ -277,6 +348,19 @@ export default function PlayerPage({
         setManualRefreshQuota(data.refresh_quota);
       }
       if (!resp.ok) {
+        const reason =
+          resp.status === 404
+            ? "missing"
+            : resp.status === 429
+              ? "quota"
+              : resp.status === 403
+                ? "bot_protection"
+                : "server";
+        trackEvent("Player Refresh Failed", {
+          route: analyticsRoute(router.pathname),
+          reason,
+          status: resp.status,
+        });
         if (resp.status === 404) {
           setDrodoProfileMissing(true);
           setDrodo(null);
@@ -309,7 +393,19 @@ export default function PlayerPage({
         setDrodoLastFetchedAt(data.fetched_at);
       }
       if (Array.isArray(data.seasons)) setSeasons(data.seasons);
+      trackEvent("Player Refresh Succeeded", {
+        route: analyticsRoute(router.pathname),
+        has_mmr: data.mmr != null,
+        has_seasons: Array.isArray(data.seasons),
+        quota_bucket: data?.refresh_quota
+          ? bucketCount(data.refresh_quota.remaining)
+          : "unknown",
+      });
     } catch (error) {
+      trackEvent("Player Refresh Failed", {
+        route: analyticsRoute(router.pathname),
+        reason: "network",
+      });
       const detail =
         error instanceof Error && error.message ? ` (${error.message})` : "";
       setRefreshError(
@@ -357,21 +453,17 @@ export default function PlayerPage({
 
   return (
     <>
-      <Head>
-        <title>{title}</title>
-        <meta name="description" content={description} />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <meta property="og:title" content={title} />
-        <meta property="og:description" content={description} />
-        <meta property="og:type" content="profile" />
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content={title} />
-        <meta name="twitter:description" content={description} />
-        {canonicalUrl && <link rel="canonical" href={canonicalUrl} />}
-        {canonicalUrl && <meta property="og:url" content={canonicalUrl} />}
-        {ogImageUrl && <meta property="og:image" content={ogImageUrl} />}
-        {ogImageUrl && <meta name="twitter:image" content={ogImageUrl} />}
-      </Head>
+      <SeoHead
+        title={title}
+        description={description}
+        path={playerPath}
+        localized={false}
+        type="profile"
+        canonicalUrl={canonicalUrl}
+        imageUrl={ogImageUrl}
+        imageAlt={`${displayName} Auto Chess profile stats`}
+        structuredData={structuredData}
+      />
 
       <style jsx>{`
         .page {
@@ -691,7 +783,17 @@ export default function PlayerPage({
                 )}
               </div>
               {twitchOgUrl && (
-                <a href={twitchOgUrl} target="_blank" rel="noopener noreferrer" style={{ fontSize: 12, color: "var(--text-muted)", letterSpacing: "0.5px" }}>
+                <a
+                  href={twitchOgUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{ fontSize: 12, color: "var(--text-muted)", letterSpacing: "0.5px" }}
+                  onClick={() =>
+                    trackEvent("Twitch Overlay Link Clicked", {
+                      route: analyticsRoute(router.pathname),
+                    })
+                  }
+                >
                   Twitch overlay link ↗
                 </a>
               )}
@@ -789,8 +891,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
           auth: { autoRefreshToken: false, persistSession: false },
         })
       : null;
-  const requestBaseUrl = getRequestSiteUrl(context.req.headers);
-  const canonicalBaseUrl = getSiteUrl() ?? requestBaseUrl;
+  const baseUrl = getRequestSiteUrl(context.req.headers);
   const manualRefreshQuota = getManualRefreshQuota(context.req.headers.cookie);
 
   let viewerSteamId: string | null = null;
@@ -1007,11 +1108,11 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       drodoProfileMissing,
       drodoLastFetchedAt,
       manualRefreshQuota,
-      ogImageUrl: absoluteUrl(`/api/og/player/${steamId}`, canonicalBaseUrl),
-      twitchOgUrl: absoluteUrl(`/api/og/twitch/${steamId}`, canonicalBaseUrl),
+      ogImageUrl: absoluteUrl(`/api/og/player/${steamId}`, baseUrl),
+      twitchOgUrl: absoluteUrl(`/api/og/twitch/${steamId}`, baseUrl),
       canonicalUrl: absoluteUrl(
         playerProfilePath(steamId, steamProfile.customUrl),
-        canonicalBaseUrl
+        baseUrl
       ),
       banned,
     },

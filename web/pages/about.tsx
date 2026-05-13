@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useRouter } from "next/router";
 import { SeoHead } from "@/lib/seo";
 import { SITE_TITLE } from "@/lib/site";
+import { trackEvent } from "@/lib/analytics";
 import { normalizeLocale } from "@/lib/i18n";
 
 const T = {
@@ -96,10 +97,17 @@ export default function AboutPage() {
     setError(null);
 
     if (!message.trim() || message.trim().length < 20) {
+      trackEvent("Support Request Validation Failed", {
+        reason: "message_too_short",
+        has_contact: Boolean(contact.trim()),
+      });
       setError(t.minLengthError);
       return;
     }
 
+    trackEvent("Support Request Submitted", {
+      has_contact: Boolean(contact.trim()),
+    });
     setSending(true);
     try {
       const response = await fetch("/api/support", {
@@ -120,7 +128,14 @@ export default function AboutPage() {
       setMessage("");
       setCompany("");
       setStatus(t.sentStatus);
+      trackEvent("Support Request Sent", {
+        has_contact: Boolean(contact.trim()),
+      });
     } catch (err) {
+      trackEvent("Support Request Failed", {
+        reason: err instanceof Error ? "server" : "unknown",
+        has_contact: Boolean(contact.trim()),
+      });
       setError(err instanceof Error ? err.message : t.sendFailed);
     } finally {
       setSending(false);

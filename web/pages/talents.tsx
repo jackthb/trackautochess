@@ -17,12 +17,16 @@ const T = {
     description:
       "Browse all Dota Auto Chess talent choices by round, compare branch A/B effects, and quickly cross-reference patch notes updates.",
     heading: "Talents",
+    structuredName: "Dota Auto Chess talents",
+    structuredAbout: "Dota Auto Chess talents",
   },
   ru: {
     title: `Таланты | ${SITE_TITLE}`,
     description:
       "Все таланты Dota Auto Chess по раундам — сравнивайте эффекты ветвей A/B и быстро сверяйтесь с патчноутами.",
     heading: "Таланты",
+    structuredName: "Таланты Dota Auto Chess",
+    structuredAbout: "Таланты Dota Auto Chess",
   },
 } as const;
 
@@ -41,9 +45,17 @@ export default function TalentsPage({ supabase }: TalentsPageProps) {
   }
   const tierRows = [...tiers.entries()].sort(([a], [b]) => a - b);
 
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    name: t.structuredName,
+    description: t.description,
+    about: t.structuredAbout,
+  };
+
   return (
     <>
-      <SeoHead title={t.title} description={t.description} path="/talents" locale={locale} />
+      <SeoHead title={t.title} description={t.description} path="/talents" locale={locale} structuredData={structuredData} />
       <div className={browserStyles.page}>
         <div className={browserStyles.container}>
           <h1 className={browserStyles.pageTitle}>{t.heading}</h1>

@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { useRouter } from "next/router";
 import { EntityCard, type EntityCardVariant } from "@/components/EntityCard";
+import { bucketCount, trackEvent } from "@/lib/analytics";
 import { normalizeLocale, type Locale } from "@/lib/i18n";
 import styles from "./EntityBrowser.module.css";
 
@@ -132,6 +133,19 @@ export function EntityBrowser({
   const total = filteredTiered
     ? filteredTiered.reduce((sum, tier) => sum + tier.length, 0)
     : filteredFlat?.length ?? 0;
+
+  useEffect(() => {
+    const trimmed = query.trim();
+    if (!trimmed) return;
+    const timer = setTimeout(() => {
+      trackEvent("Entity Browser Searched", {
+        entity_type: variant,
+        locale,
+        result_bucket: bucketCount(total),
+      });
+    }, 800);
+    return () => clearTimeout(timer);
+  }, [locale, query, total, variant]);
 
   return (
     <div className={styles.page}>

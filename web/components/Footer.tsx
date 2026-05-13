@@ -9,6 +9,17 @@ const T = {
     support: "Support",
     privacy: "Privacy",
     footerAria: "Footer",
+    browseHeading: "Browse",
+    referenceHeading: "Reference",
+    siteHeading: "Site",
+    units: "Units",
+    items: "Items",
+    classes: "Classes",
+    species: "Species",
+    relics: "Relics",
+    talents: "Talents",
+    ranks: "Ranks",
+    patchNotes: "Patch notes",
     disclaimer:
       "Not affiliated with or endorsed by Valve Corporation or Drodo Studio. Dota, Dota 2, and Dota Auto Chess are trademarks of their respective owners. Game data and assets are property of their respective owners and are used here for informational purposes only.",
   },
@@ -17,6 +28,17 @@ const T = {
     support: "Поддержать",
     privacy: "Конфиденциальность",
     footerAria: "Подвал",
+    browseHeading: "Каталог",
+    referenceHeading: "Справка",
+    siteHeading: "Сайт",
+    units: "Фигуры",
+    items: "Предметы",
+    classes: "Классы",
+    species: "Расы",
+    relics: "Реликвии",
+    talents: "Таланты",
+    ranks: "Ранги",
+    patchNotes: "Патчноуты",
     disclaimer:
       "Сайт не связан с Valve Corporation или Drodo Studio и не одобрен ими. Dota, Dota 2 и Dota Auto Chess — товарные знаки соответствующих правообладателей. Игровые данные и ресурсы принадлежат их правообладателям и используются исключительно в информационных целях.",
   },
@@ -38,23 +60,33 @@ export function Footer() {
         .inner {
           max-width: 1200px;
           margin: 0 auto;
-          padding: 22px 32px;
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          gap: 20px;
+          padding: 28px 32px 20px;
         }
-        .brand {
+        .columns {
+          display: grid;
+          grid-template-columns: 1.4fr 1fr 1fr 1fr;
+          gap: 28px;
+          align-items: flex-start;
+        }
+        .brand-col {
           font-family: var(--font-mono);
           font-size: var(--fs-12);
           color: var(--text-muted);
           letter-spacing: var(--tr-body);
         }
-        .links {
+        .col-heading {
+          font-family: var(--font-mono);
+          font-size: var(--fs-11);
+          letter-spacing: var(--tr-upper-wide);
+          text-transform: uppercase;
+          color: var(--text-primary);
+          opacity: 0.7;
+          margin: 0 0 10px;
+        }
+        .col-links {
           display: flex;
-          align-items: center;
-          gap: 18px;
-          flex-wrap: wrap;
+          flex-direction: column;
+          gap: 8px;
         }
         .link {
           font-family: var(--font-mono);
@@ -78,11 +110,18 @@ export function Footer() {
           line-height: 1.5;
           opacity: 0.6;
         }
-        @media (max-width: 620px) {
+        @media (max-width: 720px) {
+          .columns {
+            grid-template-columns: 1fr 1fr;
+            gap: 22px;
+          }
+          .brand-col {
+            grid-column: 1 / -1;
+          }
+        }
+        @media (max-width: 420px) {
           .inner {
-            align-items: flex-start;
-            flex-direction: column;
-            padding: 20px 18px;
+            padding: 22px 18px 16px;
           }
           .disclaimer {
             padding: 0 18px 18px;
@@ -91,17 +130,36 @@ export function Footer() {
       `}</style>
       <footer className="footer">
         <div className="inner">
-          <div className="brand">{SITE_NAME}</div>
-          <nav className="links" aria-label={t.footerAria}>
-            <Link href="/about" className="link">
-              {t.about}
-            </Link>
-            <Link href="/about#support" className="link">
-              {t.support}
-            </Link>
-            <Link href="/privacy" className="link">
-              {t.privacy}
-            </Link>
+          <nav className="columns" aria-label={t.footerAria}>
+            <div className="brand-col">{SITE_NAME}</div>
+            <div>
+              <h3 className="col-heading">{t.browseHeading}</h3>
+              <div className="col-links">
+                <Link href="/units" className="link">{t.units}</Link>
+                <Link href="/items" className="link">{t.items}</Link>
+                <Link href="/classes" className="link">{t.classes}</Link>
+                <Link href="/species" className="link">{t.species}</Link>
+                <Link href="/relics" className="link">{t.relics}</Link>
+              </div>
+            </div>
+            <div>
+              <h3 className="col-heading">{t.referenceHeading}</h3>
+              <div className="col-links">
+                <Link href="/talents" className="link">{t.talents}</Link>
+                <Link href="/ranks" className="link">{t.ranks}</Link>
+                <Link href="/patch-notes" className="link" locale={false}>
+                  {t.patchNotes}
+                </Link>
+              </div>
+            </div>
+            <div>
+              <h3 className="col-heading">{t.siteHeading}</h3>
+              <div className="col-links">
+                <Link href="/about" className="link">{t.about}</Link>
+                <Link href="/about#support" className="link">{t.support}</Link>
+                <Link href="/privacy" className="link">{t.privacy}</Link>
+              </div>
+            </div>
           </nav>
         </div>
         <div className="disclaimer">{t.disclaimer}</div>

@@ -5,16 +5,22 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 First, run the development server:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
 pnpm dev
-# or
-bun dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+
+## Analytics And Monetization
+
+The site uses Vercel Analytics for anonymous pageviews and privacy-scoped
+product events from `lib/analytics.ts`. Product events intentionally avoid raw
+Steam IDs, profile names, search text, tokens, and private admin/dashboard URLs.
+Set `NEXT_PUBLIC_PRODUCT_ANALYTICS=false` to pause custom product events.
+
+Ad slots are controlled by `lib/ads.ts`. Set `NEXT_PUBLIC_ADS_ENABLED=false` to
+pause every slot, or set the `NEXT_PUBLIC_DIRECT_AD_*` variables to run a
+first-party sponsor/job placement without third-party ad scripts. Adsterra keys
+remain optional and unset slots render nothing.
 
 You can start editing the page by modifying `pages/index.tsx`. The page auto-updates as you edit the file.
 

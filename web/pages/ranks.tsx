@@ -127,9 +127,17 @@ export default function RanksPage() {
   const description = t.description;
   const tierGroups = buildTierGroups();
 
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    name: title,
+    description,
+    about: { "@type": "Thing", name: "Dota Auto Chess MMR ranks" },
+  };
+
   return (
     <>
-      <SeoHead title={title} description={description} path="/ranks" locale={locale} />
+      <SeoHead title={title} description={description} path="/ranks" locale={locale} structuredData={structuredData} />
 
       <style jsx>{`
         .lead {

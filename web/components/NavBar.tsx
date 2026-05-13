@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import type { SupabaseClient, User } from "@supabase/supabase-js";
 import { SITE_NAME } from "@/lib/site";
 import { isAdminSteamId } from "@/lib/admin";
+import { trackEvent } from "@/lib/analytics";
 import { normalizeLocale } from "@/lib/i18n";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import styles from "./NavBar.module.css";
@@ -128,6 +129,7 @@ export function NavBar({ supabase }: NavBarProps) {
 
   const handleLogout = async () => {
     if (!supabase) return;
+    trackEvent("Steam Sign Out Clicked", { source: "nav" });
     await supabase.auth.signOut();
     setUser(null);
     router.replace("/");
@@ -223,7 +225,13 @@ export function NavBar({ supabase }: NavBarProps) {
                 </button>
               </>
             ) : (
-              <a href="/api/auth/steam" className={styles.navSignin}>
+              <a
+                href="/api/auth/steam"
+                className={styles.navSignin}
+                onClick={() =>
+                  trackEvent("Steam Sign In Clicked", { source: "nav" })
+                }
+              >
                 {t.signIn}
               </a>
             )
