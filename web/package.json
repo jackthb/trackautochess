@@ -7,7 +7,8 @@
     "dev": "next dev",
     "prebuild": "node ./scripts/sync-icons.mjs",
     "build": "next build --webpack",
-    "start": "next start"
+    "start": "next start",
+    "test:e2e": "pnpm run build && playwright test"
   },
   "dependencies": {
     "@dac/shared": "file:../shared",
@@ -30,6 +31,7 @@
     "styled-jsx": "^5.1.7"
   },
   "devDependencies": {
+    "@playwright/test": "^1.60.0",
     "@types/cookie": "^0.6.0",
     "@types/node": "^20",
     "@types/react": "^19",

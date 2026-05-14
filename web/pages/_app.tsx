@@ -5,6 +5,7 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
+import { BotIdClient } from "botid/client";
 import { BannerAd } from "@/components/BannerAd";
 import { CookieConsentBanner } from "@/components/CookieConsentBanner";
 import { Footer } from "@/components/Footer";
@@ -16,11 +17,6 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 
 const SanityVisualEditing = dynamic(
   () => import("@/components/SanityVisualEditing"),
-  { ssr: false }
-);
-
-const BotIdClient = dynamic(
-  () => import("botid/client").then((mod) => mod.BotIdClient),
   { ssr: false }
 );
 
