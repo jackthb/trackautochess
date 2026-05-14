@@ -573,7 +573,11 @@ VK_OEM_5 = 0xDC  # "\" key — most users have this bound to toggleconsole
 # Typing the commands directly into the console sidesteps that entirely.
 DUMP_COMMAND = (
     "dumpstringtable CustomNetTable_ranking_top_table cl verbose;"
-    "dumpstringtable CustomNetTable_match_history_table cl verbose;"
+    # Source 2 truncates stringtable names at 32 chars, so
+    # "CustomNetTable_match_history_table" (34) is stored as
+    # "CustomNetTable_match_history_tab" (32). Querying the full name
+    # silently fails with a Usage: hint.
+    "dumpstringtable CustomNetTable_match_history_tab cl verbose;"
     "dumpstringtable CustomNetTable_dac_table cl verbose;"
     "dumpstringtable CustomNetTable_player_id_table cl verbose;"
     "dumpstringtable CustomNetTable_player_info_table cl verbose;"
