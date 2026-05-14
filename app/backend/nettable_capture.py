@@ -726,9 +726,15 @@ GAME_IN_PROGRESS_RE = "DOTA_GAMERULES_STATE_GAME_IN_PROGRESS"
 POST_GAME_RE = "DOTA_GAMERULES_STATE_POST_GAME"
 STRINGTABLE_MARKER = "[stringtables]"
 
-# Wait this long after GAME_IN_PROGRESS before sending dump-key. Gives the
-# CustomNetTables time to populate.
+# Wait this long after GAME_IN_PROGRESS before sending the first capture.
+# Gives the CustomNetTables time to populate.
 DUMP_DELAY_SEC = 30.0
+
+# Recurring capture cadence while a game is in progress. DAC rounds last
+# 30-45s; sampling at 20s guarantees at least one capture per round.
+# Row-level dedupe means unchanged tables (esp. ranking_top) don't
+# re-upload between rounds.
+CAPTURE_INTERVAL_SEC = 20.0
 
 # Wait this long after POST_GAME before sending dump-key again. The `end_board`
 # table is populated server-side at POST_GAME entry; small buffer for the
@@ -770,10 +776,10 @@ class NetTableCapture:
         self._file = None  # type: ignore
         self._inode_size = 0  # last-seen size, used to detect truncation
 
-        # Per-game dump-key debounce
-        self._dump_armed = False  # set when in-progress seen, cleared after send
+        # Recurring per-round capture loop state. _dump_armed is the
+        # "loop is running" flag; cleared on POST_GAME / log rotation.
+        self._dump_armed = False
         self._dump_timer: threading.Timer | None = None
-        self._dump_sent_for_game = False
         self._dump_sent_for_postgame = False
 
         # Dump block accumulator
@@ -1011,15 +1017,8 @@ class NetTableCapture:
 
     def _reset_per_log_state(self) -> None:
         """Drop game-scoped state when the log file is rewritten."""
-        self._dump_armed = False
-        self._dump_sent_for_game = False
+        self._stop_capture_loop()
         self._dump_sent_for_postgame = False
-        if self._dump_timer:
-            try:
-                self._dump_timer.cancel()
-            except Exception:
-                pass
-            self._dump_timer = None
         self._dump_active = False
         self._dump_seen_tables = set()
         self._dump_last_line_ts = 0.0
@@ -1027,13 +1026,15 @@ class NetTableCapture:
     # ── Line handlers ──────────────────────────────────────────────────────
 
     def _handle_line(self, line: str) -> None:
-        # dump-key trigger #1: mid-game (once per game, ~30s after GAME_IN_PROGRESS).
-        if not self._dump_sent_for_game and GAME_IN_PROGRESS_RE in line:
+        # Mid-game: start the recurring capture loop on GAME_IN_PROGRESS.
+        if not self._dump_armed and GAME_IN_PROGRESS_RE in line:
             self._schedule_dump()
             return
 
-        # dump-key trigger #2: post-game (captures end_board). Once per game.
+        # Post-game: stop the recurring loop and fire one final capture
+        # to grab the end_board state.
         if not self._dump_sent_for_postgame and POST_GAME_RE in line:
+            self._stop_capture_loop()
             self._schedule_postgame_dump()
             return
 
@@ -1042,25 +1043,49 @@ class NetTableCapture:
             self._note_dump_line(line)
 
     def _schedule_dump(self) -> None:
-        if self._dump_armed or self._dump_sent_for_game:
+        """Start the recurring per-round capture loop.
+
+        First capture fires DUMP_DELAY_SEC after GAME_IN_PROGRESS (gives
+        the server-side stringtables time to settle), then every
+        CAPTURE_INTERVAL_SEC until POST_GAME stops the loop or the log
+        rotates. Row-level dedupe in _do_ingest means static tables
+        (ranking_top, settings) only upload once.
+        """
+        if self._dump_armed:
             return
         self._dump_armed = True
-        log.info("nettable: GAME_IN_PROGRESS detected — scheduling dump-key in %.0fs",
-                 DUMP_DELAY_SEC)
-        t = threading.Timer(DUMP_DELAY_SEC, self._do_send_dump)
+        log.info(
+            "nettable: GAME_IN_PROGRESS — first capture in %.0fs, then every %.0fs",
+            DUMP_DELAY_SEC, CAPTURE_INTERVAL_SEC,
+        )
+        self._schedule_next_capture(DUMP_DELAY_SEC)
+
+    def _schedule_next_capture(self, delay: float) -> None:
+        if not self._dump_armed:
+            return
+        t = threading.Timer(delay, self._do_send_dump)
         t.daemon = True
         t.start()
         self._dump_timer = t
 
     def _do_send_dump(self) -> None:
-        if self._dump_sent_for_game:
-            return
+        if not self._dump_armed:
+            return  # loop was stopped (POST_GAME or log rotation)
         ok = send_console_command(DUMP_COMMAND)
+        if not ok:
+            log.info("nettable: console-type send failed — will retry next interval")
+        # Schedule the next tick regardless of whether this one succeeded;
+        # a transient failure shouldn't kill the loop.
+        self._schedule_next_capture(CAPTURE_INTERVAL_SEC)
+
+    def _stop_capture_loop(self) -> None:
         self._dump_armed = False
-        if ok:
-            self._dump_sent_for_game = True
-        else:
-            log.info("nettable: console-type send failed — leaving disarmed for retry")
+        if self._dump_timer:
+            try:
+                self._dump_timer.cancel()
+            except Exception:
+                pass
+            self._dump_timer = None
 
     def _schedule_postgame_dump(self) -> None:
         if self._dump_sent_for_postgame:
