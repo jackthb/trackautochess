@@ -7,9 +7,9 @@ days. This script finds those duplicates and keeps a single canonical row per
 match.
 
 Usage:
-    python tools/dedupe_games.py              # dry run, print what would be deleted
-    python tools/dedupe_games.py --apply      # actually delete duplicates
-    python tools/dedupe_games.py --user 76561... --apply
+    python scripts/dedupe_games.py              # dry run, print what would be deleted
+    python scripts/dedupe_games.py --apply      # actually delete duplicates
+    python scripts/dedupe_games.py --user 76561... --apply
 
 Reads Supabase credentials from ``~/.dac/config.json`` (``supabase_url`` and
 ``supabase_key``). The anon key works as long as the project's RLS policies

@@ -3,8 +3,8 @@
 Extract DAC VScripts from the Steam workshop VPK and diff against the last known version.
 
 Usage:
-    python tools/extract_vscripts.py           # extract + print diff
-    python tools/extract_vscripts.py --save    # extract + save diff to data/vscript_diffs/
+    python scripts/extract_vscripts.py           # extract + print diff
+    python scripts/extract_vscripts.py --save    # extract + save diff to data/vscript_diffs/
 """
 
 import argparse

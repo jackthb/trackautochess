@@ -5,7 +5,7 @@ pipeline on screenshots. Imports directly from app/backend/.
 
 Usage:
     cd dac-tools
-    python tools/calibration.py [--port 8080]
+    python scripts/calibration.py [--port 8080]
 """
 
 import argparse

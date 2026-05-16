@@ -7,7 +7,7 @@ import { createRequire } from "node:module";
 const mode = process.argv[2];
 
 if (!mode || !["dev", "start"].includes(mode)) {
-  console.error("Usage: node tools/run-desktop.mjs <dev|start>");
+  console.error("Usage: node scripts/run-desktop.mjs <dev|start>");
   process.exit(1);
 }
 
