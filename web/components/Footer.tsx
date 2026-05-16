@@ -1,53 +1,30 @@
 import Link from "next/link";
-import { useRouter } from "next/router";
 import { SITE_NAME } from "@/lib/site";
-import { normalizeLocale } from "@/lib/i18n";
 
-const T = {
-  en: {
-    about: "About",
-    support: "Support",
-    privacy: "Privacy",
-    footerAria: "Footer",
-    browseHeading: "Browse",
-    referenceHeading: "Reference",
-    siteHeading: "Site",
-    units: "Units",
-    items: "Items",
-    classes: "Classes",
-    species: "Species",
-    relics: "Relics",
-    talents: "Talents",
-    ranks: "Ranks",
-    patchNotes: "Patch notes",
-    disclaimer:
-      "Not affiliated with or endorsed by Valve Corporation or Drodo Studio. Dota, Dota 2, and Dota Auto Chess are trademarks of their respective owners. Game data and assets are property of their respective owners and are used here for informational purposes only.",
-  },
-  ru: {
-    about: "О сайте",
-    support: "Поддержать",
-    privacy: "Конфиденциальность",
-    footerAria: "Подвал",
-    browseHeading: "Каталог",
-    referenceHeading: "Справка",
-    siteHeading: "Сайт",
-    units: "Фигуры",
-    items: "Предметы",
-    classes: "Классы",
-    species: "Расы",
-    relics: "Реликвии",
-    talents: "Таланты",
-    ranks: "Ранги",
-    patchNotes: "Патчноуты",
-    disclaimer:
-      "Сайт не связан с Valve Corporation или Drodo Studio и не одобрен ими. Dota, Dota 2 и Dota Auto Chess — товарные знаки соответствующих правообладателей. Игровые данные и ресурсы принадлежат их правообладателям и используются исключительно в информационных целях.",
-  },
-} as const;
+// UI chrome strings stay English across locales for now. Localized chrome
+// will return through the same Sanity-driven pipeline as entity names once
+// per-locale UI translations exist.
+const t = {
+  about: "About",
+  support: "Support",
+  privacy: "Privacy",
+  footerAria: "Footer",
+  browseHeading: "Browse",
+  referenceHeading: "Reference",
+  siteHeading: "Site",
+  units: "Units",
+  items: "Items",
+  classes: "Classes",
+  species: "Species",
+  relics: "Relics",
+  talents: "Talents",
+  ranks: "Ranks",
+  patchNotes: "Patch notes",
+  disclaimer:
+    "Not affiliated with or endorsed by Valve Corporation or Drodo Studio. Dota, Dota 2, and Dota Auto Chess are trademarks of their respective owners. Game data and assets are property of their respective owners and are used here for informational purposes only.",
+};
 
 export function Footer() {
-  const router = useRouter();
-  const locale = normalizeLocale(router.locale ?? router.defaultLocale ?? undefined);
-  const t = T[locale];
   return (
     <>
       <style jsx>{`
@@ -147,7 +124,7 @@ export function Footer() {
               <div className="col-links">
                 <Link href="/talents" className="link">{t.talents}</Link>
                 <Link href="/ranks" className="link">{t.ranks}</Link>
-                <Link href="/patch-notes" className="link" locale={false}>
+                <Link href="/patch-notes" className="link">
                   {t.patchNotes}
                 </Link>
               </div>

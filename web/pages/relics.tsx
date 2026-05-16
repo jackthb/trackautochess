@@ -11,27 +11,16 @@ interface RelicsPageProps {
   data: BrowsableEntity[];
 }
 
-const T = {
-  en: {
-    title: `Relics | ${SITE_TITLE}`,
-    description:
-      "Browse every Dota Auto Chess relic, search recent additions, and open dedicated relic pages on Track Auto Chess.",
-    heading: "Relics",
-    structuredName: "Dota Auto Chess relics",
-    structuredAbout: "Dota Auto Chess relics",
-  },
-  ru: {
-    title: `Реликвии | ${SITE_TITLE}`,
-    description:
-      "Просматривайте все реликвии Dota Auto Chess и открывайте отдельные страницы на Track Auto Chess.",
-    heading: "Реликвии",
-    structuredName: "Реликвии Dota Auto Chess",
-    structuredAbout: "Реликвии Dota Auto Chess",
-  },
-} as const;
+const t = {
+  title: `Relics | ${SITE_TITLE}`,
+  description:
+    "Browse every Dota Auto Chess relic, search recent additions, and open dedicated relic pages on Track Auto Chess.",
+  heading: "Relics",
+  structuredName: "Dota Auto Chess relics",
+  structuredAbout: "Dota Auto Chess relics",
+};
 
 export default function RelicsPage({ data, locale }: RelicsPageProps) {
-  const t = T[locale];
   const structuredData = {
     "@context": "https://schema.org",
     "@type": "CollectionPage",

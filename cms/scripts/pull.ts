@@ -66,6 +66,46 @@ function statBlock(s: any) {
 const ICON_PROJECTION = `"icon_url": icon.asset->url,
    "icon_dimensions": icon.asset->metadata.dimensions{width, height}`
 
+// GROQ projection that coalesces editor `nameOverrides.*` over the VPK-fed
+// `names.*` per locale. The returned `names` object has all locales the
+// schema declares; falsy slots stay falsy so the web layer's pickLocalized
+// fallback still kicks in.
+const NAMES_PROJECTION = `"names": {
+    "en": coalesce(nameOverrides.en, names.en),
+    "lore": coalesce(nameOverrides.lore, names.lore),
+    "ko": coalesce(nameOverrides.ko, names.ko),
+    "ru": coalesce(nameOverrides.ru, names.ru),
+    "zhCn": coalesce(nameOverrides.zhCn, names.zhCn),
+    "zhTw": coalesce(nameOverrides.zhTw, names.zhTw)
+  }`
+
+// Talent uses `titles`/`titleOverrides` instead of `names`/`nameOverrides`.
+const TITLES_PROJECTION = `"titles": {
+    "en": coalesce(titleOverrides.en, titles.en),
+    "lore": coalesce(titleOverrides.lore, titles.lore),
+    "ko": coalesce(titleOverrides.ko, titles.ko),
+    "ru": coalesce(titleOverrides.ru, titles.ru),
+    "zhCn": coalesce(titleOverrides.zhCn, titles.zhCn),
+    "zhTw": coalesce(titleOverrides.zhTw, titles.zhTw)
+  }`
+
+// Inverse of cms/scripts/migrate.ts:localizedNames — converts Sanity's
+// localizedNames object shape ({zhCn, zhTw, ...}) back to the JSON i18n
+// shape ({"zh-cn", "zh-tw", ...}) that the web/data layer reads.
+function localizedNamesToJson(
+  obj: Record<string, string | null | undefined> | null | undefined,
+): Record<string, string> | undefined {
+  if (!obj) return undefined
+  const map: Record<string, string> = {}
+  if (obj.en) map.en = obj.en
+  if (obj.lore) map.lore = obj.lore
+  if (obj.ko) map.ko = obj.ko
+  if (obj.ru) map.ru = obj.ru
+  if (obj.zhCn) map['zh-cn'] = obj.zhCn
+  if (obj.zhTw) map['zh-tw'] = obj.zhTw
+  return Object.keys(map).length > 0 ? map : undefined
+}
+
 function iconFields(r: any): {icon_url: string | null; icon_dimensions: {width: number; height: number} | null} {
   return {
     icon_url: r.icon_url ?? null,
@@ -78,13 +118,15 @@ async function pullSynergies() {
   const rows = await client.fetch<any[]>(
     `*[_type == "synergy"] | order(gameId asc){
       gameId, name, description, descriptionHtml, lore, notes, tiers, abilitySpecial,
+      ${NAMES_PROJECTION},
       ${ICON_PROJECTION}
     }`,
   )
   const i18n = readExistingI18n('synergies.json')
   const out: Record<string, any> = {}
   for (const r of rows) {
-    out[r.gameId] = applyI18n(
+    const sanityNames = localizedNamesToJson(r.names)
+    const merged = applyI18n(
       {
         name: r.name,
         description: r.description ?? '',
@@ -97,6 +139,11 @@ async function pullSynergies() {
       },
       i18n.get(r.gameId),
     )
+    // `names` is now Sanity-authoritative. Override whatever applyI18n
+    // re-attached from existing JSON, since editor overrides only apply
+    // through Sanity's nameOverrides field.
+    if (sanityNames) merged.names = sanityNames
+    out[r.gameId] = merged
   }
   writeJson('synergies.json', out)
 }
@@ -104,24 +151,16 @@ async function pullSynergies() {
 async function pullUnits() {
   const rows = await client.fetch<any[]>(
     `*[_type == "unit"] | order(name asc){
-      name, gameId, cost, pool, attackType, names, abilities, stats,
+      name, gameId, cost, pool, attackType, abilities, stats,
       "synergies": synergies[]->name,
+      ${NAMES_PROJECTION},
       ${ICON_PROJECTION}
     }`,
   )
   const simple: Record<string, any> = {}
   const full: Record<string, any> = {}
   for (const r of rows) {
-    const localizedNames = r.names
-      ? {
-          en: r.names.en,
-          lore: r.names.lore,
-          ko: r.names.ko,
-          ru: r.names.ru,
-          'zh-cn': r.names.zhCn,
-          'zh-tw': r.names.zhTw,
-        }
-      : undefined
+    const localizedNames = localizedNamesToJson(r.names)
     const icon = iconFields(r)
     simple[r.name] = {
       cost: r.cost,
@@ -223,6 +262,7 @@ async function pullItems() {
   const rows = await client.fetch<any[]>(
     `*[_type == "item"] | order(gameId asc){
       gameId, name, description, lore, quality, texture, tier, inCuratedSet, iconFile, notes,
+      ${NAMES_PROJECTION},
       ${ICON_PROJECTION}
     }`,
   )
@@ -231,7 +271,8 @@ async function pullItems() {
   const curated: Record<string, any> = {}
   for (const r of rows) {
     const icon = iconFields(r)
-    full[r.gameId] = applyI18n(
+    const sanityNames = localizedNamesToJson(r.names)
+    const merged = applyI18n(
       {
         name: r.name,
         description: r.description ?? '',
@@ -243,6 +284,8 @@ async function pullItems() {
       },
       i18n.get(r.gameId),
     )
+    if (sanityNames) merged.names = sanityNames
+    full[r.gameId] = merged
     if (r.inCuratedSet) {
       curated[r.name] = {
         tier: r.tier,
@@ -268,12 +311,14 @@ async function pullRelics() {
   const rows = await client.fetch<any[]>(
     `*[_type == "relic"] | order(gameId asc){
       gameId, name, description, lore,
+      ${NAMES_PROJECTION},
       ${ICON_PROJECTION}
     }`,
   )
   const i18n = readExistingI18n('relics.json', 'relics')
   const inner: Record<string, any> = {}
   for (const r of rows) {
+    const sanityNames = localizedNamesToJson(r.names)
     const merged = applyI18n(
       {
         name: r.name,
@@ -283,6 +328,7 @@ async function pullRelics() {
       },
       i18n.get(r.gameId),
     )
+    if (sanityNames) merged.names = sanityNames
     if (merged.lore_i18n) {
       const cleaned: Record<string, string> = {}
       for (const [lang, v] of Object.entries(merged.lore_i18n)) {
@@ -298,22 +344,32 @@ async function pullRelics() {
 
 async function pullTalents() {
   const rows = await client.fetch<any[]>(
-    `*[_type == "talent"] | order(slot asc){slot, title, description}`,
+    `*[_type == "talent"] | order(slot asc){
+      slot, title, description,
+      ${TITLES_PROJECTION}
+    }`,
   )
   const out: Record<string, any> = {}
-  for (const r of rows) out[r.slot] = {title: r.title, description: r.description ?? ''}
+  for (const r of rows) {
+    const titles = localizedNamesToJson(r.titles)
+    const entry: Record<string, any> = {title: r.title, description: r.description ?? ''}
+    if (titles) entry.titles = titles
+    out[r.slot] = entry
+  }
   writeJson('talents.json', out)
 }
 
 async function pullAbilities() {
   const rows = await client.fetch<any[]>(
     `*[_type == "ability"] | order(gameId asc){
-      gameId, name, description, cooldown, manaCost, castRange, abilitySpecial
+      gameId, name, description, cooldown, manaCost, castRange, abilitySpecial,
+      ${NAMES_PROJECTION}
     }`,
   )
   const out: Record<string, any> = {}
   for (const r of rows) {
-    out[r.gameId] = {
+    const names = localizedNamesToJson(r.names)
+    const entry: Record<string, any> = {
       name: r.name ?? '',
       description: r.description ?? '',
       cooldown: r.cooldown ?? '',
@@ -321,6 +377,8 @@ async function pullAbilities() {
       cast_range: r.castRange ?? '',
       ability_special: r.abilitySpecial ? JSON.parse(r.abilitySpecial) : {},
     }
+    if (names) entry.names = names
+    out[r.gameId] = entry
   }
   writeJson('abilities.json', out)
 }
@@ -345,7 +403,7 @@ async function pullGameMode() {
 async function pullPatchNotes() {
   const rows = await client.fetch<any[]>(
     `*[_type == "patchNote"] | order(date desc){
-      "slug": slug.current, date, title, source, flavor, sections
+      "slug": slug.current, date, title, titles, source, flavor, sections
     }`,
   )
   // Per-file outputs
@@ -355,6 +413,8 @@ async function pullPatchNotes() {
       title: r.title,
       source: r.source ?? '',
     }
+    const titles = localizedNamesToJson(r.titles)
+    if (titles) out.titles = titles
     if (r.flavor) out.flavor = r.flavor
     out.sections = (r.sections || []).map((s: any) => ({
       heading: s.heading,
@@ -368,7 +428,12 @@ async function pullPatchNotes() {
   }
   // Index
   writeJson('patch_notes/index.json', {
-    patches: rows.map((r) => ({date: r.date, title: r.title, slug: r.slug})),
+    patches: rows.map((r) => ({
+      date: r.date,
+      title: r.title,
+      slug: r.slug,
+      titles: localizedNamesToJson(r.titles),
+    })),
   })
 }
 

@@ -25,26 +25,15 @@ interface SynergyDetailPageProps {
   supabase: SupabaseClient | null;
 }
 
-const T = {
-  en: {
-    title: (n: string) => `${n} Synergy Guide | ${SITE_TITLE}`,
-    description: (n: string) => `See what ${n} does in Dota Auto Chess.`,
-    species: "Species",
-    classes: "Classes",
-    cost: (c: number) => `Cost ${c}`,
-    nUnits: (n: string) => `${n} Units`,
-    moreSynergies: "More Synergies",
-  },
-  ru: {
-    title: (n: string) => `${n} — гайд по синергии | ${SITE_TITLE}`,
-    description: (n: string) => `Что делает синергия ${n} в Dota Auto Chess.`,
-    species: "Расы",
-    classes: "Классы",
-    cost: (c: number) => `Цена ${c}`,
-    nUnits: (n: string) => `Фигуры ${n}`,
-    moreSynergies: "Ещё синергии",
-  },
-} as const;
+const t = {
+  title: (n: string) => `${n} Synergy Guide | ${SITE_TITLE}`,
+  description: (n: string) => `See what ${n} does in Dota Auto Chess.`,
+  species: "Species",
+  classes: "Classes",
+  cost: (c: number) => `Cost ${c}`,
+  nUnits: (n: string) => `${n} Units`,
+  moreSynergies: "More Synergies",
+};
 
 export default function SynergyDetailPage({
   synergy,
@@ -52,7 +41,6 @@ export default function SynergyDetailPage({
   matchingUnits,
   locale,
 }: SynergyDetailPageProps) {
-  const t = T[locale];
   const description = t.description(synergy.name);
   const translateSyn = getSynergyNameTranslator(locale);
   const moreSynergies: RelatedEntity[] = related.map((s) => ({

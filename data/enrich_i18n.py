@@ -30,7 +30,7 @@ from extract_vpk import (
     unescape_kv,
 )
 
-LOCALES = ('en', 'ru')
+LOCALES = ('en', 'ru', 'zh-cn')
 PLACEHOLDER = re.compile(r'%([A-Za-z_][A-Za-z0-9_]*)%')
 
 # Most relic _Lore entries are placeholder "From Relic Box" / "From: Relicbox"

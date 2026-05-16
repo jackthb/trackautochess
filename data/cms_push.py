@@ -191,6 +191,7 @@ def _build_synergy_docs(raw: dict[str, Any]) -> tuple[list[dict], dict[str, str]
             '_type': 'synergy',
             'gameId': game_id,
             'name': s.get('name', ''),
+            'names': _localized(s.get('names')),
             'description': s.get('description', ''),
             'descriptionHtml': s.get('description_html', ''),
             'lore': s.get('lore', ''),
@@ -244,6 +245,7 @@ def _build_item_docs(full: dict[str, Any], curated: dict[str, Any]) -> list[dict
             '_type': 'item',
             'gameId': game_id,
             'name': it.get('name', ''),
+            'names': _localized(it.get('names')),
             'description': it.get('description', ''),
             'lore': it.get('lore', ''),
             'quality': it.get('quality', ''),
@@ -265,6 +267,7 @@ def _build_relic_docs(inner: dict[str, Any]) -> list[dict]:
             '_type': 'relic',
             'gameId': game_id,
             'name': r.get('name', ''),
+            'names': _localized(r.get('names')),
             'description': r.get('description', ''),
             'lore': r.get('lore', ''),
         }
@@ -279,6 +282,7 @@ def _build_talent_docs(raw: dict[str, Any]) -> list[dict]:
             '_type': 'talent',
             'slot': slot,
             'title': t.get('title', ''),
+            'titles': _localized(t.get('titles') or t.get('names')),
             'description': t.get('description', ''),
         }
         for slot, t in raw.items()
@@ -292,6 +296,7 @@ def _build_ability_docs(raw: dict[str, Any]) -> list[dict]:
             '_type': 'ability',
             'gameId': game_id,
             'name': a.get('name', ''),
+            'names': _localized(a.get('names')),
             'description': a.get('description', ''),
             'cooldown': a.get('cooldown', ''),
             'manaCost': a.get('mana_cost', ''),

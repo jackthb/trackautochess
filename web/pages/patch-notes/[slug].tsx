@@ -2,6 +2,7 @@ import type React from "react";
 import fs from "fs";
 import path from "path";
 import Link from "next/link";
+import { useRouter } from "next/router";
 import type { GetStaticPaths, GetStaticProps } from "next";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import patchIndex from "@data/patch_notes/index.json";
@@ -10,6 +11,7 @@ import { getItemSlugByName, getItemBySlug, iconUrl } from "@/lib/items";
 import { getRelicSlugByName, getRelicBySlug } from "@/lib/relics";
 import { getTalentByName } from "@/lib/talents";
 import { absoluteUrl, SITE_NAME, SITE_TITLE } from "@/lib/site";
+import { normalizeLocale, pickLocalized } from "@/lib/i18n";
 import { loadDraftPatchNote } from "@/lib/sanity/draftLoaders";
 
 type EntryKind =
@@ -35,6 +37,7 @@ interface PatchSection {
 interface Patch {
   date: string;
   title: string;
+  titles?: Record<string, string> | null;
   source?: string;
   workshop_url?: string;
   flavor?: string;
@@ -158,7 +161,12 @@ export default function PatchDetailPage({
   slug,
   supabase,
 }: PatchPageProps) {
-  const title = `${patch.title} | Patch Notes | ${SITE_TITLE}`;
+  void supabase;
+  const router = useRouter();
+  const locale = normalizeLocale(router.locale ?? router.defaultLocale ?? undefined);
+  const localizedTitle =
+    pickLocalized(patch.titles ?? undefined, locale) || patch.title;
+  const title = `${localizedTitle} | Patch Notes | ${SITE_TITLE}`;
   const description = buildPatchDescription(patch);
   const pagePath = `/patch-notes/${slug}`;
   const pageUrl = absoluteUrl(pagePath);
@@ -167,7 +175,7 @@ export default function PatchDetailPage({
     {
       "@context": "https://schema.org",
       "@type": "Article",
-      headline: patch.title,
+      headline: localizedTitle,
       description,
       datePublished: patch.date,
       dateModified: patch.date,
@@ -190,7 +198,7 @@ export default function PatchDetailPage({
         {
           "@type": "ListItem",
           position: 2,
-          name: patch.title,
+          name: localizedTitle,
           ...(pageUrl ? { item: pageUrl } : {}),
         },
       ],
@@ -211,10 +219,10 @@ export default function PatchDetailPage({
         title={title}
         description={description}
         path={pagePath}
+        locale={locale}
         type="article"
         publishedTime={patch.date}
         structuredData={structuredData}
-        localized={false}
       />
 
       <style jsx>{`
@@ -436,10 +444,10 @@ export default function PatchDetailPage({
             <span>/</span>
             <Link href="/patch-notes">Patch Notes</Link>
             <span>/</span>
-            <span>{patch.title}</span>
+            <span>{localizedTitle}</span>
           </nav>
           <div className="date">{patch.date}</div>
-          <h1 className="title">{patch.title}</h1>
+          <h1 className="title">{localizedTitle}</h1>
 
           {(patch.source || patch.workshop_url) && (
             <div className="link-row">

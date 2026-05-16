@@ -1,15 +1,18 @@
 import { Fragment } from "react";
 import Link from "next/link";
+import { useRouter } from "next/router";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import patchIndex from "@data/patch_notes/index.json";
 import { SeoHead } from "@/lib/seo";
 import { SITE_TITLE } from "@/lib/site";
+import { normalizeLocale, pickLocalized } from "@/lib/i18n";
 import styles from "./patch-notes.module.css";
 
 interface IndexPatch {
   date: string;
   title: string;
   slug: string;
+  titles?: Record<string, string> | null;
 }
 
 interface PatchNotesPageProps {
@@ -42,6 +45,9 @@ function formatDate(iso: string): { month: string; day: string; year: string } {
 }
 
 export default function PatchNotesPage({ supabase }: PatchNotesPageProps) {
+  void supabase;
+  const router = useRouter();
+  const locale = normalizeLocale(router.locale ?? router.defaultLocale ?? undefined);
   const patches = [...(patchIndex.patches as IndexPatch[])].sort((a, b) =>
     b.date.localeCompare(a.date)
   );
@@ -64,8 +70,8 @@ export default function PatchNotesPage({ supabase }: PatchNotesPageProps) {
         title={title}
         description={description}
         path="/patch-notes"
+        locale={locale}
         structuredData={structuredData}
-        localized={false}
       />
 
       <div className={styles.page}>
@@ -93,7 +99,9 @@ export default function PatchNotesPage({ supabase }: PatchNotesPageProps) {
                       <span className={styles.month}>{month}</span>
                       <span className={styles.day}>{day}</span>
                     </div>
-                    <span className={styles.title}>{patch.title}</span>
+                    <span className={styles.title}>
+                      {pickLocalized(patch.titles ?? undefined, locale) || patch.title}
+                    </span>
                     <span className={styles.arrow}>READ &rarr;</span>
                   </Link>
                 </Fragment>

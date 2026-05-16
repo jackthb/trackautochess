@@ -4,62 +4,33 @@ import { SITE_TITLE } from "@/lib/site";
 import { normalizeLocale } from "@/lib/i18n";
 import browserStyles from "@/components/EntityBrowser.module.css";
 
-const T = {
-  en: {
-    title: `Ranks | ${SITE_TITLE}`,
-    description:
-      "Dota Auto Chess MMR rank brackets — Pawn through Queen, with the exact MMR thresholds for every step, taken straight from the game's panorama source.",
-    heading: "Ranks",
-    lead:
-      "Every Dota Auto Chess rank, from Pawn-1 up to Queen. The MMR thresholds below are derived from the canonical formula the game client uses to convert your MMR into a rank tier.",
-    formulaPre:
-      "Each tier is 80 MMR wide. Pawn-1 catches everyone below 500 MMR (the clamp), and Queen catches everyone at 3380 or above. New accounts must play at least ",
-    formulaGames: "5 games",
-    formulaPost: " before they get a rank — until then they show as Unranked.",
-    sourcePre: "Source: ",
-    sourceMid: " → ",
-    sourceLabels: "GetMMRLevelByScore()",
-    sourceWith: ", with rank labels from ",
-    sourceFile: "resource/addon_english.txt",
-    sourceDot: ".",
-    unranked: "Unranked",
-    levelZero: "Level 0",
-    unrankedDesc:
-      "Shown to any player with fewer than 5 ranked games this season. No MMR is displayed publicly until placement is complete.",
-    headStep: "Step",
-    headLvl: "Lvl",
-    headMin: "Min MMR",
-    headMax: "Max MMR",
-    noCap: "no cap",
-  },
-  ru: {
-    title: `Ранги | ${SITE_TITLE}`,
-    description:
-      "Ранги Dota Auto Chess по MMR — от Pawn до Queen, с точными порогами MMR на каждой ступени, прямо из исходников клиента.",
-    heading: "Ранги",
-    lead:
-      "Все ранги Dota Auto Chess: от Pawn-1 до Queen. Пороги MMR ниже выведены из канонической формулы, по которой клиент игры превращает MMR в ранг.",
-    formulaPre:
-      "Каждая ступень — 80 MMR. Pawn-1 ловит всех ниже 500 MMR (после clamp), а Queen — всех от 3380 и выше. Новым аккаунтам нужно сыграть минимум ",
-    formulaGames: "5 игр",
-    formulaPost: ", прежде чем им присвоят ранг — до этого они показываются как Unranked.",
-    sourcePre: "Источник: ",
-    sourceMid: " → ",
-    sourceLabels: "GetMMRLevelByScore()",
-    sourceWith: ", названия рангов взяты из ",
-    sourceFile: "resource/addon_english.txt",
-    sourceDot: ".",
-    unranked: "Без ранга",
-    levelZero: "Уровень 0",
-    unrankedDesc:
-      "Показывается игрокам, сыгравшим меньше 5 рейтинговых игр в этом сезоне. MMR публично не отображается, пока не завершится плейсмент.",
-    headStep: "Ступень",
-    headLvl: "Ур.",
-    headMin: "Min MMR",
-    headMax: "Max MMR",
-    noCap: "без потолка",
-  },
-} as const;
+const t = {
+  title: `Ranks | ${SITE_TITLE}`,
+  description:
+    "Dota Auto Chess MMR rank brackets — Pawn through Queen, with the exact MMR thresholds for every step, taken straight from the game's panorama source.",
+  heading: "Ranks",
+  lead:
+    "Every Dota Auto Chess rank, from Pawn-1 up to Queen. The MMR thresholds below are derived from the canonical formula the game client uses to convert your MMR into a rank tier.",
+  formulaPre:
+    "Each tier is 80 MMR wide. Pawn-1 catches everyone below 500 MMR (the clamp), and Queen catches everyone at 3380 or above. New accounts must play at least ",
+  formulaGames: "5 games",
+  formulaPost: " before they get a rank — until then they show as Unranked.",
+  sourcePre: "Source: ",
+  sourceMid: " → ",
+  sourceLabels: "GetMMRLevelByScore()",
+  sourceWith: ", with rank labels from ",
+  sourceFile: "resource/addon_english.txt",
+  sourceDot: ".",
+  unranked: "Unranked",
+  levelZero: "Level 0",
+  unrankedDesc:
+    "Shown to any player with fewer than 5 ranked games this season. No MMR is displayed publicly until placement is complete.",
+  headStep: "Step",
+  headLvl: "Lvl",
+  headMin: "Min MMR",
+  headMax: "Max MMR",
+  noCap: "no cap",
+};
 
 // Source of truth: GetMMRLevelByScore in
 // panorama/scripts/custom_game/dac.vjs_c (Dota Auto Chess workshop VPK).
@@ -122,7 +93,6 @@ function buildTierGroups(): { tier: string; color: string; rows: BracketRow[] }[
 export default function RanksPage() {
   const router = useRouter();
   const locale = normalizeLocale(router.locale ?? router.defaultLocale ?? undefined);
-  const t = T[locale];
   const title = t.title;
   const description = t.description;
   const tierGroups = buildTierGroups();

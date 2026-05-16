@@ -11,32 +11,21 @@ interface TalentsPageProps {
   supabase: SupabaseClient | null;
 }
 
-const T = {
-  en: {
-    title: `Talents | ${SITE_TITLE}`,
-    description:
-      "Browse all Dota Auto Chess talent choices by round, compare branch A/B effects, and quickly cross-reference patch notes updates.",
-    heading: "Talents",
-    structuredName: "Dota Auto Chess talents",
-    structuredAbout: "Dota Auto Chess talents",
-  },
-  ru: {
-    title: `Таланты | ${SITE_TITLE}`,
-    description:
-      "Все таланты Dota Auto Chess по раундам — сравнивайте эффекты ветвей A/B и быстро сверяйтесь с патчноутами.",
-    heading: "Таланты",
-    structuredName: "Таланты Dota Auto Chess",
-    structuredAbout: "Таланты Dota Auto Chess",
-  },
-} as const;
+const t = {
+  title: `Talents | ${SITE_TITLE}`,
+  description:
+    "Browse all Dota Auto Chess talent choices by round, compare branch A/B effects, and quickly cross-reference patch notes updates.",
+  heading: "Talents",
+  structuredName: "Dota Auto Chess talents",
+  structuredAbout: "Dota Auto Chess talents",
+};
 
 export default function TalentsPage({ supabase }: TalentsPageProps) {
   void supabase;
   const router = useRouter();
   const locale = normalizeLocale(router.locale ?? router.defaultLocale ?? undefined);
-  const t = T[locale];
 
-  const talents = getAllTalents();
+  const talents = getAllTalents(locale);
 
   const tiers = new Map<number, DisplayTalent[]>();
   for (const tt of talents) {

@@ -25,24 +25,20 @@ interface UnitDetailPageProps {
   supabase: SupabaseClient | null;
 }
 
-const T = {
-  en: {
-    title: (n: string) => `${n} Unit Guide | ${SITE_TITLE}`,
-    description: (n: string, c: number) =>
-      `${n} is a cost ${c} unit in Dota Auto Chess.`,
-    activates: (u: string) => `${u} activates this synergy.`,
-    cost: (c: number) => `Cost ${c}`,
-    crumbUnits: "Units",
-  },
-  ru: {
-    title: (n: string) => `${n} — гайд по фигуре | ${SITE_TITLE}`,
-    description: (n: string, c: number) =>
-      `${n} — фигура за ${c} золота в Dota Auto Chess.`,
-    activates: (u: string) => `${u} активирует эту синергию.`,
-    cost: (c: number) => `Цена ${c}`,
-    crumbUnits: "Фигуры",
-  },
-} as const;
+const t = {
+  title: (n: string) => `${n} Unit Guide | ${SITE_TITLE}`,
+  description: (n: string, c: number) =>
+    `${n} is a cost ${c} unit in Dota Auto Chess.`,
+  activates: (u: string) => `${u} activates this synergy.`,
+  cost: (c: number) => `Cost ${c}`,
+  crumbUnits: "Units",
+};
+
+const RELATED_LABELS = {
+  synergies: "Synergies",
+  unitSynergies: (n: string) => `${n} Synergies`,
+  moreUnits: "More Units",
+};
 
 export default function UnitDetailPage({
   unit,
@@ -50,7 +46,6 @@ export default function UnitDetailPage({
   synergies,
   locale,
 }: UnitDetailPageProps) {
-  const t = T[locale];
   const description = t.description(unit.name, unit.cost);
   // synergies are localized; the unit's `synergies` field stores English
   // names so we look up by slug derived from the English form.
@@ -121,29 +116,16 @@ export default function UnitDetailPage({
         variant="unit"
         name={unit.name}
         iconSrc={unit.iconUrl}
-        overview={<>{description} {unit.synergies.length ? `${RELATED_LABELS[locale].synergies}: ${unit.synergies.map(translateSyn).join(", ")}.` : ""}</>}
+        overview={<>{description} {unit.synergies.length ? `${RELATED_LABELS.synergies}: ${unit.synergies.map(translateSyn).join(", ")}.` : ""}</>}
         tag={{ label: t.cost(unit.cost) }}
-        relatedTitle={RELATED_LABELS[locale].unitSynergies(unit.name)}
+        relatedTitle={RELATED_LABELS.unitSynergies(unit.name)}
         related={synergyEntities}
-        extraRelatedTitle={RELATED_LABELS[locale].moreUnits}
+        extraRelatedTitle={RELATED_LABELS.moreUnits}
         extraRelated={relatedEntities}
       />
     </>
   );
 }
-
-const RELATED_LABELS = {
-  en: {
-    synergies: "Synergies",
-    unitSynergies: (n: string) => `${n} Synergies`,
-    moreUnits: "More Units",
-  },
-  ru: {
-    synergies: "Синергии",
-    unitSynergies: (n: string) => `Синергии ${n}`,
-    moreUnits: "Ещё фигуры",
-  },
-} as const;
 
 export const getStaticPaths: GetStaticPaths = async () => ({
   // Slugs are locale-stable (English canonical), so a single set of paths

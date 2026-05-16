@@ -11,27 +11,16 @@ interface SpeciesPageProps {
   data: BrowsableEntity[];
 }
 
-const T = {
-  en: {
-    title: `Species | ${SITE_TITLE}`,
-    description:
-      "Browse all Dota Auto Chess species traits like Beast and Demon, then open each species detail page.",
-    heading: "Species",
-    structuredName: "Dota Auto Chess species",
-    structuredAbout: "Dota Auto Chess species synergies",
-  },
-  ru: {
-    title: `Расы | ${SITE_TITLE}`,
-    description:
-      "Все расовые синергии Dota Auto Chess (Звери, Демоны и др.) с подробными страницами.",
-    heading: "Расы",
-    structuredName: "Расы Dota Auto Chess",
-    structuredAbout: "Расовые синергии Dota Auto Chess",
-  },
-} as const;
+const t = {
+  title: `Species | ${SITE_TITLE}`,
+  description:
+    "Browse all Dota Auto Chess species traits like Beast and Demon, then open each species detail page.",
+  heading: "Species",
+  structuredName: "Dota Auto Chess species",
+  structuredAbout: "Dota Auto Chess species synergies",
+};
 
 export default function SpeciesPage({ data, locale }: SpeciesPageProps) {
-  const t = T[locale];
   const structuredData = {
     "@context": "https://schema.org",
     "@type": "CollectionPage",

@@ -5,83 +5,45 @@ import { SITE_TITLE } from "@/lib/site";
 import { trackEvent } from "@/lib/analytics";
 import { normalizeLocale } from "@/lib/i18n";
 
-const T = {
-  en: {
-    title: `About | ${SITE_TITLE}`,
-    description:
-      "How Tracker Autochess surfaces Dota Auto Chess player statistics from Drodo profile data and manually tracked match history.",
-    structuredName: "About Track Auto Chess",
-    eyebrow: "About",
-    heading: "How Tracker Autochess surfaces players’ statistics",
-    copy1pre: "",
-    copy1post:
-      " surfaces Dota Auto Chess player statistics from the best source available for a profile.",
-    copy2:
-      "DAC Tools is currently in pre-release, and this is our tooling to enable tracking in-game statistics.",
-    copy3:
-      "When Drodo exposes public profile data, we use that data. When Drodo data is not available, we fall back to manually tracked or imported match history.",
-    copy4:
-      "We run light advertisements to help cover hosting costs and support continued development of the tracker.",
-    dataSources: "Data Sources",
-    drodoTitle: "Drodo profile data",
-    drodoDesc:
-      "Current rank, MMR, peak MMR, season games, candies, wins, and season snapshots when Drodo returns them publicly.",
-    trackedTitle: "Tracked match history",
-    trackedDesc:
-      "Match-level stats captured or checked manually when public Drodo profile data is missing, stale, or incomplete.",
-    support: "Support",
-    contactLabel: "Contact",
-    contactPlaceholder: "Steam name, Discord, or email",
-    messageLabel: "Message",
-    messagePlaceholder: "Tell us what is broken, missing, or confusing.",
-    companyLabel: "Company",
-    sendBtn: "Send support request",
-    sendingBtn: "Sending...",
-    sentStatus: "Sent. Thanks, we'll take a look.",
-    minLengthError: "Message must be at least 20 characters.",
-    sendFailed: "Support request failed. Try again.",
-  },
-  ru: {
-    title: `О сайте | ${SITE_TITLE}`,
-    description:
-      "Как Tracker Autochess собирает статистику игроков Dota Auto Chess из профилей Drodo и вручную отслеживаемой истории матчей.",
-    structuredName: "О Track Auto Chess",
-    eyebrow: "О сайте",
-    heading: "Как Tracker Autochess показывает статистику игроков",
-    copy1pre: "",
-    copy1post:
-      " собирает статистику игроков Dota Auto Chess из лучшего доступного источника для каждого профиля.",
-    copy2:
-      "DAC Tools сейчас находится в пред-релизе — это наш инструмент для отслеживания внутриигровой статистики.",
-    copy3:
-      "Когда Drodo делает данные профиля публичными, мы используем их. Если данных Drodo нет, мы переключаемся на вручную отслеживаемую или импортированную историю матчей.",
-    copy4:
-      "Мы показываем ненавязчивую рекламу, чтобы покрывать расходы на хостинг и поддерживать дальнейшую разработку трекера.",
-    dataSources: "Источники данных",
-    drodoTitle: "Данные профиля Drodo",
-    drodoDesc:
-      "Текущий ранг, MMR, пиковый MMR, игры за сезон, конфеты, победы и снимки сезонов, когда Drodo предоставляет их публично.",
-    trackedTitle: "Отслеживаемая история матчей",
-    trackedDesc:
-      "Статистика матчей, собираемая или проверяемая вручную, когда данные профиля Drodo отсутствуют, устарели или неполные.",
-    support: "Поддержка",
-    contactLabel: "Контакт",
-    contactPlaceholder: "Steam, Discord или e-mail",
-    messageLabel: "Сообщение",
-    messagePlaceholder: "Опишите, что сломано, чего не хватает или непонятно.",
-    companyLabel: "Компания",
-    sendBtn: "Отправить запрос",
-    sendingBtn: "Отправка...",
-    sentStatus: "Отправлено. Спасибо, мы посмотрим.",
-    minLengthError: "Сообщение должно быть не короче 20 символов.",
-    sendFailed: "Не удалось отправить. Попробуйте ещё раз.",
-  },
-} as const;
+const t = {
+  title: `About | ${SITE_TITLE}`,
+  description:
+    "How Tracker Autochess surfaces Dota Auto Chess player statistics from Drodo profile data and manually tracked match history.",
+  structuredName: "About Track Auto Chess",
+  eyebrow: "About",
+  heading: "How Tracker Autochess surfaces players’ statistics",
+  copy1pre: "",
+  copy1post:
+    " surfaces Dota Auto Chess player statistics from the best source available for a profile.",
+  copy2:
+    "DAC Tools is currently in pre-release, and this is our tooling to enable tracking in-game statistics.",
+  copy3:
+    "When Drodo exposes public profile data, we use that data. When Drodo data is not available, we fall back to manually tracked or imported match history.",
+  copy4:
+    "We run light advertisements to help cover hosting costs and support continued development of the tracker.",
+  dataSources: "Data Sources",
+  drodoTitle: "Drodo profile data",
+  drodoDesc:
+    "Current rank, MMR, peak MMR, season games, candies, wins, and season snapshots when Drodo returns them publicly.",
+  trackedTitle: "Tracked match history",
+  trackedDesc:
+    "Match-level stats captured or checked manually when public Drodo profile data is missing, stale, or incomplete.",
+  support: "Support",
+  contactLabel: "Contact",
+  contactPlaceholder: "Steam name, Discord, or email",
+  messageLabel: "Message",
+  messagePlaceholder: "Tell us what is broken, missing, or confusing.",
+  companyLabel: "Company",
+  sendBtn: "Send support request",
+  sendingBtn: "Sending...",
+  sentStatus: "Sent. Thanks, we'll take a look.",
+  minLengthError: "Message must be at least 20 characters.",
+  sendFailed: "Support request failed. Try again.",
+};
 
 export default function AboutPage() {
   const router = useRouter();
   const locale = normalizeLocale(router.locale ?? router.defaultLocale ?? undefined);
-  const t = T[locale];
   const [contact, setContact] = useState("");
   const [message, setMessage] = useState("");
   const [company, setCompany] = useState("");

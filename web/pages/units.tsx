@@ -14,31 +14,21 @@ interface UnitsPageProps {
   data: BrowsableEntity[][];
 }
 
-const T = {
-  en: {
-    title: `Units | ${SITE_TITLE}`,
-    description:
-      "Browse every Dota Auto Chess unit by cost tier, search heroes by name, and open dedicated unit pages on Track Auto Chess.",
-    heading: "Units",
-    cost: (c: number) => `Cost ${c}`,
-    costLabel: COST_LABEL,
-    structuredName: "Dota Auto Chess units",
-    structuredAbout: "Dota Auto Chess units",
-  },
-  ru: {
-    title: `Фигуры | ${SITE_TITLE}`,
-    description:
-      "Просматривайте все фигуры Dota Auto Chess по стоимости, ищите героев по имени и открывайте отдельные страницы на Track Auto Chess.",
-    heading: "Фигуры",
-    cost: (c: number) => `Цена ${c}`,
-    costLabel: { 1: "Цена 1", 2: "Цена 2", 3: "Цена 3", 4: "Цена 4", 5: "Цена 5" },
-    structuredName: "Фигуры Dota Auto Chess",
-    structuredAbout: "Фигуры Dota Auto Chess",
-  },
-} as const;
+// UI chrome strings stay English across locales for now. Entity names
+// (units, items, synergies, relics, talents) ARE localized via Sanity →
+// data/*.json and rendered through pickLocalized.
+const t = {
+  title: `Units | ${SITE_TITLE}`,
+  description:
+    "Browse every Dota Auto Chess unit by cost tier, search heroes by name, and open dedicated unit pages on Track Auto Chess.",
+  heading: "Units",
+  cost: (c: number) => `Cost ${c}`,
+  costLabel: COST_LABEL,
+  structuredName: "Dota Auto Chess units",
+  structuredAbout: "Dota Auto Chess units",
+};
 
 export default function UnitsPage({ data, locale }: UnitsPageProps) {
-  const t = T[locale];
   const structuredData = {
     "@context": "https://schema.org",
     "@type": "CollectionPage",
@@ -74,7 +64,6 @@ export const getStaticProps: GetStaticProps<UnitsPageProps> = async ({
   locale: rawLocale,
 }) => {
   const locale = normalizeLocale(rawLocale);
-  const t = T[locale];
   const translateSyn = getSynergyNameTranslator(locale);
   const data: BrowsableEntity[][] = getUnitsByCost(locale).map((tier) =>
     tier.map((unit) => ({

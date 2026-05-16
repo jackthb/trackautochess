@@ -13,35 +13,47 @@
  * routes to the same record as `/units/abaddon` — better link sharing
  * and simpler hreflang alternates.
  */
-export const LOCALES = ["en", "ru"] as const;
+export const LOCALES = ["en", "ru", "zh"] as const;
 export type Locale = (typeof LOCALES)[number];
 
 export const DEFAULT_LOCALE: Locale = "en";
 
-// Maps the runtime URL locale to the JSON `*_i18n` map key. Identity for
-// now; left as an indirection so the URL form and JSON form can diverge
-// (e.g. `zh` URL → `zh-cn` JSON key) without rewriting callers.
+// Maps the runtime URL locale to the JSON `*_i18n` map key. The Chinese URL
+// `zh` maps to the VPK's `zh-cn` key — Drodo ships Simplified by default.
 const DATA_LOCALE_KEY: Record<Locale, string> = {
   en: "en",
   ru: "ru",
+  zh: "zh-cn",
 };
 
-// hreflang code emitted to crawlers. ISO 639-1 short codes.
+// hreflang code emitted to crawlers. Use BCP 47 script subtag for Chinese
+// so crawlers can disambiguate Simplified from Traditional.
 export const HREFLANG: Record<Locale, string> = {
   en: "en",
   ru: "ru",
+  zh: "zh-Hans",
 };
 
 // `<html lang>` value.
 export const HTML_LANG: Record<Locale, string> = {
   en: "en",
   ru: "ru",
+  zh: "zh-Hans",
 };
 
 // Display label for the language switcher, in the language itself.
 export const LOCALE_LABEL: Record<Locale, string> = {
   en: "English",
   ru: "Русский",
+  zh: "中文",
+};
+
+// Compact 2-character code shown in the navbar trigger button before the
+// menu opens. Keeps the trigger width stable across locales.
+export const LOCALE_SHORT: Record<Locale, string> = {
+  en: "EN",
+  ru: "RU",
+  zh: "中",
 };
 
 export function isLocale(value: unknown): value is Locale {

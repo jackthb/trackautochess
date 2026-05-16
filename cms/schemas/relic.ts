@@ -13,7 +13,26 @@ export const relic = defineType({
       validation: (r) => r.required(),
       readOnly: true,
     }),
-    defineField({name: 'name', type: 'string', validation: (r) => r.required()}),
+    defineField({
+      name: 'name',
+      title: 'Display Name (English, canonical key)',
+      type: 'string',
+      validation: (r) => r.required(),
+    }),
+    defineField({
+      name: 'names',
+      title: 'Localized names (from VPK)',
+      description:
+        'Auto-populated from the VPK on each patch. Edit `nameOverrides` to override per-locale.',
+      type: 'localizedNames',
+    }),
+    defineField({
+      name: 'nameOverrides',
+      title: 'Localized name overrides',
+      description:
+        'Optional per-locale overrides. When set, the site renders this in place of the VPK value for that locale. VPK pushes never touch this field.',
+      type: 'localizedNames',
+    }),
     defineField({name: 'description', type: 'text', rows: 4}),
     defineField({name: 'lore', type: 'text', rows: 3}),
     defineField({

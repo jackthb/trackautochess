@@ -46,7 +46,16 @@ export const unit = defineType({
     }),
     defineField({
       name: 'names',
-      title: 'Localized names',
+      title: 'Localized names (from VPK)',
+      description:
+        'Auto-populated from the VPK on each patch. Edit `nameOverrides` to override per-locale.',
+      type: 'localizedNames',
+    }),
+    defineField({
+      name: 'nameOverrides',
+      title: 'Localized name overrides',
+      description:
+        'Optional per-locale overrides. When set, the site renders this in place of the VPK value for that locale. VPK pushes never touch this field.',
       type: 'localizedNames',
     }),
     defineField({

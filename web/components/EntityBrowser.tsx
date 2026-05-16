@@ -2,33 +2,24 @@ import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { useRouter } from "next/router";
 import { EntityCard, type EntityCardVariant } from "@/components/EntityCard";
 import { bucketCount, trackEvent } from "@/lib/analytics";
-import { normalizeLocale, type Locale } from "@/lib/i18n";
+import { normalizeLocale } from "@/lib/i18n";
 import styles from "./EntityBrowser.module.css";
 
-const COUNT_LABEL: Record<Locale, Record<EntityCardVariant, string>> = {
-  en: { item: "items", relic: "relics", unit: "units", synergy: "synergies" },
-  ru: { item: "предметов", relic: "реликвий", unit: "фигур", synergy: "синергий" },
+const COUNT_LABEL: Record<EntityCardVariant, string> = {
+  item: "items",
+  relic: "relics",
+  unit: "units",
+  synergy: "synergies",
 };
 
-const SEARCH_PLACEHOLDER: Record<Locale, Record<EntityCardVariant, string>> = {
-  en: {
-    item: "Search items...",
-    relic: "Search relics...",
-    unit: "Search units...",
-    synergy: "Search synergies...",
-  },
-  ru: {
-    item: "Поиск предметов...",
-    relic: "Поиск реликвий...",
-    unit: "Поиск фигур...",
-    synergy: "Поиск синергий...",
-  },
+const SEARCH_PLACEHOLDER: Record<EntityCardVariant, string> = {
+  item: "Search items...",
+  relic: "Search relics...",
+  unit: "Search units...",
+  synergy: "Search synergies...",
 };
 
-const NO_MATCHES: Record<Locale, string> = {
-  en: "No matches.",
-  ru: "Ничего не найдено.",
-};
+const NO_MATCHES = "No matches.";
 
 export interface BrowsableEntity {
   slug: string;
@@ -127,8 +118,8 @@ export function EntityBrowser({
       ? styles.gridRelic
       : styles.gridItem
   }`;
-  const placeholder = SEARCH_PLACEHOLDER[locale][variant];
-  const countWord = COUNT_LABEL[locale][variant];
+  const placeholder = SEARCH_PLACEHOLDER[variant];
+  const countWord = COUNT_LABEL[variant];
   const collectionPath = ENTITY_COLLECTION_PATH[variant];
   const total = filteredTiered
     ? filteredTiered.reduce((sum, tier) => sum + tier.length, 0)
@@ -203,7 +194,7 @@ export function EntityBrowser({
         {filteredFlat && (
           <section className={styles.panel}>
             {filteredFlat.length === 0 ? (
-              <div className={styles.empty}>{NO_MATCHES[locale]}</div>
+              <div className={styles.empty}>{NO_MATCHES}</div>
             ) : (
               <div className={gridClass}>
                 {filteredFlat.map((entity) => (

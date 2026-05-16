@@ -22,28 +22,13 @@ interface ItemDetailPageProps {
   supabase: SupabaseClient | null;
 }
 
-const T = {
-  en: {
-    title: (n: string) => `${n} Item Guide | ${SITE_TITLE}`,
-    descriptionPrefix: (n: string) => `See what ${n} does in Dota Auto Chess. `,
-    fallbackOverview: " A fuller in-game description is not available in the current data export.",
-    overviewPrefix: (n: string, t: string) => `${n} is a ${t} item in Dota Auto Chess.`,
-    moreOf: (t: string) => `More ${t} Items`,
-    fallbackTier: (n: string, t: string) => `${n} is a ${t} Dota Auto Chess item.`,
-  },
-  ru: {
-    title: (n: string) => `${n} — гайд по предмету | ${SITE_TITLE}`,
-    descriptionPrefix: (n: string) => `Что делает ${n} в Dota Auto Chess. `,
-    fallbackOverview: " Полное игровое описание недоступно.",
-    overviewPrefix: (n: string, t: string) => `${n} — предмет ${t} в Dota Auto Chess.`,
-    moreOf: (t: string) => `Ещё предметы ${t}`,
-    fallbackTier: (n: string, t: string) => `${n} — предмет ${t} в Dota Auto Chess.`,
-  },
-} as const;
-
-const TIER_LABEL_LOCALIZED: Record<Locale, Record<number, string>> = {
-  en: TIER_LABEL,
-  ru: { 1: "Уровень 1", 2: "Уровень 2", 3: "Уровень 3", 4: "Уровень 4", 5: "Уровень 5" },
+const t = {
+  title: (n: string) => `${n} Item Guide | ${SITE_TITLE}`,
+  descriptionPrefix: (n: string) => `See what ${n} does in Dota Auto Chess. `,
+  fallbackOverview: " A fuller in-game description is not available in the current data export.",
+  overviewPrefix: (n: string, t: string) => `${n} is a ${t} item in Dota Auto Chess.`,
+  moreOf: (t: string) => `More ${t} Items`,
+  fallbackTier: (n: string, t: string) => `${n} is a ${t} Dota Auto Chess item.`,
 };
 
 function cleanText(value: string): string {
@@ -55,9 +40,8 @@ function truncate(value: string, maxLength: number): string {
   return `${value.slice(0, maxLength - 3).trimEnd()}...`;
 }
 
-function buildDescription(item: DisplayItem, locale: Locale): string {
-  const t = T[locale];
-  const tier = TIER_LABEL_LOCALIZED[locale][item.tier];
+function buildDescription(item: DisplayItem): string {
+  const tier = TIER_LABEL[item.tier];
   const fallback = t.fallbackTier(item.name, tier);
   const summary = cleanText(item.description) || fallback;
   return truncate(`${t.descriptionPrefix(item.name)}${summary}`, 158);
@@ -68,10 +52,9 @@ export default function ItemDetailPage({
   related,
   locale,
 }: ItemDetailPageProps) {
-  const t = T[locale];
-  const tierLabel = TIER_LABEL_LOCALIZED[locale][item.tier];
+  const tierLabel = TIER_LABEL[item.tier];
   const title = t.title(item.name);
-  const description = buildDescription(item, locale);
+  const description = buildDescription(item);
   const pageUrl = absoluteUrl(`/items/${item.slug}`);
   const itemsUrl = absoluteUrl("/items");
   const tierColor = TIER_COLOR[item.tier];

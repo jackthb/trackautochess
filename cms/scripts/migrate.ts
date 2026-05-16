@@ -64,6 +64,22 @@ function imageField(assetId: string | null) {
   return {_type: 'image', asset: {_type: 'reference', _ref: assetId}}
 }
 
+// Maps the JSON i18n shape ({en, ru, "zh-cn", ...}) to Sanity's localizedNames
+// object shape ({en, ru, zhCn, ...}). Returns undefined when input is empty so
+// Sanity doesn't store a noisy empty object.
+function localizedNames(names: any): any {
+  if (!names || typeof names !== 'object') return undefined
+  const out = {
+    en: names.en,
+    lore: names.lore,
+    ko: names.ko,
+    ru: names.ru,
+    zhCn: names['zh-cn'],
+    zhTw: names['zh-tw'],
+  }
+  return Object.values(out).some((v) => v) ? out : undefined
+}
+
 async function commit(docs: any[]) {
   if (args.dryRun) {
     console.log(`  [dry] would write ${docs.length} doc(s)`)
@@ -95,6 +111,7 @@ async function migrateSynergies() {
       _type: 'synergy',
       gameId,
       name: s.name,
+      names: localizedNames(s.names),
       description: s.description ?? '',
       descriptionHtml: s.description_html ?? '',
       lore: s.lore ?? '',
@@ -138,16 +155,7 @@ async function migrateUnits(synergyNameToId: Map<string, string>) {
       pool: s.pool ?? f.pool ?? 'standard',
       attackType: f.attack_type ?? null,
       synergies: synergyRefs,
-      names: s.names
-        ? {
-            en: s.names.en,
-            lore: s.names.lore,
-            ko: s.names.ko,
-            ru: s.names.ru,
-            zhCn: s.names['zh-cn'],
-            zhTw: s.names['zh-tw'],
-          }
-        : undefined,
+      names: localizedNames(s.names),
       abilities: f.abilities ? JSON.stringify(f.abilities) : '',
       stats: stats
         ? {
@@ -208,6 +216,7 @@ async function migrateItems() {
       _type: 'item',
       gameId,
       name: it.name,
+      names: localizedNames(it.names),
       description: it.description ?? '',
       lore: it.lore ?? '',
       quality: it.quality ?? '',
@@ -237,6 +246,7 @@ async function migrateRelics() {
       _type: 'relic',
       gameId,
       name: r.name,
+      names: localizedNames(r.names),
       description: r.description ?? '',
       lore: r.lore ?? '',
       icon: imageField(assetId),
@@ -256,6 +266,7 @@ async function migrateTalents() {
     _type: 'talent',
     slot,
     title: t.title,
+    titles: localizedNames(t.titles ?? t.names),
     description: t.description ?? '',
   }))
   await commit(docs)
@@ -269,6 +280,7 @@ async function migrateAbilities() {
     _type: 'ability',
     gameId,
     name: a.name ?? '',
+    names: localizedNames(a.names),
     description: a.description ?? '',
     cooldown: a.cooldown ?? '',
     manaCost: a.mana_cost ?? '',

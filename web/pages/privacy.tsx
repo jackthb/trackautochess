@@ -3,61 +3,37 @@ import { SeoHead } from "@/lib/seo";
 import { SITE_TITLE } from "@/lib/site";
 import { normalizeLocale } from "@/lib/i18n";
 
-const T = {
-  en: {
-    title: `Privacy | ${SITE_TITLE}`,
-    description:
-      "Privacy policy for Track Auto Chess: what data we collect, how cookies and advertising work, and how to contact us.",
-    eyebrow: "Privacy",
-    heading: "Privacy Policy",
-    updated: "Last updated: May 2026",
-    h1: "What we collect",
-    p1: "We do not ask for or store personal information directly. We use Vercel Analytics for anonymous pageview counts, Vercel Speed Insights for performance, and PostHog for privacy-scoped product analytics (which pages people visit and how features get used). Product events do not include raw search text, tokens, or private dashboard/admin URLs. PostHog only links events to an identified person profile after you sign in with Steam, in which case the profile is keyed by your Steam ID. The browser's Do Not Track signal is respected.",
-    h2: "Cookies",
-    p2: "PostHog analytics cookies are only set after you accept analytics cookies. If you decline, PostHog runs in cookieless mode. Third-party services described below may set their own cookies in your browser.",
-    h3: "Advertising",
-    p3: "This site may display banner ads served by Adsterra or direct sponsor/job placements configured by the site owner. Adsterra and its partners may use cookies, device identifiers, and similar technologies to select and measure ads. Direct placements do not run third-party ad scripts. We do not share user data with advertisers; ad networks operate independently within the ad slots embedded on the page.",
-    h4: "Third-party services",
-    p4: "Steam profile data (display name, avatar, vanity URL) is fetched from the Steam Web API to render player and game pages. We do not store Steam credentials. Drodo Studio match data is fetched from public Auto Chess endpoints to populate match history.",
-    h5: "Trademarks & affiliation",
-    p5: "Track Auto Chess is an independent fan project. It is not affiliated with, endorsed by, or sponsored by Valve Corporation or Drodo Studio. Dota, Dota 2, and Dota Auto Chess are trademarks of their respective owners. Game icons, names, and statistical data shown on this site are property of their respective owners and are used for informational and analytical purposes only.",
-    h6: "Contact",
-    p6pre:
-      "Questions about this policy, or requests relating to your data, can be sent through the ",
-    p6link: "support form",
-    p6post: " on the about page.",
-  },
-  ru: {
-    title: `Конфиденциальность | ${SITE_TITLE}`,
-    description:
-      "Политика конфиденциальности Track Auto Chess: какие данные мы собираем, как работают cookies и реклама, как с нами связаться.",
-    eyebrow: "Конфиденциальность",
-    heading: "Политика конфиденциальности",
-    updated: "Последнее обновление: май 2026",
-    h1: "Какие данные мы собираем",
-    p1: "Мы не запрашиваем и не храним личные данные напрямую. Мы используем Vercel Analytics для анонимного подсчёта просмотров, Vercel Speed Insights для оценки производительности и PostHog для продуктовой аналитики (какие страницы посещают и как используют функции). PostHog связывает события с идентифицированным профилем только после входа через Steam, и тогда профиль привязан к вашему Steam ID. Сигнал браузера Do Not Track учитывается.",
-    h2: "Cookies",
-    p2: "Cookies аналитики PostHog устанавливаются только после вашего согласия. Если вы отклоните их, PostHog работает в режиме без cookies. Сторонние сервисы, перечисленные ниже, могут устанавливать собственные cookies в вашем браузере.",
-    h3: "Реклама",
-    p3: "На сайте могут отображаться баннерные объявления от Adsterra или первичные спонсорские/рекламные размещения, настроенные владельцем сайта. Adsterra и её партнёры могут использовать cookies, идентификаторы устройств и подобные технологии для подбора и измерения рекламы. Прямые размещения не запускают сторонние рекламные скрипты. Мы не передаём данные пользователей рекламодателям; рекламные сети работают независимо в пределах встроенных рекламных слотов.",
-    h4: "Сторонние сервисы",
-    p4: "Данные профиля Steam (имя, аватар, vanity URL) запрашиваются через Steam Web API для отображения страниц игроков и матчей. Мы не храним учётные данные Steam. Данные матчей Drodo Studio запрашиваются с публичных эндпоинтов Auto Chess для наполнения истории матчей.",
-    h5: "Товарные знаки и связи",
-    p5: "Track Auto Chess — независимый фанатский проект. Он не связан с Valve Corporation или Drodo Studio и не одобрен ими. Dota, Dota 2 и Dota Auto Chess — товарные знаки соответствующих правообладателей. Игровые иконки, названия и статистические данные на этом сайте принадлежат их правообладателям и используются только в информационно-аналитических целях.",
-    h6: "Связаться с нами",
-    p6pre:
-      "Вопросы по этой политике или запросы по вашим данным можно отправить через ",
-    p6link: "форму поддержки",
-    p6post: " на странице «О сайте».",
-  },
-} as const;
+// UI chrome text stays English across locales for now. Localized chrome
+// returns through the Sanity-driven pipeline once per-locale translations exist.
+const t = {
+  title: `Privacy | ${SITE_TITLE}`,
+  description:
+    "Privacy policy for Track Auto Chess: what data we collect, how cookies and advertising work, and how to contact us.",
+  eyebrow: "Privacy",
+  heading: "Privacy Policy",
+  updated: "Last updated: May 2026",
+  h1: "What we collect",
+  p1: "We do not ask for or store personal information directly. We use Vercel Analytics for anonymous pageview counts, Vercel Speed Insights for performance, and PostHog for privacy-scoped product analytics (which pages people visit and how features get used). Product events do not include raw search text, tokens, or private dashboard/admin URLs. PostHog only links events to an identified person profile after you sign in with Steam, in which case the profile is keyed by your Steam ID. The browser's Do Not Track signal is respected.",
+  h2: "Cookies",
+  p2: "PostHog analytics cookies are only set after you accept analytics cookies. If you decline, PostHog runs in cookieless mode. Third-party services described below may set their own cookies in your browser.",
+  h3: "Advertising",
+  p3: "This site may display banner ads served by Adsterra or direct sponsor/job placements configured by the site owner. Adsterra and its partners may use cookies, device identifiers, and similar technologies to select and measure ads. Direct placements do not run third-party ad scripts. We do not share user data with advertisers; ad networks operate independently within the ad slots embedded on the page.",
+  h4: "Third-party services",
+  p4: "Steam profile data (display name, avatar, vanity URL) is fetched from the Steam Web API to render player and game pages. We do not store Steam credentials. Drodo Studio match data is fetched from public Auto Chess endpoints to populate match history.",
+  h5: "Trademarks & affiliation",
+  p5: "Track Auto Chess is an independent fan project. It is not affiliated with, endorsed by, or sponsored by Valve Corporation or Drodo Studio. Dota, Dota 2, and Dota Auto Chess are trademarks of their respective owners. Game icons, names, and statistical data shown on this site are property of their respective owners and are used for informational and analytical purposes only.",
+  h6: "Contact",
+  p6pre:
+    "Questions about this policy, or requests relating to your data, can be sent through the ",
+  p6link: "support form",
+  p6post: " on the about page.",
+};
 
 export default function PrivacyPage() {
   const router = useRouter();
   const locale = normalizeLocale(
     router.locale ?? router.defaultLocale ?? undefined,
   );
-  const t = T[locale];
 
   return (
     <>

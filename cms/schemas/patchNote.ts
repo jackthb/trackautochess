@@ -12,8 +12,16 @@ export const patchNote = defineType({
     }),
     defineField({
       name: 'title',
+      title: 'Title (English, canonical key)',
       type: 'string',
       validation: (r) => r.required(),
+    }),
+    defineField({
+      name: 'titles',
+      title: 'Localized titles',
+      description:
+        'Optional per-locale title. When unset for a locale, the site falls back to the English title. Patch notes are not in the VPK; populate via Sanity AI Assist or the editor.',
+      type: 'localizedNames',
     }),
     defineField({
       name: 'slug',

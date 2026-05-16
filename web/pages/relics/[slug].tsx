@@ -19,27 +19,16 @@ interface RelicDetailPageProps {
   supabase: SupabaseClient | null;
 }
 
-const T = {
-  en: {
-    title: (n: string) => `${n} Relic Guide | ${SITE_TITLE}`,
-    descriptionPrefix: (n: string) =>
-      `See what ${n} does in Dota Auto Chess. `,
-    relicsLabel: "Relics",
-    relicGuide: (n: string) => `${n} relic guide`,
-    moreRelics: "More Relics",
-    fallback: (n: string) => `${n} is a Dota Auto Chess relic.`,
-    overviewFallback: (n: string) => `${n} is a relic in Dota Auto Chess.`,
-  },
-  ru: {
-    title: (n: string) => `${n} — гайд по реликвии | ${SITE_TITLE}`,
-    descriptionPrefix: (n: string) => `Что делает ${n} в Dota Auto Chess. `,
-    relicsLabel: "Реликвии",
-    relicGuide: (n: string) => `Гайд по реликвии ${n}`,
-    moreRelics: "Ещё реликвии",
-    fallback: (n: string) => `${n} — реликвия в Dota Auto Chess.`,
-    overviewFallback: (n: string) => `${n} — реликвия в Dota Auto Chess.`,
-  },
-} as const;
+const t = {
+  title: (n: string) => `${n} Relic Guide | ${SITE_TITLE}`,
+  descriptionPrefix: (n: string) =>
+    `See what ${n} does in Dota Auto Chess. `,
+  relicsLabel: "Relics",
+  relicGuide: (n: string) => `${n} relic guide`,
+  moreRelics: "More Relics",
+  fallback: (n: string) => `${n} is a Dota Auto Chess relic.`,
+  overviewFallback: (n: string) => `${n} is a relic in Dota Auto Chess.`,
+};
 
 function cleanText(value: string): string {
   return value.replace(/\s+/g, " ").trim();
@@ -50,8 +39,7 @@ function truncate(value: string, maxLength: number): string {
   return `${value.slice(0, maxLength - 3).trimEnd()}...`;
 }
 
-function buildDescription(relic: DisplayRelic, locale: Locale): string {
-  const t = T[locale];
+function buildDescription(relic: DisplayRelic): string {
   const summary = cleanText(relic.description) || t.fallback(relic.name);
   return truncate(`${t.descriptionPrefix(relic.name)}${summary}`, 158);
 }
@@ -61,9 +49,8 @@ export default function RelicDetailPage({
   related,
   locale,
 }: RelicDetailPageProps) {
-  const t = T[locale];
   const title = t.title(relic.name);
-  const description = buildDescription(relic, locale);
+  const description = buildDescription(relic);
   const pageUrl = absoluteUrl(`/relics/${relic.slug}`);
   const relicsUrl = absoluteUrl("/relics");
 

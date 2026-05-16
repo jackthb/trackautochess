@@ -14,43 +14,25 @@ interface HomeProps {
   initialSearchResults: SearchResult[];
 }
 
-const T = {
-  en: {
-    description:
-      "Look up Dota Auto Chess player MMR, season history, and tracked match stats by Steam vanity URL or Steam ID.",
-    tagline:
-      "Search any Steam profile to surface Auto Chess MMR, rank, season history, and tracked match stats.",
-    pasteLabel: "Paste a Steam profile URL or SteamID64",
-    exampleLabel: "Example:",
-    placeholder: "Steam profile URL or SteamID64",
-    snapshot: "Player Snapshot",
-    currentSeason: "Current season",
-    liveLabel: "Live MMR and rank bracket",
-    liveValue: "Queen 3380+",
-    historyLabel: "Season history",
-    historyValue: "MMR peaks and games",
-  },
-  ru: {
-    description:
-      "Узнавайте MMR игроков Dota Auto Chess, историю сезонов и статистику матчей по ссылке Steam или SteamID.",
-    tagline:
-      "Найдите любой Steam-профиль, чтобы увидеть MMR Auto Chess, ранг, историю сезонов и статистику матчей.",
-    pasteLabel: "Вставьте URL Steam-профиля или SteamID64",
-    exampleLabel: "Пример:",
-    placeholder: "URL Steam-профиля или SteamID64",
-    snapshot: "Карточка игрока",
-    currentSeason: "Текущий сезон",
-    liveLabel: "Текущий MMR и ранг",
-    liveValue: "Queen 3380+",
-    historyLabel: "История сезонов",
-    historyValue: "Пики MMR и сыгранные игры",
-  },
-} as const;
+const t = {
+  description:
+    "Look up Dota Auto Chess player MMR, season history, and tracked match stats by Steam vanity URL or Steam ID.",
+  tagline:
+    "Search any Steam profile to surface Auto Chess MMR, rank, season history, and tracked match stats.",
+  pasteLabel: "Paste a Steam profile URL or SteamID64",
+  exampleLabel: "Example:",
+  placeholder: "Steam profile URL or SteamID64",
+  snapshot: "Player Snapshot",
+  currentSeason: "Current season",
+  liveLabel: "Live MMR and rank bracket",
+  liveValue: "Queen 3380+",
+  historyLabel: "Season history",
+  historyValue: "MMR peaks and games",
+};
 
 export default function Home({ initialSearchResults }: HomeProps) {
   const router = useRouter();
   const locale = normalizeLocale(router.locale ?? router.defaultLocale ?? undefined);
-  const t = T[locale];
   const title = SITE_TITLE;
   const description = t.description;
   const siteUrl = absoluteUrl("/");

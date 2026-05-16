@@ -16,29 +16,17 @@ interface ItemsPageProps {
   data: BrowsableEntity[][];
 }
 
-const T = {
-  en: {
-    title: `Items | ${SITE_TITLE}`,
-    description:
-      "Browse every Dota Auto Chess item by tier, search specific items like Vanguard, and open dedicated item pages on Track Auto Chess.",
-    heading: "Items",
-    structuredName: "Dota Auto Chess items",
-    structuredAbout: "Dota Auto Chess items",
-    tierLabel: TIER_LABEL,
-  },
-  ru: {
-    title: `Предметы | ${SITE_TITLE}`,
-    description:
-      "Просматривайте все предметы Dota Auto Chess по уровням, ищите конкретные предметы и открывайте отдельные страницы на Track Auto Chess.",
-    heading: "Предметы",
-    structuredName: "Предметы Dota Auto Chess",
-    structuredAbout: "Предметы Dota Auto Chess",
-    tierLabel: { 1: "Уровень 1", 2: "Уровень 2", 3: "Уровень 3", 4: "Уровень 4", 5: "Уровень 5" },
-  },
-} as const;
+const t = {
+  title: `Items | ${SITE_TITLE}`,
+  description:
+    "Browse every Dota Auto Chess item by tier, search specific items like Vanguard, and open dedicated item pages on Track Auto Chess.",
+  heading: "Items",
+  structuredName: "Dota Auto Chess items",
+  structuredAbout: "Dota Auto Chess items",
+  tierLabel: TIER_LABEL,
+};
 
 export default function ItemsPage({ data, locale }: ItemsPageProps) {
-  const t = T[locale];
   const structuredData = {
     "@context": "https://schema.org",
     "@type": "CollectionPage",

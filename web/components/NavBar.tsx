@@ -5,7 +5,6 @@ import type { SupabaseClient, User } from "@supabase/supabase-js";
 import { SITE_NAME } from "@/lib/site";
 import { isAdminSteamId } from "@/lib/admin";
 import { trackEvent } from "@/lib/analytics";
-import { normalizeLocale } from "@/lib/i18n";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import styles from "./NavBar.module.css";
 
@@ -13,51 +12,31 @@ interface NavBarProps {
   supabase?: SupabaseClient | null;
 }
 
-const T = {
-  en: {
-    items: "Items",
-    units: "Units",
-    classes: "Classes",
-    species: "Species",
-    relics: "Relics",
-    talents: "Talents",
-    ranks: "Ranks",
-    leaderboard: "Leaderboard",
-    matches: "Matches",
-    patchNotes: "Patch Notes",
-    signOut: "Sign out",
-    signIn: "Sign in with Steam",
-    placeholderName: "Steam Player Name",
-    home: (n: string) => `${n} home`,
-    fallbackPlayer: "Player",
-    openMenu: "Open menu",
-    closeMenu: "Close menu",
-  },
-  ru: {
-    items: "Предметы",
-    units: "Фигуры",
-    classes: "Классы",
-    species: "Расы",
-    relics: "Реликвии",
-    talents: "Таланты",
-    ranks: "Ранги",
-    leaderboard: "Таблица лидеров",
-    matches: "Матчи",
-    patchNotes: "Патчноуты",
-    signOut: "Выйти",
-    signIn: "Войти через Steam",
-    placeholderName: "Имя игрока Steam",
-    home: (n: string) => `Главная ${n}`,
-    fallbackPlayer: "Игрок",
-    openMenu: "Открыть меню",
-    closeMenu: "Закрыть меню",
-  },
-} as const;
+// UI chrome strings stay English across locales for now. Localized chrome
+// will return through the same Sanity-driven pipeline as entity names once
+// per-locale UI translations exist.
+const t = {
+  items: "Items",
+  units: "Units",
+  classes: "Classes",
+  species: "Species",
+  relics: "Relics",
+  talents: "Talents",
+  ranks: "Ranks",
+  leaderboard: "Leaderboard",
+  matches: "Matches",
+  patchNotes: "Patch Notes",
+  signOut: "Sign out",
+  signIn: "Sign in with Steam",
+  placeholderName: "Steam Player Name",
+  home: (n: string) => `${n} home`,
+  fallbackPlayer: "Player",
+  openMenu: "Open menu",
+  closeMenu: "Close menu",
+};
 
 export function NavBar({ supabase }: NavBarProps) {
   const router = useRouter();
-  const locale = normalizeLocale(router.locale ?? router.defaultLocale ?? undefined);
-  const t = T[locale];
   const [user, setUser] = useState<User | null>(null);
   const [ready, setReady] = useState(false);
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
@@ -179,7 +158,7 @@ export function NavBar({ supabase }: NavBarProps) {
           {t.matches}
         </Link>
       )}
-      <Link href="/patch-notes" className={styles.navLink} locale={false}>
+      <Link href="/patch-notes" className={styles.navLink}>
         {t.patchNotes}
       </Link>
     </>

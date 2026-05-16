@@ -9,7 +9,7 @@ const nextConfig: NextConfig = {
     root: path.resolve(__dirname, ".."),
   },
   i18n: {
-    locales: ["en", "ru"],
+    locales: ["en", "ru", "zh"],
     defaultLocale: "en",
     // Don't auto-redirect users based on Accept-Language. Canonical URLs
     // stay stable for crawlers, and visitors discover other languages via

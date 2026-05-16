@@ -11,27 +11,16 @@ interface ClassesPageProps {
   data: BrowsableEntity[];
 }
 
-const T = {
-  en: {
-    title: `Classes | ${SITE_TITLE}`,
-    description:
-      "Browse all Dota Auto Chess class traits like Warrior and Wizard, then open each class detail page.",
-    heading: "Classes",
-    structuredName: "Dota Auto Chess classes",
-    structuredAbout: "Dota Auto Chess class synergies",
-  },
-  ru: {
-    title: `Классы | ${SITE_TITLE}`,
-    description:
-      "Все классы Dota Auto Chess: воины, маги и другие — подробные страницы по каждому классу.",
-    heading: "Классы",
-    structuredName: "Классы Dota Auto Chess",
-    structuredAbout: "Классовые синергии Dota Auto Chess",
-  },
-} as const;
+const t = {
+  title: `Classes | ${SITE_TITLE}`,
+  description:
+    "Browse all Dota Auto Chess class traits like Warrior and Wizard, then open each class detail page.",
+  heading: "Classes",
+  structuredName: "Dota Auto Chess classes",
+  structuredAbout: "Dota Auto Chess class synergies",
+};
 
 export default function ClassesPage({ data, locale }: ClassesPageProps) {
-  const t = T[locale];
   const structuredData = {
     "@context": "https://schema.org",
     "@type": "CollectionPage",

@@ -1,45 +1,21 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
-import { useRouter } from "next/router";
 import { EntityCard, type EntityCardVariant } from "@/components/EntityCard";
 import { EntityIcon } from "@/components/EntityIcon";
-import { normalizeLocale, type Locale } from "@/lib/i18n";
 import styles from "./EntityDetail.module.css";
 
-const T: Record<Locale, {
-  home: string;
-  breadcrumb: string;
-  notes: string;
-  lore: string;
-  index: Record<EntityCardVariant, string>;
-  overview: Record<EntityCardVariant, string>;
-}> = {
-  en: {
-    home: "Home",
-    breadcrumb: "Breadcrumb",
-    notes: "Notes",
-    lore: "Lore",
-    index: { item: "Items", relic: "Relics", unit: "Units", synergy: "Synergies" },
-    overview: {
-      item: "Item Overview",
-      relic: "Relic Overview",
-      unit: "Unit Overview",
-      synergy: "Synergy Overview",
-    },
-  },
-  ru: {
-    home: "Главная",
-    breadcrumb: "Хлебные крошки",
-    notes: "Примечания",
-    lore: "Лор",
-    index: { item: "Предметы", relic: "Реликвии", unit: "Фигуры", synergy: "Синергии" },
-    overview: {
-      item: "Описание предмета",
-      relic: "Описание реликвии",
-      unit: "Описание фигуры",
-      synergy: "Описание синергии",
-    },
-  },
+const t = {
+  home: "Home",
+  breadcrumb: "Breadcrumb",
+  notes: "Notes",
+  lore: "Lore",
+  index: { item: "Items", relic: "Relics", unit: "Units", synergy: "Synergies" } as Record<EntityCardVariant, string>,
+  overview: {
+    item: "Item Overview",
+    relic: "Relic Overview",
+    unit: "Unit Overview",
+    synergy: "Synergy Overview",
+  } as Record<EntityCardVariant, string>,
 };
 
 export interface RelatedEntity {
@@ -107,9 +83,6 @@ export function EntityDetail({
   indexLabel,
   indexPath,
 }: EntityDetailProps) {
-  const router = useRouter();
-  const locale = normalizeLocale(router.locale ?? router.defaultLocale ?? undefined);
-  const t = T[locale];
   const titleClass = `${styles.title} ${
     variant === "relic"
       ? styles.titleRelic
