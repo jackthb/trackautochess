@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-DAC Tools is a monorepo for Dota Auto Chess game tracking and analysis. It includes a desktop app (Electron + Python backend), a VOD analyzer CLI, a web viewer, a data scraper, and a stream translator.
+DAC Tools is a monorepo for Dota Auto Chess game tracking and analysis. It includes a desktop app (Electron + Python backend), a web viewer, and a data scraper.
 
 ## Architecture
 
@@ -16,13 +16,9 @@ DAC Tools is a monorepo for Dota Auto Chess game tracking and analysis. It inclu
 
 **Shared Data (`data/`)** — Single source of truth for game data (units.json, items.json, synergies.json, relics.json, icons/). Multiple modules copy from here at build time.
 
-**Analyzer (`analyzer/`)** — Python CLI for offline VOD analysis using Claude Vision API or local Ollama. Uses yt-dlp + ffmpeg for frame extraction.
-
 **Web Viewer (`web/`)** — Next.js 16 app for browsing analyzed games from Supabase.
 
 **Scraper (`scraper/`)** — Node.js/Puppeteer scraper for game data.
-
-**Translator (`translator/`)** — Firefox WebExtension + Python whisper server for real-time stream translation.
 
 ## Build & Run Commands
 
@@ -45,15 +41,6 @@ pip install -r requirements.txt
 python headless.py              # JSON Lines daemon
 python main.py parse-cv <img>   # Test CV pipeline on a screenshot
 python main.py import-matches-cv <dir>  # Batch import
-```
-
-### Analyzer
-```bash
-cd analyzer
-uv sync
-uv run dac analyze <youtube-url>
-uv run dac scan-frame <image>
-uv run dac build-guide <game.json>
 ```
 
 ### Web Viewer

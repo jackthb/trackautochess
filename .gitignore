@@ -1,8 +1,4 @@
 node_modules/
-analyzer/.venv/
-analyzer/**/__pycache__/
-analyzer/**/*.pyc
-analyzer/**/*.egg-info/
 *.part
 data/*.png
 data/debug_*.txt
