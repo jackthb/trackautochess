@@ -3,10 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "predev": "node ./scripts/sync-icons.mjs",
     "dev": "next dev",
-    "prebuild": "node ./scripts/sync-icons.mjs",
-    "build": "next build --webpack",
+    "build": "next build",
     "start": "next start",
     "test:e2e": "pnpm run build && playwright test"
   },

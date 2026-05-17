@@ -1099,39 +1099,45 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     }
   }
 
-  const gamesResult = supabase
-    ? await supabase
+  // Fetch the player's games list and leaderboard position concurrently;
+  // both are independent of each other and dominate the SSR latency.
+  const gamesPromise = supabase
+    ? supabase
         .from("games")
         .select("*, user_id::text")
         .in("user_id", profileUserIds)
         .order("played_at", { ascending: false })
-    : { data: [] };
+        .limit(100)
+    : Promise.resolve({ data: [] as PlayerGame[] });
 
-  let leaderboardPosition: LeaderboardPosition | null = null;
-  if (supabase && drodo?.mmr != null) {
-    const [{ count: higherCount }, { count: totalRanked }] = await Promise.all([
-      supabase
-        .from("users")
-        .select("steam_id", { count: "exact", head: true })
-        .not("drodo_last_fetched_at", "is", null)
-        .eq("drodo_profile_missing", false)
-        .eq("banned", false)
-        .gt("drodo_mmr", drodo.mmr),
-      supabase
-        .from("users")
-        .select("steam_id", { count: "exact", head: true })
-        .not("drodo_last_fetched_at", "is", null)
-        .eq("drodo_profile_missing", false)
-        .eq("banned", false)
-        .not("drodo_mmr", "is", null),
-    ]);
-    if (typeof higherCount === "number" && typeof totalRanked === "number") {
-      leaderboardPosition = {
-        rank: higherCount + 1,
-        total: totalRanked,
-      };
-    }
-  }
+  const leaderboardPromise: Promise<LeaderboardPosition | null> =
+    supabase && drodo?.mmr != null
+      ? Promise.all([
+          supabase
+            .from("users")
+            .select("steam_id", { count: "exact", head: true })
+            .not("drodo_last_fetched_at", "is", null)
+            .eq("drodo_profile_missing", false)
+            .eq("banned", false)
+            .gt("drodo_mmr", drodo.mmr),
+          supabase
+            .from("users")
+            .select("steam_id", { count: "exact", head: true })
+            .not("drodo_last_fetched_at", "is", null)
+            .eq("drodo_profile_missing", false)
+            .eq("banned", false)
+            .not("drodo_mmr", "is", null),
+        ]).then(([{ count: higherCount }, { count: totalRanked }]) =>
+          typeof higherCount === "number" && typeof totalRanked === "number"
+            ? { rank: higherCount + 1, total: totalRanked }
+            : null
+        )
+      : Promise.resolve(null);
+
+  const [gamesResult, leaderboardPosition] = await Promise.all([
+    gamesPromise,
+    leaderboardPromise,
+  ]);
 
   if (
     steamProfile.customUrl &&

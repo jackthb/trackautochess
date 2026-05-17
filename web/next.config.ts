@@ -31,11 +31,6 @@ const nextConfig: NextConfig = {
         headers: immutableAssetCache,
       },
       {
-        source: "/icons/:path*",
-        locale: false,
-        headers: immutableAssetCache,
-      },
-      {
         source: "/logo.svg",
         locale: false,
         headers: [

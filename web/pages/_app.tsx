@@ -6,14 +6,27 @@ import { useEffect, useState } from "react";
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { BotIdClient } from "botid/client";
-import { BannerAd } from "@/components/BannerAd";
-import { CookieConsentBanner } from "@/components/CookieConsentBanner";
 import { Footer } from "@/components/Footer";
 import { NavBar } from "@/components/NavBar";
 import { shouldShowGlobalAd } from "@/lib/ads";
 import { redactAnalyticsEvent } from "@/lib/analytics";
 import { getPostHog, identify, reset } from "@/lib/posthog";
 import type { SupabaseClient } from "@supabase/supabase-js";
+
+// Defer the ad iframe and the cookie banner until after first paint — they
+// pull in third-party scripts (ad provider, PostHog) and don't need to be
+// on the critical path.
+const BannerAd = dynamic(
+  () => import("@/components/BannerAd").then((m) => ({ default: m.BannerAd })),
+  { ssr: false }
+);
+const CookieConsentBanner = dynamic(
+  () =>
+    import("@/components/CookieConsentBanner").then((m) => ({
+      default: m.CookieConsentBanner,
+    })),
+  { ssr: false }
+);
 
 const SanityVisualEditing = dynamic(
   () => import("@/components/SanityVisualEditing"),

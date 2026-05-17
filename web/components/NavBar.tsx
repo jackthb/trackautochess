@@ -85,6 +85,10 @@ export function NavBar({ supabase }: NavBarProps) {
           : null;
     setAvatarUrl(metadataAvatar);
 
+    // Steam metadata already includes avatar_url 99% of the time. Only hit
+    // Supabase as a fallback when metadata didn't carry one.
+    if (metadataAvatar) return;
+
     const steamId = user.user_metadata?.steam_id;
     if (!steamId) return;
 

@@ -812,24 +812,29 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
   if (!data) return { notFound: true };
 
-  const steamProfile = data.user_id
-    ? await fetchSteamProfile(String(data.user_id), supabase)
-    : { name: null, customUrl: null };
+  // Kick off the row-owner Steam profile fetch and the match games query in
+  // parallel — both only depend on the single-game row already in hand.
+  const ownerProfilePromise: Promise<SteamProfile> = data.user_id
+    ? fetchSteamProfile(String(data.user_id), supabase)
+    : Promise.resolve({ name: null, customUrl: null });
 
-  // Fetch all games in the same match
-  let matchGames: Game[] = [];
+  const matchGamesPromise: Promise<Game[]> = data.match_id
+    ? Promise.resolve(
+        supabase
+          .from("games")
+          .select("*, user_id::text")
+          .eq("match_id", data.match_id)
+          .order("placement", { ascending: true })
+      ).then(({ data: matchData }) => (matchData as Game[] | null) || [])
+    : Promise.resolve([]);
+
+  const [steamProfile, matchGames] = await Promise.all([
+    ownerProfilePromise,
+    matchGamesPromise,
+  ]);
+
   const matchProfiles: Record<string, SteamProfile> = {};
-
-  if (data.match_id) {
-    const { data: matchData } = await supabase
-      .from("games")
-      .select("*, user_id::text")
-      .eq("match_id", data.match_id)
-      .order("placement", { ascending: true });
-
-    matchGames = matchData || [];
-
-    // Fetch profiles for all unique user_ids in the match
+  if (matchGames.length > 0) {
     const userIds = [...new Set(
       matchGames
         .map((g) => g.user_id)
