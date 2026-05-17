@@ -5,7 +5,6 @@ data/debug_*.txt
 data/filter_*.txt
 __pycache__/
 *.pyc
-tracker/.venv/
 data/crop_debug/
 data/yolo/
 data/detections.json
@@ -18,8 +17,7 @@ app/backend/dist/
 app/dist/
 app/release/
 tesseract-portable/
-tracker/build/
-tracker/dist/
+tracker/
 .venv/
 .claude/
 .codex

@@ -69,7 +69,6 @@ npm run scrape:items    # Items only
 - **Release pipeline** (`.github/workflows/release.yml`): triggered on `v*` tags, builds on Windows, publishes `.exe` to GitHub Releases
 - **Runtime config**: stored in `~/.dac/config.json` (player name, hotkey, Supabase URL)
 - **Database**: Supabase (PostgreSQL) with RLS policies
-- **`tracker/`** is legacy — its functionality has been merged into `app/backend/`
 
 ## Workflow
 
