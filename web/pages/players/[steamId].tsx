@@ -21,6 +21,7 @@ import {
 } from "@/lib/manualRefreshQuota";
 import { isAdminSteamId } from "@/lib/admin";
 import { analyticsRoute, bucketCount, trackEvent } from "@/lib/analytics";
+import { resolveIconUrl } from "@/lib/icons";
 import { fetchAndCacheDrodo } from "@/lib/drodo";
 import {
   fetchSteamProfile,
@@ -142,10 +143,6 @@ function originFromUrl(value: string | null): string | null {
   } catch {
     return null;
   }
-}
-
-function localIconUrl(type: string, stem: string): string {
-  return `/icons/${type}/${stem}.png`;
 }
 
 async function resolvePlayerRouteSteamId(
@@ -911,7 +908,7 @@ export default function PlayerPage({
                       <GameRowDisplay
                         game={g}
                         unitCosts={UNIT_COSTS}
-                        iconUrl={localIconUrl}
+                        iconUrl={resolveIconUrl}
                         shareUrl={`/games/${g.id}`}
                         style={{ cursor: "pointer" }}
                       />
