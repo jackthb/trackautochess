@@ -16,7 +16,6 @@ app/backend/dist/
 app/backend/vendor/
 app/dist/
 app/release/
-tracker/
 .venv/
 .claude/
 .codex
