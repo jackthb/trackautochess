@@ -11,12 +11,11 @@ data/detections.json
 runs/
 data/screenshots/
 *.pt
-ffmpeg/
 app/backend/build/
 app/backend/dist/
+app/backend/vendor/
 app/dist/
 app/release/
-tesseract-portable/
 tracker/
 .venv/
 .claude/

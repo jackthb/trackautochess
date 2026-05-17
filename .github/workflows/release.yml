@@ -31,7 +31,7 @@ jobs:
         id: tesseract-cache
         uses: actions/cache@v4
         with:
-          path: tesseract-portable
+          path: app/backend/vendor/tesseract-portable
           key: tesseract-portable-5.5.0.20241111-eng-rus
 
       - name: Download & extract portable Tesseract
@@ -40,14 +40,14 @@ jobs:
         run: |
           $url = "https://digi.bib.uni-mannheim.de/tesseract/tesseract-ocr-w64-setup-5.5.0.20241111.exe"
           Invoke-WebRequest -Uri $url -OutFile tesseract-installer.exe
-          7z x tesseract-installer.exe -otesseract-portable -y
-          if (-not (Test-Path "tesseract-portable/tessdata/eng.traineddata")) {
+          7z x tesseract-installer.exe -oapp/backend/vendor/tesseract-portable -y
+          if (-not (Test-Path "app/backend/vendor/tesseract-portable/tessdata/eng.traineddata")) {
             $engUrl = "https://github.com/tesseract-ocr/tessdata_fast/raw/main/eng.traineddata"
-            Invoke-WebRequest -Uri $engUrl -OutFile "tesseract-portable/tessdata/eng.traineddata"
+            Invoke-WebRequest -Uri $engUrl -OutFile "app/backend/vendor/tesseract-portable/tessdata/eng.traineddata"
           }
-          if (-not (Test-Path "tesseract-portable/tessdata/rus.traineddata")) {
+          if (-not (Test-Path "app/backend/vendor/tesseract-portable/tessdata/rus.traineddata")) {
             $rusUrl = "https://github.com/tesseract-ocr/tessdata_fast/raw/main/rus.traineddata"
-            Invoke-WebRequest -Uri $rusUrl -OutFile "tesseract-portable/tessdata/rus.traineddata"
+            Invoke-WebRequest -Uri $rusUrl -OutFile "app/backend/vendor/tesseract-portable/tessdata/rus.traineddata"
           }
 
       - name: Install pnpm

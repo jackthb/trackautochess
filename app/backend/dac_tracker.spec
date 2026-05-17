@@ -19,10 +19,11 @@ BACKEND_DIR = SPECPATH
 APP_DIR = os.path.dirname(BACKEND_DIR)
 ROOT_DIR = os.path.dirname(APP_DIR)
 DATA_DIR = os.path.join(ROOT_DIR, "data")
+VENDOR_DIR = os.path.join(BACKEND_DIR, "vendor")
 
-# Portable Tesseract OCR — set this to the directory containing tesseract.exe + DLLs + tessdata/
+# Portable Tesseract OCR — directory containing tesseract.exe + DLLs + tessdata/
 # Download from: https://digi.bib.uni-mannheim.de/tesseract/
-TESSERACT_DIR = os.path.join(ROOT_DIR, "tesseract-portable")
+TESSERACT_DIR = os.path.join(VENDOR_DIR, "tesseract-portable")
 
 # --- Environment validation — fail early rather than producing a broken build ---
 
@@ -63,7 +64,7 @@ else:
     print(f"[spec] WARNING: Tesseract not found at {TESSERACT_DIR} — OCR will NOT be bundled")
 
 # ffmpeg for replay recording (AV1/H.264)
-FFMPEG_DIR = os.path.join(ROOT_DIR, "ffmpeg")
+FFMPEG_DIR = os.path.join(VENDOR_DIR, "ffmpeg")
 if os.path.exists(FFMPEG_DIR):
     datas.append((FFMPEG_DIR, "ffmpeg"))
 else:

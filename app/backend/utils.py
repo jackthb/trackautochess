@@ -41,7 +41,6 @@ def setup_tesseract() -> None:
 
     backend_dir = Path(__file__).resolve().parent
     app_dir = backend_dir.parent
-    root_dir = app_dir.parent
 
     candidates: list[Path] = []
     env_cmd = os.environ.get("TESSERACT_CMD")
@@ -52,8 +51,7 @@ def setup_tesseract() -> None:
         candidates.append(Path(sys._MEIPASS) / "tesseract" / "tesseract.exe")
 
     candidates.extend([
-        backend_dir / "tesseract-portable" / "tesseract.exe",
-        root_dir / "tesseract-portable" / "tesseract.exe",
+        backend_dir / "vendor" / "tesseract-portable" / "tesseract.exe",
         backend_dir / "dist" / "headless" / "_internal" / "tesseract" / "tesseract.exe",
         app_dir / "release" / "win-unpacked" / "resources" / "headless" / "_internal" / "tesseract" / "tesseract.exe",
     ])

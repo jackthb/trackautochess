@@ -36,7 +36,7 @@ if steam_base.exists():
 
 sys.path.insert(0, str(BACKEND))
 
-TESSERACT = ROOT / "tesseract-portable" / "tesseract.exe"
+TESSERACT = BACKEND / "vendor" / "tesseract-portable" / "tesseract.exe"
 if TESSERACT.exists():
     import os
     os.environ["PATH"] = str(TESSERACT.parent) + os.pathsep + os.environ.get("PATH", "")
