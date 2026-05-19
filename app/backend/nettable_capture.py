@@ -44,18 +44,97 @@ log = logging.getLogger("dac")
 
 # ── autoexec.cfg payload (single source of truth, written verbatim) ──────────
 
-AUTOEXEC_CFG_CONTENT = """// DAC NetTable dump trigger — installed by DAC Tracker.
-//
-// Source 2 runs `autoexec.cfg` once at every Dota launch. Binds PAUSE
-// directly to the six dumpstringtable calls — no alias indirection
-// because DAC's custom game mode appears to clear user-defined
-// aliases across map transitions, which leaves the bind pointing at
-// nothing. Binding the commands directly keeps the key working even
-// if aliases get reset.
-//
-// `console.log` writing still requires the `-condebug` launch option.
+# Static reference tables we've already snapshotted to fixtures
+# (ability definitions, chess piece stats, user UI settings) are
+# excluded from the live bind — they're ~95% of dump volume and never
+# change between games. If we ever need them refreshed (e.g. after a
+# DAC patch), add them back temporarily and run a single capture.
+_DUMP_COMMANDS_INLINE = (
+    "dumpstringtable CustomNetTable_ranking_top_table cl verbose;"
+    "dumpstringtable CustomNetTable_match_history_tab cl verbose;"
+    "dumpstringtable CustomNetTable_dac_table cl verbose;"
+    "dumpstringtable CustomNetTable_player_id_table cl verbose;"
+    "dumpstringtable CustomNetTable_player_info_table cl verbose;"
+    "dumpstringtable CustomNetTable_game_info cl verbose;"
+    "dumpstringtable CustomNetTable_chess_pool_table cl verbose;"
+    "dumpstringtable CustomNetTable_unit_table cl verbose;"
+    "dumpstringtable CustomNetTable_quest_table cl verbose;"
+    "dumpstringtable CustomNetTable_casino_table cl verbose;"
+    "dumpstringtable CustomNetTable_hp_bar_table cl verbose"
+)
 
-bind "PAUSE" "dumpstringtable CustomNetTable_ranking_top_table cl verbose; dumpstringtable CustomNetTable_match_history_table cl verbose; dumpstringtable CustomNetTable_dac_table cl verbose; dumpstringtable CustomNetTable_player_id_table cl verbose; dumpstringtable CustomNetTable_player_info_table cl verbose; dumpstringtable CustomNetTable_game_info cl verbose"
+AUTOEXEC_CFG_CONTENT = f"""// DAC NetTable dump triggers — installed by DAC Tracker.
+//
+// Source 2's bind dispatcher drops chained `dumpstringtable` calls
+// because they fire too fast for the console output pipeline — only
+// the first one in a chain actually runs (observed empirically:
+// PAUSE was producing only ranking_top_table). So we bind ONE table
+// per key. Each press fires a single command, fully processed.
+//
+// Press the key you want; the backend tailer ingests whatever lands.
+// `dac_table` (INS) is the critical one — it carries `end_board` at
+// match end.
+//
+// F-keys mapped per table. Single command per key — chained
+// dumpstringtable in one bind silently drops everything after the
+// first (Valve disabled multi-command binds).
+//
+// Excluded keys:
+//   F7  → toggleconsole (default)
+//   F8  → Dota Options reserved
+//   F9  → Dota Options reserved
+//   F12 → Steam screenshot
+//
+// Note on F10: Dota's GUI hotkey file (dotakeys_personal.lst) claims
+// F10 for SpectatorBroadcasterMenu by default. The autoexec bind
+// usually wins, but on some accounts/sessions the GUI layer may
+// override. If F10 stops firing, paste `bind "F10" "..."` in console
+// (or unbind SpectatorBroadcasterMenu in Dota Settings → Hotkeys).
+//
+// Snapshot keys (press once per moment of interest):
+//   F10 → dac_table          ← has end_board after match (the snapshot key)
+//   F11 → player_info_table  ← full live per-player state
+//   F13 → unit_table         ← chess pieces on board right now
+//   F15 → player_id_table    ← MMR + candy per slot
+//   F16 → chess_pool_table   ← draft / ban / legendary state
+//
+// Polling key (safe to spam — extended F-key, no keyboard conflict):
+//   F20 → game_info          ← round_info + death_team
+
+// F10 deliberately NOT bound — per-account user_keys.vcfg may have
+// `"F10" "<unbound>"` which overrides autoexec, making F10 unreliable
+// across users. PAUSE replaces it (consistently free, not in any
+// dotakeys_personal.lst or user_keys.vcfg override file).
+bind "PAUSE" "dumpstringtable CustomNetTable_dac_table cl verbose"
+bind "F11" "dumpstringtable CustomNetTable_player_info_table cl verbose"
+bind "F13" "dumpstringtable CustomNetTable_unit_table cl verbose"
+bind "F15" "dumpstringtable CustomNetTable_player_id_table cl verbose"
+bind "F16" "dumpstringtable CustomNetTable_chess_pool_table cl verbose"
+bind "F20" "dumpstringtable CustomNetTable_game_info cl verbose"
+"""
+
+DAC_DUMP_CFG_CONTENT = """// DAC NetTable dump commands — installed by DAC Tracker.
+// Invoked via `exec dac_dump` (bind or manual paste).
+//
+// Leading `echo DAC_DUMP_FIRED` is a diagnostic marker the tailer
+// surfaces so we can confirm the file actually executed even when
+// every table is empty.
+//
+// `match_history_tab` is intentional — Source 2 truncates stringtable
+// names at 32 chars; the real name is `_tab` (32) not `_table` (34).
+
+echo DAC_DUMP_FIRED
+dumpstringtable CustomNetTable_ranking_top_table cl verbose
+dumpstringtable CustomNetTable_match_history_tab cl verbose
+dumpstringtable CustomNetTable_dac_table cl verbose
+dumpstringtable CustomNetTable_player_id_table cl verbose
+dumpstringtable CustomNetTable_player_info_table cl verbose
+dumpstringtable CustomNetTable_game_info cl verbose
+dumpstringtable CustomNetTable_chess_pool_table cl verbose
+dumpstringtable CustomNetTable_unit_table cl verbose
+dumpstringtable CustomNetTable_quest_table cl verbose
+dumpstringtable CustomNetTable_casino_table cl verbose
+dumpstringtable CustomNetTable_hp_bar_table cl verbose
 """
 
 
@@ -83,6 +162,10 @@ def find_console_log(dota_dir: Path) -> Path:
 
 def find_autoexec_target(dota_dir: Path) -> Path:
     return dota_dir / "game" / "dota" / "cfg" / "autoexec.cfg"
+
+
+def find_dac_dump_cfg_target(dota_dir: Path) -> Path:
+    return dota_dir / "game" / "dota" / "cfg" / "dac_dump.cfg"
 
 
 # ── Steam launch-options lookup (authoritative source for -condebug etc.) ────
@@ -564,6 +647,124 @@ WM_KEYDOWN = 0x0100
 WM_KEYUP = 0x0101
 WM_CHAR = 0x0102
 VK_PAUSE = 0x13
+VK_F8 = 0x77
+VK_INSERT = 0x2D
+VK_F11 = 0x7A
+VK_F13 = 0x7C
+VK_F15 = 0x7E
+VK_F16 = 0x7F
+VK_F20 = 0x83
+
+
+# ── SendInput-based key firing (replaces external AHK) ─────────────
+# AHK's `Send` uses the Win32 SendInput API which produces input
+# events indistinguishable from a real keyboard — Dota's input layer
+# accepts these (PostMessage'd events don't reach the bind dispatcher).
+# Replicating SendInput from Python via ctypes lets the backend fire
+# the cascade itself, no external tool required.
+
+_INPUT_KEYBOARD = 1
+_KEYEVENTF_KEYUP = 0x0002
+
+
+class _KEYBDINPUT(ctypes.Structure):
+    _fields_ = [
+        ("wVk", wintypes.WORD),
+        ("wScan", wintypes.WORD),
+        ("dwFlags", wintypes.DWORD),
+        ("time", wintypes.DWORD),
+        ("dwExtraInfo", ctypes.POINTER(wintypes.ULONG)),
+    ]
+
+
+class _MOUSEINPUT(ctypes.Structure):
+    _fields_ = [
+        ("dx", wintypes.LONG),
+        ("dy", wintypes.LONG),
+        ("mouseData", wintypes.DWORD),
+        ("dwFlags", wintypes.DWORD),
+        ("time", wintypes.DWORD),
+        ("dwExtraInfo", ctypes.POINTER(wintypes.ULONG)),
+    ]
+
+
+class _HARDWAREINPUT(ctypes.Structure):
+    _fields_ = [
+        ("uMsg", wintypes.DWORD),
+        ("wParamL", wintypes.WORD),
+        ("wParamH", wintypes.WORD),
+    ]
+
+
+class _INPUT_UNION(ctypes.Union):
+    # Must include all three so sizeof(INPUT) matches Windows' expected
+    # 40 bytes on x64 — SendInput returns ERROR_INVALID_PARAMETER (87)
+    # if the cb size we pass doesn't match.
+    _fields_ = [
+        ("ki", _KEYBDINPUT),
+        ("mi", _MOUSEINPUT),
+        ("hi", _HARDWAREINPUT),
+    ]
+
+
+class _INPUT(ctypes.Structure):
+    _fields_ = [
+        ("type", wintypes.DWORD),
+        ("u", _INPUT_UNION),
+    ]
+
+
+def _is_dota_foreground() -> bool:
+    """Return True only when dota2.exe owns the foreground window.
+    Gating key sends on this prevents the backend from spamming keys
+    into other apps when the user alt-tabs out."""
+    try:
+        user32 = ctypes.windll.user32
+        hwnd = user32.GetForegroundWindow()
+        if not hwnd:
+            return False
+        pid = wintypes.DWORD()
+        user32.GetWindowThreadProcessId(hwnd, ctypes.byref(pid))
+        # Read the foreground process's image name without psutil
+        # to avoid a new dependency.
+        PROCESS_QUERY_LIMITED_INFORMATION = 0x1000
+        kernel32 = ctypes.windll.kernel32
+        h = kernel32.OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, False, pid.value)
+        if not h:
+            return False
+        try:
+            buf = ctypes.create_unicode_buffer(260)
+            size = wintypes.DWORD(260)
+            ok = kernel32.QueryFullProcessImageNameW(h, 0, buf, ctypes.byref(size))
+            if not ok:
+                return False
+            return buf.value.lower().endswith("\\dota2.exe")
+        finally:
+            kernel32.CloseHandle(h)
+    except Exception:
+        return False
+
+
+def send_input_key(vk: int) -> bool:
+    """Fire a single keydown/keyup for the given virtual-key code via
+    SendInput. Returns True iff Dota is foreground AND the call sent
+    both events successfully. Silent no-op if Dota isn't active."""
+    if not _is_dota_foreground():
+        return False
+    try:
+        events = (_INPUT * 2)(
+            _INPUT(type=_INPUT_KEYBOARD,
+                   u=_INPUT_UNION(ki=_KEYBDINPUT(wVk=vk, wScan=0, dwFlags=0,
+                                                  time=0, dwExtraInfo=None))),
+            _INPUT(type=_INPUT_KEYBOARD,
+                   u=_INPUT_UNION(ki=_KEYBDINPUT(wVk=vk, wScan=0, dwFlags=_KEYEVENTF_KEYUP,
+                                                  time=0, dwExtraInfo=None))),
+        )
+        sent = ctypes.windll.user32.SendInput(2, ctypes.byref(events), ctypes.sizeof(_INPUT))
+        return sent == 2
+    except Exception as e:
+        log.warning("send_input_key(0x%x) failed: %s", vk, e)
+        return False
 VK_RETURN = 0x0D
 VK_OEM_5 = 0xDC  # "\" key — most users have this bound to toggleconsole
 
@@ -571,18 +772,7 @@ VK_OEM_5 = 0xDC  # "\" key — most users have this bound to toggleconsole
 # because custom-game addons reload their own keybinds/aliases on map load
 # (ModDota Default_Keys), so anything we set via autoexec gets clobbered.
 # Typing the commands directly into the console sidesteps that entirely.
-DUMP_COMMAND = (
-    "dumpstringtable CustomNetTable_ranking_top_table cl verbose;"
-    # Source 2 truncates stringtable names at 32 chars, so
-    # "CustomNetTable_match_history_table" (34) is stored as
-    # "CustomNetTable_match_history_tab" (32). Querying the full name
-    # silently fails with a Usage: hint.
-    "dumpstringtable CustomNetTable_match_history_tab cl verbose;"
-    "dumpstringtable CustomNetTable_dac_table cl verbose;"
-    "dumpstringtable CustomNetTable_player_id_table cl verbose;"
-    "dumpstringtable CustomNetTable_player_info_table cl verbose;"
-    "dumpstringtable CustomNetTable_game_info cl verbose"
-)
+DUMP_COMMAND = "exec dac_dump"
 
 
 def _post_key(hwnd: int, vk: int) -> None:
@@ -644,7 +834,7 @@ def send_dump_key_to_dota() -> bool:
         log.warning("send_dump_key_to_dota: Dota window not found")
         return False
     try:
-        _post_key(hwnd, VK_PAUSE)
+        _post_key(hwnd, VK_INSERT)
         log.info("Sent Pause to Dota hwnd=%s", hwnd)
         return True
     except Exception as e:
@@ -725,6 +915,21 @@ def insert_dumps(client, rows: list[dict[str, Any]]) -> int:
 GAME_IN_PROGRESS_RE = "DOTA_GAMERULES_STATE_GAME_IN_PROGRESS"
 POST_GAME_RE = "DOTA_GAMERULES_STATE_POST_GAME"
 STRINGTABLE_MARKER = "[stringtables]"
+PAUSE_FIRED_MARKER = "DAC_DUMP_FIRED"
+
+# How often the backend fires F20 (game_info) for cheap round visibility.
+# Mirrors the role AHK's PollRound timer used to play, now in-process.
+POLL_INTERVAL_SEC = 2.0
+# How often the backend fires the full cascade (dac_table + player_info +
+# unit + player_id + chess_pool + game_info). Heavier — gives a complete
+# state snapshot.
+FULL_CASCADE_INTERVAL_SEC = 15.0
+# Gap between individual keys in the cascade. dumpstringtable produces
+# hundreds of console lines per call; firing too fast can drop output.
+CASCADE_KEY_GAP_SEC = 0.2
+
+# The keys the cascade fires, in order. Mirrors the autoexec binds.
+CASCADE_VK_SEQUENCE = (VK_PAUSE, VK_F11, VK_F13, VK_F15, VK_F16, VK_F20)
 
 # Wait this long after GAME_IN_PROGRESS before sending the first capture.
 # Gives the CustomNetTables time to populate.
@@ -782,6 +987,26 @@ class NetTableCapture:
         self._dump_timer: threading.Timer | None = None
         self._dump_sent_for_postgame = False
 
+        # Set true when POST_GAME has fired; the next dump containing
+        # dac_table.end_board will be saved as a finished-match record.
+        self._postgame_capture_pending = False
+        # Hashes of end_board payloads we've already saved, to dedup if
+        # the user presses INS multiple times after game end.
+        self._saved_end_board_hashes: set[str] = set()
+
+        # Last seen round number from game_info → round_info → round.
+        # Updated on every ingest; change → emit nettable_round_changed.
+        # When round % 5 == 0, emit nettable_creep_round.
+        self._last_round: int | None = None
+        # Per-player chess_lineup snapshot for diff detection.
+        # Keyed by steam_id, value is the comma-joined chess list.
+        self._last_lineups: dict[str, str] = {}
+
+        # Match session window — used to stitch dump files into a
+        # match timeline. Set on GAME_IN_PROGRESS (start), reset
+        # after a match's timeline is generated. Float epoch seconds.
+        self._match_session_start: float | None = None
+
         # Dump block accumulator
         self._dump_active = False
         self._dump_last_line_ts = 0.0
@@ -823,6 +1048,33 @@ class NetTableCapture:
         t.start()
         p = threading.Thread(target=self._run_status_poll, daemon=True, name="nettable-status-poll")
         p.start()
+        k = threading.Thread(target=self._run_key_poller, daemon=True, name="nettable-key-poller")
+        k.start()
+
+    def _run_key_poller(self) -> None:
+        """Replaces AHK: fires F20 every 2s and the full cascade every
+        15s, but only while Dota is the foreground window. SendInput
+        keystrokes are accepted by Dota the same way real key presses
+        are (PostMessage gets filtered by the input layer)."""
+        last_full_cascade = 0.0
+        while not self._stop.is_set():
+            now = time.time()
+            try:
+                if _is_dota_foreground():
+                    if now - last_full_cascade >= FULL_CASCADE_INTERVAL_SEC:
+                        last_full_cascade = now
+                        for vk in CASCADE_VK_SEQUENCE:
+                            if self._stop.is_set():
+                                break
+                            send_input_key(vk)
+                            time.sleep(CASCADE_KEY_GAP_SEC)
+                    else:
+                        # Cheap poll — just F20 (game_info → round_info).
+                        send_input_key(VK_F20)
+            except Exception as e:
+                log.warning("nettable: key poller iteration failed: %s", e)
+            # Sleep till next poll tick.
+            self._stop.wait(POLL_INTERVAL_SEC)
 
     def emit_status(self) -> None:
         """Re-emit current status. Called on demand when the renderer asks.
@@ -935,21 +1187,23 @@ class NetTableCapture:
         if not self._dota_dir:
             log.warning("nettable: Dota dir not found — autoexec not installed")
             return False
-        dst = find_autoexec_target(self._dota_dir)
-        try:
-            dst.parent.mkdir(parents=True, exist_ok=True)
-            desired = AUTOEXEC_CFG_CONTENT.encode("utf-8")
-            if dst.exists():
-                existing = dst.read_bytes()
-                if _sha256(existing) == _sha256(desired):
-                    log.info("nettable: autoexec.cfg already current at %s", dst)
-                    return True
-            dst.write_bytes(desired)
-            log.info("nettable: wrote autoexec.cfg to %s", dst)
-            return True
-        except Exception as e:
-            log.warning("nettable: failed to install autoexec.cfg: %s", e)
-            return False
+        ok = True
+        for dst, content, label in (
+            (find_autoexec_target(self._dota_dir), AUTOEXEC_CFG_CONTENT, "autoexec.cfg"),
+            (find_dac_dump_cfg_target(self._dota_dir), DAC_DUMP_CFG_CONTENT, "dac_dump.cfg"),
+        ):
+            try:
+                dst.parent.mkdir(parents=True, exist_ok=True)
+                desired = content.encode("utf-8")
+                if dst.exists() and _sha256(dst.read_bytes()) == _sha256(desired):
+                    log.info("nettable: %s already current at %s", label, dst)
+                    continue
+                dst.write_bytes(desired)
+                log.info("nettable: wrote %s to %s", label, dst)
+            except Exception as e:
+                log.warning("nettable: failed to install %s: %s", label, e)
+                ok = False
+        return ok
 
     # ── Tail loop ──────────────────────────────────────────────────────────
 
@@ -1026,19 +1280,38 @@ class NetTableCapture:
     # ── Line handlers ──────────────────────────────────────────────────────
 
     def _handle_line(self, line: str) -> None:
-        # Mid-game: start the recurring capture loop on GAME_IN_PROGRESS.
-        if not self._dump_armed and GAME_IN_PROGRESS_RE in line:
-            self._schedule_dump()
+        # PAUSE_FIRED_MARKER: legacy echo marker. Echo no longer writes
+        # to console.log on this Dota build, so this branch is effectively
+        # never taken — but we keep it as a free signal in case Valve
+        # restores echo logging.
+        if line.rstrip().endswith(PAUSE_FIRED_MARKER):
+            log.info("nettable: dac_dump fired in Dota")
+            self._emit({"type": "nettable_pause_fired", "at": datetime.now().isoformat()})
             return
 
-        # Post-game: stop the recurring loop and fire one final capture
-        # to grab the end_board state.
-        if not self._dump_sent_for_postgame and POST_GAME_RE in line:
-            self._stop_capture_loop()
-            self._schedule_postgame_dump()
-            return
+        # Match start — opens the session window so dumps captured
+        # between now and POST_GAME / end_board belong to this match.
+        if GAME_IN_PROGRESS_RE in line:
+            if self._match_session_start is None:
+                self._match_session_start = time.time()
+                log.info("nettable: GAME_IN_PROGRESS — match session opened")
 
-        # Dump block accumulation
+        # Game state — POST_GAME tells us a match ended. We emit a
+        # notification so the UI can prompt the user to F10 (or AHK to
+        # auto-cascade). The actual end_board save happens when the
+        # resulting dump lands in _maybe_save_end_board.
+        if POST_GAME_RE in line:
+            now = time.time()
+            last = getattr(self, "_last_post_game_emit", 0.0)
+            if now - last > 10.0:  # debounce: POST_GAME can re-emit
+                self._last_post_game_emit = now
+                log.info("nettable: POST_GAME detected — match ended")
+                self._emit({
+                    "type": "nettable_game_ended",
+                    "message": "Match ended — capture end_board now (F10).",
+                    "at": datetime.now().isoformat(),
+                })
+
         if STRINGTABLE_MARKER in line:
             self._note_dump_line(line)
 
@@ -1069,13 +1342,14 @@ class NetTableCapture:
         self._dump_timer = t
 
     def _do_send_dump(self) -> None:
+        # Auto-trigger via PostMessage'd VK_INSERT is silently ignored by
+        # Dota's input dispatcher (synthetic key events don't reach the
+        # bind layer), and the only alternative — typing into the console
+        # via send_console_command — pops the console open mid-game, which
+        # is unacceptable. Leave the loop armed (so we still know we're
+        # in-game) but skip the actual send. Users dump manually via INS.
         if not self._dump_armed:
-            return  # loop was stopped (POST_GAME or log rotation)
-        ok = send_console_command(DUMP_COMMAND)
-        if not ok:
-            log.info("nettable: console-type send failed — will retry next interval")
-        # Schedule the next tick regardless of whether this one succeeded;
-        # a transient failure shouldn't kill the loop.
+            return
         self._schedule_next_capture(CAPTURE_INTERVAL_SEC)
 
     def _stop_capture_loop(self) -> None:
@@ -1090,22 +1364,19 @@ class NetTableCapture:
     def _schedule_postgame_dump(self) -> None:
         if self._dump_sent_for_postgame:
             return
-        log.info(
-            "nettable: POST_GAME detected — scheduling dump-key in %.0fs",
-            DUMP_POSTGAME_DELAY_SEC,
-        )
-        t = threading.Timer(DUMP_POSTGAME_DELAY_SEC, self._do_send_postgame_dump)
-        t.daemon = True
-        t.start()
-
-    def _do_send_postgame_dump(self) -> None:
-        if self._dump_sent_for_postgame:
-            return
-        ok = send_console_command(DUMP_COMMAND)
-        if ok:
-            self._dump_sent_for_postgame = True
-        else:
-            log.info("nettable: post-game console-type send failed")
+        # We can't reliably auto-fire the dump (PostMessage of INS is
+        # ignored by Dota; typing into the console pops the UI mid-game).
+        # Instead, notify the renderer so it can prompt the user to press
+        # INS now, and arm _do_ingest to extract dac_table.end_board from
+        # whatever dump arrives next.
+        self._dump_sent_for_postgame = True
+        self._postgame_capture_pending = True
+        log.info("nettable: POST_GAME detected — waiting for user to press INS to capture end_board")
+        self._emit({
+            "type": "nettable_postgame_prompt",
+            "message": "Game ended — press INS in Dota to capture the end board.",
+            "at": datetime.now().isoformat(),
+        })
 
     def _note_dump_line(self, line: str) -> None:
         idx = line.find("table ")
@@ -1147,6 +1418,713 @@ class NetTableCapture:
 
     # ── Ingest ─────────────────────────────────────────────────────────────
 
+    def _detect_round_change(self, rows: list[dict]) -> None:
+        """If game_info.round_info.round has changed since last ingest,
+        emit nettable_round_changed (and nettable_creep_round at every
+        5th round)."""
+        round_now = None
+        for r in rows:
+            if r.get("table_name", "").endswith("game_info") and r.get("key") == "round_info":
+                raw = r.get("raw")
+                if isinstance(raw, dict):
+                    round_now = raw.get("round")
+                break
+        if round_now is None:
+            return
+        try:
+            round_now = int(round_now)
+        except (TypeError, ValueError):
+            return
+        if round_now == self._last_round:
+            return
+        prev = self._last_round
+        self._last_round = round_now
+        log.info("nettable: round changed %s -> %s", prev, round_now)
+        self._emit({
+            "type": "nettable_round_changed",
+            "round": round_now,
+            "prev_round": prev,
+            "at": datetime.now().isoformat(),
+        })
+        # Creep rounds in DAC fire every 5 rounds (5, 10, 15, ...).
+        # Worth flagging so consumers can fire a heavier snapshot.
+        if round_now > 0 and round_now % 5 == 0:
+            log.info("nettable: creep round %d", round_now)
+            self._emit({
+                "type": "nettable_creep_round",
+                "round": round_now,
+                "at": datetime.now().isoformat(),
+            })
+
+    def _detect_lineup_change(self, rows: list[dict]) -> None:
+        """Diff per-player chess_lineup against last snapshot. Emit
+        nettable_lineup_changed for each player whose lineup changed
+        (units added, removed, or reordered)."""
+        # Locate dac_table.player_info → info → {steam_id: {chess_lineup}}
+        for r in rows:
+            if not (r.get("table_name", "").endswith("dac_table")
+                    and r.get("key") == "player_info"):
+                continue
+            raw = r.get("raw")
+            if not isinstance(raw, dict):
+                continue
+            info = raw.get("info") or raw.get("data") or {}
+            if not isinstance(info, dict):
+                continue
+            for steam_id, p in info.items():
+                if not isinstance(p, dict):
+                    continue
+                lineup = p.get("chess_lineup")
+                if not isinstance(lineup, str):
+                    continue
+                prev = self._last_lineups.get(str(steam_id))
+                if prev == lineup:
+                    continue
+                self._last_lineups[str(steam_id)] = lineup
+                if prev is None:
+                    # First time we've seen this player — not a "change".
+                    continue
+                prev_units = set(u for u in prev.split(",") if u)
+                new_units = set(u for u in lineup.split(",") if u)
+                added = sorted(new_units - prev_units)
+                removed = sorted(prev_units - new_units)
+                log.info(
+                    "nettable: lineup changed for %s: +%s -%s",
+                    steam_id, added or "-", removed or "-",
+                )
+                self._emit({
+                    "type": "nettable_lineup_changed",
+                    "steam_id": str(steam_id),
+                    "added": added,
+                    "removed": removed,
+                    "lineup": lineup,
+                    "at": datetime.now().isoformat(),
+                })
+            break
+
+    def _maybe_extract_ranking_top(self, rows: list[dict]) -> None:
+        """Find ranking_top_table.ranking_top and upsert a player profile
+        for every steam_id in the leaderboard. Lets us build a global
+        player DB without having to personally play with everyone."""
+        from utils import LOCAL_PLAYERS_DIR
+
+        for r in rows:
+            if not (r.get("table_name", "").endswith("ranking_top_table")
+                    and r.get("key") == "ranking_top"):
+                continue
+            raw = r.get("raw")
+            if not isinstance(raw, dict):
+                continue
+            top = raw.get("ranking_top") or {}
+            if not isinstance(top, dict):
+                continue
+            season = raw.get("season") or ""
+            scanned_at = datetime.now().isoformat()
+            upserted = 0
+            LOCAL_PLAYERS_DIR.mkdir(parents=True, exist_ok=True)
+            for rank_str, entry in top.items():
+                if not isinstance(entry, dict):
+                    continue
+                sid = str(entry.get("player") or "")
+                if not sid or not sid.startswith("7656"):  # SteamID64 prefix
+                    continue
+                try:
+                    ppath = LOCAL_PLAYERS_DIR / f"{sid}.json"
+                    existing: dict = {}
+                    if ppath.exists():
+                        try:
+                            existing = json.loads(ppath.read_text(encoding="utf-8"))
+                        except Exception:
+                            existing = {}
+                    profile = {
+                        **existing,
+                        "steam_id": sid,
+                        "last_ranking_seen": scanned_at,
+                        "queen_rank": _safe_int(entry.get("queen_rank")),
+                        "mmr_level": _safe_int(entry.get("mmr_level")),
+                        "is_vip": bool(entry.get("is_vip")),
+                        "chicken_count": _safe_int(entry.get("chicken_count")),
+                        "season": season,
+                        "source": "ranking_top_scan",
+                    }
+                    ppath.write_text(json.dumps(profile, indent=2, ensure_ascii=False), encoding="utf-8")
+                    upserted += 1
+                except Exception as e:
+                    log.warning("nettable: failed to upsert ranking player %s: %s", sid, e)
+            if upserted > 0:
+                log.info("nettable: ranking_top scan upserted %d player profile(s)", upserted)
+                self._emit({
+                    "type": "nettable_ranking_scanned",
+                    "player_count": upserted,
+                    "season": season,
+                    "at": scanned_at,
+                })
+            break
+
+    def _maybe_save_end_board(self, rows: list[dict], games_dir) -> None:
+        """If the dump contains dac_table.end_board, archive the raw payload
+        and trigger structured extraction (transformed match + match_players
+        + players). Dedupes on payload hash to avoid double-writes."""
+        from utils import LOCAL_END_BOARDS_DIR
+
+        end_board = None
+        for r in rows:
+            if r.get("table_name") in ("CustomNetTable_dac_table", "dac_table") \
+                    and r.get("key") == "end_board":
+                end_board = r.get("raw")
+                break
+        if end_board is None:
+            return
+        try:
+            saved_at = datetime.now().isoformat()
+            # Hash only the GAMEPLAY-relevant fields, not the wrapper or
+            # the `hehe` randomization field that DAC sprinkles into
+            # every nettable payload. Otherwise each PAUSE press
+            # generates a new "unique" end_board and we extract the
+            # same match over and over.
+            stable = self._stable_end_board_payload(end_board)
+            payload_hash = hashlib.sha256(
+                json.dumps(stable, sort_keys=True, ensure_ascii=False).encode("utf-8")
+            ).hexdigest()
+            if payload_hash in self._saved_end_board_hashes:
+                log.info("nettable: end_board already saved this session — skipping duplicate")
+                self._postgame_capture_pending = False
+                return
+            self._saved_end_board_hashes.add(payload_hash)
+
+            raw_payload = json.dumps({
+                "saved_at": saved_at,
+                "source": "dac_table.end_board",
+                "end_board": end_board,
+            }, indent=2, ensure_ascii=False, sort_keys=True)
+
+            # Archive raw to its own dir (separate from transformed records).
+            LOCAL_END_BOARDS_DIR.mkdir(parents=True, exist_ok=True)
+            ts = datetime.now().strftime("%Y%m%d_%H%M%S_%f")
+            raw_path = LOCAL_END_BOARDS_DIR / f"{ts}__end_board.json"
+            raw_path.write_text(raw_payload, encoding="utf-8")
+            log.info("nettable: archived raw end_board to %s", raw_path.name)
+
+            # Drive the transform: match header, per-player rows, player profiles.
+            self._extract_structured_match(end_board, saved_at)
+
+            self._emit({
+                "type": "nettable_end_board_saved",
+                "path": str(raw_path),
+                "at": saved_at,
+            })
+            self._postgame_capture_pending = False
+        except Exception as e:
+            log.warning("nettable: failed to save end_board: %s", e)
+
+    def _extract_structured_match(self, end_board: dict, played_at: str) -> None:
+        """Turn raw end_board into three transformed views:
+          * matches/<match_id>.json         — match header + player summary
+          * match_players/<match_id>__p<N>.json — per-player rows for ME only
+          * players/<steam_id>.json         — append-only profile per player
+        Other players' deep stats only come from the ranking_top scan."""
+        from utils import LOCAL_MATCH_PLAYERS_DIR, LOCAL_MATCHES_DIR, LOCAL_PLAYERS_DIR
+        from db import generate_match_id
+
+        data = end_board.get("data") if isinstance(end_board, dict) else None
+        if not isinstance(data, dict) or not data:
+            return
+
+        my_steam_id = str(self.config.get("steam_id") or "").strip() if hasattr(self, "config") else ""
+        # Fall back to load_config() if the NetTableCapture instance doesn't
+        # carry config (defensive — older entrypoints constructed it without).
+        if not my_steam_id:
+            try:
+                from utils import load_config
+                my_steam_id = str(load_config().get("steam_id") or "").strip()
+            except Exception:
+                my_steam_id = ""
+
+        match_id = generate_match_id()
+        match_players: list[dict] = []
+        match_duration: float | None = None
+        match_final_round: int | None = None
+
+        LOCAL_PLAYERS_DIR.mkdir(parents=True, exist_ok=True)
+        LOCAL_MATCH_PLAYERS_DIR.mkdir(parents=True, exist_ok=True)
+        LOCAL_MATCHES_DIR.mkdir(parents=True, exist_ok=True)
+
+        for steam_id, p in data.items():
+            if not isinstance(p, dict):
+                continue
+            sid = str(steam_id)
+
+            placement = _safe_int(p.get("curr_rank") or p.get("rank"))
+            mmr_level = _safe_int(p.get("mmr_level"))
+
+            # Transformed match_player record — only gameplay-relevant fields.
+            # chess_lineup / chess_hand / max_lineup_value_lineup / mvp_chess
+            # are translated from raw 'chess_br11' codes to 'Broodmother(3)'
+            # so the History tab's parser can resolve them in unitsFull.
+            mvp_raw = p.get("mvp_chess_name", "") or ""
+            mvp_translated, mvp_stars = (
+                _resolve_chess_piece(mvp_raw, _load_chess_id_map()) if mvp_raw else ("", 0)
+            )
+            mvp_display = (f"{mvp_translated}({mvp_stars})" if mvp_stars > 1 else mvp_translated) if mvp_translated else mvp_raw
+            row = {
+                "match_id": match_id,
+                "played_at": played_at,
+                "steam_id": sid,
+                "placement": placement,
+                "mmr_level": mmr_level,
+                "hero_level": _safe_int(p.get("hero_level")),
+                "chess_lineup": _transform_chess_lineup(p.get("chess_lineup")),
+                "chess_hand": _transform_chess_lineup(p.get("chess_hand")),
+                "synergies": _transform_synergies(p.get("show_buff")),
+                "relic": _transform_relic(p.get("relic", "") or ""),
+                "relic_history": p.get("relic_history") or {},
+                "talents": self._format_talents(p.get("talent_tree")),
+                "win_round": _safe_int(p.get("win_round")) or 0,
+                "lose_round": _safe_int(p.get("lose_round")) or 0,
+                "draw_round": _safe_int(p.get("draw_round")) or 0,
+                "kills": _safe_int(p.get("kills")) or 0,
+                "deaths": _safe_int(p.get("deaths")) or 0,
+                "hero_damage": _safe_int(p.get("hero_damage")) or 0,
+                "hero_damaged": _safe_int(p.get("hero_damaged")) or 0,
+                "mvp_chess_name": mvp_display,
+                "mvp_chess_items": _pipe(p.get("mvp_chess_items")),
+                "max_lineup_value": _safe_int(p.get("max_lineup_value")) or 0,
+                "max_lineup_value_lineup": _transform_chess_lineup(p.get("max_lineup_value_lineup")),
+                "duration": p.get("duration") or 0,
+                "final_round": _safe_int(p.get("round")) or 0,
+                "zhugong": p.get("zhugong", "") or "",
+                "total_money": _safe_int(p.get("total_money")) or 0,
+                "candy": _safe_int(p.get("candy")) or 0,
+            }
+            # Per-player deep row for EVERY player in end_board, not just
+            # the logged-in user. Distribution: friends play their own
+            # matches, end_board reports their data, we want it all.
+            mp_path = LOCAL_MATCH_PLAYERS_DIR / f"{match_id}__p{placement or 'X'}__{sid}.json"
+            try:
+                mp_path.write_text(json.dumps(row, indent=2, ensure_ascii=False), encoding="utf-8")
+            except Exception as e:
+                log.warning("nettable: failed to write match_player %s: %s", sid, e)
+
+            # Match-level player summary line — small, for fast match-list views.
+            match_players.append({
+                "steam_id": sid,
+                "placement": placement,
+                "mmr_level": mmr_level,
+            })
+
+            # Match-wide stats — pull from any player (they all share these).
+            if match_duration is None and row["duration"]:
+                match_duration = row["duration"]
+            if match_final_round is None and row["final_round"]:
+                match_final_round = row["final_round"]
+
+            # Player profile — append-only, accumulates match_ids over time.
+            try:
+                ppath = LOCAL_PLAYERS_DIR / f"{sid}.json"
+                existing: dict = {}
+                if ppath.exists():
+                    try:
+                        existing = json.loads(ppath.read_text(encoding="utf-8"))
+                    except Exception:
+                        existing = {}
+                match_ids = existing.get("match_ids") or []
+                if match_id not in match_ids:
+                    match_ids.append(match_id)
+                profile = {
+                    "steam_id": sid,
+                    "last_seen": played_at,
+                    "last_mmr_level": mmr_level,
+                    "last_match_id": match_id,
+                    "match_count": len(match_ids),
+                    "match_ids": match_ids,
+                }
+                ppath.write_text(json.dumps(profile, indent=2, ensure_ascii=False), encoding="utf-8")
+            except Exception as e:
+                log.warning("nettable: failed to write player profile %s: %s", sid, e)
+
+        # Match header
+        try:
+            match_record = {
+                "match_id": match_id,
+                "played_at": played_at,
+                "duration": match_duration or 0,
+                "final_round": match_final_round or 0,
+                "player_count": len(match_players),
+                "players": sorted(match_players, key=lambda x: (x["placement"] or 99)),
+            }
+            mpath = LOCAL_MATCHES_DIR / f"{match_id}.json"
+            mpath.write_text(json.dumps(match_record, indent=2, ensure_ascii=False), encoding="utf-8")
+            log.info(
+                "nettable: structured match saved — match_id=%s players=%d duration=%.0fs final_round=%d",
+                match_id, len(match_players), match_duration or 0, match_final_round or 0,
+            )
+            self._emit({
+                "type": "nettable_match_extracted",
+                "match_id": match_id,
+                "player_count": len(match_players),
+                "at": played_at,
+            })
+        except Exception as e:
+            log.warning("nettable: failed to write match record: %s", e)
+
+        # Round-by-round timeline — stitch in-session dumps into an
+        # ordered action log so the UI can replay the match.
+        try:
+            self._extract_match_timeline(match_id, played_at)
+        except Exception as e:
+            log.warning("nettable: failed to write match timeline: %s", e)
+
+        # Close the session window so the NEXT match starts clean.
+        self._match_session_start = None
+
+    def _extract_match_timeline(self, match_id: str, played_at: str) -> None:
+        """Walk dumps that belong to the just-ended match, pull
+        per-round per-player state, write match_timelines/<match_id>.json
+        as an ordered list of round snapshots.
+
+        Match-window detection (in priority order):
+          1. If GAME_IN_PROGRESS fired this session (_match_session_start
+             is set), use that as the lower bound.
+          2. Otherwise, walk dumps backwards from now; collect them
+             until the round number STOPS being monotonically
+             non-decreasing (i.e. the previous match begins). That
+             gives us this match's dumps even if backend missed the
+             session start."""
+        from utils import LOCAL_DUMPS_DIR, LOCAL_MATCH_TIMELINES_DIR
+
+        # Collect ALL dump files with their mtimes.
+        all_dumps = []
+        for p in LOCAL_DUMPS_DIR.glob("*.json"):
+            try:
+                all_dumps.append((p.stat().st_mtime, p))
+            except Exception:
+                continue
+        all_dumps.sort()
+        if not all_dumps:
+            log.info("nettable: no dumps to build timeline from")
+            return
+
+        session_start = self._match_session_start
+        if session_start is not None:
+            dump_files = [t for t in all_dumps if t[0] >= session_start - 1.0]
+        else:
+            # Walk backwards. Each in-match dump should have a round
+            # number >= the previous one (rounds go up). Stop when we
+            # see a drop (= previous match's later round → end_board's
+            # match's earlier round transition).
+            reversed_dumps = list(reversed(all_dumps))
+            in_match = []
+            prev_round = None
+            for mtime, path in reversed_dumps:
+                try:
+                    d = json.loads(path.read_text(encoding="utf-8"))
+                except Exception:
+                    continue
+                round_n = self._extract_round_from_rows(d.get("rows") or [])
+                if round_n is None:
+                    in_match.append((mtime, path))
+                    continue
+                # Walking backwards, round numbers should DECREASE or
+                # stay equal. If we see an INCREASE (older dump has
+                # higher round than newer one), that's a boundary.
+                if prev_round is not None and round_n > prev_round:
+                    break
+                prev_round = round_n
+                in_match.append((mtime, path))
+            dump_files = sorted(in_match)
+        if not dump_files:
+            log.info("nettable: no in-session dumps to build timeline from")
+            return
+
+        # Group dumps by round_info.round. Each round can have multiple
+        # dumps — keep the LATEST per round so the snapshot reflects
+        # the round's final state.
+        by_round: dict[int, dict] = {}
+        for mtime, path in dump_files:
+            try:
+                d = json.loads(path.read_text(encoding="utf-8"))
+            except Exception:
+                continue
+            rows = d.get("rows") or []
+            round_n = self._extract_round_from_rows(rows)
+            if round_n is None:
+                continue
+            snapshot = {
+                "round": round_n,
+                "captured_at": d.get("captured_at"),
+                "players": self._extract_players_state_from_rows(rows),
+                "draft": self._extract_draft_state_from_rows(rows),
+                "death_team": self._extract_death_team_from_rows(rows),
+            }
+            existing = by_round.get(round_n)
+            # Keep the latest dump per round.
+            if existing is None or (snapshot["captured_at"] or "") >= (existing["captured_at"] or ""):
+                by_round[round_n] = snapshot
+
+        if not by_round:
+            log.info("nettable: in-session dumps had no round_info — skipping timeline")
+            return
+
+        timeline = [by_round[r] for r in sorted(by_round.keys())]
+
+        LOCAL_MATCH_TIMELINES_DIR.mkdir(parents=True, exist_ok=True)
+        out_path = LOCAL_MATCH_TIMELINES_DIR / f"{match_id}.json"
+        out_path.write_text(json.dumps({
+            "match_id": match_id,
+            "played_at": played_at,
+            "round_count": len(timeline),
+            "first_round": timeline[0]["round"],
+            "last_round": timeline[-1]["round"],
+            "rounds": timeline,
+        }, indent=2, ensure_ascii=False), encoding="utf-8")
+        log.info(
+            "nettable: match timeline saved — match_id=%s rounds=%d (round %d → %d, from %d dumps)",
+            match_id, len(timeline), timeline[0]["round"], timeline[-1]["round"], len(dump_files),
+        )
+        self._emit({
+            "type": "nettable_timeline_extracted",
+            "match_id": match_id,
+            "round_count": len(timeline),
+            "at": played_at,
+        })
+
+    @staticmethod
+    def _stable_end_board_payload(end_board: dict) -> dict:
+        """Strip nondeterministic fields (`hehe` random noise) so two
+        consecutive PAUSE-press captures of the same end_board hash
+        identically and dedup correctly."""
+        if not isinstance(end_board, dict):
+            return end_board
+        # Recursively drop all `hehe` keys at any depth.
+        def scrub(node):
+            if isinstance(node, dict):
+                return {k: scrub(v) for k, v in node.items() if k != "hehe"}
+            if isinstance(node, list):
+                return [scrub(x) for x in node]
+            return node
+        return scrub(end_board)
+
+    @staticmethod
+    def _extract_round_from_rows(rows: list[dict]) -> int | None:
+        for r in rows:
+            if r.get("table_name", "").endswith("game_info") and r.get("key") == "round_info":
+                raw = r.get("raw")
+                if isinstance(raw, dict):
+                    val = raw.get("round")
+                    try:
+                        return int(val)
+                    except (TypeError, ValueError):
+                        return None
+        return None
+
+    @staticmethod
+    def _extract_players_state_from_rows(rows: list[dict]) -> dict:
+        """Pull live per-player state for a round snapshot.
+
+        Three data sources, merged in priority order:
+          1. `player_info_table.player_info.data.<steam_id>` — full
+             per-player state (hp, hero_level, curr_rank, lineup).
+             Empirically this is the one that updates round-to-round
+             for the LOCAL player.
+          2. `dac_table.player_info.info.<steam_id>` — same shape,
+             carries all 8 players in 8-player lobbies (the local
+             user's client receives everyone's state here).
+          3. `player_id_table.<key>_<slot>` (slot = 0..7) — the
+             per-slot tables: vchess_<n> (live board), courier_<n>
+             (level, win_streak, courier model), relic_ttl_<n>
+             (active relic + remaining duration), mmr_level_<n>.
+             These populate even when (1) doesn't include a given
+             player.
+
+        Field notes:
+          - `hero_level` is the round-by-round XP level shown on the
+            portrait — the "level" we want.
+          - `curr_rank` is current placement in the lobby (1-8).
+          - `rank` is MMR-ladder rank (always 0 if unranked); we
+            ignore it.
+
+        Output is keyed by steam_id when known, otherwise by the
+        synthetic key `slot_<n>` so unknown players still appear.
+        """
+        out: dict[str, dict] = {}
+
+        def merge(key: str, fields: dict) -> None:
+            existing = out.setdefault(key, {})
+            for k, v in fields.items():
+                if v is None:
+                    continue
+                # Don't downgrade live values with stale ones (hp=100 is
+                # the static-table sentinel — only accept it if we have
+                # nothing else yet).
+                if k == "hp" and v == 100 and existing.get("hp") not in (None, 100):
+                    continue
+                if existing.get(k) in (None, "", 0) or k in ("hp", "level", "placement", "lineup"):
+                    existing[k] = v
+
+        # Build slot → steam_id map. `player_<n>.player_id` is the slot
+        # number; the steam_id mapping comes from cross-referencing the
+        # `player_info` containers (each player's row has its own
+        # `player_id` field).
+        slot_to_sid: dict[int, str] = {}
+        for r in rows:
+            tname = r.get("table_name", "")
+            if not (tname.endswith("dac_table") or tname.endswith("player_info_table")):
+                continue
+            if r.get("key") != "player_info":
+                continue
+            raw = r.get("raw") or {}
+            container = raw.get("data") or raw.get("info") or {}
+            if not isinstance(container, dict):
+                continue
+            for sid, p in container.items():
+                if not isinstance(p, dict):
+                    continue
+                pid = p.get("player_id")
+                if pid is None:
+                    continue
+                try:
+                    slot_to_sid.setdefault(int(pid), str(sid))
+                except (TypeError, ValueError):
+                    continue
+
+        # (1) + (2): harvest from player_info containers.
+        def harvest_player_info(raw: dict, key: str) -> None:
+            if not isinstance(raw, dict):
+                return
+            container = raw.get(key) or {}
+            if not isinstance(container, dict):
+                return
+            for sid, p in container.items():
+                if not isinstance(p, dict):
+                    continue
+                lineup_raw = p.get("chess_lineup", "") or ""
+                merge(str(sid), {
+                    "hp": p.get("hp"),
+                    "level": p.get("hero_level"),
+                    "placement": p.get("curr_rank"),
+                    "duration": p.get("duration"),
+                    "lineup": _transform_chess_lineup(lineup_raw) if lineup_raw else None,
+                    "lineup_value": p.get("lineup_value"),
+                    "total_money": p.get("total_money"),
+                    "win_round": p.get("win_round"),
+                    "lose_round": p.get("lose_round"),
+                })
+
+        for r in rows:
+            if r.get("table_name", "").endswith("player_info_table") and r.get("key") == "player_info":
+                harvest_player_info(r.get("raw") or {}, "data")
+        for r in rows:
+            if r.get("table_name", "").endswith("dac_table") and r.get("key") == "player_info":
+                harvest_player_info(r.get("raw") or {}, "info")
+
+        # (3): per-slot tables — fill in board / courier / relic for any
+        # slot, including ones whose steam_id we don't know yet.
+        slot_data: dict[int, dict] = {}
+
+        def slot_for_key(k: str, prefix: str) -> int | None:
+            if not k.startswith(prefix + "_"):
+                return None
+            try:
+                return int(k.removeprefix(prefix + "_"))
+            except ValueError:
+                return None
+
+        for r in rows:
+            if not r.get("table_name", "").endswith("player_id_table"):
+                continue
+            k = r.get("key", "")
+            raw = r.get("raw") or {}
+            if not isinstance(raw, dict):
+                continue
+
+            n = slot_for_key(k, "vchess")
+            if n is not None:
+                chess_ids = [
+                    v.get("chess") for v in raw.values()
+                    if isinstance(v, dict) and v.get("chess")
+                ]
+                if chess_ids:
+                    slot_data.setdefault(n, {})["lineup"] = _transform_chess_lineup(",".join(chess_ids))
+                continue
+
+            n = slot_for_key(k, "courier")
+            if n is not None:
+                slot_data.setdefault(n, {}).update({
+                    "courier_level": raw.get("level"),
+                    "win_streak": raw.get("win_streak"),
+                })
+                continue
+
+            n = slot_for_key(k, "relic_ttl")
+            if n is not None:
+                relic_name = raw.get("relic_name") or ""
+                slot_data.setdefault(n, {}).update({
+                    "relic": _transform_relic(relic_name) if relic_name else None,
+                    "relic_ttl": raw.get("ttl"),
+                })
+                continue
+
+            n = slot_for_key(k, "mmr_level")
+            if n is not None:
+                slot_data.setdefault(n, {}).update({
+                    "mmr_level": raw.get("mmr_level"),
+                    "candy": raw.get("candy"),
+                })
+                continue
+
+            n = slot_for_key(k, "player")
+            if n is not None:
+                slot_data.setdefault(n, {}).update({
+                    "team_id": raw.get("team_id"),
+                    "hero_index": raw.get("hero_index"),
+                    "player_id": raw.get("player_id"),
+                })
+                continue
+
+        for slot, fields in slot_data.items():
+            sid = slot_to_sid.get(slot, f"slot_{slot}")
+            merge(sid, fields)
+
+        return out
+
+    @staticmethod
+    def _extract_draft_state_from_rows(rows: list[dict]) -> dict:
+        """Pull ban_info_* and legendary list from chess_pool_table."""
+        bans: dict[str, str] = {}
+        legendaries_revealed: list = []
+        for r in rows:
+            if not r.get("table_name", "").endswith("chess_pool_table"):
+                continue
+            key = r.get("key", "")
+            raw = r.get("raw")
+            if key.startswith("ban_info_") and isinstance(raw, dict):
+                pid = key.removeprefix("ban_info_")
+                ban = raw.get("ban") or raw.get("synergy") or ""
+                bans[pid] = ban
+            elif key == "revealed_legendary_chess_list" and isinstance(raw, (list, dict)):
+                legendaries_revealed = list(raw.values()) if isinstance(raw, dict) else list(raw)
+        return {"bans": bans, "legendaries_revealed": legendaries_revealed}
+
+    @staticmethod
+    def _extract_death_team_from_rows(rows: list[dict]) -> dict:
+        for r in rows:
+            if r.get("table_name", "").endswith("game_info") and r.get("key") == "death_team":
+                raw = r.get("raw")
+                if isinstance(raw, dict):
+                    return raw
+        return {}
+
+    @staticmethod
+    def _format_talents(talent_tree) -> str:
+        """end_board.talent_tree is a dict like {'1': 'talent_1a_winbonus', ...}.
+        Flatten to pipe-separated string sorted by key."""
+        if not isinstance(talent_tree, dict):
+            return ""
+        try:
+            return "|".join(talent_tree[k] for k in sorted(talent_tree.keys(), key=lambda x: int(x)))
+        except Exception:
+            return "|".join(str(v) for v in talent_tree.values())
+
     def _do_ingest(self, tables: list[str]) -> None:
         try:
             rows = extract_rows(self._log_path)
@@ -1154,27 +2132,37 @@ class NetTableCapture:
                 log.info("nettable: ingest found no rows — skipping")
                 return
 
-            try:
-                import httpx
-            except ImportError as e:
-                raise RuntimeError(f"httpx required for ingest: {e}")
+            from utils import LOCAL_DUMPS_DIR, LOCAL_GAMES_DIR, load_config, local_only_mode
 
-            from utils import load_config
-            cfg = load_config()
-            url = cfg.get("supabase_url")
-            # Service-role required because dac_nettable_dumps RLS has an
-            # anon SELECT policy but no INSERT — anon key gets 401 on write.
-            # Resolution order: env var (cleanest), .env.local in the dev
-            # repo (convenient when running from source), config.json
-            # supabase_key (publishable, will 401 on insert but lets reads
-            # still work). End-user shipped builds won't have .env.local.
-            key = (
-                os.environ.get("SUPABASE_SERVICE_ROLE_KEY")
-                or _load_dotenv_value("SUPABASE_SERVICE_ROLE_KEY")
-                or cfg.get("supabase_key")
-            )
-            if not url or not key:
-                raise RuntimeError("supabase_url / key missing from config")
+            # Round + lineup change detection — cheap, runs on every ingest.
+            self._detect_round_change(rows)
+            self._detect_lineup_change(rows)
+
+            # Look for dac_table.end_board — the server writes this once when
+            # a match finishes. Saving it gives us a finished-match record
+            # independent of the unreachable match_history_table.
+            self._maybe_save_end_board(rows, LOCAL_GAMES_DIR)
+
+            # Scan ranking_top_table for top players → upsert their profiles.
+            # This is how we populate the player DB for everyone we haven't
+            # personally played with.
+            self._maybe_extract_ranking_top(rows)
+
+            # Always snapshot the parsed dump to disk before doing anything
+            # else — that way local testing has a record even if Supabase
+            # is unreachable or disabled.
+            try:
+                LOCAL_DUMPS_DIR.mkdir(parents=True, exist_ok=True)
+                ts = datetime.now().strftime("%Y%m%d_%H%M%S_%f")
+                dump_path = LOCAL_DUMPS_DIR / f"{ts}.json"
+                dump_path.write_text(json.dumps({
+                    "captured_at": datetime.now().isoformat(),
+                    "tables": tables,
+                    "rows": rows,
+                }, indent=2, ensure_ascii=False), encoding="utf-8")
+                log.info("nettable: dump saved locally: %s (%d row(s))", dump_path.name, len(rows))
+            except Exception as e:
+                log.warning("nettable: local dump save failed: %s", e)
 
             # Cross-dump dedupe: only POST rows that actually changed since
             # the last successful capture. ranking_top alone is ~79 KB and
@@ -1202,7 +2190,28 @@ class NetTableCapture:
             })
 
             written = 0
-            if changed_rows:
+            if local_only_mode():
+                log.info(
+                    "nettable: local_only — supabase POST skipped (%d changed, %d unchanged)",
+                    len(changed_rows), skipped,
+                )
+            elif changed_rows:
+                import httpx
+                cfg = load_config()
+                url = cfg.get("supabase_url")
+                # Service-role required because dac_nettable_dumps RLS has an
+                # anon SELECT policy but no INSERT — anon key gets 401 on write.
+                # Resolution order: env var (cleanest), .env.local in the dev
+                # repo (convenient when running from source), config.json
+                # supabase_key (publishable, will 401 on insert but lets reads
+                # still work). End-user shipped builds won't have .env.local.
+                key = (
+                    os.environ.get("SUPABASE_SERVICE_ROLE_KEY")
+                    or _load_dotenv_value("SUPABASE_SERVICE_ROLE_KEY")
+                    or cfg.get("supabase_key")
+                )
+                if not url or not key:
+                    raise RuntimeError("supabase_url / key missing from config")
                 with httpx.Client(
                     base_url=url.rstrip("/"),
                     headers={
@@ -1237,3 +2246,165 @@ class NetTableCapture:
 
 def _sha256(data: bytes) -> str:
     return hashlib.sha256(data).hexdigest()
+
+
+def _safe_int(value) -> int | None:
+    """Coerce to int, returning None on failure or empty value.
+    end_board fields arrive as native ints normally but some show up as
+    strings or null — keep the transform tolerant."""
+    if value is None or value == "":
+        return None
+    try:
+        return int(value)
+    except (TypeError, ValueError):
+        return None
+
+
+def _pipe(value) -> str:
+    """Convert comma-separated string (end_board convention) to
+    pipe-separated (our schema convention). Empty / non-string → ''."""
+    if not isinstance(value, str):
+        return ""
+    return value.replace(",", "|").strip("|")
+
+
+_CHESS_ID_MAP_CACHE: dict[str, str] | None = None
+_SYNERGY_ID_MAP_CACHE: dict[str, str] | None = None
+_RELIC_ID_MAP_CACHE: dict[str, str] | None = None
+
+
+def _load_relic_id_map() -> dict[str, str]:
+    """Read data/relics.json → {'item_repeat_relic': 'Repeat Relic', ...}.
+    The file shape is {'relics': {<item_id>: {'name': '...', ...}}}."""
+    global _RELIC_ID_MAP_CACHE
+    if _RELIC_ID_MAP_CACHE is not None:
+        return _RELIC_ID_MAP_CACHE
+    try:
+        from utils import DATA_DIR
+        path = DATA_DIR / "relics.json"
+        if not path.exists():
+            _RELIC_ID_MAP_CACHE = {}
+            return _RELIC_ID_MAP_CACHE
+        data = json.loads(path.read_text(encoding="utf-8"))
+        relics = data.get("relics", data) if isinstance(data, dict) else {}
+        out: dict[str, str] = {}
+        if isinstance(relics, dict):
+            for item_id, info in relics.items():
+                if isinstance(info, dict):
+                    out[item_id] = info.get("name") or item_id
+        _RELIC_ID_MAP_CACHE = out
+    except Exception as e:
+        log.warning("nettable: failed to load relic id map: %s", e)
+        _RELIC_ID_MAP_CACHE = {}
+    return _RELIC_ID_MAP_CACHE
+
+
+def _transform_relic(raw: str) -> str:
+    """'item_repeat_relic' → 'Repeat Relic'. Single relic, not a list."""
+    if not raw:
+        return ""
+    return _load_relic_id_map().get(raw, raw)
+
+
+def _load_chess_id_map() -> dict[str, str]:
+    """Read data/units_full.json → {internal chess_id: 'Display Name'}.
+    Lets us convert raw end_board strings like 'chess_br11' into the
+    'Broodmother(3)' format the History tab's parsers expect."""
+    global _CHESS_ID_MAP_CACHE
+    if _CHESS_ID_MAP_CACHE is not None:
+        return _CHESS_ID_MAP_CACHE
+    try:
+        from utils import DATA_DIR
+        path = DATA_DIR / "units_full.json"
+        if not path.exists():
+            _CHESS_ID_MAP_CACHE = {}
+            return _CHESS_ID_MAP_CACHE
+        data = json.loads(path.read_text(encoding="utf-8"))
+        _CHESS_ID_MAP_CACHE = {
+            u.get("id"): name for name, u in data.items() if u.get("id")
+        }
+    except Exception as e:
+        log.warning("nettable: failed to load chess id map: %s", e)
+        _CHESS_ID_MAP_CACHE = {}
+    return _CHESS_ID_MAP_CACHE
+
+
+def _load_synergy_id_map() -> dict[str, str]:
+    """Read data/synergies.json → {'is_mage': 'Mage', 'is_human': 'Human', ...}.
+    synergies.json is keyed BY the internal id ('is_aqir') with a
+    nested 'name' field holding the display label."""
+    global _SYNERGY_ID_MAP_CACHE
+    if _SYNERGY_ID_MAP_CACHE is not None:
+        return _SYNERGY_ID_MAP_CACHE
+    try:
+        from utils import DATA_DIR
+        path = DATA_DIR / "synergies.json"
+        if not path.exists():
+            _SYNERGY_ID_MAP_CACHE = {}
+            return _SYNERGY_ID_MAP_CACHE
+        data = json.loads(path.read_text(encoding="utf-8"))
+        out: dict[str, str] = {}
+        if isinstance(data, dict):
+            for internal_id, info in data.items():
+                if isinstance(info, dict):
+                    display = info.get("name") or internal_id
+                    out[internal_id] = display
+        _SYNERGY_ID_MAP_CACHE = out
+    except Exception as e:
+        log.warning("nettable: failed to load synergy id map: %s", e)
+        _SYNERGY_ID_MAP_CACHE = {}
+    return _SYNERGY_ID_MAP_CACHE
+
+
+def _resolve_chess_piece(piece_id: str, id_map: dict[str, str]) -> tuple[str, int]:
+    """'chess_br11' → ('Broodmother', 3). Strips trailing '1's, looks
+    up the base id; star count = 1 + number stripped. Unknown ids
+    fall through as-is at 1 star so the UI shows the raw token (so
+    breakage is visible, not silent)."""
+    if not piece_id or piece_id == "placeholder":
+        return ("", 0)
+    import re as _re
+    base = _re.sub(r"1+$", "", piece_id)
+    if base in id_map:
+        stars = 1 + (len(piece_id) - len(base))
+        return (id_map[base], max(1, min(stars, 3)))
+    return (piece_id, 1)
+
+
+def _transform_chess_lineup(raw: str) -> str:
+    """'chess_br11,chess_chen11,chess_wl1' → 'Broodmother(3)|Chen(3)|Warlock(2)'."""
+    if not raw:
+        return ""
+    id_map = _load_chess_id_map()
+    if not id_map:
+        return _pipe(raw)  # fallback: at least normalize separators
+    out: list[str] = []
+    for p in str(raw).replace("|", ",").split(","):
+        p = p.strip()
+        if not p or p == "placeholder":
+            continue
+        name, stars = _resolve_chess_piece(p, id_map)
+        if not name:
+            continue
+        out.append(f"{name}({stars})" if stars > 1 else name)
+    return "|".join(out)
+
+
+def _transform_synergies(raw: str) -> str:
+    """'is_mage:9,is_human:6' → 'Mage:9|Human:6'."""
+    if not raw:
+        return ""
+    id_map = _load_synergy_id_map()
+    out: list[str] = []
+    for p in str(raw).replace("|", ",").split(","):
+        p = p.strip()
+        if not p:
+            continue
+        if ":" in p:
+            sid, count = p.split(":", 1)
+            display = id_map.get(sid.strip(), sid.strip())
+            out.append(f"{display}:{count.strip()}")
+        else:
+            display = id_map.get(p, p)
+            out.append(display)
+    return "|".join(out)

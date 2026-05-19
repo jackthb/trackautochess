@@ -707,6 +707,162 @@ ipcMain.on("tracker:command", (_event, cmd) => {
   sendToPython(cmd);
 });
 
+// ── tracker.log file watcher (bypasses Python→Electron→React IPC) ──────────
+//
+// LogTab reads tracker.log directly so it shows every log line independent
+// of any IPC quirks between the Python subprocess and the renderer.
+
+const TRACKER_LOG_PATH = path.join(DAC_DIR, "tracker.log");
+const DOTA_CONSOLE_LOG_CANDIDATES = [
+  "C:/Program Files (x86)/Steam/steamapps/common/dota 2 beta/game/dota/console.log",
+  "C:/Program Files/Steam/steamapps/common/dota 2 beta/game/dota/console.log",
+];
+const TRACKER_LOG_INITIAL_TAIL_BYTES = 256 * 1024; // ~2.5k lines
+const DOTA_LOG_INITIAL_TAIL_BYTES = 128 * 1024;
+// console.log is full of [GCClient] heartbeats etc. Drop the highest-volume
+// noise so the Log tab stays readable — keep everything else, especially
+// our DAC_* markers and [stringtables] / DOTA_GAMERULES_STATE_* lines.
+const DOTA_NOISE_RE = /\[GCClient\]|^WriteSteamRemoteStorageFileAsync|^CAsyncWriteInProgress|^\[SteamNetSockets\]/;
+let trackerLogWatcher = null;
+let trackerLogOffset = 0;
+let dotaLogWatcher = null;
+let dotaLogOffset = 0;
+let dotaLogPath = null;
+
+function parseTrackerLogLines(text) {
+  const entries = [];
+  const lineRegex = /^(\d{4}-\d{2}-\d{2}) (\d{2}:\d{2}:\d{2})\s+(\S+)\s+(.*)$/;
+  for (const raw of text.split(/\r?\n/)) {
+    if (!raw) continue;
+    const m = raw.match(lineRegex);
+    if (m) {
+      const ts = new Date(`${m[1]}T${m[2]}`).getTime() / 1000;
+      entries.push({ type: "log", source: "tracker", ts, level: m[3], msg: m[4] });
+    } else if (entries.length > 0) {
+      entries[entries.length - 1].msg += "\n" + raw;
+    }
+  }
+  return entries;
+}
+
+function parseDotaLogLines(text) {
+  const entries = [];
+  // Dota writes "MM/DD HH:MM:SS message" — no year, no level.
+  const lineRegex = /^(\d{2})\/(\d{2}) (\d{2}):(\d{2}):(\d{2}) (.*)$/;
+  const year = new Date().getFullYear();
+  for (const raw of text.split(/\r?\n/)) {
+    if (!raw) continue;
+    const m = raw.match(lineRegex);
+    if (m) {
+      if (DOTA_NOISE_RE.test(m[6])) continue;
+      const ts = new Date(`${year}-${m[1]}-${m[2]}T${m[3]}:${m[4]}:${m[5]}`).getTime() / 1000;
+      entries.push({ type: "log", source: "dota", ts, level: "INFO", msg: m[6] });
+    } else if (entries.length > 0) {
+      entries[entries.length - 1].msg += "\n" + raw;
+    }
+  }
+  return entries;
+}
+
+function resolveDotaLogPath() {
+  for (const p of DOTA_CONSOLE_LOG_CANDIDATES) {
+    if (fs.existsSync(p)) return p;
+  }
+  return null;
+}
+
+function readFileTail(filePath, maxBytes, parser) {
+  if (!filePath || !fs.existsSync(filePath)) return [];
+  const stats = fs.statSync(filePath);
+  const start = Math.max(0, stats.size - maxBytes);
+  const length = stats.size - start;
+  if (length === 0) return [];
+  const fd = fs.openSync(filePath, "r");
+  try {
+    const buf = Buffer.alloc(length);
+    fs.readSync(fd, buf, 0, length, start);
+    return parser(buf.toString("utf-8"));
+  } finally {
+    fs.closeSync(fd);
+  }
+}
+
+ipcMain.handle("trackerLog:read", () => {
+  const tracker = readFileTail(TRACKER_LOG_PATH, TRACKER_LOG_INITIAL_TAIL_BYTES, parseTrackerLogLines);
+  const dotaPath = dotaLogPath || resolveDotaLogPath();
+  const dota = readFileTail(dotaPath, DOTA_LOG_INITIAL_TAIL_BYTES, parseDotaLogLines);
+  // Merge chronologically — the renderer expects a single stream.
+  return [...tracker, ...dota].sort((a, b) => a.ts - b.ts);
+});
+
+function tailFileWatcher({ filePath, getOffset, setOffset, parser, label }) {
+  if (!fs.existsSync(filePath)) return null;
+  setOffset(fs.statSync(filePath).size);
+  try {
+    const watcher = fs.watch(filePath, (eventType) => {
+      if (eventType !== "change") return;
+      try {
+        const stats = fs.statSync(filePath);
+        let offset = getOffset();
+        if (stats.size < offset) offset = 0; // truncated/rotated
+        if (stats.size === offset) return;
+        const length = stats.size - offset;
+        const fd = fs.openSync(filePath, "r");
+        try {
+          const buf = Buffer.alloc(length);
+          fs.readSync(fd, buf, 0, length, offset);
+          setOffset(stats.size);
+          const newEntries = parser(buf.toString("utf-8"));
+          if (newEntries.length > 0 && mainWindow && !mainWindow.isDestroyed()) {
+            mainWindow.webContents.send("trackerLog:update", newEntries);
+          }
+        } finally {
+          fs.closeSync(fd);
+        }
+      } catch (e) {
+        console.error(`${label} watcher read error:`, e);
+      }
+    });
+    console.log(`${label} watcher started on ${filePath}`);
+    return watcher;
+  } catch (e) {
+    console.error(`${label} watcher failed to start:`, e);
+    return null;
+  }
+}
+
+function startTrackerLogWatcher() {
+  if (trackerLogWatcher) return;
+  if (!fs.existsSync(TRACKER_LOG_PATH)) {
+    setTimeout(startTrackerLogWatcher, 2000);
+    return;
+  }
+  trackerLogWatcher = tailFileWatcher({
+    filePath: TRACKER_LOG_PATH,
+    getOffset: () => trackerLogOffset,
+    setOffset: (v) => { trackerLogOffset = v; },
+    parser: parseTrackerLogLines,
+    label: "trackerLog",
+  });
+}
+
+function startDotaLogWatcher() {
+  if (dotaLogWatcher) return;
+  dotaLogPath = resolveDotaLogPath();
+  if (!dotaLogPath) {
+    // Dota not installed yet or path differs — re-check periodically.
+    setTimeout(startDotaLogWatcher, 5000);
+    return;
+  }
+  dotaLogWatcher = tailFileWatcher({
+    filePath: dotaLogPath,
+    getOffset: () => dotaLogOffset,
+    setOffset: (v) => { dotaLogOffset = v; },
+    parser: parseDotaLogLines,
+    label: "dotaLog",
+  });
+}
+
 // Steam stores Dota 2 screenshots under
 // <SteamRoot>/userdata/<steam32>/760/remote/570/screenshots. Default the
 // upload dialogs there when we can resolve it, since that is where the
@@ -829,14 +985,93 @@ function loadTrackerConfig() {
   }
 }
 
+// Hash a string to a deterministic positive 32-bit int — used to mint
+// stable numeric `id`s for local match_player records (the History
+// tab keys rows by numeric id, but our local data is keyed by
+// match_id+steam_id strings).
+function hashToInt(s) {
+  let h = 0;
+  for (let i = 0; i < s.length; i++) h = ((h << 5) - h + s.charCodeAt(i)) | 0;
+  return Math.abs(h);
+}
+
+function readLocalMatchPlayers() {
+  const dir = path.join(DAC_DIR, "match_players");
+  if (!fs.existsSync(dir)) return [];
+  const games = [];
+  for (const name of fs.readdirSync(dir)) {
+    if (!name.endsWith(".json")) continue;
+    try {
+      const mp = JSON.parse(fs.readFileSync(path.join(dir, name), "utf-8"));
+      const winRound = Number(mp.win_round || 0);
+      const loseRound = Number(mp.lose_round || 0);
+      games.push({
+        id: hashToInt(`${mp.match_id}__${mp.steam_id}`),
+        user_id: mp.steam_id || "",
+        placement: String(mp.placement ?? ""),
+        rank: mp.mmr_level != null ? String(mp.mmr_level) : null,
+        rank_change: "none",
+        lineup: mp.chess_lineup || null,
+        synergies: mp.synergies || null,
+        talents: mp.talents || null,
+        relic: mp.relic || null,
+        level: mp.hero_level != null ? String(mp.hero_level) : null,
+        wl: `${winRound}-${loseRound}`,
+        wins: winRound,
+        losses: loseRound,
+        screenshot: null,
+        replay: null,
+        notes: mp.mvp_chess_name ? `MVP: ${mp.mvp_chess_name}` : null,
+        match_id: mp.match_id || null,
+        played_at: mp.played_at,
+        created_at: mp.played_at,
+        // Extra fields for the timeline view (not in standard Game type,
+        // but harmless if unused).
+        _local: true,
+        _source: "match_players",
+        _file: name,
+      });
+    } catch (e) {
+      console.error(`games:fetch local read failed for ${name}:`, e);
+    }
+  }
+  return games;
+}
+
+ipcMain.handle("timelines:fetch", async (_event, matchId) => {
+  if (!matchId) return null;
+  const path = require("path");
+  const fs = require("fs");
+  const file = path.join(DAC_DIR, "match_timelines", `${matchId}.json`);
+  if (!fs.existsSync(file)) return null;
+  try {
+    return JSON.parse(fs.readFileSync(file, "utf-8"));
+  } catch (e) {
+    console.error(`timelines:fetch failed for ${matchId}:`, e);
+    return null;
+  }
+});
+
 ipcMain.handle("games:fetch", async () => {
   const config = loadTrackerConfig();
   const url = config.supabase_url;
   const key = config.supabase_key;
   const steamId = config.steam_id;
+  const localOnly = !!config.local_only;
 
-  if (!url || !key || !steamId) return [];
+  const local = readLocalMatchPlayers();
+  console.log(`[games:fetch] local_only=${localOnly} local=${local.length} steam=${steamId}`);
 
+  // local_only short-circuit: no Supabase fetch, return local only.
+  if (localOnly) {
+    local.sort((a, b) => (b.played_at || "").localeCompare(a.played_at || ""));
+    console.log(`[games:fetch] returning ${local.length} local games`);
+    return local;
+  }
+
+  if (!url || !key || !steamId) return local;
+
+  let remote = [];
   try {
     const resp = await net.fetch(
       `${url}/rest/v1/games?select=*&user_id=eq.${steamId}&order=played_at.desc&limit=100`,
@@ -848,12 +1083,22 @@ ipcMain.handle("games:fetch", async () => {
         },
       }
     );
-    if (!resp.ok) return [];
-    return await resp.json();
+    if (resp.ok) remote = await resp.json();
   } catch (e) {
     console.error("games:fetch error:", e);
-    return [];
   }
+
+  // Merge local + remote, dedupe by id (local entries shadow remote),
+  // sort by played_at desc.
+  const seen = new Set();
+  const merged = [];
+  for (const g of [...local, ...remote]) {
+    if (seen.has(g.id)) continue;
+    seen.add(g.id);
+    merged.push(g);
+  }
+  merged.sort((a, b) => (b.played_at || "").localeCompare(a.played_at || ""));
+  return merged;
 });
 
 ipcMain.handle("games:update", async (_event, gameId, fields) => {
@@ -1278,6 +1523,8 @@ app.whenReady().then(() => {
   startDotaPoller();
   registerShortcuts();
   startPython();
+  startTrackerLogWatcher();
+  startDotaLogWatcher();
 
   app.on("activate", () => {
     focusMainWindow();
@@ -1290,6 +1537,14 @@ app.on("before-quit", () => {
 
 app.on("will-quit", () => {
   globalShortcut.unregisterAll();
+  if (trackerLogWatcher) {
+    try { trackerLogWatcher.close(); } catch {}
+    trackerLogWatcher = null;
+  }
+  if (dotaLogWatcher) {
+    try { dotaLogWatcher.close(); } catch {}
+    dotaLogWatcher = null;
+  }
   if (dotaPollInterval) clearInterval(dotaPollInterval);
   for (const timer of notificationTimers.values()) {
     clearTimeout(timer);

@@ -184,6 +184,10 @@ export interface LogEntry {
   ts: number;
   level: string;
   msg: string;
+  /** Which file the line came from. "tracker" = backend's tracker.log,
+   *  "dota" = Dota 2's console.log. Optional for backwards-compat with
+   *  events emitted via the Python IPC channel. */
+  source?: "tracker" | "dota";
 }
 
 export type ImportResultTone = "success" | "warning" | "error";
@@ -336,6 +340,7 @@ declare global {
       getCloseToTray: () => Promise<boolean>;
       setCloseToTray: (value: boolean) => Promise<boolean>;
       fetchGames: () => Promise<Game[]>;
+      fetchTimeline: (matchId: string) => Promise<unknown | null>;
       updateGame: (gameId: number, fields: Partial<Game>) => Promise<boolean>;
       deleteGame: (gameId: number) => Promise<boolean>;
       fetchUnitsData: () => Promise<UnitsData>;

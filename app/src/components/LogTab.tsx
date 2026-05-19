@@ -1,9 +1,5 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { LogEntry } from "../types";
-
-interface LogTabProps {
-  entries: LogEntry[];
-}
 
 const LEVEL_COLORS: Record<string, string> = {
   DEBUG: "var(--text-muted)",
@@ -13,15 +9,63 @@ const LEVEL_COLORS: Record<string, string> = {
   CRITICAL: "#ff3333",
 };
 
+const SOURCE_COLORS: Record<string, string> = {
+  tracker: "#7aa3d9",
+  dota: "#d97a7a",
+};
+
+const MAX_DISPLAY_ENTRIES = 1000;
+
 function formatTime(ts: number): string {
   const d = new Date(ts * 1000);
   return d.toLocaleTimeString("en-GB", { hour12: false });
 }
 
-export function LogTab({ entries }: LogTabProps) {
+declare global {
+  interface Window {
+    trackerLog?: {
+      read: () => Promise<LogEntry[]>;
+      onUpdate: (callback: (entries: LogEntry[]) => void) => () => void;
+    };
+  }
+}
+
+export function LogTab() {
+  const [entries, setEntries] = useState<LogEntry[]>([]);
+  const [sourceError, setSourceError] = useState<string | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const autoScroll = useRef(true);
+
+  useEffect(() => {
+    if (!window.trackerLog) {
+      setSourceError("window.trackerLog not available — preload may be stale (restart the app).");
+      return;
+    }
+    let cancelled = false;
+
+    window.trackerLog
+      .read()
+      .then((initial) => {
+        if (cancelled) return;
+        setEntries(initial.slice(-MAX_DISPLAY_ENTRIES));
+      })
+      .catch((e) => {
+        if (!cancelled) setSourceError(`Failed to read tracker.log: ${e?.message ?? e}`);
+      });
+
+    const unsubscribe = window.trackerLog.onUpdate((newEntries) => {
+      setEntries((prev) => {
+        const next = [...prev, ...newEntries];
+        return next.length > MAX_DISPLAY_ENTRIES ? next.slice(-MAX_DISPLAY_ENTRIES) : next;
+      });
+    });
+
+    return () => {
+      cancelled = true;
+      unsubscribe();
+    };
+  }, []);
 
   useEffect(() => {
     if (autoScroll.current) {
@@ -52,28 +96,43 @@ export function LogTab({ entries }: LogTabProps) {
         cursor: "text",
       }}
     >
-      {entries.length === 0 && (
+      {sourceError && (
+        <div style={{ color: "#e05555", padding: "8px 0" }}>{sourceError}</div>
+      )}
+      {entries.length === 0 && !sourceError && (
         <div style={{ color: "var(--text-muted)", padding: "20px 0" }}>
-          Waiting for backend logs...
+          tracker.log is empty.
         </div>
       )}
-      {entries.map((entry, i) => (
-        <div key={i} style={{ display: "flex", gap: "10px", whiteSpace: "pre-wrap", wordBreak: "break-word" }}>
-          <span style={{ color: "var(--text-muted)", flexShrink: 0 }}>
-            {formatTime(entry.ts)}
-          </span>
-          <span
-            style={{
-              color: LEVEL_COLORS[entry.level] || "var(--text-secondary)",
-              flexShrink: 0,
-              width: "55px",
-            }}
-          >
-            {entry.level}
-          </span>
-          <span style={{ color: "var(--text-primary)" }}>{entry.msg}</span>
-        </div>
-      ))}
+      {entries.map((entry, i) => {
+        const source = entry.source ?? "tracker";
+        return (
+          <div key={i} style={{ display: "flex", gap: "10px", whiteSpace: "pre-wrap", wordBreak: "break-word" }}>
+            <span style={{ color: "var(--text-muted)", flexShrink: 0 }}>
+              {formatTime(entry.ts)}
+            </span>
+            <span
+              style={{
+                color: SOURCE_COLORS[source] || "var(--text-muted)",
+                flexShrink: 0,
+                width: "60px",
+              }}
+            >
+              [{source}]
+            </span>
+            <span
+              style={{
+                color: LEVEL_COLORS[entry.level] || "var(--text-secondary)",
+                flexShrink: 0,
+                width: "55px",
+              }}
+            >
+              {entry.level}
+            </span>
+            <span style={{ color: "var(--text-primary)" }}>{entry.msg}</span>
+          </div>
+        );
+      })}
       <div ref={bottomRef} />
     </div>
   );

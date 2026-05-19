@@ -176,7 +176,7 @@ export default function App() {
                 replayStats={replaysState.stats}
               />
             )}
-            {activeTab === "log" && <LogTab entries={tracker.logEntries} />}
+            {activeTab === "log" && <LogTab />}
           </div>
           <StatusBar status={tracker.status} />
           <GlobalSearch

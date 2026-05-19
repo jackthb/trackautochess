@@ -8,20 +8,27 @@ Config keys in ~/.dac/config.json:
     supabase_key      — anon/public API key
 """
 
+import json
 import logging
 from dataclasses import asdict
 from datetime import datetime, timedelta
 
-from utils import load_config
+from utils import LOCAL_GAMES_DIR, load_config, local_only_mode
 
 log = logging.getLogger("dac.db")
 
 _client = None  # lazy-init
+_local_only_logged = False
 
 
 def _get_client():
     """Lazy-init and return httpx.Client or None."""
-    global _client
+    global _client, _local_only_logged
+    if local_only_mode():
+        if not _local_only_logged:
+            log.info("DB skipped — local_only mode (writing JSON to %s)", LOCAL_GAMES_DIR)
+            _local_only_logged = True
+        return None
     if _client is not None:
         return _client
 
@@ -174,12 +181,34 @@ def _safe_int(val, lo=None, hi=None):
         return None
 
 
+def _save_game_local(row, user_id: str | None) -> None:
+    """Mirror every push_game payload to ~/.dac/games/ so testing data is
+    preserved even when Supabase is offline / disabled."""
+    try:
+        LOCAL_GAMES_DIR.mkdir(parents=True, exist_ok=True)
+        ts = datetime.now().strftime("%Y%m%d_%H%M%S_%f")
+        placement = str(getattr(row, "placement", "")) or "x"
+        path = LOCAL_GAMES_DIR / f"{ts}__p{placement}.json"
+        payload = {
+            "saved_at": datetime.now().isoformat(),
+            "user_id": str(user_id) if user_id else "",
+            "game": asdict(row) if hasattr(row, "__dataclass_fields__") else dict(row.__dict__),
+        }
+        path.write_text(json.dumps(payload, indent=2, ensure_ascii=False), encoding="utf-8")
+        log.info("game saved locally: %s", path.name)
+    except Exception as e:
+        log.warning("_save_game_local failed: %s", e)
+
+
 def push_game(row, user_id: str | None = None) -> int | None:
     """Insert a game into Supabase.
 
-    Handles string→int conversion for placement, level, and wl splitting.
+    Always writes a JSON sidecar to ~/.dac/games/ first so local testing
+    captures the payload even when Supabase is disabled.
     Returns the inserted game id on success, or None on error. Never raises.
     """
+    _save_game_local(row, user_id)
+
     client = _get_client()
     if client is None:
         return None

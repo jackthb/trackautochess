@@ -9,6 +9,7 @@ import type { TrackerEvent } from "../types";
  */
 
 export type NetTableActivityKind =
+  | "nettable_pause_fired"
   | "nettable_dump_captured"
   | "nettable_ingest_complete"
   | "nettable_ingest_error"
@@ -109,6 +110,10 @@ type NetTableResyncCompleteEvent = {
   noop?: boolean;
   error?: string;
 };
+type NetTablePauseFiredEvent = {
+  type: "nettable_pause_fired";
+  at: string;
+};
 type NetTableDumpCapturedEvent = {
   type: "nettable_dump_captured";
   tables: Record<string, number>;
@@ -133,6 +138,7 @@ type NetTableStateEvent = {
 type Incoming =
   | TrackerEvent
   | NetTableStatusEvent
+  | NetTablePauseFiredEvent
   | NetTableDumpCapturedEvent
   | NetTableIngestCompleteEvent
   | NetTableIngestErrorEvent
@@ -222,6 +228,15 @@ export function useNetTableEvents(): NetTableActivityState {
             return next;
           });
           break;
+        case "nettable_pause_fired": {
+          push({
+            kind: "nettable_pause_fired",
+            title: "PAUSE registered in Dota",
+            detail: "Autoexec bind fired — waiting on dump output (empty outside a DAC match).",
+            tone: "info",
+          });
+          break;
+        }
         case "nettable_dump_captured": {
           push({
             kind: "nettable_dump_captured",

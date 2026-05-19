@@ -12,6 +12,7 @@ import {
 import { GameRowDisplay } from "@dac/shared/GameRowDisplay";
 import type { CountedTag } from "./TagPickers";
 import { GameEditFields } from "./GameEditFields";
+import { MatchTimelinePanel } from "./MatchTimelinePanel";
 
 interface GameRowProps {
   game: Game;
@@ -253,6 +254,15 @@ export function GameRow({
               relicsData={relicsData}
             />
           </div>
+          {game.match_id && (
+            <MatchTimelinePanel
+              matchId={game.match_id}
+              unitCosts={unitCosts}
+              unitsFull={unitsFull}
+              synergiesData={synergiesData}
+              relicsData={relicsData}
+            />
+          )}
           <div className="edit-panel-actions">
             {!confirmDelete ? (
               <button

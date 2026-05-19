@@ -10,6 +10,33 @@ from pathlib import Path
 
 DAC_DIR = Path(os.environ.get("DAC_DIR") or (Path.home() / ".dac"))
 CONFIG_PATH = DAC_DIR / "config.json"
+LOCAL_DUMPS_DIR = DAC_DIR / "nettable_dumps"
+LOCAL_MATCH_PLAYERS_DIR = DAC_DIR / "match_players"
+LOCAL_PLAYERS_DIR = DAC_DIR / "players"
+LOCAL_MATCHES_DIR = DAC_DIR / "matches"
+LOCAL_END_BOARDS_DIR = DAC_DIR / "end_boards"
+LOCAL_MATCH_TIMELINES_DIR = DAC_DIR / "match_timelines"
+# Backwards-compat: callers still importing LOCAL_GAMES_DIR (CV pipeline)
+# get the new match_players location transparently.
+LOCAL_GAMES_DIR = LOCAL_MATCH_PLAYERS_DIR
+
+
+def local_only_mode() -> bool:
+    """True when the backend should skip all Supabase HTTP calls.
+
+    Env wins over config so a single launch can flip without touching disk:
+        DAC_LOCAL_ONLY=1 pnpm run dev
+    """
+    env = os.environ.get("DAC_LOCAL_ONLY", "").strip().lower()
+    if env in ("1", "true", "yes", "on"):
+        return True
+    if env in ("0", "false", "no", "off"):
+        return False
+    try:
+        cfg = load_config()
+    except Exception:
+        return False
+    return bool(cfg.get("local_only", False))
 
 def _data_dir() -> Path:
     """Return the data/ directory, works both in dev and PyInstaller bundle."""

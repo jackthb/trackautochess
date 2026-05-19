@@ -80,6 +80,8 @@ log.addHandler(_fh)
 class _JsonLogHandler(logging.Handler):
     """Emit log records as JSON events on stdout for the Electron renderer."""
 
+    _error_logged = False
+
     def emit(self, record):
         try:
             entry = {
@@ -91,8 +93,16 @@ class _JsonLogHandler(logging.Handler):
             line = json.dumps(entry, ensure_ascii=False)
             sys.stdout.buffer.write(line.encode("utf-8") + b"\n")
             sys.stdout.buffer.flush()
-        except Exception:
-            pass
+        except Exception as e:
+            # One-shot stderr breadcrumb so a broken JSON sink is visible in
+            # the Electron dev console without spamming on every log call.
+            if not _JsonLogHandler._error_logged:
+                _JsonLogHandler._error_logged = True
+                try:
+                    sys.stderr.write(f"[_JsonLogHandler] disabled: {type(e).__name__}: {e}\n")
+                    sys.stderr.flush()
+                except Exception:
+                    pass
 
 
 _jh = _JsonLogHandler()

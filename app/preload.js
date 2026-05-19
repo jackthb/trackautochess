@@ -26,6 +26,15 @@ contextBridge.exposeInMainWorld("tracker", {
   },
 });
 
+contextBridge.exposeInMainWorld("trackerLog", {
+  read: () => ipcRenderer.invoke("trackerLog:read"),
+  onUpdate: (callback) => {
+    const handler = (_event, entries) => callback(entries);
+    ipcRenderer.on("trackerLog:update", handler);
+    return () => ipcRenderer.removeListener("trackerLog:update", handler);
+  },
+});
+
 contextBridge.exposeInMainWorld("windowControls", {
   minimize: () => ipcRenderer.send("window:minimize"),
   maximize: () => ipcRenderer.send("window:maximize"),
@@ -59,6 +68,7 @@ contextBridge.exposeInMainWorld("appApi", {
   getCloseToTray: () => ipcRenderer.invoke("app:getCloseToTray"),
   setCloseToTray: (value) => ipcRenderer.invoke("app:setCloseToTray", value),
   fetchGames: () => ipcRenderer.invoke("games:fetch"),
+  fetchTimeline: (matchId) => ipcRenderer.invoke("timelines:fetch", matchId),
   updateGame: (gameId, fields) => ipcRenderer.invoke("games:update", gameId, fields),
   deleteGame: (gameId) => ipcRenderer.invoke("games:delete", gameId),
   fetchUnitsData: () => ipcRenderer.invoke("data:units"),
