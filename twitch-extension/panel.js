@@ -158,8 +158,19 @@ function readConfig() {
   return null;
 }
 
+function isInsideTwitchExtension() {
+  // The twitch-ext helper script loads from its CDN even when we're not in a
+  // Twitch iframe, so `window.Twitch?.ext` alone is a misleading check —
+  // `onAuthorized` simply never fires outside Twitch and we'd stay on Loading
+  // forever. Twitch serves extensions from *.ext-twitch.tv, so the hostname
+  // is the reliable signal.
+  if (!window.Twitch?.ext) return false;
+  const host = window.location.hostname;
+  return host.endsWith(".ext-twitch.tv") || host === "ext-twitch.tv";
+}
+
 function bootstrap() {
-  if (!window.Twitch?.ext) {
+  if (!isInsideTwitchExtension()) {
     // Local development outside Twitch — accept ?steamId=... for previewing.
     const url = new URL(window.location.href);
     const sid = url.searchParams.get("steamId");
