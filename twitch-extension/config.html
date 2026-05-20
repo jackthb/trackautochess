@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Track Auto Chess — Config</title>
+<script src="https://extension-files.twitch.tv/helper/v1/twitch-ext.min.js"></script>
+<link rel="stylesheet" href="config.css" />
+</head>
+<body>
+<main class="wrap">
+  <h1>Track Auto Chess panel</h1>
+  <p class="lead">
+    Link your Steam account so the panel shows your DAC rank, MMR, and
+    recent matches to your viewers.
+  </p>
+
+  <form id="form">
+    <label for="steamInput">Steam ID or vanity URL</label>
+    <input
+      id="steamInput"
+      type="text"
+      placeholder="e.g. jackth, or 76561198022169086"
+      autocomplete="off"
+      required
+    />
+    <p class="hint">
+      The vanity slug from
+      <code>steamcommunity.com/id/<strong>your-slug</strong></code>,
+      or your numeric SteamID64.
+    </p>
+
+    <button id="submit" type="submit">Save</button>
+  </form>
+
+  <div id="current" class="current hidden">
+    <strong>Currently linked:</strong>
+    <span id="currentName"></span>
+    <a id="currentProfile" target="_blank" rel="noopener noreferrer">View profile ↗</a>
+  </div>
+
+  <div id="status" class="status hidden"></div>
+</main>
+<script src="config.js"></script>
+</body>
+</html>
