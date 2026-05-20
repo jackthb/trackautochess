@@ -101,7 +101,6 @@ interface PlayerPageProps {
   drodoLastFetchedAt: string | null;
   manualRefreshQuota: ManualRefreshQuota;
   ogImageUrl: string | null;
-  twitchOgUrl: string | null;
   canonicalUrl: string | null;
   banned: boolean;
 }
@@ -200,7 +199,6 @@ export default function PlayerPage({
   drodoLastFetchedAt: initialDrodoLastFetchedAt,
   manualRefreshQuota: initialManualRefreshQuota,
   ogImageUrl,
-  twitchOgUrl,
   canonicalUrl,
   banned: initialBanned,
 }: PlayerPageProps) {
@@ -834,21 +832,6 @@ export default function PlayerPage({
                   <span className="last-fetched-age">{lastFetchedAge}</span>
                 )}
               </div>
-              {twitchOgUrl && (
-                <a
-                  href={twitchOgUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  style={{ fontSize: 12, color: "var(--text-muted)", letterSpacing: "0.5px" }}
-                  onClick={() =>
-                    trackEvent("Twitch Overlay Link Clicked", {
-                      route: analyticsRoute(router.pathname),
-                    })
-                  }
-                >
-                  Twitch overlay link ↗
-                </a>
-              )}
             </div>
           </div>
 
@@ -1169,7 +1152,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       drodoLastFetchedAt,
       manualRefreshQuota,
       ogImageUrl: absoluteUrl(`/api/og/player/${steamId}`, baseUrl),
-      twitchOgUrl: absoluteUrl(`/api/og/twitch/${steamId}`, baseUrl),
       canonicalUrl: absoluteUrl(
         playerProfilePath(steamId, steamProfile.customUrl),
         baseUrl
