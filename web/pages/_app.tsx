@@ -86,6 +86,12 @@ export default function App({ Component, pageProps }: AppProps<AppPageProps>) {
       }
       const meta = user.user_metadata ?? {};
       const steamId = typeof meta.steam_id === "string" ? meta.steam_id : null;
+      if (!steamId) {
+        // Steam OAuth callback always populates steam_id; if it's missing,
+        // something is off — skip identify rather than create a person
+        // keyed by the Supabase UUID that we'd later have to alias.
+        return;
+      }
       const steamName =
         typeof meta.steam_name === "string"
           ? meta.steam_name
@@ -96,12 +102,12 @@ export default function App({ Component, pageProps }: AppProps<AppPageProps>) {
         typeof meta.avatar_url === "string" ? meta.avatar_url : null;
       const customUrl =
         typeof meta.custom_url === "string" ? meta.custom_url : null;
-      identify(steamId ?? user.id, {
+      identify(steamId, {
         // $-prefixed keys are PostHog reserved person properties — $name is
         // what the Persons list and dashboards display as the user's label.
         ...(steamName ? { $name: steamName } : {}),
         ...(steamName ? { steam_name: steamName } : {}),
-        ...(steamId ? { steam_id: steamId } : {}),
+        steam_id: steamId,
         ...(avatarUrl ? { avatar_url: avatarUrl } : {}),
         ...(customUrl ? { custom_url: customUrl } : {}),
       });
