@@ -272,6 +272,207 @@ def generate_match_id() -> str:
     return str(uuid.uuid4())[:12]
 
 
+def generate_live_match_id(end_board: dict) -> str:
+    """Deterministic match_id from end_board contents.
+
+    SHA-256 of the sorted (steam_id, placement) pairs from end_board.data,
+    truncated to 16 hex chars. Two installs in the same DAC lobby produce
+    the same match_id, so cross-observer dedup works without coordination.
+    Falls back to a uuid when the payload is missing/malformed.
+    """
+    import hashlib
+    import uuid
+    data = end_board.get("data") if isinstance(end_board, dict) else None
+    if not isinstance(data, dict) or not data:
+        return str(uuid.uuid4()).replace("-", "")[:16]
+    pairs: list[tuple[str, int]] = []
+    for sid, p in data.items():
+        if not isinstance(p, dict):
+            continue
+        rank = p.get("curr_rank") or p.get("rank") or 0
+        try:
+            rank_i = int(rank)
+        except (TypeError, ValueError):
+            rank_i = 0
+        pairs.append((str(sid), rank_i))
+    pairs.sort()
+    canonical = json.dumps(pairs, separators=(",", ":"), ensure_ascii=True)
+    return hashlib.sha256(canonical.encode("utf-8")).hexdigest()[:16]
+
+
+def _save_json_local(directory, filename: str, payload: dict) -> None:
+    """Mirror a payload to a local sidecar dir under ~/.dac/. Best-effort."""
+    try:
+        directory.mkdir(parents=True, exist_ok=True)
+        (directory / filename).write_text(
+            json.dumps(payload, indent=2, ensure_ascii=False, sort_keys=True),
+            encoding="utf-8",
+        )
+    except Exception as e:
+        log.warning("_save_json_local(%s) failed: %s", filename, e)
+
+
+def push_match(match_record: dict) -> str | None:
+    """Insert one row into `matches`. Returns match_id on success, None on
+    failure or in local_only mode. Mirrors to ~/.dac/matches/ first."""
+    from utils import LOCAL_MATCHES_DIR
+    match_id = str(match_record.get("match_id") or "").strip()
+    if not match_id:
+        log.warning("push_match: missing match_id")
+        return None
+    _save_json_local(LOCAL_MATCHES_DIR, f"{match_id}.json", match_record)
+
+    client = _get_client()
+    if client is None:
+        return None
+
+    try:
+        row = {
+            "match_id": match_id,
+            "played_at": match_record.get("played_at"),
+            "duration": match_record.get("duration") or None,
+            "final_round": match_record.get("final_round") or None,
+            "player_count": match_record.get("player_count") or None,
+        }
+        resp = client.post(
+            "/rest/v1/matches",
+            json=row,
+            headers={"Prefer": "resolution=ignore-duplicates,return=minimal"},
+        )
+        resp.raise_for_status()
+        log.info("pushed match %s", match_id)
+        return match_id
+    except Exception as e:
+        body = ""
+        if hasattr(e, "response") and e.response is not None:
+            try:
+                body = e.response.text
+            except Exception:
+                pass
+        log.error("push_match error: %s | body: %s", e, body)
+        return None
+
+
+# Columns that match the match_players table schema. Anything not in this set
+# is dropped before POST so a future end_board with extra fields doesn't break
+# the insert (PostgREST 400s on unknown columns).
+_MATCH_PLAYER_COLUMNS = {
+    "match_id", "steam_id", "placement", "mmr_level", "hero_level",
+    "chess_lineup", "chess_hand", "synergies", "relic", "relic_history",
+    "talents", "win_round", "lose_round", "draw_round", "kills", "deaths",
+    "hero_damage", "hero_damaged", "mvp_chess_name", "mvp_chess_items",
+    "max_lineup_value", "max_lineup_value_lineup", "duration", "final_round",
+    "zhugong", "total_money", "candy",
+}
+
+
+def push_match_players(match_id: str, players: list[dict]) -> int:
+    """Bulk-insert up to 8 rows into `match_players`. Returns count of
+    rows POSTed (0 on failure or local_only). Mirrors to local first.
+
+    Uses ignore-duplicates so two observers in the same lobby can both call
+    this with the same match_id and the second is a no-op via the UNIQUE
+    (match_id, steam_id) constraint."""
+    from utils import LOCAL_MATCH_PLAYERS_DIR
+    if not players:
+        return 0
+    for p in players:
+        sid = str(p.get("steam_id") or "x")
+        placement = p.get("placement") or "X"
+        _save_json_local(
+            LOCAL_MATCH_PLAYERS_DIR,
+            f"{match_id}__p{placement}__{sid}.json",
+            p,
+        )
+
+    client = _get_client()
+    if client is None:
+        return 0
+
+    try:
+        rows = []
+        for p in players:
+            r = {k: v for k, v in p.items() if k in _MATCH_PLAYER_COLUMNS}
+            # steam_id stored as bigint server-side
+            if "steam_id" in r:
+                try:
+                    r["steam_id"] = int(str(r["steam_id"]).strip())
+                except (TypeError, ValueError):
+                    continue
+            r["match_id"] = match_id
+            rows.append(r)
+        if not rows:
+            return 0
+        resp = client.post(
+            "/rest/v1/match_players",
+            json=rows,
+            headers={"Prefer": "resolution=ignore-duplicates,return=minimal"},
+        )
+        resp.raise_for_status()
+        log.info("pushed %d match_players row(s) for match %s", len(rows), match_id)
+        return len(rows)
+    except Exception as e:
+        body = ""
+        if hasattr(e, "response") and e.response is not None:
+            try:
+                body = e.response.text
+            except Exception:
+                pass
+        log.error("push_match_players error: %s | body: %s", e, body)
+        return 0
+
+
+def push_live_game(player_row: dict) -> int | None:
+    """Insert a trimmed row into `games` from the live-capture path.
+
+    Shape mirrors what the CV path writes via push_game, so the web viewer's
+    player profile (`players/[steamId]`) renders it identically. Dedup is
+    enforced by the partial unique index idx_games_live_dedup on
+    (match_id, user_id) WHERE length(match_id) = 16."""
+    client = _get_client()
+    if client is None:
+        return None
+
+    try:
+        steam_id = str(player_row.get("steam_id") or "").strip()
+        if not steam_id:
+            return None
+        placement = _safe_int(player_row.get("placement"), 1, 8)
+        level = _safe_int(player_row.get("hero_level"), 1, 15)
+        wins = _safe_int(player_row.get("win_round"))
+        losses = _safe_int(player_row.get("lose_round"))
+
+        row = {
+            "played_at": player_row.get("played_at"),
+            "placement": placement,
+            "lineup": player_row.get("chess_lineup") or None,
+            "synergies": player_row.get("synergies") or None,
+            "talents": player_row.get("talents") or None,
+            "relic": player_row.get("relic") or None,
+            "level": level,
+            "wins": wins,
+            "losses": losses,
+            "match_id": player_row.get("match_id"),
+            "user_id": int(steam_id),
+        }
+        resp = client.post(
+            "/rest/v1/games",
+            json=row,
+            headers={"Prefer": "resolution=ignore-duplicates,return=minimal"},
+        )
+        resp.raise_for_status()
+        return 1
+    except Exception as e:
+        body = ""
+        if hasattr(e, "response") and e.response is not None:
+            try:
+                body = e.response.text
+            except Exception:
+                pass
+        log.error("push_live_game error: %s | body: %s", e, body)
+        return None
+
+
 def lookup_users_by_name(names: list[str]) -> dict[str, int]:
     """Look up existing users by display name (case-insensitive).
 

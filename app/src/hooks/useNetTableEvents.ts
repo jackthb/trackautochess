@@ -13,6 +13,9 @@ export type NetTableActivityKind =
   | "nettable_dump_captured"
   | "nettable_ingest_complete"
   | "nettable_ingest_error"
+  | "nettable_game_ended"
+  | "nettable_end_board_saved"
+  | "nettable_creep_round"
   | "parse_result"
   | "import_result";
 
@@ -134,6 +137,21 @@ type NetTableStateEvent = {
   state: NetTableState;
   at: string;
 };
+type NetTableGameEndedEvent = {
+  type: "nettable_game_ended";
+  message: string;
+  at: string;
+};
+type NetTableEndBoardSavedEvent = {
+  type: "nettable_end_board_saved";
+  path: string;
+  at: string;
+};
+type NetTableCreepRoundEvent = {
+  type: "nettable_creep_round";
+  round: number;
+  at: string;
+};
 
 type Incoming =
   | TrackerEvent
@@ -143,6 +161,9 @@ type Incoming =
   | NetTableIngestCompleteEvent
   | NetTableIngestErrorEvent
   | NetTableStateEvent
+  | NetTableGameEndedEvent
+  | NetTableEndBoardSavedEvent
+  | NetTableCreepRoundEvent
   | NetTableLaunchOptionsAppliedEvent
   | NetTableLaunchOptionsProgressEvent
   | NetTableResyncProgressEvent
@@ -261,6 +282,32 @@ export function useNetTableEvents(): NetTableActivityState {
             title: "Ingest failed",
             detail: msg.error,
             tone: "error",
+          });
+          break;
+        }
+        case "nettable_game_ended": {
+          push({
+            kind: "nettable_game_ended",
+            title: "Match ended",
+            detail: msg.message,
+            tone: "info",
+          });
+          break;
+        }
+        case "nettable_end_board_saved": {
+          push({
+            kind: "nettable_end_board_saved",
+            title: "Captured end board",
+            detail: msg.path,
+            tone: "success",
+          });
+          break;
+        }
+        case "nettable_creep_round": {
+          push({
+            kind: "nettable_creep_round",
+            title: `Creep round ${msg.round}`,
+            tone: "info",
           });
           break;
         }

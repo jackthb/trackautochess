@@ -4,14 +4,16 @@ Flow:
     1. On startup, install autoexec.cfg (binds dump-key to dac_dump_all) into
        <dota>/game/dota/cfg/.
     2. Tail console.log non-blockingly. Three triggers matter:
-       - DOTA_GAMERULES_STATE_GAME_IN_PROGRESS: schedule mid-game dump-key ~30s
-         later (once per game).
-       - DOTA_GAMERULES_STATE_POST_GAME: schedule post-game dump-key ~5s later
-         (captures `end_board`, once per game).
+       - DOTA_GAMERULES_STATE_GAME_IN_PROGRESS: opens the match session window.
+       - DOTA_GAMERULES_STATE_POST_GAME: emit nettable_game_ended so the UI
+         knows the match wrapped up.
        - [stringtables] table CustomNetTable_*: collect the dump block;
          when it stabilises (~2s without new [stringtables] lines), ingest
          to Supabase.
-    3. dump-key is delivered via PostMessageW so it works without focus.
+    3. Dumps are produced by the continuous SendInput cascade (see
+       _run_key_poller) — no scheduled timers; the poller fires F20 every
+       2s and the full cascade (PAUSE, F11, F13, F15, F16, F20) every 15s
+       while Dota is foreground.
 
 Emits events via the headless _emit callback:
     nettable_status          — startup + on-demand status snapshot
@@ -931,16 +933,6 @@ CASCADE_KEY_GAP_SEC = 0.2
 # The keys the cascade fires, in order. Mirrors the autoexec binds.
 CASCADE_VK_SEQUENCE = (VK_PAUSE, VK_F11, VK_F13, VK_F15, VK_F16, VK_F20)
 
-# Wait this long after GAME_IN_PROGRESS before sending the first capture.
-# Gives the CustomNetTables time to populate.
-DUMP_DELAY_SEC = 30.0
-
-# Recurring capture cadence while a game is in progress. DAC rounds last
-# 30-45s; sampling at 20s guarantees at least one capture per round.
-# Row-level dedupe means unchanged tables (esp. ranking_top) don't
-# re-upload between rounds.
-CAPTURE_INTERVAL_SEC = 20.0
-
 # Wait this long after POST_GAME before sending dump-key again. The `end_board`
 # table is populated server-side at POST_GAME entry; small buffer for the
 # broadcast to land at the client.
@@ -981,15 +973,6 @@ class NetTableCapture:
         self._file = None  # type: ignore
         self._inode_size = 0  # last-seen size, used to detect truncation
 
-        # Recurring per-round capture loop state. _dump_armed is the
-        # "loop is running" flag; cleared on POST_GAME / log rotation.
-        self._dump_armed = False
-        self._dump_timer: threading.Timer | None = None
-        self._dump_sent_for_postgame = False
-
-        # Set true when POST_GAME has fired; the next dump containing
-        # dac_table.end_board will be saved as a finished-match record.
-        self._postgame_capture_pending = False
         # Hashes of end_board payloads we've already saved, to dedup if
         # the user presses INS multiple times after game end.
         self._saved_end_board_hashes: set[str] = set()
@@ -1170,11 +1153,6 @@ class NetTableCapture:
 
     def stop(self) -> None:
         self._stop.set()
-        if self._dump_timer:
-            try:
-                self._dump_timer.cancel()
-            except Exception:
-                pass
         if self._file:
             try:
                 self._file.close()
@@ -1271,8 +1249,6 @@ class NetTableCapture:
 
     def _reset_per_log_state(self) -> None:
         """Drop game-scoped state when the log file is rewritten."""
-        self._stop_capture_loop()
-        self._dump_sent_for_postgame = False
         self._dump_active = False
         self._dump_seen_tables = set()
         self._dump_last_line_ts = 0.0
@@ -1296,10 +1272,11 @@ class NetTableCapture:
                 self._match_session_start = time.time()
                 log.info("nettable: GAME_IN_PROGRESS — match session opened")
 
-        # Game state — POST_GAME tells us a match ended. We emit a
-        # notification so the UI can prompt the user to F10 (or AHK to
-        # auto-cascade). The actual end_board save happens when the
-        # resulting dump lands in _maybe_save_end_board.
+        # Game state — POST_GAME tells us a match ended. We emit a UI
+        # signal (`nettable_game_ended`); the actual end_board capture
+        # comes from the SendInput cascade poller, which auto-fires
+        # PAUSE every 15s to keep dac_table fresh. The resulting dump
+        # is saved when it lands in _maybe_save_end_board.
         if POST_GAME_RE in line:
             now = time.time()
             last = getattr(self, "_last_post_game_emit", 0.0)
@@ -1314,69 +1291,6 @@ class NetTableCapture:
 
         if STRINGTABLE_MARKER in line:
             self._note_dump_line(line)
-
-    def _schedule_dump(self) -> None:
-        """Start the recurring per-round capture loop.
-
-        First capture fires DUMP_DELAY_SEC after GAME_IN_PROGRESS (gives
-        the server-side stringtables time to settle), then every
-        CAPTURE_INTERVAL_SEC until POST_GAME stops the loop or the log
-        rotates. Row-level dedupe in _do_ingest means static tables
-        (ranking_top, settings) only upload once.
-        """
-        if self._dump_armed:
-            return
-        self._dump_armed = True
-        log.info(
-            "nettable: GAME_IN_PROGRESS — first capture in %.0fs, then every %.0fs",
-            DUMP_DELAY_SEC, CAPTURE_INTERVAL_SEC,
-        )
-        self._schedule_next_capture(DUMP_DELAY_SEC)
-
-    def _schedule_next_capture(self, delay: float) -> None:
-        if not self._dump_armed:
-            return
-        t = threading.Timer(delay, self._do_send_dump)
-        t.daemon = True
-        t.start()
-        self._dump_timer = t
-
-    def _do_send_dump(self) -> None:
-        # Auto-trigger via PostMessage'd VK_INSERT is silently ignored by
-        # Dota's input dispatcher (synthetic key events don't reach the
-        # bind layer), and the only alternative — typing into the console
-        # via send_console_command — pops the console open mid-game, which
-        # is unacceptable. Leave the loop armed (so we still know we're
-        # in-game) but skip the actual send. Users dump manually via INS.
-        if not self._dump_armed:
-            return
-        self._schedule_next_capture(CAPTURE_INTERVAL_SEC)
-
-    def _stop_capture_loop(self) -> None:
-        self._dump_armed = False
-        if self._dump_timer:
-            try:
-                self._dump_timer.cancel()
-            except Exception:
-                pass
-            self._dump_timer = None
-
-    def _schedule_postgame_dump(self) -> None:
-        if self._dump_sent_for_postgame:
-            return
-        # We can't reliably auto-fire the dump (PostMessage of INS is
-        # ignored by Dota; typing into the console pops the UI mid-game).
-        # Instead, notify the renderer so it can prompt the user to press
-        # INS now, and arm _do_ingest to extract dac_table.end_board from
-        # whatever dump arrives next.
-        self._dump_sent_for_postgame = True
-        self._postgame_capture_pending = True
-        log.info("nettable: POST_GAME detected — waiting for user to press INS to capture end_board")
-        self._emit({
-            "type": "nettable_postgame_prompt",
-            "message": "Game ended — press INS in Dota to capture the end board.",
-            "at": datetime.now().isoformat(),
-        })
 
     def _note_dump_line(self, line: str) -> None:
         idx = line.find("table ")
@@ -1588,7 +1502,6 @@ class NetTableCapture:
             ).hexdigest()
             if payload_hash in self._saved_end_board_hashes:
                 log.info("nettable: end_board already saved this session — skipping duplicate")
-                self._postgame_capture_pending = False
                 return
             self._saved_end_board_hashes.add(payload_hash)
 
@@ -1605,30 +1518,46 @@ class NetTableCapture:
             raw_path.write_text(raw_payload, encoding="utf-8")
             log.info("nettable: archived raw end_board to %s", raw_path.name)
 
+            # Deterministic match_id from end_board contents — two installs
+            # in the same lobby produce the same id, so cross-observer dedup
+            # works without any coordination.
+            from db import generate_live_match_id
+            match_id = generate_live_match_id(end_board)
+
             # Drive the transform: match header, per-player rows, player profiles.
-            self._extract_structured_match(end_board, saved_at)
+            extracted = self._extract_structured_match(end_board, saved_at, match_id)
+
+            # Upload to Supabase if extraction produced rows.
+            if extracted is not None:
+                match_record, player_rows = extracted
+                self._upload_match_to_supabase(match_record, player_rows)
 
             self._emit({
                 "type": "nettable_end_board_saved",
                 "path": str(raw_path),
                 "at": saved_at,
             })
-            self._postgame_capture_pending = False
         except Exception as e:
             log.warning("nettable: failed to save end_board: %s", e)
 
-    def _extract_structured_match(self, end_board: dict, played_at: str) -> None:
+    def _extract_structured_match(
+        self, end_board: dict, played_at: str, match_id: str,
+    ) -> tuple[dict, list[dict]] | None:
         """Turn raw end_board into three transformed views:
           * matches/<match_id>.json         — match header + player summary
           * match_players/<match_id>__p<N>.json — per-player rows for ME only
           * players/<steam_id>.json         — append-only profile per player
-        Other players' deep stats only come from the ranking_top scan."""
+
+        match_id is computed by the caller (deterministic per end_board) so
+        two installs in the same lobby agree without coordination.
+
+        Returns (match_record, player_rows) — the caller uploads the bundle
+        to Supabase. Returns None when end_board.data is missing/empty."""
         from utils import LOCAL_MATCH_PLAYERS_DIR, LOCAL_MATCHES_DIR, LOCAL_PLAYERS_DIR
-        from db import generate_match_id
 
         data = end_board.get("data") if isinstance(end_board, dict) else None
         if not isinstance(data, dict) or not data:
-            return
+            return None
 
         my_steam_id = str(self.config.get("steam_id") or "").strip() if hasattr(self, "config") else ""
         # Fall back to load_config() if the NetTableCapture instance doesn't
@@ -1640,8 +1569,8 @@ class NetTableCapture:
             except Exception:
                 my_steam_id = ""
 
-        match_id = generate_match_id()
         match_players: list[dict] = []
+        all_player_rows: list[dict] = []
         match_duration: float | None = None
         match_final_round: int | None = None
 
@@ -1705,6 +1634,8 @@ class NetTableCapture:
             except Exception as e:
                 log.warning("nettable: failed to write match_player %s: %s", sid, e)
 
+            all_player_rows.append(row)
+
             # Match-level player summary line — small, for fast match-list views.
             match_players.append({
                 "steam_id": sid,
@@ -1743,15 +1674,15 @@ class NetTableCapture:
                 log.warning("nettable: failed to write player profile %s: %s", sid, e)
 
         # Match header
+        match_record = {
+            "match_id": match_id,
+            "played_at": played_at,
+            "duration": match_duration or 0,
+            "final_round": match_final_round or 0,
+            "player_count": len(match_players),
+            "players": sorted(match_players, key=lambda x: (x["placement"] or 99)),
+        }
         try:
-            match_record = {
-                "match_id": match_id,
-                "played_at": played_at,
-                "duration": match_duration or 0,
-                "final_round": match_final_round or 0,
-                "player_count": len(match_players),
-                "players": sorted(match_players, key=lambda x: (x["placement"] or 99)),
-            }
             mpath = LOCAL_MATCHES_DIR / f"{match_id}.json"
             mpath.write_text(json.dumps(match_record, indent=2, ensure_ascii=False), encoding="utf-8")
             log.info(
@@ -1776,6 +1707,50 @@ class NetTableCapture:
 
         # Close the session window so the NEXT match starts clean.
         self._match_session_start = None
+
+        return match_record, all_player_rows
+
+    def _upload_match_to_supabase(
+        self, match_record: dict, player_rows: list[dict],
+    ) -> None:
+        """Fan out the match → Supabase: ensure_user for every player (FK),
+        push the match header, bulk-push match_players, then write 8 trimmed
+        rows into the legacy `games` table so the web viewer's player
+        profile pages light up. Each step swallows its own failures —
+        partial success is preferred to total loss."""
+        from db import (
+            ensure_user, push_match, push_match_players, push_live_game,
+        )
+        match_id = match_record.get("match_id") or ""
+
+        # Step 1 — satisfy match_players.steam_id FK to users.
+        for r in player_rows:
+            sid = str(r.get("steam_id") or "").strip()
+            if sid:
+                try:
+                    ensure_user(sid)
+                except Exception as e:
+                    log.warning("nettable: ensure_user(%s) failed: %s", sid, e)
+
+        # Step 2 — match header.
+        try:
+            push_match(match_record)
+        except Exception as e:
+            log.warning("nettable: push_match failed: %s", e)
+
+        # Step 3 — rich per-player rows (bulk).
+        try:
+            push_match_players(match_id, player_rows)
+        except Exception as e:
+            log.warning("nettable: push_match_players failed: %s", e)
+
+        # Step 4 — trimmed games rows so every player profile sees the match.
+        for r in player_rows:
+            try:
+                push_live_game(r)
+            except Exception as e:
+                log.warning("nettable: push_live_game(%s) failed: %s",
+                            r.get("steam_id"), e)
 
     def _extract_match_timeline(self, match_id: str, played_at: str) -> None:
         """Walk dumps that belong to the just-ended match, pull

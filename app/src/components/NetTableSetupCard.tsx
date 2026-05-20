@@ -79,7 +79,11 @@ export function NetTableSetupCard({
   const condebugSet = status?.has_condebug === true;
   const conclearlogSet = status?.has_conclearlog === true;
   const flagsSet = condebugSet && conclearlogSet;
-  const needsApply = flagsKnown && !flagsSet;
+  // Empirical signal trumps config-derived signal: Steam doesn't flush
+  // localconfig.vdf to disk until it exits, so `flagsSet` can be stale
+  // while Steam is running. If `log_active` is true, the flags ARE
+  // working right now — don't pester the user to "set them for me".
+  const needsApply = flagsKnown && !flagsSet && !logActive;
 
   // "All good" requires:
   //   - autoexec installed AND
@@ -177,10 +181,13 @@ export function NetTableSetupCard({
       <div className="nettable-setup-status-row">
         <span className="nettable-setup-status-label">tracking active</span>
         <StatusBadge
-          ok={tracking}
+          ok={tracking || logActive}
           unknown={status === null || (!dotaRunning && !logActive)}
           okLabel="writing"
-          badLabel={dotaRunning ? "missing -condebug" : "idle"}
+          // If logActive is true the flags ARE working right now, so
+          // "missing -condebug" would be a lie regardless of what
+          // localconfig.vdf says. Fall back to "idle" instead.
+          badLabel={dotaRunning && !logActive ? "missing -condebug" : "idle"}
         />
       </div>
 

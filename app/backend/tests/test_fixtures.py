@@ -24,7 +24,17 @@ sys.path.insert(0, str(BACKEND_DIR))
 
 
 def load_fixtures():
-    return list(FIXTURES_DIR.glob("*.json"))
+    """CV fixtures only — anything with a `screenshot_path` field. Skips
+    nettable end_board fixtures and other non-CV JSON files that share
+    this directory."""
+    out = []
+    for p in FIXTURES_DIR.glob("*.json"):
+        try:
+            if "screenshot_path" in json.loads(p.read_text(encoding="utf-8")):
+                out.append(p)
+        except Exception:
+            continue
+    return out
 
 
 def fixture_id(path: Path) -> str:
