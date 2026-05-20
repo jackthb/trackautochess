@@ -1,0 +1,154 @@
+/* Twitch panel extension — 318px wide, up to 500px tall. */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-size: 13px;
+  color: #efeff1;
+  background: #18181b;
+}
+
+.panel {
+  padding: 12px;
+}
+
+.hidden { display: none; }
+
+.state {
+  padding: 24px 12px;
+  text-align: center;
+  color: #adadb8;
+}
+
+.state p { margin: 4px 0; }
+.muted { color: #898993; font-size: 12px; }
+
+header {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #2f2f35;
+  margin-bottom: 10px;
+}
+
+header img {
+  width: 44px;
+  height: 44px;
+  border-radius: 4px;
+  background: #2f2f35;
+  flex-shrink: 0;
+}
+
+header img:not([src]) { display: none; }
+
+header .who {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+header a {
+  font-size: 15px;
+  font-weight: 600;
+  color: #efeff1;
+  text-decoration: none;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+header a:hover { color: #bf94ff; }
+
+.stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 6px;
+  margin-bottom: 14px;
+}
+
+.stat {
+  background: #1f1f23;
+  border-radius: 4px;
+  padding: 8px 4px;
+  text-align: center;
+}
+
+.stat .label {
+  display: block;
+  font-size: 10px;
+  color: #898993;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.stat .value {
+  display: block;
+  font-size: 15px;
+  font-weight: 600;
+  margin-top: 2px;
+}
+
+h2 {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: #898993;
+  margin-bottom: 6px;
+}
+
+ol.recent {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 12px;
+}
+
+ol.recent li {
+  display: grid;
+  grid-template-columns: 28px 1fr auto;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  background: #1f1f23;
+  border-radius: 4px;
+  font-size: 12px;
+}
+
+ol.recent .placement {
+  font-weight: 700;
+  text-align: center;
+  font-size: 14px;
+}
+
+ol.recent .placement.p1 { color: #ffd166; }
+ol.recent .placement.p2 { color: #c9c4b8; }
+ol.recent .placement.p3 { color: #cd7f32; }
+ol.recent .placement.bot { color: #6e6e75; }
+
+ol.recent .synergies {
+  color: #adadb8;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+ol.recent .wl {
+  font-variant-numeric: tabular-nums;
+  color: #898993;
+}
+
+footer {
+  text-align: center;
+  padding-top: 8px;
+  border-top: 1px solid #2f2f35;
+}
+
+footer a {
+  color: #bf94ff;
+  text-decoration: none;
+  font-size: 12px;
+}
+
+footer a:hover { text-decoration: underline; }

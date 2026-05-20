@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Track Auto Chess</title>
+<script src="https://extension-files.twitch.tv/helper/v1/twitch-ext.min.js"></script>
+<link rel="stylesheet" href="panel.css" />
+</head>
+<body>
+<div id="root" class="panel">
+  <div id="loading" class="state">Loading…</div>
+  <div id="unconfigured" class="state hidden">
+    <p>This channel hasn't linked a Track Auto Chess profile yet.</p>
+    <p class="muted">Broadcaster: set your Steam ID in the extension's configuration panel.</p>
+  </div>
+  <div id="content" class="hidden">
+    <header>
+      <img id="avatar" alt="" />
+      <div class="who">
+        <a id="name" target="_blank" rel="noopener noreferrer"></a>
+        <span id="rank-line" class="muted"></span>
+      </div>
+    </header>
+    <div class="stats">
+      <div class="stat"><span class="label">MMR</span><span id="mmr" class="value">—</span></div>
+      <div class="stat"><span class="label">Peak</span><span id="max-mmr" class="value">—</span></div>
+      <div class="stat"><span class="label">Games</span><span id="games" class="value">—</span></div>
+      <div class="stat"><span class="label">Top 1</span><span id="chickens" class="value">—</span></div>
+    </div>
+    <h2>Recent matches</h2>
+    <ol id="recent" class="recent"></ol>
+    <footer>
+      <a id="profile-link" target="_blank" rel="noopener noreferrer">View full profile →</a>
+    </footer>
+  </div>
+  <div id="error" class="state hidden"></div>
+</div>
+<script src="panel.js"></script>
+</body>
+</html>
