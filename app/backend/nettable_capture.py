@@ -94,11 +94,14 @@ AUTOEXEC_CFG_CONTENT = f"""// DAC NetTable dump triggers — installed by DAC Tr
 // (or unbind SpectatorBroadcasterMenu in Dota Settings → Hotkeys).
 //
 // Snapshot keys (press once per moment of interest):
-//   F10 → dac_table          ← has end_board after match (the snapshot key)
-//   F11 → player_info_table  ← full live per-player state
-//   F13 → unit_table         ← chess pieces on board right now
-//   F15 → player_id_table    ← MMR + candy per slot
-//   F16 → chess_pool_table   ← draft / ban / legendary state
+//   PAUSE → dac_table          ← has end_board after match
+//   F11   → player_info_table  ← full live per-player state
+//   F13   → unit_table         ← chess pieces on board right now
+//   F15   → player_id_table    ← MMR + candy per slot
+//   F16   → chess_pool_table   ← draft / ban / legendary state
+//   F18   → match_history_tab  ← set ONCE per match after the DAC
+//                                backend HTTP callback completes
+//                                (~5s into GAME_IN_PROGRESS)
 //
 // Polling key (safe to spam — extended F-key, no keyboard conflict):
 //   F20 → game_info          ← round_info + death_team
@@ -112,6 +115,7 @@ bind "F11" "dumpstringtable CustomNetTable_player_info_table cl verbose"
 bind "F13" "dumpstringtable CustomNetTable_unit_table cl verbose"
 bind "F15" "dumpstringtable CustomNetTable_player_id_table cl verbose"
 bind "F16" "dumpstringtable CustomNetTable_chess_pool_table cl verbose"
+bind "F18" "dumpstringtable CustomNetTable_match_history_tab cl verbose"
 bind "F20" "dumpstringtable CustomNetTable_game_info cl verbose"
 """
 
@@ -655,6 +659,7 @@ VK_F11 = 0x7A
 VK_F13 = 0x7C
 VK_F15 = 0x7E
 VK_F16 = 0x7F
+VK_F18 = 0x81
 VK_F20 = 0x83
 
 
@@ -942,6 +947,17 @@ DUMP_POSTGAME_DELAY_SEC = 5.0
 # for this many seconds.
 DUMP_STABILISE_SEC = 2.0
 
+# After GAME_IN_PROGRESS fires, the DAC backend's autochess.ppbizon.com/game/new
+# HTTP request needs to complete before `match_history_table` is populated (see
+# addon_game_mode.lua:3088). Empirically 1-5s; we wait 8s to be safe, then fire
+# F18 once. The table is then frozen for the rest of the match.
+MATCH_HISTORY_CAPTURE_DELAY_SEC = 8.0
+
+# After POST_GAME, fire PAUSE this many times spaced this many seconds apart.
+# Riding out a brief alt-tab so end_board still lands.
+POST_GAME_PAUSE_BURST_COUNT = 3
+POST_GAME_PAUSE_BURST_GAP_SEC = 0.4
+
 # How often to poll the log file when no data is arriving.
 POLL_IDLE_SEC = 0.5
 
@@ -989,6 +1005,9 @@ class NetTableCapture:
         # match timeline. Set on GAME_IN_PROGRESS (start), reset
         # after a match's timeline is generated. Float epoch seconds.
         self._match_session_start: float | None = None
+        # Whether we've fired the one-shot F18 to capture match_history
+        # for this session. Reset when _match_session_start resets.
+        self._match_history_captured: bool = False
 
         # Dump block accumulator
         self._dump_active = False
@@ -1267,30 +1286,76 @@ class NetTableCapture:
 
         # Match start — opens the session window so dumps captured
         # between now and POST_GAME / end_board belong to this match.
+        # Also schedules a one-shot F18 press ~8s later to capture
+        # match_history_tab once the DAC backend's HTTP callback
+        # populates it (the table is set ONCE per match via
+        # addon_game_mode.lua:3088 after autochess.ppbizon.com/game/new
+        # returns, then never updated — see VPK survey).
         if GAME_IN_PROGRESS_RE in line:
             if self._match_session_start is None:
                 self._match_session_start = time.time()
+                self._match_history_captured = False
                 log.info("nettable: GAME_IN_PROGRESS — match session opened")
+                t = threading.Timer(MATCH_HISTORY_CAPTURE_DELAY_SEC,
+                                    self._fire_match_history_capture)
+                t.daemon = True
+                t.start()
 
-        # Game state — POST_GAME tells us a match ended. We emit a UI
-        # signal (`nettable_game_ended`); the actual end_board capture
-        # comes from the SendInput cascade poller, which auto-fires
-        # PAUSE every 15s to keep dac_table fresh. The resulting dump
-        # is saved when it lands in _maybe_save_end_board.
+        # Game state — POST_GAME tells us a match ended. Fire PAUSE
+        # immediately via SendInput so dac_table.end_board is captured
+        # NOW — waiting for the next 15s cascade tick loses the dump
+        # if the user alt-tabs (SendInput only delivers while Dota is
+        # foreground).
         if POST_GAME_RE in line:
             now = time.time()
             last = getattr(self, "_last_post_game_emit", 0.0)
             if now - last > 10.0:  # debounce: POST_GAME can re-emit
                 self._last_post_game_emit = now
-                log.info("nettable: POST_GAME detected — match ended")
+                log.info("nettable: POST_GAME detected — match ended, firing PAUSE")
                 self._emit({
                     "type": "nettable_game_ended",
-                    "message": "Match ended — capture end_board now (F10).",
+                    "message": "Match ended — capturing end_board.",
                     "at": datetime.now().isoformat(),
                 })
+                # Fire PAUSE three times spaced ~250ms to ride out
+                # transient foreground loss (alt-tab can be split-second).
+                threading.Thread(
+                    target=self._fire_post_game_pause_burst,
+                    daemon=True,
+                    name="nettable-postgame-pause",
+                ).start()
 
         if STRINGTABLE_MARKER in line:
             self._note_dump_line(line)
+
+    def _fire_match_history_capture(self) -> None:
+        """One-shot F18 press to capture match_history_tab. Skipped if
+        Dota isn't foreground (rare during pre-game / round 0) or if
+        we already captured this session."""
+        if self._stop.is_set() or self._match_history_captured:
+            return
+        if not _is_dota_foreground():
+            # Reschedule once — give Dota a chance to come back to focus
+            # before giving up for this session.
+            log.info("nettable: match_history capture skipped (Dota not foreground); retrying in 5s")
+            t = threading.Timer(5.0, self._fire_match_history_capture)
+            t.daemon = True
+            t.start()
+            return
+        if send_input_key(VK_F18):
+            self._match_history_captured = True
+            log.info("nettable: fired F18 for match_history_tab capture")
+
+    def _fire_post_game_pause_burst(self) -> None:
+        """Fire PAUSE several times spaced ~400ms apart immediately after
+        POST_GAME. Rides out a brief alt-tab so end_board still lands —
+        the 15s cascade alone misses it when the user clicks away."""
+        for i in range(POST_GAME_PAUSE_BURST_COUNT):
+            if self._stop.is_set():
+                return
+            send_input_key(VK_PAUSE)
+            log.info("nettable: post-game PAUSE fire %d/%d", i + 1, POST_GAME_PAUSE_BURST_COUNT)
+            self._stop.wait(POST_GAME_PAUSE_BURST_GAP_SEC)
 
     def _note_dump_line(self, line: str) -> None:
         idx = line.find("table ")
