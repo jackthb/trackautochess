@@ -92,9 +92,18 @@ export default function App({ Component, pageProps }: AppProps<AppPageProps>) {
           : typeof meta.full_name === "string"
             ? meta.full_name
             : null;
+      const avatarUrl =
+        typeof meta.avatar_url === "string" ? meta.avatar_url : null;
+      const customUrl =
+        typeof meta.custom_url === "string" ? meta.custom_url : null;
       identify(steamId ?? user.id, {
-        ...(steamId ? { steam_id: steamId } : {}),
+        // $-prefixed keys are PostHog reserved person properties — $name is
+        // what the Persons list and dashboards display as the user's label.
+        ...(steamName ? { $name: steamName } : {}),
         ...(steamName ? { steam_name: steamName } : {}),
+        ...(steamId ? { steam_id: steamId } : {}),
+        ...(avatarUrl ? { avatar_url: avatarUrl } : {}),
+        ...(customUrl ? { custom_url: customUrl } : {}),
       });
     };
     supabase.auth.getUser().then(({ data }) => apply(data.user));
