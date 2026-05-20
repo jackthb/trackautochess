@@ -46,9 +46,10 @@
   letter-spacing: var(--tr-display);
   margin: 0 0 var(--s-12);
 }
-.titleItem { color: var(--text-primary); }
+.titleItem { color: #8bbf9f; }
 .titleRelic { color: var(--gold); }
 .titleSynergy { color: #8bbf9f; }
+.titleUnit { color: var(--text-primary); }
 
 .tier {
   display: inline-flex;

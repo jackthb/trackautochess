@@ -10,6 +10,7 @@ import {
   TIER_COLOR,
   TIER_LABEL,
 } from "@/lib/items";
+import { parseItemDescription } from "@/lib/itemDescription";
 import { absoluteUrl, SITE_TITLE } from "@/lib/site";
 import { normalizeLocale, type Locale } from "@/lib/i18n";
 import { loadDraftItems } from "@/lib/sanity/draftLoaders";
@@ -25,10 +26,10 @@ interface ItemDetailPageProps {
 const t = {
   title: (n: string) => `${n} Item Guide | ${SITE_TITLE}`,
   descriptionPrefix: (n: string) => `See what ${n} does in Dota Auto Chess. `,
-  fallbackOverview: " A fuller in-game description is not available in the current data export.",
-  overviewPrefix: (n: string, t: string) => `${n} is a ${t} item in Dota Auto Chess.`,
   moreOf: (t: string) => `More ${t} Items`,
   fallbackTier: (n: string, t: string) => `${n} is a ${t} Dota Auto Chess item.`,
+  activeAbility: "Active Ability",
+  stats: "Stats",
 };
 
 function cleanText(value: string): string {
@@ -88,13 +89,11 @@ export default function ItemDetailPage({
     },
   ];
 
-  const cleanedDesc = cleanText(item.description);
-  const overview = (
-    <>
-      {t.overviewPrefix(item.name, tierLabel)}
-      {cleanedDesc ? ` ${cleanedDesc}` : t.fallbackOverview}
-    </>
-  );
+  const { active, stats } = parseItemDescription(item.description);
+  const bodySections = [
+    ...(active ? [{ title: t.activeAbility, body: active }] : []),
+    ...(stats ? [{ title: t.stats, body: stats }] : []),
+  ];
 
   const relatedEntities: RelatedEntity[] = related.map((r) => ({
     slug: r.slug,
@@ -116,7 +115,7 @@ export default function ItemDetailPage({
         variant="item"
         name={item.name}
         iconSrc={iconUrl(item)}
-        overview={overview}
+        bodySections={bodySections}
         notes={item.notes.map(cleanText)}
         lore={item.lore ? cleanText(item.lore) : undefined}
         tag={{ label: tierLabel, color: tierColor }}

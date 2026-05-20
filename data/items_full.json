@@ -1286,7 +1286,7 @@
   },
   "item_liliangdatiaodao": {
     "name": "Overwhelming Blink",
-    "description": "Active ability: Instant\nInstantly teleports off the farest square that allows it to attack an enemy. Generates 30 on activation.+ 30% HP per activation.\n\nMax Blink Distance: 800",
+    "description": "Active ability: Instant\nInstantly teleports off the farthest square that allows it to attack an enemy. Generates 30 on activation.+ 30% HP per activation.\n\nMax Blink Distance: 800",
     "lore": "",
     "quality": "rare",
     "texture": "overwhelming_blink",
@@ -1301,8 +1301,8 @@
       "ru": "Overwhelming Blink"
     },
     "descriptions": {
-      "en": "Active ability: Instant\nInstantly teleports off the farest square that allows it to attack an enemy. Generates 30 on activation.+ 30% HP per activation.\n\nMax Blink Distance: 800",
-      "ru": "Active ability: Instant\nInstantly teleports off the farest square that allows it to attack an enemy. Generates 30 on activation.+ 30% HP per activation.\n\nMax Blink Distance: 800"
+      "en": "Active ability: Instant\nInstantly teleports off the farthest square that allows it to attack an enemy. Generates 30 on activation.+ 30% HP per activation.\n\nMax Blink Distance: 800",
+      "ru": "Active ability: Instant\nInstantly teleports off the farthest square that allows it to attack an enemy. Generates 30 on activation.+ 30% HP per activation.\n\nMax Blink Distance: 800"
     },
     "lore_i18n": {}
   },
@@ -2535,7 +2535,7 @@
   },
   "item_tiaodao": {
     "name": "Blink Dagger",
-    "description": "Active ability: Instant\nInstantly teleports off the farest square that allows it to attack an enemy. \n\nRange: 800",
+    "description": "Active ability: Instant\nInstantly teleports off the farthest square that allows it to attack an enemy. \n\nRange: 800",
     "lore": "The fabled dagger used by the fastest assassin ever to walk the lands.",
     "quality": "rare",
     "texture": "item_blink",
@@ -2552,7 +2552,7 @@
       "ru": "Blink Dagger"
     },
     "descriptions": {
-      "en": "Active ability: Instant\nInstantly teleports off the farest square that allows it to attack an enemy. \n\nRange: 800",
+      "en": "Active ability: Instant\nInstantly teleports off the farthest square that allows it to attack an enemy. \n\nRange: 800",
       "ru": "Active ability: Instant\nМгновенно телепортирует на самую дальнюю клетку, с которой можно атаковать врага. \n\nRange: 800"
     },
     "lore_i18n": {

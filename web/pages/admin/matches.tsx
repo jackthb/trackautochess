@@ -6,7 +6,7 @@ import { SITE_TITLE } from "@/lib/site";
 import { playerProfilePath } from "@/lib/steam";
 import { createSupabaseClient } from "@/lib/supabase";
 import { isAdminSteamId } from "@/lib/admin";
-import browserStyles from "@/components/EntityBrowser.module.css";
+import { PageLayout } from "@/components/PageLayout";
 import type { MatchSummary } from "../api/admin/matches";
 
 type Phase = "loading" | "forbidden" | "ready" | "error";
@@ -212,9 +212,7 @@ export default function MatchesPage() {
         }
       `}</style>
 
-      <div className={browserStyles.page}>
-        <div className={browserStyles.container}>
-          <h1 className={browserStyles.pageTitle}>Matches</h1>
+      <PageLayout title="Matches">
 
           {phase === "loading" && <div className="gate">Loading…</div>}
 
@@ -310,8 +308,7 @@ export default function MatchesPage() {
               )}
             </>
           )}
-        </div>
-      </div>
+      </PageLayout>
     </>
   );
 }

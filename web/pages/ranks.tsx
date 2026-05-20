@@ -3,6 +3,7 @@ import { SeoHead } from "@/lib/seo";
 import { SITE_TITLE } from "@/lib/site";
 import { normalizeLocale } from "@/lib/i18n";
 import browserStyles from "@/components/EntityBrowser.module.css";
+import { PageLayout } from "@/components/PageLayout";
 
 const t = {
   title: `Ranks | ${SITE_TITLE}`,
@@ -217,9 +218,7 @@ export default function RanksPage() {
         }
       `}</style>
 
-      <div className={browserStyles.page}>
-        <div className={browserStyles.container}>
-          <h1 className={browserStyles.pageTitle}>{t.heading}</h1>
+      <PageLayout title={t.heading}>
 
           <p className="lead">{t.lead}</p>
 
@@ -282,8 +281,7 @@ export default function RanksPage() {
               </div>
             </section>
           ))}
-        </div>
-      </div>
+      </PageLayout>
     </>
   );
 }

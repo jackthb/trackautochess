@@ -6,7 +6,7 @@ import { levelToRankName, mmrToLevel } from "@/lib/ranks";
 import { playerProfilePath } from "@/lib/steam";
 import { createSupabaseClient } from "@/lib/supabase";
 import { isAdminSteamId } from "@/lib/admin";
-import browserStyles from "@/components/EntityBrowser.module.css";
+import { PageLayout } from "@/components/PageLayout";
 
 interface LeaderboardRow {
   steam_id: string;
@@ -237,9 +237,7 @@ export default function LeaderboardPage() {
         }
       `}</style>
 
-      <div className={browserStyles.page}>
-        <div className={browserStyles.container}>
-          <h1 className={browserStyles.pageTitle}>Leaderboard</h1>
+      <PageLayout title="Leaderboard">
 
           {phase === "loading" && <div className="gate">Loading…</div>}
 
@@ -356,8 +354,7 @@ export default function LeaderboardPage() {
               )}
             </>
           )}
-        </div>
-      </div>
+      </PageLayout>
     </>
   );
 }

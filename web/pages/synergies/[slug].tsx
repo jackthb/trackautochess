@@ -1,6 +1,7 @@
 import type { GetStaticPaths, GetStaticProps } from "next";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { EntityDetail, type RelatedEntity } from "@/components/EntityDetail";
+import { SynergyDescription } from "@/components/SynergyDescription";
 import { SeoHead } from "@/lib/seo";
 import { absoluteUrl, SITE_TITLE } from "@/lib/site";
 import {
@@ -103,7 +104,7 @@ export default function SynergyDetailPage({
         variant="synergy"
         name={synergy.name}
         iconSrc={synergy.iconUrl}
-        overview={<>{synergy.description || description}</>}
+        overview={<SynergyDescription description={synergy.description || description} />}
         lore={synergy.lore || undefined}
         indexLabel={indexLabel}
         indexPath={indexPath}

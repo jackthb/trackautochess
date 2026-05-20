@@ -1,4 +1,5 @@
 import {
+  Fragment,
   useState,
   useRef,
   useCallback,
@@ -8,6 +9,23 @@ import {
 import { createPortal } from "react-dom";
 import type { UnitFullInfo, SynergyInfo, RelicInfo } from "./types";
 import { costBorderColor, unitStem, relicStem, synIconName } from "./game-utils";
+
+/** Replace inline "(N)" tier markers with a styled chip element so the
+ *  description matches the tier-chip treatment on the synergies page. */
+function renderTierChips(text: string): ReactNode {
+  const parts = text.split(/\((\d{1,2})\)/g);
+  const nodes: ReactNode[] = [];
+  for (let i = 0; i < parts.length; i++) {
+    if (i % 2 === 1) {
+      nodes.push(
+        <span key={i} className="tooltip-tier-chip">{parts[i]}</span>,
+      );
+    } else if (parts[i]) {
+      nodes.push(<Fragment key={i}>{parts[i]}</Fragment>);
+    }
+  }
+  return nodes;
+}
 
 export interface TooltipData {
   unitCosts?: Record<string, number>;
@@ -203,7 +221,7 @@ function buildContent(
         )}
         {(info.formatted || info.description) && (
           <div className="tooltip-desc" style={{ whiteSpace: "pre-line" }}>
-            {info.formatted || info.description}
+            {renderTierChips(info.formatted || info.description || "")}
           </div>
         )}
       </>

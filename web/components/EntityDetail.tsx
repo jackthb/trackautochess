@@ -28,6 +28,11 @@ export interface RelatedEntity {
   accentColor?: string;
 }
 
+export interface BodySection {
+  title: string;
+  body: ReactNode;
+}
+
 interface EntityDetailProps {
   variant: EntityCardVariant;
   name: string;
@@ -35,12 +40,19 @@ interface EntityDetailProps {
   /** Body copy for the "Overview" section. ReactNode so callers can
    *  embed contextual links with natural anchor text for SEO. */
   overview?: ReactNode;
+  /** Optional list of body sections rendered in order between the hero
+   *  and the notes/lore. When provided, `overview` is ignored; callers
+   *  who need both should include the overview as the first entry. */
+  bodySections?: BodySection[];
   /** Optional bullet list (items). */
   notes?: string[];
   /** Flavor lore. */
   lore?: string;
   /** Small chip rendered below the title (e.g. tier label). */
   tag?: { label: string; color?: string };
+  /** Color applied to the hero title text. When set, overrides the
+   *  variant default (e.g. tier color on item pages). */
+  titleColor?: string;
   /** "More X" section. */
   relatedTitle: string;
   related: RelatedEntity[];
@@ -70,9 +82,11 @@ export function EntityDetail({
   name,
   iconSrc,
   overview,
+  bodySections,
   notes,
   lore,
   tag,
+  titleColor,
   relatedTitle,
   related,
   accentColor,
@@ -88,10 +102,15 @@ export function EntityDetail({
       ? styles.titleRelic
       : variant === "synergy"
         ? styles.titleSynergy
-        : styles.titleItem
+        : variant === "item"
+          ? styles.titleItem
+          : styles.titleUnit
   }`;
   const resolvedIndexPath = indexPath ?? ENTITY_COLLECTION_PATH[variant];
   const resolvedIndexLabel = indexLabel ?? t.index[variant];
+  const sections: BodySection[] = bodySections ?? (
+    overview ? [{ title: t.overview[variant], body: overview }] : []
+  );
 
   return (
     <div className={styles.page}>
@@ -107,7 +126,9 @@ export function EntityDetail({
         <section className={styles.hero}>
           <EntityIcon src={iconSrc} alt={name} size="lg" bordered={variant !== "unit"} />
           <div>
-            <h1 className={titleClass}>{name}</h1>
+            <h1 className={titleClass} style={titleColor ? { color: titleColor } : undefined}>
+              {name}
+            </h1>
             {tag && (
               <div className={styles.tier} style={{ color: tag.color }}>
                 {tag.label}
@@ -116,12 +137,12 @@ export function EntityDetail({
           </div>
         </section>
 
-        {overview && (
-          <section className={styles.section}>
-            <h2 className={styles.sectionTitle}>{t.overview[variant]}</h2>
-            <div className={styles.bodyCopy}>{overview}</div>
+        {sections.map((s, i) => (
+          <section key={i} className={styles.section}>
+            <h2 className={styles.sectionTitle}>{s.title}</h2>
+            <div className={styles.bodyCopy}>{s.body}</div>
           </section>
-        )}
+        ))}
 
         {notes && notes.length > 0 && (
           <section className={styles.section}>

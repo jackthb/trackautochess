@@ -815,6 +815,67 @@ def extract_all(pak):
 
 
 # ════════════════════════════════════════════════════════════════════
+# Text corrections
+# ════════════════════════════════════════════════════════════════════
+
+def load_corrections(data_dir):
+    """Load text_corrections.json. Returns a list of compiled corrections,
+    or [] if the file is missing or malformed."""
+    path = Path(data_dir) / 'text_corrections.json'
+    if not path.exists():
+        return []
+    raw = json.loads(path.read_text(encoding='utf-8'))
+    out = []
+    for entry in raw.get('corrections', []):
+        find = entry.get('find')
+        replace = entry.get('replace', '')
+        if not find:
+            continue
+        try:
+            pattern = re.compile(find)
+        except re.error as exc:
+            print(f"  text_corrections: skipping invalid regex {find!r}: {exc}")
+            continue
+        where = entry.get('where')
+        out.append({
+            'pattern': pattern,
+            'replace': replace,
+            'where': set(where) if where else None,
+            'raw': find,
+        })
+    return out
+
+
+def apply_corrections_to_value(value, corrections, kind):
+    """Recursively apply corrections to every string inside `value`.
+
+    `kind` is the top-level dataset name (e.g. 'items_full'); a correction
+    with a `where` filter is only applied when its filter contains `kind`.
+    """
+    if isinstance(value, str):
+        out = value
+        for c in corrections:
+            if c['where'] is not None and kind not in c['where']:
+                continue
+            out = c['pattern'].sub(c['replace'], out)
+        return out
+    if isinstance(value, dict):
+        return {k: apply_corrections_to_value(v, corrections, kind) for k, v in value.items()}
+    if isinstance(value, list):
+        return [apply_corrections_to_value(v, corrections, kind) for v in value]
+    return value
+
+
+def apply_corrections(data, corrections):
+    """Apply corrections in place to the data bundle from `extract_all`."""
+    if not corrections:
+        return data
+    for kind, payload in data.items():
+        data[kind] = apply_corrections_to_value(payload, corrections, kind)
+    return data
+
+
+# ════════════════════════════════════════════════════════════════════
 # items.json reconciliation
 # ════════════════════════════════════════════════════════════════════
 
@@ -1013,6 +1074,12 @@ def main():
 
     # Extract
     data = extract_all(pak)
+
+    # Apply text corrections (typo fixes baked into source-of-truth JSON)
+    corrections = load_corrections(Path(args.out))
+    if corrections:
+        print(f"text_corrections: applying {len(corrections)} rule(s)")
+        apply_corrections(data, corrections)
 
     # Write output
     out_dir = Path(args.out)

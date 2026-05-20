@@ -1,0 +1,30 @@
+.page {
+  position: relative;
+  z-index: 1;
+  min-height: calc(100vh - var(--nav-height));
+}
+
+.layout {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.layoutNarrow {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.container {
+  min-width: 0;
+  padding: var(--s-40) var(--s-32) var(--s-48);
+}
+
+.pageTitle {
+  font-family: var(--font-display);
+  font-size: 28px;
+  font-weight: var(--fw-semibold);
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: var(--text-primary);
+  margin-bottom: var(--s-24);
+}

@@ -6,6 +6,7 @@ import { getAllTalents, getTierLabel, type DisplayTalent } from "@/lib/talents";
 import { normalizeLocale } from "@/lib/i18n";
 import browserStyles from "@/components/EntityBrowser.module.css";
 import cardStyles from "@/components/EntityCard.module.css";
+import { PageLayout } from "@/components/PageLayout";
 
 interface TalentsPageProps {
   supabase: SupabaseClient | null;
@@ -45,35 +46,31 @@ export default function TalentsPage({ supabase }: TalentsPageProps) {
   return (
     <>
       <SeoHead title={t.title} description={t.description} path="/talents" locale={locale} structuredData={structuredData} />
-      <div className={browserStyles.page}>
-        <div className={browserStyles.container}>
-          <h1 className={browserStyles.pageTitle}>{t.heading}</h1>
-
-          {tierRows.map(([tier, entries]) => (
-            <section key={tier} className={browserStyles.panel}>
-              <div className={browserStyles.panelHeader}>
-                <span>{getTierLabel(tier)}</span>
-                <span className={browserStyles.count}>{entries.length}</span>
-              </div>
-              <div className={`${browserStyles.grid} ${browserStyles.gridRelic}`}>
-                {entries.map((tt) => (
-                  <div
-                    key={tt.key}
-                    className={`${cardStyles.card} ${cardStyles.relic}`}
-                    style={{ cursor: "default" }}
-                  >
-                    <div className={cardStyles.body}>
-                      <div className={cardStyles.name}>{tt.name}</div>
-                      <div className={cardStyles.desc}>{tt.description}</div>
-                    </div>
-                    <div className={cardStyles.level}>{tt.branch}</div>
+      <PageLayout title={t.heading}>
+        {tierRows.map(([tier, entries]) => (
+          <section key={tier} className={browserStyles.panel}>
+            <div className={browserStyles.panelHeader}>
+              <span>{getTierLabel(tier)}</span>
+              <span className={browserStyles.count}>{entries.length}</span>
+            </div>
+            <div className={`${browserStyles.grid} ${browserStyles.gridRelic}`}>
+              {entries.map((tt) => (
+                <div
+                  key={tt.key}
+                  className={`${cardStyles.card} ${cardStyles.relic}`}
+                  style={{ cursor: "default" }}
+                >
+                  <div className={cardStyles.body}>
+                    <div className={cardStyles.name}>{tt.name}</div>
+                    <div className={cardStyles.desc}>{tt.description}</div>
                   </div>
-                ))}
-              </div>
-            </section>
-          ))}
-        </div>
-      </div>
+                  <div className={cardStyles.level}>{tt.branch}</div>
+                </div>
+              ))}
+            </div>
+          </section>
+        ))}
+      </PageLayout>
     </>
   );
 }

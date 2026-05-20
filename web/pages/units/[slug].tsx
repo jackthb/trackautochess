@@ -6,7 +6,6 @@ import { absoluteUrl, SITE_TITLE } from "@/lib/site";
 import { getAllUnits, getUnitBySlug, type DisplayUnit } from "@/lib/units";
 import {
   getAllSynergies,
-  getSynergyNameTranslator,
   type DisplaySynergy,
 } from "@/lib/synergies";
 import { slugifyName } from "@/lib/slugs";
@@ -29,13 +28,11 @@ const t = {
   title: (n: string) => `${n} Unit Guide | ${SITE_TITLE}`,
   description: (n: string, c: number) =>
     `${n} is a cost ${c} unit in Dota Auto Chess.`,
-  activates: (u: string) => `${u} activates this synergy.`,
   cost: (c: number) => `Cost ${c}`,
   crumbUnits: "Units",
 };
 
 const RELATED_LABELS = {
-  synergies: "Synergies",
   unitSynergies: (n: string) => `${n} Synergies`,
   moreUnits: "More Units",
 };
@@ -52,7 +49,6 @@ export default function UnitDetailPage({
   const synergyByEnglishSlug = new Map(
     synergies.map((syn) => [syn.slug, syn]),
   );
-  const translateSyn = getSynergyNameTranslator(locale);
   const relatedEntities: RelatedEntity[] = related.map((u) => ({
     slug: u.slug,
     name: u.name,
@@ -65,7 +61,6 @@ export default function UnitDetailPage({
     return {
       slug,
       name: matched?.name ?? engName,
-      description: t.activates(unit.name),
       iconSrc:
         matched?.iconUrl ?? `/icons/synergies/${matched?.iconStem ?? ""}.png`,
       variant: "synergy",
@@ -116,7 +111,6 @@ export default function UnitDetailPage({
         variant="unit"
         name={unit.name}
         iconSrc={unit.iconUrl}
-        overview={<>{description} {unit.synergies.length ? `${RELATED_LABELS.synergies}: ${unit.synergies.map(translateSyn).join(", ")}.` : ""}</>}
         tag={{ label: t.cost(unit.cost) }}
         relatedTitle={RELATED_LABELS.unitSynergies(unit.name)}
         related={synergyEntities}

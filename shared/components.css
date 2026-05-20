@@ -207,6 +207,23 @@
   border-color: var(--accent);
 }
 
+.tooltip-tier-chip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  padding: 0 4px;
+  margin-right: 6px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: var(--fw-semibold);
+  color: var(--text-primary);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--r-2);
+  vertical-align: baseline;
+}
+
 /* ── Share button ─────────────────────────────────────── */
 
 .btn-share {
