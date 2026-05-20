@@ -7,7 +7,10 @@
 // Default to prod; override with ?api=http://localhost:3000 when previewing
 // locally. Twitch's hosted iframe always runs on a *.ext-twitch.tv origin so
 // the override is dev-only.
-const DEFAULT_API_HOST = "https://trackautochess.com";
+// Use the www host directly — the apex (trackautochess.com) returns a 307
+// to www, and browser CORS fetches don't reliably survive cross-origin
+// redirects. Hitting the final host avoids the round-trip and the failure.
+const DEFAULT_API_HOST = "https://www.trackautochess.com";
 const API_HOST = (() => {
   try {
     const override = new URL(window.location.href).searchParams.get("api");

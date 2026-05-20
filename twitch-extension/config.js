@@ -4,7 +4,9 @@
 // against the same /api/twitch/<id>/stats endpoint the panel uses, then
 // persist via Twitch.ext.configuration.set so the panel can read it.
 
-const DEFAULT_API_HOST = "https://trackautochess.com";
+// www. directly — apex redirects to www and CORS fetches don't survive
+// cross-origin redirects.
+const DEFAULT_API_HOST = "https://www.trackautochess.com";
 const API_HOST = (() => {
   try {
     const override = new URL(window.location.href).searchParams.get("api");
