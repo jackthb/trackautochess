@@ -1,7 +1,7 @@
 // Track Auto Chess — Twitch panel extension.
 //
 // Reads the broadcaster's configured Steam ID, polls our public stats
-// endpoint, renders compact stats + recent matches. Auto-refreshes every
+// endpoint, renders compact stats + MMR sparkline. Auto-refreshes every
 // 60s while visible.
 
 // Default to prod; override with ?api=http://localhost:3000 when previewing
@@ -32,9 +32,20 @@ const els = {
   maxMmr: document.getElementById("max-mmr"),
   games: document.getElementById("games"),
   chickens: document.getElementById("chickens"),
-  recent: document.getElementById("recent"),
+  totalChickens: document.getElementById("total-chickens"),
+  lifetimePeak: document.getElementById("lifetime-peak"),
+  totalGames: document.getElementById("total-games"),
+  candy: document.getElementById("candy"),
+  graphWrap: document.getElementById("graph-wrap"),
+  graph: document.getElementById("graph"),
   profileLink: document.getElementById("profile-link"),
 };
+
+const SVG_NS = "http://www.w3.org/2000/svg";
+const GRAPH_W = 280;
+const GRAPH_H = 90;
+const GRAPH_PAD_X = 6;
+const GRAPH_PAD_Y = 10;
 
 let pollHandle = null;
 let lastSteamId = null;
@@ -49,22 +60,86 @@ function fmt(value) {
   return value == null ? "—" : value.toLocaleString("en-US");
 }
 
-function placementClass(p) {
-  if (p === 1) return "placement p1";
-  if (p === 2) return "placement p2";
-  if (p === 3) return "placement p3";
-  if (p == null) return "placement bot";
-  return p > 4 ? "placement bot" : "placement";
+function buildGraphPoints(seasons, history) {
+  const seasonPoints = (seasons || [])
+    .filter((s) => typeof s.mmr === "number")
+    .slice()
+    .sort((a, b) => String(a.season).localeCompare(String(b.season)))
+    .map((s) => ({ mmr: s.mmr, kind: "season" }));
+  const snapshotPoints = (history || [])
+    .filter((s) => typeof s.mmr === "number")
+    .slice()
+    .sort(
+      (a, b) =>
+        new Date(a.snapshotted_at).getTime() -
+        new Date(b.snapshotted_at).getTime()
+    )
+    .map((s) => ({ mmr: s.mmr, kind: "snapshot" }));
+  return [...seasonPoints, ...snapshotPoints];
 }
 
-function summarizeSynergies(synergies) {
-  if (!synergies) return "";
-  // Pipe-delimited string like "Aqir:4|Beast:3" — top 3 by tier.
-  return synergies
-    .split("|")
-    .slice(0, 3)
-    .map((s) => s.replace(":", " "))
-    .join(" · ");
+function svgEl(tag, attrs) {
+  const node = document.createElementNS(SVG_NS, tag);
+  for (const [k, v] of Object.entries(attrs)) node.setAttribute(k, String(v));
+  return node;
+}
+
+function renderGraph(seasons, history) {
+  const points = buildGraphPoints(seasons, history);
+  while (els.graph.firstChild) els.graph.removeChild(els.graph.firstChild);
+  if (points.length < 2) {
+    els.graphWrap.classList.add("hidden");
+    return;
+  }
+  const mmrs = points.map((p) => p.mmr);
+  const minMmr = Math.min(...mmrs);
+  const maxMmr = Math.max(...mmrs);
+  const range = maxMmr - minMmr || 1;
+  const innerW = GRAPH_W - GRAPH_PAD_X * 2;
+  const innerH = GRAPH_H - GRAPH_PAD_Y * 2;
+  const coords = points.map((p, i) => ({
+    x: GRAPH_PAD_X + (i / (points.length - 1)) * innerW,
+    y: GRAPH_PAD_Y + innerH - ((p.mmr - minMmr) / range) * innerH,
+    mmr: p.mmr,
+    kind: p.kind,
+  }));
+  const polyPoints = coords.map((c) => `${c.x},${c.y}`).join(" ");
+  const first = coords[0];
+  const last = coords[coords.length - 1];
+
+  els.graph.appendChild(
+    svgEl("polygon", {
+      class: "area",
+      points: `${first.x},${GRAPH_H - GRAPH_PAD_Y} ${polyPoints} ${last.x},${GRAPH_H - GRAPH_PAD_Y}`,
+    })
+  );
+  els.graph.appendChild(
+    svgEl("polyline", { class: "line", points: polyPoints })
+  );
+  for (let i = 0; i < coords.length - 1; i++) {
+    const c = coords[i];
+    els.graph.appendChild(
+      svgEl("circle", {
+        class: `dot ${c.kind}`,
+        cx: c.x,
+        cy: c.y,
+        r: c.kind === "season" ? 2.4 : 1.6,
+      })
+    );
+  }
+  els.graph.appendChild(
+    svgEl("circle", { class: "last-dot", cx: last.x, cy: last.y, r: 2.6 })
+  );
+  const label = svgEl("text", {
+    class: "axis",
+    x: last.x - 4,
+    y: last.y - 5,
+    "text-anchor": "end",
+  });
+  label.textContent = String(last.mmr);
+  els.graph.appendChild(label);
+
+  els.graphWrap.classList.remove("hidden");
 }
 
 function render(data) {
@@ -85,32 +160,15 @@ function render(data) {
     data.stats.chicken_count != null
       ? `${fmt(data.stats.chicken_count)}${data.stats.chicken_pct != null ? ` (${data.stats.chicken_pct}%)` : ""}`
       : "—";
+  els.totalChickens.textContent = fmt(data.stats.total_chicken_count);
+  els.lifetimePeak.textContent = fmt(data.stats.lifetime_peak_mmr);
+  els.totalGames.textContent =
+    data.stats.total_games_played != null
+      ? `${fmt(data.stats.total_games_played)}${data.stats.seasons_played ? ` · ${data.stats.seasons_played}s` : ""}`
+      : "—";
+  els.candy.textContent = fmt(data.stats.candy);
 
-  els.recent.innerHTML = "";
-  if (!data.recent_games || data.recent_games.length === 0) {
-    const li = document.createElement("li");
-    li.textContent = "No recorded matches yet.";
-    li.style.justifyContent = "center";
-    li.style.color = "#898993";
-    els.recent.appendChild(li);
-  } else {
-    for (const g of data.recent_games.slice(0, 5)) {
-      const li = document.createElement("li");
-      const placement = document.createElement("span");
-      placement.className = placementClass(g.placement);
-      placement.textContent = g.placement != null ? `#${g.placement}` : "—";
-      const synergies = document.createElement("span");
-      synergies.className = "synergies";
-      synergies.textContent = summarizeSynergies(g.synergies);
-      const wl = document.createElement("span");
-      wl.className = "wl";
-      if (g.wins != null && g.losses != null) {
-        wl.textContent = `${g.wins}-${g.losses}`;
-      }
-      li.append(placement, synergies, wl);
-      els.recent.appendChild(li);
-    }
-  }
+  renderGraph(data.seasons, data.mmr_history);
 
   show("content");
 }
