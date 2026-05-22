@@ -6,6 +6,8 @@ import { NetTableStatePanel } from "./NetTableStatePanel";
 
 interface NetTableHomeProps {
   status: TrackerStatus | null;
+  // PARKED — admin "Preview as user" toggle. Props kept so reviving the
+  // dual-view code in App.tsx stays a one-line uncomment.
   isAdminPreview?: boolean;
   onExitAdminPreview?: () => void;
 }
@@ -15,11 +17,16 @@ export function NetTableHome({
   isAdminPreview,
   onExitAdminPreview,
 }: NetTableHomeProps) {
+  // Suppress unused-prop noise; both are intentionally retained for the
+  // parked admin-preview flow.
+  void isAdminPreview;
+  void onExitAdminPreview;
   const {
     status: netStatus,
     entries,
-    state,
-    stateAt,
+    // PARKED with the admin state panel below.
+    // state,
+    // stateAt,
     launchOptionsApplied,
     launchOptionsProgress,
     resyncProgress,
@@ -41,10 +48,9 @@ export function NetTableHome({
       netStatus.autoexec_installed &&
       (tracking || (!netStatus.dota_running && flagsSet)),
   );
-  // The raw VBKV dump view is admin-only — pre-release debugging tool, not a
-  // user-facing feature. Hide for everyone else, including admins previewing
-  // as a regular user.
-  const showStatePanel = status?.admin_mode === true && !isAdminPreview;
+  // PARKED — the raw VBKV dump was an admin-only debugging panel. Hidden
+  // in the unified view so the home tab renders identically for everyone.
+  // const showStatePanel = status?.admin_mode === true && !isAdminPreview;
 
   return (
     <div className="nettable-home">
@@ -54,6 +60,8 @@ export function NetTableHome({
           <h1>Live capture</h1>
         </div>
         <div className="upload-user-group">
+          {/* PARKED — "Admin view →" button. Re-render alongside the admin
+              preview toggle in App.tsx.
           {isAdminPreview && onExitAdminPreview && (
             <button
               type="button"
@@ -64,6 +72,7 @@ export function NetTableHome({
               Admin view →
             </button>
           )}
+          */}
           <div className="upload-user">
             <span>{status?.steam_name || "Steam user"}</span>
           </div>
@@ -84,11 +93,13 @@ export function NetTableHome({
         <div className="nettable-home-feed">
           <NetTableActivityFeed entries={entries} />
         </div>
+        {/* PARKED — admin debug state panel.
         {showStatePanel && (
           <div className="nettable-home-state">
             <NetTableStatePanel state={state} stateAt={stateAt} />
           </div>
         )}
+        */}
       </div>
     </div>
   );
