@@ -1,5 +1,5 @@
 import type { TrackerStatus, UnitFullInfo } from "../types";
-import { useNetTableEvents } from "../hooks/useNetTableEvents";
+import type { NetTableActivityState } from "../hooks/useNetTableEvents";
 import { NetTableSetupCard } from "./NetTableSetupCard";
 import { NetTableActivityFeed } from "./NetTableActivityFeed";
 import { NetTableStatePanel } from "./NetTableStatePanel";
@@ -8,6 +8,10 @@ interface NetTableHomeProps {
   status: TrackerStatus | null;
   /** Loaded units_full.json — forwarded to NetTableStatePanel for chess code lookup */
   unitsFull: Record<string, UnitFullInfo>;
+  /** Hoisted into App.tsx so the subscription + state survive tab switches —
+   * otherwise the grid flickers between the "setup incomplete" and
+   * "setup complete" layouts on every return to home. */
+  netTable: NetTableActivityState;
   // PARKED — admin "Preview as user" toggle. Props kept so reviving the
   // dual-view code in App.tsx stays a one-line uncomment.
   isAdminPreview?: boolean;
@@ -17,6 +21,7 @@ interface NetTableHomeProps {
 export function NetTableHome({
   status,
   unitsFull,
+  netTable,
   isAdminPreview,
   onExitAdminPreview,
 }: NetTableHomeProps) {
@@ -32,7 +37,7 @@ export function NetTableHome({
     launchOptionsApplied,
     launchOptionsProgress,
     resyncProgress,
-  } = useNetTableEvents();
+  } = netTable;
   // Match the setup card's "all good" calc — kept in sync with
   // NetTableSetupCard.tsx. Pill only collapses when we have positive
   // evidence the setup will work: either tracking is empirically active,

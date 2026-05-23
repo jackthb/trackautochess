@@ -70,7 +70,7 @@ export interface NetTableActivityEntry {
  */
 export type NetTableState = Record<string, Record<string, unknown>>;
 
-interface NetTableActivityState {
+export interface NetTableActivityState {
   status: NetTableStatus | null;
   entries: NetTableActivityEntry[];
   state: NetTableState;

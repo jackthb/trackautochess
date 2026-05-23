@@ -17,6 +17,7 @@ import { UploadShell } from "./components/UploadShell";
 import { NetTableHome } from "./components/NetTableHome";
 import { GlobalSearch } from "./components/GlobalSearch";
 import { useTrackerEvents } from "./hooks/useTrackerEvents";
+import { useNetTableEvents } from "./hooks/useNetTableEvents";
 import { useGames } from "./hooks/useGames";
 import { useDrodo } from "./hooks/useDrodo";
 import { useReplays } from "./hooks/useReplays";
@@ -61,6 +62,10 @@ export default function App() {
   const gamesState = useGames();
   const drodoState = useDrodo();
   const replaysState = useReplays();
+  // Hoisted out of NetTableHome so the subscription + state survive when the
+  // user leaves the home tab and comes back — otherwise the grid layout
+  // flickers between setup-incomplete and setup-complete on every return.
+  const netTable = useNetTableEvents();
 
   const handleImportResult = useCallback(() => {
     gamesState.refresh();
@@ -135,6 +140,7 @@ export default function App() {
               <NetTableHome
                 status={tracker.status}
                 unitsFull={gamesState.unitsFull}
+                netTable={netTable}
               />
             )}
             {activeTab === "history" && (
