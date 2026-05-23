@@ -1045,6 +1045,12 @@ class NetTableCapture:
         self.emit_status()
         self._last_status_signature = self._current_status_signature()
 
+        # Warm-start from the most recent local dump so a restart mid-match
+        # doesn't blank the live view for ~15s (the next cascade tick). Only
+        # trusts dumps newer than WARM_START_MAX_AGE_SEC so we don't surface
+        # stale match data on a cold open hours later.
+        self._warm_start_state_from_disk()
+
         t = threading.Thread(target=self._run, daemon=True, name="nettable-tail")
         t.start()
         p = threading.Thread(target=self._run_status_poll, daemon=True, name="nettable-status-poll")
@@ -1143,6 +1149,55 @@ class NetTableCapture:
             "state": self._last_state,
             "at": self._last_state_at or "",
         })
+
+    # If the freshest local dump is older than this, don't warm-start —
+    # the data is almost certainly from a different match.
+    _WARM_START_MAX_AGE_SEC = 30 * 60
+
+    def _warm_start_state_from_disk(self) -> None:
+        """Seed `_last_state` from the newest local dump file so the renderer
+        gets a populated snapshot before the next cascade tick lands. Bounded
+        by `_WARM_START_MAX_AGE_SEC`; older files are ignored."""
+        try:
+            from utils import LOCAL_DUMPS_DIR
+            if not LOCAL_DUMPS_DIR.exists():
+                return
+            candidates = sorted(
+                LOCAL_DUMPS_DIR.glob("*.json"),
+                key=lambda p: p.stat().st_mtime,
+                reverse=True,
+            )
+            if not candidates:
+                return
+            latest = candidates[0]
+            age = time.time() - latest.stat().st_mtime
+            if age > self._WARM_START_MAX_AGE_SEC:
+                log.info("nettable: warm-start skipped — newest dump is %.0fs old", age)
+                return
+            try:
+                doc = json.loads(latest.read_text(encoding="utf-8"))
+            except (OSError, ValueError) as e:
+                log.warning("nettable: warm-start failed to read %s: %s", latest.name, e)
+                return
+            rows = doc.get("rows") or []
+            captured_at = doc.get("captured_at") or ""
+            seeded = 0
+            for r in rows:
+                table = r.get("table_name")
+                key = r.get("key")
+                if not table or key is None:
+                    continue
+                self._last_state.setdefault(table, {})[key] = r.get("raw")
+                seeded += 1
+            if seeded:
+                self._last_state_at = captured_at
+                log.info(
+                    "nettable: warm-started %d row(s) from %s (%.0fs old)",
+                    seeded, latest.name, age,
+                )
+                self.emit_state()
+        except Exception as e:
+            log.warning("nettable: warm-start failed: %s", e, exc_info=True)
 
     def _current_status_signature(self) -> tuple:
         """Snapshot the bits of status that we re-emit when they change.
