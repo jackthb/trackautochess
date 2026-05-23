@@ -41,7 +41,8 @@ type TabId =
 
 export default function App() {
   const [activeTab, setActiveTab] = useState<TabId>("home");
-  // PARKED with HistoryTab/ReplaysTab — focus handoff between replays → history.
+  // History tab is back. ReplaysTab is still parked — its focus handoff
+  // (jump from a replay row to that game in History) is parked alongside it.
   // const [focusGameId, setFocusGameId] = useState<number | null>(null);
   const [searchOpen, setSearchOpen] = useState(false);
   // PARKED: admin preview toggle.
@@ -136,6 +137,16 @@ export default function App() {
                 unitsFull={gamesState.unitsFull}
               />
             )}
+            {activeTab === "history" && (
+              <HistoryTab
+                {...gamesState}
+                drodo={drodoState.drodo}
+                drodoLoading={drodoState.loading}
+                refreshDrodo={drodoState.refresh}
+                focusGameId={null}
+                onFocusHandled={() => {}}
+              />
+            )}
             {/* PARKED — single-view simplification. Restore alongside the
                 matching tab entry in TabBar.tsx. */}
             {/*
@@ -151,16 +162,6 @@ export default function App() {
                 onExitAdminPreview={
                   isAdmin ? () => setAdminPreviewAsUser(false) : undefined
                 }
-              />
-            )}
-            {activeTab === "history" && (
-              <HistoryTab
-                {...gamesState}
-                drodo={drodoState.drodo}
-                drodoLoading={drodoState.loading}
-                refreshDrodo={drodoState.refresh}
-                focusGameId={focusGameId}
-                onFocusHandled={() => setFocusGameId(null)}
               />
             )}
             {activeTab === "replays" && (

@@ -9,7 +9,7 @@ interface TabBarProps {
 // Other entries are parked (commented inline) so reviving them is a one-line uncomment.
 const TABS = [
   { id: "home", label: "Home" },
-  // { id: "history", label: "History" },        // PARKED — screenshot history
+  { id: "history", label: "History" },
   // { id: "replays", label: "Replays" },        // PARKED — record UI
   // { id: "confirm", label: "Screenshots" },    // PARKED — screenshot UI
   // { id: "lab", label: "Lab" },                // PARKED — lab tools
