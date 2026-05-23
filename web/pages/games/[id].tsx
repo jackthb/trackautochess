@@ -120,11 +120,11 @@ function MatchPlayerRow({
           ) : (
             <span className="mp-name mp-name-unknown">{displayName}</span>
           )}
+        </div>
+        <div className="mp-stats">
           {game.rank && (
             <span className="mp-rank">{game.rank}</span>
           )}
-        </div>
-        <div className="mp-stats">
           {game.level && (
             <span className="mp-stat">
               <span className="mp-stat-label">Lv</span>{game.level}
@@ -161,38 +161,41 @@ function MatchPlayerRow({
             ))}
           </div>
         )}
-        {synergies.length > 0 && (
-          <div className="mp-synergies">
-            {synergies.map((s, i) => (
-              <TooltipWrap key={i} type="synergy" name={s.name} count={s.count} data={tooltipData}>
-                <div className="syn-badge" style={{ transform: "scale(0.85)" }}>
-                  <img
-                    className="syn-icon"
-                    src={iconUrl("synergies", synIconName(s.name))}
-                    alt={s.name}
-                    loading="lazy"
-                    onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
-                  />
-                  <span className="syn-count">{s.count}</span>
-                </div>
-              </TooltipWrap>
-            ))}
-          </div>
-        )}
-        {relics.length > 0 && (
-          <div className="mp-relics">
-            {relics.map((r, i) => (
-              <TooltipWrap key={i} type="relic" name={r} relicIndex={i} data={tooltipData}>
-                <img
-                  className="relic-icon"
-                  src={iconUrl("relics", relicStem(r))}
-                  alt={r}
-                  loading="lazy"
-                  style={{ width: 20, height: 20 }}
-                  onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
-                />
-              </TooltipWrap>
-            ))}
+        {(synergies.length > 0 || relics.length > 0) && (
+          <div className="mp-syn-relics">
+            {synergies.length > 0 && (
+              <div className="mp-synergies">
+                {synergies.map((s, i) => (
+                  <TooltipWrap key={i} type="synergy" name={s.name} count={s.count} data={tooltipData}>
+                    <div className="syn-badge mp-syn-badge">
+                      <img
+                        className="syn-icon"
+                        src={iconUrl("synergies", synIconName(s.name))}
+                        alt={s.name}
+                        loading="lazy"
+                        onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
+                      />
+                      <span className="syn-count">{s.count}</span>
+                    </div>
+                  </TooltipWrap>
+                ))}
+              </div>
+            )}
+            {relics.length > 0 && (
+              <div className="mp-relics">
+                {relics.map((r, i) => (
+                  <TooltipWrap key={i} type="relic" name={r} relicIndex={i} data={tooltipData}>
+                    <img
+                      className="relic-icon mp-relic-icon"
+                      src={iconUrl("relics", relicStem(r))}
+                      alt={r}
+                      loading="lazy"
+                      onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
+                    />
+                  </TooltipWrap>
+                ))}
+              </div>
+            )}
           </div>
         )}
       </div>
@@ -237,11 +240,6 @@ export default function GamePage({
     relicsData: RELICS_DATA,
     iconUrl,
   };
-
-  // Other players in the match (excluding the main game)
-  const otherPlayers = matchGames
-    .filter((g) => g.id !== game.id)
-    .sort((a, b) => (parseInt(a.placement) || 99) - (parseInt(b.placement) || 99));
 
   // Determine which user_id to highlight, plus a name fallback for cases
   // where the Game Over import couldn't link rows to a Steam account.
@@ -319,95 +317,147 @@ export default function GamePage({
           min-height: calc(100vh - var(--nav-height));
         }
         .container {
-          max-width: 900px;
-          margin: 40px auto;
-          padding: 0 32px 80px;
+          max-width: 960px;
+          margin: 0 auto;
+          padding: 32px 24px 80px;
         }
+
+        /* ── Main match card ───────────────────────────── */
         .match-card {
           border: 1px solid var(--border);
+          border-radius: var(--r-8);
           background: var(--bg-surface);
+          overflow: hidden;
         }
         .match-header {
           display: flex;
-          align-items: flex-start;
-          gap: 20px;
-          padding: 24px;
-          background: ${placementBg(p)};
+          align-items: center;
+          gap: 24px;
+          padding: 28px 28px 24px;
+          background:
+            linear-gradient(135deg, ${placementBg(p)} 0%, transparent 65%),
+            var(--bg-surface);
           border-bottom: 1px solid var(--border-subtle);
         }
         .placement {
-          font-size: 32px;
+          font-size: 36px;
           font-weight: 700;
-          font-family: "Cinzel", serif;
-          width: 56px;
-          height: 56px;
+          font-family: var(--font-display);
+          width: 72px;
+          height: 72px;
           display: flex;
           align-items: center;
           justify-content: center;
           border: 1px solid;
+          border-radius: var(--r-4);
           flex-shrink: 0;
+          background: rgba(0, 0, 0, 0.22);
+          box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.02);
         }
         .header-info {
           flex: 1;
           min-width: 0;
+          display: flex;
+          flex-direction: column;
+          gap: 8px;
         }
         .player-row {
           display: flex;
           align-items: center;
           gap: 12px;
-          margin-bottom: 4px;
+          flex-wrap: wrap;
         }
         .player-name {
-          font-size: 18px;
-          font-weight: 600;
+          font-family: var(--font-display);
+          font-size: 26px;
+          font-weight: 700;
           color: var(--text-primary);
-          transition: color 0.15s;
+          letter-spacing: 0.5px;
+          transition: color var(--t-base) var(--t-easing);
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+          max-width: 100%;
         }
         .player-name:hover {
           color: #fff;
         }
-        .rank {
-          display: flex;
+        .rank-chip {
+          display: inline-flex;
           align-items: center;
           gap: 6px;
-          font-size: 14px;
+          padding: 4px 10px;
+          font-size: 12px;
+          font-weight: 600;
           color: var(--text-secondary);
+          background: var(--bg-elevated);
+          border: 1px solid var(--border-subtle);
+          border-radius: var(--r-3);
+          letter-spacing: 0.5px;
+        }
+        .rank-text {
+          color: var(--text-primary);
         }
         .arrow-up {
           color: var(--green-bright);
-          font-size: 12px;
+          font-size: 10px;
+          line-height: 1;
         }
         .arrow-down {
           color: var(--red-bright);
-          font-size: 12px;
+          font-size: 10px;
+          line-height: 1;
         }
         .meta-row {
-          font-size: 13px;
+          font-size: 12px;
           color: var(--text-muted);
-          letter-spacing: 0.3px;
+          letter-spacing: 0.4px;
+          display: flex;
+          align-items: center;
+          flex-wrap: wrap;
+          gap: 6px;
         }
         .meta-row a {
           color: var(--text-muted);
-          transition: color 0.15s;
+          transition: color var(--t-base) var(--t-easing);
         }
         .meta-row a:hover {
           color: var(--text-secondary);
         }
+        .meta-sep {
+          color: var(--text-muted);
+          opacity: 0.5;
+        }
+        .meta-date {
+          color: var(--text-muted);
+        }
         .stats-row {
           display: flex;
-          gap: 16px;
-          margin-top: 8px;
-          font-size: 14px;
+          gap: 8px;
+          margin-top: 4px;
+          flex-wrap: wrap;
         }
-        .stat {
-          color: var(--text-secondary);
+        .stat-chip {
+          display: inline-flex;
+          align-items: baseline;
+          gap: 8px;
+          padding: 6px 12px;
+          background: var(--bg-elevated);
+          border: 1px solid var(--border-subtle);
+          border-radius: var(--r-3);
+          font-size: 14px;
         }
         .stat-label {
           color: var(--text-muted);
-          font-size: 12px;
-          margin-right: 4px;
+          font-size: 10px;
           text-transform: uppercase;
-          letter-spacing: 1px;
+          letter-spacing: 1.2px;
+          font-weight: 500;
+        }
+        .stat-value {
+          color: var(--text-primary);
+          font-weight: 600;
+          font-variant-numeric: tabular-nums;
         }
         .wl-w {
           color: var(--green-bright);
@@ -415,27 +465,48 @@ export default function GamePage({
         .wl-l {
           color: var(--red-bright);
         }
+        .wl-sep {
+          color: var(--text-muted);
+          margin: 0 3px;
+          opacity: 0.6;
+        }
+
+        /* ── Screenshot ────────────────────────────────── */
         .screenshot-section {
           border-bottom: 1px solid var(--border-subtle);
+          background: var(--bg-deep);
         }
         .screenshot-section img {
           display: block;
           width: 100%;
           height: auto;
         }
+
+        /* ── Build sections ────────────────────────────── */
         .section {
-          padding: 20px 24px;
+          padding: 20px 28px;
           border-bottom: 1px solid var(--border-subtle);
         }
         .section:last-child {
           border-bottom: none;
         }
         .section-label {
+          display: flex;
+          align-items: center;
+          gap: 10px;
           font-size: 11px;
           letter-spacing: 2px;
           text-transform: uppercase;
-          color: var(--text-muted);
-          margin-bottom: 12px;
+          color: var(--text-secondary);
+          margin-bottom: 14px;
+          font-weight: 600;
+        }
+        .section-bar {
+          display: inline-block;
+          width: 3px;
+          height: 12px;
+          background: var(--accent);
+          border-radius: 2px;
         }
         .detail-lineup {
           display: flex;
@@ -456,67 +527,136 @@ export default function GamePage({
           align-items: center;
         }
 
-        /* Match Players section */
+        /* ── Match Players section ─────────────────────── */
         .match-section {
           margin-top: 24px;
           border: 1px solid var(--border);
+          border-radius: var(--r-8);
           background: var(--bg-surface);
+          overflow: hidden;
         }
         .match-section-header {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
           padding: 16px 24px;
           border-bottom: 1px solid var(--border-subtle);
+          background: rgba(0, 0, 0, 0.12);
         }
         .match-section-header h3 {
           margin: 0;
-          font-size: 13px;
+          font-size: 12px;
           letter-spacing: 2px;
           text-transform: uppercase;
-          color: var(--text-muted);
-          font-weight: 500;
+          color: var(--text-secondary);
+          font-weight: 600;
+          display: flex;
+          align-items: center;
+          gap: 10px;
         }
+        .match-section-count {
+          font-size: 11px;
+          color: var(--text-muted);
+          letter-spacing: 1px;
+          text-transform: uppercase;
+          font-variant-numeric: tabular-nums;
+        }
+
+        /* ── Responsive ────────────────────────────────── */
+        @media (max-width: 720px) {
+          .container {
+            padding: 20px 16px 60px;
+          }
+          .match-header {
+            padding: 20px;
+            gap: 16px;
+          }
+          .placement {
+            width: 56px;
+            height: 56px;
+            font-size: 28px;
+          }
+          .player-name {
+            font-size: 22px;
+          }
+          .section {
+            padding: 16px 20px;
+          }
+          .match-section-header {
+            padding: 14px 20px;
+          }
+        }
+      `}</style>
+
+      {/*
+        MatchPlayerRow lives in a sibling function, so styled-jsx's
+        per-component scoping wouldn't reach its JSX. Use a global
+        block for the .match-player-row / .mp-* rules.
+      */}
+      <style jsx global>{`
         .match-player-row {
           display: flex;
           align-items: center;
           gap: 16px;
-          padding: 12px 24px;
+          padding: 14px 24px;
           border-bottom: 1px solid var(--border-subtle);
-          transition: background 0.1s;
+          transition: background var(--t-base) var(--t-easing);
+          position: relative;
         }
         .match-player-row:last-child {
           border-bottom: none;
         }
+        .match-player-row:hover {
+          background: var(--bg-hover);
+        }
         .match-player-row.highlighted {
-          background: rgba(255, 255, 255, 0.04);
-          border-left: 3px solid var(--text-secondary);
-          padding-left: 21px;
+          background: rgba(224, 64, 42, 0.06);
+        }
+        .match-player-row.highlighted::before {
+          content: "";
+          position: absolute;
+          left: 0;
+          top: 0;
+          bottom: 0;
+          width: 3px;
+          background: var(--accent);
         }
         .mp-placement {
           font-size: 18px;
           font-weight: 700;
-          font-family: "Cinzel", serif;
-          width: 32px;
-          height: 32px;
+          font-family: var(--font-display);
+          width: 36px;
+          height: 36px;
           display: flex;
           align-items: center;
           justify-content: center;
           border: 1px solid;
+          border-radius: var(--r-3);
           flex-shrink: 0;
         }
         .mp-info {
-          min-width: 120px;
+          width: 160px;
           flex-shrink: 0;
+          min-width: 0;
+          display: flex;
+          flex-direction: column;
+          gap: 6px;
         }
         .mp-name-row {
           display: flex;
           align-items: center;
-          gap: 8px;
+          min-width: 0;
         }
         .mp-name {
           font-size: 14px;
           font-weight: 600;
           color: var(--text-primary);
           text-decoration: none;
-          transition: color 0.15s;
+          transition: color var(--t-base) var(--t-easing);
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+          max-width: 100%;
         }
         .mp-name:hover {
           color: #fff;
@@ -526,32 +666,45 @@ export default function GamePage({
           font-style: italic;
         }
         .mp-rank {
-          font-size: 12px;
-          color: var(--text-muted);
+          font-size: 10px;
+          color: var(--text-secondary);
+          background: var(--bg-elevated);
+          border: 1px solid var(--border-subtle);
+          border-radius: var(--r-2);
+          padding: 1px 5px;
+          letter-spacing: 0.4px;
+          font-weight: 600;
         }
         .mp-stats {
           display: flex;
-          gap: 10px;
-          font-size: 12px;
+          gap: 6px;
+          font-size: 11px;
           color: var(--text-muted);
-          margin-top: 2px;
+          align-items: center;
+          flex-wrap: wrap;
+        }
+        .mp-stat {
+          display: inline-flex;
+          align-items: baseline;
+          gap: 3px;
+          color: var(--text-secondary);
         }
         .mp-stat-label {
-          font-size: 10px;
-          letter-spacing: 1px;
+          font-size: 9px;
+          letter-spacing: 0.8px;
           text-transform: uppercase;
-          margin-right: 2px;
+          color: var(--text-muted);
         }
         .mp-wl-sep {
           color: var(--text-muted);
-          margin: 0 1px;
+          margin: 0 2px;
+          opacity: 0.5;
         }
         .mp-build {
           flex: 1;
           display: flex;
-          flex-wrap: wrap;
-          gap: 8px;
-          align-items: center;
+          flex-direction: column;
+          gap: 6px;
           min-width: 0;
         }
         .mp-lineup {
@@ -560,20 +713,55 @@ export default function GamePage({
           flex-wrap: wrap;
           align-items: center;
         }
-        .mp-unit :global(.unit-icon) {
-          width: 24px;
-          height: 24px;
+        .mp-unit .unit-icon {
+          width: 26px;
+          height: 26px;
         }
-        .mp-synergies {
+        .mp-syn-relics {
           display: flex;
-          gap: 2px;
+          gap: 12px;
           flex-wrap: wrap;
           align-items: center;
         }
+        .mp-synergies {
+          display: flex;
+          gap: 4px;
+          flex-wrap: wrap;
+          align-items: center;
+        }
+        .mp-syn-badge {
+          padding: 2px 5px 2px 3px;
+        }
+        .mp-syn-badge .syn-icon {
+          width: 14px;
+          height: 14px;
+        }
+        .mp-syn-badge .syn-count {
+          font-size: 10px;
+        }
         .mp-relics {
           display: flex;
-          gap: 3px;
+          gap: 4px;
+          flex-wrap: wrap;
           align-items: center;
+        }
+        .mp-relic-icon {
+          width: 22px !important;
+          height: 22px !important;
+        }
+        @media (max-width: 720px) {
+          .match-player-row {
+            flex-wrap: wrap;
+            padding: 14px 20px;
+          }
+          .mp-info {
+            width: auto;
+            flex: 1;
+          }
+          .mp-build {
+            flex-basis: 100%;
+            margin-left: 52px;
+          }
         }
       `}</style>
 
@@ -597,9 +785,11 @@ export default function GamePage({
                     {displayName}
                   </Link>
                   {game.rank && (
-                    <span className="rank">
-                      {tier}
-                      {rankNum ? `-${rankNum}` : ""}
+                    <span className="rank-chip">
+                      <span className="rank-text">
+                        {tier}
+                        {rankNum ? `-${rankNum}` : ""}
+                      </span>
                       {game.rank_change === "up" && (
                         <span className="arrow-up">&#9650;</span>
                       )}
@@ -621,33 +811,37 @@ export default function GamePage({
                   </a>
                   {game.played_at && (
                     <>
-                      {" \u00B7 "}
-                      {new Date(game.played_at).toLocaleDateString(undefined, {
-                        month: "short",
-                        day: "numeric",
-                        year: "numeric",
-                      })}{" "}
-                      {new Date(game.played_at).toLocaleTimeString(undefined, {
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      })}
+                      <span className="meta-sep">{"\u00B7"}</span>
+                      <span className="meta-date">
+                        {new Date(game.played_at).toLocaleDateString(undefined, {
+                          month: "short",
+                          day: "numeric",
+                          year: "numeric",
+                        })}
+                        {", "}
+                        {new Date(game.played_at).toLocaleTimeString(undefined, {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })}
+                      </span>
                     </>
                   )}
                 </div>
                 <div className="stats-row">
                   {game.level && (
-                    <span className="stat">
-                      <span className="stat-label">Lv</span>
-                      {game.level}
+                    <span className="stat-chip">
+                      <span className="stat-label">Level</span>
+                      <span className="stat-value">{game.level}</span>
                     </span>
                   )}
                   {game.wins != null && game.losses != null && (
-                    <span className="stat">
-                      <span className="wl-w">{game.wins}</span>
-                      <span style={{ color: "var(--text-muted)" }}>
-                        {" \u2013 "}
+                    <span className="stat-chip">
+                      <span className="stat-label">Record</span>
+                      <span className="stat-value">
+                        <span className="wl-w">{game.wins}</span>
+                        <span className="wl-sep">{"\u2013"}</span>
+                        <span className="wl-l">{game.losses}</span>
                       </span>
-                      <span className="wl-l">{game.losses}</span>
                     </span>
                   )}
                 </div>
@@ -668,7 +862,7 @@ export default function GamePage({
             {/* Lineup */}
             {lineup.length > 0 && (
               <div className="section">
-                <div className="section-label">Lineup</div>
+                <div className="section-label"><span className="section-bar" />Lineup</div>
                 <div className="detail-lineup">
                   {lineup.map((u, i) => (
                     <TooltipWrap
@@ -709,7 +903,7 @@ export default function GamePage({
             {/* Synergies */}
             {synergies.length > 0 && (
               <div className="section">
-                <div className="section-label">Synergies</div>
+                <div className="section-label"><span className="section-bar" />Synergies</div>
                 <div className="detail-synergies">
                   {synergies.map((s, i) => (
                     <TooltipWrap
@@ -741,7 +935,7 @@ export default function GamePage({
             {/* Relics */}
             {relics.length > 0 && (
               <div className="section">
-                <div className="section-label">Relics</div>
+                <div className="section-label"><span className="section-bar" />Relics</div>
                 <div className="detail-relics">
                   {relics.map((r, i) => (
                     <TooltipWrap
@@ -771,7 +965,12 @@ export default function GamePage({
           {matchGames.length > 1 && (
             <div className="match-section">
               <div className="match-section-header">
-                <h3>Match Players</h3>
+                <h3>
+                  <span className="section-bar" />Match Players
+                </h3>
+                <span className="match-section-count">
+                  {matchGames.length} {matchGames.length === 1 ? "player" : "players"}
+                </span>
               </div>
               {matchGames
                 .sort((a, b) => (parseInt(a.placement) || 99) - (parseInt(b.placement) || 99))
