@@ -959,9 +959,21 @@ LOG_ACTIVE_WINDOW_SEC = 30.0
 class NetTableCapture:
     """Tail Dota's console.log, send dump-key mid- and post-game, ingest dumps."""
 
-    def __init__(self, emit: Callable[[dict], None], steam_id: str | None = None):
+    def __init__(
+        self,
+        emit: Callable[[dict], None],
+        steam_id: str | None = None,
+        is_dac_active: Callable[[], bool] | None = None,
+    ):
         self._emit = emit
         self._stop = threading.Event()
+        # Gates the SendInput cascade and POST_GAME PAUSE burst to DAC custom
+        # games only — firing PAUSE in regular Dota matches both opens the
+        # menu and triggers `dumpstringtable` for tables that don't exist in
+        # that game mode, which crashes the client at post-game. Default
+        # `lambda: False` keeps us silent if the caller didn't wire a signal;
+        # headless wires this to gsi.GSIServer.is_dac_active.
+        self._is_dac_active: Callable[[], bool] = is_dac_active or (lambda: False)
         self._dota_dir = find_dota_dir()
         self._log_path = find_console_log(self._dota_dir) if self._dota_dir else None
         # The logged-in Steam user. Used to scope localconfig.vdf reads to
@@ -1020,13 +1032,14 @@ class NetTableCapture:
         opts = find_dota_launch_options(self._account_id)
         log.info(
             "nettable: steam_id=%s account_id=%s localconfig=%s "
-            "launch_options=%r has_condebug=%s has_conclearlog=%s",
+            "launch_options=%r has_condebug=%s has_conclearlog=%s has_gamestateintegration=%s",
             self._steam_id,
             self._account_id,
             cfg_path,
             opts,
             ("-condebug" in (opts or "").split()) if opts is not None else None,
             ("-conclearlog" in (opts or "").split()) if opts is not None else None,
+            ("-gamestateintegration" in (opts or "").split()) if opts is not None else None,
         )
 
         self.emit_status()
@@ -1041,14 +1054,16 @@ class NetTableCapture:
 
     def _run_key_poller(self) -> None:
         """Replaces AHK: fires F20 every 2s and the full cascade every
-        15s, but only while Dota is the foreground window. SendInput
-        keystrokes are accepted by Dota the same way real key presses
-        are (PostMessage gets filtered by the input layer)."""
+        15s, but only while Dota is the foreground window AND the GSI feed
+        confirms the current match is a DAC custom game. The cascade rebinds
+        PAUSE and F11/F13/F15/F16 to `dumpstringtable CustomNetTable_*`,
+        which is disruptive (PAUSE opens the menu) and crashing (Source 2
+        crashes at post-game when the table doesn't exist) in regular Dota."""
         last_full_cascade = 0.0
         while not self._stop.is_set():
             now = time.time()
             try:
-                if _is_dota_foreground():
+                if _is_dota_foreground() and self._is_dac_active():
                     if now - last_full_cascade >= FULL_CASCADE_INTERVAL_SEC:
                         last_full_cascade = now
                         for vk in CASCADE_VK_SEQUENCE:
@@ -1095,6 +1110,12 @@ class NetTableCapture:
             "launch_options": opts,
             "has_condebug": ("-condebug" in opts_tokens) if opts_tokens is not None else None,
             "has_conclearlog": ("-conclearlog" in opts_tokens) if opts_tokens is not None else None,
+            # Gates the SendInput cascade — without -gamestateintegration the
+            # GSI listener never receives payloads, is_dac_active() stays
+            # False, and live capture silently doesn't fire.
+            "has_gamestateintegration": (
+                "-gamestateintegration" in opts_tokens
+            ) if opts_tokens is not None else None,
             "steam_running": is_steam_running(),
         })
 
@@ -1287,6 +1308,13 @@ class NetTableCapture:
             last = getattr(self, "_last_post_game_emit", 0.0)
             if now - last > 10.0:  # debounce: POST_GAME can re-emit
                 self._last_post_game_emit = now
+                # POST_GAME fires for every Dota match mode, not just DAC.
+                # Without this gate the PAUSE burst below crashes the Dota
+                # client at the end of regular Dota matches (confirmed by
+                # crash dumps in Steam/dumps/, May 20-21 2026).
+                if not self._is_dac_active():
+                    log.info("nettable: POST_GAME detected in non-DAC match — skipping PAUSE burst")
+                    return
                 log.info("nettable: POST_GAME detected — match ended, firing PAUSE")
                 self._emit({
                     "type": "nettable_game_ended",

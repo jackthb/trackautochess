@@ -16,6 +16,7 @@ Debug mode (standalone):
 import json
 import logging
 import threading
+import time
 from http.server import HTTPServer, BaseHTTPRequestHandler
 from pathlib import Path
 
@@ -23,6 +24,11 @@ log = logging.getLogger("dac")
 
 DEFAULT_PORT = 4001
 DAC_WORKSHOP_ID = "1613886175"
+
+# If no GSI payload arrives within this many seconds, treat is_dac_active() as
+# stale → False. Dota's heartbeat cadence is 30s per the cfg, so 60s leaves
+# room for one missed beat.
+GSI_STALE_AFTER_SEC = 60.0
 
 # Debug log for raw payloads — separate from main tracker log
 GSI_DEBUG_LOG = Path.home() / ".dac" / "gsi_debug.log"
@@ -67,6 +73,10 @@ class GSIServer:
         self._prev_state = None
         self._fired = False
         self._payload_count = 0
+        # Latest game state, for is_dac_active() consumers (nettable cascade
+        # gate). Updated on every payload.
+        self._latest_custom_game = ""
+        self._latest_payload_monotonic = 0.0
 
     def start(self):
         """Start the GSI listener in a daemon thread."""
@@ -88,6 +98,7 @@ class GSIServer:
     def _handle_payload(self, data: dict):
         """Process a GSI payload."""
         self._payload_count += 1
+        self._latest_payload_monotonic = time.monotonic()
 
         if self._debug:
             self._log_debug(data)
@@ -95,6 +106,7 @@ class GSIServer:
         map_data = data.get("map", {})
         game_state = map_data.get("game_state")
         custom_game = map_data.get("customgamename", "")
+        self._latest_custom_game = custom_game or ""
 
         # Log state changes
         if game_state != self._prev_state:
@@ -112,6 +124,18 @@ class GSIServer:
                 self._fired = False
 
         self._prev_state = game_state
+
+    def is_dac_active(self) -> bool:
+        """True iff a recent GSI payload reports the player is in a DAC custom
+        game. Used to gate the SendInput cascade in nettable_capture — pressing
+        the cascade keys in non-DAC Dota matches both disrupts gameplay (PAUSE)
+        and crashes the client (post-game dumpstringtable burst on tables that
+        don't exist in this game mode)."""
+        if self._latest_payload_monotonic == 0.0:
+            return False
+        if time.monotonic() - self._latest_payload_monotonic > GSI_STALE_AFTER_SEC:
+            return False
+        return DAC_WORKSHOP_ID in self._latest_custom_game
 
     def _log_debug(self, data: dict):
         """Write raw payload to debug log file."""
@@ -152,12 +176,49 @@ def generate_cfg(port: int = DEFAULT_PORT) -> str:
 '''
 
 
-def install_cfg(port: int = DEFAULT_PORT) -> str | None:
-    """Write the GSI cfg file to the Dota 2 directory. Returns path or None."""
-    cfg_dir = Path(r"C:\Program Files (x86)\Steam\steamapps\common\dota 2 beta\game\dota\cfg\gamestate_integration")
-    cfg_dir.mkdir(parents=True, exist_ok=True)
-    cfg_path = cfg_dir / "gamestate_integration_dac_tracker.cfg"
-    cfg_path.write_text(generate_cfg(port), encoding="utf-8")
+def find_gsi_cfg_path(dota_dir: Path) -> Path:
+    """Return where our GSI cfg file lives inside a given Dota 2 install."""
+    return (
+        dota_dir
+        / "game"
+        / "dota"
+        / "cfg"
+        / "gamestate_integration"
+        / "gamestate_integration_dac_tracker.cfg"
+    )
+
+
+def install_cfg(dota_dir: Path | None = None, port: int = DEFAULT_PORT) -> str | None:
+    """Write the GSI cfg file to the Dota 2 directory if missing or stale.
+
+    `dota_dir` should be the install root (e.g.
+    ``…/steamapps/common/dota 2 beta``). If omitted, the function tries to
+    find one via ``nettable_capture.find_dota_dir`` so a fresh user gets the
+    file installed automatically on first run.
+
+    Returns the cfg path on success, or None if no Dota install was found.
+    Idempotent — only rewrites the file when the contents differ, so the
+    file's mtime stays clean across restarts.
+    """
+    if dota_dir is None:
+        # Local import avoids a circular dependency at module load time.
+        from nettable_capture import find_dota_dir
+        dota_dir = find_dota_dir()
+    if dota_dir is None:
+        log.warning("GSI: no Dota 2 install found, skipping cfg install")
+        return None
+
+    cfg_path = find_gsi_cfg_path(dota_dir)
+    desired = generate_cfg(port)
+    try:
+        existing = cfg_path.read_text(encoding="utf-8") if cfg_path.exists() else None
+    except OSError:
+        existing = None
+    if existing == desired:
+        log.info("GSI config already present at %s", cfg_path)
+        return str(cfg_path)
+    cfg_path.parent.mkdir(parents=True, exist_ok=True)
+    cfg_path.write_text(desired, encoding="utf-8")
     log.info("GSI config written to %s", cfg_path)
     return str(cfg_path)
 

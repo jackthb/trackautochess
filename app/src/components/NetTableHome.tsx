@@ -41,7 +41,8 @@ export function NetTableHome({
   const flagsSet = Boolean(
     netStatus &&
       netStatus.has_condebug === true &&
-      netStatus.has_conclearlog === true,
+      netStatus.has_conclearlog === true &&
+      netStatus.has_gamestateintegration === true,
   );
   const setupComplete = Boolean(
     netStatus &&

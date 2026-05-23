@@ -143,11 +143,38 @@ class HeadlessBackend:
         if self.config.get("replay_enabled", True):
             self._init_replay()
 
+        # GSI listener — receives Dota's gamestateintegration feed. We don't
+        # use it for end-of-game detection (the nettable tailer already covers
+        # that path); we use it to know whether the current Dota match is a
+        # DAC custom game vs regular Dota, so the SendInput cascade can be
+        # gated to DAC matches only.
+        #
+        # Two things have to be true for payloads to arrive:
+        #   1. Dota must be launched with `-gamestateintegration` — covered
+        #      by the same launch-options applier that sets `-condebug`.
+        #   2. A cfg file at `<dota>/game/dota/cfg/gamestate_integration/`
+        #      must point Dota at our local listener — installed here.
+        # Without either, `is_dac_active()` stays False and the cascade
+        # silently never fires, which would break live capture.
+        self._gsi = None
+        try:
+            from gsi import GSIServer, install_cfg as _gsi_install_cfg
+            self._gsi = GSIServer(on_game_end=None)
+            _gsi_install_cfg()
+        except Exception as e:
+            log.warning("GSI server init failed: %s", e)
+
         # NetTable capture (autoexec install + console.log tailer)
         self._nettable = None
         try:
             from nettable_capture import NetTableCapture
-            self._nettable = NetTableCapture(self._emit, steam_id=sid)
+            self._nettable = NetTableCapture(
+                self._emit,
+                steam_id=sid,
+                # Without a working GSI signal we can't tell DAC from regular
+                # Dota, so the cascade stays quiet (safer than crashing Dota).
+                is_dac_active=self._gsi.is_dac_active if self._gsi else (lambda: False),
+            )
         except Exception as e:
             log.warning("NetTable capture init failed: %s", e)
 
@@ -1448,6 +1475,11 @@ class HeadlessBackend:
                 self._nettable.stop()
             except Exception:
                 pass
+        if self._gsi:
+            try:
+                self._gsi.stop()
+            except Exception:
+                pass
 
     # ── Command dispatch ────────────────────────────────────────────────────
 
@@ -1581,6 +1613,14 @@ class HeadlessBackend:
     def run(self) -> None:
         """Start sentinel, then read stdin commands until quit or EOF."""
         self._start_sentinel()
+
+        # Start GSI listener before nettable so is_dac_active() has a chance
+        # to populate before the cascade poller's first tick.
+        if self._gsi:
+            try:
+                self._gsi.start()
+            except Exception as e:
+                log.warning("GSI server start failed: %s", e)
 
         # Start NetTable capture (autoexec install + console.log tailer)
         if self._nettable:

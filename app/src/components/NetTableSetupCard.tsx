@@ -11,7 +11,11 @@ interface NetTableSetupCardProps {
   resyncProgress: string | null;
 }
 
-const REQUIRED_FLAGS = ["-condebug", "-conclearlog"];
+// `-gamestateintegration` is required alongside the condebug pair: without
+// it the GSI listener receives no payloads, `is_dac_active()` stays False,
+// and the live-capture SendInput cascade is silently disabled. See
+// `app/backend/gsi.py` and the cascade gate in `nettable_capture.py`.
+const REQUIRED_FLAGS = ["-condebug", "-conclearlog", "-gamestateintegration"];
 const LAUNCH_OPTIONS = REQUIRED_FLAGS.join(" ");
 
 /**
@@ -78,7 +82,8 @@ export function NetTableSetupCard({
   const flagsKnown = status?.has_condebug !== null;
   const condebugSet = status?.has_condebug === true;
   const conclearlogSet = status?.has_conclearlog === true;
-  const flagsSet = condebugSet && conclearlogSet;
+  const gsiSet = status?.has_gamestateintegration === true;
+  const flagsSet = condebugSet && conclearlogSet && gsiSet;
   // Empirical signal trumps config-derived signal: Steam doesn't flush
   // localconfig.vdf to disk until it exits, so `flagsSet` can be stale
   // while Steam is running. If `log_active` is true, the flags ARE

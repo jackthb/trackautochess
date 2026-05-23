@@ -28,6 +28,10 @@ export interface NetTableStatus {
   /** True/false when localconfig was read; null if unknown. */
   has_condebug: boolean | null;
   has_conclearlog: boolean | null;
+  /** -gamestateintegration: required for the GSI listener to receive payloads,
+   *  which gates the SendInput cascade. Without it live capture silently
+   *  never fires. Null if we couldn't read localconfig. */
+  has_gamestateintegration: boolean | null;
   /** True if steam.exe was running at the moment we last checked. */
   steam_running: boolean;
   /** Empirical: dota2.exe is currently a running process. */
@@ -90,6 +94,7 @@ type NetTableStatusEvent = {
   launch_options: string | null;
   has_condebug: boolean | null;
   has_conclearlog: boolean | null;
+  has_gamestateintegration: boolean | null;
   steam_running: boolean;
   dota_running: boolean;
   log_active: boolean;
@@ -225,6 +230,7 @@ export function useNetTableEvents(): NetTableActivityState {
               launch_options: msg.launch_options ?? null,
               has_condebug: msg.has_condebug ?? null,
               has_conclearlog: msg.has_conclearlog ?? null,
+              has_gamestateintegration: msg.has_gamestateintegration ?? null,
               steam_running: msg.steam_running,
               dota_running: msg.dota_running,
               log_active: msg.log_active,
