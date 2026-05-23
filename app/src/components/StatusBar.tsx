@@ -6,7 +6,8 @@ interface StatusBarProps {
 
 export function StatusBar({ status }: StatusBarProps) {
   const backendConnected = status !== null;
-  const recording = status?.recording ?? false;
+  // PARKED — replay recording indicator. Restore alongside the replay UI in App.tsx.
+  // const recording = status?.recording ?? false;
 
   return (
     <div className="status-bar">
@@ -20,12 +21,14 @@ export function StatusBar({ status }: StatusBarProps) {
             : "Backend: connecting..."}
         </span>
       </div>
+      {/* PARKED — replay recording indicator.
       <div className="status-indicator">
         <div
           className={`status-dot ${recording ? "recording" : ""}`}
         />
         <span>{recording ? "Recording" : "Not recording"}</span>
       </div>
+      */}
     </div>
   );
 }

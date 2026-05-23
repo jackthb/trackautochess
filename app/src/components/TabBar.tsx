@@ -12,7 +12,7 @@ const TABS = [
   // { id: "history", label: "History" },        // PARKED — screenshot history
   // { id: "replays", label: "Replays" },        // PARKED — record UI
   // { id: "confirm", label: "Screenshots" },    // PARKED — screenshot UI
-  { id: "lab", label: "Lab" },
+  // { id: "lab", label: "Lab" },                // PARKED — lab tools
   { id: "settings", label: "Settings" },
   { id: "log", label: "Log" },
   // { id: "upload", label: "Upload" },          // PARKED — upload flow

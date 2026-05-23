@@ -186,7 +186,8 @@ export default function App() {
               />
             )}
             */}
-            {activeTab === "lab" && <LabTab />}
+            {/* PARKED — Lab tab. Restore alongside the matching entry in TabBar.tsx. */}
+            {/* {activeTab === "lab" && <LabTab />} */}
             {activeTab === "settings" && (
               <SettingsTab
                 status={tracker.status}

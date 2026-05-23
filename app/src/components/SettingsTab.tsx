@@ -91,6 +91,8 @@ export function SettingsTab({ status, replayStats }: SettingsTabProps) {
           </div>
         </div>
 
+        {/* PARKED — Replay Recording section. Restore alongside the Replays
+            tab in App.tsx + TabBar.tsx.
         <div className="settings-section">
           <div className="settings-section-title">Replay Recording</div>
           <div className="settings-row">
@@ -113,7 +115,10 @@ export function SettingsTab({ status, replayStats }: SettingsTabProps) {
             <span className="settings-value dim">{storageUsed}</span>
           </div>
         </div>
+        */}
 
+        {/* PARKED — Capture / Import-screenshot section. Restore alongside
+            the Upload + Screenshots tabs.
         <div className="settings-section">
           <div className="settings-section-title">Capture</div>
           <div className="settings-row">
@@ -137,6 +142,7 @@ export function SettingsTab({ status, replayStats }: SettingsTabProps) {
             <span className="settings-value dim">F6</span>
           </div>
         </div>
+        */}
 
         <div className="settings-section">
           <div className="settings-section-title">About</div>
