@@ -994,6 +994,17 @@ class NetTableCapture:
         # the user presses INS multiple times after game end.
         self._saved_end_board_hashes: set[str] = set()
 
+        # Per-match personal-end snapshot tracking. POST_GAME only fires when
+        # the WHOLE lobby finishes, so we'd otherwise miss the moment the
+        # local player's own courier dies. Watch game_info.death_team[<own
+        # team_id>] flip 0 → 1 and snapshot the player's slot state at that
+        # instant.
+        #   _prev_personal_death_team: last seen value (None = no signal yet)
+        #   _personal_end_recorded: True once we've snapshotted this match
+        # Both reset on the GAME_IN_PROGRESS transition.
+        self._prev_personal_death_team: int | None = None
+        self._personal_end_recorded: bool = False
+
         # Last seen round number from game_info → round_info → round.
         # Updated on every ingest; change → emit nettable_round_changed.
         # When round % 5 == 0, emit nettable_creep_round.
@@ -1352,6 +1363,10 @@ class NetTableCapture:
             if self._match_session_start is None:
                 self._match_session_start = time.time()
                 log.info("nettable: GAME_IN_PROGRESS — match session opened")
+                # Fresh match → re-arm personal-end detection so the next
+                # 0→1 death_team transition snapshots again.
+                self._prev_personal_death_team = None
+                self._personal_end_recorded = False
 
         # Game state — POST_GAME tells us a match ended. Fire PAUSE
         # immediately via SendInput so dac_table.end_board is captured
@@ -1645,6 +1660,132 @@ class NetTableCapture:
             })
         except Exception as e:
             log.warning("nettable: failed to save end_board: %s", e)
+
+    def _maybe_save_personal_end_board(self, rows: list[dict]) -> None:
+        """Snapshot the local player's slot the moment their courier dies.
+
+        POST_GAME only fires when the whole lobby finishes, so the
+        existing end_board path misses the "I'm out but the rest are still
+        playing" window — which is most of every match from the local
+        player's POV. Watches `game_info.death_team[<own team_id>]` flip
+        0 → 1 and dumps the slot's full state from
+        `player_info_table.player_info.data[<slot>]` to disk.
+
+        Idempotent per match: `_personal_end_recorded` blocks re-fires
+        until GAME_IN_PROGRESS resets it.
+        """
+        if self._personal_end_recorded:
+            return
+        if not self._steam_id:
+            return  # no logged-in player → can't identify own slot
+
+        # 1. Pull the live per-slot table — we need it for slot lookup AND
+        #    for the snapshot payload.
+        live_data: dict | None = None
+        for r in rows:
+            if r.get("table_name", "").endswith("player_info_table") \
+                    and r.get("key") == "player_info":
+                raw = r.get("raw")
+                if isinstance(raw, dict):
+                    d = raw.get("data")
+                    if isinstance(d, dict) and d:
+                        live_data = d
+                break
+        if live_data is None:
+            return
+
+        # 2. Find our slot by steam_id match. team_id lives on the slot row.
+        own_slot_key: str | None = None
+        own_slot_payload: dict | None = None
+        own_team_id: int | None = None
+        for slot_key, slot_payload in live_data.items():
+            if not isinstance(slot_payload, dict):
+                continue
+            if str(slot_payload.get("steam_id")) == str(self._steam_id):
+                own_slot_key = str(slot_key)
+                own_slot_payload = slot_payload
+                tid = slot_payload.get("team_id")
+                try:
+                    own_team_id = int(tid) if tid is not None else None
+                except (TypeError, ValueError):
+                    own_team_id = None
+                break
+        if own_slot_payload is None or own_team_id is None:
+            return  # not in this lobby (yet?)
+
+        # 3. Read game_info.death_team for our team's elimination bit.
+        death_team: dict | None = None
+        for r in rows:
+            if r.get("table_name", "").endswith("game_info") \
+                    and r.get("key") == "death_team":
+                raw = r.get("raw")
+                if isinstance(raw, dict):
+                    death_team = raw
+                break
+        if death_team is None:
+            return
+
+        current_raw = death_team.get(str(own_team_id))
+        try:
+            current = int(current_raw) if current_raw is not None else 0
+        except (TypeError, ValueError):
+            current = 0
+
+        prev = self._prev_personal_death_team
+        self._prev_personal_death_team = current
+
+        if current != 1:
+            return  # still alive (or unknown)
+
+        # current == 1 — capture. If prev was None (first dump after app
+        # start), we missed the actual moment; flag late_capture so the
+        # consumer knows. Otherwise prev == 0 → real 0 → 1 transition.
+        late_capture = prev is None
+
+        try:
+            from utils import LOCAL_PERSONAL_END_BOARDS_DIR
+            saved_at = datetime.now().isoformat()
+            LOCAL_PERSONAL_END_BOARDS_DIR.mkdir(parents=True, exist_ok=True)
+            ts = datetime.now().strftime("%Y%m%d_%H%M%S_%f")
+            payload = {
+                "saved_at": saved_at,
+                "steam_id": self._steam_id,
+                "slot": own_slot_key,
+                "team_id": own_team_id,
+                "late_capture": late_capture,
+                "round_at_death": own_slot_payload.get("round"),
+                "rank_at_death": own_slot_payload.get("rank")
+                    or own_slot_payload.get("curr_rank"),
+                "player_state": own_slot_payload,
+                # Context bundles useful for reconstructing the match later
+                # without re-reading the dump file.
+                "death_team": death_team,
+                "revealed_legendaries": self._last_state.get(
+                    "CustomNetTable_chess_pool_table", {},
+                ).get("revealed_legendary_chess_list"),
+            }
+            out_path = LOCAL_PERSONAL_END_BOARDS_DIR / f"{ts}__personal_end.json"
+            out_path.write_text(
+                json.dumps(payload, indent=2, ensure_ascii=False, sort_keys=True),
+                encoding="utf-8",
+            )
+            self._personal_end_recorded = True
+            log.info(
+                "nettable: personal end_board snapshotted (slot=%s team=%s round=%s rank=%s late=%s) → %s",
+                own_slot_key, own_team_id,
+                payload["round_at_death"], payload["rank_at_death"],
+                late_capture, out_path.name,
+            )
+            self._emit({
+                "type": "nettable_personal_game_ended",
+                "path": str(out_path),
+                "at": saved_at,
+                "round": payload["round_at_death"],
+                "rank": payload["rank_at_death"],
+                "late_capture": late_capture,
+            })
+        except Exception as e:
+            log.warning("nettable: failed to save personal end_board: %s", e)
 
     def _extract_structured_match(
         self, end_board: dict, played_at: str, match_id: str,
@@ -2218,6 +2359,11 @@ class NetTableCapture:
             # Round + lineup change detection — cheap, runs on every ingest.
             self._detect_round_change(rows)
             self._detect_lineup_change(rows)
+
+            # Snapshot the local player's slot the moment their team flips
+            # death_team 0 → 1 — covers "I'm out but match continues."
+            # Cheap; per-match latch prevents re-fires.
+            self._maybe_save_personal_end_board(rows)
 
             # Look for dac_table.end_board — the server writes this once when
             # a match finishes. Saving it gives us a finished-match record

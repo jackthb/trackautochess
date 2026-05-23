@@ -15,6 +15,7 @@ LOCAL_MATCH_PLAYERS_DIR = DAC_DIR / "match_players"
 LOCAL_PLAYERS_DIR = DAC_DIR / "players"
 LOCAL_MATCHES_DIR = DAC_DIR / "matches"
 LOCAL_END_BOARDS_DIR = DAC_DIR / "end_boards"
+LOCAL_PERSONAL_END_BOARDS_DIR = DAC_DIR / "personal_end_boards"
 LOCAL_MATCH_TIMELINES_DIR = DAC_DIR / "match_timelines"
 # Backwards-compat: callers still importing LOCAL_GAMES_DIR (CV pipeline)
 # get the new match_players location transparently.
