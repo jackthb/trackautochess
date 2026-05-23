@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { unitStem } from "../lib/game-utils";
 import type { NetTableState } from "../hooks/useNetTableEvents";
 import type { UnitFullInfo } from "../types";
 
@@ -111,11 +112,23 @@ function HiddenLegendaries({
             : "Every legendary in this match's pool has been revealed."}
         </div>
       ) : (
-        <ul className="nettable-state-keys">
+        <ul className="nettable-legendary-grid">
           {unrevealed.map((u) => (
-            <li key={u.code} className="nettable-state-key">
-              <span className="nettable-state-key-name">{u.name}</span>
-              <span className="nettable-state-key-summary">{u.code}</span>
+            <li key={u.code} className="nettable-legendary-cell" title={u.code}>
+              <img
+                className="nettable-legendary-icon"
+                src={`icons://units/${unitStem(u.name)}.png`}
+                alt=""
+                width={36}
+                height={36}
+                onError={(e) => {
+                  // Fall back to hiding the broken image rather than the alt
+                  // text — codes like new chess pieces we haven't shipped icons
+                  // for would otherwise show the placeholder glyph.
+                  (e.currentTarget as HTMLImageElement).style.visibility = "hidden";
+                }}
+              />
+              <span className="nettable-legendary-name">{u.name}</span>
             </li>
           ))}
         </ul>

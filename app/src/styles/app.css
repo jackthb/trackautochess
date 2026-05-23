@@ -2620,6 +2620,40 @@ select.edit-field:focus {
   white-space: pre;
 }
 
+/* Hidden Legendaries grid — icon + name tiles inside the state panel */
+.nettable-legendary-grid {
+  list-style: none;
+  margin: 0;
+  padding: 8px 0 4px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+  gap: 8px;
+}
+
+.nettable-legendary-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 4px;
+  border: 1px solid var(--border);
+  background: var(--bg-inset, rgba(0, 0, 0, 0.25));
+}
+
+.nettable-legendary-icon {
+  width: 36px;
+  height: 36px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+.nettable-legendary-name {
+  font-size: 0.72rem;
+  text-align: center;
+  line-height: 1.2;
+  word-break: break-word;
+}
+
 /* Setup card */
 
 .nettable-setup-card {
