@@ -131,7 +131,10 @@ export default function App() {
           />
           <div style={{ flex: 1, overflow: "hidden", display: "flex" }}>
             {activeTab === "home" && (
-              <NetTableHome status={tracker.status} />
+              <NetTableHome
+                status={tracker.status}
+                unitsFull={gamesState.unitsFull}
+              />
             )}
             {/* PARKED — single-view simplification. Restore alongside the
                 matching tab entry in TabBar.tsx. */}

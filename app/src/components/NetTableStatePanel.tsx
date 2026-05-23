@@ -1,9 +1,13 @@
 import { useMemo, useState } from "react";
 import type { NetTableState } from "../hooks/useNetTableEvents";
+import type { UnitFullInfo } from "../types";
 
 interface Props {
   state: NetTableState;
   stateAt: string | null;
+  /** Loaded units_full.json — used to resolve internal `chess_*` codes to
+   *  display names for the Hidden Legendaries summary. */
+  unitsFull: Record<string, UnitFullInfo>;
 }
 
 const PREFIX = "CustomNetTable_";
@@ -23,8 +27,12 @@ const TABLE_LABELS: Record<string, string> = {
  * dump → ingest cycle). Renders one collapsible section per table with the
  * decoded entries as JSON underneath — drill-down for debugging, not a
  * pretty data view.
+ *
+ * Entirely local UI — nothing on this panel is synced to Supabase or
+ * exposed via any web endpoint, so private-to-the-player data
+ * (e.g. unrevealed legendary pool) stays on your machine.
  */
-export function NetTableStatePanel({ state, stateAt }: Props) {
+export function NetTableStatePanel({ state, stateAt, unitsFull }: Props) {
   const tables = useMemo(() => {
     return Object.keys(state).sort((a, b) => {
       const aLabel = TABLE_LABELS[a] ?? a;
@@ -32,6 +40,11 @@ export function NetTableStatePanel({ state, stateAt }: Props) {
       return aLabel.localeCompare(bLabel);
     });
   }, [state]);
+
+  const hiddenLegendaries = useMemo(
+    () => extractHiddenLegendaries(state, unitsFull),
+    [state, unitsFull],
+  );
 
   const empty = tables.length === 0;
 
@@ -43,6 +56,13 @@ export function NetTableStatePanel({ state, stateAt }: Props) {
           {stateAt ? `last capture · ${formatTime(stateAt)}` : "no capture yet"}
         </span>
       </header>
+
+      {hiddenLegendaries && (
+        <HiddenLegendaries
+          revealed={hiddenLegendaries.revealed}
+          unrevealed={hiddenLegendaries.unrevealed}
+        />
+      )}
 
       {empty ? (
         <p className="nettable-state-panel-empty">
@@ -58,6 +78,97 @@ export function NetTableStatePanel({ state, stateAt }: Props) {
       )}
     </section>
   );
+}
+
+interface LegendaryEntry {
+  /** internal `chess_*` code from the live nettable feed */
+  code: string;
+  /** Friendly display name, falling back to the raw code if we don't have a map entry */
+  name: string;
+}
+
+function HiddenLegendaries({
+  revealed,
+  unrevealed,
+}: {
+  revealed: LegendaryEntry[];
+  unrevealed: LegendaryEntry[];
+}) {
+  return (
+    <div className="nettable-state-block">
+      <div className="nettable-state-block-header">
+        <span className="nettable-state-block-title">
+          Hidden legendaries (yours only)
+        </span>
+        <span className="nettable-state-block-count">
+          {unrevealed.length}
+        </span>
+      </div>
+      {unrevealed.length === 0 ? (
+        <div className="nettable-state-block-empty">
+          {revealed.length === 0
+            ? "Waiting for a capture — the pool is set once the match starts."
+            : "Every legendary in this match's pool has been revealed."}
+        </div>
+      ) : (
+        <ul className="nettable-state-keys">
+          {unrevealed.map((u) => (
+            <li key={u.code} className="nettable-state-key">
+              <span className="nettable-state-key-name">{u.name}</span>
+              <span className="nettable-state-key-summary">{u.code}</span>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+}
+
+function extractHiddenLegendaries(
+  state: NetTableState,
+  unitsFull: Record<string, UnitFullInfo>,
+): { revealed: LegendaryEntry[]; unrevealed: LegendaryEntry[] } | null {
+  const pool = state["CustomNetTable_chess_pool_table"];
+  if (!pool) return null;
+  const revealedRaw = pool["revealed_legendary_chess_list"];
+  const unrevealedRaw = pool["unrevealed_legendary_chess_list"];
+  // Drodo's lua sets both keys at the start of the match; if neither is
+  // present, we don't have a capture yet and there's nothing to show.
+  if (revealedRaw == null && unrevealedRaw == null) return null;
+  const codeToName = chessCodeToName(unitsFull);
+  return {
+    revealed: toEntries(revealedRaw, codeToName),
+    unrevealed: toEntries(unrevealedRaw, codeToName),
+  };
+}
+
+function toEntries(
+  raw: unknown,
+  codeToName: Map<string, string>,
+): LegendaryEntry[] {
+  // Drodo broadcasts this as a Lua array, which round-trips through VBKV →
+  // JSON as either an array or a {1: 'chess_x', 2: 'chess_y'} object.
+  const list: string[] = Array.isArray(raw)
+    ? raw.filter((v): v is string => typeof v === "string")
+    : raw && typeof raw === "object"
+    ? Object.values(raw as Record<string, unknown>).filter(
+        (v): v is string => typeof v === "string",
+      )
+    : [];
+  return list
+    .map((code) => ({ code, name: codeToName.get(code) ?? code }))
+    .sort((a, b) => a.name.localeCompare(b.name));
+}
+
+function chessCodeToName(
+  unitsFull: Record<string, UnitFullInfo>,
+): Map<string, string> {
+  const out = new Map<string, string>();
+  for (const [displayName, info] of Object.entries(unitsFull)) {
+    const id = (info as { id?: unknown }).id;
+    if (typeof id === "string") out.set(id, displayName);
+  }
+  return out;
 }
 
 function TableBlock({

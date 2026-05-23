@@ -1,4 +1,4 @@
-import type { TrackerStatus } from "../types";
+import type { TrackerStatus, UnitFullInfo } from "../types";
 import { useNetTableEvents } from "../hooks/useNetTableEvents";
 import { NetTableSetupCard } from "./NetTableSetupCard";
 import { NetTableActivityFeed } from "./NetTableActivityFeed";
@@ -6,6 +6,8 @@ import { NetTableStatePanel } from "./NetTableStatePanel";
 
 interface NetTableHomeProps {
   status: TrackerStatus | null;
+  /** Loaded units_full.json — forwarded to NetTableStatePanel for chess code lookup */
+  unitsFull: Record<string, UnitFullInfo>;
   // PARKED — admin "Preview as user" toggle. Props kept so reviving the
   // dual-view code in App.tsx stays a one-line uncomment.
   isAdminPreview?: boolean;
@@ -14,6 +16,7 @@ interface NetTableHomeProps {
 
 export function NetTableHome({
   status,
+  unitsFull,
   isAdminPreview,
   onExitAdminPreview,
 }: NetTableHomeProps) {
@@ -24,9 +27,8 @@ export function NetTableHome({
   const {
     status: netStatus,
     entries,
-    // PARKED with the admin state panel below.
-    // state,
-    // stateAt,
+    state,
+    stateAt,
     launchOptionsApplied,
     launchOptionsProgress,
     resyncProgress,
@@ -49,9 +51,8 @@ export function NetTableHome({
       netStatus.autoexec_installed &&
       (tracking || (!netStatus.dota_running && flagsSet)),
   );
-  // PARKED — the raw VBKV dump was an admin-only debugging panel. Hidden
-  // in the unified view so the home tab renders identically for everyone.
-  // const showStatePanel = status?.admin_mode === true && !isAdminPreview;
+  // Live debug view — always on for the local player. Renders nothing
+  // until a capture lands, so it's harmless before the first dump arrives.
 
   return (
     <div className="nettable-home">
@@ -94,13 +95,13 @@ export function NetTableHome({
         <div className="nettable-home-feed">
           <NetTableActivityFeed entries={entries} />
         </div>
-        {/* PARKED — admin debug state panel.
-        {showStatePanel && (
-          <div className="nettable-home-state">
-            <NetTableStatePanel state={state} stateAt={stateAt} />
-          </div>
-        )}
-        */}
+        <div className="nettable-home-state">
+          <NetTableStatePanel
+            state={state}
+            stateAt={stateAt}
+            unitsFull={unitsFull}
+          />
+        </div>
       </div>
     </div>
   );

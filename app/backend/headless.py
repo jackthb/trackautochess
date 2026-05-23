@@ -1612,9 +1612,14 @@ class HeadlessBackend:
 
     def run(self) -> None:
         """Start sentinel, then read stdin commands until quit or EOF."""
-        self._start_sentinel()
-
-        # Start GSI listener before nettable so is_dac_active() has a chance
+        # PARKED — sentinel template-matcher polls the screen every 3s for
+        # final-ranking + round-start, then fires `_on_game_end` (parked
+        # screenshot flow) and `_on_round_start` (parked replay recorder).
+        # Both callbacks are no-ops in the unified view, but the screen
+        # capture + CV match still ran every tick and spammed 2 DEBUG log
+        # lines/tick out the JSON pipe — observable lag during play.
+        # Restore alongside the screenshot/replay UI.
+        # self._start_sentinel()
         # to populate before the cascade poller's first tick.
         if self._gsi:
             try:
