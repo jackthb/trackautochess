@@ -3,6 +3,7 @@
 Usage:
     python main.py import-matches-cv <screenshot> [--debug]
     python main.py ingest-nettable [--dry-run] [--only NAME,NAME] [--log PATH]
+    python main.py upload-timelines [--dry-run]
 """
 
 import argparse
@@ -214,11 +215,60 @@ def cmd_ingest_nettable(args: list[str]) -> None:
     print(f"\nDone — {written} row(s) written to dac_nettable_dumps.")
 
 
+def cmd_upload_timelines(args: list[str]) -> None:
+    """Handle: python main.py upload-timelines [--dry-run]
+
+    Backfill every ~/.dac/match_timelines/<match_id>.json into Supabase's
+    match_timelines table. Idempotent — UPSERTs by match_id."""
+    from nettable_capture import make_service_role_client, upsert_match_timeline
+    from utils import LOCAL_MATCH_TIMELINES_DIR
+
+    ap = argparse.ArgumentParser(prog="main.py upload-timelines")
+    ap.add_argument("--dry-run", action="store_true",
+                    help="Walk and report, don't upload")
+    parsed = ap.parse_args(args)
+
+    files = sorted(LOCAL_MATCH_TIMELINES_DIR.glob("*.json"))
+    if not files:
+        print(f"No timelines found in {LOCAL_MATCH_TIMELINES_DIR}")
+        return
+    print(f"Found {len(files)} timeline file(s) in {LOCAL_MATCH_TIMELINES_DIR}")
+
+    if parsed.dry_run:
+        for p in files:
+            print(f"  {p.name} ({p.stat().st_size:,} bytes)")
+        return
+
+    client = make_service_role_client()
+    if client is None:
+        sys.exit("Could not build Supabase client — missing url/key in config or env")
+
+    uploaded = 0
+    failed = 0
+    with client:
+        for p in files:
+            try:
+                payload = json.loads(p.read_text(encoding="utf-8"))
+                if upsert_match_timeline(client, payload):
+                    uploaded += 1
+                    print(f"  ok{p.name}")
+                else:
+                    print(f"  err{p.name} (empty payload)")
+                    failed += 1
+            except Exception as e:
+                print(f"  err{p.name}: {type(e).__name__}: {e}")
+                failed += 1
+
+    print(f"\nDone — {uploaded} uploaded, {failed} failed.")
+
+
 def main() -> None:
     if len(sys.argv) > 1 and sys.argv[1] == "import-matches-cv":
         cmd_import_matches_cv(sys.argv[2:])
     elif len(sys.argv) > 1 and sys.argv[1] == "ingest-nettable":
         cmd_ingest_nettable(sys.argv[2:])
+    elif len(sys.argv) > 1 and sys.argv[1] == "upload-timelines":
+        cmd_upload_timelines(sys.argv[2:])
     else:
         print(__doc__.strip())
         sys.exit(1)

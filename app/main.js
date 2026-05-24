@@ -1040,12 +1040,27 @@ function readLocalMatchPlayers() {
 
 ipcMain.handle("timelines:fetch", async (_event, matchId) => {
   if (!matchId) return null;
-  const path = require("path");
-  const fs = require("fs");
-  const file = path.join(DAC_DIR, "match_timelines", `${matchId}.json`);
-  if (!fs.existsSync(file)) return null;
+  const config = loadTrackerConfig();
+  const url = config.supabase_url;
+  const key = config.supabase_key;
+  if (!url || !key) return null;
   try {
-    return JSON.parse(fs.readFileSync(file, "utf-8"));
+    const resp = await fetch(
+      `${url.replace(/\/$/, "")}/rest/v1/match_timelines?match_id=eq.${encodeURIComponent(matchId)}&select=timeline`,
+      {
+        headers: {
+          apikey: key,
+          Authorization: `Bearer ${key}`,
+          Accept: "application/json",
+        },
+      },
+    );
+    if (!resp.ok) {
+      console.error(`timelines:fetch HTTP ${resp.status} for ${matchId}`);
+      return null;
+    }
+    const rows = await resp.json();
+    return Array.isArray(rows) && rows[0]?.timeline ? rows[0].timeline : null;
   } catch (e) {
     console.error(`timelines:fetch failed for ${matchId}:`, e);
     return null;

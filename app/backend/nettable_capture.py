@@ -912,6 +912,63 @@ def insert_dumps(client, rows: list[dict[str, Any]]) -> int:
     return written
 
 
+def make_service_role_client():
+    """Build an httpx.Client authed with the Supabase service-role key.
+
+    Resolution order: SUPABASE_SERVICE_ROLE_KEY env var → .env.local in the
+    dev repo → config.json supabase_key (publishable, won't pass writes
+    that need service role). Returns None if url+key can't be resolved."""
+    from utils import load_config
+    cfg = load_config()
+    url = cfg.get("supabase_url")
+    key = (
+        os.environ.get("SUPABASE_SERVICE_ROLE_KEY")
+        or _load_dotenv_value("SUPABASE_SERVICE_ROLE_KEY")
+        or cfg.get("supabase_key")
+    )
+    if not url or not key:
+        return None
+    import httpx
+    return httpx.Client(
+        base_url=url.rstrip("/"),
+        headers={
+            "apikey": key,
+            "Authorization": f"Bearer {key}",
+            "Accept": "application/json",
+        },
+        timeout=60,
+    )
+
+
+def upsert_match_timeline(client, payload: dict[str, Any]) -> bool:
+    """UPSERT a single row into match_timelines. Returns True on success.
+
+    ``payload`` is the local timeline JSON shape: keys match_id, played_at
+    (unused server-side, just for log context), round_count, first_round,
+    last_round, rounds. We map the file shape to the table row here."""
+    match_id = payload.get("match_id")
+    rounds = payload.get("rounds") or []
+    if not match_id or not rounds:
+        return False
+    row = {
+        "match_id": match_id,
+        "timeline": payload,
+        "round_count": int(payload.get("round_count") or len(rounds)),
+        "first_round": int(payload.get("first_round") or rounds[0].get("round", 0)),
+        "last_round": int(payload.get("last_round") or rounds[-1].get("round", 0)),
+    }
+    resp = client.post(
+        "/rest/v1/match_timelines",
+        headers={
+            "Content-Type": "application/json",
+            "Prefer": "resolution=merge-duplicates,return=minimal",
+        },
+        content=json.dumps([row]),
+    )
+    resp.raise_for_status()
+    return True
+
+
 # ── Main capture class ──────────────────────────────────────────────────────
 
 GAME_IN_PROGRESS_RE = "DOTA_GAMERULES_STATE_GAME_IN_PROGRESS"
@@ -2012,7 +2069,7 @@ class NetTableCapture:
              non-decreasing (i.e. the previous match begins). That
              gives us this match's dumps even if backend missed the
              session start."""
-        from utils import LOCAL_DUMPS_DIR, LOCAL_MATCH_TIMELINES_DIR
+        from utils import LOCAL_DUMPS_DIR
 
         # Collect ALL dump files with their mtimes.
         all_dumps = []
@@ -2089,20 +2146,35 @@ class NetTableCapture:
 
         timeline = [by_round[r] for r in sorted(by_round.keys())]
 
-        LOCAL_MATCH_TIMELINES_DIR.mkdir(parents=True, exist_ok=True)
-        out_path = LOCAL_MATCH_TIMELINES_DIR / f"{match_id}.json"
-        out_path.write_text(json.dumps({
+        payload = {
             "match_id": match_id,
             "played_at": played_at,
             "round_count": len(timeline),
             "first_round": timeline[0]["round"],
             "last_round": timeline[-1]["round"],
             "rounds": timeline,
-        }, indent=2, ensure_ascii=False), encoding="utf-8")
-        log.info(
-            "nettable: match timeline saved — match_id=%s rounds=%d (round %d → %d, from %d dumps)",
-            match_id, len(timeline), timeline[0]["round"], timeline[-1]["round"], len(dump_files),
-        )
+        }
+
+        # Direct-to-Supabase — no local file. The desktop app's
+        # timelines:fetch IPC reads from Supabase too, so there's one
+        # source of truth.
+        try:
+            client = make_service_role_client()
+            if client is None:
+                log.warning(
+                    "nettable: no Supabase client (missing url/key) — timeline %s NOT uploaded",
+                    match_id,
+                )
+            else:
+                with client:
+                    upsert_match_timeline(client, payload)
+                log.info(
+                    "nettable: match timeline uploaded — match_id=%s rounds=%d (round %d → %d, from %d dumps)",
+                    match_id, len(timeline), timeline[0]["round"], timeline[-1]["round"], len(dump_files),
+                )
+        except Exception as e:
+            log.warning("nettable: timeline upload failed for %s: %s", match_id, e)
+
         self._emit({
             "type": "nettable_timeline_extracted",
             "match_id": match_id,
