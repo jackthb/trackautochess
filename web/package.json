@@ -10,13 +10,13 @@
   },
   "dependencies": {
     "@dac/shared": "file:../shared",
+    "@resvg/resvg-js": "^2.6.2",
     "@sanity/preview-url-secret": "^4.0.5",
     "@sanity/react-loader": "^2.0.9",
     "@sanity/visual-editing": "^5.3.4",
     "@supabase/ssr": "^0.9.0",
     "@supabase/supabase-js": "^2.98.0",
     "@vercel/analytics": "^2.0.1",
-    "@vercel/og": "^0.11.1",
     "@vercel/speed-insights": "^2.0.0",
     "botid": "^1.5.11",
     "cookie": "^1.1.1",
@@ -26,6 +26,7 @@
     "rate-limiter-flexible": "^11.0.1",
     "react": "19.2.3",
     "react-dom": "19.2.3",
+    "satori": "^0.26.0",
     "styled-jsx": "^5.1.7"
   },
   "devDependencies": {

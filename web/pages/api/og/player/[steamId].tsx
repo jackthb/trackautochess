@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import type { ReactNode } from "react";
-import { ImageResponse } from "@vercel/og";
+import { renderOgImage } from "@/lib/og";
 import { createClient } from "@supabase/supabase-js";
 import { readFile } from "node:fs/promises";
 import path from "node:path";
@@ -312,9 +312,8 @@ async function ogHandler(req: NextApiRequest, res: NextApiResponse) {
     : latestRecordedSeason?.season.toUpperCase() || "CURRENT";
   const rankLabel = hasCurrentStats ? `${season} RANK` : "LATEST RECORDED SEASON";
 
-  const image = new ImageResponse(
-    (
-      <div
+  const body = await renderOgImage(
+    <div
         style={{
           width: "100%",
           height: "100%",
@@ -528,34 +527,18 @@ async function ogHandler(req: NextApiRequest, res: NextApiResponse) {
           </div>
         </div>
       </div>
-    ),
+    ,
     {
       width: 1200,
       height: 630,
       fonts: [
-        {
-          name: "Cinzel",
-          data: fonts[0],
-          weight: 700,
-          style: "normal",
-        },
-        {
-          name: "JetBrains Mono",
-          data: fonts[1],
-          weight: 400,
-          style: "normal",
-        },
-        {
-          name: "JetBrains Mono",
-          data: fonts[2],
-          weight: 700,
-          style: "normal",
-        },
+        { name: "Cinzel", data: fonts[0], weight: 700 as const, style: "normal" as const },
+        { name: "JetBrains Mono", data: fonts[1], weight: 400 as const, style: "normal" as const },
+        { name: "JetBrains Mono", data: fonts[2], weight: 700 as const, style: "normal" as const },
       ],
     }
   );
 
-  const body = Buffer.from(await image.arrayBuffer());
   res.setHeader("Content-Type", "image/png");
   res.setHeader(
     "Cache-Control",
