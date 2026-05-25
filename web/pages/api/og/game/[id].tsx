@@ -96,7 +96,7 @@ async function ogHandler(req: NextApiRequest, res: NextApiResponse) {
   const [steamProfile, fonts] = await Promise.all([
     game.user_id
       ? fetchSteamProfile(String(game.user_id), supabase)
-      : Promise.resolve({ name: null, customUrl: null }),
+      : Promise.resolve({ name: null, customUrl: null, avatarUrl: null }),
     fontData,
   ]);
 
