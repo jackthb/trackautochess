@@ -1,9 +1,15 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { renderOgImage } from "@/lib/og";
+import { renderOgImage, imageToDataUrl } from "@/lib/og";
+import { resolveIconUrl } from "@/lib/icons";
 import { createClient } from "@supabase/supabase-js";
 import { readFile } from "node:fs/promises";
 import path from "node:path";
-import { parseLineup, mmrLevelToRank } from "@dac/shared/game-utils";
+import { parseLineup, unitStem, RANK_BRACKETS } from "@dac/shared/game-utils";
+
+function mmrLevelToRank(level: number | null | undefined): string {
+  if (level == null || level < 1 || level > RANK_BRACKETS.length) return "";
+  return RANK_BRACKETS[level - 1].rank.replace("-", " ");
+}
 import { fetchSteamProfile } from "@/lib/steam";
 import unitsData from "@data/units.json";
 
@@ -25,6 +31,14 @@ const fontData = Promise.all([
   readFile(path.join(fontDir, "JetBrainsMono-Regular.ttf")),
   readFile(path.join(fontDir, "JetBrainsMono-Bold.ttf")),
 ]);
+
+function costBorderColorHex(cost: number): string {
+  if (cost >= 5) return "#c9a84c";
+  if (cost === 4) return "#9b59b6";
+  if (cost === 3) return "#3498db";
+  if (cost === 2) return "#27ae60";
+  return "#7f8c8d";
+}
 
 function placementColorHex(p: number): string {
   if (p === 1) return "#c9a84c";
@@ -92,10 +106,14 @@ async function ogHandler(req: NextApiRequest, res: NextApiResponse) {
   const siteHost = getSiteHost();
 
   const lineup = parseLineup(mp.chess_lineup, UNIT_COSTS);
-  const lineupText = lineup.map((u) => {
-    const stars = u.stars > 1 ? `${"*".repeat(u.stars)}` : "";
-    return `${u.name}${stars}`;
+
+  const avatarPromise = imageToDataUrl(steamProfile.avatarUrl);
+  const iconPromises = lineup.map((u) => {
+    const url = resolveIconUrl("units", unitStem(u.name));
+    const abs = url.startsWith("/") ? `${process.env.NEXT_PUBLIC_SITE_URL || "https://www.trackautochess.com"}${url}` : url;
+    return imageToDataUrl(abs);
   });
+  const [avatarDataUrl, ...unitIcons] = await Promise.all([avatarPromise, ...iconPromises]);
 
   const wl =
     mp.win_round != null && mp.lose_round != null
@@ -196,6 +214,14 @@ async function ogHandler(req: NextApiRequest, res: NextApiResponse) {
               >
                 #{p}
               </div>
+              {avatarDataUrl && (
+                <img
+                  src={avatarDataUrl}
+                  width={110}
+                  height={110}
+                  style={{ borderRadius: 16, flexShrink: 0 }}
+                />
+              )}
               <div
                 style={{
                   display: "flex",
@@ -265,7 +291,7 @@ async function ogHandler(req: NextApiRequest, res: NextApiResponse) {
               </div>
             </div>
 
-            {lineupText.length > 0 && (
+            {lineup.length > 0 && (
               <div
                 style={{
                   display: "flex",
@@ -291,25 +317,53 @@ async function ogHandler(req: NextApiRequest, res: NextApiResponse) {
                     flexWrap: "wrap",
                     gap: 8,
                     marginTop: 12,
+                    alignItems: "center",
                   }}
                 >
-                  {lineupText.map((name, i) => (
+                  {lineup.map((u, i) => (
                     <div
                       key={i}
                       style={{
                         display: "flex",
-                        padding: "6px 14px",
-                        border: "1px solid #2f3540",
-                        borderRadius: 8,
-                        background: "#111419",
-                        fontFamily: "JetBrains Mono",
-                        fontSize: 18,
-                        fontWeight: 700,
-                        color: "#f2efe7",
-                        whiteSpace: "nowrap",
+                        flexDirection: "column",
+                        alignItems: "center",
+                        gap: 2,
                       }}
                     >
-                      {name}
+                      {unitIcons[i] ? (
+                        <img
+                          src={unitIcons[i]!}
+                          width={48}
+                          height={48}
+                          style={{
+                            borderRadius: 6,
+                            border: `2px solid ${costBorderColorHex(UNIT_COSTS[u.name] || 1)}`,
+                          }}
+                        />
+                      ) : (
+                        <div
+                          style={{
+                            display: "flex",
+                            width: 48,
+                            height: 48,
+                            borderRadius: 6,
+                            border: "2px solid #2f3540",
+                            background: "#111419",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            fontFamily: "JetBrains Mono",
+                            fontSize: 10,
+                            color: "#8a92a8",
+                          }}
+                        >
+                          {u.name.slice(0, 3)}
+                        </div>
+                      )}
+                      {u.stars > 1 && (
+                        <div style={{ display: "flex", fontSize: 10, color: "#c9a84c" }}>
+                          {"★".repeat(u.stars)}
+                        </div>
+                      )}
                     </div>
                   ))}
                 </div>

@@ -1,9 +1,18 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { renderOgImage } from "@/lib/og";
+import { renderOgImage, imageToDataUrl } from "@/lib/og";
+import { resolveIconUrl } from "@/lib/icons";
 import { createClient } from "@supabase/supabase-js";
 import { readFile } from "node:fs/promises";
 import path from "node:path";
-import { parseLineup, mmrLevelToRank } from "@dac/shared/game-utils";
+import { parseLineup, parseRelics, unitStem, relicStem, RANK_BRACKETS } from "@dac/shared/game-utils";
+import relicsData from "@data/relics.json";
+
+const RELICS_MAP = (relicsData as { relics: Record<string, { name: string }> }).relics;
+
+function mmrLevelToRank(level: number | null | undefined): string {
+  if (level == null || level < 1 || level > RANK_BRACKETS.length) return "";
+  return RANK_BRACKETS[level - 1].rank.replace("-", " ");
+}
 import { fetchSteamProfile } from "@/lib/steam";
 import unitsData from "@data/units.json";
 
@@ -25,6 +34,14 @@ const fontData = Promise.all([
   readFile(path.join(fontDir, "JetBrainsMono-Regular.ttf")),
   readFile(path.join(fontDir, "JetBrainsMono-Bold.ttf")),
 ]);
+
+function costBorderColorHex(cost: number): string {
+  if (cost >= 5) return "#c9a84c";
+  if (cost === 4) return "#9b59b6";
+  if (cost === 3) return "#3498db";
+  if (cost === 2) return "#27ae60";
+  return "#7f8c8d";
+}
 
 function placementColorHex(p: number): string {
   if (p === 1) return "#c9a84c";
@@ -83,16 +100,28 @@ async function ogHandler(req: NextApiRequest, res: NextApiResponse) {
     fontData,
   ]);
 
-  // Backfill rank from match_players.mmr_level when games.rank is empty.
-  if (!game.rank && game.match_id && game.user_id) {
+  // Pull match_players data for rank + full relic history.
+  let mpRelicNames: string[] = [];
+  if (game.match_id && game.user_id) {
     const { data: mp } = await supabase
       .from("match_players")
-      .select("mmr_level")
+      .select("mmr_level, relic_history")
       .eq("match_id", game.match_id)
       .eq("steam_id", game.user_id)
       .maybeSingle();
-    if (mp?.mmr_level) {
+    if (mp?.mmr_level && !game.rank) {
       game.rank = mmrLevelToRank(mp.mmr_level) || null;
+    }
+    if (mp?.relic_history && typeof mp.relic_history === "object") {
+      const entries = Array.isArray(mp.relic_history)
+        ? mp.relic_history
+        : Object.values(mp.relic_history as Record<string, unknown>);
+      for (const e of entries) {
+        if (e && typeof e === "object" && "relic" in (e as any)) {
+          const name = (e as { relic: string }).relic;
+          if (name) mpRelicNames.push(name);
+        }
+      }
     }
   }
 
@@ -105,16 +134,34 @@ async function ogHandler(req: NextApiRequest, res: NextApiResponse) {
   const siteHost = getSiteHost();
 
   const lineup = parseLineup(game.lineup, UNIT_COSTS);
-  const lineupText = lineup.map((u) => {
-    const stars = u.stars > 1 ? `${"*".repeat(u.stars)}` : "";
-    return `${u.name}${stars}`;
+  const rawRelics = mpRelicNames.length > 0 ? mpRelicNames : parseRelics(game.relic);
+  const relics = rawRelics.map((r) => RELICS_MAP[r]?.name || r);
+  const siteBase = process.env.NEXT_PUBLIC_SITE_URL || "https://www.trackautochess.com";
+  const toAbs = (url: string) => url.startsWith("/") ? `${siteBase}${url}` : url;
+
+  const avatarPromise = imageToDataUrl(steamProfile.avatarUrl);
+  const unitIconPromises = lineup.map((u) => imageToDataUrl(toAbs(resolveIconUrl("units", unitStem(u.name)))));
+  const relicIconPromises = relics.map((r) => {
+    const stem = relicStem(r);
+    const url = resolveIconUrl("relics", stem);
+    const abs = toAbs(url);
+    return imageToDataUrl(abs);
   });
+  const [avatarDataUrl, ...iconResults] = await Promise.all([avatarPromise, ...unitIconPromises, ...relicIconPromises]);
+  const unitIcons = iconResults.slice(0, lineup.length);
+  const relicIcons = iconResults.slice(lineup.length);
 
   const matchDate = game.played_at
     ? new Date(game.played_at).toLocaleDateString("en-US", {
         month: "short",
         day: "numeric",
         year: "numeric",
+      })
+    : null;
+  const matchTime = game.played_at
+    ? new Date(game.played_at).toLocaleTimeString("en-US", {
+        hour: "2-digit",
+        minute: "2-digit",
       })
     : null;
 
@@ -217,6 +264,14 @@ async function ogHandler(req: NextApiRequest, res: NextApiResponse) {
               >
                 #{p}
               </div>
+              {avatarDataUrl && (
+                <img
+                  src={avatarDataUrl}
+                  width={110}
+                  height={110}
+                  style={{ borderRadius: 16, flexShrink: 0 }}
+                />
+              )}
               <div
                 style={{
                   display: "flex",
@@ -286,52 +341,55 @@ async function ogHandler(req: NextApiRequest, res: NextApiResponse) {
               </div>
             </div>
 
-            {lineupText.length > 0 && (
-              <div
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  marginTop: 36,
-                }}
-              >
-                <div
-                  style={{
-                    display: "flex",
-                    color: "#8a92a8",
-                    fontFamily: "JetBrains Mono",
-                    fontSize: 16,
-                    fontWeight: 700,
-                    letterSpacing: 2,
-                  }}
-                >
+            {lineup.length > 0 && (
+              <div style={{ display: "flex", flexDirection: "column", marginTop: 24, gap: 10 }}>
+                <div style={{ display: "flex", color: "#8a92a8", fontFamily: "JetBrains Mono", fontSize: 14, fontWeight: 700, letterSpacing: 2 }}>
                   LINEUP
                 </div>
-                <div
-                  style={{
-                    display: "flex",
-                    flexWrap: "wrap",
-                    gap: 8,
-                    marginTop: 12,
-                  }}
-                >
-                  {lineupText.map((name, i) => (
-                    <div
-                      key={i}
-                      style={{
-                        display: "flex",
-                        padding: "6px 14px",
-                        border: "1px solid #2f3540",
-                        borderRadius: 8,
-                        background: "#111419",
-                        fontFamily: "JetBrains Mono",
-                        fontSize: 18,
-                        fontWeight: 700,
-                        color: "#f2efe7",
-                        whiteSpace: "nowrap",
-                      }}
-                    >
-                      {name}
+                <div style={{ display: "flex", flexWrap: "wrap", gap: 10, alignItems: "flex-start" }}>
+                  {lineup.map((u, i) => (
+                    <div key={i} style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 3 }}>
+                      <div style={{ display: "flex", position: "relative" }}>
+                        {unitIcons[i] ? (
+                          <img
+                            src={unitIcons[i]!}
+                            width={68}
+                            height={68}
+                            style={{ borderRadius: 8, border: `3px solid ${costBorderColorHex(UNIT_COSTS[u.name] || 1)}` }}
+                          />
+                        ) : (
+                          <div style={{ display: "flex", width: 68, height: 68, borderRadius: 8, border: "3px solid #2f3540", background: "#111419", alignItems: "center", justifyContent: "center", fontFamily: "JetBrains Mono", fontSize: 11, color: "#8a92a8" }}>
+                            {u.name.slice(0, 4)}
+                          </div>
+                        )}
+                      </div>
+                      {u.stars > 1 && (
+                        <div style={{ display: "flex", gap: 2 }}>
+                          {Array.from({ length: u.stars }).map((_, s) => (
+                            <div key={s} style={{ display: "flex", width: 8, height: 8, borderRadius: 4, background: u.stars >= 3 ? "#c9a84c" : "#8a92a8" }} />
+                          ))}
+                        </div>
+                      )}
                     </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {relics.length > 0 && (
+              <div style={{ display: "flex", flexDirection: "column", marginTop: 16, gap: 8 }}>
+                <div style={{ display: "flex", color: "#8a92a8", fontFamily: "JetBrains Mono", fontSize: 14, fontWeight: 700, letterSpacing: 2 }}>
+                  RELICS
+                </div>
+                <div style={{ display: "flex", flexWrap: "wrap", gap: 8, alignItems: "center" }}>
+                  {relics.map((r, i) => (
+                    relicIcons[i] ? (
+                      <img key={i} src={relicIcons[i]!} width={55} height={40} style={{ borderRadius: 6, objectFit: "contain" }} />
+                    ) : (
+                      <div key={i} style={{ display: "flex", padding: "4px 10px", border: "1px solid #2f3540", borderRadius: 6, background: "#111419", fontFamily: "JetBrains Mono", fontSize: 12, color: "#8a92a8" }}>
+                        {r.slice(0, 8)}
+                      </div>
+                    )
                   ))}
                 </div>
               </div>
@@ -348,7 +406,7 @@ async function ogHandler(req: NextApiRequest, res: NextApiResponse) {
                   paddingTop: 16,
                 }}
               >
-                {matchDate}
+                {matchDate}{matchTime ? `, ${matchTime}` : ""}
               </div>
             )}
           </div>
