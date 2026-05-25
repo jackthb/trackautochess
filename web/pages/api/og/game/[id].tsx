@@ -382,7 +382,7 @@ async function ogHandler(req: NextApiRequest, res: NextApiResponse) {
     }
   );
 
-  const body = Buffer.from(await image.arrayBuffer());
+  const body = Buffer.from(await (image as unknown as Response).arrayBuffer());
   res.setHeader("Content-Type", "image/png");
   res.setHeader(
     "Cache-Control",
