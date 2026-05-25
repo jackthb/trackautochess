@@ -115,27 +115,6 @@ function originFromUrl(value: string | null): string | null {
   }
 }
 
-/** Compact stats summary shared between compact + expanded views. */
-function PlayerStatsLine({ game }: { game: Game }) {
-  return (
-    <div className="mp-stats">
-      {game.rank && <span className="mp-rank">{game.rank}</span>}
-      {game.level && (
-        <span className="mp-stat">
-          <span className="mp-stat-label">Lv</span>
-          {game.level}
-        </span>
-      )}
-      {game.wins != null && game.losses != null && (
-        <span className="mp-stat">
-          <span className="wl-w">{game.wins}</span>
-          <span className="mp-wl-sep">{"–"}</span>
-          <span className="wl-l">{game.losses}</span>
-        </span>
-      )}
-    </div>
-  );
-}
 
 /** The "expanded" detail panel for a player row — bigger icons, full relic
  *  timeline. Lineup/synergies/relics are pre-parsed by MatchPlayerRow so
@@ -146,15 +125,25 @@ function PlayerDetail({
   relicsToShow,
   hasRelicTimeline,
   tooltipData,
+  hp,
+  gold,
 }: {
   lineup: { name: string; stars: number }[];
   synergies: { name: string; count: number }[];
   relicsToShow: RelicTimelineEntry[];
   hasRelicTimeline: boolean;
   tooltipData: TooltipData;
+  hp: number | null;
+  gold: number | null;
 }) {
   return (
     <div className="player-detail">
+      {(hp != null || gold != null) && (
+        <div className="pd-live-stats">
+          {hp != null && <span className="mp-hp">HP {hp}</span>}
+          {gold != null && <span className="mp-gold">Gold {gold}</span>}
+        </div>
+      )}
       {lineup.length > 0 && (
         <div className="pd-section">
           <div className="pd-label">Lineup</div>
@@ -342,6 +331,25 @@ function MatchPlayerRow({
     lineup.length > 0 || synergies.length > 0 || compactRelics.length > 0;
   const isOpen = expanded && hasContent;
 
+  const rankLabel =
+    displayGame.rank ||
+    (snap?.mmr_level != null && snap.mmr_level > 0
+      ? mmrLevelToRank(snap.mmr_level)
+      : null);
+
+  const roundResult =
+    snap && prevSnap && snapRound !== null
+      ? (() => {
+          const eliminated = snap.hp === 0 && (prevSnap.hp ?? 0) > 0;
+          const won = (snap.win_round ?? 0) > (prevSnap.win_round ?? 0);
+          const lost = (snap.lose_round ?? 0) > (prevSnap.lose_round ?? 0);
+          if (eliminated) return "out" as const;
+          if (won) return "w" as const;
+          if (lost) return "l" as const;
+          return null;
+        })()
+      : null;
+
   const inner = (
     <>
       <div
@@ -364,27 +372,29 @@ function MatchPlayerRow({
               <span className="mp-name mp-name-unknown">{displayName}</span>
             )}
           </div>
-          <PlayerStatsLine game={displayGame} />
-          {!displayGame.rank && snap?.mmr_level != null && snap.mmr_level > 0 && (
-            <span className="mp-rank">{mmrLevelToRank(snap.mmr_level)}</span>
-          )}
-          {snap?.hp != null && (
-            <div className="mp-hp">HP {snap.hp}</div>
-          )}
-          {snap?.total_money != null && (
-            <div className="mp-gold">Gold {snap.total_money}</div>
-          )}
-          {snap && prevSnap && snapRound !== null && (() => {
-            const eliminated = snap.hp === 0 && (prevSnap.hp ?? 0) > 0;
-            const won = (snap.win_round ?? 0) > (prevSnap.win_round ?? 0);
-            const lost = (snap.lose_round ?? 0) > (prevSnap.lose_round ?? 0);
-            if (eliminated) return <div className="mp-round-result mp-round-out">OUT</div>;
-            if (won) return <div className="mp-round-result mp-round-w">W</div>;
-            if (lost) return <div className="mp-round-result mp-round-l">L</div>;
-            return null;
-          })()}
         </div>
-        <div className="mp-build">
+        {rankLabel && <span className="mp-rank">{rankLabel}</span>}
+        <div className="mp-col-stats">
+          {displayGame.level && (
+            <span className="mp-stat">
+              <span className="mp-stat-label">Lv</span>
+              {displayGame.level}
+            </span>
+          )}
+          {displayGame.wins != null && displayGame.losses != null && (
+            <span className="mp-stat">
+              <span className="wl-w">{displayGame.wins}</span>
+              <span className="mp-wl-sep">{"–"}</span>
+              <span className="wl-l">{displayGame.losses}</span>
+            </span>
+          )}
+          {roundResult && (
+            <span className={`mp-round-result mp-round-${roundResult}`}>
+              {roundResult === "out" ? "OUT" : roundResult.toUpperCase()}
+            </span>
+          )}
+        </div>
+        <div className="mp-col-lineup">
           {lineup.length > 0 && (
             <div className="mp-lineup">
               {lineup.map((u, i) => (
@@ -418,60 +428,56 @@ function MatchPlayerRow({
               ))}
             </div>
           )}
-          {(synergies.length > 0 || compactRelics.length > 0) && (
-            <div className="mp-syn-relics">
-              {synergies.length > 0 && (
-                <div className="mp-synergies">
-                  {synergies.map((s, i) => (
-                    <TooltipWrap
-                      key={i}
-                      type="synergy"
-                      name={s.name}
-                      count={s.count}
-                      data={tooltipData}
-                    >
-                      <div className="syn-badge mp-syn-badge">
-                        <img
-                          className="syn-icon"
-                          src={iconUrl("synergies", synIconName(s.name))}
-                          alt={s.name}
-                          loading="lazy"
-                          onError={(e) => {
-                            (e.target as HTMLImageElement).style.display = "none";
-                          }}
-                        />
-                        <span className="syn-count">{s.count}</span>
-                      </div>
-                    </TooltipWrap>
-                  ))}
-                </div>
-              )}
-              {compactRelics.length > 0 && (
-                <div className="mp-relics">
-                  {compactRelics.map((r, i) => (
-                    <TooltipWrap
-                      key={i}
-                      type="relic"
-                      name={r.name}
-                      relicIndex={i}
-                      data={tooltipData}
-                    >
-                      <img
-                        className="relic-icon mp-relic-icon"
-                        src={iconUrl("relics", relicStem(r.name))}
-                        alt={r.name}
-                        loading="lazy"
-                        onError={(e) => {
-                          (e.target as HTMLImageElement).style.display = "none";
-                        }}
-                      />
-                    </TooltipWrap>
-                  ))}
-                </div>
-              )}
-            </div>
-          )}
         </div>
+        {synergies.length > 0 && (
+          <div className="mp-col-synergies">
+            {synergies.map((s, i) => (
+              <TooltipWrap
+                key={i}
+                type="synergy"
+                name={s.name}
+                count={s.count}
+                data={tooltipData}
+              >
+                <div className="syn-badge mp-syn-badge">
+                  <img
+                    className="syn-icon"
+                    src={iconUrl("synergies", synIconName(s.name))}
+                    alt={s.name}
+                    loading="lazy"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).style.display = "none";
+                    }}
+                  />
+                  <span className="syn-count">{s.count}</span>
+                </div>
+              </TooltipWrap>
+            ))}
+          </div>
+        )}
+        {compactRelics.length > 0 && (
+          <div className="mp-col-relics">
+            {compactRelics.map((r, i) => (
+              <TooltipWrap
+                key={i}
+                type="relic"
+                name={r.name}
+                relicIndex={i}
+                data={tooltipData}
+              >
+                <img
+                  className="relic-icon mp-relic-icon"
+                  src={iconUrl("relics", relicStem(r.name))}
+                  alt={r.name}
+                  loading="lazy"
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).style.display = "none";
+                  }}
+                />
+              </TooltipWrap>
+            ))}
+          </div>
+        )}
         {hasContent && (
           <div className="mp-caret" aria-hidden="true">
             {isOpen ? "−" : "+"}
@@ -511,6 +517,8 @@ function MatchPlayerRow({
           relicsToShow={compactRelics}
           hasRelicTimeline={hasRelicTimeline}
           tooltipData={tooltipData}
+          hp={snap?.hp ?? null}
+          gold={snap?.total_money ?? null}
         />
       )}
     </div>
@@ -863,9 +871,9 @@ export default function GamePage({
         .mp-toggle {
           display: flex;
           align-items: center;
-          gap: 16px;
+          gap: 12px;
           width: 100%;
-          padding: 14px 24px;
+          padding: 10px 24px;
           background: transparent;
           border: none;
           color: inherit;
@@ -900,12 +908,9 @@ export default function GamePage({
           flex-shrink: 0;
         }
         .mp-info {
-          width: 160px;
+          width: 140px;
           flex-shrink: 0;
           min-width: 0;
-          display: flex;
-          flex-direction: column;
-          gap: 6px;
         }
         .mp-name-row {
           display: flex;
@@ -940,18 +945,18 @@ export default function GamePage({
           letter-spacing: 0.4px;
           font-weight: 600;
         }
-        .mp-stats {
+        .mp-col-stats {
           display: flex;
-          gap: 6px;
-          font-size: 11px;
-          color: var(--text-muted);
+          gap: 8px;
           align-items: center;
-          flex-wrap: wrap;
+          width: 90px;
+          flex-shrink: 0;
         }
         .mp-stat {
           display: inline-flex;
           align-items: baseline;
           gap: 3px;
+          font-size: 12px;
           color: var(--text-secondary);
         }
         .mp-stat-label {
@@ -966,13 +971,13 @@ export default function GamePage({
           opacity: 0.5;
         }
         .mp-hp {
-          font-size: 10px;
+          font-size: 11px;
           color: var(--text-secondary);
           letter-spacing: 0.4px;
           font-variant-numeric: tabular-nums;
         }
         .mp-gold {
-          font-size: 10px;
+          font-size: 11px;
           color: #c9a84c;
           letter-spacing: 0.4px;
           font-variant-numeric: tabular-nums;
@@ -999,12 +1004,23 @@ export default function GamePage({
         .wl-l {
           color: var(--red-bright);
         }
-        .mp-build {
+        .mp-col-lineup {
           flex: 1;
-          display: flex;
-          flex-direction: column;
-          gap: 6px;
           min-width: 0;
+        }
+        .mp-col-synergies {
+          display: flex;
+          gap: 4px;
+          flex-wrap: wrap;
+          align-items: center;
+          flex-shrink: 0;
+        }
+        .mp-col-relics {
+          display: flex;
+          gap: 4px;
+          flex-wrap: wrap;
+          align-items: center;
+          flex-shrink: 0;
         }
         .mp-lineup {
           display: flex;
@@ -1016,18 +1032,6 @@ export default function GamePage({
           width: 26px;
           height: 26px;
         }
-        .mp-syn-relics {
-          display: flex;
-          gap: 12px;
-          flex-wrap: wrap;
-          align-items: center;
-        }
-        .mp-synergies {
-          display: flex;
-          gap: 4px;
-          flex-wrap: wrap;
-          align-items: center;
-        }
         .mp-syn-badge {
           padding: 2px 5px 2px 3px;
         }
@@ -1037,12 +1041,6 @@ export default function GamePage({
         }
         .mp-syn-badge .syn-count {
           font-size: 10px;
-        }
-        .mp-relics {
-          display: flex;
-          gap: 4px;
-          flex-wrap: wrap;
-          align-items: center;
         }
         .mp-relic-icon {
           width: 22px !important;
@@ -1076,6 +1074,11 @@ export default function GamePage({
           display: flex;
           flex-direction: column;
           gap: 18px;
+        }
+        .pd-live-stats {
+          display: flex;
+          gap: 16px;
+          align-items: center;
         }
         .pd-section {
           display: flex;
@@ -1153,15 +1156,27 @@ export default function GamePage({
         @media (max-width: 720px) {
           .mp-toggle {
             flex-wrap: wrap;
-            padding: 14px 20px;
+            padding: 10px 16px;
+            gap: 8px;
           }
           .mp-info {
             width: auto;
             flex: 1;
           }
-          .mp-build {
+          .mp-col-stats {
+            width: auto;
+          }
+          .mp-col-lineup {
             flex-basis: 100%;
-            margin-left: 52px;
+            order: 10;
+          }
+          .mp-col-synergies {
+            flex-basis: 100%;
+            order: 11;
+          }
+          .mp-col-relics {
+            flex-basis: 100%;
+            order: 12;
           }
           .mp-caret {
             margin-left: auto;
