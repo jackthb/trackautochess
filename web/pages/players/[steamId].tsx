@@ -22,6 +22,7 @@ import {
 import { isAdminSteamId } from "@/lib/admin";
 import { analyticsRoute, bucketCount, trackEvent } from "@/lib/analytics";
 import { resolveIconUrl } from "@/lib/icons";
+import { gamePath } from "@/lib/gameIds";
 import { fetchAndCacheDrodo } from "@/lib/drodo";
 import {
   fetchSteamProfile,
@@ -880,11 +881,11 @@ export default function PlayerPage({
                       className="game-row-link"
                       role="link"
                       tabIndex={0}
-                      onClick={() => router.push(`/games/${g.id}`)}
+                      onClick={() => router.push(gamePath(g.id))}
                       onKeyDown={(e) => {
                         if (e.key === "Enter" || e.key === " ") {
                           e.preventDefault();
-                          router.push(`/games/${g.id}`);
+                          router.push(gamePath(g.id));
                         }
                       }}
                     >
@@ -892,7 +893,7 @@ export default function PlayerPage({
                         game={g}
                         unitCosts={UNIT_COSTS}
                         iconUrl={resolveIconUrl}
-                        shareUrl={`/games/${g.id}`}
+                        shareUrl={gamePath(g.id)}
                         style={{ cursor: "pointer" }}
                       />
                     </div>

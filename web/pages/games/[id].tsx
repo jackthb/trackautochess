@@ -31,6 +31,7 @@ import { SeoHead } from "@/lib/seo";
 import { absoluteUrl, getRequestSiteUrl } from "@/lib/site";
 import { analyticsRoute, bucketCount, trackEvent } from "@/lib/analytics";
 import { resolveIconUrl } from "@/lib/icons";
+import { encodeGameId, decodeGameId } from "@/lib/gameIds";
 
 const UNIT_COSTS: Record<string, number> = {};
 for (const [name, info] of Object.entries(unitsData.units)) {
@@ -1326,13 +1327,23 @@ function parseRelicHistory(
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const rawId = context.params?.id;
   if (typeof rawId !== "string") return { notFound: true };
-  const id = rawId;
   const highlightUserId = (context.query.player as string) || null;
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
   const baseUrl = getRequestSiteUrl(context.req.headers);
 
   if (!url || !key) return { notFound: true };
+
+  // Resolve the game ID — accept both numeric IDs and encoded slugs.
+  let numericId: string | null = null;
+  if (/^\d+$/.test(rawId)) {
+    numericId = rawId;
+  } else {
+    const decoded = decodeGameId(rawId);
+    if (decoded != null) numericId = String(decoded);
+  }
+  if (!numericId) return { notFound: true };
+  const id = numericId;
 
   const supabase = createClient(url, key);
   const { data } = await supabase
@@ -1463,10 +1474,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       highlightUserId,
       highlightName,
       canonicalUrl: absoluteUrl(`/games/${id}`, baseUrl),
-      ogImageUrl: absoluteUrl(
-        `/api/og/game/${id}${highlightUserId ? `?player=${highlightUserId}` : ""}`,
-        baseUrl
-      ),
+      ogImageUrl: absoluteUrl(`/api/og/game/${id}`, baseUrl),
     },
   };
 };

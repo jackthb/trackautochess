@@ -5,6 +5,7 @@ import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { parseLineup, mmrLevelToRank } from "@dac/shared/game-utils";
 import { fetchSteamProfile } from "@/lib/steam";
+import { decodeGameId } from "@/lib/gameIds";
 import unitsData from "@data/units.json";
 
 const UNIT_COSTS: Record<string, number> = {};
@@ -66,29 +67,24 @@ async function ogHandler(req: NextApiRequest, res: NextApiResponse) {
     auth: { autoRefreshToken: false, persistSession: false },
   });
 
-  const { data: baseGame } = await supabase
+  // Accept both numeric IDs and encoded slugs.
+  let numericId: string | null = null;
+  if (/^\d+$/.test(rawId)) {
+    numericId = rawId;
+  } else {
+    const decoded = decodeGameId(rawId);
+    if (decoded != null) numericId = String(decoded);
+  }
+  if (!numericId) return res.status(400).send("Invalid game id");
+
+  const { data: game } = await supabase
     .from("games")
     .select("*, user_id::text")
-    .eq("id", rawId)
+    .eq("id", numericId)
     .single();
 
-  if (!baseGame) {
+  if (!game) {
     return res.status(404).send("Game not found");
-  }
-
-  // ?player=<steamId> renders that player's row instead of the default.
-  const playerParam = Array.isArray(req.query.player)
-    ? req.query.player[0]
-    : req.query.player;
-  let game = baseGame;
-  if (playerParam && baseGame.match_id) {
-    const { data: playerGame } = await supabase
-      .from("games")
-      .select("*, user_id::text")
-      .eq("match_id", baseGame.match_id)
-      .eq("user_id", playerParam)
-      .single();
-    if (playerGame) game = playerGame;
   }
 
   const [steamProfile, fonts] = await Promise.all([
