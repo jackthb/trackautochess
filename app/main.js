@@ -48,7 +48,7 @@ for (const dir of [DAC_DIR, REPLAY_DIR, SCREENSHOT_DIR]) {
 }
 
 let mainWindow = null;
-let overlayWindow = null;
+// let overlayWindow = null;
 let widgetWindow = null;
 let notificationWindow = null;
 let tray = null;
@@ -57,7 +57,7 @@ let pythonRL = null;
 const labResolvers = new Map();
 let nextLabReqId = 1;
 function nextReqId() { return `lab-${nextLabReqId++}-${Date.now()}`; }
-let overlayTimeout = null;
+// let overlayTimeout = null;
 let dotaPollInterval = null;
 let dotaOpen = false;
 let notificationReady = false;
@@ -267,9 +267,10 @@ function handlePythonEvent(msg) {
       trackerStatus = { ...trackerStatus, ...msg };
       break;
 
-    case "sentinel_match":
-      showOverlay();
-      break;
+    // PARKED — old CV capture overlay. Nettable capture handles game-end now.
+    // case "sentinel_match":
+    //   showOverlay();
+    //   break;
 
     case "notification":
       enqueueNotification(msg.title, msg.message);
@@ -460,8 +461,8 @@ function createNotificationWindow() {
   });
 }
 
-// ── Overlay window ───────────────────────────────────────────────────────────
-
+// ── Overlay window (PARKED — old CV capture flow) ────────────────────────────
+/*
 function showOverlay() {
   if (overlayWindow && !overlayWindow.isDestroyed()) {
     overlayWindow.close();
@@ -470,7 +471,6 @@ function showOverlay() {
   const primaryDisplay = screen.getPrimaryDisplay();
   const { width: screenW, height: screenH } = primaryDisplay.size;
 
-  // Position near Match History icon
   const ICON_X = 0.087;
   const ICON_Y = 0.027;
   const iconPx = Math.round(ICON_X * screenW);
@@ -501,7 +501,6 @@ function showOverlay() {
   overlayWindow.loadFile(path.join(__dirname, "overlay.html"));
   overlayWindow.setAlwaysOnTop(true, "screen-saver");
 
-  // Auto-dismiss after 120s
   if (overlayTimeout) clearTimeout(overlayTimeout);
   overlayTimeout = setTimeout(() => {
     if (overlayWindow && !overlayWindow.isDestroyed()) {
@@ -526,8 +525,6 @@ function dismissOverlay() {
   }
 }
 
-// ── Overlay IPC ──────────────────────────────────────────────────────────────
-
 ipcMain.on("overlay:capture", () => {
   dismissOverlay();
   sendToPython({ cmd: "capture" });
@@ -536,6 +533,7 @@ ipcMain.on("overlay:capture", () => {
 ipcMain.on("overlay:dismiss", () => {
   dismissOverlay();
 });
+*/
 
 // ── Dota 2 process detection ─────────────────────────────────────────────────
 

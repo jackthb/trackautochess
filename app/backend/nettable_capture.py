@@ -1004,6 +1004,8 @@ DUMP_STABILISE_SEC = 2.0
 POST_GAME_PAUSE_BURST_COUNT = 3
 POST_GAME_PAUSE_BURST_GAP_SEC = 0.4
 
+END_BOARD_FALLBACK_TIMEOUT_SEC = 45.0
+
 # How often to poll the log file when no data is arriving.
 POLL_IDLE_SEC = 0.5
 
@@ -1061,6 +1063,9 @@ class NetTableCapture:
         # Both reset on the GAME_IN_PROGRESS transition.
         self._prev_personal_death_team: int | None = None
         self._personal_end_recorded: bool = False
+
+        self._post_game_at: float | None = None
+        self._end_board_captured: bool = False
 
         # Last seen round number from game_info → round_info → round.
         # Updated on every ingest; change → emit nettable_round_changed.
@@ -1373,6 +1378,7 @@ class NetTableCapture:
         line = self._file.readline()
         if not line:
             self._maybe_finalize_dump()
+            self._check_end_board_fallback()
             time.sleep(POLL_IDLE_SEC)
             return
 
@@ -1420,10 +1426,10 @@ class NetTableCapture:
             if self._match_session_start is None:
                 self._match_session_start = time.time()
                 log.info("nettable: GAME_IN_PROGRESS — match session opened")
-                # Fresh match → re-arm personal-end detection so the next
-                # 0→1 death_team transition snapshots again.
                 self._prev_personal_death_team = None
                 self._personal_end_recorded = False
+                self._post_game_at = None
+                self._end_board_captured = False
 
         # Game state — POST_GAME tells us a match ended. Fire PAUSE
         # immediately via SendInput so dac_table.end_board is captured
@@ -1448,13 +1454,13 @@ class NetTableCapture:
                     "message": "Match ended — capturing end_board.",
                     "at": datetime.now().isoformat(),
                 })
-                # Fire PAUSE three times spaced ~250ms to ride out
-                # transient foreground loss (alt-tab can be split-second).
                 threading.Thread(
                     target=self._fire_post_game_pause_burst,
                     daemon=True,
                     name="nettable-postgame-pause",
                 ).start()
+                self._post_game_at = time.time()
+                self._end_board_captured = False
 
         if STRINGTABLE_MARKER in line:
             self._note_dump_line(line)
@@ -1469,6 +1475,135 @@ class NetTableCapture:
             send_input_key(VK_PAUSE)
             log.info("nettable: post-game PAUSE fire %d/%d", i + 1, POST_GAME_PAUSE_BURST_COUNT)
             self._stop.wait(POST_GAME_PAUSE_BURST_GAP_SEC)
+
+    def _check_end_board_fallback(self) -> None:
+        if self._post_game_at is None:
+            return
+        if self._end_board_captured:
+            return
+        if time.time() - self._post_game_at < END_BOARD_FALLBACK_TIMEOUT_SEC:
+            return
+
+        log.warning(
+            "nettable: end_board not captured %.0fs after POST_GAME — building match from last dump",
+            time.time() - self._post_game_at,
+        )
+        self._end_board_captured = True
+        self._post_game_at = None
+
+        threading.Thread(
+            target=self._build_match_from_dump,
+            daemon=True,
+            name="nettable-fallback-match",
+        ).start()
+
+    def _build_match_from_dump(self) -> None:
+        try:
+            from utils import LOCAL_DUMPS_DIR
+
+            if not LOCAL_DUMPS_DIR.exists():
+                log.warning("nettable: fallback — no dumps directory")
+                return
+            candidates = sorted(
+                LOCAL_DUMPS_DIR.glob("*.json"),
+                key=lambda p: p.stat().st_mtime,
+                reverse=True,
+            )
+            if not candidates:
+                log.warning("nettable: fallback — no dump files found")
+                return
+
+            dump_path = candidates[0]
+            try:
+                doc = json.loads(dump_path.read_text(encoding="utf-8"))
+            except (OSError, ValueError) as e:
+                log.warning("nettable: fallback — failed to read %s: %s", dump_path.name, e)
+                return
+
+            rows = doc.get("rows") or []
+            if not rows:
+                log.warning("nettable: fallback — dump %s has no rows", dump_path.name)
+                return
+
+            pit_data: dict[str, dict] = {}
+            for r in rows:
+                if r.get("table_name", "").endswith("player_info_table") \
+                        and r.get("key") == "player_info":
+                    raw = r.get("raw")
+                    if isinstance(raw, dict):
+                        d = raw.get("data")
+                        if isinstance(d, dict):
+                            for sid, p in d.items():
+                                if isinstance(p, dict):
+                                    pit_data[str(sid)] = dict(p)
+                    break
+
+            dac_info: dict[str, dict] = {}
+            for r in rows:
+                if r.get("table_name", "").endswith("dac_table") \
+                        and r.get("key") == "player_info":
+                    raw = r.get("raw")
+                    if isinstance(raw, dict):
+                        info = raw.get("info")
+                        if isinstance(info, dict):
+                            for sid, p in info.items():
+                                if isinstance(p, dict):
+                                    dac_info[str(sid)] = dict(p)
+                    break
+
+            all_sids = set(pit_data.keys()) | set(dac_info.keys())
+            if not all_sids:
+                log.warning("nettable: fallback — no player data in dump %s", dump_path.name)
+                return
+
+            merged: dict[str, dict] = {}
+            for sid in all_sids:
+                base = dac_info.get(sid, {})
+                overlay = pit_data.get(sid, {})
+                combined = {**base, **overlay}
+                if "hp" in base and base["hp"] not in (None, 100):
+                    combined["hp"] = base["hp"]
+                if "curr_rank" in base and base.get("curr_rank"):
+                    combined["curr_rank"] = base["curr_rank"]
+                merged[sid] = combined
+
+            pseudo_end_board = {"data": merged}
+
+            from db import generate_live_match_id
+            match_id = generate_live_match_id(pseudo_end_board)
+
+            if match_id in {h[:16] for h in self._saved_end_board_hashes}:
+                log.info("nettable: fallback — match %s already saved", match_id)
+                return
+
+            played_at = datetime.now().isoformat()
+            extracted = self._extract_structured_match(pseudo_end_board, played_at, match_id)
+
+            if extracted is not None:
+                match_record, player_rows = extracted
+                self._upload_match_to_supabase(match_record, player_rows)
+                log.info(
+                    "nettable: fallback match saved — match_id=%s players=%d",
+                    match_id, len(player_rows),
+                )
+            else:
+                log.warning("nettable: fallback — _extract_structured_match returned None")
+                return
+
+            self._emit({
+                "type": "nettable_end_board_saved",
+                "path": str(dump_path),
+                "at": played_at,
+                "fallback": True,
+            })
+            self._emit({
+                "type": "nettable_notification",
+                "message": "Match saved (fallback)",
+                "detail": "end_board was not captured — match reconstructed from last dump data.",
+                "at": played_at,
+            })
+        except Exception as e:
+            log.warning("nettable: fallback match build failed: %s", e, exc_info=True)
 
     def _note_dump_line(self, line: str) -> None:
         idx = line.find("table ")
@@ -1680,8 +1815,12 @@ class NetTableCapture:
             ).hexdigest()
             if payload_hash in self._saved_end_board_hashes:
                 log.info("nettable: end_board already saved this session — skipping duplicate")
+                self._end_board_captured = True
+                self._post_game_at = None
                 return
             self._saved_end_board_hashes.add(payload_hash)
+            self._end_board_captured = True
+            self._post_game_at = None
 
             raw_payload = json.dumps({
                 "saved_at": saved_at,

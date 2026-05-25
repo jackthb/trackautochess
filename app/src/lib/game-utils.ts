@@ -15,6 +15,7 @@ export {
   RANK_TIERS,
   NUMBERED_RANK_TIERS,
   mmrToRank,
+  mmrLevelToRank,
   formatSize,
   formatDate,
 } from "../../../shared/game-utils";

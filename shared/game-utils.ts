@@ -157,6 +157,11 @@ export const RANK_BRACKETS = [
 export const RANK_TIERS = ["Pawn", "Knight", "Bishop", "Rook", "King", "Queen"] as const;
 export const NUMBERED_RANK_TIERS = ["Pawn", "Knight", "Bishop", "Rook"] as const;
 
+export function mmrLevelToRank(level: number | null | undefined): string {
+  if (level == null || level < 1 || level > RANK_BRACKETS.length) return "";
+  return RANK_BRACKETS[level - 1].rank.replace("-", " ");
+}
+
 export function mmrToRank(mmr: number | null | undefined): string {
   if (mmr == null || !Number.isFinite(mmr)) return "";
   let rank: string = RANK_BRACKETS[0].rank;

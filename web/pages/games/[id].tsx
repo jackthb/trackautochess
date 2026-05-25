@@ -18,6 +18,7 @@ import {
   unitStem,
   synIconName,
   relicStem,
+  mmrLevelToRank,
 } from "@dac/shared/game-utils";
 import { TooltipWrap, type TooltipData } from "@dac/shared/Tooltip";
 import {
@@ -27,7 +28,7 @@ import {
   type SteamProfile,
 } from "../../lib/steam";
 import { SeoHead } from "@/lib/seo";
-import { absoluteUrl, getRequestSiteUrl, SITE_TITLE } from "@/lib/site";
+import { absoluteUrl, getRequestSiteUrl } from "@/lib/site";
 import { analyticsRoute, bucketCount, trackEvent } from "@/lib/analytics";
 import { resolveIconUrl } from "@/lib/icons";
 
@@ -62,12 +63,12 @@ interface TimelinePlayerSnap {
   hp?: number;
   level?: number;
   placement?: number;
-  /** Display-format lineup string ("Broodmother(3)|Chen(3)|Warlock(2)"). */
   lineup?: string;
   lineup_value?: number;
   total_money?: number;
   win_round?: number;
   lose_round?: number;
+  mmr_level?: number;
 }
 
 interface TimelineRound {
@@ -97,6 +98,7 @@ interface GamePageProps {
   highlightUserId: string | null;
   highlightName: string | null;
   canonicalUrl: string | null;
+  ogImageUrl: string | null;
   supabase: SupabaseClient | null;
 }
 
@@ -268,6 +270,7 @@ function MatchPlayerRow({
   onToggle,
   relicTimeline,
   snap,
+  prevSnap,
   snapRound,
   tooltipData,
 }: {
@@ -279,6 +282,8 @@ function MatchPlayerRow({
   relicTimeline: RelicTimelineEntry[] | undefined;
   /** Per-round snapshot for this player. null when no timeline / not in this round. */
   snap: TimelinePlayerSnap | null;
+  /** Previous round's snapshot for this player, used to diff win/loss. */
+  prevSnap: TimelinePlayerSnap | null;
   /** Currently-selected round number, or null when no scrubber. */
   snapRound: number | null;
   tooltipData: TooltipData;
@@ -360,9 +365,24 @@ function MatchPlayerRow({
             )}
           </div>
           <PlayerStatsLine game={displayGame} />
+          {!displayGame.rank && snap?.mmr_level != null && snap.mmr_level > 0 && (
+            <span className="mp-rank">{mmrLevelToRank(snap.mmr_level)}</span>
+          )}
           {snap?.hp != null && (
             <div className="mp-hp">HP {snap.hp}</div>
           )}
+          {snap?.total_money != null && (
+            <div className="mp-gold">Gold {snap.total_money}</div>
+          )}
+          {snap && prevSnap && snapRound !== null && (() => {
+            const eliminated = snap.hp === 0 && (prevSnap.hp ?? 0) > 0;
+            const won = (snap.win_round ?? 0) > (prevSnap.win_round ?? 0);
+            const lost = (snap.lose_round ?? 0) > (prevSnap.lose_round ?? 0);
+            if (eliminated) return <div className="mp-round-result mp-round-out">OUT</div>;
+            if (won) return <div className="mp-round-result mp-round-w">W</div>;
+            if (lost) return <div className="mp-round-result mp-round-l">L</div>;
+            return null;
+          })()}
         </div>
         <div className="mp-build">
           {lineup.length > 0 && (
@@ -507,6 +527,7 @@ export default function GamePage({
   highlightUserId,
   highlightName,
   canonicalUrl,
+  ogImageUrl,
 }: GamePageProps) {
   const router = useRouter();
   const lineup = parseLineup(game.lineup, UNIT_COSTS);
@@ -529,7 +550,9 @@ export default function GamePage({
   const playerPath = playerProfilePath(String(game.user_id), steamProfile.customUrl);
   const playerCanonicalUrl =
     absoluteUrl(playerPath, originFromUrl(canonicalUrl)) ?? playerPath;
-  const pageTitle = `${game.placement ? `#${game.placement} | ` : ""}${displayName} | ${SITE_TITLE}`;
+  const pageTitle = game.placement
+    ? `#${game.placement} ${displayName} — DAC Match | Track Auto Chess`
+    : `${displayName} — DAC Match | Track Auto Chess`;
   const description = game.placement
     ? `${displayName} finished #${game.placement} in a Dota Auto Chess match${game.rank ? ` at ${game.rank}` : ""}.`
     : `Dota Auto Chess match details for ${displayName}.`;
@@ -647,6 +670,8 @@ export default function GamePage({
         path={`/games/${game.id}`}
         localized={false}
         canonicalUrl={canonicalUrl}
+        imageUrl={ogImageUrl}
+        imageAlt={`${displayName} placed #${game.placement} in a Dota Auto Chess match`}
         structuredData={structuredData}
       />
 
@@ -946,6 +971,28 @@ export default function GamePage({
           letter-spacing: 0.4px;
           font-variant-numeric: tabular-nums;
         }
+        .mp-gold {
+          font-size: 10px;
+          color: #c9a84c;
+          letter-spacing: 0.4px;
+          font-variant-numeric: tabular-nums;
+        }
+        .mp-round-result {
+          font-size: 10px;
+          font-weight: 700;
+          letter-spacing: 0.6px;
+        }
+        .mp-round-w {
+          color: var(--green-bright, #4ebf72);
+        }
+        .mp-round-l {
+          color: var(--red-bright, #e35d5b);
+        }
+        .mp-round-out {
+          color: var(--red-bright, #e35d5b);
+          opacity: 0.65;
+          font-size: 11px;
+        }
         .wl-w {
           color: var(--green-bright);
         }
@@ -1203,27 +1250,33 @@ export default function GamePage({
                 {playerRows.length === 1 ? "player" : "players"}
               </span>
             </div>
-            {playerRows.map((g) => (
-              <MatchPlayerRow
-                key={g.id}
-                game={g}
-                profile={
-                  matchProfiles[String(g.user_id)] ||
-                  (g.id === game.id
-                    ? steamProfile
-                    : { name: null, customUrl: null })
-                }
-                highlighted={isHighlightedRow(g)}
-                expanded={expandedIds.has(g.id)}
-                onToggle={() => toggleExpand(g.id)}
-                relicTimeline={relicTimelines[String(g.user_id)]}
-                snap={
-                  currentSnap?.players?.[String(g.user_id)] ?? null
-                }
-                snapRound={selectedRound}
-                tooltipData={tooltipData}
-              />
-            ))}
+            {playerRows.map((g) => {
+              const prevRound: TimelineRound | null = hasTimeline && selectedRoundIdx > 0
+                ? timeline!.rounds[selectedRoundIdx - 1] ?? null
+                : null;
+              return (
+                <MatchPlayerRow
+                  key={g.id}
+                  game={g}
+                  profile={
+                    matchProfiles[String(g.user_id)] ||
+                    (g.id === game.id
+                      ? steamProfile
+                      : { name: null, customUrl: null })
+                  }
+                  highlighted={isHighlightedRow(g)}
+                  expanded={expandedIds.has(g.id)}
+                  onToggle={() => toggleExpand(g.id)}
+                  relicTimeline={relicTimelines[String(g.user_id)]}
+                  snap={
+                    currentSnap?.players?.[String(g.user_id)] ?? null
+                  }
+                  prevSnap={prevRound?.players?.[String(g.user_id)] ?? null}
+                  snapRound={selectedRound}
+                  tooltipData={tooltipData}
+                />
+              );
+            })}
           </div>
         </div>
       </div>
@@ -1383,6 +1436,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       highlightUserId,
       highlightName,
       canonicalUrl: absoluteUrl(`/games/${id}`, baseUrl),
+      ogImageUrl: absoluteUrl(`/api/og/game/${id}`, baseUrl),
     },
   };
 };

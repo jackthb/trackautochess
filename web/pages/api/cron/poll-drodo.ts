@@ -2,10 +2,8 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { fetchAndCacheDrodo } from "@/lib/drodo";
 
-// Vercel cron sets Authorization: Bearer ${CRON_SECRET} when CRON_SECRET
-// is configured in env. Reject anything else so the endpoint isn't a
-// public Drodo-fetch trigger.
-const POLL_BATCH_SIZE = 10;
+const REPOLL_BATCH_SIZE = 15;
+const SEED_BATCH_SIZE = 10;
 
 interface DueUser {
   steam_id: string;
@@ -39,18 +37,31 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     .not("drodo_last_fetched_at", "is", null)
     .eq("banned", false)
     .order("next_poll_at", { ascending: true })
-    .limit(POLL_BATCH_SIZE);
+    .limit(REPOLL_BATCH_SIZE);
 
   if (queryError) {
     return res.status(500).json({ error: queryError.message });
   }
 
+  const { data: unseededUsers } = await supabase
+    .from("users")
+    .select("steam_id::text")
+    .is("drodo_last_fetched_at", null)
+    .eq("banned", false)
+    .order("created_at", { ascending: false })
+    .limit(SEED_BATCH_SIZE);
+
   const ids = ((dueUsers ?? []) as unknown as DueUser[]).map((row) =>
     String(row.steam_id)
   );
+  const seedIds = ((unseededUsers ?? []) as unknown as DueUser[])
+    .map((row) => String(row.steam_id))
+    .filter((id) => !ids.includes(id));
+
   const results: Array<{
     steam_id: string;
     outcome: "ok" | "missing" | "upstream_error";
+    seeded?: boolean;
     error?: string;
   }> = [];
 
@@ -70,8 +81,27 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
   }
 
+  for (const steamId of seedIds) {
+    const result = await fetchAndCacheDrodo(steamId, supabase, {
+      snapshotOnSuccess: true,
+      pollMode: "reset",
+    });
+    if (result.ok) {
+      results.push({ steam_id: steamId, outcome: "ok", seeded: true });
+    } else {
+      results.push({
+        steam_id: steamId,
+        outcome: result.kind,
+        seeded: true,
+        error: result.error,
+      });
+    }
+  }
+
   return res.status(200).json({
     polled: results.length,
+    repolled: ids.length,
+    seeded: seedIds.length,
     results,
   });
 }

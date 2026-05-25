@@ -3,6 +3,7 @@ import type { NetTableActivityState } from "../hooks/useNetTableEvents";
 import { NetTableSetupCard } from "./NetTableSetupCard";
 import { NetTableActivityFeed } from "./NetTableActivityFeed";
 import { NetTableStatePanel } from "./NetTableStatePanel";
+import { LiveMatchStatus } from "./LiveMatchStatus";
 
 interface NetTableHomeProps {
   status: TrackerStatus | null;
@@ -85,6 +86,8 @@ export function NetTableHome({
           </div>
         </div>
       </div>
+
+      <LiveMatchStatus state={state} />
 
       <div
         className={`nettable-home-grid ${setupComplete ? "setup-complete" : ""}`}
