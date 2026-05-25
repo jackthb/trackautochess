@@ -2,10 +2,17 @@ import satori from "satori";
 import { Resvg } from "@resvg/resvg-js";
 import type { ReactNode } from "react";
 
+interface OgFont {
+  name: string;
+  data: Buffer | ArrayBuffer;
+  weight: 100 | 200 | 300 | 400 | 500 | 600 | 700 | 800 | 900;
+  style: "normal" | "italic";
+}
+
 interface OgImageOptions {
   width?: number;
   height?: number;
-  fonts: { name: string; data: Buffer | ArrayBuffer; weight: number; style: "normal" | "italic" }[];
+  fonts: OgFont[];
 }
 
 export async function renderOgImage(
@@ -18,10 +25,7 @@ export async function renderOgImage(
   const svg = await satori(element as any, {
     width,
     height,
-    fonts: options.fonts.map((f) => ({
-      ...f,
-      data: f.data instanceof Buffer ? f.data : Buffer.from(f.data),
-    })),
+    fonts: options.fonts,
   });
 
   const resvg = new Resvg(svg, { fitTo: { mode: "width", value: width } });
