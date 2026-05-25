@@ -2,7 +2,12 @@ import { createClient } from "@supabase/supabase-js";
 import type { GetServerSideProps } from "next";
 import relicsData from "@data/relics.json";
 import type { Game, RelicInfo } from "@dac/shared/types";
-import { mmrLevelToRank } from "@dac/shared/game-utils";
+import { RANK_BRACKETS } from "@dac/shared/game-utils";
+
+function mmrLevelToRank(level: number | null | undefined): string {
+  if (level == null || level < 1 || level > RANK_BRACKETS.length) return "";
+  return RANK_BRACKETS[level - 1].rank.replace("-", " ");
+}
 import { fetchSteamProfile, type SteamProfile } from "../../lib/steam";
 import { absoluteUrl, getRequestSiteUrl } from "@/lib/site";
 import GamePage, {

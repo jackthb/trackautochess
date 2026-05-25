@@ -18,8 +18,13 @@ import {
   unitStem,
   synIconName,
   relicStem,
-  mmrLevelToRank,
+  RANK_BRACKETS,
 } from "@dac/shared/game-utils";
+
+function mmrLevelToRank(level: number | null | undefined): string {
+  if (level == null || level < 1 || level > RANK_BRACKETS.length) return "";
+  return RANK_BRACKETS[level - 1].rank.replace("-", " ");
+}
 import { TooltipWrap, type TooltipData } from "@dac/shared/Tooltip";
 import {
   fetchSteamProfile,
