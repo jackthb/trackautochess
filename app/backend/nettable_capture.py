@@ -48,17 +48,13 @@ log = logging.getLogger("dac")
 # Drop static/noise rows before writing to disk or Supabase.
 # In-memory state (_last_state, live view, slot mapping) is NOT filtered.
 
-_STORAGE_DROP_TABLES = frozenset({"quest_table", "casino_table"})
+_STORAGE_DROP_TABLES = frozenset({
+    "quest_table", "casino_table", "chess_pool_table",
+})
 
 _STORAGE_DROP_KEYS: dict[str, frozenset[str]] = {
     "player_id_table": frozenset({"chessboard", "courier", "vchess", "mmr_level"}),
     "game_info": frozenset({"game_version", "quest"}),
-    "chess_pool_table": frozenset({
-        "synergy_info", "food_list", "item_list_by_mana", "item_level_list",
-        "chess_list_by_mana", "chess_list_by_mana_black", "chess_list_by_mana_special",
-        "chess_list_by_synergy", "chess_list_by_synergy_black_and_pandaman",
-        "chess_list_by_synergy_ban_unavailable", "chess_rm_class",
-    }),
 }
 
 def _storage_filter(rows: list[dict]) -> list[dict]:
