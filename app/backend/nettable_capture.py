@@ -44,6 +44,39 @@ from nettable_parser import parse_log
 log = logging.getLogger("dac")
 
 
+# ── Storage filter ────────────────────────────────────────────────────────────
+# Drop static/noise rows before writing to disk or Supabase.
+# In-memory state (_last_state, live view, slot mapping) is NOT filtered.
+
+_STORAGE_DROP_TABLES = frozenset({"quest_table", "casino_table"})
+
+_STORAGE_DROP_KEYS: dict[str, frozenset[str]] = {
+    "player_id_table": frozenset({"chessboard", "courier", "vchess", "mmr_level"}),
+    "game_info": frozenset({"game_version", "quest"}),
+    "chess_pool_table": frozenset({
+        "synergy_info", "food_list", "item_list_by_mana", "item_level_list",
+        "chess_list_by_mana", "chess_list_by_mana_black", "chess_list_by_mana_special",
+        "chess_list_by_synergy", "chess_list_by_synergy_black_and_pandaman",
+        "chess_list_by_synergy_ban_unavailable", "chess_rm_class",
+    }),
+}
+
+def _storage_filter(rows: list[dict]) -> list[dict]:
+    """Remove rows that shouldn't be persisted to disk or Supabase."""
+    out = []
+    for r in rows:
+        tbl = r.get("table_name", "")
+        short = tbl.removeprefix("CustomNetTable_")
+        if short in _STORAGE_DROP_TABLES:
+            continue
+        key = r.get("key", "")
+        prefixes = _STORAGE_DROP_KEYS.get(short)
+        if prefixes and any(key == p or key.startswith(p + "_") for p in prefixes):
+            continue
+        out.append(r)
+    return out
+
+
 # ── autoexec.cfg payload (single source of truth, written verbatim) ──────────
 
 # Static reference tables we've already snapshotted to fixtures
@@ -60,8 +93,6 @@ _DUMP_COMMANDS_INLINE = (
     "dumpstringtable CustomNetTable_game_info cl verbose;"
     "dumpstringtable CustomNetTable_chess_pool_table cl verbose;"
     "dumpstringtable CustomNetTable_unit_table cl verbose;"
-    "dumpstringtable CustomNetTable_quest_table cl verbose;"
-    "dumpstringtable CustomNetTable_casino_table cl verbose;"
     "dumpstringtable CustomNetTable_hp_bar_table cl verbose"
 )
 
@@ -2589,6 +2620,7 @@ class NetTableCapture:
             # Always snapshot the parsed dump to disk before doing anything
             # else — that way local testing has a record even if Supabase
             # is unreachable or disabled.
+            storable_rows = _storage_filter(rows)
             try:
                 LOCAL_DUMPS_DIR.mkdir(parents=True, exist_ok=True)
                 ts = datetime.now().strftime("%Y%m%d_%H%M%S_%f")
@@ -2596,9 +2628,9 @@ class NetTableCapture:
                 dump_path.write_text(json.dumps({
                     "captured_at": datetime.now().isoformat(),
                     "tables": tables,
-                    "rows": rows,
+                    "rows": storable_rows,
                 }, indent=2, ensure_ascii=False), encoding="utf-8")
-                log.info("nettable: dump saved locally: %s (%d row(s))", dump_path.name, len(rows))
+                log.info("nettable: dump saved locally: %s (%d row(s), %d filtered)", dump_path.name, len(storable_rows), len(rows) - len(storable_rows))
             except Exception as e:
                 log.warning("nettable: local dump save failed: %s", e)
 
@@ -2606,10 +2638,10 @@ class NetTableCapture:
             # the last successful capture. ranking_top alone is ~79 KB and
             # rarely changes mid-game — without this every dump uploads
             # the entire leaderboard.
-            changed_rows = [
+            changed_rows = _storage_filter([
                 r for r in rows
                 if self._last_state.get(r["table_name"], {}).get(r["key"]) != r["raw"]
-            ]
+            ])
             skipped = len(rows) - len(changed_rows)
 
             # Merge into local snapshot. Capture and ingest are independent
