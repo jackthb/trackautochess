@@ -3,7 +3,7 @@ import { ImageResponse } from "next/og";
 import { createClient } from "@supabase/supabase-js";
 import { readFile } from "node:fs/promises";
 import path from "node:path";
-import { parseLineup } from "@dac/shared/game-utils";
+import { parseLineup, mmrLevelToRank } from "@dac/shared/game-utils";
 import { fetchSteamProfile } from "@/lib/steam";
 import unitsData from "@data/units.json";
 
@@ -66,14 +66,29 @@ async function ogHandler(req: NextApiRequest, res: NextApiResponse) {
     auth: { autoRefreshToken: false, persistSession: false },
   });
 
-  const { data: game } = await supabase
+  const { data: baseGame } = await supabase
     .from("games")
     .select("*, user_id::text")
     .eq("id", rawId)
     .single();
 
-  if (!game) {
+  if (!baseGame) {
     return res.status(404).send("Game not found");
+  }
+
+  // ?player=<steamId> renders that player's row instead of the default.
+  const playerParam = Array.isArray(req.query.player)
+    ? req.query.player[0]
+    : req.query.player;
+  let game = baseGame;
+  if (playerParam && baseGame.match_id) {
+    const { data: playerGame } = await supabase
+      .from("games")
+      .select("*, user_id::text")
+      .eq("match_id", baseGame.match_id)
+      .eq("user_id", playerParam)
+      .single();
+    if (playerGame) game = playerGame;
   }
 
   const [steamProfile, fonts] = await Promise.all([
@@ -82,6 +97,19 @@ async function ogHandler(req: NextApiRequest, res: NextApiResponse) {
       : Promise.resolve({ name: null, customUrl: null }),
     fontData,
   ]);
+
+  // Backfill rank from match_players.mmr_level when games.rank is empty.
+  if (!game.rank && game.match_id && game.user_id) {
+    const { data: mp } = await supabase
+      .from("match_players")
+      .select("mmr_level")
+      .eq("match_id", game.match_id)
+      .eq("steam_id", game.user_id)
+      .maybeSingle();
+    if (mp?.mmr_level) {
+      game.rank = mmrLevelToRank(mp.mmr_level) || null;
+    }
+  }
 
   const p = parseInt(game.placement) || 0;
   const pColor = placementColorHex(p);
