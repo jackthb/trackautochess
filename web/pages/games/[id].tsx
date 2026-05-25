@@ -1348,16 +1348,16 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   // CV-captured games have no rows here — that's fine, the timeline map just
   // stays empty for those user_ids and the page falls back to games.relic.
   const matchPlayersPromise: Promise<
-    { steam_id: string | number; relic_history: unknown }[]
+    { steam_id: string | number; relic_history: unknown; mmr_level: number | null }[]
   > = data.match_id
     ? Promise.resolve(
         supabase
           .from("match_players")
-          .select("steam_id::text, relic_history")
+          .select("steam_id::text, relic_history, mmr_level")
           .eq("match_id", data.match_id)
       ).then(
         ({ data: rows }) =>
-          (rows as { steam_id: string | number; relic_history: unknown }[] | null) ||
+          (rows as { steam_id: string | number; relic_history: unknown; mmr_level: number | null }[] | null) ||
           []
       )
     : Promise.resolve([]);
@@ -1387,10 +1387,22 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
   const relicsMap = (relicsData as any).relics as Record<string, RelicInfo>;
   const relicTimelines: Record<string, RelicTimelineEntry[]> = {};
+  const mmrByUser: Record<string, number> = {};
   for (const mp of matchPlayers) {
     const sid = String(mp.steam_id);
     const tl = parseRelicHistory(mp.relic_history, relicsMap);
     if (tl.length > 0) relicTimelines[sid] = tl;
+    if (mp.mmr_level) mmrByUser[sid] = mp.mmr_level;
+  }
+
+  // Backfill rank from match_players.mmr_level for games that lack it.
+  for (const g of matchGames) {
+    if (!g.rank && g.user_id && mmrByUser[String(g.user_id)]) {
+      g.rank = mmrLevelToRank(mmrByUser[String(g.user_id)]) || null;
+    }
+  }
+  if (!data.rank && data.user_id && mmrByUser[String(data.user_id)]) {
+    data.rank = mmrLevelToRank(mmrByUser[String(data.user_id)]) || null;
   }
 
   const matchProfiles: Record<string, SteamProfile> = {};
