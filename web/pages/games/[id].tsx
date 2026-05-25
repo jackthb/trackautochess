@@ -1463,10 +1463,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       highlightUserId,
       highlightName,
       canonicalUrl: absoluteUrl(`/games/${id}`, baseUrl),
-      ogImageUrl: absoluteUrl(
-        `/api/og/game/${id}${highlightUserId ? `?player=${highlightUserId}` : ""}`,
-        baseUrl
-      ),
+      ogImageUrl: absoluteUrl(`/api/og/game/${id}`, baseUrl),
     },
   };
 };
