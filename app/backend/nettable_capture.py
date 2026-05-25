@@ -1009,7 +1009,7 @@ POLL_INTERVAL_SEC = 2.0
 # state snapshot.
 FULL_CASCADE_INTERVAL_SEC = 15.0
 # chess_pool_table (bans, legendaries, relic pool) on a slower cadence.
-POOL_DUMP_INTERVAL_SEC = 60.0
+POOL_DUMP_INTERVAL_SEC = 300.0
 # Gap between individual keys in the cascade. dumpstringtable produces
 # hundreds of console lines per call; firing too fast can drop output.
 CASCADE_KEY_GAP_SEC = 0.2
