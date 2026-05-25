@@ -49,7 +49,7 @@ log = logging.getLogger("dac")
 # In-memory state (_last_state, live view, slot mapping) is NOT filtered.
 
 _STORAGE_DROP_TABLES = frozenset({
-    "quest_table", "casino_table", "chess_pool_table",
+    "quest_table", "casino_table",
 })
 
 _STORAGE_DROP_KEYS: dict[str, frozenset[str]] = {
@@ -87,7 +87,6 @@ _DUMP_COMMANDS_INLINE = (
     "dumpstringtable CustomNetTable_player_id_table cl verbose;"
     "dumpstringtable CustomNetTable_player_info_table cl verbose;"
     "dumpstringtable CustomNetTable_game_info cl verbose;"
-    "dumpstringtable CustomNetTable_chess_pool_table cl verbose;"
     "dumpstringtable CustomNetTable_unit_table cl verbose;"
     "dumpstringtable CustomNetTable_hp_bar_table cl verbose"
 )
@@ -125,7 +124,7 @@ AUTOEXEC_CFG_CONTENT = f"""// DAC NetTable dump triggers — installed by DAC Tr
 //   F11   → player_info_table  ← full live per-player state
 //   F13   → unit_table         ← chess pieces on board right now
 //   F15   → player_id_table    ← MMR + candy per slot
-//   F16   → chess_pool_table   ← draft / ban / legendary state
+//   F16   → chess_pool_table   ← bans / legendaries (once per match)
 //
 // Polling key (safe to spam — extended F-key, no keyboard conflict):
 //   F20 → game_info          ← round_info + death_team
@@ -159,7 +158,6 @@ dumpstringtable CustomNetTable_dac_table cl verbose
 dumpstringtable CustomNetTable_player_id_table cl verbose
 dumpstringtable CustomNetTable_player_info_table cl verbose
 dumpstringtable CustomNetTable_game_info cl verbose
-dumpstringtable CustomNetTable_chess_pool_table cl verbose
 dumpstringtable CustomNetTable_unit_table cl verbose
 dumpstringtable CustomNetTable_quest_table cl verbose
 dumpstringtable CustomNetTable_casino_table cl verbose
@@ -1015,7 +1013,7 @@ FULL_CASCADE_INTERVAL_SEC = 15.0
 CASCADE_KEY_GAP_SEC = 0.2
 
 # The keys the cascade fires, in order. Mirrors the autoexec binds.
-CASCADE_VK_SEQUENCE = (VK_PAUSE, VK_F11, VK_F13, VK_F15, VK_F16, VK_F20)
+CASCADE_VK_SEQUENCE = (VK_PAUSE, VK_F11, VK_F13, VK_F15, VK_F20)
 
 # Wait this long after POST_GAME before sending dump-key again. The `end_board`
 # table is populated server-side at POST_GAME entry; small buffer for the
@@ -1457,6 +1455,13 @@ class NetTableCapture:
                 self._personal_end_recorded = False
                 self._post_game_at = None
                 self._end_board_captured = False
+                # One-shot: capture chess_pool_table (bans, legendaries,
+                # relic pool) once at match start.
+                try:
+                    send_input_key(VK_F16)
+                    log.info("nettable: fired F16 (chess_pool_table one-shot)")
+                except Exception as e:
+                    log.warning("nettable: F16 one-shot failed: %s", e)
 
         # Game state — POST_GAME tells us a match ended. Fire PAUSE
         # immediately via SendInput so dac_table.end_board is captured
