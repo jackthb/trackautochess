@@ -525,6 +525,8 @@ function MatchPlayerRow({
   );
 }
 
+export { type GamePageProps, type MatchTimeline, type RelicTimelineEntry };
+
 export default function GamePage({
   game,
   steamProfile,
@@ -1302,7 +1304,7 @@ export default function GamePage({
 /** Convert the raw match_players.relic_history jsonb into a sorted timeline.
  *  Input shape (dict): {"1": {relic: "item_x", round: 11}, "2": {...}, …}
  *  Or array: [{relic, round}, …]. Maps internal item_* ids → display names. */
-function parseRelicHistory(
+export function parseRelicHistory(
   raw: unknown,
   relicsData: Record<string, RelicInfo>
 ): RelicTimelineEntry[] {

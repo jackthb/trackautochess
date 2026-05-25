@@ -103,6 +103,7 @@ interface PlayerPageProps {
   ogImageUrl: string | null;
   canonicalUrl: string | null;
   banned: boolean;
+  mpIdByMatch: Record<string, number>;
 }
 
 function formatLastFetchedTimestamp(value: string | null): string {
@@ -201,6 +202,7 @@ export default function PlayerPage({
   ogImageUrl,
   canonicalUrl,
   banned: initialBanned,
+  mpIdByMatch,
 }: PlayerPageProps) {
   const router = useRouter();
   const [drodo, setDrodo] = useState(initialDrodo);
@@ -874,30 +876,34 @@ export default function PlayerPage({
                   <div className="th">Relic</div>
                   <div className="th">Date</div>
                 </div>
-                {games.map((g) => (
-                  <div key={g.id} className="game-entry">
-                    <div
-                      className="game-row-link"
-                      role="link"
-                      tabIndex={0}
-                      onClick={() => router.push(`/games/${g.id}`)}
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter" || e.key === " ") {
-                          e.preventDefault();
-                          router.push(`/games/${g.id}`);
-                        }
-                      }}
-                    >
-                      <GameRowDisplay
-                        game={g}
-                        unitCosts={UNIT_COSTS}
-                        iconUrl={resolveIconUrl}
-                        shareUrl={`/games/${g.id}`}
-                        style={{ cursor: "pointer" }}
-                      />
+                {games.map((g) => {
+                  const mpId = g.match_id ? mpIdByMatch[g.match_id] : undefined;
+                  const href = mpId ? `/matches/${mpId}` : `/games/${g.id}`;
+                  return (
+                    <div key={g.id} className="game-entry">
+                      <div
+                        className="game-row-link"
+                        role="link"
+                        tabIndex={0}
+                        onClick={() => router.push(href)}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter" || e.key === " ") {
+                            e.preventDefault();
+                            router.push(href);
+                          }
+                        }}
+                      >
+                        <GameRowDisplay
+                          game={g}
+                          unitCosts={UNIT_COSTS}
+                          iconUrl={resolveIconUrl}
+                          shareUrl={href}
+                          style={{ cursor: "pointer" }}
+                        />
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </>
           )}
@@ -1114,10 +1120,26 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         )
       : Promise.resolve(null);
 
-  const [gamesResult, leaderboardPosition] = await Promise.all([
+  const mpIdsPromise = supabase
+    ? supabase
+        .from("match_players")
+        .select("id, match_id")
+        .eq("steam_id", steamId)
+        .order("id", { ascending: false })
+        .limit(100)
+    : Promise.resolve({ data: [] as { id: number; match_id: string }[] });
+
+  const [gamesResult, leaderboardPosition, mpIdsResult] = await Promise.all([
     gamesPromise,
     leaderboardPromise,
+    mpIdsPromise,
   ]);
+
+  // Map match_id → match_players.id so game rows can link to /matches/<id>.
+  const mpIdByMatch: Record<string, number> = {};
+  for (const row of (mpIdsResult.data || []) as { id: number; match_id: string }[]) {
+    mpIdByMatch[row.match_id] = row.id;
+  }
 
   if (
     steamProfile.customUrl &&
@@ -1157,6 +1179,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         baseUrl
       ),
       banned,
+      mpIdByMatch,
     },
   };
 };
