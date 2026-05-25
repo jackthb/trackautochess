@@ -1008,11 +1008,14 @@ POLL_INTERVAL_SEC = 2.0
 # unit + player_id + chess_pool + game_info). Heavier — gives a complete
 # state snapshot.
 FULL_CASCADE_INTERVAL_SEC = 15.0
+# chess_pool_table (bans, legendaries, relic pool) on a slower cadence.
+POOL_DUMP_INTERVAL_SEC = 60.0
 # Gap between individual keys in the cascade. dumpstringtable produces
 # hundreds of console lines per call; firing too fast can drop output.
 CASCADE_KEY_GAP_SEC = 0.2
 
 # The keys the cascade fires, in order. Mirrors the autoexec binds.
+# F16 (chess_pool_table) runs on its own timer, not in the cascade.
 CASCADE_VK_SEQUENCE = (VK_PAUSE, VK_F11, VK_F13, VK_F15, VK_F20)
 
 # Wait this long after POST_GAME before sending dump-key again. The `end_board`
@@ -1164,6 +1167,7 @@ class NetTableCapture:
         which is disruptive (PAUSE opens the menu) and crashing (Source 2
         crashes at post-game when the table doesn't exist) in regular Dota."""
         last_full_cascade = 0.0
+        last_pool_dump = 0.0
         while not self._stop.is_set():
             now = time.time()
             try:
@@ -1178,6 +1182,11 @@ class NetTableCapture:
                     else:
                         # Cheap poll — just F20 (game_info → round_info).
                         send_input_key(VK_F20)
+                    # chess_pool_table on its own slow timer — bans update
+                    # each round but don't need 15s polling.
+                    if now - last_pool_dump >= POOL_DUMP_INTERVAL_SEC:
+                        last_pool_dump = now
+                        send_input_key(VK_F16)
             except Exception as e:
                 log.warning("nettable: key poller iteration failed: %s", e)
             # Sleep till next poll tick.
@@ -1455,13 +1464,6 @@ class NetTableCapture:
                 self._personal_end_recorded = False
                 self._post_game_at = None
                 self._end_board_captured = False
-                # One-shot: capture chess_pool_table (bans, legendaries,
-                # relic pool) once at match start.
-                try:
-                    send_input_key(VK_F16)
-                    log.info("nettable: fired F16 (chess_pool_table one-shot)")
-                except Exception as e:
-                    log.warning("nettable: F16 one-shot failed: %s", e)
 
         # Game state — POST_GAME tells us a match ended. Fire PAUSE
         # immediately via SendInput so dac_table.end_board is captured
