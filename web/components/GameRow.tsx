@@ -13,7 +13,6 @@ import {
 } from "@dac/shared/game-utils";
 import { GameRowDisplay } from "@dac/shared/GameRowDisplay";
 import { resolveIconUrl } from "@/lib/icons";
-import { gamePath } from "@/lib/gameIds";
 
 interface GameRowProps {
   game: Game;
@@ -388,7 +387,7 @@ export function GameRow({
           dateExtra={
             <a
               className="btn-share"
-              href={gamePath(game.id)}
+              href={`/games/${game.id}`}
               target="_blank"
               rel="noopener noreferrer"
               title="Open share page"
