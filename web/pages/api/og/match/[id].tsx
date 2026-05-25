@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { ImageResponse } from "@vercel/og";
+import { ImageResponse } from "next/og";
 import { createClient } from "@supabase/supabase-js";
 import { readFile } from "node:fs/promises";
 import path from "node:path";
@@ -346,7 +346,7 @@ async function ogHandler(req: NextApiRequest, res: NextApiResponse) {
     }
   );
 
-  const body = Buffer.from(await (image as unknown as Response).arrayBuffer());
+  const body = Buffer.from(await image.arrayBuffer());
   res.setHeader("Content-Type", "image/png");
   res.setHeader(
     "Cache-Control",

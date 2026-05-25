@@ -5,7 +5,6 @@ import path from "path";
 const nextConfig: NextConfig = {
   reactStrictMode: true,
   transpilePackages: ["@dac/shared"],
-  serverExternalPackages: ["@vercel/og"],
   turbopack: {
     root: path.resolve(__dirname, ".."),
   },
