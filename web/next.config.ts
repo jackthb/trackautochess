@@ -7,7 +7,11 @@ const nextConfig: NextConfig = {
   transpilePackages: ["@dac/shared"],
   turbopack: {
     root: path.resolve(__dirname, ".."),
+    resolveAlias: {
+      "@vercel/og": require.resolve("@vercel/og"),
+    },
   },
+  serverExternalPackages: ["@vercel/og"],
   i18n: {
     locales: ["en", "ru", "zh"],
     defaultLocale: "en",
