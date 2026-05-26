@@ -1363,29 +1363,22 @@ function mpRowToGame(
     match_id: (mp.match_id as string) ?? "",
     user_id: steamId,
     placement: mp.placement != null ? String(mp.placement) : "",
-    mmr_level: mmrLevel,
-    hero_level: heroLevel,
-    chess_lineup: (mp.chess_lineup as string) ?? null,
-    synergies: (mp.synergies as string) ?? null,
-    relic: (mp.relic as string) ?? null,
-    relic_history: mp.relic_history ?? null,
-    talents: (mp.talents as string) ?? null,
-    win_round: winRound,
-    lose_round: loseRound,
-    screenshot: (mp.screenshot as string) ?? null,
-    notes: (mp.notes as string) ?? null,
-    replay: (mp.replay as string) ?? null,
-    played_at: played,
-    created_at: (mp.created_at as string) ?? "",
-    // Legacy aliases for rendering code
     lineup: (mp.chess_lineup as string) ?? null,
+    synergies: (mp.synergies as string) ?? null,
+    talents: (mp.talents as string) ?? null,
+    relic: (mp.relic as string) ?? null,
     level: heroLevel != null ? String(heroLevel) : null,
     rank: mmrLevel ? mmrLevelToRank(mmrLevel) : null,
     rank_change: null,
     wins: winRound,
     losses: loseRound,
     wl: null,
-  } as Game;
+    screenshot: (mp.screenshot as string) ?? null,
+    notes: (mp.notes as string) ?? null,
+    replay: (mp.replay as string) ?? null,
+    played_at: played,
+    created_at: (mp.created_at as string) ?? "",
+  };
 }
 
 export const getServerSideProps: GetServerSideProps = async (context) => {
