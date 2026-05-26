@@ -87,58 +87,33 @@ _DUMP_COMMANDS_INLINE = (
     "dumpstringtable CustomNetTable_player_id_table cl verbose;"
     "dumpstringtable CustomNetTable_player_info_table cl verbose;"
     "dumpstringtable CustomNetTable_game_info cl verbose;"
-    "dumpstringtable CustomNetTable_unit_table cl verbose;"
     "dumpstringtable CustomNetTable_hp_bar_table cl verbose"
 )
 
 AUTOEXEC_CFG_CONTENT = f"""// DAC NetTable dump triggers — installed by DAC Tracker.
 //
-// Source 2's bind dispatcher drops chained `dumpstringtable` calls
-// because they fire too fast for the console output pipeline — only
-// the first one in a chain actually runs (observed empirically:
-// PAUSE was producing only ranking_top_table). So we bind ONE table
-// per key. Each press fires a single command, fully processed.
+// All binds use extended F-keys (F21–F25) to avoid conflicting with
+// any real keyboard shortcuts. Source 2 supports up to F24 natively;
+// F25 works via SendInput VK code.
 //
-// Press the key you want; the backend tailer ingests whatever lands.
-// `dac_table` (INS) is the critical one — it carries `end_board` at
-// match end.
+// One table per key — Source 2 drops chained dumpstringtable calls.
 //
-// F-keys mapped per table. Single command per key — chained
-// dumpstringtable in one bind silently drops everything after the
-// first (Valve disabled multi-command binds).
+// Cascade keys (fired automatically by the tracker):
+//   F21 → dac_table            ← end_board at match end (critical)
+//   F22 → player_info_table    ← live per-player state (every 15s)
+//   F23 → game_info            ← round_info + death_team (every 2s)
+//   F24 → player_id_table      ← steam_id → slot mapping (once at match start)
+//   F16 → chess_pool_table     ← bans / legendaries (every 5 min)
 //
-// Excluded keys:
-//   F7  → toggleconsole (default)
-//   F8  → Dota Options reserved
-//   F9  → Dota Options reserved
-//   F12 → Steam screenshot
-//
-// Note on F10: Dota's GUI hotkey file (dotakeys_personal.lst) claims
-// F10 for SpectatorBroadcasterMenu by default. The autoexec bind
-// usually wins, but on some accounts/sessions the GUI layer may
-// override. If F10 stops firing, paste `bind "F10" "..."` in console
-// (or unbind SpectatorBroadcasterMenu in Dota Settings → Hotkeys).
-//
-// Snapshot keys (press once per moment of interest):
-//   PAUSE → dac_table          ← has end_board after match
-//   F11   → player_info_table  ← full live per-player state
-//   F13   → unit_table         ← chess pieces on board right now
-//   F15   → player_id_table    ← MMR + candy per slot
-//   F16   → chess_pool_table   ← bans / legendaries (once per match)
-//
-// Polling key (safe to spam — extended F-key, no keyboard conflict):
-//   F20 → game_info          ← round_info + death_team
+// Debug key (not in cascade — manual or one-shot only):
+//   F25 → unit_table           ← chess pieces on board
 
-// F10 deliberately NOT bound — per-account user_keys.vcfg may have
-// `"F10" "<unbound>"` which overrides autoexec, making F10 unreliable
-// across users. PAUSE replaces it (consistently free, not in any
-// dotakeys_personal.lst or user_keys.vcfg override file).
-bind "PAUSE" "dumpstringtable CustomNetTable_dac_table cl verbose"
-bind "F11" "dumpstringtable CustomNetTable_player_info_table cl verbose"
-bind "F13" "dumpstringtable CustomNetTable_unit_table cl verbose"
-bind "F15" "dumpstringtable CustomNetTable_player_id_table cl verbose"
+bind "F21" "dumpstringtable CustomNetTable_dac_table cl verbose"
+bind "F22" "dumpstringtable CustomNetTable_player_info_table cl verbose"
+bind "F23" "dumpstringtable CustomNetTable_game_info cl verbose"
+bind "F24" "dumpstringtable CustomNetTable_player_id_table cl verbose"
 bind "F16" "dumpstringtable CustomNetTable_chess_pool_table cl verbose"
-bind "F20" "dumpstringtable CustomNetTable_game_info cl verbose"
+bind "F25" "dumpstringtable CustomNetTable_unit_table cl verbose"
 """
 
 DAC_DUMP_CFG_CONTENT = """// DAC NetTable dump commands — installed by DAC Tracker.
@@ -147,9 +122,6 @@ DAC_DUMP_CFG_CONTENT = """// DAC NetTable dump commands — installed by DAC Tra
 // Leading `echo DAC_DUMP_FIRED` is a diagnostic marker the tailer
 // surfaces so we can confirm the file actually executed even when
 // every table is empty.
-//
-// `match_history_tab` is intentional — Source 2 truncates stringtable
-// names at 32 chars; the real name is `_tab` (32) not `_table` (34).
 
 echo DAC_DUMP_FIRED
 dumpstringtable CustomNetTable_ranking_top_table cl verbose
@@ -158,9 +130,7 @@ dumpstringtable CustomNetTable_dac_table cl verbose
 dumpstringtable CustomNetTable_player_id_table cl verbose
 dumpstringtable CustomNetTable_player_info_table cl verbose
 dumpstringtable CustomNetTable_game_info cl verbose
-dumpstringtable CustomNetTable_unit_table cl verbose
-dumpstringtable CustomNetTable_quest_table cl verbose
-dumpstringtable CustomNetTable_casino_table cl verbose
+dumpstringtable CustomNetTable_chess_pool_table cl verbose
 dumpstringtable CustomNetTable_hp_bar_table cl verbose
 """
 
@@ -673,14 +643,11 @@ def find_dota_hwnd() -> int | None:
 WM_KEYDOWN = 0x0100
 WM_KEYUP = 0x0101
 WM_CHAR = 0x0102
-VK_PAUSE = 0x13
-VK_F8 = 0x77
-VK_INSERT = 0x2D
-VK_F11 = 0x7A
-VK_F13 = 0x7C
-VK_F15 = 0x7E
 VK_F16 = 0x7F
-VK_F20 = 0x83
+VK_F21 = 0x84  # dac_table (end_board)
+VK_F22 = 0x85  # player_info_table (live state)
+VK_F23 = 0x86  # game_info (round/death)
+VK_F24 = 0x87  # player_id_table (steam_id mapping)
 
 
 # ── SendInput-based key firing (replaces external AHK) ─────────────
@@ -861,8 +828,8 @@ def send_dump_key_to_dota() -> bool:
         log.warning("send_dump_key_to_dota: Dota window not found")
         return False
     try:
-        _post_key(hwnd, VK_INSERT)
-        log.info("Sent Pause to Dota hwnd=%s", hwnd)
+        _post_key(hwnd, VK_F21)
+        log.info("Sent F21 (dac_table dump) to Dota hwnd=%s", hwnd)
         return True
     except Exception as e:
         log.warning("send_dump_key_to_dota failed: %s", e)
@@ -1016,7 +983,7 @@ CASCADE_KEY_GAP_SEC = 0.2
 
 # The keys the cascade fires, in order. Mirrors the autoexec binds.
 # F16 (chess_pool_table) runs on its own timer, not in the cascade.
-CASCADE_VK_SEQUENCE = (VK_PAUSE, VK_F11, VK_F13, VK_F15, VK_F20)
+CASCADE_VK_SEQUENCE = (VK_F21, VK_F22, VK_F23)
 
 # Wait this long after POST_GAME before sending dump-key again. The `end_board`
 # table is populated server-side at POST_GAME entry; small buffer for the
@@ -1186,7 +1153,7 @@ class NetTableCapture:
                             time.sleep(CASCADE_KEY_GAP_SEC)
                     else:
                         # Cheap poll — just F20 (game_info → round_info).
-                        send_input_key(VK_F20)
+                        send_input_key(VK_F23)
                     # chess_pool_table on its own slow timer — bans update
                     # each round but don't need 15s polling.
                     if now - last_pool_dump >= POOL_DUMP_INTERVAL_SEC:
@@ -1427,6 +1394,8 @@ class NetTableCapture:
                 self._personal_end_recorded = False
                 self._post_game_at = None
                 self._end_board_captured = False
+                send_input_key(VK_F24)
+                log.info("nettable: fired F24 (player_id_table) at match start")
 
         # Game state — POST_GAME tells us a match ended. Fire PAUSE
         # immediately via SendInput so dac_table.end_board is captured
@@ -1469,8 +1438,8 @@ class NetTableCapture:
         for i in range(POST_GAME_PAUSE_BURST_COUNT):
             if self._stop.is_set():
                 return
-            send_input_key(VK_PAUSE)
-            log.info("nettable: post-game PAUSE fire %d/%d", i + 1, POST_GAME_PAUSE_BURST_COUNT)
+            send_input_key(VK_F21)
+            log.info("nettable: post-game F21 (dac_table) fire %d/%d", i + 1, POST_GAME_PAUSE_BURST_COUNT)
             self._stop.wait(POST_GAME_PAUSE_BURST_GAP_SEC)
 
     def _check_end_board_fallback(self) -> None:
