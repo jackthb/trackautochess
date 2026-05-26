@@ -73,7 +73,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   const { data: gamesData, error: gamesError } = await supabase
     .from("match_players")
     .select("id, steam_id::text, match_id, placement, mmr_level, chess_lineup, relic, played_at, created_at")
-    .order("played_at", { ascending: false })
+    .order("id", { ascending: false })
     .limit(GAMES_FETCH);
 
   if (gamesError) {
@@ -98,8 +98,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         return pa - pb;
       });
       const playedAt = sorted.reduce(
-        (latest, g) => (g.played_at > latest ? g.played_at : latest),
-        sorted[0].played_at
+        (latest, g) => ((g.played_at || "") > latest ? (g.played_at || "") : latest),
+        sorted[0].played_at || sorted[0].created_at || ""
       );
       return {
         matchId: key.startsWith("solo:") ? null : key,

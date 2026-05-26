@@ -631,12 +631,10 @@ function createWindow() {
     return { action: "deny" };
   });
 
-  // Intercept close: minimize to tray instead of quitting
-  mainWindow.on("close", (e) => {
-    if (!isQuitting && closeToTray) {
-      e.preventDefault();
-      mainWindow.hide();
-    }
+  // Close = quit. No tray minimization.
+  mainWindow.on("close", () => {
+    isQuitting = true;
+    app.quit();
   });
 }
 
@@ -1334,9 +1332,6 @@ app.whenReady().then(() => {
   // Remove the default menu bar (File, Edit, View, etc.)
   Menu.setApplicationMenu(null);
 
-  closeToTray = loadCloseToTray();
-
-  createTray();
   createWindow();
   createWidget();
   createNotificationWindow();
