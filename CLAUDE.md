@@ -12,13 +12,20 @@ DAC Tools is a monorepo for Dota Auto Chess game tracking and analysis. It inclu
 - React 19 + TypeScript + Vite frontend (`app/src/`)
 - Electron main process (`app/main.js`) spawns a Python backend as a subprocess
 - **IPC Protocol**: Electron ↔ Python communicate via JSON Lines over stdin/stdout (one JSON object per line)
-- Python backend (`app/backend/`) handles: screen capture (mss), computer vision parsing (OpenCV + Tesseract OCR), screen recording (PyAV), Dota window detection, Supabase sync
+- Python backend (`app/backend/`) handles: nettable capture (CustomNetTable extraction from console.log), screen recording (PyAV), Dota window detection, Supabase sync
 
 **Shared Data (`data/`)** — Single source of truth for game data (units.json, items.json, synergies.json, relics.json, icons/). Multiple modules copy from here at build time.
 
 **Web Viewer (`web/`)** — Next.js 16 app for browsing analyzed games from Supabase.
 
 **Scraper (`scraper/`)** — Node.js/Puppeteer scraper for game data.
+
+## Database
+
+- **Supabase** (PostgreSQL) with RLS policies
+- **Tables**: `matches` (one row per match), `match_players` (one row per player per match — the primary data table), `users`, `mmr_snapshots`, `match_timelines`
+- **Migrations** in `supabase/migrations/` run automatically on merge via Supabase GitHub integration — no manual migration step needed
+- The `games` table is dropped — all per-player data lives in `match_players`
 
 ## Build & Run Commands
 
@@ -39,8 +46,7 @@ pnpm run build:all        # Backend + installer
 cd app/backend
 pip install -r requirements.txt
 python headless.py              # JSON Lines daemon
-python main.py parse-cv <img>   # Test CV pipeline on a screenshot
-python main.py import-matches-cv <dir>  # Batch import
+python main.py ingest-nettable  # Manual nettable ingest from console.log
 ```
 
 ### Web Viewer
@@ -64,11 +70,12 @@ npm run scrape:items    # Items only
 
 - **Package managers**: pnpm for Node.js projects, uv for Python projects
 - **Python version**: 3.12
-- **No linter/test framework configured** — testing is manual via `app/backend/debug_*.py` utilities
-- **PyInstaller** bundles the Python backend + Tesseract + ffmpeg into a standalone Windows executable (`dac_tracker.spec`)
+- **No linter/test framework configured** — testing is manual
+- **PyInstaller** bundles the Python backend + ffmpeg into a standalone Windows executable (`dac_tracker.spec`)
 - **Release pipeline** (`.github/workflows/release.yml`): triggered on `v*` tags, builds on Windows, publishes `.exe` to GitHub Releases
+- **Auto-update**: `updater.py` checks GitHub Releases every 6h, downloads new `.exe`, self-replacing restart
 - **Runtime config**: stored in `~/.dac/config.json` (player name, hotkey, Supabase URL)
-- **Database**: Supabase (PostgreSQL) with RLS policies
+- **No local file writes**: all game data goes directly to Supabase, nothing written to `~/.dac/` except config
 
 ## Workflow
 
