@@ -33,7 +33,6 @@ const DAC_DIR = DESKTOP_PATHS.dacDir;
 const REPLAY_DIR = DESKTOP_PATHS.replayDir;
 const SCREENSHOT_DIR = DESKTOP_PATHS.screenshotDir;
 const SCREENSHOT_MANIFEST = DESKTOP_PATHS.screenshotManifest;
-const TRACKER_DIR = DESKTOP_PATHS.trackerDir;
 const ICONS_DIR = DESKTOP_PATHS.iconsDir;
 const ICON_FILENAME = DESKTOP_PATHS.iconFilename;
 const gotSingleInstanceLock = app.requestSingleInstanceLock();

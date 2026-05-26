@@ -21,9 +21,6 @@ export interface Game {
   created_at: string;
 }
 
-/** @deprecated Use Game instead — the table is flat, not split. */
-export type PlayerGame = Game;
-
 export interface Replay {
   name: string;
   path: string;

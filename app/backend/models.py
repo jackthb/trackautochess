@@ -1,13 +1,6 @@
 """Data models for the DAC tracker."""
 
 from dataclasses import dataclass
-from enum import Enum
-
-
-class RankChange(str, Enum):
-    UP = "up"
-    DOWN = "down"
-    NONE = "none"
 
 
 @dataclass

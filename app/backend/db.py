@@ -558,32 +558,3 @@ def upload_screenshot(img, user_id: str) -> str | None:
     except Exception as e:
         log.error("upload_screenshot error: %s", e)
         return None
-
-
-def fetch_games(user_id: str, limit: int = 20) -> list[dict] | None:
-    """Fetch recent games for a user.
-
-    Returns list of game dicts on success, None on error.
-    """
-    client = _get_client()
-    if client is None:
-        return None
-
-    try:
-        resp = client.get(
-            "/rest/v1/games",
-            params={
-                "user_id": f"eq.{user_id}",
-                "select": "*",
-                "order": "played_at.desc",
-                "limit": str(limit),
-            },
-            headers={"Accept": "application/json"},
-        )
-        resp.raise_for_status()
-        games = resp.json()
-        log.debug("fetched %d game(s) for user %s", len(games), user_id)
-        return games
-    except Exception as e:
-        log.error("fetch_games error: %s", e)
-        return None
