@@ -35,15 +35,14 @@ function extractPlayers(state: NetTableState): {
     | Record<string, unknown>
     | undefined;
 
-  const rawData = (pit as { raw?: { data?: Record<string, unknown> } })?.raw
-    ?.data as Record<string, Record<string, unknown>> | undefined;
-  const rawInfo = (dat as { raw?: { info?: Record<string, unknown> } })?.raw
-    ?.info as Record<string, Record<string, unknown>> | undefined;
+  const piObj = pit as Record<string, unknown> | undefined;
+  const rawData = (piObj?.data ?? (piObj as { raw?: { data?: unknown } })?.raw?.data) as Record<string, Record<string, unknown>> | undefined;
+  const datObj = dat as Record<string, unknown> | undefined;
+  const rawInfo = (datObj?.info ?? (datObj as { raw?: { info?: unknown } })?.raw?.info) as Record<string, Record<string, unknown>> | undefined;
 
-  if (!rawData) return null;
+  if (!rawData || Object.keys(rawData).length === 0) return null;
 
   const steamIds = Object.keys(rawData);
-  if (steamIds.length === 0) return null;
 
   let maxRound = 0;
   const players: PlayerRow[] = [];

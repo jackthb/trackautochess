@@ -92,11 +92,8 @@ _DUMP_COMMANDS_INLINE = (
 
 AUTOEXEC_CFG_CONTENT = f"""// DAC NetTable dump triggers — installed by DAC Tracker.
 //
-// All binds use extended F-keys (F21–F25) to avoid conflicting with
-// any real keyboard shortcuts. Source 2 supports up to F24 natively;
-// F25 works via SendInput VK code.
-//
-// One table per key — Source 2 drops chained dumpstringtable calls.
+// All binds use extended F-keys (F21-F25) to avoid conflicting with
+// user keyboard shortcuts. One table per key.
 //
 // Cascade keys (fired automatically by the tracker):
 //   F21 → dac_table            ← end_board at match end (critical)
@@ -105,7 +102,7 @@ AUTOEXEC_CFG_CONTENT = f"""// DAC NetTable dump triggers — installed by DAC Tr
 //   F24 → player_id_table      ← steam_id → slot mapping (once at match start)
 //   F16 → chess_pool_table     ← bans / legendaries (every 5 min)
 //
-// Debug key (not in cascade — manual or one-shot only):
+// Debug key (not in cascade — manual only):
 //   F25 → unit_table           ← chess pieces on board
 
 bind "F21" "dumpstringtable CustomNetTable_dac_table cl verbose"
@@ -643,11 +640,11 @@ def find_dota_hwnd() -> int | None:
 WM_KEYDOWN = 0x0100
 WM_KEYUP = 0x0101
 WM_CHAR = 0x0102
-VK_F16 = 0x7F
-VK_F21 = 0x84  # dac_table (end_board)
-VK_F22 = 0x85  # player_info_table (live state)
-VK_F23 = 0x86  # game_info (round/death)
-VK_F24 = 0x87  # player_id_table (steam_id mapping)
+VK_F16 = 0x7F     # chess_pool_table
+VK_F21 = 0x84     # dac_table (end_board)
+VK_F22 = 0x85     # player_info_table (live state)
+VK_F23 = 0x86     # game_info (round/death)
+VK_F24 = 0x87     # player_id_table (steam_id mapping)
 
 
 # ── SendInput-based key firing (replaces external AHK) ─────────────
@@ -1132,14 +1129,23 @@ class NetTableCapture:
         k.start()
 
     def _run_key_poller(self) -> None:
-        """Replaces AHK: fires F20 every 2s and the full cascade every
-        15s, but only while Dota is the foreground window AND the GSI feed
-        confirms the current match is a DAC custom game. The cascade rebinds
-        PAUSE and F11/F13/F15/F16 to `dumpstringtable CustomNetTable_*`,
-        which is disruptive (PAUSE opens the menu) and crashing (Source 2
-        crashes at post-game when the table doesn't exist) in regular Dota."""
+        """Fires F23 every 2s and the full cascade every 15s, but only while
+        Dota is the foreground window AND the GSI feed confirms a DAC game.
+        On startup, fires one immediate cascade to catch mid-game launches."""
         last_full_cascade = 0.0
         last_pool_dump = 0.0
+        # Catch-up: if Dota is already running, fire a full cascade
+        # immediately so the live view populates even when the app
+        # starts mid-game (before GSI has confirmed DAC is active).
+        if _is_dota_foreground():
+            log.info("nettable: Dota is foreground at poller start — firing catch-up cascade")
+            for vk in CASCADE_VK_SEQUENCE:
+                send_input_key(vk)
+                time.sleep(CASCADE_KEY_GAP_SEC)
+            send_input_key(VK_F24)
+            send_input_key(VK_F16)
+            last_full_cascade = time.time()
+            last_pool_dump = time.time()
         while not self._stop.is_set():
             now = time.time()
             try:

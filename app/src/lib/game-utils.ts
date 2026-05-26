@@ -1,6 +1,7 @@
 // Re-export all shared utilities from the monorepo shared package
 export {
   placementBg,
+  placementColor,
   costBorderColor,
   unitStem,
   relicStem,
@@ -9,6 +10,8 @@ export {
   parseSynergies,
   parseRelics,
   parseWL,
+  mmrLevelToRank,
+  RANK_BRACKETS,
   RANK_TIERS,
   NUMBERED_RANK_TIERS,
   formatSize,
