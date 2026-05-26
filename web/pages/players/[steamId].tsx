@@ -103,7 +103,6 @@ interface PlayerPageProps {
   ogImageUrl: string | null;
   canonicalUrl: string | null;
   banned: boolean;
-  mpIdByMatch: Record<string, number>;
 }
 
 function formatLastFetchedTimestamp(value: string | null): string {
@@ -202,7 +201,6 @@ export default function PlayerPage({
   ogImageUrl,
   canonicalUrl,
   banned: initialBanned,
-  mpIdByMatch,
 }: PlayerPageProps) {
   const router = useRouter();
   const [drodo, setDrodo] = useState(initialDrodo);
@@ -877,8 +875,7 @@ export default function PlayerPage({
                   <div className="th">Date</div>
                 </div>
                 {games.map((g) => {
-                  const mpId = g.match_id ? mpIdByMatch[g.match_id] : undefined;
-                  const href = mpId ? `/matches/${mpId}` : `/games/${g.id}`;
+                  const href = `/matches/${g.id}`;
                   return (
                     <div key={g.id} className="game-entry">
                       <div
@@ -1085,13 +1082,13 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     }
   }
 
-  // Fetch the player's games list and leaderboard position concurrently;
+  // Fetch the player's match_players rows and leaderboard position concurrently;
   // both are independent of each other and dominate the SSR latency.
   const gamesPromise = supabase
     ? supabase
-        .from("games")
-        .select("*, user_id::text")
-        .in("user_id", profileUserIds)
+        .from("match_players")
+        .select("*, steam_id::text")
+        .in("steam_id", profileUserIds)
         .order("played_at", { ascending: false })
         .limit(100)
     : Promise.resolve({ data: [] as PlayerGame[] });
@@ -1120,26 +1117,10 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         )
       : Promise.resolve(null);
 
-  const mpIdsPromise = supabase
-    ? supabase
-        .from("match_players")
-        .select("id, match_id")
-        .eq("steam_id", steamId)
-        .order("id", { ascending: false })
-        .limit(100)
-    : Promise.resolve({ data: [] as { id: number; match_id: string }[] });
-
-  const [gamesResult, leaderboardPosition, mpIdsResult] = await Promise.all([
+  const [gamesResult, leaderboardPosition] = await Promise.all([
     gamesPromise,
     leaderboardPromise,
-    mpIdsPromise,
   ]);
-
-  // Map match_id → match_players.id so game rows can link to /matches/<id>.
-  const mpIdByMatch: Record<string, number> = {};
-  for (const row of (mpIdsResult.data || []) as { id: number; match_id: string }[]) {
-    mpIdByMatch[row.match_id] = row.id;
-  }
 
   if (
     steamProfile.customUrl &&
@@ -1161,11 +1142,30 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
     );
   }
 
+  // Map match_players rows → Game shape with legacy aliases for rendering.
+  const games: PlayerGame[] = ((gamesResult.data as Record<string, unknown>[]) || []).map(
+    (row) => ({
+      ...row,
+      user_id: String(row.steam_id),
+      placement: row.placement != null ? String(row.placement) : "",
+      played_at: (row.played_at as string) ?? "",
+      created_at: (row.created_at as string) ?? "",
+      lineup: row.chess_lineup as string | null,
+      level: row.hero_level ? String(row.hero_level) : null,
+      rank: null,
+      rank_change: null,
+      wl: null,
+      wins: row.win_round as number | null,
+      losses: row.lose_round as number | null,
+      match_id: (row.match_id as string) ?? null,
+    })
+  ) as PlayerGame[];
+
   return {
     props: {
       steamId,
       steamProfile,
-      games: (gamesResult.data as PlayerGame[]) || [],
+      games,
       drodo,
       seasons,
       mmrHistory,
@@ -1179,7 +1179,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
         baseUrl
       ),
       banned,
-      mpIdByMatch,
     },
   };
 };

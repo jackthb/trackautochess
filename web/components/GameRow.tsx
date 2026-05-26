@@ -387,7 +387,7 @@ export function GameRow({
           dateExtra={
             <a
               className="btn-share"
-              href={`/games/${game.id}`}
+              href={`/matches/${game.id}`}
               target="_blank"
               rel="noopener noreferrer"
               title="Open share page"

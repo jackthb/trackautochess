@@ -249,7 +249,7 @@ export default function MatchesPage() {
                     const display =
                       winner?.name || winner?.customUrl || winner?.steamId || "Unknown";
                     const initial = (display.charAt(0) || "?").toUpperCase();
-                    const matchHref = `/games/${m.representativeGameId}`;
+                    const matchHref = `/matches/${m.representativeGameId}`;
                     return (
                       <div
                         key={`${m.matchId ?? m.representativeGameId}`}

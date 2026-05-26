@@ -1,15 +1,21 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
+import { RANK_BRACKETS } from "@dac/shared/game-utils";
 import { isAdminSteamId } from "@/lib/admin";
 import { getSessionUser } from "@/lib/sessionUser";
 
+function mmrLevelToRank(level: number | null | undefined): string {
+  if (level == null || level < 1 || level > RANK_BRACKETS.length) return "";
+  return RANK_BRACKETS[level - 1].rank.replace("-", " ");
+}
+
 interface GameRow {
   id: number;
-  user_id: string | null;
+  steam_id: string | null;
   match_id: string | null;
-  placement: string | null;
-  rank: string | null;
-  lineup: string | null;
+  placement: number | null;
+  mmr_level: number | null;
+  chess_lineup: string | null;
   relic: string | null;
   played_at: string;
   created_at: string;
@@ -65,8 +71,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   const { data: gamesData, error: gamesError } = await supabase
-    .from("games")
-    .select("id, user_id::text, match_id, placement, rank, lineup, relic, played_at, created_at")
+    .from("match_players")
+    .select("id, steam_id::text, match_id, placement, mmr_level, chess_lineup, relic, played_at, created_at")
     .order("played_at", { ascending: false })
     .limit(GAMES_FETCH);
 
@@ -74,10 +80,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(500).json({ error: gamesError.message });
   }
 
-  const games = ((gamesData ?? []) as unknown as GameRow[]).map((g) => ({
-    ...g,
-    user_id: g.user_id == null ? null : String(g.user_id),
-  }));
+  const games = (gamesData ?? []) as unknown as GameRow[];
 
   const grouped = new Map<string, GameRow[]>();
   for (const g of games) {
@@ -90,8 +93,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   const matches: MatchSummary[] = Array.from(grouped.entries())
     .map(([key, rows]) => {
       const sorted = [...rows].sort((a, b) => {
-        const pa = parseInt(a.placement || "99") || 99;
-        const pb = parseInt(b.placement || "99") || 99;
+        const pa = a.placement ?? 99;
+        const pb = b.placement ?? 99;
         return pa - pb;
       });
       const playedAt = sorted.reduce(
@@ -113,13 +116,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       playedAt: m.playedAt,
       players: m.rows.map((r) => ({
         gameId: r.id,
-        steamId: r.user_id,
+        steamId: r.steam_id,
         name: null,
         customUrl: null,
         avatarUrl: null,
-        placement: r.placement,
-        rank: r.rank,
-        lineup: r.lineup,
+        placement: r.placement != null ? String(r.placement) : null,
+        rank: r.mmr_level ? mmrLevelToRank(r.mmr_level) : null,
+        lineup: r.chess_lineup,
         relic: r.relic,
       })),
     }));

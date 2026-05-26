@@ -2221,13 +2221,14 @@ class NetTableCapture:
         except Exception as e:
             log.warning("nettable: push_match_players failed: %s", e)
 
-        # Step 4 — trimmed games rows so every player profile sees the match.
-        for r in player_rows:
-            try:
-                push_live_game(r)
-            except Exception as e:
-                log.warning("nettable: push_live_game(%s) failed: %s",
-                            r.get("steam_id"), e)
+        # DEPRECATED: games table retired — match_players is the single source of truth
+        # # Step 4 — trimmed games rows so every player profile sees the match.
+        # for r in player_rows:
+        #     try:
+        #         push_live_game(r)
+        #     except Exception as e:
+        #         log.warning("nettable: push_live_game(%s) failed: %s",
+        #                     r.get("steam_id"), e)
 
     def _extract_match_timeline(self, match_id: str, played_at: str) -> None:
         """Walk dumps that belong to the just-ended match, pull

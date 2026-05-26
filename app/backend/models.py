@@ -3,6 +3,8 @@
 from dataclasses import dataclass
 
 
+# DEPRECATED: Used by the retired games table path (push_game / CV import).
+# New match data flows through match_players via nettable capture.
 @dataclass
 class PlayerGameRow:
     """One player's result in a match.
@@ -27,4 +29,5 @@ class PlayerGameRow:
 
 
 # Backwards-compatible alias — all existing call sites use `GameRow`
+# DEPRECATED: See PlayerGameRow note above.
 GameRow = PlayerGameRow

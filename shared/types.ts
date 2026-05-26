@@ -1,10 +1,17 @@
-/** A row from the `games` table — one player's result in a match. */
+/**
+ * A player's result in a match.
+ *
+ * Historically backed by the `games` table; now sourced from `match_players`.
+ * Legacy field shapes (string placement, string level, etc.) are preserved
+ * so rendering code doesn't need a big-bang rewrite — the query layer maps
+ * match_players columns to these shapes.
+ */
 export interface Game {
   id: number;
   user_id: string;
   placement: string;
   rank: string | null;
-  rank_change: "up" | "down" | "none" | null;
+  rank_change: string | null;
   lineup: string | null;
   synergies: string | null;
   talents: string | null;
@@ -19,9 +26,17 @@ export interface Game {
   match_id: string | null;
   played_at: string;
   created_at: string;
+
+  /** match_players native fields — present when sourced from match_players */
+  mmr_level?: number | null;
+  hero_level?: number | null;
+  chess_lineup?: string | null;
+  relic_history?: unknown;
+  win_round?: number | null;
+  lose_round?: number | null;
 }
 
-/** @deprecated Use Game instead — the table is flat, not split. */
+/** @deprecated Use Game instead. */
 export type PlayerGame = Game;
 
 export interface UnitFullInfo {

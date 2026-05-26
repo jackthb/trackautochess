@@ -686,6 +686,7 @@ class HeadlessBackend:
             if preserve_player_note:
                 note = row.get("player_name") or row.get("player_label") or ""
 
+            # DEPRECATED: CV import to games table. Nettable capture → match_players is the live path.
             game_row = GameRow(
                 played_at=played_at,
                 placement=placement,

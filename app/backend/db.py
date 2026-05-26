@@ -58,6 +58,7 @@ def _get_client():
 DUPLICATE_WINDOW_DAYS = 3
 
 
+# DEPRECATED: games table is retired, use match_players
 def game_exists(user_id: str, played_at: str, placement: str, wl: str = "", level: str = "", lineup: str = "") -> bool:
     """Check if a duplicate player game already exists.
 
@@ -200,6 +201,7 @@ def _save_game_local(row, user_id: str | None) -> None:
         log.warning("_save_game_local failed: %s", e)
 
 
+# DEPRECATED: games table is retired, use match_players
 def push_game(row, user_id: str | None = None) -> int | None:
     """Insert a game into Supabase.
 
@@ -363,6 +365,7 @@ _MATCH_PLAYER_COLUMNS = {
     "hero_damage", "hero_damaged", "mvp_chess_name", "mvp_chess_items",
     "max_lineup_value", "max_lineup_value_lineup", "duration", "final_round",
     "zhugong", "total_money", "candy",
+    "played_at", "screenshot", "notes", "replay", "created_at",
 }
 
 
@@ -422,6 +425,7 @@ def push_match_players(match_id: str, players: list[dict]) -> int:
         return 0
 
 
+# DEPRECATED: games table is retired, use match_players
 def push_live_game(player_row: dict) -> int | None:
     """Insert a trimmed row into `games` from the live-capture path.
 
