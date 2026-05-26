@@ -442,6 +442,24 @@ class HeadlessBackend:
             except Exception:
                 pass
 
+    # ── Auto-update ─────────────────────────────────────────────────────────
+
+    def _do_apply_update(self, download_url: str) -> None:
+        from updater import download_update, apply_update_and_restart, is_frozen
+        from pathlib import Path
+        if not is_frozen():
+            self._emit_notification(APP_NAME, "Auto-update only works in packaged builds.")
+            return
+        try:
+            self._emit_notification(APP_NAME, "Downloading update…")
+            dest = Path(sys.executable).parent / "DACTracker_new.exe"
+            download_update(download_url, dest)
+            self._emit_notification(APP_NAME, "Update downloaded — restarting…")
+            apply_update_and_restart(dest)
+        except Exception as e:
+            log.error("Update failed: %s", e)
+            self._emit_error(f"Update failed: {e}")
+
     # ── Command dispatch ────────────────────────────────────────────────────
 
     def _handle_command(self, msg: dict) -> None:
@@ -477,6 +495,17 @@ class HeadlessBackend:
                 daemon=True,
                 name="nettable-resync",
             ).start()
+        elif cmd == "do_update":
+            url = msg.get("download_url", "")
+            if url:
+                threading.Thread(
+                    target=self._do_apply_update,
+                    args=(url,),
+                    daemon=True,
+                    name="apply-update",
+                ).start()
+            else:
+                self._emit_error("do_update: missing download_url")
         elif cmd == "quit":
             self._shutdown()
         else:
@@ -499,8 +528,19 @@ class HeadlessBackend:
             except Exception as e:
                 log.warning("NetTable capture start failed: %s", e)
 
-        from updater import __version__
+        from updater import __version__, start_update_loop
         log.info("%s headless backend v%s running", APP_NAME, __version__)
+
+        def _on_update_available(info: dict) -> None:
+            log.info("Update available: %s", info.get("tag"))
+            self._emit({
+                "type": "update_available",
+                "tag": info.get("tag", ""),
+                "download_url": info.get("download_url", ""),
+                "html_url": info.get("html_url", ""),
+            })
+
+        start_update_loop(_on_update_available)
 
         # Emit initial status
         self._emit_status()

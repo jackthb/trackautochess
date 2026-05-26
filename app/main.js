@@ -291,6 +291,15 @@ function handlePythonEvent(msg) {
       trackerStatus.focused = false;
       break;
 
+    case "update_available":
+      trackerStatus.update = {
+        tag: msg.tag,
+        downloadUrl: msg.download_url,
+        htmlUrl: msg.html_url,
+      };
+      enqueueNotification("Update Available", `Version ${msg.tag} is ready to install.`);
+      break;
+
   }
 }
 
