@@ -1132,14 +1132,23 @@ class NetTableCapture:
         k.start()
 
     def _run_key_poller(self) -> None:
-        """Replaces AHK: fires F20 every 2s and the full cascade every
-        15s, but only while Dota is the foreground window AND the GSI feed
-        confirms the current match is a DAC custom game. The cascade rebinds
-        PAUSE and F11/F13/F15/F16 to `dumpstringtable CustomNetTable_*`,
-        which is disruptive (PAUSE opens the menu) and crashing (Source 2
-        crashes at post-game when the table doesn't exist) in regular Dota."""
+        """Fires F23 every 2s and the full cascade every 15s, but only while
+        Dota is the foreground window AND the GSI feed confirms a DAC game.
+        On startup, fires one immediate cascade to catch mid-game launches."""
         last_full_cascade = 0.0
         last_pool_dump = 0.0
+        # Catch-up: if Dota is already running, fire a full cascade
+        # immediately so the live view populates even when the app
+        # starts mid-game (before GSI has confirmed DAC is active).
+        if _is_dota_foreground():
+            log.info("nettable: Dota is foreground at poller start — firing catch-up cascade")
+            for vk in CASCADE_VK_SEQUENCE:
+                send_input_key(vk)
+                time.sleep(CASCADE_KEY_GAP_SEC)
+            send_input_key(VK_F24)
+            send_input_key(VK_F16)
+            last_full_cascade = time.time()
+            last_pool_dump = time.time()
         while not self._stop.is_set():
             now = time.time()
             try:
