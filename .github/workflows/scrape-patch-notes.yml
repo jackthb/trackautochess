@@ -1,0 +1,42 @@
+name: Scrape DAC Patch Notes
+
+on:
+  schedule:
+    # Every 6 hours at :17 past the hour
+    - cron: "17 */6 * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: scrape-patch-notes
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Scrape changelog
+        run: node scripts/scrape-patch-notes.mjs
+
+      - name: Check for changes
+        id: diff
+        run: |
+          git diff --quiet data/patch_notes/ && echo "changed=false" >> "$GITHUB_OUTPUT" || echo "changed=true" >> "$GITHUB_OUTPUT"
+
+      - name: Commit and push
+        if: steps.diff.outputs.changed == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/patch_notes/
+          git commit -m "Auto-update DAC patch notes from Steam changelog"
+          git push
