@@ -2,8 +2,8 @@ name: Scrape DAC Patch Notes
 
 on:
   schedule:
-    # Every 6 hours at :17 past the hour
-    - cron: "17 */6 * * *"
+    # Every hour at :17 past
+    - cron: "17 * * * *"
   workflow_dispatch:
 
 concurrency:
