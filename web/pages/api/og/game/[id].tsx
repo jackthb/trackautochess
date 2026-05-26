@@ -17,8 +17,11 @@ import { fetchSteamProfile } from "@/lib/steam";
 import unitsData from "@data/units.json";
 
 const UNIT_COSTS: Record<string, number> = {};
+const UNIT_SYNERGIES: Record<string, string[]> = {};
 for (const [name, info] of Object.entries(unitsData.units)) {
-  UNIT_COSTS[name] = (info as { cost: number }).cost;
+  const u = info as { cost: number; synergies?: string[] };
+  UNIT_COSTS[name] = u.cost;
+  if (u.synergies) UNIT_SYNERGIES[name] = u.synergies;
 }
 for (const [alias, canonical] of Object.entries(
   (unitsData as { aliases?: Record<string, string> }).aliases ?? {}
@@ -26,6 +29,22 @@ for (const [alias, canonical] of Object.entries(
   if (UNIT_COSTS[canonical] !== undefined) {
     UNIT_COSTS[alias] = UNIT_COSTS[canonical];
   }
+  if (UNIT_SYNERGIES[canonical]) {
+    UNIT_SYNERGIES[alias] = UNIT_SYNERGIES[canonical];
+  }
+}
+
+function computeSynergies(lineup: { name: string; stars: number }[]): { name: string; count: number }[] {
+  const counts: Record<string, number> = {};
+  for (const u of lineup) {
+    for (const syn of UNIT_SYNERGIES[u.name] || []) {
+      counts[syn] = (counts[syn] || 0) + 1;
+    }
+  }
+  return Object.entries(counts)
+    .map(([name, count]) => ({ name, count }))
+    .filter((s) => s.count > 1)
+    .sort((a, b) => b.count - a.count);
 }
 
 const fontDir = path.join(process.cwd(), "public", "fonts");
@@ -100,17 +119,21 @@ async function ogHandler(req: NextApiRequest, res: NextApiResponse) {
     fontData,
   ]);
 
-  // Pull match_players data for rank + full relic history.
+  // Pull match_players data for rank, synergies, and full relic history.
   let mpRelicNames: string[] = [];
+  let mpSynergies: string | null = null;
   if (game.match_id && game.user_id) {
     const { data: mp } = await supabase
       .from("match_players")
-      .select("mmr_level, relic_history")
+      .select("mmr_level, synergies, relic_history")
       .eq("match_id", game.match_id)
       .eq("steam_id", game.user_id)
       .maybeSingle();
     if (mp?.mmr_level && !game.rank) {
       game.rank = mmrLevelToRank(mp.mmr_level) || null;
+    }
+    if (mp?.synergies) {
+      mpSynergies = mp.synergies as string;
     }
     if (mp?.relic_history && typeof mp.relic_history === "object") {
       const entries = Array.isArray(mp.relic_history)
@@ -134,7 +157,8 @@ async function ogHandler(req: NextApiRequest, res: NextApiResponse) {
   const siteHost = getSiteHost();
 
   const lineup = parseLineup(game.lineup, UNIT_COSTS);
-  const synergies = parseSynergies(game.synergies);
+  const parsedSyn = parseSynergies(mpSynergies || game.synergies);
+  const synergies = parsedSyn.length > 0 ? parsedSyn : computeSynergies(lineup);
   const rawRelics = mpRelicNames.length > 0 ? mpRelicNames : parseRelics(game.relic);
   const relics = rawRelics.map((r) => RELICS_MAP[r]?.name || r);
   const siteBase = process.env.NEXT_PUBLIC_SITE_URL || "https://www.trackautochess.com";
