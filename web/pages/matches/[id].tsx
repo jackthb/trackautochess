@@ -39,24 +39,31 @@ interface MatchPlayerRow {
 function mpToGame(mp: MatchPlayerRow): Game {
   return {
     id: mp.id,
+    match_id: mp.match_id,
     user_id: String(mp.steam_id),
     placement: mp.placement != null ? String(mp.placement) : "",
-    rank: mp.mmr_level ? mmrLevelToRank(mp.mmr_level) : null,
-    rank_change: null,
-    lineup: mp.chess_lineup,
+    mmr_level: mp.mmr_level,
+    hero_level: mp.hero_level,
+    chess_lineup: mp.chess_lineup,
     synergies: mp.synergies,
     talents: mp.talents,
     relic: mp.relic,
-    level: mp.hero_level != null ? String(mp.hero_level) : null,
-    wl: null,
-    wins: mp.win_round,
-    losses: mp.lose_round,
+    relic_history: mp.relic_history,
+    win_round: mp.win_round,
+    lose_round: mp.lose_round,
     screenshot: null,
-    replay: null,
     notes: null,
-    match_id: mp.match_id,
+    replay: null,
     played_at: mp.played_at || "",
     created_at: "",
+    // Legacy aliases for rendering code
+    lineup: mp.chess_lineup,
+    level: mp.hero_level != null ? String(mp.hero_level) : null,
+    rank: mp.mmr_level ? mmrLevelToRank(mp.mmr_level) : null,
+    rank_change: null,
+    wins: mp.win_round,
+    losses: mp.lose_round,
+    wl: null,
   };
 }
 
@@ -74,6 +81,7 @@ const MP_SELECT = [
   "relic_history",
   "win_round",
   "lose_round",
+  "played_at",
 ].join(", ");
 
 export const getServerSideProps: GetServerSideProps = async (context) => {

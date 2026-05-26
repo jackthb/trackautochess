@@ -102,15 +102,26 @@ async function ogHandler(req: NextApiRequest, res: NextApiResponse) {
     auth: { autoRefreshToken: false, persistSession: false },
   });
 
-  const { data: game } = await supabase
-    .from("games")
-    .select("*, user_id::text")
+  const { data: mp } = await supabase
+    .from("match_players")
+    .select("*, steam_id::text")
     .eq("id", rawId)
     .single();
 
-  if (!game) {
+  if (!mp) {
     return res.status(404).send("Game not found");
   }
+
+  // Derive legacy fields from match_players columns.
+  const game = {
+    ...mp,
+    user_id: String(mp.steam_id ?? ""),
+    lineup: mp.chess_lineup,
+    level: mp.hero_level != null ? String(mp.hero_level) : null,
+    rank: mp.mmr_level ? mmrLevelToRank(mp.mmr_level) : null,
+    wins: mp.win_round,
+    losses: mp.lose_round,
+  };
 
   const [steamProfile, fonts] = await Promise.all([
     game.user_id
@@ -119,31 +130,16 @@ async function ogHandler(req: NextApiRequest, res: NextApiResponse) {
     fontData,
   ]);
 
-  // Pull match_players data for rank, synergies, and full relic history.
+  // Extract relic names from relic_history directly (already on the row).
   let mpRelicNames: string[] = [];
-  let mpSynergies: string | null = null;
-  if (game.match_id && game.user_id) {
-    const { data: mp } = await supabase
-      .from("match_players")
-      .select("mmr_level, synergies, relic_history")
-      .eq("match_id", game.match_id)
-      .eq("steam_id", game.user_id)
-      .maybeSingle();
-    if (mp?.mmr_level && !game.rank) {
-      game.rank = mmrLevelToRank(mp.mmr_level) || null;
-    }
-    if (mp?.synergies) {
-      mpSynergies = mp.synergies as string;
-    }
-    if (mp?.relic_history && typeof mp.relic_history === "object") {
-      const entries = Array.isArray(mp.relic_history)
-        ? mp.relic_history
-        : Object.values(mp.relic_history as Record<string, unknown>);
-      for (const e of entries) {
-        if (e && typeof e === "object" && "relic" in (e as any)) {
-          const name = (e as { relic: string }).relic;
-          if (name) mpRelicNames.push(name);
-        }
+  if (mp.relic_history && typeof mp.relic_history === "object") {
+    const entries = Array.isArray(mp.relic_history)
+      ? mp.relic_history
+      : Object.values(mp.relic_history as Record<string, unknown>);
+    for (const e of entries) {
+      if (e && typeof e === "object" && "relic" in (e as any)) {
+        const name = (e as { relic: string }).relic;
+        if (name) mpRelicNames.push(name);
       }
     }
   }
@@ -157,7 +153,7 @@ async function ogHandler(req: NextApiRequest, res: NextApiResponse) {
   const siteHost = getSiteHost();
 
   const lineup = parseLineup(game.lineup, UNIT_COSTS);
-  const parsedSyn = parseSynergies(mpSynergies || game.synergies);
+  const parsedSyn = parseSynergies(game.synergies);
   const synergies = parsedSyn.length > 0 ? parsedSyn : computeSynergies(lineup);
   const rawRelics = mpRelicNames.length > 0 ? mpRelicNames : parseRelics(game.relic);
   const relics = rawRelics.map((r) => RELICS_MAP[r]?.name || r);

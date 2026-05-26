@@ -8,14 +8,13 @@ const {
   Tray,
   nativeImage,
   globalShortcut,
-  dialog,
   screen,
   shell,
 } = require("electron");
 const path = require("path");
 const fs = require("fs");
 const os = require("os");
-const { spawn, execFileSync } = require("child_process");
+const { spawn } = require("child_process");
 const readline = require("readline");
 const { getElectronDesktopPaths } = require("./desktop-paths.cjs");
 
@@ -31,8 +30,6 @@ const DESKTOP_PATHS = getElectronDesktopPaths(__dirname, {
 });
 const DAC_DIR = DESKTOP_PATHS.dacDir;
 const REPLAY_DIR = DESKTOP_PATHS.replayDir;
-const SCREENSHOT_DIR = DESKTOP_PATHS.screenshotDir;
-const SCREENSHOT_MANIFEST = DESKTOP_PATHS.screenshotManifest;
 const ICONS_DIR = DESKTOP_PATHS.iconsDir;
 const ICON_FILENAME = DESKTOP_PATHS.iconFilename;
 const gotSingleInstanceLock = app.requestSingleInstanceLock();
@@ -42,7 +39,7 @@ if (!gotSingleInstanceLock) {
 }
 
 // Ensure dirs exist
-for (const dir of [DAC_DIR, REPLAY_DIR, SCREENSHOT_DIR]) {
+for (const dir of [DAC_DIR, REPLAY_DIR]) {
   if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
 }
 
@@ -53,9 +50,6 @@ let notificationWindow = null;
 let tray = null;
 let pythonProcess = null;
 let pythonRL = null;
-const labResolvers = new Map();
-let nextLabReqId = 1;
-function nextReqId() { return `lab-${nextLabReqId++}-${Date.now()}`; }
 // let overlayTimeout = null;
 let dotaPollInterval = null;
 let dotaOpen = false;
@@ -297,26 +291,15 @@ function handlePythonEvent(msg) {
       trackerStatus.focused = false;
       break;
 
-    case "processing_screenshot":
-    case "parse_result":
-      // Switch to confirmation tab
-      if (mainWindow && !mainWindow.isDestroyed()) {
-        mainWindow.show();
-        mainWindow.focus();
-      }
+    case "update_available":
+      trackerStatus.update = {
+        tag: msg.tag,
+        downloadUrl: msg.download_url,
+        htmlUrl: msg.html_url,
+      };
+      enqueueNotification("Update Available", `Version ${msg.tag} is ready to install.`);
       break;
 
-    case "lab_parse_full_result":
-    case "lab_parse_region_result": {
-      const data = msg.data || {};
-      const reqId = data.req_id;
-      if (reqId && labResolvers.has(reqId)) {
-        const resolve = labResolvers.get(reqId);
-        labResolvers.delete(reqId);
-        resolve(data);
-      }
-      break;
-    }
   }
 }
 
@@ -860,101 +843,6 @@ function startDotaLogWatcher() {
   });
 }
 
-// Steam stores Dota 2 screenshots under
-// <SteamRoot>/userdata/<steam32>/760/remote/570/screenshots. Default the
-// upload dialogs there when we can resolve it, since that is where the
-// user's Game Over caps actually live; fall back to the local mirror.
-const DOTA_APP_ID = "570";
-const STEAM64_BASE = 76561197960265728n;
-
-function readSteamPathFromRegistry() {
-  if (process.platform !== "win32") return null;
-  for (const root of ["HKCU\\Software\\Valve\\Steam", "HKLM\\SOFTWARE\\WOW6432Node\\Valve\\Steam"]) {
-    try {
-      const out = execFileSync("reg", ["query", root, "/v", "SteamPath"], {
-        encoding: "utf-8",
-        stdio: ["ignore", "pipe", "ignore"],
-      });
-      const m = out.match(/SteamPath\s+REG_SZ\s+([^\r\n]+)/);
-      if (m) return path.normalize(m[1].trim());
-    } catch {}
-    try {
-      const out = execFileSync("reg", ["query", root, "/v", "InstallPath"], {
-        encoding: "utf-8",
-        stdio: ["ignore", "pipe", "ignore"],
-      });
-      const m = out.match(/InstallPath\s+REG_SZ\s+([^\r\n]+)/);
-      if (m) return path.normalize(m[1].trim());
-    } catch {}
-  }
-  return null;
-}
-
-function findSteamRoot() {
-  const fromReg = readSteamPathFromRegistry();
-  if (fromReg && fs.existsSync(fromReg)) return fromReg;
-  const candidates =
-    process.platform === "win32"
-      ? ["C:\\Program Files (x86)\\Steam", "C:\\Program Files\\Steam"]
-      : process.platform === "darwin"
-        ? [path.join(os.homedir(), "Library", "Application Support", "Steam")]
-        : [path.join(os.homedir(), ".steam", "steam"), path.join(os.homedir(), ".local", "share", "Steam")];
-  for (const p of candidates) {
-    if (fs.existsSync(p)) return p;
-  }
-  return null;
-}
-
-function getDotaScreenshotsDir() {
-  const steamRoot = findSteamRoot();
-  if (!steamRoot) return null;
-  const config = loadTrackerConfig();
-  const steamId = config && config.steam_id;
-  if (!steamId) return null;
-  let steam32;
-  try {
-    steam32 = String(BigInt(String(steamId)) - STEAM64_BASE);
-  } catch {
-    return null;
-  }
-  const dir = path.join(steamRoot, "userdata", steam32, "760", "remote", DOTA_APP_ID, "screenshots");
-  return fs.existsSync(dir) ? dir : null;
-}
-
-function screenshotDialogDefault() {
-  return getDotaScreenshotsDir() || path.join(DAC_DIR, "screenshots");
-}
-
-ipcMain.handle("app:openFileDialog", async () => {
-  const result = await dialog.showOpenDialog({
-    title: "Select MY MATCHES screenshot",
-    defaultPath: screenshotDialogDefault(),
-    filters: [
-      { name: "Images", extensions: ["jpg", "jpeg", "png"] },
-      { name: "All files", extensions: ["*"] },
-    ],
-  });
-  if (!result.canceled && result.filePaths.length > 0) {
-    return result.filePaths[0];
-  }
-  return null;
-});
-
-ipcMain.handle("app:openGameOverScreenshotDialog", async () => {
-  const result = await dialog.showOpenDialog({
-    title: "Select Game Over screenshot",
-    defaultPath: screenshotDialogDefault(),
-    filters: [
-      { name: "Images", extensions: ["jpg", "jpeg", "png"] },
-    ],
-    properties: ["openFile"],
-  });
-  if (!result.canceled && result.filePaths.length > 0) {
-    return result.filePaths[0];
-  }
-  return null;
-});
-
 ipcMain.handle("app:openExternal", async (_event, url) => {
   try {
     const parsed = new URL(String(url || ""));
@@ -980,59 +868,6 @@ function loadTrackerConfig() {
   } catch {
     return {};
   }
-}
-
-// Hash a string to a deterministic positive 32-bit int — used to mint
-// stable numeric `id`s for local match_player records (the History
-// tab keys rows by numeric id, but our local data is keyed by
-// match_id+steam_id strings).
-function hashToInt(s) {
-  let h = 0;
-  for (let i = 0; i < s.length; i++) h = ((h << 5) - h + s.charCodeAt(i)) | 0;
-  return Math.abs(h);
-}
-
-function readLocalMatchPlayers() {
-  const dir = path.join(DAC_DIR, "match_players");
-  if (!fs.existsSync(dir)) return [];
-  const games = [];
-  for (const name of fs.readdirSync(dir)) {
-    if (!name.endsWith(".json")) continue;
-    try {
-      const mp = JSON.parse(fs.readFileSync(path.join(dir, name), "utf-8"));
-      const winRound = Number(mp.win_round || 0);
-      const loseRound = Number(mp.lose_round || 0);
-      games.push({
-        id: hashToInt(`${mp.match_id}__${mp.steam_id}`),
-        user_id: mp.steam_id || "",
-        placement: String(mp.placement ?? ""),
-        rank: mp.mmr_level != null ? String(mp.mmr_level) : null,
-        rank_change: "none",
-        lineup: mp.chess_lineup || null,
-        synergies: mp.synergies || null,
-        talents: mp.talents || null,
-        relic: mp.relic || null,
-        level: mp.hero_level != null ? String(mp.hero_level) : null,
-        wl: `${winRound}-${loseRound}`,
-        wins: winRound,
-        losses: loseRound,
-        screenshot: null,
-        replay: null,
-        notes: mp.mvp_chess_name ? `MVP: ${mp.mvp_chess_name}` : null,
-        match_id: mp.match_id || null,
-        played_at: mp.played_at,
-        created_at: mp.played_at,
-        // Extra fields for the timeline view (not in standard Game type,
-        // but harmless if unused).
-        _local: true,
-        _source: "match_players",
-        _file: name,
-      });
-    } catch (e) {
-      console.error(`games:fetch local read failed for ${name}:`, e);
-    }
-  }
-  return games;
 }
 
 ipcMain.handle("timelines:fetch", async (_event, matchId) => {
@@ -1069,24 +904,12 @@ ipcMain.handle("games:fetch", async () => {
   const url = config.supabase_url;
   const key = config.supabase_key;
   const steamId = config.steam_id;
-  const localOnly = !!config.local_only;
 
-  const local = readLocalMatchPlayers();
-  console.log(`[games:fetch] local_only=${localOnly} local=${local.length} steam=${steamId}`);
+  if (!url || !key || !steamId) return [];
 
-  // local_only short-circuit: no Supabase fetch, return local only.
-  if (localOnly) {
-    local.sort((a, b) => (b.played_at || "").localeCompare(a.played_at || ""));
-    console.log(`[games:fetch] returning ${local.length} local games`);
-    return local;
-  }
-
-  if (!url || !key || !steamId) return local;
-
-  let remote = [];
   try {
     const resp = await net.fetch(
-      `${url}/rest/v1/games?select=*&user_id=eq.${steamId}&order=played_at.desc&limit=100`,
+      `${url}/rest/v1/match_players?select=*&steam_id=eq.${steamId}&order=played_at.desc&limit=50`,
       {
         headers: {
           apikey: key,
@@ -1095,22 +918,36 @@ ipcMain.handle("games:fetch", async () => {
         },
       }
     );
-    if (resp.ok) remote = await resp.json();
+    if (!resp.ok) {
+      console.error(`games:fetch HTTP ${resp.status}`);
+      return [];
+    }
+    const rows = await resp.json();
+    return rows.map((r) => ({
+      id: r.id,
+      user_id: String(r.steam_id),
+      placement: String(r.placement),
+      lineup: r.chess_lineup,
+      synergies: r.synergies,
+      talents: r.talents,
+      relic: r.relic,
+      level: r.hero_level ? String(r.hero_level) : null,
+      wins: r.win_round,
+      losses: r.lose_round,
+      match_id: r.match_id,
+      played_at: r.played_at || "",
+      created_at: r.created_at || "",
+      rank: null,
+      rank_change: null,
+      wl: null,
+      screenshot: null,
+      replay: null,
+      notes: null,
+    }));
   } catch (e) {
     console.error("games:fetch error:", e);
+    return [];
   }
-
-  // Merge local + remote, dedupe by id (local entries shadow remote),
-  // sort by played_at desc.
-  const seen = new Set();
-  const merged = [];
-  for (const g of [...local, ...remote]) {
-    if (seen.has(g.id)) continue;
-    seen.add(g.id);
-    merged.push(g);
-  }
-  merged.sort((a, b) => (b.played_at || "").localeCompare(a.played_at || ""));
-  return merged;
 });
 
 ipcMain.handle("games:update", async (_event, gameId, fields) => {
@@ -1415,14 +1252,6 @@ protocol.registerSchemesAsPrivileged([
       bypassCSP: true,
     },
   },
-  {
-    scheme: "screenshot",
-    privileges: {
-      standard: true,
-      supportFetchAPI: true,
-      bypassCSP: true,
-    },
-  },
 ]);
 
 // ── App lifecycle ────────────────────────────────────────────────────────────
@@ -1500,27 +1329,6 @@ app.whenReady().then(() => {
     }
 
     return net.fetch(`file://${filePath}`);
-  });
-
-  // Handle screenshot:// protocol for serving local screenshot files
-  protocol.handle("screenshot", (request) => {
-    const filePath = decodeURIComponent(request.url.replace("screenshot://", ""));
-
-    if (filePath.includes("..")) {
-      return new Response("Forbidden", { status: 403 });
-    }
-
-    if (!fs.existsSync(filePath)) {
-      return new Response("Not found", { status: 404 });
-    }
-
-    const buf = fs.readFileSync(filePath);
-    const ext = path.extname(filePath).toLowerCase();
-    const mime = ext === ".png" ? "image/png" : "image/jpeg";
-    return new Response(buf, {
-      status: 200,
-      headers: { "Content-Type": mime },
-    });
   });
 
   // Remove the default menu bar (File, Edit, View, etc.)
@@ -1641,282 +1449,3 @@ ipcMain.handle("replays:exists", async (_event, filename) => {
   if (!filePath.startsWith(REPLAY_DIR)) return false;
   return fs.existsSync(filePath);
 });
-
-// ── Screenshot IPC handlers ────────────────────────────────────────────────
-
-function loadScreenshotManifest() {
-  if (!fs.existsSync(SCREENSHOT_MANIFEST)) return {};
-  try {
-    return JSON.parse(fs.readFileSync(SCREENSHOT_MANIFEST, "utf-8"));
-  } catch {
-    return {};
-  }
-}
-
-ipcMain.handle("screenshots:list", async () => {
-  if (!fs.existsSync(SCREENSHOT_DIR)) return [];
-
-  const manifest = loadScreenshotManifest();
-  const files = fs
-    .readdirSync(SCREENSHOT_DIR)
-    .filter((f) => /\.(png|jpg|jpeg)$/i.test(f));
-
-  return files
-    .map((name) => {
-      const filePath = path.join(SCREENSHOT_DIR, name);
-      const stat = fs.statSync(filePath);
-      const stem = path.basename(name, path.extname(name));
-      const parsePath = path.join(SCREENSHOT_DIR, `${stem}.parse.json`);
-      const entry = manifest[name] || {};
-      return {
-        name,
-        path: filePath,
-        size: stat.size,
-        mtime: stat.mtimeMs,
-        uploaded: !!entry.uploaded_at,
-        hasParsed: fs.existsSync(parsePath),
-        hasImported: !!entry.imported_at,
-        screenType: entry.screen_type || null,
-      };
-    })
-    .sort((a, b) => b.mtime - a.mtime);
-});
-
-ipcMain.handle("screenshots:delete", async (_event, filename) => {
-  const filePath = path.join(SCREENSHOT_DIR, filename);
-  if (!filePath.startsWith(SCREENSHOT_DIR)) return false;
-  if (fs.existsSync(filePath)) {
-    fs.unlinkSync(filePath);
-    // Also remove parse result
-    const stem = path.basename(filename, path.extname(filename));
-    const parsePath = path.join(SCREENSHOT_DIR, `${stem}.parse.json`);
-    if (fs.existsSync(parsePath)) fs.unlinkSync(parsePath);
-    // Also remove from manifest
-    const manifest = loadScreenshotManifest();
-    if (manifest[filename]) {
-      delete manifest[filename];
-      fs.writeFileSync(SCREENSHOT_MANIFEST, JSON.stringify(manifest, null, 2));
-    }
-    return true;
-  }
-  return false;
-});
-
-ipcMain.handle("screenshots:openFolder", async () => {
-  const { shell } = require("electron");
-  shell.openPath(SCREENSHOT_DIR);
-});
-
-ipcMain.handle("screenshots:thumbnail", async (_event, filename) => {
-  const filePath = path.join(SCREENSHOT_DIR, filename);
-  if (!filePath.startsWith(SCREENSHOT_DIR)) return null;
-  if (!fs.existsSync(filePath)) return null;
-  const buf = fs.readFileSync(filePath);
-  const ext = path.extname(filename).toLowerCase();
-  const mime = ext === ".png" ? "image/png" : "image/jpeg";
-  return `data:${mime};base64,${buf.toString("base64")}`;
-});
-
-ipcMain.handle("screenshots:getParseResult", async (_event, filename) => {
-  const stem = path.basename(filename, path.extname(filename));
-  const parsePath = path.join(SCREENSHOT_DIR, `${stem}.parse.json`);
-  if (!fs.existsSync(parsePath)) return null;
-  try {
-    return JSON.parse(fs.readFileSync(parsePath, "utf-8"));
-  } catch {
-    return null;
-  }
-});
-
-ipcMain.handle("screenshots:updateParseRow", async (_event, filename, rowIndex, fields) => {
-  const stem = path.basename(filename, path.extname(filename));
-  const parsePath = path.join(SCREENSHOT_DIR, `${stem}.parse.json`);
-  if (!fs.existsSync(parsePath)) return false;
-  try {
-    const data = JSON.parse(fs.readFileSync(parsePath, "utf-8"));
-    if (!data.rows || rowIndex < 0 || rowIndex >= data.rows.length) return false;
-    Object.assign(data.rows[rowIndex], fields);
-    fs.writeFileSync(parsePath, JSON.stringify(data, null, 2));
-    return true;
-  } catch {
-    return false;
-  }
-});
-
-// ── Parser Lab (regions config + screenshot listing) ───────────────────────
-
-const FIXTURES_DIR = path.join(__dirname, "..", "backend", "tests", "fixtures");
-const DATA_DIR = path.join(RESOURCES_DIR, "data");
-const LAB_SCREENSHOTS = path.join(DATA_DIR, "screenshots");
-const DEFAULT_REGIONS_CONFIG_PATH = path.join(DATA_DIR, "regions_config.json");
-const USER_REGIONS_CONFIG_PATH = path.join(DAC_DIR, "regions_config.json");
-const STEAM_BASE = "C:\\Program Files (x86)\\Steam\\userdata";
-
-ipcMain.handle("lab:listScreenshots", async () => {
-  const groups = [];
-  function scanDir(dir, label) {
-    if (!fs.existsSync(dir)) return;
-    const items = [];
-    for (const name of fs.readdirSync(dir)) {
-      if (!/\.(jpg|jpeg|png)$/i.test(name)) continue;
-      const filePath = path.join(dir, name);
-      let stat;
-      try { stat = fs.statSync(filePath); } catch { continue; }
-      items.push({ name, path: filePath, size: stat.size, mtime: stat.mtimeMs });
-    }
-    items.sort((a, b) => b.mtime - a.mtime);
-    if (items.length > 0) groups.push({ label, files: items });
-  }
-  scanDir(LAB_SCREENSHOTS, "Reference");
-  scanDir(SCREENSHOT_DIR, "DAC Tracker");
-  if (fs.existsSync(STEAM_BASE)) {
-    for (const user of fs.readdirSync(STEAM_BASE)) {
-      const ssDir = path.join(STEAM_BASE, user, "760", "remote", "570", "screenshots");
-      scanDir(ssDir, "Steam");
-    }
-  }
-  return groups;
-});
-
-ipcMain.handle("lab:loadConfig", async () => {
-  const result = { defaults: null, overrides: null };
-  try {
-    if (fs.existsSync(DEFAULT_REGIONS_CONFIG_PATH)) {
-      result.defaults = JSON.parse(fs.readFileSync(DEFAULT_REGIONS_CONFIG_PATH, "utf-8"));
-    }
-  } catch {}
-  try {
-    if (fs.existsSync(USER_REGIONS_CONFIG_PATH)) {
-      result.overrides = JSON.parse(fs.readFileSync(USER_REGIONS_CONFIG_PATH, "utf-8"));
-    }
-  } catch {}
-  return result;
-});
-
-ipcMain.handle("lab:saveConfig", async (_event, config) => {
-  fs.mkdirSync(DAC_DIR, { recursive: true });
-  fs.writeFileSync(USER_REGIONS_CONFIG_PATH, JSON.stringify(config, null, 2));
-  return { ok: true, path: USER_REGIONS_CONFIG_PATH };
-});
-
-ipcMain.handle("lab:resetConfig", async () => {
-  if (fs.existsSync(USER_REGIONS_CONFIG_PATH)) {
-    fs.unlinkSync(USER_REGIONS_CONFIG_PATH);
-  }
-  return { ok: true };
-});
-
-ipcMain.handle("lab:parseFull", async (_event, payload) => {
-  const reqId = nextReqId();
-  return new Promise((resolve) => {
-    labResolvers.set(reqId, resolve);
-    sendToPython({ cmd: "lab_parse_full", path: payload?.path || "", req_id: reqId });
-    setTimeout(() => {
-      if (labResolvers.has(reqId)) {
-        labResolvers.delete(reqId);
-        resolve({ ok: false, error: "lab_parse_full timed out (60s)" });
-      }
-    }, 60000);
-  });
-});
-
-ipcMain.handle("lab:parseRegion", async (_event, payload) => {
-  const reqId = nextReqId();
-  return new Promise((resolve) => {
-    labResolvers.set(reqId, resolve);
-    sendToPython({
-      cmd: "lab_parse_region",
-      path: payload?.path || "",
-      name: payload?.name || "",
-      category: payload?.category || "",
-      bbox: payload?.bbox || [],
-      req_id: reqId,
-    });
-    setTimeout(() => {
-      if (labResolvers.has(reqId)) {
-        labResolvers.delete(reqId);
-        resolve({ ok: false, error: "lab_parse_region timed out (30s)" });
-      }
-    }, 30000);
-  });
-});
-
-ipcMain.handle("lab:listFixtures", async () => {
-  if (!fs.existsSync(FIXTURES_DIR)) return [];
-  const files = [];
-  for (const name of fs.readdirSync(FIXTURES_DIR)) {
-    if (!name.endsWith(".json")) continue;
-    const filePath = path.join(FIXTURES_DIR, name);
-    let body;
-    try { body = JSON.parse(fs.readFileSync(filePath, "utf-8")); } catch { continue; }
-    files.push({
-      name,
-      path: filePath,
-      screenshot_path: body?.screenshot_path || "",
-      screen_type: body?.screen_type || "",
-      row_count: Array.isArray(body?.rows) ? body.rows.length : 0,
-    });
-  }
-  files.sort((a, b) => a.name.localeCompare(b.name));
-  return files;
-});
-
-ipcMain.handle("lab:saveFixture", async (_event, fixtureName, data) => {
-  fs.mkdirSync(FIXTURES_DIR, { recursive: true });
-  const outPath = path.join(FIXTURES_DIR, `${fixtureName}.json`);
-  fs.writeFileSync(outPath, JSON.stringify(data, null, 2));
-  return { ok: true, path: outPath };
-});
-
-ipcMain.handle("lab:deleteFixture", async (_event, fixtureName) => {
-  const target = path.join(FIXTURES_DIR, `${fixtureName}.json`);
-  if (target.startsWith(FIXTURES_DIR) && fs.existsSync(target)) {
-    fs.unlinkSync(target);
-    return { ok: true };
-  }
-  return { ok: false, error: "fixture not found" };
-});
-
-ipcMain.handle("lab:imageData", async (_event, filePath) => {
-  if (!filePath || !fs.existsSync(filePath)) return null;
-  const buf = fs.readFileSync(filePath);
-  const ext = path.extname(filePath).toLowerCase();
-  const mime = ext === ".png" ? "image/png" : "image/jpeg";
-  return `data:${mime};base64,${buf.toString("base64")}`;
-});
-
-let pytestProc = null;
-let pytestSeq = 0;
-
-ipcMain.handle("lab:runFixtures", async (_event) => {
-  const { spawn } = require("child_process");
-  if (pytestProc) {
-    try { pytestProc.kill(); } catch {}
-    pytestProc = null;
-  }
-  pytestSeq++;
-  const seq = pytestSeq;
-  const cwd = path.join(__dirname, "backend");
-  const py = process.env.DAC_PYTHON || "python";
-  const proc = spawn(py, ["-m", "pytest", "tests/test_fixtures.py", "-v", "--no-header", "--tb=short"], {
-    cwd,
-    env: { ...process.env, PYTHONUNBUFFERED: "1" },
-  });
-  pytestProc = proc;
-
-  const broadcast = (kind, text) => {
-    if (mainWindow && !mainWindow.isDestroyed()) {
-      mainWindow.webContents.send("lab:pytestOutput", { seq, kind, text });
-    }
-  };
-  proc.stdout.on("data", (d) => broadcast("stdout", d.toString()));
-  proc.stderr.on("data", (d) => broadcast("stderr", d.toString()));
-  proc.on("close", (code) => {
-    broadcast("exit", `\n[exit code ${code}]\n`);
-    if (pytestProc === proc) pytestProc = null;
-  });
-  proc.on("error", (err) => broadcast("error", `\n[spawn error: ${err.message}]\n`));
-
-  return { ok: true, seq };
-});
-

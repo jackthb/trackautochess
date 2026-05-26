@@ -1,5 +1,4 @@
 import { useState, useEffect, useCallback } from "react";
-import { createPortal } from "react-dom";
 import type { Game, UnitFullInfo, SynergyInfo, RelicInfo } from "../types";
 import { VideoPlayer } from "./VideoPlayer";
 import {
@@ -26,39 +25,6 @@ interface GameRowProps {
   onToggle: () => void;
 }
 
-// ── Screenshot lightbox ─────────────────────────────────────────────────────
-
-function ScreenshotLightbox({
-  src,
-  onClose,
-}: {
-  src: string;
-  onClose: () => void;
-}) {
-  useEffect(() => {
-    function onKey(e: KeyboardEvent) {
-      if (e.key === "Escape") onClose();
-    }
-    document.addEventListener("keydown", onKey);
-    return () => document.removeEventListener("keydown", onKey);
-  }, [onClose]);
-
-  return createPortal(
-    <div className="screenshot-lightbox" onClick={onClose}>
-      <img
-        className="screenshot-lightbox-img"
-        src={src}
-        alt="Game screenshot"
-        onClick={(e) => e.stopPropagation()}
-      />
-      <button className="screenshot-lightbox-close" onClick={onClose}>
-        &times;
-      </button>
-    </div>,
-    document.body
-  );
-}
-
 // ── Main GameRow ────────────────────────────────────────────────────────────
 
 export function GameRow({
@@ -75,7 +41,6 @@ export function GameRow({
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
-  const [lightbox, setLightbox] = useState(false);
   const [replayExists, setReplayExists] = useState(false);
   const [showReplay, setShowReplay] = useState(false);
 
@@ -99,9 +64,6 @@ export function GameRow({
       window.replays.exists(game.replay).then(setReplayExists);
     }
   }, [game.replay]);
-
-  // Screenshot is already a full URL from Supabase
-  const screenshotUrl = game.screenshot || null;
 
   const resetEditState = useCallback(() => {
     setEditPlacement(game.placement || "");
@@ -218,16 +180,6 @@ export function GameRow({
             </div>
           )}
           <div className="edit-panel-body">
-            {screenshotUrl && (
-              <div className="edit-screenshot-col">
-                <img
-                  className="game-screenshot-thumb"
-                  src={screenshotUrl}
-                  alt="Game screenshot"
-                  onClick={() => setLightbox(true)}
-                />
-              </div>
-            )}
             <GameEditFields
               editPlacement={editPlacement}
               editLevel={editLevel}
@@ -304,13 +256,6 @@ export function GameRow({
             </button>
           </div>
         </div>
-      )}
-
-      {lightbox && screenshotUrl && (
-        <ScreenshotLightbox
-          src={screenshotUrl}
-          onClose={() => setLightbox(false)}
-        />
       )}
     </div>
   );

@@ -10,10 +10,9 @@ Config keys in ~/.dac/config.json:
 
 import json
 import logging
-from dataclasses import asdict
-from datetime import datetime, timedelta
+from datetime import datetime
 
-from utils import LOCAL_GAMES_DIR, load_config, local_only_mode
+from utils import load_config, local_only_mode
 
 log = logging.getLogger("dac.db")
 
@@ -26,7 +25,7 @@ def _get_client():
     global _client, _local_only_logged
     if local_only_mode():
         if not _local_only_logged:
-            log.info("DB skipped — local_only mode (writing JSON to %s)", LOCAL_GAMES_DIR)
+            log.info("DB skipped — local_only mode")
             _local_only_logged = True
         return None
     if _client is not None:
@@ -53,87 +52,6 @@ def _get_client():
     _client = client
     log.info("DB client configured: %s", url)
     return client
-
-
-DUPLICATE_WINDOW_DAYS = 3
-
-
-def game_exists(user_id: str, played_at: str, placement: str, wl: str = "", level: str = "", lineup: str = "") -> bool:
-    """Check if a duplicate player game already exists.
-
-    A match is a duplicate when the *same player* has another game within
-    DUPLICATE_WINDOW_DAYS that agrees on placement AND (W-L or level or lineup).
-    This catches the case where the same MY MATCHES row is re-imported from
-    multiple screenshots: the inferred ``played_at`` can drift by more than a
-    day because we subtract whole days from the screenshot timestamp, so the
-    previous ±12h window wasn't enough.
-
-    Returns True if duplicate found, False otherwise. Never raises.
-    """
-    client = _get_client()
-    if client is None:
-        return False
-
-    try:
-        dt = datetime.fromisoformat(played_at)
-        range_start = (dt - timedelta(days=DUPLICATE_WINDOW_DAYS)).isoformat()
-        range_end = (dt + timedelta(days=DUPLICATE_WINDOW_DAYS)).isoformat()
-        placement_int = _safe_int(placement, 1, 8)
-        if placement_int is None:
-            return False
-
-        params = {
-            "user_id": f"eq.{user_id}",
-            "placement": f"eq.{placement_int}",
-            "select": "id,played_at,level,wins,losses,lineup",
-            "played_at": f"gte.{range_start}",
-        }
-
-        resp = client.get(
-            "/rest/v1/games",
-            params=params,
-            headers={"Accept": "application/json"},
-        )
-        resp.raise_for_status()
-        candidates = [
-            r for r in resp.json() if r.get("played_at", "") <= range_end
-        ]
-
-        if not candidates:
-            return False
-
-        level_int = _safe_int(level, 1, 15)
-        wins, losses = None, None
-        if wl and "-" in str(wl):
-            w_str, l_str = str(wl).split("-", 1)
-            wins = _safe_int(w_str)
-            losses = _safe_int(l_str)
-
-        wanted_lineup = (lineup or "").strip()
-
-        for r in candidates:
-            matched_field = False
-            if level_int is not None and r.get("level") == level_int:
-                matched_field = True
-            if (
-                wins is not None
-                and losses is not None
-                and r.get("wins") == wins
-                and r.get("losses") == losses
-            ):
-                matched_field = True
-            if wanted_lineup and (r.get("lineup") or "").strip() == wanted_lineup:
-                matched_field = True
-            if matched_field:
-                log.debug(
-                    "duplicate found: user=%s played_at=%s place=%s match=%s",
-                    user_id, played_at, placement, r.get("id"),
-                )
-                return True
-        return False
-    except Exception as e:
-        log.error("game_exists error: %s", e)
-        return False
 
 
 def ensure_user(user_id: str, name: str | None = None, custom_url: str | None = None) -> bool:
@@ -181,97 +99,6 @@ def _safe_int(val, lo=None, hi=None):
         return None
 
 
-def _save_game_local(row, user_id: str | None) -> None:
-    """Mirror every push_game payload to ~/.dac/games/ so testing data is
-    preserved even when Supabase is offline / disabled."""
-    try:
-        LOCAL_GAMES_DIR.mkdir(parents=True, exist_ok=True)
-        ts = datetime.now().strftime("%Y%m%d_%H%M%S_%f")
-        placement = str(getattr(row, "placement", "")) or "x"
-        path = LOCAL_GAMES_DIR / f"{ts}__p{placement}.json"
-        payload = {
-            "saved_at": datetime.now().isoformat(),
-            "user_id": str(user_id) if user_id else "",
-            "game": asdict(row) if hasattr(row, "__dataclass_fields__") else dict(row.__dict__),
-        }
-        path.write_text(json.dumps(payload, indent=2, ensure_ascii=False), encoding="utf-8")
-        log.info("game saved locally: %s", path.name)
-    except Exception as e:
-        log.warning("_save_game_local failed: %s", e)
-
-
-def push_game(row, user_id: str | None = None) -> int | None:
-    """Insert a game into Supabase.
-
-    Always writes a JSON sidecar to ~/.dac/games/ first so local testing
-    captures the payload even when Supabase is disabled.
-    Returns the inserted game id on success, or None on error. Never raises.
-    """
-    _save_game_local(row, user_id)
-
-    client = _get_client()
-    if client is None:
-        return None
-
-    try:
-        placement = _safe_int(row.placement, 1, 8)
-        level = _safe_int(row.level, 1, 15)
-        wins, losses = None, None
-        wl = getattr(row, "wl", "")
-        if wl and "-" in str(wl):
-            parts = str(wl).split("-", 1)
-            wins = _safe_int(parts[0])
-            losses = _safe_int(parts[1])
-
-        rank_change = row.rank_change if row.rank_change in ("up", "down", "none") else None
-
-        game_data = {
-            "played_at": row.played_at,
-            "placement": placement,
-            "rank": row.rank or None,
-            "rank_change": rank_change,
-            "lineup": row.lineup or None,
-            "synergies": row.synergies or None,
-            "talents": row.talents or None,
-            "relic": row.relic or None,
-            "level": level,
-            "wins": wins,
-            "losses": losses,
-            "screenshot": row.screenshot or None,
-            "replay": row.replay or None,
-            "notes": row.notes or None,
-        }
-        match_id = getattr(row, "match_id", "") or None
-        if match_id:
-            game_data["match_id"] = match_id
-        if user_id:
-            game_data["user_id"] = int(user_id)
-        resp = client.post(
-            "/rest/v1/games",
-            json=game_data,
-            headers={"Prefer": "return=representation"},
-        )
-        resp.raise_for_status()
-        game_id = resp.json()[0]["id"]
-        log.info("pushed game %d: placement=%s", game_id, row.placement)
-        return int(game_id)
-    except Exception as e:
-        body = ""
-        if hasattr(e, "response") and e.response is not None:
-            try:
-                body = e.response.text
-            except Exception:
-                pass
-        log.error("push_game error: %s | body: %s", e, body)
-        return None
-
-
-def generate_match_id() -> str:
-    """Generate a unique match_id for linking all players in a match."""
-    import uuid
-    return str(uuid.uuid4())[:12]
-
-
 def generate_live_match_id(end_board: dict) -> str:
     """Deterministic match_id from end_board contents.
 
@@ -300,27 +127,13 @@ def generate_live_match_id(end_board: dict) -> str:
     return hashlib.sha256(canonical.encode("utf-8")).hexdigest()[:16]
 
 
-def _save_json_local(directory, filename: str, payload: dict) -> None:
-    """Mirror a payload to a local sidecar dir under ~/.dac/. Best-effort."""
-    try:
-        directory.mkdir(parents=True, exist_ok=True)
-        (directory / filename).write_text(
-            json.dumps(payload, indent=2, ensure_ascii=False, sort_keys=True),
-            encoding="utf-8",
-        )
-    except Exception as e:
-        log.warning("_save_json_local(%s) failed: %s", filename, e)
-
-
 def push_match(match_record: dict) -> str | None:
     """Insert one row into `matches`. Returns match_id on success, None on
-    failure or in local_only mode. Mirrors to ~/.dac/matches/ first."""
-    from utils import LOCAL_MATCHES_DIR
+    failure or in local_only mode."""
     match_id = str(match_record.get("match_id") or "").strip()
     if not match_id:
         log.warning("push_match: missing match_id")
         return None
-    _save_json_local(LOCAL_MATCHES_DIR, f"{match_id}.json", match_record)
 
     client = _get_client()
     if client is None:
@@ -363,27 +176,19 @@ _MATCH_PLAYER_COLUMNS = {
     "hero_damage", "hero_damaged", "mvp_chess_name", "mvp_chess_items",
     "max_lineup_value", "max_lineup_value_lineup", "duration", "final_round",
     "zhugong", "total_money", "candy",
+    "played_at", "screenshot", "notes", "replay", "created_at",
 }
 
 
 def push_match_players(match_id: str, players: list[dict]) -> int:
     """Bulk-insert up to 8 rows into `match_players`. Returns count of
-    rows POSTed (0 on failure or local_only). Mirrors to local first.
+    rows POSTed (0 on failure or local_only).
 
     Uses ignore-duplicates so two observers in the same lobby can both call
     this with the same match_id and the second is a no-op via the UNIQUE
     (match_id, steam_id) constraint."""
-    from utils import LOCAL_MATCH_PLAYERS_DIR
     if not players:
         return 0
-    for p in players:
-        sid = str(p.get("steam_id") or "x")
-        placement = p.get("placement") or "X"
-        _save_json_local(
-            LOCAL_MATCH_PLAYERS_DIR,
-            f"{match_id}__p{placement}__{sid}.json",
-            p,
-        )
 
     client = _get_client()
     if client is None:
@@ -420,57 +225,6 @@ def push_match_players(match_id: str, players: list[dict]) -> int:
                 pass
         log.error("push_match_players error: %s | body: %s", e, body)
         return 0
-
-
-def push_live_game(player_row: dict) -> int | None:
-    """Insert a trimmed row into `games` from the live-capture path.
-
-    Shape mirrors what the CV path writes via push_game, so the web viewer's
-    player profile (`players/[steamId]`) renders it identically. Dedup is
-    enforced by the partial unique index idx_games_live_dedup on
-    (match_id, user_id) WHERE length(match_id) = 16."""
-    client = _get_client()
-    if client is None:
-        return None
-
-    try:
-        steam_id = str(player_row.get("steam_id") or "").strip()
-        if not steam_id:
-            return None
-        placement = _safe_int(player_row.get("placement"), 1, 8)
-        level = _safe_int(player_row.get("hero_level"), 1, 15)
-        wins = _safe_int(player_row.get("win_round"))
-        losses = _safe_int(player_row.get("lose_round"))
-
-        row = {
-            "played_at": player_row.get("played_at"),
-            "placement": placement,
-            "lineup": player_row.get("chess_lineup") or None,
-            "synergies": player_row.get("synergies") or None,
-            "talents": player_row.get("talents") or None,
-            "relic": player_row.get("relic") or None,
-            "level": level,
-            "wins": wins,
-            "losses": losses,
-            "match_id": player_row.get("match_id"),
-            "user_id": int(steam_id),
-        }
-        resp = client.post(
-            "/rest/v1/games",
-            json=row,
-            headers={"Prefer": "resolution=ignore-duplicates,return=minimal"},
-        )
-        resp.raise_for_status()
-        return 1
-    except Exception as e:
-        body = ""
-        if hasattr(e, "response") and e.response is not None:
-            try:
-                body = e.response.text
-            except Exception:
-                pass
-        log.error("push_live_game error: %s | body: %s", e, body)
-        return None
 
 
 def lookup_users_by_name(names: list[str]) -> dict[str, int]:

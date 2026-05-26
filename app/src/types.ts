@@ -309,14 +309,6 @@ declare global {
       maximize: () => void;
       close: () => void;
     };
-    screenshots: {
-      list: () => Promise<Screenshot[]>;
-      delete: (filename: string) => Promise<boolean>;
-      openFolder: () => Promise<void>;
-      thumbnail: (filename: string) => Promise<string | null>;
-      getParseResult: (filename: string) => Promise<SavedParseResult | null>;
-      updateParseRow: (filename: string, rowIndex: number, fields: Partial<ParseResultRow>) => Promise<boolean>;
-    };
     replays: {
       list: () => Promise<Replay[]>;
       delete: (filename: string) => Promise<boolean>;
@@ -328,10 +320,7 @@ declare global {
       sendCommand: (cmd: Record<string, unknown>) => void;
       onEvent: (callback: (msg: TrackerEvent) => void) => () => void;
     };
-    lab: LabApi;
     appApi: {
-      openFileDialog: () => Promise<string | null>;
-      openGameOverScreenshotDialog: () => Promise<string | null>;
       openExternal: (url: string) => Promise<boolean>;
       getVersion: () => Promise<string>;
       getCloseToTray: () => Promise<boolean>;

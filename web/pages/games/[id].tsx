@@ -317,7 +317,7 @@ function MatchPlayerRow({
 
   // When the scrubber is active, prefer the snapshot's lineup. Falls back
   // to the static games.lineup for rows without a snapshot at this round.
-  const lineupStr = snap?.lineup ?? game.lineup;
+  const lineupStr = snap?.lineup ?? game.lineup ?? game.chess_lineup ?? null;
   const lineup = parseLineup(lineupStr, UNIT_COSTS);
 
   const isScrubbing = snapRound !== null && !isLastRound;
@@ -561,7 +561,7 @@ export default function GamePage({
   ogImageUrl,
 }: GamePageProps) {
   const router = useRouter();
-  const lineup = parseLineup(game.lineup, UNIT_COSTS);
+  const lineup = parseLineup(game.lineup ?? game.chess_lineup ?? null, UNIT_COSTS);
 
   // Round scrubber state. Default to the last round (= end state), which
   // makes the page render identically to the no-timeline path on load.
@@ -1347,6 +1347,47 @@ export function parseRelicHistory(
   return out;
 }
 
+/** Map a raw match_players row into a Game with legacy aliases populated. */
+function mpRowToGame(
+  mp: Record<string, unknown>,
+  playedAtFallback?: string
+): Game {
+  const steamId = String(mp.steam_id ?? "");
+  const played = (mp.played_at as string) || playedAtFallback || "";
+  const mmrLevel = (mp.mmr_level as number) ?? null;
+  const heroLevel = (mp.hero_level as number) ?? null;
+  const winRound = (mp.win_round as number) ?? null;
+  const loseRound = (mp.lose_round as number) ?? null;
+  return {
+    id: mp.id as number,
+    match_id: (mp.match_id as string) ?? "",
+    user_id: steamId,
+    placement: mp.placement != null ? String(mp.placement) : "",
+    mmr_level: mmrLevel,
+    hero_level: heroLevel,
+    chess_lineup: (mp.chess_lineup as string) ?? null,
+    synergies: (mp.synergies as string) ?? null,
+    relic: (mp.relic as string) ?? null,
+    relic_history: mp.relic_history ?? null,
+    talents: (mp.talents as string) ?? null,
+    win_round: winRound,
+    lose_round: loseRound,
+    screenshot: (mp.screenshot as string) ?? null,
+    notes: (mp.notes as string) ?? null,
+    replay: (mp.replay as string) ?? null,
+    played_at: played,
+    created_at: (mp.created_at as string) ?? "",
+    // Legacy aliases for rendering code
+    lineup: (mp.chess_lineup as string) ?? null,
+    level: heroLevel != null ? String(heroLevel) : null,
+    rank: mmrLevel ? mmrLevelToRank(mmrLevel) : null,
+    rank_change: null,
+    wins: winRound,
+    losses: loseRound,
+    wl: null,
+  } as Game;
+}
+
 export const getServerSideProps: GetServerSideProps = async (context) => {
   const rawId = context.params?.id;
   if (typeof rawId !== "string") return { notFound: true };
@@ -1360,45 +1401,27 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
   const supabase = createClient(url, key);
   const { data } = await supabase
-    .from("games")
-    .select("*, user_id::text")
+    .from("match_players")
+    .select("*, steam_id::text")
     .eq("id", id)
     .single();
 
   if (!data) return { notFound: true };
 
-  // Kick off the owner Steam profile fetch and the match games query in
-  // parallel — both only depend on the single-game row already in hand.
-  const ownerProfilePromise: Promise<SteamProfile> = data.user_id
-    ? fetchSteamProfile(String(data.user_id), supabase)
+  // Kick off the owner Steam profile fetch and the match players query in
+  // parallel — both only depend on the single row already in hand.
+  const ownerProfilePromise: Promise<SteamProfile> = data.steam_id
+    ? fetchSteamProfile(String(data.steam_id), supabase)
     : Promise.resolve({ name: null, customUrl: null });
 
-  const matchGamesPromise: Promise<Game[]> = data.match_id
-    ? Promise.resolve(
-        supabase
-          .from("games")
-          .select("*, user_id::text")
-          .eq("match_id", data.match_id)
-          .order("placement", { ascending: true })
-      ).then(({ data: matchData }) => (matchData as Game[] | null) || [])
-    : Promise.resolve([]);
-
-  // match_players holds the rich live-capture data, including relic_history.
-  // CV-captured games have no rows here — that's fine, the timeline map just
-  // stays empty for those user_ids and the page falls back to games.relic.
-  const matchPlayersPromise: Promise<
-    { steam_id: string | number; relic_history: unknown; mmr_level: number | null }[]
-  > = data.match_id
+  const matchPlayersPromise: Promise<Record<string, unknown>[]> = data.match_id
     ? Promise.resolve(
         supabase
           .from("match_players")
-          .select("steam_id::text, relic_history, mmr_level")
+          .select("*, steam_id::text")
           .eq("match_id", data.match_id)
-      ).then(
-        ({ data: rows }) =>
-          (rows as { steam_id: string | number; relic_history: unknown; mmr_level: number | null }[] | null) ||
-          []
-      )
+          .order("placement", { ascending: true })
+      ).then(({ data: matchData }) => (matchData as Record<string, unknown>[] | null) || [])
     : Promise.resolve([]);
 
   // Per-match round-by-round snapshots. Only nettable-captured matches
@@ -1417,31 +1440,41 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
       )
     : Promise.resolve(null);
 
-  const [steamProfile, matchGames, matchPlayers, timeline] = await Promise.all([
+  // played_at may be null on match_players; fall back to matches.played_at.
+  const matchPlayedAtPromise: Promise<string> = data.match_id
+    ? Promise.resolve(
+        supabase
+          .from("matches")
+          .select("played_at")
+          .eq("match_id", data.match_id)
+          .maybeSingle()
+      ).then(
+        ({ data: row }) =>
+          ((row as { played_at: string } | null)?.played_at) ?? ""
+      )
+    : Promise.resolve("");
+
+  const [steamProfile, allPlayerRows, timeline, matchPlayedAt] = await Promise.all([
     ownerProfilePromise,
-    matchGamesPromise,
     matchPlayersPromise,
     timelinePromise,
+    matchPlayedAtPromise,
   ]);
 
+  // Build the played_at fallback: prefer the row's own value, then the
+  // matches table value.
+  const playedAtFallback = (data.played_at as string) || matchPlayedAt;
+
+  const matchGames = allPlayerRows.map((row) => mpRowToGame(row, matchPlayedAt));
+  const game = mpRowToGame(data, matchPlayedAt);
+
+  // Build relic timelines directly from the match_players data we already have.
   const relicsMap = (relicsData as any).relics as Record<string, RelicInfo>;
   const relicTimelines: Record<string, RelicTimelineEntry[]> = {};
-  const mmrByUser: Record<string, number> = {};
-  for (const mp of matchPlayers) {
-    const sid = String(mp.steam_id);
-    const tl = parseRelicHistory(mp.relic_history, relicsMap);
+  for (const row of allPlayerRows) {
+    const sid = String(row.steam_id);
+    const tl = parseRelicHistory(row.relic_history, relicsMap);
     if (tl.length > 0) relicTimelines[sid] = tl;
-    if (mp.mmr_level) mmrByUser[sid] = mp.mmr_level;
-  }
-
-  // Backfill rank from match_players.mmr_level for games that lack it.
-  for (const g of matchGames) {
-    if (!g.rank && g.user_id && mmrByUser[String(g.user_id)]) {
-      g.rank = mmrLevelToRank(mmrByUser[String(g.user_id)]) || null;
-    }
-  }
-  if (!data.rank && data.user_id && mmrByUser[String(data.user_id)]) {
-    data.rank = mmrLevelToRank(mmrByUser[String(data.user_id)]) || null;
   }
 
   const matchProfiles: Record<string, SteamProfile> = {};
@@ -1478,7 +1511,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
   return {
     props: {
-      game: data,
+      game,
       steamProfile,
       matchGames,
       matchProfiles,

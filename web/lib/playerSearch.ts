@@ -94,14 +94,14 @@ export async function markRowsWithGames(
   if (ids.length === 0) return rows;
 
   const { data } = await supabase
-    .from("games")
-    .select("user_id::text")
-    .in("user_id", ids)
+    .from("match_players")
+    .select("steam_id::text")
+    .in("steam_id", ids)
     .limit(1000);
 
   const idsWithGames = new Set(
-    ((data ?? []) as Array<{ user_id: string }>).map((row) =>
-      String(row.user_id)
+    ((data ?? []) as Array<{ steam_id: string }>).map((row) =>
+      String(row.steam_id)
     )
   );
 

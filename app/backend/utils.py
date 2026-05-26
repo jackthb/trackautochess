@@ -10,16 +10,6 @@ from pathlib import Path
 
 DAC_DIR = Path(os.environ.get("DAC_DIR") or (Path.home() / ".dac"))
 CONFIG_PATH = DAC_DIR / "config.json"
-LOCAL_DUMPS_DIR = DAC_DIR / "nettable_dumps"
-LOCAL_MATCH_PLAYERS_DIR = DAC_DIR / "match_players"
-LOCAL_PLAYERS_DIR = DAC_DIR / "players"
-LOCAL_MATCHES_DIR = DAC_DIR / "matches"
-LOCAL_END_BOARDS_DIR = DAC_DIR / "end_boards"
-LOCAL_PERSONAL_END_BOARDS_DIR = DAC_DIR / "personal_end_boards"
-LOCAL_MATCH_TIMELINES_DIR = DAC_DIR / "match_timelines"
-# Backwards-compat: callers still importing LOCAL_GAMES_DIR (CV pipeline)
-# get the new match_players location transparently.
-LOCAL_GAMES_DIR = LOCAL_MATCH_PLAYERS_DIR
 
 
 def local_only_mode() -> bool:
@@ -50,50 +40,6 @@ DATA_DIR = _data_dir()
 ICONS_DIR = DATA_DIR / "icons"
 DEFAULT_REGIONS_CONFIG_PATH = DATA_DIR / "regions_config.json"
 REGIONS_CONFIG_PATH = DAC_DIR / "regions_config.json"
-
-
-_TESSERACT_SETUP_DONE = False
-
-
-def setup_tesseract() -> None:
-    """Point pytesseract at a bundled Tesseract binary when one is available."""
-    global _TESSERACT_SETUP_DONE
-    if _TESSERACT_SETUP_DONE:
-        return
-    _TESSERACT_SETUP_DONE = True
-
-    try:
-        import pytesseract
-    except ImportError:
-        return
-
-    backend_dir = Path(__file__).resolve().parent
-    app_dir = backend_dir.parent
-
-    candidates: list[Path] = []
-    env_cmd = os.environ.get("TESSERACT_CMD")
-    if env_cmd:
-        candidates.append(Path(env_cmd))
-
-    if getattr(sys, "frozen", False):
-        candidates.append(Path(sys._MEIPASS) / "tesseract" / "tesseract.exe")
-
-    candidates.extend([
-        backend_dir / "vendor" / "tesseract-portable" / "tesseract.exe",
-        backend_dir / "dist" / "headless" / "_internal" / "tesseract" / "tesseract.exe",
-        app_dir / "release" / "win-unpacked" / "resources" / "headless" / "_internal" / "tesseract" / "tesseract.exe",
-    ])
-
-    for tess_exe in candidates:
-        if not tess_exe.exists():
-            continue
-        tess_dir = tess_exe.parent
-        pytesseract.pytesseract.tesseract_cmd = str(tess_exe)
-        os.environ["PATH"] = str(tess_dir) + os.pathsep + os.environ.get("PATH", "")
-        tessdata = tess_dir / "tessdata"
-        if tessdata.exists() and not os.environ.get("TESSDATA_PREFIX"):
-            os.environ["TESSDATA_PREFIX"] = str(tessdata)
-        return
 
 
 # ── Config ────────────────────────────────────────────────────────────────────
@@ -168,36 +114,3 @@ def load_regions_config() -> dict:
     defaults = _read(DEFAULT_REGIONS_CONFIG_PATH)
     overrides = _read(REGIONS_CONFIG_PATH)
     return _merge(defaults, overrides) if defaults else overrides
-
-
-# ── Image helpers (lazy imports — cv2/numpy only loaded when called) ──────────
-
-def crop(img, x0: float, y0: float, x1: float, y1: float):
-    """Crop image using fractional coords (0..1)."""
-    h, w = img.shape[:2]
-    return img[int(h * y0):int(h * y1), int(w * x0):int(w * x1)]
-
-
-def ocr(img, psm: int = 7, whitelist: str = "", lang: str = "") -> str:
-    """OCR a small image region. Returns stripped text."""
-    import cv2
-    setup_tesseract()
-    try:
-        import pytesseract
-    except ImportError:
-        return ""
-    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY) if len(img.shape) == 3 else img
-    config = f"--psm {psm}"
-    if whitelist:
-        config += f" -c tessedit_char_whitelist={whitelist}"
-    if lang:
-        config += f" -l {lang}"
-    try:
-        return pytesseract.image_to_string(gray, config=config).strip()
-    except Exception:
-        return ""
-
-
-def unit_stem(name: str) -> str:
-    """Convert unit name to the filename stem used for icon files."""
-    return name.lower().replace(" ", "_").replace("-", "_").replace("'", "")
