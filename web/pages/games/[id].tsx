@@ -317,7 +317,7 @@ function MatchPlayerRow({
 
   // When the scrubber is active, prefer the snapshot's lineup. Falls back
   // to the static games.lineup for rows without a snapshot at this round.
-  const lineupStr = snap?.lineup ?? game.lineup ?? game.chess_lineup ?? null;
+  const lineupStr = snap?.lineup ?? game.lineup;
   const lineup = parseLineup(lineupStr, UNIT_COSTS);
 
   const isScrubbing = snapRound !== null && !isLastRound;
@@ -561,7 +561,7 @@ export default function GamePage({
   ogImageUrl,
 }: GamePageProps) {
   const router = useRouter();
-  const lineup = parseLineup(game.lineup ?? game.chess_lineup ?? null, UNIT_COSTS);
+  const lineup = parseLineup(game.lineup, UNIT_COSTS);
 
   // Round scrubber state. Default to the last round (= end state), which
   // makes the page render identically to the no-timeline path on load.
