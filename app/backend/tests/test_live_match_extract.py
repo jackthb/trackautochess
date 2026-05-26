@@ -1,14 +1,13 @@
 """Integration tests for _extract_structured_match + _maybe_save_end_board.
 
 Drives the real `nettable_capture.NetTableCapture` against the committed
-end_board fixture, with the four `db.py` upload helpers mocked. Asserts:
+end_board fixture, with the db.py upload helpers mocked. Asserts:
   - the deterministic match_id is propagated from generate_live_match_id
-    into the match_record, the per-player rows, and the local sidecars
-  - push_match / push_match_players / push_live_game / ensure_user are
-    invoked the expected number of times
+    into the match_record and the per-player rows
+  - push_match / push_match_players / ensure_user are invoked the expected
+    number of times
   - in-session dedup: the same end_board ingested twice only uploads once
-  - local_only_mode short-circuits the Supabase calls but still writes
-    local sidecars
+  - local_only_mode short-circuits the Supabase calls
 
 Run:
   cd app/backend
@@ -58,14 +57,13 @@ def _load_fixture() -> tuple[dict, str, int]:
 
 
 def _patch_db_uploaders(monkeypatch):
-    """Mock the four Supabase entry points. Returns a dict of MagicMocks
+    """Mock the Supabase entry points. Returns a dict of MagicMocks
     keyed by function name, so tests can assert call counts / args."""
     import db
     mocks = {
         "ensure_user": MagicMock(return_value=True),
         "push_match": MagicMock(side_effect=lambda r: r.get("match_id")),
         "push_match_players": MagicMock(return_value=1),
-        "push_live_game": MagicMock(return_value=1),
     }
     for name, m in mocks.items():
         monkeypatch.setattr(db, name, m)
@@ -98,7 +96,8 @@ def test_extract_structured_match_returns_record_and_rows(tmp_path, monkeypatch)
     assert all(r["played_at"] == "2026-05-20T12:00:00" for r in player_rows)
 
 
-def test_extract_structured_match_writes_local_sidecars(tmp_path, monkeypatch):
+def test_extract_structured_match_no_local_files(tmp_path, monkeypatch):
+    """_extract_structured_match must NOT write any local sidecar files."""
     _isolated(tmp_path, monkeypatch)
     end_board, expected_match_id, n_players = _load_fixture()
 
@@ -108,19 +107,10 @@ def test_extract_structured_match_writes_local_sidecars(tmp_path, monkeypatch):
         end_board, played_at="2026-05-20T12:00:00", match_id=expected_match_id,
     )
 
-    # Match header sidecar.
-    match_file = tmp_path / "matches" / f"{expected_match_id}.json"
-    assert match_file.exists(), f"missing {match_file}"
-    saved = json.loads(match_file.read_text(encoding="utf-8"))
-    assert saved["match_id"] == expected_match_id
-
-    # One match_player sidecar per player.
-    mp_files = list((tmp_path / "match_players").glob(f"{expected_match_id}__*.json"))
-    assert len(mp_files) == n_players
-
-    # Player profile sidecar per steam_id.
-    profile_files = list((tmp_path / "players").glob("*.json"))
-    assert len(profile_files) == n_players
+    # No local directories should be created.
+    assert not (tmp_path / "matches").exists()
+    assert not (tmp_path / "match_players").exists()
+    assert not (tmp_path / "players").exists()
 
 
 def test_extract_structured_match_empty_data_returns_none(tmp_path, monkeypatch):
@@ -135,8 +125,8 @@ def test_extract_structured_match_empty_data_returns_none(tmp_path, monkeypatch)
 
 
 def test_upload_match_to_supabase_calls_each_db_helper(tmp_path, monkeypatch):
-    """One call to push_match, one to push_match_players (bulk), one
-    push_live_game per player, one ensure_user per player."""
+    """One call to push_match, one to push_match_players (bulk),
+    one ensure_user per player."""
     _isolated(tmp_path, monkeypatch)
     end_board, expected_match_id, n_players = _load_fixture()
 
@@ -153,7 +143,6 @@ def test_upload_match_to_supabase_calls_each_db_helper(tmp_path, monkeypatch):
     assert mocks["ensure_user"].call_count == n_players
     assert mocks["push_match"].call_count == 1
     assert mocks["push_match_players"].call_count == 1
-    assert mocks["push_live_game"].call_count == n_players
 
     # push_match got the same match_id we passed in.
     pm_record = mocks["push_match"].call_args.args[0]
@@ -166,8 +155,8 @@ def test_upload_match_to_supabase_calls_each_db_helper(tmp_path, monkeypatch):
 
 
 def test_upload_match_to_supabase_partial_failure_continues(tmp_path, monkeypatch):
-    """If push_match raises, push_match_players + push_live_game should still
-    run — partial success is preferred to total loss (the comment in
+    """If push_match raises, push_match_players should still run —
+    partial success is preferred to total loss (the comment in
     _upload_match_to_supabase makes this explicit)."""
     _isolated(tmp_path, monkeypatch)
     end_board, expected_match_id, n_players = _load_fixture()
@@ -176,9 +165,7 @@ def test_upload_match_to_supabase_partial_failure_continues(tmp_path, monkeypatc
     monkeypatch.setattr(db, "ensure_user", MagicMock(return_value=True))
     monkeypatch.setattr(db, "push_match", MagicMock(side_effect=RuntimeError("503")))
     pmp = MagicMock(return_value=1)
-    plg = MagicMock(return_value=1)
     monkeypatch.setattr(db, "push_match_players", pmp)
-    monkeypatch.setattr(db, "push_live_game", plg)
 
     from nettable_capture import NetTableCapture
     cap = NetTableCapture(emit=lambda _: None)
@@ -190,7 +177,6 @@ def test_upload_match_to_supabase_partial_failure_continues(tmp_path, monkeypatc
 
     # Downstream calls still happened despite push_match failure.
     assert pmp.call_count == 1
-    assert plg.call_count == n_players
 
 
 # ── _maybe_save_end_board → end-to-end orchestration ────────────────────────
@@ -209,32 +195,26 @@ def _wrap_for_save(end_board: dict) -> list[dict]:
 def test_maybe_save_end_board_drives_full_pipeline(tmp_path, monkeypatch):
     """End-to-end: feed a fake `rows` containing a dac_table.end_board entry
     and assert (1) deterministic id is computed via generate_live_match_id
-    and propagated, (2) all four upload helpers are called, (3) the raw
-    end_board file is archived."""
+    and propagated, (2) all upload helpers are called, (3) no local files
+    are written."""
     _isolated(tmp_path, monkeypatch)
     end_board, expected_match_id, n_players = _load_fixture()
 
     mocks = _patch_db_uploaders(monkeypatch)
 
     from nettable_capture import NetTableCapture
-    from utils import LOCAL_GAMES_DIR
 
     cap = NetTableCapture(emit=lambda _: None)
-    cap._maybe_save_end_board(_wrap_for_save(end_board), LOCAL_GAMES_DIR)
+    cap._maybe_save_end_board(_wrap_for_save(end_board))
 
-    # Raw end_board archived.
-    archives = list((tmp_path / "end_boards").glob("*__end_board.json"))
-    assert len(archives) == 1
-
-    # Local match sidecar uses the deterministic match_id (NOT a uuid).
-    match_files = list((tmp_path / "matches").glob("*.json"))
-    assert [f.stem for f in match_files] == [expected_match_id]
-
-    # All four upload helpers fired.
+    # All upload helpers fired.
     assert mocks["push_match"].call_count == 1
     assert mocks["push_match_players"].call_count == 1
-    assert mocks["push_live_game"].call_count == n_players
     assert mocks["ensure_user"].call_count == n_players
+
+    # No local files written.
+    assert not (tmp_path / "end_boards").exists()
+    assert not (tmp_path / "matches").exists()
 
 
 def test_maybe_save_end_board_dedups_in_session(tmp_path, monkeypatch):
@@ -248,17 +228,14 @@ def test_maybe_save_end_board_dedups_in_session(tmp_path, monkeypatch):
     mocks = _patch_db_uploaders(monkeypatch)
 
     from nettable_capture import NetTableCapture
-    from utils import LOCAL_GAMES_DIR
 
     cap = NetTableCapture(emit=lambda _: None)
     rows = _wrap_for_save(end_board)
-    cap._maybe_save_end_board(rows, LOCAL_GAMES_DIR)
-    cap._maybe_save_end_board(rows, LOCAL_GAMES_DIR)
+    cap._maybe_save_end_board(rows)
+    cap._maybe_save_end_board(rows)
 
     assert mocks["push_match"].call_count == 1
     assert mocks["push_match_players"].call_count == 1
-    # And only one raw archive on disk.
-    assert len(list((tmp_path / "end_boards").glob("*__end_board.json"))) == 1
 
 
 def test_maybe_save_end_board_dedups_across_hehe_values(tmp_path, monkeypatch):
@@ -271,15 +248,14 @@ def test_maybe_save_end_board_dedups_across_hehe_values(tmp_path, monkeypatch):
     mocks = _patch_db_uploaders(monkeypatch)
 
     from nettable_capture import NetTableCapture
-    from utils import LOCAL_GAMES_DIR
 
     cap = NetTableCapture(emit=lambda _: None)
-    cap._maybe_save_end_board(_wrap_for_save(end_board), LOCAL_GAMES_DIR)
+    cap._maybe_save_end_board(_wrap_for_save(end_board))
 
     # Mutate hehe, ingest again.
     eb2 = json.loads(json.dumps(end_board))  # deep copy
     eb2["hehe"] = (end_board.get("hehe") or 0) + 1
-    cap._maybe_save_end_board(_wrap_for_save(eb2), LOCAL_GAMES_DIR)
+    cap._maybe_save_end_board(_wrap_for_save(eb2))
 
     assert mocks["push_match"].call_count == 1
 
@@ -287,10 +263,9 @@ def test_maybe_save_end_board_dedups_across_hehe_values(tmp_path, monkeypatch):
 # ── local_only_mode regression ──────────────────────────────────────────────
 
 
-def test_local_only_mode_skips_supabase_but_writes_sidecars(tmp_path, monkeypatch):
-    """With DAC_LOCAL_ONLY=1, the upload helpers must NOT hit httpx, but
-    local sidecars (matches/, match_players/, players/, end_boards/) still
-    materialize so the user can inspect what was captured."""
+def test_local_only_mode_skips_supabase(tmp_path, monkeypatch):
+    """With DAC_LOCAL_ONLY=1, the upload helpers must NOT hit httpx.
+    _extract_structured_match still produces data but no Supabase calls."""
     _isolated(tmp_path, monkeypatch)
     monkeypatch.setenv("DAC_LOCAL_ONLY", "1")
     end_board, expected_match_id, n_players = _load_fixture()
@@ -305,12 +280,11 @@ def test_local_only_mode_skips_supabase_but_writes_sidecars(tmp_path, monkeypatc
     )
 
     from nettable_capture import NetTableCapture
-    from utils import LOCAL_GAMES_DIR
 
     cap = NetTableCapture(emit=lambda _: None)
-    cap._maybe_save_end_board(_wrap_for_save(end_board), LOCAL_GAMES_DIR)
+    cap._maybe_save_end_board(_wrap_for_save(end_board))
 
-    # Sidecars present.
-    assert (tmp_path / "matches" / f"{expected_match_id}.json").exists()
-    assert len(list((tmp_path / "match_players").glob(f"{expected_match_id}__*.json"))) == n_players
-    assert len(list((tmp_path / "end_boards").glob("*__end_board.json"))) == 1
+    # No local files written.
+    assert not (tmp_path / "matches").exists()
+    assert not (tmp_path / "match_players").exists()
+    assert not (tmp_path / "end_boards").exists()

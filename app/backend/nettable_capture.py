@@ -45,7 +45,7 @@ log = logging.getLogger("dac")
 
 
 # ── Storage filter ────────────────────────────────────────────────────────────
-# Drop static/noise rows before writing to disk or Supabase.
+# Drop static/noise rows before writing to Supabase.
 # In-memory state (_last_state, live view, slot mapping) is NOT filtered.
 
 _STORAGE_DROP_TABLES = frozenset({
@@ -58,7 +58,7 @@ _STORAGE_DROP_KEYS: dict[str, frozenset[str]] = {
 }
 
 def _storage_filter(rows: list[dict]) -> list[dict]:
-    """Remove rows that shouldn't be persisted to disk or Supabase."""
+    """Remove rows that shouldn't be persisted to Supabase."""
     out = []
     for r in rows:
         tbl = r.get("table_name", "")
@@ -1103,10 +1103,15 @@ class NetTableCapture:
         # Keyed by steam_id, value is the comma-joined chess list.
         self._last_lineups: dict[str, str] = {}
 
-        # Match session window — used to stitch dump files into a
-        # match timeline. Set on GAME_IN_PROGRESS (start), reset
-        # after a match's timeline is generated. Float epoch seconds.
+        # Match session window — used to stitch dumps into a match
+        # timeline. Set on GAME_IN_PROGRESS (start), reset after a
+        # match's timeline is generated. Float epoch seconds.
         self._match_session_start: float | None = None
+
+        # In-memory dump buffer — replaces the on-disk LOCAL_DUMPS_DIR.
+        # Each entry is (epoch_seconds, {"captured_at": ..., "rows": [...]}).
+        # Cleared when a match session closes.
+        self._session_dumps: list[tuple[float, dict]] = []
 
         # Dump block accumulator
         self._dump_active = False
@@ -1257,54 +1262,11 @@ class NetTableCapture:
             "at": self._last_state_at or "",
         })
 
-    # If the freshest local dump is older than this, don't warm-start —
-    # the data is almost certainly from a different match.
-    _WARM_START_MAX_AGE_SEC = 30 * 60
-
     def _warm_start_state_from_disk(self) -> None:
-        """Seed `_last_state` from the newest local dump file so the renderer
-        gets a populated snapshot before the next cascade tick lands. Bounded
-        by `_WARM_START_MAX_AGE_SEC`; older files are ignored."""
-        try:
-            from utils import LOCAL_DUMPS_DIR
-            if not LOCAL_DUMPS_DIR.exists():
-                return
-            candidates = sorted(
-                LOCAL_DUMPS_DIR.glob("*.json"),
-                key=lambda p: p.stat().st_mtime,
-                reverse=True,
-            )
-            if not candidates:
-                return
-            latest = candidates[0]
-            age = time.time() - latest.stat().st_mtime
-            if age > self._WARM_START_MAX_AGE_SEC:
-                log.info("nettable: warm-start skipped — newest dump is %.0fs old", age)
-                return
-            try:
-                doc = json.loads(latest.read_text(encoding="utf-8"))
-            except (OSError, ValueError) as e:
-                log.warning("nettable: warm-start failed to read %s: %s", latest.name, e)
-                return
-            rows = doc.get("rows") or []
-            captured_at = doc.get("captured_at") or ""
-            seeded = 0
-            for r in rows:
-                table = r.get("table_name")
-                key = r.get("key")
-                if not table or key is None:
-                    continue
-                self._last_state.setdefault(table, {})[key] = r.get("raw")
-                seeded += 1
-            if seeded:
-                self._last_state_at = captured_at
-                log.info(
-                    "nettable: warm-started %d row(s) from %s (%.0fs old)",
-                    seeded, latest.name, age,
-                )
-                self.emit_state()
-        except Exception as e:
-            log.warning("nettable: warm-start failed: %s", e, exc_info=True)
+        """No-op. Previously seeded _last_state from local dump files.
+        Local dumps are no longer written — state is populated on the
+        first ingest from the console.log tailer."""
+        pass
 
     def _current_status_signature(self) -> tuple:
         """Snapshot the bits of status that we re-emit when they change.
@@ -1459,6 +1421,7 @@ class NetTableCapture:
         if GAME_IN_PROGRESS_RE in line:
             if self._match_session_start is None:
                 self._match_session_start = time.time()
+                self._session_dumps.clear()
                 log.info("nettable: GAME_IN_PROGRESS — match session opened")
                 self._prev_personal_death_team = None
                 self._personal_end_recorded = False
@@ -1532,31 +1495,18 @@ class NetTableCapture:
         ).start()
 
     def _build_match_from_dump(self) -> None:
+        """Fallback: reconstruct a match from the most recent in-memory dump
+        when end_board wasn't captured in time."""
         try:
-            from utils import LOCAL_DUMPS_DIR
-
-            if not LOCAL_DUMPS_DIR.exists():
-                log.warning("nettable: fallback — no dumps directory")
-                return
-            candidates = sorted(
-                LOCAL_DUMPS_DIR.glob("*.json"),
-                key=lambda p: p.stat().st_mtime,
-                reverse=True,
-            )
-            if not candidates:
-                log.warning("nettable: fallback — no dump files found")
+            if not self._session_dumps:
+                log.warning("nettable: fallback — no in-memory dumps")
                 return
 
-            dump_path = candidates[0]
-            try:
-                doc = json.loads(dump_path.read_text(encoding="utf-8"))
-            except (OSError, ValueError) as e:
-                log.warning("nettable: fallback — failed to read %s: %s", dump_path.name, e)
-                return
-
+            # Use the most recent dump.
+            _ts, doc = self._session_dumps[-1]
             rows = doc.get("rows") or []
             if not rows:
-                log.warning("nettable: fallback — dump %s has no rows", dump_path.name)
+                log.warning("nettable: fallback — latest dump has no rows")
                 return
 
             pit_data: dict[str, dict] = {}
@@ -1587,7 +1537,7 @@ class NetTableCapture:
 
             all_sids = set(pit_data.keys()) | set(dac_info.keys())
             if not all_sids:
-                log.warning("nettable: fallback — no player data in dump %s", dump_path.name)
+                log.warning("nettable: fallback — no player data in latest dump")
                 return
 
             merged: dict[str, dict] = {}
@@ -1626,7 +1576,6 @@ class NetTableCapture:
 
             self._emit({
                 "type": "nettable_end_board_saved",
-                "path": str(dump_path),
                 "at": played_at,
                 "fallback": True,
             })
@@ -1764,11 +1713,9 @@ class NetTableCapture:
             break
 
     def _maybe_extract_ranking_top(self, rows: list[dict]) -> None:
-        """Find ranking_top_table.ranking_top and upsert a player profile
-        for every steam_id in the leaderboard. Lets us build a global
-        player DB without having to personally play with everyone."""
-        from utils import LOCAL_PLAYERS_DIR
-
+        """Find ranking_top_table.ranking_top and emit an event with the
+        player count. The actual player profiles live in Supabase — no
+        local file writes."""
         for r in rows:
             if not (r.get("table_name", "").endswith("ranking_top_table")
                     and r.get("key") == "ranking_top"):
@@ -1781,53 +1728,23 @@ class NetTableCapture:
                 continue
             season = raw.get("season") or ""
             scanned_at = datetime.now().isoformat()
-            upserted = 0
-            LOCAL_PLAYERS_DIR.mkdir(parents=True, exist_ok=True)
-            for rank_str, entry in top.items():
-                if not isinstance(entry, dict):
-                    continue
-                sid = str(entry.get("player") or "")
-                if not sid or not sid.startswith("7656"):  # SteamID64 prefix
-                    continue
-                try:
-                    ppath = LOCAL_PLAYERS_DIR / f"{sid}.json"
-                    existing: dict = {}
-                    if ppath.exists():
-                        try:
-                            existing = json.loads(ppath.read_text(encoding="utf-8"))
-                        except Exception:
-                            existing = {}
-                    profile = {
-                        **existing,
-                        "steam_id": sid,
-                        "last_ranking_seen": scanned_at,
-                        "queen_rank": _safe_int(entry.get("queen_rank")),
-                        "mmr_level": _safe_int(entry.get("mmr_level")),
-                        "is_vip": bool(entry.get("is_vip")),
-                        "chicken_count": _safe_int(entry.get("chicken_count")),
-                        "season": season,
-                        "source": "ranking_top_scan",
-                    }
-                    ppath.write_text(json.dumps(profile, indent=2, ensure_ascii=False), encoding="utf-8")
-                    upserted += 1
-                except Exception as e:
-                    log.warning("nettable: failed to upsert ranking player %s: %s", sid, e)
-            if upserted > 0:
-                log.info("nettable: ranking_top scan upserted %d player profile(s)", upserted)
+            player_count = sum(
+                1 for entry in top.values()
+                if isinstance(entry, dict) and str(entry.get("player") or "").startswith("7656")
+            )
+            if player_count > 0:
+                log.info("nettable: ranking_top scan found %d player(s)", player_count)
                 self._emit({
                     "type": "nettable_ranking_scanned",
-                    "player_count": upserted,
+                    "player_count": player_count,
                     "season": season,
                     "at": scanned_at,
                 })
             break
 
-    def _maybe_save_end_board(self, rows: list[dict], games_dir) -> None:
-        """If the dump contains dac_table.end_board, archive the raw payload
-        and trigger structured extraction (transformed match + match_players
-        + players). Dedupes on payload hash to avoid double-writes."""
-        from utils import LOCAL_END_BOARDS_DIR
-
+    def _maybe_save_end_board(self, rows: list[dict]) -> None:
+        """If the dump contains dac_table.end_board, trigger structured
+        extraction and upload to Supabase. Dedupes on payload hash."""
         end_board = None
         for r in rows:
             if r.get("table_name") in ("CustomNetTable_dac_table", "dac_table") \
@@ -1856,19 +1773,6 @@ class NetTableCapture:
             self._end_board_captured = True
             self._post_game_at = None
 
-            raw_payload = json.dumps({
-                "saved_at": saved_at,
-                "source": "dac_table.end_board",
-                "end_board": end_board,
-            }, indent=2, ensure_ascii=False, sort_keys=True)
-
-            # Archive raw to its own dir (separate from transformed records).
-            LOCAL_END_BOARDS_DIR.mkdir(parents=True, exist_ok=True)
-            ts = datetime.now().strftime("%Y%m%d_%H%M%S_%f")
-            raw_path = LOCAL_END_BOARDS_DIR / f"{ts}__end_board.json"
-            raw_path.write_text(raw_payload, encoding="utf-8")
-            log.info("nettable: archived raw end_board to %s", raw_path.name)
-
             # Deterministic match_id from end_board contents — two installs
             # in the same lobby produce the same id, so cross-observer dedup
             # works without any coordination.
@@ -1885,21 +1789,19 @@ class NetTableCapture:
 
             self._emit({
                 "type": "nettable_end_board_saved",
-                "path": str(raw_path),
                 "at": saved_at,
             })
         except Exception as e:
             log.warning("nettable: failed to save end_board: %s", e)
 
     def _maybe_save_personal_end_board(self, rows: list[dict]) -> None:
-        """Snapshot the local player's slot the moment their courier dies.
+        """Detect the moment the local player's courier dies and emit an event.
 
         POST_GAME only fires when the whole lobby finishes, so the
         existing end_board path misses the "I'm out but the rest are still
         playing" window — which is most of every match from the local
         player's POV. Watches `game_info.death_team[<own team_id>]` flip
-        0 → 1 and dumps the slot's full state from
-        `player_info_table.player_info.data[<slot>]` to disk.
+        0 → 1.
 
         Idempotent per match: `_personal_end_recorded` blocks re-fires
         until GAME_IN_PROGRESS resets it.
@@ -1973,87 +1875,45 @@ class NetTableCapture:
         late_capture = prev is None
 
         try:
-            from utils import LOCAL_PERSONAL_END_BOARDS_DIR
             saved_at = datetime.now().isoformat()
-            LOCAL_PERSONAL_END_BOARDS_DIR.mkdir(parents=True, exist_ok=True)
-            ts = datetime.now().strftime("%Y%m%d_%H%M%S_%f")
-            payload = {
-                "saved_at": saved_at,
-                "steam_id": self._steam_id,
-                "slot": own_slot_key,
-                "team_id": own_team_id,
-                "late_capture": late_capture,
-                "round_at_death": own_slot_payload.get("round"),
-                "rank_at_death": own_slot_payload.get("rank")
-                    or own_slot_payload.get("curr_rank"),
-                "player_state": own_slot_payload,
-                # Context bundles useful for reconstructing the match later
-                # without re-reading the dump file.
-                "death_team": death_team,
-                "revealed_legendaries": self._last_state.get(
-                    "CustomNetTable_chess_pool_table", {},
-                ).get("revealed_legendary_chess_list"),
-            }
-            out_path = LOCAL_PERSONAL_END_BOARDS_DIR / f"{ts}__personal_end.json"
-            out_path.write_text(
-                json.dumps(payload, indent=2, ensure_ascii=False, sort_keys=True),
-                encoding="utf-8",
-            )
+            round_at_death = own_slot_payload.get("round")
+            rank_at_death = (own_slot_payload.get("rank")
+                             or own_slot_payload.get("curr_rank"))
             self._personal_end_recorded = True
             log.info(
-                "nettable: personal end_board snapshotted (slot=%s team=%s round=%s rank=%s late=%s) → %s",
+                "nettable: personal end_board snapshotted (slot=%s team=%s round=%s rank=%s late=%s)",
                 own_slot_key, own_team_id,
-                payload["round_at_death"], payload["rank_at_death"],
-                late_capture, out_path.name,
+                round_at_death, rank_at_death, late_capture,
             )
             self._emit({
                 "type": "nettable_personal_game_ended",
-                "path": str(out_path),
                 "at": saved_at,
-                "round": payload["round_at_death"],
-                "rank": payload["rank_at_death"],
+                "round": round_at_death,
+                "rank": rank_at_death,
                 "late_capture": late_capture,
             })
         except Exception as e:
-            log.warning("nettable: failed to save personal end_board: %s", e)
+            log.warning("nettable: failed to process personal end_board: %s", e)
 
     def _extract_structured_match(
         self, end_board: dict, played_at: str, match_id: str,
     ) -> tuple[dict, list[dict]] | None:
-        """Turn raw end_board into three transformed views:
-          * matches/<match_id>.json         — match header + player summary
-          * match_players/<match_id>__p<N>.json — per-player rows for ME only
-          * players/<steam_id>.json         — append-only profile per player
+        """Transform raw end_board into a match record and per-player rows
+        suitable for Supabase upload.
 
         match_id is computed by the caller (deterministic per end_board) so
         two installs in the same lobby agree without coordination.
 
         Returns (match_record, player_rows) — the caller uploads the bundle
         to Supabase. Returns None when end_board.data is missing/empty."""
-        from utils import LOCAL_MATCH_PLAYERS_DIR, LOCAL_MATCHES_DIR, LOCAL_PLAYERS_DIR
-
         data = end_board.get("data") if isinstance(end_board, dict) else None
         if not isinstance(data, dict) or not data:
             return None
-
-        my_steam_id = str(self.config.get("steam_id") or "").strip() if hasattr(self, "config") else ""
-        # Fall back to load_config() if the NetTableCapture instance doesn't
-        # carry config (defensive — older entrypoints constructed it without).
-        if not my_steam_id:
-            try:
-                from utils import load_config
-                my_steam_id = str(load_config().get("steam_id") or "").strip()
-            except Exception:
-                my_steam_id = ""
 
         match_players: list[dict] = []
         all_player_rows: list[dict] = []
         match_duration: float | None = None
         match_final_round: int | None = None
-
-        LOCAL_PLAYERS_DIR.mkdir(parents=True, exist_ok=True)
-        LOCAL_MATCH_PLAYERS_DIR.mkdir(parents=True, exist_ok=True)
-        LOCAL_MATCHES_DIR.mkdir(parents=True, exist_ok=True)
 
         for steam_id, p in data.items():
             if not isinstance(p, dict):
@@ -2102,15 +1962,6 @@ class NetTableCapture:
                 "total_money": _safe_int(p.get("total_money")) or 0,
                 "candy": _safe_int(p.get("candy")) or 0,
             }
-            # Per-player deep row for EVERY player in end_board, not just
-            # the logged-in user. Distribution: friends play their own
-            # matches, end_board reports their data, we want it all.
-            mp_path = LOCAL_MATCH_PLAYERS_DIR / f"{match_id}__p{placement or 'X'}__{sid}.json"
-            try:
-                mp_path.write_text(json.dumps(row, indent=2, ensure_ascii=False), encoding="utf-8")
-            except Exception as e:
-                log.warning("nettable: failed to write match_player %s: %s", sid, e)
-
             all_player_rows.append(row)
 
             # Match-level player summary line — small, for fast match-list views.
@@ -2126,30 +1977,6 @@ class NetTableCapture:
             if match_final_round is None and row["final_round"]:
                 match_final_round = row["final_round"]
 
-            # Player profile — append-only, accumulates match_ids over time.
-            try:
-                ppath = LOCAL_PLAYERS_DIR / f"{sid}.json"
-                existing: dict = {}
-                if ppath.exists():
-                    try:
-                        existing = json.loads(ppath.read_text(encoding="utf-8"))
-                    except Exception:
-                        existing = {}
-                match_ids = existing.get("match_ids") or []
-                if match_id not in match_ids:
-                    match_ids.append(match_id)
-                profile = {
-                    "steam_id": sid,
-                    "last_seen": played_at,
-                    "last_mmr_level": mmr_level,
-                    "last_match_id": match_id,
-                    "match_count": len(match_ids),
-                    "match_ids": match_ids,
-                }
-                ppath.write_text(json.dumps(profile, indent=2, ensure_ascii=False), encoding="utf-8")
-            except Exception as e:
-                log.warning("nettable: failed to write player profile %s: %s", sid, e)
-
         # Match header
         match_record = {
             "match_id": match_id,
@@ -2159,45 +1986,37 @@ class NetTableCapture:
             "player_count": len(match_players),
             "players": sorted(match_players, key=lambda x: (x["placement"] or 99)),
         }
-        try:
-            mpath = LOCAL_MATCHES_DIR / f"{match_id}.json"
-            mpath.write_text(json.dumps(match_record, indent=2, ensure_ascii=False), encoding="utf-8")
-            log.info(
-                "nettable: structured match saved — match_id=%s players=%d duration=%.0fs final_round=%d",
-                match_id, len(match_players), match_duration or 0, match_final_round or 0,
-            )
-            self._emit({
-                "type": "nettable_match_extracted",
-                "match_id": match_id,
-                "player_count": len(match_players),
-                "at": played_at,
-            })
-        except Exception as e:
-            log.warning("nettable: failed to write match record: %s", e)
+        log.info(
+            "nettable: structured match extracted — match_id=%s players=%d duration=%.0fs final_round=%d",
+            match_id, len(match_players), match_duration or 0, match_final_round or 0,
+        )
+        self._emit({
+            "type": "nettable_match_extracted",
+            "match_id": match_id,
+            "player_count": len(match_players),
+            "at": played_at,
+        })
 
-        # Round-by-round timeline — stitch in-session dumps into an
+        # Round-by-round timeline — stitch in-memory dumps into an
         # ordered action log so the UI can replay the match.
         try:
             self._extract_match_timeline(match_id, played_at)
         except Exception as e:
-            log.warning("nettable: failed to write match timeline: %s", e)
+            log.warning("nettable: failed to build match timeline: %s", e)
 
         # Close the session window so the NEXT match starts clean.
         self._match_session_start = None
+        self._session_dumps.clear()
 
         return match_record, all_player_rows
 
     def _upload_match_to_supabase(
         self, match_record: dict, player_rows: list[dict],
     ) -> None:
-        """Fan out the match → Supabase: ensure_user for every player (FK),
-        push the match header, bulk-push match_players, then write 8 trimmed
-        rows into the legacy `games` table so the web viewer's player
-        profile pages light up. Each step swallows its own failures —
-        partial success is preferred to total loss."""
-        from db import (
-            ensure_user, push_match, push_match_players, push_live_game,
-        )
+        """Fan out the match to Supabase: ensure_user for every player (FK),
+        push the match header, bulk-push match_players. Each step swallows
+        its own failures — partial success is preferred to total loss."""
+        from db import ensure_user, push_match, push_match_players
         match_id = match_record.get("match_id") or ""
 
         # Step 1 — satisfy match_players.steam_id FK to users.
@@ -2221,19 +2040,9 @@ class NetTableCapture:
         except Exception as e:
             log.warning("nettable: push_match_players failed: %s", e)
 
-        # DEPRECATED: games table retired — match_players is the single source of truth
-        # # Step 4 — trimmed games rows so every player profile sees the match.
-        # for r in player_rows:
-        #     try:
-        #         push_live_game(r)
-        #     except Exception as e:
-        #         log.warning("nettable: push_live_game(%s) failed: %s",
-        #                     r.get("steam_id"), e)
-
     def _extract_match_timeline(self, match_id: str, played_at: str) -> None:
-        """Walk dumps that belong to the just-ended match, pull
-        per-round per-player state, write match_timelines/<match_id>.json
-        as an ordered list of round snapshots.
+        """Walk in-memory dumps that belong to the just-ended match, pull
+        per-round per-player state, and upload the timeline to Supabase.
 
         Match-window detection (in priority order):
           1. If GAME_IN_PROGRESS fired this session (_match_session_start
@@ -2243,61 +2052,41 @@ class NetTableCapture:
              non-decreasing (i.e. the previous match begins). That
              gives us this match's dumps even if backend missed the
              session start."""
-        from utils import LOCAL_DUMPS_DIR
-
-        # Collect ALL dump files with their mtimes.
-        all_dumps = []
-        for p in LOCAL_DUMPS_DIR.glob("*.json"):
-            try:
-                all_dumps.append((p.stat().st_mtime, p))
-            except Exception:
-                continue
-        all_dumps.sort()
+        all_dumps = sorted(self._session_dumps)
         if not all_dumps:
             log.info("nettable: no dumps to build timeline from")
             return
 
         session_start = self._match_session_start
         if session_start is not None:
-            dump_files = [t for t in all_dumps if t[0] >= session_start - 1.0]
+            in_session = [(ts, d) for ts, d in all_dumps if ts >= session_start - 1.0]
         else:
             # Walk backwards. Each in-match dump should have a round
             # number >= the previous one (rounds go up). Stop when we
-            # see a drop (= previous match's later round → end_board's
+            # see a drop (= previous match's later round -> end_board's
             # match's earlier round transition).
             reversed_dumps = list(reversed(all_dumps))
-            in_match = []
+            in_session = []
             prev_round = None
-            for mtime, path in reversed_dumps:
-                try:
-                    d = json.loads(path.read_text(encoding="utf-8"))
-                except Exception:
-                    continue
+            for ts, d in reversed_dumps:
                 round_n = self._extract_round_from_rows(d.get("rows") or [])
                 if round_n is None:
-                    in_match.append((mtime, path))
+                    in_session.append((ts, d))
                     continue
-                # Walking backwards, round numbers should DECREASE or
-                # stay equal. If we see an INCREASE (older dump has
-                # higher round than newer one), that's a boundary.
                 if prev_round is not None and round_n > prev_round:
                     break
                 prev_round = round_n
-                in_match.append((mtime, path))
-            dump_files = sorted(in_match)
-        if not dump_files:
+                in_session.append((ts, d))
+            in_session = sorted(in_session)
+        if not in_session:
             log.info("nettable: no in-session dumps to build timeline from")
             return
 
         # Group dumps by round_info.round. Each round can have multiple
-        # dumps — keep the LATEST per round so the snapshot reflects
+        # dumps -- keep the LATEST per round so the snapshot reflects
         # the round's final state.
         by_round: dict[int, dict] = {}
-        for mtime, path in dump_files:
-            try:
-                d = json.loads(path.read_text(encoding="utf-8"))
-            except Exception:
-                continue
+        for _ts, d in in_session:
             rows = d.get("rows") or []
             round_n = self._extract_round_from_rows(rows)
             if round_n is None:
@@ -2329,9 +2118,8 @@ class NetTableCapture:
             "rounds": timeline,
         }
 
-        # Direct-to-Supabase — no local file. The desktop app's
-        # timelines:fetch IPC reads from Supabase too, so there's one
-        # source of truth.
+        # Direct-to-Supabase. The desktop app's timelines:fetch IPC reads
+        # from Supabase too, so there's one source of truth.
         try:
             client = make_service_role_client()
             if client is None:
@@ -2344,7 +2132,7 @@ class NetTableCapture:
                     upsert_match_timeline(client, payload)
                 log.info(
                     "nettable: match timeline uploaded — match_id=%s rounds=%d (round %d → %d, from %d dumps)",
-                    match_id, len(timeline), timeline[0]["round"], timeline[-1]["round"], len(dump_files),
+                    match_id, len(timeline), timeline[0]["round"], timeline[-1]["round"], len(in_session),
                 )
         except Exception as e:
             log.warning("nettable: timeline upload failed for %s: %s", match_id, e)
@@ -2600,7 +2388,7 @@ class NetTableCapture:
                 log.info("nettable: ingest found no rows — skipping")
                 return
 
-            from utils import LOCAL_DUMPS_DIR, LOCAL_GAMES_DIR, load_config, local_only_mode
+            from utils import load_config, local_only_mode
 
             # Round + lineup change detection — cheap, runs on every ingest.
             self._detect_round_change(rows)
@@ -2614,29 +2402,24 @@ class NetTableCapture:
             # Look for dac_table.end_board — the server writes this once when
             # a match finishes. Saving it gives us a finished-match record
             # independent of the unreachable match_history_table.
-            self._maybe_save_end_board(rows, LOCAL_GAMES_DIR)
+            self._maybe_save_end_board(rows)
 
             # Scan ranking_top_table for top players → upsert their profiles.
-            # This is how we populate the player DB for everyone we haven't
-            # personally played with.
             self._maybe_extract_ranking_top(rows)
 
-            # Always snapshot the parsed dump to disk before doing anything
-            # else — that way local testing has a record even if Supabase
-            # is unreachable or disabled.
+            # Buffer storable rows in memory for timeline building.
             storable_rows = _storage_filter(rows)
-            try:
-                LOCAL_DUMPS_DIR.mkdir(parents=True, exist_ok=True)
-                ts = datetime.now().strftime("%Y%m%d_%H%M%S_%f")
-                dump_path = LOCAL_DUMPS_DIR / f"{ts}.json"
-                dump_path.write_text(json.dumps({
-                    "captured_at": datetime.now().isoformat(),
-                    "tables": tables,
-                    "rows": storable_rows,
-                }, indent=2, ensure_ascii=False), encoding="utf-8")
-                log.info("nettable: dump saved locally: %s (%d row(s), %d filtered)", dump_path.name, len(storable_rows), len(rows) - len(storable_rows))
-            except Exception as e:
-                log.warning("nettable: local dump save failed: %s", e)
+            now_ts = time.time()
+            dump_doc = {
+                "captured_at": datetime.now().isoformat(),
+                "tables": tables,
+                "rows": storable_rows,
+            }
+            self._session_dumps.append((now_ts, dump_doc))
+            log.info(
+                "nettable: dump buffered (%d row(s), %d filtered)",
+                len(storable_rows), len(rows) - len(storable_rows),
+            )
 
             # Cross-dump dedupe: only POST rows that actually changed since
             # the last successful capture. ranking_top alone is ~79 KB and

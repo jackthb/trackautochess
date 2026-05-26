@@ -149,7 +149,6 @@ type NetTableGameEndedEvent = {
 };
 type NetTableEndBoardSavedEvent = {
   type: "nettable_end_board_saved";
-  path: string;
   at: string;
 };
 type NetTableCreepRoundEvent = {
@@ -304,7 +303,7 @@ export function useNetTableEvents(): NetTableActivityState {
           push({
             kind: "nettable_end_board_saved",
             title: "Captured end board",
-            detail: msg.path,
+            detail: msg.at,
             tone: "success",
           });
           break;

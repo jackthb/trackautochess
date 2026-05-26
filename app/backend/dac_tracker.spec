@@ -21,16 +21,10 @@ ROOT_DIR = os.path.dirname(APP_DIR)
 DATA_DIR = os.path.join(ROOT_DIR, "data")
 VENDOR_DIR = os.path.join(BACKEND_DIR, "vendor")
 
-# Portable Tesseract OCR — directory containing tesseract.exe + DLLs + tessdata/
-# Download from: https://digi.bib.uni-mannheim.de/tesseract/
-TESSERACT_DIR = os.path.join(VENDOR_DIR, "tesseract-portable")
-
 # --- Environment validation — fail early rather than producing a broken build ---
 
 _REQUIRED_PATHS = [
     (os.path.join(DATA_DIR, "icons"),                          "data/icons directory"),
-    (os.path.join(DATA_DIR, "sentinel_ref_final_ranking.png"), "data/sentinel_ref_final_ranking.png"),
-    (os.path.join(DATA_DIR, "sentinel_ref_round_start.png"),  "data/sentinel_ref_round_start.png"),
     (os.path.join(DATA_DIR, "units.json"),                     "data/units.json"),
     (os.path.join(DATA_DIR, "units_full.json"),                "data/units_full.json"),
     (os.path.join(DATA_DIR, "items.json"),                     "data/items.json"),
@@ -50,20 +44,12 @@ print("[spec] Environment OK")
 
 datas = [
     (os.path.join(DATA_DIR, "icons"),                          os.path.join("data", "icons")),
-    (os.path.join(DATA_DIR, "sentinel_ref_final_ranking.png"), "data"),
-    (os.path.join(DATA_DIR, "sentinel_ref_round_start.png"),  "data"),
     (os.path.join(DATA_DIR, "units.json"),                     "data"),
     (os.path.join(DATA_DIR, "units_full.json"),                "data"),
     (os.path.join(DATA_DIR, "items.json"),                     "data"),
     (os.path.join(DATA_DIR, "relics.json"),                    "data"),
     (os.path.join(DATA_DIR, "synergies.json"),                 "data"),
 ]
-
-# Tesseract is optional — present in CI (downloaded before build) and in full local setups.
-if os.path.exists(TESSERACT_DIR):
-    datas.append((TESSERACT_DIR, "tesseract"))
-else:
-    print(f"[spec] WARNING: Tesseract not found at {TESSERACT_DIR} — OCR will NOT be bundled")
 
 # ffmpeg for replay recording (AV1/H.264)
 FFMPEG_DIR = os.path.join(VENDOR_DIR, "ffmpeg")
@@ -89,19 +75,15 @@ a = Analysis(
     binaries=_ssl_binaries,
     datas=datas,
     hiddenimports=[
-        "capture",
-        "cv_parser",
         "db",
-        "models",
         "nettable_capture",
         "nettable_parser",
         "replay",
-        "sentinel",
+        "screen_capture",
         "steam_auth",
         "updater",
         "utils",
         "cv2",
-        "pytesseract",
         "mss",
         "mss.windows",
         "PIL",
@@ -119,6 +101,7 @@ a = Analysis(
         "pystray",
         "keyboard",
         "tkinter",
+        "pytesseract",
     ],
     noarchive=False,
 )

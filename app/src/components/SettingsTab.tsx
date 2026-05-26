@@ -9,7 +9,6 @@ interface SettingsTabProps {
 export function SettingsTab({ status, replayStats }: SettingsTabProps) {
   const [version, setVersion] = useState("\u2014");
   const [closeToTray, setCloseToTray] = useState(true);
-  const [importing, setImporting] = useState(false);
   const [loggingIn, setLoggingIn] = useState(false);
 
   useEffect(() => {
@@ -113,33 +112,6 @@ export function SettingsTab({ status, replayStats }: SettingsTabProps) {
           <div className="settings-row">
             <span className="settings-label">Storage used</span>
             <span className="settings-value dim">{storageUsed}</span>
-          </div>
-        </div>
-        */}
-
-        {/* PARKED — Capture / Import-screenshot section. Restore alongside
-            the Upload + Screenshots tabs.
-        <div className="settings-section">
-          <div className="settings-section-title">Capture</div>
-          <div className="settings-row">
-            <span className="settings-label">Import screenshot</span>
-            <button
-              className={`btn-ghost${importing ? " btn-loading" : ""}`}
-              disabled={importing}
-              onClick={async () => {
-                const filePath = await window.appApi.openFileDialog();
-                if (filePath) {
-                  setImporting(true);
-                  sendCommand({ cmd: "import_file", path: filePath });
-                }
-              }}
-            >
-              {importing ? "Processing" : "Choose file..."}
-            </button>
-          </div>
-          <div className="settings-row">
-            <span className="settings-label">Hotkey</span>
-            <span className="settings-value dim">F6</span>
           </div>
         </div>
         */}

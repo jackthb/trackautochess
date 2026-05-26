@@ -8,12 +8,14 @@ import { StatusBar } from "./components/StatusBar";
 // the matching JSX block + state below.
 import { HistoryTab } from "./components/HistoryTab";
 import { ReplaysTab } from "./components/ReplaysTab";
-import { ConfirmationTab } from "./components/ConfirmationTab";
-import { LabTab } from "./components/LabTab";
+// REMOVED: ConfirmationTab and LabTab — source files deleted.
+// import { ConfirmationTab } from "./components/ConfirmationTab";
+// import { LabTab } from "./components/LabTab";
 import { SettingsTab } from "./components/SettingsTab";
 import { LogTab } from "./components/LogTab";
 import { LoginScreen } from "./components/LoginScreen";
-import { UploadShell } from "./components/UploadShell";
+// REMOVED: UploadShell — screenshot upload flow removed.
+// import { UploadShell } from "./components/UploadShell";
 import { NetTableHome } from "./components/NetTableHome";
 import { GlobalSearch } from "./components/GlobalSearch";
 import { useTrackerEvents } from "./hooks/useTrackerEvents";
@@ -28,11 +30,8 @@ type TabId =
   // PARKED tabs — kept in the union so reviving them stays a one-line uncomment.
   | "history"
   | "replays"
-  | "confirm"
-  | "lab"
   | "settings"
-  | "log"
-  | "upload";
+  | "log";
 
 // PARKED: admin/"preview as user" toggle. Single-view simplification — the
 // app now renders the same flow for everyone (including admins). Restore by
@@ -79,17 +78,7 @@ export default function App() {
   //   tracker.status?.logged_in && (!isAdmin || adminPreviewAsUser)
   // );
 
-  // PARKED with ConfirmationTab — drove the badge + auto-switch.
-  // const hasParseResult = tracker.pendingParseResult !== null;
-  // const hasProcessingScreenshot = tracker.processingScreenshot !== null;
-  // const prevHasResult = useRef(false);
-  //
-  // useEffect(() => {
-  //   if ((hasParseResult || hasProcessingScreenshot) && !prevHasResult.current) {
-  //     setActiveTab("confirm");
-  //   }
-  //   prevHasResult.current = hasParseResult || hasProcessingScreenshot;
-  // }, [hasParseResult, hasProcessingScreenshot]);
+  // REMOVED: ConfirmationTab auto-switch logic (source file deleted).
 
   useEffect(() => {
     if (showLoginScreen) {
@@ -131,9 +120,6 @@ export default function App() {
             active={activeTab}
             onChange={handleTabChange}
             showConfirmBadge={false}
-            // PARKED with admin preview toggle.
-            // showConfirmBadge={hasParseResult}
-            // onPreviewAsUser={isAdmin ? () => setAdminPreviewAsUser(true) : undefined}
           />
           <div style={{ flex: 1, overflow: "hidden", display: "flex" }}>
             {activeTab === "home" && (
@@ -156,20 +142,6 @@ export default function App() {
             {/* PARKED — single-view simplification. Restore alongside the
                 matching tab entry in TabBar.tsx. */}
             {/*
-            {activeTab === "upload" && (
-              <UploadShell
-                status={tracker.status}
-                importing={tracker.importing}
-                importProgress={tracker.importProgress}
-                lastImportResult={tracker.lastImportResult}
-                onBeginImport={tracker.beginImport}
-                onClearImportResult={tracker.clearImportResult}
-                isAdminPreview={isAdmin && adminPreviewAsUser}
-                onExitAdminPreview={
-                  isAdmin ? () => setAdminPreviewAsUser(false) : undefined
-                }
-              />
-            )}
             {activeTab === "replays" && (
               <ReplaysTab
                 {...replaysState}
@@ -180,24 +152,7 @@ export default function App() {
                 onViewGame={handleViewGame}
               />
             )}
-            {activeTab === "confirm" && (
-              <ConfirmationTab
-                processingScreenshot={tracker.processingScreenshot}
-                parseResult={tracker.pendingParseResult}
-                onClear={tracker.clearParseResult}
-                lastImportResult={tracker.lastImportResult}
-                onClearImportResult={tracker.clearImportResult}
-                unitCosts={gamesState.unitCosts}
-                unitsFull={gamesState.unitsFull}
-                synergiesData={gamesState.synergiesData}
-                relicsData={gamesState.relicsData}
-                importing={tracker.importing}
-                onBeginImport={tracker.beginImport}
-              />
-            )}
             */}
-            {/* PARKED — Lab tab. Restore alongside the matching entry in TabBar.tsx. */}
-            {/* {activeTab === "lab" && <LabTab />} */}
             {activeTab === "settings" && (
               <SettingsTab
                 status={tracker.status}
