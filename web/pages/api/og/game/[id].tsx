@@ -4,7 +4,7 @@ import { resolveIconUrl } from "@/lib/icons";
 import { createClient } from "@supabase/supabase-js";
 import { readFile } from "node:fs/promises";
 import path from "node:path";
-import { parseLineup, parseRelics, unitStem, relicStem, RANK_BRACKETS } from "@dac/shared/game-utils";
+import { parseLineup, parseRelics, parseSynergies, unitStem, relicStem, synIconName, RANK_BRACKETS } from "@dac/shared/game-utils";
 import relicsData from "@data/relics.json";
 
 const RELICS_MAP = (relicsData as { relics: Record<string, { name: string }> }).relics;
@@ -134,6 +134,7 @@ async function ogHandler(req: NextApiRequest, res: NextApiResponse) {
   const siteHost = getSiteHost();
 
   const lineup = parseLineup(game.lineup, UNIT_COSTS);
+  const synergies = parseSynergies(game.synergies);
   const rawRelics = mpRelicNames.length > 0 ? mpRelicNames : parseRelics(game.relic);
   const relics = rawRelics.map((r) => RELICS_MAP[r]?.name || r);
   const siteBase = process.env.NEXT_PUBLIC_SITE_URL || "https://www.trackautochess.com";
@@ -141,15 +142,17 @@ async function ogHandler(req: NextApiRequest, res: NextApiResponse) {
 
   const avatarPromise = imageToDataUrl(steamProfile.avatarUrl);
   const unitIconPromises = lineup.map((u) => imageToDataUrl(toAbs(resolveIconUrl("units", unitStem(u.name)))));
+  const synIconPromises = synergies.map((s) => imageToDataUrl(toAbs(resolveIconUrl("synergies", synIconName(s.name)))));
   const relicIconPromises = relics.map((r) => {
     const stem = relicStem(r);
     const url = resolveIconUrl("relics", stem);
     const abs = toAbs(url);
     return imageToDataUrl(abs);
   });
-  const [avatarDataUrl, ...iconResults] = await Promise.all([avatarPromise, ...unitIconPromises, ...relicIconPromises]);
+  const [avatarDataUrl, ...iconResults] = await Promise.all([avatarPromise, ...unitIconPromises, ...synIconPromises, ...relicIconPromises]);
   const unitIcons = iconResults.slice(0, lineup.length);
-  const relicIcons = iconResults.slice(lineup.length);
+  const synIcons = iconResults.slice(lineup.length, lineup.length + synergies.length);
+  const relicIcons = iconResults.slice(lineup.length + synergies.length);
 
   const matchDate = game.played_at
     ? new Date(game.played_at).toLocaleDateString("en-US", {
@@ -376,8 +379,28 @@ async function ogHandler(req: NextApiRequest, res: NextApiResponse) {
               </div>
             )}
 
+            {synergies.length > 0 && (
+              <div style={{ display: "flex", flexDirection: "column", marginTop: 14, gap: 6 }}>
+                <div style={{ display: "flex", color: "#8a92a8", fontFamily: "JetBrains Mono", fontSize: 14, fontWeight: 700, letterSpacing: 2 }}>
+                  SYNERGIES
+                </div>
+                <div style={{ display: "flex", flexWrap: "wrap", gap: 6, alignItems: "center" }}>
+                  {synergies.map((s, i) => (
+                    <div key={i} style={{ display: "flex", alignItems: "center", gap: 4, background: "rgba(255,255,255,0.06)", border: "1px solid #2f3540", borderRadius: 6, padding: "3px 8px 3px 4px" }}>
+                      {synIcons[i] ? (
+                        <img src={synIcons[i]!} width={18} height={18} style={{ borderRadius: 3 }} />
+                      ) : (
+                        <div style={{ display: "flex", width: 18, height: 18, borderRadius: 3, background: "#111419" }} />
+                      )}
+                      <span style={{ fontFamily: "JetBrains Mono", fontSize: 13, fontWeight: 700, color: "#c4c0b6" }}>{s.count}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
             {relics.length > 0 && (
-              <div style={{ display: "flex", flexDirection: "column", marginTop: 16, gap: 8 }}>
+              <div style={{ display: "flex", flexDirection: "column", marginTop: 14, gap: 8 }}>
                 <div style={{ display: "flex", color: "#8a92a8", fontFamily: "JetBrains Mono", fontSize: 14, fontWeight: 700, letterSpacing: 2 }}>
                   RELICS
                 </div>

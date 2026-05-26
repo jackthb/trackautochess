@@ -266,6 +266,7 @@ function MatchPlayerRow({
   snap,
   prevSnap,
   snapRound,
+  isLastRound,
   tooltipData,
 }: {
   game: Game;
@@ -274,12 +275,10 @@ function MatchPlayerRow({
   expanded: boolean;
   onToggle: () => void;
   relicTimeline: RelicTimelineEntry[] | undefined;
-  /** Per-round snapshot for this player. null when no timeline / not in this round. */
   snap: TimelinePlayerSnap | null;
-  /** Previous round's snapshot for this player, used to diff win/loss. */
   prevSnap: TimelinePlayerSnap | null;
-  /** Currently-selected round number, or null when no scrubber. */
   snapRound: number | null;
+  isLastRound: boolean;
   tooltipData: TooltipData;
 }) {
   const p = parseInt(game.placement) || 0;
@@ -301,12 +300,8 @@ function MatchPlayerRow({
   const lineupStr = snap?.lineup ?? game.lineup;
   const lineup = parseLineup(lineupStr, UNIT_COSTS);
 
-  // Synergies aren't included in the per-round snapshot. Showing the
-  // end-of-game synergies mid-scrub would lie about the player's state,
-  // so we hide the synergy row entirely while scrubbing to a non-end round.
-  const isScrubbing = snapRound !== null;
-  const showSynergies = !isScrubbing;
-  const synergies = showSynergies ? parseSynergies(game.synergies) : [];
+  const isScrubbing = snapRound !== null && !isLastRound;
+  const synergies = !isScrubbing ? parseSynergies(game.synergies) : [];
 
   // Compact-view relic list: prefer the full set from relic_history, fall
   // back to the single `relic` field for CV-captured rows. When scrubber
@@ -1295,6 +1290,7 @@ export default function GamePage({
                   }
                   prevSnap={prevRound?.players?.[String(g.user_id)] ?? null}
                   snapRound={selectedRound}
+                  isLastRound={isLastRound}
                   tooltipData={tooltipData}
                 />
               );
