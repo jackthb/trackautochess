@@ -20,87 +20,121 @@
         {
           "kind": "added",
           "name": "Bane($1, Satyr/Warlock)",
-          "detail": "New chess piece. <Active Skill: Activates on Full Mana> Casting Spell: Grabs a random enemy chess piece, rendering it unable to act and dealing pure damage over time. Victims of Atropos often suffer excruciating agony from the vivid illusions in their nightmares."
+          "detail": "New chess piece. <Active Skill: Activates on Full Mana> Casting Spell: Grabs a random enemy chess piece, rendering it unable to act and dealing pure damage over time. Victims of Atropos often suffer excruciating agony from the vivid illusions in their nightmares.",
+          "entity_type": "unit",
+          "entity_slug": "bane"
         },
         {
           "kind": "nerf",
           "name": "Clinkz ($1, Undead/Hunter)",
-          "detail": "Downgraded from $2 to $1"
+          "detail": "Downgraded from $2 to $1",
+          "entity_type": "unit",
+          "entity_slug": "clinkz"
         },
         {
           "kind": "buff",
           "name": "Vengeful Spirit ($2, Undead/Harpy/Demon Hunter)",
-          "detail": "Upgraded from $1 to $2"
+          "detail": "Upgraded from $1 to $2",
+          "entity_type": "unit",
+          "entity_slug": "vengeful-spirit"
         },
         {
           "kind": "buff",
           "name": "Mars",
-          "detail": "Base health increased from 600 to 700"
+          "detail": "Base health increased from 600 to 700",
+          "entity_type": "unit",
+          "entity_slug": "mars"
         },
         {
           "kind": "buff",
           "name": "Tusk - Walrus Punch",
-          "detail": "Cooldown reduced from 6/5/4 seconds to 5/4/3 seconds"
+          "detail": "Cooldown reduced from 6/5/4 seconds to 5/4/3 seconds",
+          "entity_type": "unit",
+          "entity_slug": "tusk"
         },
         {
           "kind": "buff",
           "name": "Shadow Shaman - Hex",
-          "detail": "Duration increased from 4/5/6 seconds to 4/5/7 seconds, cooldown reduced from 8/6/4 seconds to 7/5/4 seconds"
+          "detail": "Duration increased from 4/5/6 seconds to 4/5/7 seconds, cooldown reduced from 8/6/4 seconds to 7/5/4 seconds",
+          "entity_type": "unit",
+          "entity_slug": "shadow-shaman"
         },
         {
           "kind": "change",
           "name": "Lina - Laguna Blade",
-          "detail": "Magic damage reduced from 500/750/1250 to 500/750/1000, cooldown reduced from 9/7/5 seconds to 8/6/4 seconds"
+          "detail": "Magic damage reduced from 500/750/1250 to 500/750/1000, cooldown reduced from 9/7/5 seconds to 8/6/4 seconds",
+          "entity_type": "unit",
+          "entity_slug": "lina"
         },
         {
           "kind": "buff",
           "name": "Pudge",
-          "detail": "Base health increased from 850 to 900"
+          "detail": "Base health increased from 850 to 900",
+          "entity_type": "unit",
+          "entity_slug": "pudge"
         },
         {
           "kind": "buff",
           "name": "Abaddon - Aphotic Shield",
-          "detail": "Absorption increased from 250/350/450 to 300/400/600"
+          "detail": "Absorption increased from 250/350/450 to 300/400/600",
+          "entity_type": "unit",
+          "entity_slug": "abaddon"
         },
         {
           "kind": "buff",
           "name": "Huskar",
-          "detail": "Magic resistance increased from 20% to 25%"
+          "detail": "Magic resistance increased from 20% to 25%",
+          "entity_type": "unit",
+          "entity_slug": "huskar"
         },
         {
           "kind": "change",
           "name": "Riki - Smoke Screen",
-          "detail": "Added effect \"Hides own position during preparation phase\" (formerly (1) Satyr effect)"
+          "detail": "Added effect \"Hides own position during preparation phase\" (formerly (1) Satyr effect)",
+          "entity_type": "unit",
+          "entity_slug": "riki"
         },
         {
           "kind": "buff",
           "name": "Muerta - Pierce the Veil",
-          "detail": "Bonus damage increased from 50/75/125 to 50/100/200"
+          "detail": "Bonus damage increased from 50/75/125 to 50/100/200",
+          "entity_type": "unit",
+          "entity_slug": "muerta"
         },
         {
           "kind": "buff",
           "name": "Drow Ranger",
-          "detail": "Base attack increased from 60 to 75"
+          "detail": "Base attack increased from 60 to 75",
+          "entity_type": "unit",
+          "entity_slug": "drow-ranger"
         },
         {
           "kind": "buff",
           "name": "Undying",
-          "detail": "Base health increased from 900 to 1000"
+          "detail": "Base health increased from 900 to 1000",
+          "entity_type": "unit",
+          "entity_slug": "undying"
         },
         {
           "kind": "nerf",
           "name": "Lion - Finger of Death",
-          "detail": "Pure damage reduced from 500/750/1250 to 500/750/1000, bonus damage per stack reduced from 200/250/350 to 150/200/250"
+          "detail": "Pure damage reduced from 500/750/1250 to 500/750/1000, bonus damage per stack reduced from 200/250/350 to 150/200/250",
+          "entity_type": "unit",
+          "entity_slug": "lion"
         },
         {
           "kind": "buff",
           "name": "Lich - Chain Frost",
-          "detail": "Base damage increased from 100 to 100/150/200"
+          "detail": "Base damage increased from 100 to 100/150/200",
+          "entity_type": "unit",
+          "entity_slug": "lich"
         },
         {
           "kind": "nerf",
           "name": "Necrophos - Reaper's Scythe",
-          "detail": "Base damage reduced from 500/700/900 to 300/400/600, percentage damage reduced from 50%/70%/90% to 40%/50%/70%"
+          "detail": "Base damage reduced from 500/700/900 to 300/400/600, percentage damage reduced from 50%/70%/90% to 40%/50%/70%",
+          "entity_type": "unit",
+          "entity_slug": "necrophos"
         }
       ]
     },
@@ -110,17 +144,23 @@
         {
           "kind": "rework",
           "name": "Satyr - Fear",
-          "detail": "Reworked racial skill. (Previously Stealth: (1) Satyr becomes invisible during the preparation phase) (2) Satyr: Allied Satyr chess pieces gain the effect: If there is more than 1 enemy  nearby, they cause those enemies to lose control due to fear. Note: The fear effect has an internal cooldown of 6-10 seconds and cannot trigger continuously."
+          "detail": "Reworked racial skill. (Previously Stealth: (1) Satyr becomes invisible during the preparation phase) (2) Satyr: Allied Satyr chess pieces gain the effect: If there is more than 1 enemy  nearby, they cause those enemies to lose control due to fear. Note: The fear effect has an internal cooldown of 6-10 seconds and cannot trigger continuously.",
+          "entity_type": "synergy",
+          "entity_slug": "satyr"
         },
         {
           "kind": "nerf",
           "name": "Aqir - Infection",
-          "detail": "The duration of spawned insect chess pieces has been reduced from 15-20 seconds to 12-20 seconds."
+          "detail": "The duration of spawned insect chess pieces has been reduced from 15-20 seconds to 12-20 seconds.",
+          "entity_type": "synergy",
+          "entity_slug": "aqir"
         },
         {
           "kind": "nerf",
           "name": "Elf - Evasion",
-          "detail": "(9) Elves: Illusion duration decreased from 8 secs to 6 secs."
+          "detail": "(9) Elves: Illusion duration decreased from 8 secs to 6 secs.",
+          "entity_type": "synergy",
+          "entity_slug": "elf"
         }
       ]
     },
@@ -130,42 +170,58 @@
         {
           "kind": "buff",
           "name": "Bottle",
-          "detail": "Upgraded from T1 to T2, grants 50 mana (30 mana in the previous version)"
+          "detail": "Upgraded from T1 to T2, grants 50 mana (30 mana in the previous version)",
+          "entity_type": "item",
+          "entity_slug": "bottle"
         },
         {
           "kind": "nerf",
           "name": "Bullwhip",
-          "detail": "Downgraded from T2 to T1, removed effects on its owner (only have effects on summoned units now)"
+          "detail": "Downgraded from T2 to T1, removed effects on its owner (only have effects on summoned units now)",
+          "entity_type": "item",
+          "entity_slug": "bullwhip"
         },
         {
           "kind": "nerf",
           "name": "Blink Dagger",
-          "detail": "Max distance decreased from 800 to 600"
+          "detail": "Max distance decreased from 800 to 600",
+          "entity_type": "item",
+          "entity_slug": "blink-dagger"
         },
         {
           "kind": "change",
           "name": "Minotaur Horn",
-          "detail": "Now immune to mana break"
+          "detail": "Now immune to mana break",
+          "entity_type": "item",
+          "entity_slug": "minotaur-horn"
         },
         {
           "kind": "buff",
           "name": "Butterfly",
-          "detail": "Attack speed bonus increased from 20% to 30%"
+          "detail": "Attack speed bonus increased from 20% to 30%",
+          "entity_type": "item",
+          "entity_slug": "butterfly"
         },
         {
           "kind": "buff",
           "name": "Abyssal Blade",
-          "detail": "CD decreased from 7 secs to 6 secs"
+          "detail": "CD decreased from 7 secs to 6 secs",
+          "entity_type": "item",
+          "entity_slug": "abyssal-blade"
         },
         {
           "kind": "nerf",
           "name": "Scythe of Vyse",
-          "detail": "Cooldown increased from 15 seconds to 20 seconds."
+          "detail": "Cooldown increased from 15 seconds to 20 seconds.",
+          "entity_type": "item",
+          "entity_slug": "scythe-of-vyse"
         },
         {
           "kind": "buff",
           "name": "Daedalus",
-          "detail": "Critical strike chance increased from 15% to 20%."
+          "detail": "Critical strike chance increased from 15% to 20%.",
+          "entity_type": "item",
+          "entity_slug": "daedalus"
         }
       ]
     },
@@ -175,7 +231,9 @@
         {
           "kind": "rework",
           "name": "Chiaroscuro Certainty",
-          "detail": "Effect reworked Grant loot tokens when the relic disappears, with token level determined by the highest reward/compensation during the holding period (removed the restriction of not being able to obtain level 3 tokens before round 25). Your win/loss streak will additionally earn 1 gold, and when the relic disappears, you will receive a corresponding level loot token based on the highest reward/compensation held during that time. Note: 2-4 win/loss streak corresponds to level 1 loot token, 5-9 win/loss streak corresponds to level 2 loot token, and 10+ win/loss streak corresponds to level 3 loot token."
+          "detail": "Effect reworked Grant loot tokens when the relic disappears, with token level determined by the highest reward/compensation during the holding period (removed the restriction of not being able to obtain level 3 tokens before round 25). Your win/loss streak will additionally earn 1 gold, and when the relic disappears, you will receive a corresponding level loot token based on the highest reward/compensation held during that time. Note: 2-4 win/loss streak corresponds to level 1 loot token, 5-9 win/loss streak corresponds to level 2 loot token, and 10+ win/loss streak corresponds to level 3 loot token.",
+          "entity_type": "relic",
+          "entity_slug": "chiaroscuro-certainty"
         },
         {
           "kind": "change",

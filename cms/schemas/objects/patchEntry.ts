@@ -23,6 +23,18 @@ export const patchEntry = defineType({
     }),
     defineField({name: 'name', type: 'string'}),
     defineField({name: 'detail', type: 'text', rows: 3}),
+    defineField({
+      name: 'entity',
+      title: 'Linked Entity',
+      type: 'reference',
+      to: [
+        {type: 'unit'},
+        {type: 'item'},
+        {type: 'relic'},
+        {type: 'synergy'},
+        {type: 'talent'},
+      ],
+    }),
   ],
   preview: {
     select: {kind: 'kind', name: 'name', detail: 'detail'},

@@ -30,7 +30,9 @@
         {
           "kind": "rework",
           "name": "Second Chance",
-          "detail": "Reworked Effect (Now it's a true \"Second Chance!\") When you use consumable items of the choice category, you can refresh the selection panel and acquire different options. Note: Items eligible for the refresh chance include Heart of Machine, Golden Heart of Machine, Dark Heart of Machine, Loot Box, and the next Relic box."
+          "detail": "Reworked Effect (Now it's a true \"Second Chance!\") When you use consumable items of the choice category, you can refresh the selection panel and acquire different options. Note: Items eligible for the refresh chance include Heart of Machine, Golden Heart of Machine, Dark Heart of Machine, Loot Box, and the next Relic box.",
+          "entity_type": "relic",
+          "entity_slug": "second-chance"
         }
       ]
     },
@@ -50,12 +52,16 @@
         {
           "kind": "change",
           "name": "Guardian Greaves",
-          "detail": "Removed the additional healing effect of 500 points. Enables quick movement. <Active Skill: Activates when many allied chess pieces are injured> Grants 500 maximum health and 25 mana to all allied units in the area. Dispels negative effects incurred during battle. Effect Range: 500 Cooldown: 15 seconds"
+          "detail": "Removed the additional healing effect of 500 points. Enables quick movement. <Active Skill: Activates when many allied chess pieces are injured> Grants 500 maximum health and 25 mana to all allied units in the area. Dispels negative effects incurred during battle. Effect Range: 500 Cooldown: 15 seconds",
+          "entity_type": "item",
+          "entity_slug": "guardian-greaves"
         },
         {
           "kind": "change",
           "name": "Necronomicon",
-          "detail": "Balancing adjustments: Death Prophet's/Necrophos's health: 250~650 / 150~390 (previously 210~930 / 140~620). Duration: 5~21 seconds (previously 4~36 seconds)."
+          "detail": "Balancing adjustments: Death Prophet's/Necrophos's health: 250~650 / 150~390 (previously 210~930 / 140~620). Duration: 5~21 seconds (previously 4~36 seconds).",
+          "entity_type": "item",
+          "entity_slug": "necronomicon"
         }
       ]
     },
@@ -75,17 +81,23 @@
         {
           "kind": "buff",
           "name": "Hoodwink- Acorn Shot",
-          "detail": "Damage increased from 100/150/200 to 150/200/250. Summoned unit vulnerability increased from 50%/75%/100% to 75%/100%/125%."
+          "detail": "Damage increased from 100/150/200 to 150/200/250. Summoned unit vulnerability increased from 50%/75%/100% to 75%/100%/125%.",
+          "entity_type": "unit",
+          "entity_slug": "hoodwink"
         },
         {
           "kind": "nerf",
           "name": "Viper - Corrosive Skin",
-          "detail": "Damage per second reduced from 40/50/60 to 30/40/50."
+          "detail": "Damage per second reduced from 40/50/60 to 30/40/50.",
+          "entity_type": "unit",
+          "entity_slug": "viper"
         },
         {
           "kind": "buff",
           "name": "Sven",
-          "detail": "Initial attack increased from 160 to 180."
+          "detail": "Initial attack increased from 160 to 180.",
+          "entity_type": "unit",
+          "entity_slug": "sven"
         }
       ]
     },

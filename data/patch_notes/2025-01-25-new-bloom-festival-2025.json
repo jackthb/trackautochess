@@ -10,12 +10,16 @@
         {
           "kind": "nerf",
           "name": "Skywrath Mage",
-          "detail": "Downgraded from $2 to $1, and adjusted accordingly."
+          "detail": "Downgraded from $2 to $1, and adjusted accordingly.",
+          "entity_type": "unit",
+          "entity_slug": "skywrath-mage"
         },
         {
           "kind": "buff",
           "name": "Luna",
-          "detail": "Upgraded from $1 to $2, and adjusted accordingly."
+          "detail": "Upgraded from $1 to $2, and adjusted accordingly.",
+          "entity_type": "unit",
+          "entity_slug": "luna"
         },
         {
           "kind": "nerf",
@@ -25,57 +29,79 @@
         {
           "kind": "buff",
           "name": "Slark - Essence Shift",
-          "detail": "Max stack count increased from 10/15/20 to 15/20/25."
+          "detail": "Max stack count increased from 10/15/20 to 15/20/25.",
+          "entity_type": "unit",
+          "entity_slug": "slark"
         },
         {
           "kind": "buff",
           "name": "Abaddon",
-          "detail": "Magical resistance increased from 0% to 20%."
+          "detail": "Magical resistance increased from 0% to 20%.",
+          "entity_type": "unit",
+          "entity_slug": "abaddon"
         },
         {
           "kind": "nerf",
           "name": "Faceless Void - Time Zone",
-          "detail": "Duration decreased from 6/7/8 secs to 5/6/7 secs."
+          "detail": "Duration decreased from 6/7/8 secs to 5/6/7 secs.",
+          "entity_type": "unit",
+          "entity_slug": "faceless-void"
         },
         {
           "kind": "nerf",
           "name": "Naga Siren - Song of the Siren",
-          "detail": "Duration decreased from 4/5/6 secs to 3/4/5 secs."
+          "detail": "Duration decreased from 4/5/6 secs to 3/4/5 secs.",
+          "entity_type": "unit",
+          "entity_slug": "naga-siren"
         },
         {
           "kind": "buff",
           "name": "Pudge",
-          "detail": "Armor increased from 2 to 4."
+          "detail": "Armor increased from 2 to 4.",
+          "entity_type": "unit",
+          "entity_slug": "pudge"
         },
         {
           "kind": "change",
           "name": "Rubick - Spell Steal",
-          "detail": "Additional ability also reset after defeating a home battle."
+          "detail": "Additional ability also reset after defeating a home battle.",
+          "entity_type": "unit",
+          "entity_slug": "rubick"
         },
         {
           "kind": "nerf",
           "name": "Muerta - Pierce the Veil",
-          "detail": "Duration decreased from 3/4/5 secs to 3/3.5/4 secs."
+          "detail": "Duration decreased from 3/4/5 secs to 3/3.5/4 secs.",
+          "entity_type": "unit",
+          "entity_slug": "muerta"
         },
         {
           "kind": "nerf",
           "name": "Drow Ranger - Gust",
-          "detail": "Damage decreased from 100/150/250 to 100/150/200."
+          "detail": "Damage decreased from 100/150/250 to 100/150/200.",
+          "entity_type": "unit",
+          "entity_slug": "drow-ranger"
         },
         {
           "kind": "nerf",
           "name": "Monkey King",
-          "detail": "Attack interval increased from 1.0 sec to 1.2 secs."
+          "detail": "Attack interval increased from 1.0 sec to 1.2 secs.",
+          "entity_type": "unit",
+          "entity_slug": "monkey-king"
         },
         {
           "kind": "change",
           "name": "Gyrocopter - Flak Cannon",
-          "detail": "Attack count decreased from 4/6/10 to 3/5/9, max target count increased from 4/7/12 to 4/8/12."
+          "detail": "Attack count decreased from 4/6/10 to 3/5/9, max target count increased from 4/7/12 to 4/8/12.",
+          "entity_type": "unit",
+          "entity_slug": "gyrocopter"
         },
         {
           "kind": "buff",
           "name": "Lich - Chain Frost",
-          "detail": "Bounce count increased from 4/6/10 to 6/8/12."
+          "detail": "Bounce count increased from 4/6/10 to 6/8/12.",
+          "entity_type": "unit",
+          "entity_slug": "lich"
         }
       ]
     },
@@ -85,12 +111,16 @@
         {
           "kind": "buff",
           "name": "Draenei - Blessing of Naaru",
-          "detail": "(4) Draeneis: Damage multiplier decreased from 1.5x to 1x, damage radius increased from 260 to 300"
+          "detail": "(4) Draeneis: Damage multiplier decreased from 1.5x to 1x, damage radius increased from 260 to 300",
+          "entity_type": "synergy",
+          "entity_slug": "draenei"
         },
         {
           "kind": "nerf",
           "name": "Shaman - Hex",
-          "detail": "Channeling duration decreased from 2 secs to 1.5 secs"
+          "detail": "Channeling duration decreased from 2 secs to 1.5 secs",
+          "entity_type": "synergy",
+          "entity_slug": "shaman"
         }
       ]
     },
@@ -105,22 +135,30 @@
         {
           "kind": "nerf",
           "name": "Tranquil Boots",
-          "detail": "Downgraded from T2 to T1, radius decreased from 300 to 200, all allies within the range gain 20 healing every 2 secs. Fast movement. Aura: All allies within the range gain 20 healing every 2 secs."
+          "detail": "Downgraded from T2 to T1, radius decreased from 300 to 200, all allies within the range gain 20 healing every 2 secs. Fast movement. Aura: All allies within the range gain 20 healing every 2 secs.",
+          "entity_type": "item",
+          "entity_slug": "tranquil-boots"
         },
         {
           "kind": "change",
           "name": "Vanguard",
-          "detail": "Block 40 damage on melee pieces.(Invalid on range pieces) Block 40 damage on melee pieces."
+          "detail": "Block 40 damage on melee pieces.(Invalid on range pieces) Block 40 damage on melee pieces.",
+          "entity_type": "item",
+          "entity_slug": "vanguard"
         },
         {
           "kind": "change",
           "name": "Skull Basher",
-          "detail": "Grants melee hero 25% chance on hit to stun the target for 3s. (Invalid on ranged pieces) Grants melee hero 25% chance on hit to stun the target for 3s."
+          "detail": "Grants melee hero 25% chance on hit to stun the target for 3s. (Invalid on ranged pieces) Grants melee hero 25% chance on hit to stun the target for 3s.",
+          "entity_type": "item",
+          "entity_slug": "skull-basher"
         },
         {
           "kind": "nerf",
           "name": "Spider Leg",
-          "detail": "Downgraded from T3 to T2."
+          "detail": "Downgraded from T3 to T2.",
+          "entity_type": "item",
+          "entity_slug": "spider-leg"
         },
         {
           "kind": "change",
@@ -130,32 +168,44 @@
         {
           "kind": "buff",
           "name": "Diffusal Blade",
-          "detail": "Internal CD decreased from 8 secs to 7 secs."
+          "detail": "Internal CD decreased from 8 secs to 7 secs.",
+          "entity_type": "item",
+          "entity_slug": "diffusal-blade"
         },
         {
           "kind": "nerf",
           "name": "Aegis of Immortal",
-          "detail": "Downgraded from T4 to T3. +600 HP instead of +900. +600 HP. Deathrattle: Resurrect once."
+          "detail": "Downgraded from T4 to T3. +600 HP instead of +900. +600 HP. Deathrattle: Resurrect once.",
+          "entity_type": "item",
+          "entity_slug": "aegis-of-immortal"
         },
         {
           "kind": "buff",
           "name": "Abyssal Blade",
-          "detail": "Internal CD decreased from 6 secs to 4 secs."
+          "detail": "Internal CD decreased from 6 secs to 4 secs.",
+          "entity_type": "item",
+          "entity_slug": "abyssal-blade"
         },
         {
           "kind": "nerf",
           "name": "Radiance",
-          "detail": "Downgraded from T5 to T4."
+          "detail": "Downgraded from T5 to T4.",
+          "entity_type": "item",
+          "entity_slug": "radiance"
         },
         {
           "kind": "buff",
           "name": "Assault Cuirass",
-          "detail": "+20 attack speed added. +15 Armor.+20 Attack speed. Aura: Grants +10 armor to allies nearby. Aura:Enemies nearby suffer -10 armor."
+          "detail": "+20 attack speed added. +15 Armor.+20 Attack speed. Aura: Grants +10 armor to allies nearby. Aura:Enemies nearby suffer -10 armor.",
+          "entity_type": "item",
+          "entity_slug": "assault-cuirass"
         },
         {
           "kind": "buff",
           "name": "Havoc",
-          "detail": "Upgraded from T4 to T5. Attack damage +50 instead of +25. Attack damage +50. All carrier damage turns into Pure Damage."
+          "detail": "Upgraded from T4 to T5. Attack damage +50 instead of +25. Attack damage +50. All carrier damage turns into Pure Damage.",
+          "entity_type": "item",
+          "entity_slug": "havoc"
         },
         {
           "kind": "rework",

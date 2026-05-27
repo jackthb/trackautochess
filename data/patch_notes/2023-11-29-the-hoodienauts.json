@@ -10,57 +10,79 @@
         {
           "kind": "rework",
           "name": "Hoodwink - Acorn Shot",
-          "detail": "The Boomerang has been reworked to Acorn Shot. <Active Ability: Activates instantly> Hoodwink attacked with an acorn at the target unit. The acorn bounces to nearby targets, bouncing it to several nearby threatening enemy chess pieces, dealing physical damage, and increasing summoned units' damage percentage against them. Summoned units refer to non-hero chess pieces summoned in battle, such as Wild Hawk, Spirit Bear, Plague Ward, etc. Summoned units will prioritise attacking the target marked with the Acorn (similar to taunting). Though she'll make do with almost anything, Oak and Ironwood acorns make the most effective projectiles -- and the bulk of Hoodwink's stash."
+          "detail": "The Boomerang has been reworked to Acorn Shot. <Active Ability: Activates instantly> Hoodwink attacked with an acorn at the target unit. The acorn bounces to nearby targets, bouncing it to several nearby threatening enemy chess pieces, dealing physical damage, and increasing summoned units' damage percentage against them. Summoned units refer to non-hero chess pieces summoned in battle, such as Wild Hawk, Spirit Bear, Plague Ward, etc. Summoned units will prioritise attacking the target marked with the Acorn (similar to taunting). Though she'll make do with almost anything, Oak and Ironwood acorns make the most effective projectiles -- and the bulk of Hoodwink's stash.",
+          "entity_type": "unit",
+          "entity_slug": "hoodwink"
         },
         {
           "kind": "buff",
           "name": "Tusk",
-          "detail": "Base attack damage increased from 50 to 60."
+          "detail": "Base attack damage increased from 50 to 60.",
+          "entity_type": "unit",
+          "entity_slug": "tusk"
         },
         {
           "kind": "buff",
           "name": "Tinker - Heat-Seeking Missile",
-          "detail": "Damage per missile increased from 200/250/300 to 250/300/350."
+          "detail": "Damage per missile increased from 200/250/300 to 250/300/350.",
+          "entity_type": "unit",
+          "entity_slug": "tinker"
         },
         {
           "kind": "buff",
           "name": "Abaddon - Aphotic Shield",
-          "detail": "Absorption/damage increased from 200/300/400 to 250/350/450."
+          "detail": "Absorption/damage increased from 200/300/400 to 250/350/450.",
+          "entity_type": "unit",
+          "entity_slug": "abaddon"
         },
         {
           "kind": "buff",
           "name": "Faceless Void - Chronosphere",
-          "detail": "Cooldown reduced from 25/20/15 seconds to 20/15/12 seconds, and the effect radius increased from 275/300/325 to 300/350/400."
+          "detail": "Cooldown reduced from 25/20/15 seconds to 20/15/12 seconds, and the effect radius increased from 275/300/325 to 300/350/400.",
+          "entity_type": "unit",
+          "entity_slug": "faceless-void"
         },
         {
           "kind": "nerf",
           "name": "Omniknight - Guardian Angel",
-          "detail": "Duration reduced from 2/3/4 seconds to 2/2.5/3.5 seconds."
+          "detail": "Duration reduced from 2/3/4 seconds to 2/2.5/3.5 seconds.",
+          "entity_type": "unit",
+          "entity_slug": "omniknight"
         },
         {
           "kind": "change",
           "name": "Shadow Fiend - Requiem of Souls",
-          "detail": "Now, every 2 layers of demonic power will add an additional +1 shadow energy (originally every 1 layer)."
+          "detail": "Now, every 2 layers of demonic power will add an additional +1 shadow energy (originally every 1 layer).",
+          "entity_type": "unit",
+          "entity_slug": "shadow-fiend"
         },
         {
           "kind": "nerf",
           "name": "Riki - Smoke Screen",
-          "detail": "Effect radius reduced from 250/350/450 to 250/300/400."
+          "detail": "Effect radius reduced from 250/350/450 to 250/300/400.",
+          "entity_type": "unit",
+          "entity_slug": "riki"
         },
         {
           "kind": "nerf",
           "name": "Viper - Corrosive Skin",
-          "detail": "Magic resistance and reduced attack speed decreased from 20%/30%/50% to 20%/30%/40%, and damage per second reduced from 40/50/70 to 40/50/60."
+          "detail": "Magic resistance and reduced attack speed decreased from 20%/30%/50% to 20%/30%/40%, and damage per second reduced from 40/50/70 to 40/50/60.",
+          "entity_type": "unit",
+          "entity_slug": "viper"
         },
         {
           "kind": "buff",
           "name": "Sven",
-          "detail": "Base attack damage increased from 140 to 160, and base armour increased from 11 to 12."
+          "detail": "Base attack damage increased from 140 to 160, and base armour increased from 11 to 12.",
+          "entity_type": "unit",
+          "entity_slug": "sven"
         },
         {
           "kind": "buff",
           "name": "Spectre",
-          "detail": "Base attack interval reduced from 1.2 seconds to 1.0 seconds."
+          "detail": "Base attack interval reduced from 1.2 seconds to 1.0 seconds.",
+          "entity_type": "unit",
+          "entity_slug": "spectres"
         }
       ]
     },
@@ -70,7 +92,9 @@
         {
           "kind": "change",
           "name": "Human - Spark of Mind",
-          "detail": "Now directly grants 2/6 experience points to the courier (originally gained 1/3 Knowledge Books)"
+          "detail": "Now directly grants 2/6 experience points to the courier (originally gained 1/3 Knowledge Books)",
+          "entity_type": "synergy",
+          "entity_slug": "human"
         },
         {
           "kind": "change",
@@ -80,32 +104,44 @@
         {
           "kind": "nerf",
           "name": "Dwarf - Take Aim",
-          "detail": "Damage bonus per grid distance reduced from 20% to 15%."
+          "detail": "Damage bonus per grid distance reduced from 20% to 15%.",
+          "entity_type": "synergy",
+          "entity_slug": "dwarf"
         },
         {
           "kind": "buff",
           "name": "Undead - Plague",
-          "detail": "(6) Undead's life reduction increased from 25% to 30%."
+          "detail": "(6) Undead's life reduction increased from 25% to 30%.",
+          "entity_type": "synergy",
+          "entity_slug": "undead"
         },
         {
           "kind": "change",
           "name": "Hunter - Aimed Shot ：",
-          "detail": "(3) Hunter trigger probability reduced from 20% to 15% (6) Hunter trigger probability increased from 35% to 40%."
+          "detail": "(3) Hunter trigger probability reduced from 20% to 15% (6) Hunter trigger probability increased from 35% to 40%.",
+          "entity_type": "synergy",
+          "entity_slug": "hunter"
         },
         {
           "kind": "buff",
           "name": "Mage - Magical Vulnerability",
-          "detail": "(6) Mage's reduced magic resistance increased from 35% to 40%."
+          "detail": "(6) Mage's reduced magic resistance increased from 35% to 40%.",
+          "entity_type": "synergy",
+          "entity_slug": "mage"
         },
         {
           "kind": "buff",
           "name": "Warrior - Fortified Armor",
-          "detail": "(6) Warrior's added armour increased from 7 to 9."
+          "detail": "(6) Warrior's added armour increased from 7 to 9.",
+          "entity_type": "synergy",
+          "entity_slug": "warrior"
         },
         {
           "kind": "nerf",
           "name": "Knight - Divine Protection",
-          "detail": "(2) Knight's shield activation probability reduced from 30% to 20%."
+          "detail": "(2) Knight's shield activation probability reduced from 30% to 20%.",
+          "entity_type": "synergy",
+          "entity_slug": "knight"
         }
       ]
     },
@@ -135,7 +171,9 @@
         {
           "kind": "nerf",
           "name": "Prince's Knife",
-          "detail": "Downgraded from T3 to T2, additional damage reduced from 60% to 50%."
+          "detail": "Downgraded from T3 to T2, additional damage reduced from 60% to 50%.",
+          "entity_type": "item",
+          "entity_slug": "princes-knife"
         },
         {
           "kind": "buff",
@@ -155,27 +193,37 @@
         {
           "kind": "buff",
           "name": "Bullwhip",
-          "detail": "Increased attack speed bonus from 80% to 100%."
+          "detail": "Increased attack speed bonus from 80% to 100%.",
+          "entity_type": "item",
+          "entity_slug": "bullwhip"
         },
         {
           "kind": "buff",
           "name": "Pipe of Insight",
-          "detail": "Teammates' magic resistance during activation increased from 30% to 50%."
+          "detail": "Teammates' magic resistance during activation increased from 30% to 50%.",
+          "entity_type": "item",
+          "entity_slug": "pipe-of-insight"
         },
         {
           "kind": "buff",
           "name": "Mekansm",
-          "detail": "Healing cooldown reduced from 20 seconds to 15 seconds."
+          "detail": "Healing cooldown reduced from 20 seconds to 15 seconds.",
+          "entity_type": "item",
+          "entity_slug": "mekansm"
         },
         {
           "kind": "buff",
           "name": "Guardian Greaves",
-          "detail": "Healing cooldown reduced from 20 seconds to 15 seconds, and also increases an equivalent amount of maximum health."
+          "detail": "Healing cooldown reduced from 20 seconds to 15 seconds, and also increases an equivalent amount of maximum health.",
+          "entity_type": "item",
+          "entity_slug": "guardian-greaves"
         },
         {
           "kind": "nerf",
           "name": "Refresher Orb",
-          "detail": "Cooldown increased from 12 seconds to 15 seconds."
+          "detail": "Cooldown increased from 12 seconds to 15 seconds.",
+          "entity_type": "item",
+          "entity_slug": "refresher-orb"
         }
       ]
     },

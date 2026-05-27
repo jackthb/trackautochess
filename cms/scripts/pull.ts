@@ -400,12 +400,110 @@ async function pullGameMode() {
   })
 }
 
+function slugifyName(value: string): string {
+  return value
+    .toLowerCase()
+    .replace(/&/g, ' and ')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+}
+
+const UNIT_SLUG_ALIASES: Record<string, string> = {
+  spectre: 'spectres',
+  bloodseeker: 'blood-seeker',
+  'soul-breaker': 'spirit-breaker',
+  'dark-seer': 'darkseer',
+  'terror-blade': 'terrorblade',
+  'centaur-warrior': 'centaur-warrunner',
+  abbadon: 'abaddon',
+  'beast-master': 'beastmaster',
+  'chao-knight': 'chaos-knight',
+  'tide-hunter': 'tidehunter',
+  'elter-titan': 'elder-titan',
+  'ring-master': 'ringmaster',
+  worlock: 'warlock',
+  necrolyte: 'necrophos',
+  antimage: 'anti-mage',
+  'life-stealer': 'lifestealer',
+}
+
+function buildEntityResolver(): (name: string) => {entity_type: string; entity_slug: string} | null {
+  const itemSlugs = new Set<string>()
+  const relicSlugs = new Set<string>()
+  const talentNames = new Map<string, true>()
+  const unitSlugs = new Set<string>()
+  const synergySlugs = new Set<string>()
+
+  try {
+    const items = JSON.parse(fs.readFileSync(path.join(DATA_DIR, 'items.json'), 'utf-8'))
+    for (const name of Object.keys(items.items ?? {})) itemSlugs.add(slugifyName(name))
+  } catch {}
+  try {
+    const relics = JSON.parse(fs.readFileSync(path.join(DATA_DIR, 'relics.json'), 'utf-8'))
+    for (const r of Object.values(relics.relics ?? {}) as any[]) {
+      if (r.name) relicSlugs.add(slugifyName(r.name))
+    }
+  } catch {}
+  try {
+    const talents = JSON.parse(fs.readFileSync(path.join(DATA_DIR, 'talents.json'), 'utf-8'))
+    for (const t of Object.values(talents) as any[]) {
+      if (t.title) talentNames.set(t.title.toLowerCase(), true)
+    }
+  } catch {}
+  try {
+    const units = JSON.parse(fs.readFileSync(path.join(DATA_DIR, 'units_full.json'), 'utf-8'))
+    for (const name of Object.keys(units)) unitSlugs.add(slugifyName(name))
+  } catch {}
+  try {
+    const synergies = JSON.parse(fs.readFileSync(path.join(DATA_DIR, 'synergies.json'), 'utf-8'))
+    for (const s of Object.values(synergies) as any[]) {
+      if (s.name) synergySlugs.add(slugifyName(s.name))
+    }
+  } catch {}
+
+  return (name: string) => {
+    const itemSlug = slugifyName(name)
+    if (itemSlugs.has(itemSlug)) return {entity_type: 'item', entity_slug: itemSlug}
+    const itemSlugNoApos = slugifyName(name.replace(/'/g, ''))
+    if (itemSlugNoApos !== itemSlug && itemSlugs.has(itemSlugNoApos)) return {entity_type: 'item', entity_slug: itemSlugNoApos}
+
+    const relicSlug = slugifyName(name)
+    if (relicSlugs.has(relicSlug)) return {entity_type: 'relic', entity_slug: relicSlug}
+
+    const talentName = name.replace(/^\d+[ab]\s*[—-]\s*/i, '')
+    if (talentNames.has(talentName.toLowerCase())) return {entity_type: 'talent', entity_slug: 'talents'}
+
+    const bare = name.replace(/\s*-\s+.*$/, '').replace(/\s*\(.*\)$/, '').trim()
+    const unitSlug = slugifyName(bare)
+    if (unitSlugs.has(unitSlug)) return {entity_type: 'unit', entity_slug: unitSlug}
+    const aliased = UNIT_SLUG_ALIASES[unitSlug]
+    if (aliased && unitSlugs.has(aliased)) return {entity_type: 'unit', entity_slug: aliased}
+
+    const synergySlug = slugifyName(bare)
+    if (synergySlugs.has(synergySlug)) return {entity_type: 'synergy', entity_slug: synergySlug}
+
+    return null
+  }
+}
+
 async function pullPatchNotes() {
   const rows = await client.fetch<any[]>(
     `*[_type == "patchNote"] | order(date desc){
-      "slug": slug.current, date, title, titles, source, flavor, sections
+      "slug": slug.current, date, title, titles, source, flavor,
+      sections[]{heading, entries[]{
+        kind, name, detail,
+        "entityType": entity->_type,
+        "entitySlug": select(
+          entity->_type == "unit" => entity->name,
+          entity->_type == "synergy" => entity->name,
+          entity->_type == "item" => entity->name,
+          entity->_type == "relic" => entity->name,
+          entity->_type == "talent" => entity->slot
+        )
+      }}
     }`,
   )
+  const resolve = buildEntityResolver()
   // Per-file outputs
   for (const r of rows) {
     const out: Record<string, unknown> = {
@@ -418,11 +516,25 @@ async function pullPatchNotes() {
     if (r.flavor) out.flavor = r.flavor
     out.sections = (r.sections || []).map((s: any) => ({
       heading: s.heading,
-      entries: (s.entries || []).map((e: any) => ({
-        kind: e.kind,
-        name: e.name ?? '',
-        detail: e.detail ?? '',
-      })),
+      entries: (s.entries || []).map((e: any) => {
+        const entry: Record<string, string> = {
+          kind: e.kind,
+          name: e.name ?? '',
+          detail: e.detail ?? '',
+        }
+        // Prefer Sanity reference; fall back to name resolution
+        if (e.entityType && e.entitySlug) {
+          entry.entity_type = e.entityType
+          entry.entity_slug = slugifyName(e.entitySlug)
+        } else {
+          const entity = resolve(entry.name)
+          if (entity) {
+            entry.entity_type = entity.entity_type
+            entry.entity_slug = entity.entity_slug
+          }
+        }
+        return entry
+      }),
     }))
     writeJson(`patch_notes/${r.slug}.json`, out)
   }

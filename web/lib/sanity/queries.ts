@@ -61,8 +61,25 @@ export const PATCH_NOTE_QUERY = `
       entries[]{
         kind,
         name,
-        detail
+        detail,
+        "entityType": entity->_type,
+        "entitySlug": select(
+          entity->_type == "unit" => entity->name,
+          entity->_type == "synergy" => entity->name,
+          entity->_type == "item" => entity->name,
+          entity->_type == "relic" => entity->name,
+          entity->_type == "talent" => entity->slot
+        )
       }
     }
+  }
+`;
+
+export const ALL_PATCH_NOTES_QUERY = `
+  *[_type == "patchNote"] | order(date desc) {
+    "slug": slug.current,
+    date,
+    title,
+    titles
   }
 `;

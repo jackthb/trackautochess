@@ -39,12 +39,16 @@
         {
           "kind": "change",
           "name": "Brewmaster",
-          "detail": "Стоимость была понижена с 2 до 1 золота, статы скорректированы в соответствии."
+          "detail": "Стоимость была понижена с 2 до 1 золота, статы скорректированы в соответствии.",
+          "entity_type": "unit",
+          "entity_slug": "brewmaster"
         },
         {
           "kind": "change",
           "name": "Ringmaster",
-          "detail": "Изменен внешний вид."
+          "detail": "Изменен внешний вид.",
+          "entity_type": "unit",
+          "entity_slug": "ringmaster"
         }
       ]
     },
@@ -54,17 +58,23 @@
         {
           "kind": "change",
           "name": "Pandaren - Hospitality",
-          "detail": "(1)(2) Вероятность призыв Пандарена увеличена с 12%/12% до 10%/15%"
+          "detail": "(1)(2) Вероятность призыв Пандарена увеличена с 12%/12% до 10%/15%",
+          "entity_type": "synergy",
+          "entity_slug": "pandaren"
         },
         {
           "kind": "change",
           "name": "Monk - Drunken Stagger",
-          "detail": "(2) Monks: Порог уничтожения снижен с 30% до 20% (4) Monks: Шансы сократить вдвое здоровье врагов уменьшено с 20% до 15%"
+          "detail": "(2) Monks: Порог уничтожения снижен с 30% до 20% (4) Monks: Шансы сократить вдвое здоровье врагов уменьшено с 20% до 15%",
+          "entity_type": "synergy",
+          "entity_slug": "monk"
         },
         {
           "kind": "change",
           "name": "Assassin - Coup de Grace",
-          "detail": "(9) Assassins: Множитель критического удара уменьшен с 600% до 500%"
+          "detail": "(9) Assassins: Множитель критического удара уменьшен с 600% до 500%",
+          "entity_type": "synergy",
+          "entity_slug": "assassin"
         }
       ]
     },
@@ -74,12 +84,16 @@
         {
           "kind": "change",
           "name": "Minotaur Horn",
-          "detail": "Повышена с T3 до T4. Владелец становится Дракономи получает 100 маны."
+          "detail": "Повышена с T3 до T4. Владелец становится Дракономи получает 100 маны.",
+          "entity_type": "item",
+          "entity_slug": "minotaur-horn"
         },
         {
           "kind": "change",
           "name": "Necronomicon",
-          "detail": "Necro Warrior и Necro Archer живут = 5 + Уровень курьера*3 секунды, вместо 5 + Уровень курьера*2 секунды."
+          "detail": "Necro Warrior и Necro Archer живут = 5 + Уровень курьера*3 секунды, вместо 5 + Уровень курьера*2 секунды.",
+          "entity_type": "item",
+          "entity_slug": "necronomicon"
         },
         {
           "kind": "change",
@@ -94,12 +108,16 @@
         {
           "kind": "change",
           "name": "Mango Tree",
-          "detail": "Переработано. Золотое манго выпадет только в том случае, если по истечении срока действия реликвии манговое дерево все еще будет живым.(в отличие от предыдущего условия). Запас здоровья мангового дерева увеличен с 7 до 8. Сажает Дерево Манго у Вашей доски. Дает зачарованное манго всегда, когда результат вашей домашней битвы отличается от предыдущей. Дерево увядает после 8 выпаданий. Золотое Манго выпадет, если манговое дерево все еще будет живым по истечении срока действия реликвии."
+          "detail": "Переработано. Золотое манго выпадет только в том случае, если по истечении срока действия реликвии манговое дерево все еще будет живым.(в отличие от предыдущего условия). Запас здоровья мангового дерева увеличен с 7 до 8. Сажает Дерево Манго у Вашей доски. Дает зачарованное манго всегда, когда результат вашей домашней битвы отличается от предыдущей. Дерево увядает после 8 выпаданий. Золотое Манго выпадет, если манговое дерево все еще будет живым по истечении срока действия реликвии.",
+          "entity_type": "relic",
+          "entity_slug": "mango-tree"
         },
         {
           "kind": "change",
           "name": "Magic Box",
-          "detail": "Количество уменьшилось с 15 до 12. В начале следующего раунда, когда игрок собирает фигуру союзника, он превращает ее в случайную новую фигуру того же уровня и ранга. Доступно 12 попыток."
+          "detail": "Количество уменьшилось с 15 до 12. В начале следующего раунда, когда игрок собирает фигуру союзника, он превращает ее в случайную новую фигуру того же уровня и ранга. Доступно 12 попыток.",
+          "entity_type": "relic",
+          "entity_slug": "magic-box"
         }
       ]
     },
@@ -149,62 +167,86 @@
         {
           "kind": "change",
           "name": "Tusk",
-          "detail": "Базовый урон увеличен с 60 до 70"
+          "detail": "Базовый урон увеличен с 60 до 70",
+          "entity_type": "unit",
+          "entity_slug": "tusk"
         },
         {
           "kind": "change",
           "name": "Muerta",
-          "detail": "Базовый урон увеличен с 65 до 75"
+          "detail": "Базовый урон увеличен с 65 до 75",
+          "entity_type": "unit",
+          "entity_slug": "muerta"
         },
         {
           "kind": "change",
           "name": "Enigma - Midnight Pulse",
-          "detail": "Радиус увеличен с 300/350/400 до 350/400/450"
+          "detail": "Радиус увеличен с 300/350/400 до 350/400/450",
+          "entity_type": "unit",
+          "entity_slug": "enigma"
         },
         {
           "kind": "change",
           "name": "Lycan - Shapeshift",
-          "detail": "Урон волчков увеличен с 75/125/175 до 75/150/225"
+          "detail": "Урон волчков увеличен с 75/125/175 до 75/150/225",
+          "entity_type": "unit",
+          "entity_slug": "lycan"
         },
         {
           "kind": "change",
           "name": "Warrior - Fortified Armor",
-          "detail": "(6) Воины - Бонус к броне увеличен с 9 до 10"
+          "detail": "(6) Воины - Бонус к броне увеличен с 9 до 10",
+          "entity_type": "synergy",
+          "entity_slug": "warrior"
         },
         {
           "kind": "change",
           "name": "Pandaren - Hospitality",
-          "detail": "Призванные фигуры могут быть проданы только за половину стоисмости вместо полной цены."
+          "detail": "Призванные фигуры могут быть проданы только за половину стоисмости вместо полной цены.",
+          "entity_type": "synergy",
+          "entity_slug": "pandaren"
         },
         {
           "kind": "change",
           "name": "Assassin - Coup de Grace",
-          "detail": "(9) Assassins - 5% шанс критического удара устранен."
+          "detail": "(9) Assassins - 5% шанс критического удара устранен.",
+          "entity_type": "synergy",
+          "entity_slug": "assassin"
         },
         {
           "kind": "change",
           "name": "Kobold - Divided we stand",
-          "detail": "(3) Kobolds - Превращенные Кобольды теперь живут 30 секунд."
+          "detail": "(3) Kobolds - Превращенные Кобольды теперь живут 30 секунд.",
+          "entity_type": "synergy",
+          "entity_slug": "kobold"
         },
         {
           "kind": "change",
           "name": "Bloodstone",
-          "detail": "Бонус к здоровью увеличен с 300 до 600."
+          "detail": "Бонус к здоровью увеличен с 300 до 600.",
+          "entity_type": "item",
+          "entity_slug": "bloodstone"
         },
         {
           "kind": "change",
           "name": "Drum of Endurance",
-          "detail": "Бонус к скорости атаки увеличен с 30% до 35%"
+          "detail": "Бонус к скорости атаки увеличен с 30% до 35%",
+          "entity_type": "item",
+          "entity_slug": "drum-of-endurance"
         },
         {
           "kind": "change",
           "name": "Manta Style",
-          "detail": "Перезарядка увеличена с 25 до 30 секунд"
+          "detail": "Перезарядка увеличена с 25 до 30 секунд",
+          "entity_type": "item",
+          "entity_slug": "manta-style"
         },
         {
           "kind": "change",
           "name": "Gleipnir",
-          "detail": "Магический урон уменьшен с 200 до 100"
+          "detail": "Магический урон уменьшен с 200 до 100",
+          "entity_type": "item",
+          "entity_slug": "gleipnir"
         },
         {
           "kind": "change",
@@ -239,67 +281,93 @@
         {
           "kind": "change",
           "name": "Largo",
-          "detail": "Базовое здоровье уменьшено с 850 до 800."
+          "detail": "Базовое здоровье уменьшено с 850 до 800.",
+          "entity_type": "unit",
+          "entity_slug": "largo"
         },
         {
           "kind": "change",
           "name": "Faceless Void - Time Zone",
-          "detail": "Бонус к скорости атаки уменьшен с 30%/40%/50% до 20%/30%/40%."
+          "detail": "Бонус к скорости атаки уменьшен с 30%/40%/50% до 20%/30%/40%.",
+          "entity_type": "unit",
+          "entity_slug": "faceless-void"
         },
         {
           "kind": "change",
           "name": "Oracle - Rain of Destiny",
-          "detail": "время перезарядки уменьшено с 15/12/10 секунд до 12/10/8 секунд."
+          "detail": "время перезарядки уменьшено с 15/12/10 секунд до 12/10/8 секунд.",
+          "entity_type": "unit",
+          "entity_slug": "oracle"
         },
         {
           "kind": "change",
           "name": "Treant Protector - Leech Seed",
-          "detail": "Продолжительность увеличена с 4 до 5 секунд, перезарядка уменьшена с 8 до 8/7/6 секунд."
+          "detail": "Продолжительность увеличена с 4 до 5 секунд, перезарядка уменьшена с 8 до 8/7/6 секунд.",
+          "entity_type": "unit",
+          "entity_slug": "treant-protector"
         },
         {
           "kind": "change",
           "name": "Venomancer",
-          "detail": "Интервал атаки вардов уменьшен с 1,4 до 1,2 секунды."
+          "detail": "Интервал атаки вардов уменьшен с 1,4 до 1,2 секунды.",
+          "entity_type": "unit",
+          "entity_slug": "venomancer"
         },
         {
           "kind": "change",
           "name": "Broodmother",
-          "detail": "Базовый урон паучат увеличен с 70/90/130 до 80/120/160. Интервал между базовыми атаками уменьшен с 1,5 до 1,2 с."
+          "detail": "Базовый урон паучат увеличен с 70/90/130 до 80/120/160. Интервал между базовыми атаками уменьшен с 1,5 до 1,2 с.",
+          "entity_type": "unit",
+          "entity_slug": "broodmother"
         },
         {
           "kind": "change",
           "name": "Snapfire - Lil Shredder",
-          "detail": "урон за выстрел увеличен со 100/150/200 до 150/200/300."
+          "detail": "урон за выстрел увеличен со 100/150/200 до 150/200/300.",
+          "entity_type": "unit",
+          "entity_slug": "snapfire"
         },
         {
           "kind": "change",
           "name": "Antimage",
-          "detail": "коэффициент сжигания маны уменьшен с 3/5/8 до 2/4/8."
+          "detail": "коэффициент сжигания маны уменьшен с 3/5/8 до 2/4/8.",
+          "entity_type": "unit",
+          "entity_slug": "anti-mage"
         },
         {
           "kind": "change",
           "name": "Morphling",
-          "detail": "интервал базовой атаки увеличен с 1,3 до 1,4 секунды."
+          "detail": "интервал базовой атаки увеличен с 1,3 до 1,4 секунды.",
+          "entity_type": "unit",
+          "entity_slug": "morphling"
         },
         {
           "kind": "change",
           "name": "Warlock",
-          "detail": "предметы чернокнижника изначально переводят 25%/50% здоровья в ману вместо 20%/40%."
+          "detail": "предметы чернокнижника изначально переводят 25%/50% здоровья в ману вместо 20%/40%.",
+          "entity_type": "unit",
+          "entity_slug": "warlock"
         },
         {
           "kind": "change",
           "name": "Naga - Scale Armor",
-          "detail": "(6) Nagas - Множитель урона от поглощения Нагами уменьшен со 150% до 100%."
+          "detail": "(6) Nagas - Множитель урона от поглощения Нагами уменьшен со 150% до 100%.",
+          "entity_type": "synergy",
+          "entity_slug": "naga"
         },
         {
           "kind": "change",
           "name": "Monk - Drunken Stagger",
-          "detail": "(4) Monks - Действует только для врагов с процентом здоровья выше 40%."
+          "detail": "(4) Monks - Действует только для врагов с процентом здоровья выше 40%.",
+          "entity_type": "synergy",
+          "entity_slug": "monk"
         },
         {
           "kind": "change",
           "name": "Mekansm",
-          "detail": "перезарядка уменьшена с 12 до 10 единиц"
+          "detail": "перезарядка уменьшена с 12 до 10 единиц",
+          "entity_type": "item",
+          "entity_slug": "mekansm"
         },
         {
           "kind": "change",

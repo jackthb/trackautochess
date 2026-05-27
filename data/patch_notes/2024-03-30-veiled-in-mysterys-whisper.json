@@ -25,47 +25,65 @@
         {
           "kind": "nerf",
           "name": "Dark Willow - Cursed Crown",
-          "detail": "Cooldown increased from 5/4/3 seconds to 8/6/4 seconds."
+          "detail": "Cooldown increased from 5/4/3 seconds to 8/6/4 seconds.",
+          "entity_type": "unit",
+          "entity_slug": "dark-willow"
         },
         {
           "kind": "buff",
           "name": "Vengeful Spirit",
-          "detail": "Armour reduction of the victim increased from -2/3/4 to -2/4/6, and removed mana regen prevention."
+          "detail": "Armour reduction of the victim increased from -2/3/4 to -2/4/6, and removed mana regen prevention.",
+          "entity_type": "unit",
+          "entity_slug": "vengeful-spirit"
         },
         {
           "kind": "nerf",
           "name": "Bloodseeker - Bloodbath",
-          "detail": "Damage type now changed back to PURE instead of MAGICAL, damage decreased from 200/300/400 to 150/200/300."
+          "detail": "Damage type now changed back to PURE instead of MAGICAL, damage decreased from 200/300/400 to 150/200/300.",
+          "entity_type": "unit",
+          "entity_slug": "blood-seeker"
         },
         {
           "kind": "nerf",
           "name": "Timbersaw - Death Whirl",
-          "detail": "Cooldown increased from 6/4/3 secs to 6/5/4 secs."
+          "detail": "Cooldown increased from 6/4/3 secs to 6/5/4 secs.",
+          "entity_type": "unit",
+          "entity_slug": "timbersaw"
         },
         {
           "kind": "nerf",
           "name": "Ember Spirit - Sleight of Fist",
-          "detail": "Additional damage decreased from 100/200/400 to 100/200/300"
+          "detail": "Additional damage decreased from 100/200/400 to 100/200/300",
+          "entity_type": "unit",
+          "entity_slug": "ember-spirit"
         },
         {
           "kind": "change",
           "name": "Storm Spirit - Ball Lightning",
-          "detail": "Flying speed decreased from 1250/1875/2500 to 1250/1500/1750 (may prevent it from escaping your own chess board), base damage increased from 40/60/100 to 50/75/125."
+          "detail": "Flying speed decreased from 1250/1875/2500 to 1250/1500/1750 (may prevent it from escaping your own chess board), base damage increased from 40/60/100 to 50/75/125.",
+          "entity_type": "unit",
+          "entity_slug": "storm-spirit"
         },
         {
           "kind": "nerf",
           "name": "Anti-Mage - Mana Break",
-          "detail": "Damage multiplier decreased from 5/7/10 to 4/6/8.."
+          "detail": "Damage multiplier decreased from 5/7/10 to 4/6/8..",
+          "entity_type": "unit",
+          "entity_slug": "anti-mage"
         },
         {
           "kind": "buff",
           "name": "Pangolier - Swashbuckle",
-          "detail": "Dagger strikes increased from 3/4/5 to 4/5/6."
+          "detail": "Dagger strikes increased from 3/4/5 to 4/5/6.",
+          "entity_type": "unit",
+          "entity_slug": "pangolier"
         },
         {
           "kind": "buff",
           "name": "Disruptor - Static Storm",
-          "detail": "Duration increased from 4/5/8 seconds to 4/6/8 seconds."
+          "detail": "Duration increased from 4/5/8 seconds to 4/6/8 seconds.",
+          "entity_type": "unit",
+          "entity_slug": "disruptor"
         }
       ]
     },
@@ -75,7 +93,9 @@
         {
           "kind": "buff",
           "name": "Shaman - Hex",
-          "detail": "Adjusted from (2) (4) to (3) (6). (3) Shaman: All friendly Shaman chess pieces gain the effect: Transform into a random chess piece of +2 levels after casting an active skill or using an active item. (6) Shaman: Equipped items carried by transformed chess pieces will also transform into random items of +2 levels. Note: Transformed chess pieces' levels will not exceed the current level of the courier. Transformation takes 3 seconds to cast. Note: Hex does not transform non-permanent chess pieces, and they cease to be permanent chess pieces after transformation, lasting 15 to 20 seconds. Note: (3) Shaman does not inherit equipment after transformation."
+          "detail": "Adjusted from (2) (4) to (3) (6). (3) Shaman: All friendly Shaman chess pieces gain the effect: Transform into a random chess piece of +2 levels after casting an active skill or using an active item. (6) Shaman: Equipped items carried by transformed chess pieces will also transform into random items of +2 levels. Note: Transformed chess pieces' levels will not exceed the current level of the courier. Transformation takes 3 seconds to cast. Note: Hex does not transform non-permanent chess pieces, and they cease to be permanent chess pieces after transformation, lasting 15 to 20 seconds. Note: (3) Shaman does not inherit equipment after transformation.",
+          "entity_type": "synergy",
+          "entity_slug": "shaman"
         },
         {
           "kind": "nerf",
@@ -100,22 +120,30 @@
         {
           "kind": "nerf",
           "name": "Bottle",
-          "detail": "Initial mana gain reduced from +40 to +30."
+          "detail": "Initial mana gain reduced from +40 to +30.",
+          "entity_type": "item",
+          "entity_slug": "bottle"
         },
         {
           "kind": "nerf",
           "name": "Blink Dagger",
-          "detail": "Mana restoration on trigger reduced from +30 to +20."
+          "detail": "Mana restoration on trigger reduced from +30 to +20.",
+          "entity_type": "item",
+          "entity_slug": "blink-dagger"
         },
         {
           "kind": "buff",
           "name": "Force Staff",
-          "detail": "Mana restoration on trigger increased from +20 to +30."
+          "detail": "Mana restoration on trigger increased from +20 to +30.",
+          "entity_type": "item",
+          "entity_slug": "force-staff"
         },
         {
           "kind": "nerf",
           "name": "Ring of Basilius",
-          "detail": "Mana regeneration reduced from +100% to +50%."
+          "detail": "Mana regeneration reduced from +100% to +50%.",
+          "entity_type": "item",
+          "entity_slug": "ring-of-basilius"
         },
         {
           "kind": "change",
@@ -125,27 +153,37 @@
         {
           "kind": "change",
           "name": "Bullwhip",
-          "detail": "Added effect: Summons' duration +100% (merged with Summoning Stone). Attack Speed +10%. Chess pieces summoned by the carrier gain: Attack speed + +100%, duration + +100%."
+          "detail": "Added effect: Summons' duration +100% (merged with Summoning Stone). Attack Speed +10%. Chess pieces summoned by the carrier gain: Attack speed + +100%, duration + +100%.",
+          "entity_type": "item",
+          "entity_slug": "bullwhip"
         },
         {
           "kind": "nerf",
           "name": "Maelstrom",
-          "detail": "Downgraded from T3 to T2. Attack Speed +10%. 20% chance on attack to release a forked lightning, dealing 100 magic damage to up to 3 enemies."
+          "detail": "Downgraded from T3 to T2. Attack Speed +10%. 20% chance on attack to release a forked lightning, dealing 100 magic damage to up to 3 enemies.",
+          "entity_type": "item",
+          "entity_slug": "maelstrom"
         },
         {
           "kind": "change",
           "name": "Spell Prism",
-          "detail": "Now also effective with targeted active items (Rod of Atos, Hand of Midas, Heaven's Halberd, Bloodthorn, God's Rebuke, Abyssal Blade, Scythe of Vyse)."
+          "detail": "Now also effective with targeted active items (Rod of Atos, Hand of Midas, Heaven's Halberd, Bloodthorn, God's Rebuke, Abyssal Blade, Scythe of Vyse).",
+          "entity_type": "item",
+          "entity_slug": "spell-prism"
         },
         {
           "kind": "buff",
           "name": "Trident",
-          "detail": "Base attack increased from +50 to +60."
+          "detail": "Base attack increased from +50 to +60.",
+          "entity_type": "item",
+          "entity_slug": "trident"
         },
         {
           "kind": "change",
           "name": "Black King Bar",
-          "detail": "AI optimisation, now activates when enemies are close to full mana (previously activated after taking damage)."
+          "detail": "AI optimisation, now activates when enemies are close to full mana (previously activated after taking damage).",
+          "entity_type": "item",
+          "entity_slug": "black-king-bar"
         },
         {
           "kind": "nerf",
@@ -155,7 +193,9 @@
         {
           "kind": "buff",
           "name": "Butterfly",
-          "detail": "Duration of active effect increased from 5 seconds to 6 seconds."
+          "detail": "Duration of active effect increased from 5 seconds to 6 seconds.",
+          "entity_type": "item",
+          "entity_slug": "butterfly"
         },
         {
           "kind": "nerf",

@@ -10,22 +10,30 @@
         {
           "kind": "added",
           "name": "Dark Seer ($2, Draenei/Warlock)",
-          "detail": "New chess piece. Ability: Ion Shell(Prioritizes casting on nearby allied units, does not stack). <Active Ability: Activates on Full Mana> Surrounds the target unit with a bristling shield that damages enemy units in an area around it. The Dark Seer slices holes into the 'Land Behind the Wall,' causing prismatic energy to seep forth."
+          "detail": "New chess piece. Ability: Ion Shell(Prioritizes casting on nearby allied units, does not stack). <Active Ability: Activates on Full Mana> Surrounds the target unit with a bristling shield that damages enemy units in an area around it. The Dark Seer slices holes into the 'Land Behind the Wall,' causing prismatic energy to seep forth.",
+          "entity_type": "unit",
+          "entity_slug": "darkseer"
         },
         {
           "kind": "added",
           "name": "Dawnbreaker($3, Draenei/Knight)",
-          "detail": "New chess piece. Ability: Fire wreath. <Active Ability: Activates on Full Mana> Dawnbreaker whirls her hammer around 3 times, damaging enemies with her attack plus bonus damage. On the final strike, she smashes her hammer down, stunning and damaging enemies in front of her. Across the vast lineage of star progeny, there were multitudes unwilling to align with the aims of the Children of Light. To those who dared organise defiance, the Children would dispatch Valora and her hammer to show a measure of their power--to leave the rebels either shattered or set back to rights."
+          "detail": "New chess piece. Ability: Fire wreath. <Active Ability: Activates on Full Mana> Dawnbreaker whirls her hammer around 3 times, damaging enemies with her attack plus bonus damage. On the final strike, she smashes her hammer down, stunning and damaging enemies in front of her. Across the vast lineage of star progeny, there were multitudes unwilling to align with the aims of the Children of Light. To those who dared organise defiance, the Children would dispatch Valora and her hammer to show a measure of their power--to leave the rebels either shattered or set back to rights.",
+          "entity_type": "unit",
+          "entity_slug": "dawnbreaker"
         },
         {
           "kind": "rework",
           "name": "OmniKnight",
-          "detail": "Skill rework to <guardian angel> (consistent with the old version, providing group protection. Originally used <Purification> temporarily due to changes in DOTA2. The All-Seeing One casts down his protection over those that Purist calls friends."
+          "detail": "Skill rework to <guardian angel> (consistent with the old version, providing group protection. Originally used <Purification> temporarily due to changes in DOTA2. The All-Seeing One casts down his protection over those that Purist calls friends.",
+          "entity_type": "unit",
+          "entity_slug": "omniknight"
         },
         {
           "kind": "buff",
           "name": "Tusk",
-          "detail": "Base attack interval reduced from 1.3 seconds to 1.2 seconds."
+          "detail": "Base attack interval reduced from 1.3 seconds to 1.2 seconds.",
+          "entity_type": "unit",
+          "entity_slug": "tusk"
         }
       ]
     },
@@ -40,42 +48,58 @@
         {
           "kind": "change",
           "name": "Undead - Plague",
-          "detail": "Effect fine-tuned (due to changes in the way undead pieces are obtained) (3) Undead: All non-undead pieces on both sides of the battle gain the plague effect: Maximum Health -10%. (6) Undead: All non-undead pieces on both sides of the battle gain the plague effect: Maximum Health -40%. (9) Undead: Plague-infected pieces that die in combat are reanimated as Skeleton Soldiers to fight for the enemy. Note: Melee chess pieces will be resurrected as Wraith King✪, while ranged chess pieces will be resurrected as Clinkz✪, with the same star level as the dead chess piece. Skeleton soldiers last for 10 seconds."
+          "detail": "Effect fine-tuned (due to changes in the way undead pieces are obtained) (3) Undead: All non-undead pieces on both sides of the battle gain the plague effect: Maximum Health -10%. (6) Undead: All non-undead pieces on both sides of the battle gain the plague effect: Maximum Health -40%. (9) Undead: Plague-infected pieces that die in combat are reanimated as Skeleton Soldiers to fight for the enemy. Note: Melee chess pieces will be resurrected as Wraith King✪, while ranged chess pieces will be resurrected as Clinkz✪, with the same star level as the dead chess piece. Skeleton soldiers last for 10 seconds.",
+          "entity_type": "synergy",
+          "entity_slug": "undead"
         },
         {
           "kind": "change",
           "name": "Monk - Drunken Stagger",
-          "detail": "(2) (4) Monks' current damage now affects the triggering probability. The higher the damage, the higher the triggering probability (balancing low-frequency high damage and high-frequency low damage benefits, adjustment coefficient is sqrt(damage/100))."
+          "detail": "(2) (4) Monks' current damage now affects the triggering probability. The higher the damage, the higher the triggering probability (balancing low-frequency high damage and high-frequency low damage benefits, adjustment coefficient is sqrt(damage/100)).",
+          "entity_type": "synergy",
+          "entity_slug": "monk"
         },
         {
           "kind": "nerf",
           "name": "Knight - Divine Protection",
-          "detail": "(4) (6) The probability of knights to proc a shield is reduced from 30%/20% to 20%/10%."
+          "detail": "(4) (6) The probability of knights to proc a shield is reduced from 30%/20% to 20%/10%.",
+          "entity_type": "synergy",
+          "entity_slug": "knight"
         },
         {
           "kind": "nerf",
           "name": "Warlock - Soul Leech",
-          "detail": "(4) The life steal ratio of warlocks is reduced from 25% to 20%, (6) The maximum health drained by warlocks is reduced from 50% to 30%."
+          "detail": "(4) The life steal ratio of warlocks is reduced from 25% to 20%, (6) The maximum health drained by warlocks is reduced from 50% to 30%.",
+          "entity_type": "unit",
+          "entity_slug": "warlock"
         },
         {
           "kind": "nerf",
           "name": "Pandaren - Hospitality",
-          "detail": "(1) (2) The probability of inviting Pandaren is balanced from 7%/10% to 6%/12%."
+          "detail": "(1) (2) The probability of inviting Pandaren is balanced from 7%/10% to 6%/12%.",
+          "entity_type": "synergy",
+          "entity_slug": "pandaren"
         },
         {
           "kind": "buff",
           "name": "Warrior - Fortified Armour",
-          "detail": "(6) The armour provided by warriors is increased from 9 to 12."
+          "detail": "(6) The armour provided by warriors is increased from 9 to 12.",
+          "entity_type": "synergy",
+          "entity_slug": "warrior"
         },
         {
           "kind": "buff",
           "name": "Hunter - AimedShot",
-          "detail": "(6) The probability of hunters dealing an additional attack is increased from 40% to 50%."
+          "detail": "(6) The probability of hunters dealing an additional attack is increased from 40% to 50%.",
+          "entity_type": "synergy",
+          "entity_slug": "hunter"
         },
         {
           "kind": "change",
           "name": "Priest - Salvation",
-          "detail": "The duration of Mind Control is now equal to the piece’s level × 2 (originally a fixed 10 seconds)."
+          "detail": "The duration of Mind Control is now equal to the piece’s level × 2 (originally a fixed 10 seconds).",
+          "entity_type": "synergy",
+          "entity_slug": "priest"
         }
       ]
     },
@@ -95,7 +119,9 @@
         {
           "kind": "buff",
           "name": "Maelstrom",
-          "detail": "Upgraded from T2 to T3, effect adjusted: Attack Speed +20%. 20% chance on attack to release a bolt of electricity that leaps between 3 targets in maximum, dealing 200 magic damage to each."
+          "detail": "Upgraded from T2 to T3, effect adjusted: Attack Speed +20%. 20% chance on attack to release a bolt of electricity that leaps between 3 targets in maximum, dealing 200 magic damage to each.",
+          "entity_type": "item",
+          "entity_slug": "maelstrom"
         },
         {
           "kind": "nerf",
@@ -105,7 +131,9 @@
         {
           "kind": "change",
           "name": "Force Staff",
-          "detail": "Added attribute: Magic Damage +10%"
+          "detail": "Added attribute: Magic Damage +10%",
+          "entity_type": "item",
+          "entity_slug": "force-staff"
         },
         {
           "kind": "buff",
@@ -125,17 +153,23 @@
         {
           "kind": "change",
           "name": "Bullwhip",
-          "detail": "Added attribute: Attack Speed +10%"
+          "detail": "Added attribute: Attack Speed +10%",
+          "entity_type": "item",
+          "entity_slug": "bullwhip"
         },
         {
           "kind": "change",
           "name": "Pipe of Insight",
-          "detail": "Added attribute: Health Regeneration +10"
+          "detail": "Added attribute: Health Regeneration +10",
+          "entity_type": "item",
+          "entity_slug": "pipe-of-insight"
         },
         {
           "kind": "change",
           "name": "Trident",
-          "detail": "Base attribute adjusted from Attack Speed +20% to Attack Damage +30%"
+          "detail": "Base attribute adjusted from Attack Speed +20% to Attack Damage +30%",
+          "entity_type": "item",
+          "entity_slug": "trident"
         },
         {
           "kind": "change",
@@ -145,17 +179,23 @@
         {
           "kind": "nerf",
           "name": "Gleipnir",
-          "detail": "Root duration reduced from 5 seconds to 4 seconds"
+          "detail": "Root duration reduced from 5 seconds to 4 seconds",
+          "entity_type": "item",
+          "entity_slug": "gleipnir"
         },
         {
           "kind": "buff",
           "name": "Giants Ring",
-          "detail": "Physical block increased from +60 to +90"
+          "detail": "Physical block increased from +60 to +90",
+          "entity_type": "item",
+          "entity_slug": "giants-ring"
         },
         {
           "kind": "buff",
           "name": "Mirror Shield",
-          "detail": "Reflect effectiveness increased from 40% to 50%"
+          "detail": "Reflect effectiveness increased from 40% to 50%",
+          "entity_type": "item",
+          "entity_slug": "mirror-shield"
         },
         {
           "kind": "buff",
@@ -170,22 +210,30 @@
         {
           "kind": "change",
           "name": "Second Chance",
-          "detail": "While holding this relic, at the beginning of each round, reroll chess pieces can also be refreshed once for free."
+          "detail": "While holding this relic, at the beginning of each round, reroll chess pieces can also be refreshed once for free.",
+          "entity_type": "relic",
+          "entity_slug": "second-chance"
         },
         {
           "kind": "change",
           "name": "Mango Tree",
-          "detail": "Now the tree wilts after 8 drops, and grants an additional golden enchanted mango (originally 9 mangoes)."
+          "detail": "Now the tree wilts after 8 drops, and grants an additional golden enchanted mango (originally 9 mangoes).",
+          "entity_type": "relic",
+          "entity_slug": "mango-tree"
         },
         {
           "kind": "change",
           "name": "WeaponSmith",
-          "detail": "While holding the relic, the weapon Smith himself will appear beside the chessboard (similar to Mango Tree, The Great Vault)."
+          "detail": "While holding the relic, the weapon Smith himself will appear beside the chessboard (similar to Mango Tree, The Great Vault).",
+          "entity_type": "relic",
+          "entity_slug": "weaponsmith"
         },
         {
           "kind": "change",
           "name": "WeaponSmith",
-          "detail": "Now, after recasting 2 pieces of Spoil tokens, the weapon Smith will disappear(originally able to recast 3 times)."
+          "detail": "Now, after recasting 2 pieces of Spoil tokens, the weapon Smith will disappear(originally able to recast 3 times).",
+          "entity_type": "relic",
+          "entity_slug": "weaponsmith"
         },
         {
           "kind": "change",

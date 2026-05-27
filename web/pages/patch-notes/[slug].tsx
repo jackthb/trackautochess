@@ -7,9 +7,11 @@ import type { GetStaticPaths, GetStaticProps } from "next";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import patchIndex from "@data/patch_notes/index.json";
 import { SeoHead } from "@/lib/seo";
-import { getItemSlugByName, getItemBySlug, iconUrl } from "@/lib/items";
-import { getRelicSlugByName, getRelicBySlug } from "@/lib/relics";
+import { getItemBySlug, iconUrl } from "@/lib/items";
+import { getRelicBySlug } from "@/lib/relics";
 import { getTalentByName } from "@/lib/talents";
+import { getUnitBySlug } from "@/lib/units";
+import { getSynergyBySlug } from "@/lib/synergies";
 import { absoluteUrl, SITE_NAME, SITE_TITLE } from "@/lib/site";
 import { normalizeLocale, pickLocalized } from "@/lib/i18n";
 import { loadDraftPatchNote } from "@/lib/sanity/draftLoaders";
@@ -27,6 +29,8 @@ interface PatchEntry {
   kind: EntryKind;
   name: string;
   detail: string;
+  entity_type?: "item" | "relic" | "talent" | "unit" | "synergy";
+  entity_slug?: string;
 }
 
 interface PatchSection {
@@ -43,12 +47,6 @@ interface Patch {
   flavor?: string;
   summary?: string;
   sections: PatchSection[];
-}
-
-interface IndexPatch {
-  date: string;
-  title: string;
-  slug: string;
 }
 
 interface PatchPageProps {
@@ -123,37 +121,54 @@ interface EntryMeta {
   tooltip: string | null;
 }
 
-function resolveEntryMeta(name: string): EntryMeta {
-  const itemSlug = getItemSlugByName(name);
-  if (itemSlug) {
-    const item = getItemBySlug(itemSlug);
-    return {
-      href: `/items/${itemSlug}`,
-      iconSrc: item ? iconUrl(item) : null,
-      tooltip: item ? `${item.name}: ${item.description}` : null,
-    };
+function resolveEntryMeta(entry: PatchEntry): EntryMeta {
+  if (!entry.entity_type || !entry.entity_slug) {
+    return { href: null, iconSrc: null, tooltip: null };
   }
-
-  const relicSlug = getRelicSlugByName(name);
-  if (relicSlug) {
-    const relic = getRelicBySlug(relicSlug);
-    return {
-      href: `/relics/${relicSlug}`,
-      iconSrc: relic ? relic.iconUrl : null,
-      tooltip: relic ? `${relic.name}: ${relic.description}` : null,
-    };
+  switch (entry.entity_type) {
+    case "item": {
+      const item = getItemBySlug(entry.entity_slug);
+      return {
+        href: `/items/${entry.entity_slug}`,
+        iconSrc: item ? iconUrl(item) : null,
+        tooltip: item ? `${item.name}: ${item.description}` : null,
+      };
+    }
+    case "relic": {
+      const relic = getRelicBySlug(entry.entity_slug);
+      return {
+        href: `/relics/${entry.entity_slug}`,
+        iconSrc: relic ? relic.iconUrl : null,
+        tooltip: relic ? `${relic.name}: ${relic.description}` : null,
+      };
+    }
+    case "talent": {
+      const talent = getTalentByName(entry.name.replace(/^\d+[ab]\s*[—-]\s*/i, ""));
+      return {
+        href: "/talents",
+        iconSrc: null,
+        tooltip: talent ? `${talent.key} ${talent.name}: ${talent.description}` : null,
+      };
+    }
+    case "unit": {
+      const unit = getUnitBySlug(entry.entity_slug);
+      return {
+        href: `/units/${entry.entity_slug}`,
+        iconSrc: unit ? unit.iconUrl : null,
+        tooltip: unit ? `${unit.name} — Cost ${unit.cost}` : null,
+      };
+    }
+    case "synergy": {
+      const synergy = getSynergyBySlug(entry.entity_slug);
+      return {
+        href: `/synergies/${entry.entity_slug}`,
+        iconSrc: synergy ? synergy.iconUrl : null,
+        tooltip: synergy ? `${synergy.name}: ${synergy.description}` : null,
+      };
+    }
+    default:
+      return { href: null, iconSrc: null, tooltip: null };
   }
-
-  const talent = getTalentByName(name.replace(/^\d+[ab]\s*[—-]\s*/i, ""));
-  if (talent) {
-    return {
-      href: "/talents",
-      iconSrc: null,
-      tooltip: `${talent.key} ${talent.name}: ${talent.description}`,
-    };
-  }
-
-  return { href: null, iconSrc: null, tooltip: null };
 }
 
 export default function PatchDetailPage({
@@ -517,7 +532,7 @@ export default function PatchDetailPage({
             <div key={section.heading} className="section">
               <div className="section-heading">{section.heading}</div>
               {section.entries.map((entry, index) => {
-                const { href, iconSrc, tooltip } = resolveEntryMeta(entry.name);
+                const { href, iconSrc, tooltip } = resolveEntryMeta(entry);
 
                 return (
                   <div key={index} className="entry">
@@ -567,6 +582,12 @@ export default function PatchDetailPage({
   );
 }
 
+interface IndexPatch {
+  date: string;
+  title: string;
+  slug: string;
+}
+
 export const getStaticPaths: GetStaticPaths = async () => {
   return {
     paths: (patchIndex.patches as IndexPatch[]).map((patch) => ({
@@ -597,6 +618,8 @@ export const getStaticProps: GetStaticProps<PatchPageProps> = async ({
           kind: e.kind as EntryKind,
           name: e.name,
           detail: e.detail,
+          entity_type: e.entityType as PatchEntry["entity_type"],
+          entity_slug: e.entitySlug,
         })),
       })),
     };

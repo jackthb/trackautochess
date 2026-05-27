@@ -10,7 +10,9 @@
         {
           "kind": "change",
           "name": "IO - Tether",
-          "detail": "Reworked. <Battlecry Ability: Activates before the battle starts> IO tethers with allies around, granting percentage damage reduction. Health percentage will be distributed equally among all tethered allies at set intervals. P.S. Tether will break when IO dies or is too far from its ally. P.S. Health from redistribution of tether will not be counted as Heal. The benevolent touch of Io brings strength from between the planes."
+          "detail": "Reworked. <Battlecry Ability: Activates before the battle starts> IO tethers with allies around, granting percentage damage reduction. Health percentage will be distributed equally among all tethered allies at set intervals. P.S. Tether will break when IO dies or is too far from its ally. P.S. Health from redistribution of tether will not be counted as Heal. The benevolent touch of Io brings strength from between the planes.",
+          "entity_type": "unit",
+          "entity_slug": "io"
         },
         {
           "kind": "change",
@@ -20,22 +22,30 @@
         {
           "kind": "change",
           "name": "Meepo",
-          "detail": "Cancelled the extra one when combined into Rank 3."
+          "detail": "Cancelled the extra one when combined into Rank 3.",
+          "entity_type": "unit",
+          "entity_slug": "meepo"
         },
         {
           "kind": "buff",
           "name": "Meepo - Poof",
-          "detail": "Damage increased from 100/150/250 to 100/200/400"
+          "detail": "Damage increased from 100/150/250 to 100/200/400",
+          "entity_type": "unit",
+          "entity_slug": "meepo"
         },
         {
           "kind": "buff",
           "name": "Legion Commander",
-          "detail": "Armor increased from 5 to 7"
+          "detail": "Armor increased from 5 to 7",
+          "entity_type": "unit",
+          "entity_slug": "legion-commander"
         },
         {
           "kind": "nerf",
           "name": "Morphling - Waveform",
-          "detail": "Damage decreased from 200/300/400 to 150/250/350"
+          "detail": "Damage decreased from 200/300/400 to 150/250/350",
+          "entity_type": "unit",
+          "entity_slug": "morphling"
         }
       ]
     },
@@ -45,17 +55,23 @@
         {
           "kind": "change",
           "name": "Kobold - Divided We Stand",
-          "detail": "(2) Reworked. (1) Kobold: If every friendly Kobold piece on board can be paired with another identical same-rank Kobold, summons a replica for each pair when battle starts. (2) Kobolds: Every unpaired Kobold piece will reshape itself into a non-Kobold ally of the same Rank before battle starts. P.S. Paired Kobolds will keep themselves. P.S. Unpaired Kobolds will reshape into highest level allies of the same rank."
+          "detail": "(2) Reworked. (1) Kobold: If every friendly Kobold piece on board can be paired with another identical same-rank Kobold, summons a replica for each pair when battle starts. (2) Kobolds: Every unpaired Kobold piece will reshape itself into a non-Kobold ally of the same Rank before battle starts. P.S. Paired Kobolds will keep themselves. P.S. Unpaired Kobolds will reshape into highest level allies of the same rank.",
+          "entity_type": "synergy",
+          "entity_slug": "kobold"
         },
         {
           "kind": "change",
           "name": "Harpy - Windfury",
-          "detail": "Simplified. (2) Harpies: All allies gain the effect - Targeted spells +1 additional targets. (4) Harpies: All allies gain the effect - Targeted spells +1 additional targets."
+          "detail": "Simplified. (2) Harpies: All allies gain the effect - Targeted spells +1 additional targets. (4) Harpies: All allies gain the effect - Targeted spells +1 additional targets.",
+          "entity_type": "synergy",
+          "entity_slug": "harpy"
         },
         {
           "kind": "nerf",
           "name": "Shaman - Hex",
-          "detail": "Channeling duration decreased from 2s to 1s"
+          "detail": "Channeling duration decreased from 2s to 1s",
+          "entity_type": "synergy",
+          "entity_slug": "shaman"
         }
       ]
     },
@@ -70,7 +86,9 @@
         {
           "kind": "buff",
           "name": "Guardian Greaves",
-          "detail": "Mana restoration increased from 25 to 30"
+          "detail": "Mana restoration increased from 25 to 30",
+          "entity_type": "item",
+          "entity_slug": "guardian-greaves"
         }
       ]
     },
@@ -120,37 +138,51 @@
         {
           "kind": "nerf",
           "name": "Tauren - Totem of the Clan",
-          "detail": "(4) Taurens: Silence duration of Woodpecker Totem decreased from 5s to 3s. Disarm duration of Horn Totem decreased from 3s to 2s"
+          "detail": "(4) Taurens: Silence duration of Woodpecker Totem decreased from 5s to 3s. Disarm duration of Horn Totem decreased from 3s to 2s",
+          "entity_type": "synergy",
+          "entity_slug": "tauren"
         },
         {
           "kind": "nerf",
           "name": "Skywrath Mage - Arcane Bolt",
-          "detail": "Inner CD increased from 1s to 2s"
+          "detail": "Inner CD increased from 1s to 2s",
+          "entity_type": "unit",
+          "entity_slug": "skywrath-mage"
         },
         {
           "kind": "buff",
           "name": "Muerta",
-          "detail": "Attack interval decreased from 1.3s to 1.1s"
+          "detail": "Attack interval decreased from 1.3s to 1.1s",
+          "entity_type": "unit",
+          "entity_slug": "muerta"
         },
         {
           "kind": "nerf",
           "name": "Kez - Kazurai Katana",
-          "detail": "Percentage Damage decreased from 20%/30%/40% to 15%/20%/30%, base damage decreased from 400/600/800 to 300/400/600"
+          "detail": "Percentage Damage decreased from 20%/30%/40% to 15%/20%/30%, base damage decreased from 400/600/800 to 300/400/600",
+          "entity_type": "unit",
+          "entity_slug": "kez"
         },
         {
           "kind": "buff",
           "name": "Shadow Fiend - Requiem of souls",
-          "detail": "Wave width increased from 150~200 to 150~250"
+          "detail": "Wave width increased from 150~200 to 150~250",
+          "entity_type": "unit",
+          "entity_slug": "shadow-fiend"
         },
         {
           "kind": "nerf",
           "name": "Elter Titan - Earth Splitter",
-          "detail": "Stunning duration decreased from 1.5/2.0/2.5s to 1.0/1.5/2.0s"
+          "detail": "Stunning duration decreased from 1.5/2.0/2.5s to 1.0/1.5/2.0s",
+          "entity_type": "unit",
+          "entity_slug": "elder-titan"
         },
         {
           "kind": "buff",
           "name": "Primal Beast - Pulverize",
-          "detail": "CD decreased from 10/8/6s to 8/6/4s"
+          "detail": "CD decreased from 10/8/6s to 8/6/4s",
+          "entity_type": "unit",
+          "entity_slug": "primal-beast"
         }
       ]
     }

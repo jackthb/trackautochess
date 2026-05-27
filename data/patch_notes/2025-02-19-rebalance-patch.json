@@ -30,82 +30,114 @@
         {
           "kind": "change",
           "name": "Muerta",
-          "detail": "$2 instead of $3, and adjusted accordingly"
+          "detail": "$2 instead of $3, and adjusted accordingly",
+          "entity_type": "unit",
+          "entity_slug": "muerta"
         },
         {
           "kind": "nerf",
           "name": "Muerta - Pierce the Veil",
-          "detail": "Extra magical damage removed, duration decreased from 2.5/3/4s to 2/3/4s, chance for double shot decreased from 30%/40%/50% to 20%/30%/40%"
+          "detail": "Extra magical damage removed, duration decreased from 2.5/3/4s to 2/3/4s, chance for double shot decreased from 30%/40%/50% to 20%/30%/40%",
+          "entity_type": "unit",
+          "entity_slug": "muerta"
         },
         {
           "kind": "change",
           "name": "Pudge",
-          "detail": "$3 instead of $2,and adjusted accordingly"
+          "detail": "$3 instead of $2,and adjusted accordingly",
+          "entity_type": "unit",
+          "entity_slug": "pudge"
         },
         {
           "kind": "change",
           "name": "Pudge - Meat Hook",
-          "detail": "Requires no mana now!"
+          "detail": "Requires no mana now!",
+          "entity_type": "unit",
+          "entity_slug": "pudge"
         },
         {
           "kind": "change",
           "name": "Soul Breaker - Greater Bash",
-          "detail": "Chances for stun increased from 15%/25%/40% to 20%/30%/50%, extra damage decreased from 100/150/250 to 100/150/200"
+          "detail": "Chances for stun increased from 15%/25%/40% to 20%/30%/50%, extra damage decreased from 100/150/250 to 100/150/200",
+          "entity_type": "unit",
+          "entity_slug": "spirit-breaker"
         },
         {
           "kind": "change",
           "name": "Hoodwink - Acorn Shot",
-          "detail": "Victims will have Taunt"
+          "detail": "Victims will have Taunt",
+          "entity_type": "unit",
+          "entity_slug": "hoodwink"
         },
         {
           "kind": "buff",
           "name": "Tiny",
-          "detail": "HP instead from 550 to 600 but removed HP of Growth. Armor increased from 3 to 5, magical resistance increased from 0% to 20%"
+          "detail": "HP instead from 550 to 600 but removed HP of Growth. Armor increased from 3 to 5, magical resistance increased from 0% to 20%",
+          "entity_type": "unit",
+          "entity_slug": "tiny"
         },
         {
           "kind": "nerf",
           "name": "Sniper",
-          "detail": "Attack interval increased from 1.2s to 1.3s"
+          "detail": "Attack interval increased from 1.2s to 1.3s",
+          "entity_type": "unit",
+          "entity_slug": "sniper"
         },
         {
           "kind": "buff",
           "name": "Luna",
-          "detail": "HP increased from 550 to 600, base damage increased from 60 to 65"
+          "detail": "HP increased from 550 to 600, base damage increased from 60 to 65",
+          "entity_type": "unit",
+          "entity_slug": "luna"
         },
         {
           "kind": "buff",
           "name": "Batrider",
-          "detail": "HP increased from 550 to 600"
+          "detail": "HP increased from 550 to 600",
+          "entity_type": "unit",
+          "entity_slug": "batrider"
         },
         {
           "kind": "change",
           "name": "Morphling",
-          "detail": "HP increased from 450 to 550, armor decreased from 3 to 2, magical resistance increased from 0% to 10%"
+          "detail": "HP increased from 450 to 550, armor decreased from 3 to 2, magical resistance increased from 0% to 10%",
+          "entity_type": "unit",
+          "entity_slug": "morphling"
         },
         {
           "kind": "nerf",
           "name": "Beastmaster - Call of the Wild",
-          "detail": "Summoned beasts’ attack interval increased from 1.2/1.2/1.2s to 1.4/1.4/1.6s"
+          "detail": "Summoned beasts’ attack interval increased from 1.2/1.2/1.2s to 1.4/1.4/1.6s",
+          "entity_type": "unit",
+          "entity_slug": "beastmaster"
         },
         {
           "kind": "nerf",
           "name": "Undying",
-          "detail": "HP decreased from 1000 to 900"
+          "detail": "HP decreased from 1000 to 900",
+          "entity_type": "unit",
+          "entity_slug": "undying"
         },
         {
           "kind": "buff",
           "name": "Phantom Assassin",
-          "detail": "HP increased from 550 to 600, armor increased from 4 to 5"
+          "detail": "HP increased from 550 to 600, armor increased from 4 to 5",
+          "entity_type": "unit",
+          "entity_slug": "phantom-assassin"
         },
         {
           "kind": "change",
           "name": "Terrorblade",
-          "detail": "HP increased from 650 to 700, demonic terrorblades’ HP decreased from 850/1700/3400 to 700/1400/2800, attack damage increased from 55 to 60, demonic terrorblades’ attack damage increased from 110/180/290 to 80/160/320, attack interval increased from 1s to 1.1s"
+          "detail": "HP increased from 650 to 700, demonic terrorblades’ HP decreased from 850/1700/3400 to 700/1400/2800, attack damage increased from 55 to 60, demonic terrorblades’ attack damage increased from 110/180/290 to 80/160/320, attack interval increased from 1s to 1.1s",
+          "entity_type": "unit",
+          "entity_slug": "terrorblade"
         },
         {
           "kind": "nerf",
           "name": "Rubick",
-          "detail": "HP decreased from 600 to 550"
+          "detail": "HP decreased from 600 to 550",
+          "entity_type": "unit",
+          "entity_slug": "rubick"
         },
         {
           "kind": "nerf",
@@ -115,47 +147,65 @@
         {
           "kind": "nerf",
           "name": "Monkey King - Jingu Mastery",
-          "detail": "Boundless Strike’s damage multiplier decreased from 150%/200%/250% to 150%/175%/200%"
+          "detail": "Boundless Strike’s damage multiplier decreased from 150%/200%/250% to 150%/175%/200%",
+          "entity_type": "unit",
+          "entity_slug": "monkey-king"
         },
         {
           "kind": "buff",
           "name": "Wraith King",
-          "detail": "HP increased from 1000 to 1100"
+          "detail": "HP increased from 1000 to 1100",
+          "entity_type": "unit",
+          "entity_slug": "wraith-king"
         },
         {
           "kind": "buff",
           "name": "Disruptor - Static Storm",
-          "detail": "Radius increased from 300/400/500 to 400/450/500, cd decreased from 25/15/10s to 20/15/10s"
+          "detail": "Radius increased from 300/400/500 to 400/450/500, cd decreased from 25/15/10s to 20/15/10s",
+          "entity_type": "unit",
+          "entity_slug": "disruptor"
         },
         {
           "kind": "buff",
           "name": "Spectre",
-          "detail": "Haunt’s damage multiplier increased from 2 to 2.5"
+          "detail": "Haunt’s damage multiplier increased from 2 to 2.5",
+          "entity_type": "unit",
+          "entity_slug": "spectres"
         },
         {
           "kind": "buff",
           "name": "Lich - Chain Frost",
-          "detail": "CD decreased from 10/8/6s to 8/7/6s"
+          "detail": "CD decreased from 10/8/6s to 8/7/6s",
+          "entity_type": "unit",
+          "entity_slug": "lich"
         },
         {
           "kind": "buff",
           "name": "Necrophos",
-          "detail": "HP increased from 950 to 1000"
+          "detail": "HP increased from 950 to 1000",
+          "entity_type": "unit",
+          "entity_slug": "necrophos"
         },
         {
           "kind": "buff",
           "name": "Necrophos - Reaper’s Scythe",
-          "detail": "Base damage increased from 300/400/600 to 400/500/700"
+          "detail": "Base damage increased from 300/400/600 to 400/500/700",
+          "entity_type": "unit",
+          "entity_slug": "necrophos"
         },
         {
           "kind": "nerf",
           "name": "Warlock - Chaotic Offerings",
-          "detail": "Inferno’s base damage decreased from 200 to 150"
+          "detail": "Inferno’s base damage decreased from 200 to 150",
+          "entity_type": "unit",
+          "entity_slug": "warlock"
         },
         {
           "kind": "nerf",
           "name": "Ringmaster - Spotlight",
-          "detail": "Damage percentage on non-permanent pieces decreased from 20%/30%/40% to 为15%/20%/30%"
+          "detail": "Damage percentage on non-permanent pieces decreased from 20%/30%/40% to 为15%/20%/30%",
+          "entity_type": "unit",
+          "entity_slug": "ringmaster"
         },
         {
           "kind": "buff",
@@ -165,32 +215,44 @@
         {
           "kind": "buff",
           "name": "Orc - Battle Hardened",
-          "detail": "(4) Orcs - Max HP bonus increased from 300 to 400"
+          "detail": "(4) Orcs - Max HP bonus increased from 300 to 400",
+          "entity_type": "synergy",
+          "entity_slug": "orc"
         },
         {
           "kind": "buff",
           "name": "Shaman - Hex",
-          "detail": "(3) Shamans - Channelling time decreased from 1.5s to 1s"
+          "detail": "(3) Shamans - Channelling time decreased from 1.5s to 1s",
+          "entity_type": "synergy",
+          "entity_slug": "shaman"
         },
         {
           "kind": "buff",
           "name": "Satyr - Fear",
-          "detail": "Duration increased from 3s to 4s"
+          "detail": "Duration increased from 3s to 4s",
+          "entity_type": "synergy",
+          "entity_slug": "satyr"
         },
         {
           "kind": "buff",
           "name": "Knight - Divine Protection",
-          "detail": "(6) Knights - Heal increased from 200 to 250"
+          "detail": "(6) Knights - Heal increased from 200 to 250",
+          "entity_type": "synergy",
+          "entity_slug": "knight"
         },
         {
           "kind": "nerf",
           "name": "Monk - Drunken Stagger",
-          "detail": "(2)(4) chances slightly decreased"
+          "detail": "(2)(4) chances slightly decreased",
+          "entity_type": "synergy",
+          "entity_slug": "monk"
         },
         {
           "kind": "buff",
           "name": "Pavise",
-          "detail": "Chances for +1 Armor increased from 50% to 75%"
+          "detail": "Chances for +1 Armor increased from 50% to 75%",
+          "entity_type": "item",
+          "entity_slug": "pavise"
         },
         {
           "kind": "change",

@@ -9,27 +9,37 @@
         {
           "kind": "change",
           "name": "Defiant Shell",
-          "detail": "Damage reduction and addition amount changed to current rank + 1."
+          "detail": "Damage reduction and addition amount changed to current rank + 1.",
+          "entity_type": "relic",
+          "entity_slug": "defiant-shell"
         },
         {
           "kind": "nerf",
           "name": "Kobold - Divided We Stand",
-          "detail": "(3) Kobolds: Frozen in wax duration for reshaping increased from random 3~5s to random 5~7s."
+          "detail": "(3) Kobolds: Frozen in wax duration for reshaping increased from random 3~5s to random 5~7s.",
+          "entity_type": "synergy",
+          "entity_slug": "kobold"
         },
         {
           "kind": "nerf",
           "name": "Gyrocopter - Flak Cannon",
-          "detail": "Targets decreased from 4/8/12 to 3/6/9."
+          "detail": "Targets decreased from 4/8/12 to 3/6/9.",
+          "entity_type": "unit",
+          "entity_slug": "gyrocopter"
         },
         {
           "kind": "buff",
           "name": "Leshrac - Pulse Nova",
-          "detail": "Radius increased from 250/300/350 to 300/350/400."
+          "detail": "Radius increased from 250/300/350 to 300/350/400.",
+          "entity_type": "unit",
+          "entity_slug": "leshrac"
         },
         {
           "kind": "buff",
           "name": "Nyx Assassin - Spiked Carapace",
-          "detail": "Stun duration increased from 1.5/2/3s to 1.5/2.5/3.5s."
+          "detail": "Stun duration increased from 1.5/2/3s to 1.5/2.5/3.5s.",
+          "entity_type": "unit",
+          "entity_slug": "nyx-assassin"
         }
       ]
     },

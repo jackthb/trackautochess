@@ -35,12 +35,16 @@
         {
           "kind": "nerf",
           "name": "Witless Shako",
-          "detail": "Downgraded from Tier 2 to Tier 1, +300 Health removed"
+          "detail": "Downgraded from Tier 2 to Tier 1, +300 Health removed",
+          "entity_type": "item",
+          "entity_slug": "witless-shako"
         },
         {
           "kind": "change",
           "name": "Spark of Courage",
-          "detail": "Only valid for targets whose level higher than the carrier (previously higher or equals to)"
+          "detail": "Only valid for targets whose level higher than the carrier (previously higher or equals to)",
+          "entity_type": "item",
+          "entity_slug": "spark-of-courage"
         },
         {
           "kind": "buff",
@@ -50,7 +54,9 @@
         {
           "kind": "change",
           "name": "Kaya",
-          "detail": "+25% mana restoration added"
+          "detail": "+25% mana restoration added",
+          "entity_type": "item",
+          "entity_slug": "kaya"
         }
       ]
     },
@@ -65,12 +71,16 @@
         {
           "kind": "fix",
           "name": "Tusk",
-          "detail": "Base Health increased from 550 to 600"
+          "detail": "Base Health increased from 550 to 600",
+          "entity_type": "unit",
+          "entity_slug": "tusk"
         },
         {
           "kind": "fix",
           "name": "Clinkz",
-          "detail": "Attack damage decreased from 60 to 50"
+          "detail": "Attack damage decreased from 60 to 50",
+          "entity_type": "unit",
+          "entity_slug": "clinkz"
         },
         {
           "kind": "fix",
@@ -80,22 +90,30 @@
         {
           "kind": "fix",
           "name": "Razor - Plasma Field",
-          "detail": "CD decreased from 15/12/9s to 10/8/6s"
+          "detail": "CD decreased from 15/12/9s to 10/8/6s",
+          "entity_type": "unit",
+          "entity_slug": "razor"
         },
         {
           "kind": "fix",
           "name": "Undying - Decay",
-          "detail": "Lifesteal percentage decreased from 9%/12%/15% to 8%/10%/12%"
+          "detail": "Lifesteal percentage decreased from 9%/12%/15% to 8%/10%/12%",
+          "entity_type": "unit",
+          "entity_slug": "undying"
         },
         {
           "kind": "fix",
           "name": "Earth Spirit",
-          "detail": "Base Health increased from 800 to 900"
+          "detail": "Base Health increased from 800 to 900",
+          "entity_type": "unit",
+          "entity_slug": "earth-spirit"
         },
         {
           "kind": "fix",
           "name": "Abyssal Underlord",
-          "detail": "Summoned Fiends are now the same rank with Abyssal Underlord (instead of the Ability Level)"
+          "detail": "Summoned Fiends are now the same rank with Abyssal Underlord (instead of the Ability Level)",
+          "entity_type": "unit",
+          "entity_slug": "abyssal-underlord"
         },
         {
           "kind": "fix",
@@ -130,37 +148,51 @@
         {
           "kind": "buff",
           "name": "Axe",
-          "detail": "Base Health increased from 700 to 750"
+          "detail": "Base Health increased from 700 to 750",
+          "entity_type": "unit",
+          "entity_slug": "axe"
         },
         {
           "kind": "nerf",
           "name": "Luna - Moon glaive",
-          "detail": "Bounce times decreased from 3/4/5 to 2/3/4"
+          "detail": "Bounce times decreased from 3/4/5 to 2/3/4",
+          "entity_type": "unit",
+          "entity_slug": "luna"
         },
         {
           "kind": "buff",
           "name": "Enigma - Midnight Pulse",
-          "detail": "CD decreased from 15/12/9s to 12/10/8s"
+          "detail": "CD decreased from 15/12/9s to 12/10/8s",
+          "entity_type": "unit",
+          "entity_slug": "enigma"
         },
         {
           "kind": "nerf",
           "name": "Undying - Decay",
-          "detail": "Lifesteal max health percent decreased from 8%/10%/12% to 4%/6%/8%"
+          "detail": "Lifesteal max health percent decreased from 8%/10%/12% to 4%/6%/8%",
+          "entity_type": "unit",
+          "entity_slug": "undying"
         },
         {
           "kind": "buff",
           "name": "Viper - Viper Strike",
-          "detail": "CD decreased from 10/8/6s to 7/6/5s"
+          "detail": "CD decreased from 10/8/6s to 7/6/5s",
+          "entity_type": "unit",
+          "entity_slug": "viper"
         },
         {
           "kind": "buff",
           "name": "Death Prophet - Exorcism",
-          "detail": "CD decreased from 15/12/9s to 8s"
+          "detail": "CD decreased from 15/12/9s to 8s",
+          "entity_type": "unit",
+          "entity_slug": "death-prophet"
         },
         {
           "kind": "buff",
           "name": "Phantom Assassin",
-          "detail": "Attack interval decreased from 1.0s to 0.9s"
+          "detail": "Attack interval decreased from 1.0s to 0.9s",
+          "entity_type": "unit",
+          "entity_slug": "phantom-assassin"
         },
         {
           "kind": "buff",
@@ -170,12 +202,16 @@
         {
           "kind": "nerf",
           "name": "Abyssal Underlord - Fiends Gate",
-          "detail": "Call interval increased from 3/2.5/2s to 4/3.5/3s"
+          "detail": "Call interval increased from 3/2.5/2s to 4/3.5/3s",
+          "entity_type": "unit",
+          "entity_slug": "abyssal-underlord"
         },
         {
           "kind": "buff",
           "name": "Primal Beast - Pulverize",
-          "detail": "CD decreased from 8/6/4s to 6/5/4s, stun duration increased from 0.5/0.75/1s to 0.5/1/1.5s"
+          "detail": "CD decreased from 8/6/4s to 6/5/4s, stun duration increased from 0.5/0.75/1s to 0.5/1/1.5s",
+          "entity_type": "unit",
+          "entity_slug": "primal-beast"
         },
         {
           "kind": "change",

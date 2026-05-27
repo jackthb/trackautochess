@@ -134,6 +134,7 @@ async function main() {
 
   const index = JSON.parse(readFileSync(INDEX_PATH, "utf-8"));
   const existingDates = new Set(index.patches.map((p) => p.date));
+  const existingSlugs = new Set(index.patches.map((p) => p.slug));
 
   // Group by date, skip existing
   const byDate = new Map();
@@ -155,7 +156,8 @@ async function main() {
   for (const [date, dayEntries] of byDate) {
     const combined = dayEntries.map((e) => e.content).join("\n\n");
     const title = "Rebalance Patch";
-    const slug = `${date}-rebalance-patch`;
+    let slug = `${date}-rebalance-patch`;
+    if (existingSlugs.has(slug)) continue;
     const filePath = join(DATA_DIR, `${slug}.json`);
 
     const patchData = {

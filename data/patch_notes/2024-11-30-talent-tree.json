@@ -35,27 +35,37 @@
         {
           "kind": "buff",
           "name": "Bane - Fiend's Grip",
-          "detail": "CD decreased from 10/8/6 secs to 8/6/4 secs"
+          "detail": "CD decreased from 10/8/6 secs to 8/6/4 secs",
+          "entity_type": "unit",
+          "entity_slug": "bane"
         },
         {
           "kind": "buff",
           "name": "Skywrath Mage - Arcane Bolt",
-          "detail": "Magical damage increased from 100/200/300 to 150/250/350"
+          "detail": "Magical damage increased from 100/200/300 to 150/250/350",
+          "entity_type": "unit",
+          "entity_slug": "skywrath-mage"
         },
         {
           "kind": "buff",
           "name": "Phantom Assassin",
-          "detail": "Attack interval decreased from 1.2 secs to 1 sec"
+          "detail": "Attack interval decreased from 1.2 secs to 1 sec",
+          "entity_type": "unit",
+          "entity_slug": "phantom-assassin"
         },
         {
           "kind": "buff",
           "name": "Legion Commander",
-          "detail": "Base attack damage increased from 75 to 85"
+          "detail": "Base attack damage increased from 75 to 85",
+          "entity_type": "unit",
+          "entity_slug": "legion-commander"
         },
         {
           "kind": "buff",
           "name": "Lich - Chain Frost",
-          "detail": "CD decreased from 12/10/8 secs to 10/8/6 secs"
+          "detail": "CD decreased from 12/10/8 secs to 10/8/6 secs",
+          "entity_type": "unit",
+          "entity_slug": "lich"
         },
         {
           "kind": "change",
@@ -75,12 +85,16 @@
         {
           "kind": "buff",
           "name": "Satyr - Fear",
-          "detail": "Internal CD decreased from 6-10 secs to 4-8 secs"
+          "detail": "Internal CD decreased from 6-10 secs to 4-8 secs",
+          "entity_type": "synergy",
+          "entity_slug": "satyr"
         },
         {
           "kind": "change",
           "name": "Aqir - Infection",
-          "detail": "1 sec delay removed."
+          "detail": "1 sec delay removed.",
+          "entity_type": "synergy",
+          "entity_slug": "aqir"
         }
       ]
     },
@@ -90,7 +104,9 @@
         {
           "kind": "buff",
           "name": "Aegis of Immortal",
-          "detail": "+600 HP added."
+          "detail": "+600 HP added.",
+          "entity_type": "item",
+          "entity_slug": "aegis-of-immortal"
         }
       ]
     },
@@ -100,17 +116,23 @@
         {
           "kind": "change",
           "name": "Malefic Rapture",
-          "detail": "Exp gained now equals to 0.75x damage taken instead of 1x"
+          "detail": "Exp gained now equals to 0.75x damage taken instead of 1x",
+          "entity_type": "relic",
+          "entity_slug": "malefic-rapture"
         },
         {
           "kind": "nerf",
           "name": "Magic Seed",
-          "detail": "Chances to grow up every round decreased from 70% to 60%"
+          "detail": "Chances to grow up every round decreased from 70% to 60%",
+          "entity_type": "relic",
+          "entity_slug": "magic-seed"
         },
         {
           "kind": "change",
           "name": "Mango Tree",
-          "detail": "Now drops up to 7 mangos instead of 8"
+          "detail": "Now drops up to 7 mangos instead of 8",
+          "entity_type": "relic",
+          "entity_slug": "mango-tree"
         }
       ]
     },
@@ -140,12 +162,16 @@
         {
           "kind": "nerf",
           "name": "Luna - Moonglaive",
-          "detail": "Bounce time decreased from 3/5/7 to 3/4/5"
+          "detail": "Bounce time decreased from 3/5/7 to 3/4/5",
+          "entity_type": "unit",
+          "entity_slug": "luna"
         },
         {
           "kind": "nerf",
           "name": "Medusa - Stone Gaze",
-          "detail": "Split shot count decreased from 3/4/5 to 2/3/4, gaze duration decreased from 4/5/6 secs to 3/4/5 secs"
+          "detail": "Split shot count decreased from 3/4/5 to 2/3/4, gaze duration decreased from 4/5/6 secs to 3/4/5 secs",
+          "entity_type": "unit",
+          "entity_slug": "medusa"
         },
         {
           "kind": "change",
@@ -165,62 +191,86 @@
         {
           "kind": "change",
           "name": "Monk - Drunken Stagger",
-          "detail": "(2) Monks - Now only valid on melee allies"
+          "detail": "(2) Monks - Now only valid on melee allies",
+          "entity_type": "synergy",
+          "entity_slug": "monk"
         },
         {
           "kind": "nerf",
           "name": "Undead - Plague",
-          "detail": "(3)(6) Undeads - Max HP decreased by 10%/45% instead of 5%/40%"
+          "detail": "(3)(6) Undeads - Max HP decreased by 10%/45% instead of 5%/40%",
+          "entity_type": "synergy",
+          "entity_slug": "undead"
         },
         {
           "kind": "buff",
           "name": "Satyr - Fear",
-          "detail": "Internal CD decreased from 4-8 secs to 4-6 secs"
+          "detail": "Internal CD decreased from 4-8 secs to 4-6 secs",
+          "entity_type": "synergy",
+          "entity_slug": "satyr"
         },
         {
           "kind": "nerf",
           "name": "Warrior - Fortified Armor",
-          "detail": "(9) Warriors - Reflection multiplier decreased from 1.7 to 1.5"
+          "detail": "(9) Warriors - Reflection multiplier decreased from 1.7 to 1.5",
+          "entity_type": "synergy",
+          "entity_slug": "warrior"
         },
         {
           "kind": "nerf",
           "name": "Troll - Voodoo Frenzy",
-          "detail": "(6) Trolls - Maximum stack decreased from 8 to 7"
+          "detail": "(6) Trolls - Maximum stack decreased from 8 to 7",
+          "entity_type": "synergy",
+          "entity_slug": "troll"
         },
         {
           "kind": "buff",
           "name": "Bane - Fiend's Grip",
-          "detail": "Damage per seconde increased from 50/75/125 to 75/100/150"
+          "detail": "Damage per seconde increased from 50/75/125 to 75/100/150",
+          "entity_type": "unit",
+          "entity_slug": "bane"
         },
         {
           "kind": "buff",
           "name": "Skywrath Mage - Arcane Bolt",
-          "detail": "Magical damage increased from 150/250/350 to 150/250/400"
+          "detail": "Magical damage increased from 150/250/350 to 150/250/400",
+          "entity_type": "unit",
+          "entity_slug": "skywrath-mage"
         },
         {
           "kind": "buff",
           "name": "Pangolier",
-          "detail": "Base damage increased from 65 to 80"
+          "detail": "Base damage increased from 65 to 80",
+          "entity_type": "unit",
+          "entity_slug": "pangolier"
         },
         {
           "kind": "buff",
           "name": "Medusa - Stone Gaze",
-          "detail": "Duration increased from 3/4/5 secs to 4/5/6 secs"
+          "detail": "Duration increased from 3/4/5 secs to 4/5/6 secs",
+          "entity_type": "unit",
+          "entity_slug": "medusa"
         },
         {
           "kind": "buff",
           "name": "Templar Assassin - Refraction",
-          "detail": "Shield increased from 30/40/50 to 40/60/80"
+          "detail": "Shield increased from 30/40/50 to 40/60/80",
+          "entity_type": "unit",
+          "entity_slug": "templar-assassin"
         },
         {
           "kind": "nerf",
           "name": "Havoc",
-          "detail": "Attack bonus decreased from 50 to 25"
+          "detail": "Attack bonus decreased from 50 to 25",
+          "entity_type": "item",
+          "entity_slug": "havoc"
         },
         {
           "kind": "nerf",
           "name": "Scythe of Vyse",
-          "detail": "Duration decreased from 6 secs to 5 secs"
+          "detail": "Duration decreased from 6 secs to 5 secs",
+          "entity_type": "item",
+          "entity_slug": "scythe-of-vyse"
         }
       ]
     },
@@ -250,32 +300,44 @@
         {
           "kind": "buff",
           "name": "Clinkz - Burning Barrage",
-          "detail": "CD decreased from 10/8/6 to 8/7/6 secs, arrow count decreased from 5/6/6 to 3/4/5, damage percentage decreased from 50%/75%/125% to 50%/75%/100%"
+          "detail": "CD decreased from 10/8/6 to 8/7/6 secs, arrow count decreased from 5/6/6 to 3/4/5, damage percentage decreased from 50%/75%/125% to 50%/75%/100%",
+          "entity_type": "unit",
+          "entity_slug": "clinkz"
         },
         {
           "kind": "nerf",
           "name": "Muerta",
-          "detail": "Attack interval increased from 1 to 1.2 secs, base attack damage decreased from 65 to 60"
+          "detail": "Attack interval increased from 1 to 1.2 secs, base attack damage decreased from 65 to 60",
+          "entity_type": "unit",
+          "entity_slug": "muerta"
         },
         {
           "kind": "nerf",
           "name": "Drow Ranger - Gust",
-          "detail": "Silence duration decreased from 2/3/5 to 2/3/4 secs"
+          "detail": "Silence duration decreased from 2/3/5 to 2/3/4 secs",
+          "entity_type": "unit",
+          "entity_slug": "drow-ranger"
         },
         {
           "kind": "nerf",
           "name": "Undying - Decay",
-          "detail": "CD increased from 8/6/4 to 10/8/6 secs"
+          "detail": "CD increased from 8/6/4 to 10/8/6 secs",
+          "entity_type": "unit",
+          "entity_slug": "undying"
         },
         {
           "kind": "change",
           "name": "Priest - Salvation",
-          "detail": "Tango restores 1~7 HP instead of 1~8"
+          "detail": "Tango restores 1~7 HP instead of 1~8",
+          "entity_type": "synergy",
+          "entity_slug": "priest"
         },
         {
           "kind": "nerf",
           "name": "Undead - Plague",
-          "detail": "(6) Undeads - Reduces 40% HP of enemies instead of 45%"
+          "detail": "(6) Undeads - Reduces 40% HP of enemies instead of 45%",
+          "entity_type": "synergy",
+          "entity_slug": "undead"
         },
         {
           "kind": "change",
@@ -305,62 +367,86 @@
         {
           "kind": "change",
           "name": "Monk - Drunken Stagger",
-          "detail": "(2) Monks - Now only valid on melee allies"
+          "detail": "(2) Monks - Now only valid on melee allies",
+          "entity_type": "synergy",
+          "entity_slug": "monk"
         },
         {
           "kind": "nerf",
           "name": "Undead - Plague",
-          "detail": "(3)(6) Undeads - Max HP decreased by 10%/45% instead of 5%/40%"
+          "detail": "(3)(6) Undeads - Max HP decreased by 10%/45% instead of 5%/40%",
+          "entity_type": "synergy",
+          "entity_slug": "undead"
         },
         {
           "kind": "buff",
           "name": "Satyr - Fear",
-          "detail": "Internal CD decreased from 4-8 secs to 4-6 secs"
+          "detail": "Internal CD decreased from 4-8 secs to 4-6 secs",
+          "entity_type": "synergy",
+          "entity_slug": "satyr"
         },
         {
           "kind": "nerf",
           "name": "Warrior - Fortified Armor",
-          "detail": "(9) Warriors - Reflection multiplier decreased from 1.7 to 1.5"
+          "detail": "(9) Warriors - Reflection multiplier decreased from 1.7 to 1.5",
+          "entity_type": "synergy",
+          "entity_slug": "warrior"
         },
         {
           "kind": "nerf",
           "name": "Troll - Voodoo Frenzy",
-          "detail": "(6) Trolls - Maximum stack decreased from 8 to 7"
+          "detail": "(6) Trolls - Maximum stack decreased from 8 to 7",
+          "entity_type": "synergy",
+          "entity_slug": "troll"
         },
         {
           "kind": "buff",
           "name": "Bane - Fiend's Grip",
-          "detail": "Damage per seconde increased from 50/75/125 to 75/100/150"
+          "detail": "Damage per seconde increased from 50/75/125 to 75/100/150",
+          "entity_type": "unit",
+          "entity_slug": "bane"
         },
         {
           "kind": "buff",
           "name": "Skywrath Mage - Arcane Bolt",
-          "detail": "Magical damage increased from 150/250/350 to 150/250/400"
+          "detail": "Magical damage increased from 150/250/350 to 150/250/400",
+          "entity_type": "unit",
+          "entity_slug": "skywrath-mage"
         },
         {
           "kind": "buff",
           "name": "Pangolier",
-          "detail": "Base damage increased from 65 to 80"
+          "detail": "Base damage increased from 65 to 80",
+          "entity_type": "unit",
+          "entity_slug": "pangolier"
         },
         {
           "kind": "buff",
           "name": "Medusa - Stone Gaze",
-          "detail": "Duration increased from 3/4/5 secs to 4/5/6 secs"
+          "detail": "Duration increased from 3/4/5 secs to 4/5/6 secs",
+          "entity_type": "unit",
+          "entity_slug": "medusa"
         },
         {
           "kind": "buff",
           "name": "Templar Assassin - Refraction",
-          "detail": "Shield increased from 30/40/50 to 40/60/80"
+          "detail": "Shield increased from 30/40/50 to 40/60/80",
+          "entity_type": "unit",
+          "entity_slug": "templar-assassin"
         },
         {
           "kind": "nerf",
           "name": "Havoc",
-          "detail": "Attack bonus decreased from 50 to 25"
+          "detail": "Attack bonus decreased from 50 to 25",
+          "entity_type": "item",
+          "entity_slug": "havoc"
         },
         {
           "kind": "nerf",
           "name": "Scythe of Vyse",
-          "detail": "Duration decreased from 6 secs to 5 secs"
+          "detail": "Duration decreased from 6 secs to 5 secs",
+          "entity_type": "item",
+          "entity_slug": "scythe-of-vyse"
         }
       ]
     },
@@ -390,32 +476,44 @@
         {
           "kind": "buff",
           "name": "Clinkz - Burning Barrage",
-          "detail": "CD decreased from 10/8/6 to 8/7/6 secs, arrow count decreased from 5/6/6 to 3/4/5, damage percentage decreased from 50%/75%/125% to 50%/75%/100%"
+          "detail": "CD decreased from 10/8/6 to 8/7/6 secs, arrow count decreased from 5/6/6 to 3/4/5, damage percentage decreased from 50%/75%/125% to 50%/75%/100%",
+          "entity_type": "unit",
+          "entity_slug": "clinkz"
         },
         {
           "kind": "nerf",
           "name": "Muerta",
-          "detail": "Attack interval increased from 1 to 1.2 secs, base attack damage decreased from 65 to 60"
+          "detail": "Attack interval increased from 1 to 1.2 secs, base attack damage decreased from 65 to 60",
+          "entity_type": "unit",
+          "entity_slug": "muerta"
         },
         {
           "kind": "nerf",
           "name": "Drow Ranger - Gust",
-          "detail": "Silence duration decreased from 2/3/5 to 2/3/4 secs"
+          "detail": "Silence duration decreased from 2/3/5 to 2/3/4 secs",
+          "entity_type": "unit",
+          "entity_slug": "drow-ranger"
         },
         {
           "kind": "nerf",
           "name": "Undying - Decay",
-          "detail": "CD increased from 8/6/4 to 10/8/6 secs"
+          "detail": "CD increased from 8/6/4 to 10/8/6 secs",
+          "entity_type": "unit",
+          "entity_slug": "undying"
         },
         {
           "kind": "change",
           "name": "Priest - Salvation",
-          "detail": "Tango restores 1~7 HP instead of 1~8"
+          "detail": "Tango restores 1~7 HP instead of 1~8",
+          "entity_type": "synergy",
+          "entity_slug": "priest"
         },
         {
           "kind": "nerf",
           "name": "Undead - Plague",
-          "detail": "(6) Undeads - Reduces 40% HP of enemies instead of 45%"
+          "detail": "(6) Undeads - Reduces 40% HP of enemies instead of 45%",
+          "entity_type": "synergy",
+          "entity_slug": "undead"
         },
         {
           "kind": "change",

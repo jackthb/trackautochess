@@ -320,12 +320,97 @@ async function migrateGameMode() {
 // ──────────────────────────────────────────────────────────────────
 // Patch notes
 // ──────────────────────────────────────────────────────────────────
+function buildEntityRefMap(): Map<string, string> {
+  const map = new Map<string, string>()
+  const slug = (s: string) => s.toLowerCase().replace(/&/g, ' and ').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '')
+
+  try {
+    const units = JSON.parse(fs.readFileSync(path.join(DATA_DIR, 'units_full.json'), 'utf-8'))
+    for (const name of Object.keys(units)) map.set(`unit:${slug(name)}`, docId.unit(name))
+  } catch {}
+  try {
+    const items = JSON.parse(fs.readFileSync(path.join(DATA_DIR, 'items.json'), 'utf-8'))
+    const itemsFull = JSON.parse(fs.readFileSync(path.join(DATA_DIR, 'items_full.json'), 'utf-8'))
+    const nameToGameId = new Map<string, string>()
+    for (const [gameId, v] of Object.entries(itemsFull) as [string, any][]) {
+      if (v.name) nameToGameId.set(slug(v.name), gameId)
+    }
+    for (const name of Object.keys(items.items ?? {})) {
+      const gameId = nameToGameId.get(slug(name))
+      if (gameId) map.set(`item:${slug(name)}`, docId.item(gameId))
+    }
+  } catch {}
+  try {
+    const relics = JSON.parse(fs.readFileSync(path.join(DATA_DIR, 'relics.json'), 'utf-8'))
+    for (const [gameId, v] of Object.entries(relics.relics ?? {}) as [string, any][]) {
+      if (v.name) map.set(`relic:${slug(v.name)}`, docId.relic(gameId))
+    }
+  } catch {}
+  try {
+    const synergies = JSON.parse(fs.readFileSync(path.join(DATA_DIR, 'synergies.json'), 'utf-8'))
+    for (const [gameId, v] of Object.entries(synergies) as [string, any][]) {
+      if (v.name) map.set(`synergy:${slug(v.name)}`, docId.synergy(gameId))
+    }
+  } catch {}
+  try {
+    const talents = JSON.parse(fs.readFileSync(path.join(DATA_DIR, 'talents.json'), 'utf-8'))
+    for (const slot of Object.keys(talents)) {
+      map.set(`talent:${slot}`, docId.talent(slot))
+    }
+  } catch {}
+  return map
+}
+
+function slugifyName(value: string): string {
+  return value.toLowerCase().replace(/&/g, ' and ').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '')
+}
+
+const UNIT_SLUG_ALIASES: Record<string, string> = {
+  spectre: 'spectres',
+  bloodseeker: 'blood-seeker',
+  'soul-breaker': 'spirit-breaker',
+  'dark-seer': 'darkseer',
+  'terror-blade': 'terrorblade',
+  'centaur-warrior': 'centaur-warrunner',
+  abbadon: 'abaddon',
+  'beast-master': 'beastmaster',
+  'chao-knight': 'chaos-knight',
+  'tide-hunter': 'tidehunter',
+  'elter-titan': 'elder-titan',
+  'ring-master': 'ringmaster',
+  worlock: 'warlock',
+  necrolyte: 'necrophos',
+  antimage: 'anti-mage',
+  'life-stealer': 'lifestealer',
+}
+
+function buildEntityResolver(refMap: Map<string, string>): (name: string) => string | null {
+  return (name: string) => {
+    const slug = slugifyName(name)
+    if (refMap.has(`item:${slug}`)) return `item:${slug}`
+    const slugNoApos = slugifyName(name.replace(/'/g, ''))
+    if (slugNoApos !== slug && refMap.has(`item:${slugNoApos}`)) return `item:${slugNoApos}`
+    if (refMap.has(`relic:${slug}`)) return `relic:${slug}`
+
+    const bare = name.replace(/\s*-\s+.*$/, '').replace(/\s*\(.*\)$/, '').trim()
+    const unitSlug = slugifyName(bare)
+    if (refMap.has(`unit:${unitSlug}`)) return `unit:${unitSlug}`
+    const aliased = UNIT_SLUG_ALIASES[unitSlug]
+    if (aliased && refMap.has(`unit:${aliased}`)) return `unit:${aliased}`
+    if (refMap.has(`synergy:${unitSlug}`)) return `synergy:${unitSlug}`
+
+    return null
+  }
+}
+
 async function migratePatchNotes() {
   const dir = path.join(DATA_DIR, 'patch_notes')
   const files = fs
     .readdirSync(dir)
     .filter((f) => f.endsWith('.json') && f !== 'index.json')
     .sort()
+  const refMap = buildEntityRefMap()
+  const resolve = buildEntityResolver(refMap)
   const docs: any[] = []
   for (const f of files) {
     const j = JSON.parse(fs.readFileSync(path.join(dir, f), 'utf-8'))
@@ -341,12 +426,22 @@ async function migratePatchNotes() {
       sections: (j.sections || []).map((s: any) => ({
         _type: 'patchSection',
         heading: s.heading,
-        entries: (s.entries || []).map((e: any) => ({
-          _type: 'patchEntry',
-          kind: e.kind,
-          name: e.name ?? '',
-          detail: e.detail ?? '',
-        })),
+        entries: (s.entries || []).map((e: any) => {
+          const entry: any = {
+            _type: 'patchEntry',
+            kind: e.kind,
+            name: e.name ?? '',
+            detail: e.detail ?? '',
+          }
+          let refKey = e.entity_type && e.entity_slug
+            ? `${e.entity_type}:${e.entity_slug}`
+            : resolve(e.name ?? '')
+          if (refKey) {
+            const ref = refMap.get(refKey)
+            if (ref) entry.entity = {_type: 'reference', _ref: ref}
+          }
+          return entry
+        }),
       })),
     })
   }

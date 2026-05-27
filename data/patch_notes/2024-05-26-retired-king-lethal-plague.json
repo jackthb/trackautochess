@@ -10,12 +10,16 @@
         {
           "kind": "rework",
           "name": "Dark Willow",
-          "detail": "Ability Reworked into Bramble Maze <Battle Cry Ability: Activates before the battle starts> Creates a bramble maze to isolate random enemies from battle, victims cannot attack or be attacked until the maze disappears. Duration: 6 secs Targets: 1/2/3"
+          "detail": "Ability Reworked into Bramble Maze <Battle Cry Ability: Activates before the battle starts> Creates a bramble maze to isolate random enemies from battle, victims cannot attack or be attacked until the maze disappears. Duration: 6 secs Targets: 1/2/3",
+          "entity_type": "unit",
+          "entity_slug": "dark-willow"
         },
         {
           "kind": "change",
           "name": "Invoker",
-          "detail": "Tornado Hurricane Removed and replaced by Ice Wall <Active Ability: Activates on Full Mana> Invoker generates a wall of solid ice to freeze enemies in a line and impairs them from healing. Duration: 3/4/5 secs Radius: 200 Healing Reduction Percent: 50"
+          "detail": "Tornado Hurricane Removed and replaced by Ice Wall <Active Ability: Activates on Full Mana> Invoker generates a wall of solid ice to freeze enemies in a line and impairs them from healing. Duration: 3/4/5 secs Radius: 200 Healing Reduction Percent: 50",
+          "entity_type": "unit",
+          "entity_slug": "invoker"
         },
         {
           "kind": "removed",
@@ -25,22 +29,30 @@
         {
           "kind": "nerf",
           "name": "Snapfire - Lil Shredder",
-          "detail": "Base damage decreased from 100/150/200 to 75/100/150, but with an additional 25% attack damage of its owner."
+          "detail": "Base damage decreased from 100/150/200 to 75/100/150, but with an additional 25% attack damage of its owner.",
+          "entity_type": "unit",
+          "entity_slug": "snapfire"
         },
         {
           "kind": "nerf",
           "name": "Templar Assassin - Refraction",
-          "detail": "Now becomes a damage taking Shield of 30/40/50 damage instead of a Block of damage, times decreased from 4/6/9 to 3/5/7"
+          "detail": "Now becomes a damage taking Shield of 30/40/50 damage instead of a Block of damage, times decreased from 4/6/9 to 3/5/7",
+          "entity_type": "unit",
+          "entity_slug": "templar-assassin"
         },
         {
           "kind": "change",
           "name": "Warlock - Chaotic Offering",
-          "detail": "Golems lasts 5-15 secs instead of 5-10 secs, and deathrattle of an extra Golem removed. Instead, the Warlock gains a chance to call upon an extra Golem himself."
+          "detail": "Golems lasts 5-15 secs instead of 5-10 secs, and deathrattle of an extra Golem removed. Instead, the Warlock gains a chance to call upon an extra Golem himself.",
+          "entity_type": "unit",
+          "entity_slug": "warlock"
         },
         {
           "kind": "buff",
           "name": "Sven - God's strength",
-          "detail": "Additional damage percent increased from 60%/120%/180% to 80%/160%/240%"
+          "detail": "Additional damage percent increased from 60%/120%/180% to 80%/160%/240%",
+          "entity_type": "unit",
+          "entity_slug": "sven"
         }
       ]
     },
@@ -50,22 +62,30 @@
         {
           "kind": "rework",
           "name": "Undead - Plague",
-          "detail": "(3)(6)Max HP reduction increased from 10%/40% to 15%/45%, (9) Reworked into Plague-infected pieces will die immediately after a while. (3) Undead: All non-undead pieces of both sides in the battle gain the plague effect: maximum health -10%%. (6)Undead: All non-undead pieces of both sides in the battle gain the plague effect: maximum health -40%%. (9)Undead: Plague-infected pieces will die immediately after a while. P.S. Plague-infected pieces will last for random 15-20 secs"
+          "detail": "(3)(6)Max HP reduction increased from 10%/40% to 15%/45%, (9) Reworked into Plague-infected pieces will die immediately after a while. (3) Undead: All non-undead pieces of both sides in the battle gain the plague effect: maximum health -10%%. (6)Undead: All non-undead pieces of both sides in the battle gain the plague effect: maximum health -40%%. (9)Undead: Plague-infected pieces will die immediately after a while. P.S. Plague-infected pieces will last for random 15-20 secs",
+          "entity_type": "synergy",
+          "entity_slug": "undead"
         },
         {
           "kind": "change",
           "name": "Elf - Evasion",
-          "detail": "(9) Elves: All dodging will create a mirrored attack from the attacker, targeting the enemy. (3) Elves: All friendly elves have +25%% evasion. (6) Elves: All friendly elves have +45%% evasion. (9) Elves: friendly elves gain the effect: Dodging any attack creates a mirrored attack from the attacker, targeting the enemy. P.S.1. Mirrored chess pieces inherit passive effects from the carrier's equipment. P.S.2. Mirrored pieces last for 7 secs, and have an internal CD of 3 secs for the next mirrored piece."
+          "detail": "(9) Elves: All dodging will create a mirrored attack from the attacker, targeting the enemy. (3) Elves: All friendly elves have +25%% evasion. (6) Elves: All friendly elves have +45%% evasion. (9) Elves: friendly elves gain the effect: Dodging any attack creates a mirrored attack from the attacker, targeting the enemy. P.S.1. Mirrored chess pieces inherit passive effects from the carrier's equipment. P.S.2. Mirrored pieces last for 7 secs, and have an internal CD of 3 secs for the next mirrored piece.",
+          "entity_type": "synergy",
+          "entity_slug": "elf"
         },
         {
           "kind": "nerf",
           "name": "Draenei - Blessing of Naru",
-          "detail": "(4) Draeneis: CD increased from 2 secs to 3 secs and damage limit decreased from 400 to 300"
+          "detail": "(4) Draeneis: CD increased from 2 secs to 3 secs and damage limit decreased from 400 to 300",
+          "entity_type": "synergy",
+          "entity_slug": "draenei"
         },
         {
           "kind": "nerf",
           "name": "Shaman - Hex",
-          "detail": "Channeling time increased from 1 sec to 2.5 secs"
+          "detail": "Channeling time increased from 1 sec to 2.5 secs",
+          "entity_type": "synergy",
+          "entity_slug": "shaman"
         },
         {
           "kind": "change",
@@ -85,22 +105,30 @@
         {
           "kind": "change",
           "name": "Ascetics Cap",
-          "detail": "Multiple Caps not stackable"
+          "detail": "Multiple Caps not stackable",
+          "entity_type": "item",
+          "entity_slug": "ascetics-cap"
         },
         {
           "kind": "nerf",
           "name": "Black King Bar",
-          "detail": "Duration decreased from 5 secs to 4 secs"
+          "detail": "Duration decreased from 5 secs to 4 secs",
+          "entity_type": "item",
+          "entity_slug": "black-king-bar"
         },
         {
           "kind": "change",
           "name": "Satanic",
-          "detail": "+600 HP"
+          "detail": "+600 HP",
+          "entity_type": "item",
+          "entity_slug": "satanic"
         },
         {
           "kind": "change",
           "name": "Aeon Disk",
-          "detail": "Carrier and its minions will be a permanent chess piece. <Active Ability: Activates when at low health.> Dispels all negative status from the caster and grants 100%% damage block for 3 seconds. P.S. Mirrored Chess pieces will not be regarded as permanent pieces."
+          "detail": "Carrier and its minions will be a permanent chess piece. <Active Ability: Activates when at low health.> Dispels all negative status from the caster and grants 100%% damage block for 3 seconds. P.S. Mirrored Chess pieces will not be regarded as permanent pieces.",
+          "entity_type": "item",
+          "entity_slug": "aeon-disk"
         }
       ]
     },
@@ -115,7 +143,9 @@
         {
           "kind": "rework",
           "name": "Chiaroscuro Certainty",
-          "detail": "Reworked +1 Award for win/lose streak, and a Spoil Token granted whose level equals to your original streak bonus when terminated. P.S.1. Spoil Token granted will never be any level higher than currently available Tokens. P.S.2. 2~4 Streak for Spoil Token Level 1, 5~9 Streak for Spoil Token Level 2, 10+ Streak for Spoil Token Level 3(Only after Round 25). P.S.3. Details are as follows： 1 Streak 2-4 Streak 5-9 Streak 10+ Streak No Relic 0 1 2 3 Prev Relic 0 2 4 6"
+          "detail": "Reworked +1 Award for win/lose streak, and a Spoil Token granted whose level equals to your original streak bonus when terminated. P.S.1. Spoil Token granted will never be any level higher than currently available Tokens. P.S.2. 2~4 Streak for Spoil Token Level 1, 5~9 Streak for Spoil Token Level 2, 10+ Streak for Spoil Token Level 3(Only after Round 25). P.S.3. Details are as follows： 1 Streak 2-4 Streak 5-9 Streak 10+ Streak No Relic 0 1 2 3 Prev Relic 0 2 4 6",
+          "entity_type": "relic",
+          "entity_slug": "chiaroscuro-certainty"
         },
         {
           "kind": "change",

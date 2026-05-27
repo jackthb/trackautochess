@@ -98,3 +98,36 @@ export function getUnitBySlug(
   ensureLoaded(locale);
   return UNIT_BY_SLUG_CACHE.get(locale)!.get(slug) ?? null;
 }
+
+const UNIT_SLUG_ALIASES: Record<string, string> = {
+  spectre: "spectres",
+  bloodseeker: "blood-seeker",
+  "soul-breaker": "spirit-breaker",
+  "dark-seer": "darkseer",
+  "terror-blade": "terrorblade",
+  "centaur-warrior": "centaur-warrunner",
+  abbadon: "abaddon",
+  "beast-master": "beastmaster",
+  "chao-knight": "chaos-knight",
+  "tide-hunter": "tidehunter",
+  "elter-titan": "elder-titan",
+  "ring-master": "ringmaster",
+  worlock: "warlock",
+  necrolyte: "necrophos",
+  antimage: "anti-mage",
+  "life-stealer": "lifestealer",
+};
+
+export function getUnitSlugByName(name: string): string | null {
+  ensureLoaded(DEFAULT_LOCALE);
+  const cache = UNIT_BY_SLUG_CACHE.get(DEFAULT_LOCALE)!;
+
+  const bare = name.replace(/\s*-\s+.*$/, "").replace(/\s*\(.*\)$/, "").trim();
+  const slug = slugifyName(bare);
+  if (cache.has(slug)) return slug;
+
+  const aliased = UNIT_SLUG_ALIASES[slug];
+  if (aliased && cache.has(aliased)) return aliased;
+
+  return null;
+}

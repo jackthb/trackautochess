@@ -11,6 +11,7 @@ import {
   ALL_ITEMS_QUERY,
   ALL_RELICS_QUERY,
   PATCH_NOTE_QUERY,
+  ALL_PATCH_NOTES_QUERY,
 } from "./queries";
 
 /**
@@ -241,8 +242,21 @@ export interface DraftPatch {
   flavor?: string;
   sections: Array<{
     heading: string;
-    entries: Array<{ kind: string; name: string; detail: string }>;
+    entries: Array<{
+      kind: string;
+      name: string;
+      detail: string;
+      entityType?: string;
+      entitySlug?: string;
+    }>;
   }>;
+}
+
+export interface PatchIndexEntry {
+  slug: string;
+  date: string;
+  title: string;
+  titles?: Record<string, string> | null;
 }
 
 export async function loadDraftPatchNote(
@@ -263,11 +277,23 @@ export async function loadDraftPatchNote(
     flavor: patch.flavor,
     sections: (patch.sections ?? []).map((s) => ({
       heading: s.heading,
-      entries: (s.entries ?? []).map((e) => ({
+      entries: (s.entries ?? []).map((e: any) => ({
         kind: e.kind,
         name: e.name ?? "",
         detail: e.detail ?? "",
+        ...(e.entityType ? { entityType: e.entityType, entitySlug: e.entitySlug } : {}),
       })),
     })),
   };
+}
+
+export async function loadPatchIndex(
+  draftMode: boolean
+): Promise<PatchIndexEntry[]> {
+  const result = await loadDraftQuery<PatchIndexEntry[]>(
+    ALL_PATCH_NOTES_QUERY,
+    {},
+    draftMode
+  );
+  return result.data ?? [];
 }

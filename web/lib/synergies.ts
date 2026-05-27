@@ -107,6 +107,13 @@ export function getClasses(locale: Locale = DEFAULT_LOCALE): DisplaySynergy[] {
  * the unit's stored synergies stay English-canonical so cross-language
  * lookups remain stable.
  */
+export function getSynergySlugByName(name: string): string | null {
+  ensureLoaded(DEFAULT_LOCALE);
+  const bare = name.replace(/\s*-\s+.*$/, "").replace(/\s*\(.*\)$/, "").trim();
+  const slug = slugifyName(bare);
+  return SLUG_CACHE.get(DEFAULT_LOCALE)!.has(slug) ? slug : null;
+}
+
 export function getSynergyNameTranslator(
   locale: Locale,
 ): (englishName: string) => string {

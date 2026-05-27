@@ -32,6 +32,23 @@ jobs:
         run: |
           git diff --quiet data/patch_notes/ && echo "changed=false" >> "$GITHUB_OUTPUT" || echo "changed=true" >> "$GITHUB_OUTPUT"
 
+      - uses: pnpm/action-setup@v4
+        if: steps.diff.outputs.changed == 'true'
+
+      - name: Install CMS dependencies
+        if: steps.diff.outputs.changed == 'true'
+        working-directory: cms
+        run: pnpm install --frozen-lockfile
+
+      - name: Sync new patch notes to Sanity
+        if: steps.diff.outputs.changed == 'true'
+        working-directory: cms
+        env:
+          SANITY_PROJECT_ID: ${{ secrets.SANITY_PROJECT_ID }}
+          SANITY_DATASET: production
+          SANITY_TOKEN: ${{ secrets.SANITY_TOKEN }}
+        run: pnpm migrate -- --only=patchNotes
+
       - name: Commit and push
         if: steps.diff.outputs.changed == 'true'
         run: |

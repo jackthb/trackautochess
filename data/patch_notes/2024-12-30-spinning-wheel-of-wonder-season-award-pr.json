@@ -10,7 +10,9 @@
         {
           "kind": "added",
           "name": "Wheel of Wonder",
-          "detail": "New relic. <Relic Consumable: Click to Use> Choose an ally piece, DISCOVER a special duplicate of it with an extra random synergy. * Recruit the discovered pieces with the only Token granted by Wheel of Wonder, no gold required. * Extra synergy can be any of the existing synergy in game. * The target can be any of your pieces, including Undead, Pandaren, IO etc."
+          "detail": "New relic. <Relic Consumable: Click to Use> Choose an ally piece, DISCOVER a special duplicate of it with an extra random synergy. * Recruit the discovered pieces with the only Token granted by Wheel of Wonder, no gold required. * Extra synergy can be any of the existing synergy in game. * The target can be any of your pieces, including Undead, Pandaren, IO etc.",
+          "entity_type": "relic",
+          "entity_slug": "wheel-of-wonder"
         },
         {
           "kind": "removed",
@@ -25,17 +27,23 @@
         {
           "kind": "rework",
           "name": "Chiaroscuro Certainty",
-          "detail": "Reworked. Win or lose streak will not be terminated with this relic. +1 Award removed. Your win or lose streak will not be terminated and when the relic disappears, you will receive a corresponding level loot token based on the highest reward/compensation held during that time."
+          "detail": "Reworked. Win or lose streak will not be terminated with this relic. +1 Award removed. Your win or lose streak will not be terminated and when the relic disappears, you will receive a corresponding level loot token based on the highest reward/compensation held during that time.",
+          "entity_type": "relic",
+          "entity_slug": "chiaroscuro-certainty"
         },
         {
           "kind": "change",
           "name": "Weaponsmith",
-          "detail": "Remaining chance for reforger shown in the relic slot."
+          "detail": "Remaining chance for reforger shown in the relic slot.",
+          "entity_type": "relic",
+          "entity_slug": "weaponsmith"
         },
         {
           "kind": "change",
           "name": "Mango Tree",
-          "detail": "Remaining chance for mango shown in the relic slot."
+          "detail": "Remaining chance for mango shown in the relic slot.",
+          "entity_type": "relic",
+          "entity_slug": "mango-tree"
         }
       ]
     },
@@ -75,7 +83,9 @@
         {
           "kind": "rework",
           "name": "Mech - Heart of the Machines",
-          "detail": "Golden Heart of the Machines Reworked <Courier consumable: Click to use>DISCOVER a panel of 5 random Legendary chess pieces. * Recruit the discovered pieces with Tokens granted by Heart of the Machines, no gold required. Tokens can be keeped for the following discoveries. * Each piece costs 1 token, and benefits from Talent Greedy."
+          "detail": "Golden Heart of the Machines Reworked <Courier consumable: Click to use>DISCOVER a panel of 5 random Legendary chess pieces. * Recruit the discovered pieces with Tokens granted by Heart of the Machines, no gold required. Tokens can be keeped for the following discoveries. * Each piece costs 1 token, and benefits from Talent Greedy.",
+          "entity_type": "synergy",
+          "entity_slug": "mech"
         }
       ]
     },
@@ -85,7 +95,9 @@
         {
           "kind": "rework",
           "name": "Diffusal Blade",
-          "detail": "Reworked Attack speed + 20%. When attacking a new target, purify the victim by removing all its synergy buffs."
+          "detail": "Reworked Attack speed + 20%. When attacking a new target, purify the victim by removing all its synergy buffs.",
+          "entity_type": "item",
+          "entity_slug": "diffusal-blade"
         }
       ]
     },
@@ -140,7 +152,9 @@
         {
           "kind": "change",
           "name": "Diffusal Blade",
-          "detail": "Remade into an active one. Attack speed +20%. Purify the victim by removing all its synergy buffs. Cool Down: 8 secs"
+          "detail": "Remade into an active one. Attack speed +20%. Purify the victim by removing all its synergy buffs. Cool Down: 8 secs",
+          "entity_type": "item",
+          "entity_slug": "diffusal-blade"
         },
         {
           "kind": "change",

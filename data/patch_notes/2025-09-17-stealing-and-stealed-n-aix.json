@@ -10,27 +10,37 @@
         {
           "kind": "added",
           "name": "Lifestealer ($2, Kobold/Undead/Wizard)",
-          "detail": "New chess piece. <Active Ability: Activate Instant> Launch into a maddened rage, becoming Debuff Immune and increasing magic resistance. Duration: 4/6/9s Magical resistance increased:80% Cooldown: 12s The madness and brutality of N'aix makes him a vicious and unrelenting foe in combat."
+          "detail": "New chess piece. <Active Ability: Activate Instant> Launch into a maddened rage, becoming Debuff Immune and increasing magic resistance. Duration: 4/6/9s Magical resistance increased:80% Cooldown: 12s The madness and brutality of N'aix makes him a vicious and unrelenting foe in combat.",
+          "entity_type": "unit",
+          "entity_slug": "lifestealer"
         },
         {
           "kind": "nerf",
           "name": "Abaddon ($1, Undead/Knight)",
-          "detail": "Downgraded from $2 to $1, properties adjusted accordingly."
+          "detail": "Downgraded from $2 to $1, properties adjusted accordingly.",
+          "entity_type": "unit",
+          "entity_slug": "abaddon"
         },
         {
           "kind": "nerf",
           "name": "Necrolyte",
-          "detail": "A passive heartstopper aura added, and damage to the reaper's scythe decreased, while cooldown increased. Emits an aura that stops the heartbeat of his enemies around, dealing percentage damage based on their max health. <Targeted Active ability: Activates on full mana>Deals (base + percentage of max health) pure damage to an enemy with his Reaper’s Scythe and prevents its victim from deathrattle."
+          "detail": "A passive heartstopper aura added, and damage to the reaper's scythe decreased, while cooldown increased. Emits an aura that stops the heartbeat of his enemies around, dealing percentage damage based on their max health. <Targeted Active ability: Activates on full mana>Deals (base + percentage of max health) pure damage to an enemy with his Reaper’s Scythe and prevents its victim from deathrattle.",
+          "entity_type": "unit",
+          "entity_slug": "necrophos"
         },
         {
           "kind": "nerf",
           "name": "Wraith King - Reincarnation",
-          "detail": "Reincarnated pieces’ last duration decreased from 20/25/30s to 15/20/25s"
+          "detail": "Reincarnated pieces’ last duration decreased from 20/25/30s to 15/20/25s",
+          "entity_type": "unit",
+          "entity_slug": "wraith-king"
         },
         {
           "kind": "nerf",
           "name": "Spectre - Haunt",
-          "detail": "Haunt duration decreased from 5/6/7s to 4/5/6s"
+          "detail": "Haunt duration decreased from 5/6/7s to 4/5/6s",
+          "entity_type": "unit",
+          "entity_slug": "spectres"
         }
       ]
     },
@@ -40,12 +50,16 @@
         {
           "kind": "rework",
           "name": "Kobold - Divided we stand",
-          "detail": "Reworked into (1)(2)(3). (1) Kobold: Each two paired Kobold pieces on board will summon a replica when battle starts. (2) Kobolds: Each two paired ally pieces on board will summon a replica when battle starts. (3) Kobolds: Every unpaired Kobold piece will reshape itself into a non-Kobold ally of the same rank before battle starts."
+          "detail": "Reworked into (1)(2)(3). (1) Kobold: Each two paired Kobold pieces on board will summon a replica when battle starts. (2) Kobolds: Each two paired ally pieces on board will summon a replica when battle starts. (3) Kobolds: Every unpaired Kobold piece will reshape itself into a non-Kobold ally of the same rank before battle starts.",
+          "entity_type": "synergy",
+          "entity_slug": "kobold"
         },
         {
           "kind": "buff",
           "name": "Pandaren - Hospitality",
-          "detail": "(2) Pandarens now have bad luck comfort as (1) pandaren: The possibility increases gradually before a Pandaren is invited."
+          "detail": "(2) Pandarens now have bad luck comfort as (1) pandaren: The possibility increases gradually before a Pandaren is invited.",
+          "entity_type": "synergy",
+          "entity_slug": "pandaren"
         }
       ]
     },
@@ -90,47 +104,65 @@
         {
           "kind": "buff",
           "name": "Knight - Divine Protection",
-          "detail": "Chance for shield increased from 20% to 25%"
+          "detail": "Chance for shield increased from 20% to 25%",
+          "entity_type": "synergy",
+          "entity_slug": "knight"
         },
         {
           "kind": "buff",
           "name": "Troll - Voodoo Frenzy",
-          "detail": "(6) Trolls' maximum stack increased from 7 to 8"
+          "detail": "(6) Trolls' maximum stack increased from 7 to 8",
+          "entity_type": "synergy",
+          "entity_slug": "troll"
         },
         {
           "kind": "nerf",
           "name": "Lich - Chain Frost",
-          "detail": "Damage bonus per bounce decreased from 30/40/50 to 25"
+          "detail": "Damage bonus per bounce decreased from 30/40/50 to 25",
+          "entity_type": "unit",
+          "entity_slug": "lich"
         },
         {
           "kind": "nerf",
           "name": "Wraith King - Reincarnation",
-          "detail": "Duration for reincarnated pieces decreased from 15/20/25s to 10/15/20s"
+          "detail": "Duration for reincarnated pieces decreased from 15/20/25s to 10/15/20s",
+          "entity_type": "unit",
+          "entity_slug": "wraith-king"
         },
         {
           "kind": "nerf",
           "name": "Spectre",
-          "detail": "Base damage decreased from 120 to 100"
+          "detail": "Base damage decreased from 120 to 100",
+          "entity_type": "unit",
+          "entity_slug": "spectres"
         },
         {
           "kind": "buff",
           "name": "Undying",
-          "detail": "Armor increased from 2 to 5"
+          "detail": "Armor increased from 2 to 5",
+          "entity_type": "unit",
+          "entity_slug": "undying"
         },
         {
           "kind": "buff",
           "name": "Drow Ranger",
-          "detail": "Base damage increased from 80 to 85"
+          "detail": "Base damage increased from 80 to 85",
+          "entity_type": "unit",
+          "entity_slug": "drow-ranger"
         },
         {
           "kind": "buff",
           "name": "Muerta",
-          "detail": "Base damage increased from 55 to 65"
+          "detail": "Base damage increased from 55 to 65",
+          "entity_type": "unit",
+          "entity_slug": "muerta"
         },
         {
           "kind": "buff",
           "name": "Lifestealer",
-          "detail": "Magical resistance increased from 30 to 50, armor increased from 5 to 6"
+          "detail": "Magical resistance increased from 30 to 50, armor increased from 5 to 6",
+          "entity_type": "unit",
+          "entity_slug": "lifestealer"
         },
         {
           "kind": "buff",
@@ -150,22 +182,30 @@
         {
           "kind": "nerf",
           "name": "Ascetics Cap",
-          "detail": "Chance for reborn is now dynamic, higher cost pieces have lower chance for reborn. Chance for reborn from $1-$5 varies from 80% to 40%"
+          "detail": "Chance for reborn is now dynamic, higher cost pieces have lower chance for reborn. Chance for reborn from $1-$5 varies from 80% to 40%",
+          "entity_type": "item",
+          "entity_slug": "ascetics-cap"
         },
         {
           "kind": "buff",
           "name": "Marci - Unleash",
-          "detail": "Magical damage increased from 50/75/125 to 100/150/250, radius increased from 128/256/384 to 200/300/400. Strikes decreased from 4/5/6 times per 1.75 secs to 3/4/5 times per 2 secs"
+          "detail": "Magical damage increased from 50/75/125 to 100/150/250, radius increased from 128/256/384 to 200/300/400. Strikes decreased from 4/5/6 times per 1.75 secs to 3/4/5 times per 2 secs",
+          "entity_type": "unit",
+          "entity_slug": "marci"
         },
         {
           "kind": "buff",
           "name": "Arc Warden",
-          "detail": "Base Health increased from 850 to 900, attack interval decreased from 1.1 to 1.0, attack range increased from 400 to 600"
+          "detail": "Base Health increased from 850 to 900, attack interval decreased from 1.1 to 1.0, attack range increased from 400 to 600",
+          "entity_type": "unit",
+          "entity_slug": "arc-warden"
         },
         {
           "kind": "change",
           "name": "Lifestealer - Rage",
-          "detail": "Immune to Pure damage when activated"
+          "detail": "Immune to Pure damage when activated",
+          "entity_type": "unit",
+          "entity_slug": "lifestealer"
         },
         {
           "kind": "change",

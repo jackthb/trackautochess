@@ -9,17 +9,23 @@
         {
           "kind": "change",
           "name": "Kobold - Divided We Stand",
-          "detail": "Reworked from (1)(2)(3) to (2)(4)."
+          "detail": "Reworked from (1)(2)(3) to (2)(4).",
+          "entity_type": "synergy",
+          "entity_slug": "kobold"
         },
         {
           "kind": "buff",
           "name": "Monk - Drunken Stagger",
-          "detail": "(6) Monks tier added."
+          "detail": "(6) Monks tier added.",
+          "entity_type": "synergy",
+          "entity_slug": "monk"
         },
         {
           "kind": "buff",
           "name": "Mech",
-          "detail": "(6) Mechs: Chances to upgrade into gold heart, and the chance rises with your courier level."
+          "detail": "(6) Mechs: Chances to upgrade into gold heart, and the chance rises with your courier level.",
+          "entity_type": "synergy",
+          "entity_slug": "mech"
         }
       ]
     },
@@ -29,7 +35,9 @@
         {
           "kind": "change",
           "name": "Life Stealer",
-          "detail": "Class changed from Wizard to Warlock."
+          "detail": "Class changed from Wizard to Warlock.",
+          "entity_type": "unit",
+          "entity_slug": "lifestealer"
         }
       ]
     },
@@ -39,17 +47,23 @@
         {
           "kind": "new",
           "name": "Kobold Cup",
-          "detail": "New T3 item added."
+          "detail": "New T3 item added.",
+          "entity_type": "item",
+          "entity_slug": "kobold-cup"
         },
         {
           "kind": "nerf",
           "name": "Drum of Endurance",
-          "detail": "Downgraded from T3 to T2."
+          "detail": "Downgraded from T3 to T2.",
+          "entity_type": "item",
+          "entity_slug": "drum-of-endurance"
         },
         {
           "kind": "nerf",
           "name": "Prince's Knife",
-          "detail": "Downgraded from T2 to T1."
+          "detail": "Downgraded from T2 to T1.",
+          "entity_type": "item",
+          "entity_slug": "princes-knife"
         }
       ]
     },

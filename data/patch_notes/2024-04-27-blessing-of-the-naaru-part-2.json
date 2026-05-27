@@ -35,32 +35,44 @@
         {
           "kind": "added",
           "name": "Hoodwink - Acorn Shot: Simplified the skill, removing the mana cost and duration of the debuff",
-          "detail": "New chess piece."
+          "detail": "New chess piece.",
+          "entity_type": "unit",
+          "entity_slug": "hoodwink"
         },
         {
           "kind": "added",
           "name": "Ogre Magi - Multicast: Removed the mana cost of the skill",
-          "detail": "New chess piece."
+          "detail": "New chess piece.",
+          "entity_type": "unit",
+          "entity_slug": "ogre-magi"
         },
         {
           "kind": "added",
           "name": "Dark Willow - Cursed Crown: Reduced stun duration from 3/4/6 seconds to 3/4/5 seconds",
-          "detail": "New chess piece."
+          "detail": "New chess piece.",
+          "entity_type": "unit",
+          "entity_slug": "dark-willow"
         },
         {
           "kind": "added",
           "name": "Lina - Laguna Blade: Cooldown reduced from 12/8/6 seconds to 9/7/5 seconds",
-          "detail": "New chess piece."
+          "detail": "New chess piece.",
+          "entity_type": "unit",
+          "entity_slug": "lina"
         },
         {
           "kind": "added",
           "name": "Keeper of the Light - Illuminate: Reduced maximum damage from 300/500/800 to 300/500/700",
-          "detail": "New chess piece."
+          "detail": "New chess piece.",
+          "entity_type": "unit",
+          "entity_slug": "keeper-of-the-light"
         },
         {
           "kind": "added",
           "name": "Anti-Mage - Mana Void: Damage threshold for triggering Mana Void changed from 100/80/60 to a unified value of 100",
-          "detail": "New chess piece."
+          "detail": "New chess piece.",
+          "entity_type": "unit",
+          "entity_slug": "anti-mage"
         },
         {
           "kind": "added",
@@ -70,7 +82,9 @@
         {
           "kind": "added",
           "name": "Necrophos - Reaper's Scythe: Cooldown reduced from 10/8/4 seconds to 8/6/4 seconds",
-          "detail": "New chess piece."
+          "detail": "New chess piece.",
+          "entity_type": "unit",
+          "entity_slug": "necrophos"
         }
       ]
     },
@@ -80,7 +94,9 @@
         {
           "kind": "change",
           "name": "Draenei - Blessing of the Naaru",
-          "detail": "Synergy Update to(2)(4) (2)Draenei: All friendly Draenei gain the effect: Every 2 seconds, steal 100 health from the nearest enemy chess piece to heal themselves. (4)Draenei: All friendly pieces gain effects: Whenever a cumulative total of more than 100 points of healing is taken it is split (cumulative healing) points of pure damage among the surrounding enemies. Note: (2) Draenei's life-steal effect deals pure damage + healing. Draenei illusions are also effective. Note: (4)Draenei's Baptism damage is no longer divided, and each enemy within the range will receive the same damage."
+          "detail": "Synergy Update to(2)(4) (2)Draenei: All friendly Draenei gain the effect: Every 2 seconds, steal 100 health from the nearest enemy chess piece to heal themselves. (4)Draenei: All friendly pieces gain effects: Whenever a cumulative total of more than 100 points of healing is taken it is split (cumulative healing) points of pure damage among the surrounding enemies. Note: (2) Draenei's life-steal effect deals pure damage + healing. Draenei illusions are also effective. Note: (4)Draenei's Baptism damage is no longer divided, and each enemy within the range will receive the same damage.",
+          "entity_type": "synergy",
+          "entity_slug": "draenei"
         },
         {
           "kind": "buff",
@@ -130,17 +146,23 @@
         {
           "kind": "nerf",
           "name": "Trident",
-          "detail": "Attack damage bonus reduced from +60 to +50."
+          "detail": "Attack damage bonus reduced from +60 to +50.",
+          "entity_type": "item",
+          "entity_slug": "trident"
         },
         {
           "kind": "nerf",
           "name": "Manta style",
-          "detail": "Illusions now inherit passive effects of the carrier's equipment (but cannot use active equipment). Duration of illusions reduced from 10 seconds to 8 seconds."
+          "detail": "Illusions now inherit passive effects of the carrier's equipment (but cannot use active equipment). Duration of illusions reduced from 10 seconds to 8 seconds.",
+          "entity_type": "item",
+          "entity_slug": "manta-style"
         },
         {
           "kind": "buff",
           "name": "Satanic",
-          "detail": "Lifesteal percentage increased from 45% to 50%. Cooldown reduced from 20 seconds to 15 seconds."
+          "detail": "Lifesteal percentage increased from 45% to 50%. Cooldown reduced from 20 seconds to 15 seconds.",
+          "entity_type": "item",
+          "entity_slug": "satanic"
         }
       ]
     },
