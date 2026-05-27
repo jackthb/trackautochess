@@ -174,7 +174,9 @@
         {
           "kind": "change",
           "name": "Aghanim's Shard",
-          "detail": "Added attribute: Magic Damage +20%"
+          "detail": "Added attribute: Magic Damage +20%",
+          "entity_type": "item",
+          "entity_slug": "aghanims-shard"
         },
         {
           "kind": "nerf",

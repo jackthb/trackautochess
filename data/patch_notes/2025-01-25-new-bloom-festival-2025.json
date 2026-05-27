@@ -163,7 +163,9 @@
         {
           "kind": "change",
           "name": "Aghanim's Shard",
-          "detail": "Additional skill will be removed after chess pieces upgraded."
+          "detail": "Additional skill will be removed after chess pieces upgraded.",
+          "entity_type": "item",
+          "entity_slug": "aghanims-shard"
         },
         {
           "kind": "buff",

@@ -1,61 +1,4 @@
 {
-  "Ancient Apparition": {
-    "id": "chess_aa",
-    "cost": 1,
-    "pool": "standard",
-    "synergies": [
-      "Elemental",
-      "Mage"
-    ],
-    "names": {
-      "en": "Ancient Apparition",
-      "lore": "Kaldr",
-      "ko": "고대 영혼",
-      "ru": "Ancient Apparition",
-      "zh-cn": "极寒幽魂",
-      "zh-tw": "極寒幽魂"
-    },
-    "attack_type": "ranged",
-    "abilities": null,
-    "stats": {
-      "1_star": {
-        "hp": 550,
-        "mana": 0,
-        "atk": [
-          30,
-          60
-        ],
-        "armor": 2,
-        "magic_resist": 10,
-        "atk_rate": 1.5,
-        "atk_range": 400
-      },
-      "2_star": {
-        "hp": 1100,
-        "mana": 0,
-        "atk": [
-          60,
-          120
-        ],
-        "armor": 2,
-        "magic_resist": 10,
-        "atk_rate": 1.5,
-        "atk_range": 600
-      },
-      "3_star": {
-        "hp": 2200,
-        "mana": 0,
-        "atk": [
-          120,
-          240
-        ],
-        "armor": 2,
-        "magic_resist": 10,
-        "atk_rate": 1.5,
-        "atk_range": 800
-      }
-    }
-  },
   "Abaddon": {
     "id": "chess_abaddon",
     "cost": 1,
@@ -111,63 +54,11 @@
         "atk_rate": 1.3,
         "atk_range": 205
       }
-    }
-  },
-  "Anti-mage": {
-    "id": "chess_am",
-    "cost": 4,
-    "pool": "standard",
-    "synergies": [
-      "Demon Hunter",
-      "Elf"
-    ],
-    "names": {
-      "en": "Anti-mage",
-      "lore": "Magina",
-      "ko": "항마사",
-      "ru": "Anti-mage",
-      "zh-cn": "敌法师",
-      "zh-tw": "敵法師"
     },
-    "attack_type": "melee",
-    "abilities": null,
-    "stats": {
-      "1_star": {
-        "hp": 850,
-        "mana": 0,
-        "atk": [
-          80,
-          110
-        ],
-        "armor": 7,
-        "magic_resist": 30,
-        "atk_rate": 0.9,
-        "atk_range": 205
-      },
-      "2_star": {
-        "hp": 1700,
-        "mana": 0,
-        "atk": [
-          160,
-          220
-        ],
-        "armor": 7,
-        "magic_resist": 30,
-        "atk_rate": 0.9,
-        "atk_range": 205
-      },
-      "3_star": {
-        "hp": 3400,
-        "mana": 0,
-        "atk": [
-          320,
-          440
-        ],
-        "armor": 7,
-        "magic_resist": 30,
-        "atk_rate": 0.9,
-        "atk_range": 205
-      }
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/d9b34bf31475241a19cfc6b709b8f0b9f1bed053-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
     }
   },
   "Abyssal Underlord": {
@@ -225,1835 +116,11 @@
         "atk_rate": 1.5,
         "atk_range": 205
       }
-    }
-  },
-  "Arc Warden": {
-    "id": "chess_aw",
-    "cost": 5,
-    "pool": "standard",
-    "synergies": [
-      "Kobold",
-      "Shaman"
-    ],
-    "names": {
-      "en": "Arc Warden",
-      "lore": "Zet",
-      "ko": "번개 감시자",
-      "ru": "Arc Warden",
-      "zh-cn": "天穹守望者",
-      "zh-tw": "天穹守望者"
     },
-    "attack_type": "ranged",
-    "abilities": null,
-    "stats": {
-      "1_star": {
-        "hp": 900,
-        "mana": 0,
-        "atk": [
-          90,
-          150
-        ],
-        "armor": 7,
-        "magic_resist": 0,
-        "atk_rate": 1.0,
-        "atk_range": 600
-      },
-      "2_star": {
-        "hp": 1700,
-        "mana": 0,
-        "atk": [
-          180,
-          300
-        ],
-        "armor": 7,
-        "magic_resist": 0,
-        "atk_rate": 1.1,
-        "atk_range": 600
-      },
-      "3_star": {
-        "hp": 3400,
-        "mana": 0,
-        "atk": [
-          360,
-          600
-        ],
-        "armor": 7,
-        "magic_resist": 0,
-        "atk_rate": 1.1,
-        "atk_range": 600
-      }
-    }
-  },
-  "Axe": {
-    "id": "chess_axe",
-    "cost": 1,
-    "pool": "standard",
-    "synergies": [
-      "Orc",
-      "Warrior"
-    ],
-    "names": {
-      "en": "Axe",
-      "lore": "MogulKahn",
-      "ko": "도끼전사",
-      "ru": "Axe",
-      "zh-cn": "斧王",
-      "zh-tw": "斧王"
-    },
-    "attack_type": "melee",
-    "abilities": null,
-    "stats": {
-      "1_star": {
-        "hp": 750,
-        "mana": 100,
-        "atk": [
-          50,
-          70
-        ],
-        "armor": 4,
-        "magic_resist": 0,
-        "atk_rate": 1.5,
-        "atk_range": 205
-      },
-      "2_star": {
-        "hp": 1500,
-        "mana": 100,
-        "atk": [
-          100,
-          140
-        ],
-        "armor": 4,
-        "magic_resist": 0,
-        "atk_rate": 1.5,
-        "atk_range": 205
-      },
-      "3_star": {
-        "hp": 3000,
-        "mana": 100,
-        "atk": [
-          200,
-          280
-        ],
-        "armor": 4,
-        "magic_resist": 0,
-        "atk_rate": 1.5,
-        "atk_range": 205
-      }
-    }
-  },
-  "Bane": {
-    "id": "chess_bane",
-    "cost": 1,
-    "pool": "standard",
-    "synergies": [
-      "Faceless",
-      "Satyr",
-      "Warlock"
-    ],
-    "names": {
-      "en": "Bane",
-      "lore": "Atropos",
-      "ko": "악몽의 그림자",
-      "ru": "Bane",
-      "zh-cn": "祸乱之源",
-      "zh-tw": "禍亂之源"
-    },
-    "attack_type": "ranged",
-    "abilities": null,
-    "stats": {
-      "1_star": {
-        "hp": 550,
-        "mana": 100,
-        "atk": [
-          40,
-          50
-        ],
-        "armor": 2,
-        "magic_resist": 10,
-        "atk_rate": 1.5,
-        "atk_range": 400
-      },
-      "2_star": {
-        "hp": 1100,
-        "mana": 100,
-        "atk": [
-          80,
-          100
-        ],
-        "armor": 2,
-        "magic_resist": 10,
-        "atk_rate": 1.5,
-        "atk_range": 400
-      },
-      "3_star": {
-        "hp": 2200,
-        "mana": 100,
-        "atk": [
-          160,
-          200
-        ],
-        "armor": 2,
-        "magic_resist": 10,
-        "atk_rate": 1.5,
-        "atk_range": 400
-      }
-    }
-  },
-  "Batrider": {
-    "id": "chess_bat",
-    "cost": 2,
-    "pool": "standard",
-    "synergies": [
-      "Knight",
-      "Troll"
-    ],
-    "names": {
-      "en": "Batrider",
-      "lore": "Kin۰zaka",
-      "ko": "박쥐기수",
-      "ru": "Batrider",
-      "zh-cn": "蝙蝠骑士",
-      "zh-tw": "蝙蝠騎士"
-    },
-    "attack_type": "ranged",
-    "abilities": null,
-    "stats": {
-      "1_star": {
-        "hp": 600,
-        "mana": 100,
-        "atk": [
-          40,
-          55
-        ],
-        "armor": 4,
-        "magic_resist": 0,
-        "atk_rate": 1.3,
-        "atk_range": 400
-      },
-      "2_star": {
-        "hp": 1200,
-        "mana": 100,
-        "atk": [
-          80,
-          110
-        ],
-        "armor": 4,
-        "magic_resist": 0,
-        "atk_rate": 1.3,
-        "atk_range": 400
-      },
-      "3_star": {
-        "hp": 2400,
-        "mana": 100,
-        "atk": [
-          160,
-          220
-        ],
-        "armor": 4,
-        "magic_resist": 0,
-        "atk_rate": 1.3,
-        "atk_range": 400
-      }
-    }
-  },
-  "Bounty Hunter": {
-    "id": "chess_bh",
-    "cost": 1,
-    "pool": "standard",
-    "synergies": [
-      "Draenei",
-      "Goblin",
-      "Hunter"
-    ],
-    "names": {
-      "en": "Bounty Hunter",
-      "lore": "Gondar",
-      "ko": "현상금 사냥꾼",
-      "ru": "Bounty Hunter",
-      "zh-cn": "赏金猎人",
-      "zh-tw": "賞金獵人"
-    },
-    "attack_type": "melee",
-    "abilities": null,
-    "stats": {
-      "1_star": {
-        "hp": 500,
-        "mana": 100,
-        "atk": [
-          50,
-          70
-        ],
-        "armor": 1,
-        "magic_resist": 0,
-        "atk_rate": 1.0,
-        "atk_range": 205
-      },
-      "2_star": {
-        "hp": 1000,
-        "mana": 100,
-        "atk": [
-          100,
-          140
-        ],
-        "armor": 1,
-        "magic_resist": 0,
-        "atk_rate": 1.0,
-        "atk_range": 205
-      },
-      "3_star": {
-        "hp": 2000,
-        "mana": 100,
-        "atk": [
-          200,
-          280
-        ],
-        "armor": 1,
-        "magic_resist": 0,
-        "atk_rate": 1.0,
-        "atk_range": 205
-      }
-    }
-  },
-  "Beastmaster": {
-    "id": "chess_bm",
-    "cost": 2,
-    "pool": "standard",
-    "synergies": [
-      "Hunter",
-      "Orc"
-    ],
-    "names": {
-      "en": "Beastmaster",
-      "lore": "Karroch",
-      "ko": "야수지배자",
-      "ru": "Beastmaster",
-      "zh-cn": "兽王",
-      "zh-tw": "獸王"
-    },
-    "attack_type": "melee",
-    "abilities": null,
-    "stats": {
-      "1_star": {
-        "hp": 650,
-        "mana": 100,
-        "atk": [
-          60,
-          70
-        ],
-        "armor": 6,
-        "magic_resist": 0,
-        "atk_rate": 1.4,
-        "atk_range": 205
-      },
-      "2_star": {
-        "hp": 1300,
-        "mana": 100,
-        "atk": [
-          120,
-          140
-        ],
-        "armor": 6,
-        "magic_resist": 0,
-        "atk_rate": 1.4,
-        "atk_range": 205
-      },
-      "3_star": {
-        "hp": 2600,
-        "mana": 100,
-        "atk": [
-          240,
-          280
-        ],
-        "armor": 6,
-        "magic_resist": 0,
-        "atk_rate": 1.4,
-        "atk_range": 205
-      }
-    }
-  },
-  "Broodmother": {
-    "id": "chess_br",
-    "cost": 4,
-    "pool": "standard",
-    "synergies": [
-      "Aqir",
-      "Hunter"
-    ],
-    "names": {
-      "en": "Broodmother",
-      "lore": "Black۰Arachnia",
-      "ko": "거미여왕",
-      "ru": "Broodmother",
-      "zh-cn": "育母蜘蛛",
-      "zh-tw": "育母蜘蛛"
-    },
-    "attack_type": "melee",
-    "abilities": null,
-    "stats": {
-      "1_star": {
-        "hp": 950,
-        "mana": 0,
-        "atk": [
-          80,
-          110
-        ],
-        "armor": 10,
-        "magic_resist": 20,
-        "atk_rate": 1.1,
-        "atk_range": 205
-      },
-      "2_star": {
-        "hp": 1900,
-        "mana": 0,
-        "atk": [
-          160,
-          220
-        ],
-        "armor": 10,
-        "magic_resist": 20,
-        "atk_rate": 1.1,
-        "atk_range": 205
-      },
-      "3_star": {
-        "hp": 3800,
-        "mana": 0,
-        "atk": [
-          320,
-          440
-        ],
-        "armor": 10,
-        "magic_resist": 20,
-        "atk_rate": 1.1,
-        "atk_range": 205
-      }
-    }
-  },
-  "Brewmaster": {
-    "id": "chess_brew",
-    "cost": 1,
-    "pool": "standard",
-    "synergies": [
-      "Monk",
-      "Pandaren"
-    ],
-    "names": {
-      "en": "Brewmaster",
-      "lore": "Mangix",
-      "ko": "취권도사",
-      "ru": "Brewmaster",
-      "zh-cn": "熊猫酒仙",
-      "zh-tw": "熊貓酒仙"
-    },
-    "attack_type": "melee",
-    "abilities": null,
-    "stats": {
-      "1_star": {
-        "hp": 600,
-        "mana": 100,
-        "atk": [
-          50,
-          60
-        ],
-        "armor": 3,
-        "magic_resist": 20,
-        "atk_rate": 1.5,
-        "atk_range": 205
-      },
-      "2_star": {
-        "hp": 1200,
-        "mana": 100,
-        "atk": [
-          100,
-          120
-        ],
-        "armor": 3,
-        "magic_resist": 20,
-        "atk_rate": 1.5,
-        "atk_range": 205
-      },
-      "3_star": {
-        "hp": 2400,
-        "mana": 100,
-        "atk": [
-          200,
-          240
-        ],
-        "armor": 3,
-        "magic_resist": 20,
-        "atk_rate": 1.5,
-        "atk_range": 205
-      }
-    }
-  },
-  "Blood Seeker": {
-    "id": "chess_bs",
-    "cost": 2,
-    "pool": "standard",
-    "synergies": [
-      "Orc",
-      "Shaman"
-    ],
-    "names": {
-      "en": "Blood Seeker",
-      "lore": "Strygwyr",
-      "ko": "혈귀",
-      "ru": "Blood Seeker",
-      "zh-cn": "血魔",
-      "zh-tw": "血魔"
-    },
-    "attack_type": "melee",
-    "abilities": null,
-    "stats": {
-      "1_star": {
-        "hp": 600,
-        "mana": 100,
-        "atk": [
-          55,
-          60
-        ],
-        "armor": 3,
-        "magic_resist": 10,
-        "atk_rate": 1.1,
-        "atk_range": 205
-      },
-      "2_star": {
-        "hp": 1200,
-        "mana": 100,
-        "atk": [
-          110,
-          120
-        ],
-        "armor": 3,
-        "magic_resist": 10,
-        "atk_rate": 1.1,
-        "atk_range": 205
-      },
-      "3_star": {
-        "hp": 2400,
-        "mana": 100,
-        "atk": [
-          220,
-          240
-        ],
-        "armor": 3,
-        "magic_resist": 10,
-        "atk_rate": 1.1,
-        "atk_range": 205
-      }
-    }
-  },
-  "Chen": {
-    "id": "chess_chen",
-    "cost": 4,
-    "pool": "standard",
-    "synergies": [
-      "Orc",
-      "Priest"
-    ],
-    "names": {
-      "en": "Chen",
-      "lore": "Chen",
-      "ko": "첸",
-      "ru": "Chen",
-      "zh-cn": "上帝之手",
-      "zh-tw": "上帝之手"
-    },
-    "attack_type": "ranged",
-    "abilities": null,
-    "stats": {
-      "1_star": {
-        "hp": 900,
-        "mana": 100,
-        "atk": [
-          40,
-          60
-        ],
-        "armor": 6,
-        "magic_resist": 10,
-        "atk_rate": 1.4,
-        "atk_range": 400
-      },
-      "2_star": {
-        "hp": 1800,
-        "mana": 100,
-        "atk": [
-          80,
-          120
-        ],
-        "armor": 6,
-        "magic_resist": 10,
-        "atk_rate": 1.4,
-        "atk_range": 400
-      },
-      "3_star": {
-        "hp": 3600,
-        "mana": 100,
-        "atk": [
-          160,
-          240
-        ],
-        "armor": 6,
-        "magic_resist": 10,
-        "atk_rate": 1.4,
-        "atk_range": 400
-      }
-    }
-  },
-  "Chaos Knight": {
-    "id": "chess_ck",
-    "cost": 2,
-    "pool": "standard",
-    "synergies": [
-      "Demon",
-      "Knight"
-    ],
-    "names": {
-      "en": "Chaos Knight",
-      "lore": "Nessaj",
-      "ko": "혼돈 기사",
-      "ru": "Chaos Knight",
-      "zh-cn": "混沌骑士",
-      "zh-tw": "混沌騎士"
-    },
-    "attack_type": "melee",
-    "abilities": null,
-    "stats": {
-      "1_star": {
-        "hp": 650,
-        "mana": 0,
-        "atk": [
-          40,
-          160
-        ],
-        "armor": 6,
-        "magic_resist": 0,
-        "atk_rate": 1.5,
-        "atk_range": 205
-      },
-      "2_star": {
-        "hp": 1300,
-        "mana": 0,
-        "atk": [
-          80,
-          320
-        ],
-        "armor": 6,
-        "magic_resist": 0,
-        "atk_rate": 1.5,
-        "atk_range": 205
-      },
-      "3_star": {
-        "hp": 2600,
-        "mana": 0,
-        "atk": [
-          160,
-          640
-        ],
-        "armor": 6,
-        "magic_resist": 0,
-        "atk_rate": 1.5,
-        "atk_range": 205
-      }
-    }
-  },
-  "Clinkz": {
-    "id": "chess_clinkz",
-    "cost": 1,
-    "pool": "undead",
-    "synergies": [
-      "Hunter",
-      "Undead"
-    ],
-    "names": {
-      "en": "Clinkz",
-      "lore": "Clinkz",
-      "ko": "클링츠",
-      "ru": "Clinkz",
-      "zh-cn": "骷髅弓箭手",
-      "zh-tw": "骷髏弓箭手"
-    },
-    "attack_type": "ranged",
-    "abilities": null,
-    "stats": {
-      "1_star": {
-        "hp": 500,
-        "mana": 100,
-        "atk": [
-          40,
-          60
-        ],
-        "armor": 2,
-        "magic_resist": 0,
-        "atk_rate": 1.0,
-        "atk_range": 600
-      },
-      "2_star": {
-        "hp": 1000,
-        "mana": 100,
-        "atk": [
-          80,
-          120
-        ],
-        "armor": 2,
-        "magic_resist": 0,
-        "atk_rate": 1.0,
-        "atk_range": 600
-      },
-      "3_star": {
-        "hp": 2000,
-        "mana": 100,
-        "atk": [
-          160,
-          240
-        ],
-        "armor": 2,
-        "magic_resist": 0,
-        "atk_rate": 1.0,
-        "atk_range": 600
-      }
-    }
-  },
-  "Clockwerk": {
-    "id": "chess_clock",
-    "cost": 1,
-    "pool": "standard",
-    "synergies": [
-      "Goblin",
-      "Mech"
-    ],
-    "names": {
-      "en": "Clockwerk",
-      "lore": "Rattletra",
-      "ko": "태엽장이",
-      "ru": "Clockwerk",
-      "zh-cn": "发条技师",
-      "zh-tw": "發條技師"
-    },
-    "attack_type": "melee",
-    "abilities": null,
-    "stats": {
-      "1_star": {
-        "hp": 700,
-        "mana": 100,
-        "atk": [
-          45,
-          55
-        ],
-        "armor": 4,
-        "magic_resist": 0,
-        "atk_rate": 1.4,
-        "atk_range": 205
-      },
-      "2_star": {
-        "hp": 1400,
-        "mana": 100,
-        "atk": [
-          90,
-          110
-        ],
-        "armor": 4,
-        "magic_resist": 0,
-        "atk_rate": 1.4,
-        "atk_range": 205
-      },
-      "3_star": {
-        "hp": 2800,
-        "mana": 100,
-        "atk": [
-          180,
-          220
-        ],
-        "armor": 4,
-        "magic_resist": 0,
-        "atk_rate": 1.4,
-        "atk_range": 205
-      }
-    }
-  },
-  "Crystal Maiden": {
-    "id": "chess_cm",
-    "cost": 1,
-    "pool": "standard",
-    "synergies": [
-      "Human",
-      "Mage"
-    ],
-    "names": {
-      "en": "Crystal Maiden",
-      "lore": "Rylai",
-      "ko": "수정의 여인",
-      "ru": "Crystal Maiden",
-      "zh-cn": "水晶室女",
-      "zh-tw": "水晶室女"
-    },
-    "attack_type": "ranged",
-    "abilities": null,
-    "stats": {
-      "1_star": {
-        "hp": 450,
-        "mana": 0,
-        "atk": [
-          40,
-          45
-        ],
-        "armor": 1,
-        "magic_resist": 5,
-        "atk_rate": 1.7,
-        "atk_range": 600
-      },
-      "2_star": {
-        "hp": 900,
-        "mana": 0,
-        "atk": [
-          80,
-          90
-        ],
-        "armor": 1,
-        "magic_resist": 5,
-        "atk_rate": 1.7,
-        "atk_range": 600
-      },
-      "3_star": {
-        "hp": 1800,
-        "mana": 0,
-        "atk": [
-          160,
-          180
-        ],
-        "armor": 1,
-        "magic_resist": 5,
-        "atk_rate": 1.7,
-        "atk_range": 600
-      }
-    }
-  },
-  "Centaur Warrunner": {
-    "id": "chess_ct",
-    "cost": 2,
-    "pool": "standard",
-    "synergies": [
-      "Centaur",
-      "Warrior"
-    ],
-    "names": {
-      "en": "Centaur Warrunner",
-      "lore": "Bradwarden",
-      "ko": "켄타우로스 전쟁용사",
-      "ru": "Centaur Warrunner",
-      "zh-cn": "半人马战行者",
-      "zh-tw": "半人馬戰行者"
-    },
-    "attack_type": "melee",
-    "abilities": null,
-    "stats": {
-      "1_star": {
-        "hp": 850,
-        "mana": 0,
-        "atk": [
-          55,
-          60
-        ],
-        "armor": 4,
-        "magic_resist": 15,
-        "atk_rate": 1.1,
-        "atk_range": 205
-      },
-      "2_star": {
-        "hp": 1700,
-        "mana": 0,
-        "atk": [
-          110,
-          120
-        ],
-        "armor": 4,
-        "magic_resist": 15,
-        "atk_rate": 1.1,
-        "atk_range": 205
-      },
-      "3_star": {
-        "hp": 3400,
-        "mana": 0,
-        "atk": [
-          220,
-          240
-        ],
-        "armor": 4,
-        "magic_resist": 15,
-        "atk_rate": 1.1,
-        "atk_range": 205
-      }
-    }
-  },
-  "Dazzle": {
-    "id": "chess_dazzle",
-    "cost": 1,
-    "pool": "standard",
-    "synergies": [
-      "Priest",
-      "Troll"
-    ],
-    "names": {
-      "en": "Dazzle",
-      "lore": "Dazzle",
-      "ko": "대즐",
-      "ru": "Dazzle",
-      "zh-cn": "暗影牧师",
-      "zh-tw": "暗影牧師"
-    },
-    "attack_type": "ranged",
-    "abilities": null,
-    "stats": {
-      "1_star": {
-        "hp": 450,
-        "mana": 100,
-        "atk": [
-          45,
-          60
-        ],
-        "armor": 1,
-        "magic_resist": 10,
-        "atk_rate": 1.2,
-        "atk_range": 400
-      },
-      "2_star": {
-        "hp": 900,
-        "mana": 100,
-        "atk": [
-          90,
-          120
-        ],
-        "armor": 1,
-        "magic_resist": 10,
-        "atk_rate": 1.2,
-        "atk_range": 400
-      },
-      "3_star": {
-        "hp": 1800,
-        "mana": 100,
-        "atk": [
-          180,
-          240
-        ],
-        "armor": 1,
-        "magic_resist": 10,
-        "atk_rate": 1.2,
-        "atk_range": 400
-      }
-    }
-  },
-  "Dawnbreaker": {
-    "id": "chess_db",
-    "cost": 3,
-    "pool": "standard",
-    "synergies": [
-      "Draenei",
-      "Knight"
-    ],
-    "names": {
-      "en": "Dawnbreaker",
-      "lore": "Valora",
-      "ko": "여명의 파괴자",
-      "ru": "Dawnbreaker",
-      "zh-cn": "破晓辰星",
-      "zh-tw": "破曉辰星"
-    },
-    "attack_type": "melee",
-    "abilities": null,
-    "stats": {
-      "1_star": {
-        "hp": 700,
-        "mana": 100,
-        "atk": [
-          70,
-          110
-        ],
-        "armor": 7,
-        "magic_resist": 0,
-        "atk_rate": 1.6,
-        "atk_range": 205
-      },
-      "2_star": {
-        "hp": 1400,
-        "mana": 100,
-        "atk": [
-          140,
-          220
-        ],
-        "armor": 7,
-        "magic_resist": 0,
-        "atk_rate": 1.6,
-        "atk_range": 205
-      },
-      "3_star": {
-        "hp": 2800,
-        "mana": 100,
-        "atk": [
-          280,
-          440
-        ],
-        "armor": 7,
-        "magic_resist": 0,
-        "atk_rate": 1.6,
-        "atk_range": 205
-      }
-    }
-  },
-  "Disruptor": {
-    "id": "chess_disruptor",
-    "cost": 5,
-    "pool": "standard",
-    "synergies": [
-      "Orc",
-      "Shaman"
-    ],
-    "names": {
-      "en": "Disruptor",
-      "lore": "Thrall",
-      "ko": "디스럽터",
-      "ru": "Disruptor",
-      "zh-cn": "干扰者",
-      "zh-tw": "幹擾者"
-    },
-    "attack_type": "ranged",
-    "abilities": null,
-    "stats": {
-      "1_star": {
-        "hp": 1000,
-        "mana": 100,
-        "atk": [
-          50,
-          70
-        ],
-        "armor": 6,
-        "magic_resist": 20,
-        "atk_rate": 1.5,
-        "atk_range": 600
-      },
-      "2_star": {
-        "hp": 2000,
-        "mana": 100,
-        "atk": [
-          100,
-          140
-        ],
-        "armor": 6,
-        "magic_resist": 20,
-        "atk_rate": 1.5,
-        "atk_range": 600
-      },
-      "3_star": {
-        "hp": 4000,
-        "mana": 100,
-        "atk": [
-          200,
-          280
-        ],
-        "armor": 6,
-        "magic_resist": 20,
-        "atk_rate": 1.5,
-        "atk_range": 600
-      }
-    }
-  },
-  "Dragon Knight": {
-    "id": "chess_dk",
-    "cost": 4,
-    "pool": "standard",
-    "synergies": [
-      "Dragon",
-      "Human",
-      "Knight"
-    ],
-    "names": {
-      "en": "Dragon Knight",
-      "lore": "Davion",
-      "ko": "용기사",
-      "ru": "Dragon Knight",
-      "zh-cn": "龙骑士",
-      "zh-tw": "龍騎士"
-    },
-    "attack_type": "melee",
-    "abilities": null,
-    "stats": {
-      "1_star": {
-        "hp": 900,
-        "mana": 100,
-        "atk": [
-          80,
-          90
-        ],
-        "armor": 12,
-        "magic_resist": 0,
-        "atk_rate": 1.5,
-        "atk_range": 205
-      },
-      "2_star": {
-        "hp": 1800,
-        "mana": 100,
-        "atk": [
-          160,
-          180
-        ],
-        "armor": 12,
-        "magic_resist": 0,
-        "atk_rate": 1.5,
-        "atk_range": 205
-      },
-      "3_star": {
-        "hp": 3600,
-        "mana": 100,
-        "atk": [
-          320,
-          360
-        ],
-        "armor": 12,
-        "magic_resist": 0,
-        "atk_rate": 1.5,
-        "atk_range": 205
-      }
-    }
-  },
-  "Doom": {
-    "id": "chess_doom",
-    "cost": 4,
-    "pool": "standard",
-    "synergies": [
-      "Demon",
-      "Warrior"
-    ],
-    "names": {
-      "en": "Doom",
-      "lore": "Lucifer",
-      "ko": "파멸의 사도",
-      "ru": "Doom",
-      "zh-cn": "末日使者",
-      "zh-tw": "末日使者"
-    },
-    "attack_type": "melee",
-    "abilities": null,
-    "stats": {
-      "1_star": {
-        "hp": 1050,
-        "mana": 100,
-        "atk": [
-          110,
-          120
-        ],
-        "armor": 10,
-        "magic_resist": 0,
-        "atk_rate": 1.3,
-        "atk_range": 205
-      },
-      "2_star": {
-        "hp": 2100,
-        "mana": 100,
-        "atk": [
-          220,
-          240
-        ],
-        "armor": 10,
-        "magic_resist": 0,
-        "atk_rate": 1.3,
-        "atk_range": 205
-      },
-      "3_star": {
-        "hp": 4200,
-        "mana": 100,
-        "atk": [
-          440,
-          480
-        ],
-        "armor": 10,
-        "magic_resist": 0,
-        "atk_rate": 1.3,
-        "atk_range": 205
-      }
-    }
-  },
-  "Death Prophet": {
-    "id": "chess_dp",
-    "cost": 4,
-    "pool": "undead",
-    "synergies": [
-      "Undead",
-      "Warlock"
-    ],
-    "names": {
-      "en": "Death Prophet",
-      "lore": "Krobelus",
-      "ko": "죽음의 예언자",
-      "ru": "Death Prophet",
-      "zh-cn": "死亡先知",
-      "zh-tw": "死亡先知"
-    },
-    "attack_type": "ranged",
-    "abilities": null,
-    "stats": {
-      "1_star": {
-        "hp": 900,
-        "mana": 100,
-        "atk": [
-          50,
-          60
-        ],
-        "armor": 6,
-        "magic_resist": 30,
-        "atk_rate": 1.4,
-        "atk_range": 400
-      },
-      "2_star": {
-        "hp": 1800,
-        "mana": 100,
-        "atk": [
-          100,
-          120
-        ],
-        "armor": 6,
-        "magic_resist": 30,
-        "atk_rate": 1.4,
-        "atk_range": 400
-      },
-      "3_star": {
-        "hp": 3600,
-        "mana": 100,
-        "atk": [
-          200,
-          240
-        ],
-        "armor": 6,
-        "magic_resist": 30,
-        "atk_rate": 1.4,
-        "atk_range": 400
-      }
-    }
-  },
-  "Drow Ranger": {
-    "id": "chess_dr",
-    "cost": 3,
-    "pool": "undead",
-    "synergies": [
-      "Hunter",
-      "Undead"
-    ],
-    "names": {
-      "en": "Drow Ranger",
-      "lore": "Traxex",
-      "ko": "드로우 레인저",
-      "ru": "Drow Ranger",
-      "zh-cn": "卓尔游侠",
-      "zh-tw": "卓爾遊俠"
-    },
-    "attack_type": "ranged",
-    "abilities": null,
-    "stats": {
-      "1_star": {
-        "hp": 600,
-        "mana": 100,
-        "atk": [
-          70,
-          100
-        ],
-        "armor": 4,
-        "magic_resist": 10,
-        "atk_rate": 0.9,
-        "atk_range": 600
-      },
-      "2_star": {
-        "hp": 1200,
-        "mana": 100,
-        "atk": [
-          140,
-          200
-        ],
-        "armor": 4,
-        "magic_resist": 10,
-        "atk_rate": 0.9,
-        "atk_range": 600
-      },
-      "3_star": {
-        "hp": 2400,
-        "mana": 100,
-        "atk": [
-          280,
-          400
-        ],
-        "armor": 4,
-        "magic_resist": 10,
-        "atk_rate": 0.9,
-        "atk_range": 600
-      }
-    }
-  },
-  "DarkSeer": {
-    "id": "chess_ds",
-    "cost": 2,
-    "pool": "standard",
-    "synergies": [
-      "Draenei",
-      "Warlock"
-    ],
-    "names": {
-      "en": "DarkSeer",
-      "lore": "Ish'kafel",
-      "ko": "어둠 현자",
-      "ru": "DarkSeer",
-      "zh-cn": "黑暗贤者",
-      "zh-tw": "黑暗賢者"
-    },
-    "attack_type": "melee",
-    "abilities": null,
-    "stats": {
-      "1_star": {
-        "hp": 700,
-        "mana": 100,
-        "atk": [
-          50,
-          90
-        ],
-        "armor": 4,
-        "magic_resist": 10,
-        "atk_rate": 1.6,
-        "atk_range": 205
-      },
-      "2_star": {
-        "hp": 1400,
-        "mana": 100,
-        "atk": [
-          100,
-          180
-        ],
-        "armor": 4,
-        "magic_resist": 10,
-        "atk_rate": 1.6,
-        "atk_range": 205
-      },
-      "3_star": {
-        "hp": 2800,
-        "mana": 100,
-        "atk": [
-          200,
-          360
-        ],
-        "armor": 4,
-        "magic_resist": 10,
-        "atk_rate": 1.6,
-        "atk_range": 205
-      }
-    }
-  },
-  "Dark Willow": {
-    "id": "chess_dw",
-    "cost": 1,
-    "pool": "standard",
-    "synergies": [
-      "Elf",
-      "Wizard"
-    ],
-    "names": {
-      "en": "Dark Willow",
-      "lore": "Mireska",
-      "ko": "흑버들",
-      "ru": "Dark Willow",
-      "zh-cn": "邪影芳灵",
-      "zh-tw": "邪影芳靈"
-    },
-    "attack_type": "ranged",
-    "abilities": null,
-    "stats": {
-      "1_star": {
-        "hp": 450,
-        "mana": 0,
-        "atk": [
-          40,
-          70
-        ],
-        "armor": 1,
-        "magic_resist": 0,
-        "atk_rate": 1.1,
-        "atk_range": 400
-      },
-      "2_star": {
-        "hp": 900,
-        "mana": 0,
-        "atk": [
-          80,
-          140
-        ],
-        "armor": 1,
-        "magic_resist": 0,
-        "atk_rate": 1.1,
-        "atk_range": 400
-      },
-      "3_star": {
-        "hp": 1800,
-        "mana": 0,
-        "atk": [
-          160,
-          280
-        ],
-        "armor": 1,
-        "magic_resist": 0,
-        "atk_rate": 1.1,
-        "atk_range": 400
-      }
-    }
-  },
-  "Earth Spirit": {
-    "id": "chess_earth",
-    "cost": 4,
-    "pool": "special",
-    "synergies": [
-      "Pandaren",
-      "Shaman"
-    ],
-    "names": {
-      "en": "Earth Spirit",
-      "lore": "Kaolin",
-      "ko": "대지령",
-      "ru": "Earth Spirit",
-      "zh-cn": "大地之灵",
-      "zh-tw": "大地之靈"
-    },
-    "attack_type": "melee",
-    "abilities": null,
-    "stats": {
-      "1_star": {
-        "hp": 900,
-        "mana": 100,
-        "atk": [
-          40,
-          70
-        ],
-        "armor": 9,
-        "magic_resist": 0,
-        "atk_rate": 1.5,
-        "atk_range": 205
-      },
-      "2_star": {
-        "hp": 1800,
-        "mana": 100,
-        "atk": [
-          80,
-          140
-        ],
-        "armor": 9,
-        "magic_resist": 0,
-        "atk_rate": 1.5,
-        "atk_range": 205
-      },
-      "3_star": {
-        "hp": 3600,
-        "mana": 100,
-        "atk": [
-          160,
-          320
-        ],
-        "armor": 9,
-        "magic_resist": 0,
-        "atk_rate": 1.5,
-        "atk_range": 205
-      }
-    }
-  },
-  "Enchantress": {
-    "id": "chess_eh",
-    "cost": 1,
-    "pool": "standard",
-    "synergies": [
-      "Beast",
-      "Centaur",
-      "Druid"
-    ],
-    "names": {
-      "en": "Enchantress",
-      "lore": "Aiushtha",
-      "ko": "요술사",
-      "ru": "Enchantress",
-      "zh-cn": "魅惑魔女",
-      "zh-tw": "魅惑魔女"
-    },
-    "attack_type": "ranged",
-    "abilities": null,
-    "stats": {
-      "1_star": {
-        "hp": 400,
-        "mana": 0,
-        "atk": [
-          50,
-          60
-        ],
-        "armor": 2,
-        "magic_resist": 10,
-        "atk_rate": 1.5,
-        "atk_range": 400
-      },
-      "2_star": {
-        "hp": 800,
-        "mana": 0,
-        "atk": [
-          100,
-          120
-        ],
-        "armor": 2,
-        "magic_resist": 10,
-        "atk_rate": 1.5,
-        "atk_range": 400
-      },
-      "3_star": {
-        "hp": 1500,
-        "mana": 0,
-        "atk": [
-          200,
-          240
-        ],
-        "armor": 2,
-        "magic_resist": 10,
-        "atk_rate": 1.5,
-        "atk_range": 400
-      }
-    }
-  },
-  "Ember Spirit": {
-    "id": "chess_ember",
-    "cost": 4,
-    "pool": "special",
-    "synergies": [
-      "Assassin",
-      "Pandaren"
-    ],
-    "names": {
-      "en": "Ember Spirit",
-      "lore": "Xin",
-      "ko": "불꽃령",
-      "ru": "Ember Spirit",
-      "zh-cn": "灰烬之灵",
-      "zh-tw": "灰燼之靈"
-    },
-    "attack_type": "melee",
-    "abilities": null,
-    "stats": {
-      "1_star": {
-        "hp": 700,
-        "mana": 100,
-        "atk": [
-          50,
-          80
-        ],
-        "armor": 4,
-        "magic_resist": 0,
-        "atk_rate": 1.2,
-        "atk_range": 205
-      },
-      "2_star": {
-        "hp": 1400,
-        "mana": 100,
-        "atk": [
-          100,
-          160
-        ],
-        "armor": 4,
-        "magic_resist": 0,
-        "atk_rate": 1.2,
-        "atk_range": 205
-      },
-      "3_star": {
-        "hp": 2800,
-        "mana": 100,
-        "atk": [
-          200,
-          320
-        ],
-        "armor": 4,
-        "magic_resist": 0,
-        "atk_rate": 1.2,
-        "atk_range": 205
-      }
-    }
-  },
-  "Enigma": {
-    "id": "chess_enigma",
-    "cost": 3,
-    "pool": "standard",
-    "synergies": [
-      "Elemental",
-      "Warlock"
-    ],
-    "names": {
-      "en": "Enigma",
-      "lore": "Darchro",
-      "ko": "에니그마",
-      "ru": "Enigma",
-      "zh-cn": "谜团",
-      "zh-tw": "謎團"
-    },
-    "attack_type": "ranged",
-    "abilities": null,
-    "stats": {
-      "1_star": {
-        "hp": 700,
-        "mana": 100,
-        "atk": [
-          45,
-          55
-        ],
-        "armor": 4,
-        "magic_resist": 10,
-        "atk_rate": 1.5,
-        "atk_range": 400
-      },
-      "2_star": {
-        "hp": 1400,
-        "mana": 100,
-        "atk": [
-          90,
-          110
-        ],
-        "armor": 4,
-        "magic_resist": 10,
-        "atk_rate": 1.5,
-        "atk_range": 400
-      },
-      "3_star": {
-        "hp": 2800,
-        "mana": 100,
-        "atk": [
-          180,
-          220
-        ],
-        "armor": 4,
-        "magic_resist": 10,
-        "atk_rate": 1.5,
-        "atk_range": 400
-      }
-    }
-  },
-  "Earthshaker": {
-    "id": "chess_es",
-    "cost": 3,
-    "pool": "standard",
-    "synergies": [
-      "Shaman",
-      "Tauren"
-    ],
-    "names": {
-      "en": "Earthshaker",
-      "lore": "Raigor۰Stonehoof",
-      "ko": "지진술사",
-      "ru": "Earthshaker",
-      "zh-cn": "撼地神牛",
-      "zh-tw": "撼地神牛"
-    },
-    "attack_type": "melee",
-    "abilities": null,
-    "stats": {
-      "1_star": {
-        "hp": 700,
-        "mana": 100,
-        "atk": [
-          80,
-          120
-        ],
-        "armor": 6,
-        "magic_resist": 0,
-        "atk_rate": 1.4,
-        "atk_range": 205
-      },
-      "2_star": {
-        "hp": 1400,
-        "mana": 100,
-        "atk": [
-          160,
-          240
-        ],
-        "armor": 6,
-        "magic_resist": 0,
-        "atk_rate": 1.4,
-        "atk_range": 205
-      },
-      "3_star": {
-        "hp": 2800,
-        "mana": 100,
-        "atk": [
-          320,
-          480
-        ],
-        "armor": 6,
-        "magic_resist": 0,
-        "atk_rate": 1.4,
-        "atk_range": 205
-      }
-    }
-  },
-  "Elder Titan": {
-    "id": "chess_et",
-    "cost": 4,
-    "pool": "standard",
-    "synergies": [
-      "Druid",
-      "God",
-      "Tauren"
-    ],
-    "names": {
-      "en": "Elder Titan",
-      "lore": "Worldsmith",
-      "ko": "고대 티탄",
-      "ru": "Elder Titan",
-      "zh-cn": "上古巨神",
-      "zh-tw": "上古巨神"
-    },
-    "attack_type": "melee",
-    "abilities": null,
-    "stats": {
-      "1_star": {
-        "hp": 900,
-        "mana": 100,
-        "atk": [
-          100,
-          130
-        ],
-        "armor": 7,
-        "magic_resist": 0,
-        "atk_rate": 1.5,
-        "atk_range": 205
-      },
-      "2_star": {
-        "hp": 1800,
-        "mana": 100,
-        "atk": [
-          200,
-          260
-        ],
-        "armor": 7,
-        "magic_resist": 0,
-        "atk_rate": 1.5,
-        "atk_range": 205
-      },
-      "3_star": {
-        "hp": 3100,
-        "mana": 100,
-        "atk": [
-          400,
-          520
-        ],
-        "armor": 7,
-        "magic_resist": 0,
-        "atk_rate": 1.5,
-        "atk_range": 205
-      }
-    }
-  },
-  "Furion": {
-    "id": "chess_fur",
-    "cost": 2,
-    "pool": "standard",
-    "synergies": [
-      "Druid",
-      "Elf"
-    ],
-    "names": {
-      "en": "Furion",
-      "lore": "Furion",
-      "ko": "자연의 예언자",
-      "ru": "Furion",
-      "zh-cn": "先知",
-      "zh-tw": "先知"
-    },
-    "attack_type": "ranged",
-    "abilities": null,
-    "stats": {
-      "1_star": {
-        "hp": 500,
-        "mana": 100,
-        "atk": [
-          45,
-          50
-        ],
-        "armor": 4,
-        "magic_resist": 5,
-        "atk_rate": 1.4,
-        "atk_range": 400
-      },
-      "2_star": {
-        "hp": 1000,
-        "mana": 100,
-        "atk": [
-          90,
-          100
-        ],
-        "armor": 4,
-        "magic_resist": 5,
-        "atk_rate": 1.4,
-        "atk_range": 400
-      },
-      "3_star": {
-        "hp": 1900,
-        "mana": 100,
-        "atk": [
-          180,
-          200
-        ],
-        "armor": 4,
-        "magic_resist": 5,
-        "atk_rate": 1.4,
-        "atk_range": 400
-      }
-    }
-  },
-  "Faceless Void": {
-    "id": "chess_fv",
-    "cost": 2,
-    "pool": "standard",
-    "synergies": [
-      "Assassin",
-      "Faceless"
-    ],
-    "names": {
-      "en": "Faceless Void",
-      "lore": "Darkterror",
-      "ko": "얼굴없는 전사",
-      "ru": "Faceless Void",
-      "zh-cn": "虚空假面",
-      "zh-tw": "虛空假面"
-    },
-    "attack_type": "melee",
-    "abilities": null,
-    "stats": {
-      "1_star": {
-        "hp": 550,
-        "mana": 100,
-        "atk": [
-          50,
-          80
-        ],
-        "armor": 4,
-        "magic_resist": 0,
-        "atk_rate": 1.3,
-        "atk_range": 205
-      },
-      "2_star": {
-        "hp": 1100,
-        "mana": 100,
-        "atk": [
-          120,
-          180
-        ],
-        "armor": 4,
-        "magic_resist": 0,
-        "atk_rate": 1.3,
-        "atk_range": 205
-      },
-      "3_star": {
-        "hp": 2200,
-        "mana": 100,
-        "atk": [
-          240,
-          360
-        ],
-        "armor": 4,
-        "magic_resist": 0,
-        "atk_rate": 1.3,
-        "atk_range": 205
-      }
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/f3ca51857b82995c2a4fe8b2f562ca819daba60a-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
     }
   },
   "Alchemist": {
@@ -2112,6 +179,2124 @@
         "atk_rate": 1.3,
         "atk_range": 205
       }
+    },
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/addbc7badf2ea384583461c06b46b0819e2fc53b-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
+  },
+  "Ancient Apparition": {
+    "id": "chess_aa",
+    "cost": 1,
+    "pool": "standard",
+    "synergies": [
+      "Elemental",
+      "Mage"
+    ],
+    "names": {
+      "en": "Ancient Apparition",
+      "lore": "Kaldr",
+      "ko": "고대 영혼",
+      "ru": "Ancient Apparition",
+      "zh-cn": "极寒幽魂",
+      "zh-tw": "極寒幽魂"
+    },
+    "attack_type": "ranged",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 550,
+        "mana": 0,
+        "atk": [
+          30,
+          60
+        ],
+        "armor": 2,
+        "magic_resist": 10,
+        "atk_rate": 1.5,
+        "atk_range": 400
+      },
+      "2_star": {
+        "hp": 1100,
+        "mana": 0,
+        "atk": [
+          60,
+          120
+        ],
+        "armor": 2,
+        "magic_resist": 10,
+        "atk_rate": 1.5,
+        "atk_range": 600
+      },
+      "3_star": {
+        "hp": 2200,
+        "mana": 0,
+        "atk": [
+          120,
+          240
+        ],
+        "armor": 2,
+        "magic_resist": 10,
+        "atk_rate": 1.5,
+        "atk_range": 800
+      }
+    },
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/c6db974ebde64b3b41fb087a10522ad9327ccf6e-32x32.png",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
+  },
+  "Anti-mage": {
+    "id": "chess_am",
+    "cost": 4,
+    "pool": "standard",
+    "synergies": [
+      "Demon Hunter",
+      "Elf"
+    ],
+    "names": {
+      "en": "Anti-mage",
+      "lore": "Magina",
+      "ko": "항마사",
+      "ru": "Anti-mage",
+      "zh-cn": "敌法师",
+      "zh-tw": "敵法師"
+    },
+    "attack_type": "melee",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 850,
+        "mana": 0,
+        "atk": [
+          80,
+          110
+        ],
+        "armor": 7,
+        "magic_resist": 30,
+        "atk_rate": 0.9,
+        "atk_range": 205
+      },
+      "2_star": {
+        "hp": 1700,
+        "mana": 0,
+        "atk": [
+          160,
+          220
+        ],
+        "armor": 7,
+        "magic_resist": 30,
+        "atk_rate": 0.9,
+        "atk_range": 205
+      },
+      "3_star": {
+        "hp": 3400,
+        "mana": 0,
+        "atk": [
+          320,
+          440
+        ],
+        "armor": 7,
+        "magic_resist": 30,
+        "atk_rate": 0.9,
+        "atk_range": 205
+      }
+    },
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/a41b66b26028f2540928b2981ddb6dd4f27023ed-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
+  },
+  "Arc Warden": {
+    "id": "chess_aw",
+    "cost": 5,
+    "pool": "standard",
+    "synergies": [
+      "Kobold",
+      "Shaman"
+    ],
+    "names": {
+      "en": "Arc Warden",
+      "lore": "Zet",
+      "ko": "번개 감시자",
+      "ru": "Arc Warden",
+      "zh-cn": "天穹守望者",
+      "zh-tw": "天穹守望者"
+    },
+    "attack_type": "ranged",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 900,
+        "mana": 0,
+        "atk": [
+          90,
+          150
+        ],
+        "armor": 7,
+        "magic_resist": 0,
+        "atk_rate": 1,
+        "atk_range": 600
+      },
+      "2_star": {
+        "hp": 1700,
+        "mana": 0,
+        "atk": [
+          180,
+          300
+        ],
+        "armor": 7,
+        "magic_resist": 0,
+        "atk_rate": 1.1,
+        "atk_range": 600
+      },
+      "3_star": {
+        "hp": 3400,
+        "mana": 0,
+        "atk": [
+          360,
+          600
+        ],
+        "armor": 7,
+        "magic_resist": 0,
+        "atk_rate": 1.1,
+        "atk_range": 600
+      }
+    },
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/21a23bdee1dc9269a868768e1e0c0bc4499c9757-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
+  },
+  "Axe": {
+    "id": "chess_axe",
+    "cost": 1,
+    "pool": "standard",
+    "synergies": [
+      "Orc",
+      "Warrior"
+    ],
+    "names": {
+      "en": "Axe",
+      "lore": "MogulKahn",
+      "ko": "도끼전사",
+      "ru": "Axe",
+      "zh-cn": "斧王",
+      "zh-tw": "斧王"
+    },
+    "attack_type": "melee",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 750,
+        "mana": 100,
+        "atk": [
+          50,
+          70
+        ],
+        "armor": 4,
+        "magic_resist": 0,
+        "atk_rate": 1.5,
+        "atk_range": 205
+      },
+      "2_star": {
+        "hp": 1500,
+        "mana": 100,
+        "atk": [
+          100,
+          140
+        ],
+        "armor": 4,
+        "magic_resist": 0,
+        "atk_rate": 1.5,
+        "atk_range": 205
+      },
+      "3_star": {
+        "hp": 3000,
+        "mana": 100,
+        "atk": [
+          200,
+          280
+        ],
+        "armor": 4,
+        "magic_resist": 0,
+        "atk_rate": 1.5,
+        "atk_range": 205
+      }
+    },
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/716038c97dd65c3f57bba3af11bfbaf51a41fef0-30x30.webp",
+    "icon_dimensions": {
+      "height": 30,
+      "width": 30
+    }
+  },
+  "Bane": {
+    "id": "chess_bane",
+    "cost": 1,
+    "pool": "standard",
+    "synergies": [
+      "Faceless",
+      "Satyr",
+      "Warlock"
+    ],
+    "names": {
+      "en": "Bane",
+      "lore": "Atropos",
+      "ko": "악몽의 그림자",
+      "ru": "Bane",
+      "zh-cn": "祸乱之源",
+      "zh-tw": "禍亂之源"
+    },
+    "attack_type": "ranged",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 550,
+        "mana": 100,
+        "atk": [
+          40,
+          50
+        ],
+        "armor": 2,
+        "magic_resist": 10,
+        "atk_rate": 1.5,
+        "atk_range": 400
+      },
+      "2_star": {
+        "hp": 1100,
+        "mana": 100,
+        "atk": [
+          80,
+          100
+        ],
+        "armor": 2,
+        "magic_resist": 10,
+        "atk_rate": 1.5,
+        "atk_range": 400
+      },
+      "3_star": {
+        "hp": 2200,
+        "mana": 100,
+        "atk": [
+          160,
+          200
+        ],
+        "armor": 2,
+        "magic_resist": 10,
+        "atk_rate": 1.5,
+        "atk_range": 400
+      }
+    },
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/63661b1d4fa73859974e7038b2e0f2b17723c42b-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
+  },
+  "Batrider": {
+    "id": "chess_bat",
+    "cost": 2,
+    "pool": "standard",
+    "synergies": [
+      "Knight",
+      "Troll"
+    ],
+    "names": {
+      "en": "Batrider",
+      "lore": "Kin۰zaka",
+      "ko": "박쥐기수",
+      "ru": "Batrider",
+      "zh-cn": "蝙蝠骑士",
+      "zh-tw": "蝙蝠騎士"
+    },
+    "attack_type": "ranged",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 600,
+        "mana": 100,
+        "atk": [
+          40,
+          55
+        ],
+        "armor": 4,
+        "magic_resist": 0,
+        "atk_rate": 1.3,
+        "atk_range": 400
+      },
+      "2_star": {
+        "hp": 1200,
+        "mana": 100,
+        "atk": [
+          80,
+          110
+        ],
+        "armor": 4,
+        "magic_resist": 0,
+        "atk_rate": 1.3,
+        "atk_range": 400
+      },
+      "3_star": {
+        "hp": 2400,
+        "mana": 100,
+        "atk": [
+          160,
+          220
+        ],
+        "armor": 4,
+        "magic_resist": 0,
+        "atk_rate": 1.3,
+        "atk_range": 400
+      }
+    },
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/1782c9f633c7e5721bb60256b6c00e0bec0ae990-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
+  },
+  "Beastmaster": {
+    "id": "chess_bm",
+    "cost": 2,
+    "pool": "standard",
+    "synergies": [
+      "Hunter",
+      "Orc"
+    ],
+    "names": {
+      "en": "Beastmaster",
+      "lore": "Karroch",
+      "ko": "야수지배자",
+      "ru": "Beastmaster",
+      "zh-cn": "兽王",
+      "zh-tw": "獸王"
+    },
+    "attack_type": "melee",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 650,
+        "mana": 100,
+        "atk": [
+          60,
+          70
+        ],
+        "armor": 6,
+        "magic_resist": 0,
+        "atk_rate": 1.4,
+        "atk_range": 205
+      },
+      "2_star": {
+        "hp": 1300,
+        "mana": 100,
+        "atk": [
+          120,
+          140
+        ],
+        "armor": 6,
+        "magic_resist": 0,
+        "atk_rate": 1.4,
+        "atk_range": 205
+      },
+      "3_star": {
+        "hp": 2600,
+        "mana": 100,
+        "atk": [
+          240,
+          280
+        ],
+        "armor": 6,
+        "magic_resist": 0,
+        "atk_rate": 1.4,
+        "atk_range": 205
+      }
+    },
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/6d20638e1a293004570a481f86c76b9c2b540ee3-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
+  },
+  "Blood Seeker": {
+    "id": "chess_bs",
+    "cost": 2,
+    "pool": "standard",
+    "synergies": [
+      "Orc",
+      "Shaman"
+    ],
+    "names": {
+      "en": "Blood Seeker",
+      "lore": "Strygwyr",
+      "ko": "혈귀",
+      "ru": "Blood Seeker",
+      "zh-cn": "血魔",
+      "zh-tw": "血魔"
+    },
+    "attack_type": "melee",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 600,
+        "mana": 100,
+        "atk": [
+          55,
+          60
+        ],
+        "armor": 3,
+        "magic_resist": 10,
+        "atk_rate": 1.1,
+        "atk_range": 205
+      },
+      "2_star": {
+        "hp": 1200,
+        "mana": 100,
+        "atk": [
+          110,
+          120
+        ],
+        "armor": 3,
+        "magic_resist": 10,
+        "atk_rate": 1.1,
+        "atk_range": 205
+      },
+      "3_star": {
+        "hp": 2400,
+        "mana": 100,
+        "atk": [
+          220,
+          240
+        ],
+        "armor": 3,
+        "magic_resist": 10,
+        "atk_rate": 1.1,
+        "atk_range": 205
+      }
+    },
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/44c892c13b5ce9deaa2eed1becee28f93cf5f2e6-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
+  },
+  "Bounty Hunter": {
+    "id": "chess_bh",
+    "cost": 1,
+    "pool": "standard",
+    "synergies": [
+      "Draenei",
+      "Goblin",
+      "Hunter"
+    ],
+    "names": {
+      "en": "Bounty Hunter",
+      "lore": "Gondar",
+      "ko": "현상금 사냥꾼",
+      "ru": "Bounty Hunter",
+      "zh-cn": "赏金猎人",
+      "zh-tw": "賞金獵人"
+    },
+    "attack_type": "melee",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 500,
+        "mana": 100,
+        "atk": [
+          50,
+          70
+        ],
+        "armor": 1,
+        "magic_resist": 0,
+        "atk_rate": 1,
+        "atk_range": 205
+      },
+      "2_star": {
+        "hp": 1000,
+        "mana": 100,
+        "atk": [
+          100,
+          140
+        ],
+        "armor": 1,
+        "magic_resist": 0,
+        "atk_rate": 1,
+        "atk_range": 205
+      },
+      "3_star": {
+        "hp": 2000,
+        "mana": 100,
+        "atk": [
+          200,
+          280
+        ],
+        "armor": 1,
+        "magic_resist": 0,
+        "atk_rate": 1,
+        "atk_range": 205
+      }
+    },
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/c0504b5de3c937af5dc69737d84eb09dc53d1d56-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
+  },
+  "Brewmaster": {
+    "id": "chess_brew",
+    "cost": 1,
+    "pool": "standard",
+    "synergies": [
+      "Monk",
+      "Pandaren"
+    ],
+    "names": {
+      "en": "Brewmaster",
+      "lore": "Mangix",
+      "ko": "취권도사",
+      "ru": "Brewmaster",
+      "zh-cn": "熊猫酒仙",
+      "zh-tw": "熊貓酒仙"
+    },
+    "attack_type": "melee",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 600,
+        "mana": 100,
+        "atk": [
+          50,
+          60
+        ],
+        "armor": 3,
+        "magic_resist": 20,
+        "atk_rate": 1.5,
+        "atk_range": 205
+      },
+      "2_star": {
+        "hp": 1200,
+        "mana": 100,
+        "atk": [
+          100,
+          120
+        ],
+        "armor": 3,
+        "magic_resist": 20,
+        "atk_rate": 1.5,
+        "atk_range": 205
+      },
+      "3_star": {
+        "hp": 2400,
+        "mana": 100,
+        "atk": [
+          200,
+          240
+        ],
+        "armor": 3,
+        "magic_resist": 20,
+        "atk_rate": 1.5,
+        "atk_range": 205
+      }
+    },
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/89f66ac03fe8e5703db32160faf0835c1ff4fa30-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
+  },
+  "Broodmother": {
+    "id": "chess_br",
+    "cost": 4,
+    "pool": "standard",
+    "synergies": [
+      "Aqir",
+      "Hunter"
+    ],
+    "names": {
+      "en": "Broodmother",
+      "lore": "Black۰Arachnia",
+      "ko": "거미여왕",
+      "ru": "Broodmother",
+      "zh-cn": "育母蜘蛛",
+      "zh-tw": "育母蜘蛛"
+    },
+    "attack_type": "melee",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 950,
+        "mana": 0,
+        "atk": [
+          80,
+          110
+        ],
+        "armor": 10,
+        "magic_resist": 20,
+        "atk_rate": 1.1,
+        "atk_range": 205
+      },
+      "2_star": {
+        "hp": 1900,
+        "mana": 0,
+        "atk": [
+          160,
+          220
+        ],
+        "armor": 10,
+        "magic_resist": 20,
+        "atk_rate": 1.1,
+        "atk_range": 205
+      },
+      "3_star": {
+        "hp": 3800,
+        "mana": 0,
+        "atk": [
+          320,
+          440
+        ],
+        "armor": 10,
+        "magic_resist": 20,
+        "atk_rate": 1.1,
+        "atk_range": 205
+      }
+    },
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/5d2408d23ad8766852bc2a7d7abc04aa8657ce80-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
+  },
+  "Centaur Warrunner": {
+    "id": "chess_ct",
+    "cost": 2,
+    "pool": "standard",
+    "synergies": [
+      "Centaur",
+      "Warrior"
+    ],
+    "names": {
+      "en": "Centaur Warrunner",
+      "lore": "Bradwarden",
+      "ko": "켄타우로스 전쟁용사",
+      "ru": "Centaur Warrunner",
+      "zh-cn": "半人马战行者",
+      "zh-tw": "半人馬戰行者"
+    },
+    "attack_type": "melee",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 850,
+        "mana": 0,
+        "atk": [
+          55,
+          60
+        ],
+        "armor": 4,
+        "magic_resist": 15,
+        "atk_rate": 1.1,
+        "atk_range": 205
+      },
+      "2_star": {
+        "hp": 1700,
+        "mana": 0,
+        "atk": [
+          110,
+          120
+        ],
+        "armor": 4,
+        "magic_resist": 15,
+        "atk_rate": 1.1,
+        "atk_range": 205
+      },
+      "3_star": {
+        "hp": 3400,
+        "mana": 0,
+        "atk": [
+          220,
+          240
+        ],
+        "armor": 4,
+        "magic_resist": 15,
+        "atk_rate": 1.1,
+        "atk_range": 205
+      }
+    },
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/6e5042b209ef23ed4744ad114aa96a8bf21bf8d1-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
+  },
+  "Chaos Knight": {
+    "id": "chess_ck",
+    "cost": 2,
+    "pool": "standard",
+    "synergies": [
+      "Demon",
+      "Knight"
+    ],
+    "names": {
+      "en": "Chaos Knight",
+      "lore": "Nessaj",
+      "ko": "혼돈 기사",
+      "ru": "Chaos Knight",
+      "zh-cn": "混沌骑士",
+      "zh-tw": "混沌騎士"
+    },
+    "attack_type": "melee",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 650,
+        "mana": 0,
+        "atk": [
+          40,
+          160
+        ],
+        "armor": 6,
+        "magic_resist": 0,
+        "atk_rate": 1.5,
+        "atk_range": 205
+      },
+      "2_star": {
+        "hp": 1300,
+        "mana": 0,
+        "atk": [
+          80,
+          320
+        ],
+        "armor": 6,
+        "magic_resist": 0,
+        "atk_rate": 1.5,
+        "atk_range": 205
+      },
+      "3_star": {
+        "hp": 2600,
+        "mana": 0,
+        "atk": [
+          160,
+          640
+        ],
+        "armor": 6,
+        "magic_resist": 0,
+        "atk_rate": 1.5,
+        "atk_range": 205
+      }
+    },
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/5b2f7bb39b8f0b40ae9ecf78fd4a769dc07e2270-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
+  },
+  "Chen": {
+    "id": "chess_chen",
+    "cost": 4,
+    "pool": "standard",
+    "synergies": [
+      "Orc",
+      "Priest"
+    ],
+    "names": {
+      "en": "Chen",
+      "lore": "Chen",
+      "ko": "첸",
+      "ru": "Chen",
+      "zh-cn": "上帝之手",
+      "zh-tw": "上帝之手"
+    },
+    "attack_type": "ranged",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 900,
+        "mana": 100,
+        "atk": [
+          40,
+          60
+        ],
+        "armor": 6,
+        "magic_resist": 10,
+        "atk_rate": 1.4,
+        "atk_range": 400
+      },
+      "2_star": {
+        "hp": 1800,
+        "mana": 100,
+        "atk": [
+          80,
+          120
+        ],
+        "armor": 6,
+        "magic_resist": 10,
+        "atk_rate": 1.4,
+        "atk_range": 400
+      },
+      "3_star": {
+        "hp": 3600,
+        "mana": 100,
+        "atk": [
+          160,
+          240
+        ],
+        "armor": 6,
+        "magic_resist": 10,
+        "atk_rate": 1.4,
+        "atk_range": 400
+      }
+    },
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/58046e9f8b7a83e0d1436f2fd9c36a7526cb3110-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
+  },
+  "Clinkz": {
+    "id": "chess_clinkz",
+    "cost": 1,
+    "pool": "undead",
+    "synergies": [
+      "Hunter",
+      "Undead"
+    ],
+    "names": {
+      "en": "Clinkz",
+      "lore": "Clinkz",
+      "ko": "클링츠",
+      "ru": "Clinkz",
+      "zh-cn": "骷髅弓箭手",
+      "zh-tw": "骷髏弓箭手"
+    },
+    "attack_type": "ranged",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 500,
+        "mana": 100,
+        "atk": [
+          40,
+          60
+        ],
+        "armor": 2,
+        "magic_resist": 0,
+        "atk_rate": 1,
+        "atk_range": 600
+      },
+      "2_star": {
+        "hp": 1000,
+        "mana": 100,
+        "atk": [
+          80,
+          120
+        ],
+        "armor": 2,
+        "magic_resist": 0,
+        "atk_rate": 1,
+        "atk_range": 600
+      },
+      "3_star": {
+        "hp": 2000,
+        "mana": 100,
+        "atk": [
+          160,
+          240
+        ],
+        "armor": 2,
+        "magic_resist": 0,
+        "atk_rate": 1,
+        "atk_range": 600
+      }
+    },
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/6ac0ecb5a36754eedc04f8e7c126e6bdb86e87fc-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
+  },
+  "Clockwerk": {
+    "id": "chess_clock",
+    "cost": 1,
+    "pool": "standard",
+    "synergies": [
+      "Goblin",
+      "Mech"
+    ],
+    "names": {
+      "en": "Clockwerk",
+      "lore": "Rattletra",
+      "ko": "태엽장이",
+      "ru": "Clockwerk",
+      "zh-cn": "发条技师",
+      "zh-tw": "發條技師"
+    },
+    "attack_type": "melee",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 700,
+        "mana": 100,
+        "atk": [
+          45,
+          55
+        ],
+        "armor": 4,
+        "magic_resist": 0,
+        "atk_rate": 1.4,
+        "atk_range": 205
+      },
+      "2_star": {
+        "hp": 1400,
+        "mana": 100,
+        "atk": [
+          90,
+          110
+        ],
+        "armor": 4,
+        "magic_resist": 0,
+        "atk_rate": 1.4,
+        "atk_range": 205
+      },
+      "3_star": {
+        "hp": 2800,
+        "mana": 100,
+        "atk": [
+          180,
+          220
+        ],
+        "armor": 4,
+        "magic_resist": 0,
+        "atk_rate": 1.4,
+        "atk_range": 205
+      }
+    },
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/ffdbf748d33b66bdf9d76b2f1ac8b695da8246f4-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
+  },
+  "Crystal Maiden": {
+    "id": "chess_cm",
+    "cost": 1,
+    "pool": "standard",
+    "synergies": [
+      "Human",
+      "Mage"
+    ],
+    "names": {
+      "en": "Crystal Maiden",
+      "lore": "Rylai",
+      "ko": "수정의 여인",
+      "ru": "Crystal Maiden",
+      "zh-cn": "水晶室女",
+      "zh-tw": "水晶室女"
+    },
+    "attack_type": "ranged",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 450,
+        "mana": 0,
+        "atk": [
+          40,
+          45
+        ],
+        "armor": 1,
+        "magic_resist": 5,
+        "atk_rate": 1.7,
+        "atk_range": 600
+      },
+      "2_star": {
+        "hp": 900,
+        "mana": 0,
+        "atk": [
+          80,
+          90
+        ],
+        "armor": 1,
+        "magic_resist": 5,
+        "atk_rate": 1.7,
+        "atk_range": 600
+      },
+      "3_star": {
+        "hp": 1800,
+        "mana": 0,
+        "atk": [
+          160,
+          180
+        ],
+        "armor": 1,
+        "magic_resist": 5,
+        "atk_rate": 1.7,
+        "atk_range": 600
+      }
+    },
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/a174506e903ebe27bbe091b86ee8146fc62b038d-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
+  },
+  "Dark Willow": {
+    "id": "chess_dw",
+    "cost": 1,
+    "pool": "standard",
+    "synergies": [
+      "Elf",
+      "Wizard"
+    ],
+    "names": {
+      "en": "Dark Willow",
+      "lore": "Mireska",
+      "ko": "흑버들",
+      "ru": "Dark Willow",
+      "zh-cn": "邪影芳灵",
+      "zh-tw": "邪影芳靈"
+    },
+    "attack_type": "ranged",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 450,
+        "mana": 0,
+        "atk": [
+          40,
+          70
+        ],
+        "armor": 1,
+        "magic_resist": 0,
+        "atk_rate": 1.1,
+        "atk_range": 400
+      },
+      "2_star": {
+        "hp": 900,
+        "mana": 0,
+        "atk": [
+          80,
+          140
+        ],
+        "armor": 1,
+        "magic_resist": 0,
+        "atk_rate": 1.1,
+        "atk_range": 400
+      },
+      "3_star": {
+        "hp": 1800,
+        "mana": 0,
+        "atk": [
+          160,
+          280
+        ],
+        "armor": 1,
+        "magic_resist": 0,
+        "atk_rate": 1.1,
+        "atk_range": 400
+      }
+    },
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/f722e9d6d645c44fd8c09f4c58f4fbd2a5670752-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
+  },
+  "DarkSeer": {
+    "id": "chess_ds",
+    "cost": 2,
+    "pool": "standard",
+    "synergies": [
+      "Draenei",
+      "Warlock"
+    ],
+    "names": {
+      "en": "DarkSeer",
+      "lore": "Ish'kafel",
+      "ko": "어둠 현자",
+      "ru": "DarkSeer",
+      "zh-cn": "黑暗贤者",
+      "zh-tw": "黑暗賢者"
+    },
+    "attack_type": "melee",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 700,
+        "mana": 100,
+        "atk": [
+          50,
+          90
+        ],
+        "armor": 4,
+        "magic_resist": 10,
+        "atk_rate": 1.6,
+        "atk_range": 205
+      },
+      "2_star": {
+        "hp": 1400,
+        "mana": 100,
+        "atk": [
+          100,
+          180
+        ],
+        "armor": 4,
+        "magic_resist": 10,
+        "atk_rate": 1.6,
+        "atk_range": 205
+      },
+      "3_star": {
+        "hp": 2800,
+        "mana": 100,
+        "atk": [
+          200,
+          360
+        ],
+        "armor": 4,
+        "magic_resist": 10,
+        "atk_rate": 1.6,
+        "atk_range": 205
+      }
+    },
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/3569409331a5ceade9d3eeb9bfde9523bd5bbd2d-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
+  },
+  "Dawnbreaker": {
+    "id": "chess_db",
+    "cost": 3,
+    "pool": "standard",
+    "synergies": [
+      "Draenei",
+      "Knight"
+    ],
+    "names": {
+      "en": "Dawnbreaker",
+      "lore": "Valora",
+      "ko": "여명의 파괴자",
+      "ru": "Dawnbreaker",
+      "zh-cn": "破晓辰星",
+      "zh-tw": "破曉辰星"
+    },
+    "attack_type": "melee",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 700,
+        "mana": 100,
+        "atk": [
+          70,
+          110
+        ],
+        "armor": 7,
+        "magic_resist": 0,
+        "atk_rate": 1.6,
+        "atk_range": 205
+      },
+      "2_star": {
+        "hp": 1400,
+        "mana": 100,
+        "atk": [
+          140,
+          220
+        ],
+        "armor": 7,
+        "magic_resist": 0,
+        "atk_rate": 1.6,
+        "atk_range": 205
+      },
+      "3_star": {
+        "hp": 2800,
+        "mana": 100,
+        "atk": [
+          280,
+          440
+        ],
+        "armor": 7,
+        "magic_resist": 0,
+        "atk_rate": 1.6,
+        "atk_range": 205
+      }
+    },
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/bc9dd343cabd59ad606c3940c0ab776d24fa4df7-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
+  },
+  "Dazzle": {
+    "id": "chess_dazzle",
+    "cost": 1,
+    "pool": "standard",
+    "synergies": [
+      "Priest",
+      "Troll"
+    ],
+    "names": {
+      "en": "Dazzle",
+      "lore": "Dazzle",
+      "ko": "대즐",
+      "ru": "Dazzle",
+      "zh-cn": "暗影牧师",
+      "zh-tw": "暗影牧師"
+    },
+    "attack_type": "ranged",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 450,
+        "mana": 100,
+        "atk": [
+          45,
+          60
+        ],
+        "armor": 1,
+        "magic_resist": 10,
+        "atk_rate": 1.2,
+        "atk_range": 400
+      },
+      "2_star": {
+        "hp": 900,
+        "mana": 100,
+        "atk": [
+          90,
+          120
+        ],
+        "armor": 1,
+        "magic_resist": 10,
+        "atk_rate": 1.2,
+        "atk_range": 400
+      },
+      "3_star": {
+        "hp": 1800,
+        "mana": 100,
+        "atk": [
+          180,
+          240
+        ],
+        "armor": 1,
+        "magic_resist": 10,
+        "atk_rate": 1.2,
+        "atk_range": 400
+      }
+    },
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/12c7c8db62c11770acbb19a83416c8b60ea41dc6-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
+  },
+  "Death Prophet": {
+    "id": "chess_dp",
+    "cost": 4,
+    "pool": "undead",
+    "synergies": [
+      "Undead",
+      "Warlock"
+    ],
+    "names": {
+      "en": "Death Prophet",
+      "lore": "Krobelus",
+      "ko": "죽음의 예언자",
+      "ru": "Death Prophet",
+      "zh-cn": "死亡先知",
+      "zh-tw": "死亡先知"
+    },
+    "attack_type": "ranged",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 900,
+        "mana": 100,
+        "atk": [
+          50,
+          60
+        ],
+        "armor": 6,
+        "magic_resist": 30,
+        "atk_rate": 1.4,
+        "atk_range": 400
+      },
+      "2_star": {
+        "hp": 1800,
+        "mana": 100,
+        "atk": [
+          100,
+          120
+        ],
+        "armor": 6,
+        "magic_resist": 30,
+        "atk_rate": 1.4,
+        "atk_range": 400
+      },
+      "3_star": {
+        "hp": 3600,
+        "mana": 100,
+        "atk": [
+          200,
+          240
+        ],
+        "armor": 6,
+        "magic_resist": 30,
+        "atk_rate": 1.4,
+        "atk_range": 400
+      }
+    },
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/22871e9f3435aefb6d8e1f86327601aae5be8683-30x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 30
+    }
+  },
+  "Disruptor": {
+    "id": "chess_disruptor",
+    "cost": 5,
+    "pool": "standard",
+    "synergies": [
+      "Orc",
+      "Shaman"
+    ],
+    "names": {
+      "en": "Disruptor",
+      "lore": "Thrall",
+      "ko": "디스럽터",
+      "ru": "Disruptor",
+      "zh-cn": "干扰者",
+      "zh-tw": "幹擾者"
+    },
+    "attack_type": "ranged",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 1000,
+        "mana": 100,
+        "atk": [
+          50,
+          70
+        ],
+        "armor": 6,
+        "magic_resist": 20,
+        "atk_rate": 1.5,
+        "atk_range": 600
+      },
+      "2_star": {
+        "hp": 2000,
+        "mana": 100,
+        "atk": [
+          100,
+          140
+        ],
+        "armor": 6,
+        "magic_resist": 20,
+        "atk_rate": 1.5,
+        "atk_range": 600
+      },
+      "3_star": {
+        "hp": 4000,
+        "mana": 100,
+        "atk": [
+          200,
+          280
+        ],
+        "armor": 6,
+        "magic_resist": 20,
+        "atk_rate": 1.5,
+        "atk_range": 600
+      }
+    },
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/377ea55347395b39b53345d29d5e871197386cad-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
+  },
+  "Doom": {
+    "id": "chess_doom",
+    "cost": 4,
+    "pool": "standard",
+    "synergies": [
+      "Demon",
+      "Warrior"
+    ],
+    "names": {
+      "en": "Doom",
+      "lore": "Lucifer",
+      "ko": "파멸의 사도",
+      "ru": "Doom",
+      "zh-cn": "末日使者",
+      "zh-tw": "末日使者"
+    },
+    "attack_type": "melee",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 1050,
+        "mana": 100,
+        "atk": [
+          110,
+          120
+        ],
+        "armor": 10,
+        "magic_resist": 0,
+        "atk_rate": 1.3,
+        "atk_range": 205
+      },
+      "2_star": {
+        "hp": 2100,
+        "mana": 100,
+        "atk": [
+          220,
+          240
+        ],
+        "armor": 10,
+        "magic_resist": 0,
+        "atk_rate": 1.3,
+        "atk_range": 205
+      },
+      "3_star": {
+        "hp": 4200,
+        "mana": 100,
+        "atk": [
+          440,
+          480
+        ],
+        "armor": 10,
+        "magic_resist": 0,
+        "atk_rate": 1.3,
+        "atk_range": 205
+      }
+    },
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/a28605b63972b589c2ce5a8b15d61638bd9f96fc-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
+  },
+  "Dragon Knight": {
+    "id": "chess_dk",
+    "cost": 4,
+    "pool": "standard",
+    "synergies": [
+      "Dragon",
+      "Human",
+      "Knight"
+    ],
+    "names": {
+      "en": "Dragon Knight",
+      "lore": "Davion",
+      "ko": "용기사",
+      "ru": "Dragon Knight",
+      "zh-cn": "龙骑士",
+      "zh-tw": "龍騎士"
+    },
+    "attack_type": "melee",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 900,
+        "mana": 100,
+        "atk": [
+          80,
+          90
+        ],
+        "armor": 12,
+        "magic_resist": 0,
+        "atk_rate": 1.5,
+        "atk_range": 205
+      },
+      "2_star": {
+        "hp": 1800,
+        "mana": 100,
+        "atk": [
+          160,
+          180
+        ],
+        "armor": 12,
+        "magic_resist": 0,
+        "atk_rate": 1.5,
+        "atk_range": 205
+      },
+      "3_star": {
+        "hp": 3600,
+        "mana": 100,
+        "atk": [
+          320,
+          360
+        ],
+        "armor": 12,
+        "magic_resist": 0,
+        "atk_rate": 1.5,
+        "atk_range": 205
+      }
+    },
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/90cddae22583acb34870838ac028902b441daea7-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
+  },
+  "Drow Ranger": {
+    "id": "chess_dr",
+    "cost": 3,
+    "pool": "undead",
+    "synergies": [
+      "Hunter",
+      "Undead"
+    ],
+    "names": {
+      "en": "Drow Ranger",
+      "lore": "Traxex",
+      "ko": "드로우 레인저",
+      "ru": "Drow Ranger",
+      "zh-cn": "卓尔游侠",
+      "zh-tw": "卓爾遊俠"
+    },
+    "attack_type": "ranged",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 600,
+        "mana": 100,
+        "atk": [
+          70,
+          100
+        ],
+        "armor": 4,
+        "magic_resist": 10,
+        "atk_rate": 0.9,
+        "atk_range": 600
+      },
+      "2_star": {
+        "hp": 1200,
+        "mana": 100,
+        "atk": [
+          140,
+          200
+        ],
+        "armor": 4,
+        "magic_resist": 10,
+        "atk_rate": 0.9,
+        "atk_range": 600
+      },
+      "3_star": {
+        "hp": 2400,
+        "mana": 100,
+        "atk": [
+          280,
+          400
+        ],
+        "armor": 4,
+        "magic_resist": 10,
+        "atk_rate": 0.9,
+        "atk_range": 600
+      }
+    },
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/90dfac136ded72b10f2102b34116b62daecfb095-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
+  },
+  "Earth Spirit": {
+    "id": "chess_earth",
+    "cost": 4,
+    "pool": "special",
+    "synergies": [
+      "Pandaren",
+      "Shaman"
+    ],
+    "names": {
+      "en": "Earth Spirit",
+      "lore": "Kaolin",
+      "ko": "대지령",
+      "ru": "Earth Spirit",
+      "zh-cn": "大地之灵",
+      "zh-tw": "大地之靈"
+    },
+    "attack_type": "melee",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 900,
+        "mana": 100,
+        "atk": [
+          40,
+          70
+        ],
+        "armor": 9,
+        "magic_resist": 0,
+        "atk_rate": 1.5,
+        "atk_range": 205
+      },
+      "2_star": {
+        "hp": 1800,
+        "mana": 100,
+        "atk": [
+          80,
+          140
+        ],
+        "armor": 9,
+        "magic_resist": 0,
+        "atk_rate": 1.5,
+        "atk_range": 205
+      },
+      "3_star": {
+        "hp": 3600,
+        "mana": 100,
+        "atk": [
+          160,
+          320
+        ],
+        "armor": 9,
+        "magic_resist": 0,
+        "atk_rate": 1.5,
+        "atk_range": 205
+      }
+    },
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/140127d6fe2b250cf752b123ba1441aa4e31a779-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
+  },
+  "Earthshaker": {
+    "id": "chess_es",
+    "cost": 3,
+    "pool": "standard",
+    "synergies": [
+      "Shaman",
+      "Tauren"
+    ],
+    "names": {
+      "en": "Earthshaker",
+      "lore": "Raigor۰Stonehoof",
+      "ko": "지진술사",
+      "ru": "Earthshaker",
+      "zh-cn": "撼地神牛",
+      "zh-tw": "撼地神牛"
+    },
+    "attack_type": "melee",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 700,
+        "mana": 100,
+        "atk": [
+          80,
+          120
+        ],
+        "armor": 6,
+        "magic_resist": 0,
+        "atk_rate": 1.4,
+        "atk_range": 205
+      },
+      "2_star": {
+        "hp": 1400,
+        "mana": 100,
+        "atk": [
+          160,
+          240
+        ],
+        "armor": 6,
+        "magic_resist": 0,
+        "atk_rate": 1.4,
+        "atk_range": 205
+      },
+      "3_star": {
+        "hp": 2800,
+        "mana": 100,
+        "atk": [
+          320,
+          480
+        ],
+        "armor": 6,
+        "magic_resist": 0,
+        "atk_rate": 1.4,
+        "atk_range": 205
+      }
+    },
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/2e2c29cf5eaf1d1dc61b1acebfba23867f8076e1-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
+  },
+  "Elder Titan": {
+    "id": "chess_et",
+    "cost": 4,
+    "pool": "standard",
+    "synergies": [
+      "Druid",
+      "God",
+      "Tauren"
+    ],
+    "names": {
+      "en": "Elder Titan",
+      "lore": "Worldsmith",
+      "ko": "고대 티탄",
+      "ru": "Elder Titan",
+      "zh-cn": "上古巨神",
+      "zh-tw": "上古巨神"
+    },
+    "attack_type": "melee",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 900,
+        "mana": 100,
+        "atk": [
+          100,
+          130
+        ],
+        "armor": 7,
+        "magic_resist": 0,
+        "atk_rate": 1.5,
+        "atk_range": 205
+      },
+      "2_star": {
+        "hp": 1800,
+        "mana": 100,
+        "atk": [
+          200,
+          260
+        ],
+        "armor": 7,
+        "magic_resist": 0,
+        "atk_rate": 1.5,
+        "atk_range": 205
+      },
+      "3_star": {
+        "hp": 3100,
+        "mana": 100,
+        "atk": [
+          400,
+          520
+        ],
+        "armor": 7,
+        "magic_resist": 0,
+        "atk_rate": 1.5,
+        "atk_range": 205
+      }
+    },
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/648c9ed98fe40a87e481e950b9b4d2dd62c660d9-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
+  },
+  "Ember Spirit": {
+    "id": "chess_ember",
+    "cost": 4,
+    "pool": "special",
+    "synergies": [
+      "Assassin",
+      "Pandaren"
+    ],
+    "names": {
+      "en": "Ember Spirit",
+      "lore": "Xin",
+      "ko": "불꽃령",
+      "ru": "Ember Spirit",
+      "zh-cn": "灰烬之灵",
+      "zh-tw": "灰燼之靈"
+    },
+    "attack_type": "melee",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 700,
+        "mana": 100,
+        "atk": [
+          50,
+          80
+        ],
+        "armor": 4,
+        "magic_resist": 0,
+        "atk_rate": 1.2,
+        "atk_range": 205
+      },
+      "2_star": {
+        "hp": 1400,
+        "mana": 100,
+        "atk": [
+          100,
+          160
+        ],
+        "armor": 4,
+        "magic_resist": 0,
+        "atk_rate": 1.2,
+        "atk_range": 205
+      },
+      "3_star": {
+        "hp": 2800,
+        "mana": 100,
+        "atk": [
+          200,
+          320
+        ],
+        "armor": 4,
+        "magic_resist": 0,
+        "atk_rate": 1.2,
+        "atk_range": 205
+      }
+    },
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/deacc9b3a92bdbb25651b6b3650baf8880a3ff16-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
+  },
+  "Enchantress": {
+    "id": "chess_eh",
+    "cost": 1,
+    "pool": "standard",
+    "synergies": [
+      "Beast",
+      "Centaur",
+      "Druid"
+    ],
+    "names": {
+      "en": "Enchantress",
+      "lore": "Aiushtha",
+      "ko": "요술사",
+      "ru": "Enchantress",
+      "zh-cn": "魅惑魔女",
+      "zh-tw": "魅惑魔女"
+    },
+    "attack_type": "ranged",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 400,
+        "mana": 0,
+        "atk": [
+          50,
+          60
+        ],
+        "armor": 2,
+        "magic_resist": 10,
+        "atk_rate": 1.5,
+        "atk_range": 400
+      },
+      "2_star": {
+        "hp": 800,
+        "mana": 0,
+        "atk": [
+          100,
+          120
+        ],
+        "armor": 2,
+        "magic_resist": 10,
+        "atk_rate": 1.5,
+        "atk_range": 400
+      },
+      "3_star": {
+        "hp": 1500,
+        "mana": 0,
+        "atk": [
+          200,
+          240
+        ],
+        "armor": 2,
+        "magic_resist": 10,
+        "atk_rate": 1.5,
+        "atk_range": 400
+      }
+    },
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/4481d44ff07776c9ef46ebb9b2922fb4a809c045-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
+  },
+  "Enigma": {
+    "id": "chess_enigma",
+    "cost": 3,
+    "pool": "standard",
+    "synergies": [
+      "Elemental",
+      "Warlock"
+    ],
+    "names": {
+      "en": "Enigma",
+      "lore": "Darchro",
+      "ko": "에니그마",
+      "ru": "Enigma",
+      "zh-cn": "谜团",
+      "zh-tw": "謎團"
+    },
+    "attack_type": "ranged",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 700,
+        "mana": 100,
+        "atk": [
+          45,
+          55
+        ],
+        "armor": 4,
+        "magic_resist": 10,
+        "atk_rate": 1.5,
+        "atk_range": 400
+      },
+      "2_star": {
+        "hp": 1400,
+        "mana": 100,
+        "atk": [
+          90,
+          110
+        ],
+        "armor": 4,
+        "magic_resist": 10,
+        "atk_rate": 1.5,
+        "atk_range": 400
+      },
+      "3_star": {
+        "hp": 2800,
+        "mana": 100,
+        "atk": [
+          180,
+          220
+        ],
+        "armor": 4,
+        "magic_resist": 10,
+        "atk_rate": 1.5,
+        "atk_range": 400
+      }
+    },
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/4aabedef5b9c74dacbe16a3b7cd6c438bdfecd93-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
+  },
+  "Faceless Void": {
+    "id": "chess_fv",
+    "cost": 2,
+    "pool": "standard",
+    "synergies": [
+      "Assassin",
+      "Faceless"
+    ],
+    "names": {
+      "en": "Faceless Void",
+      "lore": "Darkterror",
+      "ko": "얼굴없는 전사",
+      "ru": "Faceless Void",
+      "zh-cn": "虚空假面",
+      "zh-tw": "虛空假面"
+    },
+    "attack_type": "melee",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 550,
+        "mana": 100,
+        "atk": [
+          50,
+          80
+        ],
+        "armor": 4,
+        "magic_resist": 0,
+        "atk_rate": 1.3,
+        "atk_range": 205
+      },
+      "2_star": {
+        "hp": 1100,
+        "mana": 100,
+        "atk": [
+          120,
+          180
+        ],
+        "armor": 4,
+        "magic_resist": 0,
+        "atk_rate": 1.3,
+        "atk_range": 205
+      },
+      "3_star": {
+        "hp": 2200,
+        "mana": 100,
+        "atk": [
+          240,
+          360
+        ],
+        "armor": 4,
+        "magic_resist": 0,
+        "atk_rate": 1.3,
+        "atk_range": 205
+      }
+    },
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/46e1912887900c5d96238dcfbd3d55888a039c97-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
+  },
+  "Furion": {
+    "id": "chess_fur",
+    "cost": 2,
+    "pool": "standard",
+    "synergies": [
+      "Druid",
+      "Elf"
+    ],
+    "names": {
+      "en": "Furion",
+      "lore": "Furion",
+      "ko": "자연의 예언자",
+      "ru": "Furion",
+      "zh-cn": "先知",
+      "zh-tw": "先知"
+    },
+    "attack_type": "ranged",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 500,
+        "mana": 100,
+        "atk": [
+          45,
+          50
+        ],
+        "armor": 4,
+        "magic_resist": 5,
+        "atk_rate": 1.4,
+        "atk_range": 400
+      },
+      "2_star": {
+        "hp": 1000,
+        "mana": 100,
+        "atk": [
+          90,
+          100
+        ],
+        "armor": 4,
+        "magic_resist": 5,
+        "atk_rate": 1.4,
+        "atk_range": 400
+      },
+      "3_star": {
+        "hp": 1900,
+        "mana": 100,
+        "atk": [
+          180,
+          200
+        ],
+        "armor": 4,
+        "magic_resist": 5,
+        "atk_rate": 1.4,
+        "atk_range": 400
+      }
+    },
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/5a289986119f28ff83854a845eefeaed71969809-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
     }
   },
   "Gyrocopter": {
@@ -2169,63 +2354,11 @@
         "atk_rate": 0.9,
         "atk_range": 400
       }
-    }
-  },
-  "Huskar": {
-    "id": "chess_huskar",
-    "cost": 3,
-    "pool": "standard",
-    "synergies": [
-      "Troll",
-      "Warrior"
-    ],
-    "names": {
-      "en": "Huskar",
-      "lore": "Huskar",
-      "ko": "하스카",
-      "ru": "Huskar",
-      "zh-cn": "神灵武士",
-      "zh-tw": "神靈武士"
     },
-    "attack_type": "ranged",
-    "abilities": null,
-    "stats": {
-      "1_star": {
-        "hp": 700,
-        "mana": 0,
-        "atk": [
-          70,
-          100
-        ],
-        "armor": 6,
-        "magic_resist": 25,
-        "atk_rate": 1.1,
-        "atk_range": 400
-      },
-      "2_star": {
-        "hp": 1400,
-        "mana": 0,
-        "atk": [
-          140,
-          200
-        ],
-        "armor": 6,
-        "magic_resist": 25,
-        "atk_rate": 1.1,
-        "atk_range": 400
-      },
-      "3_star": {
-        "hp": 2800,
-        "mana": 0,
-        "atk": [
-          280,
-          400
-        ],
-        "armor": 6,
-        "magic_resist": 25,
-        "atk_rate": 1.1,
-        "atk_range": 400
-      }
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/3e308706b9382e1d3fa4d0000c5281e31ca1a2e8-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
     }
   },
   "Hoodwink": {
@@ -2283,6 +2416,135 @@
         "atk_rate": 1.2,
         "atk_range": 400
       }
+    },
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/0ab1234fe2ef841cdb6e03dcc4decd955c8d9b5e-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
+  },
+  "Huskar": {
+    "id": "chess_huskar",
+    "cost": 3,
+    "pool": "standard",
+    "synergies": [
+      "Troll",
+      "Warrior"
+    ],
+    "names": {
+      "en": "Huskar",
+      "lore": "Huskar",
+      "ko": "하스카",
+      "ru": "Huskar",
+      "zh-cn": "神灵武士",
+      "zh-tw": "神靈武士"
+    },
+    "attack_type": "ranged",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 700,
+        "mana": 0,
+        "atk": [
+          70,
+          100
+        ],
+        "armor": 6,
+        "magic_resist": 25,
+        "atk_rate": 1.1,
+        "atk_range": 400
+      },
+      "2_star": {
+        "hp": 1400,
+        "mana": 0,
+        "atk": [
+          140,
+          200
+        ],
+        "armor": 6,
+        "magic_resist": 25,
+        "atk_rate": 1.1,
+        "atk_range": 400
+      },
+      "3_star": {
+        "hp": 2800,
+        "mana": 0,
+        "atk": [
+          280,
+          400
+        ],
+        "armor": 6,
+        "magic_resist": 25,
+        "atk_rate": 1.1,
+        "atk_range": 400
+      }
+    },
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/b91027f5915c893a7da3f6bd4fd1b5aaca0375dd-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
+  },
+  "Invoker": {
+    "id": "chess_kael",
+    "cost": 5,
+    "pool": "standard",
+    "synergies": [
+      "Elf",
+      "Mage"
+    ],
+    "names": {
+      "en": "Invoker",
+      "lore": "Kael",
+      "ko": "원소술사",
+      "ru": "Invoker",
+      "zh-cn": "祈求者",
+      "zh-tw": "祈求者"
+    },
+    "attack_type": "ranged",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 900,
+        "mana": 100,
+        "atk": [
+          70,
+          80
+        ],
+        "armor": 7,
+        "magic_resist": 30,
+        "atk_rate": 1.1,
+        "atk_range": 600
+      },
+      "2_star": {
+        "hp": 1800,
+        "mana": 100,
+        "atk": [
+          140,
+          160
+        ],
+        "armor": 7,
+        "magic_resist": 30,
+        "atk_rate": 1.1,
+        "atk_range": 600
+      },
+      "3_star": {
+        "hp": 3600,
+        "mana": 100,
+        "atk": [
+          280,
+          320
+        ],
+        "armor": 7,
+        "magic_resist": 30,
+        "atk_rate": 1.1,
+        "atk_range": 600
+      }
+    },
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/06bab464301579bdd64b0b5804794b143e57f73a-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
     }
   },
   "Io": {
@@ -2345,6 +2607,73 @@
         "atk_rate": 1.3,
         "atk_range": 400
       }
+    },
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/754bcb166fb9eb208220f7698ff4009f134649e4-32x32.png",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
+  },
+  "Jakiro": {
+    "id": "chess_thd",
+    "cost": 5,
+    "pool": "standard",
+    "synergies": [
+      "Dragon",
+      "Mage"
+    ],
+    "names": {
+      "en": "Jakiro",
+      "lore": "Rexxar",
+      "ko": "자키로",
+      "ru": "Jakiro",
+      "zh-cn": "双头龙",
+      "zh-tw": "雙頭龍"
+    },
+    "attack_type": "ranged",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 1000,
+        "mana": 100,
+        "atk": [
+          30,
+          100
+        ],
+        "armor": 9,
+        "magic_resist": 20,
+        "atk_rate": 1.3,
+        "atk_range": 400
+      },
+      "2_star": {
+        "hp": 2000,
+        "mana": 100,
+        "atk": [
+          60,
+          200
+        ],
+        "armor": 9,
+        "magic_resist": 20,
+        "atk_rate": 1.3,
+        "atk_range": 400
+      },
+      "3_star": {
+        "hp": 4000,
+        "mana": 100,
+        "atk": [
+          120,
+          400
+        ],
+        "armor": 9,
+        "magic_resist": 20,
+        "atk_rate": 1.3,
+        "atk_range": 400
+      }
+    },
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/e0175573895e1b967aa4ac47644b07b24c5cb797-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
     }
   },
   "Juggernaut": {
@@ -2402,405 +2731,11 @@
         "atk_rate": 1.1,
         "atk_range": 205
       }
-    }
-  },
-  "Invoker": {
-    "id": "chess_kael",
-    "cost": 5,
-    "pool": "standard",
-    "synergies": [
-      "Elf",
-      "Mage"
-    ],
-    "names": {
-      "en": "Invoker",
-      "lore": "Kael",
-      "ko": "원소술사",
-      "ru": "Invoker",
-      "zh-cn": "祈求者",
-      "zh-tw": "祈求者"
     },
-    "attack_type": "ranged",
-    "abilities": null,
-    "stats": {
-      "1_star": {
-        "hp": 900,
-        "mana": 100,
-        "atk": [
-          70,
-          80
-        ],
-        "armor": 7,
-        "magic_resist": 30,
-        "atk_rate": 1.1,
-        "atk_range": 600
-      },
-      "2_star": {
-        "hp": 1800,
-        "mana": 100,
-        "atk": [
-          140,
-          160
-        ],
-        "armor": 7,
-        "magic_resist": 30,
-        "atk_rate": 1.1,
-        "atk_range": 600
-      },
-      "3_star": {
-        "hp": 3600,
-        "mana": 100,
-        "atk": [
-          280,
-          320
-        ],
-        "armor": 7,
-        "magic_resist": 30,
-        "atk_rate": 1.1,
-        "atk_range": 600
-      }
-    }
-  },
-  "Kez": {
-    "id": "chess_kez",
-    "cost": 3,
-    "pool": "standard",
-    "synergies": [
-      "Assassin",
-      "Harpy"
-    ],
-    "names": {
-      "en": "Kez",
-      "lore": "Kestrel",
-      "ko": "케즈",
-      "ru": "Kez",
-      "zh-cn": "影武者",
-      "zh-tw": "影武者"
-    },
-    "attack_type": "ranged",
-    "abilities": null,
-    "stats": {
-      "1_star": {
-        "hp": 650,
-        "mana": 100,
-        "atk": [
-          60,
-          100
-        ],
-        "armor": 6,
-        "magic_resist": 10,
-        "atk_rate": 1.1,
-        "atk_range": 205
-      },
-      "2_star": {
-        "hp": 1300,
-        "mana": 100,
-        "atk": [
-          120,
-          200
-        ],
-        "armor": 6,
-        "magic_resist": 10,
-        "atk_rate": 1.1,
-        "atk_range": 205
-      },
-      "3_star": {
-        "hp": 2600,
-        "mana": 100,
-        "atk": [
-          240,
-          400
-        ],
-        "armor": 6,
-        "magic_resist": 10,
-        "atk_rate": 1.1,
-        "atk_range": 205
-      }
-    }
-  },
-  "Kunkka": {
-    "id": "chess_kunkka",
-    "cost": 4,
-    "pool": "standard",
-    "synergies": [
-      "Human",
-      "Warrior"
-    ],
-    "names": {
-      "en": "Kunkka",
-      "lore": "Kunkka",
-      "ko": "컨카",
-      "ru": "Kunkka",
-      "zh-cn": "海军上将",
-      "zh-tw": "海軍上將"
-    },
-    "attack_type": "melee",
-    "abilities": null,
-    "stats": {
-      "1_star": {
-        "hp": 950,
-        "mana": 100,
-        "atk": [
-          80,
-          100
-        ],
-        "armor": 10,
-        "magic_resist": 0,
-        "atk_rate": 1.3,
-        "atk_range": 205
-      },
-      "2_star": {
-        "hp": 1900,
-        "mana": 100,
-        "atk": [
-          160,
-          200
-        ],
-        "armor": 10,
-        "magic_resist": 0,
-        "atk_rate": 1.3,
-        "atk_range": 205
-      },
-      "3_star": {
-        "hp": 3800,
-        "mana": 100,
-        "atk": [
-          320,
-          400
-        ],
-        "armor": 10,
-        "magic_resist": 0,
-        "atk_rate": 1.3,
-        "atk_range": 205
-      }
-    }
-  },
-  "Largo": {
-    "id": "chess_largo",
-    "cost": 2,
-    "pool": "standard",
-    "synergies": [
-      "Monk",
-      "Naga"
-    ],
-    "names": {
-      "en": "Largo",
-      "lore": "Largo",
-      "ko": "라르고",
-      "ru": "Largo",
-      "zh-cn": "云游乐手",
-      "zh-tw": "雲遊樂手"
-    },
-    "attack_type": "melee",
-    "abilities": null,
-    "stats": {
-      "1_star": {
-        "hp": 800,
-        "mana": 100,
-        "atk": [
-          50,
-          60
-        ],
-        "armor": 5,
-        "magic_resist": 20,
-        "atk_rate": 1.3,
-        "atk_range": 205
-      },
-      "2_star": {
-        "hp": 1600,
-        "mana": 100,
-        "atk": [
-          100,
-          120
-        ],
-        "armor": 5,
-        "magic_resist": 20,
-        "atk_rate": 1.3,
-        "atk_range": 205
-      },
-      "3_star": {
-        "hp": 3200,
-        "mana": 100,
-        "atk": [
-          200,
-          240
-        ],
-        "armor": 5,
-        "magic_resist": 20,
-        "atk_rate": 1.3,
-        "atk_range": 205
-      }
-    }
-  },
-  "Legion Commander": {
-    "id": "chess_lc",
-    "cost": 3,
-    "pool": "standard",
-    "synergies": [
-      "Human",
-      "Knight"
-    ],
-    "names": {
-      "en": "Legion Commander",
-      "lore": "Tresdin",
-      "ko": "군단 사령관",
-      "ru": "Legion Commander",
-      "zh-cn": "军团指挥官",
-      "zh-tw": "軍團指揮官"
-    },
-    "attack_type": "melee",
-    "abilities": null,
-    "stats": {
-      "1_star": {
-        "hp": 800,
-        "mana": 0,
-        "atk": [
-          70,
-          100
-        ],
-        "armor": 7,
-        "magic_resist": 0,
-        "atk_rate": 1.2,
-        "atk_range": 205
-      },
-      "2_star": {
-        "hp": 1600,
-        "mana": 0,
-        "atk": [
-          140,
-          200
-        ],
-        "armor": 7,
-        "magic_resist": 0,
-        "atk_rate": 1.2,
-        "atk_range": 205
-      },
-      "3_star": {
-        "hp": 3200,
-        "mana": 0,
-        "atk": [
-          280,
-          400
-        ],
-        "armor": 7,
-        "magic_resist": 0,
-        "atk_rate": 1.2,
-        "atk_range": 205
-      }
-    }
-  },
-  "Lone Druid": {
-    "id": "chess_ld",
-    "cost": 4,
-    "pool": "standard",
-    "synergies": [
-      "Beast",
-      "Druid"
-    ],
-    "names": {
-      "en": "Lone Druid",
-      "lore": "Syllabear",
-      "ko": "고독한 드루이드",
-      "ru": "Lone Druid",
-      "zh-cn": "利爪德鲁伊",
-      "zh-tw": "利爪德魯伊"
-    },
-    "attack_type": "ranged",
-    "abilities": null,
-    "stats": {
-      "1_star": {
-        "hp": 800,
-        "mana": 100,
-        "atk": [
-          50,
-          60
-        ],
-        "armor": 7,
-        "magic_resist": 0,
-        "atk_rate": 1.3,
-        "atk_range": 400
-      },
-      "2_star": {
-        "hp": 1600,
-        "mana": 100,
-        "atk": [
-          100,
-          120
-        ],
-        "armor": 7,
-        "magic_resist": 0,
-        "atk_rate": 1.3,
-        "atk_range": 400
-      },
-      "3_star": {
-        "hp": 2800,
-        "mana": 100,
-        "atk": [
-          200,
-          240
-        ],
-        "armor": 7,
-        "magic_resist": 0,
-        "atk_rate": 1.3,
-        "atk_range": 400
-      }
-    }
-  },
-  "Lich": {
-    "id": "chess_lich",
-    "cost": 4,
-    "pool": "undead",
-    "synergies": [
-      "Mage",
-      "Undead"
-    ],
-    "names": {
-      "en": "Lich",
-      "lore": "Ethreain",
-      "ko": "리치",
-      "ru": "Lich",
-      "zh-cn": "巫妖",
-      "zh-tw": "巫妖"
-    },
-    "attack_type": "ranged",
-    "abilities": null,
-    "stats": {
-      "1_star": {
-        "hp": 800,
-        "mana": 100,
-        "atk": [
-          50,
-          70
-        ],
-        "armor": 8,
-        "magic_resist": 30,
-        "atk_rate": 1.5,
-        "atk_range": 400
-      },
-      "2_star": {
-        "hp": 1600,
-        "mana": 100,
-        "atk": [
-          100,
-          140
-        ],
-        "armor": 8,
-        "magic_resist": 30,
-        "atk_rate": 1.5,
-        "atk_range": 400
-      },
-      "3_star": {
-        "hp": 3200,
-        "mana": 100,
-        "atk": [
-          200,
-          280
-        ],
-        "armor": 8,
-        "magic_resist": 30,
-        "atk_rate": 1.5,
-        "atk_range": 400
-      }
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/6edf672fa3eedb12068549adebb19b5219c8442d-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
     }
   },
   "Keeper of the Light": {
@@ -2858,6 +2793,447 @@
         "atk_rate": 1.7,
         "atk_range": 600
       }
+    },
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/7d3225876bd5e53ede8d623ad67d6202fdf3a718-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
+  },
+  "Kez": {
+    "id": "chess_kez",
+    "cost": 3,
+    "pool": "standard",
+    "synergies": [
+      "Assassin",
+      "Harpy"
+    ],
+    "names": {
+      "en": "Kez",
+      "lore": "Kestrel",
+      "ko": "케즈",
+      "ru": "Kez",
+      "zh-cn": "影武者",
+      "zh-tw": "影武者"
+    },
+    "attack_type": "ranged",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 650,
+        "mana": 100,
+        "atk": [
+          60,
+          100
+        ],
+        "armor": 6,
+        "magic_resist": 10,
+        "atk_rate": 1.1,
+        "atk_range": 205
+      },
+      "2_star": {
+        "hp": 1300,
+        "mana": 100,
+        "atk": [
+          120,
+          200
+        ],
+        "armor": 6,
+        "magic_resist": 10,
+        "atk_rate": 1.1,
+        "atk_range": 205
+      },
+      "3_star": {
+        "hp": 2600,
+        "mana": 100,
+        "atk": [
+          240,
+          400
+        ],
+        "armor": 6,
+        "magic_resist": 10,
+        "atk_rate": 1.1,
+        "atk_range": 205
+      }
+    },
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/ddb10f3c9fc531e78d6527a440b2d45c99dc06c8-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
+  },
+  "Kunkka": {
+    "id": "chess_kunkka",
+    "cost": 4,
+    "pool": "standard",
+    "synergies": [
+      "Human",
+      "Warrior"
+    ],
+    "names": {
+      "en": "Kunkka",
+      "lore": "Kunkka",
+      "ko": "컨카",
+      "ru": "Kunkka",
+      "zh-cn": "海军上将",
+      "zh-tw": "海軍上將"
+    },
+    "attack_type": "melee",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 950,
+        "mana": 100,
+        "atk": [
+          80,
+          100
+        ],
+        "armor": 10,
+        "magic_resist": 0,
+        "atk_rate": 1.3,
+        "atk_range": 205
+      },
+      "2_star": {
+        "hp": 1900,
+        "mana": 100,
+        "atk": [
+          160,
+          200
+        ],
+        "armor": 10,
+        "magic_resist": 0,
+        "atk_rate": 1.3,
+        "atk_range": 205
+      },
+      "3_star": {
+        "hp": 3800,
+        "mana": 100,
+        "atk": [
+          320,
+          400
+        ],
+        "armor": 10,
+        "magic_resist": 0,
+        "atk_rate": 1.3,
+        "atk_range": 205
+      }
+    },
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/9e67857d8bea2a5ad36d4103b1363c691006578d-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
+  },
+  "Largo": {
+    "id": "chess_largo",
+    "cost": 2,
+    "pool": "standard",
+    "synergies": [
+      "Monk",
+      "Naga"
+    ],
+    "names": {
+      "en": "Largo",
+      "lore": "Largo",
+      "ko": "라르고",
+      "ru": "Largo",
+      "zh-cn": "云游乐手",
+      "zh-tw": "雲遊樂手"
+    },
+    "attack_type": "melee",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 800,
+        "mana": 100,
+        "atk": [
+          50,
+          60
+        ],
+        "armor": 5,
+        "magic_resist": 20,
+        "atk_rate": 1.3,
+        "atk_range": 205
+      },
+      "2_star": {
+        "hp": 1600,
+        "mana": 100,
+        "atk": [
+          100,
+          120
+        ],
+        "armor": 5,
+        "magic_resist": 20,
+        "atk_rate": 1.3,
+        "atk_range": 205
+      },
+      "3_star": {
+        "hp": 3200,
+        "mana": 100,
+        "atk": [
+          200,
+          240
+        ],
+        "armor": 5,
+        "magic_resist": 20,
+        "atk_rate": 1.3,
+        "atk_range": 205
+      }
+    },
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/78f4cdf20db334f4e141e7cefd3886c13451867f-32x32.png",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
+  },
+  "Legion Commander": {
+    "id": "chess_lc",
+    "cost": 3,
+    "pool": "standard",
+    "synergies": [
+      "Human",
+      "Knight"
+    ],
+    "names": {
+      "en": "Legion Commander",
+      "lore": "Tresdin",
+      "ko": "군단 사령관",
+      "ru": "Legion Commander",
+      "zh-cn": "军团指挥官",
+      "zh-tw": "軍團指揮官"
+    },
+    "attack_type": "melee",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 800,
+        "mana": 0,
+        "atk": [
+          70,
+          100
+        ],
+        "armor": 7,
+        "magic_resist": 0,
+        "atk_rate": 1.2,
+        "atk_range": 205
+      },
+      "2_star": {
+        "hp": 1600,
+        "mana": 0,
+        "atk": [
+          140,
+          200
+        ],
+        "armor": 7,
+        "magic_resist": 0,
+        "atk_rate": 1.2,
+        "atk_range": 205
+      },
+      "3_star": {
+        "hp": 3200,
+        "mana": 0,
+        "atk": [
+          280,
+          400
+        ],
+        "armor": 7,
+        "magic_resist": 0,
+        "atk_rate": 1.2,
+        "atk_range": 205
+      }
+    },
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/ebea92394eb96d4bc2db00b2146a90c19e36d8f9-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
+  },
+  "Leshrac": {
+    "id": "chess_ts",
+    "cost": 5,
+    "pool": "standard",
+    "synergies": [
+      "Centaur",
+      "Druid",
+      "God"
+    ],
+    "names": {
+      "en": "Leshrac",
+      "lore": "Leshrac",
+      "ko": "레슈락",
+      "ru": "Leshrac",
+      "zh-cn": "受折磨的灵魂",
+      "zh-tw": "受折磨的靈魂"
+    },
+    "attack_type": "ranged",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 900,
+        "mana": 100,
+        "atk": [
+          60,
+          110
+        ],
+        "armor": 6,
+        "magic_resist": 20,
+        "atk_rate": 1.2,
+        "atk_range": 400
+      },
+      "2_star": {
+        "hp": 1800,
+        "mana": 100,
+        "atk": [
+          120,
+          220
+        ],
+        "armor": 6,
+        "magic_resist": 20,
+        "atk_rate": 1.2,
+        "atk_range": 400
+      },
+      "3_star": {
+        "hp": 3150,
+        "mana": 100,
+        "atk": [
+          240,
+          440
+        ],
+        "armor": 6,
+        "magic_resist": 20,
+        "atk_rate": 1.2,
+        "atk_range": 400
+      }
+    },
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/35d60ff7c7b027402166480a22000d1c38a7383d-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
+  },
+  "Lich": {
+    "id": "chess_lich",
+    "cost": 4,
+    "pool": "undead",
+    "synergies": [
+      "Mage",
+      "Undead"
+    ],
+    "names": {
+      "en": "Lich",
+      "lore": "Ethreain",
+      "ko": "리치",
+      "ru": "Lich",
+      "zh-cn": "巫妖",
+      "zh-tw": "巫妖"
+    },
+    "attack_type": "ranged",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 800,
+        "mana": 100,
+        "atk": [
+          50,
+          70
+        ],
+        "armor": 8,
+        "magic_resist": 30,
+        "atk_rate": 1.5,
+        "atk_range": 400
+      },
+      "2_star": {
+        "hp": 1600,
+        "mana": 100,
+        "atk": [
+          100,
+          140
+        ],
+        "armor": 8,
+        "magic_resist": 30,
+        "atk_rate": 1.5,
+        "atk_range": 400
+      },
+      "3_star": {
+        "hp": 3200,
+        "mana": 100,
+        "atk": [
+          200,
+          280
+        ],
+        "armor": 8,
+        "magic_resist": 30,
+        "atk_rate": 1.5,
+        "atk_range": 400
+      }
+    },
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/57d70099445ed521ebf2bfb8514afbcb5fcbf1fe-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
+  },
+  "Lifestealer": {
+    "id": "chess_naix",
+    "cost": 2,
+    "pool": "undead",
+    "synergies": [
+      "Kobold",
+      "Undead",
+      "Wizard"
+    ],
+    "names": {
+      "en": "Lifestealer",
+      "lore": "Naix",
+      "ko": "흡혈마",
+      "ru": "Lifestealer",
+      "zh-cn": "噬魂鬼",
+      "zh-tw": "噬魂鬼"
+    },
+    "attack_type": "melee",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 700,
+        "mana": 0,
+        "atk": [
+          50,
+          80
+        ],
+        "armor": 6,
+        "magic_resist": 50,
+        "atk_rate": 1.1,
+        "atk_range": 205
+      },
+      "2_star": {
+        "hp": 1400,
+        "mana": 0,
+        "atk": [
+          100,
+          160
+        ],
+        "armor": 5,
+        "magic_resist": 30,
+        "atk_rate": 1.1,
+        "atk_range": 205
+      },
+      "3_star": {
+        "hp": 2800,
+        "mana": 0,
+        "atk": [
+          200,
+          320
+        ],
+        "armor": 5,
+        "magic_resist": 30,
+        "atk_rate": 1.1,
+        "atk_range": 205
+      }
+    },
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/76183c8606bb543695c314bf6efebe03b759a7b0-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
     }
   },
   "Lina": {
@@ -2915,6 +3291,11 @@
         "atk_rate": 1.3,
         "atk_range": 600
       }
+    },
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/7128674c74ae567bd95eecc53724058513e9e8a0-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
     }
   },
   "Lion": {
@@ -2972,6 +3353,73 @@
         "atk_rate": 1.6,
         "atk_range": 400
       }
+    },
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/c0a026f67e621bdd675753a4bc8a03de09c5a2c6-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
+  },
+  "Lone Druid": {
+    "id": "chess_ld",
+    "cost": 4,
+    "pool": "standard",
+    "synergies": [
+      "Beast",
+      "Druid"
+    ],
+    "names": {
+      "en": "Lone Druid",
+      "lore": "Syllabear",
+      "ko": "고독한 드루이드",
+      "ru": "Lone Druid",
+      "zh-cn": "利爪德鲁伊",
+      "zh-tw": "利爪德魯伊"
+    },
+    "attack_type": "ranged",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 800,
+        "mana": 100,
+        "atk": [
+          50,
+          60
+        ],
+        "armor": 7,
+        "magic_resist": 0,
+        "atk_rate": 1.3,
+        "atk_range": 400
+      },
+      "2_star": {
+        "hp": 1600,
+        "mana": 100,
+        "atk": [
+          100,
+          120
+        ],
+        "armor": 7,
+        "magic_resist": 0,
+        "atk_rate": 1.3,
+        "atk_range": 400
+      },
+      "3_star": {
+        "hp": 2800,
+        "mana": 100,
+        "atk": [
+          200,
+          240
+        ],
+        "armor": 7,
+        "magic_resist": 0,
+        "atk_rate": 1.3,
+        "atk_range": 400
+      }
+    },
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/48e6c3d9de864ec109bece7c4ac72b016f23b36b-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
     }
   },
   "Luna": {
@@ -3029,6 +3477,11 @@
         "atk_rate": 1.2,
         "atk_range": 400
       }
+    },
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/5c1b73ac321cc580561797d3c6617f675cb17c39-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
     }
   },
   "Lycan": {
@@ -3087,6 +3540,11 @@
         "atk_rate": 1.3,
         "atk_range": 205
       }
+    },
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/dcdcb7c04c3aa3b28c06a8a5aad7217f959f93bf-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
     }
   },
   "Magnus": {
@@ -3144,6 +3602,11 @@
         "atk_rate": 1.5,
         "atk_range": 205
       }
+    },
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/0c1cc9f9d4ff426312e9d7a7ddf68e30171cff50-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
     }
   },
   "Marci": {
@@ -3201,6 +3664,11 @@
         "atk_rate": 1.1,
         "atk_range": 205
       }
+    },
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/2923de991d3aa603aee858798e56c344cf7c2872-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
     }
   },
   "Mars": {
@@ -3258,6 +3726,11 @@
         "atk_rate": 1.9,
         "atk_range": 205
       }
+    },
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/af448463b8c9038140d9e2ef5e7772d374661c3d-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
     }
   },
   "Medusa": {
@@ -3288,7 +3761,7 @@
         ],
         "armor": 7,
         "magic_resist": 10,
-        "atk_rate": 1.0,
+        "atk_rate": 1,
         "atk_range": 400
       },
       "2_star": {
@@ -3300,7 +3773,7 @@
         ],
         "armor": 7,
         "magic_resist": 10,
-        "atk_rate": 1.0,
+        "atk_rate": 1,
         "atk_range": 400
       },
       "3_star": {
@@ -3312,9 +3785,14 @@
         ],
         "armor": 7,
         "magic_resist": 10,
-        "atk_rate": 1.0,
+        "atk_rate": 1,
         "atk_range": 400
       }
+    },
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/9995fe98db97dfbb220c038bacb137786f957a22-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
     }
   },
   "Meepo": {
@@ -3345,7 +3823,7 @@
         ],
         "armor": 4,
         "magic_resist": 10,
-        "atk_rate": 1.0,
+        "atk_rate": 1,
         "atk_range": 205
       },
       "2_star": {
@@ -3357,7 +3835,7 @@
         ],
         "armor": 4,
         "magic_resist": 10,
-        "atk_rate": 1.0,
+        "atk_rate": 1,
         "atk_range": 205
       },
       "3_star": {
@@ -3369,9 +3847,76 @@
         ],
         "armor": 4,
         "magic_resist": 10,
-        "atk_rate": 1.0,
+        "atk_rate": 1,
         "atk_range": 205
       }
+    },
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/ecfcb988b30a229cf8986d0c357f50db1ba465b3-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
+  },
+  "Mirana": {
+    "id": "chess_pom",
+    "cost": 1,
+    "pool": "standard",
+    "synergies": [
+      "Elf",
+      "Hunter"
+    ],
+    "names": {
+      "en": "Mirana",
+      "lore": "Mirana",
+      "ko": "미라나",
+      "ru": "Mirana",
+      "zh-cn": "月之女祭司",
+      "zh-tw": "月之女祭司"
+    },
+    "attack_type": "ranged",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 450,
+        "mana": 100,
+        "atk": [
+          40,
+          50
+        ],
+        "armor": 0,
+        "magic_resist": 0,
+        "atk_rate": 1,
+        "atk_range": 600
+      },
+      "2_star": {
+        "hp": 900,
+        "mana": 100,
+        "atk": [
+          80,
+          100
+        ],
+        "armor": 0,
+        "magic_resist": 0,
+        "atk_rate": 1,
+        "atk_range": 600
+      },
+      "3_star": {
+        "hp": 1800,
+        "mana": 100,
+        "atk": [
+          160,
+          200
+        ],
+        "armor": 2,
+        "magic_resist": 0,
+        "atk_rate": 1,
+        "atk_range": 600
+      }
+    },
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/bdfd673d879b5d744857fd148082ca126e6a4ca9-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
     }
   },
   "Monkey King": {
@@ -3429,6 +3974,11 @@
         "atk_rate": 1.2,
         "atk_range": 205
       }
+    },
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/a3b268fd10c4e794a7ae866aabd8e207536ea823-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
     }
   },
   "Morphling": {
@@ -3487,6 +4037,11 @@
         "atk_rate": 1.4,
         "atk_range": 400
       }
+    },
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/d2a8ddbee486017981cb01b46d6e92d6f3e70b1e-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
     }
   },
   "Muerta": {
@@ -3544,6 +4099,135 @@
         "atk_rate": 1.1,
         "atk_range": 400
       }
+    },
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/b06060cb3311dd9e28cfbbdee0cccc830993bf52-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
+  },
+  "Naga Siren": {
+    "id": "chess_naga",
+    "cost": 3,
+    "pool": "standard",
+    "synergies": [
+      "Naga",
+      "Wizard"
+    ],
+    "names": {
+      "en": "Naga Siren",
+      "lore": "Slithice",
+      "ko": "나가 세이렌",
+      "ru": "Naga Siren",
+      "zh-cn": "娜迦海妖",
+      "zh-tw": "娜迦海妖"
+    },
+    "attack_type": "melee",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 650,
+        "mana": 100,
+        "atk": [
+          50,
+          90
+        ],
+        "armor": 5,
+        "magic_resist": 20,
+        "atk_rate": 1.2,
+        "atk_range": 205
+      },
+      "2_star": {
+        "hp": 1300,
+        "mana": 100,
+        "atk": [
+          100,
+          180
+        ],
+        "armor": 5,
+        "magic_resist": 20,
+        "atk_rate": 1.2,
+        "atk_range": 205
+      },
+      "3_star": {
+        "hp": 2600,
+        "mana": 100,
+        "atk": [
+          200,
+          360
+        ],
+        "armor": 5,
+        "magic_resist": 20,
+        "atk_rate": 1.2,
+        "atk_range": 205
+      }
+    },
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/8c9039fefaf89ffde29086c29522c2c04580fa44-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
+  },
+  "Necrophos": {
+    "id": "chess_nec",
+    "cost": 5,
+    "pool": "undead",
+    "synergies": [
+      "Undead",
+      "Warlock"
+    ],
+    "names": {
+      "en": "Necrophos",
+      "lore": "Rotund۰jere",
+      "ko": "강령사제",
+      "ru": "Necrophos",
+      "zh-cn": "死灵法师",
+      "zh-tw": "死靈法師"
+    },
+    "attack_type": "ranged",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 1000,
+        "mana": 100,
+        "atk": [
+          50,
+          100
+        ],
+        "armor": 6,
+        "magic_resist": 30,
+        "atk_rate": 1.2,
+        "atk_range": 400
+      },
+      "2_star": {
+        "hp": 2000,
+        "mana": 100,
+        "atk": [
+          100,
+          200
+        ],
+        "armor": 6,
+        "magic_resist": 30,
+        "atk_rate": 1.2,
+        "atk_range": 400
+      },
+      "3_star": {
+        "hp": 4000,
+        "mana": 100,
+        "atk": [
+          200,
+          400
+        ],
+        "armor": 6,
+        "magic_resist": 30,
+        "atk_rate": 1.2,
+        "atk_range": 400
+      }
+    },
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/37f307b1015c192c4257296cb97c9c72348cfa40-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
     }
   },
   "Nyx Assassin": {
@@ -3602,235 +4286,11 @@
         "atk_rate": 1.3,
         "atk_range": 205
       }
-    }
-  },
-  "Naga Siren": {
-    "id": "chess_naga",
-    "cost": 3,
-    "pool": "standard",
-    "synergies": [
-      "Naga",
-      "Wizard"
-    ],
-    "names": {
-      "en": "Naga Siren",
-      "lore": "Slithice",
-      "ko": "나가 세이렌",
-      "ru": "Naga Siren",
-      "zh-cn": "娜迦海妖",
-      "zh-tw": "娜迦海妖"
     },
-    "attack_type": "melee",
-    "abilities": null,
-    "stats": {
-      "1_star": {
-        "hp": 650,
-        "mana": 100,
-        "atk": [
-          50,
-          90
-        ],
-        "armor": 5,
-        "magic_resist": 20,
-        "atk_rate": 1.2,
-        "atk_range": 205
-      },
-      "2_star": {
-        "hp": 1300,
-        "mana": 100,
-        "atk": [
-          100,
-          180
-        ],
-        "armor": 5,
-        "magic_resist": 20,
-        "atk_rate": 1.2,
-        "atk_range": 205
-      },
-      "3_star": {
-        "hp": 2600,
-        "mana": 100,
-        "atk": [
-          200,
-          360
-        ],
-        "armor": 5,
-        "magic_resist": 20,
-        "atk_rate": 1.2,
-        "atk_range": 205
-      }
-    }
-  },
-  "Lifestealer": {
-    "id": "chess_naix",
-    "cost": 2,
-    "pool": "undead",
-    "synergies": [
-      "Kobold",
-      "Undead",
-      "Warlock"
-    ],
-    "names": {
-      "en": "Lifestealer",
-      "lore": "Naix",
-      "ko": "흡혈마",
-      "ru": "Lifestealer",
-      "zh-cn": "噬魂鬼",
-      "zh-tw": "噬魂鬼"
-    },
-    "attack_type": "melee",
-    "abilities": null,
-    "stats": {
-      "1_star": {
-        "hp": 700,
-        "mana": 0,
-        "atk": [
-          50,
-          80
-        ],
-        "armor": 6,
-        "magic_resist": 50,
-        "atk_rate": 1.1,
-        "atk_range": 205
-      },
-      "2_star": {
-        "hp": 1400,
-        "mana": 0,
-        "atk": [
-          100,
-          160
-        ],
-        "armor": 5,
-        "magic_resist": 30,
-        "atk_rate": 1.1,
-        "atk_range": 205
-      },
-      "3_star": {
-        "hp": 2800,
-        "mana": 0,
-        "atk": [
-          200,
-          320
-        ],
-        "armor": 5,
-        "magic_resist": 30,
-        "atk_rate": 1.1,
-        "atk_range": 205
-      }
-    }
-  },
-  "Necrophos": {
-    "id": "chess_nec",
-    "cost": 5,
-    "pool": "undead",
-    "synergies": [
-      "Undead",
-      "Warlock"
-    ],
-    "names": {
-      "en": "Necrophos",
-      "lore": "Rotund۰jere",
-      "ko": "강령사제",
-      "ru": "Necrophos",
-      "zh-cn": "死灵法师",
-      "zh-tw": "死靈法師"
-    },
-    "attack_type": "ranged",
-    "abilities": null,
-    "stats": {
-      "1_star": {
-        "hp": 1000,
-        "mana": 100,
-        "atk": [
-          50,
-          100
-        ],
-        "armor": 6,
-        "magic_resist": 30,
-        "atk_rate": 1.2,
-        "atk_range": 400
-      },
-      "2_star": {
-        "hp": 2000,
-        "mana": 100,
-        "atk": [
-          100,
-          200
-        ],
-        "armor": 6,
-        "magic_resist": 30,
-        "atk_rate": 1.2,
-        "atk_range": 400
-      },
-      "3_star": {
-        "hp": 4000,
-        "mana": 100,
-        "atk": [
-          200,
-          400
-        ],
-        "armor": 6,
-        "magic_resist": 30,
-        "atk_rate": 1.2,
-        "atk_range": 400
-      }
-    }
-  },
-  "Omniknight": {
-    "id": "chess_ok",
-    "cost": 5,
-    "pool": "standard",
-    "synergies": [
-      "Human",
-      "Knight"
-    ],
-    "names": {
-      "en": "Omniknight",
-      "lore": "Purist۰Thunderwrath",
-      "ko": "전능기사",
-      "ru": "Omniknight",
-      "zh-cn": "全能骑士",
-      "zh-tw": "全能騎士"
-    },
-    "attack_type": "melee",
-    "abilities": null,
-    "stats": {
-      "1_star": {
-        "hp": 1100,
-        "mana": 0,
-        "atk": [
-          90,
-          120
-        ],
-        "armor": 10,
-        "magic_resist": 20,
-        "atk_rate": 1.4,
-        "atk_range": 205
-      },
-      "2_star": {
-        "hp": 2200,
-        "mana": 0,
-        "atk": [
-          180,
-          240
-        ],
-        "armor": 10,
-        "magic_resist": 20,
-        "atk_rate": 1.4,
-        "atk_range": 205
-      },
-      "3_star": {
-        "hp": 4400,
-        "mana": 0,
-        "atk": [
-          360,
-          480
-        ],
-        "armor": 10,
-        "magic_resist": 20,
-        "atk_rate": 1.4,
-        "atk_range": 205
-      }
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/54365692feadea9cf99569af412bc9c94cf775d8-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
     }
   },
   "Ogre Magi": {
@@ -3888,6 +4348,73 @@
         "atk_rate": 1.5,
         "atk_range": 205
       }
+    },
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/0a0a468373642620ce94bd0c69f1589badfe04b3-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
+  },
+  "Omniknight": {
+    "id": "chess_ok",
+    "cost": 5,
+    "pool": "standard",
+    "synergies": [
+      "Human",
+      "Knight"
+    ],
+    "names": {
+      "en": "Omniknight",
+      "lore": "Purist۰Thunderwrath",
+      "ko": "전능기사",
+      "ru": "Omniknight",
+      "zh-cn": "全能骑士",
+      "zh-tw": "全能騎士"
+    },
+    "attack_type": "melee",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 1100,
+        "mana": 0,
+        "atk": [
+          90,
+          120
+        ],
+        "armor": 10,
+        "magic_resist": 20,
+        "atk_rate": 1.4,
+        "atk_range": 205
+      },
+      "2_star": {
+        "hp": 2200,
+        "mana": 0,
+        "atk": [
+          180,
+          240
+        ],
+        "armor": 10,
+        "magic_resist": 20,
+        "atk_rate": 1.4,
+        "atk_range": 205
+      },
+      "3_star": {
+        "hp": 4400,
+        "mana": 0,
+        "atk": [
+          360,
+          480
+        ],
+        "armor": 10,
+        "magic_resist": 20,
+        "atk_rate": 1.4,
+        "atk_range": 205
+      }
+    },
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/320f95682ee0e8c8fa5e5d419da24dc5fb91eb31-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
     }
   },
   "Oracle": {
@@ -3945,6 +4472,73 @@
         "atk_rate": 1.6,
         "atk_range": 400
       }
+    },
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/0c879cfdc78ff8a07ec1eb83e507ab19f76d0bd4-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
+  },
+  "Pangolier": {
+    "id": "chess_pangolier",
+    "cost": 4,
+    "pool": "standard",
+    "synergies": [
+      "Assassin",
+      "Beast"
+    ],
+    "names": {
+      "en": "Pangolier",
+      "lore": "Donté۰Panlin",
+      "ko": "천갑검사",
+      "ru": "Pangolier",
+      "zh-cn": "石鳞剑士",
+      "zh-tw": "石鱗劍士"
+    },
+    "attack_type": "melee",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 850,
+        "mana": 100,
+        "atk": [
+          60,
+          100
+        ],
+        "armor": 8,
+        "magic_resist": 0,
+        "atk_rate": 1,
+        "atk_range": 205
+      },
+      "2_star": {
+        "hp": 1700,
+        "mana": 100,
+        "atk": [
+          120,
+          200
+        ],
+        "armor": 8,
+        "magic_resist": 0,
+        "atk_rate": 1,
+        "atk_range": 205
+      },
+      "3_star": {
+        "hp": 3400,
+        "mana": 100,
+        "atk": [
+          240,
+          400
+        ],
+        "armor": 8,
+        "magic_resist": 0,
+        "atk_rate": 1,
+        "atk_range": 205
+      }
+    },
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/87ecae0b21dbdc79bfa5ceec3a2c73055515b17d-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
     }
   },
   "Phantom Assassin": {
@@ -4002,120 +4596,11 @@
         "atk_rate": 0.9,
         "atk_range": 205
       }
-    }
-  },
-  "Pangolier": {
-    "id": "chess_pangolier",
-    "cost": 4,
-    "pool": "standard",
-    "synergies": [
-      "Assassin",
-      "Beast"
-    ],
-    "names": {
-      "en": "Pangolier",
-      "lore": "Donté۰Panlin",
-      "ko": "천갑검사",
-      "ru": "Pangolier",
-      "zh-cn": "石鳞剑士",
-      "zh-tw": "石鱗劍士"
     },
-    "attack_type": "melee",
-    "abilities": null,
-    "stats": {
-      "1_star": {
-        "hp": 850,
-        "mana": 100,
-        "atk": [
-          60,
-          100
-        ],
-        "armor": 8,
-        "magic_resist": 0,
-        "atk_rate": 1.0,
-        "atk_range": 205
-      },
-      "2_star": {
-        "hp": 1700,
-        "mana": 100,
-        "atk": [
-          120,
-          200
-        ],
-        "armor": 8,
-        "magic_resist": 0,
-        "atk_rate": 1.0,
-        "atk_range": 205
-      },
-      "3_star": {
-        "hp": 3400,
-        "mana": 100,
-        "atk": [
-          240,
-          400
-        ],
-        "armor": 8,
-        "magic_resist": 0,
-        "atk_rate": 1.0,
-        "atk_range": 205
-      }
-    }
-  },
-  "Primal Beast": {
-    "id": "chess_pb",
-    "cost": 5,
-    "pool": "standard",
-    "synergies": [
-      "Beast",
-      "Warrior"
-    ],
-    "names": {
-      "en": "Primal Beast",
-      "lore": "Beast",
-      "ko": "원시 야수",
-      "ru": "Primal Beast",
-      "zh-cn": "原始巨兽",
-      "zh-tw": "原始巨獸"
-    },
-    "attack_type": "ranged",
-    "abilities": null,
-    "stats": {
-      "1_star": {
-        "hp": 1300,
-        "mana": 100,
-        "atk": [
-          150,
-          200
-        ],
-        "armor": 11,
-        "magic_resist": 10,
-        "atk_rate": 1.8,
-        "atk_range": 205
-      },
-      "2_star": {
-        "hp": 2600,
-        "mana": 100,
-        "atk": [
-          300,
-          400
-        ],
-        "armor": 11,
-        "magic_resist": 10,
-        "atk_rate": 1.8,
-        "atk_range": 205
-      },
-      "3_star": {
-        "hp": 5200,
-        "mana": 100,
-        "atk": [
-          600,
-          800
-        ],
-        "armor": 11,
-        "magic_resist": 10,
-        "atk_rate": 1.8,
-        "atk_range": 205
-      }
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/16cb7d3056eeebe52f6b81c2fcbf50901cf5dc42-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
     }
   },
   "Phoenix": {
@@ -4173,63 +4658,73 @@
         "atk_rate": 1.5,
         "atk_range": 400
       }
+    },
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/2e0ada0494a233741ee5bbef8ffaed3d9b827371-32x32.png",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
     }
   },
-  "Mirana": {
-    "id": "chess_pom",
-    "cost": 1,
+  "Primal Beast": {
+    "id": "chess_pb",
+    "cost": 5,
     "pool": "standard",
     "synergies": [
-      "Elf",
-      "Hunter"
+      "Beast",
+      "Warrior"
     ],
     "names": {
-      "en": "Mirana",
-      "lore": "Mirana",
-      "ko": "미라나",
-      "ru": "Mirana",
-      "zh-cn": "月之女祭司",
-      "zh-tw": "月之女祭司"
+      "en": "Primal Beast",
+      "lore": "Beast",
+      "ko": "원시 야수",
+      "ru": "Primal Beast",
+      "zh-cn": "原始巨兽",
+      "zh-tw": "原始巨獸"
     },
     "attack_type": "ranged",
     "abilities": null,
     "stats": {
       "1_star": {
-        "hp": 450,
+        "hp": 1300,
         "mana": 100,
         "atk": [
-          40,
-          50
-        ],
-        "armor": 0,
-        "magic_resist": 0,
-        "atk_rate": 1.0,
-        "atk_range": 600
-      },
-      "2_star": {
-        "hp": 900,
-        "mana": 100,
-        "atk": [
-          80,
-          100
-        ],
-        "armor": 0,
-        "magic_resist": 0,
-        "atk_rate": 1.0,
-        "atk_range": 600
-      },
-      "3_star": {
-        "hp": 1800,
-        "mana": 100,
-        "atk": [
-          160,
+          150,
           200
         ],
-        "armor": 2,
-        "magic_resist": 0,
-        "atk_rate": 1.0,
-        "atk_range": 600
+        "armor": 11,
+        "magic_resist": 10,
+        "atk_rate": 1.8,
+        "atk_range": 205
+      },
+      "2_star": {
+        "hp": 2600,
+        "mana": 100,
+        "atk": [
+          300,
+          400
+        ],
+        "armor": 11,
+        "magic_resist": 10,
+        "atk_rate": 1.8,
+        "atk_range": 205
+      },
+      "3_star": {
+        "hp": 5200,
+        "mana": 100,
+        "atk": [
+          600,
+          800
+        ],
+        "armor": 11,
+        "magic_resist": 10,
+        "atk_rate": 1.8,
+        "atk_range": 205
       }
+    },
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/4955f7017174733f721b31d0aad9202402d39095-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
     }
   },
   "Puck": {
@@ -4288,6 +4783,11 @@
         "atk_rate": 1.7,
         "atk_range": 400
       }
+    },
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/2421ec31e87faa8eaf608239a93f847631077ff3-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
     }
   },
   "Pudge": {
@@ -4318,7 +4818,7 @@
         ],
         "armor": 6,
         "magic_resist": 30,
-        "atk_rate": 2.0,
+        "atk_rate": 2,
         "atk_range": 205
       },
       "2_star": {
@@ -4330,7 +4830,7 @@
         ],
         "armor": 6,
         "magic_resist": 30,
-        "atk_rate": 2.0,
+        "atk_rate": 2,
         "atk_range": 205
       },
       "3_star": {
@@ -4342,9 +4842,14 @@
         ],
         "armor": 6,
         "magic_resist": 30,
-        "atk_rate": 2.0,
+        "atk_rate": 2,
         "atk_range": 205
       }
+    },
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/546ba9a231d87f1c63adb875a471a8307451dc13-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
     }
   },
   "Queen of Pain": {
@@ -4402,6 +4907,11 @@
         "atk_rate": 1.2,
         "atk_range": 400
       }
+    },
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/9e91c1948ee129ef1276ab250ee4d7df655c4af0-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
     }
   },
   "Razor": {
@@ -4459,6 +4969,11 @@
         "atk_rate": 1.1,
         "atk_range": 400
       }
+    },
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/bc95b61ba65247f9a6fdc96480d47b8769ca20c0-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
     }
   },
   "Riki": {
@@ -4516,6 +5031,11 @@
         "atk_rate": 0.9,
         "atk_range": 205
       }
+    },
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/09c6e0c5dcb91e2bfdfc624ca3322ca1b384fa9f-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
     }
   },
   "Ringmaster": {
@@ -4570,6 +5090,11 @@
         "atk_rate": 1.7,
         "atk_range": 400
       }
+    },
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/4e45bc7dd47a8bce85f33cc679cf51917d613d57-32x32.png",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
     }
   },
   "Rubick": {
@@ -4627,63 +5152,73 @@
         "atk_rate": 1.4,
         "atk_range": 205
       }
+    },
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/9fd7cba4adbe16fcd9f9013a6f76cf075ddf9098-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
     }
   },
-  "Spirit Breaker": {
-    "id": "chess_sb",
-    "cost": 1,
+  "Sand King": {
+    "id": "chess_sk",
+    "cost": 3,
     "pool": "standard",
     "synergies": [
-      "Assassin",
-      "Tauren"
+      "Aqir",
+      "Assassin"
     ],
     "names": {
-      "en": "Spirit Breaker",
-      "lore": "Barathrum",
-      "ko": "영혼 파괴자",
-      "ru": "Spirit Breaker",
-      "zh-cn": "裂魂人",
-      "zh-tw": "裂魂人"
+      "en": "Sand King",
+      "lore": "Crixalis",
+      "ko": "모래 제왕",
+      "ru": "Sand King",
+      "zh-cn": "沙王",
+      "zh-tw": "沙王"
     },
     "attack_type": "melee",
     "abilities": null,
     "stats": {
       "1_star": {
         "hp": 600,
-        "mana": 0,
+        "mana": 100,
         "atk": [
-          40,
+          45,
           60
         ],
-        "armor": 3,
+        "armor": 6,
         "magic_resist": 0,
         "atk_rate": 1.4,
         "atk_range": 205
       },
       "2_star": {
         "hp": 1200,
-        "mana": 0,
+        "mana": 100,
         "atk": [
-          80,
+          90,
           120
         ],
-        "armor": 3,
+        "armor": 6,
         "magic_resist": 0,
         "atk_rate": 1.4,
         "atk_range": 205
       },
       "3_star": {
         "hp": 2400,
-        "mana": 0,
+        "mana": 100,
         "atk": [
-          160,
+          180,
           240
         ],
-        "armor": 3,
+        "armor": 6,
         "magic_resist": 0,
         "atk_rate": 1.4,
         "atk_range": 205
       }
+    },
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/22e83ee5497ad800b3fe31455d4d91d8caae0337-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
     }
   },
   "Shadow Demon": {
@@ -4742,6 +5277,11 @@
         "atk_rate": 1.7,
         "atk_range": 400
       }
+    },
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/5041ccb7d04ac3bd32e380e2da696cc8c659951b-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
     }
   },
   "Shadow Fiend": {
@@ -4799,519 +5339,11 @@
         "atk_rate": 1.2,
         "atk_range": 600
       }
-    }
-  },
-  "Timbersaw": {
-    "id": "chess_shredder",
-    "cost": 2,
-    "pool": "standard",
-    "synergies": [
-      "Goblin",
-      "Mech"
-    ],
-    "names": {
-      "en": "Timbersaw",
-      "lore": "Rizzrack",
-      "ko": "벌목꾼",
-      "ru": "Timbersaw",
-      "zh-cn": "伐木机",
-      "zh-tw": "伐木機"
     },
-    "attack_type": "melee",
-    "abilities": null,
-    "stats": {
-      "1_star": {
-        "hp": 750,
-        "mana": 100,
-        "atk": [
-          55,
-          60
-        ],
-        "armor": 7,
-        "magic_resist": 0,
-        "atk_rate": 1.4,
-        "atk_range": 205
-      },
-      "2_star": {
-        "hp": 1500,
-        "mana": 100,
-        "atk": [
-          110,
-          120
-        ],
-        "armor": 7,
-        "magic_resist": 0,
-        "atk_rate": 1.4,
-        "atk_range": 205
-      },
-      "3_star": {
-        "hp": 3000,
-        "mana": 100,
-        "atk": [
-          220,
-          240
-        ],
-        "armor": 7,
-        "magic_resist": 0,
-        "atk_rate": 1.4,
-        "atk_range": 205
-      }
-    }
-  },
-  "Sand King": {
-    "id": "chess_sk",
-    "cost": 3,
-    "pool": "standard",
-    "synergies": [
-      "Aqir",
-      "Assassin"
-    ],
-    "names": {
-      "en": "Sand King",
-      "lore": "Crixalis",
-      "ko": "모래 제왕",
-      "ru": "Sand King",
-      "zh-cn": "沙王",
-      "zh-tw": "沙王"
-    },
-    "attack_type": "melee",
-    "abilities": null,
-    "stats": {
-      "1_star": {
-        "hp": 600,
-        "mana": 100,
-        "atk": [
-          45,
-          60
-        ],
-        "armor": 6,
-        "magic_resist": 0,
-        "atk_rate": 1.4,
-        "atk_range": 205
-      },
-      "2_star": {
-        "hp": 1200,
-        "mana": 100,
-        "atk": [
-          90,
-          120
-        ],
-        "armor": 6,
-        "magic_resist": 0,
-        "atk_rate": 1.4,
-        "atk_range": 205
-      },
-      "3_star": {
-        "hp": 2400,
-        "mana": 100,
-        "atk": [
-          180,
-          240
-        ],
-        "armor": 6,
-        "magic_resist": 0,
-        "atk_rate": 1.4,
-        "atk_range": 205
-      }
-    }
-  },
-  "Slardar": {
-    "id": "chess_slardar",
-    "cost": 3,
-    "pool": "standard",
-    "synergies": [
-      "Naga",
-      "Warrior"
-    ],
-    "names": {
-      "en": "Slardar",
-      "lore": "Slardar",
-      "ko": "슬라다",
-      "ru": "Slardar",
-      "zh-cn": "鱼人守卫",
-      "zh-tw": "魚人守衛"
-    },
-    "attack_type": "melee",
-    "abilities": null,
-    "stats": {
-      "1_star": {
-        "hp": 800,
-        "mana": 100,
-        "atk": [
-          80,
-          110
-        ],
-        "armor": 6,
-        "magic_resist": 10,
-        "atk_rate": 1.5,
-        "atk_range": 205
-      },
-      "2_star": {
-        "hp": 1600,
-        "mana": 100,
-        "atk": [
-          160,
-          220
-        ],
-        "armor": 6,
-        "magic_resist": 0,
-        "atk_rate": 1.5,
-        "atk_range": 205
-      },
-      "3_star": {
-        "hp": 3200,
-        "mana": 100,
-        "atk": [
-          320,
-          440
-        ],
-        "armor": 6,
-        "magic_resist": 0,
-        "atk_rate": 1.5,
-        "atk_range": 205
-      }
-    }
-  },
-  "Slark": {
-    "id": "chess_slark",
-    "cost": 2,
-    "pool": "standard",
-    "synergies": [
-      "Assassin",
-      "Naga"
-    ],
-    "names": {
-      "en": "Slark",
-      "lore": "Slark",
-      "ko": "슬라크",
-      "ru": "Slark",
-      "zh-cn": "鱼人夜行者",
-      "zh-tw": "魚人夜行者"
-    },
-    "attack_type": "melee",
-    "abilities": null,
-    "stats": {
-      "1_star": {
-        "hp": 600,
-        "mana": 0,
-        "atk": [
-          60,
-          80
-        ],
-        "armor": 5,
-        "magic_resist": 0,
-        "atk_rate": 1.0,
-        "atk_range": 205
-      },
-      "2_star": {
-        "hp": 1200,
-        "mana": 0,
-        "atk": [
-          120,
-          160
-        ],
-        "armor": 5,
-        "magic_resist": 0,
-        "atk_rate": 1.0,
-        "atk_range": 205
-      },
-      "3_star": {
-        "hp": 2400,
-        "mana": 0,
-        "atk": [
-          240,
-          320
-        ],
-        "armor": 5,
-        "magic_resist": 0,
-        "atk_rate": 1.0,
-        "atk_range": 205
-      }
-    }
-  },
-  "Skywrath Mage": {
-    "id": "chess_sm",
-    "cost": 1,
-    "pool": "standard",
-    "synergies": [
-      "Harpy",
-      "Mage"
-    ],
-    "names": {
-      "en": "Skywrath Mage",
-      "lore": "Zagnas",
-      "ko": "하늘분노 마법사",
-      "ru": "Skywrath Mage",
-      "zh-cn": "天怒法师",
-      "zh-tw": "天怒法師"
-    },
-    "attack_type": "ranged",
-    "abilities": null,
-    "stats": {
-      "1_star": {
-        "hp": 550,
-        "mana": 0,
-        "atk": [
-          40,
-          60
-        ],
-        "armor": 1,
-        "magic_resist": 10,
-        "atk_rate": 1.5,
-        "atk_range": 600
-      },
-      "2_star": {
-        "hp": 1100,
-        "mana": 0,
-        "atk": [
-          80,
-          120
-        ],
-        "armor": 1,
-        "magic_resist": 10,
-        "atk_rate": 1.5,
-        "atk_range": 600
-      },
-      "3_star": {
-        "hp": 2200,
-        "mana": 0,
-        "atk": [
-          160,
-          240
-        ],
-        "armor": 1,
-        "magic_resist": 10,
-        "atk_rate": 1.5,
-        "atk_range": 600
-      }
-    }
-  },
-  "Snapfire": {
-    "id": "chess_snap",
-    "cost": 4,
-    "pool": "standard",
-    "synergies": [
-      "Goblin",
-      "Knight"
-    ],
-    "names": {
-      "en": "Snapfire",
-      "lore": "Beatrix",
-      "ko": "스냅파이어",
-      "ru": "Snapfire",
-      "zh-cn": "电炎绝手",
-      "zh-tw": "電炎絕手"
-    },
-    "attack_type": "ranged",
-    "abilities": null,
-    "stats": {
-      "1_star": {
-        "hp": 800,
-        "mana": 100,
-        "atk": [
-          70,
-          110
-        ],
-        "armor": 9,
-        "magic_resist": 0,
-        "atk_rate": 1.2,
-        "atk_range": 600
-      },
-      "2_star": {
-        "hp": 1600,
-        "mana": 100,
-        "atk": [
-          140,
-          220
-        ],
-        "armor": 9,
-        "magic_resist": 0,
-        "atk_rate": 1.2,
-        "atk_range": 600
-      },
-      "3_star": {
-        "hp": 3200,
-        "mana": 100,
-        "atk": [
-          280,
-          440
-        ],
-        "armor": 9,
-        "magic_resist": 0,
-        "atk_rate": 1.2,
-        "atk_range": 600
-      }
-    }
-  },
-  "Sniper": {
-    "id": "chess_sniper",
-    "cost": 2,
-    "pool": "standard",
-    "synergies": [
-      "Dwarf",
-      "Hunter"
-    ],
-    "names": {
-      "en": "Sniper",
-      "lore": "Kardel۰Sharpeye",
-      "ko": "저격수",
-      "ru": "Sniper",
-      "zh-cn": "狙击手",
-      "zh-tw": "狙擊手"
-    },
-    "attack_type": "ranged",
-    "abilities": null,
-    "stats": {
-      "1_star": {
-        "hp": 450,
-        "mana": 100,
-        "atk": [
-          55,
-          65
-        ],
-        "armor": 4,
-        "magic_resist": 0,
-        "atk_rate": 1.3,
-        "atk_range": 600
-      },
-      "2_star": {
-        "hp": 900,
-        "mana": 100,
-        "atk": [
-          110,
-          130
-        ],
-        "armor": 4,
-        "magic_resist": 0,
-        "atk_rate": 1.3,
-        "atk_range": 600
-      },
-      "3_star": {
-        "hp": 1800,
-        "mana": 100,
-        "atk": [
-          220,
-          260
-        ],
-        "armor": 4,
-        "magic_resist": 0,
-        "atk_rate": 1.3,
-        "atk_range": 600
-      }
-    }
-  },
-  "Wraith King": {
-    "id": "chess_snk",
-    "cost": 5,
-    "pool": "undead",
-    "synergies": [
-      "Undead",
-      "Warrior"
-    ],
-    "names": {
-      "en": "Wraith King",
-      "lore": "King۰Ostarion",
-      "ko": "망령 제왕",
-      "ru": "Wraith King",
-      "zh-cn": "冥魂大帝",
-      "zh-tw": "冥魂大帝"
-    },
-    "attack_type": "melee",
-    "abilities": null,
-    "stats": {
-      "1_star": {
-        "hp": 1300,
-        "mana": 0,
-        "atk": [
-          150,
-          200
-        ],
-        "armor": 10,
-        "magic_resist": 20,
-        "atk_rate": 1.7,
-        "atk_range": 205
-      },
-      "2_star": {
-        "hp": 2600,
-        "mana": 0,
-        "atk": [
-          300,
-          400
-        ],
-        "armor": 10,
-        "magic_resist": 20,
-        "atk_rate": 1.7,
-        "atk_range": 205
-      },
-      "3_star": {
-        "hp": 5200,
-        "mana": 0,
-        "atk": [
-          600,
-          800
-        ],
-        "armor": 10,
-        "magic_resist": 20,
-        "atk_rate": 1.7,
-        "atk_range": 205
-      }
-    }
-  },
-  "Spectres": {
-    "id": "chess_spe",
-    "cost": 5,
-    "pool": "undead",
-    "synergies": [
-      "Demon Hunter",
-      "Undead"
-    ],
-    "names": {
-      "en": "Spectres",
-      "lore": "Mercurial",
-      "ko": "악령",
-      "ru": "Spectres",
-      "zh-cn": "幽鬼",
-      "zh-tw": "幽鬼"
-    },
-    "attack_type": "melee",
-    "abilities": null,
-    "stats": {
-      "1_star": {
-        "hp": 1000,
-        "mana": 100,
-        "atk": [
-          80,
-          120
-        ],
-        "armor": 8,
-        "magic_resist": 30,
-        "atk_rate": 1.0,
-        "atk_range": 205
-      },
-      "2_star": {
-        "hp": 2000,
-        "mana": 100,
-        "atk": [
-          160,
-          240
-        ],
-        "armor": 8,
-        "magic_resist": 30,
-        "atk_rate": 1.0,
-        "atk_range": 205
-      },
-      "3_star": {
-        "hp": 4000,
-        "mana": 100,
-        "atk": [
-          320,
-          480
-        ],
-        "armor": 8,
-        "magic_resist": 30,
-        "atk_rate": 1.0,
-        "atk_range": 205
-      }
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/ede474e6f86a42141304b4ee1ae0b36711675f2d-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
     }
   },
   "Shadow Shaman": {
@@ -5369,6 +5401,445 @@
         "atk_rate": 1.2,
         "atk_range": 400
       }
+    },
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/315a507c6c01a9b11912f0487b2be2930343e37c-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
+  },
+  "Skywrath Mage": {
+    "id": "chess_sm",
+    "cost": 1,
+    "pool": "standard",
+    "synergies": [
+      "Harpy",
+      "Mage"
+    ],
+    "names": {
+      "en": "Skywrath Mage",
+      "lore": "Zagnas",
+      "ko": "하늘분노 마법사",
+      "ru": "Skywrath Mage",
+      "zh-cn": "天怒法师",
+      "zh-tw": "天怒法師"
+    },
+    "attack_type": "ranged",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 550,
+        "mana": 0,
+        "atk": [
+          40,
+          60
+        ],
+        "armor": 1,
+        "magic_resist": 10,
+        "atk_rate": 1.5,
+        "atk_range": 600
+      },
+      "2_star": {
+        "hp": 1100,
+        "mana": 0,
+        "atk": [
+          80,
+          120
+        ],
+        "armor": 1,
+        "magic_resist": 10,
+        "atk_rate": 1.5,
+        "atk_range": 600
+      },
+      "3_star": {
+        "hp": 2200,
+        "mana": 0,
+        "atk": [
+          160,
+          240
+        ],
+        "armor": 1,
+        "magic_resist": 10,
+        "atk_rate": 1.5,
+        "atk_range": 600
+      }
+    },
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/5f3c66d432c808b97685071f2a111d4b51356e99-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
+  },
+  "Slardar": {
+    "id": "chess_slardar",
+    "cost": 3,
+    "pool": "standard",
+    "synergies": [
+      "Naga",
+      "Warrior"
+    ],
+    "names": {
+      "en": "Slardar",
+      "lore": "Slardar",
+      "ko": "슬라다",
+      "ru": "Slardar",
+      "zh-cn": "鱼人守卫",
+      "zh-tw": "魚人守衛"
+    },
+    "attack_type": "melee",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 800,
+        "mana": 100,
+        "atk": [
+          80,
+          110
+        ],
+        "armor": 6,
+        "magic_resist": 10,
+        "atk_rate": 1.5,
+        "atk_range": 205
+      },
+      "2_star": {
+        "hp": 1600,
+        "mana": 100,
+        "atk": [
+          160,
+          220
+        ],
+        "armor": 6,
+        "magic_resist": 0,
+        "atk_rate": 1.5,
+        "atk_range": 205
+      },
+      "3_star": {
+        "hp": 3200,
+        "mana": 100,
+        "atk": [
+          320,
+          440
+        ],
+        "armor": 6,
+        "magic_resist": 0,
+        "atk_rate": 1.5,
+        "atk_range": 205
+      }
+    },
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/962ef2f5ce6399ae7c848cc549a8984744e3d43a-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
+  },
+  "Slark": {
+    "id": "chess_slark",
+    "cost": 2,
+    "pool": "standard",
+    "synergies": [
+      "Assassin",
+      "Naga"
+    ],
+    "names": {
+      "en": "Slark",
+      "lore": "Slark",
+      "ko": "슬라크",
+      "ru": "Slark",
+      "zh-cn": "鱼人夜行者",
+      "zh-tw": "魚人夜行者"
+    },
+    "attack_type": "melee",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 600,
+        "mana": 0,
+        "atk": [
+          60,
+          80
+        ],
+        "armor": 5,
+        "magic_resist": 0,
+        "atk_rate": 1,
+        "atk_range": 205
+      },
+      "2_star": {
+        "hp": 1200,
+        "mana": 0,
+        "atk": [
+          120,
+          160
+        ],
+        "armor": 5,
+        "magic_resist": 0,
+        "atk_rate": 1,
+        "atk_range": 205
+      },
+      "3_star": {
+        "hp": 2400,
+        "mana": 0,
+        "atk": [
+          240,
+          320
+        ],
+        "armor": 5,
+        "magic_resist": 0,
+        "atk_rate": 1,
+        "atk_range": 205
+      }
+    },
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/89c2a76fd78b1368546c073f553af298fe04b51c-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
+  },
+  "Snapfire": {
+    "id": "chess_snap",
+    "cost": 4,
+    "pool": "standard",
+    "synergies": [
+      "Goblin",
+      "Knight"
+    ],
+    "names": {
+      "en": "Snapfire",
+      "lore": "Beatrix",
+      "ko": "스냅파이어",
+      "ru": "Snapfire",
+      "zh-cn": "电炎绝手",
+      "zh-tw": "電炎絕手"
+    },
+    "attack_type": "ranged",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 800,
+        "mana": 100,
+        "atk": [
+          70,
+          110
+        ],
+        "armor": 9,
+        "magic_resist": 0,
+        "atk_rate": 1.2,
+        "atk_range": 600
+      },
+      "2_star": {
+        "hp": 1600,
+        "mana": 100,
+        "atk": [
+          140,
+          220
+        ],
+        "armor": 9,
+        "magic_resist": 0,
+        "atk_rate": 1.2,
+        "atk_range": 600
+      },
+      "3_star": {
+        "hp": 3200,
+        "mana": 100,
+        "atk": [
+          280,
+          440
+        ],
+        "armor": 9,
+        "magic_resist": 0,
+        "atk_rate": 1.2,
+        "atk_range": 600
+      }
+    },
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/623b01c044794bfe7c30f354dedc5643576af221-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
+  },
+  "Sniper": {
+    "id": "chess_sniper",
+    "cost": 2,
+    "pool": "standard",
+    "synergies": [
+      "Dwarf",
+      "Hunter"
+    ],
+    "names": {
+      "en": "Sniper",
+      "lore": "Kardel۰Sharpeye",
+      "ko": "저격수",
+      "ru": "Sniper",
+      "zh-cn": "狙击手",
+      "zh-tw": "狙擊手"
+    },
+    "attack_type": "ranged",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 450,
+        "mana": 100,
+        "atk": [
+          55,
+          65
+        ],
+        "armor": 4,
+        "magic_resist": 0,
+        "atk_rate": 1.3,
+        "atk_range": 600
+      },
+      "2_star": {
+        "hp": 900,
+        "mana": 100,
+        "atk": [
+          110,
+          130
+        ],
+        "armor": 4,
+        "magic_resist": 0,
+        "atk_rate": 1.3,
+        "atk_range": 600
+      },
+      "3_star": {
+        "hp": 1800,
+        "mana": 100,
+        "atk": [
+          220,
+          260
+        ],
+        "armor": 4,
+        "magic_resist": 0,
+        "atk_rate": 1.3,
+        "atk_range": 600
+      }
+    },
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/1f41a8877915158434367cb71a4abd7572adb87f-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
+  },
+  "Spectres": {
+    "id": "chess_spe",
+    "cost": 5,
+    "pool": "undead",
+    "synergies": [
+      "Demon Hunter",
+      "Undead"
+    ],
+    "names": {
+      "en": "Spectres",
+      "lore": "Mercurial",
+      "ko": "악령",
+      "ru": "Spectres",
+      "zh-cn": "幽鬼",
+      "zh-tw": "幽鬼"
+    },
+    "attack_type": "melee",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 1000,
+        "mana": 100,
+        "atk": [
+          80,
+          120
+        ],
+        "armor": 8,
+        "magic_resist": 30,
+        "atk_rate": 1,
+        "atk_range": 205
+      },
+      "2_star": {
+        "hp": 2000,
+        "mana": 100,
+        "atk": [
+          160,
+          240
+        ],
+        "armor": 8,
+        "magic_resist": 30,
+        "atk_rate": 1,
+        "atk_range": 205
+      },
+      "3_star": {
+        "hp": 4000,
+        "mana": 100,
+        "atk": [
+          320,
+          480
+        ],
+        "armor": 8,
+        "magic_resist": 30,
+        "atk_rate": 1,
+        "atk_range": 205
+      }
+    },
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/2ed84de8a3588d54b82671292f0494f2837140bd-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
+  },
+  "Spirit Breaker": {
+    "id": "chess_sb",
+    "cost": 1,
+    "pool": "standard",
+    "synergies": [
+      "Assassin",
+      "Tauren"
+    ],
+    "names": {
+      "en": "Spirit Breaker",
+      "lore": "Barathrum",
+      "ko": "영혼 파괴자",
+      "ru": "Spirit Breaker",
+      "zh-cn": "裂魂人",
+      "zh-tw": "裂魂人"
+    },
+    "attack_type": "melee",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 600,
+        "mana": 0,
+        "atk": [
+          40,
+          60
+        ],
+        "armor": 3,
+        "magic_resist": 0,
+        "atk_rate": 1.4,
+        "atk_range": 205
+      },
+      "2_star": {
+        "hp": 1200,
+        "mana": 0,
+        "atk": [
+          80,
+          120
+        ],
+        "armor": 3,
+        "magic_resist": 0,
+        "atk_rate": 1.4,
+        "atk_range": 205
+      },
+      "3_star": {
+        "hp": 2400,
+        "mana": 0,
+        "atk": [
+          160,
+          240
+        ],
+        "armor": 3,
+        "magic_resist": 0,
+        "atk_rate": 1.4,
+        "atk_range": 205
+      }
+    },
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/8f449e9abc766125a0140935bcf480efc0c2d97b-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
     }
   },
   "Storm Spirit": {
@@ -5426,6 +5897,11 @@
         "atk_rate": 1.4,
         "atk_range": 400
       }
+    },
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/3c4d63846e8903e020ef01ae5c7ebd7b30559e59-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
     }
   },
   "Sven": {
@@ -5483,120 +5959,11 @@
         "atk_rate": 1.6,
         "atk_range": 205
       }
-    }
-  },
-  "Templar Assassin": {
-    "id": "chess_ta",
-    "cost": 5,
-    "pool": "standard",
-    "synergies": [
-      "Assassin",
-      "Elf"
-    ],
-    "names": {
-      "en": "Templar Assassin",
-      "lore": "Lanaya",
-      "ko": "암살 기사",
-      "ru": "Templar Assassin",
-      "zh-cn": "圣堂刺客",
-      "zh-tw": "聖堂刺客"
     },
-    "attack_type": "ranged",
-    "abilities": null,
-    "stats": {
-      "1_star": {
-        "hp": 950,
-        "mana": 100,
-        "atk": [
-          90,
-          120
-        ],
-        "armor": 8,
-        "magic_resist": 0,
-        "atk_rate": 0.9,
-        "atk_range": 400
-      },
-      "2_star": {
-        "hp": 1900,
-        "mana": 100,
-        "atk": [
-          180,
-          240
-        ],
-        "armor": 8,
-        "magic_resist": 0,
-        "atk_rate": 0.9,
-        "atk_range": 400
-      },
-      "3_star": {
-        "hp": 3800,
-        "mana": 100,
-        "atk": [
-          360,
-          480
-        ],
-        "armor": 8,
-        "magic_resist": 0,
-        "atk_rate": 0.9,
-        "atk_range": 400
-      }
-    }
-  },
-  "Terrorblade": {
-    "id": "chess_tb",
-    "cost": 3,
-    "pool": "standard",
-    "synergies": [
-      "Demon",
-      "Demon Hunter"
-    ],
-    "names": {
-      "en": "Terrorblade",
-      "lore": "Terrorblade",
-      "ko": "테러블레이드",
-      "ru": "Terrorblade",
-      "zh-cn": "灵魂守卫",
-      "zh-tw": "靈魂守衛"
-    },
-    "attack_type": "melee",
-    "abilities": null,
-    "stats": {
-      "1_star": {
-        "hp": 700,
-        "mana": 100,
-        "atk": [
-          40,
-          80
-        ],
-        "armor": 5,
-        "magic_resist": 20,
-        "atk_rate": 1.1,
-        "atk_range": 205
-      },
-      "2_star": {
-        "hp": 1400,
-        "mana": 100,
-        "atk": [
-          80,
-          160
-        ],
-        "armor": 5,
-        "magic_resist": 20,
-        "atk_rate": 1.1,
-        "atk_range": 205
-      },
-      "3_star": {
-        "hp": 2800,
-        "mana": 100,
-        "atk": [
-          160,
-          320
-        ],
-        "armor": 5,
-        "magic_resist": 20,
-        "atk_rate": 1.1,
-        "atk_range": 205
-      }
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/4c63696b75726f89b61447b571aa8c1ac36b7682-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
     }
   },
   "Techies": {
@@ -5654,6 +6021,135 @@
         "atk_rate": 1.5,
         "atk_range": 600
       }
+    },
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/a2179685e7c99b59561cdad09dead42b79d128e9-30x31.webp",
+    "icon_dimensions": {
+      "height": 31,
+      "width": 30
+    }
+  },
+  "Templar Assassin": {
+    "id": "chess_ta",
+    "cost": 5,
+    "pool": "standard",
+    "synergies": [
+      "Assassin",
+      "Elf"
+    ],
+    "names": {
+      "en": "Templar Assassin",
+      "lore": "Lanaya",
+      "ko": "암살 기사",
+      "ru": "Templar Assassin",
+      "zh-cn": "圣堂刺客",
+      "zh-tw": "聖堂刺客"
+    },
+    "attack_type": "ranged",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 950,
+        "mana": 100,
+        "atk": [
+          90,
+          120
+        ],
+        "armor": 8,
+        "magic_resist": 0,
+        "atk_rate": 0.9,
+        "atk_range": 400
+      },
+      "2_star": {
+        "hp": 1900,
+        "mana": 100,
+        "atk": [
+          180,
+          240
+        ],
+        "armor": 8,
+        "magic_resist": 0,
+        "atk_rate": 0.9,
+        "atk_range": 400
+      },
+      "3_star": {
+        "hp": 3800,
+        "mana": 100,
+        "atk": [
+          360,
+          480
+        ],
+        "armor": 8,
+        "magic_resist": 0,
+        "atk_rate": 0.9,
+        "atk_range": 400
+      }
+    },
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/e64540cb15bf04235755b50963d1a3eff1c1df6f-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
+  },
+  "Terrorblade": {
+    "id": "chess_tb",
+    "cost": 3,
+    "pool": "standard",
+    "synergies": [
+      "Demon",
+      "Demon Hunter"
+    ],
+    "names": {
+      "en": "Terrorblade",
+      "lore": "Terrorblade",
+      "ko": "테러블레이드",
+      "ru": "Terrorblade",
+      "zh-cn": "灵魂守卫",
+      "zh-tw": "靈魂守衛"
+    },
+    "attack_type": "melee",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 700,
+        "mana": 100,
+        "atk": [
+          40,
+          80
+        ],
+        "armor": 5,
+        "magic_resist": 20,
+        "atk_rate": 1.1,
+        "atk_range": 205
+      },
+      "2_star": {
+        "hp": 1400,
+        "mana": 100,
+        "atk": [
+          80,
+          160
+        ],
+        "armor": 5,
+        "magic_resist": 20,
+        "atk_rate": 1.1,
+        "atk_range": 205
+      },
+      "3_star": {
+        "hp": 2800,
+        "mana": 100,
+        "atk": [
+          160,
+          320
+        ],
+        "armor": 5,
+        "magic_resist": 20,
+        "atk_rate": 1.1,
+        "atk_range": 205
+      }
+    },
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/2c5e639de7dcd21c6db73ba87222302eacc7c958-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
     }
   },
   "Tidehunter": {
@@ -5684,7 +6180,7 @@
         ],
         "armor": 10,
         "magic_resist": 15,
-        "atk_rate": 2.0,
+        "atk_rate": 2,
         "atk_range": 205
       },
       "2_star": {
@@ -5696,7 +6192,7 @@
         ],
         "armor": 10,
         "magic_resist": 15,
-        "atk_rate": 2.0,
+        "atk_rate": 2,
         "atk_range": 205
       },
       "3_star": {
@@ -5708,66 +6204,138 @@
         ],
         "armor": 10,
         "magic_resist": 15,
-        "atk_rate": 2.0,
+        "atk_rate": 2,
         "atk_range": 205
       }
+    },
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/b495408bfb7d787cd467855e7fbefea6ab568b8f-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
     }
   },
-  "Jakiro": {
-    "id": "chess_thd",
-    "cost": 5,
+  "Timbersaw": {
+    "id": "chess_shredder",
+    "cost": 2,
     "pool": "standard",
     "synergies": [
-      "Dragon",
-      "Mage"
+      "Goblin",
+      "Mech"
     ],
     "names": {
-      "en": "Jakiro",
-      "lore": "Rexxar",
-      "ko": "자키로",
-      "ru": "Jakiro",
-      "zh-cn": "双头龙",
-      "zh-tw": "雙頭龍"
+      "en": "Timbersaw",
+      "lore": "Rizzrack",
+      "ko": "벌목꾼",
+      "ru": "Timbersaw",
+      "zh-cn": "伐木机",
+      "zh-tw": "伐木機"
+    },
+    "attack_type": "melee",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 750,
+        "mana": 100,
+        "atk": [
+          55,
+          60
+        ],
+        "armor": 7,
+        "magic_resist": 0,
+        "atk_rate": 1.4,
+        "atk_range": 205
+      },
+      "2_star": {
+        "hp": 1500,
+        "mana": 100,
+        "atk": [
+          110,
+          120
+        ],
+        "armor": 7,
+        "magic_resist": 0,
+        "atk_rate": 1.4,
+        "atk_range": 205
+      },
+      "3_star": {
+        "hp": 3000,
+        "mana": 100,
+        "atk": [
+          220,
+          240
+        ],
+        "armor": 7,
+        "magic_resist": 0,
+        "atk_rate": 1.4,
+        "atk_range": 205
+      }
+    },
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/7ee2b054b762063b927adff9d448741ee6109667-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
+  },
+  "Tinker": {
+    "id": "chess_tk",
+    "cost": 1,
+    "pool": "standard",
+    "synergies": [
+      "Goblin",
+      "Mech"
+    ],
+    "names": {
+      "en": "Tinker",
+      "lore": "Boush",
+      "ko": "땜장이",
+      "ru": "Tinker",
+      "zh-cn": "修补匠",
+      "zh-tw": "修補匠"
     },
     "attack_type": "ranged",
     "abilities": null,
     "stats": {
       "1_star": {
+        "hp": 500,
+        "mana": 100,
+        "atk": [
+          40,
+          50
+        ],
+        "armor": 3,
+        "magic_resist": 0,
+        "atk_rate": 1.5,
+        "atk_range": 600
+      },
+      "2_star": {
         "hp": 1000,
         "mana": 100,
         "atk": [
-          30,
+          80,
           100
         ],
-        "armor": 9,
-        "magic_resist": 20,
-        "atk_rate": 1.3,
-        "atk_range": 400
+        "armor": 3,
+        "magic_resist": 0,
+        "atk_rate": 1.5,
+        "atk_range": 600
       },
-      "2_star": {
+      "3_star": {
         "hp": 2000,
         "mana": 100,
         "atk": [
-          60,
+          160,
           200
         ],
-        "armor": 9,
-        "magic_resist": 20,
-        "atk_rate": 1.3,
-        "atk_range": 400
-      },
-      "3_star": {
-        "hp": 4000,
-        "mana": 100,
-        "atk": [
-          120,
-          400
-        ],
-        "armor": 9,
-        "magic_resist": 20,
-        "atk_rate": 1.3,
-        "atk_range": 400
+        "armor": 3,
+        "magic_resist": 0,
+        "atk_rate": 1.5,
+        "atk_range": 600
       }
+    },
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/ae119568a9faca49a5670d92825afe4f371bbc73-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
     }
   },
   "Tiny": {
@@ -5831,63 +6399,11 @@
         "atk_rate": 1.9,
         "atk_range": 205
       }
-    }
-  },
-  "Tinker": {
-    "id": "chess_tk",
-    "cost": 1,
-    "pool": "standard",
-    "synergies": [
-      "Goblin",
-      "Mech"
-    ],
-    "names": {
-      "en": "Tinker",
-      "lore": "Boush",
-      "ko": "땜장이",
-      "ru": "Tinker",
-      "zh-cn": "修补匠",
-      "zh-tw": "修補匠"
     },
-    "attack_type": "ranged",
-    "abilities": null,
-    "stats": {
-      "1_star": {
-        "hp": 500,
-        "mana": 100,
-        "atk": [
-          40,
-          50
-        ],
-        "armor": 3,
-        "magic_resist": 0,
-        "atk_rate": 1.5,
-        "atk_range": 600
-      },
-      "2_star": {
-        "hp": 1000,
-        "mana": 100,
-        "atk": [
-          80,
-          100
-        ],
-        "armor": 3,
-        "magic_resist": 0,
-        "atk_rate": 1.5,
-        "atk_range": 600
-      },
-      "3_star": {
-        "hp": 2000,
-        "mana": 100,
-        "atk": [
-          160,
-          200
-        ],
-        "armor": 3,
-        "magic_resist": 0,
-        "atk_rate": 1.5,
-        "atk_range": 600
-      }
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/d6a16a6cd69cf6d49152919e7772c24d1c6f62fc-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
     }
   },
   "Treant Protector": {
@@ -5918,7 +6434,7 @@
         ],
         "armor": 5,
         "magic_resist": 0,
-        "atk_rate": 2.0,
+        "atk_rate": 2,
         "atk_range": 205
       },
       "2_star": {
@@ -5930,7 +6446,7 @@
         ],
         "armor": 5,
         "magic_resist": 0,
-        "atk_rate": 2.0,
+        "atk_rate": 2,
         "atk_range": 205
       },
       "3_star": {
@@ -5942,9 +6458,14 @@
         ],
         "armor": 5,
         "magic_resist": 0,
-        "atk_rate": 2.0,
+        "atk_rate": 2,
         "atk_range": 205
       }
+    },
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/f2d97f40f9a04c2063e5fe5311158c37bd08130a-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
     }
   },
   "Troll Warlord": {
@@ -6002,64 +6523,11 @@
         "atk_rate": 0.8,
         "atk_range": 400
       }
-    }
-  },
-  "Leshrac": {
-    "id": "chess_ts",
-    "cost": 5,
-    "pool": "standard",
-    "synergies": [
-      "Centaur",
-      "Druid",
-      "God"
-    ],
-    "names": {
-      "en": "Leshrac",
-      "lore": "Leshrac",
-      "ko": "레슈락",
-      "ru": "Leshrac",
-      "zh-cn": "受折磨的灵魂",
-      "zh-tw": "受折磨的靈魂"
     },
-    "attack_type": "ranged",
-    "abilities": null,
-    "stats": {
-      "1_star": {
-        "hp": 900,
-        "mana": 100,
-        "atk": [
-          60,
-          110
-        ],
-        "armor": 6,
-        "magic_resist": 20,
-        "atk_rate": 1.2,
-        "atk_range": 400
-      },
-      "2_star": {
-        "hp": 1800,
-        "mana": 100,
-        "atk": [
-          120,
-          220
-        ],
-        "armor": 6,
-        "magic_resist": 20,
-        "atk_rate": 1.2,
-        "atk_range": 400
-      },
-      "3_star": {
-        "hp": 3150,
-        "mana": 100,
-        "atk": [
-          240,
-          440
-        ],
-        "armor": 6,
-        "magic_resist": 20,
-        "atk_rate": 1.2,
-        "atk_range": 400
-      }
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/4a32ba4677b2ba941cbb2f9fd3e67b19eefec788-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
     }
   },
   "Tusk": {
@@ -6117,6 +6585,11 @@
         "atk_rate": 1.2,
         "atk_range": 205
       }
+    },
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/4bf20c1328a96a3456ea469f7cb6152485f55c3a-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
     }
   },
   "Undying": {
@@ -6174,178 +6647,11 @@
         "atk_rate": 1.7,
         "atk_range": 205
       }
-    }
-  },
-  "Venomancer": {
-    "id": "chess_veno",
-    "cost": 3,
-    "pool": "standard",
-    "synergies": [
-      "Aqir",
-      "Beast",
-      "Warlock"
-    ],
-    "names": {
-      "en": "Venomancer",
-      "lore": "Lesale",
-      "ko": "맹독사",
-      "ru": "Venomancer",
-      "zh-cn": "剧毒术士",
-      "zh-tw": "劇毒術士"
     },
-    "attack_type": "ranged",
-    "abilities": null,
-    "stats": {
-      "1_star": {
-        "hp": 550,
-        "mana": 100,
-        "atk": [
-          50,
-          60
-        ],
-        "armor": 4,
-        "magic_resist": 30,
-        "atk_rate": 1.2,
-        "atk_range": 400
-      },
-      "2_star": {
-        "hp": 1100,
-        "mana": 100,
-        "atk": [
-          100,
-          120
-        ],
-        "armor": 4,
-        "magic_resist": 30,
-        "atk_rate": 1.2,
-        "atk_range": 400
-      },
-      "3_star": {
-        "hp": 2200,
-        "mana": 100,
-        "atk": [
-          200,
-          240
-        ],
-        "armor": 4,
-        "magic_resist": 30,
-        "atk_rate": 1.2,
-        "atk_range": 400
-      }
-    }
-  },
-  "Viper": {
-    "id": "chess_viper",
-    "cost": 3,
-    "pool": "standard",
-    "synergies": [
-      "Assassin",
-      "Dragon"
-    ],
-    "names": {
-      "en": "Viper",
-      "lore": "Viper",
-      "ko": "바이퍼",
-      "ru": "Viper",
-      "zh-cn": "冥界亚龙",
-      "zh-tw": "冥界亞龍"
-    },
-    "attack_type": "ranged",
-    "abilities": null,
-    "stats": {
-      "1_star": {
-        "hp": 650,
-        "mana": 100,
-        "atk": [
-          50,
-          60
-        ],
-        "armor": 6,
-        "magic_resist": 0,
-        "atk_rate": 1.0,
-        "atk_range": 400
-      },
-      "2_star": {
-        "hp": 1300,
-        "mana": 100,
-        "atk": [
-          100,
-          120
-        ],
-        "armor": 6,
-        "magic_resist": 0,
-        "atk_rate": 1.0,
-        "atk_range": 400
-      },
-      "3_star": {
-        "hp": 2600,
-        "mana": 100,
-        "atk": [
-          200,
-          240
-        ],
-        "armor": 6,
-        "magic_resist": 0,
-        "atk_rate": 1.0,
-        "atk_range": 400
-      }
-    }
-  },
-  "Void Spirit": {
-    "id": "chess_void",
-    "cost": 4,
-    "pool": "special",
-    "synergies": [
-      "Monk",
-      "Pandaren"
-    ],
-    "names": {
-      "en": "Void Spirit",
-      "lore": "Inai",
-      "ko": "공허령",
-      "ru": "Void Spirit",
-      "zh-cn": "虚无之灵",
-      "zh-tw": "虛無之靈"
-    },
-    "attack_type": "melee",
-    "abilities": null,
-    "stats": {
-      "1_star": {
-        "hp": 750,
-        "mana": 100,
-        "atk": [
-          60,
-          70
-        ],
-        "armor": 4,
-        "magic_resist": 0,
-        "atk_rate": 1.3,
-        "atk_range": 205
-      },
-      "2_star": {
-        "hp": 1500,
-        "mana": 100,
-        "atk": [
-          120,
-          140
-        ],
-        "armor": 4,
-        "magic_resist": 0,
-        "atk_rate": 1.3,
-        "atk_range": 205
-      },
-      "3_star": {
-        "hp": 3000,
-        "mana": 100,
-        "atk": [
-          240,
-          280
-        ],
-        "armor": 4,
-        "magic_resist": 0,
-        "atk_rate": 1.3,
-        "atk_range": 205
-      }
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/a089bafd196e317a03abefbe7773b01267e70ad5-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
     }
   },
   "Vengeful Spirit": {
@@ -6404,23 +6710,29 @@
         "atk_rate": 1.3,
         "atk_range": 400
       }
+    },
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/b30aa9f812f9eae1a0e257794fc58725c797365e-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
     }
   },
-  "Witch Doctor": {
-    "id": "chess_wd",
-    "cost": 1,
+  "Venomancer": {
+    "id": "chess_veno",
+    "cost": 3,
     "pool": "standard",
     "synergies": [
-      "Troll",
+      "Aqir",
+      "Beast",
       "Warlock"
     ],
     "names": {
-      "en": "Witch Doctor",
-      "lore": "Zharvakko",
-      "ko": "저주술사",
-      "ru": "Witch Doctor",
-      "zh-cn": "巫医",
-      "zh-tw": "巫醫"
+      "en": "Venomancer",
+      "lore": "Lesale",
+      "ko": "맹독사",
+      "ru": "Venomancer",
+      "zh-cn": "剧毒术士",
+      "zh-tw": "劇毒術士"
     },
     "attack_type": "ranged",
     "abilities": null,
@@ -6429,38 +6741,167 @@
         "hp": 550,
         "mana": 100,
         "atk": [
-          40,
-          50
+          50,
+          60
         ],
-        "armor": 0,
-        "magic_resist": 10,
-        "atk_rate": 1.5,
+        "armor": 4,
+        "magic_resist": 30,
+        "atk_rate": 1.2,
         "atk_range": 400
       },
       "2_star": {
         "hp": 1100,
         "mana": 100,
         "atk": [
-          80,
-          100
+          100,
+          120
         ],
-        "armor": 0,
-        "magic_resist": 10,
-        "atk_rate": 1.5,
+        "armor": 4,
+        "magic_resist": 30,
+        "atk_rate": 1.2,
         "atk_range": 400
       },
       "3_star": {
         "hp": 2200,
         "mana": 100,
         "atk": [
-          160,
-          200
+          200,
+          240
         ],
-        "armor": 0,
-        "magic_resist": 10,
-        "atk_rate": 1.5,
+        "armor": 4,
+        "magic_resist": 30,
+        "atk_rate": 1.2,
         "atk_range": 400
       }
+    },
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/28708d2bee9ecf7e000d5412e6e6aa2323fff3ca-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
+  },
+  "Viper": {
+    "id": "chess_viper",
+    "cost": 3,
+    "pool": "standard",
+    "synergies": [
+      "Assassin",
+      "Dragon"
+    ],
+    "names": {
+      "en": "Viper",
+      "lore": "Viper",
+      "ko": "바이퍼",
+      "ru": "Viper",
+      "zh-cn": "冥界亚龙",
+      "zh-tw": "冥界亞龍"
+    },
+    "attack_type": "ranged",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 650,
+        "mana": 100,
+        "atk": [
+          50,
+          60
+        ],
+        "armor": 6,
+        "magic_resist": 0,
+        "atk_rate": 1,
+        "atk_range": 400
+      },
+      "2_star": {
+        "hp": 1300,
+        "mana": 100,
+        "atk": [
+          100,
+          120
+        ],
+        "armor": 6,
+        "magic_resist": 0,
+        "atk_rate": 1,
+        "atk_range": 400
+      },
+      "3_star": {
+        "hp": 2600,
+        "mana": 100,
+        "atk": [
+          200,
+          240
+        ],
+        "armor": 6,
+        "magic_resist": 0,
+        "atk_rate": 1,
+        "atk_range": 400
+      }
+    },
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/061b5664cfd249bda8e79b8274ff82fdbc2b711e-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
+  },
+  "Void Spirit": {
+    "id": "chess_void",
+    "cost": 4,
+    "pool": "special",
+    "synergies": [
+      "Monk",
+      "Pandaren"
+    ],
+    "names": {
+      "en": "Void Spirit",
+      "lore": "Inai",
+      "ko": "공허령",
+      "ru": "Void Spirit",
+      "zh-cn": "虚无之灵",
+      "zh-tw": "虛無之靈"
+    },
+    "attack_type": "melee",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 750,
+        "mana": 100,
+        "atk": [
+          60,
+          70
+        ],
+        "armor": 4,
+        "magic_resist": 0,
+        "atk_rate": 1.3,
+        "atk_range": 205
+      },
+      "2_star": {
+        "hp": 1500,
+        "mana": 100,
+        "atk": [
+          120,
+          140
+        ],
+        "armor": 4,
+        "magic_resist": 0,
+        "atk_rate": 1.3,
+        "atk_range": 205
+      },
+      "3_star": {
+        "hp": 3000,
+        "mana": 100,
+        "atk": [
+          240,
+          280
+        ],
+        "armor": 4,
+        "magic_resist": 0,
+        "atk_rate": 1.3,
+        "atk_range": 205
+      }
+    },
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/9a02f29f1c2f26e1d106733fa02e6c13d9b94116-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
     }
   },
   "Warlock": {
@@ -6518,6 +6959,11 @@
         "atk_rate": 1.5,
         "atk_range": 600
       }
+    },
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/8caa421c1d755c1775d2920d16d7b96f235e2856-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
     }
   },
   "Windranger": {
@@ -6548,7 +6994,7 @@
         ],
         "armor": 3,
         "magic_resist": 0,
-        "atk_rate": 1.0,
+        "atk_rate": 1,
         "atk_range": 600
       },
       "2_star": {
@@ -6560,7 +7006,7 @@
         ],
         "armor": 3,
         "magic_resist": 0,
-        "atk_rate": 1.0,
+        "atk_rate": 1,
         "atk_range": 600
       },
       "3_star": {
@@ -6572,9 +7018,14 @@
         ],
         "armor": 3,
         "magic_resist": 0,
-        "atk_rate": 1.0,
+        "atk_rate": 1,
         "atk_range": 600
       }
+    },
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/4ac624506f5685159b7efc8c0d214c509b070a27-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
     }
   },
   "Winter Wyvern": {
@@ -6633,6 +7084,135 @@
         "atk_rate": 1.4,
         "atk_range": 400
       }
+    },
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/e92dacb9af08a3ce9e2774dbf2a2efdced0403bd-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
+  },
+  "Witch Doctor": {
+    "id": "chess_wd",
+    "cost": 1,
+    "pool": "standard",
+    "synergies": [
+      "Troll",
+      "Warlock"
+    ],
+    "names": {
+      "en": "Witch Doctor",
+      "lore": "Zharvakko",
+      "ko": "저주술사",
+      "ru": "Witch Doctor",
+      "zh-cn": "巫医",
+      "zh-tw": "巫醫"
+    },
+    "attack_type": "ranged",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 550,
+        "mana": 100,
+        "atk": [
+          40,
+          50
+        ],
+        "armor": 0,
+        "magic_resist": 10,
+        "atk_rate": 1.5,
+        "atk_range": 400
+      },
+      "2_star": {
+        "hp": 1100,
+        "mana": 100,
+        "atk": [
+          80,
+          100
+        ],
+        "armor": 0,
+        "magic_resist": 10,
+        "atk_rate": 1.5,
+        "atk_range": 400
+      },
+      "3_star": {
+        "hp": 2200,
+        "mana": 100,
+        "atk": [
+          160,
+          200
+        ],
+        "armor": 0,
+        "magic_resist": 10,
+        "atk_rate": 1.5,
+        "atk_range": 400
+      }
+    },
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/3483f1db5c8d5a0705e2d76dc18c8248eb66cc6b-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
+  },
+  "Wraith King": {
+    "id": "chess_snk",
+    "cost": 5,
+    "pool": "undead",
+    "synergies": [
+      "Undead",
+      "Warrior"
+    ],
+    "names": {
+      "en": "Wraith King",
+      "lore": "King۰Ostarion",
+      "ko": "망령 제왕",
+      "ru": "Wraith King",
+      "zh-cn": "冥魂大帝",
+      "zh-tw": "冥魂大帝"
+    },
+    "attack_type": "melee",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 1300,
+        "mana": 0,
+        "atk": [
+          150,
+          200
+        ],
+        "armor": 10,
+        "magic_resist": 20,
+        "atk_rate": 1.7,
+        "atk_range": 205
+      },
+      "2_star": {
+        "hp": 2600,
+        "mana": 0,
+        "atk": [
+          300,
+          400
+        ],
+        "armor": 10,
+        "magic_resist": 20,
+        "atk_rate": 1.7,
+        "atk_range": 205
+      },
+      "3_star": {
+        "hp": 5200,
+        "mana": 0,
+        "atk": [
+          600,
+          800
+        ],
+        "armor": 10,
+        "magic_resist": 20,
+        "atk_rate": 1.7,
+        "atk_range": 205
+      }
+    },
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/01a9044cadf47b16c789844312203848dbba287e-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
     }
   },
   "Zeus": {
@@ -6690,6 +7270,11 @@
         "atk_rate": 1.4,
         "atk_range": 400
       }
+    },
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/75ed01b3075b57b2e6ada13002708207a5a921c9-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
     }
   }
 }

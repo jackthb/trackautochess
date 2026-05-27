@@ -123,7 +123,9 @@
         {
           "kind": "change",
           "name": "Giant's Ring",
-          "detail": "Blocks 100 damage instead of 120 damage, and +30 HP regen"
+          "detail": "Blocks 100 damage instead of 120 damage, and +30 HP regen",
+          "entity_type": "item",
+          "entity_slug": "giants-ring"
         },
         {
           "kind": "nerf",

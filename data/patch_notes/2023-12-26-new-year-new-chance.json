@@ -47,7 +47,9 @@
         {
           "kind": "rework",
           "name": "Giant's Ring",
-          "detail": "Upgraded from T2 to T4. Reworked Effect: Physical Block +60. Permanent Taunt."
+          "detail": "Upgraded from T2 to T4. Reworked Effect: Physical Block +60. Permanent Taunt.",
+          "entity_type": "item",
+          "entity_slug": "giants-ring"
         },
         {
           "kind": "change",

@@ -683,11 +683,7 @@
         "height": 62,
         "width": 85
       }
-    },
-    "Kobold Cup": {
-      "tier": 3,
-      "icon": "kobold_cup.png"
     }
   },
-  "total": 77
+  "total": 76
 }

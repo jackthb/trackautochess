@@ -141,7 +141,9 @@
         {
           "kind": "buff",
           "name": "Vladimir's Offering",
-          "detail": "Lifesteal percentage increased from 15% to 20%."
+          "detail": "Lifesteal percentage increased from 15% to 20%.",
+          "entity_type": "item",
+          "entity_slug": "vladimirs-offering"
         },
         {
           "kind": "nerf",
