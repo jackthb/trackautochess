@@ -189,6 +189,12 @@
         "width": 85
       }
     },
+    "Kobold Cup": {
+      "tier": 3,
+      "icon": "kobold_cup.png",
+      "icon_url": null,
+      "icon_dimensions": null
+    },
     "Minotaur Horn": {
       "tier": 4,
       "icon": "minotaur_horn.png",
@@ -353,7 +359,9 @@
     },
     "Necronomicon": {
       "tier": 4,
-      "icon": "necronomicon.png"
+      "icon": "necronomicon.png",
+      "icon_url": null,
+      "icon_dimensions": null
     },
     "Bottle": {
       "tier": 2,
@@ -678,10 +686,6 @@
         "height": 62,
         "width": 85
       }
-    },
-    "Kobold Cup": {
-      "tier": 3,
-      "icon": "kobold_cup.png"
     }
   },
   "total": 77
