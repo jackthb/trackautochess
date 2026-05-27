@@ -774,6 +774,16 @@
       "ru": "From: Golden Heart of the Machine"
     }
   },
+  "item_goutourenjiubei": {
+    "name": "Kobold Cup",
+    "description": "Carrier counts as \nKobold.\nThe carrier and pieces of the same name gain +25% attack speed, inheritable after shapeshift.",
+    "lore": "King of the Kobold enjoys drinking.",
+    "quality": "common",
+    "texture": "kobold_cup",
+    "notes": [],
+    "icon_url": null,
+    "icon_dimensions": null
+  },
   "item_gulonghaojiao": {
     "name": "Minotaur Horn",
     "description": "Carrier counts as Dragon and has 100 initial mana.",

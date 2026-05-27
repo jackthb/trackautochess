@@ -126,6 +126,12 @@
       "icon_url": null,
       "icon_dimensions": null
     },
+    "Kobold Cup": {
+      "tier": 3,
+      "icon": "kobold_cup.png",
+      "icon_url": null,
+      "icon_dimensions": null
+    },
     "Minotaur Horn": {
       "tier": 4,
       "icon": "minotaur_horn.png",
@@ -457,5 +463,5 @@
       "icon_dimensions": null
     }
   },
-  "total": 76
+  "total": 77
 }

@@ -47,7 +47,9 @@
         {
           "kind": "added",
           "name": "Kobold Cup",
-          "detail": "New T3 item added."
+          "detail": "New T3 item added.",
+          "entity_type": "item",
+          "entity_slug": "kobold-cup"
         },
         {
           "kind": "nerf",
