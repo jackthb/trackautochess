@@ -410,17 +410,17 @@ export default function PatchDetailPage({
           border-radius: var(--r-4);
           background: var(--bg-deep);
         }
-        .entry-name {
+        :global(.entry-name) {
           font-size: var(--fs-14);
           color: var(--text-primary);
           font-weight: var(--fw-medium);
         }
-        .entry-link {
+        :global(.entry-link) {
           text-decoration: underline;
           text-underline-offset: 2px;
           transition: color var(--t-base) var(--t-easing);
         }
-        .entry-link:hover {
+        :global(.entry-link:hover) {
           color: var(--accent-dim);
         }
         .entry-tooltip {

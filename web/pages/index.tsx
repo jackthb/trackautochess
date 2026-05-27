@@ -92,7 +92,7 @@ export default function Home({ initialSearchResults }: HomeProps) {
           display: flex;
           flex-direction: column;
         }
-        .banner {
+        :global(.banner) {
           display: flex;
           align-items: center;
           justify-content: center;
@@ -103,10 +103,10 @@ export default function Home({ initialSearchResults }: HomeProps) {
           text-decoration: none;
           transition: background 0.15s ease;
         }
-        .banner:hover {
+        :global(.banner:hover) {
           background: var(--bg-elevated);
         }
-        .banner-tag {
+        :global(.banner) .banner-tag {
           font-size: 11px;
           font-weight: 600;
           letter-spacing: 1.5px;
@@ -114,21 +114,21 @@ export default function Home({ initialSearchResults }: HomeProps) {
           color: var(--accent);
           flex-shrink: 0;
         }
-        .banner-text {
+        :global(.banner) .banner-text {
           font-size: 13px;
           color: var(--text-secondary);
         }
-        .banner-arrow {
+        :global(.banner) .banner-arrow {
           font-size: 13px;
           color: var(--text-muted);
           flex-shrink: 0;
         }
         @media (max-width: 620px) {
-          .banner {
+          :global(.banner) {
             gap: 8px;
             padding: 10px 14px;
           }
-          .banner-text {
+          :global(.banner) .banner-text {
             font-size: 12px;
           }
         }
@@ -351,14 +351,12 @@ export default function Home({ initialSearchResults }: HomeProps) {
 
       <div className="page">
         {Date.now() < new Date("2026-06-15").getTime() && (
-          <Link legacyBehavior href="/patch-notes/2026-05-24-rebalance-patch">
-            <a className="banner">
-              <span className="banner-tag">NEW PATCH</span>
-              <span className="banner-text">
-                Kobold rework, Monk &amp; Mech (6), new Kobold Cup — read patch notes
-              </span>
-              <span className="banner-arrow">&rarr;</span>
-            </a>
+          <Link href="/patch-notes/2026-05-24-rebalance-patch" className="banner">
+            <span className="banner-tag">NEW PATCH</span>
+            <span className="banner-text">
+              Kobold rework, Monk &amp; Mech (6), new Kobold Cup — read patch notes
+            </span>
+            <span className="banner-arrow">&rarr;</span>
           </Link>
         )}
         <div className="hero">
