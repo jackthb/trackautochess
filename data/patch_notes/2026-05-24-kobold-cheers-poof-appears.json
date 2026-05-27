@@ -1,0 +1,78 @@
+{
+  "date": "2026-05-24",
+  "title": "Kobold cheers, poof appears",
+  "source": "https://docs.google.com/document/d/e/2PACX-1vRvaFljxcYvhGz83r7cdIZjA91fberUVZd4bhXkKpZtK9rx16gNxnCa1-wJU_bomu3ama5QdNZUh4Nf/pub",
+  "workshop_url": "https://steamcommunity.com/sharedfiles/filedetails/changelog/1613886175",
+  "sections": [
+    {
+      "heading": "Synergy Changes",
+      "entries": [
+        {
+          "kind": "change",
+          "name": "Kobold - Divided We Stand",
+          "detail": "Reworked from (1)(2)(3) to (2)(4)"
+        },
+        {
+          "kind": "new",
+          "name": "Monk - Drunken Stagger",
+          "detail": "(6) Added"
+        },
+        {
+          "kind": "buff",
+          "name": "Naga - Scaled Armor",
+          "detail": "(6) Reflection multiplier increased from 1.5x to 2x"
+        }
+      ]
+    },
+    {
+      "heading": "Chess Pieces",
+      "entries": [
+        {
+          "kind": "change",
+          "name": "Life Stealer($2,Kobold/Warlock)",
+          "detail": "Class changed from Wizard to Warlock"
+        },
+        {
+          "kind": "nerf",
+          "name": "Phoenix - Sun Ray",
+          "detail": "Base damage decreased from 100/150/250 to 为70/140/210"
+        },
+        {
+          "kind": "nerf",
+          "name": "Nyx Assassin - Spiked Carapace",
+          "detail": "CD balanced from 8/7/5s to 6/6/6s, stun duration decreased from 1.5/2.5/3.5s to 1/2/3s"
+        }
+      ]
+    },
+    {
+      "heading": "Items",
+      "entries": [
+        {
+          "kind": "new",
+          "name": "New T3 item",
+          "detail": "Kobold Cup"
+        },
+        {
+          "kind": "nerf",
+          "name": "Drum of Endurance",
+          "detail": "Downgraded from T3 to T2."
+        },
+        {
+          "kind": "nerf",
+          "name": "Princes Knife",
+          "detail": "Downgraded from T2 to T1."
+        }
+      ]
+    },
+    {
+      "heading": "Relics",
+      "entries": [
+        {
+          "kind": "change",
+          "name": "Lucid Star",
+          "detail": "Chances will be 24%/22%/20%/18%/16% according to the cost of $1/2/3/4/5."
+        }
+      ]
+    }
+  ]
+}

@@ -1,9 +1,24 @@
 {
   "patches": [
     {
-      "date": "2026-05-24",
+      "date": "2026-05-25",
       "title": "Rebalance Patch",
-      "slug": "2026-05-24-rebalance-patch"
+      "slug": "2026-05-25-rebalance-patch"
+    },
+    {
+      "date": "2026-05-24",
+      "title": "Kobold cheers, poof appears",
+      "slug": "2026-05-24-kobold-cheers-poof-appears"
+    },
+    {
+      "date": "2026-04-30",
+      "title": "Rebalance Patch",
+      "slug": "2026-04-30-rebalance-patch"
+    },
+    {
+      "date": "2026-04-21",
+      "title": "Rebalance Patch",
+      "slug": "2026-04-21-rebalance-patch"
     },
     {
       "date": "2026-04-29",

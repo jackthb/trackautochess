@@ -351,7 +351,7 @@ export default function Home({ initialSearchResults }: HomeProps) {
 
       <div className="page">
         {Date.now() < new Date("2026-06-15").getTime() && (
-          <Link href="/patch-notes/2026-05-24-rebalance-patch" className="banner">
+          <Link href="/patch-notes/2026-05-24-kobold-cheers-poof-appears" className="banner">
             <span className="banner-tag">NEW PATCH</span>
             <span className="banner-text">
               Kobold rework, Monk &amp; Mech (6), new Kobold Cup — read patch notes
