@@ -353,12 +353,7 @@
     },
     "Necronomicon": {
       "tier": 4,
-      "icon": "necronomicon.png",
-      "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/275ac231c23bbaa9f3bfd7f0f7ce859b02c2f386-85x64.png",
-      "icon_dimensions": {
-        "height": 64,
-        "width": 85
-      }
+      "icon": "necronomicon.png"
     },
     "Bottle": {
       "tier": 2,
