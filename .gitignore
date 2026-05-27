@@ -41,3 +41,5 @@ cms/.sanity/
 cms/dist/
 
 .vercel
+twitch-extension.zip
+twitch-extension/
