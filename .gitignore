@@ -39,3 +39,5 @@ cms/node_modules/
 cms/.env
 cms/.sanity/
 cms/dist/
+
+.vercel
