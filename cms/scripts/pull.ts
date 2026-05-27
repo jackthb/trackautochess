@@ -106,10 +106,27 @@ function localizedNamesToJson(
   return Object.keys(map).length > 0 ? map : undefined
 }
 
-function iconFields(r: any): {icon_url: string | null; icon_dimensions: {width: number; height: number} | null} {
+function iconFields(r: any, existing?: {icon_url?: string | null; icon_dimensions?: {width: number; height: number} | null}): {icon_url: string | null; icon_dimensions: {width: number; height: number} | null} {
   return {
-    icon_url: r.icon_url ?? null,
-    icon_dimensions: r.icon_dimensions ?? null,
+    icon_url: r.icon_url ?? existing?.icon_url ?? null,
+    icon_dimensions: r.icon_dimensions ?? existing?.icon_dimensions ?? null,
+  }
+}
+
+function readExistingIcons(filename: string, innerKey: string | null = null): Map<string, {icon_url?: string | null; icon_dimensions?: any}> {
+  try {
+    const raw = fs.readFileSync(path.join(DATA_DIR, filename), 'utf-8')
+    const parsed = JSON.parse(raw)
+    const records: Record<string, any> = innerKey ? parsed?.[innerKey] ?? {} : parsed
+    const out = new Map<string, {icon_url?: string | null; icon_dimensions?: any}>()
+    for (const [id, rec] of Object.entries(records)) {
+      if (rec?.icon_url || rec?.icon_dimensions) {
+        out.set(id, {icon_url: rec.icon_url, icon_dimensions: rec.icon_dimensions})
+      }
+    }
+    return out
+  } catch {
+    return new Map()
   }
 }
 
@@ -123,6 +140,7 @@ async function pullSynergies() {
     }`,
   )
   const i18n = readExistingI18n('synergies.json')
+  const existingSynIcons = readExistingIcons('synergies.json')
   const out: Record<string, any> = {}
   for (const r of rows) {
     const sanityNames = localizedNamesToJson(r.names)
@@ -135,13 +153,10 @@ async function pullSynergies() {
         notes: r.notes ?? [],
         tiers: r.tiers ?? [],
         ability_special: r.abilitySpecial ? JSON.parse(r.abilitySpecial) : {},
-        ...iconFields(r),
+        ...iconFields(r, existingSynIcons.get(r.gameId)),
       },
       i18n.get(r.gameId),
     )
-    // `names` is now Sanity-authoritative. Override whatever applyI18n
-    // re-attached from existing JSON, since editor overrides only apply
-    // through Sanity's nameOverrides field.
     if (sanityNames) merged.names = sanityNames
     out[r.gameId] = merged
   }
@@ -157,11 +172,14 @@ async function pullUnits() {
       ${ICON_PROJECTION}
     }`,
   )
+  const existingUnitIcons = readExistingIcons('units.json', 'units')
+  const existingFullIcons = readExistingIcons('units_full.json')
   const simple: Record<string, any> = {}
   const full: Record<string, any> = {}
   for (const r of rows) {
     const localizedNames = localizedNamesToJson(r.names)
-    const icon = iconFields(r)
+    const icon = iconFields(r, existingUnitIcons.get(r.name))
+    const fullIcon = iconFields(r, existingFullIcons.get(r.name))
     simple[r.name] = {
       cost: r.cost,
       pool: r.pool,
@@ -184,7 +202,7 @@ async function pullUnits() {
             '3_star': statBlock(r.stats.star3),
           }
         : undefined,
-      ...icon,
+      ...fullIcon,
     }
   }
   // Preserve top-level `aliases` from the existing units.json. Aliases are a
@@ -267,10 +285,12 @@ async function pullItems() {
     }`,
   )
   const i18n = readExistingI18n('items_full.json')
+  const existingFullIcons = readExistingIcons('items_full.json')
+  const existingCuratedIcons = readExistingIcons('items.json', 'items')
   const full: Record<string, any> = {}
   const curated: Record<string, any> = {}
   for (const r of rows) {
-    const icon = iconFields(r)
+    const fullIcon = iconFields(r, existingFullIcons.get(r.gameId))
     const sanityNames = localizedNamesToJson(r.names)
     const merged = applyI18n(
       {
@@ -280,7 +300,7 @@ async function pullItems() {
         quality: r.quality ?? '',
         texture: r.texture ?? '',
         notes: r.notes ?? [],
-        ...icon,
+        ...fullIcon,
       },
       i18n.get(r.gameId),
     )
@@ -290,7 +310,7 @@ async function pullItems() {
       curated[r.name] = {
         tier: r.tier,
         icon: r.iconFile ?? '',
-        ...icon,
+        ...iconFields(r, existingCuratedIcons.get(r.name)),
       }
     }
   }

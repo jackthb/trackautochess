@@ -55,8 +55,11 @@
         "atk_range": 205
       }
     },
-    "icon_url": null,
-    "icon_dimensions": null
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/d9b34bf31475241a19cfc6b709b8f0b9f1bed053-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
   },
   "Abyssal Underlord": {
     "id": "chess_au",
@@ -114,8 +117,11 @@
         "atk_range": 205
       }
     },
-    "icon_url": null,
-    "icon_dimensions": null
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/f3ca51857b82995c2a4fe8b2f562ca819daba60a-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
   },
   "Alchemist": {
     "id": "chess_ga",
@@ -174,8 +180,11 @@
         "atk_range": 205
       }
     },
-    "icon_url": null,
-    "icon_dimensions": null
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/addbc7badf2ea384583461c06b46b0819e2fc53b-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
   },
   "Ancient Apparition": {
     "id": "chess_aa",
@@ -233,8 +242,11 @@
         "atk_range": 800
       }
     },
-    "icon_url": null,
-    "icon_dimensions": null
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/c6db974ebde64b3b41fb087a10522ad9327ccf6e-32x32.png",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
   },
   "Anti-mage": {
     "id": "chess_am",
@@ -292,8 +304,11 @@
         "atk_range": 205
       }
     },
-    "icon_url": null,
-    "icon_dimensions": null
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/a41b66b26028f2540928b2981ddb6dd4f27023ed-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
   },
   "Arc Warden": {
     "id": "chess_aw",
@@ -351,8 +366,11 @@
         "atk_range": 600
       }
     },
-    "icon_url": null,
-    "icon_dimensions": null
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/21a23bdee1dc9269a868768e1e0c0bc4499c9757-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
   },
   "Axe": {
     "id": "chess_axe",
@@ -410,8 +428,11 @@
         "atk_range": 205
       }
     },
-    "icon_url": null,
-    "icon_dimensions": null
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/716038c97dd65c3f57bba3af11bfbaf51a41fef0-30x30.webp",
+    "icon_dimensions": {
+      "height": 30,
+      "width": 30
+    }
   },
   "Bane": {
     "id": "chess_bane",
@@ -470,8 +491,11 @@
         "atk_range": 400
       }
     },
-    "icon_url": null,
-    "icon_dimensions": null
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/63661b1d4fa73859974e7038b2e0f2b17723c42b-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
   },
   "Batrider": {
     "id": "chess_bat",
@@ -529,8 +553,11 @@
         "atk_range": 400
       }
     },
-    "icon_url": null,
-    "icon_dimensions": null
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/1782c9f633c7e5721bb60256b6c00e0bec0ae990-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
   },
   "Beastmaster": {
     "id": "chess_bm",
@@ -588,8 +615,11 @@
         "atk_range": 205
       }
     },
-    "icon_url": null,
-    "icon_dimensions": null
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/6d20638e1a293004570a481f86c76b9c2b540ee3-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
   },
   "Blood Seeker": {
     "id": "chess_bs",
@@ -647,8 +677,11 @@
         "atk_range": 205
       }
     },
-    "icon_url": null,
-    "icon_dimensions": null
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/44c892c13b5ce9deaa2eed1becee28f93cf5f2e6-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
   },
   "Bounty Hunter": {
     "id": "chess_bh",
@@ -707,8 +740,11 @@
         "atk_range": 205
       }
     },
-    "icon_url": null,
-    "icon_dimensions": null
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/c0504b5de3c937af5dc69737d84eb09dc53d1d56-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
   },
   "Brewmaster": {
     "id": "chess_brew",
@@ -766,8 +802,11 @@
         "atk_range": 205
       }
     },
-    "icon_url": null,
-    "icon_dimensions": null
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/89f66ac03fe8e5703db32160faf0835c1ff4fa30-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
   },
   "Broodmother": {
     "id": "chess_br",
@@ -825,8 +864,11 @@
         "atk_range": 205
       }
     },
-    "icon_url": null,
-    "icon_dimensions": null
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/5d2408d23ad8766852bc2a7d7abc04aa8657ce80-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
   },
   "Centaur Warrunner": {
     "id": "chess_ct",
@@ -884,8 +926,11 @@
         "atk_range": 205
       }
     },
-    "icon_url": null,
-    "icon_dimensions": null
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/6e5042b209ef23ed4744ad114aa96a8bf21bf8d1-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
   },
   "Chaos Knight": {
     "id": "chess_ck",
@@ -943,8 +988,11 @@
         "atk_range": 205
       }
     },
-    "icon_url": null,
-    "icon_dimensions": null
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/5b2f7bb39b8f0b40ae9ecf78fd4a769dc07e2270-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
   },
   "Chen": {
     "id": "chess_chen",
@@ -1002,8 +1050,11 @@
         "atk_range": 400
       }
     },
-    "icon_url": null,
-    "icon_dimensions": null
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/58046e9f8b7a83e0d1436f2fd9c36a7526cb3110-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
   },
   "Clinkz": {
     "id": "chess_clinkz",
@@ -1061,8 +1112,11 @@
         "atk_range": 600
       }
     },
-    "icon_url": null,
-    "icon_dimensions": null
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/6ac0ecb5a36754eedc04f8e7c126e6bdb86e87fc-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
   },
   "Clockwerk": {
     "id": "chess_clock",
@@ -1120,8 +1174,11 @@
         "atk_range": 205
       }
     },
-    "icon_url": null,
-    "icon_dimensions": null
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/ffdbf748d33b66bdf9d76b2f1ac8b695da8246f4-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
   },
   "Crystal Maiden": {
     "id": "chess_cm",
@@ -1179,8 +1236,11 @@
         "atk_range": 600
       }
     },
-    "icon_url": null,
-    "icon_dimensions": null
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/a174506e903ebe27bbe091b86ee8146fc62b038d-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
   },
   "Dark Willow": {
     "id": "chess_dw",
@@ -1238,8 +1298,11 @@
         "atk_range": 400
       }
     },
-    "icon_url": null,
-    "icon_dimensions": null
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/f722e9d6d645c44fd8c09f4c58f4fbd2a5670752-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
   },
   "DarkSeer": {
     "id": "chess_ds",
@@ -1297,8 +1360,11 @@
         "atk_range": 205
       }
     },
-    "icon_url": null,
-    "icon_dimensions": null
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/3569409331a5ceade9d3eeb9bfde9523bd5bbd2d-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
   },
   "Dawnbreaker": {
     "id": "chess_db",
@@ -1356,8 +1422,11 @@
         "atk_range": 205
       }
     },
-    "icon_url": null,
-    "icon_dimensions": null
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/bc9dd343cabd59ad606c3940c0ab776d24fa4df7-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
   },
   "Dazzle": {
     "id": "chess_dazzle",
@@ -1415,8 +1484,11 @@
         "atk_range": 400
       }
     },
-    "icon_url": null,
-    "icon_dimensions": null
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/12c7c8db62c11770acbb19a83416c8b60ea41dc6-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
   },
   "Death Prophet": {
     "id": "chess_dp",
@@ -1474,8 +1546,11 @@
         "atk_range": 400
       }
     },
-    "icon_url": null,
-    "icon_dimensions": null
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/22871e9f3435aefb6d8e1f86327601aae5be8683-30x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 30
+    }
   },
   "Disruptor": {
     "id": "chess_disruptor",
@@ -1533,8 +1608,11 @@
         "atk_range": 600
       }
     },
-    "icon_url": null,
-    "icon_dimensions": null
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/377ea55347395b39b53345d29d5e871197386cad-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
   },
   "Doom": {
     "id": "chess_doom",
@@ -1592,8 +1670,11 @@
         "atk_range": 205
       }
     },
-    "icon_url": null,
-    "icon_dimensions": null
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/a28605b63972b589c2ce5a8b15d61638bd9f96fc-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
   },
   "Dragon Knight": {
     "id": "chess_dk",
@@ -1652,8 +1733,11 @@
         "atk_range": 205
       }
     },
-    "icon_url": null,
-    "icon_dimensions": null
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/90cddae22583acb34870838ac028902b441daea7-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
   },
   "Drow Ranger": {
     "id": "chess_dr",
@@ -1711,8 +1795,11 @@
         "atk_range": 600
       }
     },
-    "icon_url": null,
-    "icon_dimensions": null
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/90dfac136ded72b10f2102b34116b62daecfb095-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
   },
   "Earth Spirit": {
     "id": "chess_earth",
@@ -1770,8 +1857,11 @@
         "atk_range": 205
       }
     },
-    "icon_url": null,
-    "icon_dimensions": null
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/140127d6fe2b250cf752b123ba1441aa4e31a779-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
   },
   "Earthshaker": {
     "id": "chess_es",
@@ -1829,8 +1919,11 @@
         "atk_range": 205
       }
     },
-    "icon_url": null,
-    "icon_dimensions": null
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/2e2c29cf5eaf1d1dc61b1acebfba23867f8076e1-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
   },
   "Elder Titan": {
     "id": "chess_et",
@@ -1889,8 +1982,11 @@
         "atk_range": 205
       }
     },
-    "icon_url": null,
-    "icon_dimensions": null
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/648c9ed98fe40a87e481e950b9b4d2dd62c660d9-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
   },
   "Ember Spirit": {
     "id": "chess_ember",
@@ -1948,8 +2044,11 @@
         "atk_range": 205
       }
     },
-    "icon_url": null,
-    "icon_dimensions": null
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/deacc9b3a92bdbb25651b6b3650baf8880a3ff16-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
   },
   "Enchantress": {
     "id": "chess_eh",
@@ -2008,8 +2107,11 @@
         "atk_range": 400
       }
     },
-    "icon_url": null,
-    "icon_dimensions": null
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/4481d44ff07776c9ef46ebb9b2922fb4a809c045-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
   },
   "Enigma": {
     "id": "chess_enigma",
@@ -2067,8 +2169,11 @@
         "atk_range": 400
       }
     },
-    "icon_url": null,
-    "icon_dimensions": null
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/4aabedef5b9c74dacbe16a3b7cd6c438bdfecd93-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
   },
   "Faceless Void": {
     "id": "chess_fv",
@@ -2126,8 +2231,11 @@
         "atk_range": 205
       }
     },
-    "icon_url": null,
-    "icon_dimensions": null
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/46e1912887900c5d96238dcfbd3d55888a039c97-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
   },
   "Furion": {
     "id": "chess_fur",
@@ -2185,8 +2293,11 @@
         "atk_range": 400
       }
     },
-    "icon_url": null,
-    "icon_dimensions": null
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/5a289986119f28ff83854a845eefeaed71969809-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
   },
   "Gyrocopter": {
     "id": "chess_gyro",
@@ -2244,8 +2355,11 @@
         "atk_range": 400
       }
     },
-    "icon_url": null,
-    "icon_dimensions": null
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/3e308706b9382e1d3fa4d0000c5281e31ca1a2e8-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
   },
   "Hoodwink": {
     "id": "chess_hw",
@@ -2303,8 +2417,11 @@
         "atk_range": 400
       }
     },
-    "icon_url": null,
-    "icon_dimensions": null
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/0ab1234fe2ef841cdb6e03dcc4decd955c8d9b5e-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
   },
   "Huskar": {
     "id": "chess_huskar",
@@ -2362,8 +2479,11 @@
         "atk_range": 400
       }
     },
-    "icon_url": null,
-    "icon_dimensions": null
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/b91027f5915c893a7da3f6bd4fd1b5aaca0375dd-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
   },
   "Invoker": {
     "id": "chess_kael",
@@ -2421,8 +2541,11 @@
         "atk_range": 600
       }
     },
-    "icon_url": null,
-    "icon_dimensions": null
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/06bab464301579bdd64b0b5804794b143e57f73a-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
   },
   "Io": {
     "id": "chess_io",
@@ -2485,8 +2608,11 @@
         "atk_range": 400
       }
     },
-    "icon_url": null,
-    "icon_dimensions": null
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/754bcb166fb9eb208220f7698ff4009f134649e4-32x32.png",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
   },
   "Jakiro": {
     "id": "chess_thd",
@@ -2544,8 +2670,11 @@
         "atk_range": 400
       }
     },
-    "icon_url": null,
-    "icon_dimensions": null
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/e0175573895e1b967aa4ac47644b07b24c5cb797-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
   },
   "Juggernaut": {
     "id": "chess_jugg",
@@ -2603,8 +2732,11 @@
         "atk_range": 205
       }
     },
-    "icon_url": null,
-    "icon_dimensions": null
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/6edf672fa3eedb12068549adebb19b5219c8442d-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
   },
   "Keeper of the Light": {
     "id": "chess_light",
@@ -2662,8 +2794,11 @@
         "atk_range": 600
       }
     },
-    "icon_url": null,
-    "icon_dimensions": null
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/7d3225876bd5e53ede8d623ad67d6202fdf3a718-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
   },
   "Kez": {
     "id": "chess_kez",
@@ -2721,8 +2856,11 @@
         "atk_range": 205
       }
     },
-    "icon_url": null,
-    "icon_dimensions": null
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/ddb10f3c9fc531e78d6527a440b2d45c99dc06c8-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
   },
   "Kunkka": {
     "id": "chess_kunkka",
@@ -2780,8 +2918,11 @@
         "atk_range": 205
       }
     },
-    "icon_url": null,
-    "icon_dimensions": null
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/9e67857d8bea2a5ad36d4103b1363c691006578d-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
   },
   "Largo": {
     "id": "chess_largo",
@@ -2839,8 +2980,11 @@
         "atk_range": 205
       }
     },
-    "icon_url": null,
-    "icon_dimensions": null
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/78f4cdf20db334f4e141e7cefd3886c13451867f-32x32.png",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
   },
   "Legion Commander": {
     "id": "chess_lc",
@@ -2898,8 +3042,11 @@
         "atk_range": 205
       }
     },
-    "icon_url": null,
-    "icon_dimensions": null
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/ebea92394eb96d4bc2db00b2146a90c19e36d8f9-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
   },
   "Leshrac": {
     "id": "chess_ts",
@@ -2958,8 +3105,11 @@
         "atk_range": 400
       }
     },
-    "icon_url": null,
-    "icon_dimensions": null
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/35d60ff7c7b027402166480a22000d1c38a7383d-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
   },
   "Lich": {
     "id": "chess_lich",
@@ -3017,8 +3167,11 @@
         "atk_range": 400
       }
     },
-    "icon_url": null,
-    "icon_dimensions": null
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/57d70099445ed521ebf2bfb8514afbcb5fcbf1fe-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
   },
   "Lifestealer": {
     "id": "chess_naix",
@@ -3077,8 +3230,11 @@
         "atk_range": 205
       }
     },
-    "icon_url": null,
-    "icon_dimensions": null
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/76183c8606bb543695c314bf6efebe03b759a7b0-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
   },
   "Lina": {
     "id": "chess_lina",
@@ -3136,8 +3292,11 @@
         "atk_range": 600
       }
     },
-    "icon_url": null,
-    "icon_dimensions": null
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/7128674c74ae567bd95eecc53724058513e9e8a0-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
   },
   "Lion": {
     "id": "chess_lion",
@@ -3195,8 +3354,11 @@
         "atk_range": 400
       }
     },
-    "icon_url": null,
-    "icon_dimensions": null
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/c0a026f67e621bdd675753a4bc8a03de09c5a2c6-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
   },
   "Lone Druid": {
     "id": "chess_ld",
@@ -3254,8 +3416,11 @@
         "atk_range": 400
       }
     },
-    "icon_url": null,
-    "icon_dimensions": null
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/48e6c3d9de864ec109bece7c4ac72b016f23b36b-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
   },
   "Luna": {
     "id": "chess_luna",
@@ -3313,8 +3478,11 @@
         "atk_range": 400
       }
     },
-    "icon_url": null,
-    "icon_dimensions": null
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/5c1b73ac321cc580561797d3c6617f675cb17c39-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
   },
   "Lycan": {
     "id": "chess_lyc",
@@ -3373,8 +3541,11 @@
         "atk_range": 205
       }
     },
-    "icon_url": null,
-    "icon_dimensions": null
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/dcdcb7c04c3aa3b28c06a8a5aad7217f959f93bf-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
   },
   "Magnus": {
     "id": "chess_mag",
@@ -3432,8 +3603,11 @@
         "atk_range": 205
       }
     },
-    "icon_url": null,
-    "icon_dimensions": null
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/0c1cc9f9d4ff426312e9d7a7ddf68e30171cff50-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
   },
   "Marci": {
     "id": "chess_marci",
@@ -3491,8 +3665,11 @@
         "atk_range": 205
       }
     },
-    "icon_url": null,
-    "icon_dimensions": null
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/2923de991d3aa603aee858798e56c344cf7c2872-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
   },
   "Mars": {
     "id": "chess_mars",
@@ -3550,8 +3727,11 @@
         "atk_range": 205
       }
     },
-    "icon_url": null,
-    "icon_dimensions": null
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/af448463b8c9038140d9e2ef5e7772d374661c3d-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
   },
   "Medusa": {
     "id": "chess_medusa",
@@ -3609,8 +3789,11 @@
         "atk_range": 400
       }
     },
-    "icon_url": null,
-    "icon_dimensions": null
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/9995fe98db97dfbb220c038bacb137786f957a22-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
   },
   "Meepo": {
     "id": "chess_meepo",
@@ -3668,8 +3851,11 @@
         "atk_range": 205
       }
     },
-    "icon_url": null,
-    "icon_dimensions": null
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/ecfcb988b30a229cf8986d0c357f50db1ba465b3-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
   },
   "Mirana": {
     "id": "chess_pom",
@@ -3727,8 +3913,11 @@
         "atk_range": 600
       }
     },
-    "icon_url": null,
-    "icon_dimensions": null
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/bdfd673d879b5d744857fd148082ca126e6a4ca9-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
   },
   "Monkey King": {
     "id": "chess_mk",
@@ -3786,8 +3975,11 @@
         "atk_range": 205
       }
     },
-    "icon_url": null,
-    "icon_dimensions": null
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/a3b268fd10c4e794a7ae866aabd8e207536ea823-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
   },
   "Morphling": {
     "id": "chess_morph",
@@ -3846,8 +4038,11 @@
         "atk_range": 400
       }
     },
-    "icon_url": null,
-    "icon_dimensions": null
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/d2a8ddbee486017981cb01b46d6e92d6f3e70b1e-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
   },
   "Muerta": {
     "id": "chess_muerta",
@@ -3905,8 +4100,11 @@
         "atk_range": 400
       }
     },
-    "icon_url": null,
-    "icon_dimensions": null
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/b06060cb3311dd9e28cfbbdee0cccc830993bf52-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
   },
   "Naga Siren": {
     "id": "chess_naga",
@@ -3964,8 +4162,11 @@
         "atk_range": 205
       }
     },
-    "icon_url": null,
-    "icon_dimensions": null
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/8c9039fefaf89ffde29086c29522c2c04580fa44-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
   },
   "Necrophos": {
     "id": "chess_nec",
@@ -4023,8 +4224,11 @@
         "atk_range": 400
       }
     },
-    "icon_url": null,
-    "icon_dimensions": null
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/37f307b1015c192c4257296cb97c9c72348cfa40-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
   },
   "Nyx Assassin": {
     "id": "chess_na",
@@ -4083,8 +4287,11 @@
         "atk_range": 205
       }
     },
-    "icon_url": null,
-    "icon_dimensions": null
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/54365692feadea9cf99569af412bc9c94cf775d8-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
   },
   "Ogre Magi": {
     "id": "chess_om",
@@ -4142,8 +4349,11 @@
         "atk_range": 205
       }
     },
-    "icon_url": null,
-    "icon_dimensions": null
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/0a0a468373642620ce94bd0c69f1589badfe04b3-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
   },
   "Omniknight": {
     "id": "chess_ok",
@@ -4201,8 +4411,11 @@
         "atk_range": 205
       }
     },
-    "icon_url": null,
-    "icon_dimensions": null
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/320f95682ee0e8c8fa5e5d419da24dc5fb91eb31-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
   },
   "Oracle": {
     "id": "chess_oracle",
@@ -4260,8 +4473,11 @@
         "atk_range": 400
       }
     },
-    "icon_url": null,
-    "icon_dimensions": null
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/0c879cfdc78ff8a07ec1eb83e507ab19f76d0bd4-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
   },
   "Pangolier": {
     "id": "chess_pangolier",
@@ -4319,8 +4535,11 @@
         "atk_range": 205
       }
     },
-    "icon_url": null,
-    "icon_dimensions": null
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/87ecae0b21dbdc79bfa5ceec3a2c73055515b17d-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
   },
   "Phantom Assassin": {
     "id": "chess_pa",
@@ -4378,8 +4597,11 @@
         "atk_range": 205
       }
     },
-    "icon_url": null,
-    "icon_dimensions": null
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/16cb7d3056eeebe52f6b81c2fcbf50901cf5dc42-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
   },
   "Phoenix": {
     "id": "chess_phx",
@@ -4437,8 +4659,11 @@
         "atk_range": 400
       }
     },
-    "icon_url": null,
-    "icon_dimensions": null
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/2e0ada0494a233741ee5bbef8ffaed3d9b827371-32x32.png",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
   },
   "Primal Beast": {
     "id": "chess_pb",
@@ -4496,8 +4721,11 @@
         "atk_range": 205
       }
     },
-    "icon_url": null,
-    "icon_dimensions": null
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/4955f7017174733f721b31d0aad9202402d39095-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
   },
   "Puck": {
     "id": "chess_puck",
@@ -4556,8 +4784,11 @@
         "atk_range": 400
       }
     },
-    "icon_url": null,
-    "icon_dimensions": null
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/2421ec31e87faa8eaf608239a93f847631077ff3-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
   },
   "Pudge": {
     "id": "chess_pudge",
@@ -4615,8 +4846,11 @@
         "atk_range": 205
       }
     },
-    "icon_url": null,
-    "icon_dimensions": null
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/546ba9a231d87f1c63adb875a471a8307451dc13-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
   },
   "Queen of Pain": {
     "id": "chess_qop",
@@ -4674,8 +4908,11 @@
         "atk_range": 400
       }
     },
-    "icon_url": null,
-    "icon_dimensions": null
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/9e91c1948ee129ef1276ab250ee4d7df655c4af0-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
   },
   "Razor": {
     "id": "chess_razor",
@@ -4733,8 +4970,11 @@
         "atk_range": 400
       }
     },
-    "icon_url": null,
-    "icon_dimensions": null
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/bc95b61ba65247f9a6fdc96480d47b8769ca20c0-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
   },
   "Riki": {
     "id": "chess_riki",
@@ -4792,8 +5032,11 @@
         "atk_range": 205
       }
     },
-    "icon_url": null,
-    "icon_dimensions": null
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/09c6e0c5dcb91e2bfdfc624ca3322ca1b384fa9f-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
   },
   "Ringmaster": {
     "id": "chess_rm",
@@ -4848,8 +5091,11 @@
         "atk_range": 400
       }
     },
-    "icon_url": null,
-    "icon_dimensions": null
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/4e45bc7dd47a8bce85f33cc679cf51917d613d57-32x32.png",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
   },
   "Rubick": {
     "id": "chess_rubick",
@@ -4907,8 +5153,11 @@
         "atk_range": 205
       }
     },
-    "icon_url": null,
-    "icon_dimensions": null
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/9fd7cba4adbe16fcd9f9013a6f76cf075ddf9098-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
   },
   "Sand King": {
     "id": "chess_sk",
@@ -4966,8 +5215,11 @@
         "atk_range": 205
       }
     },
-    "icon_url": null,
-    "icon_dimensions": null
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/22e83ee5497ad800b3fe31455d4d91d8caae0337-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
   },
   "Shadow Demon": {
     "id": "chess_sd",
@@ -5026,8 +5278,11 @@
         "atk_range": 400
       }
     },
-    "icon_url": null,
-    "icon_dimensions": null
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/5041ccb7d04ac3bd32e380e2da696cc8c659951b-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
   },
   "Shadow Fiend": {
     "id": "chess_sf",
@@ -5085,8 +5340,11 @@
         "atk_range": 600
       }
     },
-    "icon_url": null,
-    "icon_dimensions": null
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/ede474e6f86a42141304b4ee1ae0b36711675f2d-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
   },
   "Shadow Shaman": {
     "id": "chess_ss",
@@ -5144,8 +5402,11 @@
         "atk_range": 400
       }
     },
-    "icon_url": null,
-    "icon_dimensions": null
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/315a507c6c01a9b11912f0487b2be2930343e37c-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
   },
   "Skywrath Mage": {
     "id": "chess_sm",
@@ -5203,8 +5464,11 @@
         "atk_range": 600
       }
     },
-    "icon_url": null,
-    "icon_dimensions": null
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/5f3c66d432c808b97685071f2a111d4b51356e99-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
   },
   "Slardar": {
     "id": "chess_slardar",
@@ -5262,8 +5526,11 @@
         "atk_range": 205
       }
     },
-    "icon_url": null,
-    "icon_dimensions": null
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/962ef2f5ce6399ae7c848cc549a8984744e3d43a-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
   },
   "Slark": {
     "id": "chess_slark",
@@ -5321,8 +5588,11 @@
         "atk_range": 205
       }
     },
-    "icon_url": null,
-    "icon_dimensions": null
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/89c2a76fd78b1368546c073f553af298fe04b51c-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
   },
   "Snapfire": {
     "id": "chess_snap",
@@ -5380,8 +5650,11 @@
         "atk_range": 600
       }
     },
-    "icon_url": null,
-    "icon_dimensions": null
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/623b01c044794bfe7c30f354dedc5643576af221-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
   },
   "Sniper": {
     "id": "chess_sniper",
@@ -5439,8 +5712,11 @@
         "atk_range": 600
       }
     },
-    "icon_url": null,
-    "icon_dimensions": null
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/1f41a8877915158434367cb71a4abd7572adb87f-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
   },
   "Spectres": {
     "id": "chess_spe",
@@ -5498,8 +5774,11 @@
         "atk_range": 205
       }
     },
-    "icon_url": null,
-    "icon_dimensions": null
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/2ed84de8a3588d54b82671292f0494f2837140bd-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
   },
   "Spirit Breaker": {
     "id": "chess_sb",
@@ -5557,8 +5836,11 @@
         "atk_range": 205
       }
     },
-    "icon_url": null,
-    "icon_dimensions": null
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/8f449e9abc766125a0140935bcf480efc0c2d97b-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
   },
   "Storm Spirit": {
     "id": "chess_storm",
@@ -5616,8 +5898,11 @@
         "atk_range": 400
       }
     },
-    "icon_url": null,
-    "icon_dimensions": null
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/3c4d63846e8903e020ef01ae5c7ebd7b30559e59-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
   },
   "Sven": {
     "id": "chess_sven",
@@ -5675,8 +5960,11 @@
         "atk_range": 205
       }
     },
-    "icon_url": null,
-    "icon_dimensions": null
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/4c63696b75726f89b61447b571aa8c1ac36b7682-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
   },
   "Techies": {
     "id": "chess_tech",
@@ -5734,8 +6022,11 @@
         "atk_range": 600
       }
     },
-    "icon_url": null,
-    "icon_dimensions": null
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/a2179685e7c99b59561cdad09dead42b79d128e9-30x31.webp",
+    "icon_dimensions": {
+      "height": 31,
+      "width": 30
+    }
   },
   "Templar Assassin": {
     "id": "chess_ta",
@@ -5793,8 +6084,11 @@
         "atk_range": 400
       }
     },
-    "icon_url": null,
-    "icon_dimensions": null
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/e64540cb15bf04235755b50963d1a3eff1c1df6f-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
   },
   "Terrorblade": {
     "id": "chess_tb",
@@ -5852,8 +6146,11 @@
         "atk_range": 205
       }
     },
-    "icon_url": null,
-    "icon_dimensions": null
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/2c5e639de7dcd21c6db73ba87222302eacc7c958-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
   },
   "Tidehunter": {
     "id": "chess_th",
@@ -5911,8 +6208,11 @@
         "atk_range": 205
       }
     },
-    "icon_url": null,
-    "icon_dimensions": null
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/b495408bfb7d787cd467855e7fbefea6ab568b8f-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
   },
   "Timbersaw": {
     "id": "chess_shredder",
@@ -5970,8 +6270,11 @@
         "atk_range": 205
       }
     },
-    "icon_url": null,
-    "icon_dimensions": null
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/7ee2b054b762063b927adff9d448741ee6109667-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
   },
   "Tinker": {
     "id": "chess_tk",
@@ -6029,8 +6332,11 @@
         "atk_range": 600
       }
     },
-    "icon_url": null,
-    "icon_dimensions": null
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/ae119568a9faca49a5670d92825afe4f371bbc73-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
   },
   "Tiny": {
     "id": "chess_tiny",
@@ -6094,8 +6400,11 @@
         "atk_range": 205
       }
     },
-    "icon_url": null,
-    "icon_dimensions": null
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/d6a16a6cd69cf6d49152919e7772c24d1c6f62fc-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
   },
   "Treant Protector": {
     "id": "chess_tp",
@@ -6153,8 +6462,11 @@
         "atk_range": 205
       }
     },
-    "icon_url": null,
-    "icon_dimensions": null
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/f2d97f40f9a04c2063e5fe5311158c37bd08130a-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
   },
   "Troll Warlord": {
     "id": "chess_troll",
@@ -6212,8 +6524,11 @@
         "atk_range": 400
       }
     },
-    "icon_url": null,
-    "icon_dimensions": null
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/4a32ba4677b2ba941cbb2f9fd3e67b19eefec788-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
   },
   "Tusk": {
     "id": "chess_tusk",
@@ -6271,8 +6586,11 @@
         "atk_range": 205
       }
     },
-    "icon_url": null,
-    "icon_dimensions": null
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/4bf20c1328a96a3456ea469f7cb6152485f55c3a-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
   },
   "Undying": {
     "id": "chess_ud",
@@ -6330,8 +6648,11 @@
         "atk_range": 205
       }
     },
-    "icon_url": null,
-    "icon_dimensions": null
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/a089bafd196e317a03abefbe7773b01267e70ad5-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
   },
   "Vengeful Spirit": {
     "id": "chess_vs",
@@ -6390,8 +6711,11 @@
         "atk_range": 400
       }
     },
-    "icon_url": null,
-    "icon_dimensions": null
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/b30aa9f812f9eae1a0e257794fc58725c797365e-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
   },
   "Venomancer": {
     "id": "chess_veno",
@@ -6450,8 +6774,11 @@
         "atk_range": 400
       }
     },
-    "icon_url": null,
-    "icon_dimensions": null
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/28708d2bee9ecf7e000d5412e6e6aa2323fff3ca-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
   },
   "Viper": {
     "id": "chess_viper",
@@ -6509,8 +6836,11 @@
         "atk_range": 400
       }
     },
-    "icon_url": null,
-    "icon_dimensions": null
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/061b5664cfd249bda8e79b8274ff82fdbc2b711e-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
   },
   "Void Spirit": {
     "id": "chess_void",
@@ -6568,8 +6898,11 @@
         "atk_range": 205
       }
     },
-    "icon_url": null,
-    "icon_dimensions": null
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/9a02f29f1c2f26e1d106733fa02e6c13d9b94116-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
   },
   "Warlock": {
     "id": "chess_wl",
@@ -6627,8 +6960,11 @@
         "atk_range": 600
       }
     },
-    "icon_url": null,
-    "icon_dimensions": null
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/8caa421c1d755c1775d2920d16d7b96f235e2856-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
   },
   "Windranger": {
     "id": "chess_wr",
@@ -6686,8 +7022,11 @@
         "atk_range": 600
       }
     },
-    "icon_url": null,
-    "icon_dimensions": null
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/4ac624506f5685159b7efc8c0d214c509b070a27-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
   },
   "Winter Wyvern": {
     "id": "chess_ww",
@@ -6746,8 +7085,11 @@
         "atk_range": 400
       }
     },
-    "icon_url": null,
-    "icon_dimensions": null
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/e92dacb9af08a3ce9e2774dbf2a2efdced0403bd-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
   },
   "Witch Doctor": {
     "id": "chess_wd",
@@ -6805,8 +7147,11 @@
         "atk_range": 400
       }
     },
-    "icon_url": null,
-    "icon_dimensions": null
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/3483f1db5c8d5a0705e2d76dc18c8248eb66cc6b-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
   },
   "Wraith King": {
     "id": "chess_snk",
@@ -6864,8 +7209,11 @@
         "atk_range": 205
       }
     },
-    "icon_url": null,
-    "icon_dimensions": null
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/01a9044cadf47b16c789844312203848dbba287e-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
   },
   "Zeus": {
     "id": "chess_zeus",
@@ -6923,7 +7271,10 @@
         "atk_range": 400
       }
     },
-    "icon_url": null,
-    "icon_dimensions": null
+    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/75ed01b3075b57b2e6ada13002708207a5a921c9-32x32.webp",
+    "icon_dimensions": {
+      "height": 32,
+      "width": 32
+    }
   }
 }
