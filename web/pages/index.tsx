@@ -1,5 +1,6 @@
 import { createClient } from "@supabase/supabase-js";
 import type { GetStaticProps } from "next";
+import Link from "next/link";
 import { useRouter } from "next/router";
 import { ProfileSearch } from "@/components/ProfileSearch";
 import {
@@ -90,6 +91,50 @@ export default function Home({ initialSearchResults }: HomeProps) {
           overflow: hidden;
           display: flex;
           flex-direction: column;
+        }
+        .banner {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: var(--s-12);
+          padding: var(--s-10) var(--s-20);
+          background: linear-gradient(90deg, rgba(224, 64, 42, 0.12) 0%, rgba(242, 188, 100, 0.10) 100%);
+          border-bottom: 1px solid var(--border);
+          text-decoration: none;
+          transition: background var(--t-base) var(--t-easing);
+        }
+        .banner:hover {
+          background: linear-gradient(90deg, rgba(224, 64, 42, 0.18) 0%, rgba(242, 188, 100, 0.16) 100%);
+        }
+        .banner-tag {
+          font-size: var(--fs-11);
+          font-weight: var(--fw-semibold);
+          letter-spacing: var(--tr-upper);
+          text-transform: uppercase;
+          color: var(--accent);
+          background: rgba(224, 64, 42, 0.15);
+          padding: 2px 8px;
+          border-radius: var(--r-3);
+          flex-shrink: 0;
+        }
+        .banner-text {
+          font-size: var(--fs-13);
+          color: var(--text-secondary);
+          letter-spacing: var(--tr-body);
+        }
+        .banner-arrow {
+          font-size: var(--fs-13);
+          color: var(--text-muted);
+          flex-shrink: 0;
+        }
+        @media (max-width: 620px) {
+          .banner {
+            gap: var(--s-8);
+            padding: var(--s-10) var(--s-14);
+          }
+          .banner-text {
+            font-size: var(--fs-12);
+          }
         }
         .hero {
           flex: 1;
@@ -309,6 +354,15 @@ export default function Home({ initialSearchResults }: HomeProps) {
       `}</style>
 
       <div className="page">
+        {Date.now() < new Date("2026-06-15").getTime() && (
+          <Link href="/patch-notes/2026-05-24-rebalance-patch" className="banner">
+            <span className="banner-tag">NEW PATCH</span>
+            <span className="banner-text">
+              Kobold rework, Monk &amp; Mech (6), Lifestealer class change, new Kobold Cup item
+            </span>
+            <span className="banner-arrow">&rarr;</span>
+          </Link>
+        )}
         <div className="hero">
           <div className="grid" />
           <div className="glow" />
