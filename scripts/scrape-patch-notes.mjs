@@ -14,8 +14,13 @@ import { join, dirname } from "path";
 import { fileURLToPath } from "url";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const DATA_DIR = join(__dirname, "..", "data", "patch_notes");
+const ROOT_DATA = join(__dirname, "..", "data");
+const DATA_DIR = join(ROOT_DATA, "patch_notes");
 const INDEX_PATH = join(DATA_DIR, "index.json");
+const ITEMS_PATH = join(ROOT_DATA, "items.json");
+const UNITS_PATH = join(ROOT_DATA, "units.json");
+const UNITS_FULL_PATH = join(ROOT_DATA, "units_full.json");
+const SYNERGIES_PATH = join(ROOT_DATA, "synergies.json");
 const CHANGELOG_URL =
   "https://steamcommunity.com/sharedfiles/filedetails/changelog/1613886175";
 
@@ -124,6 +129,115 @@ function contentToSections(content) {
   return [{ heading: "Changes", entries }];
 }
 
+function slugifyName(value) {
+  return value.toLowerCase().replace(/&/g, " and ").replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+}
+
+function applyGameDataChanges(sections) {
+  const items = JSON.parse(readFileSync(ITEMS_PATH, "utf-8"));
+  const units = JSON.parse(readFileSync(UNITS_PATH, "utf-8"));
+  const unitsFull = JSON.parse(readFileSync(UNITS_FULL_PATH, "utf-8"));
+  const synergies = JSON.parse(readFileSync(SYNERGIES_PATH, "utf-8"));
+  let changed = false;
+
+  const itemsBySlug = new Map();
+  for (const name of Object.keys(items.items)) {
+    itemsBySlug.set(slugifyName(name), name);
+    itemsBySlug.set(slugifyName(name.replace(/'/g, "")), name);
+  }
+
+  const unitsBySlug = new Map();
+  for (const name of Object.keys(units.units ?? units)) {
+    unitsBySlug.set(slugifyName(name), name);
+  }
+
+  for (const section of sections) {
+    for (const entry of section.entries) {
+      const detail = entry.detail;
+      const bare = entry.name.replace(/\s*-\s+.*$/, "").replace(/\s*\(.*\)$/, "").trim();
+
+      // Item tier changes: "Downgraded from T3 to T2" or "Upgraded from T2 to T3"
+      const tierMatch = detail.match(/(?:downgrade|upgrade)d?\s+from\s+T(\d)\s+to\s+T(\d)/i);
+      if (tierMatch) {
+        const newTier = parseInt(tierMatch[2]);
+        const slug = slugifyName(entry.name.replace(/'/g, ""));
+        const itemName = itemsBySlug.get(slug) || itemsBySlug.get(slugifyName(entry.name));
+        if (itemName && items.items[itemName]) {
+          console.log(`  → ${itemName}: tier ${items.items[itemName].tier} → ${newTier}`);
+          items.items[itemName].tier = newTier;
+          changed = true;
+        }
+      }
+
+      // New item: "New T3 item: Kobold Cup" (name could be either field)
+      const newItemFromName = entry.name.match(/new\s+T(\d)\s+item/i);
+      const newItemFromDetail = detail.match(/new\s+T(\d)\s+item/i);
+      if (newItemFromName) {
+        const tier = parseInt(newItemFromName[1]);
+        const itemName = detail.trim();
+        if (itemName && !items.items[itemName]) {
+          console.log(`  → New item: ${itemName} (T${tier})`);
+          items.items[itemName] = { tier };
+          items.total = Object.keys(items.items).length;
+          changed = true;
+        }
+      } else if (newItemFromDetail) {
+        const tier = parseInt(newItemFromDetail[1]);
+        const itemName = entry.name.trim();
+        if (itemName && !items.items[itemName]) {
+          console.log(`  → New item: ${itemName} (T${tier})`);
+          items.items[itemName] = { tier };
+          items.total = Object.keys(items.items).length;
+          changed = true;
+        }
+      }
+
+      // Unit class/species change: "Class changed from X to Y" or "Species changed from X to Y"
+      const classMatch = detail.match(/(?:class|species)\s+changed\s+from\s+(\w[\w\s]*?)\s+to\s+(\w[\w\s]*?)\.?$/i);
+      if (classMatch) {
+        const oldSyn = classMatch[1].trim();
+        const newSyn = classMatch[2].trim();
+        const unitName = unitsBySlug.get(slugifyName(bare));
+        if (unitName) {
+          for (const data of [units.units?.[unitName] ?? units[unitName], unitsFull[unitName]]) {
+            if (!data?.synergies) continue;
+            const idx = data.synergies.indexOf(oldSyn);
+            if (idx !== -1) {
+              console.log(`  → ${unitName}: ${oldSyn} → ${newSyn}`);
+              data.synergies[idx] = newSyn;
+              changed = true;
+            }
+          }
+        }
+      }
+
+      // Synergy tier rework: "Reworked from (1)(2)(3) to (2)(4)"
+      const tierRework = detail.match(/reworked?\s+from\s+\([\d)(]+\)\s+to\s+(\([\d)(]+\))/i);
+      if (tierRework) {
+        const newTiers = [...tierRework[1].matchAll(/\((\d+)\)/g)].map(m => parseInt(m[1]));
+        const synSlug = slugifyName(bare);
+        for (const [, syn] of Object.entries(synergies)) {
+          if (syn.name && slugifyName(syn.name) === synSlug && newTiers.length > 0) {
+            console.log(`  → ${syn.name} synergy tiers: [${syn.tiers}] → [${newTiers}]`);
+            syn.tiers = newTiers;
+            changed = true;
+          }
+        }
+      }
+    }
+  }
+
+  if (changed && !DRY_RUN) {
+    writeFileSync(ITEMS_PATH, JSON.stringify(items, null, 2) + "\n");
+    writeFileSync(UNITS_PATH, JSON.stringify(units.units ? units : { units }, null, 2) + "\n");
+    writeFileSync(UNITS_FULL_PATH, JSON.stringify(unitsFull, null, 2) + "\n");
+    writeFileSync(SYNERGIES_PATH, JSON.stringify(synergies, null, 2) + "\n");
+    console.log("Updated game data files.");
+  } else if (changed) {
+    console.log("[dry-run] Would update game data files.");
+  }
+}
+
 async function main() {
   console.log("Fetching Steam Workshop changelog...");
   const html = await fetchChangelog();
@@ -176,6 +290,9 @@ async function main() {
     }
 
     newPatches.push({ date, title, slug });
+
+    console.log("Applying game data changes...");
+    applyGameDataChanges(patchData.sections);
   }
 
   if (!DRY_RUN && newPatches.length > 0) {
