@@ -1097,6 +1097,32 @@ def main():
 
     for key, filename in file_map.items():
         out_path = out_dir / filename
+        # Preserve existing icon_url / icon_dimensions (from Sanity CDN)
+        # that the VPK doesn't carry.
+        if out_path.exists():
+            try:
+                with open(out_path, encoding='utf-8') as f:
+                    existing = json.load(f)
+                # Unwrap containers like {"units": {...}} or {"relics": {...}}
+                inner_key = None
+                for ik in ('units', 'relics', 'items'):
+                    if isinstance(existing, dict) and ik in existing and isinstance(existing[ik], dict):
+                        inner_key = ik
+                        break
+                existing_records = existing[inner_key] if inner_key else existing
+                new_data = data[key]
+                new_records = new_data[inner_key] if inner_key and isinstance(new_data, dict) and inner_key in new_data else new_data
+                if isinstance(existing_records, dict) and isinstance(new_records, dict):
+                    for rec_key, rec in new_records.items():
+                        if isinstance(rec, dict) and rec_key in existing_records:
+                            old = existing_records[rec_key]
+                            if isinstance(old, dict):
+                                if old.get('icon_url') and not rec.get('icon_url'):
+                                    rec['icon_url'] = old['icon_url']
+                                if old.get('icon_dimensions') and not rec.get('icon_dimensions'):
+                                    rec['icon_dimensions'] = old['icon_dimensions']
+            except Exception:
+                pass
         with open(out_path, 'w', encoding='utf-8') as f:
             json.dump(data[key], f, indent=2, ensure_ascii=False)
 
