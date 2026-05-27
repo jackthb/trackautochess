@@ -3,686 +3,458 @@
     "Aghanims Shard": {
       "tier": 2,
       "icon": "aghanims_shard.png",
-      "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/1941fbc42371f9885eb8485c181b83732feb064e-85x62.png",
-      "icon_dimensions": {
-        "height": 62,
-        "width": 85
-      }
+      "icon_url": null,
+      "icon_dimensions": null
     },
     "Aghanims Scepter": {
       "tier": 5,
       "icon": "aghanims_scepter.png",
-      "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/355c7da2889c624aa217bbd74ba153be9d00d405-85x64.png",
-      "icon_dimensions": {
-        "height": 64,
-        "width": 85
-      }
+      "icon_url": null,
+      "icon_dimensions": null
     },
     "Avianas Feather": {
       "tier": 2,
       "icon": "avianas_feather.png",
-      "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/d0337bc142ffe686d8381e7f90bc2fc8932c29df-85x62.png",
-      "icon_dimensions": {
-        "height": 62,
-        "width": 85
-      }
+      "icon_url": null,
+      "icon_dimensions": null
     },
     "Desolator": {
       "tier": 3,
       "icon": "desolator.png",
-      "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/50e6ea742707605eb1540d58d3a684cb946edee1-85x64.png",
-      "icon_dimensions": {
-        "height": 64,
-        "width": 85
-      }
+      "icon_url": null,
+      "icon_dimensions": null
     },
     "Arcane Boots": {
       "tier": 3,
       "icon": "arcane_boots.png",
-      "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/6b18c05fe1cc4c1b8e4a7e7d3a2342eeabe75bef-85x64.png",
-      "icon_dimensions": {
-        "height": 64,
-        "width": 85
-      }
+      "icon_url": null,
+      "icon_dimensions": null
     },
     "Eye of Skadi": {
       "tier": 5,
       "icon": "eye_of_skadi.png",
-      "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/71e09d8b07234ff602b483482f036d41e41c0dd2-85x64.png",
-      "icon_dimensions": {
-        "height": 64,
-        "width": 85
-      }
+      "icon_url": null,
+      "icon_dimensions": null
     },
     "Black King Bar": {
       "tier": 4,
       "icon": "black_king_bar.png",
-      "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/0a1353427bd0c7119dd70f18b772b0872a768bfa-85x64.png",
-      "icon_dimensions": {
-        "height": 64,
-        "width": 85
-      }
+      "icon_url": null,
+      "icon_dimensions": null
     },
     "Aegis of Immortal": {
       "tier": 3,
       "icon": "aegis_of_immortal.png",
-      "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/873554f4e3153f77e66c026aef9240c9671ef891-85x64.png",
-      "icon_dimensions": {
-        "height": 64,
-        "width": 85
-      }
+      "icon_url": null,
+      "icon_dimensions": null
     },
     "Sliver": {
       "tier": 2,
       "icon": "sliver.png",
-      "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/7102e80488dcf28526bd0a6c9101f1b9fa3c880f-88x64.png",
-      "icon_dimensions": {
-        "height": 64,
-        "width": 88
-      }
+      "icon_url": null,
+      "icon_dimensions": null
     },
     "Pavise": {
       "tier": 2,
       "icon": "pavise.png",
-      "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/2234f9246f9dbd9b969fde07925251f8b3235ef4-85x62.png",
-      "icon_dimensions": {
-        "height": 62,
-        "width": 85
-      }
+      "icon_url": null,
+      "icon_dimensions": null
     },
     "Crimson Guard": {
       "tier": 3,
       "icon": "crimson_guard.png",
-      "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/45dbf93ec668ca77d2e1f6dce7def38cf5e277a8-85x64.png",
-      "icon_dimensions": {
-        "height": 64,
-        "width": 85
-      }
+      "icon_url": null,
+      "icon_dimensions": null
     },
     "Mjollnir": {
       "tier": 5,
       "icon": "mjollnir.png",
-      "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/d5025a233dbd13582087a702904df29296e3e99a-85x64.png",
-      "icon_dimensions": {
-        "height": 64,
-        "width": 85
-      }
+      "icon_url": null,
+      "icon_dimensions": null
     },
     "Daedalus": {
       "tier": 5,
       "icon": "daedalus.png",
-      "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/1a2412a99a05cc47fd9d609a4ea482151726bf14-85x64.png",
-      "icon_dimensions": {
-        "height": 64,
-        "width": 85
-      }
+      "icon_url": null,
+      "icon_dimensions": null
     },
     "Abyssal Blade": {
       "tier": 4,
       "icon": "abyssal_blade.png",
-      "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/c433e2c38e8c546fd35a875b68abee8f5ba3bbfc-85x64.png",
-      "icon_dimensions": {
-        "height": 64,
-        "width": 85
-      }
+      "icon_url": null,
+      "icon_dimensions": null
     },
     "Hand of Midas": {
       "tier": 1,
       "icon": "hand_of_midas.png",
-      "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/5b00005741bcd1f2c3782bef488cfd6eee6b0153-85x64.png",
-      "icon_dimensions": {
-        "height": 64,
-        "width": 85
-      }
+      "icon_url": null,
+      "icon_dimensions": null
     },
     "Pipe of Insight": {
       "tier": 3,
       "icon": "pipe_of_insight.png",
-      "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/def75c7ef6202cfa582a2f49fba20bcca14380ff-85x64.png",
-      "icon_dimensions": {
-        "height": 64,
-        "width": 85
-      }
+      "icon_url": null,
+      "icon_dimensions": null
     },
     "Spell Prism": {
       "tier": 3,
       "icon": "spell_prism.png",
-      "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/bac646545eacf35f1f88579e667fecdbbe321fb9-85x62.png",
-      "icon_dimensions": {
-        "height": 62,
-        "width": 85
-      }
+      "icon_url": null,
+      "icon_dimensions": null
     },
     "Ascetics Cap": {
       "tier": 2,
       "icon": "ascetics_cap.png",
-      "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/a3dbd5e8b9ccec85923937e3976d82bfaad3e048-88x64.png",
-      "icon_dimensions": {
-        "height": 64,
-        "width": 88
-      }
+      "icon_url": null,
+      "icon_dimensions": null
     },
     "Mask of Madness": {
       "tier": 2,
       "icon": "mask_of_madness.png",
-      "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/777942ae5c0fa3e6d4ecf0c8f7a552422b82a574-85x64.png",
-      "icon_dimensions": {
-        "height": 64,
-        "width": 85
-      }
+      "icon_url": null,
+      "icon_dimensions": null
     },
     "Gleipnir": {
       "tier": 4,
       "icon": "gleipnir.png",
-      "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/92696685cbd7508b79b62ae11da05ab32a41a730-88x64.png",
-      "icon_dimensions": {
-        "height": 64,
-        "width": 88
-      }
+      "icon_url": null,
+      "icon_dimensions": null
     },
     "Orb of Corrosion": {
       "tier": 1,
       "icon": "orb_of_corrosion.png",
-      "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/e47fef2396c94891e63956431008f530fb0adb6e-85x62.png",
-      "icon_dimensions": {
-        "height": 62,
-        "width": 85
-      }
+      "icon_url": null,
+      "icon_dimensions": null
     },
     "Minotaur Horn": {
       "tier": 4,
       "icon": "minotaur_horn.png",
-      "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/ee4bf9bc446b4572ce9142d2f744983c5fc91d90-85x62.png",
-      "icon_dimensions": {
-        "height": 62,
-        "width": 85
-      }
+      "icon_url": null,
+      "icon_dimensions": null
     },
     "Havoc": {
       "tier": 5,
       "icon": "havoc.png",
-      "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/aa8c6b389b298334e816ca4e06237c855161a93b-88x64.png",
-      "icon_dimensions": {
-        "height": 64,
-        "width": 88
-      }
+      "icon_url": null,
+      "icon_dimensions": null
     },
     "Dagon": {
       "tier": 4,
       "icon": "dagon.png",
-      "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/a3c77e1df7e91ef119b3660cd9d67e40393619a1-85x64.png",
-      "icon_dimensions": {
-        "height": 64,
-        "width": 85
-      }
+      "icon_url": null,
+      "icon_dimensions": null
     },
     "Manta Style": {
       "tier": 4,
       "icon": "manta_style.png",
-      "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/e51534ce23dc7695e826bdd597f0ada1c0d4e0d4-85x64.png",
-      "icon_dimensions": {
-        "height": 64,
-        "width": 85
-      }
+      "icon_url": null,
+      "icon_dimensions": null
     },
     "Butterfly": {
       "tier": 4,
       "icon": "butterfly.png",
-      "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/9604a461af6188dcfdb65efc09f7eb1cd47d67c0-85x64.png",
-      "icon_dimensions": {
-        "height": 64,
-        "width": 85
-      }
+      "icon_url": null,
+      "icon_dimensions": null
     },
     "Kaya": {
       "tier": 2,
       "icon": "kaya.png",
-      "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/60e899fe285f566685f3c2693f54abbada111086-85x62.png",
-      "icon_dimensions": {
-        "height": 62,
-        "width": 85
-      }
+      "icon_url": null,
+      "icon_dimensions": null
     },
     "Radiance": {
       "tier": 4,
       "icon": "radiance.png",
-      "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/21b30e97f6bb517bbcc5b1528fd312f7024f38df-85x64.png",
-      "icon_dimensions": {
-        "height": 64,
-        "width": 85
-      }
+      "icon_url": null,
+      "icon_dimensions": null
     },
     "Diffusal Blade": {
       "tier": 3,
       "icon": "diffusal_blade.png",
-      "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/7d11f022d29db612b58cd02e1e56ae71ca291a23-85x64.png",
-      "icon_dimensions": {
-        "height": 64,
-        "width": 85
-      }
+      "icon_url": null,
+      "icon_dimensions": null
     },
     "Tranquil Boots": {
       "tier": 2,
       "icon": "tranquil_boots.png",
-      "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/5f8b9646c6716a3b798a42adbb738ddabdbcaa19-85x64.png",
-      "icon_dimensions": {
-        "height": 64,
-        "width": 85
-      }
+      "icon_url": null,
+      "icon_dimensions": null
     },
     "Monkey King Bar": {
       "tier": 4,
       "icon": "monkey_king_bar.png",
-      "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/6e3723bc033c1178144408d9ffb60981966def9d-85x64.png",
-      "icon_dimensions": {
-        "height": 64,
-        "width": 85
-      }
+      "icon_url": null,
+      "icon_dimensions": null
     },
     "Vladimirs Offering": {
       "tier": 2,
       "icon": "vladmirs_offering.png",
-      "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/55e53cec920b6c4f2e357dd2266a231f45cd6f31-85x64.png",
-      "icon_dimensions": {
-        "height": 64,
-        "width": 85
-      }
+      "icon_url": null,
+      "icon_dimensions": null
     },
     "Giants Ring": {
       "tier": 4,
       "icon": "giants_ring.png",
-      "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/78a745f10224c01774d5d56d612509694c5bf26f-85x62.png",
-      "icon_dimensions": {
-        "height": 62,
-        "width": 85
-      }
+      "icon_url": null,
+      "icon_dimensions": null
     },
     "Null Talisman": {
       "tier": 1,
       "icon": "null_talisman.png",
-      "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/a825f0a8a52a5c7edff44c4dd179d9c66e30d69d-85x64.png",
-      "icon_dimensions": {
-        "height": 64,
-        "width": 85
-      }
+      "icon_url": null,
+      "icon_dimensions": null
     },
     "Battle Fury": {
       "tier": 4,
       "icon": "battle_fury.png",
-      "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/5541858603dbede2ac5c945d4527bd37a914383d-85x64.png",
-      "icon_dimensions": {
-        "height": 64,
-        "width": 85
-      }
+      "icon_url": null,
+      "icon_dimensions": null
     },
     "Bracer": {
       "tier": 1,
       "icon": "bracer.png",
-      "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/d0a8ff8951e4f6265127fa601787f13b299acd7c-85x64.png",
-      "icon_dimensions": {
-        "height": 64,
-        "width": 85
-      }
+      "icon_url": null,
+      "icon_dimensions": null
     },
     "Bullwhip": {
       "tier": 1,
       "icon": "bullwhip.png",
-      "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/a19f1cbf09fd38552730731395c693655cab82dd-85x62.png",
-      "icon_dimensions": {
-        "height": 62,
-        "width": 85
-      }
+      "icon_url": null,
+      "icon_dimensions": null
     },
     "Linkens Sphere": {
       "tier": 3,
       "icon": "linkens_sphere.png",
-      "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/635eadc420ccf59fd0058e01acc7c03179cbcb64-85x64.png",
-      "icon_dimensions": {
-        "height": 64,
-        "width": 85
-      }
+      "icon_url": null,
+      "icon_dimensions": null
     },
     "Mekansm": {
       "tier": 3,
       "icon": "mekansm.png",
-      "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/196c0705e45295f8489773cf906441e7ec22408d-85x64.png",
-      "icon_dimensions": {
-        "height": 64,
-        "width": 85
-      }
+      "icon_url": null,
+      "icon_dimensions": null
     },
     "Necronomicon": {
       "tier": 4,
       "icon": "necronomicon.png",
-      "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/275ac231c23bbaa9f3bfd7f0f7ce859b02c2f386-85x64.png",
-      "icon_dimensions": {
-        "height": 64,
-        "width": 85
-      }
+      "icon_url": null,
+      "icon_dimensions": null
     },
     "Bottle": {
       "tier": 2,
       "icon": "bottle.png",
-      "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/02079ccf654800b42f2e6ac9f449351c35b2d389-85x64.png",
-      "icon_dimensions": {
-        "height": 64,
-        "width": 85
-      }
+      "icon_url": null,
+      "icon_dimensions": null
     },
     "Assault Cuirass": {
       "tier": 5,
       "icon": "assault_cuirass.png",
-      "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/198370ca65f3e81849a1de8c330f5959bb6d0f1e-85x64.png",
-      "icon_dimensions": {
-        "height": 64,
-        "width": 85
-      }
+      "icon_url": null,
+      "icon_dimensions": null
     },
     "Princes Knife": {
       "tier": 1,
       "icon": "princes_knife.png",
-      "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/c825d8b7dcc614a332baaf94fd10948798ab90ae-85x62.png",
-      "icon_dimensions": {
-        "height": 62,
-        "width": 85
-      }
+      "icon_url": null,
+      "icon_dimensions": null
     },
     "Paladin Sword": {
       "tier": 3,
       "icon": "paladin_sword.png",
-      "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/9761acb02de29d3b41b04d6cff8007f738d225db-85x62.png",
-      "icon_dimensions": {
-        "height": 62,
-        "width": 85
-      }
+      "icon_url": null,
+      "icon_dimensions": null
     },
     "Drum of Endurance": {
       "tier": 2,
       "icon": "drum_of_endurance.png",
-      "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/d9c4a7918a816d9760841bdabda80628a1a30899-85x64.png",
-      "icon_dimensions": {
-        "height": 64,
-        "width": 85
-      }
+      "icon_url": null,
+      "icon_dimensions": null
     },
     "Blade Mail": {
       "tier": 2,
       "icon": "blade_mail.png",
-      "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/8a8802bac31caf3588fc8d68a244f491c8853fc3-85x64.png",
-      "icon_dimensions": {
-        "height": 64,
-        "width": 85
-      }
+      "icon_url": null,
+      "icon_dimensions": null
     },
     "Satanic": {
       "tier": 5,
       "icon": "satanic.png",
-      "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/91ae5fcb163991df27cdcfc38d8a79eb4a3d212d-85x64.png",
-      "icon_dimensions": {
-        "height": 64,
-        "width": 85
-      }
+      "icon_url": null,
+      "icon_dimensions": null
     },
     "Trident": {
       "tier": 3,
       "icon": "trident.png",
-      "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/1d4882444ae94aceda64610db6b06f2fcf7dee02-85x62.png",
-      "icon_dimensions": {
-        "height": 62,
-        "width": 85
-      }
+      "icon_url": null,
+      "icon_dimensions": null
     },
     "Rapier": {
       "tier": 5,
       "icon": "rapier.png",
-      "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/9019a1c3012cf78d7d828175f56fff1b6fa988c5-85x64.png",
-      "icon_dimensions": {
-        "height": 64,
-        "width": 85
-      }
+      "icon_url": null,
+      "icon_dimensions": null
     },
     "Mirror Shield": {
       "tier": 5,
       "icon": "mirror_shield.png",
-      "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/c4e03c22b1d83a910442130440f508b8c6d62662-85x62.png",
-      "icon_dimensions": {
-        "height": 62,
-        "width": 85
-      }
+      "icon_url": null,
+      "icon_dimensions": null
     },
     "Ogre Hood": {
       "tier": 5,
       "icon": "ogre_hood.png",
-      "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/9deda6113fd23a6eb007ce5d8c6abcfcd3b433de-88x64.png",
-      "icon_dimensions": {
-        "height": 64,
-        "width": 88
-      }
+      "icon_url": null,
+      "icon_dimensions": null
     },
     "Refresher Orb": {
       "tier": 4,
       "icon": "refresher_orb.png",
-      "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/5519f0467fa03796806981fd33c20417f0feaade-85x64.png",
-      "icon_dimensions": {
-        "height": 64,
-        "width": 85
-      }
+      "icon_url": null,
+      "icon_dimensions": null
     },
     "Crystalys": {
       "tier": 1,
       "icon": "crystalys.png",
-      "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/6c219c117632dafcafe63b79baf3a42a9dc5b2d6-85x64.png",
-      "icon_dimensions": {
-        "height": 64,
-        "width": 85
-      }
+      "icon_url": null,
+      "icon_dimensions": null
     },
     "Skull Basher": {
       "tier": 1,
       "icon": "skull_basher.png",
-      "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/7da56115d82fa98a1055bc27e1b7c2e518f05182-85x64.png",
-      "icon_dimensions": {
-        "height": 64,
-        "width": 85
-      }
+      "icon_url": null,
+      "icon_dimensions": null
     },
     "Heavens Halberd": {
       "tier": 3,
       "icon": "heavens_halberd.png",
-      "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/ee16ec6ee2ba97be68ff6a85de0717b22e69af45-85x64.png",
-      "icon_dimensions": {
-        "height": 64,
-        "width": 85
-      }
+      "icon_url": null,
+      "icon_dimensions": null
     },
     "Blink Dagger": {
       "tier": 1,
       "icon": "blink_dagger.png",
-      "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/a7f0a86f566983fb8646d526186ff26d9ce89c34-85x64.png",
-      "icon_dimensions": {
-        "height": 64,
-        "width": 85
-      }
+      "icon_url": null,
+      "icon_dimensions": null
     },
     "Hood of Defiance": {
       "tier": 2,
       "icon": "hood_of_defiance.png",
-      "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/32f406353b09ec3d30caf8def4a43b5b95d17cff-85x64.png",
-      "icon_dimensions": {
-        "height": 64,
-        "width": 85
-      }
+      "icon_url": null,
+      "icon_dimensions": null
     },
     "Spider Leg": {
       "tier": 2,
       "icon": "spider_legs.png",
-      "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/6a47f99367d80058075d894a9d1558cd4791f1cb-85x62.png",
-      "icon_dimensions": {
-        "height": 62,
-        "width": 85
-      }
+      "icon_url": null,
+      "icon_dimensions": null
     },
     "Telescope": {
       "tier": 2,
       "icon": "telescope.png",
-      "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/78fa07e7fff71befaebae25d413c181b955aa63f-85x62.jpg",
-      "icon_dimensions": {
-        "height": 62,
-        "width": 85
-      }
+      "icon_url": null,
+      "icon_dimensions": null
     },
     "Ring of Basilius": {
       "tier": 1,
       "icon": "ring_of_basilius.png",
-      "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/90df533aadf25fe675cf774b735a629d158cb738-85x64.png",
-      "icon_dimensions": {
-        "height": 64,
-        "width": 85
-      }
+      "icon_url": null,
+      "icon_dimensions": null
     },
     "Guardian Greaves": {
       "tier": 4,
       "icon": "guardian_greaves.png",
-      "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/a467df04fbc8756026050e06b8a8a701d99ac253-85x62.png",
-      "icon_dimensions": {
-        "height": 62,
-        "width": 85
-      }
+      "icon_url": null,
+      "icon_dimensions": null
     },
     "Witless Shako": {
       "tier": 1,
       "icon": "witless_shako.png",
-      "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/e775eefab33910611620cc351e42336554c3c383-85x62.png",
-      "icon_dimensions": {
-        "height": 62,
-        "width": 85
-      }
+      "icon_url": null,
+      "icon_dimensions": null
     },
     "Vanguard": {
       "tier": 2,
       "icon": "vanguard.png",
-      "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/71cfb079d0d214e61692a8efb58e20ccc77da9d1-85x64.png",
-      "icon_dimensions": {
-        "height": 64,
-        "width": 85
-      }
+      "icon_url": null,
+      "icon_dimensions": null
     },
     "Lucky Pendant": {
       "tier": 1,
       "icon": "lucky_pendant.png",
-      "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/20af7fee44015fc624ce362999691064e3a2fd23-88x64.png",
-      "icon_dimensions": {
-        "height": 64,
-        "width": 88
-      }
+      "icon_url": null,
+      "icon_dimensions": null
     },
     "Shivas Guard": {
       "tier": 3,
       "icon": "shivas_guard.png",
-      "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/6517b67475d4f33956282f8305a78005c677bdaf-85x64.png",
-      "icon_dimensions": {
-        "height": 64,
-        "width": 85
-      }
+      "icon_url": null,
+      "icon_dimensions": null
     },
     "Buckler": {
       "tier": 1,
       "icon": "buckler.png",
-      "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/49e3328b9feecf1a566c32accdab90a304f72d2c-85x62.png",
-      "icon_dimensions": {
-        "height": 62,
-        "width": 85
-      }
+      "icon_url": null,
+      "icon_dimensions": null
     },
     "Maelstrom": {
       "tier": 2,
       "icon": "maelstrom.png",
-      "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/b3425810d20859502a3d7d9ddf2815dd819c0240-85x64.png",
-      "icon_dimensions": {
-        "height": 64,
-        "width": 85
-      }
+      "icon_url": null,
+      "icon_dimensions": null
     },
     "Bloodthorn": {
       "tier": 4,
       "icon": "bloodthorn.png",
-      "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/6041e58218c6db15950f26098b6ad5871a18b0ad-85x62.png",
-      "icon_dimensions": {
-        "height": 62,
-        "width": 85
-      }
+      "icon_url": null,
+      "icon_dimensions": null
     },
     "Bloodstone": {
       "tier": 3,
       "icon": "bloodstone.png",
-      "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/19d4d037befef42e1010e929ad054ad20bc9c88a-85x64.png",
-      "icon_dimensions": {
-        "height": 64,
-        "width": 85
-      }
+      "icon_url": null,
+      "icon_dimensions": null
     },
     "Scythe of Vyse": {
       "tier": 5,
       "icon": "scythe_of_vyse.png",
-      "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/587be960ff3c463b337b8b7c1a9533c91af85542-85x64.png",
-      "icon_dimensions": {
-        "height": 64,
-        "width": 85
-      }
+      "icon_url": null,
+      "icon_dimensions": null
     },
     "Moon Shard": {
       "tier": 3,
       "icon": "moon_shard.png",
-      "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/473844f3cd568f41a226719422f37e3e8be652b7-85x62.png",
-      "icon_dimensions": {
-        "height": 62,
-        "width": 85
-      }
+      "icon_url": null,
+      "icon_dimensions": null
     },
     "Aeon Disk": {
       "tier": 5,
       "icon": "aeon_disk.png",
-      "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/5afa27b82342063366dfff3da6877806a49547ad-85x62.png",
-      "icon_dimensions": {
-        "height": 62,
-        "width": 85
-      }
+      "icon_url": null,
+      "icon_dimensions": null
     },
     "Spark of Courage": {
       "tier": 1,
       "icon": "spark_of_courage.png",
-      "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/5660880d87634bddd84a0190eef8ac7466afd172-85x62.png",
-      "icon_dimensions": {
-        "height": 62,
-        "width": 85
-      }
+      "icon_url": null,
+      "icon_dimensions": null
     },
     "Force Staff": {
       "tier": 1,
       "icon": "force_staff.png",
-      "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/96fb7aeac4e408b4c1337c929f6c78933e0b63f9-85x64.png",
-      "icon_dimensions": {
-        "height": 64,
-        "width": 85
-      }
+      "icon_url": null,
+      "icon_dimensions": null
     },
     "Wraith Band": {
       "tier": 1,
       "icon": "wraith_band.png",
-      "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/8a56ea4f5b4c6b39d364d388c847add3cea45cdb-85x64.png",
-      "icon_dimensions": {
-        "height": 64,
-        "width": 85
-      }
+      "icon_url": null,
+      "icon_dimensions": null
     },
     "Gossamer Cape": {
       "tier": 1,
       "icon": "gossamar_cape.png",
-      "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/c7f62f021bec515c8f02394d8027ce78ccbfa257-85x62.png",
-      "icon_dimensions": {
-        "height": 62,
-        "width": 85
-      }
+      "icon_url": null,
+      "icon_dimensions": null
     }
   },
   "total": 76

@@ -9,11 +9,8 @@
       "The carrier must have mana for Aghanims Shard.",
       "Additional skill will be removed after chess pieces upgraded."
     ],
-    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/1941fbc42371f9885eb8485c181b83732feb064e-85x62.png",
-    "icon_dimensions": {
-      "height": 62,
-      "width": 85
-    },
+    "icon_url": null,
+    "icon_dimensions": null,
     "names": {
       "en": "Aghanims Shard",
       "ru": "Aghanims Shard"
@@ -34,11 +31,8 @@
     "quality": "consumable",
     "texture": "ultimate_scepter",
     "notes": [],
-    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/355c7da2889c624aa217bbd74ba153be9d00d405-85x64.png",
-    "icon_dimensions": {
-      "height": 64,
-      "width": 85
-    },
+    "icon_url": null,
+    "icon_dimensions": null,
     "names": {
       "en": "Aghanims Scepter",
       "ru": "Aghanims Scepter"
@@ -59,11 +53,8 @@
     "quality": "rare",
     "texture": "item_avianas_feather",
     "notes": [],
-    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/d0337bc142ffe686d8381e7f90bc2fc8932c29df-85x62.png",
-    "icon_dimensions": {
-      "height": 62,
-      "width": 85
-    },
+    "icon_url": null,
+    "icon_dimensions": null,
     "names": {
       "en": "Avianas Feather",
       "ru": "Avianas Feather"
@@ -81,11 +72,8 @@
     "quality": "epic",
     "texture": "item_desolator",
     "notes": [],
-    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/50e6ea742707605eb1540d58d3a684cb946edee1-85x64.png",
-    "icon_dimensions": {
-      "height": 64,
-      "width": 85
-    },
+    "icon_url": null,
+    "icon_dimensions": null,
     "names": {
       "en": "Desolator",
       "ru": "Desolator"
@@ -108,11 +96,8 @@
     "notes": [
       "Immune to attack and ability when jumping"
     ],
-    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/6b18c05fe1cc4c1b8e4a7e7d3a2342eeabe75bef-85x64.png",
-    "icon_dimensions": {
-      "height": 64,
-      "width": 85
-    },
+    "icon_url": null,
+    "icon_dimensions": null,
     "names": {
       "en": "Arcane Boots",
       "ru": "Arcane Boots"
@@ -154,11 +139,8 @@
     "notes": [
       "Initial chance at Round 10 is 40% and increases 2% per round."
     ],
-    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/7850b75af42238d316080620aba606e20ac22ced-88x64.png",
-    "icon_dimensions": {
-      "height": 64,
-      "width": 88
-    },
+    "icon_url": null,
+    "icon_dimensions": null,
     "names": {
       "en": "Magic Seed",
       "ru": "Magic Seed"
@@ -179,11 +161,8 @@
     "quality": "rare",
     "texture": "item_skadi",
     "notes": [],
-    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/71e09d8b07234ff602b483482f036d41e41c0dd2-85x64.png",
-    "icon_dimensions": {
-      "height": 64,
-      "width": 85
-    },
+    "icon_url": null,
+    "icon_dimensions": null,
     "names": {
       "en": "Eye of Skadi",
       "ru": "Eye of Skadi"
@@ -204,11 +183,8 @@
     "quality": "rare",
     "texture": "item_black_king_bar",
     "notes": [],
-    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/0a1353427bd0c7119dd70f18b772b0872a768bfa-85x64.png",
-    "icon_dimensions": {
-      "height": 64,
-      "width": 85
-    },
+    "icon_url": null,
+    "icon_dimensions": null,
     "names": {
       "en": "Black King Bar",
       "ru": "Black King Bar"
@@ -251,11 +227,8 @@
     "quality": "rare",
     "texture": "item_aegis",
     "notes": [],
-    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/873554f4e3153f77e66c026aef9240c9671ef891-85x64.png",
-    "icon_dimensions": {
-      "height": 64,
-      "width": 85
-    },
+    "icon_url": null,
+    "icon_dimensions": null,
     "names": {
       "en": "Aegis of Immortal",
       "ru": "Aegis of Immortal"
@@ -276,11 +249,8 @@
     "quality": "rare",
     "texture": "custom/jushencantie",
     "notes": [],
-    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/7102e80488dcf28526bd0a6c9101f1b9fa3c880f-88x64.png",
-    "icon_dimensions": {
-      "height": 64,
-      "width": 88
-    },
+    "icon_url": null,
+    "icon_dimensions": null,
     "names": {
       "en": "Sliver",
       "ru": "Sliver"
@@ -298,11 +268,8 @@
     "quality": "consumable",
     "texture": "custom/card_chance",
     "notes": [],
-    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/b93cb5fb12534d76cabd32b25a517738c06c10e4-88x64.png",
-    "icon_dimensions": {
-      "height": 64,
-      "width": 88
-    },
+    "icon_url": null,
+    "icon_dimensions": null,
     "names": {
       "en": "Card: Chance",
       "ru": "Card: Chance"
@@ -320,11 +287,8 @@
     "quality": "consumable",
     "texture": "custom/card_fate",
     "notes": [],
-    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/a708973ee3c8813df9870eae92af0e8bcd32a59c-88x64.png",
-    "icon_dimensions": {
-      "height": 64,
-      "width": 88
-    },
+    "icon_url": null,
+    "icon_dimensions": null,
     "names": {
       "en": "Card: Fate",
       "ru": "Card: Fate"
@@ -342,11 +306,8 @@
     "quality": "consumable",
     "texture": "item_pavise",
     "notes": [],
-    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/2234f9246f9dbd9b969fde07925251f8b3235ef4-85x62.png",
-    "icon_dimensions": {
-      "height": 62,
-      "width": 85
-    },
+    "icon_url": null,
+    "icon_dimensions": null,
     "names": {
       "en": "Pavise",
       "ru": "Pavise"
@@ -364,11 +325,8 @@
     "quality": "rare",
     "texture": "item_crimson_guard",
     "notes": [],
-    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/45dbf93ec668ca77d2e1f6dce7def38cf5e277a8-85x64.png",
-    "icon_dimensions": {
-      "height": 64,
-      "width": 85
-    },
+    "icon_url": null,
+    "icon_dimensions": null,
     "names": {
       "en": "Crimson Guard",
       "ru": "Crimson Guard"
@@ -389,11 +347,8 @@
     "quality": "consumable",
     "texture": "item_tango",
     "notes": [],
-    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/a34754fe3f80dda29f220638fcf84c35b2d54c66-88x64.png",
-    "icon_dimensions": {
-      "height": 64,
-      "width": 88
-    },
+    "icon_url": null,
+    "icon_dimensions": null,
     "names": {
       "en": "Tango",
       "ru": "Tango"
@@ -414,11 +369,8 @@
     "quality": "consumable",
     "texture": "item_tango_single",
     "notes": [],
-    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/a34754fe3f80dda29f220638fcf84c35b2d54c66-88x64.png",
-    "icon_dimensions": {
-      "height": 64,
-      "width": 88
-    },
+    "icon_url": null,
+    "icon_dimensions": null,
     "names": {
       "en": "Tango",
       "ru": "Tango"
@@ -480,11 +432,8 @@
     "quality": "artifact",
     "texture": "item_mjollnir",
     "notes": [],
-    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/d5025a233dbd13582087a702904df29296e3e99a-85x64.png",
-    "icon_dimensions": {
-      "height": 64,
-      "width": 85
-    },
+    "icon_url": null,
+    "icon_dimensions": null,
     "names": {
       "en": "Mjollnir",
       "ru": "Mjollnir"
@@ -502,11 +451,8 @@
     "quality": "artifact",
     "texture": "item_greater_crit",
     "notes": [],
-    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/1a2412a99a05cc47fd9d609a4ea482151726bf14-85x64.png",
-    "icon_dimensions": {
-      "height": 64,
-      "width": 85
-    },
+    "icon_url": null,
+    "icon_dimensions": null,
     "names": {
       "en": "Daedalus",
       "ru": "Daedalus"
@@ -524,11 +470,8 @@
     "quality": "common",
     "texture": "abyssal_blade",
     "notes": [],
-    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/c433e2c38e8c546fd35a875b68abee8f5ba3bbfc-85x64.png",
-    "icon_dimensions": {
-      "height": 64,
-      "width": 85
-    },
+    "icon_url": null,
+    "icon_dimensions": null,
     "names": {
       "en": "Abyssal Blade",
       "ru": "Abyssal Blade"
@@ -549,11 +492,8 @@
     "quality": "common",
     "texture": "item_hand_of_midas",
     "notes": [],
-    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/5b00005741bcd1f2c3782bef488cfd6eee6b0153-85x64.png",
-    "icon_dimensions": {
-      "height": 64,
-      "width": 85
-    },
+    "icon_url": null,
+    "icon_dimensions": null,
     "names": {
       "en": "Hand of Midas",
       "ru": "Hand of Midas"
@@ -574,11 +514,8 @@
     "quality": "rare",
     "texture": "item_pipe",
     "notes": [],
-    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/def75c7ef6202cfa582a2f49fba20bcca14380ff-85x64.png",
-    "icon_dimensions": {
-      "height": 64,
-      "width": 85
-    },
+    "icon_url": null,
+    "icon_dimensions": null,
     "names": {
       "en": "Pipe of Insight",
       "ru": "Pipe of Insight"
@@ -599,11 +536,8 @@
     "quality": "",
     "texture": "item_doubloon",
     "notes": [],
-    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/b22a3ad136ecaabc95b675327376941b6cad702e-88x64.png",
-    "icon_dimensions": {
-      "height": 64,
-      "width": 88
-    },
+    "icon_url": null,
+    "icon_dimensions": null,
     "names": {
       "en": "Doubloon",
       "ru": "Doubloon"
@@ -651,11 +585,8 @@
     "notes": [
       "Casting skills and certain special target selection targeted spells are ineffective."
     ],
-    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/bac646545eacf35f1f88579e667fecdbbe321fb9-85x62.png",
-    "icon_dimensions": {
-      "height": 62,
-      "width": 85
-    },
+    "icon_url": null,
+    "icon_dimensions": null,
     "names": {
       "en": "Spell Prism",
       "ru": "Spell Prism"
@@ -676,11 +607,8 @@
       "At most 1 undead piece can resurrect each round.",
       "IO cannot resurrect. Independent with Dismiss."
     ],
-    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/a3dbd5e8b9ccec85923937e3976d82bfaad3e048-88x64.png",
-    "icon_dimensions": {
-      "height": 64,
-      "width": 88
-    },
+    "icon_url": null,
+    "icon_dimensions": null,
     "names": {
       "en": "Ascetics Cap",
       "ru": "Ascetics Cap"
@@ -701,11 +629,8 @@
     "quality": "rare",
     "texture": "item_mask_of_madness",
     "notes": [],
-    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/777942ae5c0fa3e6d4ecf0c8f7a552422b82a574-85x64.png",
-    "icon_dimensions": {
-      "height": 64,
-      "width": 85
-    },
+    "icon_url": null,
+    "icon_dimensions": null,
     "names": {
       "en": "Mask of Madness",
       "ru": "Mask of Madness"
@@ -774,11 +699,8 @@
     "notes": [
       "Consecutive recruitment failures will gradually raise the chance of receiving 2 Gold."
     ],
-    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/708b74fe2b1917348cd97e002a89a7655539e660-88x64.png",
-    "icon_dimensions": {
-      "height": 64,
-      "width": 88
-    },
+    "icon_url": null,
+    "icon_dimensions": null,
     "names": {
       "en": "Weighted Dice",
       "ru": "Weighted Dice"
@@ -796,11 +718,8 @@
     "quality": "epic",
     "texture": "item_gungir",
     "notes": [],
-    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/92696685cbd7508b79b62ae11da05ab32a41a730-88x64.png",
-    "icon_dimensions": {
-      "height": 64,
-      "width": 88
-    },
+    "icon_url": null,
+    "icon_dimensions": null,
     "names": {
       "en": "Gleipnir",
       "ru": "Gleipnir"
@@ -821,11 +740,8 @@
     "quality": "consumable",
     "texture": "orb_of_corrosion",
     "notes": [],
-    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/e47fef2396c94891e63956431008f530fb0adb6e-85x62.png",
-    "icon_dimensions": {
-      "height": 62,
-      "width": 85
-    },
+    "icon_url": null,
+    "icon_dimensions": null,
     "names": {
       "en": "Orb of Corrosion",
       "ru": "Orb of Corrosion"
@@ -865,11 +781,8 @@
     "quality": "rare",
     "texture": "item_minotaur_horn",
     "notes": [],
-    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/ee4bf9bc446b4572ce9142d2f744983c5fc91d90-85x62.png",
-    "icon_dimensions": {
-      "height": 62,
-      "width": 85
-    },
+    "icon_url": null,
+    "icon_dimensions": null,
     "names": {
       "en": "Minotaur Horn",
       "ru": "Minotaur Horn"
@@ -887,11 +800,8 @@
     "quality": "rare",
     "texture": "custom/haojie",
     "notes": [],
-    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/aa8c6b389b298334e816ca4e06237c855161a93b-88x64.png",
-    "icon_dimensions": {
-      "height": 64,
-      "width": 88
-    },
+    "icon_url": null,
+    "icon_dimensions": null,
     "names": {
       "en": "Havoc",
       "ru": "Havoc"
@@ -909,11 +819,8 @@
     "quality": "epic",
     "texture": "item_dagon_4",
     "notes": [],
-    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/a3c77e1df7e91ef119b3660cd9d67e40393619a1-85x64.png",
-    "icon_dimensions": {
-      "height": 64,
-      "width": 85
-    },
+    "icon_url": null,
+    "icon_dimensions": null,
     "names": {
       "en": "Dagon",
       "ru": "Dagon"
@@ -936,11 +843,8 @@
     "notes": [
       "Mirror chess pieces inherit passive effects from the carriers equipment."
     ],
-    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/e51534ce23dc7695e826bdd597f0ada1c0d4e0d4-85x64.png",
-    "icon_dimensions": {
-      "height": 64,
-      "width": 85
-    },
+    "icon_url": null,
+    "icon_dimensions": null,
     "names": {
       "en": "Manta Style",
       "ru": "Manta Style"
@@ -961,11 +865,8 @@
     "quality": "rare",
     "texture": "item_butterfly",
     "notes": [],
-    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/9604a461af6188dcfdb65efc09f7eb1cd47d67c0-85x64.png",
-    "icon_dimensions": {
-      "height": 64,
-      "width": 85
-    },
+    "icon_url": null,
+    "icon_dimensions": null,
     "names": {
       "en": "Butterfly",
       "ru": "Butterfly"
@@ -986,11 +887,8 @@
     "quality": "common",
     "texture": "kaya",
     "notes": [],
-    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/60e899fe285f566685f3c2693f54abbada111086-85x62.png",
-    "icon_dimensions": {
-      "height": 62,
-      "width": 85
-    },
+    "icon_url": null,
+    "icon_dimensions": null,
     "names": {
       "en": "Kaya",
       "ru": "Kaya"
@@ -1008,11 +906,8 @@
     "quality": "epic",
     "texture": "item_radiance",
     "notes": [],
-    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/21b30e97f6bb517bbcc5b1528fd312f7024f38df-85x64.png",
-    "icon_dimensions": {
-      "height": 64,
-      "width": 85
-    },
+    "icon_url": null,
+    "icon_dimensions": null,
     "names": {
       "en": "Radiance",
       "ru": "Radiance"
@@ -1033,11 +928,8 @@
     "quality": "rare",
     "texture": "item_diffusal_blade",
     "notes": [],
-    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/7d11f022d29db612b58cd02e1e56ae71ca291a23-85x64.png",
-    "icon_dimensions": {
-      "height": 64,
-      "width": 85
-    },
+    "icon_url": null,
+    "icon_dimensions": null,
     "names": {
       "en": "Diffusal Blade",
       "ru": "Diffusal Blade"
@@ -1060,11 +952,8 @@
     "notes": [
       "Immune to attack and ability when jumping"
     ],
-    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/5f8b9646c6716a3b798a42adbb738ddabdbcaa19-85x64.png",
-    "icon_dimensions": {
-      "height": 64,
-      "width": 85
-    },
+    "icon_url": null,
+    "icon_dimensions": null,
     "names": {
       "en": "Tranquil Boots",
       "ru": "Tranquil Boots"
@@ -1082,11 +971,8 @@
     "quality": "artifact",
     "texture": "item_monkey_king_bar",
     "notes": [],
-    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/6e3723bc033c1178144408d9ffb60981966def9d-85x64.png",
-    "icon_dimensions": {
-      "height": 64,
-      "width": 85
-    },
+    "icon_url": null,
+    "icon_dimensions": null,
     "names": {
       "en": "Monkey King Bar",
       "ru": "Monkey King Bar"
@@ -1104,11 +990,8 @@
     "quality": "rare",
     "texture": "item_vladmir",
     "notes": [],
-    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/55e53cec920b6c4f2e357dd2266a231f45cd6f31-85x64.png",
-    "icon_dimensions": {
-      "height": 64,
-      "width": 85
-    },
+    "icon_url": null,
+    "icon_dimensions": null,
     "names": {
       "en": "Vladimirs Offering",
       "ru": "Vladimirs Offering"
@@ -1172,11 +1055,8 @@
     "notes": [
       "Attack range bonus not stackable."
     ],
-    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/39a7b9055b1141431c42792a3409b6f7c778af47-88x64.png",
-    "icon_dimensions": {
-      "height": 64,
-      "width": 88
-    },
+    "icon_url": null,
+    "icon_dimensions": null,
     "names": {
       "en": "Hurricane Pike",
       "ru": "Hurricane Pike"
@@ -1197,11 +1077,8 @@
     "quality": "rare",
     "texture": "item_giants_ring",
     "notes": [],
-    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/78a745f10224c01774d5d56d612509694c5bf26f-85x62.png",
-    "icon_dimensions": {
-      "height": 62,
-      "width": 85
-    },
+    "icon_url": null,
+    "icon_dimensions": null,
     "names": {
       "en": "Giants Ring",
       "ru": "Giants Ring"
@@ -1222,11 +1099,8 @@
     "quality": "common",
     "texture": "null_talisman",
     "notes": [],
-    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/a825f0a8a52a5c7edff44c4dd179d9c66e30d69d-85x64.png",
-    "icon_dimensions": {
-      "height": 64,
-      "width": 85
-    },
+    "icon_url": null,
+    "icon_dimensions": null,
     "names": {
       "en": "Null Talisman",
       "ru": "Null Talisman"
@@ -1244,11 +1118,8 @@
     "quality": "artifact",
     "texture": "item_bfury",
     "notes": [],
-    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/5541858603dbede2ac5c945d4527bd37a914383d-85x64.png",
-    "icon_dimensions": {
-      "height": 64,
-      "width": 85
-    },
+    "icon_url": null,
+    "icon_dimensions": null,
     "names": {
       "en": "Battle Fury",
       "ru": "Battle Fury"
@@ -1269,11 +1140,8 @@
     "quality": "common",
     "texture": "falcon_blade",
     "notes": [],
-    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/2baa2ec65cfd899ce82032520bc8e6c9690f82ab-88x64.png",
-    "icon_dimensions": {
-      "height": 64,
-      "width": 88
-    },
+    "icon_url": null,
+    "icon_dimensions": null,
     "names": {
       "en": "Falcon Blade",
       "ru": "Falcon Blade"
@@ -1291,11 +1159,8 @@
     "quality": "rare",
     "texture": "overwhelming_blink",
     "notes": [],
-    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/29c636114bea282e89f650cdbb8db3a2ec329a4c-88x64.png",
-    "icon_dimensions": {
-      "height": 64,
-      "width": 88
-    },
+    "icon_url": null,
+    "icon_dimensions": null,
     "names": {
       "en": "Overwhelming Blink",
       "ru": "Overwhelming Blink"
@@ -1313,11 +1178,8 @@
     "quality": "common",
     "texture": "bracer",
     "notes": [],
-    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/d0a8ff8951e4f6265127fa601787f13b299acd7c-85x64.png",
-    "icon_dimensions": {
-      "height": 64,
-      "width": 85
-    },
+    "icon_url": null,
+    "icon_dimensions": null,
     "names": {
       "en": "Bracer",
       "ru": "Bracer"
@@ -1335,11 +1197,8 @@
     "quality": "common",
     "texture": "bullwhip",
     "notes": [],
-    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/a19f1cbf09fd38552730731395c693655cab82dd-85x62.png",
-    "icon_dimensions": {
-      "height": 62,
-      "width": 85
-    },
+    "icon_url": null,
+    "icon_dimensions": null,
     "names": {
       "en": "Bullwhip",
       "ru": "Bullwhip"
@@ -1357,11 +1216,8 @@
     "quality": "rare",
     "texture": "item_sphere",
     "notes": [],
-    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/635eadc420ccf59fd0058e01acc7c03179cbcb64-85x64.png",
-    "icon_dimensions": {
-      "height": 64,
-      "width": 85
-    },
+    "icon_url": null,
+    "icon_dimensions": null,
     "names": {
       "en": "Linkens Sphere",
       "ru": "Linkens Sphere"
@@ -1500,11 +1356,8 @@
       "Packed piece can be transformed into any piece of the same cost, despite the chess pool limit.",
       "Packed pieces will not transform into pieces you packed into before."
     ],
-    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/85cf9390b9d1037a326262287d97d343e5ab7324-88x64.png",
-    "icon_dimensions": {
-      "height": 64,
-      "width": 88
-    },
+    "icon_url": null,
+    "icon_dimensions": null,
     "names": {
       "en": "Magic box",
       "ru": "Magic box"
@@ -1569,11 +1422,8 @@
     "quality": "consumable",
     "texture": "item_enchanted_mango",
     "notes": [],
-    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/1edce445da3aefc37f3c727ff23c752031703ecb-88x64.png",
-    "icon_dimensions": {
-      "height": 64,
-      "width": 88
-    },
+    "icon_url": null,
+    "icon_dimensions": null,
     "names": {
       "en": "Enchanted Mango",
       "ru": "Enchanted Mango"
@@ -1594,11 +1444,8 @@
     "quality": "",
     "texture": "item_mango_tree",
     "notes": [],
-    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/eb6d466d89871234eb28da4261a9d3e7b404a29e-88x64.png",
-    "icon_dimensions": {
-      "height": 64,
-      "width": 88
-    },
+    "icon_url": null,
+    "icon_dimensions": null,
     "names": {
       "en": "Mango Tree",
       "ru": "Mango Tree"
@@ -1619,11 +1466,8 @@
     "quality": "rare",
     "texture": "item_mekansm",
     "notes": [],
-    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/196c0705e45295f8489773cf906441e7ec22408d-85x64.png",
-    "icon_dimensions": {
-      "height": 64,
-      "width": 85
-    },
+    "icon_url": null,
+    "icon_dimensions": null,
     "names": {
       "en": "Mekansm",
       "ru": "Mekansm"
@@ -1646,11 +1490,8 @@
     "notes": [
       "Melee carrier summons 2 necro warriors while Ranged carrier summons 2 necro archers."
     ],
-    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/275ac231c23bbaa9f3bfd7f0f7ce859b02c2f386-85x64.png",
-    "icon_dimensions": {
-      "height": 64,
-      "width": 85
-    },
+    "icon_url": null,
+    "icon_dimensions": null,
     "names": {
       "en": "Necronomicon",
       "ru": "Necronomicon"
@@ -1671,11 +1512,8 @@
     "quality": "rare",
     "texture": "swift_blink",
     "notes": [],
-    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/787f124b703cc1b06d152b253602fc5b0c64db65-88x64.png",
-    "icon_dimensions": {
-      "height": 64,
-      "width": 88
-    },
+    "icon_url": null,
+    "icon_dimensions": null,
     "names": {
       "en": "Swift Blink",
       "ru": "Swift Blink"
@@ -1733,11 +1571,8 @@
     "quality": "rare",
     "texture": "bottle",
     "notes": [],
-    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/02079ccf654800b42f2e6ac9f449351c35b2d389-85x64.png",
-    "icon_dimensions": {
-      "height": 64,
-      "width": 85
-    },
+    "icon_url": null,
+    "icon_dimensions": null,
     "names": {
       "en": "Bottle",
       "ru": "Bottle"
@@ -1755,11 +1590,8 @@
     "quality": "rare",
     "texture": "bottle_empty",
     "notes": [],
-    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/02079ccf654800b42f2e6ac9f449351c35b2d389-85x64.png",
-    "icon_dimensions": {
-      "height": 64,
-      "width": 85
-    },
+    "icon_url": null,
+    "icon_dimensions": null,
     "names": {
       "en": "Bottle",
       "ru": "Bottle"
@@ -1842,11 +1674,8 @@
     "quality": "artifact",
     "texture": "item_assault",
     "notes": [],
-    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/198370ca65f3e81849a1de8c330f5959bb6d0f1e-85x64.png",
-    "icon_dimensions": {
-      "height": 64,
-      "width": 85
-    },
+    "icon_url": null,
+    "icon_dimensions": null,
     "names": {
       "en": "Assault Cuirass",
       "ru": "Assault Cuirass"
@@ -1864,11 +1693,8 @@
     "quality": "epic",
     "texture": "princes_knife",
     "notes": [],
-    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/c825d8b7dcc614a332baaf94fd10948798ab90ae-85x62.png",
-    "icon_dimensions": {
-      "height": 62,
-      "width": 85
-    },
+    "icon_url": null,
+    "icon_dimensions": null,
     "names": {
       "en": "Princes Knife",
       "ru": "Princes Knife"
@@ -1886,11 +1712,8 @@
     "quality": "consumable",
     "texture": "item_poor_mans_shield",
     "notes": [],
-    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/0bae4187f9346076769e326d1b8c850e151fe5af-88x64.png",
-    "icon_dimensions": {
-      "height": 64,
-      "width": 88
-    },
+    "icon_url": null,
+    "icon_dimensions": null,
     "names": {
       "en": "Poor Mans Shield",
       "ru": "Poor Mans Shield"
@@ -1908,11 +1731,8 @@
     "quality": "rare",
     "texture": "item_paladin_sword",
     "notes": [],
-    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/9761acb02de29d3b41b04d6cff8007f738d225db-85x62.png",
-    "icon_dimensions": {
-      "height": 62,
-      "width": 85
-    },
+    "icon_url": null,
+    "icon_dimensions": null,
     "names": {
       "en": "Paladin Sword",
       "ru": "Paladin Sword"
@@ -1935,11 +1755,8 @@
     "notes": [
       "Modified from the previous courier-lost-health scaling formula."
     ],
-    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/01c1c3c75559fcc46a08d3b438818701fe2d78a3-88x64.png",
-    "icon_dimensions": {
-      "height": 64,
-      "width": 88
-    },
+    "icon_url": null,
+    "icon_dimensions": null,
     "names": {
       "en": "Defiant Shell",
       "ru": "Defiant Shell"
@@ -1960,11 +1777,8 @@
       "Relic equipped will expire at next relic round.",
       "Exclusive, new relic will replace the former one."
     ],
-    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/56c0d1487bb72221f502cf09de537930c5dd3da6-88x64.png",
-    "icon_dimensions": {
-      "height": 64,
-      "width": 88
-    },
+    "icon_url": null,
+    "icon_dimensions": null,
     "names": {
       "en": "Relicbox",
       "ru": "Сокровищница"
@@ -1985,11 +1799,8 @@
     "quality": "rare",
     "texture": "item_ancient_janggo",
     "notes": [],
-    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/d9c4a7918a816d9760841bdabda80628a1a30899-85x64.png",
-    "icon_dimensions": {
-      "height": 64,
-      "width": 85
-    },
+    "icon_url": null,
+    "icon_dimensions": null,
     "names": {
       "en": "Drum of Endurance",
       "ru": "Drum of Endurance"
@@ -2007,11 +1818,8 @@
     "quality": "rare",
     "texture": "item_blade_mail",
     "notes": [],
-    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/8a8802bac31caf3588fc8d68a244f491c8853fc3-85x64.png",
-    "icon_dimensions": {
-      "height": 64,
-      "width": 85
-    },
+    "icon_url": null,
+    "icon_dimensions": null,
     "names": {
       "en": "Blade Mail",
       "ru": "Blade Mail"
@@ -2100,11 +1908,8 @@
     "quality": "artifact",
     "texture": "item_satanic",
     "notes": [],
-    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/91ae5fcb163991df27cdcfc38d8a79eb4a3d212d-85x64.png",
-    "icon_dimensions": {
-      "height": 64,
-      "width": 85
-    },
+    "icon_url": null,
+    "icon_dimensions": null,
     "names": {
       "en": "Satanic",
       "ru": "Satanic"
@@ -2125,11 +1930,8 @@
     "quality": "rare",
     "texture": "item_trident",
     "notes": [],
-    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/1d4882444ae94aceda64610db6b06f2fcf7dee02-85x62.png",
-    "icon_dimensions": {
-      "height": 62,
-      "width": 85
-    },
+    "icon_url": null,
+    "icon_dimensions": null,
     "names": {
       "en": "Trident",
       "ru": "Trident"
@@ -2169,11 +1971,8 @@
     "quality": "rare",
     "texture": "item_talisman_of_evasion",
     "notes": [],
-    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/fa18078b4d379302d89b9c3fe6b3bcda2442ab43-88x64.png",
-    "icon_dimensions": {
-      "height": 64,
-      "width": 88
-    },
+    "icon_url": null,
+    "icon_dimensions": null,
     "names": {
       "en": "Talisman of Evasion",
       "ru": "Talisman of Evasion"
@@ -2191,11 +1990,8 @@
     "quality": "artifact",
     "texture": "item_rapier",
     "notes": [],
-    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/9019a1c3012cf78d7d828175f56fff1b6fa988c5-85x64.png",
-    "icon_dimensions": {
-      "height": 64,
-      "width": 85
-    },
+    "icon_url": null,
+    "icon_dimensions": null,
     "names": {
       "en": "Rapier",
       "ru": "Rapier"
@@ -2216,11 +2012,8 @@
     "quality": "rare",
     "texture": "item_mirror_shield",
     "notes": [],
-    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/c4e03c22b1d83a910442130440f508b8c6d62662-85x62.png",
-    "icon_dimensions": {
-      "height": 62,
-      "width": 85
-    },
+    "icon_url": null,
+    "icon_dimensions": null,
     "names": {
       "en": "Mirror Shield",
       "ru": "Mirror Shield"
@@ -2240,11 +2033,8 @@
     "notes": [
       "The bearer retains its original Species as well."
     ],
-    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/9deda6113fd23a6eb007ce5d8c6abcfcd3b433de-88x64.png",
-    "icon_dimensions": {
-      "height": 64,
-      "width": 88
-    },
+    "icon_url": null,
+    "icon_dimensions": null,
     "names": {
       "en": "Ogre Hood",
       "ru": "Ogre Hood"
@@ -2265,11 +2055,8 @@
     "quality": "rare",
     "texture": "item_refresher",
     "notes": [],
-    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/5519f0467fa03796806981fd33c20417f0feaade-85x64.png",
-    "icon_dimensions": {
-      "height": 64,
-      "width": 85
-    },
+    "icon_url": null,
+    "icon_dimensions": null,
     "names": {
       "en": "Refresher Orb",
       "ru": "Refresher Orb"
@@ -2290,11 +2077,8 @@
     "quality": "rare",
     "texture": "item_lesser_crit",
     "notes": [],
-    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/6c219c117632dafcafe63b79baf3a42a9dc5b2d6-85x64.png",
-    "icon_dimensions": {
-      "height": 64,
-      "width": 85
-    },
+    "icon_url": null,
+    "icon_dimensions": null,
     "names": {
       "en": "Crystalys",
       "ru": "Crystalys"
@@ -2378,11 +2162,8 @@
     "quality": "common",
     "texture": "basher",
     "notes": [],
-    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/7da56115d82fa98a1055bc27e1b7c2e518f05182-85x64.png",
-    "icon_dimensions": {
-      "height": 64,
-      "width": 85
-    },
+    "icon_url": null,
+    "icon_dimensions": null,
     "names": {
       "en": "Skull Basher",
       "ru": "Skull Basher"
@@ -2518,11 +2299,8 @@
     "quality": "rare",
     "texture": "item_heavens_halberd",
     "notes": [],
-    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/ee16ec6ee2ba97be68ff6a85de0717b22e69af45-85x64.png",
-    "icon_dimensions": {
-      "height": 64,
-      "width": 85
-    },
+    "icon_url": null,
+    "icon_dimensions": null,
     "names": {
       "en": "Heavens Halberd",
       "ru": "Heavens Halberd"
@@ -2542,11 +2320,8 @@
     "notes": [
       "Chess Pieces with fast movement can be immune to attacks and projectiles."
     ],
-    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/a7f0a86f566983fb8646d526186ff26d9ce89c34-85x64.png",
-    "icon_dimensions": {
-      "height": 64,
-      "width": 85
-    },
+    "icon_url": null,
+    "icon_dimensions": null,
     "names": {
       "en": "Blink Dagger",
       "ru": "Blink Dagger"
@@ -2567,11 +2342,8 @@
     "quality": "rare",
     "texture": "item_hood_of_defiance",
     "notes": [],
-    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/32f406353b09ec3d30caf8def4a43b5b95d17cff-85x64.png",
-    "icon_dimensions": {
-      "height": 64,
-      "width": 85
-    },
+    "icon_url": null,
+    "icon_dimensions": null,
     "names": {
       "en": "Hood of Defiance",
       "ru": "Hood of Defiance"
@@ -2611,11 +2383,8 @@
     "quality": "common",
     "texture": "item_spider_legs",
     "notes": [],
-    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/6a47f99367d80058075d894a9d1558cd4791f1cb-85x62.png",
-    "icon_dimensions": {
-      "height": 62,
-      "width": 85
-    },
+    "icon_url": null,
+    "icon_dimensions": null,
     "names": {
       "en": "Spider Leg",
       "ru": "Spider Leg"
@@ -2638,11 +2407,8 @@
     "notes": [
       "The bearer retains its original Species as well."
     ],
-    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/78fa07e7fff71befaebae25d413c181b955aa63f-85x62.jpg",
-    "icon_dimensions": {
-      "height": 62,
-      "width": 85
-    },
+    "icon_url": null,
+    "icon_dimensions": null,
     "names": {
       "en": "Telescope",
       "ru": "Telescope"
@@ -2660,11 +2426,8 @@
     "quality": "consumable",
     "texture": "ring_of_basilius",
     "notes": [],
-    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/90df533aadf25fe675cf774b735a629d158cb738-85x64.png",
-    "icon_dimensions": {
-      "height": 64,
-      "width": 85
-    },
+    "icon_url": null,
+    "icon_dimensions": null,
     "names": {
       "en": "Ring of Basilius",
       "ru": "Ring of Basilius"
@@ -2682,11 +2445,8 @@
     "quality": "consumable",
     "texture": "glimmer_cape",
     "notes": [],
-    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/32bffe43a4ec6f2e7741246887b189f1594a7f30-88x62.png",
-    "icon_dimensions": {
-      "height": 62,
-      "width": 88
-    },
+    "icon_url": null,
+    "icon_dimensions": null,
     "names": {
       "en": "Glimmer Cape",
       "ru": "Glimmer Cape"
@@ -2704,11 +2464,8 @@
     "quality": "epic",
     "texture": "item_guardian_greaves",
     "notes": [],
-    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/a467df04fbc8756026050e06b8a8a701d99ac253-85x62.png",
-    "icon_dimensions": {
-      "height": 62,
-      "width": 85
-    },
+    "icon_url": null,
+    "icon_dimensions": null,
     "names": {
       "en": "Guardian Greaves",
       "ru": "Guardian Greaves"
@@ -2731,11 +2488,8 @@
     "notes": [
       "+1 Level Only valid on chess pieces."
     ],
-    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/e775eefab33910611620cc351e42336554c3c383-85x62.png",
-    "icon_dimensions": {
-      "height": 62,
-      "width": 85
-    },
+    "icon_url": null,
+    "icon_dimensions": null,
     "names": {
       "en": "Witless Shako",
       "ru": "Witless Shako"
@@ -2753,11 +2507,8 @@
     "quality": "rare",
     "texture": "item_vanguard",
     "notes": [],
-    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/71cfb079d0d214e61692a8efb58e20ccc77da9d1-85x64.png",
-    "icon_dimensions": {
-      "height": 64,
-      "width": 85
-    },
+    "icon_url": null,
+    "icon_dimensions": null,
     "names": {
       "en": "Vanguard",
       "ru": "Vanguard"
@@ -2775,11 +2526,8 @@
     "quality": "consumable",
     "texture": "phase_boots",
     "notes": [],
-    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/a8d2dba6e893a7924cabd3e9369102cbbce5e65e-88x64.png",
-    "icon_dimensions": {
-      "height": 64,
-      "width": 88
-    },
+    "icon_url": null,
+    "icon_dimensions": null,
     "names": {
       "en": "Phase Boots",
       "ru": "Phase Boots"
@@ -2800,11 +2548,8 @@
     "quality": "consumable",
     "texture": "item_custom/item_slark_fish_bait",
     "notes": [],
-    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/20af7fee44015fc624ce362999691064e3a2fd23-88x64.png",
-    "icon_dimensions": {
-      "height": 64,
-      "width": 88
-    },
+    "icon_url": null,
+    "icon_dimensions": null,
     "names": {
       "en": "Lucky Pendant",
       "ru": "Lucky Pendant"
@@ -2822,11 +2567,8 @@
     "quality": "epic",
     "texture": "item_shivas_guard",
     "notes": [],
-    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/6517b67475d4f33956282f8305a78005c677bdaf-85x64.png",
-    "icon_dimensions": {
-      "height": 64,
-      "width": 85
-    },
+    "icon_url": null,
+    "icon_dimensions": null,
     "names": {
       "en": "Shivas Guard",
       "ru": "Shivas Guard"
@@ -2847,11 +2589,8 @@
     "quality": "consumable",
     "texture": "buckler",
     "notes": [],
-    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/49e3328b9feecf1a566c32accdab90a304f72d2c-85x62.png",
-    "icon_dimensions": {
-      "height": 62,
-      "width": 85
-    },
+    "icon_url": null,
+    "icon_dimensions": null,
     "names": {
       "en": "Buckler",
       "ru": "Buckler"
@@ -2869,11 +2608,8 @@
     "quality": "rare",
     "texture": "item_maelstrom",
     "notes": [],
-    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/b3425810d20859502a3d7d9ddf2815dd819c0240-85x64.png",
-    "icon_dimensions": {
-      "height": 64,
-      "width": 85
-    },
+    "icon_url": null,
+    "icon_dimensions": null,
     "names": {
       "en": "Maelstrom",
       "ru": "Maelstrom"
@@ -2891,11 +2627,8 @@
     "quality": "rare",
     "texture": "item_bloodthorn",
     "notes": [],
-    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/6041e58218c6db15950f26098b6ad5871a18b0ad-85x62.png",
-    "icon_dimensions": {
-      "height": 62,
-      "width": 85
-    },
+    "icon_url": null,
+    "icon_dimensions": null,
     "names": {
       "en": "Bloodthorn",
       "ru": "Bloodthorn"
@@ -2916,11 +2649,8 @@
     "quality": "rare",
     "texture": "item_bloodstone",
     "notes": [],
-    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/19d4d037befef42e1010e929ad054ad20bc9c88a-85x64.png",
-    "icon_dimensions": {
-      "height": 64,
-      "width": 85
-    },
+    "icon_url": null,
+    "icon_dimensions": null,
     "names": {
       "en": "Bloodstone",
       "ru": "Bloodstone"
@@ -2941,11 +2671,8 @@
     "quality": "common",
     "texture": "item_sheepstick",
     "notes": [],
-    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/587be960ff3c463b337b8b7c1a9533c91af85542-85x64.png",
-    "icon_dimensions": {
-      "height": 64,
-      "width": 85
-    },
+    "icon_url": null,
+    "icon_dimensions": null,
     "names": {
       "en": "Scythe of Vyse",
       "ru": "Scythe of Vyse"
@@ -2966,11 +2693,8 @@
     "quality": "epic",
     "texture": "item_moon_shard",
     "notes": [],
-    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/473844f3cd568f41a226719422f37e3e8be652b7-85x62.png",
-    "icon_dimensions": {
-      "height": 62,
-      "width": 85
-    },
+    "icon_url": null,
+    "icon_dimensions": null,
     "names": {
       "en": "Moon Shard",
       "ru": "Moon Shard"
@@ -2991,11 +2715,8 @@
     "quality": "rare",
     "texture": "item_aeon_disk",
     "notes": [],
-    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/5afa27b82342063366dfff3da6877806a49547ad-85x62.png",
-    "icon_dimensions": {
-      "height": 62,
-      "width": 85
-    },
+    "icon_url": null,
+    "icon_dimensions": null,
     "names": {
       "en": "Aeon Disk",
       "ru": "Aeon Disk"
@@ -3016,11 +2737,8 @@
     "quality": "rare",
     "texture": "item_spark_of_courage",
     "notes": [],
-    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/5660880d87634bddd84a0190eef8ac7466afd172-85x62.png",
-    "icon_dimensions": {
-      "height": 62,
-      "width": 85
-    },
+    "icon_url": null,
+    "icon_dimensions": null,
     "names": {
       "en": "Spark of Courage",
       "ru": "Spark of Courage"
@@ -3038,11 +2756,8 @@
     "quality": "common",
     "texture": "item_force_staff",
     "notes": [],
-    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/96fb7aeac4e408b4c1337c929f6c78933e0b63f9-85x64.png",
-    "icon_dimensions": {
-      "height": 64,
-      "width": 85
-    },
+    "icon_url": null,
+    "icon_dimensions": null,
     "names": {
       "en": "Force Staff",
       "ru": "Force Staff"
@@ -3063,11 +2778,8 @@
     "quality": "common",
     "texture": "wraith_band",
     "notes": [],
-    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/8a56ea4f5b4c6b39d364d388c847add3cea45cdb-85x64.png",
-    "icon_dimensions": {
-      "height": 64,
-      "width": 85
-    },
+    "icon_url": null,
+    "icon_dimensions": null,
     "names": {
       "en": "Wraith Band",
       "ru": "Wraith Band"
@@ -3085,11 +2797,8 @@
     "quality": "rare",
     "texture": "item_travel_boots",
     "notes": [],
-    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/484f53b6e67cf9a27f2cdb5609e36517313a84de-88x64.png",
-    "icon_dimensions": {
-      "height": 64,
-      "width": 88
-    },
+    "icon_url": null,
+    "icon_dimensions": null,
     "names": {
       "en": "Travel Boots",
       "ru": "Travel Boots"
@@ -3129,11 +2838,8 @@
     "quality": "rare",
     "texture": "arcane_blink",
     "notes": [],
-    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/ba42698b00386fb3223f3fad0a705a28b659d542-88x64.png",
-    "icon_dimensions": {
-      "height": 64,
-      "width": 88
-    },
+    "icon_url": null,
+    "icon_dimensions": null,
     "names": {
       "en": "Arcane Blink",
       "ru": "Arcane Blink"
@@ -3175,11 +2881,8 @@
     "quality": "consumable",
     "texture": "item_tome_of_knowledge",
     "notes": [],
-    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/6587789e8e062a964a1a8c6b107453f2ac62f377-88x64.png",
-    "icon_dimensions": {
-      "height": 64,
-      "width": 88
-    },
+    "icon_url": null,
+    "icon_dimensions": null,
     "names": {
       "en": "Tome of Knowledge",
       "ru": "Tome of Knowledge"
@@ -3200,11 +2903,8 @@
     "quality": "rare",
     "texture": "gossamer_cape",
     "notes": [],
-    "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/c7f62f021bec515c8f02394d8027ce78ccbfa257-85x62.png",
-    "icon_dimensions": {
-      "height": 62,
-      "width": 85
-    },
+    "icon_url": null,
+    "icon_dimensions": null,
     "names": {
       "en": "Gossamer Cape",
       "ru": "Gossamer Cape"
