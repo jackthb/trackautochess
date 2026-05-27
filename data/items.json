@@ -379,7 +379,7 @@
       }
     },
     "Princes Knife": {
-      "tier": 2,
+      "tier": 1,
       "icon": "princes_knife.png",
       "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/c825d8b7dcc614a332baaf94fd10948798ab90ae-85x62.png",
       "icon_dimensions": {
@@ -397,7 +397,7 @@
       }
     },
     "Drum of Endurance": {
-      "tier": 3,
+      "tier": 2,
       "icon": "drum_of_endurance.png",
       "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/d9c4a7918a816d9760841bdabda80628a1a30899-85x64.png",
       "icon_dimensions": {
