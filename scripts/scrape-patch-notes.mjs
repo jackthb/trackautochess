@@ -50,15 +50,33 @@ function parseChangelogEntries(html) {
     const month = dateMatch[2];
     const time = dateMatch[3];
 
-    const parsed = new Date(`${month} ${day}, ${currentYear}`);
-    if (isNaN(parsed.getTime())) continue;
-    const isoDate = parsed.toISOString().split("T")[0];
+    const monthIndex = ["jan","feb","mar","apr","may","jun","jul","aug","sep","oct","nov","dec"]
+      .indexOf(month.toLowerCase().slice(0, 3));
+    if (monthIndex === -1) continue;
+    const isoDate = `${currentYear}-${String(monthIndex + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
 
     // Extract content from <p id="...">content</p>
     const contentMatch = block.match(/<p\s+id="[^"]*">([\s\S]*?)<\/p>/i);
     if (!contentMatch) continue;
 
-    let content = contentMatch[1]
+    const rawHtml = contentMatch[1];
+
+    // Extract Google Docs link before stripping HTML.
+    // Steam wraps external links in a linkfilter: href="...linkfilter/?u=https%3A%2F%2Fdocs.google.com%2F..."
+    let docsUrl = null;
+    const docsFilterMatch = rawHtml.match(
+      /href="[^"]*linkfilter\/\?u=(https?%3A%2F%2Fdocs\.google\.com%2F[^"&]+)"/i
+    );
+    if (docsFilterMatch) {
+      docsUrl = decodeURIComponent(docsFilterMatch[1]);
+    } else {
+      const docsDirectMatch = rawHtml.match(
+        /href="(https:\/\/docs\.google\.com\/document\/d\/[^"]+\/pub)"/i
+      );
+      if (docsDirectMatch) docsUrl = docsDirectMatch[1];
+    }
+
+    let content = rawHtml
       .replace(/<br\s*\/?>/gi, "\n")
       .replace(/<a[^>]*>([\s\S]*?)<\/a>/gi, "$1")
       .replace(/<[^>]+>/g, "")
@@ -72,7 +90,7 @@ function parseChangelogEntries(html) {
 
     if (!content) continue;
 
-    entries.push({ date: isoDate, time, content });
+    entries.push({ date: isoDate, time, content, docsUrl });
   }
 
   return entries;
@@ -127,6 +145,104 @@ function contentToSections(content) {
   }
 
   return [{ heading: "Changes", entries }];
+}
+
+async function fetchGoogleDoc(url) {
+  const resp = await fetch(url);
+  if (!resp.ok) return null;
+  return resp.text();
+}
+
+function htmlToText(html) {
+  return html
+    .replace(/<[^>]+>/g, "")
+    .replace(/&amp;/g, "&")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'")
+    .replace(/&nbsp;/g, " ")
+    .replace(/●\s*/g, "")
+    .trim();
+}
+
+const SECTION_PATTERNS = [
+  { pattern: /chess\s*piece|unit/i, heading: "Chess Pieces" },
+  { pattern: /item/i, heading: "Items" },
+  { pattern: /relic/i, heading: "Relics" },
+  { pattern: /synergy/i, heading: "Synergy Changes" },
+  { pattern: /talent/i, heading: "Talents" },
+  { pattern: /bug|fix/i, heading: "Bug Fixes" },
+  { pattern: /season|award/i, heading: "Season Awards" },
+];
+
+function parseGoogleDoc(html) {
+  // Title: first <p> in div.doc-content
+  const titleMatch = html.match(
+    /class="[^"]*doc-content[^"]*"[^>]*>[\s\S]*?<p[^>]*><span[^>]*>([^<]+)<\/span>/i
+  );
+  const title = titleMatch ? htmlToText(titleMatch[1]) : "Rebalance Patch";
+
+  // Extract just the doc-content div
+  const contentMatch = html.match(
+    /<div[^>]*class="[^"]*doc-content[^"]*"[^>]*>([\s\S]*)<\/div>/i
+  );
+  if (!contentMatch) return { title, sections: [] };
+  // Move <hr> tags out of <p> tags so splitting on <hr> doesn't break entries
+  const body = contentMatch[1].replace(/<hr\s*\/?>\s*<\/p>/gi, "</p><hr>");
+
+  const chunks = body.split(/<hr\s*\/?>/i);
+
+  const sections = [];
+  for (const chunk of chunks) {
+    // Find heading — in <h4>, or the first <p> whose text matches a section pattern
+    const h4Match = chunk.match(/<h4[^>]*>([\s\S]*?)<\/h4>/i);
+    let rawHeading = h4Match ? htmlToText(h4Match[1]) : null;
+
+    if (!rawHeading) {
+      const pTags = [...chunk.matchAll(/<p[^>]*>([\s\S]*?)<\/p>/gi)];
+      for (const p of pTags) {
+        const text = htmlToText(p[1]);
+        if (text && SECTION_PATTERNS.some((s) => s.pattern.test(text))) {
+          rawHeading = text;
+          break;
+        }
+      }
+    }
+    if (!rawHeading) continue;
+
+    const sectionDef = SECTION_PATTERNS.find((s) => s.pattern.test(rawHeading));
+    if (!sectionDef) continue;
+
+    const section = { heading: sectionDef.heading, entries: [] };
+
+    // Find all <p> tags with ● bullets (main entries)
+    const entryRegex = /<p[^>]*>(?:<span[^>]*>)?●\s*(?:<\/span>)?\s*([\s\S]*?)<\/p>/gi;
+    let m;
+    while ((m = entryRegex.exec(chunk)) !== null) {
+      const entryHtml = m[1];
+      const entryText = htmlToText(entryHtml);
+
+      const parsed = entryText.match(/^([^:–—]+?)\s*[:–—]\s*(.+)$/);
+      if (parsed) {
+        section.entries.push({
+          kind: classifyEntry(entryText),
+          name: parsed[1].trim(),
+          detail: parsed[2].trim(),
+        });
+      } else if (entryText.length > 3) {
+        section.entries.push({
+          kind: classifyEntry(entryText),
+          name: entryText,
+          detail: entryText,
+        });
+      }
+    }
+
+    if (section.entries.length > 0) sections.push(section);
+  }
+
+  return { title, sections };
 }
 
 function slugifyName(value) {
@@ -268,17 +384,37 @@ async function main() {
   const newPatches = [];
 
   for (const [date, dayEntries] of byDate) {
-    const combined = dayEntries.map((e) => e.content).join("\n\n");
-    const title = "Rebalance Patch";
-    let slug = `${date}-rebalance-patch`;
+    // Prefer Google Docs source over Steam summary
+    const docsUrl = dayEntries.find((e) => e.docsUrl)?.docsUrl;
+    let title = "Rebalance Patch";
+    let sections;
+
+    if (docsUrl) {
+      console.log(`Fetching Google Doc: ${docsUrl}`);
+      const docHtml = await fetchGoogleDoc(docsUrl);
+      if (docHtml) {
+        const parsed = parseGoogleDoc(docHtml);
+        title = parsed.title;
+        sections = parsed.sections;
+      }
+    }
+
+    if (!sections || sections.length === 0) {
+      const combined = dayEntries.map((e) => e.content).join("\n\n");
+      sections = contentToSections(combined);
+    }
+
+    const slugBase = slugifyName(title);
+    let slug = `${date}-${slugBase || "rebalance-patch"}`;
     if (existingSlugs.has(slug)) continue;
     const filePath = join(DATA_DIR, `${slug}.json`);
 
     const patchData = {
       date,
       title,
-      source: CHANGELOG_URL,
-      sections: contentToSections(combined),
+      source: docsUrl || CHANGELOG_URL,
+      workshop_url: docsUrl ? CHANGELOG_URL : undefined,
+      sections,
     };
 
     if (DRY_RUN) {
