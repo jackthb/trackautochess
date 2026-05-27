@@ -26,7 +26,6 @@ app/release/
 /build/
 /dist/
 .pnpm-store/
-data/vscript_diffs/
 
 # Parser-Lab debug scratch files (calibration / per-row crops / overlays)
 tmp_*.png
