@@ -96,44 +96,40 @@ export default function Home({ initialSearchResults }: HomeProps) {
           display: flex;
           align-items: center;
           justify-content: center;
-          gap: var(--s-12);
-          padding: var(--s-10) var(--s-20);
-          background: linear-gradient(90deg, rgba(224, 64, 42, 0.12) 0%, rgba(242, 188, 100, 0.10) 100%);
+          gap: 12px;
+          padding: 10px 20px;
+          background: var(--bg-surface);
           border-bottom: 1px solid var(--border);
           text-decoration: none;
-          transition: background var(--t-base) var(--t-easing);
+          transition: background 0.15s ease;
         }
         .banner:hover {
-          background: linear-gradient(90deg, rgba(224, 64, 42, 0.18) 0%, rgba(242, 188, 100, 0.16) 100%);
+          background: var(--bg-elevated);
         }
         .banner-tag {
-          font-size: var(--fs-11);
-          font-weight: var(--fw-semibold);
-          letter-spacing: var(--tr-upper);
+          font-size: 11px;
+          font-weight: 600;
+          letter-spacing: 1.5px;
           text-transform: uppercase;
           color: var(--accent);
-          background: rgba(224, 64, 42, 0.15);
-          padding: 2px 8px;
-          border-radius: var(--r-3);
           flex-shrink: 0;
         }
         .banner-text {
-          font-size: var(--fs-13);
+          font-size: 13px;
           color: var(--text-secondary);
-          letter-spacing: var(--tr-body);
         }
         .banner-arrow {
-          font-size: var(--fs-13);
+          font-size: 13px;
           color: var(--text-muted);
           flex-shrink: 0;
         }
         @media (max-width: 620px) {
           .banner {
-            gap: var(--s-8);
-            padding: var(--s-10) var(--s-14);
+            gap: 8px;
+            padding: 10px 14px;
           }
           .banner-text {
-            font-size: var(--fs-12);
+            font-size: 12px;
           }
         }
         .hero {
@@ -358,7 +354,7 @@ export default function Home({ initialSearchResults }: HomeProps) {
           <Link href="/patch-notes/2026-05-24-rebalance-patch" className="banner">
             <span className="banner-tag">NEW PATCH</span>
             <span className="banner-text">
-              Kobold rework, Monk &amp; Mech (6), Lifestealer class change, new Kobold Cup item
+              Kobold rework, Monk &amp; Mech (6), new Kobold Cup — read patch notes
             </span>
             <span className="banner-arrow">&rarr;</span>
           </Link>
