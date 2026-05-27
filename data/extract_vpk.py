@@ -205,10 +205,11 @@ def strip_html(s):
         s = new_s
     s = re.sub(r'<br\s*/?>', '\n', s, flags=re.IGNORECASE)
     s = re.sub(r'<\s*/?(?:' + _BLOCK_TAGS + r')(?:\s[^>]*)?>', '\n', s, flags=re.IGNORECASE)
-    # Colored <font> tags wrap keyword labels (e.g. "Disarm", "Silence") that
-    # are conceptually a separate clause — break before them so they don't
-    # fuse onto the preceding word.
-    s = re.sub(r'<font\s+color=[^>]*>', '\n', s, flags=re.IGNORECASE)
+    # Colored <font> tags wrap keyword labels (e.g. "Disarm", "Silence").
+    # Replace with a space rather than a newline — the tag is inline emphasis,
+    # not a block break. A newline here creates mid-sentence splits like
+    # "Carrier counts as \nKobold."
+    s = re.sub(r'<font\s+color=[^>]*>', ' ', s, flags=re.IGNORECASE)
     # Inline <img> icons (e.g. cooldown indicator followed by a number) add
     # no textual meaning — drop the tag plus any trailing whitespace + digits.
     s = re.sub(r"<img\s+src=[^>]*>\s*\d*\s*\.?", '', s, flags=re.IGNORECASE)
@@ -1098,6 +1099,56 @@ def main():
         out_path = out_dir / filename
         with open(out_path, 'w', encoding='utf-8') as f:
             json.dump(data[key], f, indent=2, ensure_ascii=False)
+
+    # ── Extract item/synergy/relic icons from VPK ──
+    icons_dir = out_dir / 'icons'
+    icon_count = 0
+    icon_sources = {
+        'items': {it.get('texture', ''): it['name'] for it in data['items_full'].values() if it.get('texture')},
+        'synergies': {},
+        'relics': {},
+    }
+    for sid, syn in data['synergies'].items():
+        game_id = sid.replace('is_', '')
+        icon_sources['synergies'][game_id] = syn['name']
+    for rid, rel in data['relics'].get('relics', {}).items():
+        game_id = rid.replace('item_', '')
+        icon_sources['relics'][game_id] = rel.get('name', rid)
+
+    vpk_icon_prefixes = [
+        'resource/flash3/images/spellicons/custom/',
+        'resource/flash3/images/spellicons/',
+        'resource/flash3/images/items/',
+    ]
+    vpk_files = {f.lower(): f for f in pak}
+
+    for category, textures in icon_sources.items():
+        cat_dir = icons_dir / category
+        cat_dir.mkdir(parents=True, exist_ok=True)
+        for texture, name in textures.items():
+            stem = texture.replace('item_custom/', '').replace('custom/', '').replace('item_', '')
+            out_path = cat_dir / f'{stem}.png'
+            if out_path.exists():
+                continue
+            found = False
+            for prefix in vpk_icon_prefixes:
+                vpk_key = f'{prefix}{texture}.png'.lower()
+                if vpk_key in vpk_files:
+                    entry = pak[vpk_files[vpk_key]]
+                    out_path.write_bytes(entry.read())
+                    icon_count += 1
+                    found = True
+                    break
+                vpk_key2 = f'{prefix}{stem}.png'.lower()
+                if vpk_key2 in vpk_files:
+                    entry = pak[vpk_files[vpk_key2]]
+                    out_path.write_bytes(entry.read())
+                    icon_count += 1
+                    found = True
+                    break
+
+    if icon_count:
+        print(f"\nIcons: extracted {icon_count} new icon(s) from VPK")
 
     # Summary
     print(f"synergies.json:   {len(data['synergies'])} synergies")

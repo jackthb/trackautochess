@@ -1,18 +1,18 @@
 {
-  "tiny_grow_new": {
-    "name": "Grow",
-    "description": "Gains 100 max health permanently if killed in a home battle.",
-    "cooldown": "",
-    "mana_cost": "0",
-    "cast_range": "9999",
-    "ability_special": {}
-  },
   "wisp_wildcard": {
     "name": "Indiscriminate Relocate",
     "description": "Passive Ability\nIO★ can combine with other pieces as any ★ piece on the board.\nIO★★ can combine with other pieces as any ★★ piece on the board.",
     "cooldown": "",
     "mana_cost": "",
     "cast_range": "",
+    "ability_special": {}
+  },
+  "tiny_grow_new": {
+    "name": "Grow",
+    "description": "Gains 100 max health permanently if killed in a home battle.",
+    "cooldown": "",
+    "mana_cost": "0",
+    "cast_range": "9999",
     "ability_special": {}
   }
 }
