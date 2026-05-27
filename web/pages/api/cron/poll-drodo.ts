@@ -2,8 +2,8 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { fetchAndCacheDrodo } from "@/lib/drodo";
 
-const REPOLL_BATCH_SIZE = 15;
-const SEED_BATCH_SIZE = 10;
+const REPOLL_BATCH_SIZE = 50;
+const SEED_BATCH_SIZE = 20;
 
 interface DueUser {
   steam_id: string;
