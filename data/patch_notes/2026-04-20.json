@@ -3,6 +3,9 @@
   "title": "Starlight & Beacon",
   "source": "https://docs.google.com/document/d/e/2PACX-1vQ_7gmmHGfb4dOoZ5CugY5R1coff6auwxaHch3y0yHFDh8euxi7L-QaNcuNDrYcZCDb5uSB_Wo-Y-DS/pub",
   "flavor": "Beneath the night sky of Drodo Island, stardust cuts through the silent darkness. Starlight chases the glowing magic beacon, crossing shadowed wastes and barren lands. Travelers of all races entrust their wishes to the flickering lights. Guided by starlight and bound by sacred flames, every glimmer holds hope amid strife across this wondrous realm.",
+  "absorbedDates": [
+    "2026-04-21"
+  ],
   "sections": [
     {
       "heading": "Relics",
@@ -150,6 +153,21 @@
           "kind": "fix",
           "name": "General",
           "detail": "Various bug fixes."
+        }
+      ]
+    },
+    {
+      "heading": "Hotfix — 2026-04-21",
+      "entries": [
+        {
+          "kind": "new",
+          "name": "Russian localization",
+          "detail": "Added Russian version."
+        },
+        {
+          "kind": "fix",
+          "name": "Bug fixes",
+          "detail": "Fixed bugs."
         }
       ]
     }
