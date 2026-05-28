@@ -45,6 +45,15 @@ export const patchNote = defineType({
       type: 'array',
       of: [{type: 'patchSection'}],
     }),
+    defineField({
+      name: 'absorbedDates',
+      title: 'Absorbed hotfix dates',
+      description:
+        'Dates of small follow-up "Rebalance Patch" hotfixes that were folded into this patch as Hotfix sections. Tracked so re-scrapes do not recreate them as standalone entries. Clear a date here (and remove its Hotfix section) to split it back out.',
+      type: 'array',
+      of: [{type: 'string'}],
+      readOnly: true,
+    }),
   ],
   orderings: [
     {

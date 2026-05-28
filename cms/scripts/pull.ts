@@ -509,7 +509,7 @@ function buildEntityResolver(): (name: string) => {entity_type: string; entity_s
 async function pullPatchNotes() {
   const rows = await client.fetch<any[]>(
     `*[_type == "patchNote"] | order(date desc){
-      "slug": slug.current, date, title, titles, source, flavor,
+      "slug": slug.current, date, title, titles, source, flavor, absorbedDates,
       sections[]{heading, entries[]{
         kind, name, detail,
         "entityType": entity->_type,
@@ -534,6 +534,7 @@ async function pullPatchNotes() {
     const titles = localizedNamesToJson(r.titles)
     if (titles) out.titles = titles
     if (r.flavor) out.flavor = r.flavor
+    if (Array.isArray(r.absorbedDates) && r.absorbedDates.length) out.absorbedDates = r.absorbedDates
     out.sections = (r.sections || []).map((s: any) => ({
       heading: s.heading,
       entries: (s.entries || []).map((e: any) => {

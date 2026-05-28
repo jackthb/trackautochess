@@ -9,7 +9,7 @@
  *   node scripts/scrape-patch-notes.mjs [--dry-run]
  */
 
-import { readFileSync, writeFileSync } from "fs";
+import { readFileSync, writeFileSync, readdirSync } from "fs";
 import { join, dirname } from "path";
 import { fileURLToPath } from "url";
 
@@ -249,6 +249,51 @@ function slugifyName(value) {
   return value.toLowerCase().replace(/&/g, " and ").replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
 }
 
+// ── Hotfix folding ────────────────────────────────────────────────
+// A small generic "Rebalance Patch" landing within a couple of days of a
+// substantial patch is treated as a hotfix and folded into that patch as a
+// dated section, rather than cluttering the list with a one-line entry.
+// Named patches (anything with a real Google Doc title) are always separate.
+const HOTFIX_MAX_ENTRIES = 2; // child must be this small to fold
+const HOTFIX_MAX_DAYS = 2; // child must land within this many days of the parent
+const PARENT_MIN_ENTRIES = 4; // parent must be at least this big ("more than three")
+
+function countEntries(sections) {
+  return (sections || []).reduce((n, s) => n + (s.entries?.length || 0), 0);
+}
+
+// Generic = the "Rebalance Patch" fallback (no distinct Google Doc name).
+function isGenericTitle(title) {
+  return !title || /^rebalance patch\b/i.test(title.trim());
+}
+
+function daysBetween(isoA, isoB) {
+  return Math.round((Date.parse(isoB) - Date.parse(isoA)) / 86400000);
+}
+
+// Fold a hotfix's entries into the parent as a "Hotfix — <date>" section and
+// record the absorbed date so re-scrapes don't recreate it. Mutates `parent`
+// in memory and rewrites its file.
+function foldHotfix(parent, hotfixDate, hotfixSections) {
+  const entries = (hotfixSections || []).flatMap((s) => s.entries || []);
+  parent.sections = [
+    ...(parent.sections || []),
+    { heading: `Hotfix — ${hotfixDate}`, entries },
+  ];
+  parent.absorbedDates = [
+    ...new Set([...(parent.absorbedDates || []), hotfixDate]),
+  ];
+  if (DRY_RUN) {
+    console.log(`[dry-run] Would fold ${hotfixDate} into ${parent.slug}.json`);
+    return;
+  }
+  const data = JSON.parse(readFileSync(parent.file, "utf-8"));
+  data.sections = parent.sections;
+  data.absorbedDates = parent.absorbedDates;
+  writeFileSync(parent.file, JSON.stringify(data, null, 2) + "\n");
+  console.log(`Folded ${hotfixDate} hotfix into ${parent.slug}.json`);
+}
+
 function applyGameDataChanges(sections) {
   const items = JSON.parse(readFileSync(ITEMS_PATH, "utf-8"));
   const units = JSON.parse(readFileSync(UNITS_PATH, "utf-8"));
@@ -363,7 +408,29 @@ async function main() {
   console.log(`Found ${entries.length} changelog entries on page 1`);
 
   const index = JSON.parse(readFileSync(INDEX_PATH, "utf-8"));
-  const existingDates = new Set(index.patches.map((p) => p.date));
+
+  // Load existing patch docs from disk so hotfixes can find a parent to fold
+  // into, and so already-absorbed dates aren't re-scraped as standalone.
+  const existingPatches = [];
+  const absorbedDates = new Set();
+  for (const f of readdirSync(DATA_DIR)) {
+    if (!f.endsWith(".json") || f === "index.json") continue;
+    const data = JSON.parse(readFileSync(join(DATA_DIR, f), "utf-8"));
+    existingPatches.push({
+      date: data.date,
+      slug: f.replace(/\.json$/, ""),
+      file: join(DATA_DIR, f),
+      title: data.title,
+      sections: data.sections || [],
+      absorbedDates: data.absorbedDates || [],
+    });
+    for (const d of data.absorbedDates || []) absorbedDates.add(d);
+  }
+
+  const existingDates = new Set([
+    ...index.patches.map((p) => p.date),
+    ...absorbedDates,
+  ]);
   const existingSlugs = new Set(index.patches.map((p) => p.slug));
 
   // Group by date, skip existing
@@ -382,8 +449,13 @@ async function main() {
   console.log(`${byDate.size} new patch date(s) to add`);
 
   const newPatches = [];
+  // Standalone patches written this run — a later hotfix in the same batch can
+  // fold into one of these as well as into a pre-existing patch.
+  const writtenStandalone = [];
 
-  for (const [date, dayEntries] of byDate) {
+  // Oldest-first so a parent is always written before any hotfix folding into it.
+  for (const date of [...byDate.keys()].sort()) {
+    const dayEntries = byDate.get(date);
     // Prefer Google Docs source over Steam summary
     const docsUrl = dayEntries.find((e) => e.docsUrl)?.docsUrl;
     let title = "Rebalance Patch";
@@ -402,6 +474,26 @@ async function main() {
     if (!sections || sections.length === 0) {
       const combined = dayEntries.map((e) => e.content).join("\n\n");
       sections = contentToSections(combined);
+    }
+
+    // Hotfix folding: a small *generic* patch landing within a couple of days
+    // of a substantial patch is folded into that patch rather than listed on
+    // its own. Named patches never qualify (isGenericTitle is false).
+    if (isGenericTitle(title) && countEntries(sections) <= HOTFIX_MAX_ENTRIES) {
+      const parent = [...existingPatches, ...writtenStandalone]
+        .filter(
+          (p) =>
+            p.date < date &&
+            daysBetween(p.date, date) <= HOTFIX_MAX_DAYS &&
+            countEntries(p.sections) >= PARENT_MIN_ENTRIES
+        )
+        .sort((a, b) => b.date.localeCompare(a.date))[0];
+      if (parent) {
+        foldHotfix(parent, date, sections);
+        console.log("Applying game data changes...");
+        applyGameDataChanges(sections);
+        continue;
+      }
     }
 
     const slugBase = slugifyName(title);
@@ -425,6 +517,14 @@ async function main() {
       console.log(`Wrote ${slug}.json`);
     }
 
+    writtenStandalone.push({
+      date,
+      slug,
+      file: filePath,
+      title,
+      sections,
+      absorbedDates: [],
+    });
     newPatches.push({ date, title, slug });
 
     console.log("Applying game data changes...");

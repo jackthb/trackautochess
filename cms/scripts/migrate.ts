@@ -423,6 +423,9 @@ async function migratePatchNotes() {
       slug: {_type: 'slug', current: slug},
       source: j.source ?? null,
       flavor: j.flavor ?? null,
+      ...(Array.isArray(j.absorbedDates) && j.absorbedDates.length
+        ? {absorbedDates: j.absorbedDates}
+        : {}),
       sections: (j.sections || []).map((s: any) => ({
         _type: 'patchSection',
         heading: s.heading,
