@@ -17,7 +17,7 @@
           "entity_slug": "kobold"
         },
         {
-          "kind": "new",
+          "kind": "added",
           "name": "Monk - Drunken Stagger",
           "detail": "(6) Added",
           "entity_type": "synergy",
@@ -62,9 +62,11 @@
       "heading": "Items",
       "entries": [
         {
-          "kind": "new",
+          "kind": "added",
           "name": "New T3 item",
-          "detail": "Kobold Cup"
+          "detail": "Kobold Cup",
+          "entity_type": "item",
+          "entity_slug": "kobold-cup"
         },
         {
           "kind": "nerf",
