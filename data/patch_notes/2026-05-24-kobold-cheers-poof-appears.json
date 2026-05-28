@@ -2,6 +2,9 @@
   "date": "2026-05-24",
   "title": "Kobold cheers, poof appears",
   "source": "https://docs.google.com/document/d/e/2PACX-1vRvaFljxcYvhGz83r7cdIZjA91fberUVZd4bhXkKpZtK9rx16gNxnCa1-wJU_bomu3ama5QdNZUh4Nf/pub",
+  "absorbedDates": [
+    "2026-05-25"
+  ],
   "sections": [
     {
       "heading": "Synergy Changes",
@@ -101,8 +104,5 @@
         }
       ]
     }
-  ],
-  "absorbedDates": [
-    "2026-05-25"
   ]
 }

@@ -2,6 +2,9 @@
   "date": "2026-04-29",
   "title": "Rebalance Patch",
   "source": "https://steamcommunity.com/sharedfiles/filedetails/changelog/1613886175",
+  "absorbedDates": [
+    "2026-04-30"
+  ],
   "sections": [
     {
       "heading": "Rebalance",
@@ -55,6 +58,21 @@
           "kind": "change",
           "name": "Season settlement",
           "detail": "Badges will be settled by final season ranking. All other awards will be settled by highest rank in season. The last day of the season is casual for award settlement; S43 Stilla Ranger Season starts May 1st, 2026."
+        }
+      ]
+    },
+    {
+      "heading": "Hotfix — 2026-04-30",
+      "entries": [
+        {
+          "kind": "fix",
+          "name": "Bug fix",
+          "detail": "Fixed a bug."
+        },
+        {
+          "kind": "change",
+          "name": "S43 season start",
+          "detail": "S43 has been kicked off - enjoy the new season and claim your S42 awards. You'll need 5 games to settle your ranking as usual."
         }
       ]
     }
