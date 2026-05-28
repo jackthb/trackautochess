@@ -258,8 +258,21 @@ const HOTFIX_MAX_ENTRIES = 2; // child must be this small to fold
 const HOTFIX_MAX_DAYS = 2; // child must land within this many days of the parent
 const PARENT_MIN_ENTRIES = 4; // parent must be at least this big ("more than three")
 
+// A "substantive" entry is a real change line — its detail says something
+// distinct from its name (e.g. "Gyrocopter - Flak Cannon" | "Targets 4->3").
+// The Steam-summary fallback emits name === detail for blurb/announcement
+// lines ("Fix bug!" | "Fix bug!", season notices), which don't count. This is
+// what lets a same-patch tail of pure announcements fold even with several
+// lines, while a genuinely small *changed* patch stays on its own.
+function isSubstantiveEntry(e) {
+  return (e?.name || "").trim() !== (e?.detail || "").trim();
+}
+
 function countEntries(sections) {
-  return (sections || []).reduce((n, s) => n + (s.entries?.length || 0), 0);
+  return (sections || []).reduce(
+    (n, s) => n + (s.entries || []).filter(isSubstantiveEntry).length,
+    0
+  );
 }
 
 // Generic = the "Rebalance Patch" fallback (no distinct Google Doc name).
