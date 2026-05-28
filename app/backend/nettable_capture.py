@@ -1535,7 +1535,9 @@ class NetTableCapture:
                 log.info("nettable: fallback — match %s already saved", match_id)
                 return
 
-            played_at = datetime.now().isoformat()
+            # tz-aware: include the local UTC offset so the timestamptz column
+            # stores the correct instant rather than treating local time as UTC.
+            played_at = datetime.now().astimezone().isoformat()
             extracted = self._extract_structured_match(pseudo_end_board, played_at, match_id)
 
             if extracted is not None:
@@ -1729,7 +1731,9 @@ class NetTableCapture:
         if end_board is None:
             return
         try:
-            saved_at = datetime.now().isoformat()
+            # tz-aware: include the local UTC offset so the timestamptz column
+            # stores the correct instant rather than treating local time as UTC.
+            saved_at = datetime.now().astimezone().isoformat()
             # Hash only the GAMEPLAY-relevant fields, not the wrapper or
             # the `hehe` randomization field that DAC sprinkles into
             # every nettable payload. Otherwise each PAUSE press
