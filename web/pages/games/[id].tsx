@@ -393,12 +393,12 @@ function MatchPlayerRow({
               <span className="mp-name mp-name-unknown">{displayName}</span>
             )}
           </div>
+          {rankLabel && <span className="mp-rank">{rankLabel}</span>}
         </div>
-        {rankLabel && <span className="mp-rank">{rankLabel}</span>}
         <div className="mp-col-stats">
           {displayGame.level && (
             <span className="mp-stat">
-              <span className="mp-stat-label">Lv</span>
+              <span className="mp-stat-label">LVL</span>
               {displayGame.level}
             </span>
           )}
@@ -411,7 +411,11 @@ function MatchPlayerRow({
           )}
           {roundResult && (
             <span className={`mp-round-result mp-round-${roundResult}`}>
-              {roundResult === "out" ? "OUT" : roundResult.toUpperCase()}
+              {roundResult === "out"
+                ? "Out"
+                : roundResult === "w"
+                  ? "Won"
+                  : "Lost"}
             </span>
           )}
         </div>
@@ -450,55 +454,6 @@ function MatchPlayerRow({
             </div>
           )}
         </div>
-        {synergies.length > 0 && (
-          <div className="mp-col-synergies">
-            {synergies.map((s, i) => (
-              <TooltipWrap
-                key={i}
-                type="synergy"
-                name={s.name}
-                count={s.count}
-                data={tooltipData}
-              >
-                <div className="syn-badge mp-syn-badge">
-                  <img
-                    className="syn-icon"
-                    src={iconUrl("synergies", synIconName(s.name))}
-                    alt={s.name}
-                    loading="lazy"
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).style.display = "none";
-                    }}
-                  />
-                  <span className="syn-count">{s.count}</span>
-                </div>
-              </TooltipWrap>
-            ))}
-          </div>
-        )}
-        {compactRelics.length > 0 && (
-          <div className="mp-col-relics">
-            {compactRelics.map((r, i) => (
-              <TooltipWrap
-                key={i}
-                type="relic"
-                name={r.name}
-                relicIndex={i}
-                data={tooltipData}
-              >
-                <img
-                  className="relic-icon mp-relic-icon"
-                  src={iconUrl("relics", relicStem(r.name))}
-                  alt={r.name}
-                  loading="lazy"
-                  onError={(e) => {
-                    (e.target as HTMLImageElement).style.display = "none";
-                  }}
-                />
-              </TooltipWrap>
-            ))}
-          </div>
-        )}
         {hasContent && (
           <div className="mp-caret" aria-hidden="true">
             {isOpen ? "−" : "+"}
@@ -931,9 +886,12 @@ export default function GamePage({
           flex-shrink: 0;
         }
         .mp-info {
-          width: 140px;
+          width: 150px;
           flex-shrink: 0;
           min-width: 0;
+          display: flex;
+          flex-direction: column;
+          gap: 3px;
         }
         .mp-name-row {
           display: flex;
@@ -941,7 +899,7 @@ export default function GamePage({
           min-width: 0;
         }
         .mp-name {
-          font-size: 14px;
+          font-size: 15px;
           font-weight: 600;
           color: var(--text-primary);
           text-decoration: none;
@@ -959,20 +917,22 @@ export default function GamePage({
           font-style: italic;
         }
         .mp-rank {
+          align-self: flex-start;
           font-size: 10px;
           color: var(--text-secondary);
           background: var(--bg-elevated);
           border: 1px solid var(--border-subtle);
           border-radius: var(--r-2);
-          padding: 1px 5px;
+          padding: 1px 6px;
           letter-spacing: 0.4px;
           font-weight: 600;
+          text-transform: uppercase;
         }
         .mp-col-stats {
           display: flex;
-          gap: 8px;
+          gap: 10px;
           align-items: center;
-          width: 90px;
+          width: 112px;
           flex-shrink: 0;
         }
         .mp-stat {
@@ -1031,43 +991,26 @@ export default function GamePage({
           flex: 1;
           min-width: 0;
         }
-        .mp-col-synergies {
-          display: flex;
-          gap: 4px;
-          flex-wrap: wrap;
-          align-items: center;
-          flex-shrink: 0;
-        }
-        .mp-col-relics {
-          display: flex;
-          gap: 4px;
-          flex-wrap: wrap;
-          align-items: center;
-          flex-shrink: 0;
-        }
+        /* Single horizontal line of units — no wrapping. Synergies and relics
+           now live in the expand panel so the lineup gets the full width and
+           the icons can be larger. overflow:hidden guards against the rare
+           over-full board pushing the caret off-row. */
         .mp-lineup {
           display: flex;
-          gap: 3px;
-          flex-wrap: wrap;
+          gap: 4px;
+          flex-wrap: nowrap;
           align-items: center;
+          overflow: hidden;
+        }
+        /* Resize wrap + icon together; the global .unit-icon-wrap is 28x28, so
+           growing only the icon would overflow the wrap and overlap neighbours. */
+        .mp-unit.unit-icon-wrap {
+          width: 36px;
+          height: 36px;
         }
         .mp-unit .unit-icon {
-          width: 26px;
-          height: 26px;
-        }
-        .mp-syn-badge {
-          padding: 2px 5px 2px 3px;
-        }
-        .mp-syn-badge .syn-icon {
-          width: 14px;
-          height: 14px;
-        }
-        .mp-syn-badge .syn-count {
-          font-size: 10px;
-        }
-        .mp-relic-icon {
-          width: 22px !important;
-          height: 22px !important;
+          width: 36px;
+          height: 36px;
         }
         .mp-caret {
           flex-shrink: 0;
@@ -1193,13 +1136,11 @@ export default function GamePage({
             flex-basis: 100%;
             order: 10;
           }
-          .mp-col-synergies {
-            flex-basis: 100%;
-            order: 11;
-          }
-          .mp-col-relics {
-            flex-basis: 100%;
-            order: 12;
+          /* Phones are too narrow for a full board on one line — let it wrap
+             here so no units get clipped. */
+          .mp-lineup {
+            flex-wrap: wrap;
+            overflow: visible;
           }
           .mp-caret {
             margin-left: auto;
