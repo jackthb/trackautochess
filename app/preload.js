@@ -35,8 +35,6 @@ contextBridge.exposeInMainWorld("windowControls", {
 contextBridge.exposeInMainWorld("appApi", {
   openExternal: (url) => ipcRenderer.invoke("app:openExternal", url),
   getVersion: () => ipcRenderer.invoke("app:getVersion"),
-  getCloseToTray: () => ipcRenderer.invoke("app:getCloseToTray"),
-  setCloseToTray: (value) => ipcRenderer.invoke("app:setCloseToTray", value),
   fetchGames: () => ipcRenderer.invoke("games:fetch"),
   fetchTimeline: (matchId) => ipcRenderer.invoke("timelines:fetch", matchId),
   updateGame: (gameId, fields) => ipcRenderer.invoke("games:update", gameId, fields),

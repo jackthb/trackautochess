@@ -98,18 +98,25 @@ export function NetTableSetupCard({
   //     when launched).
   // Crucially: if Dota isn't running AND flags aren't confirmed set in
   // localconfig, we are NOT done — don't pretend we are.
+  const paused = status?.paused === true;
   const tracking = dotaRunning && logActive;
   const allOk = Boolean(
     status && autoexecOk && (tracking || (!dotaRunning && flagsSet)),
   );
 
+  const togglePause = useCallback(() => {
+    if (!window.tracker) return;
+    window.tracker.sendCommand({ cmd: "nettable_set_paused", paused: !paused });
+  }, [paused]);
+
   if (allOk) {
     return (
       <div className="nettable-setup-complete">
-        <span className="nettable-setup-complete-dot" aria-hidden="true" />
-        {tracking
-          ? "Tracking active"
-          : "Setup complete — launch Dota when ready"}
+        <span className={`nettable-setup-complete-dot${paused ? " paused" : ""}`} aria-hidden="true" />
+        {paused ? "Paused" : tracking ? "Capturing" : "Ready"}
+        <button type="button" className="btn-ghost nettable-pause-btn" onClick={togglePause}>
+          {paused ? "Resume" : "Pause"}
+        </button>
       </div>
     );
   }
@@ -164,35 +171,12 @@ export function NetTableSetupCard({
       </div>
 
       <div className="nettable-setup-status-row">
-        <span className="nettable-setup-status-label">autoexec.cfg</span>
-        <StatusBadge
-          ok={autoexecOk}
-          unknown={status === null}
-          okLabel="installed"
-          badLabel="missing"
-        />
-      </div>
-
-      <div className="nettable-setup-status-row">
-        <span className="nettable-setup-status-label">Dota running</span>
+        <span className="nettable-setup-status-label">Dota</span>
         <StatusBadge
           ok={dotaRunning}
           unknown={status === null}
-          okLabel="running"
+          okLabel={logActive ? "capturing" : "running — waiting for game"}
           badLabel="not running"
-        />
-      </div>
-
-      <div className="nettable-setup-status-row">
-        <span className="nettable-setup-status-label">tracking active</span>
-        <StatusBadge
-          ok={tracking || logActive}
-          unknown={status === null || (!dotaRunning && !logActive)}
-          okLabel="writing"
-          // If logActive is true the flags ARE working right now, so
-          // "missing -condebug" would be a lie regardless of what
-          // localconfig.vdf says. Fall back to "idle" instead.
-          badLabel={dotaRunning && !logActive ? "missing -condebug" : "idle"}
         />
       </div>
 

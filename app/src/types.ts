@@ -323,8 +323,6 @@ declare global {
     appApi: {
       openExternal: (url: string) => Promise<boolean>;
       getVersion: () => Promise<string>;
-      getCloseToTray: () => Promise<boolean>;
-      setCloseToTray: (value: boolean) => Promise<boolean>;
       fetchGames: () => Promise<Game[]>;
       fetchTimeline: (matchId: string) => Promise<unknown | null>;
       updateGame: (gameId: number, fields: Partial<Game>) => Promise<boolean>;

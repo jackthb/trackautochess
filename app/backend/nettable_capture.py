@@ -1036,6 +1036,7 @@ class NetTableCapture:
 
         # Status (re-emitted on demand via emit_status())
         self._autoexec_installed = False
+        self._paused = False
 
         # Tail state
         self._file = None  # type: ignore
@@ -1149,7 +1150,7 @@ class NetTableCapture:
         while not self._stop.is_set():
             now = time.time()
             try:
-                if _is_dota_foreground() and self._is_dac_active():
+                if _is_dota_foreground() and self._is_dac_active() and not self._paused:
                     if now - last_full_cascade >= FULL_CASCADE_INTERVAL_SEC:
                         last_full_cascade = now
                         for vk in CASCADE_VK_SEQUENCE:
@@ -1208,7 +1209,13 @@ class NetTableCapture:
                 "-gamestateintegration" in opts_tokens
             ) if opts_tokens is not None else None,
             "steam_running": is_steam_running(),
+            "paused": self._paused,
         })
+
+    def set_paused(self, paused: bool) -> None:
+        self._paused = paused
+        log.info("nettable: %s", "paused" if paused else "resumed")
+        self.emit_status()
 
     def _is_log_active(self) -> bool:
         """True if console.log was modified within the active window.

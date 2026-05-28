@@ -489,6 +489,9 @@ class HeadlessBackend:
                 daemon=True,
                 name="nettable-apply-launch-options",
             ).start()
+        elif cmd == "nettable_set_paused":
+            if self._nettable:
+                self._nettable.set_paused(bool(msg.get("paused", True)))
         elif cmd == "nettable_resync_from_steam":
             threading.Thread(
                 target=self._do_resync_from_steam,

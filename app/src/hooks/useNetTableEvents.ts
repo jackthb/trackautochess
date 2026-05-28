@@ -40,6 +40,7 @@ export interface NetTableStatus {
    *  only signal that proves -condebug is actually doing its job right now,
    *  independent of what Steam's localconfig.vdf claims. */
   log_active: boolean;
+  paused: boolean;
 }
 
 export interface NetTableLaunchOptionsApplied {
@@ -98,6 +99,7 @@ type NetTableStatusEvent = {
   steam_running: boolean;
   dota_running: boolean;
   log_active: boolean;
+  paused: boolean;
 };
 type NetTableLaunchOptionsAppliedEvent = NetTableLaunchOptionsApplied & {
   type: "nettable_launch_options_applied";
@@ -233,6 +235,7 @@ export function useNetTableEvents(): NetTableActivityState {
               steam_running: msg.steam_running,
               dota_running: msg.dota_running,
               log_active: msg.log_active,
+              paused: msg.paused ?? false,
             };
             // Surface a one-time warning when Dota launches but console.log
             // doesn't start writing — that's the empirical "you forgot

@@ -5,7 +5,6 @@ const {
   protocol,
   net,
   Menu,
-  Tray,
   nativeImage,
   globalShortcut,
   screen,
@@ -45,9 +44,7 @@ for (const dir of [DAC_DIR, REPLAY_DIR]) {
 
 let mainWindow = null;
 // let overlayWindow = null;
-let widgetWindow = null;
 let notificationWindow = null;
-let tray = null;
 let pythonProcess = null;
 let pythonRL = null;
 // let overlayTimeout = null;
@@ -55,8 +52,7 @@ let dotaPollInterval = null;
 let dotaOpen = false;
 let notificationReady = false;
 let nextNotificationId = 1;
-let closeToTray = true; // default: minimize to tray on close
-let isQuitting = false; // true when quitting from tray or app.quit()
+let isQuitting = false;
 const notificationItems = [];
 const notificationTimers = new Map();
 let trackerStatus = {
@@ -163,96 +159,10 @@ function sendToPython(cmd) {
   pythonProcess.stdin.write(line);
 }
 
-// ── Close-to-tray config ────────────────────────────────────────────────────
-
-function loadCloseToTray() {
-  const configPath = path.join(DAC_DIR, "config.json");
-  if (!fs.existsSync(configPath)) return true;
-  try {
-    const config = JSON.parse(fs.readFileSync(configPath, "utf-8"));
-    return config.close_to_tray !== false; // default true
-  } catch {
-    return true;
-  }
-}
-
-function saveCloseToTray(value) {
-  const configPath = path.join(DAC_DIR, "config.json");
-  let config = {};
-  try {
-    config = JSON.parse(fs.readFileSync(configPath, "utf-8"));
-  } catch {}
-  config.close_to_tray = value;
-  fs.writeFileSync(configPath, JSON.stringify(config, null, 2));
-}
-
-// ── System tray ─────────────────────────────────────────────────────────────
-
-function createTray() {
-  const iconPath = path.join(ICONS_DIR, ICON_FILENAME);
-  let icon;
-  if (fs.existsSync(iconPath)) {
-    icon = nativeImage.createFromPath(iconPath);
-    // Resize for tray: 16x16 on most platforms
-    if (!icon.isEmpty()) {
-      icon = icon.resize({ width: 16, height: 16 });
-    }
-  } else {
-    icon = nativeImage.createEmpty();
-  }
-
-  tray = new Tray(icon);
-  tray.setToolTip("DAC Tracker");
-
-  updateTrayMenu();
-
-  tray.on("double-click", () => {
-    if (mainWindow && !mainWindow.isDestroyed()) {
-      mainWindow.show();
-      mainWindow.focus();
-    }
-  });
-}
-
-function updateTrayMenu() {
-  if (!tray) return;
-  const contextMenu = Menu.buildFromTemplate([
-    {
-      label: "Show",
-      click: () => {
-        if (mainWindow && !mainWindow.isDestroyed()) {
-          mainWindow.show();
-          mainWindow.focus();
-        }
-      },
-    },
-    { type: "separator" },
-    {
-      label: "Quit",
-      click: () => {
-        isQuitting = true;
-        app.quit();
-      },
-    },
-  ]);
-  tray.setContextMenu(contextMenu);
-}
-
 function handlePythonEvent(msg) {
   // Forward all events to renderer
   if (mainWindow && !mainWindow.isDestroyed()) {
     mainWindow.webContents.send("tracker:event", msg);
-  }
-
-  // Forward status to widget
-  if (widgetWindow && !widgetWindow.isDestroyed()) {
-    if (msg.type === "status" || msg.type === "replay_started" || msg.type === "replay_saved") {
-      widgetWindow.webContents.send("widget:status", {
-        recording: msg.type === "replay_started" ? true :
-                   msg.type === "replay_saved" ? false :
-                   msg.recording || false,
-      });
-    }
   }
 
   switch (msg.type) {
@@ -532,13 +442,6 @@ function startDotaPoller() {
         const isOpen = !err && stdout.toLowerCase().includes("dota2.exe");
         if (isOpen !== dotaOpen) {
           dotaOpen = isOpen;
-          if (widgetWindow && !widgetWindow.isDestroyed()) {
-            if (dotaOpen) {
-              widgetWindow.show();
-            } else {
-              widgetWindow.hide();
-            }
-          }
         }
       }
     );
@@ -547,47 +450,6 @@ function startDotaPoller() {
   checkDota();
   dotaPollInterval = setInterval(checkDota, 3000);
 }
-
-// ── Widget window (Discord-style floating controls) ─────────────────────────
-
-function createWidget() {
-  const primaryDisplay = screen.getPrimaryDisplay();
-  const { width: screenW } = primaryDisplay.size;
-
-  widgetWindow = new BrowserWindow({
-    width: 120,
-    height: 44,
-    x: screenW - 140,
-    y: 20,
-    show: false,
-    frame: false,
-    transparent: true,
-    alwaysOnTop: true,
-    skipTaskbar: true,
-    resizable: false,
-    hasShadow: false,
-    webPreferences: {
-      preload: path.join(__dirname, "preload-widget.js"),
-      contextIsolation: true,
-      nodeIntegration: false,
-    },
-  });
-
-  widgetWindow.loadFile(path.join(__dirname, "widget.html"));
-  widgetWindow.setAlwaysOnTop(true, "screen-saver");
-
-  widgetWindow.on("closed", () => {
-    widgetWindow = null;
-  });
-}
-
-ipcMain.on("widget:toggle-recording", () => {
-  sendToPython({ cmd: "toggle_recording" });
-});
-
-ipcMain.on("widget:capture", () => {
-  sendToPython({ cmd: "capture" });
-});
 
 ipcMain.on("notification:dismiss", (_event, id) => {
   removeNotification(id);
@@ -631,7 +493,6 @@ function createWindow() {
     return { action: "deny" };
   });
 
-  // Close = quit. No tray minimization.
   mainWindow.on("close", () => {
     isQuitting = true;
     app.quit();
@@ -667,16 +528,6 @@ ipcMain.on("window:maximize", () => {
 
 ipcMain.on("window:close", () => {
   if (mainWindow && !mainWindow.isDestroyed()) mainWindow.close();
-});
-
-// ── Close-to-tray IPC ──────────────────────────────────────────────────────
-
-ipcMain.handle("app:getCloseToTray", () => closeToTray);
-
-ipcMain.handle("app:setCloseToTray", (_event, value) => {
-  closeToTray = !!value;
-  saveCloseToTray(closeToTray);
-  return closeToTray;
 });
 
 // ── Tracker IPC (renderer → main → Python) ──────────────────────────────────
@@ -1333,7 +1184,6 @@ app.whenReady().then(() => {
   Menu.setApplicationMenu(null);
 
   createWindow();
-  createWidget();
   createNotificationWindow();
   startDotaPoller();
   registerShortcuts();
@@ -1367,11 +1217,6 @@ app.on("will-quit", () => {
   notificationTimers.clear();
   notificationItems.length = 0;
 
-  // Destroy tray
-  if (tray) {
-    tray.destroy();
-    tray = null;
-  }
 
   // Shut down Python
   if (pythonProcess) {
@@ -1385,10 +1230,7 @@ app.on("will-quit", () => {
 });
 
 app.on("window-all-closed", () => {
-  // Don't quit when close-to-tray is active — the window is just hidden
-  if (!closeToTray) {
-    app.quit();
-  }
+  app.quit();
 });
 
 // ── Replay IPC handlers ─────────────────────────────────────────────────────

@@ -2783,6 +2783,14 @@ select.edit-field:focus {
   background: var(--green-bright);
 }
 
+.nettable-setup-complete-dot.paused {
+  background: var(--text-muted);
+}
+
+.nettable-pause-btn {
+  margin-left: auto;
+}
+
 /* Activity feed */
 
 .nettable-activity {
