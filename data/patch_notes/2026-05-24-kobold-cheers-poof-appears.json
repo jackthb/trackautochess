@@ -90,6 +90,16 @@
           "entity_slug": "lucid-star"
         }
       ]
+    },
+    {
+      "heading": "Hotfix — 2026-05-25",
+      "entries": [
+        {
+          "kind": "change",
+          "name": "(6)Mechs",
+          "detail": "Chances to upgrade into gold heart, and the chance rises with your courier level"
+        }
+      ]
     }
   ]
 }
