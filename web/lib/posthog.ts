@@ -28,8 +28,10 @@ export async function getPostHog(): Promise<PostHog | null> {
       // Only create person profiles after `identify()` to keep MAU low and
       // respect anonymous visitors who never sign in.
       person_profiles: "identified_only",
-      // Cost + privacy: session replay stays off until explicitly enabled.
-      disable_session_recording: true,
+      // Session replay ON. Naturally gated to consenting users: PostHog won't
+      // record visitors who hit "Decline" (opt_out_capturing), and cost can be
+      // capped via the project-level sample rate. Was previously off by default.
+      disable_session_recording: false,
       // Do not set PostHog cookies until the visitor explicitly accepts.
       cookieless_mode: "on_reject",
       respect_dnt: true,
