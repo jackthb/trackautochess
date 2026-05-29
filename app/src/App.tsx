@@ -88,12 +88,18 @@ export default function App() {
   useEffect(() => {
     if (!steamId || identifiedRef.current === steamId) return;
     identifiedRef.current = steamId;
+    // Mirror the web viewer's person shape (web/pages/_app.tsx): `$name` is the
+    // Persons-list label, `steam_id` the stable distinct_id — so the same human
+    // is one PostHog person across web + app.
+    const nameProps = steamName
+      ? { $name: steamName, steam_name: steamName }
+      : {};
     void window.appApi
       .getVersion()
       .then((app_version) =>
-        identify(steamId, { steam_name: steamName, app_version }),
+        identify(steamId, { steam_id: steamId, ...nameProps, app_version }),
       )
-      .catch(() => identify(steamId, { steam_name: steamName }));
+      .catch(() => identify(steamId, { steam_id: steamId, ...nameProps }));
   }, [steamId, steamName]);
   // PARKED: admin / preview-as-user gating.
   // const isAdmin = tracker.status?.admin_mode === true;

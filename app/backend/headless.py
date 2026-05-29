@@ -12,6 +12,7 @@ import logging
 import os
 import sys
 import threading
+import time
 from datetime import datetime
 from pathlib import Path
 
@@ -26,6 +27,11 @@ from utils import (
 
 APP_NAME = "DAC Tracker"
 LOG_PATH = DAC_DIR / "tracker.log"
+
+# Diagnostic logs always upload to Supabase on this cadence (re-uploads overwrite
+# the same per-session objects via upsert, so storage stays bounded).
+LOG_UPLOAD_INTERVAL_SEC = 300.0
+LOG_UPLOAD_FIRST_DELAY_SEC = 60.0
 
 # ── Logging (file only — stdout is reserved for JSON protocol) ────────────────
 
@@ -82,6 +88,10 @@ class HeadlessBackend:
         self._game_focused = False
         self._last_replay_filename = None
         self._status_timer = None
+        # Periodic diagnostic-log uploader. Logs ALWAYS upload on a cadence
+        # (not conditionally on errors), so a fresh full copy is always sitting
+        # in Supabase whenever a friend says "it's broken".
+        self._log_upload_timer = None
 
         # Ensure user exists in DB if already logged in
         sid = self.config.get("steam_id")
@@ -135,6 +145,9 @@ class HeadlessBackend:
             from updater import __version__
             self._telemetry = telemetry
             telemetry.init(self.config, version=__version__)
+            # Prime the remote kill-switch cache so the first capture doesn't
+            # block on a flag fetch (best-effort, fails open).
+            telemetry.refresh_flags()
             if sid:
                 telemetry.identify(
                     sid,
@@ -186,15 +199,63 @@ class HeadlessBackend:
                 })
             elif t == "nettable_debug_dump_done":
                 # Prime "is capture working" signal — send per-table results.
+                results = msg.get("results") or []
                 tel.capture("nettable_debug_dump_done", {
                     "ok": msg.get("ok"),
                     "dumped": msg.get("dumped"),
                     "with_data": msg.get("with_data"),
-                    "results": msg.get("results"),
+                    "results": results,
                     "reason": msg.get("reason"),
                 })
         except Exception:
             pass
+
+    def _apply_game_tracking_flag(self) -> None:
+        """Evaluate the remote game-tracking kill switch and apply it to the
+        capture. Best-effort; fails open (tracking stays enabled on any error)."""
+        tel = getattr(self, "_telemetry", None)
+        if not tel or not self._nettable:
+            return
+        try:
+            tel.refresh_flags()
+            self._nettable.set_remote_enabled(tel.is_game_tracking_enabled())
+        except Exception:
+            pass
+
+    def _start_log_upload_timer(self) -> None:
+        """Periodically ship the full logs to Supabase so a fresh copy is always
+        available, and re-sync the remote game-tracking kill switch. Re-uploads
+        overwrite the same per-session objects (upsert), so this doesn't pile up
+        storage. Best-effort, off the main thread."""
+        tel = getattr(self, "_telemetry", None)
+        if not tel:
+            return
+        self._stop_log_upload_timer()
+
+        def tick():
+            try:
+                tel.upload_logs(reason="periodic")
+            except Exception:
+                pass
+            # Re-sync the kill switch so flipping it in PostHog propagates to
+            # already-running clients without a restart.
+            self._apply_game_tracking_flag()
+            if self._stop_event.is_set():
+                return
+            self._log_upload_timer = threading.Timer(LOG_UPLOAD_INTERVAL_SEC, tick)
+            self._log_upload_timer.daemon = True
+            self._log_upload_timer.start()
+
+        # First upload after a short delay so an early-session crash still has
+        # something; then every LOG_UPLOAD_INTERVAL_SEC.
+        self._log_upload_timer = threading.Timer(LOG_UPLOAD_FIRST_DELAY_SEC, tick)
+        self._log_upload_timer.daemon = True
+        self._log_upload_timer.start()
+
+    def _stop_log_upload_timer(self) -> None:
+        if self._log_upload_timer:
+            self._log_upload_timer.cancel()
+            self._log_upload_timer = None
 
     def _emit_error(self, message: str) -> None:
         self._emit({"type": "error", "message": message})
@@ -485,6 +546,7 @@ class HeadlessBackend:
     def _shutdown(self) -> None:
         log.info("Quit requested — shutting down")
         self._stop_event.set()
+        self._stop_log_upload_timer()
 
         if self._replay_recorder and self._replay_recorder.recording:
             try:
@@ -504,6 +566,8 @@ class HeadlessBackend:
         tel = getattr(self, "_telemetry", None)
         if tel:
             try:
+                # Final always-on upload so the very end of the session lands.
+                tel.upload_logs(reason="shutdown")
                 tel.capture("backend_stopped", {})
                 tel.flush()
                 tel.shutdown()
@@ -616,6 +680,14 @@ class HeadlessBackend:
             except Exception as e:
                 log.warning("NetTable capture start failed: %s", e)
 
+        # Apply the remote game-tracking kill switch now, then keep it in sync
+        # on the periodic timer tick.
+        self._apply_game_tracking_flag()
+
+        # Always-on diagnostic log uploads (periodic). Independent of the kill
+        # switch — logs/telemetry are observability and always run.
+        self._start_log_upload_timer()
+
         from updater import __version__, start_update_loop
         log.info("%s headless backend v%s running", APP_NAME, __version__)
 
@@ -676,6 +748,14 @@ def main():
                 import telemetry
                 telemetry.capture_exception(exc_value, context)
                 telemetry.flush()
+                # Ship full logs to Supabase off-thread so network I/O doesn't
+                # block the dying process (mirrors the upload_logs command).
+                threading.Thread(
+                    target=telemetry.upload_logs,
+                    kwargs={"reason": "crash"},
+                    daemon=True,
+                    name="crash-upload-logs",
+                ).start()
             except Exception:
                 pass
 
@@ -706,6 +786,9 @@ def main():
         try:
             import telemetry
             telemetry.capture_exception(fatal_exc, {"origin": "main_fatal"})
+            # Run the upload inline (and join) here: the process is about to
+            # exit via `raise`, so a daemon thread would be killed mid-flight.
+            telemetry.upload_logs(reason="crash")
             telemetry.flush()
             telemetry.shutdown()
         except Exception:

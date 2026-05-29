@@ -745,10 +745,27 @@ def _is_dota_foreground() -> bool:
         return False
 
 
+# Remote kill switch for the core game-tracking feature. When False (driven by
+# the `game-tracking-enabled` PostHog flag), every SendInput key-firing path
+# no-ops, so the capture cascade and debug dumps stop poking Dota entirely.
+# Telemetry stays on so the disabled state is still observable. Defaults True
+# (fail-open: tracking runs unless explicitly switched off).
+_key_firing_enabled = True
+
+
+def set_key_firing_enabled(enabled: bool) -> None:
+    """Module-wide gate for ALL SendInput output (the active tracking)."""
+    global _key_firing_enabled
+    _key_firing_enabled = bool(enabled)
+
+
 def send_input_key(vk: int) -> bool:
     """Fire a single keydown/keyup for the given virtual-key code via
     SendInput. Returns True iff Dota is foreground AND the call sent
-    both events successfully. Silent no-op if Dota isn't active."""
+    both events successfully. Silent no-op if Dota isn't active or the
+    remote game-tracking kill switch is off."""
+    if not _key_firing_enabled:
+        return False
     if not _is_dota_foreground():
         return False
     try:
@@ -1049,6 +1066,10 @@ class NetTableCapture:
         # Status (re-emitted on demand via emit_status())
         self._autoexec_installed = False
         self._paused = False
+        # Remote game-tracking kill switch (driven by the PostHog flag, applied
+        # from headless). Separate from the user's manual `_paused`. Defaults
+        # enabled (fail-open).
+        self._remote_enabled = True
 
         # Tail state
         self._file = None  # type: ignore
@@ -1227,11 +1248,25 @@ class NetTableCapture:
             ) if opts_tokens is not None else None,
             "steam_running": is_steam_running(),
             "paused": self._paused,
+            "remote_enabled": self._remote_enabled,
         })
 
     def set_paused(self, paused: bool) -> None:
         self._paused = paused
         log.info("nettable: %s", "paused" if paused else "resumed")
+        self.emit_status()
+
+    def set_remote_enabled(self, enabled: bool) -> None:
+        """Apply the remote game-tracking kill switch. When disabled, ALL
+        SendInput key firing stops (module-wide gate) so the capture cascade and
+        debug dumps go quiet across every path — independent of manual pause."""
+        enabled = bool(enabled)
+        if enabled == self._remote_enabled:
+            return
+        self._remote_enabled = enabled
+        set_key_firing_enabled(enabled)
+        log.info("nettable: game tracking %s by remote flag",
+                 "ENABLED" if enabled else "DISABLED")
         self.emit_status()
 
     # Ordered (vk, table) pairs for the debug dump sequence — one key per table.

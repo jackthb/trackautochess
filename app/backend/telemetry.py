@@ -9,9 +9,11 @@ protocol the Electron renderer parses. All diagnostics go through the ``dac``
 logger (file + the renderer's JSON log sink) or, as a last resort, stderr.
 """
 
+import gzip
 import logging
 import os
 import sys
+import time
 import traceback
 from pathlib import Path
 
@@ -19,10 +21,13 @@ from utils import DAC_DIR, load_config
 
 # ── Configuration ─────────────────────────────────────────────────────────────
 
-# Intentionally blank — do not commit a real token. A token is supplied at
-# runtime via the POSTHOG_DESKTOP_TOKEN env var or the `posthog_desktop_token`
-# config key. With no token, this whole module no-ops.
-DEFAULT_POSTHOG_TOKEN = ""
+# Reuses the SAME PostHog project as the web viewer (so a person's web + app
+# activity stitch into one profile via the shared steam_id distinct_id). This
+# is the project's PUBLIC, write-only ingestion key — safe to embed (it already
+# ships in the public web bundle). Baked in so packaged builds work with no
+# per-user env; override via POSTHOG_DESKTOP_TOKEN env or `posthog_desktop_token`
+# config key. Set to "" to disable telemetry entirely.
+DEFAULT_POSTHOG_TOKEN = "phc_GUppkWFIfGM9WwVbEe33FM7aXn06JkIGWZ5P6MYy5zX"
 DEFAULT_POSTHOG_HOST = "https://eu.i.posthog.com"
 
 # Log tails are capped per-source so we never try to ship a multi-MB file.
@@ -30,6 +35,21 @@ LOG_TAIL_MAX_BYTES = 256 * 1024
 # PostHog rejects very large event payloads, so a tail is split into chunks
 # and sent as a sequence of `log_chunk` events. Stay well under the limit.
 LOG_CHUNK_BYTES = 48 * 1024
+
+# Full files are uploaded to Supabase storage; cap the read so a pathological
+# multi-GB console.log can't blow up memory. Anything past this is truncated.
+LOG_FULL_MAX_BYTES = 20 * 1024 * 1024
+# Small at-a-glance tail embedded in the `diagnostics_uploaded` event so the
+# PostHog dashboard shows the end of each log without opening Supabase.
+LOG_EVENT_TAIL_BYTES = 16 * 1024
+
+# Remote kill switch for the CORE GAME-TRACKING feature (the nettable capture /
+# SendInput cascade) — NOT telemetry. The developer flips this off in PostHog to
+# disable game tracking on every client when it's misbehaving, with no redeploy.
+# Telemetry/logging stays ALWAYS ON regardless, so the failure is still visible.
+# Evaluated with a short TTL cache; fails OPEN (see is_game_tracking_enabled()).
+FEATURE_FLAG = "game-tracking-enabled"
+FLAG_CACHE_TTL = 300  # seconds
 
 log = logging.getLogger("dac")
 
@@ -39,6 +59,14 @@ _client = None              # posthog.Posthog instance, or None when disabled
 _initialized = False
 _distinct_id = None
 _super_properties: dict = {}
+
+# Kill-switch flag cache: (value, evaluated_at_monotonic_wallclock).
+_flag_value: bool = True
+_flag_checked_at: float = 0.0
+
+# Stable per-session folder for log uploads, so periodic re-uploads overwrite
+# the same Supabase objects instead of creating one per upload. Set in init().
+_session_tag: str = ""
 
 
 def _resolve_token(config: dict | None) -> str:
@@ -69,10 +97,11 @@ def _resolve_host() -> str:
 def init(config: dict, version: str | None = None) -> None:
     """Lazily construct the PostHog client. Safe to call with no steam_id yet
     and safe to call when no token is configured (then it no-ops forever)."""
-    global _client, _initialized, _distinct_id, _super_properties
+    global _client, _initialized, _distinct_id, _super_properties, _session_tag
     if _initialized:
         return
     _initialized = True
+    _session_tag = time.strftime("%Y%m%d_%H%M%S")
     try:
         token = _resolve_token(config)
         if not token:
@@ -81,6 +110,9 @@ def init(config: dict, version: str | None = None) -> None:
 
         _distinct_id = (config or {}).get("steam_id") or None
         _super_properties = {
+            # Shared PostHog project with the web viewer — tag every desktop
+            # event so web funnels/dashboards can filter on `source`.
+            "source": "desktop_app",
             "app_version": version,
             "platform": sys.platform,
             "frozen": bool(getattr(sys, "frozen", False)),
@@ -111,18 +143,76 @@ def identify(steam_id, steam_name=None, version: str | None = None) -> None:
         return
     try:
         _distinct_id = str(steam_id)
-        props = {}
+        # Mirror the web viewer's person shape (web/pages/_app.tsx) so the same
+        # human is one PostHog person across web + app: `$name` drives the
+        # Persons-list label, `steam_id` is the stable distinct_id.
+        props = {"steam_id": _distinct_id}
         if steam_name:
+            props["$name"] = steam_name
             props["steam_name"] = steam_name
         if version:
             props["app_version"] = version
-        _client.identify(distinct_id=_distinct_id, properties=props or None)
+        _client.identify(distinct_id=_distinct_id, properties=props)
     except Exception as e:
         log.debug("telemetry: identify failed: %s", e)
 
 
+# ── Kill switch (remote feature flag) ─────────────────────────────────────────
+
+def _evaluate_flag() -> bool:
+    """Ask PostHog whether telemetry is enabled. Fails OPEN (returns True) on
+    any error or None result so a transient flag hiccup can't silently kill
+    telemetry. Caller is responsible for the client-exists check + TTL cache."""
+    try:
+        feature_enabled = getattr(_client, "feature_enabled", None)
+        if not callable(feature_enabled):
+            return True  # client without flag support → fail open
+        result = feature_enabled(FEATURE_FLAG, _distinct_id or "anonymous")
+        if result is None:
+            return True  # flag undefined / not loaded yet → fail open
+        return bool(result)
+    except Exception as e:
+        log.debug("telemetry: feature flag eval failed (%s) — failing open", e)
+        return True
+
+
+def is_game_tracking_enabled() -> bool:
+    """Whether the CORE game-tracking feature should run, per the remote
+    ``game-tracking-enabled`` PostHog flag. NOT about telemetry (telemetry is
+    always on). Fails OPEN (returns True): no client / no flag / any error →
+    enabled, so tracking only stops on an explicit flag = false from the
+    dashboard. Cached for ``FLAG_CACHE_TTL`` seconds."""
+    global _flag_value, _flag_checked_at
+    if not _client:
+        return True  # can't reach flags → leave the core feature running
+    try:
+        now = time.time()
+        if (now - _flag_checked_at) >= FLAG_CACHE_TTL or _flag_checked_at == 0.0:
+            _flag_value = _evaluate_flag()
+            _flag_checked_at = now
+        return _flag_value
+    except Exception:
+        # Never let the gate itself disable a working feature — fail open.
+        return True
+
+
+def refresh_flags() -> None:
+    """Prime / refresh the kill-switch cache. Safe to call at startup and
+    periodically. No-ops when telemetry is disabled."""
+    global _flag_value, _flag_checked_at
+    if not _client:
+        return
+    try:
+        _flag_value = _evaluate_flag()
+        _flag_checked_at = time.time()
+        log.debug("telemetry: kill switch refreshed (%s=%s)", FEATURE_FLAG, _flag_value)
+    except Exception as e:
+        log.debug("telemetry: refresh_flags failed: %s", e)
+
+
 def capture(event: str, properties: dict | None = None) -> None:
-    """Best-effort event capture. Swallows everything."""
+    """Best-effort event capture. Always on (telemetry is observability and is
+    not gated by the game-tracking kill switch). Swallows everything."""
     if not _client:
         return
     try:
@@ -138,7 +228,8 @@ def capture(event: str, properties: dict | None = None) -> None:
 def capture_exception(exc, context: dict | None = None) -> None:
     """Report an exception. Uses PostHog's native exception capture when the
     installed client exposes it, else falls back to a `backend_exception`
-    event carrying type/message/traceback."""
+    event carrying type/message/traceback. Always on — not gated by the
+    game-tracking kill switch."""
     if not _client:
         return
     try:
@@ -204,6 +295,25 @@ def _read_tail(path: Path, max_bytes: int = LOG_TAIL_MAX_BYTES) -> str:
         return ""
 
 
+def _read_full(path: Path, max_bytes: int = LOG_FULL_MAX_BYTES) -> tuple[str, bool]:
+    """Return (text, truncated) for a file, reading at most ``max_bytes`` from
+    the END (the tail is what matters for diagnostics). Returns ('', False) if
+    unreadable."""
+    try:
+        if not path or not path.exists():
+            return "", False
+        size = path.stat().st_size
+        truncated = size > max_bytes
+        with open(path, "rb") as f:
+            if truncated:
+                f.seek(size - max_bytes)
+            data = f.read()
+        return data.decode("utf-8", errors="replace"), truncated
+    except Exception as e:
+        log.debug("telemetry: could not read %s: %s", path, e)
+        return "", False
+
+
 def _find_console_log() -> Path | None:
     """Locate Dota's console.log using the same logic as the capture pipeline."""
     try:
@@ -235,40 +345,109 @@ def _send_log_chunks(source: str, text: str, reason: str) -> int:
     return total
 
 
-def upload_logs(reason: str = "manual") -> None:
-    """Ship the tails of tracker.log and Dota's console.log to PostHog.
+def _tail_str(text: str, max_bytes: int = LOG_EVENT_TAIL_BYTES) -> str:
+    """Last ``max_bytes`` of a string (byte-accurate), for event triage."""
+    raw = text.encode("utf-8", errors="replace")
+    if len(raw) <= max_bytes:
+        return text
+    return raw[-max_bytes:].decode("utf-8", errors="replace")
 
-    Each source is capped to ~256 KB and split into `log_chunk` events; a
-    summary `logs_uploaded` event records how much was sent. No-ops when
-    telemetry is disabled."""
-    if not _client:
-        log.debug("telemetry: upload_logs skipped — telemetry disabled")
+
+def upload_logs(reason: str = "manual") -> None:
+    """Upload the FULL tracker.log and Dota console.log to private Supabase
+    storage (gzipped) and emit a single ``diagnostics_uploaded`` PostHog event
+    carrying the storage paths, sizes, and a small ~16 KB tail of each for
+    at-a-glance triage.
+
+    Logs ALWAYS upload — the upload is independent of the kill switch and of
+    the PostHog client, so the diagnostic safety net survives even when tracking
+    is disabled. Only the ``diagnostics_uploaded`` event is gated (it flows
+    through ``capture()``), so a flag-off run still ships logs to Supabase but
+    stays silent in PostHog. Resilient: if the Supabase upload fails the event
+    is still emitted with ``storage_ok: false``.
+
+    Skips only when no steam_id is known yet (we need it for the storage path)."""
+    user_id = _distinct_id
+    if not user_id:
+        try:
+            user_id = (load_config() or {}).get("steam_id")
+        except Exception:
+            user_id = None
+    if not user_id:
+        log.debug("telemetry: upload_logs skipped — no steam_id yet")
         return
     try:
         tracker_path = DAC_DIR / "tracker.log"
         console_path = _find_console_log()
 
-        tracker_tail = _read_tail(tracker_path)
-        console_tail = _read_tail(console_path) if console_path else ""
+        tracker_text, tracker_trunc = _read_full(tracker_path)
+        console_text, console_trunc = (
+            _read_full(console_path) if console_path else ("", False)
+        )
 
-        tracker_chunks = _send_log_chunks("tracker_log", tracker_tail, reason)
-        console_chunks = _send_log_chunks("console_log", console_tail, reason)
+        if tracker_trunc:
+            log.info("telemetry: tracker.log truncated to last %d bytes for upload",
+                     LOG_FULL_MAX_BYTES)
+        if console_trunc:
+            log.info("telemetry: console.log truncated to last %d bytes for upload",
+                     LOG_FULL_MAX_BYTES)
+
+        tracker_bytes = len(tracker_text.encode("utf-8", errors="replace"))
+        console_bytes = len(console_text.encode("utf-8", errors="replace"))
+
+        # Upload full gzipped files to private Supabase storage. Lazy import so
+        # a db import failure can't crash telemetry.
+        paths: dict = {}
+        storage_ok = True
+        upload = None
+        try:
+            from db import upload_diagnostic_log
+            upload = upload_diagnostic_log
+        except Exception as e:
+            storage_ok = False
+            log.debug("telemetry: db import for log upload failed: %s", e)
+
+        if upload is not None:
+            subdir = _session_tag or None
+            try:
+                if tracker_text:
+                    gz = gzip.compress(tracker_text.encode("utf-8", errors="replace"))
+                    p = upload(user_id, "tracker.log.gz", gz, "application/gzip",
+                               subdir=subdir, upsert=True)
+                    if p:
+                        paths["tracker_log"] = p
+                    else:
+                        storage_ok = False
+                if console_text:
+                    gz = gzip.compress(console_text.encode("utf-8", errors="replace"))
+                    p = upload(user_id, "console.log.gz", gz, "application/gzip",
+                               subdir=subdir, upsert=True)
+                    if p:
+                        paths["console_log"] = p
+                    else:
+                        storage_ok = False
+            except Exception as e:
+                storage_ok = False
+                log.debug("telemetry: storage upload failed: %s", e)
 
         summary = {
             "reason": reason,
-            "tracker_bytes": len(tracker_tail.encode("utf-8", errors="replace")),
-            "tracker_chunks": tracker_chunks,
-            "console_bytes": len(console_tail.encode("utf-8", errors="replace")),
-            "console_chunks": console_chunks,
+            "paths": paths,
+            "storage_ok": storage_ok,
+            "tracker_bytes": tracker_bytes,
+            "tracker_truncated": tracker_trunc,
+            "console_bytes": console_bytes,
+            "console_truncated": console_trunc,
             "console_found": bool(console_path),
+            "tracker_tail": _tail_str(tracker_text),
+            "console_tail": _tail_str(console_text),
         }
-        capture("logs_uploaded", summary)
+        capture("diagnostics_uploaded", summary)
         flush()
         log.info(
-            "telemetry: logs uploaded (reason=%s) tracker=%d bytes/%d chunks, "
-            "console=%d bytes/%d chunks",
-            reason, summary["tracker_bytes"], tracker_chunks,
-            summary["console_bytes"], console_chunks,
+            "telemetry: diagnostics uploaded (reason=%s, storage_ok=%s) "
+            "tracker=%d bytes, console=%d bytes, paths=%s",
+            reason, storage_ok, tracker_bytes, console_bytes, paths,
         )
     except Exception as e:
         log.warning("telemetry: upload_logs failed: %s", e)

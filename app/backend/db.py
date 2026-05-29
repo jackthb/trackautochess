@@ -312,3 +312,54 @@ def upload_screenshot(img, user_id: str) -> str | None:
     except Exception as e:
         log.error("upload_screenshot error: %s", e)
         return None
+
+
+def upload_diagnostic_log(
+    user_id: str,
+    name: str,
+    data: bytes,
+    content_type: str = "application/gzip",
+    subdir: str | None = None,
+    upsert: bool = True,
+) -> str | None:
+    """Upload a diagnostic log blob to the PRIVATE ``diagnostic-logs`` bucket.
+
+    Mirrors ``upload_screenshot``. Returns the object path
+    (``diagnostic-logs/{user_id}/{subdir}/{name}``) on success so it can be
+    referenced from a PostHog event and looked up in the Supabase dashboard.
+    The bucket is private, so no public URL is built. Returns None on failure
+    and never raises.
+
+    ``subdir`` lets the caller pin a stable per-session folder so periodic
+    re-uploads overwrite the same object (with ``upsert``) instead of piling up
+    one object per upload. Defaults to a fresh timestamp when omitted.
+    """
+    client = _get_client()
+    if client is None:
+        return None
+
+    try:
+        subdir = subdir or datetime.now().strftime("%Y%m%d_%H%M%S")
+        path = f"{user_id}/{subdir}/{name}"
+
+        headers = {
+            "Content-Type": content_type,
+            "Prefer": "",  # override default return=minimal
+        }
+        if upsert:
+            # Overwrite an existing object at this path instead of 400ing.
+            headers["x-upsert"] = "true"
+
+        resp = client.post(
+            f"/storage/v1/object/diagnostic-logs/{path}",
+            content=data,
+            headers=headers,
+        )
+        resp.raise_for_status()
+
+        object_path = f"diagnostic-logs/{path}"
+        log.info("uploaded diagnostic log: %s (%d KB)", object_path, len(data) // 1024)
+        return object_path
+    except Exception as e:
+        log.error("upload_diagnostic_log error: %s", e)
+        return None

@@ -3,15 +3,21 @@ import type { PostHog } from "posthog-js";
 let initialized = false;
 let cachedClient: PostHog | null = null;
 
-// Token is injected at build time via Vite env. No default — when absent the
-// whole module no-ops cleanly (mirrors web/lib/posthog.ts), so dev builds and
-// anyone without the token configured send nothing.
-const DEFAULT_TOKEN = "";
+// Reuses the SAME PostHog project as the web viewer, so a person's web + app
+// activity stitch into one profile (shared steam_id distinct_id). This is the
+// project's PUBLIC, write-only ingestion key — safe to embed (it already ships
+// in the public web bundle). Baked in so packaged builds work with no env;
+// override at build via VITE_POSTHOG_DESKTOP_TOKEN. Set to "" to disable.
+const DEFAULT_TOKEN = "phc_GUppkWFIfGM9WwVbEe33FM7aXn06JkIGWZ5P6MYy5zX";
 const KEY = import.meta.env.VITE_POSTHOG_DESKTOP_TOKEN || DEFAULT_TOKEN;
 // Electron renderer talks to PostHog directly — there's no Next.js rewrite
 // proxy here, so point straight at the EU cluster for both ingest and UI.
 const API_HOST = "https://eu.i.posthog.com";
 const UI_HOST = "https://eu.i.posthog.com";
+
+// NOTE: telemetry here is ALWAYS on (observability). The `game-tracking-enabled`
+// kill switch governs the backend capture feature, not this — so the renderer
+// deliberately does not gate its events/replay on any flag.
 
 export async function getPostHog(): Promise<PostHog | null> {
   if (typeof window === "undefined" || !KEY) return null;
@@ -38,6 +44,10 @@ export async function getPostHog(): Promise<PostHog | null> {
         maskTextSelector: undefined,
       },
     });
+    // Shared project with the web viewer — tag every desktop event so web
+    // funnels/dashboards can filter on `source`.
+    posthog.register({ source: "desktop_app" });
+
     initialized = true;
   }
   cachedClient = posthog;
