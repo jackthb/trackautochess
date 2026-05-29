@@ -508,6 +508,11 @@ function registerShortcuts() {
   globalShortcut.register("F7", () => {
     sendToPython({ cmd: "toggle_recording" });
   });
+  // Debug: fire each nettable dump key in sequence, confirming each table
+  // lands in console.log (Dota must be foreground).
+  globalShortcut.register("F10", () => {
+    sendToPython({ cmd: "nettable_debug_dump" });
+  });
 }
 
 // ── Window controls IPC ──────────────────────────────────────────────────

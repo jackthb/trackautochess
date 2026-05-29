@@ -105,6 +105,14 @@ AUTOEXEC_CFG_CONTENT = f"""// DAC NetTable dump triggers — installed by DAC Tr
 // Debug key (not in cascade — manual only):
 //   F25 → unit_table           ← chess pieces on board
 
+// Clear stale dump binds from older autoexec versions / manual tests, so they
+// don't accumulate in Dota's saved keybinds. Keys we no longer drive:
+unbind "F13"
+unbind "F15"
+unbind "F20"
+unbind "INS"
+unbind "PAUSE"
+
 bind "F21" "dumpstringtable CustomNetTable_dac_table cl verbose"
 bind "F22" "dumpstringtable CustomNetTable_player_info_table cl verbose"
 bind "F23" "dumpstringtable CustomNetTable_game_info cl verbose"
@@ -645,6 +653,7 @@ VK_F21 = 0x84     # dac_table (end_board)
 VK_F22 = 0x85     # player_info_table (live state)
 VK_F23 = 0x86     # game_info (round/death)
 VK_F24 = 0x87     # player_id_table (steam_id mapping)
+VK_F25 = 0x88     # unit_table (board pieces — debug)
 
 
 # ── SendInput-based key firing (replaces external AHK) ─────────────
@@ -977,6 +986,9 @@ POOL_DUMP_INTERVAL_SEC = 300.0
 # Gap between individual keys in the cascade. dumpstringtable produces
 # hundreds of console lines per call; firing too fast can drop output.
 CASCADE_KEY_GAP_SEC = 0.2
+# Debug dump sequence: how long to wait for one table's dump to land in
+# console.log after firing its key before declaring it "no data".
+DEBUG_DUMP_TIMEOUT_SEC = 4.0
 
 # The keys the cascade fires, in order. Mirrors the autoexec binds.
 # F16 (chess_pool_table) runs on its own timer, not in the cascade.
@@ -1082,6 +1094,11 @@ class NetTableCapture:
         self._dump_active = False
         self._dump_last_line_ts = 0.0
         self._dump_seen_tables: set[str] = set()
+        # Per-table wall-clock of the last dump line seen for it. Used by the
+        # debug dump sequence to confirm each table actually produced data.
+        self._dump_last_seen: dict[str, float] = {}
+        # Per-table row count from the last dump header (e.g. "… unit_table  0").
+        self._dump_last_rows: dict[str, int] = {}
 
         # Latest decoded per-(table, key) state. Updated after each ingest,
         # re-emitted on demand so the UI can render the live snapshot.
@@ -1216,6 +1233,75 @@ class NetTableCapture:
         self._paused = paused
         log.info("nettable: %s", "paused" if paused else "resumed")
         self.emit_status()
+
+    # Ordered (vk, table) pairs for the debug dump sequence — one key per table.
+    _DEBUG_DUMP_SEQUENCE = (
+        (VK_F21, "CustomNetTable_dac_table"),
+        (VK_F22, "CustomNetTable_player_info_table"),
+        (VK_F23, "CustomNetTable_game_info"),
+        (VK_F24, "CustomNetTable_player_id_table"),
+        (VK_F16, "CustomNetTable_chess_pool_table"),
+        (VK_F25, "CustomNetTable_unit_table"),
+    )
+
+    def debug_dump_sequence(self) -> None:
+        """Debug hotkey: fire each table's dump key one at a time and confirm
+        the dump actually landed in console.log before moving to the next, so
+        you can see exactly which of the six tables are working.
+
+        Detection reuses the live tailer — _note_dump_line stamps
+        _dump_last_seen[table] whenever a dump block for that table is read, so
+        a table is "OK" when its stamp advances after we fire its key.
+        Requires Dota to be the foreground window (SendInput only delivers to
+        the focused window).
+        """
+        if not _is_dota_foreground():
+            log.warning("nettable: debug dump ignored — Dota is not foreground")
+            self._emit({
+                "type": "nettable_debug_dump_done",
+                "ok": False,
+                "reason": "dota_not_foreground",
+                "results": [],
+                "at": datetime.now().isoformat(),
+            })
+            return
+
+        results = []
+        for vk, table in self._DEBUG_DUMP_SEQUENCE:
+            short = table.removeprefix(CUSTOM_NETTABLE_PREFIX)
+            before = self._dump_last_seen.get(table, 0.0)
+            send_input_key(vk)
+            deadline = time.time() + DEBUG_DUMP_TIMEOUT_SEC
+            detected = False
+            while time.time() < deadline and not self._stop.is_set():
+                if self._dump_last_seen.get(table, 0.0) > before:
+                    detected = True
+                    break
+                time.sleep(0.1)
+            rows = self._dump_last_rows.get(table) if detected else None
+            status = "NO DUMP" if not detected else (f"{rows} rows" if rows else "EMPTY")
+            log.info("nettable: debug dump %s -> %s", short, status)
+            self._emit({
+                "type": "nettable_debug_dump",
+                "table": short,
+                "detected": detected,
+                "rows": rows,
+                "at": datetime.now().isoformat(),
+            })
+            results.append({"table": short, "detected": detected, "rows": rows})
+
+        dumped = sum(1 for r in results if r["detected"])
+        with_data = sum(1 for r in results if r.get("rows"))
+        log.info("nettable: debug dump done — %d/%d dumped, %d with data",
+                 dumped, len(results), with_data)
+        self._emit({
+            "type": "nettable_debug_dump_done",
+            "ok": dumped == len(results),
+            "dumped": dumped,
+            "with_data": with_data,
+            "results": results,
+            "at": datetime.now().isoformat(),
+        })
 
     def _is_log_active(self) -> bool:
         """True if console.log was modified within the active window.
@@ -1578,6 +1664,10 @@ class NetTableCapture:
             after = line[idx + len("table "):].split()
             if after and after[0].startswith(CUSTOM_NETTABLE_PREFIX):
                 self._dump_seen_tables.add(after[0])
+                self._dump_last_seen[after[0]] = time.time()
+                # Trailing integer on the header is the row count.
+                if len(after) > 1 and after[1].isdigit():
+                    self._dump_last_rows[after[0]] = int(after[1])
 
         self._dump_active = True
         self._dump_last_line_ts = time.time()

@@ -128,13 +128,73 @@ class HeadlessBackend:
         except Exception as e:
             log.warning("NetTable capture init failed: %s", e)
 
+        # Telemetry (PostHog) — no-ops silently when no token is configured.
+        # Must never write to stdout or raise into the backend.
+        try:
+            import telemetry
+            from updater import __version__
+            self._telemetry = telemetry
+            telemetry.init(self.config, version=__version__)
+            if sid:
+                telemetry.identify(
+                    sid,
+                    steam_name=self.config.get("steam_name"),
+                    version=__version__,
+                )
+            # Forward WARNING+ `dac` log records to PostHog automatically.
+            telemetry.attach_log_handler()
+            telemetry.capture("backend_started", {
+                "version": __version__,
+                "logged_in": bool(sid),
+                "admin_mode": self._is_admin_mode(),
+                "replay_enabled": self.config.get("replay_enabled", True),
+            })
+        except Exception as e:
+            self._telemetry = None
+            log.warning("Telemetry init failed: %s", e)
+
     # ── JSON protocol ────────────────────────────────────────────────────────
 
     def _emit(self, msg: dict) -> None:
         """Send a JSON line to stdout (Electron reads this)."""
+        self._telemetry_observe(msg)
         line = json.dumps(msg, ensure_ascii=False)
         sys.stdout.buffer.write(line.encode("utf-8") + b"\n")
         sys.stdout.buffer.flush()
+
+    def _telemetry_observe(self, msg: dict) -> None:
+        """Piggyback PostHog captures on lifecycle events already emitted by
+        the capture pipeline. Best-effort: never raises, never touches stdout."""
+        tel = getattr(self, "_telemetry", None)
+        if not tel:
+            return
+        try:
+            t = msg.get("type")
+            if t == "nettable_round_changed":
+                # First round of a session is the closest signal to "match
+                # started" that reaches _emit; capture every round but tag it.
+                if msg.get("round") in (1, "1"):
+                    tel.capture("match_started", {"round": msg.get("round")})
+            elif t == "nettable_game_ended":
+                tel.capture("game_ended", {})
+            elif t == "nettable_end_board_saved":
+                tel.capture("end_board_saved", {"at": msg.get("at")})
+            elif t == "nettable_match_extracted":
+                tel.capture("match_extracted", {
+                    "match_id": msg.get("match_id"),
+                    "player_count": msg.get("player_count"),
+                })
+            elif t == "nettable_debug_dump_done":
+                # Prime "is capture working" signal — send per-table results.
+                tel.capture("nettable_debug_dump_done", {
+                    "ok": msg.get("ok"),
+                    "dumped": msg.get("dumped"),
+                    "with_data": msg.get("with_data"),
+                    "results": msg.get("results"),
+                    "reason": msg.get("reason"),
+                })
+        except Exception:
+            pass
 
     def _emit_error(self, message: str) -> None:
         self._emit({"type": "error", "message": message})
@@ -441,6 +501,14 @@ class HeadlessBackend:
                 self._gsi.stop()
             except Exception:
                 pass
+        tel = getattr(self, "_telemetry", None)
+        if tel:
+            try:
+                tel.capture("backend_stopped", {})
+                tel.flush()
+                tel.shutdown()
+            except Exception:
+                pass
 
     # ── Auto-update ─────────────────────────────────────────────────────────
 
@@ -492,6 +560,23 @@ class HeadlessBackend:
         elif cmd == "nettable_set_paused":
             if self._nettable:
                 self._nettable.set_paused(bool(msg.get("paused", True)))
+        elif cmd == "nettable_debug_dump":
+            if self._nettable:
+                threading.Thread(
+                    target=self._nettable.debug_dump_sequence,
+                    daemon=True,
+                    name="nettable-debug-dump",
+                ).start()
+        elif cmd == "upload_logs":
+            tel = getattr(self, "_telemetry", None)
+            if tel:
+                reason = msg.get("reason", "manual")
+                threading.Thread(
+                    target=tel.upload_logs,
+                    kwargs={"reason": reason},
+                    daemon=True,
+                    name="upload-logs",
+                ).start()
         elif cmd == "nettable_resync_from_steam":
             threading.Thread(
                 target=self._do_resync_from_steam,
@@ -584,25 +669,47 @@ def main():
     atexit.register(_on_exit)
 
     try:
+        def _capture_exception(exc_value, context):
+            if exc_value is None:
+                return
+            try:
+                import telemetry
+                telemetry.capture_exception(exc_value, context)
+                telemetry.flush()
+            except Exception:
+                pass
+
         def _excepthook(exc_type, exc_value, exc_tb):
             log.critical("Unhandled exception", exc_info=(exc_type, exc_value, exc_tb))
             with open(crash_log, "a", encoding="utf-8") as f:
                 f.write(f"\n{'='*60}\n{datetime.now()}\n")
                 traceback.print_exception(exc_type, exc_value, exc_tb, file=f)
+            _capture_exception(exc_value, {"origin": "excepthook"})
         sys.excepthook = _excepthook
 
         def _thread_excepthook(args):
             log.critical("Unhandled thread exception in %s",
                          args.thread.name if args.thread else "unknown",
                          exc_info=(args.exc_type, args.exc_value, args.exc_traceback))
+            _capture_exception(args.exc_value, {
+                "origin": "thread_excepthook",
+                "thread": args.thread.name if args.thread else "unknown",
+            })
         threading.excepthook = _thread_excepthook
 
         backend = HeadlessBackend()
         backend.run()
-    except Exception:
+    except Exception as fatal_exc:
         with open(crash_log, "a", encoding="utf-8") as f:
             f.write(f"\n{'='*60}\n{datetime.now()} [FATAL]\n")
             traceback.print_exc(file=f)
+        try:
+            import telemetry
+            telemetry.capture_exception(fatal_exc, {"origin": "main_fatal"})
+            telemetry.flush()
+            telemetry.shutdown()
+        except Exception:
+            pass
         raise
 
 

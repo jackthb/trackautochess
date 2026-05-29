@@ -2,6 +2,7 @@ import type { TrackerStatus, UnitFullInfo } from "../types";
 import type { NetTableActivityState } from "../hooks/useNetTableEvents";
 import { NetTableSetupCard } from "./NetTableSetupCard";
 import { NetTableActivityFeed } from "./NetTableActivityFeed";
+import { NetTableDebugPanel } from "./NetTableDebugPanel";
 import { NetTableStatePanel } from "./NetTableStatePanel";
 import { LiveMatchStatus } from "./LiveMatchStatus";
 
@@ -38,6 +39,7 @@ export function NetTableHome({
     launchOptionsApplied,
     launchOptionsProgress,
     resyncProgress,
+    debug,
   } = netTable;
   // Match the setup card's "all good" calc — kept in sync with
   // NetTableSetupCard.tsx. Pill only collapses when we have positive
@@ -101,6 +103,7 @@ export function NetTableHome({
           />
         </div>
         <div className="nettable-home-feed">
+          <NetTableDebugPanel debug={debug} />
           <NetTableActivityFeed entries={entries} />
         </div>
         <div className="nettable-home-state">

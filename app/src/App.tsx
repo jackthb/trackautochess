@@ -1,4 +1,5 @@
-import { useState, useCallback, /* useRef, */ useEffect } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
+import { capture, identify } from "./lib/posthog";
 import { TitleBar } from "./components/TitleBar";
 import { TabBar } from "./components/TabBar";
 import { StatusBar } from "./components/StatusBar";
@@ -71,6 +72,29 @@ export default function App() {
   }, [gamesState.refresh]);
 
   const tracker = useTrackerEvents(handleImportResult, replaysState.refresh);
+
+  // Telemetry: initialise PostHog once on mount and record app open. No-ops
+  // cleanly when no token is configured (see src/lib/posthog.ts).
+  useEffect(() => {
+    capture("app_opened");
+  }, []);
+
+  // Identify the user once steam_id is known so events are filterable
+  // per-friend. distinct_id MUST be the steam_id. Re-runs only when the
+  // identity actually changes, not on every status tick.
+  const identifiedRef = useRef<string | null>(null);
+  const steamId = tracker.status?.steam_id;
+  const steamName = tracker.status?.steam_name;
+  useEffect(() => {
+    if (!steamId || identifiedRef.current === steamId) return;
+    identifiedRef.current = steamId;
+    void window.appApi
+      .getVersion()
+      .then((app_version) =>
+        identify(steamId, { steam_name: steamName, app_version }),
+      )
+      .catch(() => identify(steamId, { steam_name: steamName }));
+  }, [steamId, steamName]);
   // PARKED: admin / preview-as-user gating.
   // const isAdmin = tracker.status?.admin_mode === true;
   const showLoginScreen = !tracker.status?.logged_in;
@@ -97,6 +121,7 @@ export default function App() {
 
   const handleTabChange = useCallback((tab: string) => {
     setActiveTab(tab as TabId);
+    capture("tab_viewed", { tab });
   }, []);
 
   // PARKED with ReplaysTab — jumped from a replay row to that game in History.

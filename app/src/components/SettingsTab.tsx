@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { capture } from "../lib/posthog";
 import type { TrackerStatus, ReplayStats } from "../types";
 
 interface SettingsTabProps {
@@ -9,6 +10,7 @@ interface SettingsTabProps {
 export function SettingsTab({ status, replayStats }: SettingsTabProps) {
   const [version, setVersion] = useState("\u2014");
   const [loggingIn, setLoggingIn] = useState(false);
+  const [logsSent, setLogsSent] = useState(false);
 
   useEffect(() => {
     window.appApi.getVersion().then(setVersion);
@@ -31,6 +33,13 @@ export function SettingsTab({ status, replayStats }: SettingsTabProps) {
 
   const sendCommand = (cmd: Record<string, unknown>) => {
     window.tracker.sendCommand(cmd);
+  };
+
+  const sendLogs = () => {
+    sendCommand({ cmd: "upload_logs", reason: "manual" });
+    capture("logs_upload_requested");
+    setLogsSent(true);
+    setTimeout(() => setLogsSent(false), 2000);
   };
 
   return (
@@ -107,6 +116,12 @@ export function SettingsTab({ status, replayStats }: SettingsTabProps) {
           <div className="settings-row">
             <span className="settings-label">Backend</span>
             <span className="settings-value">{backendStatus}</span>
+          </div>
+          <div className="settings-row">
+            <span className="settings-label">Logs</span>
+            <button className="btn-ghost" onClick={sendLogs} disabled={logsSent}>
+              {logsSent ? "Sent" : "Send logs to developer"}
+            </button>
           </div>
         </div>
       </div>

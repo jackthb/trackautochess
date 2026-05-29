@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
+import { capture } from "../lib/posthog";
 import type {
   NetTableLaunchOptionsApplied,
   NetTableStatus,
@@ -107,13 +108,16 @@ export function NetTableSetupCard({
   const togglePause = useCallback(() => {
     if (!window.tracker) return;
     window.tracker.sendCommand({ cmd: "nettable_set_paused", paused: !paused });
+    capture("recording_toggled", { paused: !paused });
   }, [paused]);
 
   if (allOk) {
     return (
-      <div className="nettable-setup-complete">
-        <span className={`nettable-setup-complete-dot${paused ? " paused" : ""}`} aria-hidden="true" />
-        {paused ? "Paused" : tracking ? "Capturing" : "Ready"}
+      <div className="nettable-status-row">
+        <div className="nettable-setup-complete">
+          <span className={`nettable-setup-complete-dot${paused ? " paused" : ""}`} aria-hidden="true" />
+          {paused ? "Paused" : tracking ? "Capturing" : "Ready"}
+        </div>
         <button type="button" className="btn-ghost nettable-pause-btn" onClick={togglePause}>
           {paused ? "Resume" : "Pause"}
         </button>
