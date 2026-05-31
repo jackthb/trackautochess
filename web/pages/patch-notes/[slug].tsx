@@ -403,7 +403,7 @@ export default function PatchDetailPage({
         }
         .entry-icon {
           flex-shrink: 0;
-          width: 44px;
+          width: auto;
           height: 32px;
           object-fit: contain;
           border: 1px solid var(--border);
@@ -549,8 +549,6 @@ export default function PatchDetailPage({
                             className="entry-icon"
                             src={iconSrc}
                             alt=""
-                            width={44}
-                            height={32}
                             onError={(e: React.SyntheticEvent<HTMLImageElement>) => {
                               e.currentTarget.style.display = "none";
                             }}
