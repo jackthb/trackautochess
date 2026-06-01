@@ -1,8 +1,9 @@
+"use client";
+
 import { useEffect, useMemo, useState, type ReactNode } from "react";
-import { useRouter } from "next/router";
 import { EntityCard, type EntityCardVariant } from "@/components/EntityCard";
 import { bucketCount, trackEvent } from "@/lib/analytics";
-import { normalizeLocale } from "@/lib/i18n";
+import { DEFAULT_LOCALE } from "@/lib/i18n";
 import styles from "./EntityBrowser.module.css";
 
 const COUNT_LABEL: Record<EntityCardVariant, string> = {
@@ -38,9 +39,11 @@ interface EntityBrowserProps {
    */
   data: BrowsableEntity[] | BrowsableEntity[][];
   /** Formats the tier label (e.g. "Tier 1"). Only used for tiered data. */
-  tierLabel?: (tier: number) => string;
+  // Maps (not functions) so these props stay serializable across the App
+  // Router Server -> Client Component boundary.
+  tierLabel?: Record<number, string>;
   /** Returns a CSS color expression for the tier. */
-  tierColor?: (tier: number) => string;
+  tierColor?: Record<number, string>;
   /** Optional left-rail content (rendered desktop-only). */
   sidebarLeft?: ReactNode;
   /** Optional right-rail content (rendered desktop-only). */
@@ -92,14 +95,17 @@ export function EntityBrowser({
   bottomAd,
 }: EntityBrowserProps) {
   const hasSidebar = Boolean(sidebarLeft || sidebarRight);
-  const router = useRouter();
-  const locale = normalizeLocale(router.locale ?? router.defaultLocale ?? undefined);
+  // Single (English) locale since i18n routing was removed.
+  const locale = DEFAULT_LOCALE;
   const [query, setQuery] = useState("");
 
   useEffect(() => {
-    const search = router.query.q;
-    if (typeof search === "string") setQuery(search);
-  }, [router.query.q]);
+    // Initial ?q= filter, read via window.location (not a router hook) so this
+    // component works in both the Pages Router and the App Router.
+    if (typeof window === "undefined") return;
+    const search = new URLSearchParams(window.location.search).get("q");
+    if (search) setQuery(search);
+  }, []);
 
   const lowered = query.toLowerCase();
 
@@ -163,12 +169,12 @@ export function EntityBrowser({
             .map((entities, index) => ({ entities, tier: index + 1 }))
             .filter(({ entities }) => entities.length > 0)
             .map(({ entities, tier }) => {
-              const color = tierColor?.(tier);
+              const color = tierColor?.[tier];
               return (
                 <section key={tier} className={styles.panel}>
-                  {tierLabel && (
+                  {tierLabel?.[tier] && (
                     <div className={styles.panelHeader} style={{ color }}>
-                      <span>{tierLabel(tier)}</span>
+                      <span>{tierLabel[tier]}</span>
                       <span className={styles.count}>{entities.length}</span>
                     </div>
                   )}
