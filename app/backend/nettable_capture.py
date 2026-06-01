@@ -1125,6 +1125,14 @@ class NetTableCapture:
         # re-emitted on demand so the UI can render the live snapshot.
         self._last_state: dict[str, dict[str, Any]] = {}
         self._last_state_at: str | None = None
+        # Latest extracted per-player live state (hp, level, transformed
+        # lineup, etc.) — same shape the timeline uses. Powers the live
+        # "your board" card so the UI doesn't re-parse raw chess_* codes.
+        self._last_players: dict[str, dict] = {}
+        # Steam IDs present in player_info_table.player_info.data — i.e. the
+        # local player's own client rows. Lets the UI pick "you" out of the
+        # extracted players without guessing.
+        self._last_local_steam_ids: list[str] = []
 
         # Status signature used by the poll thread to decide whether to re-emit.
         self._last_status_signature: tuple = ()
@@ -1360,6 +1368,8 @@ class NetTableCapture:
         self._emit({
             "type": "nettable_state",
             "state": self._last_state,
+            "players": self._last_players,
+            "local_steam_ids": self._last_local_steam_ids,
             "at": self._last_state_at or "",
         })
 
@@ -2365,6 +2375,7 @@ class NetTableCapture:
                 if not isinstance(p, dict):
                     continue
                 lineup_raw = p.get("chess_lineup", "") or ""
+                relic_raw = p.get("relic", "") or ""
                 merge(str(sid), {
                     "hp": p.get("hp"),
                     "level": p.get("hero_level"),
@@ -2375,6 +2386,11 @@ class NetTableCapture:
                     "total_money": p.get("total_money"),
                     "win_round": p.get("win_round"),
                     "lose_round": p.get("lose_round"),
+                    # buff: raw synergy stems "is_mage:6,is_human:6," — the UI
+                    # renders these on the live card. relic: active relic code
+                    # (player_info carries it directly as e.g. item_stolen_vault).
+                    "buff": p.get("buff"),
+                    "relic": _transform_relic(relic_raw) if relic_raw else None,
                 })
 
         for r in rows:
@@ -2551,9 +2567,23 @@ class NetTableCapture:
                 bucket = self._last_state.setdefault(r["table_name"], {})
                 bucket[r["key"]] = r["raw"]
             self._last_state_at = now_iso
+            # Extract clean per-player state (transformed lineup, live hp with
+            # the hp=100 static sentinel handled) via the same code the
+            # timeline uses — the live "your board" card renders this directly
+            # instead of re-parsing raw chess_* codes in the UI.
+            self._last_players = self._extract_players_state_from_rows(rows)
+            self._last_local_steam_ids = [
+                str(sid)
+                for r in rows
+                if r.get("table_name", "").endswith("player_info_table")
+                and r.get("key") == "player_info"
+                for sid in ((r.get("raw") or {}).get("data") or {}).keys()
+            ]
             self._emit({
                 "type": "nettable_state",
                 "state": self._last_state,
+                "players": self._last_players,
+                "local_steam_ids": self._last_local_steam_ids,
                 "at": now_iso,
             })
 

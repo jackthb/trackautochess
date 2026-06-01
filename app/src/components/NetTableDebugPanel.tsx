@@ -4,14 +4,16 @@ interface NetTableDebugPanelProps {
   debug: NetTableDebugState;
 }
 
-// The six dump keys the F10 sequence fires, in order, with human labels.
+// The dump keys the F10 sequence fires, in order, with human labels.
+// NOTE: `unit_table` ("Board units") was removed — the game never emits that
+// CustomNetTable (console.log only ever carries the five below), so it always
+// reported "no dump". The board comes from player_info_table.chess_lineup.
 const TABLES: { key: string; label: string }[] = [
   { key: "dac_table", label: "End board" },
   { key: "player_info_table", label: "Live player state" },
   { key: "game_info", label: "Game info" },
   { key: "player_id_table", label: "Player IDs" },
   { key: "chess_pool_table", label: "Shop pool" },
-  { key: "unit_table", label: "Board units" },
 ];
 
 type Cell = { text: string; cls: "ok" | "empty" | "fail" | "idle" };

@@ -36,6 +36,8 @@ export function NetTableHome({
     entries,
     state,
     stateAt,
+    livePlayers,
+    localSteamIds,
     launchOptionsApplied,
     launchOptionsProgress,
     resyncProgress,
@@ -89,7 +91,11 @@ export function NetTableHome({
         </div>
       </div>
 
-      <LiveMatchStatus state={state} />
+      <LiveMatchStatus
+        players={livePlayers}
+        localSteamIds={localSteamIds}
+        unitsFull={unitsFull}
+      />
 
       <div
         className={`nettable-home-grid ${setupComplete ? "setup-complete" : ""}`}

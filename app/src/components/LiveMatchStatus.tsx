@@ -1,21 +1,15 @@
 import { useMemo } from "react";
-import { placementColor, mmrLevelToRank } from "../lib/game-utils";
-import type { NetTableState } from "../hooks/useNetTableEvents";
+import { parseLineup, unitStem, costBorderColor, synIconName } from "../lib/game-utils";
+import type { LivePlayer } from "../hooks/useNetTableEvents";
+import type { UnitFullInfo } from "../types";
 
 interface Props {
-  state: NetTableState;
-}
-
-interface PlayerRow {
-  steamId: string;
-  hp: number;
-  level: number;
-  wins: number;
-  losses: number;
-  gold: number;
-  unitCount: number;
-  rank: number;
-  mmrRank: string;
+  /** Extracted per-player live state, keyed by steam_id. */
+  players: Record<string, LivePlayer>;
+  /** Steam IDs belonging to the local player. */
+  localSteamIds: string[];
+  /** units_full.json — for unit cost (icon border) lookup. */
+  unitsFull: Record<string, UnitFullInfo>;
 }
 
 function hpBarColor(hp: number): string {
@@ -24,228 +18,179 @@ function hpBarColor(hp: number): string {
   return "var(--red-bright)";
 }
 
-function extractPlayers(state: NetTableState): {
-  players: PlayerRow[];
-  round: number;
-} | null {
-  const pit = state["CustomNetTable_player_info_table"]?.player_info as
-    | Record<string, unknown>
-    | undefined;
-  const dat = state["CustomNetTable_dac_table"]?.player_info as
-    | Record<string, unknown>
-    | undefined;
-
-  const piObj = pit as Record<string, unknown> | undefined;
-  const rawData = (piObj?.data ?? (piObj as { raw?: { data?: unknown } })?.raw?.data) as Record<string, Record<string, unknown>> | undefined;
-  const datObj = dat as Record<string, unknown> | undefined;
-  const rawInfo = (datObj?.info ?? (datObj as { raw?: { info?: unknown } })?.raw?.info) as Record<string, Record<string, unknown>> | undefined;
-
-  if (!rawData || Object.keys(rawData).length === 0) return null;
-
-  const steamIds = Object.keys(rawData);
-
-  let maxRound = 0;
-  const players: PlayerRow[] = [];
-
-  for (const sid of steamIds) {
-    const p = rawData[sid];
-    if (!p) continue;
-
-    const round = Number(p.round) || 0;
-    const wins = Number(p.win_round) || 0;
-    const losses = Number(p.lose_round) || 0;
-    if (round === 0 && wins === 0 && losses === 0) continue;
-
-    if (round > maxRound) maxRound = round;
-
-    const dacPlayer = rawInfo?.[sid];
-    const hp = Number(dacPlayer?.hp ?? p.hp ?? 0);
-    const rank = Number(dacPlayer?.curr_rank ?? 0);
-
-    const lineupStr = String(p.chess_lineup ?? "");
-    const unitCount = lineupStr
-      .split(",")
-      .filter((s: string) => s.trim().length > 0).length;
-
-    players.push({
-      steamId: sid,
-      hp,
-      level: Number(p.hero_level) || 1,
-      wins,
-      losses,
-      gold: Number(p.total_money) || 0,
-      unitCount,
-      rank,
-      mmrRank: mmrLevelToRank(Number(p.mmr_level) || 0),
-    });
-  }
-
-  if (players.length === 0 || maxRound === 0) return null;
-
-  players.sort((a, b) => {
-    if (a.rank > 0 && b.rank > 0) return a.rank - b.rank;
-    if (a.rank > 0) return -1;
-    if (b.rank > 0) return 1;
-    return b.hp - a.hp;
-  });
-
-  return { players, round: maxRound };
+/** "is_mage:6,is_human:6," → [{ stem: "mage", count: 6 }, …], sorted desc. */
+function parseBuff(buff: string | undefined): { stem: string; count: number }[] {
+  if (!buff) return [];
+  return buff
+    .split(",")
+    .map((s) => s.trim())
+    .filter(Boolean)
+    .map((entry) => {
+      const [raw, count] = entry.split(":");
+      return { stem: raw.replace(/^is_/, ""), count: Number(count) || 0 };
+    })
+    .filter((s) => s.count > 0)
+    .sort((a, b) => b.count - a.count);
 }
 
-export function LiveMatchStatus({ state }: Props) {
-  const data = useMemo(() => extractPlayers(state), [state]);
+/**
+ * The local player's live board: HP, round progress, gold, units (icons +
+ * stars), active synergies and relic. Fed by the backend's extracted player
+ * state — the lineup is already resolved from raw chess_* codes and the HP is
+ * the live value (not the dac_table static-100 sentinel). Renders nothing
+ * until there's a capture for the local player.
+ */
+export function LiveMatchStatus({ players, localSteamIds, unitsFull }: Props) {
+  const unitCosts = useMemo(() => {
+    const out: Record<string, number> = {};
+    for (const [name, info] of Object.entries(unitsFull)) {
+      out[name] = Number(info.cost) || 0;
+    }
+    return out;
+  }, [unitsFull]);
 
-  if (!data) return null;
+  const me = useMemo<LivePlayer | null>(() => {
+    const ids = Object.keys(players);
+    if (ids.length === 0) return null;
+    // Prefer the explicit local steam_id; fall back to the sole entry.
+    const localId = localSteamIds.find((id) => players[id]) ?? (ids.length === 1 ? ids[0] : null);
+    return localId ? players[localId] : null;
+  }, [players, localSteamIds]);
 
-  const { players, round } = data;
+  if (!me) return null;
+
+  const hp = Math.max(0, me.hp ?? 0);
+  const units = parseLineup(me.lineup || "", unitCosts);
+  const synergies = parseBuff(me.buff);
 
   return (
-    <section className="live-match-status">
+    <section className="live-board">
       <style>{`
-        .live-match-status {
+        .live-board {
           background: var(--bg-surface);
           border: 1px solid var(--border-subtle);
           border-radius: var(--r-8);
           padding: 12px 16px;
           flex-shrink: 0;
+          display: flex;
+          flex-direction: column;
+          gap: 10px;
         }
-        .live-match-header {
+        .live-board-header {
           display: flex;
           align-items: center;
           justify-content: space-between;
-          margin-bottom: 10px;
         }
-        .live-match-title {
+        .live-board-title {
           font-size: var(--fs-11);
           font-weight: var(--fw-medium);
           letter-spacing: var(--tr-upper);
           text-transform: uppercase;
           color: var(--text-muted);
         }
-        .live-match-round {
+        .live-board-stats {
+          display: flex;
+          align-items: center;
+          gap: 14px;
           font-size: var(--fs-12);
           color: var(--text-secondary);
           font-variant-numeric: tabular-nums;
         }
-        .live-match-rows {
-          display: flex;
-          flex-direction: column;
-          gap: 3px;
+        .live-board-stat b { color: var(--text-primary); font-weight: var(--fw-medium); }
+        .live-board-hp-wrap { display: flex; align-items: center; gap: 8px; }
+        .live-board-hp-bar-bg {
+          width: 120px; height: 6px;
+          background: var(--bg-deep); border-radius: 3px; overflow: hidden;
         }
-        .live-match-row {
-          display: grid;
-          grid-template-columns: 24px 64px 1fr 28px 52px 40px 28px;
-          gap: 8px;
-          align-items: center;
-          padding: 4px 6px;
-          border-radius: var(--r-0);
-          transition: background var(--t-fast) var(--t-easing);
+        .live-board-hp-bar { height: 100%; border-radius: 3px; transition: width 0.3s ease-out; min-width: 1px; }
+        .live-board-hp-text { font-size: var(--fs-11); color: var(--text-secondary); font-variant-numeric: tabular-nums; }
+        .live-board-units { display: flex; flex-wrap: wrap; gap: 3px; }
+        .live-board-empty { color: var(--text-muted); font-size: var(--fs-12); }
+        .live-board-foot {
+          display: flex; align-items: center; gap: 14px;
+          font-size: var(--fs-11); color: var(--text-muted);
         }
-        .live-match-row:hover {
-          background: var(--bg-hover);
-        }
-        .live-match-rank {
-          font-family: var(--font-display);
-          font-size: var(--fs-14);
-          font-weight: var(--fw-bold);
-          text-align: center;
-          line-height: 1;
-        }
-        .live-match-hp-wrap {
-          display: flex;
-          align-items: center;
-          gap: 6px;
-        }
-        .live-match-hp-bar-bg {
-          flex: 1;
-          height: 6px;
-          background: var(--bg-deep);
-          border-radius: 3px;
-          overflow: hidden;
-        }
-        .live-match-hp-bar {
-          height: 100%;
-          border-radius: 3px;
-          transition: width 0.3s ease-out;
-          min-width: 1px;
-        }
-        .live-match-hp-text {
-          font-size: var(--fs-11);
-          color: var(--text-secondary);
-          font-variant-numeric: tabular-nums;
-          min-width: 24px;
-          text-align: right;
-        }
-        .live-match-level {
-          font-size: var(--fs-12);
-          color: var(--text-muted);
-          text-align: center;
-          font-variant-numeric: tabular-nums;
-        }
-        .live-match-wl {
-          font-size: var(--fs-11);
-          font-variant-numeric: tabular-nums;
-          text-align: center;
-        }
-        .live-match-gold {
-          font-size: var(--fs-11);
-          color: var(--gold);
-          font-variant-numeric: tabular-nums;
-          text-align: right;
-        }
-        .live-match-mmr-rank {
-          font-size: 9px;
-          color: var(--text-muted);
-          letter-spacing: 0.3px;
-          overflow: hidden;
-          text-overflow: ellipsis;
-          white-space: nowrap;
-        }
-        .live-match-units {
-          font-size: var(--fs-11);
-          color: var(--text-muted);
-          text-align: center;
-          font-variant-numeric: tabular-nums;
-        }
+        .live-board-syn { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+        .live-board-syn-item { display: flex; align-items: center; gap: 3px; }
+        .live-board-syn-item img { width: 16px; height: 16px; }
+        .live-board-relic { color: var(--gold); }
       `}</style>
-      <div className="live-match-header">
-        <span className="live-match-title">Live match</span>
-        <span className="live-match-round">Round {round}</span>
+
+      <div className="live-board-header">
+        <span className="live-board-title">Your board</span>
+        <div className="live-board-stats">
+          <span className="live-board-stat">Lv<b>{me.level ?? "—"}</b></span>
+          <span className="live-board-stat">
+            <b style={{ color: "var(--green-bright)" }}>{me.win_round ?? 0}</b>
+            <span style={{ color: "var(--text-muted)" }}>-</span>
+            <b style={{ color: "var(--red-bright)" }}>{me.lose_round ?? 0}</b>
+          </span>
+          <span className="live-board-stat"><b style={{ color: "var(--gold)" }}>{me.total_money ?? 0}g</b></span>
+          {typeof me.lineup_value === "number" && (
+            <span className="live-board-stat">value <b>{me.lineup_value}</b></span>
+          )}
+        </div>
       </div>
-      <div className="live-match-rows">
-        {players.map((p, i) => {
-          const placement = p.rank > 0 ? p.rank : i + 1;
-          const pColor = placementColor(placement);
-          return (
-            <div key={p.steamId} className="live-match-row">
-              <span className="live-match-rank" style={{ color: pColor }}>
-                {placement}
-              </span>
-              <span className="live-match-mmr-rank">{p.mmrRank || "—"}</span>
-              <div className="live-match-hp-wrap">
-                <div className="live-match-hp-bar-bg">
-                  <div
-                    className="live-match-hp-bar"
-                    style={{
-                      width: `${Math.max(0, Math.min(100, p.hp))}%`,
-                      background: hpBarColor(p.hp),
+
+      <div className="live-board-hp-wrap">
+        <div className="live-board-hp-bar-bg">
+          <div
+            className="live-board-hp-bar"
+            style={{ width: `${Math.min(100, hp)}%`, background: hpBarColor(hp) }}
+          />
+        </div>
+        <span className="live-board-hp-text">{hp} HP</span>
+      </div>
+
+      {units.length === 0 ? (
+        <div className="live-board-empty">No units on the board yet.</div>
+      ) : (
+        <div className="live-board-units">
+          {units.map((u, i) => (
+            <div
+              key={`${u.name}-${i}`}
+              className="unit-icon-wrap"
+              title={`${u.name}${u.stars > 1 ? ` ${"★".repeat(u.stars)}` : ""}`}
+            >
+              <img
+                className="unit-icon"
+                src={`icons://units/${unitStem(u.name)}.png`}
+                alt={u.name}
+                loading="lazy"
+                style={{ borderColor: costBorderColor(unitCosts[u.name] || 1) }}
+                onError={(e) => {
+                  (e.target as HTMLImageElement).style.visibility = "hidden";
+                }}
+              />
+              {u.stars > 1 && (
+                <span className={`unit-stars s${u.stars}`}>{"★".repeat(u.stars)}</span>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+
+      {(synergies.length > 0 || me.relic) && (
+        <div className="live-board-foot">
+          {synergies.length > 0 && (
+            <div className="live-board-syn">
+              {synergies.map((s) => (
+                <span key={s.stem} className="live-board-syn-item" title={s.stem}>
+                  <img
+                    src={`icons://synergies/${synIconName(s.stem)}.png`}
+                    alt=""
+                    onError={(e) => {
+                      (e.currentTarget as HTMLImageElement).style.display = "none";
                     }}
                   />
-                </div>
-                <span className="live-match-hp-text">{p.hp}</span>
-              </div>
-              <span className="live-match-level">Lv{p.level}</span>
-              <span className="live-match-wl">
-                <span style={{ color: "var(--green-bright)" }}>{p.wins}</span>
-                <span style={{ color: "var(--text-muted)" }}>-</span>
-                <span style={{ color: "var(--red-bright)" }}>{p.losses}</span>
-              </span>
-              <span className="live-match-gold">{p.gold}g</span>
-              <span className="live-match-units">{p.unitCount}</span>
+                  {s.count}
+                </span>
+              ))}
             </div>
-          );
-        })}
-      </div>
+          )}
+          {me.relic && <span className="live-board-relic">{me.relic}</span>}
+        </div>
+      )}
     </section>
   );
 }

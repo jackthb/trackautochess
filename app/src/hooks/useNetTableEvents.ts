@@ -71,6 +71,29 @@ export interface NetTableActivityEntry {
  */
 export type NetTableState = Record<string, Record<string, unknown>>;
 
+/**
+ * Extracted per-player live state emitted alongside the raw NetTableState.
+ * Built backend-side by the same extractor the match timeline uses, so the
+ * `lineup` is already transformed from raw `chess_*` codes to `Name(stars)`
+ * and `hp` is the live value (the dac_table hp=100 sentinel is handled there).
+ */
+export interface LivePlayer {
+  hp?: number;
+  level?: number;
+  placement?: number;
+  duration?: number;
+  lineup?: string;
+  lineup_value?: number;
+  total_money?: number;
+  win_round?: number;
+  lose_round?: number;
+  relic?: string;
+  mmr_level?: number;
+  candy?: number;
+  /** Raw synergy stems from the game: "is_mage:6,is_human:6,". */
+  buff?: string;
+}
+
 /** One table's outcome from a debug dump sequence (F10 in-game). */
 export interface NetTableDebugResult {
   table: string;
@@ -92,6 +115,10 @@ export interface NetTableActivityState {
   entries: NetTableActivityEntry[];
   state: NetTableState;
   stateAt: string | null;
+  /** Extracted per-player live state, keyed by steam_id. */
+  livePlayers: Record<string, LivePlayer>;
+  /** Steam IDs belonging to the local player (from player_info_table.data). */
+  localSteamIds: string[];
   /** Result of the most recent apply-launch-options attempt. Null until the user clicks. */
   launchOptionsApplied: NetTableLaunchOptionsApplied | null;
   /** Current progress message during apply (null when idle or finished). */
@@ -160,6 +187,8 @@ type NetTableIngestErrorEvent = {
 type NetTableStateEvent = {
   type: "nettable_state";
   state: NetTableState;
+  players?: Record<string, LivePlayer>;
+  local_steam_ids?: string[];
   at: string;
 };
 type NetTableGameEndedEvent = {
@@ -231,6 +260,8 @@ export function useNetTableEvents(): NetTableActivityState {
   const [entries, setEntries] = useState<NetTableActivityEntry[]>([]);
   const [state, setState] = useState<NetTableState>({});
   const [stateAt, setStateAt] = useState<string | null>(null);
+  const [livePlayers, setLivePlayers] = useState<Record<string, LivePlayer>>({});
+  const [localSteamIds, setLocalSteamIds] = useState<string[]>([]);
   const [launchOptionsApplied, setLaunchOptionsApplied] =
     useState<NetTableLaunchOptionsApplied | null>(null);
   const [launchOptionsProgress, setLaunchOptionsProgress] = useState<string | null>(null);
@@ -361,6 +392,8 @@ export function useNetTableEvents(): NetTableActivityState {
         }
         case "nettable_state": {
           setState(msg.state ?? {});
+          setLivePlayers(msg.players ?? {});
+          setLocalSteamIds(msg.local_steam_ids ?? []);
           setStateAt(msg.at || null);
           break;
         }
@@ -475,6 +508,8 @@ export function useNetTableEvents(): NetTableActivityState {
     entries,
     state,
     stateAt,
+    livePlayers,
+    localSteamIds,
     launchOptionsApplied,
     launchOptionsProgress,
     resyncProgress,
