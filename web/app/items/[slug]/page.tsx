@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { draftMode } from "next/headers";
 import { EntityDetail, type RelatedEntity } from "@/components/EntityDetail";
+import { editAttribute } from "@/lib/sanity/editAttribute";
 import { EntityCommentaryList } from "@/components/PatchCommentary";import {
   getAllItems,
   getItemBySlug,
@@ -141,9 +142,10 @@ export default async function ItemDetailPage({ params }: Props) {
   ];
 
   const { active, stats } = parseItemDescription(item.description);
+  const descAttr = editAttribute(item, "description");
   const bodySections = [
-    ...(active ? [{ title: t.activeAbility, body: active }] : []),
-    ...(stats ? [{ title: t.stats, body: stats }] : []),
+    ...(active ? [{ title: t.activeAbility, body: active, editAttr: descAttr }] : []),
+    ...(stats ? [{ title: t.stats, body: stats, editAttr: descAttr }] : []),
   ];
 
   const relatedEntities: RelatedEntity[] = related.map((r) => ({
@@ -170,7 +172,9 @@ export default async function ItemDetailPage({ params }: Props) {
           ) : undefined
         }
         notes={item.notes.map(cleanText)}
+        notesEditAttr={editAttribute(item, "notes")}
         lore={item.lore ? cleanText(item.lore) : undefined}
+        loreEditAttr={editAttribute(item, "lore")}
         tag={{ label: tierLabel, color: tierColor }}
         relatedTitle={t.moreOf(tierLabel)}
         related={relatedEntities}

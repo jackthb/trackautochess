@@ -25,6 +25,9 @@ interface SimpleItem {
 }
 
 export interface DisplayItem {
+  /** Sanity doc identity, present only on draft-mode reads (for click-to-edit). */
+  _id?: string;
+  _type?: string;
   slug: string;
   name: string;
   description: string;

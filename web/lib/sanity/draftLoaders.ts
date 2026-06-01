@@ -35,6 +35,8 @@ async function loadDraftQuery<T>(
 }
 
 interface RawUnit {
+  _id?: string;
+  _type?: string;
   name: string;
   cost: number;
   pool?: string;
@@ -44,6 +46,8 @@ interface RawUnit {
 }
 
 interface RawSynergy {
+  _id?: string;
+  _type?: string;
   gameId: string;
   name: string;
   description?: string;
@@ -53,6 +57,8 @@ interface RawSynergy {
 }
 
 interface RawItem {
+  _id?: string;
+  _type?: string;
   gameId: string;
   name: string;
   description?: string;
@@ -68,6 +74,8 @@ interface RawItem {
 }
 
 interface RawRelic {
+  _id?: string;
+  _type?: string;
   gameId: string;
   name: string;
   description?: string;
@@ -143,6 +151,8 @@ export async function loadDraftUnits(draftMode: boolean): Promise<DisplayUnit[]>
     .map((u) => {
       const stem = unitStem(u.name);
       return {
+        _id: u._id,
+        _type: u._type,
         slug: slugifyName(u.name),
         name: u.name,
         cost: u.cost ?? 0,
@@ -172,6 +182,8 @@ export async function loadDraftSynergies(
       const stem = synIconName(s.name);
       const description = normalizeSynergyDescription(s.description ?? "");
       return {
+        _id: s._id,
+        _type: s._type,
         slug: slugifyName(s.name),
         name: s.name,
         description,
@@ -193,6 +205,8 @@ export async function loadDraftItems(draftMode: boolean): Promise<DisplayItem[]>
       const icon = i.iconFile ?? "";
       const texture = i.texture ?? "";
       return {
+        _id: i._id,
+        _type: i._type,
         slug: slugifyName(i.name),
         name: i.name,
         description: normalizePunct(i.description ?? ""),
@@ -223,6 +237,8 @@ export async function loadDraftRelics(draftMode: boolean): Promise<DisplayRelic[
     .map((r) => {
       const stem = relicStem(r.name);
       return {
+        _id: r._id,
+        _type: r._type,
         slug: slugifyName(r.name),
         name: r.name,
         description: r.description ?? "",

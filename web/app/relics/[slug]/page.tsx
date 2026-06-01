@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { draftMode } from "next/headers";
 import { EntityDetail, type RelatedEntity } from "@/components/EntityDetail";
+import { editAttribute } from "@/lib/sanity/editAttribute";
 import { EntityCommentaryList } from "@/components/PatchCommentary";import {
   getAllRelics,
   getRelicBySlug,
@@ -143,12 +144,14 @@ export default async function RelicDetailPage({ params }: Props) {
         name={relic.name}
         iconSrc={relic.iconUrl}
         overview={<>{baseOverview}</>}
+        overviewEditAttr={editAttribute(relic, "description")}
         commentary={
           commentary.length > 0 ? (
             <EntityCommentaryList entries={commentary} />
           ) : undefined
         }
         lore={relic.lore ? cleanText(relic.lore) : undefined}
+        loreEditAttr={editAttribute(relic, "lore")}
         relatedTitle="More Relics"
         related={relatedEntities}
       />    </>

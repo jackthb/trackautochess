@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { draftMode } from "next/headers";
 import { EntityDetail, type RelatedEntity } from "@/components/EntityDetail";
+import { editAttribute } from "@/lib/sanity/editAttribute";
 import { SynergyDescription } from "@/components/SynergyDescription";
 import { EntityCommentaryList } from "@/components/PatchCommentary";import {
   getAllSynergies,
@@ -164,12 +165,14 @@ export default async function SynergyDetailPage({ params }: Props) {
         name={synergy.name}
         iconSrc={synergy.iconUrl}
         overview={<SynergyDescription description={synergy.description || description} />}
+        overviewEditAttr={editAttribute(synergy, "description")}
         commentary={
           commentary.length > 0 ? (
             <EntityCommentaryList entries={commentary} />
           ) : undefined
         }
         lore={synergy.lore || undefined}
+        loreEditAttr={editAttribute(synergy, "lore")}
         indexLabel={indexLabel}
         indexPath={indexPath}
         relatedTitle={t.nUnits(synergy.name)}

@@ -5,6 +5,8 @@ const ICON_PROJECTION = `"icon_url": icon.asset->url,
 
 export const ALL_UNITS_QUERY = `
   *[_type == "unit"] | order(name asc) {
+    _id,
+    _type,
     name,
     cost,
     pool,
@@ -15,6 +17,8 @@ export const ALL_UNITS_QUERY = `
 
 export const ALL_SYNERGIES_QUERY = `
   *[_type == "synergy"] | order(gameId asc) {
+    _id,
+    _type,
     gameId,
     name,
     description,
@@ -25,6 +29,8 @@ export const ALL_SYNERGIES_QUERY = `
 
 export const ALL_ITEMS_QUERY = `
   *[_type == "item"] | order(gameId asc) {
+    _id,
+    _type,
     gameId,
     name,
     description,
@@ -41,6 +47,8 @@ export const ALL_ITEMS_QUERY = `
 
 export const ALL_RELICS_QUERY = `
   *[_type == "relic"] | order(gameId asc) {
+    _id,
+    _type,
     gameId,
     name,
     description,
