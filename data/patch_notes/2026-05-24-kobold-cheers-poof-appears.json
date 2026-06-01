@@ -101,8 +101,10 @@
       "entries": [
         {
           "kind": "change",
-          "name": "(6)Mechs",
-          "detail": "Chances to upgrade into gold heart, and the chance rises with your courier level"
+          "name": "(6) Mechs",
+          "detail": "Chances to upgrade into gold heart, and the chance rises with your courier level",
+          "entity_type": "synergy",
+          "entity_slug": "mech"
         }
       ]
     }
