@@ -1,32 +1,52 @@
-import type { SupabaseClient } from "@supabase/supabase-js";
-import { useRouter } from "next/router";
-import { SeoHead } from "@/lib/seo";
-import { SITE_TITLE } from "@/lib/site";
+import type { Metadata } from "next";
+import { SITE_NAME, SITE_TITLE } from "@/lib/site";
+import { DEFAULT_LOCALE } from "@/lib/i18n";
 import { getAllTalents, getTierLabel, type DisplayTalent } from "@/lib/talents";
-import { normalizeLocale } from "@/lib/i18n";
 import browserStyles from "@/components/EntityBrowser.module.css";
 import cardStyles from "@/components/EntityCard.module.css";
 import { PageLayout } from "@/components/PageLayout";
 
-interface TalentsPageProps {
-  supabase: SupabaseClient | null;
-}
+// App Router migration of pages/talents.tsx. getStaticProps -> direct call in
+// the Server Component (the data helpers are sync JSON reads); SeoHead ->
+// static metadata + a JSON-LD <script>; shared chrome comes from
+// app/layout.tsx. Single (English) locale.
 
-const t = {
-  title: `Talents | ${SITE_TITLE}`,
-  description:
-    "Browse all Dota Auto Chess talent choices by round, compare branch A/B effects, and quickly cross-reference patch notes updates.",
-  heading: "Talents",
-  structuredName: "Dota Auto Chess talents",
-  structuredAbout: "Dota Auto Chess talents",
+const title = `Talents | ${SITE_TITLE}`;
+const description =
+  "Browse all Dota Auto Chess talent choices by round, compare branch A/B effects, and quickly cross-reference patch notes updates.";
+
+export const metadata: Metadata = {
+  title,
+  description,
+  alternates: { canonical: "/talents" },
+  robots: "index, follow, max-image-preview:large",
+  openGraph: {
+    title,
+    description,
+    type: "website",
+    siteName: SITE_NAME,
+    url: "/talents",
+    locale: "en_US",
+    images: ["/logo.svg"],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title,
+    description,
+    images: ["/logo.svg"],
+  },
 };
 
-export default function TalentsPage({ supabase }: TalentsPageProps) {
-  void supabase;
-  const router = useRouter();
-  const locale = normalizeLocale(router.locale ?? router.defaultLocale ?? undefined);
+const structuredData = {
+  "@context": "https://schema.org",
+  "@type": "CollectionPage",
+  name: "Dota Auto Chess talents",
+  description,
+  about: "Dota Auto Chess talents",
+};
 
-  const talents = getAllTalents(locale);
+export default function TalentsPage() {
+  const talents = getAllTalents(DEFAULT_LOCALE);
 
   const tiers = new Map<number, DisplayTalent[]>();
   for (const tt of talents) {
@@ -35,18 +55,13 @@ export default function TalentsPage({ supabase }: TalentsPageProps) {
   }
   const tierRows = [...tiers.entries()].sort(([a], [b]) => a - b);
 
-  const structuredData = {
-    "@context": "https://schema.org",
-    "@type": "CollectionPage",
-    name: t.structuredName,
-    description: t.description,
-    about: t.structuredAbout,
-  };
-
   return (
     <>
-      <SeoHead title={t.title} description={t.description} path="/talents" locale={locale} structuredData={structuredData} />
-      <PageLayout title={t.heading}>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+      />
+      <PageLayout title="Talents">
         {tierRows.map(([tier, entries]) => (
           <section key={tier} className={browserStyles.panel}>
             <div className={browserStyles.panelHeader}>

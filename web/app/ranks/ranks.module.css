@@ -1,0 +1,109 @@
+/* Ported verbatim from the styled-jsx block in the former pages/ranks.tsx.
+   Element selectors (code, strong) are nested under their container class so
+   CSS-module scoping applies to them (bare tag selectors would otherwise
+   leak global). */
+.lead {
+  font-family: var(--font-mono);
+  font-size: var(--fs-13);
+  color: var(--text-secondary);
+  line-height: var(--lh-relaxed);
+  margin: 0 0 18px;
+  max-width: 720px;
+}
+.formula {
+  font-family: var(--font-mono);
+  font-size: var(--fs-12);
+  color: var(--text-muted);
+  background: var(--bg-deep, rgba(0, 0, 0, 0.25));
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--r-3);
+  padding: 12px 14px;
+  margin: 0 0 18px;
+  max-width: 720px;
+  line-height: 1.6;
+}
+.formula code {
+  color: var(--text-primary);
+}
+.source {
+  font-family: var(--font-mono);
+  font-size: var(--fs-11);
+  color: var(--text-muted);
+  margin: 0 0 32px;
+  opacity: 0.85;
+}
+.unranked-card {
+  margin-bottom: 24px;
+  padding: 16px 20px;
+  border: 1px dashed var(--border-subtle);
+  border-radius: var(--r-8);
+  background: rgba(255, 255, 255, 0.02);
+}
+.unranked-head {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  font-family: var(--font-mono);
+}
+.unranked-name {
+  font-size: var(--fs-14);
+  color: var(--text-primary);
+  text-transform: uppercase;
+  letter-spacing: var(--tr-upper);
+}
+.unranked-desc {
+  font-size: var(--fs-12);
+  color: var(--text-muted);
+  margin-top: 6px;
+  line-height: 1.5;
+}
+.table {
+  display: grid;
+  grid-template-columns: 60px 56px 1fr 1fr;
+  gap: 0;
+  border-top: 1px solid var(--border-subtle);
+}
+.row {
+  display: contents;
+}
+.cell {
+  padding: 12px 14px;
+  font-family: var(--font-mono);
+  font-size: var(--fs-13);
+  border-bottom: 1px solid var(--border-subtle);
+  color: var(--text-primary);
+}
+.cell-step,
+.cell-level {
+  color: var(--text-muted);
+  font-size: var(--fs-12);
+  letter-spacing: var(--tr-upper);
+  text-transform: uppercase;
+}
+.cell-mmr {
+  color: var(--text-secondary);
+  font-variant-numeric: tabular-nums;
+}
+.cell-mmr-min {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+.open-ended {
+  color: var(--text-muted);
+}
+.header-row .cell {
+  font-size: var(--fs-11);
+  letter-spacing: var(--tr-upper);
+  text-transform: uppercase;
+  color: var(--text-muted);
+  background: rgba(255, 255, 255, 0.02);
+}
+@media (max-width: 480px) {
+  .table {
+    grid-template-columns: 50px 44px 1fr 1fr;
+  }
+  .cell {
+    padding: 10px 6px;
+    font-size: var(--fs-12);
+  }
+}

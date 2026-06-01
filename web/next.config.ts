@@ -74,6 +74,9 @@ const nextConfig: NextConfig = {
     return [
       { source: "/ru/:path*", destination: "/:path*", permanent: true },
       { source: "/zh/:path*", destination: "/:path*", permanent: true },
+      // /synergies is an alias for the classes listing (was a getServerSideProps
+      // redirect in pages/synergies.tsx before the App Router migration).
+      { source: "/synergies", destination: "/classes", permanent: true },
     ];
   },
   skipTrailingSlashRedirect: true,
