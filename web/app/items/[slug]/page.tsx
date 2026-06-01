@@ -1,7 +1,9 @@
-import type { GetStaticPaths, GetStaticProps } from "next";
-import type { SupabaseClient } from "@supabase/supabase-js";
+import type { Metadata } from "next";
+import { notFound } from "next/navigation";
+import { draftMode } from "next/headers";
 import { EntityDetail, type RelatedEntity } from "@/components/EntityDetail";
-import { SeoHead } from "@/lib/seo";
+import { EntityCommentaryList } from "@/components/PatchCommentary";
+import AppVisualEditing from "@/components/app/AppVisualEditing";
 import {
   getAllItems,
   getItemBySlug,
@@ -11,21 +13,17 @@ import {
   TIER_LABEL,
 } from "@/lib/items";
 import { parseItemDescription } from "@/lib/itemDescription";
-import { absoluteUrl, SITE_TITLE } from "@/lib/site";
-import { normalizeLocale, type Locale } from "@/lib/i18n";
+import { absoluteUrl, SITE_NAME, SITE_TITLE } from "@/lib/site";
+import { DEFAULT_LOCALE } from "@/lib/i18n";
 import { loadDraftItems } from "@/lib/sanity/draftLoaders";
 import { getCommentaryForEntity } from "@/lib/patchCommentary";
-import type { EntityCommentary } from "@/lib/patchCommentaryTypes";
-import { EntityCommentaryList } from "@/components/PatchCommentary";
 
-interface ItemDetailPageProps {
-  item: DisplayItem;
-  related: DisplayItem[];
-  commentary: EntityCommentary[];
-  locale: Locale;
-  draftMode: boolean;
-  supabase: SupabaseClient | null;
-}
+// App Router migration of pages/items/[slug].tsx — mirrors
+// app/relics/[slug]/page.tsx. getStaticPaths -> generateStaticParams;
+// getStaticProps -> async Server Component reading params + draftMode().
+// Draft mode (Sanity Presentation/visual editing) is preserved: in draft we read
+// stega-encoded content via the loader and mount <AppVisualEditing/>; published
+// pages stay static.
 
 const t = {
   title: (n: string) => `${n} Item Guide | ${SITE_TITLE}`,
@@ -52,12 +50,62 @@ function buildDescription(item: DisplayItem): string {
   return truncate(`${t.descriptionPrefix(item.name)}${summary}`, 158);
 }
 
-export default function ItemDetailPage({
-  item,
-  related,
-  commentary,
-  locale,
-}: ItemDetailPageProps) {
+interface Props {
+  params: Promise<{ slug: string }>;
+}
+
+export function generateStaticParams() {
+  return getAllItems().map((item) => ({ slug: item.slug }));
+}
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { slug } = await params;
+  const item = getItemBySlug(slug, DEFAULT_LOCALE);
+  if (!item) return {};
+  const title = t.title(item.name);
+  const description = buildDescription(item);
+  return {
+    title,
+    description,
+    alternates: { canonical: `/items/${item.slug}` },
+    robots: "index, follow, max-image-preview:large",
+    openGraph: {
+      title,
+      description,
+      type: "article",
+      siteName: SITE_NAME,
+      url: `/items/${item.slug}`,
+      locale: "en_US",
+      images: ["/logo.svg"],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: ["/logo.svg"],
+    },
+  };
+}
+
+export default async function ItemDetailPage({ params }: Props) {
+  const { slug } = await params;
+  const { isEnabled: isDraft } = await draftMode();
+
+  const allItems = isDraft
+    ? await loadDraftItems(true)
+    : getAllItems(DEFAULT_LOCALE);
+  const item = isDraft
+    ? allItems.find((i) => i.slug === slug) ?? null
+    : getItemBySlug(slug, DEFAULT_LOCALE);
+  if (!item) notFound();
+
+  const related = allItems
+    .filter(
+      (candidate) => candidate.tier === item.tier && candidate.slug !== item.slug
+    )
+    .slice(0, 8);
+  const commentary = getCommentaryForEntity("item", slug);
+
   const tierLabel = TIER_LABEL[item.tier];
   const title = t.title(item.name);
   const description = buildDescription(item);
@@ -109,12 +157,9 @@ export default function ItemDetailPage({
 
   return (
     <>
-      <SeoHead
-        title={title}
-        description={description}
-        path={`/items/${item.slug}`}
-        locale={locale}
-        structuredData={structuredData}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
       />
       <EntityDetail
         variant="item"
@@ -133,46 +178,7 @@ export default function ItemDetailPage({
         related={relatedEntities}
         accentColor={tierColor}
       />
+      {isDraft && <AppVisualEditing />}
     </>
   );
 }
-
-export const getStaticPaths: GetStaticPaths = async () => ({
-  paths: getAllItems().map((item) => ({ params: { slug: item.slug } })),
-  fallback: "blocking",
-});
-
-export const getStaticProps: GetStaticProps<ItemDetailPageProps> = async ({
-  params,
-  locale: rawLocale,
-  draftMode = false,
-}) => {
-  const slug = params?.slug;
-  if (typeof slug !== "string") return { notFound: true };
-  const locale = normalizeLocale(rawLocale);
-
-  const allItems = draftMode
-    ? await loadDraftItems(true)
-    : getAllItems(locale);
-  const item = draftMode
-    ? allItems.find((i) => i.slug === slug) ?? null
-    : getItemBySlug(slug, locale);
-  if (!item) return { notFound: true };
-
-  const related = allItems
-    .filter(
-      (candidate) => candidate.tier === item.tier && candidate.slug !== item.slug
-    )
-    .slice(0, 8);
-
-  return {
-    props: {
-      item,
-      related,
-      commentary: getCommentaryForEntity("item", slug),
-      locale,
-      draftMode,
-      supabase: null,
-    },
-  };
-};

@@ -1,3 +1,5 @@
+"use client";
+
 import styles from "./EntityIcon.module.css";
 
 export type EntityIconSize = "sm" | "lg";
