@@ -2,9 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { draftMode } from "next/headers";
 import { EntityDetail, type RelatedEntity } from "@/components/EntityDetail";
-import { EntityCommentaryList } from "@/components/PatchCommentary";
-import AppVisualEditing from "@/components/app/AppVisualEditing";
-import { getAllUnits, getUnitBySlug } from "@/lib/units";
+import { EntityCommentaryList } from "@/components/PatchCommentary";import { getAllUnits, getUnitBySlug } from "@/lib/units";
 import { getAllSynergies } from "@/lib/synergies";
 import { slugifyName } from "@/lib/slugs";
 import { absoluteUrl, SITE_NAME, SITE_TITLE } from "@/lib/site";
@@ -167,8 +165,6 @@ export default async function UnitDetailPage({ params }: Props) {
         related={synergyEntities}
         extraRelatedTitle={RELATED_LABELS.moreUnits}
         extraRelated={relatedEntities}
-      />
-      {isDraft && <AppVisualEditing />}
-    </>
+      />    </>
   );
 }

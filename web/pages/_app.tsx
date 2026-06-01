@@ -48,6 +48,18 @@ interface AppPageProps {
 export default function App({ Component, pageProps }: AppProps<AppPageProps>) {
   const router = useRouter();
   const [supabase, setSupabase] = useState<SupabaseClient | null>(null);
+  const [embedded, setEmbedded] = useState(false);
+
+  // The Sanity Presentation tool loads the site in an iframe; mount visual
+  // editing whenever embedded (on EVERY page) so the Studio connects globally,
+  // not just on pages that opt into draft mode. Top-level visitors skip it.
+  useEffect(() => {
+    try {
+      setEmbedded(window.self !== window.top);
+    } catch {
+      setEmbedded(true);
+    }
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -131,7 +143,7 @@ export default function App({ Component, pageProps }: AppProps<AppPageProps>) {
       <Analytics beforeSend={redactAnalyticsEvent} />
       <SpeedInsights />
       <CookieConsentBanner />
-      {pageProps?.draftMode && <SanityVisualEditing />}
+      {embedded && <SanityVisualEditing />}
     </>
   );
 }

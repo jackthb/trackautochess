@@ -2,9 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { draftMode } from "next/headers";
 import { EntityDetail, type RelatedEntity } from "@/components/EntityDetail";
-import { EntityCommentaryList } from "@/components/PatchCommentary";
-import AppVisualEditing from "@/components/app/AppVisualEditing";
-import {
+import { EntityCommentaryList } from "@/components/PatchCommentary";import {
   getAllRelics,
   getRelicBySlug,
   type DisplayRelic,
@@ -153,8 +151,6 @@ export default async function RelicDetailPage({ params }: Props) {
         lore={relic.lore ? cleanText(relic.lore) : undefined}
         relatedTitle="More Relics"
         related={relatedEntities}
-      />
-      {isDraft && <AppVisualEditing />}
-    </>
+      />    </>
   );
 }

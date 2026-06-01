@@ -2,9 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { draftMode } from "next/headers";
 import { EntityDetail, type RelatedEntity } from "@/components/EntityDetail";
-import { EntityCommentaryList } from "@/components/PatchCommentary";
-import AppVisualEditing from "@/components/app/AppVisualEditing";
-import {
+import { EntityCommentaryList } from "@/components/PatchCommentary";import {
   getAllItems,
   getItemBySlug,
   iconUrl,
@@ -177,8 +175,6 @@ export default async function ItemDetailPage({ params }: Props) {
         relatedTitle={t.moreOf(tierLabel)}
         related={relatedEntities}
         accentColor={tierColor}
-      />
-      {isDraft && <AppVisualEditing />}
-    </>
+      />    </>
   );
 }

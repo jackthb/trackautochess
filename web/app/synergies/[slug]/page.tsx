@@ -3,9 +3,7 @@ import { notFound } from "next/navigation";
 import { draftMode } from "next/headers";
 import { EntityDetail, type RelatedEntity } from "@/components/EntityDetail";
 import { SynergyDescription } from "@/components/SynergyDescription";
-import { EntityCommentaryList } from "@/components/PatchCommentary";
-import AppVisualEditing from "@/components/app/AppVisualEditing";
-import {
+import { EntityCommentaryList } from "@/components/PatchCommentary";import {
   getAllSynergies,
   getSynergyBySlug,
   getSynergyNameTranslator,
@@ -178,8 +176,6 @@ export default async function SynergyDetailPage({ params }: Props) {
         related={unitsForSynergy}
         extraRelatedTitle={t.moreSynergies}
         extraRelated={moreSynergies}
-      />
-      {isDraft && <AppVisualEditing />}
-    </>
+      />    </>
   );
 }

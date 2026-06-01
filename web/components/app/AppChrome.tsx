@@ -20,6 +20,12 @@ const CookieConsentBanner = dynamic(
   { ssr: false }
 );
 
+// Loaded only when embedded in the Sanity Presentation iframe (see below).
+const AppVisualEditing = dynamic(
+  () => import("@/components/app/AppVisualEditing"),
+  { ssr: false }
+);
+
 /**
  * Client-side chrome for App Router routes — the App Router counterpart to the
  * wrapper logic in pages/_app.tsx. Bootstraps the Supabase client (for nav auth
@@ -29,6 +35,7 @@ const CookieConsentBanner = dynamic(
  */
 export function AppChrome({ children }: { children: ReactNode }) {
   const [supabase, setSupabase] = useState<SupabaseClient | null>(null);
+  const [embedded, setEmbedded] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -41,6 +48,19 @@ export function AppChrome({ children }: { children: ReactNode }) {
     };
   }, []);
 
+  useEffect(() => {
+    // The Sanity Presentation tool loads the site in an iframe. Mount visual
+    // editing whenever we're embedded — on EVERY page, not just ones that opt
+    // into draft mode — so the Studio always connects. Top-level visitors never
+    // load the overlay or open a Sanity live connection.
+    try {
+      setEmbedded(window.self !== window.top);
+    } catch {
+      // Accessing window.top cross-origin can throw; that means we're embedded.
+      setEmbedded(true);
+    }
+  }, []);
+
   return (
     <>
       <AppNavBar supabase={supabase} />
@@ -49,6 +69,7 @@ export function AppChrome({ children }: { children: ReactNode }) {
       <Analytics beforeSend={redactAnalyticsEvent} />
       <SpeedInsights />
       <CookieConsentBanner />
+      {embedded && <AppVisualEditing />}
     </>
   );
 }
