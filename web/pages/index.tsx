@@ -9,7 +9,12 @@ import {
   type SearchResult,
 } from "@/lib/playerSearch";
 import { SeoHead } from "@/lib/seo";
-import { absoluteUrl, SITE_DESCRIPTION, SITE_NAME, SITE_TITLE } from "@/lib/site";
+import {
+  absoluteUrl,
+  SITE_DESCRIPTION,
+  SITE_NAME,
+  SITE_TITLE,
+} from "@/lib/site";
 import { normalizeLocale } from "@/lib/i18n";
 
 interface HomeProps {
@@ -20,23 +25,18 @@ const t = {
   description:
     "Look up Dota Auto Chess player MMR, season history, and tracked match stats by Steam vanity URL or Steam ID.",
   tagline:
-    "Search any Steam profile to surface Auto Chess MMR, rank, season history, and tracked match stats.",
+    "Search any Steam profile to surface Auto Chess MMR, rank, season history.",
   pasteLabel: "Paste a Steam profile URL or SteamID64",
   exampleLabel: "Example:",
   placeholder: "Steam profile URL or SteamID64",
   signinDivider: "or",
-  signinNote: "Sign in",
-  snapshot: "Player Snapshot",
-  currentSeason: "Current season",
-  liveLabel: "Live MMR and rank bracket",
-  liveValue: "Queen 3380+",
-  historyLabel: "Season history",
-  historyValue: "MMR peaks and games",
 };
 
 export default function Home({ initialSearchResults }: HomeProps) {
   const router = useRouter();
-  const locale = normalizeLocale(router.locale ?? router.defaultLocale ?? undefined);
+  const locale = normalizeLocale(
+    router.locale ?? router.defaultLocale ?? undefined,
+  );
   const title = SITE_TITLE;
   const description = t.description;
   const siteUrl = absoluteUrl("/");
@@ -145,10 +145,8 @@ export default function Home({ initialSearchResults }: HomeProps) {
         .grid {
           position: absolute;
           inset: 0;
-          background-image: linear-gradient(
-              var(--border-subtle) 1px,
-              transparent 1px
-            ),
+          background-image:
+            linear-gradient(var(--border-subtle) 1px, transparent 1px),
             linear-gradient(90deg, var(--border-subtle) 1px, transparent 1px);
           background-size: 64px 64px;
           mask-image: radial-gradient(
@@ -388,10 +386,14 @@ export default function Home({ initialSearchResults }: HomeProps) {
 
       <div className="page">
         {Date.now() < new Date("2026-06-15").getTime() && (
-          <Link href="/patch-notes/2026-05-24-kobold-cheers-poof-appears" className="banner">
+          <Link
+            href="/patch-notes/2026-05-24-kobold-cheers-poof-appears"
+            className="banner"
+          >
             <span className="banner-tag">NEW PATCH</span>
             <span className="banner-text">
-              Kobold rework, Monk &amp; Mech (6), new Kobold Cup — read patch notes
+              Kobold rework, Monk &amp; Mech (6), new Kobold Cup — read patch
+              notes
             </span>
             <span className="banner-arrow">&rarr;</span>
           </Link>
@@ -399,11 +401,6 @@ export default function Home({ initialSearchResults }: HomeProps) {
         <div className="hero">
           <div className="grid" />
           <div className="glow" />
-
-          <div className="corner corner-tl" />
-          <div className="corner corner-tr" />
-          <div className="corner corner-bl" />
-          <div className="corner corner-br" />
 
           <main className="content">
             <h1 className="title">
@@ -433,23 +430,7 @@ export default function Home({ initialSearchResults }: HomeProps) {
               <div className="signin-divider">
                 <span>{t.signinDivider}</span>
               </div>
-              <p className="signin-note">{t.signinNote}</p>
               <SteamSignInButton source="home_hero" size="md" />
-            </div>
-
-            <div className="preview" aria-hidden="true">
-              <div className="preview-head">
-                <div className="preview-title">{t.snapshot}</div>
-                <div className="preview-season">{t.currentSeason}</div>
-              </div>
-              <div className="preview-row">
-                <span className="preview-label">{t.liveLabel}</span>
-                <span className="preview-value">{t.liveValue}</span>
-              </div>
-              <div className="preview-row">
-                <span className="preview-label">{t.historyLabel}</span>
-                <span className="preview-value">{t.historyValue}</span>
-              </div>
             </div>
           </main>
         </div>
