@@ -10,6 +10,7 @@ import {unitStats} from './objects/unitStats'
 import {localizedNames} from './objects/localizedNames'
 import {patchSection} from './objects/patchSection'
 import {patchEntry} from './objects/patchEntry'
+import {patchEvidence} from './objects/patchEvidence'
 
 export const schemaTypes = [
   // documents
@@ -26,4 +27,5 @@ export const schemaTypes = [
   localizedNames,
   patchSection,
   patchEntry,
+  patchEvidence,
 ]

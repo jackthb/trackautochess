@@ -14,10 +14,14 @@ import { parseItemDescription } from "@/lib/itemDescription";
 import { absoluteUrl, SITE_TITLE } from "@/lib/site";
 import { normalizeLocale, type Locale } from "@/lib/i18n";
 import { loadDraftItems } from "@/lib/sanity/draftLoaders";
+import { getCommentaryForEntity } from "@/lib/patchCommentary";
+import type { EntityCommentary } from "@/lib/patchCommentaryTypes";
+import { EntityCommentaryList } from "@/components/PatchCommentary";
 
 interface ItemDetailPageProps {
   item: DisplayItem;
   related: DisplayItem[];
+  commentary: EntityCommentary[];
   locale: Locale;
   draftMode: boolean;
   supabase: SupabaseClient | null;
@@ -51,6 +55,7 @@ function buildDescription(item: DisplayItem): string {
 export default function ItemDetailPage({
   item,
   related,
+  commentary,
   locale,
 }: ItemDetailPageProps) {
   const tierLabel = TIER_LABEL[item.tier];
@@ -116,6 +121,11 @@ export default function ItemDetailPage({
         name={item.name}
         iconSrc={iconUrl(item)}
         bodySections={bodySections}
+        commentary={
+          commentary.length > 0 ? (
+            <EntityCommentaryList entries={commentary} />
+          ) : undefined
+        }
         notes={item.notes.map(cleanText)}
         lore={item.lore ? cleanText(item.lore) : undefined}
         tag={{ label: tierLabel, color: tierColor }}
@@ -159,6 +169,7 @@ export const getStaticProps: GetStaticProps<ItemDetailPageProps> = async ({
     props: {
       item,
       related,
+      commentary: getCommentaryForEntity("item", slug),
       locale,
       draftMode,
       supabase: null,

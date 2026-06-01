@@ -16,11 +16,15 @@ import {
   loadDraftSynergies,
   loadDraftUnits,
 } from "@/lib/sanity/draftLoaders";
+import { getCommentaryForEntity } from "@/lib/patchCommentary";
+import type { EntityCommentary } from "@/lib/patchCommentaryTypes";
+import { EntityCommentaryList } from "@/components/PatchCommentary";
 
 interface SynergyDetailPageProps {
   synergy: DisplaySynergy;
   related: DisplaySynergy[];
   matchingUnits: DisplayUnit[];
+  commentary: EntityCommentary[];
   locale: Locale;
   draftMode: boolean;
   supabase: SupabaseClient | null;
@@ -40,6 +44,7 @@ export default function SynergyDetailPage({
   synergy,
   related,
   matchingUnits,
+  commentary,
   locale,
 }: SynergyDetailPageProps) {
   const description = t.description(synergy.name);
@@ -105,6 +110,11 @@ export default function SynergyDetailPage({
         name={synergy.name}
         iconSrc={synergy.iconUrl}
         overview={<SynergyDescription description={synergy.description || description} />}
+        commentary={
+          commentary.length > 0 ? (
+            <EntityCommentaryList entries={commentary} />
+          ) : undefined
+        }
         lore={synergy.lore || undefined}
         indexLabel={indexLabel}
         indexPath={indexPath}
@@ -164,6 +174,7 @@ export const getStaticProps: GetStaticProps<SynergyDetailPageProps> = async ({
       synergy,
       related,
       matchingUnits,
+      commentary: getCommentaryForEntity("synergy", slug),
       locale,
       draftMode,
       supabase: null,

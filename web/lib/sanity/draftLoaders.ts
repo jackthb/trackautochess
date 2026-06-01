@@ -248,6 +248,8 @@ export interface DraftPatch {
       detail: string;
       entityType?: string;
       entitySlug?: string;
+      commentary?: string;
+      evidence?: Array<{ source: string; detail?: string; url?: string }>;
     }>;
   }>;
 }
@@ -282,6 +284,18 @@ export async function loadDraftPatchNote(
         name: e.name ?? "",
         detail: e.detail ?? "",
         ...(e.entityType ? { entityType: e.entityType, entitySlug: e.entitySlug } : {}),
+        ...(e.commentary ? { commentary: e.commentary } : {}),
+        ...(Array.isArray(e.evidence) && e.evidence.length
+          ? {
+              evidence: e.evidence
+                .filter((ev: any) => ev && (ev.source || ev.detail || ev.url))
+                .map((ev: any) => ({
+                  source: ev.source ?? "other",
+                  ...(ev.detail ? { detail: ev.detail } : {}),
+                  ...(ev.url ? { url: ev.url } : {}),
+                })),
+            }
+          : {}),
       })),
     })),
   };

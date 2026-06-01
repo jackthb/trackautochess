@@ -15,15 +15,9 @@ import { getSynergyBySlug } from "@/lib/synergies";
 import { absoluteUrl, SITE_NAME, SITE_TITLE } from "@/lib/site";
 import { normalizeLocale, pickLocalized } from "@/lib/i18n";
 import { loadDraftPatchNote } from "@/lib/sanity/draftLoaders";
-
-type EntryKind =
-  | "added"
-  | "removed"
-  | "buff"
-  | "nerf"
-  | "change"
-  | "rework"
-  | "fix";
+import { type EntryKind, KIND_COLOR, KIND_LABEL } from "@/lib/patchKinds";
+import { EntryCommentary } from "@/components/PatchCommentary";
+import type { PatchEvidence } from "@/lib/patchCommentaryTypes";
 
 interface PatchEntry {
   kind: EntryKind;
@@ -31,6 +25,8 @@ interface PatchEntry {
   detail: string;
   entity_type?: "item" | "relic" | "talent" | "unit" | "synergy";
   entity_slug?: string;
+  commentary?: string;
+  evidence?: PatchEvidence[];
 }
 
 interface PatchSection {
@@ -55,26 +51,6 @@ interface PatchPageProps {
   draftMode: boolean;
   supabase: SupabaseClient | null;
 }
-
-const KIND_COLOR: Record<EntryKind, string> = {
-  added: "var(--green-bright)",
-  removed: "var(--red-bright)",
-  buff: "var(--green-bright)",
-  nerf: "var(--red-bright)",
-  change: "var(--text-secondary)",
-  rework: "var(--gold)",
-  fix: "var(--text-secondary)",
-};
-
-const KIND_LABEL: Record<EntryKind, string> = {
-  added: "NEW",
-  removed: "REMOVED",
-  buff: "BUFF",
-  nerf: "NERF",
-  change: "CHANGE",
-  rework: "REWORK",
-  fix: "FIX",
-};
 
 function cleanText(value: string): string {
   return value.replace(/\s+/g, " ").trim();
@@ -568,6 +544,10 @@ export default function PatchDetailPage({
                         )}
                       </div>
                       <div className="entry-detail">{entry.detail}</div>
+                      <EntryCommentary
+                        commentary={entry.commentary}
+                        evidence={entry.evidence}
+                      />
                     </div>
                   </div>
                 );
@@ -618,6 +598,8 @@ export const getStaticProps: GetStaticProps<PatchPageProps> = async ({
           detail: e.detail,
           entity_type: e.entityType as PatchEntry["entity_type"],
           entity_slug: e.entitySlug,
+          commentary: e.commentary,
+          evidence: e.evidence,
         })),
       })),
     };

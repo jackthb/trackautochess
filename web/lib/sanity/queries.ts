@@ -62,6 +62,8 @@ export const PATCH_NOTE_QUERY = `
         kind,
         name,
         detail,
+        commentary,
+        evidence[]{source, detail, url},
         "entityType": entity->_type,
         "entitySlug": select(
           entity->_type == "unit" => entity->name,

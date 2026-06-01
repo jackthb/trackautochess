@@ -10,10 +10,14 @@ import {
 import { absoluteUrl, SITE_TITLE } from "@/lib/site";
 import { normalizeLocale, type Locale } from "@/lib/i18n";
 import { loadDraftRelics } from "@/lib/sanity/draftLoaders";
+import { getCommentaryForEntity } from "@/lib/patchCommentary";
+import type { EntityCommentary } from "@/lib/patchCommentaryTypes";
+import { EntityCommentaryList } from "@/components/PatchCommentary";
 
 interface RelicDetailPageProps {
   relic: DisplayRelic;
   related: DisplayRelic[];
+  commentary: EntityCommentary[];
   locale: Locale;
   draftMode: boolean;
   supabase: SupabaseClient | null;
@@ -47,6 +51,7 @@ function buildDescription(relic: DisplayRelic): string {
 export default function RelicDetailPage({
   relic,
   related,
+  commentary,
   locale,
 }: RelicDetailPageProps) {
   const title = t.title(relic.name);
@@ -108,6 +113,11 @@ export default function RelicDetailPage({
         name={relic.name}
         iconSrc={relic.iconUrl}
         overview={overview}
+        commentary={
+          commentary.length > 0 ? (
+            <EntityCommentaryList entries={commentary} />
+          ) : undefined
+        }
         lore={relic.lore ? cleanText(relic.lore) : undefined}
         relatedTitle={t.moreRelics}
         related={relatedEntities}
@@ -146,6 +156,7 @@ export const getStaticProps: GetStaticProps<RelicDetailPageProps> = async ({
     props: {
       relic,
       related,
+      commentary: getCommentaryForEntity("relic", slug),
       locale,
       draftMode,
       supabase: null,

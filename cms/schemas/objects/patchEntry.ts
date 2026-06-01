@@ -35,11 +35,31 @@ export const patchEntry = defineType({
         {type: 'talent'},
       ],
     }),
+    defineField({
+      name: 'commentary',
+      title: 'Commentary',
+      type: 'text',
+      rows: 4,
+      description:
+        'Your own take — what this change actually means in plain language. ' +
+        'Shows under the entry on the patch page and on the linked entity page.',
+    }),
+    defineField({
+      name: 'evidence',
+      title: 'Evidence',
+      type: 'array',
+      of: [{type: 'patchEvidence'}],
+      description: 'What your commentary is based on (VPK values, testing, dev posts).',
+    }),
   ],
   preview: {
-    select: {kind: 'kind', name: 'name', detail: 'detail'},
-    prepare({kind, name, detail}) {
-      return {title: name || '(no name)', subtitle: `${kind || ''}: ${detail || ''}`.slice(0, 80)}
+    select: {kind: 'kind', name: 'name', detail: 'detail', commentary: 'commentary'},
+    prepare({kind, name, detail, commentary}) {
+      const note = commentary ? ' 💬' : ''
+      return {
+        title: `${name || '(no name)'}${note}`,
+        subtitle: `${kind || ''}: ${detail || ''}`.slice(0, 80),
+      }
     },
   },
 })

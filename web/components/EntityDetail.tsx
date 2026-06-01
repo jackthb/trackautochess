@@ -9,6 +9,7 @@ const t = {
   breadcrumb: "Breadcrumb",
   notes: "Notes",
   lore: "Lore",
+  commentary: "Commentary",
   index: { item: "Items", relic: "Relics", unit: "Units", synergy: "Synergies" } as Record<EntityCardVariant, string>,
   overview: {
     item: "Item Overview",
@@ -46,6 +47,9 @@ interface EntityDetailProps {
   bodySections?: BodySection[];
   /** Optional bullet list (items). */
   notes?: string[];
+  /** Editorial commentary tied to this entity (e.g. patch-note analysis).
+   *  Rendered in its own "Commentary" section above notes/lore. */
+  commentary?: ReactNode;
   /** Flavor lore. */
   lore?: string;
   /** Small chip rendered below the title (e.g. tier label). */
@@ -84,6 +88,7 @@ export function EntityDetail({
   overview,
   bodySections,
   notes,
+  commentary,
   lore,
   tag,
   titleColor,
@@ -143,6 +148,13 @@ export function EntityDetail({
             <div className={styles.bodyCopy}>{s.body}</div>
           </section>
         ))}
+
+        {commentary && (
+          <section className={styles.section}>
+            <h2 className={styles.sectionTitle}>{t.commentary}</h2>
+            <div className={styles.bodyCopy}>{commentary}</div>
+          </section>
+        )}
 
         {notes && notes.length > 0 && (
           <section className={styles.section}>

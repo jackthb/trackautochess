@@ -512,6 +512,8 @@ async function pullPatchNotes() {
       "slug": slug.current, date, title, titles, source, flavor, absorbedDates,
       sections[]{heading, entries[]{
         kind, name, detail,
+        commentary,
+        evidence[]{source, detail, url},
         "entityType": entity->_type,
         "entitySlug": select(
           entity->_type == "unit" => entity->name,
@@ -538,7 +540,7 @@ async function pullPatchNotes() {
     out.sections = (r.sections || []).map((s: any) => ({
       heading: s.heading,
       entries: (s.entries || []).map((e: any) => {
-        const entry: Record<string, string> = {
+        const entry: Record<string, unknown> = {
           kind: e.kind,
           name: e.name ?? '',
           detail: e.detail ?? '',
@@ -548,12 +550,24 @@ async function pullPatchNotes() {
           entry.entity_type = e.entityType
           entry.entity_slug = slugifyName(e.entitySlug)
         } else {
-          const entity = resolve(entry.name)
+          const entity = resolve(entry.name as string)
           if (entity) {
             entry.entity_type = entity.entity_type
             entry.entity_slug = entity.entity_slug
           }
         }
+        // Editorial commentary + the evidence it rests on (Sanity-only;
+        // the scraper never produces these).
+        if (e.commentary) entry.commentary = e.commentary
+        const evidence = (e.evidence || [])
+          .filter((ev: any) => ev && (ev.source || ev.detail || ev.url))
+          .map((ev: any) => {
+            const out: Record<string, string> = {source: ev.source ?? 'other'}
+            if (ev.detail) out.detail = ev.detail
+            if (ev.url) out.url = ev.url
+            return out
+          })
+        if (evidence.length) entry.evidence = evidence
         return entry
       }),
     }))
