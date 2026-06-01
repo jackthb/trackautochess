@@ -1,23 +1,11 @@
-import { createClient } from "@supabase/supabase-js";
-import type { GetStaticProps } from "next";
+"use client";
+
 import Link from "next/link";
-import { useRouter } from "next/router";
 import { ProfileSearch } from "@/components/ProfileSearch";
 import { SteamSignInButton } from "@/components/SteamSignInButton";
-import {
-  getDefaultPlayerSearchResults,
-  type SearchResult,
-} from "@/lib/playerSearch";
-import { SeoHead } from "@/lib/seo";
-import {
-  absoluteUrl,
-  SITE_DESCRIPTION,
-  SITE_NAME,
-  SITE_TITLE,
-} from "@/lib/site";
-import { normalizeLocale } from "@/lib/i18n";
+import { type SearchResult } from "@/lib/playerSearch";
 
-interface HomeProps {
+export interface HomeProps {
   initialSearchResults: SearchResult[];
 }
 
@@ -32,60 +20,12 @@ const t = {
   signinDivider: "or",
 };
 
-export default function Home({ initialSearchResults }: HomeProps) {
-  const router = useRouter();
-  const locale = normalizeLocale(
-    router.locale ?? router.defaultLocale ?? undefined,
-  );
-  const title = SITE_TITLE;
-  const description = t.description;
-  const siteUrl = absoluteUrl("/");
+export default function HomeSearch({ initialSearchResults }: HomeProps) {
   const exampleSteamUrl =
     "https://steamcommunity.com/profiles/76561198022169086";
 
-  const structuredData = [
-    {
-      "@context": "https://schema.org",
-      "@type": "WebSite",
-      name: SITE_NAME,
-      description: SITE_DESCRIPTION,
-      ...(siteUrl ? { url: siteUrl } : {}),
-      ...(siteUrl
-        ? {
-            potentialAction: {
-              "@type": "SearchAction",
-              target: `${siteUrl}/players/{search_term_string}`,
-              "query-input": "required name=search_term_string",
-            },
-          }
-        : {}),
-    },
-    {
-      "@context": "https://schema.org",
-      "@type": "WebApplication",
-      name: SITE_NAME,
-      applicationCategory: "GameApplication",
-      operatingSystem: "Web",
-      description: SITE_DESCRIPTION,
-      ...(siteUrl ? { url: siteUrl } : {}),
-      offers: {
-        "@type": "Offer",
-        price: "0",
-        priceCurrency: "USD",
-      },
-    },
-  ];
-
   return (
     <>
-      <SeoHead
-        title={title}
-        description={description}
-        path="/"
-        locale={locale}
-        structuredData={structuredData}
-      />
-
       <style jsx>{`
         .page {
           position: relative;
@@ -438,25 +378,3 @@ export default function Home({ initialSearchResults }: HomeProps) {
     </>
   );
 }
-
-export const getStaticProps: GetStaticProps<HomeProps> = async () => {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const key =
-    process.env.SUPABASE_SERVICE_ROLE_KEY ||
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-
-  if (!url || !key) {
-    return { props: { initialSearchResults: [] }, revalidate: 300 };
-  }
-
-  const supabase = createClient(url, key, {
-    auth: { autoRefreshToken: false, persistSession: false },
-  });
-
-  try {
-    const initialSearchResults = await getDefaultPlayerSearchResults(supabase);
-    return { props: { initialSearchResults }, revalidate: 300 };
-  } catch {
-    return { props: { initialSearchResults: [] }, revalidate: 300 };
-  }
-};
