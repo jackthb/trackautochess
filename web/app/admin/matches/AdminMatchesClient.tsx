@@ -7,7 +7,7 @@ import { playerProfilePath } from "@/lib/steam";
 import { createSupabaseClient } from "@/lib/supabase";
 import { isAdminSteamId } from "@/lib/admin";
 import { PageLayout } from "@/components/PageLayout";
-import type { MatchSummary } from "@/pages/api/admin/matches";
+import type { MatchSummary } from "@/app/api/admin/matches/route";
 import styles from "./matches.module.css";
 
 // Client island for /admin/matches: owns admin gating (isAdminSteamId +

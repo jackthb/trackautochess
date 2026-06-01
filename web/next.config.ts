@@ -5,6 +5,9 @@ import path from "path";
 const nextConfig: NextConfig = {
   reactStrictMode: true,
   transpilePackages: ["@dac/shared"],
+  // Native addon used by the OG-image routes (satori -> PNG). Must not be
+  // bundled by the App Router; Pages API routes externalized it automatically.
+  serverExternalPackages: ["@resvg/resvg-js"],
   turbopack: {
     root: path.resolve(__dirname, ".."),
   },
@@ -48,9 +51,8 @@ const nextConfig: NextConfig = {
       },
     ];
   },
-  // Proxy PostHog ingest through our own origin so ad blockers don't drop
-  // analytics requests targeting eu.i.posthog.com. Matches the rewrites the
-  // PostHog setup wizard installs; lib/posthog.ts sets api_host="/ingest".
+  // Self-hosted fallback for local/dev when NEXT_PUBLIC_POSTHOG_API_HOST is not
+  // configured. Production should use the PostHog managed proxy domain instead.
   async rewrites() {
     return [
       {
@@ -58,12 +60,12 @@ const nextConfig: NextConfig = {
         destination: "https://eu-assets.i.posthog.com/static/:path*",
       },
       {
-        source: "/ingest/:path*",
-        destination: "https://eu.i.posthog.com/:path*",
+        source: "/ingest/array/:path*",
+        destination: "https://eu-assets.i.posthog.com/array/:path*",
       },
       {
-        source: "/ingest/decide",
-        destination: "https://eu.i.posthog.com/decide",
+        source: "/ingest/:path*",
+        destination: "https://eu.i.posthog.com/:path*",
       },
     ];
   },
