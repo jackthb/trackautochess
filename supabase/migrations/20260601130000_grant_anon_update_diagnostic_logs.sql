@@ -1,3 +1,7 @@
+-- NOTE: resequenced to 20260601130000 — the original 20260601120000 prefix
+-- collided with 20260601120000_drop_users_banned.sql, so the Supabase
+-- integration recorded that version as applied and silently skipped this file.
+--
 -- Fix: diagnostic-log uploads were 400ing on every attempt
 -- ("new row violates row-level security policy").
 --
