@@ -2599,13 +2599,23 @@ class NetTableCapture:
             # timeline uses — the live "your board" card renders this directly
             # instead of re-parsing raw chess_* codes in the UI.
             self._last_players = self._extract_players_state_from_rows(rows)
-            self._last_local_steam_ids = [
-                str(sid)
-                for r in rows
-                if r.get("table_name", "").endswith("player_info_table")
-                and r.get("key") == "player_info"
-                for sid in ((r.get("raw") or {}).get("data") or {}).keys()
-            ]
+            # "Local" = the configured local player's SteamID64. The
+            # player_info_table.data container carries *every* visible player
+            # in an 8-player lobby (not just our own client rows), so its keys
+            # can't stand in for "you" — doing so flags all 8 seats as local
+            # and labels every opponent "You". Fall back to the data keys only
+            # when we don't know our own id and there's exactly one of them.
+            if self._steam_id:
+                self._last_local_steam_ids = [str(self._steam_id)]
+            else:
+                data_keys = [
+                    str(sid)
+                    for r in rows
+                    if r.get("table_name", "").endswith("player_info_table")
+                    and r.get("key") == "player_info"
+                    for sid in ((r.get("raw") or {}).get("data") or {}).keys()
+                ]
+                self._last_local_steam_ids = data_keys if len(data_keys) == 1 else []
             self._emit({
                 "type": "nettable_state",
                 "state": self._last_state,

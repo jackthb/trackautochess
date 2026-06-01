@@ -157,6 +157,7 @@ export default function App() {
               <NetTableHome
                 status={tracker.status}
                 unitsFull={gamesState.unitsFull}
+                synergiesData={gamesState.synergiesData}
                 netTable={netTable}
               />
             )}

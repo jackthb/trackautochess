@@ -3,7 +3,8 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { UNIT_COSTS } from "@/lib/units";
-import type { PlayerGame } from "@dac/shared/types";
+import relicsJson from "@data/relics.json";
+import type { PlayerGame, RelicInfo } from "@dac/shared/types";
 import { GameRowDisplay } from "@dac/shared/GameRowDisplay";
 import { buildStatItems } from "@dac/shared/buildStatItems";
 import { Button } from "@dac/shared/Button";
@@ -22,6 +23,10 @@ import {
 import styles from "./PlayerView.module.css";
 
 const LAST_FETCHED_TICK_MS = 1000;
+
+// item_* id → relic display info, so the match-history rows can render the
+// full relic_history pick list (not just the single active `relic`).
+const RELICS_MAP = (relicsJson as { relics?: Record<string, RelicInfo> }).relics ?? {};
 
 export interface LeaderboardPosition {
   rank: number;
@@ -461,6 +466,7 @@ export default function PlayerView({
                         <GameRowDisplay
                           game={g}
                           unitCosts={UNIT_COSTS}
+                          relicsData={RELICS_MAP}
                           iconUrl={resolveIconUrl}
                           shareUrl={href}
                           style={{ cursor: "pointer" }}

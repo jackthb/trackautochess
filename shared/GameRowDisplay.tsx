@@ -10,6 +10,7 @@ import {
   parseLineup,
   parseSynergies,
   parseRelics,
+  parseRelicHistory,
   parseWL,
 } from "./game-utils";
 import { TooltipWrap, type TooltipData } from "./Tooltip";
@@ -56,7 +57,14 @@ export function GameRowDisplay({
   const rankNum = rankParts[1] || "";
   const lineup = parseLineup(game.lineup, unitCosts);
   const syns = parseSynergies(game.synergies);
-  const relics = parseRelics(game.relic);
+  // Prefer the full round-by-round pick list from relic_history; the single
+  // `relic` column only holds the final active relic (and is the only source
+  // for older CV-captured rows that have no history).
+  const relicTimeline = parseRelicHistory(game.relic_history, relicsData);
+  const relics =
+    relicTimeline.length > 0
+      ? relicTimeline.map((e) => e.name)
+      : parseRelics(game.relic);
   const pColor = placementColor(p);
 
   return (

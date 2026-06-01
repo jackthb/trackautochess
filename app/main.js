@@ -785,6 +785,7 @@ ipcMain.handle("games:fetch", async () => {
       synergies: r.synergies,
       talents: r.talents,
       relic: r.relic,
+      relic_history: r.relic_history ?? null,
       level: r.hero_level ? String(r.hero_level) : null,
       wins: r.win_round,
       losses: r.lose_round,

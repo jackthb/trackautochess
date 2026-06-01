@@ -9,6 +9,10 @@ export interface Game {
   synergies: string | null;
   talents: string | null;
   relic: string | null;
+  /** Round-by-round relic picks (jsonb from match_players). Rendered as the
+   *  full relic list in the History row; `relic` alone is just the final
+   *  active relic. */
+  relic_history?: unknown;
   level: string | null;
   wl: string | null;
   wins: number | null;

@@ -1,4 +1,4 @@
-import type { TrackerStatus, UnitFullInfo } from "../types";
+import type { TrackerStatus, UnitFullInfo, SynergyInfo } from "../types";
 import type { NetTableActivityState } from "../hooks/useNetTableEvents";
 import { NetTableSetupCard } from "./NetTableSetupCard";
 import { NetTableActivityFeed } from "./NetTableActivityFeed";
@@ -10,6 +10,8 @@ interface NetTableHomeProps {
   status: TrackerStatus | null;
   /** Loaded units_full.json — forwarded to NetTableStatePanel for chess code lookup */
   unitsFull: Record<string, UnitFullInfo>;
+  /** Loaded synergies.json — forwarded to LiveMatchStatus for activation tiers */
+  synergiesData: Record<string, SynergyInfo>;
   /** Hoisted into App.tsx so the subscription + state survive tab switches —
    * otherwise the grid flickers between the "setup incomplete" and
    * "setup complete" layouts on every return to home. */
@@ -23,6 +25,7 @@ interface NetTableHomeProps {
 export function NetTableHome({
   status,
   unitsFull,
+  synergiesData,
   netTable,
   isAdminPreview,
   onExitAdminPreview,
@@ -95,6 +98,7 @@ export function NetTableHome({
         players={livePlayers}
         localSteamIds={localSteamIds}
         unitsFull={unitsFull}
+        synergiesData={synergiesData}
       />
 
       <div

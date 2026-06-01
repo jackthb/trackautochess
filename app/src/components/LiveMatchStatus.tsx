@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { parseLineup, unitStem, costBorderColor, synIconName } from "../lib/game-utils";
 import type { LivePlayer } from "../hooks/useNetTableEvents";
-import type { UnitFullInfo } from "../types";
+import type { UnitFullInfo, SynergyInfo } from "../types";
 
 interface Props {
   /** Extracted per-player live state, keyed by steam_id (or slot_N when the
@@ -11,6 +11,8 @@ interface Props {
   localSteamIds: string[];
   /** units_full.json — for unit cost (icon border) lookup. */
   unitsFull: Record<string, UnitFullInfo>;
+  /** synergies.json (keyed by `is_*` stem) — for activation-tier thresholds. */
+  synergiesData: Record<string, SynergyInfo>;
 }
 
 function hpBarColor(hp: number): string {
@@ -19,8 +21,22 @@ function hpBarColor(hp: number): string {
   return "var(--red-bright)";
 }
 
-/** "is_mage:6,is_human:6," → [{ stem: "mage", count: 6 }, …], sorted desc. */
-function parseBuff(buff: string | undefined): { stem: string; count: number }[] {
+/**
+ * "is_orc:5,is_shaman:3,is_demon:1," → [{ name: "orc", count: 5 }, …], desc.
+ *
+ * `firstTier` maps a stem ("orc", "demon") to that synergy's first activation
+ * count, so we keep only *active* synergies. The raw `buff` lists every type
+ * any unit on the board has — a long tail of :1 entries that overlaps heavily
+ * between players (everyone ends up touching naga/god/element/…), which made
+ * every seat look like it shared the local player's synergies. Filtering to
+ * active tiers leaves the meaningful, per-player-distinct set — and keeps
+ * tier-1 synergies like Demon (which activates at 1) that a flat "2+" cut
+ * would wrongly hide.
+ */
+function parseBuff(
+  buff: string | undefined,
+  firstTier: (stem: string) => number,
+): { name: string; count: number }[] {
   if (!buff) return [];
   return buff
     .split(",")
@@ -28,9 +44,9 @@ function parseBuff(buff: string | undefined): { stem: string; count: number }[] 
     .filter(Boolean)
     .map((entry) => {
       const [raw, count] = entry.split(":");
-      return { stem: raw.replace(/^is_/, ""), count: Number(count) || 0 };
+      return { name: raw.replace(/^is_/, ""), count: Number(count) || 0 };
     })
-    .filter((s) => s.count > 0)
+    .filter((s) => s.count >= firstTier(s.name))
     .sort((a, b) => b.count - a.count);
 }
 
@@ -51,7 +67,7 @@ interface Seat {
  * NetTable carries no player names (only steam_id + slot), so opponents are
  * labelled by placement. Renders nothing until there's at least one capture.
  */
-export function LiveMatchStatus({ players, localSteamIds, unitsFull }: Props) {
+export function LiveMatchStatus({ players, localSteamIds, unitsFull, synergiesData }: Props) {
   const unitCosts = useMemo(() => {
     const out: Record<string, number> = {};
     for (const [name, info] of Object.entries(unitsFull)) {
@@ -61,6 +77,17 @@ export function LiveMatchStatus({ players, localSteamIds, unitsFull }: Props) {
   }, [unitsFull]);
 
   const localIdSet = useMemo(() => new Set(localSteamIds), [localSteamIds]);
+
+  // Synergy stem ("orc", "demon") → its first activation count. Synergies
+  // missing tier data default to 2 (the common first tier).
+  const firstTier = useMemo(() => {
+    const out: Record<string, number> = {};
+    for (const [key, info] of Object.entries(synergiesData)) {
+      const tier = Array.isArray(info.tiers) ? info.tiers[0] : undefined;
+      if (typeof tier === "number") out[key.replace(/^is_/, "")] = tier;
+    }
+    return (stem: string) => out[stem] ?? 2;
+  }, [synergiesData]);
 
   const seats = useMemo<Seat[]>(() => {
     const list: Seat[] = Object.entries(players).map(([id, player]) => ({
@@ -102,7 +129,16 @@ export function LiveMatchStatus({ players, localSteamIds, unitsFull }: Props) {
           text-transform: uppercase;
           color: var(--text-muted);
         }
-        .live-seats { display: flex; flex-direction: column; gap: 6px; }
+        .live-seats {
+          display: flex;
+          flex-direction: column;
+          gap: 6px;
+          /* The home page itself doesn't scroll (overflow: hidden), so with a
+           * full 8-player lobby the lower seats would be clipped off-screen.
+           * Cap the list and let it scroll internally instead. */
+          max-height: 55vh;
+          overflow-y: auto;
+        }
         .live-seat {
           display: flex;
           flex-direction: column;
@@ -166,7 +202,7 @@ export function LiveMatchStatus({ players, localSteamIds, unitsFull }: Props) {
         {seats.map(({ id, player, isLocal }) => {
           const hp = Math.max(0, player.hp ?? 0);
           const units = parseLineup(player.lineup || "", unitCosts);
-          const synergies = parseBuff(player.buff);
+          const synergies = parseBuff(player.buff, firstTier);
           const label = isLocal
             ? "You"
             : player.placement
@@ -233,9 +269,9 @@ export function LiveMatchStatus({ players, localSteamIds, unitsFull }: Props) {
                   {synergies.length > 0 && (
                     <div className="live-seat-syn">
                       {synergies.map((s) => (
-                        <span key={s.stem} className="live-seat-syn-item" title={s.stem}>
+                        <span key={s.name} className="live-seat-syn-item" title={s.name}>
                           <img
-                            src={`icons://synergies/${synIconName(s.stem)}.png`}
+                            src={`icons://synergies/${synIconName(s.name)}.png`}
                             alt=""
                             onError={(e) => {
                               (e.currentTarget as HTMLImageElement).style.display = "none";

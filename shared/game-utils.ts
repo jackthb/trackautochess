@@ -1,3 +1,5 @@
+import type { RelicInfo } from "./types";
+
 export function placementColor(p: number): string {
   if (p === 1) return "var(--gold)";
   if (p <= 3) return "var(--silver)";
@@ -102,6 +104,39 @@ export function parseSynergies(
 export function parseRelics(relic: string | null): string[] {
   if (!relic) return [];
   return relic.split("|").filter(Boolean);
+}
+
+export interface RelicTimelineEntry {
+  round: number;
+  name: string;
+}
+
+/**
+ * Parse a player's raw `relic_history` jsonb into a round-ordered list of
+ * relic picks. Accepts both the dict shape the backend writes
+ * (`{"1": {relic, round}, …}`) and a plain array. Internal `item_*` ids are
+ * mapped to display names via `relicsData`, falling back to the raw id when
+ * unknown. Returns `[]` for empty/CV-captured rows that carry no history.
+ */
+export function parseRelicHistory(
+  raw: unknown,
+  relicsData?: Record<string, RelicInfo>
+): RelicTimelineEntry[] {
+  if (!raw || typeof raw !== "object") return [];
+  const entries: { relic?: unknown; round?: unknown }[] = Array.isArray(raw)
+    ? (raw as { relic?: unknown; round?: unknown }[])
+    : Object.values(raw as Record<string, { relic?: unknown; round?: unknown }>);
+  const out: RelicTimelineEntry[] = [];
+  for (const e of entries) {
+    if (!e || typeof e !== "object") continue;
+    const rawId = typeof e.relic === "string" ? e.relic : "";
+    if (!rawId) continue;
+    const round =
+      typeof e.round === "number" ? e.round : parseInt(String(e.round)) || 0;
+    out.push({ round, name: relicsData?.[rawId]?.name || rawId });
+  }
+  out.sort((a, b) => a.round - b.round);
+  return out;
 }
 
 export function parseWL(
