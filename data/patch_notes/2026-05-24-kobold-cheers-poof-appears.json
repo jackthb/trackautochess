@@ -100,7 +100,7 @@
       "heading": "Hotfix — 2026-05-25",
       "entries": [
         {
-          "kind": "change",
+          "kind": "nerf",
           "name": "(6) Mechs",
           "detail": "Chances to upgrade into gold heart, and the chance rises with your courier level",
           "entity_type": "synergy",
