@@ -4,7 +4,8 @@ import type { LivePlayer } from "../hooks/useNetTableEvents";
 import type { UnitFullInfo } from "../types";
 
 interface Props {
-  /** Extracted per-player live state, keyed by steam_id. */
+  /** Extracted per-player live state, keyed by steam_id (or slot_N when the
+   *  steam_id isn't known yet). */
   players: Record<string, LivePlayer>;
   /** Steam IDs belonging to the local player. */
   localSteamIds: string[];
@@ -33,12 +34,22 @@ function parseBuff(buff: string | undefined): { stem: string; count: number }[] 
     .sort((a, b) => b.count - a.count);
 }
 
+interface Seat {
+  id: string;
+  player: LivePlayer;
+  isLocal: boolean;
+}
+
 /**
- * The local player's live board: HP, round progress, gold, units (icons +
- * stars), active synergies and relic. Fed by the backend's extracted player
- * state — the lineup is already resolved from raw chess_* codes and the HP is
- * the live value (not the dac_table static-100 sentinel). Renders nothing
- * until there's a capture for the local player.
+ * Live lobby standings: every player the capture can see (up to 8), sorted by
+ * current placement, with the local player highlighted and pinned. Each seat
+ * shows HP, level, gold, board (unit icons + stars), active synergies and
+ * relic. Fed by the backend's extracted per-player state — lineups are already
+ * resolved from raw chess_* codes and HP is the live value (not the dac_table
+ * static-100 sentinel).
+ *
+ * NetTable carries no player names (only steam_id + slot), so opponents are
+ * labelled by placement. Renders nothing until there's at least one capture.
  */
 export function LiveMatchStatus({ players, localSteamIds, unitsFull }: Props) {
   const unitCosts = useMemo(() => {
@@ -49,19 +60,27 @@ export function LiveMatchStatus({ players, localSteamIds, unitsFull }: Props) {
     return out;
   }, [unitsFull]);
 
-  const me = useMemo<LivePlayer | null>(() => {
-    const ids = Object.keys(players);
-    if (ids.length === 0) return null;
-    // Prefer the explicit local steam_id; fall back to the sole entry.
-    const localId = localSteamIds.find((id) => players[id]) ?? (ids.length === 1 ? ids[0] : null);
-    return localId ? players[localId] : null;
-  }, [players, localSteamIds]);
+  const localIdSet = useMemo(() => new Set(localSteamIds), [localSteamIds]);
 
-  if (!me) return null;
+  const seats = useMemo<Seat[]>(() => {
+    const list: Seat[] = Object.entries(players).map(([id, player]) => ({
+      id,
+      player,
+      isLocal: localIdSet.has(id),
+    }));
+    // Placement asc (1 = top); unknown placement sinks to the bottom. Local
+    // player wins ties so "You" stays visible when placements are equal/absent.
+    list.sort((a, b) => {
+      const pa = a.player.placement ?? 99;
+      const pb = b.player.placement ?? 99;
+      if (pa !== pb) return pa - pb;
+      if (a.isLocal !== b.isLocal) return a.isLocal ? -1 : 1;
+      return a.id.localeCompare(b.id);
+    });
+    return list;
+  }, [players, localIdSet]);
 
-  const hp = Math.max(0, me.hp ?? 0);
-  const units = parseLineup(me.lineup || "", unitCosts);
-  const synergies = parseBuff(me.buff);
+  if (seats.length === 0) return null;
 
   return (
     <section className="live-board">
@@ -76,11 +95,6 @@ export function LiveMatchStatus({ players, localSteamIds, unitsFull }: Props) {
           flex-direction: column;
           gap: 10px;
         }
-        .live-board-header {
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-        }
         .live-board-title {
           font-size: var(--fs-11);
           font-weight: var(--fw-medium);
@@ -88,109 +102,157 @@ export function LiveMatchStatus({ players, localSteamIds, unitsFull }: Props) {
           text-transform: uppercase;
           color: var(--text-muted);
         }
-        .live-board-stats {
+        .live-seats { display: flex; flex-direction: column; gap: 6px; }
+        .live-seat {
+          display: flex;
+          flex-direction: column;
+          gap: 6px;
+          padding: 8px 10px;
+          border-radius: var(--r-8);
+          background: var(--bg-deep);
+          border: 1px solid transparent;
+        }
+        .live-seat.is-local { border-color: var(--gold); background: var(--bg-surface); }
+        .live-seat.is-dead { opacity: 0.5; }
+        .live-seat-head {
           display: flex;
           align-items: center;
-          gap: 14px;
+          gap: 12px;
           font-size: var(--fs-12);
           color: var(--text-secondary);
           font-variant-numeric: tabular-nums;
         }
-        .live-board-stat b { color: var(--text-primary); font-weight: var(--fw-medium); }
-        .live-board-hp-wrap { display: flex; align-items: center; gap: 8px; }
-        .live-board-hp-bar-bg {
-          width: 120px; height: 6px;
-          background: var(--bg-deep); border-radius: 3px; overflow: hidden;
+        .live-seat-rank {
+          flex-shrink: 0;
+          min-width: 30px;
+          font-weight: var(--fw-medium);
+          color: var(--text-muted);
         }
-        .live-board-hp-bar { height: 100%; border-radius: 3px; transition: width 0.3s ease-out; min-width: 1px; }
-        .live-board-hp-text { font-size: var(--fs-11); color: var(--text-secondary); font-variant-numeric: tabular-nums; }
-        .live-board-units { display: flex; flex-wrap: wrap; gap: 3px; }
-        .live-board-empty { color: var(--text-muted); font-size: var(--fs-12); }
-        .live-board-foot {
-          display: flex; align-items: center; gap: 14px;
+        .live-seat-name {
+          flex: 1 1 auto;
+          font-weight: var(--fw-medium);
+          color: var(--text-primary);
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+        .live-seat.is-local .live-seat-name { color: var(--gold); }
+        .live-seat-stat b { color: var(--text-primary); font-weight: var(--fw-medium); }
+        .live-seat-hp-wrap { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+        .live-seat-hp-bar-bg {
+          width: 70px; height: 6px;
+          background: var(--bg-deep); border: 1px solid var(--border-subtle);
+          border-radius: 3px; overflow: hidden;
+        }
+        .live-seat-hp-bar { height: 100%; border-radius: 3px; transition: width 0.3s ease-out; min-width: 1px; }
+        .live-seat-hp-text { font-size: var(--fs-11); color: var(--text-secondary); font-variant-numeric: tabular-nums; min-width: 34px; }
+        .live-seat-units { display: flex; flex-wrap: wrap; gap: 3px; }
+        .live-seat-empty { color: var(--text-muted); font-size: var(--fs-11); }
+        .live-seat-foot {
+          display: flex; align-items: center; gap: 12px;
           font-size: var(--fs-11); color: var(--text-muted);
         }
-        .live-board-syn { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
-        .live-board-syn-item { display: flex; align-items: center; gap: 3px; }
-        .live-board-syn-item img { width: 16px; height: 16px; }
-        .live-board-relic { color: var(--gold); }
+        .live-seat-syn { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+        .live-seat-syn-item { display: flex; align-items: center; gap: 3px; }
+        .live-seat-syn-item img { width: 16px; height: 16px; }
+        .live-seat-relic { color: var(--gold); }
       `}</style>
 
-      <div className="live-board-header">
-        <span className="live-board-title">Your board</span>
-        <div className="live-board-stats">
-          <span className="live-board-stat">Lv<b>{me.level ?? "—"}</b></span>
-          <span className="live-board-stat">
-            <b style={{ color: "var(--green-bright)" }}>{me.win_round ?? 0}</b>
-            <span style={{ color: "var(--text-muted)" }}>-</span>
-            <b style={{ color: "var(--red-bright)" }}>{me.lose_round ?? 0}</b>
-          </span>
-          <span className="live-board-stat"><b style={{ color: "var(--gold)" }}>{me.total_money ?? 0}g</b></span>
-          {typeof me.lineup_value === "number" && (
-            <span className="live-board-stat">value <b>{me.lineup_value}</b></span>
-          )}
-        </div>
-      </div>
+      <span className="live-board-title">
+        Live standings · {seats.length} player{seats.length === 1 ? "" : "s"}
+      </span>
 
-      <div className="live-board-hp-wrap">
-        <div className="live-board-hp-bar-bg">
-          <div
-            className="live-board-hp-bar"
-            style={{ width: `${Math.min(100, hp)}%`, background: hpBarColor(hp) }}
-          />
-        </div>
-        <span className="live-board-hp-text">{hp} HP</span>
-      </div>
-
-      {units.length === 0 ? (
-        <div className="live-board-empty">No units on the board yet.</div>
-      ) : (
-        <div className="live-board-units">
-          {units.map((u, i) => (
+      <div className="live-seats">
+        {seats.map(({ id, player, isLocal }) => {
+          const hp = Math.max(0, player.hp ?? 0);
+          const units = parseLineup(player.lineup || "", unitCosts);
+          const synergies = parseBuff(player.buff);
+          const label = isLocal
+            ? "You"
+            : player.placement
+              ? `Player #${player.placement}`
+              : "Player";
+          return (
             <div
-              key={`${u.name}-${i}`}
-              className="unit-icon-wrap"
-              title={`${u.name}${u.stars > 1 ? ` ${"★".repeat(u.stars)}` : ""}`}
+              key={id}
+              className={`live-seat${isLocal ? " is-local" : ""}${hp <= 0 ? " is-dead" : ""}`}
             >
-              <img
-                className="unit-icon"
-                src={`icons://units/${unitStem(u.name)}.png`}
-                alt={u.name}
-                loading="lazy"
-                style={{ borderColor: costBorderColor(unitCosts[u.name] || 1) }}
-                onError={(e) => {
-                  (e.target as HTMLImageElement).style.visibility = "hidden";
-                }}
-              />
-              {u.stars > 1 && (
-                <span className={`unit-stars s${u.stars}`}>{"★".repeat(u.stars)}</span>
+              <div className="live-seat-head">
+                <span className="live-seat-rank">
+                  {player.placement ? `#${player.placement}` : "—"}
+                </span>
+                <span className="live-seat-name">{label}</span>
+                <span className="live-seat-stat">Lv<b>{player.level ?? "—"}</b></span>
+                <span className="live-seat-stat">
+                  <b style={{ color: "var(--green-bright)" }}>{player.win_round ?? 0}</b>
+                  <span style={{ color: "var(--text-muted)" }}>-</span>
+                  <b style={{ color: "var(--red-bright)" }}>{player.lose_round ?? 0}</b>
+                </span>
+                <span className="live-seat-stat"><b style={{ color: "var(--gold)" }}>{player.total_money ?? 0}g</b></span>
+                <div className="live-seat-hp-wrap">
+                  <div className="live-seat-hp-bar-bg">
+                    <div
+                      className="live-seat-hp-bar"
+                      style={{ width: `${Math.min(100, hp)}%`, background: hpBarColor(hp) }}
+                    />
+                  </div>
+                  <span className="live-seat-hp-text">{hp} HP</span>
+                </div>
+              </div>
+
+              {units.length === 0 ? (
+                <div className="live-seat-empty">No units on the board yet.</div>
+              ) : (
+                <div className="live-seat-units">
+                  {units.map((u, i) => (
+                    <div
+                      key={`${u.name}-${i}`}
+                      className="unit-icon-wrap"
+                      title={`${u.name}${u.stars > 1 ? ` ${"★".repeat(u.stars)}` : ""}`}
+                    >
+                      <img
+                        className="unit-icon"
+                        src={`icons://units/${unitStem(u.name)}.png`}
+                        alt={u.name}
+                        loading="lazy"
+                        style={{ borderColor: costBorderColor(unitCosts[u.name] || 1) }}
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).style.visibility = "hidden";
+                        }}
+                      />
+                      {u.stars > 1 && (
+                        <span className={`unit-stars s${u.stars}`}>{"★".repeat(u.stars)}</span>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {(synergies.length > 0 || player.relic) && (
+                <div className="live-seat-foot">
+                  {synergies.length > 0 && (
+                    <div className="live-seat-syn">
+                      {synergies.map((s) => (
+                        <span key={s.stem} className="live-seat-syn-item" title={s.stem}>
+                          <img
+                            src={`icons://synergies/${synIconName(s.stem)}.png`}
+                            alt=""
+                            onError={(e) => {
+                              (e.currentTarget as HTMLImageElement).style.display = "none";
+                            }}
+                          />
+                          {s.count}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                  {player.relic && <span className="live-seat-relic">{player.relic}</span>}
+                </div>
               )}
             </div>
-          ))}
-        </div>
-      )}
-
-      {(synergies.length > 0 || me.relic) && (
-        <div className="live-board-foot">
-          {synergies.length > 0 && (
-            <div className="live-board-syn">
-              {synergies.map((s) => (
-                <span key={s.stem} className="live-board-syn-item" title={s.stem}>
-                  <img
-                    src={`icons://synergies/${synIconName(s.stem)}.png`}
-                    alt=""
-                    onError={(e) => {
-                      (e.currentTarget as HTMLImageElement).style.display = "none";
-                    }}
-                  />
-                  {s.count}
-                </span>
-              ))}
-            </div>
-          )}
-          {me.relic && <span className="live-board-relic">{me.relic}</span>}
-        </div>
-      )}
+          );
+        })}
+      </div>
     </section>
   );
 }
