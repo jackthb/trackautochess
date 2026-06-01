@@ -1,9 +1,7 @@
+"use client";
+
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { useRouter } from "next/router";
-import { createClient } from "@supabase/supabase-js";
-import type { GetServerSideProps } from "next";
-import type { SupabaseClient } from "@supabase/supabase-js";
 import unitsFullData from "@data/units_full.json";
 import { UNIT_COSTS, computeSynergies } from "@/lib/units";
 import synergiesData from "@data/synergies.json";
@@ -27,13 +25,11 @@ function mmrLevelToRank(level: number | null | undefined): string {
 }
 import { TooltipWrap, type TooltipData } from "@dac/shared/Tooltip";
 import {
-  fetchSteamProfile,
   playerProfilePath,
   steamProfileUrl,
   type SteamProfile,
 } from "../../lib/steam";
-import { SeoHead } from "@/lib/seo";
-import { absoluteUrl, getRequestSiteUrl } from "@/lib/site";
+import { absoluteUrl } from "@/lib/site";
 import { analyticsRoute, bucketCount, trackEvent } from "@/lib/analytics";
 import { resolveIconUrl } from "@/lib/icons";
 
@@ -93,22 +89,13 @@ interface GamePageProps {
   highlightName: string | null;
   canonicalUrl: string | null;
   ogImageUrl: string | null;
-  supabase: SupabaseClient | null;
+  /** Analytics route pattern, e.g. "/games/[id]" or "/matches/[id]". */
+  route: string;
 }
 
 function normalizeName(value: string | null | undefined): string {
   return String(value || "").trim().toLowerCase();
 }
-
-function originFromUrl(value: string | null): string | null {
-  if (!value) return null;
-  try {
-    return new URL(value).origin;
-  } catch {
-    return null;
-  }
-}
-
 
 /** The "expanded" detail panel for a player row — bigger icons, full relic
  *  timeline. Lineup/synergies/relics are pre-parsed by MatchPlayerRow so
@@ -472,7 +459,11 @@ function MatchPlayerRow({
 
 export { type GamePageProps, type MatchTimeline, type RelicTimelineEntry };
 
-export default function GamePage({
+/** SEO derivation extracted from the old GamePage body. The App Router server
+ *  pages call this to feed Next `Metadata` (generateMetadata) and to render the
+ *  JSON-LD <script>. Mirrors the previous pageTitle/description/structuredData
+ *  computations verbatim. */
+export default function GameView({
   game,
   steamProfile,
   matchGames,
@@ -483,8 +474,8 @@ export default function GamePage({
   highlightName,
   canonicalUrl,
   ogImageUrl,
+  route,
 }: GamePageProps) {
-  const router = useRouter();
   const lineup = parseLineup(game.lineup, UNIT_COSTS);
 
   // Round scrubber state. Default to the last round (= end state), which
@@ -500,17 +491,6 @@ export default function GamePage({
   const isLastRound = hasTimeline
     ? selectedRoundIdx === timeline!.rounds.length - 1
     : true;
-
-  const displayName = steamProfile.name || game.user_id;
-  const playerPath = playerProfilePath(String(game.user_id), steamProfile.customUrl);
-  const playerCanonicalUrl =
-    absoluteUrl(playerPath, originFromUrl(canonicalUrl)) ?? playerPath;
-  const pageTitle = game.placement
-    ? `#${game.placement} ${displayName} — DAC Match | Track Auto Chess`
-    : `${displayName} — DAC Match | Track Auto Chess`;
-  const description = game.placement
-    ? `${displayName} finished #${game.placement} in a Dota Auto Chess match${game.rank ? ` at ${game.rank}` : ""}.`
-    : `Dota Auto Chess match details for ${displayName}.`;
 
   const tooltipData: TooltipData = {
     unitCosts: UNIT_COSTS,
@@ -557,38 +537,9 @@ export default function GamePage({
         )
       : [game];
 
-  const structuredData = [
-    {
-      "@context": "https://schema.org",
-      "@type": "WebPage",
-      name: pageTitle,
-      description,
-      ...(canonicalUrl ? { url: canonicalUrl } : {}),
-      about: { "@type": "Thing", name: "Dota Auto Chess match" },
-    },
-    {
-      "@context": "https://schema.org",
-      "@type": "BreadcrumbList",
-      itemListElement: [
-        {
-          "@type": "ListItem",
-          position: 1,
-          name: displayName,
-          item: playerCanonicalUrl,
-        },
-        {
-          "@type": "ListItem",
-          position: 2,
-          name: "Match",
-          ...(canonicalUrl ? { item: canonicalUrl } : {}),
-        },
-      ],
-    },
-  ];
-
   useEffect(() => {
     trackEvent("Game Detail Viewed", {
-      route: analyticsRoute(router.pathname),
+      route: analyticsRoute(route),
       placement: game.placement ?? "unknown",
       has_screenshot: Boolean(game.screenshot),
       has_lineup: lineup.length > 0,
@@ -600,7 +551,7 @@ export default function GamePage({
     game.screenshot,
     lineup.length,
     playerRows.length,
-    router.pathname,
+    route,
   ]);
 
   const matchDate = game.played_at
@@ -619,17 +570,6 @@ export default function GamePage({
 
   return (
     <>
-      <SeoHead
-        title={pageTitle}
-        description={description}
-        path={`/games/${game.id}`}
-        localized={false}
-        canonicalUrl={canonicalUrl}
-        imageUrl={ogImageUrl}
-        imageAlt={`${displayName} placed #${game.placement} in a Dota Auto Chess match`}
-        structuredData={structuredData}
-      />
-
       <style jsx>{`
         .page {
           position: relative;
@@ -1236,194 +1176,3 @@ export default function GamePage({
 /** Convert the raw match_players.relic_history jsonb into a sorted timeline.
  *  Input shape (dict): {"1": {relic: "item_x", round: 11}, "2": {...}, …}
  *  Or array: [{relic, round}, …]. Maps internal item_* ids → display names. */
-export function parseRelicHistory(
-  raw: unknown,
-  relicsData: Record<string, RelicInfo>
-): RelicTimelineEntry[] {
-  if (!raw || typeof raw !== "object") return [];
-  const entries: { relic?: unknown; round?: unknown }[] = Array.isArray(raw)
-    ? (raw as { relic?: unknown; round?: unknown }[])
-    : Object.values(raw as Record<string, { relic?: unknown; round?: unknown }>);
-  const out: RelicTimelineEntry[] = [];
-  for (const e of entries) {
-    if (!e || typeof e !== "object") continue;
-    const rawId = typeof e.relic === "string" ? e.relic : "";
-    if (!rawId) continue;
-    const round = typeof e.round === "number" ? e.round : parseInt(String(e.round)) || 0;
-    const display = relicsData[rawId]?.name || rawId;
-    out.push({ round, name: display });
-  }
-  out.sort((a, b) => a.round - b.round);
-  return out;
-}
-
-/** Map a raw match_players row into a Game with legacy aliases populated. */
-function mpRowToGame(
-  mp: Record<string, unknown>,
-  playedAtFallback?: string
-): Game {
-  const steamId = String(mp.steam_id ?? "");
-  const played = (mp.played_at as string) || playedAtFallback || "";
-  const mmrLevel = (mp.mmr_level as number) ?? null;
-  const heroLevel = (mp.hero_level as number) ?? null;
-  const winRound = (mp.win_round as number) ?? null;
-  const loseRound = (mp.lose_round as number) ?? null;
-  return {
-    id: mp.id as number,
-    match_id: (mp.match_id as string) ?? "",
-    user_id: steamId,
-    placement: mp.placement != null ? String(mp.placement) : "",
-    lineup: (mp.chess_lineup as string) ?? null,
-    synergies: (mp.synergies as string) ?? null,
-    talents: (mp.talents as string) ?? null,
-    relic: (mp.relic as string) ?? null,
-    level: heroLevel != null ? String(heroLevel) : null,
-    rank: mmrLevel ? mmrLevelToRank(mmrLevel) : null,
-    rank_change: null,
-    wins: winRound,
-    losses: loseRound,
-    wl: null,
-    screenshot: (mp.screenshot as string) ?? null,
-    notes: (mp.notes as string) ?? null,
-    replay: (mp.replay as string) ?? null,
-    played_at: played,
-    created_at: (mp.created_at as string) ?? "",
-  };
-}
-
-export const getServerSideProps: GetServerSideProps = async (context) => {
-  const rawId = context.params?.id;
-  if (typeof rawId !== "string") return { notFound: true };
-  const id = rawId;
-  const highlightUserId = (context.query.player as string) || null;
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-  const baseUrl = getRequestSiteUrl(context.req.headers);
-
-  if (!url || !key) return { notFound: true };
-
-  const supabase = createClient(url, key);
-  const { data } = await supabase
-    .from("match_players")
-    .select("*, steam_id::text")
-    .eq("id", id)
-    .single();
-
-  if (!data) return { notFound: true };
-
-  // Kick off the owner Steam profile fetch and the match players query in
-  // parallel — both only depend on the single row already in hand.
-  const ownerProfilePromise: Promise<SteamProfile> = data.steam_id
-    ? fetchSteamProfile(String(data.steam_id), supabase)
-    : Promise.resolve({ name: null, customUrl: null });
-
-  const matchPlayersPromise: Promise<Record<string, unknown>[]> = data.match_id
-    ? Promise.resolve(
-        supabase
-          .from("match_players")
-          .select("*, steam_id::text")
-          .eq("match_id", data.match_id)
-          .order("placement", { ascending: true })
-      ).then(({ data: matchData }) => (matchData as Record<string, unknown>[] | null) || [])
-    : Promise.resolve([]);
-
-  // Per-match round-by-round snapshots. Only nettable-captured matches
-  // have a row here; CV-captured matches return null and the scrubber
-  // is hidden client-side.
-  const timelinePromise: Promise<MatchTimeline | null> = data.match_id
-    ? Promise.resolve(
-        supabase
-          .from("match_timelines")
-          .select("timeline")
-          .eq("match_id", data.match_id)
-          .maybeSingle()
-      ).then(
-        ({ data: row }) =>
-          ((row as { timeline: MatchTimeline } | null)?.timeline) ?? null
-      )
-    : Promise.resolve(null);
-
-  // played_at may be null on match_players; fall back to matches.played_at.
-  const matchPlayedAtPromise: Promise<string> = data.match_id
-    ? Promise.resolve(
-        supabase
-          .from("matches")
-          .select("played_at")
-          .eq("match_id", data.match_id)
-          .maybeSingle()
-      ).then(
-        ({ data: row }) =>
-          ((row as { played_at: string } | null)?.played_at) ?? ""
-      )
-    : Promise.resolve("");
-
-  const [steamProfile, allPlayerRows, timeline, matchPlayedAt] = await Promise.all([
-    ownerProfilePromise,
-    matchPlayersPromise,
-    timelinePromise,
-    matchPlayedAtPromise,
-  ]);
-
-  // Build the played_at fallback: prefer the row's own value, then the
-  // matches table value.
-  const playedAtFallback = (data.played_at as string) || matchPlayedAt;
-
-  const matchGames = allPlayerRows.map((row) => mpRowToGame(row, matchPlayedAt));
-  const game = mpRowToGame(data, matchPlayedAt);
-
-  // Build relic timelines directly from the match_players data we already have.
-  const relicsMap = (relicsData as any).relics as Record<string, RelicInfo>;
-  const relicTimelines: Record<string, RelicTimelineEntry[]> = {};
-  for (const row of allPlayerRows) {
-    const sid = String(row.steam_id);
-    const tl = parseRelicHistory(row.relic_history, relicsMap);
-    if (tl.length > 0) relicTimelines[sid] = tl;
-  }
-
-  const matchProfiles: Record<string, SteamProfile> = {};
-  if (matchGames.length > 0) {
-    const userIds = [
-      ...new Set(matchGames.map((g) => g.user_id).filter(Boolean).map(String)),
-    ];
-
-    await Promise.all(
-      userIds.map(async (uid) => {
-        matchProfiles[uid] = await fetchSteamProfile(uid, supabase);
-      })
-    );
-  }
-
-  // Look up the highlighted user's Steam name. Game Over uploads often
-  // can't link rows to a Steam account, so we also need to match by the
-  // OCR'd player name stored in `notes`.
-  let highlightName: string | null = null;
-  if (highlightUserId) {
-    if (matchProfiles[highlightUserId]?.name) {
-      highlightName = matchProfiles[highlightUserId].name;
-    } else {
-      try {
-        const profile = await fetchSteamProfile(highlightUserId, supabase, {
-          persist: false,
-        });
-        highlightName = profile.name || null;
-      } catch {
-        highlightName = null;
-      }
-    }
-  }
-
-  return {
-    props: {
-      game,
-      steamProfile,
-      matchGames,
-      matchProfiles,
-      relicTimelines,
-      timeline,
-      highlightUserId,
-      highlightName,
-      canonicalUrl: absoluteUrl(`/games/${id}`, baseUrl),
-      ogImageUrl: absoluteUrl(`/api/og/game/${id}`, baseUrl),
-    },
-  };
-};
