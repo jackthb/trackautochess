@@ -11,19 +11,7 @@ function mmrLevelToRank(level: number | null | undefined): string {
   return RANK_BRACKETS[level - 1].rank.replace("-", " ");
 }
 import { fetchSteamProfile } from "@/lib/steam";
-import unitsData from "@data/units.json";
-
-const UNIT_COSTS: Record<string, number> = {};
-for (const [name, info] of Object.entries(unitsData.units)) {
-  UNIT_COSTS[name] = (info as { cost: number }).cost;
-}
-for (const [alias, canonical] of Object.entries(
-  (unitsData as { aliases?: Record<string, string> }).aliases ?? {}
-)) {
-  if (UNIT_COSTS[canonical] !== undefined) {
-    UNIT_COSTS[alias] = UNIT_COSTS[canonical];
-  }
-}
+import { UNIT_COSTS } from "@/lib/units";
 
 const fontDir = path.join(process.cwd(), "public", "fonts");
 const fontData = Promise.all([

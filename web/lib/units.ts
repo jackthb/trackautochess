@@ -1,5 +1,9 @@
 import { unitStem } from "@dac/shared/game-utils";
 import unitsFullData from "@data/units_full.json";
+// units.json is imported solely for its top-level `aliases` map (a handful of
+// alt spellings → canonical names). Cost/synergy data is read from the full
+// file below; once `aliases` is relocated this import goes away entirely.
+import unitsAliasData from "@data/units.json";
 import { slugifyName } from "@/lib/slugs";
 import { DEFAULT_LOCALE, type Locale, pickLocalized } from "@/lib/i18n";
 
@@ -130,4 +134,57 @@ export function getUnitSlugByName(name: string): string | null {
   if (aliased && cache.has(aliased)) return aliased;
 
   return null;
+}
+
+// ── Lineup lookups: unit name → cost / synergies ─────────────────────────────
+// The match and game pages (and their OG image handlers) resolve a unit *name*
+// — as it appears in a stored lineup string, including a few alias spellings —
+// to its cost and synergy list. This was duplicated inline in four files;
+// it now lives here, built once from units_full.json plus the alias map.
+
+function buildNameLookups() {
+  const cost: Record<string, number> = {};
+  const synergies: Record<string, string[]> = {};
+  for (const [name, data] of Object.entries(
+    unitsFullData as Record<string, UnitInfo>,
+  )) {
+    cost[name] = data.cost ?? 0;
+    if (data.synergies) synergies[name] = data.synergies;
+  }
+  const aliases =
+    (unitsAliasData as { aliases?: Record<string, string> }).aliases ?? {};
+  for (const [alias, canonical] of Object.entries(aliases)) {
+    if (cost[canonical] !== undefined) cost[alias] = cost[canonical];
+    if (synergies[canonical]) synergies[alias] = synergies[canonical];
+  }
+  return { cost, synergies };
+}
+
+const NAME_LOOKUPS = buildNameLookups();
+
+/** Unit name (including alias spellings) → buy cost. Pass to parseLineup(). */
+export const UNIT_COSTS: Readonly<Record<string, number>> = NAME_LOOKUPS.cost;
+
+/** Unit name (including alias spellings) → synergy list. */
+export const UNIT_SYNERGIES: Readonly<Record<string, string[]>> =
+  NAME_LOOKUPS.synergies;
+
+/**
+ * Derive active synergies from a lineup when the stored synergies field is
+ * empty: count synergy occurrences across the lineup, keep those with 2+,
+ * sorted by count descending.
+ */
+export function computeSynergies(
+  lineup: { name: string; stars: number }[],
+): { name: string; count: number }[] {
+  const counts: Record<string, number> = {};
+  for (const u of lineup) {
+    for (const syn of UNIT_SYNERGIES[u.name] || []) {
+      counts[syn] = (counts[syn] || 0) + 1;
+    }
+  }
+  return Object.entries(counts)
+    .map(([name, count]) => ({ name, count }))
+    .filter((s) => s.count > 1)
+    .sort((a, b) => b.count - a.count);
 }

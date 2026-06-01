@@ -4,8 +4,8 @@ import { useRouter } from "next/router";
 import { createClient } from "@supabase/supabase-js";
 import type { GetServerSideProps } from "next";
 import type { SupabaseClient } from "@supabase/supabase-js";
-import unitsData from "@data/units.json";
 import unitsFullData from "@data/units_full.json";
+import { UNIT_COSTS, computeSynergies } from "@/lib/units";
 import synergiesData from "@data/synergies.json";
 import relicsData from "@data/relics.json";
 import type { Game, UnitFullInfo, SynergyInfo, RelicInfo } from "@dac/shared/types";
@@ -36,37 +36,6 @@ import { SeoHead } from "@/lib/seo";
 import { absoluteUrl, getRequestSiteUrl } from "@/lib/site";
 import { analyticsRoute, bucketCount, trackEvent } from "@/lib/analytics";
 import { resolveIconUrl } from "@/lib/icons";
-
-const UNIT_COSTS: Record<string, number> = {};
-const UNIT_SYNERGIES: Record<string, string[]> = {};
-for (const [name, info] of Object.entries(unitsData.units)) {
-  const u = info as { cost: number; synergies?: string[] };
-  UNIT_COSTS[name] = u.cost;
-  if (u.synergies) UNIT_SYNERGIES[name] = u.synergies;
-}
-for (const [alias, canonical] of Object.entries(
-  (unitsData as { aliases?: Record<string, string> }).aliases ?? {}
-)) {
-  if (UNIT_COSTS[canonical] !== undefined) {
-    UNIT_COSTS[alias] = UNIT_COSTS[canonical];
-  }
-  if (UNIT_SYNERGIES[canonical]) {
-    UNIT_SYNERGIES[alias] = UNIT_SYNERGIES[canonical];
-  }
-}
-
-function computeSynergies(lineup: { name: string; stars: number }[]): { name: string; count: number }[] {
-  const counts: Record<string, number> = {};
-  for (const u of lineup) {
-    for (const syn of UNIT_SYNERGIES[u.name] || []) {
-      counts[syn] = (counts[syn] || 0) + 1;
-    }
-  }
-  return Object.entries(counts)
-    .map(([name, count]) => ({ name, count }))
-    .filter((s) => s.count > 1)
-    .sort((a, b) => b.count - a.count);
-}
 
 const UNITS_FULL = unitsFullData as Record<string, UnitFullInfo>;
 const SYNERGIES_DATA = synergiesData as Record<string, SynergyInfo>;

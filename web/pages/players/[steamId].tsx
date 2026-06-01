@@ -4,7 +4,7 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { createServerClient } from "@supabase/ssr";
 import type { GetServerSideProps } from "next";
 import { absoluteUrl, getRequestSiteUrl, SITE_TITLE } from "@/lib/site";
-import unitsData from "@data/units.json";
+import { UNIT_COSTS } from "@/lib/units";
 import type { PlayerGame } from "@dac/shared/types";
 import { mmrToRank } from "@dac/shared/game-utils";
 import { GameRowDisplay } from "@dac/shared/GameRowDisplay";
@@ -32,17 +32,6 @@ import {
   type SteamProfile,
 } from "../../lib/steam";
 
-const UNIT_COSTS: Record<string, number> = {};
-for (const [name, info] of Object.entries(unitsData.units)) {
-  UNIT_COSTS[name] = (info as { cost: number }).cost;
-}
-for (const [alias, canonical] of Object.entries(
-  (unitsData as { aliases?: Record<string, string> }).aliases ?? {}
-)) {
-  if (UNIT_COSTS[canonical] !== undefined) {
-    UNIT_COSTS[alias] = UNIT_COSTS[canonical];
-  }
-}
 const USER_DRODO_SELECT = [
   "name",
   "custom_url",
