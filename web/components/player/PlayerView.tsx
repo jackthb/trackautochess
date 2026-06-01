@@ -1,12 +1,9 @@
-import { useRouter } from "next/router";
+"use client";
+
+import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
-import { createClient, type SupabaseClient } from "@supabase/supabase-js";
-import { createServerClient } from "@supabase/ssr";
-import type { GetServerSideProps } from "next";
-import { absoluteUrl, getRequestSiteUrl, SITE_TITLE } from "@/lib/site";
 import { UNIT_COSTS } from "@/lib/units";
 import type { PlayerGame } from "@dac/shared/types";
-import { mmrToRank } from "@dac/shared/game-utils";
 import { GameRowDisplay } from "@dac/shared/GameRowDisplay";
 import { buildStatItems } from "@dac/shared/buildStatItems";
 import { Button } from "@dac/shared/Button";
@@ -14,61 +11,24 @@ import { StatsGrid } from "@dac/shared/StatsGrid";
 import { SeasonHistoryGrid, type SeasonSnapshot } from "@dac/shared/SeasonHistoryGrid";
 import { MmrSparkline, type MmrSnapshot } from "@/components/MmrSparkline";
 import { RankLadder } from "@/components/RankLadder";
-import { SeoHead } from "@/lib/seo";
-import {
-  getManualRefreshQuota,
-  type ManualRefreshQuota,
-} from "@/lib/manualRefreshQuota";
+import { type ManualRefreshQuota } from "@/lib/manualRefreshQuota";
 import { isAdminSteamId } from "@/lib/admin";
 import { analyticsRoute, bucketCount, trackEvent } from "@/lib/analytics";
 import { resolveIconUrl } from "@/lib/icons";
-import { fetchAndCacheDrodo } from "@/lib/drodo";
 import {
-  fetchSteamProfile,
-  parseSteamInput,
-  playerProfilePath,
-  resolveSteamInput,
   steamProfileUrl,
   type SteamProfile,
 } from "../../lib/steam";
 
-const USER_DRODO_SELECT = [
-  "name",
-  "custom_url",
-  "avatar_url",
-  "drodo_mmr",
-  "drodo_max_mmr",
-  "drodo_mmr_level",
-  "drodo_season",
-  "drodo_season_games",
-  "drodo_candy",
-  "drodo_chicken_count",
-  "drodo_last_fetched_at",
-  "drodo_profile_missing",
-].join(", ");
 const LAST_FETCHED_TICK_MS = 1000;
 
-interface CachedUserDrodoRow {
-  name: string | null;
-  custom_url: string | null;
-  avatar_url: string | null;
-  drodo_mmr: number | null;
-  drodo_max_mmr: number | null;
-  drodo_mmr_level: number | null;
-  drodo_season: string | null;
-  drodo_season_games: number | null;
-  drodo_candy: number | null;
-  drodo_chicken_count: number | null;
-  drodo_last_fetched_at: string | null;
-  drodo_profile_missing: boolean | null;
-}
-
-interface LeaderboardPosition {
+export interface LeaderboardPosition {
   rank: number;
   total: number;
 }
 
-interface PlayerPageProps {
+export interface PlayerPageProps {
+  route: string;
   steamId: string;
   steamProfile: SteamProfile;
   games: PlayerGame[];
@@ -121,58 +81,8 @@ function formatLastFetchedAge(value: string | null, nowMs: number | null) {
   return `${Math.floor(hours / 24)}d ${hours % 24}h ago`;
 }
 
-function originFromUrl(value: string | null): string | null {
-  if (!value) return null;
-  try {
-    return new URL(value).origin;
-  } catch {
-    return null;
-  }
-}
-
-async function resolvePlayerRouteSteamId(
-  rawSteamId: string,
-  supabase: SupabaseClient | null
-): Promise<string | null> {
-  const parsed = parseSteamInput(rawSteamId);
-  if (!parsed) return null;
-  if (parsed.kind === "id") return parsed.value;
-
-  if (supabase) {
-    const { data } = await supabase
-      .from("users")
-      .select("steam_id::text")
-      .eq("custom_url", parsed.value)
-      .maybeSingle<{ steam_id: string }>();
-
-    if (data?.steam_id) return String(data.steam_id);
-  }
-
-  return resolveSteamInput(rawSteamId, supabase ?? undefined, {
-    persist: false,
-  });
-}
-
-function cachedSteamProfile(
-  row: CachedUserDrodoRow | null | undefined,
-  options: { requireAvatar: boolean; requireCustomUrl: boolean }
-): SteamProfile | null {
-  if (!row) return null;
-
-  const profile = {
-    name: row.name ?? null,
-    customUrl: row.custom_url ?? null,
-    avatarUrl: row.avatar_url ?? null,
-  };
-  const hasProfile = profile.name || profile.customUrl || profile.avatarUrl;
-  if (!hasProfile) return null;
-  if (options.requireAvatar && !profile.avatarUrl) return null;
-  if (options.requireCustomUrl && !profile.customUrl) return null;
-
-  return profile;
-}
-
-export default function PlayerPage({
+export default function PlayerView({
+  route,
   steamId,
   steamProfile,
   games,
@@ -183,8 +93,6 @@ export default function PlayerPage({
   drodoProfileMissing: initialDrodoProfileMissing,
   drodoLastFetchedAt: initialDrodoLastFetchedAt,
   manualRefreshQuota: initialManualRefreshQuota,
-  ogImageUrl,
-  canonicalUrl,
 }: PlayerPageProps) {
   const router = useRouter();
   const [drodo, setDrodo] = useState(initialDrodo);
@@ -251,44 +159,6 @@ export default function PlayerPage({
   const canRefresh = isAdmin || isOwnProfile;
   const displayName = steamProfile.name || steamProfile.customUrl || steamId;
   const profileUrl = steamProfileUrl(steamId, steamProfile.customUrl);
-  const playerPath = playerProfilePath(steamId, steamProfile.customUrl);
-  const title = `${displayName} | ${SITE_TITLE}`;
-  const description = drodo?.mmr
-    ? `${displayName} is ${mmrToRank(drodo.mmr)} at ${drodo.mmr.toLocaleString("en-US")} MMR.`
-    : `Dota Auto Chess profile for ${displayName}.`;
-  const structuredDataBase = originFromUrl(canonicalUrl);
-  const structuredData = [
-    {
-      "@context": "https://schema.org",
-      "@type": "ProfilePage",
-      name: title,
-      description,
-      ...(canonicalUrl ? { url: canonicalUrl } : {}),
-      about: {
-        "@type": "Person",
-        name: displayName,
-        sameAs: profileUrl,
-      },
-    },
-    {
-      "@context": "https://schema.org",
-      "@type": "BreadcrumbList",
-      itemListElement: [
-        {
-          "@type": "ListItem",
-          position: 1,
-          name: "Track Auto Chess",
-          ...(structuredDataBase ? { item: `${structuredDataBase}/` } : {}),
-        },
-        {
-          "@type": "ListItem",
-          position: 2,
-          name: displayName,
-          ...(canonicalUrl ? { item: canonicalUrl } : {}),
-        },
-      ],
-    },
-  ];
 
   const totalChickenCount = useMemo(() => {
     const sum = seasons.reduce((acc, s) => acc + (s.chicken_count ?? 0), 0);
@@ -313,7 +183,7 @@ export default function PlayerPage({
 
   useEffect(() => {
     trackEvent("Player Profile Viewed", {
-      route: analyticsRoute(router.pathname),
+      route: analyticsRoute(route),
       has_mmr: Boolean(initialDrodo?.mmr),
       has_games: games.length > 0,
       game_bucket: bucketCount(games.length),
@@ -325,7 +195,7 @@ export default function PlayerPage({
     initialDrodo?.mmr,
     initialSeasons.length,
     leaderboardPosition,
-    router.pathname,
+    route,
     steamId,
   ]);
 
@@ -341,7 +211,7 @@ export default function PlayerPage({
   const handleRefresh = async () => {
     if (!canRefresh) {
       trackEvent("Player Refresh Blocked", {
-        route: analyticsRoute(router.pathname),
+        route: analyticsRoute(route),
         reason: "not_allowed",
       });
       setRefreshError("Sign in with Steam to refresh your own profile.");
@@ -349,7 +219,7 @@ export default function PlayerPage({
     }
     if (showQuota && manualRefreshQuota.remaining <= 0) {
       trackEvent("Player Refresh Blocked", {
-        route: analyticsRoute(router.pathname),
+        route: analyticsRoute(route),
         reason: "quota",
       });
       setRefreshError("Daily manual refresh limit reached.");
@@ -357,7 +227,7 @@ export default function PlayerPage({
     }
 
     trackEvent("Player Refresh Started", {
-      route: analyticsRoute(router.pathname),
+      route: analyticsRoute(route),
       is_admin: isAdmin,
       is_own_profile: isOwnProfile,
       quota_bucket: bucketCount(manualRefreshQuota.remaining),
@@ -388,7 +258,7 @@ export default function PlayerPage({
                 ? "bot_protection"
                 : "server";
         trackEvent("Player Refresh Failed", {
-          route: analyticsRoute(router.pathname),
+          route: analyticsRoute(route),
           reason,
           status: resp.status,
         });
@@ -425,7 +295,7 @@ export default function PlayerPage({
       }
       if (Array.isArray(data.seasons)) setSeasons(data.seasons);
       trackEvent("Player Refresh Succeeded", {
-        route: analyticsRoute(router.pathname),
+        route: analyticsRoute(route),
         has_mmr: data.mmr != null,
         has_seasons: Array.isArray(data.seasons),
         quota_bucket: data?.refresh_quota
@@ -434,7 +304,7 @@ export default function PlayerPage({
       });
     } catch (error) {
       trackEvent("Player Refresh Failed", {
-        route: analyticsRoute(router.pathname),
+        route: analyticsRoute(route),
         reason: "network",
       });
       const detail =
@@ -449,18 +319,6 @@ export default function PlayerPage({
 
   return (
     <>
-      <SeoHead
-        title={title}
-        description={description}
-        path={playerPath}
-        localized={false}
-        type="profile"
-        canonicalUrl={canonicalUrl}
-        imageUrl={ogImageUrl}
-        imageAlt={`${displayName} Auto Chess profile stats`}
-        structuredData={structuredData}
-      />
-
       <style jsx>{`
         .page {
           position: relative;
@@ -826,267 +684,3 @@ export default function PlayerPage({
     </>
   );
 }
-
-export const getServerSideProps: GetServerSideProps = async (context) => {
-  const { steamId: rawSteamId } = context.params!;
-  if (!rawSteamId || typeof rawSteamId !== "string") {
-    return { notFound: true };
-  }
-
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  const supabase = url && key ? createClient(url, key) : null;
-  const supabaseAdmin =
-    url && serviceKey
-      ? createClient(url, serviceKey, {
-          auth: { autoRefreshToken: false, persistSession: false },
-        })
-      : null;
-  const baseUrl = getRequestSiteUrl(context.req.headers);
-  const manualRefreshQuota = getManualRefreshQuota(context.req.headers.cookie);
-
-  let viewerSteamId: string | null = null;
-  if (url && key) {
-    try {
-      const ssrSupabase = createServerClient(url, key, {
-        cookies: {
-          getAll() {
-            return Object.entries(context.req.cookies).map(([name, value]) => ({
-              name,
-              value: value ?? "",
-            }));
-          },
-          setAll() {
-            // Read-only for SSR; we don't need to write cookies here.
-          },
-        },
-      });
-      const { data } = await ssrSupabase.auth.getUser();
-      const meta = data.user?.user_metadata as
-        | { steam_id?: unknown }
-        | null
-        | undefined;
-      if (meta && typeof meta.steam_id === "string") {
-        viewerSteamId = meta.steam_id;
-      }
-    } catch {
-      viewerSteamId = null;
-    }
-  }
-
-  // Accept numeric Steam IDs or vanity slugs. Keep vanity slugs in the URL
-  // when present; they are the preferred public profile route.
-  const steamId = await resolvePlayerRouteSteamId(rawSteamId, supabase);
-  if (!steamId) {
-    return { notFound: true };
-  }
-
-  let cachedProfileRow: CachedUserDrodoRow | null = null;
-
-  // Fetch cached Drodo profile and season history from public Supabase rows.
-  let drodo = null;
-  let drodoProfileMissing = false;
-  let drodoLastFetchedAt = null;
-  let seasons: SeasonSnapshot[] = [];
-  let mmrHistory: MmrSnapshot[] = [];
-  if (supabase) {
-    const [profileResult, seasonsResult, snapshotsResult] = await Promise.all([
-      supabase
-        .from("users")
-        .select(USER_DRODO_SELECT)
-        .eq("steam_id", steamId)
-        .maybeSingle<CachedUserDrodoRow>(),
-      supabase
-        .from("player_seasons")
-        .select("season, mmr, max_mmr, games_played, chicken_count")
-        .eq("steam_id", steamId)
-        .order("season", { ascending: true }),
-      supabase
-        .from("mmr_snapshots")
-        .select("mmr, snapshotted_at")
-        .eq("steam_id", steamId)
-        .not("mmr", "is", null)
-        .order("snapshotted_at", { ascending: false })
-        .limit(60),
-    ]);
-    cachedProfileRow = profileResult.data ?? null;
-    mmrHistory = (snapshotsResult.data ?? []).map((row) => ({
-      mmr: row.mmr as number | null,
-      snapshotted_at: row.snapshotted_at as string,
-    }));
-    if (profileResult.data) {
-      drodoProfileMissing = Boolean(profileResult.data.drodo_profile_missing);
-      drodoLastFetchedAt = profileResult.data.drodo_last_fetched_at;
-      if (profileResult.data.drodo_last_fetched_at && !drodoProfileMissing) {
-        drodo = {
-          mmr: profileResult.data.drodo_mmr,
-          max_mmr: profileResult.data.drodo_max_mmr,
-          mmr_level: profileResult.data.drodo_mmr_level,
-          season: profileResult.data.drodo_season,
-          season_games: profileResult.data.drodo_season_games,
-          candy: profileResult.data.drodo_candy,
-          chicken_count: profileResult.data.drodo_chicken_count,
-        };
-      }
-    }
-    if (seasonsResult.data) seasons = seasonsResult.data;
-
-    // First-time profile view: kick off a Drodo pull so the page lands
-    // with data instead of an empty MMR card. The cooldown logic in
-    // fetchAndCacheDrodo + isFreshCache prevents repeat pulls.
-    if (drodoLastFetchedAt === null && supabaseAdmin) {
-      const result = await fetchAndCacheDrodo(steamId, supabaseAdmin);
-      if (result.ok) {
-        drodo = {
-          mmr: result.profile.mmr,
-          max_mmr: result.profile.max_mmr,
-          mmr_level: result.profile.mmr_level,
-          season: result.profile.season,
-          season_games: result.profile.season_games,
-          candy: result.profile.candy,
-          chicken_count: result.profile.chicken_count,
-        };
-        drodoProfileMissing = false;
-        drodoLastFetchedAt = result.profile.fetched_at;
-        const { data: refreshedSeasons } = await supabaseAdmin
-          .from("player_seasons")
-          .select("season, mmr, max_mmr, games_played, chicken_count")
-          .eq("steam_id", steamId)
-          .order("season", { ascending: true });
-        if (refreshedSeasons) seasons = refreshedSeasons;
-      } else if (result.kind === "missing") {
-        drodoProfileMissing = true;
-        drodoLastFetchedAt = result.fetchedAt ?? new Date().toISOString();
-      }
-    }
-  }
-
-  const profileRequirements = {
-    requireAvatar: true,
-    requireCustomUrl: /^\d+$/.test(rawSteamId),
-  };
-  const steamProfile =
-    cachedSteamProfile(cachedProfileRow, profileRequirements) ??
-    (await fetchSteamProfile(steamId, supabase ?? undefined, {
-      persist: true,
-      ...profileRequirements,
-    }));
-
-  let profileUserIds = [steamId];
-  if (supabase) {
-    const vanityKeys = [
-      steamProfile.customUrl,
-      !/^\d+$/.test(rawSteamId) ? rawSteamId : null,
-    ].filter(Boolean) as string[];
-
-    if (vanityKeys.length > 0) {
-      const { data: vanityUsers } = await supabase
-        .from("users")
-        .select("steam_id::text")
-        .in("custom_url", [...new Set(vanityKeys)]);
-
-      const vanityIds = (vanityUsers ?? [])
-        .map((row) => String(row.steam_id))
-        .filter(Boolean);
-      profileUserIds = [...new Set([steamId, ...vanityIds])];
-    }
-  }
-
-  // Fetch the player's match_players rows and leaderboard position concurrently;
-  // both are independent of each other and dominate the SSR latency.
-  const gamesPromise = supabase
-    ? supabase
-        .from("match_players")
-        .select("*, steam_id::text")
-        .in("steam_id", profileUserIds)
-        .order("played_at", { ascending: false })
-        .limit(100)
-    : Promise.resolve({ data: [] as PlayerGame[] });
-
-  const leaderboardPromise: Promise<LeaderboardPosition | null> =
-    supabase && drodo?.mmr != null
-      ? Promise.all([
-          supabase
-            .from("users")
-            .select("steam_id", { count: "exact", head: true })
-            .not("drodo_last_fetched_at", "is", null)
-            .eq("drodo_profile_missing", false)
-            .gt("drodo_mmr", drodo.mmr),
-          supabase
-            .from("users")
-            .select("steam_id", { count: "exact", head: true })
-            .not("drodo_last_fetched_at", "is", null)
-            .eq("drodo_profile_missing", false)
-            .not("drodo_mmr", "is", null),
-        ]).then(([{ count: higherCount }, { count: totalRanked }]) =>
-          typeof higherCount === "number" && typeof totalRanked === "number"
-            ? { rank: higherCount + 1, total: totalRanked }
-            : null
-        )
-      : Promise.resolve(null);
-
-  const [gamesResult, leaderboardPosition] = await Promise.all([
-    gamesPromise,
-    leaderboardPromise,
-  ]);
-
-  if (
-    steamProfile.customUrl &&
-    rawSteamId !== steamProfile.customUrl &&
-    rawSteamId === steamId
-  ) {
-    return {
-      redirect: {
-        destination: playerProfilePath(steamId, steamProfile.customUrl),
-        permanent: false,
-      },
-    };
-  }
-
-  if (!viewerSteamId) {
-    context.res.setHeader(
-      "Cache-Control",
-      "public, s-maxage=600, stale-while-revalidate=3600"
-    );
-  }
-
-  // Map match_players rows → Game shape with legacy aliases for rendering.
-  const games: PlayerGame[] = ((gamesResult.data as Record<string, unknown>[]) || []).map(
-    (row) => ({
-      ...row,
-      user_id: String(row.steam_id),
-      placement: row.placement != null ? String(row.placement) : "",
-      played_at: (row.played_at as string) ?? "",
-      created_at: (row.created_at as string) ?? "",
-      lineup: row.chess_lineup as string | null,
-      level: row.hero_level ? String(row.hero_level) : null,
-      rank: null,
-      rank_change: null,
-      wl: null,
-      wins: row.win_round as number | null,
-      losses: row.lose_round as number | null,
-      match_id: (row.match_id as string) ?? null,
-    })
-  ) as PlayerGame[];
-
-  return {
-    props: {
-      steamId,
-      steamProfile,
-      games,
-      drodo,
-      seasons,
-      mmrHistory,
-      leaderboardPosition,
-      drodoProfileMissing,
-      drodoLastFetchedAt,
-      manualRefreshQuota,
-      ogImageUrl: absoluteUrl(`/api/og/player/${steamId}`, baseUrl),
-      canonicalUrl: absoluteUrl(
-        playerProfilePath(steamId, steamProfile.customUrl),
-        baseUrl
-      ),
-    },
-  };
-};
