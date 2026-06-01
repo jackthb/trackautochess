@@ -283,23 +283,23 @@ export default function HomeSearch({ initialSearchResults }: HomeProps) {
           display: inline-flex;
           align-items: center;
           justify-content: center;
-          height: 44px;
-          padding: 0 26px;
+          height: 42px;
+          padding: 0 24px;
           font-family: var(--font-mono);
           font-size: 14px;
-          letter-spacing: 0.5px;
-          color: var(--text-primary);
-          background: var(--bg-surface);
-          border: 1px solid var(--border);
-          border-radius: var(--r-3);
+          font-weight: 600;
+          letter-spacing: 0.4px;
+          color: #fff;
+          background: var(--accent);
+          border: 1px solid var(--accent);
+          border-radius: 4px;
           text-decoration: none;
-          transition: border-color 0.15s ease, background 0.15s ease,
-            color 0.15s ease;
+          white-space: nowrap;
+          transition: filter 0.15s ease, box-shadow 0.15s ease;
         }
         .profile-cta:hover {
-          border-color: var(--accent-dim);
-          background: var(--bg-elevated);
-          color: var(--accent);
+          filter: brightness(1.08);
+          box-shadow: 0 0 0 3px rgba(224, 64, 42, 0.25);
         }
         .preview {
           position: relative;
