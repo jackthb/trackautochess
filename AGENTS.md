@@ -14,7 +14,7 @@ DAC Tools is a monorepo for Dota Auto Chess game tracking and analysis. It inclu
 - **IPC Protocol**: Electron ↔ Python communicate via JSON Lines over stdin/stdout (one JSON object per line)
 - Python backend (`app/backend/`) handles: screen capture (mss), computer vision parsing (OpenCV + Tesseract OCR), screen recording (PyAV), Dota window detection, Supabase sync
 
-**Shared Data (`data/`)** — Single source of truth for game data (units.json, items.json, synergies.json, relics.json, icons/). Multiple modules copy from here at build time.
+**Shared Data (`data/`)** — Single source of truth for game data (units_full.json, aliases.json, items.json, synergies.json, relics.json, icons/). Multiple modules copy from here at build time.
 
 **Web Viewer (`web/`)** — Next.js 16 app for browsing analyzed games from Supabase.
 

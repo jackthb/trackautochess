@@ -25,8 +25,8 @@ VENDOR_DIR = os.path.join(BACKEND_DIR, "vendor")
 
 _REQUIRED_PATHS = [
     (os.path.join(DATA_DIR, "icons"),                          "data/icons directory"),
-    (os.path.join(DATA_DIR, "units.json"),                     "data/units.json"),
     (os.path.join(DATA_DIR, "units_full.json"),                "data/units_full.json"),
+    (os.path.join(DATA_DIR, "aliases.json"),                   "data/aliases.json"),
     (os.path.join(DATA_DIR, "items.json"),                     "data/items.json"),
     (os.path.join(DATA_DIR, "relics.json"),                    "data/relics.json"),
 ]
@@ -44,8 +44,8 @@ print("[spec] Environment OK")
 
 datas = [
     (os.path.join(DATA_DIR, "icons"),                          os.path.join("data", "icons")),
-    (os.path.join(DATA_DIR, "units.json"),                     "data"),
     (os.path.join(DATA_DIR, "units_full.json"),                "data"),
+    (os.path.join(DATA_DIR, "aliases.json"),                   "data"),
     (os.path.join(DATA_DIR, "items.json"),                     "data"),
     (os.path.join(DATA_DIR, "relics.json"),                    "data"),
     (os.path.join(DATA_DIR, "synergies.json"),                 "data"),

@@ -1017,12 +1017,21 @@ ipcMain.handle("drodo:refresh", async () => {
 // ── Units data IPC ───────────────────────────────────────────────────────────
 
 ipcMain.handle("data:units", async () => {
-  const unitsPath = path.join(RESOURCES_DIR, "data", "units.json");
-  if (!fs.existsSync(unitsPath)) return {};
+  // units.json was collapsed into units_full.json + aliases.json. Reassemble
+  // the legacy {units, aliases} shape the renderer (useGames) still expects;
+  // units_full carries cost/synergies, so it serves as the `units` map.
+  const fullPath = path.join(RESOURCES_DIR, "data", "units_full.json");
+  const aliasPath = path.join(RESOURCES_DIR, "data", "aliases.json");
   try {
-    return JSON.parse(fs.readFileSync(unitsPath, "utf-8"));
+    const units = fs.existsSync(fullPath)
+      ? JSON.parse(fs.readFileSync(fullPath, "utf-8"))
+      : {};
+    const aliases = fs.existsSync(aliasPath)
+      ? JSON.parse(fs.readFileSync(aliasPath, "utf-8"))
+      : {};
+    return { units, aliases };
   } catch {
-    return {};
+    return { units: {}, aliases: {} };
   }
 });
 

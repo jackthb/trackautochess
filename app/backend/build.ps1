@@ -21,7 +21,7 @@ Write-Host "Validating build environment..." -ForegroundColor Cyan
 $RequiredPaths = [ordered]@{
     "Data directory"    = Join-Path $RepoDir "data"
     "Icons directory"   = Join-Path $RepoDir "data\icons"
-    "units.json"        = Join-Path $RepoDir "data\units.json"
+    "units_full.json"   = Join-Path $RepoDir "data\units_full.json"
     "items.json"        = Join-Path $RepoDir "data\items.json"
     "relics.json"       = Join-Path $RepoDir "data\relics.json"
     "spec file"         = $SpecFile

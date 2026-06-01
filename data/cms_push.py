@@ -362,9 +362,10 @@ def push_all(
         _, name_to_id = _build_synergy_docs(read('synergies.json'))
 
     if want('units'):
-        simple = read('units.json').get('units', {})
         full = read('units_full.json')
-        docs = _build_unit_docs(simple, full, name_to_id)
+        # units_full carries cost/pool/synergies/names too, so it serves as both
+        # the "simple" and "full" source now that units.json is gone.
+        docs = _build_unit_docs(full, full, name_to_id)
         client.commit(docs)
         print(f'✓ units: {len(docs)}')
 

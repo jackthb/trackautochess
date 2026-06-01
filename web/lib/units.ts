@@ -1,9 +1,8 @@
 import { unitStem } from "@dac/shared/game-utils";
 import unitsFullData from "@data/units_full.json";
-// units.json is imported solely for its top-level `aliases` map (a handful of
-// alt spellings → canonical names). Cost/synergy data is read from the full
-// file below; once `aliases` is relocated this import goes away entirely.
-import unitsAliasData from "@data/units.json";
+// aliases.json is a flat { alt-spelling: canonical } map (a VPK-pipeline
+// artifact). Cost/synergy data comes from units_full.json below.
+import aliasData from "@data/aliases.json";
 import { slugifyName } from "@/lib/slugs";
 import { DEFAULT_LOCALE, type Locale, pickLocalized } from "@/lib/i18n";
 
@@ -151,8 +150,7 @@ function buildNameLookups() {
     cost[name] = data.cost ?? 0;
     if (data.synergies) synergies[name] = data.synergies;
   }
-  const aliases =
-    (unitsAliasData as { aliases?: Record<string, string> }).aliases ?? {};
+  const aliases = aliasData as Record<string, string>;
   for (const [alias, canonical] of Object.entries(aliases)) {
     if (cost[canonical] !== undefined) cost[alias] = cost[canonical];
     if (synergies[canonical]) synergies[alias] = synergies[canonical];

@@ -27,12 +27,12 @@
       "filter": ["**/*"]
     },
     {
-      "from": "../data/units.json",
-      "to": "data/units.json"
-    },
-    {
       "from": "../data/units_full.json",
       "to": "data/units_full.json"
+    },
+    {
+      "from": "../data/aliases.json",
+      "to": "data/aliases.json"
     },
     {
       "from": "../data/synergies.json",

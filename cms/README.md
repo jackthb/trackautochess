@@ -134,15 +134,13 @@ If you want to remove the local cache and read directly from Sanity at runtime, 
 After `pnpm migrate -- --icons`, Sanity hosts every uploaded icon on its CDN. `pnpm pull` projects each asset's URL and intrinsic dimensions back into the JSON cache as two new optional fields per entity:
 
 ```jsonc
-// e.g. units.json
+// e.g. units_full.json
 {
-  "units": {
-    "Aegis": {
-      "cost": 4,
-      "synergies": ["Knight"],
-      "icon_url": "https://cdn.sanity.io/images/<proj>/<dataset>/abc.png",
-      "icon_dimensions": { "width": 128, "height": 128 }
-    }
+  "Aegis": {
+    "cost": 4,
+    "synergies": ["Knight"],
+    "icon_url": "https://cdn.sanity.io/images/<proj>/<dataset>/abc.png",
+    "icon_dimensions": { "width": 128, "height": 128 }
   }
 }
 ```

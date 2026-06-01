@@ -130,10 +130,11 @@ async function migrateSynergies() {
 // Units (references synergies by display name → looked up in nameToId)
 // ──────────────────────────────────────────────────────────────────
 async function migrateUnits(synergyNameToId: Map<string, string>) {
-  const simple = readJson<{units: Record<string, any>}>('units.json').units
+  // units_full carries cost/pool/synergies/names too, so it is now both the
+  // "simple" source (s) and the stats/abilities source (f === s here).
   const full = readJson<Record<string, any>>('units_full.json')
   const docs: any[] = []
-  for (const [name, s] of Object.entries(simple)) {
+  for (const [name, s] of Object.entries(full)) {
     const f = full[name] || {}
     const _id = docId.unit(name)
     const synergyRefs = (s.synergies || [])

@@ -76,8 +76,8 @@ def run_debug(screenshot_path: str) -> dict:
         )
         from utils import ICONS_DIR, DATA_DIR, unit_stem as _unit_stem
 
-        units_path = DATA_DIR / "units.json"
-        units_data = json.loads(units_path.read_text())["units"] if units_path.exists() else {}
+        units_path = DATA_DIR / "units_full.json"
+        units_data = json.loads(units_path.read_text()) if units_path.exists() else {}
         stem_to_name = {_unit_stem(name): name for name in units_data}
 
         unit_templates = _load_templates_multiscale(

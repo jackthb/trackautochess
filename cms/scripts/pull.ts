@@ -172,21 +172,11 @@ async function pullUnits() {
       ${ICON_PROJECTION}
     }`,
   )
-  const existingUnitIcons = readExistingIcons('units.json', 'units')
   const existingFullIcons = readExistingIcons('units_full.json')
-  const simple: Record<string, any> = {}
   const full: Record<string, any> = {}
   for (const r of rows) {
     const localizedNames = localizedNamesToJson(r.names)
-    const icon = iconFields(r, existingUnitIcons.get(r.name))
     const fullIcon = iconFields(r, existingFullIcons.get(r.name))
-    simple[r.name] = {
-      cost: r.cost,
-      pool: r.pool,
-      synergies: r.synergies ?? [],
-      names: localizedNames,
-      ...icon,
-    }
     full[r.name] = {
       id: r.gameId ?? '',
       cost: r.cost,
@@ -205,27 +195,24 @@ async function pullUnits() {
       ...fullIcon,
     }
   }
-  // Preserve top-level `aliases` from the existing units.json. Aliases are a
-  // VPK-pipeline artifact (data/extract_vpk.py) — they're not editorial and
-  // Sanity has no concept of them. Re-apply the same filter extract_vpk uses:
-  // keep an alias only when its canonical target exists and the alias name
-  // doesn't collide with a real unit.
+  // Preserve the `aliases` map (data/aliases.json). Aliases are a VPK-pipeline
+  // artifact (data/extract_vpk.py) — they're not editorial and Sanity has no
+  // concept of them. Re-apply the same filter extract_vpk uses: keep an alias
+  // only when its canonical target exists and the alias name doesn't collide
+  // with a real unit.
   const existingAliases = readExistingAliases()
   const aliases: Record<string, string> = {}
   for (const [alias, canonical] of Object.entries(existingAliases)) {
-    if (simple[canonical] && !simple[alias]) aliases[alias] = canonical
+    if (full[canonical] && !full[alias]) aliases[alias] = canonical
   }
-  const unitsOut: {units: Record<string, any>; aliases?: Record<string, string>} = {units: simple}
-  if (Object.keys(aliases).length > 0) unitsOut.aliases = aliases
-  writeJson('units.json', unitsOut)
   writeJson('units_full.json', full)
+  writeJson('aliases.json', aliases)
 }
 
 function readExistingAliases(): Record<string, string> {
   try {
-    const raw = fs.readFileSync(path.join(DATA_DIR, 'units.json'), 'utf-8')
-    const parsed = JSON.parse(raw)
-    return parsed?.aliases ?? {}
+    const raw = fs.readFileSync(path.join(DATA_DIR, 'aliases.json'), 'utf-8')
+    return JSON.parse(raw) ?? {}
   } catch {
     return {}
   }

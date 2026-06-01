@@ -10,7 +10,7 @@ Writes:
   data/items_full.json  — items with descriptions, quality, lore
   data/relics.json      — relics with descriptions
   data/units_full.json  — units with stats at each star level
-  data/units.json       — simple unit lookup (cost + synergies)
+  data/aliases.json     — alt unit-name spellings → canonical name
 
 Usage:
   python extract_vpk.py                    # auto-discover VPK, extract all
@@ -615,7 +615,6 @@ def extract_all(pak):
 
     # Build full unit output — only units in the active recruit pool
     units_full = {}
-    units_simple = {}
     for base_id, stars in sorted(base_units.items()):
         if active_unit_ids and base_id not in active_unit_ids:
             continue
@@ -677,13 +676,6 @@ def extract_all(pak):
             'attack_type': 'melee' if is_melee else 'ranged',
             'abilities': active_abs if active_abs else None,
             'stats': stats,
-        }
-
-        units_simple[display_name] = {
-            'cost': cost,
-            'pool': pool,
-            'synergies': vpk_syns,
-            'names': names,
         }
 
     # Build aliases: common/community names → canonical VPK names
@@ -808,7 +800,7 @@ def extract_all(pak):
         'items_full': items,
         'relics': {'relics': relics},
         'units_full': units_full,
-        'units': {'units': units_simple, 'aliases': aliases},
+        'aliases': aliases,
         'abilities': abilities_out,
         'talents': talents_out,
         'game_mode': game_mode_out,
@@ -1076,6 +1068,11 @@ def main():
     # Extract
     data = extract_all(pak)
 
+    # Aliases (alt name spellings → canonical) are written verbatim. Pull them
+    # out before text corrections run: a `where`-less rule could rewrite a
+    # canonical target and silently break the alias → unit mapping.
+    aliases = data.pop('aliases', {})
+
     # Apply text corrections (typo fixes baked into source-of-truth JSON)
     corrections = load_corrections(Path(args.out))
     if corrections:
@@ -1092,7 +1089,6 @@ def main():
         'abilities': 'abilities.json',
         'talents': 'talents.json',
         'game_mode': 'game_mode.json',
-        'units': 'units.json',
     }
 
     for key, filename in file_map.items():
@@ -1125,6 +1121,11 @@ def main():
                 pass
         with open(out_path, 'w', encoding='utf-8') as f:
             json.dump(data[key], f, indent=2, ensure_ascii=False)
+
+    # Aliases: a flat {alt-spelling: canonical} map, written verbatim (kept out
+    # of the loop above so text corrections / icon preservation don't touch it).
+    with open(out_dir / 'aliases.json', 'w', encoding='utf-8') as f:
+        json.dump(aliases, f, indent=2, ensure_ascii=False)
 
     # ── Extract item/synergy/relic icons from VPK ──
     icons_dir = out_dir / 'icons'
@@ -1192,7 +1193,7 @@ def main():
     print(f"\nunits_full.json:  {len(data['units_full'])} units")
     print(f"  By cost: {dict(sorted(by_cost.items()))}")
 
-    print(f"\nunits.json:       {len(data['units']['units'])} units")
+    print(f"\naliases.json:     {len(aliases)} alt-name aliases")
     print(f"\nabilities.json:   {len(data['abilities'])} active abilities")
     print(f"talents.json:     {len(data['talents'])} talent slots")
     gm = data['game_mode']
@@ -1223,9 +1224,6 @@ def main():
             if key == 'relics':
                 old_inner = old_data.get('relics', old_data)
                 new_inner = new_data.get('relics', new_data)
-            elif key == 'units':
-                old_inner = old_data.get('units', old_data)
-                new_inner = new_data.get('units', new_data)
             else:
                 old_inner = old_data
                 new_inner = new_data

@@ -18,7 +18,6 @@ const ROOT_DATA = join(__dirname, "..", "data");
 const DATA_DIR = join(ROOT_DATA, "patch_notes");
 const INDEX_PATH = join(DATA_DIR, "index.json");
 const ITEMS_PATH = join(ROOT_DATA, "items.json");
-const UNITS_PATH = join(ROOT_DATA, "units.json");
 const UNITS_FULL_PATH = join(ROOT_DATA, "units_full.json");
 const SYNERGIES_PATH = join(ROOT_DATA, "synergies.json");
 const CHANGELOG_URL =
@@ -313,7 +312,6 @@ function foldHotfix(parent, hotfixDate, hotfixSections) {
 
 function applyGameDataChanges(sections) {
   const items = JSON.parse(readFileSync(ITEMS_PATH, "utf-8"));
-  const units = JSON.parse(readFileSync(UNITS_PATH, "utf-8"));
   const unitsFull = JSON.parse(readFileSync(UNITS_FULL_PATH, "utf-8"));
   const synergies = JSON.parse(readFileSync(SYNERGIES_PATH, "utf-8"));
   let changed = false;
@@ -325,7 +323,7 @@ function applyGameDataChanges(sections) {
   }
 
   const unitsBySlug = new Map();
-  for (const name of Object.keys(units.units ?? units)) {
+  for (const name of Object.keys(unitsFull)) {
     unitsBySlug.set(slugifyName(name), name);
   }
 
@@ -377,7 +375,7 @@ function applyGameDataChanges(sections) {
         const newSyn = classMatch[2].trim();
         const unitName = unitsBySlug.get(slugifyName(bare));
         if (unitName) {
-          for (const data of [units.units?.[unitName] ?? units[unitName], unitsFull[unitName]]) {
+          for (const data of [unitsFull[unitName]]) {
             if (!data?.synergies) continue;
             const idx = data.synergies.indexOf(oldSyn);
             if (idx !== -1) {
@@ -407,7 +405,6 @@ function applyGameDataChanges(sections) {
 
   if (changed && !DRY_RUN) {
     writeFileSync(ITEMS_PATH, JSON.stringify(items, null, 2) + "\n");
-    writeFileSync(UNITS_PATH, JSON.stringify(units.units ? units : { units }, null, 2) + "\n");
     writeFileSync(UNITS_FULL_PATH, JSON.stringify(unitsFull, null, 2) + "\n");
     writeFileSync(SYNERGIES_PATH, JSON.stringify(synergies, null, 2) + "\n");
     console.log("Updated game data files.");

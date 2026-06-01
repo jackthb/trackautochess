@@ -137,7 +137,7 @@ def _extract_vpk_png(pak, vpk_path: str, dest: Path) -> bool:
 
 def extract_units(force: bool, dry_run: bool) -> tuple[int, int, int]:
     """Extract unit minimap icons from Steam CDN."""
-    units = json.loads((DATA_DIR / "units.json").read_text(encoding="utf-8"))["units"]
+    units = json.loads((DATA_DIR / "units_full.json").read_text(encoding="utf-8"))
     out_dir = ICONS_DIR / "units"
     out_dir.mkdir(parents=True, exist_ok=True)
 
@@ -392,7 +392,7 @@ def audit():
     print("=== Icon Audit ===\n")
 
     # Units
-    units = json.loads((DATA_DIR / "units.json").read_text(encoding="utf-8"))["units"]
+    units = json.loads((DATA_DIR / "units_full.json").read_text(encoding="utf-8"))
     unit_dir = ICONS_DIR / "units"
     missing_units = []
     for name in sorted(units):
