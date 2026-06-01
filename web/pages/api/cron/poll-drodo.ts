@@ -35,7 +35,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     .select("steam_id::text")
     .lte("next_poll_at", new Date().toISOString())
     .not("drodo_last_fetched_at", "is", null)
-    .eq("banned", false)
     .order("next_poll_at", { ascending: true })
     .limit(REPOLL_BATCH_SIZE);
 
@@ -47,7 +46,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     .from("users")
     .select("steam_id::text")
     .is("drodo_last_fetched_at", null)
-    .eq("banned", false)
     .order("created_at", { ascending: false })
     .limit(SEED_BATCH_SIZE);
 

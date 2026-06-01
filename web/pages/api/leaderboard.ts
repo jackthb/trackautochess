@@ -54,7 +54,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     .select(LEADERBOARD_SELECT)
     .not("drodo_last_fetched_at", "is", null)
     .eq("drodo_profile_missing", false)
-    .eq("banned", false)
     .order("drodo_mmr", { ascending: false, nullsFirst: false })
     .order("drodo_season_games", { ascending: false, nullsFirst: false })
     .limit(200);

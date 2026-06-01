@@ -118,7 +118,6 @@ export async function getDefaultPlayerSearchResults(
   const { data, error } = await supabase
     .from("users")
     .select(USER_SEARCH_SELECT)
-    .eq("banned", false)
     .order("drodo_last_fetched_at", { ascending: false, nullsFirst: false })
     .order("name", { ascending: true, nullsFirst: false })
     .limit(limit);

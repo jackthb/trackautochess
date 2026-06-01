@@ -82,7 +82,6 @@ export default async function handler(
       .from("users")
       .select(USER_SEARCH_SELECT)
       .ilike("custom_url", query)
-      .eq("banned", false)
       .limit(8);
 
     if (exactCustom.error) {
@@ -98,7 +97,6 @@ export default async function handler(
         .from("users")
         .select(USER_SEARCH_SELECT)
         .eq("steam_id", query)
-        .eq("banned", false)
         .limit(1);
 
       if (exactSteamId.error) {
@@ -114,7 +112,6 @@ export default async function handler(
       .from("users")
       .select(USER_SEARCH_SELECT)
       .ilike("custom_url", `${query}%`)
-      .eq("banned", false)
       .limit(8);
 
     if (prefixCustom.error) {
@@ -129,7 +126,6 @@ export default async function handler(
       .from("users")
       .select(USER_SEARCH_SELECT)
       .ilike("name", `%${query}%`)
-      .eq("banned", false)
       .limit(8);
 
     if (nameMatches.error) {

@@ -84,17 +84,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     return res.status(400).json({ error: "Invalid steam ID" });
   }
 
-  if (supabase) {
-    const { data: bannedRow } = await supabase
-      .from("users")
-      .select("banned")
-      .eq("steam_id", steamId)
-      .maybeSingle<{ banned: boolean | null }>();
-    if (bannedRow?.banned) {
-      return res.status(404).json({ error: "Player not found" });
-    }
-  }
-
   const forceRefresh = refresh === "1" && req.method === "POST";
 
   // Manual refresh: must be the profile owner (or an admin) and admins

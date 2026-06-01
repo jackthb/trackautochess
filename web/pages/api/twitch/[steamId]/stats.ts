@@ -94,16 +94,6 @@ export default async function handler(
   const steamId = await resolveSteamInput(raw, supabase, { persist: false });
   if (!steamId) return res.status(404).json({ error: "Player not found" });
 
-  // Banned users are silently 404'd, same as the OG endpoint did.
-  const { data: bannedRow } = await supabase
-    .from("users")
-    .select("banned")
-    .eq("steam_id", steamId)
-    .maybeSingle<{ banned: boolean | null }>();
-  if (bannedRow?.banned) {
-    return res.status(404).json({ error: "Player not found" });
-  }
-
   const [profile, drodoRes, seasonsRes, snapshotsRes] = await Promise.all([
     fetchSteamProfile(steamId, supabase, { persist: false }),
     supabase

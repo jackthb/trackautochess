@@ -1,0 +1,8 @@
+-- TOMBSTONE (no-op). This version originally created a `banned_ips` table for
+-- an IP-ban feature that was abandoned before merge. The Supabase preview
+-- branch already applied this version, so the file must stay in the migrations
+-- directory — deleting it leaves the remote with a migration version that has
+-- no local file ("Remote migration versions not found in local migrations
+-- directory"). It is intentionally empty: already-applied environments skip it,
+-- and fresh databases get a harmless no-op. Cleanup of the table (where it was
+-- ever created) lives in 20260601120000_drop_users_banned.sql.
