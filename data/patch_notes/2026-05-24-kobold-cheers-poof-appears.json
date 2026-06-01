@@ -10,14 +10,14 @@
       "heading": "Synergy Changes",
       "entries": [
         {
-          "kind": "change",
+          "kind": "nerf",
           "name": "Kobold - Divided We Stand",
           "detail": "Reworked from (1)(2)(3) to (2)(4)",
           "entity_type": "synergy",
           "entity_slug": "kobold"
         },
         {
-          "kind": "added",
+          "kind": "buff",
           "name": "Monk - Drunken Stagger",
           "detail": "(6) Added",
           "entity_type": "synergy",
@@ -50,7 +50,7 @@
           "entity_slug": "phoenix"
         },
         {
-          "kind": "nerf",
+          "kind": "change",
           "name": "Nyx Assassin - Spiked Carapace",
           "detail": "CD balanced from 8/7/5s to 6/6/6s, stun duration decreased from 1.5/2.5/3.5s to 1/2/3s",
           "entity_type": "unit",
@@ -69,14 +69,14 @@
           "entity_slug": "kobold-cup"
         },
         {
-          "kind": "nerf",
+          "kind": "change",
           "name": "Drum of Endurance",
           "detail": "Downgraded from T3 to T2.",
           "entity_type": "item",
           "entity_slug": "drum-of-endurance"
         },
         {
-          "kind": "nerf",
+          "kind": "change",
           "name": "Princes Knife",
           "detail": "Downgraded from T2 to T1.",
           "entity_type": "item",
