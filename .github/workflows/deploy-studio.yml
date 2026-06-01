@@ -1,0 +1,57 @@
+name: Deploy Sanity Studio
+
+# Redeploys the hosted Studio (trackautochess.sanity.studio) whenever the CMS
+# code changes on main — so new schema fields (e.g. patch-entry commentary)
+# show up for editors without anyone running `pnpm deploy` by hand.
+#
+# Requires a repo secret SANITY_DEPLOY_TOKEN with "Deploy Studio" scope, created
+# at https://www.sanity.io/manage/project/<PROJECT_ID>/api#tokens
+on:
+  push:
+    branches: [main]
+    paths: ["cms/**"]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-studio
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: cms
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Deploy Studio
+        env:
+          # CLI auth for non-interactive `sanity deploy`. SANITY_AUTH_TOKEN is
+          # the env var the Sanity CLI reads; the secret holding it is the
+          # dedicated "Sanity Deploy Token" (Deploy Studio scope).
+          SANITY_AUTH_TOKEN: ${{ secrets.SANITY_DEPLOY_TOKEN }}
+          # Baked into the Studio bundle at build time. The SANITY_STUDIO_*
+          # prefixed vars are the ones exposed to the browser bundle (Vite).
+          SANITY_PROJECT_ID: ${{ secrets.SANITY_PROJECT_ID }}
+          SANITY_STUDIO_PROJECT_ID: ${{ secrets.SANITY_PROJECT_ID }}
+          SANITY_DATASET: production
+          SANITY_STUDIO_DATASET: production
+          # Presentation live-preview targets production, not localhost.
+          SANITY_STUDIO_PREVIEW_ORIGIN: https://trackautochess.com
+        run: pnpm deploy
