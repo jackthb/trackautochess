@@ -109,7 +109,7 @@
           "evidence": [
             {
               "source": "vpk",
-              "detail": "`scripts/vscripts/addon_game_mode.lua` (home-win loot handler): at the (6) tier the gold drop is gated by `prob = (hero:GetLevel()-5)*0.25`, then `if RandomFloat(0,1) < prob` grants `item_jixiezhixin_gold`, else `item_jixiezhixin`. `hero:GetLevel()` is the courier level."
+              "detail": "`scripts/vscripts/addon_game_mode.lua` (home-win loot handler): at the (6) tier the drop is gated by `prob = (hero:GetLevel()-5)*0.25`, then `if RandomFloat(0,1) < prob` grants `item_jixiezhixin_gold`, else `item_jixiezhixin`. `hero:GetLevel()` is the courier level."
             }
           ]
         }
