@@ -116,6 +116,12 @@
 .evidenceDetail {
   flex: 1 1 auto;
   min-width: 0;
+  /* Evidence details quote raw file paths / identifiers like
+     scripts/vscripts/addon_game_mode.lua and item_jixiezhixin_gold — long
+     unbreakable tokens that otherwise overflow the callout and force the whole
+     card to scroll sideways on narrow screens. Let them break anywhere. */
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .evidenceLink {

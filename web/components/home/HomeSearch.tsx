@@ -1,8 +1,11 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect, useState } from "react";
+import type { User } from "@supabase/supabase-js";
 import { ProfileSearch } from "@/components/ProfileSearch";
 import { SteamSignInButton } from "@/components/SteamSignInButton";
+import { createSupabaseClient } from "@/lib/supabase";
 import { type SearchResult } from "@/lib/playerSearch";
 
 export interface HomeProps {
@@ -14,15 +17,40 @@ const t = {
     "Look up Dota Auto Chess player MMR, season history, and tracked match stats by Steam vanity URL or Steam ID.",
   tagline:
     "Search any Steam profile to surface Auto Chess MMR, rank, season history.",
-  pasteLabel: "Paste a Steam profile URL or SteamID64",
   exampleLabel: "Example:",
   placeholder: "Steam profile URL or SteamID64",
   signinDivider: "or",
+  viewProfile: "View your profile",
 };
 
 export default function HomeSearch({ initialSearchResults }: HomeProps) {
   const exampleSteamUrl =
     "https://steamcommunity.com/profiles/76561198022169086";
+
+  // Mirror the nav's auth check (AppNavBar): once we know the visitor is signed
+  // in, the hero's "Sign in through Steam" CTA is wrong — swap it for a link to
+  // their own profile. Gate on `authReady` so logged-in users never flash the
+  // sign-in button first.
+  const [user, setUser] = useState<User | null>(null);
+  const [authReady, setAuthReady] = useState(false);
+
+  useEffect(() => {
+    const supabase = createSupabaseClient();
+    if (!supabase) {
+      setAuthReady(true);
+      return;
+    }
+    supabase.auth.getUser().then(({ data }) => {
+      setUser(data.user ?? null);
+      setAuthReady(true);
+    });
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+    });
+    return () => subscription.unsubscribe();
+  }, []);
 
   return (
     <>
@@ -251,6 +279,28 @@ export default function HomeSearch({ initialSearchResults }: HomeProps) {
           color: var(--text-secondary);
           text-transform: uppercase;
         }
+        .profile-cta {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          height: 44px;
+          padding: 0 26px;
+          font-family: var(--font-mono);
+          font-size: 14px;
+          letter-spacing: 0.5px;
+          color: var(--text-primary);
+          background: var(--bg-surface);
+          border: 1px solid var(--border);
+          border-radius: var(--r-3);
+          text-decoration: none;
+          transition: border-color 0.15s ease, background 0.15s ease,
+            color 0.15s ease;
+        }
+        .profile-cta:hover {
+          border-color: var(--accent-dim);
+          background: var(--bg-elevated);
+          color: var(--accent);
+        }
         .preview {
           position: relative;
           z-index: 1;
@@ -354,7 +404,6 @@ export default function HomeSearch({ initialSearchResults }: HomeProps) {
 
             <div className="search-wrap">
               <div className="search-guidance">
-                <div className="search-guidance-label">{t.pasteLabel}</div>
                 <div className="search-example">
                   {t.exampleLabel} <span>{exampleSteamUrl}</span>
                 </div>
@@ -366,12 +415,20 @@ export default function HomeSearch({ initialSearchResults }: HomeProps) {
               />
             </div>
 
-            <div className="signin-cta">
-              <div className="signin-divider">
-                <span>{t.signinDivider}</span>
+            {authReady && (
+              <div className="signin-cta">
+                <div className="signin-divider">
+                  <span>{t.signinDivider}</span>
+                </div>
+                {user ? (
+                  <Link href="/dashboard" className="profile-cta">
+                    {t.viewProfile}
+                  </Link>
+                ) : (
+                  <SteamSignInButton source="home_hero" size="md" />
+                )}
               </div>
-              <SteamSignInButton source="home_hero" size="md" />
-            </div>
+            )}
           </main>
         </div>
       </div>
