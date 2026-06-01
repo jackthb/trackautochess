@@ -1,0 +1,60 @@
+/* Ported verbatim from the styled-jsx block in the former pages/privacy.tsx.
+   Element selectors are nested under .container so CSS-module scoping applies
+   to them (bare tag selectors would otherwise leak global). */
+.page {
+  position: relative;
+  z-index: 1;
+  min-height: calc(100vh - var(--nav-height));
+}
+.container {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 56px 32px 84px;
+}
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: var(--fs-12);
+  letter-spacing: var(--tr-upper-wide);
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 14px;
+}
+.container h1 {
+  font-family: var(--font-display);
+  font-size: var(--fs-32);
+  line-height: 1.15;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+}
+.updated {
+  font-family: var(--font-mono);
+  font-size: var(--fs-12);
+  letter-spacing: var(--tr-upper);
+  text-transform: uppercase;
+  color: var(--text-muted);
+  margin-bottom: 32px;
+}
+.container h2 {
+  font-family: var(--font-mono);
+  font-size: var(--fs-13);
+  letter-spacing: var(--tr-upper-wide);
+  text-transform: uppercase;
+  color: var(--text-primary);
+  margin-top: 28px;
+  margin-bottom: 12px;
+}
+.container p {
+  color: var(--text-secondary);
+  font-size: var(--fs-15);
+  line-height: var(--lh-relaxed);
+  margin-bottom: 14px;
+}
+.container a {
+  color: var(--accent-dim);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  transition: color var(--t-base) var(--t-easing);
+}
+.container a:hover {
+  color: var(--accent);
+}

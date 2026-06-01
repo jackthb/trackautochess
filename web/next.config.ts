@@ -71,6 +71,25 @@ const nextConfig: NextConfig = {
       },
     ];
   },
+  // /privacy moved to the App Router, which doesn't use the i18n config above,
+  // so it has no locale-prefixed variants. Redirect the old localized URLs
+  // (which served identical English content) to the canonical path.
+  async redirects() {
+    return [
+      {
+        source: "/ru/privacy",
+        destination: "/privacy",
+        locale: false,
+        permanent: true,
+      },
+      {
+        source: "/zh/privacy",
+        destination: "/privacy",
+        locale: false,
+        permanent: true,
+      },
+    ];
+  },
   skipTrailingSlashRedirect: true,
 };
 
