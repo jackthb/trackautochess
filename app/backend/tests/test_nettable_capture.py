@@ -21,7 +21,7 @@ import pytest
 BACKEND_DIR = Path(__file__).parent.parent
 sys.path.insert(0, str(BACKEND_DIR))
 
-from nettable_capture import extract_rows, normalize_allow  # noqa: E402
+from nettable_capture import NetTableCapture, extract_rows, normalize_allow  # noqa: E402
 
 
 # ── tiny VBKV builders (duplicated from test_nettable_parser to keep the
@@ -199,3 +199,57 @@ def test_extract_rows_row_shape(tmp_path):
 def test_extract_rows_empty_log(tmp_path):
     log_path = _write_log(tmp_path, "")
     assert extract_rows(log_path) == []
+
+
+# ── _last_match_dumps: segment buffered dumps into matches, keep the latest ──
+#
+# This is the fallback used when GAME_IN_PROGRESS was missed (app started
+# mid-game). The old break-on-first-increase scan could truncate a full game
+# to a single round; these lock in that it doesn't.
+
+
+def _round_dump(round_n: int | None) -> dict:
+    """A minimal dump carrying just a round_info row (or none)."""
+    rows = []
+    if round_n is not None:
+        rows = [{
+            "table_name": "CustomNetTable_game_info",
+            "key": "round_info",
+            "raw": {"round": round_n},
+        }]
+    return {"rows": rows}
+
+
+def _dumps(rounds: list[int | None]) -> list[tuple]:
+    return [(float(i), _round_dump(r)) for i, r in enumerate(rounds)]
+
+
+def _rounds_of(dumps: list[tuple]) -> list[int | None]:
+    return [NetTableCapture._extract_round_from_rows(d["rows"]) for _, d in dumps]
+
+
+def test_last_match_dumps_single_match_kept_whole():
+    dumps = _dumps([1, 1, 2, 3, 4, 5])
+    assert NetTableCapture._last_match_dumps(dumps) == dumps
+
+
+def test_last_match_dumps_keeps_only_latest_match():
+    # Two matches buffered: 1..5 then a fresh game restarting at 1.
+    dumps = _dumps([1, 2, 3, 4, 5, 1, 2, 3])
+    assert _rounds_of(NetTableCapture._last_match_dumps(dumps)) == [1, 2, 3]
+
+
+def test_last_match_dumps_tolerates_noise_no_collapse():
+    # A single stale/out-of-order low reading mid-match must NOT split the
+    # timeline — this is the exact failure that produced 1-round timelines.
+    dumps = _dumps([10, 11, 12, 11, 13, 14])
+    assert NetTableCapture._last_match_dumps(dumps) == dumps
+
+
+def test_last_match_dumps_none_rounds_attach_to_open_segment():
+    dumps = _dumps([1, None, 2, None, 3])
+    assert NetTableCapture._last_match_dumps(dumps) == dumps
+
+
+def test_last_match_dumps_empty():
+    assert NetTableCapture._last_match_dumps([]) == []

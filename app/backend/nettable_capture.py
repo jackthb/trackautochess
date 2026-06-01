@@ -998,8 +998,11 @@ POLL_INTERVAL_SEC = 2.0
 # unit + player_id + chess_pool + game_info). Heavier — gives a complete
 # state snapshot.
 FULL_CASCADE_INTERVAL_SEC = 15.0
-# chess_pool_table (bans, legendaries, relic pool) on a slower cadence.
-POOL_DUMP_INTERVAL_SEC = 300.0
+# chess_pool_table (bans, legendaries, relic pool) on a slower cadence than the
+# full cascade, but not so slow that newly-revealed legendaries take minutes to
+# surface in the live view. 60s keeps it cheap (one extra key/min) while staying
+# responsive.
+POOL_DUMP_INTERVAL_SEC = 60.0
 # Gap between individual keys in the cascade. dumpstringtable produces
 # hundreds of console lines per call; firing too fast can drop output.
 CASCADE_KEY_GAP_SEC = 0.2
@@ -2182,23 +2185,13 @@ class NetTableCapture:
         if session_start is not None:
             in_session = [(ts, d) for ts, d in all_dumps if ts >= session_start - 1.0]
         else:
-            # Walk backwards. Each in-match dump should have a round
-            # number >= the previous one (rounds go up). Stop when we
-            # see a drop (= previous match's later round -> end_board's
-            # match's earlier round transition).
-            reversed_dumps = list(reversed(all_dumps))
-            in_session = []
-            prev_round = None
-            for ts, d in reversed_dumps:
-                round_n = self._extract_round_from_rows(d.get("rows") or [])
-                if round_n is None:
-                    in_session.append((ts, d))
-                    continue
-                if prev_round is not None and round_n > prev_round:
-                    break
-                prev_round = round_n
-                in_session.append((ts, d))
-            in_session = sorted(in_session)
+            # GAME_IN_PROGRESS was missed (app likely started mid-game), so
+            # there's no clean lower bound. Segment all buffered dumps into
+            # matches and keep the most recent one. _last_match_dumps tolerates
+            # a noisy single-round reading; the old break-on-first-increase walk
+            # did not, so one stale round truncated the timeline to a single
+            # round (the 1-round-timeline bug).
+            in_session = self._last_match_dumps(all_dumps)
         if not in_session:
             log.info("nettable: no in-session dumps to build timeline from")
             return
@@ -2293,6 +2286,40 @@ class NetTableCapture:
                     except (TypeError, ValueError):
                         return None
         return None
+
+    # A round number only ever climbs within a single match, so a sustained
+    # drop marks a match boundary. Allow a few rounds of slack so one stale or
+    # out-of-order reading from the live cascade doesn't look like a new match.
+    _ROUND_DROP_TOLERANCE = 3
+
+    @classmethod
+    def _last_match_dumps(cls, all_dumps: list[tuple]) -> list[tuple]:
+        """From chronological (ts, dump) pairs that may span several matches,
+        return only the most recent match's dumps.
+
+        Splits the stream wherever the round number drops by more than
+        _ROUND_DROP_TOLERANCE (a new match starting over at a low round) and
+        keeps the last segment. Dumps with no round_info attach to whatever
+        segment is currently open. Robust to a single noisy round reading,
+        unlike a break-on-first-increase scan."""
+        segments: list[list[tuple]] = []
+        current: list[tuple] = []
+        last_round: int | None = None
+        for ts, d in all_dumps:
+            round_n = cls._extract_round_from_rows(d.get("rows") or [])
+            if (
+                round_n is not None
+                and last_round is not None
+                and round_n < last_round - cls._ROUND_DROP_TOLERANCE
+            ):
+                segments.append(current)
+                current = []
+            current.append((ts, d))
+            if round_n is not None:
+                last_round = round_n
+        if current:
+            segments.append(current)
+        return segments[-1] if segments else []
 
     @staticmethod
     def _extract_players_state_from_rows(rows: list[dict]) -> dict:
