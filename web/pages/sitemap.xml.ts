@@ -5,7 +5,6 @@ import { getAllRelics } from "@/lib/relics";
 import { getAllUnits } from "@/lib/units";
 import { getAllSynergies } from "@/lib/synergies";
 import { getRequestSiteUrl, getSiteUrl } from "@/lib/site";
-import { HREFLANG, LOCALES, localePath } from "@/lib/i18n";
 
 interface IndexPatch {
   date: string;
@@ -30,34 +29,17 @@ function escapeXml(value: string): string {
 }
 
 function renderSitemap(siteUrl: string, entries: SitemapEntry[]): string {
-  const urls: string[] = [];
-  for (const entry of entries) {
+  // Single (English) locale since i18n routing was removed — one <url> per
+  // entry, no hreflang alternates.
+  const urls = entries.map((entry) => {
     const lastmod = entry.lastmod
       ? `<lastmod>${entry.lastmod}</lastmod>`
       : "";
-    if (entry.localized === false) {
-      urls.push(
-        `<url><loc>${escapeXml(`${siteUrl}${entry.path}`)}</loc>${lastmod}</url>`,
-      );
-      continue;
-    }
-    // One <url> per locale variant, each carrying the full set of
-    // xhtml:link alternates so any can be the entry point a crawler picks.
-    for (const loc of LOCALES) {
-      const href = `${siteUrl}${localePath(loc, entry.path)}`;
-      const alts = LOCALES.map((alt) => {
-        const altHref = `${siteUrl}${localePath(alt, entry.path)}`;
-        return `<xhtml:link rel="alternate" hreflang="${HREFLANG[alt]}" href="${escapeXml(altHref)}" />`;
-      });
-      const xDefault = `<xhtml:link rel="alternate" hreflang="x-default" href="${escapeXml(`${siteUrl}${entry.path}`)}" />`;
-      urls.push(
-        `<url><loc>${escapeXml(href)}</loc>${lastmod}${alts.join("")}${xDefault}</url>`,
-      );
-    }
-  }
+    return `<url><loc>${escapeXml(`${siteUrl}${entry.path}`)}</loc>${lastmod}</url>`;
+  });
   return (
     `<?xml version="1.0" encoding="UTF-8"?>` +
-    `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">${urls.join("")}</urlset>`
+    `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${urls.join("")}</urlset>`
   );
 }
 

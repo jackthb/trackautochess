@@ -8,14 +8,10 @@ const nextConfig: NextConfig = {
   turbopack: {
     root: path.resolve(__dirname, ".."),
   },
-  i18n: {
-    locales: ["en", "ru", "zh"],
-    defaultLocale: "en",
-    // Don't auto-redirect users based on Accept-Language. Canonical URLs
-    // stay stable for crawlers, and visitors discover other languages via
-    // the switcher / hreflang alternates.
-    localeDetection: false,
-  },
+  // i18n routing was removed (en/ru/zh; ~3.4% of traffic, little translated
+  // content). The site now serves a single English locale; localization will
+  // be rebuilt on the App Router via next-intl when there's a reason to. The
+  // /ru/* and /zh/* redirects below preserve link equity for the old URLs.
   async headers() {
     const immutableAssetCache = [
       {
@@ -71,23 +67,13 @@ const nextConfig: NextConfig = {
       },
     ];
   },
-  // /privacy moved to the App Router, which doesn't use the i18n config above,
-  // so it has no locale-prefixed variants. Redirect the old localized URLs
-  // (which served identical English content) to the canonical path.
+  // The old locale-prefixed URLs now redirect to their English equivalents so
+  // existing links and indexed pages don't 404. Covers /ru/privacy -> /privacy
+  // (App Router) and e.g. /ru/units/abaddon -> /units/abaddon (Pages Router).
   async redirects() {
     return [
-      {
-        source: "/ru/privacy",
-        destination: "/privacy",
-        locale: false,
-        permanent: true,
-      },
-      {
-        source: "/zh/privacy",
-        destination: "/privacy",
-        locale: false,
-        permanent: true,
-      },
+      { source: "/ru/:path*", destination: "/:path*", permanent: true },
+      { source: "/zh/:path*", destination: "/:path*", permanent: true },
     ];
   },
   skipTrailingSlashRedirect: true,

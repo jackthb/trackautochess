@@ -1,12 +1,6 @@
 import Head from "next/head";
 import { absoluteUrl, SITE_NAME } from "@/lib/site";
-import {
-  DEFAULT_LOCALE,
-  HREFLANG,
-  LOCALES,
-  localePath,
-  type Locale,
-} from "@/lib/i18n";
+import { DEFAULT_LOCALE, type Locale } from "@/lib/i18n";
 
 interface SeoHeadProps {
   title: string;
@@ -54,8 +48,7 @@ export function SeoHead({
   // the unprefixed URL regardless of which locale URL the visitor used —
   // so /ru/patch-notes/x and /patch-notes/x both canonicalize to the
   // unprefixed path. Localized pages canonicalize to their own locale.
-  const canonical =
-    canonicalUrl ?? absoluteUrl(localized ? localePath(locale, path) : path);
+  const canonical = canonicalUrl ?? absoluteUrl(path);
   const image = imageUrl ?? (imagePath ? absoluteUrl(imagePath) : null);
   const robots = noindex
     ? "noindex, nofollow"
@@ -66,16 +59,12 @@ export function SeoHead({
       ? [structuredData]
       : [];
 
-  // Per Google's hreflang spec, every locale variant — including the page's
-  // own — should be enumerated, plus an `x-default` pointing at the
-  // unprefixed canonical so Google has a fallback for unmatched languages.
-  const alternates = localized
-    ? LOCALES.map((loc) => ({
-        hreflang: HREFLANG[loc],
-        href: absoluteUrl(localePath(loc, path)),
-      })).filter((a) => Boolean(a.href))
-    : [];
-  const xDefault = localized ? absoluteUrl(path) : null;
+  // i18n routing was removed; the site serves a single (English) locale, so no
+  // hreflang alternates are emitted. The `locale`/`localized` props are kept on
+  // the signature for call-site compatibility until pages are revisited.
+  const alternates: Array<{ hreflang: string; href: string | null }> = [];
+  const xDefault: string | null = null;
+  void localized;
 
   return (
     <Head>
