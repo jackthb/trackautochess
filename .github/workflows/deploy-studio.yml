@@ -54,4 +54,6 @@ jobs:
           SANITY_STUDIO_DATASET: production
           # Presentation live-preview targets production, not localhost.
           SANITY_STUDIO_PREVIEW_ORIGIN: https://trackautochess.com
-        run: pnpm deploy
+        # `pnpm deploy` is a pnpm built-in (workspace deploy); `pnpm run deploy`
+        # invokes the package.json script that calls `sanity deploy`.
+        run: pnpm run deploy
