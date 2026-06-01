@@ -12,6 +12,12 @@
 
 DROP TABLE IF EXISTS banned_ips;
 
+-- The trigram GIN indexes recreated below use gin_trgm_ops, which comes from
+-- pg_trgm. 20260513120000 installs it, but don't assume that migration has run
+-- (preview branches diverge / extensions can be dropped) — guard it here too so
+-- this migration is self-contained. IF NOT EXISTS makes it a no-op when present.
+CREATE EXTENSION IF NOT EXISTS pg_trgm;
+
 -- Drop the partial indexes that referenced banned, then the column.
 DROP INDEX IF EXISTS users_public_default_search_idx;
 DROP INDEX IF EXISTS users_public_custom_url_idx;
