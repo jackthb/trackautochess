@@ -104,7 +104,14 @@
           "name": "(6) Mechs",
           "detail": "Chances to upgrade into gold heart, and the chance rises with your courier level",
           "entity_type": "synergy",
-          "entity_slug": "mech"
+          "entity_slug": "mech",
+          "commentary": "At **(6) Inventors**, winning a home round no longer *guarantees* the Golden Heart of the Machine — it's now a roll, and the odds scale with your **courier level**:\n\n| Courier level | Gold Heart chance |\n|---|---|\n| ≤ 5 | 0% |\n| 6 | 25% |\n| 7 | 50% |\n| 8 | 75% |\n| 9+ | Guaranteed |\n\nOn a failed roll you still get the normal **Heart of the Machine** (a free reroll). In practice the Legendary-Discover payoff is now a *high-courier-level* reward — at courier level 6 it lands only a quarter of the time, and you don't see it for certain until level 9.",
+          "evidence": [
+            {
+              "source": "vpk",
+              "detail": "`scripts/vscripts/addon_game_mode.lua` (home-win loot handler): at the (6) tier the gold drop is gated by `prob = (hero:GetLevel()-5)*0.25`, then `if RandomFloat(0,1) < prob` grants `item_jixiezhixin_gold`, else `item_jixiezhixin`. `hero:GetLevel()` is the courier level."
+            }
+          ]
         }
       ]
     }
