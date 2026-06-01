@@ -6,6 +6,7 @@ import { SITE_NAME } from "@/lib/site";
 import { isAdminSteamId } from "@/lib/admin";
 import { trackEvent } from "@/lib/analytics";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { SteamSignInButton } from "@/components/SteamSignInButton";
 import styles from "./NavBar.module.css";
 
 interface NavBarProps {
@@ -27,7 +28,6 @@ const t = {
   matches: "Matches",
   patchNotes: "Patch Notes",
   signOut: "Sign out",
-  signIn: "Sign in with Steam",
   placeholderName: "Steam Player Name",
   home: (n: string) => `${n} home`,
   fallbackPlayer: "Player",
@@ -208,15 +208,7 @@ export function NavBar({ supabase }: NavBarProps) {
                 </button>
               </>
             ) : (
-              <a
-                href="/api/auth/steam"
-                className={styles.navSignin}
-                onClick={() =>
-                  trackEvent("Steam Sign In Clicked", { source: "nav" })
-                }
-              >
-                {t.signIn}
-              </a>
+              <SteamSignInButton source="nav" size="sm" />
             )
           ) : supabase ? (
             <div className={styles.navAuthPlaceholder} aria-hidden="true">

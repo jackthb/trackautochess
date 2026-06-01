@@ -158,19 +158,6 @@
   border-color: var(--text-muted);
 }
 
-.navSignin {
-  font-family: var(--font-mono);
-  font-size: 13px;
-  color: var(--text-secondary);
-  letter-spacing: 0.5px;
-  text-decoration: none;
-  transition: color 0.15s;
-}
-
-.navSignin:hover {
-  color: var(--text-primary);
-}
-
 .navHamburger {
   display: none;
   align-items: center;
@@ -292,7 +279,6 @@
     display: none;
   }
 
-  .navSignin,
   .navBtn {
     font-size: 11px;
     padding: 6px 10px;

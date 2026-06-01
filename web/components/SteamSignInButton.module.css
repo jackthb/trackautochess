@@ -1,0 +1,65 @@
+/* Mirrors Valve's "Sign in through Steam" button so visitors recognise the
+   real thing: Steam's dark brand fill at rest, the bright blue Steam CTA
+   gradient on hover. */
+.button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border-radius: 4px;
+  border: 1px solid #2a475e;
+  background: linear-gradient(90deg, #171a21 0%, #1b2838 100%);
+  color: #c7d5e0;
+  font-family: var(--font-mono);
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background 0.15s ease, border-color 0.15s ease,
+    color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.button:hover {
+  background: linear-gradient(90deg, #06bfff 0%, #2d73ff 100%);
+  border-color: transparent;
+  color: #ffffff;
+  box-shadow: 0 0 0 1px rgba(102, 192, 244, 0.35);
+}
+
+.logo {
+  flex-shrink: 0;
+}
+
+.brand {
+  font-weight: 700;
+  color: #ffffff;
+}
+
+/* Hero call to action. */
+.md {
+  height: 42px;
+  padding: 0 20px;
+  font-size: 14px;
+  letter-spacing: 0.4px;
+}
+.md .logo {
+  width: 19px;
+  height: 19px;
+}
+
+/* Compact nav chrome. */
+.sm {
+  height: 32px;
+  padding: 0 12px;
+  font-size: 12px;
+  letter-spacing: 0.3px;
+}
+.sm .logo {
+  width: 16px;
+  height: 16px;
+}
+
+@media (max-width: 620px) {
+  .sm {
+    height: 30px;
+    padding: 0 10px;
+    font-size: 11px;
+  }
+}

@@ -3,6 +3,7 @@ import type { GetStaticProps } from "next";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { ProfileSearch } from "@/components/ProfileSearch";
+import { SteamSignInButton } from "@/components/SteamSignInButton";
 import {
   getDefaultPlayerSearchResults,
   type SearchResult,
@@ -23,6 +24,8 @@ const t = {
   pasteLabel: "Paste a Steam profile URL or SteamID64",
   exampleLabel: "Example:",
   placeholder: "Steam profile URL or SteamID64",
+  signinDivider: "or",
+  signinNote: "Sign in",
   snapshot: "Player Snapshot",
   currentSeason: "Current season",
   liveLabel: "Live MMR and rank bracket",
@@ -276,6 +279,40 @@ export default function Home({ initialSearchResults }: HomeProps) {
         .search-example span {
           color: var(--gold);
         }
+        .signin-cta {
+          width: min(100%, 560px);
+          margin-top: 22px;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          opacity: 0;
+          animation: arrive 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.72s forwards;
+        }
+        .signin-divider {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          width: 100%;
+          margin-bottom: 18px;
+          color: var(--text-muted);
+          font-size: 11px;
+          letter-spacing: 1.5px;
+          text-transform: uppercase;
+        }
+        .signin-divider::before,
+        .signin-divider::after {
+          content: "";
+          flex: 1;
+          height: 1px;
+          background: var(--border-subtle);
+        }
+        .signin-note {
+          margin-bottom: 14px;
+          font-size: 12px;
+          letter-spacing: 0.8px;
+          color: var(--text-secondary);
+          text-transform: uppercase;
+        }
         .preview {
           position: relative;
           z-index: 1;
@@ -390,6 +427,14 @@ export default function Home({ initialSearchResults }: HomeProps) {
                 analyticsSource="home_hero"
                 placeholder={t.placeholder}
               />
+            </div>
+
+            <div className="signin-cta">
+              <div className="signin-divider">
+                <span>{t.signinDivider}</span>
+              </div>
+              <p className="signin-note">{t.signinNote}</p>
+              <SteamSignInButton source="home_hero" size="md" />
             </div>
 
             <div className="preview" aria-hidden="true">
