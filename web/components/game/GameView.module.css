@@ -1,0 +1,491 @@
+/* Ported verbatim from the styled-jsx blocks in GameView.tsx. Values are
+   unchanged from the original `<style jsx>` / `<style jsx global>` blocks.
+
+   :global(...) is used for classes that originate in the shared stylesheet
+   (shared/components.css): .unit-icon-wrap, .unit-icon, .syn-icon, .syn-count
+   — these base classes are applied by GameView's JSX but their rules live in
+   the shared global sheet, so the compound/descendant selectors here must
+   reach them globally. The local class (.mpUnit / .pdUnit / .pdSynBadge) is
+   still applied alongside, preserving the original .a.b / .a .b semantics. */
+
+.page {
+  position: relative;
+  z-index: 1;
+  min-height: calc(100vh - var(--nav-height));
+}
+.container {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 32px 24px 80px;
+}
+
+/* ── Match meta strip ──────────────────────────── */
+.matchMeta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 12px;
+  letter-spacing: 0.4px;
+  color: var(--text-muted);
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+.matchMeta strong {
+  color: var(--text-secondary);
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  font-size: 11px;
+}
+.matchMeta .sep {
+  opacity: 0.5;
+}
+
+/* ── Screenshot banner ─────────────────────────── */
+.screenshotBanner {
+  border: 1px solid var(--border);
+  border-radius: var(--r-8);
+  overflow: hidden;
+  background: var(--bg-deep);
+  margin-bottom: 24px;
+}
+.screenshotBanner img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* ── Round scrubber ────────────────────────────── */
+.roundScrubber {
+  border: 1px solid var(--border);
+  border-radius: var(--r-8);
+  background: var(--bg-surface);
+  padding: 14px 20px 12px;
+  margin-bottom: 16px;
+}
+.rsHeader {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+.rsLabel {
+  letter-spacing: 1.6px;
+  text-transform: uppercase;
+  font-weight: 600;
+  color: var(--text-secondary);
+  font-size: 10px;
+}
+.rsValue {
+  font-family: var(--font-display);
+  color: var(--text-primary);
+  font-size: 18px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  margin-left: 4px;
+}
+.rsMeta {
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}
+.rsJumpEnd {
+  margin-left: auto;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-subtle);
+  color: var(--text-secondary);
+  font-size: 11px;
+  letter-spacing: 0.6px;
+  padding: 4px 10px;
+  border-radius: var(--r-3);
+  cursor: pointer;
+  transition: color var(--t-base) var(--t-easing);
+}
+.rsJumpEnd:hover {
+  color: var(--text-primary);
+}
+.rsRange {
+  width: 100%;
+  margin: 10px 0 4px;
+  accent-color: var(--accent);
+}
+.rsEnds {
+  display: flex;
+  justify-content: space-between;
+  font-size: 10px;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.4px;
+}
+
+/* ── Players table ─────────────────────────────── */
+.matchSection {
+  border: 1px solid var(--border);
+  border-radius: var(--r-8);
+  background: var(--bg-surface);
+  overflow: hidden;
+}
+.matchSectionHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 24px;
+  border-bottom: 1px solid var(--border-subtle);
+  background: rgba(0, 0, 0, 0.12);
+}
+.matchSectionHeader h3 {
+  margin: 0;
+  font-size: 12px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.sectionBar {
+  display: inline-block;
+  width: 3px;
+  height: 12px;
+  background: var(--accent);
+  border-radius: 2px;
+}
+.matchSectionCount {
+  font-size: 11px;
+  color: var(--text-muted);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  font-variant-numeric: tabular-nums;
+}
+
+@media (max-width: 720px) {
+  .container {
+    padding: 20px 16px 60px;
+  }
+}
+
+/* ── MatchPlayerRow / PlayerDetail (formerly `<style jsx global>`) ── */
+.matchPlayerRow {
+  border-bottom: 1px solid var(--border-subtle);
+  transition: background var(--t-base) var(--t-easing);
+  position: relative;
+}
+.matchPlayerRow:last-child {
+  border-bottom: none;
+}
+.matchPlayerRow.highlighted::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: var(--accent);
+}
+.matchPlayerRow.highlighted .mpToggle {
+  background: rgba(224, 64, 42, 0.06);
+}
+.mpToggle {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 10px 24px;
+  background: transparent;
+  border: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: background var(--t-base) var(--t-easing);
+}
+.mpToggle:hover {
+  background: var(--bg-hover);
+}
+.matchPlayerRow.expanded > .mpToggle {
+  background: var(--bg-hover);
+}
+.mpToggle.mpToggleStatic {
+  cursor: default;
+}
+.mpToggle.mpToggleStatic:hover {
+  background: transparent;
+}
+.mpPlacement {
+  font-size: 18px;
+  font-weight: 700;
+  font-family: var(--font-display);
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid;
+  border-radius: var(--r-3);
+  flex-shrink: 0;
+}
+.mpInfo {
+  width: 150px;
+  flex-shrink: 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.mpNameRow {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+}
+.mpName {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-primary);
+  text-decoration: none;
+  transition: color var(--t-base) var(--t-easing);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
+}
+.mpName:hover {
+  color: #fff;
+}
+.mpNameUnknown {
+  color: var(--text-muted);
+  font-style: italic;
+}
+.mpRank {
+  align-self: flex-start;
+  font-size: 10px;
+  color: var(--text-secondary);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--r-2);
+  padding: 1px 6px;
+  letter-spacing: 0.4px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+.mpColStats {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  width: 112px;
+  flex-shrink: 0;
+}
+.mpStat {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 3px;
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+.mpStatLabel {
+  font-size: 9px;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+.mpWlSep {
+  color: var(--text-muted);
+  margin: 0 2px;
+  opacity: 0.5;
+}
+.mpHp {
+  font-size: 11px;
+  color: var(--text-secondary);
+  letter-spacing: 0.4px;
+  font-variant-numeric: tabular-nums;
+}
+.mpGold {
+  font-size: 11px;
+  color: #c9a84c;
+  letter-spacing: 0.4px;
+  font-variant-numeric: tabular-nums;
+}
+.mpRoundResult {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.6px;
+}
+.mpRoundW {
+  color: var(--green-bright, #4ebf72);
+}
+.mpRoundL {
+  color: var(--red-bright, #e35d5b);
+}
+.mpRoundOut {
+  color: var(--red-bright, #e35d5b);
+  opacity: 0.65;
+  font-size: 11px;
+}
+.wlW {
+  color: var(--green-bright);
+}
+.wlL {
+  color: var(--red-bright);
+}
+.mpColLineup {
+  flex: 1;
+  min-width: 0;
+}
+/* Single horizontal line of units — no wrapping. Synergies and relics
+   now live in the expand panel so the lineup gets the full width and
+   the icons can be larger. overflow:hidden guards against the rare
+   over-full board pushing the caret off-row. */
+.mpLineup {
+  display: flex;
+  gap: 4px;
+  flex-wrap: nowrap;
+  align-items: center;
+  overflow: hidden;
+}
+/* Resize wrap + icon together; the global .unit-icon-wrap is 28x28, so
+   growing only the icon would overflow the wrap and overlap neighbours. */
+.mpUnit:global(.unit-icon-wrap) {
+  width: 36px;
+  height: 36px;
+}
+.mpUnit :global(.unit-icon) {
+  width: 36px;
+  height: 36px;
+}
+.mpCaret {
+  flex-shrink: 0;
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
+  font-size: 16px;
+  font-weight: 600;
+  font-family: var(--font-display);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--r-2);
+  background: var(--bg-elevated);
+  transition: color var(--t-base) var(--t-easing);
+}
+.mpToggle:hover .mpCaret {
+  color: var(--text-secondary);
+}
+
+/* ── Expanded player detail ────────────────────── */
+.playerDetail {
+  padding: 18px 24px 24px 76px;
+  background: rgba(0, 0, 0, 0.18);
+  border-top: 1px solid var(--border-subtle);
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+.pdLiveStats {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+.pdSection {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.pdLabel {
+  font-size: 10px;
+  letter-spacing: 1.6px;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+.pdLabelHint {
+  color: var(--text-muted);
+  font-weight: 500;
+  letter-spacing: 0.8px;
+  text-transform: none;
+}
+.pdLineup {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+/* Resize both the wrap and the icon together — the global
+   .unit-icon-wrap is fixed at 28x28, so growing only the icon
+   would overflow the wrap and overlap neighbouring units. */
+.pdUnit:global(.unit-icon-wrap) {
+  width: 40px;
+  height: 40px;
+}
+.pdUnit :global(.unit-icon) {
+  width: 40px;
+  height: 40px;
+}
+.pdSynergies {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.pdSynBadge :global(.syn-icon) {
+  width: 16px;
+  height: 16px;
+}
+.pdRelics {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  align-items: flex-start;
+}
+.pdRelic {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+.pdRelicIcon {
+  width: 36px !important;
+  height: 36px !important;
+}
+.pdRelicRound {
+  font-size: 10px;
+  color: var(--text-secondary);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--r-2);
+  padding: 1px 6px;
+  letter-spacing: 0.4px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+@media (max-width: 720px) {
+  .mpToggle {
+    flex-wrap: wrap;
+    padding: 10px 16px;
+    gap: 8px;
+  }
+  .mpInfo {
+    width: auto;
+    flex: 1;
+  }
+  .mpColStats {
+    width: auto;
+  }
+  .mpColLineup {
+    flex-basis: 100%;
+    order: 10;
+  }
+  /* Phones are too narrow for a full board on one line — let it wrap
+     here so no units get clipped. */
+  .mpLineup {
+    flex-wrap: wrap;
+    overflow: visible;
+  }
+  .mpCaret {
+    margin-left: auto;
+  }
+  .playerDetail {
+    padding: 16px 20px 20px 20px;
+  }
+}

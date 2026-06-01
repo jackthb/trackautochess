@@ -1,0 +1,70 @@
+.wrap {
+  margin: 0 0 24px;
+  padding: 18px 20px 14px;
+  border: 1px solid var(--border);
+  background: var(--bg-surface);
+  border-radius: var(--r-8);
+}
+.head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+.label {
+  font-family: var(--font-mono);
+  font-size: var(--fs-12);
+  letter-spacing: var(--tr-upper);
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+.meta {
+  font-family: var(--font-mono);
+  font-size: var(--fs-12);
+  color: var(--text-muted);
+}
+.meta strong {
+  color: var(--text-primary);
+}
+.chartWrap {
+  width: 100%;
+  overflow: hidden;
+}
+.svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  color: var(--accent);
+}
+.area {
+  fill: currentColor;
+  opacity: 0.08;
+}
+.line {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.5;
+}
+.dot {
+  fill: currentColor;
+  opacity: 0.6;
+}
+.dot.season {
+  opacity: 0.85;
+}
+.lastDot {
+  fill: currentColor;
+}
+.axis {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  fill: var(--text-muted);
+}
+.note {
+  margin-top: 10px;
+  font-family: var(--font-mono);
+  font-size: var(--fs-11, 11px);
+  color: var(--text-muted);
+  opacity: 0.85;
+  line-height: 1.5;
+}

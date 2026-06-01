@@ -32,6 +32,7 @@ import {
 import { absoluteUrl } from "@/lib/site";
 import { analyticsRoute, bucketCount, trackEvent } from "@/lib/analytics";
 import { resolveIconUrl } from "@/lib/icons";
+import styles from "./GameView.module.css";
 
 const UNITS_FULL = unitsFullData as Record<string, UnitFullInfo>;
 const SYNERGIES_DATA = synergiesData as Record<string, SynergyInfo>;
@@ -118,17 +119,17 @@ function PlayerDetail({
   gold: number | null;
 }) {
   return (
-    <div className="player-detail">
+    <div className={styles.playerDetail}>
       {(hp != null || gold != null) && (
-        <div className="pd-live-stats">
-          {hp != null && <span className="mp-hp">HP {hp}</span>}
-          {gold != null && <span className="mp-gold">Gold {gold}</span>}
+        <div className={styles.pdLiveStats}>
+          {hp != null && <span className={styles.mpHp}>HP {hp}</span>}
+          {gold != null && <span className={styles.mpGold}>Gold {gold}</span>}
         </div>
       )}
       {lineup.length > 0 && (
-        <div className="pd-section">
-          <div className="pd-label">Lineup</div>
-          <div className="pd-lineup">
+        <div className={styles.pdSection}>
+          <div className={styles.pdLabel}>Lineup</div>
+          <div className={styles.pdLineup}>
             {lineup.map((u, i) => (
               <TooltipWrap
                 key={i}
@@ -137,7 +138,7 @@ function PlayerDetail({
                 stars={u.stars}
                 data={tooltipData}
               >
-                <div className="unit-icon-wrap pd-unit">
+                <div className={`unit-icon-wrap ${styles.pdUnit}`}>
                   <img
                     className="unit-icon"
                     src={iconUrl("units", unitStem(u.name))}
@@ -163,9 +164,9 @@ function PlayerDetail({
       )}
 
       {synergies.length > 0 && (
-        <div className="pd-section">
-          <div className="pd-label">Synergies</div>
-          <div className="pd-synergies">
+        <div className={styles.pdSection}>
+          <div className={styles.pdLabel}>Synergies</div>
+          <div className={styles.pdSynergies}>
             {synergies.map((s, i) => (
               <TooltipWrap
                 key={i}
@@ -174,7 +175,7 @@ function PlayerDetail({
                 count={s.count}
                 data={tooltipData}
               >
-                <div className="syn-badge pd-syn-badge">
+                <div className={`syn-badge ${styles.pdSynBadge}`}>
                   <img
                     className="syn-icon"
                     src={iconUrl("synergies", synIconName(s.name))}
@@ -193,16 +194,16 @@ function PlayerDetail({
       )}
 
       {relicsToShow.length > 0 && (
-        <div className="pd-section">
-          <div className="pd-label">
+        <div className={styles.pdSection}>
+          <div className={styles.pdLabel}>
             Relics
             {hasRelicTimeline && (
-              <span className="pd-label-hint">{" "}· acquired round</span>
+              <span className={styles.pdLabelHint}>{" "}· acquired round</span>
             )}
           </div>
-          <div className="pd-relics">
+          <div className={styles.pdRelics}>
             {relicsToShow.map((r, i) => (
-              <div key={i} className="pd-relic">
+              <div key={i} className={styles.pdRelic}>
                 <TooltipWrap
                   type="relic"
                   name={r.name}
@@ -210,7 +211,7 @@ function PlayerDetail({
                   data={tooltipData}
                 >
                   <img
-                    className="relic-icon pd-relic-icon"
+                    className={`relic-icon ${styles.pdRelicIcon}`}
                     src={iconUrl("relics", relicStem(r.name))}
                     alt={r.name}
                     loading="lazy"
@@ -220,7 +221,7 @@ function PlayerDetail({
                   />
                 </TooltipWrap>
                 {r.round > 0 && (
-                  <span className="pd-relic-round">R{r.round}</span>
+                  <span className={styles.pdRelicRound}>R{r.round}</span>
                 )}
               </div>
             ))}
@@ -330,43 +331,53 @@ function MatchPlayerRow({
   const inner = (
     <>
       <div
-        className="mp-placement"
+        className={styles.mpPlacement}
         style={{ color: pColor, borderColor: pColor }}
       >
         {game.placement ?? "—"}
       </div>
-        <div className="mp-info">
-          <div className="mp-name-row">
+        <div className={styles.mpInfo}>
+          <div className={styles.mpNameRow}>
             {profileUrl ? (
               <Link
                 href={playerProfilePath(String(game.user_id), profile.customUrl)}
-                className="mp-name"
+                className={styles.mpName}
                 onClick={(e) => e.stopPropagation()}
               >
                 {displayName}
               </Link>
             ) : (
-              <span className="mp-name mp-name-unknown">{displayName}</span>
+              <span className={`${styles.mpName} ${styles.mpNameUnknown}`}>{displayName}</span>
             )}
           </div>
-          {rankLabel && <span className="mp-rank">{rankLabel}</span>}
+          {rankLabel && <span className={styles.mpRank}>{rankLabel}</span>}
         </div>
-        <div className="mp-col-stats">
+        <div className={styles.mpColStats}>
           {displayGame.level && (
-            <span className="mp-stat">
-              <span className="mp-stat-label">LVL</span>
+            <span className={styles.mpStat}>
+              <span className={styles.mpStatLabel}>LVL</span>
               {displayGame.level}
             </span>
           )}
           {displayGame.wins != null && displayGame.losses != null && (
-            <span className="mp-stat">
-              <span className="wl-w">{displayGame.wins}</span>
-              <span className="mp-wl-sep">{"–"}</span>
-              <span className="wl-l">{displayGame.losses}</span>
+            <span className={styles.mpStat}>
+              <span className={styles.wlW}>{displayGame.wins}</span>
+              <span className={styles.mpWlSep}>{"–"}</span>
+              <span className={styles.wlL}>{displayGame.losses}</span>
             </span>
           )}
           {roundResult && (
-            <span className={`mp-round-result mp-round-${roundResult}`}>
+            <span
+              className={
+                styles.mpRoundResult +
+                " " +
+                (roundResult === "out"
+                  ? styles.mpRoundOut
+                  : roundResult === "w"
+                    ? styles.mpRoundW
+                    : styles.mpRoundL)
+              }
+            >
               {roundResult === "out"
                 ? "Out"
                 : roundResult === "w"
@@ -375,9 +386,9 @@ function MatchPlayerRow({
             </span>
           )}
         </div>
-        <div className="mp-col-lineup">
+        <div className={styles.mpColLineup}>
           {lineup.length > 0 && (
-            <div className="mp-lineup">
+            <div className={styles.mpLineup}>
               {lineup.map((u, i) => (
                 <TooltipWrap
                   key={i}
@@ -386,7 +397,7 @@ function MatchPlayerRow({
                   stars={u.stars}
                   data={tooltipData}
                 >
-                  <div className="unit-icon-wrap mp-unit">
+                  <div className={`unit-icon-wrap ${styles.mpUnit}`}>
                     <img
                       className="unit-icon"
                       src={iconUrl("units", unitStem(u.name))}
@@ -411,7 +422,7 @@ function MatchPlayerRow({
           )}
         </div>
         {hasContent && (
-          <div className="mp-caret" aria-hidden="true">
+          <div className={styles.mpCaret} aria-hidden="true">
             {isOpen ? "−" : "+"}
           </div>
         )}
@@ -421,16 +432,16 @@ function MatchPlayerRow({
   return (
     <div
       className={
-        "match-player-row" +
-        (highlighted ? " highlighted" : "") +
-        (isOpen ? " expanded" : "") +
+        styles.matchPlayerRow +
+        (highlighted ? " " + styles.highlighted : "") +
+        (isOpen ? " " + styles.expanded : "") +
         (hasContent ? "" : " static")
       }
     >
       {hasContent ? (
         <button
           type="button"
-          className="mp-toggle"
+          className={styles.mpToggle}
           onClick={onToggle}
           aria-expanded={isOpen}
           aria-label={
@@ -440,7 +451,7 @@ function MatchPlayerRow({
           {inner}
         </button>
       ) : (
-        <div className="mp-toggle mp-toggle-static">{inner}</div>
+        <div className={`${styles.mpToggle} ${styles.mpToggleStatic}`}>{inner}</div>
       )}
       {isOpen && (
         <PlayerDetail
@@ -570,511 +581,21 @@ export default function GameView({
 
   return (
     <>
-      <style jsx>{`
-        .page {
-          position: relative;
-          z-index: 1;
-          min-height: calc(100vh - var(--nav-height));
-        }
-        .container {
-          max-width: 960px;
-          margin: 0 auto;
-          padding: 32px 24px 80px;
-        }
-
-        /* ── Match meta strip ──────────────────────────── */
-        .match-meta {
-          display: flex;
-          align-items: center;
-          gap: 10px;
-          font-size: 12px;
-          letter-spacing: 0.4px;
-          color: var(--text-muted);
-          margin-bottom: 16px;
-          flex-wrap: wrap;
-        }
-        .match-meta strong {
-          color: var(--text-secondary);
-          font-weight: 600;
-          letter-spacing: 2px;
-          text-transform: uppercase;
-          font-size: 11px;
-        }
-        .match-meta .sep {
-          opacity: 0.5;
-        }
-
-        /* ── Screenshot banner ─────────────────────────── */
-        .screenshot-banner {
-          border: 1px solid var(--border);
-          border-radius: var(--r-8);
-          overflow: hidden;
-          background: var(--bg-deep);
-          margin-bottom: 24px;
-        }
-        .screenshot-banner img {
-          display: block;
-          width: 100%;
-          height: auto;
-        }
-
-        /* ── Round scrubber ────────────────────────────── */
-        .round-scrubber {
-          border: 1px solid var(--border);
-          border-radius: var(--r-8);
-          background: var(--bg-surface);
-          padding: 14px 20px 12px;
-          margin-bottom: 16px;
-        }
-        .rs-header {
-          display: flex;
-          align-items: baseline;
-          gap: 6px;
-          font-size: 12px;
-          color: var(--text-muted);
-        }
-        .rs-label {
-          letter-spacing: 1.6px;
-          text-transform: uppercase;
-          font-weight: 600;
-          color: var(--text-secondary);
-          font-size: 10px;
-        }
-        .rs-value {
-          font-family: var(--font-display);
-          color: var(--text-primary);
-          font-size: 18px;
-          font-weight: 700;
-          font-variant-numeric: tabular-nums;
-          margin-left: 4px;
-        }
-        .rs-meta {
-          color: var(--text-muted);
-          font-variant-numeric: tabular-nums;
-        }
-        .rs-jump-end {
-          margin-left: auto;
-          background: var(--bg-elevated);
-          border: 1px solid var(--border-subtle);
-          color: var(--text-secondary);
-          font-size: 11px;
-          letter-spacing: 0.6px;
-          padding: 4px 10px;
-          border-radius: var(--r-3);
-          cursor: pointer;
-          transition: color var(--t-base) var(--t-easing);
-        }
-        .rs-jump-end:hover {
-          color: var(--text-primary);
-        }
-        .rs-range {
-          width: 100%;
-          margin: 10px 0 4px;
-          accent-color: var(--accent);
-        }
-        .rs-ends {
-          display: flex;
-          justify-content: space-between;
-          font-size: 10px;
-          color: var(--text-muted);
-          font-variant-numeric: tabular-nums;
-          letter-spacing: 0.4px;
-        }
-
-        /* ── Players table ─────────────────────────────── */
-        .match-section {
-          border: 1px solid var(--border);
-          border-radius: var(--r-8);
-          background: var(--bg-surface);
-          overflow: hidden;
-        }
-        .match-section-header {
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          padding: 16px 24px;
-          border-bottom: 1px solid var(--border-subtle);
-          background: rgba(0, 0, 0, 0.12);
-        }
-        .match-section-header h3 {
-          margin: 0;
-          font-size: 12px;
-          letter-spacing: 2px;
-          text-transform: uppercase;
-          color: var(--text-secondary);
-          font-weight: 600;
-          display: flex;
-          align-items: center;
-          gap: 10px;
-        }
-        .section-bar {
-          display: inline-block;
-          width: 3px;
-          height: 12px;
-          background: var(--accent);
-          border-radius: 2px;
-        }
-        .match-section-count {
-          font-size: 11px;
-          color: var(--text-muted);
-          letter-spacing: 1px;
-          text-transform: uppercase;
-          font-variant-numeric: tabular-nums;
-        }
-
-        @media (max-width: 720px) {
-          .container {
-            padding: 20px 16px 60px;
-          }
-        }
-      `}</style>
-
-      {/*
-        MatchPlayerRow and PlayerDetail live in sibling functions, so
-        styled-jsx's per-component scoping wouldn't reach their JSX. Use a
-        global block for the .match-player-row / .mp-* / .pd-* rules.
-      */}
-      <style jsx global>{`
-        .match-player-row {
-          border-bottom: 1px solid var(--border-subtle);
-          transition: background var(--t-base) var(--t-easing);
-          position: relative;
-        }
-        .match-player-row:last-child {
-          border-bottom: none;
-        }
-        .match-player-row.highlighted::before {
-          content: "";
-          position: absolute;
-          left: 0;
-          top: 0;
-          bottom: 0;
-          width: 3px;
-          background: var(--accent);
-        }
-        .match-player-row.highlighted .mp-toggle {
-          background: rgba(224, 64, 42, 0.06);
-        }
-        .mp-toggle {
-          display: flex;
-          align-items: center;
-          gap: 12px;
-          width: 100%;
-          padding: 10px 24px;
-          background: transparent;
-          border: none;
-          color: inherit;
-          font: inherit;
-          text-align: left;
-          cursor: pointer;
-          transition: background var(--t-base) var(--t-easing);
-        }
-        .mp-toggle:hover {
-          background: var(--bg-hover);
-        }
-        .match-player-row.expanded > .mp-toggle {
-          background: var(--bg-hover);
-        }
-        .mp-toggle.mp-toggle-static {
-          cursor: default;
-        }
-        .mp-toggle.mp-toggle-static:hover {
-          background: transparent;
-        }
-        .mp-placement {
-          font-size: 18px;
-          font-weight: 700;
-          font-family: var(--font-display);
-          width: 36px;
-          height: 36px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          border: 1px solid;
-          border-radius: var(--r-3);
-          flex-shrink: 0;
-        }
-        .mp-info {
-          width: 150px;
-          flex-shrink: 0;
-          min-width: 0;
-          display: flex;
-          flex-direction: column;
-          gap: 3px;
-        }
-        .mp-name-row {
-          display: flex;
-          align-items: center;
-          min-width: 0;
-        }
-        .mp-name {
-          font-size: 15px;
-          font-weight: 600;
-          color: var(--text-primary);
-          text-decoration: none;
-          transition: color var(--t-base) var(--t-easing);
-          overflow: hidden;
-          text-overflow: ellipsis;
-          white-space: nowrap;
-          max-width: 100%;
-        }
-        .mp-name:hover {
-          color: #fff;
-        }
-        .mp-name-unknown {
-          color: var(--text-muted);
-          font-style: italic;
-        }
-        .mp-rank {
-          align-self: flex-start;
-          font-size: 10px;
-          color: var(--text-secondary);
-          background: var(--bg-elevated);
-          border: 1px solid var(--border-subtle);
-          border-radius: var(--r-2);
-          padding: 1px 6px;
-          letter-spacing: 0.4px;
-          font-weight: 600;
-          text-transform: uppercase;
-        }
-        .mp-col-stats {
-          display: flex;
-          gap: 10px;
-          align-items: center;
-          width: 112px;
-          flex-shrink: 0;
-        }
-        .mp-stat {
-          display: inline-flex;
-          align-items: baseline;
-          gap: 3px;
-          font-size: 12px;
-          color: var(--text-secondary);
-        }
-        .mp-stat-label {
-          font-size: 9px;
-          letter-spacing: 0.8px;
-          text-transform: uppercase;
-          color: var(--text-muted);
-        }
-        .mp-wl-sep {
-          color: var(--text-muted);
-          margin: 0 2px;
-          opacity: 0.5;
-        }
-        .mp-hp {
-          font-size: 11px;
-          color: var(--text-secondary);
-          letter-spacing: 0.4px;
-          font-variant-numeric: tabular-nums;
-        }
-        .mp-gold {
-          font-size: 11px;
-          color: #c9a84c;
-          letter-spacing: 0.4px;
-          font-variant-numeric: tabular-nums;
-        }
-        .mp-round-result {
-          font-size: 10px;
-          font-weight: 700;
-          letter-spacing: 0.6px;
-        }
-        .mp-round-w {
-          color: var(--green-bright, #4ebf72);
-        }
-        .mp-round-l {
-          color: var(--red-bright, #e35d5b);
-        }
-        .mp-round-out {
-          color: var(--red-bright, #e35d5b);
-          opacity: 0.65;
-          font-size: 11px;
-        }
-        .wl-w {
-          color: var(--green-bright);
-        }
-        .wl-l {
-          color: var(--red-bright);
-        }
-        .mp-col-lineup {
-          flex: 1;
-          min-width: 0;
-        }
-        /* Single horizontal line of units — no wrapping. Synergies and relics
-           now live in the expand panel so the lineup gets the full width and
-           the icons can be larger. overflow:hidden guards against the rare
-           over-full board pushing the caret off-row. */
-        .mp-lineup {
-          display: flex;
-          gap: 4px;
-          flex-wrap: nowrap;
-          align-items: center;
-          overflow: hidden;
-        }
-        /* Resize wrap + icon together; the global .unit-icon-wrap is 28x28, so
-           growing only the icon would overflow the wrap and overlap neighbours. */
-        .mp-unit.unit-icon-wrap {
-          width: 36px;
-          height: 36px;
-        }
-        .mp-unit .unit-icon {
-          width: 36px;
-          height: 36px;
-        }
-        .mp-caret {
-          flex-shrink: 0;
-          width: 22px;
-          height: 22px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          color: var(--text-muted);
-          font-size: 16px;
-          font-weight: 600;
-          font-family: var(--font-display);
-          border: 1px solid var(--border-subtle);
-          border-radius: var(--r-2);
-          background: var(--bg-elevated);
-          transition: color var(--t-base) var(--t-easing);
-        }
-        .mp-toggle:hover .mp-caret {
-          color: var(--text-secondary);
-        }
-
-        /* ── Expanded player detail ────────────────────── */
-        .player-detail {
-          padding: 18px 24px 24px 76px;
-          background: rgba(0, 0, 0, 0.18);
-          border-top: 1px solid var(--border-subtle);
-          display: flex;
-          flex-direction: column;
-          gap: 18px;
-        }
-        .pd-live-stats {
-          display: flex;
-          gap: 16px;
-          align-items: center;
-        }
-        .pd-section {
-          display: flex;
-          flex-direction: column;
-          gap: 10px;
-        }
-        .pd-label {
-          font-size: 10px;
-          letter-spacing: 1.6px;
-          text-transform: uppercase;
-          color: var(--text-secondary);
-          font-weight: 600;
-        }
-        .pd-label-hint {
-          color: var(--text-muted);
-          font-weight: 500;
-          letter-spacing: 0.8px;
-          text-transform: none;
-        }
-        .pd-lineup {
-          display: flex;
-          gap: 8px;
-          flex-wrap: wrap;
-          align-items: center;
-        }
-        /* Resize both the wrap and the icon together — the global
-           .unit-icon-wrap is fixed at 28x28, so growing only the icon
-           would overflow the wrap and overlap neighbouring units. */
-        .pd-unit.unit-icon-wrap {
-          width: 40px;
-          height: 40px;
-        }
-        .pd-unit .unit-icon {
-          width: 40px;
-          height: 40px;
-        }
-        .pd-synergies {
-          display: flex;
-          gap: 6px;
-          flex-wrap: wrap;
-          align-items: center;
-        }
-        .pd-syn-badge .syn-icon {
-          width: 16px;
-          height: 16px;
-        }
-        .pd-relics {
-          display: flex;
-          gap: 12px;
-          flex-wrap: wrap;
-          align-items: flex-start;
-        }
-        .pd-relic {
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          gap: 4px;
-        }
-        .pd-relic-icon {
-          width: 36px !important;
-          height: 36px !important;
-        }
-        .pd-relic-round {
-          font-size: 10px;
-          color: var(--text-secondary);
-          background: var(--bg-elevated);
-          border: 1px solid var(--border-subtle);
-          border-radius: var(--r-2);
-          padding: 1px 6px;
-          letter-spacing: 0.4px;
-          font-weight: 600;
-          font-variant-numeric: tabular-nums;
-        }
-
-        @media (max-width: 720px) {
-          .mp-toggle {
-            flex-wrap: wrap;
-            padding: 10px 16px;
-            gap: 8px;
-          }
-          .mp-info {
-            width: auto;
-            flex: 1;
-          }
-          .mp-col-stats {
-            width: auto;
-          }
-          .mp-col-lineup {
-            flex-basis: 100%;
-            order: 10;
-          }
-          /* Phones are too narrow for a full board on one line — let it wrap
-             here so no units get clipped. */
-          .mp-lineup {
-            flex-wrap: wrap;
-            overflow: visible;
-          }
-          .mp-caret {
-            margin-left: auto;
-          }
-          .player-detail {
-            padding: 16px 20px 20px 20px;
-          }
-        }
-      `}</style>
-
-      <div className="page">
-        <div className="container">
+      <div className={styles.page}>
+        <div className={styles.container}>
           {/* Slim match-meta strip */}
-          <div className="match-meta">
+          <div className={styles.matchMeta}>
             <strong>Match</strong>
             {matchDate && (
               <>
-                <span className="sep">{"·"}</span>
+                <span className={styles.sep}>{"·"}</span>
                 <span>
                   {matchDate}
                   {matchTime ? `, ${matchTime}` : ""}
                 </span>
               </>
             )}
-            <span className="sep">{"·"}</span>
+            <span className={styles.sep}>{"·"}</span>
             <span>
               {playerRows.length} {playerRows.length === 1 ? "player" : "players"}
             </span>
@@ -1082,18 +603,18 @@ export default function GameView({
 
           {/* Screenshot banner (only on the viewed player's row's game) */}
           {game.screenshot && (
-            <div className="screenshot-banner">
+            <div className={styles.screenshotBanner}>
               <img src={game.screenshot} alt="Game screenshot" loading="lazy" />
             </div>
           )}
 
           {/* Round scrubber — only rendered when nettable timeline exists. */}
           {hasTimeline && (
-            <div className="round-scrubber">
-              <div className="rs-header">
-                <span className="rs-label">Round</span>
-                <strong className="rs-value">{selectedRound}</strong>
-                <span className="rs-meta">
+            <div className={styles.roundScrubber}>
+              <div className={styles.rsHeader}>
+                <span className={styles.rsLabel}>Round</span>
+                <strong className={styles.rsValue}>{selectedRound}</strong>
+                <span className={styles.rsMeta}>
                   {" "}
                   / {timeline!.last_round}
                   {isLastRound ? " (final)" : ""}
@@ -1101,7 +622,7 @@ export default function GameView({
                 {!isLastRound && (
                   <button
                     type="button"
-                    className="rs-jump-end"
+                    className={styles.rsJumpEnd}
                     onClick={() =>
                       setSelectedRoundIdx(timeline!.rounds.length - 1)
                     }
@@ -1111,7 +632,7 @@ export default function GameView({
                 )}
               </div>
               <input
-                className="rs-range"
+                className={styles.rsRange}
                 type="range"
                 min={0}
                 max={timeline!.rounds.length - 1}
@@ -1119,7 +640,7 @@ export default function GameView({
                 onChange={(e) => setSelectedRoundIdx(Number(e.target.value))}
                 aria-label="Scrub through match rounds"
               />
-              <div className="rs-ends">
+              <div className={styles.rsEnds}>
                 <span>R{timeline!.first_round}</span>
                 <span>R{timeline!.last_round}</span>
               </div>
@@ -1127,13 +648,13 @@ export default function GameView({
           )}
 
           {/* Players table — viewed row pre-expanded */}
-          <div className="match-section">
-            <div className="match-section-header">
+          <div className={styles.matchSection}>
+            <div className={styles.matchSectionHeader}>
               <h3>
-                <span className="section-bar" />
+                <span className={styles.sectionBar} />
                 Players
               </h3>
-              <span className="match-section-count">
+              <span className={styles.matchSectionCount}>
                 {playerRows.length}{" "}
                 {playerRows.length === 1 ? "player" : "players"}
               </span>

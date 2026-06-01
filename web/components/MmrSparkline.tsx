@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+import styles from "./MmrSparkline.module.css";
 
 export interface MmrSnapshot {
   mmr: number | null;
@@ -98,131 +99,61 @@ export function MmrSparkline({ seasons = [], snapshots = [] }: MmrSparklineProps
   if (snapshotCount > 0) metaParts.push(`${snapshotCount} snapshot${snapshotCount === 1 ? "" : "s"}`);
 
   return (
-    <>
-      <style jsx>{`
-        .wrap {
-          margin: 0 0 24px;
-          padding: 18px 20px 14px;
-          border: 1px solid var(--border);
-          background: var(--bg-surface);
-          border-radius: var(--r-8);
-        }
-        .head {
-          display: flex;
-          align-items: baseline;
-          justify-content: space-between;
-          margin-bottom: 12px;
-        }
-        .label {
-          font-family: var(--font-mono);
-          font-size: var(--fs-12);
-          letter-spacing: var(--tr-upper);
-          text-transform: uppercase;
-          color: var(--text-muted);
-        }
-        .meta {
-          font-family: var(--font-mono);
-          font-size: var(--fs-12);
-          color: var(--text-muted);
-        }
-        .meta strong {
-          color: var(--text-primary);
-        }
-        .chart-wrap {
-          width: 100%;
-          overflow: hidden;
-        }
-        svg {
-          display: block;
-          width: 100%;
-          height: auto;
-          color: var(--accent);
-        }
-        .area {
-          fill: currentColor;
-          opacity: 0.08;
-        }
-        .line {
-          fill: none;
-          stroke: currentColor;
-          stroke-width: 1.5;
-        }
-        .dot {
-          fill: currentColor;
-          opacity: 0.6;
-        }
-        .dot.season {
-          opacity: 0.85;
-        }
-        .last-dot {
-          fill: currentColor;
-        }
-        .axis {
-          font-family: var(--font-mono);
-          font-size: 10px;
-          fill: var(--text-muted);
-        }
-        .note {
-          margin-top: 10px;
-          font-family: var(--font-mono);
-          font-size: var(--fs-11, 11px);
-          color: var(--text-muted);
-          opacity: 0.85;
-          line-height: 1.5;
-        }
-      `}</style>
-      <section className="wrap" aria-label="MMR history">
-        <div className="head">
-          <span className="label">MMR History</span>
-          <span className="meta">
-            {metaParts.join(" · ")} · range{" "}
-            <strong>{minMmr}</strong>–<strong>{maxMmr}</strong>
-          </span>
-        </div>
-        <div className="chart-wrap">
-          <svg viewBox={`0 0 ${WIDTH} ${HEIGHT}`} preserveAspectRatio="none">
-            <polygon
-              className="area"
-              points={`${first.x},${HEIGHT - PAD_Y} ${polylinePoints} ${last.x},${HEIGHT - PAD_Y}`}
+    <section className={styles.wrap} aria-label="MMR history">
+      <div className={styles.head}>
+        <span className={styles.label}>MMR History</span>
+        <span className={styles.meta}>
+          {metaParts.join(" · ")} · range{" "}
+          <strong>{minMmr}</strong>–<strong>{maxMmr}</strong>
+        </span>
+      </div>
+      <div className={styles.chartWrap}>
+        <svg
+          className={styles.svg}
+          viewBox={`0 0 ${WIDTH} ${HEIGHT}`}
+          preserveAspectRatio="none"
+        >
+          <polygon
+            className={styles.area}
+            points={`${first.x},${HEIGHT - PAD_Y} ${polylinePoints} ${last.x},${HEIGHT - PAD_Y}`}
+          />
+          <polyline className={styles.line} points={polylinePoints} />
+          {coords.slice(0, -1).map((c, i) => (
+            <circle
+              key={i}
+              className={`${styles.dot}${c.kind === "season" ? ` ${styles.season}` : ""}`}
+              cx={c.x}
+              cy={c.y}
+              r={c.kind === "season" ? 2.5 : 1.8}
             />
-            <polyline className="line" points={polylinePoints} />
-            {coords.slice(0, -1).map((c, i) => (
-              <circle
-                key={i}
-                className={`dot ${c.kind}`}
-                cx={c.x}
-                cy={c.y}
-                r={c.kind === "season" ? 2.5 : 1.8}
-              />
-            ))}
-            <circle className="last-dot" cx={last.x} cy={last.y} r={2.8} />
-            <text
-              className="axis"
-              x={last.x - 4}
-              y={last.y - 6}
-              textAnchor="end"
-            >
-              {last.mmr}
-            </text>
-            <text className="axis" x={PAD_X} y={HEIGHT - 2}>
-              {first.label}
-            </text>
-            <text
-              className="axis"
-              x={WIDTH - PAD_X}
-              y={HEIGHT - 2}
-              textAnchor="end"
-            >
-              {last.label}
-            </text>
-          </svg>
-        </div>
-        <p className="note">
-          Season anchors come from your end-of-season MMR. New points are added
-          each time you press refresh on this profile — check back daily to
-          build out the recent trend.
-        </p>
-      </section>
-    </>
+          ))}
+          <circle className={styles.lastDot} cx={last.x} cy={last.y} r={2.8} />
+          <text
+            className={styles.axis}
+            x={last.x - 4}
+            y={last.y - 6}
+            textAnchor="end"
+          >
+            {last.mmr}
+          </text>
+          <text className={styles.axis} x={PAD_X} y={HEIGHT - 2}>
+            {first.label}
+          </text>
+          <text
+            className={styles.axis}
+            x={WIDTH - PAD_X}
+            y={HEIGHT - 2}
+            textAnchor="end"
+          >
+            {last.label}
+          </text>
+        </svg>
+      </div>
+      <p className={styles.note}>
+        Season anchors come from your end-of-season MMR. New points are added
+        each time you press refresh on this profile — check back daily to
+        build out the recent trend.
+      </p>
+    </section>
   );
 }

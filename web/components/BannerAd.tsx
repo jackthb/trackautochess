@@ -8,6 +8,7 @@ import {
   type AdSlot,
 } from "@/lib/ads";
 import { trackEvent } from "@/lib/analytics";
+import styles from "./BannerAd.module.css";
 
 interface BannerAdProps {
   slot: AdSlot;
@@ -41,9 +42,9 @@ function buildSrcDoc(adKey: string, dims: Dims): string {
 }
 
 function wrapClassFor(slot: AdSlot): string {
-  if (slot === "bottom") return "ad-bottom";
-  if (slot === "in-content" || slot === "in-content-2") return "ad-incontent";
-  return "ad-sidebar";
+  if (slot === "bottom") return styles.adBottom;
+  if (slot === "in-content" || slot === "in-content-2") return styles.adIncontent;
+  return styles.adSidebar;
 }
 
 // Largest dim a slot can occupy. Used to reserve vertical space before the
@@ -114,155 +115,57 @@ export function BannerAd({ slot }: BannerAdProps) {
 
   if (!shouldMount) return null;
 
+  const reserved = reservedHeight(slot);
+
   return (
-    <>
-      <style jsx>{`
-        .ad-wrap {
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          gap: 6px;
-        }
-        .ad-bottom {
-          padding: 32px 24px 24px;
-          min-height: ${BOTTOM_DESKTOP.height + 24}px;
-        }
-        .ad-sidebar {
-          position: sticky;
-          top: 96px;
-          min-height: ${reservedHeight(slot)}px;
-        }
-        .ad-incontent {
-          padding: 8px 0 20px;
-          margin: 0 auto;
-          min-height: ${IN_CONTENT.height + 28}px;
-        }
-        .label {
-          font-family: var(--font-mono);
-          font-size: 11px;
-          color: var(--text-muted);
-          opacity: 0.6;
-        }
-        .frame {
-          display: block;
-          border: 0;
-        }
-        .placeholder {
-          display: block;
-        }
-        .sponsor {
-          width: 100%;
-          max-width: ${reservedHeight(slot) > 0 ? "320px" : "100%"};
-          min-height: ${reservedHeight(slot)}px;
-          display: flex;
-          flex-direction: column;
-          justify-content: center;
-          gap: 8px;
-          padding: 14px 16px;
-          border: 1px solid var(--border);
-          border-radius: var(--r-4);
-          background: rgba(18, 20, 24, 0.92);
-          color: var(--text-primary);
-          text-align: left;
-          text-decoration: none;
-          transition:
-            border-color var(--t-base) var(--t-easing),
-            background var(--t-base) var(--t-easing);
-        }
-        .sponsor:hover {
-          border-color: var(--accent-dim);
-          background: rgba(22, 24, 28, 0.96);
-        }
-        .sponsor-title {
-          display: block;
-          font-family: var(--font-mono);
-          font-size: 12px;
-          font-weight: 700;
-          letter-spacing: 0.5px;
-          text-transform: uppercase;
-        }
-        .sponsor-body {
-          display: block;
-          color: var(--text-secondary);
-          font-size: 12px;
-          line-height: 1.35;
-        }
-        .sponsor-cta {
-          color: var(--gold);
-          font-family: var(--font-mono);
-          font-size: 11px;
-          letter-spacing: 0.6px;
-          text-transform: uppercase;
-        }
-        .sponsor.compact {
-          flex-direction: row;
-          align-items: center;
-          justify-content: space-between;
-          gap: 12px;
-          padding: 8px 12px;
-        }
-        .sponsor.compact .sponsor-body {
-          display: none;
-        }
-        @media (max-width: 727px) {
-          .ad-bottom {
-            min-height: ${BOTTOM_MOBILE.height + 24}px;
+    <div
+      ref={wrapRef}
+      className={`${styles.adWrap} ${wrapClassFor(slot)}`}
+      style={slot === "sidebar" || slot === "sidebar-left" ? { minHeight: reserved } : undefined}
+      aria-label="Advertisement"
+    >
+      <span className={styles.label}>Advertisement</span>
+      {ready && directAd && dims ? (
+        <a
+          className={`${styles.sponsor} ${dims.height <= 90 ? styles.compact : ""}`}
+          style={{ maxWidth: reserved > 0 ? "320px" : "100%", minHeight: reserved }}
+          href={directAd.href}
+          target="_blank"
+          rel="nofollow sponsored noopener noreferrer"
+          onClick={() =>
+            trackEvent("Direct Ad Clicked", {
+              slot,
+              creative_type: creativeType,
+            })
           }
-        }
-        @media (max-width: 1279px) {
-          .ad-sidebar {
-            min-height: 0;
-            display: none;
-          }
-        }
-      `}</style>
-      <div
-        ref={wrapRef}
-        className={`ad-wrap ${wrapClassFor(slot)}`}
-        aria-label="Advertisement"
-      >
-        <span className="label">Advertisement</span>
-        {ready && directAd && dims ? (
-          <a
-            className={`sponsor ${dims.height <= 90 ? "compact" : ""}`}
-            href={directAd.href}
-            target="_blank"
-            rel="nofollow sponsored noopener noreferrer"
-            onClick={() =>
-              trackEvent("Direct Ad Clicked", {
-                slot,
-                creative_type: creativeType,
-              })
-            }
-          >
-            <span>
-              <span className="sponsor-title">{directAd.title}</span>
-              <span className="sponsor-body">{directAd.description}</span>
-            </span>
-            <span className="sponsor-cta">{directAd.cta}</span>
-          </a>
-        ) : ready && srcDoc && dims ? (
-          <iframe
-            className="frame"
-            srcDoc={srcDoc}
-            width={dims.width}
-            height={dims.height}
-            scrolling="no"
-            title="Advertisement"
-            // allow-same-origin is required for Adsterra: invoke.js fetches
-            // ad creative from highperformanceformat.com (set as the iframe's
-            // base href). Without it the iframe loads but the script can't
-            // pull content and the slot renders blank. The srcDoc payload is
-            // built from a sanitized key + fixed-format string, so the same-
-            // origin grant is scoped to the ad iframe alone.
-            sandbox="allow-scripts allow-popups allow-same-origin"
-            loading="lazy"
-            referrerPolicy="strict-origin-when-cross-origin"
-          />
-        ) : (
-          <span className="placeholder" aria-hidden />
-        )}
-      </div>
-    </>
+        >
+          <span>
+            <span className={styles.sponsorTitle}>{directAd.title}</span>
+            <span className={styles.sponsorBody}>{directAd.description}</span>
+          </span>
+          <span className={styles.sponsorCta}>{directAd.cta}</span>
+        </a>
+      ) : ready && srcDoc && dims ? (
+        <iframe
+          className={styles.frame}
+          srcDoc={srcDoc}
+          width={dims.width}
+          height={dims.height}
+          scrolling="no"
+          title="Advertisement"
+          // allow-same-origin is required for Adsterra: invoke.js fetches
+          // ad creative from highperformanceformat.com (set as the iframe's
+          // base href). Without it the iframe loads but the script can't
+          // pull content and the slot renders blank. The srcDoc payload is
+          // built from a sanitized key + fixed-format string, so the same-
+          // origin grant is scoped to the ad iframe alone.
+          sandbox="allow-scripts allow-popups allow-same-origin"
+          loading="lazy"
+          referrerPolicy="strict-origin-when-cross-origin"
+        />
+      ) : (
+        <span className={styles.placeholder} aria-hidden />
+      )}
+    </div>
   );
 }

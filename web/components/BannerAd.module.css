@@ -1,0 +1,95 @@
+.adWrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+.adBottom {
+  padding: 32px 24px 24px;
+  min-height: 114px;
+}
+.adSidebar {
+  position: sticky;
+  top: 96px;
+}
+.adIncontent {
+  padding: 8px 0 20px;
+  margin: 0 auto;
+  min-height: 278px;
+}
+.label {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-muted);
+  opacity: 0.6;
+}
+.frame {
+  display: block;
+  border: 0;
+}
+.placeholder {
+  display: block;
+}
+.sponsor {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 8px;
+  padding: 14px 16px;
+  border: 1px solid var(--border);
+  border-radius: var(--r-4);
+  background: rgba(18, 20, 24, 0.92);
+  color: var(--text-primary);
+  text-align: left;
+  text-decoration: none;
+  transition:
+    border-color var(--t-base) var(--t-easing),
+    background var(--t-base) var(--t-easing);
+}
+.sponsor:hover {
+  border-color: var(--accent-dim);
+  background: rgba(22, 24, 28, 0.96);
+}
+.sponsorTitle {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+.sponsorBody {
+  display: block;
+  color: var(--text-secondary);
+  font-size: 12px;
+  line-height: 1.35;
+}
+.sponsorCta {
+  color: var(--gold);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+}
+.sponsor.compact {
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 12px;
+}
+.sponsor.compact .sponsorBody {
+  display: none;
+}
+@media (max-width: 727px) {
+  .adBottom {
+    min-height: 74px;
+  }
+}
+@media (max-width: 1279px) {
+  .adSidebar {
+    min-height: 0 !important;
+    display: none;
+  }
+}

@@ -9,6 +9,7 @@ import {
   type SearchResult,
 } from "@/lib/playerSearch";
 import { bucketCount, trackEvent } from "@/lib/analytics";
+import styles from "./ProfileSearch.module.css";
 
 const MAX_VISIBLE_RESULTS = 5;
 
@@ -303,172 +304,12 @@ export function ProfileSearch({
   };
 
   return (
-    <>
-      <style jsx>{`
-        .profile-search {
-          position: relative;
-          z-index: 40;
-          width: 100%;
-        }
-        .search-form {
-          display: flex;
-          position: relative;
-          width: 100%;
-        }
-        .search-help {
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          gap: 12px;
-          padding: 9px 0 0;
-          font-family: var(--font-mono);
-          font-size: 11px;
-          color: var(--text-muted);
-          letter-spacing: 0.35px;
-          text-align: left;
-        }
-        .search-help a {
-          flex-shrink: 0;
-          color: var(--accent-dim);
-          text-decoration: none;
-          transition: color 0.15s;
-        }
-        .search-help a:hover {
-          color: var(--accent);
-        }
-        .search-input {
-          width: 100%;
-          height: 46px;
-          font-family: var(--font-mono);
-          font-size: var(--fs-14);
-          color: var(--text-primary);
-          background: var(--bg-surface);
-          border: 1px solid var(--border);
-          border-radius: var(--r-3);
-          padding: 0 16px;
-          letter-spacing: var(--tr-body);
-          transition: border-color var(--t-base) var(--t-easing), background var(--t-base) var(--t-easing);
-        }
-        .search-input.loading {
-          border-color: var(--accent-dim);
-        }
-        .search-input.error {
-          border-color: var(--accent);
-        }
-        .search-input::placeholder {
-          color: var(--text-muted);
-        }
-        .search-input:focus {
-          outline: none;
-          border-color: var(--accent-dim);
-          background: rgba(18, 20, 24, 0.96);
-        }
-        .search-progress {
-          position: absolute;
-          left: 12px;
-          right: 12px;
-          bottom: -1px;
-          height: 2px;
-          overflow: hidden;
-          pointer-events: none;
-        }
-        .search-progress-bar {
-          width: 34%;
-          height: 100%;
-          background: linear-gradient(
-            90deg,
-            transparent,
-            var(--accent-dim),
-            var(--accent),
-            transparent
-          );
-          animation: lookupBar 1s ease-in-out infinite;
-        }
-        .search-status,
-        .search-dropdown {
-          position: absolute;
-          top: calc(100% + 10px);
-          left: 0;
-          right: 0;
-          background: var(--bg-surface);
-          border: 1px solid var(--border);
-          border-radius: var(--r-3);
-          z-index: 50;
-        }
-        .search-status {
-          padding: 9px 12px;
-          font-family: var(--font-mono);
-          font-size: 11px;
-          color: var(--text-muted);
-          letter-spacing: 0.4px;
-        }
-        .search-dropdown {
-          max-height: 320px;
-          overflow: hidden auto;
-        }
-        .search-empty {
-          padding: 9px 14px;
-          font-family: var(--font-mono);
-          font-size: 12px;
-          color: var(--text-muted);
-          letter-spacing: 0.4px;
-          border-bottom: 1px solid var(--border-subtle);
-        }
-        .search-result {
-          display: flex;
-          align-items: baseline;
-          gap: 8px;
-          padding: 9px 14px;
-          font-family: var(--font-mono);
-          font-size: 13px;
-          color: var(--text-primary);
-          cursor: pointer;
-          border-bottom: 1px solid var(--border-subtle);
-        }
-        .search-result:last-child {
-          border-bottom: none;
-        }
-        .search-result.highlighted {
-          background: var(--bg-elevated, rgba(255, 255, 255, 0.04));
-        }
-        .search-steam {
-          justify-content: space-between;
-        }
-        .result-meta {
-          font-size: 11px;
-          color: var(--text-muted);
-          letter-spacing: 0.5px;
-        }
-        .search-divider {
-          padding: 8px 14px;
-          border-top: 1px solid var(--border-subtle);
-          font-family: var(--font-mono);
-          font-size: 11px;
-          color: var(--text-muted);
-          letter-spacing: 0.4px;
-        }
-        @keyframes lookupBar {
-          0% {
-            transform: translateX(-120%);
-          }
-          100% {
-            transform: translateX(320%);
-          }
-        }
-        @media (max-width: 520px) {
-          .search-help {
-            align-items: flex-start;
-            flex-direction: column;
-            gap: 4px;
-          }
-        }
-      `}</style>
-      <div className={`profile-search ${className}`} ref={containerRef}>
-        <form className="search-form" onSubmit={handleSearch}>
+    <div className={`${styles.profileSearch} ${className}`} ref={containerRef}>
+        <form className={styles.searchForm} onSubmit={handleSearch}>
           <input
             ref={inputRef}
-            className={`search-input${lookupLoading ? " loading" : ""}${
-              lookupError ? " error" : ""
+            className={`${styles.searchInput}${lookupLoading ? " " + styles.loading : ""}${
+              lookupError ? " " + styles.error : ""
             }`}
             type="text"
             placeholder={placeholder}
@@ -490,25 +331,25 @@ export function ProfileSearch({
             aria-invalid={Boolean(lookupError)}
           />
           {showLookupBar && (
-            <div className="search-progress" aria-hidden="true">
-              <div className="search-progress-bar" />
+            <div className={styles.searchProgress} aria-hidden="true">
+              <div className={styles.searchProgressBar} />
             </div>
           )}
         </form>
-        <div className="search-help">
+        <div className={styles.searchHelp}>
           <span>Paste your Steam profile URL, vanity URL, or SteamID64.</span>
           <a href="https://steamcommunity.com/my/" target="_blank" rel="noreferrer">
             Open your Steam profile
           </a>
         </div>
-        {lookupError && <div className="search-status">{lookupError}</div>}
+        {lookupError && <div className={styles.searchStatus}>{lookupError}</div>}
         {dropdownOpen && (
-          <div className="search-dropdown">
+          <div className={styles.searchDropdown}>
             {results.length === 0 &&
             searchValue.trim() &&
             !searching &&
             searchedValue === searchValue.trim() ? (
-              <div className="search-empty">
+              <div className={styles.searchEmpty}>
                 We didn't find any users in Track Auto Chess.
               </div>
             ) : null}
@@ -518,8 +359,8 @@ export function ProfileSearch({
                   <div
                     key={r.steam_id}
                     className={
-                      "search-result" +
-                      (i === highlightedIndex ? " highlighted" : "")
+                      styles.searchResult +
+                      (i === highlightedIndex ? " " + styles.highlighted : "")
                     }
                     onMouseEnter={() => setHighlightedIndex(i)}
                     onMouseDown={(e) => {
@@ -529,20 +370,20 @@ export function ProfileSearch({
                   >
                     <span>{r.name || r.custom_url || r.steam_id}</span>
                     {r.custom_url && (
-                      <span className="result-meta">/{r.custom_url}</span>
+                      <span className={styles.resultMeta}>/{r.custom_url}</span>
                     )}
                   </div>
                 ))
                 )
               : null}
             {showSteamAction && visibleResults.length > 0 && (
-              <div className="search-divider">Not the right player?</div>
+              <div className={styles.searchDivider}>Not the right player?</div>
             )}
             {showSteamAction && (
               <div
                 className={
-                  "search-result search-steam" +
-                  (highlightedIndex === steamActionIndex ? " highlighted" : "")
+                  styles.searchResult + " " + styles.searchSteam +
+                  (highlightedIndex === steamActionIndex ? " " + styles.highlighted : "")
                 }
                 onMouseEnter={() => setHighlightedIndex(steamActionIndex)}
                 onMouseDown={(e) => {
@@ -551,12 +392,11 @@ export function ProfileSearch({
                 }}
               >
                 <span>Search with Steam</span>
-                <span className="result-meta">{searchValue.trim()}</span>
+                <span className={styles.resultMeta}>{searchValue.trim()}</span>
               </div>
             )}
           </div>
         )}
-      </div>
-    </>
+    </div>
   );
 }

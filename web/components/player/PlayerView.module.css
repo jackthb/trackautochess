@@ -1,0 +1,204 @@
+.page {
+  position: relative;
+  z-index: 1;
+  min-height: calc(100vh - var(--nav-height));
+}
+.dashboard {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 32px 32px 72px;
+  position: relative;
+}
+.rankLadder {
+  position: absolute;
+  top: 32px;
+  left: -176px;
+  width: 156px;
+}
+@media (max-width: 1552px) {
+  .rankLadder {
+    display: none;
+  }
+}
+.playerHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 24px;
+}
+.playerIdentity {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  min-width: 0;
+}
+.playerAvatar {
+  width: 72px;
+  height: 72px;
+  flex-shrink: 0;
+  border: 1px solid var(--border);
+  border-radius: var(--r-8);
+  background: var(--bg-surface);
+  object-fit: cover;
+}
+.playerAvatarFallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-mono);
+  font-size: 30px;
+  font-weight: var(--fw-bold);
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+.playerHeading { min-width: 0; }
+.playerName {
+  font-family: "Cinzel", serif;
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+}
+.playerMeta {
+  font-size: 13px;
+  color: var(--text-muted);
+  letter-spacing: 0.5px;
+}
+.playerMeta a {
+  color: var(--text-muted);
+  transition: color 0.15s;
+}
+.playerMeta a:hover {
+  color: var(--text-secondary);
+}
+.leaderboardRank {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+  margin-top: 8px;
+  padding: 4px 10px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text-secondary);
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--r-3);
+  letter-spacing: 0.6px;
+}
+.leaderboardRank a {
+  color: var(--text-secondary);
+  text-decoration: none;
+}
+.leaderboardRank a:hover {
+  color: var(--text-primary);
+}
+.leaderboardRankNum {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+.leaderboardRankTotal {
+  color: var(--text-muted);
+}
+.playerActions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 10px;
+  flex-shrink: 0;
+}
+.lastFetched {
+  display: grid;
+  gap: 3px;
+  text-align: right;
+  font-size: 11px;
+  color: var(--text-muted);
+  letter-spacing: 0.4px;
+}
+.lastFetchedLabel {
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+}
+.lastFetchedValue,
+.lastFetchedAge {
+  font-family: var(--font-mono), ui-monospace, SFMono-Regular, Consolas,
+    "Liberation Mono", monospace;
+}
+.lastFetchedValue {
+  color: var(--text-secondary);
+}
+.refreshQuota {
+  display: grid;
+  gap: 3px;
+  text-align: right;
+  font-size: 11px;
+  color: var(--text-muted);
+  letter-spacing: 0.4px;
+}
+.refreshQuotaValue {
+  font-family: var(--font-mono), ui-monospace, SFMono-Regular, Consolas,
+    "Liberation Mono", monospace;
+  color: var(--text-secondary);
+}
+.refreshError {
+  max-width: 220px;
+  text-align: right;
+  font-size: 11px;
+  color: var(--accent);
+  letter-spacing: 0.35px;
+}
+.tableWrap {
+  border: 1px solid var(--border);
+  overflow: hidden;
+}
+.tableHeader {
+  display: grid;
+  grid-template-columns: 72px 1fr 120px 80px 60px 120px 100px;
+  padding: 0 20px;
+  background: var(--bg-surface);
+  border-bottom: 1px solid var(--border);
+}
+.th {
+  font-size: 13px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  padding: 14px 6px;
+}
+.gameEntry {
+  border-bottom: 1px solid var(--border-subtle);
+}
+.gameEntry:last-child {
+  border-bottom: none;
+}
+.gameRowLink {
+  display: block;
+  color: inherit;
+  cursor: pointer;
+}
+.gameRowLink:focus-visible {
+  outline: 1px solid var(--accent);
+  outline-offset: -1px;
+}
+.emptyState {
+  text-align: center;
+  padding: 80px 32px;
+  color: var(--text-muted);
+  font-size: 16px;
+  background: var(--bg-surface);
+}
+@media (max-width: 620px) {
+  .playerHeader {
+    flex-direction: column;
+  }
+  .playerIdentity {
+    align-items: flex-start;
+  }
+  .playerActions,
+  .lastFetched,
+  .refreshQuota,
+  .refreshError {
+    align-items: flex-start;
+    text-align: left;
+  }
+}

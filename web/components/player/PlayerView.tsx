@@ -19,6 +19,7 @@ import {
   steamProfileUrl,
   type SteamProfile,
 } from "../../lib/steam";
+import styles from "./PlayerView.module.css";
 
 const LAST_FETCHED_TICK_MS = 1000;
 
@@ -318,226 +319,18 @@ export default function PlayerView({
   };
 
   return (
-    <>
-      <style jsx>{`
-        .page {
-          position: relative;
-          z-index: 1;
-          min-height: calc(100vh - var(--nav-height));
-        }
-        .dashboard {
-          max-width: 1200px;
-          margin: 0 auto;
-          padding: 32px 32px 72px;
-          position: relative;
-        }
-        .rank-ladder {
-          position: absolute;
-          top: 32px;
-          left: -176px;
-          width: 156px;
-        }
-        @media (max-width: 1552px) {
-          .rank-ladder {
-            display: none;
-          }
-        }
-        .player-header {
-          display: flex;
-          align-items: flex-start;
-          justify-content: space-between;
-          gap: 24px;
-          margin-bottom: 24px;
-        }
-        .player-identity {
-          display: flex;
-          align-items: center;
-          gap: 18px;
-          min-width: 0;
-        }
-        .player-avatar {
-          width: 72px;
-          height: 72px;
-          flex-shrink: 0;
-          border: 1px solid var(--border);
-          border-radius: var(--r-8);
-          background: var(--bg-surface);
-          object-fit: cover;
-        }
-        .player-avatar-fallback {
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          font-family: var(--font-mono);
-          font-size: 30px;
-          font-weight: var(--fw-bold);
-          color: var(--text-muted);
-          text-transform: uppercase;
-        }
-        .player-heading { min-width: 0; }
-        .player-name {
-          font-family: "Cinzel", serif;
-          font-size: 28px;
-          font-weight: 700;
-          color: var(--text-primary);
-          margin-bottom: 4px;
-        }
-        .player-meta {
-          font-size: 13px;
-          color: var(--text-muted);
-          letter-spacing: 0.5px;
-        }
-        .player-meta a {
-          color: var(--text-muted);
-          transition: color 0.15s;
-        }
-        .player-meta a:hover {
-          color: var(--text-secondary);
-        }
-        .leaderboard-rank {
-          display: inline-flex;
-          align-items: baseline;
-          gap: 6px;
-          margin-top: 8px;
-          padding: 4px 10px;
-          font-family: var(--font-mono);
-          font-size: 12px;
-          color: var(--text-secondary);
-          background: var(--bg-surface);
-          border: 1px solid var(--border-subtle);
-          border-radius: var(--r-3);
-          letter-spacing: 0.6px;
-        }
-        .leaderboard-rank a {
-          color: var(--text-secondary);
-          text-decoration: none;
-        }
-        .leaderboard-rank a:hover {
-          color: var(--text-primary);
-        }
-        .leaderboard-rank-num {
-          color: var(--text-primary);
-          font-weight: 600;
-        }
-        .leaderboard-rank-total {
-          color: var(--text-muted);
-        }
-        .player-actions {
-          display: flex;
-          flex-direction: column;
-          align-items: flex-end;
-          gap: 10px;
-          flex-shrink: 0;
-        }
-        .last-fetched {
-          display: grid;
-          gap: 3px;
-          text-align: right;
-          font-size: 11px;
-          color: var(--text-muted);
-          letter-spacing: 0.4px;
-        }
-        .last-fetched-label {
-          text-transform: uppercase;
-          letter-spacing: 1.2px;
-        }
-        .last-fetched-value,
-        .last-fetched-age {
-          font-family: var(--font-mono), ui-monospace, SFMono-Regular, Consolas,
-            "Liberation Mono", monospace;
-        }
-        .last-fetched-value {
-          color: var(--text-secondary);
-        }
-        .refresh-quota {
-          display: grid;
-          gap: 3px;
-          text-align: right;
-          font-size: 11px;
-          color: var(--text-muted);
-          letter-spacing: 0.4px;
-        }
-        .refresh-quota-value {
-          font-family: var(--font-mono), ui-monospace, SFMono-Regular, Consolas,
-            "Liberation Mono", monospace;
-          color: var(--text-secondary);
-        }
-        .refresh-error {
-          max-width: 220px;
-          text-align: right;
-          font-size: 11px;
-          color: var(--accent);
-          letter-spacing: 0.35px;
-        }
-        .table-wrap {
-          border: 1px solid var(--border);
-          overflow: hidden;
-        }
-        .table-header {
-          display: grid;
-          grid-template-columns: 72px 1fr 120px 80px 60px 120px 100px;
-          padding: 0 20px;
-          background: var(--bg-surface);
-          border-bottom: 1px solid var(--border);
-        }
-        .th {
-          font-size: 13px;
-          letter-spacing: 1.5px;
-          text-transform: uppercase;
-          color: var(--text-muted);
-          padding: 14px 6px;
-        }
-        .game-entry {
-          border-bottom: 1px solid var(--border-subtle);
-        }
-        .game-entry:last-child {
-          border-bottom: none;
-        }
-        .game-row-link {
-          display: block;
-          color: inherit;
-          cursor: pointer;
-        }
-        .game-row-link:focus-visible {
-          outline: 1px solid var(--accent);
-          outline-offset: -1px;
-        }
-        .empty-state {
-          text-align: center;
-          padding: 80px 32px;
-          color: var(--text-muted);
-          font-size: 16px;
-          background: var(--bg-surface);
-        }
-        @media (max-width: 620px) {
-          .player-header {
-            flex-direction: column;
-          }
-          .player-identity {
-            align-items: flex-start;
-          }
-          .player-actions,
-          .last-fetched,
-          .refresh-quota,
-          .refresh-error {
-            align-items: flex-start;
-            text-align: left;
-          }
-        }
-      `}</style>
-
-      <div className="page">
-        <div className="dashboard">
+    <div className={styles.page}>
+      <div className={styles.dashboard}>
           {drodo?.mmr != null && (
-            <div className="rank-ladder">
+            <div className={styles.rankLadder}>
               <RankLadder mmr={drodo.mmr} />
             </div>
           )}
-          <div className="player-header">
-            <div className="player-identity">
+          <div className={styles.playerHeader}>
+            <div className={styles.playerIdentity}>
               {steamProfile.avatarUrl && !avatarFailed ? (
                 <img
-                  className="player-avatar"
+                  className={styles.playerAvatar}
                   src={steamProfile.avatarUrl}
                   alt={`${displayName} Steam avatar`}
                   width={72}
@@ -546,13 +339,13 @@ export default function PlayerView({
                   onError={() => setAvatarFailed(true)}
                 />
               ) : (
-                <div className="player-avatar player-avatar-fallback" aria-hidden="true">
+                <div className={`${styles.playerAvatar} ${styles.playerAvatarFallback}`} aria-hidden="true">
                   {displayName.charAt(0) || "?"}
                 </div>
               )}
-              <div className="player-heading">
-                <div className="player-name">{displayName}</div>
-                <div className="player-meta">
+              <div className={styles.playerHeading}>
+                <div className={styles.playerName}>{displayName}</div>
+                <div className={styles.playerMeta}>
                   <a
                     href={profileUrl}
                     target="_blank"
@@ -564,13 +357,13 @@ export default function PlayerView({
                   </a>
                 </div>
                 {isAdmin && leaderboardPosition && (
-                  <div className="leaderboard-rank">
+                  <div className={styles.leaderboardRank}>
                     <a href="/leaderboard">
                       Rank{" "}
-                      <span className="leaderboard-rank-num">
+                      <span className={styles.leaderboardRankNum}>
                         #{leaderboardPosition.rank}
                       </span>{" "}
-                      <span className="leaderboard-rank-total">
+                      <span className={styles.leaderboardRankTotal}>
                         of {leaderboardPosition.total}
                       </span>
                     </a>
@@ -578,41 +371,41 @@ export default function PlayerView({
                 )}
               </div>
             </div>
-            <div className="player-actions">
+            <div className={styles.playerActions}>
               {canRefresh && (
                 <Button disabled={refreshDisabled} onClick={handleRefresh}>
                   {refreshing ? "Refreshing..." : "Refresh MMR"}
                 </Button>
               )}
               {showQuota && (
-                <div className="refresh-quota">
+                <div className={styles.refreshQuota}>
                   <span>Manual refreshes</span>
-                  <span className="refresh-quota-value">
+                  <span className={styles.refreshQuotaValue}>
                     {refreshQuotaLabel} left today
                   </span>
                 </div>
               )}
               {refreshError && (
-                <div className="refresh-error">{refreshError}</div>
+                <div className={styles.refreshError}>{refreshError}</div>
               )}
-              <div className="last-fetched">
-                <span className="last-fetched-label">Last fetched</span>
+              <div className={styles.lastFetched}>
+                <span className={styles.lastFetchedLabel}>Last fetched</span>
                 <time
-                  className="last-fetched-value"
+                  className={styles.lastFetchedValue}
                   dateTime={drodoLastFetchedAt ?? undefined}
                 >
                   {lastFetchedTimestamp}
                 </time>
                 {lastFetchedAge && (
-                  <span className="last-fetched-age">{lastFetchedAge}</span>
+                  <span className={styles.lastFetchedAge}>{lastFetchedAge}</span>
                 )}
               </div>
             </div>
           </div>
 
           {drodoProfileMissing && !drodo && (
-            <div className="table-wrap" style={{ marginBottom: 32 }}>
-              <div className="empty-state">
+            <div className={styles.tableWrap} style={{ marginBottom: 32 }}>
+              <div className={styles.emptyState}>
                 No public Auto Chess stats found for this Steam profile.
               </div>
             </div>
@@ -639,22 +432,22 @@ export default function PlayerView({
           {games.length > 0 && (
             <>
               <div className="section-title">Matches</div>
-              <div className="table-wrap">
-                <div className="table-header">
-                  <div className="th">#</div>
-                  <div className="th">Lineup</div>
-                  <div className="th">Rank</div>
-                  <div className="th">W &ndash; L</div>
-                  <div className="th">Lv</div>
-                  <div className="th">Relic</div>
-                  <div className="th">Date</div>
+              <div className={styles.tableWrap}>
+                <div className={styles.tableHeader}>
+                  <div className={styles.th}>#</div>
+                  <div className={styles.th}>Lineup</div>
+                  <div className={styles.th}>Rank</div>
+                  <div className={styles.th}>W &ndash; L</div>
+                  <div className={styles.th}>Lv</div>
+                  <div className={styles.th}>Relic</div>
+                  <div className={styles.th}>Date</div>
                 </div>
                 {games.map((g) => {
                   const href = `/matches/${g.id}`;
                   return (
-                    <div key={g.id} className="game-entry">
+                    <div key={g.id} className={styles.gameEntry}>
                       <div
-                        className="game-row-link"
+                        className={styles.gameRowLink}
                         role="link"
                         tabIndex={0}
                         onClick={() => router.push(href)}
@@ -681,6 +474,5 @@ export default function PlayerView({
           )}
         </div>
       </div>
-    </>
   );
 }
