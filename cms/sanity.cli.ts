@@ -15,4 +15,9 @@ export default defineCliConfig({
     dataset,
   },
   studioHost: 'trackautochess',
+  // Pin the deployed app id so `sanity deploy` doesn't prompt (keeps it
+  // non-interactive for CI). Assigned by Sanity on the first v5 deploy.
+  deployment: {
+    appId: 'eolzyvkjwl428ub4ajsik3g6',
+  },
 })
