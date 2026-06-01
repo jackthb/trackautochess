@@ -18,7 +18,10 @@ interface EntryCommentaryProps {
  * Renders nothing when there's neither commentary nor evidence. Used inline on
  * the patch detail page and reused inside the entity-page list below.
  */
-export function EntryCommentary({ commentary, evidence }: EntryCommentaryProps) {
+export function EntryCommentary({
+  commentary,
+  evidence,
+}: EntryCommentaryProps) {
   const hasEvidence = Array.isArray(evidence) && evidence.length > 0;
   if (!commentary && !hasEvidence) return null;
 
@@ -26,7 +29,18 @@ export function EntryCommentary({ commentary, evidence }: EntryCommentaryProps) 
     <div className={styles.commentary}>
       {commentary && (
         <>
-          <div className={styles.label}>Commentary</div>
+          <div className={styles.label}>
+            TAC Explained
+            <span
+              className={styles.info}
+              tabIndex={0}
+              role="note"
+              aria-label="My own analysis of this change"
+              data-tooltip="My own analysis of this change. The official text is often machine-translated; so the above is my understanding of the changed, usually backed via data obtained from the VPK itself."
+            >
+              ⓘ
+            </span>
+          </div>
           <Markdown className={styles.body}>{commentary}</Markdown>
         </>
       )}
@@ -40,7 +54,9 @@ export function EntryCommentary({ commentary, evidence }: EntryCommentaryProps) 
                   {EVIDENCE_SOURCE_LABEL[ev.source] ?? ev.source}
                 </span>
                 {ev.detail && (
-                  <Markdown className={styles.evidenceDetail}>{ev.detail}</Markdown>
+                  <Markdown className={styles.evidenceDetail}>
+                    {ev.detail}
+                  </Markdown>
                 )}
                 {ev.url && (
                   <a
@@ -80,7 +96,10 @@ export function EntityCommentaryList({ entries }: EntityCommentaryListProps) {
             <span className={styles.kind} style={{ color: KIND_COLOR[e.kind] }}>
               {KIND_LABEL[e.kind]}
             </span>
-            <Link href={`/patch-notes/${e.patchSlug}`} className={styles.patchLink}>
+            <Link
+              href={`/patch-notes/${e.patchSlug}`}
+              className={styles.patchLink}
+            >
               {e.patchTitle}
             </Link>
             {e.date && <span className={styles.date}>{e.date}</span>}

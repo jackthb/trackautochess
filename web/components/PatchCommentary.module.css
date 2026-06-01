@@ -11,12 +11,55 @@
 }
 
 .label {
+  display: flex;
+  align-items: center;
+  gap: var(--s-6);
   font-size: var(--fs-11);
   letter-spacing: var(--tr-upper);
   text-transform: uppercase;
   font-weight: var(--fw-semibold);
   color: var(--accent);
   margin-bottom: var(--s-6);
+}
+
+/* Info affordance: hover/focus explains that commentary is editorial, not
+   from the official notes. Tooltip resets the label's uppercase/tracking. */
+.info {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  cursor: help;
+  font-weight: var(--fw-medium);
+  color: var(--text-muted);
+  transition: color var(--t-base) var(--t-easing);
+}
+
+.info:hover,
+.info:focus-visible {
+  color: var(--accent);
+  outline: none;
+}
+
+.info:hover::after,
+.info:focus-visible::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  left: 0;
+  top: calc(100% + 6px);
+  z-index: 20;
+  width: max-content;
+  max-width: 340px;
+  background: var(--bg-elevated, #11161d);
+  border: 1px solid var(--border);
+  border-radius: var(--r-6);
+  padding: var(--s-8) var(--s-10);
+  color: var(--text-secondary);
+  font-size: var(--fs-12);
+  font-weight: var(--fw-regular, 400);
+  line-height: 1.45;
+  text-transform: none;
+  letter-spacing: normal;
+  white-space: normal;
 }
 
 .body {
