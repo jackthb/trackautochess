@@ -88,7 +88,7 @@
       "heading": "Relics",
       "entries": [
         {
-          "kind": "change",
+          "kind": "nerf",
           "name": "Lucid Star",
           "detail": "Chances will be 24%/22%/20%/18%/16% according to the cost of $1/2/3/4/5.",
           "entity_type": "relic",
