@@ -4,12 +4,18 @@ let initialized = false;
 let cachedClient: PostHog | null = null;
 
 const KEY = process.env.NEXT_PUBLIC_POSTHOG_PROJECT_TOKEN;
-// Events are sent through /ingest (rewritten in next.config.ts to the EU
-// PostHog cluster) so ad blockers targeting *.posthog.com don't drop them.
-// UI host stays at the public domain so toolbar/links still resolve.
-const API_HOST = "/ingest";
+// Events are sent through a first-party proxy so ad blockers targeting
+// *.posthog.com don't drop them. For PostHog managed proxy, set this to a
+// neutral subdomain root such as https://t.trackautochess.com.
+const API_HOST = normalizeApiHost(process.env.NEXT_PUBLIC_POSTHOG_API_HOST);
 const UI_HOST =
-  process.env.NEXT_PUBLIC_POSTHOG_HOST || "https://eu.i.posthog.com";
+  process.env.NEXT_PUBLIC_POSTHOG_HOST || "https://eu.posthog.com";
+
+function normalizeApiHost(raw: string | undefined): string {
+  const trimmed = raw?.trim();
+  if (!trimmed) return "/ingest";
+  return trimmed.replace(/\/+$/, "") || "/ingest";
+}
 
 export async function getPostHog(): Promise<PostHog | null> {
   if (typeof window === "undefined" || !KEY) return null;

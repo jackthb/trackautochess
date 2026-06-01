@@ -17,6 +17,24 @@ product events from `lib/analytics.ts`. Product events intentionally avoid raw
 Steam IDs, profile names, search text, tokens, and private admin/dashboard URLs.
 Set `NEXT_PUBLIC_PRODUCT_ANALYTICS=false` to pause custom product events.
 
+### PostHog managed proxy setup
+
+Use a neutral proxy hostname such as `t.trackautochess.com`. Avoid hostnames
+containing `analytics`, `tracking`, `telemetry`, `posthog`, or `ph`.
+
+1. In PostHog, go to organization proxy settings and create a new managed
+   proxy for `t.trackautochess.com`.
+2. At your DNS provider, add the CNAME target PostHog generates. Do not route
+   this subdomain through Vercel. If using Cloudflare DNS, keep the record
+   DNS-only rather than proxied.
+3. Wait for PostHog to mark the proxy as live.
+4. Set production env vars:
+
+```bash
+NEXT_PUBLIC_POSTHOG_API_HOST=https://t.trackautochess.com
+NEXT_PUBLIC_POSTHOG_HOST=https://eu.posthog.com
+```
+
 Ad slots are controlled by `lib/ads.ts`. Set `NEXT_PUBLIC_ADS_ENABLED=false` to
 pause every slot, or set the `NEXT_PUBLIC_DIRECT_AD_*` variables to run a
 first-party sponsor/job placement without third-party ad scripts. Adsterra keys
