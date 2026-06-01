@@ -43,7 +43,7 @@ export function EntityCard({
       className={`${styles.card} ${styles[variant]}`}
       style={{ "--card-accent": accent } as CSSProperties}
     >
-      <EntityIcon src={iconSrc} alt={iconAlt} size="sm" bordered={variant !== "unit"} />
+      <EntityIcon src={iconSrc} alt={iconAlt} size="sm" bordered={variant !== "unit"} crop={variant === "item"} />
       <div className={styles.body}>
         <div className={styles.name}>{name}</div>
         {description !== undefined && (

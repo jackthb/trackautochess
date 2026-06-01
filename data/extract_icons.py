@@ -307,6 +307,17 @@ def extract_items(force: bool, dry_run: bool, pak) -> tuple[int, int, int]:
                 ok += 1
                 continue
 
+            # Some items are base-Dota items reused by DAC (e.g. Kobold Cup /
+            # item_goutourenjiubei → texture "kobold_cup"). Those have no "_lg"
+            # render on the react CDN, only the plain econ icon. Without this
+            # fallback they 404 here and end up with the wrong (square 94x94
+            # ability spellicon) asset instead of the real 88x64 item icon.
+            url = f"{STEAM_CDN}/items/{cdn_name}.png"
+            if _download(url, dest):
+                print(f"  OK   {name:<30s} → {icon_file}  (item CDN, no _lg)")
+                ok += 1
+                continue
+
             # Try as ability icon instead
             url = f"{STEAM_CDN}/abilities/{texture}_hp2.png"
             if _download(url, dest):
