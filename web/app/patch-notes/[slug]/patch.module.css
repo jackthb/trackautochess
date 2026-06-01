@@ -1,0 +1,214 @@
+/* Ported verbatim from the styled-jsx block in the former
+   pages/patch-notes/[slug].tsx. Element selectors are nested under their
+   container class so CSS-module scoping applies (bare tag selectors would
+   otherwise leak global). The two former :global() rules (.entry-name /
+   .entry-link) are kept module-scoped here and referenced via styles. */
+.page {
+  position: relative;
+  z-index: 1;
+  min-height: calc(100vh - var(--nav-height));
+}
+.container {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: var(--s-40) var(--s-32) var(--s-48);
+}
+.breadcrumbs {
+  display: flex;
+  gap: var(--s-10);
+  flex-wrap: wrap;
+  margin-bottom: var(--s-20);
+  font-size: var(--fs-12);
+  letter-spacing: var(--tr-upper);
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+.breadcrumbs a {
+  color: var(--text-muted);
+  transition: color var(--t-base) var(--t-easing);
+}
+.breadcrumbs a:hover {
+  color: var(--text-secondary);
+}
+.date {
+  font-size: var(--fs-12);
+  letter-spacing: var(--tr-upper-wide);
+  color: var(--text-muted);
+  text-transform: uppercase;
+  margin-bottom: var(--s-8);
+}
+.title {
+  font-family: var(--font-display);
+  font-size: var(--fs-32);
+  font-weight: var(--fw-bold);
+  letter-spacing: var(--tr-display);
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: var(--s-20);
+}
+.link-row {
+  display: flex;
+  gap: var(--s-10);
+  flex-wrap: wrap;
+  margin-bottom: var(--s-24);
+}
+.source {
+  display: inline-block;
+  font-size: var(--fs-11);
+  letter-spacing: var(--tr-upper);
+  text-transform: uppercase;
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+  border-radius: var(--r-3);
+  padding: var(--s-6) var(--s-12);
+  transition: color var(--t-base) var(--t-easing),
+    border-color var(--t-base) var(--t-easing),
+    background var(--t-base) var(--t-easing);
+}
+.source:hover {
+  color: var(--text-secondary);
+  border-color: var(--text-muted);
+  background: var(--bg-hover);
+}
+.summary {
+  padding: var(--s-20) var(--s-24);
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-8);
+  margin-bottom: var(--s-32);
+}
+.summary-line {
+  font-size: var(--fs-14);
+  line-height: var(--lh-relaxed);
+  color: var(--text-primary);
+  padding: var(--s-8) 0;
+  border-bottom: 1px solid var(--border-subtle);
+}
+.summary-line:last-child,
+.summary-line.summary-last {
+  border-bottom: none;
+}
+.summary-line.bullet {
+  position: relative;
+  padding-left: var(--s-20);
+}
+.summary-line.bullet::before {
+  content: "*";
+  position: absolute;
+  left: 0;
+  top: var(--s-8);
+  color: var(--accent-dim);
+  font-size: var(--fs-11);
+  line-height: var(--lh-body);
+}
+.summary-footer {
+  margin-top: var(--s-16);
+  padding-top: var(--s-14);
+  border-top: 1px solid var(--border-subtle);
+  font-size: var(--fs-12);
+  color: var(--text-muted);
+  letter-spacing: var(--tr-body);
+}
+.summary-footer a {
+  color: var(--accent-dim);
+  text-decoration: underline;
+  transition: color var(--t-base) var(--t-easing);
+}
+.summary-footer a:hover {
+  color: var(--accent);
+}
+.flavor {
+  font-size: var(--fs-14);
+  line-height: var(--lh-relaxed);
+  color: var(--text-secondary);
+  font-style: italic;
+  padding: var(--s-16) var(--s-20);
+  border-left: 2px solid var(--accent-dim);
+  background: var(--bg-surface);
+  border-radius: 0 var(--r-8) var(--r-8) 0;
+  margin-bottom: var(--s-40);
+}
+.section {
+  margin-bottom: var(--s-32);
+}
+.section-heading {
+  font-family: var(--font-display);
+  font-size: var(--fs-14);
+  letter-spacing: var(--tr-display);
+  text-transform: uppercase;
+  color: var(--text-primary);
+  padding-bottom: var(--s-10);
+  border-bottom: 1px solid var(--border);
+  margin-bottom: var(--s-16);
+}
+.entry {
+  display: grid;
+  grid-template-columns: 90px 1fr;
+  gap: var(--s-16);
+  padding: var(--s-12) 0;
+  border-bottom: 1px solid var(--border-subtle);
+}
+.entry:last-child {
+  border-bottom: none;
+}
+.kind {
+  font-size: var(--fs-11);
+  letter-spacing: var(--tr-upper);
+  font-weight: var(--fw-semibold);
+  padding-top: 2px;
+}
+.entry-name-row {
+  display: flex;
+  align-items: center;
+  gap: var(--s-10);
+  margin-bottom: var(--s-4);
+}
+.entry-icon {
+  flex-shrink: 0;
+  width: auto;
+  height: 32px;
+  object-fit: contain;
+  border: 1px solid var(--border);
+  border-radius: var(--r-4);
+  background: var(--bg-deep);
+}
+.entry-name {
+  font-size: var(--fs-14);
+  color: var(--text-primary);
+  font-weight: var(--fw-medium);
+}
+.entry-link {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  transition: color var(--t-base) var(--t-easing);
+}
+.entry-link:hover {
+  color: var(--accent-dim);
+}
+.entry-tooltip {
+  position: relative;
+}
+.entry-tooltip:hover::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  left: 0;
+  top: calc(100% + 6px);
+  z-index: 20;
+  max-width: 420px;
+  width: max-content;
+  background: var(--bg-elevated, #11161d);
+  border: 1px solid var(--border);
+  border-radius: var(--r-6);
+  padding: var(--s-8) var(--s-10);
+  color: var(--text-primary);
+  font-size: var(--fs-12);
+  line-height: 1.45;
+  text-transform: none;
+  letter-spacing: normal;
+  white-space: normal;
+}
+.entry-detail {
+  font-size: var(--fs-13);
+  line-height: var(--lh-body);
+  color: var(--text-secondary);
+}
