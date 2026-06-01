@@ -386,13 +386,6 @@ export default function PatchDetailPage({
           border-radius: var(--r-4);
           background: var(--bg-deep);
         }
-        /* Item icons are mixed aspect (rectangular Dota econ icons vs square
-           custom spellicons like Kobold Cup); frame them to the standard item
-           ratio with a center-crop so they sit uniformly. */
-        .entry-icon-item {
-          width: 44px;
-          object-fit: cover;
-        }
         :global(.entry-name) {
           font-size: var(--fs-14);
           color: var(--text-primary);
@@ -529,7 +522,7 @@ export default function PatchDetailPage({
                       <div className="entry-name-row">
                         {iconSrc && (
                           <img
-                            className={`entry-icon${entry.entity_type === "item" ? " entry-icon-item" : ""}`}
+                            className="entry-icon"
                             src={iconSrc}
                             alt=""
                             onError={(e: React.SyntheticEvent<HTMLImageElement>) => {

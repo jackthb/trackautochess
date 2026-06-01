@@ -15,17 +15,6 @@
   background: transparent;
 }
 
-/* Item icons come in mixed aspect ratios: Dota econ icons are rectangular
-   (~88x64), but custom Auto Chess items (e.g. Kobold Cup) only ship a square
-   spellicon. Frame them to the standard item ratio with a center-crop so they
-   sit uniformly — the game does the same when it slots a square spellicon.
-   Already-rectangular icons fill the frame unchanged. */
-.crop {
-  width: 88px;
-  height: 64px;
-  object-fit: cover;
-}
-
 .sm {
   max-width: 88px;
   max-height: 88px;

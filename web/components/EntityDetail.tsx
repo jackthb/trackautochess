@@ -129,7 +129,7 @@ export function EntityDetail({
         </nav>
 
         <section className={styles.hero}>
-          <EntityIcon src={iconSrc} alt={name} size="lg" bordered={variant !== "unit"} crop={variant === "item"} />
+          <EntityIcon src={iconSrc} alt={name} size="lg" bordered={variant !== "unit"} />
           <div>
             <h1 className={titleClass} style={titleColor ? { color: titleColor } : undefined}>
               {name}
