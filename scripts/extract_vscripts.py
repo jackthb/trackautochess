@@ -1,14 +1,20 @@
 #!/usr/bin/env python3
 """
-Extract DAC VScripts from the Steam workshop VPK and diff against the last known version.
+Extract DAC VScripts from the Steam workshop VPK and diff against the last extraction.
+
+The mod's Lua is third-party game logic, so none of it is tracked in git (see
+.gitignore). Each run rotates the prior extraction to data/vscripts_prev/ and
+diffs the fresh pull against it locally — purely for inspecting what a patch
+changed. Both dirs stay on your disk only.
 
 Usage:
-    python scripts/extract_vscripts.py           # extract + print diff
+    python scripts/extract_vscripts.py           # extract + print local diff
     python scripts/extract_vscripts.py --save    # extract + save diff to data/vscript_diffs/
 """
 
 import argparse
 import os
+import shutil
 import subprocess
 import sys
 from datetime import datetime
@@ -23,6 +29,7 @@ STEAM_PATHS = [
 
 REPO_ROOT = Path(__file__).parent.parent
 OUT_DIR = REPO_ROOT / "data" / "vscripts"
+PREV_DIR = REPO_ROOT / "data" / "vscripts_prev"  # last extraction, kept aside for local diffing
 DIFF_DIR = REPO_ROOT / "data" / "vscript_diffs"
 
 
@@ -42,6 +49,14 @@ def extract(vpk_path: Path) -> int:
         sys.exit("Missing dependency: pip install vpk")
 
     pak = vpklib.open(str(vpk_path))
+
+    # Rotate the previous extraction aside so we can diff new-vs-old locally
+    # without tracking any of it in git (the mod's Lua isn't ours to host).
+    if OUT_DIR.exists():
+        if PREV_DIR.exists():
+            shutil.rmtree(PREV_DIR)
+        OUT_DIR.rename(PREV_DIR)
+
     OUT_DIR.mkdir(parents=True, exist_ok=True)
     count = 0
     for path in pak:
@@ -55,13 +70,23 @@ def extract(vpk_path: Path) -> int:
     return count
 
 
-def git_diff() -> str:
+def local_diff() -> str:
+    """Diff the fresh extraction against the previous one (both gitignored).
+
+    Uses `git diff --no-index`, which compares two arbitrary paths regardless
+    of whether they're tracked — so nothing about the mod's Lua ever needs to
+    live in the repo. Returns "" on the first run (no previous extraction).
+    """
+    if not PREV_DIR.exists():
+        return ""
     result = subprocess.run(
-        ["git", "diff", "--", str(OUT_DIR.relative_to(REPO_ROOT))],
+        ["git", "diff", "--no-index", "--", str(PREV_DIR), str(OUT_DIR)],
         cwd=REPO_ROOT,
         capture_output=True,
         text=True,
     )
+    # `git diff --no-index` exits 1 when files differ — that's the normal case,
+    # not an error; the diff text we want is on stdout either way.
     return result.stdout
 
 
@@ -76,9 +101,13 @@ def main():
     count = extract(vpk_path)
     print(f"Extracted {count} files to {OUT_DIR}")
 
-    diff = git_diff()
+    diff = local_diff()
     if not diff:
-        print("No changes since last extraction.")
+        if not PREV_DIR.exists():
+            print("First extraction — nothing to diff against yet. "
+                  "Re-run after the next patch to see changes.")
+        else:
+            print("No changes since last extraction.")
         return
 
     if args.save:

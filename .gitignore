@@ -42,3 +42,9 @@ cms/dist/
 .vercel
 twitch-extension.zip
 twitch-extension/
+
+# Decompiled DAC mod VScripts — third-party game logic, not ours to host.
+# Regenerate + diff locally on demand via scripts/extract_vscripts.py.
+data/vscripts/
+data/vscripts_prev/
+data/vscript_diffs/
