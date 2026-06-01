@@ -1,0 +1,29 @@
+/* Signed-in hero CTA. A CSS module (not the page's styled-jsx) because
+   styled-jsx scopes to native elements and can't reach the <a> that next/link
+   renders — the class has to attach directly to the element. Matches the Steam
+   sign-in button's 42px height so the two CTAs read as siblings. */
+.profileCta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 42px;
+  padding: 0 24px;
+  font-family: var(--font-mono);
+  font-size: 14px;
+  font-weight: var(--fw-semibold);
+  letter-spacing: 0.4px;
+  color: var(--text-primary);
+  background: var(--accent);
+  border: 1px solid var(--accent);
+  border-radius: var(--r-2);
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background 0.15s ease, border-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.profileCta:hover {
+  background: var(--accent-hover);
+  border-color: var(--accent-hover);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 25%, transparent);
+}

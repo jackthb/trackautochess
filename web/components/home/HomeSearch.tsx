@@ -7,6 +7,7 @@ import { ProfileSearch } from "@/components/ProfileSearch";
 import { SteamSignInButton } from "@/components/SteamSignInButton";
 import { createSupabaseClient } from "@/lib/supabase";
 import { type SearchResult } from "@/lib/playerSearch";
+import styles from "./HomeSearch.module.css";
 
 export interface HomeProps {
   initialSearchResults: SearchResult[];
@@ -279,28 +280,6 @@ export default function HomeSearch({ initialSearchResults }: HomeProps) {
           color: var(--text-secondary);
           text-transform: uppercase;
         }
-        .profile-cta {
-          display: inline-flex;
-          align-items: center;
-          justify-content: center;
-          height: 42px;
-          padding: 0 24px;
-          font-family: var(--font-mono);
-          font-size: 14px;
-          font-weight: 600;
-          letter-spacing: 0.4px;
-          color: #fff;
-          background: var(--accent);
-          border: 1px solid var(--accent);
-          border-radius: 4px;
-          text-decoration: none;
-          white-space: nowrap;
-          transition: filter 0.15s ease, box-shadow 0.15s ease;
-        }
-        .profile-cta:hover {
-          filter: brightness(1.08);
-          box-shadow: 0 0 0 3px rgba(224, 64, 42, 0.25);
-        }
         .preview {
           position: relative;
           z-index: 1;
@@ -421,7 +400,7 @@ export default function HomeSearch({ initialSearchResults }: HomeProps) {
                   <span>{t.signinDivider}</span>
                 </div>
                 {user ? (
-                  <Link href="/dashboard" className="profile-cta">
+                  <Link href="/dashboard" className={styles.profileCta}>
                     {t.viewProfile}
                   </Link>
                 ) : (
