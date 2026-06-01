@@ -1,12 +1,13 @@
+import type { Metadata } from "next";
 import { Fragment } from "react";
 import Link from "next/link";
-import { useRouter } from "next/router";
-import type { SupabaseClient } from "@supabase/supabase-js";
 import patchIndex from "@data/patch_notes/index.json";
-import { SeoHead } from "@/lib/seo";
-import { SITE_TITLE } from "@/lib/site";
-import { normalizeLocale, pickLocalized } from "@/lib/i18n";
+import { SITE_NAME, SITE_TITLE } from "@/lib/site";
+import { DEFAULT_LOCALE, pickLocalized } from "@/lib/i18n";
 import styles from "./patch-notes.module.css";
+
+// App Router migration of pages/patch-notes.tsx — presentational list of patch
+// notes. Server Component + static metadata + JSON-LD. Single (English) locale.
 
 interface IndexPatch {
   date: string;
@@ -15,23 +16,43 @@ interface IndexPatch {
   titles?: Record<string, string> | null;
 }
 
-interface PatchNotesPageProps {
-  supabase: SupabaseClient | null;
-}
+const title = `Patch Notes | ${SITE_TITLE}`;
+const description =
+  "Read the latest Dota Auto Chess patch notes, including new relics, new items, balance changes, and update history on Track Auto Chess.";
+
+export const metadata: Metadata = {
+  title,
+  description,
+  alternates: { canonical: "/patch-notes" },
+  robots: "index, follow, max-image-preview:large",
+  openGraph: {
+    title,
+    description,
+    type: "website",
+    siteName: SITE_NAME,
+    url: "/patch-notes",
+    locale: "en_US",
+    images: ["/logo.svg"],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title,
+    description,
+    images: ["/logo.svg"],
+  },
+};
+
+const structuredData = {
+  "@context": "https://schema.org",
+  "@type": "CollectionPage",
+  name: "Dota Auto Chess patch notes",
+  description,
+  about: "Dota Auto Chess patch notes",
+};
 
 const MONTHS = [
-  "JAN",
-  "FEB",
-  "MAR",
-  "APR",
-  "MAY",
-  "JUN",
-  "JUL",
-  "AUG",
-  "SEP",
-  "OCT",
-  "NOV",
-  "DEC",
+  "JAN", "FEB", "MAR", "APR", "MAY", "JUN",
+  "JUL", "AUG", "SEP", "OCT", "NOV", "DEC",
 ];
 
 function formatDate(iso: string): { month: string; day: string; year: string } {
@@ -44,34 +65,18 @@ function formatDate(iso: string): { month: string; day: string; year: string } {
   };
 }
 
-export default function PatchNotesPage({ supabase }: PatchNotesPageProps) {
-  void supabase;
-  const router = useRouter();
-  const locale = normalizeLocale(router.locale ?? router.defaultLocale ?? undefined);
+export default function PatchNotesPage() {
   const patches = [...(patchIndex.patches as IndexPatch[])].sort((a, b) =>
     b.date.localeCompare(a.date)
   );
-  const title = `Patch Notes | ${SITE_TITLE}`;
-  const description =
-    "Read the latest Dota Auto Chess patch notes, including new relics, new items, balance changes, and update history on Track Auto Chess.";
-  const structuredData = {
-    "@context": "https://schema.org",
-    "@type": "CollectionPage",
-    name: "Dota Auto Chess patch notes",
-    description,
-    about: "Dota Auto Chess patch notes",
-  };
 
   let lastYear = "";
 
   return (
     <>
-      <SeoHead
-        title={title}
-        description={description}
-        path="/patch-notes"
-        locale={locale}
-        structuredData={structuredData}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
       />
 
       <div className={styles.page}>
@@ -100,7 +105,8 @@ export default function PatchNotesPage({ supabase }: PatchNotesPageProps) {
                       <span className={styles.day}>{day}</span>
                     </div>
                     <span className={styles.title}>
-                      {pickLocalized(patch.titles ?? undefined, locale) || patch.title}
+                      {pickLocalized(patch.titles ?? undefined, DEFAULT_LOCALE) ||
+                        patch.title}
                     </span>
                     <span className={styles.arrow}>READ &rarr;</span>
                   </Link>
