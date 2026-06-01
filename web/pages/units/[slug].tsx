@@ -66,6 +66,7 @@ export default function UnitDetailPage({
     return {
       slug,
       name: matched?.name ?? engName,
+      description: matched?.description,
       iconSrc:
         matched?.iconUrl ?? `/icons/synergies/${matched?.iconStem ?? ""}.png`,
       variant: "synergy",
