@@ -1,6 +1,7 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { validatePreviewUrl } from "@sanity/preview-url-secret";
 import { tokenClient } from "@/lib/sanity/client";
+import { partitionDraftCookie } from "@/lib/sanity/draftCookie";
 
 export default async function handler(
   req: NextApiRequest,
@@ -24,6 +25,7 @@ export default async function handler(
   }
 
   res.setDraftMode({ enable: true });
+  partitionDraftCookie(res);
   res.writeHead(307, { Location: redirectTo });
   res.end();
 }
