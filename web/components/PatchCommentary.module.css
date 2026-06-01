@@ -23,7 +23,6 @@
   font-size: var(--fs-13);
   line-height: var(--lh-relaxed);
   color: var(--text-primary);
-  white-space: pre-line;
 }
 
 .evidence {
@@ -74,7 +73,6 @@
 .evidenceDetail {
   flex: 1 1 auto;
   min-width: 0;
-  white-space: pre-line;
 }
 
 .evidenceLink {

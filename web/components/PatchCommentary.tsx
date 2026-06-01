@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Markdown } from "./Markdown";
 import { KIND_COLOR, KIND_LABEL } from "@/lib/patchKinds";
 import {
   EVIDENCE_SOURCE_LABEL,
@@ -26,7 +27,7 @@ export function EntryCommentary({ commentary, evidence }: EntryCommentaryProps) 
       {commentary && (
         <>
           <div className={styles.label}>Commentary</div>
-          <div className={styles.body}>{commentary}</div>
+          <Markdown className={styles.body}>{commentary}</Markdown>
         </>
       )}
       {hasEvidence && (
@@ -39,7 +40,7 @@ export function EntryCommentary({ commentary, evidence }: EntryCommentaryProps) 
                   {EVIDENCE_SOURCE_LABEL[ev.source] ?? ev.source}
                 </span>
                 {ev.detail && (
-                  <span className={styles.evidenceDetail}>{ev.detail}</span>
+                  <Markdown className={styles.evidenceDetail}>{ev.detail}</Markdown>
                 )}
                 {ev.url && (
                   <a

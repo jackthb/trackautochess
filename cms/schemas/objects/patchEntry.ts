@@ -41,8 +41,9 @@ export const patchEntry = defineType({
       type: 'text',
       rows: 4,
       description:
-        'Your own take — what this change actually means in plain language. ' +
-        'Shows under the entry on the patch page and on the linked entity page.',
+        'Your take on this specific change, in plain language. Appears inline ' +
+        "under this entry on the patch page, and as one dated, attributed item " +
+        "in the linked entity's commentary history (it does not affect other patches).",
     }),
     defineField({
       name: 'evidence',
