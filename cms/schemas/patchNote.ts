@@ -46,6 +46,21 @@ export const patchNote = defineType({
       of: [{type: 'patchSection'}],
     }),
     defineField({
+      name: 'entitiesSynced',
+      title: 'Entities synced for this patch',
+      description:
+        "Whether this patch's game-data changes have been pulled from the VPK into data/*.json and pushed to the CMS. The scraper sets this false on every new patch (and when a hotfix is folded in); the /sync-patch-entities skill (or `node scripts/mark-patch-synced.mjs`) flips it true once the full entity sync has run. Absent on legacy patches predating the flag, which are treated as already synced.",
+      type: 'boolean',
+      readOnly: true,
+    }),
+    defineField({
+      name: 'entitiesSyncedAt',
+      title: 'Entities synced at',
+      description: 'Timestamp of the last successful entity sync for this patch.',
+      type: 'datetime',
+      readOnly: true,
+    }),
+    defineField({
       name: 'absorbedDates',
       title: 'Absorbed hotfix dates',
       description:

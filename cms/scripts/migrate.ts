@@ -423,6 +423,10 @@ async function migratePatchNotes() {
       slug: {_type: 'slug', current: slug},
       source: j.source ?? null,
       flavor: j.flavor ?? null,
+      // Only carry the sync flag when the patch JSON declares it, so legacy
+      // patches predating the flag stay untouched (treated as already synced).
+      ...(typeof j.entitiesSynced === 'boolean' ? {entitiesSynced: j.entitiesSynced} : {}),
+      ...(j.entitiesSyncedAt ? {entitiesSyncedAt: j.entitiesSyncedAt} : {}),
       ...(Array.isArray(j.absorbedDates) && j.absorbedDates.length
         ? {absorbedDates: j.absorbedDates}
         : {}),

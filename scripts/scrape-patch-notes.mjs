@@ -296,6 +296,9 @@ function foldHotfix(parent, hotfixDate, hotfixSections) {
   parent.absorbedDates = [
     ...new Set([...(parent.absorbedDates || []), hotfixDate]),
   ];
+  // A folded hotfix brings fresh game-data changes, so the parent's entities
+  // need re-syncing — reset its flag.
+  parent.entitiesSynced = false;
   if (DRY_RUN) {
     console.log(`[dry-run] Would fold ${hotfixDate} into ${parent.slug}.json`);
     return;
@@ -303,6 +306,7 @@ function foldHotfix(parent, hotfixDate, hotfixSections) {
   const data = JSON.parse(readFileSync(parent.file, "utf-8"));
   data.sections = parent.sections;
   data.absorbedDates = parent.absorbedDates;
+  data.entitiesSynced = false;
   writeFileSync(parent.file, JSON.stringify(data, null, 2) + "\n");
   console.log(`Folded ${hotfixDate} hotfix into ${parent.slug}.json`);
 }
@@ -519,6 +523,10 @@ async function main() {
       title,
       source: docsUrl || CHANGELOG_URL,
       workshop_url: docsUrl ? CHANGELOG_URL : undefined,
+      // New patches carry game-data changes that have NOT yet been pulled from
+      // the VPK into data/*.json + the CMS. Flipped true by the
+      // /sync-patch-entities skill or scripts/mark-patch-synced.mjs.
+      entitiesSynced: false,
       sections,
     };
 
