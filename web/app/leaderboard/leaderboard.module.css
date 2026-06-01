@@ -1,0 +1,139 @@
+/* Ported verbatim from the styled-jsx block in the former pages/leaderboard.tsx.
+   Hyphenated class names are preserved and accessed via bracket notation in the
+   client island (styles["header-row"], etc.). */
+.lead {
+  font-family: var(--font-mono);
+  font-size: var(--fs-13);
+  color: var(--text-secondary);
+  line-height: var(--lh-relaxed);
+  margin: 0 0 24px;
+  max-width: 720px;
+}
+.lead strong {
+  color: var(--text-primary);
+}
+.gate {
+  text-align: center;
+  padding: 80px 20px;
+  font-family: var(--font-mono);
+  font-size: var(--fs-13);
+  color: var(--text-muted);
+  letter-spacing: 0.4px;
+}
+.table {
+  display: grid;
+  grid-template-columns: 56px 44px 1fr 96px 64px 84px 80px 80px;
+  border: 1px solid var(--border);
+  background: var(--bg-surface);
+  border-radius: var(--r-8);
+  overflow: hidden;
+}
+.row {
+  display: contents;
+}
+.cell {
+  padding: 12px 14px;
+  font-family: var(--font-mono);
+  font-size: var(--fs-13);
+  border-bottom: 1px solid var(--border-subtle);
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  min-width: 0;
+}
+.row:last-child .cell {
+  border-bottom: none;
+}
+.header-row .cell {
+  font-size: var(--fs-11);
+  letter-spacing: var(--tr-upper);
+  text-transform: uppercase;
+  color: var(--text-muted);
+  background: rgba(255, 255, 255, 0.02);
+}
+.cell-rank {
+  font-variant-numeric: tabular-nums;
+  color: var(--text-muted);
+  font-size: var(--fs-12);
+}
+.top-rank {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+.gold {
+  color: var(--gold, #d4af37);
+}
+.silver {
+  color: #c0c0c0;
+}
+.bronze {
+  color: #cd7f32;
+}
+.cell-avatar {
+  padding: 6px 0;
+}
+.avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid var(--border);
+  background: var(--bg-surface);
+}
+.avatar-fallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+.player-link {
+  color: var(--text-primary);
+  text-decoration: none;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  transition: color 0.15s;
+}
+.player-link:hover {
+  color: var(--accent);
+}
+.player-vanity {
+  color: var(--text-muted);
+  font-size: var(--fs-11);
+  margin-left: 6px;
+}
+.cell-mmr {
+  color: var(--text-primary);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.cell-meta {
+  color: var(--text-secondary);
+  font-variant-numeric: tabular-nums;
+}
+.dim {
+  color: var(--text-muted);
+  opacity: 0.6;
+}
+.empty {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: var(--fs-13);
+}
+@media (max-width: 760px) {
+  .table {
+    grid-template-columns: 44px 36px 1fr 72px 56px 64px;
+  }
+  .hide-sm {
+    display: none;
+  }
+  .cell {
+    padding: 10px 8px;
+    font-size: var(--fs-12);
+  }
+}

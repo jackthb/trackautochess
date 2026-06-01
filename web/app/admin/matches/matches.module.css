@@ -1,0 +1,121 @@
+/* Ported verbatim from the styled-jsx block in the former
+   pages/admin/matches.tsx. classNames map 1:1 to the original. */
+.lead {
+  font-family: var(--font-mono);
+  font-size: var(--fs-13);
+  color: var(--text-secondary);
+  line-height: var(--lh-relaxed);
+  margin: 0 0 24px;
+  max-width: 720px;
+}
+.gate {
+  text-align: center;
+  padding: 80px 20px;
+  font-family: var(--font-mono);
+  font-size: var(--fs-13);
+  color: var(--text-muted);
+  letter-spacing: 0.4px;
+}
+.table {
+  display: grid;
+  grid-template-columns: 56px 180px 1fr 64px;
+  border: 1px solid var(--border);
+  background: var(--bg-surface);
+  border-radius: var(--r-8);
+  overflow: hidden;
+}
+.row {
+  display: contents;
+}
+.cell {
+  padding: 12px 14px;
+  font-family: var(--font-mono);
+  font-size: var(--fs-13);
+  border-bottom: 1px solid var(--border-subtle);
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  min-width: 0;
+}
+.row:last-child .cell {
+  border-bottom: none;
+}
+.headerRow .cell {
+  font-size: var(--fs-11);
+  letter-spacing: var(--tr-upper);
+  text-transform: uppercase;
+  color: var(--text-muted);
+  background: rgba(255, 255, 255, 0.02);
+}
+.matchRow {
+  display: contents;
+  cursor: pointer;
+}
+.matchRow:hover .cell {
+  background: rgba(255, 255, 255, 0.025);
+}
+.cellMeta {
+  color: var(--text-secondary);
+  font-variant-numeric: tabular-nums;
+}
+.winner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+.avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid var(--border);
+  background: var(--bg-surface);
+  flex-shrink: 0;
+}
+.avatarFallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+.winnerName {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--text-primary);
+}
+.playerLink {
+  color: var(--text-primary);
+  text-decoration: none;
+  transition: color 0.15s;
+}
+.playerLink:hover {
+  color: var(--accent);
+}
+.placement {
+  font-variant-numeric: tabular-nums;
+  color: var(--text-muted);
+}
+.empty {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: var(--fs-13);
+}
+@media (max-width: 760px) {
+  .table {
+    grid-template-columns: 44px 1fr 56px;
+  }
+  .hideSm {
+    display: none;
+  }
+  .cell {
+    padding: 10px 8px;
+    font-size: var(--fs-12);
+  }
+}
