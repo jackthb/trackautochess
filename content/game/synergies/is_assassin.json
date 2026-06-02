@@ -5,28 +5,28 @@
   "icon": "synergies/assassin.png",
   "source": {
     "name": "Assassin",
-    "description": "The first movement of Assassin pieces in each round causes Assassins to leap over to the back of the enemy lineup. The first blow after Backstab Leap is always a critical strike with a random bonus damage amplifier.\n\nClass Perk: Coup de Grace\n\nActive when you have at least (N) different Assassin pieces on board. (Multiple effects stack)\n\n(3) Assassins: All friendly assassins have 15% chance to critical hit for 300% damage.\n(6) Assassins: All assassins have 15% chance to critical hit for 400% damage.\n(9) Assassins: All assassins refresh a Backstab Leap move after killing an enemy or a certain duration. This Backstab Leap always deals the maximum possible critical damage.",
+    "names": {
+      "en": "Assassin",
+      "ru": "Assassin"
+    },
+    "description": "The first movement of Assassin pieces in each round causes Assassins to leap over to the back of the enemy lineup. The first blow after Backstab Leap is always a critical strike with a random bonus damage amplifier.\n\nClass Perk: Coup de Grace\n Active when you have at least (N) different Assassin pieces on board. (Multiple effects stack)\n\n(3) Assassins: All friendly assassins have 15% chance to critical hit for 300% damage.\n(6) Assassins: All assassins have 15% chance to critical hit for 400% damage.\n(9) Assassins: All assassins refresh a Backstab Leap move after killing an enemy or a certain duration. This Backstab Leap always deals the maximum possible critical damage.",
+    "descriptions": {
+      "en": "The first movement of Assassin pieces in each round causes Assassins to leap over to the back of the enemy lineup. The first blow after Backstab Leap is always a critical strike with a random bonus damage amplifier.\n\nClass Perk: Coup de Grace\n Active when you have at least (N) different Assassin pieces on board. (Multiple effects stack)\n\n(3) Assassins: All friendly assassins have 15% chance to critical hit for 300% damage.\n(6) Assassins: All assassins have 15% chance to critical hit for 400% damage.\n(9) Assassins: All assassins refresh a Backstab Leap move after killing an enemy or a certain duration. This Backstab Leap always deals the maximum possible critical damage.",
+      "ru": "Первым движением фигуры ассасинов в каждом раунде прыгают за врагов. Первый удар после прыжка с ударом в спину всегда является критическим ударом, который увеличивает случайный дополнительный урон.\n\nClass Perk: Coup de Grace\n Активен, когда у вас на столе есть минимум (N) различных фигур Ассасинов. (Эффекты складываются)\n\n(3) Ассасины: Все дружественные Ассасины имеют 15% шанс нанести критический удар, наносящий 300% урона.\n(6) Ассасины: Все дружественные Ассасины имеют 15% шанс нанести критический удар, наносящий 400% урона.\n(9) Ассасины: Все ассасины обновляют Удар в спину после убийства врага или по истечении определенного времени. Удар в спину всегда наносит максимально возможный критический урон."
+    },
     "description_html": "The first movement of Assassin pieces in each round causes Assassins to leap over to the back of the enemy lineup. The first blow after Backstab Leap is always a critical strike with a random bonus damage amplifier.\n<h1>Class Perk: Coup de Grace</h1><font color=\"#656585\">Active when you have at least (N) different Assassin pieces on board. (Multiple effects stack)</font><br><br>(3) Assassins: All friendly assassins have 15% chance to critical hit for 300% damage.<br>(6) Assassins: All assassins have 15% chance to critical hit for 400% damage.<br>(9) Assassins: All assassins refresh a Backstab Leap move after killing an enemy or a certain duration. This Backstab Leap always deals the maximum possible critical damage.",
     "lore": "Assassins are skilled executioners that leap into enemy backlines. Together, they gain a keen eye for weaknesses in enemy armor, gaining the ability to deliver devastating critical hits.",
+    "lore_i18n": {
+      "en": "Assassins are skilled executioners that leap into enemy backlines. Together, they gain a keen eye for weaknesses in enemy armor, gaining the ability to deliver devastating critical hits.",
+      "ru": "Assassins — искусные убийцы, прыгающие в тыл врага. Вместе они лучше видят уязвимости в броне и получают способность наносить разрушительные критические удары."
+    },
     "notes": [],
     "tiers": [
       3,
       6,
       9
     ],
-    "ability_special": {},
-    "names": {
-      "en": "Assassin",
-      "ru": "Assassin"
-    },
-    "descriptions": {
-      "en": "The first movement of Assassin pieces in each round causes Assassins to leap over to the back of the enemy lineup. The first blow after Backstab Leap is always a critical strike with a random bonus damage amplifier.\n\nClass Perk: Coup de Grace\n Active when you have at least (N) different Assassin pieces on board. (Multiple effects stack)\n\n(3) Assassins: All friendly assassins have 15% chance to critical hit for 300% damage.\n(6) Assassins: All assassins have 15% chance to critical hit for 400% damage.\n(9) Assassins: All assassins refresh a Backstab Leap move after killing an enemy or a certain duration. This Backstab Leap always deals the maximum possible critical damage.",
-      "ru": "Первым движением фигуры ассасинов в каждом раунде прыгают за врагов. Первый удар после прыжка с ударом в спину всегда является критическим ударом, который увеличивает случайный дополнительный урон.\n\nClass Perk: Coup de Grace\n Активен, когда у вас на столе есть минимум (N) различных фигур Ассасинов. (Эффекты складываются)\n\n(3) Ассасины: Все дружественные Ассасины имеют 15% шанс нанести критический удар, наносящий 300% урона.\n(6) Ассасины: Все дружественные Ассасины имеют 15% шанс нанести критический удар, наносящий 400% урона.\n(9) Ассасины: Все ассасины обновляют Удар в спину после убийства врага или по истечении определенного времени. Удар в спину всегда наносит максимально возможный критический урон."
-    },
-    "lore_i18n": {
-      "en": "Assassins are skilled executioners that leap into enemy backlines. Together, they gain a keen eye for weaknesses in enemy armor, gaining the ability to deliver devastating critical hits.",
-      "ru": "Assassins — искусные убийцы, прыгающие в тыл врага. Вместе они лучше видят уязвимости в броне и получают способность наносить разрушительные критические удары."
-    }
+    "ability_special": {}
   },
   "overrides": {}
 }

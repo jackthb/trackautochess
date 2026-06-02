@@ -5,23 +5,23 @@
   "icon": "items/baojunwangpao.png",
   "source": {
     "name": "Cloak of Tyrants",
-    "description": "+30% Magic Resistance.\nThe carrier can hide their location during the preparation phase, and at the start of the battle, gain the full benefit of all activated racial/class skills of friendly units.",
-    "lore": "Only the fool shall question the authority of the Emperor.",
-    "quality": "common",
-    "texture": "custom/baojunwangpao",
-    "notes": [],
     "names": {
       "en": "Cloak of Tyrants",
       "ru": "Cloak of Tyrants"
     },
+    "description": "+30% Magic Resistance.\nThe carrier can hide their location during the preparation phase, and at the start of the battle, gain the full benefit of all activated racial/class skills of friendly units.",
     "descriptions": {
       "en": "+30% Magic Resistance.\nThe carrier can hide their location during the preparation phase, and at the start of the battle, gain the full benefit of all activated racial/class skills of friendly units.",
       "ru": "+30% Сопротивление магии.\nНоситель получает полный эффект всех активированных расовых/классовых навыков союзных юнитов в бою. (Не дополняет неактивные синергии)."
     },
+    "lore": "Only the fool shall question the authority of the Emperor.",
     "lore_i18n": {
       "en": "Only the fool shall question the authority of the Emperor.",
       "ru": "Лишь глупец осмелится поставить под сомнение власть Императора."
-    }
+    },
+    "quality": "common",
+    "texture": "custom/baojunwangpao",
+    "notes": []
   },
   "overrides": {}
 }

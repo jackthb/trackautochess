@@ -5,28 +5,28 @@
   "icon": "synergies/orc.png",
   "source": {
     "name": "Orc",
-    "description": "SPECIES TRAIT: Battle Hardened\n\nActive when you have at least (N) different pieces of this species on board. (Multiple effects stack)\n\n(2) Orcs: All allies have +100 Health.\n(4) Orcs: All allies have +300 Health.\n(6) Orcs: All allies have +10x(Courier health lost) Health.",
+    "names": {
+      "en": "Orc",
+      "ru": "Orc"
+    },
+    "description": "SPECIES TRAIT: Battle Hardened\n Active when you have at least (N) different pieces of this species on board. (Multiple effects stack)\n\n(2) Orcs: All allies have +100 Health.\n(4) Orcs: All allies have +300 Health.\n(6) Orcs: All allies have +10x(Courier health lost) Health.",
+    "descriptions": {
+      "en": "SPECIES TRAIT: Battle Hardened\n Active when you have at least (N) different pieces of this species on board. (Multiple effects stack)\n\n(2) Orcs: All allies have +100 Health.\n(4) Orcs: All allies have +300 Health.\n(6) Orcs: All allies have +10x(Courier health lost) Health.",
+      "ru": "SPECIES TRAIT: Battle Hardened\n Активна, когда минимум (N) разных Orcs на столе.(Эффекты складываются)\n\n(2) Orcs: +100 HP союзным фигурам.\n(4) Orcs: +300 HP союзным фигурам. \n(6) Orcs: Все союзные фигуры получают +10x(потерянное здоровье курьера)."
+    },
     "description_html": "<h1>SPECIES TRAIT: Battle Hardened</h1><font color=\"#656585\">Active when you have at least (N) different pieces of this species on board. (Multiple effects stack)</font><br><br>(2) Orcs: All allies have +100 Health.<br>(4) Orcs: All allies have +300 Health.<br>(6) Orcs: All allies have +10x(Courier health lost) Health.",
     "lore": "The Orcs are a prolific and physically powerful race, excellent at tolerating pain and injury. Being exotic to Drodolands, their home was a once-lush world but now a shattered realm. They abandoned their peaceful culture when the demon lord cunningly corrupted the Orcs and used them in his vengeful plot against the his own people.",
+    "lore_i18n": {
+      "en": "The Orcs are a prolific and physically powerful race, excellent at tolerating pain and injury. Being exotic to Drodolands, their home was a once-lush world but now a shattered realm. They abandoned their peaceful culture when the demon lord cunningly corrupted the Orcs and used them in his vengeful plot against the his own people.",
+      "ru": "Orcs — многочисленная и физически сильная раса, отлично переносящая боль и ранения. Будучи чужаками в Drodolands, они происходят из некогда цветущего мира, ныне ставшего разрушенным. Они отказались от своей мирной культуры, когда демон-владыка коварно развратил Orcs и использовал их в своей мстительной войне против собственного народа."
+    },
     "notes": [],
     "tiers": [
       2,
       4,
       6
     ],
-    "ability_special": {},
-    "names": {
-      "en": "Orc",
-      "ru": "Orc"
-    },
-    "descriptions": {
-      "en": "SPECIES TRAIT: Battle Hardened\n Active when you have at least (N) different pieces of this species on board. (Multiple effects stack)\n\n(2) Orcs: All allies have +100 Health.\n(4) Orcs: All allies have +300 Health.\n(6) Orcs: All allies have +10x(Courier health lost) Health.",
-      "ru": "SPECIES TRAIT: Battle Hardened\n Активна, когда минимум (N) разных Orcs на столе.(Эффекты складываются)\n\n(2) Orcs: +100 HP союзным фигурам.\n(4) Orcs: +300 HP союзным фигурам. \n(6) Orcs: Все союзные фигуры получают +10x(потерянное здоровье курьера)."
-    },
-    "lore_i18n": {
-      "en": "The Orcs are a prolific and physically powerful race, excellent at tolerating pain and injury. Being exotic to Drodolands, their home was a once-lush world but now a shattered realm. They abandoned their peaceful culture when the demon lord cunningly corrupted the Orcs and used them in his vengeful plot against the his own people.",
-      "ru": "Orcs — многочисленная и физически сильная раса, отлично переносящая боль и ранения. Будучи чужаками в Drodolands, они происходят из некогда цветущего мира, ныне ставшего разрушенным. Они отказались от своей мирной культуры, когда демон-владыка коварно развратил Orcs и использовал их в своей мстительной войне против собственного народа."
-    }
+    "ability_special": {}
   },
   "overrides": {}
 }

@@ -5,23 +5,23 @@
   "icon": "items/black_king_bar.png",
   "source": {
     "name": "Black King Bar",
-    "description": "+600 HP. \n\nActive ability: Activates when taking damage\nGrants spell immunity and 75% magic resistance for 4 sec. Dispels negative statuses from the caster on activation.",
-    "lore": "A powerful staff imbued with the strength of giants.",
-    "quality": "rare",
-    "texture": "item_black_king_bar",
-    "notes": [],
     "names": {
       "en": "Black King Bar",
       "ru": "Black King Bar"
     },
+    "description": "+600 HP. \n\nActive ability: Activates when taking damage\nGrants spell immunity and 75% magic resistance for 4 sec. Dispels negative statuses from the caster on activation.",
     "descriptions": {
       "en": "+600 HP. \n\nActive ability: Activates when taking damage\nGrants spell immunity and 75% magic resistance for 4 sec. Dispels negative statuses from the caster on activation.",
       "ru": "+600 к Здоровью. \n\nАктивка: Активируется при получении урона\nДаёт иммунитет к заклинаниям и 75% сопротивления магии на 4 секунды. Снимает отрицательные статусы с заклинателя при активации."
     },
+    "lore": "A powerful staff imbued with the strength of giants.",
     "lore_i18n": {
       "en": "A powerful staff imbued with the strength of giants.",
       "ru": "Мощный посох, наделенный силой великанов."
-    }
+    },
+    "quality": "rare",
+    "texture": "item_black_king_bar",
+    "notes": []
   },
   "overrides": {}
 }

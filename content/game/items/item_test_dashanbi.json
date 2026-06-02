@@ -5,17 +5,17 @@
   "icon": "items/force_field.png",
   "source": {
     "name": "Test item: +100% evasion",
-    "description": "",
-    "lore": "",
-    "quality": "rare",
-    "texture": "item_force_field",
-    "notes": [],
     "names": {
       "en": "Test item: +100% evasion",
       "ru": "Test item: +100% evasion"
     },
+    "description": "",
     "descriptions": {},
-    "lore_i18n": {}
+    "lore": "",
+    "lore_i18n": {},
+    "quality": "rare",
+    "texture": "item_force_field",
+    "notes": []
   },
   "overrides": {}
 }

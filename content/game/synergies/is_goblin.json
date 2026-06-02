@@ -5,27 +5,27 @@
   "icon": "synergies/goblin.png",
   "source": {
     "name": "Goblin",
-    "description": "Species Perk: Nanobots\n\nActive when you have at least (N) different goblin pieces on board. (Multiple effects stack) \n\n(3)Goblins: Grants a random melee ally +10 armour and +20 health regeneration.\n(6)Goblins: Grants all allies +10 armor and +20 health regeneration.",
+    "names": {
+      "en": "Goblin",
+      "ru": "Goblin"
+    },
+    "description": "Species Perk: Nanobots\n Active when you have at least (N) different goblin pieces on board. (Multiple effects stack) \n\n(3)Goblins: Grants a random melee ally +10 armour and +20 health regeneration.\n(6)Goblins: Grants all allies +10 armor and +20 health regeneration.",
+    "descriptions": {
+      "en": "Species Perk: Nanobots\n Active when you have at least (N) different goblin pieces on board. (Multiple effects stack) \n\n(3)Goblins: Grants a random melee ally +10 armour and +20 health regeneration.\n(6)Goblins: Grants all allies +10 armor and +20 health regeneration.",
+      "ru": "Species Perk: Nanobots\n Активна, когда минимум (N) разных Goblin на столе.(Эффекты складываются) \n\n(3)Goblins: Даёт случайному союзнику ближнего боя +10 брони и +20 восстановления здоровья.\n(6)Goblins: Даёт всем союзникам +10 брони и +20 восстановления здоровья."
+    },
     "description_html": "<h1>Species Perk: Nanobots</h1><font color=\"#656585\">Active when you have at least (N) different goblin pieces on board. (Multiple effects stack) </font><br><br>(3)Goblins: Grants a random melee ally +10 armour and +20 health regeneration.<br>(6)Goblins: Grants all allies+10 armor and +20 health regeneration.",
     "lore": "Goblins are a cunning species with a love for money, explosives, and less-than-reliable technology. Their drive to invent fuels them, giving the brightest among them a boost in stamina and fortitude.",
+    "lore_i18n": {
+      "en": "Goblins are a cunning species with a love for money, explosives, and less-than-reliable technology. Their drive to invent fuels them, giving the brightest among them a boost in stamina and fortitude.",
+      "ru": "Goblins — хитрая раса, любящая деньги, взрывчатку и не самую надежную технику. Стремление к изобретениям движет ими, наделяя самых талантливых дополнительной выносливостью и стойкостью."
+    },
     "notes": [],
     "tiers": [
       3,
       6
     ],
-    "ability_special": {},
-    "names": {
-      "en": "Goblin",
-      "ru": "Goblin"
-    },
-    "descriptions": {
-      "en": "Species Perk: Nanobots\n Active when you have at least (N) different goblin pieces on board. (Multiple effects stack) \n\n(3)Goblins: Grants a random melee ally +10 armour and +20 health regeneration.\n(6)Goblins: Grants all allies +10 armor and +20 health regeneration.",
-      "ru": "Species Perk: Nanobots\n Активна, когда минимум (N) разных Goblin на столе.(Эффекты складываются) \n\n(3)Goblins: Даёт случайному союзнику ближнего боя +10 брони и +20 восстановления здоровья.\n(6)Goblins: Даёт всем союзникам +10 брони и +20 восстановления здоровья."
-    },
-    "lore_i18n": {
-      "en": "Goblins are a cunning species with a love for money, explosives, and less-than-reliable technology. Their drive to invent fuels them, giving the brightest among them a boost in stamina and fortitude.",
-      "ru": "Goblins — хитрая раса, любящая деньги, взрывчатку и не самую надежную технику. Стремление к изобретениям движет ими, наделяя самых талантливых дополнительной выносливостью и стойкостью."
-    }
+    "ability_special": {}
   },
   "overrides": {}
 }

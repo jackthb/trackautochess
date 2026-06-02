@@ -5,23 +5,23 @@
   "icon": "items/creed_of_omniscience.png",
   "source": {
     "name": "Magic Card",
-    "description": "Courier Consumable: Click to use\nPerform a free recruitment to recruit chess pieces from the line up of the last opponent you lost to.",
-    "lore": "From Rambling Fatebender",
-    "quality": "consumable",
-    "texture": "item_creed_of_omniscience",
-    "notes": [],
     "names": {
       "en": "Magic Card",
       "ru": "Magic Card"
     },
+    "description": "Courier Consumable: Click to use\nPerform a free recruitment to recruit chess pieces from the line up of the last opponent you lost to.",
     "descriptions": {
       "en": "Courier Consumable: Click to use\nPerform a free recruitment to recruit chess pieces from the line up of the last opponent you lost to.",
       "ru": "Courier Consumable: Click to use\nPerform a free recruitment to recruit chess pieces from the line up of the last opponent you lost to."
     },
+    "lore": "From Rambling Fatebender",
     "lore_i18n": {
       "en": "From Rambling Fatebender",
       "ru": "From Rambling Fatebender"
-    }
+    },
+    "quality": "consumable",
+    "texture": "item_creed_of_omniscience",
+    "notes": []
   },
   "overrides": {}
 }

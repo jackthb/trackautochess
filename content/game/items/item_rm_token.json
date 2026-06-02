@@ -5,23 +5,23 @@
   "icon": "items/rm_token.png",
   "source": {
     "name": "Wheel of Wonder Token",
-    "description": "A special Token for recruiting Discovered pieces, granted by Wheel of Wonder.",
-    "lore": "From: Wheel of Wonder",
-    "quality": "consumable",
-    "texture": "custom/rm_token",
-    "notes": [],
     "names": {
       "en": "Wheel of Wonder Token",
       "ru": "Wheel of Wonder Token"
     },
+    "description": "A special Token for recruiting Discovered pieces, granted by Wheel of Wonder.",
     "descriptions": {
       "en": "A special Token for recruiting Discovered pieces, granted by Wheel of Wonder.",
       "ru": "Специальный токен для набора открытых фигур, предоставляемый Колесом Чудес."
     },
+    "lore": "From: Wheel of Wonder",
     "lore_i18n": {
       "en": "From: Wheel of Wonder",
       "ru": "From: Wheel of Wonder"
-    }
+    },
+    "quality": "consumable",
+    "texture": "custom/rm_token",
+    "notes": []
   },
   "overrides": {}
 }

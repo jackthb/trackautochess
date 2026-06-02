@@ -5,23 +5,23 @@
   "icon": "items/哼哼井武器匠.png",
   "source": {
     "name": "Weaponsmith",
-    "description": "You gain +1 to the level of loot tokens you get for recasting equipment.\n After recasting 2 pieces of Spoil tokens, the weapon smith will disappear.",
-    "lore": "From Relicbox",
-    "quality": "",
-    "texture": "item_custom/哼哼井武器匠",
-    "notes": [],
     "names": {
       "en": "Weaponsmith",
       "ru": "Weaponsmith"
     },
+    "description": "You gain +1 to the level of loot tokens you get for recasting equipment.\n After recasting 2 pieces of Spoil tokens, the weapon smith will disappear.",
     "descriptions": {
       "en": "You gain +1 to the level of loot tokens you get for recasting equipment.\n After recasting 2 pieces of Spoil tokens, the weapon smith will disappear.",
       "ru": "Вы получаете +1 к уровню жетонов при переработке предметов.\n После переработки 2 жетонов Weaponsmith исчезнет."
     },
+    "lore": "From Relicbox",
     "lore_i18n": {
       "en": "From Relicbox",
       "ru": "Из Relicbox"
-    }
+    },
+    "quality": "",
+    "texture": "item_custom/哼哼井武器匠",
+    "notes": []
   },
   "overrides": {}
 }

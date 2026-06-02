@@ -5,23 +5,23 @@
   "icon": "items/giants_ring.png",
   "source": {
     "name": "Giants Ring",
-    "description": "+30 health regeneration, +100 physical block, permanent taunt.",
-    "lore": "Prized procurement of an otherwise unremarkable ruler of Elze who abdicated his position and vanished.",
-    "quality": "rare",
-    "texture": "item_giants_ring",
-    "notes": [],
     "names": {
       "en": "Giants Ring",
       "ru": "Giants Ring"
     },
+    "description": "+30 health regeneration, +100 physical block, permanent taunt.",
     "descriptions": {
       "en": "+30 health regeneration, +100 physical block, permanent taunt.",
       "ru": "+30 регенерации здоровья, +100 физической блокировки, постоянный taunt(агр)."
     },
+    "lore": "Prized procurement of an otherwise unremarkable ruler of Elze who abdicated his position and vanished.",
     "lore_i18n": {
       "en": "Prized procurement of an otherwise unremarkable ruler of Elze who abdicated his position and vanished.",
       "ru": "Prized procurement of an otherwise unremarkable ruler of Elze who abdicated his position and vanished."
-    }
+    },
+    "quality": "rare",
+    "texture": "item_giants_ring",
+    "notes": []
   },
   "overrides": {}
 }

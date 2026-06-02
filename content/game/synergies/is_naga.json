@@ -5,31 +5,28 @@
   "icon": "synergies/naga.png",
   "source": {
     "name": "Naga",
-    "description": "Species Trait: Scale Armor\n\nActive when you have at least (N) different Naga pieces on board. (Multiple effects stack)\n\n(2) Naga: Grants allies 15% magic resistance.\n(4) Naga: Grants allies 35% magic resistance.\n(6) Naga: When taking non-pure damage, reflect 1.5 times the damage reduced by magic resistance.",
-    "description_html": "<h1>Species Trait: Scale Armor</h1><font color=\"#656585\">Active when you have at least (N) different Naga pieces on board. (Multiple effects stack)</font><br><br>(2) Naga: Grants allies 15% magic resistance.<br>(4) Naga: Grants allies 35% magic resistance.<br>(6) Naga: When taking non-pure damage, reflect 1.5 times the damage reduced by magic resistance.",
+    "names": {
+      "en": "Naga",
+      "ru": "Naga"
+    },
+    "description": "Species Trait: Scale Armor\n Active when you have at least (N) different Naga pieces on board. (Multiple effects stack)\n\n(2) Naga: Grants allies 15% magic resistance.\n(4) Naga: Grants allies 35% magic resistance.\n(6) Naga: When taking non-pure damage, reflect 1.5 times the magical resistance.",
+    "descriptions": {
+      "en": "Species Trait: Scale Armor\n Active when you have at least (N) different Naga pieces on board. (Multiple effects stack)\n\n(2) Naga: Grants allies 15% magic resistance.\n(4) Naga: Grants allies 35% magic resistance.\n(6) Naga: When taking non-pure damage, reflect 1.5 times the magical resistance.",
+      "ru": "Species Trait: Scale Armor\n Активна, когда минимум (N) разных Наг на столе.(Эффекты складываются)\n\n(2) Naga: Дает союзникам 15% маг.резиста.\n(4) Naga: Дает союзникам 35% маг.резиста.\n(6) Naga: При получении нечистого урона, отражает в 1.5 раза больше урона, уменьшенного маг.резистом."
+    },
+    "description_html": "<h1>Species Trait: Scale Armor</h1><font color=\"#656585\">Active when you have at least (N) different Naga pieces on board. (Multiple effects stack)</font><br><br>(2) Naga: Grants allies 15% magic resistance.<br>(4) Naga: Grants allies 35% magic resistance.<br>(6) Naga: When taking non-pure damage, reflect 1.5 times the magical resistance.",
     "lore": "Nagas are cursed sea-dwellers that haunt the ocean floor. Their hardened, scaly skin acts as an effective defense against spells.",
-    "notes": [
-      "Scale Armors can absorb all kinds of damage(including pure damage).",
-      "(6) Nagas detonation has a trigger threshold of 100. Less than 100 absorbed damage will not detonate but accumulate into the next detonation."
-    ],
+    "lore_i18n": {
+      "en": "Nagas are cursed sea-dwellers that haunt the ocean floor. Their hardened, scaly skin acts as an effective defense against spells.",
+      "ru": "Nagas are cursed sea-dwellers that haunt the ocean floor. Their hardened, scaly skin acts as an effective defense against spells."
+    },
+    "notes": [],
     "tiers": [
       2,
       4,
       6
     ],
-    "ability_special": {},
-    "names": {
-      "en": "Naga",
-      "ru": "Naga"
-    },
-    "descriptions": {
-      "en": "Species Trait: Scale Armor\n Active when you have at least (N) different Naga pieces on board. (Multiple effects stack)\n\n(2) Naga: Grants allies 15% magic resistance.\n(4) Naga: Grants allies 35% magic resistance.\n(6) Naga: When taking non-pure damage, reflect 2 times the magical resistance.",
-      "ru": "Species Trait: Scale Armor\n Активна, когда минимум (N) разных Наг на столе.(Эффекты складываются)\n\n(2) Naga: Дает союзникам 15% маг.резиста.\n(4) Naga: Дает союзникам 35% маг.резиста.\n(6) Naga: При получении нечистого урона, отражает в 2 раза больше урона, уменьшенного маг.резистом."
-    },
-    "lore_i18n": {
-      "en": "Nagas are cursed sea-dwellers that haunt the ocean floor. Their hardened, scaly skin acts as an effective defense against spells.",
-      "ru": "Nagas are cursed sea-dwellers that haunt the ocean floor. Their hardened, scaly skin acts as an effective defense against spells."
-    }
+    "ability_special": {}
   },
   "overrides": {}
 }

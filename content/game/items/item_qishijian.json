@@ -5,23 +5,23 @@
   "icon": "items/paladin_sword.png",
   "source": {
     "name": "Paladin Sword",
-    "description": "Damage +25, Lifesteal + 20%.\nCarrier deals +50% damage to Undead and Demon pieces.",
-    "lore": "A legendary Sword owned by a divine Paladin before he was exiled.",
-    "quality": "rare",
-    "texture": "item_paladin_sword",
-    "notes": [],
     "names": {
       "en": "Paladin Sword",
       "ru": "Paladin Sword"
     },
+    "description": "Damage +25, Lifesteal + 20%.\nCarrier deals +50% damage to Undead and Demon pieces.",
     "descriptions": {
       "en": "Damage +25, Lifesteal + 20%.\nCarrier deals +50% damage to Undead and Demon pieces.",
       "ru": "Урон +25, Вампиризм + 20%.\nВладелец наносит на 50% больше урона нежити и демонам."
     },
+    "lore": "A legendary Sword owned by a divine Paladin before he was exiled.",
     "lore_i18n": {
       "en": "A legendary Sword owned by a divine Paladin before he was exiled.",
       "ru": "Легендарный меч, принадлежавший божественному Палладину Мигелю до его изгнания."
-    }
+    },
+    "quality": "rare",
+    "texture": "item_paladin_sword",
+    "notes": []
   },
   "overrides": {}
 }

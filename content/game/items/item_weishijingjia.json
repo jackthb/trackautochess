@@ -5,23 +5,23 @@
   "icon": "items/guardian_greaves.png",
   "source": {
     "name": "Guardian Greaves",
-    "description": "Enables quick movement\n\nActive ability: Activates when many allied chess pieces are injured.\nGrants 500 maximum health and 30 mana to all allied units in the area and dispels negative effects incurred during battle.\n\nEffect Range:500",
-    "lore": "One of many holy instruments constructed to honor the Omniscience.",
-    "quality": "epic",
-    "texture": "item_guardian_greaves",
-    "notes": [],
     "names": {
       "en": "Guardian Greaves",
       "ru": "Guardian Greaves"
     },
+    "description": "Enables quick movement\n\nActive ability: Activates when many allied chess pieces are injured.\nGrants 500 maximum health and 30 mana to all allied units in the area and dispels negative effects incurred during battle.\n\nEffect Range:500",
     "descriptions": {
       "en": "Enables quick movement\n\nActive ability: Activates when many allied chess pieces are injured.\nGrants 500 maximum health and 30 mana to all allied units in the area and dispels negative effects incurred during battle.\n\nEffect Range:500",
       "ru": "Enables quick movement\n\nActive ability:Активируется, когда много союзных фигур ранены.\nДарует 500 максимального здоровья и 30 маны всем союзным юнитам в зоне действия и снимает отрицательные эффекты, полученные в бою.\n\nEffect Range:500"
     },
+    "lore": "One of many holy instruments constructed to honor the Omniscience.",
     "lore_i18n": {
       "en": "One of many holy instruments constructed to honor the Omniscience.",
       "ru": "Один из множества священных инструментов, созданных в честь Omniscience."
-    }
+    },
+    "quality": "epic",
+    "texture": "item_guardian_greaves",
+    "notes": []
   },
   "overrides": {}
 }

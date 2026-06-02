@@ -5,25 +5,25 @@
   "icon": "items/necronomicon_3.png",
   "source": {
     "name": "Necronomicon",
-    "description": "Summons 2 necro creeps",
-    "lore": "A record of the final reckoning. With one page torn out.",
-    "quality": "epic",
-    "texture": "item_necronomicon_3",
-    "notes": [
-      "Melee carrier summons 2 necro warriors while Ranged carrier summons 2 necro archers."
-    ],
     "names": {
       "en": "Necronomicon",
       "ru": "Necronomicon"
     },
+    "description": "Summons 2 necro creeps",
     "descriptions": {
       "en": "Summons 2 necro creeps",
       "ru": "Призывает 2 некро-крипа. Удваивает кол-во призываемых юнитов."
     },
+    "lore": "A record of the final reckoning. With one page torn out.",
     "lore_i18n": {
       "en": "A record of the final reckoning. With one page torn out.",
       "ru": "Запись последнего суда, с вырванной страницей."
-    }
+    },
+    "quality": "epic",
+    "texture": "item_necronomicon_3",
+    "notes": [
+      "Melee carrier summons 2 necro warriors while Ranged carrier summons 2 necro archers."
+    ]
   },
   "overrides": {}
 }

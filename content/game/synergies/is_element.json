@@ -5,28 +5,28 @@
   "icon": "synergies/element.png",
   "source": {
     "name": "Elemental",
-    "description": "Elemental Essence\n\nActive when you have at least (N) different Element pieces on board. (Multiple effects stack)\n\n(2) Elements: All friendly elementals have +15% chance to turn melee aggressors into stone for 3 sec.\n(4) Elements: All allies have +15% chance to turn melee and ranged aggressors into stone for 3 sec.\n(6) Elements: Aggressors are stoned for 1 sec longer and take +100% damage.",
+    "names": {
+      "en": "Elemental",
+      "ru": "Elemental"
+    },
+    "description": "Elemental Essence\n Active when you have at least (N) different Element pieces on board. (Multiple effects stack)\n\n(2) Elements: All friendly elementals have +15% chance to turn melee aggressors into stone for 3 sec.\n(4) Elements: All allies have +15% chance to turn melee and ranged aggressors into stone for 3 sec.\n(6) Elements: Aggressors are stoned for 1 sec longer and take +100% damage.",
+    "descriptions": {
+      "en": "Elemental Essence\n Active when you have at least (N) different Element pieces on board. (Multiple effects stack)\n\n(2) Elements: All friendly elementals have +15% chance to turn melee aggressors into stone for 3 sec.\n(4) Elements: All allies have +15% chance to turn melee and ranged aggressors into stone for 3 sec.\n(6) Elements: Aggressors are stoned for 1 sec longer and take +100% damage.",
+      "ru": "Elemental Essence\n Активна, когда минимум (N) разных Element на столе.(Эффекты складываются)\n\n(2) Element: Все союзные Element имеют 15% шанс превратить врага ближнего боя в камень на 3 сек.\n(4) Element: Все союзные Element имеют 15% шанс превратить любого врага в камень на 3 сек.\n(6) Element: Все враги превращаются в камень на 1 сек дольше и получают +100% урона."
+    },
     "description_html": "<h1>Elemental Essence</h1><font color=\"#656585\">Active when you have at least (N) different Element pieces on board. (Multiple effects stack)</font><br><br>(2) Elements: All friendly elementals have +15% chance to turn melee aggressors into stone for 3 sec.<br>(4) Elements: All allies have +15% chance to turn melee and ranged aggressors into stone for 3 sec.<br>(6) Elements: Aggressors are stoned for 1 sec longer and take +100% damage.",
     "lore": "Elementals are unstable beings that radiate mysterious energy when attacked. This gives them a chance to turn their melee aggressors to stone.",
+    "lore_i18n": {
+      "en": "Elementals are unstable beings that radiate mysterious energy when attacked. This gives them a chance to turn their melee aggressors to stone.",
+      "ru": "Elementals — нестабильные существа, излучающие загадочную энергию при получении урона. Это даёт им шанс обращать атакующих в ближнем бою врагов в камень."
+    },
     "notes": [],
     "tiers": [
       2,
       4,
       6
     ],
-    "ability_special": {},
-    "names": {
-      "en": "Elemental",
-      "ru": "Elemental"
-    },
-    "descriptions": {
-      "en": "Elemental Essence\n Active when you have at least (N) different Element pieces on board. (Multiple effects stack)\n\n(2) Elements: All friendly elementals have +15% chance to turn melee aggressors into stone for 3 sec.\n(4) Elements: All allies have +15% chance to turn melee and ranged aggressors into stone for 3 sec.\n(6) Elements: Aggressors are stoned for 1 sec longer and take +100% damage.",
-      "ru": "Elemental Essence\n Активна, когда минимум (N) разных Element на столе.(Эффекты складываются)\n\n(2) Element: Все союзные Element имеют 15% шанс превратить врага ближнего боя в камень на 3 сек.\n(4) Element: Все союзные Element имеют 15% шанс превратить любого врага в камень на 3 сек.\n(6) Element: Все враги превращаются в камень на 1 сек дольше и получают +100% урона."
-    },
-    "lore_i18n": {
-      "en": "Elementals are unstable beings that radiate mysterious energy when attacked. This gives them a chance to turn their melee aggressors to stone.",
-      "ru": "Elementals — нестабильные существа, излучающие загадочную энергию при получении урона. Это даёт им шанс обращать атакующих в ближнем бою врагов в камень."
-    }
+    "ability_special": {}
   },
   "overrides": {}
 }

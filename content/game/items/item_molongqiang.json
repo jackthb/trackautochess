@@ -5,22 +5,22 @@
   "icon": "items/dragon_lance.png",
   "source": {
     "name": "DragonLance",
-    "description": "Attack speed +20%.Ranged carrier attack range +200。",
-    "lore": "",
-    "quality": "epic",
-    "texture": "dragon_lance",
-    "notes": [
-      "Attack range bonus not stackable."
-    ],
     "names": {
       "en": "DragonLance",
       "ru": "DragonLance"
     },
+    "description": "Attack speed +20%.Ranged carrier attack range +200。",
     "descriptions": {
       "en": "Attack speed +20%.Ranged carrier attack range +200。",
       "ru": "Скорость атаки +20%.Дальность атаки дальнобойного носителя +200。"
     },
-    "lore_i18n": {}
+    "lore": "",
+    "lore_i18n": {},
+    "quality": "epic",
+    "texture": "dragon_lance",
+    "notes": [
+      "Attack range bonus not stackable."
+    ]
   },
   "overrides": {}
 }

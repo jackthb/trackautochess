@@ -5,20 +5,20 @@
   "icon": "items/trident.png",
   "source": {
     "name": "Trident",
-    "description": "Attack damage +25.\nDeals each 50% additional damage to at most 2 same-name pieces.",
-    "lore": "",
-    "quality": "rare",
-    "texture": "item_trident",
-    "notes": [],
     "names": {
       "en": "Trident",
       "ru": "Trident"
     },
+    "description": "Attack damage +25.\nDeals each 50% additional damage to at most 2 same-name pieces.",
     "descriptions": {
       "en": "Attack damage +25.\nDeals each 50% additional damage to at most 2 same-name pieces.",
       "ru": "Урон от атаки +25.\nНаносит по 50% дополнительного урона максимум двум фигурам с одинаковым именем."
     },
-    "lore_i18n": {}
+    "lore": "",
+    "lore_i18n": {},
+    "quality": "rare",
+    "texture": "item_trident",
+    "notes": []
   },
   "overrides": {}
 }

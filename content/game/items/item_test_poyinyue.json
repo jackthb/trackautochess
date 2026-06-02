@@ -5,17 +5,17 @@
   "icon": "items/unstable_wand.png",
   "source": {
     "name": "Test item: -200% attack speed",
-    "description": "",
-    "lore": "",
-    "quality": "epic",
-    "texture": "item_unstable_wand",
-    "notes": [],
     "names": {
       "en": "Test item: -200% attack speed",
       "ru": "Test item: -200% attack speed"
     },
+    "description": "",
     "descriptions": {},
-    "lore_i18n": {}
+    "lore": "",
+    "lore_i18n": {},
+    "quality": "epic",
+    "texture": "item_unstable_wand",
+    "notes": []
   },
   "overrides": {}
 }

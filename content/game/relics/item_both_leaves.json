@@ -5,16 +5,16 @@
   "icon": "relics/leafy_essence.png",
   "source": {
     "name": "Leafy Essence",
-    "description": "All offside branches unlock automatically in this single game.",
-    "lore": "",
     "names": {
       "en": "Leafy Essence",
       "ru": "Leafy Essence"
     },
+    "description": "All offside branches unlock automatically in this single game.",
     "descriptions": {
       "en": "All offside branches unlock automatically in this single game.",
       "ru": "Все боковые ветки талантов будут разблокированы автоматически в этой игре."
     },
+    "lore": "",
     "lore_i18n": {}
   },
   "overrides": {}

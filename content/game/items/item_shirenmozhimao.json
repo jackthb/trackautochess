@@ -5,25 +5,25 @@
   "icon": "items/shirenmozhimao.png",
   "source": {
     "name": "Ogre Hood",
-    "description": "+900 HP, +25% magical resistance.\nThe carrier also counts as\nOgre and +2 level.",
-    "lore": "Not only one Ogre knows what proper strength is.",
-    "quality": "common",
-    "texture": "custom/shirenmozhimao",
-    "notes": [
-      "The bearer retains its original Species as well."
-    ],
     "names": {
       "en": "Ogre Hood",
       "ru": "Ogre Hood"
     },
+    "description": "+900 HP, +25% magical resistance.\nThe carrier also counts as Ogre and +2 level.",
     "descriptions": {
       "en": "+900 HP, +25% magical resistance.\nThe carrier also counts as Ogre and +2 level.",
       "ru": "HP +900, +25% сопротивления магии.\nНоситель также становится Ogre и получает +2 уровня."
     },
+    "lore": "Not only one Ogre knows what proper strength is.",
     "lore_i18n": {
       "en": "Not only one Ogre knows what proper strength is.",
       "ru": "Не только один Ogre знает, что такое настоящая сила."
-    }
+    },
+    "quality": "common",
+    "texture": "custom/shirenmozhimao",
+    "notes": [
+      "The bearer retains its original Species as well."
+    ]
   },
   "overrides": {}
 }

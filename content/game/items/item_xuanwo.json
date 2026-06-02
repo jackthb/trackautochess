@@ -5,20 +5,20 @@
   "icon": "items/maelstrom.png",
   "source": {
     "name": "Maelstrom",
-    "description": "Attack Speed +10%.\n20% chance on attack to release a forked lightning, dealing 100 magic damage to up to 3 enemies.",
-    "lore": "",
-    "quality": "rare",
-    "texture": "item_maelstrom",
-    "notes": [],
     "names": {
       "en": "Maelstrom",
       "ru": "Maelstrom"
     },
+    "description": "Attack Speed +10%.\n20% chance on attack to release a forked lightning, dealing 100 magic damage to up to 3 enemies.",
     "descriptions": {
       "en": "Attack Speed +10%.\n20% chance on attack to release a forked lightning, dealing 100 magic damage to up to 3 enemies.",
       "ru": "Скорость атаки +10%.\n20% Шанс при атаке выпустить молнию, наносящую 100 магического урона по 3 врагам."
     },
-    "lore_i18n": {}
+    "lore": "",
+    "lore_i18n": {},
+    "quality": "rare",
+    "texture": "item_maelstrom",
+    "notes": []
   },
   "overrides": {}
 }

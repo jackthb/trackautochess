@@ -5,20 +5,20 @@
   "icon": "items/boots.png",
   "source": {
     "name": "Boots of Speed",
-    "description": "Fast movement.",
-    "lore": "",
-    "quality": "consumable",
-    "texture": "item_boots",
-    "notes": [],
     "names": {
       "en": "Boots of Speed",
       "ru": "Boots of Speed"
     },
+    "description": "Fast movement.",
     "descriptions": {
       "en": "Fast movement.",
       "ru": "Fast movement."
     },
-    "lore_i18n": {}
+    "lore": "",
+    "lore_i18n": {},
+    "quality": "consumable",
+    "texture": "item_boots",
+    "notes": []
   },
   "overrides": {}
 }

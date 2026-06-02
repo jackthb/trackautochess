@@ -5,26 +5,26 @@
   "icon": "items/repeat_relic.png",
   "source": {
     "name": "Time-Space Replica",
+    "names": {
+      "en": "Time-Space Replica",
+      "ru": "Time-Space Replica"
+    },
     "description": "Replicate your last relic.",
+    "descriptions": {
+      "en": "Replicate your last relic.",
+      "ru": "Повторите свою прошлую реликвию."
+    },
     "lore": "From: Relicbox",
+    "lore_i18n": {
+      "en": "From: Relicbox",
+      "ru": "From: Relicbox"
+    },
     "quality": "",
     "texture": "custom/repeat_relic",
     "notes": [
       "A random relic will be settled if it is your first relic, and this randomed one will not be counted as used (still available later).",
       "Time-Space Replica is not in the relic random pool when you random a relic."
-    ],
-    "names": {
-      "en": "Time-Space Replica",
-      "ru": "Time-Space Replica"
-    },
-    "descriptions": {
-      "en": "Replicate your last relic.",
-      "ru": "Повторите свою прошлую реликвию."
-    },
-    "lore_i18n": {
-      "en": "From: Relicbox",
-      "ru": "From: Relicbox"
-    }
+    ]
   },
   "overrides": {}
 }

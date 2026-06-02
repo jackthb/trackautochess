@@ -5,23 +5,23 @@
   "icon": "items/doubloon.png",
   "source": {
     "name": "Doubloon",
-    "description": "Relic Consumable: Click to Use\nTransfer 20% of the higher one of your Health and Mana into another. Can be used twice",
-    "lore": "From: Relicbox",
-    "quality": "",
-    "texture": "item_doubloon",
-    "notes": [],
     "names": {
       "en": "Doubloon",
       "ru": "Doubloon"
     },
+    "description": "Relic Consumable: Click to Use\nTransfer 20% of the higher one of your Health and Mana into another. Can be used twice",
     "descriptions": {
       "en": "Relic Consumable: Click to Use\nTransfer 20% of the higher one of your Health and Mana into another. Can be used twice",
       "ru": "Нажмите для использования\nТрансформирует 20% от вашего наивысшего показателя Здоровья или Маны в другой. Доступно 2 применения."
     },
+    "lore": "From: Relicbox",
     "lore_i18n": {
       "en": "From: Relicbox",
       "ru": "From: Relicbox"
-    }
+    },
+    "quality": "",
+    "texture": "item_doubloon",
+    "notes": []
   },
   "overrides": {}
 }

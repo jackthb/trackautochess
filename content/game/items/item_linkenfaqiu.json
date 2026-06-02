@@ -5,23 +5,23 @@
   "icon": "items/sphere.png",
   "source": {
     "name": "Linkens Sphere",
-    "description": "+300 health, +100% mana regeneration.\nBlocks targeted spell or item.",
-    "lore": "This magical sphere once protected one of the most famous heroes in history.",
-    "quality": "rare",
-    "texture": "item_sphere",
-    "notes": [],
     "names": {
       "en": "Linkens Sphere",
       "ru": "Linkens Sphere"
     },
+    "description": "+300 health, +100% mana regeneration.\nBlocks targeted spell or item.",
     "descriptions": {
       "en": "+300 health, +100% mana regeneration.\nBlocks targeted spell or item.",
       "ru": "+300 ХП, +100% мана герен.\nБлокирует нацеленное заклинание или предмет."
     },
+    "lore": "This magical sphere once protected one of the most famous heroes in history.",
     "lore_i18n": {
       "en": "This magical sphere once protected one of the most famous heroes in history.",
       "ru": "Эта магическая сфера когда-то защищала одного из самых прославленных героев в истории."
-    }
+    },
+    "quality": "rare",
+    "texture": "item_sphere",
+    "notes": []
   },
   "overrides": {}
 }

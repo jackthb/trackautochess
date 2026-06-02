@@ -5,9 +5,21 @@
   "icon": "synergies/knight.png",
   "source": {
     "name": "Knight",
-    "description": "Knight pieces who have nearby allies will gain a Divine Protection shield immediately.\n\nClass Perk: Divine Protection\n \nActive when you have at least (N) different Knight pieces on board. (Multiple effects stack)\n\n(2) Knights: All friendly knights have a 25% chance to procure a shield every 3 seconds in combat for 3 seconds.\n(4) Knights: All allies have a +25% chance to procure a shield every 3 seconds in combat.\n(6) Knights: All allies have a +25% chance to procure a shield every 3 seconds in combat. Procing a shield instantly heals for 400.",
+    "names": {
+      "en": "Knight",
+      "ru": "Knight"
+    },
+    "description": "Knight pieces who have nearby allies will gain a Divine Protection shield immediately.\n\nClass Perk: Divine Protection\n Active when you have at least (N) different Knight pieces on board. (Multiple effects stack)\n\n(2) Knights: All friendly knights have a 25% chance to procure a shield every 3 seconds in combat for 3 seconds.\n(4) Knights: All allies have a +25% chance to procure a shield every 3 seconds in combat.\n(6) Knights: All allies have a +25% chance to procure a shield every 3 seconds in combat. Procing a shield instantly heals for 400.",
+    "descriptions": {
+      "en": "Knight pieces who have nearby allies will gain a Divine Protection shield immediately.\n\nClass Perk: Divine Protection\n Active when you have at least (N) different Knight pieces on board. (Multiple effects stack)\n\n(2) Knights: All friendly knights have a 25% chance to procure a shield every 3 seconds in combat for 3 seconds.\n(4) Knights: All allies have a +25% chance to procure a shield every 3 seconds in combat.\n(6) Knights: All allies have a +25% chance to procure a shield every 3 seconds in combat. Procing a shield instantly heals for 400.",
+      "ru": "Рыцари, находящиеся рядом с союзниками, незамедлительно обретают щит Божественной Защиты.\n\nClass Perk: Divine Protection\n Active when you have at least (N) different Knight pieces on board. (Мульти-эффекты складываются)\n\n(2) Knights: Все рыцари имеют 25% шанс получить щит каждые 3 секунды в бою на 3 секунды.\n(4) Knights: Все союзники имеют +25% шанс получать щит каждые 3 секунды в бою.\n(6) Knights: Все союзники имеют шанс +25% Шанс получить щит каждые 3 секунды в бою. При получении щита моментально восстанавливает 400 здоровья."
+    },
     "description_html": "Knight pieces who have nearby allies will gain a Divine Protection shield immediately.\n<h1>Class Perk: Divine Protection</h1> <font color=\"#656585\">Active when you have at least (N) different Knight pieces on board. (Multiple effects stack)</font><br><br>(2) Knights: All friendly knights have a 25% chance to procure a shield every 3 seconds in combat for 3 seconds.<br>(4) Knights: All allies have a +25% chance to procure a shield every 3 seconds in combat.<br>(6) Knights: All allies have a +25% chance to procure a shield every 3 seconds in combat. Procing a shield instantly heals for 400.",
     "lore": "Knights are respected defenders of the realm. As they engage in battle, the Omniscience may bless them with a divine shield.",
+    "lore_i18n": {
+      "en": "Knights are respected defenders of the realm. As they engage in battle, the Omniscience may bless them with a divine shield.",
+      "ru": "Рыцари — уважаемые защитники королевства. В бою Всеведущее может благословить их божественным щитом."
+    },
     "notes": [
       "A Divine Protection shield reduces incoming physical and magical damage by 50%. Does not work on pure damage.",
       "Divine Protection activates per 3s and cannot protect knights hexed."
@@ -17,19 +29,7 @@
       4,
       6
     ],
-    "ability_special": {},
-    "names": {
-      "en": "Knight",
-      "ru": "Knight"
-    },
-    "descriptions": {
-      "en": "Knight pieces who have nearby allies will gain a Divine Protection shield immediately.\n\nClass Perk: Divine Protection\n Active when you have at least (N) different Knight pieces on board. (Multiple effects stack)\n\n(2) Knights: All friendly knights have a 25% chance to procure a shield every 3 seconds in combat for 3 seconds.\n(4) Knights: All allies have a +25% chance to procure a shield every 3 seconds in combat.\n(6) Knights: All allies have a +25% chance to procure a shield every 3 seconds in combat. Procing a shield instantly heals for 400.",
-      "ru": "Рыцари, находящиеся рядом с союзниками, незамедлительно обретают щит Божественной Защиты.\n\nClass Perk: Divine Protection\n Active when you have at least (N) different Knight pieces on board. (Мульти-эффекты складываются)\n\n(2) Knights: Все рыцари имеют 25% шанс получить щит каждые 3 секунды в бою на 3 секунды.\n(4) Knights: Все союзники имеют +25% шанс получать щит каждые 3 секунды в бою.\n(6) Knights: Все союзники имеют шанс +25% Шанс получить щит каждые 3 секунды в бою. При получении щита моментально восстанавливает 400 здоровья."
-    },
-    "lore_i18n": {
-      "en": "Knights are respected defenders of the realm. As they engage in battle, the Omniscience may bless them with a divine shield.",
-      "ru": "Рыцари — уважаемые защитники королевства. В бою Всеведущее может благословить их божественным щитом."
-    }
+    "ability_special": {}
   },
   "overrides": {}
 }

@@ -5,20 +5,20 @@
   "icon": "items/talisman_of_evasion.png",
   "source": {
     "name": "Talisman of Evasion",
-    "description": "+25% evasion.",
-    "lore": "",
-    "quality": "rare",
-    "texture": "item_talisman_of_evasion",
-    "notes": [],
     "names": {
       "en": "Talisman of Evasion",
       "ru": "Talisman of Evasion"
     },
+    "description": "+25% evasion.",
     "descriptions": {
       "en": "+25% evasion.",
       "ru": "+25% evasion."
     },
-    "lore_i18n": {}
+    "lore": "",
+    "lore_i18n": {},
+    "quality": "rare",
+    "texture": "item_talisman_of_evasion",
+    "notes": []
   },
   "overrides": {}
 }

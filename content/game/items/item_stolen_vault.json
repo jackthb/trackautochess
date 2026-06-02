@@ -5,23 +5,23 @@
   "icon": "items/coin.png",
   "source": {
     "name": "Stolen Vault",
-    "description": "Discard all 3 relics and get a Stolen Vault with random 10 ~ 15 gold.",
-    "lore": "From: Relicbox",
-    "quality": "",
-    "texture": "custom/coin",
-    "notes": [],
     "names": {
       "en": "Stolen Vault",
       "ru": "Stolen Vault"
     },
+    "description": "Discard all 3 relics and get a Stolen Vault with random 10 ~ 15 gold.",
     "descriptions": {
       "en": "Discard all 3 relics and get a Stolen Vault with random 10 ~ 15 gold.",
       "ru": "Отказаться от выбора реликвии и получить Stolen Vault с случайными 10-15 золота."
     },
+    "lore": "From: Relicbox",
     "lore_i18n": {
       "en": "From: Relicbox",
       "ru": "From: Relicbox"
-    }
+    },
+    "quality": "",
+    "texture": "custom/coin",
+    "notes": []
   },
   "overrides": {}
 }

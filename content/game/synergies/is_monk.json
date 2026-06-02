@@ -5,29 +5,30 @@
   "icon": "synergies/monk.png",
   "source": {
     "name": "Monk",
-    "description": "Class Perk: Drunken Stagger\n\nActive when you have at least (N) different Monk pieces on board. (Multiple effects stack)\n\n(2) Monks: All friendly melee Monks have a chance on dealing damage to instantly eliminate the target enemy with a low health.\n(4) Monks: All friendly Monks have a chance on dealing damage to reduce the current health of the target enemy by half.",
-    "description_html": "<h1>Class Perk: Drunken Stagger</h1><font color=\"#656585\">Active when you have at least (N) different Monk pieces on board. (Multiple effects stack)</font><br><br>(2) Monks: All friendly melee Monks have a chance on dealing damage to instantly eliminate the target enemy with a low health.<br>(4) Monks: All friendly Monks have a chance on dealing damage to reduce the current health of the target enemy by half.",
+    "names": {
+      "en": "Monk",
+      "ru": "Monk"
+    },
+    "description": "Class Perk: Drunken Stagger\n Active when you have at least (N) different Monk pieces on board. (Multiple effects stack)\n\n(2) Monks: All friendly melee Monks have a chance on dealing damage to instantly eliminate the target enemy with a low health.\n(4) Monks: All friendly Monks have a chance on dealing damage to reduce the current health of the target enemy by half.\n(6) Monks: Damage dealt by Drunken Stagger will heal the caster by a same amount.",
+    "descriptions": {
+      "en": "Class Perk: Drunken Stagger\n Active when you have at least (N) different Monk pieces on board. (Multiple effects stack)\n\n(2) Monks: All friendly melee Monks have a chance on dealing damage to instantly eliminate the target enemy with a low health.\n(4) Monks: All friendly Monks have a chance on dealing damage to reduce the current health of the target enemy by half.\n(6) Monks: Damage dealt by Drunken Stagger will heal the caster by a same amount.",
+      "ru": "Class Perk: Drunken Stagger\n Активна, когда минимум (N) разных Monks на столе.(Эффекты складываются))\n\n(2) Monks: Все союзные Monks ближнего боя имеют шанс мгновенно уничтожить врага с низким уровнем здоровья при нанесении урона.\n(4) Monks: Все союзные Monks имеют шанс при нанесении урона уменьшить текущее здоровье цели наполовину.\n(6) Monks: Урон от Drunken Stagger исцеляет владельца на то же значение."
+    },
+    "description_html": "<h1>Class Perk: Drunken Stagger</h1><font color=\"#656585\">Active when you have at least (N) different Monk pieces on board. (Multiple effects stack)</font><br><br>(2) Monks: All friendly melee Monks have a chance on dealing damage to instantly eliminate the target enemy with a low health.<br>(4) Monks: All friendly Monks have a chance on dealing damage to reduce the current health of the target enemy by half.<br>(6) Monks: Damage dealt by Drunken Stagger will heal the caster by a same amount.",
     "lore": "When the Pandaren were subjugated centuries ago, it was the monks that brought hope to a seemingly dim future. Restricted from using weapons by their slave masters, these Pandaren instead focused on harnessing their physical ability and learning weaponless combat. When the opportunity for revolution struck, they were well-trained to throw off the yoke of oppression.",
+    "lore_i18n": {
+      "en": "When the Pandaren were subjugated centuries ago, it was the monks that brought hope to a seemingly dim future. Restricted from using weapons by their slave masters, these Pandaren instead focused on harnessing their physical ability and learning weaponless combat. When the opportunity for revolution struck, they were well-trained to throw off the yoke of oppression.",
+      "ru": "When the Pandaren were subjugated centuries ago, it was the monks that brought hope to a seemingly dim future. Restricted from using weapons by their slave masters, these Pandaren instead focused on harnessing their physical ability and learning weaponless combat. When the opportunity for revolution struck, they were well-trained to throw off the yoke of oppression."
+    },
     "notes": [
       "The more damage the Monk deals, the higher the probability that Drunken Stagger will trigger."
     ],
     "tiers": [
       2,
-      4
+      4,
+      6
     ],
-    "ability_special": {},
-    "names": {
-      "en": "Monk",
-      "ru": "Monk"
-    },
-    "descriptions": {
-      "en": "Class Perk: Drunken Stagger\n Active when you have at least (N) different Monk pieces on board. (Multiple effects stack)\n\n(2) Monks: All friendly melee Monks have a chance on dealing damage to instantly eliminate the target enemy with a low health.\n(4) Monks: All friendly Monks have a chance on dealing damage to reduce the current health of the target enemy by half.\n(6) Monks: Damage dealt by Drunken Stagger will heal the caster by a same amount.",
-      "ru": "Class Perk: Drunken Stagger\n Активна, когда минимум (N) разных Monks на столе.(Эффекты складываются))\n\n(2) Monks: Все союзные Monks ближнего боя имеют шанс мгновенно уничтожить врага с низким уровнем здоровья при нанесении урона.\n(4) Monks: Все союзные Monks имеют шанс при нанесении урона уменьшить текущее здоровье цели наполовину.\n(6) Monks: Урон от Drunken Stagger исцеляет владельца на то же значение."
-    },
-    "lore_i18n": {
-      "en": "When the Pandaren were subjugated centuries ago, it was the monks that brought hope to a seemingly dim future. Restricted from using weapons by their slave masters, these Pandaren instead focused on harnessing their physical ability and learning weaponless combat. When the opportunity for revolution struck, they were well-trained to throw off the yoke of oppression.",
-      "ru": "When the Pandaren were subjugated centuries ago, it was the monks that brought hope to a seemingly dim future. Restricted from using weapons by their slave masters, these Pandaren instead focused on harnessing their physical ability and learning weaponless combat. When the opportunity for revolution struck, they were well-trained to throw off the yoke of oppression."
-    }
+    "ability_special": {}
   },
   "overrides": {}
 }

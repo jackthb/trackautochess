@@ -5,20 +5,20 @@
   "icon": "items/default.png",
   "source": {
     "name": "UNAVAILABLE",
-    "description": "This item slot is unavailable.",
-    "lore": "",
-    "quality": "consumable",
-    "texture": "item_default",
-    "notes": [],
     "names": {
       "en": "UNAVAILABLE",
       "ru": "UNAVAILABLE"
     },
+    "description": "This item slot is unavailable.",
     "descriptions": {
       "en": "This item slot is unavailable.",
       "ru": "This item slot is unavailable."
     },
-    "lore_i18n": {}
+    "lore": "",
+    "lore_i18n": {},
+    "quality": "consumable",
+    "texture": "item_default",
+    "notes": []
   },
   "overrides": {}
 }

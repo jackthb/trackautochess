@@ -5,23 +5,23 @@
   "icon": "items/aegis.png",
   "source": {
     "name": "Aegis of Immortal",
-    "description": "+600 HP.\nDeathrattle: Resurrect once.",
-    "lore": "Immortals used to have a magical shield to prevent them from death.",
-    "quality": "rare",
-    "texture": "item_aegis",
-    "notes": [],
     "names": {
       "en": "Aegis of Immortal",
       "ru": "Aegis of Immortal"
     },
+    "description": "+600 HP.\nDeathrattle: Resurrect once.",
     "descriptions": {
       "en": "+600 HP.\nDeathrattle: Resurrect once.",
       "ru": "+600 Здоровья.\nСмертельный хрип: Воскрешается один раз."
     },
+    "lore": "Immortals used to have a magical shield to prevent them from death.",
     "lore_i18n": {
       "en": "Immortals used to have a magical shield to prevent them from death.",
       "ru": "Immortals used to have a magical shield to prevent them from death."
-    }
+    },
+    "quality": "rare",
+    "texture": "item_aegis",
+    "notes": []
   },
   "overrides": {}
 }

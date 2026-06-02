@@ -5,23 +5,23 @@
   "icon": "items/mekansm.png",
   "source": {
     "name": "Mekansm",
-    "description": "Active ability: Activate when most allies are wounded\nHeals 500 health to all allied units within the range. \n\nRange:400",
-    "lore": "A glowing jewel formed out of assorted parts that somehow fit together perfectly.",
-    "quality": "rare",
-    "texture": "item_mekansm",
-    "notes": [],
     "names": {
       "en": "Mekansm",
       "ru": "Mekansm"
     },
+    "description": "Active ability: Activate when most allies are wounded\nHeals 500 health to all allied units within the range. \n\nRange:400",
     "descriptions": {
       "en": "Active ability: Activate when most allies are wounded\nHeals 500 health to all allied units within the range. \n\nRange:400",
       "ru": "Active ability: Activate when most allies are wounded\nИсцеляет 500 здоровья всем союзным юнитам в радиусе."
     },
+    "lore": "A glowing jewel formed out of assorted parts that somehow fit together perfectly.",
     "lore_i18n": {
       "en": "A glowing jewel formed out of assorted parts that somehow fit together perfectly.",
       "ru": "A glowing jewel formed out of assorted parts that somehow fit together perfectly."
-    }
+    },
+    "quality": "rare",
+    "texture": "item_mekansm",
+    "notes": []
   },
   "overrides": {}
 }

@@ -5,27 +5,27 @@
   "icon": "synergies/tauren.png",
   "source": {
     "name": "Tauren",
-    "description": "SPECIES TRAIT: Totem of the Clan\n\nActive when you have at least (N) different pieces of this species on board. (Multiple effects stack)\n\n(2) Taurens: Summons a Taunt Totem at the start of the battle.\n(4) Taurens: Summons a Woodpecker Totem and a Horn Totem at the start of the battle.",
+    "names": {
+      "en": "Tauren",
+      "ru": "Tauren"
+    },
+    "description": "SPECIES TRAIT: Totem of the Clan\n Active when you have at least (N) different pieces of this species on board. (Multiple effects stack)\n\n(2) Taurens: Summons a Taunt Totem at the start of the battle.\n(4) Taurens: Summons a Woodpecker Totem and a Horn Totem at the start of the battle.",
+    "descriptions": {
+      "en": "SPECIES TRAIT: Totem of the Clan\n Active when you have at least (N) different pieces of this species on board. (Multiple effects stack)\n\n(2) Taurens: Summons a Taunt Totem at the start of the battle.\n(4) Taurens: Summons a Woodpecker Totem and a Horn Totem at the start of the battle.",
+      "ru": "SPECIES TRAIT: Totem of the Clan\n Активна, когда минимум (N) разных Taurens на столе.(Эффекты складываются)\n\n(2) Taurens: Призывает Totem Taunt в начале битвы.\n(4) Taurens: Призывает Totem Woodpecker и Totem Horn в начале битвы."
+    },
     "description_html": "<h1>SPECIES TRAIT: Totem of the Clan</h1><font color=\"#656585\">Active when you have at least (N) different pieces of this species on board. (Multiple effects stack)</font><br><br>(2) Taurens: Summons a Taunt Totem at the start of the battle.<br>(4) Taurens: Summons a Woodpecker Totem and a Horn Totem at the start of the battle.",
     "lore": "Peace-loving Taurens live on mountain-high plateaus of the barren Drodoland. They strive to preserve the balance of nature at the behest of the Earth Mother.",
+    "lore_i18n": {
+      "en": "Peace-loving Taurens live on mountain-high plateaus of the barren Drodoland. They strive to preserve the balance of nature at the behest of the Earth Mother.",
+      "ru": "Taurens с высокогорных плато Drodoland служат Earth Mother и оберегают баланс природы."
+    },
     "notes": [],
     "tiers": [
       2,
       4
     ],
-    "ability_special": {},
-    "names": {
-      "en": "Tauren",
-      "ru": "Tauren"
-    },
-    "descriptions": {
-      "en": "SPECIES TRAIT: Totem of the Clan\n Active when you have at least (N) different pieces of this species on board. (Multiple effects stack)\n\n(2) Taurens: Summons a Taunt Totem at the start of the battle.\n(4) Taurens: Summons a Woodpecker Totem and a Horn Totem at the start of the battle.",
-      "ru": "SPECIES TRAIT: Totem of the Clan\n Активна, когда минимум (N) разных Taurens на столе.(Эффекты складываются)\n\n(2) Taurens: Призывает Totem Taunt в начале битвы.\n(4) Taurens: Призывает Totem Woodpecker и Totem Horn в начале битвы."
-    },
-    "lore_i18n": {
-      "en": "Peace-loving Taurens live on mountain-high plateaus of the barren Drodoland. They strive to preserve the balance of nature at the behest of the Earth Mother.",
-      "ru": "Taurens с высокогорных плато Drodoland служат Earth Mother и оберегают баланс природы."
-    }
+    "ability_special": {}
   },
   "overrides": {}
 }

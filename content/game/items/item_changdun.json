@@ -5,20 +5,20 @@
   "icon": "items/pavise.png",
   "source": {
     "name": "Pavise",
-    "description": "+5 Armor.\nChances to gain +1 armor permanently on its carrier on damage taken in home battle.",
-    "lore": "",
-    "quality": "consumable",
-    "texture": "item_pavise",
-    "notes": [],
     "names": {
       "en": "Pavise",
       "ru": "Pavise"
     },
+    "description": "+5 Armor.\nChances to gain +1 armor permanently on its carrier on damage taken in home battle.",
     "descriptions": {
       "en": "+5 Armor.\nChances to gain +1 armor permanently on its carrier on damage taken in home battle.",
       "ru": "+5 брони.\nШанс получить +1 брони носителю навсегда, при получении урона в домашнем бою."
     },
-    "lore_i18n": {}
+    "lore": "",
+    "lore_i18n": {},
+    "quality": "consumable",
+    "texture": "item_pavise",
+    "notes": []
   },
   "overrides": {}
 }

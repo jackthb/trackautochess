@@ -5,23 +5,23 @@
   "icon": "items/hand_of_midas.png",
   "source": {
     "name": "Hand of Midas",
-    "description": "Active ability: Instant Activation\n Immediately eliminates a summoned or illusion piece with health lower than the carrier. In-home battles, drops 1 gold coins.",
-    "lore": "Preserved through unknown magical means, the Hand of Midas is a weapon of greed, sacrificing animals to line the owners pockets.",
-    "quality": "common",
-    "texture": "item_hand_of_midas",
-    "notes": [],
     "names": {
       "en": "Hand of Midas",
       "ru": "Hand of Midas"
     },
+    "description": "Active ability: Instant Activation\n Immediately eliminates a summoned or illusion piece with health lower than the carrier. In-home battles, drops 1 gold coins.",
     "descriptions": {
       "en": "Active ability: Instant Activation\n Immediately eliminates a summoned or illusion piece with health lower than the carrier. In-home battles, drops 1 gold coins.",
       "ru": "Нацеленная Активка: Мгновенная\n Немедленно уничтожает призванную или иллюзорную фигуру с меньшим здоровьем, чем у носителя. В домашних битвах дает 1 золотую монету."
     },
+    "lore": "Preserved through unknown magical means, the Hand of Midas is a weapon of greed, sacrificing animals to line the owners pockets.",
     "lore_i18n": {
       "en": "Preserved through unknown magical means, the Hand of Midas is a weapon of greed, sacrificing animals to line the owners pockets.",
       "ru": "Preserved through unknown magical means, the Hand of Midas is a weapon of greed, sacrificing animals to line the owners pockets."
-    }
+    },
+    "quality": "common",
+    "texture": "item_hand_of_midas",
+    "notes": []
   },
   "overrides": {}
 }

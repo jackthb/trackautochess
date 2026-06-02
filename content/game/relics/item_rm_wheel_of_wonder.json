@@ -5,16 +5,16 @@
   "icon": "relics/wheel_of_wonder.png",
   "source": {
     "name": "Wheel of Wonder",
-    "description": "Relic Consumable: Click to Use\nChoose an ally piece and put it into the wheel of wonder, DISCOVER a special version of it with an extra random synergy.",
-    "lore": "",
     "names": {
       "en": "Wheel of Wonder",
       "ru": "Wheel of Wonder"
     },
+    "description": "Relic Consumable: Click to Use\nChoose an ally piece and put it into the wheel of wonder, DISCOVER a special version of it with an extra random synergy.",
     "descriptions": {
       "en": "Relic Consumable: Click to Use\nChoose an ally piece and put it into the wheel of wonder, DISCOVER a special version of it with an extra random synergy.",
       "ru": "Нажмите для использования\nВыберите союзную фигуру и откройте уникальную версию с дополнительной случайной синергией."
     },
+    "lore": "",
     "lore_i18n": {}
   },
   "overrides": {}

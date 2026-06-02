@@ -5,25 +5,25 @@
   "icon": "items/golden_mango2.png",
   "source": {
     "name": "Golden Enchanted Mango",
-    "description": "Courier consumable: Activate when taking fatal damage\nConsumes 1 charge of Golden Enchanted Mango and protects your Courier from fatal damage for this round.",
-    "lore": "From: Mango Tree",
-    "quality": "consumable",
-    "texture": "custom/golden_mango2",
-    "notes": [
-      "Move into Backpack slots if you don't wish to use this item for the round."
-    ],
     "names": {
       "en": "Golden Enchanted Mango",
       "ru": "Golden Enchanted Mango"
     },
+    "description": "Courier consumable: Activate when taking fatal damage\nConsumes 1 charge of Golden Enchanted Mango and protects your Courier from fatal damage for this round.",
     "descriptions": {
       "en": "Courier consumable: Activate when taking fatal damage\nConsumes 1 charge of Golden Enchanted Mango and protects your Courier from fatal damage for this round.",
       "ru": "Потребляемый предмет курьера: активируется при получении фатального урона.\nПотребляет 1 заряд Золотого Зачарованного Манго и защищает вашего курьера от фатального урона в этом раунде."
     },
+    "lore": "From: Mango Tree",
     "lore_i18n": {
       "en": "From: Mango Tree",
       "ru": "From: Mango Tree"
-    }
+    },
+    "quality": "consumable",
+    "texture": "custom/golden_mango2",
+    "notes": [
+      "Move into Backpack slots if you don't wish to use this item for the round."
+    ]
   },
   "overrides": {}
 }

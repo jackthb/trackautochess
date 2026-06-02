@@ -5,20 +5,20 @@
   "icon": "items/card_chance.png",
   "source": {
     "name": "Card: Chance",
-    "description": "Courier Consumable: Click to use\nYou can designate a chess piece to gain an additional class from the nearest other class permanently.",
-    "lore": "",
-    "quality": "consumable",
-    "texture": "custom/card_chance",
-    "notes": [],
     "names": {
       "en": "Card: Chance",
       "ru": "Card: Chance"
     },
+    "description": "Courier Consumable: Click to use\nYou can designate a chess piece to gain an additional class from the nearest other class permanently.",
     "descriptions": {
       "en": "Courier Consumable: Click to use\nYou can designate a chess piece to gain an additional class from the nearest other class permanently.",
       "ru": "Courier Consumable: Click to use\nYou can designate a chess piece to gain an additional class from the nearest other class permanently."
     },
-    "lore_i18n": {}
+    "lore": "",
+    "lore_i18n": {},
+    "quality": "consumable",
+    "texture": "custom/card_chance",
+    "notes": []
   },
   "overrides": {}
 }

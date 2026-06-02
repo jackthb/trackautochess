@@ -5,23 +5,23 @@
   "icon": "items/bloodthorn.png",
   "source": {
     "name": "Bloodthorn",
-    "description": "+20% Attack speed.\n\nActive ability: Instant\nRoots and \nsilences the highest-level enemy chess piece in the attack range for 6 seconds. Any attacks to the victim causes 200% critical damage and all allies with in the attack range focus attacking the victim within the duration.",
-    "lore": "A reviled blade that bites deeper with each wriggle of its victims final throes.",
-    "quality": "rare",
-    "texture": "item_bloodthorn",
-    "notes": [],
     "names": {
       "en": "Bloodthorn",
       "ru": "Bloodthorn"
     },
+    "description": "+20% Attack speed.\n\nActive ability: Instant\nRoots and silences the highest-level enemy chess piece in the attack range for 6 seconds. Any attacks to the victim causes 200% critical damage and all allies with in the attack range focus attacking the victim within the duration.",
     "descriptions": {
       "en": "+20% Attack speed.\n\nActive ability: Instant\nRoots and silences the highest-level enemy chess piece in the attack range for 6 seconds. Any attacks to the victim causes 200% critical damage and all allies with in the attack range focus attacking the victim within the duration.",
       "ru": "+20% Скорости атаки.\n\nАктивка: Мгновенная\nНакладывает Молчание на вражескую фигуру с самым высоким уровнем в зоне атаки на 6 секунд. Все атаки по цели наносят 200% критического урона, а союзники в радиусе атаки сосредотачиваются на атаке цели в течение действия эффекта."
     },
+    "lore": "A reviled blade that bites deeper with each wriggle of its victims final throes.",
     "lore_i18n": {
       "en": "A reviled blade that bites deeper with each wriggle of its victims final throes.",
       "ru": "Проклятый клинок, который вонзается всё глубже с каждой конвульсией умирающей жертвы."
-    }
+    },
+    "quality": "rare",
+    "texture": "item_bloodthorn",
+    "notes": []
   },
   "overrides": {}
 }

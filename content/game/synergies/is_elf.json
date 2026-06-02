@@ -5,28 +5,28 @@
   "icon": "synergies/elf.png",
   "source": {
     "name": "Elf",
-    "description": "Species Trait: Evasion\n\nActive when you have at least (N) different Elf pieces on board. (Multiple effects stack)\n\n(3) Elves: All friendly elves have +25% evasion.\n(6) Elves: All friendly elves have +40% evasion.\n(9) Elves: Friendly elves gain the effect: Dodging any attack will conceal itself for 1 second and create a mirrored attack from the attacker, targeting the enemy.",
+    "names": {
+      "en": "Elf",
+      "ru": "Elf"
+    },
+    "description": "Species Trait: Evasion\n Active when you have at least (N) different Elf pieces on board. (Multiple effects stack)\n\n(3) Elves: All friendly elves have +25% evasion.\n(6) Elves: All friendly elves have +40% evasion.\n(9) Elves: Friendly elves gain the effect: Dodging any attack will conceal itself for 1 second and create a mirrored attack from the attacker, targeting the enemy.",
+    "descriptions": {
+      "en": "Species Trait: Evasion\n Active when you have at least (N) different Elf pieces on board. (Multiple effects stack)\n\n(3) Elves: All friendly elves have +25% evasion.\n(6) Elves: All friendly elves have +40% evasion.\n(9) Elves: Friendly elves gain the effect: Dodging any attack will conceal itself for 1 second and create a mirrored attack from the attacker, targeting the enemy.",
+      "ru": "Species Trait: Evasion\n Активируется, когда на поле есть хотя бы (N) разных Elf фигур. (Эффекты складываются)\n\n(3) Elves: Все дружественные Elves получают +25% уклонения.\n(6) Elves: Все дружественные Elves получают +40% уклонения.\n(9) Elves: Дружественные Elves получают эффект: уклоняясь от любой атаки, фигура скрывается на 1 секунду и создаёт зеркальную атаку от атакующего, нацеливая её на врага."
+    },
     "description_html": "<h1>Species Trait: Evasion</h1><font color=\"#656585\">Active when you have at least (N) different Elf pieces on board. (Multiple effects stack)</font><br><br>(3) Elves: All friendly elves have +25% evasion.<br>(6) Elves: All friendly elves have +40% evasion.<br>(9) Elves: Friendly elves gain the effect: Dodging any attack will conceal itself for 1 second and create a mirrored attack from the attacker, targeting the enemy.",
     "lore": "Nimble Elves who live on the crown of the World Tree are one of the most important primal protectors of Drodo Island. Their belief in the Goddess of the Moon and natural harmony has profoundly affected their lifestyle.",
+    "lore_i18n": {
+      "en": "Nimble Elves who live on the crown of the World Tree are one of the most important primal protectors of Drodo Island. Their belief in the Goddess of the Moon and natural harmony has profoundly affected their lifestyle.",
+      "ru": "Проворные Elves, живущие в кроне World Tree, являются одними из важнейших первородных защитников Drodo Island. Их вера в Goddess of the Moon и гармонию природы глубоко влияет на их образ жизни."
+    },
     "notes": [],
     "tiers": [
       3,
       6,
       9
     ],
-    "ability_special": {},
-    "names": {
-      "en": "Elf",
-      "ru": "Elf"
-    },
-    "descriptions": {
-      "en": "Species Trait: Evasion\n Active when you have at least (N) different Elf pieces on board. (Multiple effects stack)\n\n(3) Elves: All friendly elves have +25% evasion.\n(6) Elves: All friendly elves have +40% evasion.\n(9) Elves: Friendly elves gain the effect: Dodging any attack will conceal itself for 1 second and create a mirrored attack from the attacker, targeting the enemy.",
-      "ru": "Species Trait: Evasion\n Активируется, когда на поле есть хотя бы (N) разных Elf фигур. (Эффекты складываются)\n\n(3) Elves: Все дружественные Elves получают +25% уклонения.\n(6) Elves: Все дружественные Elves получают +40% уклонения.\n(9) Elves: Дружественные Elves получают эффект: уклоняясь от любой атаки, фигура скрывается на 1 секунду и создаёт зеркальную атаку от атакующего, нацеливая её на врага."
-    },
-    "lore_i18n": {
-      "en": "Nimble Elves who live on the crown of the World Tree are one of the most important primal protectors of Drodo Island. Their belief in the Goddess of the Moon and natural harmony has profoundly affected their lifestyle.",
-      "ru": "Проворные Elves, живущие в кроне World Tree, являются одними из важнейших первородных защитников Drodo Island. Их вера в Goddess of the Moon и гармонию природы глубоко влияет на их образ жизни."
-    }
+    "ability_special": {}
   },
   "overrides": {}
 }

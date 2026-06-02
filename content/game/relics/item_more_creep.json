@@ -5,16 +5,16 @@
   "icon": "relics/march_of_the_beasts.png",
   "source": {
     "name": "March of The Beasts",
-    "description": "All creeps duplicate themselves and counted as level +1.",
-    "lore": "",
     "names": {
       "en": "March of The Beasts",
       "ru": "March of The Beasts"
     },
+    "description": "All creeps duplicate themselves and counted as level +1.",
     "descriptions": {
       "en": "All creeps duplicate themselves and counted as level +1.",
       "ru": "Все крипы удваиваются и считаются на один уровень выше."
     },
+    "lore": "",
     "lore_i18n": {}
   },
   "overrides": {}

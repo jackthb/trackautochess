@@ -5,9 +5,21 @@
   "icon": "synergies/mage.png",
   "source": {
     "name": "Mage",
-    "description": "For every standing friendly Mage on the chessboard, Mage pieces receive +10% bonus mana restoration, up to a maximum of 60%.\n\nClass Perk: Magical Vulnerability\n\nActive when you have at least (N) different mage pieces on board. (Multiple effects stack) \n\n(3) Mages: All enemies suffer -30% magic resistance.\n(6) Mages: All enemies suffer -35% magic resistance.\n(9) Mages: All enemies are cursed with frost incantation, which freezes them upon receiving magical damage. Lasts longer for more increased damage taken.",
+    "names": {
+      "en": "Mage",
+      "ru": "Mage"
+    },
+    "description": "For every standing friendly Mage on the chessboard, Mage pieces receive +10% bonus mana restoration, up to a maximum of 60%.\n\nClass Perk: Magical Vulnerability\n Active when you have at least (N) different mage pieces on board. (Multiple effects stack) \n\n(3) Mages: All enemies suffer -30% magic resistance.\n(6) Mages: All enemies suffer -35% magic resistance.\n(9) Mages: All enemies are cursed with frost incantation, which freezes them upon receiving magical damage. Lasts longer for more increased damage taken.",
+    "descriptions": {
+      "en": "For every standing friendly Mage on the chessboard, Mage pieces receive +10% bonus mana restoration, up to a maximum of 60%.\n\nClass Perk: Magical Vulnerability\n Active when you have at least (N) different mage pieces on board. (Multiple effects stack) \n\n(3) Mages: All enemies suffer -30% magic resistance.\n(6) Mages: All enemies suffer -35% magic resistance.\n(9) Mages: All enemies are cursed with frost incantation, which freezes them upon receiving magical damage. Lasts longer for more increased damage taken.",
+      "ru": "За каждого стоящего на доске дружественного Мага фигуры Магов получают бонус к восстановлению маны +10%, максимум до 60%.\n\nClass Perk: Magical Vulnerability\n Активна, когда минимум (N) разных Магов на столе.(Эффекты складываются) \n\n(3) Mages: Магический резист врагов снижен на 30%.\n(6) Mages: Магический резист врагов снижен на 35%.\n(9) Mages: Все враги заражены чумой, которая замораживает их при получении маг. урона. Длительность зависит от кол-ва полученного урона."
+    },
     "description_html": "For every standing friendly Mage on the chessboard, Mage pieces receive +10% bonus mana restoration, up to a maximum of 60%.\n<h1>Class Perk: Magical Vulnerability</h1><font color=\"#656585\">Active when you have at least (N) different mage pieces on board. (Multiple effects stack) </font><br><br>(3) Mages: All enemies suffer -30% magic resistance.<br>(6) Mages: All enemies suffer -35% magic resistance.<br>(9) Mages: All enemies are cursed with frost incantation, which freezes them upon receiving magical damage. Lasts longer for more increased damage taken.",
     "lore": "Mages are keen intellectuals who have spent years studying arcane knowledge. This allows them to make their victims more vulnerable to magic damage.",
+    "lore_i18n": {
+      "en": "Mages are keen intellectuals who have spent years studying arcane knowledge. This allows them to make their victims more vulnerable to magic damage.",
+      "ru": "Mages — проницательные интеллектуалы, посвятившие годы изучению тайных знаний. Это позволяет им делать врагов более уязвимыми к магическому урону."
+    },
     "notes": [
       "Freeze duration equals to magical damage/400 with a minimum of 0.5s."
     ],
@@ -16,19 +28,7 @@
       6,
       9
     ],
-    "ability_special": {},
-    "names": {
-      "en": "Mage",
-      "ru": "Mage"
-    },
-    "descriptions": {
-      "en": "For every standing friendly Mage on the chessboard, Mage pieces receive +10% bonus mana restoration, up to a maximum of 60%.\n\nClass Perk: Magical Vulnerability\n Active when you have at least (N) different mage pieces on board. (Multiple effects stack) \n\n(3) Mages: All enemies suffer -30% magic resistance.\n(6) Mages: All enemies suffer -35% magic resistance.\n(9) Mages: All enemies are cursed with frost incantation, which freezes them upon receiving magical damage. Lasts longer for more increased damage taken.",
-      "ru": "За каждого стоящего на доске дружественного Мага фигуры Магов получают бонус к восстановлению маны +10%, максимум до 60%.\n\nClass Perk: Magical Vulnerability\n Активна, когда минимум (N) разных Магов на столе.(Эффекты складываются) \n\n(3) Mages: Магический резист врагов снижен на 30%.\n(6) Mages: Магический резист врагов снижен на 35%.\n(9) Mages: Все враги заражены чумой, которая замораживает их при получении маг. урона. Длительность зависит от кол-ва полученного урона."
-    },
-    "lore_i18n": {
-      "en": "Mages are keen intellectuals who have spent years studying arcane knowledge. This allows them to make their victims more vulnerable to magic damage.",
-      "ru": "Mages — проницательные интеллектуалы, посвятившие годы изучению тайных знаний. Это позволяет им делать врагов более уязвимыми к магическому урону."
-    }
+    "ability_special": {}
   },
   "overrides": {}
 }

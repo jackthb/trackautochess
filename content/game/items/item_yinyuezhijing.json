@@ -5,23 +5,23 @@
   "icon": "items/moon_shard.png",
   "source": {
     "name": "Moon Shard",
-    "description": "Attack speed +50%.",
-    "lore": "Said to be a tear from the lunar goddess Selemene.",
-    "quality": "epic",
-    "texture": "item_moon_shard",
-    "notes": [],
     "names": {
       "en": "Moon Shard",
       "ru": "Moon Shard"
     },
+    "description": "Attack speed +50%.",
     "descriptions": {
       "en": "Attack speed +50%.",
       "ru": "Скорость атаки +50%."
     },
+    "lore": "Said to be a tear from the lunar goddess Selemene.",
     "lore_i18n": {
       "en": "Said to be a tear from the lunar goddess Selemene.",
       "ru": "Said to be a tear from the lunar goddess Selemene."
-    }
+    },
+    "quality": "epic",
+    "texture": "item_moon_shard",
+    "notes": []
   },
   "overrides": {}
 }

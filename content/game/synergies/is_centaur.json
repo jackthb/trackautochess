@@ -5,9 +5,21 @@
   "icon": "synergies/centaur.png",
   "source": {
     "name": "Centaur",
-    "description": "SPECIES TRAIT: Stampede\n\nActive when you have at least (N) different pieces of this species on board. (Multiple effects stack).\n\n(2)Centaurs: All friendly Centaurs gain the effect: when starting a battle, immediately charge to the target grid with the most enemy pieces around, and stun the enemy pieces on the path.\n(4)Centaurs: Every move of all melee-friendly pieces is a Stampede.",
+    "names": {
+      "en": "Centaur",
+      "ru": "Centaur"
+    },
+    "description": "SPECIES TRAIT: Stampede\n Active when you have at least (N) different pieces of this species on board. (Multiple effects stack).\n\n(2)Centaurs: All friendly Centaurs gain the effect: when starting a battle, immediately charge to the target grid with the most enemy pieces around, and stun the enemy pieces on the path.\n(4)Centaurs: Every move of all melee-friendly pieces is a Stampede.",
+    "descriptions": {
+      "en": "SPECIES TRAIT: Stampede\n Active when you have at least (N) different pieces of this species on board. (Multiple effects stack).\n\n(2)Centaurs: All friendly Centaurs gain the effect: when starting a battle, immediately charge to the target grid with the most enemy pieces around, and stun the enemy pieces on the path.\n(4)Centaurs: Every move of all melee-friendly pieces is a Stampede.",
+      "ru": "SPECIES TRAIT: Stampede\n Активна, когда минимум (N) разных Centaurs на столе.(Эффекты складываются).\n\n(2)Centaurs: Все союзные Centaurs получают эффект: при начале битвы они немедленно мчатся к клетке с наибольшим количеством вражеских фигур вокруг и оглушают врагов на пути.\n(4)Centaurs: Каждое движение всех ближних союзных фигур является Stampede."
+    },
     "description_html": "<h1>SPECIES TRAIT: Stampede</h1><font color=\"#656585\">Active when you have at least (N) different pieces of this species on board. (Multiple effects stack).</font><br><br>(2)Centaurs: All friendly Centaurs gain the effect: when starting a battle, immediately charge to the target grid with the most enemy pieces around, and stun the enemy pieces on the path.<br>(4)Centaurs:  Every move of all melee-friendly pieces is a Stampede.",
     "lore": "Centaurs are of noble blood, they are given birth by Half-god’s elder son Zaetar and only daughter of Princess Theradras. Cruelty and fierceness fill their blood, generation by generation.",
+    "lore_i18n": {
+      "en": "Centaurs are of noble blood, they are given birth by Half-god’s elder son Zaetar and only daughter of Princess Theradras. Cruelty and fierceness fill their blood, generation by generation.",
+      "ru": "Centaurs — благородного происхождения: они рождены от старшего сына полубога Zaetar и единственной дочери принцессы Theradras. Жестокость и свирепость передаются в их крови из поколения в поколение."
+    },
     "notes": [
       "Duration: 0.75s"
     ],
@@ -15,19 +27,7 @@
       2,
       4
     ],
-    "ability_special": {},
-    "names": {
-      "en": "Centaur",
-      "ru": "Centaur"
-    },
-    "descriptions": {
-      "en": "SPECIES TRAIT: Stampede\n Active when you have at least (N) different pieces of this species on board. (Multiple effects stack).\n\n(2)Centaurs: All friendly Centaurs gain the effect: when starting a battle, immediately charge to the target grid with the most enemy pieces around, and stun the enemy pieces on the path.\n(4)Centaurs: Every move of all melee-friendly pieces is a Stampede.",
-      "ru": "SPECIES TRAIT: Stampede\n Активна, когда минимум (N) разных Centaurs на столе.(Эффекты складываются).\n\n(2)Centaurs: Все союзные Centaurs получают эффект: при начале битвы они немедленно мчатся к клетке с наибольшим количеством вражеских фигур вокруг и оглушают врагов на пути.\n(4)Centaurs: Каждое движение всех ближних союзных фигур является Stampede."
-    },
-    "lore_i18n": {
-      "en": "Centaurs are of noble blood, they are given birth by Half-god’s elder son Zaetar and only daughter of Princess Theradras. Cruelty and fierceness fill their blood, generation by generation.",
-      "ru": "Centaurs — благородного происхождения: они рождены от старшего сына полубога Zaetar и единственной дочери принцессы Theradras. Жестокость и свирепость передаются в их крови из поколения в поколение."
-    }
+    "ability_special": {}
   },
   "overrides": {}
 }

@@ -5,20 +5,20 @@
   "icon": "items/greater_crit.png",
   "source": {
     "name": "Daedalus",
-    "description": "+75 damage.\nAttacks have a 20% chance to critically strike for 400% damage.",
-    "lore": "",
-    "quality": "artifact",
-    "texture": "item_greater_crit",
-    "notes": [],
     "names": {
       "en": "Daedalus",
       "ru": "Daedalus"
     },
+    "description": "+75 damage.\nAttacks have a 20% chance to critically strike for 400% damage.",
     "descriptions": {
       "en": "+75 damage.\nAttacks have a 20% chance to critically strike for 400% damage.",
       "ru": "+75 damage.\nАтаки имеют 20% шанс на критический удар, наносящий 400% урона."
     },
-    "lore_i18n": {}
+    "lore": "",
+    "lore_i18n": {},
+    "quality": "artifact",
+    "texture": "item_greater_crit",
+    "notes": []
   },
   "overrides": {}
 }

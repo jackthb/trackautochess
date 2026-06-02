@@ -5,23 +5,23 @@
   "icon": "items/第二次机会.png",
   "source": {
     "name": "Second Chance",
-    "description": "When you use consumable items of the choice category, you can refresh the selection panel and acquire different options.",
-    "lore": "From Relicbox",
-    "quality": "",
-    "texture": "item_custom/第二次机会",
-    "notes": [],
     "names": {
       "en": "Second Chance",
       "ru": "Second Chance"
     },
+    "description": "When you use consumable items of the choice category, you can refresh the selection panel and acquire different options.",
     "descriptions": {
       "en": "When you use consumable items of the choice category, you can refresh the selection panel and acquire different options.",
       "ru": "Позволяет обновить выбор в сундуке - вместо случайного предмета вы снова получаете 3 новых варианта на выбор."
     },
+    "lore": "From Relicbox",
     "lore_i18n": {
       "en": "From Relicbox",
       "ru": "Из Relicbox"
-    }
+    },
+    "quality": "",
+    "texture": "item_custom/第二次机会",
+    "notes": []
   },
   "overrides": {}
 }

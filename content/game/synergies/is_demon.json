@@ -5,26 +5,26 @@
   "icon": "synergies/demon.png",
   "source": {
     "name": "Demon",
-    "description": "SPECIES TRAIT: Fel Power\n\nActive when you control only 1 type of Demon on the chessboard.\n\n(1) Demon: Normal attack damage caused by allied demon chess pieces is settled as pure damage. Fel Powers damage is increased by 15%,with a maximum stack count of 7.",
-    "description_html": "<h1>SPECIES TRAIT: Fel Power</h1><font color=\"#656585\">Active when you control only 1 type of Demon on the chessboard.</font><br><br>(1) Demon: Normal attack damage caused by allied demon chess pieces is settled as pure damage. Fel Powers damage is increased by 15%,with a maximum stack count of 7.",
-    "lore": "Chaotic beings that emerged from a dimensional fissure.",
-    "notes": [],
-    "tiers": [
-      1
-    ],
-    "ability_special": {},
     "names": {
       "en": "Demon",
       "ru": "Demon"
     },
+    "description": "SPECIES TRAIT: Fel Power\n Active when you control only 1 type of Demon on the chessboard.\n\n(1) Demon: Normal attack damage caused by allied demon chess pieces is settled as pure damage. Fel Powers damage is increased by 15%,with a maximum stack count of 7.",
     "descriptions": {
       "en": "SPECIES TRAIT: Fel Power\n Active when you control only 1 type of Demon on the chessboard.\n\n(1) Demon: Normal attack damage caused by allied demon chess pieces is settled as pure damage. Fel Powers damage is increased by 15%,with a maximum stack count of 7.",
       "ru": "Species Trait: Fel Power\n Активен, если на поле только один Demon. Допускаются несколько одинаковых.\n\n(1) Demon: Урон от обычных атак, наносимый союзными демоническими фигурами, считается чистым уроном. Урон Fel Powers увеличивается на 15%, с максимальным кол-во стаков 7."
     },
+    "description_html": "<h1>SPECIES TRAIT: Fel Power</h1><font color=\"#656585\">Active when you control only 1 type of Demon on the chessboard.</font><br><br>(1) Demon: Normal attack damage caused by allied demon chess pieces is settled as pure damage. Fel Powers damage is increased by 15%,with a maximum stack count of 7.",
+    "lore": "Chaotic beings that emerged from a dimensional fissure.",
     "lore_i18n": {
       "en": "Chaotic beings that emerged from a dimensional fissure.",
       "ru": "Лови момент и помни о смерти."
-    }
+    },
+    "notes": [],
+    "tiers": [
+      1
+    ],
+    "ability_special": {}
   },
   "overrides": {}
 }

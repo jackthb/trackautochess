@@ -5,9 +5,21 @@
   "icon": "synergies/undead.png",
   "source": {
     "name": "Undead",
-    "description": "Species Trait: Plague\n\nActive when you have at least (N) different Undead pieces on board. (Multiple effects stack)\n\n(3) Undeads: All non-undead pieces of both sides in the battle gain the plague effect: maximum health -10%.\n(6) Undeads: All non-undead pieces of both sides in the battle gain the plague effect: maximum health -40%.\n(9) Undeads: All plague-infected pieces lose 5% max health per 2.5 secs (no less than 5%).",
+    "names": {
+      "en": "Undead",
+      "ru": "Undead"
+    },
+    "description": "Species Trait: Plague\n Active when you have at least (N) different Undead pieces on board. (Multiple effects stack)\n\n(3) Undeads: All non-undead pieces of both sides in the battle gain the plague effect: maximum health -10%.\n(6) Undeads: All non-undead pieces of both sides in the battle gain the plague effect: maximum health -40%.\n(9) Undeads: All plague-infected pieces lose 5% max health per 2.5 secs (no less than 5%).",
+    "descriptions": {
+      "en": "Species Trait: Plague\n Active when you have at least (N) different Undead pieces on board. (Multiple effects stack)\n\n(3) Undeads: All non-undead pieces of both sides in the battle gain the plague effect: maximum health -10%.\n(6) Undeads: All non-undead pieces of both sides in the battle gain the plague effect: maximum health -40%.\n(9) Undeads: All plague-infected pieces lose 5% max health per 2.5 secs (no less than 5%).",
+      "ru": "Свойство Расы: Чума\n Активна, когда минимум (N) разных Undead на столе.(Эффекты складываются)\n\n(3) Undeads: Все фигуры не-нежити с обеих сторон в битве получают эффект чумы: максимальное здоровье -10%.\n(6) Undeads: Все фигуры не-нежити с обеих сторон в битве получают эффект чумы: максимальное здоровье -40%.\n(9) Undeads: Все зараженные чумой фигуры теряют 5% от максимального здоровья каждые 2.5 секунды (не менее 5%)."
+    },
     "description_html": "<h1>Species Trait: Plague</h1><font color=\"#656585\">Active when you have at least (N) different Undead pieces on board. (Multiple effects stack)</font><br><br>(3) Undeads: All non-undead pieces of both sides in the battle gain the plague effect: maximum health -10%.<br>(6) Undeads: All non-undead pieces of both sides in the battle gain the plague effect: maximum health -40%.<br>(9) Undeads: All plague-infected pieces lose 5% max health per 2.5 secs (no less than 5%).",
     "lore": "Many humans had unfortunately lost their life to the Scourge King during his conquest of his homeland. The victims were raised as Undeads with cruelty, turned into minions of the fleshless legion, and were forced to destroy their own kingdom under the command of the Fallen Prince.",
+    "lore_i18n": {
+      "en": "Many humans had unfortunately lost their life to the Scourge King during his conquest of his homeland. The victims were raised as Undeads with cruelty, turned into minions of the fleshless legion, and were forced to destroy their own kingdom under the command of the Fallen Prince.",
+      "ru": "Во время завоевания родных земель Scourge King многие люди трагически погибли. Их безжалостно воскрешали как Undead, превращая в прислужников безплотного легиона и заставляя разрушать собственное королевство по приказу Fallen Prince."
+    },
     "notes": [
       "Only Base HP is affected by the effect of the reduction in maximum HP.",
       "Plague-infected pieces will have at least 5% max HP."
@@ -17,19 +29,7 @@
       6,
       9
     ],
-    "ability_special": {},
-    "names": {
-      "en": "Undead",
-      "ru": "Undead"
-    },
-    "descriptions": {
-      "en": "Species Trait: Plague\n Active when you have at least (N) different Undead pieces on board. (Multiple effects stack)\n\n(3) Undeads: All non-undead pieces of both sides in the battle gain the plague effect: maximum health -10%.\n(6) Undeads: All non-undead pieces of both sides in the battle gain the plague effect: maximum health -40%.\n(9) Undeads: All plague-infected pieces lose 5% max health per 2.5 secs (no less than 5%).",
-      "ru": "Свойство Расы: Чума\n Активна, когда минимум (N) разных Undead на столе.(Эффекты складываются)\n\n(3) Undeads: Все фигуры не-нежити с обеих сторон в битве получают эффект чумы: максимальное здоровье -10%.\n(6) Undeads: Все фигуры не-нежити с обеих сторон в битве получают эффект чумы: максимальное здоровье -40%.\n(9) Undeads: Все зараженные чумой фигуры теряют 5% от максимального здоровья каждые 2.5 секунды (не менее 5%)."
-    },
-    "lore_i18n": {
-      "en": "Many humans had unfortunately lost their life to the Scourge King during his conquest of his homeland. The victims were raised as Undeads with cruelty, turned into minions of the fleshless legion, and were forced to destroy their own kingdom under the command of the Fallen Prince.",
-      "ru": "Во время завоевания родных земель Scourge King многие люди трагически погибли. Их безжалостно воскрешали как Undead, превращая в прислужников безплотного легиона и заставляя разрушать собственное королевство по приказу Fallen Prince."
-    }
+    "ability_special": {}
   },
   "overrides": {}
 }

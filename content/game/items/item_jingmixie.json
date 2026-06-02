@@ -5,22 +5,22 @@
   "icon": "items/tranquil_boots.png",
   "source": {
     "name": "Tranquil Boots",
-    "description": "Fast movement. Recharges 20 health for allies around per 2 seconds.",
-    "lore": "",
-    "quality": "rare",
-    "texture": "item_tranquil_boots",
-    "notes": [
-      "Immune to attack and ability when jumping"
-    ],
     "names": {
       "en": "Tranquil Boots",
       "ru": "Tranquil Boots"
     },
+    "description": "Fast movement. Recharges 20 health for allies around per 2 seconds.",
     "descriptions": {
       "en": "Fast movement. Recharges 20 health for allies around per 2 seconds.",
       "ru": "Быстрое передвижение. Восстанавливает 20 здоровья союзникам раз в 2 секунды."
     },
-    "lore_i18n": {}
+    "lore": "",
+    "lore_i18n": {},
+    "quality": "rare",
+    "texture": "item_tranquil_boots",
+    "notes": [
+      "Immune to attack and ability when jumping"
+    ]
   },
   "overrides": {}
 }

@@ -5,20 +5,20 @@
   "icon": "items/vanguard.png",
   "source": {
     "name": "Vanguard",
-    "description": "Block 40 damage on melee pieces.",
-    "lore": "",
-    "quality": "rare",
-    "texture": "item_vanguard",
-    "notes": [],
     "names": {
       "en": "Vanguard",
       "ru": "Vanguard"
     },
+    "description": "Block 40 damage on melee pieces.",
     "descriptions": {
       "en": "Block 40 damage on melee pieces.",
       "ru": "Блокирует 40 урона на героях ближнего боя и 20 дальнего."
     },
-    "lore_i18n": {}
+    "lore": "",
+    "lore_i18n": {},
+    "quality": "rare",
+    "texture": "item_vanguard",
+    "notes": []
   },
   "overrides": {}
 }

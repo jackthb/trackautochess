@@ -5,23 +5,23 @@
   "icon": "items/crimson_guard.png",
   "source": {
     "name": "Crimson Guard",
-    "description": "+5 armor, Block 30 damage.\n\nActive ability: Activates when taking damage\nGrants all allies within the range 50% chance to block 100 damage for melee pieces and 30 damage for ranged pieces. Lasts 8 sec.\n\nRange: 400",
-    "lore": "A cuirass originally built to protect against the dreaded Year Beast.",
-    "quality": "rare",
-    "texture": "item_crimson_guard",
-    "notes": [],
     "names": {
       "en": "Crimson Guard",
       "ru": "Crimson Guard"
     },
+    "description": "+5 armor, Block 30 damage.\n\nActive ability: Activates when taking damage\nGrants all allies within the range 50% chance to block 100 damage for melee pieces and 30 damage for ranged pieces. Lasts 8 sec.\n\nRange: 400",
     "descriptions": {
       "en": "+5 armor, Block 30 damage.\n\nActive ability: Activates when taking damage\nGrants all allies within the range 50% chance to block 100 damage for melee pieces and 30 damage for ranged pieces. Lasts 8 sec.\n\nRange: 400",
       "ru": "+5 брони, Блокирует 30 урона.\n\nАктивируется при получении урона\nДаёт всем союзникам в радиусе 50% шанс блокировать 100 урона для ближних фигур и 30 урона для дальних. Длится 8 секунд.\n\nРадиус: 400"
     },
+    "lore": "A cuirass originally built to protect against the dreaded Year Beast.",
     "lore_i18n": {
       "en": "A cuirass originally built to protect against the dreaded Year Beast.",
       "ru": "Кираса, изначально созданная для защиты от ужасного Year Beast."
-    }
+    },
+    "quality": "rare",
+    "texture": "item_crimson_guard",
+    "notes": []
   },
   "overrides": {}
 }

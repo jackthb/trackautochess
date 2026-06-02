@@ -5,28 +5,28 @@
   "icon": "synergies/troll.png",
   "source": {
     "name": "Troll",
-    "description": "SPECIES TRAIT: Voodoo Frenzy\n\nActive when you have at least (N) different pieces of this species on board. (Multiple effects stack)\n\n(2) Trolls: Increases the attack speed of all allies by 20.\n(4) Trolls: Increases the attack speed of all allies by 50.\n(6) Trolls: All allies gain +20 attack speed for each successful attack. Maximum 7 stacks.",
+    "names": {
+      "en": "Troll",
+      "ru": "Troll"
+    },
+    "description": "SPECIES TRAIT: Voodoo Frenzy\n Active when you have at least (N) different pieces of this species on board. (Multiple effects stack)\n\n(2) Trolls: Increases the attack speed of all allies by 20.\n(4) Trolls: Increases the attack speed of all allies by 50.\n(6) Trolls: All allies gain +20 attack speed for each successful attack. Maximum 7 stacks.",
+    "descriptions": {
+      "en": "SPECIES TRAIT: Voodoo Frenzy\n Active when you have at least (N) different pieces of this species on board. (Multiple effects stack)\n\n(2) Trolls: Increases the attack speed of all allies by 20.\n(4) Trolls: Increases the attack speed of all allies by 50.\n(6) Trolls: All allies gain +20 attack speed for each successful attack. Maximum 7 stacks.",
+      "ru": "Species Trait: Voodoo Frenzy\n Активна, когда минимум (N) разных Trolls на столе.(Эффекты складываются)\n\n(2) Trolls: Увеличивает скорость атаки всех союзников на 20.\n(4) Trolls: Увеличивает скорость атаки всех союзников на 50.\n(6) Trolls: Все союзники получают +20 скорости атаки за каждый успешный удар. Максимум 7 стаков."
+    },
     "description_html": "<h1>SPECIES TRAIT: Voodoo Frenzy</h1><font color=\"#656585\">Active when you have at least (N) different pieces of this species on board. (Multiple effects stack)</font><br><br>(2) Trolls: Increases the attack speed of all allies by 20.<br>(4) Trolls: Increases the attack speed of all allies by 50.<br>(6) Trolls: All allies gain +20 attack speed for each successful attack. Maximum 7 stacks.",
     "lore": "Savage trolls are notorious for their cruelty, dark occult religion, and fierce hatred of other races.",
+    "lore_i18n": {
+      "en": "Savage trolls are notorious for their cruelty, dark occult religion, and fierce hatred of other races.",
+      "ru": "Свирепые тролли известны своей жестокостью, мрачным культом и яростной ненавистью к другим расам."
+    },
     "notes": [],
     "tiers": [
       2,
       4,
       6
     ],
-    "ability_special": {},
-    "names": {
-      "en": "Troll",
-      "ru": "Troll"
-    },
-    "descriptions": {
-      "en": "SPECIES TRAIT: Voodoo Frenzy\n Active when you have at least (N) different pieces of this species on board. (Multiple effects stack)\n\n(2) Trolls: Increases the attack speed of all allies by 20.\n(4) Trolls: Increases the attack speed of all allies by 50.\n(6) Trolls: All allies gain +20 attack speed for each successful attack. Maximum 7 stacks.",
-      "ru": "Species Trait: Voodoo Frenzy\n Активна, когда минимум (N) разных Trolls на столе.(Эффекты складываются)\n\n(2) Trolls: Увеличивает скорость атаки всех союзников на 20.\n(4) Trolls: Увеличивает скорость атаки всех союзников на 50.\n(6) Trolls: Все союзники получают +20 скорости атаки за каждый успешный удар. Максимум 7 стаков."
-    },
-    "lore_i18n": {
-      "en": "Savage trolls are notorious for their cruelty, dark occult religion, and fierce hatred of other races.",
-      "ru": "Свирепые тролли известны своей жестокостью, мрачным культом и яростной ненавистью к другим расам."
-    }
+    "ability_special": {}
   },
   "overrides": {}
 }

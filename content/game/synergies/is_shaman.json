@@ -5,9 +5,21 @@
   "icon": "synergies/shaman.png",
   "source": {
     "name": "Shaman",
-    "description": "Shaman pieces spend 25% less mana when casting spells.\n\nClass Perk: Hex\n\nActive when you have at least (N) different Shaman pieces on board. (Multiple effects stack)\n\n(3)All friendly Shaman chess pieces gain the effect: Transform into a random chess piece of +2 levels after casting an active skill or using an active item.\n(6)Shaman: Equipped items carried by transformed chess pieces will also transform into random items of +2 levels.",
+    "names": {
+      "en": "Shaman",
+      "ru": "Shaman"
+    },
+    "description": "Shaman pieces spend 25% less mana when casting spells.\n\nClass Perk: Hex\n Active when you have at least (N) different Shaman pieces on board. (Multiple effects stack)\n\n(3)All friendly Shaman chess pieces gain the effect: Transform into a random chess piece of +2 levels after casting an active skill or using an active item.\n(6)Shaman: Equipped items carried by transformed chess pieces will also transform into random items of +2 levels.",
+    "descriptions": {
+      "en": "Shaman pieces spend 25% less mana when casting spells.\n\nClass Perk: Hex\n Active when you have at least (N) different Shaman pieces on board. (Multiple effects stack)\n\n(3)All friendly Shaman chess pieces gain the effect: Transform into a random chess piece of +2 levels after casting an active skill or using an active item.\n(6)Shaman: Equipped items carried by transformed chess pieces will also transform into random items of +2 levels.",
+      "ru": "Шаманы тратят на 25% меньше маны при применении заклинаний.\n\nClass Perk: Hex\n Активна, когда минимум (N) разных Shamans на столе.(Эффекты складываются)\n\n(3)Все дружественные фигуры Шаманов получают эффект: превращаются в случайную фигуру на +2 уровня выше после использования активного навыка или предмета.\n(6)Shaman: Экипированные предметы у превращённых фигур также трансформируются в случайные предметы на +2 уровня выше."
+    },
     "description_html": "Shaman pieces spend 25% less mana when casting spells.\n<h1>Class Perk: Hex</h1><font color=\"#656585\">Active when you have at least (N) different Shaman pieces on board. (Multiple effects stack)</font><br><br>(3)All friendly Shaman chess pieces gain the effect: Transform into a random chess piece of +2 levels after casting an active skill or using an active item.<br>(6)Shaman: Equipped items carried by transformed chess pieces will also transform into random items of +2 levels.",
     "lore": "Mortal mediators of the ancient elements. Following the guide of ancestral spirits, Shaman learn to wield unseemingly mysterious power over generations to protect their family and clans.",
+    "lore_i18n": {
+      "en": "Mortal mediators of the ancient elements. Following the guide of ancestral spirits, Shaman learn to wield unseemingly mysterious power over generations to protect their family and clans.",
+      "ru": "Mortal mediators of the ancient elements. Following the guide of ancestral spirits, Shaman learn to wield unseemingly mysterious power over generations to protect their family and clans."
+    },
     "notes": [
       "Transformed chess pieces levels will not exceed the current level of the courier. Transformation takes 1.5 seconds to cast.",
       "Hex does not transform non-permanent chess pieces, and pieces turn into  non-permanent chess pieces after transformation.",
@@ -17,19 +29,7 @@
       3,
       6
     ],
-    "ability_special": {},
-    "names": {
-      "en": "Shaman",
-      "ru": "Shaman"
-    },
-    "descriptions": {
-      "en": "Shaman pieces spend 25% less mana when casting spells.\n\nClass Perk: Hex\n Active when you have at least (N) different Shaman pieces on board. (Multiple effects stack)\n\n(3)All friendly Shaman chess pieces gain the effect: Transform into a random chess piece of +2 levels after casting an active skill or using an active item.\n(6)Shaman: Equipped items carried by transformed chess pieces will also transform into random items of +2 levels.",
-      "ru": "Шаманы тратят на 25% меньше маны при применении заклинаний.\n\nClass Perk: Hex\n Активна, когда минимум (N) разных Shamans на столе.(Эффекты складываются)\n\n(3)Все дружественные фигуры Шаманов получают эффект: превращаются в случайную фигуру на +2 уровня выше после использования активного навыка или предмета.\n(6)Shaman: Экипированные предметы у превращённых фигур также трансформируются в случайные предметы на +2 уровня выше."
-    },
-    "lore_i18n": {
-      "en": "Mortal mediators of the ancient elements. Following the guide of ancestral spirits, Shaman learn to wield unseemingly mysterious power over generations to protect their family and clans.",
-      "ru": "Mortal mediators of the ancient elements. Following the guide of ancestral spirits, Shaman learn to wield unseemingly mysterious power over generations to protect their family and clans."
-    }
+    "ability_special": {}
   },
   "overrides": {}
 }

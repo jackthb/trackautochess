@@ -5,17 +5,17 @@
   "icon": "items/carapace_of_qaldin.png",
   "source": {
     "name": "Test item: +999 armor",
-    "description": "",
-    "lore": "",
-    "quality": "consumable",
-    "texture": "item_carapace_of_qaldin",
-    "notes": [],
     "names": {
       "en": "Test item: +999 armor",
       "ru": "Test item: +999 armor"
     },
+    "description": "",
     "descriptions": {},
-    "lore_i18n": {}
+    "lore": "",
+    "lore_i18n": {},
+    "quality": "consumable",
+    "texture": "item_carapace_of_qaldin",
+    "notes": []
   },
   "overrides": {}
 }

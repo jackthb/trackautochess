@@ -5,20 +5,20 @@
   "icon": "items/ring_of_basilius.png",
   "source": {
     "name": "Ring of Basilius",
-    "description": "MP regen +50%.",
-    "lore": "",
-    "quality": "consumable",
-    "texture": "ring_of_basilius",
-    "notes": [],
     "names": {
       "en": "Ring of Basilius",
       "ru": "Ring of Basilius"
     },
+    "description": "MP regen +50%.",
     "descriptions": {
       "en": "MP regen +50%.",
       "ru": "Мана реген +50%."
     },
-    "lore_i18n": {}
+    "lore": "",
+    "lore_i18n": {},
+    "quality": "consumable",
+    "texture": "ring_of_basilius",
+    "notes": []
   },
   "overrides": {}
 }

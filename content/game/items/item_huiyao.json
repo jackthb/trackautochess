@@ -5,23 +5,23 @@
   "icon": "items/radiance.png",
   "source": {
     "name": "Radiance",
-    "description": "+25% Evasion.\n\nAura\nDeals 100 pure damage to surrounding enemies every 3 secs and forces them to have a 25% chance to miss the attack.",
-    "lore": "A divine weapon that causes damage and a bright burning effect that lays waste to nearby enemies.",
-    "quality": "epic",
-    "texture": "item_radiance",
-    "notes": [],
     "names": {
       "en": "Radiance",
       "ru": "Radiance"
     },
+    "description": "+25% Evasion.\n\nAura\nDeals 100 pure damage to surrounding enemies every 3 secs and forces them to have a 25% chance to miss the attack.",
     "descriptions": {
       "en": "+25% Evasion.\n\nAura\nDeals 100 pure damage to surrounding enemies every 3 secs and forces them to have a 25% chance to miss the attack.",
       "ru": "+25% уклонения.\n\nAura\nНаносит 100 чистого урона врагам в радиусе каждые 3 секунды и заставляет их с шансом в 25% промахиваться атакой."
     },
+    "lore": "A divine weapon that causes damage and a bright burning effect that lays waste to nearby enemies.",
     "lore_i18n": {
       "en": "A divine weapon that causes damage and a bright burning effect that lays waste to nearby enemies.",
       "ru": "Божественное оружие, наносящее урон и оставляющее после себя яркое пламя, уничтожающее ближайших врагов."
-    }
+    },
+    "quality": "epic",
+    "texture": "item_radiance",
+    "notes": []
   },
   "overrides": {}
 }

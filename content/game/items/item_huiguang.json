@@ -5,20 +5,20 @@
   "icon": "items/kaya.png",
   "source": {
     "name": "Kaya",
-    "description": "Mana restoration + 25%. Magical damage +30%.",
-    "lore": "",
-    "quality": "common",
-    "texture": "kaya",
-    "notes": [],
     "names": {
       "en": "Kaya",
       "ru": "Kaya"
     },
+    "description": "Mana restoration + 25%. Magical damage +30%.",
     "descriptions": {
       "en": "Mana restoration + 25%. Magical damage +30%.",
       "ru": "Восстановление маны + 25%. Магический урон +30%."
     },
-    "lore_i18n": {}
+    "lore": "",
+    "lore_i18n": {},
+    "quality": "common",
+    "texture": "kaya",
+    "notes": []
   },
   "overrides": {}
 }

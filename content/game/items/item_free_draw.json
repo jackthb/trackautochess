@@ -5,22 +5,22 @@
   "icon": "items/weighted_dice.png",
   "source": {
     "name": "Weighted Dice",
-    "description": "Refund 1~2 random Gold if you fail to recruit any owned chess piece.",
-    "lore": "",
-    "quality": "",
-    "texture": "weighted_dice",
-    "notes": [
-      "Consecutive recruitment failures will gradually raise the chance of receiving 2 Gold."
-    ],
     "names": {
       "en": "Weighted Dice",
       "ru": "Weighted Dice"
     },
+    "description": "Refund 1~2 random Gold if you fail to recruit any owned chess piece.",
     "descriptions": {
       "en": "Refund 1~2 random Gold if you fail to recruit any owned chess piece.",
       "ru": "Возвращает 1-2 Золота, если ролл не содержит ни одной имеющейся фигуры."
     },
-    "lore_i18n": {}
+    "lore": "",
+    "lore_i18n": {},
+    "quality": "",
+    "texture": "weighted_dice",
+    "notes": [
+      "Consecutive recruitment failures will gradually raise the chance of receiving 2 Gold."
+    ]
   },
   "overrides": {}
 }

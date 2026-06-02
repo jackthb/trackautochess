@@ -2,7 +2,7 @@
   "date": "2026-06-01",
   "title": "Rebalance Patch",
   "source": "https://steamcommunity.com/sharedfiles/filedetails/changelog/1613886175",
-  "entitiesSynced": false,
+  "entitiesSynced": true,
   "sourceEntries": [
     {
       "sourceId": "1780380302",
@@ -57,5 +57,6 @@
         }
       ]
     }
-  ]
+  ],
+  "entitiesSyncedAt": "2026-06-02T23:32:17.933Z"
 }

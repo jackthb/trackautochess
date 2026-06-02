@@ -5,23 +5,23 @@
   "icon": "items/rapier.png",
   "source": {
     "name": "Rapier",
-    "description": "Basic Attack Damage: +350, Skill Damage: +25%.\n If defeated on home battle and the courier takes damage, it drops to a random other player. Cannot be reforged.",
-    "lore": "So powerful, it cannot have a single owner.",
-    "quality": "artifact",
-    "texture": "item_rapier",
-    "notes": [],
     "names": {
       "en": "Rapier",
       "ru": "Rapier"
     },
+    "description": "Basic Attack Damage: +350, Skill Damage: +25%.\n If defeated on home battle and the courier takes damage, it drops to a random other player. Cannot be reforged.",
     "descriptions": {
       "en": "Basic Attack Damage: +350, Skill Damage: +25%.\n If defeated on home battle and the courier takes damage, it drops to a random other player. Cannot be reforged.",
       "ru": "Урон от базовой атаки: +350, урон от навыков: +25%.\n Если курьер получает урон при поражении на домашнем поле, он передается случайному игроку. Перековке не подлежит."
     },
+    "lore": "So powerful, it cannot have a single owner.",
     "lore_i18n": {
       "en": "So powerful, it cannot have a single owner.",
       "ru": "Он настолько могущественен, что у него не может быть одного владельца."
-    }
+    },
+    "quality": "artifact",
+    "texture": "item_rapier",
+    "notes": []
   },
   "overrides": {}
 }

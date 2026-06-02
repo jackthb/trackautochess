@@ -5,9 +5,21 @@
   "icon": "synergies/draenei.png",
   "source": {
     "name": "Draenei",
-    "description": "SPECIES TRAIT: Blessing of the Naaru\n\nActive when you have at least (N) different pieces of this species on board. (Multiple effects stack)\n\n(2) Draeneis: All friendly Draenei gain the effect: Every 4 seconds, steal 50+2% max health from the nearest enemy chess piece to heal themselves.\n(4) Draeneis: All friendly pieces gain effects: Whenever a cumulative total of more than 100 points of healing is taken it is split (cumulative healing) points of pure damage among the surrounding enemies.",
+    "names": {
+      "en": "Draenei",
+      "ru": "Draenei"
+    },
+    "description": "SPECIES TRAIT: Blessing of the Naaru\n Active when you have at least (N) different pieces of this species on board. (Multiple effects stack)\n\n(2) Draeneis: All friendly Draenei gain the effect: Every 4 seconds, steal 50+2% max health from the nearest enemy chess piece to heal themselves.\n(4) Draeneis: All friendly pieces gain effects: Whenever a cumulative total of more than 100 points of healing is taken it is split (cumulative healing) points of pure damage among the surrounding enemies.",
+    "descriptions": {
+      "en": "SPECIES TRAIT: Blessing of the Naaru\n Active when you have at least (N) different pieces of this species on board. (Multiple effects stack)\n\n(2) Draeneis: All friendly Draenei gain the effect: Every 4 seconds, steal 50+2% max health from the nearest enemy chess piece to heal themselves.\n(4) Draeneis: All friendly pieces gain effects: Whenever a cumulative total of more than 100 points of healing is taken it is split (cumulative healing) points of pure damage among the surrounding enemies.",
+      "ru": "SPECIES TRAIT: Blessing of the Naaru\n Активна, когда минимум (N) разных Draenei на столе.(Эффекты складываются)\n\n(2) Draeneis: Дренеи получают эффект: каждые 4 секунд крадут 50+2% от максимального здоровья ближайшей вражеской фигуры, чтобы исцелить себя.\n(4) Draeneis: Все дружественные фигуры получают эффект благославения: когда общее исцеление превышает 100 очков, оно превращается в чистый урон, который наносится ближайшим врагам."
+    },
     "description_html": "<h1>SPECIES TRAIT: Blessing of the Naaru</h1><font color=\"#656585\">Active when you have at least (N) different pieces of this species on board. (Multiple effects stack)</font><br><br>(2) Draeneis: All friendly Draenei gain the effect: Every 4 seconds, steal 50+2% max health from the nearest enemy chess piece to heal themselves.<br>(4) Draeneis: All friendly pieces gain effects: Whenever a cumulative total of more than 100 points of healing is taken it is split (cumulative healing) points of pure damage among the surrounding enemies.",
     "lore": "To evade the Burning Legions clutches, a congregation led by the Farseer fled their homelands, faithful to the Naaru and the Holy Light. They named themselves Draenei, the Exiled Ones.",
+    "lore_i18n": {
+      "en": "To evade the Burning Legions clutches, a congregation led by the Farseer fled their homelands, faithful to the Naaru and the Holy Light. They named themselves Draenei, the Exiled Ones.",
+      "ru": "Чтобы избежать хватки Пылающих Легионов, конгрегация, возглавляемая Провидцем, покинула свои родные земли, веруя в Наару и Священный Свет. Они назвали себя Дренеями, народ прозвал их Жижей."
+    },
     "notes": [
       "The blessings will not trigger for a while if there are no enemies in range.",
       "The blessings have a single damage limit of 300 and a cooldown of 5 seconds."
@@ -16,19 +28,7 @@
       2,
       4
     ],
-    "ability_special": {},
-    "names": {
-      "en": "Draenei",
-      "ru": "Draenei"
-    },
-    "descriptions": {
-      "en": "SPECIES TRAIT: Blessing of the Naaru\n Active when you have at least (N) different pieces of this species on board. (Multiple effects stack)\n\n(2) Draeneis: All friendly Draenei gain the effect: Every 4 seconds, steal 50+2% max health from the nearest enemy chess piece to heal themselves.\n(4) Draeneis: All friendly pieces gain effects: Whenever a cumulative total of more than 100 points of healing is taken it is split (cumulative healing) points of pure damage among the surrounding enemies.",
-      "ru": "SPECIES TRAIT: Blessing of the Naaru\n Активна, когда минимум (N) разных Draenei на столе.(Эффекты складываются)\n\n(2) Draeneis: Дренеи получают эффект: каждые 4 секунд крадут 50+2% от максимального здоровья ближайшей вражеской фигуры, чтобы исцелить себя.\n(4) Draeneis: Все дружественные фигуры получают эффект благославения: когда общее исцеление превышает 100 очков, оно превращается в чистый урон, который наносится ближайшим врагам."
-    },
-    "lore_i18n": {
-      "en": "To evade the Burning Legions clutches, a congregation led by the Farseer fled their homelands, faithful to the Naaru and the Holy Light. They named themselves Draenei, the Exiled Ones.",
-      "ru": "Чтобы избежать хватки Пылающих Легионов, конгрегация, возглавляемая Провидцем, покинула свои родные земли, веруя в Наару и Священный Свет. Они назвали себя Дренеями, народ прозвал их Жижей."
-    }
+    "ability_special": {}
   },
   "overrides": {}
 }

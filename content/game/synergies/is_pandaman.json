@@ -5,9 +5,21 @@
   "icon": "synergies/pandaman.png",
   "source": {
     "name": "Pandaren",
-    "description": "SPECIES TRAIT: Hospitality\n\nActive when you have at least (N) different pieces of this species on board. (Multiple effects stack)\n\n(1) Pandaren: Have a chance to invite a random un-emerged chess piece of the same species with a chess piece on the board from the chess piece pool to join the team at the beginning of the round.\n(2) Pandaren: Each Pandaren chess piece on board has a chance to invite a piece of the same name with it.",
+    "names": {
+      "en": "Pandaren",
+      "ru": "Pandaren"
+    },
+    "description": "SPECIES TRAIT: Hospitality\n Active when you have at least (N) different pieces of this species on board. (Multiple effects stack)\n\n(1) Pandaren: Have a chance to invite a random un-emerged chess piece of the same species with a chess piece on the board from the chess piece pool to join the team at the beginning of the round.\n(2) Pandaren: Each Pandaren chess piece on board has a chance to invite a piece of the same name with it.",
+    "descriptions": {
+      "en": "SPECIES TRAIT: Hospitality\n Active when you have at least (N) different pieces of this species on board. (Multiple effects stack)\n\n(1) Pandaren: Have a chance to invite a random un-emerged chess piece of the same species with a chess piece on the board from the chess piece pool to join the team at the beginning of the round.\n(2) Pandaren: Each Pandaren chess piece on board has a chance to invite a piece of the same name with it.",
+      "ru": "SPECIES TRAIT: Hospitality\n Активен, когда хотя бы (N) разных Pandaren на доске. (Эффекты складываются)\n\n(1) Pandaren: В начале раунда есть шанс призвать случайную невыставленную фигуру той же расы из пула, что и одна из фигур на поле.\n(2) Pandaren: Каждая фигура Pandaren на поле имеет шанс призвать копию себя."
+    },
     "description_html": "<h1>SPECIES TRAIT: Hospitality</h1><font color=\"#656585\">Active when you have at least (N) different pieces of this species on board. (Multiple effects stack)</font><br><br>(1) Pandaren: Have a chance to invite a random un-emerged chess piece of the same species with a chess piece on the board from the chess piece pool to join the team at the beginning of the round.<br>(2) Pandaren: Each Pandaren chess piece on board has a chance to invite a piece of the same name with it.",
     "lore": "Ten thousand years ago the last emperor of the Pandaren Empire surrounded his entire territory in the misty protection in order to save his people from the Great Havoc. Now the ancient species has once again revealed themselves and they are literally a mist to the others.",
+    "lore_i18n": {
+      "en": "Ten thousand years ago the last emperor of the Pandaren Empire surrounded his entire territory in the misty protection in order to save his people from the Great Havoc. Now the ancient species has once again revealed themselves and they are literally a mist to the others.",
+      "ru": "Ten thousand years ago the last emperor of the Pandaren Empire surrounded his entire territory in the misty protection in order to save his people from the Great Havoc. Now the ancient species has once again revealed themselves and they are literally a mist to the others."
+    },
     "notes": [
       "(1) Pandaren do not invite pieces you already have on board."
     ],
@@ -15,19 +27,7 @@
       1,
       2
     ],
-    "ability_special": {},
-    "names": {
-      "en": "Pandaren",
-      "ru": "Pandaren"
-    },
-    "descriptions": {
-      "en": "SPECIES TRAIT: Hospitality\n Active when you have at least (N) different pieces of this species on board. (Multiple effects stack)\n\n(1) Pandaren: Have a chance to invite a random un-emerged chess piece of the same species with a chess piece on the board from the chess piece pool to join the team at the beginning of the round.\n(2) Pandaren: Each Pandaren chess piece on board has a chance to invite a piece of the same name with it.",
-      "ru": "SPECIES TRAIT: Hospitality\n Активен, когда хотя бы (N) разных Pandaren на доске. (Эффекты складываются)\n\n(1) Pandaren: В начале раунда есть шанс призвать случайную невыставленную фигуру той же расы из пула, что и одна из фигур на поле.\n(2) Pandaren: Каждая фигура Pandaren на поле имеет шанс призвать копию себя."
-    },
-    "lore_i18n": {
-      "en": "Ten thousand years ago the last emperor of the Pandaren Empire surrounded his entire territory in the misty protection in order to save his people from the Great Havoc. Now the ancient species has once again revealed themselves and they are literally a mist to the others.",
-      "ru": "Ten thousand years ago the last emperor of the Pandaren Empire surrounded his entire territory in the misty protection in order to save his people from the Great Havoc. Now the ancient species has once again revealed themselves and they are literally a mist to the others."
-    }
+    "ability_special": {}
   },
   "overrides": {}
 }

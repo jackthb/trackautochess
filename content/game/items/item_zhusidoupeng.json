@@ -5,20 +5,20 @@
   "icon": "items/gossamer_cape.png",
   "source": {
     "name": "Gossamer Cape",
-    "description": "+25% magical resistance. Its carrier and all minions are immune to mind control.",
-    "lore": "",
-    "quality": "rare",
-    "texture": "gossamer_cape",
-    "notes": [],
     "names": {
       "en": "Gossamer Cape",
       "ru": "Gossamer Cape"
     },
+    "description": "+25% magical resistance. Its carrier and all minions are immune to mind control.",
     "descriptions": {
       "en": "+25% magical resistance. Its carrier and all minions are immune to mind control.",
       "ru": "+25% сопротивления магии. Носитель и призывные существа невосприимчивы к контролю разума."
     },
-    "lore_i18n": {}
+    "lore": "",
+    "lore_i18n": {},
+    "quality": "rare",
+    "texture": "gossamer_cape",
+    "notes": []
   },
   "overrides": {}
 }

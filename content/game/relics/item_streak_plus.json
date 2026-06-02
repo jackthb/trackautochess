@@ -5,16 +5,16 @@
   "icon": "relics/chiaroscuro_certainty.png",
   "source": {
     "name": "Chiaroscuro Certainty",
-    "description": "Your win or lose streak will not be terminated and when the relic disappears, you will receive a corresponding level loot token based on the highest reward/compensation held during that time.",
-    "lore": "",
     "names": {
       "en": "Chiaroscuro Certainty",
       "ru": "Chiaroscuro Certainty"
     },
+    "description": "Your win or lose streak will not be terminated and when the relic disappears, you will receive a corresponding level loot token based on the highest reward/compensation held during that time.",
     "descriptions": {
       "en": "Your win or lose streak will not be terminated and when the relic disappears, you will receive a corresponding level loot token based on the highest reward/compensation held during that time.",
       "ru": "Ваша серия побед или поражений не будет прервана, и когда реликвия исчезнет, вы получите жетон, уровень которого соответствует самой высокой награде/компенсации, полученной за это время."
     },
+    "lore": "",
     "lore_i18n": {}
   },
   "overrides": {}

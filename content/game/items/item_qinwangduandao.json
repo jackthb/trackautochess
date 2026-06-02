@@ -5,20 +5,20 @@
   "icon": "items/princes_knife.png",
   "source": {
     "name": "Princes Knife",
-    "description": "Damage +25。\nThe carrier deals increased damage to enemy chess pieces of the same species/class +50%。",
-    "lore": "",
-    "quality": "epic",
-    "texture": "princes_knife",
-    "notes": [],
     "names": {
       "en": "Princes Knife",
       "ru": "Princes Knife"
     },
+    "description": "Damage +10.\nThe carrier deals increased damage to enemy chess pieces of the same species/class +25%.",
     "descriptions": {
       "en": "Damage +10.\nThe carrier deals increased damage to enemy chess pieces of the same species/class +25%.",
       "ru": "Урон+10.\nНоситель наносит на 25% больше урона вражеским фигурам той же расы/класса."
     },
-    "lore_i18n": {}
+    "lore": "",
+    "lore_i18n": {},
+    "quality": "epic",
+    "texture": "princes_knife",
+    "notes": []
   },
   "overrides": {}
 }

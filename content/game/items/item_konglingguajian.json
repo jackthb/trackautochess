@@ -5,20 +5,20 @@
   "icon": "items/null_talisman.png",
   "source": {
     "name": "Null Talisman",
-    "description": "Magical damage +20%。",
-    "lore": "",
-    "quality": "common",
-    "texture": "null_talisman",
-    "notes": [],
     "names": {
       "en": "Null Talisman",
       "ru": "Null Talisman"
     },
+    "description": "Magical damage +20%。",
     "descriptions": {
       "en": "Magical damage +20%。",
       "ru": "Магический урон +20%."
     },
-    "lore_i18n": {}
+    "lore": "",
+    "lore_i18n": {},
+    "quality": "common",
+    "texture": "null_talisman",
+    "notes": []
   },
   "overrides": {}
 }

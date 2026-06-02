@@ -5,20 +5,20 @@
   "icon": "items/orb_of_corrosion.png",
   "source": {
     "name": "Orb of Corrosion",
-    "description": "Target armor -5.",
-    "lore": "",
-    "quality": "consumable",
-    "texture": "orb_of_corrosion",
-    "notes": [],
     "names": {
       "en": "Orb of Corrosion",
       "ru": "Orb of Corrosion"
     },
+    "description": "Target armor -5.",
     "descriptions": {
       "en": "Target armor -5.",
       "ru": "Броня цели -5."
     },
-    "lore_i18n": {}
+    "lore": "",
+    "lore_i18n": {},
+    "quality": "consumable",
+    "texture": "orb_of_corrosion",
+    "notes": []
   },
   "overrides": {}
 }

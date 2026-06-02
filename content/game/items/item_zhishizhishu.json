@@ -5,23 +5,23 @@
   "icon": "items/tome_of_knowledge.png",
   "source": {
     "name": "Tome of Knowledge",
-    "description": "Courier consumable: Click to use\nInstantly addeds 2 XP. Bonus Courier XP granted via Tome of Knowledge is unlimited to the maximum Courier Level.",
-    "lore": "From: Spark of Mind",
-    "quality": "consumable",
-    "texture": "item_tome_of_knowledge",
-    "notes": [],
     "names": {
       "en": "Tome of Knowledge",
       "ru": "Tome of Knowledge"
     },
+    "description": "Courier consumable: Click to use\nInstantly addeds 2 XP. Bonus Courier XP granted via Tome of Knowledge is unlimited to the maximum Courier Level.",
     "descriptions": {
       "en": "Courier consumable: Click to use\nInstantly addeds 2 XP. Bonus Courier XP granted via Tome of Knowledge is unlimited to the maximum Courier Level.",
       "ru": "Courier consumable: Click to use\nInstantly addeds 2 XP. Bonus Courier XP granted via Tome of Knowledge is unlimited to the maximum Courier Level."
     },
+    "lore": "From: Spark of Mind",
     "lore_i18n": {
       "en": "From: Spark of Mind",
       "ru": "От: Spark of Mind"
-    }
+    },
+    "quality": "consumable",
+    "texture": "item_tome_of_knowledge",
+    "notes": []
   },
   "overrides": {}
 }

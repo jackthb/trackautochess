@@ -5,9 +5,21 @@
   "icon": "synergies/druid.png",
   "source": {
     "name": "Druid",
-    "description": "Druid pieces will not be destroyed on a ★★★ piece combined.\n\nCLASS PERK: Synergy\n\nActive when you have at least (N) different pieces of this class on board. (Multiple effects stack)\n\n(2) Druids: Two identical Druid★ can promote to a Druid★★.\n(4) Druids: Two identical Druid★★ can promote to a Druid★★★.\n(6) Druids: Two identical Druid★★★ can promote to the great Altar of Spirits♥♥♥, and gain several(equal to the level of Druid★★★) stack of Altar Power, and destroy all Druid pieces in the chess pool.",
+    "names": {
+      "en": "Druid",
+      "ru": "Druid"
+    },
+    "description": "Druid pieces will not be destroyed on a ★★★ piece combined.\n\nCLASS PERK: Synergy\n Active when you have at least (N) different pieces of this class on board. (Multiple effects stack)\n\n(2) Druids: Two identical Druid★ can promote to a Druid★★.\n(4) Druids: Two identical Druid★★ can promote to a Druid★★★.\n(6) Druids: Two identical Druid★★★ can promote to the great Altar of Spirits♥♥♥, and gain several(equal to the level of Druid★★★) stack of Altar Power, and destroy all Druid pieces in the chess pool.",
+    "descriptions": {
+      "en": "Druid pieces will not be destroyed on a ★★★ piece combined.\n\nCLASS PERK: Synergy\n Active when you have at least (N) different pieces of this class on board. (Multiple effects stack)\n\n(2) Druids: Two identical Druid★ can promote to a Druid★★.\n(4) Druids: Two identical Druid★★ can promote to a Druid★★★.\n(6) Druids: Two identical Druid★★★ can promote to the great Altar of Spirits♥♥♥, and gain several(equal to the level of Druid★★★) stack of Altar Power, and destroy all Druid pieces in the chess pool.",
+      "ru": "фигуры друидов не монополятся при создании ★★★ фигуры.\n\nCLASS PERK: Synergy\n Активна, когда минимум (N) разных Druids на столе.(Эффекты складываются)\n\n(2) Druids: Два идентичных Друида★ могут быть улучшены до Друида★★.\n (4) Druids: Два идентичных Друида★★ могут быть улучшены до Друида★★★.(6) Druids: две одинаковые Druid★★★ могут улучшиться до великого Легендарного Виспа ♥♥♥ и получить несколько (равное уровню Druid★★★) зарядов Легендарного Виспа, а все фигуры Druid в пуле будут уничтожены."
+    },
     "description_html": "Druid pieces will not be destroyed on a ★★★ piece combined.\n<h1>CLASS PERK: Synergy</h1><font color=\"#656585\">Active when you have at least (N) different pieces of this class on board. (Multiple effects stack)</font><br><br>(2) Druids: Two identical Druid★ can promote to a Druid★★.<br>(4) Druids: Two identical Druid★★ can promote to a Druid★★★.<br>(6) Druids: Two identical Druid★★★ can promote to the great Altar of Spirits♥♥♥, and gain several(equal to the level of Druid★★★) stack of Altar Power, and destroy all Druid pieces in the chess pool.",
     "lore": "Druids can control great power of Nature to protect spirits and balance.",
+    "lore_i18n": {
+      "en": "Druids can control great power of Nature to protect spirits and balance.",
+      "ru": "Druids могут контролировать силу природы, чтобы защищать духов и поддерживать равновесие."
+    },
     "notes": [
       "Every stack of Altar Power can reduce 10% damage taken and increase 10% damage dealt.",
       "Altar Power can be shared by all ally Druid pieces tethered by Altar of Spirits♥♥♥"
@@ -17,19 +29,7 @@
       4,
       6
     ],
-    "ability_special": {},
-    "names": {
-      "en": "Druid",
-      "ru": "Druid"
-    },
-    "descriptions": {
-      "en": "Druid pieces will not be destroyed on a ★★★ piece combined.\n\nCLASS PERK: Synergy\n Active when you have at least (N) different pieces of this class on board. (Multiple effects stack)\n\n(2) Druids: Two identical Druid★ can promote to a Druid★★.\n(4) Druids: Two identical Druid★★ can promote to a Druid★★★.\n(6) Druids: Two identical Druid★★★ can promote to the great Altar of Spirits♥♥♥, and gain several(equal to the level of Druid★★★) stack of Altar Power, and destroy all Druid pieces in the chess pool.",
-      "ru": "фигуры друидов не монополятся при создании ★★★ фигуры.\n\nCLASS PERK: Synergy\n Активна, когда минимум (N) разных Druids на столе.(Эффекты складываются)\n\n(2) Druids: Два идентичных Друида★ могут быть улучшены до Друида★★.\n (4) Druids: Два идентичных Друида★★ могут быть улучшены до Друида★★★.(6) Druids: две одинаковые Druid★★★ могут улучшиться до великого Легендарного Виспа ♥♥♥ и получить несколько (равное уровню Druid★★★) зарядов Легендарного Виспа, а все фигуры Druid в пуле будут уничтожены."
-    },
-    "lore_i18n": {
-      "en": "Druids can control great power of Nature to protect spirits and balance.",
-      "ru": "Druids могут контролировать силу природы, чтобы защищать духов и поддерживать равновесие."
-    }
+    "ability_special": {}
   },
   "overrides": {}
 }

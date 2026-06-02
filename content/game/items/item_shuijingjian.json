@@ -5,20 +5,20 @@
   "icon": "items/lesser_crit.png",
   "source": {
     "name": "Crystalys",
-    "description": "Attacks have a 20% chance to cause 200% critical strike damage.",
-    "lore": "",
-    "quality": "rare",
-    "texture": "item_lesser_crit",
-    "notes": [],
     "names": {
       "en": "Crystalys",
       "ru": "Crystalys"
     },
+    "description": "Attacks have a 20% chance to cause 200% critical strike damage.",
     "descriptions": {
       "en": "Attacks have a 20% chance to cause 200% critical strike damage.",
       "ru": "Атаки имеют 20% шанс нанести 200% урона от критического удара."
     },
-    "lore_i18n": {}
+    "lore": "",
+    "lore_i18n": {},
+    "quality": "rare",
+    "texture": "item_lesser_crit",
+    "notes": []
   },
   "overrides": {}
 }

@@ -5,20 +5,20 @@
   "icon": "items/mirror_shield.png",
   "source": {
     "name": "Mirror Shield",
-    "description": "Physical Block +60. \n50% probability of rebounding all damage and directional spells taken.",
-    "lore": "",
-    "quality": "rare",
-    "texture": "item_mirror_shield",
-    "notes": [],
     "names": {
       "en": "Mirror Shield",
       "ru": "Mirror Shield"
     },
+    "description": "Physical Block +60. \n50% probability of rebounding all damage and directional spells taken.",
     "descriptions": {
       "en": "Physical Block +60. \n50% probability of rebounding all damage and directional spells taken.",
       "ru": "Блокировка физического урона +60. \n50% шанс отразить весь получаемый урон и направленные заклинания."
     },
-    "lore_i18n": {}
+    "lore": "",
+    "lore_i18n": {},
+    "quality": "rare",
+    "texture": "item_mirror_shield",
+    "notes": []
   },
   "overrides": {}
 }

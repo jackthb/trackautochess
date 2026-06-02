@@ -5,23 +5,23 @@
   "icon": "items/enchanted_mango.png",
   "source": {
     "name": "Enchanted Mango",
-    "description": "Consumable: Click to use\nRandomly grants Gold and Courier XP up to currnet Courier level.",
-    "lore": "From: Mango Tree",
-    "quality": "consumable",
-    "texture": "item_enchanted_mango",
-    "notes": [],
     "names": {
       "en": "Enchanted Mango",
       "ru": "Enchanted Mango"
     },
+    "description": "Consumable: Click to use\nRandomly grants Gold and Courier XP up to currnet Courier level.",
     "descriptions": {
       "en": "Consumable: Click to use\nRandomly grants Gold and Courier XP up to currnet Courier level.",
       "ru": "Расходуемый: Нажмите, чтобы использовать\nРандомно даёт золото и опыт курьера до текущего уровня курьера."
     },
+    "lore": "From: Mango Tree",
     "lore_i18n": {
       "en": "From: Mango Tree",
       "ru": "From: Mango Tree"
-    }
+    },
+    "quality": "consumable",
+    "texture": "item_enchanted_mango",
+    "notes": []
   },
   "overrides": {}
 }

@@ -5,17 +5,17 @@
   "icon": "items/vengeances_shadow.png",
   "source": {
     "name": "Test item: -50% magic resistance",
-    "description": "",
-    "lore": "",
-    "quality": "consumable",
-    "texture": "item_vengeances_shadow",
-    "notes": [],
     "names": {
       "en": "Test item: -50% magic resistance",
       "ru": "Test item: -50% magic resistance"
     },
+    "description": "",
     "descriptions": {},
-    "lore_i18n": {}
+    "lore": "",
+    "lore_i18n": {},
+    "quality": "consumable",
+    "texture": "item_vengeances_shadow",
+    "notes": []
   },
   "overrides": {}
 }

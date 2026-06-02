@@ -5,23 +5,23 @@
   "icon": "items/basher.png",
   "source": {
     "name": "Skull Basher",
-    "description": "Grants melee hero 20% chance on hit to stun the target for 2s.",
-    "lore": "A feared weapon in the right hands, this maul’s ability to shatter the defenses of its opponents should not be underestimated.",
-    "quality": "common",
-    "texture": "basher",
-    "notes": [],
     "names": {
       "en": "Skull Basher",
       "ru": "Skull Basher"
     },
+    "description": "Grants melee hero 20% chance on hit to stun the target for 2s.",
     "descriptions": {
       "en": "Grants melee hero 20% chance on hit to stun the target for 2s.",
       "ru": "Предоставляет герою ближнего боя 20% шанс при ударе оглушить цель на 2 секунды."
     },
+    "lore": "A feared weapon in the right hands, this maul’s ability to shatter the defenses of its opponents should not be underestimated.",
     "lore_i18n": {
       "en": "A feared weapon in the right hands, this maul’s ability to shatter the defenses of its opponents should not be underestimated.",
       "ru": "Грозное оружие в умелых руках: эта булава способна сокрушать защиту врагов, и недооценивать её не стоит."
-    }
+    },
+    "quality": "common",
+    "texture": "basher",
+    "notes": []
   },
   "overrides": {}
 }

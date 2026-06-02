@@ -5,25 +5,25 @@
   "icon": "items/manta.png",
   "source": {
     "name": "Manta Style",
-    "description": "Damage +25.\nActive ability: Instant\nCreates 2 images of the caster that last 7 seconds.",
-    "lore": "An axe made of reflective materials that confuse enemy ranks.",
-    "quality": "common",
-    "texture": "item_manta",
-    "notes": [
-      "Mirror chess pieces inherit passive effects from the carriers equipment."
-    ],
     "names": {
       "en": "Manta Style",
       "ru": "Manta Style"
     },
+    "description": "Damage +25.\nActive ability: Instant\nCreates 2 images of the caster that last 7 seconds.",
     "descriptions": {
       "en": "Damage +25.\nActive ability: Instant\nCreates 2 images of the caster that last 7 seconds.",
       "ru": "Урон +25.\nActive ability: Instant\nСоздаёт 2 копии заклинателя, которые длятся 7 секунд."
     },
+    "lore": "An axe made of reflective materials that confuse enemy ranks.",
     "lore_i18n": {
       "en": "An axe made of reflective materials that confuse enemy ranks.",
       "ru": "Топор из отражающих материалов, сбивающий строй врагов с толку."
-    }
+    },
+    "quality": "common",
+    "texture": "item_manta",
+    "notes": [
+      "Mirror chess pieces inherit passive effects from the carriers equipment."
+    ]
   },
   "overrides": {}
 }

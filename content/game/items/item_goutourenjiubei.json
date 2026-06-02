@@ -5,23 +5,23 @@
   "icon": "items/kobold_cup.png",
   "source": {
     "name": "Kobold Cup",
-    "description": "Carrier counts as \nKobold.\nThe carrier and pieces of the same name gain +25% attack speed, inheritable after shapeshift.",
-    "lore": "King of the Kobold enjoys drinking.",
-    "quality": "common",
-    "texture": "kobold_cup",
-    "notes": [],
     "names": {
       "en": "Kobold Cup",
       "ru": "Kobold Cup"
     },
+    "description": "Carrier counts as Kobold.\nThe carrier and pieces of the same name gain +25% attack speed, inheritable after shapeshift.",
     "descriptions": {
       "en": "Carrier counts as Kobold.\nThe carrier and pieces of the same name gain +25% attack speed, inheritable after shapeshift.",
       "ru": "Носитель считается Kobold.\nНоситель и фигуры с тем же именем получают +25% к скорости атаки; эффект сохраняется после превращения."
     },
+    "lore": "King of the Kobold enjoys drinking.",
     "lore_i18n": {
       "en": "King of the Kobold enjoys drinking.",
       "ru": "Король Кобольдов любит выпить."
-    }
+    },
+    "quality": "common",
+    "texture": "kobold_cup",
+    "notes": []
   },
   "overrides": {}
 }

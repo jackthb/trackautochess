@@ -5,23 +5,23 @@
   "icon": "items/bloodstone.png",
   "source": {
     "name": "Bloodstone",
-    "description": "+600 Health.\nIf an enemy chess piece on the hosts side is killed, the holder has a 15% chance of gaining 1 energy point. Each energy point will increase the magic damage the holder inflicts by 10%.\nIf the holder is killed, half of the energy points will be lost.",
-    "lore": "The Bloodstones bright ruby color is unmistakable on the battlefield, as the owner seems to have infinite vitality and spirit.",
-    "quality": "rare",
-    "texture": "item_bloodstone",
-    "notes": [],
     "names": {
       "en": "Bloodstone",
       "ru": "Bloodstone"
     },
+    "description": "+600 Health.\nIf an enemy chess piece on the hosts side is killed, the holder has a 15% chance of gaining 1 energy point. Each energy point will increase the magic damage the holder inflicts by 10%.\nIf the holder is killed, half of the energy points will be lost.",
     "descriptions": {
       "en": "+600 Health.\nIf an enemy chess piece on the hosts side is killed, the holder has a 15% chance of gaining 1 energy point. Each energy point will increase the magic damage the holder inflicts by 10%.\nIf the holder is killed, half of the energy points will be lost.",
       "ru": "+600 Здоровья.\nЕсли вражеская фигура умирает на домашнем столе, то носитель с 15% вероятностью получит заряд. Каждый заряд увиличивает маг. урон владельца на 10%.\nЕсли носитель погибает, то теряет половину зарядов."
     },
+    "lore": "The Bloodstones bright ruby color is unmistakable on the battlefield, as the owner seems to have infinite vitality and spirit.",
     "lore_i18n": {
       "en": "The Bloodstones bright ruby color is unmistakable on the battlefield, as the owner seems to have infinite vitality and spirit.",
       "ru": "The Bloodstones яркий рубиновый цвет безошибочно выделяется на поле боя, а владелец будто обладает бесконечной жизненной силой и духом."
-    }
+    },
+    "quality": "rare",
+    "texture": "item_bloodstone",
+    "notes": []
   },
   "overrides": {}
 }

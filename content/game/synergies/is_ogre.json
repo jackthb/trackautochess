@@ -5,28 +5,28 @@
   "icon": "synergies/ogre.png",
   "source": {
     "name": "Ogre",
-    "description": "SPECIES TRAIT: Iron Fist\n\nActive when you have at least (N) different pieces of this species on board. (Multiple effects stack)\n\n(2) Ogres: Each ogre can eat up allies nearby (A cross of 4 grids) whose level is lower than itself and gains their 60% HP and Damage. Deals extra damage to enemys courier equals to the sum of all its victims when winning an away-home battle.",
+    "names": {
+      "en": "Ogre",
+      "ru": "Ogre"
+    },
+    "description": "SPECIES TRAIT: Iron Fist\n Active when you have at least (N) different pieces of this species on board. (Multiple effects stack)\n\n(2) Ogres: Each ogre can eat up allies nearby (A cross of 4 grids) whose level is lower than itself and gains their 60% HP and Damage. Deals extra damage to enemys courier equals to the sum of all its victims when winning an away-home battle.",
+    "descriptions": {
+      "en": "SPECIES TRAIT: Iron Fist\n Active when you have at least (N) different pieces of this species on board. (Multiple effects stack)\n\n(2) Ogres: Each ogre can eat up allies nearby (A cross of 4 grids) whose level is lower than itself and gains their 60% HP and Damage. Deals extra damage to enemys courier equals to the sum of all its victims when winning an away-home battle.",
+      "ru": "SPECIES TRAIT: Iron Fist\n Активна, когда минимум (N) разных Ogre на столе.(Эффекты складываются)\n\n(2) Ogres: Каждый огр может съедать союзников, находящихся рядом (крест из 4 клеток), чьи уровни ниже его, и получает 60% их здоровья и урона. Наносит дополнительный урон курьеру врага, равный сумме всех его жертв, при победе на вражеском поле."
+    },
     "description_html": "<h1>SPECIES TRAIT: Iron Fist</h1><font color=\"#656585\">Active when you have at least (N) different pieces of this species on board. (Multiple effects stack)</font><br><br>(2) Ogres:  Each ogre can eat up allies nearby (A cross of 4 grids) whose level is lower than itself and gains their 60% HP and Damage. Deals extra damage to enemys courier equals to the sum of all its victims when winning an away-home battle.",
     "lore": "Ogres have two heads, or was it three? More heads, more stamina!",
+    "lore_i18n": {
+      "en": "Ogres have two heads, or was it three? More heads, more stamina!",
+      "ru": "У огров две головы, или три? Чем больше голов, тем больше выносливости!"
+    },
     "notes": [
       "Deals extra damage to enemys courier equals to the sum of all its victims when winning an away-home battle."
     ],
     "tiers": [
       2
     ],
-    "ability_special": {},
-    "names": {
-      "en": "Ogre",
-      "ru": "Ogre"
-    },
-    "descriptions": {
-      "en": "SPECIES TRAIT: Iron Fist\n Active when you have at least (N) different pieces of this species on board. (Multiple effects stack)\n\n(2) Ogres: Each ogre can eat up allies nearby (A cross of 4 grids) whose level is lower than itself and gains their 60% HP and Damage. Deals extra damage to enemys courier equals to the sum of all its victims when winning an away-home battle.",
-      "ru": "SPECIES TRAIT: Iron Fist\n Активна, когда минимум (N) разных Ogre на столе.(Эффекты складываются)\n\n(2) Ogres: Каждый огр может съедать союзников, находящихся рядом (крест из 4 клеток), чьи уровни ниже его, и получает 60% их здоровья и урона. Наносит дополнительный урон курьеру врага, равный сумме всех его жертв, при победе на вражеском поле."
-    },
-    "lore_i18n": {
-      "en": "Ogres have two heads, or was it three? More heads, more stamina!",
-      "ru": "У огров две головы, или три? Чем больше голов, тем больше выносливости!"
-    }
+    "ability_special": {}
   },
   "overrides": {}
 }

@@ -5,16 +5,16 @@
   "icon": "relics/time_space_replica.png",
   "source": {
     "name": "Time-Space Replica",
-    "description": "Replicate your last relic.",
-    "lore": "",
     "names": {
       "en": "Time-Space Replica",
       "ru": "Time-Space Replica"
     },
+    "description": "Replicate your last relic.",
     "descriptions": {
       "en": "Replicate your last relic.",
       "ru": "Повторите свою прошлую реликвию."
     },
+    "lore": "",
     "lore_i18n": {}
   },
   "overrides": {}

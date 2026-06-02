@@ -5,20 +5,20 @@
   "icon": "items/poor_mans_shield.png",
   "source": {
     "name": "Poor Mans Shield",
-    "description": "+30 physical damage block, +30% chance to block extra 30% physical damage.",
-    "lore": "",
-    "quality": "consumable",
-    "texture": "item_poor_mans_shield",
-    "notes": [],
     "names": {
       "en": "Poor Mans Shield",
       "ru": "Poor Mans Shield"
     },
+    "description": "+30 physical damage block, +30% chance to block extra 30% physical damage.",
     "descriptions": {
       "en": "+30 physical damage block, +30% chance to block extra 30% physical damage.",
       "ru": "+30 physical damage block, +30% chance to block extra 30% physical damage."
     },
-    "lore_i18n": {}
+    "lore": "",
+    "lore_i18n": {},
+    "quality": "consumable",
+    "texture": "item_poor_mans_shield",
+    "notes": []
   },
   "overrides": {}
 }

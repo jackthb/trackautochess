@@ -5,23 +5,23 @@
   "icon": "items/帷幕2.png",
   "source": {
     "name": "Shroud of Concealment",
-    "description": "Conceal your chessboard in the Preparation Phase. Hide your courier also to skip the next PVP battle after your courier takes damage.",
-    "lore": "From Relicbox",
-    "quality": "",
-    "texture": "item_custom/帷幕2",
-    "notes": [],
     "names": {
       "en": "Shroud of Concealment",
       "ru": "Shroud of Concealment"
     },
+    "description": "Conceal your chessboard in the Preparation Phase. Hide your courier also to skip the next PVP battle after your courier takes damage.",
     "descriptions": {
       "en": "Conceal your chessboard in the Preparation Phase. Hide your courier also to skip the next PVP battle after your courier takes damage.",
       "ru": "Скрывает доску на фазе подготовки. Позволяет пропустить следующий PvP-раунд после получения урона курьером."
     },
+    "lore": "From Relicbox",
     "lore_i18n": {
       "en": "From Relicbox",
       "ru": "Из Relicbox"
-    }
+    },
+    "quality": "",
+    "texture": "item_custom/帷幕2",
+    "notes": []
   },
   "overrides": {}
 }

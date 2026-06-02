@@ -5,22 +5,22 @@
   "icon": "items/arcane_boots.png",
   "source": {
     "name": "Arcane Boots",
-    "description": "Fast movement.\n\nActive ability: Instant\nRestores 40 mana for all allies within the range.\n\nRange: 400",
-    "lore": "",
-    "quality": "rare",
-    "texture": "item_arcane_boots",
-    "notes": [
-      "Immune to attack and ability when jumping"
-    ],
     "names": {
       "en": "Arcane Boots",
       "ru": "Arcane Boots"
     },
+    "description": "Fast movement.\n\nActive ability: Instant\nRestores 40 mana for all allies within the range.\n\nRange: 400",
     "descriptions": {
       "en": "Fast movement.\n\nActive ability: Instant\nRestores 40 mana for all allies within the range.\n\nRange: 400",
       "ru": "Ускоренное передвижение.\n\nАктивка: Мгновенная\nДает 40 маны всем союзникам в области.\n\nРадиус: 400"
     },
-    "lore_i18n": {}
+    "lore": "",
+    "lore_i18n": {},
+    "quality": "rare",
+    "texture": "item_arcane_boots",
+    "notes": [
+      "Immune to attack and ability when jumping"
+    ]
   },
   "overrides": {}
 }

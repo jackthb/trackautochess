@@ -5,25 +5,25 @@
   "icon": "items/blink.png",
   "source": {
     "name": "Blink Dagger",
-    "description": "Active ability: Instant\nInstantly teleports off the farest square that allows it to attack an enemy. \n\nRange: 800",
-    "lore": "The fabled dagger used by the fastest assassin ever to walk the lands.",
-    "quality": "rare",
-    "texture": "item_blink",
-    "notes": [
-      "Chess Pieces with fast movement can be immune to attacks and projectiles."
-    ],
     "names": {
       "en": "Blink Dagger",
       "ru": "Blink Dagger"
     },
+    "description": "Active ability: Instant\nInstantly teleports off the farthest square that allows it to attack an enemy. \n\nRange: 800",
     "descriptions": {
       "en": "Active ability: Instant\nInstantly teleports off the farthest square that allows it to attack an enemy. \n\nRange: 800",
       "ru": "Активка: Мгновенная\nМгновенно телепортирует на самую дальнюю клетку, с которой можно атаковать врага. \n\nRange: 800"
     },
+    "lore": "The fabled dagger used by the fastest assassin ever to walk the lands.",
     "lore_i18n": {
       "en": "The fabled dagger used by the fastest assassin ever to walk the lands.",
       "ru": "Легендарный кинжал, принадлежавший самому быстрому убийце, когда-либо ступавшему по этим землям."
-    }
+    },
+    "quality": "rare",
+    "texture": "item_blink",
+    "notes": [
+      "Chess Pieces with fast movement can be immune to attacks and projectiles."
+    ]
   },
   "overrides": {}
 }

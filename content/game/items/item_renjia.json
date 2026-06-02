@@ -5,20 +5,20 @@
   "icon": "items/blade_mail.png",
   "source": {
     "name": "Blade Mail",
-    "description": "+5 armor.\n\nActive ability: Activates when taking damage\nDuplicates 50% of the damage taken back to the unit that dealt the damage for 7 sec.",
-    "lore": "",
-    "quality": "rare",
-    "texture": "item_blade_mail",
-    "notes": [],
     "names": {
       "en": "Blade Mail",
       "ru": "Blade Mail"
     },
+    "description": "+5 armor.\n\nActive ability: Activates when taking damage\nDuplicates 50% of the damage taken back to the unit that dealt the damage for 7 sec.",
     "descriptions": {
       "en": "+5 armor.\n\nActive ability: Activates when taking damage\nDuplicates 50% of the damage taken back to the unit that dealt the damage for 7 sec.",
       "ru": "+5 брони.\n\nActive ability: Активируется когда получает урон\nВозвращает 50% полученного урона в юнита нанесшего урон в течении 7 секунд."
     },
-    "lore_i18n": {}
+    "lore": "",
+    "lore_i18n": {},
+    "quality": "rare",
+    "texture": "item_blade_mail",
+    "notes": []
   },
   "overrides": {}
 }

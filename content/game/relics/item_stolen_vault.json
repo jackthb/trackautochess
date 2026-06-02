@@ -5,16 +5,16 @@
   "icon": "relics/stolen_vault.png",
   "source": {
     "name": "Stolen Vault",
-    "description": "Discard all 3 relics and get a Stolen Vault with random 10 ~ 15 gold.",
-    "lore": "",
     "names": {
       "en": "Stolen Vault",
       "ru": "Stolen Vault"
     },
+    "description": "Discard all 3 relics and get a Stolen Vault with random 10 ~ 15 gold.",
     "descriptions": {
       "en": "Discard all 3 relics and get a Stolen Vault with random 10 ~ 15 gold.",
       "ru": "Отказаться от выбора реликвии и получить Stolen Vault с случайными 10-15 золота."
     },
+    "lore": "",
     "lore_i18n": {}
   },
   "overrides": {}

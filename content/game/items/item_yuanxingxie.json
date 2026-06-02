@@ -5,20 +5,20 @@
   "icon": "items/travel_boots.png",
   "source": {
     "name": "Travel Boots",
-    "description": "Fast Movement\nTeleports its owner to help the home/away battle if the owner survives the current battle.\n\nActive ability: Instant\nInstantly teleports off the farthest square that allows it to attack an enemy. Generates 20 on activation.\n\nMax distance: 800",
-    "lore": "",
-    "quality": "rare",
-    "texture": "item_travel_boots",
-    "notes": [],
     "names": {
       "en": "Travel Boots",
       "ru": "Travel Boots"
     },
+    "description": "Fast Movement\nTeleports its owner to help the home/away battle if the owner survives the current battle.\n\nActive ability: Instant\nInstantly teleports off the farthest square that allows it to attack an enemy. Generates 20 on activation.\n\nMax distance: 800",
     "descriptions": {
       "en": "Fast Movement\nTeleports its owner to help the home/away battle if the owner survives the current battle.\n\nActive ability: Instant\nInstantly teleports off the farthest square that allows it to attack an enemy. Generates 20 on activation.\n\nMax distance: 800",
       "ru": "Fast Movement\nTeleports its owner to help the home/away battle if the owner survives the current battle.\n\nActive ability: Instant\nInstantly teleports off the farthest square that allows it to attack an enemy. Generates 20 on activation.\n\nMax distance: 800"
     },
-    "lore_i18n": {}
+    "lore": "",
+    "lore_i18n": {},
+    "quality": "rare",
+    "texture": "item_travel_boots",
+    "notes": []
   },
   "overrides": {}
 }

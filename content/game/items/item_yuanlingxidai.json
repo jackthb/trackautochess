@@ -5,20 +5,20 @@
   "icon": "items/wraith_band.png",
   "source": {
     "name": "Wraith Band",
-    "description": "Attack speed +20%。",
-    "lore": "",
-    "quality": "common",
-    "texture": "wraith_band",
-    "notes": [],
     "names": {
       "en": "Wraith Band",
       "ru": "Wraith Band"
     },
+    "description": "Attack speed +20%。",
     "descriptions": {
       "en": "Attack speed +20%。",
       "ru": "Скорость атаки +20%."
     },
-    "lore_i18n": {}
+    "lore": "",
+    "lore_i18n": {},
+    "quality": "common",
+    "texture": "wraith_band",
+    "notes": []
   },
   "overrides": {}
 }

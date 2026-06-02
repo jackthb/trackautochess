@@ -5,23 +5,23 @@
   "icon": "items/sheepstick.png",
   "source": {
     "name": "Scythe of Vyse",
-    "description": "Magic damage +60%。\n\nActive Ability: Instant\nTransforms an enemy piece of the highest level into a harmless animal for 5 sec.",
-    "lore": "The most guarded relic among the cult of Vyse, it is the most coveted weapon among magi.",
-    "quality": "common",
-    "texture": "item_sheepstick",
-    "notes": [],
     "names": {
       "en": "Scythe of Vyse",
       "ru": "Scythe of Vyse"
     },
+    "description": "Magic damage +60%。\n\nActive Ability: Instant\nTransforms an enemy piece of the highest level into a harmless animal for 5 sec.",
     "descriptions": {
       "en": "Magic damage +60%。\n\nActive Ability: Instant\nTransforms an enemy piece of the highest level into a harmless animal for 5 sec.",
       "ru": "Магический урон +60%。\n\nАктивка: Мгновенно\nПревращает фигуру противника самого высокого уровня в безвредное животное на 5 секунд."
     },
+    "lore": "The most guarded relic among the cult of Vyse, it is the most coveted weapon among magi.",
     "lore_i18n": {
       "en": "The most guarded relic among the cult of Vyse, it is the most coveted weapon among magi.",
       "ru": "Это самая охраняемая реликвия культа Вайса и самое желанное оружие среди магов."
-    }
+    },
+    "quality": "common",
+    "texture": "item_sheepstick",
+    "notes": []
   },
   "overrides": {}
 }

@@ -5,16 +5,16 @@
   "icon": "relics/lucid_star.png",
   "source": {
     "name": "Lucid Star",
-    "description": "There is a 20% chance to directly obtain a ★★ piece on purchase if you already owned one.",
-    "lore": "",
     "names": {
       "en": "Lucid Star",
       "ru": "Lucid Star"
     },
+    "description": "There is a 20% chance to directly obtain a ★★ piece on purchase if you already owned one.",
     "descriptions": {
       "en": "There is a 20% chance to directly obtain a ★★ piece on purchase if you already owned one.",
       "ru": "Есть вероятность напрямую получить ★★ фигуру при покупке, если одна уже есть."
     },
+    "lore": "",
     "lore_i18n": {}
   },
   "overrides": {}

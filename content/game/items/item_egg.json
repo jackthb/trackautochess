@@ -5,26 +5,26 @@
   "icon": "items/precious_egg.png",
   "source": {
     "name": "Greevil Egg",
+    "names": {
+      "en": "Greevil Egg",
+      "ru": "Greevil Egg"
+    },
     "description": "Relic Consumable: Click to Use\n Put a piece into an egg which has a chance to grow once every round. You can break it anytime, hatching a piece according to the points.",
+    "descriptions": {
+      "en": "Relic Consumable: Click to Use\n Put a piece into an egg which has a chance to grow once every round. You can break it anytime, hatching a piece according to the points.",
+      "ru": "Нажмите для использования релика\n Поместите фигуру в яйцо, которое имеет шанс вырасти каждую волну. Вы можете разбить его в любое время, чтобы достать фигуру в зависимости от очков роста."
+    },
     "lore": "From Relic Box",
+    "lore_i18n": {
+      "en": "From Relic Box",
+      "ru": "From Relic Box"
+    },
     "quality": "",
     "texture": "precious_egg",
     "notes": [
       "★★ for no less than 3 points, ★★★ for no less than 9 points.",
       "Hatching points deduct pieces from the chess pool and will stop growing when there are no pieces in the chess pool."
-    ],
-    "names": {
-      "en": "Greevil Egg",
-      "ru": "Greevil Egg"
-    },
-    "descriptions": {
-      "en": "Relic Consumable: Click to Use\n Put a piece into an egg which has a chance to grow once every round. You can break it anytime, hatching a piece according to the points.",
-      "ru": "Нажмите для использования релика\n Поместите фигуру в яйцо, которое имеет шанс вырасти каждую волну. Вы можете разбить его в любое время, чтобы достать фигуру в зависимости от очков роста."
-    },
-    "lore_i18n": {
-      "en": "From Relic Box",
-      "ru": "From Relic Box"
-    }
+    ]
   },
   "overrides": {}
 }

@@ -5,16 +5,16 @@
   "icon": "relics/magic_seed.png",
   "source": {
     "name": "Magic Seed",
-    "description": "Fill your bench with magic vegetable sprouts. The sell value of these sprouts has a dynamic chance to increase by 1 at the beginning of every round. You can sell the sprouts any time to reuse the bench.",
-    "lore": "",
     "names": {
       "en": "Magic Seed",
       "ru": "Magic Seed"
     },
+    "description": "Fill your bench with magic vegetable sprouts. The sell value of these sprouts has a dynamic chance to increase by 1 at the beginning of every round. You can sell the sprouts any time to reuse the bench.",
     "descriptions": {
       "en": "Fill your bench with magic vegetable sprouts. The sell value of these sprouts has a dynamic chance to increase by 1 at the beginning of every round. You can sell the sprouts any time to reuse the bench.",
       "ru": "Заполняет лавку магическими репками. Их цена продажи имеет шанс увеличиться на 1 в начале каждого раунда. Репки можно продать в любой момент, чтобы освободить лавку."
     },
+    "lore": "",
     "lore_i18n": {}
   },
   "overrides": {}

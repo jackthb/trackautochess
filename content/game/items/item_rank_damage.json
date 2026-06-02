@@ -5,22 +5,22 @@
   "icon": "items/defiant_shell.png",
   "source": {
     "name": "Defiant Shell",
-    "description": "Reduces damage taken from home defeats or increases damage dealt in away-home victories by your current rank + 1.",
-    "lore": "",
-    "quality": "",
-    "texture": "defiant_shell",
-    "notes": [
-      "Modified from the previous courier-lost-health scaling formula."
-    ],
     "names": {
       "en": "Defiant Shell",
       "ru": "Defiant Shell"
     },
+    "description": "Reduces damage taken from home defeats or increases damage dealt in away-home victories by your (current rank + 1)",
     "descriptions": {
       "en": "Reduces damage taken from home defeats or increases damage dealt in away-home victories by your (current rank + 1)",
       "ru": "Уменьшает урон, получаемый при домашних поражениях, или увеличивает урон, наносимый при выездных победах на Позицию в игре+1 (по здоровью)"
     },
-    "lore_i18n": {}
+    "lore": "",
+    "lore_i18n": {},
+    "quality": "",
+    "texture": "defiant_shell",
+    "notes": [
+      "Every 10% Health lost increases 1 damage to the damage bonus or reduction with a maximum of 10."
+    ]
   },
   "overrides": {}
 }

@@ -5,20 +5,20 @@
   "icon": "items/glimmer_cape.png",
   "source": {
     "name": "Glimmer Cape",
-    "description": "Magical resistance +30%.\nHides the carrier from others’ sight.",
-    "lore": "",
-    "quality": "consumable",
-    "texture": "glimmer_cape",
-    "notes": [],
     "names": {
       "en": "Glimmer Cape",
       "ru": "Glimmer Cape"
     },
+    "description": "Magical resistance +30%.\nHides the carrier from others’ sight.",
     "descriptions": {
       "en": "Magical resistance +30%.\nHides the carrier from others’ sight.",
       "ru": "Магическое сопротивление +30%.\nСкрывает носителя от чужих глаз во время подготовки."
     },
-    "lore_i18n": {}
+    "lore": "",
+    "lore_i18n": {},
+    "quality": "consumable",
+    "texture": "glimmer_cape",
+    "notes": []
   },
   "overrides": {}
 }

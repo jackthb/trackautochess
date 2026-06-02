@@ -5,9 +5,21 @@
   "icon": "synergies/mech.png",
   "source": {
     "name": "Mech",
-    "description": "Inventors arm themselves with the latest technology that allows them to receive +50% healing from other sources.\n\nClass Perk: Heart of the Machine\n\nActive when you have at least (N) different Inventor pieces on board. (Multiple effects stack)\n\n(3) Inventors: Summon an AWESOME Invention after winning a home battle last round with at least 1 friendly Inventor who survived.\n(6) Inventors: Heart of the Machine now summons a Golden AWESOME Invention.",
+    "names": {
+      "en": "Mech",
+      "ru": "Mech"
+    },
+    "description": "Inventors arm themselves with the latest technology that allows them to receive +50% healing from other sources.\n\nClass Perk: Heart of the Machine\n Active when you have at least (N) different Inventor pieces on board. (Multiple effects stack)\n\n(3) Inventors: Summon an AWESOME Invention after winning a home battle last round with at least 1 friendly Inventor who survived.\n(6) Inventors: Heart of the Machine now summons a Golden AWESOME Invention.",
+    "descriptions": {
+      "en": "Inventors arm themselves with the latest technology that allows them to receive +50% healing from other sources.\n\nClass Perk: Heart of the Machine\n Active when you have at least (N) different Inventor pieces on board. (Multiple effects stack)\n\n(3) Inventors: Summon an AWESOME Invention after winning a home battle last round with at least 1 friendly Inventor who survived.\n(6) Inventors: Heart of the Machine now summons a Golden AWESOME Invention.",
+      "ru": "Inventors arm themselves with the latest technology that allows them to receive +50% healing from other sources.\n\nClass Perk: Heart of the Machine\n Active when you have at least (N) different Inventor pieces on board. (Multiple effects stack)\n\n(3) Меха: Вы получаете бесплатный ролл после победы в домашней битве, если хотя бы 1 мех выжил.\n(6) Мехов: Вы получаете золотой ролл после победы в домашней битве, если хотя бы 1 мех выжил."
+    },
     "description_html": "Inventors arm themselves with the latest technology that allows them to receive +50% healing from other sources.\n<h1>Class Perk: Heart of the Machine</h1><font color=\"#656585\">Active when you have at least (N) different Inventor pieces on board. (Multiple effects stack)</font><br><br>(3) Inventors: Summon an AWESOME Invention after winning a home battle last round with at least 1 friendly Inventor who survived.<br>(6) Inventors: Heart of the Machine now summons a Golden AWESOME Invention.",
     "lore": "Inventors are usually the ones within a race who possess the most profound knowledge, and the are ambitious in discover new methods and creations. Though most of the time the inventions are problematic and not-so-reliable, they do invoke miracles sometimes.",
+    "lore_i18n": {
+      "en": "Inventors are usually the ones within a race who possess the most profound knowledge, and the are ambitious in discover new methods and creations. Though most of the time the inventions are problematic and not-so-reliable, they do invoke miracles sometimes.",
+      "ru": "Изобретатели обычно являются представителями расы с наиболее глубокими знаниями и стремятся открывать новые методы и создавать новые изобретения. Хотя их творения часто оказываются проблемными и ненадёжными, но иногда они всё же совершают настоящие чудеса."
+    },
     "notes": [
       "Heart of the Machine: Refresh your recruitment panel for free.",
       "Golden Heart of the Machine: DISCOVER a panel of 5 random Legendary chess pieces."
@@ -16,19 +28,7 @@
       3,
       6
     ],
-    "ability_special": {},
-    "names": {
-      "en": "Mech",
-      "ru": "Mech"
-    },
-    "descriptions": {
-      "en": "Inventors arm themselves with the latest technology that allows them to receive +50% healing from other sources.\n\nClass Perk: Heart of the Machine\n Active when you have at least (N) different Inventor pieces on board. (Multiple effects stack)\n\n(3) Inventors: Summon an AWESOME Invention after winning a home battle last round with at least 1 friendly Inventor who survived.\n(6) Inventors: Heart of the Machine now summons a Golden AWESOME Invention.",
-      "ru": "Inventors arm themselves with the latest technology that allows them to receive +50% healing from other sources.\n\nClass Perk: Heart of the Machine\n Active when you have at least (N) different Inventor pieces on board. (Multiple effects stack)\n\n(3) Меха: Вы получаете бесплатный ролл после победы в домашней битве, если хотя бы 1 мех выжил.\n(6) Мехов: Вы получаете золотой ролл после победы в домашней битве, если хотя бы 1 мех выжил."
-    },
-    "lore_i18n": {
-      "en": "Inventors are usually the ones within a race who possess the most profound knowledge, and the are ambitious in discover new methods and creations. Though most of the time the inventions are problematic and not-so-reliable, they do invoke miracles sometimes.",
-      "ru": "Изобретатели обычно являются представителями расы с наиболее глубокими знаниями и стремятся открывать новые методы и создавать новые изобретения. Хотя их творения часто оказываются проблемными и ненадёжными, но иногда они всё же совершают настоящие чудеса."
-    }
+    "ability_special": {}
   },
   "overrides": {}
 }

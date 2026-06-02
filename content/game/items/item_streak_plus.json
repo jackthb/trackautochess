@@ -5,26 +5,26 @@
   "icon": "items/明暗终途2.png",
   "source": {
     "name": "Chiaroscuro Certainty",
+    "names": {
+      "en": "Chiaroscuro Certainty",
+      "ru": "Chiaroscuro Certainty"
+    },
     "description": "Your win or lose streak will not be terminated and when the relic disappears, you will receive a corresponding level loot token based on the highest reward/compensation held during that time.",
+    "descriptions": {
+      "en": "Your win or lose streak will not be terminated and when the relic disappears, you will receive a corresponding level loot token based on the highest reward/compensation held during that time.",
+      "ru": "Ваша серия побед или поражений не будет прервана, и когда реликвия исчезнет, вы получите жетон, уровень которого соответствует самой высокой награде/компенсации, полученной за это время."
+    },
     "lore": "From Relicbox",
+    "lore_i18n": {
+      "en": "From Relicbox",
+      "ru": "From Relicbox"
+    },
     "quality": "",
     "texture": "item_custom/明暗终途2",
     "notes": [
       "2-4 win/loss streak corresponds to level (lapsed relic count) loot token, 5-9 win/loss streak corresponds to level (lapsed relic count+1) loot token, and 10+ win/loss streak corresponds to level (lapsed relic count+2) loot token.",
       "The Maximum level of this token is level 5."
-    ],
-    "names": {
-      "en": "Chiaroscuro Certainty",
-      "ru": "Chiaroscuro Certainty"
-    },
-    "descriptions": {
-      "en": "Your win or lose streak will not be terminated and when the relic disappears, you will receive a corresponding level loot token based on the highest reward/compensation held during that time.",
-      "ru": "Ваша серия побед или поражений не будет прервана, и когда реликвия исчезнет, вы получите жетон, уровень которого соответствует самой высокой награде/компенсации, полученной за это время."
-    },
-    "lore_i18n": {
-      "en": "From Relicbox",
-      "ru": "From Relicbox"
-    }
+    ]
   },
   "overrides": {}
 }

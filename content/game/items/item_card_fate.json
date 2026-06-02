@@ -5,20 +5,20 @@
   "icon": "items/card_fate.png",
   "source": {
     "name": "Card: Fate",
-    "description": "Courier Consumable: Click to use\nYou can designate a chess piece to permanently gain an additional race from the nearest other race",
-    "lore": "",
-    "quality": "consumable",
-    "texture": "custom/card_fate",
-    "notes": [],
     "names": {
       "en": "Card: Fate",
       "ru": "Card: Fate"
     },
+    "description": "Courier Consumable: Click to use\nYou can designate a chess piece to permanently gain an additional race from the nearest other race",
     "descriptions": {
       "en": "Courier Consumable: Click to use\nYou can designate a chess piece to permanently gain an additional race from the nearest other race",
       "ru": "Courier Consumable: Click to use\nYou can designate a chess piece to permanently gain an additional race from the nearest other race"
     },
-    "lore_i18n": {}
+    "lore": "",
+    "lore_i18n": {},
+    "quality": "consumable",
+    "texture": "custom/card_fate",
+    "notes": []
   },
   "overrides": {}
 }

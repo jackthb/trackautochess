@@ -5,23 +5,23 @@
   "icon": "items/force_staff.png",
   "source": {
     "name": "Force Staff",
-    "description": "Magic Damage +10%.\n\nActive ability: Activated when Hp is low\nPush the carrier to a safe grid that cannot be reached by enemy attacks, and restore 20 mana immediately.",
-    "lore": "Allows you to manipulate others, for good or evil.",
-    "quality": "common",
-    "texture": "item_force_staff",
-    "notes": [],
     "names": {
       "en": "Force Staff",
       "ru": "Force Staff"
     },
+    "description": "Magic Damage +10%.\n\nActive ability: Activated when Hp is low\nPush the carrier to a safe grid that cannot be reached by enemy attacks, and restore 20 mana immediately.",
     "descriptions": {
       "en": "Magic Damage +10%.\n\nActive ability: Activated when Hp is low\nPush the carrier to a safe grid that cannot be reached by enemy attacks, and restore 20 mana immediately.",
       "ru": "Маг. Урон+10%.\n\nАктивируется при низком здоровье\nПеремещает носителя на безопасную клетку, недоступную для вражеских атак, и немедленно восстанавливает 20 маны."
     },
+    "lore": "Allows you to manipulate others, for good or evil.",
     "lore_i18n": {
       "en": "Allows you to manipulate others, for good or evil.",
       "ru": "Allows you to manipulate others, for good or evil."
-    }
+    },
+    "quality": "common",
+    "texture": "item_force_staff",
+    "notes": []
   },
   "overrides": {}
 }

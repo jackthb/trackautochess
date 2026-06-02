@@ -5,17 +5,17 @@
   "icon": "items/arcane_ring.png",
   "source": {
     "name": "Test item: +100 mana",
-    "description": "",
-    "lore": "",
-    "quality": "rare",
-    "texture": "arcane_ring",
-    "notes": [],
     "names": {
       "en": "Test item: +100 mana",
       "ru": "Test item: +100 mana"
     },
+    "description": "",
     "descriptions": {},
-    "lore_i18n": {}
+    "lore": "",
+    "lore_i18n": {},
+    "quality": "rare",
+    "texture": "arcane_ring",
+    "notes": []
   },
   "overrides": {}
 }

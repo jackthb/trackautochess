@@ -5,22 +5,22 @@
   "icon": "items/witless_shako.png",
   "source": {
     "name": "Witless Shako",
-    "description": "+25% magical resistance. The carrier +1 level.",
-    "lore": "",
-    "quality": "common",
-    "texture": "witless_shako",
-    "notes": [
-      "+1 Level Only valid on chess pieces."
-    ],
     "names": {
       "en": "Witless Shako",
       "ru": "Witless Shako"
     },
+    "description": "+25% magical resistance. The carrier +1 level.",
     "descriptions": {
       "en": "+25% magical resistance. The carrier +1 level.",
       "ru": "+25% сопротивления магии. Носитель считается на 1 уровень выше."
     },
-    "lore_i18n": {}
+    "lore": "",
+    "lore_i18n": {},
+    "quality": "common",
+    "texture": "witless_shako",
+    "notes": [
+      "+1 Level Only valid on chess pieces."
+    ]
   },
   "overrides": {}
 }

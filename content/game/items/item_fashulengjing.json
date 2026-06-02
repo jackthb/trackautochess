@@ -5,22 +5,22 @@
   "icon": "items/spell_prism.png",
   "source": {
     "name": "Spell Prism",
-    "description": "magical damage +20%。\n Target quantity of enemy-directed targeted spells or items +1.",
-    "lore": "",
-    "quality": "common",
-    "texture": "spell_prism",
-    "notes": [
-      "Casting skills and certain special target selection targeted spells are ineffective."
-    ],
     "names": {
       "en": "Spell Prism",
       "ru": "Spell Prism"
     },
+    "description": "magical damage +20%。\n Target quantity of enemy-directed targeted spells or items +1.",
     "descriptions": {
       "en": "magical damage +20%。\n Target quantity of enemy-directed targeted spells or items +1.",
       "ru": "Магический урон +20%。\n Количество заклинаний или предметов, направленных на цель, +1 (удваивается)."
     },
-    "lore_i18n": {}
+    "lore": "",
+    "lore_i18n": {},
+    "quality": "common",
+    "texture": "spell_prism",
+    "notes": [
+      "Casting skills and certain special target selection targeted spells are ineffective."
+    ]
   },
   "overrides": {}
 }

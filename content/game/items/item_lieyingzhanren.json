@@ -5,20 +5,20 @@
   "icon": "items/falcon_blade.png",
   "source": {
     "name": "Falcon Blade",
-    "description": "Attack damage +25。",
-    "lore": "",
-    "quality": "common",
-    "texture": "falcon_blade",
-    "notes": [],
     "names": {
       "en": "Falcon Blade",
       "ru": "Falcon Blade"
     },
+    "description": "Attack damage +25。",
     "descriptions": {
       "en": "Attack damage +25。",
       "ru": "Урон атаки +25."
     },
-    "lore_i18n": {}
+    "lore": "",
+    "lore_i18n": {},
+    "quality": "common",
+    "texture": "falcon_blade",
+    "notes": []
   },
   "overrides": {}
 }

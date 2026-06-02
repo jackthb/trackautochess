@@ -5,28 +5,28 @@
   "icon": "synergies/satyr.png",
   "source": {
     "name": "Satyr",
-    "description": "SPECIES TRAIT: Fear \n\nActive when you have at least (N) different pieces on board. (Multiple effects stack.)\n\n(2) Satyr: Allied Satyr chess pieces gain the effect: If there is more than 1 enemy nearby, they cause those enemies to lose control due to fear.",
+    "names": {
+      "en": "Satyr",
+      "ru": "Satyr"
+    },
+    "description": "SPECIES TRAIT: Fear \n Active when you have at least (N) different pieces on board. (Multiple effects stack.)\n\n(2) Satyr: Allied Satyr chess pieces gain the effect: If there is more than 1 enemy nearby, they cause those enemies to lose control due to fear.",
+    "descriptions": {
+      "en": "SPECIES TRAIT: Fear \n Active when you have at least (N) different pieces on board. (Multiple effects stack.)\n\n(2) Satyr: Allied Satyr chess pieces gain the effect: If there is more than 1 enemy nearby, they cause those enemies to lose control due to fear.",
+      "ru": "SPECIES TRAIT: Fear \n Активна, когда минимум (N) разных Satyr на столе.(Эффекты складываются)\n\n(2) Satyr: Союзные Сатиры имеют эффект: если поблизости больше одного врага, они заставляют их потерять контроль от страха."
+    },
     "description_html": "<h1>SPECIES TRAIT: Fear </h1><font color=\"#656585\">Active when you have at least (N) different pieces on board. (Multiple effects stack.)</font><br><br>(2) Satyr: Allied Satyr chess pieces gain the effect: If there is more than 1 enemy nearby, they cause those enemies to lose control due to fear.",
     "lore": "Demonic species rose from twisted elves, experts at concealing themselves in nightmares, and fanatics in spreading blood and agony.",
+    "lore_i18n": {
+      "en": "Demonic species rose from twisted elves, experts at concealing themselves in nightmares, and fanatics in spreading blood and agony.",
+      "ru": "Demonic произошли от искажённых эльфов, скрываются в кошмарах и сеют кровь и боль."
+    },
     "notes": [
       "The fear effect has an internal cooldown and cannot trigger continuously."
     ],
     "tiers": [
       2
     ],
-    "ability_special": {},
-    "names": {
-      "en": "Satyr",
-      "ru": "Satyr"
-    },
-    "descriptions": {
-      "en": "SPECIES TRAIT: Fear \n Active when you have at least (N) different pieces on board. (Multiple effects stack.)\n\n(2) Satyr: Allied Satyr chess pieces gain the effect: If there is more than 1 enemy nearby, they cause those enemies to lose control due to fear.",
-      "ru": "SPECIES TRAIT: Fear \n Активна, когда минимум (N) разных Satyr на столе.(Эффекты складываются)\n\n(2) Satyr: Союзные Сатиры имеют эффект: если поблизости больше одного врага, они заставляют их потерять контроль от страха."
-    },
-    "lore_i18n": {
-      "en": "Demonic species rose from twisted elves, experts at concealing themselves in nightmares, and fanatics in spreading blood and agony.",
-      "ru": "Demonic произошли от искажённых эльфов, скрываются в кошмарах и сеют кровь и боль."
-    }
+    "ability_special": {}
   },
   "overrides": {}
 }
