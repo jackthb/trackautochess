@@ -13,6 +13,7 @@ const storage =
         repo: githubRepo,
       } as const)
     : ({ kind: "local" } as const);
+const contentPath = useGithubStorage ? "content" : "../content";
 
 const entitySchema = {
   gameId: fields.text({ label: "Game ID" }),
@@ -53,7 +54,7 @@ export default config({
   collections: {
     patchNotes: collection({
       label: "Patch Notes",
-      path: "../content/patch-notes/*",
+      path: `${contentPath}/patch-notes/*`,
       slugField: "title",
       format: { data: "json" },
       columns: ["date", "entitiesSynced"],
@@ -95,7 +96,7 @@ export default config({
     }),
     units: collection({
       label: "Units",
-      path: "../content/game/units/*",
+      path: `${contentPath}/game/units/*`,
       slugField: "name",
       format: { data: "json" },
       columns: ["gameId"],
@@ -103,7 +104,7 @@ export default config({
     }),
     items: collection({
       label: "Items",
-      path: "../content/game/items/*",
+      path: `${contentPath}/game/items/*`,
       slugField: "name",
       format: { data: "json" },
       columns: ["gameId"],
@@ -111,7 +112,7 @@ export default config({
     }),
     synergies: collection({
       label: "Synergies",
-      path: "../content/game/synergies/*",
+      path: `${contentPath}/game/synergies/*`,
       slugField: "name",
       format: { data: "json" },
       columns: ["gameId"],
@@ -119,7 +120,7 @@ export default config({
     }),
     relics: collection({
       label: "Relics",
-      path: "../content/game/relics/*",
+      path: `${contentPath}/game/relics/*`,
       slugField: "name",
       format: { data: "json" },
       columns: ["gameId"],
