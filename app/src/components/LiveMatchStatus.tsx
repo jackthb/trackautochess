@@ -133,11 +133,6 @@ export function LiveMatchStatus({ players, localSteamIds, unitsFull, synergiesDa
           display: flex;
           flex-direction: column;
           gap: 6px;
-          /* The home page itself doesn't scroll (overflow: hidden), so with a
-           * full 8-player lobby the lower seats would be clipped off-screen.
-           * Cap the list and let it scroll internally instead. */
-          max-height: 55vh;
-          overflow-y: auto;
         }
         .live-seat {
           display: flex;
