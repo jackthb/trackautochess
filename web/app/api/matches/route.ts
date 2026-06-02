@@ -1,7 +1,7 @@
 import type { NextApiRequest } from "next";
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { RANK_BRACKETS } from "@dac/shared/game-utils";
-import { isAdminSteamId } from "@/lib/admin";
+import { isBetaFeaturesEnabledForSteamId } from "@/lib/betaFeaturesServer";
 import { getSessionUser } from "@/lib/sessionUser";
 
 // Adapt a Web Request into the minimal NextApiRequest shape consumed by
@@ -69,7 +69,7 @@ export async function GET(req: Request) {
   }
 
   const session = await getSessionUser(toApiReq(req), supabase);
-  if (!isAdminSteamId(session.steamId)) {
+  if (!(await isBetaFeaturesEnabledForSteamId(session.steamId))) {
     return Response.json({ error: "Forbidden" }, { status: 403 });
   }
 

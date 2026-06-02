@@ -5,17 +5,22 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { playerProfilePath } from "@/lib/steam";
 import { createSupabaseClient } from "@/lib/supabase";
-import { isAdminSteamId } from "@/lib/admin";
+import { useBetaFeaturesAccess } from "@/lib/betaFeatures";
 import { PageLayout } from "@/components/PageLayout";
-import type { MatchSummary } from "@/app/api/admin/matches/route";
+import type { MatchSummary } from "@/app/api/matches/route";
 import styles from "./matches.module.css";
 
-// Client island for /admin/matches: owns admin gating (isAdminSteamId +
-// Supabase session token), data fetching from /api/admin/matches, all state,
+// Client island for /matches: owns beta gating (PostHog feature flag +
+// Supabase session token), data fetching from /api/matches, all state,
 // and rendering. Creates its own Supabase client since there's no _app-provided
 // prop in the App Router. styled-jsx was ported to matches.module.css.
 
 type Phase = "loading" | "forbidden" | "ready" | "error";
+
+interface ViewerSession {
+  token: string | null;
+  steamId: string | null;
+}
 
 function formatPlayedAt(iso: string): string {
   const date = new Date(iso);
@@ -29,11 +34,13 @@ function formatPlayedAt(iso: string): string {
   });
 }
 
-export function AdminMatchesClient() {
+export function MatchesClient() {
   const router = useRouter();
   const [phase, setPhase] = useState<Phase>("loading");
+  const [viewerSession, setViewerSession] = useState<ViewerSession | null>(null);
   const [matches, setMatches] = useState<MatchSummary[]>([]);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const betaAccess = useBetaFeaturesAccess(viewerSession?.steamId ?? null);
 
   useEffect(() => {
     const supabase = createSupabaseClient();
@@ -43,14 +50,50 @@ export function AdminMatchesClient() {
     }
     let cancelled = false;
 
-    const load = async (token: string | null, steamId: string | null) => {
-      if (!isAdminSteamId(steamId) || !token) {
-        if (!cancelled) setPhase("forbidden");
-        return;
+    supabase.auth.getSession().then(({ data }) => {
+      const meta = data.session?.user?.user_metadata as
+        | { steam_id?: unknown }
+        | null
+        | undefined;
+      const steamId = meta && typeof meta.steam_id === "string" ? meta.steam_id : null;
+      if (!cancelled) {
+        setViewerSession({
+          token: data.session?.access_token ?? null,
+          steamId,
+        });
       }
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!viewerSession) {
+      setPhase("loading");
+      return;
+    }
+    if (!viewerSession.token || !viewerSession.steamId) {
+      setPhase("forbidden");
+      return;
+    }
+    if (betaAccess === "loading") {
+      setPhase("loading");
+      return;
+    }
+    if (betaAccess !== "enabled") {
+      setPhase("forbidden");
+      return;
+    }
+
+    let cancelled = false;
+
+    const load = async () => {
+      setPhase("loading");
       try {
-        const resp = await fetch("/api/admin/matches", {
-          headers: { Authorization: `Bearer ${token}` },
+        const resp = await fetch("/api/matches", {
+          headers: { Authorization: `Bearer ${viewerSession.token}` },
         });
         if (!resp.ok) {
           const body = await resp.json().catch(() => null);
@@ -73,19 +116,12 @@ export function AdminMatchesClient() {
       }
     };
 
-    supabase.auth.getSession().then(({ data }) => {
-      const meta = data.session?.user?.user_metadata as
-        | { steam_id?: unknown }
-        | null
-        | undefined;
-      const steamId = meta && typeof meta.steam_id === "string" ? meta.steam_id : null;
-      void load(data.session?.access_token ?? null, steamId);
-    });
+    void load();
 
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [betaAccess, viewerSession]);
 
   return (
     <PageLayout title="Matches">
@@ -93,7 +129,7 @@ export function AdminMatchesClient() {
 
       {phase === "forbidden" && (
         <div className={styles.gate}>
-          This page is restricted. Sign in with the admin Steam account to view it.
+          This page is restricted. Sign in with a beta-enabled Steam account to view it.
         </div>
       )}
 

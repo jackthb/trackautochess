@@ -14,6 +14,7 @@ from __future__ import annotations
 
 import json
 import sys
+from datetime import datetime, timezone
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
@@ -223,6 +224,56 @@ def test_push_match_no_supabase_config(tmp_path, monkeypatch):
     out = db.push_match({"match_id": "bbbbbbbbbbbbbbbb", "played_at": "2026-05-20T12:00:00"})
     assert out is None
     assert (tmp_path / "matches" / "bbbbbbbbbbbbbbbb.json").exists()
+
+
+# ── Queen ladder throttle ───────────────────────────────────────────────────
+
+
+def _queen_ladder_response(rows):
+    resp = MagicMock()
+    resp.raise_for_status = MagicMock()
+    resp.json = MagicMock(return_value=rows)
+    return resp
+
+
+def test_queen_ladder_recent_update_throttles(tmp_path, monkeypatch):
+    _isolated_dac_dir(tmp_path, monkeypatch)
+    import db
+
+    client = MagicMock()
+    client.get.return_value = _queen_ladder_response([
+        {"queen_ladder_last_seen_at": "2026-06-02T11:30:00+00:00"}
+    ])
+
+    now = datetime(2026, 6, 2, 12, 0, tzinfo=timezone.utc)
+
+    assert db._queen_ladder_recently_updated(client, now) is True
+
+
+def test_queen_ladder_old_update_allows_refresh(tmp_path, monkeypatch):
+    _isolated_dac_dir(tmp_path, monkeypatch)
+    import db
+
+    client = MagicMock()
+    client.get.return_value = _queen_ladder_response([
+        {"queen_ladder_last_seen_at": "2026-06-02T10:00:00+00:00"}
+    ])
+
+    now = datetime(2026, 6, 2, 12, 0, tzinfo=timezone.utc)
+
+    assert db._queen_ladder_recently_updated(client, now) is False
+
+
+def test_queen_ladder_throttle_check_failure_skips(tmp_path, monkeypatch):
+    _isolated_dac_dir(tmp_path, monkeypatch)
+    import db
+
+    client = MagicMock()
+    client.get.side_effect = RuntimeError("read failed")
+
+    now = datetime(2026, 6, 2, 12, 0, tzinfo=timezone.utc)
+
+    assert db._queen_ladder_recently_updated(client, now) is True
 
 
 # ── push_match_players ──────────────────────────────────────────────────────

@@ -1,5 +1,6 @@
 param(
-    [switch]$Clean
+    [switch]$Clean,
+    [string]$Branch = "main"
 )
 
 $ErrorActionPreference = "Stop"
@@ -40,8 +41,21 @@ Write-Host "  Environment OK." -ForegroundColor Green
 
 # ── Pull latest ──────────────────────────────────────────────────────────────
 
-Write-Host "Pulling latest changes..." -ForegroundColor Cyan
-git -C $RepoDir pull
+Write-Host "Pulling latest changes from $Branch..." -ForegroundColor Cyan
+git -C $RepoDir fetch origin $Branch
+if ($LASTEXITCODE -ne 0) { throw "git fetch failed" }
+
+$CurrentBranch = git -C $RepoDir branch --show-current
+if ($CurrentBranch -ne $Branch) {
+    $Dirty = git -C $RepoDir status --porcelain
+    if ($Dirty) {
+        throw "Cannot switch from '$CurrentBranch' to '$Branch' with uncommitted changes. Commit or stash them, then rerun build."
+    }
+    git -C $RepoDir switch $Branch
+    if ($LASTEXITCODE -ne 0) { throw "git switch $Branch failed" }
+}
+
+git -C $RepoDir pull --ff-only origin $Branch
 if ($LASTEXITCODE -ne 0) { throw "git pull failed" }
 
 # ── Python venv + deps ───────────────────────────────────────────────────────

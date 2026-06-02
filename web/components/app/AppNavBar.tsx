@@ -5,8 +5,8 @@ import { useRouter, usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import type { SupabaseClient, User } from "@supabase/supabase-js";
 import { SITE_NAME } from "@/lib/site";
-import { isAdminSteamId } from "@/lib/admin";
 import { trackEvent } from "@/lib/analytics";
+import { useBetaFeaturesEnabled } from "@/lib/betaFeatures";
 import { SteamSignInButton } from "@/components/SteamSignInButton";
 import styles from "@/components/NavBar.module.css";
 
@@ -34,6 +34,7 @@ const t = {
   relics: "Relics",
   talents: "Talents",
   ranks: "Ranks",
+  queens: "Queens",
   leaderboard: "Leaderboard",
   matches: "Matches",
   patchNotes: "Patch Notes",
@@ -139,7 +140,7 @@ export function AppNavBar({ supabase }: AppNavBarProps) {
     typeof user?.user_metadata?.steam_id === "string"
       ? user.user_metadata.steam_id
       : null;
-  const isAdmin = isAdminSteamId(sessionSteamId);
+  const canSeeBetaFeatures = useBetaFeaturesEnabled(sessionSteamId);
 
   const navLinks = (
     <>
@@ -164,13 +165,18 @@ export function AppNavBar({ supabase }: AppNavBarProps) {
       <Link href="/ranks" className={styles.navLink}>
         {t.ranks}
       </Link>
-      {isAdmin && (
+      {canSeeBetaFeatures && (
+        <Link href="/queens" className={styles.navLink}>
+          {t.queens}
+        </Link>
+      )}
+      {canSeeBetaFeatures && (
         <Link href="/leaderboard" className={styles.navLink}>
           {t.leaderboard}
         </Link>
       )}
-      {isAdmin && (
-        <Link href="/admin/matches" className={styles.navLink}>
+      {canSeeBetaFeatures && (
+        <Link href="/matches" className={styles.navLink}>
           {t.matches}
         </Link>
       )}

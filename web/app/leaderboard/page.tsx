@@ -3,12 +3,12 @@ import { SITE_TITLE } from "@/lib/site";
 import { LeaderboardClient } from "./LeaderboardClient";
 
 // App Router migration of pages/leaderboard.tsx. The page is a Server Component
-// that owns metadata and renders a "use client" island holding the admin gating,
+// that owns metadata and renders a "use client" island holding the beta gating,
 // data fetching, and rendering. noindex carried over from the source's SeoHead.
 
 export const metadata: Metadata = {
   title: `Leaderboard | ${SITE_TITLE}`,
-  description: "Track Auto Chess admin leaderboard.",
+  description: "Track Auto Chess beta leaderboard.",
   robots: "noindex, nofollow",
   alternates: { canonical: "/leaderboard" },
 };

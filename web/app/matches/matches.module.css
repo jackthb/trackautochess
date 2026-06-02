@@ -1,5 +1,5 @@
-/* Ported verbatim from the styled-jsx block in the former
-   pages/admin/matches.tsx. classNames map 1:1 to the original. */
+/* Ported verbatim from the styled-jsx block in the former matches page.
+   classNames map 1:1 to the original. */
 .lead {
   font-family: var(--font-mono);
   font-size: var(--fs-13);

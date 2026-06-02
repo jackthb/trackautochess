@@ -21,7 +21,12 @@ import pytest
 BACKEND_DIR = Path(__file__).parent.parent
 sys.path.insert(0, str(BACKEND_DIR))
 
-from nettable_capture import NetTableCapture, extract_rows, normalize_allow  # noqa: E402
+from nettable_capture import (  # noqa: E402
+    NetTableCapture,
+    _storage_filter,
+    extract_rows,
+    normalize_allow,
+)
 
 
 # ── tiny VBKV builders (duplicated from test_nettable_parser to keep the
@@ -201,6 +206,29 @@ def test_extract_rows_empty_log(tmp_path):
     assert extract_rows(log_path) == []
 
 
+# ── storage filter ──────────────────────────────────────────────────────────
+
+
+def test_storage_filter_keeps_player_id_board_items_and_relics():
+    rows = [
+        {"table_name": "CustomNetTable_player_id_table", "key": "player_0", "raw": {}},
+        {"table_name": "CustomNetTable_player_id_table", "key": "vchess_0", "raw": {}},
+        {"table_name": "CustomNetTable_player_id_table", "key": "relic_ttl_0", "raw": {}},
+        {"table_name": "CustomNetTable_player_id_table", "key": "mmr_level_0", "raw": {}},
+        {"table_name": "CustomNetTable_player_id_table", "key": "chessboard_0", "raw": {}},
+        {"table_name": "CustomNetTable_player_id_table", "key": "courier_0", "raw": {}},
+    ]
+
+    kept = _storage_filter(rows)
+
+    assert {r["key"] for r in kept} == {
+        "player_0",
+        "vchess_0",
+        "relic_ttl_0",
+        "mmr_level_0",
+    }
+
+
 # ── _last_match_dumps: segment buffered dumps into matches, keep the latest ──
 #
 # This is the fallback used when GAME_IN_PROGRESS was missed (app started
@@ -253,3 +281,38 @@ def test_last_match_dumps_none_rounds_attach_to_open_segment():
 
 def test_last_match_dumps_empty():
     assert NetTableCapture._last_match_dumps([]) == []
+
+# ── Queen ladder extraction ─────────────────────────────────────────────────
+
+
+def test_extract_ranking_top_players_accepts_common_aliases():
+    scanned_at = "2026-06-02T12:00:00+00:00"
+    raw = {
+        "season": "s40",
+        "ranking_top": {
+            "1": {"player": "76561198000000001", "name": "Alpha", "mmr": 4200},
+            "2": {"steam_id": "76561198000000002", "player_name": "Beta", "score": "4100"},
+            "noise": {"player": "123", "name": "Not Steam64"},
+        },
+    }
+
+    players = NetTableCapture._extract_ranking_top_players(raw, scanned_at)
+
+    assert players == [
+        {
+            "steam_id": "76561198000000001",
+            "name": "Alpha",
+            "rank": 1,
+            "mmr": 4200,
+            "season": "s40",
+            "seen_at": scanned_at,
+        },
+        {
+            "steam_id": "76561198000000002",
+            "name": "Beta",
+            "rank": 2,
+            "mmr": 4100,
+            "season": "s40",
+            "seen_at": scanned_at,
+        },
+    ]

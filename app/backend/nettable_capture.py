@@ -1,7 +1,7 @@
 """Automatic NetTable capture from Dota's console.log.
 
 Flow:
-    1. On startup, install autoexec.cfg (binds dump-key to dac_dump_all) into
+    1. On startup, install autoexec.cfg (binds dump keys) into
        <dota>/game/dota/cfg/.
     2. Tail console.log non-blockingly. Three triggers matter:
        - DOTA_GAMERULES_STATE_GAME_IN_PROGRESS: opens the match session window.
@@ -11,8 +11,9 @@ Flow:
          when it stabilises (~2s without new [stringtables] lines), ingest
          to Supabase.
     3. Dumps are produced by the continuous SendInput cascade (see
-       _run_key_poller) — no scheduled timers; the poller fires F20 every
-       2s and the full cascade (PAUSE, F11, F13, F15, F16, F20) every 15s
+       _run_key_poller) — no scheduled timers; the poller fires F23 every
+       2s, the full cascade (F21, F22, F23) every 15s, and one
+       F24 lobby metadata dump when a match/session opens
        while Dota is foreground.
 
 Emits events via the headless _emit callback:
@@ -53,7 +54,7 @@ _STORAGE_DROP_TABLES = frozenset({
 })
 
 _STORAGE_DROP_KEYS: dict[str, frozenset[str]] = {
-    "player_id_table": frozenset({"chessboard", "courier", "vchess", "mmr_level"}),
+    "player_id_table": frozenset({"chessboard", "courier"}),
     "game_info": frozenset({"game_version", "quest"}),
 }
 
@@ -75,68 +76,31 @@ def _storage_filter(rows: list[dict]) -> list[dict]:
 
 # ── autoexec.cfg payload (single source of truth, written verbatim) ──────────
 
-# Static reference tables we've already snapshotted to fixtures
-# (ability definitions, chess piece stats, user UI settings) are
-# excluded from the live bind — they're ~95% of dump volume and never
-# change between games. If we ever need them refreshed (e.g. after a
-# DAC patch), add them back temporarily and run a single capture.
-_DUMP_COMMANDS_INLINE = (
-    "dumpstringtable CustomNetTable_ranking_top_table cl verbose;"
-    "dumpstringtable CustomNetTable_match_history_tab cl verbose;"
-    "dumpstringtable CustomNetTable_dac_table cl verbose;"
-    "dumpstringtable CustomNetTable_player_id_table cl verbose;"
-    "dumpstringtable CustomNetTable_player_info_table cl verbose;"
-    "dumpstringtable CustomNetTable_game_info cl verbose;"
-    "dumpstringtable CustomNetTable_hp_bar_table cl verbose"
-)
-
 AUTOEXEC_CFG_CONTENT = f"""// DAC NetTable dump triggers — installed by DAC Tracker.
 //
-// All binds use extended F-keys (F21-F25) to avoid conflicting with
+// All binds use extended F-keys (F20-F25) to avoid conflicting with
 // user keyboard shortcuts. One table per key.
 //
 // Cascade keys (fired automatically by the tracker):
 //   F21 → dac_table            ← end_board at match end (critical)
 //   F22 → player_info_table    ← live per-player state (every 15s)
 //   F23 → game_info            ← round_info + death_team (every 2s)
-//   F24 → player_id_table      ← steam_id → slot mapping (once at match start)
+//   F20 → player_id_table      ← board/items/relics (every 30s + post-game)
+//   F24 → ranking_top_table + player_id_table
+//                                ← Queen ladder + steam_id → slot mapping
+//                                  (once per match/session opening)
 //   F16 → chess_pool_table     ← bans / legendaries (every 5 min)
 //
 // Debug key (not in cascade — manual only):
 //   F25 → unit_table           ← chess pieces on board
 
-// Clear stale dump binds from older autoexec versions / manual tests, so they
-// don't accumulate in Dota's saved keybinds. Keys we no longer drive:
-unbind "F13"
-unbind "F15"
-unbind "F20"
-unbind "INS"
-unbind "PAUSE"
-
+bind "F20" "dumpstringtable CustomNetTable_player_id_table cl verbose"
 bind "F21" "dumpstringtable CustomNetTable_dac_table cl verbose"
 bind "F22" "dumpstringtable CustomNetTable_player_info_table cl verbose"
 bind "F23" "dumpstringtable CustomNetTable_game_info cl verbose"
-bind "F24" "dumpstringtable CustomNetTable_player_id_table cl verbose"
+bind "F24" "dumpstringtable CustomNetTable_ranking_top_table cl verbose;dumpstringtable CustomNetTable_player_id_table cl verbose"
 bind "F16" "dumpstringtable CustomNetTable_chess_pool_table cl verbose"
 bind "F25" "dumpstringtable CustomNetTable_unit_table cl verbose"
-"""
-
-DAC_DUMP_CFG_CONTENT = """// DAC NetTable dump commands — installed by DAC Tracker.
-// Invoked via `exec dac_dump` (bind or manual paste).
-//
-// Leading `echo DAC_DUMP_FIRED` is a diagnostic marker the tailer
-// surfaces so we can confirm the file actually executed even when
-// every table is empty.
-
-echo DAC_DUMP_FIRED
-dumpstringtable CustomNetTable_ranking_top_table cl verbose
-dumpstringtable CustomNetTable_match_history_tab cl verbose
-dumpstringtable CustomNetTable_dac_table cl verbose
-dumpstringtable CustomNetTable_player_id_table cl verbose
-dumpstringtable CustomNetTable_player_info_table cl verbose
-dumpstringtable CustomNetTable_game_info cl verbose
-dumpstringtable CustomNetTable_chess_pool_table cl verbose
-dumpstringtable CustomNetTable_hp_bar_table cl verbose
 """
 
 
@@ -164,10 +128,6 @@ def find_console_log(dota_dir: Path) -> Path:
 
 def find_autoexec_target(dota_dir: Path) -> Path:
     return dota_dir / "game" / "dota" / "cfg" / "autoexec.cfg"
-
-
-def find_dac_dump_cfg_target(dota_dir: Path) -> Path:
-    return dota_dir / "game" / "dota" / "cfg" / "dac_dump.cfg"
 
 
 # ── Steam launch-options lookup (authoritative source for -condebug etc.) ────
@@ -648,11 +608,12 @@ def find_dota_hwnd() -> int | None:
 WM_KEYDOWN = 0x0100
 WM_KEYUP = 0x0101
 WM_CHAR = 0x0102
+VK_F20 = 0x83     # player_id_table (board/items/relics)
 VK_F16 = 0x7F     # chess_pool_table
 VK_F21 = 0x84     # dac_table (end_board)
 VK_F22 = 0x85     # player_info_table (live state)
 VK_F23 = 0x86     # game_info (round/death)
-VK_F24 = 0x87     # player_id_table (steam_id mapping)
+VK_F24 = 0x87     # ranking_top_table + player_id_table
 VK_F25 = 0x88     # unit_table (board pieces — debug)
 
 
@@ -991,13 +952,15 @@ POST_GAME_RE = "DOTA_GAMERULES_STATE_POST_GAME"
 STRINGTABLE_MARKER = "[stringtables]"
 PAUSE_FIRED_MARKER = "DAC_DUMP_FIRED"
 
-# How often the backend fires F20 (game_info) for cheap round visibility.
+# How often the backend fires F23 (game_info) for cheap round visibility.
 # Mirrors the role AHK's PollRound timer used to play, now in-process.
 POLL_INTERVAL_SEC = 2.0
 # How often the backend fires the full cascade (dac_table + player_info +
-# unit + player_id + chess_pool + game_info). Heavier — gives a complete
-# state snapshot.
+# game_info). Heavier — gives a complete core state snapshot.
 FULL_CASCADE_INTERVAL_SEC = 15.0
+# How often to refresh player_id_table after the initial lobby metadata dump.
+# This table includes vchess_* board positions/items and relic_ttl_* windows.
+PLAYER_ID_DUMP_INTERVAL_SEC = 30.0
 # chess_pool_table (bans, legendaries, relic pool) on a slower cadence than the
 # full cascade, but not so slow that newly-revealed legendaries take minutes to
 # surface in the live view. 60s keeps it cheap (one extra key/min) while staying
@@ -1011,7 +974,8 @@ CASCADE_KEY_GAP_SEC = 0.2
 DEBUG_DUMP_TIMEOUT_SEC = 4.0
 
 # The keys the cascade fires, in order. Mirrors the autoexec binds.
-# F16 (chess_pool_table) runs on its own timer, not in the cascade.
+# F20 (player_id_table) and F16 (chess_pool_table) run on their own timers.
+# F24 (ranking_top_table + player_id_table) runs once per match/session opening.
 CASCADE_VK_SEQUENCE = (VK_F21, VK_F22, VK_F23)
 
 # Wait this long after POST_GAME before sending dump-key again. The `end_board`
@@ -1137,6 +1101,11 @@ class NetTableCapture:
         # extracted players without guessing.
         self._last_local_steam_ids: list[str] = []
 
+        # Fired once per match/session opening. F24 dumps both Queen ladder
+        # metadata and the current lobby's slot mapping.
+        self._lobby_metadata_fired = False
+        self._last_player_id_dump_at = 0.0
+
         # Status signature used by the poll thread to decide whether to re-emit.
         self._last_status_signature: tuple = ()
 
@@ -1179,9 +1148,12 @@ class NetTableCapture:
         k.start()
 
     def _run_key_poller(self) -> None:
-        """Fires F23 every 2s and the full cascade every 15s, but only while
-        Dota is the foreground window AND the GSI feed confirms a DAC game.
-        On startup, fires one immediate cascade to catch mid-game launches."""
+        """Fires F23 every 2s, core cascades every 15s, and player boards every 30s.
+
+        The steady-state loop only runs while Dota is foreground and GSI says
+        DAC is active. On startup, an immediate catch-up cascade handles
+        mid-game launches before the first GSI tick arrives.
+        """
         last_full_cascade = 0.0
         last_pool_dump = 0.0
         # Catch-up: if Dota is already running, fire a full cascade
@@ -1192,7 +1164,7 @@ class NetTableCapture:
             for vk in CASCADE_VK_SEQUENCE:
                 send_input_key(vk)
                 time.sleep(CASCADE_KEY_GAP_SEC)
-            send_input_key(VK_F24)
+            self._fire_lobby_metadata_dump("poller start")
             send_input_key(VK_F16)
             last_full_cascade = time.time()
             last_pool_dump = time.time()
@@ -1200,6 +1172,8 @@ class NetTableCapture:
             now = time.time()
             try:
                 if _is_dota_foreground() and self._is_dac_active() and not self._paused:
+                    if not self._lobby_metadata_fired:
+                        self._fire_lobby_metadata_dump("DAC active")
                     if now - last_full_cascade >= FULL_CASCADE_INTERVAL_SEC:
                         last_full_cascade = now
                         for vk in CASCADE_VK_SEQUENCE:
@@ -1208,8 +1182,10 @@ class NetTableCapture:
                             send_input_key(vk)
                             time.sleep(CASCADE_KEY_GAP_SEC)
                     else:
-                        # Cheap poll — just F20 (game_info → round_info).
+                        # Cheap poll — just F23 (game_info → round_info).
                         send_input_key(VK_F23)
+                    if now - self._last_player_id_dump_at >= PLAYER_ID_DUMP_INTERVAL_SEC:
+                        self._fire_player_id_dump("periodic board/items refresh")
                     # chess_pool_table on its own slow timer — bans update
                     # each round but don't need 15s polling.
                     if now - last_pool_dump >= POOL_DUMP_INTERVAL_SEC:
@@ -1280,20 +1256,33 @@ class NetTableCapture:
                  "ENABLED" if enabled else "DISABLED")
         self.emit_status()
 
-    # Ordered (vk, table) pairs for the debug dump sequence — one key per table.
+    def _fire_lobby_metadata_dump(self, reason: str) -> None:
+        send_input_key(VK_F24)
+        self._lobby_metadata_fired = True
+        self._last_player_id_dump_at = time.time()
+        log.info("nettable: fired F24 (ranking_top_table + player_id_table) at %s", reason)
+
+    def _fire_player_id_dump(self, reason: str) -> None:
+        send_input_key(VK_F20)
+        self._last_player_id_dump_at = time.time()
+        log.info("nettable: fired F20 (player_id_table) at %s", reason)
+
+    # Ordered (vk, tables) pairs for the debug dump sequence.
     _DEBUG_DUMP_SEQUENCE = (
-        (VK_F21, "CustomNetTable_dac_table"),
-        (VK_F22, "CustomNetTable_player_info_table"),
-        (VK_F23, "CustomNetTable_game_info"),
-        (VK_F24, "CustomNetTable_player_id_table"),
-        (VK_F16, "CustomNetTable_chess_pool_table"),
-        (VK_F25, "CustomNetTable_unit_table"),
+        (VK_F21, ("CustomNetTable_dac_table",)),
+        (VK_F22, ("CustomNetTable_player_info_table",)),
+        (VK_F23, ("CustomNetTable_game_info",)),
+        (VK_F20, ("CustomNetTable_player_id_table",)),
+        (VK_F24, (
+            "CustomNetTable_ranking_top_table",
+            "CustomNetTable_player_id_table",
+        )),
+        (VK_F16, ("CustomNetTable_chess_pool_table",)),
+        (VK_F25, ("CustomNetTable_unit_table",)),
     )
 
     def debug_dump_sequence(self) -> None:
-        """Debug hotkey: fire each table's dump key one at a time and confirm
-        the dump actually landed in console.log before moving to the next, so
-        you can see exactly which of the six tables are working.
+        """Debug hotkey: fire each dump key and confirm the table output.
 
         Detection reuses the live tailer — _note_dump_line stamps
         _dump_last_seen[table] whenever a dump block for that table is read, so
@@ -1313,28 +1302,28 @@ class NetTableCapture:
             return
 
         results = []
-        for vk, table in self._DEBUG_DUMP_SEQUENCE:
-            short = table.removeprefix(CUSTOM_NETTABLE_PREFIX)
-            before = self._dump_last_seen.get(table, 0.0)
+        for vk, tables in self._DEBUG_DUMP_SEQUENCE:
+            before = {table: self._dump_last_seen.get(table, 0.0) for table in tables}
             send_input_key(vk)
             deadline = time.time() + DEBUG_DUMP_TIMEOUT_SEC
-            detected = False
             while time.time() < deadline and not self._stop.is_set():
-                if self._dump_last_seen.get(table, 0.0) > before:
-                    detected = True
+                if all(self._dump_last_seen.get(table, 0.0) > before[table] for table in tables):
                     break
                 time.sleep(0.1)
-            rows = self._dump_last_rows.get(table) if detected else None
-            status = "NO DUMP" if not detected else (f"{rows} rows" if rows else "EMPTY")
-            log.info("nettable: debug dump %s -> %s", short, status)
-            self._emit({
-                "type": "nettable_debug_dump",
-                "table": short,
-                "detected": detected,
-                "rows": rows,
-                "at": datetime.now().isoformat(),
-            })
-            results.append({"table": short, "detected": detected, "rows": rows})
+            for table in tables:
+                short = table.removeprefix(CUSTOM_NETTABLE_PREFIX)
+                detected = self._dump_last_seen.get(table, 0.0) > before[table]
+                rows = self._dump_last_rows.get(table) if detected else None
+                status = "NO DUMP" if not detected else (f"{rows} rows" if rows else "EMPTY")
+                log.info("nettable: debug dump %s -> %s", short, status)
+                self._emit({
+                    "type": "nettable_debug_dump",
+                    "table": short,
+                    "detected": detected,
+                    "rows": rows,
+                    "at": datetime.now().isoformat(),
+                })
+                results.append({"table": short, "detected": detected, "rows": rows})
 
         dumped = sum(1 for r in results if r["detected"])
         with_data = sum(1 for r in results if r.get("rows"))
@@ -1430,21 +1419,18 @@ class NetTableCapture:
             log.warning("nettable: Dota dir not found — autoexec not installed")
             return False
         ok = True
-        for dst, content, label in (
-            (find_autoexec_target(self._dota_dir), AUTOEXEC_CFG_CONTENT, "autoexec.cfg"),
-            (find_dac_dump_cfg_target(self._dota_dir), DAC_DUMP_CFG_CONTENT, "dac_dump.cfg"),
-        ):
-            try:
-                dst.parent.mkdir(parents=True, exist_ok=True)
-                desired = content.encode("utf-8")
-                if dst.exists() and _sha256(dst.read_bytes()) == _sha256(desired):
-                    log.info("nettable: %s already current at %s", label, dst)
-                    continue
-                dst.write_bytes(desired)
-                log.info("nettable: wrote %s to %s", label, dst)
-            except Exception as e:
-                log.warning("nettable: failed to install %s: %s", label, e)
-                ok = False
+        dst = find_autoexec_target(self._dota_dir)
+        try:
+            dst.parent.mkdir(parents=True, exist_ok=True)
+            desired = AUTOEXEC_CFG_CONTENT.encode("utf-8")
+            if dst.exists() and _sha256(dst.read_bytes()) == _sha256(desired):
+                log.info("nettable: autoexec.cfg already current at %s", dst)
+                return ok
+            dst.write_bytes(desired)
+            log.info("nettable: wrote autoexec.cfg to %s", dst)
+        except Exception as e:
+            log.warning("nettable: failed to install autoexec.cfg: %s", e)
+            ok = False
         return ok
 
     # ── Tail loop ──────────────────────────────────────────────────────────
@@ -1517,6 +1503,8 @@ class NetTableCapture:
         self._dump_active = False
         self._dump_seen_tables = set()
         self._dump_last_line_ts = 0.0
+        self._lobby_metadata_fired = False
+        self._last_player_id_dump_at = 0.0
 
     # ── Line handlers ──────────────────────────────────────────────────────
 
@@ -1541,8 +1529,9 @@ class NetTableCapture:
                 self._personal_end_recorded = False
                 self._post_game_at = None
                 self._end_board_captured = False
-                send_input_key(VK_F24)
-                log.info("nettable: fired F24 (player_id_table) at match start")
+                self._lobby_metadata_fired = False
+                self._last_player_id_dump_at = 0.0
+                self._fire_lobby_metadata_dump("match start")
 
         # Game state — POST_GAME tells us a match ended. Fire PAUSE
         # immediately via SendInput so dac_table.end_board is captured
@@ -1587,6 +1576,11 @@ class NetTableCapture:
                 return
             send_input_key(VK_F21)
             log.info("nettable: post-game F21 (dac_table) fire %d/%d", i + 1, POST_GAME_PAUSE_BURST_COUNT)
+            if i == 0:
+                self._stop.wait(CASCADE_KEY_GAP_SEC)
+                if self._stop.is_set():
+                    return
+                self._fire_player_id_dump("post-game board/items snapshot")
             self._stop.wait(POST_GAME_PAUSE_BURST_GAP_SEC)
 
     def _check_end_board_fallback(self) -> None:
@@ -1834,10 +1828,71 @@ class NetTableCapture:
                 })
             break
 
+    @staticmethod
+    def _first_present_int(source: dict, keys: tuple[str, ...], *, lo: int | None = None) -> int | None:
+        for key in keys:
+            val = source.get(key)
+            if val in (None, ""):
+                continue
+            try:
+                n = int(str(val).strip())
+            except (TypeError, ValueError):
+                continue
+            if lo is not None and n < lo:
+                continue
+            return n
+        return None
+
+    @staticmethod
+    def _first_present_str(source: dict, keys: tuple[str, ...]) -> str | None:
+        for key in keys:
+            val = source.get(key)
+            if val in (None, ""):
+                continue
+            text = str(val).strip()
+            if text:
+                return text
+        return None
+
+    @classmethod
+    def _extract_ranking_top_players(cls, raw: dict, scanned_at: str) -> list[dict]:
+        """Return normalized Queen-ladder rows from ranking_top_table.
+
+        Drodo has changed the exact field names in this CustomNetTable over
+        time, so this accepts a small set of observed/likely aliases instead
+        of depending on one brittle shape.
+        """
+        top = raw.get("ranking_top") or {}
+        if not isinstance(top, dict):
+            return []
+        season = cls._first_present_str(raw, ("season", "current_season", "season_id"))
+        players: list[dict] = []
+        for fallback_rank, entry in enumerate(top.values(), start=1):
+            if not isinstance(entry, dict):
+                continue
+            steam_id = cls._first_present_str(entry, (
+                "steam_id", "steamid", "player", "player_id", "uid", "id",
+            ))
+            if not steam_id or not steam_id.startswith("7656"):
+                continue
+            players.append({
+                "steam_id": steam_id,
+                "name": cls._first_present_str(entry, (
+                    "name", "player_name", "nick_name", "nickname", "user_name",
+                )),
+                "rank": cls._first_present_int(entry, (
+                    "rank", "ranking", "queen_rank", "ladder_rank", "index", "place",
+                ), lo=1) or fallback_rank,
+                "mmr": cls._first_present_int(entry, (
+                    "mmr", "score", "rank_score", "season_mmr", "points",
+                ), lo=0),
+                "season": season,
+                "seen_at": scanned_at,
+            })
+        return players
+
     def _maybe_extract_ranking_top(self, rows: list[dict]) -> None:
-        """Find ranking_top_table.ranking_top and emit an event with the
-        player count. The actual player profiles live in Supabase — no
-        local file writes."""
+        """Find ranking_top_table.ranking_top and upsert discovered Queen players."""
         for r in rows:
             if not (r.get("table_name", "").endswith("ranking_top_table")
                     and r.get("key") == "ranking_top"):
@@ -1845,20 +1900,25 @@ class NetTableCapture:
             raw = r.get("raw")
             if not isinstance(raw, dict):
                 continue
-            top = raw.get("ranking_top") or {}
-            if not isinstance(top, dict):
-                continue
-            season = raw.get("season") or ""
-            scanned_at = datetime.now().isoformat()
-            player_count = sum(
-                1 for entry in top.values()
-                if isinstance(entry, dict) and str(entry.get("player") or "").startswith("7656")
-            )
+            scanned_at = datetime.now().astimezone().isoformat()
+            players = self._extract_ranking_top_players(raw, scanned_at)
+            player_count = len(players)
             if player_count > 0:
-                log.info("nettable: ranking_top scan found %d player(s)", player_count)
+                pushed = 0
+                try:
+                    from db import upsert_queen_ladder_players
+                    pushed = upsert_queen_ladder_players(players)
+                except Exception as e:
+                    log.warning("nettable: queen ladder upsert failed: %s", e)
+                season = players[0].get("season") or ""
+                log.info(
+                    "nettable: ranking_top scan found %d player(s), upserted %d",
+                    player_count, pushed,
+                )
                 self._emit({
                     "type": "nettable_ranking_scanned",
                     "player_count": player_count,
+                    "upserted_count": pushed,
                     "season": season,
                     "at": scanned_at,
                 })

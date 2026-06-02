@@ -10,7 +10,7 @@ interface PageLayoutProps {
 
 /**
  * Shared page chrome for top-level routes (talents, ranks, leaderboard,
- * admin/matches). Provides the same max-width + padding as the EntityBrowser
+ * matches). Provides the same max-width + padding as the EntityBrowser
  * pages (units, classes, species, items, relics) so the site reads as one
  * consistent layout instead of each page picking its own gutter.
  */

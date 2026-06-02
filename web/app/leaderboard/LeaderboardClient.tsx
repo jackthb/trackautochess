@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { levelToRankName, mmrToLevel } from "@/lib/ranks";
 import { playerProfilePath } from "@/lib/steam";
 import { createSupabaseClient } from "@/lib/supabase";
-import { isAdminSteamId } from "@/lib/admin";
+import { useBetaFeaturesAccess } from "@/lib/betaFeatures";
 import { PageLayout } from "@/components/PageLayout";
 import styles from "./leaderboard.module.css";
 
@@ -29,10 +29,17 @@ interface LeaderboardData {
 
 type Phase = "loading" | "forbidden" | "ready" | "error";
 
+interface ViewerSession {
+  token: string | null;
+  steamId: string | null;
+}
+
 export function LeaderboardClient() {
   const [phase, setPhase] = useState<Phase>("loading");
+  const [viewerSession, setViewerSession] = useState<ViewerSession | null>(null);
   const [data, setData] = useState<LeaderboardData | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const betaAccess = useBetaFeaturesAccess(viewerSession?.steamId ?? null);
 
   useEffect(() => {
     const supabase = createSupabaseClient();
@@ -42,14 +49,50 @@ export function LeaderboardClient() {
     }
     let cancelled = false;
 
-    const load = async (token: string | null, steamId: string | null) => {
-      if (!isAdminSteamId(steamId) || !token) {
-        if (!cancelled) setPhase("forbidden");
-        return;
+    supabase.auth.getSession().then(({ data: sessionData }) => {
+      const meta = sessionData.session?.user?.user_metadata as
+        | { steam_id?: unknown }
+        | null
+        | undefined;
+      const steamId = meta && typeof meta.steam_id === "string" ? meta.steam_id : null;
+      if (!cancelled) {
+        setViewerSession({
+          token: sessionData.session?.access_token ?? null,
+          steamId,
+        });
       }
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!viewerSession) {
+      setPhase("loading");
+      return;
+    }
+    if (!viewerSession.token || !viewerSession.steamId) {
+      setPhase("forbidden");
+      return;
+    }
+    if (betaAccess === "loading") {
+      setPhase("loading");
+      return;
+    }
+    if (betaAccess !== "enabled") {
+      setPhase("forbidden");
+      return;
+    }
+
+    let cancelled = false;
+
+    const load = async () => {
+      setPhase("loading");
       try {
         const resp = await fetch("/api/leaderboard", {
-          headers: { Authorization: `Bearer ${token}` },
+          headers: { Authorization: `Bearer ${viewerSession.token}` },
         });
         if (!resp.ok) {
           const body = await resp.json().catch(() => null);
@@ -72,19 +115,12 @@ export function LeaderboardClient() {
       }
     };
 
-    supabase.auth.getSession().then(({ data: sessionData }) => {
-      const meta = sessionData.session?.user?.user_metadata as
-        | { steam_id?: unknown }
-        | null
-        | undefined;
-      const steamId = meta && typeof meta.steam_id === "string" ? meta.steam_id : null;
-      void load(sessionData.session?.access_token ?? null, steamId);
-    });
+    void load();
 
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [betaAccess, viewerSession]);
 
   const seasonLabel = data?.currentSeason ? data.currentSeason.toUpperCase() : "current season";
   const rows = data?.rows ?? [];
@@ -95,7 +131,7 @@ export function LeaderboardClient() {
 
       {phase === "forbidden" && (
         <div className={styles.gate}>
-          This page is restricted. Sign in with the admin Steam account to view it.
+          This page is restricted. Sign in with a beta-enabled Steam account to view it.
         </div>
       )}
 

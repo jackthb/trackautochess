@@ -10,7 +10,7 @@ Config keys in ~/.dac/config.json:
 
 import json
 import logging
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from utils import load_config, local_only_mode
 
@@ -18,6 +18,7 @@ log = logging.getLogger("dac.db")
 
 _client = None  # lazy-init
 _local_only_logged = False
+QUEEN_LADDER_UPDATE_MIN_INTERVAL = timedelta(hours=1)
 
 
 def _get_client():
@@ -97,6 +98,52 @@ def _safe_int(val, lo=None, hi=None):
         return n
     except (ValueError, TypeError):
         return None
+
+
+def _parse_iso_datetime(value) -> datetime | None:
+    if not isinstance(value, str) or not value.strip():
+        return None
+    try:
+        normalized = value.strip().replace("Z", "+00:00")
+        parsed = datetime.fromisoformat(normalized)
+        return parsed.astimezone() if parsed.tzinfo is not None else parsed
+    except ValueError:
+        return None
+
+
+def _queen_ladder_recently_updated(client, now: datetime) -> bool:
+    """Return True when the DB already has a Queen ladder scan from the last hour.
+
+    This is intentionally global, not per-client: if a few beta EXEs are
+    running at once, only one should refresh the website's Queen ladder row set
+    per hour.
+    """
+    try:
+        resp = client.get(
+            "/rest/v1/users",
+            params={
+                "select": "queen_ladder_last_seen_at",
+                "queen_ladder_last_seen_at": "not.is.null",
+                "order": "queen_ladder_last_seen_at.desc",
+                "limit": "1",
+            },
+            headers={"Accept": "application/json"},
+        )
+        resp.raise_for_status()
+        rows = resp.json()
+        if not isinstance(rows, list) or not rows:
+            return False
+        last_seen = _parse_iso_datetime(rows[0].get("queen_ladder_last_seen_at"))
+        if last_seen is None:
+            return False
+        if last_seen.tzinfo is None and now.tzinfo is not None:
+            last_seen = last_seen.replace(tzinfo=now.tzinfo)
+        return now - last_seen < QUEEN_LADDER_UPDATE_MIN_INTERVAL
+    except Exception as e:
+        # The throttle is a max-cadence guard. If we cannot prove the last
+        # update is old enough, skip rather than risk hammering the ladder.
+        log.warning("queen ladder throttle check failed; skipping update: %s", e)
+        return True
 
 
 def generate_live_match_id(end_board: dict) -> str:
@@ -226,6 +273,84 @@ def push_match_players(match_id: str, players: list[dict]) -> int:
         log.error("push_match_players error: %s | body: %s", e, body)
         return 0
 
+
+
+def upsert_queen_ladder_players(players: list[dict]) -> int:
+    """Upsert player identities discovered from the in-game Queen ladder.
+
+    The ranking_top_table payload is the only place the desktop app can see
+    the top Queen ladder without somebody searching each player manually. We
+    cache the Steam IDs plus lightweight ladder metadata in `users`; the web
+    cron can later hydrate full Drodo profiles from those users rows.
+    """
+    if not players:
+        return 0
+
+    client = _get_client()
+    if client is None:
+        return 0
+
+    now_dt = datetime.now().astimezone()
+    if _queen_ladder_recently_updated(client, now_dt):
+        log.info("queen ladder upsert skipped — updated within the last hour")
+        return 0
+
+    seen: set[int] = set()
+    rows = []
+    now = now_dt.isoformat()
+    for p in players:
+        try:
+            steam_id = int(str(p.get("steam_id") or "").strip())
+        except (TypeError, ValueError):
+            continue
+        if steam_id in seen:
+            continue
+        seen.add(steam_id)
+
+        row: dict = {
+            "steam_id": steam_id,
+            "queen_ladder_last_seen_at": p.get("seen_at") or now,
+        }
+        name = str(p.get("name") or "").strip()
+        if name:
+            row["name"] = name
+        season = str(p.get("season") or "").strip()
+        if season:
+            row["queen_ladder_season"] = season
+        rank = _safe_int(p.get("rank"), lo=1)
+        if rank is not None:
+            row["queen_ladder_rank"] = rank
+        mmr = _safe_int(p.get("mmr"), lo=0)
+        if mmr is not None:
+            row["queen_ladder_mmr"] = mmr
+            # The Queen ladder consists of Queen players; setting these fields
+            # lets public leaderboards show them immediately, before a Drodo
+            # profile refresh fills in richer season stats.
+            row.setdefault("drodo_mmr", mmr)
+            row.setdefault("drodo_mmr_level", 38)
+        rows.append(row)
+
+    if not rows:
+        return 0
+
+    try:
+        resp = client.post(
+            "/rest/v1/users",
+            json=rows,
+            headers={"Prefer": "resolution=merge-duplicates,return=minimal"},
+        )
+        resp.raise_for_status()
+        log.info("upserted %d queen ladder user row(s)", len(rows))
+        return len(rows)
+    except Exception as e:
+        body = ""
+        if hasattr(e, "response") and e.response is not None:
+            try:
+                body = e.response.text
+            except Exception:
+                pass
+        log.error("upsert_queen_ladder_players error: %s | body: %s", e, body)
+        return 0
 
 def lookup_users_by_name(names: list[str]) -> dict[str, int]:
     """Look up existing users by display name (case-insensitive).
