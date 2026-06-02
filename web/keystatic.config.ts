@@ -1,11 +1,13 @@
 import { collection, config, fields } from "@keystatic/core";
 
-const githubRepo = process.env.KEYSTATIC_GITHUB_REPO as
-  | `${string}/${string}`
-  | undefined;
+const githubRepo = "jackthb/dac-tools" as const;
+const useGithubStorage = Boolean(
+  process.env.NEXT_PUBLIC_KEYSTATIC_GITHUB_APP_SLUG &&
+    process.env.NODE_ENV === "production",
+);
 
 const storage =
-  githubRepo && process.env.NODE_ENV === "production"
+  useGithubStorage
     ? ({
         kind: "github",
         repo: githubRepo,

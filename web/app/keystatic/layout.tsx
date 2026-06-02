@@ -1,5 +1,5 @@
-import KeystaticApp from "./keystatic";
+import AdminGate from "./AdminGate";
 
 export default function KeystaticLayout() {
-  return <KeystaticApp />;
+  return <AdminGate />;
 }
