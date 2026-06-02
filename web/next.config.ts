@@ -1,6 +1,20 @@
 import type { NextConfig } from "next";
 import { withBotId } from "botid/next/config";
+import { cpSync, existsSync } from "fs";
 import path from "path";
+
+function syncPublicIcons() {
+  const source = path.resolve(__dirname, "../data/icons");
+  const target = path.resolve(__dirname, "public/icons");
+
+  if (existsSync(source)) {
+    cpSync(source, target, { recursive: true, force: true });
+  }
+}
+
+// Vercel may invoke `next build` directly, bypassing package.json prebuild.
+// Keep gitignored public icons present before Next snapshots static assets.
+syncPublicIcons();
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
@@ -22,8 +36,27 @@ const nextConfig: NextConfig = {
         value: "public, max-age=31536000, immutable",
       },
     ];
+    const immutableImageCache = [
+      {
+        key: "Cache-Control",
+        value: "public, max-age=31536000, immutable",
+      },
+      {
+        key: "CDN-Cache-Control",
+        value: "public, max-age=31536000, immutable",
+      },
+      {
+        key: "Vercel-CDN-Cache-Control",
+        value: "public, max-age=31536000, immutable",
+      },
+    ];
 
     return [
+      {
+        source: "/icons/:path*",
+        locale: false,
+        headers: immutableImageCache,
+      },
       {
         source: "/fonts/:path*",
         locale: false,
@@ -32,22 +65,12 @@ const nextConfig: NextConfig = {
       {
         source: "/logo.svg",
         locale: false,
-        headers: [
-          {
-            key: "Cache-Control",
-            value: "public, max-age=86400, stale-while-revalidate=604800",
-          },
-        ],
+        headers: immutableImageCache,
       },
       {
         source: "/favicon.ico",
         locale: false,
-        headers: [
-          {
-            key: "Cache-Control",
-            value: "public, max-age=86400, stale-while-revalidate=604800",
-          },
-        ],
+        headers: immutableImageCache,
       },
     ];
   },

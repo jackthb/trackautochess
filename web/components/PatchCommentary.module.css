@@ -92,17 +92,19 @@
 }
 
 .evidenceItem {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
+  display: grid;
+  grid-template-columns: max-content minmax(0, 1fr);
+  align-items: start;
   gap: var(--s-8);
   font-size: var(--fs-12);
   line-height: var(--lh-body);
   color: var(--text-secondary);
+  min-width: 0;
 }
 
 .evidenceSource {
-  flex-shrink: 0;
+  width: max-content;
+  max-width: 100%;
   font-size: var(--fs-10);
   letter-spacing: var(--tr-upper);
   text-transform: uppercase;
@@ -114,7 +116,6 @@
 }
 
 .evidenceDetail {
-  flex: 1 1 auto;
   min-width: 0;
   /* Evidence details quote raw file paths / identifiers like
      scripts/vscripts/addon_game_mode.lua and item_jixiezhixin_gold — long
@@ -125,7 +126,8 @@
 }
 
 .evidenceLink {
-  flex-shrink: 0;
+  grid-column: 2;
+  width: max-content;
   color: var(--accent-dim);
   text-decoration: underline;
   text-underline-offset: 2px;
@@ -134,6 +136,16 @@
 
 .evidenceLink:hover {
   color: var(--accent);
+}
+
+@media (max-width: 560px) {
+  .evidenceItem {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .evidenceLink {
+    grid-column: 1;
+  }
 }
 
 /* Entity-page list: each record gets the change context (patch, date, kind)
