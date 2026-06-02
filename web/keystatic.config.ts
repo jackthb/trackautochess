@@ -54,6 +54,26 @@ const entryKind = fields.select({
   defaultValue: "change",
 });
 
+const entityReference = fields.object(
+  {
+    type: fields.select({
+      label: "Type",
+      options: [
+        { label: "Unit", value: "unit" },
+        { label: "Item", value: "item" },
+        { label: "Synergy", value: "synergy" },
+        { label: "Relic", value: "relic" },
+      ],
+      defaultValue: "unit",
+    }),
+    slug: fields.text({
+      label: "Slug",
+      description: "URL slug of the linked unit, item, synergy, or relic.",
+    }),
+  },
+  { label: "Linked entity" },
+);
+
 export default config({
   storage,
   collections: {
@@ -83,7 +103,7 @@ export default config({
                 name: fields.text({ label: "Name" }),
                 detail: fields.text({ label: "Detail", multiline: true }),
                 commentary: fields.text({ label: "Commentary", multiline: true }),
-                entity: fields.ignored(),
+                entity: entityReference,
                 evidence: fields.ignored(),
               }),
               {
