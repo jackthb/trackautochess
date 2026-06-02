@@ -2,6 +2,7 @@
   "gameId": "item_gulonghaojiao",
   "name": "Minotaur Horn",
   "slug": "minotaur-horn",
+  "icon": "items/minotaur_horn.png",
   "source": {
     "name": "Minotaur Horn",
     "description": "Carrier counts as Dragon and has 100 initial mana.",

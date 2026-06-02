@@ -2,6 +2,7 @@
   "gameId": "chess_ds",
   "name": "DarkSeer",
   "slug": "darkseer",
+  "icon": "units/dark_seer.png",
   "source": {
     "id": "chess_ds",
     "cost": 2,

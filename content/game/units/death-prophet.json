@@ -2,6 +2,7 @@
   "gameId": "chess_dp",
   "name": "Death Prophet",
   "slug": "death-prophet",
+  "icon": "units/death_prophet.png",
   "source": {
     "id": "chess_dp",
     "cost": 4,

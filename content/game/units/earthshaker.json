@@ -2,6 +2,7 @@
   "gameId": "chess_es",
   "name": "Earthshaker",
   "slug": "earthshaker",
+  "icon": "units/earthshaker.png",
   "source": {
     "id": "chess_es",
     "cost": 3,

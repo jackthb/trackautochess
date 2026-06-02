@@ -2,6 +2,7 @@
   "gameId": "is_priest",
   "name": "Priest",
   "slug": "priest",
+  "icon": "synergies/priest.png",
   "source": {
     "name": "Priest",
     "description": "Priest Pieces are determined, and cannot be mind controlled.\nClass Perk: Salvation\n\nActive when you have at least (N) different Priest pieces on board. (Multiple effects stack)\n\n(2) Priests: Get a Tango when defeated in a home battle with courier health lost if your pieces on board are less than your max pieces capacity.\n(4) Priest: Every Priest piece will Mind Control an enemy whose level equals to or less than itself if your pieces on board are less than your max pieces capacity. (Max control count = Your capacity - Your pieces on board)",

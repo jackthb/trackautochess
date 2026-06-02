@@ -2,6 +2,7 @@
   "gameId": "item_xiangweixie",
   "name": "Phase Boots",
   "slug": "phase-boots",
+  "icon": "items/phase_boots.png",
   "source": {
     "name": "Phase Boots",
     "description": "Enables quick movement.\n\nActive ability: Instant Activation\nMelee carriers will phase through obstacles, swiftly moving to the vicinity of an enemy chess piece with lower health in the range and prioritizing an attack on it.\n\nEffect Range:600",

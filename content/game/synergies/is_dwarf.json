@@ -2,6 +2,7 @@
   "gameId": "is_dwarf",
   "name": "Dwarf",
   "slug": "dwarf",
+  "icon": "synergies/dwarf.png",
   "source": {
     "name": "Dwarf",
     "description": "Species Trait: Take Aim\n\nActive when you have at least (N) different Dwarf pieces on board. (Multiple effects stack)\n\n(2) Dwarves: All dwarves’ attack range +200, physical damage deals 15% increased damage for every 1 square away from the target.",

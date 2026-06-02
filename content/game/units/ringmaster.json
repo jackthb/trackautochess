@@ -2,6 +2,7 @@
   "gameId": "chess_rm",
   "name": "Ringmaster",
   "slug": "ringmaster",
+  "icon": "units/ringmaster.png",
   "source": {
     "id": "chess_rm",
     "cost": 5,

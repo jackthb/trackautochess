@@ -2,6 +2,7 @@
   "gameId": "item_pingguo",
   "name": "Golden Enchanted Mango",
   "slug": "golden-enchanted-mango",
+  "icon": "items/golden_mango2.png",
   "source": {
     "name": "Golden Enchanted Mango",
     "description": "Courier consumable: Activate when taking fatal damage\nConsumes 1 charge of Golden Enchanted Mango and protects your Courier from fatal damage for this round.",

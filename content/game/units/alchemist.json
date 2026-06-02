@@ -2,6 +2,7 @@
   "gameId": "chess_ga",
   "name": "Alchemist",
   "slug": "alchemist",
+  "icon": "units/alchemist.png",
   "source": {
     "id": "chess_ga",
     "cost": 4,

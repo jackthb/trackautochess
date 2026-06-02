@@ -2,6 +2,7 @@
   "gameId": "item_xiwa",
   "name": "Shivas Guard",
   "slug": "shivas-guard",
+  "icon": "items/shivas_guard.png",
   "source": {
     "name": "Shivas Guard",
     "description": "+10 armor.\n\nActive ability: Instant\n Emits a freezing wave that slows the attack speed and healing effectiveness of enemies within 3 cells by 50% for 5 seconds and deals 100 magical damage.",

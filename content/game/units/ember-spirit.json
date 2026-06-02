@@ -2,6 +2,7 @@
   "gameId": "chess_ember",
   "name": "Ember Spirit",
   "slug": "ember-spirit",
+  "icon": "units/ember_spirit.png",
   "source": {
     "id": "chess_ember",
     "cost": 4,

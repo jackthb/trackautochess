@@ -2,6 +2,7 @@
   "gameId": "item_rank_damage",
   "name": "Defiant Shell",
   "slug": "defiant-shell",
+  "icon": "relics/defiant_shell.png",
   "source": {
     "name": "Defiant Shell",
     "description": "Reduces damage taken from home defeats or increases damage dealt in away-home victories by your current rank + 1.",

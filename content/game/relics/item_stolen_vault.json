@@ -2,6 +2,7 @@
   "gameId": "item_stolen_vault",
   "name": "Stolen Vault",
   "slug": "stolen-vault",
+  "icon": "relics/stolen_vault.png",
   "source": {
     "name": "Stolen Vault",
     "description": "Discard all 3 relics and get a Stolen Vault with random 10 ~ 15 gold.",

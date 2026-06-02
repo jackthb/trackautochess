@@ -2,6 +2,7 @@
   "gameId": "chess_sk",
   "name": "Sand King",
   "slug": "sand-king",
+  "icon": "units/sand_king.png",
   "source": {
     "id": "chess_sk",
     "cost": 3,

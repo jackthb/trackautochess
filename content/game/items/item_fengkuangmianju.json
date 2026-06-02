@@ -2,6 +2,7 @@
   "gameId": "item_fengkuangmianju",
   "name": "Mask of Madness",
   "slug": "mask-of-madness",
+  "icon": "items/mask_of_madness.png",
   "source": {
     "name": "Mask of Madness",
     "description": "+15% attack speed, lifesteal +20%, but silences the carrier.",

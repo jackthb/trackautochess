@@ -2,6 +2,7 @@
   "gameId": "chess_brew",
   "name": "Brewmaster",
   "slug": "brewmaster",
+  "icon": "units/brewmaster.png",
   "source": {
     "id": "chess_brew",
     "cost": 1,

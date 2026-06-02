@@ -2,6 +2,7 @@
   "gameId": "item_zhipeitoukui",
   "name": "Hell of the Dominator",
   "slug": "hell-of-the-dominator",
+  "icon": "items/helm_of_the_dominator.png",
   "source": {
     "name": "Hell of the Dominator",
     "description": "lifesteal + 15%.\n\nActive ability: Instant\nMind Controls a summoned or creep enemy whose level less than its owner’s level for 10 sec.",

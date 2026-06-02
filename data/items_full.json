@@ -20,7 +20,8 @@
     "lore_i18n": {
       "en": "With origins known only to a single wizard, fragments of this impossible crystal are nearly as coveted as the renowned scepter itself.",
       "ru": "Осколки этого загадочного кристалла почти так же ценны, как и сам легендарный скипетр."
-    }
+    },
+    "icon": "items/aghanims_shard.png"
   },
   "item_ahalimushenzhang": {
     "name": "Aghanims Scepter",
@@ -40,7 +41,8 @@
     "lore_i18n": {
       "en": "The scepter of a wizard with demigod-like powers.",
       "ru": "Скипетр мага с силой полубога."
-    }
+    },
+    "icon": "items/ultimate_scepter.png"
   },
   "item_aiweinazhiyu": {
     "name": "Avianas Feather",
@@ -57,7 +59,8 @@
       "en": "All damage dealt by carriers is considered as Magical damage.",
       "ru": "Весь урон нанесенный владельцем считается Магическим."
     },
-    "lore_i18n": {}
+    "lore_i18n": {},
+    "icon": "items/avianas_feather.png"
   },
   "item_anmie": {
     "name": "Desolator",
@@ -77,7 +80,8 @@
     "lore_i18n": {
       "en": "A wicked weapon, used in torturing political criminals.",
       "ru": "Жестокое оружие, используемое для пыток политических преступников."
-    }
+    },
+    "icon": "items/desolator.png"
   },
   "item_aoshuxie": {
     "name": "Arcane Boots",
@@ -96,7 +100,8 @@
       "en": "Fast movement.\n\nActive ability: Instant\nRestores 40 mana for all allies within the range.\n\nRange: 400",
       "ru": "Ускоренное передвижение.\n\nАктивка: Мгновенная\nДает 40 маны всем союзникам в области.\n\nРадиус: 400"
     },
-    "lore_i18n": {}
+    "lore_i18n": {},
+    "icon": "items/arcane_boots.png"
   },
   "item_baojunwangpao": {
     "name": "Cloak of Tyrants",
@@ -116,7 +121,8 @@
     "lore_i18n": {
       "en": "Only the fool shall question the authority of the Emperor.",
       "ru": "Лишь глупец осмелится поставить под сомнение власть Императора."
-    }
+    },
+    "icon": "items/baojunwangpao.png"
   },
   "item_bench_contract": {
     "name": "Magic Seed",
@@ -138,7 +144,8 @@
     "lore_i18n": {
       "en": "From Relic Box",
       "ru": "From Relic Box"
-    }
+    },
+    "icon": "items/magic_seed.png"
   },
   "item_bingyan": {
     "name": "Eye of Skadi",
@@ -158,7 +165,8 @@
     "lore_i18n": {
       "en": "Extremely rare artifact, guarded by the azure dragons.",
       "ru": "Чрезвычайно редкий артефакт, охраняемый лазурными драконами."
-    }
+    },
+    "icon": "items/skadi.png"
   },
   "item_bkb": {
     "name": "Black King Bar",
@@ -178,7 +186,8 @@
     "lore_i18n": {
       "en": "A powerful staff imbued with the strength of giants.",
       "ru": "Мощный посох, наделенный силой великанов."
-    }
+    },
+    "icon": "items/black_king_bar.png"
   },
   "item_both_leaves": {
     "name": "Leafy Essence",
@@ -198,7 +207,8 @@
     "lore_i18n": {
       "en": "From: Relicbox",
       "ru": "From: Relicbox"
-    }
+    },
+    "icon": "items/seeds_of_serenity.png"
   },
   "item_buxiuzhishouhu": {
     "name": "Aegis of Immortal",
@@ -218,7 +228,8 @@
     "lore_i18n": {
       "en": "Immortals used to have a magical shield to prevent them from death.",
       "ru": "Immortals used to have a magical shield to prevent them from death."
-    }
+    },
+    "icon": "items/aegis.png"
   },
   "item_cantie": {
     "name": "Sliver",
@@ -235,7 +246,8 @@
       "en": "+25 damage.\nConsidered as Tier 3 Item.",
       "ru": "+25 урона.\nСчитается предметом Т3."
     },
-    "lore_i18n": {}
+    "lore_i18n": {},
+    "icon": "items/jushencantie.png"
   },
   "item_card_chance": {
     "name": "Card: Chance",
@@ -252,7 +264,8 @@
       "en": "Courier Consumable: Click to use\nYou can designate a chess piece to gain an additional class from the nearest other class permanently.",
       "ru": "Courier Consumable: Click to use\nYou can designate a chess piece to gain an additional class from the nearest other class permanently."
     },
-    "lore_i18n": {}
+    "lore_i18n": {},
+    "icon": "items/card_chance.png"
   },
   "item_card_fate": {
     "name": "Card: Fate",
@@ -269,7 +282,8 @@
       "en": "Courier Consumable: Click to use\nYou can designate a chess piece to permanently gain an additional race from the nearest other race",
       "ru": "Courier Consumable: Click to use\nYou can designate a chess piece to permanently gain an additional race from the nearest other race"
     },
-    "lore_i18n": {}
+    "lore_i18n": {},
+    "icon": "items/card_fate.png"
   },
   "item_changdun": {
     "name": "Pavise",
@@ -286,7 +300,8 @@
       "en": "+5 Armor.\nChances to gain +1 armor permanently on its carrier on damage taken in home battle.",
       "ru": "+5 брони.\nШанс получить +1 брони носителю навсегда, при получении урона в домашнем бою."
     },
-    "lore_i18n": {}
+    "lore_i18n": {},
+    "icon": "items/pavise.png"
   },
   "item_chihongjia": {
     "name": "Crimson Guard",
@@ -306,7 +321,8 @@
     "lore_i18n": {
       "en": "A cuirass originally built to protect against the dreaded Year Beast.",
       "ru": "Кираса, изначально созданная для защиты от ужасного Year Beast."
-    }
+    },
+    "icon": "items/crimson_guard.png"
   },
   "item_chishu": {
     "name": "Tango",
@@ -326,7 +342,8 @@
     "lore_i18n": {
       "en": "From: Blessing of Priests",
       "ru": "От: Blessing of Priests"
-    }
+    },
+    "icon": "items/tango.png"
   },
   "item_chishu_new": {
     "name": "Tango",
@@ -343,7 +360,8 @@
       "en": "Courier consumable: Click to use\nKnock down a tree and randomly restore up to 8 health for your Courier.",
       "ru": "Courier consumable: Click to use\nСлучайным образом восстанавливает до 8 здоровья, ломая ближайшее дерево."
     },
-    "lore_i18n": {}
+    "lore_i18n": {},
+    "icon": "items/tango_single.png"
   },
   "item_common_token": {
     "name": "Machine Token",
@@ -363,7 +381,8 @@
     "lore_i18n": {
       "en": "From: Heart of the Machine",
       "ru": "From: Heart of the Machine"
-    }
+    },
+    "icon": "items/common_token.png"
   },
   "item_conceal_prepare": {
     "name": "Shroud of Concealment",
@@ -383,7 +402,8 @@
     "lore_i18n": {
       "en": "From Relicbox",
       "ru": "Из Relicbox"
-    }
+    },
+    "icon": "items/帷幕2.png"
   },
   "item_dadianchui": {
     "name": "Mjollnir",
@@ -400,7 +420,8 @@
       "en": "+60% attack speed.\n20% chance when attacking or being attacked to release a bolt of electricity that leaps between 5 targets, dealing 100 magical damage to each.",
       "ru": "+60% скорости атаки.\n20% шанс при атаке или получении урона выпустить заряд молнии, который прыгает между 5 целями, нанося 100 магического урона каждой."
     },
-    "lore_i18n": {}
+    "lore_i18n": {},
+    "icon": "items/mjollnir.png"
   },
   "item_dapao": {
     "name": "Daedalus",
@@ -417,7 +438,8 @@
       "en": "+75 damage.\nAttacks have a 20% chance to critically strike for 400% damage.",
       "ru": "+75 damage.\nАтаки имеют 20% шанс на критический удар, наносящий 400% урона."
     },
-    "lore_i18n": {}
+    "lore_i18n": {},
+    "icon": "items/greater_crit.png"
   },
   "item_dayunchui": {
     "name": "Abyssal Blade",
@@ -437,7 +459,8 @@
     "lore_i18n": {
       "en": "The lost blade of the Commander of the Abyss, this edge cuts into the enemy’s soul.",
       "ru": "Утерянный клинок Командующего Бездной, пронзающий душу врага."
-    }
+    },
+    "icon": "items/abyssal_blade.png"
   },
   "item_dianjinshou": {
     "name": "Hand of Midas",
@@ -457,7 +480,8 @@
     "lore_i18n": {
       "en": "Preserved through unknown magical means, the Hand of Midas is a weapon of greed, sacrificing animals to line the owners pockets.",
       "ru": "Preserved through unknown magical means, the Hand of Midas is a weapon of greed, sacrificing animals to line the owners pockets."
-    }
+    },
+    "icon": "items/hand_of_midas.png"
   },
   "item_dongchayandou": {
     "name": "Pipe of Insight",
@@ -477,7 +501,8 @@
     "lore_i18n": {
       "en": "A powerful artifact of mysterious origin, it creates barriers against magical forces.",
       "ru": "Мощный артефакт таинственного происхождения создает барьеры, препятствующие воздействию магических сил."
-    }
+    },
+    "icon": "items/pipe.png"
   },
   "item_double_coin": {
     "name": "Doubloon",
@@ -497,7 +522,8 @@
     "lore_i18n": {
       "en": "From: Relicbox",
       "ru": "From: Relicbox"
-    }
+    },
+    "icon": "items/doubloon.png"
   },
   "item_egg": {
     "name": "Greevil Egg",
@@ -520,7 +546,8 @@
     "lore_i18n": {
       "en": "From Relic Box",
       "ru": "From Relic Box"
-    }
+    },
+    "icon": "items/precious_egg.png"
   },
   "item_fashulengjing": {
     "name": "Spell Prism",
@@ -539,7 +566,8 @@
       "en": "magical damage +20%。\n Target quantity of enemy-directed targeted spells or items +1.",
       "ru": "Магический урон +20%。\n Количество заклинаний или предметов, направленных на цель, +1 (удваивается)."
     },
-    "lore_i18n": {}
+    "lore_i18n": {},
+    "icon": "items/spell_prism.png"
   },
   "item_feijiangxiaomao": {
     "name": "Ascetics Cap",
@@ -562,7 +590,8 @@
     "lore_i18n": {
       "en": "An austere cap from Undery.",
       "ru": "Шляпа Аскета"
-    }
+    },
+    "icon": "items/ascetic_cap.png"
   },
   "item_fengkuangmianju": {
     "name": "Mask of Madness",
@@ -582,7 +611,8 @@
     "lore_i18n": {
       "en": "Once this mask is worn, its bearer becomes an uncontrollable aggressive force.",
       "ru": "Тот, кто надел эту маску, превращается в неуправляемую агрессивную силу."
-    }
+    },
+    "icon": "items/mask_of_madness.png"
   },
   "item_fengwangjiang": {
     "name": "Royal Jelly Shield",
@@ -604,7 +634,8 @@
     "lore_i18n": {
       "en": "From: Blessing of Priests",
       "ru": "ОТ: Blessing of Priests"
-    }
+    },
+    "icon": "items/royal_jelly.png"
   },
   "item_free_ban": {
     "name": "Gaolers Master Key",
@@ -624,7 +655,8 @@
     "lore_i18n": {
       "en": "From Relicbox",
       "ru": "Из Relicbox"
-    }
+    },
+    "icon": "items/狱卒的钥匙2.png"
   },
   "item_free_draw": {
     "name": "Weighted Dice",
@@ -643,7 +675,8 @@
       "en": "Refund 1~2 random Gold if you fail to recruit any owned chess piece.",
       "ru": "Возвращает 1-2 Золота, если ролл не содержит ни одной имеющейся фигуры."
     },
-    "lore_i18n": {}
+    "lore_i18n": {},
+    "icon": "items/weighted_dice.png"
   },
   "item_fulingsuo": {
     "name": "Gleipnir",
@@ -663,7 +696,8 @@
     "lore_i18n": {
       "en": "Bindings forged by impossible means to leash an ancient evil.",
       "ru": "Узы, выкованные невозможными средствами, чтобы сдерживать древнее зло."
-    }
+    },
+    "icon": "items/gungir.png"
   },
   "item_fushizhiqiu": {
     "name": "Orb of Corrosion",
@@ -680,7 +714,8 @@
       "en": "Target armor -5.",
       "ru": "Броня цели -5."
     },
-    "lore_i18n": {}
+    "lore_i18n": {},
+    "icon": "items/orb_of_corrosion.png"
   },
   "item_gold_token": {
     "name": "Golden Machine Token",
@@ -700,7 +735,8 @@
     "lore_i18n": {
       "en": "From: Golden Heart of the Machine",
       "ru": "From: Golden Heart of the Machine"
-    }
+    },
+    "icon": "items/gold_token.png"
   },
   "item_goutourenjiubei": {
     "name": "Kobold Cup",
@@ -720,7 +756,8 @@
     "lore_i18n": {
       "en": "King of the Kobold enjoys drinking.",
       "ru": "Король Кобольдов любит выпить."
-    }
+    },
+    "icon": "items/kobold_cup.png"
   },
   "item_gulonghaojiao": {
     "name": "Minotaur Horn",
@@ -737,7 +774,8 @@
       "en": "Carrier counts as Dragon and has 100 initial mana.",
       "ru": "Владелец становится Драконом и получает 100 маны."
     },
-    "lore_i18n": {}
+    "lore_i18n": {},
+    "icon": "items/minotaur_horn.png"
   },
   "item_haojie": {
     "name": "Havoc",
@@ -754,7 +792,8 @@
       "en": "Attack damage +50.\n All carriers damage settled as Pure Damage.",
       "ru": "Урон атаки +50.\n Весь урон носителя становится чистым."
     },
-    "lore_i18n": {}
+    "lore_i18n": {},
+    "icon": "items/haojie.png"
   },
   "item_hongzhang": {
     "name": "Dagon",
@@ -774,7 +813,8 @@
     "lore_i18n": {
       "en": "A powerful secondary staff that allows the wielders magic to surge from their fingertips.",
       "ru": "Мощный посох, позволяющий магии владельца струиться из кончиков пальцев."
-    }
+    },
+    "icon": "items/dagon_4.png"
   },
   "item_huanyingfu": {
     "name": "Manta Style",
@@ -796,7 +836,8 @@
     "lore_i18n": {
       "en": "An axe made of reflective materials that confuse enemy ranks.",
       "ru": "Топор из отражающих материалов, сбивающий строй врагов с толку."
-    }
+    },
+    "icon": "items/manta.png"
   },
   "item_hudie": {
     "name": "Butterfly",
@@ -816,7 +857,8 @@
     "lore_i18n": {
       "en": "Only the mightiest and most experienced of warriors can wield the Butterfly, but it provides incredible dexterity in combat.",
       "ru": "Только самые могучие и опытные воины могут владеть Butterfly, но она обеспечивает невероятную ловкость в бою."
-    }
+    },
+    "icon": "items/butterfly.png"
   },
   "item_huiguang": {
     "name": "Kaya",
@@ -833,7 +875,8 @@
       "en": "Mana restoration + 25%. Magical damage +30%.",
       "ru": "Восстановление маны + 25%. Магический урон +30%."
     },
-    "lore_i18n": {}
+    "lore_i18n": {},
+    "icon": "items/kaya.png"
   },
   "item_huiyao": {
     "name": "Radiance",
@@ -853,7 +896,8 @@
     "lore_i18n": {
       "en": "A divine weapon that causes damage and a bright burning effect that lays waste to nearby enemies.",
       "ru": "Божественное оружие, наносящее урон и оставляющее после себя яркое пламя, уничтожающее ближайших врагов."
-    }
+    },
+    "icon": "items/radiance.png"
   },
   "item_jinghunzhiren": {
     "name": "Diffusal Blade",
@@ -873,7 +917,8 @@
     "lore_i18n": {
       "en": "An enchanted blade that allows the user to cut straight into the enemys soul.",
       "ru": "Зачарованный клинок, который позволяет пользователю рассекать саму душу врага."
-    }
+    },
+    "icon": "items/diffusal_blade.png"
   },
   "item_jingmixie": {
     "name": "Tranquil Boots",
@@ -892,7 +937,8 @@
       "en": "Fast movement. Recharges 20 health for allies around per 2 seconds.",
       "ru": "Быстрое передвижение. Восстанавливает 20 здоровья союзникам раз в 2 секунды."
     },
-    "lore_i18n": {}
+    "lore_i18n": {},
+    "icon": "items/tranquil_boots.png"
   },
   "item_jingubang": {
     "name": "Monkey King Bar",
@@ -909,7 +955,8 @@
       "en": "+40% attack speed.\nAttacks pierce through evasion and deal an extra 50 magical damage.",
       "ru": "+40% скорости атаки.\nАтаки проходят сквозь уклонение и наносят дополнительно 50 магического урона."
     },
-    "lore_i18n": {}
+    "lore_i18n": {},
+    "icon": "items/monkey_king_bar.png"
   },
   "item_jipin": {
     "name": "Vladimirs Offering",
@@ -926,7 +973,8 @@
       "en": "Aura Effect\nAllied units in the surrounding area gain the effect: Lifesteal +25%.",
       "ru": "Aura Effect\nСоюзные юниты в радиусе получают эффект: Вампиризм +25%."
     },
-    "lore_i18n": {}
+    "lore_i18n": {},
+    "icon": "items/vladmir.png"
   },
   "item_jixiezhixin": {
     "name": "Heart of the Machine",
@@ -946,7 +994,8 @@
     "lore_i18n": {
       "en": "Proundly presented by Heart of the Machine.",
       "ru": "Сгордостью представлен Heart of the Machine."
-    }
+    },
+    "icon": "items/ex_machina_lg.png"
   },
   "item_jixiezhixin_gold": {
     "name": "Golden Heart of the Machine",
@@ -966,7 +1015,8 @@
     "lore_i18n": {
       "en": "The finest product from Heart of the Machine.",
       "ru": "Отличный продукт от Heart of the Machine."
-    }
+    },
+    "icon": "items/golden_machina_lg.png"
   },
   "item_jufengchangji": {
     "name": "Hurricane Pike",
@@ -988,7 +1038,8 @@
     "lore_i18n": {
       "en": "A legendary pike once held as royal sigil of the ancient wyvern riders.",
       "ru": "A legendary pike once held as royal sigil of the ancient wyvern riders."
-    }
+    },
+    "icon": "items/hurricane_pike.png"
   },
   "item_jurenzhijie": {
     "name": "Giants Ring",
@@ -1008,7 +1059,8 @@
     "lore_i18n": {
       "en": "Prized procurement of an otherwise unremarkable ruler of Elze who abdicated his position and vanished.",
       "ru": "Prized procurement of an otherwise unremarkable ruler of Elze who abdicated his position and vanished."
-    }
+    },
+    "icon": "items/giants_ring.png"
   },
   "item_konglingguajian": {
     "name": "Null Talisman",
@@ -1025,7 +1077,8 @@
       "en": "Magical damage +20%。",
       "ru": "Магический урон +20%."
     },
-    "lore_i18n": {}
+    "lore_i18n": {},
+    "icon": "items/null_talisman.png"
   },
   "item_kuangzhanfu": {
     "name": "Battle Fury",
@@ -1045,7 +1098,8 @@
     "lore_i18n": {
       "en": "The Drodo Island Committee has banned private tree-cutting activities here, with permission granted to a small batch of contractors. This decent replica of the legendary tool is offered for entertainment purposes only.",
       "ru": "The Drodo Island Committee has banned private tree-cutting activities here, with permission granted to a small batch of contractors. This decent replica of the legendary tool is offered for entertainment purposes only."
-    }
+    },
+    "icon": "items/bfury.png"
   },
   "item_lieyingzhanren": {
     "name": "Falcon Blade",
@@ -1062,7 +1116,8 @@
       "en": "Attack damage +25。",
       "ru": "Урон атаки +25."
     },
-    "lore_i18n": {}
+    "lore_i18n": {},
+    "icon": "items/falcon_blade.png"
   },
   "item_liliangdatiaodao": {
     "name": "Overwhelming Blink",
@@ -1079,7 +1134,8 @@
       "en": "Active ability: Instant\nInstantly teleports off the farthest square that allows it to attack an enemy. Generates 30 on activation.+ 30% HP per activation.\n\nMax Blink Distance: 800",
       "ru": "Active ability: Instant\nInstantly teleports off the farthest square that allows it to attack an enemy. Generates 30 on activation.+ 30% HP per activation.\n\nMax Blink Distance: 800"
     },
-    "lore_i18n": {}
+    "lore_i18n": {},
+    "icon": "items/overwhelming_blink.png"
   },
   "item_lilianghuwan": {
     "name": "Bracer",
@@ -1096,7 +1152,8 @@
       "en": "HP +300.",
       "ru": "Здоровье +300."
     },
-    "lore_i18n": {}
+    "lore_i18n": {},
+    "icon": "items/bracer.png"
   },
   "item_linglichangbian": {
     "name": "Bullwhip",
@@ -1113,7 +1170,8 @@
       "en": "Chess pieces summoned by the carrier gain: Attack speed +100%, duration +100%",
       "ru": "Фигуры, призванные носителем, получают: скорость атаки +100%, продолжительность жизни +100%."
     },
-    "lore_i18n": {}
+    "lore_i18n": {},
+    "icon": "items/bullwhip.png"
   },
   "item_linkenfaqiu": {
     "name": "Linkens Sphere",
@@ -1133,7 +1191,8 @@
     "lore_i18n": {
       "en": "This magical sphere once protected one of the most famous heroes in history.",
       "ru": "Эта магическая сфера когда-то защищала одного из самых прославленных героев в истории."
-    }
+    },
+    "icon": "items/sphere.png"
   },
   "item_longxin": {
     "name": "Heart of Tarrasque",
@@ -1150,7 +1209,8 @@
       "en": "Fast movement, +60% health, +10 health regeneration.\n\nAura:\nAllies within the range gain healing per sec equal to 1.5% of the carriers maximum health.\n\nRange:?",
       "ru": "Fast movement, +60% health, +10 health regeneration.\n\nAura:\nAllies within the range gain healing per sec equal to 1.5% of the carriers maximum health.\n\nRange:?"
     },
-    "lore_i18n": {}
+    "lore_i18n": {},
+    "icon": "items/heart.png"
   },
   "item_lootbox_lv1": {
     "name": "Spoil Token Level 1",
@@ -1167,7 +1227,8 @@
       "en": "Courier consumable: Click to open\nSelect one from three random items to your inventory.",
       "ru": "Courier consumable: Click to open\nSelect one from three random items to your inventory."
     },
-    "lore_i18n": {}
+    "lore_i18n": {},
+    "icon": "items/tier1_token.png"
   },
   "item_lootbox_lv2": {
     "name": "Spoil Token Level 2",
@@ -1184,7 +1245,8 @@
       "en": "Courier consumable: Click to open\nSelect one from three random items to your inventory.",
       "ru": "Courier consumable: Click to open\nSelect one from three random items to your inventory."
     },
-    "lore_i18n": {}
+    "lore_i18n": {},
+    "icon": "items/lootbox_lv2.png"
   },
   "item_lootbox_lv3": {
     "name": "Spoil Token Level 3",
@@ -1201,7 +1263,8 @@
       "en": "Courier consumable: Click to open\nSelect one from three random items to your inventory.",
       "ru": "Courier consumable: Click to open\nSelect one from three random items to your inventory."
     },
-    "lore_i18n": {}
+    "lore_i18n": {},
+    "icon": "items/tier3_token.png"
   },
   "item_lootbox_lv4": {
     "name": "Spoil Token Level 4",
@@ -1218,7 +1281,8 @@
       "en": "Courier consumable: Click to open\nSelect one from three random items to your inventory.",
       "ru": "Courier consumable: Click to open\nSelect one from three random items to your inventory."
     },
-    "lore_i18n": {}
+    "lore_i18n": {},
+    "icon": "items/tier4_token.png"
   },
   "item_lootbox_lv5": {
     "name": "Spoil Token Level 5",
@@ -1235,7 +1299,8 @@
       "en": "Courier consumable: Click to open\nSelect one from three random items to your inventory.",
       "ru": "Courier consumable: Click to open\nSelect one from three random items to your inventory."
     },
-    "lore_i18n": {}
+    "lore_i18n": {},
+    "icon": "items/tier5_token.png"
   },
   "item_magic_box": {
     "name": "Magic box",
@@ -1259,7 +1324,8 @@
     "lore_i18n": {
       "en": "From: Relicbox",
       "ru": "From: Relicbox"
-    }
+    },
+    "icon": "items/magic_box.png"
   },
   "item_magic_card": {
     "name": "Magic Card",
@@ -1279,7 +1345,8 @@
     "lore_i18n": {
       "en": "From Rambling Fatebender",
       "ru": "From Rambling Fatebender"
-    }
+    },
+    "icon": "items/creed_of_omniscience.png"
   },
   "item_malefic_rapture": {
     "name": "Malefic Rapture",
@@ -1299,7 +1366,8 @@
     "lore_i18n": {
       "en": "From Relic Box",
       "ru": "Из Relic Box"
-    }
+    },
+    "icon": "items/zainankuanghuan.png"
   },
   "item_mangguo": {
     "name": "Enchanted Mango",
@@ -1319,7 +1387,8 @@
     "lore_i18n": {
       "en": "From: Mango Tree",
       "ru": "From: Mango Tree"
-    }
+    },
+    "icon": "items/enchanted_mango.png"
   },
   "item_mangotree": {
     "name": "Mango Tree",
@@ -1339,7 +1408,8 @@
     "lore_i18n": {
       "en": "From Relicbox",
       "ru": "Из Relicbox"
-    }
+    },
+    "icon": "items/mango_tree.png"
   },
   "item_meiken": {
     "name": "Mekansm",
@@ -1359,7 +1429,8 @@
     "lore_i18n": {
       "en": "A glowing jewel formed out of assorted parts that somehow fit together perfectly.",
       "ru": "A glowing jewel formed out of assorted parts that somehow fit together perfectly."
-    }
+    },
+    "icon": "items/mekansm.png"
   },
   "item_minglingshu": {
     "name": "Necronomicon",
@@ -1381,7 +1452,8 @@
     "lore_i18n": {
       "en": "A record of the final reckoning. With one page torn out.",
       "ru": "Запись последнего суда, с вырванной страницей."
-    }
+    },
+    "icon": "items/necronomicon_3.png"
   },
   "item_minjiedatiaodao": {
     "name": "Swift Blink",
@@ -1398,7 +1470,8 @@
       "en": "Active ability: Instant Cast\nInstantly move to the farthest grid within the range that can attack the enemy, gain 30 mana, and a stackable effect of +20% attack speed.\n\nmaximum distance: 800",
       "ru": "Active ability: Instant Cast\nInstantly move to the farthest grid within the range that can attack the enemy, gain 30 mana, and a stackable effect of +20% attack speed.\n\nmaximum distance: 800"
     },
-    "lore_i18n": {}
+    "lore_i18n": {},
+    "icon": "items/swift_blink.png"
   },
   "item_molongqiang": {
     "name": "DragonLance",
@@ -1417,7 +1490,8 @@
       "en": "Attack speed +20%.Ranged carrier attack range +200。",
       "ru": "Скорость атаки +20%.Дальность атаки дальнобойного носителя +200。"
     },
-    "lore_i18n": {}
+    "lore_i18n": {},
+    "icon": "items/dragon_lance.png"
   },
   "item_money": {
     "name": "A Bag of Coins",
@@ -1434,7 +1508,8 @@
       "en": "Courier consumable: Activate on pick up\nGrants some Gold.",
       "ru": "Courier consumable: Activate on pick up\nGrants some Gold."
     },
-    "lore_i18n": {}
+    "lore_i18n": {},
+    "icon": "items/coin.png"
   },
   "item_moping": {
     "name": "Bottle",
@@ -1451,7 +1526,8 @@
       "en": "MP +50.",
       "ru": "Мана +50."
     },
-    "lore_i18n": {}
+    "lore_i18n": {},
+    "icon": "items/bottle.png"
   },
   "item_moping_kong": {
     "name": "Bottle",
@@ -1468,7 +1544,8 @@
       "en": "MP +50.",
       "ru": "Мана +50."
     },
-    "lore_i18n": {}
+    "lore_i18n": {},
+    "icon": "items/bottle_empty.png"
   },
   "item_more_creep": {
     "name": "March of The Beasts",
@@ -1488,7 +1565,8 @@
     "lore_i18n": {
       "en": "From Relic Box",
       "ru": "From Relic Box"
-    }
+    },
+    "icon": "items/more_creep.png"
   },
   "item_null": {
     "name": "UNAVAILABLE",
@@ -1505,7 +1583,8 @@
       "en": "This item slot is unavailable.",
       "ru": "This item slot is unavailable."
     },
-    "lore_i18n": {}
+    "lore_i18n": {},
+    "icon": "items/default.png"
   },
   "item_pingguo": {
     "name": "Golden Enchanted Mango",
@@ -1527,7 +1606,8 @@
     "lore_i18n": {
       "en": "From: Mango Tree",
       "ru": "From: Mango Tree"
-    }
+    },
+    "icon": "items/golden_mango2.png"
   },
   "item_qiangxi": {
     "name": "Assault Cuirass",
@@ -1544,7 +1624,8 @@
       "en": "+15 Armor.+20 Attack speed.\n\nAura\nGrants +10 armor to allies nearby.\nEnemies nearby suffer -10 armor.",
       "ru": "+15 брони. +20 скорости атаки.\n\nАура\nДаёт +10 брони союзникам поблизости.\nВраги поблизости теряют -10 брони."
     },
-    "lore_i18n": {}
+    "lore_i18n": {},
+    "icon": "items/assault.png"
   },
   "item_qinwangduandao": {
     "name": "Princes Knife",
@@ -1561,7 +1642,8 @@
       "en": "Damage +10.\nThe carrier deals increased damage to enemy chess pieces of the same species/class +25%.",
       "ru": "Урон+10.\nНоситель наносит на 25% больше урона вражеским фигурам той же расы/класса."
     },
-    "lore_i18n": {}
+    "lore_i18n": {},
+    "icon": "items/princes_knife.png"
   },
   "item_qiongguidun": {
     "name": "Poor Mans Shield",
@@ -1578,7 +1660,8 @@
       "en": "+30 physical damage block, +30% chance to block extra 30% physical damage.",
       "ru": "+30 physical damage block, +30% chance to block extra 30% physical damage."
     },
-    "lore_i18n": {}
+    "lore_i18n": {},
+    "icon": "items/poor_mans_shield.png"
   },
   "item_qishijian": {
     "name": "Paladin Sword",
@@ -1598,7 +1681,8 @@
     "lore_i18n": {
       "en": "A legendary Sword owned by a divine Paladin before he was exiled.",
       "ru": "Легендарный меч, принадлежавший божественному Палладину Мигелю до его изгнания."
-    }
+    },
+    "icon": "items/paladin_sword.png"
   },
   "item_rank_damage": {
     "name": "Defiant Shell",
@@ -1617,7 +1701,8 @@
       "en": "Reduces damage taken from home defeats or increases damage dealt in away-home victories by your (current rank + 1)",
       "ru": "Уменьшает урон, получаемый при домашних поражениях, или увеличивает урон, наносимый при выездных победах на Позицию в игре+1 (по здоровью)"
     },
-    "lore_i18n": {}
+    "lore_i18n": {},
+    "icon": "items/defiant_shell.png"
   },
   "item_relicbox": {
     "name": "Relicbox",
@@ -1640,7 +1725,8 @@
     "lore_i18n": {
       "en": "Long long ago, a dragon appeared and took away all relic treasures...",
       "ru": "Давным-давно дракон похитил все реликты…"
-    }
+    },
+    "icon": "items/relicbox.png"
   },
   "item_rengu": {
     "name": "Drum of Endurance",
@@ -1657,7 +1743,8 @@
       "en": "h1>Aura Effect\nAllied units in the surrounding area gain the effect: Attack speed +25%.",
       "ru": "h1>Aura Effect\nСоюзные юниты поблизости получают эффект: скорость атаки +25%."
     },
-    "lore_i18n": {}
+    "lore_i18n": {},
+    "icon": "items/ancient_janggo.png"
   },
   "item_renjia": {
     "name": "Blade Mail",
@@ -1674,7 +1761,8 @@
       "en": "+5 armor.\n\nActive ability: Activates when taking damage\nDuplicates 50% of the damage taken back to the unit that dealt the damage for 7 sec.",
       "ru": "+5 брони.\n\nActive ability: Активируется когда получает урон\nВозвращает 50% полученного урона в юнита нанесшего урон в течении 7 секунд."
     },
-    "lore_i18n": {}
+    "lore_i18n": {},
+    "icon": "items/blade_mail.png"
   },
   "item_repeat_relic": {
     "name": "Time-Space Replica",
@@ -1697,7 +1785,8 @@
     "lore_i18n": {
       "en": "From: Relicbox",
       "ru": "From: Relicbox"
-    }
+    },
+    "icon": "items/repeat_relic.png"
   },
   "item_rm_token": {
     "name": "Wheel of Wonder Token",
@@ -1717,7 +1806,8 @@
     "lore_i18n": {
       "en": "From: Wheel of Wonder",
       "ru": "From: Wheel of Wonder"
-    }
+    },
+    "icon": "items/rm_token.png"
   },
   "item_rm_wheel_of_wonder": {
     "name": "Wheel of Wonder",
@@ -1739,7 +1829,8 @@
     "lore_i18n": {
       "en": "From: Relicbox",
       "ru": "From: Relicbox"
-    }
+    },
+    "icon": "items/rm_wheel_of_wonder.png"
   },
   "item_sadan": {
     "name": "Satanic",
@@ -1759,7 +1850,8 @@
     "lore_i18n": {
       "en": "Immense power at the cost of your soul.",
       "ru": "Невероятная сила ценой твоей души."
-    }
+    },
+    "icon": "items/satanic.png"
   },
   "item_sanchaji": {
     "name": "Trident",
@@ -1776,7 +1868,8 @@
       "en": "Attack damage +25.\nDeals each 50% additional damage to at most 2 same-name pieces.",
       "ru": "Урон от атаки +25.\nНаносит по 50% дополнительного урона максимум двум фигурам с одинаковым именем."
     },
-    "lore_i18n": {}
+    "lore_i18n": {},
+    "icon": "items/trident.png"
   },
   "item_second_chance": {
     "name": "Second Chance",
@@ -1796,7 +1889,8 @@
     "lore_i18n": {
       "en": "From Relicbox",
       "ru": "Из Relicbox"
-    }
+    },
+    "icon": "items/第二次机会.png"
   },
   "item_shanbihufu": {
     "name": "Talisman of Evasion",
@@ -1813,7 +1907,8 @@
       "en": "+25% evasion.",
       "ru": "+25% evasion."
     },
-    "lore_i18n": {}
+    "lore_i18n": {},
+    "icon": "items/talisman_of_evasion.png"
   },
   "item_shengjian": {
     "name": "Rapier",
@@ -1833,7 +1928,8 @@
     "lore_i18n": {
       "en": "So powerful, it cannot have a single owner.",
       "ru": "Он настолько могущественен, что у него не может быть одного владельца."
-    }
+    },
+    "icon": "items/rapier.png"
   },
   "item_shenjingdun": {
     "name": "Mirror Shield",
@@ -1850,7 +1946,8 @@
       "en": "Physical Block +60. \n50% probability of rebounding all damage and directional spells taken.",
       "ru": "Блокировка физического урона +60. \n50% шанс отразить весь получаемый урон и направленные заклинания."
     },
-    "lore_i18n": {}
+    "lore_i18n": {},
+    "icon": "items/mirror_shield.png"
   },
   "item_shirenmozhimao": {
     "name": "Ogre Hood",
@@ -1872,7 +1969,8 @@
     "lore_i18n": {
       "en": "Not only one Ogre knows what proper strength is.",
       "ru": "Не только один Ogre знает, что такое настоящая сила."
-    }
+    },
+    "icon": "items/shirenmozhimao.png"
   },
   "item_shuaxinqiu": {
     "name": "Refresher Orb",
@@ -1892,7 +1990,8 @@
     "lore_i18n": {
       "en": "A powerful artifact created for wizards.",
       "ru": "Мощный артефакт, созданный для магов.."
-    }
+    },
+    "icon": "items/refresher.png"
   },
   "item_shuijingjian": {
     "name": "Crystalys",
@@ -1909,7 +2008,8 @@
       "en": "Attacks have a 20% chance to cause 200% critical strike damage.",
       "ru": "Атаки имеют 20% шанс нанести 200% урона от критического удара."
     },
-    "lore_i18n": {}
+    "lore_i18n": {},
+    "icon": "items/lesser_crit.png"
   },
   "item_stolen_vault": {
     "name": "Stolen Vault",
@@ -1929,7 +2029,8 @@
     "lore_i18n": {
       "en": "From: Relicbox",
       "ru": "From: Relicbox"
-    }
+    },
+    "icon": "items/coin.png"
   },
   "item_streak_plus": {
     "name": "Chiaroscuro Certainty",
@@ -1952,7 +2053,8 @@
     "lore_i18n": {
       "en": "From Relicbox",
       "ru": "From Relicbox"
-    }
+    },
+    "icon": "items/明暗终途2.png"
   },
   "item_suduzhixue": {
     "name": "Boots of Speed",
@@ -1969,7 +2071,8 @@
       "en": "Fast movement.",
       "ru": "Fast movement."
     },
-    "lore_i18n": {}
+    "lore_i18n": {},
+    "icon": "items/boots.png"
   },
   "item_suiluchui": {
     "name": "Skull Basher",
@@ -1989,7 +2092,8 @@
     "lore_i18n": {
       "en": "A feared weapon in the right hands, this maul’s ability to shatter the defenses of its opponents should not be underestimated.",
       "ru": "Грозное оружие в умелых руках: эта булава способна сокрушать защиту врагов, и недооценивать её не стоит."
-    }
+    },
+    "icon": "items/basher.png"
   },
   "item_super_uprank": {
     "name": "Lucid Star",
@@ -2006,7 +2110,8 @@
       "en": "There is a 20% chance to directly obtain a ★★ piece on purchase if you already owned one.",
       "ru": "Есть вероятность напрямую получить ★★ фигуру при покупке, если одна уже есть."
     },
-    "lore_i18n": {}
+    "lore_i18n": {},
+    "icon": "items/super_uprank.png"
   },
   "item_test_dafali": {
     "name": "Test item: +100 mana",
@@ -2020,7 +2125,8 @@
       "ru": "Test item: +100 mana"
     },
     "descriptions": {},
-    "lore_i18n": {}
+    "lore_i18n": {},
+    "icon": "items/arcane_ring.png"
   },
   "item_test_dahujia": {
     "name": "Test item: +999 armor",
@@ -2034,7 +2140,8 @@
       "ru": "Test item: +999 armor"
     },
     "descriptions": {},
-    "lore_i18n": {}
+    "lore_i18n": {},
+    "icon": "items/carapace_of_qaldin.png"
   },
   "item_test_damokang": {
     "name": "Test item: +100% magic resistance",
@@ -2048,7 +2155,8 @@
       "ru": "Test item: +100% magic resistance"
     },
     "descriptions": {},
-    "lore_i18n": {}
+    "lore_i18n": {},
+    "icon": "items/eternal_shroud.png"
   },
   "item_test_dashanbi": {
     "name": "Test item: +100% evasion",
@@ -2062,7 +2170,8 @@
       "ru": "Test item: +100% evasion"
     },
     "descriptions": {},
-    "lore_i18n": {}
+    "lore_i18n": {},
+    "icon": "items/force_field.png"
   },
   "item_test_pomokang": {
     "name": "Test item: -50% magic resistance",
@@ -2076,7 +2185,8 @@
       "ru": "Test item: -50% magic resistance"
     },
     "descriptions": {},
-    "lore_i18n": {}
+    "lore_i18n": {},
+    "icon": "items/vengeances_shadow.png"
   },
   "item_test_poyinyue": {
     "name": "Test item: -200% attack speed",
@@ -2090,7 +2200,8 @@
       "ru": "Test item: -200% attack speed"
     },
     "descriptions": {},
-    "lore_i18n": {}
+    "lore_i18n": {},
+    "icon": "items/unstable_wand.png"
   },
   "item_tiantangzhiji": {
     "name": "Heavens Halberd",
@@ -2107,7 +2218,8 @@
       "en": "Evasion +25%.\n\nActive ability: Instant\nthe enemy chess piece with the highest attack Disarm, lasting for 6 seconds.",
       "ru": "Уклонение +25%.\n\nНацеленная Активка: Мгновенная\nФигура противника с самым высоким уроном атаки получает Disarm,(обезоруживание) длится 6 секунд."
     },
-    "lore_i18n": {}
+    "lore_i18n": {},
+    "icon": "items/heavens_halberd.png"
   },
   "item_tiaodao": {
     "name": "Blink Dagger",
@@ -2129,7 +2241,8 @@
     "lore_i18n": {
       "en": "The fabled dagger used by the fastest assassin ever to walk the lands.",
       "ru": "Легендарный кинжал, принадлежавший самому быстрому убийце, когда-либо ступавшему по этим землям."
-    }
+    },
+    "icon": "items/blink.png"
   },
   "item_tiaozhantoujin": {
     "name": "Hood of Defiance",
@@ -2146,7 +2259,8 @@
       "en": "+50% magic resistance.",
       "ru": "+50% Сопротивления к магии."
     },
-    "lore_i18n": {}
+    "lore_i18n": {},
+    "icon": "items/hood_of_defiance.png"
   },
   "item_upgrade_lootbox": {
     "name": "Weaponsmith",
@@ -2166,7 +2280,8 @@
     "lore_i18n": {
       "en": "From Relicbox",
       "ru": "Из Relicbox"
-    }
+    },
+    "icon": "items/哼哼井武器匠.png"
   },
   "item_wangchongtui": {
     "name": "Spider Leg",
@@ -2186,7 +2301,8 @@
     "lore_i18n": {
       "en": "A horrifying yet useful mixture of necromancy and artifice.",
       "ru": "Ужасающая, но полезная смесь некромантии и искусственной инженерии."
-    }
+    },
+    "icon": "items/spider_legs.png"
   },
   "item_wangyuanjing": {
     "name": "Telescope",
@@ -2205,7 +2321,8 @@
       "en": "Ranged carriers will be counted as Dwarf.",
       "ru": "Дальнобойный владелец считается Dwarf."
     },
-    "lore_i18n": {}
+    "lore_i18n": {},
+    "icon": "items/telescope.png"
   },
   "item_wangzhezhijie": {
     "name": "Ring of Basilius",
@@ -2222,7 +2339,8 @@
       "en": "MP regen +50%.",
       "ru": "Мана реген +50%."
     },
-    "lore_i18n": {}
+    "lore_i18n": {},
+    "icon": "items/ring_of_basilius.png"
   },
   "item_weiguangpifeng": {
     "name": "Glimmer Cape",
@@ -2239,7 +2357,8 @@
       "en": "Magical resistance +30%.\nHides the carrier from others’ sight.",
       "ru": "Магическое сопротивление +30%.\nСкрывает носителя от чужих глаз во время подготовки."
     },
-    "lore_i18n": {}
+    "lore_i18n": {},
+    "icon": "items/glimmer_cape.png"
   },
   "item_weishijingjia": {
     "name": "Guardian Greaves",
@@ -2259,7 +2378,8 @@
     "lore_i18n": {
       "en": "One of many holy instruments constructed to honor the Omniscience.",
       "ru": "Один из множества священных инструментов, созданных в честь Omniscience."
-    }
+    },
+    "icon": "items/guardian_greaves.png"
   },
   "item_wuzhixiaomao": {
     "name": "Witless Shako",
@@ -2278,7 +2398,8 @@
       "en": "+25% magical resistance. The carrier +1 level.",
       "ru": "+25% сопротивления магии. Носитель считается на 1 уровень выше."
     },
-    "lore_i18n": {}
+    "lore_i18n": {},
+    "icon": "items/witless_shako.png"
   },
   "item_xianfengdun": {
     "name": "Vanguard",
@@ -2295,7 +2416,8 @@
       "en": "Block 40 damage on melee pieces.",
       "ru": "Блокирует 40 урона на героях ближнего боя и 20 дальнего."
     },
-    "lore_i18n": {}
+    "lore_i18n": {},
+    "icon": "items/vanguard.png"
   },
   "item_xiangweixie": {
     "name": "Phase Boots",
@@ -2315,7 +2437,8 @@
     "lore_i18n": {
       "en": "Boots that allow the wearer to travel between the ether.",
       "ru": "Boots that allow the wearer to travel between the ether."
-    }
+    },
+    "icon": "items/phase_boots.png"
   },
   "item_xingyunguazhui": {
     "name": "Lucky Pendant",
@@ -2332,7 +2455,8 @@
       "en": "The carrier has additional chances on all probability synergies.",
       "ru": "Носитель увеличивает вероятность срабатывания всех синергией с шансом."
     },
-    "lore_i18n": {}
+    "lore_i18n": {},
+    "icon": "items/slark_fish_bait.png"
   },
   "item_xiwa": {
     "name": "Shivas Guard",
@@ -2352,7 +2476,8 @@
     "lore_i18n": {
       "en": "Said to have belonged to a goddess, today it retains much of its former power.",
       "ru": "Said to have belonged to a goddess, today it retains much of its former power."
-    }
+    },
+    "icon": "items/shivas_guard.png"
   },
   "item_xuanmingdunpai": {
     "name": "Buckler",
@@ -2369,7 +2494,8 @@
       "en": "Armor +5。",
       "ru": "Броня +5."
     },
-    "lore_i18n": {}
+    "lore_i18n": {},
+    "icon": "items/buckler.png"
   },
   "item_xuanwo": {
     "name": "Maelstrom",
@@ -2386,7 +2512,8 @@
       "en": "Attack Speed +10%.\n20% chance on attack to release a forked lightning, dealing 100 magic damage to up to 3 enemies.",
       "ru": "Скорость атаки +10%.\n20% Шанс при атаке выпустить молнию, наносящую 100 магического урона по 3 врагам."
     },
-    "lore_i18n": {}
+    "lore_i18n": {},
+    "icon": "items/maelstrom.png"
   },
   "item_xueji": {
     "name": "Bloodthorn",
@@ -2406,7 +2533,8 @@
     "lore_i18n": {
       "en": "A reviled blade that bites deeper with each wriggle of its victims final throes.",
       "ru": "Проклятый клинок, который вонзается всё глубже с каждой конвульсией умирающей жертвы."
-    }
+    },
+    "icon": "items/bloodthorn.png"
   },
   "item_xuejingshi": {
     "name": "Bloodstone",
@@ -2426,7 +2554,8 @@
     "lore_i18n": {
       "en": "The Bloodstones bright ruby color is unmistakable on the battlefield, as the owner seems to have infinite vitality and spirit.",
       "ru": "The Bloodstones яркий рубиновый цвет безошибочно выделяется на поле боя, а владелец будто обладает бесконечной жизненной силой и духом."
-    }
+    },
+    "icon": "items/bloodstone.png"
   },
   "item_yangdao": {
     "name": "Scythe of Vyse",
@@ -2446,7 +2575,8 @@
     "lore_i18n": {
       "en": "The most guarded relic among the cult of Vyse, it is the most coveted weapon among magi.",
       "ru": "Это самая охраняемая реликвия культа Вайса и самое желанное оружие среди магов."
-    }
+    },
+    "icon": "items/sheepstick.png"
   },
   "item_yinyuezhijing": {
     "name": "Moon Shard",
@@ -2466,7 +2596,8 @@
     "lore_i18n": {
       "en": "Said to be a tear from the lunar goddess Selemene.",
       "ru": "Said to be a tear from the lunar goddess Selemene."
-    }
+    },
+    "icon": "items/moon_shard.png"
   },
   "item_yonghengzhipan": {
     "name": "Aeon Disk",
@@ -2486,7 +2617,8 @@
     "lore_i18n": {
       "en": "A powerful artifact long ago smuggled out of the Ivory Incubarium. Or so many believe.",
       "ru": "Мощный артефакт, некогда тайно вывезенный из Слоновой Инкубарии. По крайней мере, так считают многие."
-    }
+    },
+    "icon": "items/aeon_disk.png"
   },
   "item_yongqizhiguang": {
     "name": "Spark of Courage",
@@ -2503,7 +2635,8 @@
       "en": "Carrier deals +25% damage to enemies level higher than carrier.",
       "ru": "Наносит +25% урона врагам чей уровень выше носителя."
     },
-    "lore_i18n": {}
+    "lore_i18n": {},
+    "icon": "items/spark_of_courage.png"
   },
   "item_yuanlifazhang": {
     "name": "Force Staff",
@@ -2523,7 +2656,8 @@
     "lore_i18n": {
       "en": "Allows you to manipulate others, for good or evil.",
       "ru": "Allows you to manipulate others, for good or evil."
-    }
+    },
+    "icon": "items/force_staff.png"
   },
   "item_yuanlingxidai": {
     "name": "Wraith Band",
@@ -2540,7 +2674,8 @@
       "en": "Attack speed +20%。",
       "ru": "Скорость атаки +20%."
     },
-    "lore_i18n": {}
+    "lore_i18n": {},
+    "icon": "items/wraith_band.png"
   },
   "item_yuanxingxie": {
     "name": "Travel Boots",
@@ -2557,7 +2692,8 @@
       "en": "Fast Movement\nTeleports its owner to help the home/away battle if the owner survives the current battle.\n\nActive ability: Instant\nInstantly teleports off the farthest square that allows it to attack an enemy. Generates 20 on activation.\n\nMax distance: 800",
       "ru": "Fast Movement\nTeleports its owner to help the home/away battle if the owner survives the current battle.\n\nActive ability: Instant\nInstantly teleports off the farthest square that allows it to attack an enemy. Generates 20 on activation.\n\nMax distance: 800"
     },
-    "lore_i18n": {}
+    "lore_i18n": {},
+    "icon": "items/travel_boots.png"
   },
   "item_zhaohuanshenshi": {
     "name": "Summoning Stone",
@@ -2577,7 +2713,8 @@
     "lore_i18n": {
       "en": "Crush your enemies with ruthless tides of minions. Yeah Minions!",
       "ru": "Crush your enemies with ruthless tides of minions. Yeah Minions!"
-    }
+    },
+    "icon": "items/zhaohuanshenshi.png"
   },
   "item_zhilidatiaodao": {
     "name": "Arcane Blink",
@@ -2594,7 +2731,8 @@
       "en": "Active ability: On ability cooling down\nInstantly move to the farthest grid within the range that can attack the enemy, gain 25 mana and +20% magical damage amplification, and reduce ability CD by 5 sec.\n\nmaximum distance:800",
       "ru": "Активка: Мгновенная\nInstantly move to the farthest grid within the range that can attack the enemy, gain 25 mana and +20% magical damage amplification, and reduce ability CD by 5 sec.\n\nmaximum distance:800"
     },
-    "lore_i18n": {}
+    "lore_i18n": {},
+    "icon": "items/arcane_blink.png"
   },
   "item_zhipeitoukui": {
     "name": "Hell of the Dominator",
@@ -2616,7 +2754,8 @@
     "lore_i18n": {
       "en": "The powerful headpiece of a dead necromancer.",
       "ru": "The powerful headpiece of a dead necromancer."
-    }
+    },
+    "icon": "items/helm_of_the_dominator.png"
   },
   "item_zhishizhishu": {
     "name": "Tome of Knowledge",
@@ -2636,7 +2775,8 @@
     "lore_i18n": {
       "en": "From: Spark of Mind",
       "ru": "От: Spark of Mind"
-    }
+    },
+    "icon": "items/tome_of_knowledge.png"
   },
   "item_zhusidoupeng": {
     "name": "Gossamer Cape",
@@ -2653,6 +2793,7 @@
       "en": "+25% magical resistance. Its carrier and all minions are immune to mind control.",
       "ru": "+25% сопротивления магии. Носитель и призывные существа невосприимчивы к контролю разума."
     },
-    "lore_i18n": {}
+    "lore_i18n": {},
+    "icon": "items/gossamer_cape.png"
   }
 }

@@ -2,6 +2,7 @@
   "gameId": "chess_meepo",
   "name": "Meepo",
   "slug": "meepo",
+  "icon": "units/meepo.png",
   "source": {
     "id": "chess_meepo",
     "cost": 2,

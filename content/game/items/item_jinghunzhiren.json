@@ -2,6 +2,7 @@
   "gameId": "item_jinghunzhiren",
   "name": "Diffusal Blade",
   "slug": "diffusal-blade",
+  "icon": "items/diffusal_blade.png",
   "source": {
     "name": "Diffusal Blade",
     "description": "Attack speed + 20%.\n\nActive Ability: Instant\nPurify the attack target by removing all its synergy buffs.",

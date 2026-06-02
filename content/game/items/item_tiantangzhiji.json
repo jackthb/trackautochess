@@ -2,6 +2,7 @@
   "gameId": "item_tiantangzhiji",
   "name": "Heavens Halberd",
   "slug": "heavens-halberd",
+  "icon": "items/heavens_halberd.png",
   "source": {
     "name": "Heavens Halberd",
     "description": "Evasion +25%.\n\nActive ability: Instant\nthe enemy chess piece with the highest attack\nDisarm, lasting for 6 seconds.",

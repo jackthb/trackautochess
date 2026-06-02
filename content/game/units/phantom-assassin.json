@@ -2,6 +2,7 @@
   "gameId": "chess_pa",
   "name": "Phantom Assassin",
   "slug": "phantom-assassin",
+  "icon": "units/phantom_assassin.png",
   "source": {
     "id": "chess_pa",
     "cost": 4,

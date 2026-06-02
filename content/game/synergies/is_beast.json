@@ -2,6 +2,7 @@
   "gameId": "is_beast",
   "name": "Beast",
   "slug": "beast",
+  "icon": "synergies/beast.png",
   "source": {
     "name": "Beast",
     "description": "Species Trait: Power of the Wild\n\nActive when you have at least (N) different Beast pieces on board. (Multiple effects stack)\n\n(2) Beasts: All allies have +10% attack damage, including summoned units.\n(4) Beasts: All allies have +25% attack damage, including summoned units.\n(6) Beasts: Attacks from all allies increase physical damage taken by the target by 10%. This effect stacks up to a maximum of 10 and can be applied by friendly summoned units.",

@@ -2,6 +2,7 @@
   "gameId": "is_wizard",
   "name": "Wizard",
   "slug": "wizard",
+  "icon": "synergies/wizard.png",
   "source": {
     "name": "Wizard",
     "description": "Wizard chess pieces are never considered priority targets by enemies.\n\nClass Perk: Something from Nothing\n\nActive when you have at least (N) different Wizard pieces on board. (Multiple effects stack)\n\n(2) Wizards: During the combat round, reduce the required number of chess pieces for the activation of race/class skills by 1, if there are (4) or more chess pieces needed.\n(4) Wizards: If you trigger the unique non-Wizard race/class skill during the combat round, unlock all of its layers.",

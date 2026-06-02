@@ -2,6 +2,7 @@
   "gameId": "item_fushizhiqiu",
   "name": "Orb of Corrosion",
   "slug": "orb-of-corrosion",
+  "icon": "items/orb_of_corrosion.png",
   "source": {
     "name": "Orb of Corrosion",
     "description": "Target armor -5.",

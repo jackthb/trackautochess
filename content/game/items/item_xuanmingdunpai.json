@@ -2,6 +2,7 @@
   "gameId": "item_xuanmingdunpai",
   "name": "Buckler",
   "slug": "buckler",
+  "icon": "items/buckler.png",
   "source": {
     "name": "Buckler",
     "description": "Armor +5。",

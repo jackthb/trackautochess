@@ -2,6 +2,7 @@
   "gameId": "is_element",
   "name": "Elemental",
   "slug": "elemental",
+  "icon": "synergies/element.png",
   "source": {
     "name": "Elemental",
     "description": "Elemental Essence\n\nActive when you have at least (N) different Element pieces on board. (Multiple effects stack)\n\n(2) Elements: All friendly elementals have +15% chance to turn melee aggressors into stone for 3 sec.\n(4) Elements: All allies have +15% chance to turn melee and ranged aggressors into stone for 3 sec.\n(6) Elements: Aggressors are stoned for 1 sec longer and take +100% damage.",

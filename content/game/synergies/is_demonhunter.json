@@ -2,6 +2,7 @@
   "gameId": "is_demonhunter",
   "name": "Demon Hunter",
   "slug": "demon-hunter",
+  "icon": "synergies/demonhunter.png",
   "source": {
     "name": "Demon Hunter",
     "description": "Counts as a different enemy Demon type.\n\nCLASS PERK: Shuttered Soul\n\nActive when you have at least (N) different Demon Hunter pieces on board. (Multiple effects stack)\n(2) Demon Hunters: All friendly demons are considered the same type.\n(4) Demon Hunters: All damage dealt is settled as Pure Damage.",

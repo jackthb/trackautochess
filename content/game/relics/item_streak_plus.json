@@ -2,6 +2,7 @@
   "gameId": "item_streak_plus",
   "name": "Chiaroscuro Certainty",
   "slug": "chiaroscuro-certainty",
+  "icon": "relics/chiaroscuro_certainty.png",
   "source": {
     "name": "Chiaroscuro Certainty",
     "description": "Your win or lose streak will not be terminated and when the relic disappears, you will receive a corresponding level loot token based on the highest reward/compensation held during that time.",

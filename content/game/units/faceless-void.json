@@ -2,6 +2,7 @@
   "gameId": "chess_fv",
   "name": "Faceless Void",
   "slug": "faceless-void",
+  "icon": "units/faceless_void.png",
   "source": {
     "id": "chess_fv",
     "cost": 2,

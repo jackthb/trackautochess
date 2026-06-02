@@ -2,6 +2,7 @@
   "gameId": "chess_dazzle",
   "name": "Dazzle",
   "slug": "dazzle",
+  "icon": "units/dazzle.png",
   "source": {
     "id": "chess_dazzle",
     "cost": 1,

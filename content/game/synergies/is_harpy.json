@@ -2,6 +2,7 @@
   "gameId": "is_harpy",
   "name": "Harpy",
   "slug": "harpy",
+  "icon": "synergies/harpy.png",
   "source": {
     "name": "Harpy",
     "description": "Species Trait: Windfury\n\nActive when you have at least (N) different pieces of this species on board. (Multiple effects stack).\n\n(2) Harpies: All allies gain the effect - Targeted spells +1 additional targets.\n(4) Harpies: All allies gain the effect - Targeted spells +1 additional targets.",

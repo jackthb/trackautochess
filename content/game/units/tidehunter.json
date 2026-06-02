@@ -2,6 +2,7 @@
   "gameId": "chess_th",
   "name": "Tidehunter",
   "slug": "tidehunter",
+  "icon": "units/tidehunter.png",
   "source": {
     "id": "chess_th",
     "cost": 5,

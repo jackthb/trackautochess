@@ -2,6 +2,7 @@
   "gameId": "item_jingmixie",
   "name": "Tranquil Boots",
   "slug": "tranquil-boots",
+  "icon": "items/tranquil_boots.png",
   "source": {
     "name": "Tranquil Boots",
     "description": "Fast movement. Recharges 20 health for allies around per 2 seconds.",

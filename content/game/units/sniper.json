@@ -2,6 +2,7 @@
   "gameId": "chess_sniper",
   "name": "Sniper",
   "slug": "sniper",
+  "icon": "units/sniper.png",
   "source": {
     "id": "chess_sniper",
     "cost": 2,

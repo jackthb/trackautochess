@@ -2,6 +2,7 @@
   "gameId": "chess_pb",
   "name": "Primal Beast",
   "slug": "primal-beast",
+  "icon": "units/primal_beast.png",
   "source": {
     "id": "chess_pb",
     "cost": 5,

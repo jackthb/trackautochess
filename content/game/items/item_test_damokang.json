@@ -2,6 +2,7 @@
   "gameId": "item_test_damokang",
   "name": "Test item: +100% magic resistance",
   "slug": "test-item-100-magic-resistance",
+  "icon": "items/eternal_shroud.png",
   "source": {
     "name": "Test item: +100% magic resistance",
     "description": "",

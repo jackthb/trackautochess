@@ -2,6 +2,7 @@
   "gameId": "chess_ss",
   "name": "Shadow Shaman",
   "slug": "shadow-shaman",
+  "icon": "units/shadow_shaman.png",
   "source": {
     "id": "chess_ss",
     "cost": 1,

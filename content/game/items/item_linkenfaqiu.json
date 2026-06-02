@@ -2,6 +2,7 @@
   "gameId": "item_linkenfaqiu",
   "name": "Linkens Sphere",
   "slug": "linkens-sphere",
+  "icon": "items/sphere.png",
   "source": {
     "name": "Linkens Sphere",
     "description": "+300 health, +100% mana regeneration.\nBlocks targeted spell or item.",

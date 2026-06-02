@@ -2,6 +2,7 @@
   "gameId": "item_null",
   "name": "UNAVAILABLE",
   "slug": "unavailable",
+  "icon": "items/default.png",
   "source": {
     "name": "UNAVAILABLE",
     "description": "This item slot is unavailable.",

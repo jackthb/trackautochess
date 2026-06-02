@@ -2,6 +2,7 @@
   "gameId": "chess_vs",
   "name": "Vengeful Spirit",
   "slug": "vengeful-spirit",
+  "icon": "units/vengeful_spirit.png",
   "source": {
     "id": "chess_vs",
     "cost": 2,

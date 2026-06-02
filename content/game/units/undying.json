@@ -2,6 +2,7 @@
   "gameId": "chess_ud",
   "name": "Undying",
   "slug": "undying",
+  "icon": "units/undying.png",
   "source": {
     "id": "chess_ud",
     "cost": 3,

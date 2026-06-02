@@ -2,6 +2,7 @@
   "gameId": "chess_snap",
   "name": "Snapfire",
   "slug": "snapfire",
+  "icon": "units/snapfire.png",
   "source": {
     "id": "chess_snap",
     "cost": 4,

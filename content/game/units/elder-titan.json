@@ -2,6 +2,7 @@
   "gameId": "chess_et",
   "name": "Elder Titan",
   "slug": "elder-titan",
+  "icon": "units/elder_titan.png",
   "source": {
     "id": "chess_et",
     "cost": 4,

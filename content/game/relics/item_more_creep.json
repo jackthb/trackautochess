@@ -2,6 +2,7 @@
   "gameId": "item_more_creep",
   "name": "March of The Beasts",
   "slug": "march-of-the-beasts",
+  "icon": "relics/march_of_the_beasts.png",
   "source": {
     "name": "March of The Beasts",
     "description": "All creeps duplicate themselves and counted as level +1.",

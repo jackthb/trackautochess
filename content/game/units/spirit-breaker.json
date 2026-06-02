@@ -2,6 +2,7 @@
   "gameId": "chess_sb",
   "name": "Spirit Breaker",
   "slug": "spirit-breaker",
+  "icon": "units/spirit_breaker.png",
   "source": {
     "id": "chess_sb",
     "cost": 1,

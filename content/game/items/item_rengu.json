@@ -2,6 +2,7 @@
   "gameId": "item_rengu",
   "name": "Drum of Endurance",
   "slug": "drum-of-endurance",
+  "icon": "items/ancient_janggo.png",
   "source": {
     "name": "Drum of Endurance",
     "description": "Aura Effect\nAllied units in the surrounding area gain the effect: Attack speed +35%.",

@@ -2,6 +2,7 @@
   "gameId": "item_wangzhezhijie",
   "name": "Ring of Basilius",
   "slug": "ring-of-basilius",
+  "icon": "items/ring_of_basilius.png",
   "source": {
     "name": "Ring of Basilius",
     "description": "MP regen +50%.",

@@ -2,6 +2,7 @@
   "gameId": "item_magic_card",
   "name": "Magic Card",
   "slug": "magic-card",
+  "icon": "items/creed_of_omniscience.png",
   "source": {
     "name": "Magic Card",
     "description": "Courier Consumable: Click to use\nPerform a free recruitment to recruit chess pieces from the line up of the last opponent you lost to.",

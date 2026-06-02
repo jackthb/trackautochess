@@ -2,6 +2,7 @@
   "gameId": "chess_kunkka",
   "name": "Kunkka",
   "slug": "kunkka",
+  "icon": "units/kunkka.png",
   "source": {
     "id": "chess_kunkka",
     "cost": 4,

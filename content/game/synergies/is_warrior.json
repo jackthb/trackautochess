@@ -2,6 +2,7 @@
   "gameId": "is_warrior",
   "name": "Warrior",
   "slug": "warrior",
+  "icon": "synergies/warrior.png",
   "source": {
     "name": "Warrior",
     "description": "Warriors have a double bonus from Fortified Armor while below 50% health.\n\nClass Perk: Fortified Armor\n\nActive when you have at least (N) different Warrior pieces on board. (Multiple effects stack) \n\n(3) Warriors: All friendly warriors have +3 armour.\n(6) Warriors: All friendly warriors have +11 armour.\n(9) Warriors: Reflect pure damage equivalent to (1.5x current armour) when taking physical and magical damage.",

@@ -2,6 +2,7 @@
   "gameId": "chess_fur",
   "name": "Furion",
   "slug": "furion",
+  "icon": "units/furion.png",
   "source": {
     "id": "chess_fur",
     "cost": 2,

@@ -2,6 +2,7 @@
   "gameId": "item_yuanxingxie",
   "name": "Travel Boots",
   "slug": "travel-boots",
+  "icon": "items/travel_boots.png",
   "source": {
     "name": "Travel Boots",
     "description": "Fast Movement\nTeleports its owner to help the home/away battle if the owner survives the current battle.\n\nActive ability: Instant\nInstantly teleports off the farthest square that allows it to attack an enemy. Generates 20 on activation.\n\nMax distance: 800",

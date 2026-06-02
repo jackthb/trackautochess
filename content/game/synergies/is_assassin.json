@@ -2,6 +2,7 @@
   "gameId": "is_assassin",
   "name": "Assassin",
   "slug": "assassin",
+  "icon": "synergies/assassin.png",
   "source": {
     "name": "Assassin",
     "description": "The first movement of Assassin pieces in each round causes Assassins to leap over to the back of the enemy lineup. The first blow after Backstab Leap is always a critical strike with a random bonus damage amplifier.\n\nClass Perk: Coup de Grace\n\nActive when you have at least (N) different Assassin pieces on board. (Multiple effects stack)\n\n(3) Assassins: All friendly assassins have 15% chance to critical hit for 300% damage.\n(6) Assassins: All assassins have 15% chance to critical hit for 400% damage.\n(9) Assassins: All assassins refresh a Backstab Leap move after killing an enemy or a certain duration. This Backstab Leap always deals the maximum possible critical damage.",

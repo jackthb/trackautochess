@@ -2,6 +2,7 @@
   "gameId": "item_buxiuzhishouhu",
   "name": "Aegis of Immortal",
   "slug": "aegis-of-immortal",
+  "icon": "items/aegis.png",
   "source": {
     "name": "Aegis of Immortal",
     "description": "+600 HP.\nDeathrattle: Resurrect once.",

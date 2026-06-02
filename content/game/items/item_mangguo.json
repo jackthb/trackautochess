@@ -2,6 +2,7 @@
   "gameId": "item_mangguo",
   "name": "Enchanted Mango",
   "slug": "enchanted-mango",
+  "icon": "items/enchanted_mango.png",
   "source": {
     "name": "Enchanted Mango",
     "description": "Consumable: Click to use\nRandomly grants Gold and Courier XP up to currnet Courier level.",

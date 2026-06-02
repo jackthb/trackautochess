@@ -2,6 +2,7 @@
   "gameId": "item_baojunwangpao",
   "name": "Cloak of Tyrants",
   "slug": "cloak-of-tyrants",
+  "icon": "items/baojunwangpao.png",
   "source": {
     "name": "Cloak of Tyrants",
     "description": "+30% Magic Resistance.\nThe carrier can hide their location during the preparation phase, and at the start of the battle, gain the full benefit of all activated racial/class skills of friendly units.",

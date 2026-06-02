@@ -2,6 +2,7 @@
   "gameId": "item_yuanlifazhang",
   "name": "Force Staff",
   "slug": "force-staff",
+  "icon": "items/force_staff.png",
   "source": {
     "name": "Force Staff",
     "description": "Magic Damage +10%.\n\nActive ability: Activated when Hp is low\nPush the carrier to a safe grid that cannot be reached by enemy attacks, and restore 20 mana immediately.",

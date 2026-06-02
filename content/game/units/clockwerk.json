@@ -2,6 +2,7 @@
   "gameId": "chess_clock",
   "name": "Clockwerk",
   "slug": "clockwerk",
+  "icon": "units/clockwerk.png",
   "source": {
     "id": "chess_clock",
     "cost": 1,

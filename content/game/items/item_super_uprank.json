@@ -2,6 +2,7 @@
   "gameId": "item_super_uprank",
   "name": "Lucid Star",
   "slug": "lucid-star",
+  "icon": "items/super_uprank.png",
   "source": {
     "name": "Lucid Star",
     "description": "There is a 20% chance to directly obtain a ★★ piece on purchase if you already owned one.",

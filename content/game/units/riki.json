@@ -2,6 +2,7 @@
   "gameId": "chess_riki",
   "name": "Riki",
   "slug": "riki",
+  "icon": "units/riki.png",
   "source": {
     "id": "chess_riki",
     "cost": 3,

@@ -2,6 +2,7 @@
   "gameId": "item_xingyunguazhui",
   "name": "Lucky Pendant",
   "slug": "lucky-pendant",
+  "icon": "items/slark_fish_bait.png",
   "source": {
     "name": "Lucky Pendant",
     "description": "The carrier has additional chances on all probability synergies.",

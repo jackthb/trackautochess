@@ -2,6 +2,7 @@
   "gameId": "item_qinwangduandao",
   "name": "Princes Knife",
   "slug": "princes-knife",
+  "icon": "items/princes_knife.png",
   "source": {
     "name": "Princes Knife",
     "description": "Damage +25。\nThe carrier deals increased damage to enemy chess pieces of the same species/class +50%。",

@@ -2,6 +2,7 @@
   "gameId": "is_shaman",
   "name": "Shaman",
   "slug": "shaman",
+  "icon": "synergies/shaman.png",
   "source": {
     "name": "Shaman",
     "description": "Shaman pieces spend 25% less mana when casting spells.\n\nClass Perk: Hex\n\nActive when you have at least (N) different Shaman pieces on board. (Multiple effects stack)\n\n(3)All friendly Shaman chess pieces gain the effect: Transform into a random chess piece of +2 levels after casting an active skill or using an active item.\n(6)Shaman: Equipped items carried by transformed chess pieces will also transform into random items of +2 levels.",

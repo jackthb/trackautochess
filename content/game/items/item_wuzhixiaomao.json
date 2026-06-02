@@ -2,6 +2,7 @@
   "gameId": "item_wuzhixiaomao",
   "name": "Witless Shako",
   "slug": "witless-shako",
+  "icon": "items/witless_shako.png",
   "source": {
     "name": "Witless Shako",
     "description": "+25% magical resistance. The carrier +1 level.",

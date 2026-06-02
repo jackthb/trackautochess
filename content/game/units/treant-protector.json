@@ -2,6 +2,7 @@
   "gameId": "chess_tp",
   "name": "Treant Protector",
   "slug": "treant-protector",
+  "icon": "units/treant_protector.png",
   "source": {
     "id": "chess_tp",
     "cost": 3,

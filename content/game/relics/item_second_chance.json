@@ -2,6 +2,7 @@
   "gameId": "item_second_chance",
   "name": "Second Chance",
   "slug": "second-chance",
+  "icon": "relics/second_chance.png",
   "source": {
     "name": "Second Chance",
     "description": "When you use consumable items of the choice category, you can refresh the selection panel and acquire different options.",

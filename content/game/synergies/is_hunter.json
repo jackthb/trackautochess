@@ -2,6 +2,7 @@
   "gameId": "is_hunter",
   "name": "Hunter",
   "slug": "hunter",
+  "icon": "synergies/hunter.png",
   "source": {
     "name": "Hunter",
     "description": "Hunter pieces always focus on attacking the lowest health enemy within attack range.\n\nClass Perk: Aimed Shot\n\nActive when you have at least (N) different Hunter pieces on board. (Multiple effects stack)\n\n(3) Hunters: Every attack of all ally hunters has a 50% chance to perform a precise shot, penetrates evasion and -5 armor, lasts for 5 seconds.\n(6) Hunters: Every attack of all ally hunters has a 100% chance to perform a precise shot, penetrates evasion and -10 armor, lasts for 10 seconds.\n(9) Hunters: Every precise shot will knock back the victim for 1 grid on hit and perform an extra attack.",

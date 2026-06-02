@@ -2,6 +2,7 @@
   "gameId": "chess_mk",
   "name": "Monkey King",
   "slug": "monkey-king",
+  "icon": "units/monkey_king.png",
   "source": {
     "id": "chess_mk",
     "cost": 4,

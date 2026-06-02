@@ -2,6 +2,7 @@
   "gameId": "item_rm_wheel_of_wonder",
   "name": "Wheel of Wonder",
   "slug": "wheel-of-wonder",
+  "icon": "items/rm_wheel_of_wonder.png",
   "source": {
     "name": "Wheel of Wonder",
     "description": "Relic Consumable: Click to Use\nChoose an ally piece and put it into the wheel of wonder, DISCOVER a special version of it with an extra random synergy.",

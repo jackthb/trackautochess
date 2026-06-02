@@ -2,6 +2,7 @@
   "gameId": "item_tiaodao",
   "name": "Blink Dagger",
   "slug": "blink-dagger",
+  "icon": "items/blink.png",
   "source": {
     "name": "Blink Dagger",
     "description": "Active ability: Instant\nInstantly teleports off the farest square that allows it to attack an enemy. \n\nRange: 800",

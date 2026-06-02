@@ -2,6 +2,7 @@
   "gameId": "item_bkb",
   "name": "Black King Bar",
   "slug": "black-king-bar",
+  "icon": "items/black_king_bar.png",
   "source": {
     "name": "Black King Bar",
     "description": "+600 HP. \n\nActive ability: Activates when taking damage\nGrants spell immunity and 75% magic resistance for 4 sec. Dispels negative statuses from the caster on activation.",

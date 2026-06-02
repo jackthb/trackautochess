@@ -2,6 +2,7 @@
   "gameId": "chess_largo",
   "name": "Largo",
   "slug": "largo",
+  "icon": "units/largo.png",
   "source": {
     "id": "chess_largo",
     "cost": 2,

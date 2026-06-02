@@ -2,6 +2,7 @@
   "gameId": "item_fashulengjing",
   "name": "Spell Prism",
   "slug": "spell-prism",
+  "icon": "items/spell_prism.png",
   "source": {
     "name": "Spell Prism",
     "description": "magical damage +20%。\n Target quantity of enemy-directed targeted spells or items +1.",

@@ -2,6 +2,7 @@
   "gameId": "item_money",
   "name": "A Bag of Coins",
   "slug": "a-bag-of-coins",
+  "icon": "items/coin.png",
   "source": {
     "name": "A Bag of Coins",
     "description": "Courier consumable: Activate on pick up\nGrants some Gold.",

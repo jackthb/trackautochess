@@ -2,6 +2,7 @@
   "gameId": "item_chishu_new",
   "name": "Tango",
   "slug": "tango",
+  "icon": "items/tango_single.png",
   "source": {
     "name": "Tango",
     "description": "Courier consumable: Click to use\nKnock down a tree and randomly restore up to 8 health for your Courier.",

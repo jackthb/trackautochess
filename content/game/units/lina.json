@@ -2,6 +2,7 @@
   "gameId": "chess_lina",
   "name": "Lina",
   "slug": "lina",
+  "icon": "units/lina.png",
   "source": {
     "id": "chess_lina",
     "cost": 2,

@@ -2,6 +2,7 @@
   "gameId": "item_both_leaves",
   "name": "Leafy Essence",
   "slug": "leafy-essence",
+  "icon": "relics/leafy_essence.png",
   "source": {
     "name": "Leafy Essence",
     "description": "All offside branches unlock automatically in this single game.",

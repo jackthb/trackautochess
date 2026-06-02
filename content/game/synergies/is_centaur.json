@@ -2,6 +2,7 @@
   "gameId": "is_centaur",
   "name": "Centaur",
   "slug": "centaur",
+  "icon": "synergies/centaur.png",
   "source": {
     "name": "Centaur",
     "description": "SPECIES TRAIT: Stampede\n\nActive when you have at least (N) different pieces of this species on board. (Multiple effects stack).\n\n(2)Centaurs: All friendly Centaurs gain the effect: when starting a battle, immediately charge to the target grid with the most enemy pieces around, and stun the enemy pieces on the path.\n(4)Centaurs: Every move of all melee-friendly pieces is a Stampede.",

@@ -2,6 +2,7 @@
   "gameId": "chess_sf",
   "name": "Shadow Fiend",
   "slug": "shadow-fiend",
+  "icon": "units/shadow_fiend.png",
   "source": {
     "id": "chess_sf",
     "cost": 3,

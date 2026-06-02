@@ -2,6 +2,7 @@
   "gameId": "chess_mag",
   "name": "Magnus",
   "slug": "magnus",
+  "icon": "units/magnus.png",
   "source": {
     "id": "chess_mag",
     "cost": 4,

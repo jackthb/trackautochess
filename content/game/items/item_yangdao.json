@@ -2,6 +2,7 @@
   "gameId": "item_yangdao",
   "name": "Scythe of Vyse",
   "slug": "scythe-of-vyse",
+  "icon": "items/sheepstick.png",
   "source": {
     "name": "Scythe of Vyse",
     "description": "Magic damage +60%。\n\nActive Ability: Instant\nTransforms an enemy piece of the highest level into a harmless animal for 5 sec.",

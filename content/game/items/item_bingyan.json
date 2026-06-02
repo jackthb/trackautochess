@@ -2,6 +2,7 @@
   "gameId": "item_bingyan",
   "name": "Eye of Skadi",
   "slug": "eye-of-skadi",
+  "icon": "items/skadi.png",
   "source": {
     "name": "Eye of Skadi",
     "description": "+600 max health.\nAttack speed, Attack damage, Move speed, mana restoration and healing effectiveness -50%.",

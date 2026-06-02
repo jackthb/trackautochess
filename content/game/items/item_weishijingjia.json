@@ -2,6 +2,7 @@
   "gameId": "item_weishijingjia",
   "name": "Guardian Greaves",
   "slug": "guardian-greaves",
+  "icon": "items/guardian_greaves.png",
   "source": {
     "name": "Guardian Greaves",
     "description": "Enables quick movement\n\nActive ability: Activates when many allied chess pieces are injured.\nGrants 500 maximum health and 30 mana to all allied units in the area and dispels negative effects incurred during battle.\n\nEffect Range:500",

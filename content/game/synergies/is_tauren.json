@@ -2,6 +2,7 @@
   "gameId": "is_tauren",
   "name": "Tauren",
   "slug": "tauren",
+  "icon": "synergies/tauren.png",
   "source": {
     "name": "Tauren",
     "description": "SPECIES TRAIT: Totem of the Clan\n\nActive when you have at least (N) different pieces of this species on board. (Multiple effects stack)\n\n(2) Taurens: Summons a Taunt Totem at the start of the battle.\n(4) Taurens: Summons a Woodpecker Totem and a Horn Totem at the start of the battle.",

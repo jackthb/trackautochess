@@ -2,6 +2,7 @@
   "gameId": "item_minglingshu",
   "name": "Necronomicon",
   "slug": "necronomicon",
+  "icon": "items/necronomicon_3.png",
   "source": {
     "name": "Necronomicon",
     "description": "Summons 2 necro creeps",

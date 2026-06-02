@@ -2,6 +2,7 @@
   "gameId": "item_suduzhixue",
   "name": "Boots of Speed",
   "slug": "boots-of-speed",
+  "icon": "items/boots.png",
   "source": {
     "name": "Boots of Speed",
     "description": "Fast movement.",

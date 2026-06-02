@@ -2,6 +2,7 @@
   "gameId": "chess_cm",
   "name": "Crystal Maiden",
   "slug": "crystal-maiden",
+  "icon": "units/crystal_maiden.png",
   "source": {
     "id": "chess_cm",
     "cost": 1,

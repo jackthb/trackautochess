@@ -2,6 +2,7 @@
   "gameId": "item_jipin",
   "name": "Vladimirs Offering",
   "slug": "vladimirs-offering",
+  "icon": "items/vladmir.png",
   "source": {
     "name": "Vladimirs Offering",
     "description": "Aura Effect\nAllied units in the surrounding area gain the effect: Lifesteal +25%.",

@@ -2,6 +2,7 @@
   "gameId": "item_dayunchui",
   "name": "Abyssal Blade",
   "slug": "abyssal-blade",
+  "icon": "items/abyssal_blade.png",
   "source": {
     "name": "Abyssal Blade",
     "description": "+50 damage.\n\nActive ability: Instant\nStun a nearby enemy piece for 5s, and deal 100 pure damage, ignores skill immunity.",

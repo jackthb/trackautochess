@@ -2,6 +2,7 @@
   "gameId": "item_jufengchangji",
   "name": "Hurricane Pike",
   "slug": "hurricane-pike",
+  "icon": "items/hurricane_pike.png",
   "source": {
     "name": "Hurricane Pike",
     "description": "+20% Attack speed, +200 ranged carrier‘s attack range.\n\nActive ability: Activated when there is an enemy chess piece in close proximity\nPush nearby enemy to the farthest grid in the opposite direction, and push oneself to the farthest grid. Ranged carriers will also immediately perform 4 distance-ignoring attacks on the target.",

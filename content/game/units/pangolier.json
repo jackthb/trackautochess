@@ -2,6 +2,7 @@
   "gameId": "chess_pangolier",
   "name": "Pangolier",
   "slug": "pangolier",
+  "icon": "units/pangolier.png",
   "source": {
     "id": "chess_pangolier",
     "cost": 4,

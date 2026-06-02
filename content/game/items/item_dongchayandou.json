@@ -2,6 +2,7 @@
   "gameId": "item_dongchayandou",
   "name": "Pipe of Insight",
   "slug": "pipe-of-insight",
+  "icon": "items/pipe.png",
   "source": {
     "name": "Pipe of Insight",
     "description": "+10 health regeneration, +50% magic resistance.\n\nActive ability: Activates when taking damage\nGrants ranged allies with +10 health regeneration, +50% magic resistance for 10 sec.\n\nRange:500",

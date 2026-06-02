@@ -2,6 +2,7 @@
   "gameId": "item_test_pomokang",
   "name": "Test item: -50% magic resistance",
   "slug": "test-item-50-magic-resistance",
+  "icon": "items/vengeances_shadow.png",
   "source": {
     "name": "Test item: -50% magic resistance",
     "description": "",

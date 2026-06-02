@@ -2,6 +2,7 @@
   "gameId": "chess_gyro",
   "name": "Gyrocopter",
   "slug": "gyrocopter",
+  "icon": "units/gyrocopter.png",
   "source": {
     "id": "chess_gyro",
     "cost": 5,

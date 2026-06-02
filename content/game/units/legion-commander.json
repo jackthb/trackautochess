@@ -2,6 +2,7 @@
   "gameId": "chess_lc",
   "name": "Legion Commander",
   "slug": "legion-commander",
+  "icon": "units/legion_commander.png",
   "source": {
     "id": "chess_lc",
     "cost": 3,

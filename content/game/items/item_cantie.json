@@ -2,6 +2,7 @@
   "gameId": "item_cantie",
   "name": "Sliver",
   "slug": "sliver",
+  "icon": "items/jushencantie.png",
   "source": {
     "name": "Sliver",
     "description": "+25 damage.\nConsidered as Tier 3 Item.",

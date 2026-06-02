@@ -2,6 +2,7 @@
   "gameId": "is_satyr",
   "name": "Satyr",
   "slug": "satyr",
+  "icon": "synergies/satyr.png",
   "source": {
     "name": "Satyr",
     "description": "SPECIES TRAIT: Fear \n\nActive when you have at least (N) different pieces on board. (Multiple effects stack.)\n\n(2) Satyr: Allied Satyr chess pieces gain the effect: If there is more than 1 enemy nearby, they cause those enemies to lose control due to fear.",

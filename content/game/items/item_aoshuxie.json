@@ -2,6 +2,7 @@
   "gameId": "item_aoshuxie",
   "name": "Arcane Boots",
   "slug": "arcane-boots",
+  "icon": "items/arcane_boots.png",
   "source": {
     "name": "Arcane Boots",
     "description": "Fast movement.\n\nActive ability: Instant\nRestores 40 mana for all allies within the range.\n\nRange: 400",

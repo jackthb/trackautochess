@@ -2,6 +2,7 @@
   "gameId": "item_huanyingfu",
   "name": "Manta Style",
   "slug": "manta-style",
+  "icon": "items/manta.png",
   "source": {
     "name": "Manta Style",
     "description": "Damage +25.\nActive ability: Instant\nCreates 2 images of the caster that last 7 seconds.",

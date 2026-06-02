@@ -2,6 +2,7 @@
   "gameId": "chess_oracle",
   "name": "Oracle",
   "slug": "oracle",
+  "icon": "units/oracle.png",
   "source": {
     "id": "chess_oracle",
     "cost": 2,

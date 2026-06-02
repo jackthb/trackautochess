@@ -2,6 +2,7 @@
   "gameId": "chess_jugg",
   "name": "Juggernaut",
   "slug": "juggernaut",
+  "icon": "units/juggernaut.png",
   "source": {
     "id": "chess_jugg",
     "cost": 2,

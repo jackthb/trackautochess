@@ -2,6 +2,7 @@
   "gameId": "item_moping",
   "name": "Bottle",
   "slug": "bottle",
+  "icon": "items/bottle.png",
   "source": {
     "name": "Bottle",
     "description": "MP +50.",

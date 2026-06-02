@@ -2,6 +2,7 @@
   "gameId": "item_shenjingdun",
   "name": "Mirror Shield",
   "slug": "mirror-shield",
+  "icon": "items/mirror_shield.png",
   "source": {
     "name": "Mirror Shield",
     "description": "Physical Block +60. \n50% probability of rebounding all damage and directional spells taken.",

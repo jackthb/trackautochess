@@ -2,6 +2,7 @@
   "gameId": "item_lieyingzhanren",
   "name": "Falcon Blade",
   "slug": "falcon-blade",
+  "icon": "items/falcon_blade.png",
   "source": {
     "name": "Falcon Blade",
     "description": "Attack damage +25。",

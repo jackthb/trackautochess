@@ -2,6 +2,7 @@
   "gameId": "item_weiguangpifeng",
   "name": "Glimmer Cape",
   "slug": "glimmer-cape",
+  "icon": "items/glimmer_cape.png",
   "source": {
     "name": "Glimmer Cape",
     "description": "Magical resistance +30%.\nHides the carrier from others’ sight.",

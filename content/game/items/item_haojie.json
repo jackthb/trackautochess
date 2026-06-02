@@ -2,6 +2,7 @@
   "gameId": "item_haojie",
   "name": "Havoc",
   "slug": "havoc",
+  "icon": "items/haojie.png",
   "source": {
     "name": "Havoc",
     "description": "Attack damage +50.\n All carriers damage settled as Pure Damage.",

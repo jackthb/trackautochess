@@ -2,6 +2,7 @@
   "gameId": "is_god",
   "name": "God",
   "slug": "god",
+  "icon": "synergies/god.png",
   "source": {
     "name": "God",
     "description": "SPECIES TRAIT: Overweening superiority\n\nActive when you have at least (N) different pieces of this species on board. (Multiple effects stack)\n\n(2)Gods: All allies get the effect: skill cooldown time -30%.\n(4)Gods: All allies get the effect: skill cooldown time -30%.\n(6) Gods: All allies get the effect: Using skills that consume mana will reduce the current remaining cooldown time of active abilities and items by 60%.",

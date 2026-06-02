@@ -2,6 +2,7 @@
   "gameId": "item_suiluchui",
   "name": "Skull Basher",
   "slug": "skull-basher",
+  "icon": "items/basher.png",
   "source": {
     "name": "Skull Basher",
     "description": "Grants melee hero 20% chance on hit to stun the target for 2s.",

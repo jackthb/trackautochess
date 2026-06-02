@@ -2,6 +2,7 @@
   "gameId": "item_test_dahujia",
   "name": "Test item: +999 armor",
   "slug": "test-item-999-armor",
+  "icon": "items/carapace_of_qaldin.png",
   "source": {
     "name": "Test item: +999 armor",
     "description": "",

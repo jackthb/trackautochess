@@ -2,6 +2,7 @@
   "gameId": "is_elf",
   "name": "Elf",
   "slug": "elf",
+  "icon": "synergies/elf.png",
   "source": {
     "name": "Elf",
     "description": "Species Trait: Evasion\n\nActive when you have at least (N) different Elf pieces on board. (Multiple effects stack)\n\n(3) Elves: All friendly elves have +25% evasion.\n(6) Elves: All friendly elves have +40% evasion.\n(9) Elves: Friendly elves gain the effect: Dodging any attack will conceal itself for 1 second and create a mirrored attack from the attacker, targeting the enemy.",

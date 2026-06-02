@@ -2,6 +2,7 @@
   "gameId": "item_jixiezhixin_gold",
   "name": "Golden Heart of the Machine",
   "slug": "golden-heart-of-the-machine",
+  "icon": "items/golden_machina_lg.png",
   "source": {
     "name": "Golden Heart of the Machine",
     "description": "Courier consumable: Click to use\nDISCOVER a panel of 5 random Legendary chess pieces.",

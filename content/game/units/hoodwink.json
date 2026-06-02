@@ -2,6 +2,7 @@
   "gameId": "chess_hw",
   "name": "Hoodwink",
   "slug": "hoodwink",
+  "icon": "units/hoodwink.png",
   "source": {
     "id": "chess_hw",
     "cost": 1,

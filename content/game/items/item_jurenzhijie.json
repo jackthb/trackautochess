@@ -2,6 +2,7 @@
   "gameId": "item_jurenzhijie",
   "name": "Giants Ring",
   "slug": "giants-ring",
+  "icon": "items/giants_ring.png",
   "source": {
     "name": "Giants Ring",
     "description": "+30 health regeneration, +100 physical block, permanent taunt.",

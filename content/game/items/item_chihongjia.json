@@ -2,6 +2,7 @@
   "gameId": "item_chihongjia",
   "name": "Crimson Guard",
   "slug": "crimson-guard",
+  "icon": "items/crimson_guard.png",
   "source": {
     "name": "Crimson Guard",
     "description": "+5 armor, Block 30 damage.\n\nActive ability: Activates when taking damage\nGrants all allies within the range 50% chance to block 100 damage for melee pieces and 30 damage for ranged pieces. Lasts 8 sec.\n\nRange: 400",

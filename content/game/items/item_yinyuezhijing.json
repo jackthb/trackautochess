@@ -2,6 +2,7 @@
   "gameId": "item_yinyuezhijing",
   "name": "Moon Shard",
   "slug": "moon-shard",
+  "icon": "items/moon_shard.png",
   "source": {
     "name": "Moon Shard",
     "description": "Attack speed +50%.",

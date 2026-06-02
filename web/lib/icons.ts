@@ -7,17 +7,24 @@ import relicsData from "@data/relics.json";
 import itemsFullData from "@data/items_full.json";
 
 interface CmsIconFields {
+  icon?: string | null;
   icon_url?: string | null;
 }
 
 type IconMap = Record<string, string>;
+
+function iconPath(data: CmsIconFields): string | null {
+  if (data.icon) return `/icons/${data.icon}`;
+  return data.icon_url ?? null;
+}
 
 function buildUnitMap(): IconMap {
   const map: IconMap = {};
   for (const [name, data] of Object.entries(
     unitsFullData as Record<string, CmsIconFields>
   )) {
-    if (data?.icon_url) map[unitStem(name)] = data.icon_url;
+    const icon = iconPath(data);
+    if (icon) map[unitStem(name)] = icon;
   }
   return map;
 }
@@ -27,8 +34,9 @@ function buildSynergyMap(): IconMap {
   for (const data of Object.values(
     synergiesData as Record<string, CmsIconFields & { name?: string }>
   )) {
-    if (data?.name && data.icon_url) {
-      map[synIconName(data.name)] = data.icon_url;
+    const icon = iconPath(data);
+    if (data?.name && icon) {
+      map[synIconName(data.name)] = icon;
     }
   }
   return map;
@@ -38,8 +46,9 @@ function buildRelicMap(): IconMap {
   const map: IconMap = {};
   const relics = (relicsData as { relics: Record<string, CmsIconFields & { name?: string }> }).relics;
   for (const data of Object.values(relics)) {
-    if (data?.name && data.icon_url) {
-      map[relicStem(data.name)] = data.icon_url;
+    const icon = iconPath(data);
+    if (data?.name && icon) {
+      map[relicStem(data.name)] = icon;
     }
   }
   return map;
@@ -47,10 +56,11 @@ function buildRelicMap(): IconMap {
 
 function buildItemMap(): IconMap {
   const map: IconMap = {};
-  const items = itemsFullData as Record<string, ItemFullInfo>;
+  const items = itemsFullData as Record<string, ItemFullInfo & CmsIconFields>;
   for (const [id, data] of Object.entries(items)) {
-    if (data?.icon_url) {
-      map[itemIconStem(id, items)] = data.icon_url;
+    const icon = iconPath(data);
+    if (icon) {
+      map[itemIconStem(id, items)] = icon;
     }
   }
   return map;
@@ -65,9 +75,9 @@ const ICON_MAPS: Record<string, IconMap> = {
 
 /**
  * Resolve icon URL for a stem produced by unitStem/synIconName/relicStem.
- * Returns the remote icon URL when present in the JSON cache, otherwise
- * falls back to the local /icons/<type>/<stem>.png path served from
- * web/public/icons (synced from data/icons by web/scripts/sync-icons.mjs).
+ * Returns the committed icon reference from the JSON cache, otherwise falls
+ * back to the local /icons/<type>/<stem>.png path served from web/public/icons
+ * (synced from data/icons by web/scripts/sync-icons.mjs).
  */
 export function resolveIconUrl(type: string, stem: string): string {
   return ICON_MAPS[type]?.[stem] ?? `/icons/${type}/${stem}.png`;

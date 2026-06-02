@@ -2,6 +2,7 @@
   "gameId": "item_qiongguidun",
   "name": "Poor Mans Shield",
   "slug": "poor-mans-shield",
+  "icon": "items/poor_mans_shield.png",
   "source": {
     "name": "Poor Mans Shield",
     "description": "+30 physical damage block, +30% chance to block extra 30% physical damage.",

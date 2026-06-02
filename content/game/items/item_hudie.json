@@ -2,6 +2,7 @@
   "gameId": "item_hudie",
   "name": "Butterfly",
   "slug": "butterfly",
+  "icon": "items/butterfly.png",
   "source": {
     "name": "Butterfly",
     "description": "Evasion +40%，Attack Speed +20%.\n\nActive ability: Activates upon taking damage\nThe bonuses provided by Butterfly are doubled for 6 seconds.",

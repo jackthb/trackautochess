@@ -2,6 +2,7 @@
   "gameId": "chess_zeus",
   "name": "Zeus",
   "slug": "zeus",
+  "icon": "units/zeus.png",
   "source": {
     "id": "chess_zeus",
     "cost": 5,

@@ -2,6 +2,7 @@
   "gameId": "chess_bane",
   "name": "Bane",
   "slug": "bane",
+  "icon": "units/bane.png",
   "source": {
     "id": "chess_bane",
     "cost": 1,

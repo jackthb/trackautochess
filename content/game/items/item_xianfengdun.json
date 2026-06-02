@@ -2,6 +2,7 @@
   "gameId": "item_xianfengdun",
   "name": "Vanguard",
   "slug": "vanguard",
+  "icon": "items/vanguard.png",
   "source": {
     "name": "Vanguard",
     "description": "Block 40 damage on melee pieces.",

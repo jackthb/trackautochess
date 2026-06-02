@@ -2,6 +2,7 @@
   "gameId": "item_relicbox",
   "name": "Relicbox",
   "slug": "relicbox",
+  "icon": "items/relicbox.png",
   "source": {
     "name": "Relicbox",
     "description": "Courier consumable: Click to open\nSelect one from three random relics to your inventory.",

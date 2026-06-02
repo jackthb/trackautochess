@@ -2,6 +2,7 @@
   "gameId": "item_ahalimumojing",
   "name": "Aghanims Shard",
   "slug": "aghanims-shard",
+  "icon": "items/aghanims_shard.png",
   "source": {
     "name": "Aghanims Shard",
     "description": "Magic Regen +75%.\nThe carrier permanently gains a random enemy chess pieces active skill as an additional skill.",

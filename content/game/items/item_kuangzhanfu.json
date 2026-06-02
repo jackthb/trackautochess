@@ -2,6 +2,7 @@
   "gameId": "item_kuangzhanfu",
   "name": "Battle Fury",
   "slug": "battle-fury",
+  "icon": "items/bfury.png",
   "source": {
     "name": "Battle Fury",
     "description": "+50 damage.\nMelee attacks deal 50% cleave damage in a range of 1 square.",

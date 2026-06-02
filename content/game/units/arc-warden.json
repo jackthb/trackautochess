@@ -2,6 +2,7 @@
   "gameId": "chess_aw",
   "name": "Arc Warden",
   "slug": "arc-warden",
+  "icon": "units/arc_warden.png",
   "source": {
     "id": "chess_aw",
     "cost": 5,

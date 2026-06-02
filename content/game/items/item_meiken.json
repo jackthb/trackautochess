@@ -2,6 +2,7 @@
   "gameId": "item_meiken",
   "name": "Mekansm",
   "slug": "mekansm",
+  "icon": "items/mekansm.png",
   "source": {
     "name": "Mekansm",
     "description": "Active ability: Activate when most allies are wounded\nHeals 500 health to all allied units within the range. \n\nRange:400",

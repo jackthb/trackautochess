@@ -2,6 +2,7 @@
   "gameId": "item_changdun",
   "name": "Pavise",
   "slug": "pavise",
+  "icon": "items/pavise.png",
   "source": {
     "name": "Pavise",
     "description": "+5 Armor.\nChances to gain +1 armor permanently on its carrier on damage taken in home battle.",

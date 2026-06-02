@@ -2,6 +2,7 @@
   "gameId": "chess_abaddon",
   "name": "Abaddon",
   "slug": "abaddon",
+  "icon": "units/abaddon.png",
   "source": {
     "id": "chess_abaddon",
     "cost": 1,

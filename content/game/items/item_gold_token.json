@@ -2,6 +2,7 @@
   "gameId": "item_gold_token",
   "name": "Golden Machine Token",
   "slug": "golden-machine-token",
+  "icon": "items/gold_token.png",
   "source": {
     "name": "Golden Machine Token",
     "description": "A special Token for recruiting Discovered pieces, granted by Golden Heart of the Machine.",

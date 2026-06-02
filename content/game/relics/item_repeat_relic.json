@@ -2,6 +2,7 @@
   "gameId": "item_repeat_relic",
   "name": "Time-Space Replica",
   "slug": "time-space-replica",
+  "icon": "relics/time_space_replica.png",
   "source": {
     "name": "Time-Space Replica",
     "description": "Replicate your last relic.",

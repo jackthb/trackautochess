@@ -2,6 +2,7 @@
   "gameId": "chess_marci",
   "name": "Marci",
   "slug": "marci",
+  "icon": "units/marci.png",
   "source": {
     "id": "chess_marci",
     "cost": 3,

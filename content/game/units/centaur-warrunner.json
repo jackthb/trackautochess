@@ -2,6 +2,7 @@
   "gameId": "chess_ct",
   "name": "Centaur Warrunner",
   "slug": "centaur-warrunner",
+  "icon": "units/centaur_warrunner.png",
   "source": {
     "id": "chess_ct",
     "cost": 2,

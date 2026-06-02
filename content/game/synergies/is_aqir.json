@@ -2,6 +2,7 @@
   "gameId": "is_aqir",
   "name": "Aqir",
   "slug": "aqir",
+  "icon": "synergies/aqir.png",
   "source": {
     "name": "Aqir",
     "description": "Species Trait: Infection\n\nActive when there are at least (N) different Aqir chess pieces on the chessboard. (Multiple effects stack)\n\n(2) Aqirs: Grants all non-Aqir allies: Upon death, if there is any Infected friendly piece of the same name on the chessboard, immediately hatches a random Aqir piece.\n(4) Aqirs: Rank 1 effect now also applies to all friendly Aqir pieces, and will hatch a random higher-level Aqir piece.",

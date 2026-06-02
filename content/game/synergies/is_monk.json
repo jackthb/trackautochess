@@ -2,6 +2,7 @@
   "gameId": "is_monk",
   "name": "Monk",
   "slug": "monk",
+  "icon": "synergies/monk.png",
   "source": {
     "name": "Monk",
     "description": "Class Perk: Drunken Stagger\n\nActive when you have at least (N) different Monk pieces on board. (Multiple effects stack)\n\n(2) Monks: All friendly melee Monks have a chance on dealing damage to instantly eliminate the target enemy with a low health.\n(4) Monks: All friendly Monks have a chance on dealing damage to reduce the current health of the target enemy by half.",

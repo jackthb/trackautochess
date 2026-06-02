@@ -2,6 +2,7 @@
   "gameId": "is_warlock",
   "name": "Warlock",
   "slug": "warlock",
+  "icon": "synergies/warlock.png",
   "source": {
     "name": "Warlock",
     "description": "Warlock pieces convert 25% of their health into 50% mana when a battle starts.\n\nClass Perk: Soul Leech\n\nActive when you have at least (N) different Warlock pieces on board. (Multiple effects stack)\n\n(2) Warlocks: All allies have All allies have +5% lifesteal from all damage dealt.\n(4) Warlocks: All allies have All allies have +20% lifesteal from all damage dealt.\n(6) Warlocks: All ally warlocks steal a max health of 0.5x damage on every attack.",

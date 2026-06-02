@@ -54,7 +54,8 @@
         "atk_rate": 1.3,
         "atk_range": 205
       }
-    }
+    },
+    "icon": "units/abaddon.png"
   },
   "Abyssal Underlord": {
     "id": "chess_au",
@@ -111,7 +112,8 @@
         "atk_rate": 1.5,
         "atk_range": 205
       }
-    }
+    },
+    "icon": "units/abyssal_underlord.png"
   },
   "Alchemist": {
     "id": "chess_ga",
@@ -169,7 +171,8 @@
         "atk_rate": 1.3,
         "atk_range": 205
       }
-    }
+    },
+    "icon": "units/alchemist.png"
   },
   "Ancient Apparition": {
     "id": "chess_aa",
@@ -226,7 +229,8 @@
         "atk_rate": 1.5,
         "atk_range": 800
       }
-    }
+    },
+    "icon": "units/ancient_apparition.png"
   },
   "Anti-mage": {
     "id": "chess_am",
@@ -283,7 +287,8 @@
         "atk_rate": 0.9,
         "atk_range": 205
       }
-    }
+    },
+    "icon": "units/anti_mage.png"
   },
   "Arc Warden": {
     "id": "chess_aw",
@@ -340,7 +345,8 @@
         "atk_rate": 1.1,
         "atk_range": 600
       }
-    }
+    },
+    "icon": "units/arc_warden.png"
   },
   "Axe": {
     "id": "chess_axe",
@@ -397,7 +403,8 @@
         "atk_rate": 1.5,
         "atk_range": 205
       }
-    }
+    },
+    "icon": "units/axe.png"
   },
   "Bane": {
     "id": "chess_bane",
@@ -455,7 +462,8 @@
         "atk_rate": 1.5,
         "atk_range": 400
       }
-    }
+    },
+    "icon": "units/bane.png"
   },
   "Batrider": {
     "id": "chess_bat",
@@ -512,7 +520,8 @@
         "atk_rate": 1.3,
         "atk_range": 400
       }
-    }
+    },
+    "icon": "units/batrider.png"
   },
   "Beastmaster": {
     "id": "chess_bm",
@@ -569,7 +578,8 @@
         "atk_rate": 1.4,
         "atk_range": 205
       }
-    }
+    },
+    "icon": "units/beastmaster.png"
   },
   "Blood Seeker": {
     "id": "chess_bs",
@@ -626,7 +636,8 @@
         "atk_rate": 1.1,
         "atk_range": 205
       }
-    }
+    },
+    "icon": "units/bloodseeker.png"
   },
   "Bounty Hunter": {
     "id": "chess_bh",
@@ -684,7 +695,8 @@
         "atk_rate": 1,
         "atk_range": 205
       }
-    }
+    },
+    "icon": "units/bounty_hunter.png"
   },
   "Brewmaster": {
     "id": "chess_brew",
@@ -741,7 +753,8 @@
         "atk_rate": 1.5,
         "atk_range": 205
       }
-    }
+    },
+    "icon": "units/brewmaster.png"
   },
   "Broodmother": {
     "id": "chess_br",
@@ -798,7 +811,8 @@
         "atk_rate": 1.1,
         "atk_range": 205
       }
-    }
+    },
+    "icon": "units/broodmother.png"
   },
   "Centaur Warrunner": {
     "id": "chess_ct",
@@ -855,7 +869,8 @@
         "atk_rate": 1.1,
         "atk_range": 205
       }
-    }
+    },
+    "icon": "units/centaur_warrunner.png"
   },
   "Chaos Knight": {
     "id": "chess_ck",
@@ -912,7 +927,8 @@
         "atk_rate": 1.5,
         "atk_range": 205
       }
-    }
+    },
+    "icon": "units/chaos_knight.png"
   },
   "Chen": {
     "id": "chess_chen",
@@ -969,7 +985,8 @@
         "atk_rate": 1.4,
         "atk_range": 400
       }
-    }
+    },
+    "icon": "units/chen.png"
   },
   "Clinkz": {
     "id": "chess_clinkz",
@@ -1026,7 +1043,8 @@
         "atk_rate": 1,
         "atk_range": 600
       }
-    }
+    },
+    "icon": "units/clinkz.png"
   },
   "Clockwerk": {
     "id": "chess_clock",
@@ -1083,7 +1101,8 @@
         "atk_rate": 1.4,
         "atk_range": 205
       }
-    }
+    },
+    "icon": "units/clockwerk.png"
   },
   "Crystal Maiden": {
     "id": "chess_cm",
@@ -1140,7 +1159,8 @@
         "atk_rate": 1.7,
         "atk_range": 600
       }
-    }
+    },
+    "icon": "units/crystal_maiden.png"
   },
   "Dark Willow": {
     "id": "chess_dw",
@@ -1197,7 +1217,8 @@
         "atk_rate": 1.1,
         "atk_range": 400
       }
-    }
+    },
+    "icon": "units/dark_willow.png"
   },
   "DarkSeer": {
     "id": "chess_ds",
@@ -1254,7 +1275,8 @@
         "atk_rate": 1.6,
         "atk_range": 205
       }
-    }
+    },
+    "icon": "units/dark_seer.png"
   },
   "Dawnbreaker": {
     "id": "chess_db",
@@ -1311,7 +1333,8 @@
         "atk_rate": 1.6,
         "atk_range": 205
       }
-    }
+    },
+    "icon": "units/dawnbreaker.png"
   },
   "Dazzle": {
     "id": "chess_dazzle",
@@ -1368,7 +1391,8 @@
         "atk_rate": 1.2,
         "atk_range": 400
       }
-    }
+    },
+    "icon": "units/dazzle.png"
   },
   "Death Prophet": {
     "id": "chess_dp",
@@ -1425,7 +1449,8 @@
         "atk_rate": 1.4,
         "atk_range": 400
       }
-    }
+    },
+    "icon": "units/death_prophet.png"
   },
   "Disruptor": {
     "id": "chess_disruptor",
@@ -1482,7 +1507,8 @@
         "atk_rate": 1.5,
         "atk_range": 600
       }
-    }
+    },
+    "icon": "units/disruptor.png"
   },
   "Doom": {
     "id": "chess_doom",
@@ -1539,7 +1565,8 @@
         "atk_rate": 1.3,
         "atk_range": 205
       }
-    }
+    },
+    "icon": "units/doom.png"
   },
   "Dragon Knight": {
     "id": "chess_dk",
@@ -1597,7 +1624,8 @@
         "atk_rate": 1.5,
         "atk_range": 205
       }
-    }
+    },
+    "icon": "units/dragon_knight.png"
   },
   "Drow Ranger": {
     "id": "chess_dr",
@@ -1654,7 +1682,8 @@
         "atk_rate": 0.9,
         "atk_range": 600
       }
-    }
+    },
+    "icon": "units/drow_ranger.png"
   },
   "Earth Spirit": {
     "id": "chess_earth",
@@ -1711,7 +1740,8 @@
         "atk_rate": 1.5,
         "atk_range": 205
       }
-    }
+    },
+    "icon": "units/earth_spirit.png"
   },
   "Earthshaker": {
     "id": "chess_es",
@@ -1768,7 +1798,8 @@
         "atk_rate": 1.4,
         "atk_range": 205
       }
-    }
+    },
+    "icon": "units/earthshaker.png"
   },
   "Elder Titan": {
     "id": "chess_et",
@@ -1826,7 +1857,8 @@
         "atk_rate": 1.5,
         "atk_range": 205
       }
-    }
+    },
+    "icon": "units/elder_titan.png"
   },
   "Ember Spirit": {
     "id": "chess_ember",
@@ -1883,7 +1915,8 @@
         "atk_rate": 1.2,
         "atk_range": 205
       }
-    }
+    },
+    "icon": "units/ember_spirit.png"
   },
   "Enchantress": {
     "id": "chess_eh",
@@ -1941,7 +1974,8 @@
         "atk_rate": 1.5,
         "atk_range": 400
       }
-    }
+    },
+    "icon": "units/enchantress.png"
   },
   "Enigma": {
     "id": "chess_enigma",
@@ -1998,7 +2032,8 @@
         "atk_rate": 1.5,
         "atk_range": 400
       }
-    }
+    },
+    "icon": "units/enigma.png"
   },
   "Faceless Void": {
     "id": "chess_fv",
@@ -2055,7 +2090,8 @@
         "atk_rate": 1.3,
         "atk_range": 205
       }
-    }
+    },
+    "icon": "units/faceless_void.png"
   },
   "Furion": {
     "id": "chess_fur",
@@ -2112,7 +2148,8 @@
         "atk_rate": 1.4,
         "atk_range": 400
       }
-    }
+    },
+    "icon": "units/furion.png"
   },
   "Gyrocopter": {
     "id": "chess_gyro",
@@ -2169,7 +2206,8 @@
         "atk_rate": 0.9,
         "atk_range": 400
       }
-    }
+    },
+    "icon": "units/gyrocopter.png"
   },
   "Hoodwink": {
     "id": "chess_hw",
@@ -2226,7 +2264,8 @@
         "atk_rate": 1.2,
         "atk_range": 400
       }
-    }
+    },
+    "icon": "units/hoodwink.png"
   },
   "Huskar": {
     "id": "chess_huskar",
@@ -2283,7 +2322,8 @@
         "atk_rate": 1.1,
         "atk_range": 400
       }
-    }
+    },
+    "icon": "units/huskar.png"
   },
   "Invoker": {
     "id": "chess_kael",
@@ -2340,7 +2380,8 @@
         "atk_rate": 1.1,
         "atk_range": 600
       }
-    }
+    },
+    "icon": "units/invoker.png"
   },
   "Io": {
     "id": "chess_io",
@@ -2402,7 +2443,8 @@
         "atk_rate": 1.3,
         "atk_range": 400
       }
-    }
+    },
+    "icon": "units/io.png"
   },
   "Jakiro": {
     "id": "chess_thd",
@@ -2459,7 +2501,8 @@
         "atk_rate": 1.3,
         "atk_range": 400
       }
-    }
+    },
+    "icon": "units/jakiro.png"
   },
   "Juggernaut": {
     "id": "chess_jugg",
@@ -2516,7 +2559,8 @@
         "atk_rate": 1.1,
         "atk_range": 205
       }
-    }
+    },
+    "icon": "units/juggernaut.png"
   },
   "Keeper of the Light": {
     "id": "chess_light",
@@ -2573,7 +2617,8 @@
         "atk_rate": 1.7,
         "atk_range": 600
       }
-    }
+    },
+    "icon": "units/keeper_of_the_light.png"
   },
   "Kez": {
     "id": "chess_kez",
@@ -2630,7 +2675,8 @@
         "atk_rate": 1.1,
         "atk_range": 205
       }
-    }
+    },
+    "icon": "units/kez.png"
   },
   "Kunkka": {
     "id": "chess_kunkka",
@@ -2687,7 +2733,8 @@
         "atk_rate": 1.3,
         "atk_range": 205
       }
-    }
+    },
+    "icon": "units/kunkka.png"
   },
   "Largo": {
     "id": "chess_largo",
@@ -2744,7 +2791,8 @@
         "atk_rate": 1.3,
         "atk_range": 205
       }
-    }
+    },
+    "icon": "units/largo.png"
   },
   "Legion Commander": {
     "id": "chess_lc",
@@ -2801,7 +2849,8 @@
         "atk_rate": 1.2,
         "atk_range": 205
       }
-    }
+    },
+    "icon": "units/legion_commander.png"
   },
   "Leshrac": {
     "id": "chess_ts",
@@ -2859,7 +2908,8 @@
         "atk_rate": 1.2,
         "atk_range": 400
       }
-    }
+    },
+    "icon": "units/leshrac.png"
   },
   "Lich": {
     "id": "chess_lich",
@@ -2916,7 +2966,8 @@
         "atk_rate": 1.5,
         "atk_range": 400
       }
-    }
+    },
+    "icon": "units/lich.png"
   },
   "Lifestealer": {
     "id": "chess_naix",
@@ -2974,7 +3025,8 @@
         "atk_rate": 1.1,
         "atk_range": 205
       }
-    }
+    },
+    "icon": "units/lifestealer.png"
   },
   "Lina": {
     "id": "chess_lina",
@@ -3031,7 +3083,8 @@
         "atk_rate": 1.3,
         "atk_range": 600
       }
-    }
+    },
+    "icon": "units/lina.png"
   },
   "Lion": {
     "id": "chess_lion",
@@ -3088,7 +3141,8 @@
         "atk_rate": 1.6,
         "atk_range": 400
       }
-    }
+    },
+    "icon": "units/lion.png"
   },
   "Lone Druid": {
     "id": "chess_ld",
@@ -3145,7 +3199,8 @@
         "atk_rate": 1.3,
         "atk_range": 400
       }
-    }
+    },
+    "icon": "units/lone_druid.png"
   },
   "Luna": {
     "id": "chess_luna",
@@ -3202,7 +3257,8 @@
         "atk_rate": 1.2,
         "atk_range": 400
       }
-    }
+    },
+    "icon": "units/luna.png"
   },
   "Lycan": {
     "id": "chess_lyc",
@@ -3260,7 +3316,8 @@
         "atk_rate": 1.3,
         "atk_range": 205
       }
-    }
+    },
+    "icon": "units/lycan.png"
   },
   "Magnus": {
     "id": "chess_mag",
@@ -3317,7 +3374,8 @@
         "atk_rate": 1.5,
         "atk_range": 205
       }
-    }
+    },
+    "icon": "units/magnus.png"
   },
   "Marci": {
     "id": "chess_marci",
@@ -3374,7 +3432,8 @@
         "atk_rate": 1.1,
         "atk_range": 205
       }
-    }
+    },
+    "icon": "units/marci.png"
   },
   "Mars": {
     "id": "chess_mars",
@@ -3431,7 +3490,8 @@
         "atk_rate": 1.9,
         "atk_range": 205
       }
-    }
+    },
+    "icon": "units/mars.png"
   },
   "Medusa": {
     "id": "chess_medusa",
@@ -3488,7 +3548,8 @@
         "atk_rate": 1,
         "atk_range": 400
       }
-    }
+    },
+    "icon": "units/medusa.png"
   },
   "Meepo": {
     "id": "chess_meepo",
@@ -3545,7 +3606,8 @@
         "atk_rate": 1,
         "atk_range": 205
       }
-    }
+    },
+    "icon": "units/meepo.png"
   },
   "Mirana": {
     "id": "chess_pom",
@@ -3602,7 +3664,8 @@
         "atk_rate": 1,
         "atk_range": 600
       }
-    }
+    },
+    "icon": "units/mirana.png"
   },
   "Monkey King": {
     "id": "chess_mk",
@@ -3659,7 +3722,8 @@
         "atk_rate": 1.2,
         "atk_range": 205
       }
-    }
+    },
+    "icon": "units/monkey_king.png"
   },
   "Morphling": {
     "id": "chess_morph",
@@ -3717,7 +3781,8 @@
         "atk_rate": 1.4,
         "atk_range": 400
       }
-    }
+    },
+    "icon": "units/morphling.png"
   },
   "Muerta": {
     "id": "chess_muerta",
@@ -3774,7 +3839,8 @@
         "atk_rate": 1.1,
         "atk_range": 400
       }
-    }
+    },
+    "icon": "units/muerta.png"
   },
   "Naga Siren": {
     "id": "chess_naga",
@@ -3831,7 +3897,8 @@
         "atk_rate": 1.2,
         "atk_range": 205
       }
-    }
+    },
+    "icon": "units/naga_siren.png"
   },
   "Necrophos": {
     "id": "chess_nec",
@@ -3888,7 +3955,8 @@
         "atk_rate": 1.2,
         "atk_range": 400
       }
-    }
+    },
+    "icon": "units/necrophos.png"
   },
   "Nyx Assassin": {
     "id": "chess_na",
@@ -3946,7 +4014,8 @@
         "atk_rate": 1.3,
         "atk_range": 205
       }
-    }
+    },
+    "icon": "units/nyx_assassin.png"
   },
   "Ogre Magi": {
     "id": "chess_om",
@@ -4003,7 +4072,8 @@
         "atk_rate": 1.5,
         "atk_range": 205
       }
-    }
+    },
+    "icon": "units/ogre_magi.png"
   },
   "Omniknight": {
     "id": "chess_ok",
@@ -4060,7 +4130,8 @@
         "atk_rate": 1.4,
         "atk_range": 205
       }
-    }
+    },
+    "icon": "units/omniknight.png"
   },
   "Oracle": {
     "id": "chess_oracle",
@@ -4117,7 +4188,8 @@
         "atk_rate": 1.6,
         "atk_range": 400
       }
-    }
+    },
+    "icon": "units/oracle.png"
   },
   "Pangolier": {
     "id": "chess_pangolier",
@@ -4174,7 +4246,8 @@
         "atk_rate": 1,
         "atk_range": 205
       }
-    }
+    },
+    "icon": "units/pangolier.png"
   },
   "Phantom Assassin": {
     "id": "chess_pa",
@@ -4231,7 +4304,8 @@
         "atk_rate": 0.9,
         "atk_range": 205
       }
-    }
+    },
+    "icon": "units/phantom_assassin.png"
   },
   "Phoenix": {
     "id": "chess_phx",
@@ -4288,7 +4362,8 @@
         "atk_rate": 1.5,
         "atk_range": 400
       }
-    }
+    },
+    "icon": "units/phoenix.png"
   },
   "Primal Beast": {
     "id": "chess_pb",
@@ -4345,7 +4420,8 @@
         "atk_rate": 1.8,
         "atk_range": 205
       }
-    }
+    },
+    "icon": "units/primal_beast.png"
   },
   "Puck": {
     "id": "chess_puck",
@@ -4403,7 +4479,8 @@
         "atk_rate": 1.7,
         "atk_range": 400
       }
-    }
+    },
+    "icon": "units/puck.png"
   },
   "Pudge": {
     "id": "chess_pudge",
@@ -4460,7 +4537,8 @@
         "atk_rate": 2,
         "atk_range": 205
       }
-    }
+    },
+    "icon": "units/pudge.png"
   },
   "Queen of Pain": {
     "id": "chess_qop",
@@ -4517,7 +4595,8 @@
         "atk_rate": 1.2,
         "atk_range": 400
       }
-    }
+    },
+    "icon": "units/queen_of_pain.png"
   },
   "Razor": {
     "id": "chess_razor",
@@ -4574,7 +4653,8 @@
         "atk_rate": 1.1,
         "atk_range": 400
       }
-    }
+    },
+    "icon": "units/razor.png"
   },
   "Riki": {
     "id": "chess_riki",
@@ -4631,7 +4711,8 @@
         "atk_rate": 0.9,
         "atk_range": 205
       }
-    }
+    },
+    "icon": "units/riki.png"
   },
   "Ringmaster": {
     "id": "chess_rm",
@@ -4685,7 +4766,8 @@
         "atk_rate": 1.7,
         "atk_range": 400
       }
-    }
+    },
+    "icon": "units/ringmaster.png"
   },
   "Rubick": {
     "id": "chess_rubick",
@@ -4742,7 +4824,8 @@
         "atk_rate": 1.4,
         "atk_range": 205
       }
-    }
+    },
+    "icon": "units/rubick.png"
   },
   "Sand King": {
     "id": "chess_sk",
@@ -4799,7 +4882,8 @@
         "atk_rate": 1.4,
         "atk_range": 205
       }
-    }
+    },
+    "icon": "units/sand_king.png"
   },
   "Shadow Demon": {
     "id": "chess_sd",
@@ -4857,7 +4941,8 @@
         "atk_rate": 1.7,
         "atk_range": 400
       }
-    }
+    },
+    "icon": "units/shadow_demon.png"
   },
   "Shadow Fiend": {
     "id": "chess_sf",
@@ -4914,7 +4999,8 @@
         "atk_rate": 1.2,
         "atk_range": 600
       }
-    }
+    },
+    "icon": "units/shadow_fiend.png"
   },
   "Shadow Shaman": {
     "id": "chess_ss",
@@ -4971,7 +5057,8 @@
         "atk_rate": 1.2,
         "atk_range": 400
       }
-    }
+    },
+    "icon": "units/shadow_shaman.png"
   },
   "Skywrath Mage": {
     "id": "chess_sm",
@@ -5028,7 +5115,8 @@
         "atk_rate": 1.5,
         "atk_range": 600
       }
-    }
+    },
+    "icon": "units/skywrath_mage.png"
   },
   "Slardar": {
     "id": "chess_slardar",
@@ -5085,7 +5173,8 @@
         "atk_rate": 1.5,
         "atk_range": 205
       }
-    }
+    },
+    "icon": "units/slardar.png"
   },
   "Slark": {
     "id": "chess_slark",
@@ -5142,7 +5231,8 @@
         "atk_rate": 1,
         "atk_range": 205
       }
-    }
+    },
+    "icon": "units/slark.png"
   },
   "Snapfire": {
     "id": "chess_snap",
@@ -5199,7 +5289,8 @@
         "atk_rate": 1.2,
         "atk_range": 600
       }
-    }
+    },
+    "icon": "units/snapfire.png"
   },
   "Sniper": {
     "id": "chess_sniper",
@@ -5256,7 +5347,8 @@
         "atk_rate": 1.3,
         "atk_range": 600
       }
-    }
+    },
+    "icon": "units/sniper.png"
   },
   "Spectres": {
     "id": "chess_spe",
@@ -5313,7 +5405,8 @@
         "atk_rate": 1,
         "atk_range": 205
       }
-    }
+    },
+    "icon": "units/spectre.png"
   },
   "Spirit Breaker": {
     "id": "chess_sb",
@@ -5370,7 +5463,8 @@
         "atk_rate": 1.4,
         "atk_range": 205
       }
-    }
+    },
+    "icon": "units/spirit_breaker.png"
   },
   "Storm Spirit": {
     "id": "chess_storm",
@@ -5427,7 +5521,8 @@
         "atk_rate": 1.4,
         "atk_range": 400
       }
-    }
+    },
+    "icon": "units/storm_spirit.png"
   },
   "Sven": {
     "id": "chess_sven",
@@ -5484,7 +5579,8 @@
         "atk_rate": 1.6,
         "atk_range": 205
       }
-    }
+    },
+    "icon": "units/sven.png"
   },
   "Techies": {
     "id": "chess_tech",
@@ -5541,7 +5637,8 @@
         "atk_rate": 1.5,
         "atk_range": 600
       }
-    }
+    },
+    "icon": "units/techies.png"
   },
   "Templar Assassin": {
     "id": "chess_ta",
@@ -5598,7 +5695,8 @@
         "atk_rate": 0.9,
         "atk_range": 400
       }
-    }
+    },
+    "icon": "units/templar_assassin.png"
   },
   "Terrorblade": {
     "id": "chess_tb",
@@ -5655,7 +5753,8 @@
         "atk_rate": 1.1,
         "atk_range": 205
       }
-    }
+    },
+    "icon": "units/terrorblade.png"
   },
   "Tidehunter": {
     "id": "chess_th",
@@ -5712,7 +5811,8 @@
         "atk_rate": 2,
         "atk_range": 205
       }
-    }
+    },
+    "icon": "units/tidehunter.png"
   },
   "Timbersaw": {
     "id": "chess_shredder",
@@ -5769,7 +5869,8 @@
         "atk_rate": 1.4,
         "atk_range": 205
       }
-    }
+    },
+    "icon": "units/timbersaw.png"
   },
   "Tinker": {
     "id": "chess_tk",
@@ -5826,7 +5927,8 @@
         "atk_rate": 1.5,
         "atk_range": 600
       }
-    }
+    },
+    "icon": "units/tinker.png"
   },
   "Tiny": {
     "id": "chess_tiny",
@@ -5889,7 +5991,8 @@
         "atk_rate": 1.9,
         "atk_range": 205
       }
-    }
+    },
+    "icon": "units/tiny.png"
   },
   "Treant Protector": {
     "id": "chess_tp",
@@ -5946,7 +6049,8 @@
         "atk_rate": 2,
         "atk_range": 205
       }
-    }
+    },
+    "icon": "units/treant_protector.png"
   },
   "Troll Warlord": {
     "id": "chess_troll",
@@ -6003,7 +6107,8 @@
         "atk_rate": 0.8,
         "atk_range": 400
       }
-    }
+    },
+    "icon": "units/troll_warlord.png"
   },
   "Tusk": {
     "id": "chess_tusk",
@@ -6060,7 +6165,8 @@
         "atk_rate": 1.2,
         "atk_range": 205
       }
-    }
+    },
+    "icon": "units/tusk.png"
   },
   "Undying": {
     "id": "chess_ud",
@@ -6117,7 +6223,8 @@
         "atk_rate": 1.7,
         "atk_range": 205
       }
-    }
+    },
+    "icon": "units/undying.png"
   },
   "Vengeful Spirit": {
     "id": "chess_vs",
@@ -6175,7 +6282,8 @@
         "atk_rate": 1.3,
         "atk_range": 400
       }
-    }
+    },
+    "icon": "units/vengeful_spirit.png"
   },
   "Venomancer": {
     "id": "chess_veno",
@@ -6233,7 +6341,8 @@
         "atk_rate": 1.2,
         "atk_range": 400
       }
-    }
+    },
+    "icon": "units/venomancer.png"
   },
   "Viper": {
     "id": "chess_viper",
@@ -6290,7 +6399,8 @@
         "atk_rate": 1,
         "atk_range": 400
       }
-    }
+    },
+    "icon": "units/viper.png"
   },
   "Void Spirit": {
     "id": "chess_void",
@@ -6347,7 +6457,8 @@
         "atk_rate": 1.3,
         "atk_range": 205
       }
-    }
+    },
+    "icon": "units/void_spirit.png"
   },
   "Warlock": {
     "id": "chess_wl",
@@ -6404,7 +6515,8 @@
         "atk_rate": 1.5,
         "atk_range": 600
       }
-    }
+    },
+    "icon": "units/warlock.png"
   },
   "Windranger": {
     "id": "chess_wr",
@@ -6461,7 +6573,8 @@
         "atk_rate": 1,
         "atk_range": 600
       }
-    }
+    },
+    "icon": "units/windranger.png"
   },
   "Winter Wyvern": {
     "id": "chess_ww",
@@ -6519,7 +6632,8 @@
         "atk_rate": 1.4,
         "atk_range": 400
       }
-    }
+    },
+    "icon": "units/winter_wyvern.png"
   },
   "Witch Doctor": {
     "id": "chess_wd",
@@ -6576,7 +6690,8 @@
         "atk_rate": 1.5,
         "atk_range": 400
       }
-    }
+    },
+    "icon": "units/witch_doctor.png"
   },
   "Wraith King": {
     "id": "chess_snk",
@@ -6633,7 +6748,8 @@
         "atk_rate": 1.7,
         "atk_range": 205
       }
-    }
+    },
+    "icon": "units/wraith_king.png"
   },
   "Zeus": {
     "id": "chess_zeus",
@@ -6690,6 +6806,7 @@
         "atk_rate": 1.4,
         "atk_range": 400
       }
-    }
+    },
+    "icon": "units/zeus.png"
   }
 }

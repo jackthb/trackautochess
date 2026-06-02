@@ -2,6 +2,7 @@
   "gameId": "item_qiangxi",
   "name": "Assault Cuirass",
   "slug": "assault-cuirass",
+  "icon": "items/assault.png",
   "source": {
     "name": "Assault Cuirass",
     "description": "+15 Armor.+20 Attack speed.\n\nAura\nGrants +10 armor to allies nearby.\nEnemies nearby suffer -10 armor.",

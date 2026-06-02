@@ -2,6 +2,7 @@
   "gameId": "item_feijiangxiaomao",
   "name": "Ascetics Cap",
   "slug": "ascetics-cap",
+  "icon": "items/ascetic_cap.png",
   "source": {
     "name": "Ascetics Cap",
     "description": "+25% magical resistance. A non-Undead carrier has a chance to be reborn into an undead piece of the same rank and level.",

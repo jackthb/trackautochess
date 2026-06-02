@@ -2,6 +2,7 @@
   "gameId": "chess_spe",
   "name": "Spectres",
   "slug": "spectres",
+  "icon": "units/spectre.png",
   "source": {
     "id": "chess_spe",
     "cost": 5,

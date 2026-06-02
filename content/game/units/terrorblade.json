@@ -2,6 +2,7 @@
   "gameId": "chess_tb",
   "name": "Terrorblade",
   "slug": "terrorblade",
+  "icon": "units/terrorblade.png",
   "source": {
     "id": "chess_tb",
     "cost": 3,

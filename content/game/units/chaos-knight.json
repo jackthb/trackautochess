@@ -2,6 +2,7 @@
   "gameId": "chess_ck",
   "name": "Chaos Knight",
   "slug": "chaos-knight",
+  "icon": "units/chaos_knight.png",
   "source": {
     "id": "chess_ck",
     "cost": 2,

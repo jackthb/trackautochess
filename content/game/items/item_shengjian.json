@@ -2,6 +2,7 @@
   "gameId": "item_shengjian",
   "name": "Rapier",
   "slug": "rapier",
+  "icon": "items/rapier.png",
   "source": {
     "name": "Rapier",
     "description": "Basic Attack Damage: +350, Skill Damage: +25%.\n If defeated on home battle and the courier takes damage, it drops to a random other player. Cannot be reforged.",

@@ -2,6 +2,7 @@
   "gameId": "item_test_poyinyue",
   "name": "Test item: -200% attack speed",
   "slug": "test-item-200-attack-speed",
+  "icon": "items/unstable_wand.png",
   "source": {
     "name": "Test item: -200% attack speed",
     "description": "",

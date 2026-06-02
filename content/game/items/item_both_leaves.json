@@ -2,6 +2,7 @@
   "gameId": "item_both_leaves",
   "name": "Leafy Essence",
   "slug": "leafy-essence",
+  "icon": "items/seeds_of_serenity.png",
   "source": {
     "name": "Leafy Essence",
     "description": "All offside branches unlock automatically in this single game.",

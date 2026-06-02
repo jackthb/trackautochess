@@ -2,6 +2,7 @@
   "gameId": "item_double_coin",
   "name": "Doubloon",
   "slug": "doubloon",
+  "icon": "relics/doubloon.png",
   "source": {
     "name": "Doubloon",
     "description": "Relic Consumable: Click to Use\nTransfer 20% of the higher one of your Health and Mana into another. Can be used twice",

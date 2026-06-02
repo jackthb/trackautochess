@@ -2,6 +2,7 @@
   "gameId": "item_shuaxinqiu",
   "name": "Refresher Orb",
   "slug": "refresher-orb",
+  "icon": "items/refresher.png",
   "source": {
     "name": "Refresher Orb",
     "description": "+200% mana regeneration\n\nActive ability: Activates when ability or items incur cooldown\nResets the cooldown of abilities and other items.",

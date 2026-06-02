@@ -2,6 +2,7 @@
   "gameId": "chess_muerta",
   "name": "Muerta",
   "slug": "muerta",
+  "icon": "units/muerta.png",
   "source": {
     "id": "chess_muerta",
     "cost": 2,

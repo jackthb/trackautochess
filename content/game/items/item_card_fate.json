@@ -2,6 +2,7 @@
   "gameId": "item_card_fate",
   "name": "Card: Fate",
   "slug": "card-fate",
+  "icon": "items/card_fate.png",
   "source": {
     "name": "Card: Fate",
     "description": "Courier Consumable: Click to use\nYou can designate a chess piece to permanently gain an additional race from the nearest other race",

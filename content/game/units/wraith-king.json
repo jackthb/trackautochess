@@ -2,6 +2,7 @@
   "gameId": "chess_snk",
   "name": "Wraith King",
   "slug": "wraith-king",
+  "icon": "units/wraith_king.png",
   "source": {
     "id": "chess_snk",
     "cost": 5,

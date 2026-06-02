@@ -2,6 +2,7 @@
   "gameId": "is_human",
   "name": "Human",
   "slug": "human",
+  "icon": "synergies/human.png",
   "source": {
     "name": "Human",
     "description": "Species Perk: Spark of Mind\n\nActive when you have at least (N) different human pieces on board. (Multiple effects stack) \n\n(3) Humans: Gain 2 experience points at the start of each round.\n(6) Humans: Gain (Courier Level - 2) points of experience points at the start of each round if you won your last home battle.",

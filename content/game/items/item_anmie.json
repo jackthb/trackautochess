@@ -2,6 +2,7 @@
   "gameId": "item_anmie",
   "name": "Desolator",
   "slug": "desolator",
+  "icon": "items/desolator.png",
   "source": {
     "name": "Desolator",
     "description": "+25 damage.\nArmor -10 to the target on attacks.",

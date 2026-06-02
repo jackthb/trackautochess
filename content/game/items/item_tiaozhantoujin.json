@@ -2,6 +2,7 @@
   "gameId": "item_tiaozhantoujin",
   "name": "Hood of Defiance",
   "slug": "hood-of-defiance",
+  "icon": "items/hood_of_defiance.png",
   "source": {
     "name": "Hood of Defiance",
     "description": "+50% magic resistance.",

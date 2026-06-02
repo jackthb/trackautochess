@@ -2,6 +2,7 @@
   "gameId": "item_mangotree",
   "name": "Mango Tree",
   "slug": "mango-tree",
+  "icon": "relics/mango_tree.png",
   "source": {
     "name": "Mango Tree",
     "description": "Plants a Mango Tree by the side of your Chessboard.\nDrops an Enchanted Mango whenever your home battle result differs from the last round. The tree wilts after 8 drops. A Golden Mango will be dropped if the mango tree is still alive at Relic expiration.",

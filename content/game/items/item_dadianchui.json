@@ -2,6 +2,7 @@
   "gameId": "item_dadianchui",
   "name": "Mjollnir",
   "slug": "mjollnir",
+  "icon": "items/mjollnir.png",
   "source": {
     "name": "Mjollnir",
     "description": "+60% attack speed.\n20% chance when attacking or being attacked to release a bolt of electricity that leaps between 5 targets, dealing 100 magical damage to each.",

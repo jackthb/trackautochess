@@ -2,6 +2,7 @@
   "gameId": "chess_lich",
   "name": "Lich",
   "slug": "lich",
+  "icon": "units/lich.png",
   "source": {
     "id": "chess_lich",
     "cost": 4,

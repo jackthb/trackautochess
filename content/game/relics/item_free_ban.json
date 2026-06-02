@@ -2,6 +2,7 @@
   "gameId": "item_free_ban",
   "name": "Gaolers Master Key",
   "slug": "gaolers-master-key",
+  "icon": "relics/gaolers_master_key.png",
   "source": {
     "name": "Gaolers Master Key",
     "description": "You can freely dismiss any race/class. If already dismissed, the spent gold will be refunded.",

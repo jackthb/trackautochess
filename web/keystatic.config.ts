@@ -19,6 +19,10 @@ const entitySchema = {
   gameId: fields.text({ label: "Game ID" }),
   name: fields.slug({ name: { label: "Name" } }),
   slug: fields.text({ label: "Slug" }),
+  icon: fields.text({
+    label: "Icon path",
+    description: "Relative to web/public/icons, for example units/axe.png.",
+  }),
   source: fields.ignored(),
   overrides: fields.object(
     {

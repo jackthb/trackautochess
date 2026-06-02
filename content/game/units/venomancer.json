@@ -2,6 +2,7 @@
   "gameId": "chess_veno",
   "name": "Venomancer",
   "slug": "venomancer",
+  "icon": "units/venomancer.png",
   "source": {
     "id": "chess_veno",
     "cost": 3,

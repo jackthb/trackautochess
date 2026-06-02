@@ -2,6 +2,7 @@
   "gameId": "item_dianjinshou",
   "name": "Hand of Midas",
   "slug": "hand-of-midas",
+  "icon": "items/hand_of_midas.png",
   "source": {
     "name": "Hand of Midas",
     "description": "Active ability: Instant Activation\n Immediately eliminates a summoned or illusion piece with health lower than the carrier. In-home battles, drops 1 gold coins.",

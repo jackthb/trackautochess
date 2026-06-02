@@ -2,6 +2,7 @@
   "gameId": "chess_disruptor",
   "name": "Disruptor",
   "slug": "disruptor",
+  "icon": "units/disruptor.png",
   "source": {
     "id": "chess_disruptor",
     "cost": 5,

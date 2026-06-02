@@ -2,6 +2,7 @@
   "gameId": "chess_wd",
   "name": "Witch Doctor",
   "slug": "witch-doctor",
+  "icon": "units/witch_doctor.png",
   "source": {
     "id": "chess_wd",
     "cost": 1,

@@ -2,6 +2,7 @@
   "gameId": "item_malefic_rapture",
   "name": "Malefic Rapture",
   "slug": "malefic-rapture",
+  "icon": "items/zainankuanghuan.png",
   "source": {
     "name": "Malefic Rapture",
     "description": "When your courier takes damage, you immediately gain the corresponding (damage taken) amount of experience.",

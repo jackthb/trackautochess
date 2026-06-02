@@ -1,3 +1,4 @@
+import { existsSync } from "node:fs";
 import { mkdir, readFile, readdir, writeFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
@@ -23,14 +24,67 @@ function slugify(value) {
     .slice(0, 80);
 }
 
+const UNIT_STEM_MAP = {
+  "Blood Seeker": "bloodseeker",
+  Spectres: "spectre",
+  DarkSeer: "dark_seer",
+};
+
+const SYN_ICON_MAP = {
+  "Demon Hunter": "demonhunter",
+  Elemental: "element",
+  Faceless: "nraqi",
+  Pandaren: "pandaman",
+};
+
+function unitStem(name) {
+  if (UNIT_STEM_MAP[name]) return UNIT_STEM_MAP[name];
+  return name.toLowerCase().replace(/ /g, "_").replace(/-/g, "_").replace(/'/g, "");
+}
+
+function relicStem(name) {
+  return name.toLowerCase().replace(/ /g, "_").replace(/-/g, "_");
+}
+
+function synIconName(name) {
+  if (SYN_ICON_MAP[name]) return SYN_ICON_MAP[name];
+  return name.toLowerCase().replace(/ /g, "");
+}
+
+function itemIconStem(gameId, item) {
+  const stem = item?.texture || gameId;
+  return stem
+    .replace(/^item_custom\//, "")
+    .replace(/^custom\//, "")
+    .replace(/^item_/, "")
+    .toLowerCase()
+    .replace(/ /g, "_")
+    .replace(/-/g, "_");
+}
+
+function iconRef(type, stem) {
+  const file = `${type}/${stem}.png`;
+  return existsSync(path.join(dataDir, "icons", file)) ? file : null;
+}
+
 async function writeJson(relativePath, value) {
   const target = path.join(contentDir, relativePath);
   await mkdir(path.dirname(target), { recursive: true });
   await writeFile(target, toJson(value), "utf8");
 }
 
-function contentEntity(gameId, name, source) {
+async function existingContent(relativePath) {
+  try {
+    return await fromJson(path.join(contentDir, relativePath));
+  } catch (error) {
+    if (error?.code === "ENOENT") return null;
+    throw error;
+  }
+}
+
+function contentEntity(gameId, name, source, icon, existing) {
   const sourceWithoutLegacyIcons = { ...source };
+  delete sourceWithoutLegacyIcons.icon;
   delete sourceWithoutLegacyIcons.icon_url;
   delete sourceWithoutLegacyIcons.icon_dimensions;
 
@@ -38,8 +92,9 @@ function contentEntity(gameId, name, source) {
     gameId,
     name,
     slug: slugify(name || gameId),
+    ...(icon ? { icon } : {}),
     source: sourceWithoutLegacyIcons,
-    overrides: {},
+    overrides: existing?.overrides ?? {},
   };
 
   return entity;
@@ -105,30 +160,58 @@ async function main() {
 
   for (const [name, unit] of Object.entries(units)) {
     const gameId = unit.id ?? slugify(name);
+    const relativePath = `game/units/${slugify(name)}.json`;
     await writeJson(
-      `game/units/${slugify(name)}.json`,
-      contentEntity(gameId, name, unit),
+      relativePath,
+      contentEntity(
+        gameId,
+        name,
+        unit,
+        iconRef("units", unitStem(name)),
+        await existingContent(relativePath),
+      ),
     );
   }
 
   for (const [gameId, item] of Object.entries(itemsFull)) {
+    const relativePath = `game/items/${gameId}.json`;
     await writeJson(
-      `game/items/${gameId}.json`,
-      contentEntity(gameId, item.name ?? gameId, item),
+      relativePath,
+      contentEntity(
+        gameId,
+        item.name ?? gameId,
+        item,
+        iconRef("items", itemIconStem(gameId, item)),
+        await existingContent(relativePath),
+      ),
     );
   }
 
   for (const [gameId, synergy] of Object.entries(synergies)) {
+    const relativePath = `game/synergies/${gameId}.json`;
     await writeJson(
-      `game/synergies/${gameId}.json`,
-      contentEntity(gameId, synergy.name ?? gameId, synergy),
+      relativePath,
+      contentEntity(
+        gameId,
+        synergy.name ?? gameId,
+        synergy,
+        iconRef("synergies", synIconName(synergy.name ?? gameId)),
+        await existingContent(relativePath),
+      ),
     );
   }
 
   for (const [gameId, relic] of Object.entries(relics.relics ?? {})) {
+    const relativePath = `game/relics/${gameId}.json`;
     await writeJson(
-      `game/relics/${gameId}.json`,
-      contentEntity(gameId, relic.name ?? gameId, relic),
+      relativePath,
+      contentEntity(
+        gameId,
+        relic.name ?? gameId,
+        relic,
+        iconRef("relics", relicStem(relic.name ?? gameId)),
+        await existingContent(relativePath),
+      ),
     );
   }
 

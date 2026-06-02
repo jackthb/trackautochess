@@ -2,6 +2,7 @@
   "gameId": "item_sadan",
   "name": "Satanic",
   "slug": "satanic",
+  "icon": "items/satanic.png",
   "source": {
     "name": "Satanic",
     "description": "+600HP, +50% lifesteal.\n\nActive ability: Activates when taking damage\nGains +150% Lifesteal for 6 sec.",

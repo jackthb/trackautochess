@@ -2,6 +2,7 @@
   "gameId": "chess_earth",
   "name": "Earth Spirit",
   "slug": "earth-spirit",
+  "icon": "units/earth_spirit.png",
   "source": {
     "id": "chess_earth",
     "cost": 4,

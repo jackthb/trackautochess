@@ -2,6 +2,7 @@
   "gameId": "chess_ld",
   "name": "Lone Druid",
   "slug": "lone-druid",
+  "icon": "units/lone_druid.png",
   "source": {
     "id": "chess_ld",
     "cost": 4,

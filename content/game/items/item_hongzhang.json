@@ -2,6 +2,7 @@
   "gameId": "item_hongzhang",
   "name": "Dagon",
   "slug": "dagon",
+  "icon": "items/dagon_4.png",
   "source": {
     "name": "Dagon",
     "description": "+40% magical damage.\n\nActive ability: Instant\nDeals 700 magical damage to a random enemy chess piece.",

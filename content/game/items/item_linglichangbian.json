@@ -2,6 +2,7 @@
   "gameId": "item_linglichangbian",
   "name": "Bullwhip",
   "slug": "bullwhip",
+  "icon": "items/bullwhip.png",
   "source": {
     "name": "Bullwhip",
     "description": "Chess pieces summoned by the carrier gain: Attack speed +100%, duration +100%",

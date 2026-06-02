@@ -2,6 +2,7 @@
   "gameId": "item_bench_contract",
   "name": "Magic Seed",
   "slug": "magic-seed",
+  "icon": "items/magic_seed.png",
   "source": {
     "name": "Magic Seed",
     "description": "Fill your bench with magic vegetable sprouts. The sell value of these sprouts has a dynamic chance to increase by 1 at the beginning of every round. You can sell the sprouts any time to reuse the bench.",

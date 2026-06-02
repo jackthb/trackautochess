@@ -2,6 +2,7 @@
   "gameId": "item_huiguang",
   "name": "Kaya",
   "slug": "kaya",
+  "icon": "items/kaya.png",
   "source": {
     "name": "Kaya",
     "description": "Mana restoration + 25%. Magical damage +30%.",

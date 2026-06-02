@@ -2,6 +2,7 @@
   "gameId": "item_upgrade_lootbox",
   "name": "Weaponsmith",
   "slug": "weaponsmith",
+  "icon": "items/哼哼井武器匠.png",
   "source": {
     "name": "Weaponsmith",
     "description": "You gain +1 to the level of loot tokens you get for recasting equipment.\n After recasting 2 pieces of Spoil tokens, the weapon smith will disappear.",

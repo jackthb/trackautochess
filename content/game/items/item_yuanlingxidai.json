@@ -2,6 +2,7 @@
   "gameId": "item_yuanlingxidai",
   "name": "Wraith Band",
   "slug": "wraith-band",
+  "icon": "items/wraith_band.png",
   "source": {
     "name": "Wraith Band",
     "description": "Attack speed +20%。",

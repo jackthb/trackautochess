@@ -2,6 +2,7 @@
   "gameId": "item_fulingsuo",
   "name": "Gleipnir",
   "slug": "gleipnir",
+  "icon": "items/gungir.png",
   "source": {
     "name": "Gleipnir",
     "description": "Attack speed +30%.\n\nActive ability: Instant\nEntangle the highest-level enemy piece within a 2-grid radius, immobilizing all enemy pieces in that range for 4 seconds and dealing 100 points of magical damage.",

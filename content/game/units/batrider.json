@@ -2,6 +2,7 @@
   "gameId": "chess_bat",
   "name": "Batrider",
   "slug": "batrider",
+  "icon": "units/batrider.png",
   "source": {
     "id": "chess_bat",
     "cost": 2,

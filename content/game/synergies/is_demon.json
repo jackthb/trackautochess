@@ -2,6 +2,7 @@
   "gameId": "is_demon",
   "name": "Demon",
   "slug": "demon",
+  "icon": "synergies/demon.png",
   "source": {
     "name": "Demon",
     "description": "SPECIES TRAIT: Fel Power\n\nActive when you control only 1 type of Demon on the chessboard.\n\n(1) Demon: Normal attack damage caused by allied demon chess pieces is settled as pure damage. Fel Powers damage is increased by 15%,with a maximum stack count of 7.",

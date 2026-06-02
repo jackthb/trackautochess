@@ -2,6 +2,7 @@
   "gameId": "item_goutourenjiubei",
   "name": "Kobold Cup",
   "slug": "kobold-cup",
+  "icon": "items/kobold_cup.png",
   "source": {
     "name": "Kobold Cup",
     "description": "Carrier counts as \nKobold.\nThe carrier and pieces of the same name gain +25% attack speed, inheritable after shapeshift.",

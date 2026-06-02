@@ -2,6 +2,7 @@
   "gameId": "chess_wr",
   "name": "Windranger",
   "slug": "windranger",
+  "icon": "units/windranger.png",
   "source": {
     "id": "chess_wr",
     "cost": 2,

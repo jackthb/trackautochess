@@ -2,6 +2,7 @@
   "gameId": "chess_viper",
   "name": "Viper",
   "slug": "viper",
+  "icon": "units/viper.png",
   "source": {
     "id": "chess_viper",
     "cost": 3,

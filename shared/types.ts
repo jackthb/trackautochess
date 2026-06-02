@@ -70,6 +70,7 @@ export interface RelicInfo {
 export interface ItemFullInfo {
   name?: string;
   texture?: string;
+  icon?: string | null;
   icon_url?: string | null;
   description?: string;
   [key: string]: unknown;

@@ -2,6 +2,7 @@
   "gameId": "is_nraqi",
   "name": "Faceless",
   "slug": "faceless",
+  "icon": "synergies/nraqi.png",
   "source": {
     "name": "Faceless",
     "description": "Species Trait: Whisper of Darkness\n\nActive when you have at least (N) different Faceless pieces on board. (Multiple effects stack)\n\n(2) Facelesses: If you have no other active synergies except Whisper of Darkness, all friendly chess pieces are immune to all negative effects during combat.",

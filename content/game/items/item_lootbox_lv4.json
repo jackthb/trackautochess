@@ -2,6 +2,7 @@
   "gameId": "item_lootbox_lv4",
   "name": "Spoil Token Level 4",
   "slug": "spoil-token-level-4",
+  "icon": "items/tier4_token.png",
   "source": {
     "name": "Spoil Token Level 4",
     "description": "Courier consumable: Click to open\nSelect one from three random items to your inventory.",

@@ -2,6 +2,7 @@
   "gameId": "chess_axe",
   "name": "Axe",
   "slug": "axe",
+  "icon": "units/axe.png",
   "source": {
     "id": "chess_axe",
     "cost": 1,

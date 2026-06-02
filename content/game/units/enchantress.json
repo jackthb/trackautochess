@@ -2,6 +2,7 @@
   "gameId": "chess_eh",
   "name": "Enchantress",
   "slug": "enchantress",
+  "icon": "units/enchantress.png",
   "source": {
     "id": "chess_eh",
     "cost": 1,

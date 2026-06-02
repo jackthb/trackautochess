@@ -2,6 +2,7 @@
   "gameId": "item_konglingguajian",
   "name": "Null Talisman",
   "slug": "null-talisman",
+  "icon": "items/null_talisman.png",
   "source": {
     "name": "Null Talisman",
     "description": "Magical damage +20%。",

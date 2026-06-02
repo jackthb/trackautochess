@@ -2,6 +2,7 @@
   "gameId": "item_longxin",
   "name": "Heart of Tarrasque",
   "slug": "heart-of-tarrasque",
+  "icon": "items/heart.png",
   "source": {
     "name": "Heart of Tarrasque",
     "description": "Fast movement, +60% health, +10 health regeneration.\n\nAura:\nAllies within the range gain healing per sec equal to 1.5% of the carriers maximum health.\n\nRange:?",

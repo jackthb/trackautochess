@@ -2,6 +2,7 @@
   "gameId": "item_card_chance",
   "name": "Card: Chance",
   "slug": "card-chance",
+  "icon": "items/card_chance.png",
   "source": {
     "name": "Card: Chance",
     "description": "Courier Consumable: Click to use\nYou can designate a chess piece to gain an additional class from the nearest other class permanently.",

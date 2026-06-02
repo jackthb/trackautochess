@@ -2,6 +2,7 @@
   "gameId": "chess_aa",
   "name": "Ancient Apparition",
   "slug": "ancient-apparition",
+  "icon": "units/ancient_apparition.png",
   "source": {
     "id": "chess_aa",
     "cost": 1,

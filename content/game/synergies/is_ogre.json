@@ -2,6 +2,7 @@
   "gameId": "is_ogre",
   "name": "Ogre",
   "slug": "ogre",
+  "icon": "synergies/ogre.png",
   "source": {
     "name": "Ogre",
     "description": "SPECIES TRAIT: Iron Fist\n\nActive when you have at least (N) different pieces of this species on board. (Multiple effects stack)\n\n(2) Ogres: Each ogre can eat up allies nearby (A cross of 4 grids) whose level is lower than itself and gains their 60% HP and Damage. Deals extra damage to enemys courier equals to the sum of all its victims when winning an away-home battle.",

@@ -2,6 +2,7 @@
   "gameId": "chess_puck",
   "name": "Puck",
   "slug": "puck",
+  "icon": "units/puck.png",
   "source": {
     "id": "chess_puck",
     "cost": 2,

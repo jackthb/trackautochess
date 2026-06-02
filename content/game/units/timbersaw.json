@@ -2,6 +2,7 @@
   "gameId": "chess_shredder",
   "name": "Timbersaw",
   "slug": "timbersaw",
+  "icon": "units/timbersaw.png",
   "source": {
     "id": "chess_shredder",
     "cost": 2,

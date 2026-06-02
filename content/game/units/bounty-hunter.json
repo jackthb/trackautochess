@@ -2,6 +2,7 @@
   "gameId": "chess_bh",
   "name": "Bounty Hunter",
   "slug": "bounty-hunter",
+  "icon": "units/bounty_hunter.png",
   "source": {
     "id": "chess_bh",
     "cost": 1,

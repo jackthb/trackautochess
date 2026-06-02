@@ -2,6 +2,7 @@
   "gameId": "item_wangyuanjing",
   "name": "Telescope",
   "slug": "telescope",
+  "icon": "items/telescope.png",
   "source": {
     "name": "Telescope",
     "description": "Ranged carriers will be counted as \nDwarf.",

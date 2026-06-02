@@ -2,6 +2,7 @@
   "gameId": "chess_phx",
   "name": "Phoenix",
   "slug": "phoenix",
+  "icon": "units/phoenix.png",
   "source": {
     "id": "chess_phx",
     "cost": 4,

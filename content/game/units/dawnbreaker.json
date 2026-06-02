@@ -2,6 +2,7 @@
   "gameId": "chess_db",
   "name": "Dawnbreaker",
   "slug": "dawnbreaker",
+  "icon": "units/dawnbreaker.png",
   "source": {
     "id": "chess_db",
     "cost": 3,

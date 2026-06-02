@@ -2,6 +2,7 @@
   "gameId": "is_draenei",
   "name": "Draenei",
   "slug": "draenei",
+  "icon": "synergies/draenei.png",
   "source": {
     "name": "Draenei",
     "description": "SPECIES TRAIT: Blessing of the Naaru\n\nActive when you have at least (N) different pieces of this species on board. (Multiple effects stack)\n\n(2) Draeneis: All friendly Draenei gain the effect: Every 4 seconds, steal 50+2% max health from the nearest enemy chess piece to heal themselves.\n(4) Draeneis: All friendly pieces gain effects: Whenever a cumulative total of more than 100 points of healing is taken it is split (cumulative healing) points of pure damage among the surrounding enemies.",

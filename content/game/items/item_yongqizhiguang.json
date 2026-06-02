@@ -2,6 +2,7 @@
   "gameId": "item_yongqizhiguang",
   "name": "Spark of Courage",
   "slug": "spark-of-courage",
+  "icon": "items/spark_of_courage.png",
   "source": {
     "name": "Spark of Courage",
     "description": "Carrier deals +25% damage to enemies level higher than carrier.",

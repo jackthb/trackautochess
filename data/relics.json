@@ -12,7 +12,8 @@
         "en": "Fill your bench with magic vegetable sprouts. The sell value of these sprouts has a dynamic chance to increase by 1 at the beginning of every round. You can sell the sprouts any time to reuse the bench.",
         "ru": "Заполняет лавку магическими репками. Их цена продажи имеет шанс увеличиться на 1 в начале каждого раунда. Репки можно продать в любой момент, чтобы освободить лавку."
       },
-      "lore_i18n": {}
+      "lore_i18n": {},
+      "icon": "relics/magic_seed.png"
     },
     "item_both_leaves": {
       "name": "Leafy Essence",
@@ -26,7 +27,8 @@
         "en": "All offside branches unlock automatically in this single game.",
         "ru": "Все боковые ветки талантов будут разблокированы автоматически в этой игре."
       },
-      "lore_i18n": {}
+      "lore_i18n": {},
+      "icon": "relics/leafy_essence.png"
     },
     "item_conceal_prepare": {
       "name": "Shroud of Concealment",
@@ -42,7 +44,8 @@
       },
       "lore_i18n": {
         "ru": "Из Relicbox"
-      }
+      },
+      "icon": "relics/shroud_of_concealment.png"
     },
     "item_double_coin": {
       "name": "Doubloon",
@@ -56,7 +59,8 @@
         "en": "Relic Consumable: Click to Use\nTransfer 20% of the higher one of your Health and Mana into another. Can be used twice",
         "ru": "Нажмите для использования\nТрансформирует 20% от вашего наивысшего показателя Здоровья или Маны в другой. Доступно 2 применения."
       },
-      "lore_i18n": {}
+      "lore_i18n": {},
+      "icon": "relics/doubloon.png"
     },
     "item_egg": {
       "name": "Greevil Egg",
@@ -70,7 +74,8 @@
         "en": "Relic Consumable: Click to Use\n Put a piece into an egg which has a chance to grow once every round. You can break it anytime, hatching a piece according to the points.",
         "ru": "Нажмите для использования релика\n Поместите фигуру в яйцо, которое имеет шанс вырасти каждую волну. Вы можете разбить его в любое время, чтобы достать фигуру в зависимости от очков роста."
       },
-      "lore_i18n": {}
+      "lore_i18n": {},
+      "icon": "relics/greevil_egg.png"
     },
     "item_free_ban": {
       "name": "Gaolers Master Key",
@@ -86,7 +91,8 @@
       },
       "lore_i18n": {
         "ru": "Из Relicbox"
-      }
+      },
+      "icon": "relics/gaolers_master_key.png"
     },
     "item_free_draw": {
       "name": "Weighted Dice",
@@ -100,7 +106,8 @@
         "en": "Refund 1~2 random Gold if you fail to recruit any owned chess piece.",
         "ru": "Возвращает 1-2 Золота, если ролл не содержит ни одной имеющейся фигуры."
       },
-      "lore_i18n": {}
+      "lore_i18n": {},
+      "icon": "relics/weighted_dice.png"
     },
     "item_magic_box": {
       "name": "Magic box",
@@ -114,7 +121,8 @@
         "en": "Packs an ally piece, at the beginning of next round, transforms it into a randon new piece of the same Level and Rank. 12 times available.",
         "ru": "Упаковывает союзную фигуру, и в начале следующего раунда превращает её в случайную фигуру того же уровня и ранга. Доступно 12 зарядов."
       },
-      "lore_i18n": {}
+      "lore_i18n": {},
+      "icon": "relics/magic_box.png"
     },
     "item_malefic_rapture": {
       "name": "Malefic Rapture",
@@ -130,7 +138,8 @@
       },
       "lore_i18n": {
         "ru": "Из Relic Box"
-      }
+      },
+      "icon": "relics/malefic_rapture.png"
     },
     "item_mangotree": {
       "name": "Mango Tree",
@@ -146,7 +155,8 @@
       },
       "lore_i18n": {
         "ru": "Из Relicbox"
-      }
+      },
+      "icon": "relics/mango_tree.png"
     },
     "item_more_creep": {
       "name": "March of The Beasts",
@@ -160,7 +170,8 @@
         "en": "All creeps duplicate themselves and counted as level +1.",
         "ru": "Все крипы удваиваются и считаются на один уровень выше."
       },
-      "lore_i18n": {}
+      "lore_i18n": {},
+      "icon": "relics/march_of_the_beasts.png"
     },
     "item_rank_damage": {
       "name": "Defiant Shell",
@@ -174,7 +185,8 @@
         "en": "Reduces damage taken from home defeats or increases damage dealt in away-home victories by your (current rank + 1)",
         "ru": "Уменьшает урон, получаемый при домашних поражениях, или увеличивает урон, наносимый при выездных победах на Позицию в игре+1 (по здоровью)"
       },
-      "lore_i18n": {}
+      "lore_i18n": {},
+      "icon": "relics/defiant_shell.png"
     },
     "item_repeat_relic": {
       "name": "Time-Space Replica",
@@ -188,7 +200,8 @@
         "en": "Replicate your last relic.",
         "ru": "Повторите свою прошлую реликвию."
       },
-      "lore_i18n": {}
+      "lore_i18n": {},
+      "icon": "relics/time_space_replica.png"
     },
     "item_rm_wheel_of_wonder": {
       "name": "Wheel of Wonder",
@@ -202,7 +215,8 @@
         "en": "Relic Consumable: Click to Use\nChoose an ally piece and put it into the wheel of wonder, DISCOVER a special version of it with an extra random synergy.",
         "ru": "Нажмите для использования\nВыберите союзную фигуру и откройте уникальную версию с дополнительной случайной синергией."
       },
-      "lore_i18n": {}
+      "lore_i18n": {},
+      "icon": "relics/wheel_of_wonder.png"
     },
     "item_second_chance": {
       "name": "Second Chance",
@@ -218,7 +232,8 @@
       },
       "lore_i18n": {
         "ru": "Из Relicbox"
-      }
+      },
+      "icon": "relics/second_chance.png"
     },
     "item_stolen_vault": {
       "name": "Stolen Vault",
@@ -232,7 +247,8 @@
         "en": "Discard all 3 relics and get a Stolen Vault with random 10 ~ 15 gold.",
         "ru": "Отказаться от выбора реликвии и получить Stolen Vault с случайными 10-15 золота."
       },
-      "lore_i18n": {}
+      "lore_i18n": {},
+      "icon": "relics/stolen_vault.png"
     },
     "item_streak_plus": {
       "name": "Chiaroscuro Certainty",
@@ -246,7 +262,8 @@
         "en": "Your win or lose streak will not be terminated and when the relic disappears, you will receive a corresponding level loot token based on the highest reward/compensation held during that time.",
         "ru": "Ваша серия побед или поражений не будет прервана, и когда реликвия исчезнет, вы получите жетон, уровень которого соответствует самой высокой награде/компенсации, полученной за это время."
       },
-      "lore_i18n": {}
+      "lore_i18n": {},
+      "icon": "relics/chiaroscuro_certainty.png"
     },
     "item_super_uprank": {
       "name": "Lucid Star",
@@ -260,7 +277,8 @@
         "en": "There is a 20% chance to directly obtain a ★★ piece on purchase if you already owned one.",
         "ru": "Есть вероятность напрямую получить ★★ фигуру при покупке, если одна уже есть."
       },
-      "lore_i18n": {}
+      "lore_i18n": {},
+      "icon": "relics/lucid_star.png"
     },
     "item_upgrade_lootbox": {
       "name": "Weaponsmith",
@@ -276,7 +294,8 @@
       },
       "lore_i18n": {
         "ru": "Из Relicbox"
-      }
+      },
+      "icon": "relics/weaponsmith.png"
     }
   }
 }

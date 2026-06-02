@@ -2,6 +2,7 @@
   "gameId": "chess_enigma",
   "name": "Enigma",
   "slug": "enigma",
+  "icon": "units/enigma.png",
   "source": {
     "id": "chess_enigma",
     "cost": 3,

@@ -2,6 +2,7 @@
   "gameId": "item_shanbihufu",
   "name": "Talisman of Evasion",
   "slug": "talisman-of-evasion",
+  "icon": "items/talisman_of_evasion.png",
   "source": {
     "name": "Talisman of Evasion",
     "description": "+25% evasion.",

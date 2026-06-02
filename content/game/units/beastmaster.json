@@ -2,6 +2,7 @@
   "gameId": "chess_bm",
   "name": "Beastmaster",
   "slug": "beastmaster",
+  "icon": "units/beastmaster.png",
   "source": {
     "id": "chess_bm",
     "cost": 2,

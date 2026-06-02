@@ -2,6 +2,7 @@
   "gameId": "chess_clinkz",
   "name": "Clinkz",
   "slug": "clinkz",
+  "icon": "units/clinkz.png",
   "source": {
     "id": "chess_clinkz",
     "cost": 1,

@@ -2,6 +2,7 @@
   "gameId": "item_aiweinazhiyu",
   "name": "Avianas Feather",
   "slug": "avianas-feather",
+  "icon": "items/avianas_feather.png",
   "source": {
     "name": "Avianas Feather",
     "description": "All damage dealt by carriers is considered as Magical damage.",

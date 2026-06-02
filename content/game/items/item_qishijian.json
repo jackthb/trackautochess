@@ -2,6 +2,7 @@
   "gameId": "item_qishijian",
   "name": "Paladin Sword",
   "slug": "paladin-sword",
+  "icon": "items/paladin_sword.png",
   "source": {
     "name": "Paladin Sword",
     "description": "Damage +25, Lifesteal + 20%.\nCarrier deals +50% damage to Undead and Demon pieces.",

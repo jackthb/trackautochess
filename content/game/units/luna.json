@@ -2,6 +2,7 @@
   "gameId": "chess_luna",
   "name": "Luna",
   "slug": "luna",
+  "icon": "units/luna.png",
   "source": {
     "id": "chess_luna",
     "cost": 2,

@@ -2,6 +2,7 @@
   "gameId": "chess_slardar",
   "name": "Slardar",
   "slug": "slardar",
+  "icon": "units/slardar.png",
   "source": {
     "id": "chess_slardar",
     "cost": 3,

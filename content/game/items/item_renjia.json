@@ -2,6 +2,7 @@
   "gameId": "item_renjia",
   "name": "Blade Mail",
   "slug": "blade-mail",
+  "icon": "items/blade_mail.png",
   "source": {
     "name": "Blade Mail",
     "description": "+5 armor.\n\nActive ability: Activates when taking damage\nDuplicates 50% of the damage taken back to the unit that dealt the damage for 7 sec.",

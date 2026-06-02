@@ -2,6 +2,7 @@
   "gameId": "chess_morph",
   "name": "Morphling",
   "slug": "morphling",
+  "icon": "units/morphling.png",
   "source": {
     "id": "chess_morph",
     "cost": 5,

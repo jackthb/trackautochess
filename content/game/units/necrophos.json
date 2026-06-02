@@ -2,6 +2,7 @@
   "gameId": "chess_nec",
   "name": "Necrophos",
   "slug": "necrophos",
+  "icon": "units/necrophos.png",
   "source": {
     "id": "chess_nec",
     "cost": 5,

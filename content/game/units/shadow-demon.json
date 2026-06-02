@@ -2,6 +2,7 @@
   "gameId": "chess_sd",
   "name": "Shadow Demon",
   "slug": "shadow-demon",
+  "icon": "units/shadow_demon.png",
   "source": {
     "id": "chess_sd",
     "cost": 1,

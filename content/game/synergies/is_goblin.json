@@ -2,6 +2,7 @@
   "gameId": "is_goblin",
   "name": "Goblin",
   "slug": "goblin",
+  "icon": "synergies/goblin.png",
   "source": {
     "name": "Goblin",
     "description": "Species Perk: Nanobots\n\nActive when you have at least (N) different goblin pieces on board. (Multiple effects stack) \n\n(3)Goblins: Grants a random melee ally +10 armour and +20 health regeneration.\n(6)Goblins: Grants all allies +10 armor and +20 health regeneration.",

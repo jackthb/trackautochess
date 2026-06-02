@@ -2,6 +2,7 @@
   "gameId": "is_kobold",
   "name": "Kobold",
   "slug": "kobold",
+  "icon": "synergies/kobold.png",
   "source": {
     "name": "Kobold",
     "description": "SPECIES TRAIT: Divided we stand\n\nActive when you have at least (N) different Kobold pieces on board. (Multiple effects stack)\n\n(1) Kobold: Each two paired Kobold pieces on board will summon a replica when battle starts.\n(2) Kobolds: Each two paired ally pieces on board will summon a replica when battle starts.\n(3) Kobolds: Every unpaired Kobold piece will reshape itself into a non-Kobold ally of the same rank before battle starts.",

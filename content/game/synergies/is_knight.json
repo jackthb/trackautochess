@@ -2,6 +2,7 @@
   "gameId": "is_knight",
   "name": "Knight",
   "slug": "knight",
+  "icon": "synergies/knight.png",
   "source": {
     "name": "Knight",
     "description": "Knight pieces who have nearby allies will gain a Divine Protection shield immediately.\n\nClass Perk: Divine Protection\n \nActive when you have at least (N) different Knight pieces on board. (Multiple effects stack)\n\n(2) Knights: All friendly knights have a 25% chance to procure a shield every 3 seconds in combat for 3 seconds.\n(4) Knights: All allies have a +25% chance to procure a shield every 3 seconds in combat.\n(6) Knights: All allies have a +25% chance to procure a shield every 3 seconds in combat. Procing a shield instantly heals for 400.",

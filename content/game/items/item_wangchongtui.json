@@ -2,6 +2,7 @@
   "gameId": "item_wangchongtui",
   "name": "Spider Leg",
   "slug": "spider-leg",
+  "icon": "items/spider_legs.png",
   "source": {
     "name": "Spider Leg",
     "description": "Evasion +25%。\nThe carrier also counts as \nAqir，and is eligible for friendly Infection spawning.",

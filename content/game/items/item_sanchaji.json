@@ -2,6 +2,7 @@
   "gameId": "item_sanchaji",
   "name": "Trident",
   "slug": "trident",
+  "icon": "items/trident.png",
   "source": {
     "name": "Trident",
     "description": "Attack damage +25.\nDeals each 50% additional damage to at most 2 same-name pieces.",

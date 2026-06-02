@@ -2,6 +2,7 @@
   "gameId": "chess_pom",
   "name": "Mirana",
   "slug": "mirana",
+  "icon": "units/mirana.png",
   "source": {
     "id": "chess_pom",
     "cost": 1,

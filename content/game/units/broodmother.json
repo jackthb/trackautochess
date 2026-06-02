@@ -2,6 +2,7 @@
   "gameId": "chess_br",
   "name": "Broodmother",
   "slug": "broodmother",
+  "icon": "units/broodmother.png",
   "source": {
     "id": "chess_br",
     "cost": 4,

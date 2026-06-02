@@ -2,6 +2,7 @@
   "gameId": "is_naga",
   "name": "Naga",
   "slug": "naga",
+  "icon": "synergies/naga.png",
   "source": {
     "name": "Naga",
     "description": "Species Trait: Scale Armor\n\nActive when you have at least (N) different Naga pieces on board. (Multiple effects stack)\n\n(2) Naga: Grants allies 15% magic resistance.\n(4) Naga: Grants allies 35% magic resistance.\n(6) Naga: When taking non-pure damage, reflect 1.5 times the damage reduced by magic resistance.",

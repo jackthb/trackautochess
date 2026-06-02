@@ -2,6 +2,7 @@
   "gameId": "is_troll",
   "name": "Troll",
   "slug": "troll",
+  "icon": "synergies/troll.png",
   "source": {
     "name": "Troll",
     "description": "SPECIES TRAIT: Voodoo Frenzy\n\nActive when you have at least (N) different pieces of this species on board. (Multiple effects stack)\n\n(2) Trolls: Increases the attack speed of all allies by 20.\n(4) Trolls: Increases the attack speed of all allies by 50.\n(6) Trolls: All allies gain +20 attack speed for each successful attack. Maximum 7 stacks.",

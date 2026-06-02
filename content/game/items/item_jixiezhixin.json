@@ -2,6 +2,7 @@
   "gameId": "item_jixiezhixin",
   "name": "Heart of the Machine",
   "slug": "heart-of-the-machine",
+  "icon": "items/ex_machina_lg.png",
   "source": {
     "name": "Heart of the Machine",
     "description": "Courier consumable: Click to use\nRefresh your recruitment panel for free.",

@@ -2,6 +2,7 @@
   "gameId": "chess_am",
   "name": "Anti-mage",
   "slug": "anti-mage",
+  "icon": "units/anti_mage.png",
   "source": {
     "id": "chess_am",
     "cost": 4,

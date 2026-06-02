@@ -2,6 +2,7 @@
   "gameId": "chess_om",
   "name": "Ogre Magi",
   "slug": "ogre-magi",
+  "icon": "units/ogre_magi.png",
   "source": {
     "id": "chess_om",
     "cost": 3,

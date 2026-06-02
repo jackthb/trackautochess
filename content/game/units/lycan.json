@@ -2,6 +2,7 @@
   "gameId": "chess_lyc",
   "name": "Lycan",
   "slug": "lycan",
+  "icon": "units/lycan.png",
   "source": {
     "id": "chess_lyc",
     "cost": 3,

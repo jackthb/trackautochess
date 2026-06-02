@@ -2,6 +2,7 @@
   "gameId": "chess_pudge",
   "name": "Pudge",
   "slug": "pudge",
+  "icon": "units/pudge.png",
   "source": {
     "id": "chess_pudge",
     "cost": 3,

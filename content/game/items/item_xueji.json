@@ -2,6 +2,7 @@
   "gameId": "item_xueji",
   "name": "Bloodthorn",
   "slug": "bloodthorn",
+  "icon": "items/bloodthorn.png",
   "source": {
     "name": "Bloodthorn",
     "description": "+20% Attack speed.\n\nActive ability: Instant\nRoots and \nsilences the highest-level enemy chess piece in the attack range for 6 seconds. Any attacks to the victim causes 200% critical damage and all allies with in the attack range focus attacking the victim within the duration.",

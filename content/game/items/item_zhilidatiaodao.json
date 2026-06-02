@@ -2,6 +2,7 @@
   "gameId": "item_zhilidatiaodao",
   "name": "Arcane Blink",
   "slug": "arcane-blink",
+  "icon": "items/arcane_blink.png",
   "source": {
     "name": "Arcane Blink",
     "description": "Active ability: On ability cooling down\nInstantly move to the farthest grid within the range that can attack the enemy, gain 25 mana and +20% magical damage amplification, and reduce ability CD by 5 sec.\n\nmaximum distance:800",

@@ -2,6 +2,7 @@
   "gameId": "item_lootbox_lv2",
   "name": "Spoil Token Level 2",
   "slug": "spoil-token-level-2",
+  "icon": "items/lootbox_lv2.png",
   "source": {
     "name": "Spoil Token Level 2",
     "description": "Courier consumable: Click to open\nSelect one from three random items to your inventory.",

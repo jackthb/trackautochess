@@ -2,6 +2,7 @@
   "gameId": "item_yonghengzhipan",
   "name": "Aeon Disk",
   "slug": "aeon-disk",
+  "icon": "items/aeon_disk.png",
   "source": {
     "name": "Aeon Disk",
     "description": "Carrier and its minions will be a\n permanent chess piece.\n\nActive ability: Activates when at low health.\nGrants 100% damage block for 3.5 seconds.",

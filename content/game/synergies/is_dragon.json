@@ -2,6 +2,7 @@
   "gameId": "is_dragon",
   "name": "Dragon",
   "slug": "dragon",
+  "icon": "synergies/dragon.png",
   "source": {
     "name": "Dragon",
     "description": "Species Trait: Attunement\n\nActive when you have at least (N) different pieces of this species on board. (Multiple effects stack).\n\n(3) Dragons: All friendly Dragons have an initial mana value of 100.\n(5) Dragons: All allies have an initial mana value of 100.",

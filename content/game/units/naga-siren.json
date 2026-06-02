@@ -2,6 +2,7 @@
   "gameId": "chess_naga",
   "name": "Naga Siren",
   "slug": "naga-siren",
+  "icon": "units/naga_siren.png",
   "source": {
     "id": "chess_naga",
     "cost": 3,

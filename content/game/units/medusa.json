@@ -2,6 +2,7 @@
   "gameId": "chess_medusa",
   "name": "Medusa",
   "slug": "medusa",
+  "icon": "units/medusa.png",
   "source": {
     "id": "chess_medusa",
     "cost": 4,

@@ -2,6 +2,7 @@
   "gameId": "is_pandaman",
   "name": "Pandaren",
   "slug": "pandaren",
+  "icon": "synergies/pandaman.png",
   "source": {
     "name": "Pandaren",
     "description": "SPECIES TRAIT: Hospitality\n\nActive when you have at least (N) different pieces of this species on board. (Multiple effects stack)\n\n(1) Pandaren: Have a chance to invite a random un-emerged chess piece of the same species with a chess piece on the board from the chess piece pool to join the team at the beginning of the round.\n(2) Pandaren: Each Pandaren chess piece on board has a chance to invite a piece of the same name with it.",

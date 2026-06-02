@@ -24,7 +24,8 @@
     "lore_i18n": {
       "en": "From time to time, the Aqirs dwelled on and beneath the ancient land of Drodo Island. Though most of their powers are sealed by the holy Gods, remained powers from the insanity within the Aqir blood draws their insectoid instinct to reside on the flesh of other creatures.",
       "ru": "Время от времени Акиры обитали на древней земле Острова Дродо и под ней. Хотя большинство их сил запечатаны святыми богами, оставшиеся силы, вызванные безумием в их крови, побуждают их насекомоподобный инстинкт интересоваться, как же они работают."
-    }
+    },
+    "icon": "synergies/aqir.png"
   },
   "is_assassin": {
     "name": "Assassin",
@@ -49,7 +50,8 @@
     "lore_i18n": {
       "en": "Assassins are skilled executioners that leap into enemy backlines. Together, they gain a keen eye for weaknesses in enemy armor, gaining the ability to deliver devastating critical hits.",
       "ru": "Assassins — искусные убийцы, прыгающие в тыл врага. Вместе они лучше видят уязвимости в броне и получают способность наносить разрушительные критические удары."
-    }
+    },
+    "icon": "synergies/assassin.png"
   },
   "is_beast": {
     "name": "Beast",
@@ -74,7 +76,8 @@
     "lore_i18n": {
       "en": "Beasts have superhuman strength, stamina and speed, and are good at group predation.",
       "ru": "Звери обладают сверхчеловеческой силой, выносливостью и скоростью, а также искусны в групповой охоте."
-    }
+    },
+    "icon": "synergies/beast.png"
   },
   "is_centaur": {
     "name": "Centaur",
@@ -100,7 +103,8 @@
     "lore_i18n": {
       "en": "Centaurs are of noble blood, they are given birth by Half-god’s elder son Zaetar and only daughter of Princess Theradras. Cruelty and fierceness fill their blood, generation by generation.",
       "ru": "Centaurs — благородного происхождения: они рождены от старшего сына полубога Zaetar и единственной дочери принцессы Theradras. Жестокость и свирепость передаются в их крови из поколения в поколение."
-    }
+    },
+    "icon": "synergies/centaur.png"
   },
   "is_demon": {
     "name": "Demon",
@@ -123,7 +127,8 @@
     "lore_i18n": {
       "en": "Chaotic beings that emerged from a dimensional fissure.",
       "ru": "Лови момент и помни о смерти."
-    }
+    },
+    "icon": "synergies/demon.png"
   },
   "is_demonhunter": {
     "name": "Demon Hunter",
@@ -147,7 +152,8 @@
     "lore_i18n": {
       "en": "Demon hunters ritually trade their normal form in exchange for the mastery of demonic powers that enables them to deliver devastating strikes to their prey. This enhanced strength, together with their great agility and magical prowess, makes demon hunters unsuppressible.",
       "ru": "Охотники на демонов ритуально отказываются от своего обычного облика в обмен на владение демоническими силами, которые позволяют им наносить сокрушительные удары по своей жертве. Благодаря этой невероятной силе, а также ловкости и магическому мастерству охотники на демонов непобедимы."
-    }
+    },
+    "icon": "synergies/demonhunter.png"
   },
   "is_draenei": {
     "name": "Draenei",
@@ -174,7 +180,8 @@
     "lore_i18n": {
       "en": "To evade the Burning Legions clutches, a congregation led by the Farseer fled their homelands, faithful to the Naaru and the Holy Light. They named themselves Draenei, the Exiled Ones.",
       "ru": "Чтобы избежать хватки Пылающих Легионов, конгрегация, возглавляемая Провидцем, покинула свои родные земли, веруя в Наару и Священный Свет. Они назвали себя Дренеями, народ прозвал их Жижей."
-    }
+    },
+    "icon": "synergies/draenei.png"
   },
   "is_dragon": {
     "name": "Dragon",
@@ -198,7 +205,8 @@
     "lore_i18n": {
       "en": "Dragons were among the first creatures to exist on this ancient land. They possess unimaginable powers, deep within, which they like to show off when they commune together.",
       "ru": "Драконы были одними из первых существ, появившихся на этой древней земле. В глубине их душ таятся невообразимые силы, которые они любят демонстрировать, когда собираются вместе."
-    }
+    },
+    "icon": "synergies/dragon.png"
   },
   "is_druid": {
     "name": "Druid",
@@ -226,7 +234,8 @@
     "lore_i18n": {
       "en": "Druids can control great power of Nature to protect spirits and balance.",
       "ru": "Druids могут контролировать силу природы, чтобы защищать духов и поддерживать равновесие."
-    }
+    },
+    "icon": "synergies/druid.png"
   },
   "is_dwarf": {
     "name": "Dwarf",
@@ -249,7 +258,8 @@
     "lore_i18n": {
       "en": "Dwarves are a bold and courageous species of humanoids that excel in creating and refining weapons and gadgets, allowing them to slay their foes from afar.",
       "ru": "Dwarves are a bold and courageous species of humanoids that excel in creating and refining weapons and gadgets, allowing them to slay their foes from afar."
-    }
+    },
+    "icon": "synergies/dwarf.png"
   },
   "is_element": {
     "name": "Elemental",
@@ -274,7 +284,8 @@
     "lore_i18n": {
       "en": "Elementals are unstable beings that radiate mysterious energy when attacked. This gives them a chance to turn their melee aggressors to stone.",
       "ru": "Elementals — нестабильные существа, излучающие загадочную энергию при получении урона. Это даёт им шанс обращать атакующих в ближнем бою врагов в камень."
-    }
+    },
+    "icon": "synergies/element.png"
   },
   "is_elf": {
     "name": "Elf",
@@ -299,7 +310,8 @@
     "lore_i18n": {
       "en": "Nimble Elves who live on the crown of the World Tree are one of the most important primal protectors of Drodo Island. Their belief in the Goddess of the Moon and natural harmony has profoundly affected their lifestyle.",
       "ru": "Проворные Elves, живущие в кроне World Tree, являются одними из важнейших первородных защитников Drodo Island. Их вера в Goddess of the Moon и гармонию природы глубоко влияет на их образ жизни."
-    }
+    },
+    "icon": "synergies/elf.png"
   },
   "is_goblin": {
     "name": "Goblin",
@@ -323,7 +335,8 @@
     "lore_i18n": {
       "en": "Goblins are a cunning species with a love for money, explosives, and less-than-reliable technology. Their drive to invent fuels them, giving the brightest among them a boost in stamina and fortitude.",
       "ru": "Goblins — хитрая раса, любящая деньги, взрывчатку и не самую надежную технику. Стремление к изобретениям движет ими, наделяя самых талантливых дополнительной выносливостью и стойкостью."
-    }
+    },
+    "icon": "synergies/goblin.png"
   },
   "is_god": {
     "name": "God",
@@ -350,7 +363,8 @@
     "lore_i18n": {
       "en": "The highly worshipped Gods are considered as the creators of Drodo Island. Being both arrogant and prideful, the loyal beliefs from their creations have forged the supreme powers that Gods possess, granting them the most significant potential among all creatures which can completely change the outcome of a battle.",
       "ru": "Боги, которым поклоняются с особым почтением, считаются создателями острова Дродо. Высокомерие и гордыня, а также вера в их творения наделили богов высшей силой, которая дает им самый значительный потенциал среди всех существ и может полностью изменить исход битвы."
-    }
+    },
+    "icon": "synergies/god.png"
   },
   "is_harpy": {
     "name": "Harpy",
@@ -374,7 +388,8 @@
     "lore_i18n": {
       "en": "Harpies believe they survived from an ancient age. Their ancestors are transformed into bird-like bodies after betraying the Night Elves Queen.",
       "ru": "Harpies верят, что они сохранились с незапамятных времен. Их предки превратились в птицеподобных после того, как предали королеву Ночных эльфов."
-    }
+    },
+    "icon": "synergies/harpy.png"
   },
   "is_human": {
     "name": "Human",
@@ -400,7 +415,8 @@
     "lore_i18n": {
       "en": "Humans are an intelligent species that values kindness and cooperation, and silences any who they deem unworthy.",
       "ru": "Humans — разумная раса, ценящая доброту и сотрудничество, и заставляющая молчать тех, кого считает недостойными."
-    }
+    },
+    "icon": "synergies/human.png"
   },
   "is_hunter": {
     "name": "Hunter",
@@ -425,7 +441,8 @@
     "lore_i18n": {
       "en": "Since time immemorial, the call of the wild has driven some adventurers from the comfort of their home to venture into unforgiving primeval worlds. Those who persist become hunters.",
       "ru": "С незапамятных времён зов дикой природы уводил некоторых искателей приключений из уюта дома в суровые первобытные миры. Те, кто выдерживает это испытание, становятся охотниками."
-    }
+    },
+    "icon": "synergies/hunter.png"
   },
   "is_knight": {
     "name": "Knight",
@@ -453,7 +470,8 @@
     "lore_i18n": {
       "en": "Knights are respected defenders of the realm. As they engage in battle, the Omniscience may bless them with a divine shield.",
       "ru": "Рыцари — уважаемые защитники королевства. В бою Всеведущее может благословить их божественным щитом."
-    }
+    },
+    "icon": "synergies/knight.png"
   },
   "is_kobold": {
     "name": "Kobold",
@@ -482,7 +500,8 @@
     "lore_i18n": {
       "en": "Aggressive, xenophobic, yet industrious small humanoid creatures living in tunnels and caves deep below the surface. Known for not particularly intelligent, notoriously cowardly and individually weak, the dimunitive beings possess great potential in group combats. A candle on top of the head distinguishes the Kobolds.",
       "ru": "Агрессивные и ксенофобные, но трудолюбивые Kobolds живут в подземных тоннелях. Слабые и трусливые поодиночке, они опасны в группе. Отличительный признак — свеча на голове."
-    }
+    },
+    "icon": "synergies/kobold.png"
   },
   "is_mage": {
     "name": "Mage",
@@ -509,7 +528,8 @@
     "lore_i18n": {
       "en": "Mages are keen intellectuals who have spent years studying arcane knowledge. This allows them to make their victims more vulnerable to magic damage.",
       "ru": "Mages — проницательные интеллектуалы, посвятившие годы изучению тайных знаний. Это позволяет им делать врагов более уязвимыми к магическому урону."
-    }
+    },
+    "icon": "synergies/mage.png"
   },
   "is_mech": {
     "name": "Mech",
@@ -536,7 +556,8 @@
     "lore_i18n": {
       "en": "Inventors are usually the ones within a race who possess the most profound knowledge, and the are ambitious in discover new methods and creations. Though most of the time the inventions are problematic and not-so-reliable, they do invoke miracles sometimes.",
       "ru": "Изобретатели обычно являются представителями расы с наиболее глубокими знаниями и стремятся открывать новые методы и создавать новые изобретения. Хотя их творения часто оказываются проблемными и ненадёжными, но иногда они всё же совершают настоящие чудеса."
-    }
+    },
+    "icon": "synergies/mech.png"
   },
   "is_monk": {
     "name": "Monk",
@@ -562,7 +583,8 @@
     "lore_i18n": {
       "en": "When the Pandaren were subjugated centuries ago, it was the monks that brought hope to a seemingly dim future. Restricted from using weapons by their slave masters, these Pandaren instead focused on harnessing their physical ability and learning weaponless combat. When the opportunity for revolution struck, they were well-trained to throw off the yoke of oppression.",
       "ru": "When the Pandaren were subjugated centuries ago, it was the monks that brought hope to a seemingly dim future. Restricted from using weapons by their slave masters, these Pandaren instead focused on harnessing their physical ability and learning weaponless combat. When the opportunity for revolution struck, they were well-trained to throw off the yoke of oppression."
-    }
+    },
+    "icon": "synergies/monk.png"
   },
   "is_naga": {
     "name": "Naga",
@@ -590,7 +612,8 @@
     "lore_i18n": {
       "en": "Nagas are cursed sea-dwellers that haunt the ocean floor. Their hardened, scaly skin acts as an effective defense against spells.",
       "ru": "Nagas are cursed sea-dwellers that haunt the ocean floor. Their hardened, scaly skin acts as an effective defense against spells."
-    }
+    },
+    "icon": "synergies/naga.png"
   },
   "is_nraqi": {
     "name": "Faceless",
@@ -613,7 +636,8 @@
     "lore_i18n": {
       "en": "The Faceless, otherwise known as the Faceless Ones or N'raqi, are a monstrous race that arose from the organic matter that seeped from the Old Gods' blighted forms during the primordial era of Drodo Island. Cunning and intelligent, they serve their eldritch masters with fanatical loyalty and possess the power from the Void.",
       "ru": "The Faceless, также известные как Faceless Ones или N'raqi, — чудовищная раса, возникшая из органической материи, просочившейся из осквернённых форм Old Gods в первобытную эпоху Drodo Island. Хитрые и разумные, они с фанатичной преданностью служат своим потусторонним владыкам и обладают силой Пустоты."
-    }
+    },
+    "icon": "synergies/nraqi.png"
   },
   "is_ogre": {
     "name": "Ogre",
@@ -638,7 +662,8 @@
     "lore_i18n": {
       "en": "Ogres have two heads, or was it three? More heads, more stamina!",
       "ru": "У огров две головы, или три? Чем больше голов, тем больше выносливости!"
-    }
+    },
+    "icon": "synergies/ogre.png"
   },
   "is_orc": {
     "name": "Orc",
@@ -663,7 +688,8 @@
     "lore_i18n": {
       "en": "The Orcs are a prolific and physically powerful race, excellent at tolerating pain and injury. Being exotic to Drodolands, their home was a once-lush world but now a shattered realm. They abandoned their peaceful culture when the demon lord cunningly corrupted the Orcs and used them in his vengeful plot against the his own people.",
       "ru": "Orcs — многочисленная и физически сильная раса, отлично переносящая боль и ранения. Будучи чужаками в Drodolands, они происходят из некогда цветущего мира, ныне ставшего разрушенным. Они отказались от своей мирной культуры, когда демон-владыка коварно развратил Orcs и использовал их в своей мстительной войне против собственного народа."
-    }
+    },
+    "icon": "synergies/orc.png"
   },
   "is_pandaman": {
     "name": "Pandaren",
@@ -689,7 +715,8 @@
     "lore_i18n": {
       "en": "Ten thousand years ago the last emperor of the Pandaren Empire surrounded his entire territory in the misty protection in order to save his people from the Great Havoc. Now the ancient species has once again revealed themselves and they are literally a mist to the others.",
       "ru": "Ten thousand years ago the last emperor of the Pandaren Empire surrounded his entire territory in the misty protection in order to save his people from the Great Havoc. Now the ancient species has once again revealed themselves and they are literally a mist to the others."
-    }
+    },
+    "icon": "synergies/pandaman.png"
   },
   "is_priest": {
     "name": "Priest",
@@ -715,7 +742,8 @@
     "lore_i18n": {
       "en": "Priests are blessed invokers of light and darkness, who express their determined spirits through dedicated service to the people. For numerous battles, with the mastery of light and shadow energies they have weaved the most reliable life-saving protections for their allies.",
       "ru": "Priests — благословенные заклинатели света и тьмы, выражающие свою решимость служением людям. Во множестве сражений, владея энергиями света и тени, они создают самые надёжные защитные чары, спасающие союзников."
-    }
+    },
+    "icon": "synergies/priest.png"
   },
   "is_satyr": {
     "name": "Satyr",
@@ -740,7 +768,8 @@
     "lore_i18n": {
       "en": "Demonic species rose from twisted elves, experts at concealing themselves in nightmares, and fanatics in spreading blood and agony.",
       "ru": "Demonic произошли от искажённых эльфов, скрываются в кошмарах и сеют кровь и боль."
-    }
+    },
+    "icon": "synergies/satyr.png"
   },
   "is_shaman": {
     "name": "Shaman",
@@ -768,7 +797,8 @@
     "lore_i18n": {
       "en": "Mortal mediators of the ancient elements. Following the guide of ancestral spirits, Shaman learn to wield unseemingly mysterious power over generations to protect their family and clans.",
       "ru": "Mortal mediators of the ancient elements. Following the guide of ancestral spirits, Shaman learn to wield unseemingly mysterious power over generations to protect their family and clans."
-    }
+    },
+    "icon": "synergies/shaman.png"
   },
   "is_tauren": {
     "name": "Tauren",
@@ -792,7 +822,8 @@
     "lore_i18n": {
       "en": "Peace-loving Taurens live on mountain-high plateaus of the barren Drodoland. They strive to preserve the balance of nature at the behest of the Earth Mother.",
       "ru": "Taurens с высокогорных плато Drodoland служат Earth Mother и оберегают баланс природы."
-    }
+    },
+    "icon": "synergies/tauren.png"
   },
   "is_troll": {
     "name": "Troll",
@@ -817,7 +848,8 @@
     "lore_i18n": {
       "en": "Savage trolls are notorious for their cruelty, dark occult religion, and fierce hatred of other races.",
       "ru": "Свирепые тролли известны своей жестокостью, мрачным культом и яростной ненавистью к другим расам."
-    }
+    },
+    "icon": "synergies/troll.png"
   },
   "is_undead": {
     "name": "Undead",
@@ -845,7 +877,8 @@
     "lore_i18n": {
       "en": "Many humans had unfortunately lost their life to the Scourge King during his conquest of his homeland. The victims were raised as Undeads with cruelty, turned into minions of the fleshless legion, and were forced to destroy their own kingdom under the command of the Fallen Prince.",
       "ru": "Во время завоевания родных земель Scourge King многие люди трагически погибли. Их безжалостно воскрешали как Undead, превращая в прислужников безплотного легиона и заставляя разрушать собственное королевство по приказу Fallen Prince."
-    }
+    },
+    "icon": "synergies/undead.png"
   },
   "is_warlock": {
     "name": "Warlock",
@@ -870,7 +903,8 @@
     "lore_i18n": {
       "en": "Warlocks are cursed sorcerers who use demonic power to drain the life force from their enemies, restoring themselves to continue their cursed battle.",
       "ru": "Warlocks — проклятые чародеи, использующие демоническую силу, чтобы высасывать жизненную энергию врагов и восстанавливать себя для продолжения своей проклятой битвы."
-    }
+    },
+    "icon": "synergies/warlock.png"
   },
   "is_warrior": {
     "name": "Warrior",
@@ -892,7 +926,8 @@
       "en": "Warriors have a double bonus from Fortified Armor while below 50% health.\n\nClass Perk: Fortified Armor\n Active when you have at least (N) different Warrior pieces on board. (Multiple effects stack) \n\n(3) Warriors: All friendly warriors have +3 armour.\n(6) Warriors: All friendly warriors have +11 armour.\n(9) Warriors: Reflect pure damage equivalent to (1.5x current armour) when taking physical and magical damage.",
       "ru": "Бонус Воинов удваивается, если здоровье ниже 50%.\n\nClass Perk: Fortified Armor\n Активен, когда хотя бы (N) разных Воинов на доске. (Эффекты складываются) \n\n(3) Warrior: Все союзные войны получают +3 брони.\n(6) Warrior: Все союзные войны получают +11 брони.\n(9) Warrior: Отражаeт чистый урон, эквивалентный (в 1,5 раза больше текущей брони) при получении физического и магического урона."
     },
-    "lore_i18n": {}
+    "lore_i18n": {},
+    "icon": "synergies/warrior.png"
   },
   "is_wizard": {
     "name": "Wizard",
@@ -916,6 +951,7 @@
     "lore_i18n": {
       "en": "Wizards play an ancient yet mysterious role. Even though they mostly comprehend oracles and do minor entertaining tricks, Wizards are regarded as evil by many others because of the uncertainty of their purpose of action. The unique power Wizards possess awakes the inner potential of others, leading to a more united alliance.",
       "ru": "Wizards — загадочные существа, пробуждающие потенциал союзников, но из-за своей непредсказуемости считаются злом."
-    }
+    },
+    "icon": "synergies/wizard.png"
   }
 }

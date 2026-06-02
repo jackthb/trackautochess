@@ -2,6 +2,7 @@
   "gameId": "chess_slark",
   "name": "Slark",
   "slug": "slark",
+  "icon": "units/slark.png",
   "source": {
     "id": "chess_slark",
     "cost": 2,

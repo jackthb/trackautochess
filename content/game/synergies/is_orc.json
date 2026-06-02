@@ -2,6 +2,7 @@
   "gameId": "is_orc",
   "name": "Orc",
   "slug": "orc",
+  "icon": "synergies/orc.png",
   "source": {
     "name": "Orc",
     "description": "SPECIES TRAIT: Battle Hardened\n\nActive when you have at least (N) different pieces of this species on board. (Multiple effects stack)\n\n(2) Orcs: All allies have +100 Health.\n(4) Orcs: All allies have +300 Health.\n(6) Orcs: All allies have +10x(Courier health lost) Health.",

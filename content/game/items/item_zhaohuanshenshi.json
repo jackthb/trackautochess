@@ -2,6 +2,7 @@
   "gameId": "item_zhaohuanshenshi",
   "name": "Summoning Stone",
   "slug": "summoning-stone",
+  "icon": "items/zhaohuanshenshi.png",
   "source": {
     "name": "Summoning Stone",
     "description": "Grants your summoned units the effect: Maximum Health +200, Duration +100%.",

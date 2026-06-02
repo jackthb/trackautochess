@@ -2,6 +2,7 @@
   "gameId": "item_lilianghuwan",
   "name": "Bracer",
   "slug": "bracer",
+  "icon": "items/bracer.png",
   "source": {
     "name": "Bracer",
     "description": "HP +300.",

@@ -2,6 +2,7 @@
   "gameId": "item_huiyao",
   "name": "Radiance",
   "slug": "radiance",
+  "icon": "items/radiance.png",
   "source": {
     "name": "Radiance",
     "description": "+25% Evasion.\n\nAura\nDeals 100 pure damage to surrounding enemies every 3 secs and forces them to have a 25% chance to miss the attack.",
