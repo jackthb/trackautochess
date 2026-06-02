@@ -782,6 +782,53 @@ function loadTrackerConfig() {
   }
 }
 
+const MMR_LEVEL_RANKS = [
+  "Pawn-1",
+  "Pawn-2",
+  "Pawn-3",
+  "Pawn-4",
+  "Pawn-5",
+  "Pawn-6",
+  "Pawn-7",
+  "Pawn-8",
+  "Pawn-9",
+  "Knight-1",
+  "Knight-2",
+  "Knight-3",
+  "Knight-4",
+  "Knight-5",
+  "Knight-6",
+  "Knight-7",
+  "Knight-8",
+  "Knight-9",
+  "Bishop-1",
+  "Bishop-2",
+  "Bishop-3",
+  "Bishop-4",
+  "Bishop-5",
+  "Bishop-6",
+  "Bishop-7",
+  "Bishop-8",
+  "Bishop-9",
+  "Rook-1",
+  "Rook-2",
+  "Rook-3",
+  "Rook-4",
+  "Rook-5",
+  "Rook-6",
+  "Rook-7",
+  "Rook-8",
+  "Rook-9",
+  "King",
+  "Queen",
+];
+
+function mmrLevelToAppRank(level) {
+  const n = Number(level);
+  if (!Number.isInteger(n) || n < 1 || n > MMR_LEVEL_RANKS.length) return null;
+  return MMR_LEVEL_RANKS[n - 1];
+}
+
 ipcMain.handle("timelines:fetch", async (_event, matchId) => {
   if (!matchId) return null;
   const config = loadTrackerConfig();
@@ -850,7 +897,7 @@ ipcMain.handle("games:fetch", async () => {
       match_id: r.match_id,
       played_at: r.played_at || "",
       created_at: r.created_at || "",
-      rank: null,
+      rank: mmrLevelToAppRank(r.mmr_level),
       rank_change: null,
       wl: null,
       screenshot: null,

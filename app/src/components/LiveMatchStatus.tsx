@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { parseLineup, unitStem, costBorderColor, synIconName } from "../lib/game-utils";
+import { parseLineup, unitStem, costBorderColor, synIconName, mmrLevelToRank } from "../lib/game-utils";
 import type { LivePlayer } from "../hooks/useNetTableEvents";
 import type { UnitFullInfo, SynergyInfo } from "../types";
 
@@ -174,6 +174,11 @@ export function LiveMatchStatus({ players, localSteamIds, unitsFull, synergiesDa
         }
         .live-seat.is-local .live-seat-name { color: var(--gold); }
         .live-seat-stat b { color: var(--text-primary); font-weight: var(--fw-medium); }
+        .live-seat-skill {
+          color: var(--text-secondary);
+          font-size: var(--fs-11);
+          flex-shrink: 0;
+        }
         .live-seat-hp-wrap { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
         .live-seat-hp-bar-bg {
           width: 70px; height: 6px;
@@ -208,6 +213,7 @@ export function LiveMatchStatus({ players, localSteamIds, unitsFull, synergiesDa
             : player.placement
               ? `Player #${player.placement}`
               : "Player";
+          const skillRank = mmrLevelToRank(player.mmr_level);
           return (
             <div
               key={id}
@@ -218,6 +224,7 @@ export function LiveMatchStatus({ players, localSteamIds, unitsFull, synergiesDa
                   {player.placement ? `#${player.placement}` : "—"}
                 </span>
                 <span className="live-seat-name">{label}</span>
+                {skillRank && <span className="live-seat-skill">{skillRank}</span>}
                 <span className="live-seat-stat">Lv<b>{player.level ?? "—"}</b></span>
                 <span className="live-seat-stat">
                   <b style={{ color: "var(--green-bright)" }}>{player.win_round ?? 0}</b>
