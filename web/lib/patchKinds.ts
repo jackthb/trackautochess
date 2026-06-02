@@ -7,7 +7,9 @@ export type EntryKind =
   | "nerf"
   | "change"
   | "rework"
-  | "fix";
+  | "fix"
+  | "new"
+  | "note";
 
 export const KIND_COLOR: Record<EntryKind, string> = {
   added: "var(--green-bright)",
@@ -17,6 +19,8 @@ export const KIND_COLOR: Record<EntryKind, string> = {
   change: "var(--text-secondary)",
   rework: "var(--gold)",
   fix: "var(--text-secondary)",
+  new: "var(--green-bright)",
+  note: "var(--text-secondary)",
 };
 
 export const KIND_LABEL: Record<EntryKind, string> = {
@@ -27,4 +31,6 @@ export const KIND_LABEL: Record<EntryKind, string> = {
   change: "CHANGE",
   rework: "REWORK",
   fix: "FIX",
+  new: "NEW",
+  note: "NOTE",
 };

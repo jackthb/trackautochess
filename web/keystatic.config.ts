@@ -45,6 +45,7 @@ const entryKind = fields.select({
     { label: "Rework", value: "rework" },
     { label: "Fix", value: "fix" },
     { label: "New", value: "new" },
+    { label: "Note", value: "note" },
   ],
   defaultValue: "change",
 });
