@@ -86,6 +86,14 @@ interface LegendaryEntry {
   code: string;
   /** Friendly display name, falling back to the raw code if we don't have a map entry */
   name: string;
+  /** Unit synergies from units_full.json. Used to rank which trait bans deny the most legendaries. */
+  synergies: string[];
+}
+
+interface LegendaryBanPick {
+  synergy: string;
+  units: LegendaryEntry[];
+  poolShare: number;
 }
 
 function HiddenLegendaries({
@@ -95,6 +103,9 @@ function HiddenLegendaries({
   revealed: LegendaryEntry[];
   unrevealed: LegendaryEntry[];
 }) {
+  const fullPool = [...revealed, ...unrevealed];
+  const bestBans = rankLegendaryBanPicks(fullPool);
+
   return (
     <div className="nettable-state-block">
       <div className="nettable-state-block-header">
@@ -105,6 +116,35 @@ function HiddenLegendaries({
           {unrevealed.length}
         </span>
       </div>
+      {bestBans.length > 0 && (
+        <div className="nettable-best-bans" aria-label="Most efficient legendary bans">
+          <div className="nettable-best-bans-heading">
+            Best bans by legendary pool impact
+          </div>
+          <ul className="nettable-best-ban-list">
+            {bestBans.map((ban) => (
+              <li key={ban.synergy} className="nettable-best-ban-card">
+                <div className="nettable-best-ban-main">
+                  <span className="nettable-best-ban-name">{ban.synergy}</span>
+                  <span className="nettable-best-ban-count">
+                    {ban.units.length}/{fullPool.length} legendaries
+                  </span>
+                </div>
+                <div className="nettable-best-ban-meter" aria-hidden="true">
+                  <span style={{ width: `${ban.poolShare * 100}%` }} />
+                </div>
+                <div className="nettable-best-ban-units">
+                  {ban.units.map((u) => u.name).join(", ")}
+                </div>
+              </li>
+            ))}
+          </ul>
+          <div className="nettable-best-bans-note">
+            One ban removes every legendary sharing that trait from this match's pool.
+          </div>
+        </div>
+      )}
+
       {unrevealed.length === 0 ? (
         <div className="nettable-state-block-empty">
           {revealed.length === 0
@@ -148,16 +188,42 @@ function extractHiddenLegendaries(
   // Drodo's lua sets both keys at the start of the match; if neither is
   // present, we don't have a capture yet and there's nothing to show.
   if (revealedRaw == null && unrevealedRaw == null) return null;
-  const codeToName = chessCodeToName(unitsFull);
+  const codeToUnit = chessCodeToUnit(unitsFull);
   return {
-    revealed: toEntries(revealedRaw, codeToName),
-    unrevealed: toEntries(unrevealedRaw, codeToName),
+    revealed: toEntries(revealedRaw, codeToUnit),
+    unrevealed: toEntries(unrevealedRaw, codeToUnit),
   };
+}
+
+function rankLegendaryBanPicks(pool: LegendaryEntry[]): LegendaryBanPick[] {
+  if (pool.length === 0) return [];
+
+  const bySynergy = new Map<string, LegendaryEntry[]>();
+  for (const unit of pool) {
+    for (const synergy of unit.synergies) {
+      const list = bySynergy.get(synergy) ?? [];
+      list.push(unit);
+      bySynergy.set(synergy, list);
+    }
+  }
+
+  return Array.from(bySynergy, ([synergy, units]) => ({
+    synergy,
+    units: units.slice().sort((a, b) => a.name.localeCompare(b.name)),
+    poolShare: units.length / pool.length,
+  }))
+    .filter((ban) => ban.units.length > 1)
+    .sort((a, b) => {
+      const countDiff = b.units.length - a.units.length;
+      if (countDiff !== 0) return countDiff;
+      return a.synergy.localeCompare(b.synergy);
+    })
+    .slice(0, 5);
 }
 
 function toEntries(
   raw: unknown,
-  codeToName: Map<string, string>,
+  codeToUnit: Map<string, { name: string; synergies: string[] }>,
 ): LegendaryEntry[] {
   // Drodo broadcasts this as a Lua array, which round-trips through VBKV →
   // JSON as either an array or a {1: 'chess_x', 2: 'chess_y'} object.
@@ -169,17 +235,30 @@ function toEntries(
       )
     : [];
   return list
-    .map((code) => ({ code, name: codeToName.get(code) ?? code }))
+    .map((code) => {
+      const unit = codeToUnit.get(code);
+      return {
+        code,
+        name: unit?.name ?? code,
+        synergies: unit?.synergies ?? [],
+      };
+    })
     .sort((a, b) => a.name.localeCompare(b.name));
 }
 
-function chessCodeToName(
+function chessCodeToUnit(
   unitsFull: Record<string, UnitFullInfo>,
-): Map<string, string> {
-  const out = new Map<string, string>();
+): Map<string, { name: string; synergies: string[] }> {
+  const out = new Map<string, { name: string; synergies: string[] }>();
   for (const [displayName, info] of Object.entries(unitsFull)) {
     const id = (info as { id?: unknown }).id;
-    if (typeof id === "string") out.set(id, displayName);
+    if (typeof id !== "string") continue;
+    out.set(id, {
+      name: displayName,
+      synergies: Array.isArray(info.synergies)
+        ? info.synergies.filter((s): s is string => typeof s === "string")
+        : [],
+    });
   }
   return out;
 }
