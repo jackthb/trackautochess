@@ -1,9 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import dynamic from "next/dynamic";
 import { isAdminSteamId } from "@/lib/admin";
 import { createSupabaseClient } from "@/lib/supabase";
-import KeystaticApp from "./keystatic";
+
+const KeystaticApp = dynamic(() => import("./keystatic"), { ssr: false });
 
 type GateState = "loading" | "allowed" | "denied";
 
