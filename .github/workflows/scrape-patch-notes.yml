@@ -30,7 +30,11 @@ jobs:
       - name: Check for changes
         id: diff
         run: |
-          git diff --quiet data/ && echo "changed=false" >> "$GITHUB_OUTPUT" || echo "changed=true" >> "$GITHUB_OUTPUT"
+          if [ -n "$(git status --porcelain -- data/)" ]; then
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          fi
 
       - uses: pnpm/action-setup@v4
         if: steps.diff.outputs.changed == 'true'
