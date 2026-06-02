@@ -32,6 +32,7 @@ const REPLAY_DIR = DESKTOP_PATHS.replayDir;
 const ICONS_DIR = DESKTOP_PATHS.iconsDir;
 const ICON_FILENAME = DESKTOP_PATHS.iconFilename;
 const gotSingleInstanceLock = app.requestSingleInstanceLock();
+const IS_DEV = !IS_PACKAGED && process.argv.includes("--dev");
 
 if (!gotSingleInstanceLock) {
   app.quit();
@@ -47,6 +48,9 @@ let mainWindow = null;
 let notificationWindow = null;
 let pythonProcess = null;
 let pythonRL = null;
+let pythonRestarting = false;
+let pythonRestartTimer = null;
+let pythonWatchers = [];
 // let overlayTimeout = null;
 let dotaPollInterval = null;
 let dotaOpen = false;
@@ -99,6 +103,8 @@ function getBackendCommand() {
 }
 
 function startPython() {
+  if (pythonProcess) return;
+
   const { command, args, cwd } = getBackendCommand();
 
   if (!fs.existsSync(command)) {
@@ -135,6 +141,12 @@ function startPython() {
     pythonProcess = null;
     pythonRL = null;
 
+    if (pythonRestarting) {
+      pythonRestarting = false;
+      startPython();
+      return;
+    }
+
     // Notify renderer
     if (mainWindow && !mainWindow.isDestroyed()) {
       mainWindow.webContents.send("tracker:event", {
@@ -147,6 +159,52 @@ function startPython() {
   pythonProcess.on("error", (err) => {
     console.error("Failed to start Python:", err);
   });
+}
+
+function restartPython(reason) {
+  if (IS_PACKAGED) return;
+  console.log(`Restarting Python backend: ${reason}`);
+
+  if (!pythonProcess) {
+    startPython();
+    return;
+  }
+
+  pythonRestarting = true;
+  sendToPython({ cmd: "quit" });
+  setTimeout(() => {
+    if (pythonProcess && pythonRestarting) {
+      pythonProcess.kill();
+    }
+  }, 1500);
+}
+
+function schedulePythonRestart(reason) {
+  if (pythonRestartTimer) clearTimeout(pythonRestartTimer);
+  pythonRestartTimer = setTimeout(() => {
+    pythonRestartTimer = null;
+    restartPython(reason);
+  }, 350);
+}
+
+function startPythonDevWatcher() {
+  if (!IS_DEV) return;
+
+  const backendDir = DESKTOP_PATHS.backendDir;
+  if (!fs.existsSync(backendDir)) return;
+
+  try {
+    const watcher = fs.watch(backendDir, { recursive: true }, (_event, filename) => {
+      if (!filename || !filename.endsWith(".py")) return;
+      const normalized = filename.replace(/\\/g, "/");
+      if (normalized.includes("/.venv/") || normalized.includes("/build/")) return;
+      schedulePythonRestart(filename);
+    });
+    pythonWatchers.push(watcher);
+    console.log(`Watching Python backend for hot restart: ${backendDir}`);
+  } catch (e) {
+    console.error(`Failed to watch Python backend dir ${backendDir}:`, e);
+  }
 }
 
 function sendToPython(cmd) {
@@ -1203,6 +1261,7 @@ app.whenReady().then(() => {
   startDotaPoller();
   registerShortcuts();
   startPython();
+  startPythonDevWatcher();
   startTrackerLogWatcher();
   startDotaLogWatcher();
 
@@ -1224,6 +1283,14 @@ app.on("will-quit", () => {
   if (dotaLogWatcher) {
     try { dotaLogWatcher.close(); } catch {}
     dotaLogWatcher = null;
+  }
+  for (const watcher of pythonWatchers) {
+    try { watcher.close(); } catch {}
+  }
+  pythonWatchers = [];
+  if (pythonRestartTimer) {
+    clearTimeout(pythonRestartTimer);
+    pythonRestartTimer = null;
   }
   if (dotaPollInterval) clearInterval(dotaPollInterval);
   for (const timer of notificationTimers.values()) {
