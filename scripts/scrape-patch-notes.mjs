@@ -10,6 +10,7 @@
  */
 
 import { readFileSync, writeFileSync, readdirSync } from "fs";
+import { createHash } from "crypto";
 import { join, dirname } from "path";
 import { fileURLToPath } from "url";
 
@@ -24,8 +25,13 @@ const CHANGELOG_URL =
   "https://steamcommunity.com/sharedfiles/filedetails/changelog/1613886175";
 
 const DRY_RUN = process.argv.includes("--dry-run");
+const CHANGELOG_FILE_ARG = process.argv.find((arg) =>
+  arg.startsWith("--changelog-file=")
+);
+const CHANGELOG_FILE = CHANGELOG_FILE_ARG?.split("=").slice(1).join("=");
 
 async function fetchChangelog() {
+  if (CHANGELOG_FILE) return readFileSync(CHANGELOG_FILE, "utf-8");
   const resp = await fetch(CHANGELOG_URL);
   if (!resp.ok) throw new Error(`HTTP ${resp.status} fetching changelog`);
   return resp.text();
@@ -147,9 +153,14 @@ function contentToSections(content) {
 }
 
 async function fetchGoogleDoc(url) {
-  const resp = await fetch(url);
-  if (!resp.ok) return null;
-  return resp.text();
+  try {
+    const resp = await fetch(url);
+    if (!resp.ok) return null;
+    return resp.text();
+  } catch (err) {
+    console.warn(`Could not fetch Google Doc ${url}: ${err.message}`);
+    return null;
+  }
 }
 
 function htmlToText(html) {
@@ -244,6 +255,71 @@ function parseGoogleDoc(html) {
   return { title, sections };
 }
 
+function normalizeContent(value) {
+  return (value || "").replace(/\s+/g, " ").trim();
+}
+
+function entryContentHash(entry) {
+  return createHash("sha256")
+    .update(normalizeContent(entry.content))
+    .digest("hex")
+    .slice(0, 16);
+}
+
+function sourceEntryRecord(entry) {
+  return {
+    date: entry.date,
+    time: entry.time,
+    docsUrl: entry.docsUrl || undefined,
+    contentHash: entryContentHash(entry),
+  };
+}
+
+function sourceEntryKey(entry) {
+  return `${entry.date}|${entry.time}|${entryContentHash(entry)}`;
+}
+
+function collectSourceEntryKeys(patch) {
+  return new Set(
+    (patch.sourceEntries || [])
+      .map((entry) => {
+        if (entry.key) return entry.key;
+        if (entry.date && entry.time && entry.contentHash) {
+          return `${entry.date}|${entry.time}|${entry.contentHash}`;
+        }
+        return null;
+      })
+      .filter(Boolean)
+  );
+}
+
+function isEntryRepresented(entry, existingPatches, knownSourceEntryKeys) {
+  if (knownSourceEntryKeys.has(sourceEntryKey(entry))) return true;
+
+  // Older patch files did not store Steam entry-level metadata. Fall back to
+  // conservative checks that still allow a distinct Google Doc release posted
+  // on a date that was previously represented only by a generic hotfix.
+  for (const patch of existingPatches) {
+    if (
+      entry.docsUrl &&
+      (patch.source === entry.docsUrl || patch.workshop_url === entry.docsUrl)
+    ) {
+      return true;
+    }
+
+    if (patch.date === entry.date) {
+      if (!entry.docsUrl) return true;
+      if (patch.source === entry.docsUrl) return true;
+    }
+
+    if ((patch.absorbedDates || []).includes(entry.date) && !entry.docsUrl) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
 function slugifyName(value) {
   return value.toLowerCase().replace(/&/g, " and ").replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
 }
@@ -286,7 +362,7 @@ function daysBetween(isoA, isoB) {
 // Fold a hotfix's entries into the parent as a "Hotfix — <date>" section and
 // record the absorbed date so re-scrapes don't recreate it. Mutates `parent`
 // in memory and rewrites its file.
-function foldHotfix(parent, hotfixDate, hotfixSections) {
+function foldHotfix(parent, hotfixDate, hotfixSections, hotfixEntries = []) {
   const entries = (hotfixSections || []).flatMap((s) => s.entries || []);
   parent.sections = [
     ...(parent.sections || []),
@@ -294,6 +370,10 @@ function foldHotfix(parent, hotfixDate, hotfixSections) {
   ];
   parent.absorbedDates = [
     ...new Set([...(parent.absorbedDates || []), hotfixDate]),
+  ];
+  parent.sourceEntries = [
+    ...(parent.sourceEntries || []),
+    ...hotfixEntries.map(sourceEntryRecord),
   ];
   // A folded hotfix brings fresh game-data changes, so the parent's entities
   // need re-syncing — reset its flag.
@@ -305,6 +385,7 @@ function foldHotfix(parent, hotfixDate, hotfixSections) {
   const data = JSON.parse(readFileSync(parent.file, "utf-8"));
   data.sections = parent.sections;
   data.absorbedDates = parent.absorbedDates;
+  data.sourceEntries = parent.sourceEntries;
   data.entitiesSynced = false;
   writeFileSync(parent.file, JSON.stringify(data, null, 2) + "\n");
   console.log(`Folded ${hotfixDate} hotfix into ${parent.slug}.json`);
@@ -426,7 +507,6 @@ async function main() {
   // Load existing patch docs from disk so hotfixes can find a parent to fold
   // into, and so already-absorbed dates aren't re-scraped as standalone.
   const existingPatches = [];
-  const absorbedDates = new Set();
   for (const f of readdirSync(DATA_DIR)) {
     if (!f.endsWith(".json") || f === "index.json") continue;
     const data = JSON.parse(readFileSync(join(DATA_DIR, f), "utf-8"));
@@ -437,20 +517,23 @@ async function main() {
       title: data.title,
       sections: data.sections || [],
       absorbedDates: data.absorbedDates || [],
+      source: data.source,
+      workshop_url: data.workshop_url,
+      sourceEntries: data.sourceEntries || [],
     });
-    for (const d of data.absorbedDates || []) absorbedDates.add(d);
   }
 
-  const existingDates = new Set([
-    ...index.patches.map((p) => p.date),
-    ...absorbedDates,
-  ]);
+  const knownSourceEntryKeys = new Set(
+    existingPatches.flatMap((patch) => [...collectSourceEntryKeys(patch)])
+  );
   const existingSlugs = new Set(index.patches.map((p) => p.slug));
 
-  // Group by date, skip existing
+  // Group by date, skip only Steam entries that are already represented. Do
+  // not skip solely by calendar date: Steam can publish a generic hotfix and a
+  // named patch on the same day, and older runs may have absorbed that date.
   const byDate = new Map();
   for (const entry of entries) {
-    if (existingDates.has(entry.date)) continue;
+    if (isEntryRepresented(entry, existingPatches, knownSourceEntryKeys)) continue;
     if (!byDate.has(entry.date)) byDate.set(entry.date, []);
     byDate.get(entry.date).push(entry);
   }
@@ -503,7 +586,7 @@ async function main() {
         )
         .sort((a, b) => b.date.localeCompare(a.date))[0];
       if (parent) {
-        foldHotfix(parent, date, sections);
+        foldHotfix(parent, date, sections, dayEntries);
         console.log("Applying game data changes...");
         applyGameDataChanges(sections);
         continue;
@@ -524,6 +607,7 @@ async function main() {
       // the VPK into data/*.json + the CMS. Flipped true by the
       // /sync-patch-entities skill or scripts/mark-patch-synced.mjs.
       entitiesSynced: false,
+      sourceEntries: dayEntries.map(sourceEntryRecord),
       sections,
     };
 
@@ -542,6 +626,7 @@ async function main() {
       title,
       sections,
       absorbedDates: [],
+      sourceEntries: dayEntries.map(sourceEntryRecord),
     });
     newPatches.push({ date, title, slug });
 
