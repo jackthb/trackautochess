@@ -155,12 +155,23 @@ export function MatchTimelinePanel({
 
   const round = timeline.rounds[selectedRoundIdx];
 
-  // Sort players: alive first (HP > 0), then by placement ascending.
-  const playerRows = Object.entries(round.players || {}).sort(([, a], [, b]) => {
-    const aAlive = (a.hp ?? 0) > 0 ? 0 : 1;
-    const bAlive = (b.hp ?? 0) > 0 ? 0 : 1;
-    if (aAlive !== bAlive) return aAlive - bAlive;
-    return (a.placement ?? 99) - (b.placement ?? 99);
+  const isLastRound = selectedRoundIdx === timeline.rounds.length - 1;
+
+  // While scrubbing through earlier rounds, rank players by the HP they had in
+  // that snapshot instead of freezing the final placement order. Equal-HP early
+  // rounds fall back to Steam ID for a deterministic alphabetical-ish order; the
+  // final round keeps the stored placement order so the end state is unchanged.
+  const playerRows = Object.entries(round.players || {}).sort(([aSid, a], [bSid, b]) => {
+    const placementDelta = (a.placement ?? 99) - (b.placement ?? 99);
+    if (isLastRound) return placementDelta;
+
+    const aHasHp = typeof a.hp === "number";
+    const bHasHp = typeof b.hp === "number";
+    if (aHasHp !== bHasHp) return aHasHp ? -1 : 1;
+    if (aHasHp && bHasHp && a.hp !== b.hp) return b.hp - a.hp;
+
+    const sidDelta = aSid.localeCompare(bSid, undefined, { numeric: true });
+    return sidDelta || placementDelta;
   });
 
   return (
@@ -195,14 +206,14 @@ export function MatchTimelinePanel({
             </tr>
           </thead>
           <tbody>
-            {playerRows.map(([sid, p]) => {
+            {playerRows.map(([sid, p], rowIdx) => {
               const dead = (p.hp ?? 0) <= 0;
               return (
                 <tr
                   key={sid}
                   style={{ borderTop: "1px solid #222", opacity: dead ? 0.45 : 1 }}
                 >
-                  <td style={{ padding: "4px 8px" }}>{p.placement ?? "-"}</td>
+                  <td style={{ padding: "4px 8px" }}>{isLastRound ? p.placement ?? "-" : rowIdx + 1}</td>
                   <td style={{ padding: "4px 8px", fontFamily: "monospace", fontSize: 11 }}>{sid}</td>
                   <td style={{ padding: "4px 8px" }}>{p.hp ?? "-"}</td>
                   <td style={{ padding: "4px 8px" }}>{p.level ?? "-"}</td>

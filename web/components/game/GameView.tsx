@@ -244,6 +244,7 @@ function MatchPlayerRow({
   prevSnap,
   snapRound,
   isLastRound,
+  displayPosition,
   tooltipData,
 }: {
   game: Game;
@@ -256,9 +257,10 @@ function MatchPlayerRow({
   prevSnap: TimelinePlayerSnap | null;
   snapRound: number | null;
   isLastRound: boolean;
+  displayPosition: number | null;
   tooltipData: TooltipData;
 }) {
-  const p = parseInt(game.placement) || 0;
+  const p = displayPosition ?? (parseInt(game.placement) || 0);
   const pColor = placementColor(p);
   // OCR'd player name lives in `notes` when the Game Over uploader couldn't
   // link the row to a Steam account.
@@ -334,7 +336,7 @@ function MatchPlayerRow({
         className={styles.mpPlacement}
         style={{ color: pColor, borderColor: pColor }}
       >
-        {game.placement ?? "—"}
+        {displayPosition ?? game.placement ?? "—"}
       </div>
         <div className={styles.mpInfo}>
           <div className={styles.mpNameRow}>
@@ -541,12 +543,30 @@ export default function GameView({
 
   // For a single-row match (no companions in `games` for the same match_id),
   // synthesize a one-element list so the same table renders for both cases.
-  const playerRows: Game[] =
-    matchGames.length > 0
-      ? [...matchGames].sort(
-          (a, b) => (parseInt(a.placement) || 99) - (parseInt(b.placement) || 99)
-        )
-      : [game];
+  const basePlayerRows = matchGames.length > 0 ? matchGames : [game];
+  const playerRows: Game[] = [...basePlayerRows].sort((a, b) => {
+    const finalPlacementDelta =
+      (parseInt(a.placement) || 99) - (parseInt(b.placement) || 99);
+    if (!hasTimeline || isLastRound || !currentSnap?.players) {
+      return finalPlacementDelta;
+    }
+
+    const aSnap = currentSnap.players[String(a.user_id)];
+    const bSnap = currentSnap.players[String(b.user_id)];
+    const aHp = aSnap?.hp;
+    const bHp = bSnap?.hp;
+    const aHasHp = typeof aHp === "number";
+    const bHasHp = typeof bHp === "number";
+    if (aHasHp !== bHasHp) return aHasHp ? -1 : 1;
+    if (aHasHp && bHasHp && aHp !== bHp) return bHp - aHp;
+
+    const aProfile = matchProfiles[String(a.user_id)];
+    const bProfile = matchProfiles[String(b.user_id)];
+    const aName = aProfile?.name || a.notes || String(a.user_id || a.id);
+    const bName = bProfile?.name || b.notes || String(b.user_id || b.id);
+    const nameDelta = aName.localeCompare(bName, undefined, { sensitivity: "base" });
+    return nameDelta || finalPlacementDelta;
+  });
 
   useEffect(() => {
     trackEvent("Game Detail Viewed", {
@@ -659,7 +679,7 @@ export default function GameView({
                 {playerRows.length === 1 ? "player" : "players"}
               </span>
             </div>
-            {playerRows.map((g) => {
+            {playerRows.map((g, rowIdx) => {
               const prevRound: TimelineRound | null = hasTimeline && selectedRoundIdx > 0
                 ? timeline!.rounds[selectedRoundIdx - 1] ?? null
                 : null;
@@ -683,6 +703,9 @@ export default function GameView({
                   prevSnap={prevRound?.players?.[String(g.user_id)] ?? null}
                   snapRound={selectedRound}
                   isLastRound={isLastRound}
+                  displayPosition={
+                    hasTimeline && !isLastRound ? rowIdx + 1 : parseInt(g.placement) || null
+                  }
                   tooltipData={tooltipData}
                 />
               );
