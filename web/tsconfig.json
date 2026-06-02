@@ -25,6 +25,9 @@
         "../data/*"
       ]
     },
+    "typeRoots": [
+      "./node_modules/@types"
+    ],
     "plugins": [
       {
         "name": "next"
