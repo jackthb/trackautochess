@@ -17,8 +17,6 @@ interface HistoryTabProps {
   relicsData: Record<string, RelicInfo>;
   lastRefresh: Date | null;
   refresh: () => Promise<void>;
-  updateGame: (gameId: number, fields: Partial<Game>) => Promise<boolean>;
-  deleteGame: (gameId: number) => Promise<boolean>;
   drodo?: DrodoProfile | null;
   drodoLoading?: boolean;
   refreshDrodo?: () => Promise<void>;
@@ -36,8 +34,6 @@ export function HistoryTab({
   relicsData,
   lastRefresh,
   refresh,
-  updateGame,
-  deleteGame,
   drodo,
   drodoLoading,
   refreshDrodo,
@@ -187,8 +183,6 @@ export function HistoryTab({
                 unitsFull={unitsFull}
                 synergiesData={synergiesData}
                 relicsData={relicsData}
-                onUpdate={updateGame}
-                onDelete={deleteGame}
                 expanded={expandedId === g.id}
                 onToggle={() => setExpandedId(expandedId === g.id ? null : g.id)}
               />

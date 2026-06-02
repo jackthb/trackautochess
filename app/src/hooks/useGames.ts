@@ -22,7 +22,6 @@ interface GamesState {
   lastRefresh: Date | null;
   refresh: () => Promise<void>;
   updateGame: (gameId: number, fields: Partial<Game>) => Promise<boolean>;
-  deleteGame: (gameId: number) => Promise<boolean>;
 }
 
 export function useGames(): GamesState {
@@ -101,14 +100,6 @@ export function useGames(): GamesState {
     setRefreshing(false);
   }, [unitCosts]);
 
-  const deleteGame = useCallback(async (gameId: number): Promise<boolean> => {
-    const ok = await window.appApi.deleteGame(gameId);
-    if (ok) {
-      setGames((prev) => prev.filter((g) => g.id !== gameId));
-    }
-    return ok;
-  }, []);
-
   const updateGame = useCallback(
     async (gameId: number, fields: Partial<Game>): Promise<boolean> => {
       const ok = await window.appApi.updateGame(gameId, fields);
@@ -142,6 +133,5 @@ export function useGames(): GamesState {
     lastRefresh,
     refresh,
     updateGame,
-    deleteGame,
   };
 }

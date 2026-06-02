@@ -330,7 +330,6 @@ declare global {
       fetchGames: () => Promise<Game[]>;
       fetchTimeline: (matchId: string) => Promise<unknown | null>;
       updateGame: (gameId: number, fields: Partial<Game>) => Promise<boolean>;
-      deleteGame: (gameId: number) => Promise<boolean>;
       fetchUnitsData: () => Promise<UnitsData>;
       fetchUnitsFull: () => Promise<Record<string, UnitFullInfo>>;
       fetchSynergies: () => Promise<Record<string, SynergyInfo>>;

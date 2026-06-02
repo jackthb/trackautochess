@@ -938,32 +938,6 @@ ipcMain.handle("games:update", async (_event, gameId, fields) => {
   }
 });
 
-ipcMain.handle("games:delete", async (_event, gameId) => {
-  const config = loadTrackerConfig();
-  const url = config.supabase_url;
-  const key = config.supabase_key;
-
-  if (!url || !key) return false;
-
-  try {
-    const resp = await net.fetch(
-      `${url}/rest/v1/games?id=eq.${gameId}`,
-      {
-        method: "DELETE",
-        headers: {
-          apikey: key,
-          Authorization: `Bearer ${key}`,
-          Prefer: "return=minimal",
-        },
-      }
-    );
-    return resp.ok;
-  } catch (e) {
-    console.error("games:delete error:", e);
-    return false;
-  }
-});
-
 // ── Drodo profile IPC (fetch from Supabase + Drodo API) ─────────────────────
 
 const DRODO_BASE = "http://autochess.ppbizon.com";

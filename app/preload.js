@@ -38,7 +38,6 @@ contextBridge.exposeInMainWorld("appApi", {
   fetchGames: () => ipcRenderer.invoke("games:fetch"),
   fetchTimeline: (matchId) => ipcRenderer.invoke("timelines:fetch", matchId),
   updateGame: (gameId, fields) => ipcRenderer.invoke("games:update", gameId, fields),
-  deleteGame: (gameId) => ipcRenderer.invoke("games:delete", gameId),
   fetchUnitsData: () => ipcRenderer.invoke("data:units"),
   fetchUnitsFull: () => ipcRenderer.invoke("data:units_full"),
   fetchSynergies: () => ipcRenderer.invoke("data:synergies"),
