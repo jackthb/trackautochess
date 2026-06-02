@@ -3,14 +3,9 @@ import { collection, config, fields } from "@keystatic/core";
 const githubRepo = process.env.KEYSTATIC_GITHUB_REPO as
   | `${string}/${string}`
   | undefined;
-const hasGithubAppConfig = Boolean(
-  process.env.KEYSTATIC_GITHUB_CLIENT_ID &&
-    process.env.KEYSTATIC_GITHUB_CLIENT_SECRET &&
-    process.env.NEXT_PUBLIC_KEYSTATIC_GITHUB_APP_SLUG,
-);
 
 const storage =
-  githubRepo && hasGithubAppConfig && process.env.NODE_ENV === "production"
+  githubRepo && process.env.NODE_ENV === "production"
     ? ({
         kind: "github",
         repo: githubRepo,
