@@ -21,10 +21,11 @@ const INDEX_PATH = join(DATA_DIR, "index.json");
 const ITEMS_PATH = join(ROOT_DATA, "items.json");
 const UNITS_FULL_PATH = join(ROOT_DATA, "units_full.json");
 const SYNERGIES_PATH = join(ROOT_DATA, "synergies.json");
+const PUBLISHED_FILE_ID = "1613886175";
 const CHANGELOG_URL =
-  "https://steamcommunity.com/sharedfiles/filedetails/changelog/1613886175";
+  `https://steamcommunity.com/sharedfiles/filedetails/changelog/${PUBLISHED_FILE_ID}`;
 const CHANGELOG_FETCH_URL =
-  "https://steamcommunity.com/sharedfiles/filedetails/changelog/1613886175?l=english";
+  `${CHANGELOG_URL}?l=english`;
 const CHANGELOG_FETCH_URLS = [
   CHANGELOG_FETCH_URL,
   `${CHANGELOG_FETCH_URL}&p=1`,
@@ -86,9 +87,27 @@ async function fetchChangelogWithEntries() {
   }
 
   if (firstHtml) {
-    throw new Error(describeUnexpectedChangelogHtml(firstHtml));
+    return { html: firstHtml, entries: [] };
   }
   throw firstError || new Error("Could not fetch Steam changelog");
+}
+
+async function fetchLatestSteamUpdateId() {
+  const params = new URLSearchParams();
+  params.set("itemcount", "1");
+  params.set("publishedfileids[0]", PUBLISHED_FILE_ID);
+  const resp = await fetch(
+    "https://api.steampowered.com/ISteamRemoteStorage/GetPublishedFileDetails/v1/",
+    {
+      method: "POST",
+      headers: REQUEST_HEADERS,
+      body: params,
+    }
+  );
+  if (!resp.ok) throw new Error(`HTTP ${resp.status} fetching published file details`);
+  const data = await resp.json();
+  const details = data?.response?.publishedfiledetails?.[0];
+  return details?.time_updated ? String(details.time_updated) : null;
 }
 
 function describeUnexpectedChangelogHtml(html) {
@@ -127,10 +146,11 @@ function parseChangelogEntries(html) {
     const isoDate = `${currentYear}-${String(monthIndex + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
 
     // Extract content from <p id="...">content</p>
-    const contentMatch = block.match(/<p\s+id="[^"]*">([\s\S]*?)<\/p>/i);
+    const contentMatch = block.match(/<p\s+id="([^"]*)">([\s\S]*?)<\/p>/i);
     if (!contentMatch) continue;
 
-    const rawHtml = contentMatch[1];
+    const sourceId = contentMatch[1];
+    const rawHtml = contentMatch[2];
 
     // Extract Google Docs link before stripping HTML.
     // Steam wraps external links in a linkfilter: href="...linkfilter/?u=https%3A%2F%2Fdocs.google.com%2F..."
@@ -161,7 +181,7 @@ function parseChangelogEntries(html) {
 
     if (!content) continue;
 
-    entries.push({ date: isoDate, time, content, docsUrl });
+    entries.push({ date: isoDate, time, content, docsUrl, sourceId });
   }
 
   return entries;
@@ -334,11 +354,20 @@ function entryContentHash(entry) {
 
 function sourceEntryRecord(entry) {
   return {
+    sourceId: entry.sourceId || undefined,
     date: entry.date,
     time: entry.time,
     docsUrl: entry.docsUrl || undefined,
     contentHash: entryContentHash(entry),
   };
+}
+
+function collectSourceEntryIds(patch) {
+  return new Set(
+    (patch.sourceEntries || [])
+      .map((entry) => entry.sourceId || null)
+      .filter(Boolean)
+  );
 }
 
 function sourceEntryKey(entry) {
@@ -359,7 +388,8 @@ function collectSourceEntryKeys(patch) {
   );
 }
 
-function isEntryRepresented(entry, existingPatches, knownSourceEntryKeys) {
+function isEntryRepresented(entry, existingPatches, knownSourceEntryKeys, knownSourceEntryIds) {
+  if (entry.sourceId && knownSourceEntryIds.has(entry.sourceId)) return true;
   if (knownSourceEntryKeys.has(sourceEntryKey(entry))) return true;
 
   // Older patch files did not store Steam entry-level metadata. Fall back to
@@ -562,7 +592,7 @@ function applyGameDataChanges(sections) {
 
 async function main() {
   console.log("Fetching Steam Workshop changelog...");
-  const { entries } = await fetchChangelogWithEntries();
+  const { html, entries } = await fetchChangelogWithEntries();
 
   console.log("Parsing entries...");
   console.log(`Found ${entries.length} changelog entries on page 1`);
@@ -591,14 +621,37 @@ async function main() {
   const knownSourceEntryKeys = new Set(
     existingPatches.flatMap((patch) => [...collectSourceEntryKeys(patch)])
   );
+  const knownSourceEntryIds = new Set(
+    existingPatches.flatMap((patch) => [...collectSourceEntryIds(patch)])
+  );
   const existingSlugs = new Set(index.patches.map((p) => p.slug));
+
+  if (entries.length === 0) {
+    const latestUpdateId = await fetchLatestSteamUpdateId();
+    if (latestUpdateId && knownSourceEntryIds.has(latestUpdateId)) {
+      console.warn(
+        `Steam changelog returned 0 entries, but latest update ${latestUpdateId} is already represented; no-op.`
+      );
+      return;
+    }
+    throw new Error(
+      [
+        describeUnexpectedChangelogHtml(html),
+        latestUpdateId
+          ? `Latest Steam update id ${latestUpdateId} is not represented in local patch data.`
+          : null,
+      ]
+        .filter(Boolean)
+        .join("\n")
+    );
+  }
 
   // Group by date, skip only Steam entries that are already represented. Do
   // not skip solely by calendar date: Steam can publish a generic hotfix and a
   // named patch on the same day, and older runs may have absorbed that date.
   const byDate = new Map();
   for (const entry of entries) {
-    if (isEntryRepresented(entry, existingPatches, knownSourceEntryKeys)) continue;
+    if (isEntryRepresented(entry, existingPatches, knownSourceEntryKeys, knownSourceEntryIds)) continue;
     if (!byDate.has(entry.date)) byDate.set(entry.date, []);
     byDate.get(entry.date).push(entry);
   }
