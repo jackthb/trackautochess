@@ -22,13 +22,34 @@ const UNITS_FULL_PATH = join(ROOT_DATA, "units_full.json");
 const SYNERGIES_PATH = join(ROOT_DATA, "synergies.json");
 const CHANGELOG_URL =
   "https://steamcommunity.com/sharedfiles/filedetails/changelog/1613886175";
+const CHANGELOG_FETCH_URL =
+  "https://steamcommunity.com/sharedfiles/filedetails/changelog/1613886175?l=english";
+
+const REQUEST_HEADERS = {
+  "User-Agent":
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0 Safari/537.36",
+  Accept: "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+  "Accept-Language": "en-US,en;q=0.9",
+};
 
 const DRY_RUN = process.argv.includes("--dry-run");
 
 async function fetchChangelog() {
-  const resp = await fetch(CHANGELOG_URL);
+  const resp = await fetch(CHANGELOG_FETCH_URL, { headers: REQUEST_HEADERS });
   if (!resp.ok) throw new Error(`HTTP ${resp.status} fetching changelog`);
   return resp.text();
+}
+
+function describeUnexpectedChangelogHtml(html) {
+  const title = html.match(/<title[^>]*>([\s\S]*?)<\/title>/i)?.[1];
+  const bodyText = htmlToText(html).replace(/\s+/g, " ").slice(0, 300);
+  return [
+    `Fetched Steam changelog, but found 0 changelog entries.`,
+    title ? `Page title: ${title.trim()}` : null,
+    bodyText ? `Page excerpt: ${bodyText}` : null,
+  ]
+    .filter(Boolean)
+    .join("\n");
 }
 
 function parseChangelogEntries(html) {
@@ -147,7 +168,7 @@ function contentToSections(content) {
 }
 
 async function fetchGoogleDoc(url) {
-  const resp = await fetch(url);
+  const resp = await fetch(url, { headers: REQUEST_HEADERS });
   if (!resp.ok) return null;
   return resp.text();
 }
@@ -420,6 +441,9 @@ async function main() {
   console.log("Parsing entries...");
   const entries = parseChangelogEntries(html);
   console.log(`Found ${entries.length} changelog entries on page 1`);
+  if (entries.length === 0) {
+    throw new Error(describeUnexpectedChangelogHtml(html));
+  }
 
   const index = JSON.parse(readFileSync(INDEX_PATH, "utf-8"));
 
