@@ -107,7 +107,7 @@ async function handle(req: Request, ctx: { params: Promise<{ steamId: string }> 
   const responseHeaders: Record<string, string> = {};
 
   // Manual refresh: must be the profile owner (or an admin) and admins
-  // bypass the daily quota. Anonymous and cross-profile refreshes are rejected.
+  // bypass the hourly quota. Anonymous and cross-profile refreshes are rejected.
   let refreshQuota: ManualRefreshQuota | undefined;
   if (forceRefresh) {
     const session = await getSessionUser(reqShim, supabase);
@@ -142,7 +142,7 @@ async function handle(req: Request, ctx: { params: Promise<{ steamId: string }> 
         ).toString();
         return Response.json(
           {
-            error: "Daily manual refresh limit reached",
+            error: "Hourly manual refresh limit reached",
             refresh_quota: refreshQuota,
           },
           { status: 429, headers: responseHeaders }

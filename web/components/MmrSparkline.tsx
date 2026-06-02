@@ -151,7 +151,7 @@ export function MmrSparkline({ seasons = [], snapshots = [] }: MmrSparklineProps
       </div>
       <p className={styles.note}>
         Season anchors come from your end-of-season MMR. New points are added
-        each time you press refresh on this profile — check back daily to
+        each time you press refresh on this profile — check back hourly to
         build out the recent trend.
       </p>
     </section>

@@ -70,6 +70,21 @@ function formatLastFetchedTimestamp(value: string | null): string {
   )} UTC`;
 }
 
+
+function formatRefreshReset(value: string | null, nowMs: number | null): string {
+  if (!value || nowMs == null) return "available this hour";
+
+  const resetMs = new Date(value).getTime();
+  if (!Number.isFinite(resetMs) || resetMs <= nowMs) return "available now";
+
+  const totalSeconds = Math.max(1, Math.ceil((resetMs - nowMs) / 1000));
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = totalSeconds % 60;
+  if (minutes <= 0) return `available in ${seconds}s`;
+
+  return `available in ${minutes}m ${seconds}s`;
+}
+
 function formatLastFetchedAge(value: string | null, nowMs: number | null) {
   if (!value || nowMs == null) return null;
   const fetchedMs = new Date(value).getTime();
@@ -207,12 +222,32 @@ export default function PlayerView({
 
   const lastFetchedTimestamp = formatLastFetchedTimestamp(drodoLastFetchedAt);
   const lastFetchedAge = formatLastFetchedAge(drodoLastFetchedAt, nowMs);
+  const effectiveManualRefreshQuota = useMemo(() => {
+    if (manualRefreshQuota.remaining > 0 || nowMs == null) {
+      return manualRefreshQuota;
+    }
+
+    const resetMs = new Date(manualRefreshQuota.reset_at).getTime();
+    if (!Number.isFinite(resetMs) || resetMs > nowMs) {
+      return manualRefreshQuota;
+    }
+
+    return {
+      ...manualRefreshQuota,
+      used: 0,
+      remaining: manualRefreshQuota.limit,
+    };
+  }, [manualRefreshQuota, nowMs]);
   const showQuota = canRefresh && !isAdmin;
   const refreshDisabled =
     !canRefresh ||
     refreshing ||
-    (showQuota && manualRefreshQuota.remaining <= 0);
-  const refreshQuotaLabel = `${manualRefreshQuota.remaining}/${manualRefreshQuota.limit}`;
+    (showQuota && effectiveManualRefreshQuota.remaining <= 0);
+  const refreshQuotaLabel = `${effectiveManualRefreshQuota.remaining}/${effectiveManualRefreshQuota.limit}`;
+  const refreshQuotaResetLabel = formatRefreshReset(
+    effectiveManualRefreshQuota.reset_at,
+    nowMs
+  );
 
   const handleRefresh = async () => {
     if (!canRefresh) {
@@ -223,12 +258,12 @@ export default function PlayerView({
       setRefreshError("Sign in with Steam to refresh your own profile.");
       return;
     }
-    if (showQuota && manualRefreshQuota.remaining <= 0) {
+    if (showQuota && effectiveManualRefreshQuota.remaining <= 0) {
       trackEvent("Player Refresh Blocked", {
         route: analyticsRoute(route),
         reason: "quota",
       });
-      setRefreshError("Daily manual refresh limit reached.");
+      setRefreshError("Hourly manual refresh limit reached.");
       return;
     }
 
@@ -236,7 +271,7 @@ export default function PlayerView({
       route: analyticsRoute(route),
       is_admin: isAdmin,
       is_own_profile: isOwnProfile,
-      quota_bucket: bucketCount(manualRefreshQuota.remaining),
+      quota_bucket: bucketCount(effectiveManualRefreshQuota.remaining),
     });
     setRefreshError(null);
     setRefreshing(true);
@@ -275,7 +310,7 @@ export default function PlayerView({
             setDrodoLastFetchedAt(data.fetched_at);
           }
         } else if (resp.status === 429) {
-          setRefreshError("Daily manual refresh limit reached.");
+          setRefreshError("Hourly manual refresh limit reached.");
         } else if (resp.status === 403) {
           setRefreshError("Refresh blocked by anti-bot verification.");
         } else {
@@ -386,7 +421,7 @@ export default function PlayerView({
                 <div className={styles.refreshQuota}>
                   <span>Manual refreshes</span>
                   <span className={styles.refreshQuotaValue}>
-                    {refreshQuotaLabel} left today
+                    {refreshQuotaLabel} {refreshQuotaResetLabel}
                   </span>
                 </div>
               )}
