@@ -55,17 +55,21 @@ export function ProfileSearch({
   };
 
   const localMatches = (value: string): SearchResult[] => {
-    const lower = value.toLowerCase();
-    if (!lower) return defaultResults;
+    const parsed = parseSteamInput(value);
+    const terms = [value, parsed?.value]
+      .filter((term): term is string => Boolean(term))
+      .map((term) => term.toLowerCase());
+    if (terms.length === 0) return defaultResults;
     return sortSearchResults(
       defaultResults.filter((row) => {
-        return (
-          row.steam_id.includes(lower) ||
-          row.name?.toLowerCase().includes(lower) ||
-          row.custom_url?.toLowerCase().includes(lower)
+        return terms.some(
+          (term) =>
+            row.steam_id.includes(term) ||
+            row.name?.toLowerCase().includes(term) ||
+            row.custom_url?.toLowerCase().includes(term)
         );
       }),
-      value
+      parsed?.value ?? value
     );
   };
 
@@ -238,11 +242,25 @@ export function ProfileSearch({
   };
 
   const visibleResults = results.slice(0, MAX_VISIBLE_RESULTS);
-  const canSearchSteam = Boolean(parseSteamInput(searchValue));
+  const parsedSteamInput = parseSteamInput(searchValue);
+  const canSearchSteam = Boolean(parsedSteamInput);
+  const hasExactKnownSteamResult = Boolean(
+    parsedSteamInput &&
+      results.some((result) => {
+        if (parsedSteamInput.kind === "id") {
+          return result.steam_id === parsedSteamInput.value;
+        }
+        return (
+          result.custom_url?.toLowerCase() ===
+          parsedSteamInput.value.toLowerCase()
+        );
+      })
+  );
   const steamActionIndex = visibleResults.length;
   const showSteamAction =
     dropdownOpen &&
     canSearchSteam &&
+    !hasExactKnownSteamResult &&
     !searching &&
     searchedValue === searchValue.trim();
 
@@ -267,7 +285,7 @@ export function ProfileSearch({
       return;
     }
 
-    if (highlightedIndex === steamActionIndex && canSearchSteam) {
+    if (highlightedIndex === steamActionIndex && showSteamAction) {
       void resolveSteamAndNavigate(val);
       return;
     }

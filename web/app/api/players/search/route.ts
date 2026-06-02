@@ -92,6 +92,15 @@ export async function GET(req: Request) {
     }
   }
 
+  const parsed = parseSteamInput(query);
+  const profileQuery = parsed?.value ?? query;
+  const vanityQuery = parsed?.kind === "slug" ? parsed.value : query;
+  const steamIdQuery = parsed?.kind === "id"
+    ? parsed.value
+    : /^\d+$/.test(query)
+      ? query
+      : null;
+
   let rows: SearchResult[] = [];
   if (supabase) {
     const candidateRows: SearchResult[] = [];
@@ -99,7 +108,7 @@ export async function GET(req: Request) {
     const exactCustom = await supabase
       .from("users")
       .select(USER_SEARCH_SELECT)
-      .ilike("custom_url", query)
+      .ilike("custom_url", vanityQuery)
       .limit(8);
 
     if (exactCustom.error) {
@@ -110,11 +119,11 @@ export async function GET(req: Request) {
       ...((exactCustom.data ?? []) as UserSearchRow[]).map(toSearchResult)
     );
 
-    if (/^\d+$/.test(query)) {
+    if (steamIdQuery) {
       const exactSteamId = await supabase
         .from("users")
         .select(USER_SEARCH_SELECT)
-        .eq("steam_id", query)
+        .eq("steam_id", steamIdQuery)
         .limit(1);
 
       if (exactSteamId.error) {
@@ -129,7 +138,7 @@ export async function GET(req: Request) {
     const prefixCustom = await supabase
       .from("users")
       .select(USER_SEARCH_SELECT)
-      .ilike("custom_url", `${query}%`)
+      .ilike("custom_url", `${vanityQuery}%`)
       .limit(8);
 
     if (prefixCustom.error) {
@@ -143,7 +152,7 @@ export async function GET(req: Request) {
     const nameMatches = await supabase
       .from("users")
       .select(USER_SEARCH_SELECT)
-      .ilike("name", `%${query}%`)
+      .ilike("name", `%${profileQuery}%`)
       .limit(8);
 
     if (nameMatches.error) {
@@ -156,11 +165,10 @@ export async function GET(req: Request) {
 
     rows = sortSearchResults(
       await markRowsWithGames(supabase, mergeSearchResults(candidateRows)),
-      query
+      profileQuery
     );
   }
 
-  const parsed = parseSteamInput(query);
   let authoritativeSteamId: string | null = null;
   if (parsed && shouldSearchSteam) {
     const resolvedSteamId = await resolveSteamInput(query, supabase, {
@@ -187,7 +195,7 @@ export async function GET(req: Request) {
     }
   }
 
-  rows = sortSearchResults(mergeSearchResults(rows), query);
+  rows = sortSearchResults(mergeSearchResults(rows), profileQuery);
   if (authoritativeSteamId) {
     const authoritative = rows.find(
       (row) => String(row.steam_id) === authoritativeSteamId

@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "prebuild": "node -e \"const{cpSync}=require('fs');cpSync('../data/icons','public/icons',{recursive:true,force:true})\"",
+    "prebuild": "node scripts/sync-icons.mjs",
     "dev": "next dev",
     "build": "next build",
     "start": "next start",

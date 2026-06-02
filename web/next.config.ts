@@ -1,15 +1,19 @@
 import type { NextConfig } from "next";
 import { withBotId } from "botid/next/config";
-import { cpSync, existsSync } from "fs";
+import { cpSync, existsSync, mkdirSync } from "fs";
 import path from "path";
 
 function syncPublicIcons() {
-  const source = path.resolve(__dirname, "../data/icons");
-  const target = path.resolve(__dirname, "public/icons");
+  const source = path.resolve(__dirname, "..", "data", "icons");
+  const destination = path.resolve(__dirname, "public", "icons");
 
-  if (existsSync(source)) {
-    cpSync(source, target, { recursive: true, force: true });
+  if (!existsSync(source)) {
+    console.warn(`[next-config] Missing icon source directory: ${source}`);
+    return;
   }
+
+  mkdirSync(path.dirname(destination), { recursive: true });
+  cpSync(source, destination, { recursive: true, force: true });
 }
 
 // Vercel may invoke `next build` directly, bypassing package.json prebuild.

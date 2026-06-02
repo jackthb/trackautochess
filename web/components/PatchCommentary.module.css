@@ -103,7 +103,7 @@
 }
 
 .evidenceSource {
-  width: max-content;
+  justify-self: start;
   max-width: 100%;
   font-size: var(--fs-10);
   letter-spacing: var(--tr-upper);
@@ -127,7 +127,7 @@
 
 .evidenceLink {
   grid-column: 2;
-  width: max-content;
+  justify-self: start;
   color: var(--accent-dim);
   text-decoration: underline;
   text-underline-offset: 2px;

@@ -160,26 +160,31 @@ function resolveEntryMeta(entry: PatchEntry): EntryMeta {
 
 async function loadPatch(slug: string, isDraft: boolean): Promise<Patch | null> {
   if (isDraft) {
-    const draft = await loadDraftPatchNote(slug, true);
-    if (!draft) return null;
-    return {
-      date: draft.date,
-      title: draft.title,
-      source: draft.source,
-      flavor: draft.flavor,
-      sections: draft.sections.map((s) => ({
-        heading: s.heading,
-        entries: s.entries.map((e) => ({
-          kind: e.kind as EntryKind,
-          name: e.name,
-          detail: e.detail,
-          entity_type: e.entityType as PatchEntry["entity_type"],
-          entity_slug: e.entitySlug,
-          commentary: e.commentary,
-          evidence: e.evidence,
-        })),
-      })),
-    };
+    try {
+      const draft = await loadDraftPatchNote(slug, true);
+      if (draft) {
+        return {
+          date: draft.date,
+          title: draft.title,
+          source: draft.source,
+          flavor: draft.flavor,
+          sections: draft.sections.map((s) => ({
+            heading: s.heading,
+            entries: s.entries.map((e) => ({
+              kind: e.kind as EntryKind,
+              name: e.name,
+              detail: e.detail,
+              entity_type: e.entityType as PatchEntry["entity_type"],
+              entity_slug: e.entitySlug,
+              commentary: e.commentary,
+              evidence: e.evidence,
+            })),
+          })),
+        };
+      }
+    } catch (error) {
+      console.warn(`[patch-notes] Failed to load draft patch ${slug}`, error);
+    }
   }
 
   const filePath = path.join(
