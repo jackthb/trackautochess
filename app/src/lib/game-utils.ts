@@ -6,6 +6,8 @@ export {
   unitStem,
   relicStem,
   synIconName,
+  itemDisplayName,
+  itemIconStem,
   parseLineup,
   parseSynergies,
   parseRelics,

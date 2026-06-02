@@ -11,6 +11,7 @@
     "./StatsGrid": "./StatsGrid.tsx",
     "./SeasonHistoryGrid": "./SeasonHistoryGrid.tsx",
     "./GameRowDisplay": "./GameRowDisplay.tsx",
+    "./ChessBoard": "./ChessBoard.tsx",
     "./Tooltip": "./Tooltip.tsx",
     "./types": "./types.ts",
     "./tokens.css": "./tokens.css",

@@ -285,6 +285,52 @@ def test_last_match_dumps_empty():
 # ── Queen ladder extraction ─────────────────────────────────────────────────
 
 
+def test_extract_players_state_keeps_structured_vchess_board():
+    rows = [
+        {
+            "table_name": "CustomNetTable_dac_table",
+            "key": "player_info",
+            "raw": {"info": {"76561198000000001": {"player_id": 3}}},
+        },
+        {
+            "table_name": "CustomNetTable_player_id_table",
+            "key": "vchess_3",
+            "raw": {
+                "2_4": {
+                    "chess": "chess_cm1",
+                    "x": 4,
+                    "y": 2,
+                    "item": {"1": "item_a"},
+                    "lastitem": {"2": "item_b"},
+                    "buy_price": 3,
+                    "index": 123,
+                    "water_id": 45,
+                }
+            },
+        },
+    ]
+
+    players = NetTableCapture._extract_players_state_from_rows(rows)
+    player = players["76561198000000001"]
+
+    assert player["lineup"] == "Crystal Maiden(2)"
+    assert player["board"] == [
+        {
+            "slot_key": "2_4",
+            "chess": "chess_cm1",
+            "name": "Crystal Maiden",
+            "stars": 2,
+            "x": 4,
+            "y": 2,
+            "items": ["item_a"],
+            "last_items": ["item_b"],
+            "index": 123,
+            "buy_price": 3,
+            "water_id": 45,
+        }
+    ]
+
+
 def test_extract_ranking_top_players_accepts_common_aliases():
     scanned_at = "2026-06-02T12:00:00+00:00"
     raw = {

@@ -1,7 +1,8 @@
 import { useMemo } from "react";
-import { parseLineup, unitStem, costBorderColor, synIconName, mmrLevelToRank } from "../lib/game-utils";
+import { parseLineup, synIconName, mmrLevelToRank } from "../lib/game-utils";
 import type { LivePlayer } from "../hooks/useNetTableEvents";
-import type { UnitFullInfo, SynergyInfo } from "../types";
+import type { UnitFullInfo, SynergyInfo, ItemFullInfo } from "../types";
+import { ChessBoard } from "@dac/shared/ChessBoard";
 
 interface Props {
   /** Extracted per-player live state, keyed by steam_id (or slot_N when the
@@ -13,6 +14,7 @@ interface Props {
   unitsFull: Record<string, UnitFullInfo>;
   /** synergies.json (keyed by `is_*` stem) — for activation-tier thresholds. */
   synergiesData: Record<string, SynergyInfo>;
+  itemsFull?: Record<string, ItemFullInfo>;
 }
 
 function hpBarColor(hp: number): string {
@@ -67,7 +69,7 @@ interface Seat {
  * NetTable carries no player names (only steam_id + slot), so opponents are
  * labelled by placement. Renders nothing until there's at least one capture.
  */
-export function LiveMatchStatus({ players, localSteamIds, unitsFull, synergiesData }: Props) {
+export function LiveMatchStatus({ players, localSteamIds, unitsFull, synergiesData, itemsFull }: Props) {
   const unitCosts = useMemo(() => {
     const out: Record<string, number> = {};
     for (const [name, info] of Object.entries(unitsFull)) {
@@ -183,6 +185,7 @@ export function LiveMatchStatus({ players, localSteamIds, unitsFull, synergiesDa
         .live-seat-hp-bar { height: 100%; border-radius: 3px; transition: width 0.3s ease-out; min-width: 1px; }
         .live-seat-hp-text { font-size: var(--fs-11); color: var(--text-secondary); font-variant-numeric: tabular-nums; min-width: 34px; }
         .live-seat-units { display: flex; flex-wrap: wrap; gap: 3px; }
+        .live-seat-board { max-width: 100%; overflow-x: auto; }
         .live-seat-empty { color: var(--text-muted); font-size: var(--fs-11); }
         .live-seat-foot {
           display: flex; align-items: center; gap: 12px;
@@ -202,6 +205,7 @@ export function LiveMatchStatus({ players, localSteamIds, unitsFull, synergiesDa
         {seats.map(({ id, player, isLocal }) => {
           const hp = Math.max(0, player.hp ?? 0);
           const units = parseLineup(player.lineup || "", unitCosts);
+          const hasBoard = Array.isArray(player.board) && player.board.length > 0;
           const synergies = parseBuff(player.buff, firstTier);
           const label = isLocal
             ? "You"
@@ -238,31 +242,18 @@ export function LiveMatchStatus({ players, localSteamIds, unitsFull, synergiesDa
                 </div>
               </div>
 
-              {units.length === 0 ? (
+              {units.length === 0 && !hasBoard ? (
                 <div className="live-seat-empty">No units on the board yet.</div>
               ) : (
-                <div className="live-seat-units">
-                  {units.map((u, i) => (
-                    <div
-                      key={`${u.name}-${i}`}
-                      className="unit-icon-wrap"
-                      title={`${u.name}${u.stars > 1 ? ` ${"★".repeat(u.stars)}` : ""}`}
-                    >
-                      <img
-                        className="unit-icon"
-                        src={`icons://units/${unitStem(u.name)}.png`}
-                        alt={u.name}
-                        loading="lazy"
-                        style={{ borderColor: costBorderColor(unitCosts[u.name] || 1) }}
-                        onError={(e) => {
-                          (e.target as HTMLImageElement).style.visibility = "hidden";
-                        }}
-                      />
-                      {u.stars > 1 && (
-                        <span className={`unit-stars s${u.stars}`}>{"★".repeat(u.stars)}</span>
-                      )}
-                    </div>
-                  ))}
+                <div className="live-seat-board">
+                  <ChessBoard
+                    board={player.board}
+                    lineup={player.lineup || ""}
+                    unitCosts={unitCosts}
+                    iconUrl={(type, stem) => `icons://${type}/${stem}.png`}
+                    itemsFull={itemsFull}
+                    compact
+                  />
                 </div>
               )}
 

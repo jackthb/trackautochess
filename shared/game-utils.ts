@@ -1,4 +1,4 @@
-import type { RelicInfo } from "./types";
+import type { ItemFullInfo, RelicInfo } from "./types";
 
 export function placementColor(p: number): string {
   if (p === 1) return "var(--gold)";
@@ -40,6 +40,22 @@ export function unitStem(name: string): string {
 
 export function relicStem(name: string): string {
   return name.toLowerCase().replace(/ /g, "_").replace(/-/g, "_");
+}
+
+export function itemIconStem(itemId: string, itemsFull?: Record<string, ItemFullInfo>): string {
+  const texture = itemsFull?.[itemId]?.texture;
+  const stem = texture || itemId;
+  return stem
+    .replace(/^item_custom\//, "")
+    .replace(/^custom\//, "")
+    .replace(/^item_/, "")
+    .toLowerCase()
+    .replace(/ /g, "_")
+    .replace(/-/g, "_");
+}
+
+export function itemDisplayName(itemId: string, itemsFull?: Record<string, ItemFullInfo>): string {
+  return itemsFull?.[itemId]?.name || itemId.replace(/^item_/, "").replace(/_/g, " ");
 }
 
 export const SYN_ICON_MAP: Record<string, string> = {

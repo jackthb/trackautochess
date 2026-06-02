@@ -66,3 +66,25 @@ export interface RelicInfo {
   description?: string;
   [key: string]: unknown;
 }
+
+export interface ItemFullInfo {
+  name?: string;
+  texture?: string;
+  icon_url?: string | null;
+  description?: string;
+  [key: string]: unknown;
+}
+
+export interface ChessBoardPiece {
+  slot_key?: string;
+  chess?: string;
+  name?: string;
+  stars?: number;
+  x?: number | null;
+  y?: number | null;
+  items?: string[];
+  last_items?: string[];
+  index?: number;
+  buy_price?: number;
+  water_id?: number;
+}

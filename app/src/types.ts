@@ -281,6 +281,14 @@ export interface ItemsData {
   total?: number;
 }
 
+export interface ItemFullInfo {
+  name?: string;
+  texture?: string;
+  icon_url?: string | null;
+  description?: string;
+  [key: string]: unknown;
+}
+
 export interface TalentInfo {
   title: string;
   description?: string;
@@ -335,6 +343,7 @@ declare global {
       fetchSynergies: () => Promise<Record<string, SynergyInfo>>;
       fetchRelics: () => Promise<{ relics: Record<string, RelicInfo> }>;
       fetchItems: () => Promise<ItemsData>;
+      fetchItemsFull: () => Promise<Record<string, ItemFullInfo>>;
       fetchTalents: () => Promise<Record<string, TalentInfo>>;
       fetchDrodo: () => Promise<DrodoProfile | null>;
       refreshDrodo: () => Promise<DrodoProfile | null>;

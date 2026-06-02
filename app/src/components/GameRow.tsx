@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { GameRowDisplay } from "@dac/shared/GameRowDisplay";
-import type { Game, RelicInfo, SynergyInfo, UnitFullInfo } from "../types";
+import type { Game, RelicInfo, SynergyInfo, UnitFullInfo, ItemFullInfo } from "../types";
 import { placementBg } from "../lib/game-utils";
 import { MatchTimelinePanel } from "./MatchTimelinePanel";
 import { VideoPlayer } from "./VideoPlayer";
@@ -11,6 +11,7 @@ interface GameRowProps {
   unitsFull: Record<string, UnitFullInfo>;
   synergiesData: Record<string, SynergyInfo>;
   relicsData: Record<string, RelicInfo>;
+  itemsFull: Record<string, ItemFullInfo>;
   expanded: boolean;
   onToggle: () => void;
 }
@@ -21,6 +22,7 @@ export function GameRow({
   unitsFull,
   synergiesData,
   relicsData,
+  itemsFull,
   expanded,
   onToggle,
 }: GameRowProps) {
@@ -88,6 +90,7 @@ export function GameRow({
               unitsFull={unitsFull}
               synergiesData={synergiesData}
               relicsData={relicsData}
+              itemsFull={itemsFull}
             />
           )}
         </div>

@@ -6,7 +6,9 @@ import unitsFullData from "@data/units_full.json";
 import { UNIT_COSTS, computeSynergies } from "@/lib/units";
 import synergiesData from "@data/synergies.json";
 import relicsData from "@data/relics.json";
+import itemsFullData from "@data/items_full.json";
 import type { Game, UnitFullInfo, SynergyInfo, RelicInfo } from "@dac/shared/types";
+import type { ChessBoardPiece, ItemFullInfo } from "../../../shared/types";
 import {
   parseLineup,
   parseSynergies,
@@ -24,6 +26,7 @@ function mmrLevelToRank(level: number | null | undefined): string {
   return RANK_BRACKETS[level - 1].rank.replace("-", " ");
 }
 import { TooltipWrap, type TooltipData } from "@dac/shared/Tooltip";
+import { ChessBoard } from "../../../shared/ChessBoard";
 import {
   playerProfilePath,
   steamProfileUrl,
@@ -37,6 +40,7 @@ import styles from "./GameView.module.css";
 const UNITS_FULL = unitsFullData as Record<string, UnitFullInfo>;
 const SYNERGIES_DATA = synergiesData as Record<string, SynergyInfo>;
 const RELICS_DATA = (relicsData as any).relics as Record<string, RelicInfo>;
+const ITEMS_FULL = itemsFullData as Record<string, ItemFullInfo>;
 
 const iconUrl = resolveIconUrl;
 
@@ -60,6 +64,7 @@ interface TimelinePlayerSnap {
   win_round?: number;
   lose_round?: number;
   mmr_level?: number;
+  board?: ChessBoardPiece[];
 }
 
 interface TimelineRound {
@@ -109,14 +114,18 @@ function PlayerDetail({
   tooltipData,
   hp,
   gold,
+  board,
+  lineupStr,
 }: {
   lineup: { name: string; stars: number }[];
+  lineupStr: string | null;
   synergies: { name: string; count: number }[];
   relicsToShow: RelicTimelineEntry[];
   hasRelicTimeline: boolean;
   tooltipData: TooltipData;
   hp: number | null;
   gold: number | null;
+  board?: ChessBoardPiece[];
 }) {
   return (
     <div className={styles.playerDetail}>
@@ -124,6 +133,20 @@ function PlayerDetail({
         <div className={styles.pdLiveStats}>
           {hp != null && <span className={styles.mpHp}>HP {hp}</span>}
           {gold != null && <span className={styles.mpGold}>Gold {gold}</span>}
+        </div>
+      )}
+      {(board?.length || lineup.length > 0) && (
+        <div className={styles.pdSection}>
+          <div className={styles.pdLabel}>Board</div>
+          <div className={styles.pdBoard}>
+            <ChessBoard
+              board={board}
+              lineup={lineupStr}
+              unitCosts={UNIT_COSTS}
+              iconUrl={iconUrl}
+              itemsFull={ITEMS_FULL}
+            />
+          </div>
         </div>
       )}
       {lineup.length > 0 && (
@@ -464,6 +487,8 @@ function MatchPlayerRow({
           tooltipData={tooltipData}
           hp={snap?.hp ?? null}
           gold={snap?.total_money ?? null}
+          board={snap?.board}
+          lineupStr={lineupStr}
         />
       )}
     </div>

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import type { UnitFullInfo, SynergyInfo, RelicInfo } from "../types";
-import { parseLineup, unitStem, costBorderColor } from "@dac/shared/game-utils";
-import { TooltipWrap, type TooltipData } from "@dac/shared/Tooltip";
+import type { UnitFullInfo, SynergyInfo, RelicInfo, ItemFullInfo } from "../types";
+import type { ChessBoardPiece } from "@dac/shared/types";
+import { ChessBoard } from "@dac/shared/ChessBoard";
 
 interface PlayerSnap {
   hp?: number;
@@ -21,6 +21,7 @@ interface PlayerSnap {
   team_id?: number;
   hero_index?: number;
   player_id?: number;
+  board?: ChessBoardPiece[];
 }
 
 interface RoundSnap {
@@ -46,78 +47,17 @@ interface Props {
   unitsFull?: Record<string, UnitFullInfo>;
   synergiesData?: Record<string, SynergyInfo>;
   relicsData?: Record<string, RelicInfo>;
-}
-
-function LineupIcons({
-  lineup,
-  unitCosts,
-  tooltipData,
-}: {
-  lineup: string;
-  unitCosts: Record<string, number>;
-  tooltipData: TooltipData | null;
-}) {
-  const units = parseLineup(lineup, unitCosts);
-  if (units.length === 0) {
-    return <span style={{ color: "#666" }}>—</span>;
-  }
-  return (
-    <div className="lineup" style={{ display: "flex", flexWrap: "wrap", gap: 2 }}>
-      {units.map((u, i) => {
-        const icon = (
-          <div
-            key={i}
-            className="unit-icon-wrap"
-            title={tooltipData ? undefined : `${u.name}${u.stars > 1 ? ` ${"★".repeat(u.stars)}` : ""}`}
-          >
-            <img
-              className="unit-icon"
-              src={`icons://units/${unitStem(u.name)}.png`}
-              alt={u.name}
-              loading="lazy"
-              style={{ borderColor: costBorderColor(unitCosts[u.name] || 1) }}
-              onError={(e) => {
-                (e.target as HTMLImageElement).style.display = "none";
-              }}
-            />
-            {u.stars > 1 && (
-              <span className={`unit-stars s${u.stars}`}>
-                {"★".repeat(u.stars)}
-              </span>
-            )}
-          </div>
-        );
-        return tooltipData ? (
-          <TooltipWrap key={i} type="unit" name={u.name} stars={u.stars} data={tooltipData}>
-            {icon}
-          </TooltipWrap>
-        ) : icon;
-      })}
-    </div>
-  );
+  itemsFull?: Record<string, ItemFullInfo>;
 }
 
 export function MatchTimelinePanel({
   matchId,
   unitCosts,
-  unitsFull,
-  synergiesData,
-  relicsData,
+  itemsFull,
 }: Props) {
   const [timeline, setTimeline] = useState<Timeline | null>(null);
   const [loading, setLoading] = useState(true);
   const [selectedRoundIdx, setSelectedRoundIdx] = useState(0);
-
-  const tooltipData: TooltipData | null =
-    unitsFull || synergiesData || relicsData
-      ? {
-          unitCosts,
-          unitsFull,
-          synergiesData,
-          relicsData,
-          iconUrl: (type, stem) => `icons://${type}/${stem}.png`,
-        }
-      : null;
 
   useEffect(() => {
     let cancelled = false;
@@ -202,7 +142,7 @@ export function MatchTimelinePanel({
               <th style={{ padding: "4px 8px" }}>HP</th>
               <th style={{ padding: "4px 8px" }}>Lvl</th>
               <th style={{ padding: "4px 8px" }}>W-L</th>
-              <th style={{ padding: "4px 8px", width: "100%" }}>Lineup</th>
+              <th style={{ padding: "4px 8px", width: "100%" }}>Board</th>
             </tr>
           </thead>
           <tbody>
@@ -219,10 +159,13 @@ export function MatchTimelinePanel({
                   <td style={{ padding: "4px 8px" }}>{p.level ?? "-"}</td>
                   <td style={{ padding: "4px 8px" }}>{p.win_round ?? 0}-{p.lose_round ?? 0}</td>
                   <td style={{ padding: "4px 8px" }}>
-                    <LineupIcons
+                    <ChessBoard
+                      board={p.board}
                       lineup={p.lineup || ""}
                       unitCosts={unitCosts}
-                      tooltipData={tooltipData}
+                      iconUrl={(type, stem) => `icons://${type}/${stem}.png`}
+                      itemsFull={itemsFull}
+                      compact
                     />
                   </td>
                 </tr>

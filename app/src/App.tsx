@@ -158,6 +158,7 @@ export default function App() {
                 status={tracker.status}
                 unitsFull={gamesState.unitsFull}
                 synergiesData={gamesState.synergiesData}
+                itemsFull={gamesState.itemsFull}
                 netTable={netTable}
               />
             )}

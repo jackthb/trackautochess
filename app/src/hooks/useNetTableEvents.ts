@@ -92,6 +92,7 @@ export interface LivePlayer {
   candy?: number;
   /** Raw synergy stems from the game: "is_mage:6,is_human:6,". */
   buff?: string;
+  board?: import("@dac/shared/types").ChessBoardPiece[];
 }
 
 /** One table's outcome from a debug dump sequence (F10 in-game). */

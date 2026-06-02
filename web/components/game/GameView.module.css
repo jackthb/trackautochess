@@ -410,6 +410,11 @@
   flex-wrap: wrap;
   align-items: center;
 }
+.pdBoard {
+  max-width: 100%;
+  overflow-x: auto;
+  padding-bottom: 2px;
+}
 /* Resize both the wrap and the icon together — the global
    .unit-icon-wrap is fixed at 28x28, so growing only the icon
    would overflow the wrap and overlap neighbouring units. */

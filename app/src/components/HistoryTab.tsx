@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { Button } from "@dac/shared/Button";
 import { SeasonHistoryGrid } from "@dac/shared/SeasonHistoryGrid";
-import type { Game, UnitFullInfo, SynergyInfo, RelicInfo, DrodoProfile } from "../types";
+import type { Game, UnitFullInfo, SynergyInfo, RelicInfo, ItemFullInfo, DrodoProfile } from "../types";
 import { StatsBar } from "./StatsBar";
 import { GameRow } from "./GameRow";
 
@@ -15,6 +15,7 @@ interface HistoryTabProps {
   unitsFull: Record<string, UnitFullInfo>;
   synergiesData: Record<string, SynergyInfo>;
   relicsData: Record<string, RelicInfo>;
+  itemsFull: Record<string, ItemFullInfo>;
   lastRefresh: Date | null;
   refresh: () => Promise<void>;
   drodo?: DrodoProfile | null;
@@ -32,6 +33,7 @@ export function HistoryTab({
   unitsFull,
   synergiesData,
   relicsData,
+  itemsFull,
   lastRefresh,
   refresh,
   drodo,
@@ -183,6 +185,7 @@ export function HistoryTab({
                 unitsFull={unitsFull}
                 synergiesData={synergiesData}
                 relicsData={relicsData}
+                itemsFull={itemsFull}
                 expanded={expandedId === g.id}
                 onToggle={() => setExpandedId(expandedId === g.id ? null : g.id)}
               />

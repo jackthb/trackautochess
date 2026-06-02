@@ -35,10 +35,10 @@ pnpm run build:all        # Backend + installer
 ### Python Backend (app/backend/)
 ```bash
 cd app/backend
-pip install -r requirements.txt
-python headless.py              # JSON Lines daemon
-python main.py parse-cv <img>   # Test CV pipeline on a screenshot
-python main.py import-matches-cv <dir>  # Batch import
+.\.venv\Scripts\python.exe -m pip install -r requirements.txt
+.\.venv\Scripts\python.exe headless.py              # JSON Lines daemon
+.\.venv\Scripts\python.exe main.py parse-cv <img>   # Test CV pipeline on a screenshot
+.\.venv\Scripts\python.exe main.py import-matches-cv <dir>  # Batch import
 ```
 
 ### Web Viewer
@@ -62,6 +62,7 @@ npm run scrape:items    # Items only
 
 - **Package managers**: pnpm for Node.js projects, uv for Python projects
 - **Python version**: 3.12
+- **Python environment**: always use the project virtual environment for backend commands (`app/backend/.venv`). Do not run backend scripts, pytest, pip, or Python helpers with the system Python unless the user explicitly asks for it. If the venv is missing or not Python 3.12, recreate it with `py -3.12 -m venv .venv` from `app/backend/`, then use `.\.venv\Scripts\python.exe -m pip install -r requirements.txt`. On Windows, prefer `app/backend/.venv/Scripts/python.exe -m pytest ...` or `.\.venv\Scripts\python.exe ...` from `app/backend/`.
 - **No linter/test framework configured** — testing is manual via `app/backend/debug_*.py` utilities
 - **PyInstaller** bundles the Python backend + Tesseract + ffmpeg into a standalone Windows executable (`dac_tracker.spec`)
 - **Release pipeline** (`.github/workflows/release.yml`): triggered on `v*` tags, builds on Windows, publishes `.exe` to GitHub Releases

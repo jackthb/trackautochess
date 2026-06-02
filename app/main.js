@@ -1163,6 +1163,16 @@ ipcMain.handle("data:items", async () => {
   }
 });
 
+ipcMain.handle("data:items_full", async () => {
+  const itemsPath = path.join(RESOURCES_DIR, "data", "items_full.json");
+  if (!fs.existsSync(itemsPath)) return {};
+  try {
+    return JSON.parse(fs.readFileSync(itemsPath, "utf-8"));
+  } catch {
+    return {};
+  }
+});
+
 // ── Talents data IPC ─────────────────────────────────────────────────────────
 
 ipcMain.handle("data:talents", async () => {

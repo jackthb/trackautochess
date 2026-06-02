@@ -36,9 +36,6 @@ LOG_TAIL_MAX_BYTES = 256 * 1024
 # and sent as a sequence of `log_chunk` events. Stay well under the limit.
 LOG_CHUNK_BYTES = 48 * 1024
 
-# Full files are uploaded to Supabase storage; cap the read so a pathological
-# multi-GB console.log can't blow up memory. Anything past this is truncated.
-LOG_FULL_MAX_BYTES = 20 * 1024 * 1024
 # Small at-a-glance tail embedded in the `diagnostics_uploaded` event so the
 # PostHog dashboard shows the end of each log without opening Supabase.
 LOG_EVENT_TAIL_BYTES = 16 * 1024
@@ -295,23 +292,16 @@ def _read_tail(path: Path, max_bytes: int = LOG_TAIL_MAX_BYTES) -> str:
         return ""
 
 
-def _read_full(path: Path, max_bytes: int = LOG_FULL_MAX_BYTES) -> tuple[str, bool]:
-    """Return (text, truncated) for a file, reading at most ``max_bytes`` from
-    the END (the tail is what matters for diagnostics). Returns ('', False) if
-    unreadable."""
+def _read_full(path: Path) -> bytes:
+    """Return the full raw file bytes, or b'' if unreadable."""
     try:
         if not path or not path.exists():
-            return "", False
-        size = path.stat().st_size
-        truncated = size > max_bytes
+            return b""
         with open(path, "rb") as f:
-            if truncated:
-                f.seek(size - max_bytes)
-            data = f.read()
-        return data.decode("utf-8", errors="replace"), truncated
+            return f.read()
     except Exception as e:
         log.debug("telemetry: could not read %s: %s", path, e)
-        return "", False
+        return b""
 
 
 def _find_console_log() -> Path | None:
@@ -345,12 +335,11 @@ def _send_log_chunks(source: str, text: str, reason: str) -> int:
     return total
 
 
-def _tail_str(text: str, max_bytes: int = LOG_EVENT_TAIL_BYTES) -> str:
-    """Last ``max_bytes`` of a string (byte-accurate), for event triage."""
-    raw = text.encode("utf-8", errors="replace")
-    if len(raw) <= max_bytes:
-        return text
-    return raw[-max_bytes:].decode("utf-8", errors="replace")
+def _tail_bytes(data: bytes, max_bytes: int = LOG_EVENT_TAIL_BYTES) -> str:
+    """Last ``max_bytes`` of raw log bytes decoded for event triage."""
+    if len(data) <= max_bytes:
+        return data.decode("utf-8", errors="replace")
+    return data[-max_bytes:].decode("utf-8", errors="replace")
 
 
 def upload_logs(reason: str = "manual") -> None:
@@ -380,20 +369,11 @@ def upload_logs(reason: str = "manual") -> None:
         tracker_path = DAC_DIR / "tracker.log"
         console_path = _find_console_log()
 
-        tracker_text, tracker_trunc = _read_full(tracker_path)
-        console_text, console_trunc = (
-            _read_full(console_path) if console_path else ("", False)
-        )
+        tracker_data = _read_full(tracker_path)
+        console_data = _read_full(console_path) if console_path else b""
 
-        if tracker_trunc:
-            log.info("telemetry: tracker.log truncated to last %d bytes for upload",
-                     LOG_FULL_MAX_BYTES)
-        if console_trunc:
-            log.info("telemetry: console.log truncated to last %d bytes for upload",
-                     LOG_FULL_MAX_BYTES)
-
-        tracker_bytes = len(tracker_text.encode("utf-8", errors="replace"))
-        console_bytes = len(console_text.encode("utf-8", errors="replace"))
+        tracker_bytes = len(tracker_data)
+        console_bytes = len(console_data)
 
         # Upload full gzipped files to private Supabase storage. Lazy import so
         # a db import failure can't crash telemetry.
@@ -410,16 +390,16 @@ def upload_logs(reason: str = "manual") -> None:
         if upload is not None:
             subdir = _session_tag or None
             try:
-                if tracker_text:
-                    gz = gzip.compress(tracker_text.encode("utf-8", errors="replace"))
+                if tracker_data:
+                    gz = gzip.compress(tracker_data)
                     p = upload(user_id, "tracker.log.gz", gz, "application/gzip",
                                subdir=subdir, upsert=True)
                     if p:
                         paths["tracker_log"] = p
                     else:
                         storage_ok = False
-                if console_text:
-                    gz = gzip.compress(console_text.encode("utf-8", errors="replace"))
+                if console_data:
+                    gz = gzip.compress(console_data)
                     p = upload(user_id, "console.log.gz", gz, "application/gzip",
                                subdir=subdir, upsert=True)
                     if p:
@@ -435,12 +415,10 @@ def upload_logs(reason: str = "manual") -> None:
             "paths": paths,
             "storage_ok": storage_ok,
             "tracker_bytes": tracker_bytes,
-            "tracker_truncated": tracker_trunc,
             "console_bytes": console_bytes,
-            "console_truncated": console_trunc,
             "console_found": bool(console_path),
-            "tracker_tail": _tail_str(tracker_text),
-            "console_tail": _tail_str(console_text),
+            "tracker_tail": _tail_bytes(tracker_data),
+            "console_tail": _tail_bytes(console_data),
         }
         capture("diagnostics_uploaded", summary)
         flush()

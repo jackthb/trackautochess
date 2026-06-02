@@ -2509,10 +2509,10 @@ class NetTableCapture:
 
             n = slot_for_key(k, "vchess")
             if n is not None:
-                chess_ids = [
-                    v.get("chess") for v in raw.values()
-                    if isinstance(v, dict) and v.get("chess")
-                ]
+                board = _extract_vchess_board(raw)
+                if board:
+                    slot_data.setdefault(n, {})["board"] = board
+                chess_ids = [p.get("chess") for p in board if p.get("chess")]
                 if chess_ids:
                     slot_data.setdefault(n, {})["lineup"] = _transform_chess_lineup(",".join(chess_ids))
                 continue
@@ -2763,6 +2763,29 @@ def _pipe(value) -> str:
     return value.replace(",", "|").strip("|")
 
 
+def _string_list(value) -> list[str]:
+    """Normalize VBKV item containers into a stable list of non-empty ids."""
+    if value is None or value == "":
+        return []
+    if isinstance(value, str):
+        return [value] if value else []
+    if isinstance(value, list):
+        return [str(v) for v in value if v]
+    if isinstance(value, dict):
+        def sort_key(k) -> tuple[int, str]:
+            try:
+                return (0, f"{int(k):08d}")
+            except (TypeError, ValueError):
+                return (1, str(k))
+
+        return [
+            str(value[k])
+            for k in sorted(value.keys(), key=sort_key)
+            if value.get(k)
+        ]
+    return [str(value)]
+
+
 _CHESS_ID_MAP_CACHE: dict[str, str] | None = None
 _SYNERGY_ID_MAP_CACHE: dict[str, str] | None = None
 _RELIC_ID_MAP_CACHE: dict[str, str] | None = None
@@ -2883,6 +2906,49 @@ def _transform_chess_lineup(raw: str) -> str:
             continue
         out.append(f"{name}({stars})" if stars > 1 else name)
     return "|".join(out)
+
+
+def _extract_vchess_board(raw: dict) -> list[dict]:
+    """Normalize player_id_table.vchess_N into positioned board pieces."""
+    if not isinstance(raw, dict):
+        return []
+    id_map = _load_chess_id_map()
+    board: list[dict] = []
+    for slot_key, cell in raw.items():
+        if not isinstance(cell, dict):
+            continue
+        chess_id = str(cell.get("chess") or "")
+        if not chess_id or chess_id == "placeholder":
+            continue
+        name, stars = _resolve_chess_piece(chess_id, id_map)
+        if not name:
+            continue
+        piece = {
+            "slot_key": str(slot_key),
+            "chess": chess_id,
+            "name": name,
+            "stars": stars,
+            "x": _safe_int(cell.get("x")),
+            "y": _safe_int(cell.get("y")),
+            "items": _string_list(cell.get("item")),
+            "last_items": _string_list(cell.get("lastitem")),
+        }
+        for raw_key, out_key in (
+            ("index", "index"),
+            ("buy_price", "buy_price"),
+            ("water_id", "water_id"),
+        ):
+            value = _safe_int(cell.get(raw_key))
+            if value is not None:
+                piece[out_key] = value
+        board.append(piece)
+
+    board.sort(key=lambda p: (
+        p.get("y") if p.get("y") is not None else 99,
+        p.get("x") if p.get("x") is not None else 99,
+        p.get("slot_key") or "",
+    ))
+    return board
 
 
 def _transform_synergies(raw: str) -> str:
