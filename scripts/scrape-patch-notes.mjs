@@ -25,6 +25,10 @@ const CHANGELOG_URL =
   "https://steamcommunity.com/sharedfiles/filedetails/changelog/1613886175";
 const CHANGELOG_FETCH_URL =
   "https://steamcommunity.com/sharedfiles/filedetails/changelog/1613886175?l=english";
+const CHANGELOG_FETCH_URLS = [
+  CHANGELOG_FETCH_URL,
+  `${CHANGELOG_FETCH_URL}&p=1`,
+];
 
 const REQUEST_HEADERS = {
   "User-Agent":
@@ -39,11 +43,52 @@ const CHANGELOG_FILE_ARG = process.argv.find((arg) =>
 );
 const CHANGELOG_FILE = CHANGELOG_FILE_ARG?.split("=").slice(1).join("=");
 
-async function fetchChangelog() {
-  if (CHANGELOG_FILE) return readFileSync(CHANGELOG_FILE, "utf-8");
-  const resp = await fetch(CHANGELOG_FETCH_URL, { headers: REQUEST_HEADERS });
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+async function fetchChangelogUrl(url) {
+  const resp = await fetch(url, { headers: REQUEST_HEADERS });
   if (!resp.ok) throw new Error(`HTTP ${resp.status} fetching changelog`);
   return resp.text();
+}
+
+async function fetchChangelogWithEntries() {
+  if (CHANGELOG_FILE) {
+    const html = readFileSync(CHANGELOG_FILE, "utf-8");
+    return { html, entries: parseChangelogEntries(html) };
+  }
+
+  let firstHtml = "";
+  let firstError = null;
+  const urls = [
+    ...CHANGELOG_FETCH_URLS,
+    ...CHANGELOG_FETCH_URLS.map((url) => `${url}&_=${Date.now()}`),
+  ];
+
+  for (let i = 0; i < urls.length; i += 1) {
+    try {
+      const html = await fetchChangelogUrl(urls[i]);
+      if (!firstHtml) firstHtml = html;
+      const entries = parseChangelogEntries(html);
+      if (entries.length > 0) return { html, entries };
+      if (i < urls.length - 1) {
+        console.warn(`Steam changelog attempt ${i + 1} returned 0 entries; retrying...`);
+        await sleep(750);
+      }
+    } catch (err) {
+      if (!firstError) firstError = err;
+      if (i < urls.length - 1) {
+        console.warn(`Steam changelog attempt ${i + 1} failed: ${err.message}; retrying...`);
+        await sleep(750);
+      }
+    }
+  }
+
+  if (firstHtml) {
+    throw new Error(describeUnexpectedChangelogHtml(firstHtml));
+  }
+  throw firstError || new Error("Could not fetch Steam changelog");
 }
 
 function describeUnexpectedChangelogHtml(html) {
@@ -164,7 +209,7 @@ function contentToSections(content) {
     } else {
       entries.push({
         kind: classifyEntry(line),
-        name: line.length > 60 ? line.slice(0, 50) + "…" : line,
+        name: line.length > 60 ? line.slice(0, 50) + "..." : line,
         detail: line,
       });
     }
@@ -517,14 +562,10 @@ function applyGameDataChanges(sections) {
 
 async function main() {
   console.log("Fetching Steam Workshop changelog...");
-  const html = await fetchChangelog();
+  const { entries } = await fetchChangelogWithEntries();
 
   console.log("Parsing entries...");
-  const entries = parseChangelogEntries(html);
   console.log(`Found ${entries.length} changelog entries on page 1`);
-  if (entries.length === 0) {
-    throw new Error(describeUnexpectedChangelogHtml(html));
-  }
 
   const index = JSON.parse(readFileSync(INDEX_PATH, "utf-8"));
 
