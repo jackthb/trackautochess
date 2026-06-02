@@ -38,8 +38,7 @@
     "react-markdown": "^10.1.0",
     "remark-breaks": "^4.0.0",
     "remark-gfm": "^4.0.1",
-    "satori": "^0.26.0",
-    "styled-jsx": "^5.1.7"
+    "satori": "^0.26.0"
   },
   "devDependencies": {
     "@playwright/test": "^1.60.0",

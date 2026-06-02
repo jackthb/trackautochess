@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import "@/styles/globals.css";
 import { getSiteUrl, DEFAULT_SITE_URL } from "@/lib/site";
-import StyledJsxRegistry from "./StyledJsxRegistry";
 import { AppChrome } from "@/components/app/AppChrome";
 
 // Root layout for App Router routes (pilot). Pages Router routes keep using
@@ -51,9 +50,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         />
       </head>
       <body>
-        <StyledJsxRegistry>
-          <AppChrome>{children}</AppChrome>
-        </StyledJsxRegistry>
+        <AppChrome>{children}</AppChrome>
       </body>
     </html>
   );
