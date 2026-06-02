@@ -1,0 +1,63 @@
+{
+  "gameId": "chess_tusk",
+  "name": "Tusk",
+  "slug": "tusk",
+  "source": {
+    "id": "chess_tusk",
+    "cost": 1,
+    "pool": "standard",
+    "synergies": [
+      "Beast",
+      "Warrior"
+    ],
+    "names": {
+      "en": "Tusk",
+      "lore": "Ymir",
+      "ko": "얼음폭군",
+      "ru": "Tusk",
+      "zh-cn": "巨牙海民",
+      "zh-tw": "巨牙海民"
+    },
+    "attack_type": "melee",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 600,
+        "mana": 100,
+        "atk": [
+          40,
+          100
+        ],
+        "armor": 2,
+        "magic_resist": 0,
+        "atk_rate": 1.2,
+        "atk_range": 205
+      },
+      "2_star": {
+        "hp": 1200,
+        "mana": 100,
+        "atk": [
+          80,
+          200
+        ],
+        "armor": 2,
+        "magic_resist": 0,
+        "atk_rate": 1.2,
+        "atk_range": 205
+      },
+      "3_star": {
+        "hp": 2400,
+        "mana": 100,
+        "atk": [
+          160,
+          400
+        ],
+        "armor": 2,
+        "magic_resist": 0,
+        "atk_rate": 1.2,
+        "atk_range": 205
+      }
+    }
+  },
+  "overrides": {}
+}

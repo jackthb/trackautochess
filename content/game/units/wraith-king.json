@@ -1,0 +1,63 @@
+{
+  "gameId": "chess_snk",
+  "name": "Wraith King",
+  "slug": "wraith-king",
+  "source": {
+    "id": "chess_snk",
+    "cost": 5,
+    "pool": "undead",
+    "synergies": [
+      "Undead",
+      "Warrior"
+    ],
+    "names": {
+      "en": "Wraith King",
+      "lore": "King۰Ostarion",
+      "ko": "망령 제왕",
+      "ru": "Wraith King",
+      "zh-cn": "冥魂大帝",
+      "zh-tw": "冥魂大帝"
+    },
+    "attack_type": "melee",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 1300,
+        "mana": 0,
+        "atk": [
+          150,
+          200
+        ],
+        "armor": 10,
+        "magic_resist": 20,
+        "atk_rate": 1.7,
+        "atk_range": 205
+      },
+      "2_star": {
+        "hp": 2600,
+        "mana": 0,
+        "atk": [
+          300,
+          400
+        ],
+        "armor": 10,
+        "magic_resist": 20,
+        "atk_rate": 1.7,
+        "atk_range": 205
+      },
+      "3_star": {
+        "hp": 5200,
+        "mana": 0,
+        "atk": [
+          600,
+          800
+        ],
+        "armor": 10,
+        "magic_resist": 20,
+        "atk_rate": 1.7,
+        "atk_range": 205
+      }
+    }
+  },
+  "overrides": {}
+}

@@ -1,0 +1,26 @@
+{
+  "gameId": "item_kuangzhanfu",
+  "name": "Battle Fury",
+  "slug": "battle-fury",
+  "source": {
+    "name": "Battle Fury",
+    "description": "+50 damage.\nMelee attacks deal 50% cleave damage in a range of 1 square.",
+    "lore": "The Drodo Island Committee has banned private tree-cutting activities here, with permission granted to a small batch of contractors. This decent replica of the legendary tool is offered for entertainment purposes only.",
+    "quality": "artifact",
+    "texture": "item_bfury",
+    "notes": [],
+    "names": {
+      "en": "Battle Fury",
+      "ru": "Battle Fury"
+    },
+    "descriptions": {
+      "en": "+50 damage.\nMelee attacks deal 50% cleave damage in a range of 1 square.",
+      "ru": "+50 к урону.\nАтаки в ближнем бою наносят 50% урона по области в радиусе 1 клетки."
+    },
+    "lore_i18n": {
+      "en": "The Drodo Island Committee has banned private tree-cutting activities here, with permission granted to a small batch of contractors. This decent replica of the legendary tool is offered for entertainment purposes only.",
+      "ru": "The Drodo Island Committee has banned private tree-cutting activities here, with permission granted to a small batch of contractors. This decent replica of the legendary tool is offered for entertainment purposes only."
+    }
+  },
+  "overrides": {}
+}

@@ -4,7 +4,8 @@
  *
  * The scraper writes `entitiesSynced: false` on every new patch (and resets it
  * when a hotfix is folded in). That flag means "this patch's game-data changes
- * have NOT yet been pulled from the VPK into data/*.json and pushed to the CMS."
+ * have NOT yet been pulled from the VPK into data/*.json and regenerated into
+ * committed content/data files."
  * Once the full entity sync has run, flip the flag true with this script (or via
  * the /sync-patch-entities skill, which runs the sync then calls this).
  *
@@ -91,4 +92,4 @@ for (const p of targets) {
   write(p, true);
   console.log(`Marked ${p.slug} synced.`);
 }
-console.log(`\nDone — ${targets.length} patch(es) flagged synced. Commit data/ and push the CMS.`);
+console.log(`\nDone - ${targets.length} patch(es) flagged synced. Commit content/ and data/.`);

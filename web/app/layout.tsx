@@ -26,11 +26,6 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         )}
         <link
           rel="preconnect"
-          href="https://cdn.sanity.io"
-          crossOrigin="anonymous"
-        />
-        <link
-          rel="preconnect"
           href="https://avatars.steamstatic.com"
           crossOrigin="anonymous"
         />

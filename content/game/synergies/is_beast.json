@@ -1,0 +1,31 @@
+{
+  "gameId": "is_beast",
+  "name": "Beast",
+  "slug": "beast",
+  "source": {
+    "name": "Beast",
+    "description": "Species Trait: Power of the Wild\n\nActive when you have at least (N) different Beast pieces on board. (Multiple effects stack)\n\n(2) Beasts: All allies have +10% attack damage, including summoned units.\n(4) Beasts: All allies have +25% attack damage, including summoned units.\n(6) Beasts: Attacks from all allies increase physical damage taken by the target by 10%. This effect stacks up to a maximum of 10 and can be applied by friendly summoned units.",
+    "description_html": "<h1>Species Trait: Power of the Wild</h1><font color=\"#656585\">Active when you have at least (N) different Beast pieces on board. (Multiple effects stack)</font><br><br>(2) Beasts: All allies have +10% attack damage, including summoned units.<br>(4) Beasts: All allies have +25% attack damage, including summoned units.<br>(6) Beasts: Attacks from all allies increase physical damage taken by the target by 10%. This effect stacks up to a maximum of 10 and can be applied by friendly summoned units.",
+    "lore": "Beasts have superhuman strength, stamina and speed, and are good at group predation.",
+    "notes": [],
+    "tiers": [
+      2,
+      4,
+      6
+    ],
+    "ability_special": {},
+    "names": {
+      "en": "Beast",
+      "ru": "Beast"
+    },
+    "descriptions": {
+      "en": "Species Trait: Power of the Wild\n Active when you have at least (N) different Beast pieces on board. (Multiple effects stack)\n\n(2) Beasts: All allies have +10% attack damage, including summoned units.\n(4) Beasts: All allies have +25% attack damage, including summoned units.\n(6) Beasts: Attacks from all allies increase physical damage taken by the target by 10%. This effect stacks up to a maximum of 10 and can be applied by friendly summoned units.",
+      "ru": "Species Trait: Power of the Wild\n Активна, когда минимум (N) разных Beast на столе.(Эффекты складываются)\n\n(2) Beasts: Все союзники получают +10% урона атаки, включая призывных юнитов.\n(4) Beasts: Все союзники получают +25% урона атаки, включая призывных юнитов.\n(6) Beasts: Атаки от всех союзников увеличивают физический урон целью на 10%. Этот эффект суммируется максимум до 10 и работает на дружественных призванных юнитов."
+    },
+    "lore_i18n": {
+      "en": "Beasts have superhuman strength, stamina and speed, and are good at group predation.",
+      "ru": "Звери обладают сверхчеловеческой силой, выносливостью и скоростью, а также искусны в групповой охоте."
+    }
+  },
+  "overrides": {}
+}

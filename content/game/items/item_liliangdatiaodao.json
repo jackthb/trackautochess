@@ -1,0 +1,23 @@
+{
+  "gameId": "item_liliangdatiaodao",
+  "name": "Overwhelming Blink",
+  "slug": "overwhelming-blink",
+  "source": {
+    "name": "Overwhelming Blink",
+    "description": "Active ability: Instant\nInstantly teleports off the farest square that allows it to attack an enemy. Generates 30 on activation.+ 30% HP per activation.\n\nMax Blink Distance: 800",
+    "lore": "",
+    "quality": "rare",
+    "texture": "overwhelming_blink",
+    "notes": [],
+    "names": {
+      "en": "Overwhelming Blink",
+      "ru": "Overwhelming Blink"
+    },
+    "descriptions": {
+      "en": "Active ability: Instant\nInstantly teleports off the farthest square that allows it to attack an enemy. Generates 30 on activation.+ 30% HP per activation.\n\nMax Blink Distance: 800",
+      "ru": "Active ability: Instant\nInstantly teleports off the farthest square that allows it to attack an enemy. Generates 30 on activation.+ 30% HP per activation.\n\nMax Blink Distance: 800"
+    },
+    "lore_i18n": {}
+  },
+  "overrides": {}
+}

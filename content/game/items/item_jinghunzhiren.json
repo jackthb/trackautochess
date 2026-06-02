@@ -1,0 +1,26 @@
+{
+  "gameId": "item_jinghunzhiren",
+  "name": "Diffusal Blade",
+  "slug": "diffusal-blade",
+  "source": {
+    "name": "Diffusal Blade",
+    "description": "Attack speed + 20%.\n\nActive Ability: Instant\nPurify the attack target by removing all its synergy buffs.",
+    "lore": "An enchanted blade that allows the user to cut straight into the enemys soul.",
+    "quality": "rare",
+    "texture": "item_diffusal_blade",
+    "notes": [],
+    "names": {
+      "en": "Diffusal Blade",
+      "ru": "Diffusal Blade"
+    },
+    "descriptions": {
+      "en": "Attack speed + 20%.\n\nActive Ability: Instant\nPurify the attack target by removing all its synergy buffs.",
+      "ru": "Скорость атаки + 30%.\n\nАктивка: Мгновенная\nСнимает с цели атаки все её бонусы от синергий."
+    },
+    "lore_i18n": {
+      "en": "An enchanted blade that allows the user to cut straight into the enemys soul.",
+      "ru": "Зачарованный клинок, который позволяет пользователю рассекать саму душу врага."
+    }
+  },
+  "overrides": {}
+}

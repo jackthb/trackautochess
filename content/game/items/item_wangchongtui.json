@@ -1,0 +1,26 @@
+{
+  "gameId": "item_wangchongtui",
+  "name": "Spider Leg",
+  "slug": "spider-leg",
+  "source": {
+    "name": "Spider Leg",
+    "description": "Evasion +25%。\nThe carrier also counts as \nAqir，and is eligible for friendly Infection spawning.",
+    "lore": "A horrifying yet useful mixture of necromancy and artifice.",
+    "quality": "common",
+    "texture": "item_spider_legs",
+    "notes": [],
+    "names": {
+      "en": "Spider Leg",
+      "ru": "Spider Leg"
+    },
+    "descriptions": {
+      "en": "Evasion +25%。\nThe carrier also counts as Aqir，and is eligible for friendly Infection spawning.",
+      "ru": "Уклонение+25%。\nНоситель также считается как Aqir，и может быть подвержен дружественному заражению."
+    },
+    "lore_i18n": {
+      "en": "A horrifying yet useful mixture of necromancy and artifice.",
+      "ru": "Ужасающая, но полезная смесь некромантии и искусственной инженерии."
+    }
+  },
+  "overrides": {}
+}

@@ -1,0 +1,26 @@
+{
+  "gameId": "item_anmie",
+  "name": "Desolator",
+  "slug": "desolator",
+  "source": {
+    "name": "Desolator",
+    "description": "+25 damage.\nArmor -10 to the target on attacks.",
+    "lore": "A wicked weapon, used in torturing political criminals.",
+    "quality": "epic",
+    "texture": "item_desolator",
+    "notes": [],
+    "names": {
+      "en": "Desolator",
+      "ru": "Desolator"
+    },
+    "descriptions": {
+      "en": "+25 damage.\nArmor -10 to the target on attacks.",
+      "ru": "+25 урона.\nБроня цели снижена на 10."
+    },
+    "lore_i18n": {
+      "en": "A wicked weapon, used in torturing political criminals.",
+      "ru": "Жестокое оружие, используемое для пыток политических преступников."
+    }
+  },
+  "overrides": {}
+}

@@ -1,0 +1,63 @@
+{
+  "gameId": "chess_wr",
+  "name": "Windranger",
+  "slug": "windranger",
+  "source": {
+    "id": "chess_wr",
+    "cost": 2,
+    "pool": "standard",
+    "synergies": [
+      "Elf",
+      "Hunter"
+    ],
+    "names": {
+      "en": "Windranger",
+      "lore": "Lyralei",
+      "ko": "바람순찰자",
+      "ru": "Windranger",
+      "zh-cn": "风行者",
+      "zh-tw": "風行者"
+    },
+    "attack_type": "ranged",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 550,
+        "mana": 100,
+        "atk": [
+          50,
+          70
+        ],
+        "armor": 3,
+        "magic_resist": 0,
+        "atk_rate": 1,
+        "atk_range": 600
+      },
+      "2_star": {
+        "hp": 1100,
+        "mana": 100,
+        "atk": [
+          100,
+          140
+        ],
+        "armor": 3,
+        "magic_resist": 0,
+        "atk_rate": 1,
+        "atk_range": 600
+      },
+      "3_star": {
+        "hp": 2200,
+        "mana": 100,
+        "atk": [
+          200,
+          280
+        ],
+        "armor": 3,
+        "magic_resist": 0,
+        "atk_rate": 1,
+        "atk_range": 600
+      }
+    }
+  },
+  "overrides": {}
+}

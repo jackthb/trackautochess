@@ -1,0 +1,26 @@
+{
+  "gameId": "item_jixiezhixin",
+  "name": "Heart of the Machine",
+  "slug": "heart-of-the-machine",
+  "source": {
+    "name": "Heart of the Machine",
+    "description": "Courier consumable: Click to use\nRefresh your recruitment panel for free.",
+    "lore": "Proundly presented by Heart of the Machine.",
+    "quality": "consumable",
+    "texture": "custom/ex_machina_lg",
+    "notes": [],
+    "names": {
+      "en": "Heart of the Machine",
+      "ru": "Heart of the Machine"
+    },
+    "descriptions": {
+      "en": "Courier consumable: Click to use\nRefresh your recruitment panel for free.",
+      "ru": "Courier consumable: Нажмите чтобы использовать\nОбнови ролл покупки юнитов бесплатно"
+    },
+    "lore_i18n": {
+      "en": "Proundly presented by Heart of the Machine.",
+      "ru": "Сгордостью представлен Heart of the Machine."
+    }
+  },
+  "overrides": {}
+}

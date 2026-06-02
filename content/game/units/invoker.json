@@ -1,0 +1,63 @@
+{
+  "gameId": "chess_kael",
+  "name": "Invoker",
+  "slug": "invoker",
+  "source": {
+    "id": "chess_kael",
+    "cost": 5,
+    "pool": "standard",
+    "synergies": [
+      "Elf",
+      "Mage"
+    ],
+    "names": {
+      "en": "Invoker",
+      "lore": "Kael",
+      "ko": "원소술사",
+      "ru": "Invoker",
+      "zh-cn": "祈求者",
+      "zh-tw": "祈求者"
+    },
+    "attack_type": "ranged",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 900,
+        "mana": 100,
+        "atk": [
+          70,
+          80
+        ],
+        "armor": 7,
+        "magic_resist": 30,
+        "atk_rate": 1.1,
+        "atk_range": 600
+      },
+      "2_star": {
+        "hp": 1800,
+        "mana": 100,
+        "atk": [
+          140,
+          160
+        ],
+        "armor": 7,
+        "magic_resist": 30,
+        "atk_rate": 1.1,
+        "atk_range": 600
+      },
+      "3_star": {
+        "hp": 3600,
+        "mana": 100,
+        "atk": [
+          280,
+          320
+        ],
+        "armor": 7,
+        "magic_resist": 30,
+        "atk_rate": 1.1,
+        "atk_range": 600
+      }
+    }
+  },
+  "overrides": {}
+}

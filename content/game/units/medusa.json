@@ -1,0 +1,63 @@
+{
+  "gameId": "chess_medusa",
+  "name": "Medusa",
+  "slug": "medusa",
+  "source": {
+    "id": "chess_medusa",
+    "cost": 4,
+    "pool": "standard",
+    "synergies": [
+      "Hunter",
+      "Naga"
+    ],
+    "names": {
+      "en": "Medusa",
+      "lore": "Medusa",
+      "ko": "메두사",
+      "ru": "Medusa",
+      "zh-cn": "蛇发女妖",
+      "zh-tw": "蛇發女妖"
+    },
+    "attack_type": "ranged",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 750,
+        "mana": 100,
+        "atk": [
+          25,
+          40
+        ],
+        "armor": 7,
+        "magic_resist": 10,
+        "atk_rate": 1,
+        "atk_range": 400
+      },
+      "2_star": {
+        "hp": 1500,
+        "mana": 100,
+        "atk": [
+          50,
+          80
+        ],
+        "armor": 7,
+        "magic_resist": 10,
+        "atk_rate": 1,
+        "atk_range": 400
+      },
+      "3_star": {
+        "hp": 3000,
+        "mana": 100,
+        "atk": [
+          100,
+          160
+        ],
+        "armor": 7,
+        "magic_resist": 10,
+        "atk_rate": 1,
+        "atk_range": 400
+      }
+    }
+  },
+  "overrides": {}
+}

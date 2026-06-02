@@ -1,0 +1,63 @@
+{
+  "gameId": "chess_tp",
+  "name": "Treant Protector",
+  "slug": "treant-protector",
+  "source": {
+    "id": "chess_tp",
+    "cost": 3,
+    "pool": "standard",
+    "synergies": [
+      "Druid",
+      "Elf"
+    ],
+    "names": {
+      "en": "Treant Protector",
+      "lore": "Rooftrellen",
+      "ko": "나무정령 수호자",
+      "ru": "Treant Protector",
+      "zh-cn": "树精卫士",
+      "zh-tw": "樹精衛士"
+    },
+    "attack_type": "melee",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 700,
+        "mana": 100,
+        "atk": [
+          80,
+          90
+        ],
+        "armor": 5,
+        "magic_resist": 0,
+        "atk_rate": 2,
+        "atk_range": 205
+      },
+      "2_star": {
+        "hp": 1400,
+        "mana": 100,
+        "atk": [
+          160,
+          180
+        ],
+        "armor": 5,
+        "magic_resist": 0,
+        "atk_rate": 2,
+        "atk_range": 205
+      },
+      "3_star": {
+        "hp": 2450,
+        "mana": 100,
+        "atk": [
+          320,
+          360
+        ],
+        "armor": 5,
+        "magic_resist": 0,
+        "atk_rate": 2,
+        "atk_range": 205
+      }
+    }
+  },
+  "overrides": {}
+}

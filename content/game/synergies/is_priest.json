@@ -1,0 +1,32 @@
+{
+  "gameId": "is_priest",
+  "name": "Priest",
+  "slug": "priest",
+  "source": {
+    "name": "Priest",
+    "description": "Priest Pieces are determined, and cannot be mind controlled.\nClass Perk: Salvation\n\nActive when you have at least (N) different Priest pieces on board. (Multiple effects stack)\n\n(2) Priests: Get a Tango when defeated in a home battle with courier health lost if your pieces on board are less than your max pieces capacity.\n(4) Priest: Every Priest piece will Mind Control an enemy whose level equals to or less than itself if your pieces on board are less than your max pieces capacity. (Max control count = Your capacity - Your pieces on board)",
+    "description_html": "Priest Pieces are determined, and cannot be mind controlled.<h1>Class Perk: Salvation</h1><font color=\"#656585\">Active when you have at least (N) different Priest pieces on board. (Multiple effects stack)</font><br><br>(2) Priests: Get a Tango when defeated in a home battle with courier health lost if your pieces on board are less than your max pieces capacity.<br>(4) Priest: Every Priest piece will Mind Control an enemy whose level equals to or less than itself if your pieces on board are less than your max pieces capacity. (Max control count = Your capacity - Your pieces on board)",
+    "lore": "Priests are blessed invokers of light and darkness, who express their determined spirits through dedicated service to the people. For numerous battles, with the mastery of light and shadow energies they have weaved the most reliable life-saving protections for their allies.",
+    "notes": [
+      "The duration of Mind Control is now equal to pieces level ×2 + 1."
+    ],
+    "tiers": [
+      2,
+      4
+    ],
+    "ability_special": {},
+    "names": {
+      "en": "Priest",
+      "ru": "Priest"
+    },
+    "descriptions": {
+      "en": "Priest Pieces are determined, and cannot be mind controlled.\nClass Perk: Salvation\n Active when you have at least (N) different Priest pieces on board. (Multiple effects stack)\n\n(2) Priests: Get a Tango when defeated in a home battle with courier health lost if your pieces on board are less than your max pieces capacity.\n(4) Priest: Every Priest piece will Mind Control an enemy whose level equals to or less than itself if your pieces on board are less than your max pieces capacity. (Max control count = Your capacity - Your pieces on board)",
+      "ru": "Priest фигуры не могут быть под контролем разума.\nClass Perk: Salvation\n Активна, когда минимум (N) разных Priest на столе.(Эффекты складываются)\n\n(2) Priests: Получите Тангo, если вас победили в домашнем бою, при этом здоровье курьера теряется, если на поле меньше фигур, чем ваша максимальная вместимость.\n(4) Priest: Каждая фигура Priest будет контролировать разум врага, уровень которого равен или ниже её собственного, если на поле меньше фигур, чем ваша максимальная вместимость. (Максимальное количество контролируемых = Ваша вместимость - Ваши фигуры на поле)"
+    },
+    "lore_i18n": {
+      "en": "Priests are blessed invokers of light and darkness, who express their determined spirits through dedicated service to the people. For numerous battles, with the mastery of light and shadow energies they have weaved the most reliable life-saving protections for their allies.",
+      "ru": "Priests — благословенные заклинатели света и тьмы, выражающие свою решимость служением людям. Во множестве сражений, владея энергиями света и тени, они создают самые надёжные защитные чары, спасающие союзников."
+    }
+  },
+  "overrides": {}
+}

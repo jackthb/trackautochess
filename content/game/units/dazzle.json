@@ -1,0 +1,63 @@
+{
+  "gameId": "chess_dazzle",
+  "name": "Dazzle",
+  "slug": "dazzle",
+  "source": {
+    "id": "chess_dazzle",
+    "cost": 1,
+    "pool": "standard",
+    "synergies": [
+      "Priest",
+      "Troll"
+    ],
+    "names": {
+      "en": "Dazzle",
+      "lore": "Dazzle",
+      "ko": "대즐",
+      "ru": "Dazzle",
+      "zh-cn": "暗影牧师",
+      "zh-tw": "暗影牧師"
+    },
+    "attack_type": "ranged",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 450,
+        "mana": 100,
+        "atk": [
+          45,
+          60
+        ],
+        "armor": 1,
+        "magic_resist": 10,
+        "atk_rate": 1.2,
+        "atk_range": 400
+      },
+      "2_star": {
+        "hp": 900,
+        "mana": 100,
+        "atk": [
+          90,
+          120
+        ],
+        "armor": 1,
+        "magic_resist": 10,
+        "atk_rate": 1.2,
+        "atk_range": 400
+      },
+      "3_star": {
+        "hp": 1800,
+        "mana": 100,
+        "atk": [
+          180,
+          240
+        ],
+        "armor": 1,
+        "magic_resist": 10,
+        "atk_rate": 1.2,
+        "atk_range": 400
+      }
+    }
+  },
+  "overrides": {}
+}

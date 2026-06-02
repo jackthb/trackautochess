@@ -1,0 +1,63 @@
+{
+  "gameId": "chess_disruptor",
+  "name": "Disruptor",
+  "slug": "disruptor",
+  "source": {
+    "id": "chess_disruptor",
+    "cost": 5,
+    "pool": "standard",
+    "synergies": [
+      "Orc",
+      "Shaman"
+    ],
+    "names": {
+      "en": "Disruptor",
+      "lore": "Thrall",
+      "ko": "디스럽터",
+      "ru": "Disruptor",
+      "zh-cn": "干扰者",
+      "zh-tw": "幹擾者"
+    },
+    "attack_type": "ranged",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 1000,
+        "mana": 100,
+        "atk": [
+          50,
+          70
+        ],
+        "armor": 6,
+        "magic_resist": 20,
+        "atk_rate": 1.5,
+        "atk_range": 600
+      },
+      "2_star": {
+        "hp": 2000,
+        "mana": 100,
+        "atk": [
+          100,
+          140
+        ],
+        "armor": 6,
+        "magic_resist": 20,
+        "atk_rate": 1.5,
+        "atk_range": 600
+      },
+      "3_star": {
+        "hp": 4000,
+        "mana": 100,
+        "atk": [
+          200,
+          280
+        ],
+        "armor": 6,
+        "magic_resist": 20,
+        "atk_rate": 1.5,
+        "atk_range": 600
+      }
+    }
+  },
+  "overrides": {}
+}

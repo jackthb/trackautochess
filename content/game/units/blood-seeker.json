@@ -1,0 +1,63 @@
+{
+  "gameId": "chess_bs",
+  "name": "Blood Seeker",
+  "slug": "blood-seeker",
+  "source": {
+    "id": "chess_bs",
+    "cost": 2,
+    "pool": "standard",
+    "synergies": [
+      "Orc",
+      "Shaman"
+    ],
+    "names": {
+      "en": "Blood Seeker",
+      "lore": "Strygwyr",
+      "ko": "혈귀",
+      "ru": "Blood Seeker",
+      "zh-cn": "血魔",
+      "zh-tw": "血魔"
+    },
+    "attack_type": "melee",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 600,
+        "mana": 100,
+        "atk": [
+          55,
+          60
+        ],
+        "armor": 3,
+        "magic_resist": 10,
+        "atk_rate": 1.1,
+        "atk_range": 205
+      },
+      "2_star": {
+        "hp": 1200,
+        "mana": 100,
+        "atk": [
+          110,
+          120
+        ],
+        "armor": 3,
+        "magic_resist": 10,
+        "atk_rate": 1.1,
+        "atk_range": 205
+      },
+      "3_star": {
+        "hp": 2400,
+        "mana": 100,
+        "atk": [
+          220,
+          240
+        ],
+        "armor": 3,
+        "magic_resist": 10,
+        "atk_rate": 1.1,
+        "atk_range": 205
+      }
+    }
+  },
+  "overrides": {}
+}

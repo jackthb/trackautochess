@@ -1,0 +1,26 @@
+{
+  "gameId": "item_xiwa",
+  "name": "Shivas Guard",
+  "slug": "shivas-guard",
+  "source": {
+    "name": "Shivas Guard",
+    "description": "+10 armor.\n\nActive ability: Instant\n Emits a freezing wave that slows the attack speed and healing effectiveness of enemies within 3 cells by 50% for 5 seconds and deals 100 magical damage.",
+    "lore": "Said to have belonged to a goddess, today it retains much of its former power.",
+    "quality": "epic",
+    "texture": "item_shivas_guard",
+    "notes": [],
+    "names": {
+      "en": "Shivas Guard",
+      "ru": "Shivas Guard"
+    },
+    "descriptions": {
+      "en": "+10 armor.\n\nActive ability: Instant\n Emits a freezing wave that slows the attack speed and healing effectiveness of enemies within 3 cells by 50% for 5 seconds and deals 100 magical damage.",
+      "ru": "+10 брони.\n\nАктивка: мгновенно\nВыпускает ледяную волну, замедляющую скорость атаки и лечение врагов в радиусе 3 клеток на 50% на 5 секунд и наносящую 100 магического урона."
+    },
+    "lore_i18n": {
+      "en": "Said to have belonged to a goddess, today it retains much of its former power.",
+      "ru": "Said to have belonged to a goddess, today it retains much of its former power."
+    }
+  },
+  "overrides": {}
+}

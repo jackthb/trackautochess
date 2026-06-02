@@ -1,0 +1,63 @@
+{
+  "gameId": "chess_abaddon",
+  "name": "Abaddon",
+  "slug": "abaddon",
+  "source": {
+    "id": "chess_abaddon",
+    "cost": 1,
+    "pool": "undead",
+    "synergies": [
+      "Knight",
+      "Undead"
+    ],
+    "names": {
+      "en": "Abaddon",
+      "lore": "Abaddon",
+      "ko": "아바돈",
+      "ru": "Abaddon",
+      "zh-cn": "死亡骑士",
+      "zh-tw": "死亡騎士"
+    },
+    "attack_type": "melee",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 700,
+        "mana": 100,
+        "atk": [
+          45,
+          55
+        ],
+        "armor": 3,
+        "magic_resist": 20,
+        "atk_rate": 1.3,
+        "atk_range": 205
+      },
+      "2_star": {
+        "hp": 1400,
+        "mana": 100,
+        "atk": [
+          90,
+          110
+        ],
+        "armor": 3,
+        "magic_resist": 20,
+        "atk_rate": 1.3,
+        "atk_range": 205
+      },
+      "3_star": {
+        "hp": 2800,
+        "mana": 100,
+        "atk": [
+          180,
+          220
+        ],
+        "armor": 3,
+        "magic_resist": 20,
+        "atk_rate": 1.3,
+        "atk_range": 205
+      }
+    }
+  },
+  "overrides": {}
+}

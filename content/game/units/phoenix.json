@@ -1,0 +1,63 @@
+{
+  "gameId": "chess_phx",
+  "name": "Phoenix",
+  "slug": "phoenix",
+  "source": {
+    "id": "chess_phx",
+    "cost": 4,
+    "pool": "standard",
+    "synergies": [
+      "Elemental",
+      "Mage"
+    ],
+    "names": {
+      "en": "Phoenix",
+      "lore": "Icarus",
+      "ko": "불사조",
+      "ru": "Phoenix",
+      "zh-cn": "凤凰",
+      "zh-tw": "鳳凰"
+    },
+    "attack_type": "ranged",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 850,
+        "mana": 0,
+        "atk": [
+          50,
+          90
+        ],
+        "armor": 4,
+        "magic_resist": 30,
+        "atk_rate": 1.5,
+        "atk_range": 400
+      },
+      "2_star": {
+        "hp": 1700,
+        "mana": 0,
+        "atk": [
+          100,
+          180
+        ],
+        "armor": 4,
+        "magic_resist": 30,
+        "atk_rate": 1.5,
+        "atk_range": 400
+      },
+      "3_star": {
+        "hp": 3400,
+        "mana": 0,
+        "atk": [
+          200,
+          360
+        ],
+        "armor": 4,
+        "magic_resist": 30,
+        "atk_rate": 1.5,
+        "atk_range": 400
+      }
+    }
+  },
+  "overrides": {}
+}

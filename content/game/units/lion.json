@@ -1,0 +1,63 @@
+{
+  "gameId": "chess_lion",
+  "name": "Lion",
+  "slug": "lion",
+  "source": {
+    "id": "chess_lion",
+    "cost": 4,
+    "pool": "standard",
+    "synergies": [
+      "Demon",
+      "Wizard"
+    ],
+    "names": {
+      "en": "Lion",
+      "lore": "Lion",
+      "ko": "라이온",
+      "ru": "Lion",
+      "zh-cn": "恶魔巫师",
+      "zh-tw": "惡魔巫師"
+    },
+    "attack_type": "ranged",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 750,
+        "mana": 100,
+        "atk": [
+          45,
+          55
+        ],
+        "armor": 3,
+        "magic_resist": 20,
+        "atk_rate": 1.6,
+        "atk_range": 400
+      },
+      "2_star": {
+        "hp": 1500,
+        "mana": 100,
+        "atk": [
+          90,
+          110
+        ],
+        "armor": 3,
+        "magic_resist": 20,
+        "atk_rate": 1.6,
+        "atk_range": 400
+      },
+      "3_star": {
+        "hp": 3000,
+        "mana": 100,
+        "atk": [
+          180,
+          220
+        ],
+        "armor": 3,
+        "magic_resist": 20,
+        "atk_rate": 1.6,
+        "atk_range": 400
+      }
+    }
+  },
+  "overrides": {}
+}

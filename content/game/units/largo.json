@@ -1,0 +1,63 @@
+{
+  "gameId": "chess_largo",
+  "name": "Largo",
+  "slug": "largo",
+  "source": {
+    "id": "chess_largo",
+    "cost": 2,
+    "pool": "standard",
+    "synergies": [
+      "Monk",
+      "Naga"
+    ],
+    "names": {
+      "en": "Largo",
+      "lore": "Largo",
+      "ko": "라르고",
+      "ru": "Largo",
+      "zh-cn": "云游乐手",
+      "zh-tw": "雲遊樂手"
+    },
+    "attack_type": "melee",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 800,
+        "mana": 100,
+        "atk": [
+          50,
+          60
+        ],
+        "armor": 5,
+        "magic_resist": 20,
+        "atk_rate": 1.3,
+        "atk_range": 205
+      },
+      "2_star": {
+        "hp": 1600,
+        "mana": 100,
+        "atk": [
+          100,
+          120
+        ],
+        "armor": 5,
+        "magic_resist": 20,
+        "atk_rate": 1.3,
+        "atk_range": 205
+      },
+      "3_star": {
+        "hp": 3200,
+        "mana": 100,
+        "atk": [
+          200,
+          240
+        ],
+        "armor": 5,
+        "magic_resist": 20,
+        "atk_rate": 1.3,
+        "atk_range": 205
+      }
+    }
+  },
+  "overrides": {}
+}

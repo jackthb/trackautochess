@@ -1,0 +1,63 @@
+{
+  "gameId": "chess_br",
+  "name": "Broodmother",
+  "slug": "broodmother",
+  "source": {
+    "id": "chess_br",
+    "cost": 4,
+    "pool": "standard",
+    "synergies": [
+      "Aqir",
+      "Hunter"
+    ],
+    "names": {
+      "en": "Broodmother",
+      "lore": "Black۰Arachnia",
+      "ko": "거미여왕",
+      "ru": "Broodmother",
+      "zh-cn": "育母蜘蛛",
+      "zh-tw": "育母蜘蛛"
+    },
+    "attack_type": "melee",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 950,
+        "mana": 0,
+        "atk": [
+          80,
+          110
+        ],
+        "armor": 10,
+        "magic_resist": 20,
+        "atk_rate": 1.1,
+        "atk_range": 205
+      },
+      "2_star": {
+        "hp": 1900,
+        "mana": 0,
+        "atk": [
+          160,
+          220
+        ],
+        "armor": 10,
+        "magic_resist": 20,
+        "atk_rate": 1.1,
+        "atk_range": 205
+      },
+      "3_star": {
+        "hp": 3800,
+        "mana": 0,
+        "atk": [
+          320,
+          440
+        ],
+        "armor": 10,
+        "magic_resist": 20,
+        "atk_rate": 1.1,
+        "atk_range": 205
+      }
+    }
+  },
+  "overrides": {}
+}

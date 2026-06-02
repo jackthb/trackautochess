@@ -1,0 +1,317 @@
+{
+  "date": "2024-08-26",
+  "title": "Skyfall: The Ascendant Conflict (Part I)",
+  "source": "https://docs.google.com/document/d/1EQ5bHm2Tm8I8e99WJqUXIdY6-PcQEXMyST0BDJ5v8Lc/pub",
+  "flavor": "Shendelzare is the rightful queen of the Harpy clan, cruelly deposed by her sister Imperia. Shendelzare's lover, Zagnas, is part of Imperia's elite mage guard, and his power and life are at Imperia's command. With the assistance of the goddess Scree'Auk, both Shendelzare and Zagnas have gained new powers, providing them a final opportunity for revenge and to reclaim the throne.",
+  "sections": [
+    {
+      "heading": "Game Rules",
+      "entries": [
+        {
+          "kind": "change",
+          "name": "All pieces that are replaced will now be shuffled back into the deck (including Undead pieces, Pandaren pieces, which previously were not shuffled back) and can be recruited",
+          "detail": ""
+        },
+        {
+          "kind": "change",
+          "name": "All targeted spells and items will now have a special note <Targeted Active Spell> in their descriptions for easier identification",
+          "detail": ""
+        }
+      ]
+    },
+    {
+      "heading": "Chess Pieces",
+      "entries": [
+        {
+          "kind": "change",
+          "name": "Skywrath Mage ($2, Harpy/Mage)",
+          "detail": "Skill <Arcane Bolt> <Targeted active ability: Activate on ally skill cast> Whenever an allied piece casts a skill, the Stormrage Mage will immediately cast a slow-moving Arcane Bolt swarm at the enemy, dealing magic damage to the target.",
+          "entity": {
+            "type": "unit",
+            "slug": "skywrath-mage"
+          }
+        },
+        {
+          "kind": "change",
+          "name": "Vengeful Spirit ($1, Harpy/Undead/Demon Hunter)",
+          "detail": "Updated race to Harpy/Undead.",
+          "entity": {
+            "type": "unit",
+            "slug": "vengeful-spirit"
+          }
+        },
+        {
+          "kind": "change",
+          "name": "Vengeful Spirit - Nether Swap",
+          "detail": "Now a targeted active skill rather than a Battlecry. <Targeted active ability: Instant> Switch positions with one or more enemy pieces with a star level not higher than the Nether Swap skill level.",
+          "entity": {
+            "type": "unit",
+            "slug": "vengeful-spirit"
+          }
+        },
+        {
+          "kind": "nerf",
+          "name": "Enigma ($3, Elemental/Warlock)",
+          "detail": "Cost reduced from $5 to $3, with adjustments to piece and skill values to match the new cost.",
+          "entity": {
+            "type": "unit",
+            "slug": "enigma"
+          }
+        },
+        {
+          "kind": "buff",
+          "name": "Lich ($5, Undead/Mage)",
+          "detail": "Cost increased from $4 to $5, with adjustments to piece and skill values to match the new cost.",
+          "entity": {
+            "type": "unit",
+            "slug": "lich"
+          }
+        },
+        {
+          "kind": "buff",
+          "name": "Omniknight ($5, Human/Knight)",
+          "detail": "Cost increased from $3 to $5, with adjustments to piece and skill values to match the new cost.",
+          "entity": {
+            "type": "unit",
+            "slug": "omniknight"
+          }
+        },
+        {
+          "kind": "rework",
+          "name": "Omniknight - Guardian Angel",
+          "detail": "has been reworked. <Active ability: Activated on ally injured> Summons a Guardian Angel that grants nearby allied pieces a Divine Protection Shield, significantly reducing physical and magic damage, and dispelling negative effects.",
+          "entity": {
+            "type": "unit",
+            "slug": "omniknight"
+          }
+        },
+        {
+          "kind": "rework",
+          "name": "Viper",
+          "detail": "Skill reworked to <Viper Strike> <Targeted active ability: Activated when mana is full> Viper Strike targets an enemy piece with the highest attack damage, reducing its attack speed and dealing ongoing poison magic damage. Attack speed gradually recovers during the poison’s duration.",
+          "entity": {
+            "type": "unit",
+            "slug": "viper"
+          }
+        },
+        {
+          "kind": "change",
+          "name": "Rubick - Spell Steal",
+          "detail": "Now only steals abilities from enemy pieces that have mana.",
+          "entity": {
+            "type": "unit",
+            "slug": "rubick"
+          }
+        },
+        {
+          "kind": "change",
+          "name": "Lion - Finger of Death",
+          "detail": "The base damage has been changed from (400/600/1000 + 5%/10%/15% of target's maximum health as magical damage) to (300/500/900 as pure damage); the additional damage per stack of Fel Power has been adjusted from (5%/10%/15% of target's maximum health as magical damage) to (200/250/350 as pure damage), and the effect of stealing the target's current mana has been removed.",
+          "entity": {
+            "type": "unit",
+            "slug": "lion"
+          }
+        },
+        {
+          "kind": "change",
+          "name": "Necrophos - Reaper's Scythe",
+          "detail": "The execution damage has been changed from (200/300/400 + 0.6/1.2/1.8 times the target's missing health) to (500/700/900 + 50%/70%/90% of the target's maximum health). Cooldown has been balanced from 8/6/4 seconds to 8/7/6 seconds. <Targeted active ability: Activates on full mana> Use Reaper's Scythe to strike an enemy, causing stun and pure damage based on (base damage + a percentage of maximum health), and enemy pieces killed by this will not trigger their death passives.",
+          "entity": {
+            "type": "unit",
+            "slug": "necrophos"
+          }
+        },
+        {
+          "kind": "nerf",
+          "name": "Invoker - Forge Spirit",
+          "detail": "The number of summoned Forge Spirits has been increased from 2 to 2/3/3, and the cooldown has been balanced from 12/9/6 seconds to 12/10/6 seconds.",
+          "entity": {
+            "type": "unit",
+            "slug": "invoker"
+          }
+        },
+        {
+          "kind": "nerf",
+          "name": "Warlock - Chaotic Offering",
+          "detail": "The stun range of the inferno from Hellfire has been reduced from 250 to 200/200/250.",
+          "entity": {
+            "type": "unit",
+            "slug": "warlock"
+          }
+        },
+        {
+          "kind": "added",
+          "name": "New ornamental sets have been introduced for Omniknight, Wraith King, and Lich",
+          "detail": ""
+        }
+      ]
+    },
+    {
+      "heading": "Synergies",
+      "entries": [
+        {
+          "kind": "added",
+          "name": "New Race",
+          "detail": "Harpy (Current members include Vengeful Spirit, Skywrath Mage) (2) Harpies: All allied pieces gain the effect: When casting targeted spells at enemies, there is a chance to hit +1 additional target. Note: The trigger probability for +1 target is 75%."
+        },
+        {
+          "kind": "change",
+          "name": "Elf - Evasion",
+          "detail": "(9) Elves: When elves create illusions, they now gain a brief invisibility effect, causing enemies to temporarily lose their attack target. (9) Elves: Friendly elves gain the effect: Dodging any attack will conceal itself for 0.5 second and create a mirrored attack from the attacker, targeting the enemy.",
+          "entity": {
+            "type": "synergy",
+            "slug": "elf"
+          }
+        },
+        {
+          "kind": "buff",
+          "name": "God - Overweening superiority",
+          "detail": "(6) Gods: Now requires mana-consuming active abilities to trigger. (6) Gods: All allies get the effect: Using skills that consume mana will reduce the current remaining cooldown time of active abilities and items by 50%%.",
+          "entity": {
+            "type": "synergy",
+            "slug": "god"
+          }
+        },
+        {
+          "kind": "change",
+          "name": "Demon - Fel Power",
+          "detail": "Now even a single demon has one layer of Demonic Power (previously only counted \"other\" demons of the same type).",
+          "entity": {
+            "type": "synergy",
+            "slug": "demon"
+          }
+        },
+        {
+          "kind": "buff",
+          "name": "Elemental - Elemental Essence",
+          "detail": "(4) Elementals: The chance of petrification for 4 seconds is increased from 25% to 30%.",
+          "entity": {
+            "type": "synergy",
+            "slug": "elemental"
+          }
+        },
+        {
+          "kind": "change",
+          "name": "Naga - Scale Armor",
+          "detail": "(6) Nagas: The explosion damage from Naga's abilities now has a cap of 500 (but does not affect absorbed damage).",
+          "entity": {
+            "type": "synergy",
+            "slug": "naga"
+          }
+        },
+        {
+          "kind": "nerf",
+          "name": "Centaur - Stampede",
+          "detail": "The duration of the stun from the charge is reduced from 1.25 seconds to 1 second.",
+          "entity": {
+            "type": "synergy",
+            "slug": "centaur"
+          }
+        }
+      ]
+    },
+    {
+      "heading": "Bug Fixes",
+      "entries": [
+        {
+          "kind": "fix",
+          "name": "Fixed a bug where the walking animation of the Sky Breaker Mk.XI (Pet) was glitchy",
+          "detail": ""
+        },
+        {
+          "kind": "fix",
+          "name": "Fixed a bug where the attack speed bonus provided by Rod of Atos did not match its description",
+          "detail": ""
+        }
+      ]
+    },
+    {
+      "heading": "Season Awards",
+      "entries": [
+        {
+          "kind": "change",
+          "name": "The EoS rewards for S32 Jade Fairy (01/07 to 31/08) are based on the following",
+          "detail": "♕Top 20 Queens (on Leaderboard): S32 Badge + ♕Queen rewards. ♕Queen: 320 Candies + Crown (valid for S33) + Jade Fairy♦Ruby. ♔King: 320 Candies + Jade Fairy♦Amethyst. ♖Rook: 160 Candies + Jade Fairy♦Amber. ♗Bishop: 80 Candies + Jade Fairy♦Emerald. ♘Knight: 40 Candies. ♙Pawn: 20 Candies."
+        },
+        {
+          "kind": "change",
+          "name": "Top 20 Queens are rewarded based on their final places and the other ranks for the highest rank achieved in the season",
+          "detail": ""
+        },
+        {
+          "kind": "change",
+          "name": "As usual, the last day of the season will be the off-season break to award the excellent players. Games played on the day do not affect Rankings. The new season of S33 Champion starts on 01/09/2024!",
+          "detail": ""
+        }
+      ]
+    },
+    {
+      "heading": "S.H.I.E.L.D. Prediction and Rebalance Patch",
+      "entries": [
+        {
+          "kind": "change",
+          "name": "Pick your favorite DOTA2 team with 40 Candies!",
+          "detail": ""
+        },
+        {
+          "kind": "change",
+          "name": "If your team wins top 3 place, you'll get a Legendary Courier",
+          "detail": "Golden Brightskye!"
+        },
+        {
+          "kind": "change",
+          "name": "If your team wins the championship, you'll get a pile of candies according to the odds!",
+          "detail": ""
+        },
+        {
+          "kind": "change",
+          "name": "Valid until",
+          "detail": "00:00 Sep, 4th, 2024 (GMT+8)"
+        },
+        {
+          "kind": "change",
+          "name": "(9) Undeads",
+          "detail": "All plagued units lose 5% max health per 3 secs (no less than 5%)"
+        },
+        {
+          "kind": "buff",
+          "name": "(6) Knights",
+          "detail": "Shield Chance increased from 15% to 20%"
+        },
+        {
+          "kind": "nerf",
+          "name": "Omniknight - Guardian Angel",
+          "detail": "Radius decreased from 350/550/750 to 350/450/650",
+          "entity": {
+            "type": "unit",
+            "slug": "omniknight"
+          }
+        },
+        {
+          "kind": "change",
+          "name": "Fix bugs",
+          "detail": ""
+        }
+      ]
+    },
+    {
+      "heading": "Rebalance",
+      "entries": [
+        {
+          "kind": "change",
+          "name": "On the last day of the season, the ranked chess room will be closed to award prizes to outstanding players. During the closure, casual gameplay is available, but ladder ranking points will not be counted. The new season (S33 Champion) will begin on Sep 1st!",
+          "detail": ""
+        },
+        {
+          "kind": "rework",
+          "name": "Naga - Scale Armor",
+          "detail": "Reworked (2) Nagas: All allies gain 2 stack of shields, each stack absorbs 15% ability damage (4) Nagas: All allies gain 3 stacks of shields above, and the stack reduces every 3 seconds. (6) Nagas: Every stack on Naga pieces explodes when it disappears, dealing a magical damage that equals to damage absorbed after the last explosion. P.S.1 Cannot absorb pure damage P.S.2 Explosion damage cannot exceed its max HP",
+          "entity": {
+            "type": "synergy",
+            "slug": "naga"
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,63 @@
+{
+  "gameId": "chess_ct",
+  "name": "Centaur Warrunner",
+  "slug": "centaur-warrunner",
+  "source": {
+    "id": "chess_ct",
+    "cost": 2,
+    "pool": "standard",
+    "synergies": [
+      "Centaur",
+      "Warrior"
+    ],
+    "names": {
+      "en": "Centaur Warrunner",
+      "lore": "Bradwarden",
+      "ko": "켄타우로스 전쟁용사",
+      "ru": "Centaur Warrunner",
+      "zh-cn": "半人马战行者",
+      "zh-tw": "半人馬戰行者"
+    },
+    "attack_type": "melee",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 850,
+        "mana": 0,
+        "atk": [
+          55,
+          60
+        ],
+        "armor": 4,
+        "magic_resist": 15,
+        "atk_rate": 1.1,
+        "atk_range": 205
+      },
+      "2_star": {
+        "hp": 1700,
+        "mana": 0,
+        "atk": [
+          110,
+          120
+        ],
+        "armor": 4,
+        "magic_resist": 15,
+        "atk_rate": 1.1,
+        "atk_range": 205
+      },
+      "3_star": {
+        "hp": 3400,
+        "mana": 0,
+        "atk": [
+          220,
+          240
+        ],
+        "armor": 4,
+        "magic_resist": 15,
+        "atk_rate": 1.1,
+        "atk_range": 205
+      }
+    }
+  },
+  "overrides": {}
+}

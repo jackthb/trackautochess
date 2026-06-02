@@ -1,0 +1,20 @@
+{
+  "gameId": "item_test_dafali",
+  "name": "Test item: +100 mana",
+  "slug": "test-item-100-mana",
+  "source": {
+    "name": "Test item: +100 mana",
+    "description": "",
+    "lore": "",
+    "quality": "rare",
+    "texture": "arcane_ring",
+    "notes": [],
+    "names": {
+      "en": "Test item: +100 mana",
+      "ru": "Test item: +100 mana"
+    },
+    "descriptions": {},
+    "lore_i18n": {}
+  },
+  "overrides": {}
+}

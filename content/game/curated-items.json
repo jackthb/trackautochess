@@ -1,0 +1,313 @@
+{
+  "items": {
+    "Aghanims Shard": {
+      "tier": 2,
+      "icon": "aghanims_shard.png"
+    },
+    "Aghanims Scepter": {
+      "tier": 5,
+      "icon": "aghanims_scepter.png"
+    },
+    "Avianas Feather": {
+      "tier": 2,
+      "icon": "avianas_feather.png"
+    },
+    "Desolator": {
+      "tier": 3,
+      "icon": "desolator.png"
+    },
+    "Arcane Boots": {
+      "tier": 3,
+      "icon": "arcane_boots.png"
+    },
+    "Eye of Skadi": {
+      "tier": 5,
+      "icon": "eye_of_skadi.png"
+    },
+    "Black King Bar": {
+      "tier": 4,
+      "icon": "black_king_bar.png"
+    },
+    "Aegis of Immortal": {
+      "tier": 3,
+      "icon": "aegis_of_immortal.png"
+    },
+    "Sliver": {
+      "tier": 2,
+      "icon": "sliver.png"
+    },
+    "Pavise": {
+      "tier": 2,
+      "icon": "pavise.png"
+    },
+    "Crimson Guard": {
+      "tier": 3,
+      "icon": "crimson_guard.png"
+    },
+    "Mjollnir": {
+      "tier": 5,
+      "icon": "mjollnir.png"
+    },
+    "Daedalus": {
+      "tier": 5,
+      "icon": "daedalus.png"
+    },
+    "Abyssal Blade": {
+      "tier": 4,
+      "icon": "abyssal_blade.png"
+    },
+    "Hand of Midas": {
+      "tier": 1,
+      "icon": "hand_of_midas.png"
+    },
+    "Pipe of Insight": {
+      "tier": 3,
+      "icon": "pipe_of_insight.png"
+    },
+    "Spell Prism": {
+      "tier": 3,
+      "icon": "spell_prism.png"
+    },
+    "Ascetics Cap": {
+      "tier": 2,
+      "icon": "ascetics_cap.png"
+    },
+    "Mask of Madness": {
+      "tier": 2,
+      "icon": "mask_of_madness.png"
+    },
+    "Gleipnir": {
+      "tier": 4,
+      "icon": "gleipnir.png"
+    },
+    "Orb of Corrosion": {
+      "tier": 1,
+      "icon": "orb_of_corrosion.png"
+    },
+    "Kobold Cup": {
+      "tier": 3,
+      "icon": "kobold_cup.png"
+    },
+    "Minotaur Horn": {
+      "tier": 4,
+      "icon": "minotaur_horn.png"
+    },
+    "Havoc": {
+      "tier": 5,
+      "icon": "havoc.png"
+    },
+    "Dagon": {
+      "tier": 4,
+      "icon": "dagon.png"
+    },
+    "Manta Style": {
+      "tier": 4,
+      "icon": "manta_style.png"
+    },
+    "Butterfly": {
+      "tier": 4,
+      "icon": "butterfly.png"
+    },
+    "Kaya": {
+      "tier": 2,
+      "icon": "kaya.png"
+    },
+    "Radiance": {
+      "tier": 4,
+      "icon": "radiance.png"
+    },
+    "Diffusal Blade": {
+      "tier": 3,
+      "icon": "diffusal_blade.png"
+    },
+    "Tranquil Boots": {
+      "tier": 2,
+      "icon": "tranquil_boots.png"
+    },
+    "Monkey King Bar": {
+      "tier": 4,
+      "icon": "monkey_king_bar.png"
+    },
+    "Vladimirs Offering": {
+      "tier": 2,
+      "icon": "vladmirs_offering.png"
+    },
+    "Giants Ring": {
+      "tier": 4,
+      "icon": "giants_ring.png"
+    },
+    "Null Talisman": {
+      "tier": 1,
+      "icon": "null_talisman.png"
+    },
+    "Battle Fury": {
+      "tier": 4,
+      "icon": "battle_fury.png"
+    },
+    "Bracer": {
+      "tier": 1,
+      "icon": "bracer.png"
+    },
+    "Bullwhip": {
+      "tier": 1,
+      "icon": "bullwhip.png"
+    },
+    "Linkens Sphere": {
+      "tier": 3,
+      "icon": "linkens_sphere.png"
+    },
+    "Mekansm": {
+      "tier": 3,
+      "icon": "mekansm.png"
+    },
+    "Necronomicon": {
+      "tier": 4,
+      "icon": "necronomicon_3.png"
+    },
+    "Bottle": {
+      "tier": 2,
+      "icon": "bottle.png"
+    },
+    "Assault Cuirass": {
+      "tier": 5,
+      "icon": "assault_cuirass.png"
+    },
+    "Princes Knife": {
+      "tier": 1,
+      "icon": "princes_knife.png"
+    },
+    "Paladin Sword": {
+      "tier": 3,
+      "icon": "paladin_sword.png"
+    },
+    "Drum of Endurance": {
+      "tier": 2,
+      "icon": "drum_of_endurance.png"
+    },
+    "Blade Mail": {
+      "tier": 2,
+      "icon": "blade_mail.png"
+    },
+    "Satanic": {
+      "tier": 5,
+      "icon": "satanic.png"
+    },
+    "Trident": {
+      "tier": 3,
+      "icon": "trident.png"
+    },
+    "Rapier": {
+      "tier": 5,
+      "icon": "rapier.png"
+    },
+    "Mirror Shield": {
+      "tier": 5,
+      "icon": "mirror_shield.png"
+    },
+    "Ogre Hood": {
+      "tier": 5,
+      "icon": "ogre_hood.png"
+    },
+    "Refresher Orb": {
+      "tier": 4,
+      "icon": "refresher_orb.png"
+    },
+    "Crystalys": {
+      "tier": 1,
+      "icon": "crystalys.png"
+    },
+    "Skull Basher": {
+      "tier": 1,
+      "icon": "skull_basher.png"
+    },
+    "Heavens Halberd": {
+      "tier": 3,
+      "icon": "heavens_halberd.png"
+    },
+    "Blink Dagger": {
+      "tier": 1,
+      "icon": "blink_dagger.png"
+    },
+    "Hood of Defiance": {
+      "tier": 2,
+      "icon": "hood_of_defiance.png"
+    },
+    "Spider Leg": {
+      "tier": 2,
+      "icon": "spider_legs.png"
+    },
+    "Telescope": {
+      "tier": 2,
+      "icon": "telescope.png"
+    },
+    "Ring of Basilius": {
+      "tier": 1,
+      "icon": "ring_of_basilius.png"
+    },
+    "Guardian Greaves": {
+      "tier": 4,
+      "icon": "guardian_greaves.png"
+    },
+    "Witless Shako": {
+      "tier": 1,
+      "icon": "witless_shako.png"
+    },
+    "Vanguard": {
+      "tier": 2,
+      "icon": "vanguard.png"
+    },
+    "Lucky Pendant": {
+      "tier": 1,
+      "icon": "lucky_pendant.png"
+    },
+    "Shivas Guard": {
+      "tier": 3,
+      "icon": "shivas_guard.png"
+    },
+    "Buckler": {
+      "tier": 1,
+      "icon": "buckler.png"
+    },
+    "Maelstrom": {
+      "tier": 2,
+      "icon": "maelstrom.png"
+    },
+    "Bloodthorn": {
+      "tier": 4,
+      "icon": "bloodthorn.png"
+    },
+    "Bloodstone": {
+      "tier": 3,
+      "icon": "bloodstone.png"
+    },
+    "Scythe of Vyse": {
+      "tier": 5,
+      "icon": "scythe_of_vyse.png"
+    },
+    "Moon Shard": {
+      "tier": 3,
+      "icon": "moon_shard.png"
+    },
+    "Aeon Disk": {
+      "tier": 5,
+      "icon": "aeon_disk.png"
+    },
+    "Spark of Courage": {
+      "tier": 1,
+      "icon": "spark_of_courage.png"
+    },
+    "Force Staff": {
+      "tier": 1,
+      "icon": "force_staff.png"
+    },
+    "Wraith Band": {
+      "tier": 1,
+      "icon": "wraith_band.png"
+    },
+    "Gossamer Cape": {
+      "tier": 1,
+      "icon": "gossamar_cape.png"
+    }
+  },
+  "total": 77
+}

@@ -1,0 +1,63 @@
+{
+  "gameId": "chess_naga",
+  "name": "Naga Siren",
+  "slug": "naga-siren",
+  "source": {
+    "id": "chess_naga",
+    "cost": 3,
+    "pool": "standard",
+    "synergies": [
+      "Naga",
+      "Wizard"
+    ],
+    "names": {
+      "en": "Naga Siren",
+      "lore": "Slithice",
+      "ko": "나가 세이렌",
+      "ru": "Naga Siren",
+      "zh-cn": "娜迦海妖",
+      "zh-tw": "娜迦海妖"
+    },
+    "attack_type": "melee",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 650,
+        "mana": 100,
+        "atk": [
+          50,
+          90
+        ],
+        "armor": 5,
+        "magic_resist": 20,
+        "atk_rate": 1.2,
+        "atk_range": 205
+      },
+      "2_star": {
+        "hp": 1300,
+        "mana": 100,
+        "atk": [
+          100,
+          180
+        ],
+        "armor": 5,
+        "magic_resist": 20,
+        "atk_rate": 1.2,
+        "atk_range": 205
+      },
+      "3_star": {
+        "hp": 2600,
+        "mana": 100,
+        "atk": [
+          200,
+          360
+        ],
+        "armor": 5,
+        "magic_resist": 20,
+        "atk_rate": 1.2,
+        "atk_range": 205
+      }
+    }
+  },
+  "overrides": {}
+}

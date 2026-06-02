@@ -4,7 +4,9 @@
     {
       "find": "\\bfarest\\b",
       "replace": "farthest",
-      "where": ["items_full"],
+      "where": [
+        "items_full"
+      ],
       "note": "Blink Dagger and Overwhelming Blink misspell 'farthest' as 'farest'."
     }
   ]

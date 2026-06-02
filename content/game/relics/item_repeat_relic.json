@@ -1,0 +1,20 @@
+{
+  "gameId": "item_repeat_relic",
+  "name": "Time-Space Replica",
+  "slug": "time-space-replica",
+  "source": {
+    "name": "Time-Space Replica",
+    "description": "Replicate your last relic.",
+    "lore": "",
+    "names": {
+      "en": "Time-Space Replica",
+      "ru": "Time-Space Replica"
+    },
+    "descriptions": {
+      "en": "Replicate your last relic.",
+      "ru": "Повторите свою прошлую реликвию."
+    },
+    "lore_i18n": {}
+  },
+  "overrides": {}
+}

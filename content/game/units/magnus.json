@@ -1,0 +1,63 @@
+{
+  "gameId": "chess_mag",
+  "name": "Magnus",
+  "slug": "magnus",
+  "source": {
+    "id": "chess_mag",
+    "cost": 4,
+    "pool": "standard",
+    "synergies": [
+      "Assassin",
+      "Centaur"
+    ],
+    "names": {
+      "en": "Magnus",
+      "lore": "Magnus",
+      "ko": "마그누스",
+      "ru": "Magnus",
+      "zh-cn": "半人猛犸",
+      "zh-tw": "半人猛獁"
+    },
+    "attack_type": "melee",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 900,
+        "mana": 100,
+        "atk": [
+          65,
+          75
+        ],
+        "armor": 7,
+        "magic_resist": 5,
+        "atk_rate": 1.5,
+        "atk_range": 205
+      },
+      "2_star": {
+        "hp": 1800,
+        "mana": 100,
+        "atk": [
+          130,
+          150
+        ],
+        "armor": 7,
+        "magic_resist": 5,
+        "atk_rate": 1.5,
+        "atk_range": 205
+      },
+      "3_star": {
+        "hp": 3600,
+        "mana": 100,
+        "atk": [
+          260,
+          300
+        ],
+        "armor": 7,
+        "magic_resist": 5,
+        "atk_rate": 1.5,
+        "atk_range": 205
+      }
+    }
+  },
+  "overrides": {}
+}

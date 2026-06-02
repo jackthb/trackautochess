@@ -1,0 +1,69 @@
+{
+  "gameId": "chess_tiny",
+  "name": "Tiny",
+  "slug": "tiny",
+  "source": {
+    "id": "chess_tiny",
+    "cost": 2,
+    "pool": "standard",
+    "synergies": [
+      "Elemental",
+      "Warrior"
+    ],
+    "names": {
+      "en": "Tiny",
+      "lore": "Tiny",
+      "ko": "타이니",
+      "ru": "Tiny",
+      "zh-cn": "山岭巨人",
+      "zh-tw": "山嶺巨人"
+    },
+    "attack_type": "melee",
+    "abilities": [
+      {
+        "id": "tiny_grow_new",
+        "name": "Grow",
+        "description": "Gains 100 max health permanently if killed in a home battle."
+      }
+    ],
+    "stats": {
+      "1_star": {
+        "hp": 700,
+        "mana": 100,
+        "atk": [
+          60,
+          100
+        ],
+        "armor": 7,
+        "magic_resist": 20,
+        "atk_rate": 1.9,
+        "atk_range": 205
+      },
+      "2_star": {
+        "hp": 1400,
+        "mana": 100,
+        "atk": [
+          120,
+          200
+        ],
+        "armor": 7,
+        "magic_resist": 20,
+        "atk_rate": 1.9,
+        "atk_range": 205
+      },
+      "3_star": {
+        "hp": 2800,
+        "mana": 100,
+        "atk": [
+          240,
+          400
+        ],
+        "armor": 7,
+        "magic_resist": 20,
+        "atk_rate": 1.9,
+        "atk_range": 205
+      }
+    }
+  },
+  "overrides": {}
+}

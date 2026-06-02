@@ -1,20 +1,15 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { draftMode } from "next/headers";
 import { EntityDetail, type RelatedEntity } from "@/components/EntityDetail";
-import { EntityCommentaryList } from "@/components/PatchCommentary";import { getAllUnits, getUnitBySlug } from "@/lib/units";
+import { EntityCommentaryList } from "@/components/PatchCommentary";
+import { getAllUnits, getUnitBySlug } from "@/lib/units";
 import { getAllSynergies } from "@/lib/synergies";
 import { slugifyName } from "@/lib/slugs";
 import { absoluteUrl, SITE_NAME, SITE_TITLE } from "@/lib/site";
 import { DEFAULT_LOCALE } from "@/lib/i18n";
-import { loadDraftUnits, loadDraftSynergies } from "@/lib/sanity/draftLoaders";
 import { getCommentaryForEntity } from "@/lib/patchCommentary";
 
-// App Router migration of pages/units/[slug].tsx — mirrors the relics template.
-// getStaticPaths -> generateStaticParams; getStaticProps -> async Server
-// Component reading params + draftMode(). Draft mode (Sanity Presentation/
-// visual editing) is preserved: in draft we read stega-encoded content via the
-// loaders and mount <AppVisualEditing/>; published pages stay static.
+// Static detail page backed by committed JSON generated from content/.
 
 const t = {
   title: (n: string) => `${n} Unit Guide | ${SITE_TITLE}`,
@@ -68,14 +63,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function UnitDetailPage({ params }: Props) {
   const { slug } = await params;
-  const { isEnabled: isDraft } = await draftMode();
 
-  const allUnits = isDraft
-    ? await loadDraftUnits(true)
-    : getAllUnits(DEFAULT_LOCALE);
-  const unit = isDraft
-    ? allUnits.find((u) => u.slug === slug) ?? null
-    : getUnitBySlug(slug, DEFAULT_LOCALE);
+  const allUnits = getAllUnits(DEFAULT_LOCALE);
+  const unit = getUnitBySlug(slug, DEFAULT_LOCALE);
   if (!unit) notFound();
 
   const related = allUnits
@@ -85,9 +75,7 @@ export default async function UnitDetailPage({ params }: Props) {
     )
     .slice(0, 8);
 
-  const synergies = isDraft
-    ? await loadDraftSynergies(true)
-    : getAllSynergies(DEFAULT_LOCALE);
+  const synergies = getAllSynergies(DEFAULT_LOCALE);
 
   const commentary = getCommentaryForEntity("unit", slug);
 
@@ -165,6 +153,7 @@ export default async function UnitDetailPage({ params }: Props) {
         related={synergyEntities}
         extraRelatedTitle={RELATED_LABELS.moreUnits}
         extraRelated={relatedEntities}
-      />    </>
+      />
+    </>
   );
 }

@@ -1,0 +1,63 @@
+{
+  "gameId": "chess_shredder",
+  "name": "Timbersaw",
+  "slug": "timbersaw",
+  "source": {
+    "id": "chess_shredder",
+    "cost": 2,
+    "pool": "standard",
+    "synergies": [
+      "Goblin",
+      "Mech"
+    ],
+    "names": {
+      "en": "Timbersaw",
+      "lore": "Rizzrack",
+      "ko": "벌목꾼",
+      "ru": "Timbersaw",
+      "zh-cn": "伐木机",
+      "zh-tw": "伐木機"
+    },
+    "attack_type": "melee",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 750,
+        "mana": 100,
+        "atk": [
+          55,
+          60
+        ],
+        "armor": 7,
+        "magic_resist": 0,
+        "atk_rate": 1.4,
+        "atk_range": 205
+      },
+      "2_star": {
+        "hp": 1500,
+        "mana": 100,
+        "atk": [
+          110,
+          120
+        ],
+        "armor": 7,
+        "magic_resist": 0,
+        "atk_rate": 1.4,
+        "atk_range": 205
+      },
+      "3_star": {
+        "hp": 3000,
+        "mana": 100,
+        "atk": [
+          220,
+          240
+        ],
+        "armor": 7,
+        "magic_resist": 0,
+        "atk_rate": 1.4,
+        "atk_range": 205
+      }
+    }
+  },
+  "overrides": {}
+}

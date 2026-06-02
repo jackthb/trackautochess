@@ -1,0 +1,26 @@
+{
+  "gameId": "item_shuaxinqiu",
+  "name": "Refresher Orb",
+  "slug": "refresher-orb",
+  "source": {
+    "name": "Refresher Orb",
+    "description": "+200% mana regeneration\n\nActive ability: Activates when ability or items incur cooldown\nResets the cooldown of abilities and other items.",
+    "lore": "A powerful artifact created for wizards.",
+    "quality": "rare",
+    "texture": "item_refresher",
+    "notes": [],
+    "names": {
+      "en": "Refresher Orb",
+      "ru": "Refresher Orb"
+    },
+    "descriptions": {
+      "en": "+200% mana regeneration\n\nActive ability: Activates when ability or items incur cooldown\nResets the cooldown of abilities and other items.",
+      "ru": "+200% mana regeneration\n\nАктивка: Когда появляется КД\nСбрасывает время перезарядки способностей и других предметов."
+    },
+    "lore_i18n": {
+      "en": "A powerful artifact created for wizards.",
+      "ru": "Мощный артефакт, созданный для магов.."
+    }
+  },
+  "overrides": {}
+}

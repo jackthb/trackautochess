@@ -1,0 +1,30 @@
+{
+  "gameId": "is_harpy",
+  "name": "Harpy",
+  "slug": "harpy",
+  "source": {
+    "name": "Harpy",
+    "description": "Species Trait: Windfury\n\nActive when you have at least (N) different pieces of this species on board. (Multiple effects stack).\n\n(2) Harpies: All allies gain the effect - Targeted spells +1 additional targets.\n(4) Harpies: All allies gain the effect - Targeted spells +1 additional targets.",
+    "description_html": "<h1>Species Trait: Windfury</h1><font color=\"#656585\">Active when you have at least (N) different pieces of this species on board. (Multiple effects stack).</font><br><br>(2) Harpies: All allies gain the effect - Targeted spells +1 additional targets.<br>(4) Harpies: All allies gain the effect - Targeted spells +1 additional targets.",
+    "lore": "Harpies believe they survived from an ancient age. Their ancestors are transformed into bird-like bodies after betraying the Night Elves Queen.",
+    "notes": [],
+    "tiers": [
+      2,
+      4
+    ],
+    "ability_special": {},
+    "names": {
+      "en": "Harpy",
+      "ru": "Harpy"
+    },
+    "descriptions": {
+      "en": "Species Trait: Windfury\n Active when you have at least (N) different pieces of this species on board. (Multiple effects stack).\n\n(2) Harpies: All allies gain the effect - Targeted spells +1 additional targets.\n(4) Harpies: All allies gain the effect - Targeted spells +1 additional targets.",
+      "ru": "Species Trait: Windfury\n Активен, когда хотя бы (N) разных Harpy на доске. (Эффекты складываются).\n\n(2) Harpies: Все союзники получают эффект - целевые заклинания по +1 доп. цель.\n(4) Harpies: Все союзники получают эффект - целевые заклинания по +1 доп. цель."
+    },
+    "lore_i18n": {
+      "en": "Harpies believe they survived from an ancient age. Their ancestors are transformed into bird-like bodies after betraying the Night Elves Queen.",
+      "ru": "Harpies верят, что они сохранились с незапамятных времен. Их предки превратились в птицеподобных после того, как предали королеву Ночных эльфов."
+    }
+  },
+  "overrides": {}
+}

@@ -1,0 +1,22 @@
+{
+  "gameId": "item_second_chance",
+  "name": "Second Chance",
+  "slug": "second-chance",
+  "source": {
+    "name": "Second Chance",
+    "description": "When you use consumable items of the choice category, you can refresh the selection panel and acquire different options.",
+    "lore": "",
+    "names": {
+      "en": "Second Chance",
+      "ru": "Second Chance"
+    },
+    "descriptions": {
+      "en": "When you use consumable items of the choice category, you can refresh the selection panel and acquire different options.",
+      "ru": "Позволяет обновить выбор в сундуке - вместо случайного предмета вы снова получаете 3 новых варианта на выбор."
+    },
+    "lore_i18n": {
+      "ru": "Из Relicbox"
+    }
+  },
+  "overrides": {}
+}

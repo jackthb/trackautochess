@@ -1,0 +1,22 @@
+{
+  "gameId": "item_malefic_rapture",
+  "name": "Malefic Rapture",
+  "slug": "malefic-rapture",
+  "source": {
+    "name": "Malefic Rapture",
+    "description": "When your courier takes damage, you immediately gain the corresponding (damage taken) amount of experience.",
+    "lore": "",
+    "names": {
+      "en": "Malefic Rapture",
+      "ru": "Malefic Rapture"
+    },
+    "descriptions": {
+      "en": "When your courier takes damage, you immediately gain the corresponding (damage taken) amount of experience.",
+      "ru": "Когда ваш курьер получает урон, вы сразу получаете опыт, соответствующий полученному урону."
+    },
+    "lore_i18n": {
+      "ru": "Из Relic Box"
+    }
+  },
+  "overrides": {}
+}

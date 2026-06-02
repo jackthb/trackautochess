@@ -4,7 +4,6 @@ import path from "path";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { HideOnErrorImg } from "@/components/HideOnErrorImg";
-import { draftMode } from "next/headers";
 import patchIndex from "@data/patch_notes/index.json";
 import { getItemBySlug, iconUrl } from "@/lib/items";
 import { getRelicBySlug } from "@/lib/relics";
@@ -13,19 +12,14 @@ import { getUnitBySlug } from "@/lib/units";
 import { getSynergyBySlug } from "@/lib/synergies";
 import { absoluteUrl, SITE_NAME, SITE_TITLE } from "@/lib/site";
 import { DEFAULT_LOCALE, pickLocalized } from "@/lib/i18n";
-import { loadDraftPatchNote } from "@/lib/sanity/draftLoaders";
 import { type EntryKind, KIND_COLOR, KIND_LABEL } from "@/lib/patchKinds";
 import { EntryCommentary } from "@/components/PatchCommentary";
 import type { PatchEvidence } from "@/lib/patchCommentaryTypes";
 import styles from "./patch.module.css";
 
-// App Router migration of pages/patch-notes/[slug].tsx — the patch-note detail
-// page. getStaticPaths -> generateStaticParams; getStaticProps -> async Server
-// Component reading params + draftMode(). Draft mode reads stega-encoded content
-// via loadDraftPatchNote; published pages read the on-disk JSON statically. The
-// styled-jsx block is ported to patch.module.css. Single (English) locale —
-// DEFAULT_LOCALE replaces the former router locale. The visual-editing overlay
-// is mounted globally in the chrome, so this page does not mount it itself.
+// Static patch-note detail page backed by committed JSON generated from
+// content/. Single (English) locale — DEFAULT_LOCALE replaces the former router
+// locale.
 
 interface PatchEntry {
   kind: EntryKind;
@@ -158,35 +152,7 @@ function resolveEntryMeta(entry: PatchEntry): EntryMeta {
   }
 }
 
-async function loadPatch(slug: string, isDraft: boolean): Promise<Patch | null> {
-  if (isDraft) {
-    try {
-      const draft = await loadDraftPatchNote(slug, true);
-      if (draft) {
-        return {
-          date: draft.date,
-          title: draft.title,
-          source: draft.source,
-          flavor: draft.flavor,
-          sections: draft.sections.map((s) => ({
-            heading: s.heading,
-            entries: s.entries.map((e) => ({
-              kind: e.kind as EntryKind,
-              name: e.name,
-              detail: e.detail,
-              entity_type: e.entityType as PatchEntry["entity_type"],
-              entity_slug: e.entitySlug,
-              commentary: e.commentary,
-              evidence: e.evidence,
-            })),
-          })),
-        };
-      }
-    } catch (error) {
-      console.warn(`[patch-notes] Failed to load draft patch ${slug}`, error);
-    }
-  }
-
+async function loadPatch(slug: string): Promise<Patch | null> {
   const filePath = path.join(
     process.cwd(),
     "..",
@@ -206,7 +172,7 @@ export function generateStaticParams() {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
-  const patch = await loadPatch(slug, false);
+  const patch = await loadPatch(slug);
   if (!patch) return {};
 
   const localizedTitle =
@@ -239,9 +205,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function PatchDetailPage({ params }: Props) {
   const { slug } = await params;
-  const { isEnabled: isDraft } = await draftMode();
 
-  const patch = await loadPatch(slug, isDraft);
+  const patch = await loadPatch(slug);
   if (!patch) notFound();
 
   const locale = DEFAULT_LOCALE;

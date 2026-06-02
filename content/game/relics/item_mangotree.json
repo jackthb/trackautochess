@@ -1,0 +1,22 @@
+{
+  "gameId": "item_mangotree",
+  "name": "Mango Tree",
+  "slug": "mango-tree",
+  "source": {
+    "name": "Mango Tree",
+    "description": "Plants a Mango Tree by the side of your Chessboard.\nDrops an Enchanted Mango whenever your home battle result differs from the last round. The tree wilts after 8 drops. A Golden Mango will be dropped if the mango tree is still alive at Relic expiration.",
+    "lore": "",
+    "names": {
+      "en": "Mango Tree",
+      "ru": "Mango Tree"
+    },
+    "descriptions": {
+      "en": "Plants a Mango Tree by the side of your Chessboard.\nDrops an Enchanted Mango whenever your home battle result differs from the last round. The tree wilts after 8 drops. A Golden Mango will be dropped if the mango tree is still alive at Relic expiration.",
+      "ru": "Сажает Дерево Манго у Вашей доски.\nДает зачарованное манго всегда, когда результат вашей домашней битвы отличается от предыдущей. Дерево увядает после 8 выпаданий. Золотое Манго выпадет, если манговое дерево все еще будет живым по истечении срока действия реликвии."
+    },
+    "lore_i18n": {
+      "ru": "Из Relicbox"
+    }
+  },
+  "overrides": {}
+}

@@ -1028,13 +1028,6 @@ def main():
     parser.add_argument('--diff', metavar='OLD_DIR', help='Diff against previous extraction in OLD_DIR')
     parser.add_argument('--out', metavar='DIR', default=str(Path(__file__).parent),
                         help='Output directory (default: same as script)')
-    parser.add_argument('--push-cms', action='store_true',
-                        help='After extraction, push the JSON files to the Sanity CMS '
-                             '(requires SANITY_PROJECT_ID and SANITY_TOKEN; see cms/README.md).')
-    parser.add_argument('--cms-only', nargs='+',
-                        choices=['synergies', 'units', 'items', 'relics', 'talents',
-                                 'abilities', 'gameMode'],
-                        help='When pushing to CMS, only push these kinds.')
     args = parser.parse_args()
 
     # Find VPK
@@ -1093,8 +1086,7 @@ def main():
 
     for key, filename in file_map.items():
         out_path = out_dir / filename
-        # Preserve existing icon_url / icon_dimensions (from Sanity CDN)
-        # that the VPK doesn't carry.
+        # Preserve existing icon_url / icon_dimensions that the VPK doesn't carry.
         if out_path.exists():
             try:
                 with open(out_path, encoding='utf-8') as f:
@@ -1229,19 +1221,6 @@ def main():
                 new_inner = new_data
 
             print_diff(filename, old_inner, new_inner)
-
-    # ── Push to CMS ──
-    if args.push_cms:
-        print(f"\n{'=' * 60}")
-        print('PUSH → SANITY CMS')
-        print(f"{'=' * 60}")
-        # Local import so the rest of the script works without a populated env.
-        from cms_push import push_all  # noqa: WPS433 (intentional local import)
-        push_all(
-            data_dir=out_dir,
-            only=set(args.cms_only) if args.cms_only else None,
-        )
-
 
 if __name__ == '__main__':
     main()

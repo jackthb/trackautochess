@@ -1,0 +1,63 @@
+{
+  "gameId": "chess_fv",
+  "name": "Faceless Void",
+  "slug": "faceless-void",
+  "source": {
+    "id": "chess_fv",
+    "cost": 2,
+    "pool": "standard",
+    "synergies": [
+      "Assassin",
+      "Faceless"
+    ],
+    "names": {
+      "en": "Faceless Void",
+      "lore": "Darkterror",
+      "ko": "얼굴없는 전사",
+      "ru": "Faceless Void",
+      "zh-cn": "虚空假面",
+      "zh-tw": "虛空假面"
+    },
+    "attack_type": "melee",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 550,
+        "mana": 100,
+        "atk": [
+          50,
+          80
+        ],
+        "armor": 4,
+        "magic_resist": 0,
+        "atk_rate": 1.3,
+        "atk_range": 205
+      },
+      "2_star": {
+        "hp": 1100,
+        "mana": 100,
+        "atk": [
+          120,
+          180
+        ],
+        "armor": 4,
+        "magic_resist": 0,
+        "atk_rate": 1.3,
+        "atk_range": 205
+      },
+      "3_star": {
+        "hp": 2200,
+        "mana": 100,
+        "atk": [
+          240,
+          360
+        ],
+        "armor": 4,
+        "magic_resist": 0,
+        "atk_rate": 1.3,
+        "atk_range": 205
+      }
+    }
+  },
+  "overrides": {}
+}

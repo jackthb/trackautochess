@@ -1,0 +1,63 @@
+{
+  "gameId": "chess_tk",
+  "name": "Tinker",
+  "slug": "tinker",
+  "source": {
+    "id": "chess_tk",
+    "cost": 1,
+    "pool": "standard",
+    "synergies": [
+      "Goblin",
+      "Mech"
+    ],
+    "names": {
+      "en": "Tinker",
+      "lore": "Boush",
+      "ko": "땜장이",
+      "ru": "Tinker",
+      "zh-cn": "修补匠",
+      "zh-tw": "修補匠"
+    },
+    "attack_type": "ranged",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 500,
+        "mana": 100,
+        "atk": [
+          40,
+          50
+        ],
+        "armor": 3,
+        "magic_resist": 0,
+        "atk_rate": 1.5,
+        "atk_range": 600
+      },
+      "2_star": {
+        "hp": 1000,
+        "mana": 100,
+        "atk": [
+          80,
+          100
+        ],
+        "armor": 3,
+        "magic_resist": 0,
+        "atk_rate": 1.5,
+        "atk_range": 600
+      },
+      "3_star": {
+        "hp": 2000,
+        "mana": 100,
+        "atk": [
+          160,
+          200
+        ],
+        "armor": 3,
+        "magic_resist": 0,
+        "atk_rate": 1.5,
+        "atk_range": 600
+      }
+    }
+  },
+  "overrides": {}
+}

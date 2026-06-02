@@ -1,0 +1,20 @@
+{
+  "gameId": "item_test_damokang",
+  "name": "Test item: +100% magic resistance",
+  "slug": "test-item-100-magic-resistance",
+  "source": {
+    "name": "Test item: +100% magic resistance",
+    "description": "",
+    "lore": "",
+    "quality": "consumable",
+    "texture": "item_eternal_shroud",
+    "notes": [],
+    "names": {
+      "en": "Test item: +100% magic resistance",
+      "ru": "Test item: +100% magic resistance"
+    },
+    "descriptions": {},
+    "lore_i18n": {}
+  },
+  "overrides": {}
+}

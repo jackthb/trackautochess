@@ -1,0 +1,64 @@
+{
+  "gameId": "chess_ww",
+  "name": "Winter Wyvern",
+  "slug": "winter-wyvern",
+  "source": {
+    "id": "chess_ww",
+    "cost": 1,
+    "pool": "undead",
+    "synergies": [
+      "Dragon",
+      "Mage",
+      "Undead"
+    ],
+    "names": {
+      "en": "Winter Wyvern",
+      "lore": "Auroth",
+      "ko": "겨울 비룡",
+      "ru": "Winter Wyvern",
+      "zh-cn": "寒冬飞龙",
+      "zh-tw": "寒冬飛龍"
+    },
+    "attack_type": "ranged",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 550,
+        "mana": 100,
+        "atk": [
+          40,
+          55
+        ],
+        "armor": 0,
+        "magic_resist": 10,
+        "atk_rate": 1.4,
+        "atk_range": 400
+      },
+      "2_star": {
+        "hp": 1100,
+        "mana": 100,
+        "atk": [
+          80,
+          110
+        ],
+        "armor": 0,
+        "magic_resist": 10,
+        "atk_rate": 1.4,
+        "atk_range": 400
+      },
+      "3_star": {
+        "hp": 2200,
+        "mana": 100,
+        "atk": [
+          160,
+          220
+        ],
+        "armor": 0,
+        "magic_resist": 10,
+        "atk_rate": 1.4,
+        "atk_range": 400
+      }
+    }
+  },
+  "overrides": {}
+}

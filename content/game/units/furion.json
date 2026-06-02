@@ -1,0 +1,63 @@
+{
+  "gameId": "chess_fur",
+  "name": "Furion",
+  "slug": "furion",
+  "source": {
+    "id": "chess_fur",
+    "cost": 2,
+    "pool": "standard",
+    "synergies": [
+      "Druid",
+      "Elf"
+    ],
+    "names": {
+      "en": "Furion",
+      "lore": "Furion",
+      "ko": "자연의 예언자",
+      "ru": "Furion",
+      "zh-cn": "先知",
+      "zh-tw": "先知"
+    },
+    "attack_type": "ranged",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 500,
+        "mana": 100,
+        "atk": [
+          45,
+          50
+        ],
+        "armor": 4,
+        "magic_resist": 5,
+        "atk_rate": 1.4,
+        "atk_range": 400
+      },
+      "2_star": {
+        "hp": 1000,
+        "mana": 100,
+        "atk": [
+          90,
+          100
+        ],
+        "armor": 4,
+        "magic_resist": 5,
+        "atk_rate": 1.4,
+        "atk_range": 400
+      },
+      "3_star": {
+        "hp": 1900,
+        "mana": 100,
+        "atk": [
+          180,
+          200
+        ],
+        "armor": 4,
+        "magic_resist": 5,
+        "atk_rate": 1.4,
+        "atk_range": 400
+      }
+    }
+  },
+  "overrides": {}
+}

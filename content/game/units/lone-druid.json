@@ -1,0 +1,63 @@
+{
+  "gameId": "chess_ld",
+  "name": "Lone Druid",
+  "slug": "lone-druid",
+  "source": {
+    "id": "chess_ld",
+    "cost": 4,
+    "pool": "standard",
+    "synergies": [
+      "Beast",
+      "Druid"
+    ],
+    "names": {
+      "en": "Lone Druid",
+      "lore": "Syllabear",
+      "ko": "고독한 드루이드",
+      "ru": "Lone Druid",
+      "zh-cn": "利爪德鲁伊",
+      "zh-tw": "利爪德魯伊"
+    },
+    "attack_type": "ranged",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 800,
+        "mana": 100,
+        "atk": [
+          50,
+          60
+        ],
+        "armor": 7,
+        "magic_resist": 0,
+        "atk_rate": 1.3,
+        "atk_range": 400
+      },
+      "2_star": {
+        "hp": 1600,
+        "mana": 100,
+        "atk": [
+          100,
+          120
+        ],
+        "armor": 7,
+        "magic_resist": 0,
+        "atk_rate": 1.3,
+        "atk_range": 400
+      },
+      "3_star": {
+        "hp": 2800,
+        "mana": 100,
+        "atk": [
+          200,
+          240
+        ],
+        "armor": 7,
+        "magic_resist": 0,
+        "atk_rate": 1.3,
+        "atk_range": 400
+      }
+    }
+  },
+  "overrides": {}
+}

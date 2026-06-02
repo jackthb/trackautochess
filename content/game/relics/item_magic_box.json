@@ -1,0 +1,20 @@
+{
+  "gameId": "item_magic_box",
+  "name": "Magic box",
+  "slug": "magic-box",
+  "source": {
+    "name": "Magic box",
+    "description": "Packs an ally piece, at the beginning of next round, transforms it into a randon new piece of the same Level and Rank. 12 times available.",
+    "lore": "",
+    "names": {
+      "en": "Magic box",
+      "ru": "Magic box"
+    },
+    "descriptions": {
+      "en": "Packs an ally piece, at the beginning of next round, transforms it into a randon new piece of the same Level and Rank. 12 times available.",
+      "ru": "Упаковывает союзную фигуру, и в начале следующего раунда превращает её в случайную фигуру того же уровня и ранга. Доступно 12 зарядов."
+    },
+    "lore_i18n": {}
+  },
+  "overrides": {}
+}

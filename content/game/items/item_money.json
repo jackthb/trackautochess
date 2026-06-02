@@ -1,0 +1,23 @@
+{
+  "gameId": "item_money",
+  "name": "A Bag of Coins",
+  "slug": "a-bag-of-coins",
+  "source": {
+    "name": "A Bag of Coins",
+    "description": "Courier consumable: Activate on pick up\nGrants some Gold.",
+    "lore": "",
+    "quality": "consumable",
+    "texture": "custom/coin",
+    "notes": [],
+    "names": {
+      "en": "A Bag of Coins",
+      "ru": "Мешочек денег"
+    },
+    "descriptions": {
+      "en": "Courier consumable: Activate on pick up\nGrants some Gold.",
+      "ru": "Courier consumable: Activate on pick up\nGrants some Gold."
+    },
+    "lore_i18n": {}
+  },
+  "overrides": {}
+}

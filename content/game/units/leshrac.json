@@ -1,0 +1,64 @@
+{
+  "gameId": "chess_ts",
+  "name": "Leshrac",
+  "slug": "leshrac",
+  "source": {
+    "id": "chess_ts",
+    "cost": 5,
+    "pool": "standard",
+    "synergies": [
+      "Centaur",
+      "Druid",
+      "God"
+    ],
+    "names": {
+      "en": "Leshrac",
+      "lore": "Leshrac",
+      "ko": "레슈락",
+      "ru": "Leshrac",
+      "zh-cn": "受折磨的灵魂",
+      "zh-tw": "受折磨的靈魂"
+    },
+    "attack_type": "ranged",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 900,
+        "mana": 100,
+        "atk": [
+          60,
+          110
+        ],
+        "armor": 6,
+        "magic_resist": 20,
+        "atk_rate": 1.2,
+        "atk_range": 400
+      },
+      "2_star": {
+        "hp": 1800,
+        "mana": 100,
+        "atk": [
+          120,
+          220
+        ],
+        "armor": 6,
+        "magic_resist": 20,
+        "atk_rate": 1.2,
+        "atk_range": 400
+      },
+      "3_star": {
+        "hp": 3150,
+        "mana": 100,
+        "atk": [
+          240,
+          440
+        ],
+        "armor": 6,
+        "magic_resist": 20,
+        "atk_rate": 1.2,
+        "atk_range": 400
+      }
+    }
+  },
+  "overrides": {}
+}

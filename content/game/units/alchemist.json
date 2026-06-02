@@ -1,0 +1,64 @@
+{
+  "gameId": "chess_ga",
+  "name": "Alchemist",
+  "slug": "alchemist",
+  "source": {
+    "id": "chess_ga",
+    "cost": 4,
+    "pool": "standard",
+    "synergies": [
+      "Goblin",
+      "Ogre",
+      "Warlock"
+    ],
+    "names": {
+      "en": "Alchemist",
+      "lore": "Razzil۰Darkbrew",
+      "ko": "연금술사",
+      "ru": "Alchemist",
+      "zh-cn": "炼金术士",
+      "zh-tw": "煉金術士"
+    },
+    "attack_type": "melee",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 1050,
+        "mana": 100,
+        "atk": [
+          50,
+          110
+        ],
+        "armor": 6,
+        "magic_resist": 0,
+        "atk_rate": 1.3,
+        "atk_range": 205
+      },
+      "2_star": {
+        "hp": 2100,
+        "mana": 100,
+        "atk": [
+          100,
+          220
+        ],
+        "armor": 6,
+        "magic_resist": 0,
+        "atk_rate": 1.3,
+        "atk_range": 205
+      },
+      "3_star": {
+        "hp": 4200,
+        "mana": 100,
+        "atk": [
+          200,
+          440
+        ],
+        "armor": 6,
+        "magic_resist": 0,
+        "atk_rate": 1.3,
+        "atk_range": 205
+      }
+    }
+  },
+  "overrides": {}
+}

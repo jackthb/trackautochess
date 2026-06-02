@@ -1,0 +1,23 @@
+{
+  "gameId": "item_xuanmingdunpai",
+  "name": "Buckler",
+  "slug": "buckler",
+  "source": {
+    "name": "Buckler",
+    "description": "Armor +5。",
+    "lore": "",
+    "quality": "consumable",
+    "texture": "buckler",
+    "notes": [],
+    "names": {
+      "en": "Buckler",
+      "ru": "Buckler"
+    },
+    "descriptions": {
+      "en": "Armor +5。",
+      "ru": "Броня +5."
+    },
+    "lore_i18n": {}
+  },
+  "overrides": {}
+}

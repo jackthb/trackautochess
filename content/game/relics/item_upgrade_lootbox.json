@@ -1,0 +1,22 @@
+{
+  "gameId": "item_upgrade_lootbox",
+  "name": "Weaponsmith",
+  "slug": "weaponsmith",
+  "source": {
+    "name": "Weaponsmith",
+    "description": "You gain +1 to the level of loot tokens you get for recasting equipment.\n After recasting 2 pieces of Spoil tokens, the weapon smith will disappear.",
+    "lore": "",
+    "names": {
+      "en": "Weaponsmith",
+      "ru": "Weaponsmith"
+    },
+    "descriptions": {
+      "en": "You gain +1 to the level of loot tokens you get for recasting equipment.\n After recasting 2 pieces of Spoil tokens, the weapon smith will disappear.",
+      "ru": "Вы получаете +1 к уровню жетонов при переработке предметов.\n После переработки 2 жетонов Weaponsmith исчезнет."
+    },
+    "lore_i18n": {
+      "ru": "Из Relicbox"
+    }
+  },
+  "overrides": {}
+}

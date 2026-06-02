@@ -1,0 +1,63 @@
+{
+  "gameId": "chess_kez",
+  "name": "Kez",
+  "slug": "kez",
+  "source": {
+    "id": "chess_kez",
+    "cost": 3,
+    "pool": "standard",
+    "synergies": [
+      "Assassin",
+      "Harpy"
+    ],
+    "names": {
+      "en": "Kez",
+      "lore": "Kestrel",
+      "ko": "케즈",
+      "ru": "Kez",
+      "zh-cn": "影武者",
+      "zh-tw": "影武者"
+    },
+    "attack_type": "ranged",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 650,
+        "mana": 100,
+        "atk": [
+          60,
+          100
+        ],
+        "armor": 6,
+        "magic_resist": 10,
+        "atk_rate": 1.1,
+        "atk_range": 205
+      },
+      "2_star": {
+        "hp": 1300,
+        "mana": 100,
+        "atk": [
+          120,
+          200
+        ],
+        "armor": 6,
+        "magic_resist": 10,
+        "atk_rate": 1.1,
+        "atk_range": 205
+      },
+      "3_star": {
+        "hp": 2600,
+        "mana": 100,
+        "atk": [
+          240,
+          400
+        ],
+        "armor": 6,
+        "magic_resist": 10,
+        "atk_rate": 1.1,
+        "atk_range": 205
+      }
+    }
+  },
+  "overrides": {}
+}

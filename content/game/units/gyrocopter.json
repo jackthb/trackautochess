@@ -1,0 +1,63 @@
+{
+  "gameId": "chess_gyro",
+  "name": "Gyrocopter",
+  "slug": "gyrocopter",
+  "source": {
+    "id": "chess_gyro",
+    "cost": 5,
+    "pool": "standard",
+    "synergies": [
+      "Dwarf",
+      "Mech"
+    ],
+    "names": {
+      "en": "Gyrocopter",
+      "lore": "Aurel",
+      "ko": "자이로콥터",
+      "ru": "Gyrocopter",
+      "zh-cn": "矮人直升机",
+      "zh-tw": "矮人直升機"
+    },
+    "attack_type": "ranged",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 900,
+        "mana": 0,
+        "atk": [
+          65,
+          85
+        ],
+        "armor": 12,
+        "magic_resist": 0,
+        "atk_rate": 0.9,
+        "atk_range": 400
+      },
+      "2_star": {
+        "hp": 1800,
+        "mana": 0,
+        "atk": [
+          130,
+          170
+        ],
+        "armor": 12,
+        "magic_resist": 0,
+        "atk_rate": 0.9,
+        "atk_range": 400
+      },
+      "3_star": {
+        "hp": 3600,
+        "mana": 0,
+        "atk": [
+          260,
+          340
+        ],
+        "armor": 12,
+        "magic_resist": 0,
+        "atk_rate": 0.9,
+        "atk_range": 400
+      }
+    }
+  },
+  "overrides": {}
+}

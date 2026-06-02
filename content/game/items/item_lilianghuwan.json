@@ -1,0 +1,23 @@
+{
+  "gameId": "item_lilianghuwan",
+  "name": "Bracer",
+  "slug": "bracer",
+  "source": {
+    "name": "Bracer",
+    "description": "HP +300.",
+    "lore": "",
+    "quality": "common",
+    "texture": "bracer",
+    "notes": [],
+    "names": {
+      "en": "Bracer",
+      "ru": "Bracer"
+    },
+    "descriptions": {
+      "en": "HP +300.",
+      "ru": "Здоровье +300."
+    },
+    "lore_i18n": {}
+  },
+  "overrides": {}
+}

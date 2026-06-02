@@ -1,0 +1,64 @@
+{
+  "gameId": "chess_morph",
+  "name": "Morphling",
+  "slug": "morphling",
+  "source": {
+    "id": "chess_morph",
+    "cost": 5,
+    "pool": "standard",
+    "synergies": [
+      "Assassin",
+      "Elemental",
+      "Elf"
+    ],
+    "names": {
+      "en": "Morphling",
+      "lore": "Morphling",
+      "ko": "모플링",
+      "ru": "Morphling",
+      "zh-cn": "变体精灵",
+      "zh-tw": "變體精靈"
+    },
+    "attack_type": "ranged",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 1000,
+        "mana": 0,
+        "atk": [
+          70,
+          80
+        ],
+        "armor": 5,
+        "magic_resist": 10,
+        "atk_rate": 1.4,
+        "atk_range": 400
+      },
+      "2_star": {
+        "hp": 2000,
+        "mana": 0,
+        "atk": [
+          140,
+          160
+        ],
+        "armor": 5,
+        "magic_resist": 10,
+        "atk_rate": 1.4,
+        "atk_range": 400
+      },
+      "3_star": {
+        "hp": 4000,
+        "mana": 0,
+        "atk": [
+          280,
+          320
+        ],
+        "armor": 5,
+        "magic_resist": 10,
+        "atk_rate": 1.4,
+        "atk_range": 400
+      }
+    }
+  },
+  "overrides": {}
+}

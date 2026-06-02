@@ -1,0 +1,23 @@
+{
+  "gameId": "item_card_fate",
+  "name": "Card: Fate",
+  "slug": "card-fate",
+  "source": {
+    "name": "Card: Fate",
+    "description": "Courier Consumable: Click to use\nYou can designate a chess piece to permanently gain an additional race from the nearest other race",
+    "lore": "",
+    "quality": "consumable",
+    "texture": "custom/card_fate",
+    "notes": [],
+    "names": {
+      "en": "Card: Fate",
+      "ru": "Card: Fate"
+    },
+    "descriptions": {
+      "en": "Courier Consumable: Click to use\nYou can designate a chess piece to permanently gain an additional race from the nearest other race",
+      "ru": "Courier Consumable: Click to use\nYou can designate a chess piece to permanently gain an additional race from the nearest other race"
+    },
+    "lore_i18n": {}
+  },
+  "overrides": {}
+}

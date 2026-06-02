@@ -1,0 +1,63 @@
+{
+  "gameId": "chess_om",
+  "name": "Ogre Magi",
+  "slug": "ogre-magi",
+  "source": {
+    "id": "chess_om",
+    "cost": 3,
+    "pool": "standard",
+    "synergies": [
+      "Mage",
+      "Ogre"
+    ],
+    "names": {
+      "en": "Ogre Magi",
+      "lore": "Aggron۰Stonebreaker",
+      "ko": "오거마법사",
+      "ru": "Ogre Magi",
+      "zh-cn": "食人魔魔法师",
+      "zh-tw": "食人魔魔法師"
+    },
+    "attack_type": "melee",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 950,
+        "mana": 0,
+        "atk": [
+          55,
+          75
+        ],
+        "armor": 3,
+        "magic_resist": 20,
+        "atk_rate": 1.5,
+        "atk_range": 205
+      },
+      "2_star": {
+        "hp": 1900,
+        "mana": 0,
+        "atk": [
+          110,
+          150
+        ],
+        "armor": 3,
+        "magic_resist": 20,
+        "atk_rate": 1.5,
+        "atk_range": 205
+      },
+      "3_star": {
+        "hp": 3800,
+        "mana": 0,
+        "atk": [
+          220,
+          300
+        ],
+        "armor": 3,
+        "magic_resist": 20,
+        "atk_rate": 1.5,
+        "atk_range": 205
+      }
+    }
+  },
+  "overrides": {}
+}

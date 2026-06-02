@@ -103,15 +103,15 @@
           "kind": "nerf",
           "name": "Mechs - Heart of the Machine",
           "detail": "Chances to upgrade into gold heart, and the chance rises with your courier level",
-          "entity_type": "synergy",
-          "entity_slug": "mech",
           "commentary": "With 6 Mech units, winning a home round no longer *guarantees* the golden rolls. It's now a chance based, and the odds scale with **courier level**:\n\n| Courier level | Gold Heart chance |\n|---|---|\n| ≤ 5 | 0% |\n| 6 | 25% |\n| 7 | 50% |\n| 8 | 75% |\n| 9+ | Guaranteed |\n\nFailed rolls you still return the normal **Heart of the Machine** (a free reroll). ",
           "evidence": [
             {
               "source": "vpk",
               "detail": "`scripts/vscripts/addon_game_mode.lua` (home-win loot handler): at the (6) tier the drop is gated by `prob = (hero:GetLevel()-5)*0.25`, then `if RandomFloat(0,1) < prob` grants `item_jixiezhixin_gold`, else `item_jixiezhixin`. \n\n`hero:GetLevel()` is the courier level."
             }
-          ]
+          ],
+          "entity_type": "synergy",
+          "entity_slug": "mech"
         }
       ]
     }

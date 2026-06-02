@@ -1,0 +1,23 @@
+{
+  "gameId": "item_linglichangbian",
+  "name": "Bullwhip",
+  "slug": "bullwhip",
+  "source": {
+    "name": "Bullwhip",
+    "description": "Chess pieces summoned by the carrier gain: Attack speed +100%, duration +100%",
+    "lore": "",
+    "quality": "common",
+    "texture": "bullwhip",
+    "notes": [],
+    "names": {
+      "en": "Bullwhip",
+      "ru": "Bullwhip"
+    },
+    "descriptions": {
+      "en": "Chess pieces summoned by the carrier gain: Attack speed +100%, duration +100%",
+      "ru": "Фигуры, призванные носителем, получают: скорость атаки +100%, продолжительность жизни +100%."
+    },
+    "lore_i18n": {}
+  },
+  "overrides": {}
+}

@@ -1,0 +1,63 @@
+{
+  "gameId": "chess_axe",
+  "name": "Axe",
+  "slug": "axe",
+  "source": {
+    "id": "chess_axe",
+    "cost": 1,
+    "pool": "standard",
+    "synergies": [
+      "Orc",
+      "Warrior"
+    ],
+    "names": {
+      "en": "Axe",
+      "lore": "MogulKahn",
+      "ko": "도끼전사",
+      "ru": "Axe",
+      "zh-cn": "斧王",
+      "zh-tw": "斧王"
+    },
+    "attack_type": "melee",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 750,
+        "mana": 100,
+        "atk": [
+          50,
+          70
+        ],
+        "armor": 4,
+        "magic_resist": 0,
+        "atk_rate": 1.5,
+        "atk_range": 205
+      },
+      "2_star": {
+        "hp": 1500,
+        "mana": 100,
+        "atk": [
+          100,
+          140
+        ],
+        "armor": 4,
+        "magic_resist": 0,
+        "atk_rate": 1.5,
+        "atk_range": 205
+      },
+      "3_star": {
+        "hp": 3000,
+        "mana": 100,
+        "atk": [
+          200,
+          280
+        ],
+        "armor": 4,
+        "magic_resist": 0,
+        "atk_rate": 1.5,
+        "atk_range": 205
+      }
+    }
+  },
+  "overrides": {}
+}

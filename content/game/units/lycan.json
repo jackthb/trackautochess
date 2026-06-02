@@ -1,0 +1,64 @@
+{
+  "gameId": "chess_lyc",
+  "name": "Lycan",
+  "slug": "lycan",
+  "source": {
+    "id": "chess_lyc",
+    "cost": 3,
+    "pool": "standard",
+    "synergies": [
+      "Beast",
+      "Human",
+      "Warrior"
+    ],
+    "names": {
+      "en": "Lycan",
+      "lore": "Banehallow",
+      "ko": "늑대인간",
+      "ru": "Lycan",
+      "zh-cn": "狼人",
+      "zh-tw": "狼人"
+    },
+    "attack_type": "melee",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 700,
+        "mana": 100,
+        "atk": [
+          50,
+          60
+        ],
+        "armor": 4,
+        "magic_resist": 0,
+        "atk_rate": 1.3,
+        "atk_range": 205
+      },
+      "2_star": {
+        "hp": 1400,
+        "mana": 100,
+        "atk": [
+          100,
+          120
+        ],
+        "armor": 4,
+        "magic_resist": 0,
+        "atk_rate": 1.3,
+        "atk_range": 205
+      },
+      "3_star": {
+        "hp": 2800,
+        "mana": 100,
+        "atk": [
+          200,
+          240
+        ],
+        "armor": 4,
+        "magic_resist": 0,
+        "atk_rate": 1.3,
+        "atk_range": 205
+      }
+    }
+  },
+  "overrides": {}
+}

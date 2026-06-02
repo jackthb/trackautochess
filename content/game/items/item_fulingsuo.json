@@ -1,0 +1,26 @@
+{
+  "gameId": "item_fulingsuo",
+  "name": "Gleipnir",
+  "slug": "gleipnir",
+  "source": {
+    "name": "Gleipnir",
+    "description": "Attack speed +30%.\n\nActive ability: Instant\nEntangle the highest-level enemy piece within a 2-grid radius, immobilizing all enemy pieces in that range for 4 seconds and dealing 100 points of magical damage.",
+    "lore": "Bindings forged by impossible means to leash an ancient evil.",
+    "quality": "epic",
+    "texture": "item_gungir",
+    "notes": [],
+    "names": {
+      "en": "Gleipnir",
+      "ru": "Gleipnir"
+    },
+    "descriptions": {
+      "en": "Attack speed +30%.\n\nActive ability: Instant\nEntangle the highest-level enemy piece within a 2-grid radius, immobilizing all enemy pieces in that range for 4 seconds and dealing 100 points of magical damage.",
+      "ru": "Скорость атаки+30%.\n\nАктивка: Мгновенная\nПривязывает фигуру противника самого высокого уровня в радиусе 2 клеток, обездвиживая все вражеские фигуры в этом радиусе на 4 секунды и нанося 100 магического урона."
+    },
+    "lore_i18n": {
+      "en": "Bindings forged by impossible means to leash an ancient evil.",
+      "ru": "Узы, выкованные невозможными средствами, чтобы сдерживать древнее зло."
+    }
+  },
+  "overrides": {}
+}

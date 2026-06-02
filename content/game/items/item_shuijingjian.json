@@ -1,0 +1,23 @@
+{
+  "gameId": "item_shuijingjian",
+  "name": "Crystalys",
+  "slug": "crystalys",
+  "source": {
+    "name": "Crystalys",
+    "description": "Attacks have a 20% chance to cause 200% critical strike damage.",
+    "lore": "",
+    "quality": "rare",
+    "texture": "item_lesser_crit",
+    "notes": [],
+    "names": {
+      "en": "Crystalys",
+      "ru": "Crystalys"
+    },
+    "descriptions": {
+      "en": "Attacks have a 20% chance to cause 200% critical strike damage.",
+      "ru": "Атаки имеют 20% шанс нанести 200% урона от критического удара."
+    },
+    "lore_i18n": {}
+  },
+  "overrides": {}
+}

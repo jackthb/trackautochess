@@ -15,7 +15,7 @@ interface RelicInfo {
 }
 
 export interface DisplayRelic {
-  /** Sanity doc identity, present only on draft-mode reads (for click-to-edit). */
+  /** Optional CMS identity, reserved for editor integrations. */
   _id?: string;
   _type?: string;
   slug: string;

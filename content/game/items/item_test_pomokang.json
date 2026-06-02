@@ -1,0 +1,20 @@
+{
+  "gameId": "item_test_pomokang",
+  "name": "Test item: -50% magic resistance",
+  "slug": "test-item-50-magic-resistance",
+  "source": {
+    "name": "Test item: -50% magic resistance",
+    "description": "",
+    "lore": "",
+    "quality": "consumable",
+    "texture": "item_vengeances_shadow",
+    "notes": [],
+    "names": {
+      "en": "Test item: -50% magic resistance",
+      "ru": "Test item: -50% magic resistance"
+    },
+    "descriptions": {},
+    "lore_i18n": {}
+  },
+  "overrides": {}
+}

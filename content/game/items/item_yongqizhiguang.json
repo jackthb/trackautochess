@@ -1,0 +1,23 @@
+{
+  "gameId": "item_yongqizhiguang",
+  "name": "Spark of Courage",
+  "slug": "spark-of-courage",
+  "source": {
+    "name": "Spark of Courage",
+    "description": "Carrier deals +25% damage to enemies level higher than carrier.",
+    "lore": "",
+    "quality": "rare",
+    "texture": "item_spark_of_courage",
+    "notes": [],
+    "names": {
+      "en": "Spark of Courage",
+      "ru": "Spark of Courage"
+    },
+    "descriptions": {
+      "en": "Carrier deals +25% damage to enemies level higher than carrier.",
+      "ru": "Наносит +25% урона врагам чей уровень выше носителя."
+    },
+    "lore_i18n": {}
+  },
+  "overrides": {}
+}

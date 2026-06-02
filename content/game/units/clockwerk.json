@@ -1,0 +1,63 @@
+{
+  "gameId": "chess_clock",
+  "name": "Clockwerk",
+  "slug": "clockwerk",
+  "source": {
+    "id": "chess_clock",
+    "cost": 1,
+    "pool": "standard",
+    "synergies": [
+      "Goblin",
+      "Mech"
+    ],
+    "names": {
+      "en": "Clockwerk",
+      "lore": "Rattletra",
+      "ko": "태엽장이",
+      "ru": "Clockwerk",
+      "zh-cn": "发条技师",
+      "zh-tw": "發條技師"
+    },
+    "attack_type": "melee",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 700,
+        "mana": 100,
+        "atk": [
+          45,
+          55
+        ],
+        "armor": 4,
+        "magic_resist": 0,
+        "atk_rate": 1.4,
+        "atk_range": 205
+      },
+      "2_star": {
+        "hp": 1400,
+        "mana": 100,
+        "atk": [
+          90,
+          110
+        ],
+        "armor": 4,
+        "magic_resist": 0,
+        "atk_rate": 1.4,
+        "atk_range": 205
+      },
+      "3_star": {
+        "hp": 2800,
+        "mana": 100,
+        "atk": [
+          180,
+          220
+        ],
+        "armor": 4,
+        "magic_resist": 0,
+        "atk_rate": 1.4,
+        "atk_range": 205
+      }
+    }
+  },
+  "overrides": {}
+}

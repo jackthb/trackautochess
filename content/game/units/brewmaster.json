@@ -1,0 +1,63 @@
+{
+  "gameId": "chess_brew",
+  "name": "Brewmaster",
+  "slug": "brewmaster",
+  "source": {
+    "id": "chess_brew",
+    "cost": 1,
+    "pool": "standard",
+    "synergies": [
+      "Monk",
+      "Pandaren"
+    ],
+    "names": {
+      "en": "Brewmaster",
+      "lore": "Mangix",
+      "ko": "취권도사",
+      "ru": "Brewmaster",
+      "zh-cn": "熊猫酒仙",
+      "zh-tw": "熊貓酒仙"
+    },
+    "attack_type": "melee",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 600,
+        "mana": 100,
+        "atk": [
+          50,
+          60
+        ],
+        "armor": 3,
+        "magic_resist": 20,
+        "atk_rate": 1.5,
+        "atk_range": 205
+      },
+      "2_star": {
+        "hp": 1200,
+        "mana": 100,
+        "atk": [
+          100,
+          120
+        ],
+        "armor": 3,
+        "magic_resist": 20,
+        "atk_rate": 1.5,
+        "atk_range": 205
+      },
+      "3_star": {
+        "hp": 2400,
+        "mana": 100,
+        "atk": [
+          200,
+          240
+        ],
+        "armor": 3,
+        "magic_resist": 20,
+        "atk_rate": 1.5,
+        "atk_range": 205
+      }
+    }
+  },
+  "overrides": {}
+}

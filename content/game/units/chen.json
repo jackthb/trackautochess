@@ -1,0 +1,63 @@
+{
+  "gameId": "chess_chen",
+  "name": "Chen",
+  "slug": "chen",
+  "source": {
+    "id": "chess_chen",
+    "cost": 4,
+    "pool": "standard",
+    "synergies": [
+      "Orc",
+      "Priest"
+    ],
+    "names": {
+      "en": "Chen",
+      "lore": "Chen",
+      "ko": "첸",
+      "ru": "Chen",
+      "zh-cn": "上帝之手",
+      "zh-tw": "上帝之手"
+    },
+    "attack_type": "ranged",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 900,
+        "mana": 100,
+        "atk": [
+          40,
+          60
+        ],
+        "armor": 6,
+        "magic_resist": 10,
+        "atk_rate": 1.4,
+        "atk_range": 400
+      },
+      "2_star": {
+        "hp": 1800,
+        "mana": 100,
+        "atk": [
+          80,
+          120
+        ],
+        "armor": 6,
+        "magic_resist": 10,
+        "atk_rate": 1.4,
+        "atk_range": 400
+      },
+      "3_star": {
+        "hp": 3600,
+        "mana": 100,
+        "atk": [
+          160,
+          240
+        ],
+        "armor": 6,
+        "magic_resist": 10,
+        "atk_rate": 1.4,
+        "atk_range": 400
+      }
+    }
+  },
+  "overrides": {}
+}

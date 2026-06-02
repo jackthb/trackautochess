@@ -1,0 +1,64 @@
+{
+  "gameId": "chess_bh",
+  "name": "Bounty Hunter",
+  "slug": "bounty-hunter",
+  "source": {
+    "id": "chess_bh",
+    "cost": 1,
+    "pool": "standard",
+    "synergies": [
+      "Draenei",
+      "Goblin",
+      "Hunter"
+    ],
+    "names": {
+      "en": "Bounty Hunter",
+      "lore": "Gondar",
+      "ko": "현상금 사냥꾼",
+      "ru": "Bounty Hunter",
+      "zh-cn": "赏金猎人",
+      "zh-tw": "賞金獵人"
+    },
+    "attack_type": "melee",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 500,
+        "mana": 100,
+        "atk": [
+          50,
+          70
+        ],
+        "armor": 1,
+        "magic_resist": 0,
+        "atk_rate": 1,
+        "atk_range": 205
+      },
+      "2_star": {
+        "hp": 1000,
+        "mana": 100,
+        "atk": [
+          100,
+          140
+        ],
+        "armor": 1,
+        "magic_resist": 0,
+        "atk_rate": 1,
+        "atk_range": 205
+      },
+      "3_star": {
+        "hp": 2000,
+        "mana": 100,
+        "atk": [
+          200,
+          280
+        ],
+        "armor": 1,
+        "magic_resist": 0,
+        "atk_rate": 1,
+        "atk_range": 205
+      }
+    }
+  },
+  "overrides": {}
+}

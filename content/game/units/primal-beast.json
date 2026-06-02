@@ -1,0 +1,63 @@
+{
+  "gameId": "chess_pb",
+  "name": "Primal Beast",
+  "slug": "primal-beast",
+  "source": {
+    "id": "chess_pb",
+    "cost": 5,
+    "pool": "standard",
+    "synergies": [
+      "Beast",
+      "Warrior"
+    ],
+    "names": {
+      "en": "Primal Beast",
+      "lore": "Beast",
+      "ko": "원시 야수",
+      "ru": "Primal Beast",
+      "zh-cn": "原始巨兽",
+      "zh-tw": "原始巨獸"
+    },
+    "attack_type": "ranged",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 1300,
+        "mana": 100,
+        "atk": [
+          150,
+          200
+        ],
+        "armor": 11,
+        "magic_resist": 10,
+        "atk_rate": 1.8,
+        "atk_range": 205
+      },
+      "2_star": {
+        "hp": 2600,
+        "mana": 100,
+        "atk": [
+          300,
+          400
+        ],
+        "armor": 11,
+        "magic_resist": 10,
+        "atk_rate": 1.8,
+        "atk_range": 205
+      },
+      "3_star": {
+        "hp": 5200,
+        "mana": 100,
+        "atk": [
+          600,
+          800
+        ],
+        "armor": 11,
+        "magic_resist": 10,
+        "atk_rate": 1.8,
+        "atk_range": 205
+      }
+    }
+  },
+  "overrides": {}
+}

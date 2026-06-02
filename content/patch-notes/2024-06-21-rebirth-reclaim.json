@@ -1,0 +1,339 @@
+{
+  "date": "2024-06-21",
+  "title": "Rebirth & Reclaim",
+  "source": "https://docs.google.com/document/d/e/2PACX-1vQcMxRouZByJ4f1GbWMX4sDUVquOaL40P68gd4JMEtTCjAY4BkGO_3sCYq034AArL_H9Fu3blJ4hqSg/pub",
+  "flavor": "The Wraith King’s body had been totally destroyed after times of death. But he pinned his only hope on an ancient ceremony called Rebirth Eve. At that moment, the aurora sweeps over the land with a dazzling radiance. All undeads can rebirth and even derive a new talent with the aurora essence. Aegis of Immortal, found as a special offering, will play an important part, when the Wraith King reclaim his throne. Will he surprise us all?",
+  "sections": [
+    {
+      "heading": "Game Rules",
+      "entries": [
+        {
+          "kind": "change",
+          "name": "Deathrattle",
+          "detail": "A unified definition - Effect on a chess piece killed. (Including Resurrect, Aegis of Immortal, Bloodthrone, Infection, Soul Leech etc.)"
+        },
+        {
+          "kind": "change",
+          "name": "All illusion pieces cannot trigger Battlecry now",
+          "detail": ""
+        },
+        {
+          "kind": "change",
+          "name": "Only Tier 4 & Tier 5 items will be broadcast in bullet (to avoid too many info bullets)",
+          "detail": ""
+        }
+      ]
+    },
+    {
+      "heading": "Chess Pieces",
+      "entries": [
+        {
+          "kind": "change",
+          "name": "Returned Chess Piece",
+          "detail": ""
+        },
+        {
+          "kind": "change",
+          "name": "Wraith King($4, Undead/Warrior)",
+          "detail": "Ability: Spectral Blade <Passive Skill> Wraith King’s form regroups after death, allowing him to reincarnate when killed. <Passive Skill> Wraith King’s cursed attack deals additional pure damage after a short delay, with a fixed damage and a percentage of his attack damage. Cursed debuff cannot be stacked. Conspirators against the Wraith King wonder why he never stays dead.",
+          "entity": {
+            "type": "unit",
+            "slug": "wraith-king"
+          }
+        },
+        {
+          "kind": "change",
+          "name": "Clinkz($2, Undead/Hunter)",
+          "detail": "Ability: Burning Barrage <Active Skill: Activate on Full Mana> Clinkz shoots multiple burning arrows that hit all enemies in a line. Every shot deals his physical attack damage. It’s hard to say whether the blur around the Bone Fletcher is from his flaming heart or his speed with the quiver.",
+          "entity": {
+            "type": "unit",
+            "slug": "clinkz"
+          }
+        },
+        {
+          "kind": "change",
+          "name": "Necrophos - Reaper’s Scythe",
+          "detail": "“Prevent its victim from deathrattle” added, “Death Pulse” removed. <Active Skill: Activate on Full Mana> Stun and deal pure damage to an enemy with his Reaper’s Scythe and prevent its victim from deathrattle. Damage dealt is positively related to the lost health of the victim.",
+          "entity": {
+            "type": "unit",
+            "slug": "necrophos"
+          }
+        },
+        {
+          "kind": "nerf",
+          "name": "Pudge - Meathook",
+          "detail": "Damage decreased from 250/350/450 to 200/300/450",
+          "entity": {
+            "type": "unit",
+            "slug": "pudge"
+          }
+        },
+        {
+          "kind": "nerf",
+          "name": "Drow Ranger - Gust",
+          "detail": "Silence Duration decreased from 3/4/5 secs to 2/3/5 secs",
+          "entity": {
+            "type": "unit",
+            "slug": "drow-ranger"
+          }
+        },
+        {
+          "kind": "nerf",
+          "name": "Muerta - Pierce the Veil",
+          "detail": "Damage bonus decrease from 75/100/125 to 50/75/125",
+          "entity": {
+            "type": "unit",
+            "slug": "muerta"
+          }
+        },
+        {
+          "kind": "change",
+          "name": "Pangolier - Swashbuckle",
+          "detail": "Immune to all damage when rolling.",
+          "entity": {
+            "type": "unit",
+            "slug": "pangolier"
+          }
+        },
+        {
+          "kind": "nerf",
+          "name": "Templar Assassin - Refraction",
+          "detail": "Cooldown increased from 6/6/6 secs to 8/7/6 secs, refraction times decreased from 3/5/7 to 2/4/6",
+          "entity": {
+            "type": "unit",
+            "slug": "templar-assassin"
+          }
+        }
+      ]
+    },
+    {
+      "heading": "Synergies",
+      "entries": [
+        {
+          "kind": "rework",
+          "name": "Undead - Plague",
+          "detail": "Reworked (3) Undeads: All non-undead pieces of both sides in the battle gain the plague effect: maximum health -10%. (6) Undeads: All non-undead pieces of both sides in the battle gain the plague effect: maximum health -40%. (9) Undeads: All plague-infected pieces have a certain lifespan and will suicide.",
+          "entity": {
+            "type": "synergy",
+            "slug": "undead"
+          }
+        }
+      ]
+    },
+    {
+      "heading": "Items",
+      "entries": [
+        {
+          "kind": "rework",
+          "name": "Ascetic’s Cap, now Tier 1 instead of Tier 2",
+          "detail": "Reworked ★ or ★★ Non-undead carrier gains: If the carrier survives a home battle, it will resurrect into a random undead piece of the same cost at the beginning of next round. *At most 1 undead piece can resurrect each round. *Resurrect buff is settled when battle starts. Chess pieces given the cap during battle cannot resurrect this round. *★★★ Pieces and IO cannot resurrect. Independ with Dismiss. An austere cap from Undery."
+        },
+        {
+          "kind": "added",
+          "name": "New Tier 4 Item - Aegis of Immortal",
+          "detail": "Deathrattle: Resurrect once after death. Immortals used to have a magical shield to prevent them from death."
+        },
+        {
+          "kind": "change",
+          "name": "DragonLance, now Tier 2 instead of Tier 1",
+          "detail": "Attack damage +20%, ranged carrier attack range +200"
+        },
+        {
+          "kind": "change",
+          "name": "Giant's Ring",
+          "detail": "Blocks 100 damage instead of 120 damage, and +30 HP regen",
+          "entity": {
+            "type": "item",
+            "slug": "giants-ring"
+          }
+        },
+        {
+          "kind": "nerf",
+          "name": "Black King Bar",
+          "detail": "Magic resistance decreased from 100% to 75% when activated",
+          "entity": {
+            "type": "item",
+            "slug": "black-king-bar"
+          }
+        },
+        {
+          "kind": "change",
+          "name": "Rapier",
+          "detail": "+400 base attack damage instead of +500",
+          "entity": {
+            "type": "item",
+            "slug": "rapier"
+          }
+        }
+      ]
+    },
+    {
+      "heading": "Season Awards",
+      "entries": [
+        {
+          "kind": "change",
+          "name": "The EoS rewards for S31 Keshira Season (01/05 to 30/06) are based on the following",
+          "detail": "♕Top 20 Queens (on Leaderboard): S31 Badge + ♕Queen rewards. ♕Queen: 320 Candies + Crown (valid for S32) + Keshira♦Black. ♔King: 320 Candies + Keshira♦White. ♖Rook: 160 Candies + Keshira♦Red. ♗Bishop: 80 Candies + Keshira♦Blue. ♘Knight: 40 Candies. ♙Pawn: 20 Candies."
+        },
+        {
+          "kind": "change",
+          "name": "Top 20 Queens are rewarded based on their final places and the other ranks for the highest rank achieved in the season",
+          "detail": ""
+        },
+        {
+          "kind": "change",
+          "name": "As usual, the last day of the season will be the off-season break to award the excellent players. Games played on the day do not affect Rankings. The new season of S32 Jade Fairy Season starts on 01/07/2024!",
+          "detail": ""
+        }
+      ]
+    },
+    {
+      "heading": "Bug Fixes",
+      "entries": [
+        {
+          "kind": "fix",
+          "name": "General",
+          "detail": "Various bug fixes."
+        }
+      ]
+    },
+    {
+      "heading": "Rebalance",
+      "entries": [
+        {
+          "kind": "buff",
+          "name": "Monk - Drunken Stagger",
+          "detail": "(4) Monks: Chance increased from 15% to 20%",
+          "entity": {
+            "type": "synergy",
+            "slug": "monk"
+          }
+        },
+        {
+          "kind": "change",
+          "name": "Undead - Horror",
+          "detail": "(3)(6) Undeads -5%/-35% HP instead of -10%/-40%",
+          "entity": {
+            "type": "synergy",
+            "slug": "undead"
+          }
+        },
+        {
+          "kind": "change",
+          "name": "Orc - Battle Hardened",
+          "detail": "(6) Health bonus has a maximum limit of 800 (Courier HP <=20)",
+          "entity": {
+            "type": "synergy",
+            "slug": "orc"
+          }
+        },
+        {
+          "kind": "nerf",
+          "name": "Spectre - Haunt",
+          "detail": "Max illusion count decreased from 5/8/15 to 4/6/10",
+          "entity": {
+            "type": "unit",
+            "slug": "spectres"
+          }
+        },
+        {
+          "kind": "buff",
+          "name": "Mars",
+          "detail": "Base HP increased from 550 to 600",
+          "entity": {
+            "type": "unit",
+            "slug": "mars"
+          }
+        },
+        {
+          "kind": "buff",
+          "name": "Batrider - firefly",
+          "detail": "Damage per second increased from 30/45/75 to 40/60/80",
+          "entity": {
+            "type": "unit",
+            "slug": "batrider"
+          }
+        },
+        {
+          "kind": "buff",
+          "name": "Monkey King",
+          "detail": "Attack interval decreased from 1.1 sec to 1 sec, Boundless Strike stun duration increased from 1/1/2 sec to 1/1.5/2 sec",
+          "entity": {
+            "type": "unit",
+            "slug": "monkey-king"
+          }
+        },
+        {
+          "kind": "nerf",
+          "name": "Anti Mage",
+          "detail": "Magical resistance decreased from 40 to 30, Mana Void multiplier decreased from 4/6/8 to 3/5/8",
+          "entity": {
+            "type": "unit",
+            "slug": "anti-mage"
+          }
+        },
+        {
+          "kind": "change",
+          "name": "Recalled Pangolier modification",
+          "detail": ""
+        },
+        {
+          "kind": "change",
+          "name": "Fix bugs",
+          "detail": ""
+        }
+      ]
+    },
+    {
+      "heading": "Rebalance",
+      "entries": [
+        {
+          "kind": "change",
+          "name": "Vengeful Spirit - Nether Swap",
+          "detail": "Removed armor reduction. <Battlecry: Activates before the start of the battle round.> Swap positions with an enemy chess piece whose star level is no higher than(Nether Swap skill level)",
+          "entity": {
+            "type": "unit",
+            "slug": "vengeful-spirit"
+          }
+        },
+        {
+          "kind": "change",
+          "name": "Winter Wyvern - Cold Embrace",
+          "detail": "Removed attack speed reduction on attacker. <Active Skill: Activates on full mana> Encases an ally in an icy cocoon, freezing them solid while healing a base amount as well as a percentage of their maximum health each second. The cocoon blocks all physical damage.",
+          "entity": {
+            "type": "unit",
+            "slug": "winter-wyvern"
+          }
+        },
+        {
+          "kind": "nerf",
+          "name": "Spectre - Haunt",
+          "detail": "Max haunt count decreased from 4/6/10 to 3/5/8",
+          "entity": {
+            "type": "unit",
+            "slug": "spectres"
+          }
+        },
+        {
+          "kind": "change",
+          "name": "Terrorblade - Metamorphosis",
+          "detail": "Demonic allies cannot extend Aegis of Immortal",
+          "entity": {
+            "type": "unit",
+            "slug": "terrorblade"
+          }
+        },
+        {
+          "kind": "change",
+          "name": "Attempt to fix crash issues after new release",
+          "detail": ""
+        },
+        {
+          "kind": "change",
+          "name": "Fix bugs",
+          "detail": ""
+        }
+      ]
+    }
+  ]
+}

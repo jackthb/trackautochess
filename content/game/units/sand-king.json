@@ -1,0 +1,63 @@
+{
+  "gameId": "chess_sk",
+  "name": "Sand King",
+  "slug": "sand-king",
+  "source": {
+    "id": "chess_sk",
+    "cost": 3,
+    "pool": "standard",
+    "synergies": [
+      "Aqir",
+      "Assassin"
+    ],
+    "names": {
+      "en": "Sand King",
+      "lore": "Crixalis",
+      "ko": "모래 제왕",
+      "ru": "Sand King",
+      "zh-cn": "沙王",
+      "zh-tw": "沙王"
+    },
+    "attack_type": "melee",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 600,
+        "mana": 100,
+        "atk": [
+          45,
+          60
+        ],
+        "armor": 6,
+        "magic_resist": 0,
+        "atk_rate": 1.4,
+        "atk_range": 205
+      },
+      "2_star": {
+        "hp": 1200,
+        "mana": 100,
+        "atk": [
+          90,
+          120
+        ],
+        "armor": 6,
+        "magic_resist": 0,
+        "atk_rate": 1.4,
+        "atk_range": 205
+      },
+      "3_star": {
+        "hp": 2400,
+        "mana": 100,
+        "atk": [
+          180,
+          240
+        ],
+        "armor": 6,
+        "magic_resist": 0,
+        "atk_rate": 1.4,
+        "atk_range": 205
+      }
+    }
+  },
+  "overrides": {}
+}

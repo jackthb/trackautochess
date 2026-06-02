@@ -1,0 +1,23 @@
+{
+  "gameId": "item_lootbox_lv3",
+  "name": "Spoil Token Level 3",
+  "slug": "spoil-token-level-3",
+  "source": {
+    "name": "Spoil Token Level 3",
+    "description": "Courier consumable: Click to open\nSelect one from three random items to your inventory.",
+    "lore": "",
+    "quality": "consumable",
+    "texture": "tier3_token",
+    "notes": [],
+    "names": {
+      "en": "Spoil Token Level 3",
+      "ru": "Жетон ур. 3"
+    },
+    "descriptions": {
+      "en": "Courier consumable: Click to open\nSelect one from three random items to your inventory.",
+      "ru": "Courier consumable: Click to open\nSelect one from three random items to your inventory."
+    },
+    "lore_i18n": {}
+  },
+  "overrides": {}
+}

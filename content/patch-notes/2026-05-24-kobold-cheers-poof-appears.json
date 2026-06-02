@@ -1,0 +1,141 @@
+{
+  "date": "2026-05-24",
+  "title": "Kobold cheers, poof appears",
+  "source": "https://docs.google.com/document/d/e/2PACX-1vRvaFljxcYvhGz83r7cdIZjA91fberUVZd4bhXkKpZtK9rx16gNxnCa1-wJU_bomu3ama5QdNZUh4Nf/pub",
+  "absorbedDates": [
+    "2026-05-25"
+  ],
+  "sections": [
+    {
+      "heading": "Synergy Changes",
+      "entries": [
+        {
+          "kind": "nerf",
+          "name": "Kobold - Divided We Stand",
+          "detail": "Reworked from (1)(2)(3) to (2)(4)",
+          "entity": {
+            "type": "synergy",
+            "slug": "kobold"
+          }
+        },
+        {
+          "kind": "buff",
+          "name": "Monk - Drunken Stagger",
+          "detail": "(6) Added",
+          "entity": {
+            "type": "synergy",
+            "slug": "monk"
+          }
+        },
+        {
+          "kind": "buff",
+          "name": "Naga - Scaled Armor",
+          "detail": "(6) Reflection multiplier increased from 1.5x to 2x",
+          "entity": {
+            "type": "synergy",
+            "slug": "naga"
+          }
+        }
+      ]
+    },
+    {
+      "heading": "Chess Pieces",
+      "entries": [
+        {
+          "kind": "change",
+          "name": "Life Stealer($2,Kobold/Warlock)",
+          "detail": "Class changed from Wizard to Warlock",
+          "entity": {
+            "type": "unit",
+            "slug": "lifestealer"
+          }
+        },
+        {
+          "kind": "nerf",
+          "name": "Phoenix - Sun Ray",
+          "detail": "Base damage decreased from 100/150/250 to 为70/140/210",
+          "entity": {
+            "type": "unit",
+            "slug": "phoenix"
+          }
+        },
+        {
+          "kind": "change",
+          "name": "Nyx Assassin - Spiked Carapace",
+          "detail": "CD balanced from 8/7/5s to 6/6/6s, stun duration decreased from 1.5/2.5/3.5s to 1/2/3s",
+          "entity": {
+            "type": "unit",
+            "slug": "nyx-assassin"
+          }
+        }
+      ]
+    },
+    {
+      "heading": "Items",
+      "entries": [
+        {
+          "kind": "added",
+          "name": "New T3 item",
+          "detail": "Kobold Cup",
+          "entity": {
+            "type": "item",
+            "slug": "kobold-cup"
+          }
+        },
+        {
+          "kind": "change",
+          "name": "Drum of Endurance",
+          "detail": "Downgraded from T3 to T2.",
+          "entity": {
+            "type": "item",
+            "slug": "drum-of-endurance"
+          }
+        },
+        {
+          "kind": "change",
+          "name": "Princes Knife",
+          "detail": "Downgraded from T2 to T1.",
+          "entity": {
+            "type": "item",
+            "slug": "princes-knife"
+          }
+        }
+      ]
+    },
+    {
+      "heading": "Relics",
+      "entries": [
+        {
+          "kind": "nerf",
+          "name": "Lucid Star",
+          "detail": "Chances will be 24%/22%/20%/18%/16% according to the cost of $1/2/3/4/5.",
+          "entity": {
+            "type": "relic",
+            "slug": "lucid-star"
+          }
+        }
+      ]
+    },
+    {
+      "heading": "Hotfix — 2026-05-25",
+      "entries": [
+        {
+          "kind": "nerf",
+          "name": "Mechs - Heart of the Machine",
+          "detail": "Chances to upgrade into gold heart, and the chance rises with your courier level",
+          "commentary": "With 6 Mech units, winning a home round no longer *guarantees* the golden rolls. It's now a chance based, and the odds scale with **courier level**:\n\n| Courier level | Gold Heart chance |\n|---|---|\n| ≤ 5 | 0% |\n| 6 | 25% |\n| 7 | 50% |\n| 8 | 75% |\n| 9+ | Guaranteed |\n\nFailed rolls you still return the normal **Heart of the Machine** (a free reroll). ",
+          "evidence": [
+            {
+              "source": "vpk",
+              "detail": "`scripts/vscripts/addon_game_mode.lua` (home-win loot handler): at the (6) tier the drop is gated by `prob = (hero:GetLevel()-5)*0.25`, then `if RandomFloat(0,1) < prob` grants `item_jixiezhixin_gold`, else `item_jixiezhixin`. \n\n`hero:GetLevel()` is the courier level."
+            }
+          ],
+          "entity": {
+            "type": "synergy",
+            "slug": "mech"
+          }
+        }
+      ]
+    }
+  ]
+}

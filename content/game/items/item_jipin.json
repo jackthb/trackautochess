@@ -1,0 +1,23 @@
+{
+  "gameId": "item_jipin",
+  "name": "Vladimirs Offering",
+  "slug": "vladimirs-offering",
+  "source": {
+    "name": "Vladimirs Offering",
+    "description": "Aura Effect\nAllied units in the surrounding area gain the effect: Lifesteal +25%.",
+    "lore": "",
+    "quality": "rare",
+    "texture": "item_vladmir",
+    "notes": [],
+    "names": {
+      "en": "Vladimirs Offering",
+      "ru": "Vladimirs Offering"
+    },
+    "descriptions": {
+      "en": "Aura Effect\nAllied units in the surrounding area gain the effect: Lifesteal +25%.",
+      "ru": "Aura Effect\nСоюзные юниты в радиусе получают эффект: Вампиризм +25%."
+    },
+    "lore_i18n": {}
+  },
+  "overrides": {}
+}

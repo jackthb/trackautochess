@@ -1,0 +1,63 @@
+{
+  "gameId": "chess_earth",
+  "name": "Earth Spirit",
+  "slug": "earth-spirit",
+  "source": {
+    "id": "chess_earth",
+    "cost": 4,
+    "pool": "special",
+    "synergies": [
+      "Pandaren",
+      "Shaman"
+    ],
+    "names": {
+      "en": "Earth Spirit",
+      "lore": "Kaolin",
+      "ko": "대지령",
+      "ru": "Earth Spirit",
+      "zh-cn": "大地之灵",
+      "zh-tw": "大地之靈"
+    },
+    "attack_type": "melee",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 900,
+        "mana": 100,
+        "atk": [
+          40,
+          70
+        ],
+        "armor": 9,
+        "magic_resist": 0,
+        "atk_rate": 1.5,
+        "atk_range": 205
+      },
+      "2_star": {
+        "hp": 1800,
+        "mana": 100,
+        "atk": [
+          80,
+          140
+        ],
+        "armor": 9,
+        "magic_resist": 0,
+        "atk_rate": 1.5,
+        "atk_range": 205
+      },
+      "3_star": {
+        "hp": 3600,
+        "mana": 100,
+        "atk": [
+          160,
+          320
+        ],
+        "armor": 9,
+        "magic_resist": 0,
+        "atk_rate": 1.5,
+        "atk_range": 205
+      }
+    }
+  },
+  "overrides": {}
+}

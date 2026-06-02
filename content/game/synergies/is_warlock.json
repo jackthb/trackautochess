@@ -1,0 +1,31 @@
+{
+  "gameId": "is_warlock",
+  "name": "Warlock",
+  "slug": "warlock",
+  "source": {
+    "name": "Warlock",
+    "description": "Warlock pieces convert 25% of their health into 50% mana when a battle starts.\n\nClass Perk: Soul Leech\n\nActive when you have at least (N) different Warlock pieces on board. (Multiple effects stack)\n\n(2) Warlocks: All allies have All allies have +5% lifesteal from all damage dealt.\n(4) Warlocks: All allies have All allies have +20% lifesteal from all damage dealt.\n(6) Warlocks: All ally warlocks steal a max health of 0.5x damage on every attack.",
+    "description_html": "Warlock pieces convert 25% of their health into 50% mana when a battle starts.\n<h1>Class Perk: Soul Leech</h1><font color=\"#656585\">Active when you have at least (N) different Warlock pieces on board. (Multiple effects stack)</font><br><br>(2) Warlocks: All allies have All allies have +5% lifesteal from all damage dealt.<br>(4) Warlocks: All allies have All allies have +20% lifesteal from all damage dealt.<br>(6) Warlocks: All ally warlocks steal a max health of 0.5x damage on every attack.",
+    "lore": "Warlocks are cursed sorcerers who use demonic power to drain the life force from their enemies, restoring themselves to continue their cursed battle.",
+    "notes": [],
+    "tiers": [
+      2,
+      4,
+      6
+    ],
+    "ability_special": {},
+    "names": {
+      "en": "Warlock",
+      "ru": "Warlock"
+    },
+    "descriptions": {
+      "en": "Warlock pieces convert 25% of their health into 50% mana when a battle starts.\n\nClass Perk: Soul Leech\n Active when you have at least (N) different Warlock pieces on board. (Multiple effects stack)\n\n(2) Warlocks: All allies have All allies have +5% lifesteal from all damage dealt.\n(4) Warlocks: All allies have All allies have +20% lifesteal from all damage dealt.\n(6) Warlocks: All ally warlocks steal a max health of 0.5x damage on every attack.",
+      "ru": "Варлоки обменивают 25% своего здоровья в 50% маны в начале боя.\n\nClass Perk: Soul Leech\n Активен, когда хотя бы (N) разных Warlocks на доске. (Эффекты складываются)\n\n(2) Warlocks: Все союзники получают +5% вампиризма от всего нанесенного урона.\n(4) Warlocks: Все союзники получают +20% вампиризма от всего нанесенного урона.\n(6) Warlocks: Все союзные варлоки крадут максимальное здоровье, равное нанесенному урону, 0.5x при каждой атаке."
+    },
+    "lore_i18n": {
+      "en": "Warlocks are cursed sorcerers who use demonic power to drain the life force from their enemies, restoring themselves to continue their cursed battle.",
+      "ru": "Warlocks — проклятые чародеи, использующие демоническую силу, чтобы высасывать жизненную энергию врагов и восстанавливать себя для продолжения своей проклятой битвы."
+    }
+  },
+  "overrides": {}
+}

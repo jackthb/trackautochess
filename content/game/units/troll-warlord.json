@@ -1,0 +1,63 @@
+{
+  "gameId": "chess_troll",
+  "name": "Troll Warlord",
+  "slug": "troll-warlord",
+  "source": {
+    "id": "chess_troll",
+    "cost": 5,
+    "pool": "standard",
+    "synergies": [
+      "Troll",
+      "Warrior"
+    ],
+    "names": {
+      "en": "Troll Warlord",
+      "lore": "Jah۰rakal",
+      "ko": "트롤 전쟁군주",
+      "ru": "Troll Warlord",
+      "zh-cn": "巨魔战将",
+      "zh-tw": "巨魔戰將"
+    },
+    "attack_type": "ranged",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 1000,
+        "mana": 0,
+        "atk": [
+          90,
+          130
+        ],
+        "armor": 10,
+        "magic_resist": 10,
+        "atk_rate": 0.8,
+        "atk_range": 400
+      },
+      "2_star": {
+        "hp": 2000,
+        "mana": 0,
+        "atk": [
+          180,
+          260
+        ],
+        "armor": 10,
+        "magic_resist": 10,
+        "atk_rate": 0.8,
+        "atk_range": 400
+      },
+      "3_star": {
+        "hp": 4000,
+        "mana": 0,
+        "atk": [
+          360,
+          520
+        ],
+        "armor": 10,
+        "magic_resist": 10,
+        "atk_rate": 0.8,
+        "atk_range": 400
+      }
+    }
+  },
+  "overrides": {}
+}

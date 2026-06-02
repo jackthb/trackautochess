@@ -1,0 +1,260 @@
+{
+  "date": "2025-10-14",
+  "title": "Havoc from the dark portal",
+  "source": "https://docs.google.com/document/d/e/2PACX-1vSYC2Fo5qpofWkhl12HP0h2kEUI1zuVtjjb0xzBllWrJKJdoQk8g43fzEHSJamiwzwL7mKb7pkMSNZX/pub",
+  "flavor": "The Abyssal Underlord - so mysterious that neither myth nor song exist to tell of their coming. Vrogros is able to conjure forth flame and crippling malice through the twist between worlds. By his command the first waves of abyssal invaders have already marched through his dark portal, a few doomed legions meant merely to test the might of nations above. Now, with his armies fully prepared for endless conquest, Vrogros himself stepped into the sunlit world, announcing his impending reign. Now, as his full force readies itself for unending conquest, Vrogros himself steps into a sunlit world to announce his coming reign. Those who face the Underlord will bow and pay tribute, or be crushed where they stand. Game Optimization",
+  "sections": [
+    {
+      "heading": "Changes",
+      "entries": [
+        {
+          "kind": "change",
+          "name": "Loading optimization",
+          "detail": "Available for reconnection for most conditions. And fixed some freezing problems."
+        },
+        {
+          "kind": "change",
+          "name": "Relic history is now available in Match History",
+          "detail": ""
+        }
+      ]
+    },
+    {
+      "heading": "Chess Pieces",
+      "entries": [
+        {
+          "kind": "added",
+          "name": "New Piece",
+          "detail": "Abyssal Underlord ($5, Demon/Warlock), Ability - Fiend’s Gate <Battlecry Ability: Activates on battle> Opens a portal connecting with the dark spaceThe gate calls demons of the same rank with Underlord continuously and consuming its own health on each call until it is damaged or used up. P.S. The gate has an initial Health equal to the sum of Level of all ally demons. Each demon called consumes its own health equal to the Cost of this piece. P.S. The gate is considered as Ward and immune to ability damage. P.S. Demons called can extend the Fel power of Underlord but the stack counts independently. They come without warning, leaving fire and blood where kingdoms once flourished."
+        }
+      ]
+    },
+    {
+      "heading": "Items",
+      "entries": [
+        {
+          "kind": "nerf",
+          "name": "Witless Shako",
+          "detail": "Downgraded from Tier 2 to Tier 1, +300 Health removed",
+          "entity": {
+            "type": "item",
+            "slug": "witless-shako"
+          }
+        },
+        {
+          "kind": "change",
+          "name": "Spark of Courage",
+          "detail": "Only valid for targets whose level higher than the carrier (previously higher or equals to)",
+          "entity": {
+            "type": "item",
+            "slug": "spark-of-courage"
+          }
+        },
+        {
+          "kind": "buff",
+          "name": "Tranquil Boot",
+          "detail": "Upgraded from Tier 1 to Tier 2, Heal effect upgraded into aura effect."
+        },
+        {
+          "kind": "change",
+          "name": "Kaya",
+          "detail": "+25% mana restoration added",
+          "entity": {
+            "type": "item",
+            "slug": "kaya"
+          }
+        }
+      ]
+    },
+    {
+      "heading": "Bug Fixes",
+      "entries": [
+        {
+          "kind": "fix",
+          "name": "Season Break Patch",
+          "detail": ""
+        },
+        {
+          "kind": "fix",
+          "name": "Tusk",
+          "detail": "Base Health increased from 550 to 600",
+          "entity": {
+            "type": "unit",
+            "slug": "tusk"
+          }
+        },
+        {
+          "kind": "fix",
+          "name": "Clinkz",
+          "detail": "Attack damage decreased from 60 to 50",
+          "entity": {
+            "type": "unit",
+            "slug": "clinkz"
+          }
+        },
+        {
+          "kind": "fix",
+          "name": "Chaos Knight -Chaos Strike",
+          "detail": "Minimum multiplier increased from 120% to 125%, maximum multiplier decreased from 200%/250%/300% to 150%/200%/250%"
+        },
+        {
+          "kind": "fix",
+          "name": "Razor - Plasma Field",
+          "detail": "CD decreased from 15/12/9s to 10/8/6s",
+          "entity": {
+            "type": "unit",
+            "slug": "razor"
+          }
+        },
+        {
+          "kind": "fix",
+          "name": "Undying - Decay",
+          "detail": "Lifesteal percentage decreased from 9%/12%/15% to 8%/10%/12%",
+          "entity": {
+            "type": "unit",
+            "slug": "undying"
+          }
+        },
+        {
+          "kind": "fix",
+          "name": "Earth Spirit",
+          "detail": "Base Health increased from 800 to 900",
+          "entity": {
+            "type": "unit",
+            "slug": "earth-spirit"
+          }
+        },
+        {
+          "kind": "fix",
+          "name": "Abyssal Underlord",
+          "detail": "Summoned Fiends are now the same rank with Abyssal Underlord (instead of the Ability Level)",
+          "entity": {
+            "type": "unit",
+            "slug": "abyssal-underlord"
+          }
+        },
+        {
+          "kind": "fix",
+          "name": "Fix bugs",
+          "detail": ""
+        }
+      ]
+    },
+    {
+      "heading": "Season Awards",
+      "entries": [
+        {
+          "kind": "change",
+          "name": "S39 Scholar Momo(Sep, 1st - Oct 31st) Awards will be granted as follows",
+          "detail": "♕Queen Top 20: Badge for S39 ♕Queen: 320 Candies and Crown(Valid in S40) +Scholar Momo·Gold(Legendary) ♔King: 320 Candies + Scholar Momo·Red(Mythical) ♖Rook: 160 Candies + Scholar Momo·Blue(Rare) ♗Bishop: 80 Candies + Scholar Momo·Green(Common) ♘Knight: 40 Candies ♙Pawn: 20 Candies"
+        },
+        {
+          "kind": "change",
+          "name": "Badges will be settled by the final ranking of the Season. All other awards will be settled by the highest rank in Season",
+          "detail": ""
+        },
+        {
+          "kind": "change",
+          "name": "The last day of the season will be a casual day to settle the awards. You can play casual games without rankings. New Season S40 Dryad Season will be kicked off on Nov 1st",
+          "detail": ""
+        }
+      ]
+    },
+    {
+      "heading": "Rebalance",
+      "entries": [
+        {
+          "kind": "buff",
+          "name": "Axe",
+          "detail": "Base Health increased from 700 to 750",
+          "entity": {
+            "type": "unit",
+            "slug": "axe"
+          }
+        },
+        {
+          "kind": "nerf",
+          "name": "Luna - Moon glaive",
+          "detail": "Bounce times decreased from 3/4/5 to 2/3/4",
+          "entity": {
+            "type": "unit",
+            "slug": "luna"
+          }
+        },
+        {
+          "kind": "buff",
+          "name": "Enigma - Midnight Pulse",
+          "detail": "CD decreased from 15/12/9s to 12/10/8s",
+          "entity": {
+            "type": "unit",
+            "slug": "enigma"
+          }
+        },
+        {
+          "kind": "nerf",
+          "name": "Undying - Decay",
+          "detail": "Lifesteal max health percent decreased from 8%/10%/12% to 4%/6%/8%",
+          "entity": {
+            "type": "unit",
+            "slug": "undying"
+          }
+        },
+        {
+          "kind": "buff",
+          "name": "Viper - Viper Strike",
+          "detail": "CD decreased from 10/8/6s to 7/6/5s",
+          "entity": {
+            "type": "unit",
+            "slug": "viper"
+          }
+        },
+        {
+          "kind": "buff",
+          "name": "Death Prophet - Exorcism",
+          "detail": "CD decreased from 15/12/9s to 8s",
+          "entity": {
+            "type": "unit",
+            "slug": "death-prophet"
+          }
+        },
+        {
+          "kind": "buff",
+          "name": "Phantom Assassin",
+          "detail": "Attack interval decreased from 1.0s to 0.9s",
+          "entity": {
+            "type": "unit",
+            "slug": "phantom-assassin"
+          }
+        },
+        {
+          "kind": "buff",
+          "name": "Phantom Assassin Coup de Grace",
+          "detail": "Chances for critical strike increased from 15% to 20%"
+        },
+        {
+          "kind": "nerf",
+          "name": "Abyssal Underlord - Fiends Gate",
+          "detail": "Call interval increased from 3/2.5/2s to 4/3.5/3s",
+          "entity": {
+            "type": "unit",
+            "slug": "abyssal-underlord"
+          }
+        },
+        {
+          "kind": "buff",
+          "name": "Primal Beast - Pulverize",
+          "detail": "CD decreased from 8/6/4s to 6/5/4s, stun duration increased from 0.5/0.75/1s to 0.5/1/1.5s",
+          "entity": {
+            "type": "unit",
+            "slug": "primal-beast"
+          }
+        },
+        {
+          "kind": "change",
+          "name": "Fix bugs",
+          "detail": ""
+        }
+      ]
+    }
+  ]
+}

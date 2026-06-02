@@ -1,0 +1,63 @@
+{
+  "gameId": "chess_tb",
+  "name": "Terrorblade",
+  "slug": "terrorblade",
+  "source": {
+    "id": "chess_tb",
+    "cost": 3,
+    "pool": "standard",
+    "synergies": [
+      "Demon",
+      "Demon Hunter"
+    ],
+    "names": {
+      "en": "Terrorblade",
+      "lore": "Terrorblade",
+      "ko": "테러블레이드",
+      "ru": "Terrorblade",
+      "zh-cn": "灵魂守卫",
+      "zh-tw": "靈魂守衛"
+    },
+    "attack_type": "melee",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 700,
+        "mana": 100,
+        "atk": [
+          40,
+          80
+        ],
+        "armor": 5,
+        "magic_resist": 20,
+        "atk_rate": 1.1,
+        "atk_range": 205
+      },
+      "2_star": {
+        "hp": 1400,
+        "mana": 100,
+        "atk": [
+          80,
+          160
+        ],
+        "armor": 5,
+        "magic_resist": 20,
+        "atk_rate": 1.1,
+        "atk_range": 205
+      },
+      "3_star": {
+        "hp": 2800,
+        "mana": 100,
+        "atk": [
+          160,
+          320
+        ],
+        "armor": 5,
+        "magic_resist": 20,
+        "atk_rate": 1.1,
+        "atk_range": 205
+      }
+    }
+  },
+  "overrides": {}
+}

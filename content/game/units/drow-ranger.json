@@ -1,0 +1,63 @@
+{
+  "gameId": "chess_dr",
+  "name": "Drow Ranger",
+  "slug": "drow-ranger",
+  "source": {
+    "id": "chess_dr",
+    "cost": 3,
+    "pool": "undead",
+    "synergies": [
+      "Hunter",
+      "Undead"
+    ],
+    "names": {
+      "en": "Drow Ranger",
+      "lore": "Traxex",
+      "ko": "드로우 레인저",
+      "ru": "Drow Ranger",
+      "zh-cn": "卓尔游侠",
+      "zh-tw": "卓爾遊俠"
+    },
+    "attack_type": "ranged",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 600,
+        "mana": 100,
+        "atk": [
+          70,
+          100
+        ],
+        "armor": 4,
+        "magic_resist": 10,
+        "atk_rate": 0.9,
+        "atk_range": 600
+      },
+      "2_star": {
+        "hp": 1200,
+        "mana": 100,
+        "atk": [
+          140,
+          200
+        ],
+        "armor": 4,
+        "magic_resist": 10,
+        "atk_rate": 0.9,
+        "atk_range": 600
+      },
+      "3_star": {
+        "hp": 2400,
+        "mana": 100,
+        "atk": [
+          280,
+          400
+        ],
+        "armor": 4,
+        "magic_resist": 10,
+        "atk_rate": 0.9,
+        "atk_range": 600
+      }
+    }
+  },
+  "overrides": {}
+}

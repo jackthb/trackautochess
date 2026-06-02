@@ -1,0 +1,26 @@
+{
+  "gameId": "item_goutourenjiubei",
+  "name": "Kobold Cup",
+  "slug": "kobold-cup",
+  "source": {
+    "name": "Kobold Cup",
+    "description": "Carrier counts as \nKobold.\nThe carrier and pieces of the same name gain +25% attack speed, inheritable after shapeshift.",
+    "lore": "King of the Kobold enjoys drinking.",
+    "quality": "common",
+    "texture": "kobold_cup",
+    "notes": [],
+    "names": {
+      "en": "Kobold Cup",
+      "ru": "Kobold Cup"
+    },
+    "descriptions": {
+      "en": "Carrier counts as Kobold.\nThe carrier and pieces of the same name gain +25% attack speed, inheritable after shapeshift.",
+      "ru": "Носитель считается Kobold.\nНоситель и фигуры с тем же именем получают +25% к скорости атаки; эффект сохраняется после превращения."
+    },
+    "lore_i18n": {
+      "en": "King of the Kobold enjoys drinking.",
+      "ru": "Король Кобольдов любит выпить."
+    }
+  },
+  "overrides": {}
+}

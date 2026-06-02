@@ -48,3 +48,5 @@ twitch-extension/
 data/vscripts/
 data/vscripts_prev/
 data/vscript_diffs/
+
+.vercel

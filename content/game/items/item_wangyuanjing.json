@@ -1,0 +1,25 @@
+{
+  "gameId": "item_wangyuanjing",
+  "name": "Telescope",
+  "slug": "telescope",
+  "source": {
+    "name": "Telescope",
+    "description": "Ranged carriers will be counted as \nDwarf.",
+    "lore": "",
+    "quality": "common",
+    "texture": "custom/telescope",
+    "notes": [
+      "The bearer retains its original Species as well."
+    ],
+    "names": {
+      "en": "Telescope",
+      "ru": "Telescope"
+    },
+    "descriptions": {
+      "en": "Ranged carriers will be counted as Dwarf.",
+      "ru": "Дальнобойный владелец считается Dwarf."
+    },
+    "lore_i18n": {}
+  },
+  "overrides": {}
+}

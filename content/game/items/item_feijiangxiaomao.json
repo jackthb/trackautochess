@@ -1,0 +1,29 @@
+{
+  "gameId": "item_feijiangxiaomao",
+  "name": "Ascetics Cap",
+  "slug": "ascetics-cap",
+  "source": {
+    "name": "Ascetics Cap",
+    "description": "+25% magical resistance. A non-Undead carrier has a chance to be reborn into an undead piece of the same rank and level.",
+    "lore": "An austere cap from Undery.",
+    "quality": "rare",
+    "texture": "item_ascetic_cap",
+    "notes": [
+      "At most 1 undead piece can resurrect each round.",
+      "IO cannot resurrect. Independent with Dismiss."
+    ],
+    "names": {
+      "en": "Ascetics Cap",
+      "ru": "Ascetics Cap"
+    },
+    "descriptions": {
+      "en": "+25% magical resistance. A non-Undead carrier has a chance to be reborn into an undead piece of the same rank and level.",
+      "ru": "+25% маг.резиста. Носитель не-Undead имеет шанс переродиться в фигуру Undead с тем же рангом и уровнем."
+    },
+    "lore_i18n": {
+      "en": "An austere cap from Undery.",
+      "ru": "Шляпа Аскета"
+    }
+  },
+  "overrides": {}
+}

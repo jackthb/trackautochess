@@ -1,0 +1,63 @@
+{
+  "gameId": "chess_rubick",
+  "name": "Rubick",
+  "slug": "rubick",
+  "source": {
+    "id": "chess_rubick",
+    "cost": 3,
+    "pool": "standard",
+    "synergies": [
+      "God",
+      "Wizard"
+    ],
+    "names": {
+      "en": "Rubick",
+      "lore": "Rubick",
+      "ko": "루빅",
+      "ru": "Rubick",
+      "zh-cn": "大魔导师",
+      "zh-tw": "大魔導師"
+    },
+    "attack_type": "ranged",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 550,
+        "mana": 100,
+        "atk": [
+          50,
+          60
+        ],
+        "armor": 2,
+        "magic_resist": 20,
+        "atk_rate": 1.4,
+        "atk_range": 205
+      },
+      "2_star": {
+        "hp": 1100,
+        "mana": 100,
+        "atk": [
+          100,
+          120
+        ],
+        "armor": 2,
+        "magic_resist": 20,
+        "atk_rate": 1.4,
+        "atk_range": 205
+      },
+      "3_star": {
+        "hp": 2200,
+        "mana": 100,
+        "atk": [
+          200,
+          240
+        ],
+        "armor": 2,
+        "magic_resist": 20,
+        "atk_rate": 1.4,
+        "atk_range": 205
+      }
+    }
+  },
+  "overrides": {}
+}

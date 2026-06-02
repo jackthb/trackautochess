@@ -1,0 +1,63 @@
+{
+  "gameId": "chess_meepo",
+  "name": "Meepo",
+  "slug": "meepo",
+  "source": {
+    "id": "chess_meepo",
+    "cost": 2,
+    "pool": "standard",
+    "synergies": [
+      "Kobold",
+      "Mech"
+    ],
+    "names": {
+      "en": "Meepo",
+      "lore": "Meepo",
+      "ko": "미포",
+      "ru": "Meepo",
+      "zh-cn": "地卜师",
+      "zh-tw": "地蔔師"
+    },
+    "attack_type": "melee",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 600,
+        "mana": 100,
+        "atk": [
+          50,
+          60
+        ],
+        "armor": 4,
+        "magic_resist": 10,
+        "atk_rate": 1,
+        "atk_range": 205
+      },
+      "2_star": {
+        "hp": 1200,
+        "mana": 100,
+        "atk": [
+          100,
+          120
+        ],
+        "armor": 4,
+        "magic_resist": 10,
+        "atk_rate": 1,
+        "atk_range": 205
+      },
+      "3_star": {
+        "hp": 1800,
+        "mana": 100,
+        "atk": [
+          200,
+          240
+        ],
+        "armor": 4,
+        "magic_resist": 10,
+        "atk_rate": 1,
+        "atk_range": 205
+      }
+    }
+  },
+  "overrides": {}
+}

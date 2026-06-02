@@ -1,0 +1,23 @@
+{
+  "gameId": "item_cantie",
+  "name": "Sliver",
+  "slug": "sliver",
+  "source": {
+    "name": "Sliver",
+    "description": "+25 damage.\nConsidered as Tier 3 Item.",
+    "lore": "",
+    "quality": "rare",
+    "texture": "custom/jushencantie",
+    "notes": [],
+    "names": {
+      "en": "Sliver",
+      "ru": "Sliver"
+    },
+    "descriptions": {
+      "en": "+25 damage.\nConsidered as Tier 3 Item.",
+      "ru": "+25 урона.\nСчитается предметом Т3."
+    },
+    "lore_i18n": {}
+  },
+  "overrides": {}
+}

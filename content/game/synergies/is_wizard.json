@@ -1,0 +1,30 @@
+{
+  "gameId": "is_wizard",
+  "name": "Wizard",
+  "slug": "wizard",
+  "source": {
+    "name": "Wizard",
+    "description": "Wizard chess pieces are never considered priority targets by enemies.\n\nClass Perk: Something from Nothing\n\nActive when you have at least (N) different Wizard pieces on board. (Multiple effects stack)\n\n(2) Wizards: During the combat round, reduce the required number of chess pieces for the activation of race/class skills by 1, if there are (4) or more chess pieces needed.\n(4) Wizards: If you trigger the unique non-Wizard race/class skill during the combat round, unlock all of its layers.",
+    "description_html": "Wizard chess pieces are never considered priority targets by enemies.\n<h1>Class Perk: Something from Nothing</h1><font color=\"#656585\">Active when you have at least (N) different Wizard pieces on board. (Multiple effects stack)</font><br><br>(2) Wizards: During the combat round, reduce the required number of chess pieces for the activation of race/class skills by 1, if there are (4) or more chess pieces needed.<br>(4) Wizards: If you trigger the unique non-Wizard race/class skill during the combat round, unlock all of its layers.",
+    "lore": "Wizards play an ancient yet mysterious role. Even though they mostly comprehend oracles and do minor entertaining tricks, Wizards are regarded as evil by many others because of the uncertainty of their purpose of action. The unique power Wizards possess awakes the inner potential of others, leading to a more united alliance.",
+    "notes": [],
+    "tiers": [
+      2,
+      4
+    ],
+    "ability_special": {},
+    "names": {
+      "en": "Wizard",
+      "ru": "Wizard"
+    },
+    "descriptions": {
+      "en": "Wizard chess pieces are never considered priority targets by enemies.\n\nClass Perk: Something from Nothing\n Active when you have at least (N) different Wizard pieces on board. (Multiple effects stack)\n\n(2) Wizards: During the combat round, reduce the required number of chess pieces for the activation of race/class skills by 1, if there are (4) or more chess pieces needed.\n(4) Wizards: If you trigger the unique non-Wizard race/class skill during the combat round, unlock all of its layers.",
+      "ru": "Wizard являются не приоритетными целями для врагов.\n\nClass Perk: Something from Nothing\n Активна, когда минимум (N) разных Wizard на столе.(Эффекты складываются)\n\n(2) Wizards: Во время раунда боя уменьшает необходимое количество фигур для активации навыков расы/класса на 1, если требуется 4 или более фигур.\n(4) Wizards: Если во время раунда-боя активен только один уникальный навык расы/класса (не Wizard), активируются все его уровни."
+    },
+    "lore_i18n": {
+      "en": "Wizards play an ancient yet mysterious role. Even though they mostly comprehend oracles and do minor entertaining tricks, Wizards are regarded as evil by many others because of the uncertainty of their purpose of action. The unique power Wizards possess awakes the inner potential of others, leading to a more united alliance.",
+      "ru": "Wizards — загадочные существа, пробуждающие потенциал союзников, но из-за своей непредсказуемости считаются злом."
+    }
+  },
+  "overrides": {}
+}

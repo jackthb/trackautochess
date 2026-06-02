@@ -1,0 +1,26 @@
+{
+  "gameId": "item_bingyan",
+  "name": "Eye of Skadi",
+  "slug": "eye-of-skadi",
+  "source": {
+    "name": "Eye of Skadi",
+    "description": "+600 max health.\nAttack speed, Attack damage, Move speed, mana restoration and healing effectiveness -50%.",
+    "lore": "Extremely rare artifact, guarded by the azure dragons.",
+    "quality": "rare",
+    "texture": "item_skadi",
+    "notes": [],
+    "names": {
+      "en": "Eye of Skadi",
+      "ru": "Eye of Skadi"
+    },
+    "descriptions": {
+      "en": "+600 max health.\nAttack speed, Attack damage, Move speed, mana restoration and healing effectiveness -50%.",
+      "ru": "+600 здоровья.\nПоражённые цели: скорость атаки, урона, скорость передвижения, восстановление маны и эффективность лечения - снижены на 50%."
+    },
+    "lore_i18n": {
+      "en": "Extremely rare artifact, guarded by the azure dragons.",
+      "ru": "Чрезвычайно редкий артефакт, охраняемый лазурными драконами."
+    }
+  },
+  "overrides": {}
+}

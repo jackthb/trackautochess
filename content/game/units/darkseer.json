@@ -1,0 +1,63 @@
+{
+  "gameId": "chess_ds",
+  "name": "DarkSeer",
+  "slug": "darkseer",
+  "source": {
+    "id": "chess_ds",
+    "cost": 2,
+    "pool": "standard",
+    "synergies": [
+      "Draenei",
+      "Warlock"
+    ],
+    "names": {
+      "en": "DarkSeer",
+      "lore": "Ish'kafel",
+      "ko": "어둠 현자",
+      "ru": "DarkSeer",
+      "zh-cn": "黑暗贤者",
+      "zh-tw": "黑暗賢者"
+    },
+    "attack_type": "melee",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 700,
+        "mana": 100,
+        "atk": [
+          50,
+          90
+        ],
+        "armor": 4,
+        "magic_resist": 10,
+        "atk_rate": 1.6,
+        "atk_range": 205
+      },
+      "2_star": {
+        "hp": 1400,
+        "mana": 100,
+        "atk": [
+          100,
+          180
+        ],
+        "armor": 4,
+        "magic_resist": 10,
+        "atk_rate": 1.6,
+        "atk_range": 205
+      },
+      "3_star": {
+        "hp": 2800,
+        "mana": 100,
+        "atk": [
+          200,
+          360
+        ],
+        "armor": 4,
+        "magic_resist": 10,
+        "atk_rate": 1.6,
+        "atk_range": 205
+      }
+    }
+  },
+  "overrides": {}
+}

@@ -1,0 +1,20 @@
+{
+  "gameId": "item_more_creep",
+  "name": "March of The Beasts",
+  "slug": "march-of-the-beasts",
+  "source": {
+    "name": "March of The Beasts",
+    "description": "All creeps duplicate themselves and counted as level +1.",
+    "lore": "",
+    "names": {
+      "en": "March of The Beasts",
+      "ru": "March of The Beasts"
+    },
+    "descriptions": {
+      "en": "All creeps duplicate themselves and counted as level +1.",
+      "ru": "Все крипы удваиваются и считаются на один уровень выше."
+    },
+    "lore_i18n": {}
+  },
+  "overrides": {}
+}

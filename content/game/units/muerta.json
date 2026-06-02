@@ -1,0 +1,63 @@
+{
+  "gameId": "chess_muerta",
+  "name": "Muerta",
+  "slug": "muerta",
+  "source": {
+    "id": "chess_muerta",
+    "cost": 2,
+    "pool": "undead",
+    "synergies": [
+      "Hunter",
+      "Undead"
+    ],
+    "names": {
+      "en": "Muerta",
+      "lore": "Muerta",
+      "ko": "무에르타",
+      "ru": "Muerta",
+      "zh-cn": "琼英碧灵",
+      "zh-tw": "瓊英碧靈"
+    },
+    "attack_type": "ranged",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 600,
+        "mana": 100,
+        "atk": [
+          50,
+          100
+        ],
+        "armor": 3,
+        "magic_resist": 0,
+        "atk_rate": 1.1,
+        "atk_range": 400
+      },
+      "2_star": {
+        "hp": 1200,
+        "mana": 100,
+        "atk": [
+          100,
+          200
+        ],
+        "armor": 3,
+        "magic_resist": 0,
+        "atk_rate": 1.1,
+        "atk_range": 400
+      },
+      "3_star": {
+        "hp": 2200,
+        "mana": 100,
+        "atk": [
+          200,
+          400
+        ],
+        "armor": 3,
+        "magic_resist": 0,
+        "atk_rate": 1.1,
+        "atk_range": 400
+      }
+    }
+  },
+  "overrides": {}
+}

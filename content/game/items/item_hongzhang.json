@@ -1,0 +1,26 @@
+{
+  "gameId": "item_hongzhang",
+  "name": "Dagon",
+  "slug": "dagon",
+  "source": {
+    "name": "Dagon",
+    "description": "+40% magical damage.\n\nActive ability: Instant\nDeals 700 magical damage to a random enemy chess piece.",
+    "lore": "A powerful secondary staff that allows the wielders magic to surge from their fingertips.",
+    "quality": "epic",
+    "texture": "item_dagon_4",
+    "notes": [],
+    "names": {
+      "en": "Dagon",
+      "ru": "Dagon"
+    },
+    "descriptions": {
+      "en": "+40% magical damage.\n\nActive ability: Instant\nDeals 700 magical damage to a random enemy chess piece.",
+      "ru": "Магический урон +40%。\n\nАктивка: Мгновенная\nНаносит 700 магического урона случайной вражеской фигуре."
+    },
+    "lore_i18n": {
+      "en": "A powerful secondary staff that allows the wielders magic to surge from their fingertips.",
+      "ru": "Мощный посох, позволяющий магии владельца струиться из кончиков пальцев."
+    }
+  },
+  "overrides": {}
+}

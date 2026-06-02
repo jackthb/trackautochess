@@ -1,0 +1,9 @@
+{
+  "gameId": "wisp_wildcard",
+  "name": "Indiscriminate Relocate",
+  "description": "Passive Ability\nIO★ can combine with other pieces as any ★ piece on the board.\nIO★★ can combine with other pieces as any ★★ piece on the board.",
+  "cooldown": "",
+  "mana_cost": "",
+  "cast_range": "",
+  "ability_special": {}
+}

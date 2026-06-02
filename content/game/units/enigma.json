@@ -1,0 +1,63 @@
+{
+  "gameId": "chess_enigma",
+  "name": "Enigma",
+  "slug": "enigma",
+  "source": {
+    "id": "chess_enigma",
+    "cost": 3,
+    "pool": "standard",
+    "synergies": [
+      "Elemental",
+      "Warlock"
+    ],
+    "names": {
+      "en": "Enigma",
+      "lore": "Darchro",
+      "ko": "에니그마",
+      "ru": "Enigma",
+      "zh-cn": "谜团",
+      "zh-tw": "謎團"
+    },
+    "attack_type": "ranged",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 700,
+        "mana": 100,
+        "atk": [
+          45,
+          55
+        ],
+        "armor": 4,
+        "magic_resist": 10,
+        "atk_rate": 1.5,
+        "atk_range": 400
+      },
+      "2_star": {
+        "hp": 1400,
+        "mana": 100,
+        "atk": [
+          90,
+          110
+        ],
+        "armor": 4,
+        "magic_resist": 10,
+        "atk_rate": 1.5,
+        "atk_range": 400
+      },
+      "3_star": {
+        "hp": 2800,
+        "mana": 100,
+        "atk": [
+          180,
+          220
+        ],
+        "armor": 4,
+        "magic_resist": 10,
+        "atk_rate": 1.5,
+        "atk_range": 400
+      }
+    }
+  },
+  "overrides": {}
+}

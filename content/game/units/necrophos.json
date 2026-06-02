@@ -1,0 +1,63 @@
+{
+  "gameId": "chess_nec",
+  "name": "Necrophos",
+  "slug": "necrophos",
+  "source": {
+    "id": "chess_nec",
+    "cost": 5,
+    "pool": "undead",
+    "synergies": [
+      "Undead",
+      "Warlock"
+    ],
+    "names": {
+      "en": "Necrophos",
+      "lore": "Rotund۰jere",
+      "ko": "강령사제",
+      "ru": "Necrophos",
+      "zh-cn": "死灵法师",
+      "zh-tw": "死靈法師"
+    },
+    "attack_type": "ranged",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 1000,
+        "mana": 100,
+        "atk": [
+          50,
+          100
+        ],
+        "armor": 6,
+        "magic_resist": 30,
+        "atk_rate": 1.2,
+        "atk_range": 400
+      },
+      "2_star": {
+        "hp": 2000,
+        "mana": 100,
+        "atk": [
+          100,
+          200
+        ],
+        "armor": 6,
+        "magic_resist": 30,
+        "atk_rate": 1.2,
+        "atk_range": 400
+      },
+      "3_star": {
+        "hp": 4000,
+        "mana": 100,
+        "atk": [
+          200,
+          400
+        ],
+        "armor": 6,
+        "magic_resist": 30,
+        "atk_rate": 1.2,
+        "atk_range": 400
+      }
+    }
+  },
+  "overrides": {}
+}

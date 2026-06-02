@@ -1,0 +1,68 @@
+{
+  "gameId": "chess_io",
+  "name": "Io",
+  "slug": "io",
+  "source": {
+    "id": "chess_io",
+    "cost": 5,
+    "pool": "special",
+    "synergies": [
+      "Elf"
+    ],
+    "names": {
+      "en": "Io",
+      "lore": "IO",
+      "ko": "이오",
+      "ru": "Io",
+      "zh-cn": "精灵守卫",
+      "zh-tw": "精靈守衛"
+    },
+    "attack_type": "ranged",
+    "abilities": [
+      {
+        "id": "wisp_wildcard",
+        "name": "Indiscriminate Relocate",
+        "description": "Passive Ability\nIO★ can combine with other pieces as any ★ piece on the board.\nIO★★ can combine with other pieces as any ★★ piece on the board."
+      }
+    ],
+    "stats": {
+      "1_star": {
+        "hp": 700,
+        "mana": 0,
+        "atk": [
+          40,
+          60
+        ],
+        "armor": 5,
+        "magic_resist": 30,
+        "atk_rate": 1.3,
+        "atk_range": 400
+      },
+      "2_star": {
+        "hp": 1400,
+        "mana": 0,
+        "atk": [
+          80,
+          120
+        ],
+        "armor": 5,
+        "magic_resist": 30,
+        "atk_rate": 1.3,
+        "atk_range": 400
+      },
+      "3_star": {
+        "hp": 2800,
+        "mana": 0,
+        "atk": [
+          160,
+          240
+        ],
+        "armor": 5,
+        "magic_resist": 30,
+        "atk_rate": 1.3,
+        "atk_range": 400
+      }
+    }
+  },
+  "overrides": {}
+}

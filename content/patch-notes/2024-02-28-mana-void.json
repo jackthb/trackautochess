@@ -1,0 +1,198 @@
+{
+  "date": "2024-02-28",
+  "title": "Mana Void",
+  "source": "https://docs.google.com/document/d/e/2PACX-1vSZmin5fikmgbu98cPyqW8pYW7iSSxVqpg209PLlDhNOb9bfL3ObptKmE1-Y5eriCZpjiYm0iHJLBfH/pub",
+  "flavor": "When the tide-like demonic invaders swept away the kingdom below, the demon hunters of Dadaray merely watched silently from the mountains, overlooking the rugged Susuna Valley. Ascetic and pragmatic, they secluded themselves in the remote highlands, beyond the influence of any magical elements or divine gaze, immersing themselves in meditation far from the hustle and bustle, practising the ultimate secret art that could turn magical energy against its wielder.",
+  "sections": [
+    {
+      "heading": "Chess Pieces",
+      "entries": [
+        {
+          "kind": "rework",
+          "name": "Anti-Mage",
+          "detail": "Upgraded from $1 to $4, with his base attributes adjusted accordingly to fit the new cost. \"Mana Break\" skill reworked. <Passive Skill> Each attack will drain the mana of the target enemy chess piece, dealing additional physical damage equal to the mana drained. Whenever a certain amount of mana is drained cumulatively, Anti-Mage will activate the \"Mana Void,\" target with a lower mana enemy, and deal magical damage based on the mana lost by the target together with a brief stun to enemies within range. Note: Anti-Mage will prioritize attacking targets with mana. A martial technique, refined from the gentle techniques of the monks of the Starry Temple, capable of turning magical energy against its wielder.",
+          "entity": {
+            "type": "unit",
+            "slug": "anti-mage"
+          }
+        },
+        {
+          "kind": "change",
+          "name": "Lion",
+          "detail": "Attack range reduced from 600 to 400, base health increased from 500 to 550.",
+          "entity": {
+            "type": "unit",
+            "slug": "lion"
+          }
+        },
+        {
+          "kind": "buff",
+          "name": "Lina - Laguna Blade",
+          "detail": "Cooldown reduced from 15/10/7 seconds to 12/8/6 seconds.",
+          "entity": {
+            "type": "unit",
+            "slug": "lina"
+          }
+        },
+        {
+          "kind": "change",
+          "name": "Terror Blade",
+          "detail": "Pre-transformation and post-transformation health adjusted from 700/700 (described as 750 but 700) to 650/850.",
+          "entity": {
+            "type": "unit",
+            "slug": "terrorblade"
+          }
+        },
+        {
+          "kind": "nerf",
+          "name": "Keeper of the Light - Illuminate",
+          "detail": "Cooldown increased from 10/8/6 seconds to 12/10/8 seconds.",
+          "entity": {
+            "type": "unit",
+            "slug": "keeper-of-the-light"
+          }
+        },
+        {
+          "kind": "nerf",
+          "name": "Warlock",
+          "detail": "Average damage of Golem’s descent reduced from 125 to 100.",
+          "entity": {
+            "type": "unit",
+            "slug": "warlock"
+          }
+        },
+        {
+          "kind": "change",
+          "name": "Cosmetic items updated for Brewmaster and Anti-Mage",
+          "detail": ""
+        }
+      ]
+    },
+    {
+      "heading": "Synergies",
+      "entries": [
+        {
+          "kind": "change",
+          "name": "Demon Hunter - Shuttered soul",
+          "detail": "(4) Demon Hunter effects adjusted (2) Demon Hunter: All friendly demons now count as the same type. (4) Demon Hunter: All damage dealt by allies is converted into pure damage.",
+          "entity": {
+            "type": "synergy",
+            "slug": "demon-hunter"
+          }
+        },
+        {
+          "kind": "buff",
+          "name": "Demon - Fel Power",
+          "detail": "Now has a maximum of 7 stacks. (1) Demon: Normal attack damage caused by allied demon chess pieces is considered pure damage. Fel Power's damage is increased by 10%, up to a maximum of 70% for each other allied demon chess piece of the same species.",
+          "entity": {
+            "type": "synergy",
+            "slug": "demon"
+          }
+        },
+        {
+          "kind": "change",
+          "name": "Dragon - Attunement",
+          "detail": "Now grants +100 mana to chess pieces at the start of the battle and when chess pieces are deployed (previously before the start of the battle and during the alliance calculation phase).",
+          "entity": {
+            "type": "synergy",
+            "slug": "dragon"
+          }
+        },
+        {
+          "kind": "change",
+          "name": "Wizard now has an added class perk",
+          "detail": "Wizard chess pieces are never considered priority targets by enemies."
+        },
+        {
+          "kind": "nerf",
+          "name": "Warrior - Fortified Armor",
+          "detail": "The armour bonus provided by (6) Warriors has been reduced from 12 to 11.",
+          "entity": {
+            "type": "synergy",
+            "slug": "warrior"
+          }
+        }
+      ]
+    },
+    {
+      "heading": "Items",
+      "entries": [
+        {
+          "kind": "added",
+          "name": "Heaven's Halberd +25% Evasion",
+          "detail": "New tier 3 item. <Active Ability: Instant> It prevents the enemy chess piece with the highest damage from attacking for 6 seconds. Cooldown: 15 seconds"
+        }
+      ]
+    },
+    {
+      "heading": "Relics",
+      "entries": [
+        {
+          "kind": "change",
+          "name": "Sin Reaper, Malefic Rapture, and Mango Tree",
+          "detail": "Experience gained through sanctity is no longer restricted by the courier’s level 10 limit (reading chess books can only reach up to level 10)."
+        }
+      ]
+    },
+    {
+      "heading": "Season Awards",
+      "entries": [
+        {
+          "kind": "change",
+          "name": "The EoS rewards for S29 Dragon Roar (01/01 to 29/02) are based on the following",
+          "detail": "♕Top 20 Queens (on Leaderboard): S29 Badge + ♕Queen rewards. ♕Queen: 320 Candies + Crown (valid for S30) + Dragon Roar Green. ♔King: 320 Candies + Dragon Roar Red. ♖Rook: 160 Candies + Dragon Roar Yellow. ♗Bishop: 80 Candies + Dragon Roar Blue. ♘Knight: 40 Candies. ♙Pawn: 20 Candies."
+        },
+        {
+          "kind": "change",
+          "name": "Top 20 Queens are rewarded based on their final places and the other ranks for the highest rank achieved in the season",
+          "detail": ""
+        },
+        {
+          "kind": "change",
+          "name": "As usual, the last day of the season will be the off-season break to award the excellent players. Games played on the day do not affect Rankings. The new season of S30 Arcane Player starts on 01/03/2024!",
+          "detail": ""
+        }
+      ]
+    },
+    {
+      "heading": "Bug Fixes",
+      "entries": [
+        {
+          "kind": "fix",
+          "name": "Fixed a bug with the sven - God’s Strength that values become invalid due to changes in the data structure of DOTA2",
+          "detail": ""
+        },
+        {
+          "kind": "fix",
+          "name": "Fixed a bug with Flying Coffin Hat where it would fail to summon when summoning to a shielded race/profession of chess pieces",
+          "detail": ""
+        },
+        {
+          "kind": "fix",
+          "name": "Fixed a bug where the just removed chess pieces could attack enemies on the field",
+          "detail": ""
+        },
+        {
+          "kind": "fix",
+          "name": "Fixed a bug with Terrorblade where transformed allied chess pieces had a duration",
+          "detail": ""
+        },
+        {
+          "kind": "fix",
+          "name": "Fixed inaccurate descriptions for the transformation of allied chess pieces by Terrorblade",
+          "detail": ""
+        },
+        {
+          "kind": "fix",
+          "name": "Fixed missing descriptions for the status of Heaven's Halberd and Guardian's Greaves",
+          "detail": ""
+        },
+        {
+          "kind": "fix",
+          "name": "Fixed abnormal walking animation speed for the Mini TV Courier",
+          "detail": ""
+        }
+      ]
+    }
+  ]
+}

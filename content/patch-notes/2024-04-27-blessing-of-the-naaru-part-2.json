@@ -1,0 +1,281 @@
+{
+  "date": "2024-04-27",
+  "title": "Blessing of the Naaru (Part 2)",
+  "source": "https://docs.google.com/document/d/e/2PACX-1vRXiGNip4-WoTU5CGyWxiQfqPGYB3VUY0mA6hmGqZDUh_fdbP_buJ6goCa8Bv4O8orjcpGFlo_O5f-3/pub",
+  "flavor": "Having fallen under the yoke of the Burning Legion, the Eredar has been twisted into chaotic, ferocious entities devoid of humanity. They no longer recall their homeworld, their kin, their professions, or even their own visages. All that fills their gaze now is boundless slaughter, spreading fear across world after world.",
+  "sections": [
+    {
+      "heading": "Chess Pieces",
+      "entries": [
+        {
+          "kind": "added",
+          "name": "Shadow Demon: Disseminate ($3, Demon/Draenei/Priest)",
+          "detail": "New chess piece. <Active Skill: Instant Activation> Applying the toxic curse of Shadow Demon's attacks: Nearby allies will receive damage of the same type as a percentage when taking damage, and nearby enemies will also receive healing as a percentage when receiving healing. Note: The spreading effect cannot be stacked on the same unit. Note: The spreading effect can benefit from Spell Prism and Soulbind. When the Eredar no longer requires his followers, he'll discard his shackles—along with their lives."
+        },
+        {
+          "kind": "added",
+          "name": "Lion: Finger of Death(Upgraded from $1 to $4)",
+          "detail": "New chess piece. <Active Skill: Activates on full mana> Tear into an enemy, inflicting a substantial amount of magical damage and siphoning their current mana. Furthermore, for each stack of the Fel Power effect, it will deal additional magical damage based on a percentage of the target's maximum health. Lion's disfigured hand is also the source of his greatest power, capable of flooding victims with malefic force."
+        },
+        {
+          "kind": "added",
+          "name": "Slardar: Downgraded from $3 to $2, with adjustments made to its attributes and skill values to match the new cost",
+          "detail": "New chess piece."
+        },
+        {
+          "kind": "added",
+          "name": "Slark: Downgraded from $2 to $1, with adjustments made to its attributes and skill values to match the new cost",
+          "detail": "New chess piece."
+        },
+        {
+          "kind": "added",
+          "name": "Grimstroke: Downgraded from $4 to $1, with adjustments made to its attributes and skill values to match the new cost",
+          "detail": "New chess piece."
+        },
+        {
+          "kind": "added",
+          "name": "Hoodwink - Acorn Shot: Simplified the skill, removing the mana cost and duration of the debuff",
+          "detail": "New chess piece.",
+          "entity": {
+            "type": "unit",
+            "slug": "hoodwink"
+          }
+        },
+        {
+          "kind": "added",
+          "name": "Ogre Magi - Multicast: Removed the mana cost of the skill",
+          "detail": "New chess piece.",
+          "entity": {
+            "type": "unit",
+            "slug": "ogre-magi"
+          }
+        },
+        {
+          "kind": "added",
+          "name": "Dark Willow - Cursed Crown: Reduced stun duration from 3/4/6 seconds to 3/4/5 seconds",
+          "detail": "New chess piece.",
+          "entity": {
+            "type": "unit",
+            "slug": "dark-willow"
+          }
+        },
+        {
+          "kind": "added",
+          "name": "Lina - Laguna Blade: Cooldown reduced from 12/8/6 seconds to 9/7/5 seconds",
+          "detail": "New chess piece.",
+          "entity": {
+            "type": "unit",
+            "slug": "lina"
+          }
+        },
+        {
+          "kind": "added",
+          "name": "Keeper of the Light - Illuminate: Reduced maximum damage from 300/500/800 to 300/500/700",
+          "detail": "New chess piece.",
+          "entity": {
+            "type": "unit",
+            "slug": "keeper-of-the-light"
+          }
+        },
+        {
+          "kind": "added",
+          "name": "Anti-Mage - Mana Void: Damage threshold for triggering Mana Void changed from 100/80/60 to a unified value of 100",
+          "detail": "New chess piece.",
+          "entity": {
+            "type": "unit",
+            "slug": "anti-mage"
+          }
+        },
+        {
+          "kind": "added",
+          "name": "Lone Druid: Base attack damage of summoned bear companion reduced from 175/275/375 to 150/200/300",
+          "detail": "New chess piece."
+        },
+        {
+          "kind": "added",
+          "name": "Necrophos - Reaper's Scythe: Cooldown reduced from 10/8/4 seconds to 8/6/4 seconds",
+          "detail": "New chess piece.",
+          "entity": {
+            "type": "unit",
+            "slug": "necrophos"
+          }
+        }
+      ]
+    },
+    {
+      "heading": "Synergies",
+      "entries": [
+        {
+          "kind": "change",
+          "name": "Draenei - Blessing of the Naaru",
+          "detail": "Synergy Update to(2)(4) (2)Draenei: All friendly Draenei gain the effect: Every 2 seconds, steal 100 health from the nearest enemy chess piece to heal themselves. (4)Draenei: All friendly pieces gain effects: Whenever a cumulative total of more than 100 points of healing is taken it is split (cumulative healing) points of pure damage among the surrounding enemies. Note: (2) Draenei's life-steal effect deals pure damage + healing. Draenei illusions are also effective. Note: (4)Draenei's Baptism damage is no longer divided, and each enemy within the range will receive the same damage.",
+          "entity": {
+            "type": "synergy",
+            "slug": "draenei"
+          }
+        },
+        {
+          "kind": "buff",
+          "name": "Knights - Divine Protection",
+          "detail": "(2) (4) (6)Knights:  The shield trigger probability for Knights is increased from (described as 20%/20%/10% but functions as 20%/10%/20%, inconsistent with the description) to 20%/20%/15%."
+        },
+        {
+          "kind": "nerf",
+          "name": "Warlocks - Soul Leech",
+          "detail": "(4) Warlocks: The lifesteal percentage is decreased from 5%/20% to 5%/15%."
+        },
+        {
+          "kind": "buff",
+          "name": "Priests - Salvation",
+          "detail": "(4) Priests: The duration of the Priest's Mind Control is increased from (controller level × 2) seconds to (controller level × 2 + 2) seconds."
+        },
+        {
+          "kind": "change",
+          "name": "Elves - Evasion",
+          "detail": "(9) Elves: Enemy illusions copied by Elves now inherit the passive effects of the enemy's equipment (but cannot use active equipment)."
+        },
+        {
+          "kind": "nerf",
+          "name": "Demons - Fel Power",
+          "detail": "Maximum stack count reduced from 10 to 8."
+        },
+        {
+          "kind": "buff",
+          "name": "Orcs -Battle Hardened",
+          "detail": "(6) Orcs: The health bonus coefficient increased from 8 to 10."
+        }
+      ]
+    },
+    {
+      "heading": "Items",
+      "entries": [
+        {
+          "kind": "added",
+          "name": "New Tier 3 Item - Diffusal Blade",
+          "detail": "Attack Damage: +25, Mana Break on Attack: +50 The carrier deals +50% damage to non-permanent chess pieces."
+        },
+        {
+          "kind": "buff",
+          "name": "Vladimir's Offering",
+          "detail": "Lifesteal percentage increased from 15% to 20%.",
+          "entity": {
+            "type": "item",
+            "slug": "vladimirs-offering"
+          }
+        },
+        {
+          "kind": "nerf",
+          "name": "Trident",
+          "detail": "Attack damage bonus reduced from +60 to +50.",
+          "entity": {
+            "type": "item",
+            "slug": "trident"
+          }
+        },
+        {
+          "kind": "nerf",
+          "name": "Manta style",
+          "detail": "Illusions now inherit passive effects of the carrier's equipment (but cannot use active equipment). Duration of illusions reduced from 10 seconds to 8 seconds.",
+          "entity": {
+            "type": "item",
+            "slug": "manta-style"
+          }
+        },
+        {
+          "kind": "buff",
+          "name": "Satanic",
+          "detail": "Lifesteal percentage increased from 45% to 50%. Cooldown reduced from 20 seconds to 15 seconds.",
+          "entity": {
+            "type": "item",
+            "slug": "satanic"
+          }
+        }
+      ]
+    },
+    {
+      "heading": "Season Awards",
+      "entries": [
+        {
+          "kind": "change",
+          "name": "The EoS rewards for S30 Arcane Player (01/03 to 30/04) are based on the following",
+          "detail": "♕Top 20 Queens (on Leaderboard): S30 Badge + ♕Queen rewards. ♕Queen: 320 Candies + Crown (valid for S31) + Arcane Player♦Red. ♔King: 320 Candies + Arcane Player♦Magenta. ♖Rook: 160 Candies + Arcane Player♦Blue. ♗Bishop: 80 Candies + Arcane Player♦Green. ♘Knight: 40 Candies. ♙Pawn: 20 Candies."
+        },
+        {
+          "kind": "change",
+          "name": "Top 20 Queens are rewarded based on their final places and the other ranks for the highest rank achieved in the season",
+          "detail": ""
+        },
+        {
+          "kind": "change",
+          "name": "As usual, the last day of the season will be the off-season break to award the excellent players. Games played on the day do not affect Rankings. The new season of S31 Keshira Season starts on 01/05/2024!",
+          "detail": ""
+        }
+      ]
+    },
+    {
+      "heading": "Bug Fixes",
+      "entries": [
+        {
+          "kind": "fix",
+          "name": "Improved chess piece preloading to prevent crashes",
+          "detail": ""
+        },
+        {
+          "kind": "fix",
+          "name": "Rectified issues with score and rank protection in lower-tier ladder modes",
+          "detail": ""
+        },
+        {
+          "kind": "fix",
+          "name": "Ensured Elves can evade attacks from (4) Demon Hunters",
+          "detail": ""
+        },
+        {
+          "kind": "fix",
+          "name": "Addressed the oversight of cooldown adjustments for \"Keeper of the Light - Illuminate.\"",
+          "detail": ""
+        },
+        {
+          "kind": "fix",
+          "name": "Corrected Shaman's Hex to allow transformed units to use abilities",
+          "detail": ""
+        },
+        {
+          "kind": "fix",
+          "name": "Fixed a bug where Priests with Helm of the Dominator could mind control multiple times",
+          "detail": ""
+        },
+        {
+          "kind": "fix",
+          "name": "Fixed a bug where Anti-Mage's Mana Void could affect enemies immune to abilities",
+          "detail": ""
+        },
+        {
+          "kind": "fix",
+          "name": "Fixed a bug where reading a playbook at the beginning of a turn would instantly level up a piece",
+          "detail": ""
+        },
+        {
+          "kind": "fix",
+          "name": "Fixed a bug where selling an item from the Weapon Smith would grant 1 gold",
+          "detail": ""
+        },
+        {
+          "kind": "fix",
+          "name": "Fixed a bug where the resizing animation of Giants Ring could trigger Shaman's Hex (it is not considered an active item)",
+          "detail": ""
+        },
+        {
+          "kind": "fix",
+          "name": "Fixed an issue with the description error during loading of casual maps with spectator slots (line breaks showing as <br>)",
+          "detail": ""
+        },
+        {
+          "kind": "fix",
+          "name": "Fixed inaccuracies in the description of Rapier",
+          "detail": ""
+        }
+      ]
+    }
+  ]
+}

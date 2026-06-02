@@ -1,0 +1,64 @@
+{
+  "gameId": "chess_eh",
+  "name": "Enchantress",
+  "slug": "enchantress",
+  "source": {
+    "id": "chess_eh",
+    "cost": 1,
+    "pool": "standard",
+    "synergies": [
+      "Beast",
+      "Centaur",
+      "Druid"
+    ],
+    "names": {
+      "en": "Enchantress",
+      "lore": "Aiushtha",
+      "ko": "요술사",
+      "ru": "Enchantress",
+      "zh-cn": "魅惑魔女",
+      "zh-tw": "魅惑魔女"
+    },
+    "attack_type": "ranged",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 400,
+        "mana": 0,
+        "atk": [
+          50,
+          60
+        ],
+        "armor": 2,
+        "magic_resist": 10,
+        "atk_rate": 1.5,
+        "atk_range": 400
+      },
+      "2_star": {
+        "hp": 800,
+        "mana": 0,
+        "atk": [
+          100,
+          120
+        ],
+        "armor": 2,
+        "magic_resist": 10,
+        "atk_rate": 1.5,
+        "atk_range": 400
+      },
+      "3_star": {
+        "hp": 1500,
+        "mana": 0,
+        "atk": [
+          200,
+          240
+        ],
+        "armor": 2,
+        "magic_resist": 10,
+        "atk_rate": 1.5,
+        "atk_range": 400
+      }
+    }
+  },
+  "overrides": {}
+}

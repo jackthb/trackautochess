@@ -1,0 +1,63 @@
+{
+  "gameId": "chess_au",
+  "name": "Abyssal Underlord",
+  "slug": "abyssal-underlord",
+  "source": {
+    "id": "chess_au",
+    "cost": 5,
+    "pool": "standard",
+    "synergies": [
+      "Demon",
+      "Warlock"
+    ],
+    "names": {
+      "en": "Abyssal Underlord",
+      "lore": "Vrogros",
+      "ko": "지하군주",
+      "ru": "Abyssal Underlord",
+      "zh-cn": "孽主",
+      "zh-tw": "孽主"
+    },
+    "attack_type": "melee",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 1250,
+        "mana": 0,
+        "atk": [
+          100,
+          160
+        ],
+        "armor": 10,
+        "magic_resist": 20,
+        "atk_rate": 1.5,
+        "atk_range": 205
+      },
+      "2_star": {
+        "hp": 2500,
+        "mana": 0,
+        "atk": [
+          200,
+          320
+        ],
+        "armor": 10,
+        "magic_resist": 20,
+        "atk_rate": 1.5,
+        "atk_range": 205
+      },
+      "3_star": {
+        "hp": 5000,
+        "mana": 0,
+        "atk": [
+          400,
+          640
+        ],
+        "armor": 10,
+        "magic_resist": 20,
+        "atk_rate": 1.5,
+        "atk_range": 205
+      }
+    }
+  },
+  "overrides": {}
+}

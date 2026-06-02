@@ -1,0 +1,64 @@
+{
+  "gameId": "chess_na",
+  "name": "Nyx Assassin",
+  "slug": "nyx-assassin",
+  "source": {
+    "id": "chess_na",
+    "cost": 4,
+    "pool": "undead",
+    "synergies": [
+      "Aqir",
+      "Assassin",
+      "Undead"
+    ],
+    "names": {
+      "en": "Nyx Assassin",
+      "lore": "Anub۰arak",
+      "ko": "닉스 암살자",
+      "ru": "Nyx Assassin",
+      "zh-cn": "司夜刺客",
+      "zh-tw": "司夜刺客"
+    },
+    "attack_type": "melee",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 950,
+        "mana": 100,
+        "atk": [
+          45,
+          90
+        ],
+        "armor": 10,
+        "magic_resist": 20,
+        "atk_rate": 1.3,
+        "atk_range": 205
+      },
+      "2_star": {
+        "hp": 1900,
+        "mana": 100,
+        "atk": [
+          90,
+          180
+        ],
+        "armor": 10,
+        "magic_resist": 20,
+        "atk_rate": 1.3,
+        "atk_range": 205
+      },
+      "3_star": {
+        "hp": 3800,
+        "mana": 100,
+        "atk": [
+          180,
+          360
+        ],
+        "armor": 10,
+        "magic_resist": 20,
+        "atk_rate": 1.3,
+        "atk_range": 205
+      }
+    }
+  },
+  "overrides": {}
+}

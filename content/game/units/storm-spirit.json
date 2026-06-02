@@ -1,0 +1,63 @@
+{
+  "gameId": "chess_storm",
+  "name": "Storm Spirit",
+  "slug": "storm-spirit",
+  "source": {
+    "id": "chess_storm",
+    "cost": 4,
+    "pool": "special",
+    "synergies": [
+      "Mage",
+      "Pandaren"
+    ],
+    "names": {
+      "en": "Storm Spirit",
+      "lore": "Raijin۰Thunderkeg",
+      "ko": "폭풍령",
+      "ru": "Storm Spirit",
+      "zh-cn": "风暴之灵",
+      "zh-tw": "風暴之靈"
+    },
+    "attack_type": "ranged",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 700,
+        "mana": 100,
+        "atk": [
+          60,
+          70
+        ],
+        "armor": 4,
+        "magic_resist": 10,
+        "atk_rate": 1.4,
+        "atk_range": 400
+      },
+      "2_star": {
+        "hp": 1400,
+        "mana": 100,
+        "atk": [
+          120,
+          140
+        ],
+        "armor": 4,
+        "magic_resist": 10,
+        "atk_rate": 1.4,
+        "atk_range": 400
+      },
+      "3_star": {
+        "hp": 2800,
+        "mana": 100,
+        "atk": [
+          240,
+          280
+        ],
+        "armor": 4,
+        "magic_resist": 10,
+        "atk_rate": 1.4,
+        "atk_range": 400
+      }
+    }
+  },
+  "overrides": {}
+}

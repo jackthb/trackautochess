@@ -1,0 +1,26 @@
+{
+  "gameId": "item_free_ban",
+  "name": "Gaolers Master Key",
+  "slug": "gaolers-master-key",
+  "source": {
+    "name": "Gaolers Master Key",
+    "description": "You can freely dismiss any race/class. If already dismissed, the spent gold will be refunded.",
+    "lore": "From Relicbox",
+    "quality": "",
+    "texture": "item_custom/狱卒的钥匙2",
+    "notes": [],
+    "names": {
+      "en": "Gaolers Master Key",
+      "ru": "Gaolers Master Key"
+    },
+    "descriptions": {
+      "en": "You can freely dismiss any race/class. If already dismissed, the spent gold will be refunded.",
+      "ru": "Вы можете бесплатно забанить любую расу/класс (для себя). Если уже забанили, потраченное золото будет возвращено."
+    },
+    "lore_i18n": {
+      "en": "From Relicbox",
+      "ru": "Из Relicbox"
+    }
+  },
+  "overrides": {}
+}

@@ -4,8 +4,8 @@ existing data/{synergies,items_full,relics}.json without touching any other
 field (icon_url, icon_dimensions, etc).
 
 The full extract_vpk.py rewrites these files from scratch and would drop
-the icon URLs that the Sanity pull cycle baked in. This script is the
-narrow alternative — read the VPK, build per-locale `names`/`descriptions`/
+the legacy remote icon URLs baked into the JSON. This script is the narrow
+alternative — read the VPK, build per-locale `names`/`descriptions`/
 `lore_i18n` maps, merge them into the existing JSON in place.
 
 Usage (from repo root or data/):

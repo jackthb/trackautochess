@@ -1,0 +1,13 @@
+{
+  "_comment": "Text corrections applied to extracted VPK strings. Each entry is a regex 'find' applied via re.sub against every string field (description, lore, notes, names) in items_full.json, units_full.json, synergies.json, relics.json, abilities.json. The 'where' field is optional: if present, the correction only applies to matching entity types. The 'note' field is human-readable context, ignored at runtime.",
+  "corrections": [
+    {
+      "find": "\\bfarest\\b",
+      "replace": "farthest",
+      "where": [
+        "items_full"
+      ],
+      "note": "Blink Dagger and Overwhelming Blink misspell 'farthest' as 'farest'."
+    }
+  ]
+}

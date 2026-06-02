@@ -4,11 +4,6 @@
       "name": "Magic Seed",
       "description": "Fill your bench with magic vegetable sprouts. The sell value of these sprouts has a dynamic chance to increase by 1 at the beginning of every round. You can sell the sprouts any time to reuse the bench.",
       "lore": "",
-      "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/7850b75af42238d316080620aba606e20ac22ced-88x64.png",
-      "icon_dimensions": {
-        "height": 64,
-        "width": 88
-      },
       "names": {
         "en": "Magic Seed",
         "ru": "Magic Seed"
@@ -23,11 +18,6 @@
       "name": "Leafy Essence",
       "description": "All offside branches unlock automatically in this single game.",
       "lore": "",
-      "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/0a6b2ea4c4958a40a7ede05997481792b10d0fba-88x64.png",
-      "icon_dimensions": {
-        "height": 64,
-        "width": 88
-      },
       "names": {
         "en": "Leafy Essence",
         "ru": "Leafy Essence"
@@ -42,11 +32,6 @@
       "name": "Shroud of Concealment",
       "description": "Conceal your chessboard in the Preparation Phase. Hide your courier also to skip the next PVP battle after your courier takes damage.",
       "lore": "",
-      "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/e3627ed522f592193d6fac0a731b32f216e10c2e-88x64.png",
-      "icon_dimensions": {
-        "height": 64,
-        "width": 88
-      },
       "names": {
         "en": "Shroud of Concealment",
         "ru": "Shroud of Concealment"
@@ -63,11 +48,6 @@
       "name": "Doubloon",
       "description": "Relic Consumable: Click to Use\nTransfer 20% of the higher one of your Health and Mana into another. Can be used twice",
       "lore": "",
-      "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/b22a3ad136ecaabc95b675327376941b6cad702e-88x64.png",
-      "icon_dimensions": {
-        "height": 64,
-        "width": 88
-      },
       "names": {
         "en": "Doubloon",
         "ru": "Doubloon"
@@ -82,11 +62,6 @@
       "name": "Greevil Egg",
       "description": "Relic Consumable: Click to Use\n Put a piece into an egg which has a chance to grow once every round. You can break it anytime, hatching a piece according to the points.",
       "lore": "",
-      "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/634e8c38f58236a43cd7fbdb8aa0b6e1c4a1c87a-88x64.png",
-      "icon_dimensions": {
-        "height": 64,
-        "width": 88
-      },
       "names": {
         "en": "Greevil Egg",
         "ru": "Greevil Egg"
@@ -101,11 +76,6 @@
       "name": "Gaolers Master Key",
       "description": "You can freely dismiss any race/class. If already dismissed, the spent gold will be refunded.",
       "lore": "",
-      "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/4a64cc0761c5955f07293cb9ea3f1043fe071ff2-88x64.png",
-      "icon_dimensions": {
-        "height": 64,
-        "width": 88
-      },
       "names": {
         "en": "Gaolers Master Key",
         "ru": "Gaolers Master Key"
@@ -122,11 +92,6 @@
       "name": "Weighted Dice",
       "description": "Refund 1~2 random Gold if you fail to recruit any owned chess piece.",
       "lore": "",
-      "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/708b74fe2b1917348cd97e002a89a7655539e660-88x64.png",
-      "icon_dimensions": {
-        "height": 64,
-        "width": 88
-      },
       "names": {
         "en": "Weighted Dice",
         "ru": "Weighted Dice"
@@ -141,11 +106,6 @@
       "name": "Magic box",
       "description": "Packs an ally piece, at the beginning of next round, transforms it into a randon new piece of the same Level and Rank. 12 times available.",
       "lore": "",
-      "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/85cf9390b9d1037a326262287d97d343e5ab7324-88x64.png",
-      "icon_dimensions": {
-        "height": 64,
-        "width": 88
-      },
       "names": {
         "en": "Magic box",
         "ru": "Magic box"
@@ -160,11 +120,6 @@
       "name": "Malefic Rapture",
       "description": "When your courier takes damage, you immediately gain the corresponding (damage taken) amount of experience.",
       "lore": "",
-      "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/588c5ab5f5cf9deb2ba20404e9d4869257a081d3-88x64.png",
-      "icon_dimensions": {
-        "height": 64,
-        "width": 88
-      },
       "names": {
         "en": "Malefic Rapture",
         "ru": "Malefic Rapture"
@@ -181,11 +136,6 @@
       "name": "Mango Tree",
       "description": "Plants a Mango Tree by the side of your Chessboard.\nDrops an Enchanted Mango whenever your home battle result differs from the last round. The tree wilts after 8 drops. A Golden Mango will be dropped if the mango tree is still alive at Relic expiration.",
       "lore": "",
-      "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/eb6d466d89871234eb28da4261a9d3e7b404a29e-88x64.png",
-      "icon_dimensions": {
-        "height": 64,
-        "width": 88
-      },
       "names": {
         "en": "Mango Tree",
         "ru": "Mango Tree"
@@ -202,11 +152,6 @@
       "name": "March of The Beasts",
       "description": "All creeps duplicate themselves and counted as level +1.",
       "lore": "",
-      "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/e7d2acd38923305c8dc51da495e882e87a85b1fc-88x64.png",
-      "icon_dimensions": {
-        "height": 64,
-        "width": 88
-      },
       "names": {
         "en": "March of The Beasts",
         "ru": "March of The Beasts"
@@ -221,11 +166,6 @@
       "name": "Defiant Shell",
       "description": "Reduces damage taken from home defeats or increases damage dealt in away-home victories by your current rank + 1.",
       "lore": "",
-      "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/01c1c3c75559fcc46a08d3b438818701fe2d78a3-88x64.png",
-      "icon_dimensions": {
-        "height": 64,
-        "width": 88
-      },
       "names": {
         "en": "Defiant Shell",
         "ru": "Defiant Shell"
@@ -240,11 +180,6 @@
       "name": "Time-Space Replica",
       "description": "Replicate your last relic.",
       "lore": "",
-      "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/5beb323bd316206ee6a434f63bc508c9128774e4-88x64.jpg",
-      "icon_dimensions": {
-        "height": 64,
-        "width": 88
-      },
       "names": {
         "en": "Time-Space Replica",
         "ru": "Time-Space Replica"
@@ -259,11 +194,6 @@
       "name": "Wheel of Wonder",
       "description": "Relic Consumable: Click to Use\nChoose an ally piece and put it into the wheel of wonder, DISCOVER a special version of it with an extra random synergy.",
       "lore": "",
-      "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/2be82bf47fc5b861ac59067a7b824e7184037f47-88x64.png",
-      "icon_dimensions": {
-        "height": 64,
-        "width": 88
-      },
       "names": {
         "en": "Wheel of Wonder",
         "ru": "Wheel of Wonder"
@@ -278,11 +208,6 @@
       "name": "Second Chance",
       "description": "When you use consumable items of the choice category, you can refresh the selection panel and acquire different options.",
       "lore": "",
-      "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/b1b061169fcc619828448f77659f2a70951d2879-88x64.png",
-      "icon_dimensions": {
-        "height": 64,
-        "width": 88
-      },
       "names": {
         "en": "Second Chance",
         "ru": "Second Chance"
@@ -299,11 +224,6 @@
       "name": "Stolen Vault",
       "description": "Discard all 3 relics and get a Stolen Vault with random 10 ~ 15 gold.",
       "lore": "",
-      "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/01c1d351b0b2de28698db014491e9565dba15164-88x64.png",
-      "icon_dimensions": {
-        "height": 64,
-        "width": 88
-      },
       "names": {
         "en": "Stolen Vault",
         "ru": "Stolen Vault"
@@ -318,11 +238,6 @@
       "name": "Chiaroscuro Certainty",
       "description": "Your win or lose streak will not be terminated and when the relic disappears, you will receive a corresponding level loot token based on the highest reward/compensation held during that time.",
       "lore": "",
-      "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/0438b04ccfa96d9a6b61581dca2d8f6cb9a03366-88x64.png",
-      "icon_dimensions": {
-        "height": 64,
-        "width": 88
-      },
       "names": {
         "en": "Chiaroscuro Certainty",
         "ru": "Chiaroscuro Certainty"
@@ -337,11 +252,6 @@
       "name": "Lucid Star",
       "description": "There is a 20% chance to directly obtain a ★★ piece on purchase if you already owned one.",
       "lore": "",
-      "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/b4dcc34531ca9aeecf5c5a2e43217276932b3a8d-88x64.png",
-      "icon_dimensions": {
-        "height": 64,
-        "width": 88
-      },
       "names": {
         "en": "Lucid Star",
         "ru": "Lucid Star"
@@ -356,11 +266,6 @@
       "name": "Weaponsmith",
       "description": "You gain +1 to the level of loot tokens you get for recasting equipment.\n After recasting 2 pieces of Spoil tokens, the weapon smith will disappear.",
       "lore": "",
-      "icon_url": "https://cdn.sanity.io/images/9ntwx5ie/production/158dfa1820c0f513f88e4bb6fae1e79547d87abc-88x64.png",
-      "icon_dimensions": {
-        "height": 64,
-        "width": 88
-      },
       "names": {
         "en": "Weaponsmith",
         "ru": "Weaponsmith"

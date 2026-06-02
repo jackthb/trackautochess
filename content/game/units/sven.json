@@ -1,0 +1,63 @@
+{
+  "gameId": "chess_sven",
+  "name": "Sven",
+  "slug": "sven",
+  "source": {
+    "id": "chess_sven",
+    "cost": 5,
+    "pool": "standard",
+    "synergies": [
+      "Demon",
+      "Warrior"
+    ],
+    "names": {
+      "en": "Sven",
+      "lore": "Sven",
+      "ko": "스벤",
+      "ru": "Sven",
+      "zh-cn": "流浪剑客",
+      "zh-tw": "流浪劍客"
+    },
+    "attack_type": "melee",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 1200,
+        "mana": 100,
+        "atk": [
+          150,
+          210
+        ],
+        "armor": 12,
+        "magic_resist": 0,
+        "atk_rate": 1.6,
+        "atk_range": 205
+      },
+      "2_star": {
+        "hp": 2400,
+        "mana": 100,
+        "atk": [
+          300,
+          420
+        ],
+        "armor": 12,
+        "magic_resist": 0,
+        "atk_rate": 1.6,
+        "atk_range": 205
+      },
+      "3_star": {
+        "hp": 4800,
+        "mana": 100,
+        "atk": [
+          600,
+          840
+        ],
+        "armor": 12,
+        "magic_resist": 0,
+        "atk_rate": 1.6,
+        "atk_range": 205
+      }
+    }
+  },
+  "overrides": {}
+}

@@ -1,0 +1,26 @@
+{
+  "gameId": "item_sadan",
+  "name": "Satanic",
+  "slug": "satanic",
+  "source": {
+    "name": "Satanic",
+    "description": "+600HP, +50% lifesteal.\n\nActive ability: Activates when taking damage\nGains +150% Lifesteal for 6 sec.",
+    "lore": "Immense power at the cost of your soul.",
+    "quality": "artifact",
+    "texture": "item_satanic",
+    "notes": [],
+    "names": {
+      "en": "Satanic",
+      "ru": "Satanic"
+    },
+    "descriptions": {
+      "en": "+600HP, +50% lifesteal.\n\nActive ability: Activates when taking damage\nGains +150% Lifesteal for 6 sec.",
+      "ru": "+600HP, +50% вампиризма.\n\nАктивируется при получении урона\nПолучает +150% вампиризма на 6 секунд."
+    },
+    "lore_i18n": {
+      "en": "Immense power at the cost of your soul.",
+      "ru": "Невероятная сила ценой твоей души."
+    }
+  },
+  "overrides": {}
+}

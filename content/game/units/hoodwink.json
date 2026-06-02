@@ -1,0 +1,63 @@
+{
+  "gameId": "chess_hw",
+  "name": "Hoodwink",
+  "slug": "hoodwink",
+  "source": {
+    "id": "chess_hw",
+    "cost": 1,
+    "pool": "standard",
+    "synergies": [
+      "Beast",
+      "Hunter"
+    ],
+    "names": {
+      "en": "Hoodwink",
+      "lore": "Hoodwink",
+      "ko": "후드윙크",
+      "ru": "Hoodwink",
+      "zh-cn": "森海飞霞",
+      "zh-tw": "森海飛霞"
+    },
+    "attack_type": "ranged",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 550,
+        "mana": 0,
+        "atk": [
+          40,
+          60
+        ],
+        "armor": 2,
+        "magic_resist": 0,
+        "atk_rate": 1.2,
+        "atk_range": 400
+      },
+      "2_star": {
+        "hp": 1100,
+        "mana": 0,
+        "atk": [
+          80,
+          120
+        ],
+        "armor": 2,
+        "magic_resist": 0,
+        "atk_rate": 1.2,
+        "atk_range": 400
+      },
+      "3_star": {
+        "hp": 2200,
+        "mana": 0,
+        "atk": [
+          160,
+          240
+        ],
+        "armor": 2,
+        "magic_resist": 0,
+        "atk_rate": 1.2,
+        "atk_range": 400
+      }
+    }
+  },
+  "overrides": {}
+}

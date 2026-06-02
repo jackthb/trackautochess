@@ -1,0 +1,63 @@
+{
+  "gameId": "chess_aa",
+  "name": "Ancient Apparition",
+  "slug": "ancient-apparition",
+  "source": {
+    "id": "chess_aa",
+    "cost": 1,
+    "pool": "standard",
+    "synergies": [
+      "Elemental",
+      "Mage"
+    ],
+    "names": {
+      "en": "Ancient Apparition",
+      "lore": "Kaldr",
+      "ko": "고대 영혼",
+      "ru": "Ancient Apparition",
+      "zh-cn": "极寒幽魂",
+      "zh-tw": "極寒幽魂"
+    },
+    "attack_type": "ranged",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 550,
+        "mana": 0,
+        "atk": [
+          30,
+          60
+        ],
+        "armor": 2,
+        "magic_resist": 10,
+        "atk_rate": 1.5,
+        "atk_range": 400
+      },
+      "2_star": {
+        "hp": 1100,
+        "mana": 0,
+        "atk": [
+          60,
+          120
+        ],
+        "armor": 2,
+        "magic_resist": 10,
+        "atk_rate": 1.5,
+        "atk_range": 600
+      },
+      "3_star": {
+        "hp": 2200,
+        "mana": 0,
+        "atk": [
+          120,
+          240
+        ],
+        "armor": 2,
+        "magic_resist": 10,
+        "atk_rate": 1.5,
+        "atk_range": 800
+      }
+    }
+  },
+  "overrides": {}
+}

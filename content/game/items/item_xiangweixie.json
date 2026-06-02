@@ -1,0 +1,26 @@
+{
+  "gameId": "item_xiangweixie",
+  "name": "Phase Boots",
+  "slug": "phase-boots",
+  "source": {
+    "name": "Phase Boots",
+    "description": "Enables quick movement.\n\nActive ability: Instant Activation\nMelee carriers will phase through obstacles, swiftly moving to the vicinity of an enemy chess piece with lower health in the range and prioritizing an attack on it.\n\nEffect Range:600",
+    "lore": "Boots that allow the wearer to travel between the ether.",
+    "quality": "consumable",
+    "texture": "phase_boots",
+    "notes": [],
+    "names": {
+      "en": "Phase Boots",
+      "ru": "Phase Boots"
+    },
+    "descriptions": {
+      "en": "Enables quick movement.\n\nActive ability: Instant Activation\nMelee carriers will phase through obstacles, swiftly moving to the vicinity of an enemy chess piece with lower health in the range and prioritizing an attack on it.\n\nEffect Range:600",
+      "ru": "Enables quick movement.\n\nActive ability: Instant Activation\nMelee carriers will phase through obstacles, swiftly moving to the vicinity of an enemy chess piece with lower health in the range and prioritizing an attack on it."
+    },
+    "lore_i18n": {
+      "en": "Boots that allow the wearer to travel between the ether.",
+      "ru": "Boots that allow the wearer to travel between the ether."
+    }
+  },
+  "overrides": {}
+}

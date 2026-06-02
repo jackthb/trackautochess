@@ -1,0 +1,63 @@
+{
+  "gameId": "chess_dw",
+  "name": "Dark Willow",
+  "slug": "dark-willow",
+  "source": {
+    "id": "chess_dw",
+    "cost": 1,
+    "pool": "standard",
+    "synergies": [
+      "Elf",
+      "Wizard"
+    ],
+    "names": {
+      "en": "Dark Willow",
+      "lore": "Mireska",
+      "ko": "흑버들",
+      "ru": "Dark Willow",
+      "zh-cn": "邪影芳灵",
+      "zh-tw": "邪影芳靈"
+    },
+    "attack_type": "ranged",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 450,
+        "mana": 0,
+        "atk": [
+          40,
+          70
+        ],
+        "armor": 1,
+        "magic_resist": 0,
+        "atk_rate": 1.1,
+        "atk_range": 400
+      },
+      "2_star": {
+        "hp": 900,
+        "mana": 0,
+        "atk": [
+          80,
+          140
+        ],
+        "armor": 1,
+        "magic_resist": 0,
+        "atk_rate": 1.1,
+        "atk_range": 400
+      },
+      "3_star": {
+        "hp": 1800,
+        "mana": 0,
+        "atk": [
+          160,
+          280
+        ],
+        "armor": 1,
+        "magic_resist": 0,
+        "atk_rate": 1.1,
+        "atk_range": 400
+      }
+    }
+  },
+  "overrides": {}
+}

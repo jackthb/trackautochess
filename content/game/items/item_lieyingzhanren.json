@@ -1,0 +1,23 @@
+{
+  "gameId": "item_lieyingzhanren",
+  "name": "Falcon Blade",
+  "slug": "falcon-blade",
+  "source": {
+    "name": "Falcon Blade",
+    "description": "Attack damage +25。",
+    "lore": "",
+    "quality": "common",
+    "texture": "falcon_blade",
+    "notes": [],
+    "names": {
+      "en": "Falcon Blade",
+      "ru": "Falcon Blade"
+    },
+    "descriptions": {
+      "en": "Attack damage +25。",
+      "ru": "Урон атаки +25."
+    },
+    "lore_i18n": {}
+  },
+  "overrides": {}
+}

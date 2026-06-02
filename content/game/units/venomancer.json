@@ -1,0 +1,64 @@
+{
+  "gameId": "chess_veno",
+  "name": "Venomancer",
+  "slug": "venomancer",
+  "source": {
+    "id": "chess_veno",
+    "cost": 3,
+    "pool": "standard",
+    "synergies": [
+      "Aqir",
+      "Beast",
+      "Warlock"
+    ],
+    "names": {
+      "en": "Venomancer",
+      "lore": "Lesale",
+      "ko": "맹독사",
+      "ru": "Venomancer",
+      "zh-cn": "剧毒术士",
+      "zh-tw": "劇毒術士"
+    },
+    "attack_type": "ranged",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 550,
+        "mana": 100,
+        "atk": [
+          50,
+          60
+        ],
+        "armor": 4,
+        "magic_resist": 30,
+        "atk_rate": 1.2,
+        "atk_range": 400
+      },
+      "2_star": {
+        "hp": 1100,
+        "mana": 100,
+        "atk": [
+          100,
+          120
+        ],
+        "armor": 4,
+        "magic_resist": 30,
+        "atk_rate": 1.2,
+        "atk_range": 400
+      },
+      "3_star": {
+        "hp": 2200,
+        "mana": 100,
+        "atk": [
+          200,
+          240
+        ],
+        "armor": 4,
+        "magic_resist": 30,
+        "atk_rate": 1.2,
+        "atk_range": 400
+      }
+    }
+  },
+  "overrides": {}
+}

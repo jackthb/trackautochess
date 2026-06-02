@@ -47,6 +47,22 @@
       "to": "data/items.json"
     },
     {
+      "from": "../data/items_full.json",
+      "to": "data/items_full.json"
+    },
+    {
+      "from": "../data/talents.json",
+      "to": "data/talents.json"
+    },
+    {
+      "from": "../data/abilities.json",
+      "to": "data/abilities.json"
+    },
+    {
+      "from": "../data/game_mode.json",
+      "to": "data/game_mode.json"
+    },
+    {
       "from": "../data/regions_config.json",
       "to": "data/regions_config.json"
     },

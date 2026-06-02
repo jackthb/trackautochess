@@ -12,9 +12,8 @@ interface NavBarProps {
   supabase?: SupabaseClient | null;
 }
 
-// UI chrome strings stay English across locales for now. Localized chrome
-// will return through the same Sanity-driven pipeline as entity names once
-// per-locale UI translations exist.
+// UI chrome strings stay English across locales for now. Per-locale UI
+// translations can be added once the copy needs localization.
 const t = {
   items: "Items",
   units: "Units",

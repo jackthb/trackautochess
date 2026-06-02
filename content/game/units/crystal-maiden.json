@@ -1,0 +1,63 @@
+{
+  "gameId": "chess_cm",
+  "name": "Crystal Maiden",
+  "slug": "crystal-maiden",
+  "source": {
+    "id": "chess_cm",
+    "cost": 1,
+    "pool": "standard",
+    "synergies": [
+      "Human",
+      "Mage"
+    ],
+    "names": {
+      "en": "Crystal Maiden",
+      "lore": "Rylai",
+      "ko": "수정의 여인",
+      "ru": "Crystal Maiden",
+      "zh-cn": "水晶室女",
+      "zh-tw": "水晶室女"
+    },
+    "attack_type": "ranged",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 450,
+        "mana": 0,
+        "atk": [
+          40,
+          45
+        ],
+        "armor": 1,
+        "magic_resist": 5,
+        "atk_rate": 1.7,
+        "atk_range": 600
+      },
+      "2_star": {
+        "hp": 900,
+        "mana": 0,
+        "atk": [
+          80,
+          90
+        ],
+        "armor": 1,
+        "magic_resist": 5,
+        "atk_rate": 1.7,
+        "atk_range": 600
+      },
+      "3_star": {
+        "hp": 1800,
+        "mana": 0,
+        "atk": [
+          160,
+          180
+        ],
+        "armor": 1,
+        "magic_resist": 5,
+        "atk_rate": 1.7,
+        "atk_range": 600
+      }
+    }
+  },
+  "overrides": {}
+}

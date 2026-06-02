@@ -1,0 +1,20 @@
+{
+  "gameId": "item_test_dashanbi",
+  "name": "Test item: +100% evasion",
+  "slug": "test-item-100-evasion",
+  "source": {
+    "name": "Test item: +100% evasion",
+    "description": "",
+    "lore": "",
+    "quality": "rare",
+    "texture": "item_force_field",
+    "notes": [],
+    "names": {
+      "en": "Test item: +100% evasion",
+      "ru": "Test item: +100% evasion"
+    },
+    "descriptions": {},
+    "lore_i18n": {}
+  },
+  "overrides": {}
+}

@@ -1,0 +1,63 @@
+{
+  "gameId": "chess_db",
+  "name": "Dawnbreaker",
+  "slug": "dawnbreaker",
+  "source": {
+    "id": "chess_db",
+    "cost": 3,
+    "pool": "standard",
+    "synergies": [
+      "Draenei",
+      "Knight"
+    ],
+    "names": {
+      "en": "Dawnbreaker",
+      "lore": "Valora",
+      "ko": "여명의 파괴자",
+      "ru": "Dawnbreaker",
+      "zh-cn": "破晓辰星",
+      "zh-tw": "破曉辰星"
+    },
+    "attack_type": "melee",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 700,
+        "mana": 100,
+        "atk": [
+          70,
+          110
+        ],
+        "armor": 7,
+        "magic_resist": 0,
+        "atk_rate": 1.6,
+        "atk_range": 205
+      },
+      "2_star": {
+        "hp": 1400,
+        "mana": 100,
+        "atk": [
+          140,
+          220
+        ],
+        "armor": 7,
+        "magic_resist": 0,
+        "atk_rate": 1.6,
+        "atk_range": 205
+      },
+      "3_star": {
+        "hp": 2800,
+        "mana": 100,
+        "atk": [
+          280,
+          440
+        ],
+        "armor": 7,
+        "magic_resist": 0,
+        "atk_rate": 1.6,
+        "atk_range": 205
+      }
+    }
+  },
+  "overrides": {}
+}

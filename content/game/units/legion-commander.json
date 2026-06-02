@@ -1,0 +1,63 @@
+{
+  "gameId": "chess_lc",
+  "name": "Legion Commander",
+  "slug": "legion-commander",
+  "source": {
+    "id": "chess_lc",
+    "cost": 3,
+    "pool": "standard",
+    "synergies": [
+      "Human",
+      "Knight"
+    ],
+    "names": {
+      "en": "Legion Commander",
+      "lore": "Tresdin",
+      "ko": "군단 사령관",
+      "ru": "Legion Commander",
+      "zh-cn": "军团指挥官",
+      "zh-tw": "軍團指揮官"
+    },
+    "attack_type": "melee",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 800,
+        "mana": 0,
+        "atk": [
+          70,
+          100
+        ],
+        "armor": 7,
+        "magic_resist": 0,
+        "atk_rate": 1.2,
+        "atk_range": 205
+      },
+      "2_star": {
+        "hp": 1600,
+        "mana": 0,
+        "atk": [
+          140,
+          200
+        ],
+        "armor": 7,
+        "magic_resist": 0,
+        "atk_rate": 1.2,
+        "atk_range": 205
+      },
+      "3_star": {
+        "hp": 3200,
+        "mana": 0,
+        "atk": [
+          280,
+          400
+        ],
+        "armor": 7,
+        "magic_resist": 0,
+        "atk_rate": 1.2,
+        "atk_range": 205
+      }
+    }
+  },
+  "overrides": {}
+}

@@ -1,0 +1,32 @@
+{
+  "gameId": "is_human",
+  "name": "Human",
+  "slug": "human",
+  "source": {
+    "name": "Human",
+    "description": "Species Perk: Spark of Mind\n\nActive when you have at least (N) different human pieces on board. (Multiple effects stack) \n\n(3) Humans: Gain 2 experience points at the start of each round.\n(6) Humans: Gain (Courier Level - 2) points of experience points at the start of each round if you won your last home battle.",
+    "description_html": "<h1>Species Perk: Spark of Mind</h1><font color=\"#656585\">Active when you have at least (N) different human pieces on board. (Multiple effects stack) </font><br><br>(3) Humans: Gain 2 experience points at the start of each round.<br>(6) Humans: Gain (Courier Level - 2) points of experience points at the start of each round if you won your last home battle.",
+    "lore": "Humans are an intelligent species that values kindness and cooperation, and silences any who they deem unworthy.",
+    "notes": [
+      "Experience gained by Spark of Mind is not restricted by the max level of 10."
+    ],
+    "tiers": [
+      3,
+      6
+    ],
+    "ability_special": {},
+    "names": {
+      "en": "Human",
+      "ru": "Human"
+    },
+    "descriptions": {
+      "en": "Species Perk: Spark of Mind\n Active when you have at least (N) different human pieces on board. (Multiple effects stack) \n\n(3) Humans: Gain 2 experience points at the start of each round.\n(6) Humans: Gain (Courier Level - 2) points of experience points at the start of each round if you won your last home battle.",
+      "ru": "Species Perk: Spark of Mind\n Активна, когда минимум (N) разных Human на столе.(Эффекты складываются) \n\n(3) Humans: Получаете 2 опыта в начале каждого раунда.\n(6) Humans: Получаете (Уровень Курьера -2) очков опыта в начале каждого раунда, если вы выиграли последнюю домашнюю битву."
+    },
+    "lore_i18n": {
+      "en": "Humans are an intelligent species that values kindness and cooperation, and silences any who they deem unworthy.",
+      "ru": "Humans — разумная раса, ценящая доброту и сотрудничество, и заставляющая молчать тех, кого считает недостойными."
+    }
+  },
+  "overrides": {}
+}

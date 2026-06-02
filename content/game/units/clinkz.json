@@ -1,0 +1,63 @@
+{
+  "gameId": "chess_clinkz",
+  "name": "Clinkz",
+  "slug": "clinkz",
+  "source": {
+    "id": "chess_clinkz",
+    "cost": 1,
+    "pool": "undead",
+    "synergies": [
+      "Hunter",
+      "Undead"
+    ],
+    "names": {
+      "en": "Clinkz",
+      "lore": "Clinkz",
+      "ko": "클링츠",
+      "ru": "Clinkz",
+      "zh-cn": "骷髅弓箭手",
+      "zh-tw": "骷髏弓箭手"
+    },
+    "attack_type": "ranged",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 500,
+        "mana": 100,
+        "atk": [
+          40,
+          60
+        ],
+        "armor": 2,
+        "magic_resist": 0,
+        "atk_rate": 1,
+        "atk_range": 600
+      },
+      "2_star": {
+        "hp": 1000,
+        "mana": 100,
+        "atk": [
+          80,
+          120
+        ],
+        "armor": 2,
+        "magic_resist": 0,
+        "atk_rate": 1,
+        "atk_range": 600
+      },
+      "3_star": {
+        "hp": 2000,
+        "mana": 100,
+        "atk": [
+          160,
+          240
+        ],
+        "armor": 2,
+        "magic_resist": 0,
+        "atk_rate": 1,
+        "atk_range": 600
+      }
+    }
+  },
+  "overrides": {}
+}

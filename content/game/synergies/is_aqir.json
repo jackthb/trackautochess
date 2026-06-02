@@ -1,0 +1,33 @@
+{
+  "gameId": "is_aqir",
+  "name": "Aqir",
+  "slug": "aqir",
+  "source": {
+    "name": "Aqir",
+    "description": "Species Trait: Infection\n\nActive when there are at least (N) different Aqir chess pieces on the chessboard. (Multiple effects stack)\n\n(2) Aqirs: Grants all non-Aqir allies: Upon death, if there is any Infected friendly piece of the same name on the chessboard, immediately hatches a random Aqir piece.\n(4) Aqirs: Rank 1 effect now also applies to all friendly Aqir pieces, and will hatch a random higher-level Aqir piece.",
+    "description_html": "<h1>Species Trait: Infection</h1><font color=\"#656585\">Active when there are at least (N) different Aqir chess pieces on the chessboard. (Multiple effects stack)</font><br><br>(2) Aqirs: Grants all non-Aqir allies: Upon death, if there is any Infected friendly piece of the same name on the chessboard, immediately hatches a random Aqir piece.<br>(4) Aqirs: Rank 1 effect now also applies to all friendly Aqir pieces , and will hatch a random higher-level Aqir piece.",
+    "lore": "From time to time, the Aqirs dwelled on and beneath the ancient land of Drodo Island. Though most of their powers are sealed by the holy Gods, remained powers from the insanity within the Aqir blood draws their insectoid instinct to reside on the flesh of other creatures.",
+    "notes": [
+      "Aqirs do not infect on chess pieces with a expiration duration.",
+      "The higher the level of the infected friendly chess piece, the higher the level of the summoned Aqir piece.Rank 1 effect summons the same-level piece as the dying chess piece. Rank 2 summons a chess piece that can be 1 level higher than the dying chess piece, randomly."
+    ],
+    "tiers": [
+      2,
+      4
+    ],
+    "ability_special": {},
+    "names": {
+      "en": "Aqir",
+      "ru": "Aqir"
+    },
+    "descriptions": {
+      "en": "Species Trait: Infection\n Active when there are at least (N) different Aqir chess pieces on the chessboard. (Multiple effects stack)\n\n(2) Aqirs: Grants all non-Aqir allies: Upon death, if there is any Infected friendly piece of the same name on the chessboard, immediately hatches a random Aqir piece.\n(4) Aqirs: Rank 1 effect now also applies to all friendly Aqir pieces, and will hatch a random higher-level Aqir piece.",
+      "ru": "Species Trait: Infection\n Активно когда у вас есть (N) разных Aqir фигур на столе. (Эффекты складываются)\n\n(2) Aqirs: дает всем союзным не-Aqir: при смерти, если на поле есть заражённый союзник с тем же именем, немедленно вылупляется случайная фигура Aqir.\n(4) Aqirs: Акиры могут вылуплятся из союзных Aqir фигур, воскрешая фигуру Aqir более высокого уровня."
+    },
+    "lore_i18n": {
+      "en": "From time to time, the Aqirs dwelled on and beneath the ancient land of Drodo Island. Though most of their powers are sealed by the holy Gods, remained powers from the insanity within the Aqir blood draws their insectoid instinct to reside on the flesh of other creatures.",
+      "ru": "Время от времени Акиры обитали на древней земле Острова Дродо и под ней. Хотя большинство их сил запечатаны святыми богами, оставшиеся силы, вызванные безумием в их крови, побуждают их насекомоподобный инстинкт интересоваться, как же они работают."
+    }
+  },
+  "overrides": {}
+}

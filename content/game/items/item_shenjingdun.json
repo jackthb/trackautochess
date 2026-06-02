@@ -1,0 +1,23 @@
+{
+  "gameId": "item_shenjingdun",
+  "name": "Mirror Shield",
+  "slug": "mirror-shield",
+  "source": {
+    "name": "Mirror Shield",
+    "description": "Physical Block +60. \n50% probability of rebounding all damage and directional spells taken.",
+    "lore": "",
+    "quality": "rare",
+    "texture": "item_mirror_shield",
+    "notes": [],
+    "names": {
+      "en": "Mirror Shield",
+      "ru": "Mirror Shield"
+    },
+    "descriptions": {
+      "en": "Physical Block +60. \n50% probability of rebounding all damage and directional spells taken.",
+      "ru": "Блокировка физического урона +60. \n50% шанс отразить весь получаемый урон и направленные заклинания."
+    },
+    "lore_i18n": {}
+  },
+  "overrides": {}
+}

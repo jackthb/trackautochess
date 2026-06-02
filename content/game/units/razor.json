@@ -1,0 +1,63 @@
+{
+  "gameId": "chess_razor",
+  "name": "Razor",
+  "slug": "razor",
+  "source": {
+    "id": "chess_razor",
+    "cost": 3,
+    "pool": "standard",
+    "synergies": [
+      "Elemental",
+      "Shaman"
+    ],
+    "names": {
+      "en": "Razor",
+      "lore": "Razor",
+      "ko": "레이저",
+      "ru": "Razor",
+      "zh-cn": "闪电幽魂",
+      "zh-tw": "閃電幽魂"
+    },
+    "attack_type": "ranged",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 650,
+        "mana": 100,
+        "atk": [
+          50,
+          60
+        ],
+        "armor": 4,
+        "magic_resist": 0,
+        "atk_rate": 1.1,
+        "atk_range": 400
+      },
+      "2_star": {
+        "hp": 1300,
+        "mana": 100,
+        "atk": [
+          100,
+          120
+        ],
+        "armor": 4,
+        "magic_resist": 0,
+        "atk_rate": 1.1,
+        "atk_range": 400
+      },
+      "3_star": {
+        "hp": 2600,
+        "mana": 100,
+        "atk": [
+          200,
+          240
+        ],
+        "armor": 4,
+        "magic_resist": 0,
+        "atk_rate": 1.1,
+        "atk_range": 400
+      }
+    }
+  },
+  "overrides": {}
+}

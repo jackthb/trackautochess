@@ -1,0 +1,64 @@
+{
+  "gameId": "chess_vs",
+  "name": "Vengeful Spirit",
+  "slug": "vengeful-spirit",
+  "source": {
+    "id": "chess_vs",
+    "cost": 2,
+    "pool": "undead",
+    "synergies": [
+      "Demon Hunter",
+      "Harpy",
+      "Undead"
+    ],
+    "names": {
+      "en": "Vengeful Spirit",
+      "lore": "Shendelzare",
+      "ko": "복수 혼령",
+      "ru": "Vengeful Spirit",
+      "zh-cn": "复仇之魂",
+      "zh-tw": "復仇之魂"
+    },
+    "attack_type": "ranged",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 500,
+        "mana": 0,
+        "atk": [
+          40,
+          80
+        ],
+        "armor": 2,
+        "magic_resist": 0,
+        "atk_rate": 1.3,
+        "atk_range": 400
+      },
+      "2_star": {
+        "hp": 1000,
+        "mana": 0,
+        "atk": [
+          80,
+          160
+        ],
+        "armor": 2,
+        "magic_resist": 0,
+        "atk_rate": 1.3,
+        "atk_range": 400
+      },
+      "3_star": {
+        "hp": 2000,
+        "mana": 0,
+        "atk": [
+          160,
+          320
+        ],
+        "armor": 2,
+        "magic_resist": 0,
+        "atk_rate": 1.3,
+        "atk_range": 400
+      }
+    }
+  },
+  "overrides": {}
+}

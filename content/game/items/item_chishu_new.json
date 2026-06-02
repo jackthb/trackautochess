@@ -1,0 +1,23 @@
+{
+  "gameId": "item_chishu_new",
+  "name": "Tango",
+  "slug": "tango",
+  "source": {
+    "name": "Tango",
+    "description": "Courier consumable: Click to use\nKnock down a tree and randomly restore up to 8 health for your Courier.",
+    "lore": "",
+    "quality": "consumable",
+    "texture": "item_tango_single",
+    "notes": [],
+    "names": {
+      "en": "Tango",
+      "ru": "Tango"
+    },
+    "descriptions": {
+      "en": "Courier consumable: Click to use\nKnock down a tree and randomly restore up to 8 health for your Courier.",
+      "ru": "Courier consumable: Click to use\nСлучайным образом восстанавливает до 8 здоровья, ломая ближайшее дерево."
+    },
+    "lore_i18n": {}
+  },
+  "overrides": {}
+}

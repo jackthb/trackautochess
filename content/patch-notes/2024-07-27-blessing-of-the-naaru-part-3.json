@@ -1,0 +1,339 @@
+{
+  "date": "2024-07-27",
+  "title": "Blessing of the Naaru (Part 3)",
+  "source": "https://docs.google.com/document/d/e/2PACX-1vSqL-jwk09HyR6a4Nq4UlZoLRXG0jhckuQo6w3J1vn___kkfe19iFFgJGGpbK4zP7DE0sU2oQkhZsjT/pub",
+  "flavor": "When Orc Invaders filled with demonic blood slayed Draenei cities with no mercy, exiled Draenei bounty hunters are forced to holed up everywhere and conceal themselves despite the faith of Holy Light. At last they made a dishonorable way to recapture their homeland, by helping their enemy’s enemy. But Illidari never intended to share Draenei’s homeland with them after the overwhelming victory. After the initial despair, Bounty Hunter Gondar are waiting for a new chance for revenge. “I paid for my miscalculation, but all I need is to keep patient. The moment will come, when betrayers get betrayed finally…”",
+  "sections": [
+    {
+      "heading": "Chess Pieces",
+      "entries": [
+        {
+          "kind": "change",
+          "name": "Bounty Hunter",
+          "detail": "Synergies updated from Goblin/Assassin to Goblin/Draenei/Assassin.",
+          "entity": {
+            "type": "unit",
+            "slug": "bounty-hunter"
+          }
+        },
+        {
+          "kind": "rework",
+          "name": "Faceless Void",
+          "detail": "Ability Reworked into Time Zone Ability: Time Zone <Active Skill: Activate on Full Mana> Creates a blister in spacetime, altering the movement, attack, cast projectile, and turn rate speed of all units inside. Allies have increased speed and enemies have decreased speed. Enemies are leashed inside the Time Zone.",
+          "entity": {
+            "type": "unit",
+            "slug": "faceless-void"
+          }
+        },
+        {
+          "kind": "change",
+          "name": "Terrorblade - Metamorphosis",
+          "detail": "Now demonic Terrorblade will be no higher than the rank of Terrorblade. Ability:  Metamorphosis <Active Skill: Activate on Full Mana> Terrorblade transforms into a powerful demonic form with a ranged attack, removing most of the status effects from himself. Rank 2 or higher Terrorblade also transforms his nearest ally into a demon with a rank equal to the transformed chess piece(no higher than the rank of Terrorblade).",
+          "entity": {
+            "type": "unit",
+            "slug": "terrorblade"
+          }
+        },
+        {
+          "kind": "change",
+          "name": "Shadow Shaman - Hex",
+          "detail": "Fix CD bug of 8/6/4 secs",
+          "entity": {
+            "type": "unit",
+            "slug": "shadow-shaman"
+          }
+        },
+        {
+          "kind": "buff",
+          "name": "Batrider - Firefly",
+          "detail": "CD decreased from 20/15/10 secs to 15/12/9 secs",
+          "entity": {
+            "type": "unit",
+            "slug": "batrider"
+          }
+        },
+        {
+          "kind": "nerf",
+          "name": "Centaur Warrior - Double Edge",
+          "detail": "Radius decreased from 200/250/300 to 200/225/250",
+          "entity": {
+            "type": "unit",
+            "slug": "centaur-warrunner"
+          }
+        },
+        {
+          "kind": "buff",
+          "name": "Meepo - Poof",
+          "detail": "CD decreased from8/7/6 secs to 6/5/5 secs",
+          "entity": {
+            "type": "unit",
+            "slug": "meepo"
+          }
+        },
+        {
+          "kind": "buff",
+          "name": "Shadow Demon - Disseminate",
+          "detail": "Damage/Heal percentage increased from 20%/30%/50% to 25%/40%/70%",
+          "entity": {
+            "type": "unit",
+            "slug": "shadow-demon"
+          }
+        },
+        {
+          "kind": "buff",
+          "name": "Wraith King",
+          "detail": "Base HP increased from 950 to 1000",
+          "entity": {
+            "type": "unit",
+            "slug": "wraith-king"
+          }
+        },
+        {
+          "kind": "buff",
+          "name": "Wraith King - Spectral Blade",
+          "detail": "Base damage increase from 50/75/125 to 75/100/150",
+          "entity": {
+            "type": "unit",
+            "slug": "wraith-king"
+          }
+        },
+        {
+          "kind": "buff",
+          "name": "Lich - Chain Frost",
+          "detail": "Damage increment per bounce increased from 20/30/40 to 30/40/50",
+          "entity": {
+            "type": "unit",
+            "slug": "lich"
+          }
+        },
+        {
+          "kind": "change",
+          "name": "Redecorated Muerta ★★/★★★",
+          "detail": ""
+        },
+        {
+          "kind": "change",
+          "name": "Redecorated Snapfire★★★",
+          "detail": ""
+        }
+      ]
+    },
+    {
+      "heading": "Synergies",
+      "entries": [
+        {
+          "kind": "change",
+          "name": "Draenei - Blessing of the Naaru",
+          "detail": "(2) Draeneis: steal a combined fixed and percentage health from the enemy instead of a fixed health. (2) Draeneis: All friendly Draenei gain the effect: Every 3 seconds, steal 70+3% max health from the nearest enemy chess piece to heal themselves. (4) Draeneis: All friendly pieces gain effects: Whenever a cumulative total of more than 100 points of healing is taken it is split (cumulative healing×1.5) points of pure damage among the surrounding enemies.",
+          "entity": {
+            "type": "synergy",
+            "slug": "draenei"
+          }
+        },
+        {
+          "kind": "change",
+          "name": "Demon Hunter - Shuttered Soul",
+          "detail": "(4) Demon Hunters: Allies don’t count as demons any more (2) Demon Hunters: All friendly demons now have Fel Power. (4) Demon Hunters: All friendly pieces now have Fel Power.",
+          "entity": {
+            "type": "synergy",
+            "slug": "demon-hunter"
+          }
+        },
+        {
+          "kind": "buff",
+          "name": "Demon - Fel Power",
+          "detail": "Max Stack increased from 5 to 7",
+          "entity": {
+            "type": "synergy",
+            "slug": "demon"
+          }
+        },
+        {
+          "kind": "change",
+          "name": "Hunter - Aimed Shot",
+          "detail": "(9) Hunters: Deal an extra 30 magical damage on knockback",
+          "entity": {
+            "type": "synergy",
+            "slug": "hunter"
+          }
+        },
+        {
+          "kind": "nerf",
+          "name": "Assassin - Coup de Grace",
+          "detail": "Crit Chance decreased from 20% to 15%",
+          "entity": {
+            "type": "synergy",
+            "slug": "assassin"
+          }
+        },
+        {
+          "kind": "buff",
+          "name": "Undead - Plague",
+          "detail": "(6) Undeads: Max HP reduction increased from 35% to 40%",
+          "entity": {
+            "type": "synergy",
+            "slug": "undead"
+          }
+        }
+      ]
+    },
+    {
+      "heading": "Items",
+      "entries": [
+        {
+          "kind": "added",
+          "name": "New Tier 3 Item - Minotaur Horn",
+          "detail": "Carrier’s active ability counts as battlecry."
+        },
+        {
+          "kind": "added",
+          "name": "New Tier 4 Item - Havoc",
+          "detail": "Attack damage +50. All carrier’s damage turns into Pure Damage."
+        },
+        {
+          "kind": "buff",
+          "name": "Force Staff",
+          "detail": "CD decreased from 10 secs to 7 secs",
+          "entity": {
+            "type": "item",
+            "slug": "force-staff"
+          }
+        },
+        {
+          "kind": "change",
+          "name": "Dragon Lance",
+          "detail": "All carriers has +10% attack speed (instead of ranged +20%)"
+        },
+        {
+          "kind": "change",
+          "name": "Diffusal Blade",
+          "detail": "+20% attack speed removed. Additional damage on transformed pieces added. Mana Break on Attack: +50. The carrier deals +50%% damage to non-permanent and transformed chess pieces.",
+          "entity": {
+            "type": "item",
+            "slug": "diffusal-blade"
+          }
+        },
+        {
+          "kind": "nerf",
+          "name": "Gleipnir",
+          "detail": "Attack speed decreased from +40% to +30%",
+          "entity": {
+            "type": "item",
+            "slug": "gleipnir"
+          }
+        },
+        {
+          "kind": "change",
+          "name": "Monkey King Bar",
+          "detail": "Deal additional 50 magical damage instead of +70 attack damage.",
+          "entity": {
+            "type": "item",
+            "slug": "monkey-king-bar"
+          }
+        },
+        {
+          "kind": "change",
+          "name": "Aegis of Immortal",
+          "detail": "Round 50 Roshan will grants an Aegis when slayed",
+          "entity": {
+            "type": "item",
+            "slug": "aegis-of-immortal"
+          }
+        }
+      ]
+    },
+    {
+      "heading": "Bug Fixes",
+      "entries": [
+        {
+          "kind": "fix",
+          "name": "General",
+          "detail": "Various bug fixes."
+        }
+      ]
+    },
+    {
+      "heading": "Rebalance",
+      "entries": [
+        {
+          "kind": "change",
+          "name": "on July 30th, 2024",
+          "detail": ""
+        },
+        {
+          "kind": "rework",
+          "name": "Faceless Void",
+          "detail": "Ability Reworked into Time Zone Ability: Time Zone <Active Skill: Activate on Full Mana> Creates a blister in spacetime, altering the movement, attack, cast projectile, and turn rate speed of all units inside. Allies have increased speed and enemies have decreased speed. Enemies are leashed inside the Time Zone.",
+          "entity": {
+            "type": "unit",
+            "slug": "faceless-void"
+          }
+        },
+        {
+          "kind": "rework",
+          "name": "Juggernaut",
+          "detail": "Blade Fury Reworked, approximately as previous. Now Jugg has 80% magical resistance instead of immunity when activated. CD decreased from 12 secs to 12/10/8 secs Ability:  Bladefury <Active Skill: Activate on Full Mana> Causes a bladestorm of destructive force around Juggernaut, dealing damage to nearby enemies within 2 grids. Obtain 80% Magical Resistance. Damage interval decreases when Juggernauts attack speed increases.",
+          "entity": {
+            "type": "unit",
+            "slug": "juggernaut"
+          }
+        },
+        {
+          "kind": "buff",
+          "name": "Wraith King",
+          "detail": "Base HP increased from 1050 to 1150. Armor increased from 8 to 9",
+          "entity": {
+            "type": "unit",
+            "slug": "wraith-king"
+          }
+        },
+        {
+          "kind": "buff",
+          "name": "Gyrocopter - Flak Cannon",
+          "detail": "Every extra shot has a maximum target limit of 4/8/12. CD decreased from 15/12/9 secs to 12/10/8 secs.",
+          "entity": {
+            "type": "unit",
+            "slug": "gyrocopter"
+          }
+        },
+        {
+          "kind": "nerf",
+          "name": "Arc Warden",
+          "detail": "Base HP decreased from 950 to 850",
+          "entity": {
+            "type": "unit",
+            "slug": "arc-warden"
+          }
+        },
+        {
+          "kind": "buff",
+          "name": "Spectre - Haunt",
+          "detail": "Maximum illusion increased from 3/5/8 to 4/6/10",
+          "entity": {
+            "type": "unit",
+            "slug": "spectres"
+          }
+        },
+        {
+          "kind": "nerf",
+          "name": "Draenei - Blessing of Naaru",
+          "detail": "(2) Draeneis: Lifesteal decreased from 70+3% to 50+2%",
+          "entity": {
+            "type": "synergy",
+            "slug": "draenei"
+          }
+        },
+        {
+          "kind": "change",
+          "name": "Ascetic’s Cap",
+          "detail": "★ or ★★ carrier can be immune to Plague ★ or ★★ Non-undead carrier gains: Immune to Plague. If the carrier survives a home battle, it will resurrect into a random undead piece of the same cost at the beginning of next round."
+        },
+        {
+          "kind": "change",
+          "name": "Fix bug",
+          "detail": ""
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,29 @@
+{
+  "gameId": "is_nraqi",
+  "name": "Faceless",
+  "slug": "faceless",
+  "source": {
+    "name": "Faceless",
+    "description": "Species Trait: Whisper of Darkness\n\nActive when you have at least (N) different Faceless pieces on board. (Multiple effects stack)\n\n(2) Facelesses: If you have no other active synergies except Whisper of Darkness, all friendly chess pieces are immune to all negative effects during combat.",
+    "description_html": "<h1>Species Trait: Whisper of Darkness</h1><font color=\"#656585\">Active when you have at least (N) different Faceless pieces on board. (Multiple effects stack)</font><br><br>(2) Facelesses: If you have no other active synergies except Whisper of Darkness, all friendly chess pieces are immune to all negative effects during combat.",
+    "lore": "The Faceless, otherwise known as the Faceless Ones or N'raqi, are a monstrous race that arose from the organic matter that seeped from the Old Gods' blighted forms during the primordial era of Drodo Island. Cunning and intelligent, they serve their eldritch masters with fanatical loyalty and possess the power from the Void.",
+    "notes": [],
+    "tiers": [
+      2
+    ],
+    "ability_special": {},
+    "names": {
+      "en": "Faceless",
+      "ru": "Faceless"
+    },
+    "descriptions": {
+      "en": "Species Trait: Whisper of Darkness\n Active when you have at least (N) different Faceless pieces on board. (Multiple effects stack)\n\n(2) Facelesses: If you have no other active synergies except Whisper of Darkness, all friendly chess pieces are immune to all negative effects during combat.",
+      "ru": "Species Trait: Whisper of Darkness\n Активен, когда хотя бы (N) разных Faceless на доске. (Эффекты складываются)\n\n(2) Facelesses: Если нет других активных синергиий, все союзные фигуры получают иммунитет ко всем негативным эффектам во время раунда."
+    },
+    "lore_i18n": {
+      "en": "The Faceless, otherwise known as the Faceless Ones or N'raqi, are a monstrous race that arose from the organic matter that seeped from the Old Gods' blighted forms during the primordial era of Drodo Island. Cunning and intelligent, they serve their eldritch masters with fanatical loyalty and possess the power from the Void.",
+      "ru": "The Faceless, также известные как Faceless Ones или N'raqi, — чудовищная раса, возникшая из органической материи, просочившейся из осквернённых форм Old Gods в первобытную эпоху Drodo Island. Хитрые и разумные, они с фанатичной преданностью служат своим потусторонним владыкам и обладают силой Пустоты."
+    }
+  },
+  "overrides": {}
+}

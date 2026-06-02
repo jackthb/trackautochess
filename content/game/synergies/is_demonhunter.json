@@ -1,0 +1,30 @@
+{
+  "gameId": "is_demonhunter",
+  "name": "Demon Hunter",
+  "slug": "demon-hunter",
+  "source": {
+    "name": "Demon Hunter",
+    "description": "Counts as a different enemy Demon type.\n\nCLASS PERK: Shuttered Soul\n\nActive when you have at least (N) different Demon Hunter pieces on board. (Multiple effects stack)\n(2) Demon Hunters: All friendly demons are considered the same type.\n(4) Demon Hunters: All damage dealt is settled as Pure Damage.",
+    "description_html": "Counts as a different enemy Demon type.\n<h1>CLASS PERK: Shuttered Soul</h1><font color=\"#656585\">Active when you have at least (N) different Demon Hunter pieces on board. (Multiple effects stack)</font><br>(2) Demon Hunters: All friendly demons are considered the same type.<br>(4) Demon Hunters: All damage dealt is settled as Pure Damage.",
+    "lore": "Demon hunters ritually trade their normal form in exchange for the mastery of demonic powers that enables them to deliver devastating strikes to their prey. This enhanced strength, together with their great agility and magical prowess, makes demon hunters unsuppressible.",
+    "notes": [],
+    "tiers": [
+      2,
+      4
+    ],
+    "ability_special": {},
+    "names": {
+      "en": "Demon Hunter",
+      "ru": "Demon Hunter"
+    },
+    "descriptions": {
+      "en": "Counts as a different enemy Demon type.\n\nCLASS PERK: Shuttered Soul\n Active when you have at least (N) different Demon Hunter pieces on board. (Multiple effects stack)\n(2) Demon Hunters: All friendly demons are considered the same type.\n(4) Demon Hunters: All damage dealt is settled as Pure Damage.",
+      "ru": "Считается как демон для противника.\n\nCLASS PERK: Shuttered Soul\n Активно когда у вас есть (N) разных Demon Hunter на столе. (Эффекты складываются)\n(2) Demon Hunters: Все союзные демоны считаются одним типом. \n(4) Demon Hunters: Весь урон становится Чистым Уроном."
+    },
+    "lore_i18n": {
+      "en": "Demon hunters ritually trade their normal form in exchange for the mastery of demonic powers that enables them to deliver devastating strikes to their prey. This enhanced strength, together with their great agility and magical prowess, makes demon hunters unsuppressible.",
+      "ru": "Охотники на демонов ритуально отказываются от своего обычного облика в обмен на владение демоническими силами, которые позволяют им наносить сокрушительные удары по своей жертве. Благодаря этой невероятной силе, а также ловкости и магическому мастерству охотники на демонов непобедимы."
+    }
+  },
+  "overrides": {}
+}

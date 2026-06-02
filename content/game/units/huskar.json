@@ -1,0 +1,63 @@
+{
+  "gameId": "chess_huskar",
+  "name": "Huskar",
+  "slug": "huskar",
+  "source": {
+    "id": "chess_huskar",
+    "cost": 3,
+    "pool": "standard",
+    "synergies": [
+      "Troll",
+      "Warrior"
+    ],
+    "names": {
+      "en": "Huskar",
+      "lore": "Huskar",
+      "ko": "하스카",
+      "ru": "Huskar",
+      "zh-cn": "神灵武士",
+      "zh-tw": "神靈武士"
+    },
+    "attack_type": "ranged",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 700,
+        "mana": 0,
+        "atk": [
+          70,
+          100
+        ],
+        "armor": 6,
+        "magic_resist": 25,
+        "atk_rate": 1.1,
+        "atk_range": 400
+      },
+      "2_star": {
+        "hp": 1400,
+        "mana": 0,
+        "atk": [
+          140,
+          200
+        ],
+        "armor": 6,
+        "magic_resist": 25,
+        "atk_rate": 1.1,
+        "atk_range": 400
+      },
+      "3_star": {
+        "hp": 2800,
+        "mana": 0,
+        "atk": [
+          280,
+          400
+        ],
+        "armor": 6,
+        "magic_resist": 25,
+        "atk_rate": 1.1,
+        "atk_range": 400
+      }
+    }
+  },
+  "overrides": {}
+}

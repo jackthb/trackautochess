@@ -1,0 +1,63 @@
+{
+  "gameId": "chess_pa",
+  "name": "Phantom Assassin",
+  "slug": "phantom-assassin",
+  "source": {
+    "id": "chess_pa",
+    "cost": 4,
+    "pool": "standard",
+    "synergies": [
+      "Assassin",
+      "Elf"
+    ],
+    "names": {
+      "en": "Phantom Assassin",
+      "lore": "Mortred",
+      "ko": "유령 자객",
+      "ru": "Phantom Assassin",
+      "zh-cn": "幻影刺客",
+      "zh-tw": "幻影刺客"
+    },
+    "attack_type": "melee",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 800,
+        "mana": 0,
+        "atk": [
+          90,
+          100
+        ],
+        "armor": 5,
+        "magic_resist": 20,
+        "atk_rate": 0.9,
+        "atk_range": 205
+      },
+      "2_star": {
+        "hp": 1600,
+        "mana": 0,
+        "atk": [
+          180,
+          200
+        ],
+        "armor": 5,
+        "magic_resist": 20,
+        "atk_rate": 0.9,
+        "atk_range": 205
+      },
+      "3_star": {
+        "hp": 3200,
+        "mana": 0,
+        "atk": [
+          360,
+          400
+        ],
+        "armor": 5,
+        "magic_resist": 20,
+        "atk_rate": 0.9,
+        "atk_range": 205
+      }
+    }
+  },
+  "overrides": {}
+}

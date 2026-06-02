@@ -1,0 +1,63 @@
+{
+  "gameId": "chess_snap",
+  "name": "Snapfire",
+  "slug": "snapfire",
+  "source": {
+    "id": "chess_snap",
+    "cost": 4,
+    "pool": "standard",
+    "synergies": [
+      "Goblin",
+      "Knight"
+    ],
+    "names": {
+      "en": "Snapfire",
+      "lore": "Beatrix",
+      "ko": "스냅파이어",
+      "ru": "Snapfire",
+      "zh-cn": "电炎绝手",
+      "zh-tw": "電炎絕手"
+    },
+    "attack_type": "ranged",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 800,
+        "mana": 100,
+        "atk": [
+          70,
+          110
+        ],
+        "armor": 9,
+        "magic_resist": 0,
+        "atk_rate": 1.2,
+        "atk_range": 600
+      },
+      "2_star": {
+        "hp": 1600,
+        "mana": 100,
+        "atk": [
+          140,
+          220
+        ],
+        "armor": 9,
+        "magic_resist": 0,
+        "atk_rate": 1.2,
+        "atk_range": 600
+      },
+      "3_star": {
+        "hp": 3200,
+        "mana": 100,
+        "atk": [
+          280,
+          440
+        ],
+        "armor": 9,
+        "magic_resist": 0,
+        "atk_rate": 1.2,
+        "atk_range": 600
+      }
+    }
+  },
+  "overrides": {}
+}

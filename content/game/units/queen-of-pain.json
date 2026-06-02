@@ -1,0 +1,63 @@
+{
+  "gameId": "chess_qop",
+  "name": "Queen of Pain",
+  "slug": "queen-of-pain",
+  "source": {
+    "id": "chess_qop",
+    "cost": 5,
+    "pool": "standard",
+    "synergies": [
+      "Assassin",
+      "Demon"
+    ],
+    "names": {
+      "en": "Queen of Pain",
+      "lore": "Clinkz",
+      "ko": "고통의 여왕",
+      "ru": "Queen of Pain",
+      "zh-cn": "痛苦女王",
+      "zh-tw": "痛苦女王"
+    },
+    "attack_type": "ranged",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 950,
+        "mana": 100,
+        "atk": [
+          75,
+          100
+        ],
+        "armor": 6,
+        "magic_resist": 20,
+        "atk_rate": 1.2,
+        "atk_range": 400
+      },
+      "2_star": {
+        "hp": 1900,
+        "mana": 100,
+        "atk": [
+          150,
+          200
+        ],
+        "armor": 6,
+        "magic_resist": 20,
+        "atk_rate": 1.2,
+        "atk_range": 400
+      },
+      "3_star": {
+        "hp": 3800,
+        "mana": 100,
+        "atk": [
+          300,
+          400
+        ],
+        "armor": 6,
+        "magic_resist": 20,
+        "atk_rate": 1.2,
+        "atk_range": 400
+      }
+    }
+  },
+  "overrides": {}
+}

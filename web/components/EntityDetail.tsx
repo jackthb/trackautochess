@@ -32,8 +32,7 @@ export interface RelatedEntity {
 export interface BodySection {
   title: string;
   body: ReactNode;
-  /** `data-sanity` attribute for click-to-edit on this section's field, used
-   *  for processed text that lost its stega markers. */
+  /** Optional edit attribute for processed text. */
   editAttr?: string;
 }
 
@@ -55,9 +54,7 @@ interface EntityDetailProps {
   commentary?: ReactNode;
   /** Flavor lore. */
   lore?: string;
-  /** `data-sanity` attributes enabling click-to-edit on processed fields whose
-   *  stega was stripped. `overviewEditAttr` applies when using `overview` (not
-   *  `bodySections`). No-ops when undefined (published mode). */
+  /** Optional edit attributes for processed fields. No-ops when undefined. */
   overviewEditAttr?: string;
   loreEditAttr?: string;
   notesEditAttr?: string;
@@ -159,7 +156,7 @@ export function EntityDetail({
         {sections.map((s, i) => (
           <section key={i} className={styles.section}>
             <h2 className={styles.sectionTitle}>{s.title}</h2>
-            <div className={styles.bodyCopy} data-sanity={s.editAttr}>
+            <div className={styles.bodyCopy} data-edit-field={s.editAttr}>
               {s.body}
             </div>
           </section>
@@ -175,7 +172,7 @@ export function EntityDetail({
         {notes && notes.length > 0 && (
           <section className={styles.section}>
             <h2 className={styles.sectionTitle}>{t.notes}</h2>
-            <ul className={styles.notes} data-sanity={notesEditAttr}>
+            <ul className={styles.notes} data-edit-field={notesEditAttr}>
               {notes.map((note, i) => (
                 <li key={i}>{note}</li>
               ))}
@@ -186,7 +183,7 @@ export function EntityDetail({
         {lore && (
           <section className={styles.section}>
             <h2 className={styles.sectionTitle}>{t.lore}</h2>
-            <div className={styles.bodyCopy} data-sanity={loreEditAttr}>
+            <div className={styles.bodyCopy} data-edit-field={loreEditAttr}>
               {lore}
             </div>
           </section>

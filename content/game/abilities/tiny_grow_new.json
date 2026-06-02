@@ -1,0 +1,9 @@
+{
+  "gameId": "tiny_grow_new",
+  "name": "Grow",
+  "description": "Gains 100 max health permanently if killed in a home battle.",
+  "cooldown": "",
+  "mana_cost": "0",
+  "cast_range": "9999",
+  "ability_special": {}
+}

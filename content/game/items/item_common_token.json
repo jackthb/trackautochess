@@ -1,0 +1,26 @@
+{
+  "gameId": "item_common_token",
+  "name": "Machine Token",
+  "slug": "machine-token",
+  "source": {
+    "name": "Machine Token",
+    "description": "A special Token for recruiting Discovered pieces, granted by Heart of the Machine.",
+    "lore": "From: Heart of the Machine",
+    "quality": "consumable",
+    "texture": "custom/common_token",
+    "notes": [],
+    "names": {
+      "en": "Machine Token",
+      "ru": "Machine Token"
+    },
+    "descriptions": {
+      "en": "A special Token for recruiting Discovered pieces, granted by Heart of the Machine.",
+      "ru": "Специальный токен для покупки фигур из голден-ролла."
+    },
+    "lore_i18n": {
+      "en": "From: Heart of the Machine",
+      "ru": "From: Heart of the Machine"
+    }
+  },
+  "overrides": {}
+}

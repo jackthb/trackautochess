@@ -1,0 +1,63 @@
+{
+  "gameId": "chess_tech",
+  "name": "Techies",
+  "slug": "techies",
+  "source": {
+    "id": "chess_tech",
+    "cost": 5,
+    "pool": "standard",
+    "synergies": [
+      "Goblin",
+      "Mech"
+    ],
+    "names": {
+      "en": "Techies",
+      "lore": "Squee۰Spleen۰Spoon",
+      "ko": "기술단",
+      "ru": "Techies",
+      "zh-cn": "地精工程师",
+      "zh-tw": "地精工程師"
+    },
+    "attack_type": "ranged",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 1000,
+        "mana": 100,
+        "atk": [
+          45,
+          55
+        ],
+        "armor": 10,
+        "magic_resist": 0,
+        "atk_rate": 1.5,
+        "atk_range": 600
+      },
+      "2_star": {
+        "hp": 2000,
+        "mana": 100,
+        "atk": [
+          90,
+          110
+        ],
+        "armor": 10,
+        "magic_resist": 0,
+        "atk_rate": 1.5,
+        "atk_range": 600
+      },
+      "3_star": {
+        "hp": 4000,
+        "mana": 100,
+        "atk": [
+          180,
+          220
+        ],
+        "armor": 10,
+        "magic_resist": 0,
+        "atk_rate": 1.5,
+        "atk_range": 600
+      }
+    }
+  },
+  "overrides": {}
+}

@@ -1,0 +1,63 @@
+{
+  "gameId": "chess_sb",
+  "name": "Spirit Breaker",
+  "slug": "spirit-breaker",
+  "source": {
+    "id": "chess_sb",
+    "cost": 1,
+    "pool": "standard",
+    "synergies": [
+      "Assassin",
+      "Tauren"
+    ],
+    "names": {
+      "en": "Spirit Breaker",
+      "lore": "Barathrum",
+      "ko": "영혼 파괴자",
+      "ru": "Spirit Breaker",
+      "zh-cn": "裂魂人",
+      "zh-tw": "裂魂人"
+    },
+    "attack_type": "melee",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 600,
+        "mana": 0,
+        "atk": [
+          40,
+          60
+        ],
+        "armor": 3,
+        "magic_resist": 0,
+        "atk_rate": 1.4,
+        "atk_range": 205
+      },
+      "2_star": {
+        "hp": 1200,
+        "mana": 0,
+        "atk": [
+          80,
+          120
+        ],
+        "armor": 3,
+        "magic_resist": 0,
+        "atk_rate": 1.4,
+        "atk_range": 205
+      },
+      "3_star": {
+        "hp": 2400,
+        "mana": 0,
+        "atk": [
+          160,
+          240
+        ],
+        "armor": 3,
+        "magic_resist": 0,
+        "atk_rate": 1.4,
+        "atk_range": 205
+      }
+    }
+  },
+  "overrides": {}
+}

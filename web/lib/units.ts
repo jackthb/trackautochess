@@ -15,7 +15,7 @@ interface UnitInfo {
 }
 
 export interface DisplayUnit {
-  /** Sanity doc identity, present only on draft-mode reads (for click-to-edit). */
+  /** Optional CMS identity, reserved for editor integrations. */
   _id?: string;
   _type?: string;
   slug: string;
@@ -24,7 +24,7 @@ export interface DisplayUnit {
   synergies: string[];
   iconStem: string;
   /**
-   * Resolved icon URL: Sanity CDN URL when uploaded, otherwise the local
+   * Resolved icon URL: remote URL when present, otherwise the local
    * `/icons/units/<stem>.png` path served from web/public/icons (synced from
    * data/icons by web/scripts/sync-icons.mjs).
    */

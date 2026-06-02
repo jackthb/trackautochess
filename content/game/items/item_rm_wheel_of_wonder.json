@@ -1,0 +1,28 @@
+{
+  "gameId": "item_rm_wheel_of_wonder",
+  "name": "Wheel of Wonder",
+  "slug": "wheel-of-wonder",
+  "source": {
+    "name": "Wheel of Wonder",
+    "description": "Relic Consumable: Click to Use\nChoose an ally piece and put it into the wheel of wonder, DISCOVER a special version of it with an extra random synergy.",
+    "lore": "From: Relicbox",
+    "quality": "",
+    "texture": "custom/rm_wheel_of_wonder",
+    "notes": [
+      "Discovered pieces with Kobold or Dwarfs may not work due to their species constraints."
+    ],
+    "names": {
+      "en": "Wheel of Wonder",
+      "ru": "Wheel of Wonder"
+    },
+    "descriptions": {
+      "en": "Relic Consumable: Click to Use\nChoose an ally piece and put it into the wheel of wonder, DISCOVER a special version of it with an extra random synergy.",
+      "ru": "Нажмите для использования\nВыберите союзную фигуру и откройте уникальную версию с дополнительной случайной синергией."
+    },
+    "lore_i18n": {
+      "en": "From: Relicbox",
+      "ru": "From: Relicbox"
+    }
+  },
+  "overrides": {}
+}

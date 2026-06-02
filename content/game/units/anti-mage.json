@@ -1,0 +1,63 @@
+{
+  "gameId": "chess_am",
+  "name": "Anti-mage",
+  "slug": "anti-mage",
+  "source": {
+    "id": "chess_am",
+    "cost": 4,
+    "pool": "standard",
+    "synergies": [
+      "Demon Hunter",
+      "Elf"
+    ],
+    "names": {
+      "en": "Anti-mage",
+      "lore": "Magina",
+      "ko": "항마사",
+      "ru": "Anti-mage",
+      "zh-cn": "敌法师",
+      "zh-tw": "敵法師"
+    },
+    "attack_type": "melee",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 850,
+        "mana": 0,
+        "atk": [
+          80,
+          110
+        ],
+        "armor": 7,
+        "magic_resist": 30,
+        "atk_rate": 0.9,
+        "atk_range": 205
+      },
+      "2_star": {
+        "hp": 1700,
+        "mana": 0,
+        "atk": [
+          160,
+          220
+        ],
+        "armor": 7,
+        "magic_resist": 30,
+        "atk_rate": 0.9,
+        "atk_range": 205
+      },
+      "3_star": {
+        "hp": 3400,
+        "mana": 0,
+        "atk": [
+          320,
+          440
+        ],
+        "armor": 7,
+        "magic_resist": 30,
+        "atk_rate": 0.9,
+        "atk_range": 205
+      }
+    }
+  },
+  "overrides": {}
+}

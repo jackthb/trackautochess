@@ -1,0 +1,23 @@
+{
+  "gameId": "item_aiweinazhiyu",
+  "name": "Avianas Feather",
+  "slug": "avianas-feather",
+  "source": {
+    "name": "Avianas Feather",
+    "description": "All damage dealt by carriers is considered as Magical damage.",
+    "lore": "",
+    "quality": "rare",
+    "texture": "item_avianas_feather",
+    "notes": [],
+    "names": {
+      "en": "Avianas Feather",
+      "ru": "Avianas Feather"
+    },
+    "descriptions": {
+      "en": "All damage dealt by carriers is considered as Magical damage.",
+      "ru": "Весь урон нанесенный владельцем считается Магическим."
+    },
+    "lore_i18n": {}
+  },
+  "overrides": {}
+}

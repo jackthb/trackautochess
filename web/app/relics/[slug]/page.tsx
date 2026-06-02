@@ -1,24 +1,17 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { draftMode } from "next/headers";
 import { EntityDetail, type RelatedEntity } from "@/components/EntityDetail";
-import { editAttribute } from "@/lib/sanity/editAttribute";
-import { EntityCommentaryList } from "@/components/PatchCommentary";import {
+import { EntityCommentaryList } from "@/components/PatchCommentary";
+import {
   getAllRelics,
   getRelicBySlug,
   type DisplayRelic,
 } from "@/lib/relics";
 import { absoluteUrl, SITE_NAME, SITE_TITLE } from "@/lib/site";
 import { DEFAULT_LOCALE } from "@/lib/i18n";
-import { loadDraftRelics } from "@/lib/sanity/draftLoaders";
 import { getCommentaryForEntity } from "@/lib/patchCommentary";
 
-// App Router migration of pages/relics/[slug].tsx — the template for the
-// EntityDetail "[slug]" pages. getStaticPaths -> generateStaticParams;
-// getStaticProps -> async Server Component reading params + draftMode().
-// Draft mode (Sanity Presentation/visual editing) is preserved: in draft we read
-// stega-encoded content via the loader and mount <AppVisualEditing/>; published
-// pages stay static.
+// Static detail page backed by committed JSON generated from content/.
 
 function cleanText(value: string): string {
   return value.replace(/\s+/g, " ").trim();
@@ -74,14 +67,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function RelicDetailPage({ params }: Props) {
   const { slug } = await params;
-  const { isEnabled: isDraft } = await draftMode();
 
-  const allRelics = isDraft
-    ? await loadDraftRelics(true)
-    : getAllRelics(DEFAULT_LOCALE);
-  const relic = isDraft
-    ? allRelics.find((r) => r.slug === slug) ?? null
-    : getRelicBySlug(slug, DEFAULT_LOCALE);
+  const allRelics = getAllRelics(DEFAULT_LOCALE);
+  const relic = getRelicBySlug(slug, DEFAULT_LOCALE);
   if (!relic) notFound();
 
   const related = allRelics
@@ -144,16 +132,15 @@ export default async function RelicDetailPage({ params }: Props) {
         name={relic.name}
         iconSrc={relic.iconUrl}
         overview={<>{baseOverview}</>}
-        overviewEditAttr={editAttribute(relic, "description")}
         commentary={
           commentary.length > 0 ? (
             <EntityCommentaryList entries={commentary} />
           ) : undefined
         }
         lore={relic.lore ? cleanText(relic.lore) : undefined}
-        loreEditAttr={editAttribute(relic, "lore")}
         relatedTitle="More Relics"
         related={relatedEntities}
-      />    </>
+      />
+    </>
   );
 }

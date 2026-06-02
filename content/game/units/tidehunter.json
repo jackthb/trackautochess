@@ -1,0 +1,63 @@
+{
+  "gameId": "chess_th",
+  "name": "Tidehunter",
+  "slug": "tidehunter",
+  "source": {
+    "id": "chess_th",
+    "cost": 5,
+    "pool": "standard",
+    "synergies": [
+      "Hunter",
+      "Naga"
+    ],
+    "names": {
+      "en": "Tidehunter",
+      "lore": "Leviathan",
+      "ko": "파도사냥꾼",
+      "ru": "Tidehunter",
+      "zh-cn": "潮汐猎人",
+      "zh-tw": "潮汐獵人"
+    },
+    "attack_type": "melee",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 1100,
+        "mana": 100,
+        "atk": [
+          65,
+          75
+        ],
+        "armor": 10,
+        "magic_resist": 15,
+        "atk_rate": 2,
+        "atk_range": 205
+      },
+      "2_star": {
+        "hp": 2200,
+        "mana": 100,
+        "atk": [
+          130,
+          150
+        ],
+        "armor": 10,
+        "magic_resist": 15,
+        "atk_rate": 2,
+        "atk_range": 205
+      },
+      "3_star": {
+        "hp": 4400,
+        "mana": 100,
+        "atk": [
+          260,
+          300
+        ],
+        "armor": 10,
+        "magic_resist": 15,
+        "atk_rate": 2,
+        "atk_range": 205
+      }
+    }
+  },
+  "overrides": {}
+}

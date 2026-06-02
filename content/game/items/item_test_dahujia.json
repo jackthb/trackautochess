@@ -1,0 +1,20 @@
+{
+  "gameId": "item_test_dahujia",
+  "name": "Test item: +999 armor",
+  "slug": "test-item-999-armor",
+  "source": {
+    "name": "Test item: +999 armor",
+    "description": "",
+    "lore": "",
+    "quality": "consumable",
+    "texture": "item_carapace_of_qaldin",
+    "notes": [],
+    "names": {
+      "en": "Test item: +999 armor",
+      "ru": "Test item: +999 armor"
+    },
+    "descriptions": {},
+    "lore_i18n": {}
+  },
+  "overrides": {}
+}

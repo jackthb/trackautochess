@@ -1,0 +1,64 @@
+{
+  "gameId": "chess_bane",
+  "name": "Bane",
+  "slug": "bane",
+  "source": {
+    "id": "chess_bane",
+    "cost": 1,
+    "pool": "standard",
+    "synergies": [
+      "Faceless",
+      "Satyr",
+      "Warlock"
+    ],
+    "names": {
+      "en": "Bane",
+      "lore": "Atropos",
+      "ko": "악몽의 그림자",
+      "ru": "Bane",
+      "zh-cn": "祸乱之源",
+      "zh-tw": "禍亂之源"
+    },
+    "attack_type": "ranged",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 550,
+        "mana": 100,
+        "atk": [
+          40,
+          50
+        ],
+        "armor": 2,
+        "magic_resist": 10,
+        "atk_rate": 1.5,
+        "atk_range": 400
+      },
+      "2_star": {
+        "hp": 1100,
+        "mana": 100,
+        "atk": [
+          80,
+          100
+        ],
+        "armor": 2,
+        "magic_resist": 10,
+        "atk_rate": 1.5,
+        "atk_range": 400
+      },
+      "3_star": {
+        "hp": 2200,
+        "mana": 100,
+        "atk": [
+          160,
+          200
+        ],
+        "armor": 2,
+        "magic_resist": 10,
+        "atk_rate": 1.5,
+        "atk_range": 400
+      }
+    }
+  },
+  "overrides": {}
+}

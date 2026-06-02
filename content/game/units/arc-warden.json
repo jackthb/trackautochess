@@ -1,0 +1,63 @@
+{
+  "gameId": "chess_aw",
+  "name": "Arc Warden",
+  "slug": "arc-warden",
+  "source": {
+    "id": "chess_aw",
+    "cost": 5,
+    "pool": "standard",
+    "synergies": [
+      "Kobold",
+      "Shaman"
+    ],
+    "names": {
+      "en": "Arc Warden",
+      "lore": "Zet",
+      "ko": "번개 감시자",
+      "ru": "Arc Warden",
+      "zh-cn": "天穹守望者",
+      "zh-tw": "天穹守望者"
+    },
+    "attack_type": "ranged",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 900,
+        "mana": 0,
+        "atk": [
+          90,
+          150
+        ],
+        "armor": 7,
+        "magic_resist": 0,
+        "atk_rate": 1,
+        "atk_range": 600
+      },
+      "2_star": {
+        "hp": 1700,
+        "mana": 0,
+        "atk": [
+          180,
+          300
+        ],
+        "armor": 7,
+        "magic_resist": 0,
+        "atk_rate": 1.1,
+        "atk_range": 600
+      },
+      "3_star": {
+        "hp": 3400,
+        "mana": 0,
+        "atk": [
+          360,
+          600
+        ],
+        "armor": 7,
+        "magic_resist": 0,
+        "atk_rate": 1.1,
+        "atk_range": 600
+      }
+    }
+  },
+  "overrides": {}
+}

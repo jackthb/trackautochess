@@ -65,7 +65,7 @@ const ICON_MAPS: Record<string, IconMap> = {
 
 /**
  * Resolve icon URL for a stem produced by unitStem/synIconName/relicStem.
- * Returns the Sanity-hosted URL when present in the JSON cache, otherwise
+ * Returns the remote icon URL when present in the JSON cache, otherwise
  * falls back to the local /icons/<type>/<stem>.png path served from
  * web/public/icons (synced from data/icons by web/scripts/sync-icons.mjs).
  */

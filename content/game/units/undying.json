@@ -1,0 +1,63 @@
+{
+  "gameId": "chess_ud",
+  "name": "Undying",
+  "slug": "undying",
+  "source": {
+    "id": "chess_ud",
+    "cost": 3,
+    "pool": "undead",
+    "synergies": [
+      "Priest",
+      "Undead"
+    ],
+    "names": {
+      "en": "Undying",
+      "lore": "Dirge",
+      "ko": "언다잉",
+      "ru": "Undying",
+      "zh-cn": "不朽尸王",
+      "zh-tw": "不朽屍王"
+    },
+    "attack_type": "melee",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 900,
+        "mana": 100,
+        "atk": [
+          60,
+          90
+        ],
+        "armor": 5,
+        "magic_resist": 20,
+        "atk_rate": 1.7,
+        "atk_range": 205
+      },
+      "2_star": {
+        "hp": 1800,
+        "mana": 100,
+        "atk": [
+          120,
+          180
+        ],
+        "armor": 5,
+        "magic_resist": 20,
+        "atk_rate": 1.7,
+        "atk_range": 205
+      },
+      "3_star": {
+        "hp": 3600,
+        "mana": 100,
+        "atk": [
+          240,
+          360
+        ],
+        "armor": 5,
+        "magic_resist": 20,
+        "atk_rate": 1.7,
+        "atk_range": 205
+      }
+    }
+  },
+  "overrides": {}
+}

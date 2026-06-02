@@ -25,7 +25,7 @@ interface SimpleItem {
 }
 
 export interface DisplayItem {
-  /** Sanity doc identity, present only on draft-mode reads (for click-to-edit). */
+  /** Optional CMS identity, reserved for editor integrations. */
   _id?: string;
   _type?: string;
   slug: string;
@@ -38,7 +38,7 @@ export interface DisplayItem {
   icon: string;
   texture: string;
   /**
-   * Resolved icon URL: Sanity CDN URL when uploaded, otherwise the local
+   * Resolved icon URL: remote URL when present, otherwise the local
    * `/icons/items/<file>.png` fallback (synced from data/icons at build time).
    */
   iconUrl: string;
@@ -103,7 +103,7 @@ function buildItemsForLocale(locale: Locale): DisplayItem[] {
       const localizedName = full
         ? pickLocalized(full.names, locale) || full.name
         : simpleName;
-      const sanityUrl = basic.icon_url || full?.icon_url || null;
+      const remoteUrl = basic.icon_url || full?.icon_url || null;
       const localUrl = legacyIconUrl({ icon: basic.icon, texture: full?.texture ?? "" });
 
       return {
@@ -120,7 +120,7 @@ function buildItemsForLocale(locale: Locale): DisplayItem[] {
         tier: basic.tier,
         icon: basic.icon,
         texture: full?.texture ?? "",
-        iconUrl: sanityUrl || localUrl,
+        iconUrl: remoteUrl || localUrl,
         iconDimensions: basic.icon_dimensions ?? full?.icon_dimensions ?? null,
       };
     })
@@ -161,7 +161,7 @@ export function getItemSlugByName(name: string): string | null {
 }
 
 /**
- * Resolve an icon URL. Prefers the Sanity-hosted URL when `iconUrl` is set on
+ * Resolve an icon URL. Prefers the remote URL when `iconUrl` is set on
  * the DisplayItem, falls back to the local `/icons/items/<file>.png` path
  * (synced from data/icons at build time) otherwise.
  *

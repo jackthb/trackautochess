@@ -1,0 +1,26 @@
+{
+  "gameId": "item_jixiezhixin_gold",
+  "name": "Golden Heart of the Machine",
+  "slug": "golden-heart-of-the-machine",
+  "source": {
+    "name": "Golden Heart of the Machine",
+    "description": "Courier consumable: Click to use\nDISCOVER a panel of 5 random Legendary chess pieces.",
+    "lore": "The finest product from Heart of the Machine.",
+    "quality": "consumable",
+    "texture": "custom/golden_machina_lg",
+    "notes": [],
+    "names": {
+      "en": "Golden Heart of the Machine",
+      "ru": "Golden Heart of the Machine"
+    },
+    "descriptions": {
+      "en": "Courier consumable: Click to use\nDISCOVER a panel of 5 random Legendary chess pieces.",
+      "ru": "Courier consumable: Нажмите чтобы использовать\nОткройте ролл с 5 легендарными юнитами фигурами."
+    },
+    "lore_i18n": {
+      "en": "The finest product from Heart of the Machine.",
+      "ru": "Отличный продукт от Heart of the Machine."
+    }
+  },
+  "overrides": {}
+}

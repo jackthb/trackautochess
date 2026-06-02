@@ -15,11 +15,8 @@
     "install:desktop:app": "pnpm --dir app install --frozen-lockfile",
     "install:desktop:backend": "node scripts/setup-desktop-backend.mjs",
     "verify:desktop:backend": "node scripts/verify-desktop-backend.mjs",
-    "cms:install": "pnpm --dir cms install",
-    "cms:dev": "pnpm --dir cms run dev",
-    "cms:pull": "pnpm --dir cms run pull",
-    "cms:migrate": "pnpm --dir cms run migrate",
-    "migrate": "pnpm --dir cms run migrate",
-    "cms:check": "pnpm --dir cms run check"
+    "content:import": "node scripts/import-data-to-content.mjs",
+    "content:generate": "node scripts/generate-data.mjs",
+    "cms:dev": "pnpm --dir web run dev"
   }
 }

@@ -1,0 +1,28 @@
+{
+  "gameId": "item_bench_contract",
+  "name": "Magic Seed",
+  "slug": "magic-seed",
+  "source": {
+    "name": "Magic Seed",
+    "description": "Fill your bench with magic vegetable sprouts. The sell value of these sprouts has a dynamic chance to increase by 1 at the beginning of every round. You can sell the sprouts any time to reuse the bench.",
+    "lore": "From Relic Box",
+    "quality": "",
+    "texture": "item_custom/item_magic_seed",
+    "notes": [
+      "Initial chance at Round 10 is 40% and increases 2% per round."
+    ],
+    "names": {
+      "en": "Magic Seed",
+      "ru": "Magic Seed"
+    },
+    "descriptions": {
+      "en": "Fill your bench with magic vegetable sprouts. The sell value of these sprouts has a dynamic chance to increase by 1 at the beginning of every round. You can sell the sprouts any time to reuse the bench.",
+      "ru": "Заполняет лавку магическими репками. Их цена продажи имеет шанс увеличиться на 1 в начале каждого раунда. Репки можно продать в любой момент, чтобы освободить лавку."
+    },
+    "lore_i18n": {
+      "en": "From Relic Box",
+      "ru": "From Relic Box"
+    }
+  },
+  "overrides": {}
+}

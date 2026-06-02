@@ -1,0 +1,26 @@
+{
+  "gameId": "item_dongchayandou",
+  "name": "Pipe of Insight",
+  "slug": "pipe-of-insight",
+  "source": {
+    "name": "Pipe of Insight",
+    "description": "+10 health regeneration, +50% magic resistance.\n\nActive ability: Activates when taking damage\nGrants ranged allies with +10 health regeneration, +50% magic resistance for 10 sec.\n\nRange:500",
+    "lore": "A powerful artifact of mysterious origin, it creates barriers against magical forces.",
+    "quality": "rare",
+    "texture": "item_pipe",
+    "notes": [],
+    "names": {
+      "en": "Pipe of Insight",
+      "ru": "Pipe of Insight"
+    },
+    "descriptions": {
+      "en": "+10 health regeneration, +50% magic resistance.\n\nActive ability: Activates when taking damage\nGrants ranged allies with +10 health regeneration, +50% magic resistance for 10 sec.\n\nRange:500",
+      "ru": "+10 к восстановлению здоровья, +50% маг.резисту.\n\nАктивка: При получении урона\nДаёт союзникам +10 к регенерации здоровья, +50% сопротивления магии на 10 секунд, в радусе действия. \n\nРадиус:500"
+    },
+    "lore_i18n": {
+      "en": "A powerful artifact of mysterious origin, it creates barriers against magical forces.",
+      "ru": "Мощный артефакт таинственного происхождения создает барьеры, препятствующие воздействию магических сил."
+    }
+  },
+  "overrides": {}
+}

@@ -1,0 +1,63 @@
+{
+  "gameId": "chess_spe",
+  "name": "Spectres",
+  "slug": "spectres",
+  "source": {
+    "id": "chess_spe",
+    "cost": 5,
+    "pool": "undead",
+    "synergies": [
+      "Demon Hunter",
+      "Undead"
+    ],
+    "names": {
+      "en": "Spectres",
+      "lore": "Mercurial",
+      "ko": "악령",
+      "ru": "Spectres",
+      "zh-cn": "幽鬼",
+      "zh-tw": "幽鬼"
+    },
+    "attack_type": "melee",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 1000,
+        "mana": 100,
+        "atk": [
+          80,
+          120
+        ],
+        "armor": 8,
+        "magic_resist": 30,
+        "atk_rate": 1,
+        "atk_range": 205
+      },
+      "2_star": {
+        "hp": 2000,
+        "mana": 100,
+        "atk": [
+          160,
+          240
+        ],
+        "armor": 8,
+        "magic_resist": 30,
+        "atk_rate": 1,
+        "atk_range": 205
+      },
+      "3_star": {
+        "hp": 4000,
+        "mana": 100,
+        "atk": [
+          320,
+          480
+        ],
+        "armor": 8,
+        "magic_resist": 30,
+        "atk_rate": 1,
+        "atk_range": 205
+      }
+    }
+  },
+  "overrides": {}
+}

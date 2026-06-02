@@ -1,0 +1,63 @@
+{
+  "gameId": "chess_es",
+  "name": "Earthshaker",
+  "slug": "earthshaker",
+  "source": {
+    "id": "chess_es",
+    "cost": 3,
+    "pool": "standard",
+    "synergies": [
+      "Shaman",
+      "Tauren"
+    ],
+    "names": {
+      "en": "Earthshaker",
+      "lore": "Raigor۰Stonehoof",
+      "ko": "지진술사",
+      "ru": "Earthshaker",
+      "zh-cn": "撼地神牛",
+      "zh-tw": "撼地神牛"
+    },
+    "attack_type": "melee",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 700,
+        "mana": 100,
+        "atk": [
+          80,
+          120
+        ],
+        "armor": 6,
+        "magic_resist": 0,
+        "atk_rate": 1.4,
+        "atk_range": 205
+      },
+      "2_star": {
+        "hp": 1400,
+        "mana": 100,
+        "atk": [
+          160,
+          240
+        ],
+        "armor": 6,
+        "magic_resist": 0,
+        "atk_rate": 1.4,
+        "atk_range": 205
+      },
+      "3_star": {
+        "hp": 2800,
+        "mana": 100,
+        "atk": [
+          320,
+          480
+        ],
+        "armor": 6,
+        "magic_resist": 0,
+        "atk_rate": 1.4,
+        "atk_range": 205
+      }
+    }
+  },
+  "overrides": {}
+}

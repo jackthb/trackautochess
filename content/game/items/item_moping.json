@@ -1,0 +1,23 @@
+{
+  "gameId": "item_moping",
+  "name": "Bottle",
+  "slug": "bottle",
+  "source": {
+    "name": "Bottle",
+    "description": "MP +50.",
+    "lore": "",
+    "quality": "rare",
+    "texture": "bottle",
+    "notes": [],
+    "names": {
+      "en": "Bottle",
+      "ru": "Bottle"
+    },
+    "descriptions": {
+      "en": "MP +50.",
+      "ru": "Мана +50."
+    },
+    "lore_i18n": {}
+  },
+  "overrides": {}
+}

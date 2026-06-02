@@ -1,0 +1,63 @@
+{
+  "gameId": "chess_ta",
+  "name": "Templar Assassin",
+  "slug": "templar-assassin",
+  "source": {
+    "id": "chess_ta",
+    "cost": 5,
+    "pool": "standard",
+    "synergies": [
+      "Assassin",
+      "Elf"
+    ],
+    "names": {
+      "en": "Templar Assassin",
+      "lore": "Lanaya",
+      "ko": "암살 기사",
+      "ru": "Templar Assassin",
+      "zh-cn": "圣堂刺客",
+      "zh-tw": "聖堂刺客"
+    },
+    "attack_type": "ranged",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 950,
+        "mana": 100,
+        "atk": [
+          90,
+          120
+        ],
+        "armor": 8,
+        "magic_resist": 0,
+        "atk_rate": 0.9,
+        "atk_range": 400
+      },
+      "2_star": {
+        "hp": 1900,
+        "mana": 100,
+        "atk": [
+          180,
+          240
+        ],
+        "armor": 8,
+        "magic_resist": 0,
+        "atk_rate": 0.9,
+        "atk_range": 400
+      },
+      "3_star": {
+        "hp": 3800,
+        "mana": 100,
+        "atk": [
+          360,
+          480
+        ],
+        "armor": 8,
+        "magic_resist": 0,
+        "atk_rate": 0.9,
+        "atk_range": 400
+      }
+    }
+  },
+  "overrides": {}
+}

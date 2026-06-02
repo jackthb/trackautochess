@@ -1,0 +1,63 @@
+{
+  "gameId": "chess_mk",
+  "name": "Monkey King",
+  "slug": "monkey-king",
+  "source": {
+    "id": "chess_mk",
+    "cost": 4,
+    "pool": "standard",
+    "synergies": [
+      "Beast",
+      "Monk"
+    ],
+    "names": {
+      "en": "Monkey King",
+      "lore": "Wu۰kong",
+      "ko": "원숭이 왕",
+      "ru": "Monkey King",
+      "zh-cn": "齐天大圣",
+      "zh-tw": "齊天大聖"
+    },
+    "attack_type": "melee",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 900,
+        "mana": 0,
+        "atk": [
+          70,
+          90
+        ],
+        "armor": 8,
+        "magic_resist": 0,
+        "atk_rate": 1.2,
+        "atk_range": 205
+      },
+      "2_star": {
+        "hp": 1800,
+        "mana": 0,
+        "atk": [
+          140,
+          180
+        ],
+        "armor": 8,
+        "magic_resist": 0,
+        "atk_rate": 1.2,
+        "atk_range": 205
+      },
+      "3_star": {
+        "hp": 3600,
+        "mana": 0,
+        "atk": [
+          280,
+          360
+        ],
+        "armor": 8,
+        "magic_resist": 0,
+        "atk_rate": 1.2,
+        "atk_range": 205
+      }
+    }
+  },
+  "overrides": {}
+}

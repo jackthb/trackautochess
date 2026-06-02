@@ -1,0 +1,20 @@
+{
+  "gameId": "item_free_draw",
+  "name": "Weighted Dice",
+  "slug": "weighted-dice",
+  "source": {
+    "name": "Weighted Dice",
+    "description": "Refund 1~2 random Gold if you fail to recruit any owned chess piece.",
+    "lore": "",
+    "names": {
+      "en": "Weighted Dice",
+      "ru": "Weighted Dice"
+    },
+    "descriptions": {
+      "en": "Refund 1~2 random Gold if you fail to recruit any owned chess piece.",
+      "ru": "Возвращает 1-2 Золота, если ролл не содержит ни одной имеющейся фигуры."
+    },
+    "lore_i18n": {}
+  },
+  "overrides": {}
+}

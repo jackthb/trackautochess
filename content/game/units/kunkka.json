@@ -1,0 +1,63 @@
+{
+  "gameId": "chess_kunkka",
+  "name": "Kunkka",
+  "slug": "kunkka",
+  "source": {
+    "id": "chess_kunkka",
+    "cost": 4,
+    "pool": "standard",
+    "synergies": [
+      "Human",
+      "Warrior"
+    ],
+    "names": {
+      "en": "Kunkka",
+      "lore": "Kunkka",
+      "ko": "컨카",
+      "ru": "Kunkka",
+      "zh-cn": "海军上将",
+      "zh-tw": "海軍上將"
+    },
+    "attack_type": "melee",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 950,
+        "mana": 100,
+        "atk": [
+          80,
+          100
+        ],
+        "armor": 10,
+        "magic_resist": 0,
+        "atk_rate": 1.3,
+        "atk_range": 205
+      },
+      "2_star": {
+        "hp": 1900,
+        "mana": 100,
+        "atk": [
+          160,
+          200
+        ],
+        "armor": 10,
+        "magic_resist": 0,
+        "atk_rate": 1.3,
+        "atk_range": 205
+      },
+      "3_star": {
+        "hp": 3800,
+        "mana": 100,
+        "atk": [
+          320,
+          400
+        ],
+        "armor": 10,
+        "magic_resist": 0,
+        "atk_rate": 1.3,
+        "atk_range": 205
+      }
+    }
+  },
+  "overrides": {}
+}

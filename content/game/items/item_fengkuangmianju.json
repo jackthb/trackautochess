@@ -1,0 +1,26 @@
+{
+  "gameId": "item_fengkuangmianju",
+  "name": "Mask of Madness",
+  "slug": "mask-of-madness",
+  "source": {
+    "name": "Mask of Madness",
+    "description": "+15% attack speed, lifesteal +20%, but silences the carrier.",
+    "lore": "Once this mask is worn, its bearer becomes an uncontrollable aggressive force.",
+    "quality": "rare",
+    "texture": "item_mask_of_madness",
+    "notes": [],
+    "names": {
+      "en": "Mask of Madness",
+      "ru": "Mask of Madness"
+    },
+    "descriptions": {
+      "en": "+15% attack speed, lifesteal +20%, but silences the carrier.",
+      "ru": "+20% скорости атаки, лайфстил +20%, но обезмалвливает носителя."
+    },
+    "lore_i18n": {
+      "en": "Once this mask is worn, its bearer becomes an uncontrollable aggressive force.",
+      "ru": "Тот, кто надел эту маску, превращается в неуправляемую агрессивную силу."
+    }
+  },
+  "overrides": {}
+}

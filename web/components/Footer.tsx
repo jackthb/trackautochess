@@ -4,9 +4,8 @@ import Link from "next/link";
 import { SITE_NAME } from "@/lib/site";
 import styles from "./Footer.module.css";
 
-// UI chrome strings stay English across locales for now. Localized chrome
-// will return through the same Sanity-driven pipeline as entity names once
-// per-locale UI translations exist.
+// UI chrome strings stay English across locales for now. Per-locale UI
+// translations can be added once the copy needs localization.
 const t = {
   about: "About",
   support: "Support",

@@ -1,0 +1,63 @@
+{
+  "gameId": "chess_zeus",
+  "name": "Zeus",
+  "slug": "zeus",
+  "source": {
+    "id": "chess_zeus",
+    "cost": 5,
+    "pool": "standard",
+    "synergies": [
+      "God",
+      "Mage"
+    ],
+    "names": {
+      "en": "Zeus",
+      "lore": "Zeus",
+      "ko": "제우스",
+      "ru": "Zeus",
+      "zh-cn": "众神之王",
+      "zh-tw": "眾神之王"
+    },
+    "attack_type": "ranged",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 950,
+        "mana": 100,
+        "atk": [
+          50,
+          70
+        ],
+        "armor": 7,
+        "magic_resist": 40,
+        "atk_rate": 1.4,
+        "atk_range": 400
+      },
+      "2_star": {
+        "hp": 1900,
+        "mana": 100,
+        "atk": [
+          100,
+          140
+        ],
+        "armor": 7,
+        "magic_resist": 40,
+        "atk_rate": 1.4,
+        "atk_range": 400
+      },
+      "3_star": {
+        "hp": 3800,
+        "mana": 100,
+        "atk": [
+          200,
+          280
+        ],
+        "armor": 7,
+        "magic_resist": 40,
+        "atk_rate": 1.4,
+        "atk_range": 400
+      }
+    }
+  },
+  "overrides": {}
+}

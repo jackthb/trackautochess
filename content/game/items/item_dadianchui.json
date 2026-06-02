@@ -1,0 +1,23 @@
+{
+  "gameId": "item_dadianchui",
+  "name": "Mjollnir",
+  "slug": "mjollnir",
+  "source": {
+    "name": "Mjollnir",
+    "description": "+60% attack speed.\n20% chance when attacking or being attacked to release a bolt of electricity that leaps between 5 targets, dealing 100 magical damage to each.",
+    "lore": "",
+    "quality": "artifact",
+    "texture": "item_mjollnir",
+    "notes": [],
+    "names": {
+      "en": "Mjollnir",
+      "ru": "Mjollnir"
+    },
+    "descriptions": {
+      "en": "+60% attack speed.\n20% chance when attacking or being attacked to release a bolt of electricity that leaps between 5 targets, dealing 100 magical damage to each.",
+      "ru": "+60% скорости атаки.\n20% шанс при атаке или получении урона выпустить заряд молнии, который прыгает между 5 целями, нанося 100 магического урона каждой."
+    },
+    "lore_i18n": {}
+  },
+  "overrides": {}
+}

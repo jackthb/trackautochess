@@ -1,0 +1,26 @@
+{
+  "gameId": "item_yonghengzhipan",
+  "name": "Aeon Disk",
+  "slug": "aeon-disk",
+  "source": {
+    "name": "Aeon Disk",
+    "description": "Carrier and its minions will be a\n permanent chess piece.\n\nActive ability: Activates when at low health.\nGrants 100% damage block for 3.5 seconds.",
+    "lore": "A powerful artifact long ago smuggled out of the Ivory Incubarium. Or so many believe.",
+    "quality": "rare",
+    "texture": "item_aeon_disk",
+    "notes": [],
+    "names": {
+      "en": "Aeon Disk",
+      "ru": "Aeon Disk"
+    },
+    "descriptions": {
+      "en": "Carrier and its minions will be a\n permanent chess piece.\n\nActive ability: Activates when at low health.\nGrants 100% damage block for 3.5 seconds.",
+      "ru": "Носитель и его призывные юниты\n становятся постояннымми фигурами.\n\nАктивируется при низком HP\nДаёт 100% блокировку урона на 3.5 секунды."
+    },
+    "lore_i18n": {
+      "en": "A powerful artifact long ago smuggled out of the Ivory Incubarium. Or so many believe.",
+      "ru": "Мощный артефакт, некогда тайно вывезенный из Слоновой Инкубарии. По крайней мере, так считают многие."
+    }
+  },
+  "overrides": {}
+}

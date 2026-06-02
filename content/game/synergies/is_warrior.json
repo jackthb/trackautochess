@@ -1,0 +1,28 @@
+{
+  "gameId": "is_warrior",
+  "name": "Warrior",
+  "slug": "warrior",
+  "source": {
+    "name": "Warrior",
+    "description": "Warriors have a double bonus from Fortified Armor while below 50% health.\n\nClass Perk: Fortified Armor\n\nActive when you have at least (N) different Warrior pieces on board. (Multiple effects stack) \n\n(3) Warriors: All friendly warriors have +3 armour.\n(6) Warriors: All friendly warriors have +11 armour.\n(9) Warriors: Reflect pure damage equivalent to (1.5x current armour) when taking physical and magical damage.",
+    "description_html": "Warriors have a double bonus from Fortified Armor while below 50% health.\n<h1>Class Perk: Fortified Armor</h1><font color=\"#656585\">Active when you have at least (N) different Warrior pieces on board. (Multiple effects stack) </font><br><br>(3) Warriors: All friendly warriors have +3 armour.<br>(6) Warriors: All friendly warriors have +11 armour.<br>(9) Warriors: Reflect pure damage equivalent to (1.5x current armour) when taking physical and magical damage.",
+    "lore": "",
+    "notes": [],
+    "tiers": [
+      3,
+      6,
+      9
+    ],
+    "ability_special": {},
+    "names": {
+      "en": "Warrior",
+      "ru": "Warrior"
+    },
+    "descriptions": {
+      "en": "Warriors have a double bonus from Fortified Armor while below 50% health.\n\nClass Perk: Fortified Armor\n Active when you have at least (N) different Warrior pieces on board. (Multiple effects stack) \n\n(3) Warriors: All friendly warriors have +3 armour.\n(6) Warriors: All friendly warriors have +11 armour.\n(9) Warriors: Reflect pure damage equivalent to (1.5x current armour) when taking physical and magical damage.",
+      "ru": "Бонус Воинов удваивается, если здоровье ниже 50%.\n\nClass Perk: Fortified Armor\n Активен, когда хотя бы (N) разных Воинов на доске. (Эффекты складываются) \n\n(3) Warrior: Все союзные войны получают +3 брони.\n(6) Warrior: Все союзные войны получают +11 брони.\n(9) Warrior: Отражаeт чистый урон, эквивалентный (в 1,5 раза больше текущей брони) при получении физического и магического урона."
+    },
+    "lore_i18n": {}
+  },
+  "overrides": {}
+}

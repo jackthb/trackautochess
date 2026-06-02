@@ -1,0 +1,64 @@
+{
+  "gameId": "chess_dk",
+  "name": "Dragon Knight",
+  "slug": "dragon-knight",
+  "source": {
+    "id": "chess_dk",
+    "cost": 4,
+    "pool": "standard",
+    "synergies": [
+      "Dragon",
+      "Human",
+      "Knight"
+    ],
+    "names": {
+      "en": "Dragon Knight",
+      "lore": "Davion",
+      "ko": "용기사",
+      "ru": "Dragon Knight",
+      "zh-cn": "龙骑士",
+      "zh-tw": "龍騎士"
+    },
+    "attack_type": "melee",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 900,
+        "mana": 100,
+        "atk": [
+          80,
+          90
+        ],
+        "armor": 12,
+        "magic_resist": 0,
+        "atk_rate": 1.5,
+        "atk_range": 205
+      },
+      "2_star": {
+        "hp": 1800,
+        "mana": 100,
+        "atk": [
+          160,
+          180
+        ],
+        "armor": 12,
+        "magic_resist": 0,
+        "atk_rate": 1.5,
+        "atk_range": 205
+      },
+      "3_star": {
+        "hp": 3600,
+        "mana": 100,
+        "atk": [
+          320,
+          360
+        ],
+        "armor": 12,
+        "magic_resist": 0,
+        "atk_rate": 1.5,
+        "atk_range": 205
+      }
+    }
+  },
+  "overrides": {}
+}

@@ -1,0 +1,63 @@
+{
+  "gameId": "chess_ok",
+  "name": "Omniknight",
+  "slug": "omniknight",
+  "source": {
+    "id": "chess_ok",
+    "cost": 5,
+    "pool": "standard",
+    "synergies": [
+      "Human",
+      "Knight"
+    ],
+    "names": {
+      "en": "Omniknight",
+      "lore": "Purist۰Thunderwrath",
+      "ko": "전능기사",
+      "ru": "Omniknight",
+      "zh-cn": "全能骑士",
+      "zh-tw": "全能騎士"
+    },
+    "attack_type": "melee",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 1100,
+        "mana": 0,
+        "atk": [
+          90,
+          120
+        ],
+        "armor": 10,
+        "magic_resist": 20,
+        "atk_rate": 1.4,
+        "atk_range": 205
+      },
+      "2_star": {
+        "hp": 2200,
+        "mana": 0,
+        "atk": [
+          180,
+          240
+        ],
+        "armor": 10,
+        "magic_resist": 20,
+        "atk_rate": 1.4,
+        "atk_range": 205
+      },
+      "3_star": {
+        "hp": 4400,
+        "mana": 0,
+        "atk": [
+          360,
+          480
+        ],
+        "armor": 10,
+        "magic_resist": 20,
+        "atk_rate": 1.4,
+        "atk_range": 205
+      }
+    }
+  },
+  "overrides": {}
+}

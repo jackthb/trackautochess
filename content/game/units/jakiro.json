@@ -1,0 +1,63 @@
+{
+  "gameId": "chess_thd",
+  "name": "Jakiro",
+  "slug": "jakiro",
+  "source": {
+    "id": "chess_thd",
+    "cost": 5,
+    "pool": "standard",
+    "synergies": [
+      "Dragon",
+      "Mage"
+    ],
+    "names": {
+      "en": "Jakiro",
+      "lore": "Rexxar",
+      "ko": "자키로",
+      "ru": "Jakiro",
+      "zh-cn": "双头龙",
+      "zh-tw": "雙頭龍"
+    },
+    "attack_type": "ranged",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 1000,
+        "mana": 100,
+        "atk": [
+          30,
+          100
+        ],
+        "armor": 9,
+        "magic_resist": 20,
+        "atk_rate": 1.3,
+        "atk_range": 400
+      },
+      "2_star": {
+        "hp": 2000,
+        "mana": 100,
+        "atk": [
+          60,
+          200
+        ],
+        "armor": 9,
+        "magic_resist": 20,
+        "atk_rate": 1.3,
+        "atk_range": 400
+      },
+      "3_star": {
+        "hp": 4000,
+        "mana": 100,
+        "atk": [
+          120,
+          400
+        ],
+        "armor": 9,
+        "magic_resist": 20,
+        "atk_rate": 1.3,
+        "atk_range": 400
+      }
+    }
+  },
+  "overrides": {}
+}

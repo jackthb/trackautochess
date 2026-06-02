@@ -1,0 +1,63 @@
+{
+  "gameId": "chess_oracle",
+  "name": "Oracle",
+  "slug": "oracle",
+  "source": {
+    "id": "chess_oracle",
+    "cost": 2,
+    "pool": "standard",
+    "synergies": [
+      "God",
+      "Priest"
+    ],
+    "names": {
+      "en": "Oracle",
+      "lore": "Nerif",
+      "ko": "예지자",
+      "ru": "Oracle",
+      "zh-cn": "神谕者",
+      "zh-tw": "神諭者"
+    },
+    "attack_type": "ranged",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 550,
+        "mana": 100,
+        "atk": [
+          40,
+          60
+        ],
+        "armor": 1,
+        "magic_resist": 10,
+        "atk_rate": 1.6,
+        "atk_range": 400
+      },
+      "2_star": {
+        "hp": 1100,
+        "mana": 100,
+        "atk": [
+          80,
+          120
+        ],
+        "armor": 1,
+        "magic_resist": 10,
+        "atk_rate": 1.6,
+        "atk_range": 400
+      },
+      "3_star": {
+        "hp": 2200,
+        "mana": 100,
+        "atk": [
+          160,
+          240
+        ],
+        "armor": 1,
+        "magic_resist": 10,
+        "atk_rate": 1.6,
+        "atk_range": 400
+      }
+    }
+  },
+  "overrides": {}
+}

@@ -1,0 +1,63 @@
+{
+  "gameId": "chess_lich",
+  "name": "Lich",
+  "slug": "lich",
+  "source": {
+    "id": "chess_lich",
+    "cost": 4,
+    "pool": "undead",
+    "synergies": [
+      "Mage",
+      "Undead"
+    ],
+    "names": {
+      "en": "Lich",
+      "lore": "Ethreain",
+      "ko": "리치",
+      "ru": "Lich",
+      "zh-cn": "巫妖",
+      "zh-tw": "巫妖"
+    },
+    "attack_type": "ranged",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 800,
+        "mana": 100,
+        "atk": [
+          50,
+          70
+        ],
+        "armor": 8,
+        "magic_resist": 30,
+        "atk_rate": 1.5,
+        "atk_range": 400
+      },
+      "2_star": {
+        "hp": 1600,
+        "mana": 100,
+        "atk": [
+          100,
+          140
+        ],
+        "armor": 8,
+        "magic_resist": 30,
+        "atk_rate": 1.5,
+        "atk_range": 400
+      },
+      "3_star": {
+        "hp": 3200,
+        "mana": 100,
+        "atk": [
+          200,
+          280
+        ],
+        "armor": 8,
+        "magic_resist": 30,
+        "atk_rate": 1.5,
+        "atk_range": 400
+      }
+    }
+  },
+  "overrides": {}
+}

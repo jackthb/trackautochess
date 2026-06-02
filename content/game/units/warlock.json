@@ -1,0 +1,63 @@
+{
+  "gameId": "chess_wl",
+  "name": "Warlock",
+  "slug": "warlock",
+  "source": {
+    "id": "chess_wl",
+    "cost": 5,
+    "pool": "standard",
+    "synergies": [
+      "Orc",
+      "Warlock"
+    ],
+    "names": {
+      "en": "Warlock",
+      "lore": "Demnok۰Lannik",
+      "ko": "흑마법사",
+      "ru": "Warlock",
+      "zh-cn": "术士",
+      "zh-tw": "術士"
+    },
+    "attack_type": "ranged",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 850,
+        "mana": 100,
+        "atk": [
+          60,
+          120
+        ],
+        "armor": 6,
+        "magic_resist": 25,
+        "atk_rate": 1.5,
+        "atk_range": 600
+      },
+      "2_star": {
+        "hp": 1700,
+        "mana": 100,
+        "atk": [
+          120,
+          240
+        ],
+        "armor": 6,
+        "magic_resist": 25,
+        "atk_rate": 1.5,
+        "atk_range": 600
+      },
+      "3_star": {
+        "hp": 3400,
+        "mana": 100,
+        "atk": [
+          240,
+          480
+        ],
+        "armor": 6,
+        "magic_resist": 25,
+        "atk_rate": 1.5,
+        "atk_range": 600
+      }
+    }
+  },
+  "overrides": {}
+}

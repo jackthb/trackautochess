@@ -1,0 +1,23 @@
+{
+  "gameId": "item_xingyunguazhui",
+  "name": "Lucky Pendant",
+  "slug": "lucky-pendant",
+  "source": {
+    "name": "Lucky Pendant",
+    "description": "The carrier has additional chances on all probability synergies.",
+    "lore": "",
+    "quality": "consumable",
+    "texture": "item_custom/item_slark_fish_bait",
+    "notes": [],
+    "names": {
+      "en": "Lucky Pendant",
+      "ru": "Lucky Pendant"
+    },
+    "descriptions": {
+      "en": "The carrier has additional chances on all probability synergies.",
+      "ru": "Носитель увеличивает вероятность срабатывания всех синергией с шансом."
+    },
+    "lore_i18n": {}
+  },
+  "overrides": {}
+}

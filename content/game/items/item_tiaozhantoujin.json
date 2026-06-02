@@ -1,0 +1,23 @@
+{
+  "gameId": "item_tiaozhantoujin",
+  "name": "Hood of Defiance",
+  "slug": "hood-of-defiance",
+  "source": {
+    "name": "Hood of Defiance",
+    "description": "+50% magic resistance.",
+    "lore": "",
+    "quality": "rare",
+    "texture": "item_hood_of_defiance",
+    "notes": [],
+    "names": {
+      "en": "Hood of Defiance",
+      "ru": "Hood of Defiance"
+    },
+    "descriptions": {
+      "en": "+50% magic resistance.",
+      "ru": "+50% Сопротивления к магии."
+    },
+    "lore_i18n": {}
+  },
+  "overrides": {}
+}

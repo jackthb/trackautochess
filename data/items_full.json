@@ -9,8 +9,6 @@
       "The carrier must have mana for Aghanims Shard.",
       "Additional skill will be removed after chess pieces upgraded."
     ],
-    "icon_url": null,
-    "icon_dimensions": null,
     "names": {
       "en": "Aghanims Shard",
       "ru": "Aghanims Shard"
@@ -31,8 +29,6 @@
     "quality": "consumable",
     "texture": "ultimate_scepter",
     "notes": [],
-    "icon_url": null,
-    "icon_dimensions": null,
     "names": {
       "en": "Aghanims Scepter",
       "ru": "Aghanims Scepter"
@@ -53,8 +49,6 @@
     "quality": "rare",
     "texture": "item_avianas_feather",
     "notes": [],
-    "icon_url": null,
-    "icon_dimensions": null,
     "names": {
       "en": "Avianas Feather",
       "ru": "Avianas Feather"
@@ -72,8 +66,6 @@
     "quality": "epic",
     "texture": "item_desolator",
     "notes": [],
-    "icon_url": null,
-    "icon_dimensions": null,
     "names": {
       "en": "Desolator",
       "ru": "Desolator"
@@ -96,8 +88,6 @@
     "notes": [
       "Immune to attack and ability when jumping"
     ],
-    "icon_url": null,
-    "icon_dimensions": null,
     "names": {
       "en": "Arcane Boots",
       "ru": "Arcane Boots"
@@ -115,8 +105,6 @@
     "quality": "common",
     "texture": "custom/baojunwangpao",
     "notes": [],
-    "icon_url": null,
-    "icon_dimensions": null,
     "names": {
       "en": "Cloak of Tyrants",
       "ru": "Cloak of Tyrants"
@@ -139,8 +127,6 @@
     "notes": [
       "Initial chance at Round 10 is 40% and increases 2% per round."
     ],
-    "icon_url": null,
-    "icon_dimensions": null,
     "names": {
       "en": "Magic Seed",
       "ru": "Magic Seed"
@@ -161,8 +147,6 @@
     "quality": "rare",
     "texture": "item_skadi",
     "notes": [],
-    "icon_url": null,
-    "icon_dimensions": null,
     "names": {
       "en": "Eye of Skadi",
       "ru": "Eye of Skadi"
@@ -183,8 +167,6 @@
     "quality": "rare",
     "texture": "item_black_king_bar",
     "notes": [],
-    "icon_url": null,
-    "icon_dimensions": null,
     "names": {
       "en": "Black King Bar",
       "ru": "Black King Bar"
@@ -205,8 +187,6 @@
     "quality": "",
     "texture": "seeds_of_serenity",
     "notes": [],
-    "icon_url": null,
-    "icon_dimensions": null,
     "names": {
       "en": "Leafy Essence",
       "ru": "Leafy Essence"
@@ -227,8 +207,6 @@
     "quality": "rare",
     "texture": "item_aegis",
     "notes": [],
-    "icon_url": null,
-    "icon_dimensions": null,
     "names": {
       "en": "Aegis of Immortal",
       "ru": "Aegis of Immortal"
@@ -249,8 +227,6 @@
     "quality": "rare",
     "texture": "custom/jushencantie",
     "notes": [],
-    "icon_url": null,
-    "icon_dimensions": null,
     "names": {
       "en": "Sliver",
       "ru": "Sliver"
@@ -268,8 +244,6 @@
     "quality": "consumable",
     "texture": "custom/card_chance",
     "notes": [],
-    "icon_url": null,
-    "icon_dimensions": null,
     "names": {
       "en": "Card: Chance",
       "ru": "Card: Chance"
@@ -287,8 +261,6 @@
     "quality": "consumable",
     "texture": "custom/card_fate",
     "notes": [],
-    "icon_url": null,
-    "icon_dimensions": null,
     "names": {
       "en": "Card: Fate",
       "ru": "Card: Fate"
@@ -306,8 +278,6 @@
     "quality": "consumable",
     "texture": "item_pavise",
     "notes": [],
-    "icon_url": null,
-    "icon_dimensions": null,
     "names": {
       "en": "Pavise",
       "ru": "Pavise"
@@ -325,8 +295,6 @@
     "quality": "rare",
     "texture": "item_crimson_guard",
     "notes": [],
-    "icon_url": null,
-    "icon_dimensions": null,
     "names": {
       "en": "Crimson Guard",
       "ru": "Crimson Guard"
@@ -347,8 +315,6 @@
     "quality": "consumable",
     "texture": "item_tango",
     "notes": [],
-    "icon_url": null,
-    "icon_dimensions": null,
     "names": {
       "en": "Tango",
       "ru": "Tango"
@@ -369,8 +335,6 @@
     "quality": "consumable",
     "texture": "item_tango_single",
     "notes": [],
-    "icon_url": null,
-    "icon_dimensions": null,
     "names": {
       "en": "Tango",
       "ru": "Tango"
@@ -388,8 +352,6 @@
     "quality": "consumable",
     "texture": "custom/common_token",
     "notes": [],
-    "icon_url": null,
-    "icon_dimensions": null,
     "names": {
       "en": "Machine Token",
       "ru": "Machine Token"
@@ -410,8 +372,6 @@
     "quality": "",
     "texture": "item_custom/帷幕2",
     "notes": [],
-    "icon_url": null,
-    "icon_dimensions": null,
     "names": {
       "en": "Shroud of Concealment",
       "ru": "Shroud of Concealment"
@@ -432,8 +392,6 @@
     "quality": "artifact",
     "texture": "item_mjollnir",
     "notes": [],
-    "icon_url": null,
-    "icon_dimensions": null,
     "names": {
       "en": "Mjollnir",
       "ru": "Mjollnir"
@@ -451,8 +409,6 @@
     "quality": "artifact",
     "texture": "item_greater_crit",
     "notes": [],
-    "icon_url": null,
-    "icon_dimensions": null,
     "names": {
       "en": "Daedalus",
       "ru": "Daedalus"
@@ -470,8 +426,6 @@
     "quality": "common",
     "texture": "abyssal_blade",
     "notes": [],
-    "icon_url": null,
-    "icon_dimensions": null,
     "names": {
       "en": "Abyssal Blade",
       "ru": "Abyssal Blade"
@@ -492,8 +446,6 @@
     "quality": "common",
     "texture": "item_hand_of_midas",
     "notes": [],
-    "icon_url": null,
-    "icon_dimensions": null,
     "names": {
       "en": "Hand of Midas",
       "ru": "Hand of Midas"
@@ -514,8 +466,6 @@
     "quality": "rare",
     "texture": "item_pipe",
     "notes": [],
-    "icon_url": null,
-    "icon_dimensions": null,
     "names": {
       "en": "Pipe of Insight",
       "ru": "Pipe of Insight"
@@ -536,8 +486,6 @@
     "quality": "",
     "texture": "item_doubloon",
     "notes": [],
-    "icon_url": null,
-    "icon_dimensions": null,
     "names": {
       "en": "Doubloon",
       "ru": "Doubloon"
@@ -561,8 +509,6 @@
       "★★ for no less than 3 points, ★★★ for no less than 9 points.",
       "Hatching points deduct pieces from the chess pool and will stop growing when there are no pieces in the chess pool."
     ],
-    "icon_url": null,
-    "icon_dimensions": null,
     "names": {
       "en": "Greevil Egg",
       "ru": "Greevil Egg"
@@ -585,8 +531,6 @@
     "notes": [
       "Casting skills and certain special target selection targeted spells are ineffective."
     ],
-    "icon_url": null,
-    "icon_dimensions": null,
     "names": {
       "en": "Spell Prism",
       "ru": "Spell Prism"
@@ -607,8 +551,6 @@
       "At most 1 undead piece can resurrect each round.",
       "IO cannot resurrect. Independent with Dismiss."
     ],
-    "icon_url": null,
-    "icon_dimensions": null,
     "names": {
       "en": "Ascetics Cap",
       "ru": "Ascetics Cap"
@@ -629,8 +571,6 @@
     "quality": "rare",
     "texture": "item_mask_of_madness",
     "notes": [],
-    "icon_url": null,
-    "icon_dimensions": null,
     "names": {
       "en": "Mask of Madness",
       "ru": "Mask of Madness"
@@ -653,8 +593,6 @@
     "notes": [
       "Move into Backpack slots if you don't wish to use this item for the round."
     ],
-    "icon_url": null,
-    "icon_dimensions": null,
     "names": {
       "en": "Royal Jelly Shield",
       "ru": "Royal Jelly Shield"
@@ -675,8 +613,6 @@
     "quality": "",
     "texture": "item_custom/狱卒的钥匙2",
     "notes": [],
-    "icon_url": null,
-    "icon_dimensions": null,
     "names": {
       "en": "Gaolers Master Key",
       "ru": "Gaolers Master Key"
@@ -699,8 +635,6 @@
     "notes": [
       "Consecutive recruitment failures will gradually raise the chance of receiving 2 Gold."
     ],
-    "icon_url": null,
-    "icon_dimensions": null,
     "names": {
       "en": "Weighted Dice",
       "ru": "Weighted Dice"
@@ -718,8 +652,6 @@
     "quality": "epic",
     "texture": "item_gungir",
     "notes": [],
-    "icon_url": null,
-    "icon_dimensions": null,
     "names": {
       "en": "Gleipnir",
       "ru": "Gleipnir"
@@ -740,8 +672,6 @@
     "quality": "consumable",
     "texture": "orb_of_corrosion",
     "notes": [],
-    "icon_url": null,
-    "icon_dimensions": null,
     "names": {
       "en": "Orb of Corrosion",
       "ru": "Orb of Corrosion"
@@ -759,8 +689,6 @@
     "quality": "consumable",
     "texture": "custom/gold_token",
     "notes": [],
-    "icon_url": null,
-    "icon_dimensions": null,
     "names": {
       "en": "Golden Machine Token",
       "ru": "Golden Machine Token"
@@ -781,8 +709,6 @@
     "quality": "common",
     "texture": "kobold_cup",
     "notes": [],
-    "icon_url": null,
-    "icon_dimensions": null,
     "names": {
       "en": "Kobold Cup",
       "ru": "Kobold Cup"
@@ -803,8 +729,6 @@
     "quality": "rare",
     "texture": "item_minotaur_horn",
     "notes": [],
-    "icon_url": null,
-    "icon_dimensions": null,
     "names": {
       "en": "Minotaur Horn",
       "ru": "Minotaur Horn"
@@ -822,8 +746,6 @@
     "quality": "rare",
     "texture": "custom/haojie",
     "notes": [],
-    "icon_url": null,
-    "icon_dimensions": null,
     "names": {
       "en": "Havoc",
       "ru": "Havoc"
@@ -841,8 +763,6 @@
     "quality": "epic",
     "texture": "item_dagon_4",
     "notes": [],
-    "icon_url": null,
-    "icon_dimensions": null,
     "names": {
       "en": "Dagon",
       "ru": "Dagon"
@@ -865,8 +785,6 @@
     "notes": [
       "Mirror chess pieces inherit passive effects from the carriers equipment."
     ],
-    "icon_url": null,
-    "icon_dimensions": null,
     "names": {
       "en": "Manta Style",
       "ru": "Manta Style"
@@ -887,8 +805,6 @@
     "quality": "rare",
     "texture": "item_butterfly",
     "notes": [],
-    "icon_url": null,
-    "icon_dimensions": null,
     "names": {
       "en": "Butterfly",
       "ru": "Butterfly"
@@ -909,8 +825,6 @@
     "quality": "common",
     "texture": "kaya",
     "notes": [],
-    "icon_url": null,
-    "icon_dimensions": null,
     "names": {
       "en": "Kaya",
       "ru": "Kaya"
@@ -928,8 +842,6 @@
     "quality": "epic",
     "texture": "item_radiance",
     "notes": [],
-    "icon_url": null,
-    "icon_dimensions": null,
     "names": {
       "en": "Radiance",
       "ru": "Radiance"
@@ -950,8 +862,6 @@
     "quality": "rare",
     "texture": "item_diffusal_blade",
     "notes": [],
-    "icon_url": null,
-    "icon_dimensions": null,
     "names": {
       "en": "Diffusal Blade",
       "ru": "Diffusal Blade"
@@ -974,8 +884,6 @@
     "notes": [
       "Immune to attack and ability when jumping"
     ],
-    "icon_url": null,
-    "icon_dimensions": null,
     "names": {
       "en": "Tranquil Boots",
       "ru": "Tranquil Boots"
@@ -993,8 +901,6 @@
     "quality": "artifact",
     "texture": "item_monkey_king_bar",
     "notes": [],
-    "icon_url": null,
-    "icon_dimensions": null,
     "names": {
       "en": "Monkey King Bar",
       "ru": "Monkey King Bar"
@@ -1012,8 +918,6 @@
     "quality": "rare",
     "texture": "item_vladmir",
     "notes": [],
-    "icon_url": null,
-    "icon_dimensions": null,
     "names": {
       "en": "Vladimirs Offering",
       "ru": "Vladimirs Offering"
@@ -1031,8 +935,6 @@
     "quality": "consumable",
     "texture": "custom/ex_machina_lg",
     "notes": [],
-    "icon_url": null,
-    "icon_dimensions": null,
     "names": {
       "en": "Heart of the Machine",
       "ru": "Heart of the Machine"
@@ -1053,8 +955,6 @@
     "quality": "consumable",
     "texture": "custom/golden_machina_lg",
     "notes": [],
-    "icon_url": null,
-    "icon_dimensions": null,
     "names": {
       "en": "Golden Heart of the Machine",
       "ru": "Golden Heart of the Machine"
@@ -1077,8 +977,6 @@
     "notes": [
       "Attack range bonus not stackable."
     ],
-    "icon_url": null,
-    "icon_dimensions": null,
     "names": {
       "en": "Hurricane Pike",
       "ru": "Hurricane Pike"
@@ -1099,8 +997,6 @@
     "quality": "rare",
     "texture": "item_giants_ring",
     "notes": [],
-    "icon_url": null,
-    "icon_dimensions": null,
     "names": {
       "en": "Giants Ring",
       "ru": "Giants Ring"
@@ -1121,8 +1017,6 @@
     "quality": "common",
     "texture": "null_talisman",
     "notes": [],
-    "icon_url": null,
-    "icon_dimensions": null,
     "names": {
       "en": "Null Talisman",
       "ru": "Null Talisman"
@@ -1140,8 +1034,6 @@
     "quality": "artifact",
     "texture": "item_bfury",
     "notes": [],
-    "icon_url": null,
-    "icon_dimensions": null,
     "names": {
       "en": "Battle Fury",
       "ru": "Battle Fury"
@@ -1162,8 +1054,6 @@
     "quality": "common",
     "texture": "falcon_blade",
     "notes": [],
-    "icon_url": null,
-    "icon_dimensions": null,
     "names": {
       "en": "Falcon Blade",
       "ru": "Falcon Blade"
@@ -1181,8 +1071,6 @@
     "quality": "rare",
     "texture": "overwhelming_blink",
     "notes": [],
-    "icon_url": null,
-    "icon_dimensions": null,
     "names": {
       "en": "Overwhelming Blink",
       "ru": "Overwhelming Blink"
@@ -1200,8 +1088,6 @@
     "quality": "common",
     "texture": "bracer",
     "notes": [],
-    "icon_url": null,
-    "icon_dimensions": null,
     "names": {
       "en": "Bracer",
       "ru": "Bracer"
@@ -1219,8 +1105,6 @@
     "quality": "common",
     "texture": "bullwhip",
     "notes": [],
-    "icon_url": null,
-    "icon_dimensions": null,
     "names": {
       "en": "Bullwhip",
       "ru": "Bullwhip"
@@ -1238,8 +1122,6 @@
     "quality": "rare",
     "texture": "item_sphere",
     "notes": [],
-    "icon_url": null,
-    "icon_dimensions": null,
     "names": {
       "en": "Linkens Sphere",
       "ru": "Linkens Sphere"
@@ -1260,8 +1142,6 @@
     "quality": "artifact",
     "texture": "item_heart",
     "notes": [],
-    "icon_url": null,
-    "icon_dimensions": null,
     "names": {
       "en": "Heart of Tarrasque",
       "ru": "Heart of Tarrasque"
@@ -1279,8 +1159,6 @@
     "quality": "consumable",
     "texture": "tier1_token",
     "notes": [],
-    "icon_url": null,
-    "icon_dimensions": null,
     "names": {
       "en": "Spoil Token Level 1",
       "ru": "Жетон ур. 1"
@@ -1298,8 +1176,6 @@
     "quality": "consumable",
     "texture": "custom/item_lootbox_lv2",
     "notes": [],
-    "icon_url": null,
-    "icon_dimensions": null,
     "names": {
       "en": "Spoil Token Level 2",
       "ru": "Жетон ур. 2"
@@ -1317,8 +1193,6 @@
     "quality": "consumable",
     "texture": "tier3_token",
     "notes": [],
-    "icon_url": null,
-    "icon_dimensions": null,
     "names": {
       "en": "Spoil Token Level 3",
       "ru": "Жетон ур. 3"
@@ -1336,8 +1210,6 @@
     "quality": "consumable",
     "texture": "tier4_token",
     "notes": [],
-    "icon_url": null,
-    "icon_dimensions": null,
     "names": {
       "en": "Spoil Token Level 4",
       "ru": "Жетон ур. 4"
@@ -1355,8 +1227,6 @@
     "quality": "consumable",
     "texture": "tier5_token",
     "notes": [],
-    "icon_url": null,
-    "icon_dimensions": null,
     "names": {
       "en": "Spoil Token Level 5",
       "ru": "Жетон ур. 5"
@@ -1378,8 +1248,6 @@
       "Packed piece can be transformed into any piece of the same cost, despite the chess pool limit.",
       "Packed pieces will not transform into pieces you packed into before."
     ],
-    "icon_url": null,
-    "icon_dimensions": null,
     "names": {
       "en": "Magic box",
       "ru": "Magic box"
@@ -1400,8 +1268,6 @@
     "quality": "consumable",
     "texture": "item_creed_of_omniscience",
     "notes": [],
-    "icon_url": null,
-    "icon_dimensions": null,
     "names": {
       "en": "Magic Card",
       "ru": "Magic Card"
@@ -1422,8 +1288,6 @@
     "quality": "",
     "texture": "item_custom/zainankuanghuan",
     "notes": [],
-    "icon_url": null,
-    "icon_dimensions": null,
     "names": {
       "en": "Malefic Rapture",
       "ru": "Malefic Rapture"
@@ -1444,8 +1308,6 @@
     "quality": "consumable",
     "texture": "item_enchanted_mango",
     "notes": [],
-    "icon_url": null,
-    "icon_dimensions": null,
     "names": {
       "en": "Enchanted Mango",
       "ru": "Enchanted Mango"
@@ -1466,8 +1328,6 @@
     "quality": "",
     "texture": "item_mango_tree",
     "notes": [],
-    "icon_url": null,
-    "icon_dimensions": null,
     "names": {
       "en": "Mango Tree",
       "ru": "Mango Tree"
@@ -1488,8 +1348,6 @@
     "quality": "rare",
     "texture": "item_mekansm",
     "notes": [],
-    "icon_url": null,
-    "icon_dimensions": null,
     "names": {
       "en": "Mekansm",
       "ru": "Mekansm"
@@ -1512,8 +1370,6 @@
     "notes": [
       "Melee carrier summons 2 necro warriors while Ranged carrier summons 2 necro archers."
     ],
-    "icon_url": null,
-    "icon_dimensions": null,
     "names": {
       "en": "Necronomicon",
       "ru": "Necronomicon"
@@ -1534,8 +1390,6 @@
     "quality": "rare",
     "texture": "swift_blink",
     "notes": [],
-    "icon_url": null,
-    "icon_dimensions": null,
     "names": {
       "en": "Swift Blink",
       "ru": "Swift Blink"
@@ -1555,8 +1409,6 @@
     "notes": [
       "Attack range bonus not stackable."
     ],
-    "icon_url": null,
-    "icon_dimensions": null,
     "names": {
       "en": "DragonLance",
       "ru": "DragonLance"
@@ -1574,8 +1426,6 @@
     "quality": "consumable",
     "texture": "custom/coin",
     "notes": [],
-    "icon_url": null,
-    "icon_dimensions": null,
     "names": {
       "en": "A Bag of Coins",
       "ru": "Мешочек денег"
@@ -1593,8 +1443,6 @@
     "quality": "rare",
     "texture": "bottle",
     "notes": [],
-    "icon_url": null,
-    "icon_dimensions": null,
     "names": {
       "en": "Bottle",
       "ru": "Bottle"
@@ -1612,8 +1460,6 @@
     "quality": "rare",
     "texture": "bottle_empty",
     "notes": [],
-    "icon_url": null,
-    "icon_dimensions": null,
     "names": {
       "en": "Bottle",
       "ru": "Bottle"
@@ -1631,8 +1477,6 @@
     "quality": "",
     "texture": "item_custom/more_creep",
     "notes": [],
-    "icon_url": null,
-    "icon_dimensions": null,
     "names": {
       "en": "March of The Beasts",
       "ru": "March of The Beasts"
@@ -1653,8 +1497,6 @@
     "quality": "consumable",
     "texture": "item_default",
     "notes": [],
-    "icon_url": null,
-    "icon_dimensions": null,
     "names": {
       "en": "UNAVAILABLE",
       "ru": "UNAVAILABLE"
@@ -1674,8 +1516,6 @@
     "notes": [
       "Move into Backpack slots if you don't wish to use this item for the round."
     ],
-    "icon_url": null,
-    "icon_dimensions": null,
     "names": {
       "en": "Golden Enchanted Mango",
       "ru": "Golden Enchanted Mango"
@@ -1696,8 +1536,6 @@
     "quality": "artifact",
     "texture": "item_assault",
     "notes": [],
-    "icon_url": null,
-    "icon_dimensions": null,
     "names": {
       "en": "Assault Cuirass",
       "ru": "Assault Cuirass"
@@ -1715,8 +1553,6 @@
     "quality": "epic",
     "texture": "princes_knife",
     "notes": [],
-    "icon_url": null,
-    "icon_dimensions": null,
     "names": {
       "en": "Princes Knife",
       "ru": "Princes Knife"
@@ -1734,8 +1570,6 @@
     "quality": "consumable",
     "texture": "item_poor_mans_shield",
     "notes": [],
-    "icon_url": null,
-    "icon_dimensions": null,
     "names": {
       "en": "Poor Mans Shield",
       "ru": "Poor Mans Shield"
@@ -1753,8 +1587,6 @@
     "quality": "rare",
     "texture": "item_paladin_sword",
     "notes": [],
-    "icon_url": null,
-    "icon_dimensions": null,
     "names": {
       "en": "Paladin Sword",
       "ru": "Paladin Sword"
@@ -1777,8 +1609,6 @@
     "notes": [
       "Modified from the previous courier-lost-health scaling formula."
     ],
-    "icon_url": null,
-    "icon_dimensions": null,
     "names": {
       "en": "Defiant Shell",
       "ru": "Defiant Shell"
@@ -1799,8 +1629,6 @@
       "Relic equipped will expire at next relic round.",
       "Exclusive, new relic will replace the former one."
     ],
-    "icon_url": null,
-    "icon_dimensions": null,
     "names": {
       "en": "Relicbox",
       "ru": "Сокровищница"
@@ -1821,8 +1649,6 @@
     "quality": "rare",
     "texture": "item_ancient_janggo",
     "notes": [],
-    "icon_url": null,
-    "icon_dimensions": null,
     "names": {
       "en": "Drum of Endurance",
       "ru": "Drum of Endurance"
@@ -1840,8 +1666,6 @@
     "quality": "rare",
     "texture": "item_blade_mail",
     "notes": [],
-    "icon_url": null,
-    "icon_dimensions": null,
     "names": {
       "en": "Blade Mail",
       "ru": "Blade Mail"
@@ -1862,8 +1686,6 @@
       "A random relic will be settled if it is your first relic, and this randomed one will not be counted as used (still available later).",
       "Time-Space Replica is not in the relic random pool when you random a relic."
     ],
-    "icon_url": null,
-    "icon_dimensions": null,
     "names": {
       "en": "Time-Space Replica",
       "ru": "Time-Space Replica"
@@ -1884,8 +1706,6 @@
     "quality": "consumable",
     "texture": "custom/rm_token",
     "notes": [],
-    "icon_url": null,
-    "icon_dimensions": null,
     "names": {
       "en": "Wheel of Wonder Token",
       "ru": "Wheel of Wonder Token"
@@ -1908,8 +1728,6 @@
     "notes": [
       "Discovered pieces with Kobold or Dwarfs may not work due to their species constraints."
     ],
-    "icon_url": null,
-    "icon_dimensions": null,
     "names": {
       "en": "Wheel of Wonder",
       "ru": "Wheel of Wonder"
@@ -1930,8 +1748,6 @@
     "quality": "artifact",
     "texture": "item_satanic",
     "notes": [],
-    "icon_url": null,
-    "icon_dimensions": null,
     "names": {
       "en": "Satanic",
       "ru": "Satanic"
@@ -1952,8 +1768,6 @@
     "quality": "rare",
     "texture": "item_trident",
     "notes": [],
-    "icon_url": null,
-    "icon_dimensions": null,
     "names": {
       "en": "Trident",
       "ru": "Trident"
@@ -1971,8 +1785,6 @@
     "quality": "",
     "texture": "item_custom/第二次机会",
     "notes": [],
-    "icon_url": null,
-    "icon_dimensions": null,
     "names": {
       "en": "Second Chance",
       "ru": "Second Chance"
@@ -1993,8 +1805,6 @@
     "quality": "rare",
     "texture": "item_talisman_of_evasion",
     "notes": [],
-    "icon_url": null,
-    "icon_dimensions": null,
     "names": {
       "en": "Talisman of Evasion",
       "ru": "Talisman of Evasion"
@@ -2012,8 +1822,6 @@
     "quality": "artifact",
     "texture": "item_rapier",
     "notes": [],
-    "icon_url": null,
-    "icon_dimensions": null,
     "names": {
       "en": "Rapier",
       "ru": "Rapier"
@@ -2034,8 +1842,6 @@
     "quality": "rare",
     "texture": "item_mirror_shield",
     "notes": [],
-    "icon_url": null,
-    "icon_dimensions": null,
     "names": {
       "en": "Mirror Shield",
       "ru": "Mirror Shield"
@@ -2055,8 +1861,6 @@
     "notes": [
       "The bearer retains its original Species as well."
     ],
-    "icon_url": null,
-    "icon_dimensions": null,
     "names": {
       "en": "Ogre Hood",
       "ru": "Ogre Hood"
@@ -2077,8 +1881,6 @@
     "quality": "rare",
     "texture": "item_refresher",
     "notes": [],
-    "icon_url": null,
-    "icon_dimensions": null,
     "names": {
       "en": "Refresher Orb",
       "ru": "Refresher Orb"
@@ -2099,8 +1901,6 @@
     "quality": "rare",
     "texture": "item_lesser_crit",
     "notes": [],
-    "icon_url": null,
-    "icon_dimensions": null,
     "names": {
       "en": "Crystalys",
       "ru": "Crystalys"
@@ -2118,8 +1918,6 @@
     "quality": "",
     "texture": "custom/coin",
     "notes": [],
-    "icon_url": null,
-    "icon_dimensions": null,
     "names": {
       "en": "Stolen Vault",
       "ru": "Stolen Vault"
@@ -2143,8 +1941,6 @@
       "2-4 win/loss streak corresponds to level (lapsed relic count) loot token, 5-9 win/loss streak corresponds to level (lapsed relic count+1) loot token, and 10+ win/loss streak corresponds to level (lapsed relic count+2) loot token.",
       "The Maximum level of this token is level 5."
     ],
-    "icon_url": null,
-    "icon_dimensions": null,
     "names": {
       "en": "Chiaroscuro Certainty",
       "ru": "Chiaroscuro Certainty"
@@ -2165,8 +1961,6 @@
     "quality": "consumable",
     "texture": "item_boots",
     "notes": [],
-    "icon_url": null,
-    "icon_dimensions": null,
     "names": {
       "en": "Boots of Speed",
       "ru": "Boots of Speed"
@@ -2184,8 +1978,6 @@
     "quality": "common",
     "texture": "basher",
     "notes": [],
-    "icon_url": null,
-    "icon_dimensions": null,
     "names": {
       "en": "Skull Basher",
       "ru": "Skull Basher"
@@ -2206,8 +1998,6 @@
     "quality": "",
     "texture": "item_custom/super_uprank",
     "notes": [],
-    "icon_url": null,
-    "icon_dimensions": null,
     "names": {
       "en": "Lucid Star",
       "ru": "Lucid Star"
@@ -2225,8 +2015,6 @@
     "quality": "rare",
     "texture": "arcane_ring",
     "notes": [],
-    "icon_url": null,
-    "icon_dimensions": null,
     "names": {
       "en": "Test item: +100 mana",
       "ru": "Test item: +100 mana"
@@ -2241,8 +2029,6 @@
     "quality": "consumable",
     "texture": "item_carapace_of_qaldin",
     "notes": [],
-    "icon_url": null,
-    "icon_dimensions": null,
     "names": {
       "en": "Test item: +999 armor",
       "ru": "Test item: +999 armor"
@@ -2257,8 +2043,6 @@
     "quality": "consumable",
     "texture": "item_eternal_shroud",
     "notes": [],
-    "icon_url": null,
-    "icon_dimensions": null,
     "names": {
       "en": "Test item: +100% magic resistance",
       "ru": "Test item: +100% magic resistance"
@@ -2273,8 +2057,6 @@
     "quality": "rare",
     "texture": "item_force_field",
     "notes": [],
-    "icon_url": null,
-    "icon_dimensions": null,
     "names": {
       "en": "Test item: +100% evasion",
       "ru": "Test item: +100% evasion"
@@ -2289,8 +2071,6 @@
     "quality": "consumable",
     "texture": "item_vengeances_shadow",
     "notes": [],
-    "icon_url": null,
-    "icon_dimensions": null,
     "names": {
       "en": "Test item: -50% magic resistance",
       "ru": "Test item: -50% magic resistance"
@@ -2305,8 +2085,6 @@
     "quality": "epic",
     "texture": "item_unstable_wand",
     "notes": [],
-    "icon_url": null,
-    "icon_dimensions": null,
     "names": {
       "en": "Test item: -200% attack speed",
       "ru": "Test item: -200% attack speed"
@@ -2321,8 +2099,6 @@
     "quality": "rare",
     "texture": "item_heavens_halberd",
     "notes": [],
-    "icon_url": null,
-    "icon_dimensions": null,
     "names": {
       "en": "Heavens Halberd",
       "ru": "Heavens Halberd"
@@ -2342,8 +2118,6 @@
     "notes": [
       "Chess Pieces with fast movement can be immune to attacks and projectiles."
     ],
-    "icon_url": null,
-    "icon_dimensions": null,
     "names": {
       "en": "Blink Dagger",
       "ru": "Blink Dagger"
@@ -2364,8 +2138,6 @@
     "quality": "rare",
     "texture": "item_hood_of_defiance",
     "notes": [],
-    "icon_url": null,
-    "icon_dimensions": null,
     "names": {
       "en": "Hood of Defiance",
       "ru": "Hood of Defiance"
@@ -2383,8 +2155,6 @@
     "quality": "",
     "texture": "item_custom/哼哼井武器匠",
     "notes": [],
-    "icon_url": null,
-    "icon_dimensions": null,
     "names": {
       "en": "Weaponsmith",
       "ru": "Weaponsmith"
@@ -2405,8 +2175,6 @@
     "quality": "common",
     "texture": "item_spider_legs",
     "notes": [],
-    "icon_url": null,
-    "icon_dimensions": null,
     "names": {
       "en": "Spider Leg",
       "ru": "Spider Leg"
@@ -2429,8 +2197,6 @@
     "notes": [
       "The bearer retains its original Species as well."
     ],
-    "icon_url": null,
-    "icon_dimensions": null,
     "names": {
       "en": "Telescope",
       "ru": "Telescope"
@@ -2448,8 +2214,6 @@
     "quality": "consumable",
     "texture": "ring_of_basilius",
     "notes": [],
-    "icon_url": null,
-    "icon_dimensions": null,
     "names": {
       "en": "Ring of Basilius",
       "ru": "Ring of Basilius"
@@ -2467,8 +2231,6 @@
     "quality": "consumable",
     "texture": "glimmer_cape",
     "notes": [],
-    "icon_url": null,
-    "icon_dimensions": null,
     "names": {
       "en": "Glimmer Cape",
       "ru": "Glimmer Cape"
@@ -2486,8 +2248,6 @@
     "quality": "epic",
     "texture": "item_guardian_greaves",
     "notes": [],
-    "icon_url": null,
-    "icon_dimensions": null,
     "names": {
       "en": "Guardian Greaves",
       "ru": "Guardian Greaves"
@@ -2510,8 +2270,6 @@
     "notes": [
       "+1 Level Only valid on chess pieces."
     ],
-    "icon_url": null,
-    "icon_dimensions": null,
     "names": {
       "en": "Witless Shako",
       "ru": "Witless Shako"
@@ -2529,8 +2287,6 @@
     "quality": "rare",
     "texture": "item_vanguard",
     "notes": [],
-    "icon_url": null,
-    "icon_dimensions": null,
     "names": {
       "en": "Vanguard",
       "ru": "Vanguard"
@@ -2548,8 +2304,6 @@
     "quality": "consumable",
     "texture": "phase_boots",
     "notes": [],
-    "icon_url": null,
-    "icon_dimensions": null,
     "names": {
       "en": "Phase Boots",
       "ru": "Phase Boots"
@@ -2570,8 +2324,6 @@
     "quality": "consumable",
     "texture": "item_custom/item_slark_fish_bait",
     "notes": [],
-    "icon_url": null,
-    "icon_dimensions": null,
     "names": {
       "en": "Lucky Pendant",
       "ru": "Lucky Pendant"
@@ -2589,8 +2341,6 @@
     "quality": "epic",
     "texture": "item_shivas_guard",
     "notes": [],
-    "icon_url": null,
-    "icon_dimensions": null,
     "names": {
       "en": "Shivas Guard",
       "ru": "Shivas Guard"
@@ -2611,8 +2361,6 @@
     "quality": "consumable",
     "texture": "buckler",
     "notes": [],
-    "icon_url": null,
-    "icon_dimensions": null,
     "names": {
       "en": "Buckler",
       "ru": "Buckler"
@@ -2630,8 +2378,6 @@
     "quality": "rare",
     "texture": "item_maelstrom",
     "notes": [],
-    "icon_url": null,
-    "icon_dimensions": null,
     "names": {
       "en": "Maelstrom",
       "ru": "Maelstrom"
@@ -2649,8 +2395,6 @@
     "quality": "rare",
     "texture": "item_bloodthorn",
     "notes": [],
-    "icon_url": null,
-    "icon_dimensions": null,
     "names": {
       "en": "Bloodthorn",
       "ru": "Bloodthorn"
@@ -2671,8 +2415,6 @@
     "quality": "rare",
     "texture": "item_bloodstone",
     "notes": [],
-    "icon_url": null,
-    "icon_dimensions": null,
     "names": {
       "en": "Bloodstone",
       "ru": "Bloodstone"
@@ -2693,8 +2435,6 @@
     "quality": "common",
     "texture": "item_sheepstick",
     "notes": [],
-    "icon_url": null,
-    "icon_dimensions": null,
     "names": {
       "en": "Scythe of Vyse",
       "ru": "Scythe of Vyse"
@@ -2715,8 +2455,6 @@
     "quality": "epic",
     "texture": "item_moon_shard",
     "notes": [],
-    "icon_url": null,
-    "icon_dimensions": null,
     "names": {
       "en": "Moon Shard",
       "ru": "Moon Shard"
@@ -2737,8 +2475,6 @@
     "quality": "rare",
     "texture": "item_aeon_disk",
     "notes": [],
-    "icon_url": null,
-    "icon_dimensions": null,
     "names": {
       "en": "Aeon Disk",
       "ru": "Aeon Disk"
@@ -2759,8 +2495,6 @@
     "quality": "rare",
     "texture": "item_spark_of_courage",
     "notes": [],
-    "icon_url": null,
-    "icon_dimensions": null,
     "names": {
       "en": "Spark of Courage",
       "ru": "Spark of Courage"
@@ -2778,8 +2512,6 @@
     "quality": "common",
     "texture": "item_force_staff",
     "notes": [],
-    "icon_url": null,
-    "icon_dimensions": null,
     "names": {
       "en": "Force Staff",
       "ru": "Force Staff"
@@ -2800,8 +2532,6 @@
     "quality": "common",
     "texture": "wraith_band",
     "notes": [],
-    "icon_url": null,
-    "icon_dimensions": null,
     "names": {
       "en": "Wraith Band",
       "ru": "Wraith Band"
@@ -2819,8 +2549,6 @@
     "quality": "rare",
     "texture": "item_travel_boots",
     "notes": [],
-    "icon_url": null,
-    "icon_dimensions": null,
     "names": {
       "en": "Travel Boots",
       "ru": "Travel Boots"
@@ -2838,8 +2566,6 @@
     "quality": "rare",
     "texture": "custom/zhaohuanshenshi",
     "notes": [],
-    "icon_url": null,
-    "icon_dimensions": null,
     "names": {
       "en": "Summoning Stone",
       "ru": "Summoning Stone"
@@ -2860,8 +2586,6 @@
     "quality": "rare",
     "texture": "arcane_blink",
     "notes": [],
-    "icon_url": null,
-    "icon_dimensions": null,
     "names": {
       "en": "Arcane Blink",
       "ru": "Arcane Blink"
@@ -2881,8 +2605,6 @@
     "notes": [
       "The duration of Mind Control is now equal to pieces level ×2 + 1."
     ],
-    "icon_url": null,
-    "icon_dimensions": null,
     "names": {
       "en": "Hell of the Dominator",
       "ru": "Hell of the Dominator"
@@ -2903,8 +2625,6 @@
     "quality": "consumable",
     "texture": "item_tome_of_knowledge",
     "notes": [],
-    "icon_url": null,
-    "icon_dimensions": null,
     "names": {
       "en": "Tome of Knowledge",
       "ru": "Tome of Knowledge"
@@ -2925,8 +2645,6 @@
     "quality": "rare",
     "texture": "gossamer_cape",
     "notes": [],
-    "icon_url": null,
-    "icon_dimensions": null,
     "names": {
       "en": "Gossamer Cape",
       "ru": "Gossamer Cape"

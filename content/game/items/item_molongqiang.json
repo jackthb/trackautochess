@@ -1,0 +1,25 @@
+{
+  "gameId": "item_molongqiang",
+  "name": "DragonLance",
+  "slug": "dragonlance",
+  "source": {
+    "name": "DragonLance",
+    "description": "Attack speed +20%.Ranged carrier attack range +200。",
+    "lore": "",
+    "quality": "epic",
+    "texture": "dragon_lance",
+    "notes": [
+      "Attack range bonus not stackable."
+    ],
+    "names": {
+      "en": "DragonLance",
+      "ru": "DragonLance"
+    },
+    "descriptions": {
+      "en": "Attack speed +20%.Ranged carrier attack range +200。",
+      "ru": "Скорость атаки +20%.Дальность атаки дальнобойного носителя +200。"
+    },
+    "lore_i18n": {}
+  },
+  "overrides": {}
+}

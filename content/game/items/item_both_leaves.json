@@ -1,0 +1,26 @@
+{
+  "gameId": "item_both_leaves",
+  "name": "Leafy Essence",
+  "slug": "leafy-essence",
+  "source": {
+    "name": "Leafy Essence",
+    "description": "All offside branches unlock automatically in this single game.",
+    "lore": "From: Relicbox",
+    "quality": "",
+    "texture": "seeds_of_serenity",
+    "notes": [],
+    "names": {
+      "en": "Leafy Essence",
+      "ru": "Leafy Essence"
+    },
+    "descriptions": {
+      "en": "All offside branches unlock automatically in this single game.",
+      "ru": "Все боковые ветки талантов будут разблокированы автоматически в этой игре."
+    },
+    "lore_i18n": {
+      "en": "From: Relicbox",
+      "ru": "From: Relicbox"
+    }
+  },
+  "overrides": {}
+}

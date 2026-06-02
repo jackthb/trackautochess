@@ -1,0 +1,29 @@
+{
+  "gameId": "item_ahalimumojing",
+  "name": "Aghanims Shard",
+  "slug": "aghanims-shard",
+  "source": {
+    "name": "Aghanims Shard",
+    "description": "Magic Regen +75%.\nThe carrier permanently gains a random enemy chess pieces active skill as an additional skill.",
+    "lore": "With origins known only to a single wizard, fragments of this impossible crystal are nearly as coveted as the renowned scepter itself.",
+    "quality": "consumable",
+    "texture": "aghanims_shard",
+    "notes": [
+      "The carrier must have mana for Aghanims Shard.",
+      "Additional skill will be removed after chess pieces upgraded."
+    ],
+    "names": {
+      "en": "Aghanims Shard",
+      "ru": "Aghanims Shard"
+    },
+    "descriptions": {
+      "en": "Magic Regen +75%.\nThe carrier permanently gains a random enemy chess pieces active skill as an additional skill.",
+      "ru": "Мана реген +75%.\nНоситель навсегда получает активный навык случайной враждебной шахматной фигуры как дополнительный навык."
+    },
+    "lore_i18n": {
+      "en": "With origins known only to a single wizard, fragments of this impossible crystal are nearly as coveted as the renowned scepter itself.",
+      "ru": "Осколки этого загадочного кристалла почти так же ценны, как и сам легендарный скипетр."
+    }
+  },
+  "overrides": {}
+}

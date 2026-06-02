@@ -1,0 +1,26 @@
+{
+  "gameId": "item_ahalimushenzhang",
+  "name": "Aghanims Scepter",
+  "slug": "aghanims-scepter",
+  "source": {
+    "name": "Aghanims Scepter",
+    "description": "+40% Magic Damage.\nChess piece skill level +1 of the carrier.",
+    "lore": "The scepter of a wizard with demigod-like powers.",
+    "quality": "consumable",
+    "texture": "ultimate_scepter",
+    "notes": [],
+    "names": {
+      "en": "Aghanims Scepter",
+      "ru": "Aghanims Scepter"
+    },
+    "descriptions": {
+      "en": "+40% Magic Damage.\nChess piece skill level +1 of the carrier.",
+      "ru": "+40% Маг.урона.\nПоднимает уровень способности фигуры на +1"
+    },
+    "lore_i18n": {
+      "en": "The scepter of a wizard with demigod-like powers.",
+      "ru": "Скипетр мага с силой полубога."
+    }
+  },
+  "overrides": {}
+}

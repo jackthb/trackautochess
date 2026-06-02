@@ -1,0 +1,63 @@
+{
+  "gameId": "chess_jugg",
+  "name": "Juggernaut",
+  "slug": "juggernaut",
+  "source": {
+    "id": "chess_jugg",
+    "cost": 2,
+    "pool": "standard",
+    "synergies": [
+      "Orc",
+      "Warrior"
+    ],
+    "names": {
+      "en": "Juggernaut",
+      "lore": "Yurnero",
+      "ko": "가면무사",
+      "ru": "Juggernaut",
+      "zh-cn": "剑圣",
+      "zh-tw": "劍聖"
+    },
+    "attack_type": "melee",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 600,
+        "mana": 100,
+        "atk": [
+          65,
+          70
+        ],
+        "armor": 4,
+        "magic_resist": 0,
+        "atk_rate": 1.1,
+        "atk_range": 205
+      },
+      "2_star": {
+        "hp": 1200,
+        "mana": 100,
+        "atk": [
+          130,
+          140
+        ],
+        "armor": 4,
+        "magic_resist": 0,
+        "atk_rate": 1.1,
+        "atk_range": 205
+      },
+      "3_star": {
+        "hp": 2400,
+        "mana": 100,
+        "atk": [
+          260,
+          280
+        ],
+        "armor": 4,
+        "magic_resist": 0,
+        "atk_rate": 1.1,
+        "atk_range": 205
+      }
+    }
+  },
+  "overrides": {}
+}

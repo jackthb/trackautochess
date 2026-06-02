@@ -1,0 +1,23 @@
+{
+  "gameId": "item_minjiedatiaodao",
+  "name": "Swift Blink",
+  "slug": "swift-blink",
+  "source": {
+    "name": "Swift Blink",
+    "description": "Active ability: Instant Cast\nInstantly move to the farthest grid within the range that can attack the enemy, gain 30 mana, and a stackable effect of +20% attack speed.\n\nmaximum distance: 800",
+    "lore": "",
+    "quality": "rare",
+    "texture": "swift_blink",
+    "notes": [],
+    "names": {
+      "en": "Swift Blink",
+      "ru": "Swift Blink"
+    },
+    "descriptions": {
+      "en": "Active ability: Instant Cast\nInstantly move to the farthest grid within the range that can attack the enemy, gain 30 mana, and a stackable effect of +20% attack speed.\n\nmaximum distance: 800",
+      "ru": "Active ability: Instant Cast\nInstantly move to the farthest grid within the range that can attack the enemy, gain 30 mana, and a stackable effect of +20% attack speed.\n\nmaximum distance: 800"
+    },
+    "lore_i18n": {}
+  },
+  "overrides": {}
+}

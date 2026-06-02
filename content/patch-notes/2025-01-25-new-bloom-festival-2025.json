@@ -1,0 +1,322 @@
+{
+  "date": "2025-01-25",
+  "title": "New Bloom Festival 2025",
+  "source": "https://docs.google.com/document/d/e/2PACX-1vTdR5jBvk3snZfYDfBYy73mtyBPJMmFb4KmFZ-JRzftx35_dtO-gc81NbxkHuRPukhR1WA6_nuvRG-J/pub",
+  "flavor": "The chaos of spring has arrived. As snows melt and flowers begin to bloom, the battlefield is bathed in color and life. Lanterns now lead heroes through the forest trails, guiding them beneath the shadow of their dragon towers on their way to fight the war for supremacy. With every hard-earned victory or bitter defeat, fireworks stand ready to celebrate the end of battle.",
+  "sections": [
+    {
+      "heading": "Chess Pieces",
+      "entries": [
+        {
+          "kind": "nerf",
+          "name": "Skywrath Mage",
+          "detail": "Downgraded from $2 to $1, and adjusted accordingly.",
+          "entity": {
+            "type": "unit",
+            "slug": "skywrath-mage"
+          }
+        },
+        {
+          "kind": "buff",
+          "name": "Luna",
+          "detail": "Upgraded from $1 to $2, and adjusted accordingly.",
+          "entity": {
+            "type": "unit",
+            "slug": "luna"
+          }
+        },
+        {
+          "kind": "nerf",
+          "name": "Grimstroke - Stroke of Fate",
+          "detail": "Target count decreased from 2/3/5 to 2/3/4."
+        },
+        {
+          "kind": "buff",
+          "name": "Slark - Essence Shift",
+          "detail": "Max stack count increased from 10/15/20 to 15/20/25.",
+          "entity": {
+            "type": "unit",
+            "slug": "slark"
+          }
+        },
+        {
+          "kind": "buff",
+          "name": "Abaddon",
+          "detail": "Magical resistance increased from 0% to 20%.",
+          "entity": {
+            "type": "unit",
+            "slug": "abaddon"
+          }
+        },
+        {
+          "kind": "nerf",
+          "name": "Faceless Void - Time Zone",
+          "detail": "Duration decreased from 6/7/8 secs to 5/6/7 secs.",
+          "entity": {
+            "type": "unit",
+            "slug": "faceless-void"
+          }
+        },
+        {
+          "kind": "nerf",
+          "name": "Naga Siren - Song of the Siren",
+          "detail": "Duration decreased from 4/5/6 secs to 3/4/5 secs.",
+          "entity": {
+            "type": "unit",
+            "slug": "naga-siren"
+          }
+        },
+        {
+          "kind": "buff",
+          "name": "Pudge",
+          "detail": "Armor increased from 2 to 4.",
+          "entity": {
+            "type": "unit",
+            "slug": "pudge"
+          }
+        },
+        {
+          "kind": "change",
+          "name": "Rubick - Spell Steal",
+          "detail": "Additional ability also reset after defeating a home battle.",
+          "entity": {
+            "type": "unit",
+            "slug": "rubick"
+          }
+        },
+        {
+          "kind": "nerf",
+          "name": "Muerta - Pierce the Veil",
+          "detail": "Duration decreased from 3/4/5 secs to 3/3.5/4 secs.",
+          "entity": {
+            "type": "unit",
+            "slug": "muerta"
+          }
+        },
+        {
+          "kind": "nerf",
+          "name": "Drow Ranger - Gust",
+          "detail": "Damage decreased from 100/150/250 to 100/150/200.",
+          "entity": {
+            "type": "unit",
+            "slug": "drow-ranger"
+          }
+        },
+        {
+          "kind": "nerf",
+          "name": "Monkey King",
+          "detail": "Attack interval increased from 1.0 sec to 1.2 secs.",
+          "entity": {
+            "type": "unit",
+            "slug": "monkey-king"
+          }
+        },
+        {
+          "kind": "change",
+          "name": "Gyrocopter - Flak Cannon",
+          "detail": "Attack count decreased from 4/6/10 to 3/5/9, max target count increased from 4/7/12 to 4/8/12.",
+          "entity": {
+            "type": "unit",
+            "slug": "gyrocopter"
+          }
+        },
+        {
+          "kind": "buff",
+          "name": "Lich - Chain Frost",
+          "detail": "Bounce count increased from 4/6/10 to 6/8/12.",
+          "entity": {
+            "type": "unit",
+            "slug": "lich"
+          }
+        }
+      ]
+    },
+    {
+      "heading": "Synergies",
+      "entries": [
+        {
+          "kind": "buff",
+          "name": "Draenei - Blessing of Naaru",
+          "detail": "(4) Draeneis: Damage multiplier decreased from 1.5x to 1x, damage radius increased from 260 to 300",
+          "entity": {
+            "type": "synergy",
+            "slug": "draenei"
+          }
+        },
+        {
+          "kind": "nerf",
+          "name": "Shaman - Hex",
+          "detail": "Channeling duration decreased from 2 secs to 1.5 secs",
+          "entity": {
+            "type": "synergy",
+            "slug": "shaman"
+          }
+        }
+      ]
+    },
+    {
+      "heading": "Items",
+      "entries": [
+        {
+          "kind": "added",
+          "name": "Pavise +5 Armor",
+          "detail": "New item. Chances to gain +1 armor permanently on its carrier if HP falls below 50% in home battle. P.S. +1 Armor can only trigger once in a single battle with a 50% chance."
+        },
+        {
+          "kind": "nerf",
+          "name": "Tranquil Boots",
+          "detail": "Downgraded from T2 to T1, radius decreased from 300 to 200, all allies within the range gain 20 healing every 2 secs. Fast movement. Aura: All allies within the range gain 20 healing every 2 secs.",
+          "entity": {
+            "type": "item",
+            "slug": "tranquil-boots"
+          }
+        },
+        {
+          "kind": "change",
+          "name": "Vanguard",
+          "detail": "Block 40 damage on melee pieces.(Invalid on range pieces) Block 40 damage on melee pieces.",
+          "entity": {
+            "type": "item",
+            "slug": "vanguard"
+          }
+        },
+        {
+          "kind": "change",
+          "name": "Skull Basher",
+          "detail": "Grants melee hero 25% chance on hit to stun the target for 3s. (Invalid on ranged pieces) Grants melee hero 25% chance on hit to stun the target for 3s.",
+          "entity": {
+            "type": "item",
+            "slug": "skull-basher"
+          }
+        },
+        {
+          "kind": "nerf",
+          "name": "Spider Leg",
+          "detail": "Downgraded from T3 to T2.",
+          "entity": {
+            "type": "item",
+            "slug": "spider-leg"
+          }
+        },
+        {
+          "kind": "change",
+          "name": "Aghanim's Shard",
+          "detail": "Additional skill will be removed after chess pieces upgraded.",
+          "entity": {
+            "type": "item",
+            "slug": "aghanims-shard"
+          }
+        },
+        {
+          "kind": "buff",
+          "name": "Diffusal Blade",
+          "detail": "Internal CD decreased from 8 secs to 7 secs.",
+          "entity": {
+            "type": "item",
+            "slug": "diffusal-blade"
+          }
+        },
+        {
+          "kind": "nerf",
+          "name": "Aegis of Immortal",
+          "detail": "Downgraded from T4 to T3. +600 HP instead of +900. +600 HP. Deathrattle: Resurrect once.",
+          "entity": {
+            "type": "item",
+            "slug": "aegis-of-immortal"
+          }
+        },
+        {
+          "kind": "buff",
+          "name": "Abyssal Blade",
+          "detail": "Internal CD decreased from 6 secs to 4 secs.",
+          "entity": {
+            "type": "item",
+            "slug": "abyssal-blade"
+          }
+        },
+        {
+          "kind": "nerf",
+          "name": "Radiance",
+          "detail": "Downgraded from T5 to T4.",
+          "entity": {
+            "type": "item",
+            "slug": "radiance"
+          }
+        },
+        {
+          "kind": "buff",
+          "name": "Assault Cuirass",
+          "detail": "+20 attack speed added. +15 Armor.+20 Attack speed. Aura: Grants +10 armor to allies nearby. Aura:Enemies nearby suffer -10 armor.",
+          "entity": {
+            "type": "item",
+            "slug": "assault-cuirass"
+          }
+        },
+        {
+          "kind": "buff",
+          "name": "Havoc",
+          "detail": "Upgraded from T4 to T5. Attack damage +50 instead of +25. Attack damage +50. All carrier damage turns into Pure Damage.",
+          "entity": {
+            "type": "item",
+            "slug": "havoc"
+          }
+        },
+        {
+          "kind": "rework",
+          "name": "Golden Enchanted Mango",
+          "detail": "Icon reworked."
+        }
+      ]
+    },
+    {
+      "heading": "Game UI",
+      "entries": [
+        {
+          "kind": "change",
+          "name": "Camera View optimized",
+          "detail": ""
+        }
+      ]
+    },
+    {
+      "heading": "Bug Fixes",
+      "entries": [
+        {
+          "kind": "fix",
+          "name": "New Bloom Festival 2025",
+          "detail": ""
+        },
+        {
+          "kind": "fix",
+          "name": "Almost all decorations are available now! Random refresh mechanism removed. Available couriers include most seasonal couriers of previous seasons",
+          "detail": ""
+        },
+        {
+          "kind": "fix",
+          "name": "Preview reworked",
+          "detail": "All effects, projectiles, entrances can preview now."
+        },
+        {
+          "kind": "fix",
+          "name": "Switching courier is more flexible",
+          "detail": "You can switch more than once in a single game."
+        },
+        {
+          "kind": "fix",
+          "name": "Skip Movie option added for Gatcha to skip the Gatcha animation",
+          "detail": ""
+        },
+        {
+          "kind": "fix",
+          "name": "Recycle Rate increased",
+          "detail": "Common/Rare/Mythical/Legendary courier can recycle for 15/30/60/120 instead of 10/20/40/80."
+        },
+        {
+          "kind": "fix",
+          "name": "During the New Bloom Festival(Jan 27th, 2025 0",
+          "detail": "00 - Feb 5th, 2025 0:00，CET+8), daily victory award +50% and mmr bonus +25% while mmr deduction stays the same. All couriers, Gatcha, effects, chess boards in Decorations Gallery enjoy a 20% discount."
+        }
+      ]
+    }
+  ]
+}

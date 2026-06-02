@@ -1,10 +1,9 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { draftMode } from "next/headers";
 import { EntityDetail, type RelatedEntity } from "@/components/EntityDetail";
-import { editAttribute } from "@/lib/sanity/editAttribute";
 import { SynergyDescription } from "@/components/SynergyDescription";
-import { EntityCommentaryList } from "@/components/PatchCommentary";import {
+import { EntityCommentaryList } from "@/components/PatchCommentary";
+import {
   getAllSynergies,
   getSynergyBySlug,
   getSynergyNameTranslator,
@@ -12,17 +11,9 @@ import { EntityCommentaryList } from "@/components/PatchCommentary";import {
 import { getAllUnits } from "@/lib/units";
 import { absoluteUrl, SITE_NAME, SITE_TITLE } from "@/lib/site";
 import { DEFAULT_LOCALE } from "@/lib/i18n";
-import {
-  loadDraftSynergies,
-  loadDraftUnits,
-} from "@/lib/sanity/draftLoaders";
 import { getCommentaryForEntity } from "@/lib/patchCommentary";
 
-// App Router migration of pages/synergies/[slug].tsx. getStaticPaths ->
-// generateStaticParams; getStaticProps -> async Server Component reading
-// params + draftMode(). Draft mode (Sanity Presentation/visual editing) is
-// preserved: in draft we read stega-encoded content via the loaders and
-// mount <AppVisualEditing/>; published pages stay static.
+// Static detail page backed by committed JSON generated from content/.
 
 const t = {
   title: (n: string) => `${n} Synergy Guide | ${SITE_TITLE}`,
@@ -73,14 +64,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function SynergyDetailPage({ params }: Props) {
   const { slug } = await params;
-  const { isEnabled: isDraft } = await draftMode();
 
-  const allSynergies = isDraft
-    ? await loadDraftSynergies(true)
-    : getAllSynergies(DEFAULT_LOCALE);
-  const synergy = isDraft
-    ? allSynergies.find((s) => s.slug === slug) ?? null
-    : getSynergyBySlug(slug, DEFAULT_LOCALE);
+  const allSynergies = getAllSynergies(DEFAULT_LOCALE);
+  const synergy = getSynergyBySlug(slug, DEFAULT_LOCALE);
   if (!synergy) notFound();
 
   // Units' `synergies` array stores English-canonical names. Resolve the
@@ -89,9 +75,7 @@ export default async function SynergyDetailPage({ params }: Props) {
   const englishName =
     getAllSynergies(DEFAULT_LOCALE).find((s) => s.slug === synergy.slug)?.name ??
     synergy.name;
-  const localizedUnits = isDraft
-    ? await loadDraftUnits(true)
-    : getAllUnits(DEFAULT_LOCALE);
+  const localizedUnits = getAllUnits(DEFAULT_LOCALE);
   const matchingUnits = localizedUnits.filter((u) =>
     u.synergies.includes(englishName),
   );
@@ -165,20 +149,19 @@ export default async function SynergyDetailPage({ params }: Props) {
         name={synergy.name}
         iconSrc={synergy.iconUrl}
         overview={<SynergyDescription description={synergy.description || description} />}
-        overviewEditAttr={editAttribute(synergy, "description")}
         commentary={
           commentary.length > 0 ? (
             <EntityCommentaryList entries={commentary} />
           ) : undefined
         }
         lore={synergy.lore || undefined}
-        loreEditAttr={editAttribute(synergy, "lore")}
         indexLabel={indexLabel}
         indexPath={indexPath}
         relatedTitle={t.nUnits(synergy.name)}
         related={unitsForSynergy}
         extraRelatedTitle={t.moreSynergies}
         extraRelated={moreSynergies}
-      />    </>
+      />
+    </>
   );
 }

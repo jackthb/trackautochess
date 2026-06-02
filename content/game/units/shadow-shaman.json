@@ -1,0 +1,63 @@
+{
+  "gameId": "chess_ss",
+  "name": "Shadow Shaman",
+  "slug": "shadow-shaman",
+  "source": {
+    "id": "chess_ss",
+    "cost": 1,
+    "pool": "standard",
+    "synergies": [
+      "Shaman",
+      "Troll"
+    ],
+    "names": {
+      "en": "Shadow Shaman",
+      "lore": "Rhasta",
+      "ko": "그림자 주술사",
+      "ru": "Shadow Shaman",
+      "zh-cn": "暗影萨满",
+      "zh-tw": "暗影薩滿"
+    },
+    "attack_type": "ranged",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 550,
+        "mana": 100,
+        "atk": [
+          40,
+          50
+        ],
+        "armor": 0,
+        "magic_resist": 10,
+        "atk_rate": 1.2,
+        "atk_range": 400
+      },
+      "2_star": {
+        "hp": 1100,
+        "mana": 100,
+        "atk": [
+          80,
+          100
+        ],
+        "armor": 0,
+        "magic_resist": 10,
+        "atk_rate": 1.2,
+        "atk_range": 400
+      },
+      "3_star": {
+        "hp": 2200,
+        "mana": 100,
+        "atk": [
+          160,
+          200
+        ],
+        "armor": 0,
+        "magic_resist": 10,
+        "atk_rate": 1.2,
+        "atk_range": 400
+      }
+    }
+  },
+  "overrides": {}
+}

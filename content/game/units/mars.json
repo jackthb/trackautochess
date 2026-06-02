@@ -1,0 +1,63 @@
+{
+  "gameId": "chess_mars",
+  "name": "Mars",
+  "slug": "mars",
+  "source": {
+    "id": "chess_mars",
+    "cost": 1,
+    "pool": "standard",
+    "synergies": [
+      "God",
+      "Warrior"
+    ],
+    "names": {
+      "en": "Mars",
+      "lore": "Mars",
+      "ko": "마르스",
+      "ru": "Mars",
+      "zh-cn": "天界战神",
+      "zh-tw": "天界戰神"
+    },
+    "attack_type": "melee",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 700,
+        "mana": 0,
+        "atk": [
+          50,
+          80
+        ],
+        "armor": 6,
+        "magic_resist": 0,
+        "atk_rate": 1.9,
+        "atk_range": 205
+      },
+      "2_star": {
+        "hp": 1400,
+        "mana": 0,
+        "atk": [
+          100,
+          160
+        ],
+        "armor": 6,
+        "magic_resist": 0,
+        "atk_rate": 1.9,
+        "atk_range": 205
+      },
+      "3_star": {
+        "hp": 2800,
+        "mana": 0,
+        "atk": [
+          200,
+          320
+        ],
+        "armor": 6,
+        "magic_resist": 0,
+        "atk_rate": 1.9,
+        "atk_range": 205
+      }
+    }
+  },
+  "overrides": {}
+}

@@ -1,0 +1,30 @@
+{
+  "gameId": "is_dragon",
+  "name": "Dragon",
+  "slug": "dragon",
+  "source": {
+    "name": "Dragon",
+    "description": "Species Trait: Attunement\n\nActive when you have at least (N) different pieces of this species on board. (Multiple effects stack).\n\n(3) Dragons: All friendly Dragons have an initial mana value of 100.\n(5) Dragons: All allies have an initial mana value of 100.",
+    "description_html": "<h1>Species Trait:  Attunement</h1><font color=\"#656585\">Active when you have at least (N) different pieces of this species on board. (Multiple effects stack).</font><br><br>(3) Dragons: All friendly Dragons have an initial mana value of 100.<br>(5) Dragons: All allies have an initial mana value of 100.",
+    "lore": "Dragons were among the first creatures to exist on this ancient land. They possess unimaginable powers, deep within, which they like to show off when they commune together.",
+    "notes": [],
+    "tiers": [
+      3,
+      5
+    ],
+    "ability_special": {},
+    "names": {
+      "en": "Dragon",
+      "ru": "Dragon"
+    },
+    "descriptions": {
+      "en": "Species Trait: Attunement\n Active when you have at least (N) different pieces of this species on board. (Multiple effects stack).\n\n(3) Dragons: All friendly Dragons have an initial mana value of 100.\n(5) Dragons: All allies have an initial mana value of 100.",
+      "ru": "Species Trait: Attunement\n Активна, когда минимум (N) разных Dragon на столе.(Эффекты складываются)\n\n(3) Dragons: Все дружественные Dragons начинают бой со 100 маны.\n(5) Dragons: Все союзники начинают бой с 100 маны."
+    },
+    "lore_i18n": {
+      "en": "Dragons were among the first creatures to exist on this ancient land. They possess unimaginable powers, deep within, which they like to show off when they commune together.",
+      "ru": "Драконы были одними из первых существ, появившихся на этой древней земле. В глубине их душ таятся невообразимые силы, которые они любят демонстрировать, когда собираются вместе."
+    }
+  },
+  "overrides": {}
+}

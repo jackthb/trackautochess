@@ -1,0 +1,63 @@
+{
+  "gameId": "chess_dp",
+  "name": "Death Prophet",
+  "slug": "death-prophet",
+  "source": {
+    "id": "chess_dp",
+    "cost": 4,
+    "pool": "undead",
+    "synergies": [
+      "Undead",
+      "Warlock"
+    ],
+    "names": {
+      "en": "Death Prophet",
+      "lore": "Krobelus",
+      "ko": "죽음의 예언자",
+      "ru": "Death Prophet",
+      "zh-cn": "死亡先知",
+      "zh-tw": "死亡先知"
+    },
+    "attack_type": "ranged",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 900,
+        "mana": 100,
+        "atk": [
+          50,
+          60
+        ],
+        "armor": 6,
+        "magic_resist": 30,
+        "atk_rate": 1.4,
+        "atk_range": 400
+      },
+      "2_star": {
+        "hp": 1800,
+        "mana": 100,
+        "atk": [
+          100,
+          120
+        ],
+        "armor": 6,
+        "magic_resist": 30,
+        "atk_rate": 1.4,
+        "atk_range": 400
+      },
+      "3_star": {
+        "hp": 3600,
+        "mana": 100,
+        "atk": [
+          200,
+          240
+        ],
+        "armor": 6,
+        "magic_resist": 30,
+        "atk_rate": 1.4,
+        "atk_range": 400
+      }
+    }
+  },
+  "overrides": {}
+}

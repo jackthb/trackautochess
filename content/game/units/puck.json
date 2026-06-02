@@ -1,0 +1,64 @@
+{
+  "gameId": "chess_puck",
+  "name": "Puck",
+  "slug": "puck",
+  "source": {
+    "id": "chess_puck",
+    "cost": 2,
+    "pool": "standard",
+    "synergies": [
+      "Dragon",
+      "Elf",
+      "Mage"
+    ],
+    "names": {
+      "en": "Puck",
+      "lore": "Puck",
+      "ko": "퍽",
+      "ru": "Puck",
+      "zh-cn": "仙女龙",
+      "zh-tw": "仙女龍"
+    },
+    "attack_type": "ranged",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 450,
+        "mana": 100,
+        "atk": [
+          40,
+          50
+        ],
+        "armor": 2,
+        "magic_resist": 50,
+        "atk_rate": 1.7,
+        "atk_range": 400
+      },
+      "2_star": {
+        "hp": 900,
+        "mana": 100,
+        "atk": [
+          80,
+          100
+        ],
+        "armor": 2,
+        "magic_resist": 50,
+        "atk_rate": 1.7,
+        "atk_range": 400
+      },
+      "3_star": {
+        "hp": 1800,
+        "mana": 100,
+        "atk": [
+          160,
+          200
+        ],
+        "armor": 2,
+        "magic_resist": 50,
+        "atk_rate": 1.7,
+        "atk_range": 400
+      }
+    }
+  },
+  "overrides": {}
+}

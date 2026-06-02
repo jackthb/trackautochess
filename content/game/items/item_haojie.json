@@ -1,0 +1,23 @@
+{
+  "gameId": "item_haojie",
+  "name": "Havoc",
+  "slug": "havoc",
+  "source": {
+    "name": "Havoc",
+    "description": "Attack damage +50.\n All carriers damage settled as Pure Damage.",
+    "lore": "",
+    "quality": "rare",
+    "texture": "custom/haojie",
+    "notes": [],
+    "names": {
+      "en": "Havoc",
+      "ru": "Havoc"
+    },
+    "descriptions": {
+      "en": "Attack damage +50.\n All carriers damage settled as Pure Damage.",
+      "ru": "Урон атаки +50.\n Весь урон носителя становится чистым."
+    },
+    "lore_i18n": {}
+  },
+  "overrides": {}
+}

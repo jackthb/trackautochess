@@ -1,0 +1,64 @@
+{
+  "gameId": "chess_naix",
+  "name": "Lifestealer",
+  "slug": "lifestealer",
+  "source": {
+    "id": "chess_naix",
+    "cost": 2,
+    "pool": "undead",
+    "synergies": [
+      "Kobold",
+      "Undead",
+      "Warlock"
+    ],
+    "names": {
+      "en": "Lifestealer",
+      "lore": "Naix",
+      "ko": "흡혈마",
+      "ru": "Lifestealer",
+      "zh-cn": "噬魂鬼",
+      "zh-tw": "噬魂鬼"
+    },
+    "attack_type": "melee",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 700,
+        "mana": 0,
+        "atk": [
+          50,
+          80
+        ],
+        "armor": 6,
+        "magic_resist": 50,
+        "atk_rate": 1.1,
+        "atk_range": 205
+      },
+      "2_star": {
+        "hp": 1400,
+        "mana": 0,
+        "atk": [
+          100,
+          160
+        ],
+        "armor": 5,
+        "magic_resist": 30,
+        "atk_rate": 1.1,
+        "atk_range": 205
+      },
+      "3_star": {
+        "hp": 2800,
+        "mana": 0,
+        "atk": [
+          200,
+          320
+        ],
+        "armor": 5,
+        "magic_resist": 30,
+        "atk_rate": 1.1,
+        "atk_range": 205
+      }
+    }
+  },
+  "overrides": {}
+}

@@ -1,0 +1,63 @@
+{
+  "gameId": "chess_slardar",
+  "name": "Slardar",
+  "slug": "slardar",
+  "source": {
+    "id": "chess_slardar",
+    "cost": 3,
+    "pool": "standard",
+    "synergies": [
+      "Naga",
+      "Warrior"
+    ],
+    "names": {
+      "en": "Slardar",
+      "lore": "Slardar",
+      "ko": "슬라다",
+      "ru": "Slardar",
+      "zh-cn": "鱼人守卫",
+      "zh-tw": "魚人守衛"
+    },
+    "attack_type": "melee",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 800,
+        "mana": 100,
+        "atk": [
+          80,
+          110
+        ],
+        "armor": 6,
+        "magic_resist": 10,
+        "atk_rate": 1.5,
+        "atk_range": 205
+      },
+      "2_star": {
+        "hp": 1600,
+        "mana": 100,
+        "atk": [
+          160,
+          220
+        ],
+        "armor": 6,
+        "magic_resist": 0,
+        "atk_rate": 1.5,
+        "atk_range": 205
+      },
+      "3_star": {
+        "hp": 3200,
+        "mana": 100,
+        "atk": [
+          320,
+          440
+        ],
+        "armor": 6,
+        "magic_resist": 0,
+        "atk_rate": 1.5,
+        "atk_range": 205
+      }
+    }
+  },
+  "overrides": {}
+}

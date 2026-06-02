@@ -1,0 +1,64 @@
+{
+  "gameId": "chess_et",
+  "name": "Elder Titan",
+  "slug": "elder-titan",
+  "source": {
+    "id": "chess_et",
+    "cost": 4,
+    "pool": "standard",
+    "synergies": [
+      "Druid",
+      "God",
+      "Tauren"
+    ],
+    "names": {
+      "en": "Elder Titan",
+      "lore": "Worldsmith",
+      "ko": "고대 티탄",
+      "ru": "Elder Titan",
+      "zh-cn": "上古巨神",
+      "zh-tw": "上古巨神"
+    },
+    "attack_type": "melee",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 900,
+        "mana": 100,
+        "atk": [
+          100,
+          130
+        ],
+        "armor": 7,
+        "magic_resist": 0,
+        "atk_rate": 1.5,
+        "atk_range": 205
+      },
+      "2_star": {
+        "hp": 1800,
+        "mana": 100,
+        "atk": [
+          200,
+          260
+        ],
+        "armor": 7,
+        "magic_resist": 0,
+        "atk_rate": 1.5,
+        "atk_range": 205
+      },
+      "3_star": {
+        "hp": 3100,
+        "mana": 100,
+        "atk": [
+          400,
+          520
+        ],
+        "armor": 7,
+        "magic_resist": 0,
+        "atk_rate": 1.5,
+        "atk_range": 205
+      }
+    }
+  },
+  "overrides": {}
+}

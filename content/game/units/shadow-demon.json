@@ -1,0 +1,64 @@
+{
+  "gameId": "chess_sd",
+  "name": "Shadow Demon",
+  "slug": "shadow-demon",
+  "source": {
+    "id": "chess_sd",
+    "cost": 1,
+    "pool": "standard",
+    "synergies": [
+      "Demon",
+      "Draenei",
+      "Priest"
+    ],
+    "names": {
+      "en": "Shadow Demon",
+      "lore": "Eredar",
+      "ko": "그림자 악마",
+      "ru": "Shadow Demon",
+      "zh-cn": "暗影恶魔",
+      "zh-tw": "暗影惡魔"
+    },
+    "attack_type": "ranged",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 500,
+        "mana": 0,
+        "atk": [
+          40,
+          70
+        ],
+        "armor": 2,
+        "magic_resist": 10,
+        "atk_rate": 1.7,
+        "atk_range": 400
+      },
+      "2_star": {
+        "hp": 1000,
+        "mana": 0,
+        "atk": [
+          80,
+          140
+        ],
+        "armor": 2,
+        "magic_resist": 10,
+        "atk_rate": 1.7,
+        "atk_range": 400
+      },
+      "3_star": {
+        "hp": 2000,
+        "mana": 0,
+        "atk": [
+          160,
+          280
+        ],
+        "armor": 2,
+        "magic_resist": 10,
+        "atk_rate": 1.7,
+        "atk_range": 400
+      }
+    }
+  },
+  "overrides": {}
+}

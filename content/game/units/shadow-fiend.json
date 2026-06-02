@@ -1,0 +1,63 @@
+{
+  "gameId": "chess_sf",
+  "name": "Shadow Fiend",
+  "slug": "shadow-fiend",
+  "source": {
+    "id": "chess_sf",
+    "cost": 3,
+    "pool": "standard",
+    "synergies": [
+      "Demon",
+      "Warlock"
+    ],
+    "names": {
+      "en": "Shadow Fiend",
+      "lore": "Nevermore",
+      "ko": "그림자 마귀",
+      "ru": "Shadow Fiend",
+      "zh-cn": "影魔",
+      "zh-tw": "影魔"
+    },
+    "attack_type": "ranged",
+    "abilities": null,
+    "stats": {
+      "1_star": {
+        "hp": 600,
+        "mana": 100,
+        "atk": [
+          70,
+          100
+        ],
+        "armor": 3,
+        "magic_resist": 20,
+        "atk_rate": 1.2,
+        "atk_range": 600
+      },
+      "2_star": {
+        "hp": 1200,
+        "mana": 100,
+        "atk": [
+          140,
+          200
+        ],
+        "armor": 3,
+        "magic_resist": 20,
+        "atk_rate": 1.2,
+        "atk_range": 600
+      },
+      "3_star": {
+        "hp": 2400,
+        "mana": 100,
+        "atk": [
+          280,
+          400
+        ],
+        "armor": 3,
+        "magic_resist": 20,
+        "atk_rate": 1.2,
+        "atk_range": 600
+      }
+    }
+  },
+  "overrides": {}
+}
