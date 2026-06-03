@@ -54,25 +54,56 @@ const entryKind = fields.select({
   defaultValue: "change",
 });
 
+const entityType = fields.select({
+  label: "Type",
+  options: [
+    { label: "Unit", value: "unit" },
+    { label: "Item", value: "item" },
+    { label: "Synergy", value: "synergy" },
+    { label: "Relic", value: "relic" },
+    { label: "Talent", value: "talent" },
+  ],
+  defaultValue: "unit",
+});
+
 const entityReference = fields.object(
   {
-    type: fields.select({
-      label: "Type",
-      options: [
-        { label: "Unit", value: "unit" },
-        { label: "Item", value: "item" },
-        { label: "Synergy", value: "synergy" },
-        { label: "Relic", value: "relic" },
-        { label: "Talent", value: "talent" },
-      ],
-      defaultValue: "unit",
+    type: entityType,
+    unit: fields.relationship({
+      label: "Unit",
+      collection: "units",
+      description: "Search and select an existing unit.",
     }),
-    slug: fields.text({
-      label: "Slug",
-      description: "URL slug of the linked unit, item, synergy, relic, or talent page.",
+    item: fields.relationship({
+      label: "Item",
+      collection: "items",
+      description: "Search and select an existing item.",
     }),
+    synergy: fields.relationship({
+      label: "Synergy",
+      collection: "synergies",
+      description: "Search and select an existing synergy.",
+    }),
+    relic: fields.relationship({
+      label: "Relic",
+      collection: "relics",
+      description: "Search and select an existing relic.",
+    }),
+    talent: fields.relationship({
+      label: "Talent",
+      collection: "talents",
+      description: "Search and select an existing talent.",
+    }),
+    // Legacy manual slug field. Kept hidden so existing content files still
+    // parse; scripts/generate-data.mjs falls back to it when no picker value
+    // exists yet.
+    slug: fields.ignored(),
   },
-  { label: "Linked entity" },
+  {
+    label: "Linked entity",
+    description:
+      "Pick the entity type, then use the matching search field below. The generator ignores non-matching picker fields.",
+  },
 );
 
 export default config({
@@ -151,6 +182,18 @@ export default config({
       format: { data: "json" },
       columns: ["gameId"],
       schema: entitySchema,
+    }),
+    talents: collection({
+      label: "Talents",
+      path: `${contentPath}/game/talents/*`,
+      slugField: "slot",
+      format: { data: "json" },
+      columns: ["name"],
+      schema: {
+        slot: fields.slug({ name: { label: "Slot" } }),
+        name: fields.text({ label: "Name" }),
+        description: fields.text({ label: "Description", multiline: true }),
+      },
     }),
   },
 });

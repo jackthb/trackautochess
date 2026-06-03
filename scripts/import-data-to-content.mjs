@@ -113,9 +113,12 @@ function patchToContent(patch) {
         ? section.entries.map((entry) => {
             const converted = { ...entry };
             if (converted.entity_type || converted.entity_slug) {
+              const type = converted.entity_type ?? null;
+              const slug = converted.entity_slug ?? null;
               converted.entity = {
-                type: converted.entity_type ?? null,
-                slug: converted.entity_slug ?? null,
+                type,
+                ...(type && slug ? { [type]: slug } : {}),
+                slug,
               };
               delete converted.entity_type;
               delete converted.entity_slug;

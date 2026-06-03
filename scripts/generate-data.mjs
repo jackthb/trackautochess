@@ -51,6 +51,17 @@ function materializeEntity(entity) {
   return output;
 }
 
+function linkedEntitySlug(entity) {
+  if (!entity || typeof entity !== "object") return null;
+  const type = entity.type;
+  if (typeof type === "string") {
+    const selected = entity[type];
+    if (typeof selected === "string" && selected) return selected;
+  }
+  if (typeof entity.slug === "string" && entity.slug) return entity.slug;
+  return null;
+}
+
 function patchToData(patch) {
   const next = { ...patch };
   if ("workshopUrl" in next) {
@@ -65,7 +76,7 @@ function patchToData(patch) {
             const converted = { ...entry };
             if (converted.entity) {
               converted.entity_type = converted.entity.type ?? null;
-              converted.entity_slug = converted.entity.slug ?? null;
+              converted.entity_slug = linkedEntitySlug(converted.entity);
               delete converted.entity;
             }
             return converted;
