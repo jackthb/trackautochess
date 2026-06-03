@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
+import { captureServerEvent } from "@/lib/posthogServer";
 import { fetchSteamProfileFromApi, upsertSteamUser } from "@/lib/steam";
 
 // App Router migration of pages/api/auth/steam/callback.ts — verifies the Steam
@@ -89,6 +90,14 @@ export async function GET(req: Request) {
       return fail("user_creation_failed");
     }
     user = data.user;
+    await captureServerEvent("user_signed_up", steamId, {
+      source: "steam_auth",
+      steam_id: steamId,
+      steam_name: steamName,
+      custom_url: steamProfile.customUrl,
+      avatar_url: steamProfile.avatarUrl,
+      user_id: user.id,
+    });
   } else {
     await supabaseAdmin.auth.admin.updateUserById(user.id, {
       user_metadata: {
