@@ -26,6 +26,13 @@ function mmrLevelToRank(level: number | null | undefined): string {
   return RANK_BRACKETS[level - 1].rank.replace("-", " ");
 }
 
+interface MatchMetaRow {
+  played_at: string;
+  capture_status: string | null;
+  is_finished: boolean | null;
+  verification_source: string | null;
+}
+
 interface MatchPlayerRow {
   id: number;
   match_id: string;
@@ -125,7 +132,7 @@ const loadMatch = cache(
         .order("placement", { ascending: true }),
       supabase
         .from("matches")
-        .select("played_at")
+        .select("played_at, capture_status, is_finished, verification_source")
         .eq("match_id", mp.match_id)
         .maybeSingle(),
       fetchSteamProfile(String(mp.steam_id), supabase),
@@ -137,7 +144,8 @@ const loadMatch = cache(
     ]);
 
     const players = (allPlayers as unknown as MatchPlayerRow[] | null) || [];
-    const playedAt = (matchRow as { played_at: string } | null)?.played_at || "";
+    const matchMeta = matchRow as MatchMetaRow | null;
+    const playedAt = matchMeta?.played_at || "";
 
     // Stamp played_at from the matches table onto each player row.
     for (const p of players) {

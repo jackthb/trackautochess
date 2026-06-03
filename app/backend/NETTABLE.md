@@ -1,7 +1,8 @@
 # NetTable Capture
 
-Captures Drodo's CustomNetTable broadcasts (queen ladder, per-lobby match
-histories, post-game `end_board`, player_id ↔ team mapping) into Supabase.
+Captures Drodo's CustomNetTable broadcasts (queen ladder, post-game
+`end_board`, live player snapshots, player_id ↔ team mapping) locally first,
+then uploads the processed match representation to Supabase.
 
 ## How it works
 
@@ -22,9 +23,10 @@ histories, post-game `end_board`, player_id ↔ team mapping) into Supabase.
 4. Each key fires a single `dumpstringtable` command; the engine writes
    binary VBKV payloads into console.log.
 5. The tailer detects stable dump blocks (no new `[stringtables]` lines
-   for 2s), decodes them via `nettable_parser.parse_log`, and either
-   processes them in-memory (match extraction, timeline) or POSTs rows
-   to `dac_nettable_dumps` in Supabase.
+   for 2s), decodes them via `nettable_parser.parse_log`, archives raw
+   dumps locally under `~/.dac/captures/sessions/`, and processes them
+   in-memory into `matches`, `match_players`, and `match_timelines`. Raw
+   `dac_nettable_dumps` uploads are debug opt-in only.
 
 ## Key binds (autoexec.cfg)
 
@@ -61,11 +63,12 @@ constant in `nettable_capture.py` — single source of truth.
 { type: "nettable_ingest_complete", rows_written: number, tables: string[], at: ISO_string }
 { type: "nettable_ingest_error", error: string }
 { type: "nettable_end_board_saved", at: ISO_string }
+{ type: "nettable_partial_match_saved", match_id: string, capture_status: string, verification_source: string, at: ISO_string }
 ```
 
 ## What gets captured
 
-Each row in `dac_nettable_dumps` is `(table_name, key, raw jsonb)`.
+Raw dumps are stored locally as gzipped JSONL. Normal Supabase writes use the processed tables; `dac_nettable_dumps` is only written when `upload_raw_nettable_dumps` is enabled.
 
 | Table | Key entries | Contents |
 |---|---|---|
@@ -92,8 +95,10 @@ Bare names in `--only` get the `CustomNetTable_` prefix auto-prepended.
 
 ## Supabase auth
 
-The `dac_nettable_dumps` table has RLS open SELECT to anon only. Writes
-need the service role key. Either:
+Normal live capture uploads use the app's configured publishable Supabase key
+for processed `matches`, `match_players`, and `match_timelines` rows. Raw
+`dac_nettable_dumps` writes are disabled by default; if a developer explicitly
+enables `upload_raw_nettable_dumps`, raw writes still require a service-role key:
 
 - Export `SUPABASE_SERVICE_ROLE_KEY` in the environment the app inherits, or
 - Replace `supabase_key` in `~/.dac/config.json` with the service-role

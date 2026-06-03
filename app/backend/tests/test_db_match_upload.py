@@ -3,7 +3,6 @@
 Covers:
   - generate_live_match_id determinism + hehe-insensitivity
   - push_match / push_match_players happy path, local_only, failure
-  - push_live_game shape
 
 Run:
   cd app/backend
@@ -12,7 +11,6 @@ Run:
 
 from __future__ import annotations
 
-import json
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
@@ -157,18 +155,40 @@ def test_push_match_happy_path(tmp_path, monkeypatch, fake_client):
     assert body["duration"] == 3200.5
     assert body["final_round"] == 54
     assert body["player_count"] == 8
+    assert body["capture_status"] == "complete"
+    assert body["is_finished"] is True
+    assert body["verification_source"] == "end_board"
+    assert body["verified_at"] == "2026-05-20T12:00:00"
     # `players` is NOT a column on the matches table — it must be dropped.
     assert "players" not in body
 
-    # Local sidecar exists.
-    sidecar = tmp_path / "matches" / "abc1234567890def.json"
-    assert sidecar.exists()
-    saved = json.loads(sidecar.read_text(encoding="utf-8"))
-    assert saved["match_id"] == "abc1234567890def"
+
+def test_push_match_accepts_partial_capture_metadata(tmp_path, monkeypatch, fake_client):
+    _isolated_dac_dir(tmp_path, monkeypatch)
+    import db
+
+    monkeypatch.setattr(db, "_get_client", lambda: fake_client)
+
+    db.push_match({
+        "match_id": "feedfacefeedface",
+        "played_at": "2026-05-20T12:00:00",
+        "capture_status": "timeout",
+        "is_finished": False,
+        "verification_source": "last_dump_timeout",
+        "capture_started_at": "2026-05-20T11:30:00",
+        "capture_ended_at": "2026-05-20T12:00:00",
+        "observer_steam_id": "76561198000000001",
+    })
+
+    body = fake_client.post.call_args.kwargs["json"]
+    assert body["capture_status"] == "timeout"
+    assert body["is_finished"] is False
+    assert body["verification_source"] == "last_dump_timeout"
+    assert body["observer_steam_id"] == 76561198000000001
 
 
 def test_push_match_local_only(tmp_path, monkeypatch):
-    """DAC_LOCAL_ONLY=1 must skip the httpx call but still write the sidecar."""
+    """DAC_LOCAL_ONLY=1 must skip the httpx call."""
     _isolated_dac_dir(tmp_path, monkeypatch)
     monkeypatch.setenv("DAC_LOCAL_ONLY", "1")
     import db
@@ -186,8 +206,6 @@ def test_push_match_local_only(tmp_path, monkeypatch):
     out = db.push_match(record)
 
     assert out is None  # no Supabase, no return value
-    sidecar = tmp_path / "matches" / "deadbeefdeadbeef.json"
-    assert sidecar.exists()
 
 
 def test_push_match_missing_match_id(tmp_path, monkeypatch, fake_client):
@@ -211,8 +229,6 @@ def test_push_match_client_failure_swallows(tmp_path, monkeypatch):
 
     out = db.push_match({"match_id": "aaaaaaaaaaaaaaaa", "played_at": "2026-05-20T12:00:00"})
     assert out is None
-    # Sidecar still written first.
-    assert (tmp_path / "matches" / "aaaaaaaaaaaaaaaa.json").exists()
 
 
 def test_push_match_no_supabase_config(tmp_path, monkeypatch):
@@ -223,7 +239,6 @@ def test_push_match_no_supabase_config(tmp_path, monkeypatch):
     monkeypatch.setattr(db, "_get_client", lambda: None)
     out = db.push_match({"match_id": "bbbbbbbbbbbbbbbb", "played_at": "2026-05-20T12:00:00"})
     assert out is None
-    assert (tmp_path / "matches" / "bbbbbbbbbbbbbbbb.json").exists()
 
 
 # ── Queen ladder throttle ───────────────────────────────────────────────────
@@ -337,9 +352,6 @@ def test_push_match_players_local_only(tmp_path, monkeypatch):
     n = db.push_match_players("eeeeeeeeeeeeeeee", rows)
     assert n == 0  # no Supabase
 
-    # But sidecars still exist.
-    mp_dir = tmp_path / "match_players"
-    assert len(list(mp_dir.glob("eeeeeeeeeeeeeeee__*.json"))) == 2
 
 
 def test_push_match_players_empty_list(tmp_path, monkeypatch, fake_client):
@@ -360,65 +372,3 @@ def test_push_match_players_failure_swallows(tmp_path, monkeypatch):
     monkeypatch.setattr(db, "_get_client", lambda: boom_client)
     out = db.push_match_players("ddddddddddddddd1", [{"steam_id": "1", "placement": 1}])
     assert out == 0
-
-
-# ── push_live_game ──────────────────────────────────────────────────────────
-
-
-def test_push_live_game_shape(tmp_path, monkeypatch, fake_client):
-    """push_live_game maps an end_board player row into the legacy `games`
-    schema so the web viewer's player profile page renders it identically
-    to a CV-imported match."""
-    _isolated_dac_dir(tmp_path, monkeypatch)
-    import db
-
-    monkeypatch.setattr(db, "_get_client", lambda: fake_client)
-
-    row = {
-        "match_id": "ccccccccccccccc1",
-        "played_at": "2026-05-20T12:00:00",
-        "steam_id": "76561198000000001",
-        "placement": 1,
-        "hero_level": 10,
-        "chess_lineup": "Broodmother(3)|Chen(3)",
-        "synergies": "Aqir:4|Warlock:2",
-        "talents": "talent_1a|talent_2b",
-        "relic": "Repeat Relic",
-        "win_round": 30,
-        "lose_round": 6,
-    }
-    out = db.push_live_game(row)
-    assert out == 1
-
-    body = fake_client.post.call_args.kwargs["json"]
-    assert body["match_id"] == "ccccccccccccccc1"
-    assert body["user_id"] == 76561198000000001
-    assert body["placement"] == 1
-    assert body["level"] == 10  # hero_level → level
-    assert body["wins"] == 30   # win_round → wins
-    assert body["losses"] == 6  # lose_round → losses
-    assert body["lineup"] == "Broodmother(3)|Chen(3)"
-
-
-def test_push_live_game_local_only(tmp_path, monkeypatch):
-    _isolated_dac_dir(tmp_path, monkeypatch)
-    monkeypatch.setenv("DAC_LOCAL_ONLY", "1")
-    import db
-
-    # _get_client returns None under local_only.
-    out = db.push_live_game({
-        "match_id": "ccccccccccccccc2",
-        "steam_id": "76561198000000001",
-        "placement": 1,
-    })
-    assert out is None
-
-
-def test_push_live_game_missing_steam_id(tmp_path, monkeypatch, fake_client):
-    _isolated_dac_dir(tmp_path, monkeypatch)
-    import db
-
-    monkeypatch.setattr(db, "_get_client", lambda: fake_client)
-    out = db.push_live_game({"placement": 1})
-    assert out is None
-    fake_client.post.assert_not_called()

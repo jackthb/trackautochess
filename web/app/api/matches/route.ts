@@ -27,6 +27,10 @@ interface GameRow {
   relic: string | null;
   played_at: string;
   created_at: string;
+  matches?: {
+    capture_status: string | null;
+    is_finished: boolean | null;
+  } | null;
 }
 
 interface UserRow {
@@ -75,7 +79,10 @@ export async function GET(req: Request) {
 
   const { data: gamesData, error: gamesError } = await supabase
     .from("match_players")
-    .select("id, steam_id::text, match_id, placement, mmr_level, chess_lineup, relic, played_at, created_at")
+    .select(
+      "id, steam_id::text, match_id, placement, mmr_level, chess_lineup, relic, played_at, created_at, matches!inner(capture_status, is_finished)"
+    )
+    .eq("matches.is_finished", true)
     .order("id", { ascending: false })
     .limit(GAMES_FETCH);
 

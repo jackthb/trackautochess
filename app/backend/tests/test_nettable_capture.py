@@ -25,7 +25,9 @@ from nettable_capture import (  # noqa: E402
     NetTableCapture,
     _storage_filter,
     extract_rows,
+    keep_local_nettable_dumps,
     normalize_allow,
+    upload_raw_nettable_dumps,
 )
 
 
@@ -227,6 +229,39 @@ def test_storage_filter_keeps_player_id_board_items_and_relics():
         "relic_ttl_0",
         "mmr_level_0",
     }
+
+
+# ── raw dump persistence policy ─────────────────────────────────────────────
+
+
+def test_raw_nettable_upload_disabled_by_default(tmp_path, monkeypatch):
+    monkeypatch.setenv("DAC_DIR", str(tmp_path))
+    monkeypatch.delenv("DAC_LOCAL_ONLY", raising=False)
+    # utils was imported when nettable_capture loaded; point its globals at the
+    # isolated temp directory to avoid reading the real ~/.dac/config.json.
+    import utils
+
+    monkeypatch.setattr(utils, "DAC_DIR", tmp_path)
+    monkeypatch.setattr(utils, "CONFIG_PATH", tmp_path / "config.json")
+
+    assert upload_raw_nettable_dumps() is False
+    assert keep_local_nettable_dumps() is True
+
+
+def test_raw_nettable_upload_can_be_enabled_in_config(tmp_path, monkeypatch):
+    monkeypatch.setenv("DAC_DIR", str(tmp_path))
+    import utils
+
+    monkeypatch.setattr(utils, "DAC_DIR", tmp_path)
+    monkeypatch.setattr(utils, "CONFIG_PATH", tmp_path / "config.json")
+    tmp_path.mkdir(parents=True, exist_ok=True)
+    (tmp_path / "config.json").write_text(
+        '{"upload_raw_nettable_dumps": true, "keep_local_nettable_dumps": false}',
+        encoding="utf-8",
+    )
+
+    assert upload_raw_nettable_dumps() is True
+    assert keep_local_nettable_dumps() is False
 
 
 # ── _last_match_dumps: segment buffered dumps into matches, keep the latest ──

@@ -8,8 +8,8 @@ Flow:
        - DOTA_GAMERULES_STATE_POST_GAME: emit nettable_game_ended so the UI
          knows the match wrapped up.
        - [stringtables] table CustomNetTable_*: collect the dump block;
-         when it stabilises (~2s without new [stringtables] lines), ingest
-         to Supabase.
+         when it stabilises (~2s without new [stringtables] lines), archive
+         it locally and process it into the canonical match representation.
     3. Dumps are produced by the continuous SendInput cascade (see
        _run_key_poller) — no scheduled timers; the poller fires F23 every
        2s, the full cascade (F21, F22, F23) every 15s, and one
@@ -19,18 +19,20 @@ Flow:
 Emits events via the headless _emit callback:
     nettable_status          — startup + on-demand status snapshot
     nettable_dump_captured   — dump block stabilised
-    nettable_ingest_complete — rows written to Supabase
+    nettable_ingest_complete — dump block processed; raw upload is opt-in
     nettable_ingest_error    — failure during ingest
 """
 
 from __future__ import annotations
 
 import ctypes
+import gzip
 import hashlib
 import json
 import logging
 import os
 import re
+import shutil
 import subprocess
 import sys
 import threading
@@ -72,6 +74,32 @@ def _storage_filter(rows: list[dict]) -> list[dict]:
             continue
         out.append(r)
     return out
+
+
+def _config_bool(name: str, default: bool) -> bool:
+    try:
+        from utils import load_config
+        value = load_config().get(name, default)
+    except Exception:
+        return default
+    if isinstance(value, str):
+        return value.strip().lower() in ("1", "true", "yes", "on")
+    return bool(value)
+
+
+def keep_local_nettable_dumps() -> bool:
+    """Return whether raw nettable captures should be archived on-device."""
+    return _config_bool("keep_local_nettable_dumps", True)
+
+
+def upload_raw_nettable_dumps() -> bool:
+    """Return whether raw nettable rows should be uploaded to Postgres.
+
+    Defaults off: Supabase should receive processed match/timeline records,
+    while raw CustomNetTable dumps remain local debug material unless the user
+    or developer explicitly opts in.
+    """
+    return _config_bool("upload_raw_nettable_dumps", False)
 
 
 # ── autoexec.cfg payload (single source of truth, written verbatim) ──────────
@@ -1056,6 +1084,8 @@ class NetTableCapture:
         # Both reset on the GAME_IN_PROGRESS transition.
         self._prev_personal_death_team: int | None = None
         self._personal_end_recorded: bool = False
+        self._personal_end_snapshot: dict | None = None
+        self._partial_match_saved: bool = False
 
         self._post_game_at: float | None = None
         self._end_board_captured: bool = False
@@ -1073,10 +1103,14 @@ class NetTableCapture:
         # match's timeline is generated. Float epoch seconds.
         self._match_session_start: float | None = None
 
-        # In-memory dump buffer — replaces the on-disk LOCAL_DUMPS_DIR.
+        # In-memory dump buffer used to build a curated per-round timeline.
         # Each entry is (epoch_seconds, {"captured_at": ..., "rows": [...]}).
-        # Cleared when a match session closes.
+        # Cleared when a match session closes. Raw captures can also be archived
+        # locally (not uploaded) by _append_local_raw_dump.
         self._session_dumps: list[tuple[float, dict]] = []
+        self._local_capture_dir: Path | None = None
+        self._local_capture_started_at: str | None = None
+        self._local_capture_cleaned = False
 
         # Dump block accumulator
         self._dump_active = False
@@ -1405,6 +1439,14 @@ class NetTableCapture:
                 self.emit_status()
 
     def stop(self) -> None:
+        if self._personal_end_recorded:
+            self._maybe_save_partial_match_from_latest_dump(
+                capture_status="player_eliminated",
+                verification_source="death_team",
+                close_session=True,
+            )
+        elif not self._end_board_captured:
+            self._close_local_capture_session({"capture_status": "abandoned"})
         self._stop.set()
         if self._file:
             try:
@@ -1506,6 +1548,140 @@ class NetTableCapture:
         self._lobby_metadata_fired = False
         self._last_player_id_dump_at = 0.0
 
+    # ── Local capture archive ───────────────────────────────────────────────
+
+    def _local_capture_root(self) -> Path:
+        from utils import DAC_DIR
+        return DAC_DIR / "captures" / "sessions"
+
+    def _cleanup_local_captures_once(self) -> None:
+        if self._local_capture_cleaned:
+            return
+        self._local_capture_cleaned = True
+        try:
+            from utils import load_config
+            cfg = load_config()
+            retention_days = int(cfg.get("local_nettable_retention_days", 14) or 14)
+            max_mb = int(cfg.get("local_nettable_max_mb", 500) or 500)
+        except Exception:
+            retention_days = 14
+            max_mb = 500
+
+        root = self._local_capture_root()
+        if not root.exists():
+            return
+        now = time.time()
+        cutoff = now - max(retention_days, 1) * 86400
+        try:
+            sessions = [p for p in root.iterdir() if p.is_dir()]
+            for path in sessions:
+                try:
+                    if path.stat().st_mtime < cutoff:
+                        shutil.rmtree(path, ignore_errors=True)
+                except OSError:
+                    continue
+
+            sessions = [p for p in root.iterdir() if p.is_dir()]
+            total_bytes = sum(
+                f.stat().st_size
+                for session in sessions
+                for f in session.rglob("*")
+                if f.is_file()
+            )
+            max_bytes = max_mb * 1024 * 1024
+            if max_bytes <= 0:
+                return
+            for session in sorted(sessions, key=lambda p: p.stat().st_mtime):
+                if total_bytes <= max_bytes:
+                    break
+                session_bytes = sum(f.stat().st_size for f in session.rglob("*") if f.is_file())
+                shutil.rmtree(session, ignore_errors=True)
+                total_bytes -= session_bytes
+        except Exception as e:
+            log.warning("nettable: local capture cleanup failed: %s", e)
+
+    def _ensure_local_capture_session(self) -> Path | None:
+        if not keep_local_nettable_dumps():
+            return None
+        if self._local_capture_dir is not None:
+            return self._local_capture_dir
+        try:
+            self._cleanup_local_captures_once()
+            root = self._local_capture_root()
+            root.mkdir(parents=True, exist_ok=True)
+            now = datetime.now().astimezone()
+            self._local_capture_started_at = now.isoformat()
+            stamp = now.strftime("%Y%m%d_%H%M%S")
+            observer = str(self._steam_id or "anonymous")
+            path = root / f"{stamp}_{observer}"
+            suffix = 1
+            while path.exists():
+                suffix += 1
+                path = root / f"{stamp}_{observer}_{suffix}"
+            path.mkdir(parents=True, exist_ok=True)
+            self._local_capture_dir = path
+            self._write_local_manifest({
+                "session_id": path.name,
+                "started_at": self._local_capture_started_at,
+                "observer_steam_id": self._steam_id,
+                "raw_upload_enabled": upload_raw_nettable_dumps(),
+            })
+            log.info("nettable: local capture session opened at %s", path)
+            return path
+        except Exception as e:
+            log.warning("nettable: failed to open local capture session: %s", e)
+            return None
+
+    def _write_local_manifest(self, updates: dict) -> None:
+        path = self._local_capture_dir
+        if path is None:
+            return
+        try:
+            manifest_path = path / "manifest.json"
+            current = {}
+            if manifest_path.exists():
+                current = json.loads(manifest_path.read_text(encoding="utf-8"))
+            current.update({k: v for k, v in updates.items() if v is not None})
+            manifest_path.write_text(
+                json.dumps(current, ensure_ascii=False, indent=2, sort_keys=True),
+                encoding="utf-8",
+            )
+        except Exception as e:
+            log.warning("nettable: failed to write local capture manifest: %s", e)
+
+    def _append_local_raw_dump(self, dump_doc: dict) -> None:
+        path = self._ensure_local_capture_session()
+        if path is None:
+            return
+        try:
+            with gzip.open(path / "raw_dumps.jsonl.gz", "at", encoding="utf-8") as fh:
+                fh.write(json.dumps(dump_doc, ensure_ascii=False, separators=(",", ":")))
+                fh.write("\n")
+        except Exception as e:
+            log.warning("nettable: failed to append local raw dump: %s", e)
+
+    def _write_local_processed_json(self, name: str, payload: dict) -> None:
+        path = self._local_capture_dir
+        if path is None:
+            return
+        try:
+            (path / name).write_text(
+                json.dumps(payload, ensure_ascii=False, indent=2, sort_keys=True),
+                encoding="utf-8",
+            )
+        except Exception as e:
+            log.warning("nettable: failed to write local %s: %s", name, e)
+
+    def _close_local_capture_session(self, updates: dict | None = None) -> None:
+        if self._local_capture_dir is None:
+            return
+        final_updates = {"ended_at": datetime.now().astimezone().isoformat()}
+        if updates:
+            final_updates.update(updates)
+        self._write_local_manifest(final_updates)
+        self._local_capture_dir = None
+        self._local_capture_started_at = None
+
     # ── Line handlers ──────────────────────────────────────────────────────
 
     def _handle_line(self, line: str) -> None:
@@ -1521,12 +1697,24 @@ class NetTableCapture:
         # Match start — opens the session window so dumps captured
         # between now and POST_GAME / end_board belong to this match.
         if GAME_IN_PROGRESS_RE in line:
+            if self._match_session_start is not None and not self._end_board_captured:
+                self._maybe_save_partial_match_from_latest_dump(
+                    capture_status="player_eliminated" if self._personal_end_recorded else "abandoned",
+                    verification_source="death_team" if self._personal_end_recorded else "game_restart",
+                    close_session=True,
+                )
+                self._match_session_start = None
+
             if self._match_session_start is None:
                 self._match_session_start = time.time()
                 self._session_dumps.clear()
+                self._close_local_capture_session({"capture_status": "abandoned"})
+                self._ensure_local_capture_session()
                 log.info("nettable: GAME_IN_PROGRESS — match session opened")
                 self._prev_personal_death_team = None
                 self._personal_end_recorded = False
+                self._personal_end_snapshot = None
+                self._partial_match_saved = False
                 self._post_game_at = None
                 self._end_board_captured = False
                 self._lobby_metadata_fired = False
@@ -1604,6 +1792,147 @@ class NetTableCapture:
             name="nettable-fallback-match",
         ).start()
 
+    def _latest_dump_rows(self) -> list[dict]:
+        if self._session_dumps:
+            _ts, doc = self._session_dumps[-1]
+            rows = doc.get("rows") or []
+            if isinstance(rows, list):
+                return rows
+        return []
+
+    def _pseudo_end_board_from_rows(self, rows: list[dict]) -> dict | None:
+        """Build an end_board-like payload from the latest live dump rows."""
+        if not rows:
+            return None
+
+        pit_data: dict[str, dict] = {}
+        for r in rows:
+            if r.get("table_name", "").endswith("player_info_table") \
+                    and r.get("key") == "player_info":
+                raw = r.get("raw")
+                if isinstance(raw, dict):
+                    d = raw.get("data")
+                    if isinstance(d, dict):
+                        for sid, p in d.items():
+                            if isinstance(p, dict):
+                                pit_data[str(sid)] = dict(p)
+                break
+
+        dac_info: dict[str, dict] = {}
+        for r in rows:
+            if r.get("table_name", "").endswith("dac_table") \
+                    and r.get("key") == "player_info":
+                raw = r.get("raw")
+                if isinstance(raw, dict):
+                    info = raw.get("info")
+                    if isinstance(info, dict):
+                        for sid, p in info.items():
+                            if isinstance(p, dict):
+                                dac_info[str(sid)] = dict(p)
+                break
+
+        all_sids = set(pit_data.keys()) | set(dac_info.keys())
+        if not all_sids:
+            return None
+
+        merged: dict[str, dict] = {}
+        for sid in all_sids:
+            base = dac_info.get(sid, {})
+            overlay = pit_data.get(sid, {})
+            combined = {**base, **overlay}
+            if "hp" in base and base["hp"] not in (None, 100):
+                combined["hp"] = base["hp"]
+            if "curr_rank" in base and base.get("curr_rank"):
+                combined["curr_rank"] = base["curr_rank"]
+            merged[sid] = combined
+        return {"data": merged}
+
+    def _generate_partial_match_id(self, pseudo_end_board: dict) -> str:
+        data = pseudo_end_board.get("data") if isinstance(pseudo_end_board, dict) else None
+        pairs: list[tuple[str, int]] = []
+        if isinstance(data, dict):
+            for sid, p in data.items():
+                if not isinstance(p, dict):
+                    continue
+                rank = p.get("curr_rank") or p.get("rank") or 0
+                try:
+                    rank_i = int(rank)
+                except (TypeError, ValueError):
+                    rank_i = 0
+                pairs.append((str(sid), rank_i))
+        pairs.sort()
+        seed = {
+            "kind": "partial",
+            "observer_steam_id": self._steam_id,
+            "match_session_start": self._match_session_start,
+            "personal_end": self._personal_end_snapshot,
+            "players": pairs,
+        }
+        return hashlib.sha256(
+            json.dumps(seed, sort_keys=True, separators=(",", ":"), ensure_ascii=True).encode("utf-8")
+        ).hexdigest()[:16]
+
+    def _maybe_save_partial_match_from_latest_dump(
+        self,
+        *,
+        capture_status: str,
+        verification_source: str,
+        close_session: bool,
+    ) -> None:
+        """Persist a useful unfinished match when the final end_board is absent."""
+        if self._partial_match_saved or self._end_board_captured:
+            return
+        if capture_status == "player_eliminated" and not self._personal_end_recorded:
+            return
+
+        rows = self._latest_dump_rows()
+        pseudo_end_board = self._pseudo_end_board_from_rows(rows)
+        if pseudo_end_board is None:
+            if close_session:
+                self._close_local_capture_session({"capture_status": capture_status})
+            return
+
+        played_at = datetime.now().astimezone().isoformat()
+        match_id = self._generate_partial_match_id(pseudo_end_board)
+        extracted = self._extract_structured_match(
+            pseudo_end_board,
+            played_at,
+            match_id,
+            capture_status=capture_status,
+            is_finished=False,
+            verification_source=verification_source,
+        )
+        if extracted is None:
+            return
+
+        match_record, player_rows = extracted
+        if self._personal_end_snapshot:
+            match_record["personal_end_snapshot"] = self._personal_end_snapshot
+        self._write_local_processed_json("processed_match.json", {
+            "match": match_record,
+            "players": player_rows,
+        })
+        self._upload_match_to_supabase(match_record, player_rows)
+        self._partial_match_saved = True
+        log.info(
+            "nettable: partial match saved — match_id=%s status=%s players=%d",
+            match_id, capture_status, len(player_rows),
+        )
+        if close_session:
+            self._close_local_capture_session({
+                "match_id": match_id,
+                "capture_status": capture_status,
+                "is_finished": False,
+                "verification_source": verification_source,
+            })
+        self._emit({
+            "type": "nettable_partial_match_saved",
+            "match_id": match_id,
+            "capture_status": capture_status,
+            "verification_source": verification_source,
+            "at": played_at,
+        })
+
     def _build_match_from_dump(self) -> None:
         """Fallback: reconstruct a match from the most recent in-memory dump
         when end_board wasn't captured in time."""
@@ -1673,7 +2002,14 @@ class NetTableCapture:
             # tz-aware: include the local UTC offset so the timestamptz column
             # stores the correct instant rather than treating local time as UTC.
             played_at = datetime.now().astimezone().isoformat()
-            extracted = self._extract_structured_match(pseudo_end_board, played_at, match_id)
+            extracted = self._extract_structured_match(
+                pseudo_end_board,
+                played_at,
+                match_id,
+                capture_status="timeout",
+                is_finished=False,
+                verification_source="last_dump_timeout",
+            )
 
             if extracted is not None:
                 match_record, player_rows = extracted
@@ -1686,6 +2022,13 @@ class NetTableCapture:
                 log.warning("nettable: fallback — _extract_structured_match returned None")
                 return
 
+            self._partial_match_saved = True
+            self._close_local_capture_session({
+                "match_id": match_id,
+                "capture_status": "timeout",
+                "is_finished": False,
+                "verification_source": "last_dump_timeout",
+            })
             self._emit({
                 "type": "nettable_end_board_saved",
                 "at": played_at,
@@ -1971,6 +2314,13 @@ class NetTableCapture:
                 match_record, player_rows = extracted
                 self._upload_match_to_supabase(match_record, player_rows)
 
+            self._partial_match_saved = True
+            self._close_local_capture_session({
+                "match_id": match_id,
+                "capture_status": "complete",
+                "is_finished": True,
+                "verification_source": "end_board",
+            })
             self._emit({
                 "type": "nettable_end_board_saved",
                 "at": saved_at,
@@ -2064,6 +2414,15 @@ class NetTableCapture:
             rank_at_death = (own_slot_payload.get("rank")
                              or own_slot_payload.get("curr_rank"))
             self._personal_end_recorded = True
+            self._personal_end_snapshot = {
+                "at": saved_at,
+                "round": round_at_death,
+                "rank": rank_at_death,
+                "late_capture": late_capture,
+                "slot_key": own_slot_key,
+                "team_id": own_team_id,
+                "player": dict(own_slot_payload),
+            }
             log.info(
                 "nettable: personal end_board snapshotted (slot=%s team=%s round=%s rank=%s late=%s)",
                 own_slot_key, own_team_id,
@@ -2080,7 +2439,13 @@ class NetTableCapture:
             log.warning("nettable: failed to process personal end_board: %s", e)
 
     def _extract_structured_match(
-        self, end_board: dict, played_at: str, match_id: str,
+        self,
+        end_board: dict,
+        played_at: str,
+        match_id: str,
+        capture_status: str = "complete",
+        is_finished: bool = True,
+        verification_source: str = "end_board",
     ) -> tuple[dict, list[dict]] | None:
         """Transform raw end_board into a match record and per-player rows
         suitable for Supabase upload.
@@ -2172,6 +2537,13 @@ class NetTableCapture:
             "final_round": match_final_round or 0,
             "player_count": len(match_players),
             "players": sorted(match_players, key=lambda x: (x["placement"] or 99)),
+            "capture_status": capture_status,
+            "is_finished": is_finished,
+            "verification_source": verification_source,
+            "verified_at": played_at if capture_status == "complete" else None,
+            "capture_started_at": self._local_capture_started_at,
+            "capture_ended_at": played_at,
+            "observer_steam_id": self._steam_id,
         }
         log.info(
             "nettable: structured match extracted — match_id=%s players=%d duration=%.0fs final_round=%d",
@@ -2182,6 +2554,11 @@ class NetTableCapture:
             "match_id": match_id,
             "player_count": len(match_players),
             "at": played_at,
+        })
+
+        self._write_local_processed_json("processed_match.json", {
+            "match": match_record,
+            "players": all_player_rows,
         })
 
         # Round-by-round timeline — stitch in-memory dumps into an
@@ -2227,7 +2604,7 @@ class NetTableCapture:
         except Exception as e:
             log.warning("nettable: push_match_players failed: %s", e)
 
-    def _extract_match_timeline(self, match_id: str, played_at: str) -> None:
+    def _extract_match_timeline(self, match_id: str, played_at: str) -> dict | None:
         """Walk in-memory dumps that belong to the just-ended match, pull
         per-round per-player state, and upload the timeline to Supabase.
 
@@ -2242,7 +2619,7 @@ class NetTableCapture:
         all_dumps = sorted(self._session_dumps)
         if not all_dumps:
             log.info("nettable: no dumps to build timeline from")
-            return
+            return None
 
         session_start = self._match_session_start
         if session_start is not None:
@@ -2257,7 +2634,7 @@ class NetTableCapture:
             in_session = self._last_match_dumps(all_dumps)
         if not in_session:
             log.info("nettable: no in-session dumps to build timeline from")
-            return
+            return None
 
         # Group dumps by round_info.round. Each round can have multiple
         # dumps -- keep the LATEST per round so the snapshot reflects
@@ -2282,7 +2659,7 @@ class NetTableCapture:
 
         if not by_round:
             log.info("nettable: in-session dumps had no round_info — skipping timeline")
-            return
+            return None
 
         timeline = [by_round[r] for r in sorted(by_round.keys())]
 
@@ -2294,6 +2671,8 @@ class NetTableCapture:
             "last_round": timeline[-1]["round"],
             "rounds": timeline,
         }
+
+        self._write_local_processed_json("processed_timeline.json", payload)
 
         # Direct-to-Supabase. The desktop app's timelines:fetch IPC reads
         # from Supabase too, so there's one source of truth.
@@ -2320,6 +2699,7 @@ class NetTableCapture:
             "round_count": len(timeline),
             "at": played_at,
         })
+        return payload
 
     @staticmethod
     def _stable_end_board_payload(end_board: dict) -> dict:
@@ -2624,19 +3004,18 @@ class NetTableCapture:
             # Scan ranking_top_table for top players → upsert their profiles.
             self._maybe_extract_ranking_top(rows)
 
-            # Buffer storable rows in memory for timeline building.
-            storable_rows = _storage_filter(rows)
+            # Buffer full raw rows in memory for timeline building and archive
+            # them locally for debugging/reprocessing. Raw rows are not uploaded
+            # unless upload_raw_nettable_dumps is explicitly enabled.
             now_ts = time.time()
             dump_doc = {
                 "captured_at": datetime.now().isoformat(),
                 "tables": tables,
-                "rows": storable_rows,
+                "rows": rows,
             }
             self._session_dumps.append((now_ts, dump_doc))
-            log.info(
-                "nettable: dump buffered (%d row(s), %d filtered)",
-                len(storable_rows), len(rows) - len(storable_rows),
-            )
+            self._append_local_raw_dump(dump_doc)
+            log.info("nettable: dump buffered locally (%d row(s))", len(rows))
 
             # Cross-dump dedupe: only POST rows that actually changed since
             # the last successful capture. ranking_top alone is ~79 KB and
@@ -2693,7 +3072,7 @@ class NetTableCapture:
                     "nettable: local_only — supabase POST skipped (%d changed, %d unchanged)",
                     len(changed_rows), skipped,
                 )
-            elif changed_rows:
+            elif changed_rows and upload_raw_nettable_dumps():
                 import httpx
                 cfg = load_config()
                 url = cfg.get("supabase_url")
@@ -2720,6 +3099,11 @@ class NetTableCapture:
                     timeout=60,
                 ) as client:
                     written = insert_dumps(client, changed_rows)
+            elif changed_rows:
+                log.info(
+                    "nettable: raw Supabase dump upload disabled (%d changed, %d unchanged)",
+                    len(changed_rows), skipped,
+                )
 
             log.info(
                 "nettable: ingested %d row(s) across %d table(s) (skipped %d unchanged)",

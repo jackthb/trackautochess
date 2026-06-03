@@ -311,3 +311,69 @@ def test_local_only_mode_skips_supabase(tmp_path, monkeypatch):
     assert not (tmp_path / "matches").exists()
     assert not (tmp_path / "match_players").exists()
     assert not (tmp_path / "end_boards").exists()
+
+
+def test_partial_match_saved_from_latest_dump_after_personal_elimination(tmp_path, monkeypatch):
+    """If the local player is eliminated and no final end_board arrives, the
+    latest live dump can still become an unfinished, provenance-marked match."""
+    _isolated(tmp_path, monkeypatch)
+    mocks = _patch_db_uploaders(monkeypatch)
+
+    from nettable_capture import NetTableCapture
+
+    steam_id = "76561198000000001"
+    rows = [
+        {
+            "table_name": "CustomNetTable_player_info_table",
+            "key": "player_info",
+            "raw": {
+                "data": {
+                    steam_id: {
+                        "steam_id": steam_id,
+                        "team_id": 1,
+                        "rank": 4,
+                        "round": 28,
+                        "hero_level": 9,
+                    },
+                    "76561198000000002": {
+                        "steam_id": "76561198000000002",
+                        "team_id": 2,
+                        "rank": 1,
+                        "round": 28,
+                        "hero_level": 10,
+                    },
+                }
+            },
+        },
+        {
+            "table_name": "CustomNetTable_dac_table",
+            "key": "player_info",
+            "raw": {
+                "info": {
+                    steam_id: {"curr_rank": 4, "hp": 0},
+                    "76561198000000002": {"curr_rank": 1, "hp": 42},
+                }
+            },
+        },
+    ]
+
+    cap = NetTableCapture(emit=lambda _: None, steam_id=steam_id)
+    cap._match_session_start = 123.0
+    cap._session_dumps.append((124.0, {"captured_at": "2026-05-20T12:00:00", "rows": rows}))
+    cap._personal_end_recorded = True
+    cap._personal_end_snapshot = {"round": 28, "rank": 4}
+
+    cap._maybe_save_partial_match_from_latest_dump(
+        capture_status="player_eliminated",
+        verification_source="death_team",
+        close_session=True,
+    )
+
+    assert mocks["push_match"].call_count == 1
+    match_record = mocks["push_match"].call_args.args[0]
+    assert match_record["capture_status"] == "player_eliminated"
+    assert match_record["is_finished"] is False
+    assert match_record["verification_source"] == "death_team"
+    assert match_record["personal_end_snapshot"] == {"round": 28, "rank": 4}
+    assert mocks["push_match_players"].call_count == 1
+    assert cap._partial_match_saved is True

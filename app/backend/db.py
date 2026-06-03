@@ -21,6 +21,7 @@ _local_only_logged = False
 QUEEN_LADDER_UPDATE_MIN_INTERVAL = timedelta(hours=1)
 
 
+
 def _get_client():
     """Lazy-init and return httpx.Client or None."""
     global _client, _local_only_logged
@@ -182,18 +183,30 @@ def push_match(match_record: dict) -> str | None:
         log.warning("push_match: missing match_id")
         return None
 
+    row = {
+        "match_id": match_id,
+        "played_at": match_record.get("played_at"),
+        "duration": match_record.get("duration") or None,
+        "final_round": match_record.get("final_round") or None,
+        "player_count": match_record.get("player_count") or None,
+        "capture_status": match_record.get("capture_status") or "complete",
+        "is_finished": bool(match_record.get("is_finished", True)),
+        "verification_source": match_record.get("verification_source") or "end_board",
+        "verified_at": match_record.get("verified_at") or match_record.get("played_at"),
+        "capture_started_at": match_record.get("capture_started_at"),
+        "capture_ended_at": match_record.get("capture_ended_at") or match_record.get("played_at"),
+        "observer_steam_id": match_record.get("observer_steam_id") or None,
+    }
+    if row["observer_steam_id"] is not None:
+        try:
+            row["observer_steam_id"] = int(str(row["observer_steam_id"]).strip())
+        except (TypeError, ValueError):
+            row["observer_steam_id"] = None
     client = _get_client()
     if client is None:
         return None
 
     try:
-        row = {
-            "match_id": match_id,
-            "played_at": match_record.get("played_at"),
-            "duration": match_record.get("duration") or None,
-            "final_round": match_record.get("final_round") or None,
-            "player_count": match_record.get("player_count") or None,
-        }
         resp = client.post(
             "/rest/v1/matches",
             json=row,
@@ -237,24 +250,25 @@ def push_match_players(match_id: str, players: list[dict]) -> int:
     if not players:
         return 0
 
+    rows = []
+    for p in players:
+        r = {k: v for k, v in p.items() if k in _MATCH_PLAYER_COLUMNS}
+        # steam_id stored as bigint server-side
+        if "steam_id" in r:
+            try:
+                r["steam_id"] = int(str(r["steam_id"]).strip())
+            except (TypeError, ValueError):
+                continue
+        r["match_id"] = match_id
+        rows.append(r)
+    if not rows:
+        return 0
+
     client = _get_client()
     if client is None:
         return 0
 
     try:
-        rows = []
-        for p in players:
-            r = {k: v for k, v in p.items() if k in _MATCH_PLAYER_COLUMNS}
-            # steam_id stored as bigint server-side
-            if "steam_id" in r:
-                try:
-                    r["steam_id"] = int(str(r["steam_id"]).strip())
-                except (TypeError, ValueError):
-                    continue
-            r["match_id"] = match_id
-            rows.append(r)
-        if not rows:
-            return 0
         resp = client.post(
             "/rest/v1/match_players",
             json=rows,

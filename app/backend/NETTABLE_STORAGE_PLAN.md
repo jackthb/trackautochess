@@ -1,13 +1,12 @@
 # NetTable Storage Filter — Plan
 
-Deferred work. We're storing way more rows than we need to. The cascade captures the full nettable state every ~15s; most of it is static reference data we already have from the VPK extraction, or per-slot fluff we don't care about.
+Implemented direction (2026-06-02): raw dumps are local-first. The cascade still captures the full nettable state every ~15s for in-memory live UI and timeline construction, but Supabase raw dump uploads are disabled by default. Normal uploads now send the processed `matches` / `match_players` / `match_timelines` representation plus capture provenance. Raw dump upload is an explicit debug opt-in via `upload_raw_nettable_dumps`.
 
-**Strategy:** filter at the **storage boundary only** — not at capture. The in-memory `_last_state` (live debug view + warm-start) still sees everything. We just stop writing the noise to:
+We're storing way more rows than we need to if raw dumps go to Postgres. Most of the raw state is static reference data we already have from the VPK extraction, or per-slot fluff we don't care about.
 
-- `~/.dac/nettable_dumps/<ts>.json` (local dump files)
-- `dac_nettable_dumps` table in Supabase
+**Strategy:** filter/upload at the **storage boundary only** — not at capture. The in-memory `_last_state` (live debug view + warm-start) still sees everything. Raw dump material is archived locally under `~/.dac/captures/sessions/<session>/raw_dumps.jsonl.gz`; Postgres raw dump writes happen only when explicitly opted in.
 
-Implementation lives in `nettable_capture.py`. Apply the denylist before the `LOCAL_DUMPS_DIR / ...write_text(...)` call and before `insert_dumps(client, changed_rows)`. Do not apply at `extract_rows()` — in-memory consumers (slot mapping, live view) need the full set.
+Implementation lives in `nettable_capture.py`. Keep any denylist/upload filtering near `insert_dumps(client, changed_rows)`. Do not apply at `extract_rows()` — in-memory consumers (slot mapping, live view, timeline construction, and local debugging archives) need the full set.
 
 ## Drop
 

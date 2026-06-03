@@ -56,6 +56,12 @@ DEFAULT_CONFIG = {
     "steam_name": "",
     "replay_enabled": True,
     "replay_max_gb": 15,
+    # Raw nettable dumps are noisy/debug data. Keep them on-device by
+    # default and upload only the processed match/timeline representation.
+    "keep_local_nettable_dumps": True,
+    "upload_raw_nettable_dumps": False,
+    "local_nettable_retention_days": 14,
+    "local_nettable_max_mb": 500,
 }
 
 
