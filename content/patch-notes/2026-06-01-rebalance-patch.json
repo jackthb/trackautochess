@@ -3,7 +3,6 @@
   "title": "Rebalance Patch",
   "source": "https://steamcommunity.com/sharedfiles/filedetails/changelog/1613886175",
   "entitiesSynced": true,
-  "entitiesSyncedAt": "2026-06-02T23:32:17.933Z",
   "sourceEntries": [
     {
       "sourceId": "1780380302",
@@ -19,11 +18,7 @@
         {
           "kind": "nerf",
           "name": "Lucid Star",
-          "detail": "Dynamic probability reduced from 24%/22%/20%/18%/16% to 22%/20%/18%/16%/14%",
-          "entity": {
-            "type": "item",
-            "relic": "item_super_uprank"
-          }
+          "detail": "Dynamic probability reduced from 24%/22%/20%/18%/16% to 22%/20%/18%/16%/14%"
         },
         {
           "kind": "buff",
@@ -31,7 +26,8 @@
           "detail": "Bounce count raised from 2/3/4 to 3/4/5",
           "entity": {
             "type": "unit",
-            "unit": "luna"
+            "unit": "luna",
+            "slug": "luna"
           }
         },
         {
@@ -40,7 +36,8 @@
           "detail": "Linked target damage reduction raised from 10%/15%/25% to 10%/20%/30%",
           "entity": {
             "type": "unit",
-            "unit": "io"
+            "unit": "io",
+            "slug": "io"
           }
         },
         {
@@ -48,8 +45,9 @@
           "name": "Naga - Scale Armor",
           "detail": "6 Naga reflect damage multiplier lowered from twice to 1.5 times",
           "entity": {
-            "type": "unit",
-            "synergy": "is_naga"
+            "type": "synergy",
+            "synergy": "is_naga",
+            "slug": "naga"
           }
         },
         {
@@ -57,7 +55,9 @@
           "name": "Bloodthorn",
           "detail": "Cooldown reduced from 15 seconds to 12 seconds",
           "entity": {
-            "type": "unit"
+            "type": "item",
+            "item": "item_xueji",
+            "slug": "bloodthorn"
           }
         },
         {
@@ -65,7 +65,9 @@
           "name": "Spark of Courage",
           "detail": "Trigger condition changed from target level higher than self to target level no less than self",
           "entity": {
-            "type": "unit"
+            "type": "item",
+            "item": "item_yongqizhiguang",
+            "slug": "spark-of-courage"
           }
         },
         {
@@ -73,19 +75,18 @@
           "name": "Assassins - 9",
           "detail": "Fixed bug of 9 Assassin leap cooldown miscalculated as 15 seconds correct value is 10 seconds",
           "entity": {
-            "type": "unit",
-            "synergy": "is_assassin"
+            "type": "synergy",
+            "synergy": "is_assassin",
+            "slug": "assassin"
           }
         },
         {
           "kind": "change",
           "name": "Legend Piece & Relic Pool popup",
-          "detail": "Optimize UI to prevent covering recruit panel",
-          "entity": {
-            "type": "unit"
-          }
+          "detail": "Optimize UI to prevent covering recruit panel"
         }
       ]
     }
-  ]
+  ],
+  "entitiesSyncedAt": "2026-06-02T23:32:17.933Z"
 }
