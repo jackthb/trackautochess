@@ -35,6 +35,7 @@ export interface DrodoProfileRow {
   mmr: number | null;
   max_mmr: number | null;
   mmr_level: number | null;
+  queen_rank: number | null;
   season: string | null;
   season_games: number | null;
   candy: number | null;
@@ -117,6 +118,19 @@ function extractAllSeasons(
   );
 }
 
+function numberFromDrodoData(
+  data: Record<string, unknown>,
+  key: string
+): number | null {
+  const value = data[key];
+  if (typeof value === "number") return Number.isFinite(value) ? value : null;
+  if (typeof value === "string" && value.trim()) {
+    const parsed = Number(value);
+    return Number.isFinite(parsed) ? parsed : null;
+  }
+  return null;
+}
+
 export function buildDrodoProfile(
   steamId: string,
   drodoData: Record<string, unknown>
@@ -132,6 +146,7 @@ export function buildDrodoProfile(
       mmr: mmrKey ? Number(drodoData[mmrKey]) || null : null,
       max_mmr: maxMmrKey ? Number(drodoData[maxMmrKey]) || null : null,
       mmr_level: Number(drodoData.mmr_level) || null,
+      queen_rank: numberFromDrodoData(drodoData, "queen_rank"),
       season,
       season_games: matchKey ? Number(drodoData[matchKey]) || null : null,
       candy: Number(drodoData.candy) || null,
@@ -182,6 +197,9 @@ export function cachedUserToDrodoProfile(row: CachedUserDrodoRow): DrodoProfileR
     mmr: row.drodo_mmr,
     max_mmr: row.drodo_max_mmr,
     mmr_level: row.drodo_mmr_level,
+    queen_rank: row.drodo_raw_data
+      ? numberFromDrodoData(row.drodo_raw_data, "queen_rank")
+      : null,
     season: row.drodo_season,
     season_games: row.drodo_season_games,
     candy: row.drodo_candy,

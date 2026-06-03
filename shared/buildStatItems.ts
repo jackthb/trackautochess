@@ -8,6 +8,7 @@ interface GameForStats {
 interface DrodoForStats {
   mmr?: number | null;
   max_mmr?: number | null;
+  queen_rank?: number | null;
   season_games?: number | null;
   candy?: number | null;
   chicken_count?: number | null;
@@ -41,6 +42,7 @@ export function buildStatItems(
 
   const drodoItems: StatItem[] = [];
   if (drodo?.mmr != null) drodoItems.push({ key: "drodo-mmr", value: drodo.mmr, label: mmrToRank(drodo.mmr) || "MMR", source: "drodo" });
+  if (drodo?.queen_rank != null) drodoItems.push({ key: "drodo-queen-rank", value: `#${drodo.queen_rank}`, label: "Queen Rank", tone: "gold", source: "drodo" });
   if (drodo?.max_mmr != null) drodoItems.push({ key: "drodo-peak", value: drodo.max_mmr, label: "Peak MMR", tone: "gold", source: "drodo" });
   if (drodo?.season_games != null) drodoItems.push({ key: "drodo-season-games", value: drodo.season_games, label: "Season Games", source: "drodo" });
   if (drodo?.candy != null) drodoItems.push({ key: "drodo-candy", value: drodo.candy, label: "Candies", tone: "gold", source: "drodo" });

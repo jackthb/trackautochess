@@ -45,6 +45,7 @@ export interface PlayerPageProps {
     mmr: number | null;
     max_mmr: number | null;
     mmr_level: number | null;
+    queen_rank: number | null;
     season: string | null;
     season_games: number | null;
     candy: number | null;
@@ -333,6 +334,7 @@ export default function PlayerView({
         mmr: data.mmr ?? null,
         max_mmr: data.max_mmr ?? null,
         mmr_level: data.mmr_level ?? null,
+        queen_rank: data.queen_rank ?? null,
         season: data.season ?? null,
         season_games: data.season_games ?? null,
         candy: data.candy ?? null,

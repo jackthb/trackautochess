@@ -27,6 +27,19 @@ type LoadResult =
   | { kind: "redirect"; destination: string }
   | { kind: "ok"; data: Omit<PlayerPageProps, "route"> };
 
+function numberFromRawData(
+  rawData: Record<string, unknown> | null | undefined,
+  key: string
+): number | null {
+  const value = rawData?.[key];
+  if (typeof value === "number") return Number.isFinite(value) ? value : null;
+  if (typeof value === "string" && value.trim()) {
+    const parsed = Number(value);
+    return Number.isFinite(parsed) ? parsed : null;
+  }
+  return null;
+}
+
 /** Cached per request so generateMetadata and the page render share data. */
 const loadPlayer = cache(async (rawSteamId: string): Promise<LoadResult> => {
   if (!rawSteamId || typeof rawSteamId !== "string") {
@@ -97,6 +110,7 @@ const loadPlayer = cache(async (rawSteamId: string): Promise<LoadResult> => {
           mmr: profileResult.data.drodo_mmr,
           max_mmr: profileResult.data.drodo_max_mmr,
           mmr_level: profileResult.data.drodo_mmr_level,
+          queen_rank: numberFromRawData(profileResult.data.drodo_raw_data, "queen_rank"),
           season: profileResult.data.drodo_season,
           season_games: profileResult.data.drodo_season_games,
           candy: profileResult.data.drodo_candy,
@@ -116,6 +130,7 @@ const loadPlayer = cache(async (rawSteamId: string): Promise<LoadResult> => {
           mmr: result.profile.mmr,
           max_mmr: result.profile.max_mmr,
           mmr_level: result.profile.mmr_level,
+          queen_rank: numberFromRawData(result.profile.raw_data, "queen_rank"),
           season: result.profile.season,
           season_games: result.profile.season_games,
           candy: result.profile.candy,

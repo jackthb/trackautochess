@@ -21,6 +21,7 @@ export const USER_DRODO_SELECT = [
   "drodo_season_games",
   "drodo_candy",
   "drodo_chicken_count",
+  "drodo_raw_data",
   "drodo_last_fetched_at",
   "drodo_profile_missing",
 ].join(", ");
@@ -36,6 +37,7 @@ export interface CachedUserDrodoRow {
   drodo_season_games: number | null;
   drodo_candy: number | null;
   drodo_chicken_count: number | null;
+  drodo_raw_data: Record<string, unknown> | null;
   drodo_last_fetched_at: string | null;
   drodo_profile_missing: boolean | null;
 }
