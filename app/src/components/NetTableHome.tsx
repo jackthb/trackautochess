@@ -124,6 +124,9 @@ export function NetTableHome({
             state={state}
             stateAt={stateAt}
             unitsFull={unitsFull}
+            livePlayers={livePlayers}
+            localSteamIds={localSteamIds}
+            synergiesData={synergiesData}
           />
         </div>
       </div>

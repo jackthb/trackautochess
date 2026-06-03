@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { unitStem } from "../lib/game-utils";
-import type { NetTableState } from "../hooks/useNetTableEvents";
-import type { UnitFullInfo } from "../types";
+import type { LivePlayer, NetTableState } from "../hooks/useNetTableEvents";
+import type { SynergyInfo, UnitFullInfo } from "../types";
 
 interface Props {
   state: NetTableState;
@@ -9,6 +9,9 @@ interface Props {
   /** Loaded units_full.json — used to resolve internal `chess_*` codes to
    *  display names for the Hidden Legendaries summary. */
   unitsFull: Record<string, UnitFullInfo>;
+  livePlayers: Record<string, LivePlayer>;
+  localSteamIds: string[];
+  synergiesData: Record<string, SynergyInfo>;
 }
 
 const PREFIX = "CustomNetTable_";
@@ -33,7 +36,14 @@ const TABLE_LABELS: Record<string, string> = {
  * exposed via any web endpoint, so private-to-the-player data
  * (e.g. unrevealed legendary pool) stays on your machine.
  */
-export function NetTableStatePanel({ state, stateAt, unitsFull }: Props) {
+export function NetTableStatePanel({
+  state,
+  stateAt,
+  unitsFull,
+  livePlayers,
+  localSteamIds,
+  synergiesData,
+}: Props) {
   const tables = useMemo(() => {
     return Object.keys(state).sort((a, b) => {
       const aLabel = TABLE_LABELS[a] ?? a;
@@ -62,6 +72,9 @@ export function NetTableStatePanel({ state, stateAt, unitsFull }: Props) {
         <HiddenLegendaries
           revealed={hiddenLegendaries.revealed}
           unrevealed={hiddenLegendaries.unrevealed}
+          livePlayers={livePlayers}
+          localSteamIds={localSteamIds}
+          synergiesData={synergiesData}
         />
       )}
 
@@ -93,18 +106,46 @@ interface LegendaryEntry {
 interface LegendaryBanPick {
   synergy: string;
   units: LegendaryEntry[];
+  expendableUnits: LegendaryEntry[];
+  protectedUnits: LegendaryEntry[];
   poolShare: number;
+  score: number;
+}
+
+interface BuildBanContext {
+  synergies: Array<{ name: string; count: number }>;
+  protectedUnits: LegendaryEntry[];
+  protectedUnitCodes: Set<string>;
 }
 
 function HiddenLegendaries({
   revealed,
   unrevealed,
+  livePlayers,
+  localSteamIds,
+  synergiesData,
 }: {
   revealed: LegendaryEntry[];
   unrevealed: LegendaryEntry[];
+  livePlayers: Record<string, LivePlayer>;
+  localSteamIds: string[];
+  synergiesData: Record<string, SynergyInfo>;
 }) {
   const fullPool = [...revealed, ...unrevealed];
-  const bestBans = rankLegendaryBanPicks(fullPool);
+  const banContext = inferBanContext(
+    fullPool,
+    livePlayers,
+    localSteamIds,
+    synergiesData,
+  );
+  const bestBans = rankLegendaryBanPicks(
+    fullPool,
+    banContext.protectedUnitCodes,
+  );
+  const hasBuildContext = banContext.synergies.length > 0;
+  const hasProtectedTargets = banContext.protectedUnits.length > 0;
+  const contextLabel = banContext.synergies.map((s) => s.name).join(" / ");
+  const protectedUnitNames = banContext.protectedUnits.map((u) => u.name);
 
   return (
     <div className="nettable-state-block">
@@ -119,7 +160,9 @@ function HiddenLegendaries({
       {bestBans.length > 0 && (
         <div className="nettable-best-bans" aria-label="Most efficient legendary bans">
           <div className="nettable-best-bans-heading">
-            Best bans by legendary pool impact
+            {hasBuildContext
+              ? "Pool-thinning bans for your board"
+              : "Best bans by legendary pool impact"}
           </div>
           <ul className="nettable-best-ban-list">
             {bestBans.map((ban) => (
@@ -127,20 +170,41 @@ function HiddenLegendaries({
                 <div className="nettable-best-ban-main">
                   <span className="nettable-best-ban-name">{ban.synergy}</span>
                   <span className="nettable-best-ban-count">
-                    {ban.units.length}/{fullPool.length} legendaries
+                    {hasProtectedTargets
+                      ? `${ban.expendableUnits.length}/${fullPool.length} unwanted`
+                      : `${ban.units.length}/${fullPool.length} legendaries`}
                   </span>
                 </div>
                 <div className="nettable-best-ban-meter" aria-hidden="true">
-                  <span style={{ width: `${ban.poolShare * 100}%` }} />
+                  <span
+                    style={{
+                      width: `${
+                        hasProtectedTargets
+                          ? (ban.expendableUnits.length / fullPool.length) * 100
+                          : ban.poolShare * 100
+                      }%`,
+                    }}
+                  />
                 </div>
                 <div className="nettable-best-ban-units">
-                  {ban.units.map((u) => u.name).join(", ")}
+                  {(hasProtectedTargets ? ban.expendableUnits : ban.units)
+                    .map((u) => u.name)
+                    .join(", ")}
                 </div>
+                {hasProtectedTargets && ban.protectedUnits.length > 0 && (
+                  <div className="nettable-best-ban-units">
+                    Hits target: {ban.protectedUnits.map((u) => u.name).join(", ")}
+                  </div>
+                )}
               </li>
             ))}
           </ul>
           <div className="nettable-best-bans-note">
-            One ban removes every legendary sharing that trait from this match's pool.
+            {hasProtectedTargets
+              ? `Protecting ${protectedUnitNames.join(", ")} from your active ${contextLabel} synergies.`
+              : hasBuildContext
+                ? `No current legendary targets match your active ${contextLabel} synergies, so this is raw pool thinning.`
+                : "One ban removes every legendary sharing that trait from this match's pool."}
           </div>
         </div>
       )}
@@ -195,7 +259,10 @@ function extractHiddenLegendaries(
   };
 }
 
-function rankLegendaryBanPicks(pool: LegendaryEntry[]): LegendaryBanPick[] {
+function rankLegendaryBanPicks(
+  pool: LegendaryEntry[],
+  protectedUnitCodes: Set<string> = new Set(),
+): LegendaryBanPick[] {
   if (pool.length === 0) return [];
 
   const bySynergy = new Map<string, LegendaryEntry[]>();
@@ -207,18 +274,122 @@ function rankLegendaryBanPicks(pool: LegendaryEntry[]): LegendaryBanPick[] {
     }
   }
 
-  return Array.from(bySynergy, ([synergy, units]) => ({
-    synergy,
-    units: units.slice().sort((a, b) => a.name.localeCompare(b.name)),
-    poolShare: units.length / pool.length,
-  }))
-    .filter((ban) => ban.units.length > 1)
+  const picks = Array.from(bySynergy, ([synergy, units]) => {
+    const sortedUnits = units.slice().sort((a, b) => a.name.localeCompare(b.name));
+    const protectedUnits = sortedUnits.filter((u) => protectedUnitCodes.has(u.code));
+    const expendableUnits = sortedUnits.filter((u) => !protectedUnitCodes.has(u.code));
+    return {
+      synergy,
+      units: sortedUnits,
+      expendableUnits,
+      protectedUnits,
+      poolShare: sortedUnits.length / pool.length,
+      score: expendableUnits.length - protectedUnits.length * (pool.length + 1),
+    };
+  });
+
+  const hasProtectedContext = protectedUnitCodes.size > 0;
+  const cleanPicks = picks.filter(
+    (ban) => ban.protectedUnits.length === 0 && ban.expendableUnits.length > 0,
+  );
+  const rankedSource =
+    hasProtectedContext && cleanPicks.length > 0
+      ? cleanPicks
+      : picks.filter((ban) =>
+          hasProtectedContext ? ban.expendableUnits.length > 0 : ban.units.length > 1,
+        );
+
+  return rankedSource
     .sort((a, b) => {
+      const scoreDiff = b.score - a.score;
+      if (scoreDiff !== 0) return scoreDiff;
+      const expendableDiff = b.expendableUnits.length - a.expendableUnits.length;
+      if (expendableDiff !== 0) return expendableDiff;
+      const protectedDiff = a.protectedUnits.length - b.protectedUnits.length;
+      if (protectedDiff !== 0) return protectedDiff;
       const countDiff = b.units.length - a.units.length;
       if (countDiff !== 0) return countDiff;
       return a.synergy.localeCompare(b.synergy);
     })
     .slice(0, 5);
+}
+
+function inferBanContext(
+  pool: LegendaryEntry[],
+  livePlayers: Record<string, LivePlayer>,
+  localSteamIds: string[],
+  synergiesData: Record<string, SynergyInfo>,
+): BuildBanContext {
+  const localPlayer = findLocalPlayer(livePlayers, localSteamIds);
+  const synergies = parseBuildSynergies(localPlayer?.buff, synergiesData).slice(0, 3);
+  const protectedSynergies = new Set(synergies.map((s) => s.name));
+  const protectedUnits = pool.filter((unit) =>
+    unit.synergies.some((synergy) => protectedSynergies.has(synergy)),
+  );
+  return {
+    synergies,
+    protectedUnits,
+    protectedUnitCodes: new Set(protectedUnits.map((unit) => unit.code)),
+  };
+}
+
+function findLocalPlayer(
+  livePlayers: Record<string, LivePlayer>,
+  localSteamIds: string[],
+): LivePlayer | undefined {
+  for (const steamId of localSteamIds) {
+    const player = livePlayers[steamId];
+    if (player) return player;
+  }
+  return undefined;
+}
+
+function parseBuildSynergies(
+  buff: string | undefined,
+  synergiesData: Record<string, SynergyInfo>,
+): Array<{ name: string; count: number; score: number }> {
+  if (!buff) return [];
+
+  return buff
+    .split(",")
+    .map((entry) => entry.trim())
+    .filter(Boolean)
+    .map((entry) => {
+      const [rawKey, rawCount] = entry.split(":");
+      const key = rawKey.trim();
+      const info = synergiesData[key];
+      const count = Number(rawCount) || 0;
+      const firstTier =
+        Array.isArray(info?.tiers) && typeof info.tiers[0] === "number"
+          ? info.tiers[0]
+          : 2;
+      return {
+        name: info?.name || displayNameFromSynergyKey(key),
+        count,
+        firstTier,
+        score: count / Math.max(firstTier || 1, 1),
+      };
+    })
+    .filter((synergy) => {
+      if (synergy.count < synergy.firstTier) return false;
+      // One-piece synergies like Demon are often incidental splashes. Keep
+      // this first pass focused on multi-piece build shape.
+      if (synergy.firstTier <= 1 && synergy.count <= 1) return false;
+      return true;
+    })
+    .sort((a, b) => {
+      const scoreDiff = b.score - a.score;
+      if (scoreDiff !== 0) return scoreDiff;
+      return b.count - a.count;
+    });
+}
+
+function displayNameFromSynergyKey(key: string): string {
+  return key
+    .replace(/^is_/, "")
+    .split("_")
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(" ");
 }
 
 function toEntries(
