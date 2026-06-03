@@ -23,6 +23,13 @@ syncPublicIcons();
 const nextConfig: NextConfig = {
   reactStrictMode: true,
   transpilePackages: ["@dac/shared"],
+  webpack(config) {
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      "@dac/shared": path.resolve(__dirname, "..", "shared"),
+    };
+    return config;
+  },
   // Native addon used by the OG-image routes (satori -> PNG). Must not be
   // bundled by the App Router; Pages API routes externalized it automatically.
   serverExternalPackages: ["@resvg/resvg-js"],

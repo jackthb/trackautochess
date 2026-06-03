@@ -8,11 +8,12 @@ import styles from "./RankLadder.module.css";
 
 interface RankLadderProps {
   mmr: number | null | undefined;
+  queenRank?: number | null;
   /** How many ranks to show above and below the current. */
   span?: number;
 }
 
-export function RankLadder({ mmr, span = 4 }: RankLadderProps) {
+export function RankLadder({ mmr, queenRank, span = 4 }: RankLadderProps) {
   if (mmr == null || !Number.isFinite(mmr)) return null;
   const current = mmrToLevel(mmr);
   if (current < MIN_LEVEL) return null;
@@ -28,6 +29,7 @@ export function RankLadder({ mmr, span = 4 }: RankLadderProps) {
       <ol className={styles.list}>
         {levels.map((level) => {
           const isCurrent = level === current;
+          const showQueenRank = isCurrent && level === MAX_LEVEL && queenRank != null;
           const cls = isCurrent
             ? styles.current
             : level > current
@@ -35,6 +37,7 @@ export function RankLadder({ mmr, span = 4 }: RankLadderProps) {
               : styles.below;
           return (
             <li key={level} className={`${styles.row} ${cls}`}>
+              {showQueenRank && <span className={styles.position}>#{queenRank}</span>}
               <span className={styles.rank}>{levelToRankName(level)}</span>
               <span className={styles.level}>{level}</span>
             </li>

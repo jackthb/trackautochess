@@ -32,21 +32,34 @@ export function buildStatItems(
     const top4 = placements.filter((p) => p >= 1 && p <= 4).length;
     const top4pct = ((top4 / games.length) * 100).toFixed(0);
     const wins = placements.filter((p) => p === 1).length;
+    const winPct = ((wins / games.length) * 100).toFixed(0);
     tracked.push(
+      { key: "win-rate", value: `${winPct}%`, label: "Win Rate", tone: "gold", source: "tracked" },
+      { key: "wins", value: wins, label: "Wins", tone: "gold", source: "tracked" },
       { key: "games", value: games.length, label: "Games", source: "tracked" },
       { key: "avg", value: avg, label: "Avg Place", tone: "gold", source: "tracked" },
       { key: "top4", value: `${top4pct}%`, label: "Top 4 Rate", tone: "green", source: "tracked" },
-      { key: "wins", value: wins, label: "Wins", tone: "gold", source: "tracked" },
     );
   }
 
   const drodoItems: StatItem[] = [];
-  if (drodo?.mmr != null) drodoItems.push({ key: "drodo-mmr", value: drodo.mmr, label: mmrToRank(drodo.mmr) || "MMR", source: "drodo" });
-  if (drodo?.queen_rank != null) drodoItems.push({ key: "drodo-queen-rank", value: `#${drodo.queen_rank}`, label: "Queen Rank", tone: "gold", source: "drodo" });
+  if (drodo?.mmr != null) {
+    const rank = mmrToRank(drodo.mmr) || "MMR";
+    const rankLabel = rank === "Queen" && drodo.queen_rank != null
+      ? `MMR · Queen #${drodo.queen_rank}`
+      : rank === "MMR"
+        ? "MMR"
+        : `MMR · ${rank}`;
+    drodoItems.push({ key: "drodo-mmr", value: drodo.mmr, label: rankLabel, source: "drodo" });
+  }
   if (drodo?.max_mmr != null) drodoItems.push({ key: "drodo-peak", value: drodo.max_mmr, label: "Peak MMR", tone: "gold", source: "drodo" });
+  if (drodo?.season_games != null && drodo.season_games > 0 && drodo?.chicken_count != null) {
+    const winPct = ((drodo.chicken_count / drodo.season_games) * 100).toFixed(0);
+    drodoItems.push({ key: "drodo-win-rate", value: `${winPct}%`, label: "Win Rate", tone: "gold", source: "drodo" });
+  }
+  if (drodo?.chicken_count != null) drodoItems.push({ key: "drodo-chickens", value: drodo.chicken_count, label: "Season Wins", tone: "gold", source: "drodo" });
   if (drodo?.season_games != null) drodoItems.push({ key: "drodo-season-games", value: drodo.season_games, label: "Season Games", source: "drodo" });
   if (drodo?.candy != null) drodoItems.push({ key: "drodo-candy", value: drodo.candy, label: "Candies", tone: "gold", source: "drodo" });
-  if (drodo?.chicken_count != null) drodoItems.push({ key: "drodo-chickens", value: drodo.chicken_count, label: "Season Wins", tone: "gold", source: "drodo" });
   if (drodo?.total_chicken_count != null && drodo.total_chicken_count !== drodo.chicken_count) drodoItems.push({ key: "drodo-total-chickens", value: drodo.total_chicken_count, label: "Total Wins", tone: "gold", source: "drodo" });
 
   return { tracked, drodo: drodoItems };

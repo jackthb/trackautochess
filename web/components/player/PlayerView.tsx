@@ -11,6 +11,7 @@ import { Button } from "@dac/shared/Button";
 import { StatsGrid } from "@dac/shared/StatsGrid";
 import { SeasonHistoryGrid, type SeasonSnapshot } from "@dac/shared/SeasonHistoryGrid";
 import { MmrSparkline, type MmrSnapshot } from "@/components/MmrSparkline";
+import { QueenRankSparkline, type QueenRankSnapshot } from "@/components/QueenRankSparkline";
 import { RankLadder } from "@/components/RankLadder";
 import {
   getManualRefreshQuota,
@@ -46,6 +47,8 @@ export interface PlayerPageProps {
     max_mmr: number | null;
     mmr_level: number | null;
     queen_rank: number | null;
+    last_win_at: string | number | null;
+    last_top3_at: string | number | null;
     season: string | null;
     season_games: number | null;
     candy: number | null;
@@ -53,6 +56,7 @@ export interface PlayerPageProps {
   } | null;
   seasons: SeasonSnapshot[];
   mmrHistory: MmrSnapshot[];
+  queenRankHistory: QueenRankSnapshot[];
   leaderboardPosition: LeaderboardPosition | null;
   drodoProfileMissing: boolean;
   drodoLastFetchedAt: string | null;
@@ -114,6 +118,7 @@ export default function PlayerView({
   drodo: initialDrodo,
   seasons: initialSeasons,
   mmrHistory,
+  queenRankHistory,
   leaderboardPosition,
   drodoProfileMissing: initialDrodoProfileMissing,
   drodoLastFetchedAt: initialDrodoLastFetchedAt,
@@ -132,6 +137,7 @@ export default function PlayerView({
     initialManualRefreshQuota
   );
   const [refreshError, setRefreshError] = useState<string | null>(null);
+  const [historyTab, setHistoryTab] = useState<"mmr" | "queen">("mmr");
   const [nowMs, setNowMs] = useState<number | null>(null);
   const [refreshing, setRefreshing] = useState(false);
   const [avatarFailed, setAvatarFailed] = useState(false);
@@ -194,6 +200,7 @@ export default function PlayerView({
     () => buildStatItems(games, drodo ? { ...drodo, total_chicken_count: totalChickenCount } : null),
     [games, drodo, totalChickenCount]
   );
+  const showQueenRankHistory = Boolean(drodo?.queen_rank) && queenRankHistory.length >= 2;
 
   // TODO: ingest total matches / avg rank / wins / preferred lineup / max damage from history pages for server-side season snapshots.
   useEffect(() => {
@@ -329,21 +336,6 @@ export default function PlayerView({
         return;
       }
 
-      setDrodoProfileMissing(false);
-      setDrodo({
-        mmr: data.mmr ?? null,
-        max_mmr: data.max_mmr ?? null,
-        mmr_level: data.mmr_level ?? null,
-        queen_rank: data.queen_rank ?? null,
-        season: data.season ?? null,
-        season_games: data.season_games ?? null,
-        candy: data.candy ?? null,
-        chicken_count: data.chicken_count ?? null,
-      });
-      if (typeof data.fetched_at === "string") {
-        setDrodoLastFetchedAt(data.fetched_at);
-      }
-      if (Array.isArray(data.seasons)) setSeasons(data.seasons);
       trackEvent("Player Refresh Succeeded", {
         route: analyticsRoute(route),
         has_mmr: data.mmr != null,
@@ -352,6 +344,7 @@ export default function PlayerView({
           ? bucketCount(data.refresh_quota.remaining)
           : "unknown",
       });
+      window.location.reload();
     } catch (error) {
       trackEvent("Player Refresh Failed", {
         route: analyticsRoute(route),
@@ -372,7 +365,7 @@ export default function PlayerView({
       <div className={styles.dashboard}>
           {drodo?.mmr != null && (
             <div className={styles.rankLadder}>
-              <RankLadder mmr={drodo.mmr} />
+              <RankLadder mmr={drodo.mmr} queenRank={drodo.queen_rank} />
             </div>
           )}
           <div className={styles.playerHeader}>
@@ -474,7 +467,37 @@ export default function PlayerView({
             </>
           )}
 
-          <MmrSparkline seasons={seasons} snapshots={mmrHistory} />
+          {showQueenRankHistory ? (
+            <div className={styles.historyPanel}>
+              <div className={styles.historyTabs} role="tablist" aria-label="Rating history">
+                <button
+                  type="button"
+                  className={`${styles.historyTab} ${historyTab === "mmr" ? styles.historyTabActive : ""}`}
+                  onClick={() => setHistoryTab("mmr")}
+                  role="tab"
+                  aria-selected={historyTab === "mmr"}
+                >
+                  MMR
+                </button>
+                <button
+                  type="button"
+                  className={`${styles.historyTab} ${historyTab === "queen" ? styles.historyTabActive : ""}`}
+                  onClick={() => setHistoryTab("queen")}
+                  role="tab"
+                  aria-selected={historyTab === "queen"}
+                >
+                  Queen Rank
+                </button>
+              </div>
+              {historyTab === "queen" ? (
+                <QueenRankSparkline snapshots={queenRankHistory} />
+              ) : (
+                <MmrSparkline seasons={seasons} snapshots={mmrHistory} />
+              )}
+            </div>
+          ) : (
+            <MmrSparkline seasons={seasons} snapshots={mmrHistory} />
+          )}
 
           <SeasonHistoryGrid seasons={seasons} />
 

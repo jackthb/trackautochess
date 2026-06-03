@@ -5,9 +5,10 @@ import { createClient } from "@supabase/supabase-js";
 import type { PlayerGame } from "@dac/shared/types";
 import type { SeasonSnapshot } from "@dac/shared/SeasonHistoryGrid";
 import type { MmrSnapshot } from "@/components/MmrSparkline";
+import type { QueenRankSnapshot } from "@/components/QueenRankSparkline";
 import { absoluteUrl, getSiteUrl } from "@/lib/site";
 import { getManualRefreshQuota } from "@/lib/manualRefreshQuota";
-import { fetchAndCacheDrodo } from "@/lib/drodo";
+import { fetchAndCacheDrodo, lastTop3FromDrodoData, lastWinFromDrodoData } from "@/lib/drodo";
 import { fetchSteamProfile } from "@/lib/steam";
 import PlayerView, { type PlayerPageProps } from "@/components/player/PlayerView";
 import {
@@ -73,6 +74,7 @@ const loadPlayer = cache(async (rawSteamId: string): Promise<LoadResult> => {
   let drodoLastFetchedAt = null;
   let seasons: SeasonSnapshot[] = [];
   let mmrHistory: MmrSnapshot[] = [];
+  let queenRankHistory: QueenRankSnapshot[] = [];
   if (supabase) {
     const profilePromise = cachedProfileRow
       ? Promise.resolve({ data: cachedProfileRow })
@@ -91,7 +93,7 @@ const loadPlayer = cache(async (rawSteamId: string): Promise<LoadResult> => {
         .order("season", { ascending: true }),
       supabase
         .from("mmr_snapshots")
-        .select("mmr, snapshotted_at")
+        .select("*")
         .eq("steam_id", steamId)
         .not("mmr", "is", null)
         .order("snapshotted_at", { ascending: false })
@@ -102,6 +104,12 @@ const loadPlayer = cache(async (rawSteamId: string): Promise<LoadResult> => {
       mmr: row.mmr as number | null,
       snapshotted_at: row.snapshotted_at as string,
     }));
+    queenRankHistory = (snapshotsResult.data ?? [])
+      .map((row) => ({
+        queen_rank: typeof row.queen_rank === "number" ? row.queen_rank : null,
+        snapshotted_at: row.snapshotted_at as string,
+      }))
+      .filter((row) => row.queen_rank != null);
     if (profileResult.data) {
       drodoProfileMissing = Boolean(profileResult.data.drodo_profile_missing);
       drodoLastFetchedAt = profileResult.data.drodo_last_fetched_at;
@@ -111,6 +119,8 @@ const loadPlayer = cache(async (rawSteamId: string): Promise<LoadResult> => {
           max_mmr: profileResult.data.drodo_max_mmr,
           mmr_level: profileResult.data.drodo_mmr_level,
           queen_rank: numberFromRawData(profileResult.data.drodo_raw_data, "queen_rank"),
+          last_win_at: profileResult.data.drodo_raw_data ? lastWinFromDrodoData(profileResult.data.drodo_raw_data) : null,
+          last_top3_at: profileResult.data.drodo_raw_data ? lastTop3FromDrodoData(profileResult.data.drodo_raw_data) : null,
           season: profileResult.data.drodo_season,
           season_games: profileResult.data.drodo_season_games,
           candy: profileResult.data.drodo_candy,
@@ -131,6 +141,8 @@ const loadPlayer = cache(async (rawSteamId: string): Promise<LoadResult> => {
           max_mmr: result.profile.max_mmr,
           mmr_level: result.profile.mmr_level,
           queen_rank: numberFromRawData(result.profile.raw_data, "queen_rank"),
+          last_win_at: result.profile.last_win_at,
+          last_top3_at: result.profile.last_top3_at,
           season: result.profile.season,
           season_games: result.profile.season_games,
           candy: result.profile.candy,
@@ -212,6 +224,7 @@ const loadPlayer = cache(async (rawSteamId: string): Promise<LoadResult> => {
       drodo,
       seasons,
       mmrHistory,
+      queenRankHistory,
       leaderboardPosition: null,
       drodoProfileMissing,
       drodoLastFetchedAt,

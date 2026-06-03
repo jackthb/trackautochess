@@ -36,6 +36,8 @@ export interface DrodoProfileRow {
   max_mmr: number | null;
   mmr_level: number | null;
   queen_rank: number | null;
+  last_win_at: string | number | null;
+  last_top3_at: string | number | null;
   season: string | null;
   season_games: number | null;
   candy: number | null;
@@ -131,6 +133,46 @@ function numberFromDrodoData(
   return null;
 }
 
+function valueFromDrodoData(
+  data: Record<string, unknown>,
+  keys: string[]
+): string | number | null {
+  for (const key of keys) {
+    const value = data[key];
+    if (typeof value === "string" && value.trim()) return value;
+    if (typeof value === "number" && Number.isFinite(value)) return value;
+  }
+  return null;
+}
+
+export function lastWinFromDrodoData(data: Record<string, unknown>): string | number | null {
+  return valueFromDrodoData(data, [
+    "last_win_at",
+    "last_win_date",
+    "last_win_time",
+    "last_top1_at",
+    "last_top1_date",
+    "last_top1_time",
+    "top1_at",
+    "top1_date",
+    "top1_time",
+    "last_chicken_at",
+    "last_chicken_date",
+    "last_chicken_time",
+  ]);
+}
+
+export function lastTop3FromDrodoData(data: Record<string, unknown>): string | number | null {
+  return valueFromDrodoData(data, [
+    "last_top3_at",
+    "last_top3_date",
+    "last_top3_time",
+    "top3_at",
+    "top3_date",
+    "top3_time",
+  ]);
+}
+
 export function buildDrodoProfile(
   steamId: string,
   drodoData: Record<string, unknown>
@@ -147,6 +189,8 @@ export function buildDrodoProfile(
       max_mmr: maxMmrKey ? Number(drodoData[maxMmrKey]) || null : null,
       mmr_level: Number(drodoData.mmr_level) || null,
       queen_rank: numberFromDrodoData(drodoData, "queen_rank"),
+      last_win_at: lastWinFromDrodoData(drodoData),
+      last_top3_at: lastTop3FromDrodoData(drodoData),
       season,
       season_games: matchKey ? Number(drodoData[matchKey]) || null : null,
       candy: Number(drodoData.candy) || null,
@@ -200,6 +244,8 @@ export function cachedUserToDrodoProfile(row: CachedUserDrodoRow): DrodoProfileR
     queen_rank: row.drodo_raw_data
       ? numberFromDrodoData(row.drodo_raw_data, "queen_rank")
       : null,
+    last_win_at: row.drodo_raw_data ? lastWinFromDrodoData(row.drodo_raw_data) : null,
+    last_top3_at: row.drodo_raw_data ? lastTop3FromDrodoData(row.drodo_raw_data) : null,
     season: row.drodo_season,
     season_games: row.drodo_season_games,
     candy: row.drodo_candy,
@@ -484,9 +530,10 @@ export async function fetchAndCacheDrodo(
           mmr: profile.mmr,
           season: profile.season,
           chicken_count: profile.chicken_count,
+          queen_rank: profile.queen_rank,
           snapshotted_at: new Date().toISOString(),
         },
-        { onConflict: "steam_id,season,mmr,chicken_count" }
+        { onConflict: "steam_id,season,mmr,chicken_count,queen_rank" }
       );
     if (snapshotError) {
       console.error("Failed to upsert mmr_snapshot:", snapshotError.message);

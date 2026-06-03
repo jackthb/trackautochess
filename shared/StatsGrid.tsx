@@ -16,7 +16,6 @@ export function StatsGrid({ items }: { items: StatItem[] }) {
         <div key={item.key} className="stat-cell">
           <div className={`stat-value ${item.tone ?? "default"}`}>{item.value}</div>
           <div className="stat-label">{item.label}</div>
-          {item.source && <div className="stat-source">{item.source}</div>}
         </div>
       ))}
     </div>

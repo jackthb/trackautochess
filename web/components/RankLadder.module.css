@@ -25,8 +25,15 @@
 .row {
   display: flex;
   align-items: center;
+  gap: 8px;
   padding: 6px 14px;
   line-height: 1.4;
+}
+.position {
+  color: var(--gold, #d4af37);
+  font-size: var(--fs-11, 11px);
+  font-variant-numeric: tabular-nums;
+  min-width: 28px;
 }
 .rank {
   flex: 1;
