@@ -16,6 +16,7 @@ interface EntityCardProps {
   level?: string | number;
   /** Hover border/glow color. Defaults by variant. */
   accentColor?: string;
+  onClick?: () => void;
 }
 
 const DEFAULT_ACCENT: Record<EntityCardVariant, string> = {
@@ -34,6 +35,7 @@ export function EntityCard({
   variant,
   level,
   accentColor,
+  onClick,
 }: EntityCardProps) {
   const accent = accentColor ?? DEFAULT_ACCENT[variant];
 
@@ -42,6 +44,7 @@ export function EntityCard({
       href={href}
       className={`${styles.card} ${styles[variant]}`}
       style={{ "--card-accent": accent } as CSSProperties}
+      onClick={onClick}
     >
       <EntityIcon src={iconSrc} alt={iconAlt} size="sm" bordered={variant !== "unit"} />
       <div className={styles.body}>

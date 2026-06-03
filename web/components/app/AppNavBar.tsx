@@ -141,46 +141,49 @@ export function AppNavBar({ supabase }: AppNavBarProps) {
       ? user.user_metadata.steam_id
       : null;
   const canSeeBetaFeatures = useBetaFeaturesEnabled(sessionSteamId);
+  const trackNavClick = (destination: string) => {
+    trackEvent("Navigation Link Clicked", { source: "nav", destination });
+  };
 
   const navLinks = (
     <>
-      <Link href="/items" className={styles.navLink}>
+      <Link href="/items" className={styles.navLink} onClick={() => trackNavClick("items")}>
         {t.items}
       </Link>
-      <Link href="/units" className={styles.navLink}>
+      <Link href="/units" className={styles.navLink} onClick={() => trackNavClick("units")}>
         {t.units}
       </Link>
-      <Link href="/classes" className={styles.navLink}>
+      <Link href="/classes" className={styles.navLink} onClick={() => trackNavClick("classes")}>
         {t.classes}
       </Link>
-      <Link href="/species" className={styles.navLink}>
+      <Link href="/species" className={styles.navLink} onClick={() => trackNavClick("species")}>
         {t.species}
       </Link>
-      <Link href="/relics" className={styles.navLink}>
+      <Link href="/relics" className={styles.navLink} onClick={() => trackNavClick("relics")}>
         {t.relics}
       </Link>
-      <Link href="/talents" className={styles.navLink}>
+      <Link href="/talents" className={styles.navLink} onClick={() => trackNavClick("talents")}>
         {t.talents}
       </Link>
-      <Link href="/ranks" className={styles.navLink}>
+      <Link href="/ranks" className={styles.navLink} onClick={() => trackNavClick("ranks")}>
         {t.ranks}
       </Link>
       {canSeeBetaFeatures && (
-        <Link href="/queens" className={styles.navLink}>
+        <Link href="/queens" className={styles.navLink} onClick={() => trackNavClick("queens")}>
           {t.queens}
         </Link>
       )}
       {canSeeBetaFeatures && (
-        <Link href="/leaderboard" className={styles.navLink}>
+        <Link href="/leaderboard" className={styles.navLink} onClick={() => trackNavClick("leaderboard")}>
           {t.leaderboard}
         </Link>
       )}
       {canSeeBetaFeatures && (
-        <Link href="/matches" className={styles.navLink}>
+        <Link href="/matches" className={styles.navLink} onClick={() => trackNavClick("matches")}>
           {t.matches}
         </Link>
       )}
-      <Link href="/patch-notes" className={styles.navLink}>
+      <Link href="/patch-notes" className={styles.navLink} onClick={() => trackNavClick("patch_notes")}>
         {t.patchNotes}
       </Link>
     </>
@@ -199,7 +202,7 @@ export function AppNavBar({ supabase }: AppNavBarProps) {
           {ready ? (
             user ? (
               <>
-                <Link href="/dashboard" className={styles.navUserLink}>
+                <Link href="/dashboard" className={styles.navUserLink} onClick={() => trackNavClick("dashboard")}>
                   {avatarUrl ? (
                     <img
                       className={styles.navAvatar}

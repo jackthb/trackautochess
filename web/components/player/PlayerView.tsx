@@ -13,6 +13,7 @@ import { SeasonHistoryGrid, type SeasonSnapshot } from "@dac/shared/SeasonHistor
 import { MmrSparkline, type MmrSnapshot } from "@/components/MmrSparkline";
 import { QueenRankSparkline, type QueenRankSnapshot } from "@/components/QueenRankSparkline";
 import { RankLadder } from "@/components/RankLadder";
+import { SteamSignInButton } from "@/components/SteamSignInButton";
 import {
   getManualRefreshQuota,
   type ManualRefreshQuota,
@@ -27,6 +28,8 @@ import {
 import styles from "./PlayerView.module.css";
 
 const LAST_FETCHED_TICK_MS = 1000;
+const ANONYMOUS_PROFILE_SEEN_KEY = "dac.anonymous_profile_seen";
+const ANONYMOUS_RETURN_PROMPT_KEY = "dac.anonymous_return_prompt_seen";
 
 // item_* id → relic display info, so the match-history rows can render the
 // full relic_history pick list (not just the single active `relic`).
@@ -110,6 +113,117 @@ function formatLastFetchedAge(value: string | null, nowMs: number | null) {
   return `${Math.floor(hours / 24)}d ${hours % 24}h ago`;
 }
 
+function latestMmrDelta(snapshots: MmrSnapshot[]) {
+  const points = snapshots
+    .filter((snapshot): snapshot is MmrSnapshot & { mmr: number } =>
+      typeof snapshot.mmr === "number"
+    )
+    .slice()
+    .sort(
+      (a, b) =>
+        new Date(a.snapshotted_at).getTime() -
+        new Date(b.snapshotted_at).getTime()
+    );
+
+  if (points.length < 2) return null;
+  const previous = points[points.length - 2];
+  const latest = points[points.length - 1];
+  return {
+    delta: latest.mmr - previous.mmr,
+    latestMmr: latest.mmr,
+    previousMmr: previous.mmr,
+  };
+}
+
+function HistoryLockedPanel() {
+  return (
+    <section className={styles.historyLocked} aria-label="Locked MMR history">
+      <div className={styles.historyLockedGlow} aria-hidden="true" />
+      <div className={styles.historyLockedChart} aria-hidden="true">
+        <span />
+        <span />
+        <span />
+        <span />
+      </div>
+      <div className={styles.historyLockedCopy}>
+        <div className={styles.historyLockedEyebrow}>Login-only history</div>
+        <h2>Sign in via Steam to view the MMR graph.</h2>
+        <p>
+          MMR history, season history, Queen Rank trends, and session-to-session
+          deltas are now reserved for logged-in Steam users.
+        </p>
+        <SteamTrustNote source="player_history_lock" />
+      </div>
+      <div className={styles.historyLockedAction}>
+        <SteamSignInButton source="player_history_lock" size="md" />
+      </div>
+    </section>
+  );
+}
+
+function SteamTrustNote({ source }: { source: string }) {
+  return (
+    <details
+      className={styles.steamTrustNote}
+      onToggle={(event) => {
+        if (event.currentTarget.open) {
+          trackEvent("Steam Sign In Reassurance Expanded", { source });
+        }
+      }}
+    >
+      <summary>
+        <span className={styles.steamTrustIcon} aria-hidden="true">i</span>
+        Worried about Steam sign-in?
+      </summary>
+      <p>
+        You sign in on <strong>steamcommunity.com</strong> using Steam OpenID.
+        Track Auto Chess never sees your Steam password and cannot access your
+        items or inventory; Steam only sends us your SteamID so we know which
+        profile is yours.
+      </p>
+      <a
+        href="https://partner.steamgames.com/doc/features/auth#website"
+        target="_blank"
+        rel="noopener noreferrer"
+        onClick={() => trackEvent("Steam Sign In Reassurance Link Clicked", { source })}
+      >
+        Read Valve's OpenID sign-in docs
+      </a>
+    </details>
+  );
+}
+
+function MmrDeltaCard({ snapshots }: { snapshots: MmrSnapshot[] }) {
+  const delta = latestMmrDelta(snapshots);
+  if (!delta) return null;
+
+  const positive = delta.delta > 0;
+  const neutral = delta.delta === 0;
+  const signedDelta = neutral
+    ? "±0"
+    : `${positive ? "+" : ""}${delta.delta}`;
+
+  return (
+    <div className={styles.deltaCard}>
+      <span className={styles.deltaLabel}>Since last refresh</span>
+      <strong
+        className={
+          positive
+            ? styles.deltaPositive
+            : neutral
+              ? styles.deltaNeutral
+              : styles.deltaNegative
+        }
+      >
+        {signedDelta} MMR
+      </strong>
+      <span className={styles.deltaMeta}>
+        {delta.previousMmr} → {delta.latestMmr}
+      </span>
+    </div>
+  );
+}
+
 export default function PlayerView({
   route,
   steamId,
@@ -143,6 +257,8 @@ export default function PlayerView({
   const [avatarFailed, setAvatarFailed] = useState(false);
   const [sessionSteamId, setSessionSteamId] = useState<string | null>(null);
   const [accessToken, setAccessToken] = useState<string | null>(null);
+  const [authReady, setAuthReady] = useState(false);
+  const [showReturnPrompt, setShowReturnPrompt] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -151,7 +267,10 @@ export default function PlayerView({
     void import("@/lib/supabase").then(({ createSupabaseClient }) => {
       if (cancelled) return;
       const supabase = createSupabaseClient();
-      if (!supabase) return;
+      if (!supabase) {
+        setAuthReady(true);
+        return;
+      }
 
       supabase.auth.getSession().then(({ data }) => {
         if (cancelled) return;
@@ -163,6 +282,7 @@ export default function PlayerView({
           meta && typeof meta.steam_id === "string" ? meta.steam_id : null
         );
         setAccessToken(data.session?.access_token ?? null);
+        setAuthReady(true);
       });
       const {
         data: { subscription },
@@ -175,6 +295,7 @@ export default function PlayerView({
           meta && typeof meta.steam_id === "string" ? meta.steam_id : null
         );
         setAccessToken(session?.access_token ?? null);
+        setAuthReady(true);
       });
       unsubscribe = () => subscription.unsubscribe();
     });
@@ -187,6 +308,7 @@ export default function PlayerView({
 
   const isAdmin = isAdminSteamId(sessionSteamId);
   const isOwnProfile = sessionSteamId !== null && sessionSteamId === steamId;
+  const canViewHistory = authReady && sessionSteamId !== null;
   const canRefresh = isAdmin || isOwnProfile;
   const displayName = steamProfile.name || steamProfile.customUrl || steamId;
   const profileUrl = steamProfileUrl(steamId, steamProfile.customUrl);
@@ -234,6 +356,40 @@ export default function PlayerView({
     route,
     steamId,
   ]);
+
+  useEffect(() => {
+    if (!authReady) return;
+    if (sessionSteamId) {
+      setShowReturnPrompt(false);
+      return;
+    }
+
+    const hasVisitedBefore = window.localStorage.getItem(ANONYMOUS_PROFILE_SEEN_KEY) === "1";
+    const hasSeenPrompt = window.localStorage.getItem(ANONYMOUS_RETURN_PROMPT_KEY) === "1";
+    window.localStorage.setItem(ANONYMOUS_PROFILE_SEEN_KEY, "1");
+
+    if (hasVisitedBefore && !hasSeenPrompt) {
+      setShowReturnPrompt(true);
+      window.localStorage.setItem(ANONYMOUS_RETURN_PROMPT_KEY, "1");
+      trackEvent("Returning Anonymous Prompt Viewed", {
+        route: analyticsRoute(route),
+      });
+    }
+  }, [authReady, route, sessionSteamId]);
+
+  useEffect(() => {
+    if (!authReady || canViewHistory) return;
+    trackEvent("Player History Locked Viewed", {
+      route: analyticsRoute(route),
+    });
+  }, [authReady, canViewHistory, route]);
+
+  const dismissReturnPrompt = () => {
+    setShowReturnPrompt(false);
+    trackEvent("Returning Anonymous Prompt Dismissed", {
+      route: analyticsRoute(route),
+    });
+  };
 
   const lastFetchedTimestamp = formatLastFetchedTimestamp(drodoLastFetchedAt);
   const lastFetchedAge = formatLastFetchedAge(drodoLastFetchedAt, nowMs);
@@ -362,6 +518,28 @@ export default function PlayerView({
 
   return (
     <div className={styles.page}>
+      {showReturnPrompt && (
+        <div className={styles.returnPrompt} role="dialog" aria-live="polite" aria-label="Sign in reminder">
+          <div className={styles.returnPromptPanel}>
+            <button
+              type="button"
+              className={styles.returnPromptClose}
+              onClick={dismissReturnPrompt}
+              aria-label="Dismiss sign in reminder"
+            >
+              ×
+            </button>
+            <div className={styles.returnPromptEyebrow}>Welcome back</div>
+            <h2>Log in once to keep your Auto Chess history unlocked.</h2>
+            <p>
+              We remember you have visited before, but not which Steam profile is yours.
+              Sign in to unlock MMR graphs, season history, and session deltas.
+            </p>
+            <SteamTrustNote source="returning_anonymous_prompt" />
+            <SteamSignInButton source="returning_anonymous_prompt" size="md" />
+          </div>
+        </div>
+      )}
       <div className={styles.dashboard}>
           {drodo?.mmr != null && (
             <div className={styles.rankLadder}>
@@ -467,39 +645,46 @@ export default function PlayerView({
             </>
           )}
 
-          {showQueenRankHistory ? (
-            <div className={styles.historyPanel}>
-              <div className={styles.historyTabs} role="tablist" aria-label="Rating history">
-                <button
-                  type="button"
-                  className={`${styles.historyTab} ${historyTab === "mmr" ? styles.historyTabActive : ""}`}
-                  onClick={() => setHistoryTab("mmr")}
-                  role="tab"
-                  aria-selected={historyTab === "mmr"}
-                >
-                  MMR
-                </button>
-                <button
-                  type="button"
-                  className={`${styles.historyTab} ${historyTab === "queen" ? styles.historyTabActive : ""}`}
-                  onClick={() => setHistoryTab("queen")}
-                  role="tab"
-                  aria-selected={historyTab === "queen"}
-                >
-                  Queen Rank
-                </button>
-              </div>
-              {historyTab === "queen" ? (
-                <QueenRankSparkline snapshots={queenRankHistory} />
+          {canViewHistory ? (
+            <>
+              <MmrDeltaCard snapshots={mmrHistory} />
+              {showQueenRankHistory ? (
+                <div className={styles.historyPanel}>
+                  <div className={styles.historyTabs} role="tablist" aria-label="Rating history">
+                    <button
+                      type="button"
+                      className={`${styles.historyTab} ${historyTab === "mmr" ? styles.historyTabActive : ""}`}
+                      onClick={() => setHistoryTab("mmr")}
+                      role="tab"
+                      aria-selected={historyTab === "mmr"}
+                    >
+                      MMR
+                    </button>
+                    <button
+                      type="button"
+                      className={`${styles.historyTab} ${historyTab === "queen" ? styles.historyTabActive : ""}`}
+                      onClick={() => setHistoryTab("queen")}
+                      role="tab"
+                      aria-selected={historyTab === "queen"}
+                    >
+                      Queen Rank
+                    </button>
+                  </div>
+                  {historyTab === "queen" ? (
+                    <QueenRankSparkline snapshots={queenRankHistory} />
+                  ) : (
+                    <MmrSparkline seasons={seasons} snapshots={mmrHistory} />
+                  )}
+                </div>
               ) : (
                 <MmrSparkline seasons={seasons} snapshots={mmrHistory} />
               )}
-            </div>
-          ) : (
-            <MmrSparkline seasons={seasons} snapshots={mmrHistory} />
-          )}
 
-          <SeasonHistoryGrid seasons={seasons} />
+              <SeasonHistoryGrid seasons={seasons} />
+            </>
+          ) : authReady ? (
+            <HistoryLockedPanel />
+          ) : null}
 
           {games.length > 0 && (
             <>

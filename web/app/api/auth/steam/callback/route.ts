@@ -36,13 +36,25 @@ async function verifySteamAssertion(
 
 export async function GET(req: Request) {
   const url = new URL(req.url);
-  const fail = (error: string) =>
-    NextResponse.redirect(new URL(`/?error=${error}`, req.url));
+  const fail = async (error: string, steamId?: string | null) => {
+    if (steamId) {
+      await captureServerEvent("Steam Sign In Failed", steamId, {
+        source: "steam_auth_callback",
+        reason: error,
+      });
+    }
+
+    return NextResponse.redirect(new URL(`/?error=${error}`, req.url));
+  };
 
   const steamId = await verifySteamAssertion(url.searchParams);
   if (!steamId) {
     return fail("steam_auth_failed");
   }
+
+  await captureServerEvent("Steam Sign In Callback Verified", steamId, {
+    source: "steam_auth_callback",
+  });
 
   const steamProfile = await fetchSteamProfileFromApi(steamId);
   const steamName = steamProfile.name || steamId;
@@ -68,9 +80,10 @@ export async function GET(req: Request) {
     await supabaseAdmin.auth.admin.listUsers();
   if (listError) {
     console.error("Failed to list users:", listError.message);
-    return fail("list_users_failed");
+    return fail("list_users_failed", steamId);
   }
-  let user = users?.users?.find((u) => u.email === email);
+  const existingUser = users?.users?.find((u) => u.email === email);
+  let user = existingUser;
   console.log("Existing user:", user?.id || "none");
 
   if (!user) {
@@ -87,7 +100,7 @@ export async function GET(req: Request) {
     });
     if (error) {
       console.error("Failed to create user:", error.message);
-      return fail("user_creation_failed");
+      return fail("user_creation_failed", steamId);
     }
     user = data.user;
     await captureServerEvent("user_signed_up", steamId, {
@@ -121,7 +134,7 @@ export async function GET(req: Request) {
   );
   if (linkError || !linkData?.properties?.hashed_token) {
     console.error("Failed to generate link:", linkError?.message);
-    return fail("session_failed");
+    return fail("session_failed", steamId);
   }
 
   // Verify the token server-side to get a session
@@ -142,14 +155,22 @@ export async function GET(req: Request) {
   console.log("Verify response:", verifyResp.status, verifyBody.substring(0, 300));
   if (!verifyResp.ok) {
     console.error("Token verify failed:", verifyResp.status, verifyBody);
-    return fail("session_failed");
+    return fail("session_failed", steamId);
   }
 
   const session = JSON.parse(verifyBody);
   if (!session.access_token || !session.refresh_token) {
     console.error("No tokens in verify response:", JSON.stringify(session));
-    return fail("session_failed");
+    return fail("session_failed", steamId);
   }
+
+  await captureServerEvent("Steam Sign In Completed", steamId, {
+    source: "steam_auth_callback",
+    user_created: !existingUser,
+    has_custom_url: Boolean(steamProfile.customUrl),
+    has_avatar: Boolean(steamProfile.avatarUrl),
+    user_id: user.id,
+  });
 
   // Redirect with tokens in hash fragment — Supabase JS client picks these up
   // automatically via onAuthStateChange.

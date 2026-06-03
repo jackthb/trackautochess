@@ -190,6 +190,12 @@ export function EntityBrowser({
 
                         variant={variant}
                         accentColor={color}
+                        onClick={() =>
+                          trackEvent("Entity Card Clicked", {
+                            entity_type: variant,
+                            source: "entity_browser",
+                          })
+                        }
                       />
                     ))}
                   </div>
@@ -212,6 +218,12 @@ export function EntityBrowser({
                     name={entity.name}
                     description={entity.description}
                     variant={variant}
+                    onClick={() =>
+                      trackEvent("Entity Card Clicked", {
+                        entity_type: variant,
+                        source: "entity_browser",
+                      })
+                    }
                   />
                 ))}
               </div>

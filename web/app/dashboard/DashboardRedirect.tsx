@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createSupabaseClient } from "@/lib/supabase";
+import { trackEvent } from "@/lib/analytics";
 import { playerProfilePath } from "@/lib/steam";
 import styles from "./dashboard.module.css";
 
@@ -18,6 +19,7 @@ export function DashboardRedirect() {
   useEffect(() => {
     const supabase = createSupabaseClient();
     if (!supabase) {
+      trackEvent("Dashboard Redirect Failed", { reason: "supabase_unavailable" });
       router.replace("/");
       return;
     }
@@ -25,14 +27,17 @@ export function DashboardRedirect() {
     supabase.auth.getUser().then(({ data: { user } }) => {
       setLoading(false);
       if (!user) {
+        trackEvent("Dashboard Redirect Failed", { reason: "signed_out" });
         router.replace("/");
         return;
       }
       const steamId = user.user_metadata?.steam_id;
       const customUrl = user.user_metadata?.custom_url;
       if (steamId) {
+        trackEvent("Dashboard Redirect Completed", { destination: "player_profile" });
         router.replace(playerProfilePath(steamId, customUrl));
       } else {
+        trackEvent("Dashboard Redirect Failed", { reason: "missing_steam_id" });
         router.replace("/");
       }
     });

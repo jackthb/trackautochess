@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { trackEvent } from "@/lib/analytics";
 import { getPostHog } from "@/lib/posthog";
 import styles from "./CookieConsentBanner.module.css";
 
@@ -45,6 +46,7 @@ export function CookieConsentBanner() {
     void getPostHog()
       .then((posthog) => {
         posthog?.opt_in_capturing();
+        trackEvent("Analytics Consent Granted", { source: "cookie_banner" });
         setStatus("granted");
       })
       .finally(() => setSaving(false));
@@ -55,6 +57,7 @@ export function CookieConsentBanner() {
     void getPostHog()
       .then((posthog) => {
         posthog?.opt_out_capturing();
+        trackEvent("Analytics Consent Denied", { source: "cookie_banner" });
         setStatus("denied");
       })
       .finally(() => setSaving(false));
