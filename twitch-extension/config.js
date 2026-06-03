@@ -1,8 +1,8 @@
 // Track Auto Chess — Twitch Extension config view.
 //
-// Broadcaster enters their Steam ID (numeric or vanity slug). We validate
-// against the same /api/twitch/<id>/stats endpoint the panel uses, then
-// persist via Twitch.ext.configuration.set so the panel can read it.
+// Broadcaster enters their Steam username / vanity slug or SteamID64. We
+// validate against the same /api/twitch/<id>/stats endpoint the panel uses,
+// then persist via Twitch.ext.configuration.set so the panel can read it.
 
 // www. directly — apex redirects to www and CORS fetches don't survive
 // cross-origin redirects.
@@ -42,11 +42,14 @@ function readCurrentConfig() {
   if (!raw) return null;
   try {
     const parsed = JSON.parse(raw);
+    if (typeof parsed.steamInput === "string" && parsed.steamInput.trim()) {
+      return { steamInput: parsed.steamInput.trim() };
+    }
     if (typeof parsed.steamId === "string" && parsed.steamId.trim()) {
-      return { steamId: parsed.steamId.trim() };
+      return { steamInput: parsed.steamId.trim() };
     }
   } catch {
-    return raw.trim() ? { steamId: raw.trim() } : null;
+    return raw.trim() ? { steamInput: raw.trim() } : null;
   }
   return null;
 }
@@ -68,14 +71,14 @@ async function showCurrent() {
     els.current.classList.add("hidden");
     return;
   }
-  els.input.value = cfg.steamId;
+  els.input.value = cfg.steamInput;
   try {
-    const player = await validate(cfg.steamId);
-    els.currentName.textContent = `${player.name || cfg.steamId} (${cfg.steamId})`;
+    const player = await validate(cfg.steamInput);
+    els.currentName.textContent = `${player.name || cfg.steamInput} (${cfg.steamInput})`;
     els.currentProfile.href = player.profile_url;
     els.current.classList.remove("hidden");
   } catch {
-    els.currentName.textContent = cfg.steamId;
+    els.currentName.textContent = cfg.steamInput;
     els.currentProfile.href = "#";
     els.current.classList.remove("hidden");
   }
@@ -85,7 +88,7 @@ async function onSubmit(e) {
   e.preventDefault();
   const input = els.input.value.trim();
   if (!input) {
-    setStatus("error", "Enter a Steam ID or vanity slug.");
+    setStatus("error", "Enter a Steam username or SteamID64.");
     return;
   }
 
@@ -94,7 +97,7 @@ async function onSubmit(e) {
 
   try {
     const player = await validate(input);
-    const payload = JSON.stringify({ steamId: input });
+    const payload = JSON.stringify({ steamInput: input });
 
     if (window.Twitch?.ext?.configuration?.set) {
       window.Twitch.ext.configuration.set(
@@ -104,7 +107,7 @@ async function onSubmit(e) {
       );
       setStatus(
         "success",
-        `Linked to ${player.name || input}. The panel will refresh on viewers' pages.`
+        `Linked to ${player.name || input}. The panel will refresh for viewers every 30 minutes.`
       );
       await showCurrent();
     } else {

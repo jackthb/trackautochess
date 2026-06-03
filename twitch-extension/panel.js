@@ -1,15 +1,12 @@
 // Track Auto Chess — Twitch panel extension.
 //
-// Reads the broadcaster's configured Steam ID, polls our public stats
-// endpoint, renders compact stats + MMR sparkline. Auto-refreshes every
-// 60s while visible.
+// Reads the broadcaster's configured Steam username / SteamID64, loads the
+// public rank endpoint, and refreshes every 30 minutes. The panel intentionally
+// stays tiny and only shows the current rank — no match history.
 
 // Default to prod; override with ?api=http://localhost:3000 when previewing
-// locally. Twitch's hosted iframe always runs on a *.ext-twitch.tv origin so
-// the override is dev-only.
-// Use the www host directly — the apex (trackautochess.com) returns a 307
-// to www, and browser CORS fetches don't reliably survive cross-origin
-// redirects. Hitting the final host avoids the round-trip and the failure.
+// locally. Use the www host directly so browser CORS fetches do not follow a
+// cross-origin redirect from the apex domain.
 const DEFAULT_API_HOST = "https://www.trackautochess.com";
 const API_HOST = (() => {
   try {
@@ -18,7 +15,7 @@ const API_HOST = (() => {
   } catch {}
   return DEFAULT_API_HOST;
 })();
-const POLL_INTERVAL_MS = 60_000;
+const POLL_INTERVAL_MS = 30 * 60 * 1000;
 
 const els = {
   loading: document.getElementById("loading"),
@@ -27,25 +24,13 @@ const els = {
   error: document.getElementById("error"),
   avatar: document.getElementById("avatar"),
   name: document.getElementById("name"),
-  rankLine: document.getElementById("rank-line"),
+  rank: document.getElementById("rank"),
   mmr: document.getElementById("mmr"),
-  maxMmr: document.getElementById("max-mmr"),
-  games: document.getElementById("games"),
-  chickens: document.getElementById("chickens"),
-  totalChickens: document.getElementById("total-chickens"),
-  lifetimePeak: document.getElementById("lifetime-peak"),
-  totalGames: document.getElementById("total-games"),
-  candy: document.getElementById("candy"),
-  graphWrap: document.getElementById("graph-wrap"),
-  graph: document.getElementById("graph"),
+  ladder: document.getElementById("ladder"),
+  season: document.getElementById("season"),
+  updated: document.getElementById("updated"),
   profileLink: document.getElementById("profile-link"),
 };
-
-const SVG_NS = "http://www.w3.org/2000/svg";
-const GRAPH_W = 280;
-const GRAPH_H = 90;
-const GRAPH_PAD_X = 6;
-const GRAPH_PAD_Y = 10;
 
 let pollHandle = null;
 let lastSteamId = null;
@@ -60,115 +45,30 @@ function fmt(value) {
   return value == null ? "—" : value.toLocaleString("en-US");
 }
 
-function buildGraphPoints(seasons, history) {
-  const seasonPoints = (seasons || [])
-    .filter((s) => typeof s.mmr === "number")
-    .slice()
-    .sort((a, b) => String(a.season).localeCompare(String(b.season)))
-    .map((s) => ({ mmr: s.mmr, kind: "season" }));
-  const snapshotPoints = (history || [])
-    .filter((s) => typeof s.mmr === "number")
-    .slice()
-    .sort(
-      (a, b) =>
-        new Date(a.snapshotted_at).getTime() -
-        new Date(b.snapshotted_at).getTime()
-    )
-    .map((s) => ({ mmr: s.mmr, kind: "snapshot" }));
-  return [...seasonPoints, ...snapshotPoints];
-}
-
-function svgEl(tag, attrs) {
-  const node = document.createElementNS(SVG_NS, tag);
-  for (const [k, v] of Object.entries(attrs)) node.setAttribute(k, String(v));
-  return node;
-}
-
-function renderGraph(seasons, history) {
-  const points = buildGraphPoints(seasons, history);
-  while (els.graph.firstChild) els.graph.removeChild(els.graph.firstChild);
-  if (points.length < 2) {
-    els.graphWrap.classList.add("hidden");
-    return;
-  }
-  const mmrs = points.map((p) => p.mmr);
-  const minMmr = Math.min(...mmrs);
-  const maxMmr = Math.max(...mmrs);
-  const range = maxMmr - minMmr || 1;
-  const innerW = GRAPH_W - GRAPH_PAD_X * 2;
-  const innerH = GRAPH_H - GRAPH_PAD_Y * 2;
-  const coords = points.map((p, i) => ({
-    x: GRAPH_PAD_X + (i / (points.length - 1)) * innerW,
-    y: GRAPH_PAD_Y + innerH - ((p.mmr - minMmr) / range) * innerH,
-    mmr: p.mmr,
-    kind: p.kind,
-  }));
-  const polyPoints = coords.map((c) => `${c.x},${c.y}`).join(" ");
-  const first = coords[0];
-  const last = coords[coords.length - 1];
-
-  els.graph.appendChild(
-    svgEl("polygon", {
-      class: "area",
-      points: `${first.x},${GRAPH_H - GRAPH_PAD_Y} ${polyPoints} ${last.x},${GRAPH_H - GRAPH_PAD_Y}`,
-    })
-  );
-  els.graph.appendChild(
-    svgEl("polyline", { class: "line", points: polyPoints })
-  );
-  for (let i = 0; i < coords.length - 1; i++) {
-    const c = coords[i];
-    els.graph.appendChild(
-      svgEl("circle", {
-        class: `dot ${c.kind}`,
-        cx: c.x,
-        cy: c.y,
-        r: c.kind === "season" ? 2.4 : 1.6,
-      })
-    );
-  }
-  els.graph.appendChild(
-    svgEl("circle", { class: "last-dot", cx: last.x, cy: last.y, r: 2.6 })
-  );
-  const label = svgEl("text", {
-    class: "axis",
-    x: last.x - 4,
-    y: last.y - 5,
-    "text-anchor": "end",
-  });
-  label.textContent = String(last.mmr);
-  els.graph.appendChild(label);
-
-  els.graphWrap.classList.remove("hidden");
+function formatUpdated(iso) {
+  if (!iso) return "Refreshes every 30 min";
+  const date = new Date(iso);
+  if (Number.isNaN(date.getTime())) return "Refreshes every 30 min";
+  return `Updated ${date.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })} · refreshes every 30 min`;
 }
 
 function render(data) {
   els.avatar.src = data.player.avatar_url || "";
+  els.avatar.classList.toggle("hidden", !data.player.avatar_url);
   els.name.textContent = data.player.name || data.player.steam_id;
-  els.name.href = data.player.profile_url;
   els.profileLink.href = data.player.profile_url;
 
-  const rankBits = [];
-  if (data.stats.rank) rankBits.push(data.stats.rank);
-  if (data.stats.season) rankBits.push(data.stats.season.toUpperCase());
-  els.rankLine.textContent = rankBits.join(" · ");
+  els.rank.textContent = data.stats.rank || "Unranked";
+  els.mmr.textContent = data.stats.mmr != null ? `${fmt(data.stats.mmr)} MMR` : "No MMR yet";
+  els.season.textContent = data.stats.season ? data.stats.season.toUpperCase() : "";
+  els.updated.textContent = formatUpdated(data.generated_at);
 
-  els.mmr.textContent = fmt(data.stats.mmr);
-  els.maxMmr.textContent = fmt(data.stats.max_mmr);
-  els.games.textContent = fmt(data.stats.games_played);
-  els.chickens.textContent =
-    data.stats.chicken_count != null
-      ? `${fmt(data.stats.chicken_count)}${data.stats.chicken_pct != null ? ` (${data.stats.chicken_pct}%)` : ""}`
-      : "—";
-  els.totalChickens.textContent = fmt(data.stats.total_chicken_count);
-  els.lifetimePeak.textContent = fmt(data.stats.lifetime_peak_mmr);
-  els.totalGames.textContent =
-    data.stats.total_games_played != null
-      ? `${fmt(data.stats.total_games_played)}${data.stats.seasons_played ? ` · ${data.stats.seasons_played}s` : ""}`
-      : "—";
-  els.candy.textContent = fmt(data.stats.candy);
-
-  renderGraph(data.seasons, data.mmr_history);
+  if (data.stats.queen_ladder_rank != null) {
+    els.ladder.textContent = `Queen ladder #${fmt(data.stats.queen_ladder_rank)}`;
+    els.ladder.classList.remove("hidden");
+  } else {
+    els.ladder.classList.add("hidden");
+  }
 
   show("content");
 }
@@ -176,15 +76,16 @@ function render(data) {
 async function fetchStats(steamId) {
   try {
     const resp = await fetch(
-      `${API_HOST}/api/twitch/${encodeURIComponent(steamId)}/stats`
+      `${API_HOST}/api/twitch/${encodeURIComponent(steamId)}/stats`,
+      { cache: "no-store" }
     );
     if (resp.status === 404) {
-      els.error.textContent = "Profile not found.";
+      els.error.textContent = "Profile not found. Check the username in setup.";
       show("error");
       return;
     }
     if (!resp.ok) {
-      els.error.textContent = `Failed to load (HTTP ${resp.status}).`;
+      els.error.textContent = `Failed to load rank (HTTP ${resp.status}).`;
       show("error");
       return;
     }
@@ -204,27 +105,25 @@ function startPolling(steamId) {
 }
 
 function readConfig() {
-  // Broadcaster sets a per-channel "steamId" string via the config view.
+  // Broadcaster sets a per-channel steamInput string via the config view.
   const raw = window.Twitch?.ext?.configuration?.broadcaster?.content;
   if (!raw) return null;
   try {
     const parsed = JSON.parse(raw);
+    if (typeof parsed.steamInput === "string" && parsed.steamInput.trim()) {
+      return parsed.steamInput.trim();
+    }
+    // Backwards compatible with the previous config shape.
     if (typeof parsed.steamId === "string" && parsed.steamId.trim()) {
       return parsed.steamId.trim();
     }
   } catch {
-    /* not JSON; treat raw as the id */
     return raw.trim() || null;
   }
   return null;
 }
 
 function isInsideTwitchExtension() {
-  // The twitch-ext helper script loads from its CDN even when we're not in a
-  // Twitch iframe, so `window.Twitch?.ext` alone is a misleading check —
-  // `onAuthorized` simply never fires outside Twitch and we'd stay on Loading
-  // forever. Twitch serves extensions from *.ext-twitch.tv, so the hostname
-  // is the reliable signal.
   if (!window.Twitch?.ext) return false;
   const host = window.location.hostname;
   return host.endsWith(".ext-twitch.tv") || host === "ext-twitch.tv";
@@ -232,9 +131,10 @@ function isInsideTwitchExtension() {
 
 function bootstrap() {
   if (!isInsideTwitchExtension()) {
-    // Local development outside Twitch — accept ?steamId=... for previewing.
+    // Local development outside Twitch — accept ?steamId=... or ?username=...
+    // for previewing.
     const url = new URL(window.location.href);
-    const sid = url.searchParams.get("steamId");
+    const sid = url.searchParams.get("steamId") || url.searchParams.get("username");
     if (sid) startPolling(sid);
     else show("unconfigured");
     return;
