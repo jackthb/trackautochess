@@ -9,6 +9,8 @@ import {
   getSynergyNameTranslator,
 } from "@/lib/synergies";
 import { getAllUnits } from "@/lib/units";
+import { TIER_COLOR, TIER_LABEL, iconUrl } from "@/lib/items";
+import { getRelatedItemsForSynergy } from "@/lib/itemRelations";
 import { absoluteUrl, SITE_NAME, SITE_TITLE } from "@/lib/site";
 import { DEFAULT_LOCALE } from "@/lib/i18n";
 import { getCommentaryForEntity } from "@/lib/patchCommentary";
@@ -23,6 +25,7 @@ const t = {
   cost: (c: number) => `Cost ${c}`,
   nUnits: (n: string) => `${n} Units`,
   moreSynergies: "More Synergies",
+  relatedItems: (n: string) => `${n} Items`,
 };
 
 interface Props {
@@ -80,6 +83,8 @@ export default async function SynergyDetailPage({ params }: Props) {
     u.synergies.includes(englishName),
   );
 
+  const relatedItems = getRelatedItemsForSynergy(englishName, DEFAULT_LOCALE);
+
   const related = allSynergies
     .filter(
       (candidate) =>
@@ -91,6 +96,16 @@ export default async function SynergyDetailPage({ params }: Props) {
 
   const description = t.description(synergy.name);
   const translateSyn = getSynergyNameTranslator(DEFAULT_LOCALE);
+  const itemEntities: RelatedEntity[] = relatedItems.map(({ item, relation }) => ({
+    slug: item.slug,
+    name: item.name,
+    description: `${relation.label} • ${relation.description}`,
+    iconSrc: iconUrl(item),
+    variant: "item",
+    level: TIER_LABEL[item.tier],
+    accentColor: TIER_COLOR[item.tier],
+  }));
+
   const moreSynergies: RelatedEntity[] = related.map((s) => ({
     slug: s.slug,
     name: s.name,
@@ -159,8 +174,8 @@ export default async function SynergyDetailPage({ params }: Props) {
         indexPath={indexPath}
         relatedTitle={t.nUnits(synergy.name)}
         related={unitsForSynergy}
-        extraRelatedTitle={t.moreSynergies}
-        extraRelated={moreSynergies}
+        extraRelatedTitle={itemEntities.length > 0 ? t.relatedItems(synergy.name) : t.moreSynergies}
+        extraRelated={itemEntities.length > 0 ? itemEntities : moreSynergies}
       />
     </>
   );

@@ -11,6 +11,7 @@ import {
   TIER_LABEL,
 } from "@/lib/items";
 import { parseItemDescription } from "@/lib/itemDescription";
+import { getRelatedSynergiesForItem, ITEM_RELATION_CATEGORY_LABEL } from "@/lib/itemRelations";
 import { absoluteUrl, SITE_NAME, SITE_TITLE } from "@/lib/site";
 import { DEFAULT_LOCALE } from "@/lib/i18n";
 import { getCommentaryForEntity } from "@/lib/patchCommentary";
@@ -21,6 +22,7 @@ const t = {
   title: (n: string) => `${n} Item Guide | ${SITE_TITLE}`,
   descriptionPrefix: (n: string) => `See what ${n} does in Dota Auto Chess. `,
   moreOf: (t: string) => `More ${t} Items`,
+  relatedSynergies: "Related Synergies",
   fallbackTier: (n: string, t: string) => `${n} is a ${t} Dota Auto Chess item.`,
   activeAbility: "Active Ability",
   stats: "Stats",
@@ -86,6 +88,8 @@ export default async function ItemDetailPage({ params }: Props) {
   const item = getItemBySlug(slug, DEFAULT_LOCALE);
   if (!item) notFound();
 
+  const relatedSynergies = getRelatedSynergiesForItem(item.name, DEFAULT_LOCALE);
+
   const related = allItems
     .filter(
       (candidate) => candidate.tier === item.tier && candidate.slug !== item.slug
@@ -135,6 +139,14 @@ export default async function ItemDetailPage({ params }: Props) {
     ...(stats ? [{ title: t.stats, body: stats }] : []),
   ];
 
+  const synergyEntities: RelatedEntity[] = relatedSynergies.map(({ synergy, relation }) => ({
+    slug: synergy.slug,
+    name: synergy.name,
+    description: `${relation.label} • ${ITEM_RELATION_CATEGORY_LABEL[relation.category]}`,
+    iconSrc: synergy.iconUrl,
+    variant: "synergy",
+  }));
+
   const relatedEntities: RelatedEntity[] = related.map((r) => ({
     slug: r.slug,
     name: r.name,
@@ -161,8 +173,10 @@ export default async function ItemDetailPage({ params }: Props) {
         notes={item.notes.map(cleanText)}
         lore={item.lore ? cleanText(item.lore) : undefined}
         tag={{ label: tierLabel, color: tierColor }}
-        relatedTitle={t.moreOf(tierLabel)}
-        related={relatedEntities}
+        relatedTitle={synergyEntities.length > 0 ? t.relatedSynergies : t.moreOf(tierLabel)}
+        related={synergyEntities.length > 0 ? synergyEntities : relatedEntities}
+        extraRelatedTitle={synergyEntities.length > 0 ? t.moreOf(tierLabel) : undefined}
+        extraRelated={synergyEntities.length > 0 ? relatedEntities : undefined}
         accentColor={tierColor}
       />
     </>

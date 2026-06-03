@@ -1,0 +1,39 @@
+{
+  "links": [
+    {
+      "item": "Kobold Cup",
+      "synergy": "Kobold",
+      "category": "counts_as_synergy",
+      "label": "Counts as Kobold",
+      "description": "Carrier counts as Kobold, helping activate Kobold traits and extending the cup's attack speed bonus to matching pieces."
+    },
+    {
+      "item": "Spider Leg",
+      "synergy": "Aqir",
+      "category": "counts_as_synergy",
+      "label": "Counts as Aqir",
+      "description": "Carrier also counts as Aqir and can participate in friendly Infection spawning."
+    },
+    {
+      "item": "Heart of the Machine",
+      "synergy": "Mech",
+      "category": "synergy_reward",
+      "label": "Mech (3) reward",
+      "description": "Normal Heart of the Machine reward: refresh your recruitment panel for free after meeting the Mech survival condition."
+    },
+    {
+      "item": "Golden Heart of the Machine",
+      "synergy": "Mech",
+      "category": "synergy_reward",
+      "label": "Mech (6) golden reward",
+      "description": "Golden Heart of the Machine reward: discover five random legendary chess pieces and recruit them with the granted tokens."
+    },
+    {
+      "item": "Golden Machine Token",
+      "synergy": "Mech",
+      "category": "generated_token",
+      "label": "Golden Heart token",
+      "description": "Token granted by Golden Heart of the Machine for recruiting discovered legendary pieces."
+    }
+  ]
+}

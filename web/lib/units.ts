@@ -6,9 +6,34 @@ import aliasData from "@data/aliases.json";
 import { slugifyName } from "@/lib/slugs";
 import { DEFAULT_LOCALE, type Locale, pickLocalized } from "@/lib/i18n";
 
+interface UnitAbility {
+  id: string;
+  name: string;
+  description: string;
+}
+
+export interface UnitStats {
+  hp: number;
+  mana: number;
+  atk: number[];
+  armor: number;
+  magic_resist: number;
+  atk_rate: number;
+  atk_range: number;
+}
+
+export interface UnitStatsByStar {
+  "1_star"?: UnitStats;
+  "2_star"?: UnitStats;
+  "3_star"?: UnitStats;
+}
+
 interface UnitInfo {
   cost: number;
   synergies?: string[];
+  attack_type?: string;
+  abilities?: UnitAbility[] | null;
+  stats?: UnitStatsByStar;
   names?: Record<string, string>;
   icon_url?: string | null;
   icon_dimensions?: { width: number; height: number } | null;
@@ -22,6 +47,9 @@ export interface DisplayUnit {
   name: string;
   cost: number;
   synergies: string[];
+  attackType: string;
+  abilities: UnitAbility[];
+  stats: UnitStatsByStar | null;
   iconStem: string;
   /**
    * Resolved icon URL: remote URL when present, otherwise the local
@@ -43,6 +71,9 @@ function buildUnitsForLocale(locale: Locale): DisplayUnit[] {
         name: localizedName,
         cost: data.cost ?? 0,
         synergies: data.synergies ?? [],
+        attackType: data.attack_type ?? "",
+        abilities: data.abilities ?? [],
+        stats: data.stats ?? null,
         iconStem: stem,
         iconUrl: data.icon_url || `/icons/units/${stem}.png`,
         iconDimensions: data.icon_dimensions ?? null,

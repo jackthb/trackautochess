@@ -18,8 +18,8 @@ interface FullItem {
 }
 
 interface SimpleItem {
-  tier: number;
-  icon: string;
+  tier?: number;
+  icon?: string;
   icon_url?: string | null;
   icon_dimensions?: { width: number; height: number } | null;
 }
@@ -51,6 +51,7 @@ export const TIER_LABEL: Record<number, string> = {
   3: "Tier 3",
   4: "Tier 4",
   5: "Tier 5",
+  0: "Special",
 };
 
 export const TIER_COLOR: Record<number, string> = {
@@ -59,6 +60,7 @@ export const TIER_COLOR: Record<number, string> = {
   3: "#4eaa62",
   4: "#a85fd2",
   5: "var(--gold)",
+  0: "var(--accent-dim)",
 };
 
 function norm(value: string): string {
@@ -94,8 +96,16 @@ function buildItemsForLocale(locale: Locale): DisplayItem[] {
     fullByNorm.set(norm(value.name), value);
   }
 
-  return Object.entries(simple)
-    .map(([simpleName, basic]) => {
+  const itemNames = new Set([
+    ...Object.keys(simple),
+    ...Object.values(itemsFull as Record<string, FullItem>)
+      .map((item) => item.name)
+      .filter((name): name is string => Boolean(name?.trim())),
+  ]);
+
+  return Array.from(itemNames)
+    .map((simpleName) => {
+      const basic = simple[simpleName];
       const full = fullByNorm.get(norm(simpleName));
       // Slug always uses the English canonical name so URLs are stable
       // across locales.
@@ -103,8 +113,8 @@ function buildItemsForLocale(locale: Locale): DisplayItem[] {
       const localizedName = full
         ? pickLocalized(full.names, locale) || full.name
         : simpleName;
-      const remoteUrl = basic.icon_url || full?.icon_url || null;
-      const localUrl = legacyIconUrl({ icon: basic.icon, texture: full?.texture ?? "" });
+      const remoteUrl = basic?.icon_url || full?.icon_url || null;
+      const localUrl = legacyIconUrl({ icon: basic?.icon ?? "", texture: full?.texture ?? "" });
 
       return {
         slug: slugifyName(canonicalName),
@@ -117,11 +127,11 @@ function buildItemsForLocale(locale: Locale): DisplayItem[] {
         ),
         quality: full?.quality ?? "",
         notes: (full?.notes ?? []).map(normalizePunct),
-        tier: basic.tier,
-        icon: basic.icon,
+        tier: basic?.tier ?? 0,
+        icon: basic?.icon ?? "",
         texture: full?.texture ?? "",
         iconUrl: remoteUrl || localUrl,
-        iconDimensions: basic.icon_dimensions ?? full?.icon_dimensions ?? null,
+        iconDimensions: basic?.icon_dimensions ?? full?.icon_dimensions ?? null,
       };
     })
     .sort((a, b) => {

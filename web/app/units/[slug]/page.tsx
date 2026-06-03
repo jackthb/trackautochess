@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { EntityDetail, type RelatedEntity } from "@/components/EntityDetail";
 import { EntityCommentaryList } from "@/components/PatchCommentary";
+import { UnitStatsTable } from "@/components/UnitStatsTable";
 import { getAllUnits, getUnitBySlug } from "@/lib/units";
 import { getAllSynergies } from "@/lib/synergies";
 import { slugifyName } from "@/lib/slugs";
@@ -17,6 +18,10 @@ const t = {
     `${n} is a cost ${c} unit in Dota Auto Chess.`,
   cost: (c: number) => `Cost ${c}`,
   crumbUnits: "Units",
+  overview: "Overview",
+  abilities: "Abilities",
+  stats: "Stats",
+  attackType: (type: string) => `${type.charAt(0).toUpperCase()}${type.slice(1)} attack`,
 };
 
 const RELATED_LABELS = {
@@ -102,6 +107,31 @@ export default async function UnitDetailPage({ params }: Props) {
     };
   });
 
+  const bodySections = [
+    {
+      title: t.overview,
+      body: unit.attackType ? t.attackType(unit.attackType) : description,
+    },
+    ...(unit.abilities.length > 0
+      ? [
+          {
+            title: t.abilities,
+            body: (
+              <div>
+                {unit.abilities.map((ability) => (
+                  <section key={ability.id}>
+                    <strong>{ability.name}</strong>
+                    <p>{ability.description}</p>
+                  </section>
+                ))}
+              </div>
+            ),
+          },
+        ]
+      : []),
+    ...(unit.stats ? [{ title: t.stats, body: <UnitStatsTable stats={unit.stats} /> }] : []),
+  ];
+
   const pageUrl = absoluteUrl(`/units/${unit.slug}`);
   const unitsUrl = absoluteUrl("/units");
   const structuredData = [
@@ -144,6 +174,7 @@ export default async function UnitDetailPage({ params }: Props) {
         name={unit.name}
         iconSrc={unit.iconUrl}
         tag={{ label: t.cost(unit.cost) }}
+        bodySections={bodySections}
         commentary={
           commentary.length > 0 ? (
             <EntityCommentaryList entries={commentary} />
