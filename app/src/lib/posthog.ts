@@ -1,7 +1,13 @@
-import type { PostHog } from "posthog-js";
+type PostHogClient = {
+  capture: (event: string, properties?: Record<string, unknown>) => void;
+  identify: (distinctId: string, properties?: Record<string, unknown>) => void;
+  init: (token: string, config: Record<string, unknown>) => void;
+  register: (properties: Record<string, unknown>) => void;
+  reset: () => void;
+};
 
 let initialized = false;
-let cachedClient: PostHog | null = null;
+let cachedClient: PostHogClient | null = null;
 
 // Reuses the SAME PostHog project as the web viewer, so a person's web + app
 // activity stitch into one profile (shared steam_id distinct_id). This is the
@@ -9,21 +15,23 @@ let cachedClient: PostHog | null = null;
 // in the public web bundle). Baked in so packaged builds work with no env;
 // override at build via VITE_POSTHOG_DESKTOP_TOKEN. Set to "" to disable.
 const DEFAULT_TOKEN = "phc_GUppkWFIfGM9WwVbEe33FM7aXn06JkIGWZ5P6MYy5zX";
-const KEY = import.meta.env.VITE_POSTHOG_DESKTOP_TOKEN || DEFAULT_TOKEN;
+const configuredToken = import.meta.env.VITE_POSTHOG_DESKTOP_TOKEN;
+const KEY =
+  configuredToken === undefined ? DEFAULT_TOKEN : configuredToken.trim();
 // Electron renderer talks to PostHog directly — there's no Next.js rewrite
-// proxy here, so point straight at the EU cluster for both ingest and UI.
+// proxy here; ingest goes to the EU cluster and UI links go to the PostHog app.
 const API_HOST = "https://eu.i.posthog.com";
-const UI_HOST = "https://eu.i.posthog.com";
+const UI_HOST = "https://eu.posthog.com";
 
 // NOTE: telemetry here is ALWAYS on (observability). The `game-tracking-enabled`
 // kill switch governs the backend capture feature, not this — so the renderer
 // deliberately does not gate its events/replay on any flag.
 
-export async function getPostHog(): Promise<PostHog | null> {
+export async function getPostHog(): Promise<PostHogClient | null> {
   if (typeof window === "undefined" || !KEY) return null;
   if (cachedClient) return cachedClient;
-  const mod = await import("posthog-js");
-  const posthog = mod.default;
+  const mod = await import("posthog-js/dist/module.full.no-external");
+  const posthog = mod.default as PostHogClient;
   if (!initialized) {
     posthog.init(KEY, {
       api_host: API_HOST,

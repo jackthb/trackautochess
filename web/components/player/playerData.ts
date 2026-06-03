@@ -10,11 +10,6 @@ import {
 } from "@/lib/steam";
 import type { PlayerPageProps } from "./PlayerView";
 
-// Server-safe pure helpers for the player profile page. They live OUTSIDE the
-// "use client" PlayerView module because the App Router page calls them during
-// data fetching / generateMetadata (server) — a function exported from a client
-// module can't be invoked on the server. Types are imported type-only (erased).
-
 export const USER_DRODO_SELECT = [
   "name",
   "custom_url",
@@ -45,6 +40,15 @@ export interface CachedUserDrodoRow {
   drodo_profile_missing: boolean | null;
 }
 
+interface RouteUserRow extends CachedUserDrodoRow {
+  steam_id: string;
+}
+
+export interface ResolvedPlayerRoute {
+  steamId: string;
+  cachedProfileRow: CachedUserDrodoRow | null;
+}
+
 function originFromUrl(value: string | null): string | null {
   if (!value) return null;
   try {
@@ -54,27 +58,33 @@ function originFromUrl(value: string | null): string | null {
   }
 }
 
-export async function resolvePlayerRouteSteamId(
+export async function resolvePlayerRoute(
   rawSteamId: string,
   supabase: SupabaseClient | null
-): Promise<string | null> {
+): Promise<ResolvedPlayerRoute | null> {
   const parsed = parseSteamInput(rawSteamId);
   if (!parsed) return null;
-  if (parsed.kind === "id") return parsed.value;
+  if (parsed.kind === "id") {
+    return { steamId: parsed.value, cachedProfileRow: null };
+  }
 
   if (supabase) {
     const { data } = await supabase
       .from("users")
-      .select("steam_id::text")
+      .select(`steam_id::text, ${USER_DRODO_SELECT}`)
       .eq("custom_url", parsed.value)
-      .maybeSingle<{ steam_id: string }>();
+      .maybeSingle<RouteUserRow>();
 
-    if (data?.steam_id) return String(data.steam_id);
+    if (data?.steam_id) {
+      const { steam_id: steamId, ...cachedProfileRow } = data;
+      return { steamId: String(steamId), cachedProfileRow };
+    }
   }
 
-  return resolveSteamInput(rawSteamId, supabase ?? undefined, {
+  const steamId = await resolveSteamInput(rawSteamId, supabase ?? undefined, {
     persist: false,
   });
+  return steamId ? { steamId, cachedProfileRow: null } : null;
 }
 
 export function cachedSteamProfile(
@@ -96,9 +106,6 @@ export function cachedSteamProfile(
   return profile;
 }
 
-/** Compute SEO (title/description/canonical/og/structuredData) for a player
- *  profile page from its props. Used by the page's generateMetadata + JSON-LD.
- *  Replicates what the old <SeoHead> on pages/players/[steamId].tsx received. */
 export function buildPlayerSeo(props: Omit<PlayerPageProps, "route">): {
   title: string;
   description: string;
@@ -151,9 +158,14 @@ export function buildPlayerSeo(props: Omit<PlayerPageProps, "route">): {
     },
   ];
 
-  return { title, description, canonicalUrl, ogImageUrl, imageAlt, structuredData };
+  return {
+    title,
+    description,
+    canonicalUrl,
+    ogImageUrl,
+    imageAlt,
+    structuredData,
+  };
 }
 
-// playerProfilePath is re-used by the page for the redirect + canonical; export
-// it through here so the page imports server helpers from a single module.
 export { playerProfilePath };

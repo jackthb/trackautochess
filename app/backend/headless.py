@@ -399,6 +399,13 @@ class HeadlessBackend:
             save_config(self.config)
             from db import ensure_user
             ensure_user(sid, name=name)
+            tel = getattr(self, "_telemetry", None)
+            if tel:
+                try:
+                    from updater import __version__
+                    tel.identify(sid, steam_name=name, version=__version__)
+                except Exception:
+                    pass
             self._emit({"type": "steam_login", "steam_id": sid, "steam_name": name})
             self._emit_status()
             log.info("Steam login: %s (%s)", name, sid)
@@ -406,6 +413,12 @@ class HeadlessBackend:
         threading.Thread(target=_login, daemon=True, name="steam-login").start()
 
     def _do_steam_logout(self) -> None:
+        tel = getattr(self, "_telemetry", None)
+        if tel:
+            try:
+                tel.clear_identity()
+            except Exception:
+                pass
         self.config["steam_id"] = ""
         self.config["steam_name"] = ""
         save_config(self.config)

@@ -68,17 +68,16 @@ _session_tag: str = ""
 
 def _resolve_token(config: dict | None) -> str:
     """Token precedence: env → config → module default."""
-    env = os.environ.get("POSTHOG_DESKTOP_TOKEN")
-    if env and env.strip():
-        return env.strip()
+    if "POSTHOG_DESKTOP_TOKEN" in os.environ:
+        return os.environ.get("POSTHOG_DESKTOP_TOKEN", "").strip()
     if config is None:
         try:
             config = load_config()
         except Exception:
             config = {}
-    cfg_token = (config or {}).get("posthog_desktop_token")
-    if isinstance(cfg_token, str) and cfg_token.strip():
-        return cfg_token.strip()
+    if "posthog_desktop_token" in (config or {}):
+        cfg_token = (config or {}).get("posthog_desktop_token")
+        return cfg_token.strip() if isinstance(cfg_token, str) else ""
     return DEFAULT_POSTHOG_TOKEN
 
 
@@ -152,6 +151,18 @@ def identify(steam_id, steam_name=None, version: str | None = None) -> None:
         _client.identify(distinct_id=_distinct_id, properties=props)
     except Exception as e:
         log.debug("telemetry: identify failed: %s", e)
+
+
+def clear_identity() -> None:
+    """Forget the current Steam identity for future backend events."""
+    global _distinct_id
+    try:
+        if _client and _distinct_id:
+            capture("steam_logged_out", {})
+        _distinct_id = None
+    except Exception as e:
+        _distinct_id = None
+        log.debug("telemetry: clear_identity failed: %s", e)
 
 
 # ── Kill switch (remote feature flag) ─────────────────────────────────────────

@@ -1,43 +1,33 @@
 import type { Metadata } from "next";
 import { cache } from "react";
-import { cookies, headers } from "next/headers";
 import { notFound, redirect } from "next/navigation";
 import { createClient } from "@supabase/supabase-js";
-import { createServerClient } from "@supabase/ssr";
 import type { PlayerGame } from "@dac/shared/types";
 import type { SeasonSnapshot } from "@dac/shared/SeasonHistoryGrid";
 import type { MmrSnapshot } from "@/components/MmrSparkline";
-import { absoluteUrl, getRequestSiteUrl } from "@/lib/site";
+import { absoluteUrl, getSiteUrl } from "@/lib/site";
 import { getManualRefreshQuota } from "@/lib/manualRefreshQuota";
 import { fetchAndCacheDrodo } from "@/lib/drodo";
 import { fetchSteamProfile } from "@/lib/steam";
-import PlayerView, {
-  type LeaderboardPosition,
-  type PlayerPageProps,
-} from "@/components/player/PlayerView";
+import PlayerView, { type PlayerPageProps } from "@/components/player/PlayerView";
 import {
   buildPlayerSeo,
   cachedSteamProfile,
   playerProfilePath,
-  resolvePlayerRouteSteamId,
+  resolvePlayerRoute,
   USER_DRODO_SELECT,
   type CachedUserDrodoRow,
 } from "@/components/player/playerData";
 
-// App Router migration of pages/players/[steamId].tsx. The old getServerSideProps
-// body lives here verbatim, wrapped in React cache() so generateMetadata and the
-// page share one fetch per request. PlayerPage (now PlayerView) is a "use client"
-// component in @/components/player/PlayerView.
-export const dynamic = "force-dynamic";
+export const dynamic = "force-static";
+export const revalidate = 300;
 
 type LoadResult =
   | { kind: "notFound" }
   | { kind: "redirect"; destination: string }
   | { kind: "ok"; data: Omit<PlayerPageProps, "route"> };
 
-/** Single cached fetch shared between generateMetadata and the page render.
- *  Port of the deleted players getServerSideProps. Returns a discriminated
- *  result so the page can mirror the old notFound / redirect / props branches. */
+/** Cached per request so generateMetadata and the page render share data. */
 const loadPlayer = cache(async (rawSteamId: string): Promise<LoadResult> => {
   if (!rawSteamId || typeof rawSteamId !== "string") {
     return { kind: "notFound" };
@@ -54,72 +44,33 @@ const loadPlayer = cache(async (rawSteamId: string): Promise<LoadResult> => {
         })
       : null;
 
-  const hdrs = await headers();
-  const baseUrl = getRequestSiteUrl({
-    host: hdrs.get("host") ?? undefined,
-    "x-forwarded-proto": hdrs.get("x-forwarded-proto") ?? undefined,
-    "x-forwarded-host": hdrs.get("x-forwarded-host") ?? undefined,
-  });
-  const cookieStore = await cookies();
-  const cookieHeader = cookieStore.toString();
-  const manualRefreshQuota = getManualRefreshQuota(cookieHeader);
+  const baseUrl = getSiteUrl();
+  const manualRefreshQuota = getManualRefreshQuota(undefined);
 
-  let viewerSteamId: string | null = null;
-  if (url && key) {
-    try {
-      const ssrSupabase = createServerClient(url, key, {
-        cookies: {
-          getAll() {
-            return cookieStore.getAll().map(({ name, value }) => ({
-              name,
-              value: value ?? "",
-            }));
-          },
-          setAll() {
-            // Read-only for SSR; we don't need to write cookies here.
-          },
-        },
-      });
-      const { data } = await ssrSupabase.auth.getUser();
-      const meta = data.user?.user_metadata as
-        | { steam_id?: unknown }
-        | null
-        | undefined;
-      if (meta && typeof meta.steam_id === "string") {
-        viewerSteamId = meta.steam_id;
-      }
-    } catch {
-      viewerSteamId = null;
-    }
-  }
-  // viewerSteamId previously gated a per-request Cache-Control header in
-  // getServerSideProps. App Router server components can't set response
-  // headers, and `dynamic = "force-dynamic"` already opts out of caching, so
-  // we keep the auth read (harmless) but drop the cache-header branch.
-  void viewerSteamId;
-
-  // Accept numeric Steam IDs or vanity slugs. Keep vanity slugs in the URL
-  // when present; they are the preferred public profile route.
-  const steamId = await resolvePlayerRouteSteamId(rawSteamId, supabase);
-  if (!steamId) {
+  const resolved = await resolvePlayerRoute(rawSteamId, supabase);
+  if (!resolved) {
     return { kind: "notFound" };
   }
+  const { steamId } = resolved;
 
-  let cachedProfileRow: CachedUserDrodoRow | null = null;
+  let cachedProfileRow: CachedUserDrodoRow | null = resolved.cachedProfileRow;
 
-  // Fetch cached Drodo profile and season history from public Supabase rows.
   let drodo = null;
   let drodoProfileMissing = false;
   let drodoLastFetchedAt = null;
   let seasons: SeasonSnapshot[] = [];
   let mmrHistory: MmrSnapshot[] = [];
   if (supabase) {
+    const profilePromise = cachedProfileRow
+      ? Promise.resolve({ data: cachedProfileRow })
+      : supabase
+          .from("users")
+          .select(USER_DRODO_SELECT)
+          .eq("steam_id", steamId)
+          .maybeSingle<CachedUserDrodoRow>();
+
     const [profileResult, seasonsResult, snapshotsResult] = await Promise.all([
-      supabase
-        .from("users")
-        .select(USER_DRODO_SELECT)
-        .eq("steam_id", steamId)
-        .maybeSingle<CachedUserDrodoRow>(),
+      profilePromise,
       supabase
         .from("player_seasons")
         .select("season, mmr, max_mmr, games_played, chicken_count")
@@ -196,63 +147,16 @@ const loadPlayer = cache(async (rawSteamId: string): Promise<LoadResult> => {
       ...profileRequirements,
     }));
 
-  let profileUserIds = [steamId];
-  if (supabase) {
-    const vanityKeys = [
-      steamProfile.customUrl,
-      !/^\d+$/.test(rawSteamId) ? rawSteamId : null,
-    ].filter(Boolean) as string[];
-
-    if (vanityKeys.length > 0) {
-      const { data: vanityUsers } = await supabase
-        .from("users")
-        .select("steam_id::text")
-        .in("custom_url", [...new Set(vanityKeys)]);
-
-      const vanityIds = (vanityUsers ?? [])
-        .map((row) => String(row.steam_id))
-        .filter(Boolean);
-      profileUserIds = [...new Set([steamId, ...vanityIds])];
-    }
-  }
-
-  // Fetch the player's match_players rows and leaderboard position concurrently;
-  // both are independent of each other and dominate the SSR latency.
   const gamesPromise = supabase
     ? supabase
         .from("match_players")
         .select("*, steam_id::text")
-        .in("steam_id", profileUserIds)
+        .eq("steam_id", steamId)
         .order("played_at", { ascending: false })
         .limit(100)
     : Promise.resolve({ data: [] as PlayerGame[] });
 
-  const leaderboardPromise: Promise<LeaderboardPosition | null> =
-    supabase && drodo?.mmr != null
-      ? Promise.all([
-          supabase
-            .from("users")
-            .select("steam_id", { count: "exact", head: true })
-            .not("drodo_last_fetched_at", "is", null)
-            .eq("drodo_profile_missing", false)
-            .gt("drodo_mmr", drodo.mmr),
-          supabase
-            .from("users")
-            .select("steam_id", { count: "exact", head: true })
-            .not("drodo_last_fetched_at", "is", null)
-            .eq("drodo_profile_missing", false)
-            .not("drodo_mmr", "is", null),
-        ]).then(([{ count: higherCount }, { count: totalRanked }]) =>
-          typeof higherCount === "number" && typeof totalRanked === "number"
-            ? { rank: higherCount + 1, total: totalRanked }
-            : null
-        )
-      : Promise.resolve(null);
-
-  const [gamesResult, leaderboardPosition] = await Promise.all([
-    gamesPromise,
-    leaderboardPromise,
-  ]);
+  const gamesResult = await gamesPromise;
 
   if (
     steamProfile.customUrl &&
@@ -293,7 +197,7 @@ const loadPlayer = cache(async (rawSteamId: string): Promise<LoadResult> => {
       drodo,
       seasons,
       mmrHistory,
-      leaderboardPosition,
+      leaderboardPosition: null,
       drodoProfileMissing,
       drodoLastFetchedAt,
       manualRefreshQuota,
@@ -308,6 +212,10 @@ const loadPlayer = cache(async (rawSteamId: string): Promise<LoadResult> => {
 
 interface PageProps {
   params: Promise<{ steamId: string }>;
+}
+
+export async function generateStaticParams() {
+  return [];
 }
 
 export async function generateMetadata({

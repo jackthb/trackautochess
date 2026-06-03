@@ -1,10 +1,15 @@
 import type { NextApiRequest } from "next";
+import { revalidatePath } from "next/cache";
 import type { IncomingHttpHeaders } from "node:http";
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { checkBotId } from "botid/server";
 import { RateLimiterMemory } from "rate-limiter-flexible";
 import { getClientIp, getUserAgent, logAbuse } from "@/lib/abuseLog";
-import { fetchSteamProfile, resolveSteamInput } from "@/lib/steam";
+import {
+  fetchSteamProfile,
+  playerProfilePath,
+  resolveSteamInput,
+} from "@/lib/steam";
 import {
   consumeManualRefreshQuota,
   type ManualRefreshQuota,
@@ -32,6 +37,16 @@ const BOT_UA_RE =
 // through fetchAndCacheDrodo. 60/min is generous for normal browsing
 // and cuts off scrape patterns before they reach the upstream.
 const ipRateLimiter = new RateLimiterMemory({ points: 60, duration: 60 });
+
+function revalidatePlayerProfilePaths(
+  steamId: string,
+  customUrl?: string | null
+) {
+  revalidatePath(playerProfilePath(steamId));
+  if (customUrl) {
+    revalidatePath(playerProfilePath(steamId, customUrl));
+  }
+}
 
 // Web `Request` headers expose a `Headers` instance; the shared abuse/session
 // helpers expect Node-style `IncomingHttpHeaders`. Build the plain map once and
@@ -197,6 +212,9 @@ async function handle(req: Request, ctx: { params: Promise<{ steamId: string }> 
 
   if (!result.ok) {
     if (result.kind === "missing") {
+      if (forceRefresh) {
+        revalidatePlayerProfilePaths(steamId);
+      }
       return Response.json(
         {
           error: result.error,
@@ -216,7 +234,10 @@ async function handle(req: Request, ctx: { params: Promise<{ steamId: string }> 
     );
   }
 
-  await fetchSteamProfile(steamId, supabase ?? undefined);
+  const steamProfile = await fetchSteamProfile(steamId, supabase ?? undefined);
+  if (forceRefresh) {
+    revalidatePlayerProfilePaths(steamId, steamProfile.customUrl);
+  }
 
   if (!supabase) {
     return Response.json(

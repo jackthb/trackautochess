@@ -1,5 +1,5 @@
 import { useState, useCallback, useRef, useEffect } from "react";
-import { capture, identify } from "./lib/posthog";
+import { capture, identify, reset } from "./lib/posthog";
 import { TitleBar } from "./components/TitleBar";
 import { TabBar } from "./components/TabBar";
 import { StatusBar } from "./components/StatusBar";
@@ -86,7 +86,14 @@ export default function App() {
   const steamId = tracker.status?.steam_id;
   const steamName = tracker.status?.steam_name;
   useEffect(() => {
-    if (!steamId || identifiedRef.current === steamId) return;
+    if (!steamId) {
+      if (identifiedRef.current !== null) {
+        identifiedRef.current = null;
+        reset();
+      }
+      return;
+    }
+    if (identifiedRef.current === steamId) return;
     identifiedRef.current = steamId;
     // Mirror the web viewer's person shape (web/pages/_app.tsx): `$name` is the
     // Persons-list label, `steam_id` the stable distinct_id — so the same human

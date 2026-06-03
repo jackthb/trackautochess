@@ -12,7 +12,10 @@ import { StatsGrid } from "@dac/shared/StatsGrid";
 import { SeasonHistoryGrid, type SeasonSnapshot } from "@dac/shared/SeasonHistoryGrid";
 import { MmrSparkline, type MmrSnapshot } from "@/components/MmrSparkline";
 import { RankLadder } from "@/components/RankLadder";
-import { type ManualRefreshQuota } from "@/lib/manualRefreshQuota";
+import {
+  getManualRefreshQuota,
+  type ManualRefreshQuota,
+} from "@/lib/manualRefreshQuota";
 import { isAdminSteamId } from "@/lib/admin";
 import { analyticsRoute, bucketCount, trackEvent } from "@/lib/analytics";
 import { resolveIconUrl } from "@/lib/icons";
@@ -200,6 +203,10 @@ export default function PlayerView({
     setNowMs(Date.now());
     const timer = setInterval(() => setNowMs(Date.now()), LAST_FETCHED_TICK_MS);
     return () => clearInterval(timer);
+  }, []);
+
+  useEffect(() => {
+    setManualRefreshQuota(getManualRefreshQuota(document.cookie));
   }, []);
 
   useEffect(() => {
