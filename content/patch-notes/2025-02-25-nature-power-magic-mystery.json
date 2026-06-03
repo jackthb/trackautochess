@@ -10,12 +10,22 @@
         {
           "kind": "added",
           "name": "New Relic - Leafy Essence",
-          "detail": "<Relic Consumable: Click to Use> Unlock the offside branch of all your settled talents."
+          "detail": "<Relic Consumable: Click to Use> Unlock the offside branch of all your settled talents.",
+          "entity": {
+            "type": "relic",
+            "relic": "item_both_leaves",
+            "slug": "leafy-essence"
+          }
         },
         {
           "kind": "added",
           "name": "New Relic - Magic Box",
-          "detail": "<Relic Consumable: Click to Use> Packs an ally Rank 1 piece, at the beginning of next round, transforms it into a randon new piece of the same cost. 12 times available."
+          "detail": "<Relic Consumable: Click to Use> Packs an ally Rank 1 piece, at the beginning of next round, transforms it into a randon new piece of the same cost. 12 times available.",
+          "entity": {
+            "type": "relic",
+            "relic": "item_magic_box",
+            "slug": "magic-box"
+          }
         },
         {
           "kind": "removed",
@@ -33,6 +43,7 @@
           "detail": "Damage reduction per bounce decreased from 40% to 25%",
           "entity": {
             "type": "unit",
+            "unit": "luna",
             "slug": "luna"
           }
         },
@@ -42,6 +53,7 @@
           "detail": "Magical resistance increased from 20% to 30%",
           "entity": {
             "type": "unit",
+            "unit": "abaddon",
             "slug": "abaddon"
           }
         },
@@ -51,6 +63,7 @@
           "detail": "CD decreased from 10s to 10/8/6s",
           "entity": {
             "type": "unit",
+            "unit": "abaddon",
             "slug": "abaddon"
           }
         },
@@ -60,6 +73,7 @@
           "detail": "Damage decreased from 500/750/1000 to 500/700/900, CD increased from 8/6/4s to 9/7/5s",
           "entity": {
             "type": "unit",
+            "unit": "lina",
             "slug": "lina"
           }
         },
@@ -69,6 +83,7 @@
           "detail": "Magical resistance increased from 20% to 30%",
           "entity": {
             "type": "unit",
+            "unit": "venomancer",
             "slug": "venomancer"
           }
         },
@@ -78,6 +93,7 @@
           "detail": "Base HP increased from 600 to 650, magical resistance increased from 0 to 10%",
           "entity": {
             "type": "unit",
+            "unit": "phantom-assassin",
             "slug": "phantom-assassin"
           }
         },
@@ -87,6 +103,7 @@
           "detail": "Radius decreased from 350/400/450 to 300/350/400",
           "entity": {
             "type": "unit",
+            "unit": "ember-spirit",
             "slug": "ember-spirit"
           }
         },
@@ -96,6 +113,7 @@
           "detail": "Width increased from 125 to 150",
           "entity": {
             "type": "unit",
+            "unit": "pangolier",
             "slug": "pangolier"
           }
         },
@@ -105,6 +123,7 @@
           "detail": "Base damage decreased from 50/75/125 to 50/75/100, flying speed decreased from 1250/1500/1750 to 1000/1250/1500",
           "entity": {
             "type": "unit",
+            "unit": "storm-spirit",
             "slug": "storm-spirit"
           }
         },
@@ -114,6 +133,7 @@
           "detail": "Base HP increased from 850 to 900, magical resistance increased from 20% to 30%",
           "entity": {
             "type": "unit",
+            "unit": "death-prophet",
             "slug": "death-prophet"
           }
         },
@@ -123,6 +143,7 @@
           "detail": "Chaotic duration decreased from 2/3/4s to 1.5/2/3s",
           "entity": {
             "type": "unit",
+            "unit": "queen-of-pain",
             "slug": "queen-of-pain"
           }
         },
@@ -132,6 +153,7 @@
           "detail": "Radius decrease from 350/450/650 to300/400/500",
           "entity": {
             "type": "unit",
+            "unit": "omniknight",
             "slug": "omniknight"
           }
         }
@@ -146,6 +168,7 @@
           "detail": "Damage decreased from 800 to 700",
           "entity": {
             "type": "item",
+            "item": "item_hongzhang",
             "slug": "dagon"
           }
         }
@@ -190,6 +213,7 @@
           "detail": "Downgraded from T2 to T1",
           "entity": {
             "type": "item",
+            "item": "item_suiluchui",
             "slug": "skull-basher"
           }
         },
@@ -209,6 +233,7 @@
           "detail": "Reworked into a targeted spell. Bonus damage and speed reduction removed.",
           "entity": {
             "type": "unit",
+            "unit": "tusk",
             "slug": "tusk"
           }
         },
@@ -218,6 +243,7 @@
           "detail": "Internal CD increased from 4-6s to 5-6s",
           "entity": {
             "type": "synergy",
+            "synergy": "is_satyr",
             "slug": "satyr"
           }
         },
@@ -227,6 +253,7 @@
           "detail": "Ceiling of extra HP removed.(A maximum of 800 previously)",
           "entity": {
             "type": "synergy",
+            "synergy": "is_orc",
             "slug": "orc"
           }
         },
@@ -236,6 +263,7 @@
           "detail": "(2) Mages - magic resistance reduction decreased from 30% to 25%",
           "entity": {
             "type": "synergy",
+            "synergy": "is_mage",
             "slug": "mage"
           }
         },
@@ -245,6 +273,7 @@
           "detail": "(2) Pandarens - Invitation chance decreased from 12% to 10%",
           "entity": {
             "type": "synergy",
+            "synergy": "is_pandaman",
             "slug": "pandaren"
           }
         },
@@ -254,6 +283,7 @@
           "detail": "(4) Monks - Chances decreased from 20% to 15%",
           "entity": {
             "type": "synergy",
+            "synergy": "is_monk",
             "slug": "monk"
           }
         },
@@ -263,6 +293,7 @@
           "detail": "Plague Ward’s attack speed reduction increased from 30% to 50%, duration decreased from 5s to 4s",
           "entity": {
             "type": "unit",
+            "unit": "venomancer",
             "slug": "venomancer"
           }
         },
@@ -272,6 +303,7 @@
           "detail": "Base HP increased from 750 to 850",
           "entity": {
             "type": "unit",
+            "unit": "pangolier",
             "slug": "pangolier"
           }
         },
@@ -281,6 +313,7 @@
           "detail": "Desolate multiplier decreased from 2.5 to 2.0",
           "entity": {
             "type": "unit",
+            "unit": "spectres",
             "slug": "spectres"
           }
         },
@@ -305,6 +338,7 @@
           "detail": "Duration decreased from 4s to 3s",
           "entity": {
             "type": "synergy",
+            "synergy": "is_satyr",
             "slug": "satyr"
           }
         },
@@ -314,6 +348,7 @@
           "detail": "Hex channeling duration increased from 1s to 1.5s",
           "entity": {
             "type": "synergy",
+            "synergy": "is_shaman",
             "slug": "shaman"
           }
         },
@@ -323,6 +358,7 @@
           "detail": "Hatching delay decreased from 0.5s to 0.2s",
           "entity": {
             "type": "synergy",
+            "synergy": "is_aqir",
             "slug": "aqir"
           }
         },
@@ -332,6 +368,7 @@
           "detail": "(2)(4) CD reduction decreased from 33% to 30%",
           "entity": {
             "type": "synergy",
+            "synergy": "is_god",
             "slug": "god"
           }
         },
@@ -341,6 +378,7 @@
           "detail": "Stun duration increased from 0.5/1/1.5s to 1/1.5/2s",
           "entity": {
             "type": "unit",
+            "unit": "tiny",
             "slug": "tiny"
           }
         },
@@ -350,6 +388,7 @@
           "detail": "Duration decreased from 4/5/7s to 4/4/5s",
           "entity": {
             "type": "unit",
+            "unit": "shadow-shaman",
             "slug": "shadow-shaman"
           }
         },
@@ -359,6 +398,7 @@
           "detail": "Bounce time decreased from4/5/7 to 4/5/6, radius decreased from 575 to 300",
           "entity": {
             "type": "unit",
+            "unit": "witch-doctor",
             "slug": "witch-doctor"
           }
         },
@@ -368,6 +408,7 @@
           "detail": "Isolation duration decreased from 4/3/3s to 3/2/2s",
           "entity": {
             "type": "unit",
+            "unit": "dark-willow",
             "slug": "dark-willow"
           }
         },
@@ -377,6 +418,7 @@
           "detail": "Damage decreased from 500/700/900 to 400/600/800",
           "entity": {
             "type": "unit",
+            "unit": "lina",
             "slug": "lina"
           }
         },
@@ -386,6 +428,7 @@
           "detail": "Attack damage of Battle Bear decreased from 160 to 120",
           "entity": {
             "type": "unit",
+            "unit": "beastmaster",
             "slug": "beastmaster"
           }
         },
@@ -395,6 +438,7 @@
           "detail": "Chance to enter sleep decreased from 30% to 20% per tick, sleep duration decreased from 3/4/5s to 2/3/3s",
           "entity": {
             "type": "unit",
+            "unit": "naga-siren",
             "slug": "naga-siren"
           }
         },
@@ -404,6 +448,7 @@
           "detail": "Base damage increased from 75/125/175 to 100/150/200",
           "entity": {
             "type": "unit",
+            "unit": "invoker",
             "slug": "invoker"
           }
         },
@@ -413,6 +458,7 @@
           "detail": "Stun duration decreased from 3s to 2s",
           "entity": {
             "type": "item",
+            "item": "item_suiluchui",
             "slug": "skull-basher"
           }
         },
@@ -422,6 +468,7 @@
           "detail": "Attack speed +20 increased to +30",
           "entity": {
             "type": "item",
+            "item": "item_jinghunzhiren",
             "slug": "diffusal-blade"
           }
         },
@@ -431,6 +478,7 @@
           "detail": "Mango grants XP and Gold of randomly 3-Courier Level instead of 1-Courier Level",
           "entity": {
             "type": "relic",
+            "relic": "item_mangotree",
             "slug": "mango-tree"
           }
         }
@@ -450,6 +498,7 @@
           "detail": "CD increased from 15s to 20s",
           "entity": {
             "type": "unit",
+            "unit": "beastmaster",
             "slug": "beastmaster"
           }
         },
@@ -459,6 +508,7 @@
           "detail": "Damage reduction per bounce increased from 25% to 30%",
           "entity": {
             "type": "unit",
+            "unit": "luna",
             "slug": "luna"
           }
         },
@@ -468,6 +518,7 @@
           "detail": "Duration decreased from 6/7/8s to 5/6/7s, maximum count decreased from 4/6/10 to 4/6/8",
           "entity": {
             "type": "unit",
+            "unit": "spectres",
             "slug": "spectres"
           }
         },
@@ -477,6 +528,7 @@
           "detail": "Bounce radius decreased from 500 to 300",
           "entity": {
             "type": "unit",
+            "unit": "lich",
             "slug": "lich"
           }
         },
@@ -486,6 +538,7 @@
           "detail": "Stun chance decreased from 25% to 20%",
           "entity": {
             "type": "item",
+            "item": "item_suiluchui",
             "slug": "skull-basher"
           }
         },

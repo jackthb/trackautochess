@@ -148,7 +148,9 @@
         {
           "kind": "change",
           "name": "Phase Boots",
-          "detail": "Added attribute: Armour +5"
+          "detail": "Added attribute: Armour +5",
+          "entity_type": "item",
+          "entity_slug": "phase-boots"
         },
         {
           "kind": "change",

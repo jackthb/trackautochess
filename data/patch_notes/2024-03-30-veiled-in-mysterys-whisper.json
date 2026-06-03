@@ -200,7 +200,9 @@
         {
           "kind": "nerf",
           "name": "Scythe of the Vyse",
-          "detail": "Duration reduced from 7 seconds to 6 seconds."
+          "detail": "Duration reduced from 7 seconds to 6 seconds.",
+          "entity_type": "item",
+          "entity_slug": "scythe-of-vyse"
         }
       ]
     },
@@ -230,7 +232,9 @@
         {
           "kind": "fix",
           "name": "Fixed bug where Guardian Greaves could dispel ally mind control",
-          "detail": ""
+          "detail": "",
+          "entity_type": "item",
+          "entity_slug": "guardian-greaves"
         },
         {
           "kind": "fix",

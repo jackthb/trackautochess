@@ -10,22 +10,42 @@
         {
           "kind": "added",
           "name": "Shadow Demon: Disseminate ($3, Demon/Draenei/Priest)",
-          "detail": "New chess piece. <Active Skill: Instant Activation> Applying the toxic curse of Shadow Demon's attacks: Nearby allies will receive damage of the same type as a percentage when taking damage, and nearby enemies will also receive healing as a percentage when receiving healing. Note: The spreading effect cannot be stacked on the same unit. Note: The spreading effect can benefit from Spell Prism and Soulbind. When the Eredar no longer requires his followers, he'll discard his shackles—along with their lives."
+          "detail": "New chess piece. <Active Skill: Instant Activation> Applying the toxic curse of Shadow Demon's attacks: Nearby allies will receive damage of the same type as a percentage when taking damage, and nearby enemies will also receive healing as a percentage when receiving healing. Note: The spreading effect cannot be stacked on the same unit. Note: The spreading effect can benefit from Spell Prism and Soulbind. When the Eredar no longer requires his followers, he'll discard his shackles—along with their lives.",
+          "entity": {
+            "type": "unit",
+            "unit": "shadow-demon",
+            "slug": "shadow-demon"
+          }
         },
         {
           "kind": "added",
           "name": "Lion: Finger of Death(Upgraded from $1 to $4)",
-          "detail": "New chess piece. <Active Skill: Activates on full mana> Tear into an enemy, inflicting a substantial amount of magical damage and siphoning their current mana. Furthermore, for each stack of the Fel Power effect, it will deal additional magical damage based on a percentage of the target's maximum health. Lion's disfigured hand is also the source of his greatest power, capable of flooding victims with malefic force."
+          "detail": "New chess piece. <Active Skill: Activates on full mana> Tear into an enemy, inflicting a substantial amount of magical damage and siphoning their current mana. Furthermore, for each stack of the Fel Power effect, it will deal additional magical damage based on a percentage of the target's maximum health. Lion's disfigured hand is also the source of his greatest power, capable of flooding victims with malefic force.",
+          "entity": {
+            "type": "unit",
+            "unit": "lion",
+            "slug": "lion"
+          }
         },
         {
           "kind": "added",
           "name": "Slardar: Downgraded from $3 to $2, with adjustments made to its attributes and skill values to match the new cost",
-          "detail": "New chess piece."
+          "detail": "New chess piece.",
+          "entity": {
+            "type": "unit",
+            "unit": "slardar",
+            "slug": "slardar"
+          }
         },
         {
           "kind": "added",
           "name": "Slark: Downgraded from $2 to $1, with adjustments made to its attributes and skill values to match the new cost",
-          "detail": "New chess piece."
+          "detail": "New chess piece.",
+          "entity": {
+            "type": "unit",
+            "unit": "slark",
+            "slug": "slark"
+          }
         },
         {
           "kind": "added",
@@ -38,6 +58,7 @@
           "detail": "New chess piece.",
           "entity": {
             "type": "unit",
+            "unit": "hoodwink",
             "slug": "hoodwink"
           }
         },
@@ -47,6 +68,7 @@
           "detail": "New chess piece.",
           "entity": {
             "type": "unit",
+            "unit": "ogre-magi",
             "slug": "ogre-magi"
           }
         },
@@ -56,6 +78,7 @@
           "detail": "New chess piece.",
           "entity": {
             "type": "unit",
+            "unit": "dark-willow",
             "slug": "dark-willow"
           }
         },
@@ -65,6 +88,7 @@
           "detail": "New chess piece.",
           "entity": {
             "type": "unit",
+            "unit": "lina",
             "slug": "lina"
           }
         },
@@ -74,6 +98,7 @@
           "detail": "New chess piece.",
           "entity": {
             "type": "unit",
+            "unit": "keeper-of-the-light",
             "slug": "keeper-of-the-light"
           }
         },
@@ -83,13 +108,19 @@
           "detail": "New chess piece.",
           "entity": {
             "type": "unit",
+            "unit": "anti-mage",
             "slug": "anti-mage"
           }
         },
         {
           "kind": "added",
           "name": "Lone Druid: Base attack damage of summoned bear companion reduced from 175/275/375 to 150/200/300",
-          "detail": "New chess piece."
+          "detail": "New chess piece.",
+          "entity": {
+            "type": "unit",
+            "unit": "lone-druid",
+            "slug": "lone-druid"
+          }
         },
         {
           "kind": "added",
@@ -97,6 +128,7 @@
           "detail": "New chess piece.",
           "entity": {
             "type": "unit",
+            "unit": "necrophos",
             "slug": "necrophos"
           }
         }
@@ -111,23 +143,39 @@
           "detail": "Synergy Update to(2)(4) (2)Draenei: All friendly Draenei gain the effect: Every 2 seconds, steal 100 health from the nearest enemy chess piece to heal themselves. (4)Draenei: All friendly pieces gain effects: Whenever a cumulative total of more than 100 points of healing is taken it is split (cumulative healing) points of pure damage among the surrounding enemies. Note: (2) Draenei's life-steal effect deals pure damage + healing. Draenei illusions are also effective. Note: (4)Draenei's Baptism damage is no longer divided, and each enemy within the range will receive the same damage.",
           "entity": {
             "type": "synergy",
+            "synergy": "is_draenei",
             "slug": "draenei"
           }
         },
         {
           "kind": "buff",
           "name": "Knights - Divine Protection",
-          "detail": "(2) (4) (6)Knights:  The shield trigger probability for Knights is increased from (described as 20%/20%/10% but functions as 20%/10%/20%, inconsistent with the description) to 20%/20%/15%."
+          "detail": "(2) (4) (6)Knights:  The shield trigger probability for Knights is increased from (described as 20%/20%/10% but functions as 20%/10%/20%, inconsistent with the description) to 20%/20%/15%.",
+          "entity": {
+            "type": "synergy",
+            "synergy": "is_knight",
+            "slug": "knight"
+          }
         },
         {
           "kind": "nerf",
           "name": "Warlocks - Soul Leech",
-          "detail": "(4) Warlocks: The lifesteal percentage is decreased from 5%/20% to 5%/15%."
+          "detail": "(4) Warlocks: The lifesteal percentage is decreased from 5%/20% to 5%/15%.",
+          "entity": {
+            "type": "synergy",
+            "synergy": "is_warlock",
+            "slug": "warlock"
+          }
         },
         {
           "kind": "buff",
           "name": "Priests - Salvation",
-          "detail": "(4) Priests: The duration of the Priest's Mind Control is increased from (controller level × 2) seconds to (controller level × 2 + 2) seconds."
+          "detail": "(4) Priests: The duration of the Priest's Mind Control is increased from (controller level × 2) seconds to (controller level × 2 + 2) seconds.",
+          "entity": {
+            "type": "synergy",
+            "synergy": "is_priest",
+            "slug": "priest"
+          }
         },
         {
           "kind": "change",
@@ -137,7 +185,12 @@
         {
           "kind": "nerf",
           "name": "Demons - Fel Power",
-          "detail": "Maximum stack count reduced from 10 to 8."
+          "detail": "Maximum stack count reduced from 10 to 8.",
+          "entity": {
+            "type": "synergy",
+            "synergy": "is_demon",
+            "slug": "demon"
+          }
         },
         {
           "kind": "buff",
@@ -152,7 +205,12 @@
         {
           "kind": "added",
           "name": "New Tier 3 Item - Diffusal Blade",
-          "detail": "Attack Damage: +25, Mana Break on Attack: +50 The carrier deals +50% damage to non-permanent chess pieces."
+          "detail": "Attack Damage: +25, Mana Break on Attack: +50 The carrier deals +50% damage to non-permanent chess pieces.",
+          "entity": {
+            "type": "item",
+            "item": "item_jinghunzhiren",
+            "slug": "diffusal-blade"
+          }
         },
         {
           "kind": "buff",
@@ -160,6 +218,7 @@
           "detail": "Lifesteal percentage increased from 15% to 20%.",
           "entity": {
             "type": "item",
+            "item": "item_jipin",
             "slug": "vladimirs-offering"
           }
         },
@@ -169,6 +228,7 @@
           "detail": "Attack damage bonus reduced from +60 to +50.",
           "entity": {
             "type": "item",
+            "item": "item_sanchaji",
             "slug": "trident"
           }
         },
@@ -178,6 +238,7 @@
           "detail": "Illusions now inherit passive effects of the carrier's equipment (but cannot use active equipment). Duration of illusions reduced from 10 seconds to 8 seconds.",
           "entity": {
             "type": "item",
+            "item": "item_huanyingfu",
             "slug": "manta-style"
           }
         },
@@ -187,6 +248,7 @@
           "detail": "Lifesteal percentage increased from 45% to 50%. Cooldown reduced from 20 seconds to 15 seconds.",
           "entity": {
             "type": "item",
+            "item": "item_sadan",
             "slug": "satanic"
           }
         }

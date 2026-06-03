@@ -18,6 +18,7 @@
           "detail": "Level 3 added. <Battlecry Ability: Activates before the battle starts> IO tethers with allies around, granting percentage damage reduction. Health percentage will be distributed equally among all tethered allies at set intervals. The benevolent touch of Io brings strength from between the planes.",
           "entity": {
             "type": "unit",
+            "unit": "io",
             "slug": "io"
           }
         },
@@ -27,6 +28,7 @@
           "detail": "Base attack damage increased from 50 to 60",
           "entity": {
             "type": "unit",
+            "unit": "clinkz",
             "slug": "clinkz"
           }
         },
@@ -36,6 +38,7 @@
           "detail": "CD decreased from 25/20/15s to 15/12/10s",
           "entity": {
             "type": "unit",
+            "unit": "muerta",
             "slug": "muerta"
           }
         },
@@ -45,6 +48,7 @@
           "detail": "Base attack damage decreased from 75 to 60",
           "entity": {
             "type": "unit",
+            "unit": "terrorblade",
             "slug": "terrorblade"
           }
         },
@@ -54,6 +58,7 @@
           "detail": "Base attack damage increased from 75 to 80",
           "entity": {
             "type": "unit",
+            "unit": "drow-ranger",
             "slug": "drow-ranger"
           }
         },
@@ -63,6 +68,7 @@
           "detail": "Base magical resistance increased from 10 to 20",
           "entity": {
             "type": "unit",
+            "unit": "phantom-assassin",
             "slug": "phantom-assassin"
           }
         },
@@ -72,6 +78,7 @@
           "detail": "Now affects Magic Immune targets.",
           "entity": {
             "type": "unit",
+            "unit": "primal-beast",
             "slug": "primal-beast"
           }
         },
@@ -81,6 +88,7 @@
           "detail": "Duration increased from 4/5/6s to 5/6/7s",
           "entity": {
             "type": "unit",
+            "unit": "omniknight",
             "slug": "omniknight"
           }
         },
@@ -90,6 +98,7 @@
           "detail": "Mana cost increased from 50 to 75",
           "entity": {
             "type": "unit",
+            "unit": "invoker",
             "slug": "invoker"
           }
         },
@@ -99,6 +108,7 @@
           "detail": "Spirit count decreased from 2/3/3 to 1/2/3, CD decreased from 12/10/6s to 10s",
           "entity": {
             "type": "unit",
+            "unit": "invoker",
             "slug": "invoker"
           }
         },
@@ -108,6 +118,7 @@
           "detail": "Frozen duration from 3/4/5s to 2/3/4s",
           "entity": {
             "type": "unit",
+            "unit": "invoker",
             "slug": "invoker"
           }
         },
@@ -117,6 +128,7 @@
           "detail": "Duration decreased from 8s to 6s.",
           "entity": {
             "type": "unit",
+            "unit": "ringmaster",
             "slug": "ringmaster"
           }
         }
@@ -128,7 +140,12 @@
         {
           "kind": "added",
           "name": "New Class Specialty - Druid",
-          "detail": "Druid pieces will not be destroyed on a ★★★ piece combined."
+          "detail": "Druid pieces will not be destroyed on a ★★★ piece combined.",
+          "entity": {
+            "type": "synergy",
+            "synergy": "is_druid",
+            "slug": "druid"
+          }
         },
         {
           "kind": "nerf",
@@ -136,6 +153,7 @@
           "detail": "(6) Added. (2) Druids: Two identical Druid★ can promote to a Druid★★. (4) Druids: Two identical Druid★★ can promote to a Druid★★★. (6) Druids: Two identical Druid★★★ can promote to the great Altar of Spirits♥♥♥, and gain several(equal to the level of Druid★★★) stack of Altar Power, and destroy all Druid pieces in the chess pool. P.S.: Every stack of Altar Power can reduce 10% damage taken and amplify 20% damage dealt. P.S.: Altar Power can be shared by all ally Druid pieces tethered by Altar of Spirits♥♥♥. Druids can control the great power of Nature to protect spirits and balance.",
           "entity": {
             "type": "synergy",
+            "synergy": "is_druid",
             "slug": "druid"
           }
         },
@@ -145,6 +163,7 @@
           "detail": "(2) Kobolds now reshape itself into a random non-Kobold ally of the same rank before battle starts.",
           "entity": {
             "type": "synergy",
+            "synergy": "is_kobold",
             "slug": "kobold"
           }
         },
@@ -154,6 +173,7 @@
           "detail": "Now Lifesteal affects Pure damage.",
           "entity": {
             "type": "unit",
+            "unit": "warlock",
             "slug": "warlock"
           }
         },
@@ -163,6 +183,7 @@
           "detail": "Description precised. All damage will settled as Pure Damage (Prior to considered as Magical damage)",
           "entity": {
             "type": "synergy",
+            "synergy": "is_demon",
             "slug": "demon"
           }
         },
@@ -172,6 +193,7 @@
           "detail": "Description precised. All damage will settled as Pure Damage (Prior to considered as Magical damage)",
           "entity": {
             "type": "synergy",
+            "synergy": "is_demonhunter",
             "slug": "demon-hunter"
           }
         }
@@ -201,6 +223,7 @@
           "detail": "Upgraded from T3 to T5, and adjusted accordingly. +900 max health. All victims suffer: Attack speed, Move speed, mana restoration and healing effectiveness -75%.",
           "entity": {
             "type": "item",
+            "item": "item_bingyan",
             "slug": "eye-of-skadi"
           }
         },
@@ -215,6 +238,7 @@
           "detail": "Magical damage amplification decreased from +40% to 30%.",
           "entity": {
             "type": "item",
+            "item": "item_huiguang",
             "slug": "kaya"
           }
         },
@@ -229,6 +253,7 @@
           "detail": "+20% attack speed removed, all damage increases by 20% preserved. All damage increases by 20% Deals each 50% additional damage to at most 2 same-name pieces.",
           "entity": {
             "type": "item",
+            "item": "item_sanchaji",
             "slug": "trident"
           }
         },
@@ -238,6 +263,7 @@
           "detail": "Description precised. All damage will settled as Pure Damage (Prior to considered as Magical damage)",
           "entity": {
             "type": "item",
+            "item": "item_haojie",
             "slug": "havoc"
           }
         }

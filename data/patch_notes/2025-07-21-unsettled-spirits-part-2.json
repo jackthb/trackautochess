@@ -104,7 +104,9 @@
         {
           "kind": "added",
           "name": "New Class Specialty - Druid",
-          "detail": "Druid pieces will not be destroyed on a ★★★ piece combined."
+          "detail": "Druid pieces will not be destroyed on a ★★★ piece combined.",
+          "entity_type": "synergy",
+          "entity_slug": "druid"
         },
         {
           "kind": "nerf",

@@ -122,7 +122,7 @@
           "name": "3A — Frenzy",
           "detail": "Lifesteal 25% → 30%.",
           "entity_type": "talent",
-          "entity_slug": "talents"
+          "entity_slug": "3a"
         },
         {
           "kind": "nerf",

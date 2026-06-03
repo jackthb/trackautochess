@@ -28,6 +28,7 @@
           "detail": "Skill <Arcane Bolt> <Targeted active ability: Activate on ally skill cast> Whenever an allied piece casts a skill, the Stormrage Mage will immediately cast a slow-moving Arcane Bolt swarm at the enemy, dealing magic damage to the target.",
           "entity": {
             "type": "unit",
+            "unit": "skywrath-mage",
             "slug": "skywrath-mage"
           }
         },
@@ -37,6 +38,7 @@
           "detail": "Updated race to Harpy/Undead.",
           "entity": {
             "type": "unit",
+            "unit": "vengeful-spirit",
             "slug": "vengeful-spirit"
           }
         },
@@ -46,6 +48,7 @@
           "detail": "Now a targeted active skill rather than a Battlecry. <Targeted active ability: Instant> Switch positions with one or more enemy pieces with a star level not higher than the Nether Swap skill level.",
           "entity": {
             "type": "unit",
+            "unit": "vengeful-spirit",
             "slug": "vengeful-spirit"
           }
         },
@@ -55,6 +58,7 @@
           "detail": "Cost reduced from $5 to $3, with adjustments to piece and skill values to match the new cost.",
           "entity": {
             "type": "unit",
+            "unit": "enigma",
             "slug": "enigma"
           }
         },
@@ -64,6 +68,7 @@
           "detail": "Cost increased from $4 to $5, with adjustments to piece and skill values to match the new cost.",
           "entity": {
             "type": "unit",
+            "unit": "lich",
             "slug": "lich"
           }
         },
@@ -73,6 +78,7 @@
           "detail": "Cost increased from $3 to $5, with adjustments to piece and skill values to match the new cost.",
           "entity": {
             "type": "unit",
+            "unit": "omniknight",
             "slug": "omniknight"
           }
         },
@@ -82,6 +88,7 @@
           "detail": "has been reworked. <Active ability: Activated on ally injured> Summons a Guardian Angel that grants nearby allied pieces a Divine Protection Shield, significantly reducing physical and magic damage, and dispelling negative effects.",
           "entity": {
             "type": "unit",
+            "unit": "omniknight",
             "slug": "omniknight"
           }
         },
@@ -91,6 +98,7 @@
           "detail": "Skill reworked to <Viper Strike> <Targeted active ability: Activated when mana is full> Viper Strike targets an enemy piece with the highest attack damage, reducing its attack speed and dealing ongoing poison magic damage. Attack speed gradually recovers during the poison’s duration.",
           "entity": {
             "type": "unit",
+            "unit": "viper",
             "slug": "viper"
           }
         },
@@ -100,6 +108,7 @@
           "detail": "Now only steals abilities from enemy pieces that have mana.",
           "entity": {
             "type": "unit",
+            "unit": "rubick",
             "slug": "rubick"
           }
         },
@@ -109,6 +118,7 @@
           "detail": "The base damage has been changed from (400/600/1000 + 5%/10%/15% of target's maximum health as magical damage) to (300/500/900 as pure damage); the additional damage per stack of Fel Power has been adjusted from (5%/10%/15% of target's maximum health as magical damage) to (200/250/350 as pure damage), and the effect of stealing the target's current mana has been removed.",
           "entity": {
             "type": "unit",
+            "unit": "lion",
             "slug": "lion"
           }
         },
@@ -118,6 +128,7 @@
           "detail": "The execution damage has been changed from (200/300/400 + 0.6/1.2/1.8 times the target's missing health) to (500/700/900 + 50%/70%/90% of the target's maximum health). Cooldown has been balanced from 8/6/4 seconds to 8/7/6 seconds. <Targeted active ability: Activates on full mana> Use Reaper's Scythe to strike an enemy, causing stun and pure damage based on (base damage + a percentage of maximum health), and enemy pieces killed by this will not trigger their death passives.",
           "entity": {
             "type": "unit",
+            "unit": "necrophos",
             "slug": "necrophos"
           }
         },
@@ -127,6 +138,7 @@
           "detail": "The number of summoned Forge Spirits has been increased from 2 to 2/3/3, and the cooldown has been balanced from 12/9/6 seconds to 12/10/6 seconds.",
           "entity": {
             "type": "unit",
+            "unit": "invoker",
             "slug": "invoker"
           }
         },
@@ -136,6 +148,7 @@
           "detail": "The stun range of the inferno from Hellfire has been reduced from 250 to 200/200/250.",
           "entity": {
             "type": "unit",
+            "unit": "warlock",
             "slug": "warlock"
           }
         },
@@ -160,6 +173,7 @@
           "detail": "(9) Elves: When elves create illusions, they now gain a brief invisibility effect, causing enemies to temporarily lose their attack target. (9) Elves: Friendly elves gain the effect: Dodging any attack will conceal itself for 0.5 second and create a mirrored attack from the attacker, targeting the enemy.",
           "entity": {
             "type": "synergy",
+            "synergy": "is_elf",
             "slug": "elf"
           }
         },
@@ -169,6 +183,7 @@
           "detail": "(6) Gods: Now requires mana-consuming active abilities to trigger. (6) Gods: All allies get the effect: Using skills that consume mana will reduce the current remaining cooldown time of active abilities and items by 50%%.",
           "entity": {
             "type": "synergy",
+            "synergy": "is_god",
             "slug": "god"
           }
         },
@@ -178,6 +193,7 @@
           "detail": "Now even a single demon has one layer of Demonic Power (previously only counted \"other\" demons of the same type).",
           "entity": {
             "type": "synergy",
+            "synergy": "is_demon",
             "slug": "demon"
           }
         },
@@ -187,6 +203,7 @@
           "detail": "(4) Elementals: The chance of petrification for 4 seconds is increased from 25% to 30%.",
           "entity": {
             "type": "synergy",
+            "synergy": "is_element",
             "slug": "elemental"
           }
         },
@@ -196,6 +213,7 @@
           "detail": "(6) Nagas: The explosion damage from Naga's abilities now has a cap of 500 (but does not affect absorbed damage).",
           "entity": {
             "type": "synergy",
+            "synergy": "is_naga",
             "slug": "naga"
           }
         },
@@ -205,6 +223,7 @@
           "detail": "The duration of the stun from the charge is reduced from 1.25 seconds to 1 second.",
           "entity": {
             "type": "synergy",
+            "synergy": "is_centaur",
             "slug": "centaur"
           }
         }
@@ -271,12 +290,22 @@
         {
           "kind": "change",
           "name": "(9) Undeads",
-          "detail": "All plagued units lose 5% max health per 3 secs (no less than 5%)"
+          "detail": "All plagued units lose 5% max health per 3 secs (no less than 5%)",
+          "entity": {
+            "type": "synergy",
+            "synergy": "is_undead",
+            "slug": "undead"
+          }
         },
         {
           "kind": "buff",
           "name": "(6) Knights",
-          "detail": "Shield Chance increased from 15% to 20%"
+          "detail": "Shield Chance increased from 15% to 20%",
+          "entity": {
+            "type": "synergy",
+            "synergy": "is_knight",
+            "slug": "knight"
+          }
         },
         {
           "kind": "nerf",
@@ -284,6 +313,7 @@
           "detail": "Radius decreased from 350/550/750 to 350/450/650",
           "entity": {
             "type": "unit",
+            "unit": "omniknight",
             "slug": "omniknight"
           }
         },
@@ -308,6 +338,7 @@
           "detail": "Reworked (2) Nagas: All allies gain 2 stack of shields, each stack absorbs 15% ability damage (4) Nagas: All allies gain 3 stacks of shields above, and the stack reduces every 3 seconds. (6) Nagas: Every stack on Naga pieces explodes when it disappears, dealing a magical damage that equals to damage absorbed after the last explosion. P.S.1 Cannot absorb pure damage P.S.2 Explosion damage cannot exceed its max HP",
           "entity": {
             "type": "synergy",
+            "synergy": "is_naga",
             "slug": "naga"
           }
         }

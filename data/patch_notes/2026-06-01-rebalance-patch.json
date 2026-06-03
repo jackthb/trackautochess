@@ -23,32 +23,44 @@
         {
           "kind": "buff",
           "name": "Luna - Moon Glaive",
-          "detail": "Bounce count raised from 2/3/4 to 3/4/5"
+          "detail": "Bounce count raised from 2/3/4 to 3/4/5",
+          "entity_type": "unit",
+          "entity_slug": "luna"
         },
         {
           "kind": "buff",
           "name": "Io/Altar of Spirits - Bond",
-          "detail": "Linked target damage reduction raised from 10%/15%/25% to 10%/20%/30%"
+          "detail": "Linked target damage reduction raised from 10%/15%/25% to 10%/20%/30%",
+          "entity_type": "unit",
+          "entity_slug": "io"
         },
         {
           "kind": "nerf",
           "name": "Naga - Scale Armor",
-          "detail": "6 Naga reflect damage multiplier lowered from twice to 1.5 times"
+          "detail": "6 Naga reflect damage multiplier lowered from twice to 1.5 times",
+          "entity_type": "synergy",
+          "entity_slug": "naga"
         },
         {
           "kind": "buff",
           "name": "Bloodthorn",
-          "detail": "Cooldown reduced from 15 seconds to 12 seconds"
+          "detail": "Cooldown reduced from 15 seconds to 12 seconds",
+          "entity_type": "item",
+          "entity_slug": "bloodthorn"
         },
         {
           "kind": "change",
           "name": "Spark of Courage",
-          "detail": "Trigger condition changed from target level higher than self to target level no less than self"
+          "detail": "Trigger condition changed from target level higher than self to target level no less than self",
+          "entity_type": "item",
+          "entity_slug": "spark-of-courage"
         },
         {
           "kind": "fix",
           "name": "Assassins - 9",
-          "detail": "Fixed bug of 9 Assassin leap cooldown miscalculated as 15 seconds correct value is 10 seconds"
+          "detail": "Fixed bug of 9 Assassin leap cooldown miscalculated as 15 seconds correct value is 10 seconds",
+          "entity_type": "synergy",
+          "entity_slug": "assassin"
         },
         {
           "kind": "change",

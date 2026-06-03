@@ -28,6 +28,7 @@
           "detail": "Cooldown increased from 5/4/3 seconds to 8/6/4 seconds.",
           "entity": {
             "type": "unit",
+            "unit": "dark-willow",
             "slug": "dark-willow"
           }
         },
@@ -37,6 +38,7 @@
           "detail": "Armour reduction of the victim increased from -2/3/4 to -2/4/6, and removed mana regen prevention.",
           "entity": {
             "type": "unit",
+            "unit": "vengeful-spirit",
             "slug": "vengeful-spirit"
           }
         },
@@ -46,6 +48,7 @@
           "detail": "Damage type now changed back to PURE instead of MAGICAL, damage decreased from 200/300/400 to 150/200/300.",
           "entity": {
             "type": "unit",
+            "unit": "blood-seeker",
             "slug": "blood-seeker"
           }
         },
@@ -55,6 +58,7 @@
           "detail": "Cooldown increased from 6/4/3 secs to 6/5/4 secs.",
           "entity": {
             "type": "unit",
+            "unit": "timbersaw",
             "slug": "timbersaw"
           }
         },
@@ -64,6 +68,7 @@
           "detail": "Additional damage decreased from 100/200/400 to 100/200/300",
           "entity": {
             "type": "unit",
+            "unit": "ember-spirit",
             "slug": "ember-spirit"
           }
         },
@@ -73,6 +78,7 @@
           "detail": "Flying speed decreased from 1250/1875/2500 to 1250/1500/1750 (may prevent it from escaping your own chess board), base damage increased from 40/60/100 to 50/75/125.",
           "entity": {
             "type": "unit",
+            "unit": "storm-spirit",
             "slug": "storm-spirit"
           }
         },
@@ -82,6 +88,7 @@
           "detail": "Damage multiplier decreased from 5/7/10 to 4/6/8..",
           "entity": {
             "type": "unit",
+            "unit": "anti-mage",
             "slug": "anti-mage"
           }
         },
@@ -91,6 +98,7 @@
           "detail": "Dagger strikes increased from 3/4/5 to 4/5/6.",
           "entity": {
             "type": "unit",
+            "unit": "pangolier",
             "slug": "pangolier"
           }
         },
@@ -100,6 +108,7 @@
           "detail": "Duration increased from 4/5/8 seconds to 4/6/8 seconds.",
           "entity": {
             "type": "unit",
+            "unit": "disruptor",
             "slug": "disruptor"
           }
         }
@@ -114,6 +123,7 @@
           "detail": "Adjusted from (2) (4) to (3) (6). (3) Shaman: All friendly Shaman chess pieces gain the effect: Transform into a random chess piece of +2 levels after casting an active skill or using an active item. (6) Shaman: Equipped items carried by transformed chess pieces will also transform into random items of +2 levels. Note: Transformed chess pieces' levels will not exceed the current level of the courier. Transformation takes 3 seconds to cast. Note: Hex does not transform non-permanent chess pieces, and they cease to be permanent chess pieces after transformation, lasting 15 to 20 seconds. Note: (3) Shaman does not inherit equipment after transformation.",
           "entity": {
             "type": "synergy",
+            "synergy": "is_shaman",
             "slug": "shaman"
           }
         },
@@ -143,6 +153,7 @@
           "detail": "Initial mana gain reduced from +40 to +30.",
           "entity": {
             "type": "item",
+            "item": "item_moping_kong",
             "slug": "bottle"
           }
         },
@@ -152,6 +163,7 @@
           "detail": "Mana restoration on trigger reduced from +30 to +20.",
           "entity": {
             "type": "item",
+            "item": "item_tiaodao",
             "slug": "blink-dagger"
           }
         },
@@ -161,6 +173,7 @@
           "detail": "Mana restoration on trigger increased from +20 to +30.",
           "entity": {
             "type": "item",
+            "item": "item_yuanlifazhang",
             "slug": "force-staff"
           }
         },
@@ -170,6 +183,7 @@
           "detail": "Mana regeneration reduced from +100% to +50%.",
           "entity": {
             "type": "item",
+            "item": "item_wangzhezhijie",
             "slug": "ring-of-basilius"
           }
         },
@@ -184,6 +198,7 @@
           "detail": "Added effect: Summons' duration +100% (merged with Summoning Stone). Attack Speed +10%. Chess pieces summoned by the carrier gain: Attack speed + +100%, duration + +100%.",
           "entity": {
             "type": "item",
+            "item": "item_linglichangbian",
             "slug": "bullwhip"
           }
         },
@@ -193,6 +208,7 @@
           "detail": "Downgraded from T3 to T2. Attack Speed +10%. 20% chance on attack to release a forked lightning, dealing 100 magic damage to up to 3 enemies.",
           "entity": {
             "type": "item",
+            "item": "item_xuanwo",
             "slug": "maelstrom"
           }
         },
@@ -202,6 +218,7 @@
           "detail": "Now also effective with targeted active items (Rod of Atos, Hand of Midas, Heaven's Halberd, Bloodthorn, God's Rebuke, Abyssal Blade, Scythe of Vyse).",
           "entity": {
             "type": "item",
+            "item": "item_fashulengjing",
             "slug": "spell-prism"
           }
         },
@@ -211,6 +228,7 @@
           "detail": "Base attack increased from +50 to +60.",
           "entity": {
             "type": "item",
+            "item": "item_sanchaji",
             "slug": "trident"
           }
         },
@@ -220,6 +238,7 @@
           "detail": "AI optimisation, now activates when enemies are close to full mana (previously activated after taking damage).",
           "entity": {
             "type": "item",
+            "item": "item_bkb",
             "slug": "black-king-bar"
           }
         },
@@ -234,13 +253,19 @@
           "detail": "Duration of active effect increased from 5 seconds to 6 seconds.",
           "entity": {
             "type": "item",
+            "item": "item_hudie",
             "slug": "butterfly"
           }
         },
         {
           "kind": "nerf",
           "name": "Scythe of the Vyse",
-          "detail": "Duration reduced from 7 seconds to 6 seconds."
+          "detail": "Duration reduced from 7 seconds to 6 seconds.",
+          "entity": {
+            "type": "item",
+            "item": "item_yangdao",
+            "slug": "scythe-of-vyse"
+          }
         }
       ]
     },
@@ -270,7 +295,12 @@
         {
           "kind": "fix",
           "name": "Fixed bug where Guardian Greaves could dispel ally mind control",
-          "detail": ""
+          "detail": "",
+          "entity": {
+            "type": "item",
+            "item": "item_weishijingjia",
+            "slug": "guardian-greaves"
+          }
         },
         {
           "kind": "fix",

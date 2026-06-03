@@ -140,7 +140,9 @@
         {
           "kind": "fix",
           "name": "Fixed a bug with the sven - God’s Strength that values become invalid due to changes in the data structure of DOTA2",
-          "detail": ""
+          "detail": "",
+          "entity_type": "unit",
+          "entity_slug": "sven"
         },
         {
           "kind": "fix",
@@ -155,7 +157,9 @@
         {
           "kind": "fix",
           "name": "Fixed a bug with Terrorblade where transformed allied chess pieces had a duration",
-          "detail": ""
+          "detail": "",
+          "entity_type": "unit",
+          "entity_slug": "terrorblade"
         },
         {
           "kind": "fix",

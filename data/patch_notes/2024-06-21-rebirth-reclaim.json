@@ -113,7 +113,9 @@
         {
           "kind": "added",
           "name": "New Tier 4 Item - Aegis of Immortal",
-          "detail": "Deathrattle: Resurrect once after death. Immortals used to have a magical shield to prevent them from death."
+          "detail": "Deathrattle: Resurrect once after death. Immortals used to have a magical shield to prevent them from death.",
+          "entity_type": "item",
+          "entity_slug": "aegis-of-immortal"
         },
         {
           "kind": "change",

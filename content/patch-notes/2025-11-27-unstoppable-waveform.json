@@ -23,6 +23,7 @@
           "detail": "Upgraded from $2 to $5, and gained Elf.",
           "entity": {
             "type": "unit",
+            "unit": "morphling",
             "slug": "morphling"
           }
         },
@@ -32,6 +33,7 @@
           "detail": "Reworked <Passive Ability> Morphling will transfer his properties between his attack damage and health percentage due to his health status. The higher his health percentage is, the higher the attack speed he gains. <Active Ability: Activates on accumulated attack times> Morphling dissolves into liquid and surges towards an far-away enemy, dealing magical damage to enemy units on his path.",
           "entity": {
             "type": "unit",
+            "unit": "morphling",
             "slug": "morphling"
           }
         },
@@ -41,6 +43,7 @@
           "detail": "Upgraded from $1 to $3, Multicast reworked into an aura effect. <Aura>Grants all allies around: Have a chance to recast its ability and gain a bloodlust effect with bonus attack speed.",
           "entity": {
             "type": "unit",
+            "unit": "ogre-magi",
             "slug": "ogre-magi"
           }
         },
@@ -50,6 +53,7 @@
           "detail": "Downgraded from $3 to $2.",
           "entity": {
             "type": "unit",
+            "unit": "meepo",
             "slug": "meepo"
           }
         },
@@ -59,6 +63,7 @@
           "detail": "Duration increased from 5/8/10s to 6/8/10s, CD decreased from 7/6/5s to 6/5/4s.",
           "entity": {
             "type": "unit",
+            "unit": "viper",
             "slug": "viper"
           }
         },
@@ -68,6 +73,7 @@
           "detail": "Radius decreased from 250/300/400 to 250/300/350, CD increased from 10/8/6s to 10/9/8s.",
           "entity": {
             "type": "unit",
+            "unit": "undying",
             "slug": "undying"
           }
         },
@@ -77,6 +83,7 @@
           "detail": "Physical damage decreased from 150/300/450 to 100/200/400.",
           "entity": {
             "type": "unit",
+            "unit": "earthshaker",
             "slug": "earthshaker"
           }
         },
@@ -86,6 +93,7 @@
           "detail": "Base attack speed decreased from 1.7s to 1.5s",
           "entity": {
             "type": "unit",
+            "unit": "dragon-knight",
             "slug": "dragon-knight"
           }
         },
@@ -95,6 +103,7 @@
           "detail": "CD decreased from 10/8/6s to 8/6/4s",
           "entity": {
             "type": "unit",
+            "unit": "snapfire",
             "slug": "snapfire"
           }
         },
@@ -104,6 +113,7 @@
           "detail": "CD increased from 12/10/8s to 12/12/12s",
           "entity": {
             "type": "unit",
+            "unit": "chen",
             "slug": "chen"
           }
         },
@@ -113,6 +123,7 @@
           "detail": "Consumes a health of the gate that equals to the level of minion summoned instead of the cost of it. Summons at a fixed interval of 4s.",
           "entity": {
             "type": "unit",
+            "unit": "abyssal-underlord",
             "slug": "abyssal-underlord"
           }
         },
@@ -122,6 +133,7 @@
           "detail": "Base attack damage bonus decrease from 80%/160%/240% to 80%/120%/200%, additional attack damage bonus per Demon decreased from 40%/80%/120% to 40%/60%/100%",
           "entity": {
             "type": "unit",
+            "unit": "sven",
             "slug": "sven"
           }
         },
@@ -131,6 +143,7 @@
           "detail": "Duration decreased from 5/6/7s to 4/5/6s",
           "entity": {
             "type": "unit",
+            "unit": "omniknight",
             "slug": "omniknight"
           }
         }
@@ -145,6 +158,7 @@
           "detail": "(4) Taurens - Chance for Horn Totem and Woodpecker Totem increased from 5%/25% to 10%/30%",
           "entity": {
             "type": "synergy",
+            "synergy": "is_tauren",
             "slug": "tauren"
           }
         },
@@ -154,6 +168,7 @@
           "detail": "(9) Assassins - Crit multiplier increased from 500% to 600%",
           "entity": {
             "type": "synergy",
+            "synergy": "is_assassin",
             "slug": "assassin"
           }
         },
@@ -163,6 +178,7 @@
           "detail": "(6) Undeads - Max health reduction decreased from 40% to 35%; (9) Undeads - Max health reduction interval decreased from 2.5s to 2s",
           "entity": {
             "type": "synergy",
+            "synergy": "is_undead",
             "slug": "undead"
           }
         },
@@ -172,6 +188,7 @@
           "detail": "(9) Minimum frozen duration increased from 0.2s to 0.5s",
           "entity": {
             "type": "synergy",
+            "synergy": "is_mage",
             "slug": "mage"
           }
         }
@@ -186,6 +203,7 @@
           "detail": "CD decreased from 5s to 3s",
           "entity": {
             "type": "item",
+            "item": "item_jinghunzhiren",
             "slug": "diffusal-blade"
           }
         },
@@ -195,6 +213,7 @@
           "detail": "Magical damage bonus increased from 20% to 30%",
           "entity": {
             "type": "item",
+            "item": "item_aiweinazhiyu",
             "slug": "avianas-feather"
           }
         },
@@ -204,6 +223,7 @@
           "detail": "CD increased from 15s to 25s",
           "entity": {
             "type": "item",
+            "item": "item_huanyingfu",
             "slug": "manta-style"
           }
         }
@@ -218,6 +238,7 @@
           "detail": "Chances for turnips’ growing up every round is now dynamic. Chances are much higher in later games. Details are as follows: Rounds Previous Chance Dynamic Chance 10~19 60% 40%~60% 20~29 60% 60%~80% 30~39 60% 80%~100% 40+ 60% 100%",
           "entity": {
             "type": "relic",
+            "relic": "item_bench_contract",
             "slug": "magic-seed"
           }
         },
@@ -227,6 +248,7 @@
           "detail": "Randoms between 1 ~ Current Level instead of 2 ~ Current Level",
           "entity": {
             "type": "relic",
+            "relic": "item_mangotree",
             "slug": "mango-tree"
           }
         }

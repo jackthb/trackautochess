@@ -16,6 +16,7 @@
           "detail": "New relic. 20% chance to directly obtain a ★★ piece on purchase if you already own one.",
           "entity": {
             "type": "relic",
+            "relic": "item_super_uprank",
             "slug": "lucid-star"
           }
         },
@@ -25,6 +26,7 @@
           "detail": "New relic. Reduces damage taken on home defeats or increases damage dealt on away-home victories by 1–10 based on your courier's lost health. Every 10% health lost adds 1 to the reduction or bonus, capped at 10.",
           "entity": {
             "type": "relic",
+            "relic": "item_rank_damage",
             "slug": "defiant-shell"
           }
         },
@@ -34,6 +36,7 @@
           "detail": "New relic. Refunds 1–2 random gold if you fail to recruit any owned chess piece. Consecutive recruitment failures gradually raise the chance of receiving 2 gold.",
           "entity": {
             "type": "relic",
+            "relic": "item_free_draw",
             "slug": "weighted-dice"
           }
         },
@@ -43,6 +46,7 @@
           "detail": "Temporarily removed from the drop pool.",
           "entity": {
             "type": "relic",
+            "relic": "item_conceal_prepare",
             "slug": "shroud-of-concealment"
           }
         }
@@ -57,6 +61,7 @@
           "detail": "Base attack interval reduced from 1.3s to 1.2s.",
           "entity": {
             "type": "unit",
+            "unit": "luna",
             "slug": "luna"
           }
         },
@@ -86,6 +91,7 @@
           "detail": "Base attack damage 87.5 → 75.",
           "entity": {
             "type": "unit",
+            "unit": "gyrocopter",
             "slug": "gyrocopter"
           }
         },
@@ -135,7 +141,8 @@
           "detail": "Lifesteal 25% → 30%.",
           "entity": {
             "type": "talent",
-            "slug": "talents"
+            "talent": "3a",
+            "slug": "3a"
           }
         },
         {

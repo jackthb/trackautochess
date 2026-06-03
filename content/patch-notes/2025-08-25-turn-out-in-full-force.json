@@ -33,6 +33,7 @@
           "detail": "Reworked Hoodwink attacked with an acorn at the target unit. The acorn bounces to nearby targets, bouncing it to several nearby threatening enemy chess pieces, dealing physical damage, and granting a 100% chance for probable effects of all allies’ synergy on its victims.",
           "entity": {
             "type": "unit",
+            "unit": "hoodwink",
             "slug": "hoodwink"
           }
         },
@@ -42,6 +43,7 @@
           "detail": "CD decreased from 20/15/12s to 15/12/10s",
           "entity": {
             "type": "unit",
+            "unit": "oracle",
             "slug": "oracle"
           }
         },
@@ -51,6 +53,7 @@
           "detail": "Damage decreased from 250/400/550 to 150/300/600",
           "entity": {
             "type": "unit",
+            "unit": "earthshaker",
             "slug": "earthshaker"
           }
         },
@@ -60,6 +63,7 @@
           "detail": "Transformed allies are now non-permanent pieces which last for 60s.",
           "entity": {
             "type": "unit",
+            "unit": "terrorblade",
             "slug": "terrorblade"
           }
         },
@@ -69,6 +73,7 @@
           "detail": "Damage increased from 100/200/400 to 150/300/600",
           "entity": {
             "type": "unit",
+            "unit": "meepo",
             "slug": "meepo"
           }
         },
@@ -78,6 +83,7 @@
           "detail": "Max damage increased from 100/175/250 to 150/225/300",
           "entity": {
             "type": "unit",
+            "unit": "razor",
             "slug": "razor"
           }
         },
@@ -87,6 +93,7 @@
           "detail": "Radius decreased from 300/350/400 to 250/300/350, damage per second decreased from 100/125/150 to 75/100/125",
           "entity": {
             "type": "unit",
+            "unit": "leshrac",
             "slug": "leshrac"
           }
         },
@@ -96,6 +103,7 @@
           "detail": "Rank 1 damage decreased from 400+40% to 300+30%, while Rank 2 and 3 are not changed.",
           "entity": {
             "type": "unit",
+            "unit": "necrophos",
             "slug": "necrophos"
           }
         },
@@ -105,6 +113,7 @@
           "detail": "Damage on non-permanent pieces decreased from 10%/15%/20% to 8%/12%/16%",
           "entity": {
             "type": "unit",
+            "unit": "ringmaster",
             "slug": "ringmaster"
           }
         },
@@ -114,6 +123,7 @@
           "detail": "Allies protected by angels gains an instant heal of 200/300/400, while damage reduction percentage decreased from 50/70/90% to 40/60/80%",
           "entity": {
             "type": "unit",
+            "unit": "omniknight",
             "slug": "omniknight"
           }
         },
@@ -123,6 +133,7 @@
           "detail": "Cannot tether with Totems now. Damage reduction percentage decreased from 10/20/30% to 10/15/20%, health redistribution interval increased from 5/4/2s to 5/4/3s",
           "entity": {
             "type": "unit",
+            "unit": "io",
             "slug": "io"
           }
         }
@@ -137,6 +148,7 @@
           "detail": "Reworked. (3) Hunters: Every attack of all ally hunters has a 30% chance to perform a precise shot, penetrates evasion and -3 armor, lasts for 5 seconds and is stackable. (6) Hunters: Every attack of all ally hunters has a 60% chance to perform a precise shot, penetrates evasion and -6 armor, lasts for 10 seconds and is stackable. (9) Hunters: Every precise shot will knock back the victim for 2 grids on hit and perform an extra attack.",
           "entity": {
             "type": "synergy",
+            "synergy": "is_hunter",
             "slug": "hunter"
           }
         },
@@ -146,6 +158,7 @@
           "detail": "(4) strengthened and (6) reworked. (2) Warlocks: All allies have All allies have +5% lifesteal from all damage dealt. (4) Warlocks: All allies have All allies have +20% lifesteal from all damage dealt. (6) Warlocks: All ally warlocks steal a max health that equals to the damage on every attack.",
           "entity": {
             "type": "unit",
+            "unit": "warlock",
             "slug": "warlock"
           }
         },
@@ -155,6 +168,7 @@
           "detail": "Can absorb all kinds of damage now (including pure damage)",
           "entity": {
             "type": "synergy",
+            "synergy": "is_naga",
             "slug": "naga"
           }
         },
@@ -164,6 +178,7 @@
           "detail": "(6) Warriors: +9 Armor instead of +12",
           "entity": {
             "type": "synergy",
+            "synergy": "is_warrior",
             "slug": "warrior"
           }
         },
@@ -173,6 +188,7 @@
           "detail": "(9) Elves: Illusion cannot extend Item effects, duration increased from 5s to 7s, CD increased from 4s to 5s",
           "entity": {
             "type": "synergy",
+            "synergy": "is_elf",
             "slug": "elf"
           }
         }
@@ -187,6 +203,7 @@
           "detail": "New tier 3 item. <Aura> All allies in radius gain effect: Attack speed +30%",
           "entity": {
             "type": "item",
+            "item": "item_rengu",
             "slug": "drum-of-endurance"
           }
         },
@@ -201,6 +218,7 @@
           "detail": "Reworked. Now only valid for the carrier, recharges 20 health per 2 seconds instead of 15.",
           "entity": {
             "type": "item",
+            "item": "item_jingmixie",
             "slug": "tranquil-boots"
           }
         },
@@ -210,6 +228,7 @@
           "detail": "Chance increased from +25% to +30%",
           "entity": {
             "type": "item",
+            "item": "item_xingyunguazhui",
             "slug": "lucky-pendant"
           }
         },
@@ -219,6 +238,7 @@
           "detail": "Magical resistance +25% added.",
           "entity": {
             "type": "item",
+            "item": "item_zhusidoupeng",
             "slug": "gossamer-cape"
           }
         },
@@ -228,6 +248,7 @@
           "detail": "Ranged carrier +200 attack range, and counts as Dwarf.",
           "entity": {
             "type": "item",
+            "item": "item_wangyuanjing",
             "slug": "telescope"
           }
         },
@@ -237,6 +258,7 @@
           "detail": "Lifesteal increased from 15% to 25%, attack speed decreased from +20% to +15%",
           "entity": {
             "type": "item",
+            "item": "item_fengkuangmianju",
             "slug": "mask-of-madness"
           }
         },
@@ -246,6 +268,7 @@
           "detail": "Duration increased from 4s to 5s",
           "entity": {
             "type": "item",
+            "item": "item_renjia",
             "slug": "blade-mail"
           }
         },
@@ -255,6 +278,7 @@
           "detail": "Triggers on damage taken instead of health under 50%",
           "entity": {
             "type": "item",
+            "item": "item_changdun",
             "slug": "pavise"
           }
         },
@@ -264,6 +288,7 @@
           "detail": "Reworked. Block 25 physical damage. A melee carrier has a 50% chance to block extra 25 physical damage.",
           "entity": {
             "type": "item",
+            "item": "item_xianfengdun",
             "slug": "vanguard"
           }
         },
@@ -273,6 +298,7 @@
           "detail": "Downgraded from T3 to T2, lifesteal decreased from 30% to 25%",
           "entity": {
             "type": "item",
+            "item": "item_jipin",
             "slug": "vladimirs-offering"
           }
         },
@@ -282,6 +308,7 @@
           "detail": "Lifesteal increased from 20% to 25%",
           "entity": {
             "type": "item",
+            "item": "item_qishijian",
             "slug": "paladin-sword"
           }
         },
@@ -291,6 +318,7 @@
           "detail": "Magical damage +20% added.",
           "entity": {
             "type": "item",
+            "item": "item_aiweinazhiyu",
             "slug": "avianas-feather"
           }
         },
@@ -300,6 +328,7 @@
           "detail": "All damage +20% changed into attack damage +25",
           "entity": {
             "type": "item",
+            "item": "item_sanchaji",
             "slug": "trident"
           }
         },
@@ -309,6 +338,7 @@
           "detail": "Normally blocks 25 damage instead of 30. Blocks 50 damage instead of 30 when activated. +5 armor, Block 25 damage. <Active ability: Activates when taking damage>Grants all allies within the range 50 damage block and +5 armor. Lasts 8 seconds.",
           "entity": {
             "type": "item",
+            "item": "item_chihongjia",
             "slug": "crimson-guard"
           }
         },
@@ -318,6 +348,7 @@
           "detail": "Damage interval increased from 2s to 3s",
           "entity": {
             "type": "item",
+            "item": "item_huiyao",
             "slug": "radiance"
           }
         },
@@ -327,6 +358,7 @@
           "detail": "Health recharge removed. Magical damage +25% added. +25% magical damage, +100 physical block, permanent taunt.",
           "entity": {
             "type": "item",
+            "item": "item_jurenzhijie",
             "slug": "giants-ring"
           }
         }
@@ -341,6 +373,7 @@
           "detail": "Randomly gets 10~15 gold instead of 10~20",
           "entity": {
             "type": "relic",
+            "relic": "item_stolen_vault",
             "slug": "stolen-vault"
           }
         }
@@ -352,7 +385,12 @@
         {
           "kind": "nerf",
           "name": "Talent4A - Radiance",
-          "detail": "IO extra chance initiates from +800% instead of +1000%, and still decreases processively by 200% per IO recruited."
+          "detail": "IO extra chance initiates from +800% instead of +1000%, and still decreases processively by 200% per IO recruited.",
+          "entity": {
+            "type": "talent",
+            "talent": "4a",
+            "slug": "4a"
+          }
         }
       ]
     },
@@ -415,6 +453,7 @@
           "detail": "(6) Warlocks - Steals 0.75× max health instead of 1×",
           "entity": {
             "type": "unit",
+            "unit": "warlock",
             "slug": "warlock"
           }
         },
@@ -424,6 +463,7 @@
           "detail": "(3) (6) strengthened. (3) Hunters: 40% chance for armor -4 for 4s (6) Hunters: 80% chance for armor -8 for 8s",
           "entity": {
             "type": "synergy",
+            "synergy": "is_hunter",
             "slug": "hunter"
           }
         },
@@ -433,6 +473,7 @@
           "detail": "Lasts for 3/5/7s instead 3/4/5s",
           "entity": {
             "type": "unit",
+            "unit": "hoodwink",
             "slug": "hoodwink"
           }
         },
@@ -442,6 +483,7 @@
           "detail": "CD decreased from 16/14/12s to 12/9/6s",
           "entity": {
             "type": "unit",
+            "unit": "windranger",
             "slug": "windranger"
           }
         },
@@ -451,6 +493,7 @@
           "detail": "Inits with 4/5/6 instead of 4/5/7",
           "entity": {
             "type": "unit",
+            "unit": "shadow-fiend",
             "slug": "shadow-fiend"
           }
         },
@@ -460,6 +503,7 @@
           "detail": "Chances for critial strike increased from 10% to 15%",
           "entity": {
             "type": "unit",
+            "unit": "phantom-assassin",
             "slug": "phantom-assassin"
           }
         },
@@ -469,6 +513,7 @@
           "detail": "Interval CD increased from 5~6s to 5~10s",
           "entity": {
             "type": "synergy",
+            "synergy": "is_satyr",
             "slug": "satyr"
           }
         }

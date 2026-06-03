@@ -51,18 +51,20 @@ function materializeEntity(entity) {
   return output;
 }
 
-function linkedEntitySlug(entity) {
+function linkedEntitySlug(entity, entitySlugByRef) {
   if (!entity || typeof entity !== "object") return null;
   const type = entity.type;
   if (typeof type === "string") {
     const selected = entity[type];
-    if (typeof selected === "string" && selected) return selected;
+    if (typeof selected === "string" && selected) {
+      return entitySlugByRef?.[type]?.get(selected) ?? selected;
+    }
   }
   if (typeof entity.slug === "string" && entity.slug) return entity.slug;
   return null;
 }
 
-function patchToData(patch) {
+function patchToData(patch, entitySlugByRef) {
   const next = { ...patch };
   if ("workshopUrl" in next) {
     next.workshop_url = next.workshopUrl;
@@ -76,7 +78,7 @@ function patchToData(patch) {
             const converted = { ...entry };
             if (converted.entity) {
               converted.entity_type = converted.entity.type ?? null;
-              converted.entity_slug = linkedEntitySlug(converted.entity);
+              converted.entity_slug = linkedEntitySlug(converted.entity, entitySlugByRef);
               delete converted.entity;
             }
             return converted;
@@ -98,8 +100,17 @@ async function main() {
     ),
   ]);
 
+  const entitySlugByRef = {
+    unit: new Map(),
+    item: new Map(),
+    synergy: new Map(),
+    relic: new Map(),
+    talent: new Map(),
+  };
+
   const units = {};
-  for (const { entry } of await readCollection("game/units")) {
+  for (const { file, entry } of await readCollection("game/units")) {
+    entitySlugByRef.unit.set(file.replace(/\.json$/, ""), entry.slug);
     units[entry.name] = {
       id: entry.gameId,
       ...materializeEntity(entry),
@@ -108,25 +119,29 @@ async function main() {
   await writeJson("units_full.json", units);
 
   const itemsFull = {};
-  for (const { entry } of await readCollection("game/items")) {
+  for (const { file, entry } of await readCollection("game/items")) {
+    entitySlugByRef.item.set(file.replace(/\.json$/, ""), entry.slug);
     itemsFull[entry.gameId] = materializeEntity(entry);
   }
   await writeJson("items_full.json", itemsFull);
 
   const synergies = {};
-  for (const { entry } of await readCollection("game/synergies")) {
+  for (const { file, entry } of await readCollection("game/synergies")) {
+    entitySlugByRef.synergy.set(file.replace(/\.json$/, ""), entry.slug);
     synergies[entry.gameId] = materializeEntity(entry);
   }
   await writeJson("synergies.json", synergies);
 
   const relics = {};
-  for (const { entry } of await readCollection("game/relics")) {
+  for (const { file, entry } of await readCollection("game/relics")) {
+    entitySlugByRef.relic.set(file.replace(/\.json$/, ""), entry.slug);
     relics[entry.gameId] = materializeEntity(entry);
   }
   await writeJson("relics.json", { relics });
 
   const talents = {};
-  for (const { entry } of await readCollection("game/talents")) {
+  for (const { file, entry } of await readCollection("game/talents")) {
+    entitySlugByRef.talent.set(file.replace(/\.json$/, ""), entry.slot);
     const { slot, ...talent } = entry;
     talents[slot] = talent;
   }
@@ -142,7 +157,7 @@ async function main() {
   const patchEntries = [];
   for (const { file, entry } of await readCollection("patch-notes")) {
     const slug = file.replace(/\.json$/, "");
-    const patch = patchToData(entry);
+    const patch = patchToData(entry, entitySlugByRef);
     await writeJson(`patch_notes/${file}`, patch);
     patchEntries.push({
       date: patch.date,

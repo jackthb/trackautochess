@@ -99,7 +99,9 @@
         {
           "kind": "change",
           "name": "Goblins - Nanobots",
-          "detail": "(3) Goblins now target random melee allies (previously random allies)."
+          "detail": "(3) Goblins now target random melee allies (previously random allies).",
+          "entity_type": "synergy",
+          "entity_slug": "goblin"
         },
         {
           "kind": "nerf",
@@ -156,12 +158,16 @@
         {
           "kind": "change",
           "name": "Force Staff (T1)",
-          "detail": "<Active Ability: Activates when health is low. - Pushes the carrier to a safe grid that cannot be attacked by enemies. - Cooldown: 10 seconds. Allows you to manipulate others, for good or evil."
+          "detail": "<Active Ability: Activates when health is low. - Pushes the carrier to a safe grid that cannot be attacked by enemies. - Cooldown: 10 seconds. Allows you to manipulate others, for good or evil.",
+          "entity_type": "item",
+          "entity_slug": "force-staff"
         },
         {
           "kind": "buff",
           "name": "Hand of Midas (T2)",
-          "detail": "<Active Ability: Instant Activation> - Immediately eliminates a summon or creature with health lower than the bearer's. In-home battles, drops (target level/3) gold coins. - Cooldown: 60 seconds. Preserved through unknown magical means, the Hand of Midas is a weapon of greed, sacrificing animals to line the owner's pockets. Item Changes:"
+          "detail": "<Active Ability: Instant Activation> - Immediately eliminates a summon or creature with health lower than the bearer's. In-home battles, drops (target level/3) gold coins. - Cooldown: 60 seconds. Preserved through unknown magical means, the Hand of Midas is a weapon of greed, sacrificing animals to line the owner's pockets. Item Changes:",
+          "entity_type": "item",
+          "entity_slug": "hand-of-midas"
         },
         {
           "kind": "buff",
@@ -178,7 +184,9 @@
         {
           "kind": "buff",
           "name": "Summoning Stone",
-          "detail": "Duration bonus for summoned units increased from 50% to 100%."
+          "detail": "Duration bonus for summoned units increased from 50% to 100%.",
+          "entity_type": "item",
+          "entity_slug": "summoning-stone"
         },
         {
           "kind": "buff",

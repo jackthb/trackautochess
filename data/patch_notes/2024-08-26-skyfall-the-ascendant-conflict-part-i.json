@@ -233,12 +233,16 @@
         {
           "kind": "change",
           "name": "(9) Undeads",
-          "detail": "All plagued units lose 5% max health per 3 secs (no less than 5%)"
+          "detail": "All plagued units lose 5% max health per 3 secs (no less than 5%)",
+          "entity_type": "synergy",
+          "entity_slug": "undead"
         },
         {
           "kind": "buff",
           "name": "(6) Knights",
-          "detail": "Shield Chance increased from 15% to 20%"
+          "detail": "Shield Chance increased from 15% to 20%",
+          "entity_type": "synergy",
+          "entity_slug": "knight"
         },
         {
           "kind": "nerf",

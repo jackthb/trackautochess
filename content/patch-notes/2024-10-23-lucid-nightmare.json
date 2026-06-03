@@ -23,6 +23,7 @@
           "detail": "New chess piece. <Active Skill: Activates on Full Mana> Casting Spell: Grabs a random enemy chess piece, rendering it unable to act and dealing pure damage over time. Victims of Atropos often suffer excruciating agony from the vivid illusions in their nightmares.",
           "entity": {
             "type": "unit",
+            "unit": "bane",
             "slug": "bane"
           }
         },
@@ -32,6 +33,7 @@
           "detail": "Downgraded from $2 to $1",
           "entity": {
             "type": "unit",
+            "unit": "clinkz",
             "slug": "clinkz"
           }
         },
@@ -41,6 +43,7 @@
           "detail": "Upgraded from $1 to $2",
           "entity": {
             "type": "unit",
+            "unit": "vengeful-spirit",
             "slug": "vengeful-spirit"
           }
         },
@@ -50,6 +53,7 @@
           "detail": "Base health increased from 600 to 700",
           "entity": {
             "type": "unit",
+            "unit": "mars",
             "slug": "mars"
           }
         },
@@ -59,6 +63,7 @@
           "detail": "Cooldown reduced from 6/5/4 seconds to 5/4/3 seconds",
           "entity": {
             "type": "unit",
+            "unit": "tusk",
             "slug": "tusk"
           }
         },
@@ -68,6 +73,7 @@
           "detail": "Duration increased from 4/5/6 seconds to 4/5/7 seconds, cooldown reduced from 8/6/4 seconds to 7/5/4 seconds",
           "entity": {
             "type": "unit",
+            "unit": "shadow-shaman",
             "slug": "shadow-shaman"
           }
         },
@@ -77,6 +83,7 @@
           "detail": "Magic damage reduced from 500/750/1250 to 500/750/1000, cooldown reduced from 9/7/5 seconds to 8/6/4 seconds",
           "entity": {
             "type": "unit",
+            "unit": "lina",
             "slug": "lina"
           }
         },
@@ -86,6 +93,7 @@
           "detail": "Base health increased from 850 to 900",
           "entity": {
             "type": "unit",
+            "unit": "pudge",
             "slug": "pudge"
           }
         },
@@ -95,6 +103,7 @@
           "detail": "Absorption increased from 250/350/450 to 300/400/600",
           "entity": {
             "type": "unit",
+            "unit": "abaddon",
             "slug": "abaddon"
           }
         },
@@ -104,6 +113,7 @@
           "detail": "Magic resistance increased from 20% to 25%",
           "entity": {
             "type": "unit",
+            "unit": "huskar",
             "slug": "huskar"
           }
         },
@@ -113,6 +123,7 @@
           "detail": "Added effect \"Hides own position during preparation phase\" (formerly (1) Satyr effect)",
           "entity": {
             "type": "unit",
+            "unit": "riki",
             "slug": "riki"
           }
         },
@@ -122,6 +133,7 @@
           "detail": "Bonus damage increased from 50/75/125 to 50/100/200",
           "entity": {
             "type": "unit",
+            "unit": "muerta",
             "slug": "muerta"
           }
         },
@@ -131,6 +143,7 @@
           "detail": "Base attack increased from 60 to 75",
           "entity": {
             "type": "unit",
+            "unit": "drow-ranger",
             "slug": "drow-ranger"
           }
         },
@@ -140,6 +153,7 @@
           "detail": "Base health increased from 900 to 1000",
           "entity": {
             "type": "unit",
+            "unit": "undying",
             "slug": "undying"
           }
         },
@@ -149,6 +163,7 @@
           "detail": "Pure damage reduced from 500/750/1250 to 500/750/1000, bonus damage per stack reduced from 200/250/350 to 150/200/250",
           "entity": {
             "type": "unit",
+            "unit": "lion",
             "slug": "lion"
           }
         },
@@ -158,6 +173,7 @@
           "detail": "Base damage increased from 100 to 100/150/200",
           "entity": {
             "type": "unit",
+            "unit": "lich",
             "slug": "lich"
           }
         },
@@ -167,6 +183,7 @@
           "detail": "Base damage reduced from 500/700/900 to 300/400/600, percentage damage reduced from 50%/70%/90% to 40%/50%/70%",
           "entity": {
             "type": "unit",
+            "unit": "necrophos",
             "slug": "necrophos"
           }
         }
@@ -181,6 +198,7 @@
           "detail": "Reworked racial skill. (Previously Stealth: (1) Satyr becomes invisible during the preparation phase) (2) Satyr: Allied Satyr chess pieces gain the effect: If there is more than 1 enemy  nearby, they cause those enemies to lose control due to fear. Note: The fear effect has an internal cooldown of 6-10 seconds and cannot trigger continuously.",
           "entity": {
             "type": "synergy",
+            "synergy": "is_satyr",
             "slug": "satyr"
           }
         },
@@ -190,6 +208,7 @@
           "detail": "The duration of spawned insect chess pieces has been reduced from 15-20 seconds to 12-20 seconds.",
           "entity": {
             "type": "synergy",
+            "synergy": "is_aqir",
             "slug": "aqir"
           }
         },
@@ -199,6 +218,7 @@
           "detail": "(9) Elves: Illusion duration decreased from 8 secs to 6 secs.",
           "entity": {
             "type": "synergy",
+            "synergy": "is_elf",
             "slug": "elf"
           }
         }
@@ -213,6 +233,7 @@
           "detail": "Upgraded from T1 to T2, grants 50 mana (30 mana in the previous version)",
           "entity": {
             "type": "item",
+            "item": "item_moping_kong",
             "slug": "bottle"
           }
         },
@@ -222,6 +243,7 @@
           "detail": "Downgraded from T2 to T1, removed effects on its owner (only have effects on summoned units now)",
           "entity": {
             "type": "item",
+            "item": "item_linglichangbian",
             "slug": "bullwhip"
           }
         },
@@ -231,6 +253,7 @@
           "detail": "Max distance decreased from 800 to 600",
           "entity": {
             "type": "item",
+            "item": "item_tiaodao",
             "slug": "blink-dagger"
           }
         },
@@ -240,6 +263,7 @@
           "detail": "Now immune to mana break",
           "entity": {
             "type": "item",
+            "item": "item_gulonghaojiao",
             "slug": "minotaur-horn"
           }
         },
@@ -249,6 +273,7 @@
           "detail": "Attack speed bonus increased from 20% to 30%",
           "entity": {
             "type": "item",
+            "item": "item_hudie",
             "slug": "butterfly"
           }
         },
@@ -258,6 +283,7 @@
           "detail": "CD decreased from 7 secs to 6 secs",
           "entity": {
             "type": "item",
+            "item": "item_dayunchui",
             "slug": "abyssal-blade"
           }
         },
@@ -267,6 +293,7 @@
           "detail": "Cooldown increased from 15 seconds to 20 seconds.",
           "entity": {
             "type": "item",
+            "item": "item_yangdao",
             "slug": "scythe-of-vyse"
           }
         },
@@ -276,6 +303,7 @@
           "detail": "Critical strike chance increased from 15% to 20%.",
           "entity": {
             "type": "item",
+            "item": "item_dapao",
             "slug": "daedalus"
           }
         }
@@ -290,13 +318,19 @@
           "detail": "Effect reworked Grant loot tokens when the relic disappears, with token level determined by the highest reward/compensation during the holding period (removed the restriction of not being able to obtain level 3 tokens before round 25). Your win/loss streak will additionally earn 1 gold, and when the relic disappears, you will receive a corresponding level loot token based on the highest reward/compensation held during that time. Note: 2-4 win/loss streak corresponds to level 1 loot token, 5-9 win/loss streak corresponds to level 2 loot token, and 10+ win/loss streak corresponds to level 3 loot token.",
           "entity": {
             "type": "relic",
+            "relic": "item_streak_plus",
             "slug": "chiaroscuro-certainty"
           }
         },
         {
           "kind": "change",
           "name": "Gaoler's Master Key",
-          "detail": "If this relic is chosen after a race/class already dismissed, the gold spent will be refunded. You can freely dismiss any race/class. If already dismissed, the spent gold will be refunded."
+          "detail": "If this relic is chosen after a race/class already dismissed, the gold spent will be refunded. You can freely dismiss any race/class. If already dismissed, the spent gold will be refunded.",
+          "entity": {
+            "type": "relic",
+            "relic": "item_free_ban",
+            "slug": "gaolers-master-key"
+          }
         }
       ]
     },

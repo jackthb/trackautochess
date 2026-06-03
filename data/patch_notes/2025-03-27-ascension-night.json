@@ -265,7 +265,9 @@
         {
           "kind": "buff",
           "name": "Talent 2B - Ascendency",
-          "detail": "Chance for +1 Level in recruitment increased from 50% to 60%"
+          "detail": "Chance for +1 Level in recruitment increased from 50% to 60%",
+          "entity_type": "talent",
+          "entity_slug": "2b"
         }
       ]
     },

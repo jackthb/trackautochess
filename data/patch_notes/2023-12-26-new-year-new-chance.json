@@ -73,12 +73,16 @@
         {
           "kind": "change",
           "name": "Added a new Immortal item for Tusk ★★★",
-          "detail": "Jingle Fist."
+          "detail": "Jingle Fist.",
+          "entity_type": "unit",
+          "entity_slug": "tusk"
         },
         {
           "kind": "change",
           "name": "Added a new Immortal item for Arc Warden ★★★",
-          "detail": "Orbuculum Equinox."
+          "detail": "Orbuculum Equinox.",
+          "entity_type": "unit",
+          "entity_slug": "arc-warden"
         },
         {
           "kind": "buff",
@@ -189,7 +193,9 @@
         {
           "kind": "fix",
           "name": "Fixed a bug where Lucky Pendant did not correctly match the bonus and description for Pandaren - Hospitality",
-          "detail": ""
+          "detail": "",
+          "entity_type": "item",
+          "entity_slug": "lucky-pendant"
         },
         {
           "kind": "fix",

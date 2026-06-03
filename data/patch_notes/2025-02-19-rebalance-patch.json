@@ -210,7 +210,9 @@
         {
           "kind": "buff",
           "name": "Frenzy(Talent 3A)",
-          "detail": "Lifesteal percentage increased from 20% to 25%"
+          "detail": "Lifesteal percentage increased from 20% to 25%",
+          "entity_type": "talent",
+          "entity_slug": "3a"
         },
         {
           "kind": "buff",

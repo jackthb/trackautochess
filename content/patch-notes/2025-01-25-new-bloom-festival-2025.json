@@ -13,6 +13,7 @@
           "detail": "Downgraded from $2 to $1, and adjusted accordingly.",
           "entity": {
             "type": "unit",
+            "unit": "skywrath-mage",
             "slug": "skywrath-mage"
           }
         },
@@ -22,6 +23,7 @@
           "detail": "Upgraded from $1 to $2, and adjusted accordingly.",
           "entity": {
             "type": "unit",
+            "unit": "luna",
             "slug": "luna"
           }
         },
@@ -36,6 +38,7 @@
           "detail": "Max stack count increased from 10/15/20 to 15/20/25.",
           "entity": {
             "type": "unit",
+            "unit": "slark",
             "slug": "slark"
           }
         },
@@ -45,6 +48,7 @@
           "detail": "Magical resistance increased from 0% to 20%.",
           "entity": {
             "type": "unit",
+            "unit": "abaddon",
             "slug": "abaddon"
           }
         },
@@ -54,6 +58,7 @@
           "detail": "Duration decreased from 6/7/8 secs to 5/6/7 secs.",
           "entity": {
             "type": "unit",
+            "unit": "faceless-void",
             "slug": "faceless-void"
           }
         },
@@ -63,6 +68,7 @@
           "detail": "Duration decreased from 4/5/6 secs to 3/4/5 secs.",
           "entity": {
             "type": "unit",
+            "unit": "naga-siren",
             "slug": "naga-siren"
           }
         },
@@ -72,6 +78,7 @@
           "detail": "Armor increased from 2 to 4.",
           "entity": {
             "type": "unit",
+            "unit": "pudge",
             "slug": "pudge"
           }
         },
@@ -81,6 +88,7 @@
           "detail": "Additional ability also reset after defeating a home battle.",
           "entity": {
             "type": "unit",
+            "unit": "rubick",
             "slug": "rubick"
           }
         },
@@ -90,6 +98,7 @@
           "detail": "Duration decreased from 3/4/5 secs to 3/3.5/4 secs.",
           "entity": {
             "type": "unit",
+            "unit": "muerta",
             "slug": "muerta"
           }
         },
@@ -99,6 +108,7 @@
           "detail": "Damage decreased from 100/150/250 to 100/150/200.",
           "entity": {
             "type": "unit",
+            "unit": "drow-ranger",
             "slug": "drow-ranger"
           }
         },
@@ -108,6 +118,7 @@
           "detail": "Attack interval increased from 1.0 sec to 1.2 secs.",
           "entity": {
             "type": "unit",
+            "unit": "monkey-king",
             "slug": "monkey-king"
           }
         },
@@ -117,6 +128,7 @@
           "detail": "Attack count decreased from 4/6/10 to 3/5/9, max target count increased from 4/7/12 to 4/8/12.",
           "entity": {
             "type": "unit",
+            "unit": "gyrocopter",
             "slug": "gyrocopter"
           }
         },
@@ -126,6 +138,7 @@
           "detail": "Bounce count increased from 4/6/10 to 6/8/12.",
           "entity": {
             "type": "unit",
+            "unit": "lich",
             "slug": "lich"
           }
         }
@@ -140,6 +153,7 @@
           "detail": "(4) Draeneis: Damage multiplier decreased from 1.5x to 1x, damage radius increased from 260 to 300",
           "entity": {
             "type": "synergy",
+            "synergy": "is_draenei",
             "slug": "draenei"
           }
         },
@@ -149,6 +163,7 @@
           "detail": "Channeling duration decreased from 2 secs to 1.5 secs",
           "entity": {
             "type": "synergy",
+            "synergy": "is_shaman",
             "slug": "shaman"
           }
         }
@@ -168,6 +183,7 @@
           "detail": "Downgraded from T2 to T1, radius decreased from 300 to 200, all allies within the range gain 20 healing every 2 secs. Fast movement. Aura: All allies within the range gain 20 healing every 2 secs.",
           "entity": {
             "type": "item",
+            "item": "item_jingmixie",
             "slug": "tranquil-boots"
           }
         },
@@ -177,6 +193,7 @@
           "detail": "Block 40 damage on melee pieces.(Invalid on range pieces) Block 40 damage on melee pieces.",
           "entity": {
             "type": "item",
+            "item": "item_xianfengdun",
             "slug": "vanguard"
           }
         },
@@ -186,6 +203,7 @@
           "detail": "Grants melee hero 25% chance on hit to stun the target for 3s. (Invalid on ranged pieces) Grants melee hero 25% chance on hit to stun the target for 3s.",
           "entity": {
             "type": "item",
+            "item": "item_suiluchui",
             "slug": "skull-basher"
           }
         },
@@ -195,6 +213,7 @@
           "detail": "Downgraded from T3 to T2.",
           "entity": {
             "type": "item",
+            "item": "item_wangchongtui",
             "slug": "spider-leg"
           }
         },
@@ -204,6 +223,7 @@
           "detail": "Additional skill will be removed after chess pieces upgraded.",
           "entity": {
             "type": "item",
+            "item": "item_ahalimumojing",
             "slug": "aghanims-shard"
           }
         },
@@ -213,6 +233,7 @@
           "detail": "Internal CD decreased from 8 secs to 7 secs.",
           "entity": {
             "type": "item",
+            "item": "item_jinghunzhiren",
             "slug": "diffusal-blade"
           }
         },
@@ -222,6 +243,7 @@
           "detail": "Downgraded from T4 to T3. +600 HP instead of +900. +600 HP. Deathrattle: Resurrect once.",
           "entity": {
             "type": "item",
+            "item": "item_buxiuzhishouhu",
             "slug": "aegis-of-immortal"
           }
         },
@@ -231,6 +253,7 @@
           "detail": "Internal CD decreased from 6 secs to 4 secs.",
           "entity": {
             "type": "item",
+            "item": "item_dayunchui",
             "slug": "abyssal-blade"
           }
         },
@@ -240,6 +263,7 @@
           "detail": "Downgraded from T5 to T4.",
           "entity": {
             "type": "item",
+            "item": "item_huiyao",
             "slug": "radiance"
           }
         },
@@ -249,6 +273,7 @@
           "detail": "+20 attack speed added. +15 Armor.+20 Attack speed. Aura: Grants +10 armor to allies nearby. Aura:Enemies nearby suffer -10 armor.",
           "entity": {
             "type": "item",
+            "item": "item_qiangxi",
             "slug": "assault-cuirass"
           }
         },
@@ -258,13 +283,19 @@
           "detail": "Upgraded from T4 to T5. Attack damage +50 instead of +25. Attack damage +50. All carrier damage turns into Pure Damage.",
           "entity": {
             "type": "item",
+            "item": "item_haojie",
             "slug": "havoc"
           }
         },
         {
           "kind": "rework",
           "name": "Golden Enchanted Mango",
-          "detail": "Icon reworked."
+          "detail": "Icon reworked.",
+          "entity": {
+            "type": "item",
+            "item": "item_pingguo",
+            "slug": "golden-enchanted-mango"
+          }
         }
       ]
     },

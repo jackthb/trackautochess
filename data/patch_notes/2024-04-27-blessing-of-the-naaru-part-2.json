@@ -10,22 +10,30 @@
         {
           "kind": "added",
           "name": "Shadow Demon: Disseminate ($3, Demon/Draenei/Priest)",
-          "detail": "New chess piece. <Active Skill: Instant Activation> Applying the toxic curse of Shadow Demon's attacks: Nearby allies will receive damage of the same type as a percentage when taking damage, and nearby enemies will also receive healing as a percentage when receiving healing. Note: The spreading effect cannot be stacked on the same unit. Note: The spreading effect can benefit from Spell Prism and Soulbind. When the Eredar no longer requires his followers, he'll discard his shackles—along with their lives."
+          "detail": "New chess piece. <Active Skill: Instant Activation> Applying the toxic curse of Shadow Demon's attacks: Nearby allies will receive damage of the same type as a percentage when taking damage, and nearby enemies will also receive healing as a percentage when receiving healing. Note: The spreading effect cannot be stacked on the same unit. Note: The spreading effect can benefit from Spell Prism and Soulbind. When the Eredar no longer requires his followers, he'll discard his shackles—along with their lives.",
+          "entity_type": "unit",
+          "entity_slug": "shadow-demon"
         },
         {
           "kind": "added",
           "name": "Lion: Finger of Death(Upgraded from $1 to $4)",
-          "detail": "New chess piece. <Active Skill: Activates on full mana> Tear into an enemy, inflicting a substantial amount of magical damage and siphoning their current mana. Furthermore, for each stack of the Fel Power effect, it will deal additional magical damage based on a percentage of the target's maximum health. Lion's disfigured hand is also the source of his greatest power, capable of flooding victims with malefic force."
+          "detail": "New chess piece. <Active Skill: Activates on full mana> Tear into an enemy, inflicting a substantial amount of magical damage and siphoning their current mana. Furthermore, for each stack of the Fel Power effect, it will deal additional magical damage based on a percentage of the target's maximum health. Lion's disfigured hand is also the source of his greatest power, capable of flooding victims with malefic force.",
+          "entity_type": "unit",
+          "entity_slug": "lion"
         },
         {
           "kind": "added",
           "name": "Slardar: Downgraded from $3 to $2, with adjustments made to its attributes and skill values to match the new cost",
-          "detail": "New chess piece."
+          "detail": "New chess piece.",
+          "entity_type": "unit",
+          "entity_slug": "slardar"
         },
         {
           "kind": "added",
           "name": "Slark: Downgraded from $2 to $1, with adjustments made to its attributes and skill values to match the new cost",
-          "detail": "New chess piece."
+          "detail": "New chess piece.",
+          "entity_type": "unit",
+          "entity_slug": "slark"
         },
         {
           "kind": "added",
@@ -77,7 +85,9 @@
         {
           "kind": "added",
           "name": "Lone Druid: Base attack damage of summoned bear companion reduced from 175/275/375 to 150/200/300",
-          "detail": "New chess piece."
+          "detail": "New chess piece.",
+          "entity_type": "unit",
+          "entity_slug": "lone-druid"
         },
         {
           "kind": "added",
@@ -101,17 +111,23 @@
         {
           "kind": "buff",
           "name": "Knights - Divine Protection",
-          "detail": "(2) (4) (6)Knights:  The shield trigger probability for Knights is increased from (described as 20%/20%/10% but functions as 20%/10%/20%, inconsistent with the description) to 20%/20%/15%."
+          "detail": "(2) (4) (6)Knights:  The shield trigger probability for Knights is increased from (described as 20%/20%/10% but functions as 20%/10%/20%, inconsistent with the description) to 20%/20%/15%.",
+          "entity_type": "synergy",
+          "entity_slug": "knight"
         },
         {
           "kind": "nerf",
           "name": "Warlocks - Soul Leech",
-          "detail": "(4) Warlocks: The lifesteal percentage is decreased from 5%/20% to 5%/15%."
+          "detail": "(4) Warlocks: The lifesteal percentage is decreased from 5%/20% to 5%/15%.",
+          "entity_type": "synergy",
+          "entity_slug": "warlock"
         },
         {
           "kind": "buff",
           "name": "Priests - Salvation",
-          "detail": "(4) Priests: The duration of the Priest's Mind Control is increased from (controller level × 2) seconds to (controller level × 2 + 2) seconds."
+          "detail": "(4) Priests: The duration of the Priest's Mind Control is increased from (controller level × 2) seconds to (controller level × 2 + 2) seconds.",
+          "entity_type": "synergy",
+          "entity_slug": "priest"
         },
         {
           "kind": "change",
@@ -121,7 +137,9 @@
         {
           "kind": "nerf",
           "name": "Demons - Fel Power",
-          "detail": "Maximum stack count reduced from 10 to 8."
+          "detail": "Maximum stack count reduced from 10 to 8.",
+          "entity_type": "synergy",
+          "entity_slug": "demon"
         },
         {
           "kind": "buff",
@@ -136,7 +154,9 @@
         {
           "kind": "added",
           "name": "New Tier 3 Item - Diffusal Blade",
-          "detail": "Attack Damage: +25, Mana Break on Attack: +50 The carrier deals +50% damage to non-permanent chess pieces."
+          "detail": "Attack Damage: +25, Mana Break on Attack: +50 The carrier deals +50% damage to non-permanent chess pieces.",
+          "entity_type": "item",
+          "entity_slug": "diffusal-blade"
         },
         {
           "kind": "buff",

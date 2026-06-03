@@ -13,6 +13,7 @@
           "detail": "Upgraded from $1 to $4, with his base attributes adjusted accordingly to fit the new cost. \"Mana Break\" skill reworked. <Passive Skill> Each attack will drain the mana of the target enemy chess piece, dealing additional physical damage equal to the mana drained. Whenever a certain amount of mana is drained cumulatively, Anti-Mage will activate the \"Mana Void,\" target with a lower mana enemy, and deal magical damage based on the mana lost by the target together with a brief stun to enemies within range. Note: Anti-Mage will prioritize attacking targets with mana. A martial technique, refined from the gentle techniques of the monks of the Starry Temple, capable of turning magical energy against its wielder.",
           "entity": {
             "type": "unit",
+            "unit": "anti-mage",
             "slug": "anti-mage"
           }
         },
@@ -22,6 +23,7 @@
           "detail": "Attack range reduced from 600 to 400, base health increased from 500 to 550.",
           "entity": {
             "type": "unit",
+            "unit": "lion",
             "slug": "lion"
           }
         },
@@ -31,6 +33,7 @@
           "detail": "Cooldown reduced from 15/10/7 seconds to 12/8/6 seconds.",
           "entity": {
             "type": "unit",
+            "unit": "lina",
             "slug": "lina"
           }
         },
@@ -40,6 +43,7 @@
           "detail": "Pre-transformation and post-transformation health adjusted from 700/700 (described as 750 but 700) to 650/850.",
           "entity": {
             "type": "unit",
+            "unit": "terrorblade",
             "slug": "terrorblade"
           }
         },
@@ -49,6 +53,7 @@
           "detail": "Cooldown increased from 10/8/6 seconds to 12/10/8 seconds.",
           "entity": {
             "type": "unit",
+            "unit": "keeper-of-the-light",
             "slug": "keeper-of-the-light"
           }
         },
@@ -58,6 +63,7 @@
           "detail": "Average damage of Golem’s descent reduced from 125 to 100.",
           "entity": {
             "type": "unit",
+            "unit": "warlock",
             "slug": "warlock"
           }
         },
@@ -77,6 +83,7 @@
           "detail": "(4) Demon Hunter effects adjusted (2) Demon Hunter: All friendly demons now count as the same type. (4) Demon Hunter: All damage dealt by allies is converted into pure damage.",
           "entity": {
             "type": "synergy",
+            "synergy": "is_demonhunter",
             "slug": "demon-hunter"
           }
         },
@@ -86,6 +93,7 @@
           "detail": "Now has a maximum of 7 stacks. (1) Demon: Normal attack damage caused by allied demon chess pieces is considered pure damage. Fel Power's damage is increased by 10%, up to a maximum of 70% for each other allied demon chess piece of the same species.",
           "entity": {
             "type": "synergy",
+            "synergy": "is_demon",
             "slug": "demon"
           }
         },
@@ -95,6 +103,7 @@
           "detail": "Now grants +100 mana to chess pieces at the start of the battle and when chess pieces are deployed (previously before the start of the battle and during the alliance calculation phase).",
           "entity": {
             "type": "synergy",
+            "synergy": "is_dragon",
             "slug": "dragon"
           }
         },
@@ -109,6 +118,7 @@
           "detail": "The armour bonus provided by (6) Warriors has been reduced from 12 to 11.",
           "entity": {
             "type": "synergy",
+            "synergy": "is_warrior",
             "slug": "warrior"
           }
         }
@@ -160,7 +170,12 @@
         {
           "kind": "fix",
           "name": "Fixed a bug with the sven - God’s Strength that values become invalid due to changes in the data structure of DOTA2",
-          "detail": ""
+          "detail": "",
+          "entity": {
+            "type": "unit",
+            "unit": "sven",
+            "slug": "sven"
+          }
         },
         {
           "kind": "fix",
@@ -175,7 +190,12 @@
         {
           "kind": "fix",
           "name": "Fixed a bug with Terrorblade where transformed allied chess pieces had a duration",
-          "detail": ""
+          "detail": "",
+          "entity": {
+            "type": "unit",
+            "unit": "terrorblade",
+            "slug": "terrorblade"
+          }
         },
         {
           "kind": "fix",

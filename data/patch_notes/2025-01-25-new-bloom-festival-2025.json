@@ -212,7 +212,9 @@
         {
           "kind": "rework",
           "name": "Golden Enchanted Mango",
-          "detail": "Icon reworked."
+          "detail": "Icon reworked.",
+          "entity_type": "item",
+          "entity_slug": "golden-enchanted-mango"
         }
       ]
     },

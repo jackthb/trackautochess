@@ -13,6 +13,7 @@
           "detail": "New chess piece. <Active Ability: Activate Instant> Launch into a maddened rage, becoming Debuff Immune and increasing magic resistance. Duration: 4/6/9s Magical resistance increased:80% Cooldown: 12s The madness and brutality of N'aix makes him a vicious and unrelenting foe in combat.",
           "entity": {
             "type": "unit",
+            "unit": "lifestealer",
             "slug": "lifestealer"
           }
         },
@@ -22,6 +23,7 @@
           "detail": "Downgraded from $2 to $1, properties adjusted accordingly.",
           "entity": {
             "type": "unit",
+            "unit": "abaddon",
             "slug": "abaddon"
           }
         },
@@ -31,6 +33,7 @@
           "detail": "A passive heartstopper aura added, and damage to the reaper's scythe decreased, while cooldown increased. Emits an aura that stops the heartbeat of his enemies around, dealing percentage damage based on their max health. <Targeted Active ability: Activates on full mana>Deals (base + percentage of max health) pure damage to an enemy with his Reaper’s Scythe and prevents its victim from deathrattle.",
           "entity": {
             "type": "unit",
+            "unit": "necrophos",
             "slug": "necrophos"
           }
         },
@@ -40,6 +43,7 @@
           "detail": "Reincarnated pieces’ last duration decreased from 20/25/30s to 15/20/25s",
           "entity": {
             "type": "unit",
+            "unit": "wraith-king",
             "slug": "wraith-king"
           }
         },
@@ -49,6 +53,7 @@
           "detail": "Haunt duration decreased from 5/6/7s to 4/5/6s",
           "entity": {
             "type": "unit",
+            "unit": "spectres",
             "slug": "spectres"
           }
         }
@@ -63,6 +68,7 @@
           "detail": "Reworked into (1)(2)(3). (1) Kobold: Each two paired Kobold pieces on board will summon a replica when battle starts. (2) Kobolds: Each two paired ally pieces on board will summon a replica when battle starts. (3) Kobolds: Every unpaired Kobold piece will reshape itself into a non-Kobold ally of the same rank before battle starts.",
           "entity": {
             "type": "synergy",
+            "synergy": "is_kobold",
             "slug": "kobold"
           }
         },
@@ -72,6 +78,7 @@
           "detail": "(2) Pandarens now have bad luck comfort as (1) pandaren: The possibility increases gradually before a Pandaren is invited.",
           "entity": {
             "type": "synergy",
+            "synergy": "is_pandaman",
             "slug": "pandaren"
           }
         }
@@ -121,6 +128,7 @@
           "detail": "Chance for shield increased from 20% to 25%",
           "entity": {
             "type": "synergy",
+            "synergy": "is_knight",
             "slug": "knight"
           }
         },
@@ -130,6 +138,7 @@
           "detail": "(6) Trolls' maximum stack increased from 7 to 8",
           "entity": {
             "type": "synergy",
+            "synergy": "is_troll",
             "slug": "troll"
           }
         },
@@ -139,6 +148,7 @@
           "detail": "Damage bonus per bounce decreased from 30/40/50 to 25",
           "entity": {
             "type": "unit",
+            "unit": "lich",
             "slug": "lich"
           }
         },
@@ -148,6 +158,7 @@
           "detail": "Duration for reincarnated pieces decreased from 15/20/25s to 10/15/20s",
           "entity": {
             "type": "unit",
+            "unit": "wraith-king",
             "slug": "wraith-king"
           }
         },
@@ -157,6 +168,7 @@
           "detail": "Base damage decreased from 120 to 100",
           "entity": {
             "type": "unit",
+            "unit": "spectres",
             "slug": "spectres"
           }
         },
@@ -166,6 +178,7 @@
           "detail": "Armor increased from 2 to 5",
           "entity": {
             "type": "unit",
+            "unit": "undying",
             "slug": "undying"
           }
         },
@@ -175,6 +188,7 @@
           "detail": "Base damage increased from 80 to 85",
           "entity": {
             "type": "unit",
+            "unit": "drow-ranger",
             "slug": "drow-ranger"
           }
         },
@@ -184,6 +198,7 @@
           "detail": "Base damage increased from 55 to 65",
           "entity": {
             "type": "unit",
+            "unit": "muerta",
             "slug": "muerta"
           }
         },
@@ -193,6 +208,7 @@
           "detail": "Magical resistance increased from 30 to 50, armor increased from 5 to 6",
           "entity": {
             "type": "unit",
+            "unit": "lifestealer",
             "slug": "lifestealer"
           }
         },
@@ -217,6 +233,7 @@
           "detail": "Chance for reborn is now dynamic, higher cost pieces have lower chance for reborn. Chance for reborn from $1-$5 varies from 80% to 40%",
           "entity": {
             "type": "item",
+            "item": "item_feijiangxiaomao",
             "slug": "ascetics-cap"
           }
         },
@@ -226,6 +243,7 @@
           "detail": "Magical damage increased from 50/75/125 to 100/150/250, radius increased from 128/256/384 to 200/300/400. Strikes decreased from 4/5/6 times per 1.75 secs to 3/4/5 times per 2 secs",
           "entity": {
             "type": "unit",
+            "unit": "marci",
             "slug": "marci"
           }
         },
@@ -235,6 +253,7 @@
           "detail": "Base Health increased from 850 to 900, attack interval decreased from 1.1 to 1.0, attack range increased from 400 to 600",
           "entity": {
             "type": "unit",
+            "unit": "arc-warden",
             "slug": "arc-warden"
           }
         },
@@ -244,6 +263,7 @@
           "detail": "Immune to Pure damage when activated",
           "entity": {
             "type": "unit",
+            "unit": "lifestealer",
             "slug": "lifestealer"
           }
         },

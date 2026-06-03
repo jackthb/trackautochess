@@ -238,7 +238,9 @@
         {
           "kind": "change",
           "name": "Gaoler's Master Key",
-          "detail": "If this relic is chosen after a race/class already dismissed, the gold spent will be refunded. You can freely dismiss any race/class. If already dismissed, the spent gold will be refunded."
+          "detail": "If this relic is chosen after a race/class already dismissed, the gold spent will be refunded. You can freely dismiss any race/class. If already dismissed, the spent gold will be refunded.",
+          "entity_type": "relic",
+          "entity_slug": "gaolers-master-key"
         }
       ]
     },

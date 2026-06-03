@@ -295,7 +295,9 @@
         {
           "kind": "nerf",
           "name": "Round 25 talent Frenzy",
-          "detail": "Lifesteal decreased from 25% to 20%"
+          "detail": "Lifesteal decreased from 25% to 20%",
+          "entity_type": "talent",
+          "entity_slug": "3a"
         },
         {
           "kind": "buff",
@@ -471,7 +473,9 @@
         {
           "kind": "nerf",
           "name": "Round 25 talent Frenzy",
-          "detail": "Lifesteal decreased from 25% to 20%"
+          "detail": "Lifesteal decreased from 25% to 20%",
+          "entity_type": "talent",
+          "entity_slug": "3a"
         },
         {
           "kind": "buff",

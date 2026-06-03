@@ -10,12 +10,16 @@
         {
           "kind": "added",
           "name": "New Relic - Leafy Essence",
-          "detail": "<Relic Consumable: Click to Use> Unlock the offside branch of all your settled talents."
+          "detail": "<Relic Consumable: Click to Use> Unlock the offside branch of all your settled talents.",
+          "entity_type": "relic",
+          "entity_slug": "leafy-essence"
         },
         {
           "kind": "added",
           "name": "New Relic - Magic Box",
-          "detail": "<Relic Consumable: Click to Use> Packs an ally Rank 1 piece, at the beginning of next round, transforms it into a randon new piece of the same cost. 12 times available."
+          "detail": "<Relic Consumable: Click to Use> Packs an ally Rank 1 piece, at the beginning of next round, transforms it into a randon new piece of the same cost. 12 times available.",
+          "entity_type": "relic",
+          "entity_slug": "magic-box"
         },
         {
           "kind": "removed",

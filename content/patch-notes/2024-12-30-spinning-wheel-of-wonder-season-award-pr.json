@@ -13,6 +13,7 @@
           "detail": "New relic. <Relic Consumable: Click to Use> Choose an ally piece, DISCOVER a special duplicate of it with an extra random synergy. * Recruit the discovered pieces with the only Token granted by Wheel of Wonder, no gold required. * Extra synergy can be any of the existing synergy in game. * The target can be any of your pieces, including Undead, Pandaren, IO etc.",
           "entity": {
             "type": "relic",
+            "relic": "item_rm_wheel_of_wonder",
             "slug": "wheel-of-wonder"
           }
         },
@@ -32,6 +33,7 @@
           "detail": "Reworked. Win or lose streak will not be terminated with this relic. +1 Award removed. Your win or lose streak will not be terminated and when the relic disappears, you will receive a corresponding level loot token based on the highest reward/compensation held during that time.",
           "entity": {
             "type": "relic",
+            "relic": "item_streak_plus",
             "slug": "chiaroscuro-certainty"
           }
         },
@@ -41,6 +43,7 @@
           "detail": "Remaining chance for reforger shown in the relic slot.",
           "entity": {
             "type": "relic",
+            "relic": "item_upgrade_lootbox",
             "slug": "weaponsmith"
           }
         },
@@ -50,6 +53,7 @@
           "detail": "Remaining chance for mango shown in the relic slot.",
           "entity": {
             "type": "relic",
+            "relic": "item_mangotree",
             "slug": "mango-tree"
           }
         }
@@ -94,6 +98,7 @@
           "detail": "Golden Heart of the Machines Reworked <Courier consumable: Click to use>DISCOVER a panel of 5 random Legendary chess pieces. * Recruit the discovered pieces with Tokens granted by Heart of the Machines, no gold required. Tokens can be keeped for the following discoveries. * Each piece costs 1 token, and benefits from Talent Greedy.",
           "entity": {
             "type": "synergy",
+            "synergy": "is_mech",
             "slug": "mech"
           }
         }
@@ -108,6 +113,7 @@
           "detail": "Reworked Attack speed + 20%. When attacking a new target, purify the victim by removing all its synergy buffs.",
           "entity": {
             "type": "item",
+            "item": "item_jinghunzhiren",
             "slug": "diffusal-blade"
           }
         }
@@ -167,6 +173,7 @@
           "detail": "Remade into an active one. Attack speed +20%. Purify the victim by removing all its synergy buffs. Cool Down: 8 secs",
           "entity": {
             "type": "item",
+            "item": "item_jinghunzhiren",
             "slug": "diffusal-blade"
           }
         },

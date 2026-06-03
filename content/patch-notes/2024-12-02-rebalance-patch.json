@@ -38,6 +38,7 @@
           "detail": "CD decreased from 10/8/6 secs to 8/6/4 secs",
           "entity": {
             "type": "unit",
+            "unit": "bane",
             "slug": "bane"
           }
         },
@@ -47,6 +48,7 @@
           "detail": "Magical damage increased from 100/200/300 to 150/250/350",
           "entity": {
             "type": "unit",
+            "unit": "skywrath-mage",
             "slug": "skywrath-mage"
           }
         },
@@ -56,6 +58,7 @@
           "detail": "Attack interval decreased from 1.2 secs to 1 sec",
           "entity": {
             "type": "unit",
+            "unit": "phantom-assassin",
             "slug": "phantom-assassin"
           }
         },
@@ -65,6 +68,7 @@
           "detail": "Base attack damage increased from 75 to 85",
           "entity": {
             "type": "unit",
+            "unit": "legion-commander",
             "slug": "legion-commander"
           }
         },
@@ -74,6 +78,7 @@
           "detail": "CD decreased from 12/10/8 secs to 10/8/6 secs",
           "entity": {
             "type": "unit",
+            "unit": "lich",
             "slug": "lich"
           }
         },
@@ -98,6 +103,7 @@
           "detail": "Internal CD decreased from 6-10 secs to 4-8 secs",
           "entity": {
             "type": "synergy",
+            "synergy": "is_satyr",
             "slug": "satyr"
           }
         },
@@ -107,6 +113,7 @@
           "detail": "1 sec delay removed.",
           "entity": {
             "type": "synergy",
+            "synergy": "is_aqir",
             "slug": "aqir"
           }
         }
@@ -121,6 +128,7 @@
           "detail": "+600 HP added.",
           "entity": {
             "type": "item",
+            "item": "item_buxiuzhishouhu",
             "slug": "aegis-of-immortal"
           }
         }
@@ -135,6 +143,7 @@
           "detail": "Exp gained now equals to 0.75x damage taken instead of 1x",
           "entity": {
             "type": "relic",
+            "relic": "item_malefic_rapture",
             "slug": "malefic-rapture"
           }
         },
@@ -144,6 +153,7 @@
           "detail": "Chances to grow up every round decreased from 70% to 60%",
           "entity": {
             "type": "relic",
+            "relic": "item_bench_contract",
             "slug": "magic-seed"
           }
         },
@@ -153,6 +163,7 @@
           "detail": "Now drops up to 7 mangos instead of 8",
           "entity": {
             "type": "relic",
+            "relic": "item_mangotree",
             "slug": "mango-tree"
           }
         }
@@ -182,6 +193,7 @@
           "detail": "Bounce time decreased from 3/5/7 to 3/4/5",
           "entity": {
             "type": "unit",
+            "unit": "luna",
             "slug": "luna"
           }
         },
@@ -191,6 +203,7 @@
           "detail": "Split shot count decreased from 3/4/5 to 2/3/4, gaze duration decreased from 4/5/6 secs to 3/4/5 secs",
           "entity": {
             "type": "unit",
+            "unit": "medusa",
             "slug": "medusa"
           }
         },
@@ -215,6 +228,7 @@
           "detail": "(2) Monks - Now only valid on melee allies",
           "entity": {
             "type": "synergy",
+            "synergy": "is_monk",
             "slug": "monk"
           }
         },
@@ -224,6 +238,7 @@
           "detail": "(3)(6) Undeads - Max HP decreased by 10%/45% instead of 5%/40%",
           "entity": {
             "type": "synergy",
+            "synergy": "is_undead",
             "slug": "undead"
           }
         },
@@ -233,6 +248,7 @@
           "detail": "Internal CD decreased from 4-8 secs to 4-6 secs",
           "entity": {
             "type": "synergy",
+            "synergy": "is_satyr",
             "slug": "satyr"
           }
         },
@@ -242,6 +258,7 @@
           "detail": "(9) Warriors - Reflection multiplier decreased from 1.7 to 1.5",
           "entity": {
             "type": "synergy",
+            "synergy": "is_warrior",
             "slug": "warrior"
           }
         },
@@ -251,6 +268,7 @@
           "detail": "(6) Trolls - Maximum stack decreased from 8 to 7",
           "entity": {
             "type": "synergy",
+            "synergy": "is_troll",
             "slug": "troll"
           }
         },
@@ -260,6 +278,7 @@
           "detail": "Damage per seconde increased from 50/75/125 to 75/100/150",
           "entity": {
             "type": "unit",
+            "unit": "bane",
             "slug": "bane"
           }
         },
@@ -269,6 +288,7 @@
           "detail": "Magical damage increased from 150/250/350 to 150/250/400",
           "entity": {
             "type": "unit",
+            "unit": "skywrath-mage",
             "slug": "skywrath-mage"
           }
         },
@@ -278,6 +298,7 @@
           "detail": "Base damage increased from 65 to 80",
           "entity": {
             "type": "unit",
+            "unit": "pangolier",
             "slug": "pangolier"
           }
         },
@@ -287,6 +308,7 @@
           "detail": "Duration increased from 3/4/5 secs to 4/5/6 secs",
           "entity": {
             "type": "unit",
+            "unit": "medusa",
             "slug": "medusa"
           }
         },
@@ -296,6 +318,7 @@
           "detail": "Shield increased from 30/40/50 to 40/60/80",
           "entity": {
             "type": "unit",
+            "unit": "templar-assassin",
             "slug": "templar-assassin"
           }
         },
@@ -305,6 +328,7 @@
           "detail": "Attack bonus decreased from 50 to 25",
           "entity": {
             "type": "item",
+            "item": "item_haojie",
             "slug": "havoc"
           }
         },
@@ -314,6 +338,7 @@
           "detail": "Duration decreased from 6 secs to 5 secs",
           "entity": {
             "type": "item",
+            "item": "item_yangdao",
             "slug": "scythe-of-vyse"
           }
         }
@@ -340,7 +365,12 @@
         {
           "kind": "nerf",
           "name": "Round 25 talent Frenzy",
-          "detail": "Lifesteal decreased from 25% to 20%"
+          "detail": "Lifesteal decreased from 25% to 20%",
+          "entity": {
+            "type": "talent",
+            "talent": "3a",
+            "slug": "3a"
+          }
         },
         {
           "kind": "buff",
@@ -348,6 +378,7 @@
           "detail": "CD decreased from 10/8/6 to 8/7/6 secs, arrow count decreased from 5/6/6 to 3/4/5, damage percentage decreased from 50%/75%/125% to 50%/75%/100%",
           "entity": {
             "type": "unit",
+            "unit": "clinkz",
             "slug": "clinkz"
           }
         },
@@ -357,6 +388,7 @@
           "detail": "Attack interval increased from 1 to 1.2 secs, base attack damage decreased from 65 to 60",
           "entity": {
             "type": "unit",
+            "unit": "muerta",
             "slug": "muerta"
           }
         },
@@ -366,6 +398,7 @@
           "detail": "Silence duration decreased from 2/3/5 to 2/3/4 secs",
           "entity": {
             "type": "unit",
+            "unit": "drow-ranger",
             "slug": "drow-ranger"
           }
         },
@@ -375,6 +408,7 @@
           "detail": "CD increased from 8/6/4 to 10/8/6 secs",
           "entity": {
             "type": "unit",
+            "unit": "undying",
             "slug": "undying"
           }
         },
@@ -384,6 +418,7 @@
           "detail": "Tango restores 1~7 HP instead of 1~8",
           "entity": {
             "type": "synergy",
+            "synergy": "is_priest",
             "slug": "priest"
           }
         },
@@ -393,6 +428,7 @@
           "detail": "(6) Undeads - Reduces 40% HP of enemies instead of 45%",
           "entity": {
             "type": "synergy",
+            "synergy": "is_undead",
             "slug": "undead"
           }
         },
@@ -427,6 +463,7 @@
           "detail": "(2) Monks - Now only valid on melee allies",
           "entity": {
             "type": "synergy",
+            "synergy": "is_monk",
             "slug": "monk"
           }
         },
@@ -436,6 +473,7 @@
           "detail": "(3)(6) Undeads - Max HP decreased by 10%/45% instead of 5%/40%",
           "entity": {
             "type": "synergy",
+            "synergy": "is_undead",
             "slug": "undead"
           }
         },
@@ -445,6 +483,7 @@
           "detail": "Internal CD decreased from 4-8 secs to 4-6 secs",
           "entity": {
             "type": "synergy",
+            "synergy": "is_satyr",
             "slug": "satyr"
           }
         },
@@ -454,6 +493,7 @@
           "detail": "(9) Warriors - Reflection multiplier decreased from 1.7 to 1.5",
           "entity": {
             "type": "synergy",
+            "synergy": "is_warrior",
             "slug": "warrior"
           }
         },
@@ -463,6 +503,7 @@
           "detail": "(6) Trolls - Maximum stack decreased from 8 to 7",
           "entity": {
             "type": "synergy",
+            "synergy": "is_troll",
             "slug": "troll"
           }
         },
@@ -472,6 +513,7 @@
           "detail": "Damage per seconde increased from 50/75/125 to 75/100/150",
           "entity": {
             "type": "unit",
+            "unit": "bane",
             "slug": "bane"
           }
         },
@@ -481,6 +523,7 @@
           "detail": "Magical damage increased from 150/250/350 to 150/250/400",
           "entity": {
             "type": "unit",
+            "unit": "skywrath-mage",
             "slug": "skywrath-mage"
           }
         },
@@ -490,6 +533,7 @@
           "detail": "Base damage increased from 65 to 80",
           "entity": {
             "type": "unit",
+            "unit": "pangolier",
             "slug": "pangolier"
           }
         },
@@ -499,6 +543,7 @@
           "detail": "Duration increased from 3/4/5 secs to 4/5/6 secs",
           "entity": {
             "type": "unit",
+            "unit": "medusa",
             "slug": "medusa"
           }
         },
@@ -508,6 +553,7 @@
           "detail": "Shield increased from 30/40/50 to 40/60/80",
           "entity": {
             "type": "unit",
+            "unit": "templar-assassin",
             "slug": "templar-assassin"
           }
         },
@@ -517,6 +563,7 @@
           "detail": "Attack bonus decreased from 50 to 25",
           "entity": {
             "type": "item",
+            "item": "item_haojie",
             "slug": "havoc"
           }
         },
@@ -526,6 +573,7 @@
           "detail": "Duration decreased from 6 secs to 5 secs",
           "entity": {
             "type": "item",
+            "item": "item_yangdao",
             "slug": "scythe-of-vyse"
           }
         }
@@ -552,7 +600,12 @@
         {
           "kind": "nerf",
           "name": "Round 25 talent Frenzy",
-          "detail": "Lifesteal decreased from 25% to 20%"
+          "detail": "Lifesteal decreased from 25% to 20%",
+          "entity": {
+            "type": "talent",
+            "talent": "3a",
+            "slug": "3a"
+          }
         },
         {
           "kind": "buff",
@@ -560,6 +613,7 @@
           "detail": "CD decreased from 10/8/6 to 8/7/6 secs, arrow count decreased from 5/6/6 to 3/4/5, damage percentage decreased from 50%/75%/125% to 50%/75%/100%",
           "entity": {
             "type": "unit",
+            "unit": "clinkz",
             "slug": "clinkz"
           }
         },
@@ -569,6 +623,7 @@
           "detail": "Attack interval increased from 1 to 1.2 secs, base attack damage decreased from 65 to 60",
           "entity": {
             "type": "unit",
+            "unit": "muerta",
             "slug": "muerta"
           }
         },
@@ -578,6 +633,7 @@
           "detail": "Silence duration decreased from 2/3/5 to 2/3/4 secs",
           "entity": {
             "type": "unit",
+            "unit": "drow-ranger",
             "slug": "drow-ranger"
           }
         },
@@ -587,6 +643,7 @@
           "detail": "CD increased from 8/6/4 to 10/8/6 secs",
           "entity": {
             "type": "unit",
+            "unit": "undying",
             "slug": "undying"
           }
         },
@@ -596,6 +653,7 @@
           "detail": "Tango restores 1~7 HP instead of 1~8",
           "entity": {
             "type": "synergy",
+            "synergy": "is_priest",
             "slug": "priest"
           }
         },
@@ -605,6 +663,7 @@
           "detail": "(6) Undeads - Reduces 40% HP of enemies instead of 45%",
           "entity": {
             "type": "synergy",
+            "synergy": "is_undead",
             "slug": "undead"
           }
         },

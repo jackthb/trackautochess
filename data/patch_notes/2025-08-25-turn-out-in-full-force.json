@@ -286,7 +286,9 @@
         {
           "kind": "nerf",
           "name": "Talent4A - Radiance",
-          "detail": "IO extra chance initiates from +800% instead of +1000%, and still decreases processively by 200% per IO recruited."
+          "detail": "IO extra chance initiates from +800% instead of +1000%, and still decreases processively by 200% per IO recruited.",
+          "entity_type": "talent",
+          "entity_slug": "4a"
         }
       ]
     },

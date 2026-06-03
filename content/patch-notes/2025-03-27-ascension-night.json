@@ -13,6 +13,7 @@
           "detail": "New chess piece. <Targeted Active ability:Activates on full mana> Kez attacks with his Kanata, stuns the victim and deals Physical Damage equals to a percentage of the victim's Max Health. Stab forward and back each deals half the damage and affiliates his base attack damage. To fight back against the reach of Imperia and her Queensguard, the Kazurai had to become skilled in the ways of attrition.",
           "entity": {
             "type": "unit",
+            "unit": "kez",
             "slug": "kez"
           }
         },
@@ -22,6 +23,7 @@
           "detail": "Upgraded from $3 to $4 and adjusted accordingly. Has a chance to evade Ability Damage. <Passive Ability> Phantom Assassin refines her combat abilities, gaining a chance of delivering a devastating critical strike to enemy units and evading Ability Damage.",
           "entity": {
             "type": "unit",
+            "unit": "phantom-assassin",
             "slug": "phantom-assassin"
           }
         },
@@ -31,6 +33,7 @@
           "detail": "Class changed from Assassin into Hunter.",
           "entity": {
             "type": "unit",
+            "unit": "bounty-hunter",
             "slug": "bounty-hunter"
           }
         },
@@ -45,6 +48,7 @@
           "detail": "Damage per second decreased from 75/100/150 to 50/75/100",
           "entity": {
             "type": "unit",
+            "unit": "bane",
             "slug": "bane"
           }
         },
@@ -54,6 +58,7 @@
           "detail": "Heal per second decreased from 100/125/150 to 100/100/100",
           "entity": {
             "type": "unit",
+            "unit": "oracle",
             "slug": "oracle"
           }
         },
@@ -63,6 +68,7 @@
           "detail": "Bounce times decreased from 3/4/5 to 2/3/4",
           "entity": {
             "type": "unit",
+            "unit": "luna",
             "slug": "luna"
           }
         },
@@ -72,6 +78,7 @@
           "detail": "CD increased from 25/20/15s to 30s",
           "entity": {
             "type": "unit",
+            "unit": "naga-siren",
             "slug": "naga-siren"
           }
         },
@@ -81,6 +88,7 @@
           "detail": "Duration decreased from 2/3/4s to 1.5/2.5/3.5s",
           "entity": {
             "type": "unit",
+            "unit": "riki",
             "slug": "riki"
           }
         },
@@ -90,6 +98,7 @@
           "detail": "Chance for counterattack increased from 15/20/30% to 15/25/35% and lifesteal increased from 15% to 20%",
           "entity": {
             "type": "unit",
+            "unit": "legion-commander",
             "slug": "legion-commander"
           }
         },
@@ -99,6 +108,7 @@
           "detail": "CD increased from 2s to 3s, damage diffusion percentage decreased from 25%/40%/70% to 30%/40%/60%● Shadow Demon - Disseminate: CD increased from 2s to 3s, diffusion percentage increased from 25%/40%/70% to 30%/40%/60%",
           "entity": {
             "type": "unit",
+            "unit": "shadow-demon",
             "slug": "shadow-demon"
           }
         },
@@ -108,6 +118,7 @@
           "detail": "Illusion amount decreased from 4/6/8 to 3/5/7",
           "entity": {
             "type": "unit",
+            "unit": "spectres",
             "slug": "spectres"
           }
         },
@@ -117,6 +128,7 @@
           "detail": "All abilities cost 50 mana instead of 100",
           "entity": {
             "type": "unit",
+            "unit": "invoker",
             "slug": "invoker"
           }
         }
@@ -131,6 +143,7 @@
           "detail": "Reworked into (2)(4) (2) Harpies: All Non-harpy allies gain the effect: Targeted spells +1 additional target. (4) Harpies: All allies gain the effect: Targeted spells +2 additional targets.",
           "entity": {
             "type": "synergy",
+            "synergy": "is_harpy",
             "slug": "harpy"
           }
         },
@@ -140,6 +153,7 @@
           "detail": "(4) Demon Hunters reworked (2) Demon Hunters: All friendly demons now have Fel Power. (4) Demon Hunters: All friendly pieces now deal Pure Damage.",
           "entity": {
             "type": "synergy",
+            "synergy": "is_demonhunter",
             "slug": "demon-hunter"
           }
         },
@@ -149,6 +163,7 @@
           "detail": "(9) Elves’ Illusion now hides for 1s instead of 0.5s.",
           "entity": {
             "type": "synergy",
+            "synergy": "is_elf",
             "slug": "elf"
           }
         },
@@ -158,6 +173,7 @@
           "detail": "(3) Mages: Enemies suffer a higher magical vulnerability of 30% instead of 25%, (9) Mages: Frozen duration increased from 1/400*damage to 1/300*damage (3) Mages: All enemies suffer -30% magic resistance. (6) Mages: All enemies suffer -40% magic resistance. (9) Mages: All enemies are cursed with frost incantation, which freezes them upon receiving magical damage. Lasts longer for more increased damage taken.",
           "entity": {
             "type": "synergy",
+            "synergy": "is_mage",
             "slug": "mage"
           }
         },
@@ -167,6 +183,7 @@
           "detail": "Shield explosion deals 1.5x damage absorbed instead of 1x.",
           "entity": {
             "type": "synergy",
+            "synergy": "is_naga",
             "slug": "naga"
           }
         },
@@ -176,6 +193,7 @@
           "detail": "(6) Gods: CD reduction after casting ability increased from 50% to 60%",
           "entity": {
             "type": "synergy",
+            "synergy": "is_god",
             "slug": "god"
           }
         },
@@ -185,6 +203,7 @@
           "detail": "(4) Max Health bonus decreased from 400 to 300",
           "entity": {
             "type": "synergy",
+            "synergy": "is_orc",
             "slug": "orc"
           }
         },
@@ -194,6 +213,7 @@
           "detail": "Tango now restores random 1-8 Health instead of 1-7",
           "entity": {
             "type": "synergy",
+            "synergy": "is_priest",
             "slug": "priest"
           }
         }
@@ -208,6 +228,7 @@
           "detail": "Reworked Attack speed +20. All damage increases by 20%, and deals each 50% additional damage to at most 2 same-name pieces.",
           "entity": {
             "type": "item",
+            "item": "item_sanchaji",
             "slug": "trident"
           }
         },
@@ -217,6 +238,7 @@
           "detail": "Now “Summons 2 necro creeps” instead of “Summons 1 necro warrior and 1 necro archer” P.S. Melee carrier summons 2 necro warriors while Ranged carrier summons 2 necro archers.",
           "entity": {
             "type": "item",
+            "item": "item_minglingshu",
             "slug": "necronomicon"
           }
         },
@@ -231,6 +253,7 @@
           "detail": "+25% Evasion removed",
           "entity": {
             "type": "item",
+            "item": "item_zhusidoupeng",
             "slug": "gossamer-cape"
           }
         },
@@ -245,6 +268,7 @@
           "detail": "Attack speed bonus increased from +25 to +30, CD decreased from 7s to 5s",
           "entity": {
             "type": "item",
+            "item": "item_jinghunzhiren",
             "slug": "diffusal-blade"
           }
         },
@@ -254,6 +278,7 @@
           "detail": "Base damage bonus decreased from +400 to +350",
           "entity": {
             "type": "item",
+            "item": "item_shengjian",
             "slug": "rapier"
           }
         },
@@ -263,6 +288,7 @@
           "detail": "CD increased from 20s to 25s",
           "entity": {
             "type": "item",
+            "item": "item_yangdao",
             "slug": "scythe-of-vyse"
           }
         }
@@ -277,6 +303,7 @@
           "detail": "Adjusted into Passive Effect. All offside branches unlock automatically in this single game.",
           "entity": {
             "type": "relic",
+            "relic": "item_both_leaves",
             "slug": "leafy-essence"
           }
         },
@@ -286,6 +313,7 @@
           "detail": "Higher Rank token granted in later rounds. Your win or lose streak will not be terminated and when the relic disappears, you will receive a corresponding level loot token based on the highest reward/compensation held during that time. P.S. 2-4 win/loss streak corresponds to level (lapsed relic count) loot token, 5-9 win/loss streak corresponds to level (lapsed relic count+1) loot token, and 10+ win/loss streak corresponds to level (lapsed relic count+2) loot token. The Maximum level of this token is level 5.",
           "entity": {
             "type": "relic",
+            "relic": "item_streak_plus",
             "slug": "chiaroscuro-certainty"
           }
         },
@@ -295,6 +323,7 @@
           "detail": "Will not transform into pieces that you’ve packed before.",
           "entity": {
             "type": "relic",
+            "relic": "item_magic_box",
             "slug": "magic-box"
           }
         },
@@ -304,6 +333,7 @@
           "detail": "Reworked. Removed the reduction of creeps’ Health and Damage and the extra token. Now all creeps duplicate themselves and counted as level +1.",
           "entity": {
             "type": "relic",
+            "relic": "item_more_creep",
             "slug": "march-of-the-beasts"
           }
         }
@@ -325,7 +355,12 @@
         {
           "kind": "buff",
           "name": "Talent 2B - Ascendency",
-          "detail": "Chance for +1 Level in recruitment increased from 50% to 60%"
+          "detail": "Chance for +1 Level in recruitment increased from 50% to 60%",
+          "entity": {
+            "type": "talent",
+            "talent": "2b",
+            "slug": "2b"
+          }
         }
       ]
     },
@@ -348,6 +383,7 @@
           "detail": "(4) Harpies adjusted (2) Harpies: All Non-harpy allies gain the effect: Targeted spells +1 additional target. (4) Harpies: All allies gain the effect: Targeted spells +1 additional target. harpies +1 additional target.",
           "entity": {
             "type": "synergy",
+            "synergy": "is_harpy",
             "slug": "harpy"
           }
         },
@@ -357,6 +393,7 @@
           "detail": "Channeling duration increased from 1.5s to 2s",
           "entity": {
             "type": "synergy",
+            "synergy": "is_shaman",
             "slug": "shaman"
           }
         },
@@ -366,6 +403,7 @@
           "detail": "Base Health increased from 600 to 650",
           "entity": {
             "type": "unit",
+            "unit": "tiny",
             "slug": "tiny"
           }
         },
@@ -375,6 +413,7 @@
           "detail": "Base Health increased from 800 to 950",
           "entity": {
             "type": "unit",
+            "unit": "nyx-assassin",
             "slug": "nyx-assassin"
           }
         },
@@ -384,6 +423,7 @@
           "detail": "Stun duration increased from 2s to 1.5/2/3/s",
           "entity": {
             "type": "unit",
+            "unit": "nyx-assassin",
             "slug": "nyx-assassin"
           }
         },
@@ -393,6 +433,7 @@
           "detail": "Evasion chance decreased from 30%/40%/50% to 20%/30%/40%",
           "entity": {
             "type": "unit",
+            "unit": "phantom-assassin",
             "slug": "phantom-assassin"
           }
         },
@@ -402,6 +443,7 @@
           "detail": "Illusion amount decreased from 3/5/7 to 为3/4/6",
           "entity": {
             "type": "unit",
+            "unit": "spectres",
             "slug": "spectres"
           }
         },
@@ -411,6 +453,7 @@
           "detail": "Enchanted Mango grants randomly 2 - Current Level Gold and XP instead of 3 - Current Level",
           "entity": {
             "type": "relic",
+            "relic": "item_mangotree",
             "slug": "mango-tree"
           }
         }

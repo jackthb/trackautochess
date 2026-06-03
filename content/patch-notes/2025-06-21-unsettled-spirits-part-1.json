@@ -13,6 +13,7 @@
           "detail": "Reworked. <Battlecry Ability: Activates before the battle starts> IO tethers with allies around, granting percentage damage reduction. Health percentage will be distributed equally among all tethered allies at set intervals. P.S. Tether will break when IO dies or is too far from its ally. P.S. Health from redistribution of tether will not be counted as Heal. The benevolent touch of Io brings strength from between the planes.",
           "entity": {
             "type": "unit",
+            "unit": "io",
             "slug": "io"
           }
         },
@@ -27,6 +28,7 @@
           "detail": "Cancelled the extra one when combined into Rank 3.",
           "entity": {
             "type": "unit",
+            "unit": "meepo",
             "slug": "meepo"
           }
         },
@@ -36,6 +38,7 @@
           "detail": "Damage increased from 100/150/250 to 100/200/400",
           "entity": {
             "type": "unit",
+            "unit": "meepo",
             "slug": "meepo"
           }
         },
@@ -45,6 +48,7 @@
           "detail": "Armor increased from 5 to 7",
           "entity": {
             "type": "unit",
+            "unit": "legion-commander",
             "slug": "legion-commander"
           }
         },
@@ -54,6 +58,7 @@
           "detail": "Damage decreased from 200/300/400 to 150/250/350",
           "entity": {
             "type": "unit",
+            "unit": "morphling",
             "slug": "morphling"
           }
         }
@@ -68,6 +73,7 @@
           "detail": "(2) Reworked. (1) Kobold: If every friendly Kobold piece on board can be paired with another identical same-rank Kobold, summons a replica for each pair when battle starts. (2) Kobolds: Every unpaired Kobold piece will reshape itself into a non-Kobold ally of the same Rank before battle starts. P.S. Paired Kobolds will keep themselves. P.S. Unpaired Kobolds will reshape into highest level allies of the same rank.",
           "entity": {
             "type": "synergy",
+            "synergy": "is_kobold",
             "slug": "kobold"
           }
         },
@@ -77,6 +83,7 @@
           "detail": "Simplified. (2) Harpies: All allies gain the effect - Targeted spells +1 additional targets. (4) Harpies: All allies gain the effect - Targeted spells +1 additional targets.",
           "entity": {
             "type": "synergy",
+            "synergy": "is_harpy",
             "slug": "harpy"
           }
         },
@@ -86,6 +93,7 @@
           "detail": "Channeling duration decreased from 2s to 1s",
           "entity": {
             "type": "synergy",
+            "synergy": "is_shaman",
             "slug": "shaman"
           }
         }
@@ -105,6 +113,7 @@
           "detail": "Mana restoration increased from 25 to 30",
           "entity": {
             "type": "item",
+            "item": "item_weishijingjia",
             "slug": "guardian-greaves"
           }
         }
@@ -159,6 +168,7 @@
           "detail": "(4) Taurens: Silence duration of Woodpecker Totem decreased from 5s to 3s. Disarm duration of Horn Totem decreased from 3s to 2s",
           "entity": {
             "type": "synergy",
+            "synergy": "is_tauren",
             "slug": "tauren"
           }
         },
@@ -168,6 +178,7 @@
           "detail": "Inner CD increased from 1s to 2s",
           "entity": {
             "type": "unit",
+            "unit": "skywrath-mage",
             "slug": "skywrath-mage"
           }
         },
@@ -177,6 +188,7 @@
           "detail": "Attack interval decreased from 1.3s to 1.1s",
           "entity": {
             "type": "unit",
+            "unit": "muerta",
             "slug": "muerta"
           }
         },
@@ -186,6 +198,7 @@
           "detail": "Percentage Damage decreased from 20%/30%/40% to 15%/20%/30%, base damage decreased from 400/600/800 to 300/400/600",
           "entity": {
             "type": "unit",
+            "unit": "kez",
             "slug": "kez"
           }
         },
@@ -195,6 +208,7 @@
           "detail": "Wave width increased from 150~200 to 150~250",
           "entity": {
             "type": "unit",
+            "unit": "shadow-fiend",
             "slug": "shadow-fiend"
           }
         },
@@ -204,6 +218,7 @@
           "detail": "Stunning duration decreased from 1.5/2.0/2.5s to 1.0/1.5/2.0s",
           "entity": {
             "type": "unit",
+            "unit": "elder-titan",
             "slug": "elder-titan"
           }
         },
@@ -213,6 +228,7 @@
           "detail": "CD decreased from 10/8/6s to 8/6/4s",
           "entity": {
             "type": "unit",
+            "unit": "primal-beast",
             "slug": "primal-beast"
           }
         }

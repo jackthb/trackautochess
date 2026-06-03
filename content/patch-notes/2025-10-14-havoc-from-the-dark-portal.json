@@ -38,6 +38,7 @@
           "detail": "Downgraded from Tier 2 to Tier 1, +300 Health removed",
           "entity": {
             "type": "item",
+            "item": "item_wuzhixiaomao",
             "slug": "witless-shako"
           }
         },
@@ -47,6 +48,7 @@
           "detail": "Only valid for targets whose level higher than the carrier (previously higher or equals to)",
           "entity": {
             "type": "item",
+            "item": "item_yongqizhiguang",
             "slug": "spark-of-courage"
           }
         },
@@ -61,6 +63,7 @@
           "detail": "+25% mana restoration added",
           "entity": {
             "type": "item",
+            "item": "item_huiguang",
             "slug": "kaya"
           }
         }
@@ -80,6 +83,7 @@
           "detail": "Base Health increased from 550 to 600",
           "entity": {
             "type": "unit",
+            "unit": "tusk",
             "slug": "tusk"
           }
         },
@@ -89,6 +93,7 @@
           "detail": "Attack damage decreased from 60 to 50",
           "entity": {
             "type": "unit",
+            "unit": "clinkz",
             "slug": "clinkz"
           }
         },
@@ -103,6 +108,7 @@
           "detail": "CD decreased from 15/12/9s to 10/8/6s",
           "entity": {
             "type": "unit",
+            "unit": "razor",
             "slug": "razor"
           }
         },
@@ -112,6 +118,7 @@
           "detail": "Lifesteal percentage decreased from 9%/12%/15% to 8%/10%/12%",
           "entity": {
             "type": "unit",
+            "unit": "undying",
             "slug": "undying"
           }
         },
@@ -121,6 +128,7 @@
           "detail": "Base Health increased from 800 to 900",
           "entity": {
             "type": "unit",
+            "unit": "earth-spirit",
             "slug": "earth-spirit"
           }
         },
@@ -130,6 +138,7 @@
           "detail": "Summoned Fiends are now the same rank with Abyssal Underlord (instead of the Ability Level)",
           "entity": {
             "type": "unit",
+            "unit": "abyssal-underlord",
             "slug": "abyssal-underlord"
           }
         },
@@ -169,6 +178,7 @@
           "detail": "Base Health increased from 700 to 750",
           "entity": {
             "type": "unit",
+            "unit": "axe",
             "slug": "axe"
           }
         },
@@ -178,6 +188,7 @@
           "detail": "Bounce times decreased from 3/4/5 to 2/3/4",
           "entity": {
             "type": "unit",
+            "unit": "luna",
             "slug": "luna"
           }
         },
@@ -187,6 +198,7 @@
           "detail": "CD decreased from 15/12/9s to 12/10/8s",
           "entity": {
             "type": "unit",
+            "unit": "enigma",
             "slug": "enigma"
           }
         },
@@ -196,6 +208,7 @@
           "detail": "Lifesteal max health percent decreased from 8%/10%/12% to 4%/6%/8%",
           "entity": {
             "type": "unit",
+            "unit": "undying",
             "slug": "undying"
           }
         },
@@ -205,6 +218,7 @@
           "detail": "CD decreased from 10/8/6s to 7/6/5s",
           "entity": {
             "type": "unit",
+            "unit": "viper",
             "slug": "viper"
           }
         },
@@ -214,6 +228,7 @@
           "detail": "CD decreased from 15/12/9s to 8s",
           "entity": {
             "type": "unit",
+            "unit": "death-prophet",
             "slug": "death-prophet"
           }
         },
@@ -223,6 +238,7 @@
           "detail": "Attack interval decreased from 1.0s to 0.9s",
           "entity": {
             "type": "unit",
+            "unit": "phantom-assassin",
             "slug": "phantom-assassin"
           }
         },
@@ -237,6 +253,7 @@
           "detail": "Call interval increased from 3/2.5/2s to 4/3.5/3s",
           "entity": {
             "type": "unit",
+            "unit": "abyssal-underlord",
             "slug": "abyssal-underlord"
           }
         },
@@ -246,6 +263,7 @@
           "detail": "CD decreased from 8/6/4s to 6/5/4s, stun duration increased from 0.5/0.75/1s to 0.5/1/1.5s",
           "entity": {
             "type": "unit",
+            "unit": "primal-beast",
             "slug": "primal-beast"
           }
         },

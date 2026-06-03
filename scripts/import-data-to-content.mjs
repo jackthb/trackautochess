@@ -100,7 +100,15 @@ function contentEntity(gameId, name, source, icon, existing) {
   return entity;
 }
 
-function patchToContent(patch) {
+function entityReference(type, slug, entityRefBySlug) {
+  return {
+    type,
+    ...(type && slug ? { [type]: entityRefBySlug?.[type]?.get(slug) ?? slug } : {}),
+    slug,
+  };
+}
+
+function patchToContent(patch, entityRefBySlug) {
   const next = { ...patch };
   if ("workshop_url" in next) {
     next.workshopUrl = next.workshop_url;
@@ -115,11 +123,7 @@ function patchToContent(patch) {
             if (converted.entity_type || converted.entity_slug) {
               const type = converted.entity_type ?? null;
               const slug = converted.entity_slug ?? null;
-              converted.entity = {
-                type,
-                ...(type && slug ? { [type]: slug } : {}),
-                slug,
-              };
+              converted.entity = entityReference(type, slug, entityRefBySlug);
               delete converted.entity_type;
               delete converted.entity_slug;
             }
@@ -161,9 +165,18 @@ async function main() {
   await writeJson("game/game-mode.json", gameMode);
   await writeJson("game/text-corrections.json", textCorrections);
 
+  const entityRefBySlug = {
+    unit: new Map(),
+    item: new Map(),
+    synergy: new Map(),
+    relic: new Map(),
+    talent: new Map(),
+  };
+
   for (const [name, unit] of Object.entries(units)) {
     const gameId = unit.id ?? slugify(name);
     const relativePath = `game/units/${slugify(name)}.json`;
+    entityRefBySlug.unit.set(slugify(name), slugify(name));
     await writeJson(
       relativePath,
       contentEntity(
@@ -178,6 +191,7 @@ async function main() {
 
   for (const [gameId, item] of Object.entries(itemsFull)) {
     const relativePath = `game/items/${gameId}.json`;
+    entityRefBySlug.item.set(slugify(item.name ?? gameId), gameId);
     await writeJson(
       relativePath,
       contentEntity(
@@ -192,6 +206,7 @@ async function main() {
 
   for (const [gameId, synergy] of Object.entries(synergies)) {
     const relativePath = `game/synergies/${gameId}.json`;
+    entityRefBySlug.synergy.set(slugify(synergy.name ?? gameId), gameId);
     await writeJson(
       relativePath,
       contentEntity(
@@ -206,6 +221,7 @@ async function main() {
 
   for (const [gameId, relic] of Object.entries(relics.relics ?? {})) {
     const relativePath = `game/relics/${gameId}.json`;
+    entityRefBySlug.relic.set(slugify(relic.name ?? gameId), gameId);
     await writeJson(
       relativePath,
       contentEntity(
@@ -219,6 +235,7 @@ async function main() {
   }
 
   for (const [slot, talent] of Object.entries(talents)) {
+    entityRefBySlug.talent.set(slot, slugify(slot));
     await writeJson(`game/talents/${slugify(slot)}.json`, {
       slot,
       ...talent,
@@ -238,7 +255,7 @@ async function main() {
     .sort();
   for (const file of patchFiles) {
     const patch = await fromJson(path.join(patchDir, file));
-    await writeJson(`patch-notes/${file}`, patchToContent(patch));
+    await writeJson(`patch-notes/${file}`, patchToContent(patch, entityRefBySlug));
   }
 
   console.log(`Imported ${patchFiles.length} patch notes and game data to content/.`);

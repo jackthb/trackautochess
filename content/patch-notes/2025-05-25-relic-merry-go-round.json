@@ -42,6 +42,7 @@
           "detail": "New coming! <Relic Consumable: Click to Use> Transfer 20% of the higher one of your Health and Mana into another. Can be used twice.",
           "entity": {
             "type": "relic",
+            "relic": "item_double_coin",
             "slug": "doubloon"
           }
         },
@@ -51,6 +52,7 @@
           "detail": "New coming! Replicate your last relic. P.S. A random relic will be settled if it is your first relic, and this randomed one will not be counted as used (still available later). P.S. Time-Space Replica is not in the relic random pool when you random a relic.",
           "entity": {
             "type": "relic",
+            "relic": "item_repeat_relic",
             "slug": "time-space-replica"
           }
         },
@@ -60,6 +62,7 @@
           "detail": "New coming! A special choice of Stolen Vault is provided instead of Discard in the relic box. A bag of random 10 ~ 20 gold will be dropped as a Stolen Vault. If you are not interested in any of the 3 relics in the relic box, just get this Vault! P.S. Can be replicated by Time-Space Replica.",
           "entity": {
             "type": "relic",
+            "relic": "item_stolen_vault",
             "slug": "stolen-vault"
           }
         },
@@ -79,6 +82,7 @@
           "detail": "Stun duration decreased from 3/5/5s to 3/4/4s.",
           "entity": {
             "type": "unit",
+            "unit": "windranger",
             "slug": "windranger"
           }
         },
@@ -88,6 +92,7 @@
           "detail": "Base Health decreased from 700 to 650",
           "entity": {
             "type": "unit",
+            "unit": "chaos-knight",
             "slug": "chaos-knight"
           }
         },
@@ -97,6 +102,7 @@
           "detail": "Damage increased from 400/600/800 to 500/700/900",
           "entity": {
             "type": "unit",
+            "unit": "lina",
             "slug": "lina"
           }
         },
@@ -106,6 +112,7 @@
           "detail": "Base Health increased from 600 to 700",
           "entity": {
             "type": "unit",
+            "unit": "marci",
             "slug": "marci"
           }
         },
@@ -115,6 +122,7 @@
           "detail": "Base Health increased from 700 to 800",
           "entity": {
             "type": "unit",
+            "unit": "legion-commander",
             "slug": "legion-commander"
           }
         },
@@ -124,6 +132,7 @@
           "detail": "Base Health increased from 850 to 900, Armor increased from 10 to 12",
           "entity": {
             "type": "unit",
+            "unit": "dragon-knight",
             "slug": "dragon-knight"
           }
         },
@@ -133,6 +142,7 @@
           "detail": "Duration increased from 3/4/5s to 4/5/6s",
           "entity": {
             "type": "unit",
+            "unit": "omniknight",
             "slug": "omniknight"
           }
         },
@@ -142,6 +152,7 @@
           "detail": "Duration decreased from 4/5/6s to 3/4/5s",
           "entity": {
             "type": "unit",
+            "unit": "invoker",
             "slug": "invoker"
           }
         }
@@ -156,6 +167,7 @@
           "detail": "Invitation cannot be affected by Dismiss.",
           "entity": {
             "type": "synergy",
+            "synergy": "is_pandaman",
             "slug": "pandaren"
           }
         },
@@ -165,6 +177,7 @@
           "detail": "(1) Pandaren - Chance increased from 10% to 12%.",
           "entity": {
             "type": "synergy",
+            "synergy": "is_pandaman",
             "slug": "pandaren"
           }
         },
@@ -174,6 +187,7 @@
           "detail": "(4) Knights - Chances decreased from 25% to 20%. (6) Knights - Heal per Shield increased from 300 to 400.",
           "entity": {
             "type": "synergy",
+            "synergy": "is_knight",
             "slug": "knight"
           }
         },
@@ -183,6 +197,7 @@
           "detail": "(6) Hunters - Chances for additional attack decreased from 60% to 50%.",
           "entity": {
             "type": "synergy",
+            "synergy": "is_hunter",
             "slug": "hunter"
           }
         },
@@ -197,6 +212,7 @@
           "detail": "(4) Beasts - Damage bonus increased from 20% to +25%.",
           "entity": {
             "type": "synergy",
+            "synergy": "is_beast",
             "slug": "beast"
           }
         }
@@ -211,6 +227,7 @@
           "detail": "Tier 3 New Item. Attack damage +25, lifesteal +20%. Carrier deals +50% damage to Undead and Demon pieces.",
           "entity": {
             "type": "item",
+            "item": "item_qishijian",
             "slug": "paladin-sword"
           }
         },
@@ -225,6 +242,7 @@
           "detail": "Upgraded from Tier 3 to Tier 4. Attack damage +25. <Active ability: Instant>Creates 2 images of the caster that last 7 seconds.",
           "entity": {
             "type": "item",
+            "item": "item_huanyingfu",
             "slug": "manta-style"
           }
         }
@@ -254,6 +272,7 @@
           "detail": "(4) Monks - Chances increased from 15% to 20%",
           "entity": {
             "type": "synergy",
+            "synergy": "is_monk",
             "slug": "monk"
           }
         },
@@ -263,6 +282,7 @@
           "detail": "Health increased from 450 to 500",
           "entity": {
             "type": "unit",
+            "unit": "slark",
             "slug": "slark"
           }
         },
@@ -272,6 +292,7 @@
           "detail": "Blinded duration increased from 2/3/4s to 3/4/5s精",
           "entity": {
             "type": "unit",
+            "unit": "puck",
             "slug": "puck"
           }
         },
@@ -281,6 +302,7 @@
           "detail": "Attack speed decreased from 1.4s to 1.2s",
           "entity": {
             "type": "unit",
+            "unit": "legion-commander",
             "slug": "legion-commander"
           }
         },
@@ -300,6 +322,7 @@
           "detail": "Enemies' attack speed reduction increased from 15%/20%/30% to 30%/30%/40%",
           "entity": {
             "type": "unit",
+            "unit": "enchantress",
             "slug": "enchantress"
           }
         },
@@ -309,6 +332,7 @@
           "detail": "Chances for stun increased from 20%/30%/50% to 30%/40%/50%",
           "entity": {
             "type": "unit",
+            "unit": "spirit-breaker",
             "slug": "spirit-breaker"
           }
         },
@@ -318,6 +342,7 @@
           "detail": "Attack damage of Treants increased from 50/50/80 to 60/60/90",
           "entity": {
             "type": "unit",
+            "unit": "furion",
             "slug": "furion"
           }
         },
@@ -327,6 +352,7 @@
           "detail": "Damage increased from 150/200/300 to 200/250/350",
           "entity": {
             "type": "unit",
+            "unit": "blood-seeker",
             "slug": "blood-seeker"
           }
         },
@@ -336,6 +362,7 @@
           "detail": "Damage increased from 150/250/400 to 200/300/400",
           "entity": {
             "type": "unit",
+            "unit": "skywrath-mage",
             "slug": "skywrath-mage"
           }
         },
@@ -345,6 +372,7 @@
           "detail": "Duration increased from 3/3.5/4s to 3.5/4/4.5s",
           "entity": {
             "type": "unit",
+            "unit": "muerta",
             "slug": "muerta"
           }
         },
@@ -354,6 +382,7 @@
           "detail": "Damage decreased from 150/200/250 to 100/150/200, width decreased from 200~300 to 150~200",
           "entity": {
             "type": "unit",
+            "unit": "shadow-fiend",
             "slug": "shadow-fiend"
           }
         },
@@ -363,6 +392,7 @@
           "detail": "Damage decreased from 150/200/250 to 100/150/200",
           "entity": {
             "type": "unit",
+            "unit": "meepo",
             "slug": "meepo"
           }
         },
@@ -372,6 +402,7 @@
           "detail": "Damage per second decreased from 4%/5%/7% to 4%/5%/6%",
           "entity": {
             "type": "unit",
+            "unit": "enigma",
             "slug": "enigma"
           }
         },
@@ -381,6 +412,7 @@
           "detail": "Max damage decreased from 100/175/300 to 100/175/250",
           "entity": {
             "type": "unit",
+            "unit": "razor",
             "slug": "razor"
           }
         },
@@ -390,6 +422,7 @@
           "detail": "Base Health increased from 1200 to 1300",
           "entity": {
             "type": "unit",
+            "unit": "primal-beast",
             "slug": "primal-beast"
           }
         },
@@ -399,6 +432,7 @@
           "detail": "CD decreased from 12/9/6s to 10/8/6s",
           "entity": {
             "type": "unit",
+            "unit": "primal-beast",
             "slug": "primal-beast"
           }
         },
@@ -408,6 +442,7 @@
           "detail": "Base Health increased from 1000 to 1100",
           "entity": {
             "type": "unit",
+            "unit": "tidehunter",
             "slug": "tidehunter"
           }
         },
@@ -417,6 +452,7 @@
           "detail": "Base Health decreased from 1000 to 900",
           "entity": {
             "type": "unit",
+            "unit": "invoker",
             "slug": "invoker"
           }
         },

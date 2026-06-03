@@ -149,12 +149,16 @@
         {
           "kind": "added",
           "name": "New Tier 3 Item - Minotaur Horn",
-          "detail": "Carrier’s active ability counts as battlecry."
+          "detail": "Carrier’s active ability counts as battlecry.",
+          "entity_type": "item",
+          "entity_slug": "minotaur-horn"
         },
         {
           "kind": "added",
           "name": "New Tier 4 Item - Havoc",
-          "detail": "Attack damage +50. All carrier’s damage turns into Pure Damage."
+          "detail": "Attack damage +50. All carrier’s damage turns into Pure Damage.",
+          "entity_type": "item",
+          "entity_slug": "havoc"
         },
         {
           "kind": "buff",
