@@ -96,6 +96,29 @@ def test_extract_structured_match_returns_record_and_rows(tmp_path, monkeypatch)
     assert all(r["played_at"] == "2026-05-20T12:00:00" for r in player_rows)
 
 
+def test_extract_structured_match_synergies_prefer_filtered_buff(tmp_path, monkeypatch):
+    _isolated(tmp_path, monkeypatch)
+    end_board, expected_match_id, _ = _load_fixture()
+
+    # `show_buff` has been observed stale/repeated across players in live
+    # end-board data. `buff` has the correct per-player counts, plus inactive
+    # one-offs that should be filtered by synergy tier metadata.
+    first_player = next(iter(end_board["data"].values()))
+    first_player["show_buff"] = "is_knight:6,is_troll:6,is_demon:1"
+
+    from nettable_capture import NetTableCapture
+    cap = NetTableCapture(emit=lambda _: None)
+
+    extracted = cap._extract_structured_match(
+        end_board, played_at="2026-05-20T12:00:00", match_id=expected_match_id,
+    )
+    assert extracted is not None
+    _, player_rows = extracted
+
+    row = next(r for r in player_rows if r["steam_id"] == "76561198085976065")
+    assert row["synergies"] == "Aqir:4|Warlock:2|Orc:2|Beast:2"
+
+
 def test_extract_structured_match_no_local_files(tmp_path, monkeypatch):
     """_extract_structured_match must NOT write any local sidecar files."""
     _isolated(tmp_path, monkeypatch)

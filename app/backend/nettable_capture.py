@@ -2125,7 +2125,10 @@ class NetTableCapture:
                 "hero_level": _safe_int(p.get("hero_level")),
                 "chess_lineup": _transform_chess_lineup(p.get("chess_lineup")),
                 "chess_hand": _transform_chess_lineup(p.get("chess_hand")),
-                "synergies": _transform_synergies(p.get("show_buff")),
+                # `show_buff` can be stale/repeated across end-board players.
+                # `buff` is the per-player full count list; filter it through
+                # the synergy tier metadata so inactive one-offs are omitted.
+                "synergies": _transform_synergies(p.get("buff") or p.get("show_buff"), active_only=True),
                 "relic": _transform_relic(p.get("relic", "") or ""),
                 "relic_history": p.get("relic_history") or {},
                 "talents": self._format_talents(p.get("talent_tree")),
@@ -2788,6 +2791,7 @@ def _string_list(value) -> list[str]:
 
 _CHESS_ID_MAP_CACHE: dict[str, str] | None = None
 _SYNERGY_ID_MAP_CACHE: dict[str, str] | None = None
+_SYNERGY_MIN_TIER_MAP_CACHE: dict[str, int] | None = None
 _RELIC_ID_MAP_CACHE: dict[str, str] | None = None
 
 
@@ -2874,6 +2878,36 @@ def _load_synergy_id_map() -> dict[str, str]:
     return _SYNERGY_ID_MAP_CACHE
 
 
+def _load_synergy_min_tier_map() -> dict[str, int]:
+    """Read data/synergies.json -> {'is_mage': 3, 'is_demon': 1, ...}."""
+    global _SYNERGY_MIN_TIER_MAP_CACHE
+    if _SYNERGY_MIN_TIER_MAP_CACHE is not None:
+        return _SYNERGY_MIN_TIER_MAP_CACHE
+    try:
+        from utils import DATA_DIR
+        path = DATA_DIR / "synergies.json"
+        if not path.exists():
+            _SYNERGY_MIN_TIER_MAP_CACHE = {}
+            return _SYNERGY_MIN_TIER_MAP_CACHE
+        data = json.loads(path.read_text(encoding="utf-8"))
+        out: dict[str, int] = {}
+        if isinstance(data, dict):
+            for internal_id, info in data.items():
+                tiers = info.get("tiers") if isinstance(info, dict) else None
+                nums: list[int] = []
+                for tier in tiers or []:
+                    n = _safe_int(tier)
+                    if n is not None:
+                        nums.append(n)
+                if nums:
+                    out[internal_id] = min(nums)
+        _SYNERGY_MIN_TIER_MAP_CACHE = out
+    except Exception as e:
+        log.warning("nettable: failed to load synergy tier map: %s", e)
+        _SYNERGY_MIN_TIER_MAP_CACHE = {}
+    return _SYNERGY_MIN_TIER_MAP_CACHE
+
+
 def _resolve_chess_piece(piece_id: str, id_map: dict[str, str]) -> tuple[str, int]:
     """'chess_br11' → ('Broodmother', 3). Strips trailing '1's, looks
     up the base id; star count = 1 + number stripped. Unknown ids
@@ -2951,11 +2985,12 @@ def _extract_vchess_board(raw: dict) -> list[dict]:
     return board
 
 
-def _transform_synergies(raw: str) -> str:
+def _transform_synergies(raw: str, active_only: bool = False) -> str:
     """'is_mage:9,is_human:6' → 'Mage:9|Human:6'."""
     if not raw:
         return ""
     id_map = _load_synergy_id_map()
+    min_tiers = _load_synergy_min_tier_map() if active_only else {}
     out: list[str] = []
     for p in str(raw).replace("|", ",").split(","):
         p = p.strip()
@@ -2963,8 +2998,15 @@ def _transform_synergies(raw: str) -> str:
             continue
         if ":" in p:
             sid, count = p.split(":", 1)
-            display = id_map.get(sid.strip(), sid.strip())
-            out.append(f"{display}:{count.strip()}")
+            sid = sid.strip()
+            count_text = count.strip()
+            count_int = _safe_int(count_text)
+            if active_only and count_int is not None:
+                min_tier = min_tiers.get(sid)
+                if min_tier is not None and count_int < min_tier:
+                    continue
+            display = id_map.get(sid, sid)
+            out.append(f"{display}:{count_text}")
         else:
             display = id_map.get(p, p)
             out.append(display)
