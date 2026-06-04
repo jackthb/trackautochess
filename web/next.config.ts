@@ -113,6 +113,7 @@ const nextConfig: NextConfig = {
       // /synergies is an alias for the classes listing (was a getServerSideProps
       // redirect in pages/synergies.tsx before the App Router migration).
       { source: "/synergies", destination: "/classes", permanent: true },
+      { source: "/admin/matches", destination: "/matches", permanent: false },
     ];
   },
   skipTrailingSlashRedirect: true,

@@ -95,22 +95,6 @@ export interface LivePlayer {
   board?: import("@dac/shared/types").ChessBoardPiece[];
 }
 
-/** One table's outcome from a debug dump sequence (F10 in-game). */
-export interface NetTableDebugResult {
-  table: string;
-  detected: boolean;
-  rows: number | null;
-}
-
-/** Results of the most recent debug dump sequence. */
-export interface NetTableDebugState {
-  running: boolean;
-  results: NetTableDebugResult[];
-  /** Set when the last run couldn't fire (e.g. "dota_not_foreground"). */
-  reason: string | null;
-  at: string | null;
-}
-
 export interface NetTableActivityState {
   status: NetTableStatus | null;
   entries: NetTableActivityEntry[];
@@ -126,8 +110,6 @@ export interface NetTableActivityState {
   launchOptionsProgress: string | null;
   /** Current progress message during resync-from-Steam (null when idle). */
   resyncProgress: string | null;
-  /** Per-table outcome of the most recent F10 debug dump sequence. */
-  debug: NetTableDebugState;
 }
 
 const MAX_ENTRIES = 50;
@@ -206,21 +188,6 @@ type NetTableCreepRoundEvent = {
   round: number;
   at: string;
 };
-type NetTableDebugDumpEvent = {
-  type: "nettable_debug_dump";
-  table: string;
-  detected: boolean;
-  rows: number | null;
-  at: string;
-};
-type NetTableDebugDumpDoneEvent = {
-  type: "nettable_debug_dump_done";
-  ok: boolean;
-  reason?: string;
-  results: NetTableDebugResult[];
-  at: string;
-};
-
 type Incoming =
   | TrackerEvent
   | NetTableStatusEvent
@@ -232,8 +199,6 @@ type Incoming =
   | NetTableGameEndedEvent
   | NetTableEndBoardSavedEvent
   | NetTableCreepRoundEvent
-  | NetTableDebugDumpEvent
-  | NetTableDebugDumpDoneEvent
   | NetTableLaunchOptionsAppliedEvent
   | NetTableLaunchOptionsProgressEvent
   | NetTableResyncProgressEvent
@@ -266,13 +231,6 @@ export function useNetTableEvents(): NetTableActivityState {
     useState<NetTableLaunchOptionsApplied | null>(null);
   const [launchOptionsProgress, setLaunchOptionsProgress] = useState<string | null>(null);
   const [resyncProgress, setResyncProgress] = useState<string | null>(null);
-  const [debug, setDebug] = useState<NetTableDebugState>({
-    running: false,
-    results: [],
-    reason: null,
-    at: null,
-  });
-
   useEffect(() => {
     if (!window.tracker) return;
     let nextId = 1;
@@ -397,28 +355,6 @@ export function useNetTableEvents(): NetTableActivityState {
           setStateAt(msg.at || null);
           break;
         }
-        case "nettable_debug_dump": {
-          // Incremental per-table result as the sequence fires each key.
-          setDebug((prev) => ({
-            running: true,
-            reason: null,
-            at: prev.at,
-            results: [
-              ...prev.results.filter((r) => r.table !== msg.table),
-              { table: msg.table, detected: msg.detected, rows: msg.rows ?? null },
-            ],
-          }));
-          break;
-        }
-        case "nettable_debug_dump_done": {
-          setDebug({
-            running: false,
-            results: msg.results ?? [],
-            reason: msg.reason ?? null,
-            at: msg.at ?? null,
-          });
-          break;
-        }
         case "nettable_launch_options_progress": {
           setLaunchOptionsProgress(msg.message);
           break;
@@ -513,6 +449,5 @@ export function useNetTableEvents(): NetTableActivityState {
     launchOptionsApplied,
     launchOptionsProgress,
     resyncProgress,
-    debug,
   };
 }
