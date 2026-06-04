@@ -29,6 +29,9 @@ interface StatsResponse {
     mmr: number | null;
     max_mmr: number | null;
     season: string | null;
+    season_games: number | null;
+    candy: number | null;
+    chicken_count: number | null;
     rank: string | null;
     mmr_level: number | null;
     queen_ladder_rank: number | null;
@@ -91,7 +94,7 @@ export async function GET(
     supabase
       .from("users")
       .select(
-        "drodo_mmr, drodo_max_mmr, drodo_mmr_level, drodo_season, drodo_profile_missing, queen_ladder_rank"
+        "drodo_mmr, drodo_max_mmr, drodo_mmr_level, drodo_season, drodo_season_games, drodo_candy, drodo_chicken_count, drodo_profile_missing, queen_ladder_rank"
       )
       .eq("steam_id", steamId)
       .maybeSingle(),
@@ -102,6 +105,9 @@ export async function GET(
     drodo_max_mmr: number | null;
     drodo_mmr_level: number | null;
     drodo_season: string | null;
+    drodo_season_games: number | null;
+    drodo_candy: number | null;
+    drodo_chicken_count: number | null;
     drodo_profile_missing: boolean | null;
     queen_ladder_rank: number | null;
   } | null;
@@ -120,6 +126,9 @@ export async function GET(
       mmr,
       max_mmr: hasStats ? drodo.drodo_max_mmr : null,
       season: hasStats ? drodo.drodo_season : null,
+      season_games: hasStats ? drodo.drodo_season_games : null,
+      candy: hasStats ? drodo.drodo_candy : null,
+      chicken_count: hasStats ? drodo.drodo_chicken_count : null,
       rank: mmrToRank(mmr) || null,
       mmr_level: hasStats ? drodo.drodo_mmr_level : null,
       queen_ladder_rank: hasStats ? drodo.queen_ladder_rank : null,

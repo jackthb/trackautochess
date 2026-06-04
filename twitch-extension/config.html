@@ -7,38 +7,49 @@
 <link rel="stylesheet" href="config.css" />
 </head>
 <body>
-<main class="wrap">
-  <h1>Track Auto Chess setup</h1>
-  <p class="lead">
-    Enter your Steam username, vanity URL, or SteamID64. The panel will stay
-    small and show viewers only your current DAC rank.
-  </p>
+<main class="setup-shell">
+  <section class="setup-card">
+    <header class="setup-header">
+      <div class="brand" aria-label="Track Auto Chess">
+        <img src="logo.svg" alt="" />
+        <span>Track Auto Chess</span>
+      </div>
+      <p class="eyebrow">Twitch Extension Setup</p>
+      <h1>Link the broadcaster profile</h1>
+      <p class="lead">
+        Enter your Steam username, vanity URL, or SteamID64. The Twitch panel
+        will show viewers the same current DAC rank summary used by the web app.
+      </p>
+    </header>
 
-  <form id="form">
-    <label for="steamInput">Steam username or SteamID64</label>
-    <input
-      id="steamInput"
-      type="text"
-      placeholder="e.g. jackth or 76561198022169086"
-      autocomplete="off"
-      required
-    />
-    <p class="hint">
-      Use the username from
-      <code>steamcommunity.com/id/<strong>your-name</strong></code>
-      or your numeric SteamID64.
-    </p>
+    <form id="form" class="setup-form">
+      <label for="steamInput">Steam username or SteamID64</label>
+      <input
+        id="steamInput"
+        type="text"
+        placeholder="e.g. jackth or 76561198022169086"
+        autocomplete="off"
+        required
+      />
+      <p class="hint">
+        Use the username from
+        <code>steamcommunity.com/id/<strong>your-name</strong></code>
+        or your numeric SteamID64.
+      </p>
 
-    <button id="submit" type="submit">Save</button>
-  </form>
+      <button id="submit" type="submit">Save broadcaster profile</button>
+    </form>
 
-  <div id="current" class="current hidden">
-    <strong>Current setup:</strong>
-    <span id="currentName"></span>
-    <a id="currentProfile" target="_blank" rel="noopener noreferrer">View profile ↗</a>
-  </div>
+    <div id="current" class="current hidden">
+      <span>
+        <strong>Current setup</strong>
+        <span id="currentName"></span>
+      </span>
+      <a id="currentProfile" target="_blank" rel="noopener noreferrer">View profile</a>
+    </div>
 
-  <div id="status" class="status hidden"></div>
+    <div id="status" class="status hidden"></div>
+  </section>
 </main>
 <script src="config.js"></script>
 </body>

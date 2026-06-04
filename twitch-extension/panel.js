@@ -1,12 +1,8 @@
 // Track Auto Chess — Twitch panel extension.
 //
-// Reads the broadcaster's configured Steam username / SteamID64, loads the
-// public rank endpoint, and refreshes every 30 minutes. The panel intentionally
-// stays tiny and only shows the current rank — no match history.
+// Reads the broadcaster's configured Steam username / SteamID64 and loads the
+// public rank endpoint for display inside Twitch's hosted-extension shell.
 
-// Default to prod; override with ?api=http://localhost:3000 when previewing
-// locally. Use the www host directly so browser CORS fetches do not follow a
-// cross-origin redirect from the apex domain.
 const DEFAULT_API_HOST = "https://www.trackautochess.com";
 const API_HOST = (() => {
   try {
@@ -22,11 +18,14 @@ const els = {
   unconfigured: document.getElementById("unconfigured"),
   content: document.getElementById("content"),
   error: document.getElementById("error"),
-  avatar: document.getElementById("avatar"),
   name: document.getElementById("name"),
   rank: document.getElementById("rank"),
   mmr: document.getElementById("mmr"),
-  ladder: document.getElementById("ladder"),
+  maxMmr: document.getElementById("max-mmr"),
+  winRate: document.getElementById("win-rate"),
+  chickenCount: document.getElementById("chicken-count"),
+  seasonGames: document.getElementById("season-games"),
+  candy: document.getElementById("candy"),
   season: document.getElementById("season"),
   updated: document.getElementById("updated"),
   profileLink: document.getElementById("profile-link"),
@@ -42,33 +41,45 @@ function show(state) {
 }
 
 function fmt(value) {
-  return value == null ? "—" : value.toLocaleString("en-US");
+  return value == null ? "--" : value.toLocaleString("en-US");
+}
+
+function setText(el, value) {
+  if (el) el.textContent = value;
+}
+
+function pct(value) {
+  return value == null ? "--" : `${fmt(value)}%`;
 }
 
 function formatUpdated(iso) {
-  if (!iso) return "Refreshes every 30 min";
+  if (!iso) return "";
   const date = new Date(iso);
-  if (Number.isNaN(date.getTime())) return "Refreshes every 30 min";
-  return `Updated ${date.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })} · refreshes every 30 min`;
+  if (Number.isNaN(date.getTime())) return "";
+  return `Updated ${date.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}`;
+}
+
+function winRate(stats) {
+  if (stats.chicken_count == null || !stats.season_games) return null;
+  return Math.round((stats.chicken_count / stats.season_games) * 100);
 }
 
 function render(data) {
-  els.avatar.src = data.player.avatar_url || "";
-  els.avatar.classList.toggle("hidden", !data.player.avatar_url);
-  els.name.textContent = data.player.name || data.player.steam_id;
-  els.profileLink.href = data.player.profile_url;
+  const stats = data.stats || {};
+  const player = data.player || {};
 
-  els.rank.textContent = data.stats.rank || "Unranked";
-  els.mmr.textContent = data.stats.mmr != null ? `${fmt(data.stats.mmr)} MMR` : "No MMR yet";
-  els.season.textContent = data.stats.season ? data.stats.season.toUpperCase() : "";
-  els.updated.textContent = formatUpdated(data.generated_at);
+  setText(els.name, player.name || player.steam_id || "Auto Chess player");
+  els.profileLink.href = player.profile_url || "#";
 
-  if (data.stats.queen_ladder_rank != null) {
-    els.ladder.textContent = `Queen ladder #${fmt(data.stats.queen_ladder_rank)}`;
-    els.ladder.classList.remove("hidden");
-  } else {
-    els.ladder.classList.add("hidden");
-  }
+  setText(els.rank, stats.rank || "Unranked");
+  setText(els.mmr, stats.mmr != null ? `${fmt(stats.mmr)} MMR` : "No MMR yet");
+  setText(els.maxMmr, stats.max_mmr != null ? fmt(stats.max_mmr) : "--");
+  setText(els.winRate, pct(winRate(stats)));
+  setText(els.chickenCount, stats.chicken_count != null ? fmt(stats.chicken_count) : "--");
+  setText(els.seasonGames, stats.season_games != null ? fmt(stats.season_games) : "--");
+  setText(els.candy, stats.candy != null ? fmt(stats.candy) : "--");
+  setText(els.season, stats.season ? stats.season.toUpperCase() : "");
+  setText(els.updated, formatUpdated(data.generated_at));
 
   show("content");
 }
@@ -89,9 +100,8 @@ async function fetchStats(steamId) {
       show("error");
       return;
     }
-    const data = await resp.json();
-    render(data);
-  } catch (err) {
+    render(await resp.json());
+  } catch {
     els.error.textContent = "Couldn't reach Track Auto Chess.";
     show("error");
   }
@@ -105,7 +115,6 @@ function startPolling(steamId) {
 }
 
 function readConfig() {
-  // Broadcaster sets a per-channel steamInput string via the config view.
   const raw = window.Twitch?.ext?.configuration?.broadcaster?.content;
   if (!raw) return null;
   try {
@@ -113,7 +122,6 @@ function readConfig() {
     if (typeof parsed.steamInput === "string" && parsed.steamInput.trim()) {
       return parsed.steamInput.trim();
     }
-    // Backwards compatible with the previous config shape.
     if (typeof parsed.steamId === "string" && parsed.steamId.trim()) {
       return parsed.steamId.trim();
     }
@@ -131,8 +139,6 @@ function isInsideTwitchExtension() {
 
 function bootstrap() {
   if (!isInsideTwitchExtension()) {
-    // Local development outside Twitch — accept ?steamId=... or ?username=...
-    // for previewing.
     const url = new URL(window.location.href);
     const sid = url.searchParams.get("steamId") || url.searchParams.get("username");
     if (sid) startPolling(sid);

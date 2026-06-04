@@ -7,52 +7,65 @@
 <link rel="stylesheet" href="panel.css" />
 </head>
 <body>
-<div id="root" class="panel">
-  <div id="loading" class="state">Loading rank…</div>
-  <div id="unconfigured" class="state hidden">
-    <p class="state-title">No player linked</p>
-    <p class="muted">Broadcaster: add your Steam username or SteamID64 in setup.</p>
-  </div>
-  <article id="content" class="rank-card hidden" aria-live="polite">
-    <div class="brand" aria-label="Track Auto Chess">
-      <svg class="brand-logo" viewBox="0 0 512 512" aria-hidden="true">
-        <defs>
-          <path id="bishop" d="M 256 52 C 240 52, 228 64, 228 80 C 228 90, 233 99, 241 104 L 220 160 C 190 170, 168 200, 168 236 C 168 260, 178 282, 196 296 L 180 340 C 170 348, 164 362, 164 376 L 164 392 L 148 392 C 140 392, 132 400, 132 408 L 132 440 C 132 448, 140 456, 148 456 L 364 456 C 372 456, 380 448, 380 440 L 380 408 C 380 400, 372 392, 364 392 L 348 392 L 348 376 C 348 362, 342 348, 332 340 L 316 296 C 334 282, 344 260, 344 236 C 344 200, 322 170, 292 160 L 271 104 C 279 99, 284 90, 284 80 C 284 64, 272 52, 256 52 Z" />
-          <clipPath id="clip-top"><polygon points="115,0 512,0 512,397" /></clipPath>
-          <clipPath id="clip-mid"><polygon points="0,0 85,0 512,427 512,512 427,512 0,85" /></clipPath>
-          <clipPath id="clip-bot"><polygon points="0,115 397,512 0,512" /></clipPath>
-          <linearGradient id="r1" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stop-color="#FF6046" /><stop offset="100%" stop-color="#E0402A" />
-          </linearGradient>
-          <linearGradient id="r2" x1="100%" y1="0%" x2="0%" y2="100%">
-            <stop offset="0%" stop-color="#CC3520" /><stop offset="100%" stop-color="#B02A18" />
-          </linearGradient>
-        </defs>
-        <rect width="512" height="512" rx="64" fill="#1B2838" />
-        <g clip-path="url(#clip-top)" transform="translate(5,-5)"><use href="#bishop" fill="url(#r1)" /></g>
-        <g clip-path="url(#clip-mid)"><use href="#bishop" fill="url(#r1)" /></g>
-        <g clip-path="url(#clip-bot)" transform="translate(-5,5)"><use href="#bishop" fill="url(#r2)" /></g>
-      </svg>
-      <span>Track Auto Chess</span>
-    </div>
+<main id="root" class="panel-shell">
+  <section id="loading" class="state-card">Loading rank...</section>
 
-    <a id="profile-link" class="player" target="_blank" rel="noopener noreferrer">
-      <img id="avatar" alt="" />
-      <span id="name" class="player-name"></span>
+  <section id="unconfigured" class="state-card hidden">
+    <img class="brand-mark" src="logo.svg" alt="" />
+    <p class="eyebrow">Track Auto Chess</p>
+    <h1>No player linked</h1>
+    <p class="muted">Broadcaster: add your Steam username or SteamID64 in setup.</p>
+  </section>
+
+  <article id="content" class="rank-panel hidden" aria-live="polite">
+    <header class="panel-header">
+      <div class="brand" aria-label="Track Auto Chess">
+        <img src="logo.svg" alt="" />
+        <span>Track Auto Chess</span>
+      </div>
+      <span id="season" class="season muted"></span>
+    </header>
+
+    <a id="profile-link" class="player-header" target="_blank" rel="noopener noreferrer">
+      <span class="player-heading">
+        <span id="name" class="player-name"></span>
+        <span id="profile-meta" class="player-meta muted">Public DAC profile</span>
+      </span>
     </a>
 
-    <div class="rank">
-      <span class="eyebrow">Current rank</span>
-      <strong id="rank">—</strong>
-      <span id="mmr" class="mmr">— MMR</span>
-    </div>
+    <section class="rank-hero">
+      <span class="stat-label">Current rank</span>
+      <strong id="rank" class="rank-value">--</strong>
+      <span id="mmr" class="rank-subvalue">-- MMR</span>
+    </section>
 
-    <div id="ladder" class="ladder hidden"></div>
-    <div id="season" class="season muted"></div>
+    <section class="stats-grid" aria-label="Public Auto Chess profile stats">
+      <div class="stat-cell">
+        <span class="stat-label">Peak MMR</span>
+        <strong id="max-mmr" class="stat-value">--</strong>
+      </div>
+      <div class="stat-cell">
+        <span class="stat-label">Win Rate</span>
+        <strong id="win-rate" class="stat-value gold">--</strong>
+      </div>
+      <div class="stat-cell">
+        <span class="stat-label">Wins</span>
+        <strong id="chicken-count" class="stat-value gold">--</strong>
+      </div>
+      <div class="stat-cell">
+        <span class="stat-label">Games</span>
+        <strong id="season-games" class="stat-value">--</strong>
+      </div>
+      <div class="stat-cell wide-stat">
+        <span class="stat-label">Candies</span>
+        <strong id="candy" class="stat-value gold">--</strong>
+      </div>
+    </section>
     <div id="updated" class="updated muted"></div>
   </article>
-  <div id="error" class="state hidden"></div>
-</div>
+
+  <section id="error" class="state-card hidden"></section>
+</main>
 <script src="panel.js"></script>
 </body>
 </html>
