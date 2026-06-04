@@ -20,6 +20,7 @@
 import { readFileSync, writeFileSync, readdirSync } from "fs";
 import { join, dirname } from "path";
 import { fileURLToPath } from "url";
+import { patchNoteToJson } from "./lib/patch-note-json.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const DATA_DIR = join(__dirname, "..", "data", "patch_notes");
@@ -40,7 +41,7 @@ function write(p, synced) {
   data.entitiesSynced = synced;
   if (synced) data.entitiesSyncedAt = new Date().toISOString();
   else delete data.entitiesSyncedAt;
-  writeFileSync(p.file, JSON.stringify(data, null, 2) + "\n");
+  writeFileSync(p.file, patchNoteToJson(data));
 }
 
 const argv = process.argv.slice(2);

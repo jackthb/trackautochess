@@ -24,6 +24,9 @@ jobs:
         with:
           node-version: 24
 
+      - name: Hydrate generated data from content
+        run: node scripts/generate-data.mjs
+
       - name: Scrape changelog
         run: node scripts/scrape-patch-notes.mjs
 

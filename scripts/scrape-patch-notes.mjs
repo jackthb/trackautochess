@@ -13,6 +13,7 @@ import { readFileSync, writeFileSync, readdirSync } from "fs";
 import { createHash } from "crypto";
 import { join, dirname } from "path";
 import { fileURLToPath } from "url";
+import { patchNoteToJson } from "./lib/patch-note-json.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT_DATA = join(__dirname, "..", "data");
@@ -474,6 +475,7 @@ function foldHotfix(parent, hotfixDate, hotfixSections, hotfixEntries = []) {
   // A folded hotfix brings fresh game-data changes, so the parent's entities
   // need re-syncing — reset its flag.
   parent.entitiesSynced = false;
+  delete parent.entitiesSyncedAt;
   if (DRY_RUN) {
     console.log(`[dry-run] Would fold ${hotfixDate} into ${parent.slug}.json`);
     return;
@@ -483,7 +485,8 @@ function foldHotfix(parent, hotfixDate, hotfixSections, hotfixEntries = []) {
   data.absorbedDates = parent.absorbedDates;
   data.sourceEntries = parent.sourceEntries;
   data.entitiesSynced = false;
-  writeFileSync(parent.file, JSON.stringify(data, null, 2) + "\n");
+  delete data.entitiesSyncedAt;
+  writeFileSync(parent.file, patchNoteToJson(data));
   console.log(`Folded ${hotfixDate} hotfix into ${parent.slug}.json`);
 }
 
@@ -614,6 +617,7 @@ async function main() {
       absorbedDates: data.absorbedDates || [],
       source: data.source,
       workshop_url: data.workshop_url,
+      entitiesSynced: data.entitiesSynced,
       sourceEntries: data.sourceEntries || [],
     });
   }
@@ -693,11 +697,13 @@ async function main() {
 
     // Hotfix folding: a small *generic* patch landing within a couple of days
     // of a substantial patch is folded into that patch rather than listed on
-    // its own. Named patches never qualify (isGenericTitle is false).
+    // its own. Synced parents are treated as validated and left alone.
+    // Named patches never qualify (isGenericTitle is false).
     if (isGenericTitle(title) && countEntries(sections) <= HOTFIX_MAX_ENTRIES) {
       const parent = [...existingPatches, ...writtenStandalone]
         .filter(
           (p) =>
+            p.entitiesSynced !== true &&
             p.date < date &&
             daysBetween(p.date, date) <= HOTFIX_MAX_DAYS &&
             countEntries(p.sections) >= PARENT_MIN_ENTRIES
@@ -733,7 +739,7 @@ async function main() {
       console.log(`\n[dry-run] Would write ${slug}.json:`);
       console.log(JSON.stringify(patchData, null, 2));
     } else {
-      writeFileSync(filePath, JSON.stringify(patchData, null, 2) + "\n");
+      writeFileSync(filePath, patchNoteToJson(patchData));
       console.log(`Wrote ${slug}.json`);
     }
 
@@ -744,6 +750,7 @@ async function main() {
       title,
       sections,
       absorbedDates: [],
+      entitiesSynced: patchData.entitiesSynced,
       sourceEntries: dayEntries.map(sourceEntryRecord),
     });
     newPatches.push({ date, title, slug });
