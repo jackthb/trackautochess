@@ -197,16 +197,6 @@ class HeadlessBackend:
                     "match_id": msg.get("match_id"),
                     "player_count": msg.get("player_count"),
                 })
-            elif t == "nettable_debug_dump_done":
-                # Prime "is capture working" signal — send per-table results.
-                results = msg.get("results") or []
-                tel.capture("nettable_debug_dump_done", {
-                    "ok": msg.get("ok"),
-                    "dumped": msg.get("dumped"),
-                    "with_data": msg.get("with_data"),
-                    "results": results,
-                    "reason": msg.get("reason"),
-                })
         except Exception:
             pass
 
@@ -637,13 +627,6 @@ class HeadlessBackend:
         elif cmd == "nettable_set_paused":
             if self._nettable:
                 self._nettable.set_paused(bool(msg.get("paused", True)))
-        elif cmd == "nettable_debug_dump":
-            if self._nettable:
-                threading.Thread(
-                    target=self._nettable.debug_dump_sequence,
-                    daemon=True,
-                    name="nettable-debug-dump",
-                ).start()
         elif cmd == "upload_logs":
             tel = getattr(self, "_telemetry", None)
             if tel:
