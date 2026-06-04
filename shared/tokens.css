@@ -34,8 +34,9 @@
   --accent-dim: #CC3520;
 
   /* ── Typography ── */
-  --font-mono: 'JetBrains Mono', ui-monospace, Menlo, monospace;
-  --font-display: 'Cinzel', 'Trajan Pro', serif;
+  --font-ui: 'JetBrains Mono', 'Segoe UI', 'Noto Sans', 'Noto Sans CJK SC', 'Microsoft YaHei', 'PingFang SC', 'Hiragino Sans GB', 'Arial Unicode MS', sans-serif;
+  --font-mono: 'JetBrains Mono', 'Segoe UI Mono', 'Cascadia Mono', 'Noto Sans Mono', 'Noto Sans CJK SC', 'Microsoft YaHei', ui-monospace, Menlo, monospace;
+  --font-display: 'Cinzel', 'Trajan Pro', 'Segoe UI', 'Noto Sans', 'Noto Sans CJK SC', 'Microsoft YaHei', 'PingFang SC', serif;
 
   /* Body / UI sizes */
   --fs-11: 11px;   /* status bar, tiny meta */

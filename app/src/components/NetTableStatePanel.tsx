@@ -25,6 +25,10 @@ const TABLE_LABELS: Record<string, string> = {
   CustomNetTable_game_info: "Game info",
 };
 
+const HIDDEN_CURRENT_CAPTURE_TABLES = new Set([
+  "CustomNetTable_chess_pool_table",
+]);
+
 /**
  * Live view of the most recent CustomNetTable dump. Updates whenever the
  * backend emits `nettable_state` (which happens after each successful F12
@@ -39,23 +43,16 @@ const TABLE_LABELS: Record<string, string> = {
 export function NetTableStatePanel({
   state,
   stateAt,
-  unitsFull,
-  livePlayers,
-  localSteamIds,
-  synergiesData,
 }: Props) {
   const tables = useMemo(() => {
-    return Object.keys(state).sort((a, b) => {
-      const aLabel = TABLE_LABELS[a] ?? a;
-      const bLabel = TABLE_LABELS[b] ?? b;
-      return aLabel.localeCompare(bLabel);
-    });
+    return Object.keys(state)
+      .filter((table) => !HIDDEN_CURRENT_CAPTURE_TABLES.has(table))
+      .sort((a, b) => {
+        const aLabel = TABLE_LABELS[a] ?? a;
+        const bLabel = TABLE_LABELS[b] ?? b;
+        return aLabel.localeCompare(bLabel);
+      });
   }, [state]);
-
-  const hiddenLegendaries = useMemo(
-    () => extractHiddenLegendaries(state, unitsFull),
-    [state, unitsFull],
-  );
 
   const empty = tables.length === 0;
 
@@ -67,16 +64,6 @@ export function NetTableStatePanel({
           {stateAt ? `last capture · ${formatTime(stateAt)}` : "no capture yet"}
         </span>
       </header>
-
-      {hiddenLegendaries && (
-        <HiddenLegendaries
-          revealed={hiddenLegendaries.revealed}
-          unrevealed={hiddenLegendaries.unrevealed}
-          livePlayers={livePlayers}
-          localSteamIds={localSteamIds}
-          synergiesData={synergiesData}
-        />
-      )}
 
       {empty ? (
         <p className="nettable-state-panel-empty">
@@ -448,7 +435,10 @@ function TableBlock({
   return (
     <div className="nettable-state-block">
       <div className="nettable-state-block-header">
-        <span className="nettable-state-block-title">{label}</span>
+        <span className="nettable-state-block-heading">
+          <span className="nettable-state-block-title">{label}</span>
+          <code className="nettable-state-block-table">{table}</code>
+        </span>
         <span className="nettable-state-block-count">{keys.length}</span>
       </div>
       {keys.length === 0 ? (

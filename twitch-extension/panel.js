@@ -64,6 +64,14 @@ function winRate(stats) {
   return Math.round((stats.chicken_count / stats.season_games) * 100);
 }
 
+function rankLabel(stats) {
+  if (!stats.rank) return "Unranked";
+  if (stats.rank === "Queen" && stats.queen_ladder_rank != null) {
+    return `Queen #${fmt(stats.queen_ladder_rank)}`;
+  }
+  return stats.rank;
+}
+
 function render(data) {
   const stats = data.stats || {};
   const player = data.player || {};
@@ -71,7 +79,7 @@ function render(data) {
   setText(els.name, player.name || player.steam_id || "Auto Chess player");
   els.profileLink.href = player.profile_url || "#";
 
-  setText(els.rank, stats.rank || "Unranked");
+  setText(els.rank, rankLabel(stats));
   setText(els.mmr, stats.mmr != null ? `${fmt(stats.mmr)} MMR` : "No MMR yet");
   setText(els.maxMmr, stats.max_mmr != null ? fmt(stats.max_mmr) : "--");
   setText(els.winRate, pct(winRate(stats)));

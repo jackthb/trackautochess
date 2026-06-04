@@ -117,9 +117,10 @@ AUTOEXEC_CFG_CONTENT = f"""// DAC NetTable dump triggers — installed by DAC Tr
 //   F24 → ranking_top_table + player_id_table
 //                                ← Queen ladder + steam_id → slot mapping
 //                                  (once per match/session opening)
-//   F16 → chess_pool_table     ← bans / legendaries (every 5 min)
+//   F16 → chess_pool_table     ← pool/bans/legendaries/relics
+//                                  (once per match/session opening)
 //
-// Debug key (not in cascade — manual only):
+// Debug keys (not in cascade — manual only):
 //   F25 → unit_table           ← chess pieces on board
 
 bind "F20" "dumpstringtable CustomNetTable_player_id_table cl verbose"
@@ -989,11 +990,6 @@ FULL_CASCADE_INTERVAL_SEC = 15.0
 # How often to refresh player_id_table after the initial lobby metadata dump.
 # This table includes vchess_* board positions/items and relic_ttl_* windows.
 PLAYER_ID_DUMP_INTERVAL_SEC = 30.0
-# chess_pool_table (bans, legendaries, relic pool) on a slower cadence than the
-# full cascade, but not so slow that newly-revealed legendaries take minutes to
-# surface in the live view. 60s keeps it cheap (one extra key/min) while staying
-# responsive.
-POOL_DUMP_INTERVAL_SEC = 60.0
 # Gap between individual keys in the cascade. dumpstringtable produces
 # hundreds of console lines per call; firing too fast can drop output.
 CASCADE_KEY_GAP_SEC = 0.2
@@ -1002,7 +998,8 @@ CASCADE_KEY_GAP_SEC = 0.2
 DEBUG_DUMP_TIMEOUT_SEC = 4.0
 
 # The keys the cascade fires, in order. Mirrors the autoexec binds.
-# F20 (player_id_table) and F16 (chess_pool_table) run on their own timers.
+# F20 (player_id_table) runs on its own timer. F16 (chess_pool_table) fires once
+# per session because its useful values are static enough that polling is noise.
 # F24 (ranking_top_table + player_id_table) runs once per match/session opening.
 CASCADE_VK_SEQUENCE = (VK_F21, VK_F22, VK_F23)
 
@@ -1189,7 +1186,7 @@ class NetTableCapture:
         mid-game launches before the first GSI tick arrives.
         """
         last_full_cascade = 0.0
-        last_pool_dump = 0.0
+        pool_dump_fired = False
         # Catch-up: if Dota is already running, fire a full cascade
         # immediately so the live view populates even when the app
         # starts mid-game (before GSI has confirmed DAC is active).
@@ -1200,8 +1197,8 @@ class NetTableCapture:
                 time.sleep(CASCADE_KEY_GAP_SEC)
             self._fire_lobby_metadata_dump("poller start")
             send_input_key(VK_F16)
+            pool_dump_fired = True
             last_full_cascade = time.time()
-            last_pool_dump = time.time()
         while not self._stop.is_set():
             now = time.time()
             try:
@@ -1220,11 +1217,9 @@ class NetTableCapture:
                         send_input_key(VK_F23)
                     if now - self._last_player_id_dump_at >= PLAYER_ID_DUMP_INTERVAL_SEC:
                         self._fire_player_id_dump("periodic board/items refresh")
-                    # chess_pool_table on its own slow timer — bans update
-                    # each round but don't need 15s polling.
-                    if now - last_pool_dump >= POOL_DUMP_INTERVAL_SEC:
-                        last_pool_dump = now
+                    if not pool_dump_fired:
                         send_input_key(VK_F16)
+                        pool_dump_fired = True
             except Exception as e:
                 log.warning("nettable: key poller iteration failed: %s", e)
             # Sleep till next poll tick.

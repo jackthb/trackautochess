@@ -44,8 +44,9 @@
   --text-muted: #5c6278;
   --gold: #c9a84c;
   --accent: #e0402a;
-  --font-mono: "JetBrains Mono", ui-monospace, Menlo, monospace;
-  --font-display: "Cinzel", "Trajan Pro", serif;
+  --font-ui: "JetBrains Mono", "Segoe UI", "Noto Sans", "Noto Sans CJK SC", "Microsoft YaHei", "PingFang SC", "Hiragino Sans GB", "Arial Unicode MS", sans-serif;
+  --font-mono: "JetBrains Mono", "Segoe UI Mono", "Cascadia Mono", "Noto Sans Mono", "Noto Sans CJK SC", "Microsoft YaHei", ui-monospace, Menlo, monospace;
+  --font-display: "Cinzel", "Trajan Pro", "Segoe UI", "Noto Sans", "Noto Sans CJK SC", "Microsoft YaHei", "PingFang SC", serif;
 }
 
 html,
@@ -167,10 +168,11 @@ a { color: inherit; text-decoration: none; }
 }
 
 .player-name {
+  display: none;
   min-width: 0;
   overflow: hidden;
   color: var(--text-primary);
-  font-family: var(--font-display);
+  font-family: var(--font-ui);
   font-size: 18px;
   font-weight: 700;
   line-height: 1.1;

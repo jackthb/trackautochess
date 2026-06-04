@@ -50,6 +50,19 @@ const TWITCH_CACHE_HEADERS = {
   "Cache-Control": "public, s-maxage=1800, stale-while-revalidate=300",
 };
 
+function numberFromRawData(
+  rawData: Record<string, unknown> | null | undefined,
+  key: string
+): number | null {
+  const value = rawData?.[key];
+  if (typeof value === "number") return Number.isFinite(value) ? value : null;
+  if (typeof value === "string" && value.trim()) {
+    const parsed = Number(value);
+    return Number.isFinite(parsed) ? parsed : null;
+  }
+  return null;
+}
+
 export async function OPTIONS() {
   return new Response(null, { status: 204, headers: CORS_HEADERS });
 }
@@ -94,7 +107,7 @@ export async function GET(
     supabase
       .from("users")
       .select(
-        "drodo_mmr, drodo_max_mmr, drodo_mmr_level, drodo_season, drodo_season_games, drodo_candy, drodo_chicken_count, drodo_profile_missing, queen_ladder_rank"
+        "drodo_mmr, drodo_max_mmr, drodo_mmr_level, drodo_season, drodo_season_games, drodo_candy, drodo_chicken_count, drodo_profile_missing, drodo_raw_data, queen_ladder_rank"
       )
       .eq("steam_id", steamId)
       .maybeSingle(),
@@ -109,11 +122,16 @@ export async function GET(
     drodo_candy: number | null;
     drodo_chicken_count: number | null;
     drodo_profile_missing: boolean | null;
+    drodo_raw_data: Record<string, unknown> | null;
     queen_ladder_rank: number | null;
   } | null;
 
   const hasStats = drodo && !drodo.drodo_profile_missing;
   const mmr = hasStats ? drodo.drodo_mmr : null;
+  const queenLadderRank = hasStats
+    ? (drodo.queen_ladder_rank ??
+      numberFromRawData(drodo.drodo_raw_data, "queen_rank"))
+    : null;
 
   const payload: StatsResponse = {
     player: {
@@ -131,7 +149,7 @@ export async function GET(
       chicken_count: hasStats ? drodo.drodo_chicken_count : null,
       rank: mmrToRank(mmr) || null,
       mmr_level: hasStats ? drodo.drodo_mmr_level : null,
-      queen_ladder_rank: hasStats ? drodo.queen_ladder_rank : null,
+      queen_ladder_rank: queenLadderRank,
     },
     generated_at: new Date().toISOString(),
   };

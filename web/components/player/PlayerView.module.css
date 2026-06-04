@@ -54,7 +54,7 @@
 }
 .playerHeading { min-width: 0; }
 .playerName {
-  font-family: "Cinzel", serif;
+  font-family: var(--font-ui);
   font-size: 28px;
   font-weight: 700;
   color: var(--text-primary);

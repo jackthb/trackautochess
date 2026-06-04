@@ -1,8 +1,7 @@
 import { useMemo } from "react";
-import { parseLineup, synIconName, mmrLevelToRank } from "../lib/game-utils";
+import { costBorderColor, parseLineup, synIconName, mmrLevelToRank, unitStem } from "../lib/game-utils";
 import type { LivePlayer } from "../hooks/useNetTableEvents";
 import type { UnitFullInfo, SynergyInfo, ItemFullInfo } from "../types";
-import { ChessBoard } from "@dac/shared/ChessBoard";
 
 interface Props {
   /** Extracted per-player live state, keyed by steam_id (or slot_N when the
@@ -70,6 +69,7 @@ interface Seat {
  * labelled by placement. Renders nothing until there's at least one capture.
  */
 export function LiveMatchStatus({ players, localSteamIds, unitsFull, synergiesData, itemsFull }: Props) {
+  void itemsFull;
   const unitCosts = useMemo(() => {
     const out: Record<string, number> = {};
     for (const [name, info] of Object.entries(unitsFull)) {
@@ -118,11 +118,11 @@ export function LiveMatchStatus({ players, localSteamIds, unitsFull, synergiesDa
           background: var(--bg-surface);
           border: 1px solid var(--border-subtle);
           border-radius: var(--r-8);
-          padding: 12px 16px;
+          padding: 10px 12px;
           flex-shrink: 0;
           display: flex;
           flex-direction: column;
-          gap: 10px;
+          gap: 8px;
         }
         .live-board-title {
           font-size: var(--fs-11);
@@ -132,15 +132,16 @@ export function LiveMatchStatus({ players, localSteamIds, unitsFull, synergiesDa
           color: var(--text-muted);
         }
         .live-seats {
-          display: flex;
-          flex-direction: column;
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
           gap: 6px;
         }
         .live-seat {
           display: flex;
           flex-direction: column;
-          gap: 6px;
-          padding: 8px 10px;
+          gap: 5px;
+          min-width: 0;
+          padding: 7px 9px;
           border-radius: var(--r-8);
           background: var(--bg-deep);
           border: 1px solid transparent;
@@ -150,7 +151,7 @@ export function LiveMatchStatus({ players, localSteamIds, unitsFull, synergiesDa
         .live-seat-head {
           display: flex;
           align-items: center;
-          gap: 12px;
+          gap: 8px;
           font-size: var(--fs-12);
           color: var(--text-secondary);
           font-variant-numeric: tabular-nums;
@@ -176,19 +177,50 @@ export function LiveMatchStatus({ players, localSteamIds, unitsFull, synergiesDa
           font-size: var(--fs-11);
           flex-shrink: 0;
         }
+        .live-seat-stat { flex-shrink: 0; white-space: nowrap; }
         .live-seat-hp-wrap { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
         .live-seat-hp-bar-bg {
-          width: 70px; height: 6px;
+          width: 54px; height: 6px;
           background: var(--bg-deep); border: 1px solid var(--border-subtle);
           border-radius: 3px; overflow: hidden;
         }
         .live-seat-hp-bar { height: 100%; border-radius: 3px; transition: width 0.3s ease-out; min-width: 1px; }
         .live-seat-hp-text { font-size: var(--fs-11); color: var(--text-secondary); font-variant-numeric: tabular-nums; min-width: 34px; }
-        .live-seat-units { display: flex; flex-wrap: wrap; gap: 3px; }
-        .live-seat-board { max-width: 100%; overflow-x: auto; }
+        .live-seat-units {
+          display: flex;
+          align-items: center;
+          flex-wrap: wrap;
+          gap: 3px;
+          min-width: 0;
+        }
+        .live-seat-unit {
+          position: relative;
+          width: 24px;
+          height: 24px;
+          flex: 0 0 auto;
+        }
+        .live-seat-unit img {
+          width: 24px;
+          height: 24px;
+          border: 2px solid var(--border);
+          border-radius: var(--r-3);
+          object-fit: cover;
+          background: var(--bg-elevated);
+        }
+        .live-seat-stars {
+          position: absolute;
+          right: -2px;
+          bottom: -2px;
+          padding: 1px 2px;
+          border-radius: var(--r-2);
+          background: var(--bg-deep);
+          color: var(--gold);
+          font-size: 8px;
+          line-height: 1;
+        }
         .live-seat-empty { color: var(--text-muted); font-size: var(--fs-11); }
         .live-seat-foot {
-          display: flex; align-items: center; gap: 12px;
+          display: flex; align-items: center; gap: 10px;
           font-size: var(--fs-11); color: var(--text-muted);
         }
         .live-seat-syn { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
@@ -205,7 +237,6 @@ export function LiveMatchStatus({ players, localSteamIds, unitsFull, synergiesDa
         {seats.map(({ id, player, isLocal }) => {
           const hp = Math.max(0, player.hp ?? 0);
           const units = parseLineup(player.lineup || "", unitCosts);
-          const hasBoard = Array.isArray(player.board) && player.board.length > 0;
           const synergies = parseBuff(player.buff, firstTier);
           const label = isLocal
             ? "You"
@@ -242,18 +273,30 @@ export function LiveMatchStatus({ players, localSteamIds, unitsFull, synergiesDa
                 </div>
               </div>
 
-              {units.length === 0 && !hasBoard ? (
+              {units.length === 0 ? (
                 <div className="live-seat-empty">No units on the board yet.</div>
               ) : (
-                <div className="live-seat-board">
-                  <ChessBoard
-                    board={player.board}
-                    lineup={player.lineup || ""}
-                    unitCosts={unitCosts}
-                    iconUrl={(type, stem) => `icons://${type}/${stem}.png`}
-                    itemsFull={itemsFull}
-                    compact
-                  />
+                <div className="live-seat-units">
+                  {units.map((unit, index) => (
+                    <span
+                      key={`${unit.name}-${index}`}
+                      className="live-seat-unit"
+                      title={`${unit.name}${unit.stars > 1 ? ` ${"★".repeat(unit.stars)}` : ""}`}
+                    >
+                      <img
+                        src={`icons://units/${unitStem(unit.name)}.png`}
+                        alt={unit.name}
+                        loading="lazy"
+                        style={{ borderColor: costBorderColor(unitCosts[unit.name] || 1) }}
+                        onError={(e) => {
+                          (e.currentTarget as HTMLImageElement).style.display = "none";
+                        }}
+                      />
+                      {unit.stars > 1 && (
+                        <span className="live-seat-stars">{"★".repeat(unit.stars)}</span>
+                      )}
+                    </span>
+                  ))}
                 </div>
               )}
 

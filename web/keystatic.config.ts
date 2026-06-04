@@ -115,6 +115,10 @@ export default config({
       slugField: "title",
       format: { data: "json" },
       columns: ["date", "entitiesSynced"],
+      parseSlugForSort: (slug) => {
+        const timestamp = Date.parse(slug.slice(0, 10));
+        return Number.isNaN(timestamp) ? Number.POSITIVE_INFINITY : -timestamp;
+      },
       schema: {
         date: fields.date({ label: "Date" }),
         title: fields.slug({ name: { label: "Title" } }),

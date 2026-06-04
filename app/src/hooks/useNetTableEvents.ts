@@ -172,7 +172,7 @@ type NetTablePauseFiredEvent = {
 };
 type NetTableDumpCapturedEvent = {
   type: "nettable_dump_captured";
-  tables: Record<string, number>;
+  tables: string[];
   at: string;
 };
 type NetTableIngestCompleteEvent = {
@@ -239,13 +239,12 @@ type Incoming =
   | NetTableResyncProgressEvent
   | NetTableResyncCompleteEvent;
 
-function summarizeTables(tables: Record<string, number>): string {
-  const names = Object.keys(tables);
-  if (names.length === 0) return "no tables";
-  const head = names.slice(0, 3);
-  const extra = names.length - head.length;
-  const headStr = head.join(" · ");
-  return extra > 0 ? `${headStr} · ${extra} more` : headStr;
+function summarizeTables(tables: string[]): string {
+  if (tables.length === 0) return "no tables";
+  return tables
+    .slice()
+    .sort((a, b) => a.localeCompare(b))
+    .join("\n");
 }
 
 function summarizeTableList(tables: string[]): string {
