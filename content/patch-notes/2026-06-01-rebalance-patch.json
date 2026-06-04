@@ -3,7 +3,6 @@
   "title": "Rebalance Patch",
   "source": "https://steamcommunity.com/sharedfiles/filedetails/changelog/1613886175",
   "entitiesSynced": true,
-  "entitiesSyncedAt": "2026-06-02T23:32:17.933Z",
   "sourceEntries": [
     {
       "sourceId": "1780380302",
@@ -19,11 +18,7 @@
         {
           "kind": "nerf",
           "name": "Lucid Star",
-          "detail": "Dynamic probability reduced from 24%/22%/20%/18%/16% to 22%/20%/18%/16%/14%",
-          "entity": {
-            "type": "relic",
-            "relic": "item_super_uprank"
-          }
+          "detail": "Dynamic probability reduced from 24%/22%/20%/18%/16% to 22%/20%/18%/16%/14%"
         },
         {
           "kind": "buff",
@@ -88,12 +83,10 @@
         {
           "kind": "change",
           "name": "Legend Piece & Relic Pool popup",
-          "detail": "Optimize UI to prevent covering recruit panel",
-          "entity": {
-            "type": "unit"
-          }
+          "detail": "Optimize UI to prevent covering recruit panel"
         }
       ]
     }
-  ]
+  ],
+  "entitiesSyncedAt": "2026-06-02T23:32:17.933Z"
 }
