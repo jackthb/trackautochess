@@ -3,7 +3,6 @@ import Link from "next/link";
 import { createClient } from "@supabase/supabase-js";
 import { PageLayout } from "@/components/PageLayout";
 import { SITE_NAME, SITE_TITLE } from "@/lib/site";
-import { levelToRankName, mmrToLevel } from "@/lib/ranks";
 import { playerProfilePath } from "@/lib/steam";
 import styles from "../leaderboard/leaderboard.module.css";
 
@@ -12,8 +11,7 @@ interface QueenRow {
   name: string | null;
   custom_url: string | null;
   avatar_url: string | null;
-  drodo_mmr: number | null;
-  drodo_mmr_level: number | null;
+  drodo_season: string | null;
   drodo_season_games: number | null;
   drodo_chicken_count: number | null;
   queen_ladder_rank: number | null;
@@ -24,13 +22,13 @@ interface QueenRow {
 
 const title = `Queen Players | ${SITE_TITLE}`;
 const description =
-  "Current Dota Auto Chess Queen players discovered from the in-game Queen ladder and tracked Drodo profiles.";
+  "Latest Dota Auto Chess Queen players captured from the in-game Queen ladder, with MMR and season stats for tracked profiles.";
 
 export const metadata: Metadata = {
   title,
   description,
   alternates: { canonical: "/queens" },
-  robots: "noindex, nofollow",
+  robots: "index, follow, max-image-preview:large",
   openGraph: {
     title,
     description,
@@ -52,8 +50,7 @@ const SELECT = [
   "name",
   "custom_url",
   "avatar_url",
-  "drodo_mmr",
-  "drodo_mmr_level",
+  "drodo_season",
   "drodo_season_games",
   "drodo_chicken_count",
   "queen_ladder_rank",
@@ -78,17 +75,24 @@ async function loadQueens(): Promise<{ rows: QueenRow[]; error: string | null }>
   const { data, error } = await supabase
     .from("users")
     .select(SELECT)
-    .or("queen_ladder_last_seen_at.not.is.null,drodo_mmr_level.eq.38,drodo_mmr.gte.3380")
+    .not("queen_ladder_last_seen_at", "is", null)
+    .order("queen_ladder_last_seen_at", { ascending: false, nullsFirst: false })
     .order("queen_ladder_rank", { ascending: true, nullsFirst: false })
-    .order("drodo_mmr", { ascending: false, nullsFirst: false })
-    .limit(200);
+    .order("queen_ladder_mmr", { ascending: false, nullsFirst: false })
+    .limit(300);
 
   if (error) return { rows: [], error: error.message };
+  const normalizedRows = ((data ?? []) as unknown as QueenRow[]).map((row) => ({
+    ...row,
+    steam_id: String(row.steam_id),
+  }));
+  const latestSeenAt = normalizedRows[0]?.queen_ladder_last_seen_at ?? null;
+  const rows = latestSeenAt
+    ? normalizedRows.filter((row) => row.queen_ladder_last_seen_at === latestSeenAt)
+    : [];
+
   return {
-    rows: ((data ?? []) as unknown as QueenRow[]).map((row) => ({
-      ...row,
-      steam_id: String(row.steam_id),
-    })),
+    rows,
     error: null,
   };
 }
@@ -104,6 +108,33 @@ function formatDate(value: string | null): string {
   });
 }
 
+function seasonMatches(row: QueenRow): boolean {
+  const ladderSeason = row.queen_ladder_season?.toLowerCase() ?? null;
+  const drodoSeason = row.drodo_season?.toLowerCase() ?? null;
+  return !ladderSeason || !drodoSeason || ladderSeason === drodoSeason;
+}
+
+function seasonGames(row: QueenRow): number | null {
+  if (!seasonMatches(row)) return null;
+  return row.drodo_season_games;
+}
+
+function seasonWins(row: QueenRow): number | null {
+  if (!seasonMatches(row)) return null;
+  return row.drodo_chicken_count;
+}
+
+function formatWinRate(wins: number | null, games: number | null): string {
+  if (wins == null || games == null || games <= 0) return "—";
+  return `${Math.round((wins / games) * 100)}%`;
+}
+
+function formatRecord(wins: number | null, games: number | null): string {
+  if (wins == null || games == null || games <= 0) return "—";
+  const losses = Math.max(0, games - wins);
+  return `${wins.toLocaleString()}-${losses.toLocaleString()}`;
+}
+
 export default async function QueensPage() {
   const { rows, error } = await loadQueens();
   const season = rows.find((row) => row.queen_ladder_season)?.queen_ladder_season;
@@ -111,10 +142,10 @@ export default async function QueensPage() {
   return (
     <PageLayout title="Queen Players">
       <p className={styles.lead}>
-        The in-game Queen ladder is now captured by the desktop tracker and
-        cached here. This page also includes tracked profiles whose current MMR
-        is high enough for Queen, so players can appear before their full Drodo
-        profile refresh completes{season ? ` for ${season.toUpperCase()}` : ""}.
+        Latest in-game Queen ladder output captured by the desktop tracker
+        {season ? ` for ${season.toUpperCase()}` : ""}. Rows are replaced when
+        a fresh ladder upload is accepted, with season stats filled in when a
+        tracked Drodo profile is available.
       </p>
 
       {error ? (
@@ -122,24 +153,25 @@ export default async function QueensPage() {
       ) : rows.length === 0 ? (
         <div className={styles.empty}>No Queen players tracked yet.</div>
       ) : (
-        <div className={styles.table} role="table">
+        <div className={`${styles.table} ${styles["queen-table"]}`} role="table">
           <div className={`${styles.row} ${styles["header-row"]}`}>
             <div className={`${styles.cell} ${styles["cell-rank"]}`}>Rank</div>
             <div className={styles.cell} aria-hidden="true" />
             <div className={styles.cell}>Player</div>
             <div className={styles.cell}>MMR</div>
-            <div className={styles.cell}>Lvl</div>
             <div className={styles.cell}>Tier</div>
             <div className={`${styles.cell} ${styles["hide-sm"]}`}>Games</div>
-            <div className={`${styles.cell} ${styles["hide-sm"]}`}>Seen</div>
+            <div className={`${styles.cell} ${styles["hide-sm"]}`}>W-L</div>
+            <div className={`${styles.cell} ${styles["hide-sm"]}`}>Win rate</div>
+            <div className={`${styles.cell} ${styles["hide-md"]}`}>Last synced date</div>
           </div>
           {rows.map((row, index) => {
             const ladderRank = row.queen_ladder_rank ?? index + 1;
-            const mmr = row.queen_ladder_mmr ?? row.drodo_mmr;
-            const level = row.drodo_mmr_level ?? mmrToLevel(mmr);
-            const tier = levelToRankName(level || 38) || "Queen";
+            const mmr = row.queen_ladder_mmr;
             const display = row.name || row.custom_url || row.steam_id;
             const initial = display.charAt(0).toUpperCase() || "?";
+            const games = seasonGames(row);
+            const wins = seasonWins(row);
             const rankClass =
               ladderRank === 1
                 ? styles.gold
@@ -183,13 +215,18 @@ export default async function QueensPage() {
                   {mmr != null ? mmr.toLocaleString() : "—"}
                 </div>
                 <div className={`${styles.cell} ${styles["cell-meta"]}`}>
-                  {level || 38}
-                </div>
-                <div className={`${styles.cell} ${styles["cell-meta"]}`}>{tier}</div>
-                <div className={`${styles.cell} ${styles["cell-meta"]} ${styles["hide-sm"]}`}>
-                  {row.drodo_season_games?.toLocaleString() ?? "—"}
+                  Queen
                 </div>
                 <div className={`${styles.cell} ${styles["cell-meta"]} ${styles["hide-sm"]}`}>
+                  {games?.toLocaleString() ?? "—"}
+                </div>
+                <div className={`${styles.cell} ${styles["cell-meta"]} ${styles["hide-sm"]}`}>
+                  {formatRecord(wins, games)}
+                </div>
+                <div className={`${styles.cell} ${styles["cell-meta"]} ${styles["hide-sm"]}`}>
+                  {formatWinRate(wins, games)}
+                </div>
+                <div className={`${styles.cell} ${styles["cell-meta"]} ${styles["hide-md"]}`}>
                   {formatDate(row.queen_ladder_last_seen_at)}
                 </div>
               </div>

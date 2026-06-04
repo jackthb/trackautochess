@@ -37,6 +37,7 @@
 }
 
 .unit-icon-wrap { position: relative; width: 28px; height: 28px; cursor: pointer; }
+.unit-icon-wrap:hover { z-index: 10; }
 
 .unit-icon {
   width: 28px;
@@ -222,14 +223,12 @@
 }
 
 .chess-board-item-tooltip {
-  position: absolute;
-  z-index: 20;
-  left: 50%;
-  bottom: calc(100% + 6px);
-  display: none;
+  position: fixed;
+  z-index: 1000;
+  display: grid;
+  gap: 4px;
   min-width: 142px;
   max-width: 190px;
-  transform: translateX(-50%);
   padding: 6px;
   border: 1px solid var(--border);
   border-radius: var(--r-4);
@@ -240,12 +239,7 @@
 }
 
 .chess-board-piece:hover {
-  z-index: 25;
-}
-
-.chess-board-piece:hover .chess-board-item-tooltip {
-  display: grid;
-  gap: 4px;
+  z-index: 50;
 }
 
 .chess-board-item-row {

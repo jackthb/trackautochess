@@ -198,6 +198,7 @@
   font: inherit;
   text-align: left;
   cursor: pointer;
+  overflow: visible;
   transition: background var(--t-base) var(--t-easing);
 }
 .mpToggle:hover {
@@ -330,17 +331,18 @@
 .mpColLineup {
   flex: 1;
   min-width: 0;
+  overflow: visible;
 }
 /* Single horizontal line of units — no wrapping. Synergies and relics
    now live in the expand panel so the lineup gets the full width and
-   the icons can be larger. overflow:hidden guards against the rare
-   over-full board pushing the caret off-row. */
+   the icons can be larger. Keep overflow visible so hover scaling is not
+   clipped by the compact row. */
 .mpLineup {
   display: flex;
   gap: 4px;
   flex-wrap: nowrap;
   align-items: center;
-  overflow: hidden;
+  overflow: visible;
 }
 /* Resize wrap + icon together; the global .unit-icon-wrap is 28x28, so
    growing only the icon would overflow the wrap and overlap neighbours. */

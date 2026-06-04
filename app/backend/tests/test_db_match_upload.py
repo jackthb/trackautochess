@@ -271,7 +271,7 @@ def test_queen_ladder_old_update_allows_refresh(tmp_path, monkeypatch):
 
     client = MagicMock()
     client.get.return_value = _queen_ladder_response([
-        {"queen_ladder_last_seen_at": "2026-06-02T10:00:00+00:00"}
+        {"queen_ladder_last_seen_at": "2026-06-01T10:00:00+00:00"}
     ])
 
     now = datetime(2026, 6, 2, 12, 0, tzinfo=timezone.utc)
@@ -289,6 +289,76 @@ def test_queen_ladder_throttle_check_failure_skips(tmp_path, monkeypatch):
     now = datetime(2026, 6, 2, 12, 0, tzinfo=timezone.utc)
 
     assert db._queen_ladder_recently_updated(client, now) is True
+
+
+def test_upsert_queen_ladder_clears_previous_snapshot(tmp_path, monkeypatch):
+    _isolated_dac_dir(tmp_path, monkeypatch)
+    import db
+
+    client = MagicMock()
+    ok_resp = MagicMock()
+    ok_resp.raise_for_status = MagicMock()
+    client.patch = MagicMock(return_value=ok_resp)
+    client.post = MagicMock(return_value=ok_resp)
+
+    monkeypatch.setattr(db, "_get_client", lambda: client)
+    monkeypatch.setattr(db, "_queen_ladder_recently_updated", lambda *_: False)
+
+    out = db.upsert_queen_ladder_players([
+        {
+            "steam_id": "76561198000000001",
+            "name": "Alpha",
+            "rank": 1,
+            "mmr": 4200,
+            "season": "s40",
+            "seen_at": "2026-06-02T12:00:00+00:00",
+        },
+        {
+            "steam_id": "76561198000000002",
+            "name": "Beta",
+            "rank": 2,
+            "mmr": 4100,
+            "season": "s40",
+            "seen_at": "2026-06-02T12:00:00+00:00",
+        },
+    ])
+
+    assert out == 2
+    client.patch.assert_called_once()
+    patch_args, patch_kwargs = client.patch.call_args
+    assert patch_args[0] == "/rest/v1/users"
+    assert patch_kwargs["params"] == {"queen_ladder_last_seen_at": "not.is.null"}
+    assert patch_kwargs["json"] == {
+        "queen_ladder_rank": None,
+        "queen_ladder_mmr": None,
+        "queen_ladder_season": None,
+        "queen_ladder_last_seen_at": None,
+    }
+
+    client.post.assert_called_once()
+    body = client.post.call_args.kwargs["json"]
+    assert [row["queen_ladder_rank"] for row in body] == [1, 2]
+    assert [row["queen_ladder_last_seen_at"] for row in body] == [
+        "2026-06-02T12:00:00+00:00",
+        "2026-06-02T12:00:00+00:00",
+    ]
+
+
+def test_upsert_queen_ladder_abort_when_clear_fails(tmp_path, monkeypatch):
+    _isolated_dac_dir(tmp_path, monkeypatch)
+    import db
+
+    client = MagicMock()
+    client.patch.side_effect = RuntimeError("patch denied")
+    monkeypatch.setattr(db, "_get_client", lambda: client)
+    monkeypatch.setattr(db, "_queen_ladder_recently_updated", lambda *_: False)
+
+    out = db.upsert_queen_ladder_players([
+        {"steam_id": "76561198000000001", "rank": 1, "mmr": 4200},
+    ])
+
+    assert out == 0
+    client.post.assert_not_called()
 
 
 # ── push_match_players ──────────────────────────────────────────────────────

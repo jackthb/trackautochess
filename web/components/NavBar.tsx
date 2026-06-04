@@ -151,11 +151,9 @@ export function NavBar({ supabase }: NavBarProps) {
       <Link href="/ranks" className={styles.navLink}>
         {t.ranks}
       </Link>
-      {canSeeBetaFeatures && (
-        <Link href="/queens" className={styles.navLink}>
-          {t.queens}
-        </Link>
-      )}
+      <Link href="/queens" className={styles.navLink}>
+        {t.queens}
+      </Link>
       {canSeeBetaFeatures && (
         <Link href="/leaderboard" className={styles.navLink}>
           {t.leaderboard}

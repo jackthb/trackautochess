@@ -18,7 +18,7 @@ log = logging.getLogger("dac.db")
 
 _client = None  # lazy-init
 _local_only_logged = False
-QUEEN_LADDER_UPDATE_MIN_INTERVAL = timedelta(hours=1)
+QUEEN_LADDER_UPDATE_MIN_INTERVAL = timedelta(hours=24)
 
 
 
@@ -113,11 +113,11 @@ def _parse_iso_datetime(value) -> datetime | None:
 
 
 def _queen_ladder_recently_updated(client, now: datetime) -> bool:
-    """Return True when the DB already has a Queen ladder scan from the last hour.
+    """Return True when the DB already has a Queen ladder scan from the last day.
 
     This is intentionally global, not per-client: if a few beta EXEs are
-    running at once, only one should refresh the website's Queen ladder row set
-    per hour.
+    running at once, the first accepted in-game ladder sync owns the website's
+    Queen ladder row set for the cadence window.
     """
     try:
         resp = client.get(
@@ -145,6 +145,32 @@ def _queen_ladder_recently_updated(client, now: datetime) -> bool:
         # update is old enough, skip rather than risk hammering the ladder.
         log.warning("queen ladder throttle check failed; skipping update: %s", e)
         return True
+
+
+def _clear_queen_ladder_snapshot(client) -> bool:
+    """Clear previous in-game Queen ladder fields before writing a new scan."""
+    try:
+        resp = client.patch(
+            "/rest/v1/users",
+            params={"queen_ladder_last_seen_at": "not.is.null"},
+            json={
+                "queen_ladder_rank": None,
+                "queen_ladder_mmr": None,
+                "queen_ladder_season": None,
+                "queen_ladder_last_seen_at": None,
+            },
+        )
+        resp.raise_for_status()
+        return True
+    except Exception as e:
+        body = ""
+        if hasattr(e, "response") and e.response is not None:
+            try:
+                body = e.response.text
+            except Exception:
+                pass
+        log.error("clear queen ladder snapshot error: %s | body: %s", e, body)
+        return False
 
 
 def generate_live_match_id(end_board: dict) -> str:
@@ -345,6 +371,9 @@ def upsert_queen_ladder_players(players: list[dict]) -> int:
         rows.append(row)
 
     if not rows:
+        return 0
+
+    if not _clear_queen_ladder_snapshot(client):
         return 0
 
     try:

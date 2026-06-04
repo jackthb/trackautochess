@@ -1,3 +1,7 @@
+"use client";
+
+import { useState, type CSSProperties, type MouseEvent } from "react";
+import { createPortal } from "react-dom";
 import type { ChessBoardPiece, ItemFullInfo } from "./types";
 import { costBorderColor, itemDisplayName, itemIconStem, parseLineup, unitStem } from "./game-utils";
 
@@ -86,6 +90,130 @@ function displayRow(y: number): number {
   return BOARD_ROWS + 1 - y;
 }
 
+function ChessBoardItemTooltip({
+  items,
+  itemsFull,
+  iconUrl,
+  style,
+}: {
+  items: string[];
+  itemsFull?: Record<string, ItemFullInfo>;
+  iconUrl: (type: string, stem: string) => string;
+  style?: CSSProperties;
+}) {
+  return (
+    <span className="chess-board-item-tooltip" role="tooltip" style={style}>
+      {items.slice(0, 6).map((item, index) => (
+        <span className="chess-board-item-row" key={`${item}-tooltip-${index}`}>
+          <img
+            src={iconUrl("items", itemIconStem(item, itemsFull))}
+            alt=""
+            loading="lazy"
+            onError={(e) => {
+              (e.currentTarget as HTMLImageElement).style.display = "none";
+            }}
+          />
+          <span>{itemDisplayName(item, itemsFull)}</span>
+        </span>
+      ))}
+    </span>
+  );
+}
+
+function ChessBoardPieceView({
+  piece,
+  unitCosts,
+  iconUrl,
+  itemsFull,
+}: {
+  piece: RenderPiece;
+  unitCosts: Record<string, number>;
+  iconUrl: (type: string, stem: string) => string;
+  itemsFull?: Record<string, ItemFullInfo>;
+}) {
+  const [tooltipPos, setTooltipPos] = useState<{
+    left: number;
+    top: number;
+    placement: "above" | "below";
+  } | null>(null);
+
+  const showItems = (e: MouseEvent<HTMLDivElement>) => {
+    if (piece.items.length === 0) return;
+    const rect = e.currentTarget.getBoundingClientRect();
+    const tooltipWidth = 190;
+    const margin = 8;
+    const placement = rect.top < 92 ? "below" : "above";
+    const left = Math.max(
+      margin,
+      Math.min(rect.left + rect.width / 2 - tooltipWidth / 2, window.innerWidth - tooltipWidth - margin)
+    );
+    setTooltipPos({
+      left,
+      top: placement === "below" ? rect.bottom + margin : rect.top - margin,
+      placement,
+    });
+  };
+
+  const hideItems = () => setTooltipPos(null);
+  const title = pieceTitle(piece, itemsFull);
+
+  return (
+    <div
+      className="chess-board-piece"
+      style={{ gridColumn: piece.x, gridRow: displayRow(piece.y) }}
+      title={piece.items.length > 0 ? undefined : title}
+      aria-label={title}
+      onMouseEnter={showItems}
+      onMouseLeave={hideItems}
+    >
+      <img
+        className="chess-board-piece-icon"
+        src={iconUrl("units", unitStem(piece.name))}
+        alt={piece.name}
+        loading="lazy"
+        style={{ borderColor: costBorderColor(unitCosts[piece.name] || piece.raw?.buy_price || 1) }}
+        onError={(e) => {
+          (e.currentTarget as HTMLImageElement).style.visibility = "hidden";
+        }}
+      />
+      {piece.stars > 1 && (
+        <span className={`chess-board-stars s${piece.stars}`}>
+          {"*".repeat(piece.stars)}
+        </span>
+      )}
+      {piece.items.length > 0 && (
+        <span className="chess-board-items" aria-label={`${piece.items.length} items`}>
+          {piece.items.slice(0, 3).map((item, index) => (
+            <img
+              key={`${item}-${index}`}
+              src={iconUrl("items", itemIconStem(item, itemsFull))}
+              alt=""
+              loading="lazy"
+              onError={(e) => {
+                (e.currentTarget as HTMLImageElement).style.display = "none";
+              }}
+            />
+          ))}
+        </span>
+      )}
+      {tooltipPos &&
+        createPortal(
+          <ChessBoardItemTooltip
+            items={piece.items}
+            itemsFull={itemsFull}
+            iconUrl={iconUrl}
+            style={{
+              left: tooltipPos.left,
+              top: tooltipPos.top,
+              transform: tooltipPos.placement === "above" ? "translateY(-100%)" : undefined,
+            }}
+          />,
+          document.body
+        )}
+    </div>
+  );
+}
+
 export function ChessBoard({
   board,
   lineup,
@@ -121,60 +249,13 @@ export function ChessBoard({
         />
       ))}
       {pieces.map((piece) => (
-        <div
+        <ChessBoardPieceView
           key={piece.key}
-          className="chess-board-piece"
-          style={{ gridColumn: piece.x, gridRow: displayRow(piece.y) }}
-          title={pieceTitle(piece, itemsFull)}
-        >
-          <img
-            className="chess-board-piece-icon"
-            src={iconUrl("units", unitStem(piece.name))}
-            alt={piece.name}
-            loading="lazy"
-            style={{ borderColor: costBorderColor(unitCosts[piece.name] || piece.raw?.buy_price || 1) }}
-            onError={(e) => {
-              (e.currentTarget as HTMLImageElement).style.visibility = "hidden";
-            }}
-          />
-          {piece.stars > 1 && (
-            <span className={`chess-board-stars s${piece.stars}`}>
-              {"*".repeat(piece.stars)}
-            </span>
-          )}
-          {piece.items.length > 0 && (
-            <span className="chess-board-items" aria-label={`${piece.items.length} items`}>
-              {piece.items.slice(0, 3).map((item, index) => (
-                <img
-                  key={`${item}-${index}`}
-                  src={iconUrl("items", itemIconStem(item, itemsFull))}
-                  alt=""
-                  loading="lazy"
-                  onError={(e) => {
-                    (e.currentTarget as HTMLImageElement).style.display = "none";
-                  }}
-                />
-              ))}
-            </span>
-          )}
-          {piece.items.length > 0 && (
-            <span className="chess-board-item-tooltip" role="tooltip">
-              {piece.items.slice(0, 6).map((item, index) => (
-                <span className="chess-board-item-row" key={`${item}-tooltip-${index}`}>
-                  <img
-                    src={iconUrl("items", itemIconStem(item, itemsFull))}
-                    alt=""
-                    loading="lazy"
-                    onError={(e) => {
-                      (e.currentTarget as HTMLImageElement).style.display = "none";
-                    }}
-                  />
-                  <span>{itemDisplayName(item, itemsFull)}</span>
-                </span>
-              ))}
-            </span>
-          )}
-        </div>
+          piece={piece}
+          unitCosts={unitCosts}
+          iconUrl={iconUrl}
+          itemsFull={itemsFull}
+        />
       ))}
     </div>
   );

@@ -168,11 +168,9 @@ export function AppNavBar({ supabase }: AppNavBarProps) {
       <Link href="/ranks" className={styles.navLink} onClick={() => trackNavClick("ranks")}>
         {t.ranks}
       </Link>
-      {canSeeBetaFeatures && (
-        <Link href="/queens" className={styles.navLink} onClick={() => trackNavClick("queens")}>
-          {t.queens}
-        </Link>
-      )}
+      <Link href="/queens" className={styles.navLink} onClick={() => trackNavClick("queens")}>
+        {t.queens}
+      </Link>
       {canSeeBetaFeatures && (
         <Link href="/leaderboard" className={styles.navLink} onClick={() => trackNavClick("leaderboard")}>
           {t.leaderboard}
