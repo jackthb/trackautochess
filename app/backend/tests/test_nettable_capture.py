@@ -27,6 +27,7 @@ from nettable_capture import (  # noqa: E402
     extract_rows,
     keep_local_nettable_dumps,
     normalize_allow,
+    upsert_match_timeline,
     upload_raw_nettable_dumps,
 )
 
@@ -262,6 +263,90 @@ def test_raw_nettable_upload_can_be_enabled_in_config(tmp_path, monkeypatch):
 
     assert upload_raw_nettable_dumps() is True
     assert keep_local_nettable_dumps() is False
+
+
+# ── timeline upload consistency ──────────────────────────────────────────────
+
+
+class _FakeResponse:
+    def __init__(self, rows=None):
+        self._rows = rows or []
+
+    def raise_for_status(self):
+        return None
+
+    def json(self):
+        return self._rows
+
+
+class _FakeTimelineClient:
+    def __init__(self, existing_rows=None):
+        self.existing_rows = existing_rows or []
+        self.posts = []
+
+    def get(self, *_args, **_kwargs):
+        return _FakeResponse(self.existing_rows)
+
+    def post(self, *args, **kwargs):
+        self.posts.append((args, kwargs))
+        return _FakeResponse()
+
+
+def _timeline_payload(round_count: int, *, finished: bool = False) -> dict:
+    rounds = [{"round": n} for n in range(1, round_count + 1)]
+    return {
+        "match_id": "same-match",
+        "round_count": round_count,
+        "first_round": 1,
+        "last_round": round_count,
+        "is_finished": finished,
+        "verification_source": "end_board" if finished else "timeline",
+        "rounds": rounds,
+    }
+
+
+def test_timeline_upload_keeps_existing_when_it_has_more_rounds():
+    client = _FakeTimelineClient([{
+        "match_id": "same-match",
+        "round_count": 4,
+        "timeline": _timeline_payload(4),
+    }])
+
+    assert upsert_match_timeline(client, _timeline_payload(3)) is False
+    assert client.posts == []
+
+
+def test_timeline_upload_replaces_existing_when_incoming_has_more_rounds():
+    client = _FakeTimelineClient([{
+        "match_id": "same-match",
+        "round_count": 2,
+        "timeline": _timeline_payload(2),
+    }])
+
+    assert upsert_match_timeline(client, _timeline_payload(3)) is True
+    assert len(client.posts) == 1
+
+
+def test_timeline_upload_prefers_end_board_complete_timeline_over_more_rounds():
+    client = _FakeTimelineClient([{
+        "match_id": "same-match",
+        "round_count": 3,
+        "timeline": _timeline_payload(3, finished=True),
+    }])
+
+    assert upsert_match_timeline(client, _timeline_payload(4, finished=False)) is False
+    assert client.posts == []
+
+
+def test_timeline_upload_replaces_partial_with_end_board_complete_timeline():
+    client = _FakeTimelineClient([{
+        "match_id": "same-match",
+        "round_count": 4,
+        "timeline": _timeline_payload(4, finished=False),
+    }])
+
+    assert upsert_match_timeline(client, _timeline_payload(3, finished=True)) is True
+    assert len(client.posts) == 1
 
 
 # ── _last_match_dumps: segment buffered dumps into matches, keep the latest ──

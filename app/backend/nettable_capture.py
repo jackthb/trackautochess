@@ -10,11 +10,10 @@ Flow:
        - [stringtables] table CustomNetTable_*: collect the dump block;
          when it stabilises (~2s without new [stringtables] lines), archive
          it locally and process it into the canonical match representation.
-    3. Dumps are produced by the continuous SendInput cascade (see
-       _run_key_poller) — no scheduled timers; the poller fires F23 every
-       2s, the full cascade (F21, F22, F23) every 15s, and one
-       F24 lobby metadata dump when a match/session opens
-       while Dota is foreground.
+    3. Dumps are produced by the SendInput poller (see _run_key_poller):
+       F23 (game_info) every 2s, F22/F20 snapshots when round_info changes,
+       and one F24/F16 lobby metadata dump when a match/session opens while
+       Dota is foreground. F21 (dac_table) is held for POST_GAME.
 
 Emits events via the headless _emit callback:
     nettable_status          — startup + on-demand status snapshot
@@ -102,18 +101,21 @@ def upload_raw_nettable_dumps() -> bool:
     return _config_bool("upload_raw_nettable_dumps", False)
 
 
-# ── autoexec.cfg payload (single source of truth, written verbatim) ──────────
+# ── autoexec.cfg payload (managed block, preserving user content) ────────────
 
-AUTOEXEC_CFG_CONTENT = f"""// DAC NetTable dump triggers — installed by DAC Tracker.
+AUTOEXEC_CFG_BLOCK_BEGIN = "// >>> DAC Tracker NetTable binds >>>"
+AUTOEXEC_CFG_BLOCK_END = "// <<< DAC Tracker NetTable binds <<<"
+
+AUTOEXEC_CFG_LEGACY_CONTENT = f"""// DAC NetTable dump triggers — installed by DAC Tracker.
 //
 // All binds use extended F-keys (F20-F25) to avoid conflicting with
 // user keyboard shortcuts. One table per key.
 //
 // Cascade keys (fired automatically by the tracker):
-//   F21 → dac_table            ← end_board at match end (critical)
-//   F22 → player_info_table    ← live per-player state (every 15s)
+//   F21 → dac_table            ← end_board at match end (POST_GAME only)
+//   F22 → player_info_table    ← live per-player state (on round change)
 //   F23 → game_info            ← round_info + death_team (every 2s)
-//   F20 → player_id_table      ← board/items/relics (every 30s + post-game)
+//   F20 → player_id_table      ← board/items/relics (on round change)
 //   F24 + F16 → ranking_top_table + player_id_table + chess_pool_table
 //              ← Queen ladder, steam_id → slot mapping, one pool snapshot
 //                (once per match/session opening)
@@ -129,6 +131,40 @@ bind "F24" "dumpstringtable CustomNetTable_ranking_top_table cl verbose;dumpstri
 bind "F16" "dumpstringtable CustomNetTable_chess_pool_table cl verbose"
 bind "F25" "dumpstringtable CustomNetTable_unit_table cl verbose"
 """
+
+AUTOEXEC_CFG_CONTENT = (
+    f"{AUTOEXEC_CFG_BLOCK_BEGIN}\n"
+    f"{AUTOEXEC_CFG_LEGACY_CONTENT.rstrip()}\n"
+    f"{AUTOEXEC_CFG_BLOCK_END}\n"
+)
+
+
+def _upsert_managed_autoexec_block(existing: str) -> str:
+    """Return autoexec.cfg content with only DAC Tracker's block updated.
+
+    Users can have their own autoexec.cfg. We must not overwrite it; append our
+    managed block if missing, replace only that block if present, and migrate the
+    previous all-DAC file shape without creating duplicate binds.
+    """
+    desired = AUTOEXEC_CFG_CONTENT
+    start = existing.find(AUTOEXEC_CFG_BLOCK_BEGIN)
+    end = existing.find(AUTOEXEC_CFG_BLOCK_END)
+    if start != -1 and end != -1 and start < end:
+        end += len(AUTOEXEC_CFG_BLOCK_END)
+        suffix = existing[end:]
+        if suffix.startswith("\r\n"):
+            suffix = suffix[2:]
+        elif suffix.startswith("\n"):
+            suffix = suffix[1:]
+        return existing[:start] + desired + suffix
+
+    if existing.strip() == AUTOEXEC_CFG_LEGACY_CONTENT.strip():
+        return desired
+
+    if not existing.strip():
+        return desired
+
+    return existing.rstrip() + "\n\n" + desired
 
 
 # ── Dota directory candidates (mirrors tools/dac_dump/ingest.py) ─────────────
@@ -948,15 +984,52 @@ def upsert_match_timeline(client, payload: dict[str, Any]) -> bool:
 
     ``payload`` is the local timeline JSON shape: keys match_id, played_at
     (unused server-side, just for log context), round_count, first_round,
-    last_round, rounds. We map the file shape to the table row here."""
+    last_round, rounds. We map the file shape to the table row here.
+
+    Multiple observers can track the same lobby. They should converge on the
+    same deterministic match_id; when that happens, keep whichever observer has
+    the richer timeline. For now "richer" means more distinct rounds captured.
+    """
     match_id = payload.get("match_id")
     rounds = payload.get("rounds") or []
     if not match_id or not rounds:
         return False
+    incoming_round_count = int(payload.get("round_count") or len(rounds))
+    incoming_is_finished = bool(payload.get("is_finished")) or payload.get("verification_source") == "end_board"
+    existing = client.get(
+        "/rest/v1/match_timelines",
+        params={
+            "match_id": f"eq.{match_id}",
+            "select": "match_id,round_count,timeline",
+            "limit": "1",
+        },
+    )
+    existing.raise_for_status()
+    existing_rows = existing.json()
+    if existing_rows:
+        existing_round_count = int(existing_rows[0].get("round_count") or 0)
+        existing_timeline = existing_rows[0].get("timeline") or {}
+        existing_is_finished = (
+            bool(existing_timeline.get("is_finished"))
+            or existing_timeline.get("verification_source") == "end_board"
+        )
+        if existing_is_finished and not incoming_is_finished:
+            log.info(
+                "nettable: existing complete timeline kept — match_id=%s existing_rounds=%d incoming_rounds=%d",
+                match_id, existing_round_count, incoming_round_count,
+            )
+            return False
+        if existing_is_finished == incoming_is_finished and existing_round_count >= incoming_round_count:
+            log.info(
+                "nettable: existing timeline kept — match_id=%s existing_rounds=%d incoming_rounds=%d",
+                match_id, existing_round_count, incoming_round_count,
+            )
+            return False
+
     row = {
         "match_id": match_id,
         "timeline": payload,
-        "round_count": int(payload.get("round_count") or len(rounds)),
+        "round_count": incoming_round_count,
         "first_round": int(payload.get("first_round") or rounds[0].get("round", 0)),
         "last_round": int(payload.get("last_round") or rounds[-1].get("round", 0)),
     }
@@ -982,20 +1055,18 @@ PAUSE_FIRED_MARKER = "DAC_DUMP_FIRED"
 # How often the backend fires F23 (game_info) for cheap round visibility.
 # Mirrors the role AHK's PollRound timer used to play, now in-process.
 POLL_INTERVAL_SEC = 2.0
-# How often the backend fires the full cascade (dac_table + player_info +
-# game_info). Heavier — gives a complete core state snapshot.
-FULL_CASCADE_INTERVAL_SEC = 15.0
-# How often to refresh player_id_table after the initial lobby metadata dump.
-# This table includes vchess_* board positions/items and relic_ttl_* windows.
-PLAYER_ID_DUMP_INTERVAL_SEC = 30.0
+# The backend polls game_info cheaply, then takes heavier player/board snapshots
+# only when round_info changes. That lines snapshots up with the round view we
+# actually show and avoids multiple equivalent mid-round dumps.
 # Gap between individual keys in the cascade. dumpstringtable produces
 # hundreds of console lines per call; firing too fast can drop output.
 CASCADE_KEY_GAP_SEC = 0.2
-# The keys the cascade fires, in order. Mirrors the autoexec binds.
-# F20 (player_id_table) runs on its own timer. F16 (chess_pool_table) fires once
-# per session because its useful values are static enough that polling is noise.
-# F24 (ranking_top_table + player_id_table) runs once per match/session opening.
-CASCADE_VK_SEQUENCE = (VK_F21, VK_F22, VK_F23)
+# The keys a round snapshot fires, in order. F21 (dac_table) is intentionally
+# excluded here and fired at POST_GAME only for end_board. F16 (chess_pool_table)
+# fires once per session because its useful values are static enough that
+# polling is noise. F24 (ranking_top_table + player_id_table) runs once per
+# match/session opening.
+ROUND_SNAPSHOT_VK_SEQUENCE = (VK_F22, VK_F20)
 
 # Wait this long after POST_GAME before sending dump-key again. The `end_board`
 # table is populated server-side at POST_GAME entry; small buffer for the
@@ -1076,6 +1147,9 @@ class NetTableCapture:
         self._prev_personal_death_team: int | None = None
         self._personal_end_recorded: bool = False
         self._personal_end_snapshot: dict | None = None
+        self._own_slot_key: str | None = None
+        self._own_team_id: int | None = None
+        self._last_own_player_payload: dict | None = None
         self._partial_match_saved: bool = False
 
         self._post_game_at: float | None = None
@@ -1093,6 +1167,7 @@ class NetTableCapture:
         # timeline. Set on GAME_IN_PROGRESS (start), reset after a
         # match's timeline is generated. Float epoch seconds.
         self._match_session_start: float | None = None
+        self._match_roster_fingerprint: tuple[str, ...] | None = None
 
         # In-memory dump buffer used to build a curated per-round timeline.
         # Each entry is (epoch_seconds, {"captured_at": ..., "rows": [...]}).
@@ -1173,41 +1248,28 @@ class NetTableCapture:
         k.start()
 
     def _run_key_poller(self) -> None:
-        """Fires F23 every 2s, core cascades every 15s, and player boards every 30s.
+        """Fires F23 every 2s; heavier player/board snapshots are round-driven.
 
         The steady-state loop only runs while Dota is foreground and GSI says
-        DAC is active. On startup, an immediate catch-up cascade handles
+        DAC is active. On startup, an immediate catch-up snapshot handles
         mid-game launches before the first GSI tick arrives.
         """
-        last_full_cascade = 0.0
-        # Catch-up: if Dota is already running, fire a full cascade
+        # Catch-up: if Dota is already running, fire a live-state snapshot
         # immediately so the live view populates even when the app
         # starts mid-game (before GSI has confirmed DAC is active).
         if _is_dota_foreground():
-            log.info("nettable: Dota is foreground at poller start — firing catch-up cascade")
-            for vk in CASCADE_VK_SEQUENCE:
-                send_input_key(vk)
-                time.sleep(CASCADE_KEY_GAP_SEC)
+            log.info("nettable: Dota is foreground at poller start — firing catch-up snapshot")
+            self._fire_round_snapshot("poller start")
             self._fire_lobby_metadata_dump("poller start")
-            last_full_cascade = time.time()
         while not self._stop.is_set():
-            now = time.time()
             try:
                 if _is_dota_foreground() and self._is_dac_active() and not self._paused:
                     if not self._lobby_metadata_fired:
                         self._fire_lobby_metadata_dump("DAC active")
-                    if now - last_full_cascade >= FULL_CASCADE_INTERVAL_SEC:
-                        last_full_cascade = now
-                        for vk in CASCADE_VK_SEQUENCE:
-                            if self._stop.is_set():
-                                break
-                            send_input_key(vk)
-                            time.sleep(CASCADE_KEY_GAP_SEC)
-                    else:
-                        # Cheap poll — just F23 (game_info → round_info).
-                        send_input_key(VK_F23)
-                    if now - self._last_player_id_dump_at >= PLAYER_ID_DUMP_INTERVAL_SEC:
-                        self._fire_player_id_dump("periodic board/items refresh")
+                    # Cheap poll — just F23 (game_info → round_info/death_team).
+                    # _detect_round_change() fires F22/F20 snapshots only when
+                    # the round advances.
+                    send_input_key(VK_F23)
             except Exception as e:
                 log.warning("nettable: key poller iteration failed: %s", e)
             # Sleep till next poll tick.
@@ -1281,10 +1343,43 @@ class NetTableCapture:
         self._last_player_id_dump_at = time.time()
         log.info("nettable: fired lobby metadata dump (F24 + F16) at %s", reason)
 
+    def _fire_round_snapshot(self, reason: str) -> None:
+        for vk in ROUND_SNAPSHOT_VK_SEQUENCE:
+            if self._stop.is_set():
+                return
+            send_input_key(vk)
+            time.sleep(CASCADE_KEY_GAP_SEC)
+        self._last_player_id_dump_at = time.time()
+        log.info("nettable: fired round snapshot (F22 + F20) at %s", reason)
+
     def _fire_player_id_dump(self, reason: str) -> None:
         send_input_key(VK_F20)
         self._last_player_id_dump_at = time.time()
         log.info("nettable: fired F20 (player_id_table) at %s", reason)
+
+    def _reset_match_tracking(self) -> None:
+        self._prev_personal_death_team = None
+        self._personal_end_recorded = False
+        self._personal_end_snapshot = None
+        self._own_slot_key = None
+        self._own_team_id = None
+        self._last_own_player_payload = None
+        self._partial_match_saved = False
+        self._post_game_at = None
+        self._end_board_captured = False
+        self._lobby_metadata_fired = False
+        self._last_player_id_dump_at = 0.0
+        self._last_round = None
+        self._last_lineups.clear()
+
+    def _open_match_session(self, reason: str) -> None:
+        self._match_session_start = time.time()
+        self._match_roster_fingerprint = None
+        self._session_dumps.clear()
+        self._close_local_capture_session({"capture_status": "abandoned"})
+        self._ensure_local_capture_session()
+        self._reset_match_tracking()
+        log.info("nettable: match session opened (%s)", reason)
 
     def _is_log_active(self) -> bool:
         """True if console.log was modified within the active window.
@@ -1378,12 +1473,13 @@ class NetTableCapture:
         dst = find_autoexec_target(self._dota_dir)
         try:
             dst.parent.mkdir(parents=True, exist_ok=True)
-            desired = AUTOEXEC_CFG_CONTENT.encode("utf-8")
-            if dst.exists() and _sha256(dst.read_bytes()) == _sha256(desired):
+            existing = dst.read_text(encoding="utf-8") if dst.exists() else ""
+            updated = _upsert_managed_autoexec_block(existing)
+            if existing == updated:
                 log.info("nettable: autoexec.cfg already current at %s", dst)
                 return ok
-            dst.write_bytes(desired)
-            log.info("nettable: wrote autoexec.cfg to %s", dst)
+            dst.write_text(updated, encoding="utf-8", newline="\n")
+            log.info("nettable: updated DAC Tracker autoexec.cfg block at %s", dst)
         except Exception as e:
             log.warning("nettable: failed to install autoexec.cfg: %s", e)
             ok = False
@@ -1611,29 +1707,14 @@ class NetTableCapture:
         # Match start — opens the session window so dumps captured
         # between now and POST_GAME / end_board belong to this match.
         if GAME_IN_PROGRESS_RE in line:
-            if self._match_session_start is not None and not self._end_board_captured:
-                self._maybe_save_partial_match_from_latest_dump(
-                    capture_status="player_eliminated" if self._personal_end_recorded else "abandoned",
-                    verification_source="death_team" if self._personal_end_recorded else "game_restart",
-                    close_session=True,
-                )
-                self._match_session_start = None
-
             if self._match_session_start is None:
-                self._match_session_start = time.time()
-                self._session_dumps.clear()
-                self._close_local_capture_session({"capture_status": "abandoned"})
-                self._ensure_local_capture_session()
-                log.info("nettable: GAME_IN_PROGRESS — match session opened")
-                self._prev_personal_death_team = None
-                self._personal_end_recorded = False
-                self._personal_end_snapshot = None
-                self._partial_match_saved = False
-                self._post_game_at = None
-                self._end_board_captured = False
-                self._lobby_metadata_fired = False
-                self._last_player_id_dump_at = 0.0
+                self._open_match_session("GAME_IN_PROGRESS")
                 self._fire_lobby_metadata_dump("match start")
+            else:
+                # A reconnect can re-emit GAME_IN_PROGRESS for the same lobby.
+                # Do not close the existing session here; wait for the next
+                # player_info_table roster and compare Steam IDs exactly.
+                log.info("nettable: GAME_IN_PROGRESS while session open — waiting for roster comparison")
 
         # Game state — POST_GAME tells us a match ended. Fire PAUSE
         # immediately via SendInput so dac_table.end_board is captured
@@ -2029,6 +2110,8 @@ class NetTableCapture:
             "prev_round": prev,
             "at": datetime.now().isoformat(),
         })
+        if round_now > 0 and _is_dota_foreground() and self._is_dac_active() and not self._paused:
+            self._fire_round_snapshot(f"round changed {prev} -> {round_now}")
         # Creep rounds in DAC fire every 5 rounds (5, 10, 15, ...).
         # Worth flagging so consumers can fire a heavier snapshot.
         if round_now > 0 and round_now % 5 == 0:
@@ -2043,9 +2126,11 @@ class NetTableCapture:
         """Diff per-player chess_lineup against last snapshot. Emit
         nettable_lineup_changed for each player whose lineup changed
         (units added, removed, or reordered)."""
-        # Locate dac_table.player_info → info → {steam_id: {chess_lineup}}
+        # Locate player_info_table.player_info → data → {steam_id: {chess_lineup}}.
+        # Older captures also had dac_table.player_info, so keep accepting it.
         for r in rows:
-            if not (r.get("table_name", "").endswith("dac_table")
+            table_name = r.get("table_name", "")
+            if not ((table_name.endswith("player_info_table") or table_name.endswith("dac_table"))
                     and r.get("key") == "player_info"):
                 continue
             raw = r.get("raw")
@@ -2259,8 +2344,10 @@ class NetTableCapture:
         if not self._steam_id:
             return  # no logged-in player → can't identify own slot
 
-        # 1. Pull the live per-slot table — we need it for slot lookup AND
-        #    for the snapshot payload.
+        # 1. Pull the live per-slot table when present. F23-only polls do not
+        #    include player_info_table, so cache the local player's team/payload
+        #    from the last round snapshot and still allow death_team to detect
+        #    elimination between heavy captures.
         live_data: dict | None = None
         for r in rows:
             if r.get("table_name", "").endswith("player_info_table") \
@@ -2271,25 +2358,36 @@ class NetTableCapture:
                     if isinstance(d, dict) and d:
                         live_data = d
                 break
-        if live_data is None:
-            return
 
         # 2. Find our slot by steam_id match. team_id lives on the slot row.
         own_slot_key: str | None = None
         own_slot_payload: dict | None = None
         own_team_id: int | None = None
-        for slot_key, slot_payload in live_data.items():
-            if not isinstance(slot_payload, dict):
-                continue
-            if str(slot_payload.get("steam_id")) == str(self._steam_id):
-                own_slot_key = str(slot_key)
-                own_slot_payload = slot_payload
-                tid = slot_payload.get("team_id")
-                try:
-                    own_team_id = int(tid) if tid is not None else None
-                except (TypeError, ValueError):
-                    own_team_id = None
-                break
+        if live_data is not None:
+            for slot_key, slot_payload in live_data.items():
+                if not isinstance(slot_payload, dict):
+                    continue
+                if str(slot_payload.get("steam_id")) == str(self._steam_id):
+                    own_slot_key = str(slot_key)
+                    own_slot_payload = slot_payload
+                    tid = slot_payload.get("team_id")
+                    try:
+                        own_team_id = int(tid) if tid is not None else None
+                    except (TypeError, ValueError):
+                        own_team_id = None
+                    break
+            if own_slot_payload is not None:
+                self._own_slot_key = own_slot_key
+                self._last_own_player_payload = dict(own_slot_payload)
+            if own_team_id is not None:
+                self._own_team_id = own_team_id
+
+        if own_slot_key is None:
+            own_slot_key = self._own_slot_key
+        if own_slot_payload is None:
+            own_slot_payload = self._last_own_player_payload
+        if own_team_id is None:
+            own_team_id = self._own_team_id
         if own_slot_payload is None or own_team_id is None:
             return  # not in this lobby (yet?)
 
@@ -2580,6 +2678,10 @@ class NetTableCapture:
         payload = {
             "match_id": match_id,
             "played_at": played_at,
+            "roster_fingerprint": list(self._match_roster_fingerprint or []),
+            "observer_steam_id": self._steam_id,
+            "is_finished": self._end_board_captured,
+            "verification_source": "end_board" if self._end_board_captured else "timeline",
             "round_count": len(timeline),
             "first_round": timeline[0]["round"],
             "last_round": timeline[-1]["round"],
@@ -2599,11 +2701,17 @@ class NetTableCapture:
                 )
             else:
                 with client:
-                    upsert_match_timeline(client, payload)
-                log.info(
-                    "nettable: match timeline uploaded — match_id=%s rounds=%d (round %d → %d, from %d dumps)",
-                    match_id, len(timeline), timeline[0]["round"], timeline[-1]["round"], len(in_session),
-                )
+                    uploaded = upsert_match_timeline(client, payload)
+                if uploaded:
+                    log.info(
+                        "nettable: match timeline uploaded — match_id=%s rounds=%d (round %d → %d, from %d dumps)",
+                        match_id, len(timeline), timeline[0]["round"], timeline[-1]["round"], len(in_session),
+                    )
+                else:
+                    log.info(
+                        "nettable: match timeline not replaced — match_id=%s incoming_rounds=%d",
+                        match_id, len(timeline),
+                    )
         except Exception as e:
             log.warning("nettable: timeline upload failed for %s: %s", match_id, e)
 
@@ -2687,9 +2795,9 @@ class NetTableCapture:
              per-player state (hp, hero_level, curr_rank, lineup).
              Empirically this is the one that updates round-to-round
              for the LOCAL player.
-          2. `dac_table.player_info.info.<steam_id>` — same shape,
-             carries all 8 players in 8-player lobbies (the local
-             user's client receives everyone's state here).
+          2. `dac_table.player_info.info.<steam_id>` — same shape, accepted
+             for old/local dumps and POST_GAME, but observed live values are
+             often stale/default, so the 15s cascade no longer polls it.
           3. `player_id_table.<key>_<slot>` (slot = 0..7) — the
              per-slot tables: vchess_<n> (live board), courier_<n>
              (level, win_streak, courier model), relic_ttl_<n>
@@ -2882,6 +2990,28 @@ class NetTableCapture:
         return {}
 
     @staticmethod
+    def _extract_roster_fingerprint(rows: list[dict]) -> tuple[str, ...] | None:
+        """Return sorted Steam IDs from player_info_table for lobby identity.
+
+        Reconnects can re-emit GAME_IN_PROGRESS, but the same lobby should have
+        the exact same player Steam IDs. A different roster means the previous
+        open session was abandoned/replaced by a new lobby.
+        """
+        for r in rows:
+            if not (r.get("table_name", "").endswith("player_info_table")
+                    and r.get("key") == "player_info"):
+                continue
+            raw = r.get("raw")
+            if not isinstance(raw, dict):
+                continue
+            data = raw.get("data")
+            if not isinstance(data, dict) or not data:
+                continue
+            roster = tuple(sorted(str(sid) for sid in data.keys() if str(sid).startswith("7656")))
+            return roster or None
+        return None
+
+    @staticmethod
     def _format_talents(talent_tree) -> str:
         """end_board.talent_tree is a dict like {'1': 'talent_1a_winbonus', ...}.
         Flatten to pipe-separated string sorted by key."""
@@ -2900,6 +3030,29 @@ class NetTableCapture:
                 return
 
             from utils import load_config, local_only_mode
+
+            roster = self._extract_roster_fingerprint(rows)
+            if roster is not None:
+                if self._match_session_start is None:
+                    self._open_match_session("roster seen")
+                    self._match_roster_fingerprint = roster
+                    log.info("nettable: match roster set (%d player(s))", len(roster))
+                elif self._match_roster_fingerprint is None:
+                    self._match_roster_fingerprint = roster
+                    log.info("nettable: match roster set (%d player(s))", len(roster))
+                elif roster != self._match_roster_fingerprint:
+                    log.info(
+                        "nettable: roster changed (%d -> %d player(s)) — closing previous session as abandoned",
+                        len(self._match_roster_fingerprint), len(roster),
+                    )
+                    self._maybe_save_partial_match_from_latest_dump(
+                        capture_status="player_eliminated" if self._personal_end_recorded else "abandoned",
+                        verification_source="death_team" if self._personal_end_recorded else "roster_changed",
+                        close_session=True,
+                    )
+                    self._match_session_start = None
+                    self._open_match_session("roster changed")
+                    self._match_roster_fingerprint = roster
 
             # Round + lineup change detection — cheap, runs on every ingest.
             self._detect_round_change(rows)
@@ -3039,10 +3192,6 @@ class NetTableCapture:
 
 
 # ── helpers ─────────────────────────────────────────────────────────────────
-
-def _sha256(data: bytes) -> str:
-    return hashlib.sha256(data).hexdigest()
-
 
 def _safe_int(value) -> int | None:
     """Coerce to int, returning None on failure or empty value.

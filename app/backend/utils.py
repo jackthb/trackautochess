@@ -5,7 +5,6 @@ import os
 import sys
 from pathlib import Path
 
-
 # ── Paths ─────────────────────────────────────────────────────────────────────
 
 DAC_DIR = Path(os.environ.get("DAC_DIR") or (Path.home() / ".dac"))
@@ -29,12 +28,14 @@ def local_only_mode() -> bool:
         return False
     return bool(cfg.get("local_only", False))
 
+
 def _data_dir() -> Path:
     """Return the data/ directory, works both in dev and PyInstaller bundle."""
     if getattr(sys, "frozen", False):
         return Path(sys._MEIPASS) / "data"
     # backend/ → app/ → repo root
     return Path(__file__).resolve().parent.parent.parent / "data"
+
 
 DATA_DIR = _data_dir()
 ICONS_DIR = DATA_DIR / "icons"
@@ -47,8 +48,6 @@ REGIONS_CONFIG_PATH = DAC_DIR / "regions_config.json"
 DEFAULT_CONFIG = {
     "player_name": "jack",
     "hotkey": "F6",
-    "model": "qwen2.5vl:7b",
-    "ollama_url": "http://localhost:11434",
     "supabase_url": "https://xkfxykorskdltcmvgihh.supabase.co",
     "supabase_key": "sb_publishable_Tk7hBHGJImbtzxxZzEIgKQ_kwnKuCaK",
     "supabase_db_url": "",
@@ -99,6 +98,7 @@ def load_regions_config() -> dict:
 
     Schema is flat — single 16:9 profile, no aspect-ratio dispatch.
     """
+
     def _read(path: Path) -> dict:
         if not path.exists():
             return {}
