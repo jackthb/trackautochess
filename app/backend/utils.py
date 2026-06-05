@@ -37,7 +37,15 @@ def _data_dir() -> Path:
     return Path(__file__).resolve().parent.parent.parent / "data"
 
 
+def _content_dir() -> Path:
+    """Return the content/ directory, works both in dev and PyInstaller bundle."""
+    if getattr(sys, "frozen", False):
+        return Path(sys._MEIPASS) / "content"
+    return Path(__file__).resolve().parent.parent.parent / "content"
+
+
 DATA_DIR = _data_dir()
+CONTENT_DIR = _content_dir()
 ICONS_DIR = DATA_DIR / "icons"
 DEFAULT_REGIONS_CONFIG_PATH = DATA_DIR / "regions_config.json"
 REGIONS_CONFIG_PATH = DAC_DIR / "regions_config.json"

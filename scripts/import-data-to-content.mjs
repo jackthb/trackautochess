@@ -2,6 +2,7 @@ import { existsSync } from "node:fs";
 import { mkdir, readFile, readdir, writeFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
+import { orderPatchNote } from "./lib/patch-note-json.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const dataDir = path.join(root, "data");
@@ -101,24 +102,70 @@ function contentEntity(gameId, name, source, icon, existing) {
 }
 
 function entityReference(type, slug, entityRefBySlug) {
-  return {
+  const entity = {
     type,
-    ...(type && slug ? { [type]: entityRefBySlug?.[type]?.get(slug) ?? slug } : {}),
-    slug,
   };
+  if (type && slug) {
+    entity[type] = entityRefBySlug?.[type]?.get(slug) ?? slug;
+  }
+  if (slug) {
+    entity.slug = slug;
+  }
+  return entity;
 }
 
-function patchToContent(patch, entityRefBySlug) {
+function sameEntityReference(a, b) {
+  if (!a || !b || typeof a !== "object" || typeof b !== "object") return false;
+  if ((a.type ?? null) !== (b.type ?? null)) return false;
+
+  const type = a.type;
+  const aTypedRef = type && typeof a[type] === "string" ? a[type] : null;
+  const bTypedRef = type && typeof b[type] === "string" ? b[type] : null;
+  if (aTypedRef || bTypedRef) return aTypedRef === bTypedRef;
+
+  const aSlug = typeof a.slug === "string" ? a.slug : null;
+  const bSlug = typeof b.slug === "string" ? b.slug : null;
+  if (aSlug || bSlug) return aSlug === bSlug;
+
+  return true;
+}
+
+function patchEntryKey(entry) {
+  return [entry?.kind ?? "", entry?.name ?? "", entry?.detail ?? ""].join("\u0000");
+}
+
+function existingSectionFor(existingPatch, section, sectionIndex) {
+  const sections = existingPatch?.sections;
+  if (!Array.isArray(sections)) return null;
+
+  const byIndex = sections[sectionIndex];
+  if (byIndex?.heading === section.heading) return byIndex;
+  return sections.find((candidate) => candidate?.heading === section.heading) ?? null;
+}
+
+function existingEntryFor(existingSection, entry, entryIndex) {
+  const entries = existingSection?.entries;
+  if (!Array.isArray(entries)) return null;
+
+  const key = patchEntryKey(entry);
+  const byIndex = entries[entryIndex];
+  if (patchEntryKey(byIndex) === key) return byIndex;
+  return entries.find((candidate) => patchEntryKey(candidate) === key) ?? null;
+}
+
+function patchToContent(patch, entityRefBySlug, existingPatch = null) {
   const next = { ...patch };
   if ("workshop_url" in next) {
     next.workshopUrl = next.workshop_url;
     delete next.workshop_url;
   }
   if (Array.isArray(next.sections)) {
-    next.sections = next.sections.map((section) => ({
-      ...section,
-      entries: Array.isArray(section.entries)
-        ? section.entries.map((entry) => {
+    next.sections = next.sections.map((section, sectionIndex) => {
+      const existingSection = existingSectionFor(existingPatch, section, sectionIndex);
+      return {
+        ...section,
+        entries: Array.isArray(section.entries)
+          ? section.entries.map((entry, entryIndex) => {
             const converted = { ...entry };
             if (converted.entity_type || converted.entity_slug) {
               const type = converted.entity_type ?? null;
@@ -127,12 +174,23 @@ function patchToContent(patch, entityRefBySlug) {
               delete converted.entity_type;
               delete converted.entity_slug;
             }
+            const existingEntry = existingEntryFor(existingSection, entry, entryIndex);
+            if (
+              converted.entity &&
+              existingEntry?.entity &&
+              sameEntityReference(converted.entity, existingEntry.entity)
+            ) {
+              converted.entity = existingEntry.entity;
+            } else if (!converted.entity && existingEntry?.entity) {
+              converted.entity = existingEntry.entity;
+            }
             return converted;
           })
-        : [],
-    }));
+          : [],
+      };
+    });
   }
-  return next;
+  return orderPatchNote(next);
 }
 
 async function main() {
@@ -253,12 +311,25 @@ async function main() {
   const patchFiles = (await readdir(patchDir))
     .filter((file) => file.endsWith(".json") && file !== "index.json")
     .sort();
+  let importedPatchCount = 0;
   for (const file of patchFiles) {
+    const relativePath = `patch-notes/${file}`;
+    const existingPatch = await existingContent(relativePath);
+    if (existingPatch?.entitiesSynced === true) {
+      continue;
+    }
     const patch = await fromJson(path.join(patchDir, file));
-    await writeJson(`patch-notes/${file}`, patchToContent(patch, entityRefBySlug));
+    await writeJson(
+      relativePath,
+      patchToContent(patch, entityRefBySlug, existingPatch),
+    );
+    importedPatchCount += 1;
   }
 
-  console.log(`Imported ${patchFiles.length} patch notes and game data to content/.`);
+  console.log(
+    `Imported ${importedPatchCount} patch notes and game data to content/. ` +
+      `Skipped ${patchFiles.length - importedPatchCount} synced patch note(s).`,
+  );
 }
 
 main().catch((error) => {

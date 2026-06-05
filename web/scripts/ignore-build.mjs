@@ -4,7 +4,7 @@ const watchedPaths = [
   ".",
   "../content/",
   "../data/icons/",
-  "../scripts/generate-data.mjs",
+  "../scripts/generate-web-runtime-data.mjs",
 ];
 
 function git(args) {

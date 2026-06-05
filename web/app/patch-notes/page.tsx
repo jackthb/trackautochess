@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Fragment } from "react";
 import Link from "next/link";
-import patchIndex from "@data/patch_notes/index.json";
+import { patchIndexData } from "@/generated/content-data";
 import { SITE_NAME, SITE_TITLE } from "@/lib/site";
 import { DEFAULT_LOCALE, pickLocalized } from "@/lib/i18n";
 import styles from "./patch-notes.module.css";
@@ -66,7 +66,7 @@ function formatDate(iso: string): { month: string; day: string; year: string } {
 }
 
 export default function PatchNotesPage() {
-  const patches = [...(patchIndex.patches as IndexPatch[])].sort((a, b) =>
+  const patches = [...((patchIndexData as { patches: IndexPatch[] }).patches)].sort((a, b) =>
     b.date.localeCompare(a.date)
   );
 

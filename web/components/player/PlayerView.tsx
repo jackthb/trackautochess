@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import { UNIT_COSTS } from "@/lib/units";
-import relicsJson from "@data/relics.json";
+import { relicsData as relicsJson } from "@/generated/content-data";
 import type { PlayerGame, RelicInfo } from "@dac/shared/types";
 import { GameRowDisplay } from "@dac/shared/GameRowDisplay";
 import { buildStatItems } from "@dac/shared/buildStatItems";

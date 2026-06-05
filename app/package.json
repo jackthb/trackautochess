@@ -8,10 +8,8 @@
     "dev:vite": "vite",
     "dev:electron": "electron . --dev",
     "dev": "node scripts/dev.mjs",
-    "prebuild": "node ../scripts/generate-data.mjs",
     "build": "vite build",
     "build:backend": "cd backend && pyinstaller dac_tracker.spec --noconfirm --clean",
-    "prebuild:installer": "node ../scripts/generate-data.mjs",
     "build:installer": "vite build && electron-builder --win --config electron-builder.json",
     "build:all": "pnpm run build:backend && pnpm run build:installer"
   },

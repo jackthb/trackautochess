@@ -38,22 +38,22 @@ then uploads the processed match representation to Supabase.
    in-memory into `matches`, `match_players`, and `match_timelines`. Raw
    `dac_nettable_dumps` uploads are debug opt-in only.
 
-## Key binds (autoexec.cfg)
+## Active capture matrix / key binds
 
 All binds use extended F-keys (F20-F25) plus F16 to avoid conflicting with
 normal user keyboard shortcuts. Most binds dump one table. F24 deliberately
 dumps `ranking_top_table` and `player_id_table` together so the one-time lobby
 metadata snapshot includes both the Queen ladder and the slot mapping.
 
-| Key | Table | Cadence |
-|-----|-------|---------|
-| F21 | `dac_table` | POST_GAME burst only, to capture `end_board` |
-| F22 | `player_info_table` | On round change |
-| F23 | `game_info` | Every 2s |
-| F20 | `player_id_table` | On round change |
-| F24 | `ranking_top_table` + `player_id_table` | Once at match/session opening |
-| F16 | `chess_pool_table` | Once at match/session opening, paired with F24 |
-| F25 | `unit_table` | Bound only; not automatically fired |
+| Key | Table(s) | Automatic trigger / cadence | Important keys | What it means / what we use it for | Raw-upload storage filter |
+|---|---|---|---|---|---|
+| F21 | `dac_table` | POST_GAME burst only | `end_board`, `player_info`, `user_panel_ranking`, `show_all_player_connect_status`, sometimes `stat_chess`, `game_over` | Main game-wide table, now captured only at the end because `end_board` is the important part. In observed same-second live dumps, `dac_table.player_info` was mostly default/stale, so continuously polling it was noise. Prefer `player_info_table.player_info` for current player state. | Kept. |
+| F22 | `player_info_table` | On round change | `player_info` | Dedicated current player-state table: HP, gold, level, lineup, bench/hand, synergies, damage, rank, relic, talent tree, MMR/candy fields, etc. In same-second diffs, this is the table with the real current/final values while `dac_table.player_info` is mostly defaults. Round-change capture lines this up with the review UI's per-round view. | Kept. |
+| F23 | `game_info` | Every 2s | `round_info`, `death_team`, `game_version`, `quest` | Cheap live heartbeat. `round_info.round` triggers heavier F22/F20 snapshots once per round. `death_team` maps team IDs to elimination bits and is used to detect when the local player dies before the whole lobby ends. | `round_info` and `death_team` kept. `game_version` and `quest` dropped from raw Supabase uploads. |
+| F20 | `player_id_table` | On round change | `player_<n>`, `vchess_<n>`, `relic_ttl_<n>`, `mmr_level_<n>`, `courier_<n>`, `chessboard_<n>` | Per-slot state. `player_<n>` maps lobby slots/team IDs/hero indexes. `vchess_<n>` is the board grid state for that slot: unit IDs/names, board coordinates, items, water IDs, etc. `relic_ttl_<n>` is active relic + remaining duration. `mmr_level_<n>` is rank/candy baseline. | `player_*`, `vchess_*`, `relic_ttl_*`, and `mmr_level_*` kept. Cosmetic `courier_*` and `chessboard_*` dropped from raw Supabase uploads. |
+| F24 | `ranking_top_table` + `player_id_table` | Once at match/session opening | `ranking_top`; plus the `player_id_table` keys above | One-shot lobby metadata. `ranking_top_table` normalizes into public Queen ladder/profile rank rows; the paired `player_id_table` gives an early steam_id → slot/team mapping before the first round snapshot. | Kept; `player_id_table` key-level filter still applies. |
+| F16 | `chess_pool_table` | Once at match/session opening, immediately after F24 | `ban_info`, `ban_info_<n>`, `legendary_info`, `relic_list`, `destroy_info`, `chess_list_by_mana`, `chess_list_by_synergy`, `revealed_legendary_chess_list`, `unrevealed_legendary_chess_list`, static/reference list keys | Lobby pool metadata. Local raw dumps keep the whole one-shot table. The processed timeline currently extracts `ban_info_<n>` and `revealed_legendary_chess_list`; `relic_list`, `legendary_info`, `destroy_info`, and static reference lists are raw-only today unless we add explicit processed fields. | Kept. The old plan proposed dropping several static keys, but current code keeps the table because it is one-shot and useful for debugging patch/data drift. |
+| F25 | `unit_table` | Bound only; not automatically fired | `egg_*` and/or unit entries depending on game state | Manual debugging only. It is not part of the normal capture cadence, so it should not appear unless someone presses F25 or runs a manual dump. | Kept if manually uploaded, but normally absent. |
 
 ## Files
 
@@ -88,18 +88,6 @@ profile rows. `dac_nettable_dumps` is only written when
 
 The storage filter is intentionally only at the raw-upload boundary. The
 in-memory live state and local raw archive still receive the full decoded dump.
-
-### Active captured tables
-
-| Table | Trigger | Important keys | What it means / what we use it for | Raw-upload storage filter |
-|---|---|---|---|---|
-| `dac_table` | F21 burst at POST_GAME only | `player_info`, `user_panel_ranking`, `end_board`, `show_all_player_connect_status`, sometimes `stat_chess`, `game_over` | Main game-wide table, now captured only at the end because `end_board` is the important part. In observed same-second live dumps, `dac_table.player_info` was mostly default/stale, so continuously polling it was noise. Prefer `player_info_table.player_info` for current player state. | Kept. |
-| `player_info_table` | F22 on round change | `player_info` | Dedicated current player-state table: HP, gold, level, lineup, bench/hand, synergies, damage, rank, relic, talent tree, MMR/candy fields, etc. In same-second diffs, this is the table with the real current/final values while `dac_table.player_info` is mostly defaults. Round-change capture lines this up with the review UI's per-round view. | Kept. |
-| `game_info` | F23 every 2s | `round_info`, `death_team`, `game_version`, `quest` | Cheap live heartbeat. `round_info.round` triggers heavier F22/F20 snapshots once per round. `death_team` maps team IDs to elimination bits and is used to detect when the local player dies before the whole lobby ends. | `round_info` and `death_team` kept. `game_version` and `quest` dropped from raw Supabase uploads. |
-| `player_id_table` | F24 once at match/session opening; F20 on round change | `player_<n>`, `vchess_<n>`, `relic_ttl_<n>`, `mmr_level_<n>`, `courier_<n>`, `chessboard_<n>` | Per-slot state. `player_<n>` maps lobby slots/team IDs/hero indexes. `vchess_<n>` is the board grid state for that slot: unit IDs/names, board coordinates, items, water IDs, etc. `relic_ttl_<n>` is active relic + remaining duration. `mmr_level_<n>` is rank/candy baseline. | `player_*`, `vchess_*`, `relic_ttl_*`, and `mmr_level_*` kept. Cosmetic `courier_*` and `chessboard_*` dropped from raw Supabase uploads. |
-| `ranking_top_table` | F24 once at match/session opening | `ranking_top` | Queen ladder snapshot. We normalize the `ranking_top.ranking_top` rows into public player/profile rank data and also preserve leaderboard subcategory payloads in local raw dumps. | Kept. |
-| `chess_pool_table` | F16 once at match/session opening, immediately after F24 | `ban_info`, `ban_info_<n>`, `legendary_info`, `relic_list`, `destroy_info`, `chess_list_by_mana`, `chess_list_by_synergy`, `revealed_legendary_chess_list`, `unrevealed_legendary_chess_list`, static/reference list keys | Lobby pool metadata. Local raw dumps keep the whole one-shot table. The processed timeline currently extracts `ban_info_<n>` and `revealed_legendary_chess_list`; `relic_list`, `legendary_info`, `destroy_info`, and static reference lists are raw-only today unless we add explicit processed fields. | Kept. The old plan proposed dropping several static keys, but current code keeps the table because it is one-shot and useful for debugging patch/data drift. |
-| `unit_table` | F25 manual/debug only; not fired automatically | `egg_*` and/or unit entries depending on game state | Bound for manual debugging. It is not part of the normal capture cadence, so it should not appear unless someone presses F25 or runs a manual dump. | Kept if manually uploaded, but normally absent. |
 
 ### Known DAC nettables not currently captured by the app
 

@@ -12,7 +12,7 @@ import {
   unitStem,
   RANK_BRACKETS,
 } from "@dac/shared/game-utils";
-import relicsData from "@data/relics.json";
+import { relicsData } from "@/generated/content-data";
 import type { RelicInfo } from "@dac/shared/types";
 import { fetchSteamProfile } from "@/lib/steam";
 import { UNIT_COSTS, computeSynergies } from "@/lib/units";

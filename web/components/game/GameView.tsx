@@ -2,11 +2,13 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import unitsFullData from "@data/units_full.json";
 import { UNIT_COSTS, computeSynergies } from "@/lib/units";
-import synergiesData from "@data/synergies.json";
-import relicsData from "@data/relics.json";
-import itemsFullData from "@data/items_full.json";
+import {
+  itemsFullData,
+  relicsData,
+  synergiesData,
+  unitsFullData,
+} from "@/generated/content-data";
 import type { Game, UnitFullInfo, SynergyInfo, RelicInfo } from "@dac/shared/types";
 import type { ChessBoardPiece, ItemFullInfo } from "../../../shared/types";
 import {

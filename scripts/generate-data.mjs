@@ -1,6 +1,7 @@
 import { mkdir, readFile, readdir, writeFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
+import { orderPatchNote } from "./lib/patch-note-json.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const contentDir = path.join(root, "content");
@@ -157,7 +158,7 @@ async function main() {
   const patchEntries = [];
   for (const { file, entry } of await readCollection("patch-notes")) {
     const slug = file.replace(/\.json$/, "");
-    const patch = patchToData(entry, entitySlugByRef);
+    const patch = orderPatchNote(patchToData(entry, entitySlugByRef));
     await writeJson(`patch_notes/${file}`, patch);
     patchEntries.push({
       date: patch.date,

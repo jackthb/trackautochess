@@ -1,11 +1,11 @@
 #!/usr/bin/env node
 /**
- * Toggle the per-patch `entitiesSynced` flag on data/patch_notes/*.json.
+ * Toggle the per-patch `entitiesSynced` flag on content/patch-notes/*.json.
  *
  * The scraper writes `entitiesSynced: false` on every new patch (and resets it
  * when a hotfix is folded in). That flag means "this patch's game-data changes
- * have NOT yet been pulled from the VPK into data/*.json and regenerated into
- * committed content/data files."
+ * have NOT yet been pulled from the VPK into content/game/*.json and regenerated
+ * into compatibility data files."
  * Once the full entity sync has run, flip the flag true with this script (or via
  * the /sync-patch-entities skill, which runs the sync then calls this).
  *
@@ -20,15 +20,16 @@
 import { readFileSync, writeFileSync, readdirSync } from "fs";
 import { join, dirname } from "path";
 import { fileURLToPath } from "url";
+import { patchNoteToJson } from "./lib/patch-note-json.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const DATA_DIR = join(__dirname, "..", "data", "patch_notes");
+const PATCH_NOTES_DIR = join(__dirname, "..", "content", "patch-notes");
 
 function loadPatches() {
-  return readdirSync(DATA_DIR)
-    .filter((f) => f.endsWith(".json") && f !== "index.json")
+  return readdirSync(PATCH_NOTES_DIR)
+    .filter((f) => f.endsWith(".json"))
     .map((f) => {
-      const file = join(DATA_DIR, f);
+      const file = join(PATCH_NOTES_DIR, f);
       return { slug: f.replace(/\.json$/, ""), file, data: JSON.parse(readFileSync(file, "utf-8")) };
     });
 }
@@ -40,7 +41,7 @@ function write(p, synced) {
   data.entitiesSynced = synced;
   if (synced) data.entitiesSyncedAt = new Date().toISOString();
   else delete data.entitiesSyncedAt;
-  writeFileSync(p.file, JSON.stringify(data, null, 2) + "\n");
+  writeFileSync(p.file, patchNoteToJson(data));
 }
 
 const argv = process.argv.slice(2);

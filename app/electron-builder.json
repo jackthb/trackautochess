@@ -27,40 +27,9 @@
       "filter": ["**/*"]
     },
     {
-      "from": "../data/units_full.json",
-      "to": "data/units_full.json"
-    },
-    {
-      "from": "../data/aliases.json",
-      "to": "data/aliases.json"
-    },
-    {
-      "from": "../data/synergies.json",
-      "to": "data/synergies.json"
-    },
-    {
-      "from": "../data/relics.json",
-      "to": "data/relics.json"
-    },
-    {
-      "from": "../data/items.json",
-      "to": "data/items.json"
-    },
-    {
-      "from": "../data/items_full.json",
-      "to": "data/items_full.json"
-    },
-    {
-      "from": "../data/talents.json",
-      "to": "data/talents.json"
-    },
-    {
-      "from": "../data/abilities.json",
-      "to": "data/abilities.json"
-    },
-    {
-      "from": "../data/game_mode.json",
-      "to": "data/game_mode.json"
+      "from": "../content",
+      "to": "content",
+      "filter": ["**/*"]
     },
     {
       "from": "../data/regions_config.json",

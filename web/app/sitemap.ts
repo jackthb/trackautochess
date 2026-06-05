@@ -1,5 +1,5 @@
 import type { MetadataRoute } from "next";
-import patchIndex from "@data/patch_notes/index.json";
+import { patchIndexData } from "@/generated/content-data";
 import { getAllItems } from "@/lib/items";
 import { getAllRelics } from "@/lib/relics";
 import { getAllUnits } from "@/lib/units";
@@ -37,7 +37,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     ...getAllUnits().map((u) => ({ url: `${base}/units/${u.slug}` })),
     ...getAllSynergies().map((s) => ({ url: `${base}/synergies/${s.slug}` })),
     ...getAllRelics().map((r) => ({ url: `${base}/relics/${r.slug}` })),
-    ...(patchIndex.patches as IndexPatch[]).map((p) => ({
+    ...((patchIndexData as { patches: IndexPatch[] }).patches).map((p) => ({
       url: `${base}/patch-notes/${p.slug}`,
       lastModified: p.date,
     })),

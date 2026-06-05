@@ -16,7 +16,7 @@
     "install:desktop:backend": "node scripts/setup-desktop-backend.mjs",
     "verify:desktop:backend": "node scripts/verify-desktop-backend.mjs",
     "content:import": "node scripts/import-data-to-content.mjs",
-    "content:generate": "node scripts/generate-data.mjs",
+    "web:data": "node scripts/generate-web-runtime-data.mjs",
     "cms:dev": "pnpm --dir web run dev"
   }
 }

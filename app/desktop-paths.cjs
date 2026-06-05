@@ -29,6 +29,7 @@ function getRepoDesktopPaths(repoDir, options = {}) {
     venvDir,
     backendPythonPath: getVenvPythonPath(venvDir, platform),
     dataDir: path.join(repoDir, "data"),
+    contentDir: path.join(repoDir, "content"),
     iconsDir: path.join(repoDir, "data", "icons"),
     dacDir,
     replayDir: path.join(dacDir, "replays"),

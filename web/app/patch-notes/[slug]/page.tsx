@@ -1,10 +1,8 @@
 import type { Metadata } from "next";
-import fs from "fs";
-import path from "path";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { HideOnErrorImg } from "@/components/HideOnErrorImg";
-import patchIndex from "@data/patch_notes/index.json";
+import { patchIndexData, patchesBySlugData } from "@/generated/content-data";
 import { getItemBySlug, iconUrl } from "@/lib/items";
 import { getRelicBySlug } from "@/lib/relics";
 import { getTalentByName } from "@/lib/talents";
@@ -153,19 +151,13 @@ function resolveEntryMeta(entry: PatchEntry): EntryMeta {
 }
 
 async function loadPatch(slug: string): Promise<Patch | null> {
-  const filePath = path.join(
-    process.cwd(),
-    "..",
-    "data",
-    "patch_notes",
-    `${slug}.json`
+  return (
+    (patchesBySlugData as Record<string, Patch | undefined>)[slug] ?? null
   );
-  if (!fs.existsSync(filePath)) return null;
-  return JSON.parse(fs.readFileSync(filePath, "utf-8")) as Patch;
 }
 
 export function generateStaticParams() {
-  return (patchIndex.patches as IndexPatch[]).map((patch) => ({
+  return ((patchIndexData as { patches: IndexPatch[] }).patches).map((patch) => ({
     slug: patch.slug,
   }));
 }

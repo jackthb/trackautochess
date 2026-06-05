@@ -1,8 +1,7 @@
 import { unitStem } from "@dac/shared/game-utils";
-import unitsFullData from "@data/units_full.json";
-// aliases.json is a flat { alt-spelling: canonical } map (a VPK-pipeline
-// artifact). Cost/synergy data comes from units_full.json below.
-import aliasData from "@data/aliases.json";
+// aliasesData is a flat { alt-spelling: canonical } map. Cost/synergy data
+// comes from content/game/units via the generated runtime module.
+import { aliasesData, unitsFullData } from "@/generated/content-data";
 import { slugifyName } from "@/lib/slugs";
 import { DEFAULT_LOCALE, type Locale, pickLocalized } from "@/lib/i18n";
 
@@ -173,7 +172,7 @@ export function getUnitSlugByName(name: string): string | null {
 // The match and game pages (and their OG image handlers) resolve a unit *name*
 // — as it appears in a stored lineup string, including a few alias spellings —
 // to its cost and synergy list. This was duplicated inline in four files;
-// it now lives here, built once from units_full.json plus the alias map.
+// it now lives here, built once from content/game/units plus the alias map.
 
 function buildNameLookups() {
   const cost: Record<string, number> = {};
@@ -184,7 +183,7 @@ function buildNameLookups() {
     cost[name] = data.cost ?? 0;
     if (data.synergies) synergies[name] = data.synergies;
   }
-  const aliases = aliasData as Record<string, string>;
+  const aliases = aliasesData as Record<string, string>;
   for (const [alias, canonical] of Object.entries(aliases)) {
     if (cost[canonical] !== undefined) cost[alias] = cost[canonical];
     if (synergies[canonical]) synergies[alias] = synergies[canonical];

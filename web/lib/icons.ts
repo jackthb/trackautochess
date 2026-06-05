@@ -1,10 +1,12 @@
 import { relicStem, synIconName, unitStem } from "@dac/shared/game-utils";
 import { itemIconStem } from "../../shared/game-utils";
 import type { ItemFullInfo } from "../../shared/types";
-import unitsFullData from "@data/units_full.json";
-import synergiesData from "@data/synergies.json";
-import relicsData from "@data/relics.json";
-import itemsFullData from "@data/items_full.json";
+import {
+  itemsFullData,
+  relicsData,
+  synergiesData,
+  unitsFullData,
+} from "@/generated/content-data";
 
 interface CmsIconFields {
   icon?: string | null;

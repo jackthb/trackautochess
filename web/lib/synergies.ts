@@ -1,5 +1,5 @@
 import { synIconName } from "@dac/shared/game-utils";
-import synergiesData from "@data/synergies.json";
+import { synergiesData } from "@/generated/content-data";
 import { slugifyName } from "@/lib/slugs";
 import { DEFAULT_LOCALE, type Locale, pickLocalized } from "@/lib/i18n";
 
