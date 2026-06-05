@@ -3,13 +3,16 @@
   "name": "Golden Mango",
   "slug": "golden-mango",
   "icon": "items/golden_mango2.png",
-  "commentary": "Special mango reward associated with Mango Tree.",
+  "commentary": "Special mango reward associated with Mango Tree. Reduces courier damage to zero on a fatal loss, then is consumed.",
   "source": {
     "name": "Golden Mango",
     "description": "A special mango reward Mango Tree can drop if it is still alive when the relic expires.",
     "lore": "",
     "quality": "special",
     "texture": "item_golden_mango",
+    "notes": []
+  },
+  "overrides": {
     "notes": []
   },
   "relatedEntities": [
