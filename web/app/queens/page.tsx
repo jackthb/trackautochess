@@ -139,9 +139,9 @@ function formatWinRate(wins: number | null, games: number | null): string {
   return `${Math.round((wins / games) * 100)}%`;
 }
 
-function formatWinTotal(wins: number | null, games: number | null): string {
-  if (wins == null || games == null || games <= 0) return "—";
-  return `${wins.toLocaleString()} / ${games.toLocaleString()}`;
+function formatWinTotal(wins: number | null): string {
+  if (wins == null) return "—";
+  return `${wins.toLocaleString()}`
 }
 
 export default async function QueensPage() {
@@ -153,7 +153,7 @@ export default async function QueensPage() {
     <PageLayout title="Queen Players">
       <p className={styles.lead}>
         Latest in-game Queen ladder output captured by the desktop tracker
-        {season ? ` for ${season.toUpperCase()}` : ""}. Rows are replaced when
+        {season ? ` for ${season.filter("_").toUpperCase()}` : ""}. Rows are replaced when
         a fresh ladder upload is accepted. Season stats fill in after a profile
         is refreshed; signed-in owners are checked about hourly in the
         background.
@@ -175,8 +175,8 @@ export default async function QueensPage() {
               <div className={styles.cell} aria-hidden="true" />
               <div className={styles.cell}>Player</div>
               <div className={styles.cell}>MMR</div>
+              <div className={`${styles.cell} ${styles["hide-sm"]}`}>Wins</div>
               <div className={`${styles.cell} ${styles["hide-sm"]}`}>Games</div>
-              <div className={`${styles.cell} ${styles["hide-sm"]}`}>Wins / Games</div>
               <div className={`${styles.cell} ${styles["hide-sm"]}`}>Win rate</div>
             </div>
             {rows.map((row, index) => {
@@ -229,10 +229,10 @@ export default async function QueensPage() {
                     {mmr != null ? mmr.toLocaleString() : "—"}
                   </div>
                   <div className={`${styles.cell} ${styles["cell-meta"]} ${styles["hide-sm"]}`}>
-                    {games?.toLocaleString() ?? "—"}
+                    {formatWinTotal(wins)}
                   </div>
                   <div className={`${styles.cell} ${styles["cell-meta"]} ${styles["hide-sm"]}`}>
-                    {formatWinTotal(wins, games)}
+                    {games?.toLocaleString() ?? "—"}
                   </div>
                   <div className={`${styles.cell} ${styles["cell-meta"]} ${styles["hide-sm"]}`}>
                     {formatWinRate(wins, games)}
