@@ -8,7 +8,12 @@ import type { MmrSnapshot } from "@/components/MmrSparkline";
 import type { QueenRankSnapshot } from "@/components/QueenRankSparkline";
 import { absoluteUrl, getSiteUrl } from "@/lib/site";
 import { getManualRefreshQuota } from "@/lib/manualRefreshQuota";
-import { lastTop3FromDrodoData, lastWinFromDrodoData } from "@/lib/drodo";
+import {
+  fetchAndCacheDrodo,
+  lastTop3FromDrodoData,
+  lastWinFromDrodoData,
+  type DrodoProfileRow,
+} from "@/lib/drodo";
 import { fetchSteamProfile } from "@/lib/steam";
 import PlayerView, { type PlayerPageProps } from "@/components/player/PlayerView";
 import {
@@ -41,6 +46,36 @@ function numberFromRawData(
   return null;
 }
 
+function drodoFromProfile(profile: DrodoProfileRow) {
+  return {
+    mmr: profile.mmr,
+    max_mmr: profile.max_mmr,
+    mmr_level: profile.mmr_level,
+    queen_rank: profile.queen_rank,
+    last_win_at: lastWinFromDrodoData(profile.raw_data),
+    last_top3_at: lastTop3FromDrodoData(profile.raw_data),
+    season: profile.season,
+    season_games: profile.season_games,
+    candy: profile.candy,
+    chicken_count: profile.chicken_count,
+  };
+}
+
+function drodoFromCachedRow(row: CachedUserDrodoRow) {
+  return {
+    mmr: row.drodo_mmr,
+    max_mmr: row.drodo_max_mmr,
+    mmr_level: row.drodo_mmr_level,
+    queen_rank: numberFromRawData(row.drodo_raw_data, "queen_rank"),
+    last_win_at: row.drodo_raw_data ? lastWinFromDrodoData(row.drodo_raw_data) : null,
+    last_top3_at: row.drodo_raw_data ? lastTop3FromDrodoData(row.drodo_raw_data) : null,
+    season: row.drodo_season,
+    season_games: row.drodo_season_games,
+    candy: row.drodo_candy,
+    chicken_count: row.drodo_chicken_count,
+  };
+}
+
 /** Cached per request so generateMetadata and the page render share data. */
 const loadPlayer = cache(async (rawSteamId: string): Promise<LoadResult> => {
   if (!rawSteamId || typeof rawSteamId !== "string") {
@@ -48,7 +83,9 @@ const loadPlayer = cache(async (rawSteamId: string): Promise<LoadResult> => {
   }
 
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  const key =
+    process.env.SUPABASE_SERVICE_ROLE_KEY ||
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
   const supabase = url && key ? createClient(url, key) : null;
 
   const baseUrl = getSiteUrl();
@@ -114,21 +151,43 @@ const loadPlayer = cache(async (rawSteamId: string): Promise<LoadResult> => {
           profileResult.data.drodo_mmr != null) &&
         !drodoProfileMissing
       ) {
-        drodo = {
-          mmr: profileResult.data.drodo_mmr,
-          max_mmr: profileResult.data.drodo_max_mmr,
-          mmr_level: profileResult.data.drodo_mmr_level,
-          queen_rank: numberFromRawData(profileResult.data.drodo_raw_data, "queen_rank"),
-          last_win_at: profileResult.data.drodo_raw_data ? lastWinFromDrodoData(profileResult.data.drodo_raw_data) : null,
-          last_top3_at: profileResult.data.drodo_raw_data ? lastTop3FromDrodoData(profileResult.data.drodo_raw_data) : null,
-          season: profileResult.data.drodo_season,
-          season_games: profileResult.data.drodo_season_games,
-          candy: profileResult.data.drodo_candy,
-          chicken_count: profileResult.data.drodo_chicken_count,
-        };
+        drodo = drodoFromCachedRow(profileResult.data);
       }
     }
     if (seasonsResult.data) seasons = seasonsResult.data;
+
+    if (!drodo && !drodoProfileMissing) {
+      const initialDrodo = await fetchAndCacheDrodo(steamId, supabase, {
+        snapshotOnSuccess: true,
+        pollMode: "reset",
+      });
+
+      if (initialDrodo.ok) {
+        drodo = drodoFromProfile(initialDrodo.profile);
+        seasons = initialDrodo.seasonRows;
+        drodoLastFetchedAt = initialDrodo.profile.fetched_at;
+        drodoProfileMissing = false;
+        mmrHistory = [
+          {
+            mmr: initialDrodo.profile.mmr,
+            snapshotted_at: initialDrodo.profile.fetched_at,
+          },
+          ...mmrHistory,
+        ];
+        queenRankHistory = initialDrodo.profile.queen_rank == null
+          ? queenRankHistory
+          : [
+              {
+                queen_rank: initialDrodo.profile.queen_rank,
+                snapshotted_at: initialDrodo.profile.fetched_at,
+              },
+              ...queenRankHistory,
+            ];
+      } else if (initialDrodo.kind === "missing") {
+        drodoProfileMissing = true;
+        drodoLastFetchedAt = initialDrodo.fetchedAt ?? null;
+      }
+    }
   }
 
   const profileRequirements = {
