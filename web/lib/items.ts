@@ -95,14 +95,7 @@ function buildItemsForLocale(locale: Locale): DisplayItem[] {
     fullByNorm.set(norm(value.name), value);
   }
 
-  const itemNames = new Set([
-    ...Object.keys(simple),
-    ...Object.values(itemsFullData as Record<string, FullItem>)
-      .map((item) => item.name)
-      .filter((name): name is string => Boolean(name?.trim())),
-  ]);
-
-  return Array.from(itemNames)
+  return Object.keys(simple)
     .map((simpleName) => {
       const basic = simple[simpleName];
       const full = fullByNorm.get(norm(simpleName));

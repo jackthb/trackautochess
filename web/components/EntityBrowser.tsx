@@ -207,6 +207,15 @@ export function EntityBrowser({
 
           {allTags.length > 0 && (
             <div className={styles.tagFilter}>
+              {activeTags.size > 0 && (
+                <button
+                  type="button"
+                  className={styles.clearFiltersBtn}
+                  onClick={() => setActiveTags(new Set())}
+                >
+                  Deselect filters
+                </button>
+              )}
               {allTags.map((tag) => {
                 const active = activeTags.has(tag.slug);
                 return (

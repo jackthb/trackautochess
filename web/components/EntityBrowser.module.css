@@ -156,6 +156,26 @@
     background: var(--bg-deep);
 }
 
+.clearFiltersBtn {
+    font-family: var(--font-mono);
+    font-size: var(--fs-11);
+    letter-spacing: var(--tr-ui);
+    color: var(--gold);
+    background: color-mix(in srgb, var(--gold) 8%, transparent);
+    border: 1px solid color-mix(in srgb, var(--gold) 45%, var(--border));
+    border-radius: var(--r-3);
+    padding: 3px var(--s-8);
+    cursor: pointer;
+    transition: border-color var(--t-base) var(--t-easing),
+                color var(--t-base) var(--t-easing),
+                background var(--t-base) var(--t-easing);
+}
+.clearFiltersBtn:hover {
+    color: var(--text-primary);
+    background: color-mix(in srgb, var(--gold) 14%, transparent);
+    border-color: var(--gold);
+}
+
 .tagIcon {
     width: 16px;
     height: 16px;
