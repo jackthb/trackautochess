@@ -44,24 +44,24 @@
     },
     {
       "relic": "Mango Tree",
-      "relatedItem": "Mango Treat",
+      "relatedItem": "Golden Mango",
       "category": "generated_item",
-      "label": "Creates Mango Treats",
-      "description": "Mango Treat is the special mango reward associated with Mango Tree."
+      "label": "Creates Golden Mangoes",
+      "description": "Golden Mango is the special reward Mango Tree can drop if it is still alive when the relic expires."
     },
     {
-      "item": "Mango Treat",
+      "item": "Golden Mango",
       "relatedItem": "Enchanted Mango",
       "category": "generated_item",
       "label": "Related mango reward",
-      "description": "Mango Treat and Enchanted Mango are related Mango Tree rewards."
+      "description": "Golden Mango and Enchanted Mango are related Mango Tree rewards."
     },
     {
       "item": "Enchanted Mango",
-      "relatedItem": "Mango Treat",
+      "relatedItem": "Golden Mango",
       "category": "generated_item",
       "label": "Related mango reward",
-      "description": "Enchanted Mango and Mango Treat are related Mango Tree rewards."
+      "description": "Enchanted Mango and Golden Mango are related Mango Tree rewards."
     }
   ]
 }
