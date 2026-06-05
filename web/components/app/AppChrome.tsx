@@ -2,13 +2,12 @@
 
 import { useEffect, useState, type ReactNode } from "react";
 import dynamic from "next/dynamic";
-import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { BotIdClient } from "botid/client";
 import type { AuthChangeEvent, Session, SupabaseClient } from "@supabase/supabase-js";
 import { AppNavBar } from "@/components/app/AppNavBar";
 import { Footer } from "@/components/Footer";
-import { redactAnalyticsEvent, trackEvent } from "@/lib/analytics";
+import { trackEvent } from "@/lib/analytics";
 import { getPostHog } from "@/lib/posthog";
 
 const BOT_ID_PROTECTED_ROUTES = [
@@ -99,7 +98,6 @@ export function AppChrome({ children }: { children: ReactNode }) {
       <AppNavBar supabase={supabase} />
       {children}
       <Footer />
-      <Analytics beforeSend={redactAnalyticsEvent} />
       <SpeedInsights />
       <CookieConsentBanner />
     </>

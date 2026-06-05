@@ -44,8 +44,8 @@ export default function PrivacyPage() {
         <h2>What we collect</h2>
         <p>
           We do not ask for or store personal information directly. We use
-          Vercel Analytics for anonymous pageview counts, Vercel Speed Insights
-          for performance, and PostHog for privacy-scoped product analytics
+          Vercel Speed Insights for performance, and PostHog for privacy-scoped
+          product analytics
           (which pages people visit and how features get used). Product events
           do not include raw search text, tokens, or private dashboard/admin
           URLs. PostHog only links events to an identified person profile after

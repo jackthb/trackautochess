@@ -1,4 +1,3 @@
-import type { BeforeSendEvent } from "@vercel/analytics/next";
 import { capture as posthogCapture } from "@/lib/posthog";
 
 type AnalyticsValue = string | number | boolean | null | undefined;
@@ -52,30 +51,6 @@ export function trackEvent(
     if (process.env.NEXT_PUBLIC_ANALYTICS_DEBUG === "true") {
       console.debug("[analytics failed]", name, error);
     }
-  }
-}
-
-export function redactAnalyticsEvent(
-  event: BeforeSendEvent,
-): BeforeSendEvent | null {
-  try {
-    const url = new URL(event.url);
-    const route = analyticsRoute(url.pathname);
-
-    if (route === "/dashboard" || route.startsWith("/admin")) {
-      return null;
-    }
-
-    url.pathname = route;
-    url.search = "";
-    url.hash = "";
-
-    return {
-      ...event,
-      url: url.toString(),
-    };
-  } catch {
-    return event;
   }
 }
 
