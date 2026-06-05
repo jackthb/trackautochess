@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import type { SupabaseClient, User } from "@supabase/supabase-js";
 import { SITE_NAME } from "@/lib/site";
 import { trackEvent } from "@/lib/analytics";
+import { isAdminSteamId } from "@/lib/admin";
 import { useBetaFeaturesEnabled } from "@/lib/betaFeatures";
 import { SteamSignInButton } from "@/components/SteamSignInButton";
 import styles from "@/components/NavBar.module.css";
@@ -38,6 +39,7 @@ const t = {
   leaderboard: "Leaderboard",
   matches: "Matches",
   patchNotes: "Patch Notes",
+  cms: "Admin CMS",
   signOut: "Sign out",
   placeholderName: "Steam Player Name",
   home: (n: string) => `${n} home`,
@@ -141,6 +143,7 @@ export function AppNavBar({ supabase }: AppNavBarProps) {
       ? user.user_metadata.steam_id
       : null;
   const canSeeBetaFeatures = useBetaFeaturesEnabled(sessionSteamId);
+  const isAdmin = isAdminSteamId(sessionSteamId);
   const trackNavClick = (destination: string) => {
     trackEvent("Navigation Link Clicked", { source: "nav", destination });
   };
@@ -221,6 +224,11 @@ export function AppNavBar({ supabase }: AppNavBarProps) {
                   )}
                   <span className={styles.navUser}>{displayName}</span>
                 </Link>
+                {isAdmin && (
+                  <Link href="/keystatic" className={styles.navBtn} onClick={() => trackNavClick("keystatic")}>
+                    {t.cms}
+                  </Link>
+                )}
                 <button className={styles.navBtn} onClick={handleLogout}>
                   {t.signOut}
                 </button>
