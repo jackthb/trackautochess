@@ -5,9 +5,7 @@ import path from "node:path";
 
 const ROOT = process.cwd();
 const ENV_PATH = path.join(ROOT, "web", ".env.local");
-const UNITS_PATH = path.join(ROOT, "data", "units_full.json");
-const ALIASES_PATH = path.join(ROOT, "data", "aliases.json");
-const SYNERGIES_PATH = path.join(ROOT, "data", "synergies.json");
+const CONTENT_GAME_DIR = path.join(ROOT, "content", "game");
 
 function readJson(filePath) {
   return JSON.parse(fs.readFileSync(filePath, "utf8"));
@@ -40,13 +38,16 @@ function canonicalUnitName(entry) {
 }
 
 function buildLookups() {
-  const units = readJson(UNITS_PATH);
-  const aliases = readJson(ALIASES_PATH);
-  const synergyData = readJson(SYNERGIES_PATH);
+  const aliases = readJson(path.join(CONTENT_GAME_DIR, "aliases.json"));
 
   const unitSynergies = new Map();
-  for (const [name, info] of Object.entries(units)) {
-    unitSynergies.set(name, Array.isArray(info.synergies) ? info.synergies : []);
+  for (const file of fs.readdirSync(path.join(CONTENT_GAME_DIR, "units"))) {
+    if (!file.endsWith(".json")) continue;
+    const entry = readJson(path.join(CONTENT_GAME_DIR, "units", file));
+    const source = entry.source && typeof entry.source === "object" ? entry.source : {};
+    const name = entry.name || source.name;
+    if (!name) continue;
+    unitSynergies.set(name, Array.isArray(source.synergies) ? source.synergies : []);
   }
   for (const [alias, canonical] of Object.entries(aliases)) {
     if (unitSynergies.has(canonical)) {
@@ -55,11 +56,15 @@ function buildLookups() {
   }
 
   const minTierByName = new Map();
-  for (const info of Object.values(synergyData)) {
-    if (!info || typeof info !== "object" || !info.name) continue;
-    const tiers = Array.isArray(info.tiers) ? info.tiers : [];
+  for (const file of fs.readdirSync(path.join(CONTENT_GAME_DIR, "synergies"))) {
+    if (!file.endsWith(".json")) continue;
+    const entry = readJson(path.join(CONTENT_GAME_DIR, "synergies", file));
+    const source = entry.source && typeof entry.source === "object" ? entry.source : {};
+    const name = entry.name || source.name;
+    if (!name) continue;
+    const tiers = Array.isArray(source.tiers) ? source.tiers : [];
     const nums = tiers.map((tier) => Number(tier)).filter(Number.isFinite);
-    if (nums.length > 0) minTierByName.set(info.name, Math.min(...nums));
+    if (nums.length > 0) minTierByName.set(name, Math.min(...nums));
   }
 
   return { unitSynergies, minTierByName };

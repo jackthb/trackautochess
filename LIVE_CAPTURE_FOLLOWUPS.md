@@ -1,9 +1,3 @@
-# Live Capture Follow-Ups
-
-Notes from the June 2, 2026 live game test. These are product and engineering
-follow-ups discovered while validating nettable capture, diagnostics, and match
-timeline persistence.
-
 ## 1. Diagnostic Log Lifecycle
 
 Problem:
@@ -76,12 +70,6 @@ Problem:
 - The timeline extractor currently flattens `vchess_*` into a pipe-delimited
   lineup string and discards positions/items.
 
-Desired behavior:
-- Show each player's chess board at a chosen round/time.
-- Preserve board positions and per-piece items from `vchess_*`.
-- Start with board display only; future work can add matchup visualization
-  such as who is fighting whom.
-
 Proposed data direction:
 - Extend timeline player snapshots with a structured `board` array, for example:
 
@@ -123,15 +111,8 @@ Shared UI direction:
 - Board rendering should be shared between the Electron app and the web app.
 - Prefer a shared data model and rendering component contract under `shared/`
   rather than duplicating parsing and styles in both apps.
-- Define common TypeScript types for match timeline, player snapshot, board
-  piece, item ids, and board coordinates.
-- Consider a shared React board component if both web and Electron can consume
-  the same styling stack cleanly; otherwise share the model/parser first and
-  keep host-specific presentation thin.
 
 Open questions:
-- What exact coordinate system does `vchess_*` use, and how should it map to
-  the displayed board grid?
 - Are `item` and `lastitem` both needed for current board display, or should one
   be treated as historical/debug state?
 - Should the board timeline be stored inline in `match_timelines.timeline`, or

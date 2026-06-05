@@ -1,15 +1,9 @@
 import type { Metadata } from "next";
-import { BannerAd } from "@/components/BannerAd";
 import { EntityBrowser, type BrowsableEntity } from "@/components/EntityBrowser";
 import { SITE_NAME, SITE_TITLE } from "@/lib/site";
 import { DEFAULT_LOCALE } from "@/lib/i18n";
 import { COST_COLOR, COST_LABEL, getUnitsByCost } from "@/lib/units";
 import { getSynergyNameTranslator } from "@/lib/synergies";
-
-// App Router migration of pages/units.tsx — mirrors app/classes/page.tsx.
-// getStaticProps -> direct call in the Server Component (the data helpers are
-// sync JSON reads); SeoHead -> static metadata + a JSON-LD <script>; shared
-// chrome comes from app/layout.tsx. Single (English) locale.
 
 const title = `Units | ${SITE_TITLE}`;
 const description =
@@ -72,10 +66,6 @@ export default function UnitsPage() {
         data={data}
         tierLabel={COST_LABEL}
         tierColor={COST_COLOR}
-        sidebarLeft={<BannerAd slot="sidebar-left" />}
-        sidebarRight={<BannerAd slot="sidebar" />}
-        topAd={<BannerAd slot="in-content" />}
-        bottomAd={<BannerAd slot="in-content-2" />}
       />
     </>
   );

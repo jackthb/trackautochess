@@ -7,9 +7,6 @@ import {
 } from "@/lib/playerSearch";
 import { absoluteUrl, SITE_DESCRIPTION, SITE_NAME, SITE_TITLE } from "@/lib/site";
 
-// App Router migration of pages/index.tsx (home). ISR (revalidate 300) like the
-// old getStaticProps; the interactive search UI is the HomeSearch client island.
-
 export const revalidate = 300;
 
 const description =

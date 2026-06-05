@@ -2,8 +2,6 @@ import { NextResponse } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 
-// App Router migration of pages/api/auth/callback.ts — exchanges a Supabase OAuth
-// `code` for a session, writing the session cookies onto the redirect response.
 export async function GET(req: Request) {
   const url = new URL(req.url);
   const code = url.searchParams.get("code");

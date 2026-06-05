@@ -3,10 +3,6 @@ import { createClient } from "@supabase/supabase-js";
 import { captureServerEvent } from "@/lib/posthogServer";
 import { fetchSteamProfileFromApi, upsertSteamUser } from "@/lib/steam";
 
-// App Router migration of pages/api/auth/steam/callback.ts — verifies the Steam
-// OpenID assertion, upserts the user, mints a Supabase session, and redirects to
-// the dashboard with the tokens in the URL hash (the supabase-js client picks
-// them up via onAuthStateChange).
 const STEAM_OPENID_URL = "https://steamcommunity.com/openid/login";
 
 async function verifySteamAssertion(

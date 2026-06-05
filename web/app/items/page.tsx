@@ -1,14 +1,8 @@
 import type { Metadata } from "next";
-import { BannerAd } from "@/components/BannerAd";
 import { EntityBrowser, type BrowsableEntity } from "@/components/EntityBrowser";
 import { SITE_NAME, SITE_TITLE } from "@/lib/site";
 import { DEFAULT_LOCALE } from "@/lib/i18n";
 import { getAllItems, iconUrl, TIER_COLOR, TIER_LABEL } from "@/lib/items";
-
-// App Router migration of pages/items.tsx — mirrors app/classes/page.tsx.
-// getStaticProps -> direct call in the Server Component (the data helpers are
-// sync JSON reads); SeoHead -> static metadata + a JSON-LD <script>; shared
-// chrome comes from app/layout.tsx. Single (English) locale.
 
 const title = `Items | ${SITE_TITLE}`;
 const description =
@@ -72,10 +66,6 @@ export default function ItemsPage() {
         data={tiers}
         tierLabel={TIER_LABEL}
         tierColor={TIER_COLOR}
-        sidebarLeft={<BannerAd slot="sidebar-left" />}
-        sidebarRight={<BannerAd slot="sidebar" />}
-        topAd={<BannerAd slot="in-content" />}
-        bottomAd={<BannerAd slot="in-content-2" />}
       />
     </>
   );

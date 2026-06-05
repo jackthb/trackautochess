@@ -1,14 +1,8 @@
 import type { Metadata } from "next";
-import { BannerAd } from "@/components/BannerAd";
 import { EntityBrowser, type BrowsableEntity } from "@/components/EntityBrowser";
 import { SITE_NAME, SITE_TITLE } from "@/lib/site";
 import { DEFAULT_LOCALE } from "@/lib/i18n";
 import { getClasses } from "@/lib/synergies";
-
-// App Router migration of pages/classes.tsx — the template for the EntityBrowser
-// "list" pages. getStaticProps -> direct call in the Server Component (the data
-// helpers are sync JSON reads); SeoHead -> generateMetadata + a JSON-LD <script>;
-// shared chrome comes from app/layout.tsx. Single (English) locale.
 
 const title = `Classes | ${SITE_TITLE}`;
 const description =
@@ -62,11 +56,8 @@ export default function ClassesPage() {
       <EntityBrowser
         title="Classes"
         variant="synergy"
+        searchPlaceholder="Search classes..."
         data={data}
-        sidebarLeft={<BannerAd slot="sidebar-left" />}
-        sidebarRight={<BannerAd slot="sidebar" />}
-        topAd={<BannerAd slot="in-content" />}
-        bottomAd={<BannerAd slot="in-content-2" />}
       />
     </>
   );

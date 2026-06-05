@@ -15,20 +15,21 @@ pnpm --dir app install
 
 ## Data Pipeline
 
-Game data lives in committed JSON files under `content/`. `data/` is for assets
-and extractor scratch/output; app and web runtime readers consume `content/`.
+Game data lives in committed JSON files under `content/`. The app, web runtime,
+scraper, and VPK extractor all read/write that same content shape directly.
+`data/` is only for non-CMS assets/config such as icons, parser regions, and
+local extractor helper scripts.
 
 ```text
 content/*.json  ->  web generated runtime module    ->  web
 content/*.json  ->  Electron/Python content readers ->  desktop app
-VPK files       ->  data/extract_vpk.py             ->  legacy data output + data/icons/
-Steam changelog ->  scripts/scrape-patch-notes.mjs  ->  content/
+VPK files       ->  data/extract_vpk.py             ->  content/game + data/icons
+Steam changelog ->  scripts/scrape-patch-notes.mjs  ->  content/patch-notes + content/game
 ```
 
 - `node scripts/generate-web-runtime-data.mjs` - build web/generated runtime data from content
-- `node scripts/import-data-to-content.mjs` - one-off migration/recovery from legacy `data/`
 - `pnpm --dir web run dev` - run the web app and Keystatic at `/keystatic`
-- `python data/extract_vpk.py` - extract game data + icons from VPK
+- `python data/extract_vpk.py` - extract game data into `content/game` and icons into `data/icons`
 - `node scripts/scrape-patch-notes.mjs` - scrape new patch notes and update content files
 
 ## Editing content from a phone

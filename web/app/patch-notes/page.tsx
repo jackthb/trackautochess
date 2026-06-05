@@ -6,9 +6,6 @@ import { SITE_NAME, SITE_TITLE } from "@/lib/site";
 import { DEFAULT_LOCALE, pickLocalized } from "@/lib/i18n";
 import styles from "./patch-notes.module.css";
 
-// App Router migration of pages/patch-notes.tsx — presentational list of patch
-// notes. Server Component + static metadata + JSON-LD. Single (English) locale.
-
 interface IndexPatch {
   date: string;
   title: string;

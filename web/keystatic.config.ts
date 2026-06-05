@@ -194,10 +194,10 @@ export default config({
       path: `${contentPath}/game/talents/*`,
       slugField: "slot",
       format: { data: "json" },
-      columns: ["name"],
+      columns: ["title"],
       schema: {
         slot: fields.slug({ name: { label: "Slot" } }),
-        name: fields.text({ label: "Name" }),
+        title: fields.text({ label: "Name" }),
         description: fields.text({ label: "Description", multiline: true }),
       },
     }),

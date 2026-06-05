@@ -1,14 +1,8 @@
 import type { Metadata } from "next";
-import { BannerAd } from "@/components/BannerAd";
 import { EntityBrowser, type BrowsableEntity } from "@/components/EntityBrowser";
 import { SITE_NAME, SITE_TITLE } from "@/lib/site";
 import { DEFAULT_LOCALE } from "@/lib/i18n";
 import { getAllRelics } from "@/lib/relics";
-
-// App Router migration of pages/relics.tsx — mirrors app/classes/page.tsx.
-// getStaticProps -> direct call in the Server Component (the data helpers are
-// sync JSON reads); SeoHead -> static metadata + a JSON-LD <script>; shared
-// chrome comes from app/layout.tsx. Single (English) locale.
 
 const title = `Relics | ${SITE_TITLE}`;
 const description =
@@ -63,10 +57,6 @@ export default function RelicsPage() {
         title="Relics"
         variant="relic"
         data={data}
-        sidebarLeft={<BannerAd slot="sidebar-left" />}
-        sidebarRight={<BannerAd slot="sidebar" />}
-        topAd={<BannerAd slot="in-content" />}
-        bottomAd={<BannerAd slot="in-content-2" />}
       />
     </>
   );

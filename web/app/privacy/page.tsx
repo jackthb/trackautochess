@@ -43,14 +43,14 @@ export default function PrivacyPage() {
 
         <h2>What we collect</h2>
         <p>
-          We do not ask for or store personal information directly. We use Vercel
-          Analytics for anonymous pageview counts, Vercel Speed Insights for
-          performance, and PostHog for privacy-scoped product analytics (which
-          pages people visit and how features get used). Product events do not
-          include raw search text, tokens, or private dashboard/admin URLs.
-          PostHog only links events to an identified person profile after you
-          sign in with Steam, in which case the profile is keyed by your Steam
-          ID. The browser&apos;s Do Not Track signal is respected.
+          We do not ask for or store personal information directly. We use
+          Vercel Analytics for anonymous pageview counts, Vercel Speed Insights
+          for performance, and PostHog for privacy-scoped product analytics
+          (which pages people visit and how features get used). Product events
+          do not include raw search text, tokens, or private dashboard/admin
+          URLs. PostHog only links events to an identified person profile after
+          you sign in with Steam, in which case the profile is keyed by your
+          Steam ID. The browser&apos;s Do Not Track signal is respected.
         </p>
 
         <h2>Cookies</h2>
@@ -58,16 +58,6 @@ export default function PrivacyPage() {
           PostHog analytics cookies are only set after you accept analytics
           cookies. If you decline, PostHog runs in cookieless mode. Third-party
           services described below may set their own cookies in your browser.
-        </p>
-
-        <h2>Advertising</h2>
-        <p>
-          This site may display banner ads served by Adsterra or direct
-          sponsor/job placements configured by the site owner. Adsterra and its
-          partners may use cookies, device identifiers, and similar technologies
-          to select and measure ads. Direct placements do not run third-party ad
-          scripts. We do not share user data with advertisers; ad networks
-          operate independently within the ad slots embedded on the page.
         </p>
 
         <h2>Third-party services</h2>

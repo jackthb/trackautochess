@@ -6,11 +6,6 @@ import browserStyles from "@/components/EntityBrowser.module.css";
 import cardStyles from "@/components/EntityCard.module.css";
 import { PageLayout } from "@/components/PageLayout";
 
-// App Router migration of pages/talents.tsx. getStaticProps -> direct call in
-// the Server Component (the data helpers are sync JSON reads); SeoHead ->
-// static metadata + a JSON-LD <script>; shared chrome comes from
-// app/layout.tsx. Single (English) locale.
-
 const title = `Talents | ${SITE_TITLE}`;
 const description =
   "Browse all Dota Auto Chess talent choices by round, compare branch A/B effects, and quickly cross-reference patch notes updates.";

@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
 
-// App Router migration of pages/api/auth/steam.ts — kicks off Steam OpenID login.
 const STEAM_OPENID_URL = "https://steamcommunity.com/openid/login";
 
 export function GET(req: Request) {

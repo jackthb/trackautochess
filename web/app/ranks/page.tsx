@@ -5,10 +5,6 @@ import browserStyles from "@/components/EntityBrowser.module.css";
 import { PageLayout } from "@/components/PageLayout";
 import styles from "./ranks.module.css";
 
-// App Router migration of pages/ranks.tsx. useRouter/next-router dropped — the
-// page is a plain Server Component; SeoHead -> static metadata + a JSON-LD
-// <script>; styled-jsx -> ranks.module.css. Single (English) locale.
-
 const t = {
   title: `Ranks | ${SITE_TITLE}`,
   description:

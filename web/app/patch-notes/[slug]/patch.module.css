@@ -164,13 +164,7 @@
   margin-bottom: var(--s-4);
 }
 .entry-icon {
-  flex-shrink: 0;
-  width: auto;
   height: 32px;
-  object-fit: contain;
-  border: 1px solid var(--border);
-  border-radius: var(--r-4);
-  background: var(--bg-deep);
 }
 .entry-name {
   font-size: var(--fs-14);

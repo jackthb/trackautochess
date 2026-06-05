@@ -6,11 +6,8 @@ Auto-discovers VPK from local Steam installation.
 Diff mode: --diff <old_dir> shows what changed.
 
 Writes:
-  data/synergies.json   — synergy traits with tiers, descriptions, lore
-  data/items_full.json  — items with descriptions, quality, lore
-  data/relics.json      — relics with descriptions
-  data/units_full.json  — units with stats at each star level
-  data/aliases.json     — alt unit-name spellings → canonical name
+  content/game/*        — CMS-format game data records
+  data/icons/*          — extracted icon assets
 
 Usage:
   python extract_vpk.py                    # auto-discover VPK, extract all
@@ -811,10 +808,10 @@ def extract_all(pak):
 # Text corrections
 # ════════════════════════════════════════════════════════════════════
 
-def load_corrections(data_dir):
-    """Load text_corrections.json. Returns a list of compiled corrections,
+def load_corrections(game_dir):
+    """Load text-corrections.json. Returns a list of compiled corrections,
     or [] if the file is missing or malformed."""
-    path = Path(data_dir) / 'text_corrections.json'
+    path = Path(game_dir) / 'text-corrections.json'
     if not path.exists():
         return []
     raw = json.loads(path.read_text(encoding='utf-8'))
@@ -827,7 +824,7 @@ def load_corrections(data_dir):
         try:
             pattern = re.compile(find)
         except re.error as exc:
-            print(f"  text_corrections: skipping invalid regex {find!r}: {exc}")
+            print(f"  text-corrections: skipping invalid regex {find!r}: {exc}")
             continue
         where = entry.get('where')
         out.append({
@@ -866,83 +863,6 @@ def apply_corrections(data, corrections):
     for kind, payload in data.items():
         data[kind] = apply_corrections_to_value(payload, corrections, kind)
     return data
-
-
-# ════════════════════════════════════════════════════════════════════
-# items.json reconciliation
-# ════════════════════════════════════════════════════════════════════
-
-def reconcile_items_json(out_dir, items_full):
-    """Reconcile the hand-curated items.json tier list against VPK canonical
-    names. items.json is the source of truth for *which* items the game
-    actually uses (the VPK contains unused/test items too, so we don't
-    auto-generate it). But its keys drift from the VPK localization over time
-    — "Gossamar Cape" vs "Gossamer Cape", "Spider Legs" vs "Spider Leg" — and
-    every drifted key silently breaks the /items page join that fetches
-    descriptions.
-
-    On each extraction, auto-rename any items.json key whose normalized form
-    matches a VPK name via a fuzzy heuristic (normalized equality, trailing
-    's' toggle, difflib close match). Warn loudly about anything that can't
-    be reconciled so the curator can investigate.
-    """
-    import difflib
-    items_path = Path(out_dir) / 'items.json'
-    if not items_path.exists():
-        return
-    data = json.loads(items_path.read_text(encoding='utf-8'))
-    simple = data.get('items', data)
-
-    def norm(s):
-        return s.lower().replace(' ', '').replace("'", '')
-
-    full_by_norm = {}
-    for v in items_full.values():
-        if v.get('name'):
-            full_by_norm[norm(v['name'])] = v['name']
-
-    renames = {}
-    orphans = []
-    for name in list(simple.keys()):
-        n = norm(name)
-        # 1. exact normalized match
-        if n in full_by_norm:
-            canonical = full_by_norm[n]
-            if canonical != name:
-                renames[name] = canonical
-            continue
-        # 2. toggle trailing 's' ("Spider Legs" -> "Spider Leg")
-        alt = n[:-1] if n.endswith('s') else n + 's'
-        if alt in full_by_norm:
-            renames[name] = full_by_norm[alt]
-            continue
-        # 3. fuzzy close-match as last resort
-        close = difflib.get_close_matches(n, full_by_norm.keys(), n=1, cutoff=0.85)
-        if close:
-            renames[name] = full_by_norm[close[0]]
-            continue
-        orphans.append(name)
-
-    if renames:
-        print(f"\nitems.json reconcile: renaming {len(renames)} drifted key(s)")
-        new_items = {}
-        for k, v in simple.items():
-            new_items[renames.get(k, k)] = v
-        if 'items' in data:
-            data['items'] = new_items
-        else:
-            data = new_items
-        items_path.write_text(
-            json.dumps(data, indent=2, ensure_ascii=False) + '\n',
-            encoding='utf-8',
-        )
-        for old, new in renames.items():
-            print(f"  {old!r:<30s} -> {new!r}")
-
-    if orphans:
-        print(f"\nitems.json orphans ({len(orphans)}) — no VPK match, check manually:")
-        for o in orphans:
-            print(f"  {o!r}")
 
 
 # ════════════════════════════════════════════════════════════════════
@@ -1019,15 +939,203 @@ def print_diff(category, old_data, new_data):
 
 
 # ════════════════════════════════════════════════════════════════════
+# Content output
+# ════════════════════════════════════════════════════════════════════
+
+def slugify(value):
+    return re.sub(r'[^a-z0-9]+', '-', str(value).lower().replace('&', ' and ')).strip('-')[:80]
+
+
+UNIT_STEM_MAP = {
+    'Blood Seeker': 'bloodseeker',
+    'Spectres': 'spectre',
+    'DarkSeer': 'dark_seer',
+}
+
+
+SYN_ICON_MAP = {
+    'Demon Hunter': 'demonhunter',
+    'Elemental': 'element',
+    'Faceless': 'nraqi',
+    'Pandaren': 'pandaman',
+}
+
+
+def read_json_if_exists(path):
+    if not path.exists():
+        return None
+    with open(path, encoding='utf-8') as f:
+        return json.load(f)
+
+
+def write_json(path, value):
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with open(path, 'w', encoding='utf-8') as f:
+        json.dump(value, f, indent=2, ensure_ascii=False)
+        f.write('\n')
+
+
+def content_icon_ref(icons_dir, category, stem):
+    file = f'{category}/{stem}.png'
+    return file if (icons_dir / file).exists() else None
+
+
+def unit_icon_stem(name):
+    return UNIT_STEM_MAP.get(name) or name.lower().replace(' ', '_').replace('-', '_').replace("'", '')
+
+
+def item_icon_stem(game_id, item):
+    stem = item.get('texture') or game_id
+    return (
+        stem.replace('item_custom/', '')
+        .replace('custom/', '')
+        .replace('item_', '')
+        .lower()
+        .replace(' ', '_')
+        .replace('-', '_')
+    )
+
+
+def synergy_icon_stem(name):
+    return SYN_ICON_MAP.get(name) or name.lower().replace(' ', '')
+
+
+def relic_icon_stem(name):
+    return name.lower().replace(' ', '_').replace('-', '_')
+
+
+def content_entity(game_id, name, source, icon, existing):
+    source_without_legacy_icons = dict(source)
+    source_without_legacy_icons.pop('icon', None)
+    source_without_legacy_icons.pop('icon_url', None)
+    source_without_legacy_icons.pop('icon_dimensions', None)
+    entity = {
+        'gameId': game_id,
+        'name': name,
+        'slug': slugify(name or game_id),
+        'source': source_without_legacy_icons,
+        'overrides': (existing or {}).get('overrides', {}),
+    }
+    if icon:
+        entity['icon'] = icon
+    return entity
+
+
+def write_content_outputs(content_dir, icons_dir, data, aliases):
+    game_dir = content_dir / 'game'
+
+    write_json(game_dir / 'aliases.json', aliases)
+    write_json(game_dir / 'game-mode.json', data['game_mode'])
+
+    for name, unit in sorted(data['units_full'].items()):
+        game_id = unit.get('id') or slugify(name)
+        path = game_dir / 'units' / f'{slugify(name)}.json'
+        write_json(
+            path,
+            content_entity(
+                game_id,
+                name,
+                unit,
+                content_icon_ref(icons_dir, 'units', unit_icon_stem(name)),
+                read_json_if_exists(path),
+            ),
+        )
+
+    for game_id, item in sorted(data['items_full'].items()):
+        name = item.get('name') or game_id
+        path = game_dir / 'items' / f'{game_id}.json'
+        write_json(
+            path,
+            content_entity(
+                game_id,
+                name,
+                item,
+                content_icon_ref(icons_dir, 'items', item_icon_stem(game_id, item)),
+                read_json_if_exists(path),
+            ),
+        )
+
+    for game_id, synergy in sorted(data['synergies'].items()):
+        name = synergy.get('name') or game_id
+        path = game_dir / 'synergies' / f'{game_id}.json'
+        write_json(
+            path,
+            content_entity(
+                game_id,
+                name,
+                synergy,
+                content_icon_ref(icons_dir, 'synergies', synergy_icon_stem(name)),
+                read_json_if_exists(path),
+            ),
+        )
+
+    for game_id, relic in sorted(data['relics'].get('relics', {}).items()):
+        name = relic.get('name') or game_id
+        path = game_dir / 'relics' / f'{game_id}.json'
+        write_json(
+            path,
+            content_entity(
+                game_id,
+                name,
+                relic,
+                content_icon_ref(icons_dir, 'relics', relic_icon_stem(name)),
+                read_json_if_exists(path),
+            ),
+        )
+
+    for slot, talent in sorted(data['talents'].items()):
+        path = game_dir / 'talents' / f'{slugify(slot)}.json'
+        write_json(path, {'slot': slot, **talent})
+
+    for game_id, ability in sorted(data['abilities'].items()):
+        path = game_dir / 'abilities' / f'{game_id}.json'
+        write_json(path, {'gameId': game_id, **ability})
+
+
+def _content_source(entry):
+    return entry.get('source') if isinstance(entry.get('source'), dict) else entry
+
+
+def _read_content_collection(game_dir, relative_dir, key_by):
+    collection_dir = game_dir / relative_dir
+    if not collection_dir.exists():
+        return {}
+    records = {}
+    for path in sorted(collection_dir.glob('*.json')):
+        entry = read_json_if_exists(path)
+        if not isinstance(entry, dict):
+            continue
+        key = key_by(entry)
+        if key:
+            records[key] = _content_source(entry)
+    return records
+
+
+def read_content_snapshot(content_dir):
+    base_dir = Path(content_dir)
+    game_dir = base_dir / 'game' if (base_dir / 'game').exists() else base_dir
+    game_mode = read_json_if_exists(game_dir / 'game-mode.json') or {}
+    return {
+        'synergies': _read_content_collection(game_dir, 'synergies', lambda e: e.get('gameId') or e.get('slug')),
+        'items_full': _read_content_collection(game_dir, 'items', lambda e: e.get('gameId') or e.get('slug')),
+        'relics': {'relics': _read_content_collection(game_dir, 'relics', lambda e: e.get('gameId') or e.get('slug'))},
+        'units_full': _read_content_collection(game_dir, 'units', lambda e: e.get('name') or e.get('slug')),
+        'abilities': _read_content_collection(game_dir, 'abilities', lambda e: e.get('gameId') or e.get('slug')),
+        'talents': _read_content_collection(game_dir, 'talents', lambda e: e.get('slot') or e.get('slug')),
+        'game_mode': game_mode,
+    }
+
+
+# ════════════════════════════════════════════════════════════════════
 # Main
 # ════════════════════════════════════════════════════════════════════
 
 def main():
     parser = argparse.ArgumentParser(description='Extract DAC game data from VPK')
     parser.add_argument('vpk_path', nargs='?', help='Path to VPK file (auto-discovered if omitted)')
-    parser.add_argument('--diff', metavar='OLD_DIR', help='Diff against previous extraction in OLD_DIR')
-    parser.add_argument('--out', metavar='DIR', default=str(Path(__file__).parent),
-                        help='Output directory (default: same as script)')
+    parser.add_argument('--diff', metavar='OLD_CONTENT_DIR', help='Diff against a previous content/ snapshot')
+    parser.add_argument('--out', metavar='DIR', default=str(Path(__file__).parent.parent / 'content'),
+                        help='Content output directory (default: repo content/)')
     args = parser.parse_args()
 
     # Find VPK
@@ -1050,8 +1158,12 @@ def main():
     try:
         import vpk as vpk_mod
     except ImportError:
-        venv_path = Path(__file__).parent.parent / 'app/backend/.venv/lib/python3.12/site-packages'
-        sys.path.insert(0, str(venv_path))
+        backend_venv = Path(__file__).parent.parent / 'app/backend/.venv'
+        for venv_path in (
+            backend_venv / 'Lib/site-packages',
+            backend_venv / 'lib/python3.12/site-packages',
+        ):
+            sys.path.insert(0, str(venv_path))
         import vpk as vpk_mod
 
     pak = vpk_mod.open(str(vpk_path))
@@ -1067,60 +1179,16 @@ def main():
     aliases = data.pop('aliases', {})
 
     # Apply text corrections (typo fixes baked into source-of-truth JSON)
-    corrections = load_corrections(Path(args.out))
+    out_dir = Path(args.out)
+    game_dir = out_dir / 'game'
+    icons_dir = Path(__file__).parent / 'icons'
+
+    corrections = load_corrections(game_dir)
     if corrections:
-        print(f"text_corrections: applying {len(corrections)} rule(s)")
+        print(f"text-corrections: applying {len(corrections)} rule(s)")
         apply_corrections(data, corrections)
 
-    # Write output
-    out_dir = Path(args.out)
-    file_map = {
-        'synergies': 'synergies.json',
-        'items_full': 'items_full.json',
-        'relics': 'relics.json',
-        'units_full': 'units_full.json',
-        'abilities': 'abilities.json',
-        'talents': 'talents.json',
-        'game_mode': 'game_mode.json',
-    }
-
-    for key, filename in file_map.items():
-        out_path = out_dir / filename
-        # Preserve existing icon_url / icon_dimensions that the VPK doesn't carry.
-        if out_path.exists():
-            try:
-                with open(out_path, encoding='utf-8') as f:
-                    existing = json.load(f)
-                # Unwrap containers like {"units": {...}} or {"relics": {...}}
-                inner_key = None
-                for ik in ('units', 'relics', 'items'):
-                    if isinstance(existing, dict) and ik in existing and isinstance(existing[ik], dict):
-                        inner_key = ik
-                        break
-                existing_records = existing[inner_key] if inner_key else existing
-                new_data = data[key]
-                new_records = new_data[inner_key] if inner_key and isinstance(new_data, dict) and inner_key in new_data else new_data
-                if isinstance(existing_records, dict) and isinstance(new_records, dict):
-                    for rec_key, rec in new_records.items():
-                        if isinstance(rec, dict) and rec_key in existing_records:
-                            old = existing_records[rec_key]
-                            if isinstance(old, dict):
-                                if old.get('icon_url') and not rec.get('icon_url'):
-                                    rec['icon_url'] = old['icon_url']
-                                if old.get('icon_dimensions') and not rec.get('icon_dimensions'):
-                                    rec['icon_dimensions'] = old['icon_dimensions']
-            except Exception:
-                pass
-        with open(out_path, 'w', encoding='utf-8') as f:
-            json.dump(data[key], f, indent=2, ensure_ascii=False)
-
-    # Aliases: a flat {alt-spelling: canonical} map, written verbatim (kept out
-    # of the loop above so text corrections / icon preservation don't touch it).
-    with open(out_dir / 'aliases.json', 'w', encoding='utf-8') as f:
-        json.dump(aliases, f, indent=2, ensure_ascii=False)
-
     # ── Extract item/synergy/relic icons from VPK ──
-    icons_dir = out_dir / 'icons'
     icon_count = 0
     icon_sources = {
         'items': {it.get('texture', ''): it['name'] for it in data['items_full'].values() if it.get('texture')},
@@ -1169,30 +1237,30 @@ def main():
     if icon_count:
         print(f"\nIcons: extracted {icon_count} new icon(s) from VPK")
 
+    write_content_outputs(out_dir, icons_dir, data, aliases)
+    print(f"content: wrote game entities to {game_dir}")
+
     # Summary
-    print(f"synergies.json:   {len(data['synergies'])} synergies")
+    print(f"synergies:        {len(data['synergies'])} synergies")
     for sid, s in data['synergies'].items():
         print(f"  {s['name']}: tiers={s['tiers']}")
 
     qc = Counter(i['quality'] for i in data['items_full'].values())
-    print(f"\nitems_full.json:  {len(data['items_full'])} items")
+    print(f"\nitems:            {len(data['items_full'])} items")
     print(f"  By quality: {dict(qc)}")
 
     relics_inner = data['relics'].get('relics', {})
-    print(f"\nrelics.json:      {len(relics_inner)} relics")
+    print(f"\nrelics:           {len(relics_inner)} relics")
 
     by_cost = Counter(u['cost'] for u in data['units_full'].values() if u['cost'])
-    print(f"\nunits_full.json:  {len(data['units_full'])} units")
+    print(f"\nunits:            {len(data['units_full'])} units")
     print(f"  By cost: {dict(sorted(by_cost.items()))}")
 
-    print(f"\naliases.json:     {len(aliases)} alt-name aliases")
-    print(f"\nabilities.json:   {len(data['abilities'])} active abilities")
-    print(f"talents.json:     {len(data['talents'])} talent slots")
+    print(f"\naliases:          {len(aliases)} alt-name aliases")
+    print(f"\nabilities:        {len(data['abilities'])} active abilities")
+    print(f"talents:          {len(data['talents'])} talent slots")
     gm = data['game_mode']
-    print(f"game_mode.json:   {len(gm['drop_relic_list'])} drop relics, prepare_timer={gm['prepare_timer']}, battle_timer={gm['battle_timer']}")
-
-    # ── Audit hand-curated items.json against VPK canonical names ──
-    reconcile_items_json(out_dir, data['items_full'])
+    print(f"game mode:        {len(gm['drop_relic_list'])} drop relics, prepare_timer={gm['prepare_timer']}, battle_timer={gm['battle_timer']}")
 
     # ── Diff ──
     if args.diff:
@@ -1201,26 +1269,22 @@ def main():
         print(f"DIFF vs {old_dir}")
         print(f"{'='*60}")
 
-        for key, filename in file_map.items():
-            old_path = old_dir / filename
-            if not old_path.exists():
-                print(f"\n  {filename}: no previous file")
-                continue
-
-            with open(old_path, encoding='utf-8') as f:
-                old_data = json.load(f)
-
-            new_data = data[key]
+        old_snapshot = read_content_snapshot(old_dir)
+        for key, new_data in data.items():
+            old_data = old_snapshot.get(key)
 
             # Unwrap containers
-            if key == 'relics':
+            if old_data is None:
+                old_inner = None
+                new_inner = new_data
+            elif key == 'relics':
                 old_inner = old_data.get('relics', old_data)
                 new_inner = new_data.get('relics', new_data)
             else:
                 old_inner = old_data
                 new_inner = new_data
 
-            print_diff(filename, old_inner, new_inner)
+            print_diff(key, old_inner, new_inner)
 
 if __name__ == '__main__':
     main()

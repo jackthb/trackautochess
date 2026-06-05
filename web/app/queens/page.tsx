@@ -153,7 +153,7 @@ export default async function QueensPage() {
     <PageLayout title="Queen Players">
       <p className={styles.lead}>
         Latest in-game Queen ladder output captured by the desktop tracker
-        {season ? ` for ${season.filter("_").toUpperCase()}` : ""}. Rows are replaced when
+        {season ? ` for ${season.replace(/_/g, " ").toUpperCase()}` : ""}. Rows are replaced when
         a fresh ladder upload is accepted. Season stats fill in after a profile
         is refreshed; signed-in owners are checked about hourly in the
         background.

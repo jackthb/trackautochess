@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { EntityCard, type EntityCardVariant } from "@/components/EntityCard";
 import { bucketCount, trackEvent } from "@/lib/analytics";
 import { DEFAULT_LOCALE } from "@/lib/i18n";
@@ -38,20 +38,12 @@ interface EntityBrowserProps {
    * is tier 1, index 1 is tier 2, etc.
    */
   data: BrowsableEntity[] | BrowsableEntity[][];
-  /** Formats the tier label (e.g. "Tier 1"). Only used for tiered data. */
   // Maps (not functions) so these props stay serializable across the App
   // Router Server -> Client Component boundary.
   tierLabel?: Record<number, string>;
-  /** Returns a CSS color expression for the tier. */
   tierColor?: Record<number, string>;
-  /** Optional left-rail content (rendered desktop-only). */
-  sidebarLeft?: ReactNode;
-  /** Optional right-rail content (rendered desktop-only). */
-  sidebarRight?: ReactNode;
-  /** Optional in-content content rendered between the title block and the grid. */
-  topAd?: ReactNode;
-  /** Optional in-content content rendered after the grid. */
-  bottomAd?: ReactNode;
+  /** Overrides the default "Search <variant>..." placeholder. */
+  searchPlaceholder?: string;
 }
 const ENTITY_PATH: Record<EntityCardVariant, string> = {
   item: "items",
@@ -89,12 +81,8 @@ export function EntityBrowser({
   data,
   tierLabel,
   tierColor,
-  sidebarLeft,
-  sidebarRight,
-  topAd,
-  bottomAd,
+  searchPlaceholder,
 }: EntityBrowserProps) {
-  const hasSidebar = Boolean(sidebarLeft || sidebarRight);
   // Single (English) locale since i18n routing was removed.
   const locale = DEFAULT_LOCALE;
   const [query, setQuery] = useState("");
@@ -124,7 +112,7 @@ export function EntityBrowser({
       ? styles.gridRelic
       : styles.gridItem
   }`;
-  const placeholder = SEARCH_PLACEHOLDER[variant];
+  const placeholder = searchPlaceholder ?? SEARCH_PLACEHOLDER[variant];
   const countWord = COUNT_LABEL[variant];
   const collectionPath = ENTITY_COLLECTION_PATH[variant];
   const total = filteredTiered
@@ -146,10 +134,7 @@ export function EntityBrowser({
 
   return (
     <div className={styles.page}>
-      <div className={hasSidebar ? styles.layoutWithSidebar : styles.layout}>
-        {hasSidebar && (
-          <aside className={styles.sidebarLeft}>{sidebarLeft}</aside>
-        )}
+      <div className={styles.layout}>
         <div className={styles.container}>
           <h1 className={styles.pageTitle}>{title}</h1>
         <input
@@ -161,8 +146,6 @@ export function EntityBrowser({
         <div className={styles.total}>
           {total} {countWord}
         </div>
-
-        {topAd && <div className={styles.topAd}>{topAd}</div>}
 
         {filteredTiered &&
           filteredTiered
@@ -231,11 +214,7 @@ export function EntityBrowser({
           </section>
         )}
 
-        {bottomAd && <div className={styles.topAd}>{bottomAd}</div>}
         </div>
-        {hasSidebar && (
-          <aside className={styles.sidebarRight}>{sidebarRight}</aside>
-        )}
       </div>
     </div>
   );

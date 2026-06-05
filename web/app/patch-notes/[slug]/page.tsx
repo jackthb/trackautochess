@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { HideOnErrorImg } from "@/components/HideOnErrorImg";
+import { EntityIcon } from "@/components/EntityIcon";
 import { patchIndexData, patchesBySlugData } from "@/generated/content-data";
 import { getItemBySlug, iconUrl } from "@/lib/items";
 import { getRelicBySlug } from "@/lib/relics";
@@ -350,10 +350,11 @@ export default async function PatchDetailPage({ params }: Props) {
                     <div>
                       <div className={styles["entry-name-row"]}>
                         {iconSrc && (
-                          <HideOnErrorImg
-                            className={styles["entry-icon"]}
+                          <EntityIcon
                             src={iconSrc}
                             alt=""
+                            bordered={entry.entity_type !== "unit"}
+                            className={styles["entry-icon"]}
                           />
                         )}
                         {href ? (

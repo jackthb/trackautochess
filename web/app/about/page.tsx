@@ -2,10 +2,6 @@ import type { Metadata } from "next";
 import { SITE_NAME, SITE_TITLE } from "@/lib/site";
 import { AboutContent } from "./AboutContent";
 
-// App Router migration of pages/about.tsx. The page is a Server Component that
-// owns metadata + the AboutPage JSON-LD, and renders a "use client" island
-// (AboutContent) holding the support-form state and submit logic.
-
 const title = `About | ${SITE_TITLE}`;
 const description =
   "How Tracker Autochess surfaces Dota Auto Chess player statistics from Drodo profile data and manually tracked match history.";

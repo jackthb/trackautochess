@@ -15,10 +15,6 @@ import GameView, {
 } from "@/components/game/GameView";
 import { buildGameSeo, parseRelicHistory } from "@/components/game/gameData";
 
-// App Router migration of pages/games/[id].tsx. The old getServerSideProps body
-// lives here verbatim, wrapped in React cache() so generateMetadata and the page
-// component share a single fetch per request. GamePage (now GameView) is a
-// "use client" component in @/components/game/GameView.
 export const dynamic = "force-dynamic";
 
 function mmrLevelToRank(level: number | null | undefined): string {

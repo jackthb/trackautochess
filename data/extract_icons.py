@@ -21,6 +21,7 @@ import urllib.request
 from pathlib import Path
 
 DATA_DIR = Path(__file__).parent
+CONTENT_GAME_DIR = DATA_DIR.parent / "content" / "game"
 ICONS_DIR = DATA_DIR / "icons"
 
 WORKSHOP_ID = "1613886175"
@@ -65,7 +66,7 @@ DAC_TO_DOTA2_HERO: dict[str, str | None] = {
 }
 
 # ── Synergy icon overrides ──────────────────────────────────────────────────
-# synergy_id (from synergies.json key, without "is_" prefix) → source info.
+# synergy_id (from content/game/synergies gameId, without "is_" prefix) → source info.
 # Most synergy icons come from VPK custom spellicons or were manually sourced.
 # This map provides fallback URLs for icons not found in the VPK.
 SYNERGY_CDN_OVERRIDES: dict[str, str] = {
@@ -82,6 +83,69 @@ def _dota2_hero_name(dac_name: str) -> str | None:
     if dac_name in DAC_TO_DOTA2_HERO:
         return DAC_TO_DOTA2_HERO[dac_name]
     return _unit_stem(dac_name)
+
+
+def _read_json(path: Path):
+    return json.loads(path.read_text(encoding="utf-8"))
+
+
+def _materialize_content_entity(entry: dict) -> dict:
+    source = entry.get("source") if isinstance(entry.get("source"), dict) else {}
+    out = dict(source)
+    if entry.get("icon"):
+        out["icon"] = entry["icon"]
+    overrides = entry.get("overrides") if isinstance(entry.get("overrides"), dict) else {}
+    for key, value in overrides.items():
+        if value is not None:
+            out[key] = value
+    return out
+
+
+def _read_collection(relative_dir: str) -> list[dict]:
+    collection_dir = CONTENT_GAME_DIR / relative_dir
+    if not collection_dir.exists():
+        return []
+    return [
+        _read_json(path)
+        for path in sorted(collection_dir.glob("*.json"))
+    ]
+
+
+def _load_units_full() -> dict[str, dict]:
+    units: dict[str, dict] = {}
+    for entry in _read_collection("units"):
+        name = entry.get("name")
+        if name:
+            units[name] = {"id": entry.get("gameId"), **_materialize_content_entity(entry)}
+    return units
+
+
+def _load_synergies() -> dict[str, dict]:
+    return {
+        entry.get("gameId") or entry.get("slug"): _materialize_content_entity(entry)
+        for entry in _read_collection("synergies")
+        if entry.get("gameId") or entry.get("slug")
+    }
+
+
+def _load_items_simple() -> dict:
+    return _read_json(CONTENT_GAME_DIR / "curated-items.json")["items"]
+
+
+def _load_items_full() -> dict[str, dict]:
+    return {
+        entry.get("gameId") or entry.get("slug"): _materialize_content_entity(entry)
+        for entry in _read_collection("items")
+        if entry.get("gameId") or entry.get("slug")
+    }
+
+
+def _load_relics() -> dict[str, dict]:
+    return {
+        entry.get("gameId") or entry.get("slug"): _materialize_content_entity(entry)
+        for entry in _read_collection("relics")
+        if entry.get("gameId") or entry.get("slug")
+    }
 
 
 def _download(url: str, dest: Path) -> bool:
@@ -109,8 +173,12 @@ def _load_vpk():
     if not VPK_PATH.exists():
         return None
     try:
-        vpk_dir = Path(__file__).parent.parent / "tracker/.venv/lib/python3.12/site-packages"
-        sys.path.insert(0, str(vpk_dir))
+        backend_venv = Path(__file__).parent.parent / "app/backend/.venv"
+        for vpk_dir in (
+            backend_venv / "Lib/site-packages",
+            backend_venv / "lib/python3.12/site-packages",
+        ):
+            sys.path.insert(0, str(vpk_dir))
         import vpk
         return vpk.open(str(VPK_PATH))
     except Exception as e:
@@ -137,7 +205,7 @@ def _extract_vpk_png(pak, vpk_path: str, dest: Path) -> bool:
 
 def extract_units(force: bool, dry_run: bool) -> tuple[int, int, int]:
     """Extract unit minimap icons from Steam CDN."""
-    units = json.loads((DATA_DIR / "units_full.json").read_text(encoding="utf-8"))
+    units = _load_units_full()
     out_dir = ICONS_DIR / "units"
     out_dir.mkdir(parents=True, exist_ok=True)
 
@@ -180,7 +248,7 @@ def extract_units(force: bool, dry_run: bool) -> tuple[int, int, int]:
 
 def extract_synergies(force: bool, dry_run: bool, pak) -> tuple[int, int, int]:
     """Extract synergy icons from VPK custom spellicons or CDN."""
-    synergies = json.loads((DATA_DIR / "synergies.json").read_text(encoding="utf-8"))
+    synergies = _load_synergies()
     out_dir = ICONS_DIR / "synergies"
     out_dir.mkdir(parents=True, exist_ok=True)
 
@@ -260,12 +328,12 @@ def extract_synergies(force: bool, dry_run: bool, pak) -> tuple[int, int, int]:
 
 def extract_items(force: bool, dry_run: bool, pak) -> tuple[int, int, int]:
     """Extract item icons from VPK or Steam CDN."""
-    items = json.loads((DATA_DIR / "items.json").read_text(encoding="utf-8"))["items"]
-    items_full = json.loads((DATA_DIR / "items_full.json").read_text(encoding="utf-8"))
+    items = _load_items_simple()
+    items_full = _load_items_full()
     out_dir = ICONS_DIR / "items"
     out_dir.mkdir(parents=True, exist_ok=True)
 
-    # Build texture map from items_full.json
+    # Build texture map from content/game/items source data.
     # item display name → texture name
     texture_by_name: dict[str, str] = {}
     for iid, idata in items_full.items():
@@ -337,8 +405,8 @@ def extract_items(force: bool, dry_run: bool, pak) -> tuple[int, int, int]:
 
 def extract_relics(force: bool, dry_run: bool, pak) -> tuple[int, int, int]:
     """Extract relic icons from VPK or Steam CDN."""
-    relics = json.loads((DATA_DIR / "relics.json").read_text(encoding="utf-8"))["relics"]
-    items_full = json.loads((DATA_DIR / "items_full.json").read_text(encoding="utf-8"))
+    relics = _load_relics()
+    items_full = _load_items_full()
     out_dir = ICONS_DIR / "relics"
     out_dir.mkdir(parents=True, exist_ok=True)
 
@@ -403,7 +471,7 @@ def audit():
     print("=== Icon Audit ===\n")
 
     # Units
-    units = json.loads((DATA_DIR / "units_full.json").read_text(encoding="utf-8"))
+    units = _load_units_full()
     unit_dir = ICONS_DIR / "units"
     missing_units = []
     for name in sorted(units):
@@ -415,7 +483,7 @@ def audit():
         print(f"  MISSING: {m}")
 
     # Synergies
-    synergies = json.loads((DATA_DIR / "synergies.json").read_text(encoding="utf-8"))
+    synergies = _load_synergies()
     syn_dir = ICONS_DIR / "synergies"
     missing_syns = []
     for sid, sdata in sorted(synergies.items()):
@@ -427,7 +495,7 @@ def audit():
         print(f"  MISSING: {m}")
 
     # Items
-    items = json.loads((DATA_DIR / "items.json").read_text(encoding="utf-8"))["items"]
+    items = _load_items_simple()
     item_dir = ICONS_DIR / "items"
     missing_items = []
     for name, idata in sorted(items.items()):
@@ -439,7 +507,7 @@ def audit():
         print(f"  MISSING: {m}")
 
     # Relics
-    relics = json.loads((DATA_DIR / "relics.json").read_text(encoding="utf-8"))["relics"]
+    relics = _load_relics()
     relic_dir = ICONS_DIR / "relics"
     missing_relics = []
     for rid, rdata in sorted(relics.items()):
