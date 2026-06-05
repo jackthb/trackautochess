@@ -7,10 +7,12 @@ import { createSupabaseClient } from "@/lib/supabase";
 
 const KeystaticApp = dynamic(() => import("./keystatic"), { ssr: false });
 
+const DEV_BYPASS = process.env.NODE_ENV === "development";
+
 type GateState = "loading" | "allowed" | "denied";
 
 export default function AdminGate() {
-  const [state, setState] = useState<GateState>("loading");
+  const [state, setState] = useState<GateState>(DEV_BYPASS ? "allowed" : "loading");
 
   useEffect(() => {
     const supabase = createSupabaseClient();
