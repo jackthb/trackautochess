@@ -1,4 +1,4 @@
-import { collection, config, fields } from "@keystatic/core";
+import { collection, config, fields, singleton } from "@keystatic/core";
 
 const githubRepo = "jackthb/dac-tools" as const;
 // The storage *kind* must resolve identically in the browser bundle and on the
@@ -119,8 +119,65 @@ const entityReference = fields.object(
   },
 );
 
+const relationCategory = fields.select({
+  label: "Category",
+  options: [
+    { label: "Counts as synergy", value: "counts_as_synergy" },
+    { label: "Synergy reward", value: "synergy_reward" },
+    { label: "Generated token", value: "generated_token" },
+    { label: "Generated item", value: "generated_item" },
+  ],
+  defaultValue: "generated_item",
+});
+
 export default config({
   storage,
+  singletons: {
+    itemLinks: singleton({
+      label: "Entity Relations",
+      path: `${contentPath}/game/item-links`,
+      format: { data: "json" },
+      schema: {
+        links: fields.array(
+          fields.object({
+            item: fields.text({
+              label: "Source item name",
+              description:
+                "Exact item name for item-sourced links. Leave blank when the source is a relic.",
+            }),
+            relic: fields.text({
+              label: "Source relic name",
+              description:
+                "Exact relic name for relic-sourced links, e.g. Mango Tree. Leave blank when the source is an item.",
+            }),
+            relatedItem: fields.text({
+              label: "Related item name",
+              description:
+                "Exact target item name, e.g. Enchanted Mango or Golden Mango.",
+            }),
+            synergy: fields.text({
+              label: "Related synergy name",
+              description: "Exact target synergy name for item-to-synergy links.",
+            }),
+            category: relationCategory,
+            label: fields.text({ label: "Display label" }),
+            description: fields.text({
+              label: "Description",
+              multiline: true,
+            }),
+          }),
+          {
+            label: "Relations",
+            itemLabel: (props) =>
+              props.fields.label.value ||
+              props.fields.item.value ||
+              props.fields.relic.value ||
+              "Relation",
+          },
+        ),
+      },
+    }),
+  },
   collections: {
     patchNotes: collection({
       label: "Patch Notes",
