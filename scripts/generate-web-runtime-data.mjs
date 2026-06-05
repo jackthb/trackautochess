@@ -1,10 +1,11 @@
-import { mkdir, readFile, readdir, writeFile } from "node:fs/promises";
+import { mkdir, readFile, readdir, rm, writeFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const contentDir = path.join(root, "content");
 const outputFile = path.join(root, "web", "generated", "content-data.ts");
+const entityIndexDir = path.join(contentDir, "game", "entities");
 
 async function fromJson(file) {
   return JSON.parse(await readFile(file, "utf8"));
@@ -25,9 +26,12 @@ function materializeRelatedEntities(relatedEntities, entitySlugByRef) {
   if (!Array.isArray(relatedEntities)) return [];
   return relatedEntities
     .map((relation) => {
-      const entity = relation?.entity;
-      const entity_type = entity?.type ?? null;
-      const entity_slug = linkedEntitySlug(entity, entitySlugByRef);
+      const linkedEntity = normalizeLinkedEntity(
+        relation?.entityKey ?? relation?.entity,
+        entitySlugByRef,
+      );
+      const entity_type = linkedEntity?.type ?? null;
+      const entity_slug = linkedEntity?.slug ?? null;
       if (!entity_type || !entity_slug) return null;
       return {
         entity_type,
@@ -84,6 +88,20 @@ function linkedEntitySlug(entity, entitySlugByRef) {
   return null;
 }
 
+function normalizeLinkedEntity(entity, entitySlugByRef) {
+  if (typeof entity === "string" && entity) {
+    const indexedEntity = entitySlugByRef?.entity?.get(entity);
+    if (indexedEntity) return indexedEntity;
+
+    const [type, slug] = entity.split(":", 2);
+    return type && slug ? { type, slug } : null;
+  }
+  if (!entity || typeof entity !== "object") return null;
+  const type = entity.type;
+  const slug = linkedEntitySlug(entity, entitySlugByRef);
+  return typeof type === "string" && slug ? { type, slug } : null;
+}
+
 function patchToRuntime(patch, entitySlugByRef) {
   const next = { ...patch };
   if ("workshopUrl" in next) {
@@ -96,9 +114,18 @@ function patchToRuntime(patch, entitySlugByRef) {
       entries: Array.isArray(section.entries)
         ? section.entries.map((entry) => {
             const converted = { ...entry };
+            const linkedEntity = normalizeLinkedEntity(
+              converted.entityKey ?? converted.entity,
+              entitySlugByRef,
+            );
+            if (linkedEntity) {
+              converted.entity_type = linkedEntity.type;
+              converted.entity_slug = linkedEntity.slug;
+            }
+            if (converted.entityKey) {
+              delete converted.entityKey;
+            }
             if (converted.entity) {
-              converted.entity_type = converted.entity.type ?? null;
-              converted.entity_slug = linkedEntitySlug(converted.entity, entitySlugByRef);
               delete converted.entity;
             }
             return converted;
@@ -115,6 +142,34 @@ function exportJson(name, value) {
   )});\n`;
 }
 
+function entityRef(type, slug) {
+  return `${type}__${slug}`;
+}
+
+function entityIndexEntry(type, slug, name) {
+  return {
+    ref: entityRef(type, slug),
+    key: `${type}:${slug}`,
+    type,
+    slug,
+    name,
+  };
+}
+
+async function writeEntityIndex(entries) {
+  await rm(entityIndexDir, { recursive: true, force: true });
+  await mkdir(entityIndexDir, { recursive: true });
+  await Promise.all(
+    entries.map(({ ref, key, type, slug, name }) =>
+      writeFile(
+        path.join(entityIndexDir, `${ref}.json`),
+        `${JSON.stringify({ key, type, slug, name }, null, 2)}\n`,
+        "utf8",
+      ),
+    ),
+  );
+}
+
 async function main() {
   const aliases = await fromJson(path.join(contentDir, "game", "aliases.json"));
   const itemsSimple = await fromJson(path.join(contentDir, "game", "curated-items.json"));
@@ -126,6 +181,7 @@ async function main() {
     synergy: new Map(),
     relic: new Map(),
     talent: new Map(),
+    entity: new Map(),
   };
 
   const unitEntries = await readCollection("game/units");
@@ -134,21 +190,34 @@ async function main() {
   const relicEntries = await readCollection("game/relics");
   const talentEntries = await readCollection("game/talents");
 
+  const entityIndexEntries = [];
+
   for (const { file, entry } of unitEntries) {
     entitySlugByRef.unit.set(file.replace(/\.json$/, ""), entry.slug);
+    entityIndexEntries.push(entityIndexEntry("unit", entry.slug, entry.name));
   }
   for (const { file, entry } of itemEntries) {
     entitySlugByRef.item.set(file.replace(/\.json$/, ""), entry.slug);
+    entityIndexEntries.push(entityIndexEntry("item", entry.slug, entry.name));
   }
   for (const { file, entry } of synergyEntries) {
     entitySlugByRef.synergy.set(file.replace(/\.json$/, ""), entry.slug);
+    entityIndexEntries.push(entityIndexEntry("synergy", entry.slug, entry.name));
   }
   for (const { file, entry } of relicEntries) {
     entitySlugByRef.relic.set(file.replace(/\.json$/, ""), entry.slug);
+    entityIndexEntries.push(entityIndexEntry("relic", entry.slug, entry.name));
   }
   for (const { file, entry } of talentEntries) {
     entitySlugByRef.talent.set(file.replace(/\.json$/, ""), entry.slot);
+    entityIndexEntries.push(entityIndexEntry("talent", entry.slot, entry.title));
   }
+
+  entityIndexEntries.sort((a, b) => a.key.localeCompare(b.key));
+  for (const entry of entityIndexEntries) {
+    entitySlugByRef.entity.set(entry.ref, { type: entry.type, slug: entry.slug });
+  }
+  await writeEntityIndex(entityIndexEntries);
 
   const unitsFull = {};
   for (const { entry } of unitEntries) {

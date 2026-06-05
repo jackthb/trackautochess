@@ -17,13 +17,12 @@ export interface ParsedSteamInput {
 
 // BigInt(...) instead of n-literals so the ES2017 tsconfig target accepts them.
 const STEAM_ID64_MIN = BigInt("76561197960265728");
-const STEAM_ID64_MAX = BigInt("76561197964560623");
 
 function isLikelySteamId64(input: string): boolean {
   if (!/^\d+$/.test(input)) return false;
   try {
     const value = BigInt(input);
-    return value >= STEAM_ID64_MIN && value <= STEAM_ID64_MAX;
+    return value >= STEAM_ID64_MIN;
   } catch {
     return false;
   }

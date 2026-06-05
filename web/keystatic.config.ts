@@ -40,60 +40,20 @@ const entryKind = fields.select({
   defaultValue: "change",
 });
 
-const entityType = fields.select({
-  label: "Type",
-  options: [
-    { label: "Unit", value: "unit" },
-    { label: "Item", value: "item" },
-    { label: "Synergy", value: "synergy" },
-    { label: "Relic", value: "relic" },
-    { label: "Talent", value: "talent" },
-  ],
-  defaultValue: "unit",
+const entityReference = fields.relationship({
+  label: "Linked entity",
+  collection: "entities",
+  description:
+    "Search all units, items, synergies, relics, and talents by stable lower-case slug, e.g. item:bloodthorn or synergy:naga.",
 });
-
-const entityReference = fields.object(
-  {
-    type: entityType,
-    unit: fields.relationship({
-      label: "Unit",
-      collection: "units",
-      description: "Search and select an existing unit.",
-    }),
-    item: fields.relationship({
-      label: "Item",
-      collection: "items",
-      description: "Search and select an existing item.",
-    }),
-    synergy: fields.relationship({
-      label: "Synergy",
-      collection: "synergies",
-      description: "Search and select an existing synergy.",
-    }),
-    relic: fields.relationship({
-      label: "Relic",
-      collection: "relics",
-      description: "Search and select an existing relic.",
-    }),
-    talent: fields.relationship({
-      label: "Talent",
-      collection: "talents",
-      description: "Search and select an existing talent.",
-    }),
-    // Legacy manual slug field. Kept hidden so existing content files still
-    // parse; runtime generators fall back to it when no picker value exists yet.
-    slug: fields.ignored(),
-  },
-  {
-    label: "Linked entity",
-    description:
-      "Pick the entity type, then use the matching search field below. The generator ignores non-matching picker fields.",
-  },
-);
 
 const relatedEntity = fields.object(
   {
-    entity: entityReference,
+    entityKey: entityReference,
+    // Legacy type + relationship object. Kept hidden so existing content files
+    // still parse; the runtime generator falls back to it when entityKey is not
+    // set yet.
+    entity: fields.ignored(),
     label: fields.text({ label: "Display label" }),
     description: fields.text({ label: "Description", multiline: true }),
   },
@@ -105,14 +65,18 @@ const relatedEntities = fields.array(relatedEntity, {
   itemLabel: (props) => props.fields.label.value || "Related entity",
 });
 
-const createEntitySchema = () => ({
-  gameId: fields.text({ label: "Game ID" }),
+const createEntitySchema = ({ showTechnicalFields = true } = {}): Record<string, any> => ({
+  gameId: showTechnicalFields
+    ? fields.text({ label: "Game ID" })
+    : fields.ignored(),
   name: fields.slug({ name: { label: "Name" } }),
   slug: fields.text({ label: "Slug" }),
-  icon: fields.text({
-    label: "Icon path",
-    description: "Relative to web/public/icons, for example units/axe.png.",
-  }),
+  icon: showTechnicalFields
+    ? fields.text({
+        label: "Icon path",
+        description: "Relative to web/public/icons, for example units/axe.png.",
+      })
+    : fields.ignored(),
   commentary: fields.text({
     label: "Commentary",
     multiline: true,
@@ -167,7 +131,11 @@ export default config({
                 name: fields.text({ label: "Name" }),
                 detail: fields.text({ label: "Detail", multiline: true }),
                 commentary: fields.text({ label: "Commentary", multiline: true }),
-                entity: entityReference,
+                entityKey: entityReference,
+                // Legacy type + relationship object. Kept hidden so existing
+                // patch entries still parse until they are re-saved with the
+                // single selector.
+                entity: fields.ignored(),
                 evidence: fields.ignored(),
               }),
               {
@@ -196,30 +164,24 @@ export default config({
       path: `${contentPath}/game/items/*`,
       slugField: "name",
       format: { data: "json" },
-      // Files are named by gameId, so the title column shows that cryptic id.
-      // Surface the readable slug and the icon path so entries are findable.
-      columns: ["slug", "gameId", "icon"],
-      schema: createEntitySchema(),
+      columns: ["slug"],
+      schema: createEntitySchema({ showTechnicalFields: false }),
     }),
     synergies: collection({
       label: "Synergies",
       path: `${contentPath}/game/synergies/*`,
       slugField: "name",
       format: { data: "json" },
-      // Files are named by gameId, so the title column shows that cryptic id.
-      // Surface the readable slug and the icon path so entries are findable.
-      columns: ["slug", "gameId", "icon"],
-      schema: createEntitySchema(),
+      columns: ["slug"],
+      schema: createEntitySchema({ showTechnicalFields: false }),
     }),
     relics: collection({
       label: "Relics",
       path: `${contentPath}/game/relics/*`,
       slugField: "name",
       format: { data: "json" },
-      // Files are named by gameId, so the title column shows that cryptic id.
-      // Surface the readable slug and the icon path so entries are findable.
-      columns: ["slug", "gameId", "icon"],
-      schema: createEntitySchema(),
+      columns: ["slug"],
+      schema: createEntitySchema({ showTechnicalFields: false }),
     }),
     talents: collection({
       label: "Talents",
@@ -231,6 +193,19 @@ export default config({
         slot: fields.slug({ name: { label: "Slot" } }),
         title: fields.text({ label: "Name" }),
         description: fields.text({ label: "Description", multiline: true }),
+      },
+    }),
+    entities: collection({
+      label: "All Entities",
+      path: `${contentPath}/game/entities/*`,
+      slugField: "key",
+      format: { data: "json" },
+      columns: ["type", "slug", "name"],
+      schema: {
+        key: fields.slug({ name: { label: "Key" } }),
+        type: fields.text({ label: "Type" }),
+        slug: fields.text({ label: "Slug" }),
+        name: fields.text({ label: "Name" }),
       },
     }),
   },
