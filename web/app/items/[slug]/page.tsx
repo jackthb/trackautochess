@@ -12,6 +12,7 @@ import {
 } from "@/lib/items";
 import { parseItemDescription } from "@/lib/itemDescription";
 import {
+  getRelatedEntitiesForItem,
   getRelatedItemsForItem,
   getRelatedSynergiesForItem,
   ITEM_RELATION_CATEGORY_LABEL,
@@ -92,6 +93,7 @@ export default async function ItemDetailPage({ params }: Props) {
   const item = getItemBySlug(slug, DEFAULT_LOCALE);
   if (!item) notFound();
 
+  const cmsRelatedEntities = getRelatedEntitiesForItem(item.name, DEFAULT_LOCALE);
   const explicitRelatedItems = getRelatedItemsForItem(item.name, DEFAULT_LOCALE);
   const relatedSynergies = getRelatedSynergiesForItem(item.name, DEFAULT_LOCALE);
 
@@ -191,26 +193,28 @@ export default async function ItemDetailPage({ params }: Props) {
         lore={item.lore ? cleanText(item.lore) : undefined}
         tag={{ label: tierLabel, color: tierColor }}
         relatedTitle={
-          explicitRelatedItemEntities.length > 0
-            ? "Related Items"
+          cmsRelatedEntities.length > 0 || explicitRelatedItemEntities.length > 0
+            ? "Related Entities"
             : synergyEntities.length > 0
               ? t.relatedSynergies
               : t.moreOf(tierLabel)
         }
         related={
-          explicitRelatedItemEntities.length > 0
-            ? explicitRelatedItemEntities
-            : synergyEntities.length > 0
-              ? synergyEntities
-              : relatedEntities
+          cmsRelatedEntities.length > 0
+            ? cmsRelatedEntities
+            : explicitRelatedItemEntities.length > 0
+              ? explicitRelatedItemEntities
+              : synergyEntities.length > 0
+                ? synergyEntities
+                : relatedEntities
         }
         extraRelatedTitle={
-          explicitRelatedItemEntities.length > 0 || synergyEntities.length > 0
+          cmsRelatedEntities.length > 0 || explicitRelatedItemEntities.length > 0 || synergyEntities.length > 0
             ? t.moreOf(tierLabel)
             : undefined
         }
         extraRelated={
-          explicitRelatedItemEntities.length > 0 || synergyEntities.length > 0
+          cmsRelatedEntities.length > 0 || explicitRelatedItemEntities.length > 0 || synergyEntities.length > 0
             ? relatedEntities
             : undefined
         }

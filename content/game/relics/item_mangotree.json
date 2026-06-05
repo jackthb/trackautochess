@@ -19,5 +19,23 @@
       "ru": "Из Relicbox"
     }
   },
-  "overrides": {}
+  "overrides": {},
+  "relatedEntities": [
+    {
+      "entity": {
+        "type": "item",
+        "item": "item_mangguo"
+      },
+      "label": "Creates Enchanted Mangoes",
+      "description": "Mango Tree drops an Enchanted Mango whenever your home battle result differs from the last round."
+    },
+    {
+      "entity": {
+        "type": "item",
+        "item": "item_golden_mango"
+      },
+      "label": "Creates Golden Mangoes",
+      "description": "Mango Tree can drop a Golden Mango if it is still alive when the relic expires."
+    }
+  ]
 }

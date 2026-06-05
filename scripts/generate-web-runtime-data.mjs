@@ -21,7 +21,25 @@ async function readCollection(relativePath) {
   );
 }
 
-function materializeEntity(entity) {
+function materializeRelatedEntities(relatedEntities, entitySlugByRef) {
+  if (!Array.isArray(relatedEntities)) return [];
+  return relatedEntities
+    .map((relation) => {
+      const entity = relation?.entity;
+      const entity_type = entity?.type ?? null;
+      const entity_slug = linkedEntitySlug(entity, entitySlugByRef);
+      if (!entity_type || !entity_slug) return null;
+      return {
+        entity_type,
+        entity_slug,
+        label: relation.label ?? "",
+        description: relation.description ?? "",
+      };
+    })
+    .filter(Boolean);
+}
+
+function materializeEntity(entity, entitySlugByRef) {
   const output = {
     ...entity.source,
   };
@@ -40,6 +58,14 @@ function materializeEntity(entity) {
         output[key] = value;
       }
     }
+  }
+
+  const relatedEntities = materializeRelatedEntities(
+    entity.relatedEntities,
+    entitySlugByRef,
+  );
+  if (relatedEntities.length > 0) {
+    output.relatedEntities = relatedEntities;
   }
 
   return output;
@@ -102,36 +128,53 @@ async function main() {
     talent: new Map(),
   };
 
-  const unitsFull = {};
-  for (const { file, entry } of await readCollection("game/units")) {
+  const unitEntries = await readCollection("game/units");
+  const itemEntries = await readCollection("game/items");
+  const synergyEntries = await readCollection("game/synergies");
+  const relicEntries = await readCollection("game/relics");
+  const talentEntries = await readCollection("game/talents");
+
+  for (const { file, entry } of unitEntries) {
     entitySlugByRef.unit.set(file.replace(/\.json$/, ""), entry.slug);
+  }
+  for (const { file, entry } of itemEntries) {
+    entitySlugByRef.item.set(file.replace(/\.json$/, ""), entry.slug);
+  }
+  for (const { file, entry } of synergyEntries) {
+    entitySlugByRef.synergy.set(file.replace(/\.json$/, ""), entry.slug);
+  }
+  for (const { file, entry } of relicEntries) {
+    entitySlugByRef.relic.set(file.replace(/\.json$/, ""), entry.slug);
+  }
+  for (const { file, entry } of talentEntries) {
+    entitySlugByRef.talent.set(file.replace(/\.json$/, ""), entry.slot);
+  }
+
+  const unitsFull = {};
+  for (const { entry } of unitEntries) {
     unitsFull[entry.name] = {
       id: entry.gameId,
-      ...materializeEntity(entry),
+      ...materializeEntity(entry, entitySlugByRef),
     };
   }
 
   const itemsFull = {};
-  for (const { file, entry } of await readCollection("game/items")) {
-    entitySlugByRef.item.set(file.replace(/\.json$/, ""), entry.slug);
-    itemsFull[entry.gameId] = materializeEntity(entry);
+  for (const { entry } of itemEntries) {
+    itemsFull[entry.gameId] = materializeEntity(entry, entitySlugByRef);
   }
 
   const synergies = {};
-  for (const { file, entry } of await readCollection("game/synergies")) {
-    entitySlugByRef.synergy.set(file.replace(/\.json$/, ""), entry.slug);
-    synergies[entry.gameId] = materializeEntity(entry);
+  for (const { entry } of synergyEntries) {
+    synergies[entry.gameId] = materializeEntity(entry, entitySlugByRef);
   }
 
   const relics = {};
-  for (const { file, entry } of await readCollection("game/relics")) {
-    entitySlugByRef.relic.set(file.replace(/\.json$/, ""), entry.slug);
-    relics[entry.gameId] = materializeEntity(entry);
+  for (const { entry } of relicEntries) {
+    relics[entry.gameId] = materializeEntity(entry, entitySlugByRef);
   }
 
   const talents = {};
-  for (const { file, entry } of await readCollection("game/talents")) {
-    entitySlugByRef.talent.set(file.replace(/\.json$/, ""), entry.slot);
+  for (const { entry } of talentEntries) {
     const { slot, ...talent } = entry;
     talents[slot] = talent;
   }

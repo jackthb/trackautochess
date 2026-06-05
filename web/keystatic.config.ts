@@ -1,4 +1,4 @@
-import { collection, config, fields, singleton } from "@keystatic/core";
+import { collection, config, fields } from "@keystatic/core";
 
 const githubRepo = "jackthb/dac-tools" as const;
 // The storage *kind* must resolve identically in the browser bundle and on the
@@ -23,34 +23,6 @@ const storage =
       } as const)
     : ({ kind: "local" } as const);
 const contentPath = useGithubStorage ? "content" : "../content";
-
-const entitySchema = {
-  gameId: fields.text({ label: "Game ID" }),
-  name: fields.slug({ name: { label: "Name" } }),
-  slug: fields.text({ label: "Slug" }),
-  icon: fields.text({
-    label: "Icon path",
-    description: "Relative to web/public/icons, for example units/axe.png.",
-  }),
-  commentary: fields.text({
-    label: "Commentary",
-    multiline: true,
-    description: "Generic editorial notes explaining what this is / what it does.",
-  }),
-  source: fields.ignored(),
-  overrides: fields.object(
-    {
-      name: fields.text({ label: "Name override" }),
-      description: fields.text({ label: "Description override", multiline: true }),
-      lore: fields.text({ label: "Lore override", multiline: true }),
-      notes: fields.array(fields.text({ label: "Note", multiline: true }), {
-        label: "Notes override",
-        itemLabel: (props) => props.value || "Note",
-      }),
-    },
-    { label: "Overrides" },
-  ),
-};
 
 const entryKind = fields.select({
   label: "Kind",
@@ -119,65 +91,51 @@ const entityReference = fields.object(
   },
 );
 
-const relationCategory = fields.select({
-  label: "Category",
-  options: [
-    { label: "Counts as synergy", value: "counts_as_synergy" },
-    { label: "Synergy reward", value: "synergy_reward" },
-    { label: "Generated token", value: "generated_token" },
-    { label: "Generated item", value: "generated_item" },
-  ],
-  defaultValue: "generated_item",
+const relatedEntity = fields.object(
+  {
+    entity: entityReference,
+    label: fields.text({ label: "Display label" }),
+    description: fields.text({ label: "Description", multiline: true }),
+  },
+  { label: "Related entity" },
+);
+
+const relatedEntities = fields.array(relatedEntity, {
+  label: "Related entities",
+  itemLabel: (props) => props.fields.label.value || "Related entity",
+});
+
+const createEntitySchema = () => ({
+  gameId: fields.text({ label: "Game ID" }),
+  name: fields.slug({ name: { label: "Name" } }),
+  slug: fields.text({ label: "Slug" }),
+  icon: fields.text({
+    label: "Icon path",
+    description: "Relative to web/public/icons, for example units/axe.png.",
+  }),
+  commentary: fields.text({
+    label: "Commentary",
+    multiline: true,
+    description: "Generic editorial notes explaining what this is / what it does.",
+  }),
+  source: fields.ignored(),
+  overrides: fields.object(
+    {
+      name: fields.text({ label: "Name override" }),
+      description: fields.text({ label: "Description override", multiline: true }),
+      lore: fields.text({ label: "Lore override", multiline: true }),
+      notes: fields.array(fields.text({ label: "Note", multiline: true }), {
+        label: "Notes override",
+        itemLabel: (props) => props.value || "Note",
+      }),
+    },
+    { label: "Overrides" },
+  ),
+  relatedEntities,
 });
 
 export default config({
   storage,
-  singletons: {
-    itemLinks: singleton({
-      label: "Entity Relations",
-      path: `${contentPath}/game/item-links`,
-      format: { data: "json" },
-      schema: {
-        links: fields.array(
-          fields.object({
-            item: fields.text({
-              label: "Source item name",
-              description:
-                "Exact item name for item-sourced links. Leave blank when the source is a relic.",
-            }),
-            relic: fields.text({
-              label: "Source relic name",
-              description:
-                "Exact relic name for relic-sourced links, e.g. Mango Tree. Leave blank when the source is an item.",
-            }),
-            relatedItem: fields.text({
-              label: "Related item name",
-              description:
-                "Exact target item name, e.g. Enchanted Mango or Golden Mango.",
-            }),
-            synergy: fields.text({
-              label: "Related synergy name",
-              description: "Exact target synergy name for item-to-synergy links.",
-            }),
-            category: relationCategory,
-            label: fields.text({ label: "Display label" }),
-            description: fields.text({
-              label: "Description",
-              multiline: true,
-            }),
-          }),
-          {
-            label: "Relations",
-            itemLabel: (props) =>
-              props.fields.label.value ||
-              props.fields.item.value ||
-              props.fields.relic.value ||
-              "Relation",
-          },
-        ),
-      },
-    }),
-  },
   collections: {
     patchNotes: collection({
       label: "Patch Notes",
@@ -231,7 +189,7 @@ export default config({
       slugField: "name",
       format: { data: "json" },
       columns: ["gameId"],
-      schema: entitySchema,
+      schema: createEntitySchema(),
     }),
     items: collection({
       label: "Items",
@@ -241,7 +199,7 @@ export default config({
       // Files are named by gameId, so the title column shows that cryptic id.
       // Surface the readable slug and the icon path so entries are findable.
       columns: ["slug", "gameId", "icon"],
-      schema: entitySchema,
+      schema: createEntitySchema(),
     }),
     synergies: collection({
       label: "Synergies",
@@ -251,7 +209,7 @@ export default config({
       // Files are named by gameId, so the title column shows that cryptic id.
       // Surface the readable slug and the icon path so entries are findable.
       columns: ["slug", "gameId", "icon"],
-      schema: entitySchema,
+      schema: createEntitySchema(),
     }),
     relics: collection({
       label: "Relics",
@@ -261,7 +219,7 @@ export default config({
       // Files are named by gameId, so the title column shows that cryptic id.
       // Surface the readable slug and the icon path so entries are findable.
       columns: ["slug", "gameId", "icon"],
-      schema: entitySchema,
+      schema: createEntitySchema(),
     }),
     talents: collection({
       label: "Talents",

@@ -9,6 +9,7 @@ import {
 } from "@/lib/relics";
 import { iconUrl, TIER_COLOR, TIER_LABEL } from "@/lib/items";
 import {
+  getRelatedEntitiesForRelic,
   getRelatedItemsForRelic,
   ITEM_RELATION_CATEGORY_LABEL,
 } from "@/lib/itemRelations";
@@ -80,6 +81,7 @@ export default async function RelicDetailPage({ params }: Props) {
   const related = allRelics
     .filter((candidate) => candidate.slug !== relic.slug)
     .slice(0, 8);
+  const cmsRelatedEntities = getRelatedEntitiesForRelic(relic.name, DEFAULT_LOCALE);
   const relatedItems = getRelatedItemsForRelic(relic.name, DEFAULT_LOCALE);
   const commentary = getCommentaryForEntity("relic", slug);
 
@@ -156,10 +158,28 @@ export default async function RelicDetailPage({ params }: Props) {
           ) : undefined
         }
         lore={relic.lore ? cleanText(relic.lore) : undefined}
-        relatedTitle={relatedItemEntities.length > 0 ? "Related Items" : "More Relics"}
-        related={relatedItemEntities.length > 0 ? relatedItemEntities : relatedEntities}
-        extraRelatedTitle={relatedItemEntities.length > 0 ? "More Relics" : undefined}
-        extraRelated={relatedItemEntities.length > 0 ? relatedEntities : undefined}
+        relatedTitle={
+          cmsRelatedEntities.length > 0 || relatedItemEntities.length > 0
+            ? "Related Entities"
+            : "More Relics"
+        }
+        related={
+          cmsRelatedEntities.length > 0
+            ? cmsRelatedEntities
+            : relatedItemEntities.length > 0
+              ? relatedItemEntities
+              : relatedEntities
+        }
+        extraRelatedTitle={
+          cmsRelatedEntities.length > 0 || relatedItemEntities.length > 0
+            ? "More Relics"
+            : undefined
+        }
+        extraRelated={
+          cmsRelatedEntities.length > 0 || relatedItemEntities.length > 0
+            ? relatedEntities
+            : undefined
+        }
       />
     </>
   );
