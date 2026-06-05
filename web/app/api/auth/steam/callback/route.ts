@@ -73,6 +73,7 @@ export async function GET(req: Request) {
     name: steamName === steamId ? null : steamName,
     customUrl: steamProfile.customUrl,
     avatarUrl: steamProfile.avatarUrl,
+    steamSignedInAt: new Date().toISOString(),
   });
 
   // Find or create user

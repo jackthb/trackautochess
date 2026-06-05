@@ -11,6 +11,7 @@ interface QueenRow {
   name: string | null;
   custom_url: string | null;
   avatar_url: string | null;
+  drodo_mmr: number | null;
   drodo_season: string | null;
   drodo_season_games: number | null;
   drodo_chicken_count: number | null;
@@ -22,7 +23,7 @@ interface QueenRow {
 
 const title = `Queen Players | ${SITE_TITLE}`;
 const description =
-  "Latest Dota Auto Chess Queen players captured from the in-game Queen ladder, with MMR and season stats for tracked profiles.";
+  "Latest Dota Auto Chess Queen players captured from the in-game Queen ladder, with MMR and available season stats.";
 
 export const metadata: Metadata = {
   title,
@@ -50,6 +51,7 @@ const SELECT = [
   "name",
   "custom_url",
   "avatar_url",
+  "drodo_mmr",
   "drodo_season",
   "drodo_season_games",
   "drodo_chicken_count",
@@ -79,6 +81,7 @@ async function loadQueens(): Promise<{ rows: QueenRow[]; error: string | null }>
     .order("queen_ladder_last_seen_at", { ascending: false, nullsFirst: false })
     .order("queen_ladder_rank", { ascending: true, nullsFirst: false })
     .order("queen_ladder_mmr", { ascending: false, nullsFirst: false })
+    .order("drodo_mmr", { ascending: false, nullsFirst: false })
     .limit(300);
 
   if (error) return { rows: [], error: error.message };
@@ -108,9 +111,16 @@ function formatDate(value: string | null): string {
   });
 }
 
+function normalizeSeason(value: string | null): string | null {
+  const raw = value?.trim().toLowerCase();
+  if (!raw) return null;
+  const match = raw.match(/\d+/);
+  return match ? `s${Number(match[0])}` : raw;
+}
+
 function seasonMatches(row: QueenRow): boolean {
-  const ladderSeason = row.queen_ladder_season?.toLowerCase() ?? null;
-  const drodoSeason = row.drodo_season?.toLowerCase() ?? null;
+  const ladderSeason = normalizeSeason(row.queen_ladder_season);
+  const drodoSeason = normalizeSeason(row.drodo_season);
   return !ladderSeason || !drodoSeason || ladderSeason === drodoSeason;
 }
 
@@ -129,23 +139,24 @@ function formatWinRate(wins: number | null, games: number | null): string {
   return `${Math.round((wins / games) * 100)}%`;
 }
 
-function formatRecord(wins: number | null, games: number | null): string {
+function formatWinTotal(wins: number | null, games: number | null): string {
   if (wins == null || games == null || games <= 0) return "—";
-  const losses = Math.max(0, games - wins);
-  return `${wins.toLocaleString()}-${losses.toLocaleString()}`;
+  return `${wins.toLocaleString()} / ${games.toLocaleString()}`;
 }
 
 export default async function QueensPage() {
   const { rows, error } = await loadQueens();
   const season = rows.find((row) => row.queen_ladder_season)?.queen_ladder_season;
+  const lastSyncedAt = rows[0]?.queen_ladder_last_seen_at ?? null;
 
   return (
     <PageLayout title="Queen Players">
       <p className={styles.lead}>
         Latest in-game Queen ladder output captured by the desktop tracker
         {season ? ` for ${season.toUpperCase()}` : ""}. Rows are replaced when
-        a fresh ladder upload is accepted, with season stats filled in when a
-        tracked Drodo profile is available.
+        a fresh ladder upload is accepted. Season stats fill in after a profile
+        is refreshed; signed-in owners are checked about hourly in the
+        background.
       </p>
 
       {error ? (
@@ -153,86 +164,84 @@ export default async function QueensPage() {
       ) : rows.length === 0 ? (
         <div className={styles.empty}>No Queen players tracked yet.</div>
       ) : (
-        <div className={`${styles.table} ${styles["queen-table"]}`} role="table">
-          <div className={`${styles.row} ${styles["header-row"]}`}>
-            <div className={`${styles.cell} ${styles["cell-rank"]}`}>Rank</div>
-            <div className={styles.cell} aria-hidden="true" />
-            <div className={styles.cell}>Player</div>
-            <div className={styles.cell}>MMR</div>
-            <div className={styles.cell}>Tier</div>
-            <div className={`${styles.cell} ${styles["hide-sm"]}`}>Games</div>
-            <div className={`${styles.cell} ${styles["hide-sm"]}`}>W-L</div>
-            <div className={`${styles.cell} ${styles["hide-sm"]}`}>Win rate</div>
-            <div className={`${styles.cell} ${styles["hide-md"]}`}>Last synced date</div>
+        <>
+          <div className={styles["snapshot-meta"]}>
+            <span>Last synced date</span>
+            <strong>{formatDate(lastSyncedAt)}</strong>
           </div>
-          {rows.map((row, index) => {
-            const ladderRank = row.queen_ladder_rank ?? index + 1;
-            const mmr = row.queen_ladder_mmr;
-            const display = row.name || row.custom_url || row.steam_id;
-            const initial = display.charAt(0).toUpperCase() || "?";
-            const games = seasonGames(row);
-            const wins = seasonWins(row);
-            const rankClass =
-              ladderRank === 1
-                ? styles.gold
-                : ladderRank === 2
-                  ? styles.silver
-                  : ladderRank === 3
-                    ? styles.bronze
-                    : "";
-            return (
-              <div key={row.steam_id} className={styles.row}>
-                <div
-                  className={`${styles.cell} ${styles["cell-rank"]} ${ladderRank <= 3 ? `${styles["top-rank"]} ${rankClass}` : ""}`}
-                >
-                  #{ladderRank}
-                </div>
-                <div className={`${styles.cell} ${styles["cell-avatar"]}`}>
-                  {row.avatar_url ? (
-                    <img
-                      className={styles.avatar}
-                      src={row.avatar_url}
-                      alt=""
-                      width={32}
-                      height={32}
-                      referrerPolicy="no-referrer"
-                    />
-                  ) : (
-                    <div className={`${styles.avatar} ${styles["avatar-fallback"]}`}>
-                      {initial}
-                    </div>
-                  )}
-                </div>
-                <div className={styles.cell}>
-                  <Link
-                    href={playerProfilePath(row.steam_id, row.custom_url)}
-                    className={styles["player-link"]}
+          <div className={`${styles.table} ${styles["queen-table"]}`} role="table">
+            <div className={`${styles.row} ${styles["header-row"]}`}>
+              <div className={`${styles.cell} ${styles["cell-rank"]}`}>Rank</div>
+              <div className={styles.cell} aria-hidden="true" />
+              <div className={styles.cell}>Player</div>
+              <div className={styles.cell}>MMR</div>
+              <div className={`${styles.cell} ${styles["hide-sm"]}`}>Games</div>
+              <div className={`${styles.cell} ${styles["hide-sm"]}`}>Wins / Games</div>
+              <div className={`${styles.cell} ${styles["hide-sm"]}`}>Win rate</div>
+            </div>
+            {rows.map((row, index) => {
+              const ladderRank = row.queen_ladder_rank ?? index + 1;
+              const mmr = row.queen_ladder_mmr ?? row.drodo_mmr;
+              const display = row.name || row.custom_url || row.steam_id;
+              const initial = display.charAt(0).toUpperCase() || "?";
+              const games = seasonGames(row);
+              const wins = seasonWins(row);
+              const rankClass =
+                ladderRank === 1
+                  ? styles.gold
+                  : ladderRank === 2
+                    ? styles.silver
+                    : ladderRank === 3
+                      ? styles.bronze
+                      : "";
+              return (
+                <div key={row.steam_id} className={styles.row}>
+                  <div
+                    className={`${styles.cell} ${styles["cell-rank"]} ${ladderRank <= 3 ? `${styles["top-rank"]} ${rankClass}` : ""}`}
                   >
-                    {display}
-                  </Link>
+                    #{ladderRank}
+                  </div>
+                  <div className={`${styles.cell} ${styles["cell-avatar"]}`}>
+                    {row.avatar_url ? (
+                      <img
+                        className={styles.avatar}
+                        src={row.avatar_url}
+                        alt=""
+                        width={32}
+                        height={32}
+                        referrerPolicy="no-referrer"
+                      />
+                    ) : (
+                      <div className={`${styles.avatar} ${styles["avatar-fallback"]}`}>
+                        {initial}
+                      </div>
+                    )}
+                  </div>
+                  <div className={styles.cell}>
+                    <Link
+                      href={playerProfilePath(row.steam_id, row.custom_url)}
+                      className={styles["player-link"]}
+                    >
+                      {display}
+                    </Link>
+                  </div>
+                  <div className={`${styles.cell} ${styles["cell-mmr"]}`}>
+                    {mmr != null ? mmr.toLocaleString() : "—"}
+                  </div>
+                  <div className={`${styles.cell} ${styles["cell-meta"]} ${styles["hide-sm"]}`}>
+                    {games?.toLocaleString() ?? "—"}
+                  </div>
+                  <div className={`${styles.cell} ${styles["cell-meta"]} ${styles["hide-sm"]}`}>
+                    {formatWinTotal(wins, games)}
+                  </div>
+                  <div className={`${styles.cell} ${styles["cell-meta"]} ${styles["hide-sm"]}`}>
+                    {formatWinRate(wins, games)}
+                  </div>
                 </div>
-                <div className={`${styles.cell} ${styles["cell-mmr"]}`}>
-                  {mmr != null ? mmr.toLocaleString() : "—"}
-                </div>
-                <div className={`${styles.cell} ${styles["cell-meta"]}`}>
-                  Queen
-                </div>
-                <div className={`${styles.cell} ${styles["cell-meta"]} ${styles["hide-sm"]}`}>
-                  {games?.toLocaleString() ?? "—"}
-                </div>
-                <div className={`${styles.cell} ${styles["cell-meta"]} ${styles["hide-sm"]}`}>
-                  {formatRecord(wins, games)}
-                </div>
-                <div className={`${styles.cell} ${styles["cell-meta"]} ${styles["hide-sm"]}`}>
-                  {formatWinRate(wins, games)}
-                </div>
-                <div className={`${styles.cell} ${styles["cell-meta"]} ${styles["hide-md"]}`}>
-                  {formatDate(row.queen_ladder_last_seen_at)}
-                </div>
-              </div>
-            );
-          })}
-        </div>
+              );
+            })}
+          </div>
+        </>
       )}
     </PageLayout>
   );

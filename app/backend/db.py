@@ -10,6 +10,7 @@ Config keys in ~/.dac/config.json:
 
 import json
 import logging
+import re
 from datetime import datetime, timedelta
 
 from utils import load_config, local_only_mode
@@ -110,6 +111,16 @@ def _parse_iso_datetime(value) -> datetime | None:
         return parsed.astimezone() if parsed.tzinfo is not None else parsed
     except ValueError:
         return None
+
+
+def _normalize_season_key(value) -> str:
+    raw = str(value or "").strip().lower()
+    if not raw:
+        return ""
+    match = re.search(r"\d+", raw)
+    if match:
+        return f"s{int(match.group(0))}"
+    return raw
 
 
 def _queen_ladder_recently_updated(client, now: datetime) -> bool:
@@ -354,7 +365,7 @@ def upsert_queen_ladder_players(players: list[dict]) -> int:
         name = str(p.get("name") or "").strip()
         if name:
             row["name"] = name
-        season = str(p.get("season") or "").strip()
+        season = _normalize_season_key(p.get("season"))
         if season:
             row["queen_ladder_season"] = season
         rank = _safe_int(p.get("rank"), lo=1)

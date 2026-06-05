@@ -27,6 +27,7 @@ async function handle(req: Request) {
   const { data: dueUsers, error: queryError } = await supabase
     .from("users")
     .select("steam_id::text")
+    .not("steam_signed_in_at", "is", null)
     .lte("next_poll_at", new Date().toISOString())
     .not("drodo_last_fetched_at", "is", null)
     .order("next_poll_at", { ascending: true })
@@ -39,6 +40,7 @@ async function handle(req: Request) {
   const { data: unseededUsers } = await supabase
     .from("users")
     .select("steam_id::text")
+    .not("steam_signed_in_at", "is", null)
     .is("drodo_last_fetched_at", null)
     .order("created_at", { ascending: false })
     .limit(SEED_BATCH_SIZE);

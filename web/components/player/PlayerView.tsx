@@ -16,6 +16,7 @@ import { RankLadder } from "@/components/RankLadder";
 import { SteamSignInButton } from "@/components/SteamSignInButton";
 import {
   getManualRefreshQuota,
+  type ManualRefreshCadence,
   type ManualRefreshQuota,
 } from "@/lib/manualRefreshQuota";
 import { isAdminSteamId } from "@/lib/admin";
@@ -82,16 +83,27 @@ function formatLastFetchedTimestamp(value: string | null): string {
 }
 
 
-function formatRefreshReset(value: string | null, nowMs: number | null): string {
-  if (!value || nowMs == null) return "available this hour";
+function formatRefreshReset(
+  quota: ManualRefreshQuota,
+  nowMs: number | null
+): string {
+  if (quota.remaining > 0) return "available now";
+  if (!quota.reset_at || nowMs == null) return "cooling down";
 
-  const resetMs = new Date(value).getTime();
+  const resetMs = new Date(quota.reset_at).getTime();
   if (!Number.isFinite(resetMs) || resetMs <= nowMs) return "available now";
 
   const totalSeconds = Math.max(1, Math.ceil((resetMs - nowMs) / 1000));
   const minutes = Math.floor(totalSeconds / 60);
   const seconds = totalSeconds % 60;
   if (minutes <= 0) return `available in ${seconds}s`;
+
+  const hours = Math.floor(minutes / 60);
+  if (hours > 0) {
+    const days = Math.floor(hours / 24);
+    if (days > 0) return `available in ${days}d ${hours % 24}h`;
+    return `available in ${hours}h ${minutes % 60}m`;
+  }
 
   return `available in ${minutes}m ${seconds}s`;
 }
@@ -309,7 +321,9 @@ export default function PlayerView({
   const isAdmin = isAdminSteamId(sessionSteamId);
   const isOwnProfile = sessionSteamId !== null && sessionSteamId === steamId;
   const canViewHistory = authReady && sessionSteamId !== null;
-  const canRefresh = isAdmin || isOwnProfile;
+  const refreshCadence: ManualRefreshCadence =
+    isAdmin || isOwnProfile ? "owner" : "public";
+  const canRefresh = authReady;
   const displayName = steamProfile.name || steamProfile.customUrl || steamId;
   const profileUrl = steamProfileUrl(steamId, steamProfile.customUrl);
 
@@ -336,8 +350,14 @@ export default function PlayerView({
   }, []);
 
   useEffect(() => {
-    setManualRefreshQuota(getManualRefreshQuota(document.cookie));
-  }, []);
+    if (!authReady) return;
+    setManualRefreshQuota(
+      getManualRefreshQuota(document.cookie, Date.now(), {
+        cadence: refreshCadence,
+        target: steamId,
+      })
+    );
+  }, [authReady, refreshCadence, steamId]);
 
   useEffect(() => {
     trackEvent("Player Profile Viewed", {
@@ -415,26 +435,30 @@ export default function PlayerView({
     refreshing ||
     (showQuota && effectiveManualRefreshQuota.remaining <= 0);
   const refreshQuotaLabel = `${effectiveManualRefreshQuota.remaining}/${effectiveManualRefreshQuota.limit}`;
-  const refreshQuotaResetLabel = formatRefreshReset(
-    effectiveManualRefreshQuota.reset_at,
-    nowMs
-  );
+  const refreshQuotaResetLabel = formatRefreshReset(effectiveManualRefreshQuota, nowMs);
+  const refreshQuotaTitle =
+    refreshCadence === "owner" ? "Your refreshes" : "Daily profile refresh";
 
   const handleRefresh = async () => {
     if (!canRefresh) {
       trackEvent("Player Refresh Blocked", {
         route: analyticsRoute(route),
-        reason: "not_allowed",
+        reason: "auth_loading",
       });
-      setRefreshError("Sign in with Steam to refresh your own profile.");
+      setRefreshError("Checking your Steam session. Try again in a moment.");
       return;
     }
     if (showQuota && effectiveManualRefreshQuota.remaining <= 0) {
       trackEvent("Player Refresh Blocked", {
         route: analyticsRoute(route),
         reason: "quota",
+        refresh_cadence: refreshCadence,
       });
-      setRefreshError("Hourly manual refresh limit reached.");
+      setRefreshError(
+        refreshCadence === "owner"
+          ? "Your next refresh is available after the 30-minute cooldown."
+          : "This profile has already been refreshed today."
+      );
       return;
     }
 
@@ -442,6 +466,7 @@ export default function PlayerView({
       route: analyticsRoute(route),
       is_admin: isAdmin,
       is_own_profile: isOwnProfile,
+      refresh_cadence: refreshCadence,
       quota_bucket: bucketCount(effectiveManualRefreshQuota.remaining),
     });
     setRefreshError(null);
@@ -481,7 +506,12 @@ export default function PlayerView({
             setDrodoLastFetchedAt(data.fetched_at);
           }
         } else if (resp.status === 429) {
-          setRefreshError("Hourly manual refresh limit reached.");
+          setRefreshError(
+            data?.error ||
+              (refreshCadence === "owner"
+                ? "Your next refresh is available after the 30-minute cooldown."
+                : "This profile has already been refreshed today.")
+          );
         } else if (resp.status === 403) {
           setRefreshError("Refresh blocked by anti-bot verification.");
         } else {
@@ -592,14 +622,16 @@ export default function PlayerView({
               </div>
             </div>
             <div className={styles.playerActions}>
-              {canRefresh && (
-                <Button disabled={refreshDisabled} onClick={handleRefresh}>
-                  {refreshing ? "Refreshing..." : "Refresh MMR"}
-                </Button>
-              )}
+              <Button disabled={refreshDisabled} onClick={handleRefresh}>
+                {!authReady
+                  ? "Checking..."
+                  : refreshing
+                    ? "Refreshing..."
+                    : "Refresh Stats"}
+              </Button>
               {showQuota && (
                 <div className={styles.refreshQuota}>
-                  <span>Manual refreshes</span>
+                  <span>{refreshQuotaTitle}</span>
                   <span className={styles.refreshQuotaValue}>
                     {refreshQuotaLabel} {refreshQuotaResetLabel}
                   </span>

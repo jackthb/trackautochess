@@ -107,7 +107,7 @@ export function parseSteamInput(raw: string): ParsedSteamInput | null {
 export async function upsertSteamUser(
   steamId: string,
   supabase?: SupabaseClient,
-  profile?: SteamProfile | null
+  profile?: (SteamProfile & { steamSignedInAt?: string }) | null
 ): Promise<void> {
   if (!supabase || !steamId) return;
 
@@ -116,11 +116,13 @@ export async function upsertSteamUser(
     name?: string;
     custom_url?: string;
     avatar_url?: string;
+    steam_signed_in_at?: string;
   } = { steam_id: steamId };
 
   if (profile?.name) payload.name = profile.name;
   if (profile?.customUrl) payload.custom_url = profile.customUrl;
   if (profile?.avatarUrl) payload.avatar_url = profile.avatarUrl;
+  if (profile?.steamSignedInAt) payload.steam_signed_in_at = profile.steamSignedInAt;
 
   const { error } = await supabase
     .from("users")

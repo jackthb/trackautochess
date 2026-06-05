@@ -151,8 +151,8 @@ export function MmrSparkline({ seasons = [], snapshots = [] }: MmrSparklineProps
       </div>
       <p className={styles.note}>
         Season anchors come from your end-of-season MMR. New points are added
-        each time you press refresh on this profile — check back hourly to
-        build out the recent trend.
+        each time you refresh this profile, with a shorter cooldown when it is
+        your signed-in Steam account.
       </p>
     </section>
   );

@@ -12,6 +12,7 @@ import {
 } from "@/lib/steam";
 import {
   consumeManualRefreshQuota,
+  type ManualRefreshCadence,
   type ManualRefreshQuota,
 } from "@/lib/manualRefreshQuota";
 import { isAdminSteamId } from "@/lib/admin";
@@ -121,25 +122,24 @@ async function handle(req: Request, ctx: { params: Promise<{ steamId: string }> 
   // Response headers accumulated alongside the JSON body (Set-Cookie / Retry-After).
   const responseHeaders: Record<string, string> = {};
 
-  // Manual refresh: must be the profile owner (or an admin) and admins
-  // bypass the hourly quota. Anonymous and cross-profile refreshes are rejected.
+  // Manual refreshes are allowed for everyone: signed-in owners get a shorter
+  // cooldown, while anonymous and cross-profile refreshes are daily per profile.
+  // Admins bypass the quota.
   let refreshQuota: ManualRefreshQuota | undefined;
   if (forceRefresh) {
     const session = await getSessionUser(reqShim, supabase);
     const isOwnProfile = session.steamId === steamId;
     const isAdmin = isAdminSteamId(session.steamId);
-
-    if (!isOwnProfile && !isAdmin) {
-      return Response.json(
-        {
-          error: "Sign in with Steam to refresh your own profile.",
-        },
-        { status: 403 }
-      );
-    }
+    const refreshCadence: ManualRefreshCadence = isOwnProfile
+      ? "owner"
+      : "public";
 
     if (!isAdmin) {
-      const quotaResult = consumeManualRefreshQuota(nodeHeaders.cookie);
+      const nowMs = Date.now();
+      const quotaResult = consumeManualRefreshQuota(nodeHeaders.cookie, nowMs, {
+        cadence: refreshCadence,
+        target: steamId,
+      });
       refreshQuota = quotaResult.quota;
       responseHeaders["Set-Cookie"] = quotaResult.cookie;
       if (!quotaResult.allowed) {
@@ -148,16 +148,20 @@ async function handle(req: Request, ctx: { params: Promise<{ steamId: string }> 
           ip,
           ua,
           steam_id: steamId,
+          reason: refreshCadence,
         });
         responseHeaders["Retry-After"] = Math.max(
           1,
           Math.ceil(
-            (new Date(refreshQuota.reset_at).getTime() - Date.now()) / 1000
+            (new Date(refreshQuota.reset_at).getTime() - nowMs) / 1000
           )
         ).toString();
         return Response.json(
           {
-            error: "Hourly manual refresh limit reached",
+            error:
+              refreshCadence === "owner"
+                ? "Your next refresh is available after the 30-minute cooldown."
+                : "This profile has already been refreshed today.",
             refresh_quota: refreshQuota,
           },
           { status: 429, headers: responseHeaders }

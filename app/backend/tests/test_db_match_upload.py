@@ -310,7 +310,7 @@ def test_upsert_queen_ladder_clears_previous_snapshot(tmp_path, monkeypatch):
             "name": "Alpha",
             "rank": 1,
             "mmr": 4200,
-            "season": "s40",
+            "season": "40",
             "seen_at": "2026-06-02T12:00:00+00:00",
         },
         {
@@ -338,6 +338,7 @@ def test_upsert_queen_ladder_clears_previous_snapshot(tmp_path, monkeypatch):
     client.post.assert_called_once()
     body = client.post.call_args.kwargs["json"]
     assert [row["queen_ladder_rank"] for row in body] == [1, 2]
+    assert [row["queen_ladder_season"] for row in body] == ["s40", "s40"]
     assert [row["queen_ladder_last_seen_at"] for row in body] == [
         "2026-06-02T12:00:00+00:00",
         "2026-06-02T12:00:00+00:00",
