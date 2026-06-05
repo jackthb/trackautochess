@@ -194,10 +194,7 @@ export default function App() {
             )}
             */}
             {activeTab === "settings" && (
-              <SettingsTab
-                status={tracker.status}
-                replayStats={replaysState.stats}
-              />
+              <SettingsTab status={tracker.status} />
             )}
             {activeTab === "log" && <LogTab />}
           </div>

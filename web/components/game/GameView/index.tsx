@@ -10,7 +10,7 @@ import {
   unitsFullData,
 } from "@/generated/content-data";
 import type { Game, UnitFullInfo, SynergyInfo, RelicInfo } from "@dac/shared/types";
-import type { ChessBoardPiece, ItemFullInfo } from "../../../shared/types";
+import type { ChessBoardPiece, ItemFullInfo } from "@dac/shared/types";
 import {
   parseLineup,
   parseSynergies,
@@ -28,12 +28,12 @@ function mmrLevelToRank(level: number | null | undefined): string {
   return RANK_BRACKETS[level - 1].rank.replace("-", " ");
 }
 import { TooltipWrap, type TooltipData } from "@dac/shared/Tooltip";
-import { ChessBoard } from "../../../shared/ChessBoard";
+import { ChessBoard } from "@dac/shared/ChessBoard";
 import {
   playerProfilePath,
   steamProfileUrl,
   type SteamProfile,
-} from "../../lib/steam";
+} from "@/lib/steam";
 import { absoluteUrl } from "@/lib/site";
 import { analyticsRoute, bucketCount, trackEvent } from "@/lib/analytics";
 import { resolveIconUrl } from "@/lib/icons";

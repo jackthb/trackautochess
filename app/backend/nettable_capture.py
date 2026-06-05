@@ -3093,6 +3093,7 @@ class NetTableCapture:
                 if self._last_state.get(r["table_name"], {}).get(r["key"]) != r["raw"]
             ])
             skipped = len(rows) - len(changed_rows)
+            raw_upload_enabled = upload_raw_nettable_dumps()
 
             # Merge into local snapshot. Capture and ingest are independent
             # concerns: if Supabase auth fails the data we decoded is still
@@ -3135,11 +3136,8 @@ class NetTableCapture:
 
             written = 0
             if local_only_mode():
-                log.info(
-                    "nettable: local_only — supabase POST skipped (%d changed, %d unchanged)",
-                    len(changed_rows), skipped,
-                )
-            elif changed_rows and upload_raw_nettable_dumps():
+                pass
+            elif changed_rows and raw_upload_enabled:
                 import httpx
                 cfg = load_config()
                 url = cfg.get("supabase_url")
@@ -3166,16 +3164,12 @@ class NetTableCapture:
                     timeout=60,
                 ) as client:
                     written = insert_dumps(client, changed_rows)
-            elif changed_rows:
-                log.info(
-                    "nettable: raw Supabase dump upload disabled (%d changed, %d unchanged)",
-                    len(changed_rows), skipped,
-                )
 
-            log.info(
-                "nettable: ingested %d row(s) across %d table(s) (skipped %d unchanged)",
-                written, len(tables), skipped,
-            )
+            if raw_upload_enabled:
+                log.info(
+                    "nettable: raw Supabase ingest wrote %d row(s) across %d table(s) (skipped %d unchanged)",
+                    written, len(tables), skipped,
+                )
             self._emit({
                 "type": "nettable_ingest_complete",
                 "rows_written": written,

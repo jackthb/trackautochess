@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import { parseSteamInput, playerProfilePath } from "../lib/steam";
+import { parseSteamInput, playerProfilePath } from "@/lib/steam";
 import {
   mergeSearchResults,
   sortSearchResults,

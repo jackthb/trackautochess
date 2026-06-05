@@ -3546,6 +3546,29 @@ state. It is not truncated.
 
 ## Manual test (no app running)
 
+When manually running `dumpstringtable` commands in Dota's console, avoid one
+huge semicolon chain for every candidate table. Very long direct dump batches
+can truncate or drop output in `console.log`; split broad audits into a few
+smaller commands and run them one at a time.
+
+Direct console batch 1/3 — core live/game tables:
+
+```text
+dumpstringtable CustomNetTable_dac_table cl verbose;dumpstringtable CustomNetTable_player_info_table cl verbose;dumpstringtable CustomNetTable_game_info cl verbose;dumpstringtable CustomNetTable_player_id_table cl verbose;dumpstringtable CustomNetTable_ranking_top_table cl verbose;dumpstringtable CustomNetTable_chess_pool_table cl verbose;dumpstringtable CustomNetTable_unit_table cl verbose
+```
+
+Direct console batch 2/3 — suspected gameplay/extra state tables:
+
+```text
+dumpstringtable CustomNetTable_match_history_table cl verbose;dumpstringtable CustomNetTable_hp_bar_table cl verbose;dumpstringtable CustomNetTable_quest_table cl verbose;dumpstringtable CustomNetTable_casino_table cl verbose;dumpstringtable CustomNetTable_hero_available_items cl verbose;dumpstringtable CustomNetTable_other_available_items cl verbose;dumpstringtable CustomNetTable_setting_table cl verbose
+```
+
+Direct console batch 3/3 — static/cosmetic/reference tables:
+
+```text
+dumpstringtable CustomNetTable_ability_kv_table cl verbose;dumpstringtable CustomNetTable_chess_kv_table cl verbose;dumpstringtable CustomNetTable_gems cl verbose;dumpstringtable CustomNetTable_hero_ethereals cl verbose;dumpstringtable CustomNetTable_hero_prismatic cl verbose;dumpstringtable CustomNetTable_hero_wearables cl verbose
+```
+
 ```powershell
 $env:SUPABASE_SERVICE_ROLE_KEY = '<sb_secret_...>'
 cd app/backend

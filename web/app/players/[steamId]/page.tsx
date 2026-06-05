@@ -4,6 +4,7 @@ import { notFound, redirect } from "next/navigation";
 import { createClient } from "@supabase/supabase-js";
 import type { PlayerGame } from "@dac/shared/types";
 import type { SeasonSnapshot } from "@dac/shared/SeasonHistoryGrid";
+import { RANK_BRACKETS } from "@dac/shared/game-utils";
 import type { MmrSnapshot } from "@/components/MmrSparkline";
 import type { QueenRankSnapshot } from "@/components/QueenRankSparkline";
 import { absoluteUrl, getSiteUrl } from "@/lib/site";
@@ -59,6 +60,13 @@ function drodoFromProfile(profile: DrodoProfileRow) {
     candy: profile.candy,
     chicken_count: profile.chicken_count,
   };
+}
+
+function mmrLevelToRank(level: unknown): string | null {
+  if (typeof level !== "number" || level < 1 || level > RANK_BRACKETS.length) {
+    return null;
+  }
+  return RANK_BRACKETS[level - 1].rank;
 }
 
 function drodoFromCachedRow(row: CachedUserDrodoRow) {
@@ -233,7 +241,7 @@ const loadPlayer = cache(async (rawSteamId: string): Promise<LoadResult> => {
       created_at: (row.created_at as string) ?? "",
       lineup: row.chess_lineup as string | null,
       level: row.hero_level ? String(row.hero_level) : null,
-      rank: null,
+      rank: mmrLevelToRank(row.mmr_level),
       rank_change: null,
       wl: null,
       wins: row.win_round as number | null,

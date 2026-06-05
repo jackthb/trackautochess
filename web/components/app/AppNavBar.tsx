@@ -9,7 +9,7 @@ import { trackEvent } from "@/lib/analytics";
 import { isAdminSteamId } from "@/lib/admin";
 import { useBetaFeaturesEnabled } from "@/lib/betaFeatures";
 import { SteamSignInButton } from "@/components/SteamSignInButton";
-import styles from "@/components/NavBar.module.css";
+import styles from "@/components/NavBar/NavBar.module.css";
 
 /**
  * App Router twin of components/NavBar.tsx.

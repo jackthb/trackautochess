@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import { SITE_NAME, SITE_TITLE } from "@/lib/site";
 import { DEFAULT_LOCALE } from "@/lib/i18n";
 import { getAllTalents, getTierLabel, type DisplayTalent } from "@/lib/talents";
-import browserStyles from "@/components/EntityBrowser.module.css";
-import cardStyles from "@/components/EntityCard.module.css";
+import browserStyles from "@/components/EntityBrowser/EntityBrowser.module.css";
+import cardStyles from "@/components/EntityCard/EntityCard.module.css";
 import { PageLayout } from "@/components/PageLayout";
 
 const title = `Talents | ${SITE_TITLE}`;

@@ -1,16 +1,13 @@
 import { useEffect, useState } from "react";
-import { capture } from "../lib/posthog";
-import type { TrackerStatus, ReplayStats } from "../types";
+import type { TrackerStatus } from "../types";
 
 interface SettingsTabProps {
   status: TrackerStatus | null;
-  replayStats: ReplayStats;
 }
 
-export function SettingsTab({ status, replayStats }: SettingsTabProps) {
+export function SettingsTab({ status }: SettingsTabProps) {
   const [version, setVersion] = useState("\u2014");
   const [loggingIn, setLoggingIn] = useState(false);
-  const [logsSent, setLogsSent] = useState(false);
 
   useEffect(() => {
     window.appApi.getVersion().then(setVersion);
@@ -24,22 +21,10 @@ export function SettingsTab({ status, replayStats }: SettingsTabProps) {
   const loggedIn = !!status?.steam_name;
   const steamName = status?.steam_name || "Not logged in";
   const steamId = status?.steam_id || "\u2014";
-  const replayEnabled = status?.replay_enabled ?? true;
   const backendStatus = status ? "Connected" : "Disconnected";
-  const storageUsed =
-    replayStats.count > 0
-      ? `${(replayStats.totalBytes / 1024 ** 3).toFixed(1)} GB (${replayStats.count} replays)`
-      : "\u2014";
 
   const sendCommand = (cmd: Record<string, unknown>) => {
     window.tracker.sendCommand(cmd);
-  };
-
-  const sendLogs = () => {
-    sendCommand({ cmd: "upload_logs", reason: "manual" });
-    capture("logs_upload_requested");
-    setLogsSent(true);
-    setTimeout(() => setLogsSent(false), 2000);
   };
 
   return (
@@ -116,12 +101,6 @@ export function SettingsTab({ status, replayStats }: SettingsTabProps) {
           <div className="settings-row">
             <span className="settings-label">Backend</span>
             <span className="settings-value">{backendStatus}</span>
-          </div>
-          <div className="settings-row">
-            <span className="settings-label">Logs</span>
-            <button className="btn-ghost" onClick={sendLogs} disabled={logsSent}>
-              {logsSent ? "Sent" : "Send logs to developer"}
-            </button>
           </div>
         </div>
       </div>

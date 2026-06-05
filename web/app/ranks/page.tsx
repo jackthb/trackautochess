@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { SITE_NAME, SITE_TITLE } from "@/lib/site";
 import { DEFAULT_LOCALE } from "@/lib/i18n";
-import browserStyles from "@/components/EntityBrowser.module.css";
+import browserStyles from "@/components/EntityBrowser/EntityBrowser.module.css";
 import { PageLayout } from "@/components/PageLayout";
 import styles from "./ranks.module.css";
 

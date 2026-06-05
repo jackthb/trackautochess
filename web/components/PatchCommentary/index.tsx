@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Markdown } from "./Markdown";
+import { Markdown } from "@/components/Markdown";
 import { KIND_COLOR, KIND_LABEL } from "@/lib/patchKinds";
 import {
   EVIDENCE_SOURCE_LABEL,

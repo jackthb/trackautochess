@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import styles from "./MmrSparkline.module.css";
+import styles from "@/components/MmrSparkline/MmrSparkline.module.css";
 
 export interface QueenRankSnapshot {
   queen_rank: number | null;

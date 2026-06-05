@@ -1,16 +1,13 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
-import { UNIT_COSTS } from "@/lib/units";
-import { relicsData as relicsJson } from "@/generated/content-data";
-import type { PlayerGame, RelicInfo } from "@dac/shared/types";
-import { GameRowDisplay } from "@dac/shared/GameRowDisplay";
+import type { PlayerGame } from "@dac/shared/types";
 import { buildStatItems } from "@dac/shared/buildStatItems";
 import { Button } from "@dac/shared/Button";
 import { StatsGrid } from "@dac/shared/StatsGrid";
 import { SeasonHistoryGrid, type SeasonSnapshot } from "@dac/shared/SeasonHistoryGrid";
 import { MmrSparkline, type MmrSnapshot } from "@/components/MmrSparkline";
+import { MatchHistoryList } from "@/components/matches/MatchHistoryList";
 import { QueenRankSparkline, type QueenRankSnapshot } from "@/components/QueenRankSparkline";
 import { RankLadder } from "@/components/RankLadder";
 import { SteamSignInButton } from "@/components/SteamSignInButton";
@@ -21,20 +18,15 @@ import {
 } from "@/lib/manualRefreshQuota";
 import { isAdminSteamId } from "@/lib/admin";
 import { analyticsRoute, bucketCount, trackEvent } from "@/lib/analytics";
-import { resolveIconUrl } from "@/lib/icons";
 import {
   steamProfileUrl,
   type SteamProfile,
-} from "../../lib/steam";
+} from "@/lib/steam";
 import styles from "./PlayerView.module.css";
 
 const LAST_FETCHED_TICK_MS = 1000;
 const ANONYMOUS_PROFILE_SEEN_KEY = "dac.anonymous_profile_seen";
 const ANONYMOUS_RETURN_PROMPT_KEY = "dac.anonymous_return_prompt_seen";
-
-// item_* id → relic display info, so the match-history rows can render the
-// full relic_history pick list (not just the single active `relic`).
-const RELICS_MAP = (relicsJson as { relics?: Record<string, RelicInfo> }).relics ?? {};
 
 export interface LeaderboardPosition {
   rank: number;
@@ -250,7 +242,6 @@ export default function PlayerView({
   drodoLastFetchedAt: initialDrodoLastFetchedAt,
   manualRefreshQuota: initialManualRefreshQuota,
 }: PlayerPageProps) {
-  const router = useRouter();
   const [drodo, setDrodo] = useState(initialDrodo);
   const [seasons, setSeasons] = useState(initialSeasons);
   const [drodoProfileMissing, setDrodoProfileMissing] = useState(
@@ -722,45 +713,7 @@ export default function PlayerView({
           {games.length > 0 && (
             <>
               <div className="section-title">Matches</div>
-              <div className={styles.tableWrap}>
-                <div className={styles.tableHeader}>
-                  <div className={styles.th}>#</div>
-                  <div className={styles.th}>Lineup</div>
-                  <div className={styles.th}>Rank</div>
-                  <div className={styles.th}>W &ndash; L</div>
-                  <div className={styles.th}>Lv</div>
-                  <div className={styles.th}>Relic</div>
-                  <div className={styles.th}>Date</div>
-                </div>
-                {games.map((g) => {
-                  const href = `/matches/${g.id}`;
-                  return (
-                    <div key={g.id} className={styles.gameEntry}>
-                      <div
-                        className={styles.gameRowLink}
-                        role="link"
-                        tabIndex={0}
-                        onClick={() => router.push(href)}
-                        onKeyDown={(e) => {
-                          if (e.key === "Enter" || e.key === " ") {
-                            e.preventDefault();
-                            router.push(href);
-                          }
-                        }}
-                      >
-                        <GameRowDisplay
-                          game={g}
-                          unitCosts={UNIT_COSTS}
-                          relicsData={RELICS_MAP}
-                          iconUrl={resolveIconUrl}
-                          shareUrl={href}
-                          style={{ cursor: "pointer" }}
-                        />
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
+              <MatchHistoryList games={games} />
             </>
           )}
         </div>
