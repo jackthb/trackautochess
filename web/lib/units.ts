@@ -36,6 +36,7 @@ interface UnitInfo {
   names?: Record<string, string>;
   icon_url?: string | null;
   icon_dimensions?: { width: number; height: number } | null;
+  commentary?: string;
 }
 
 export interface DisplayUnit {
@@ -57,6 +58,8 @@ export interface DisplayUnit {
    */
   iconUrl: string;
   iconDimensions: { width: number; height: number } | null;
+  /** Editorial commentary authored in the CMS; empty string when none. */
+  commentary: string;
 }
 
 function buildUnitsForLocale(locale: Locale): DisplayUnit[] {
@@ -76,6 +79,7 @@ function buildUnitsForLocale(locale: Locale): DisplayUnit[] {
         iconStem: stem,
         iconUrl: data.icon_url || `/icons/units/${stem}.png`,
         iconDimensions: data.icon_dimensions ?? null,
+        commentary: data.commentary ?? "",
       };
     })
     .sort((a, b) => {

@@ -32,6 +32,11 @@ const entitySchema = {
     label: "Icon path",
     description: "Relative to web/public/icons, for example units/axe.png.",
   }),
+  commentary: fields.text({
+    label: "Commentary",
+    multiline: true,
+    description: "Generic editorial notes explaining what this is / what it does.",
+  }),
   source: fields.ignored(),
   overrides: fields.object(
     {

@@ -30,6 +30,10 @@ function materializeEntity(entity) {
     output.icon = entity.icon;
   }
 
+  if (entity.commentary) {
+    output.commentary = entity.commentary;
+  }
+
   if (entity.overrides) {
     for (const [key, value] of Object.entries(entity.overrides)) {
       if (value !== null && value !== undefined) {

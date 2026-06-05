@@ -19,6 +19,7 @@ const t = {
   cost: (c: number) => `Cost ${c}`,
   crumbUnits: "Units",
   overview: "Overview",
+  commentary: "Commentary",
   abilities: "Abilities",
   stats: "Stats",
   attackType: (type: string) => `${type.charAt(0).toUpperCase()}${type.slice(1)} attack`,
@@ -112,6 +113,18 @@ export default async function UnitDetailPage({ params }: Props) {
       title: t.overview,
       body: unit.attackType ? t.attackType(unit.attackType) : description,
     },
+    // Generic editorial commentary authored in the CMS, distinct from the
+    // patch-note commentary rendered in the commentary slot below.
+    ...(unit.commentary
+      ? [
+          {
+            title: t.commentary,
+            body: (
+              <p style={{ whiteSpace: "pre-line", margin: 0 }}>{unit.commentary}</p>
+            ),
+          },
+        ]
+      : []),
     ...(unit.abilities.length > 0
       ? [
           {
