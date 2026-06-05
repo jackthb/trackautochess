@@ -55,6 +55,8 @@ interface Props {
   params: Promise<{ slug: string }>;
 }
 
+export const dynamicParams = false;
+
 function cleanText(value: string): string {
   return value.replace(/\s+/g, " ").trim();
 }

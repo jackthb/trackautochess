@@ -42,6 +42,7 @@ export function EntityCard({
   return (
     <Link
       href={href}
+      prefetch={false}
       className={`${styles.card} ${styles[variant]}`}
       style={{ "--card-accent": accent } as CSSProperties}
       onClick={onClick}

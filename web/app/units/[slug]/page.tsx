@@ -34,6 +34,8 @@ interface Props {
   params: Promise<{ slug: string }>;
 }
 
+export const dynamicParams = false;
+
 export function generateStaticParams() {
   return getAllUnits().map((unit) => ({ slug: unit.slug }));
 }

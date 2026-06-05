@@ -32,6 +32,8 @@ interface Props {
   params: Promise<{ slug: string }>;
 }
 
+export const dynamicParams = false;
+
 export function generateStaticParams() {
   return getAllSynergies().map((synergy) => ({ slug: synergy.slug }));
 }

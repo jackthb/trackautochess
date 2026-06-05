@@ -98,6 +98,7 @@ export function EntityCommentaryList({ entries }: EntityCommentaryListProps) {
             </span>
             <Link
               href={`/patch-notes/${e.patchSlug}`}
+              prefetch={false}
               className={styles.patchLink}
             >
               {e.patchTitle}

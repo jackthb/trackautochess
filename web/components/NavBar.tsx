@@ -130,41 +130,41 @@ export function NavBar({ supabase }: NavBarProps) {
 
   const navLinks = (
     <>
-      <Link href="/items" className={styles.navLink}>
+      <Link href="/items" className={styles.navLink} prefetch={false}>
         {t.items}
       </Link>
-      <Link href="/units" className={styles.navLink}>
+      <Link href="/units" className={styles.navLink} prefetch={false}>
         {t.units}
       </Link>
-      <Link href="/classes" className={styles.navLink}>
+      <Link href="/classes" className={styles.navLink} prefetch={false}>
         {t.classes}
       </Link>
-      <Link href="/species" className={styles.navLink}>
+      <Link href="/species" className={styles.navLink} prefetch={false}>
         {t.species}
       </Link>
-      <Link href="/relics" className={styles.navLink}>
+      <Link href="/relics" className={styles.navLink} prefetch={false}>
         {t.relics}
       </Link>
-      <Link href="/talents" className={styles.navLink}>
+      <Link href="/talents" className={styles.navLink} prefetch={false}>
         {t.talents}
       </Link>
-      <Link href="/ranks" className={styles.navLink}>
+      <Link href="/ranks" className={styles.navLink} prefetch={false}>
         {t.ranks}
       </Link>
-      <Link href="/queens" className={styles.navLink}>
+      <Link href="/queens" className={styles.navLink} prefetch={false}>
         {t.queens}
       </Link>
       {canSeeBetaFeatures && (
-        <Link href="/leaderboard" className={styles.navLink}>
+        <Link href="/leaderboard" className={styles.navLink} prefetch={false}>
           {t.leaderboard}
         </Link>
       )}
       {canSeeBetaFeatures && (
-        <Link href="/matches" className={styles.navLink}>
+        <Link href="/matches" className={styles.navLink} prefetch={false}>
           {t.matches}
         </Link>
       )}
-      <Link href="/patch-notes" className={styles.navLink}>
+      <Link href="/patch-notes" className={styles.navLink} prefetch={false}>
         {t.patchNotes}
       </Link>
     </>
@@ -174,7 +174,7 @@ export function NavBar({ supabase }: NavBarProps) {
     <>
       <nav className={styles.nav}>
         <div className={styles.navLeft}>
-          <Link href="/" className={styles.navLogo} aria-label={t.home(SITE_NAME)}>
+          <Link href="/" className={styles.navLogo} aria-label={t.home(SITE_NAME)} prefetch={false}>
             <img src="/logo.svg" alt={SITE_NAME} />
           </Link>
           <div className={styles.navLinks}>{navLinks}</div>
@@ -183,7 +183,7 @@ export function NavBar({ supabase }: NavBarProps) {
           {ready ? (
             user ? (
               <>
-                <Link href="/dashboard" className={styles.navUserLink}>
+                <Link href="/dashboard" className={styles.navUserLink} prefetch={false}>
                   {avatarUrl ? (
                     <img
                       className={styles.navAvatar}

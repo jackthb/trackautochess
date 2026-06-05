@@ -35,19 +35,19 @@ export function Footer() {
           <div>
             <h3 className={styles.colHeading}>{t.browseHeading}</h3>
             <div className={styles.colLinks}>
-              <Link href="/units" className={styles.link}>{t.units}</Link>
-              <Link href="/items" className={styles.link}>{t.items}</Link>
-              <Link href="/classes" className={styles.link}>{t.classes}</Link>
-              <Link href="/species" className={styles.link}>{t.species}</Link>
-              <Link href="/relics" className={styles.link}>{t.relics}</Link>
+              <Link href="/units" className={styles.link} prefetch={false}>{t.units}</Link>
+              <Link href="/items" className={styles.link} prefetch={false}>{t.items}</Link>
+              <Link href="/classes" className={styles.link} prefetch={false}>{t.classes}</Link>
+              <Link href="/species" className={styles.link} prefetch={false}>{t.species}</Link>
+              <Link href="/relics" className={styles.link} prefetch={false}>{t.relics}</Link>
             </div>
           </div>
           <div>
             <h3 className={styles.colHeading}>{t.referenceHeading}</h3>
             <div className={styles.colLinks}>
-              <Link href="/talents" className={styles.link}>{t.talents}</Link>
-              <Link href="/ranks" className={styles.link}>{t.ranks}</Link>
-              <Link href="/patch-notes" className={styles.link}>
+              <Link href="/talents" className={styles.link} prefetch={false}>{t.talents}</Link>
+              <Link href="/ranks" className={styles.link} prefetch={false}>{t.ranks}</Link>
+              <Link href="/patch-notes" className={styles.link} prefetch={false}>
                 {t.patchNotes}
               </Link>
             </div>
@@ -55,9 +55,9 @@ export function Footer() {
           <div>
             <h3 className={styles.colHeading}>{t.siteHeading}</h3>
             <div className={styles.colLinks}>
-              <Link href="/about" className={styles.link}>{t.about}</Link>
-              <Link href="/about#support" className={styles.link}>{t.support}</Link>
-              <Link href="/privacy" className={styles.link}>{t.privacy}</Link>
+              <Link href="/about" className={styles.link} prefetch={false}>{t.about}</Link>
+              <Link href="/about#support" className={styles.link} prefetch={false}>{t.support}</Link>
+              <Link href="/privacy" className={styles.link} prefetch={false}>{t.privacy}</Link>
             </div>
           </div>
         </nav>

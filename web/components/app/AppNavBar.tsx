@@ -150,41 +150,41 @@ export function AppNavBar({ supabase }: AppNavBarProps) {
 
   const navLinks = (
     <>
-      <Link href="/items" className={styles.navLink} onClick={() => trackNavClick("items")}>
+      <Link href="/items" className={styles.navLink} prefetch={false} onClick={() => trackNavClick("items")}>
         {t.items}
       </Link>
-      <Link href="/units" className={styles.navLink} onClick={() => trackNavClick("units")}>
+      <Link href="/units" className={styles.navLink} prefetch={false} onClick={() => trackNavClick("units")}>
         {t.units}
       </Link>
-      <Link href="/classes" className={styles.navLink} onClick={() => trackNavClick("classes")}>
+      <Link href="/classes" className={styles.navLink} prefetch={false} onClick={() => trackNavClick("classes")}>
         {t.classes}
       </Link>
-      <Link href="/species" className={styles.navLink} onClick={() => trackNavClick("species")}>
+      <Link href="/species" className={styles.navLink} prefetch={false} onClick={() => trackNavClick("species")}>
         {t.species}
       </Link>
-      <Link href="/relics" className={styles.navLink} onClick={() => trackNavClick("relics")}>
+      <Link href="/relics" className={styles.navLink} prefetch={false} onClick={() => trackNavClick("relics")}>
         {t.relics}
       </Link>
-      <Link href="/talents" className={styles.navLink} onClick={() => trackNavClick("talents")}>
+      <Link href="/talents" className={styles.navLink} prefetch={false} onClick={() => trackNavClick("talents")}>
         {t.talents}
       </Link>
-      <Link href="/ranks" className={styles.navLink} onClick={() => trackNavClick("ranks")}>
+      <Link href="/ranks" className={styles.navLink} prefetch={false} onClick={() => trackNavClick("ranks")}>
         {t.ranks}
       </Link>
-      <Link href="/queens" className={styles.navLink} onClick={() => trackNavClick("queens")}>
+      <Link href="/queens" className={styles.navLink} prefetch={false} onClick={() => trackNavClick("queens")}>
         {t.queens}
       </Link>
       {canSeeBetaFeatures && (
-        <Link href="/leaderboard" className={styles.navLink} onClick={() => trackNavClick("leaderboard")}>
+        <Link href="/leaderboard" className={styles.navLink} prefetch={false} onClick={() => trackNavClick("leaderboard")}>
           {t.leaderboard}
         </Link>
       )}
       {canSeeBetaFeatures && (
-        <Link href="/matches" className={styles.navLink} onClick={() => trackNavClick("matches")}>
+        <Link href="/matches" className={styles.navLink} prefetch={false} onClick={() => trackNavClick("matches")}>
           {t.matches}
         </Link>
       )}
-      <Link href="/patch-notes" className={styles.navLink} onClick={() => trackNavClick("patch_notes")}>
+      <Link href="/patch-notes" className={styles.navLink} prefetch={false} onClick={() => trackNavClick("patch_notes")}>
         {t.patchNotes}
       </Link>
     </>
@@ -194,7 +194,7 @@ export function AppNavBar({ supabase }: AppNavBarProps) {
     <>
       <nav className={styles.nav}>
         <div className={styles.navLeft}>
-          <Link href="/" className={styles.navLogo} aria-label={t.home(SITE_NAME)}>
+          <Link href="/" className={styles.navLogo} aria-label={t.home(SITE_NAME)} prefetch={false}>
             <img src="/logo.svg" alt={SITE_NAME} />
           </Link>
           <div className={styles.navLinks}>{navLinks}</div>
@@ -203,7 +203,7 @@ export function AppNavBar({ supabase }: AppNavBarProps) {
           {ready ? (
             user ? (
               <>
-                <Link href="/dashboard" className={styles.navUserLink} onClick={() => trackNavClick("dashboard")}>
+                <Link href="/dashboard" className={styles.navUserLink} prefetch={false} onClick={() => trackNavClick("dashboard")}>
                   {avatarUrl ? (
                     <img
                       className={styles.navAvatar}
@@ -225,7 +225,7 @@ export function AppNavBar({ supabase }: AppNavBarProps) {
                   <span className={styles.navUser}>{displayName}</span>
                 </Link>
                 {isAdmin && (
-                  <Link href="/keystatic" className={styles.navBtn} onClick={() => trackNavClick("keystatic")}>
+                  <Link href="/keystatic" className={styles.navBtn} prefetch={false} onClick={() => trackNavClick("keystatic")}>
                     {t.cms}
                   </Link>
                 )}

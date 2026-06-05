@@ -46,6 +46,8 @@ export const metadata: Metadata = {
   },
 };
 
+export const revalidate = 300;
+
 const SELECT = [
   "steam_id::text",
   "name",
@@ -221,6 +223,7 @@ export default async function QueensPage() {
                     <Link
                       href={playerProfilePath(row.steam_id, row.custom_url)}
                       className={styles["player-link"]}
+                      prefetch={false}
                     >
                       {display}
                     </Link>

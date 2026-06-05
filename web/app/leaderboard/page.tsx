@@ -33,6 +33,8 @@ export const metadata: Metadata = {
   alternates: { canonical: "/leaderboard" },
 };
 
+export const revalidate = 300;
+
 const LEADERBOARD_SELECT = [
   "steam_id::text",
   "name",
@@ -188,6 +190,7 @@ export default async function LeaderboardPage() {
                   <Link
                     href={playerProfilePath(row.steam_id, row.custom_url)}
                     className={styles["player-link"]}
+                    prefetch={false}
                   >
                     {display}
                   </Link>

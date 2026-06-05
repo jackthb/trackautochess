@@ -38,6 +38,8 @@ interface Props {
   params: Promise<{ slug: string }>;
 }
 
+export const dynamicParams = false;
+
 export function generateStaticParams() {
   return getAllRelics().map((relic) => ({ slug: relic.slug }));
 }

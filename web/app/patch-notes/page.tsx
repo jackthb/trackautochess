@@ -95,6 +95,7 @@ export default function PatchNotesPage() {
                   )}
                   <Link
                     href={`/patch-notes/${patch.slug}`}
+                    prefetch={false}
                     className={styles.entry}
                   >
                     <div className={styles.date}>
