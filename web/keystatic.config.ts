@@ -1,13 +1,19 @@
 import { collection, config, fields } from "@keystatic/core";
 
 const githubRepo = "jackthb/dac-tools" as const;
-const useGithubStorage = Boolean(
-  process.env.NEXT_PUBLIC_KEYSTATIC_GITHUB_APP_SLUG &&
-    process.env.KEYSTATIC_GITHUB_CLIENT_ID &&
-    process.env.KEYSTATIC_GITHUB_CLIENT_SECRET &&
-    process.env.KEYSTATIC_SECRET &&
-    process.env.NODE_ENV === "production",
-);
+// The storage *kind* must resolve identically in the browser bundle and on the
+// server, because the client decides whether to read content from the GitHub
+// API (github mode) or from /api/keystatic/tree (local mode). Only NEXT_PUBLIC_*
+// vars and NODE_ENV are inlined into the client bundle — the secret vars
+// (CLIENT_ID / CLIENT_SECRET / KEYSTATIC_SECRET) are undefined in the browser.
+// Gating on them made the client fall back to "local" storage (hitting
+// /api/keystatic/tree → 404 → HTML → "Unable to load collection: JSON.parse
+// unexpected character") while the server ran in "github" mode. Gate only on
+// values present in both environments; the server reads the secrets at runtime
+// for the OAuth token exchange.
+const useGithubStorage =
+  process.env.NODE_ENV === "production" &&
+  Boolean(process.env.NEXT_PUBLIC_KEYSTATIC_GITHUB_APP_SLUG);
 
 const storage =
   useGithubStorage
