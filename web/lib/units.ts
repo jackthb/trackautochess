@@ -183,7 +183,7 @@ function buildNameLookups() {
     cost[name] = data.cost ?? 0;
     if (data.synergies) synergies[name] = data.synergies;
   }
-  const aliases = aliasData as Record<string, string>;
+  const aliases = aliasesData as Record<string, string>;
   for (const [alias, canonical] of Object.entries(aliases)) {
     if (cost[canonical] !== undefined) cost[alias] = cost[canonical];
     if (synergies[canonical]) synergies[alias] = synergies[canonical];
