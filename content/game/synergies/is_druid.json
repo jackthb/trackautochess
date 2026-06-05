@@ -3,6 +3,7 @@
   "name": "Druid",
   "slug": "druid",
   "icon": "synergies/druid.png",
+  "commentary": "Doesn't work with Wizards.",
   "source": {
     "name": "Druid",
     "names": {
@@ -31,5 +32,7 @@
     ],
     "ability_special": {}
   },
-  "overrides": {}
+  "overrides": {
+    "notes": []
+  }
 }
