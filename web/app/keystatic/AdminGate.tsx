@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
+import { notFound } from "next/navigation";
 import { isAdminSteamId } from "@/lib/admin";
 import { createSupabaseClient } from "@/lib/supabase";
 
@@ -15,6 +16,8 @@ export default function AdminGate() {
   const [state, setState] = useState<GateState>(DEV_BYPASS ? "allowed" : "loading");
 
   useEffect(() => {
+    if (DEV_BYPASS) return;
+
     const supabase = createSupabaseClient();
     let cancelled = false;
 
@@ -37,17 +40,8 @@ export default function AdminGate() {
     };
   }, []);
 
-  if (state === "loading") {
-    return null;
-  }
-
-  if (state === "denied") {
-    return (
-      <main style={{ padding: 24, fontFamily: "system-ui, sans-serif" }}>
-        <h1>Not found</h1>
-      </main>
-    );
-  }
+  if (state === "loading") return null;
+  if (state === "denied") notFound();
 
   return <KeystaticApp />;
 }
