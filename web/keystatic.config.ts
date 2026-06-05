@@ -176,7 +176,9 @@ export default config({
       path: `${contentPath}/game/items/*`,
       slugField: "name",
       format: { data: "json" },
-      columns: ["gameId"],
+      // Files are named by gameId, so the title column shows that cryptic id.
+      // Surface the readable slug and the icon path so entries are findable.
+      columns: ["slug", "gameId", "icon"],
       schema: entitySchema,
     }),
     synergies: collection({
@@ -184,7 +186,9 @@ export default config({
       path: `${contentPath}/game/synergies/*`,
       slugField: "name",
       format: { data: "json" },
-      columns: ["gameId"],
+      // Files are named by gameId, so the title column shows that cryptic id.
+      // Surface the readable slug and the icon path so entries are findable.
+      columns: ["slug", "gameId", "icon"],
       schema: entitySchema,
     }),
     relics: collection({
@@ -192,7 +196,9 @@ export default config({
       path: `${contentPath}/game/relics/*`,
       slugField: "name",
       format: { data: "json" },
-      columns: ["gameId"],
+      // Files are named by gameId, so the title column shows that cryptic id.
+      // Surface the readable slug and the icon path so entries are findable.
+      columns: ["slug", "gameId", "icon"],
       schema: entitySchema,
     }),
     talents: collection({
