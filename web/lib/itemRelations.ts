@@ -1,4 +1,4 @@
-import itemLinksData from "@data/item_links.json";
+import { itemLinksData } from "@/generated/content-data";
 import { getAllItems, getItemSlugByName, iconUrl, type DisplayItem } from "@/lib/items";
 import { getAllSynergies, getSynergySlugByName, type DisplaySynergy } from "@/lib/synergies";
 import { DEFAULT_LOCALE, type Locale } from "@/lib/i18n";

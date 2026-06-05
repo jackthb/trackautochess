@@ -1,5 +1,5 @@
 import { relicStem } from "@dac/shared/game-utils";
-import relicsData from "@data/relics.json";
+import { relicsData } from "@/generated/content-data";
 import { slugifyName } from "@/lib/slugs";
 import { DEFAULT_LOCALE, type Locale, pickLocalized } from "@/lib/i18n";
 

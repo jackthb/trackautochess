@@ -3100,18 +3100,18 @@ def _load_relic_id_map() -> dict[str, str]:
     if _RELIC_ID_MAP_CACHE is not None:
         return _RELIC_ID_MAP_CACHE
     try:
-        from utils import DATA_DIR
-        path = DATA_DIR / "relics.json"
-        if not path.exists():
+        from utils import CONTENT_DIR
+        relic_dir = CONTENT_DIR / "game" / "relics"
+        if not relic_dir.exists():
             _RELIC_ID_MAP_CACHE = {}
             return _RELIC_ID_MAP_CACHE
-        data = json.loads(path.read_text(encoding="utf-8"))
-        relics = data.get("relics", data) if isinstance(data, dict) else {}
         out: dict[str, str] = {}
-        if isinstance(relics, dict):
-            for item_id, info in relics.items():
-                if isinstance(info, dict):
-                    out[item_id] = info.get("name") or item_id
+        for path in sorted(relic_dir.glob("*.json")):
+            info = json.loads(path.read_text(encoding="utf-8"))
+            if isinstance(info, dict):
+                item_id = info.get("gameId") or path.stem
+                source = info.get("source") if isinstance(info.get("source"), dict) else {}
+                out[item_id] = info.get("name") or source.get("name") or item_id
         _RELIC_ID_MAP_CACHE = out
     except Exception as e:
         log.warning("nettable: failed to load relic id map: %s", e)
@@ -3134,15 +3134,21 @@ def _load_chess_id_map() -> dict[str, str]:
     if _CHESS_ID_MAP_CACHE is not None:
         return _CHESS_ID_MAP_CACHE
     try:
-        from utils import DATA_DIR
-        path = DATA_DIR / "units_full.json"
-        if not path.exists():
+        from utils import CONTENT_DIR
+        unit_dir = CONTENT_DIR / "game" / "units"
+        if not unit_dir.exists():
             _CHESS_ID_MAP_CACHE = {}
             return _CHESS_ID_MAP_CACHE
-        data = json.loads(path.read_text(encoding="utf-8"))
-        _CHESS_ID_MAP_CACHE = {
-            u.get("id"): name for name, u in data.items() if u.get("id")
-        }
+        out: dict[str, str] = {}
+        for path in sorted(unit_dir.glob("*.json")):
+            info = json.loads(path.read_text(encoding="utf-8"))
+            if isinstance(info, dict):
+                source = info.get("source") if isinstance(info.get("source"), dict) else {}
+                chess_id = source.get("id") or info.get("gameId")
+                name = info.get("name") or source.get("name")
+                if chess_id and name:
+                    out[chess_id] = name
+        _CHESS_ID_MAP_CACHE = out
     except Exception as e:
         log.warning("nettable: failed to load chess id map: %s", e)
         _CHESS_ID_MAP_CACHE = {}
@@ -3157,18 +3163,18 @@ def _load_synergy_id_map() -> dict[str, str]:
     if _SYNERGY_ID_MAP_CACHE is not None:
         return _SYNERGY_ID_MAP_CACHE
     try:
-        from utils import DATA_DIR
-        path = DATA_DIR / "synergies.json"
-        if not path.exists():
+        from utils import CONTENT_DIR
+        synergy_dir = CONTENT_DIR / "game" / "synergies"
+        if not synergy_dir.exists():
             _SYNERGY_ID_MAP_CACHE = {}
             return _SYNERGY_ID_MAP_CACHE
-        data = json.loads(path.read_text(encoding="utf-8"))
         out: dict[str, str] = {}
-        if isinstance(data, dict):
-            for internal_id, info in data.items():
-                if isinstance(info, dict):
-                    display = info.get("name") or internal_id
-                    out[internal_id] = display
+        for path in sorted(synergy_dir.glob("*.json")):
+            info = json.loads(path.read_text(encoding="utf-8"))
+            if isinstance(info, dict):
+                source = info.get("source") if isinstance(info.get("source"), dict) else {}
+                internal_id = info.get("gameId") or path.stem
+                out[internal_id] = info.get("name") or source.get("name") or internal_id
         _SYNERGY_ID_MAP_CACHE = out
     except Exception as e:
         log.warning("nettable: failed to load synergy id map: %s", e)
@@ -3182,23 +3188,25 @@ def _load_synergy_min_tier_map() -> dict[str, int]:
     if _SYNERGY_MIN_TIER_MAP_CACHE is not None:
         return _SYNERGY_MIN_TIER_MAP_CACHE
     try:
-        from utils import DATA_DIR
-        path = DATA_DIR / "synergies.json"
-        if not path.exists():
+        from utils import CONTENT_DIR
+        synergy_dir = CONTENT_DIR / "game" / "synergies"
+        if not synergy_dir.exists():
             _SYNERGY_MIN_TIER_MAP_CACHE = {}
             return _SYNERGY_MIN_TIER_MAP_CACHE
-        data = json.loads(path.read_text(encoding="utf-8"))
         out: dict[str, int] = {}
-        if isinstance(data, dict):
-            for internal_id, info in data.items():
-                tiers = info.get("tiers") if isinstance(info, dict) else None
-                nums: list[int] = []
-                for tier in tiers or []:
-                    n = _safe_int(tier)
-                    if n is not None:
-                        nums.append(n)
-                if nums:
-                    out[internal_id] = min(nums)
+        for path in sorted(synergy_dir.glob("*.json")):
+            info = json.loads(path.read_text(encoding="utf-8"))
+            if not isinstance(info, dict):
+                continue
+            source = info.get("source") if isinstance(info.get("source"), dict) else {}
+            internal_id = info.get("gameId") or path.stem
+            nums: list[int] = []
+            for tier in source.get("tiers") or []:
+                n = _safe_int(tier)
+                if n is not None:
+                    nums.append(n)
+            if nums:
+                out[internal_id] = min(nums)
         _SYNERGY_MIN_TIER_MAP_CACHE = out
     except Exception as e:
         log.warning("nettable: failed to load synergy tier map: %s", e)

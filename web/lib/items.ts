@@ -1,5 +1,4 @@
-import itemsFull from "@data/items_full.json";
-import itemsSimple from "@data/items.json";
+import { itemsFullData, itemsSimpleData } from "@/generated/content-data";
 import { slugifyName } from "@/lib/slugs";
 import { DEFAULT_LOCALE, type Locale, pickLocalized } from "@/lib/i18n";
 
@@ -88,17 +87,17 @@ function normalizePunct(value: string): string {
 }
 
 function buildItemsForLocale(locale: Locale): DisplayItem[] {
-  const simple = (itemsSimple as { items: Record<string, SimpleItem> }).items;
+  const simple = (itemsSimpleData as { items: Record<string, SimpleItem> }).items;
   const fullByNorm = new Map<string, FullItem>();
 
-  for (const value of Object.values(itemsFull as Record<string, FullItem>)) {
+  for (const value of Object.values(itemsFullData as Record<string, FullItem>)) {
     if (!value.name?.trim()) continue;
     fullByNorm.set(norm(value.name), value);
   }
 
   const itemNames = new Set([
     ...Object.keys(simple),
-    ...Object.values(itemsFull as Record<string, FullItem>)
+    ...Object.values(itemsFullData as Record<string, FullItem>)
       .map((item) => item.name)
       .filter((name): name is string => Boolean(name?.trim())),
   ]);
@@ -176,7 +175,7 @@ export function getItemSlugByName(name: string): string | null {
  * (synced from data/icons at build time) otherwise.
  *
  * Accepts either a full DisplayItem (uses its precomputed iconUrl) or a
- * lighter shape derived from raw items_full / items.json data.
+ * lighter shape derived from content item data.
  */
 export function iconUrl(
   item: Partial<Pick<DisplayItem, "iconUrl">> & Pick<DisplayItem, "icon" | "texture">

@@ -31,6 +31,7 @@ const DAC_DIR = DESKTOP_PATHS.dacDir;
 const REPLAY_DIR = DESKTOP_PATHS.replayDir;
 const ICONS_DIR = DESKTOP_PATHS.iconsDir;
 const ICON_FILENAME = DESKTOP_PATHS.iconFilename;
+const CONTENT_DIR = path.join(RESOURCES_DIR, "content");
 const gotSingleInstanceLock = app.requestSingleInstanceLock();
 const IS_DEV = !IS_PACKAGED && process.argv.includes("--dev");
 
@@ -68,6 +69,84 @@ let trackerStatus = {
   steam_name: "",
   replay_enabled: true,
 };
+
+let runtimeGameDataCache = null;
+
+function readJsonFile(file, fallback) {
+  try {
+    if (!fs.existsSync(file)) return fallback;
+    return JSON.parse(fs.readFileSync(file, "utf-8"));
+  } catch {
+    return fallback;
+  }
+}
+
+function materializeContentEntity(entity) {
+  const output = { ...(entity?.source || {}) };
+  if (entity?.icon) output.icon = entity.icon;
+  for (const [key, value] of Object.entries(entity?.overrides || {})) {
+    if (value !== null && value !== undefined) output[key] = value;
+  }
+  return output;
+}
+
+function readContentCollection(relativeDir) {
+  const dir = path.join(CONTENT_DIR, "game", relativeDir);
+  if (!fs.existsSync(dir)) return [];
+  return fs
+    .readdirSync(dir)
+    .filter((file) => file.endsWith(".json"))
+    .sort()
+    .map((file) => readJsonFile(path.join(dir, file), null))
+    .filter(Boolean);
+}
+
+function getRuntimeGameData() {
+  if (runtimeGameDataCache) return runtimeGameDataCache;
+
+  const aliases = readJsonFile(path.join(CONTENT_DIR, "game", "aliases.json"), {});
+  const items = readJsonFile(path.join(CONTENT_DIR, "game", "curated-items.json"), {});
+
+  const unitsFull = {};
+  for (const entry of readContentCollection("units")) {
+    unitsFull[entry.name] = {
+      id: entry.gameId,
+      ...materializeContentEntity(entry),
+    };
+  }
+
+  const synergies = {};
+  for (const entry of readContentCollection("synergies")) {
+    synergies[entry.gameId] = materializeContentEntity(entry);
+  }
+
+  const relics = {};
+  for (const entry of readContentCollection("relics")) {
+    relics[entry.gameId] = materializeContentEntity(entry);
+  }
+
+  const itemsFull = {};
+  for (const entry of readContentCollection("items")) {
+    itemsFull[entry.gameId] = materializeContentEntity(entry);
+  }
+
+  const talents = {};
+  for (const entry of readContentCollection("talents")) {
+    const { slot, ...talent } = entry;
+    talents[slot] = talent;
+  }
+
+  runtimeGameDataCache = {
+    aliases,
+    items,
+    unitsFull,
+    synergies,
+    relics: { relics },
+    itemsFull,
+    talents,
+  };
+  return runtimeGameDataCache;
+}
 
 function focusMainWindow() {
   if (!mainWindow || mainWindow.isDestroyed()) return;
@@ -1092,92 +1171,42 @@ ipcMain.handle("drodo:refresh", async () => {
 // ── Units data IPC ───────────────────────────────────────────────────────────
 
 ipcMain.handle("data:units", async () => {
-  // units.json was collapsed into units_full.json + aliases.json. Reassemble
-  // the legacy {units, aliases} shape the renderer (useGames) still expects;
-  // units_full carries cost/synergies, so it serves as the `units` map.
-  const fullPath = path.join(RESOURCES_DIR, "data", "units_full.json");
-  const aliasPath = path.join(RESOURCES_DIR, "data", "aliases.json");
-  try {
-    const units = fs.existsSync(fullPath)
-      ? JSON.parse(fs.readFileSync(fullPath, "utf-8"))
-      : {};
-    const aliases = fs.existsSync(aliasPath)
-      ? JSON.parse(fs.readFileSync(aliasPath, "utf-8"))
-      : {};
-    return { units, aliases };
-  } catch {
-    return { units: {}, aliases: {} };
-  }
+  const data = getRuntimeGameData();
+  return { units: data.unitsFull, aliases: data.aliases };
 });
 
 // ── Synergies data IPC ────────────────────────────────────────────────────────
 
 ipcMain.handle("data:synergies", async () => {
-  const synPath = path.join(RESOURCES_DIR, "data", "synergies.json");
-  if (!fs.existsSync(synPath)) return {};
-  try {
-    return JSON.parse(fs.readFileSync(synPath, "utf-8"));
-  } catch {
-    return {};
-  }
+  return getRuntimeGameData().synergies;
 });
 
 // ── Relics data IPC ──────────────────────────────────────────────────────────
 
 ipcMain.handle("data:relics", async () => {
-  const relicPath = path.join(RESOURCES_DIR, "data", "relics.json");
-  if (!fs.existsSync(relicPath)) return {};
-  try {
-    return JSON.parse(fs.readFileSync(relicPath, "utf-8"));
-  } catch {
-    return {};
-  }
+  return getRuntimeGameData().relics;
 });
 
 // ── Full units data IPC ──────────────────────────────────────────────────────
 
 ipcMain.handle("data:units_full", async () => {
-  const fullPath = path.join(RESOURCES_DIR, "data", "units_full.json");
-  if (!fs.existsSync(fullPath)) return {};
-  try {
-    return JSON.parse(fs.readFileSync(fullPath, "utf-8"));
-  } catch {
-    return {};
-  }
+  return getRuntimeGameData().unitsFull;
 });
 
 // ── Items data IPC ───────────────────────────────────────────────────────────
 
 ipcMain.handle("data:items", async () => {
-  const itemsPath = path.join(RESOURCES_DIR, "data", "items.json");
-  if (!fs.existsSync(itemsPath)) return {};
-  try {
-    return JSON.parse(fs.readFileSync(itemsPath, "utf-8"));
-  } catch {
-    return {};
-  }
+  return getRuntimeGameData().items;
 });
 
 ipcMain.handle("data:items_full", async () => {
-  const itemsPath = path.join(RESOURCES_DIR, "data", "items_full.json");
-  if (!fs.existsSync(itemsPath)) return {};
-  try {
-    return JSON.parse(fs.readFileSync(itemsPath, "utf-8"));
-  } catch {
-    return {};
-  }
+  return getRuntimeGameData().itemsFull;
 });
 
 // ── Talents data IPC ─────────────────────────────────────────────────────────
 
 ipcMain.handle("data:talents", async () => {
-  const talentsPath = path.join(RESOURCES_DIR, "data", "talents.json");
-  if (!fs.existsSync(talentsPath)) return {};
-  try {
-    return JSON.parse(fs.readFileSync(talentsPath, "utf-8"));
-  } catch {
-    return {};
-  }
+  return getRuntimeGameData().talents;
 });
 
 // ── Replay protocol ──────────────────────────────────────────────────────────

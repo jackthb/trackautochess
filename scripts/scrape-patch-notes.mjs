@@ -2,7 +2,7 @@
 /**
  * Scrape DAC patch notes from the Steam Workshop changelog.
  *
- * Fetches the changelog page, parses entries, diffs against index.json,
+ * Fetches the changelog page, parses entries, diffs against content files,
  * and writes new patch JSON files.
  *
  * Usage:
@@ -16,12 +16,12 @@ import { fileURLToPath } from "url";
 import { patchNoteToJson } from "./lib/patch-note-json.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const ROOT_DATA = join(__dirname, "..", "data");
-const DATA_DIR = join(ROOT_DATA, "patch_notes");
-const INDEX_PATH = join(DATA_DIR, "index.json");
-const ITEMS_PATH = join(ROOT_DATA, "items.json");
-const UNITS_FULL_PATH = join(ROOT_DATA, "units_full.json");
-const SYNERGIES_PATH = join(ROOT_DATA, "synergies.json");
+const ROOT_CONTENT = join(__dirname, "..", "content");
+const PATCH_NOTES_DIR = join(ROOT_CONTENT, "patch-notes");
+const GAME_CONTENT_DIR = join(ROOT_CONTENT, "game");
+const ITEMS_PATH = join(GAME_CONTENT_DIR, "curated-items.json");
+const UNITS_DIR = join(GAME_CONTENT_DIR, "units");
+const SYNERGIES_DIR = join(GAME_CONTENT_DIR, "synergies");
 const PUBLISHED_FILE_ID = "1613886175";
 const CHANGELOG_URL =
   `https://steamcommunity.com/sharedfiles/filedetails/changelog/${PUBLISHED_FILE_ID}`;
@@ -593,6 +593,128 @@ function applyGameDataChanges(sections) {
   }
 }
 
+function readJsonFile(file) {
+  return JSON.parse(readFileSync(file, "utf-8"));
+}
+
+function writeJsonFile(file, data) {
+  writeFileSync(file, JSON.stringify(data, null, 2) + "\n");
+}
+
+function applyContentGameDataChanges(sections) {
+  const items = readJsonFile(ITEMS_PATH);
+  let changed = false;
+  const changedFiles = new Map();
+
+  const itemsBySlug = new Map();
+  for (const name of Object.keys(items.items)) {
+    itemsBySlug.set(slugifyName(name), name);
+    itemsBySlug.set(slugifyName(name.replace(/'/g, "")), name);
+  }
+
+  const unitsBySlug = new Map();
+  for (const file of readdirSync(UNITS_DIR)) {
+    if (!file.endsWith(".json")) continue;
+    const fullPath = join(UNITS_DIR, file);
+    const data = readJsonFile(fullPath);
+    unitsBySlug.set(slugifyName(data.name || file.replace(/\.json$/, "")), {
+      file: fullPath,
+      data,
+    });
+  }
+
+  const synergiesBySlug = new Map();
+  for (const file of readdirSync(SYNERGIES_DIR)) {
+    if (!file.endsWith(".json")) continue;
+    const fullPath = join(SYNERGIES_DIR, file);
+    const data = readJsonFile(fullPath);
+    const name = data.name || data.source?.name || file.replace(/\.json$/, "");
+    synergiesBySlug.set(slugifyName(name), { file: fullPath, data });
+  }
+
+  for (const section of sections) {
+    for (const entry of section.entries) {
+      const detail = entry.detail;
+      const bare = entry.name.replace(/\s*-\s+.*$/, "").replace(/\s*\(.*\)$/, "").trim();
+
+      const tierMatch = detail.match(/(?:downgrade|upgrade)d?\s+from\s+T(\d)\s+to\s+T(\d)/i);
+      if (tierMatch) {
+        const newTier = parseInt(tierMatch[2]);
+        const slug = slugifyName(entry.name.replace(/'/g, ""));
+        const itemName = itemsBySlug.get(slug) || itemsBySlug.get(slugifyName(entry.name));
+        if (itemName && items.items[itemName]) {
+          console.log(`  -> ${itemName}: tier ${items.items[itemName].tier} -> ${newTier}`);
+          items.items[itemName].tier = newTier;
+          changed = true;
+          changedFiles.set(ITEMS_PATH, items);
+        }
+      }
+
+      const newItemFromName = entry.name.match(/new\s+T(\d)\s+item/i);
+      const newItemFromDetail = detail.match(/new\s+T(\d)\s+item/i);
+      if (newItemFromName) {
+        const tier = parseInt(newItemFromName[1]);
+        const itemName = detail.trim();
+        if (itemName && !items.items[itemName]) {
+          console.log(`  -> New item: ${itemName} (T${tier})`);
+          items.items[itemName] = { tier };
+          items.total = Object.keys(items.items).length;
+          changed = true;
+          changedFiles.set(ITEMS_PATH, items);
+        }
+      } else if (newItemFromDetail) {
+        const tier = parseInt(newItemFromDetail[1]);
+        const itemName = entry.name.trim();
+        if (itemName && !items.items[itemName]) {
+          console.log(`  -> New item: ${itemName} (T${tier})`);
+          items.items[itemName] = { tier };
+          items.total = Object.keys(items.items).length;
+          changed = true;
+          changedFiles.set(ITEMS_PATH, items);
+        }
+      }
+
+      const classMatch = detail.match(/(?:class|species)\s+changed\s+from\s+(\w[\w\s]*?)\s+to\s+(\w[\w\s]*?)\.?$/i);
+      if (classMatch) {
+        const oldSyn = classMatch[1].trim();
+        const newSyn = classMatch[2].trim();
+        const unit = unitsBySlug.get(slugifyName(bare));
+        if (unit?.data?.source?.synergies) {
+          const idx = unit.data.source.synergies.indexOf(oldSyn);
+          if (idx !== -1) {
+            console.log(`  -> ${unit.data.name}: ${oldSyn} -> ${newSyn}`);
+            unit.data.source.synergies[idx] = newSyn;
+            changed = true;
+            changedFiles.set(unit.file, unit.data);
+          }
+        }
+      }
+
+      const tierRework = detail.match(/reworked?\s+from\s+\([\d)(]+\)\s+to\s+(\([\d)(]+\))/i);
+      if (tierRework) {
+        const newTiers = [...tierRework[1].matchAll(/\((\d+)\)/g)].map((m) => parseInt(m[1]));
+        const synergy = synergiesBySlug.get(slugifyName(bare));
+        const source = synergy?.data?.source;
+        if (source?.name && newTiers.length > 0) {
+          console.log(`  -> ${source.name} synergy tiers: [${source.tiers}] -> [${newTiers}]`);
+          source.tiers = newTiers;
+          changed = true;
+          changedFiles.set(synergy.file, synergy.data);
+        }
+      }
+    }
+  }
+
+  if (changed && !DRY_RUN) {
+    for (const [file, data] of changedFiles) {
+      writeJsonFile(file, data);
+    }
+    console.log("Updated content game files.");
+  } else if (changed) {
+    console.log("[dry-run] Would update content game files.");
+  }
+}
+
 async function main() {
   console.log("Fetching Steam Workshop changelog...");
   const { html, entries } = await fetchChangelogWithEntries();
@@ -600,23 +722,21 @@ async function main() {
   console.log("Parsing entries...");
   console.log(`Found ${entries.length} changelog entries on page 1`);
 
-  const index = JSON.parse(readFileSync(INDEX_PATH, "utf-8"));
-
   // Load existing patch docs from disk so hotfixes can find a parent to fold
   // into, and so already-absorbed dates aren't re-scraped as standalone.
   const existingPatches = [];
-  for (const f of readdirSync(DATA_DIR)) {
-    if (!f.endsWith(".json") || f === "index.json") continue;
-    const data = JSON.parse(readFileSync(join(DATA_DIR, f), "utf-8"));
+  for (const f of readdirSync(PATCH_NOTES_DIR)) {
+    if (!f.endsWith(".json")) continue;
+    const data = readJsonFile(join(PATCH_NOTES_DIR, f));
     existingPatches.push({
       date: data.date,
       slug: f.replace(/\.json$/, ""),
-      file: join(DATA_DIR, f),
+      file: join(PATCH_NOTES_DIR, f),
       title: data.title,
       sections: data.sections || [],
       absorbedDates: data.absorbedDates || [],
       source: data.source,
-      workshop_url: data.workshop_url,
+      workshop_url: data.workshop_url || data.workshopUrl,
       entitiesSynced: data.entitiesSynced,
       sourceEntries: data.sourceEntries || [],
     });
@@ -628,7 +748,7 @@ async function main() {
   const knownSourceEntryIds = new Set(
     existingPatches.flatMap((patch) => [...collectSourceEntryIds(patch)])
   );
-  const existingSlugs = new Set(index.patches.map((p) => p.slug));
+  const existingSlugs = new Set(existingPatches.map((p) => p.slug));
 
   if (entries.length === 0) {
     const latestUpdateId = await fetchLatestSteamUpdateId();
@@ -712,7 +832,7 @@ async function main() {
       if (parent) {
         foldHotfix(parent, date, sections, dayEntries);
         console.log("Applying game data changes...");
-        applyGameDataChanges(sections);
+        applyContentGameDataChanges(sections);
         continue;
       }
     }
@@ -720,15 +840,15 @@ async function main() {
     const slugBase = slugifyName(title);
     let slug = `${date}-${slugBase || "rebalance-patch"}`;
     if (existingSlugs.has(slug)) continue;
-    const filePath = join(DATA_DIR, `${slug}.json`);
+    const filePath = join(PATCH_NOTES_DIR, `${slug}.json`);
 
     const patchData = {
       date,
       title,
       source: docsUrl || CHANGELOG_URL,
-      workshop_url: docsUrl ? CHANGELOG_URL : undefined,
+      workshopUrl: docsUrl ? CHANGELOG_URL : undefined,
       // New patches carry game-data changes that have NOT yet been pulled from
-      // the VPK into data/*.json + the CMS. Flipped true by the
+      // the VPK into content/game/*.json. Flipped true by the
       // /sync-patch-entities skill or scripts/mark-patch-synced.mjs.
       entitiesSynced: false,
       sourceEntries: dayEntries.map(sourceEntryRecord),
@@ -756,14 +876,7 @@ async function main() {
     newPatches.push({ date, title, slug });
 
     console.log("Applying game data changes...");
-    applyGameDataChanges(patchData.sections);
-  }
-
-  if (!DRY_RUN && newPatches.length > 0) {
-    newPatches.sort((a, b) => b.date.localeCompare(a.date));
-    index.patches = [...newPatches, ...index.patches];
-    writeFileSync(INDEX_PATH, JSON.stringify(index, null, 2) + "\n");
-    console.log(`Updated index.json with ${newPatches.length} new patch(es)`);
+    applyContentGameDataChanges(patchData.sections);
   }
 }
 

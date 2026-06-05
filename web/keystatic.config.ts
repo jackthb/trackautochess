@@ -98,8 +98,7 @@ const entityReference = fields.object(
       description: "Search and select an existing talent.",
     }),
     // Legacy manual slug field. Kept hidden so existing content files still
-    // parse; scripts/generate-data.mjs falls back to it when no picker value
-    // exists yet.
+    // parse; runtime generators fall back to it when no picker value exists yet.
     slug: fields.ignored(),
   },
   {

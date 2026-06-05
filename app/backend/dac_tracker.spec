@@ -19,16 +19,16 @@ BACKEND_DIR = SPECPATH
 APP_DIR = os.path.dirname(BACKEND_DIR)
 ROOT_DIR = os.path.dirname(APP_DIR)
 DATA_DIR = os.path.join(ROOT_DIR, "data")
+CONTENT_DIR = os.path.join(ROOT_DIR, "content")
 VENDOR_DIR = os.path.join(BACKEND_DIR, "vendor")
 
 # --- Environment validation — fail early rather than producing a broken build ---
 
 _REQUIRED_PATHS = [
     (os.path.join(DATA_DIR, "icons"),                          "data/icons directory"),
-    (os.path.join(DATA_DIR, "units_full.json"),                "data/units_full.json"),
-    (os.path.join(DATA_DIR, "aliases.json"),                   "data/aliases.json"),
-    (os.path.join(DATA_DIR, "items.json"),                     "data/items.json"),
-    (os.path.join(DATA_DIR, "relics.json"),                    "data/relics.json"),
+    (os.path.join(CONTENT_DIR, "game", "units"),               "content/game/units directory"),
+    (os.path.join(CONTENT_DIR, "game", "synergies"),           "content/game/synergies directory"),
+    (os.path.join(CONTENT_DIR, "game", "relics"),              "content/game/relics directory"),
 ]
 
 _missing = [label for path, label in _REQUIRED_PATHS if not os.path.exists(path)]
@@ -44,11 +44,7 @@ print("[spec] Environment OK")
 
 datas = [
     (os.path.join(DATA_DIR, "icons"),                          os.path.join("data", "icons")),
-    (os.path.join(DATA_DIR, "units_full.json"),                "data"),
-    (os.path.join(DATA_DIR, "aliases.json"),                   "data"),
-    (os.path.join(DATA_DIR, "items.json"),                     "data"),
-    (os.path.join(DATA_DIR, "relics.json"),                    "data"),
-    (os.path.join(DATA_DIR, "synergies.json"),                 "data"),
+    (CONTENT_DIR,                                               "content"),
 ]
 
 # ffmpeg for replay recording (AV1/H.264)

@@ -3,7 +3,7 @@ import { cache } from "react";
 import { headers } from "next/headers";
 import { notFound } from "next/navigation";
 import { createClient } from "@supabase/supabase-js";
-import relicsData from "@data/relics.json";
+import { relicsData } from "@/generated/content-data";
 import type { Game, RelicInfo } from "@dac/shared/types";
 import { RANK_BRACKETS } from "@dac/shared/game-utils";
 import { fetchSteamProfile, type SteamProfile } from "@/lib/steam";

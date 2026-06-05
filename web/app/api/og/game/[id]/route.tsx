@@ -4,7 +4,7 @@ import { createClient } from "@supabase/supabase-js";
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { parseLineup, parseRelics, parseSynergies, unitStem, relicStem, synIconName, RANK_BRACKETS } from "@dac/shared/game-utils";
-import relicsData from "@data/relics.json";
+import { relicsData } from "@/generated/content-data";
 
 const RELICS_MAP = (relicsData as { relics: Record<string, { name: string }> }).relics;
 

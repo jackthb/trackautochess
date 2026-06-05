@@ -1,4 +1,4 @@
-import talentsData from "@data/talents.json";
+import { talentsData } from "@/generated/content-data";
 import { DEFAULT_LOCALE, type Locale, pickLocalized } from "@/lib/i18n";
 
 export interface DisplayTalent {

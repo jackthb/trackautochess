@@ -3,8 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "predev": "node ../scripts/generate-data.mjs",
-    "prebuild": "node ../scripts/generate-data.mjs && node scripts/sync-icons.mjs",
+    "predev": "node ../scripts/generate-web-runtime-data.mjs",
+    "prebuild": "node ../scripts/generate-web-runtime-data.mjs && node scripts/sync-icons.mjs",
     "dev": "next dev",
     "build": "next build",
     "start": "next start",

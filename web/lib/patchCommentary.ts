@@ -5,10 +5,8 @@
 // JSON cache once and groups every entry that *has* commentary by its linked
 // entity, so an entity page can show "here's what I think this change meant".
 //
-// Server-only: uses fs and is invoked from getStaticProps. Mirrors the data
-// path used by pages/patch-notes/[slug].tsx (web/ cwd, data/ one level up).
-import fs from "fs";
-import path from "path";
+// Backed by the generated runtime module built from committed content/.
+import { patchesBySlugData } from "@/generated/content-data";
 import type { EntryKind } from "./patchKinds";
 import type {
   EntityCommentary,
@@ -33,38 +31,32 @@ function key(type: string, slug: string): string {
 }
 
 function buildIndex(): Map<string, EntityCommentary[]> {
-  const dir = path.join(process.cwd(), "..", "data", "patch_notes");
   const map = new Map<string, EntityCommentary[]>();
 
-  let files: string[];
-  try {
-    files = fs.readdirSync(dir);
-  } catch {
-    return map;
-  }
-
-  for (const file of files) {
-    if (!file.endsWith(".json") || file === "index.json") continue;
-    let patch: {
+  for (const [patchSlug, patch] of Object.entries(
+    patchesBySlugData as Record<
+      string,
+      {
+        title?: string;
+        date?: string;
+        sections?: { entries?: RawEntry[] }[];
+      }
+    >,
+  )) {
+    const typedPatch: {
       title?: string;
       date?: string;
       sections?: { entries?: RawEntry[] }[];
-    };
-    try {
-      patch = JSON.parse(fs.readFileSync(path.join(dir, file), "utf-8"));
-    } catch {
-      continue;
-    }
-    const patchSlug = file.replace(/\.json$/, "");
-    for (const section of patch.sections ?? []) {
+    } = patch;
+    for (const section of typedPatch.sections ?? []) {
       for (const entry of section.entries ?? []) {
         if (!entry.commentary || !entry.entity_type || !entry.entity_slug) {
           continue;
         }
         const rec: EntityCommentary = {
           patchSlug,
-          patchTitle: patch.title ?? patchSlug,
-          date: patch.date ?? "",
+          patchTitle: typedPatch.title ?? patchSlug,
+          date: typedPatch.date ?? "",
           kind: entry.kind,
           name: entry.name ?? "",
           detail: entry.detail ?? "",
