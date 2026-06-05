@@ -66,6 +66,7 @@ export default function ItemsPage() {
         data={tiers}
         tierLabel={TIER_LABEL}
         tierColor={TIER_COLOR}
+        tierNav
       />
     </>
   );

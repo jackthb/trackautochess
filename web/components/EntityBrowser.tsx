@@ -22,12 +22,20 @@ const SEARCH_PLACEHOLDER: Record<EntityCardVariant, string> = {
 
 const NO_MATCHES = "No matches.";
 
+export interface FilterTag {
+  slug: string;
+  label: string;
+  iconSrc: string;
+}
+
 export interface BrowsableEntity {
   slug: string;
   name: string;
   description?: string;
   lore?: string;
   iconSrc: string;
+  /** Tags used for the synergy filter on the units page. */
+  filterTags?: FilterTag[];
 }
 
 interface EntityBrowserProps {
@@ -44,13 +52,9 @@ interface EntityBrowserProps {
   tierColor?: Record<number, string>;
   /** Overrides the default "Search <variant>..." placeholder. */
   searchPlaceholder?: string;
+  /** Show tier jump-links above the grid (items). */
+  tierNav?: boolean;
 }
-const ENTITY_PATH: Record<EntityCardVariant, string> = {
-  item: "items",
-  relic: "relics",
-  unit: "units",
-  synergy: "synergies",
-};
 
 const ENTITY_COLLECTION_PATH: Record<EntityCardVariant, string> = {
   item: "/items",
@@ -59,14 +63,23 @@ const ENTITY_COLLECTION_PATH: Record<EntityCardVariant, string> = {
   synergy: "/synergies",
 };
 
-
 function isTiered(
   data: BrowsableEntity[] | BrowsableEntity[][]
 ): data is BrowsableEntity[][] {
   return data.length > 0 && Array.isArray(data[0]);
 }
 
-function matches(entity: BrowsableEntity, lowered: string): boolean {
+function matches(
+  entity: BrowsableEntity,
+  lowered: string,
+  activeTags: Set<string>,
+): boolean {
+  if (
+    activeTags.size > 0 &&
+    !entity.filterTags?.some((t) => activeTags.has(t.slug))
+  ) {
+    return false;
+  }
   if (!lowered) return true;
   return (
     entity.name.toLowerCase().includes(lowered) ||
@@ -82,10 +95,12 @@ export function EntityBrowser({
   tierLabel,
   tierColor,
   searchPlaceholder,
+  tierNav,
 }: EntityBrowserProps) {
   // Single (English) locale since i18n routing was removed.
   const locale = DEFAULT_LOCALE;
   const [query, setQuery] = useState("");
+  const [activeTags, setActiveTags] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     // Initial ?q= filter, read via window.location (not a router hook) so this
@@ -95,17 +110,32 @@ export function EntityBrowser({
     if (search) setQuery(search);
   }, []);
 
+  const allTags = useMemo<FilterTag[]>(() => {
+    const flat = isTiered(data) ? data.flat() : data;
+    const seen = new Map<string, FilterTag>();
+    for (const entity of flat) {
+      for (const tag of entity.filterTags ?? []) {
+        if (!seen.has(tag.slug)) seen.set(tag.slug, tag);
+      }
+    }
+    return Array.from(seen.values()).sort((a, b) =>
+      a.label.localeCompare(b.label),
+    );
+  }, [data]);
+
   const lowered = query.toLowerCase();
 
   const filteredTiered = useMemo(() => {
     if (!isTiered(data)) return null;
-    return data.map((tier) => tier.filter((e) => matches(e, lowered)));
-  }, [data, lowered]);
+    return data.map((tier) =>
+      tier.filter((e) => matches(e, lowered, activeTags)),
+    );
+  }, [data, lowered, activeTags]);
 
   const filteredFlat = useMemo(() => {
     if (isTiered(data)) return null;
-    return data.filter((e) => matches(e, lowered));
-  }, [data, lowered]);
+    return data.filter((e) => matches(e, lowered, activeTags));
+  }, [data, lowered, activeTags]);
 
   const gridClass = `${styles.grid} ${
     variant === "relic" || variant === "synergy"
@@ -132,88 +162,144 @@ export function EntityBrowser({
     return () => clearTimeout(timer);
   }, [locale, query, total, variant]);
 
+  function toggleTag(slug: string) {
+    setActiveTags((prev) => {
+      const next = new Set(prev);
+      if (next.has(slug)) next.delete(slug);
+      else next.add(slug);
+      return next;
+    });
+  }
+
+  const visibleTiers = filteredTiered
+    ?.map((entities, index) => ({ entities, tier: index + 1 }))
+    .filter(({ entities }) => entities.length > 0);
+
   return (
     <div className={styles.page}>
       <div className={styles.layout}>
         <div className={styles.container}>
           <h1 className={styles.pageTitle}>{title}</h1>
-        <input
-          className={styles.search}
-          placeholder={placeholder}
-          value={query}
-          onChange={(event) => setQuery(event.target.value)}
-        />
-        <div className={styles.total}>
-          {total} {countWord}
-        </div>
+          <input
+            className={styles.search}
+            placeholder={placeholder}
+            value={query}
+            onChange={(event) => setQuery(event.target.value)}
+          />
+          <div className={styles.total}>
+            {total} {countWord}
+          </div>
 
-        {filteredTiered &&
-          filteredTiered
-            .map((entities, index) => ({ entities, tier: index + 1 }))
-            .filter(({ entities }) => entities.length > 0)
-            .map(({ entities, tier }) => {
-              const color = tierColor?.[tier];
-              return (
-                <section key={tier} className={styles.panel}>
-                  {tierLabel?.[tier] && (
-                    <div className={styles.panelHeader} style={{ color }}>
-                      <span>{tierLabel[tier]}</span>
-                      <span className={styles.count}>{entities.length}</span>
+          {tierNav && tierLabel && visibleTiers && (
+            <div className={styles.tierNav}>
+              {visibleTiers.map(({ tier }) => (
+                <a
+                  key={tier}
+                  href={`#tier-${tier}`}
+                  className={styles.tierNavLink}
+                  style={{ color: tierColor?.[tier] }}
+                >
+                  {tierLabel[tier]}
+                </a>
+              ))}
+            </div>
+          )}
+
+          {allTags.length > 0 && (
+            <div className={styles.tagFilter}>
+              {allTags.map((tag) => {
+                const active = activeTags.has(tag.slug);
+                return (
+                  <button
+                    key={tag.slug}
+                    type="button"
+                    className={`${styles.tagBtn}${active ? ` ${styles.tagBtnActive}` : ""}`}
+                    onClick={() => toggleTag(tag.slug)}
+                  >
+                    <img
+                      src={tag.iconSrc}
+                      alt=""
+                      className={styles.tagIcon}
+                      onError={(e) => {
+                        e.currentTarget.style.display = "none";
+                      }}
+                    />
+                    <span>{tag.label}</span>
+                  </button>
+                );
+              })}
+            </div>
+          )}
+
+          {filteredTiered &&
+            filteredTiered
+              .map((entities, index) => ({ entities, tier: index + 1 }))
+              .filter(({ entities }) => entities.length > 0)
+              .map(({ entities, tier }) => {
+                const color = tierColor?.[tier];
+                return (
+                  <section
+                    key={tier}
+                    id={`tier-${tier}`}
+                    className={styles.panel}
+                  >
+                    {tierLabel?.[tier] && (
+                      <div className={styles.panelHeader} style={{ color }}>
+                        <span>{tierLabel[tier]}</span>
+                        <span className={styles.count}>{entities.length}</span>
+                      </div>
+                    )}
+                    <div className={gridClass}>
+                      {entities.map((entity) => (
+                        <EntityCard
+                          key={entity.slug}
+                          href={`${collectionPath}/${entity.slug}`}
+                          iconSrc={entity.iconSrc}
+                          iconAlt={entity.name}
+                          name={entity.name}
+                          description={entity.description}
+                          variant={variant}
+                          accentColor={color}
+                          onClick={() =>
+                            trackEvent("Entity Card Clicked", {
+                              entity_type: variant,
+                              source: "entity_browser",
+                            })
+                          }
+                        />
+                      ))}
                     </div>
-                  )}
-                  <div className={gridClass}>
-                    {entities.map((entity) => (
-                      <EntityCard
-                        key={entity.slug}
-                        href={`${collectionPath}/${entity.slug}`}
-                        iconSrc={entity.iconSrc}
-                        iconAlt={entity.name}
-                        name={entity.name}
-                        description={entity.description}
+                  </section>
+                );
+              })}
 
-                        variant={variant}
-                        accentColor={color}
-                        onClick={() =>
-                          trackEvent("Entity Card Clicked", {
-                            entity_type: variant,
-                            source: "entity_browser",
-                          })
-                        }
-                      />
-                    ))}
-                  </div>
-                </section>
-              );
-            })}
-
-        {filteredFlat && (
-          <section className={styles.panel}>
-            {filteredFlat.length === 0 ? (
-              <div className={styles.empty}>{NO_MATCHES}</div>
-            ) : (
-              <div className={gridClass}>
-                {filteredFlat.map((entity) => (
-                  <EntityCard
-                    key={entity.slug}
-                    href={`${collectionPath}/${entity.slug}`}
-                    iconSrc={entity.iconSrc}
-                    iconAlt={entity.name}
-                    name={entity.name}
-                    description={entity.description}
-                    variant={variant}
-                    onClick={() =>
-                      trackEvent("Entity Card Clicked", {
-                        entity_type: variant,
-                        source: "entity_browser",
-                      })
-                    }
-                  />
-                ))}
-              </div>
-            )}
-          </section>
-        )}
-
+          {filteredFlat && (
+            <section className={styles.panel}>
+              {filteredFlat.length === 0 ? (
+                <div className={styles.empty}>{NO_MATCHES}</div>
+              ) : (
+                <div className={gridClass}>
+                  {filteredFlat.map((entity) => (
+                    <EntityCard
+                      key={entity.slug}
+                      href={`${collectionPath}/${entity.slug}`}
+                      iconSrc={entity.iconSrc}
+                      iconAlt={entity.name}
+                      name={entity.name}
+                      description={entity.description}
+                      variant={variant}
+                      onClick={() =>
+                        trackEvent("Entity Card Clicked", {
+                          entity_type: variant,
+                          source: "entity_browser",
+                        })
+                      }
+                    />
+                  ))}
+                </div>
+              )}
+            </section>
+          )}
         </div>
       </div>
     </div>
