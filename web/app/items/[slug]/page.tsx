@@ -11,7 +11,11 @@ import {
   TIER_LABEL,
 } from "@/lib/items";
 import { parseItemDescription } from "@/lib/itemDescription";
-import { getRelatedSynergiesForItem, ITEM_RELATION_CATEGORY_LABEL } from "@/lib/itemRelations";
+import {
+  getRelatedItemsForItem,
+  getRelatedSynergiesForItem,
+  ITEM_RELATION_CATEGORY_LABEL,
+} from "@/lib/itemRelations";
 import { absoluteUrl, SITE_NAME, SITE_TITLE } from "@/lib/site";
 import { DEFAULT_LOCALE } from "@/lib/i18n";
 import { getCommentaryForEntity } from "@/lib/patchCommentary";
@@ -88,6 +92,7 @@ export default async function ItemDetailPage({ params }: Props) {
   const item = getItemBySlug(slug, DEFAULT_LOCALE);
   if (!item) notFound();
 
+  const explicitRelatedItems = getRelatedItemsForItem(item.name, DEFAULT_LOCALE);
   const relatedSynergies = getRelatedSynergiesForItem(item.name, DEFAULT_LOCALE);
 
   const related = allItems
@@ -147,6 +152,18 @@ export default async function ItemDetailPage({ params }: Props) {
     variant: "synergy",
   }));
 
+  const explicitRelatedItemEntities: RelatedEntity[] = explicitRelatedItems.map(
+    ({ item: relatedItem, relation }) => ({
+      slug: relatedItem.slug,
+      name: relatedItem.name,
+      description: `${relation.label} • ${relation.description}`,
+      iconSrc: iconUrl(relatedItem),
+      variant: "item",
+      level: TIER_LABEL[relatedItem.tier],
+      accentColor: TIER_COLOR[relatedItem.tier],
+    }),
+  );
+
   const relatedEntities: RelatedEntity[] = related.map((r) => ({
     slug: r.slug,
     name: r.name,
@@ -173,10 +190,30 @@ export default async function ItemDetailPage({ params }: Props) {
         notes={item.notes.map(cleanText)}
         lore={item.lore ? cleanText(item.lore) : undefined}
         tag={{ label: tierLabel, color: tierColor }}
-        relatedTitle={synergyEntities.length > 0 ? t.relatedSynergies : t.moreOf(tierLabel)}
-        related={synergyEntities.length > 0 ? synergyEntities : relatedEntities}
-        extraRelatedTitle={synergyEntities.length > 0 ? t.moreOf(tierLabel) : undefined}
-        extraRelated={synergyEntities.length > 0 ? relatedEntities : undefined}
+        relatedTitle={
+          explicitRelatedItemEntities.length > 0
+            ? "Related Items"
+            : synergyEntities.length > 0
+              ? t.relatedSynergies
+              : t.moreOf(tierLabel)
+        }
+        related={
+          explicitRelatedItemEntities.length > 0
+            ? explicitRelatedItemEntities
+            : synergyEntities.length > 0
+              ? synergyEntities
+              : relatedEntities
+        }
+        extraRelatedTitle={
+          explicitRelatedItemEntities.length > 0 || synergyEntities.length > 0
+            ? t.moreOf(tierLabel)
+            : undefined
+        }
+        extraRelated={
+          explicitRelatedItemEntities.length > 0 || synergyEntities.length > 0
+            ? relatedEntities
+            : undefined
+        }
         accentColor={tierColor}
       />
     </>

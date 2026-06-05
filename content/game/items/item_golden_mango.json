@@ -1,0 +1,15 @@
+{
+  "gameId": "item_golden_mango",
+  "name": "Mango Treat",
+  "slug": "mango-treat",
+  "icon": "items/golden_mango2.png",
+  "commentary": "Special mango reward associated with Mango Tree.",
+  "source": {
+    "name": "Mango Treat",
+    "description": "A special mango reward associated with Mango Tree.",
+    "lore": "",
+    "quality": "special",
+    "texture": "item_golden_mango",
+    "notes": []
+  }
+}

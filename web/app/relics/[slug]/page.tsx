@@ -7,6 +7,11 @@ import {
   getRelicBySlug,
   type DisplayRelic,
 } from "@/lib/relics";
+import { iconUrl, TIER_COLOR, TIER_LABEL } from "@/lib/items";
+import {
+  getRelatedItemsForRelic,
+  ITEM_RELATION_CATEGORY_LABEL,
+} from "@/lib/itemRelations";
 import { absoluteUrl, SITE_NAME, SITE_TITLE } from "@/lib/site";
 import { DEFAULT_LOCALE } from "@/lib/i18n";
 import { getCommentaryForEntity } from "@/lib/patchCommentary";
@@ -75,6 +80,7 @@ export default async function RelicDetailPage({ params }: Props) {
   const related = allRelics
     .filter((candidate) => candidate.slug !== relic.slug)
     .slice(0, 8);
+  const relatedItems = getRelatedItemsForRelic(relic.name, DEFAULT_LOCALE);
   const commentary = getCommentaryForEntity("relic", slug);
 
   const title = `${relic.name} Relic Guide | ${SITE_TITLE}`;
@@ -121,6 +127,18 @@ export default async function RelicDetailPage({ params }: Props) {
     iconSrc: r.iconUrl,
   }));
 
+  const relatedItemEntities: RelatedEntity[] = relatedItems.map(
+    ({ item, relation }) => ({
+      slug: item.slug,
+      name: item.name,
+      description: `${relation.label} • ${ITEM_RELATION_CATEGORY_LABEL[relation.category]}`,
+      iconSrc: iconUrl(item),
+      variant: "item",
+      level: TIER_LABEL[item.tier],
+      accentColor: TIER_COLOR[item.tier],
+    }),
+  );
+
   return (
     <>
       <script
@@ -138,8 +156,10 @@ export default async function RelicDetailPage({ params }: Props) {
           ) : undefined
         }
         lore={relic.lore ? cleanText(relic.lore) : undefined}
-        relatedTitle="More Relics"
-        related={relatedEntities}
+        relatedTitle={relatedItemEntities.length > 0 ? "Related Items" : "More Relics"}
+        related={relatedItemEntities.length > 0 ? relatedItemEntities : relatedEntities}
+        extraRelatedTitle={relatedItemEntities.length > 0 ? "More Relics" : undefined}
+        extraRelated={relatedItemEntities.length > 0 ? relatedEntities : undefined}
       />
     </>
   );

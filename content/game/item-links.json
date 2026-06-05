@@ -34,6 +34,34 @@
       "category": "generated_token",
       "label": "Golden Heart token",
       "description": "Token granted by Golden Heart of the Machine for recruiting discovered legendary pieces."
+    },
+    {
+      "relic": "Mango Tree",
+      "relatedItem": "Enchanted Mango",
+      "category": "generated_item",
+      "label": "Creates Enchanted Mangoes",
+      "description": "Mango Tree can generate Enchanted Mangoes after qualifying home battle result changes."
+    },
+    {
+      "relic": "Mango Tree",
+      "relatedItem": "Mango Treat",
+      "category": "generated_item",
+      "label": "Creates Mango Treats",
+      "description": "Mango Treat is the special mango reward associated with Mango Tree."
+    },
+    {
+      "item": "Mango Treat",
+      "relatedItem": "Enchanted Mango",
+      "category": "generated_item",
+      "label": "Related mango reward",
+      "description": "Mango Treat and Enchanted Mango are related Mango Tree rewards."
+    },
+    {
+      "item": "Enchanted Mango",
+      "relatedItem": "Mango Treat",
+      "category": "generated_item",
+      "label": "Related mango reward",
+      "description": "Enchanted Mango and Mango Treat are related Mango Tree rewards."
     }
   ]
 }

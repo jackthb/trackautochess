@@ -304,10 +304,18 @@
       "tier": 1,
       "icon": "wraith_band.png"
     },
+    "Enchanted Mango": {
+      "tier": 0,
+      "icon": "enchanted_mango.png"
+    },
+    "Mango Treat": {
+      "tier": 0,
+      "icon": "golden_mango2.png"
+    },
     "Gossamer Cape": {
       "tier": 1,
       "icon": "gossamar_cape.png"
     }
   },
-  "total": 77
+  "total": 79
 }
