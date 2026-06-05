@@ -160,7 +160,7 @@ async function handle(req: Request, ctx: { params: Promise<{ steamId: string }> 
           {
             error:
               refreshCadence === "owner"
-                ? "Your next refresh is available after the 30-minute cooldown."
+                ? "Refresh is temporarily unavailable. Try again later."
                 : "This profile has already been refreshed today.",
             refresh_quota: refreshQuota,
           },

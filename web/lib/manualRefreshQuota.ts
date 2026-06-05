@@ -16,10 +16,16 @@ export interface ManualRefreshQuotaOptions {
 
 const OWNER_REFRESH_QUOTA_COOKIE = "dac_manual_refresh_quota";
 const PUBLIC_REFRESH_QUOTA_COOKIE = "dac_public_refresh_quota";
-const OWNER_REFRESH_COOLDOWN_SECONDS = 30 * 60;
+const OWNER_REFRESH_COOLDOWN_SECONDS = 15 * 60;
 const PUBLIC_REFRESH_COOLDOWN_SECONDS = 24 * 60 * 60;
 const PUBLIC_REFRESH_COOKIE_ENTRY_LIMIT = 50;
-export const MANUAL_REFRESH_LIMIT = 1;
+const OWNER_MANUAL_REFRESH_LIMIT = 5;
+const PUBLIC_MANUAL_REFRESH_LIMIT = 1;
+
+interface OwnerRefreshState {
+  resetAtMs: number;
+  used: number;
+}
 
 function cooldownSeconds(cadence: ManualRefreshCadence): number {
   return cadence === "owner"
@@ -39,20 +45,37 @@ function secondsUntilReset(resetAt: string, nowMs: number): number {
   return Math.max(1, Math.ceil((new Date(resetAt).getTime() - nowMs) / 1000));
 }
 
-function availableQuota(nowMs: number, cooldownMs: number): ManualRefreshQuota {
+function limitForCadence(cadence: ManualRefreshCadence): number {
+  return cadence === "owner"
+    ? OWNER_MANUAL_REFRESH_LIMIT
+    : PUBLIC_MANUAL_REFRESH_LIMIT;
+}
+
+function availableQuota(
+  cadence: ManualRefreshCadence,
+  nowMs: number,
+  cooldownMs: number
+): ManualRefreshQuota {
+  const limit = limitForCadence(cadence);
   return {
-    limit: MANUAL_REFRESH_LIMIT,
+    limit,
     used: 0,
-    remaining: MANUAL_REFRESH_LIMIT,
+    remaining: limit,
     reset_at: resetAtFromNow(nowMs, cooldownMs),
   };
 }
 
-function consumedQuota(resetAtMs: number): ManualRefreshQuota {
+function quotaFromUsage(
+  cadence: ManualRefreshCadence,
+  used: number,
+  resetAtMs: number
+): ManualRefreshQuota {
+  const limit = limitForCadence(cadence);
+  const safeUsed = Math.max(0, Math.min(limit, used));
   return {
-    limit: MANUAL_REFRESH_LIMIT,
-    used: MANUAL_REFRESH_LIMIT,
-    remaining: 0,
+    limit,
+    used: safeUsed,
+    remaining: Math.max(0, limit - safeUsed),
     reset_at: resetAtFromUnixMs(resetAtMs),
   };
 }
@@ -102,18 +125,37 @@ function trimPublicResetMap(
   );
 }
 
-function readOwnerResetAtMsFromCookie(
+function readOwnerStateFromCookie(
   cookieHeader: string | undefined,
   nowMs: number
-): number | null {
+): OwnerRefreshState | null {
   const cookies = parse(cookieHeader ?? "");
   const raw = cookies[OWNER_REFRESH_QUOTA_COOKIE];
   if (!raw) return null;
 
-  const resetAtMs = Number.parseInt(raw, 10);
-  if (!Number.isFinite(resetAtMs) || resetAtMs <= nowMs) return null;
+  try {
+    const parsed = JSON.parse(raw) as unknown;
+    if (parsed && typeof parsed === "object" && !Array.isArray(parsed)) {
+      const record = parsed as Record<string, unknown>;
+      const resetAtMs = Number(record.resetAtMs);
+      const used = Number(record.used);
+      if (
+        Number.isFinite(resetAtMs) &&
+        resetAtMs > nowMs &&
+        Number.isFinite(used) &&
+        used > 0
+      ) {
+        return { resetAtMs, used };
+      }
+    }
+  } catch {
+    // Fall through to the legacy timestamp-only cookie format below.
+  }
 
-  return resetAtMs;
+  const legacyResetAtMs = Number.parseInt(raw, 10);
+  if (!Number.isFinite(legacyResetAtMs) || legacyResetAtMs <= nowMs) return null;
+
+  return { resetAtMs: legacyResetAtMs, used: OWNER_MANUAL_REFRESH_LIMIT };
 }
 
 function readPublicResetAtMsFromCookie(
@@ -133,13 +175,21 @@ export function getManualRefreshQuota(
 ): ManualRefreshQuota {
   const cadence = options.cadence ?? "owner";
   const cooldownMs = cooldownSeconds(cadence) * 1000;
-  const resetAtMs =
-    cadence === "public"
-      ? readPublicResetAtMsFromCookie(cookieHeader, nowMs, options.target)
-      : readOwnerResetAtMsFromCookie(cookieHeader, nowMs);
-  return resetAtMs
-    ? consumedQuota(resetAtMs)
-    : availableQuota(nowMs, cooldownMs);
+  if (cadence === "public") {
+    const resetAtMs = readPublicResetAtMsFromCookie(
+      cookieHeader,
+      nowMs,
+      options.target
+    );
+    return resetAtMs
+      ? quotaFromUsage(cadence, PUBLIC_MANUAL_REFRESH_LIMIT, resetAtMs)
+      : availableQuota(cadence, nowMs, cooldownMs);
+  }
+
+  const ownerState = readOwnerStateFromCookie(cookieHeader, nowMs);
+  return ownerState
+    ? quotaFromUsage(cadence, ownerState.used, ownerState.resetAtMs)
+    : availableQuota(cadence, nowMs, cooldownMs);
 }
 
 export function consumeManualRefreshQuota(
@@ -163,7 +213,7 @@ export function consumeManualRefreshQuota(
     const quotaResetAtMs = allowed ? nowMs + cooldownMs : resetAtMs;
     resetMap[targetKey] = quotaResetAtMs;
     const nextResetMap = trimPublicResetMap(resetMap);
-    const quota = consumedQuota(quotaResetAtMs);
+    const quota = quotaFromUsage(cadence, PUBLIC_MANUAL_REFRESH_LIMIT, quotaResetAtMs);
 
     return {
       allowed,
@@ -181,17 +231,19 @@ export function consumeManualRefreshQuota(
     };
   }
 
-  const resetAtMs = readOwnerResetAtMsFromCookie(cookieHeader, nowMs);
-  const allowed = resetAtMs === null;
-  const quotaResetAtMs = allowed ? nowMs + cooldownMs : resetAtMs;
-  const quota = consumedQuota(quotaResetAtMs);
+  const ownerState = readOwnerStateFromCookie(cookieHeader, nowMs);
+  const previousUsed = ownerState?.used ?? 0;
+  const allowed = previousUsed < OWNER_MANUAL_REFRESH_LIMIT;
+  const quotaResetAtMs = ownerState?.resetAtMs ?? nowMs + cooldownMs;
+  const nextUsed = allowed ? previousUsed + 1 : previousUsed;
+  const quota = quotaFromUsage(cadence, nextUsed, quotaResetAtMs);
 
   return {
     allowed,
     quota,
     cookie: serialize(
       OWNER_REFRESH_QUOTA_COOKIE,
-      String(quotaResetAtMs),
+      JSON.stringify({ resetAtMs: quotaResetAtMs, used: nextUsed }),
       {
         path: "/",
         sameSite: "lax",

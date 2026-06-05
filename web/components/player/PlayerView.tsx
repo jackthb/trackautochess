@@ -429,11 +429,12 @@ export default function PlayerView({
       remaining: manualRefreshQuota.limit,
     };
   }, [manualRefreshQuota, nowMs]);
-  const showQuota = canRefresh && !isAdmin;
+  const enforceQuota = canRefresh && !isAdmin;
+  const showQuota = enforceQuota && !isOwnProfile;
   const refreshDisabled =
     !canRefresh ||
     refreshing ||
-    (showQuota && effectiveManualRefreshQuota.remaining <= 0);
+    (enforceQuota && effectiveManualRefreshQuota.remaining <= 0);
   const refreshQuotaLabel = `${effectiveManualRefreshQuota.remaining}/${effectiveManualRefreshQuota.limit}`;
   const refreshQuotaResetLabel = formatRefreshReset(effectiveManualRefreshQuota, nowMs);
   const refreshQuotaTitle =
@@ -448,7 +449,7 @@ export default function PlayerView({
       setRefreshError("Checking your Steam session. Try again in a moment.");
       return;
     }
-    if (showQuota && effectiveManualRefreshQuota.remaining <= 0) {
+    if (enforceQuota && effectiveManualRefreshQuota.remaining <= 0) {
       trackEvent("Player Refresh Blocked", {
         route: analyticsRoute(route),
         reason: "quota",
@@ -456,7 +457,7 @@ export default function PlayerView({
       });
       setRefreshError(
         refreshCadence === "owner"
-          ? "Your next refresh is available after the 30-minute cooldown."
+          ? "Refresh is temporarily unavailable. Try again later."
           : "This profile has already been refreshed today."
       );
       return;
@@ -509,7 +510,7 @@ export default function PlayerView({
           setRefreshError(
             data?.error ||
               (refreshCadence === "owner"
-                ? "Your next refresh is available after the 30-minute cooldown."
+                ? "Refresh is temporarily unavailable. Try again later."
                 : "This profile has already been refreshed today.")
           );
         } else if (resp.status === 403) {
