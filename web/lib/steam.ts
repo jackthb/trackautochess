@@ -15,6 +15,20 @@ export interface ParsedSteamInput {
   value: string;
 }
 
+// BigInt(...) instead of n-literals so the ES2017 tsconfig target accepts them.
+const STEAM_ID64_MIN = BigInt("76561197960265728");
+const STEAM_ID64_MAX = BigInt("76561197964560623");
+
+function isLikelySteamId64(input: string): boolean {
+  if (!/^\d+$/.test(input)) return false;
+  try {
+    const value = BigInt(input);
+    return value >= STEAM_ID64_MIN && value <= STEAM_ID64_MAX;
+  } catch {
+    return false;
+  }
+}
+
 interface SteamLookupOptions {
   persist?: boolean;
   requireAvatar?: boolean;
@@ -89,14 +103,17 @@ export function parseSteamInput(raw: string): ParsedSteamInput | null {
   const profileMatch = decoded.match(
     /^(?:https?:\/\/)?(?:www\.)?steamcommunity\.com\/profiles\/(\d+)(?:[/?#].*)?$/i
   );
-  if (profileMatch) return { kind: "id", value: profileMatch[1] };
+  if (profileMatch && isLikelySteamId64(profileMatch[1])) {
+    return { kind: "id", value: profileMatch[1] };
+  }
 
   const customUrlMatch = decoded.match(
     /^(?:https?:\/\/)?(?:www\.)?steamcommunity\.com\/id\/([A-Za-z0-9_-]+)(?:[/?#].*)?$/i
   );
   if (customUrlMatch) return { kind: "slug", value: customUrlMatch[1] };
 
-  if (/^\d+$/.test(decoded)) return { kind: "id", value: decoded };
+  if (isLikelySteamId64(decoded)) return { kind: "id", value: decoded };
+  if (/^\d+$/.test(decoded)) return { kind: "slug", value: decoded };
   if (/^[A-Za-z0-9_-]+$/.test(decoded)) {
     return { kind: "slug", value: decoded };
   }
