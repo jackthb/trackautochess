@@ -66,10 +66,10 @@ export function ProfileSearch({
           (term) =>
             row.steam_id.includes(term) ||
             row.name?.toLowerCase().includes(term) ||
-            row.custom_url?.toLowerCase().includes(term)
+            row.custom_url?.toLowerCase().includes(term),
         );
       }),
-      parsed?.value ?? value
+      parsed?.value ?? value,
     );
   };
 
@@ -125,7 +125,7 @@ export function ProfileSearch({
       let rows: SearchResult[] = [];
       try {
         const resp = await fetch(
-          `/api/players/search?q=${encodeURIComponent(safe)}`
+          `/api/players/search?q=${encodeURIComponent(safe)}`,
         );
         if (resp.ok) {
           const data = await resp.json();
@@ -137,7 +137,7 @@ export function ProfileSearch({
 
       const mergedRows = sortSearchResults(
         mergeSearchResults([...rows, ...localRows]),
-        val
+        val,
       );
       setResults(mergedRows);
       setSearchedValue(val);
@@ -165,7 +165,7 @@ export function ProfileSearch({
   useEffect(() => clearLookupBarTimer, []);
 
   const navigateToPlayer = async (
-    result: Pick<SearchResult, "steam_id" | "custom_url">
+    result: Pick<SearchResult, "steam_id" | "custom_url">,
   ) => {
     setSearchValue("");
     setResults([]);
@@ -194,7 +194,7 @@ export function ProfileSearch({
 
     try {
       const resp = await fetch(
-        `/api/players/search?q=${encodeURIComponent(lookupValue)}&steam=1`
+        `/api/players/search?q=${encodeURIComponent(lookupValue)}&steam=1`,
       );
       if (reqId !== lookupReqRef.current) return;
 
@@ -246,15 +246,15 @@ export function ProfileSearch({
   const canSearchSteam = Boolean(parsedSteamInput);
   const hasExactKnownSteamResult = Boolean(
     parsedSteamInput &&
-      results.some((result) => {
-        if (parsedSteamInput.kind === "id") {
-          return result.steam_id === parsedSteamInput.value;
-        }
-        return (
-          result.custom_url?.toLowerCase() ===
-          parsedSteamInput.value.toLowerCase()
-        );
-      })
+    results.some((result) => {
+      if (parsedSteamInput.kind === "id") {
+        return result.steam_id === parsedSteamInput.value;
+      }
+      return (
+        result.custom_url?.toLowerCase() ===
+        parsedSteamInput.value.toLowerCase()
+      );
+    }),
   );
   const steamActionIndex = visibleResults.length;
   const showSteamAction =
@@ -323,98 +323,103 @@ export function ProfileSearch({
 
   return (
     <div className={`${styles.profileSearch} ${className}`} ref={containerRef}>
-        <form className={styles.searchForm} onSubmit={handleSearch}>
-          <input
-            ref={inputRef}
-            className={`${styles.searchInput}${lookupLoading ? " " + styles.loading : ""}${
-              lookupError ? " " + styles.error : ""
-            }`}
-            type="text"
-            placeholder={placeholder}
-            value={searchValue}
-            onChange={(e) => {
-              setSearchValue(e.target.value);
-              if (lookupError) setLookupError(null);
-            }}
-            onKeyDown={handleKeyDown}
-            onFocus={() => {
-              if (searchValue.trim() && results.length > 0) {
-                setDropdownOpen(true);
-              }
-              if (lookupError) setLookupError(null);
-            }}
-            autoComplete="off"
-            autoFocus={autoFocus}
-            aria-busy={lookupLoading || searching}
-            aria-invalid={Boolean(lookupError)}
-          />
-          {showLookupBar && (
-            <div className={styles.searchProgress} aria-hidden="true">
-              <div className={styles.searchProgressBar} />
-            </div>
-          )}
-        </form>
-        <div className={styles.searchHelp}>
-          <span>Paste your Steam profile URL, vanity URL, or SteamID64.</span>
-          <a href="https://steamcommunity.com/my/" target="_blank" rel="noreferrer">
-            Open your Steam profile
-          </a>
-        </div>
-        {lookupError && <div className={styles.searchStatus}>{lookupError}</div>}
-        {dropdownOpen && (
-          <div className={styles.searchDropdown}>
-            {results.length === 0 &&
-            searchValue.trim() &&
-            !searching &&
-            searchedValue === searchValue.trim() ? (
-              <div className={styles.searchEmpty}>
-                We didn't find any users in Track Auto Chess.
-              </div>
-            ) : null}
-            {visibleResults.length > 0
-              ? (
-                visibleResults.map((r, i) => (
-                  <div
-                    key={r.steam_id}
-                    className={
-                      styles.searchResult +
-                      (i === highlightedIndex ? " " + styles.highlighted : "")
-                    }
-                    onMouseEnter={() => setHighlightedIndex(i)}
-                    onMouseDown={(e) => {
-                      e.preventDefault();
-                      selectResult(r, i);
-                    }}
-                  >
-                    <span>{r.name || r.custom_url || r.steam_id}</span>
-                    {r.custom_url && (
-                      <span className={styles.resultMeta}>/{r.custom_url}</span>
-                    )}
-                  </div>
-                ))
-                )
-              : null}
-            {showSteamAction && visibleResults.length > 0 && (
-              <div className={styles.searchDivider}>Not the right player?</div>
-            )}
-            {showSteamAction && (
-              <div
-                className={
-                  styles.searchResult + " " + styles.searchSteam +
-                  (highlightedIndex === steamActionIndex ? " " + styles.highlighted : "")
-                }
-                onMouseEnter={() => setHighlightedIndex(steamActionIndex)}
-                onMouseDown={(e) => {
-                  e.preventDefault();
-                  void resolveSteamAndNavigate(searchValue.trim());
-                }}
-              >
-                <span>Search with Steam</span>
-                <span className={styles.resultMeta}>{searchValue.trim()}</span>
-              </div>
-            )}
+      <form className={styles.searchForm} onSubmit={handleSearch}>
+        <input
+          ref={inputRef}
+          className={`${styles.searchInput}${lookupLoading ? " " + styles.loading : ""}${
+            lookupError ? " " + styles.error : ""
+          }`}
+          type="text"
+          placeholder={placeholder}
+          value={searchValue}
+          onChange={(e) => {
+            setSearchValue(e.target.value);
+            if (lookupError) setLookupError(null);
+          }}
+          onKeyDown={handleKeyDown}
+          onFocus={() => {
+            if (searchValue.trim() && results.length > 0) {
+              setDropdownOpen(true);
+            }
+            if (lookupError) setLookupError(null);
+          }}
+          autoComplete="off"
+          autoFocus={autoFocus}
+          aria-busy={lookupLoading || searching}
+          aria-invalid={Boolean(lookupError)}
+        />
+        {showLookupBar && (
+          <div className={styles.searchProgress} aria-hidden="true">
+            <div className={styles.searchProgressBar} />
           </div>
         )}
+      </form>
+      <div className={styles.searchHelp}>
+        <a
+          href="https://steamcommunity.com/my/"
+          target="_blank"
+          rel="noreferrer"
+        >
+          Open your Steam profile
+        </a>
+      </div>
+      {lookupError && <div className={styles.searchStatus}>{lookupError}</div>}
+      {dropdownOpen && (
+        <div className={styles.searchDropdown}>
+          {results.length === 0 &&
+          searchValue.trim() &&
+          !searching &&
+          searchedValue === searchValue.trim() ? (
+            <div className={styles.searchEmpty}>
+              We didn't find any users in Track Auto Chess.
+            </div>
+          ) : null}
+          {visibleResults.length > 0
+            ? visibleResults.map((r, i) => (
+                <div
+                  key={r.steam_id}
+                  className={
+                    styles.searchResult +
+                    (i === highlightedIndex ? " " + styles.highlighted : "")
+                  }
+                  onMouseEnter={() => setHighlightedIndex(i)}
+                  onMouseDown={(e) => {
+                    e.preventDefault();
+                    selectResult(r, i);
+                  }}
+                >
+                  <span>{r.name || r.custom_url || r.steam_id}</span>
+                  {r.custom_url && (
+                    <span className={styles.resultMeta}>/{r.custom_url}</span>
+                  )}
+                </div>
+              ))
+            : null}
+          {showSteamAction && visibleResults.length > 0 && (
+            <div className={styles.searchDivider}>Not the right player?</div>
+          )}
+          {showSteamAction && (
+            <div
+              className={
+                styles.searchResult +
+                " " +
+                styles.searchSteam +
+                (highlightedIndex === steamActionIndex
+                  ? " " + styles.highlighted
+                  : "")
+              }
+              onMouseEnter={() => setHighlightedIndex(steamActionIndex)}
+              onMouseDown={(e) => {
+                e.preventDefault();
+                void resolveSteamAndNavigate(searchValue.trim());
+              }}
+            >
+              <span>Search with Steam</span>
+              <span className={styles.resultMeta}>{searchValue.trim()}</span>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }

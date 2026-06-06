@@ -679,6 +679,19 @@ VK_F23 = 0x86     # game_info (round/death)
 VK_F24 = 0x87     # ranking_top_table + player_id_table
 VK_F25 = 0x88     # unit_table (board pieces — debug)
 
+DUMP_COMMAND_BY_VK = {
+    VK_F16: "dumpstringtable CustomNetTable_chess_pool_table cl verbose",
+    VK_F20: "dumpstringtable CustomNetTable_player_id_table cl verbose",
+    VK_F21: "dumpstringtable CustomNetTable_dac_table cl verbose",
+    VK_F22: "dumpstringtable CustomNetTable_player_info_table cl verbose",
+    VK_F23: "dumpstringtable CustomNetTable_game_info cl verbose",
+    VK_F24: (
+        "dumpstringtable CustomNetTable_ranking_top_table cl verbose;"
+        "dumpstringtable CustomNetTable_player_id_table cl verbose"
+    ),
+    VK_F25: "dumpstringtable CustomNetTable_unit_table cl verbose",
+}
+
 
 # ── SendInput-based key firing (replaces external AHK) ─────────────
 # AHK's `Send` uses the Win32 SendInput API which produces input
@@ -863,6 +876,25 @@ def send_console_command(cmd: str) -> bool:
     except Exception as e:
         log.warning("send_console_command failed: %s", e)
         return False
+
+
+def fire_dump_key(vk: int) -> bool:
+    """Trigger one dump table command.
+
+    Prefer the bound extended-F-key path while Dota is foreground because it is
+    invisible to the user. If the tracker/app is foreground instead, SendInput
+    would go to the wrong window, so fall back to posting the direct
+    `dumpstringtable ...` command to Dota's console. This keeps live capture
+    refreshing while the user is actually looking at the live tracker.
+    """
+    if not _key_firing_enabled:
+        return False
+    if _is_dota_foreground():
+        return send_input_key(vk)
+    cmd = DUMP_COMMAND_BY_VK.get(vk)
+    if not cmd:
+        return False
+    return send_console_command(cmd)
 
 
 def send_dump_key_to_dota() -> bool:
@@ -1063,9 +1095,10 @@ POLL_INTERVAL_SEC = 2.0
 CASCADE_KEY_GAP_SEC = 0.2
 # The keys a round snapshot fires, in order. F21 (dac_table) is intentionally
 # excluded here and fired at POST_GAME only for end_board. F16 (chess_pool_table)
-# fires once per session because its useful values are static enough that
-# polling is noise. F24 (ranking_top_table + player_id_table) runs once per
-# match/session opening.
+# gets one extra early-round retry because relic/legendary pool keys are not
+# reliably populated at match opening; it is not part of every round snapshot.
+# F24 (ranking_top_table + player_id_table) still runs once per match/session
+# opening.
 ROUND_SNAPSHOT_VK_SEQUENCE = (VK_F22, VK_F20)
 
 # Wait this long after POST_GAME before sending dump-key again. The `end_board`
@@ -1204,6 +1237,8 @@ class NetTableCapture:
         # Fired once per match/session opening. Dumps Queen ladder metadata,
         # current lobby slot mapping, and one chess_pool_table snapshot.
         self._lobby_metadata_fired = False
+        self._ranking_top_scanned = False
+        self._early_chess_pool_retry_fired = False
         self._last_player_id_dump_at = 0.0
 
         # Status signature used by the poll thread to decide whether to re-emit.
@@ -1250,26 +1285,25 @@ class NetTableCapture:
     def _run_key_poller(self) -> None:
         """Fires F23 every 2s; heavier player/board snapshots are round-driven.
 
-        The steady-state loop only runs while Dota is foreground and GSI says
-        DAC is active. On startup, an immediate catch-up snapshot handles
-        mid-game launches before the first GSI tick arrives.
+        The steady-state loop only runs while Dota is running and GSI says DAC
+        is active. On startup, an immediate catch-up snapshot handles mid-game
+        launches once GSI has already confirmed DAC.
         """
-        # Catch-up: if Dota is already running, fire a live-state snapshot
-        # immediately so the live view populates even when the app
-        # starts mid-game (before GSI has confirmed DAC is active).
-        if _is_dota_foreground():
-            log.info("nettable: Dota is foreground at poller start — firing catch-up snapshot")
+        # Catch-up: if Dota is already running and GSI has confirmed DAC,
+        # fire a live-state snapshot immediately so the live view populates.
+        if is_dota_running() and self._is_dac_active():
+            log.info("nettable: DAC is active at poller start — firing catch-up snapshot")
             self._fire_round_snapshot("poller start")
             self._fire_lobby_metadata_dump("poller start")
         while not self._stop.is_set():
             try:
-                if _is_dota_foreground() and self._is_dac_active() and not self._paused:
+                if is_dota_running() and self._is_dac_active() and not self._paused:
                     if not self._lobby_metadata_fired:
                         self._fire_lobby_metadata_dump("DAC active")
                     # Cheap poll — just F23 (game_info → round_info/death_team).
                     # _detect_round_change() fires F22/F20 snapshots only when
                     # the round advances.
-                    send_input_key(VK_F23)
+                    fire_dump_key(VK_F23)
             except Exception as e:
                 log.warning("nettable: key poller iteration failed: %s", e)
             # Sleep till next poll tick.
@@ -1336,9 +1370,9 @@ class NetTableCapture:
         self.emit_status()
 
     def _fire_lobby_metadata_dump(self, reason: str) -> None:
-        send_input_key(VK_F24)
+        fire_dump_key(VK_F24)
         time.sleep(CASCADE_KEY_GAP_SEC)
-        send_input_key(VK_F16)
+        fire_dump_key(VK_F16)
         self._lobby_metadata_fired = True
         self._last_player_id_dump_at = time.time()
         log.info("nettable: fired lobby metadata dump (F24 + F16) at %s", reason)
@@ -1347,13 +1381,18 @@ class NetTableCapture:
         for vk in ROUND_SNAPSHOT_VK_SEQUENCE:
             if self._stop.is_set():
                 return
-            send_input_key(vk)
+            fire_dump_key(vk)
             time.sleep(CASCADE_KEY_GAP_SEC)
         self._last_player_id_dump_at = time.time()
         log.info("nettable: fired round snapshot (F22 + F20) at %s", reason)
 
+    def _fire_early_chess_pool_retry(self, reason: str) -> None:
+        fire_dump_key(VK_F16)
+        self._early_chess_pool_retry_fired = True
+        log.info("nettable: fired early chess_pool_table retry (F16) at %s", reason)
+
     def _fire_player_id_dump(self, reason: str) -> None:
-        send_input_key(VK_F20)
+        fire_dump_key(VK_F20)
         self._last_player_id_dump_at = time.time()
         log.info("nettable: fired F20 (player_id_table) at %s", reason)
 
@@ -1368,6 +1407,8 @@ class NetTableCapture:
         self._post_game_at = None
         self._end_board_captured = False
         self._lobby_metadata_fired = False
+        self._ranking_top_scanned = False
+        self._early_chess_pool_retry_fired = False
         self._last_player_id_dump_at = 0.0
         self._last_round = None
         self._last_lineups.clear()
@@ -1407,6 +1448,20 @@ class NetTableCapture:
             "local_steam_ids": self._last_local_steam_ids,
             "at": self._last_state_at or "",
         })
+
+    def _last_state_as_rows(self) -> list[dict]:
+        """Return the cumulative latest table/key snapshot in row form.
+
+        Individual dump blocks can be partial (for example only
+        chess_pool_table). The live UI should treat those as incremental
+        updates to the latest known state, not as a full replacement that wipes
+        player rows from the previous player_info/player_id dump.
+        """
+        return [
+            {"table_name": table_name, "key": key, "raw": raw}
+            for table_name, entries in self._last_state.items()
+            for key, raw in entries.items()
+        ]
 
     def _warm_start_state_from_disk(self) -> None:
         """No-op. Previously seeded _last_state from local dump files.
@@ -1757,7 +1812,7 @@ class NetTableCapture:
         for i in range(POST_GAME_PAUSE_BURST_COUNT):
             if self._stop.is_set():
                 return
-            send_input_key(VK_F21)
+            fire_dump_key(VK_F21)
             log.info("nettable: post-game F21 (dac_table) fire %d/%d", i + 1, POST_GAME_PAUSE_BURST_COUNT)
             if i == 0:
                 self._stop.wait(CASCADE_KEY_GAP_SEC)
@@ -2110,8 +2165,11 @@ class NetTableCapture:
             "prev_round": prev,
             "at": datetime.now().isoformat(),
         })
-        if round_now > 0 and _is_dota_foreground() and self._is_dac_active() and not self._paused:
+        if round_now > 0 and self._is_dac_active() and not self._paused:
             self._fire_round_snapshot(f"round changed {prev} -> {round_now}")
+            if not self._early_chess_pool_retry_fired:
+                time.sleep(CASCADE_KEY_GAP_SEC)
+                self._fire_early_chess_pool_retry(f"round {round_now}")
         # Creep rounds in DAC fire every 5 rounds (5, 10, 15, ...).
         # Worth flagging so consumers can fire a heavier snapshot.
         if round_now > 0 and round_now % 5 == 0:
@@ -2233,8 +2291,12 @@ class NetTableCapture:
             })
         return players
 
-    def _maybe_extract_ranking_top(self, rows: list[dict]) -> None:
+    def _maybe_extract_ranking_top(self, rows: list[dict], tables: list[str]) -> None:
         """Find ranking_top_table.ranking_top and upsert discovered Queen players."""
+        if self._ranking_top_scanned:
+            return
+        if "CustomNetTable_ranking_top_table" not in tables:
+            return
         for r in rows:
             if not (r.get("table_name", "").endswith("ranking_top_table")
                     and r.get("key") == "ranking_top"):
@@ -2264,6 +2326,7 @@ class NetTableCapture:
                     "season": season,
                     "at": scanned_at,
                 })
+            self._ranking_top_scanned = True
             break
 
     def _maybe_save_end_board(self, rows: list[dict]) -> None:
@@ -3069,7 +3132,9 @@ class NetTableCapture:
             self._maybe_save_end_board(rows)
 
             # Scan ranking_top_table for top players → upsert their profiles.
-            self._maybe_extract_ranking_top(rows)
+            # extract_rows parses the whole console.log, so only run this for
+            # the actual F24 block and only once per match/session.
+            self._maybe_extract_ranking_top(rows, tables)
 
             # Buffer full raw rows in memory for timeline building and archive
             # them locally for debugging/reprocessing. Raw rows are not uploaded
@@ -3104,11 +3169,12 @@ class NetTableCapture:
                 bucket = self._last_state.setdefault(r["table_name"], {})
                 bucket[r["key"]] = r["raw"]
             self._last_state_at = now_iso
+            cumulative_rows = self._last_state_as_rows()
             # Extract clean per-player state (transformed lineup, live hp with
             # the hp=100 static sentinel handled) via the same code the
             # timeline uses — the live "your board" card renders this directly
             # instead of re-parsing raw chess_* codes in the UI.
-            self._last_players = self._extract_players_state_from_rows(rows)
+            self._last_players = self._extract_players_state_from_rows(cumulative_rows)
             # "Local" = the configured local player's SteamID64. The
             # player_info_table.data container carries *every* visible player
             # in an 8-player lobby (not just our own client rows), so its keys
@@ -3120,7 +3186,7 @@ class NetTableCapture:
             else:
                 data_keys = [
                     str(sid)
-                    for r in rows
+                    for r in cumulative_rows
                     if r.get("table_name", "").endswith("player_info_table")
                     and r.get("key") == "player_info"
                     for sid in ((r.get("raw") or {}).get("data") or {}).keys()

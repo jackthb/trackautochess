@@ -88,6 +88,7 @@ class HeadlessBackend:
         self._game_focused = False
         self._last_replay_filename = None
         self._status_timer = None
+        self._tracking_started = False
         # Periodic diagnostic-log uploader. Logs ALWAYS upload on a cadence
         # (not conditionally on errors), so a fresh full copy is always sitting
         # in Supabase whenever a friend says "it's broken".
@@ -201,16 +202,68 @@ class HeadlessBackend:
             pass
 
     def _apply_game_tracking_flag(self) -> None:
-        """Evaluate the remote game-tracking kill switch and apply it to the
-        capture. Best-effort; fails open (tracking stays enabled on any error)."""
+        """Apply the remote tracking gate to the whole tracking subsystem.
+
+        When `game-tracking-enabled` is false, neither GSI nor NetTable capture
+        should run. GSI is part of tracking because it opens match sessions and
+        drives capture state; disabling only key sends leaves a half-running
+        tracker that logs sessions but cannot refresh.
+        """
         tel = getattr(self, "_telemetry", None)
-        if not tel or not self._nettable:
+        try:
+            enabled = tel.is_game_tracking_enabled() if tel else True
+        except Exception:
+            enabled = True
+        if enabled:
+            if not self._tracking_started:
+                self._start_tracking_if_enabled()
             return
+        if not self._tracking_started:
+            return
+
+        log.info("game tracking disabled by remote flag — stopping GSI and NetTable capture")
+        if self._nettable:
+            try:
+                self._nettable.stop()
+            except Exception:
+                pass
+        if self._gsi:
+            try:
+                self._gsi.stop()
+            except Exception:
+                pass
+        self._tracking_started = False
+
+    def _tracking_enabled(self) -> bool:
+        tel = getattr(self, "_telemetry", None)
+        if not tel:
+            return True
         try:
             tel.refresh_flags()
-            self._nettable.set_remote_enabled(tel.is_game_tracking_enabled())
+            return tel.is_game_tracking_enabled()
         except Exception:
-            pass
+            return True
+
+    def _start_tracking_if_enabled(self) -> None:
+        if self._tracking_started:
+            return
+        if not self._tracking_enabled():
+            log.info("game tracking disabled by remote flag — GSI and NetTable capture not started")
+            return
+
+        if self._gsi:
+            try:
+                self._gsi.start()
+            except Exception as e:
+                log.warning("GSI server start failed: %s", e)
+
+        if self._nettable:
+            try:
+                self._nettable.start()
+            except Exception as e:
+                log.warning("NetTable capture start failed: %s", e)
+
+        self._tracking_started = True
 
     def _start_log_upload_timer(self) -> None:
         """Periodically ship the full logs to Supabase so a fresh copy is always
@@ -227,8 +280,7 @@ class HeadlessBackend:
                 tel.upload_logs(reason="periodic")
             except Exception:
                 pass
-            # Re-sync the kill switch so flipping it in PostHog propagates to
-            # already-running clients without a restart.
+            # Re-sync the remote tracking gate for already-running clients.
             self._apply_game_tracking_flag()
             if self._stop_event.is_set():
                 return
@@ -663,22 +715,7 @@ class HeadlessBackend:
 
     def run(self) -> None:
         """Read stdin commands until quit or EOF."""
-        if self._gsi:
-            try:
-                self._gsi.start()
-            except Exception as e:
-                log.warning("GSI server start failed: %s", e)
-
-        # Start NetTable capture (autoexec install + console.log tailer)
-        if self._nettable:
-            try:
-                self._nettable.start()
-            except Exception as e:
-                log.warning("NetTable capture start failed: %s", e)
-
-        # Apply the remote game-tracking kill switch now, then keep it in sync
-        # on the periodic timer tick.
-        self._apply_game_tracking_flag()
+        self._start_tracking_if_enabled()
 
         # Always-on diagnostic log uploads (periodic). Independent of the kill
         # switch — logs/telemetry are observability and always run.

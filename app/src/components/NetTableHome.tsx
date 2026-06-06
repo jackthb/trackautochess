@@ -1,12 +1,10 @@
-import type { TrackerStatus, UnitFullInfo, SynergyInfo, ItemFullInfo } from "../types";
+import type { UnitFullInfo, SynergyInfo, ItemFullInfo } from "../types";
 import type { NetTableActivityState } from "../hooks/useNetTableEvents";
 import { NetTableSetupCard } from "./NetTableSetupCard";
-import { NetTableActivityFeed } from "./NetTableActivityFeed";
 import { NetTableStatePanel } from "./NetTableStatePanel";
 import { LiveMatchStatus } from "./LiveMatchStatus";
 
 interface NetTableHomeProps {
-  status: TrackerStatus | null;
   /** Loaded units_full.json — forwarded to NetTableStatePanel for chess code lookup */
   unitsFull: Record<string, UnitFullInfo>;
   /** Loaded synergies.json — forwarded to LiveMatchStatus for activation tiers */
@@ -23,7 +21,6 @@ interface NetTableHomeProps {
 }
 
 export function NetTableHome({
-  status,
   unitsFull,
   synergiesData,
   itemsFull,
@@ -37,7 +34,6 @@ export function NetTableHome({
   void onExitAdminPreview;
   const {
     status: netStatus,
-    entries,
     state,
     stateAt,
     livePlayers,
@@ -46,54 +42,11 @@ export function NetTableHome({
     launchOptionsProgress,
     resyncProgress,
   } = netTable;
-  // Match the setup card's "all good" calc — kept in sync with
-  // NetTableSetupCard.tsx. Pill only collapses when we have positive
-  // evidence the setup will work: either tracking is empirically active,
-  // or Dota isn't running yet AND launch options are confirmed set.
-  const tracking = Boolean(
-    netStatus && netStatus.dota_running && netStatus.log_active,
-  );
-  const flagsSet = Boolean(
-    netStatus &&
-      netStatus.has_condebug === true &&
-      netStatus.has_conclearlog === true &&
-      netStatus.has_gamestateintegration === true,
-  );
-  const setupComplete = Boolean(
-    netStatus &&
-      netStatus.autoexec_installed &&
-      (tracking || (!netStatus.dota_running && flagsSet)),
-  );
   // Live debug view — always on for the local player. Renders nothing
   // until a capture lands, so it's harmless before the first dump arrives.
 
   return (
     <div className="nettable-home">
-      <div className="nettable-home-header">
-        <div>
-          <div className="upload-eyebrow">DAC Tracker</div>
-          <h1>Live capture</h1>
-        </div>
-        <div className="upload-user-group">
-          {/* PARKED — "Admin view →" button. Re-render alongside the admin
-              preview toggle in App.tsx.
-          {isAdminPreview && onExitAdminPreview && (
-            <button
-              type="button"
-              className="upload-admin-toggle"
-              onClick={onExitAdminPreview}
-              title="Leave preview and return to the full admin view"
-            >
-              Admin view →
-            </button>
-          )}
-          */}
-          <div className="upload-user">
-            <span>{status?.steam_name || "Steam user"}</span>
-          </div>
-        </div>
-      </div>
-
       <LiveMatchStatus
         players={livePlayers}
         localSteamIds={localSteamIds}
@@ -102,9 +55,7 @@ export function NetTableHome({
         itemsFull={itemsFull}
       />
 
-      <div
-        className={`nettable-home-grid ${setupComplete ? "setup-complete" : ""}`}
-      >
+      <div className="nettable-home-grid">
         <div className="nettable-home-setup">
           <NetTableSetupCard
             status={netStatus}
@@ -112,9 +63,6 @@ export function NetTableHome({
             progress={launchOptionsProgress}
             resyncProgress={resyncProgress}
           />
-        </div>
-        <div className="nettable-home-feed">
-          <NetTableActivityFeed entries={entries} />
         </div>
         <div className="nettable-home-state">
           <NetTableStatePanel

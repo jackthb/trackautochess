@@ -158,11 +158,11 @@ export default function App() {
             active={activeTab}
             onChange={handleTabChange}
             showConfirmBadge={false}
+            userName={steamName ?? undefined}
           />
           <div style={{ flex: 1, overflow: "hidden", display: "flex" }}>
             {activeTab === "home" && (
               <NetTableHome
-                status={tracker.status}
                 unitsFull={gamesState.unitsFull}
                 synergiesData={gamesState.synergiesData}
                 itemsFull={gamesState.itemsFull}

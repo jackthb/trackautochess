@@ -112,11 +112,12 @@ export function NetTableSetupCard({
   }, [paused]);
 
   if (allOk) {
+    const statusLabel = paused ? "Paused" : tracking ? "Capturing" : "Ready";
     return (
       <div className="nettable-status-row">
-        <div className="nettable-setup-complete">
+        <div className={`nettable-setup-complete${paused ? " paused" : ""}`}>
           <span className={`nettable-setup-complete-dot${paused ? " paused" : ""}`} aria-hidden="true" />
-          {paused ? "Paused" : tracking ? "Capturing" : "Ready"}
+          {statusLabel}
         </div>
         <button type="button" className="btn-ghost nettable-pause-btn" onClick={togglePause}>
           {paused ? "Resume" : "Pause"}

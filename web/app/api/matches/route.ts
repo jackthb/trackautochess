@@ -14,7 +14,7 @@ function toApiReq(req: Request): NextApiRequest {
 
 function mmrLevelToRank(level: number | null | undefined): string {
   if (level == null || level < 1 || level > RANK_BRACKETS.length) return "";
-  return RANK_BRACKETS[level - 1].rank.replace("-", " ");
+  return RANK_BRACKETS[level - 1].rank;
 }
 
 interface GameRow {
@@ -23,8 +23,13 @@ interface GameRow {
   match_id: string | null;
   placement: number | null;
   mmr_level: number | null;
+  hero_level: number | null;
   chess_lineup: string | null;
+  synergies: string | null;
   relic: string | null;
+  relic_history: unknown;
+  win_round: number | null;
+  lose_round: number | null;
   played_at: string;
   created_at: string;
   matches?: {
@@ -49,7 +54,12 @@ export interface MatchPlayer {
   placement: string | null;
   rank: string | null;
   lineup: string | null;
+  synergies: string | null;
   relic: string | null;
+  relicHistory: unknown;
+  level: string | null;
+  wins: number | null;
+  losses: number | null;
 }
 
 export interface MatchSummary {
@@ -80,7 +90,7 @@ export async function GET(req: Request) {
   const { data: gamesData, error: gamesError } = await supabase
     .from("match_players")
     .select(
-      "id, steam_id::text, match_id, placement, mmr_level, chess_lineup, relic, played_at, created_at, matches!inner(capture_status, is_finished)"
+      "id, steam_id::text, match_id, placement, mmr_level, hero_level, chess_lineup, synergies, relic, relic_history, win_round, lose_round, played_at, created_at, matches!inner(capture_status, is_finished)"
     )
     .eq("matches.is_finished", true)
     .order("id", { ascending: false })
@@ -133,7 +143,12 @@ export async function GET(req: Request) {
         placement: r.placement != null ? String(r.placement) : null,
         rank: r.mmr_level ? mmrLevelToRank(r.mmr_level) : null,
         lineup: r.chess_lineup,
+        synergies: r.synergies,
         relic: r.relic,
+        relicHistory: r.relic_history,
+        level: r.hero_level != null ? String(r.hero_level) : null,
+        wins: r.win_round,
+        losses: r.lose_round,
       })),
     }));
 

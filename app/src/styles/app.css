@@ -123,6 +123,21 @@
   border-color: var(--text-muted);
 }
 
+.tab-bar-user {
+  margin-left: auto;
+  align-self: center;
+  max-width: 240px;
+  padding: 5px 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--r-4);
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+  font-size: var(--fs-12);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 /* ── Shared: btn-ghost ─────────────────────────────────── */
 
 .btn-ghost {
@@ -2061,49 +2076,20 @@ video {
   flex-direction: column;
   min-height: 0;
   width: 100%;
-  padding: 32px 40px 24px;
-  gap: 24px;
+  padding: 24px 40px;
+  gap: 16px;
   overflow-y: auto;
   overflow-x: hidden;
   background: linear-gradient(180deg, var(--bg-deep) 0%, var(--bg-surface) 100%);
 }
 
-.nettable-home-header {
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: 24px;
-}
-
-.nettable-home-header h1 {
-  font-family: var(--font-display);
-  font-size: var(--fs-24);
-  font-weight: var(--fw-semibold);
-  letter-spacing: var(--tr-display);
-  text-transform: uppercase;
-  color: var(--text-primary);
-  margin-top: 4px;
-}
-
 .nettable-home-grid {
   flex: 0 0 auto;
   display: grid;
-  grid-template-columns: minmax(280px, 360px) 1fr;
+  grid-template-columns: minmax(280px, 360px) minmax(0, 1fr);
   grid-template-areas:
-    "setup feed"
-    "state state";
-  gap: 24px;
-}
-
-.nettable-home-grid.setup-complete {
-  grid-template-columns: 1fr 1fr;
-  grid-template-areas:
-    "feed state"
-    "setup setup";
-}
-
-.nettable-home-grid.setup-complete .nettable-home-setup {
-  align-self: flex-end;
+    "setup state";
+  gap: 16px;
 }
 
 .nettable-home-setup {
@@ -2557,6 +2543,7 @@ video {
   letter-spacing: var(--tr-body);
   padding: 2px 8px;
   border: 1px solid var(--border);
+  border-radius: var(--r-4);
   color: var(--text-secondary);
 }
 
@@ -2597,7 +2584,13 @@ video {
   letter-spacing: var(--tr-body);
   color: var(--text-secondary);
   border: 1px solid color-mix(in srgb, var(--green-bright) 45%, var(--border));
+  border-radius: var(--r-4);
   padding: 4px 10px;
+}
+
+.nettable-setup-complete.paused {
+  border-color: var(--border);
+  color: var(--text-muted);
 }
 
 .nettable-setup-complete-dot {
@@ -2613,119 +2606,5 @@ video {
 }
 
 .nettable-pause-btn {
-  /* Standalone, sits beside the status pill (no longer inside it). */
-}
-
-/* Activity feed */
-
-.nettable-activity {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  border: 1px solid var(--border);
-  background: var(--bg-surface);
-  overflow: hidden;
-}
-
-.nettable-activity-header {
-  font-size: var(--fs-13);
-  letter-spacing: var(--tr-upper-wide);
-  text-transform: uppercase;
-  color: var(--text-muted);
-  padding: 14px 20px;
-  border-bottom: 1px solid var(--border-subtle);
-}
-
-.nettable-activity-empty {
-  padding: 20px;
-  font-size: var(--fs-13);
-  color: var(--text-muted);
-}
-
-.nettable-activity-list {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  flex: 1;
-  overflow-y: auto;
-}
-
-.nettable-activity-item {
-  display: grid;
-  grid-template-columns: 90px 1fr;
-  gap: 16px;
-  padding: 12px 20px;
-  border-bottom: 1px solid var(--border-subtle);
-  align-items: baseline;
-}
-
-.nettable-activity-item:last-child {
-  border-bottom: none;
-}
-
-.nettable-activity-time {
-  font-size: var(--fs-11);
-  color: var(--text-muted);
-  letter-spacing: var(--tr-body);
-  font-variant-numeric: tabular-nums;
-}
-
-.nettable-activity-body {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  min-width: 0;
-}
-
-.nettable-activity-title {
-  font-size: var(--fs-14);
-  color: var(--text-primary);
-  word-break: break-word;
-}
-
-.nettable-activity-detail {
-  font-size: var(--fs-12);
-  color: var(--text-muted);
-  white-space: pre-line;
-  word-break: break-word;
-}
-
-.nettable-activity-item.tone-success .nettable-activity-title {
-  color: var(--green-bright);
-}
-
-.nettable-activity-item.tone-warning .nettable-activity-title {
-  color: #e8a838;
-}
-
-.nettable-activity-item.tone-error .nettable-activity-title {
-  color: var(--red-bright);
-}
-
-/* Tone accent down the left edge + hover, so the feed is scannable at a glance.
-   2px border + 18px left padding keeps text aligned with the 20px header. */
-.nettable-activity-item {
-  border-left: 2px solid transparent;
-  padding-left: 18px;
-  transition: background 120ms ease;
-}
-
-.nettable-activity-item:hover {
-  background: color-mix(in srgb, var(--text-muted) 6%, transparent);
-}
-
-.nettable-activity-item.tone-info {
-  border-left-color: color-mix(in srgb, var(--text-muted) 35%, transparent);
-}
-
-.nettable-activity-item.tone-success {
-  border-left-color: var(--green-bright);
-}
-
-.nettable-activity-item.tone-warning {
-  border-left-color: #e8a838;
-}
-
-.nettable-activity-item.tone-error {
-  border-left-color: var(--red-bright);
+  padding: 4px 10px;
 }

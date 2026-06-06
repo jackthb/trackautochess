@@ -37,3 +37,10 @@
   outline: 1px solid var(--accent);
   outline-offset: -1px;
 }
+
+.dateExtra {
+  margin-top: 4px;
+  font-family: var(--font-mono);
+  font-size: var(--fs-11);
+  color: var(--text-muted);
+}

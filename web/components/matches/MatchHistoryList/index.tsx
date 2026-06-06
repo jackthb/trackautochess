@@ -1,5 +1,6 @@
 "use client";
 
+import type { ReactNode } from "react";
 import { useRouter } from "next/navigation";
 import { GameRowDisplay } from "@dac/shared/GameRowDisplay";
 import type { PlayerGame, RelicInfo, UnitFullInfo, SynergyInfo } from "@dac/shared/types";
@@ -15,6 +16,8 @@ interface MatchHistoryListProps {
   unitsFull?: Record<string, UnitFullInfo>;
   synergiesData?: Record<string, SynergyInfo>;
   relicsData?: Record<string, RelicInfo>;
+  getHref?: (game: PlayerGame) => string;
+  getDateExtra?: (game: PlayerGame) => ReactNode;
 }
 
 export function MatchHistoryList({
@@ -22,6 +25,8 @@ export function MatchHistoryList({
   unitsFull,
   synergiesData,
   relicsData = RELICS_MAP,
+  getHref = (game) => `/matches/${game.id}`,
+  getDateExtra,
 }: MatchHistoryListProps) {
   const router = useRouter();
 
@@ -39,7 +44,8 @@ export function MatchHistoryList({
         <div className={styles.th}>Date</div>
       </div>
       {games.map((game) => {
-        const href = `/matches/${game.id}`;
+        const href = getHref(game);
+        const dateExtra = getDateExtra?.(game);
         return (
           <div key={game.id} className={styles.gameEntry}>
             <div
@@ -62,6 +68,7 @@ export function MatchHistoryList({
                 relicsData={relicsData}
                 iconUrl={resolveIconUrl}
                 shareUrl={href}
+                dateExtra={dateExtra ? <div className={styles.dateExtra}>{dateExtra}</div> : undefined}
                 style={{ cursor: "pointer" }}
               />
             </div>

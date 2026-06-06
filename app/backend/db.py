@@ -11,7 +11,7 @@ Config keys in ~/.dac/config.json:
 import json
 import logging
 import re
-from datetime import datetime, timedelta
+from datetime import datetime
 
 from utils import load_config, local_only_mode
 
@@ -19,7 +19,6 @@ log = logging.getLogger("dac.db")
 
 _client = None  # lazy-init
 _local_only_logged = False
-QUEEN_LADDER_UPDATE_MIN_INTERVAL = timedelta(hours=24)
 
 
 
@@ -121,41 +120,6 @@ def _normalize_season_key(value) -> str:
     if match:
         return f"s{int(match.group(0))}"
     return raw
-
-
-def _queen_ladder_recently_updated(client, now: datetime) -> bool:
-    """Return True when the DB already has a Queen ladder scan from the last day.
-
-    This is intentionally global, not per-client: if a few beta EXEs are
-    running at once, the first accepted in-game ladder sync owns the website's
-    Queen ladder row set for the cadence window.
-    """
-    try:
-        resp = client.get(
-            "/rest/v1/users",
-            params={
-                "select": "queen_ladder_last_seen_at",
-                "queen_ladder_last_seen_at": "not.is.null",
-                "order": "queen_ladder_last_seen_at.desc",
-                "limit": "1",
-            },
-            headers={"Accept": "application/json"},
-        )
-        resp.raise_for_status()
-        rows = resp.json()
-        if not isinstance(rows, list) or not rows:
-            return False
-        last_seen = _parse_iso_datetime(rows[0].get("queen_ladder_last_seen_at"))
-        if last_seen is None:
-            return False
-        if last_seen.tzinfo is None and now.tzinfo is not None:
-            last_seen = last_seen.replace(tzinfo=now.tzinfo)
-        return now - last_seen < QUEEN_LADDER_UPDATE_MIN_INTERVAL
-    except Exception as e:
-        # The throttle is a max-cadence guard. If we cannot prove the last
-        # update is old enough, skip rather than risk hammering the ladder.
-        log.warning("queen ladder throttle check failed; skipping update: %s", e)
-        return True
 
 
 def _clear_queen_ladder_snapshot(client) -> bool:
@@ -342,10 +306,6 @@ def upsert_queen_ladder_players(players: list[dict]) -> int:
         return 0
 
     now_dt = datetime.now().astimezone()
-    if _queen_ladder_recently_updated(client, now_dt):
-        log.info("queen ladder upsert skipped — updated within the last hour")
-        return 0
-
     seen: set[int] = set()
     rows = []
     now = now_dt.isoformat()

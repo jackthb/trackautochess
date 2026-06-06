@@ -43,7 +43,15 @@ const HIDDEN_CURRENT_CAPTURE_TABLES = new Set([
 export function NetTableStatePanel({
   state,
   stateAt,
+  unitsFull,
+  livePlayers,
+  localSteamIds,
+  synergiesData,
 }: Props) {
+  const hiddenLegendaries = useMemo(
+    () => extractHiddenLegendaries(state, unitsFull),
+    [state, unitsFull],
+  );
   const tables = useMemo(() => {
     return Object.keys(state)
       .filter((table) => !HIDDEN_CURRENT_CAPTURE_TABLES.has(table))
@@ -54,7 +62,7 @@ export function NetTableStatePanel({
       });
   }, [state]);
 
-  const empty = tables.length === 0;
+  const empty = tables.length === 0 && hiddenLegendaries === null;
 
   return (
     <section className="nettable-state-panel">
@@ -72,6 +80,15 @@ export function NetTableStatePanel({
         </p>
       ) : (
         <div className="nettable-state-panel-list">
+          {hiddenLegendaries && (
+            <HiddenLegendaries
+              revealed={hiddenLegendaries.revealed}
+              unrevealed={hiddenLegendaries.unrevealed}
+              livePlayers={livePlayers}
+              localSteamIds={localSteamIds}
+              synergiesData={synergiesData}
+            />
+          )}
           {tables.map((table) => (
             <TableBlock key={table} table={table} entries={state[table]} />
           ))}

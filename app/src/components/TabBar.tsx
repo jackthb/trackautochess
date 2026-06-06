@@ -2,6 +2,7 @@ interface TabBarProps {
   active: string;
   onChange: (tab: string) => void;
   showConfirmBadge: boolean;
+  userName?: string;
   onPreviewAsUser?: () => void;
 }
 
@@ -18,7 +19,7 @@ const TABS = [
   // { id: "upload", label: "Upload" },          // PARKED — upload flow
 ];
 
-export function TabBar({ active, onChange, showConfirmBadge, onPreviewAsUser }: TabBarProps) {
+export function TabBar({ active, onChange, showConfirmBadge, userName, onPreviewAsUser }: TabBarProps) {
   // `showConfirmBadge` / `onPreviewAsUser` are kept on the prop type so the
   // parked admin-preview + screenshot flows revive cleanly. Neither is
   // consumed in the unified view.
@@ -40,6 +41,7 @@ export function TabBar({ active, onChange, showConfirmBadge, onPreviewAsUser }: 
           */}
         </div>
       ))}
+      {userName && <div className="tab-bar-user">{userName}</div>}
       {/* PARKED — admin "Preview as user" toggle.
       {onPreviewAsUser && (
         <button
