@@ -1524,6 +1524,53 @@ video {
 .settings-value { font-size: 14px; color: var(--text-primary); }
 .settings-value.dim { color: var(--text-muted); }
 
+.settings-feedback {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 16px 20px 18px;
+}
+
+.settings-feedback-label {
+  color: var(--text-secondary);
+  font-size: 14px;
+}
+
+.settings-feedback-input {
+  min-height: 96px;
+  resize: vertical;
+  background: var(--bg-deep);
+  border: 1px solid var(--border);
+  border-radius: var(--r-4);
+  color: var(--text-primary);
+  font-family: inherit;
+  font-size: 13px;
+  line-height: 1.5;
+  padding: 10px 12px;
+}
+
+.settings-feedback-input::placeholder {
+  color: var(--text-muted);
+}
+
+.settings-feedback-input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.settings-feedback-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.settings-feedback-status {
+  color: var(--text-muted);
+  font-size: 12px;
+  line-height: 1.4;
+}
+
 /* ── Status bar ────────────────────────────────────────── */
 
 .status-bar {
@@ -2084,12 +2131,27 @@ video {
 }
 
 .nettable-home-grid {
-  flex: 0 0 auto;
+  flex: 1 1 auto;
+  min-height: 0;
   display: grid;
   grid-template-columns: minmax(280px, 360px) minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr);
   grid-template-areas:
     "setup state";
   gap: 16px;
+}
+
+/* When setup is complete (or remotely disabled) the setup column is only a
+   thin status toolbar, not a full card. A 360px sidebar next to it leaves a
+   lopsided void, so collapse to a single column: toolbar on top, the capture
+   panel filling the width and remaining height below. */
+.nettable-home-grid:has(.nettable-status-row),
+.nettable-home-grid:has(.nettable-status-disabled) {
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: auto minmax(0, 1fr);
+  grid-template-areas:
+    "setup"
+    "state";
 }
 
 .nettable-home-setup {
@@ -2619,8 +2681,14 @@ video {
 .nettable-status-row {
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
   gap: 8px;
   align-self: flex-start;
+}
+
+.nettable-status-row .btn-ghost,
+.nettable-pause-btn {
+  white-space: nowrap;
 }
 
 .nettable-status-disabled {
