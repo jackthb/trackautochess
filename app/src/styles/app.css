@@ -1527,42 +1527,11 @@ video {
 .settings-feedback {
   display: flex;
   flex-direction: column;
-  gap: 10px;
   padding: 16px 20px 18px;
 }
 
-.settings-feedback-label {
-  color: var(--text-secondary);
-  font-size: 14px;
-}
-
-.settings-feedback-input {
-  min-height: 96px;
-  resize: vertical;
-  background: var(--bg-deep);
-  border: 1px solid var(--border);
-  border-radius: var(--r-4);
+.settings-feedback-survey {
   color: var(--text-primary);
-  font-family: inherit;
-  font-size: 13px;
-  line-height: 1.5;
-  padding: 10px 12px;
-}
-
-.settings-feedback-input::placeholder {
-  color: var(--text-muted);
-}
-
-.settings-feedback-input:focus {
-  outline: none;
-  border-color: var(--accent);
-}
-
-.settings-feedback-actions {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
 }
 
 .settings-feedback-status {

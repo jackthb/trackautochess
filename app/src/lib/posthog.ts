@@ -1,5 +1,20 @@
 type PostHogClient = {
   capture: (event: string, properties?: Record<string, unknown>) => void;
+  displaySurvey: (
+    surveyId: string,
+    options: {
+      displayType: "inline";
+      selector: string;
+      properties?: Record<string, unknown>;
+    },
+  ) => void;
+  getActiveMatchingSurveys: (
+    callback: (
+      surveys: Array<{ id: string; name?: string }>,
+      context?: { isLoaded?: boolean; error?: string },
+    ) => void,
+    forceReload?: boolean,
+  ) => void;
   identify: (distinctId: string, properties?: Record<string, unknown>) => void;
   init: (token: string, config: Record<string, unknown>) => void;
   register: (properties: Record<string, unknown>) => void;
@@ -43,6 +58,7 @@ export async function getPostHog(): Promise<PostHogClient | null> {
       // Only create person profiles after `identify()` so events are keyed to
       // the logged-in steam_id rather than anonymous device ids.
       person_profiles: "identified_only",
+      surveys: true,
       // Deliberate product decision (opposite to web): session replay ON.
       // This is a desktop game tracker with low PII and consenting friends,
       // so we keep PostHog's default masking and record everything else.

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { capture } from "../lib/posthog";
+import { getPostHog } from "../lib/posthog";
 import type { TrackerStatus } from "../types";
 
 interface SettingsTabProps {
@@ -9,8 +9,7 @@ interface SettingsTabProps {
 export function SettingsTab({ status }: SettingsTabProps) {
   const [version, setVersion] = useState("\u2014");
   const [loggingIn, setLoggingIn] = useState(false);
-  const [feedback, setFeedback] = useState("");
-  const [feedbackState, setFeedbackState] = useState<"idle" | "sent">("idle");
+  const [surveyStatus, setSurveyStatus] = useState("Loading feedback survey...");
 
   useEffect(() => {
     window.appApi.getVersion().then(setVersion);
@@ -25,23 +24,68 @@ export function SettingsTab({ status }: SettingsTabProps) {
   const steamName = status?.steam_name || "Not logged in";
   const steamId = status?.steam_id || "\u2014";
   const backendStatus = status ? "Connected" : "Disconnected";
-  const feedbackText = feedback.trim();
 
   const sendCommand = (cmd: Record<string, unknown>) => {
     window.tracker.sendCommand(cmd);
   };
 
-  const submitFeedback = () => {
-    if (!feedbackText) return;
-    capture("feedback_submitted", {
-      feedback: feedbackText,
+  useEffect(() => {
+    let cancelled = false;
+    const selector = "#posthog-feedback-survey";
+    const configuredSurveyId = import.meta.env.VITE_POSTHOG_FEEDBACK_SURVEY_ID?.trim();
+    const properties = {
       app_version: version,
       steam_id: status?.steam_id ?? null,
       steam_name: status?.steam_name ?? null,
+      source: "desktop_app_settings",
+    };
+
+    const renderSurvey = (surveyId: string) => {
+      const container = document.querySelector(selector);
+      if (!container || cancelled) return;
+      container.innerHTML = "";
+      void getPostHog().then((posthog) => {
+        if (!posthog || cancelled) return;
+        posthog.displaySurvey(surveyId, {
+          displayType: "inline",
+          selector,
+          properties,
+        });
+        setSurveyStatus("");
+      });
+    };
+
+    if (configuredSurveyId) {
+      renderSurvey(configuredSurveyId);
+      return () => {
+        cancelled = true;
+      };
+    }
+
+    void getPostHog().then((posthog) => {
+      if (!posthog || cancelled) {
+        if (!cancelled) setSurveyStatus("Feedback survey is not available in this build.");
+        return;
+      }
+      posthog.getActiveMatchingSurveys((surveys, context) => {
+        if (cancelled) return;
+        const survey = surveys[0];
+        if (survey?.id) {
+          renderSurvey(survey.id);
+          return;
+        }
+        setSurveyStatus(
+          context?.error
+            ? "Could not load the feedback survey."
+            : "No feedback survey is active for this user yet.",
+        );
+      }, true);
     });
-    setFeedback("");
-    setFeedbackState("sent");
-  };
+
+    return () => {
+      cancelled = true;
+    };
+  }, [status?.steam_id, status?.steam_name, version]);
 
   return (
     <div className="settings-tab">
@@ -111,35 +155,8 @@ export function SettingsTab({ status }: SettingsTabProps) {
         <div className="settings-section">
           <div className="settings-section-title">Feedback</div>
           <div className="settings-feedback">
-            <label className="settings-feedback-label" htmlFor="settings-feedback-input">
-              Tell us what is broken, confusing, or missing.
-            </label>
-            <textarea
-              id="settings-feedback-input"
-              className="settings-feedback-input"
-              value={feedback}
-              maxLength={1200}
-              placeholder="Example: Queen upload worked, but I could not tell if tracking was setup."
-              onChange={(event) => {
-                setFeedback(event.target.value);
-                if (feedbackState !== "idle") setFeedbackState("idle");
-              }}
-            />
-            <div className="settings-feedback-actions">
-              <span className="settings-feedback-status">
-                {feedbackState === "sent"
-                  ? "Thanks — feedback sent."
-                  : "Sent through PostHog with your Steam ID so we can follow up."}
-              </span>
-              <button
-                className="btn-ghost"
-                type="button"
-                disabled={!feedbackText}
-                onClick={submitFeedback}
-              >
-                Send feedback
-              </button>
-            </div>
+            <div id="posthog-feedback-survey" className="settings-feedback-survey" />
+            {surveyStatus && <div className="settings-feedback-status">{surveyStatus}</div>}
           </div>
         </div>
 
