@@ -13,6 +13,7 @@ export type NetTableActivityKind =
   | "nettable_dump_captured"
   | "nettable_ingest_complete"
   | "nettable_ingest_error"
+  | "nettable_queen_upload_complete"
   | "nettable_game_ended"
   | "nettable_end_board_saved"
   | "nettable_creep_round"
@@ -23,6 +24,8 @@ export interface NetTableStatus {
   autoexec_installed: boolean;
   log_path: string;
   log_writable: boolean;
+  /** False when the remote game-tracking kill switch is disabling capture. */
+  remote_enabled: boolean;
   /** Raw launch-options string from Steam's localconfig.vdf, or null if we couldn't read it. */
   launch_options: string | null;
   /** True/false when localconfig was read; null if unknown. */
@@ -52,6 +55,15 @@ export interface NetTableLaunchOptionsApplied {
   added?: string[];
   config_path?: string;
   backup_path?: string;
+}
+
+export interface NetTableQueenUploadResult {
+  ok: boolean;
+  player_count: number;
+  upserted_count: number;
+  season?: string;
+  error?: string;
+  at?: string;
 }
 
 export interface NetTableActivityEntry {
@@ -110,6 +122,10 @@ export interface NetTableActivityState {
   launchOptionsProgress: string | null;
   /** Current progress message during resync-from-Steam (null when idle). */
   resyncProgress: string | null;
+  /** Result of the most recent manual Queen upload. Null until the user clicks. */
+  queenUpload: NetTableQueenUploadResult | null;
+  /** Current progress message during manual Queen upload (null when idle). */
+  queenUploadProgress: string | null;
 }
 
 const MAX_ENTRIES = 50;
@@ -120,6 +136,7 @@ type NetTableStatusEvent = {
   autoexec_installed: boolean;
   log_path: string;
   log_writable: boolean;
+  remote_enabled?: boolean;
   launch_options: string | null;
   has_condebug: boolean | null;
   has_conclearlog: boolean | null;
@@ -147,6 +164,14 @@ type NetTableResyncCompleteEvent = {
   ok: boolean;
   noop?: boolean;
   error?: string;
+};
+type NetTableQueenUploadProgressEvent = {
+  type: "nettable_queen_upload_progress";
+  message: string;
+  at?: string;
+};
+type NetTableQueenUploadCompleteEvent = NetTableQueenUploadResult & {
+  type: "nettable_queen_upload_complete";
 };
 type NetTablePauseFiredEvent = {
   type: "nettable_pause_fired";
@@ -202,7 +227,9 @@ type Incoming =
   | NetTableLaunchOptionsAppliedEvent
   | NetTableLaunchOptionsProgressEvent
   | NetTableResyncProgressEvent
-  | NetTableResyncCompleteEvent;
+  | NetTableResyncCompleteEvent
+  | NetTableQueenUploadProgressEvent
+  | NetTableQueenUploadCompleteEvent;
 
 function summarizeTables(tables: string[]): string {
   if (tables.length === 0) return "no tables";
@@ -231,6 +258,8 @@ export function useNetTableEvents(): NetTableActivityState {
     useState<NetTableLaunchOptionsApplied | null>(null);
   const [launchOptionsProgress, setLaunchOptionsProgress] = useState<string | null>(null);
   const [resyncProgress, setResyncProgress] = useState<string | null>(null);
+  const [queenUpload, setQueenUpload] = useState<NetTableQueenUploadResult | null>(null);
+  const [queenUploadProgress, setQueenUploadProgress] = useState<string | null>(null);
   useEffect(() => {
     if (!window.tracker) return;
     let nextId = 1;
@@ -257,6 +286,7 @@ export function useNetTableEvents(): NetTableActivityState {
               autoexec_installed: msg.autoexec_installed,
               log_path: msg.log_path,
               log_writable: msg.log_writable,
+              remote_enabled: msg.remote_enabled ?? true,
               launch_options: msg.launch_options ?? null,
               has_condebug: msg.has_condebug ?? null,
               has_conclearlog: msg.has_conclearlog ?? null,
@@ -277,9 +307,9 @@ export function useNetTableEvents(): NetTableActivityState {
             ) {
               push({
                 kind: "nettable_ingest_error",
-                title: "Dota started but tracking isn't active",
+                title: "Can't tell if setup is complete",
                 detail:
-                  "console.log isn't being written. Click 'Set them for me' to add -condebug -conclearlog and relaunch Dota.",
+                  "Open a practice lobby and play one round. If nothing appears, run automatic setup and restart Dota.",
                 tone: "warning",
               });
             }
@@ -375,6 +405,24 @@ export function useNetTableEvents(): NetTableActivityState {
           }
           break;
         }
+        case "nettable_queen_upload_progress": {
+          setQueenUploadProgress(msg.message);
+          break;
+        }
+        case "nettable_queen_upload_complete": {
+          const { type: _type, ...rest } = msg;
+          setQueenUpload(rest);
+          setQueenUploadProgress(null);
+          push({
+            kind: "nettable_queen_upload_complete",
+            title: rest.ok ? "Queens uploaded" : "Queens upload failed",
+            detail: rest.ok
+              ? `${rest.upserted_count}/${rest.player_count} player${rest.player_count === 1 ? "" : "s"} saved`
+              : rest.error,
+            tone: rest.ok ? "success" : "error",
+          });
+          break;
+        }
         case "nettable_launch_options_applied": {
           const { type: _type, ...rest } = msg;
           setLaunchOptionsApplied(rest);
@@ -382,14 +430,14 @@ export function useNetTableEvents(): NetTableActivityState {
           if (rest.ok && !rest.noop) {
             push({
               kind: "nettable_ingest_complete",
-              title: "Launch options updated",
-              detail: `Added ${(rest.added ?? []).join(" ")} — restart Steam, then Dota.`,
+              title: "Setup updated",
+              detail: "Restart Steam, then Dota.",
               tone: "success",
             });
           } else if (!rest.ok) {
             push({
               kind: "nettable_ingest_error",
-              title: "Couldn't update launch options",
+              title: "Couldn't update setup",
               detail: rest.error,
               tone: "error",
             });
@@ -449,5 +497,7 @@ export function useNetTableEvents(): NetTableActivityState {
     launchOptionsApplied,
     launchOptionsProgress,
     resyncProgress,
+    queenUpload,
+    queenUploadProgress,
   };
 }

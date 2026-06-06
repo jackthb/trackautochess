@@ -5,6 +5,7 @@ import { PageLayout } from "@/components/PageLayout";
 import { SITE_NAME, SITE_TITLE } from "@/lib/site";
 import { playerProfilePath } from "@/lib/steam";
 import styles from "../leaderboard/leaderboard.module.css";
+import { LastSyncedTime } from "./LastSyncedTime";
 
 interface QueenRow {
   steam_id: string;
@@ -102,17 +103,6 @@ async function loadQueens(): Promise<{ rows: QueenRow[]; error: string | null }>
   };
 }
 
-function formatDate(value: string | null): string {
-  if (!value) return "—";
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return "—";
-  return date.toLocaleDateString("en-US", {
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-  });
-}
-
 function normalizeSeason(value: string | null): string | null {
   const raw = value?.trim().toLowerCase();
   if (!raw) return null;
@@ -168,8 +158,8 @@ export default async function QueensPage() {
       ) : (
         <>
           <div className={styles["snapshot-meta"]}>
-            <span>Last synced date</span>
-            <strong>{formatDate(lastSyncedAt)}</strong>
+            <span>Last synced</span>
+            <LastSyncedTime value={lastSyncedAt} />
           </div>
           <div className={`${styles.table} ${styles["queen-table"]}`} role="table">
             <div className={`${styles.row} ${styles["header-row"]}`}>

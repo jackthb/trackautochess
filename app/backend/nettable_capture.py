@@ -2329,6 +2329,96 @@ class NetTableCapture:
             self._ranking_top_scanned = True
             break
 
+    def manual_upload_queen_ladder(self) -> None:
+        """Force a fresh Queen-ladder scan from the current Dota console log.
+
+        The normal path uploads this once when the lobby metadata dump appears.
+        This manual path is for "I'm in game, upload it now": fire the lobby
+        metadata dump if capture is allowed, wait briefly for Dota to write it,
+        then parse ranking_top_table and upsert the players regardless of the
+        per-session `_ranking_top_scanned` latch.
+        """
+        started_at = datetime.now().astimezone().isoformat()
+        self._emit({
+            "type": "nettable_queen_upload_progress",
+            "message": "Checking the current Queen list…",
+            "at": started_at,
+        })
+        try:
+            if self._log_path is None or not self._log_path.exists():
+                raise RuntimeError("Dota log not found. Start Dota, enter a DAC lobby, then try again.")
+
+            if is_dota_running() and self._remote_enabled and not self._paused:
+                self._emit({
+                    "type": "nettable_queen_upload_progress",
+                    "message": "Asking Dota for the current Queen list…",
+                    "at": datetime.now().astimezone().isoformat(),
+                })
+                self._fire_lobby_metadata_dump("manual queen upload")
+                # Dota writes console.log asynchronously; give the stringtable
+                # block time to land before parsing the full file.
+                time.sleep(2.5)
+            elif self._paused:
+                self._emit({
+                    "type": "nettable_queen_upload_progress",
+                    "message": "Capture is paused; uploading the most recent Queen list we can see…",
+                    "at": datetime.now().astimezone().isoformat(),
+                })
+            elif not self._remote_enabled:
+                self._emit({
+                    "type": "nettable_queen_upload_progress",
+                    "message": "Tracking is disabled; uploading the most recent Queen list we can see…",
+                    "at": datetime.now().astimezone().isoformat(),
+                })
+
+            rows = extract_rows(self._log_path, allow=normalize_allow("ranking_top_table"))
+            ranking_row = next(
+                (
+                    r for r in rows
+                    if r.get("table_name", "").endswith("ranking_top_table")
+                    and r.get("key") == "ranking_top"
+                    and isinstance(r.get("raw"), dict)
+                ),
+                None,
+            )
+            if ranking_row is None:
+                raise RuntimeError("No Queen list found yet. Try a practice lobby, wait a few seconds, then press Upload Queens again.")
+
+            players = self._extract_ranking_top_players(
+                ranking_row["raw"],
+                datetime.now().astimezone().isoformat(),
+            )
+            if not players:
+                raise RuntimeError("Found the Queen list, but it did not contain any players.")
+
+            from db import upsert_queen_ladder_players
+            pushed = upsert_queen_ladder_players(players)
+            season = players[0].get("season") or ""
+            self._ranking_top_scanned = True
+            log.info(
+                "nettable: manual queen ladder upload found %d player(s), upserted %d",
+                len(players), pushed,
+            )
+            self._emit({
+                "type": "nettable_queen_upload_complete",
+                "ok": pushed > 0,
+                "player_count": len(players),
+                "upserted_count": pushed,
+                "season": season,
+                "error": None if pushed > 0 else f"Found {len(players)} Queen players, but the database wrote 0 rows.",
+                "at": datetime.now().astimezone().isoformat(),
+            })
+        except Exception as e:
+            log.warning("nettable: manual queen ladder upload failed: %s", e, exc_info=True)
+            self._emit({
+                "type": "nettable_queen_upload_complete",
+                "ok": False,
+                "player_count": 0,
+                "upserted_count": 0,
+                "error": str(e),
+                "at": datetime.now().astimezone().isoformat(),
+            })
+
     def _maybe_save_end_board(self, rows: list[dict]) -> None:
         """If the dump contains dac_table.end_board, trigger structured
         extraction and upload to Supabase. Dedupes on payload hash."""

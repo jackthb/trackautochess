@@ -41,6 +41,8 @@ export function NetTableHome({
     launchOptionsApplied,
     launchOptionsProgress,
     resyncProgress,
+    queenUpload,
+    queenUploadProgress,
   } = netTable;
   // Live debug view — always on for the local player. Renders nothing
   // until a capture lands, so it's harmless before the first dump arrives.
@@ -62,6 +64,8 @@ export function NetTableHome({
             lastApply={launchOptionsApplied}
             progress={launchOptionsProgress}
             resyncProgress={resyncProgress}
+            queenUpload={queenUpload}
+            queenUploadProgress={queenUploadProgress}
           />
         </div>
         <div className="nettable-home-state">

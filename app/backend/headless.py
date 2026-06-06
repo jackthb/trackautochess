@@ -219,11 +219,17 @@ class HeadlessBackend:
                 self._start_tracking_if_enabled()
             return
         if not self._tracking_started:
+            if self._nettable:
+                try:
+                    self._nettable.set_remote_enabled(False)
+                except Exception:
+                    pass
             return
 
         log.info("game tracking disabled by remote flag — stopping GSI and NetTable capture")
         if self._nettable:
             try:
+                self._nettable.set_remote_enabled(False)
                 self._nettable.stop()
             except Exception:
                 pass
@@ -248,8 +254,19 @@ class HeadlessBackend:
         if self._tracking_started:
             return
         if not self._tracking_enabled():
+            if self._nettable:
+                try:
+                    self._nettable.set_remote_enabled(False)
+                except Exception:
+                    pass
             log.info("game tracking disabled by remote flag — GSI and NetTable capture not started")
             return
+
+        if self._nettable:
+            try:
+                self._nettable.set_remote_enabled(True)
+            except Exception:
+                pass
 
         if self._gsi:
             try:
@@ -679,6 +696,21 @@ class HeadlessBackend:
         elif cmd == "nettable_set_paused":
             if self._nettable:
                 self._nettable.set_paused(bool(msg.get("paused", True)))
+        elif cmd == "nettable_upload_queens":
+            if self._nettable:
+                threading.Thread(
+                    target=self._nettable.manual_upload_queen_ladder,
+                    daemon=True,
+                    name="nettable-upload-queens",
+                ).start()
+            else:
+                self._emit({
+                    "type": "nettable_queen_upload_complete",
+                    "ok": False,
+                    "player_count": 0,
+                    "upserted_count": 0,
+                    "error": "Live tracking is not initialized.",
+                })
         elif cmd == "upload_logs":
             tel = getattr(self, "_telemetry", None)
             if tel:
