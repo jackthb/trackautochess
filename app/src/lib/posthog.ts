@@ -19,6 +19,9 @@ type PostHogClient = {
   init: (token: string, config: Record<string, unknown>) => void;
   register: (properties: Record<string, unknown>) => void;
   reset: () => void;
+  startSessionRecording: (
+    override?: boolean | { sampling?: boolean; linked_flag?: boolean },
+  ) => void;
 };
 
 let initialized = false;
@@ -71,6 +74,11 @@ export async function getPostHog(): Promise<PostHogClient | null> {
     // Shared project with the web viewer — tag every desktop event so web
     // funnels/dashboards can filter on `source`.
     posthog.register({ source: "desktop_app" });
+
+    // Force replay on for every desktop app session. Passing `true` overrides
+    // sampling / linked-flag controls for this recording session, so packaged
+    // clients don't silently depend on project defaults.
+    posthog.startSessionRecording(true);
 
     initialized = true;
   }
