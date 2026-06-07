@@ -17,10 +17,8 @@ const { getRepoDesktopPaths } = require("./desktop-paths.cjs");
 const repoDir = path.resolve(__dirname, "..");
 const desktopPaths = getRepoDesktopPaths(repoDir);
 const dacDir = desktopPaths.dacDir;
-const venvPython = desktopPaths.backendPythonPath;
-
-if (!existsSync(venvPython)) {
-  console.error("Desktop backend is not installed. Run `npm run install:desktop` first.");
+if (desktopPaths.backendKind === "python" && !existsSync(desktopPaths.backendPythonPath)) {
+  console.error("Desktop Python backend is not installed. Run `npm run install:desktop` first.");
   process.exit(1);
 }
 

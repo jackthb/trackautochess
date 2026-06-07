@@ -9,9 +9,10 @@
     "dev:electron": "electron . --dev",
     "dev": "node scripts/dev.mjs",
     "build": "vite build",
-    "build:backend": "cd backend && pyinstaller dac_tracker.spec --noconfirm --clean",
+    "build:backend": "node scripts/build-rust-backend.mjs",
     "build:installer": "vite build && electron-builder --win --config electron-builder.json",
-    "build:all": "pnpm run build:backend && pnpm run build:installer"
+    "build:all": "pnpm run build:backend && pnpm run build:installer",
+    "build:backend:python": "cd backend && pyinstaller dac_tracker.spec --noconfirm --clean"
   },
   "pnpm": {
     "onlyBuiltDependencies": [

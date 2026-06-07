@@ -5,16 +5,15 @@ import { createRequire } from "node:module";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const require = createRequire(import.meta.url);
-const { getRepoDesktopPaths } = require("./desktop-paths.cjs");
+const { getElectronDesktopPaths } = require("./desktop-paths.cjs");
 const repoDir = path.resolve(__dirname, "..");
-const desktopPaths = getRepoDesktopPaths(repoDir);
-const backendDir = desktopPaths.backendDir;
+const appDir = path.join(repoDir, "app");
+const desktopPaths = getElectronDesktopPaths(appDir, { isPackaged: false });
 const dacDir = desktopPaths.dacDir;
-const pythonPath = desktopPaths.backendPythonPath;
-const scriptPath = path.join(backendDir, "headless.py");
+const { command, args, cwd } = desktopPaths.backendCommand;
 
-const child = spawn(pythonPath, [scriptPath], {
-  cwd: backendDir,
+const child = spawn(command, args, {
+  cwd,
   stdio: ["pipe", "pipe", "pipe"],
   env: {
     ...process.env,
@@ -44,7 +43,7 @@ function succeed() {
 
 const timer = setTimeout(() => {
   fail("Timed out waiting for backend startup.");
-}, 15000);
+}, 30000);
 
 child.stdout.setEncoding("utf8");
 child.stdout.on("data", (chunk) => {
@@ -57,7 +56,7 @@ child.stdout.on("data", (chunk) => {
         succeed();
       }
     } catch {
-      // Ignore non-JSON noise.
+      // Ignore non-JSON noise from cargo build/run.
     }
   }
 });
@@ -69,7 +68,7 @@ child.stderr.on("data", (chunk) => {
 
 child.on("error", (error) => {
   clearTimeout(timer);
-  fail(`Failed to start backend: ${error.message}`);
+  fail(`Failed to start backend (${desktopPaths.backendKind}): ${error.message}`);
 });
 
 child.on("exit", (code) => {
@@ -79,7 +78,7 @@ child.on("exit", (code) => {
     return;
   }
   if (sawStatus && code === 0) {
-    console.log("Backend startup verified.");
+    console.log(`${desktopPaths.backendKind} backend startup verified.`);
     process.exit(0);
     return;
   }

@@ -1,0 +1,44 @@
+use crate::nettable_parser::{extract_rows, NettableRow};
+use std::{
+    io,
+    path::PathBuf,
+    thread,
+    time::{Duration, SystemTime},
+};
+
+#[derive(Debug, Clone)]
+pub struct NettableTailer {
+    path: PathBuf,
+    last_modified: Option<SystemTime>,
+}
+
+impl NettableTailer {
+    pub fn new(path: PathBuf) -> Self {
+        Self {
+            path,
+            last_modified: None,
+        }
+    }
+
+    pub fn poll(&mut self) -> io::Result<Option<Vec<NettableRow>>> {
+        let modified = self.path.metadata()?.modified()?;
+        if self.last_modified == Some(modified) {
+            return Ok(None);
+        }
+        self.last_modified = Some(modified);
+        Ok(Some(extract_rows(&self.path)?))
+    }
+
+    #[allow(dead_code)]
+    pub fn run<F>(&mut self, interval: Duration, mut on_rows: F) -> io::Result<()>
+    where
+        F: FnMut(Vec<NettableRow>),
+    {
+        loop {
+            if let Some(rows) = self.poll()? {
+                on_rows(rows);
+            }
+            thread::sleep(interval);
+        }
+    }
+}

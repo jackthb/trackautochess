@@ -186,12 +186,12 @@ function startPython() {
 
   const { command, args, cwd } = getBackendCommand();
 
-  if (!fs.existsSync(command)) {
+  if ((command.includes(path.sep) || path.isAbsolute(command)) && !fs.existsSync(command)) {
     console.error(`Backend not found at ${command}`);
     return;
   }
 
-  console.log(`Starting backend: ${command} ${args.join(" ")}`);
+  console.log(`Starting ${DESKTOP_PATHS.backendKind} backend: ${command} ${args.join(" ")}`);
 
   pythonProcess = spawn(command, args, {
     cwd,
@@ -206,7 +206,7 @@ function startPython() {
       const msg = JSON.parse(line);
       handlePythonEvent(msg);
     } catch (e) {
-      console.error("Failed to parse Python output:", line);
+      console.error("Failed to parse backend output:", line);
     }
   });
 
@@ -216,7 +216,7 @@ function startPython() {
   });
 
   pythonProcess.on("close", (code) => {
-    console.log(`Python process exited with code ${code}`);
+    console.log(`Backend process exited with code ${code}`);
     pythonProcess = null;
     pythonRL = null;
 
@@ -230,19 +230,19 @@ function startPython() {
     if (mainWindow && !mainWindow.isDestroyed()) {
       mainWindow.webContents.send("tracker:event", {
         type: "error",
-        message: `Python backend exited (code ${code})`,
+        message: `${DESKTOP_PATHS.backendKind} backend exited (code ${code})`,
       });
     }
   });
 
   pythonProcess.on("error", (err) => {
-    console.error("Failed to start Python:", err);
+    console.error("Failed to start backend:", err);
   });
 }
 
 function restartPython(reason) {
   if (IS_PACKAGED) return;
-  console.log(`Restarting Python backend: ${reason}`);
+  console.log(`Restarting backend: ${reason}`);
 
   if (!pythonProcess) {
     startPython();
@@ -269,26 +269,26 @@ function schedulePythonRestart(reason) {
 function startPythonDevWatcher() {
   if (!IS_DEV) return;
 
-  const backendDir = DESKTOP_PATHS.backendDir;
+  const backendDir = DESKTOP_PATHS.trackerDir;
   if (!fs.existsSync(backendDir)) return;
 
   try {
     const watcher = fs.watch(backendDir, { recursive: true }, (_event, filename) => {
-      if (!filename || !filename.endsWith(".py")) return;
-      const normalized = filename.replace(/\\/g, "/");
-      if (normalized.includes("/.venv/") || normalized.includes("/build/")) return;
+      const normalized = String(filename || "").replace(/\\/g, "/");
+      if (!normalized.endsWith(".py") && !normalized.endsWith(".rs")) return;
+      if (normalized.includes("/.venv/") || normalized.includes("/build/") || normalized.includes("/target/")) return;
       schedulePythonRestart(filename);
     });
     pythonWatchers.push(watcher);
-    console.log(`Watching Python backend for hot restart: ${backendDir}`);
+    console.log(`Watching ${DESKTOP_PATHS.backendKind} backend for hot restart: ${backendDir}`);
   } catch (e) {
-    console.error(`Failed to watch Python backend dir ${backendDir}:`, e);
+    console.error(`Failed to watch backend dir ${backendDir}:`, e);
   }
 }
 
 function sendToPython(cmd) {
   if (!pythonProcess || !pythonProcess.stdin.writable) {
-    console.error("Python process not running — cannot send:", cmd);
+    console.error("Backend process not running — cannot send:", cmd);
     return;
   }
   const line = JSON.stringify(cmd) + "\n";
