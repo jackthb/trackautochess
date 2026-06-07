@@ -13,6 +13,7 @@ const {
 const path = require("path");
 const fs = require("fs");
 const os = require("os");
+const https = require("https");
 const { spawn } = require("child_process");
 const readline = require("readline");
 const { getElectronDesktopPaths } = require("./desktop-paths.cjs");
@@ -34,6 +35,8 @@ const ICON_FILENAME = DESKTOP_PATHS.iconFilename;
 const CONTENT_DIR = path.join(RESOURCES_DIR, "content");
 const gotSingleInstanceLock = app.requestSingleInstanceLock();
 const IS_DEV = !IS_PACKAGED && process.argv.includes("--dev");
+const UPDATE_CHECK_INTERVAL_MS = 6 * 3600 * 1000;
+const GITHUB_RELEASES_API = "https://api.github.com/repos/jackthb/dac-tools/releases/latest";
 
 if (!gotSingleInstanceLock) {
   app.quit();
@@ -71,6 +74,84 @@ let trackerStatus = {
 };
 
 let runtimeGameDataCache = null;
+
+function parseSemver(tag) {
+  const match = String(tag || "").match(/^v?(\d+)\.(\d+)\.(\d+)/);
+  return match ? match.slice(1).map((part) => Number.parseInt(part, 10)) : [0, 0, 0];
+}
+
+function isNewerVersion(remoteTag, currentVersion) {
+  const remote = parseSemver(remoteTag);
+  const current = parseSemver(currentVersion);
+  for (let i = 0; i < 3; i += 1) {
+    if (remote[i] > current[i]) return true;
+    if (remote[i] < current[i]) return false;
+  }
+  return false;
+}
+
+function fetchJson(url) {
+  return new Promise((resolve, reject) => {
+    const req = https.get(
+      url,
+      {
+        headers: {
+          Accept: "application/vnd.github.v3+json",
+          "User-Agent": "DAC-Tracker-Updater",
+        },
+        timeout: 15000,
+      },
+      (res) => {
+        let body = "";
+        res.setEncoding("utf8");
+        res.on("data", (chunk) => {
+          body += chunk;
+        });
+        res.on("end", () => {
+          if (res.statusCode < 200 || res.statusCode >= 300) {
+            reject(new Error(`GitHub releases API returned ${res.statusCode}`));
+            return;
+          }
+          try {
+            resolve(JSON.parse(body));
+          } catch (e) {
+            reject(e);
+          }
+        });
+      },
+    );
+    req.on("timeout", () => req.destroy(new Error("GitHub releases API timed out")));
+    req.on("error", reject);
+  });
+}
+
+async function checkForUpdate() {
+  if (!IS_PACKAGED) return;
+  try {
+    const data = await fetchJson(GITHUB_RELEASES_API);
+    const remoteTag = data?.tag_name || "";
+    if (!remoteTag || !isNewerVersion(remoteTag, app.getVersion())) return;
+    const asset = (data.assets || []).find((item) =>
+      String(item?.name || "").toLowerCase().endsWith(".exe"),
+    );
+    if (!asset?.browser_download_url) return;
+    if (trackerStatus.update?.tag === remoteTag) return;
+    handlePythonMessage({
+      type: "update_available",
+      tag: remoteTag,
+      download_url: asset.browser_download_url,
+      html_url: data.html_url || "",
+    });
+  } catch (e) {
+    console.error("Update check failed:", e);
+  }
+}
+
+function startUpdateLoop() {
+  if (!IS_PACKAGED) return;
+  setTimeout(checkForUpdate, 10_000);
+  setInterval(checkForUpdate, UPDATE_CHECK_INTERVAL_MS);
+}
 
 function readJsonFile(file, fallback) {
   try {
@@ -1319,6 +1400,7 @@ app.whenReady().then(() => {
   startPythonDevWatcher();
   startTrackerLogWatcher();
   startDotaLogWatcher();
+  startUpdateLoop();
 
   app.on("activate", () => {
     focusMainWindow();
