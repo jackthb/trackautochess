@@ -4,10 +4,10 @@ use crate::{
     nettable_parser::{self, NettableRow, ParsedLog},
     queen_ladder,
     supabase::{finished_match_id_from_rows, queue_rows, SupabaseClient},
-    unit_codes::normalize_chess_lineup,
+    unit_codes::{normalize_chess_lineup, normalize_chess_unit},
 };
 use std::{
-    collections::HashSet,
+    collections::{HashMap, HashSet},
     env, fs, io,
     path::{Path, PathBuf},
     sync::{Arc, Mutex},
@@ -160,7 +160,10 @@ impl NettableService {
                             if local_is_capture_owner(&state) {
                                 if let Some(client) = SupabaseClient::from_config(&cfg) {
                                     if let Some(match_id) = finished_match_id_from_rows(&rows) {
-                                        if end_board_already_uploaded(&state, &match_id) {
+                                        if end_board_already_uploaded(&state, &match_id)
+                                            || client.finished_match_exists(&match_id)
+                                        {
+                                            mark_end_board_uploaded(&state, &match_id);
                                             continue;
                                         }
                                     }
@@ -418,7 +421,10 @@ impl NettableService {
                 if rows_have_end_board(&rows) {
                     if let Some(client) = SupabaseClient::from_config(&cfg) {
                         if let Some(match_id) = finished_match_id_from_rows(&rows) {
-                            if end_board_already_uploaded(&state, &match_id) {
+                            if end_board_already_uploaded(&state, &match_id)
+                                || client.finished_match_exists(&match_id)
+                            {
+                                mark_end_board_uploaded(&state, &match_id);
                                 return;
                             }
                         }
@@ -803,7 +809,23 @@ mod tests {
                         (
                             "CustomNetTable_player_info_table",
                             "player_info",
-                            serde_json::json!({"data": {"76561198022169086": {"hp": 88, "hero_level": 5, "curr_rank": 1}}}),
+                            serde_json::json!({"data": {"76561198022169086": {"hp": 88, "hero_level": 5, "curr_rank": 1, "player_id": 0}}}),
+                        ),
+                        (
+                            "CustomNetTable_player_id_table",
+                            "vchess_0",
+                            serde_json::json!({
+                                "2_3": {
+                                    "chess": "chess_ck1",
+                                    "x": 3,
+                                    "y": 2,
+                                    "item": {"1": "item_bkb"},
+                                    "lastitem": {"2": "item_blink"},
+                                    "buy_price": 4,
+                                    "index": 123,
+                                    "water_id": 9
+                                }
+                            }),
                         ),
                     ]),
                 },
@@ -822,6 +844,13 @@ mod tests {
             timeline["rounds"][0]["players"]["76561198022169086"]["hp"],
             88
         );
+        let board = &timeline["rounds"][0]["players"]["76561198022169086"]["board"][0];
+        assert_eq!(board["name"], "Chaos Knight");
+        assert_eq!(board["stars"], 2);
+        assert_eq!(board["x"], 3);
+        assert_eq!(board["y"], 2);
+        assert_eq!(board["items"][0], "item_bkb");
+        assert_eq!(board["last_items"][0], "item_blink");
     }
 
     #[test]
@@ -1291,7 +1320,13 @@ pub fn live_players_value(
 ) -> (serde_json::Value, Vec<String>) {
     use serde_json::{Map, Value};
 
-    fn harvest(players: &mut Map<String, Value>, container: &Value) {
+    let boards_by_player_id = live_boards_by_player_id(rows);
+
+    fn harvest(
+        players: &mut Map<String, Value>,
+        container: &Value,
+        boards_by_player_id: &HashMap<i64, Value>,
+    ) {
         let Some(obj) = container.as_object() else {
             return;
         };
@@ -1320,6 +1355,15 @@ pub fn live_players_value(
                         };
                         row.entry((*dst).to_owned()).or_insert(normalized);
                     }
+                }
+            }
+            if !row.contains_key("board") {
+                if let Some(board) = player
+                    .get("player_id")
+                    .and_then(Value::as_i64)
+                    .and_then(|player_id| boards_by_player_id.get(&player_id))
+                {
+                    row.insert("board".to_owned(), board.clone());
                 }
             }
             // Full relic pick order from `relic_history`
@@ -1354,14 +1398,14 @@ pub fn live_players_value(
     for row in rows {
         if row.table_name.ends_with("player_info_table") && row.key == "player_info" {
             if let Some(data) = row.raw.to_value().get("data") {
-                harvest(&mut players, data);
+                harvest(&mut players, data, &boards_by_player_id);
             }
         }
     }
     for row in rows {
         if row.table_name.ends_with("dac_table") && row.key == "player_info" {
             if let Some(info) = row.raw.to_value().get("info") {
-                harvest(&mut players, info);
+                harvest(&mut players, info, &boards_by_player_id);
             }
         }
     }
@@ -1374,6 +1418,94 @@ pub fn live_players_value(
     };
 
     (Value::Object(players), local_ids)
+}
+
+fn live_boards_by_player_id(rows: &[NettableRow]) -> HashMap<i64, serde_json::Value> {
+    rows.iter()
+        .filter(|row| row.table_name == "CustomNetTable_player_id_table")
+        .filter_map(|row| {
+            let player_id = row.key.strip_prefix("vchess_")?.parse::<i64>().ok()?;
+            let board = normalize_live_board(row.raw.to_value())?;
+            Some((player_id, board))
+        })
+        .collect()
+}
+
+fn normalize_live_board(value: serde_json::Value) -> Option<serde_json::Value> {
+    let mut pieces = value
+        .as_object()?
+        .iter()
+        .filter_map(|(slot_key, piece)| normalize_live_board_piece(slot_key, piece))
+        .collect::<Vec<_>>();
+    pieces.sort_by_key(|piece| {
+        let y = piece
+            .get("y")
+            .and_then(serde_json::Value::as_i64)
+            .unwrap_or(99);
+        let x = piece
+            .get("x")
+            .and_then(serde_json::Value::as_i64)
+            .unwrap_or(99);
+        (y, x)
+    });
+    (!pieces.is_empty()).then(|| serde_json::Value::Array(pieces))
+}
+
+fn normalize_live_board_piece(
+    slot_key: &str,
+    piece: &serde_json::Value,
+) -> Option<serde_json::Value> {
+    let chess = piece.get("chess")?.as_str()?.to_owned();
+    let name = normalize_chess_unit(&chess).unwrap_or_else(|| chess.clone());
+    let stars = name
+        .rsplit_once('(')
+        .and_then(|(_, suffix)| suffix.strip_suffix(')'))
+        .and_then(|suffix| suffix.parse::<i64>().ok())
+        .unwrap_or(1);
+    let mut out = serde_json::Map::new();
+    out.insert("slot_key".to_owned(), serde_json::json!(slot_key));
+    out.insert("chess".to_owned(), serde_json::json!(chess));
+    out.insert(
+        "name".to_owned(),
+        serde_json::json!(name.trim_end_matches(&format!("({stars})")).trim()),
+    );
+    out.insert("stars".to_owned(), serde_json::json!(stars));
+    for key in ["x", "y", "index", "buy_price", "water_id"] {
+        if let Some(value) = piece.get(key) {
+            out.insert(key.to_owned(), value.clone());
+        }
+    }
+    let items = sorted_string_values(piece.get("item"));
+    if !items.is_empty() {
+        out.insert("items".to_owned(), serde_json::Value::Array(items));
+    }
+    let last_items = sorted_string_values(piece.get("lastitem"));
+    if !last_items.is_empty() {
+        out.insert(
+            "last_items".to_owned(),
+            serde_json::Value::Array(last_items),
+        );
+    }
+    Some(serde_json::Value::Object(out))
+}
+
+fn sorted_string_values(value: Option<&serde_json::Value>) -> Vec<serde_json::Value> {
+    let mut values = value
+        .and_then(serde_json::Value::as_object)
+        .map(|object| {
+            let mut entries = object
+                .iter()
+                .filter_map(|(key, value)| Some((key.parse::<i64>().ok()?, value.as_str()?)))
+                .collect::<Vec<_>>();
+            entries.sort_by_key(|(key, _)| *key);
+            entries
+                .into_iter()
+                .map(|(_, value)| serde_json::Value::String(value.to_owned()))
+                .collect::<Vec<_>>()
+        })
+        .unwrap_or_default();
+    values.dedup();
+    values
 }
 
 /// How recently console.log must have been written for `-condebug` to count
@@ -1671,7 +1803,10 @@ where
     ));
     if let Some(client) = SupabaseClient::from_config(cfg) {
         if let Some(match_id) = finished_match_id_from_rows(&rows) {
-            if end_board_already_uploaded(state, &match_id) {
+            if end_board_already_uploaded(state, &match_id)
+                || client.finished_match_exists(&match_id)
+            {
+                mark_end_board_uploaded(state, &match_id);
                 return;
             }
         }

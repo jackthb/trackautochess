@@ -120,6 +120,15 @@ impl SupabaseClient {
         self.upload_end_board_rows(&row_values)
     }
 
+    pub fn finished_match_exists(&self, match_id: &str) -> bool {
+        self.get_json(&format!(
+            "/rest/v1/matches?select=match_id&match_id=eq.{match_id}&limit=1"
+        ))
+        .ok()
+        .and_then(|value| value.as_array().map(|rows| !rows.is_empty()))
+        .unwrap_or(false)
+    }
+
     pub fn upsert_match_timeline(&self, timeline: &Value) -> Result<(), String> {
         let match_id = timeline
             .get("match_id")

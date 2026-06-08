@@ -11,7 +11,7 @@ pub fn normalize_chess_lineup(value: &str) -> Option<String> {
     (!units.is_empty()).then(|| units.join("|"))
 }
 
-fn normalize_chess_unit(value: &str) -> Option<String> {
+pub fn normalize_chess_unit(value: &str) -> Option<String> {
     if value.is_empty() {
         return None;
     }
