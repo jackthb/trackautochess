@@ -133,7 +133,14 @@ function formatWinRate(wins: number | null, games: number | null): string {
 
 function formatWinTotal(wins: number | null): string {
   if (wins == null) return "—";
-  return `${wins.toLocaleString()}`
+  return `${wins.toLocaleString()}`;
+}
+
+function queenMmr(row: QueenRow): number | null {
+  // `queen_ladder_mmr` is captured directly from the in-game ladder/pool.
+  // `drodo_mmr` is available only after a full profile search/hydration, so it
+  // must be a fallback rather than a prerequisite for newly discovered Queens.
+  return row.queen_ladder_mmr ?? row.drodo_mmr ?? null;
 }
 
 export default async function QueensPage() {
@@ -173,7 +180,7 @@ export default async function QueensPage() {
             </div>
             {rows.map((row, index) => {
               const ladderRank = row.queen_ladder_rank ?? index + 1;
-              const mmr = row.queen_ladder_mmr ?? row.drodo_mmr;
+              const mmr = queenMmr(row);
               const display = row.name || row.custom_url || row.steam_id;
               const initial = display.charAt(0).toUpperCase() || "?";
               const games = seasonGames(row);

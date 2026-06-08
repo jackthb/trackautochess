@@ -45,7 +45,14 @@ pub fn extract_ranking_top_players(raw: &Value, scanned_at: &str) -> Vec<QueenPl
         }
         let rank = first_present_int(
             entry,
-            &["rank", "ranking", "queen_rank", "ladder_rank", "index", "place"],
+            &[
+                "rank",
+                "ranking",
+                "queen_rank",
+                "ladder_rank",
+                "index",
+                "place",
+            ],
             Some(1),
         )
         .unwrap_or((idx as i64) + 1);
@@ -58,7 +65,17 @@ pub fn extract_ranking_top_players(raw: &Value, scanned_at: &str) -> Vec<QueenPl
             rank,
             mmr: first_present_int(
                 entry,
-                &["mmr", "score", "rank_score", "season_mmr", "points"],
+                &[
+                    "mmr",
+                    "score",
+                    "rank_score",
+                    "season_mmr",
+                    "points",
+                    "ladder_mmr",
+                    "rank_mmr",
+                    "current_mmr",
+                    "pool_mmr",
+                ],
                 Some(0),
             ),
             season: season.clone(),
@@ -151,6 +168,18 @@ mod tests {
         assert_eq!(players[1].steam_id, "76561198000000002");
         assert_eq!(players[1].name.as_deref(), Some("bob"));
         assert_eq!(players[1].mmr, Some(4100));
+    }
+
+    #[test]
+    fn extracts_ladder_mmr_alias_from_pool_payloads() {
+        let raw = json!({
+            "ranking_top": {
+                "0": {"steam_id": "76561198000000001", "queen_rank": 1, "pool_mmr": 4875}
+            }
+        });
+        let players = extract_ranking_top_players(&raw, "2026-06-08T12:00:00Z");
+        assert_eq!(players.len(), 1);
+        assert_eq!(players[0].mmr, Some(4875));
     }
 
     #[test]

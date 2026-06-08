@@ -8,17 +8,17 @@ use std::{
 const STEAM_OPENID_URL: &str = "https://steamcommunity.com/openid/login";
 const RETURN_PORT: u16 = 27034;
 
-pub fn steam_login(timeout: Duration) -> Result<(String, String), String> {
+pub fn steam_login_with_opener<F>(timeout: Duration, open: F) -> Result<(String, String), String>
+where
+    F: FnOnce(&str) -> Result<(), String>,
+{
     let listener = TcpListener::bind(("127.0.0.1", RETURN_PORT))
         .or_else(|_| TcpListener::bind(("127.0.0.1", 0)))
         .map_err(|err| format!("failed to start Steam callback listener: {err}"))?;
     listener
         .set_nonblocking(true)
         .map_err(|err| format!("failed to configure Steam callback listener: {err}"))?;
-    let port = listener
-        .local_addr()
-        .map_err(|err| err.to_string())?
-        .port();
+    let port = listener.local_addr().map_err(|err| err.to_string())?.port();
     let return_url = format!("http://127.0.0.1:{port}");
     let login_url = format!(
         "{STEAM_OPENID_URL}?openid.ns={}&openid.mode=checkid_setup&openid.return_to={}&openid.realm={}&openid.identity={}&openid.claimed_id={}",
@@ -28,7 +28,7 @@ pub fn steam_login(timeout: Duration) -> Result<(String, String), String> {
         enc("http://specs.openid.net/auth/2.0/identifier_select"),
         enc("http://specs.openid.net/auth/2.0/identifier_select"),
     );
-    open_browser(&login_url)?;
+    open(&login_url)?;
 
     let deadline = Instant::now() + timeout;
     while Instant::now() < deadline {
@@ -58,7 +58,9 @@ pub fn steam_login(timeout: Duration) -> Result<(String, String), String> {
 fn handle_callback(mut stream: TcpStream) -> Result<BTreeMap<String, String>, String> {
     let mut reader = BufReader::new(stream.try_clone().map_err(|err| err.to_string())?);
     let mut first = String::new();
-    reader.read_line(&mut first).map_err(|err| err.to_string())?;
+    reader
+        .read_line(&mut first)
+        .map_err(|err| err.to_string())?;
     let path = first
         .split_whitespace()
         .nth(1)
@@ -119,32 +121,9 @@ pub fn normalize_steam_name(value: &str) -> String {
     let trimmed = value.trim();
     let without_cdata = trimmed
         .strip_prefix("<![CDATA[")
-        .and_then(|rest| rest.strip_suffix("]]>") )
+        .and_then(|rest| rest.strip_suffix("]]>"))
         .unwrap_or(trimmed);
     html_unescape(without_cdata.trim())
-}
-
-fn open_browser(url: &str) -> Result<(), String> {
-    #[cfg(target_os = "windows")]
-    let mut command = {
-        let mut command = std::process::Command::new("rundll32");
-        command.args(["url.dll,FileProtocolHandler", url]);
-        command
-    };
-    #[cfg(target_os = "macos")]
-    let mut command = {
-        let mut command = std::process::Command::new("open");
-        command.arg(url);
-        command
-    };
-    #[cfg(all(unix, not(target_os = "macos")))]
-    let mut command = {
-        let mut command = std::process::Command::new("xdg-open");
-        command.arg(url);
-        command
-    };
-    command.spawn().map_err(|err| format!("failed to open browser: {err}"))?;
-    Ok(())
 }
 
 fn parse_query(query: &str) -> BTreeMap<String, String> {

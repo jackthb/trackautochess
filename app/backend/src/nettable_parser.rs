@@ -19,7 +19,9 @@ impl Value {
                     .map(|(key, value)| (key.clone(), value.to_value()))
                     .collect(),
             ),
-            Value::Array(values) => serde_json::Value::Array(values.iter().map(Value::to_value).collect()),
+            Value::Array(values) => {
+                serde_json::Value::Array(values.iter().map(Value::to_value).collect())
+            }
             Value::String(value) => serde_json::Value::String(value.clone()),
             Value::I32(value) => serde_json::Value::from(*value),
             Value::U32(value) => serde_json::Value::from(*value),

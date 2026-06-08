@@ -15,8 +15,6 @@ import { ReplaysTab } from "./components/ReplaysTab";
 import { SettingsTab } from "./components/SettingsTab";
 import { LogTab } from "./components/LogTab";
 import { LoginScreen } from "./components/LoginScreen";
-// REMOVED: UploadShell — screenshot upload flow removed.
-// import { UploadShell } from "./components/UploadShell";
 import { NetTableHome } from "./components/NetTableHome";
 import { GlobalSearch } from "./components/GlobalSearch";
 import { FeedbackSurveyButton } from "./components/FeedbackSurveyButton";
@@ -38,7 +36,7 @@ type TabId =
 // PARKED: admin/"preview as user" toggle. Single-view simplification — the
 // app now renders the same flow for everyone (including admins). Restore by
 // uncommenting ADMIN_PREVIEW_KEY, the adminPreviewAsUser state + effect, the
-// isAdmin/isUserView lines, and the related props on TabBar/NetTableHome/UploadShell.
+// isAdmin/isUserView lines, and the related props on TabBar/NetTableHome.
 // const ADMIN_PREVIEW_KEY = "dac.adminPreviewAsUser";
 
 export default function App() {

@@ -137,7 +137,10 @@ fn run_daemon() -> io::Result<()> {
                 if let Some(key) = json_string_field(&line, "key") {
                     let value = json_field_raw(&line, "value").unwrap_or_else(|| "null".to_owned());
                     cfg.save_value(&key, &value)?;
-                    emit(&format!(r#"{{"type":"config_updated","key":{}}}"#, json_string(&key)))?;
+                    emit(&format!(
+                        r#"{{"type":"config_updated","key":{}}}"#,
+                        json_string(&key)
+                    ))?;
                 } else {
                     emit_error("set_config missing key")?;
                 }
@@ -149,28 +152,43 @@ fn run_daemon() -> io::Result<()> {
                 cfg.steam_name.clear();
                 emit(r#"{"type":"steam_logout"}"#)?;
             }
-            "steam_login" => match steam_auth::steam_login(Duration::from_secs(120)) {
-                Ok((steam_id, steam_name)) => {
-                    cfg.save_steam_user(&steam_id, &steam_name)?;
-                    cfg.steam_id = steam_id.clone();
-                    cfg.steam_name = steam_name.clone();
-                    if let Some(client) = supabase::SupabaseClient::from_config(&cfg) {
-                        let _ = client.upsert_user(&steam_id, &steam_name);
-                    }
+            "steam_login" => {
+                match steam_auth::steam_login_with_opener(Duration::from_secs(120), |url| {
                     emit(&format!(
-                        r#"{{"type":"steam_login","steam_id":{},"steam_name":{}}}"#,
-                        json_string(&steam_id),
-                        json_string(&steam_name)
-                    ))?;
+                        r#"{{"type":"steam_login_url","url":{}}}"#,
+                        json_string(url)
+                    ))
+                    .map_err(|err| err.to_string())
+                }) {
+                    Ok((steam_id, steam_name)) => {
+                        cfg.save_steam_user(&steam_id, &steam_name)?;
+                        cfg.steam_id = steam_id.clone();
+                        cfg.steam_name = steam_name.clone();
+                        if let Some(client) = supabase::SupabaseClient::from_config(&cfg) {
+                            let _ = client.upsert_user(&steam_id, &steam_name);
+                        }
+                        emit(&format!(
+                            r#"{{"type":"steam_login","steam_id":{},"steam_name":{}}}"#,
+                            json_string(&steam_id),
+                            json_string(&steam_name)
+                        ))?;
+                    }
+                    Err(err) => emit_error(&format!("steam_login failed: {err}"))?,
                 }
-                Err(err) => emit_error(&format!("steam_login failed: {err}"))?,
-            },
-            "toggle_recording" => emit_error("Replay recording is not available in the Rust-only nettable build")?,
+            }
+            "toggle_recording" => {
+                emit_error("Replay recording is not available in the Rust-only nettable build")?
+            }
             "nettable_status" => emit(&nettable.status_json())?,
             "nettable_get_state" => emit(&nettable.state_json())?,
-            "nettable_apply_launch_options" => emit(&nettable.apply_launch_options_json())?,
+            "capture" => emit(&nettable.capture_once_json())?,
+            "nettable_apply_launch_options" => nettable.apply_launch_options(&cfg, |line| {
+                let _ = emit(&line);
+            }),
             "nettable_check_active_match" => emit(&nettable.check_active_match_json())?,
-            "nettable_resync_from_steam" => emit(&nettable.status_json())?,
+            "nettable_resync_from_steam" => nettable.resync_from_steam(|line| {
+                let _ = emit(&line);
+            }),
             "nettable_set_paused" => {
                 let paused = json_bool_field(&line, "paused").unwrap_or(false);
                 nettable.set_paused(paused);
@@ -182,7 +200,28 @@ fn run_daemon() -> io::Result<()> {
             "nettable_upload_queens" => nettable.upload_queens(&cfg, |line| {
                 let _ = emit(&line);
             }),
-            "upload_logs" => emit(r#"{"type":"diagnostics_uploaded","backend":"rust","storage_ok":false,"reason":"manual","paths":{},"message":"Diagnostic log upload is not available in the Rust-only nettable build."}"#)?,
+            "upload_logs" => {
+                let reason =
+                    json_string_field(&line, "reason").unwrap_or_else(|| "manual".to_owned());
+                match supabase::SupabaseClient::from_config(&cfg) {
+                    Some(client) => match client.upload_diagnostic_logs(
+                        &cfg,
+                        &reason,
+                        nettable_service::find_console_log(),
+                    ) {
+                        Ok(summary) => emit(&summary.event_json())?,
+                        Err(err) => emit(&format!(
+                            r#"{{"type":"diagnostics_uploaded","backend":"rust","storage_ok":false,"reason":{},"paths":{{}},"message":{}}}"#,
+                            json_string(&reason),
+                            json_string(&err)
+                        ))?,
+                    },
+                    None => emit(&format!(
+                        r#"{{"type":"diagnostics_uploaded","backend":"rust","storage_ok":false,"reason":{},"paths":{{}},"message":"Supabase is not configured."}}"#,
+                        json_string(&reason)
+                    ))?,
+                }
+            }
             "do_update" => emit(r#"{"type":"update_apply_requested","backend":"rust","ok":true}"#)?,
             "parse_log" => {
                 if let Some(path) = json_string_field(&line, "path") {

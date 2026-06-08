@@ -7,7 +7,6 @@ const {
   Menu,
   nativeImage,
   globalShortcut,
-  screen,
   shell,
 } = require("electron");
 const path = require("path");
@@ -48,21 +47,14 @@ for (const dir of [DAC_DIR, REPLAY_DIR]) {
 }
 
 let mainWindow = null;
-// let overlayWindow = null;
-let notificationWindow = null;
 let backendProcess = null;
 let backendRL = null;
 let backendRestarting = false;
 let backendRestartTimer = null;
 let backendWatchers = [];
-// let overlayTimeout = null;
 let dotaPollInterval = null;
 let dotaOpen = false;
-let notificationReady = false;
-let nextNotificationId = 1;
 let isQuitting = false;
-const notificationItems = [];
-const notificationTimers = new Map();
 let trackerStatus = {
   recording: false,
   focused: false,
@@ -240,22 +232,6 @@ function focusMainWindow() {
   mainWindow.focus();
 }
 
-const NOTIFICATION_WINDOW_WIDTH = 340;
-const NOTIFICATION_WINDOW_MARGIN = 20;
-const NOTIFICATION_WINDOW_TOP = 76;
-const NOTIFICATION_CARD_HEIGHT = 96;
-const NOTIFICATION_CARD_GAP = 10;
-const NOTIFICATION_WINDOW_PADDING = 8;
-const MAX_VISIBLE_NOTIFICATIONS = 4;
-const SUPPRESSED_NOTIFICATION_PATTERNS = [
-  /^Recording started$/i,
-  /^Game started.*recording replay$/i,
-  /^Game ended! Open Match History and click Capture\.$/i,
-  /^My Matches detected.*parsing/i,
-  /^Game Over detected.*parsing all players/i,
-  /^Logged out of Steam\.$/i,
-];
-
 // ── Rust backend subprocess ──────────────────────────────────────────────────
 
 function getBackendCommand() {
@@ -273,10 +249,11 @@ function startBackend() {
   }
 
   console.log(`Starting ${DESKTOP_PATHS.backendKind} backend: ${command} ${args.join(" ")}`);
+  appendTrackerLog("INFO", `Starting ${DESKTOP_PATHS.backendKind} backend: ${command} ${args.join(" ")}`);
 
   backendProcess = spawn(command, args, {
     cwd,
-    env: { ...process.env },
+    env: { ...process.env, DAC_TRACKER_LOG_PATH: TRACKER_LOG_PATH },
     stdio: ["pipe", "pipe", "pipe"],
   });
 
@@ -288,16 +265,20 @@ function startBackend() {
       handleBackendEvent(msg);
     } catch (e) {
       console.error("Failed to parse backend output:", line);
+      appendTrackerLog("ERROR", `Failed to parse backend output: ${line}`);
     }
   });
 
   // Log stderr
   backendProcess.stderr.on("data", (data) => {
-    console.error(`[backend stderr] ${data.toString().trim()}`);
+    const text = data.toString().trim();
+    console.error(`[backend stderr] ${text}`);
+    if (text) appendTrackerLog("ERROR", `[backend stderr] ${text}`);
   });
 
   backendProcess.on("close", (code) => {
     console.log(`Backend process exited with code ${code}`);
+    appendTrackerLog("WARNING", `Backend process exited with code ${code}`);
     backendProcess = null;
     backendRL = null;
 
@@ -318,6 +299,7 @@ function startBackend() {
 
   backendProcess.on("error", (err) => {
     console.error("Failed to start backend:", err);
+    appendTrackerLog("ERROR", `Failed to start backend: ${err?.message || err}`);
   });
 }
 
@@ -370,14 +352,18 @@ function startBackendDevWatcher() {
 function sendToBackend(cmd) {
   if (!backendProcess || !backendProcess.stdin.writable) {
     console.error("Backend process not running — cannot send:", cmd);
+    appendTrackerLog("ERROR", `Backend process not running — cannot send: ${JSON.stringify(cmd)}`);
     return;
   }
   const line = JSON.stringify(cmd) + "\n";
   console.log("sendToBackend:", line.trim());
+  appendTrackerLog("INFO", `Command sent: ${cmd?.cmd ?? "unknown"}`);
   backendProcess.stdin.write(line);
 }
 
 function handleBackendEvent(msg) {
+  logBackendEvent(msg);
+
   // Forward all events to renderer
   if (mainWindow && !mainWindow.isDestroyed()) {
     mainWindow.webContents.send("tracker:event", msg);
@@ -388,19 +374,18 @@ function handleBackendEvent(msg) {
       trackerStatus = { ...trackerStatus, ...msg };
       break;
 
-    // PARKED — old CV capture overlay. Nettable capture handles game-end now.
-    // case "sentinel_match":
-    //   showOverlay();
-    //   break;
-
-    case "notification":
-      enqueueNotification(msg.title, msg.message);
-      break;
-
     case "steam_login":
       trackerStatus.logged_in = true;
       trackerStatus.steam_id = msg.steam_id;
       trackerStatus.steam_name = msg.steam_name;
+      break;
+
+    case "steam_login_url":
+      if (msg.url) {
+        shell.openExternal(msg.url).catch((err) => {
+          console.error("Failed to open Steam login URL:", err);
+        });
+      }
       break;
 
     case "replay_started":
@@ -425,225 +410,10 @@ function handleBackendEvent(msg) {
         downloadUrl: msg.download_url,
         htmlUrl: msg.html_url,
       };
-      enqueueNotification("Update Available", `Version ${msg.tag} is ready to install.`);
       break;
 
   }
 }
-
-// ── Notifications ────────────────────────────────────────────────────────────
-
-function shouldShowNotification(body = "") {
-  return !SUPPRESSED_NOTIFICATION_PATTERNS.some((pattern) => pattern.test(body));
-}
-
-function getNotificationTone(body = "") {
-  if (/failed|error|timed out|cannot import|not recognised|not recognized|no rows/i.test(body)) {
-    return "error";
-  }
-  if (/disabled|already imported|already in progress|not on my matches|skipping/i.test(body)) {
-    return "warning";
-  }
-  if (/saved|imported/i.test(body)) {
-    return "success";
-  }
-  return "info";
-}
-
-function getNotificationTimeoutMs(tone) {
-  switch (tone) {
-    case "error":
-      return 7000;
-    case "warning":
-      return 6000;
-    case "success":
-      return 5000;
-    default:
-      return 4500;
-  }
-}
-
-function getNotificationWindowBounds(count) {
-  const display = screen.getPrimaryDisplay().workArea;
-  const height = Math.max(
-    1,
-    NOTIFICATION_WINDOW_PADDING * 2 +
-      count * NOTIFICATION_CARD_HEIGHT +
-      Math.max(0, count - 1) * NOTIFICATION_CARD_GAP
-  );
-
-  return {
-    width: NOTIFICATION_WINDOW_WIDTH,
-    height,
-    x: display.x + display.width - NOTIFICATION_WINDOW_WIDTH - NOTIFICATION_WINDOW_MARGIN,
-    y: display.y + NOTIFICATION_WINDOW_TOP,
-  };
-}
-
-function syncNotificationWindow() {
-  if (!notificationWindow || notificationWindow.isDestroyed()) {
-    return;
-  }
-
-  if (!notificationItems.length) {
-    notificationWindow.hide();
-    return;
-  }
-
-  const visibleItems = notificationItems.slice(-MAX_VISIBLE_NOTIFICATIONS).reverse();
-  notificationWindow.setBounds(getNotificationWindowBounds(visibleItems.length), false);
-
-  if (!notificationReady) {
-    return;
-  }
-
-  notificationWindow.webContents.send("notification:update", visibleItems);
-  notificationWindow.showInactive();
-}
-
-function removeNotification(id) {
-  const timer = notificationTimers.get(id);
-  if (timer) {
-    clearTimeout(timer);
-    notificationTimers.delete(id);
-  }
-
-  const index = notificationItems.findIndex((item) => item.id === id);
-  if (index !== -1) {
-    notificationItems.splice(index, 1);
-    syncNotificationWindow();
-  }
-}
-
-function enqueueNotification(title, body) {
-  if (!shouldShowNotification(body)) {
-    return;
-  }
-
-  const tone = getNotificationTone(body);
-  const id = `notification-${nextNotificationId++}`;
-  const item = {
-    id,
-    title: title || "DAC Tracker",
-    body,
-    tone,
-  };
-
-  notificationItems.push(item);
-
-  while (notificationItems.length > MAX_VISIBLE_NOTIFICATIONS) {
-    removeNotification(notificationItems[0].id);
-  }
-
-  const timer = setTimeout(() => removeNotification(id), getNotificationTimeoutMs(tone));
-  notificationTimers.set(id, timer);
-  syncNotificationWindow();
-}
-
-function createNotificationWindow() {
-  notificationWindow = new BrowserWindow({
-    ...getNotificationWindowBounds(1),
-    show: false,
-    frame: false,
-    transparent: true,
-    alwaysOnTop: true,
-    skipTaskbar: true,
-    resizable: false,
-    hasShadow: false,
-    webPreferences: {
-      preload: path.join(__dirname, "preload-notification.js"),
-      contextIsolation: true,
-      nodeIntegration: false,
-    },
-  });
-
-  notificationWindow.loadFile(path.join(__dirname, "notification.html"));
-  notificationWindow.setAlwaysOnTop(true, "screen-saver");
-
-  notificationWindow.webContents.on("did-finish-load", () => {
-    notificationReady = true;
-    syncNotificationWindow();
-  });
-
-  notificationWindow.on("closed", () => {
-    notificationReady = false;
-    notificationWindow = null;
-  });
-}
-
-// ── Overlay window (PARKED — old CV capture flow) ────────────────────────────
-/*
-function showOverlay() {
-  if (overlayWindow && !overlayWindow.isDestroyed()) {
-    overlayWindow.close();
-  }
-
-  const primaryDisplay = screen.getPrimaryDisplay();
-  const { width: screenW, height: screenH } = primaryDisplay.size;
-
-  const ICON_X = 0.087;
-  const ICON_Y = 0.027;
-  const iconPx = Math.round(ICON_X * screenW);
-  const iconPy = Math.round(ICON_Y * screenH);
-  const winW = 310;
-  const winH = 120;
-  const x = iconPx + 20;
-  const y = Math.max(0, iconPy - Math.round(winH / 2));
-
-  overlayWindow = new BrowserWindow({
-    width: winW,
-    height: winH,
-    x,
-    y,
-    frame: false,
-    transparent: true,
-    alwaysOnTop: true,
-    skipTaskbar: true,
-    resizable: false,
-    focusable: true,
-    webPreferences: {
-      preload: path.join(__dirname, "preload-overlay.js"),
-      contextIsolation: true,
-      nodeIntegration: false,
-    },
-  });
-
-  overlayWindow.loadFile(path.join(__dirname, "overlay.html"));
-  overlayWindow.setAlwaysOnTop(true, "screen-saver");
-
-  if (overlayTimeout) clearTimeout(overlayTimeout);
-  overlayTimeout = setTimeout(() => {
-    if (overlayWindow && !overlayWindow.isDestroyed()) {
-      overlayWindow.close();
-      overlayWindow = null;
-    }
-  }, 120000);
-
-  overlayWindow.on("closed", () => {
-    overlayWindow = null;
-    if (overlayTimeout) {
-      clearTimeout(overlayTimeout);
-      overlayTimeout = null;
-    }
-  });
-}
-
-function dismissOverlay() {
-  if (overlayWindow && !overlayWindow.isDestroyed()) {
-    overlayWindow.close();
-    overlayWindow = null;
-  }
-}
-
-ipcMain.on("overlay:capture", () => {
-  dismissOverlay();
-  sendToBackend({ cmd: "capture" });
-});
-
-ipcMain.on("overlay:dismiss", () => {
-  dismissOverlay();
-});
-*/
 
 // ── Dota 2 process detection ─────────────────────────────────────────────────
 
@@ -668,10 +438,6 @@ function startDotaPoller() {
   checkDota();
   dotaPollInterval = setInterval(checkDota, 3000);
 }
-
-ipcMain.on("notification:dismiss", (_event, id) => {
-  removeNotification(id);
-});
 
 // ── Main window ──────────────────────────────────────────────────────────────
 
@@ -764,12 +530,15 @@ ipcMain.on("tracker:command", (_event, cmd) => {
   sendToBackend(cmd);
 });
 
-// ── tracker.log file watcher (bypasses backend→Electron→React IPC) ──────────
+// ── desktop app log watcher (bypasses backend→Electron→React IPC) ───────────
 //
-// LogTab reads tracker.log directly so it shows every log line independent
-// of any IPC quirks between the backend subprocess and the renderer.
+// LogTab reads the desktop app log directly so it shows every line independent
+// of any IPC quirks between the backend subprocess and the renderer. Do not use
+// ~/.dac/tracker.log here; that was the legacy Python backend log and can be
+// stale while the Rust packaged app is running.
 
-const TRACKER_LOG_PATH = path.join(DAC_DIR, "tracker.log");
+const APP_LOG_DIR = path.join(app.getPath("userData"), "logs");
+const TRACKER_LOG_PATH = path.join(APP_LOG_DIR, "tracker.log");
 const DOTA_CONSOLE_LOG_CANDIDATES = [
   "C:/Program Files (x86)/Steam/steamapps/common/dota 2 beta/game/dota/console.log",
   "C:/Program Files/Steam/steamapps/common/dota 2 beta/game/dota/console.log",
@@ -785,6 +554,42 @@ let trackerLogOffset = 0;
 let dotaLogWatcher = null;
 let dotaLogOffset = 0;
 let dotaLogPath = null;
+
+function trackerLogTimestamp(date = new Date()) {
+  const pad = (value) => String(value).padStart(2, "0");
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())} ${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`;
+}
+
+function appendTrackerLog(level, message) {
+  try {
+    fs.mkdirSync(APP_LOG_DIR, { recursive: true });
+    const normalizedLevel = String(level || "INFO").toUpperCase().padEnd(7, " ");
+    const text = String(message || "").replace(/\r?\n/g, "\n  ");
+    fs.appendFileSync(TRACKER_LOG_PATH, `${trackerLogTimestamp()}  ${normalizedLevel} ${text}\n`, "utf-8");
+  } catch (e) {
+    console.error("Failed to append tracker.log:", e);
+  }
+}
+
+function logBackendEvent(msg) {
+  if (!msg || typeof msg !== "object") return;
+  const type = String(msg.type || "");
+  if (!type) return;
+  if (["status", "nettable_status", "nettable_state", "nettable_rows", "log"].includes(type)) {
+    return;
+  }
+  const level = type === "error" || type.endsWith("_error") ? "ERROR" : "INFO";
+  const message = msg.message || msg.error || summarizeBackendEvent(msg);
+  appendTrackerLog(level, `Backend event ${type}: ${message}`);
+}
+
+function summarizeBackendEvent(msg) {
+  const summary = { ...msg };
+  delete summary.rows;
+  delete summary.state;
+  delete summary.players;
+  return JSON.stringify(summary);
+}
 
 function parseTrackerLogLines(text) {
   const entries = [];
@@ -1087,7 +892,7 @@ ipcMain.handle("games:update", async (_event, gameId, fields) => {
 
   try {
     const resp = await net.fetch(
-      `${url}/rest/v1/games?id=eq.${gameId}`,
+      `${url}/rest/v1/match_players?id=eq.${gameId}`,
       {
         method: "PATCH",
         headers: {
@@ -1406,7 +1211,7 @@ app.whenReady().then(() => {
   Menu.setApplicationMenu(null);
 
   createWindow();
-  createNotificationWindow();
+
   startDotaPoller();
   registerShortcuts();
   startBackend();
@@ -1443,12 +1248,6 @@ app.on("will-quit", () => {
     backendRestartTimer = null;
   }
   if (dotaPollInterval) clearInterval(dotaPollInterval);
-  for (const timer of notificationTimers.values()) {
-    clearTimeout(timer);
-  }
-  notificationTimers.clear();
-  notificationItems.length = 0;
-
 
   // Shut down backend
   if (backendProcess) {

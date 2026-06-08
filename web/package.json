@@ -10,14 +10,6 @@
     "start": "next start",
     "test:e2e": "pnpm run build && playwright test"
   },
-  "pnpm": {
-    "onlyBuiltDependencies": [
-      "core-js",
-      "esbuild",
-      "protobufjs",
-      "sharp"
-    ]
-  },
   "dependencies": {
     "@dac/shared": "file:../shared",
     "@keystatic/core": "^0.5.49",

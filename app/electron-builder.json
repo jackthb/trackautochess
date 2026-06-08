@@ -8,52 +8,39 @@
     "main.js",
     "desktop-paths.cjs",
     "preload.js",
-    "preload-overlay.js",
-    "preload-notification.js",
-    "overlay.html",
-    "notification.html",
     "dist/**/*",
     "!node_modules/**/*"
   ],
   "extraResources": [
     {
-      "from": "backend-rs/dist/headless",
+      "from": "backend/dist/headless",
       "to": "headless",
-      "filter": ["**/*"]
+      "filter": [
+        "**/*"
+      ]
     },
     {
       "from": "../data/icons",
       "to": "data/icons",
-      "filter": ["**/*"]
+      "filter": [
+        "**/*"
+      ]
     },
     {
       "from": "../content",
       "to": "content",
-      "filter": ["**/*"]
-    },
-    {
-      "from": "../data/regions_config.json",
-      "to": "data/regions_config.json"
-    },
-    {
-      "from": "../data/screenshots",
-      "to": "data/screenshots",
-      "filter": ["**/*"]
-    },
-    {
-      "from": "../data/sentinel_ref_final_ranking.png",
-      "to": "data/sentinel_ref_final_ranking.png"
-    },
-    {
-      "from": "../data/sentinel_ref_round_start.png",
-      "to": "data/sentinel_ref_round_start.png"
+      "filter": [
+        "**/*"
+      ]
     }
   ],
   "win": {
     "target": [
       {
         "target": "nsis",
-        "arch": ["x64"]
+        "arch": [
+          "x64"
+        ]
       }
     ],
     "icon": "../data/icons/dac_tracker.ico",

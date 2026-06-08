@@ -4,7 +4,11 @@ use crate::{
 };
 use serde_json::{json, Value};
 use sha2::{Digest, Sha256};
-use std::{collections::HashSet, io, path::PathBuf};
+use std::{
+    collections::HashSet,
+    env, fs, io,
+    path::{Path, PathBuf},
+};
 
 const STEAM_ID64_MIN: u64 = 76_561_197_960_265_728;
 const STEAM_ID64_MAX: u64 = 76_561_202_255_233_023;
@@ -27,8 +31,8 @@ impl SupabaseClient {
     }
 
     pub fn upsert_user(&self, steam_id: &str, steam_name: &str) -> Result<(), String> {
-        let steam_id_num = parse_valid_steam_id64(steam_id)
-            .ok_or_else(|| "invalid steam_id".to_owned())?;
+        let steam_id_num =
+            parse_valid_steam_id64(steam_id).ok_or_else(|| "invalid steam_id".to_owned())?;
         let row = json!({"steam_id": steam_id_num, "name": steam_name});
         self.post_json(
             "/rest/v1/users",
@@ -42,21 +46,100 @@ impl SupabaseClient {
             return Ok(0);
         }
         let row_values = rows.iter().map(nettable_row_json).collect::<Vec<_>>();
-        let _ = self.upload_end_board_rows(&row_values);
-        let body = Value::Array(
-            row_values,
-        );
-        self.post_json("/rest/v1/dac_nettable_dumps", &body, "return=minimal")?;
+        self.upload_end_board_rows(&row_values)?;
         Ok(rows.len())
     }
 
-    pub fn upload_finished_match_from_rows(&self, rows: &[NettableRow]) -> Result<bool, String> {
+    pub fn upload_diagnostic_logs(
+        &self,
+        cfg: &Config,
+        reason: &str,
+        console_path: Option<PathBuf>,
+    ) -> Result<DiagnosticUploadSummary, String> {
+        let user_id = cfg.steam_id.trim();
+        if user_id.is_empty() {
+            return Err("diagnostic upload needs steam_id for storage path".to_owned());
+        }
+        let session = chrono::Utc::now().format("%Y%m%d_%H%M%S").to_string();
+        let tracker_path = env::var_os("DAC_TRACKER_LOG_PATH")
+            .map(PathBuf::from)
+            .unwrap_or_else(|| cfg.dac_dir.join("tracker.log"));
+        let tracker_data = read_file_bytes(&tracker_path).unwrap_or_default();
+        let console_data = console_path
+            .as_deref()
+            .and_then(read_file_bytes)
+            .unwrap_or_default();
+
+        let mut paths = serde_json::Map::new();
+        let mut storage_ok = true;
+        if !tracker_data.is_empty() {
+            match self.upload_storage_object(
+                &format!("{user_id}/{session}/tracker.log"),
+                &tracker_data,
+                "text/plain; charset=utf-8",
+                true,
+            ) {
+                Ok(path) => {
+                    paths.insert("tracker_log".to_owned(), json!(path));
+                }
+                Err(_) => storage_ok = false,
+            }
+        }
+        if !console_data.is_empty() {
+            match self.upload_storage_object(
+                &format!("{user_id}/{session}/console.log"),
+                &console_data,
+                "text/plain; charset=utf-8",
+                true,
+            ) {
+                Ok(path) => {
+                    paths.insert("console_log".to_owned(), json!(path));
+                }
+                Err(_) => storage_ok = false,
+            }
+        }
+
+        Ok(DiagnosticUploadSummary {
+            reason: reason.to_owned(),
+            storage_ok,
+            paths: Value::Object(paths),
+            tracker_bytes: tracker_data.len(),
+            console_bytes: console_data.len(),
+            console_found: console_path.is_some(),
+        })
+    }
+
+    pub fn upload_finished_match_from_rows(
+        &self,
+        rows: &[NettableRow],
+    ) -> Result<Option<String>, String> {
         let row_values = rows.iter().map(nettable_row_json).collect::<Vec<_>>();
         if !row_values.iter().any(is_end_board_row) {
-            return Ok(false);
+            return Ok(None);
         }
-        self.upload_end_board_rows(&row_values)?;
-        Ok(true)
+        self.upload_end_board_rows(&row_values)
+    }
+
+    pub fn upsert_match_timeline(&self, timeline: &Value) -> Result<(), String> {
+        let match_id = timeline
+            .get("match_id")
+            .and_then(Value::as_str)
+            .ok_or_else(|| "timeline missing match_id".to_owned())?;
+        let round_count = timeline
+            .get("round_count")
+            .and_then(Value::as_u64)
+            .unwrap_or(0);
+        let row = json!({
+            "match_id": match_id,
+            "played_at": timeline.get("played_at").cloned().unwrap_or(Value::Null),
+            "round_count": round_count,
+            "timeline": timeline,
+        });
+        self.post_json(
+            "/rest/v1/match_timelines?on_conflict=match_id",
+            &row,
+            "resolution=merge-duplicates,return=minimal",
+        )
     }
 
     pub fn upsert_fallback_finished_match(
@@ -163,13 +246,19 @@ impl SupabaseClient {
         )
     }
 
-    fn upload_end_board_rows(&self, rows: &[Value]) -> Result<(), String> {
+    fn upload_end_board_rows(&self, rows: &[Value]) -> Result<Option<String>, String> {
         if !rows.iter().any(is_end_board_row) {
-            return Ok(());
+            return Ok(None);
         }
         let Some(upload) = build_end_board_upload(rows, &now_iso_utc()) else {
-            return Ok(());
+            return Ok(None);
         };
+        let match_id = upload
+            .match_row
+            .get("match_id")
+            .and_then(Value::as_str)
+            .unwrap_or_default()
+            .to_owned();
         self.post_json(
             "/rest/v1/matches",
             &upload.match_row,
@@ -183,7 +272,7 @@ impl SupabaseClient {
                 "resolution=ignore-duplicates,return=minimal",
             )?;
         }
-        Ok(())
+        Ok(Some(match_id))
     }
 
     pub fn replay_outbox(&self, outbox: &Outbox) -> io::Result<usize> {
@@ -202,17 +291,44 @@ impl SupabaseClient {
 
     fn post_raw_payload(&self, payload: &str) -> Result<(), String> {
         let value = serde_json::from_str::<Value>(payload).map_err(|err| err.to_string())?;
-        let table = value
-            .get("table")
-            .and_then(Value::as_str)
-            .unwrap_or("dac_nettable_dumps");
-        let body = value.get("rows").or_else(|| value.get("payload")).unwrap_or(&value);
-        if table == "dac_nettable_dumps" {
+        let table = value.get("table").and_then(Value::as_str).unwrap_or("");
+        let body = value
+            .get("rows")
+            .or_else(|| value.get("payload"))
+            .unwrap_or(&value);
+        if table.is_empty() || table == "dac_nettable_dumps" {
             if let Some(rows) = body.as_array() {
                 let _ = self.upload_end_board_rows(rows);
             }
+            return Ok(());
         }
         self.post_json(&format!("/rest/v1/{table}"), body, "return=minimal")
+    }
+
+    fn upload_storage_object(
+        &self,
+        object_path: &str,
+        body: &[u8],
+        content_type: &str,
+        upsert: bool,
+    ) -> Result<String, String> {
+        let mut request = ureq::post(&format!(
+            "{}/storage/v1/object/diagnostic-logs/{}",
+            self.url, object_path
+        ))
+        .set("apikey", &self.key)
+        .set("Authorization", &format!("Bearer {}", self.key))
+        .set("Content-Type", content_type);
+        if upsert {
+            request = request.set("x-upsert", "true");
+        }
+        match request.send_bytes(body) {
+            Ok(resp) if (200..300).contains(&resp.status()) => {
+                Ok(format!("diagnostic-logs/{object_path}"))
+            }
+            Ok(resp) => Err(format!("Supabase Storage returned HTTP {}", resp.status())),
+            Err(err) => Err(err.to_string()),
+        }
     }
 
     fn post_json(&self, path: &str, body: &Value, prefer: &str) -> Result<(), String> {
@@ -306,8 +422,6 @@ const MATCH_PLAYER_COLUMNS: &[&str] = &[
     "total_money",
     "candy",
     "played_at",
-    "screenshot",
-    "notes",
     "replay",
     "created_at",
 ];
@@ -386,7 +500,8 @@ fn build_end_board_upload(rows: &[Value], played_at: &str) -> Option<EndBoardUpl
             row.insert("match_id".to_owned(), json!(match_id));
             row.insert("steam_id".to_owned(), json!(steam_id_num));
             row.insert("placement".to_owned(), json!(placement));
-            row.entry("played_at".to_owned()).or_insert_with(|| json!(played_at));
+            row.entry("played_at".to_owned())
+                .or_insert_with(|| json!(played_at));
             Some(Value::Object(row))
         })
         .collect::<Vec<_>>();
@@ -404,7 +519,7 @@ fn build_fallback_match_row(rows: &[NettableRow], reason: &str, played_at: &str)
         "match_id": match_id,
         "played_at": played_at,
         "player_count": pairs.len(),
-        "capture_status": "finished_no_end_board",
+        "capture_status": "partial",
         "is_finished": true,
         "verification_source": reason,
         "verified_at": played_at,
@@ -453,7 +568,9 @@ fn generate_fallback_match_id(pairs: &[(String, i64)], reason: &str, played_at: 
 
 fn parse_valid_steam_id64(value: &str) -> Option<u64> {
     let steam_id = value.trim().parse::<u64>().ok()?;
-    (STEAM_ID64_MIN..=STEAM_ID64_MAX).contains(&steam_id).then_some(steam_id)
+    (STEAM_ID64_MIN..=STEAM_ID64_MAX)
+        .contains(&steam_id)
+        .then_some(steam_id)
 }
 
 fn now_iso_utc() -> String {
@@ -479,9 +596,12 @@ mod tests {
             table_name: "CustomNetTable_dac_table".to_owned(),
             key: "end_board".to_owned(),
             raw: crate::nettable_parser::Value::Object(
-                [("data".to_owned(), crate::nettable_parser::Value::Object(Default::default()))]
-                    .into_iter()
-                    .collect(),
+                [(
+                    "data".to_owned(),
+                    crate::nettable_parser::Value::Object(Default::default()),
+                )]
+                .into_iter()
+                .collect(),
             ),
         };
         assert_eq!(
@@ -513,8 +633,14 @@ mod tests {
 
     #[test]
     fn steam_id64_validation_rejects_out_of_range_values() {
-        assert_eq!(parse_valid_steam_id64("76561197960265728"), Some(76561197960265728));
-        assert_eq!(parse_valid_steam_id64("76561202255233023"), Some(76561202255233023));
+        assert_eq!(
+            parse_valid_steam_id64("76561197960265728"),
+            Some(76561197960265728)
+        );
+        assert_eq!(
+            parse_valid_steam_id64("76561202255233023"),
+            Some(76561202255233023)
+        );
         assert_eq!(parse_valid_steam_id64("76561197960265727"), None);
         assert_eq!(parse_valid_steam_id64("76561202255233024"), None);
         assert_eq!(parse_valid_steam_id64("not-a-steam-id"), None);
@@ -532,6 +658,8 @@ mod tests {
                         "curr_rank": 2,
                         "mmr_level": 4200,
                         "chess_lineup": "Axe(2)",
+                        "screenshot": "legacy screenshot should not upload",
+                        "notes": "legacy notes should not upload",
                         "unknown_future_field": "drop me"
                     },
                     "76561198000000001": {
@@ -544,13 +672,18 @@ mod tests {
             }
         })];
 
-        let upload = build_end_board_upload(&rows, "2026-06-07T12:00:00Z").expect("end_board should build upload");
+        let upload = build_end_board_upload(&rows, "2026-06-07T12:00:00Z")
+            .expect("end_board should build upload");
 
         assert_eq!(upload.match_row["match_id"], "d5246b0d2fcc093d");
         assert_eq!(upload.match_row["player_count"], 3);
         assert_eq!(upload.match_row["capture_status"], "complete");
         assert_eq!(upload.match_row["verification_source"], "end_board");
-        assert_eq!(upload.players.len(), 2, "invalid Steam IDs should be skipped for match_players");
+        assert_eq!(
+            upload.players.len(),
+            2,
+            "invalid Steam IDs should be skipped for match_players"
+        );
 
         let second = upload
             .players
@@ -560,25 +693,43 @@ mod tests {
         assert_eq!(second["placement"], 2, "curr_rank should win over rank");
         assert_eq!(second["mmr_level"], 4200);
         assert_eq!(second["chess_lineup"], "Axe(2)");
-        assert!(second.get("unknown_future_field").is_none(), "unknown columns should not be posted to PostgREST");
+        assert!(
+            second.get("screenshot").is_none(),
+            "legacy screenshot column should not be posted"
+        );
+        assert!(
+            second.get("notes").is_none(),
+            "legacy notes column should not be posted"
+        );
+        assert!(
+            second.get("unknown_future_field").is_none(),
+            "unknown columns should not be posted to PostgREST"
+        );
 
         let first = upload
             .players
             .iter()
             .find(|player| player["steam_id"] == 76561198000000001u64)
             .expect("first player row should exist");
-        assert_eq!(first["played_at"], "from-payload", "payload played_at should be preserved when present");
+        assert_eq!(
+            first["played_at"], "from-payload",
+            "payload played_at should be preserved when present"
+        );
         assert_eq!(first["relic"], "relic_example");
     }
 
     #[test]
     fn end_board_upload_ignores_missing_or_empty_end_board() {
         assert!(build_end_board_upload(&[], "2026-06-07T12:00:00Z").is_none());
-        assert!(build_end_board_upload(&[json!({
-            "table_name": "CustomNetTable_dac_table",
-            "key": "end_board",
-            "raw": {"data": {}}
-        })], "2026-06-07T12:00:00Z").is_none());
+        assert!(build_end_board_upload(
+            &[json!({
+                "table_name": "CustomNetTable_dac_table",
+                "key": "end_board",
+                "raw": {"data": {}}
+            })],
+            "2026-06-07T12:00:00Z"
+        )
+        .is_none());
     }
 
     #[test]
@@ -588,18 +739,24 @@ mod tests {
                 table_name: "CustomNetTable_player_id_table".to_owned(),
                 key: "player_1".to_owned(),
                 raw: crate::nettable_parser::Value::Object(
-                    [("steam_id".to_owned(), crate::nettable_parser::Value::U64(76561198000000002))]
-                        .into_iter()
-                        .collect(),
+                    [(
+                        "steam_id".to_owned(),
+                        crate::nettable_parser::Value::U64(76561198000000002),
+                    )]
+                    .into_iter()
+                    .collect(),
                 ),
             },
             NettableRow {
                 table_name: "CustomNetTable_player_id_table".to_owned(),
                 key: "player_0".to_owned(),
                 raw: crate::nettable_parser::Value::Object(
-                    [("steam_id".to_owned(), crate::nettable_parser::Value::U64(76561198000000001))]
-                        .into_iter()
-                        .collect(),
+                    [(
+                        "steam_id".to_owned(),
+                        crate::nettable_parser::Value::U64(76561198000000001),
+                    )]
+                    .into_iter()
+                    .collect(),
                 ),
             },
         ];
@@ -609,13 +766,17 @@ mod tests {
 
         assert_eq!(row["match_id"], "070e139568e352a7");
         assert_eq!(row["player_count"], 2);
-        assert_eq!(row["capture_status"], "finished_no_end_board");
+        assert_eq!(row["capture_status"], "partial");
         assert_eq!(row["is_finished"], true);
         assert_eq!(row["verification_source"], "post_game_no_end_board");
 
-        let later = build_fallback_match_row(&rows, "post_game_no_end_board", "2026-06-07T12:01:00Z")
-            .expect("later fallback should also build");
-        assert_ne!(later["match_id"], row["match_id"], "fallback IDs must not collide across sessions");
+        let later =
+            build_fallback_match_row(&rows, "post_game_no_end_board", "2026-06-07T12:01:00Z")
+                .expect("later fallback should also build");
+        assert_ne!(
+            later["match_id"], row["match_id"],
+            "fallback IDs must not collide across sessions"
+        );
     }
 }
 
@@ -625,8 +786,38 @@ pub fn queue_rows(outbox_dir: PathBuf, rows: &[NettableRow]) -> io::Result<Optio
     }
     let outbox = Outbox::new(outbox_dir);
     let payload = json!({
-        "table": "dac_nettable_dumps",
+        "kind": "nettable_rows",
         "rows": rows.iter().map(nettable_row_json).collect::<Vec<_>>()
     });
     outbox.enqueue_str(&payload.to_string()).map(Some)
+}
+
+#[derive(Debug, Clone, PartialEq)]
+pub struct DiagnosticUploadSummary {
+    pub reason: String,
+    pub storage_ok: bool,
+    pub paths: Value,
+    pub tracker_bytes: usize,
+    pub console_bytes: usize,
+    pub console_found: bool,
+}
+
+impl DiagnosticUploadSummary {
+    pub fn event_json(&self) -> String {
+        json!({
+            "type": "diagnostics_uploaded",
+            "backend": "rust",
+            "reason": self.reason,
+            "storage_ok": self.storage_ok,
+            "paths": self.paths,
+            "tracker_bytes": self.tracker_bytes,
+            "console_bytes": self.console_bytes,
+            "console_found": self.console_found,
+        })
+        .to_string()
+    }
+}
+
+fn read_file_bytes(path: &Path) -> Option<Vec<u8>> {
+    fs::read(path).ok().filter(|data| !data.is_empty())
 }

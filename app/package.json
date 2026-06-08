@@ -10,13 +10,9 @@
     "dev": "node scripts/dev.mjs",
     "build": "vite build",
     "build:backend": "node scripts/build-rust-backend.mjs",
+    "build:app": "vite build && electron-builder --win dir --config electron-builder.json",
     "build:installer": "vite build && electron-builder --win --config electron-builder.json",
     "build:all": "pnpm run build:backend && pnpm run build:installer"
-  },
-  "pnpm": {
-    "onlyBuiltDependencies": [
-      "electron"
-    ]
   },
   "devDependencies": {
     "@rolldown/binding-linux-x64-gnu": "1.0.0-rc.9",

@@ -42,13 +42,19 @@ fn assert_player_info_colon_coverage(case_dir: &Path) {
                 case_dir.display()
             )
         });
-    assert!(!data.is_empty(), "player_info data should contain at least one player");
+    assert!(
+        !data.is_empty(),
+        "player_info data should contain at least one player"
+    );
     let player = data
         .values()
         .next()
         .and_then(Value::as_object)
         .expect("player entry should be an object");
-    assert!(player.contains_key("hp"), "decoded player should carry live hp");
+    assert!(
+        player.contains_key("hp"),
+        "decoded player should carry live hp"
+    );
     let buff = player
         .get("buff")
         .and_then(Value::as_str)
@@ -61,9 +67,10 @@ fn assert_player_info_colon_coverage(case_dir: &Path) {
     // The rows projection must surface the table too (not just the decoded map).
     let rows = read_json(&case_dir.join("expected_rows.json"));
     assert!(
-        rows.as_array().expect("rows fixture should be array").iter().any(|row| {
-            row["table_name"] == "CustomNetTable_player_info_table"
-        }),
+        rows.as_array()
+            .expect("rows fixture should be array")
+            .iter()
+            .any(|row| { row["table_name"] == "CustomNetTable_player_info_table" }),
         "rows output should include player_info_table"
     );
 }
@@ -72,7 +79,9 @@ fn assert_tracking_coverage(case_dir: &Path) {
     let decoded = read_json(&case_dir.join("expected_decoded.json"));
     let rows = read_json(&case_dir.join("expected_rows.json"));
 
-    let decoded_obj = decoded.as_object().expect("decoded fixture should be object");
+    let decoded_obj = decoded
+        .as_object()
+        .expect("decoded fixture should be object");
     for table in [
         "CustomNetTable_dac_table",
         "CustomNetTable_game_info",
@@ -101,7 +110,11 @@ fn assert_tracking_coverage(case_dir: &Path) {
         .as_array()
         .expect("rows fixture should be array")
         .iter()
-        .map(|row| row["table_name"].as_str().expect("table_name should be string"))
+        .map(|row| {
+            row["table_name"]
+                .as_str()
+                .expect("table_name should be string")
+        })
         .collect::<std::collections::BTreeSet<_>>();
     assert_eq!(
         row_tables,
@@ -155,7 +168,10 @@ fn assert_command_json_eq(case_dir: &Path, command: &str, expected_file: &str) {
     );
 
     let mut actual: Value = serde_json::from_slice(&output.stdout).unwrap_or_else(|err| {
-        panic!("{command} emitted invalid JSON for {}: {err}", input.display())
+        panic!(
+            "{command} emitted invalid JSON for {}: {err}",
+            input.display()
+        )
     });
     let mut expected = expected;
     if expected_file == "expected_rows.json" {
@@ -170,7 +186,9 @@ fn assert_command_json_eq(case_dir: &Path, command: &str, expected_file: &str) {
 }
 
 fn sort_rows(value: &mut Value) {
-    let rows = value.as_array_mut().expect("rows output should be an array");
+    let rows = value
+        .as_array_mut()
+        .expect("rows output should be an array");
     rows.sort_by(|a, b| {
         let a_key = format!(
             "{}\u{0}{}\u{0}{}",

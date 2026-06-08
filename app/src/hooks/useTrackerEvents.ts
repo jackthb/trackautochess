@@ -135,11 +135,6 @@ export function useTrackerEvents(
         case "steam_logout":
           setStatus((prev) => prev ? { ...prev, logged_in: false, steam_id: "", steam_name: "" } : prev);
           break;
-        case "notification":
-          if (msg.message?.toLowerCase().includes("steam login failed")) {
-            setAuthError(msg.message);
-          }
-          break;
         case "processing_screenshot":
           setProcessingScreenshot(msg);
           break;
@@ -193,6 +188,9 @@ export function useTrackerEvents(
           break;
         case "error":
           setProcessingScreenshot(null);
+          if (msg.message?.toLowerCase().includes("steam_login failed")) {
+            setAuthError(msg.message);
+          }
           if (msg.message?.includes("exited")) {
             setStatus((prev) =>
               prev ? { ...prev, type: "status" } : prev

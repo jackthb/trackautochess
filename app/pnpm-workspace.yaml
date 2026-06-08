@@ -1,0 +1,12 @@
+allowBuilds:
+  core-js: true
+  electron: true
+  electron-winstaller: true
+  protobufjs: true
+
+supportedArchitectures:
+  os:
+    - win32
+    - linux
+  cpu:
+    - x64

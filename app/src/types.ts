@@ -229,8 +229,7 @@ export type TrackerEvent =
   | { type: "replay_saved" }
   | { type: "error"; message: string }
   | { type: "steam_login"; steam_id: string; steam_name: string }
-  | { type: "steam_logout" }
-  | { type: "notification"; title: string; message: string };
+  | { type: "steam_logout" };
 
 export interface UnitInfo {
   cost: number;

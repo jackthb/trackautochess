@@ -15,6 +15,7 @@ pub enum DumpKey {
     F24,
 }
 
+#[cfg(target_os = "windows")]
 impl DumpKey {
     fn virtual_key(self) -> u16 {
         match self {
@@ -75,7 +76,10 @@ fn send_key(key: DumpKey) -> Result<(), String> {
     if sent == inputs.len() as u32 {
         Ok(())
     } else {
-        Err(format!("SendInput sent {sent}/{} events for {key:?}", inputs.len()))
+        Err(format!(
+            "SendInput sent {sent}/{} events for {key:?}",
+            inputs.len()
+        ))
     }
 }
 

@@ -30,7 +30,10 @@ impl Config {
             // Sanitize on load: legacy configs (old backend) stored the raw
             // Steam XML `<![CDATA[name]]>`, which otherwise renders as
             // "C. Data <name>". normalize_steam_name strips that wrapper.
-            steam_name: crate::steam_auth::normalize_steam_name(&value_string(&value, "steam_name")),
+            steam_name: crate::steam_auth::normalize_steam_name(&value_string(
+                &value,
+                "steam_name",
+            )),
             replay_enabled: value_bool(&value, "replay_enabled", true),
             keep_local_nettable_dumps: value_bool(&value, "keep_local_nettable_dumps", true),
             upload_raw_nettable_dumps: value_bool(&value, "upload_raw_nettable_dumps", false),
@@ -96,7 +99,8 @@ fn default_config_json() -> &'static str {
 }
 
 fn parse_config_json(body: &str) -> Value {
-    serde_json::from_str(body).unwrap_or_else(|_| serde_json::from_str(default_config_json()).unwrap())
+    serde_json::from_str(body)
+        .unwrap_or_else(|_| serde_json::from_str(default_config_json()).unwrap())
 }
 
 fn value_string(value: &Value, key: &str) -> String {
@@ -112,7 +116,11 @@ fn value_bool(value: &Value, key: &str, fallback: bool) -> bool {
 }
 
 fn local_only_mode_from(value: &Value) -> bool {
-    match env::var("DAC_LOCAL_ONLY").unwrap_or_default().to_ascii_lowercase().as_str() {
+    match env::var("DAC_LOCAL_ONLY")
+        .unwrap_or_default()
+        .to_ascii_lowercase()
+        .as_str()
+    {
         "1" | "true" | "yes" | "on" => return true,
         "0" | "false" | "no" | "off" => return false,
         _ => {}

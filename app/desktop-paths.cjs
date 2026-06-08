@@ -13,7 +13,7 @@ function getRepoDesktopPaths(repoDir, options = {}) {
   const defaultDacDir = options.defaultDacDir || path.join(repoDir, ".dac-local");
   const dacDir = options.dacDir || process.env.DAC_DIR || defaultDacDir;
   const appDir = path.join(repoDir, "app");
-  const rustBackendDir = path.join(appDir, "backend-rs");
+  const rustBackendDir = path.join(appDir, "backend");
 
   return {
     repoDir,
@@ -25,8 +25,6 @@ function getRepoDesktopPaths(repoDir, options = {}) {
     iconsDir: path.join(repoDir, "data", "icons"),
     dacDir,
     replayDir: path.join(dacDir, "replays"),
-    screenshotDir: path.join(dacDir, "screenshots"),
-    screenshotManifest: path.join(dacDir, "screenshots", "manifest.json"),
     iconFilename: getIconFilename(platform),
     backendExecutableName: getRustBackendExecutableName(platform),
     rustBackendExecutableName: getRustBackendExecutableName(platform),

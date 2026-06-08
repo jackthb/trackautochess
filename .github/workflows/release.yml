@@ -15,41 +15,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Python 3.12
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-          cache: "pip"
-          cache-dependency-path: app/backend/requirements.txt
-
-      - name: Install Python dependencies
-        run: |
-          pip install pyinstaller
-          pip install -r app/backend/requirements.txt
-
-      - name: Cache portable Tesseract
-        id: tesseract-cache
-        uses: actions/cache@v4
-        with:
-          path: app/backend/vendor/tesseract-portable
-          key: tesseract-portable-5.5.0.20241111-eng-rus
-
-      - name: Download & extract portable Tesseract
-        if: steps.tesseract-cache.outputs.cache-hit != 'true'
-        shell: pwsh
-        run: |
-          $url = "https://digi.bib.uni-mannheim.de/tesseract/tesseract-ocr-w64-setup-5.5.0.20241111.exe"
-          Invoke-WebRequest -Uri $url -OutFile tesseract-installer.exe
-          7z x tesseract-installer.exe -oapp/backend/vendor/tesseract-portable -y
-          if (-not (Test-Path "app/backend/vendor/tesseract-portable/tessdata/eng.traineddata")) {
-            $engUrl = "https://github.com/tesseract-ocr/tessdata_fast/raw/main/eng.traineddata"
-            Invoke-WebRequest -Uri $engUrl -OutFile "app/backend/vendor/tesseract-portable/tessdata/eng.traineddata"
-          }
-          if (-not (Test-Path "app/backend/vendor/tesseract-portable/tessdata/rus.traineddata")) {
-            $rusUrl = "https://github.com/tesseract-ocr/tessdata_fast/raw/main/rus.traineddata"
-            Invoke-WebRequest -Uri $rusUrl -OutFile "app/backend/vendor/tesseract-portable/tessdata/rus.traineddata"
-          }
-
       - name: Install pnpm
         uses: pnpm/action-setup@v4
         with:
@@ -62,11 +27,13 @@ jobs:
           cache: "pnpm"
           cache-dependency-path: app/pnpm-lock.yaml
 
-      - name: Inject version from tag
-        shell: bash
-        run: |
-          VERSION="${GITHUB_REF_NAME#v}"
-          sed -i "s/__version__ = \"0.0.0-dev\"/__version__ = \"${VERSION}\"/" app/backend/updater.py
+      - name: Set up Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache Rust build
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: app/backend
 
       - name: Cache electron-builder downloads
         uses: actions/cache@v4
@@ -76,16 +43,12 @@ jobs:
           restore-keys: |
             electron-builder-${{ runner.os }}-
 
-      - name: Build headless backend
-        run: |
-          cd app/backend
-          pyinstaller dac_tracker.spec --noconfirm
-
       - name: Build Electron app & installer
         shell: pwsh
         run: |
           cd app
           pnpm install --frozen-lockfile
+          pnpm run build:backend
           pnpm run build
           pnpm exec electron-builder --win --config electron-builder.json
 

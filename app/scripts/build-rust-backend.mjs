@@ -6,9 +6,9 @@ import { spawnSync } from "node:child_process";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const appDir = path.resolve(__dirname, "..");
 const repoDir = path.resolve(appDir, "..");
-const manifest = path.join(appDir, "backend-rs", "Cargo.toml");
-const targetDir = path.join(appDir, "backend-rs", "target", "release");
-const distDir = path.join(appDir, "backend-rs", "dist", "headless");
+const manifest = path.join(appDir, "backend", "Cargo.toml");
+const targetDir = path.join(appDir, "backend", "target", "release");
+const distDir = path.join(appDir, "backend", "dist", "headless");
 const exeName = process.platform === "win32" ? "dac-capture-backend.exe" : "dac-capture-backend";
 const cargoName = process.platform === "win32" ? "cargo.exe" : "cargo";
 const cargoPath = process.platform === "win32" && process.env.USERPROFILE

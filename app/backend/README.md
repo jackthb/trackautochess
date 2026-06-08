@@ -23,9 +23,9 @@ development and packaged builds.
 ```bash
 pnpm --dir app run build:backend              # cargo release build + copy for electron-builder
 node scripts/verify-desktop-backend.mjs       # start daemon and wait for status
-cargo run --manifest-path app/backend-rs/Cargo.toml -- daemon
-cargo run --manifest-path app/backend-rs/Cargo.toml -- parse-log ~/.steam/.../console.log
-cargo run --manifest-path app/backend-rs/Cargo.toml -- gsi-cfg
+cargo run --manifest-path app/backend/Cargo.toml -- daemon
+cargo run --manifest-path app/backend/Cargo.toml -- parse-log ~/.steam/.../console.log
+cargo run --manifest-path app/backend/Cargo.toml -- gsi-cfg
 ```
 
 The daemon keeps stdout reserved for JSON protocol messages. Diagnostics should

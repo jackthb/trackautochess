@@ -3,7 +3,7 @@
 Game tracking and analysis tools for Dota Auto Chess.
 
 - **Web** - [trackautochess.com](https://www.trackautochess.com) - player lookup, match history, patch notes, item/unit/synergy guides
-- **Desktop App** - Electron + Python tracker that captures game data and syncs to Supabase
+- **Desktop App** - Electron + Rust tracker that captures game data and syncs to Supabase
 - **Scraper** - Hourly automated patch notes from Steam Workshop changelog
 
 ## Setup
@@ -22,7 +22,7 @@ local extractor helper scripts.
 
 ```text
 content/*.json  ->  web generated runtime module    ->  web
-content/*.json  ->  Electron/Python content readers ->  desktop app
+content/*.json  ->  Electron/Rust content readers   ->  desktop app
 VPK files       ->  data/extract_vpk.py             ->  content/game + data/icons
 Steam changelog ->  scripts/scrape-patch-notes.mjs  ->  content/patch-notes + content/game
 ```
@@ -59,5 +59,5 @@ repository's default branch (`main`).
 | CMS | Keystatic + committed JSON |
 | Database | Supabase (PostgreSQL) |
 | Desktop | Electron, React, Vite |
-| Backend | Python, PyAV, PyInstaller |
+| Backend | Rust, Cargo |
 | CI | GitHub Actions |

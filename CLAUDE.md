@@ -4,15 +4,15 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-DAC Tools is a monorepo for Dota Auto Chess game tracking and analysis. It includes a desktop app (Electron + Python backend), a web viewer, and a data scraper.
+DAC Tools is a monorepo for Dota Auto Chess game tracking and analysis. It includes a desktop app (Electron + Rust backend), a web viewer, and a data scraper.
 
 ## Architecture
 
 **Electron App (`app/`)** — The main desktop application.
 - React 19 + TypeScript + Vite frontend (`app/src/`)
-- Electron main process (`app/main.js`) spawns a Python backend as a subprocess
-- **IPC Protocol**: Electron ↔ Python communicate via JSON Lines over stdin/stdout (one JSON object per line)
-- Python backend (`app/backend/`) handles: nettable capture (CustomNetTable extraction from console.log), screen recording (PyAV), Dota window detection, Supabase sync
+- Electron main process (`app/main.js`) spawns a Rust backend as a subprocess
+- **IPC Protocol**: Electron ↔ Rust communicate via JSON Lines over stdin/stdout (one JSON object per line)
+- Rust backend (`app/backend/`) handles: nettable capture (CustomNetTable extraction from console.log), Dota/GSI state detection, Steam auth, Supabase sync, and diagnostic log uploads
 
 **Shared Data (`data/`)** — Single source of truth for game data (units_full.json, aliases.json, items.json, synergies.json, relics.json, icons/). Multiple modules copy from here at build time.
 
@@ -36,17 +36,18 @@ pnpm install
 pnpm run dev              # Vite build + launch Electron
 pnpm run dev:vite         # Vite dev server only (port 5173)
 pnpm run dev:electron     # Electron only (expects dist/)
-pnpm run build:backend    # PyInstaller → dist/headless/
+pnpm run build:backend    # Cargo release build → backend/dist/headless/
 pnpm run build:installer  # electron-builder NSIS → release/
 pnpm run build:all        # Backend + installer
 ```
 
-### Python Backend (app/backend/)
+### Rust Backend (app/backend/)
 ```bash
 cd app/backend
-pip install -r requirements.txt
-python headless.py              # JSON Lines daemon
-python main.py ingest-nettable  # Manual nettable ingest from console.log
+cargo run -- daemon
+cargo run -- parse-log <path-to-console.log>
+cargo run -- parse-log-full <path-to-console.log>
+cargo test
 ```
 
 ### Web Viewer
@@ -68,13 +69,11 @@ npm run scrape:items    # Items only
 
 ## Key Technical Details
 
-- **Package managers**: pnpm for Node.js projects, uv for Python projects
-- **Python version**: 3.12
-- **No linter/test framework configured** — testing is manual
-- **PyInstaller** bundles the Python backend + ffmpeg into a standalone Windows executable (`dac_tracker.spec`)
+- **Package managers**: pnpm for Node.js projects, Cargo for the Rust backend
+- **Backend migration status**: the Python/CV backend has been removed; `app/backend/` is the Rust backend
+- **Cargo** builds the Rust backend executable bundled by electron-builder
 - **Release pipeline** (`.github/workflows/release.yml`): triggered on `v*` tags, builds on Windows, publishes `.exe` to GitHub Releases
-- **Auto-update**: `updater.py` checks GitHub Releases every 6h, downloads new `.exe`, self-replacing restart
-- **Runtime config**: stored in `~/.dac/config.json` (player name, hotkey, Supabase URL)
+- **Runtime config**: stored in `~/.dac/config.json` (Steam identity, Supabase URL/key, local toggles)
 - **No local file writes**: all game data goes directly to Supabase, nothing written to `~/.dac/` except config
 
 ## Workflow
