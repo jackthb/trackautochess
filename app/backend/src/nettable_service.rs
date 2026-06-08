@@ -153,28 +153,34 @@ impl NettableService {
                             }
                             if local_is_capture_owner(&state) {
                                 if let Some(client) = SupabaseClient::from_config(&cfg) {
-                                    if let Ok(Some(match_id)) =
-                                        client.upload_finished_match_from_rows(&rows)
-                                    {
-                                        if let Some(timeline) =
-                                            build_match_timeline(&state, &match_id)
-                                        {
-                                            let _ = client.upsert_match_timeline(&timeline);
+                                    match client.upload_finished_match_from_rows(&rows) {
+                                        Ok(Some(match_id)) => {
+                                            if let Some(timeline) =
+                                                build_match_timeline(&state, &match_id)
+                                            {
+                                                let _ = client.upsert_match_timeline(&timeline);
+                                                emit(format!(
+                                                    r#"{{"type":"nettable_timeline_extracted","backend":"rust","match_id":{},"round_count":{},"at":{}}}"#,
+                                                    json_string(&match_id),
+                                                    timeline
+                                                        .get("round_count")
+                                                        .and_then(serde_json::Value::as_u64)
+                                                        .unwrap_or(0),
+                                                    json_string(&now_iso_utc())
+                                                ));
+                                            }
                                             emit(format!(
-                                                r#"{{"type":"nettable_timeline_extracted","backend":"rust","match_id":{},"round_count":{},"at":{}}}"#,
+                                                r#"{{"type":"nettable_end_board_saved","backend":"rust","match_id":{},"at":{}}}"#,
                                                 json_string(&match_id),
-                                                timeline
-                                                    .get("round_count")
-                                                    .and_then(serde_json::Value::as_u64)
-                                                    .unwrap_or(0),
                                                 json_string(&now_iso_utc())
                                             ));
                                         }
-                                        emit(format!(
-                                            r#"{{"type":"nettable_end_board_saved","backend":"rust","match_id":{},"at":{}}}"#,
-                                            json_string(&match_id),
+                                        Ok(None) => {}
+                                        Err(err) => emit(format!(
+                                            r#"{{"type":"nettable_ingest_error","backend":"rust","error":{},"at":{}}}"#,
+                                            json_string(&format!("end_board upload failed: {err}")),
                                             json_string(&now_iso_utc())
-                                        ));
+                                        )),
                                     }
                                 }
                             }
@@ -390,12 +396,31 @@ impl NettableService {
                     .unwrap_or_default();
                 if rows_have_end_board(&rows) {
                     if let Some(client) = SupabaseClient::from_config(&cfg) {
-                        let _ = client.upload_finished_match_from_rows(&rows);
+                        match client.upload_finished_match_from_rows(&rows) {
+                            Ok(Some(match_id)) => emit(format!(
+                                r#"{{"type":"nettable_end_board_saved","backend":"rust","match_id":{},"at":{}}}"#,
+                                json_string(&match_id),
+                                json_string(&now_iso_utc())
+                            )),
+                            Ok(None) => emit(format!(
+                                r#"{{"type":"nettable_end_board_saved","backend":"rust","at":{}}}"#,
+                                json_string(&now_iso_utc())
+                            )),
+                            Err(err) => emit(format!(
+                                r#"{{"type":"nettable_ingest_error","backend":"rust","error":{},"at":{}}}"#,
+                                json_string(&format!("post-game end_board upload failed: {err}")),
+                                json_string(&now_iso_utc())
+                            )),
+                        }
+                    } else {
+                        emit(format!(
+                            r#"{{"type":"nettable_ingest_error","backend":"rust","error":{},"at":{}}}"#,
+                            json_string(
+                                "post-game end_board upload failed: Supabase is not configured"
+                            ),
+                            json_string(&now_iso_utc())
+                        ));
                     }
-                    emit(format!(
-                        r#"{{"type":"nettable_end_board_saved","backend":"rust","at":{}}}"#,
-                        json_string(&now_iso_utc())
-                    ));
                     return;
                 }
             }
@@ -1593,17 +1618,21 @@ where
         json_string(&now_iso_utc())
     ));
     if let Some(client) = SupabaseClient::from_config(cfg) {
-        if client
-            .upload_finished_match_from_rows(&rows)
-            .ok()
-            .flatten()
-            .is_some()
-        {
-            emit(format!(
-                r#"{{"type":"nettable_end_board_saved","backend":"rust","at":{}}}"#,
+        match client.upload_finished_match_from_rows(&rows) {
+            Ok(Some(match_id)) => {
+                emit(format!(
+                    r#"{{"type":"nettable_end_board_saved","backend":"rust","match_id":{},"at":{}}}"#,
+                    json_string(&match_id),
+                    json_string(&now_iso_utc())
+                ));
+                return;
+            }
+            Ok(None) => {}
+            Err(err) => emit(format!(
+                r#"{{"type":"nettable_ingest_error","backend":"rust","error":{},"at":{}}}"#,
+                json_string(&format!("match-left end_board upload failed: {err}")),
                 json_string(&now_iso_utc())
-            ));
-            return;
+            )),
         }
     }
     match finalize_without_end_board(cfg, &rows) {
