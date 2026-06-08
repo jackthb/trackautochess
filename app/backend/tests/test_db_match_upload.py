@@ -406,6 +406,20 @@ def test_push_match_players_empty_list(tmp_path, monkeypatch, fake_client):
     fake_client.post.assert_not_called()
 
 
+def test_push_match_players_rejects_out_of_range_steam_ids(tmp_path, monkeypatch, fake_client):
+    _isolated_dac_dir(tmp_path, monkeypatch)
+    import db
+
+    monkeypatch.setattr(db, "_get_client", lambda: fake_client)
+    rows = [
+        {"steam_id": "76561197960265727", "placement": 1},
+        {"steam_id": "76561202255233024", "placement": 2},
+    ]
+
+    assert db.push_match_players("abc1234567890def", rows) == 0
+    fake_client.post.assert_not_called()
+
+
 def test_push_match_players_failure_swallows(tmp_path, monkeypatch):
     _isolated_dac_dir(tmp_path, monkeypatch)
     import db

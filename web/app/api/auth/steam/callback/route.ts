@@ -1,7 +1,11 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { captureServerEvent } from "@/lib/posthogServer";
-import { fetchSteamProfileFromApi, upsertSteamUser } from "@/lib/steam";
+import {
+  fetchSteamProfileFromApi,
+  isValidSteamId64,
+  upsertSteamUser,
+} from "@/lib/steam";
 
 const STEAM_OPENID_URL = "https://steamcommunity.com/openid/login";
 
@@ -27,7 +31,7 @@ async function verifySteamAssertion(
 
   const claimed = query.get("openid.claimed_id") || "";
   const match = claimed.match(/\/id\/(\d+)$/);
-  return match ? match[1] : null;
+  return match && isValidSteamId64(match[1]) ? match[1] : null;
 }
 
 export async function GET(req: Request) {

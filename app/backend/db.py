@@ -20,6 +20,18 @@ log = logging.getLogger("dac.db")
 _client = None  # lazy-init
 _local_only_logged = False
 
+STEAM_ID64_MIN = 76561197960265728
+STEAM_ID64_MAX = 76561202255233023
+
+
+def _valid_steam_id64(value) -> int | None:
+    try:
+        steam_id = int(str(value).strip())
+    except (TypeError, ValueError):
+        return None
+    if STEAM_ID64_MIN <= steam_id <= STEAM_ID64_MAX:
+        return steam_id
+    return None
 
 
 def _get_client():
@@ -66,7 +78,11 @@ def ensure_user(user_id: str, name: str | None = None, custom_url: str | None = 
     if client is None:
         return False
     try:
-        row: dict = {"steam_id": int(user_id)}
+        steam_id = _valid_steam_id64(user_id)
+        if steam_id is None:
+            log.warning("ensure_user skipped invalid SteamID64: %s", user_id)
+            return False
+        row: dict = {"steam_id": steam_id}
         if name:
             row["name"] = name
         if custom_url:
@@ -205,10 +221,11 @@ def push_match(match_record: dict) -> str | None:
         "observer_steam_id": match_record.get("observer_steam_id") or None,
     }
     if row["observer_steam_id"] is not None:
-        try:
-            row["observer_steam_id"] = int(str(row["observer_steam_id"]).strip())
-        except (TypeError, ValueError):
+        observer_steam_id = _valid_steam_id64(row["observer_steam_id"])
+        if observer_steam_id is None:
             row["observer_steam_id"] = None
+        else:
+            row["observer_steam_id"] = observer_steam_id
     client = _get_client()
     if client is None:
         return None
@@ -263,10 +280,10 @@ def push_match_players(match_id: str, players: list[dict]) -> int:
         r = {k: v for k, v in p.items() if k in _MATCH_PLAYER_COLUMNS}
         # steam_id stored as bigint server-side
         if "steam_id" in r:
-            try:
-                r["steam_id"] = int(str(r["steam_id"]).strip())
-            except (TypeError, ValueError):
+            steam_id = _valid_steam_id64(r["steam_id"])
+            if steam_id is None:
                 continue
+            r["steam_id"] = steam_id
         steam_id = r.get("steam_id")
         if not isinstance(steam_id, int) or steam_id in seen_steam_ids:
             continue
@@ -321,9 +338,8 @@ def upsert_queen_ladder_players(players: list[dict]) -> int:
     rows = []
     now = now_dt.isoformat()
     for p in players:
-        try:
-            steam_id = int(str(p.get("steam_id") or "").strip())
-        except (TypeError, ValueError):
+        steam_id = _valid_steam_id64(p.get("steam_id"))
+        if steam_id is None:
             continue
         if steam_id in seen:
             continue

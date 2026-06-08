@@ -6,6 +6,9 @@ use serde_json::{json, Value};
 use sha2::{Digest, Sha256};
 use std::{collections::HashSet, io, path::PathBuf};
 
+const STEAM_ID64_MIN: u64 = 76_561_197_960_265_728;
+const STEAM_ID64_MAX: u64 = 76_561_202_255_233_023;
+
 #[derive(Debug, Clone)]
 pub struct SupabaseClient {
     url: String,
@@ -24,9 +27,8 @@ impl SupabaseClient {
     }
 
     pub fn upsert_user(&self, steam_id: &str, steam_name: &str) -> Result<(), String> {
-        let steam_id_num = steam_id
-            .parse::<u64>()
-            .map_err(|err| format!("invalid steam_id: {err}"))?;
+        let steam_id_num = parse_valid_steam_id64(steam_id)
+            .ok_or_else(|| "invalid steam_id".to_owned())?;
         let row = json!({"steam_id": steam_id_num, "name": steam_name});
         self.post_json(
             "/rest/v1/users",
@@ -92,7 +94,7 @@ impl SupabaseClient {
         let mut seen_ids: Vec<u64> = Vec::new();
         let mut rows: Vec<Value> = Vec::new();
         for player in players {
-            let Ok(steam_id) = player.steam_id.trim().parse::<u64>() else {
+            let Some(steam_id) = parse_valid_steam_id64(&player.steam_id) else {
                 continue;
             };
             if !seen.insert(steam_id) {
@@ -367,7 +369,7 @@ fn build_end_board_upload(rows: &[Value], played_at: &str) -> Option<EndBoardUpl
     let players = data
         .iter()
         .filter_map(|(steam_id, player)| {
-            let steam_id_num = steam_id.parse::<u64>().ok()?;
+            let steam_id_num = parse_valid_steam_id64(steam_id)?;
             let placement = player
                 .get("curr_rank")
                 .or_else(|| player.get("rank"))
@@ -424,7 +426,7 @@ fn player_id_pairs(rows: &[NettableRow]) -> Vec<(String, i64)> {
                     Value::Number(value) => Some(value.to_string()),
                     _ => None,
                 })?;
-            if steam_id.trim().is_empty() {
+            if parse_valid_steam_id64(&steam_id).is_none() {
                 return None;
             }
             Some((steam_id, slot))
@@ -447,6 +449,11 @@ fn generate_fallback_match_id(pairs: &[(String, i64)], reason: &str, played_at: 
     });
     let digest = Sha256::digest(seed.to_string().as_bytes());
     format!("{digest:x}")[..16].to_owned()
+}
+
+fn parse_valid_steam_id64(value: &str) -> Option<u64> {
+    let steam_id = value.trim().parse::<u64>().ok()?;
+    (STEAM_ID64_MIN..=STEAM_ID64_MAX).contains(&steam_id).then_some(steam_id)
 }
 
 fn now_iso_utc() -> String {
@@ -502,6 +509,15 @@ mod tests {
         assert_eq!(players.len(), 2);
         assert_eq!(players[0]["steam_id"], 76561198000000001u64);
         assert_eq!(players[1]["steam_id"], 76561198000000002u64);
+    }
+
+    #[test]
+    fn steam_id64_validation_rejects_out_of_range_values() {
+        assert_eq!(parse_valid_steam_id64("76561197960265728"), Some(76561197960265728));
+        assert_eq!(parse_valid_steam_id64("76561202255233023"), Some(76561202255233023));
+        assert_eq!(parse_valid_steam_id64("76561197960265727"), None);
+        assert_eq!(parse_valid_steam_id64("76561202255233024"), None);
+        assert_eq!(parse_valid_steam_id64("not-a-steam-id"), None);
     }
 
     #[test]
