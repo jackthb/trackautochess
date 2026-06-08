@@ -8,6 +8,7 @@ mod outbox;
 mod queen_ladder;
 mod steam_auth;
 mod supabase;
+mod unit_codes;
 
 use config::Config;
 use nettable_service::{parsed_json, rows_json, NettableService};

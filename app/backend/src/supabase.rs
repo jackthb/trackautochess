@@ -1,6 +1,6 @@
 use crate::{
     config::Config, nettable_parser::NettableRow, outbox::Outbox, queen_ladder,
-    queen_ladder::QueenPlayer,
+    queen_ladder::QueenPlayer, unit_codes::normalize_chess_lineup,
 };
 use serde_json::{json, Value};
 use sha2::{Digest, Sha256};
@@ -129,10 +129,24 @@ impl SupabaseClient {
             .get("round_count")
             .and_then(Value::as_u64)
             .unwrap_or(0);
+        if let Ok(existing) = self.get_json(&format!(
+            "/rest/v1/match_timelines?select=round_count&match_id=eq.{match_id}&limit=1"
+        )) {
+            let existing_round_count = existing
+                .as_array()
+                .and_then(|rows| rows.first())
+                .and_then(|row| row.get("round_count"))
+                .and_then(Value::as_u64)
+                .unwrap_or(0);
+            if existing_round_count >= round_count && existing_round_count > 0 {
+                return Ok(());
+            }
+        }
         let row = json!({
             "match_id": match_id,
-            "played_at": timeline.get("played_at").cloned().unwrap_or(Value::Null),
             "round_count": round_count,
+            "first_round": timeline.get("first_round").cloned().unwrap_or(Value::Null),
+            "last_round": timeline.get("last_round").cloned().unwrap_or(Value::Null),
             "timeline": timeline,
         });
         self.post_json(
@@ -377,6 +391,21 @@ impl SupabaseClient {
             Err(err) => Err(err.to_string()),
         }
     }
+
+    fn get_json(&self, path: &str) -> Result<Value, String> {
+        let response = ureq::get(&format!("{}{}", self.url, path))
+            .set("apikey", &self.key)
+            .set("Authorization", &format!("Bearer {}", self.key))
+            .call();
+        match response {
+            Ok(resp) if (200..300).contains(&resp.status()) => {
+                let body = resp.into_string().map_err(|err| err.to_string())?;
+                serde_json::from_str::<Value>(&body).map_err(|err| err.to_string())
+            }
+            Ok(resp) => Err(format!("Supabase returned HTTP {}", resp.status())),
+            Err(err) => Err(err.to_string()),
+        }
+    }
 }
 
 fn queen_ladder_stale_clear_path(current_steam_ids: &[u64]) -> String {
@@ -527,6 +556,20 @@ fn build_end_board_upload(rows: &[Value], played_at: &str) -> Option<EndBoardUpl
                         row.insert((*column).to_owned(), value.clone());
                     }
                 }
+            }
+            if let Some(lineup) = player
+                .get("chess_lineup")
+                .and_then(Value::as_str)
+                .and_then(normalize_chess_lineup)
+            {
+                row.insert("chess_lineup".to_owned(), json!(lineup));
+            }
+            if let Some(lineup) = player
+                .get("max_lineup_value_lineup")
+                .and_then(Value::as_str)
+                .and_then(normalize_chess_lineup)
+            {
+                row.insert("max_lineup_value_lineup".to_owned(), json!(lineup));
             }
             row.insert("match_id".to_owned(), json!(match_id));
             row.insert("steam_id".to_owned(), json!(steam_id_num));

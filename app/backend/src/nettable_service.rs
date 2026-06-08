@@ -4,6 +4,7 @@ use crate::{
     nettable_parser::{self, NettableRow, ParsedLog},
     queen_ladder,
     supabase::{finished_match_id_from_rows, queue_rows, SupabaseClient},
+    unit_codes::normalize_chess_lineup,
 };
 use std::{
     collections::HashSet,
@@ -196,12 +197,21 @@ impl NettableService {
                                 }
                             }
                             if cfg.upload_raw_nettable_dumps && local_is_capture_owner(&state) {
-                                if let Some(client) = SupabaseClient::from_config(&cfg) {
-                                    if client.insert_nettable_rows(&rows).is_err() {
+                                let raw_end_board_already_uploaded =
+                                    finished_match_id_from_rows(&rows)
+                                        .as_deref()
+                                        .map(|match_id| {
+                                            end_board_already_uploaded(&state, match_id)
+                                        })
+                                        .unwrap_or(false);
+                                if !raw_end_board_already_uploaded {
+                                    if let Some(client) = SupabaseClient::from_config(&cfg) {
+                                        if client.insert_nettable_rows(&rows).is_err() {
+                                            let _ = queue_rows(cfg.dac_dir.join("outbox"), &rows);
+                                        }
+                                    } else {
                                         let _ = queue_rows(cfg.dac_dir.join("outbox"), &rows);
                                     }
-                                } else {
-                                    let _ = queue_rows(cfg.dac_dir.join("outbox"), &rows);
                                 }
                             }
                         }
@@ -1299,8 +1309,16 @@ pub fn live_players_value(
                     if !value.is_null() {
                         // The live table is harvested first; or_insert keeps
                         // its value over the dac_table gap-fill pass.
-                        row.entry((*dst).to_owned())
-                            .or_insert_with(|| value.clone());
+                        let normalized = if *dst == "lineup" {
+                            value
+                                .as_str()
+                                .and_then(normalize_chess_lineup)
+                                .map(Value::String)
+                                .unwrap_or_else(|| value.clone())
+                        } else {
+                            value.clone()
+                        };
+                        row.entry((*dst).to_owned()).or_insert(normalized);
                     }
                 }
             }
