@@ -3,9 +3,10 @@ use crate::{
     hotkeys::{send_dump_keys, DumpKey},
     nettable_parser::{self, NettableRow, ParsedLog},
     queen_ladder,
-    supabase::{queue_rows, SupabaseClient},
+    supabase::{finished_match_id_from_rows, queue_rows, SupabaseClient},
 };
 use std::{
+    collections::HashSet,
     env, fs, io,
     path::{Path, PathBuf},
     sync::{Arc, Mutex},
@@ -77,6 +78,10 @@ struct NettableState {
     /// Python scanned ranking_top_table once per lobby/session. Keep the same
     /// latch so automatic Queen ladder upserts don't spam Supabase.
     ranking_top_scanned: bool,
+    /// End-board match ids already uploaded by this daemon process. Dota keeps
+    /// the finished end_board in console.log, so without this the poller would
+    /// keep re-upserting and mutating played_at every heartbeat after a game.
+    uploaded_end_board_match_ids: HashSet<String>,
 }
 
 #[derive(Debug, Clone)]
@@ -153,8 +158,14 @@ impl NettableService {
                             }
                             if local_is_capture_owner(&state) {
                                 if let Some(client) = SupabaseClient::from_config(&cfg) {
+                                    if let Some(match_id) = finished_match_id_from_rows(&rows) {
+                                        if end_board_already_uploaded(&state, &match_id) {
+                                            continue;
+                                        }
+                                    }
                                     match client.upload_finished_match_from_rows(&rows) {
                                         Ok(Some(match_id)) => {
+                                            mark_end_board_uploaded(&state, &match_id);
                                             if let Some(timeline) =
                                                 build_match_timeline(&state, &match_id)
                                             {
@@ -396,12 +407,20 @@ impl NettableService {
                     .unwrap_or_default();
                 if rows_have_end_board(&rows) {
                     if let Some(client) = SupabaseClient::from_config(&cfg) {
+                        if let Some(match_id) = finished_match_id_from_rows(&rows) {
+                            if end_board_already_uploaded(&state, &match_id) {
+                                return;
+                            }
+                        }
                         match client.upload_finished_match_from_rows(&rows) {
-                            Ok(Some(match_id)) => emit(format!(
-                                r#"{{"type":"nettable_end_board_saved","backend":"rust","match_id":{},"at":{}}}"#,
-                                json_string(&match_id),
-                                json_string(&now_iso_utc())
-                            )),
+                            Ok(Some(match_id)) => {
+                                mark_end_board_uploaded(&state, &match_id);
+                                emit(format!(
+                                    r#"{{"type":"nettable_end_board_saved","backend":"rust","match_id":{},"at":{}}}"#,
+                                    json_string(&match_id),
+                                    json_string(&now_iso_utc())
+                                ));
+                            }
                             Ok(None) => emit(format!(
                                 r#"{{"type":"nettable_end_board_saved","backend":"rust","at":{}}}"#,
                                 json_string(&now_iso_utc())
@@ -1559,6 +1578,21 @@ fn rows_have_end_board(rows: &[NettableRow]) -> bool {
         .any(|row| row.table_name == "CustomNetTable_dac_table" && row.key == "end_board")
 }
 
+fn end_board_already_uploaded(state: &Arc<Mutex<NettableState>>, match_id: &str) -> bool {
+    state
+        .lock()
+        .map(|state| state.uploaded_end_board_match_ids.contains(match_id))
+        .unwrap_or(false)
+}
+
+fn mark_end_board_uploaded(state: &Arc<Mutex<NettableState>>, match_id: &str) {
+    if let Ok(mut state) = state.lock() {
+        state
+            .uploaded_end_board_match_ids
+            .insert(match_id.to_owned());
+    }
+}
+
 fn finalize_without_end_board(
     cfg: &Config,
     rows: &[NettableRow],
@@ -1618,8 +1652,14 @@ where
         json_string(&now_iso_utc())
     ));
     if let Some(client) = SupabaseClient::from_config(cfg) {
+        if let Some(match_id) = finished_match_id_from_rows(&rows) {
+            if end_board_already_uploaded(state, &match_id) {
+                return;
+            }
+        }
         match client.upload_finished_match_from_rows(&rows) {
             Ok(Some(match_id)) => {
+                mark_end_board_uploaded(state, &match_id);
                 emit(format!(
                     r#"{{"type":"nettable_end_board_saved","backend":"rust","match_id":{},"at":{}}}"#,
                     json_string(&match_id),

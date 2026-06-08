@@ -909,6 +909,17 @@ pub fn queue_rows(outbox_dir: PathBuf, rows: &[NettableRow]) -> io::Result<Optio
     outbox.enqueue_str(&payload.to_string()).map(Some)
 }
 
+pub fn finished_match_id_from_rows(rows: &[NettableRow]) -> Option<String> {
+    let row_values = rows.iter().map(nettable_row_json).collect::<Vec<_>>();
+    build_end_board_upload(&row_values, &now_iso_utc()).and_then(|upload| {
+        upload
+            .match_row
+            .get("match_id")
+            .and_then(Value::as_str)
+            .map(str::to_owned)
+    })
+}
+
 #[derive(Debug, Clone, PartialEq)]
 pub struct DiagnosticUploadSummary {
     pub reason: String,
