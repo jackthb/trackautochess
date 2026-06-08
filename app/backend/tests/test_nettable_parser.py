@@ -213,6 +213,30 @@ def test_parse_log_decode_error_preserves_raw_hex(tmp_path):
     assert entry["_raw_hex"].startswith("56424b56")  # "VBKV"
 
 
+def test_parse_log_ignores_non_vbkv_stringtable_stub(tmp_path):
+    """Tiny non-VBKV stubs should not become decode-error rows."""
+    stub = b"hehe\x00q\x02\x00\x00\x00ranking_top\x00\x001"
+    log = _format_block("CustomNetTable_ranking_top_table", [("ranking_top", stub)])
+    log_path = tmp_path / "console.log"
+    log_path.write_text(log)
+
+    assert parse_log(log_path) == {}
+
+
+def test_parse_log_bad_later_dump_does_not_overwrite_good_value(tmp_path):
+    """A partial EOF dump should not replace an earlier complete table/key."""
+    good = _wrap(_root(_string("season", "s43")))
+    bad = b"VBKV\xaa\xbb\xcc\xdd\x00\x00\x01season\x00s"
+    log = _format_block("CustomNetTable_ranking_top_table", [("ranking_top", good)])
+    log += _format_block("CustomNetTable_ranking_top_table", [("ranking_top", bad)])
+    log_path = tmp_path / "console.log"
+    log_path.write_text(log)
+
+    assert parse_log(log_path) == {
+        "CustomNetTable_ranking_top_table": {"ranking_top": {"season": "s43"}}
+    }
+
+
 def test_parse_log_short_final_hex_token(tmp_path):
     """The last `>>` line of an entry can end with a short (non-8-char) hex token."""
     # Build a blob whose length isn't a multiple of 4 — the final `>>` line

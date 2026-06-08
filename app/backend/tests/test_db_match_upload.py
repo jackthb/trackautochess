@@ -243,7 +243,7 @@ def test_push_match_no_supabase_config(tmp_path, monkeypatch):
 # ── Queen ladder throttle ───────────────────────────────────────────────────
 
 
-def test_upsert_queen_ladder_clears_previous_snapshot(tmp_path, monkeypatch):
+def test_upsert_queen_ladder_clears_only_stale_snapshot_rows(tmp_path, monkeypatch):
     _isolated_dac_dir(tmp_path, monkeypatch)
     import db
 
@@ -274,17 +274,6 @@ def test_upsert_queen_ladder_clears_previous_snapshot(tmp_path, monkeypatch):
     ])
 
     assert out == 2
-    client.patch.assert_called_once()
-    patch_args, patch_kwargs = client.patch.call_args
-    assert patch_args[0] == "/rest/v1/users"
-    assert patch_kwargs["params"] == {"queen_ladder_last_seen_at": "not.is.null"}
-    assert patch_kwargs["json"] == {
-        "queen_ladder_rank": None,
-        "queen_ladder_mmr": None,
-        "queen_ladder_season": None,
-        "queen_ladder_last_seen_at": None,
-    }
-
     client.post.assert_called_once()
     body = client.post.call_args.kwargs["json"]
     assert [row["queen_ladder_rank"] for row in body] == [1, 2]
@@ -294,20 +283,38 @@ def test_upsert_queen_ladder_clears_previous_snapshot(tmp_path, monkeypatch):
         "2026-06-02T12:00:00+00:00",
     ]
 
+    client.patch.assert_called_once()
+    patch_args, patch_kwargs = client.patch.call_args
+    assert patch_args[0] == "/rest/v1/users"
+    assert patch_kwargs["params"] == {
+        "queen_ladder_last_seen_at": "not.is.null",
+        "steam_id": "not.in.(76561198000000001,76561198000000002)",
+    }
+    assert patch_kwargs["json"] == {
+        "queen_ladder_rank": None,
+        "queen_ladder_mmr": None,
+        "queen_ladder_season": None,
+        "queen_ladder_last_seen_at": None,
+    }
 
-def test_upsert_queen_ladder_abort_when_clear_fails(tmp_path, monkeypatch):
+
+def test_upsert_queen_ladder_does_not_zero_when_cleanup_fails(tmp_path, monkeypatch):
     _isolated_dac_dir(tmp_path, monkeypatch)
     import db
 
     client = MagicMock()
+    ok_resp = MagicMock()
+    ok_resp.raise_for_status = MagicMock()
+    client.post = MagicMock(return_value=ok_resp)
     client.patch.side_effect = RuntimeError("patch denied")
     monkeypatch.setattr(db, "_get_client", lambda: client)
     out = db.upsert_queen_ladder_players([
         {"steam_id": "76561198000000001", "rank": 1, "mmr": 4200},
     ])
 
-    assert out == 0
-    client.post.assert_not_called()
+    assert out == 1
+    client.post.assert_called_once()
+    client.patch.assert_called_once()
 
 
 # ── push_match_players ──────────────────────────────────────────────────────
@@ -329,13 +336,30 @@ def test_push_match_players_happy_path(tmp_path, monkeypatch, fake_client):
     # One POST with both rows in the body.
     fake_client.post.assert_called_once()
     args, kwargs = fake_client.post.call_args
-    assert args[0] == "/rest/v1/match_players"
+    assert args[0] == "/rest/v1/match_players?on_conflict=match_id,steam_id"
     body = kwargs["json"]
     assert len(body) == 2
     # steam_id coerced to int (bigint on server).
     assert all(isinstance(r["steam_id"], int) for r in body)
     # match_id stamped onto every row.
     assert all(r["match_id"] == "abc1234567890def" for r in body)
+
+
+def test_push_match_players_dedupes_duplicate_steam_ids(tmp_path, monkeypatch, fake_client):
+    _isolated_dac_dir(tmp_path, monkeypatch)
+    import db
+
+    monkeypatch.setattr(db, "_get_client", lambda: fake_client)
+    rows = [
+        {"steam_id": "76561198000000001", "placement": 1},
+        {"steam_id": "76561198000000001", "placement": 1},
+    ]
+
+    n = db.push_match_players("abc1234567890def", rows)
+
+    assert n == 1
+    body = fake_client.post.call_args.kwargs["json"]
+    assert len(body) == 1
 
 
 def test_push_match_players_drops_unknown_columns(tmp_path, monkeypatch, fake_client):

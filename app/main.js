@@ -50,11 +50,11 @@ for (const dir of [DAC_DIR, REPLAY_DIR]) {
 let mainWindow = null;
 // let overlayWindow = null;
 let notificationWindow = null;
-let pythonProcess = null;
-let pythonRL = null;
-let pythonRestarting = false;
-let pythonRestartTimer = null;
-let pythonWatchers = [];
+let backendProcess = null;
+let backendRL = null;
+let backendRestarting = false;
+let backendRestartTimer = null;
+let backendWatchers = [];
 // let overlayTimeout = null;
 let dotaPollInterval = null;
 let dotaOpen = false;
@@ -136,7 +136,7 @@ async function checkForUpdate() {
     );
     if (!asset?.browser_download_url) return;
     if (trackerStatus.update?.tag === remoteTag) return;
-    handlePythonMessage({
+    handleBackendEvent({
       type: "update_available",
       tag: remoteTag,
       download_url: asset.browser_download_url,
@@ -256,14 +256,14 @@ const SUPPRESSED_NOTIFICATION_PATTERNS = [
   /^Logged out of Steam\.$/i,
 ];
 
-// ── Python subprocess ────────────────────────────────────────────────────────
+// ── Rust backend subprocess ──────────────────────────────────────────────────
 
 function getBackendCommand() {
   return DESKTOP_PATHS.backendCommand;
 }
 
-function startPython() {
-  if (pythonProcess) return;
+function startBackend() {
+  if (backendProcess) return;
 
   const { command, args, cwd } = getBackendCommand();
 
@@ -274,36 +274,36 @@ function startPython() {
 
   console.log(`Starting ${DESKTOP_PATHS.backendKind} backend: ${command} ${args.join(" ")}`);
 
-  pythonProcess = spawn(command, args, {
+  backendProcess = spawn(command, args, {
     cwd,
-    env: { ...process.env, PYTHONUNBUFFERED: "1" },
+    env: { ...process.env },
     stdio: ["pipe", "pipe", "pipe"],
   });
 
   // Read stdout line by line (JSON lines protocol)
-  pythonRL = readline.createInterface({ input: pythonProcess.stdout });
-  pythonRL.on("line", (line) => {
+  backendRL = readline.createInterface({ input: backendProcess.stdout });
+  backendRL.on("line", (line) => {
     try {
       const msg = JSON.parse(line);
-      handlePythonEvent(msg);
+      handleBackendEvent(msg);
     } catch (e) {
       console.error("Failed to parse backend output:", line);
     }
   });
 
   // Log stderr
-  pythonProcess.stderr.on("data", (data) => {
-    console.error(`[python stderr] ${data.toString().trim()}`);
+  backendProcess.stderr.on("data", (data) => {
+    console.error(`[backend stderr] ${data.toString().trim()}`);
   });
 
-  pythonProcess.on("close", (code) => {
+  backendProcess.on("close", (code) => {
     console.log(`Backend process exited with code ${code}`);
-    pythonProcess = null;
-    pythonRL = null;
+    backendProcess = null;
+    backendRL = null;
 
-    if (pythonRestarting) {
-      pythonRestarting = false;
-      startPython();
+    if (backendRestarting) {
+      backendRestarting = false;
+      startBackend();
       return;
     }
 
@@ -316,38 +316,38 @@ function startPython() {
     }
   });
 
-  pythonProcess.on("error", (err) => {
+  backendProcess.on("error", (err) => {
     console.error("Failed to start backend:", err);
   });
 }
 
-function restartPython(reason) {
+function restartBackend(reason) {
   if (IS_PACKAGED) return;
   console.log(`Restarting backend: ${reason}`);
 
-  if (!pythonProcess) {
-    startPython();
+  if (!backendProcess) {
+    startBackend();
     return;
   }
 
-  pythonRestarting = true;
-  sendToPython({ cmd: "quit" });
+  backendRestarting = true;
+  sendToBackend({ cmd: "quit" });
   setTimeout(() => {
-    if (pythonProcess && pythonRestarting) {
-      pythonProcess.kill();
+    if (backendProcess && backendRestarting) {
+      backendProcess.kill();
     }
   }, 1500);
 }
 
-function schedulePythonRestart(reason) {
-  if (pythonRestartTimer) clearTimeout(pythonRestartTimer);
-  pythonRestartTimer = setTimeout(() => {
-    pythonRestartTimer = null;
-    restartPython(reason);
+function scheduleBackendRestart(reason) {
+  if (backendRestartTimer) clearTimeout(backendRestartTimer);
+  backendRestartTimer = setTimeout(() => {
+    backendRestartTimer = null;
+    restartBackend(reason);
   }, 350);
 }
 
-function startPythonDevWatcher() {
+function startBackendDevWatcher() {
   if (!IS_DEV) return;
 
   const backendDir = DESKTOP_PATHS.trackerDir;
@@ -356,28 +356,28 @@ function startPythonDevWatcher() {
   try {
     const watcher = fs.watch(backendDir, { recursive: true }, (_event, filename) => {
       const normalized = String(filename || "").replace(/\\/g, "/");
-      if (!normalized.endsWith(".py") && !normalized.endsWith(".rs")) return;
+      if (!normalized.endsWith(".rs")) return;
       if (normalized.includes("/.venv/") || normalized.includes("/build/") || normalized.includes("/target/")) return;
-      schedulePythonRestart(filename);
+      scheduleBackendRestart(filename);
     });
-    pythonWatchers.push(watcher);
+    backendWatchers.push(watcher);
     console.log(`Watching ${DESKTOP_PATHS.backendKind} backend for hot restart: ${backendDir}`);
   } catch (e) {
     console.error(`Failed to watch backend dir ${backendDir}:`, e);
   }
 }
 
-function sendToPython(cmd) {
-  if (!pythonProcess || !pythonProcess.stdin.writable) {
+function sendToBackend(cmd) {
+  if (!backendProcess || !backendProcess.stdin.writable) {
     console.error("Backend process not running — cannot send:", cmd);
     return;
   }
   const line = JSON.stringify(cmd) + "\n";
-  console.log("sendToPython:", line.trim());
-  pythonProcess.stdin.write(line);
+  console.log("sendToBackend:", line.trim());
+  backendProcess.stdin.write(line);
 }
 
-function handlePythonEvent(msg) {
+function handleBackendEvent(msg) {
   // Forward all events to renderer
   if (mainWindow && !mainWindow.isDestroyed()) {
     mainWindow.webContents.send("tracker:event", msg);
@@ -637,7 +637,7 @@ function dismissOverlay() {
 
 ipcMain.on("overlay:capture", () => {
   dismissOverlay();
-  sendToPython({ cmd: "capture" });
+  sendToBackend({ cmd: "capture" });
 });
 
 ipcMain.on("overlay:dismiss", () => {
@@ -721,10 +721,10 @@ function createWindow() {
 
 function registerShortcuts() {
   globalShortcut.register("F6", () => {
-    sendToPython({ cmd: "capture" });
+    sendToBackend({ cmd: "capture" });
   });
   globalShortcut.register("F7", () => {
-    sendToPython({ cmd: "toggle_recording" });
+    sendToBackend({ cmd: "toggle_recording" });
   });
 }
 
@@ -748,16 +748,26 @@ ipcMain.on("window:close", () => {
   if (mainWindow && !mainWindow.isDestroyed()) mainWindow.close();
 });
 
-// ── Tracker IPC (renderer → main → Python) ──────────────────────────────────
+// ── Tracker IPC (renderer → main → Rust backend) ────────────────────────────
 
 ipcMain.on("tracker:command", (_event, cmd) => {
-  sendToPython(cmd);
+  if (cmd?.cmd === "do_update") {
+    const url = cmd.download_url || cmd.downloadUrl || trackerStatus.update?.downloadUrl || trackerStatus.update?.htmlUrl;
+    if (url) {
+      shell.openExternal(url);
+      handleBackendEvent({ type: "update_apply_requested", backend: "electron", ok: true });
+    } else {
+      handleBackendEvent({ type: "error", message: "No update URL is available." });
+    }
+    return;
+  }
+  sendToBackend(cmd);
 });
 
-// ── tracker.log file watcher (bypasses Python→Electron→React IPC) ──────────
+// ── tracker.log file watcher (bypasses backend→Electron→React IPC) ──────────
 //
 // LogTab reads tracker.log directly so it shows every log line independent
-// of any IPC quirks between the Python subprocess and the renderer.
+// of any IPC quirks between the backend subprocess and the renderer.
 
 const TRACKER_LOG_PATH = path.join(DAC_DIR, "tracker.log");
 const DOTA_CONSOLE_LOG_CANDIDATES = [
@@ -766,10 +776,10 @@ const DOTA_CONSOLE_LOG_CANDIDATES = [
 ];
 const TRACKER_LOG_INITIAL_TAIL_BYTES = 256 * 1024; // ~2.5k lines
 const DOTA_LOG_INITIAL_TAIL_BYTES = 128 * 1024;
-// console.log is full of [GCClient] heartbeats etc. Drop the highest-volume
-// noise so the Log tab stays readable — keep everything else, especially
-// our DAC_* markers and [stringtables] / DOTA_GAMERULES_STATE_* lines.
-const DOTA_NOISE_RE = /\[GCClient\]|^WriteSteamRemoteStorageFileAsync|^CAsyncWriteInProgress|^\[SteamNetSockets\]/;
+// console.log is full of engine/bootstrap noise. Drop high-volume or irrelevant
+// lines so the Log tab stays readable — keep everything else, especially our
+// DAC_* markers and [stringtables] / DOTA_GAMERULES_STATE_* lines.
+const DOTA_NOISE_RE = /\[GCClient\]|^WriteSteamRemoteStorageFileAsync|^CAsyncWriteInProgress|^\[SteamNetSockets\]|\[Filesystem\].*\.vpk\b|\bbad VPK magic\b|\bVPK magic\b|\bvpk:.*\.vpk:/i;
 let trackerLogWatcher = null;
 let trackerLogOffset = 0;
 let dotaLogWatcher = null;
@@ -783,6 +793,7 @@ function parseTrackerLogLines(text) {
     if (!raw) continue;
     const m = raw.match(lineRegex);
     if (m) {
+      if (!m[4].trim()) continue;
       const ts = new Date(`${m[1]}T${m[2]}`).getTime() / 1000;
       entries.push({ type: "log", source: "tracker", ts, level: m[3], msg: m[4] });
     } else if (entries.length > 0) {
@@ -799,11 +810,13 @@ function parseDotaLogLines(text) {
   const year = new Date().getFullYear();
   for (const raw of text.split(/\r?\n/)) {
     if (!raw) continue;
+    if (DOTA_NOISE_RE.test(raw)) continue;
     const m = raw.match(lineRegex);
     if (m) {
-      if (DOTA_NOISE_RE.test(m[6])) continue;
+      const msg = m[6].trim();
+      if (!msg || DOTA_NOISE_RE.test(msg)) continue;
       const ts = new Date(`${year}-${m[1]}-${m[2]}T${m[3]}:${m[4]}:${m[5]}`).getTime() / 1000;
-      entries.push({ type: "log", source: "dota", ts, level: "INFO", msg: m[6] });
+      entries.push({ type: "log", source: "dota", ts, level: "INFO", msg });
     } else if (entries.length > 0) {
       entries[entries.length - 1].msg += "\n" + raw;
     }
@@ -1396,8 +1409,8 @@ app.whenReady().then(() => {
   createNotificationWindow();
   startDotaPoller();
   registerShortcuts();
-  startPython();
-  startPythonDevWatcher();
+  startBackend();
+  startBackendDevWatcher();
   startTrackerLogWatcher();
   startDotaLogWatcher();
   startUpdateLoop();
@@ -1421,13 +1434,13 @@ app.on("will-quit", () => {
     try { dotaLogWatcher.close(); } catch {}
     dotaLogWatcher = null;
   }
-  for (const watcher of pythonWatchers) {
+  for (const watcher of backendWatchers) {
     try { watcher.close(); } catch {}
   }
-  pythonWatchers = [];
-  if (pythonRestartTimer) {
-    clearTimeout(pythonRestartTimer);
-    pythonRestartTimer = null;
+  backendWatchers = [];
+  if (backendRestartTimer) {
+    clearTimeout(backendRestartTimer);
+    backendRestartTimer = null;
   }
   if (dotaPollInterval) clearInterval(dotaPollInterval);
   for (const timer of notificationTimers.values()) {
@@ -1437,12 +1450,12 @@ app.on("will-quit", () => {
   notificationItems.length = 0;
 
 
-  // Shut down Python
-  if (pythonProcess) {
-    sendToPython({ cmd: "quit" });
+  // Shut down backend
+  if (backendProcess) {
+    sendToBackend({ cmd: "quit" });
     setTimeout(() => {
-      if (pythonProcess) {
-        pythonProcess.kill();
+      if (backendProcess) {
+        backendProcess.kill();
       }
     }, 3000);
   }

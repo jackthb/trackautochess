@@ -19,6 +19,7 @@ import { LoginScreen } from "./components/LoginScreen";
 // import { UploadShell } from "./components/UploadShell";
 import { NetTableHome } from "./components/NetTableHome";
 import { GlobalSearch } from "./components/GlobalSearch";
+import { FeedbackSurveyButton } from "./components/FeedbackSurveyButton";
 import { useTrackerEvents } from "./hooks/useTrackerEvents";
 import { useNetTableEvents } from "./hooks/useNetTableEvents";
 import { useGames } from "./hooks/useGames";
@@ -165,6 +166,7 @@ export default function App() {
               <NetTableHome
                 unitsFull={gamesState.unitsFull}
                 synergiesData={gamesState.synergiesData}
+                relicsData={gamesState.relicsData}
                 itemsFull={gamesState.itemsFull}
                 netTable={netTable}
               />
@@ -209,6 +211,7 @@ export default function App() {
             itemsData={gamesState.itemsData}
             talentsData={gamesState.talentsData}
           />
+          <FeedbackSurveyButton status={tracker.status} />
         </>
       )}
     </>

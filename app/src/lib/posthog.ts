@@ -3,8 +3,10 @@ type PostHogClient = {
   displaySurvey: (
     surveyId: string,
     options: {
-      displayType: "inline";
-      selector: string;
+      displayType: "inline" | "popover" | "widget";
+      selector?: string;
+      ignoreConditions?: boolean;
+      ignoreDelay?: boolean;
       properties?: Record<string, unknown>;
     },
   ) => void;
@@ -15,8 +17,24 @@ type PostHogClient = {
     ) => void,
     forceReload?: boolean,
   ) => void;
+  getSurveys: (
+    callback: (
+      surveys: Array<{
+        id: string;
+        name?: string;
+        description?: string;
+        type?: string;
+        start_date?: string | null;
+        end_date?: string | null;
+        archived?: boolean;
+      }>,
+      context?: { isLoaded?: boolean; error?: string },
+    ) => void,
+    forceReload?: boolean,
+  ) => void;
   identify: (distinctId: string, properties?: Record<string, unknown>) => void;
   init: (token: string, config: Record<string, unknown>) => void;
+  onSurveysLoaded?: (callback: () => void) => void;
   register: (properties: Record<string, unknown>) => void;
   reset: () => void;
   startSessionRecording: (

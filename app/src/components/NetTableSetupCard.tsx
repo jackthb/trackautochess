@@ -68,6 +68,12 @@ export function NetTableSetupCard({
     capture("queen_ladder_manual_upload_clicked", {});
   }, []);
 
+  const checkActiveMatch = useCallback(() => {
+    if (!window.tracker) return;
+    window.tracker.sendCommand({ cmd: "nettable_check_active_match" });
+    capture("nettable_check_active_match_clicked", {});
+  }, []);
+
   const resyncing = resyncProgress !== null;
 
   // Clear the local applying flag once a result lands.
@@ -128,6 +134,7 @@ export function NetTableSetupCard({
           Game tracking is currently turned off remotely. Dota setup and logs can still be checked,
           but live capture will not run until tracking is re-enabled.
         </div>
+        <ActiveMatchControl onCheck={checkActiveMatch} />
         <QueenUploadControl
           uploading={uploadingQueens}
           progress={queenUploadProgress}
@@ -149,6 +156,7 @@ export function NetTableSetupCard({
         <button type="button" className="btn-ghost nettable-pause-btn" onClick={togglePause}>
           {paused ? "Resume" : "Pause"}
         </button>
+        <ActiveMatchControl onCheck={checkActiveMatch} compact />
         <QueenUploadControl
           uploading={uploadingQueens}
           progress={queenUploadProgress}
@@ -161,10 +169,10 @@ export function NetTableSetupCard({
   }
 
   const buttonLabel = applying ? "Setting up…" : "Set up automatically";
-  const setupTitle = notSetup ? "Not setup" : "Can't tell if setup is complete";
+  const setupTitle = notSetup ? "Setup needs update" : "Might be set up";
   const setupDetail = notSetup
     ? "Run automatic setup, then restart Dota."
-    : "Try a practice lobby and play one round. If no live data appears, run automatic setup and restart Dota.";
+    : "We've applied the Dota setup we can check. We can't confirm it is working until Dota writes lobby data, so try a practice lobby and play one round.";
 
   return (
     <div className="nettable-setup-card">
@@ -179,7 +187,7 @@ export function NetTableSetupCard({
           <div className="nettable-setup-apply">
             <button
               type="button"
-              className={`btn-ghost${applying ? " btn-loading" : ""}`}
+              className={`btn-ghost nettable-setup-apply-button${applying ? " btn-loading" : ""}`}
               onClick={applyLaunchOptions}
               disabled={applying}
               title="We close Steam, update the Dota setup, then you restart Steam + Dota."
@@ -201,21 +209,17 @@ export function NetTableSetupCard({
             Setup updated. Restart Steam, then Dota.
           </div>
         )}
+        {lastApply && lastApply.ok && (lastApply.added ?? []).length === 0 && (
+          <div className="nettable-setup-apply-success">
+            Setup already applied. Restart Steam, then Dota if live data still does not appear.
+          </div>
+        )}
+        <ActiveMatchControl onCheck={checkActiveMatch} />
         <QueenUploadControl
           uploading={uploadingQueens}
           progress={queenUploadProgress}
           result={queenUpload}
           onUpload={uploadQueens}
-        />
-      </div>
-
-      <div className="nettable-setup-status-row">
-        <span className="nettable-setup-status-label">Dota</span>
-        <StatusBadge
-          ok={dotaRunning}
-          unknown={status === null}
-          okLabel={logActive ? "capturing" : "running — try practice lobby"}
-          badLabel="not running"
         />
       </div>
 
@@ -233,6 +237,32 @@ export function NetTableSetupCard({
               : "Re-check setup (quits Steam)"}
           </button>
         </div>
+      )}
+    </div>
+  );
+}
+
+function ActiveMatchControl({
+  onCheck,
+  compact = false,
+}: {
+  onCheck: () => void;
+  compact?: boolean;
+}) {
+  return (
+    <div className={`nettable-active-match-check${compact ? " compact" : ""}`}>
+      <button
+        type="button"
+        className="btn-ghost nettable-active-match-button"
+        onClick={onCheck}
+        title="Unpauses live capture and requests a full DAC lobby snapshot."
+      >
+        Check active match
+      </button>
+      {!compact && (
+        <span className="nettable-setup-apply-note">
+          Use this after restarting or joining mid-game.
+        </span>
       )}
     </div>
   );
@@ -260,7 +290,7 @@ function QueenUploadControl({
     <div className={`nettable-queen-upload${compact ? " compact" : ""}`}>
       <button
         type="button"
-        className={`btn-ghost${uploading ? " btn-loading" : ""}`}
+        className={`btn-ghost nettable-queen-upload-button${uploading ? " btn-loading" : ""}`}
         onClick={onUpload}
         disabled={uploading}
       >

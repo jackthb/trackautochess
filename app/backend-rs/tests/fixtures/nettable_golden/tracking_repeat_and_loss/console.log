@@ -1,0 +1,17 @@
+[stringtables] table CustomNetTable_game_info 2
+[stringtables]    0 : tracking_start_a
+[stringtables]    >>  VBKV.......state.trackin 56424b56 aabbccdd 00000173 74617465 00747261 636b696e
+[stringtables]    >>  g_started..round......   675f7374 61727465 64000272 6f756e64 00010000 000b
+[stringtables]    1 : tracking_start_b
+[stringtables]    >>  VBKV.......state.trackin 56424b56 aabbccdd 00000173 74617465 00747261 636b696e
+[stringtables]    >>  g_started..round......   675f7374 61727465 64000272 6f756e64 00010000 000b
+[stringtables] table CustomNetTable_game_info 1
+[stringtables]    0 : tracking_lost
+[stringtables]    >>  VBKV.......state.trackin 56424b56 aabbccdd 00000173 74617465 00747261 636b696e
+[stringtables]    >>  g_lost..round......reaso 675f6c6f 73740002 726f756e 64000600 00000172 6561736f
+[stringtables]    >>  n.console_log_missing_th 6e00636f 6e736f6c 655f6c6f 675f6d69 7373696e 675f7468
+[stringtables]    >>  en_restored..            656e5f72 6573746f 72656400 0b
+[stringtables] table CustomNetTable_player_id_table 1
+[stringtables]    0 : player_0
+[stringtables]    >>  VBKV.......steam_id..L^. 56424b56 aabbccdd 00000773 7465616d 5f696400 014c5e02
+[stringtables]    >>  .....name.Alpha..        01001001 016e616d 6500416c 70686100 0b

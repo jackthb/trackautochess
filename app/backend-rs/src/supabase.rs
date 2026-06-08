@@ -1,0 +1,616 @@
+use crate::{
+    config::Config, nettable_parser::NettableRow, outbox::Outbox, queen_ladder,
+    queen_ladder::QueenPlayer,
+};
+use serde_json::{json, Value};
+use sha2::{Digest, Sha256};
+use std::{collections::HashSet, io, path::PathBuf};
+
+#[derive(Debug, Clone)]
+pub struct SupabaseClient {
+    url: String,
+    key: String,
+}
+
+impl SupabaseClient {
+    pub fn from_config(cfg: &Config) -> Option<Self> {
+        if cfg.local_only || cfg.supabase_url.is_empty() || cfg.supabase_key.is_empty() {
+            return None;
+        }
+        Some(Self {
+            url: cfg.supabase_url.trim_end_matches('/').to_owned(),
+            key: cfg.supabase_key.clone(),
+        })
+    }
+
+    pub fn upsert_user(&self, steam_id: &str, steam_name: &str) -> Result<(), String> {
+        let steam_id_num = steam_id
+            .parse::<u64>()
+            .map_err(|err| format!("invalid steam_id: {err}"))?;
+        let row = json!({"steam_id": steam_id_num, "name": steam_name});
+        self.post_json(
+            "/rest/v1/users",
+            &row,
+            "resolution=merge-duplicates,return=minimal",
+        )
+    }
+
+    pub fn insert_nettable_rows(&self, rows: &[NettableRow]) -> Result<usize, String> {
+        if rows.is_empty() {
+            return Ok(0);
+        }
+        let row_values = rows.iter().map(nettable_row_json).collect::<Vec<_>>();
+        let _ = self.upload_end_board_rows(&row_values);
+        let body = Value::Array(
+            row_values,
+        );
+        self.post_json("/rest/v1/dac_nettable_dumps", &body, "return=minimal")?;
+        Ok(rows.len())
+    }
+
+    pub fn upload_finished_match_from_rows(&self, rows: &[NettableRow]) -> Result<bool, String> {
+        let row_values = rows.iter().map(nettable_row_json).collect::<Vec<_>>();
+        if !row_values.iter().any(is_end_board_row) {
+            return Ok(false);
+        }
+        self.upload_end_board_rows(&row_values)?;
+        Ok(true)
+    }
+
+    pub fn upsert_fallback_finished_match(
+        &self,
+        rows: &[NettableRow],
+        reason: &str,
+    ) -> Result<Option<String>, String> {
+        let Some(match_row) = build_fallback_match_row(rows, reason, &now_iso_utc()) else {
+            return Ok(None);
+        };
+        let match_id = match_row
+            .get("match_id")
+            .and_then(Value::as_str)
+            .unwrap_or_default()
+            .to_owned();
+        self.post_json(
+            "/rest/v1/matches",
+            &match_row,
+            "resolution=ignore-duplicates,return=minimal",
+        )?;
+        Ok(Some(match_id))
+    }
+
+    /// Upsert player identities discovered from the in-game Queen ladder.
+    ///
+    /// Mirrors the Python `upsert_queen_ladder_players`: merge fresh rows into
+    /// `users`, then clear stale ladder fields for users absent from the new
+    /// snapshot. Returns the number of rows posted (0 if nothing usable).
+    pub fn upsert_queen_ladder_players(&self, players: &[QueenPlayer]) -> Result<usize, String> {
+        if players.is_empty() {
+            return Ok(0);
+        }
+        let now = now_iso_utc();
+        let mut seen: HashSet<u64> = HashSet::new();
+        let mut seen_ids: Vec<u64> = Vec::new();
+        let mut rows: Vec<Value> = Vec::new();
+        for player in players {
+            let Ok(steam_id) = player.steam_id.trim().parse::<u64>() else {
+                continue;
+            };
+            if !seen.insert(steam_id) {
+                continue;
+            }
+            let mut row = serde_json::Map::new();
+            row.insert("steam_id".to_owned(), json!(steam_id));
+            let seen_at = if player.seen_at.is_empty() {
+                now.clone()
+            } else {
+                player.seen_at.clone()
+            };
+            row.insert("queen_ladder_last_seen_at".to_owned(), json!(seen_at));
+            if let Some(name) = player
+                .name
+                .as_deref()
+                .map(str::trim)
+                .filter(|name| !name.is_empty())
+            {
+                row.insert("name".to_owned(), json!(name));
+            }
+            let season = queen_ladder::normalize_season_key(player.season.as_deref().unwrap_or(""));
+            if !season.is_empty() {
+                row.insert("queen_ladder_season".to_owned(), json!(season));
+            }
+            if player.rank >= 1 {
+                row.insert("queen_ladder_rank".to_owned(), json!(player.rank));
+            }
+            if let Some(mmr) = player.mmr.filter(|mmr| *mmr >= 0) {
+                row.insert("queen_ladder_mmr".to_owned(), json!(mmr));
+                // The Queen ladder consists of Queen players; setting these lets
+                // public leaderboards show them before a Drodo profile refresh.
+                row.insert("drodo_mmr".to_owned(), json!(mmr));
+                row.insert("drodo_mmr_level".to_owned(), json!(38));
+            }
+            rows.push(Value::Object(row));
+            seen_ids.push(steam_id);
+        }
+        if rows.is_empty() {
+            return Ok(0);
+        }
+        let count = rows.len();
+        self.post_json(
+            "/rest/v1/users",
+            &Value::Array(rows),
+            "resolution=merge-duplicates,return=minimal",
+        )?;
+        let _ = self.clear_stale_queen_ladder_snapshot(&seen_ids);
+        Ok(count)
+    }
+
+    fn clear_stale_queen_ladder_snapshot(&self, current_steam_ids: &[u64]) -> Result<(), String> {
+        if current_steam_ids.is_empty() {
+            return Ok(());
+        }
+        let body = json!({
+            "queen_ladder_rank": Value::Null,
+            "queen_ladder_mmr": Value::Null,
+            "queen_ladder_season": Value::Null,
+            "queen_ladder_last_seen_at": Value::Null,
+        });
+        self.patch_json(
+            &queen_ladder_stale_clear_path(current_steam_ids),
+            &body,
+            "return=minimal",
+        )
+    }
+
+    fn upload_end_board_rows(&self, rows: &[Value]) -> Result<(), String> {
+        if !rows.iter().any(is_end_board_row) {
+            return Ok(());
+        }
+        let Some(upload) = build_end_board_upload(rows, &now_iso_utc()) else {
+            return Ok(());
+        };
+        self.post_json(
+            "/rest/v1/matches",
+            &upload.match_row,
+            "resolution=ignore-duplicates,return=minimal",
+        )?;
+        let players = dedupe_match_players(upload.players);
+        if !players.is_empty() {
+            self.post_json(
+                "/rest/v1/match_players?on_conflict=match_id,steam_id",
+                &Value::Array(players),
+                "resolution=ignore-duplicates,return=minimal",
+            )?;
+        }
+        Ok(())
+    }
+
+    pub fn replay_outbox(&self, outbox: &Outbox) -> io::Result<usize> {
+        let mut uploaded = 0;
+        for item in outbox.list()? {
+            match self.post_raw_payload(&item.payload) {
+                Ok(()) => {
+                    outbox.mark_uploaded(&item.path)?;
+                    uploaded += 1;
+                }
+                Err(_) => {}
+            }
+        }
+        Ok(uploaded)
+    }
+
+    fn post_raw_payload(&self, payload: &str) -> Result<(), String> {
+        let value = serde_json::from_str::<Value>(payload).map_err(|err| err.to_string())?;
+        let table = value
+            .get("table")
+            .and_then(Value::as_str)
+            .unwrap_or("dac_nettable_dumps");
+        let body = value.get("rows").or_else(|| value.get("payload")).unwrap_or(&value);
+        if table == "dac_nettable_dumps" {
+            if let Some(rows) = body.as_array() {
+                let _ = self.upload_end_board_rows(rows);
+            }
+        }
+        self.post_json(&format!("/rest/v1/{table}"), body, "return=minimal")
+    }
+
+    fn post_json(&self, path: &str, body: &Value, prefer: &str) -> Result<(), String> {
+        let response = ureq::post(&format!("{}{}", self.url, path))
+            .set("apikey", &self.key)
+            .set("Authorization", &format!("Bearer {}", self.key))
+            .set("Content-Type", "application/json")
+            .set("Prefer", prefer)
+            .send_string(&body.to_string());
+        match response {
+            Ok(resp) if (200..300).contains(&resp.status()) => Ok(()),
+            Ok(resp) => Err(format!("Supabase returned HTTP {}", resp.status())),
+            Err(err) => Err(err.to_string()),
+        }
+    }
+
+    fn patch_json(&self, path: &str, body: &Value, prefer: &str) -> Result<(), String> {
+        let response = ureq::request("PATCH", &format!("{}{}", self.url, path))
+            .set("apikey", &self.key)
+            .set("Authorization", &format!("Bearer {}", self.key))
+            .set("Content-Type", "application/json")
+            .set("Prefer", prefer)
+            .send_string(&body.to_string());
+        match response {
+            Ok(resp) if (200..300).contains(&resp.status()) => Ok(()),
+            Ok(resp) => Err(format!("Supabase returned HTTP {}", resp.status())),
+            Err(err) => Err(err.to_string()),
+        }
+    }
+}
+
+fn queen_ladder_stale_clear_path(current_steam_ids: &[u64]) -> String {
+    let ids = current_steam_ids
+        .iter()
+        .map(u64::to_string)
+        .collect::<Vec<_>>()
+        .join(",");
+    format!("/rest/v1/users?queen_ladder_last_seen_at=not.is.null&steam_id=not.in.({ids})")
+}
+
+fn dedupe_match_players(players: Vec<Value>) -> Vec<Value> {
+    let mut seen = HashSet::new();
+    let mut out = Vec::new();
+    for player in players {
+        let key = player
+            .get("steam_id")
+            .and_then(Value::as_u64)
+            .map(|steam_id| {
+                let match_id = player
+                    .get("match_id")
+                    .and_then(Value::as_str)
+                    .unwrap_or_default()
+                    .to_owned();
+                (match_id, steam_id)
+            });
+        if let Some(key) = key {
+            if seen.insert(key) {
+                out.push(player);
+            }
+        }
+    }
+    out
+}
+
+const MATCH_PLAYER_COLUMNS: &[&str] = &[
+    "match_id",
+    "steam_id",
+    "placement",
+    "mmr_level",
+    "hero_level",
+    "chess_lineup",
+    "chess_hand",
+    "synergies",
+    "relic",
+    "relic_history",
+    "talents",
+    "win_round",
+    "lose_round",
+    "draw_round",
+    "kills",
+    "deaths",
+    "hero_damage",
+    "hero_damaged",
+    "mvp_chess_name",
+    "mvp_chess_items",
+    "max_lineup_value",
+    "max_lineup_value_lineup",
+    "duration",
+    "final_round",
+    "zhugong",
+    "total_money",
+    "candy",
+    "played_at",
+    "screenshot",
+    "notes",
+    "replay",
+    "created_at",
+];
+
+fn nettable_row_json(row: &NettableRow) -> Value {
+    json!({
+        "table_name": row.table_name,
+        "key": row.key,
+        "raw": row.raw.to_value(),
+    })
+}
+
+fn is_end_board_row(row: &Value) -> bool {
+    row.get("table_name").and_then(Value::as_str) == Some("CustomNetTable_dac_table")
+        && row.get("key").and_then(Value::as_str) == Some("end_board")
+}
+
+#[derive(Debug, PartialEq)]
+struct EndBoardUpload {
+    match_row: Value,
+    players: Vec<Value>,
+}
+
+fn build_end_board_upload(rows: &[Value], played_at: &str) -> Option<EndBoardUpload> {
+    let end_board = rows.iter().find(|row| {
+        row.get("table_name").and_then(Value::as_str) == Some("CustomNetTable_dac_table")
+            && row.get("key").and_then(Value::as_str) == Some("end_board")
+    })?;
+    let data = end_board
+        .get("raw")
+        .and_then(|raw| raw.get("data"))
+        .and_then(Value::as_object)?;
+    if data.is_empty() {
+        return None;
+    }
+    let mut pairs = data
+        .iter()
+        .map(|(steam_id, player)| {
+            let rank = player
+                .get("curr_rank")
+                .or_else(|| player.get("rank"))
+                .and_then(Value::as_i64)
+                .unwrap_or(0);
+            (steam_id.clone(), rank)
+        })
+        .collect::<Vec<_>>();
+    pairs.sort();
+    let match_id = generate_live_match_id(&pairs);
+    let match_row = json!({
+        "match_id": match_id,
+        "played_at": played_at,
+        "player_count": data.len(),
+        "capture_status": "complete",
+        "is_finished": true,
+        "verification_source": "end_board",
+        "verified_at": played_at,
+        "capture_ended_at": played_at,
+    });
+    let players = data
+        .iter()
+        .filter_map(|(steam_id, player)| {
+            let steam_id_num = steam_id.parse::<u64>().ok()?;
+            let placement = player
+                .get("curr_rank")
+                .or_else(|| player.get("rank"))
+                .and_then(Value::as_i64)
+                .unwrap_or(0);
+            let mut row = serde_json::Map::new();
+            if let Some(player_obj) = player.as_object() {
+                for column in MATCH_PLAYER_COLUMNS {
+                    if let Some(value) = player_obj.get(*column) {
+                        row.insert((*column).to_owned(), value.clone());
+                    }
+                }
+            }
+            row.insert("match_id".to_owned(), json!(match_id));
+            row.insert("steam_id".to_owned(), json!(steam_id_num));
+            row.insert("placement".to_owned(), json!(placement));
+            row.entry("played_at".to_owned()).or_insert_with(|| json!(played_at));
+            Some(Value::Object(row))
+        })
+        .collect::<Vec<_>>();
+    Some(EndBoardUpload { match_row, players })
+}
+
+fn build_fallback_match_row(rows: &[NettableRow], reason: &str, played_at: &str) -> Option<Value> {
+    let mut pairs = player_id_pairs(rows);
+    if pairs.is_empty() {
+        return None;
+    }
+    pairs.sort();
+    let match_id = generate_fallback_match_id(&pairs, reason, played_at);
+    Some(json!({
+        "match_id": match_id,
+        "played_at": played_at,
+        "player_count": pairs.len(),
+        "capture_status": "finished_no_end_board",
+        "is_finished": true,
+        "verification_source": reason,
+        "verified_at": played_at,
+        "capture_ended_at": played_at,
+    }))
+}
+
+fn player_id_pairs(rows: &[NettableRow]) -> Vec<(String, i64)> {
+    rows.iter()
+        .filter(|row| row.table_name == "CustomNetTable_player_id_table")
+        .filter_map(|row| {
+            let slot = row.key.strip_prefix("player_")?.parse::<i64>().ok()?;
+            let steam_id = row
+                .raw
+                .to_value()
+                .get("steam_id")
+                .and_then(|value| match value {
+                    Value::String(value) => Some(value.clone()),
+                    Value::Number(value) => Some(value.to_string()),
+                    _ => None,
+                })?;
+            if steam_id.trim().is_empty() {
+                return None;
+            }
+            Some((steam_id, slot))
+        })
+        .collect()
+}
+
+fn generate_live_match_id(pairs: &[(String, i64)]) -> String {
+    let canonical = serde_json::to_string(pairs).unwrap_or_else(|_| "[]".to_owned());
+    let digest = Sha256::digest(canonical.as_bytes());
+    format!("{digest:x}")[..16].to_owned()
+}
+
+fn generate_fallback_match_id(pairs: &[(String, i64)], reason: &str, played_at: &str) -> String {
+    let seed = json!({
+        "kind": "fallback_no_end_board",
+        "reason": reason,
+        "played_at": played_at,
+        "players": pairs,
+    });
+    let digest = Sha256::digest(seed.to_string().as_bytes());
+    format!("{digest:x}")[..16].to_owned()
+}
+
+fn now_iso_utc() -> String {
+    chrono::Utc::now().to_rfc3339()
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn live_match_id_hashes_like_legacy_algorithm() {
+        let pairs = vec![
+            ("76561198000000001".to_owned(), 1),
+            ("76561198000000002".to_owned(), 2),
+        ];
+        assert_eq!(generate_live_match_id(&pairs), "0197bf92d36d4c32");
+    }
+
+    #[test]
+    fn nettable_row_json_preserves_upload_shape() {
+        let row = NettableRow {
+            table_name: "CustomNetTable_dac_table".to_owned(),
+            key: "end_board".to_owned(),
+            raw: crate::nettable_parser::Value::Object(
+                [("data".to_owned(), crate::nettable_parser::Value::Object(Default::default()))]
+                    .into_iter()
+                    .collect(),
+            ),
+        };
+        assert_eq!(
+            nettable_row_json(&row),
+            json!({"table_name":"CustomNetTable_dac_table","key":"end_board","raw":{"data":{}}})
+        );
+    }
+
+    #[test]
+    fn queen_ladder_cleanup_excludes_current_scan_ids() {
+        assert_eq!(
+            queen_ladder_stale_clear_path(&[76561198000000001, 76561198000000002]),
+            "/rest/v1/users?queen_ladder_last_seen_at=not.is.null&steam_id=not.in.(76561198000000001,76561198000000002)"
+        );
+    }
+
+    #[test]
+    fn match_player_dedupe_keeps_one_row_per_match_and_steam_id() {
+        let players = dedupe_match_players(vec![
+            json!({"match_id":"m1","steam_id":76561198000000001u64,"placement":1}),
+            json!({"match_id":"m1","steam_id":76561198000000001u64,"placement":1}),
+            json!({"match_id":"m1","steam_id":76561198000000002u64,"placement":2}),
+        ]);
+
+        assert_eq!(players.len(), 2);
+        assert_eq!(players[0]["steam_id"], 76561198000000001u64);
+        assert_eq!(players[1]["steam_id"], 76561198000000002u64);
+    }
+
+    #[test]
+    fn end_board_upload_builds_match_and_schema_safe_player_rows() {
+        let rows = vec![json!({
+            "table_name": "CustomNetTable_dac_table",
+            "key": "end_board",
+            "raw": {
+                "data": {
+                    "76561198000000002": {
+                        "rank": 8,
+                        "curr_rank": 2,
+                        "mmr_level": 4200,
+                        "chess_lineup": "Axe(2)",
+                        "unknown_future_field": "drop me"
+                    },
+                    "76561198000000001": {
+                        "rank": 1,
+                        "played_at": "from-payload",
+                        "relic": "relic_example"
+                    },
+                    "not-a-steam-id": { "rank": 3 }
+                }
+            }
+        })];
+
+        let upload = build_end_board_upload(&rows, "2026-06-07T12:00:00Z").expect("end_board should build upload");
+
+        assert_eq!(upload.match_row["match_id"], "d5246b0d2fcc093d");
+        assert_eq!(upload.match_row["player_count"], 3);
+        assert_eq!(upload.match_row["capture_status"], "complete");
+        assert_eq!(upload.match_row["verification_source"], "end_board");
+        assert_eq!(upload.players.len(), 2, "invalid Steam IDs should be skipped for match_players");
+
+        let second = upload
+            .players
+            .iter()
+            .find(|player| player["steam_id"] == 76561198000000002u64)
+            .expect("second player row should exist");
+        assert_eq!(second["placement"], 2, "curr_rank should win over rank");
+        assert_eq!(second["mmr_level"], 4200);
+        assert_eq!(second["chess_lineup"], "Axe(2)");
+        assert!(second.get("unknown_future_field").is_none(), "unknown columns should not be posted to PostgREST");
+
+        let first = upload
+            .players
+            .iter()
+            .find(|player| player["steam_id"] == 76561198000000001u64)
+            .expect("first player row should exist");
+        assert_eq!(first["played_at"], "from-payload", "payload played_at should be preserved when present");
+        assert_eq!(first["relic"], "relic_example");
+    }
+
+    #[test]
+    fn end_board_upload_ignores_missing_or_empty_end_board() {
+        assert!(build_end_board_upload(&[], "2026-06-07T12:00:00Z").is_none());
+        assert!(build_end_board_upload(&[json!({
+            "table_name": "CustomNetTable_dac_table",
+            "key": "end_board",
+            "raw": {"data": {}}
+        })], "2026-06-07T12:00:00Z").is_none());
+    }
+
+    #[test]
+    fn fallback_match_uses_player_id_table_without_end_board() {
+        let rows = vec![
+            NettableRow {
+                table_name: "CustomNetTable_player_id_table".to_owned(),
+                key: "player_1".to_owned(),
+                raw: crate::nettable_parser::Value::Object(
+                    [("steam_id".to_owned(), crate::nettable_parser::Value::U64(76561198000000002))]
+                        .into_iter()
+                        .collect(),
+                ),
+            },
+            NettableRow {
+                table_name: "CustomNetTable_player_id_table".to_owned(),
+                key: "player_0".to_owned(),
+                raw: crate::nettable_parser::Value::Object(
+                    [("steam_id".to_owned(), crate::nettable_parser::Value::U64(76561198000000001))]
+                        .into_iter()
+                        .collect(),
+                ),
+            },
+        ];
+
+        let row = build_fallback_match_row(&rows, "post_game_no_end_board", "2026-06-07T12:00:00Z")
+            .expect("player_id_table should be enough to build fallback match row");
+
+        assert_eq!(row["match_id"], "070e139568e352a7");
+        assert_eq!(row["player_count"], 2);
+        assert_eq!(row["capture_status"], "finished_no_end_board");
+        assert_eq!(row["is_finished"], true);
+        assert_eq!(row["verification_source"], "post_game_no_end_board");
+
+        let later = build_fallback_match_row(&rows, "post_game_no_end_board", "2026-06-07T12:01:00Z")
+            .expect("later fallback should also build");
+        assert_ne!(later["match_id"], row["match_id"], "fallback IDs must not collide across sessions");
+    }
+}
+
+pub fn queue_rows(outbox_dir: PathBuf, rows: &[NettableRow]) -> io::Result<Option<PathBuf>> {
+    if rows.is_empty() {
+        return Ok(None);
+    }
+    let outbox = Outbox::new(outbox_dir);
+    let payload = json!({
+        "table": "dac_nettable_dumps",
+        "rows": rows.iter().map(nettable_row_json).collect::<Vec<_>>()
+    });
+    outbox.enqueue_str(&payload.to_string()).map(Some)
+}

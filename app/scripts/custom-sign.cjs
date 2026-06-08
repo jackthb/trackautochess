@@ -1,6 +1,6 @@
 // electron-builder custom signing hook.
 //
-// Skips vendor binaries (tesseract.exe, ffmpeg.exe) that are already signed
+// Skips vendor binaries (ffmpeg.exe) that are already signed
 // by their upstream maintainers — re-signing them is just a slow round-trip
 // to the timestamp server. Everything else is signed via signtool using
 // CSC_LINK (.pfx) or WIN_CSC_SHA1 (cert thumbprint in Windows store).
@@ -13,7 +13,6 @@ const { execFileSync } = require("child_process");
 const path = require("path");
 
 const SKIP_VENDOR_BINARIES = new Set([
-  "tesseract.exe",
   "ffmpeg.exe",
 ]);
 

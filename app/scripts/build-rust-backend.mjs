@@ -10,6 +10,10 @@ const manifest = path.join(appDir, "backend-rs", "Cargo.toml");
 const targetDir = path.join(appDir, "backend-rs", "target", "release");
 const distDir = path.join(appDir, "backend-rs", "dist", "headless");
 const exeName = process.platform === "win32" ? "dac-capture-backend.exe" : "dac-capture-backend";
+const cargoName = process.platform === "win32" ? "cargo.exe" : "cargo";
+const cargoPath = process.platform === "win32" && process.env.USERPROFILE
+  ? path.join(process.env.USERPROFILE, ".cargo", "bin", cargoName)
+  : cargoName;
 
 function run(cmd, args) {
   const result = spawnSync(cmd, args, {
@@ -26,7 +30,7 @@ if (!existsSync(manifest)) {
   process.exit(1);
 }
 
-run("cargo", ["build", "--release", "--manifest-path", manifest]);
+run(existsSync(cargoPath) ? cargoPath : "cargo", ["build", "--release", "--manifest-path", manifest]);
 
 mkdirSync(distDir, { recursive: true });
 copyFileSync(path.join(targetDir, exeName), path.join(distDir, exeName));

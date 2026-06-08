@@ -146,7 +146,7 @@ def _extract_hex_tokens(line: str) -> str:
 
 def parse_log(log_path: Path) -> dict[str, dict[str, Any]]:
     """Return { table_name: { entry_key: decoded_or_error_dict } } found in the log."""
-    raw: dict[str, dict[str, bytes]] = {}
+    decoded: dict[str, dict[str, Any]] = {}
     cur_table: str | None = None
     cur_key: str | None = None
     cur_hex: list[str] = []
@@ -154,7 +154,22 @@ def parse_log(log_path: Path) -> dict[str, dict[str, Any]]:
     def commit() -> None:
         nonlocal cur_hex
         if cur_table is not None and cur_key is not None and cur_hex:
-            raw[cur_table][cur_key] = bytes.fromhex("".join(cur_hex))
+            blob = bytes.fromhex("".join(cur_hex))
+            # Dota sometimes emits tiny non-VBKV stringtable stubs (notably for
+            # ranking_top) and can expose incomplete bytes at EOF while it is
+            # still writing console.log. Keep the last good parsed value for the
+            # same table/key instead of replacing it with transient junk.
+            if not blob.startswith(b"VBKV"):
+                cur_hex = []
+                return
+            try:
+                decoded.setdefault(cur_table, {})[cur_key] = parse_vbkv(blob)
+            except (VBKVError, IndexError, struct.error, ValueError) as e:
+                if cur_key not in decoded.setdefault(cur_table, {}):
+                    decoded[cur_table][cur_key] = {
+                        "_decode_error": str(e),
+                        "_raw_hex": blob.hex(),
+                    }
         cur_hex = []
 
     with log_path.open("r", encoding="utf-8", errors="replace") as f:
@@ -164,7 +179,7 @@ def parse_log(log_path: Path) -> dict[str, dict[str, Any]]:
             if m:
                 commit()
                 cur_table = m.group(1)
-                raw.setdefault(cur_table, {})
+                decoded.setdefault(cur_table, {})
                 cur_key = None
                 continue
             m = ENTRY_RE.search(line)
@@ -176,16 +191,4 @@ def parse_log(log_path: Path) -> dict[str, dict[str, Any]]:
             if hex_chunk and cur_key is not None:
                 cur_hex.append(hex_chunk)
         commit()
-
-    decoded: dict[str, dict[str, Any]] = {}
-    for table, entries in raw.items():
-        decoded[table] = {}
-        for key, blob in entries.items():
-            try:
-                decoded[table][key] = parse_vbkv(blob)
-            except (VBKVError, IndexError, struct.error, ValueError) as e:
-                decoded[table][key] = {
-                    "_decode_error": str(e),
-                    "_raw_hex": blob.hex(),
-                }
-    return decoded
+    return {table: entries for table, entries in decoded.items() if entries}

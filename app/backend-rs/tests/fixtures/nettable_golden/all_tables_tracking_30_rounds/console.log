@@ -1,0 +1,163 @@
+[stringtables] table CustomNetTable_game_info 1
+[stringtables]    0 : tracking_start
+[stringtables]    >>  VBKV.......state.trackin 56424b56 aabbccdd 00000173 74617465 00747261 636b696e
+[stringtables]    >>  g_started..round......   675f7374 61727465 64000272 6f756e64 00010000 000b
+[stringtables] table CustomNetTable_game_info 30
+[stringtables]    0 : round_01
+[stringtables]    >>  VBKV.......round......ph 56424b56 aabbccdd 00000272 6f756e64 00010000 00017068
+[stringtables]    >>  ase.tracking_started..al 61736500 74726163 6b696e67 5f737461 72746564 0002616c
+[stringtables]    >>  ive_players......        6976655f 706c6179 65727300 09000000 0b
+[stringtables]    1 : round_02
+[stringtables]    >>  VBKV.......round......ph 56424b56 aabbccdd 00000272 6f756e64 00020000 00017068
+[stringtables]    >>  ase.combat..alive_player 61736500 636f6d62 61740002 616c6976 655f706c 61796572
+[stringtables]    >>  s......                  73000900 00000b
+[stringtables]    2 : round_03
+[stringtables]    >>  VBKV.......round......ph 56424b56 aabbccdd 00000272 6f756e64 00030000 00017068
+[stringtables]    >>  ase.combat..alive_player 61736500 636f6d62 61740002 616c6976 655f706c 61796572
+[stringtables]    >>  s......                  73000900 00000b
+[stringtables]    3 : round_04
+[stringtables]    >>  VBKV.......round......ph 56424b56 aabbccdd 00000272 6f756e64 00040000 00017068
+[stringtables]    >>  ase.combat..alive_player 61736500 636f6d62 61740002 616c6976 655f706c 61796572
+[stringtables]    >>  s......                  73000800 00000b
+[stringtables]    4 : round_05
+[stringtables]    >>  VBKV.......round......ph 56424b56 aabbccdd 00000272 6f756e64 00050000 00017068
+[stringtables]    >>  ase.combat..alive_player 61736500 636f6d62 61740002 616c6976 655f706c 61796572
+[stringtables]    >>  s......                  73000800 00000b
+[stringtables]    5 : round_06
+[stringtables]    >>  VBKV.......round......ph 56424b56 aabbccdd 00000272 6f756e64 00060000 00017068
+[stringtables]    >>  ase.combat..alive_player 61736500 636f6d62 61740002 616c6976 655f706c 61796572
+[stringtables]    >>  s......                  73000800 00000b
+[stringtables]    6 : round_07
+[stringtables]    >>  VBKV.......round......ph 56424b56 aabbccdd 00000272 6f756e64 00070000 00017068
+[stringtables]    >>  ase.combat..alive_player 61736500 636f6d62 61740002 616c6976 655f706c 61796572
+[stringtables]    >>  s......                  73000800 00000b
+[stringtables]    7 : round_08
+[stringtables]    >>  VBKV.......round......ph 56424b56 aabbccdd 00000272 6f756e64 00080000 00017068
+[stringtables]    >>  ase.combat..alive_player 61736500 636f6d62 61740002 616c6976 655f706c 61796572
+[stringtables]    >>  s......                  73000700 00000b
+[stringtables]    8 : round_09
+[stringtables]    >>  VBKV.......round......ph 56424b56 aabbccdd 00000272 6f756e64 00090000 00017068
+[stringtables]    >>  ase.combat..alive_player 61736500 636f6d62 61740002 616c6976 655f706c 61796572
+[stringtables]    >>  s......                  73000700 00000b
+[stringtables]    9 : round_10
+[stringtables]    >>  VBKV.......round......ph 56424b56 aabbccdd 00000272 6f756e64 000a0000 00017068
+[stringtables]    >>  ase.combat..alive_player 61736500 636f6d62 61740002 616c6976 655f706c 61796572
+[stringtables]    >>  s......                  73000700 00000b
+[stringtables]    10 : round_11
+[stringtables]    >>  VBKV.......round......ph 56424b56 aabbccdd 00000272 6f756e64 000b0000 00017068
+[stringtables]    >>  ase.combat..alive_player 61736500 636f6d62 61740002 616c6976 655f706c 61796572
+[stringtables]    >>  s......                  73000700 00000b
+[stringtables]    11 : round_12
+[stringtables]    >>  VBKV.......round......ph 56424b56 aabbccdd 00000272 6f756e64 000c0000 00017068
+[stringtables]    >>  ase.combat..alive_player 61736500 636f6d62 61740002 616c6976 655f706c 61796572
+[stringtables]    >>  s......                  73000600 00000b
+[stringtables]    12 : round_13
+[stringtables]    >>  VBKV.......round......ph 56424b56 aabbccdd 00000272 6f756e64 000d0000 00017068
+[stringtables]    >>  ase.combat..alive_player 61736500 636f6d62 61740002 616c6976 655f706c 61796572
+[stringtables]    >>  s......                  73000600 00000b
+[stringtables]    13 : round_14
+[stringtables]    >>  VBKV.......round......ph 56424b56 aabbccdd 00000272 6f756e64 000e0000 00017068
+[stringtables]    >>  ase.combat..alive_player 61736500 636f6d62 61740002 616c6976 655f706c 61796572
+[stringtables]    >>  s......                  73000600 00000b
+[stringtables]    14 : round_15
+[stringtables]    >>  VBKV.......round......ph 56424b56 aabbccdd 00000272 6f756e64 000f0000 00017068
+[stringtables]    >>  ase.combat..alive_player 61736500 636f6d62 61740002 616c6976 655f706c 61796572
+[stringtables]    >>  s......                  73000600 00000b
+[stringtables]    15 : round_16
+[stringtables]    >>  VBKV.......round......ph 56424b56 aabbccdd 00000272 6f756e64 00100000 00017068
+[stringtables]    >>  ase.combat..alive_player 61736500 636f6d62 61740002 616c6976 655f706c 61796572
+[stringtables]    >>  s......                  73000500 00000b
+[stringtables]    16 : round_17
+[stringtables]    >>  VBKV.......round......ph 56424b56 aabbccdd 00000272 6f756e64 00110000 00017068
+[stringtables]    >>  ase.tracking_lost..alive 61736500 74726163 6b696e67 5f6c6f73 74000261 6c697665
+[stringtables]    >>  _players......           5f706c61 79657273 00050000 000b
+[stringtables]    17 : round_18
+[stringtables]    >>  VBKV.......round......ph 56424b56 aabbccdd 00000272 6f756e64 00120000 00017068
+[stringtables]    >>  ase.combat..alive_player 61736500 636f6d62 61740002 616c6976 655f706c 61796572
+[stringtables]    >>  s......                  73000500 00000b
+[stringtables]    18 : round_19
+[stringtables]    >>  VBKV.......round......ph 56424b56 aabbccdd 00000272 6f756e64 00130000 00017068
+[stringtables]    >>  ase.combat..alive_player 61736500 636f6d62 61740002 616c6976 655f706c 61796572
+[stringtables]    >>  s......                  73000500 00000b
+[stringtables]    19 : round_20
+[stringtables]    >>  VBKV.......round......ph 56424b56 aabbccdd 00000272 6f756e64 00140000 00017068
+[stringtables]    >>  ase.combat..alive_player 61736500 636f6d62 61740002 616c6976 655f706c 61796572
+[stringtables]    >>  s......                  73000400 00000b
+[stringtables]    20 : round_21
+[stringtables]    >>  VBKV.......round......ph 56424b56 aabbccdd 00000272 6f756e64 00150000 00017068
+[stringtables]    >>  ase.combat..alive_player 61736500 636f6d62 61740002 616c6976 655f706c 61796572
+[stringtables]    >>  s......                  73000400 00000b
+[stringtables]    21 : round_22
+[stringtables]    >>  VBKV.......round......ph 56424b56 aabbccdd 00000272 6f756e64 00160000 00017068
+[stringtables]    >>  ase.combat..alive_player 61736500 636f6d62 61740002 616c6976 655f706c 61796572
+[stringtables]    >>  s......                  73000400 00000b
+[stringtables]    22 : round_23
+[stringtables]    >>  VBKV.......round......ph 56424b56 aabbccdd 00000272 6f756e64 00170000 00017068
+[stringtables]    >>  ase.combat..alive_player 61736500 636f6d62 61740002 616c6976 655f706c 61796572
+[stringtables]    >>  s......                  73000400 00000b
+[stringtables]    23 : round_24
+[stringtables]    >>  VBKV.......round......ph 56424b56 aabbccdd 00000272 6f756e64 00180000 00017068
+[stringtables]    >>  ase.combat..alive_player 61736500 636f6d62 61740002 616c6976 655f706c 61796572
+[stringtables]    >>  s......                  73000300 00000b
+[stringtables]    24 : round_25
+[stringtables]    >>  VBKV.......round......ph 56424b56 aabbccdd 00000272 6f756e64 00190000 00017068
+[stringtables]    >>  ase.combat..alive_player 61736500 636f6d62 61740002 616c6976 655f706c 61796572
+[stringtables]    >>  s......                  73000300 00000b
+[stringtables]    25 : round_26
+[stringtables]    >>  VBKV.......round......ph 56424b56 aabbccdd 00000272 6f756e64 001a0000 00017068
+[stringtables]    >>  ase.combat..alive_player 61736500 636f6d62 61740002 616c6976 655f706c 61796572
+[stringtables]    >>  s......                  73000300 00000b
+[stringtables]    26 : round_27
+[stringtables]    >>  VBKV.......round......ph 56424b56 aabbccdd 00000272 6f756e64 001b0000 00017068
+[stringtables]    >>  ase.combat..alive_player 61736500 636f6d62 61740002 616c6976 655f706c 61796572
+[stringtables]    >>  s......                  73000300 00000b
+[stringtables]    27 : round_28
+[stringtables]    >>  VBKV.......round......ph 56424b56 aabbccdd 00000272 6f756e64 001c0000 00017068
+[stringtables]    >>  ase.combat..alive_player 61736500 636f6d62 61740002 616c6976 655f706c 61796572
+[stringtables]    >>  s......                  73000200 00000b
+[stringtables]    28 : round_29
+[stringtables]    >>  VBKV.......round......ph 56424b56 aabbccdd 00000272 6f756e64 001d0000 00017068
+[stringtables]    >>  ase.combat..alive_player 61736500 636f6d62 61740002 616c6976 655f706c 61796572
+[stringtables]    >>  s......                  73000200 00000b
+[stringtables]    29 : round_30
+[stringtables]    >>  VBKV.......round......ph 56424b56 aabbccdd 00000272 6f756e64 001e0000 00017068
+[stringtables]    >>  ase.combat..alive_player 61736500 636f6d62 61740002 616c6976 655f706c 61796572
+[stringtables]    >>  s......                  73000200 00000b
+[stringtables] table CustomNetTable_game_info 1
+[stringtables]    0 : tracking_lost
+[stringtables]    >>  VBKV.......state.trackin 56424b56 aabbccdd 00000173 74617465 00747261 636b696e
+[stringtables]    >>  g_lost..round......      675f6c6f 73740002 726f756e 64001100 00000b
+[stringtables] table CustomNetTable_dac_table 2
+[stringtables]    0 : player_info
+[stringtables]    >>  VBKV.......info..7656119 56424b56 aabbccdd 00000069 6e666f00 00373635 36313139
+[stringtables]    >>  8000000001..player_id... 38303030 30303030 30310002 706c6179 65725f69 64000000
+[stringtables]    >>  ...name.Alpha...76561198 0000016e 616d6500 416c7068 61000b00 37363536 31313938
+[stringtables]    >>  000000002..player_id.... 30303030 30303030 32000270 6c617965 725f6964 00010000
+[stringtables]    >>  ..name.Beta....          00016e61 6d650042 65746100 0b0b0b
+[stringtables]    1 : end_board
+[stringtables]    >>  VBKV.......data..7656119 56424b56 aabbccdd 00000064 61746100 00373635 36313139
+[stringtables]    >>  8000000001..rank.......7 38303030 30303030 30310002 72616e6b 00010000 000b0037
+[stringtables]    >>  6561198000000002..rank.. 36353631 31393830 30303030 30303032 00027261 6e6b0002
+[stringtables]    >>  ......                   0000000b 0b0b
+[stringtables] table CustomNetTable_player_id_table 4
+[stringtables]    0 : player_0
+[stringtables]    >>  VBKV.......steam_id..L^. 56424b56 aabbccdd 00000773 7465616d 5f696400 014c5e02
+[stringtables]    >>  .....name.Alpha..        01001001 016e616d 6500416c 70686100 0b
+[stringtables]    1 : vchess_0
+[stringtables]    >>  VBKV.......2_4..chess.ch 56424b56 aabbccdd 00000032 5f340001 63686573 73006368
+[stringtables]    >>  ess_cm1..x......y....... 6573735f 636d3100 02780004 00000002 79000200 00000b0b
+[stringtables]    2 : relic_ttl_0
+[stringtables]    >>  VBKV.......relic_1.relic 56424b56 aabbccdd 00000172 656c6963 5f310072 656c6963
+[stringtables]    >>  _example..               5f657861 6d706c65 000b
+[stringtables]    3 : mmr_level_0
+[stringtables]    >>  VBKV.......mmr.h....     56424b56 aabbccdd 0000026d 6d720068 1000000b
+[stringtables] table CustomNetTable_ranking_top_table 2
+[stringtables]    0 : season
+[stringtables]    >>  VBKV.......season.s40..  56424b56 aabbccdd 00000173 6561736f 6e007334 30000b
+[stringtables]    1 : ranking_top
+[stringtables]    >>  VBKV.......ranking_top.. 56424b56 aabbccdd 00000072 616e6b69 6e675f74 6f700000
+[stringtables]    >>  1..steam_id..L^......nam 31000773 7465616d 5f696400 014c5e02 01001001 016e616d
+[stringtables]    >>  e.Alpha..mmr.h......     6500416c 70686100 026d6d72 00681000 000b0b0b
+[stringtables] table ModifierNames 1
+[stringtables]    0 : non_custom_noise
+[stringtables]    >>  VBKV.......ignored.yes.. 56424b56 aabbccdd 00000169 676e6f72 65640079 6573000b

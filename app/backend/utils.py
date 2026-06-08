@@ -30,7 +30,7 @@ def local_only_mode() -> bool:
 
 
 def _data_dir() -> Path:
-    """Return the data/ directory, works both in dev and PyInstaller bundle."""
+    """Return the data/ directory, works both in dev and frozen bundles."""
     if getattr(sys, "frozen", False):
         return Path(sys._MEIPASS) / "data"
     # backend/ → app/ → repo root
@@ -38,7 +38,7 @@ def _data_dir() -> Path:
 
 
 def _content_dir() -> Path:
-    """Return the content/ directory, works both in dev and PyInstaller bundle."""
+    """Return the content/ directory, works both in dev and frozen bundles."""
     if getattr(sys, "frozen", False):
         return Path(sys._MEIPASS) / "content"
     return Path(__file__).resolve().parent.parent.parent / "content"

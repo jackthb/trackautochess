@@ -10,6 +10,7 @@ import type { TrackerEvent } from "../types";
 
 export type NetTableActivityKind =
   | "nettable_pause_fired"
+  | "nettable_check_active_match"
   | "nettable_dump_captured"
   | "nettable_ingest_complete"
   | "nettable_ingest_error"
@@ -85,9 +86,10 @@ export type NetTableState = Record<string, Record<string, unknown>>;
 
 /**
  * Extracted per-player live state emitted alongside the raw NetTableState.
- * Built backend-side by the same extractor the match timeline uses, so the
- * `lineup` is already transformed from raw `chess_*` codes to `Name(stars)`
- * and `hp` is the live value (the dac_table hp=100 sentinel is handled there).
+ * Built backend-side from `player_info_table` (gap-filled from `dac_table`).
+ * `lineup` is the raw `chess_*` code list (e.g. `chess_wl1,chess_br11,`);
+ * the frontend resolves codes → names + stars where units_full.json lives.
+ * `hp` is the live value (the dac_table hp=100 sentinel is handled backend-side).
  */
 export interface LivePlayer {
   hp?: number;
@@ -99,7 +101,10 @@ export interface LivePlayer {
   total_money?: number;
   win_round?: number;
   lose_round?: number;
+  /** Current/latest relic code. */
   relic?: string;
+  /** Every relic the player has taken, in pick order (from relic_history). */
+  relics?: string[];
   mmr_level?: number;
   candy?: number;
   /** Raw synergy stems from the game: "is_mage:6,is_human:6,". */
@@ -192,6 +197,20 @@ type NetTableIngestErrorEvent = {
   type: "nettable_ingest_error";
   error: string;
 };
+type NetTableCheckActiveMatchEvent = {
+  type: "nettable_check_active_match";
+  ok: boolean;
+  message?: string;
+  at?: string;
+};
+type NetTableRowEvent = {
+  type: "nettable_rows";
+  rows: Array<{
+    table_name?: string;
+    key?: string;
+    raw?: unknown;
+  }>;
+};
 type NetTableStateEvent = {
   type: "nettable_state";
   state: NetTableState;
@@ -220,6 +239,8 @@ type Incoming =
   | NetTableDumpCapturedEvent
   | NetTableIngestCompleteEvent
   | NetTableIngestErrorEvent
+  | NetTableCheckActiveMatchEvent
+  | NetTableRowEvent
   | NetTableStateEvent
   | NetTableGameEndedEvent
   | NetTableEndBoardSavedEvent
@@ -245,6 +266,22 @@ function summarizeTableList(tables: string[]): string {
   const extra = tables.length - head.length;
   const headStr = head.join(" · ");
   return extra > 0 ? `${headStr} · ${extra} more` : headStr;
+}
+
+function stateFromRows(rows: NetTableRowEvent["rows"]): NetTableState {
+  const next: NetTableState = {};
+  for (const row of rows) {
+    if (!row.table_name || !row.key) continue;
+    next[row.table_name] ??= {};
+    next[row.table_name][row.key] = row.raw;
+  }
+  return next;
+}
+
+function tablesFromRows(rows: NetTableRowEvent["rows"]): string[] {
+  return Array.from(
+    new Set(rows.map((row) => row.table_name).filter((table): table is string => Boolean(table))),
+  ).sort((a, b) => a.localeCompare(b));
 }
 
 export function useNetTableEvents(): NetTableActivityState {
@@ -307,9 +344,9 @@ export function useNetTableEvents(): NetTableActivityState {
             ) {
               push({
                 kind: "nettable_ingest_error",
-                title: "Can't tell if setup is complete",
+                title: "Setup should be applied",
                 detail:
-                  "Open a practice lobby and play one round. If nothing appears, run automatic setup and restart Dota.",
+                  "We can't confirm it is working until Dota writes lobby data. Open a practice lobby and play one round; if nothing appears, run automatic setup and restart Dota.",
                 tone: "warning",
               });
             }
@@ -349,6 +386,28 @@ export function useNetTableEvents(): NetTableActivityState {
             title: "Ingest failed",
             detail: msg.error,
             tone: "error",
+          });
+          break;
+        }
+        case "nettable_check_active_match": {
+          push({
+            kind: "nettable_check_active_match",
+            title: "Checking active match",
+            detail: msg.message,
+            tone: msg.ok ? "info" : "warning",
+          });
+          break;
+        }
+        case "nettable_rows": {
+          const rows = Array.isArray(msg.rows) ? msg.rows : [];
+          const tables = tablesFromRows(rows);
+          setState(stateFromRows(rows));
+          setStateAt(new Date().toISOString());
+          push({
+            kind: "nettable_dump_captured",
+            title: `Captured ${rows.length} row${rows.length === 1 ? "" : "s"}`,
+            detail: summarizeTableList(tables),
+            tone: "success",
           });
           break;
         }

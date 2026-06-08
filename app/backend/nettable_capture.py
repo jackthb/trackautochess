@@ -2042,8 +2042,7 @@ class NetTableCapture:
 
             pseudo_end_board = {"data": merged}
 
-            from db import generate_live_match_id
-            match_id = generate_live_match_id(pseudo_end_board)
+            match_id = self._generate_partial_match_id(pseudo_end_board)
 
             if match_id in {h[:16] for h in self._saved_end_board_hashes}:
                 log.info("nettable: fallback — match %s already saved", match_id)

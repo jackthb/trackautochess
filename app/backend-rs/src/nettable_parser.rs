@@ -6,40 +6,32 @@ pub enum Value {
     Array(Vec<Value>),
     String(String),
     I32(i32),
+    U32(u32),
     U64(u64),
     F32(f32),
 }
 
 impl Value {
-    pub fn to_json(&self) -> String {
+    pub fn to_value(&self) -> serde_json::Value {
         match self {
-            Value::Object(map) => {
-                let fields = map
-                    .iter()
-                    .map(|(k, v)| format!("{}:{}", json_string(k), v.to_json()))
-                    .collect::<Vec<_>>()
-                    .join(",");
-                format!("{{{fields}}}")
-            }
-            Value::Array(values) => format!(
-                "[{}]",
-                values
-                    .iter()
-                    .map(Value::to_json)
-                    .collect::<Vec<_>>()
-                    .join(",")
+            Value::Object(map) => serde_json::Value::Object(
+                map.iter()
+                    .map(|(key, value)| (key.clone(), value.to_value()))
+                    .collect(),
             ),
-            Value::String(value) => json_string(value),
-            Value::I32(value) => value.to_string(),
-            Value::U64(value) => value.to_string(),
-            Value::F32(value) => {
-                if value.is_finite() {
-                    value.to_string()
-                } else {
-                    "null".to_owned()
-                }
-            }
+            Value::Array(values) => serde_json::Value::Array(values.iter().map(Value::to_value).collect()),
+            Value::String(value) => serde_json::Value::String(value.clone()),
+            Value::I32(value) => serde_json::Value::from(*value),
+            Value::U32(value) => serde_json::Value::from(*value),
+            Value::U64(value) => serde_json::Value::from(*value),
+            Value::F32(value) if value.is_finite() => serde_json::Value::from(*value),
+            Value::F32(_) => serde_json::Value::Null,
         }
+    }
+
+    #[cfg(test)]
+    pub fn to_json(&self) -> String {
+        self.to_value().to_string()
     }
 }
 
@@ -72,10 +64,7 @@ pub fn parse_vbkv(bytes: &[u8]) -> Result<Value, ParseError> {
     if ty != 0 {
         return Err(ParseError("root is not a subkey".to_owned()));
     }
-    let name = cursor.cstring()?;
-    if !name.is_empty() {
-        return Err(ParseError("root key name is not empty".to_owned()));
-    }
+    let _name = cursor.cstring()?;
     parse_object(&mut cursor)
 }
 
@@ -93,11 +82,27 @@ pub fn parse_log_text(body: &str) -> ParsedLog {
     let flush =
         |out: &mut ParsedLog, table: &Option<String>, key: &Option<String>, hex: &mut String| {
             if let (Some(table), Some(key)) = (table, key) {
-                if let Ok(bytes) = decode_hex(hex) {
-                    if let Ok(value) = parse_vbkv(&bytes) {
+                let raw_hex = hex.clone();
+                let decoded = decode_hex(hex);
+                let should_skip = decoded
+                    .as_ref()
+                    .map(|bytes| bytes.len() < 8 || &bytes[..4] != b"VBKV")
+                    .unwrap_or_else(|_| raw_hex.trim().is_empty());
+                if should_skip {
+                    hex.clear();
+                    return;
+                }
+                match decoded.and_then(|bytes| parse_vbkv(&bytes)) {
+                    Ok(value) => {
                         out.entry(table.clone())
                             .or_default()
                             .insert(key.clone(), value);
+                    }
+                    Err(_) => {
+                        // Dota writes console.log asynchronously. Large dumps
+                        // (notably ranking_top) can be visible at EOF before
+                        // the final bytes have landed. Do not replace the last
+                        // good value with a transient decode failure.
                     }
                 }
             }
@@ -105,14 +110,37 @@ pub fn parse_log_text(body: &str) -> ParsedLog {
         };
 
     for line in body.lines() {
-        let trimmed = line.trim_start();
+        let Some(idx) = line.find("[stringtables]") else {
+            continue;
+        };
+        let trimmed = &line[idx..];
         if let Some(rest) = trimmed.strip_prefix("[stringtables] table ") {
             flush(&mut out, &table, &key, &mut hex);
             table = rest.split_whitespace().next().map(str::to_owned);
             key = None;
             continue;
         }
-        if !trimmed.starts_with("[stringtables]") {
+        // Check the ">>" hex-data line BEFORE the "key :" line. The VBKV ASCII
+        // column of a dump can contain ':' (e.g. buff strings "is_warlock:1"),
+        // so testing for a key first would misread a data line as a new key,
+        // prematurely flush a half-decoded blob, and drop the whole table.
+        if let Some(idx) = trimmed.find(">>") {
+            let after = &trimmed[idx + 2..];
+            let tokens = after.split_whitespace().collect::<Vec<_>>();
+            let mut trailing_hex = Vec::new();
+            for token in tokens.iter().rev() {
+                if (2..=8).contains(&token.len())
+                    && token.len() % 2 == 0
+                    && token.chars().all(|c| c.is_ascii_hexdigit())
+                {
+                    trailing_hex.push(*token);
+                } else {
+                    break;
+                }
+            }
+            for token in trailing_hex.iter().rev() {
+                hex.push_str(token);
+            }
             continue;
         }
         if let Some((_, rest)) = trimmed.split_once(':') {
@@ -121,14 +149,6 @@ pub fn parse_log_text(body: &str) -> ParsedLog {
                 flush(&mut out, &table, &key, &mut hex);
                 key = Some(candidate.to_owned());
                 continue;
-            }
-        }
-        if let Some(idx) = trimmed.find(">>") {
-            let after = &trimmed[idx + 2..];
-            for token in after.split_whitespace() {
-                if token.len() == 8 && token.chars().all(|c| c.is_ascii_hexdigit()) {
-                    hex.push_str(token);
-                }
             }
         }
     }
@@ -148,6 +168,9 @@ pub fn rows_from_parsed(parsed: ParsedLog) -> Vec<NettableRow> {
             continue;
         }
         for (key, raw) in entries {
+            if is_decode_error(&raw) {
+                continue;
+            }
             rows.push(NettableRow {
                 table_name: table_name.clone(),
                 key,
@@ -156,6 +179,10 @@ pub fn rows_from_parsed(parsed: ParsedLog) -> Vec<NettableRow> {
         }
     }
     rows
+}
+
+fn is_decode_error(value: &Value) -> bool {
+    matches!(value, Value::Object(map) if map.contains_key("_decode_error"))
 }
 
 fn parse_object(cursor: &mut Cursor<'_>) -> Result<Value, ParseError> {
@@ -171,6 +198,7 @@ fn parse_object(cursor: &mut Cursor<'_>) -> Result<Value, ParseError> {
             0x01 => Value::String(cursor.cstring()?),
             0x02 => Value::I32(cursor.i32_le()?),
             0x03 => Value::F32(f32::from_bits(cursor.u32_le()?)),
+            0x04 | 0x06 => Value::U32(cursor.u32_le()?),
             0x07 => Value::U64(cursor.u64_le()?),
             other => return Err(ParseError(format!("unknown VBKV type 0x{other:02x}"))),
         };
@@ -268,22 +296,6 @@ fn hex_nibble(byte: u8) -> Result<u8, ParseError> {
     }
 }
 
-fn json_string(value: &str) -> String {
-    let mut out = String::from("\"");
-    for ch in value.chars() {
-        match ch {
-            '"' => out.push_str("\\\""),
-            '\\' => out.push_str("\\\\"),
-            '\n' => out.push_str("\\n"),
-            '\r' => out.push_str("\\r"),
-            '\t' => out.push_str("\\t"),
-            other => out.push(other),
-        }
-    }
-    out.push('"');
-    out
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -362,6 +374,69 @@ mod tests {
         assert_eq!(
             parsed["CustomNetTable_dac_table"]["player_info"].to_json(),
             r#"{"name":"jack","rank":7}"#
+        );
+    }
+
+    #[test]
+    fn parses_timestamp_prefixed_dota_console_lines() {
+        let mut entries = string("name", "jack");
+        entries.extend(int32("rank", 7));
+        let blob = wrap(root(entries));
+        let log = format_block("CustomNetTable_dac_table", "player_info", &blob)
+            .lines()
+            .map(|line| format!("06/07 22:52:54 {line}"))
+            .collect::<Vec<_>>()
+            .join("\n");
+        let parsed = parse_log_text(&log);
+        assert_eq!(
+            parsed["CustomNetTable_dac_table"]["player_info"].to_json(),
+            r#"{"name":"jack","rank":7}"#
+        );
+    }
+
+    #[test]
+    fn parses_vbkv_with_colon_in_ascii_column() {
+        // player_info_table buff strings contain ':' (e.g. "is_warlock:1").
+        // The ':' must not be mistaken for a key separator on a ">>" data line.
+        let blob = wrap(root(string("buff", "is_warlock:1,is_nraqi:1,")));
+        let log = format_block("CustomNetTable_player_info_table", "player_info", &blob);
+        let parsed = parse_log_text(&log);
+        assert_eq!(
+            parsed["CustomNetTable_player_info_table"]["player_info"].to_json(),
+            r#"{"buff":"is_warlock:1,is_nraqi:1,"}"#
+        );
+    }
+
+    #[test]
+    fn ignores_non_vbkv_stringtable_noise() {
+        let log = [
+            "[stringtables] table CustomNetTable_dac_table 1",
+            "[stringtables]    0 : noise_entry",
+            "[stringtables]    >>  ................ 00000000 11111111",
+        ]
+        .join("\n");
+        let parsed = parse_log_text(&log);
+        assert!(parsed.is_empty());
+        assert!(rows_from_parsed(parsed).is_empty());
+    }
+
+    #[test]
+    fn incomplete_later_dump_does_not_overwrite_prior_good_value() {
+        let good = format_block(
+            "CustomNetTable_ranking_top_table",
+            "ranking_top",
+            &wrap(root(string("season", "s43"))),
+        );
+        let bad = [
+            "[stringtables] table CustomNetTable_ranking_top_table 1",
+            "[stringtables]    0 : ranking_top",
+            "[stringtables]    >>  VBKV........season 56424b56 11111111 00000173 6561736f 6e00",
+        ]
+        .join("\n");
+        let parsed = parse_log_text(&format!("{good}\n{bad}"));
+        assert_eq!(
+            parsed["CustomNetTable_ranking_top_table"]["ranking_top"].to_json(),
+            r#"{"season":"s43"}"#
         );
     }
 }

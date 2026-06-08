@@ -1,12 +1,19 @@
 mod config;
 mod gsi;
+mod hotkeys;
 mod nettable_parser;
+mod nettable_service;
 mod nettable_tail;
 mod outbox;
+mod queen_ladder;
+mod steam_auth;
+mod supabase;
 
 use config::Config;
+use nettable_service::{parsed_json, rows_json, NettableService};
 use nettable_tail::NettableTailer;
 use outbox::Outbox;
+use std::sync::{Arc, Mutex};
 use std::{
     env, fs,
     io::{self, BufRead, Write},
@@ -25,6 +32,29 @@ fn main() -> io::Result<()> {
             })?;
             let rows = nettable_parser::extract_rows(&path)?;
             println!("{}", rows_json(&rows));
+            Ok(())
+        }
+        "parse-log-full" => {
+            let path = args.get(1).map(PathBuf::from).ok_or_else(|| {
+                io::Error::new(io::ErrorKind::InvalidInput, "parse-log-full needs a path")
+            })?;
+            let parsed = nettable_parser::parse_log(&path)?;
+            println!("{}", parsed_json(&parsed));
+            Ok(())
+        }
+        // Same extraction the live standings board consumes — handy for
+        // confirming a console.log yields per-player state without a daemon.
+        "parse-live" => {
+            let path = args.get(1).map(PathBuf::from).ok_or_else(|| {
+                io::Error::new(io::ErrorKind::InvalidInput, "parse-live needs a path")
+            })?;
+            let rows = nettable_parser::extract_rows(&path)?;
+            let (players, local_ids) =
+                nettable_service::live_players_value(&rows, args.get(2).map(String::as_str));
+            println!(
+                "{}",
+                serde_json::json!({ "players": players, "local_steam_ids": local_ids })
+            );
             Ok(())
         }
         "queue" => {
@@ -57,29 +87,43 @@ fn main() -> io::Result<()> {
 }
 
 fn run_daemon() -> io::Result<()> {
-    let cfg = Config::load()?;
+    let mut cfg = Config::load()?;
     let outbox = Outbox::new(cfg.dac_dir.join("outbox"));
-    let _gsi = gsi::GsiServer::spawn(gsi::DEFAULT_PORT).ok();
-    emit(&format!(
-        r#"{{"type":"status","backend":"rust","recording":false,"focused":false,"logged_in":{},"steam_id":{},"steam_name":{},"replay_enabled":{}}}"#,
-        if cfg.steam_id.is_empty() {
-            "false"
-        } else {
-            "true"
-        },
-        json_string(&cfg.steam_id),
-        json_string(&cfg.steam_name),
-        if cfg.replay_enabled { "true" } else { "false" }
-    ))?;
+    let stdout_lock = Arc::new(Mutex::new(()));
+    let nettable = NettableService::new();
+    let _gsi = {
+        let stdout_lock = stdout_lock.clone();
+        let nettable = nettable.clone();
+        let cfg = cfg.clone();
+        gsi::GsiServer::spawn_with_callback(gsi::DEFAULT_PORT, move |event| {
+            if event == gsi::GsiEvent::DacPostGame {
+                let stdout_lock = stdout_lock.clone();
+                nettable.handle_post_game(cfg.clone(), move |line| {
+                    let _guard = stdout_lock.lock().ok();
+                    let _ = emit(&line);
+                });
+            }
+        })
+        .ok()
+    };
+    {
+        let stdout_lock = stdout_lock.clone();
+        nettable.start(cfg.clone(), move |line| {
+            let _guard = stdout_lock.lock().ok();
+            let _ = emit(&line);
+        });
+    }
+    if let Some(client) = supabase::SupabaseClient::from_config(&cfg) {
+        let _ = client.replay_outbox(&outbox);
+    }
+    emit(&status_json(&cfg))?;
 
     for line in io::stdin().lock().lines() {
         let line = line?;
         let cmd = json_string_field(&line, "cmd").unwrap_or_default();
         match cmd.as_str() {
             "quit" => break,
-            "status" => {
-                emit(r#"{"type":"status","backend":"rust","recording":false,"focused":false}"#)?
-            }
+            "status" => emit(&status_json(&cfg))?,
             "queue_ingest" | "queue_payload" => {
                 let payload =
                     json_object_field(&line, "payload").unwrap_or_else(|| "{}".to_owned());
@@ -101,17 +145,45 @@ fn run_daemon() -> io::Result<()> {
             "steam_logout" => {
                 cfg.save_value("steam_id", "\"\"")?;
                 cfg.save_value("steam_name", "\"\"")?;
+                cfg.steam_id.clear();
+                cfg.steam_name.clear();
                 emit(r#"{"type":"steam_logout"}"#)?;
             }
-            "steam_login" => emit_error("steam_login is not migrated to Rust yet; use DAC_BACKEND=python for Steam OAuth")?,
-            "toggle_recording" => emit_error("Replay recording is not migrated to Rust yet; use DAC_BACKEND=python for recording")?,
-            "nettable_status" => emit(r#"{"type":"nettable_status","backend":"rust","ok":true}"#)?,
-            "nettable_get_state" => emit(r#"{"type":"nettable_state","backend":"rust","rows":[]}"#)?,
-            "nettable_apply_launch_options" => emit_error("Launch-option mutation is not migrated to Rust yet")?,
-            "nettable_set_paused" => emit(r#"{"type":"nettable_paused","backend":"rust"}"#)?,
-            "nettable_upload_queens" => emit(r#"{"type":"nettable_queen_upload_complete","ok":false,"player_count":0,"upserted_count":0,"error":"Queen upload is not migrated to Rust yet."}"#)?,
-            "upload_logs" => emit_error("Log upload is not migrated to Rust yet")?,
-            "do_update" => emit_error("Auto-update apply is not migrated to Rust yet")?,
+            "steam_login" => match steam_auth::steam_login(Duration::from_secs(120)) {
+                Ok((steam_id, steam_name)) => {
+                    cfg.save_steam_user(&steam_id, &steam_name)?;
+                    cfg.steam_id = steam_id.clone();
+                    cfg.steam_name = steam_name.clone();
+                    if let Some(client) = supabase::SupabaseClient::from_config(&cfg) {
+                        let _ = client.upsert_user(&steam_id, &steam_name);
+                    }
+                    emit(&format!(
+                        r#"{{"type":"steam_login","steam_id":{},"steam_name":{}}}"#,
+                        json_string(&steam_id),
+                        json_string(&steam_name)
+                    ))?;
+                }
+                Err(err) => emit_error(&format!("steam_login failed: {err}"))?,
+            },
+            "toggle_recording" => emit_error("Replay recording is not available in the Rust-only nettable build")?,
+            "nettable_status" => emit(&nettable.status_json())?,
+            "nettable_get_state" => emit(&nettable.state_json())?,
+            "nettable_apply_launch_options" => emit(&nettable.apply_launch_options_json())?,
+            "nettable_check_active_match" => emit(&nettable.check_active_match_json())?,
+            "nettable_resync_from_steam" => emit(&nettable.status_json())?,
+            "nettable_set_paused" => {
+                let paused = json_bool_field(&line, "paused").unwrap_or(false);
+                nettable.set_paused(paused);
+                emit(&format!(
+                    r#"{{"type":"nettable_paused","backend":"rust","paused":{}}}"#,
+                    if paused { "true" } else { "false" }
+                ))?;
+            }
+            "nettable_upload_queens" => nettable.upload_queens(&cfg, |line| {
+                let _ = emit(&line);
+            }),
+            "upload_logs" => emit(r#"{"type":"diagnostics_uploaded","backend":"rust","storage_ok":false,"reason":"manual","paths":{},"message":"Diagnostic log upload is not available in the Rust-only nettable build."}"#)?,
+            "do_update" => emit(r#"{"type":"update_apply_requested","backend":"rust","ok":true}"#)?,
             "parse_log" => {
                 if let Some(path) = json_string_field(&line, "path") {
                     match nettable_parser::extract_rows(PathBuf::from(path).as_path()) {
@@ -144,21 +216,21 @@ fn run_daemon() -> io::Result<()> {
             other => emit_error(&format!("unknown command: {other}"))?,
         }
     }
+
     Ok(())
 }
 
-fn rows_json(rows: &[nettable_parser::NettableRow]) -> String {
+fn status_json(cfg: &Config) -> String {
     format!(
-        "[{}]",
-        rows.iter()
-            .map(|row| format!(
-                r#"{{"table_name":{},"key":{},"raw":{}}}"#,
-                json_string(&row.table_name),
-                json_string(&row.key),
-                row.raw.to_json()
-            ))
-            .collect::<Vec<_>>()
-            .join(",")
+        r#"{{"type":"status","backend":"rust","recording":false,"focused":false,"logged_in":{},"steam_id":{},"steam_name":{},"replay_enabled":{}}}"#,
+        if cfg.steam_id.is_empty() {
+            "false"
+        } else {
+            "true"
+        },
+        json_string(&cfg.steam_id),
+        json_string(&cfg.steam_name),
+        if cfg.replay_enabled { "true" } else { "false" }
     )
 }
 
@@ -215,6 +287,20 @@ fn json_field_raw(body: &str, key: &str) -> Option<String> {
         .find(|ch: char| ch == ',' || ch == '}')
         .unwrap_or(value.len());
     Some(value[..end].trim().to_owned())
+}
+
+fn json_bool_field(body: &str, key: &str) -> Option<bool> {
+    let marker = format!("\"{key}\"");
+    let (_, rest) = body.split_once(&marker)?;
+    let (_, rest) = rest.split_once(':')?;
+    let value = rest.trim_start();
+    if value.starts_with("true") {
+        Some(true)
+    } else if value.starts_with("false") {
+        Some(false)
+    } else {
+        None
+    }
 }
 
 fn json_object_field(body: &str, key: &str) -> Option<String> {

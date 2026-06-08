@@ -72,16 +72,26 @@ pub struct GsiServer {
 }
 
 impl GsiServer {
+    #[allow(dead_code)]
     pub fn spawn(port: u16) -> io::Result<Self> {
+        Self::spawn_with_callback(port, |_| {})
+    }
+
+    pub fn spawn_with_callback<F>(port: u16, on_event: F) -> io::Result<Self>
+    where
+        F: Fn(GsiEvent) + Send + Sync + 'static,
+    {
         let listener = TcpListener::bind(("127.0.0.1", port))?;
         let state = Arc::new(Mutex::new(GsiState::default()));
         let thread_state = Arc::clone(&state);
+        let on_event = Arc::new(on_event);
         thread::Builder::new()
             .name("gsi-listener-rs".to_owned())
             .spawn(move || {
                 for stream in listener.incoming().flatten() {
                     let state = Arc::clone(&thread_state);
-                    let _ = handle_stream(stream, state);
+                    let on_event = Arc::clone(&on_event);
+                    let _ = handle_stream(stream, state, on_event);
                 }
             })
             .map_err(io::Error::other)?;
@@ -121,15 +131,25 @@ pub fn install_cfg_text(port: u16) -> String {
     )
 }
 
-fn handle_stream(mut stream: TcpStream, state: Arc<Mutex<GsiState>>) -> io::Result<()> {
+fn handle_stream<F>(
+    mut stream: TcpStream,
+    state: Arc<Mutex<GsiState>>,
+    on_event: Arc<F>,
+) -> io::Result<()>
+where
+    F: Fn(GsiEvent) + Send + Sync + 'static,
+{
     let mut buffer = Vec::new();
     stream.read_to_end(&mut buffer)?;
     let request = String::from_utf8_lossy(&buffer);
     if let Some(body) = request.split("\r\n\r\n").nth(1) {
-        state
+        let event = state
             .lock()
             .expect("gsi state poisoned")
             .apply_payload(body);
+        if event == GsiEvent::DacPostGame {
+            on_event(event);
+        }
     }
     stream.write_all(b"HTTP/1.1 200 OK\r\nContent-Length: 0\r\n\r\n")?;
     Ok(())

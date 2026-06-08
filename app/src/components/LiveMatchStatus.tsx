@@ -1,7 +1,7 @@
 import { useMemo } from "react";
-import { costBorderColor, parseLineup, synIconName, mmrLevelToRank, unitStem } from "../lib/game-utils";
+import { costBorderColor, synIconName, mmrLevelToRank, unitStem } from "../lib/game-utils";
 import type { LivePlayer } from "../hooks/useNetTableEvents";
-import type { UnitFullInfo, SynergyInfo, ItemFullInfo } from "../types";
+import type { UnitFullInfo, SynergyInfo, RelicInfo, ItemFullInfo } from "../types";
 
 interface Props {
   /** Extracted per-player live state, keyed by steam_id (or slot_N when the
@@ -9,10 +9,15 @@ interface Props {
   players: Record<string, LivePlayer>;
   /** Steam IDs belonging to the local player. */
   localSteamIds: string[];
+  /** Current game round, shown in the standings header. */
+  round?: number;
   /** units_full.json — for unit cost (icon border) lookup. */
   unitsFull: Record<string, UnitFullInfo>;
   /** synergies.json (keyed by `is_*` stem) — for activation-tier thresholds. */
   synergiesData: Record<string, SynergyInfo>;
+  /** relics.json (keyed by `item_*` gameId) — resolves the live relic code
+   *  to a display name + icon. */
+  relicsData: Record<string, RelicInfo>;
   itemsFull?: Record<string, ItemFullInfo>;
 }
 
@@ -58,6 +63,35 @@ interface Seat {
 }
 
 /**
+ * Resolve a raw `chess_lineup` string into named, star-rated board units.
+ *
+ * The backend emits the lineup verbatim — comma-separated `chess_*` codes
+ * where star level is encoded as trailing `1`s (`chess_wl1` → Warlock 2★,
+ * `chess_br11` → Broodmother 3★). Mirrors the old Python `_resolve_chess_piece`:
+ * strip trailing `1`s to get the base id, stars = 1 + count stripped (1–3).
+ * Units live in the frontend (units_full.json), so the resolution lives here
+ * rather than duplicating that data into the backend.
+ */
+function resolveChessLineup(
+  raw: string | undefined,
+  idToUnit: Map<string, { name: string; cost: number }>,
+): { name: string; stars: number }[] {
+  if (!raw) return [];
+  const resolved: { name: string; stars: number; cost: number }[] = [];
+  for (const token of raw.replace(/\|/g, ",").split(",")) {
+    const code = token.trim();
+    if (!code || code === "placeholder") continue;
+    const base = code.replace(/1+$/, "");
+    const unit = idToUnit.get(base);
+    if (!unit) continue; // unknown id → no icon to show; skip quietly
+    const stars = Math.max(1, Math.min(1 + (code.length - base.length), 3));
+    resolved.push({ name: unit.name, stars, cost: unit.cost });
+  }
+  resolved.sort((a, b) => b.stars - a.stars || b.cost - a.cost);
+  return resolved.map(({ name, stars }) => ({ name, stars }));
+}
+
+/**
  * Live lobby standings: every player the capture can see (up to 8), sorted by
  * current placement, with the local player highlighted and pinned. Each seat
  * shows HP, level, gold, board (unit icons + stars), active synergies and
@@ -68,7 +102,7 @@ interface Seat {
  * NetTable carries no player names (only steam_id + slot), so opponents are
  * labelled by placement. Renders nothing until there's at least one capture.
  */
-export function LiveMatchStatus({ players, localSteamIds, unitsFull, synergiesData, itemsFull }: Props) {
+export function LiveMatchStatus({ players, localSteamIds, round, unitsFull, synergiesData, relicsData, itemsFull }: Props) {
   void itemsFull;
   const unitCosts = useMemo(() => {
     const out: Record<string, number> = {};
@@ -76,6 +110,16 @@ export function LiveMatchStatus({ players, localSteamIds, unitsFull, synergiesDa
       out[name] = Number(info.cost) || 0;
     }
     return out;
+  }, [unitsFull]);
+
+  // chess_* code → { display name, cost }, for resolving raw live lineups.
+  const chessIdToUnit = useMemo(() => {
+    const map = new Map<string, { name: string; cost: number }>();
+    for (const [name, info] of Object.entries(unitsFull)) {
+      const id = (info as { id?: unknown }).id;
+      if (typeof id === "string") map.set(id, { name, cost: Number(info.cost) || 0 });
+    }
+    return map;
   }, [unitsFull]);
 
   const localIdSet = useMemo(() => new Set(localSteamIds), [localSteamIds]);
@@ -226,18 +270,28 @@ export function LiveMatchStatus({ players, localSteamIds, unitsFull, synergiesDa
         .live-seat-syn { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
         .live-seat-syn-item { display: flex; align-items: center; gap: 3px; }
         .live-seat-syn-item img { width: 16px; height: 16px; }
-        .live-seat-relic { color: var(--gold); }
+        .live-seat-relic { display: inline-flex; align-items: center; gap: 4px; color: var(--gold); }
+        .live-seat-relic img { width: 16px; height: 16px; border-radius: var(--r-2); }
+        .live-seat-relics { display: flex; align-items: center; gap: 3px; flex-wrap: wrap; }
+        .live-seat-relic-icon { width: 18px; height: 18px; border-radius: var(--r-2); border: 1px solid var(--border); }
       `}</style>
 
       <span className="live-board-title">
-        Live standings · {seats.length} player{seats.length === 1 ? "" : "s"}
+        Live standings{round != null ? ` · Round ${round}` : ""} · {seats.length}{" "}
+        player{seats.length === 1 ? "" : "s"}
       </span>
 
       <div className="live-seats">
         {seats.map(({ id, player, isLocal }) => {
           const hp = Math.max(0, player.hp ?? 0);
-          const units = parseLineup(player.lineup || "", unitCosts);
+          const units = resolveChessLineup(player.lineup, chessIdToUnit);
           const synergies = parseBuff(player.buff, firstTier);
+          const relicCodes =
+            player.relics && player.relics.length > 0
+              ? player.relics
+              : player.relic
+                ? [player.relic]
+                : [];
           const label = isLocal
             ? "You"
             : player.placement
@@ -300,7 +354,7 @@ export function LiveMatchStatus({ players, localSteamIds, unitsFull, synergiesDa
                 </div>
               )}
 
-              {(synergies.length > 0 || player.relic) && (
+              {(synergies.length > 0 || relicCodes.length > 0) && (
                 <div className="live-seat-foot">
                   {synergies.length > 0 && (
                     <div className="live-seat-syn">
@@ -318,7 +372,32 @@ export function LiveMatchStatus({ players, localSteamIds, unitsFull, synergiesDa
                       ))}
                     </div>
                   )}
-                  {player.relic && <span className="live-seat-relic">{player.relic}</span>}
+                  {relicCodes.length > 0 && (
+                    <div className="live-seat-relics">
+                      {relicCodes.map((code, i) => {
+                        const info = relicsData[code];
+                        const name = info?.name ?? code;
+                        const icon =
+                          typeof info?.icon === "string" ? info.icon : undefined;
+                        return icon ? (
+                          <img
+                            key={`${code}-${i}`}
+                            className="live-seat-relic-icon"
+                            src={`icons://${icon}`}
+                            alt={name}
+                            title={name}
+                            onError={(e) => {
+                              (e.currentTarget as HTMLImageElement).style.display = "none";
+                            }}
+                          />
+                        ) : (
+                          <span key={`${code}-${i}`} className="live-seat-relic" title={name}>
+                            {name}
+                          </span>
+                        );
+                      })}
+                    </div>
+                  )}
                 </div>
               )}
             </div>

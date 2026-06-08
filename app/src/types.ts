@@ -187,7 +187,7 @@ export interface LogEntry {
   msg: string;
   /** Which file the line came from. "tracker" = backend's tracker.log,
    *  "dota" = Dota 2's console.log. Optional for backwards-compat with
-   *  events emitted via the Python IPC channel. */
+   *  older backend events that did not include a source. */
   source?: "tracker" | "dota";
 }
 
@@ -229,6 +229,7 @@ export type TrackerEvent =
   | { type: "replay_saved" }
   | { type: "error"; message: string }
   | { type: "steam_login"; steam_id: string; steam_name: string }
+  | { type: "steam_logout" }
   | { type: "notification"; title: string; message: string };
 
 export interface UnitInfo {

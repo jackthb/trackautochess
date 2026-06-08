@@ -49,6 +49,15 @@ interface TrackerState {
 // Slightly longer than the backend's IMPORT_TIMEOUT_SEC (90s).
 const IMPORT_SAFETY_TIMEOUT_MS = 100_000;
 
+function cleanSteamName(value: unknown): string {
+  if (typeof value !== "string") return "";
+  return value
+    .trim()
+    .replace(/^<!\[CDATA\[/, "")
+    .replace(/\]\]>$/, "")
+    .trim();
+}
+
 export function useTrackerEvents(
   onImportResult?: () => void,
   onReplaySaved?: () => void
@@ -103,7 +112,7 @@ export function useTrackerEvents(
           });
           break;
         case "status":
-          setStatus(msg);
+          setStatus({ ...msg, steam_name: cleanSteamName(msg.steam_name) });
           if (msg.logged_in) {
             setAuthError(null);
           }
@@ -120,8 +129,11 @@ export function useTrackerEvents(
             admin_mode: prev?.admin_mode ?? false,
             logged_in: true,
             steam_id: msg.steam_id,
-            steam_name: msg.steam_name,
+            steam_name: cleanSteamName(msg.steam_name),
           }));
+          break;
+        case "steam_logout":
+          setStatus((prev) => prev ? { ...prev, logged_in: false, steam_id: "", steam_name: "" } : prev);
           break;
         case "notification":
           if (msg.message?.toLowerCase().includes("steam login failed")) {

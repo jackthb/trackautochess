@@ -106,16 +106,18 @@ export function LogTab() {
       )}
       {entries.map((entry, i) => {
         const source = entry.source ?? "tracker";
+        if (!entry.msg?.trim()) return null;
         return (
-          <div key={i} style={{ display: "flex", gap: "10px", whiteSpace: "pre-wrap", wordBreak: "break-word" }}>
-            <span style={{ color: "var(--text-muted)", flexShrink: 0 }}>
+          <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: "10px", whiteSpace: "pre-wrap", wordBreak: "break-word" }}>
+            <span style={{ color: "var(--text-muted)", flexShrink: 0, whiteSpace: "nowrap" }}>
               {formatTime(entry.ts)}
             </span>
             <span
               style={{
                 color: SOURCE_COLORS[source] || "var(--text-muted)",
                 flexShrink: 0,
-                width: "60px",
+                width: "72px",
+                whiteSpace: "nowrap",
               }}
             >
               [{source}]
@@ -125,11 +127,14 @@ export function LogTab() {
                 color: LEVEL_COLORS[entry.level] || "var(--text-secondary)",
                 flexShrink: 0,
                 width: "55px",
+                whiteSpace: "nowrap",
               }}
             >
               {entry.level}
             </span>
-            <span style={{ color: "var(--text-primary)" }}>{entry.msg}</span>
+            <span style={{ color: "var(--text-primary)", flex: 1, minWidth: 0 }}>
+              {entry.msg}
+            </span>
           </div>
         );
       })}

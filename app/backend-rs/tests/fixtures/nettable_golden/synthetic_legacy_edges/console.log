@@ -1,0 +1,16 @@
+[stringtables] table CustomNetTable_dac_table 2
+[stringtables]    0 : player_info
+[stringtables]    >>  VBKV.......name.jack..ra 56424b56 aabbccdd 0000016e 616d6500 6a61636b 00027261
+[stringtables]    >>  nk......ratio....?.      6e6b0007 00000003 72617469 6f000000 003f0b
+[stringtables]    1 : u32_types
+[stringtables]    >>  VBKV.......ptr.@....colo 56424b56 aabbccdd 00000470 74720040 e2010006 636f6c6f
+[stringtables]    >>  r.D3"..                  72004433 22110b
+[stringtables] table CustomNetTable_game_info 2
+[stringtables]    0 : short_final_token
+[stringtables]    >>  VBKV.......tiny.x..      56424b56 aabbccdd 00000174 696e7900 78000b
+[stringtables]    1 : borked
+[stringtables]    >>  VBKV......fjunk.data     56424b56 aabbccdd 0000666a 756e6b00 64617461
+[stringtables] table ModifierNames 1
+[stringtables]    0 : ignored_non_custom
+[stringtables]    >>  VBKV.......name.jack..ra 56424b56 aabbccdd 0000016e 616d6500 6a61636b 00027261
+[stringtables]    >>  nk......ratio....?.      6e6b0007 00000003 72617469 6f000000 003f0b

@@ -122,12 +122,18 @@ def _normalize_season_key(value) -> str:
     return raw
 
 
-def _clear_queen_ladder_snapshot(client) -> bool:
-    """Clear previous in-game Queen ladder fields before writing a new scan."""
+def _clear_stale_queen_ladder_snapshot(client, current_steam_ids: set[int]) -> bool:
+    """Clear Queen ladder fields only for users absent from the new scan."""
+    if not current_steam_ids:
+        return True
+    ids = ",".join(str(steam_id) for steam_id in sorted(current_steam_ids))
     try:
         resp = client.patch(
             "/rest/v1/users",
-            params={"queen_ladder_last_seen_at": "not.is.null"},
+            params={
+                "queen_ladder_last_seen_at": "not.is.null",
+                "steam_id": f"not.in.({ids})",
+            },
             json={
                 "queen_ladder_rank": None,
                 "queen_ladder_mmr": None,
@@ -144,7 +150,7 @@ def _clear_queen_ladder_snapshot(client) -> bool:
                 body = e.response.text
             except Exception:
                 pass
-        log.error("clear queen ladder snapshot error: %s | body: %s", e, body)
+        log.error("clear stale queen ladder snapshot error: %s | body: %s", e, body)
         return False
 
 
@@ -252,6 +258,7 @@ def push_match_players(match_id: str, players: list[dict]) -> int:
         return 0
 
     rows = []
+    seen_steam_ids: set[int] = set()
     for p in players:
         r = {k: v for k, v in p.items() if k in _MATCH_PLAYER_COLUMNS}
         # steam_id stored as bigint server-side
@@ -260,6 +267,10 @@ def push_match_players(match_id: str, players: list[dict]) -> int:
                 r["steam_id"] = int(str(r["steam_id"]).strip())
             except (TypeError, ValueError):
                 continue
+        steam_id = r.get("steam_id")
+        if not isinstance(steam_id, int) or steam_id in seen_steam_ids:
+            continue
+        seen_steam_ids.add(steam_id)
         r["match_id"] = match_id
         rows.append(r)
     if not rows:
@@ -271,7 +282,7 @@ def push_match_players(match_id: str, players: list[dict]) -> int:
 
     try:
         resp = client.post(
-            "/rest/v1/match_players",
+            "/rest/v1/match_players?on_conflict=match_id,steam_id",
             json=rows,
             headers={"Prefer": "resolution=ignore-duplicates,return=minimal"},
         )
@@ -344,9 +355,6 @@ def upsert_queen_ladder_players(players: list[dict]) -> int:
     if not rows:
         return 0
 
-    if not _clear_queen_ladder_snapshot(client):
-        return 0
-
     try:
         resp = client.post(
             "/rest/v1/users",
@@ -354,6 +362,8 @@ def upsert_queen_ladder_players(players: list[dict]) -> int:
             headers={"Prefer": "resolution=merge-duplicates,return=minimal"},
         )
         resp.raise_for_status()
+        if not _clear_stale_queen_ladder_snapshot(client, seen):
+            log.warning("upserted queen ladder rows, but stale ladder cleanup failed")
         log.info("upserted %d queen ladder user row(s)", len(rows))
         return len(rows)
     except Exception as e:
