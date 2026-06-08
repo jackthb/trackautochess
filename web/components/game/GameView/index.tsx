@@ -61,6 +61,7 @@ interface TimelinePlayerSnap {
   level?: number;
   placement?: number;
   lineup?: string;
+  hand?: string;
   lineup_value?: number;
   total_money?: number;
   win_round?: number;
@@ -118,9 +119,11 @@ function PlayerDetail({
   gold,
   board,
   lineupStr,
+  hand,
 }: {
   lineup: { name: string; stars: number }[];
   lineupStr: string | null;
+  hand: { name: string; stars: number }[];
   synergies: { name: string; count: number }[];
   relicsToShow: RelicTimelineEntry[];
   hasRelicTimeline: boolean;
@@ -156,6 +159,43 @@ function PlayerDetail({
           <div className={styles.pdLabel}>Lineup</div>
           <div className={styles.pdLineup}>
             {lineup.map((u, i) => (
+              <TooltipWrap
+                key={i}
+                type="unit"
+                name={u.name}
+                stars={u.stars}
+                data={tooltipData}
+              >
+                <div className={`unit-icon-wrap ${styles.pdUnit}`}>
+                  <img
+                    className="unit-icon"
+                    src={iconUrl("units", unitStem(u.name))}
+                    alt={u.name}
+                    loading="lazy"
+                    style={{
+                      borderColor: costBorderColor(UNIT_COSTS[u.name] || 1),
+                    }}
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).style.display = "none";
+                    }}
+                  />
+                  {u.stars > 1 && (
+                    <span className={`unit-stars s${u.stars}`}>
+                      {"★".repeat(u.stars)}
+                    </span>
+                  )}
+                </div>
+              </TooltipWrap>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {hand.length > 0 && (
+        <div className={styles.pdSection}>
+          <div className={styles.pdLabel}>Hand</div>
+          <div className={styles.pdLineup}>
+            {hand.map((u, i) => (
               <TooltipWrap
                 key={i}
                 type="unit"
@@ -303,6 +343,7 @@ function MatchPlayerRow({
   // to the static games.lineup for rows without a snapshot at this round.
   const lineupStr = snap?.lineup ?? game.lineup;
   const lineup = parseLineup(lineupStr, UNIT_COSTS);
+  const hand = parseLineup(snap?.hand ?? "", UNIT_COSTS);
 
   const isScrubbing = snapRound !== null && !isLastRound;
   const parsedSyn = !isScrubbing ? parseSynergies(game.synergies) : [];
@@ -333,7 +374,7 @@ function MatchPlayerRow({
   // No lineup / synergies / relics → nothing to expand into. Render as a
   // static (non-clickable) row and skip the caret + detail panel.
   const hasContent =
-    lineup.length > 0 || synergies.length > 0 || compactRelics.length > 0;
+    lineup.length > 0 || hand.length > 0 || synergies.length > 0 || compactRelics.length > 0;
   const isOpen = expanded && hasContent;
 
   const rankLabel =
@@ -491,6 +532,7 @@ function MatchPlayerRow({
           gold={snap?.total_money ?? null}
           board={snap?.board}
           lineupStr={lineupStr}
+          hand={hand}
         />
       )}
     </div>

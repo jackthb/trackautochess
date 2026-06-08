@@ -809,7 +809,7 @@ mod tests {
                         (
                             "CustomNetTable_player_info_table",
                             "player_info",
-                            serde_json::json!({"data": {"76561198022169086": {"hp": 88, "hero_level": 5, "curr_rank": 1, "player_id": 0}}}),
+                            serde_json::json!({"data": {"76561198022169086": {"hp": 88, "hero_level": 5, "curr_rank": 1, "player_id": 0, "chess_hand": "chess_lion,chess_ck1,"}}}),
                         ),
                         (
                             "CustomNetTable_player_id_table",
@@ -843,6 +843,10 @@ mod tests {
         assert_eq!(
             timeline["rounds"][0]["players"]["76561198022169086"]["hp"],
             88
+        );
+        assert_eq!(
+            timeline["rounds"][0]["players"]["76561198022169086"]["hand"],
+            "Lion|Chaos Knight(2)"
         );
         let board = &timeline["rounds"][0]["players"]["76561198022169086"]["board"][0];
         assert_eq!(board["name"], "Chaos Knight");
@@ -1298,6 +1302,7 @@ const LIVE_PLAYER_FIELDS: &[(&str, &str)] = &[
     ("curr_rank", "placement"),
     ("duration", "duration"),
     ("chess_lineup", "lineup"),
+    ("chess_hand", "hand"),
     ("lineup_value", "lineup_value"),
     ("total_money", "total_money"),
     ("win_round", "win_round"),
@@ -1344,7 +1349,7 @@ pub fn live_players_value(
                     if !value.is_null() {
                         // The live table is harvested first; or_insert keeps
                         // its value over the dac_table gap-fill pass.
-                        let normalized = if *dst == "lineup" {
+                        let normalized = if *dst == "lineup" || *dst == "hand" {
                             value
                                 .as_str()
                                 .and_then(normalize_chess_lineup)

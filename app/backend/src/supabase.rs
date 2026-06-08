@@ -573,6 +573,13 @@ fn build_end_board_upload(rows: &[Value], played_at: &str) -> Option<EndBoardUpl
             {
                 row.insert("chess_lineup".to_owned(), json!(lineup));
             }
+            if let Some(hand) = player
+                .get("chess_hand")
+                .and_then(Value::as_str)
+                .and_then(normalize_chess_lineup)
+            {
+                row.insert("chess_hand".to_owned(), json!(hand));
+            }
             if let Some(lineup) = player
                 .get("max_lineup_value_lineup")
                 .and_then(Value::as_str)
@@ -589,12 +596,9 @@ fn build_end_board_upload(rows: &[Value], played_at: &str) -> Option<EndBoardUpl
                 }
             }
             if !row.contains_key("synergies") {
-                if let Some(synergies) = normalize_synergy_string(
-                    player
-                        .get("buff")
-                        .or_else(|| player.get("show_buff"))
-                        .and_then(Value::as_str),
-                ) {
+                if let Some(synergies) =
+                    normalize_synergy_string(player.get("buff").and_then(Value::as_str))
+                {
                     row.insert("synergies".to_owned(), json!(synergies));
                 }
             }
@@ -819,6 +823,7 @@ mod tests {
                             "1": "talent_1b_losebonus"
                         },
                         "chess_lineup": "Axe(2)",
+                        "chess_hand": "chess_ck1,chess_lion,",
                         "screenshot": "legacy screenshot should not upload",
                         "notes": "legacy notes should not upload",
                         "unknown_future_field": "drop me"
@@ -862,6 +867,7 @@ mod tests {
         assert_eq!(second["synergies"], "demon:5|demonhunter:2|warlock:2");
         assert_eq!(second["talents"], "talent_1b_losebonus|talent_2b_promotion");
         assert_eq!(second["chess_lineup"], "Axe(2)");
+        assert_eq!(second["chess_hand"], "Chaos Knight(2)|Lion");
         assert!(
             second.get("screenshot").is_none(),
             "legacy screenshot column should not be posted"
