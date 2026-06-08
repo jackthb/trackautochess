@@ -262,7 +262,7 @@ impl SupabaseClient {
         self.post_json(
             "/rest/v1/matches",
             &upload.match_row,
-            "resolution=ignore-duplicates,return=minimal",
+            "resolution=merge-duplicates,return=minimal",
         )?;
         let players = dedupe_match_players(upload.players);
         if !players.is_empty() {
@@ -270,7 +270,7 @@ impl SupabaseClient {
             self.post_json(
                 "/rest/v1/match_players?on_conflict=match_id,steam_id",
                 &Value::Array(players),
-                "resolution=ignore-duplicates,return=minimal",
+                "resolution=merge-duplicates,return=minimal",
             )?;
         }
         Ok(Some(match_id))
@@ -489,9 +489,21 @@ fn build_end_board_upload(rows: &[Value], played_at: &str) -> Option<EndBoardUpl
         .collect::<Vec<_>>();
     pairs.sort();
     let match_id = generate_live_match_id(&pairs);
+    let final_round = data
+        .values()
+        .filter_map(|player| value_i64(player.get("round")))
+        .max();
+    let duration = data
+        .values()
+        .filter_map(|player| value_f64(player.get("duration")))
+        .fold(None, |acc: Option<f64>, value| {
+            Some(acc.map_or(value, |current| current.max(value)))
+        });
     let match_row = json!({
         "match_id": match_id,
         "played_at": played_at,
+        "duration": duration,
+        "final_round": final_round,
         "player_count": data.len(),
         "capture_status": "complete",
         "is_finished": true,
@@ -519,12 +531,83 @@ fn build_end_board_upload(rows: &[Value], played_at: &str) -> Option<EndBoardUpl
             row.insert("match_id".to_owned(), json!(match_id));
             row.insert("steam_id".to_owned(), json!(steam_id_num));
             row.insert("placement".to_owned(), json!(placement));
+            if !row.contains_key("final_round") {
+                if let Some(round) = player.get("round") {
+                    row.insert("final_round".to_owned(), round.clone());
+                }
+            }
+            if !row.contains_key("synergies") {
+                if let Some(synergies) = normalize_synergy_string(
+                    player
+                        .get("show_buff")
+                        .or_else(|| player.get("buff"))
+                        .and_then(Value::as_str),
+                ) {
+                    row.insert("synergies".to_owned(), json!(synergies));
+                }
+            }
+            if !row.contains_key("talents") {
+                if let Some(talents) = normalize_talents(player.get("talent_tree")) {
+                    row.insert("talents".to_owned(), json!(talents));
+                }
+            }
             row.entry("played_at".to_owned())
                 .or_insert_with(|| json!(played_at));
             Some(Value::Object(row))
         })
         .collect::<Vec<_>>();
     Some(EndBoardUpload { match_row, players })
+}
+
+fn value_i64(value: Option<&Value>) -> Option<i64> {
+    value.and_then(|value| match value {
+        Value::Number(number) => number
+            .as_i64()
+            .or_else(|| number.as_u64().map(|v| v as i64)),
+        Value::String(value) => value.parse::<i64>().ok(),
+        _ => None,
+    })
+}
+
+fn value_f64(value: Option<&Value>) -> Option<f64> {
+    value.and_then(|value| match value {
+        Value::Number(number) => number.as_f64(),
+        Value::String(value) => value.parse::<f64>().ok(),
+        _ => None,
+    })
+}
+
+fn normalize_synergy_string(value: Option<&str>) -> Option<String> {
+    let out = value?
+        .split(',')
+        .filter_map(|entry| {
+            let entry = entry.trim();
+            if entry.is_empty() {
+                return None;
+            }
+            let (name, count) = entry.split_once(':')?;
+            let name = name.trim().strip_prefix("is_").unwrap_or(name.trim());
+            let count = count.trim();
+            (!name.is_empty() && !count.is_empty()).then(|| format!("{name}:{count}"))
+        })
+        .collect::<Vec<_>>()
+        .join("|");
+    (!out.is_empty()).then_some(out)
+}
+
+fn normalize_talents(value: Option<&Value>) -> Option<String> {
+    let object = value?.as_object()?;
+    let mut entries = object
+        .iter()
+        .filter_map(|(slot, talent)| Some((slot.parse::<i64>().ok()?, talent.as_str()?)))
+        .collect::<Vec<_>>();
+    entries.sort_by_key(|(slot, _)| *slot);
+    let out = entries
+        .into_iter()
+        .map(|(_, talent)| talent)
+        .collect::<Vec<_>>()
+        .join("|");
+    (!out.is_empty()).then_some(out)
 }
 
 fn build_fallback_match_row(rows: &[NettableRow], reason: &str, played_at: &str) -> Option<Value> {
@@ -676,6 +759,13 @@ mod tests {
                         "rank": 8,
                         "curr_rank": 2,
                         "mmr_level": 4200,
+                        "round": 34,
+                        "duration": 2084.5,
+                        "show_buff": "is_shaman:3,is_kobold:2,is_pandaman:2,",
+                        "talent_tree": {
+                            "2": "talent_2b_promotion",
+                            "1": "talent_1b_losebonus"
+                        },
                         "chess_lineup": "Axe(2)",
                         "screenshot": "legacy screenshot should not upload",
                         "notes": "legacy notes should not upload",
@@ -683,6 +773,8 @@ mod tests {
                     },
                     "76561198000000001": {
                         "rank": 1,
+                        "round": 42,
+                        "duration": 2400.0,
                         "played_at": "from-payload",
                         "relic": "relic_example"
                     },
@@ -696,6 +788,8 @@ mod tests {
 
         assert_eq!(upload.match_row["match_id"], "d5246b0d2fcc093d");
         assert_eq!(upload.match_row["player_count"], 3);
+        assert_eq!(upload.match_row["final_round"], 42);
+        assert_eq!(upload.match_row["duration"], 2400.0);
         assert_eq!(upload.match_row["capture_status"], "complete");
         assert_eq!(upload.match_row["verification_source"], "end_board");
         assert_eq!(
@@ -711,6 +805,10 @@ mod tests {
             .expect("second player row should exist");
         assert_eq!(second["placement"], 2, "curr_rank should win over rank");
         assert_eq!(second["mmr_level"], 4200);
+        assert_eq!(second["final_round"], 34);
+        assert_eq!(second["duration"], 2084.5);
+        assert_eq!(second["synergies"], "shaman:3|kobold:2|pandaman:2");
+        assert_eq!(second["talents"], "talent_1b_losebonus|talent_2b_promotion");
         assert_eq!(second["chess_lineup"], "Axe(2)");
         assert!(
             second.get("screenshot").is_none(),
