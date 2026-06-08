@@ -266,6 +266,7 @@ impl SupabaseClient {
         )?;
         let players = dedupe_match_players(upload.players);
         if !players.is_empty() {
+            self.ensure_match_player_users(&players)?;
             self.post_json(
                 "/rest/v1/match_players?on_conflict=match_id,steam_id",
                 &Value::Array(players),
@@ -273,6 +274,24 @@ impl SupabaseClient {
             )?;
         }
         Ok(Some(match_id))
+    }
+
+    fn ensure_match_player_users(&self, players: &[Value]) -> Result<(), String> {
+        let mut seen = HashSet::new();
+        let rows = players
+            .iter()
+            .filter_map(|player| player.get("steam_id").and_then(Value::as_u64))
+            .filter(|steam_id| seen.insert(*steam_id))
+            .map(|steam_id| json!({ "steam_id": steam_id }))
+            .collect::<Vec<_>>();
+        if rows.is_empty() {
+            return Ok(());
+        }
+        self.post_json(
+            "/rest/v1/users",
+            &Value::Array(rows),
+            "resolution=ignore-duplicates,return=minimal",
+        )
     }
 
     pub fn replay_outbox(&self, outbox: &Outbox) -> io::Result<usize> {
