@@ -67,6 +67,17 @@ export async function resolvePlayerRoute(
   const parsed = parseSteamInput(rawSteamId);
   if (!parsed) return null;
   if (parsed.kind === "id") {
+    // Pull the cached row so the page can short-circuit the id→vanity redirect
+    // before any heavy loading. The main load reuses this same row, so this is
+    // not an extra query on the warm path.
+    if (supabase) {
+      const { data } = await supabase
+        .from("users")
+        .select(USER_DRODO_SELECT)
+        .eq("steam_id", parsed.value)
+        .maybeSingle<CachedUserDrodoRow>();
+      return { steamId: parsed.value, cachedProfileRow: data ?? null };
+    }
     return { steamId: parsed.value, cachedProfileRow: null };
   }
 

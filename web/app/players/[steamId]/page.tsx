@@ -103,6 +103,25 @@ const loadPlayer = cache(async (rawSteamId: string): Promise<LoadResult> => {
     return { kind: "notFound" };
   }
   const { steamId } = resolved;
+
+  // Short-circuit the id→vanity redirect using the custom_url we already have,
+  // before any heavy loading (Supabase queries, Steam/Drodo fetches). Visiting
+  // by numeric Steam ID otherwise paid a full ~1.5s render just to compute the
+  // redirect target. The cold case (no cached custom_url) still falls through to
+  // the late redirect below once a fresh Steam profile is fetched.
+  const cachedCustomUrl = resolved.cachedProfileRow?.custom_url ?? null;
+  if (
+    /^\d+$/.test(rawSteamId) &&
+    rawSteamId === steamId &&
+    cachedCustomUrl &&
+    cachedCustomUrl !== rawSteamId
+  ) {
+    return {
+      kind: "redirect",
+      destination: playerProfilePath(steamId, cachedCustomUrl),
+    };
+  }
+
   const manualRefreshQuota = getManualRefreshQuota(undefined, Date.now(), {
     cadence: "public",
     target: steamId,
