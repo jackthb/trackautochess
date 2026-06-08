@@ -261,22 +261,14 @@
   line-height: 1.55;
   color: var(--text-muted);
 }
-.steamTrustNote summary {
+.steamTrustLead {
   display: inline-flex;
   align-items: center;
   gap: 7px;
   width: fit-content;
   font-family: var(--font-mono);
   color: var(--text-secondary);
-  cursor: pointer;
-  list-style: none;
   letter-spacing: 0.35px;
-}
-.steamTrustNote summary::-webkit-details-marker {
-  display: none;
-}
-.steamTrustNote summary:hover {
-  color: var(--text-primary);
 }
 .steamTrustIcon {
   display: inline-flex;

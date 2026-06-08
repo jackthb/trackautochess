@@ -3,194 +3,66 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { parseSteamInput, playerProfilePath } from "@/lib/steam";
+import { type SearchResult } from "@/lib/playerSearch";
 import {
-  mergeSearchResults,
-  sortSearchResults,
-  type SearchResult,
-} from "@/lib/playerSearch";
+  addRecentPlayer,
+  getRecentPlayers,
+  type RecentPlayer,
+} from "@/lib/recentPlayers";
 import { bucketCount, trackEvent } from "@/lib/analytics";
 import styles from "./ProfileSearch.module.css";
-
-const MAX_VISIBLE_RESULTS = 5;
 
 interface ProfileSearchProps {
   autoFocus?: boolean;
   className?: string;
-  initialResults?: SearchResult[];
   analyticsSource?: string;
   placeholder?: string;
+  /** Optional example input shown beneath the box (e.g. a Steam profile URL). */
+  exampleUrl?: string;
 }
 
 export function ProfileSearch({
   autoFocus = false,
   className = "",
-  initialResults = [],
   analyticsSource = "profile_search",
   placeholder = "Steam vanity URL, profile URL, or Steam ID",
+  exampleUrl,
 }: ProfileSearchProps) {
   const router = useRouter();
   const [searchValue, setSearchValue] = useState("");
-  const [searching, setSearching] = useState(false);
   const [lookupLoading, setLookupLoading] = useState(false);
-  const [showLookupBar, setShowLookupBar] = useState(false);
+  const [lookupDone, setLookupDone] = useState(false);
   const [lookupError, setLookupError] = useState<string | null>(null);
-  const [defaultResults, setDefaultResults] =
-    useState<SearchResult[]>(initialResults);
-  const [results, setResults] = useState<SearchResult[]>(initialResults);
-  const [searchedValue, setSearchedValue] = useState("");
-  const [dropdownOpen, setDropdownOpen] = useState(false);
-  const [highlightedIndex, setHighlightedIndex] = useState(-1);
-  const searchReqRef = useRef(0);
-  const defaultReqRef = useRef(0);
+  const [recents, setRecents] = useState<RecentPlayer[]>([]);
   const lookupReqRef = useRef(0);
-  const lookupBarTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const clearLookupBarTimer = () => {
-    if (lookupBarTimerRef.current) {
-      clearTimeout(lookupBarTimerRef.current);
-      lookupBarTimerRef.current = null;
-    }
-  };
-
-  const localMatches = (value: string): SearchResult[] => {
-    const parsed = parseSteamInput(value);
-    const terms = [value, parsed?.value]
-      .filter((term): term is string => Boolean(term))
-      .map((term) => term.toLowerCase());
-    if (terms.length === 0) return defaultResults;
-    return sortSearchResults(
-      defaultResults.filter((row) => {
-        return terms.some(
-          (term) =>
-            row.steam_id.includes(term) ||
-            row.name?.toLowerCase().includes(term) ||
-            row.custom_url?.toLowerCase().includes(term),
-        );
-      }),
-      parsed?.value ?? value,
-    );
-  };
-
-  useEffect(() => {
-    if (defaultResults.length > 0) return;
-
-    const reqId = ++defaultReqRef.current;
-    fetch("/api/players/search")
-      .then(async (resp) => (resp.ok ? resp.json() : []))
-      .then((data) => {
-        if (reqId !== defaultReqRef.current) return;
-        const rows = Array.isArray(data) ? (data as SearchResult[]) : [];
-        setDefaultResults(rows);
-        if (!searchValue.trim()) {
-          setResults(rows);
-          setHighlightedIndex(-1);
-        }
-      })
-      .catch(() => {});
-  }, [defaultResults.length, searchValue]);
-
-  useEffect(() => {
-    const val = searchValue.trim();
-    if (!val) {
-      searchReqRef.current += 1;
-      setResults(defaultResults);
-      setSearchedValue("");
-      setDropdownOpen(false);
-      setHighlightedIndex(-1);
-      setSearching(false);
-      return;
-    }
-
-    const safe = val.replace(/[,()%*]/g, "");
-    if (!safe) {
-      setResults([]);
-      setSearchedValue(val);
-      setDropdownOpen(true);
-      setHighlightedIndex(-1);
-      setSearching(false);
-      return;
-    }
-
-    const localRows = localMatches(safe);
-    setResults(localRows);
-    setSearchedValue(val);
-    setDropdownOpen(true);
-    setHighlightedIndex(localRows.length > 0 ? 0 : -1);
-
-    const reqId = ++searchReqRef.current;
-    setSearching(true);
-    const timeout = setTimeout(async () => {
-      let rows: SearchResult[] = [];
-      try {
-        const resp = await fetch(
-          `/api/players/search?q=${encodeURIComponent(safe)}`,
-        );
-        if (resp.ok) {
-          const data = await resp.json();
-          rows = Array.isArray(data) ? (data as SearchResult[]) : [];
-        }
-      } catch {}
-
-      if (reqId !== searchReqRef.current) return;
-
-      const mergedRows = sortSearchResults(
-        mergeSearchResults([...rows, ...localRows]),
-        val,
-      );
-      setResults(mergedRows);
-      setSearchedValue(val);
-      setDropdownOpen(true);
-      setHighlightedIndex(mergedRows.length > 0 ? 0 : -1);
-      setSearching(false);
-    }, 80);
-
-    return () => clearTimeout(timeout);
-  }, [defaultResults, searchValue]);
-
-  useEffect(() => {
-    const handler = (e: MouseEvent) => {
-      if (
-        containerRef.current &&
-        !containerRef.current.contains(e.target as Node)
-      ) {
-        setDropdownOpen(false);
-      }
-    };
-    document.addEventListener("mousedown", handler);
-    return () => document.removeEventListener("mousedown", handler);
-  }, []);
-
-  useEffect(() => clearLookupBarTimer, []);
+  // Load recents from localStorage on the client (after mount, to avoid a
+  // server/client hydration mismatch).
+  useEffect(() => setRecents(getRecentPlayers()), []);
 
   const navigateToPlayer = async (
-    result: Pick<SearchResult, "steam_id" | "custom_url">,
+    result: Pick<SearchResult, "steam_id" | "custom_url" | "name">,
   ) => {
-    setSearchValue("");
-    setResults([]);
-    setSearchedValue("");
-    setDropdownOpen(false);
-    setHighlightedIndex(-1);
+    setRecents(
+      addRecentPlayer({
+        steam_id: result.steam_id,
+        name: result.name ?? null,
+        custom_url: result.custom_url ?? null,
+      }),
+    );
     setLookupError(null);
     await router.push(playerProfilePath(result.steam_id, result.custom_url));
   };
 
-  const resolveSteamAndNavigate = async (lookupValue: string) => {
+  // Resolve the input to a real profile, then navigate. Never navigate to an
+  // unverified guess: if the Steam ID/vanity doesn't resolve to anything, show
+  // an inline error and stay put.
+  const resolveAndNavigate = async (lookupValue: string) => {
     const reqId = ++lookupReqRef.current;
-    trackEvent("Profile Steam Lookup Started", {
-      source: analyticsSource,
-    });
-    clearLookupBarTimer();
+    trackEvent("Profile Steam Lookup Started", { source: analyticsSource });
     setLookupError(null);
     setLookupLoading(true);
-    setShowLookupBar(false);
-    setDropdownOpen(false);
-    setHighlightedIndex(-1);
-
-    lookupBarTimerRef.current = setTimeout(() => {
-      if (reqId === lookupReqRef.current) setShowLookupBar(true);
-    }, 600);
 
     try {
       const resp = await fetch(
@@ -206,6 +78,7 @@ export function ProfileSearch({
             source: analyticsSource,
             result_bucket: bucketCount(data.length),
           });
+          setLookupDone(true);
           await navigateToPlayer(first);
           return;
         }
@@ -215,7 +88,7 @@ export function ProfileSearch({
         source: analyticsSource,
         reason: "not_found",
       });
-      setLookupError("Unable to resolve that Steam profile.");
+      setLookupError("We couldn't find that Steam profile. Check the ID or URL.");
     } catch {
       if (reqId !== lookupReqRef.current) return;
       trackEvent("Profile Steam Lookup Failed", {
@@ -224,200 +97,111 @@ export function ProfileSearch({
       });
       setLookupError("Lookup failed. Try again.");
     } finally {
-      if (reqId === lookupReqRef.current) {
-        clearLookupBarTimer();
-        setShowLookupBar(false);
-        setLookupLoading(false);
-      }
+      if (reqId === lookupReqRef.current) setLookupLoading(false);
     }
   };
-
-  const selectResult = (result: SearchResult, index: number | null = null) => {
-    trackEvent("Profile Search Result Selected", {
-      source: analyticsSource,
-      position: index == null ? "default" : index + 1,
-      result_bucket: bucketCount(results.length),
-    });
-    void navigateToPlayer(result);
-  };
-
-  const visibleResults = results.slice(0, MAX_VISIBLE_RESULTS);
-  const parsedSteamInput = parseSteamInput(searchValue);
-  const canSearchSteam = Boolean(parsedSteamInput);
-  const hasExactKnownSteamResult = Boolean(
-    parsedSteamInput &&
-    results.some((result) => {
-      if (parsedSteamInput.kind === "id") {
-        return result.steam_id === parsedSteamInput.value;
-      }
-      return (
-        result.custom_url?.toLowerCase() ===
-        parsedSteamInput.value.toLowerCase()
-      );
-    }),
-  );
-  const steamActionIndex = visibleResults.length;
-  const showSteamAction =
-    dropdownOpen &&
-    canSearchSteam &&
-    !hasExactKnownSteamResult &&
-    !searching &&
-    searchedValue === searchValue.trim();
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     const val = searchValue.trim();
-    if (!val) return;
+    if (!val || lookupLoading || lookupDone) return;
+
+    if (!parseSteamInput(val)) {
+      setLookupError("Enter a Steam ID, vanity name, or profile URL.");
+      return;
+    }
 
     trackEvent("Profile Search Submitted", {
       source: analyticsSource,
-      can_external_lookup: canSearchSteam,
-      has_cached_results: results.length > 0,
-      result_bucket: bucketCount(results.length),
+      can_external_lookup: true,
     });
-
-    if (
-      dropdownOpen &&
-      highlightedIndex >= 0 &&
-      visibleResults[highlightedIndex]
-    ) {
-      selectResult(visibleResults[highlightedIndex], highlightedIndex);
-      return;
-    }
-
-    if (highlightedIndex === steamActionIndex && showSteamAction) {
-      void resolveSteamAndNavigate(val);
-      return;
-    }
-
-    if (results.length > 0) {
-      selectResult(results[0], 0);
-      return;
-    }
-
-    if (canSearchSteam) {
-      setDropdownOpen(true);
-      setHighlightedIndex(steamActionIndex);
-      return;
-    }
-
-    setLookupError("Enter a Steam profile URL, vanity name, or Steam ID.");
+    void resolveAndNavigate(val);
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Escape") {
-      setDropdownOpen(false);
-      return;
-    }
-    if (!dropdownOpen) return;
-    const itemCount = visibleResults.length + (showSteamAction ? 1 : 0);
-    if (itemCount === 0) return;
-    if (e.key === "ArrowDown") {
-      e.preventDefault();
-      setHighlightedIndex((i) => (i + 1) % itemCount);
-    } else if (e.key === "ArrowUp") {
-      e.preventDefault();
-      setHighlightedIndex((i) => (i - 1 + itemCount) % itemCount);
-    }
-  };
+  const buttonLabel = lookupDone
+    ? "Opening…"
+    : lookupLoading
+      ? "Searching…"
+      : "Search";
+  // Drop the scheme for display so the whole help line fits on one row.
+  const exampleDisplay = exampleUrl ? exampleUrl.replace(/^https?:\/\//, "") : "";
 
   return (
-    <div className={`${styles.profileSearch} ${className}`} ref={containerRef}>
-      <form className={styles.searchForm} onSubmit={handleSearch}>
-        <input
-          ref={inputRef}
-          className={`${styles.searchInput}${lookupLoading ? " " + styles.loading : ""}${
-            lookupError ? " " + styles.error : ""
-          }`}
-          type="text"
-          placeholder={placeholder}
-          value={searchValue}
-          onChange={(e) => {
-            setSearchValue(e.target.value);
-            if (lookupError) setLookupError(null);
-          }}
-          onKeyDown={handleKeyDown}
-          onFocus={() => {
-            if (searchValue.trim() && results.length > 0) {
-              setDropdownOpen(true);
-            }
-            if (lookupError) setLookupError(null);
-          }}
-          autoComplete="off"
-          autoFocus={autoFocus}
-          aria-busy={lookupLoading || searching}
-          aria-invalid={Boolean(lookupError)}
-        />
-        {showLookupBar && (
-          <div className={styles.searchProgress} aria-hidden="true">
-            <div className={styles.searchProgressBar} />
-          </div>
-        )}
-      </form>
+    <div className={`${styles.profileSearch} ${className}`}>
       <div className={styles.searchHelp}>
         <a
           href="https://steamcommunity.com/my/"
           target="_blank"
           rel="noreferrer"
         >
-          Open your Steam profile
+          Find your Steam profile URL
         </a>
+        {exampleUrl && (
+          <>
+            <span className={styles.searchHelpArrow} aria-hidden="true">
+              &rarr;
+            </span>
+            <span className={styles.searchExampleUrl}>{exampleDisplay}</span>
+          </>
+        )}
       </div>
+      <form className={styles.searchForm} onSubmit={handleSearch}>
+        <div className={styles.inputWrap}>
+          <svg
+            className={styles.searchIcon}
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth={2}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden="true"
+          >
+            <circle cx="11" cy="11" r="8" />
+            <line x1="21" y1="21" x2="16.65" y2="16.65" />
+          </svg>
+          <input
+            ref={inputRef}
+            className={`${styles.searchInput}${lookupLoading ? " " + styles.loading : ""}${
+              lookupError ? " " + styles.error : ""
+            }`}
+            type="text"
+            placeholder={placeholder}
+            value={searchValue}
+            onChange={(e) => {
+              setSearchValue(e.target.value);
+              if (lookupError) setLookupError(null);
+            }}
+            autoComplete="off"
+            autoFocus={autoFocus}
+            aria-busy={lookupLoading}
+            aria-invalid={Boolean(lookupError)}
+          />
+        </div>
+        <button
+          type="submit"
+          className={styles.searchButton}
+          disabled={lookupLoading || lookupDone}
+        >
+          {buttonLabel}
+        </button>
+      </form>
       {lookupError && <div className={styles.searchStatus}>{lookupError}</div>}
-      {dropdownOpen && (
-        <div className={styles.searchDropdown}>
-          {results.length === 0 &&
-          searchValue.trim() &&
-          !searching &&
-          searchedValue === searchValue.trim() ? (
-            <div className={styles.searchEmpty}>
-              We didn't find any users in Track Auto Chess.
-            </div>
-          ) : null}
-          {visibleResults.length > 0
-            ? visibleResults.map((r, i) => (
-                <div
-                  key={r.steam_id}
-                  className={
-                    styles.searchResult +
-                    (i === highlightedIndex ? " " + styles.highlighted : "")
-                  }
-                  onMouseEnter={() => setHighlightedIndex(i)}
-                  onMouseDown={(e) => {
-                    e.preventDefault();
-                    selectResult(r, i);
-                  }}
-                >
-                  <span>{r.name || r.custom_url || r.steam_id}</span>
-                  {r.custom_url && (
-                    <span className={styles.resultMeta}>/{r.custom_url}</span>
-                  )}
-                </div>
-              ))
-            : null}
-          {showSteamAction && visibleResults.length > 0 && (
-            <div className={styles.searchDivider}>Not the right player?</div>
-          )}
-          {showSteamAction && (
-            <div
-              className={
-                styles.searchResult +
-                " " +
-                styles.searchSteam +
-                (highlightedIndex === steamActionIndex
-                  ? " " + styles.highlighted
-                  : "")
-              }
-              onMouseEnter={() => setHighlightedIndex(steamActionIndex)}
-              onMouseDown={(e) => {
-                e.preventDefault();
-                void resolveSteamAndNavigate(searchValue.trim());
-              }}
-            >
-              <span>Search with Steam</span>
-              <span className={styles.resultMeta}>{searchValue.trim()}</span>
-            </div>
-          )}
+      {!searchValue.trim() && recents.length > 0 && (
+        <div className={styles.recents}>
+          <span className={styles.recentsLabel}>Recent</span>
+          <div className={styles.recentChips}>
+            {recents.map((r) => (
+              <button
+                type="button"
+                key={r.steam_id}
+                className={styles.recentChip}
+                onClick={() => void navigateToPlayer(r)}
+              >
+                {r.name || (r.custom_url ? `/${r.custom_url}` : r.steam_id)}
+              </button>
+            ))}
+          </div>
         </div>
       )}
     </div>

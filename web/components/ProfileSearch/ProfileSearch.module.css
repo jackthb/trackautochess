@@ -2,32 +2,110 @@
   position: relative;
   z-index: 40;
   width: 100%;
+  text-align: left;
 }
 .searchForm {
   display: flex;
   position: relative;
   width: 100%;
+  gap: 8px;
+}
+.inputWrap {
+  position: relative;
+  flex: 1;
+  min-width: 0;
 }
 .searchHelp {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 9px 0 0;
+  flex-wrap: nowrap;
+  align-items: baseline;
+  justify-content: flex-start;
+  gap: 6px;
+  padding: 0 0 9px;
   font-family: var(--font-mono);
   font-size: 11px;
   color: var(--text-muted);
   letter-spacing: 0.35px;
-  text-align: left;
 }
 .searchHelp a {
   flex-shrink: 0;
   color: var(--accent-dim);
-  text-decoration: none;
+  text-decoration: underline;
+  text-underline-offset: 2px;
   transition: color 0.15s;
 }
 .searchHelp a:hover {
   color: var(--accent);
+}
+.searchHelpArrow {
+  flex-shrink: 0;
+  color: var(--text-muted);
+}
+/* Plain example text (not a link) in a distinct colour. Can shrink +
+   ellipsize on very narrow screens so the row stays on one line; at the hero's
+   full width it shows in full. */
+.searchHelp .searchExampleUrl {
+  flex: 0 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--gold);
+}
+.recents {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 0 0;
+  flex-wrap: wrap;
+}
+.recentsLabel {
+  flex-shrink: 0;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+.recentChips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  min-width: 0;
+}
+.recentChip {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  padding: 6px 12px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text-secondary);
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-2);
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s, background 0.15s;
+}
+.recentChip:hover {
+  color: var(--text-primary);
+  border-color: var(--accent-dim);
+  background: var(--bg-elevated, rgba(255, 255, 255, 0.04));
+}
+.searchIcon {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 17px;
+  height: 17px;
+  color: var(--text-muted);
+  pointer-events: none;
+  transition: color var(--t-base) var(--t-easing);
+}
+.inputWrap:focus-within .searchIcon {
+  color: var(--accent-dim);
 }
 .searchInput {
   width: 100%;
@@ -38,7 +116,7 @@
   background: var(--bg-surface);
   border: 1px solid var(--border);
   border-radius: var(--r-3);
-  padding: 0 16px;
+  padding: 0 16px 0 40px;
   letter-spacing: var(--tr-body);
   transition: border-color var(--t-base) var(--t-easing), background var(--t-base) var(--t-easing);
 }
@@ -55,6 +133,39 @@
   outline: none;
   border-color: var(--accent-dim);
   background: rgba(18, 20, 24, 0.96);
+}
+.searchButton {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 46px;
+  padding: 0 24px;
+  font-family: var(--font-mono);
+  font-size: var(--fs-14);
+  font-weight: var(--fw-semibold);
+  letter-spacing: 0.4px;
+  color: var(--text-primary);
+  background: var(--accent);
+  border: 1px solid var(--accent);
+  border-radius: var(--r-3);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s ease, border-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+.searchButton:hover {
+  background: var(--accent-hover);
+  border-color: var(--accent-hover);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 25%, transparent);
+}
+.searchButton:active {
+  transform: translateY(1px);
+}
+.searchButton:disabled {
+  opacity: 0.55;
+  cursor: default;
+  box-shadow: none;
 }
 .searchProgress {
   position: absolute;
@@ -77,16 +188,14 @@
   );
   animation: lookupBar 1s ease-in-out infinite;
 }
-.searchStatus,
-.searchDropdown {
-  position: absolute;
-  top: calc(100% + 10px);
-  left: 0;
-  right: 0;
+/* Anchor under the search box itself (input height 46px), not the bottom of
+   the whole component, so the dropdown drops directly from the box and
+   overlays the example/recents/help below it. */
+.searchStatus {
+  margin-top: 8px;
   background: var(--bg-surface);
   border: 1px solid var(--border);
   border-radius: var(--r-3);
-  z-index: 50;
 }
 .searchStatus {
   padding: 9px 12px;
@@ -149,9 +258,7 @@
   }
 }
 @media (max-width: 520px) {
-  .searchHelp {
-    align-items: flex-start;
-    flex-direction: column;
-    gap: 4px;
+  .searchButton {
+    padding: 0 16px;
   }
 }

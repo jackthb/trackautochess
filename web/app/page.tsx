@@ -1,10 +1,5 @@
 import type { Metadata } from "next";
-import { createClient } from "@supabase/supabase-js";
 import HomeSearch from "@/components/home/HomeSearch";
-import {
-  getDefaultPlayerSearchResults,
-  type SearchResult,
-} from "@/lib/playerSearch";
 import { absoluteUrl, SITE_DESCRIPTION, SITE_NAME, SITE_TITLE } from "@/lib/site";
 
 export const revalidate = 300;
@@ -64,31 +59,14 @@ const structuredData = [
   },
 ];
 
-async function getInitialSearchResults(): Promise<SearchResult[]> {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const key =
-    process.env.SUPABASE_SERVICE_ROLE_KEY ||
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-  if (!url || !key) return [];
-  const supabase = createClient(url, key, {
-    auth: { autoRefreshToken: false, persistSession: false },
-  });
-  try {
-    return await getDefaultPlayerSearchResults(supabase);
-  } catch {
-    return [];
-  }
-}
-
-export default async function HomePage() {
-  const initialSearchResults = await getInitialSearchResults();
+export default function HomePage() {
   return (
     <>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
       />
-      <HomeSearch initialSearchResults={initialSearchResults} />
+      <HomeSearch />
     </>
   );
 }

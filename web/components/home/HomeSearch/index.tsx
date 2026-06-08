@@ -6,28 +6,18 @@ import type { User } from "@supabase/supabase-js";
 import { ProfileSearch } from "@/components/ProfileSearch";
 import { SteamSignInButton } from "@/components/SteamSignInButton";
 import { createSupabaseClient } from "@/lib/supabase";
-import { type SearchResult } from "@/lib/playerSearch";
 import styles from "./HomeSearch.module.css";
-
-export interface HomeProps {
-  initialSearchResults: SearchResult[];
-}
 
 const t = {
   description:
     "Look up Dota Auto Chess player MMR, season history, and tracked match stats by Steam vanity URL or Steam ID.",
-  tagline:
-    "Search any Steam profile to surface Auto Chess MMR, rank, season history.",
-  exampleLabel: "Example:",
-  placeholder: "Steam profile URL or SteamID64",
+  tagline: "MMR, rank & season history for any Auto Chess player.",
+  placeholder: "Steam vanity, profile URL, or ID",
   signinDivider: "or",
   viewProfile: "View your profile",
 };
 
-export default function HomeSearch({ initialSearchResults }: HomeProps) {
-  const exampleSteamUrl =
-    "https://steamcommunity.com/profiles/76561198022169086";
-
+export default function HomeSearch() {
   // Mirror the nav's auth check (AppNavBar): once we know the visitor is signed
   // in, the hero's "Sign in through Steam" CTA is wrong — swap it for a link to
   // their own profile. Gate on `authReady` so logged-in users never flash the
@@ -82,24 +72,10 @@ export default function HomeSearch({ initialSearchResults }: HomeProps) {
 
           <p className={styles.tagline}>{t.tagline}</p>
 
-          <div className={styles.searchWrap}>
-            <div className={styles.searchGuidance}>
-              <div className={styles.searchExample}>
-                {t.exampleLabel} <span>{exampleSteamUrl}</span>
-              </div>
-            </div>
-            <ProfileSearch
-              initialResults={initialSearchResults}
-              analyticsSource="home_hero"
-              placeholder={t.placeholder}
-            />
-          </div>
-
+          {/* Sign-in is the fastest path (and unlocks daily auto-tracking), so
+              it leads. Search is the no-login fallback below the divider. */}
           {authReady && (
-            <div className={styles.signinCta}>
-              <div className={styles.signinDivider}>
-                <span>{t.signinDivider}</span>
-              </div>
+            <div className={styles.primaryCta}>
               {user ? (
                 <Link href="/dashboard" className={styles.profileCta}>
                   {t.viewProfile}
@@ -109,6 +85,20 @@ export default function HomeSearch({ initialSearchResults }: HomeProps) {
               )}
             </div>
           )}
+
+          {authReady && (
+            <div className={styles.signinDivider}>
+              <span>{t.signinDivider}</span>
+            </div>
+          )}
+
+          <div className={styles.searchWrap}>
+            <ProfileSearch
+              analyticsSource="home_hero"
+              placeholder={t.placeholder}
+              exampleUrl="https://steamcommunity.com/profiles/76561198022169086"
+            />
+          </div>
         </main>
       </div>
     </div>

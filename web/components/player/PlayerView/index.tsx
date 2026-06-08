@@ -154,7 +154,8 @@ function HistoryLockedPanel() {
         <h2>Sign in via Steam to view the MMR graph.</h2>
         <p>
           MMR history, season history, Queen Rank trends, and session-to-session
-          deltas are now reserved for logged-in Steam users.
+          deltas are reserved for logged-in Steam users — who can also refresh
+          their stats every 30 minutes, instead of once a day.
         </p>
         <SteamTrustNote source="player_history_lock" />
       </div>
@@ -165,20 +166,15 @@ function HistoryLockedPanel() {
   );
 }
 
+// Always-visible Steam sign-in reassurance (no toggle) so it doesn't shift the
+// graph and button. Shown under the history lock and the returning-user prompt.
 function SteamTrustNote({ source }: { source: string }) {
   return (
-    <details
-      className={styles.steamTrustNote}
-      onToggle={(event) => {
-        if (event.currentTarget.open) {
-          trackEvent("Steam Sign In Reassurance Expanded", { source });
-        }
-      }}
-    >
-      <summary>
+    <div className={styles.steamTrustNote}>
+      <div className={styles.steamTrustLead}>
         <span className={styles.steamTrustIcon} aria-hidden="true">i</span>
-        Worried about Steam sign-in?
-      </summary>
+        How Steam sign-in works
+      </div>
       <p>
         You sign in on <strong>steamcommunity.com</strong> using Steam OpenID.
         Track Auto Chess never sees your Steam password and cannot access your
@@ -193,7 +189,7 @@ function SteamTrustNote({ source }: { source: string }) {
       >
         Read Valve's OpenID sign-in docs
       </a>
-    </details>
+    </div>
   );
 }
 

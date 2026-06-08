@@ -149,19 +149,8 @@ export async function GET(req: Request) {
       ...((prefixCustom.data ?? []) as UserSearchRow[]).map(toSearchResult)
     );
 
-    const nameMatches = await supabase
-      .from("users")
-      .select(USER_SEARCH_SELECT)
-      .ilike("name", `%${profileQuery}%`)
-      .limit(8);
-
-    if (nameMatches.error) {
-      return Response.json({ error: nameMatches.error.message }, { status: 500 });
-    }
-
-    candidateRows.push(
-      ...((nameMatches.data ?? []) as UserSearchRow[]).map(toSearchResult)
-    );
+    // Search resolves only by Steam ID or vanity URL — never by display name.
+    // (The display name is still shown in results for recognition.)
 
     rows = sortSearchResults(
       await markRowsWithGames(supabase, mergeSearchResults(candidateRows)),
