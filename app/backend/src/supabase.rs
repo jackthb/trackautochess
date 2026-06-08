@@ -539,8 +539,8 @@ fn build_end_board_upload(rows: &[Value], played_at: &str) -> Option<EndBoardUpl
             if !row.contains_key("synergies") {
                 if let Some(synergies) = normalize_synergy_string(
                     player
-                        .get("show_buff")
-                        .or_else(|| player.get("buff"))
+                        .get("buff")
+                        .or_else(|| player.get("show_buff"))
                         .and_then(Value::as_str),
                 ) {
                     row.insert("synergies".to_owned(), json!(synergies));
@@ -761,7 +761,7 @@ mod tests {
                         "mmr_level": 4200,
                         "round": 34,
                         "duration": 2084.5,
-                        "show_buff": "is_shaman:3,is_kobold:2,is_pandaman:2,",
+                        "buff": "is_demon:5,is_demonhunter:2,is_warlock:2,",
                         "talent_tree": {
                             "2": "talent_2b_promotion",
                             "1": "talent_1b_losebonus"
@@ -807,7 +807,7 @@ mod tests {
         assert_eq!(second["mmr_level"], 4200);
         assert_eq!(second["final_round"], 34);
         assert_eq!(second["duration"], 2084.5);
-        assert_eq!(second["synergies"], "shaman:3|kobold:2|pandaman:2");
+        assert_eq!(second["synergies"], "demon:5|demonhunter:2|warlock:2");
         assert_eq!(second["talents"], "talent_1b_losebonus|talent_2b_promotion");
         assert_eq!(second["chess_lineup"], "Axe(2)");
         assert!(
