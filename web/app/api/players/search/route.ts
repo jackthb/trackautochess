@@ -18,6 +18,7 @@ import {
   type SearchResult,
   type UserSearchRow,
 } from "@/lib/playerSearch";
+import { fetchAndCacheDrodo } from "@/lib/drodo";
 
 // Adapt a Web Request into the minimal NextApiRequest shape consumed by the
 // abuseLog helpers (getClientIp reads req.headers["x-forwarded-for"] and
@@ -170,14 +171,35 @@ export async function GET(req: Request) {
         requireAvatar: true,
         requireCustomUrl: parsed.kind === "id",
       });
+
+      // Only a real result if the profile has Auto Chess data — a Drodo
+      // profile or tracked games. Otherwise the client errors instead of
+      // opening an empty profile.
+      const [drodoResult, gamesCheck] = await Promise.all([
+        fetchAndCacheDrodo(resolvedSteamId, supabase ?? null, {
+          snapshotOnSuccess: true,
+          pollMode: "reset",
+        }),
+        supabase
+          ? supabase
+              .from("match_players")
+              .select("steam_id::text")
+              .eq("steam_id", resolvedSteamId)
+              .limit(1)
+          : Promise.resolve({ data: [] as unknown[] }),
+      ]);
+      const hasAutochess = drodoResult.ok;
+      const hasGames = ((gamesCheck.data as unknown[] | null) ?? []).length > 0;
+
       rows = mergeSearchResults([
         {
           steam_id: resolvedSteamId,
           name: profile.name,
           custom_url:
             profile.customUrl ?? (parsed.kind === "slug" ? parsed.value : null),
-          has_autochess_profile: false,
-          drodo_profile_missing: false,
+          has_autochess_profile: hasAutochess,
+          has_games: hasGames,
+          drodo_profile_missing: !hasAutochess,
         },
         ...rows,
       ]);

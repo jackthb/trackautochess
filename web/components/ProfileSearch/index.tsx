@@ -74,6 +74,18 @@ export function ProfileSearch({
         const data = (await resp.json()) as SearchResult[];
         const first = data[0];
         if (first?.steam_id) {
+          // Resolved a Steam profile, but it has no Auto Chess data — don't
+          // open an empty profile; surface it as an error in place.
+          if (!first.has_autochess_profile && !first.has_games) {
+            trackEvent("Profile Steam Lookup Failed", {
+              source: analyticsSource,
+              reason: "no_autochess",
+            });
+            setLookupError(
+              "No public Auto Chess stats found for this Steam profile.",
+            );
+            return;
+          }
           trackEvent("Profile Steam Lookup Resolved", {
             source: analyticsSource,
             result_bucket: bucketCount(data.length),
