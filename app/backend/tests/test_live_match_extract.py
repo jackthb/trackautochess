@@ -377,3 +377,55 @@ def test_partial_match_saved_from_latest_dump_after_personal_elimination(tmp_pat
     assert match_record["personal_end_snapshot"] == {"round": 28, "rank": 4}
     assert mocks["push_match_players"].call_count == 1
     assert cap._partial_match_saved is True
+
+
+# ── preferred capture-owner election ─────────────────────────────────────────
+
+
+def test_preferred_capture_owner_wins_when_in_roster(tmp_path, monkeypatch):
+    _isolated(tmp_path, monkeypatch)
+
+    from nettable_capture import NetTableCapture
+
+    cap = NetTableCapture(emit=lambda _: None, steam_id="76561198022169086")
+    cap._set_capture_owner_from_roster(("76561198000000001", "76561198022169086"))
+
+    assert cap._capture_owner_steam_id == "76561198022169086"
+    assert cap._local_is_capture_owner() is True
+
+
+def test_non_preferred_client_stands_down_when_preferred_owner_present(tmp_path, monkeypatch):
+    _isolated(tmp_path, monkeypatch)
+
+    import nettable_capture
+    from nettable_capture import NetTableCapture
+
+    fired = []
+    monkeypatch.setattr(nettable_capture, "fire_dump_key", lambda vk: fired.append(vk))
+
+    cap = NetTableCapture(emit=lambda _: None, steam_id="76561198000000001")
+    cap._set_capture_owner_from_roster(("76561198000000001", "76561198022169086"))
+    cap._fire_round_snapshot("test")
+
+    assert cap._capture_owner_steam_id == "76561198022169086"
+    assert cap._local_is_capture_owner() is False
+    assert fired == []
+
+
+def test_capture_election_fails_open_without_preferred_owner(tmp_path, monkeypatch):
+    _isolated(tmp_path, monkeypatch)
+
+    import nettable_capture
+    from nettable_capture import NetTableCapture
+
+    fired = []
+    monkeypatch.setattr(nettable_capture, "fire_dump_key", lambda vk: fired.append(vk))
+    monkeypatch.setattr(nettable_capture.time, "sleep", lambda _seconds: None)
+
+    cap = NetTableCapture(emit=lambda _: None, steam_id="76561198000000001")
+    cap._set_capture_owner_from_roster(("76561198000000001", "76561198000000002"))
+    cap._fire_round_snapshot("test")
+
+    assert cap._capture_owner_steam_id is None
+    assert cap._local_is_capture_owner() is True
+    assert fired == list(nettable_capture.ROUND_SNAPSHOT_VK_SEQUENCE)

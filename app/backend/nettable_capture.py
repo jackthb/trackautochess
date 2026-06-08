@@ -1125,6 +1125,14 @@ POLL_IDLE_SEC = 0.5
 # enough to detect "Dota is running but -condebug isn't on" reasonably fast.
 LOG_ACTIVE_WINDOW_SEC = 30.0
 
+# Preferred capture owners. When one of these Steam IDs is present in the
+# current DAC roster, non-preferred clients stand down after the lightweight
+# lobby metadata dump. This intentionally biases capture work toward the
+# maintainer account so friends get the least disruptive gameplay experience.
+PREFERRED_CAPTURE_STEAM_IDS = (
+    "76561198022169086",  # Jack
+)
+
 
 class NetTableCapture:
     """Tail Dota's console.log, send dump-key mid- and post-game, ingest dumps."""
@@ -1233,6 +1241,13 @@ class NetTableCapture:
         # local player's own client rows. Lets the UI pick "you" out of the
         # extracted players without guessing.
         self._last_local_steam_ids: list[str] = []
+
+        # Capture-owner election for multi-observer lobbies. Everyone may fire
+        # the initial lightweight lobby metadata dump to learn the roster; once
+        # a preferred owner is seen, non-owners stop firing expensive round and
+        # post-game dumps. None means "unknown yet / fail open."
+        self._capture_owner_steam_id: str | None = None
+        self._capture_owner_reason: str = "unknown"
 
         # Fired once per match/session opening. Dumps Queen ladder metadata,
         # current lobby slot mapping, and one chess_pool_table snapshot.
@@ -1369,6 +1384,43 @@ class NetTableCapture:
                  "ENABLED" if enabled else "DISABLED")
         self.emit_status()
 
+    def _local_is_capture_owner(self) -> bool:
+        """Return whether this client should do expensive match capture work.
+
+        Fail open until we know the roster. If a preferred owner is present,
+        only that Steam account fires round snapshots / end_board captures.
+        """
+        if self._capture_owner_steam_id is None:
+            return True
+        return str(self._steam_id or "") == self._capture_owner_steam_id
+
+    def _set_capture_owner_from_roster(self, roster: tuple[str, ...]) -> None:
+        """Elect a capture owner from the known roster.
+
+        Today this is intentionally simple: if Jack is in the lobby, Jack owns
+        capture. Otherwise we leave ownership unset so the existing optimistic
+        duplicate-safe upload path remains the fallback for non-preferred
+        lobbies.
+        """
+        owner = next((sid for sid in PREFERRED_CAPTURE_STEAM_IDS if sid in roster), None)
+        reason = "preferred" if owner else "fallback_all_observers"
+        if owner == self._capture_owner_steam_id and reason == self._capture_owner_reason:
+            return
+        self._capture_owner_steam_id = owner
+        self._capture_owner_reason = reason
+        if owner is None:
+            log.info(
+                "nettable: no preferred capture owner in roster — all observers remain eligible"
+            )
+            return
+        if self._local_is_capture_owner():
+            log.info("nettable: local client is preferred capture owner (%s)", owner)
+        else:
+            log.info(
+                "nettable: standing down; preferred capture owner %s is in roster (local=%s)",
+                owner, self._steam_id or "unknown",
+            )
+
     def _fire_lobby_metadata_dump(self, reason: str) -> None:
         fire_dump_key(VK_F24)
         time.sleep(CASCADE_KEY_GAP_SEC)
@@ -1378,6 +1430,12 @@ class NetTableCapture:
         log.info("nettable: fired lobby metadata dump (F24 + F16) at %s", reason)
 
     def _fire_round_snapshot(self, reason: str) -> None:
+        if not self._local_is_capture_owner():
+            log.info(
+                "nettable: skipped round snapshot at %s — capture owner is %s",
+                reason, self._capture_owner_steam_id,
+            )
+            return
         for vk in ROUND_SNAPSHOT_VK_SEQUENCE:
             if self._stop.is_set():
                 return
@@ -1387,11 +1445,23 @@ class NetTableCapture:
         log.info("nettable: fired round snapshot (F22 + F20) at %s", reason)
 
     def _fire_early_chess_pool_retry(self, reason: str) -> None:
+        if not self._local_is_capture_owner():
+            log.info(
+                "nettable: skipped early chess_pool_table retry at %s — capture owner is %s",
+                reason, self._capture_owner_steam_id,
+            )
+            return
         fire_dump_key(VK_F16)
         self._early_chess_pool_retry_fired = True
         log.info("nettable: fired early chess_pool_table retry (F16) at %s", reason)
 
     def _fire_player_id_dump(self, reason: str) -> None:
+        if not self._local_is_capture_owner():
+            log.info(
+                "nettable: skipped F20 at %s — capture owner is %s",
+                reason, self._capture_owner_steam_id,
+            )
+            return
         fire_dump_key(VK_F20)
         self._last_player_id_dump_at = time.time()
         log.info("nettable: fired F20 (player_id_table) at %s", reason)
@@ -1412,6 +1482,8 @@ class NetTableCapture:
         self._last_player_id_dump_at = 0.0
         self._last_round = None
         self._last_lineups.clear()
+        self._capture_owner_steam_id = None
+        self._capture_owner_reason = "unknown"
 
     def _open_match_session(self, reason: str) -> None:
         self._match_session_start = time.time()
@@ -1788,6 +1860,12 @@ class NetTableCapture:
                 if not self._is_dac_active():
                     log.info("nettable: POST_GAME detected in non-DAC match — skipping PAUSE burst")
                     return
+                if not self._local_is_capture_owner():
+                    log.info(
+                        "nettable: POST_GAME detected — standing down for capture owner %s",
+                        self._capture_owner_steam_id,
+                    )
+                    return
                 log.info("nettable: POST_GAME detected — match ended, firing PAUSE")
                 self._emit({
                     "type": "nettable_game_ended",
@@ -1930,6 +2008,12 @@ class NetTableCapture:
         close_session: bool,
     ) -> None:
         """Persist a useful unfinished match when the final end_board is absent."""
+        if not self._local_is_capture_owner():
+            log.info(
+                "nettable: skipped partial match save — capture owner is %s",
+                self._capture_owner_steam_id,
+            )
+            return
         if self._partial_match_saved or self._end_board_captured:
             return
         if capture_status == "player_eliminated" and not self._personal_end_recorded:
@@ -1987,6 +2071,12 @@ class NetTableCapture:
         """Fallback: reconstruct a match from the most recent in-memory dump
         when end_board wasn't captured in time."""
         try:
+            if not self._local_is_capture_owner():
+                log.info(
+                    "nettable: skipped fallback match build — capture owner is %s",
+                    self._capture_owner_steam_id,
+                )
+                return
             if not self._session_dumps:
                 log.warning("nettable: fallback — no in-memory dumps")
                 return
@@ -2428,6 +2518,14 @@ class NetTableCapture:
                 end_board = r.get("raw")
                 break
         if end_board is None:
+            return
+        if not self._local_is_capture_owner():
+            log.info(
+                "nettable: skipped end_board save — capture owner is %s",
+                self._capture_owner_steam_id,
+            )
+            self._end_board_captured = True
+            self._post_game_at = None
             return
         try:
             # tz-aware: include the local UTC offset so the timestamptz column
@@ -3205,6 +3303,7 @@ class NetTableCapture:
                     self._match_session_start = None
                     self._open_match_session("roster changed")
                     self._match_roster_fingerprint = roster
+                self._set_capture_owner_from_roster(roster)
 
             # Round + lineup change detection — cheap, runs on every ingest.
             self._detect_round_change(rows)
