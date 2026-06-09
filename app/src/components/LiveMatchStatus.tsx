@@ -1,5 +1,11 @@
 import { useMemo } from "react";
 import { costBorderColor, synIconName, mmrLevelToRank, unitStem } from "../lib/game-utils";
+import {
+  buildChessCodeUnitLookup,
+  buildUnitCostLookup,
+  parseNettableSynergyBuff,
+  resolveChessLineup,
+} from "@dac/shared/game-structure";
 import type { LivePlayer } from "../hooks/useNetTableEvents";
 import type { UnitFullInfo, SynergyInfo, RelicInfo, ItemFullInfo } from "../types";
 
@@ -27,68 +33,10 @@ function hpBarColor(hp: number): string {
   return "var(--red-bright)";
 }
 
-/**
- * "is_orc:5,is_shaman:3,is_demon:1," → [{ name: "orc", count: 5 }, …], desc.
- *
- * `firstTier` maps a stem ("orc", "demon") to that synergy's first activation
- * count, so we keep only *active* synergies. The raw `buff` lists every type
- * any unit on the board has — a long tail of :1 entries that overlaps heavily
- * between players (everyone ends up touching naga/god/element/…), which made
- * every seat look like it shared the local player's synergies. Filtering to
- * active tiers leaves the meaningful, per-player-distinct set — and keeps
- * tier-1 synergies like Demon (which activates at 1) that a flat "2+" cut
- * would wrongly hide.
- */
-function parseBuff(
-  buff: string | undefined,
-  firstTier: (stem: string) => number,
-): { name: string; count: number }[] {
-  if (!buff) return [];
-  return buff
-    .split(",")
-    .map((s) => s.trim())
-    .filter(Boolean)
-    .map((entry) => {
-      const [raw, count] = entry.split(":");
-      return { name: raw.replace(/^is_/, ""), count: Number(count) || 0 };
-    })
-    .filter((s) => s.count >= firstTier(s.name))
-    .sort((a, b) => b.count - a.count);
-}
-
 interface Seat {
   id: string;
   player: LivePlayer;
   isLocal: boolean;
-}
-
-/**
- * Resolve a raw `chess_lineup` string into named, star-rated board units.
- *
- * The backend emits the lineup verbatim — comma-separated `chess_*` codes
- * where star level is encoded as trailing `1`s (`chess_wl1` → Warlock 2★,
- * `chess_br11` → Broodmother 3★). Mirrors the old Python `_resolve_chess_piece`:
- * strip trailing `1`s to get the base id, stars = 1 + count stripped (1–3).
- * Units live in the frontend (units_full.json), so the resolution lives here
- * rather than duplicating that data into the backend.
- */
-function resolveChessLineup(
-  raw: string | undefined,
-  idToUnit: Map<string, { name: string; cost: number }>,
-): { name: string; stars: number }[] {
-  if (!raw) return [];
-  const resolved: { name: string; stars: number; cost: number }[] = [];
-  for (const token of raw.replace(/\|/g, ",").split(",")) {
-    const code = token.trim();
-    if (!code || code === "placeholder") continue;
-    const base = code.replace(/1+$/, "");
-    const unit = idToUnit.get(base);
-    if (!unit) continue; // unknown id → no icon to show; skip quietly
-    const stars = Math.max(1, Math.min(1 + (code.length - base.length), 3));
-    resolved.push({ name: unit.name, stars, cost: unit.cost });
-  }
-  resolved.sort((a, b) => b.stars - a.stars || b.cost - a.cost);
-  return resolved.map(({ name, stars }) => ({ name, stars }));
 }
 
 /**
@@ -104,36 +52,12 @@ function resolveChessLineup(
  */
 export function LiveMatchStatus({ players, localSteamIds, round, unitsFull, synergiesData, relicsData, itemsFull }: Props) {
   void itemsFull;
-  const unitCosts = useMemo(() => {
-    const out: Record<string, number> = {};
-    for (const [name, info] of Object.entries(unitsFull)) {
-      out[name] = Number(info.cost) || 0;
-    }
-    return out;
-  }, [unitsFull]);
+  const unitCosts = useMemo(() => buildUnitCostLookup(unitsFull), [unitsFull]);
 
-  // chess_* code → { display name, cost }, for resolving raw live lineups.
-  const chessIdToUnit = useMemo(() => {
-    const map = new Map<string, { name: string; cost: number }>();
-    for (const [name, info] of Object.entries(unitsFull)) {
-      const id = (info as { id?: unknown }).id;
-      if (typeof id === "string") map.set(id, { name, cost: Number(info.cost) || 0 });
-    }
-    return map;
-  }, [unitsFull]);
+  // chess_* code → unit metadata, for resolving raw live lineups.
+  const chessIdToUnit = useMemo(() => buildChessCodeUnitLookup(unitsFull), [unitsFull]);
 
   const localIdSet = useMemo(() => new Set(localSteamIds), [localSteamIds]);
-
-  // Synergy stem ("orc", "demon") → its first activation count. Synergies
-  // missing tier data default to 2 (the common first tier).
-  const firstTier = useMemo(() => {
-    const out: Record<string, number> = {};
-    for (const [key, info] of Object.entries(synergiesData)) {
-      const tier = Array.isArray(info.tiers) ? info.tiers[0] : undefined;
-      if (typeof tier === "number") out[key.replace(/^is_/, "")] = tier;
-    }
-    return (stem: string) => out[stem] ?? 2;
-  }, [synergiesData]);
 
   const seats = useMemo<Seat[]>(() => {
     const list: Seat[] = Object.entries(players).map(([id, player]) => ({
@@ -285,7 +209,7 @@ export function LiveMatchStatus({ players, localSteamIds, round, unitsFull, syne
         {seats.map(({ id, player, isLocal }) => {
           const hp = Math.max(0, player.hp ?? 0);
           const units = resolveChessLineup(player.lineup, chessIdToUnit);
-          const synergies = parseBuff(player.buff, firstTier);
+          const synergies = parseNettableSynergyBuff(player.buff, synergiesData);
           const relicCodes =
             player.relics && player.relics.length > 0
               ? player.relics

@@ -18,7 +18,7 @@ interface ReplaysTabProps {
 // Games shown in the manual-assignment dropdown must have been played within
 // this many days of the replay's recorded mtime. Matches the user's "within
 // one or two days" request.
-const ASSIGN_WINDOW_DAYS = 2;
+const ASSIGN_WINDOW_DAYS: number = 2;
 
 function formatElapsed(seconds: number): string {
   const m = Math.floor(seconds / 60);

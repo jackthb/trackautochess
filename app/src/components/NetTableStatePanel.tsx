@@ -1,5 +1,9 @@
 import { useMemo, useState } from "react";
 import { unitStem } from "../lib/game-utils";
+import {
+  buildChessCodeUnitLookup,
+  parseNettableSynergyBuff,
+} from "@dac/shared/game-structure";
 import type { LivePlayer, NetTableState } from "../hooks/useNetTableEvents";
 import type { SynergyInfo, UnitFullInfo } from "../types";
 
@@ -256,7 +260,7 @@ function extractHiddenLegendaries(
   // Drodo's lua sets both keys at the start of the match; if neither is
   // present, we don't have a capture yet and there's nothing to show.
   if (revealedRaw == null && unrevealedRaw == null) return null;
-  const codeToUnit = chessCodeToUnit(unitsFull);
+  const codeToUnit = buildChessCodeUnitLookup(unitsFull);
   return {
     revealed: toEntries(revealedRaw, codeToUnit),
     unrevealed: toEntries(unrevealedRaw, codeToUnit),
@@ -352,48 +356,12 @@ function parseBuildSynergies(
   buff: string | undefined,
   synergiesData: Record<string, SynergyInfo>,
 ): Array<{ name: string; count: number; score: number }> {
-  if (!buff) return [];
-
-  return buff
-    .split(",")
-    .map((entry) => entry.trim())
-    .filter(Boolean)
-    .map((entry) => {
-      const [rawKey, rawCount] = entry.split(":");
-      const key = rawKey.trim();
-      const info = synergiesData[key];
-      const count = Number(rawCount) || 0;
-      const firstTier =
-        Array.isArray(info?.tiers) && typeof info.tiers[0] === "number"
-          ? info.tiers[0]
-          : 2;
-      return {
-        name: info?.name || displayNameFromSynergyKey(key),
-        count,
-        firstTier,
-        score: count / Math.max(firstTier || 1, 1),
-      };
-    })
-    .filter((synergy) => {
-      if (synergy.count < synergy.firstTier) return false;
-      // One-piece synergies like Demon are often incidental splashes. Keep
-      // this first pass focused on multi-piece build shape.
-      if (synergy.firstTier <= 1 && synergy.count <= 1) return false;
-      return true;
-    })
-    .sort((a, b) => {
-      const scoreDiff = b.score - a.score;
-      if (scoreDiff !== 0) return scoreDiff;
-      return b.count - a.count;
-    });
-}
-
-function displayNameFromSynergyKey(key: string): string {
-  return key
-    .replace(/^is_/, "")
-    .split("_")
-    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
-    .join(" ");
+  // One-piece synergies like Demon are often incidental splashes. Keep this
+  // inference focused on multi-piece build shape while reusing the same
+  // activation-tier rules as live standings and web match display.
+  return parseNettableSynergyBuff(buff, synergiesData, {
+    includeOnePieceActive: false,
+  });
 }
 
 function toEntries(
@@ -419,23 +387,6 @@ function toEntries(
       };
     })
     .sort((a, b) => a.name.localeCompare(b.name));
-}
-
-function chessCodeToUnit(
-  unitsFull: Record<string, UnitFullInfo>,
-): Map<string, { name: string; synergies: string[] }> {
-  const out = new Map<string, { name: string; synergies: string[] }>();
-  for (const [displayName, info] of Object.entries(unitsFull)) {
-    const id = (info as { id?: unknown }).id;
-    if (typeof id !== "string") continue;
-    out.set(id, {
-      name: displayName,
-      synergies: Array.isArray(info.synergies)
-        ? info.synergies.filter((s): s is string => typeof s === "string")
-        : [],
-    });
-  }
-  return out;
 }
 
 function TableBlock({

@@ -1,4 +1,8 @@
 import { unitStem } from "@dac/shared/game-utils";
+import {
+  buildSynergyMinCountByName,
+  filterActiveSynergiesWithThresholds,
+} from "@dac/shared/game-structure";
 // aliasesData is a flat { alt-spelling: canonical } map. Cost/synergy data
 // comes from content/game/units via the generated runtime module.
 import { aliasesData, synergiesData, unitsFullData } from "@/generated/content-data";
@@ -208,17 +212,9 @@ export const UNIT_SYNERGIES: Readonly<Record<string, string[]>> =
 // synergies activate at 2, but a few (Demon, Pandaren) activate at 1. A lineup
 // holding a single Beast or Faceless has NOT activated that synergy, so it must
 // not be shown; a single Demon HAS.
-const SYNERGY_MIN_COUNT: Record<string, number> = (() => {
-  const map: Record<string, number> = {};
-  for (const data of Object.values(
-    synergiesData as Record<string, { name?: string; tiers?: number[] }>,
-  )) {
-    if (data?.name && Array.isArray(data.tiers) && data.tiers.length > 0) {
-      map[data.name] = data.tiers[0];
-    }
-  }
-  return map;
-})();
+const SYNERGY_MIN_COUNT = buildSynergyMinCountByName(
+  synergiesData as Record<string, { name: string; tiers?: number[] }>,
+);
 
 /**
  * Keep only synergies that have reached their activation threshold (first
@@ -229,7 +225,7 @@ const SYNERGY_MIN_COUNT: Record<string, number> = (() => {
 export function filterActiveSynergies(
   synergies: { name: string; count: number }[],
 ): { name: string; count: number }[] {
-  return synergies.filter((s) => s.count >= (SYNERGY_MIN_COUNT[s.name] ?? 2));
+  return filterActiveSynergiesWithThresholds(synergies, SYNERGY_MIN_COUNT);
 }
 
 /**

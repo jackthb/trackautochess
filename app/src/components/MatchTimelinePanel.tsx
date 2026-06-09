@@ -108,7 +108,12 @@ export function MatchTimelinePanel({
     const aHasHp = typeof a.hp === "number";
     const bHasHp = typeof b.hp === "number";
     if (aHasHp !== bHasHp) return aHasHp ? -1 : 1;
-    if (aHasHp && bHasHp && a.hp !== b.hp) return b.hp - a.hp;
+    if (aHasHp && bHasHp) {
+      const aHp = a.hp as number;
+      const bHp = b.hp as number;
+      const hpDelta = bHp - aHp;
+      if (hpDelta !== 0) return hpDelta;
+    }
 
     const sidDelta = aSid.localeCompare(bSid, undefined, { numeric: true });
     return sidDelta || placementDelta;
