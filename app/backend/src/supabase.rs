@@ -47,6 +47,11 @@ impl SupabaseClient {
         }
         let row_values = rows.iter().map(nettable_row_json).collect::<Vec<_>>();
         self.upload_end_board_rows(&row_values)?;
+        self.post_json(
+            "/rest/v1/dac_nettable_dumps",
+            &Value::Array(row_values),
+            "return=minimal",
+        )?;
         Ok(rows.len())
     }
 
@@ -341,6 +346,11 @@ impl SupabaseClient {
         if table.is_empty() || table == "dac_nettable_dumps" {
             if let Some(rows) = body.as_array() {
                 let _ = self.upload_end_board_rows(rows);
+                return self.post_json(
+                    "/rest/v1/dac_nettable_dumps",
+                    &Value::Array(rows.clone()),
+                    "return=minimal",
+                );
             }
             return Ok(());
         }

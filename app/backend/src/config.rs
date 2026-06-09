@@ -36,7 +36,7 @@ impl Config {
             )),
             replay_enabled: value_bool(&value, "replay_enabled", true),
             keep_local_nettable_dumps: value_bool(&value, "keep_local_nettable_dumps", true),
-            upload_raw_nettable_dumps: value_bool(&value, "upload_raw_nettable_dumps", false),
+            upload_raw_nettable_dumps: value_bool(&value, "upload_raw_nettable_dumps", true),
             local_only: local_only_mode_from(&value),
             supabase_url: value_string(&value, "supabase_url"),
             supabase_key: value_string(&value, "supabase_key"),
@@ -91,7 +91,7 @@ fn default_config_json() -> &'static str {
   "replay_enabled": true,
   "replay_max_gb": 15,
   "keep_local_nettable_dumps": true,
-  "upload_raw_nettable_dumps": false,
+  "upload_raw_nettable_dumps": true,
   "local_nettable_retention_days": 14,
   "local_nettable_max_mb": 500
 }
