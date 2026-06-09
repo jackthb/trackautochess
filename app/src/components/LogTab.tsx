@@ -25,6 +25,7 @@ declare global {
   interface Window {
     trackerLog?: {
       read: () => Promise<LogEntry[]>;
+      paths: () => Promise<{ tracker: string; dota: string | null }>;
       onUpdate: (callback: (entries: LogEntry[]) => void) => () => void;
     };
   }
@@ -33,6 +34,7 @@ declare global {
 export function LogTab() {
   const [entries, setEntries] = useState<LogEntry[]>([]);
   const [sourceError, setSourceError] = useState<string | null>(null);
+  const [paths, setPaths] = useState<{ tracker: string; dota: string | null } | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const autoScroll = useRef(true);
@@ -43,6 +45,15 @@ export function LogTab() {
       return;
     }
     let cancelled = false;
+
+    window.trackerLog
+      .paths()
+      .then((value) => {
+        if (!cancelled) setPaths(value);
+      })
+      .catch(() => {
+        // Non-critical: log reading still works without displaying paths.
+      });
 
     window.trackerLog
       .read()
@@ -102,6 +113,12 @@ export function LogTab() {
       {entries.length === 0 && !sourceError && (
         <div style={{ color: "var(--text-muted)", padding: "20px 0" }}>
           tracker.log is empty.
+        </div>
+      )}
+      {paths && (
+        <div style={{ color: "var(--text-muted)", padding: "0 0 12px" }}>
+          Tracker log: {paths.tracker}
+          {paths.dota ? `\nDota log: ${paths.dota}` : ""}
         </div>
       )}
       {entries.map((entry, i) => {

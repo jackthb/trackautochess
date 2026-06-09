@@ -19,6 +19,7 @@ contextBridge.exposeInMainWorld("tracker", {
 
 contextBridge.exposeInMainWorld("trackerLog", {
   read: () => ipcRenderer.invoke("trackerLog:read"),
+  paths: () => ipcRenderer.invoke("trackerLog:paths"),
   onUpdate: (callback) => {
     const handler = (_event, entries) => callback(entries);
     ipcRenderer.on("trackerLog:update", handler);

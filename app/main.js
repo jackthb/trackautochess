@@ -250,6 +250,7 @@ function startBackend() {
 
   console.log(`Starting ${DESKTOP_PATHS.backendKind} backend: ${command} ${args.join(" ")}`);
   appendTrackerLog("INFO", `Starting ${DESKTOP_PATHS.backendKind} backend: ${command} ${args.join(" ")}`);
+  appendTrackerLog("INFO", `Tracker log path: ${TRACKER_LOG_PATH}`);
 
   backendProcess = spawn(command, args, {
     cwd,
@@ -532,10 +533,10 @@ ipcMain.on("tracker:command", (_event, cmd) => {
 
 // ── desktop app log watcher (bypasses backend→Electron→React IPC) ───────────
 //
-// LogTab reads the desktop app log directly so it shows every line independent
-// of any IPC quirks between the backend subprocess and the renderer. Do not use
-// ~/.dac/tracker.log here; that was the legacy Python backend log and can be
-// stale while the Rust packaged app is running.
+// Keep tracker logs in Electron's canonical userData directory. On Windows this
+// is AppData/Roaming/<app-name>/logs/tracker.log for both dev and packaged app
+// runs. Do not add fallback tracker log locations; split logs make diagnostics
+// ambiguous.
 
 const APP_LOG_DIR = path.join(app.getPath("userData"), "logs");
 const TRACKER_LOG_PATH = path.join(APP_LOG_DIR, "tracker.log");
@@ -659,6 +660,11 @@ ipcMain.handle("trackerLog:read", () => {
   // Merge chronologically — the renderer expects a single stream.
   return [...tracker, ...dota].sort((a, b) => a.ts - b.ts);
 });
+
+ipcMain.handle("trackerLog:paths", () => ({
+  tracker: TRACKER_LOG_PATH,
+  dota: dotaLogPath || resolveDotaLogPath(),
+}));
 
 function tailFileWatcher({ filePath, getOffset, setOffset, parser, label }) {
   if (!fs.existsSync(filePath)) return null;
