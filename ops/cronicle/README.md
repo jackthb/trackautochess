@@ -15,8 +15,9 @@ Cronicle provides the prepackaged pieces we do not want to build ourselves:
 The Docker image used here (`soulteary/cronicle`) is multi-arch and supports
 x86, ARM64, and ARMv7, so it should run on a normal Raspberry Pi Docker setup.
 
-The actual poller script runs locally on the Pi and talks directly to Drodo and
-Supabase. The Vercel API can stay focused on user-directed refreshes.
+The actual poller script runs locally on the Pi with plain Node.js and talks
+directly to Drodo and Supabase. The Vercel API can stay focused on
+user-directed refreshes.
 
 The GitHub Actions schedule for `Poll Drodo (MMR snapshots)` has been disabled;
 it remains manually runnable only as an emergency/operator-triggered fallback.
@@ -26,12 +27,24 @@ it remains manually runnable only as an emergency/operator-triggered fallback.
 From the repository root on the Pi:
 
 ```bash
-pnpm --dir web install --frozen-lockfile
 cp ops/cronicle/.env.example ops/cronicle/.env
 nano ops/cronicle/.env
 chmod 600 ops/cronicle/.env
 docker compose -f ops/cronicle/docker-compose.yml up -d
 ```
+
+No web workspace install is needed for the poller. The Cronicle container only
+needs `node` plus the checked-in scripts mounted from this directory.
+
+If Cronicle is installed directly on the Pi instead of via Docker, expose the
+same scripts path that the jobs below use:
+
+```bash
+sudo ln -sfn "$PWD/ops/cronicle/scripts" /opt/cronicle/dac-scripts
+```
+
+The job wrappers source `ops/cronicle/.env` themselves, so they work in either
+the Docker or direct systemd Cronicle setup.
 
 Open Cronicle:
 
@@ -101,7 +114,6 @@ the run failed and keeps the stderr/stdout logs.
 
 ```bash
 git pull
-pnpm --dir web install --frozen-lockfile
 docker compose -f ops/cronicle/docker-compose.yml up -d
 ```
 
