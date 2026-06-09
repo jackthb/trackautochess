@@ -148,6 +148,26 @@ def _load_relics() -> dict[str, dict]:
     }
 
 
+def _to_real_png(data: bytes) -> bytes:
+    """Transcode WebP bytes to real PNG.
+
+    Steam's CDN serves several hero minimap icons as WebP bytes under a `.png`
+    name. Browsers content-sniff and display them fine, but the OG image
+    rasterizer (resvg, via web/lib/og.tsx) cannot decode WebP and renders them
+    as blank boxes — so the social-card unit icons silently disappear. We
+    transcode to a real PNG at extraction time so every consumer gets bytes
+    that match the extension. Non-WebP input is returned unchanged.
+    """
+    if not (data[:4] == b"RIFF" and data[8:12] == b"WEBP"):
+        return data
+    from io import BytesIO
+    from PIL import Image  # Pillow; required to write real PNGs from Steam WebP
+
+    buf = BytesIO()
+    Image.open(BytesIO(data)).convert("RGBA").save(buf, format="PNG", optimize=True)
+    return buf.getvalue()
+
+
 def _download(url: str, dest: Path) -> bool:
     """Download a file from URL. Returns True on success."""
     try:
@@ -162,7 +182,7 @@ def _download(url: str, dest: Path) -> bool:
                 data[:2] == b"\xff\xd8"):
             return False
         dest.parent.mkdir(parents=True, exist_ok=True)
-        dest.write_bytes(data)
+        dest.write_bytes(_to_real_png(data))
         return True
     except Exception:
         return False
@@ -193,7 +213,7 @@ def _extract_vpk_png(pak, vpk_path: str, dest: Path) -> bool:
         if len(data) < 100:
             return False
         dest.parent.mkdir(parents=True, exist_ok=True)
-        dest.write_bytes(data)
+        dest.write_bytes(_to_real_png(data))
         return True
     except (KeyError, Exception):
         return False
