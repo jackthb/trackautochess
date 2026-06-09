@@ -89,7 +89,7 @@ function fetchJson(url) {
       {
         headers: {
           Accept: "application/vnd.github.v3+json",
-          "User-Agent": "DAC-Tracker-Updater",
+          "User-Agent": "Track-Auto-Chess-Updater",
         },
         timeout: 15000,
       },
@@ -253,7 +253,7 @@ function startBackend() {
 
   backendProcess = spawn(command, args, {
     cwd,
-    env: { ...process.env, DAC_TRACKER_LOG_PATH: TRACKER_LOG_PATH },
+    env: { ...process.env, TRACK_AUTO_CHESS_LOG_PATH: TRACKER_LOG_PATH },
     stdio: ["pipe", "pipe", "pipe"],
   });
 

@@ -5,7 +5,7 @@ function getRustBackendExecutableName(platform = process.platform) {
 }
 
 function getIconFilename(platform = process.platform) {
-  return platform === "win32" ? "dac_tracker.ico" : "dac_tracker.png";
+  return platform === "win32" ? "track_auto_chess.ico" : "track_auto_chess.png";
 }
 
 function getRepoDesktopPaths(repoDir, options = {}) {

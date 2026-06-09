@@ -97,7 +97,8 @@ impl SupabaseClient {
             return Err("diagnostic upload needs steam_id for storage path".to_owned());
         }
         let session = chrono::Utc::now().format("%Y%m%d_%H%M%S").to_string();
-        let tracker_path = env::var_os("DAC_TRACKER_LOG_PATH")
+        let tracker_path = env::var_os("TRACK_AUTO_CHESS_LOG_PATH")
+            .or_else(|| env::var_os(concat!("DAC", "_TRACKER_LOG_PATH")))
             .map(PathBuf::from)
             .unwrap_or_else(|| cfg.dac_dir.join("tracker.log"));
         let tracker_data = read_file_bytes(&tracker_path).unwrap_or_default();

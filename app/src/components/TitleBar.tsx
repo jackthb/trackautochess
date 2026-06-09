@@ -26,7 +26,7 @@ export function TitleBar() {
     <div className="titlebar">
       <span className="titlebar-logo">
         <Logo size={18} />
-        <span>DAC</span> Tracker
+        <span>Track</span> Auto Chess
       </span>
       <div className="titlebar-controls">
         <button

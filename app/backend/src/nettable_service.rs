@@ -25,7 +25,7 @@ const PREFERRED_CAPTURE_STEAM_IDS: &[&str] = &[
     "76561198022169086", // Jack
 ];
 
-const AUTOEXEC_BLOCK: &str = r#"// >>> DAC Tracker nettable capture >>>
+const AUTOEXEC_BLOCK: &str = r#"// >>> Track Auto Chess nettable capture >>>
 bind "F20" "dumpstringtable CustomNetTable_player_id_table cl verbose"
 bind "F21" "dumpstringtable CustomNetTable_dac_table cl verbose"
 bind "F22" "dumpstringtable CustomNetTable_player_info_table cl verbose"
@@ -33,7 +33,7 @@ bind "F23" "dumpstringtable CustomNetTable_game_info cl verbose"
 bind "F24" "dumpstringtable CustomNetTable_ranking_top_table cl verbose;dumpstringtable CustomNetTable_player_id_table cl verbose"
 bind "F16" "dumpstringtable CustomNetTable_chess_pool_table cl verbose"
 bind "F25" "dumpstringtable CustomNetTable_unit_table cl verbose"
-// <<< DAC Tracker nettable capture <<<
+// <<< Track Auto Chess nettable capture <<<
 "#;
 
 #[derive(Clone)]
@@ -2257,7 +2257,7 @@ fn candidate_steam_dirs() -> Vec<PathBuf> {
 
 fn find_gsi_cfg_target() -> Option<PathBuf> {
     find_dota_dir().map(|dir| {
-        dir.join("game/dota/cfg/gamestate_integration/gamestate_integration_dac_tracker.cfg")
+        dir.join("game/dota/cfg/gamestate_integration/gamestate_integration_track_auto_chess.cfg")
     })
 }
 
@@ -2268,6 +2268,14 @@ fn install_gsi_cfg(port: u16) -> io::Result<PathBuf> {
     let desired = crate::gsi::install_cfg_text(port);
     if fs::read_to_string(&path).ok().as_deref() != Some(desired.as_str()) {
         fs::write(&path, desired)?;
+    }
+    if let Some(old_path) = path.parent().map(|dir| {
+        let legacy_name = ["gamestate_integration", "dac", "tracker.cfg"].join("_");
+        dir.join(legacy_name)
+    }) {
+        if old_path != path {
+            let _ = fs::remove_file(old_path);
+        }
     }
     Ok(path)
 }
@@ -2347,11 +2355,22 @@ fn install_autoexec() -> io::Result<PathBuf> {
         .ok_or_else(|| io::Error::new(io::ErrorKind::NotFound, "Dota directory not found"))?;
     fs::create_dir_all(path.parent().unwrap())?;
     let existing = fs::read_to_string(&path).unwrap_or_default();
-    let next = if let (Some(start), Some(end)) = (
-        existing.find("// >>> DAC Tracker nettable capture >>>"),
-        existing.find("// <<< DAC Tracker nettable capture <<<"),
-    ) {
-        let end = end + "// <<< DAC Tracker nettable capture <<<".len();
+    const OLD_START: &str = concat!("// >>> ", "DAC ", "Tracker", " nettable capture >>>");
+    const OLD_END: &str = concat!("// <<< ", "DAC ", "Tracker", " nettable capture <<<");
+    const START: &str = "// >>> Track Auto Chess nettable capture >>>";
+    const END: &str = "// <<< Track Auto Chess nettable capture <<<";
+    let block_bounds = existing
+        .find(START)
+        .and_then(|start| existing.find(END).map(|end| (start, end, END.len())))
+        .or_else(|| {
+            existing.find(OLD_START).and_then(|start| {
+                existing
+                    .find(OLD_END)
+                    .map(|end| (start, end, OLD_END.len()))
+            })
+        });
+    let next = if let Some((start, end, end_len)) = block_bounds {
+        let end = end + end_len;
         format!(
             "{}{}{}",
             &existing[..start],

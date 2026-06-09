@@ -32,7 +32,7 @@ export function LoginScreen({ status, authError, onClearAuthError }: LoginScreen
   return (
     <div className="login-screen">
       <div className="login-card">
-        <div className="login-eyebrow">DAC Tracker</div>
+        <div className="login-eyebrow">Track Auto Chess</div>
         <h1 className="login-title">Login with Steam</h1>
         <p className="login-copy">
           {backendReady

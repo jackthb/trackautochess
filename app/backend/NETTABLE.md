@@ -10,8 +10,8 @@ then uploads the processed match representation to Supabase.
    tees the in-game console to `<dota>/game/dota/console.log`;
    `conclearlog` truncates it at each launch, so ingest is idempotent
    across sessions.
-2. When the user applies nettable setup, the Rust `nettable_service` writes a marked DAC
-   Tracker block inside `<dota>/game/dota/cfg/autoexec.cfg`. If the user has
+2. When the user applies nettable setup, the Rust `nettable_service` writes a marked Track
+   Auto Chess block inside `<dota>/game/dota/cfg/autoexec.cfg`. If the user has
    their own autoexec, it appends/replaces only our marked block and preserves
    the rest of the file.
 3. The capture module tails `console.log` and sends key presses to the Dota
@@ -66,7 +66,7 @@ metadata snapshot includes both the Queen ladder and the slot mapping.
 | `app/backend/src/supabase.rs` | Processed match/timeline/Queen uploads, outbox replay, diagnostic-log Storage uploads, and raw nettable dump-log Storage uploads. |
 | `app/backend/src/hotkeys.rs` | Windows `SendInput` wrapper for the extended F-key dump cadence. |
 
-`AUTOEXEC_CFG_CONTENT` is the marked DAC Tracker cfg block in `nettable_service.rs`. The setup path upserts that block instead of replacing the user's whole `autoexec.cfg`.
+`AUTOEXEC_CFG_CONTENT` is the marked Track Auto Chess cfg block in `nettable_service.rs`. The setup path upserts that block instead of replacing the user's whole `autoexec.cfg`.
 
 ## Events emitted (consumed by `useNetTableEvents` in the renderer)
 

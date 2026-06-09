@@ -37,8 +37,8 @@ export function buildGameSeo(props: Omit<GamePageProps, "route">): {
   const playerCanonicalUrl =
     absoluteUrl(playerPath, originFromUrl(canonicalUrl)) ?? playerPath;
   const title = game.placement
-    ? `#${game.placement} ${displayName} — DAC Match | Track Auto Chess`
-    : `${displayName} — DAC Match | Track Auto Chess`;
+    ? `#${game.placement} ${displayName} — Dota Auto Chess Match | Track Auto Chess`
+    : `${displayName} — Dota Auto Chess Match | Track Auto Chess`;
   const description = game.placement
     ? `${displayName} finished #${game.placement} in a Dota Auto Chess match${game.rank ? ` at ${game.rank}` : ""}.`
     : `Dota Auto Chess match details for ${displayName}.`;

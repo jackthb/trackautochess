@@ -1,7 +1,7 @@
 {
-  "name": "dac-tracker",
+  "name": "track-auto-chess",
   "version": "0.1.2",
-  "description": "Dota Auto Chess game tracker",
+  "description": "Track Auto Chess desktop app",
   "main": "main.js",
   "scripts": {
     "start": "vite build && electron .",

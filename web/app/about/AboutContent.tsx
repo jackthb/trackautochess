@@ -8,15 +8,15 @@ import styles from "./about.module.css";
 const t = {
   title: `About | ${SITE_TITLE}`,
   description:
-    "How Tracker Autochess surfaces Dota Auto Chess player statistics from Drodo profile data and manually tracked match history.",
+    "How Track Auto Chess surfaces Dota Auto Chess player statistics from Drodo profile data and manually tracked match history.",
   structuredName: "About Track Auto Chess",
   eyebrow: "About",
-  heading: "How Tracker Autochess surfaces players’ statistics",
+  heading: "How Track Auto Chess surfaces players’ statistics",
   copy1pre: "",
   copy1post:
     " surfaces Dota Auto Chess player statistics from the best source available for a profile.",
   copy2:
-    "DAC Tools is currently in pre-release, and this is our tooling to enable tracking in-game statistics.",
+    "Track Auto Chess is currently in pre-release, and this is our tooling to enable tracking in-game statistics.",
   copy3:
     "When Drodo exposes public profile data, we use that data. When Drodo data is not available, we fall back to manually tracked or imported match history.",
   copy4:

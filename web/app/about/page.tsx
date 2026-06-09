@@ -4,7 +4,7 @@ import { AboutContent } from "./AboutContent";
 
 const title = `About | ${SITE_TITLE}`;
 const description =
-  "How Tracker Autochess surfaces Dota Auto Chess player statistics from Drodo profile data and manually tracked match history.";
+  "How Track Auto Chess surfaces Dota Auto Chess player statistics from Drodo profile data and manually tracked match history.";
 
 export const metadata: Metadata = {
   title,

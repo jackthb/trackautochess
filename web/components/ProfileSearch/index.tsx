@@ -100,7 +100,9 @@ export function ProfileSearch({
         source: analyticsSource,
         reason: "not_found",
       });
-      setLookupError("We couldn't find that Steam profile. Check the ID or URL.");
+      setLookupError(
+        "We couldn't find that Steam profile. Check the ID or URL.",
+      );
     } catch {
       if (reqId !== lookupReqRef.current) return;
       trackEvent("Profile Steam Lookup Failed", {
@@ -136,27 +138,12 @@ export function ProfileSearch({
       ? "Searching…"
       : "Search";
   // Drop the scheme for display so the whole help line fits on one row.
-  const exampleDisplay = exampleUrl ? exampleUrl.replace(/^https?:\/\//, "") : "";
+  const exampleDisplay = exampleUrl
+    ? exampleUrl.replace(/^https?:\/\//, "")
+    : "";
 
   return (
     <div className={`${styles.profileSearch} ${className}`}>
-      <div className={styles.searchHelp}>
-        <a
-          href="https://steamcommunity.com/my/"
-          target="_blank"
-          rel="noreferrer"
-        >
-          Find your Steam profile URL
-        </a>
-        {exampleUrl && (
-          <>
-            <span className={styles.searchHelpArrow} aria-hidden="true">
-              &rarr;
-            </span>
-            <span className={styles.searchExampleUrl}>{exampleDisplay}</span>
-          </>
-        )}
-      </div>
       <form className={styles.searchForm} onSubmit={handleSearch}>
         <div className={styles.inputWrap}>
           <svg
@@ -216,6 +203,23 @@ export function ProfileSearch({
           </div>
         </div>
       )}
+      <div className={styles.searchHelp}>
+        <a
+          href="https://steamcommunity.com/my/"
+          target="_blank"
+          rel="noreferrer"
+        >
+          Find your Steam profile URL
+        </a>
+        {exampleUrl && (
+          <>
+            <span className={styles.searchHelpArrow} aria-hidden="true">
+              &rarr;
+            </span>
+            <span className={styles.searchExampleUrl}>{exampleDisplay}</span>
+          </>
+        )}
+      </div>
     </div>
   );
 }

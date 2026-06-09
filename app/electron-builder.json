@@ -1,6 +1,6 @@
 {
-  "appId": "com.dac-tracker.app",
-  "productName": "DAC Tracker",
+  "appId": "com.trackautochess.app",
+  "productName": "Track Auto Chess",
   "directories": {
     "output": "release"
   },
@@ -43,14 +43,14 @@
         ]
       }
     ],
-    "icon": "../data/icons/dac_tracker.ico",
+    "icon": "../data/icons/track_auto_chess.ico",
     "signtoolOptions": {
       "sign": "./scripts/custom-sign.cjs"
     }
   },
   "linux": {
     "category": "Utility",
-    "icon": "../data/icons/dac_tracker.png"
+    "icon": "../data/icons/track_auto_chess.png"
   },
   "nsis": {
     "oneClick": true,
@@ -58,8 +58,8 @@
     "allowToChangeInstallationDirectory": false,
     "deleteAppDataOnUninstall": false,
     "createDesktopShortcut": true,
-    "installerIcon": "../data/icons/dac_tracker.ico",
-    "uninstallerIcon": "../data/icons/dac_tracker.ico"
+    "installerIcon": "../data/icons/track_auto_chess.ico",
+    "uninstallerIcon": "../data/icons/track_auto_chess.ico"
   },
   "publish": {
     "provider": "github",

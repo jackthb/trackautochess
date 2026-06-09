@@ -66,7 +66,7 @@ $BackendDir = Join-Path $AppDir "backend"
 $WebDir = Join-Path $RepoRoot "web"
 
 if (-not (Test-Path (Join-Path $RepoRoot "package.json"))) {
-  throw "Could not find repository package.json at $RepoRoot. Run this script from the checked-out dac-tools repo."
+  throw "Could not find repository package.json at $RepoRoot. Run this script from the checked-out Track Auto Chess repo."
 }
 
 if ($env:WSL_DISTRO_NAME) {
@@ -105,7 +105,7 @@ Invoke-Step "Verify backend daemon startup" "node" @("scripts/verify-desktop-bac
 
 if (-not $SkipApp) {
   Invoke-Step "Build unpacked Windows app" "pnpm" @("--dir", "app", "run", "build:app")
-  $AppExe = Join-Path $AppDir "release\win-unpacked\DAC Tracker.exe"
+  $AppExe = Join-Path $AppDir "release\win-unpacked\Track Auto Chess.exe"
   if (-not (Test-Path $AppExe)) {
     throw "Expected unpacked app executable was not created: $AppExe"
   }

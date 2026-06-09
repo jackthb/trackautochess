@@ -4,7 +4,7 @@ This file provides guidance to Codex (Codex.ai/code) when working with code in t
 
 ## Project Overview
 
-DAC Tools is a monorepo for Dota Auto Chess game tracking and analysis. It includes a desktop app (Electron + React + Rust backend), a Next.js web viewer/CMS, shared UI/data utilities, committed game content, and automation for patch-note/game-data updates.
+Track Auto Chess is a monorepo for Dota Auto Chess game tracking and analysis. It includes a desktop app (Electron + React + Rust backend), a Next.js web viewer/CMS, shared UI/data utilities, committed game content, and automation for patch-note/game-data updates.
 
 ## Architecture
 

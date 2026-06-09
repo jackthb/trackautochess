@@ -255,7 +255,7 @@ function ActiveMatchControl({
         type="button"
         className="btn-ghost nettable-active-match-button"
         onClick={onCheck}
-        title="Unpauses live capture and requests a full DAC lobby snapshot."
+        title="Unpauses live capture and requests a full Dota Auto Chess lobby snapshot."
       >
         Check active match
       </button>

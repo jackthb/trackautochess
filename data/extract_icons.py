@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Unified icon extraction for DAC Tools.
+"""Unified icon extraction for Track Auto Chess.
 
 Sources:
   - Unit icons:    Steam CDN hero minimap icons

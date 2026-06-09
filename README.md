@@ -1,6 +1,6 @@
-# DAC Tools
+# Track Auto Chess
 
-Game tracking and analysis tools for Dota Auto Chess.
+Game tracking and analysis for Dota Auto Chess.
 
 - **Web** - [trackautochess.com](https://www.trackautochess.com) - player lookup, match history, patch notes, item/unit/synergy/relic/talent guides, and Keystatic content editing.
 - **Desktop App** - Electron + React + Rust tracker that captures Dota console/nettable data locally and syncs processed match data to Supabase.

@@ -114,7 +114,7 @@ impl GsiServer {
 
 pub fn install_cfg_text(port: u16) -> String {
     format!(
-        r#""DAC Tools GSI"
+        r#""Track Auto Chess GSI"
 {{
     "uri"           "http://127.0.0.1:{port}"
     "timeout"       "5.0"
