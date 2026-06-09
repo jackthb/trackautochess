@@ -16,7 +16,8 @@ const { getRepoDesktopPaths } = require("./desktop-paths.cjs");
 const repoDir = path.resolve(__dirname, "..");
 const desktopPaths = getRepoDesktopPaths(repoDir);
 const dacDir = desktopPaths.dacDir;
-const child = spawn("corepack", ["pnpm", "--dir", "app", "run", mode], {
+const pnpmCommand = process.platform === "win32" ? "pnpm.cmd" : "pnpm";
+const child = spawn(pnpmCommand, ["--dir", "app", "run", mode], {
   cwd: repoDir,
   stdio: "inherit",
   env: {
@@ -34,6 +35,6 @@ child.on("exit", (code, signal) => {
 });
 
 child.on("error", (error) => {
-  console.error(error.message);
+  console.error(`Failed to start pnpm (${pnpmCommand}): ${error.message}`);
   process.exit(1);
 });
