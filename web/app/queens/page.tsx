@@ -111,19 +111,16 @@ async function loadQueens(): Promise<{ rows: QueenRow[]; error: string | null }>
     steam_id: String(row.steam_id),
   }));
   const latestSeenAt = normalizedRows[0]?.queen_ladder_last_seen_at ?? null;
-  const rows = (latestSeenAt
+  const rankedRows = (latestSeenAt
     ? normalizedRows.filter(
         (row) => row.queen_ladder_last_seen_at === latestSeenAt || profileQueenRank(row) != null
       )
     : normalizedRows.filter((row) => profileQueenRank(row) != null)
-  ).sort((a, b) => {
-    const aRank = effectiveQueenRank(a) ?? Number.MAX_SAFE_INTEGER;
-    const bRank = effectiveQueenRank(b) ?? Number.MAX_SAFE_INTEGER;
-    return aRank - bRank || (queenMmr(b) ?? -1) - (queenMmr(a) ?? -1);
-  }).filter((row) => {
+  ).sort(compareQueenRows).filter((row) => {
     const rank = effectiveQueenRank(row);
     return rank == null || rank <= QUEEN_TABLE_LIMIT;
-  }).slice(0, QUEEN_TABLE_LIMIT);
+  });
+  const rows = dedupeQueenRanks(rankedRows).slice(0, QUEEN_TABLE_LIMIT);
 
   if (rows.length === 0) {
     return { rows, error: null };
@@ -234,6 +231,40 @@ function profileQueenRank(row: QueenRow): number | null {
 
 function effectiveQueenRank(row: QueenRow): number | null {
   return row.queen_ladder_rank ?? profileQueenRank(row);
+}
+
+function compareQueenRows(a: QueenRow, b: QueenRow): number {
+  const aRank = effectiveQueenRank(a) ?? Number.MAX_SAFE_INTEGER;
+  const bRank = effectiveQueenRank(b) ?? Number.MAX_SAFE_INTEGER;
+  return aRank - bRank || (queenMmr(b) ?? -1) - (queenMmr(a) ?? -1);
+}
+
+function isBetterRankRow(candidate: QueenRow, current: QueenRow): boolean {
+  const candidateSeenAt = candidate.queen_ladder_last_seen_at;
+  const currentSeenAt = current.queen_ladder_last_seen_at;
+  if (candidateSeenAt && !currentSeenAt) return true;
+  if (!candidateSeenAt && currentSeenAt) return false;
+  if (candidateSeenAt && currentSeenAt && candidateSeenAt !== currentSeenAt) {
+    return candidateSeenAt > currentSeenAt;
+  }
+  return (queenMmr(candidate) ?? -1) > (queenMmr(current) ?? -1);
+}
+
+function dedupeQueenRanks(rows: QueenRow[]): QueenRow[] {
+  const ranked = new Map<number, QueenRow>();
+  const unranked: QueenRow[] = [];
+  for (const row of rows) {
+    const rank = effectiveQueenRank(row);
+    if (rank == null) {
+      unranked.push(row);
+      continue;
+    }
+    const current = ranked.get(rank);
+    if (!current || isBetterRankRow(row, current)) {
+      ranked.set(rank, row);
+    }
+  }
+  return [...ranked.values(), ...unranked].sort(compareQueenRows);
 }
 
 function formatMove(move: QueenMove | null | undefined): string {
