@@ -18,6 +18,7 @@ use std::{
 const POST_GAME_FINALIZE_ATTEMPTS: usize = 12;
 const POST_GAME_FINALIZE_INTERVAL: Duration = Duration::from_secs(4);
 const QUEEN_LADDER_AUTO_SYNC_INTERVAL: Duration = Duration::from_secs(600);
+const MAX_SESSION_ROUND_SNAPSHOTS: usize = 80;
 const DEFAULT_GSI_PORT: u16 = 4001;
 const STEAM_ID64_BASE: u64 = 76_561_197_960_265_728;
 const DOTA_APP_ID: &str = "570";
@@ -784,7 +785,7 @@ mod tests {
     }
 
     #[test]
-    fn timeline_builds_latest_snapshot_per_round() {
+    fn timeline_ignores_duplicate_snapshots_per_round() {
         let state = Arc::new(Mutex::new(NettableState {
             local_steam_id: Some("76561198022169086".to_owned()),
             match_roster_fingerprint: Some(vec!["76561198022169086".to_owned()]),
@@ -845,22 +846,87 @@ mod tests {
         assert_eq!(timeline["round_count"], 1);
         assert_eq!(timeline["first_round"], 1);
         assert_eq!(timeline["last_round"], 1);
-        assert_eq!(timeline["rounds"][0]["captured_at"], "2026-06-08T00:01:00Z");
+        assert_eq!(timeline["rounds"][0]["captured_at"], "2026-06-08T00:00:00Z");
         assert_eq!(
             timeline["rounds"][0]["players"]["76561198022169086"]["hp"],
-            88
+            99
         );
-        assert_eq!(
-            timeline["rounds"][0]["players"]["76561198022169086"]["hand"],
-            "Lion|Chaos Knight(2)"
-        );
-        let board = &timeline["rounds"][0]["players"]["76561198022169086"]["board"][0];
-        assert_eq!(board["name"], "Chaos Knight");
-        assert_eq!(board["stars"], 2);
-        assert_eq!(board["x"], 3);
-        assert_eq!(board["y"], 2);
-        assert_eq!(board["items"][0], "item_bkb");
-        assert_eq!(board["last_items"][0], "item_blink");
+    }
+
+    #[test]
+    fn timeline_keeps_unique_rounds_when_polling_many_times_per_round() {
+        let state = Arc::new(Mutex::new(NettableState {
+            local_steam_id: Some("76561198022169086".to_owned()),
+            match_roster_fingerprint: Some(vec!["76561198022169086".to_owned()]),
+            ..NettableState::default()
+        }));
+
+        {
+            let mut state = state.lock().unwrap();
+            for round in 1..=41 {
+                for poll in 0..8 {
+                    store_session_dump(&mut state, SessionDump {
+                        captured_at: format!("2026-06-08T00:{round:02}:{poll:02}Z"),
+                        rows: rows_from_json(vec![
+                            (
+                                "CustomNetTable_game_info",
+                                "round_info",
+                                serde_json::json!({"round": round}),
+                            ),
+                            (
+                                "CustomNetTable_player_info_table",
+                                "player_info",
+                                serde_json::json!({"data": {"76561198022169086": {"hp": 100 - round, "hero_level": 5, "curr_rank": 1}}}),
+                            ),
+                        ]),
+                    });
+                }
+            }
+        }
+
+        let timeline = build_match_timeline(&state, "match-1").expect("timeline builds");
+
+        assert_eq!(timeline["round_count"], 41);
+        assert_eq!(timeline["first_round"], 1);
+        assert_eq!(timeline["last_round"], 41);
+        assert_eq!(timeline["rounds"][0]["captured_at"], "2026-06-08T00:01:00Z");
+        assert_eq!(timeline["rounds"][40]["captured_at"], "2026-06-08T00:41:00Z");
+    }
+
+    #[test]
+    fn timeline_caps_at_eighty_unique_rounds() {
+        let state = Arc::new(Mutex::new(NettableState {
+            local_steam_id: Some("76561198022169086".to_owned()),
+            match_roster_fingerprint: Some(vec!["76561198022169086".to_owned()]),
+            ..NettableState::default()
+        }));
+
+        {
+            let mut state = state.lock().unwrap();
+            for round in 1..=90 {
+                store_session_dump(&mut state, SessionDump {
+                    captured_at: format!("2026-06-08T00:{round:02}:00Z"),
+                    rows: rows_from_json(vec![
+                        (
+                            "CustomNetTable_game_info",
+                            "round_info",
+                            serde_json::json!({"round": round}),
+                        ),
+                        (
+                            "CustomNetTable_player_info_table",
+                            "player_info",
+                            serde_json::json!({"data": {"76561198022169086": {"hp": 100 - round, "hero_level": 5, "curr_rank": 1}}}),
+                        ),
+                    ]),
+                });
+            }
+        }
+
+        let timeline = build_match_timeline(&state, "match-1").expect("timeline builds");
+
+        assert_eq!(timeline["round_count"], 80);
+        assert_eq!(timeline["first_round"], 11);
+        assert_eq!(timeline["last_round"], 90);
     }
 
     #[test]
@@ -1085,15 +1151,29 @@ fn handle_rows_for_parity(state: &Arc<Mutex<NettableState>>, rows: &[NettableRow
         events.push(event);
     }
 
-    state.session_dumps.push(SessionDump {
+    store_session_dump(&mut state, SessionDump {
         captured_at: now,
         rows: rows.to_vec(),
     });
-    if state.session_dumps.len() > 256 {
-        let excess = state.session_dumps.len() - 256;
+    events
+}
+
+fn store_session_dump(state: &mut NettableState, dump: SessionDump) {
+    if let Some(round) = extract_round_from_rows(&dump.rows) {
+        if state
+            .session_dumps
+            .iter()
+            .rev()
+            .any(|existing| extract_round_from_rows(&existing.rows) == Some(round))
+        {
+            return;
+        }
+    }
+    state.session_dumps.push(dump);
+    if state.session_dumps.len() > MAX_SESSION_ROUND_SNAPSHOTS {
+        let excess = state.session_dumps.len() - MAX_SESSION_ROUND_SNAPSHOTS;
         state.session_dumps.drain(0..excess);
     }
-    events
 }
 
 fn maybe_auto_upload_queen_ladder(
@@ -1156,15 +1236,7 @@ fn build_match_timeline(
             "draft": extract_draft_state_from_rows(&dump.rows),
             "death_team": extract_death_team_from_rows(&dump.rows),
         });
-        let replace = by_round
-            .get(&round)
-            .and_then(|existing| existing.get("captured_at"))
-            .and_then(serde_json::Value::as_str)
-            .map(|existing_at| dump.captured_at.as_str() >= existing_at)
-            .unwrap_or(true);
-        if replace {
-            by_round.insert(round, snapshot);
-        }
+        by_round.entry(round).or_insert(snapshot);
     }
     if by_round.is_empty() {
         return None;
@@ -1915,8 +1987,7 @@ fn poll_once(
     }
     // Read the log once: parse the stringtables AND scan the UI-state line.
     let text = fs::read_to_string(&path)?;
-    let parsed = nettable_parser::parse_log_text(&text);
-    let mut rows = nettable_parser::rows_from_log_text(&text);
+    let (parsed, mut rows) = nettable_parser::parse_log_text_with_rows(&text);
     let ui_state = latest_ui_state(&text);
     let mut state = state.lock().unwrap();
     state.last_modified = Some(modified);

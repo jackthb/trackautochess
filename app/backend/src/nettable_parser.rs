@@ -80,7 +80,18 @@ pub fn parse_log(path: &Path) -> io::Result<ParsedLog> {
 }
 
 pub fn parse_log_text(body: &str) -> ParsedLog {
-    parse_log_text_with_observed_at(body)
+    parsed_without_observed_at(parse_log_text_with_observed_at(body))
+}
+
+pub fn parse_log_text_with_rows(body: &str) -> (ParsedLog, Vec<NettableRow>) {
+    let parsed_with_observed_at = parse_log_text_with_observed_at(body);
+    let parsed = parsed_without_observed_at(parsed_with_observed_at.clone());
+    let rows = rows_from_parsed_with_observed_at(parsed_with_observed_at);
+    (parsed, rows)
+}
+
+fn parsed_without_observed_at(parsed: ParsedLogWithObservedAt) -> ParsedLog {
+    parsed
         .into_iter()
         .map(|(table, entries)| {
             (
@@ -214,6 +225,7 @@ pub fn rows_from_log_text(body: &str) -> Vec<NettableRow> {
     rows_from_parsed_with_observed_at(parse_log_text_with_observed_at(body))
 }
 
+#[cfg(test)]
 pub fn rows_from_parsed(parsed: ParsedLog) -> Vec<NettableRow> {
     rows_from_parsed_with_observed_at(
         parsed
