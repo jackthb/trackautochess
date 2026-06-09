@@ -1,9 +1,4 @@
 //! Queen-ladder extraction from the `ranking_top_table` CustomNetTable.
-//!
-//! Ported from the Python backend's `_extract_ranking_top_players`
-//! (`app/backend/nettable_capture.py`). Drodo has changed the exact field
-//! names in this net-table over time, so this accepts a small set of
-//! observed/likely aliases instead of depending on one brittle shape.
 
 use serde_json::{Map, Value};
 
