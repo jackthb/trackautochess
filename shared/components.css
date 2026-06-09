@@ -146,6 +146,47 @@
   min-height: calc((var(--chess-board-cell) * 4) + 12px);
 }
 
+.chess-board-with-hand {
+  min-width: calc((var(--chess-board-cell) * 9) + 28px);
+  padding-top: calc(var(--chess-board-cell) + 14px);
+}
+
+.chess-board-hand {
+  position: absolute;
+  top: 6px;
+  left: 6px;
+  display: grid;
+  grid-template-columns: repeat(9, var(--chess-board-cell));
+  gap: 2px;
+  z-index: 0;
+}
+
+.chess-board-hand-cell {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--chess-board-cell);
+  height: var(--chess-board-cell);
+  border: 1px solid color-mix(in srgb, var(--border-subtle) 70%, transparent);
+  border-radius: var(--r-3);
+  background: color-mix(in srgb, var(--bg-surface) 52%, transparent);
+}
+
+.chess-board-hand-cell:nth-child(odd) {
+  background: color-mix(in srgb, var(--bg-elevated) 46%, transparent);
+}
+
+.chess-board-hand-piece {
+  width: 100%;
+  height: 100%;
+}
+
+.chess-board-hand-piece .chess-board-piece-icon {
+  width: calc(var(--chess-board-cell) - 10px);
+  height: calc(var(--chess-board-cell) - 10px);
+}
+
 .chess-board-cell {
   z-index: 0;
   min-width: 0;

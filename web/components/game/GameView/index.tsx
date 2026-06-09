@@ -2,14 +2,23 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { UNIT_COSTS, computeSynergies, filterActiveSynergies } from "@/lib/units";
+import {
+  UNIT_COSTS,
+  computeSynergies,
+  filterActiveSynergies,
+} from "@/lib/units";
 import {
   itemsFullData,
   relicsData,
   synergiesData,
   unitsFullData,
 } from "@/generated/content-data";
-import type { Game, UnitFullInfo, SynergyInfo, RelicInfo } from "@dac/shared/types";
+import type {
+  Game,
+  UnitFullInfo,
+  SynergyInfo,
+  RelicInfo,
+} from "@dac/shared/types";
 import type { ChessBoardPiece, ItemFullInfo } from "@dac/shared/types";
 import {
   parseLineup,
@@ -103,7 +112,9 @@ interface GamePageProps {
 }
 
 function normalizeName(value: string | null | undefined): string {
-  return String(value || "").trim().toLowerCase();
+  return String(value || "")
+    .trim()
+    .toLowerCase();
 }
 
 /** The "expanded" detail panel for a player row — bigger icons, full relic
@@ -140,16 +151,20 @@ function PlayerDetail({
           {gold != null && <span className={styles.mpGold}>Gold {gold}</span>}
         </div>
       )}
-      {(board?.length || lineup.length > 0) && (
+      {(board?.length || lineup.length > 0 || hand.length > 0) && (
         <div className={styles.pdSection}>
           <div className={styles.pdLabel}>Board</div>
           <div className={styles.pdBoard}>
             <ChessBoard
               board={board}
               lineup={lineupStr}
+              hand={hand
+                .map((u) => `${u.name}${u.stars > 1 ? `(${u.stars})` : ""}`)
+                .join("|")}
               unitCosts={UNIT_COSTS}
               iconUrl={iconUrl}
               itemsFull={ITEMS_FULL}
+              tooltipData={tooltipData}
             />
           </div>
         </div>
@@ -159,43 +174,6 @@ function PlayerDetail({
           <div className={styles.pdLabel}>Lineup</div>
           <div className={styles.pdLineup}>
             {lineup.map((u, i) => (
-              <TooltipWrap
-                key={i}
-                type="unit"
-                name={u.name}
-                stars={u.stars}
-                data={tooltipData}
-              >
-                <div className={`unit-icon-wrap ${styles.pdUnit}`}>
-                  <img
-                    className="unit-icon"
-                    src={iconUrl("units", unitStem(u.name))}
-                    alt={u.name}
-                    loading="lazy"
-                    style={{
-                      borderColor: costBorderColor(UNIT_COSTS[u.name] || 1),
-                    }}
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).style.display = "none";
-                    }}
-                  />
-                  {u.stars > 1 && (
-                    <span className={`unit-stars s${u.stars}`}>
-                      {"★".repeat(u.stars)}
-                    </span>
-                  )}
-                </div>
-              </TooltipWrap>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {hand.length > 0 && (
-        <div className={styles.pdSection}>
-          <div className={styles.pdLabel}>Hand</div>
-          <div className={styles.pdLineup}>
-            {hand.map((u, i) => (
               <TooltipWrap
                 key={i}
                 type="unit"
@@ -263,7 +241,7 @@ function PlayerDetail({
           <div className={styles.pdLabel}>
             Relics
             {hasRelicTimeline && (
-              <span className={styles.pdLabelHint}>{" "}· acquired round</span>
+              <span className={styles.pdLabelHint}> · acquired round</span>
             )}
           </div>
           <div className={styles.pdRelics}>
@@ -310,6 +288,7 @@ function MatchPlayerRow({
   snapRound,
   isLastRound,
   displayPosition,
+  deathRound,
   tooltipData,
 }: {
   game: Game;
@@ -323,6 +302,7 @@ function MatchPlayerRow({
   snapRound: number | null;
   isLastRound: boolean;
   displayPosition: number | null;
+  deathRound: number | null;
   tooltipData: TooltipData;
 }) {
   const p = displayPosition ?? (parseInt(game.placement) || 0);
@@ -347,7 +327,10 @@ function MatchPlayerRow({
 
   const isScrubbing = snapRound !== null && !isLastRound;
   const parsedSyn = !isScrubbing ? parseSynergies(game.synergies) : [];
-  const synergies = parsedSyn.length > 0 ? filterActiveSynergies(parsedSyn) : computeSynergies(lineup);
+  const synergies =
+    parsedSyn.length > 0
+      ? filterActiveSynergies(parsedSyn)
+      : computeSynergies(lineup);
 
   // Compact-view relic list: prefer the full set from relic_history, fall
   // back to the single `relic` field for CV-captured rows. When scrubber
@@ -374,7 +357,10 @@ function MatchPlayerRow({
   // No lineup / synergies / relics → nothing to expand into. Render as a
   // static (non-clickable) row and skip the caret + detail panel.
   const hasContent =
-    lineup.length > 0 || hand.length > 0 || synergies.length > 0 || compactRelics.length > 0;
+    lineup.length > 0 ||
+    hand.length > 0 ||
+    synergies.length > 0 ||
+    compactRelics.length > 0;
   const isOpen = expanded && hasContent;
 
   const rankLabel =
@@ -395,6 +381,10 @@ function MatchPlayerRow({
           return null;
         })()
       : null;
+  const visibleDeathRound =
+    deathRound != null && (snapRound == null || snapRound >= deathRound)
+      ? deathRound
+      : null;
 
   const inner = (
     <>
@@ -404,132 +394,131 @@ function MatchPlayerRow({
       >
         {displayPosition ?? game.placement ?? "—"}
       </div>
-        <div className={styles.mpInfo}>
-          <div className={styles.mpNameRow}>
-            {profileUrl ? (
-              <Link
-                href={playerProfilePath(String(game.user_id), profile.customUrl)}
-                className={styles.mpName}
-                onClick={(e) => e.stopPropagation()}
-              >
-                {displayName}
-              </Link>
-            ) : (
-              <span className={`${styles.mpName} ${styles.mpNameUnknown}`}>{displayName}</span>
-            )}
-          </div>
-          {rankLabel && <span className={styles.mpRank}>{rankLabel}</span>}
-        </div>
-        <div className={styles.mpColStats}>
-          {displayGame.level && (
-            <span className={styles.mpStat}>
-              <span className={styles.mpStatLabel}>LVL</span>
-              {displayGame.level}
-            </span>
-          )}
-          {displayGame.wins != null && displayGame.losses != null && (
-            <span className={styles.mpStat}>
-              <span className={styles.wlW}>{displayGame.wins}</span>
-              <span className={styles.mpWlSep}>{"–"}</span>
-              <span className={styles.wlL}>{displayGame.losses}</span>
-            </span>
-          )}
-          {roundResult && (
-            <span
-              className={
-                styles.mpRoundResult +
-                " " +
-                (roundResult === "out"
-                  ? styles.mpRoundOut
-                  : roundResult === "w"
-                    ? styles.mpRoundW
-                    : styles.mpRoundL)
-              }
+      <div className={styles.mpInfo}>
+        <div className={styles.mpNameRow}>
+          {profileUrl ? (
+            <Link
+              href={playerProfilePath(String(game.user_id), profile.customUrl)}
+              className={styles.mpName}
+              onClick={(e) => e.stopPropagation()}
             >
-              {roundResult === "out"
-                ? "Out"
-                : roundResult === "w"
-                  ? "Won"
-                  : "Lost"}
+              {displayName}
+            </Link>
+          ) : (
+            <span className={`${styles.mpName} ${styles.mpNameUnknown}`}>
+              {displayName}
             </span>
           )}
         </div>
-        <div className={styles.mpColLineup}>
-          {lineup.length > 0 && (
-            <div className={styles.mpLineup}>
-              {lineup.map((u, i) => (
-                <TooltipWrap
-                  key={i}
-                  type="unit"
-                  name={u.name}
-                  stars={u.stars}
-                  data={tooltipData}
-                >
-                  <div className={`unit-icon-wrap ${styles.mpUnit}`}>
-                    <img
-                      className="unit-icon"
-                      src={iconUrl("units", unitStem(u.name))}
-                      alt={u.name}
-                      loading="lazy"
-                      style={{
-                        borderColor: costBorderColor(UNIT_COSTS[u.name] || 1),
-                      }}
-                      onError={(e) => {
-                        (e.target as HTMLImageElement).style.display = "none";
-                      }}
-                    />
-                    {u.stars > 1 && (
-                      <span className={`unit-stars s${u.stars}`}>
-                        {"★".repeat(u.stars)}
-                      </span>
-                    )}
-                  </div>
-                </TooltipWrap>
-              ))}
-            </div>
-          )}
-          {hand.length > 0 && (
-            <div className={styles.mpHandRow}>
-              <span className={styles.mpHandLabel}>Hand</span>
-              <div className={styles.mpHandLineup}>
-                {hand.map((u, i) => (
-                  <TooltipWrap
-                    key={i}
-                    type="unit"
-                    name={u.name}
-                    stars={u.stars}
-                    data={tooltipData}
-                  >
-                    <div className={`unit-icon-wrap ${styles.mpHandUnit}`}>
-                      <img
-                        className="unit-icon"
-                        src={iconUrl("units", unitStem(u.name))}
-                        alt={u.name}
-                        loading="lazy"
-                        style={{
-                          borderColor: costBorderColor(UNIT_COSTS[u.name] || 1),
-                        }}
-                        onError={(e) => {
-                          (e.target as HTMLImageElement).style.display = "none";
-                        }}
-                      />
-                      {u.stars > 1 && (
-                        <span className={`unit-stars s${u.stars}`}>
-                          {"★".repeat(u.stars)}
-                        </span>
-                      )}
-                    </div>
-                  </TooltipWrap>
-                ))}
-              </div>
-            </div>
-          )}
-        </div>
-        {hasContent && (
-          <div className={styles.mpCaret} aria-hidden="true">
-            {isOpen ? "−" : "+"}
+        {rankLabel && <span className={styles.mpRank}>{rankLabel}</span>}
+      </div>
+      <div className={styles.mpColStats}>
+        {displayGame.level && (
+          <span className={styles.mpStat}>
+            <span className={styles.mpStatLabel}>LVL</span>
+            {displayGame.level}
+          </span>
+        )}
+        {displayGame.wins != null && displayGame.losses != null && (
+          <span className={styles.mpStat}>
+            <span className={styles.wlW}>{displayGame.wins}</span>
+            <span className={styles.mpWlSep}>{"–"}</span>
+            <span className={styles.wlL}>{displayGame.losses}</span>
+          </span>
+        )}
+        {roundResult && (
+          <span
+            className={
+              styles.mpRoundResult +
+              " " +
+              (roundResult === "out"
+                ? styles.mpRoundOut
+                : roundResult === "w"
+                  ? styles.mpRoundW
+                  : styles.mpRoundL)
+            }
+          >
+            {roundResult === "out"
+              ? visibleDeathRound != null
+                ? `Out R${visibleDeathRound}`
+                : "Out"
+              : roundResult === "w"
+                ? "Won"
+                : "Lost"}
+          </span>
+        )}
+        {!roundResult && visibleDeathRound != null && (
+          <span className={`${styles.mpRoundResult} ${styles.mpDeathRound}`}>
+            Died R{visibleDeathRound}
+          </span>
+        )}
+      </div>
+      <div className={styles.mpColLineup}>
+        {lineup.length > 0 && (
+          <div className={styles.mpLineup}>
+            {lineup.map((u, i) => (
+              <TooltipWrap
+                key={i}
+                type="unit"
+                name={u.name}
+                stars={u.stars}
+                data={tooltipData}
+              >
+                <div className={`unit-icon-wrap ${styles.mpUnit}`}>
+                  <img
+                    className="unit-icon"
+                    src={iconUrl("units", unitStem(u.name))}
+                    alt={u.name}
+                    loading="lazy"
+                    style={{
+                      borderColor: costBorderColor(UNIT_COSTS[u.name] || 1),
+                    }}
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).style.display = "none";
+                    }}
+                  />
+                  {u.stars > 1 && (
+                    <span className={`unit-stars s${u.stars}`}>
+                      {"★".repeat(u.stars)}
+                    </span>
+                  )}
+                </div>
+              </TooltipWrap>
+            ))}
           </div>
         )}
+        {synergies.length > 0 && (
+          <div className={styles.mpSynergies}>
+            {synergies.map((s, i) => (
+              <TooltipWrap
+                key={i}
+                type="synergy"
+                name={s.name}
+                count={s.count}
+                data={tooltipData}
+              >
+                <div className={`syn-badge ${styles.mpSynBadge}`}>
+                  <img
+                    className="syn-icon"
+                    src={iconUrl("synergies", synIconName(s.name))}
+                    alt={s.name}
+                    loading="lazy"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).style.display = "none";
+                    }}
+                  />
+                  <span className="syn-count">{s.count}</span>
+                </div>
+              </TooltipWrap>
+            ))}
+          </div>
+        )}
+      </div>
+      {hasContent && (
+        <div className={styles.mpCaret} aria-hidden="true">
+          {isOpen ? "−" : "+"}
+        </div>
+      )}
     </>
   );
 
@@ -555,7 +544,9 @@ function MatchPlayerRow({
           {inner}
         </button>
       ) : (
-        <div className={`${styles.mpToggle} ${styles.mpToggleStatic}`}>{inner}</div>
+        <div className={`${styles.mpToggle} ${styles.mpToggleStatic}`}>
+          {inner}
+        </div>
       )}
       {isOpen && (
         <PlayerDetail
@@ -598,17 +589,22 @@ export default function GameView({
 
   // Round scrubber state. Default to the last round (= end state), which
   // makes the page render identically to the no-timeline path on load.
-  const hasTimeline = !!(timeline && timeline.rounds && timeline.rounds.length > 0);
+  const hasTimeline = !!(
+    timeline &&
+    timeline.rounds &&
+    timeline.rounds.length > 0
+  );
   const [selectedRoundIdx, setSelectedRoundIdx] = useState<number>(
-    hasTimeline ? timeline!.rounds.length - 1 : 0
+    hasTimeline ? timeline!.rounds.length - 1 : 0,
   );
   const currentSnap: TimelineRound | null = hasTimeline
-    ? timeline!.rounds[selectedRoundIdx] ?? null
+    ? (timeline!.rounds[selectedRoundIdx] ?? null)
     : null;
   const selectedRound = currentSnap?.round ?? null;
   const isLastRound = hasTimeline
     ? selectedRoundIdx === timeline!.rounds.length - 1
     : true;
+  const canSelectRounds = hasTimeline && timeline!.rounds.length > 1;
 
   const tooltipData: TooltipData = {
     unitCosts: UNIT_COSTS,
@@ -623,7 +619,10 @@ export default function GameView({
   const effectiveHighlightName = normalizeName(highlightName);
   const isHighlightedRow = (g: Game): boolean => {
     if (g.user_id && String(g.user_id) === effectiveHighlight) return true;
-    if (effectiveHighlightName && normalizeName(g.notes) === effectiveHighlightName) {
+    if (
+      effectiveHighlightName &&
+      normalizeName(g.notes) === effectiveHighlightName
+    ) {
       return true;
     }
     return false;
@@ -635,7 +634,7 @@ export default function GameView({
     .filter(isHighlightedRow)
     .map((g) => g.id);
   const [expandedIds, setExpandedIds] = useState<Set<number>>(
-    () => new Set(initiallyExpanded.length ? initiallyExpanded : [game.id])
+    () => new Set(initiallyExpanded.length ? initiallyExpanded : [game.id]),
   );
   const toggleExpand = (id: number) => {
     setExpandedIds((prev) => {
@@ -669,9 +668,28 @@ export default function GameView({
     const bProfile = matchProfiles[String(b.user_id)];
     const aName = aProfile?.name || a.notes || String(a.user_id || a.id);
     const bName = bProfile?.name || b.notes || String(b.user_id || b.id);
-    const nameDelta = aName.localeCompare(bName, undefined, { sensitivity: "base" });
+    const nameDelta = aName.localeCompare(bName, undefined, {
+      sensitivity: "base",
+    });
     return nameDelta || finalPlacementDelta;
   });
+
+  const deathRounds = new Map<string, number>();
+  if (hasTimeline) {
+    for (const g of basePlayerRows) {
+      const playerKey = String(g.user_id);
+      let previousHp: number | null = null;
+      for (const round of timeline!.rounds) {
+        const hp = round.players?.[playerKey]?.hp;
+        if (typeof hp !== "number") continue;
+        if (hp <= 0 && previousHp != null && previousHp > 0) {
+          deathRounds.set(playerKey, round.round);
+          break;
+        }
+        if (hp > 0) previousHp = hp;
+      }
+    }
+  }
 
   useEffect(() => {
     trackEvent("Game Detail Viewed", {
@@ -722,7 +740,8 @@ export default function GameView({
             )}
             <span className={styles.sep}>{"·"}</span>
             <span>
-              {playerRows.length} {playerRows.length === 1 ? "player" : "players"}
+              {playerRows.length}{" "}
+              {playerRows.length === 1 ? "player" : "players"}
             </span>
           </div>
 
@@ -734,7 +753,7 @@ export default function GameView({
           )}
 
           {/* Round scrubber — only rendered when nettable timeline exists. */}
-          {hasTimeline && (
+          {canSelectRounds && (
             <div className={styles.roundScrubber}>
               <div className={styles.rsHeader}>
                 <span className={styles.rsLabel}>Round</span>
@@ -785,9 +804,10 @@ export default function GameView({
               </span>
             </div>
             {playerRows.map((g, rowIdx) => {
-              const prevRound: TimelineRound | null = hasTimeline && selectedRoundIdx > 0
-                ? timeline!.rounds[selectedRoundIdx - 1] ?? null
-                : null;
+              const prevRound: TimelineRound | null =
+                hasTimeline && selectedRoundIdx > 0
+                  ? (timeline!.rounds[selectedRoundIdx - 1] ?? null)
+                  : null;
               return (
                 <MatchPlayerRow
                   key={g.id}
@@ -802,15 +822,16 @@ export default function GameView({
                   expanded={expandedIds.has(g.id)}
                   onToggle={() => toggleExpand(g.id)}
                   relicTimeline={relicTimelines[String(g.user_id)]}
-                  snap={
-                    currentSnap?.players?.[String(g.user_id)] ?? null
-                  }
+                  snap={currentSnap?.players?.[String(g.user_id)] ?? null}
                   prevSnap={prevRound?.players?.[String(g.user_id)] ?? null}
                   snapRound={selectedRound}
                   isLastRound={isLastRound}
                   displayPosition={
-                    hasTimeline && !isLastRound ? rowIdx + 1 : parseInt(g.placement) || null
+                    hasTimeline && !isLastRound
+                      ? rowIdx + 1
+                      : parseInt(g.placement) || null
                   }
+                  deathRound={deathRounds.get(String(g.user_id)) ?? null}
                   tooltipData={tooltipData}
                 />
               );

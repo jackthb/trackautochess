@@ -3,7 +3,13 @@
 import { useState, type CSSProperties, type MouseEvent } from "react";
 import { createPortal } from "react-dom";
 import type { ChessBoardPiece, ItemFullInfo } from "./types";
-import { costBorderColor, itemDisplayName, itemIconStem, parseLineup, unitStem } from "./game-utils";
+import {
+  costBorderColor,
+  itemDisplayName,
+  itemIconStem,
+  parseLineup,
+  unitStem,
+} from "./game-utils";
 import { TooltipWrap, type TooltipData } from "./Tooltip";
 
 const BOARD_COLS = 8;
@@ -22,6 +28,7 @@ interface RenderPiece {
 export interface ChessBoardProps {
   board?: ChessBoardPiece[] | null;
   lineup?: string | null;
+  hand?: string | null;
   unitCosts: Record<string, number>;
   iconUrl: (type: string, stem: string) => string;
   itemsFull?: Record<string, ItemFullInfo>;
@@ -38,7 +45,9 @@ function boundedCoord(value: unknown, max: number): number | null {
   return rounded;
 }
 
-function normalizeBoard(board: ChessBoardPiece[] | null | undefined): RenderPiece[] {
+function normalizeBoard(
+  board: ChessBoardPiece[] | null | undefined,
+): RenderPiece[] {
   if (!Array.isArray(board)) return [];
   const pieces: RenderPiece[] = [];
   board.forEach((piece, index) => {
@@ -47,10 +56,14 @@ function normalizeBoard(board: ChessBoardPiece[] | null | undefined): RenderPiec
     const x = boundedCoord(piece.x, BOARD_COLS);
     const y = boundedCoord(piece.y, BOARD_ROWS);
     if (x == null || y == null) return;
-    const items = Array.from(new Set([
-      ...(Array.isArray(piece.items) ? piece.items : []),
-      ...(Array.isArray(piece.last_items) ? piece.last_items : []),
-    ].filter(Boolean)));
+    const items = Array.from(
+      new Set(
+        [
+          ...(Array.isArray(piece.items) ? piece.items : []),
+          ...(Array.isArray(piece.last_items) ? piece.last_items : []),
+        ].filter(Boolean),
+      ),
+    );
     pieces.push({
       key: piece.slot_key || piece.chess || `${name}-${index}`,
       name,
@@ -61,10 +74,15 @@ function normalizeBoard(board: ChessBoardPiece[] | null | undefined): RenderPiec
       raw: piece,
     });
   });
-  return pieces.sort((a, b) => a.y - b.y || a.x - b.x || a.key.localeCompare(b.key));
+  return pieces.sort(
+    (a, b) => a.y - b.y || a.x - b.x || a.key.localeCompare(b.key),
+  );
 }
 
-function fallbackBoard(lineup: string | null | undefined, unitCosts: Record<string, number>): RenderPiece[] {
+function fallbackBoard(
+  lineup: string | null | undefined,
+  unitCosts: Record<string, number>,
+): RenderPiece[] {
   return parseLineup(lineup || "", unitCosts)
     .slice(0, BOARD_COLS * BOARD_ROWS)
     .map((unit, index) => ({
@@ -77,7 +95,26 @@ function fallbackBoard(lineup: string | null | undefined, unitCosts: Record<stri
     }));
 }
 
-function pieceTitle(piece: RenderPiece, itemsFull?: Record<string, ItemFullInfo>): string {
+function fallbackHand(
+  hand: string | null | undefined,
+  unitCosts: Record<string, number>,
+): RenderPiece[] {
+  return parseLineup(hand || "", unitCosts)
+    .slice(0, 9)
+    .map((unit, index) => ({
+      key: `hand-${unit.name}-${index}`,
+      name: unit.name,
+      stars: unit.stars,
+      x: index + 1,
+      y: 1,
+      items: [],
+    }));
+}
+
+function pieceTitle(
+  piece: RenderPiece,
+  itemsFull?: Record<string, ItemFullInfo>,
+): string {
   const bits = [
     piece.name,
     piece.stars > 1 ? `${piece.stars} stars` : "",
@@ -128,12 +165,16 @@ function ChessBoardPieceView({
   iconUrl,
   itemsFull,
   tooltipData,
+  className,
+  style,
 }: {
   piece: RenderPiece;
   unitCosts: Record<string, number>;
   iconUrl: (type: string, stem: string) => string;
   itemsFull?: Record<string, ItemFullInfo>;
   tooltipData?: TooltipData;
+  className?: string;
+  style?: CSSProperties;
 }) {
   const [tooltipPos, setTooltipPos] = useState<{
     left: number;
@@ -149,7 +190,10 @@ function ChessBoardPieceView({
     const placement = rect.top < 92 ? "below" : "above";
     const left = Math.max(
       margin,
-      Math.min(rect.left + rect.width / 2 - tooltipWidth / 2, window.innerWidth - tooltipWidth - margin)
+      Math.min(
+        rect.left + rect.width / 2 - tooltipWidth / 2,
+        window.innerWidth - tooltipWidth - margin,
+      ),
     );
     setTooltipPos({
       left,
@@ -168,7 +212,11 @@ function ChessBoardPieceView({
         src={iconUrl("units", unitStem(piece.name))}
         alt={piece.name}
         loading="lazy"
-        style={{ borderColor: costBorderColor(unitCosts[piece.name] || piece.raw?.buy_price || 1) }}
+        style={{
+          borderColor: costBorderColor(
+            unitCosts[piece.name] || piece.raw?.buy_price || 1,
+          ),
+        }}
         onError={(e) => {
           (e.currentTarget as HTMLImageElement).style.visibility = "hidden";
         }}
@@ -179,7 +227,10 @@ function ChessBoardPieceView({
         </span>
       )}
       {piece.items.length > 0 && (
-        <span className="chess-board-items" aria-label={`${piece.items.length} items`}>
+        <span
+          className="chess-board-items"
+          aria-label={`${piece.items.length} items`}
+        >
           {piece.items.slice(0, 3).map((item, index) => (
             <img
               key={`${item}-${index}`}
@@ -198,18 +249,29 @@ function ChessBoardPieceView({
 
   return (
     <div
-      className="chess-board-piece"
-      style={{ gridColumn: piece.x, gridRow: displayRow(piece.y) }}
+      className={["chess-board-piece", className || ""]
+        .filter(Boolean)
+        .join(" ")}
+      style={style ?? { gridColumn: piece.x, gridRow: displayRow(piece.y) }}
       title={piece.items.length > 0 ? undefined : title}
       aria-label={title}
       onMouseEnter={showItems}
       onMouseLeave={hideItems}
     >
       {tooltipData ? (
-        <TooltipWrap type="unit" name={piece.name} stars={piece.stars} data={tooltipData}>
-          <span className="chess-board-piece-tooltip-target">{pieceVisual}</span>
+        <TooltipWrap
+          type="unit"
+          name={piece.name}
+          stars={piece.stars}
+          data={tooltipData}
+        >
+          <span className="chess-board-piece-tooltip-target">
+            {pieceVisual}
+          </span>
         </TooltipWrap>
-      ) : pieceVisual}
+      ) : (
+        pieceVisual
+      )}
       {tooltipPos &&
         createPortal(
           <ChessBoardItemTooltip
@@ -219,10 +281,13 @@ function ChessBoardPieceView({
             style={{
               left: tooltipPos.left,
               top: tooltipPos.top,
-              transform: tooltipPos.placement === "above" ? "translateY(-100%)" : undefined,
+              transform:
+                tooltipPos.placement === "above"
+                  ? "translateY(-100%)"
+                  : undefined,
             }}
           />,
-          document.body
+          document.body,
         )}
     </div>
   );
@@ -231,6 +296,7 @@ function ChessBoardPieceView({
 export function ChessBoard({
   board,
   lineup,
+  hand,
   unitCosts,
   iconUrl,
   itemsFull,
@@ -239,20 +305,44 @@ export function ChessBoard({
   compact = false,
 }: ChessBoardProps) {
   const positioned = normalizeBoard(board);
-  const pieces = positioned.length > 0 ? positioned : fallbackBoard(lineup, unitCosts);
+  const pieces =
+    positioned.length > 0 ? positioned : fallbackBoard(lineup, unitCosts);
+  const handPieces = fallbackHand(hand, unitCosts);
   const classes = [
     "chess-board",
     compact ? "chess-board-compact" : "",
     positioned.length === 0 ? "chess-board-fallback" : "",
+    handPieces.length > 0 ? "chess-board-with-hand" : "",
     className || "",
-  ].filter(Boolean).join(" ");
+  ]
+    .filter(Boolean)
+    .join(" ");
 
-  if (pieces.length === 0) {
+  if (pieces.length === 0 && handPieces.length === 0) {
     return <div className={`${classes} chess-board-empty`} />;
   }
 
   return (
     <div className={classes}>
+      {handPieces.length > 0 && (
+        <div className="chess-board-hand" aria-label="Bench hand">
+          {Array.from({ length: 9 }, (_, index) => (
+            <div key={`hand-cell-${index}`} className="chess-board-hand-cell">
+              {handPieces[index] && (
+                <ChessBoardPieceView
+                  piece={handPieces[index]}
+                  unitCosts={unitCosts}
+                  iconUrl={iconUrl}
+                  itemsFull={itemsFull}
+                  tooltipData={tooltipData}
+                  className="chess-board-hand-piece"
+                  style={{}}
+                />
+              )}
+            </div>
+          ))}
+        </div>
+      )}
       {Array.from({ length: BOARD_COLS * BOARD_ROWS }, (_, index) => (
         <div
           key={index}

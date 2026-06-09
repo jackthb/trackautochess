@@ -322,6 +322,11 @@
   opacity: 0.65;
   font-size: 11px;
 }
+.mpDeathRound {
+  color: var(--red-bright, #e35d5b);
+  opacity: 0.8;
+  font-size: 11px;
+}
 .wlW {
   color: var(--green-bright);
 }
@@ -333,10 +338,8 @@
   min-width: 0;
   overflow: visible;
 }
-/* Single horizontal line of units — no wrapping. Synergies and relics
-   now live in the expand panel so the lineup gets the full width and
-   the icons can be larger. Keep overflow visible so hover scaling is not
-   clipped by the compact row. */
+/* Single horizontal line of units — no wrapping. Keep overflow visible so
+   hover scaling is not clipped by the compact row. */
 .mpLineup {
   display: flex;
   gap: 4px;
@@ -344,38 +347,21 @@
   align-items: center;
   overflow: visible;
 }
-.mpHandRow {
+.mpSynergies {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 4px;
+  flex-wrap: wrap;
   margin-top: 7px;
-  min-height: 24px;
 }
-.mpHandLabel {
-  font-size: 9px;
-  line-height: 1;
-  letter-spacing: 1px;
-  text-transform: uppercase;
-  color: var(--text-muted);
-  font-weight: 700;
-}
-.mpHandLineup {
-  display: flex;
+.mpSynBadge:global(.syn-badge) {
   gap: 3px;
-  align-items: center;
-  flex-wrap: nowrap;
-  overflow: visible;
+  padding: 2px 5px 2px 3px;
+  font-size: 10px;
 }
-.mpHandUnit:global(.unit-icon-wrap) {
-  width: 24px;
-  height: 24px;
-}
-.mpHandUnit :global(.unit-icon) {
-  width: 24px;
-  height: 24px;
-}
-.mpHandUnit :global(.unit-stars) {
-  font-size: 6px;
+.mpSynBadge :global(.syn-icon) {
+  width: 16px;
+  height: 16px;
 }
 /* Resize wrap + icon together; the global .unit-icon-wrap is 28x28, so
    growing only the icon would overflow the wrap and overlap neighbours. */
