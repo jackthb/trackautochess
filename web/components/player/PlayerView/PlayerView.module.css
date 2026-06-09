@@ -330,60 +330,6 @@
 .deltaPositive { color: #7ee787; }
 .deltaNeutral { color: var(--text-secondary); }
 .deltaNegative { color: #ff8b8b; }
-.returnPrompt {
-  position: fixed;
-  right: 24px;
-  bottom: 24px;
-  z-index: 30;
-  width: min(420px, calc(100vw - 32px));
-}
-.returnPromptPanel {
-  position: relative;
-  padding: 22px;
-  border: 1px solid rgba(226, 169, 79, 0.42);
-  border-radius: var(--r-8);
-  background:
-    radial-gradient(circle at 92% 0%, rgba(226, 169, 79, 0.2), transparent 38%),
-    linear-gradient(180deg, rgba(28, 24, 20, 0.98), rgba(14, 13, 12, 0.98));
-  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.48);
-}
-.returnPromptClose {
-  position: absolute;
-  top: 10px;
-  right: 12px;
-  border: 0;
-  color: var(--text-muted);
-  background: transparent;
-  font-size: 24px;
-  line-height: 1;
-  cursor: pointer;
-}
-.returnPromptClose:hover {
-  color: var(--text-primary);
-}
-.returnPromptEyebrow {
-  margin-bottom: 8px;
-  font-family: var(--font-mono);
-  font-size: 11px;
-  color: var(--accent);
-  letter-spacing: 1.8px;
-  text-transform: uppercase;
-}
-.returnPromptPanel h2 {
-  margin: 0 20px 8px 0;
-  font-family: "Cinzel", serif;
-  font-size: 21px;
-  color: var(--text-primary);
-}
-.returnPromptPanel p {
-  margin: 0 0 16px;
-  font-size: 13px;
-  line-height: 1.6;
-  color: var(--text-muted);
-}
-.returnPromptPanel .steamTrustNote {
-  margin: -4px 0 16px;
-}
 .refreshQuota {
   display: grid;
   gap: 3px;
@@ -470,9 +416,5 @@
   .deltaCard {
     grid-template-columns: 1fr;
     gap: 4px;
-  }
-  .returnPrompt {
-    right: 16px;
-    bottom: 16px;
   }
 }

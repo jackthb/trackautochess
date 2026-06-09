@@ -25,8 +25,6 @@ import {
 import styles from "./PlayerView.module.css";
 
 const LAST_FETCHED_TICK_MS = 1000;
-const ANONYMOUS_PROFILE_SEEN_KEY = "dac.anonymous_profile_seen";
-const ANONYMOUS_RETURN_PROMPT_KEY = "dac.anonymous_return_prompt_seen";
 
 export interface LeaderboardPosition {
   rank: number;
@@ -257,7 +255,6 @@ export default function PlayerView({
   const [sessionSteamId, setSessionSteamId] = useState<string | null>(null);
   const [accessToken, setAccessToken] = useState<string | null>(null);
   const [authReady, setAuthReady] = useState(false);
-  const [showReturnPrompt, setShowReturnPrompt] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -365,38 +362,11 @@ export default function PlayerView({
   ]);
 
   useEffect(() => {
-    if (!authReady) return;
-    if (sessionSteamId) {
-      setShowReturnPrompt(false);
-      return;
-    }
-
-    const hasVisitedBefore = window.localStorage.getItem(ANONYMOUS_PROFILE_SEEN_KEY) === "1";
-    const hasSeenPrompt = window.localStorage.getItem(ANONYMOUS_RETURN_PROMPT_KEY) === "1";
-    window.localStorage.setItem(ANONYMOUS_PROFILE_SEEN_KEY, "1");
-
-    if (hasVisitedBefore && !hasSeenPrompt) {
-      setShowReturnPrompt(true);
-      window.localStorage.setItem(ANONYMOUS_RETURN_PROMPT_KEY, "1");
-      trackEvent("Returning Anonymous Prompt Viewed", {
-        route: analyticsRoute(route),
-      });
-    }
-  }, [authReady, route, sessionSteamId]);
-
-  useEffect(() => {
     if (!authReady || canViewHistory) return;
     trackEvent("Player History Locked Viewed", {
       route: analyticsRoute(route),
     });
   }, [authReady, canViewHistory, route]);
-
-  const dismissReturnPrompt = () => {
-    setShowReturnPrompt(false);
-    trackEvent("Returning Anonymous Prompt Dismissed", {
-      route: analyticsRoute(route),
-    });
-  };
 
   const lastFetchedTimestamp = formatLastFetchedTimestamp(drodoLastFetchedAt);
   const lastFetchedAge = formatLastFetchedAge(drodoLastFetchedAt, nowMs);
@@ -536,28 +506,6 @@ export default function PlayerView({
 
   return (
     <div className={styles.page}>
-      {showReturnPrompt && (
-        <div className={styles.returnPrompt} role="dialog" aria-live="polite" aria-label="Sign in reminder">
-          <div className={styles.returnPromptPanel}>
-            <button
-              type="button"
-              className={styles.returnPromptClose}
-              onClick={dismissReturnPrompt}
-              aria-label="Dismiss sign in reminder"
-            >
-              ×
-            </button>
-            <div className={styles.returnPromptEyebrow}>Welcome back</div>
-            <h2>Log in once to keep your Auto Chess history unlocked.</h2>
-            <p>
-              We remember you have visited before, but not which Steam profile is yours.
-              Sign in to unlock MMR graphs, season history, and session deltas.
-            </p>
-            <SteamTrustNote source="returning_anonymous_prompt" />
-            <SteamSignInButton source="returning_anonymous_prompt" size="md" />
-          </div>
-        </div>
-      )}
       <div className={styles.dashboard}>
           {drodo?.mmr != null && (
             <div className={styles.rankLadder}>
