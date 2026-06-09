@@ -10,7 +10,7 @@ then uploads the processed match representation to Supabase.
    tees the in-game console to `<dota>/game/dota/console.log`;
    `conclearlog` truncates it at each launch, so ingest is idempotent
    across sessions.
-2. On app startup, `nettable_capture.NetTableCapture` updates a marked DAC
+2. When the user applies nettable setup, the Rust `nettable_service` writes a marked DAC
    Tracker block inside `<dota>/game/dota/cfg/autoexec.cfg`. If the user has
    their own autoexec, it appends/replaces only our marked block and preserves
    the rest of the file.
@@ -33,10 +33,11 @@ then uploads the processed match representation to Supabase.
    timelines. The timeline JSON also includes `roster_fingerprint` and
    `observer_steam_id` for audit/debugging.
 7. The tailer detects stable dump blocks (no new `[stringtables]` lines
-   for 2s), decodes them via `nettable_parser.parse_log`, archives raw
-   dumps locally under `~/.dac/captures/sessions/`, and processes them
+   for 2s), decodes them via `nettable_parser.parse_log`, optionally persists raw
+   rows locally under `~/.dac/captures/` and `~/.dac/nettable_dumps/`, and processes them
    in-memory into `matches`, `match_players`, and `match_timelines`. Raw
-   `dac_nettable_dumps` uploads are debug opt-in only.
+   nettable dump logs upload to Supabase Storage `diagnostic-logs`; the legacy
+   `dac_nettable_dumps` table has been dropped.
 
 ## Active capture matrix / key binds
 
@@ -49,84 +50,70 @@ metadata snapshot includes both the Queen ladder and the slot mapping.
 |---|---|---|---|---|---|
 | F21 | `dac_table` | POST_GAME burst only | `end_board`, `player_info`, `user_panel_ranking`, `show_all_player_connect_status`, sometimes `stat_chess`, `game_over` | Main game-wide table, now captured only at the end because `end_board` is the important part. In observed same-second live dumps, `dac_table.player_info` was mostly default/stale, so continuously polling it was noise. Prefer `player_info_table.player_info` for current player state. | Kept. |
 | F22 | `player_info_table` | On round change | `player_info` | Dedicated current player-state table: HP, gold, level, lineup, bench/hand, synergies, damage, rank, relic, talent tree, MMR/candy fields, etc. In same-second diffs, this is the table with the real current/final values while `dac_table.player_info` is mostly defaults. Round-change capture lines this up with the review UI's per-round view. | Kept. |
-| F23 | `game_info` | Every 2s | `round_info`, `death_team`, `game_version`, `quest` | Cheap live heartbeat. `round_info.round` triggers heavier F22/F20 snapshots once per round. `death_team` maps team IDs to elimination bits and is used to detect when the local player dies before the whole lobby ends. | `round_info` and `death_team` kept. `game_version` and `quest` dropped from raw Supabase uploads. |
-| F20 | `player_id_table` | On round change | `player_<n>`, `vchess_<n>`, `relic_ttl_<n>`, `mmr_level_<n>`, `courier_<n>`, `chessboard_<n>` | Per-slot state. `player_<n>` maps lobby slots/team IDs/hero indexes. `vchess_<n>` is the board grid state for that slot: unit IDs/names, board coordinates, items, water IDs, etc. `relic_ttl_<n>` is active relic + remaining duration. `mmr_level_<n>` is rank/candy baseline. | `player_*`, `vchess_*`, `relic_ttl_*`, and `mmr_level_*` kept. Cosmetic `courier_*` and `chessboard_*` dropped from raw Supabase uploads. |
+| F23 | `game_info` | Every 2s | `round_info`, `death_team`, `game_version`, `quest` | Cheap live heartbeat. `round_info.round` triggers heavier F22/F20 snapshots once per round. `death_team` maps team IDs to elimination bits and is used to detect when the local player dies before the whole lobby ends. | Processed capture uses `round_info` and `death_team`; `game_version` and `quest` are debug-only if present in raw logs. |
+| F20 | `player_id_table` | On round change | `player_<n>`, `vchess_<n>`, `relic_ttl_<n>`, `mmr_level_<n>`, `courier_<n>`, `chessboard_<n>` | Per-slot state. `player_<n>` maps lobby slots/team IDs/hero indexes. `vchess_<n>` is the board grid state for that slot: unit IDs/names, board coordinates, items, water IDs, etc. `relic_ttl_<n>` is active relic + remaining duration. `mmr_level_<n>` is rank/candy baseline. | Processed capture uses `player_*`, `vchess_*`, `relic_ttl_*`, and `mmr_level_*`; cosmetic `courier_*` and `chessboard_*` are debug-only. |
 | F24 | `ranking_top_table` + `player_id_table` | Once at match/session opening | `ranking_top`; plus the `player_id_table` keys above | One-shot lobby metadata. `ranking_top_table` normalizes into public Queen ladder/profile rank rows; the paired `player_id_table` gives an early steam_id → slot/team mapping before the first round snapshot. | Kept; `player_id_table` key-level filter still applies. |
 | F16 | `chess_pool_table` | Once at match/session opening, immediately after F24 | `ban_info`, `ban_info_<n>`, `legendary_info`, `relic_list`, `destroy_info`, `chess_list_by_mana`, `chess_list_by_synergy`, `revealed_legendary_chess_list`, `unrevealed_legendary_chess_list`, static/reference list keys | Lobby pool metadata. Local raw dumps keep the whole one-shot table. The processed timeline currently extracts `ban_info_<n>` and `revealed_legendary_chess_list`; `relic_list`, `legendary_info`, `destroy_info`, and static reference lists are raw-only today unless we add explicit processed fields. | Kept. The old plan proposed dropping several static keys, but current code keeps the table because it is one-shot and useful for debugging patch/data drift. |
-| F25 | `unit_table` | Bound only; not automatically fired | `egg_*` and/or unit entries depending on game state | Manual debugging only. It is not part of the normal capture cadence, so it should not appear unless someone presses F25 or runs a manual dump. | Kept if manually uploaded, but normally absent. |
+| F25 | `unit_table` | Bound only; not automatically fired | `egg_*` and/or unit entries depending on game state | Manual debugging only. It is not part of the normal capture cadence, so it should not appear unless someone presses F25 or runs a manual dump. | Debug-only if manually dumped, but normally absent. |
 
 ## Files
 
 | File | Role |
 |---|---|
-| `nettable_capture.py` | Autoexec install, log tailer, key sender, match extraction, timeline, event emits, ingest helpers. |
-| `nettable_parser.py` | Pure VBKV decoder (`parse_vbkv`) and console.log walker (`parse_log`). |
-| `main.py ingest-nettable` | CLI fallback for manual ingest when the app daemon isn't running. |
-| `headless.py` | Instantiates `NetTableCapture(self._emit)` and runs its tailer thread. |
+| `app/backend/src/nettable_service.rs` | Autoexec/GSI setup helpers, log tailer orchestration, hotkey cadence, live state, match/timeline extraction, local dump persistence, and renderer events. |
+| `app/backend/src/nettable_parser.rs` | Pure VBKV decoder and `console.log` walker used by the CLI, daemon, and tests. |
+| `app/backend/src/main.rs` | JSON-lines daemon and CLI commands (`parse-log`, `parse-log-full`, `parse-live`, `queue`, `outbox-list`, `gsi-cfg`). |
+| `app/backend/src/supabase.rs` | Processed match/timeline/Queen uploads, outbox replay, diagnostic-log Storage uploads, and raw nettable dump-log Storage uploads. |
+| `app/backend/src/hotkeys.rs` | Windows `SendInput` wrapper for the extended F-key dump cadence. |
 
-`AUTOEXEC_CFG_CONTENT` is the marked DAC Tracker cfg block, inlined as a
-constant in `nettable_capture.py` — single source of truth. The installer
-upserts that block instead of replacing the user's whole `autoexec.cfg`.
+`AUTOEXEC_CFG_CONTENT` is the marked DAC Tracker cfg block in `nettable_service.rs`. The setup path upserts that block instead of replacing the user's whole `autoexec.cfg`.
 
 ## Events emitted (consumed by `useNetTableEvents` in the renderer)
 
+Representative Rust daemon event types include:
+
 ```ts
-{ type: "nettable_status", autoexec_installed: bool, log_path: str, log_writable: bool, dota_dir: str }
-{ type: "nettable_dump_captured", tables: string[], at: ISO_string }
-{ type: "nettable_ingest_complete", rows_written: number, tables: string[], at: ISO_string }
-{ type: "nettable_ingest_error", error: string }
-{ type: "nettable_end_board_saved", at: ISO_string }
-{ type: "nettable_partial_match_saved", match_id: string, capture_status: string, verification_source: string, at: ISO_string }
+{ type: "nettable_status", backend: "rust", ok: boolean, autoexec_installed: boolean, gsi_cfg_installed: boolean, log_path: string, log_writable: boolean }
+{ type: "nettable_state", backend: "rust", rows: number, state: object, players: unknown[], local_steam_ids: string[] }
+{ type: "nettable_round_changed", backend: "rust", round: number, prev_round: number | null }
+{ type: "nettable_creep_round", backend: "rust", round: number }
+{ type: "nettable_game_ended", backend: "rust", message: string, match_id?: string }
+{ type: "nettable_end_board_saved", backend: "rust", match_id: string }
+{ type: "nettable_ingest_error", backend?: "rust", error: string }
+{ type: "nettable_launch_options_applied", backend: "rust", ok: boolean, autoexec_path?: string, gsi_cfg_path?: string }
+{ type: "nettable_queen_upload_progress", message: string }
+{ type: "nettable_queen_upload_complete", ok: boolean, player_count: number, upserted_count: number, season: string }
+{ type: "diagnostics_uploaded", backend: "rust", storage_ok: boolean, reason: string, paths: object }
 ```
 
 ## What gets captured
 
-Raw dumps are stored locally as gzipped JSONL. Normal Supabase writes use the
-processed `matches`, `match_players`, `match_timelines`, and Queen ladder
-profile rows. `dac_nettable_dumps` is only written when
-`upload_raw_nettable_dumps` is enabled.
+Normal Supabase writes use processed `matches`, `match_players`, `match_timelines`, and Queen ladder/profile rows. The legacy relational `dac_nettable_dumps` table has been dropped. Raw decoded nettable rows are local-only unless the backend uploads a JSON dump log to Supabase Storage under the private `diagnostic-logs` bucket.
 
-The storage filter is intentionally only at the raw-upload boundary. The
-in-memory live state and local raw archive still receive the full decoded dump.
+Local raw dump persistence is controlled by the config field `keep_local_nettable_dumps`. When enabled, the backend writes `~/.dac/captures/latest_nettable_rows.json` and timestamped files under `~/.dac/nettable_dumps/`.
 
 ### Known DAC nettables not currently captured by the app
 
-These showed up in older VPK/triage notes, but they are not in the current
-automatic key cadence. If we need one later, add an explicit bind/cadence and
-document why.
+These showed up in older VPK/triage notes, but they are not in the current automatic key cadence. If we need one later, add an explicit bind/cadence and document why.
 
 | Table | Current status | Notes |
 |---|---|---|
 | `match_history_table` | Not currently bound/captured | Previously investigated and observed to be empty in practice, so we do not treat it as a useful source unless a future patch proves otherwise. |
 | `hp_bar_table` | Not currently bound/captured | Likely duplicates HP fields already present in player state. Still an open question if it adds cleaner live HP. |
-| `quest_table` | Dropped if encountered | Battle-pass/quest noise. Entire table is excluded from raw Supabase upload. |
-| `casino_table` | Dropped if encountered | Pass/minigame noise. Entire table is excluded from raw Supabase upload. |
+| `quest_table` | Not currently bound/captured | Battle-pass/quest noise; not part of the normal capture cadence. |
+| `casino_table` | Not currently bound/captured | Pass/minigame noise; not part of the normal capture cadence. |
 | `hero_available_items`, `other_available_items` | Not currently bound/captured | In-game available-item UI state; not used by the tracker. |
-| `ability_kv_table`, `chess_kv_table` | Not currently bound/captured | Static definitions better sourced from scraper/VPK data. |
+| `ability_kv_table`, `chess_kv_table` | Not currently bound/captured | Static definitions better sourced from VPK/content data. |
 | `gems`, `hero_ethereals`, `hero_prismatic`, `hero_wearables` | Not currently bound/captured | Cosmetic data. |
 | `setting_table` | Not currently bound/captured | UI/settings state. |
 
-### Current raw-upload storage filter
+### Current storage behavior
 
-This is the implemented filter in `nettable_capture.py`, not a proposal:
+The Rust pipeline processes decoded rows in memory and uploads normalized product data. Diagnostic/raw dump artifacts are Storage objects, not table rows:
 
-```text
-Drop entire tables from raw Supabase upload:
-- quest_table
-- casino_table
-
-Drop keys by prefix from raw Supabase upload:
-- player_id_table.chessboard_*
-- player_id_table.courier_*
-- game_info.game_version
-- game_info.quest
-
-Keep everything else.
-```
-
-Local `raw_dumps.jsonl.gz` archives are not filtered. The filter only affects
-optional raw writes to `dac_nettable_dumps`; processed match/timeline/profile
-uploads use the in-memory decoded state.
+- `supabase.upload_diagnostic_logs(...)` uploads tracker/console diagnostics to `diagnostic-logs`.
+- `supabase.upload_nettable_dump_log(...)` uploads raw nettable dump JSON logs to `diagnostic-logs/{steam_id}/nettable-dumps/`.
+- Outbox replay refuses legacy `dac_nettable_dumps` table payloads and treats them as diagnostic-log Storage uploads instead.
 
 ### Open questions / current answers
 
@@ -137,7 +124,7 @@ uploads use the in-memory decoded state.
 | Do we need `mmr_level_*`? | Keep for now. It gives rank/candy baseline by slot and is small. |
 | Is `death_team` redundant with HP or destroy info? | Maybe, but it is the cleanest local-player-death signal we currently have, so keep it. |
 | Does `hp_bar_table` add anything over `player_info.hp`? | Unknown because it is not currently captured. If HP timing is bad, this is the first table to test. |
-| Do we need static `chess_pool_table` lists like `chess_list_by_mana`? | Not for normal processing, because scraper/VPK data is the source of truth. Current code still keeps them in the one-shot local/raw capture because the table is not polled repeatedly and it can expose patch drift. |
+| Do we need static `chess_pool_table` lists like `chess_list_by_mana`? | Not for normal processing, because VPK/content data is the source of truth. Current code still keeps them in the one-shot local/raw capture because the table is not polled repeatedly and it can expose patch drift. |
 | Do we store the chess-pool relic list in processed match data? | Not currently. `chess_pool_table.relic_list` is present in local/raw dumps, but processed player/timeline rows use active per-player relic state from `player_id_table.relic_ttl_<n>`. |
 
 ## Example raw output by table
@@ -16069,23 +16056,12 @@ Direct console batch 3/3 — static/cosmetic/reference tables:
 dumpstringtable CustomNetTable_ability_kv_table cl verbose;dumpstringtable CustomNetTable_chess_kv_table cl verbose;dumpstringtable CustomNetTable_gems cl verbose;dumpstringtable CustomNetTable_hero_ethereals cl verbose;dumpstringtable CustomNetTable_hero_prismatic cl verbose;dumpstringtable CustomNetTable_hero_wearables cl verbose
 ```
 
-```powershell
-$env:SUPABASE_SERVICE_ROLE_KEY = '<sb_secret_...>'
-cd app/backend
-python main.py ingest-nettable --dry-run        # parse-only
-python main.py ingest-nettable                   # write
-python main.py ingest-nettable --only dac_table  # filter
+```bash
+cargo run --manifest-path app/backend/Cargo.toml -- parse-log <path-to-console.log>
+cargo run --manifest-path app/backend/Cargo.toml -- parse-log-full <path-to-console.log>
+cargo run --manifest-path app/backend/Cargo.toml -- parse-live <path-to-console.log> [local-steam-id]
 ```
-
-Bare names in `--only` get the `CustomNetTable_` prefix auto-prepended.
 
 ## Supabase auth
 
-Normal live capture uploads use the app's configured publishable Supabase key
-for processed `matches`, `match_players`, and `match_timelines` rows. Raw
-`dac_nettable_dumps` writes are disabled by default; if a developer explicitly
-enables `upload_raw_nettable_dumps`, raw writes still require a service-role key:
-
-- Export `SUPABASE_SERVICE_ROLE_KEY` in the environment the app inherits, or
-- Replace `supabase_key` in `~/.dac/config.json` with the service-role
-  key (not recommended).
+Normal live capture uploads use the app's configured Supabase URL/key for processed `matches`, `match_players`, and `match_timelines` rows. Diagnostic and raw nettable dump logs upload to Supabase Storage bucket `diagnostic-logs` using the same configured client path and Storage policies.
