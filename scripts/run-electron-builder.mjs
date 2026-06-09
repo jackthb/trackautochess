@@ -6,13 +6,29 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const repoDir = path.resolve(__dirname, "..");
 const toolsBinDir = path.join(repoDir, "tools", "bin");
 const electronBuilderCli = path.join(repoDir, "app", "node_modules", "electron-builder", "cli.js");
-const spawnPatch = path.join(repoDir, "tools", "electron-builder-spawn-fix.cjs");
+const spawnPatch = path.join(__dirname, "electron-builder-spawn-fix.cjs");
 const cacheRoot = path.join(repoDir, ".electron-builder-cache");
 const args = process.argv.slice(2);
+const signingConfigured = Boolean(
+  process.env.WIN_CSC_LINK ||
+    process.env.CSC_LINK ||
+    process.env.WIN_CSC_SHA1 ||
+    process.env.WIN_CSC_AUTO === "1"
+);
+const effectiveArgs = signingConfigured
+  ? args
+  : [...args, "--config.win.signAndEditExecutable=false"];
 
 const child = spawn(
   process.execPath,
-  ["--require", spawnPatch, electronBuilderCli, ...args, "--config", "electron-builder.json"],
+  [
+    "--require",
+    spawnPatch,
+    electronBuilderCli,
+    ...effectiveArgs,
+    "--config",
+    "electron-builder.json",
+  ],
   {
     cwd: path.join(repoDir, "app"),
     stdio: "inherit",
