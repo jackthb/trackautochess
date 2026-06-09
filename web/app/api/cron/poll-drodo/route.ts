@@ -1,8 +1,8 @@
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
-import { fetchAndCacheDrodo } from "@/lib/drodo";
+import { fetchAndCacheDrodoBatch } from "@/lib/drodo";
 
-const REPOLL_BATCH_SIZE = 50;
-const SEED_BATCH_SIZE = 20;
+const POLL_BATCH_SIZE = 200;
+const RECENT_SIGN_IN_WINDOW_MS = 14 * 24 * 60 * 60 * 1000;
 
 interface DueUser {
   steam_id: string;
@@ -23,15 +23,20 @@ async function handle(req: Request) {
   const supabase: SupabaseClient = createClient(supabaseUrl, serviceKey, {
     auth: { autoRefreshToken: false, persistSession: false },
   });
+  const now = new Date();
+  const recentSignInCutoff = new Date(
+    now.getTime() - RECENT_SIGN_IN_WINDOW_MS
+  ).toISOString();
+  const activeSyncFilter = `steam_signed_in_at.gte.${recentSignInCutoff},queen_ladder_last_seen_at.not.is.null,drodo_raw_data->>queen_rank.not.is.null`;
 
   const { data: dueUsers, error: queryError } = await supabase
     .from("users")
     .select("steam_id::text")
-    .not("steam_signed_in_at", "is", null)
-    .lte("next_poll_at", new Date().toISOString())
+    .or(activeSyncFilter)
+    .lte("next_poll_at", now.toISOString())
     .not("drodo_last_fetched_at", "is", null)
     .order("next_poll_at", { ascending: true })
-    .limit(REPOLL_BATCH_SIZE);
+    .limit(POLL_BATCH_SIZE);
 
   if (queryError) {
     return Response.json({ error: queryError.message }, { status: 500 });
@@ -40,10 +45,11 @@ async function handle(req: Request) {
   const { data: unseededUsers } = await supabase
     .from("users")
     .select("steam_id::text")
-    .not("steam_signed_in_at", "is", null)
+    .or(activeSyncFilter)
     .is("drodo_last_fetched_at", null)
-    .order("created_at", { ascending: false })
-    .limit(SEED_BATCH_SIZE);
+    .order("queen_ladder_last_seen_at", { ascending: false, nullsFirst: false })
+    .order("steam_signed_in_at", { ascending: false, nullsFirst: false })
+    .limit(POLL_BATCH_SIZE);
 
   const ids = ((dueUsers ?? []) as unknown as DueUser[]).map((row) =>
     String(row.steam_id)
@@ -59,32 +65,32 @@ async function handle(req: Request) {
     error?: string;
   }> = [];
 
-  for (const steamId of ids) {
-    const result = await fetchAndCacheDrodo(steamId, supabase, {
-      snapshotOnSuccess: true,
-      pollMode: "adaptive",
-    });
+  const repollResults = await fetchAndCacheDrodoBatch(ids, supabase, {
+    snapshotOnSuccess: true,
+    pollMode: "adaptive",
+  });
+  for (const result of repollResults) {
     if (result.ok) {
-      results.push({ steam_id: steamId, outcome: "ok" });
+      results.push({ steam_id: result.steam_id, outcome: "ok" });
     } else {
       results.push({
-        steam_id: steamId,
+        steam_id: result.steam_id,
         outcome: result.kind,
         error: result.error,
       });
     }
   }
 
-  for (const steamId of seedIds) {
-    const result = await fetchAndCacheDrodo(steamId, supabase, {
-      snapshotOnSuccess: true,
-      pollMode: "reset",
-    });
+  const seedResults = await fetchAndCacheDrodoBatch(seedIds, supabase, {
+    snapshotOnSuccess: true,
+    pollMode: "reset",
+  });
+  for (const result of seedResults) {
     if (result.ok) {
-      results.push({ steam_id: steamId, outcome: "ok", seeded: true });
+      results.push({ steam_id: result.steam_id, outcome: "ok", seeded: true });
     } else {
       results.push({
-        steam_id: steamId,
+        steam_id: result.steam_id,
         outcome: result.kind,
         seeded: true,
         error: result.error,

@@ -4,6 +4,7 @@ import { useState, type CSSProperties, type MouseEvent } from "react";
 import { createPortal } from "react-dom";
 import type { ChessBoardPiece, ItemFullInfo } from "./types";
 import { costBorderColor, itemDisplayName, itemIconStem, parseLineup, unitStem } from "./game-utils";
+import { TooltipWrap, type TooltipData } from "./Tooltip";
 
 const BOARD_COLS = 8;
 const BOARD_ROWS = 4;
@@ -24,6 +25,7 @@ export interface ChessBoardProps {
   unitCosts: Record<string, number>;
   iconUrl: (type: string, stem: string) => string;
   itemsFull?: Record<string, ItemFullInfo>;
+  tooltipData?: TooltipData;
   className?: string;
   compact?: boolean;
 }
@@ -125,11 +127,13 @@ function ChessBoardPieceView({
   unitCosts,
   iconUrl,
   itemsFull,
+  tooltipData,
 }: {
   piece: RenderPiece;
   unitCosts: Record<string, number>;
   iconUrl: (type: string, stem: string) => string;
   itemsFull?: Record<string, ItemFullInfo>;
+  tooltipData?: TooltipData;
 }) {
   const [tooltipPos, setTooltipPos] = useState<{
     left: number;
@@ -157,15 +161,8 @@ function ChessBoardPieceView({
   const hideItems = () => setTooltipPos(null);
   const title = pieceTitle(piece, itemsFull);
 
-  return (
-    <div
-      className="chess-board-piece"
-      style={{ gridColumn: piece.x, gridRow: displayRow(piece.y) }}
-      title={piece.items.length > 0 ? undefined : title}
-      aria-label={title}
-      onMouseEnter={showItems}
-      onMouseLeave={hideItems}
-    >
+  const pieceVisual = (
+    <>
       <img
         className="chess-board-piece-icon"
         src={iconUrl("units", unitStem(piece.name))}
@@ -196,6 +193,23 @@ function ChessBoardPieceView({
           ))}
         </span>
       )}
+    </>
+  );
+
+  return (
+    <div
+      className="chess-board-piece"
+      style={{ gridColumn: piece.x, gridRow: displayRow(piece.y) }}
+      title={piece.items.length > 0 ? undefined : title}
+      aria-label={title}
+      onMouseEnter={showItems}
+      onMouseLeave={hideItems}
+    >
+      {tooltipData ? (
+        <TooltipWrap type="unit" name={piece.name} stars={piece.stars} data={tooltipData}>
+          <span className="chess-board-piece-tooltip-target">{pieceVisual}</span>
+        </TooltipWrap>
+      ) : pieceVisual}
       {tooltipPos &&
         createPortal(
           <ChessBoardItemTooltip
@@ -220,6 +234,7 @@ export function ChessBoard({
   unitCosts,
   iconUrl,
   itemsFull,
+  tooltipData,
   className,
   compact = false,
 }: ChessBoardProps) {
@@ -255,6 +270,7 @@ export function ChessBoard({
           unitCosts={unitCosts}
           iconUrl={iconUrl}
           itemsFull={itemsFull}
+          tooltipData={tooltipData}
         />
       ))}
     </div>

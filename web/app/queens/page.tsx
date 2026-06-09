@@ -16,15 +16,29 @@ interface QueenRow {
   drodo_season: string | null;
   drodo_season_games: number | null;
   drodo_chicken_count: number | null;
+  drodo_raw_data: Record<string, unknown> | null;
   queen_ladder_rank: number | null;
   queen_ladder_mmr: number | null;
   queen_ladder_season: string | null;
   queen_ladder_last_seen_at: string | null;
+  move?: QueenMove | null;
+}
+
+interface QueenSnapshotRow {
+  steam_id: string;
+  queen_rank: number | null;
+  snapshotted_at: string;
+}
+
+interface QueenMove {
+  latestRank: number;
+  previousRank: number | null;
+  delta: number | null;
 }
 
 const title = `Queen Players | ${SITE_TITLE}`;
 const description =
-  "Latest Dota Auto Chess Queen players captured from the in-game Queen ladder, with MMR and available season stats.";
+  "Latest Dota Auto Chess Queen players captured from the in-game Queen ladder and refreshed profile snapshots, with MMR, rank movement, and available season stats.";
 
 export const metadata: Metadata = {
   title,
@@ -47,7 +61,8 @@ export const metadata: Metadata = {
   },
 };
 
-export const revalidate = 300;
+export const revalidate = 600;
+const QUEEN_TABLE_LIMIT = 100;
 
 const SELECT = [
   "steam_id::text",
@@ -58,6 +73,7 @@ const SELECT = [
   "drodo_season",
   "drodo_season_games",
   "drodo_chicken_count",
+  "drodo_raw_data",
   "queen_ladder_rank",
   "queen_ladder_mmr",
   "queen_ladder_season",
@@ -80,7 +96,7 @@ async function loadQueens(): Promise<{ rows: QueenRow[]; error: string | null }>
   const { data, error } = await supabase
     .from("users")
     .select(SELECT)
-    .not("queen_ladder_last_seen_at", "is", null)
+    .or("queen_ladder_last_seen_at.not.is.null,drodo_raw_data->>queen_rank.not.is.null")
     .order("queen_ladder_last_seen_at", { ascending: false, nullsFirst: false })
     .order("queen_ladder_rank", { ascending: true, nullsFirst: false })
     .order("queen_ladder_mmr", { ascending: false, nullsFirst: false })
@@ -93,14 +109,75 @@ async function loadQueens(): Promise<{ rows: QueenRow[]; error: string | null }>
     steam_id: String(row.steam_id),
   }));
   const latestSeenAt = normalizedRows[0]?.queen_ladder_last_seen_at ?? null;
-  const rows = latestSeenAt
-    ? normalizedRows.filter((row) => row.queen_ladder_last_seen_at === latestSeenAt)
-    : [];
+  const rows = (latestSeenAt
+    ? normalizedRows.filter(
+        (row) => row.queen_ladder_last_seen_at === latestSeenAt || profileQueenRank(row) != null
+      )
+    : normalizedRows.filter((row) => profileQueenRank(row) != null)
+  ).sort((a, b) => {
+    const aRank = effectiveQueenRank(a) ?? Number.MAX_SAFE_INTEGER;
+    const bRank = effectiveQueenRank(b) ?? Number.MAX_SAFE_INTEGER;
+    return aRank - bRank || (queenMmr(b) ?? -1) - (queenMmr(a) ?? -1);
+  }).filter((row) => {
+    const rank = effectiveQueenRank(row);
+    return rank == null || rank <= QUEEN_TABLE_LIMIT;
+  }).slice(0, QUEEN_TABLE_LIMIT);
+
+  if (rows.length === 0) {
+    return { rows, error: null };
+  }
+
+  const { data: snapshots, error: snapshotsError } = await supabase
+    .from("mmr_snapshots")
+    .select("steam_id::text, queen_rank, snapshotted_at")
+    .in(
+      "steam_id",
+      rows.map((row) => row.steam_id)
+    )
+    .not("queen_rank", "is", null)
+    .order("steam_id", { ascending: true })
+    .order("snapshotted_at", { ascending: false })
+    .limit(rows.length * 8);
+
+  if (snapshotsError) {
+    console.error("Failed to load Queen rank movement:", snapshotsError.message);
+  }
+
+  const moves = buildQueenMoves((snapshots ?? []) as unknown as QueenSnapshotRow[]);
 
   return {
-    rows,
+    rows: rows.map((row) => ({ ...row, move: moves.get(row.steam_id) ?? null })),
     error: null,
   };
+}
+
+function buildQueenMoves(snapshots: QueenSnapshotRow[]): Map<string, QueenMove> {
+  const bySteamId = new Map<string, QueenSnapshotRow[]>();
+  for (const snapshot of snapshots) {
+    if (typeof snapshot.queen_rank !== "number") continue;
+    const steamId = String(snapshot.steam_id);
+    const list = bySteamId.get(steamId) ?? [];
+    list.push({ ...snapshot, steam_id: steamId });
+    bySteamId.set(steamId, list);
+  }
+
+  const moves = new Map<string, QueenMove>();
+  for (const [steamId, list] of bySteamId) {
+    const ordered = [...list].sort(
+      (a, b) =>
+        new Date(b.snapshotted_at).getTime() - new Date(a.snapshotted_at).getTime()
+    );
+    const latestRank = ordered[0]?.queen_rank ?? null;
+    if (latestRank == null) continue;
+    const previousRank =
+      ordered.find((snapshot) => snapshot.queen_rank !== latestRank)?.queen_rank ?? null;
+    moves.set(steamId, {
+      latestRank,
+      previousRank,
+      delta: previousRank == null ? null : previousRank - latestRank,
+    });
+  }
+  return moves;
 }
 
 function normalizeSeason(value: string | null): string | null {
@@ -143,6 +220,31 @@ function queenMmr(row: QueenRow): number | null {
   return row.queen_ladder_mmr ?? row.drodo_mmr ?? null;
 }
 
+function profileQueenRank(row: QueenRow): number | null {
+  const value = row.drodo_raw_data?.queen_rank;
+  if (typeof value === "number" && Number.isFinite(value)) return value;
+  if (typeof value === "string" && value.trim()) {
+    const parsed = Number(value);
+    return Number.isFinite(parsed) ? parsed : null;
+  }
+  return null;
+}
+
+function effectiveQueenRank(row: QueenRow): number | null {
+  return row.queen_ladder_rank ?? profileQueenRank(row);
+}
+
+function formatMove(move: QueenMove | null | undefined): string {
+  if (!move || move.delta == null) return "—";
+  if (move.delta === 0) return "0";
+  return move.delta > 0 ? `↑${move.delta}` : `↓${Math.abs(move.delta)}`;
+}
+
+function moveClass(move: QueenMove | null | undefined): string {
+  if (!move || move.delta == null || move.delta === 0) return styles.dim;
+  return move.delta > 0 ? styles.up : styles.down;
+}
+
 export default async function QueensPage() {
   const { rows, error } = await loadQueens();
   const season = rows.find((row) => row.queen_ladder_season)?.queen_ladder_season;
@@ -154,8 +256,11 @@ export default async function QueensPage() {
         Latest in-game Queen ladder output captured by the desktop tracker
         {season ? ` for ${season.replace(/_/g, " ").toUpperCase()}` : ""}. Rows are replaced when
         a fresh ladder upload is accepted. Season stats fill in after a profile
-        is refreshed; signed-in owners are checked about hourly in the
-        background.
+        is refreshed; Queens and recently signed-in users are checked about every 10 minutes in the
+        background. The table is capped to the known top 100; profile refreshes
+        are used to fill missing ranks when we know them, so visible rank numbers
+        may skip slots until the next full in-game ladder capture fills the
+        surrounding players.
       </p>
 
       {error ? (
@@ -171,6 +276,7 @@ export default async function QueensPage() {
           <div className={`${styles.table} ${styles["queen-table"]}`} role="table">
             <div className={`${styles.row} ${styles["header-row"]}`}>
               <div className={`${styles.cell} ${styles["cell-rank"]}`}>Rank</div>
+              <div className={`${styles.cell} ${styles["cell-move"]}`}>Move</div>
               <div className={styles.cell} aria-hidden="true" />
               <div className={styles.cell}>Player</div>
               <div className={styles.cell}>MMR</div>
@@ -179,7 +285,7 @@ export default async function QueensPage() {
               <div className={`${styles.cell} ${styles["hide-sm"]}`}>Win rate</div>
             </div>
             {rows.map((row, index) => {
-              const ladderRank = row.queen_ladder_rank ?? index + 1;
+              const ladderRank = effectiveQueenRank(row) ?? index + 1;
               const mmr = queenMmr(row);
               const display = row.name || row.custom_url || row.steam_id;
               const initial = display.charAt(0).toUpperCase() || "?";
@@ -199,6 +305,9 @@ export default async function QueensPage() {
                     className={`${styles.cell} ${styles["cell-rank"]} ${ladderRank <= 3 ? `${styles["top-rank"]} ${rankClass}` : ""}`}
                   >
                     #{ladderRank}
+                  </div>
+                  <div className={`${styles.cell} ${styles["cell-move"]} ${moveClass(row.move)}`}>
+                    {formatMove(row.move)}
                   </div>
                   <div className={`${styles.cell} ${styles["cell-avatar"]}`}>
                     {row.avatar_url ? (

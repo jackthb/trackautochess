@@ -12,6 +12,7 @@ use std::{
 
 const STEAM_ID64_MIN: u64 = 76_561_197_960_265_728;
 const STEAM_ID64_MAX: u64 = 76_561_202_255_233_023;
+const DRODO_COURIER_BATCH_SIZE: usize = 100;
 
 #[derive(Debug, Clone)]
 pub struct SupabaseClient {
@@ -284,8 +285,154 @@ impl SupabaseClient {
             &Value::Array(rows),
             "resolution=merge-duplicates,return=minimal",
         )?;
+        let _ = self.upsert_queen_ladder_snapshots(players);
+        let _ = self.hydrate_unpulled_queen_profiles(&seen_ids);
         let _ = self.clear_stale_queen_ladder_snapshot(&seen_ids);
         Ok(count)
+    }
+
+    fn upsert_queen_ladder_snapshots(&self, players: &[QueenPlayer]) -> Result<usize, String> {
+        let mut rows = Vec::new();
+        let mut seen = HashSet::new();
+        for player in players {
+            let Some(steam_id) = parse_valid_steam_id64(&player.steam_id) else {
+                continue;
+            };
+            if !seen.insert(steam_id) || player.rank < 1 {
+                continue;
+            }
+            let season = queen_ladder::normalize_season_key(player.season.as_deref().unwrap_or(""));
+            rows.push(json!({
+                "steam_id": steam_id,
+                "season": if season.is_empty() { Value::Null } else { json!(season) },
+                "mmr": player.mmr,
+                "chicken_count": Value::Null,
+                "queen_rank": player.rank,
+                "snapshotted_at": if player.seen_at.is_empty() { now_iso_utc() } else { player.seen_at.clone() },
+            }));
+        }
+        if rows.is_empty() {
+            return Ok(0);
+        }
+        let count = rows.len();
+        self.post_json(
+            "/rest/v1/mmr_snapshots?on_conflict=steam_id,season,mmr,chicken_count,queen_rank",
+            &Value::Array(rows),
+            "resolution=merge-duplicates,return=minimal",
+        )?;
+        Ok(count)
+    }
+
+    fn hydrate_unpulled_queen_profiles(&self, current_steam_ids: &[u64]) -> Result<usize, String> {
+        if current_steam_ids.is_empty() {
+            return Ok(0);
+        }
+        let ids = current_steam_ids
+            .iter()
+            .map(u64::to_string)
+            .collect::<Vec<_>>()
+            .join(",");
+        let unpulled = self.get_json(&format!(
+            "/rest/v1/users?select=steam_id&drodo_last_fetched_at=is.null&steam_id=in.({ids})"
+        ))?;
+        let ids = unpulled
+            .as_array()
+            .into_iter()
+            .flatten()
+            .filter_map(|row| row.get("steam_id").and_then(Value::as_u64))
+            .collect::<Vec<_>>();
+        if ids.is_empty() {
+            return Ok(0);
+        }
+        let mut user_rows = Vec::new();
+        let mut snapshot_rows = Vec::new();
+        for batch in ids.chunks(DRODO_COURIER_BATCH_SIZE) {
+            let fetched_at = now_iso_utc();
+            let joined = batch
+                .iter()
+                .map(u64::to_string)
+                .collect::<Vec<_>>()
+                .join(",");
+            let response = ureq::get(&format!(
+                "http://autochess.ppbizon.com/courier/get/@{joined}"
+            ))
+            .call()
+            .map_err(|err| err.to_string())?;
+            if !(200..300).contains(&response.status()) {
+                return Err(format!("Drodo returned HTTP {}", response.status()));
+            }
+            let body = response.into_string().map_err(|err| err.to_string())?;
+            let payload = serde_json::from_str::<Value>(&body).map_err(|err| err.to_string())?;
+            let user_info = payload
+                .get("user_info")
+                .and_then(Value::as_object)
+                .ok_or_else(|| "Drodo response missing user_info".to_owned())?;
+            for steam_id in batch {
+                let key = steam_id.to_string();
+                let Some(info) = user_info.get(&key).and_then(Value::as_object) else {
+                    user_rows.push(json!({
+                        "steam_id": steam_id,
+                        "drodo_last_fetched_at": fetched_at,
+                        "drodo_profile_missing": true,
+                        "next_poll_at": next_drodo_poll_at(600),
+                        "poll_interval_seconds": 600,
+                    }));
+                    continue;
+                };
+                let season = current_drodo_season(info);
+                let mmr = season
+                    .as_deref()
+                    .and_then(|season| number_from_object(info, &format!("mmr_{season}")));
+                let max_mmr = season
+                    .as_deref()
+                    .and_then(|season| number_from_object(info, &format!("max_mmr_{season}")));
+                let season_games = season
+                    .as_deref()
+                    .and_then(|season| number_from_object(info, &format!("match_{season}")));
+                let chicken_count = number_from_object(info, "chicken_count").unwrap_or(0);
+                let queen_rank = number_from_object(info, "queen_rank");
+                user_rows.push(json!({
+                    "steam_id": steam_id,
+                    "drodo_mmr": mmr,
+                    "drodo_max_mmr": max_mmr,
+                    "drodo_mmr_level": number_from_object(info, "mmr_level"),
+                    "drodo_season": season,
+                    "drodo_season_games": season_games,
+                    "drodo_candy": number_from_object(info, "candy"),
+                    "drodo_chicken_count": chicken_count,
+                    "drodo_raw_data": Value::Object(info.clone()),
+                    "drodo_last_fetched_at": fetched_at,
+                    "drodo_profile_missing": false,
+                    "next_poll_at": next_drodo_poll_at(600),
+                    "poll_interval_seconds": 600,
+                }));
+                snapshot_rows.push(json!({
+                    "steam_id": steam_id,
+                    "season": season,
+                    "mmr": mmr,
+                    "chicken_count": chicken_count,
+                    "queen_rank": queen_rank,
+                    "snapshotted_at": fetched_at,
+                }));
+            }
+        }
+        if !user_rows.is_empty() {
+            self.post_json(
+                "/rest/v1/users",
+                &Value::Array(user_rows),
+                "resolution=merge-duplicates,return=minimal",
+            )?;
+        }
+        if !snapshot_rows.is_empty() {
+            let snapshot_count = snapshot_rows.len();
+            let _ = self.post_json(
+                "/rest/v1/mmr_snapshots?on_conflict=steam_id,season,mmr,chicken_count,queen_rank",
+                &Value::Array(snapshot_rows),
+                "resolution=merge-duplicates,return=minimal",
+            );
+            return Ok(snapshot_count);
+        }
+        Ok(0)
     }
 
     fn clear_stale_queen_ladder_snapshot(&self, current_steam_ids: &[u64]) -> Result<(), String> {
@@ -521,11 +668,17 @@ const MATCH_PLAYER_COLUMNS: &[&str] = &[
 ];
 
 fn nettable_row_json(row: &NettableRow) -> Value {
-    json!({
-        "table_name": row.table_name,
-        "key": row.key,
-        "raw": row.raw.to_value(),
-    })
+    let mut out = serde_json::Map::new();
+    out.insert("table_name".to_owned(), json!(row.table_name));
+    out.insert("key".to_owned(), json!(row.key));
+    out.insert("raw".to_owned(), row.raw.to_value());
+    if let Some(observed_at) = &row.observed_at {
+        out.insert("observed_at".to_owned(), json!(observed_at));
+    }
+    if let Some(match_started_at) = &row.match_started_at {
+        out.insert("match_started_at".to_owned(), json!(match_started_at));
+    }
+    Value::Object(out)
 }
 
 fn is_end_board_row(row: &Value) -> bool {
@@ -539,11 +692,20 @@ struct EndBoardUpload {
     players: Vec<Value>,
 }
 
-fn build_end_board_upload(rows: &[Value], played_at: &str) -> Option<EndBoardUpload> {
+fn build_end_board_upload(rows: &[Value], fallback_played_at: &str) -> Option<EndBoardUpload> {
     let end_board = rows.iter().find(|row| {
         row.get("table_name").and_then(Value::as_str) == Some("CustomNetTable_dac_table")
             && row.get("key").and_then(Value::as_str) == Some("end_board")
     })?;
+    let observed_at = end_board
+        .get("observed_at")
+        .and_then(Value::as_str)
+        .filter(|value| !value.trim().is_empty());
+    let match_started_at = end_board
+        .get("match_started_at")
+        .and_then(Value::as_str)
+        .filter(|value| !value.trim().is_empty());
+    let played_at = observed_at.unwrap_or(fallback_played_at);
     let data = end_board
         .get("raw")
         .and_then(|raw| raw.get("data"))
@@ -563,7 +725,6 @@ fn build_end_board_upload(rows: &[Value], played_at: &str) -> Option<EndBoardUpl
         })
         .collect::<Vec<_>>();
     pairs.sort();
-    let match_id = generate_live_match_id(&pairs);
     let final_round = data
         .values()
         .filter_map(|player| value_i64(player.get("round")))
@@ -574,6 +735,11 @@ fn build_end_board_upload(rows: &[Value], played_at: &str) -> Option<EndBoardUpl
         .fold(None, |acc: Option<f64>, value| {
             Some(acc.map_or(value, |current| current.max(value)))
         });
+    let match_started_hour = match_started_at
+        .or(observed_at)
+        .and_then(match_identity_hour_bucket);
+    let match_id =
+        generate_live_match_id(&pairs, final_round, duration, match_started_hour.as_deref());
     let match_row = json!({
         "match_id": match_id,
         "played_at": played_at,
@@ -670,6 +836,13 @@ fn value_f64(value: Option<&Value>) -> Option<f64> {
     })
 }
 
+fn match_identity_hour_bucket(value: &str) -> Option<String> {
+    let value = value.trim();
+    let t = value.find('T')?;
+    let hour_end = t + 3;
+    (value.len() >= hour_end).then(|| value[..hour_end].to_owned())
+}
+
 fn normalize_synergy_string(value: Option<&str>) -> Option<String> {
     let out = value?
         .split(',')
@@ -744,8 +917,20 @@ fn player_id_pairs(rows: &[NettableRow]) -> Vec<(String, i64)> {
         .collect()
 }
 
-fn generate_live_match_id(pairs: &[(String, i64)]) -> String {
-    let canonical = serde_json::to_string(pairs).unwrap_or_else(|_| "[]".to_owned());
+fn generate_live_match_id(
+    pairs: &[(String, i64)],
+    final_round: Option<i64>,
+    duration: Option<f64>,
+    match_started_hour: Option<&str>,
+) -> String {
+    let seed = json!({
+        "kind": "end_board",
+        "players": pairs,
+        "match_started_hour": match_started_hour,
+        "final_round": final_round,
+        "duration_seconds": duration.map(|value| (value * 1000.0).round() as i64),
+    });
+    let canonical = serde_json::to_string(&seed).unwrap_or_else(|_| "{}".to_owned());
     let digest = Sha256::digest(canonical.as_bytes());
     format!("{digest:x}")[..16].to_owned()
 }
@@ -768,6 +953,31 @@ fn parse_valid_steam_id64(value: &str) -> Option<u64> {
         .then_some(steam_id)
 }
 
+fn number_from_object(object: &serde_json::Map<String, Value>, key: &str) -> Option<i64> {
+    let value = object.get(key)?;
+    match value {
+        Value::Number(number) => number
+            .as_i64()
+            .or_else(|| number.as_u64().and_then(|n| i64::try_from(n).ok())),
+        Value::String(text) => text.trim().parse::<i64>().ok(),
+        _ => None,
+    }
+}
+
+fn current_drodo_season(object: &serde_json::Map<String, Value>) -> Option<String> {
+    object
+        .keys()
+        .filter_map(|key| key.strip_prefix("mmr_s"))
+        .filter_map(|suffix| suffix.parse::<u32>().ok())
+        .max()
+        .map(|season| format!("s{season}"))
+}
+
+fn next_drodo_poll_at(interval_seconds: i64) -> String {
+    let seconds = interval_seconds.max(0);
+    (chrono::Utc::now() + chrono::Duration::seconds(seconds)).to_rfc3339()
+}
+
 fn now_iso_utc() -> String {
     chrono::Utc::now().to_rfc3339()
 }
@@ -777,12 +987,20 @@ mod tests {
     use super::*;
 
     #[test]
-    fn live_match_id_hashes_like_legacy_algorithm() {
-        let pairs = vec![
-            ("76561198000000001".to_owned(), 1),
-            ("76561198000000002".to_owned(), 2),
-        ];
-        assert_eq!(generate_live_match_id(&pairs), "0197bf92d36d4c32");
+    fn live_match_id_distinguishes_repeat_solo_games() {
+        let pairs = vec![("76561198000000001".to_owned(), 1)];
+        let first =
+            generate_live_match_id(&pairs, Some(46), Some(2084.0), Some("2026-06-09T10:59:52Z"));
+        let retry =
+            generate_live_match_id(&pairs, Some(46), Some(2084.0), Some("2026-06-09T10:59:52Z"));
+        let next_solo_win =
+            generate_live_match_id(&pairs, Some(49), Some(2210.0), Some("2026-06-09T11:12:16Z"));
+
+        assert_eq!(first, retry, "same final board should remain idempotent");
+        assert_ne!(
+            first, next_solo_win,
+            "solo games with the same player and placement must not collide"
+        );
     }
 
     #[test]
@@ -798,10 +1016,12 @@ mod tests {
                 .into_iter()
                 .collect(),
             ),
+            observed_at: Some("2026-06-09T10:59:52Z".to_owned()),
+            match_started_at: Some("2026-06-09T10:01:10Z".to_owned()),
         };
         assert_eq!(
             nettable_row_json(&row),
-            json!({"table_name":"CustomNetTable_dac_table","key":"end_board","raw":{"data":{}}})
+            json!({"table_name":"CustomNetTable_dac_table","key":"end_board","raw":{"data":{}},"observed_at":"2026-06-09T10:59:52Z","match_started_at":"2026-06-09T10:01:10Z"})
         );
     }
 
@@ -880,7 +1100,13 @@ mod tests {
         let upload = build_end_board_upload(&rows, "2026-06-07T12:00:00Z")
             .expect("end_board should build upload");
 
-        assert_eq!(upload.match_row["match_id"], "d5246b0d2fcc093d");
+        assert_eq!(
+            upload.match_row["match_id"],
+            build_end_board_upload(&rows, "2026-06-07T12:00:05Z")
+                .expect("same end board should rebuild")
+                .match_row["match_id"],
+            "same end_board content should be stable across upload retries"
+        );
         assert_eq!(upload.match_row["player_count"], 3);
         assert_eq!(upload.match_row["final_round"], 42);
         assert_eq!(upload.match_row["duration"], 2400.0);
@@ -958,6 +1184,8 @@ mod tests {
                     .into_iter()
                     .collect(),
                 ),
+                observed_at: None,
+                match_started_at: None,
             },
             NettableRow {
                 table_name: "CustomNetTable_player_id_table".to_owned(),
@@ -970,6 +1198,8 @@ mod tests {
                     .into_iter()
                     .collect(),
                 ),
+                observed_at: None,
+                match_started_at: None,
             },
         ];
 

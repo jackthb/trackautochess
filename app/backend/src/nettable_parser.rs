@@ -1,3 +1,4 @@
+use chrono::{Datelike, Local, TimeZone};
 use std::{collections::BTreeMap, fmt, fs, io, path::Path};
 
 #[derive(Debug, Clone, PartialEq)]
@@ -53,9 +54,12 @@ pub struct NettableRow {
     pub table_name: String,
     pub key: String,
     pub raw: Value,
+    pub observed_at: Option<String>,
+    pub match_started_at: Option<String>,
 }
 
 pub type ParsedLog = BTreeMap<String, BTreeMap<String, Value>>;
+type ParsedLogWithObservedAt = BTreeMap<String, BTreeMap<String, (Value, Option<String>)>>;
 
 pub fn parse_vbkv(bytes: &[u8]) -> Result<Value, ParseError> {
     if bytes.len() < 8 || &bytes[..4] != b"VBKV" {
@@ -76,50 +80,71 @@ pub fn parse_log(path: &Path) -> io::Result<ParsedLog> {
 }
 
 pub fn parse_log_text(body: &str) -> ParsedLog {
-    let mut out: BTreeMap<String, BTreeMap<String, Value>> = BTreeMap::new();
+    parse_log_text_with_observed_at(body)
+        .into_iter()
+        .map(|(table, entries)| {
+            (
+                table,
+                entries
+                    .into_iter()
+                    .map(|(key, (value, _))| (key, value))
+                    .collect(),
+            )
+        })
+        .collect()
+}
+
+fn parse_log_text_with_observed_at(body: &str) -> ParsedLogWithObservedAt {
+    let mut out: ParsedLogWithObservedAt = BTreeMap::new();
     let mut table: Option<String> = None;
     let mut key: Option<String> = None;
+    let mut key_observed_at: Option<String> = None;
     let mut hex = String::new();
 
-    let flush =
-        |out: &mut ParsedLog, table: &Option<String>, key: &Option<String>, hex: &mut String| {
-            if let (Some(table), Some(key)) = (table, key) {
-                let raw_hex = hex.clone();
-                let decoded = decode_hex(hex);
-                let should_skip = decoded
-                    .as_ref()
-                    .map(|bytes| bytes.len() < 8 || &bytes[..4] != b"VBKV")
-                    .unwrap_or_else(|_| raw_hex.trim().is_empty());
-                if should_skip {
-                    hex.clear();
-                    return;
+    let flush = |out: &mut ParsedLogWithObservedAt,
+                 table: &Option<String>,
+                 key: &Option<String>,
+                 key_observed_at: &Option<String>,
+                 hex: &mut String| {
+        if let (Some(table), Some(key)) = (table, key) {
+            let raw_hex = hex.clone();
+            let decoded = decode_hex(hex);
+            let should_skip = decoded
+                .as_ref()
+                .map(|bytes| bytes.len() < 8 || &bytes[..4] != b"VBKV")
+                .unwrap_or_else(|_| raw_hex.trim().is_empty());
+            if should_skip {
+                hex.clear();
+                return;
+            }
+            match decoded.and_then(|bytes| parse_vbkv(&bytes)) {
+                Ok(value) => {
+                    out.entry(table.clone())
+                        .or_default()
+                        .insert(key.clone(), (value, key_observed_at.clone()));
                 }
-                match decoded.and_then(|bytes| parse_vbkv(&bytes)) {
-                    Ok(value) => {
-                        out.entry(table.clone())
-                            .or_default()
-                            .insert(key.clone(), value);
-                    }
-                    Err(_) => {
-                        // Dota writes console.log asynchronously. Large dumps
-                        // (notably ranking_top) can be visible at EOF before
-                        // the final bytes have landed. Do not replace the last
-                        // good value with a transient decode failure.
-                    }
+                Err(_) => {
+                    // Dota writes console.log asynchronously. Large dumps
+                    // (notably ranking_top) can be visible at EOF before
+                    // the final bytes have landed. Do not replace the last
+                    // good value with a transient decode failure.
                 }
             }
-            hex.clear();
-        };
+        }
+        hex.clear();
+    };
 
     for line in body.lines() {
         let Some(idx) = line.find("[stringtables]") else {
             continue;
         };
+        let observed_at = console_line_observed_at(line);
         let trimmed = &line[idx..];
         if let Some(rest) = trimmed.strip_prefix("[stringtables] table ") {
-            flush(&mut out, &table, &key, &mut hex);
+            flush(&mut out, &table, &key, &key_observed_at, &mut hex);
             table = rest.split_whitespace().next().map(str::to_owned);
             key = None;
+            key_observed_at = None;
             continue;
         }
         // Check the ">>" hex-data line BEFORE the "key :" line. The VBKV ASCII
@@ -148,28 +173,71 @@ pub fn parse_log_text(body: &str) -> ParsedLog {
         if let Some((_, rest)) = trimmed.split_once(':') {
             let candidate = rest.trim();
             if !candidate.starts_with('>') && !candidate.is_empty() {
-                flush(&mut out, &table, &key, &mut hex);
+                flush(&mut out, &table, &key, &key_observed_at, &mut hex);
                 key = Some(candidate.to_owned());
+                key_observed_at = observed_at;
                 continue;
             }
         }
     }
-    flush(&mut out, &table, &key, &mut hex);
+    flush(&mut out, &table, &key, &key_observed_at, &mut hex);
     out
 }
 
+pub(crate) fn console_line_observed_at(line: &str) -> Option<String> {
+    let prefix = line.get(..14)?;
+    let bytes = prefix.as_bytes();
+    if bytes.get(2) != Some(&b'/')
+        || bytes.get(5) != Some(&b' ')
+        || bytes.get(8) != Some(&b':')
+        || bytes.get(11) != Some(&b':')
+    {
+        return None;
+    }
+    let month = prefix[0..2].parse::<u32>().ok()?;
+    let day = prefix[3..5].parse::<u32>().ok()?;
+    let hour = prefix[6..8].parse::<u32>().ok()?;
+    let minute = prefix[9..11].parse::<u32>().ok()?;
+    let second = prefix[12..14].parse::<u32>().ok()?;
+    Local
+        .with_ymd_and_hms(Local::now().year(), month, day, hour, minute, second)
+        .single()
+        .map(|dt| dt.to_rfc3339())
+}
+
 pub fn extract_rows(path: &Path) -> io::Result<Vec<NettableRow>> {
-    let parsed = parse_log(path)?;
-    Ok(rows_from_parsed(parsed))
+    let body = fs::read_to_string(path)?;
+    Ok(rows_from_log_text(&body))
+}
+
+pub fn rows_from_log_text(body: &str) -> Vec<NettableRow> {
+    rows_from_parsed_with_observed_at(parse_log_text_with_observed_at(body))
 }
 
 pub fn rows_from_parsed(parsed: ParsedLog) -> Vec<NettableRow> {
+    rows_from_parsed_with_observed_at(
+        parsed
+            .into_iter()
+            .map(|(table, entries)| {
+                (
+                    table,
+                    entries
+                        .into_iter()
+                        .map(|(key, value)| (key, (value, None)))
+                        .collect(),
+                )
+            })
+            .collect(),
+    )
+}
+
+fn rows_from_parsed_with_observed_at(parsed: ParsedLogWithObservedAt) -> Vec<NettableRow> {
     let mut rows = Vec::new();
     for (table_name, entries) in parsed {
         if !table_name.starts_with("CustomNetTable_") {
             continue;
         }
-        for (key, raw) in entries {
+        for (key, (raw, observed_at)) in entries {
             if is_decode_error(&raw) {
                 continue;
             }
@@ -177,6 +245,8 @@ pub fn rows_from_parsed(parsed: ParsedLog) -> Vec<NettableRow> {
                 table_name: table_name.clone(),
                 key,
                 raw,
+                observed_at,
+                match_started_at: None,
             });
         }
     }
@@ -393,6 +463,16 @@ mod tests {
         assert_eq!(
             parsed["CustomNetTable_dac_table"]["player_info"].to_json(),
             r#"{"name":"jack","rank":7}"#
+        );
+        let rows = rows_from_log_text(&log);
+        assert!(
+            rows.iter().any(|row| row.key == "player_info"
+                && row
+                    .observed_at
+                    .as_deref()
+                    .unwrap_or_default()
+                    .contains("T22:52:54")),
+            "timestamp-prefixed console rows should retain the observed_at time"
         );
     }
 

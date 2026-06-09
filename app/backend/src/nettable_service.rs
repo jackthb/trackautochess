@@ -17,6 +17,7 @@ use std::{
 
 const POST_GAME_FINALIZE_ATTEMPTS: usize = 12;
 const POST_GAME_FINALIZE_INTERVAL: Duration = Duration::from_secs(4);
+const QUEEN_LADDER_AUTO_SYNC_INTERVAL: Duration = Duration::from_secs(600);
 const DEFAULT_GSI_PORT: u16 = 4001;
 const STEAM_ID64_BASE: u64 = 76_561_197_960_265_728;
 const DOTA_APP_ID: &str = "570";
@@ -54,6 +55,10 @@ struct NettableState {
     /// Last Dota UI state seen in console.log (`ChangeGameUIState` target).
     /// Used to detect when a match leaves gameplay.
     last_ui_state: Option<String>,
+    /// Console timestamp for the transition into the active match. This is the
+    /// stable per-game identity salt; unlike end_board dump time it does not
+    /// change if post-game dump hotkeys fire repeatedly.
+    match_started_at: Option<String>,
     /// Set by `poll_once` when the UI left `DOTA_GAME_UI_DOTA_INGAME`; the
     /// capture loop consumes it to finalize the match (GSI-independent).
     pending_match_end: bool,
@@ -76,9 +81,10 @@ struct NettableState {
     own_slot_key: Option<String>,
     own_team_id: Option<i64>,
     last_own_player_payload: Option<serde_json::Value>,
-    /// Python scanned ranking_top_table once per lobby/session. Keep the same
-    /// latch so automatic Queen ladder upserts don't spam Supabase.
-    ranking_top_scanned: bool,
+    /// Last automatic Queen ladder sync. Dota's ranking table is dumped on the
+    /// metadata cadence; throttle uploads so a visible Queen list stays fresh
+    /// without re-writing Supabase on every poll.
+    last_ranking_top_sync_at: Option<Instant>,
     /// End-board match ids already uploaded by this daemon process. Dota keeps
     /// the finished end_board in console.log, so without this the poller would
     /// keep re-upserting and mutating played_at every heartbeat after a game.
@@ -636,8 +642,8 @@ mod tests {
 06/08 01:11:19 ChangeGameUIState: DOTA_GAME_UI_STATE_LOADING_SCREEN -> DOTA_GAME_UI_STATE_DASHBOARD
 ";
         assert_eq!(
-            latest_ui_state(log).as_deref(),
-            Some("DOTA_GAME_UI_STATE_DASHBOARD")
+            latest_ui_state(log).map(|(state, _)| state),
+            Some("DOTA_GAME_UI_STATE_DASHBOARD".to_owned())
         );
         assert_eq!(latest_ui_state("no transitions here"), None);
     }
@@ -858,7 +864,7 @@ mod tests {
     }
 
     #[test]
-    fn automatic_queen_scan_is_latched_per_session() {
+    fn automatic_queen_scan_is_throttled_to_sync_interval() {
         let state = Arc::new(Mutex::new(NettableState::default()));
         let cfg = Config {
             dac_dir: std::env::temp_dir(),
@@ -879,10 +885,21 @@ mod tests {
 
         let first = maybe_auto_upload_queen_ladder(&state, &cfg, &rows).expect("scan event");
         let second = maybe_auto_upload_queen_ladder(&state, &cfg, &rows);
+        {
+            let mut state = state.lock().unwrap();
+            state.last_ranking_top_sync_at =
+                Some(Instant::now() - QUEEN_LADDER_AUTO_SYNC_INTERVAL - Duration::from_secs(1));
+        }
+        let third = maybe_auto_upload_queen_ladder(&state, &cfg, &rows).expect("resync event");
 
         assert!(first.contains("nettable_ranking_scanned"));
         assert!(first.contains("\"player_count\":1"));
-        assert!(second.is_none(), "ranking scan should be once per session");
+        assert!(
+            second.is_none(),
+            "ranking scan should be throttled inside interval"
+        );
+        assert!(third.contains("nettable_ranking_scanned"));
+        assert!(third.contains("\"player_count\":1"));
     }
 
     #[test]
@@ -935,6 +952,8 @@ mod tests {
                     table_name: "CustomNetTable_player_id_table".to_owned(),
                     key: format!("player_{idx}"),
                     raw: crate::nettable_parser::Value::Object(raw),
+                    observed_at: None,
+                    match_started_at: None,
                 }
             })
             .collect()
@@ -946,6 +965,8 @@ mod tests {
                 table_name: table_name.to_owned(),
                 key: key.to_owned(),
                 raw: value_from_json(raw),
+                observed_at: None,
+                match_started_at: None,
             })
             .collect()
     }
@@ -1036,7 +1057,7 @@ fn handle_rows_for_parity(state: &Arc<Mutex<NettableState>>, rows: &[NettableRow
             state.own_slot_key = None;
             state.own_team_id = None;
             state.last_own_player_payload = None;
-            state.ranking_top_scanned = false;
+            state.last_ranking_top_sync_at = None;
         }
     }
 
@@ -1080,11 +1101,16 @@ fn maybe_auto_upload_queen_ladder(
     cfg: &Config,
     rows: &[NettableRow],
 ) -> Option<String> {
-    {
+    let now = Instant::now();
+    let should_sync = {
         let state = state.lock().unwrap();
-        if state.ranking_top_scanned {
-            return None;
-        }
+        state
+            .last_ranking_top_sync_at
+            .map(|last| now.duration_since(last) >= QUEEN_LADDER_AUTO_SYNC_INTERVAL)
+            .unwrap_or(true)
+    };
+    if !should_sync {
+        return None;
     }
     let ranking_raw = rows
         .iter()
@@ -1094,7 +1120,7 @@ fn maybe_auto_upload_queen_ladder(
     let players = queen_ladder::extract_ranking_top_players(&ranking_raw, &scanned_at);
     let player_count = players.len();
     if let Ok(mut state) = state.lock() {
-        state.ranking_top_scanned = true;
+        state.last_ranking_top_sync_at = Some(now);
     }
     if player_count == 0 {
         return None;
@@ -1763,14 +1789,18 @@ const DOTA_INGAME_STATE: &str = "DOTA_GAME_UI_DOTA_INGAME";
 
 /// The current UI state = the target of the last `ChangeGameUIState: X -> Y`
 /// line in the log. Dota writes these on every menu/match transition.
-fn latest_ui_state(text: &str) -> Option<String> {
+fn latest_ui_state(text: &str) -> Option<(String, Option<String>)> {
     let (idx, _) = text.rmatch_indices("ChangeGameUIState:").next()?;
-    let line = text[idx..].lines().next()?;
+    let line_start = text[..idx].rfind('\n').map(|pos| pos + 1).unwrap_or(0);
+    let line = text[line_start..].lines().next()?;
     let target = line.rsplit("-> ").next()?.trim();
     if target.is_empty() {
         return None;
     }
-    Some(target.to_owned())
+    Some((
+        target.to_owned(),
+        crate::nettable_parser::console_line_observed_at(line),
+    ))
 }
 
 /// True when the UI just left a match (was in-game, now isn't). This is the
@@ -1886,19 +1916,27 @@ fn poll_once(
     // Read the log once: parse the stringtables AND scan the UI-state line.
     let text = fs::read_to_string(&path)?;
     let parsed = nettable_parser::parse_log_text(&text);
-    let rows = nettable_parser::rows_from_parsed(parsed.clone());
+    let mut rows = nettable_parser::rows_from_log_text(&text);
     let ui_state = latest_ui_state(&text);
     let mut state = state.lock().unwrap();
     state.last_modified = Some(modified);
-    state.latest_parsed = parsed;
-    state.latest_rows = rows.clone();
-    update_capture_owner_from_rows(&mut state, &rows);
-    if let Some(next) = ui_state {
+    if let Some((next, observed_at)) = ui_state {
+        if state.last_ui_state.as_deref() != Some(DOTA_INGAME_STATE) && next == DOTA_INGAME_STATE {
+            state.match_started_at = observed_at.or_else(|| Some(now_iso_utc()));
+            state.uploaded_end_board_match_ids.clear();
+        }
         if is_match_end_transition(state.last_ui_state.as_deref(), &next) {
             state.pending_match_end = true;
         }
         state.last_ui_state = Some(next);
     }
+    let match_started_at = state.match_started_at.clone();
+    for row in &mut rows {
+        row.match_started_at = match_started_at.clone();
+    }
+    state.latest_parsed = parsed;
+    state.latest_rows = rows.clone();
+    update_capture_owner_from_rows(&mut state, &rows);
     if cfg.keep_local_nettable_dumps && !rows.is_empty() {
         persist_local_nettable_dump(cfg, &rows);
     }
@@ -1907,16 +1945,7 @@ fn poll_once(
 
 fn persist_local_nettable_dump(cfg: &Config, rows: &[NettableRow]) {
     let captured_at = now_iso_utc();
-    let row_values = rows
-        .iter()
-        .map(|row| {
-            serde_json::json!({
-                "table_name": row.table_name,
-                "key": row.key,
-                "raw": row.raw.to_value(),
-            })
-        })
-        .collect::<Vec<_>>();
+    let row_values = rows.iter().map(nettable_row_debug_json).collect::<Vec<_>>();
     let mut tables = rows
         .iter()
         .map(|row| row.table_name.as_str())
@@ -2397,6 +2426,23 @@ pub fn rows_json(rows: &[NettableRow]) -> String {
             .collect(),
     )
     .to_string()
+}
+
+fn nettable_row_debug_json(row: &NettableRow) -> serde_json::Value {
+    let mut out = serde_json::Map::new();
+    out.insert("table_name".to_owned(), serde_json::json!(row.table_name));
+    out.insert("key".to_owned(), serde_json::json!(row.key));
+    out.insert("raw".to_owned(), row.raw.to_value());
+    if let Some(observed_at) = &row.observed_at {
+        out.insert("observed_at".to_owned(), serde_json::json!(observed_at));
+    }
+    if let Some(match_started_at) = &row.match_started_at {
+        out.insert(
+            "match_started_at".to_owned(),
+            serde_json::json!(match_started_at),
+        );
+    }
+    serde_json::Value::Object(out)
 }
 
 pub fn parsed_json(parsed: &ParsedLog) -> String {

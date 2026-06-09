@@ -171,14 +171,29 @@ export function resolveChessLineup(
 ): ResolvedChessUnit[] {
   if (!raw) return [];
   const resolved: Array<ResolvedChessUnit & { cost: number }> = [];
+  const displayUnitCostByName = new Map(
+    Array.from(codeToUnit.values()).map((entry) => [entry.name, entry.cost]),
+  );
   for (const token of raw.replace(/\|/g, ",").split(",")) {
     const code = token.trim();
     if (!code || code === "placeholder") continue;
-    const base = code.replace(/1+$/, "");
-    const unit = codeToUnit.get(base);
-    if (!unit) continue;
-    const stars = Math.max(1, Math.min(1 + (code.length - base.length), 3));
-    resolved.push({ name: unit.name, stars, cost: unit.cost });
+    if (code.startsWith("chess_")) {
+      const base = code.replace(/1+$/, "");
+      const unit = codeToUnit.get(base);
+      if (!unit) continue;
+      const stars = Math.max(1, Math.min(1 + (code.length - base.length), 3));
+      resolved.push({ name: unit.name, stars, cost: unit.cost });
+      continue;
+    }
+
+    // The Rust backend may already normalize live nettable lineups into
+    // display names (`Lion|Chaos Knight(2)`). Accept that shape too so the
+    // live board does not drop every unit while waiting for raw `chess_*` codes.
+    const displayMatch = code.match(/^(.*?)(?:\((\d+)\))?$/);
+    const name = displayMatch?.[1]?.trim();
+    if (!name) continue;
+    const stars = Math.max(1, Math.min(Number(displayMatch?.[2]) || 1, 3));
+    resolved.push({ name, stars, cost: displayUnitCostByName.get(name) ?? 0 });
   }
   resolved.sort((a, b) => b.stars - a.stars || b.cost - a.cost);
   return resolved.map(({ name, stars }) => ({ name, stars }));

@@ -1,5 +1,7 @@
 import { useMemo } from "react";
-import { costBorderColor, synIconName, mmrLevelToRank, unitStem } from "../lib/game-utils";
+import { synIconName, mmrLevelToRank, relicStem } from "../lib/game-utils";
+import { ChessBoard } from "@dac/shared/ChessBoard";
+import { TooltipWrap, type TooltipData } from "@dac/shared/Tooltip";
 import {
   buildChessCodeUnitLookup,
   buildUnitCostLookup,
@@ -42,7 +44,7 @@ interface Seat {
 /**
  * Live lobby standings: every player the capture can see (up to 8), sorted by
  * current placement, with the local player highlighted and pinned. Each seat
- * shows HP, level, gold, board (unit icons + stars), active synergies and
+ * shows HP, level, gold, board position/items, active synergies and
  * relic. Fed by the backend's extracted per-player state — lineups are already
  * resolved from raw chess_* codes and HP is the live value (not the dac_table
  * static-100 sentinel).
@@ -51,8 +53,12 @@ interface Seat {
  * labelled by placement. Renders nothing until there's at least one capture.
  */
 export function LiveMatchStatus({ players, localSteamIds, round, unitsFull, synergiesData, relicsData, itemsFull }: Props) {
-  void itemsFull;
+  const iconUrl = useMemo(() => (type: string, stem: string) => `icons://${type}/${stem}.png`, []);
   const unitCosts = useMemo(() => buildUnitCostLookup(unitsFull), [unitsFull]);
+  const tooltipData = useMemo<TooltipData>(
+    () => ({ unitCosts, unitsFull, synergiesData, relicsData, iconUrl }),
+    [unitCosts, unitsFull, synergiesData, relicsData, iconUrl],
+  );
 
   // chess_* code → unit metadata, for resolving raw live lineups.
   const chessIdToUnit = useMemo(() => buildChessCodeUnitLookup(unitsFull), [unitsFull]);
@@ -154,38 +160,7 @@ export function LiveMatchStatus({ players, localSteamIds, round, unitsFull, syne
         }
         .live-seat-hp-bar { height: 100%; border-radius: 3px; transition: width 0.3s ease-out; min-width: 1px; }
         .live-seat-hp-text { font-size: var(--fs-11); color: var(--text-secondary); font-variant-numeric: tabular-nums; min-width: 34px; }
-        .live-seat-units {
-          display: flex;
-          align-items: center;
-          flex-wrap: wrap;
-          gap: 3px;
-          min-width: 0;
-        }
-        .live-seat-unit {
-          position: relative;
-          width: 24px;
-          height: 24px;
-          flex: 0 0 auto;
-        }
-        .live-seat-unit img {
-          width: 24px;
-          height: 24px;
-          border: 2px solid var(--border);
-          border-radius: var(--r-3);
-          object-fit: cover;
-          background: var(--bg-elevated);
-        }
-        .live-seat-stars {
-          position: absolute;
-          right: -2px;
-          bottom: -2px;
-          padding: 1px 2px;
-          border-radius: var(--r-2);
-          background: var(--bg-deep);
-          color: var(--gold);
-          font-size: 8px;
-          line-height: 1;
-        }
+        .live-seat-board { overflow-x: auto; padding-bottom: 2px; }
         .live-seat-empty { color: var(--text-muted); font-size: var(--fs-11); }
         .live-seat-foot {
           display: flex; align-items: center; gap: 10px;
@@ -208,7 +183,11 @@ export function LiveMatchStatus({ players, localSteamIds, round, unitsFull, syne
       <div className="live-seats">
         {seats.map(({ id, player, isLocal }) => {
           const hp = Math.max(0, player.hp ?? 0);
-          const units = resolveChessLineup(player.lineup, chessIdToUnit);
+          const fallbackLineup = resolveChessLineup(player.lineup, chessIdToUnit)
+            .map((unit) => `${unit.name}${unit.stars > 1 ? `(${unit.stars})` : ""}`)
+            .join("|");
+          const hasBoardUnits = Array.isArray(player.board) && player.board.length > 0;
+          const hasAnyUnits = hasBoardUnits || fallbackLineup.length > 0;
           const synergies = parseNettableSynergyBuff(player.buff, synergiesData);
           const relicCodes =
             player.relics && player.relics.length > 0
@@ -251,30 +230,19 @@ export function LiveMatchStatus({ players, localSteamIds, round, unitsFull, syne
                 </div>
               </div>
 
-              {units.length === 0 ? (
+              {!hasAnyUnits ? (
                 <div className="live-seat-empty">No units on the board yet.</div>
               ) : (
-                <div className="live-seat-units">
-                  {units.map((unit, index) => (
-                    <span
-                      key={`${unit.name}-${index}`}
-                      className="live-seat-unit"
-                      title={`${unit.name}${unit.stars > 1 ? ` ${"★".repeat(unit.stars)}` : ""}`}
-                    >
-                      <img
-                        src={`icons://units/${unitStem(unit.name)}.png`}
-                        alt={unit.name}
-                        loading="lazy"
-                        style={{ borderColor: costBorderColor(unitCosts[unit.name] || 1) }}
-                        onError={(e) => {
-                          (e.currentTarget as HTMLImageElement).style.display = "none";
-                        }}
-                      />
-                      {unit.stars > 1 && (
-                        <span className="live-seat-stars">{"★".repeat(unit.stars)}</span>
-                      )}
-                    </span>
-                  ))}
+                <div className="live-seat-board">
+                  <ChessBoard
+                    board={player.board}
+                    lineup={fallbackLineup}
+                    unitCosts={unitCosts}
+                    iconUrl={iconUrl}
+                    itemsFull={itemsFull}
+                    tooltipData={tooltipData}
+                    compact
+                  />
                 </div>
               )}
 
@@ -283,16 +251,24 @@ export function LiveMatchStatus({ players, localSteamIds, round, unitsFull, syne
                   {synergies.length > 0 && (
                     <div className="live-seat-syn">
                       {synergies.map((s) => (
-                        <span key={s.name} className="live-seat-syn-item" title={s.name}>
-                          <img
-                            src={`icons://synergies/${synIconName(s.name)}.png`}
-                            alt=""
-                            onError={(e) => {
-                              (e.currentTarget as HTMLImageElement).style.display = "none";
-                            }}
-                          />
-                          {s.count}
-                        </span>
+                        <TooltipWrap
+                          key={s.name}
+                          type="synergy"
+                          name={s.name}
+                          count={s.count}
+                          data={tooltipData}
+                        >
+                          <span className="syn-badge live-seat-syn-item" title={s.name}>
+                            <img
+                              src={iconUrl("synergies", synIconName(s.name))}
+                              alt=""
+                              onError={(e) => {
+                                (e.currentTarget as HTMLImageElement).style.display = "none";
+                              }}
+                            />
+                            {s.count}
+                          </span>
+                        </TooltipWrap>
                       ))}
                     </div>
                   )}
@@ -300,24 +276,39 @@ export function LiveMatchStatus({ players, localSteamIds, round, unitsFull, syne
                     <div className="live-seat-relics">
                       {relicCodes.map((code, i) => {
                         const info = relicsData[code];
-                        const name = info?.name ?? code;
+                        const name = info?.name ?? code.replace(/^item_/, "").replace(/_/g, " ");
                         const icon =
                           typeof info?.icon === "string" ? info.icon : undefined;
-                        return icon ? (
-                          <img
+                        return (
+                          <TooltipWrap
                             key={`${code}-${i}`}
-                            className="live-seat-relic-icon"
-                            src={`icons://${icon}`}
-                            alt={name}
-                            title={name}
-                            onError={(e) => {
-                              (e.currentTarget as HTMLImageElement).style.display = "none";
-                            }}
-                          />
-                        ) : (
-                          <span key={`${code}-${i}`} className="live-seat-relic" title={name}>
-                            {name}
-                          </span>
+                            type="relic"
+                            name={name}
+                            relicIndex={i}
+                            data={tooltipData}
+                          >
+                            {icon ? (
+                              <img
+                                className="relic-icon live-seat-relic-icon"
+                                src={`icons://${icon}`}
+                                alt={name}
+                                title={name}
+                                onError={(e) => {
+                                  (e.currentTarget as HTMLImageElement).style.display = "none";
+                                }}
+                              />
+                            ) : (
+                              <img
+                                className="relic-icon live-seat-relic-icon"
+                                src={iconUrl("relics", relicStem(name))}
+                                alt={name}
+                                title={name}
+                                onError={(e) => {
+                                  (e.currentTarget as HTMLImageElement).style.display = "none";
+                                }}
+                              />
+                            )}
+                          </TooltipWrap>
                         );
                       })}
                     </div>

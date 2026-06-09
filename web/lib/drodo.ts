@@ -1,6 +1,7 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 const DRODO_BASE = "http://autochess.ppbizon.com";
+const DRODO_COURIER_BATCH_SIZE = 200;
 
 /**
  * Cached profiles refresh after 24h on a normal page view; profiles that
@@ -16,7 +17,7 @@ export const EMPTY_DRODO_PROFILE_ERROR =
 // interval, otherwise we reset to the floor. Manual refreshes always
 // reset (the user just expressed interest). Missing profiles park at
 // the cap until the next manual refresh.
-export const POLL_MIN_INTERVAL_SECONDS = 60 * 60; // 1 hour
+export const POLL_MIN_INTERVAL_SECONDS = 10 * 60; // 10 minutes
 export const POLL_MAX_INTERVAL_SECONDS = 7 * 24 * 60 * 60; // 7 days
 export const POLL_BACKOFF_FACTOR = 1.5;
 
@@ -282,7 +283,13 @@ interface PollSnapshot {
   drodo_mmr: number | null;
   drodo_season_games: number | null;
   drodo_chicken_count: number | null;
+  queen_rank: number | null;
   poll_interval_seconds: number | null;
+}
+
+interface PollSnapshotRow extends PollSnapshot {
+  steam_id: string;
+  drodo_raw_data: Record<string, unknown> | null;
 }
 
 function clampInterval(seconds: number): number {
@@ -325,11 +332,42 @@ async function loadPollSnapshot(
   const { data } = await supabase
     .from("users")
     .select(
-      "drodo_mmr, drodo_season_games, drodo_chicken_count, poll_interval_seconds"
+      "drodo_mmr, drodo_season_games, drodo_chicken_count, drodo_raw_data, poll_interval_seconds"
     )
     .eq("steam_id", steamId)
-    .maybeSingle<PollSnapshot>();
-  return data ?? null;
+    .maybeSingle<PollSnapshotRow>();
+  return data ? pollSnapshotFromRow(data) : null;
+}
+
+async function loadPollSnapshots(
+  steamIds: string[],
+  supabase: SupabaseClient
+): Promise<Map<string, PollSnapshot>> {
+  if (steamIds.length === 0) return new Map();
+  const { data } = await supabase
+    .from("users")
+    .select(
+      "steam_id::text, drodo_mmr, drodo_season_games, drodo_chicken_count, drodo_raw_data, poll_interval_seconds"
+    )
+    .in("steam_id", steamIds);
+  return new Map(
+    ((data ?? []) as unknown as PollSnapshotRow[]).map((row) => [
+      String(row.steam_id),
+      pollSnapshotFromRow(row),
+    ])
+  );
+}
+
+function pollSnapshotFromRow(row: PollSnapshotRow): PollSnapshot {
+  return {
+    drodo_mmr: row.drodo_mmr,
+    drodo_season_games: row.drodo_season_games,
+    drodo_chicken_count: row.drodo_chicken_count,
+    queen_rank: row.drodo_raw_data
+      ? numberFromDrodoData(row.drodo_raw_data, "queen_rank")
+      : null,
+    poll_interval_seconds: row.poll_interval_seconds,
+  };
 }
 
 function profileChanged(
@@ -340,7 +378,8 @@ function profileChanged(
   return (
     prev.drodo_mmr !== next.mmr ||
     prev.drodo_season_games !== next.season_games ||
-    prev.drodo_chicken_count !== next.chicken_count
+    prev.drodo_chicken_count !== next.chicken_count ||
+    prev.queen_rank !== next.queen_rank
   );
 }
 
@@ -432,6 +471,179 @@ export type FetchDrodoResult =
       fetchedAt?: string;
     };
 
+export type FetchDrodoBatchResult = FetchDrodoResult & { steam_id: string };
+
+async function persistDrodoProfile(
+  profile: DrodoProfileRow,
+  seasonRows: SeasonSnapshotRow[],
+  supabase: SupabaseClient,
+  options: {
+    snapshotOnSuccess?: boolean;
+    pollMode: "adaptive" | "reset";
+    prevSnapshot?: PollSnapshot | null;
+  }
+): Promise<void> {
+  const changed = profileChanged(options.prevSnapshot ?? null, profile);
+  const schedule = nextPollSchedule({
+    mode: options.pollMode,
+    changed,
+    prevIntervalSeconds: options.prevSnapshot?.poll_interval_seconds ?? null,
+  });
+  const { error: upsertError } = await supabase
+    .from("users")
+    .upsert(
+      {
+        ...drodoProfileToUserPayload(profile),
+        next_poll_at: schedule.next_poll_at,
+        poll_interval_seconds: schedule.poll_interval_seconds,
+      },
+      { onConflict: "steam_id" }
+    );
+  if (upsertError) {
+    console.error("Failed to cache Drodo profile:", upsertError.message);
+  }
+
+  if (options.snapshotOnSuccess) {
+    const { error: snapshotError } = await supabase
+      .from("mmr_snapshots")
+      .upsert(
+        {
+          steam_id: profile.steam_id,
+          mmr: profile.mmr,
+          season: profile.season,
+          chicken_count: profile.chicken_count,
+          queen_rank: profile.queen_rank,
+          snapshotted_at: new Date().toISOString(),
+        },
+        { onConflict: "steam_id,season,mmr,chicken_count,queen_rank" }
+      );
+    if (snapshotError) {
+      console.error("Failed to upsert mmr_snapshot:", snapshotError.message);
+    }
+  }
+
+  if (seasonRows.length > 0) {
+    const { data: existingSeasons } = await supabase
+      .from("player_seasons")
+      .select("season, chicken_count")
+      .eq("steam_id", profile.steam_id);
+    const existingChickenCounts = new Map(
+      (existingSeasons ?? []).map((r) => [
+        r.season,
+        r.chicken_count as number | null,
+      ])
+    );
+    const mergedRows = seasonRows.map((row) => ({
+      ...row,
+      chicken_count:
+        row.chicken_count ?? existingChickenCounts.get(row.season) ?? null,
+    }));
+    const { error: seasonsError } = await supabase
+      .from("player_seasons")
+      .upsert(mergedRows, { onConflict: "steam_id,season" });
+    if (seasonsError) {
+      console.error(
+        "Failed to upsert player_seasons:",
+        seasonsError.message
+      );
+    }
+  }
+}
+
+export async function fetchAndCacheDrodoBatch(
+  steamIds: string[],
+  supabase: SupabaseClient,
+  options: {
+    snapshotOnSuccess?: boolean;
+    pollMode?: "adaptive" | "reset";
+  } = {}
+): Promise<FetchDrodoBatchResult[]> {
+  const ids = [...new Set(steamIds.map(String).filter(Boolean))];
+  if (ids.length === 0) return [];
+
+  if (ids.length > DRODO_COURIER_BATCH_SIZE) {
+    const results: FetchDrodoBatchResult[] = [];
+    for (let i = 0; i < ids.length; i += DRODO_COURIER_BATCH_SIZE) {
+      results.push(
+        ...(await fetchAndCacheDrodoBatch(
+          ids.slice(i, i + DRODO_COURIER_BATCH_SIZE),
+          supabase,
+          options
+        ))
+      );
+    }
+    return results;
+  }
+
+  const pollMode = options.pollMode ?? "reset";
+  const prevSnapshots =
+    pollMode === "adaptive" ? await loadPollSnapshots(ids, supabase) : new Map();
+
+  let payload: unknown;
+  try {
+    const resp = await fetch(`${DRODO_BASE}/courier/get/@${ids.join(",")}`);
+    if (!resp.ok) {
+      return ids.map((steamId) => ({
+        steam_id: steamId,
+        ok: false,
+        kind: "upstream_error",
+        status: resp.status,
+        error: "Drodo API error",
+      }));
+    }
+    payload = await resp.json();
+  } catch {
+    return ids.map((steamId) => ({
+      steam_id: steamId,
+      ok: false,
+      kind: "upstream_error",
+      error: "Failed to reach Drodo API",
+    }));
+  }
+
+  const json = payload as {
+    err?: number;
+    user_info?: Record<string, Record<string, unknown>>;
+  };
+  const results: FetchDrodoBatchResult[] = [];
+  for (const steamId of ids) {
+    const drodoData = json.user_info?.[steamId];
+    if (json.err !== 0 || !drodoData) {
+      const fetchedAt = await markDrodoMissing(steamId, supabase);
+      results.push({
+        steam_id: steamId,
+        ok: false,
+        kind: "missing",
+        error: "Player not found on Drodo",
+        fetchedAt,
+      });
+      continue;
+    }
+
+    const { profile, seasonRows } = buildDrodoProfile(steamId, drodoData);
+    if (!hasDrodoStats(profile, seasonRows)) {
+      const fetchedAt = await markDrodoMissing(steamId, supabase);
+      results.push({
+        steam_id: steamId,
+        ok: false,
+        kind: "missing",
+        error: EMPTY_DRODO_PROFILE_ERROR,
+        fetchedAt,
+      });
+      continue;
+    }
+
+    await persistDrodoProfile(profile, seasonRows, supabase, {
+      snapshotOnSuccess: options.snapshotOnSuccess,
+      pollMode,
+      prevSnapshot: prevSnapshots.get(steamId) ?? null,
+    });
+    results.push({ steam_id: steamId, ok: true, profile, seasonRows });
+  }
+
+  return results;
+}
+
 /**
  * Hit Drodo, persist the result, and snapshot when requested.
  *
@@ -499,73 +711,11 @@ export async function fetchAndCacheDrodo(
     return { ok: true, profile, seasonRows };
   }
 
-  const changed = profileChanged(prevSnapshot, profile);
-  const schedule = nextPollSchedule({
-    mode: pollMode,
-    changed,
-    prevIntervalSeconds: prevSnapshot?.poll_interval_seconds ?? null,
+  await persistDrodoProfile(profile, seasonRows, supabase, {
+    snapshotOnSuccess: options.snapshotOnSuccess,
+    pollMode,
+    prevSnapshot,
   });
-  const { error: upsertError } = await supabase
-    .from("users")
-    .upsert(
-      {
-        ...drodoProfileToUserPayload(profile),
-        next_poll_at: schedule.next_poll_at,
-        poll_interval_seconds: schedule.poll_interval_seconds,
-      },
-      { onConflict: "steam_id" }
-    );
-  if (upsertError) {
-    console.error("Failed to cache Drodo profile:", upsertError.message);
-  }
-
-  if (options.snapshotOnSuccess) {
-    // Upsert on (steam_id, season, mmr, chicken_count): if the same observation
-    // already exists, only bump snapshotted_at instead of inserting a duplicate.
-    const { error: snapshotError } = await supabase
-      .from("mmr_snapshots")
-      .upsert(
-        {
-          steam_id: profile.steam_id,
-          mmr: profile.mmr,
-          season: profile.season,
-          chicken_count: profile.chicken_count,
-          queen_rank: profile.queen_rank,
-          snapshotted_at: new Date().toISOString(),
-        },
-        { onConflict: "steam_id,season,mmr,chicken_count,queen_rank" }
-      );
-    if (snapshotError) {
-      console.error("Failed to upsert mmr_snapshot:", snapshotError.message);
-    }
-  }
-
-  if (seasonRows.length > 0) {
-    const { data: existingSeasons } = await supabase
-      .from("player_seasons")
-      .select("season, chicken_count")
-      .eq("steam_id", steamId);
-    const existingChickenCounts = new Map(
-      (existingSeasons ?? []).map((r) => [
-        r.season,
-        r.chicken_count as number | null,
-      ])
-    );
-    const mergedRows = seasonRows.map((row) => ({
-      ...row,
-      chicken_count:
-        row.chicken_count ?? existingChickenCounts.get(row.season) ?? null,
-    }));
-    const { error: seasonsError } = await supabase
-      .from("player_seasons")
-      .upsert(mergedRows, { onConflict: "steam_id,season" });
-    if (seasonsError) {
-      console.error(
-        "Failed to upsert player_seasons:",
-        seasonsError.message
-      );
-    }
-  }
 
   return { ok: true, profile, seasonRows };
 }
