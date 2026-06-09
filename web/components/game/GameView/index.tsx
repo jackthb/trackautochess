@@ -488,6 +488,42 @@ function MatchPlayerRow({
               ))}
             </div>
           )}
+          {hand.length > 0 && (
+            <div className={styles.mpHandRow}>
+              <span className={styles.mpHandLabel}>Hand</span>
+              <div className={styles.mpHandLineup}>
+                {hand.map((u, i) => (
+                  <TooltipWrap
+                    key={i}
+                    type="unit"
+                    name={u.name}
+                    stars={u.stars}
+                    data={tooltipData}
+                  >
+                    <div className={`unit-icon-wrap ${styles.mpHandUnit}`}>
+                      <img
+                        className="unit-icon"
+                        src={iconUrl("units", unitStem(u.name))}
+                        alt={u.name}
+                        loading="lazy"
+                        style={{
+                          borderColor: costBorderColor(UNIT_COSTS[u.name] || 1),
+                        }}
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).style.display = "none";
+                        }}
+                      />
+                      {u.stars > 1 && (
+                        <span className={`unit-stars s${u.stars}`}>
+                          {"★".repeat(u.stars)}
+                        </span>
+                      )}
+                    </div>
+                  </TooltipWrap>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
         {hasContent && (
           <div className={styles.mpCaret} aria-hidden="true">

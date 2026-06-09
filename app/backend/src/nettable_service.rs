@@ -1900,13 +1900,47 @@ fn poll_once(
         state.last_ui_state = Some(next);
     }
     if cfg.keep_local_nettable_dumps && !rows.is_empty() {
-        let _ = fs::create_dir_all(cfg.dac_dir.join("captures"));
-        let _ = fs::write(
-            cfg.dac_dir.join("captures/latest_nettable_rows.json"),
-            rows_json(&rows),
-        );
+        persist_local_nettable_dump(cfg, &rows);
     }
     Ok(Some(rows))
+}
+
+fn persist_local_nettable_dump(cfg: &Config, rows: &[NettableRow]) {
+    let captured_at = now_iso_utc();
+    let row_values = rows
+        .iter()
+        .map(|row| {
+            serde_json::json!({
+                "table_name": row.table_name,
+                "key": row.key,
+                "raw": row.raw.to_value(),
+            })
+        })
+        .collect::<Vec<_>>();
+    let mut tables = rows
+        .iter()
+        .map(|row| row.table_name.as_str())
+        .collect::<Vec<_>>();
+    tables.sort_unstable();
+    tables.dedup();
+    let dump = serde_json::json!({
+        "captured_at": captured_at,
+        "tables": tables,
+        "rows": row_values,
+    });
+
+    let captures_dir = cfg.dac_dir.join("captures");
+    let _ = fs::create_dir_all(&captures_dir);
+    if let Ok(body) = serde_json::to_string_pretty(&row_values) {
+        let _ = fs::write(captures_dir.join("latest_nettable_rows.json"), body);
+    }
+
+    let dumps_dir = cfg.dac_dir.join("nettable_dumps");
+    let _ = fs::create_dir_all(&dumps_dir);
+    let file_name = format!("{}.json", chrono::Utc::now().format("%Y%m%d_%H%M%S_%6f"));
+    if let Ok(body) = serde_json::to_string_pretty(&dump) {
+        let _ = fs::write(dumps_dir.join(file_name), body);
+    }
 }
 
 pub fn find_dota_dir() -> Option<PathBuf> {
