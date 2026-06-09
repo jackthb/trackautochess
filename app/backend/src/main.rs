@@ -115,7 +115,7 @@ fn run_daemon() -> io::Result<()> {
         });
     }
     if let Some(client) = supabase::SupabaseClient::from_config(&cfg) {
-        let _ = client.replay_outbox(&outbox);
+        let _ = client.replay_outbox(&cfg, &outbox);
     }
     emit(&status_json(&cfg))?;
 

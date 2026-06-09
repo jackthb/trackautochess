@@ -7,7 +7,13 @@ pub struct Config {
     pub steam_id: String,
     pub steam_name: String,
     pub replay_enabled: bool,
+    /// Persist raw CustomNetTable captures locally for logging/debugging and
+    /// post-hoc reprocessing. Product views should use processed matches,
+    /// players, and timelines instead of depending on these raw dumps.
     pub keep_local_nettable_dumps: bool,
+    /// Upload the same raw captures as private Supabase Storage blobs. This is
+    /// a logging/reprocessing safety net, not a Postgres table dependency and
+    /// not the user-facing match data model.
     pub upload_raw_nettable_dumps: bool,
     pub local_only: bool,
     pub supabase_url: String,

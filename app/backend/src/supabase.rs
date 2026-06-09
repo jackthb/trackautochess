@@ -41,18 +41,49 @@ impl SupabaseClient {
         )
     }
 
-    pub fn insert_nettable_rows(&self, rows: &[NettableRow]) -> Result<usize, String> {
+    pub fn upload_nettable_dump_log(
+        &self,
+        cfg: &Config,
+        rows: &[NettableRow],
+    ) -> Result<usize, String> {
         if rows.is_empty() {
             return Ok(0);
         }
         let row_values = rows.iter().map(nettable_row_json).collect::<Vec<_>>();
         self.upload_end_board_rows(&row_values)?;
-        self.post_json(
-            "/rest/v1/dac_nettable_dumps",
-            &Value::Array(row_values),
-            "return=minimal",
-        )?;
+        self.upload_nettable_rows_blob(cfg, &row_values)?;
         Ok(rows.len())
+    }
+
+    fn upload_nettable_rows_blob(&self, cfg: &Config, rows: &[Value]) -> Result<String, String> {
+        let user_id = cfg.steam_id.trim();
+        if user_id.is_empty() {
+            return Err("nettable dump logging needs steam_id for storage path".to_owned());
+        }
+        let captured_at = chrono::Utc::now();
+        let mut tables = rows
+            .iter()
+            .filter_map(|row| row.get("table_name").and_then(Value::as_str))
+            .collect::<Vec<_>>();
+        tables.sort_unstable();
+        tables.dedup();
+        let body = json!({
+            "kind": "nettable_dump_log",
+            "captured_at": captured_at.to_rfc3339(),
+            "tables": tables,
+            "rows": rows,
+        });
+        let bytes = serde_json::to_vec_pretty(&body).map_err(|err| err.to_string())?;
+        self.upload_storage_object(
+            &format!(
+                "{user_id}/nettable-dumps/{}.json",
+                captured_at.format("%Y%m%d_%H%M%S_%6f")
+            ),
+            &bytes,
+            "application/json",
+            true,
+        )?;
+        Ok(format!("{} rows", rows.len()))
     }
 
     pub fn upload_diagnostic_logs(
@@ -322,10 +353,10 @@ impl SupabaseClient {
         )
     }
 
-    pub fn replay_outbox(&self, outbox: &Outbox) -> io::Result<usize> {
+    pub fn replay_outbox(&self, cfg: &Config, outbox: &Outbox) -> io::Result<usize> {
         let mut uploaded = 0;
         for item in outbox.list()? {
-            match self.post_raw_payload(&item.payload) {
+            match self.post_raw_payload(cfg, &item.payload) {
                 Ok(()) => {
                     outbox.mark_uploaded(&item.path)?;
                     uploaded += 1;
@@ -336,7 +367,7 @@ impl SupabaseClient {
         Ok(uploaded)
     }
 
-    fn post_raw_payload(&self, payload: &str) -> Result<(), String> {
+    fn post_raw_payload(&self, cfg: &Config, payload: &str) -> Result<(), String> {
         let value = serde_json::from_str::<Value>(payload).map_err(|err| err.to_string())?;
         let table = value.get("table").and_then(Value::as_str).unwrap_or("");
         let body = value
@@ -346,11 +377,7 @@ impl SupabaseClient {
         if table.is_empty() || table == "dac_nettable_dumps" {
             if let Some(rows) = body.as_array() {
                 let _ = self.upload_end_board_rows(rows);
-                return self.post_json(
-                    "/rest/v1/dac_nettable_dumps",
-                    &Value::Array(rows.clone()),
-                    "return=minimal",
-                );
+                self.upload_nettable_rows_blob(cfg, rows)?;
             }
             return Ok(());
         }

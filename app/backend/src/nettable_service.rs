@@ -209,7 +209,7 @@ impl NettableService {
                                         .unwrap_or(false);
                                 if !raw_end_board_already_uploaded {
                                     if let Some(client) = SupabaseClient::from_config(&cfg) {
-                                        if client.insert_nettable_rows(&rows).is_err() {
+                                        if client.upload_nettable_dump_log(&cfg, &rows).is_err() {
                                             let _ = queue_rows(cfg.dac_dir.join("outbox"), &rows);
                                         }
                                     } else {
