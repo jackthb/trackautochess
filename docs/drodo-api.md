@@ -22,6 +22,22 @@ Player profile lookup. Multiple IDs comma-separated.
 
 With auth the game also gets: `badgeall`, `match_history` (bundled inside `/game/new`).
 
+#### `mmr_level` tier mapping
+
+Drodo profile and nettable fields use numeric `mmr_level` values for broad tier labels. Queen is open-ended: `38`, `39`, etc. all mean the player is in the Queen tier; they are not Queen ladder positions. Use `queen_rank` for the player's current Queen leaderboard rank when present.
+
+```js
+function tierLabel(level) {
+  if (level > 37) return "Queen";
+  if (level == 37) return "King";
+  if (level >= 28) return "Rook-" + (level - 27);
+  if (level >= 19) return "Bishop-" + (level - 18);
+  if (level >= 10) return "Knight-" + (level - 9);
+  if (level >= 1) return "Pawn-" + level;
+  return "Unranked";
+}
+```
+
 ---
 
 ### `GET /lineup/get?hehe={random}&from=InitHeros&difficulty={n}`
