@@ -126,6 +126,34 @@
 .player-link:hover {
   color: var(--accent);
 }
+.cell-player {
+  gap: 8px;
+}
+.cell-player .player-link {
+  min-width: 0;
+}
+.stream-link {
+  color: var(--accent);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  flex: 0 0 auto;
+  opacity: 0.9;
+  transition: color 0.15s, opacity 0.15s;
+}
+.stream-link svg {
+  display: block;
+  width: 18px;
+  height: 18px;
+  fill: currentColor;
+}
+.stream-link:hover {
+  color: var(--text-primary);
+  opacity: 1;
+}
 .player-vanity {
   color: var(--text-muted);
   font-size: var(--fs-11);

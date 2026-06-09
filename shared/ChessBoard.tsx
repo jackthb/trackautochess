@@ -100,7 +100,7 @@ function fallbackHand(
   unitCosts: Record<string, number>,
 ): RenderPiece[] {
   return parseLineup(hand || "", unitCosts)
-    .slice(0, 9)
+    .slice(0, BOARD_COLS)
     .map((unit, index) => ({
       key: `hand-${unit.name}-${index}`,
       name: unit.name,
@@ -325,23 +325,26 @@ export function ChessBoard({
   return (
     <div className={classes}>
       {handPieces.length > 0 && (
-        <div className="chess-board-hand" aria-label="Bench hand">
-          {Array.from({ length: 9 }, (_, index) => (
-            <div key={`hand-cell-${index}`} className="chess-board-hand-cell">
-              {handPieces[index] && (
-                <ChessBoardPieceView
-                  piece={handPieces[index]}
-                  unitCosts={unitCosts}
-                  iconUrl={iconUrl}
-                  itemsFull={itemsFull}
-                  tooltipData={tooltipData}
-                  className="chess-board-hand-piece"
-                  style={{}}
-                />
-              )}
-            </div>
-          ))}
-        </div>
+        <>
+          <div className="chess-board-hand" aria-label="Hand">
+            {Array.from({ length: BOARD_COLS }, (_, index) => (
+              <div key={`hand-cell-${index}`} className="chess-board-hand-cell">
+                {handPieces[index] && (
+                  <ChessBoardPieceView
+                    piece={handPieces[index]}
+                    unitCosts={unitCosts}
+                    iconUrl={iconUrl}
+                    itemsFull={itemsFull}
+                    tooltipData={tooltipData}
+                    className="chess-board-hand-piece"
+                    style={{}}
+                  />
+                )}
+              </div>
+            ))}
+          </div>
+          <div className="chess-board-hand-label">HAND</div>
+        </>
       )}
       {Array.from({ length: BOARD_COLS * BOARD_ROWS }, (_, index) => (
         <div

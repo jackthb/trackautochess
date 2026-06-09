@@ -12,6 +12,7 @@ interface QueenRow {
   name: string | null;
   custom_url: string | null;
   avatar_url: string | null;
+  stream_link: string | null;
   drodo_mmr: number | null;
   drodo_season: string | null;
   drodo_season_games: number | null;
@@ -69,6 +70,7 @@ const SELECT = [
   "name",
   "custom_url",
   "avatar_url",
+  "stream_link",
   "drodo_mmr",
   "drodo_season",
   "drodo_season_games",
@@ -245,6 +247,47 @@ function moveClass(move: QueenMove | null | undefined): string {
   return move.delta > 0 ? styles.up : styles.down;
 }
 
+function streamPlatform(url: string): "twitch" | "youtube" | "kick" | "stream" {
+  try {
+    const hostname = new URL(url).hostname.replace(/^www\./, "");
+    if (hostname.includes("twitch.tv")) return "twitch";
+    if (hostname.includes("youtube.com") || hostname.includes("youtu.be")) return "youtube";
+    if (hostname.includes("kick.com")) return "kick";
+  } catch {
+    // Fall through to the generic stream icon for malformed stored URLs.
+  }
+  return "stream";
+}
+
+function StreamIcon({ platform }: { platform: ReturnType<typeof streamPlatform> }) {
+  if (platform === "youtube") {
+    return (
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        <path d="M21.6 7.2a3 3 0 0 0-2.1-2.1C17.7 4.6 12 4.6 12 4.6s-5.7 0-7.5.5a3 3 0 0 0-2.1 2.1A31.3 31.3 0 0 0 1.9 12c0 1.7.2 3.4.5 4.8a3 3 0 0 0 2.1 2.1c1.8.5 7.5.5 7.5.5s5.7 0 7.5-.5a3 3 0 0 0 2.1-2.1c.3-1.4.5-3.1.5-4.8s-.2-3.4-.5-4.8ZM10 15.4V8.6l5.8 3.4L10 15.4Z" />
+      </svg>
+    );
+  }
+  if (platform === "kick") {
+    return (
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        <path d="M4 4h6v5h2V7h2V4h6v6h-3v2h3v8h-6v-3h-2v-2h-2v5H4V4Z" />
+      </svg>
+    );
+  }
+  if (platform === "twitch") {
+    return (
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        <path d="M5 3h16v11l-5 5h-4l-3 3H6v-3H2V7l3-4Zm2 2-2 2v9h4v3l3-3h4l3-3V5H7Zm4 3h2v5h-2V8Zm5 0h2v5h-2V8Z" />
+      </svg>
+    );
+  }
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <path d="M4 5h16v14H4V5Zm2 2v10h12V7H6Zm4 2.2 5 2.8-5 2.8V9.2Z" />
+    </svg>
+  );
+}
+
 export default async function QueensPage() {
   const { rows, error } = await loadQueens();
   const season = rows.find((row) => row.queen_ladder_season)?.queen_ladder_season;
@@ -325,7 +368,7 @@ export default async function QueensPage() {
                       </div>
                     )}
                   </div>
-                  <div className={styles.cell}>
+                  <div className={`${styles.cell} ${styles["cell-player"]}`}>
                     <Link
                       href={playerProfilePath(row.steam_id, row.custom_url)}
                       className={styles["player-link"]}
@@ -333,6 +376,18 @@ export default async function QueensPage() {
                     >
                       {display}
                     </Link>
+                    {row.stream_link ? (
+                      <a
+                        className={styles["stream-link"]}
+                        href={row.stream_link}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        aria-label={`${display} stream`}
+                        title={`${display} stream`}
+                      >
+                        <StreamIcon platform={streamPlatform(row.stream_link)} />
+                      </a>
+                    ) : null}
                   </div>
                   <div className={`${styles.cell} ${styles["cell-mmr"]}`}>
                     {mmr != null ? mmr.toLocaleString() : "—"}

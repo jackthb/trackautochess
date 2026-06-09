@@ -1,9 +1,6 @@
 name: Poll Drodo (MMR snapshots)
 
 on:
-  schedule:
-    # Every 10 minutes, matching the high-frequency Drodo poll floor.
-    - cron: "*/10 * * * *"
   workflow_dispatch:
 
 concurrency:

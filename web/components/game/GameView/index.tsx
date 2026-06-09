@@ -153,7 +153,7 @@ function PlayerDetail({
       )}
       {(board?.length || lineup.length > 0 || hand.length > 0) && (
         <div className={styles.pdSection}>
-          <div className={styles.pdLabel}>Board</div>
+          <div className={styles.pdLabel}>BOARD</div>
           <div className={styles.pdBoard}>
             <ChessBoard
               board={board}
@@ -378,7 +378,7 @@ function MatchPlayerRow({
           if (eliminated) return "out" as const;
           if (won) return "w" as const;
           if (lost) return "l" as const;
-          return null;
+          return "d" as const;
         })()
       : null;
   const visibleDeathRound =
@@ -424,32 +424,6 @@ function MatchPlayerRow({
             <span className={styles.wlW}>{displayGame.wins}</span>
             <span className={styles.mpWlSep}>{"–"}</span>
             <span className={styles.wlL}>{displayGame.losses}</span>
-          </span>
-        )}
-        {roundResult && (
-          <span
-            className={
-              styles.mpRoundResult +
-              " " +
-              (roundResult === "out"
-                ? styles.mpRoundOut
-                : roundResult === "w"
-                  ? styles.mpRoundW
-                  : styles.mpRoundL)
-            }
-          >
-            {roundResult === "out"
-              ? visibleDeathRound != null
-                ? `Out R${visibleDeathRound}`
-                : "Out"
-              : roundResult === "w"
-                ? "Won"
-                : "Lost"}
-          </span>
-        )}
-        {!roundResult && visibleDeathRound != null && (
-          <span className={`${styles.mpRoundResult} ${styles.mpDeathRound}`}>
-            Died R{visibleDeathRound}
           </span>
         )}
       </div>
@@ -514,6 +488,36 @@ function MatchPlayerRow({
           </div>
         )}
       </div>
+      {roundResult && (
+        <span
+          className={
+            styles.mpRoundResult +
+            " " +
+            (roundResult === "out"
+              ? styles.mpRoundOut
+              : roundResult === "w"
+                ? styles.mpRoundW
+                : roundResult === "l"
+                  ? styles.mpRoundL
+                  : styles.mpRoundD)
+          }
+        >
+          {roundResult === "out"
+            ? visibleDeathRound != null
+              ? `Out R${visibleDeathRound}`
+              : "Out"
+            : roundResult === "w"
+              ? "Won"
+              : roundResult === "l"
+                ? "Lost"
+                : "Draw"}
+        </span>
+      )}
+      {!roundResult && visibleDeathRound != null && (
+        <span className={`${styles.mpRoundResult} ${styles.mpDeathRound}`}>
+          Died R{visibleDeathRound}
+        </span>
+      )}
       {hasContent && (
         <div className={styles.mpCaret} aria-hidden="true">
           {isOpen ? "−" : "+"}
