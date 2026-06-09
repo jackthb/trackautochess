@@ -2,8 +2,8 @@ name: Poll Drodo (MMR snapshots)
 
 on:
   schedule:
-    # Every 6 hours, off-aligned minute to avoid GitHub thundering-herd.
-    - cron: "47 3,9,15,21 * * *"
+    # Every 10 minutes, matching the high-frequency Drodo poll floor.
+    - cron: "*/10 * * * *"
   workflow_dispatch:
 
 concurrency:
