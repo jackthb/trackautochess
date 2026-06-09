@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { UNIT_COSTS, computeSynergies } from "@/lib/units";
+import { UNIT_COSTS, computeSynergies, filterActiveSynergies } from "@/lib/units";
 import {
   itemsFullData,
   relicsData,
@@ -347,7 +347,7 @@ function MatchPlayerRow({
 
   const isScrubbing = snapRound !== null && !isLastRound;
   const parsedSyn = !isScrubbing ? parseSynergies(game.synergies) : [];
-  const synergies = parsedSyn.length > 0 ? parsedSyn : computeSynergies(lineup);
+  const synergies = parsedSyn.length > 0 ? filterActiveSynergies(parsedSyn) : computeSynergies(lineup);
 
   // Compact-view relic list: prefer the full set from relic_history, fall
   // back to the single `relic` field for CV-captured rows. When scrubber

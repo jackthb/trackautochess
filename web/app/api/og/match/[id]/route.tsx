@@ -15,7 +15,7 @@ import {
 import { relicsData } from "@/generated/content-data";
 import type { RelicInfo } from "@dac/shared/types";
 import { fetchSteamProfile } from "@/lib/steam";
-import { UNIT_COSTS, computeSynergies } from "@/lib/units";
+import { UNIT_COSTS, computeSynergies, filterActiveSynergies } from "@/lib/units";
 
 function mmrLevelToRank(level: number | null | undefined): string {
   if (level == null || level < 1 || level > RANK_BRACKETS.length) return "";
@@ -141,7 +141,7 @@ function rowLineup(row: Pick<MatchPlayerRow, "chess_lineup">): LineupUnit[] {
 function rowSynergies(row: Pick<MatchPlayerRow, "chess_lineup" | "synergies">): SynergyBadge[] {
   const lineup = rowLineup(row);
   const parsed = parseSynergies(row.synergies);
-  return parsed.length > 0 ? parsed : computeSynergies(lineup);
+  return parsed.length > 0 ? filterActiveSynergies(parsed) : computeSynergies(lineup);
 }
 
 export async function GET(req: Request, ctx: { params: Promise<{ id: string }> }) {

@@ -1,7 +1,7 @@
 import { unitStem } from "@dac/shared/game-utils";
 // aliasesData is a flat { alt-spelling: canonical } map. Cost/synergy data
 // comes from content/game/units via the generated runtime module.
-import { aliasesData, unitsFullData } from "@/generated/content-data";
+import { aliasesData, synergiesData, unitsFullData } from "@/generated/content-data";
 import { slugifyName } from "@/lib/slugs";
 import { DEFAULT_LOCALE, type Locale, pickLocalized } from "@/lib/i18n";
 
@@ -204,10 +204,38 @@ export const UNIT_COSTS: Readonly<Record<string, number>> = NAME_LOOKUPS.cost;
 export const UNIT_SYNERGIES: Readonly<Record<string, string[]>> =
   NAME_LOOKUPS.synergies;
 
+// Synergy name → minimum unit count to activate (its first tier). Most
+// synergies activate at 2, but a few (Demon, Pandaren) activate at 1. A lineup
+// holding a single Beast or Faceless has NOT activated that synergy, so it must
+// not be shown; a single Demon HAS.
+const SYNERGY_MIN_COUNT: Record<string, number> = (() => {
+  const map: Record<string, number> = {};
+  for (const data of Object.values(
+    synergiesData as Record<string, { name?: string; tiers?: number[] }>,
+  )) {
+    if (data?.name && Array.isArray(data.tiers) && data.tiers.length > 0) {
+      map[data.name] = data.tiers[0];
+    }
+  }
+  return map;
+})();
+
+/**
+ * Keep only synergies that have reached their activation threshold (first
+ * tier), preserving the input order. Synergies with no known threshold fall
+ * back to 2 (the common case). Use this on any synergy list before display —
+ * raw counts include partial synergies that aren't actually active in-game.
+ */
+export function filterActiveSynergies(
+  synergies: { name: string; count: number }[],
+): { name: string; count: number }[] {
+  return synergies.filter((s) => s.count >= (SYNERGY_MIN_COUNT[s.name] ?? 2));
+}
+
 /**
  * Derive active synergies from a lineup when the stored synergies field is
- * empty: count synergy occurrences across the lineup, keep those with 2+,
- * sorted by count descending.
+ * empty: count synergy occurrences across the lineup, keep those that have
+ * reached their activation tier, sorted by count descending.
  */
 export function computeSynergies(
   lineup: { name: string; stars: number }[],
@@ -218,8 +246,7 @@ export function computeSynergies(
       counts[syn] = (counts[syn] || 0) + 1;
     }
   }
-  return Object.entries(counts)
-    .map(([name, count]) => ({ name, count }))
-    .filter((s) => s.count > 1)
-    .sort((a, b) => b.count - a.count);
+  return filterActiveSynergies(
+    Object.entries(counts).map(([name, count]) => ({ name, count })),
+  ).sort((a, b) => b.count - a.count);
 }

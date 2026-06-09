@@ -13,7 +13,7 @@ function mmrLevelToRank(level: number | null | undefined): string {
   return RANK_BRACKETS[level - 1].rank.replace("-", " ");
 }
 import { fetchSteamProfile } from "@/lib/steam";
-import { UNIT_COSTS, computeSynergies } from "@/lib/units";
+import { UNIT_COSTS, computeSynergies, filterActiveSynergies } from "@/lib/units";
 
 const fontDir = path.join(process.cwd(), "public", "fonts");
 const fontData = Promise.all([
@@ -122,7 +122,7 @@ async function ogHandler(req: Request, ctx: { params: Promise<{ id: string }> })
 
   const lineup = parseLineup(game.lineup, UNIT_COSTS);
   const parsedSyn = parseSynergies(game.synergies);
-  const synergies = parsedSyn.length > 0 ? parsedSyn : computeSynergies(lineup);
+  const synergies = parsedSyn.length > 0 ? filterActiveSynergies(parsedSyn) : computeSynergies(lineup);
   const rawRelics = mpRelicNames.length > 0 ? mpRelicNames : parseRelics(game.relic);
   const relics = rawRelics.map((r) => RELICS_MAP[r]?.name || r);
   const siteBase = process.env.NEXT_PUBLIC_SITE_URL || "https://www.trackautochess.com";
