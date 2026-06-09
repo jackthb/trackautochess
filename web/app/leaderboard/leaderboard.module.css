@@ -42,7 +42,7 @@
   overflow: hidden;
 }
 .queen-table {
-  grid-template-columns: 56px 64px 44px minmax(180px, 1fr) 96px 82px 96px 84px;
+  grid-template-columns: 56px 64px 44px minmax(180px, 1fr) 82px 96px 82px 96px 84px;
 }
 .row {
   display: contents;
@@ -126,6 +126,17 @@
 .player-link:hover {
   color: var(--accent);
 }
+.stream-link {
+  color: var(--accent);
+  text-decoration: none;
+  font-size: var(--fs-12);
+  font-weight: 600;
+  letter-spacing: 0.2px;
+  transition: color 0.15s;
+}
+.stream-link:hover {
+  color: var(--text-primary);
+}
 .player-vanity {
   color: var(--text-muted);
   font-size: var(--fs-11);
@@ -169,6 +180,6 @@
 
 @media (min-width: 761px) and (max-width: 980px) {
   .queen-table {
-    grid-template-columns: 50px 56px 40px minmax(150px, 1fr) 86px 74px 86px 78px;
+    grid-template-columns: 50px 56px 40px minmax(150px, 1fr) 76px 86px 74px 86px 78px;
   }
 }

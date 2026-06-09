@@ -12,8 +12,12 @@ import {
   unitStem,
   RANK_BRACKETS,
 } from "@dac/shared/game-utils";
-import { relicsData } from "@/generated/content-data";
-import type { RelicInfo } from "@dac/shared/types";
+import {
+  buildChessCodeUnitLookup,
+  resolveChessLineup,
+} from "@dac/shared/game-structure";
+import { relicsData, synergiesData, unitsFullData } from "@/generated/content-data";
+import type { RelicInfo, SynergyInfo, UnitFullInfo } from "@dac/shared/types";
 import { fetchSteamProfile } from "@/lib/steam";
 import { UNIT_COSTS, computeSynergies, filterActiveSynergies } from "@/lib/units";
 
@@ -26,6 +30,14 @@ const RELICS_MAP = (relicsData as { relics: Record<string, RelicInfo> }).relics;
 const REPEAT_RELIC_ID = "item_repeat_relic";
 const STAR_ICON_DATA_URL =
   "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23c9a84c' d='M12 1.8l2.95 6.1 6.72.96-4.86 4.73 1.15 6.68L12 17.12l-5.96 3.15 1.15-6.68-4.86-4.73 6.72-.96L12 1.8z'/%3E%3C/svg%3E";
+const CHESS_CODE_UNITS = buildChessCodeUnitLookup(
+  unitsFullData as Record<string, UnitFullInfo>
+);
+const SYNERGY_MAX_TIER_BY_NAME = Object.fromEntries(
+  Object.values(synergiesData as Record<string, SynergyInfo>)
+    .filter((synergy) => synergy.name && Array.isArray(synergy.tiers) && synergy.tiers.length > 0)
+    .map((synergy) => [synergy.name, Math.max(...synergy.tiers!)])
+);
 
 type LineupUnit = ReturnType<typeof parseLineup>[number];
 type SynergyBadge = ReturnType<typeof parseSynergies>[number];
@@ -135,13 +147,23 @@ function displayRelicsFromRow(row: Pick<MatchPlayerRow, "relic" | "relic_history
 }
 
 function rowLineup(row: Pick<MatchPlayerRow, "chess_lineup">): LineupUnit[] {
-  return parseLineup(row.chess_lineup, UNIT_COSTS);
+  const resolved = resolveChessLineup(row.chess_lineup ?? undefined, CHESS_CODE_UNITS);
+  return resolved.length > 0 ? resolved : parseLineup(row.chess_lineup, UNIT_COSTS);
+}
+
+function capSynergyCounts(synergies: SynergyBadge[]): SynergyBadge[] {
+  return synergies.map((synergy) => ({
+    ...synergy,
+    count: Math.min(synergy.count, SYNERGY_MAX_TIER_BY_NAME[synergy.name] ?? synergy.count),
+  }));
 }
 
 function rowSynergies(row: Pick<MatchPlayerRow, "chess_lineup" | "synergies">): SynergyBadge[] {
   const lineup = rowLineup(row);
   const parsed = parseSynergies(row.synergies);
-  return parsed.length > 0 ? filterActiveSynergies(parsed) : computeSynergies(lineup);
+  return capSynergyCounts(
+    parsed.length > 0 ? filterActiveSynergies(parsed) : computeSynergies(lineup)
+  );
 }
 
 export async function GET(req: Request, ctx: { params: Promise<{ id: string }> }) {
@@ -534,7 +556,7 @@ async function ogHandler(req: Request, ctx: { params: Promise<{ id: string }> })
                           height: 12,
                         }}
                       >
-                        {Array.from({ length: Math.max(0, u.stars - 1) }).map((_, s) => (
+                        {Array.from({ length: u.stars > 1 ? u.stars : 0 }).map((_, s) => (
                           <img
                             key={s}
                             src={STAR_ICON_DATA_URL}

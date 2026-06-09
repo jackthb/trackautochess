@@ -12,6 +12,7 @@ interface QueenRow {
   name: string | null;
   custom_url: string | null;
   avatar_url: string | null;
+  stream_link: string | null;
   drodo_mmr: number | null;
   drodo_season: string | null;
   drodo_season_games: number | null;
@@ -69,6 +70,7 @@ const SELECT = [
   "name",
   "custom_url",
   "avatar_url",
+  "stream_link",
   "drodo_mmr",
   "drodo_season",
   "drodo_season_games",
@@ -279,6 +281,7 @@ export default async function QueensPage() {
               <div className={`${styles.cell} ${styles["cell-move"]}`}>Move</div>
               <div className={styles.cell} aria-hidden="true" />
               <div className={styles.cell}>Player</div>
+              <div className={`${styles.cell} ${styles["hide-sm"]}`}>Stream</div>
               <div className={styles.cell}>MMR</div>
               <div className={`${styles.cell} ${styles["hide-sm"]}`}>Wins</div>
               <div className={`${styles.cell} ${styles["hide-sm"]}`}>Games</div>
@@ -333,6 +336,20 @@ export default async function QueensPage() {
                     >
                       {display}
                     </Link>
+                  </div>
+                  <div className={`${styles.cell} ${styles["cell-stream"]} ${styles["hide-sm"]}`}>
+                    {row.stream_link ? (
+                      <a
+                        className={styles["stream-link"]}
+                        href={row.stream_link}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        Stream
+                      </a>
+                    ) : (
+                      "—"
+                    )}
                   </div>
                   <div className={`${styles.cell} ${styles["cell-mmr"]}`}>
                     {mmr != null ? mmr.toLocaleString() : "—"}
