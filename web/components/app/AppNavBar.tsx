@@ -9,23 +9,7 @@ import { trackEvent } from "@/lib/analytics";
 import { isAdminSteamId } from "@/lib/admin";
 import { useBetaFeaturesEnabled } from "@/lib/betaFeatures";
 import { SteamSignInButton } from "@/components/SteamSignInButton";
-import styles from "@/components/NavBar/NavBar.module.css";
-
-/**
- * App Router twin of components/NavBar.tsx.
- *
- * The Pages-Router NavBar can't run here: it depends on `next/router`
- * (`useRouter`, `router.events`) and the `<LanguageSwitcher>`, none of which
- * exist in the App Router. This port reuses NavBar.module.css verbatim so the
- * styling stays single-sourced — only the router wiring differs:
- *   - next/navigation instead of next/router
- *   - usePathname() effect instead of router.events to close the mobile menu
- *   - no LanguageSwitcher (App Router routes aren't locale-prefixed)
- *
- * The duplicated markup/logic is the deliberate tax of running both routers.
- * The real fix before migrating more pages is to make the nav router-agnostic
- * (inject router behavior) and move i18n to a middleware/[locale] approach.
- */
+import styles from "./AppNavBar.module.css";
 
 const t = {
   items: "Items",
