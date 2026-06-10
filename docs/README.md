@@ -96,8 +96,13 @@ Steam changelog ->  scripts/scrape-patch-notes.mjs  ->  content/patch-notes + co
 ## Automation
 
 - `.github/workflows/scrape-patch-notes.yml` runs hourly at minute 17 and commits changes under `content/` when the Steam Workshop changelog produces updates.
-- `.github/workflows/poll-drodo.yml` calls the production `/api/cron/poll-drodo` endpoint every six hours to refresh MMR snapshots.
 - `.github/workflows/release.yml` runs on `v*` tags, builds the Windows Electron app and Rust backend, and uploads installer `.exe` artifacts to the GitHub Release.
+
+### Cronicle Drodo polling
+
+Cronicle is the primary operations path for Drodo MMR polling. See [ops/cronicle/README.md](../ops/cronicle/README.md) for setup, schedule, and runbook details.
+
+The `.github/workflows/poll-drodo.yml` workflow is an emergency fallback and should remain disabled unless it is intentionally re-enabled for an incident or Cronicle outage.
 
 ## Editing content from a phone
 
