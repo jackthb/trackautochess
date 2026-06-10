@@ -1,10 +1,11 @@
 import type { NextApiRequest } from "next";
 import { revalidatePath } from "next/cache";
 import type { IncomingHttpHeaders } from "node:http";
-import { createClient, type SupabaseClient } from "@supabase/supabase-js";
+import type { SupabaseClient } from "@supabase/supabase-js";
 import { checkBotId } from "botid/server";
 import { RateLimiterMemory } from "rate-limiter-flexible";
 import { getClientIp, getUserAgent, logAbuse } from "@/lib/abuseLog";
+import { createSupabaseServiceRoleClient } from "@/lib/supabase";
 import {
   fetchSteamProfile,
   playerProfilePath,
@@ -101,14 +102,7 @@ async function handle(req: Request, ctx: { params: Promise<{ steamId: string }> 
     }
   }
 
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  const supabase: SupabaseClient | null =
-    supabaseUrl && serviceKey
-      ? createClient(supabaseUrl, serviceKey, {
-          auth: { autoRefreshToken: false, persistSession: false },
-        })
-      : null;
+  const supabase: SupabaseClient | null = createSupabaseServiceRoleClient();
 
   const steamId = await resolveSteamInput(rawSteamId, supabase ?? undefined, {
     persist: false,

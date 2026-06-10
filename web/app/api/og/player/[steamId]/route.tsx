@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 import { renderOgImage } from "@/lib/og";
-import { createClient } from "@supabase/supabase-js";
+import { createSupabaseServerClient } from "@/lib/supabase";
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 import { mmrToRank } from "@dac/shared/game-utils";
@@ -221,16 +221,7 @@ async function ogHandler(req: Request, ctx: { params: Promise<{ steamId: string 
   }
   const parsedRawSteamId = parseSteamInput(rawSteamId);
 
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const supabaseKey =
-    process.env.SUPABASE_SERVICE_ROLE_KEY ||
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-  const supabase =
-    supabaseUrl && supabaseKey
-      ? createClient(supabaseUrl, supabaseKey, {
-          auth: { autoRefreshToken: false, persistSession: false },
-        })
-      : undefined;
+  const supabase = createSupabaseServerClient() ?? undefined;
 
   const steamId = await resolveSteamInput(rawSteamId, supabase, {
     persist: false,

@@ -1,5 +1,6 @@
-import { createClient, type SupabaseClient } from "@supabase/supabase-js";
+import type { SupabaseClient } from "@supabase/supabase-js";
 import { fetchAndCacheDrodoBatch } from "@/lib/drodo";
+import { createSupabaseServiceRoleClient } from "@/lib/supabase";
 
 const DEFAULT_POLL_BATCH_SIZE = 200;
 const RECENT_SIGN_IN_WINDOW_MS = 14 * 24 * 60 * 60 * 1000;
@@ -53,9 +54,7 @@ async function handle(req: Request) {
   if (!supabaseUrl || !serviceKey) {
     return Response.json({ error: "Database not configured" }, { status: 500 });
   }
-  const supabase: SupabaseClient = createClient(supabaseUrl, serviceKey, {
-    auth: { autoRefreshToken: false, persistSession: false },
-  });
+  const supabase = createSupabaseServiceRoleClient() as SupabaseClient;
   const now = new Date();
   const pollBatchSizeLimit = pollBatchSize();
   const recentSignInCutoff = new Date(

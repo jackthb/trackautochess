@@ -1,6 +1,6 @@
 import { renderOgImage, imageToDataUrl } from "@/lib/og";
 import { resolveIconUrl } from "@/lib/icons";
-import { createClient } from "@supabase/supabase-js";
+import { createSupabaseServerClient } from "@/lib/supabase";
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 import {
@@ -181,17 +181,10 @@ async function ogHandler(req: Request, ctx: { params: Promise<{ id: string }> })
     return new Response("Missing match player id", { status: 400 });
   }
 
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const supabaseKey =
-    process.env.SUPABASE_SERVICE_ROLE_KEY ||
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-  if (!supabaseUrl || !supabaseKey) {
+  const supabase = createSupabaseServerClient();
+  if (!supabase) {
     return new Response("Missing Supabase config", { status: 500 });
   }
-
-  const supabase = createClient(supabaseUrl, supabaseKey, {
-    auth: { autoRefreshToken: false, persistSession: false },
-  });
 
   const { data: mp } = await supabase
     .from("match_players")

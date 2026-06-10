@@ -2,12 +2,12 @@ import type { Metadata } from "next";
 import { cache } from "react";
 import { headers } from "next/headers";
 import { notFound } from "next/navigation";
-import { createClient } from "@supabase/supabase-js";
 import { relicsData } from "@/generated/content-data";
 import type { Game, RelicInfo } from "@dac/shared/types";
 import { RANK_BRACKETS } from "@dac/shared/game-utils";
 import { fetchSteamProfile, type SteamProfile } from "@/lib/steam";
 import { absoluteUrl, getRequestSiteUrl } from "@/lib/site";
+import { createSupabaseAnonClient } from "@/lib/supabase";
 import GameView, {
   type GamePageProps,
   type MatchTimeline,
@@ -93,17 +93,14 @@ const loadMatch = cache(
   async (rawId: string): Promise<Omit<GamePageProps, "route"> | null> => {
     if (!/^\d+$/.test(rawId)) return null;
 
-    const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-    const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
     const hdrs = await headers();
     const baseUrl = getRequestSiteUrl({
       host: hdrs.get("host") ?? undefined,
       "x-forwarded-proto": hdrs.get("x-forwarded-proto") ?? undefined,
       "x-forwarded-host": hdrs.get("x-forwarded-host") ?? undefined,
     });
-    if (!url || !key) return null;
-
-    const supabase = createClient(url, key);
+    const supabase = createSupabaseAnonClient();
+    if (!supabase) return null;
 
     const { data: focusRow } = await supabase
       .from("match_players")

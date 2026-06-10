@@ -1,7 +1,8 @@
 import type { NextApiRequest } from "next";
-import { createClient, type SupabaseClient } from "@supabase/supabase-js";
+import type { SupabaseClient } from "@supabase/supabase-js";
 import { isBetaFeaturesEnabledForSteamId } from "@/lib/betaFeaturesServer";
 import { getSessionUser } from "@/lib/sessionUser";
+import { createSupabaseAnonClient } from "@/lib/supabase";
 
 // Adapt a Web Request into the minimal NextApiRequest shape consumed by
 // getSessionUser (it reads req.headers.authorization).
@@ -38,10 +39,7 @@ const LEADERBOARD_SELECT = [
 ].join(", ");
 
 export async function GET(req: Request) {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-  const supabase: SupabaseClient | null =
-    supabaseUrl && anonKey ? createClient(supabaseUrl, anonKey) : null;
+  const supabase: SupabaseClient | null = createSupabaseAnonClient();
 
   if (!supabase) {
     return Response.json({ error: "Database not configured" }, { status: 500 });

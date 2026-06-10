@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
 import { captureServerEvent } from "@/lib/posthogServer";
+import { createSupabaseServiceRoleClientOrThrow } from "@/lib/supabase";
 import {
   fetchSteamProfileFromApi,
   isValidSteamId64,
@@ -59,11 +59,7 @@ export async function GET(req: Request) {
   const steamProfile = await fetchSteamProfileFromApi(steamId);
   const steamName = steamProfile.name || steamId;
 
-  const supabaseAdmin = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!,
-    { auth: { autoRefreshToken: false, persistSession: false } }
-  );
+  const supabaseAdmin = createSupabaseServiceRoleClientOrThrow();
 
   const email = `${steamId}@steam.local`;
   console.log("Steam verified:", steamId, steamName);

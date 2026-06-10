@@ -1,8 +1,8 @@
 import type { NextApiRequest } from "next";
-import { createClient } from "@supabase/supabase-js";
 import { checkBotId } from "botid/server";
 import { RateLimiterMemory } from "rate-limiter-flexible";
 import { getClientIp, getUserAgent, logAbuse } from "@/lib/abuseLog";
+import { createSupabaseServerClient } from "@/lib/supabase";
 import {
   fetchSteamProfile,
   parseSteamInput,
@@ -61,17 +61,7 @@ export async function GET(req: Request) {
   const query = rawQuery?.trim().replace(/[,()%*]/g, "") ?? "";
   const shouldSearchSteam = searchParams.get("steam") === "1";
 
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const key =
-    process.env.SUPABASE_SERVICE_ROLE_KEY ||
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-
-  const supabase =
-    url && key
-      ? createClient(url, key, {
-          auth: { autoRefreshToken: false, persistSession: false },
-        })
-      : undefined;
+  const supabase = createSupabaseServerClient() ?? undefined;
 
   if (!query) {
     if (!supabase) return Response.json([]);

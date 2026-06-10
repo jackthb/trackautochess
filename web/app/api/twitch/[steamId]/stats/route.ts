@@ -6,8 +6,8 @@
  *
  * Public; CORS open; cached at the edge for 30 minutes.
  */
-import { createClient } from "@supabase/supabase-js";
 import { mmrToRank } from "@dac/shared/game-utils";
+import { createSupabaseServerClient } from "@/lib/supabase";
 import {
   fetchSteamProfile,
   playerProfilePath,
@@ -79,20 +79,13 @@ export async function GET(
     );
   }
 
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const supabaseKey =
-    process.env.SUPABASE_SERVICE_ROLE_KEY ||
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-  if (!supabaseUrl || !supabaseKey) {
+  const supabase = createSupabaseServerClient();
+  if (!supabase) {
     return Response.json(
       { error: "Supabase not configured" },
       { status: 500, headers: CORS_HEADERS }
     );
   }
-
-  const supabase = createClient(supabaseUrl, supabaseKey, {
-    auth: { autoRefreshToken: false, persistSession: false },
-  });
 
   const steamId = await resolveSteamInput(raw, supabase, { persist: false });
   if (!steamId) {
