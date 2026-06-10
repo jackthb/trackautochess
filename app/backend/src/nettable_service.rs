@@ -9,6 +9,10 @@ use crate::{
         NettableResyncComplete, NettableRoundChanged, NettableRows, NettableStateEvent,
         NettableStatus, NettableTimelineExtracted,
     },
+    match_builder::{
+        build_match_timeline, extract_death_team_from_rows, extract_round_from_rows,
+        store_session_dump, SessionDump,
+    },
     nettable_parser::{self, NettableRow, ParsedLog},
     nettable_setup::{
         apply_dota_launch_options, find_autoexec_target, find_console_log, find_dota_dir,
@@ -29,7 +33,6 @@ use std::{
 };
 
 const QUEEN_LADDER_AUTO_SYNC_INTERVAL: Duration = Duration::from_secs(600);
-const MAX_SESSION_ROUND_SNAPSHOTS: usize = 80;
 const PREFERRED_CAPTURE_STEAM_IDS: &[&str] = &[
     "76561198022169086", // Jack
 ];
@@ -86,12 +89,6 @@ struct NettableState {
     /// the finished end_board in console.log, so without this the poller would
     /// keep re-upserting and mutating played_at every heartbeat after a game.
     uploaded_end_board_match_ids: HashSet<String>,
-}
-
-#[derive(Debug, Clone)]
-struct SessionDump {
-    captured_at: String,
-    rows: Vec<NettableRow>,
 }
 
 impl NettableService {
@@ -170,7 +167,7 @@ impl NettableService {
                                         Ok(Some(match_id)) => {
                                             mark_end_board_uploaded(&state, &match_id);
                                             if let Some(timeline) =
-                                                build_match_timeline(&state, &match_id)
+                                                build_match_timeline_from_state(&state, &match_id)
                                             {
                                                 let _ = client.upsert_match_timeline(&timeline);
                                                 let round_count = timeline
@@ -770,7 +767,7 @@ mod tests {
             ..NettableState::default()
         }));
 
-        let timeline = build_match_timeline(&state, "match-1").expect("timeline builds");
+        let timeline = build_match_timeline_from_state(&state, "match-1").expect("timeline builds");
 
         assert_eq!(timeline["match_id"], "match-1");
         assert_eq!(timeline["round_count"], 1);
@@ -796,7 +793,7 @@ mod tests {
             for round in 1..=41 {
                 for poll in 0..8 {
                     store_session_dump(
-                        &mut state,
+                        &mut state.session_dumps,
                         SessionDump {
                             captured_at: format!("2026-06-08T00:{round:02}:{poll:02}Z"),
                             rows: rows_from_json(vec![
@@ -817,7 +814,7 @@ mod tests {
             }
         }
 
-        let timeline = build_match_timeline(&state, "match-1").expect("timeline builds");
+        let timeline = build_match_timeline_from_state(&state, "match-1").expect("timeline builds");
 
         assert_eq!(timeline["round_count"], 41);
         assert_eq!(timeline["first_round"], 1);
@@ -841,7 +838,7 @@ mod tests {
             let mut state = state.lock().unwrap();
             for round in 1..=90 {
                 store_session_dump(
-                    &mut state,
+                    &mut state.session_dumps,
                     SessionDump {
                         captured_at: format!("2026-06-08T00:{round:02}:00Z"),
                         rows: rows_from_json(vec![
@@ -861,7 +858,7 @@ mod tests {
             }
         }
 
-        let timeline = build_match_timeline(&state, "match-1").expect("timeline builds");
+        let timeline = build_match_timeline_from_state(&state, "match-1").expect("timeline builds");
 
         assert_eq!(timeline["round_count"], 80);
         assert_eq!(timeline["first_round"], 11);
@@ -1041,31 +1038,13 @@ fn handle_rows_for_parity(state: &Arc<Mutex<NettableState>>, rows: &[NettableRow
     }
 
     store_session_dump(
-        &mut state,
+        &mut state.session_dumps,
         SessionDump {
             captured_at: now,
             rows: rows.to_vec(),
         },
     );
     events
-}
-
-fn store_session_dump(state: &mut NettableState, dump: SessionDump) {
-    if let Some(round) = extract_round_from_rows(&dump.rows) {
-        if state
-            .session_dumps
-            .iter()
-            .rev()
-            .any(|existing| extract_round_from_rows(&existing.rows) == Some(round))
-        {
-            return;
-        }
-    }
-    state.session_dumps.push(dump);
-    if state.session_dumps.len() > MAX_SESSION_ROUND_SNAPSHOTS {
-        let excess = state.session_dumps.len() - MAX_SESSION_ROUND_SNAPSHOTS;
-        state.session_dumps.drain(0..excess);
-    }
 }
 
 fn maybe_auto_upload_queen_ladder(
@@ -1109,61 +1088,18 @@ fn maybe_auto_upload_queen_ladder(
     )))
 }
 
-fn build_match_timeline(
+fn build_match_timeline_from_state(
     state: &Arc<Mutex<NettableState>>,
     match_id: &str,
 ) -> Option<serde_json::Value> {
     let state = state.lock().unwrap();
-    let mut by_round = std::collections::BTreeMap::<i64, serde_json::Value>::new();
-    for dump in &state.session_dumps {
-        let Some(round) = extract_round_from_rows(&dump.rows) else {
-            continue;
-        };
-        let (players, _local_ids) = live_players_value(&dump.rows, state.local_steam_id.as_deref());
-        let snapshot = serde_json::json!({
-            "round": round,
-            "captured_at": dump.captured_at,
-            "players": players,
-            "draft": extract_draft_state_from_rows(&dump.rows),
-            "death_team": extract_death_team_from_rows(&dump.rows),
-        });
-        by_round.entry(round).or_insert(snapshot);
-    }
-    if by_round.is_empty() {
-        return None;
-    }
-    let first_round = *by_round.keys().next()?;
-    let last_round = *by_round.keys().last()?;
-    let rounds = by_round.into_values().collect::<Vec<_>>();
-    Some(serde_json::json!({
-        "match_id": match_id,
-        "played_at": now_iso_utc(),
-        "roster_fingerprint": state.match_roster_fingerprint.clone().unwrap_or_default(),
-        "observer_steam_id": state.local_steam_id.clone().unwrap_or_default(),
-        "is_finished": true,
-        "verification_source": "end_board",
-        "round_count": rounds.len(),
-        "first_round": first_round,
-        "last_round": last_round,
-        "rounds": rounds,
-    }))
-}
-
-fn extract_round_from_rows(rows: &[NettableRow]) -> Option<i64> {
-    let mut best = None;
-    for row in rows {
-        if !row.table_name.ends_with("game_info") {
-            continue;
-        }
-        let value = row.raw.to_value();
-        if row.key == "round_info" {
-            return value.get("round").and_then(serde_json::Value::as_i64);
-        }
-        if let Some(round) = value.get("round").and_then(serde_json::Value::as_i64) {
-            best = Some(best.map_or(round, |current: i64| current.max(round)));
-        }
-    }
-    best
+    build_match_timeline(
+        &state.session_dumps,
+        state.local_steam_id.as_deref(),
+        state.match_roster_fingerprint.as_deref(),
+        match_id,
+        &now_iso_utc(),
+    )
 }
 
 fn detect_personal_elimination(
@@ -1238,46 +1174,6 @@ fn own_player_payload(
         }
     }
     None
-}
-
-fn extract_draft_state_from_rows(rows: &[NettableRow]) -> serde_json::Value {
-    let mut bans = serde_json::Map::new();
-    let mut legendaries = Vec::new();
-    for row in rows {
-        if !row.table_name.ends_with("chess_pool_table") {
-            continue;
-        }
-        let raw = row.raw.to_value();
-        if let Some(pid) = row.key.strip_prefix("ban_info_") {
-            if let Some(ban) = raw
-                .get("ban")
-                .or_else(|| raw.get("synergy"))
-                .and_then(serde_json::Value::as_str)
-            {
-                bans.insert(pid.to_owned(), serde_json::Value::String(ban.to_owned()));
-            }
-        } else if row.key == "revealed_legendary_chess_list" {
-            if let Some(values) = raw.as_object() {
-                legendaries.extend(values.values().cloned());
-            } else if let Some(values) = raw.as_array() {
-                legendaries.extend(values.iter().cloned());
-            }
-        }
-    }
-    serde_json::json!({"bans": bans, "legendaries_revealed": legendaries})
-}
-
-fn extract_death_team_from_rows(
-    rows: &[NettableRow],
-) -> serde_json::Map<String, serde_json::Value> {
-    for row in rows {
-        if row.table_name.ends_with("game_info") && row.key == "death_team" {
-            if let Some(obj) = row.raw.to_value().as_object() {
-                return obj.clone();
-            }
-        }
-    }
-    serde_json::Map::new()
 }
 
 /// How recently console.log must have been written for `-condebug` to count

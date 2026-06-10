@@ -863,8 +863,8 @@ mod tests {
     #[test]
     #[ignore = "generates app/src/backend-events.generated.ts"]
     fn export_backend_event_bindings() {
-        let path = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
-            .join("../src/backend-events.generated.ts");
+        let path =
+            PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../src/backend-events.generated.ts");
         fs::write(path, generated_bindings()).expect("write backend event bindings");
     }
 

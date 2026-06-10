@@ -2,6 +2,7 @@ mod config;
 mod gsi;
 mod hotkeys;
 mod ipc_events;
+mod match_builder;
 mod nettable_live;
 mod nettable_parser;
 mod nettable_service;
@@ -198,72 +199,101 @@ fn run_daemon() -> io::Result<()> {
             "fetch_games" => {
                 let request_id = json_string_field(&line, "request_id").unwrap_or_default();
                 let steam_id = cfg.steam_id.clone();
-                spawn_supabase_request(stdout_lock.clone(), cfg.clone(), move |client, emit_lock| {
-                    let event = match client.and_then(|client| client.fetch_games_for_steam_id(&steam_id)) {
-                        Ok(games) => event_json(&GamesList::ok(request_id, games)),
-                        Err(err) => event_json(&GamesList::error(request_id, err)),
-                    };
-                    emit_threaded(&emit_lock, &event);
-                });
+                spawn_supabase_request(
+                    stdout_lock.clone(),
+                    cfg.clone(),
+                    move |client, emit_lock| {
+                        let event = match client
+                            .and_then(|client| client.fetch_games_for_steam_id(&steam_id))
+                        {
+                            Ok(games) => event_json(&GamesList::ok(request_id, games)),
+                            Err(err) => event_json(&GamesList::error(request_id, err)),
+                        };
+                        emit_threaded(&emit_lock, &event);
+                    },
+                );
             }
             "fetch_timeline" => {
                 let request_id = json_string_field(&line, "request_id").unwrap_or_default();
                 let match_id = json_string_field(&line, "match_id").unwrap_or_default();
-                spawn_supabase_request(stdout_lock.clone(), cfg.clone(), move |client, emit_lock| {
-                    let event = if match_id.is_empty() {
-                        event_json(&MatchTimeline::error(
-                            request_id,
-                            "fetch_timeline missing match_id".to_owned(),
-                        ))
-                    } else {
-                        match client.and_then(|client| client.fetch_match_timeline(&match_id)) {
-                            Ok(timeline) => event_json(&MatchTimeline::ok(request_id, timeline)),
-                            Err(err) => event_json(&MatchTimeline::error(request_id, err)),
-                        }
-                    };
-                    emit_threaded(&emit_lock, &event);
-                });
+                spawn_supabase_request(
+                    stdout_lock.clone(),
+                    cfg.clone(),
+                    move |client, emit_lock| {
+                        let event = if match_id.is_empty() {
+                            event_json(&MatchTimeline::error(
+                                request_id,
+                                "fetch_timeline missing match_id".to_owned(),
+                            ))
+                        } else {
+                            match client.and_then(|client| client.fetch_match_timeline(&match_id)) {
+                                Ok(timeline) => {
+                                    event_json(&MatchTimeline::ok(request_id, timeline))
+                                }
+                                Err(err) => event_json(&MatchTimeline::error(request_id, err)),
+                            }
+                        };
+                        emit_threaded(&emit_lock, &event);
+                    },
+                );
             }
             "update_game" => {
                 let request_id = json_string_field(&line, "request_id").unwrap_or_default();
                 let game_id = json_i64_field(&line, "id").unwrap_or_default();
                 let fields = json_object_value_field(&line, "fields").unwrap_or_default();
-                spawn_supabase_request(stdout_lock.clone(), cfg.clone(), move |client, emit_lock| {
-                    let event = if game_id == 0 {
-                        event_json(&GameUpdated::error(
-                            request_id,
-                            "update_game missing id".to_owned(),
-                        ))
-                    } else {
-                        match client.and_then(|client| client.update_game_fields(game_id, &fields)) {
-                            Ok(()) => event_json(&GameUpdated::ok(request_id)),
-                            Err(err) => event_json(&GameUpdated::error(request_id, err)),
-                        }
-                    };
-                    emit_threaded(&emit_lock, &event);
-                });
+                spawn_supabase_request(
+                    stdout_lock.clone(),
+                    cfg.clone(),
+                    move |client, emit_lock| {
+                        let event = if game_id == 0 {
+                            event_json(&GameUpdated::error(
+                                request_id,
+                                "update_game missing id".to_owned(),
+                            ))
+                        } else {
+                            match client
+                                .and_then(|client| client.update_game_fields(game_id, &fields))
+                            {
+                                Ok(()) => event_json(&GameUpdated::ok(request_id)),
+                                Err(err) => event_json(&GameUpdated::error(request_id, err)),
+                            }
+                        };
+                        emit_threaded(&emit_lock, &event);
+                    },
+                );
             }
             "fetch_drodo" => {
                 let request_id = json_string_field(&line, "request_id").unwrap_or_default();
                 let steam_id = cfg.steam_id.clone();
-                spawn_supabase_request(stdout_lock.clone(), cfg.clone(), move |client, emit_lock| {
-                    let event = match client.and_then(|client| client.fetch_drodo_profile(&steam_id)) {
-                        Ok(profile) => event_json(&DrodoProfile::ok(request_id, profile)),
-                        Err(err) => event_json(&DrodoProfile::error(request_id, err)),
-                    };
-                    emit_threaded(&emit_lock, &event);
-                });
+                spawn_supabase_request(
+                    stdout_lock.clone(),
+                    cfg.clone(),
+                    move |client, emit_lock| {
+                        let event =
+                            match client.and_then(|client| client.fetch_drodo_profile(&steam_id)) {
+                                Ok(profile) => event_json(&DrodoProfile::ok(request_id, profile)),
+                                Err(err) => event_json(&DrodoProfile::error(request_id, err)),
+                            };
+                        emit_threaded(&emit_lock, &event);
+                    },
+                );
             }
             "refresh_drodo" => {
                 let request_id = json_string_field(&line, "request_id").unwrap_or_default();
                 let steam_id = cfg.steam_id.clone();
-                spawn_supabase_request(stdout_lock.clone(), cfg.clone(), move |client, emit_lock| {
-                    let event = match client.and_then(|client| client.refresh_drodo_profile(&steam_id)) {
-                        Ok(profile) => event_json(&DrodoProfile::ok(request_id, profile)),
-                        Err(err) => event_json(&DrodoProfile::error(request_id, err)),
-                    };
-                    emit_threaded(&emit_lock, &event);
-                });
+                spawn_supabase_request(
+                    stdout_lock.clone(),
+                    cfg.clone(),
+                    move |client, emit_lock| {
+                        let event = match client
+                            .and_then(|client| client.refresh_drodo_profile(&steam_id))
+                        {
+                            Ok(profile) => event_json(&DrodoProfile::ok(request_id, profile)),
+                            Err(err) => event_json(&DrodoProfile::error(request_id, err)),
+                        };
+                        emit_threaded(&emit_lock, &event);
+                    },
+                );
             }
             "upload_logs" => {
                 let reason =
