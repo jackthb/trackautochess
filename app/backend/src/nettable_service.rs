@@ -1,18 +1,18 @@
+pub use crate::nettable_live::live_players_value;
 use crate::{
     config::Config,
     hotkeys::{send_dump_keys, DumpKey},
     ipc_events::{
-        event_json, NettableCreepRound, NettableEndBoardSaved, NettableIngestComplete,
-        NettablePersonalGameEnded, NettableRankingScanned, NettableRoundChanged,
-        NettableTimelineExtracted,
+        event_json, NettableCheckActiveMatch, NettableCreepRound, NettableEndBoardSaved,
+        NettableGameEnded, NettableIngestComplete, NettableIngestError, NettablePersonalGameEnded,
+        NettableRankingScanned, NettableRoundChanged, NettableRows, NettableTimelineExtracted,
     },
     nettable_parser::{self, NettableRow, ParsedLog},
     queen_ladder,
     supabase::{finished_match_id_from_rows, queue_rows, SupabaseClient},
-    unit_codes::{normalize_chess_lineup, normalize_chess_unit},
 };
 use std::{
-    collections::{HashMap, HashSet},
+    collections::HashSet,
     env, fs, io,
     path::{Path, PathBuf},
     sync::{Arc, Mutex},
@@ -149,10 +149,7 @@ impl NettableService {
                 match result {
                     Ok(Some(rows)) => {
                         if !rows.is_empty() {
-                            emit(format!(
-                                r#"{{"type":"nettable_rows","rows":{}}}"#,
-                                rows_json(&rows)
-                            ));
+                            emit(event_json(&NettableRows::new(rows_value(&rows))));
                             emit(state_json_from(&state));
                             emit(event_json(&NettableIngestComplete::new(
                                 rows.len(),
@@ -200,12 +197,11 @@ impl NettableService {
                                         }
                                         Ok(None) => {}
                                         Err(err) => {
-                                            emit(format!(
-                                                r#"{{"type":"nettable_ingest_error","backend":"rust","error":{},"at":{}}}"#,
-                                                json_string(&format!(
-                                                    "end_board upload failed: {err}"
-                                                )),
-                                                json_string(&now_iso_utc())
+                                            emit(event_json(
+                                                &NettableIngestError::with_backend_at(
+                                                    &format!("end_board upload failed: {err}"),
+                                                    &now_iso_utc(),
+                                                ),
                                             ));
                                             emit_fallback_finalize(&cfg, &rows, &emit, "End-board upload failed; saved a partial match from the last live snapshot.");
                                             if let Some(match_id) =
@@ -238,10 +234,7 @@ impl NettableService {
                         }
                     }
                     Ok(None) => {}
-                    Err(err) => emit(format!(
-                        r#"{{"type":"nettable_ingest_error","error":{}}}"#,
-                        json_string(&err.to_string())
-                    )),
+                    Err(err) => emit(event_json(&NettableIngestError::new(&err.to_string()))),
                 }
                 // Finalize when Dota leaves the match (UI returned to the menu).
                 // This is the GSI-independent path: many setups never deliver a
@@ -362,15 +355,13 @@ impl NettableService {
     pub fn capture_once_json(&self) -> String {
         self.set_paused(false);
         match send_dump_keys(&[DumpKey::F23, DumpKey::F22, DumpKey::F20, DumpKey::F21]) {
-            Ok(()) => format!(
-                r#"{{"type":"nettable_check_active_match","backend":"rust","ok":true,"paused":false,"message":{},"at":{}}}"#,
-                json_string("Requested a manual lobby snapshot."),
-                json_string(&now_iso_utc())
-            ),
-            Err(err) => format!(
-                r#"{{"type":"nettable_ingest_error","error":{}}}"#,
-                json_string(&format!("manual capture failed: {err}"))
-            ),
+            Ok(()) => event_json(&NettableCheckActiveMatch::new(
+                "Requested a manual lobby snapshot.",
+                &now_iso_utc(),
+            )),
+            Err(err) => event_json(&NettableIngestError::new(&format!(
+                "manual capture failed: {err}"
+            ))),
         }
     }
 
@@ -384,15 +375,13 @@ impl NettableService {
             DumpKey::F16,
             DumpKey::F21,
         ]) {
-            Ok(()) => format!(
-                r#"{{"type":"nettable_check_active_match","backend":"rust","ok":true,"paused":false,"message":{},"at":{}}}"#,
-                json_string("Requested a full live lobby snapshot. If Dota is focused, new rows should appear within a few seconds."),
-                json_string(&now_iso_utc())
-            ),
-            Err(err) => format!(
-                r#"{{"type":"nettable_ingest_error","error":{}}}"#,
-                json_string(&format!("active match check failed: {err}"))
-            ),
+            Ok(()) => event_json(&NettableCheckActiveMatch::new(
+                "Requested a full live lobby snapshot. If Dota is focused, new rows should appear within a few seconds.",
+                &now_iso_utc(),
+            )),
+            Err(err) => event_json(&NettableIngestError::new(&format!(
+                "active match check failed: {err}"
+            ))),
         }
     }
 
@@ -408,38 +397,39 @@ impl NettableService {
             }
             if !local_is_capture_owner(&state) {
                 let owner = capture_owner_steam_id(&state).unwrap_or_else(|| "unknown".to_owned());
-                emit(format!(
-                    r#"{{"type":"nettable_game_ended","backend":"rust","message":{},"at":{}}}"#,
-                    json_string(&format!("Dota reported post-game; standing down for preferred capture owner {owner}.")),
-                    json_string(&now_iso_utc())
-                ));
+                let message = format!(
+                    "Dota reported post-game; standing down for preferred capture owner {owner}."
+                );
+                emit(event_json(&NettableGameEnded::new(
+                    &message,
+                    None,
+                    &now_iso_utc(),
+                )));
                 return;
             }
-            emit(format!(
-                r#"{{"type":"nettable_game_ended","backend":"rust","message":{},"at":{}}}"#,
-                json_string("Dota reported post-game — finalizing without extra dump hotkeys."),
-                json_string(&now_iso_utc())
-            ));
+            emit(event_json(&NettableGameEnded::new(
+                "Dota reported post-game; finalizing without extra dump hotkeys.",
+                None,
+                &now_iso_utc(),
+            )));
             let rows = state
                 .lock()
                 .map(|state| state.latest_rows.clone())
                 .unwrap_or_default();
             match finalize_without_end_board(&cfg, &rows) {
-                Ok(Some(match_id)) => emit(format!(
-                    r#"{{"type":"nettable_game_ended","backend":"rust","message":{},"match_id":{},"at":{}}}"#,
-                    json_string("Marked the match finished from the last live snapshot; end_board never appeared."),
-                    json_string(&match_id),
-                    json_string(&now_iso_utc())
-                )),
-                Ok(None) => emit(format!(
-                    r#"{{"type":"nettable_game_ended","backend":"rust","message":{},"at":{}}}"#,
-                    json_string("Post-game ended, but there was no usable lobby snapshot to finalize."),
-                    json_string(&now_iso_utc())
-                )),
-                Err(err) => emit(format!(
-                    r#"{{"type":"nettable_ingest_error","error":{}}}"#,
-                    json_string(&format!("post-game fallback finalize failed: {err}"))
-                )),
+                Ok(Some(match_id)) => emit(event_json(&NettableGameEnded::new(
+                    "Marked the match finished from the last live snapshot; end_board never appeared.",
+                    Some(&match_id),
+                    &now_iso_utc(),
+                ))),
+                Ok(None) => emit(event_json(&NettableGameEnded::new(
+                    "Post-game ended, but there was no usable lobby snapshot to finalize.",
+                    None,
+                    &now_iso_utc(),
+                ))),
+                Err(err) => emit(event_json(&NettableIngestError::new(&format!(
+                    "post-game fallback finalize failed: {err}"
+                )))),
             }
         });
     }
@@ -1344,227 +1334,6 @@ fn extract_death_team_from_rows(
     serde_json::Map::new()
 }
 
-/// Source → output field mapping for live per-player state, mirroring the
-/// Python `_extract_players_state_from_rows`. `lineup` stays as the raw
-/// `chess_*` code list — the frontend resolves codes to names (it owns
-/// units_full.json) so we don't duplicate that data in the backend.
-const LIVE_PLAYER_FIELDS: &[(&str, &str)] = &[
-    ("hp", "hp"),
-    ("hero_level", "level"),
-    ("curr_rank", "placement"),
-    ("duration", "duration"),
-    ("chess_lineup", "lineup"),
-    ("chess_hand", "hand"),
-    ("lineup_value", "lineup_value"),
-    ("total_money", "total_money"),
-    ("win_round", "win_round"),
-    ("lose_round", "lose_round"),
-    ("buff", "buff"),
-    ("relic", "relic"),
-    ("mmr_level", "mmr_level"),
-    ("candy", "candy"),
-];
-
-/// Extract live per-player state for the standings board, keyed by steam_id.
-///
-/// `player_info_table.player_info.data` is the live source (updates round to
-/// round); `dac_table.player_info.info` only fills gaps for players the live
-/// table hasn't covered yet. Returns the players object plus the local
-/// steam_ids to highlight ("You").
-pub fn live_players_value(
-    rows: &[NettableRow],
-    local_steam_id: Option<&str>,
-) -> (serde_json::Value, Vec<String>) {
-    use serde_json::{Map, Value};
-
-    let boards_by_player_id = live_boards_by_player_id(rows);
-
-    fn harvest(
-        players: &mut Map<String, Value>,
-        container: &Value,
-        boards_by_player_id: &HashMap<i64, Value>,
-    ) {
-        let Some(obj) = container.as_object() else {
-            return;
-        };
-        for (sid, player) in obj {
-            let Some(player) = player.as_object() else {
-                continue;
-            };
-            let row = players
-                .entry(sid.clone())
-                .or_insert_with(|| Value::Object(Map::new()))
-                .as_object_mut()
-                .expect("player row is an object");
-            for (src, dst) in LIVE_PLAYER_FIELDS {
-                if let Some(value) = player.get(*src) {
-                    if !value.is_null() {
-                        // The live table is harvested first; or_insert keeps
-                        // its value over the dac_table gap-fill pass.
-                        let normalized = if *dst == "lineup" || *dst == "hand" {
-                            value
-                                .as_str()
-                                .and_then(normalize_chess_lineup)
-                                .map(Value::String)
-                                .unwrap_or_else(|| value.clone())
-                        } else {
-                            value.clone()
-                        };
-                        row.entry((*dst).to_owned()).or_insert(normalized);
-                    }
-                }
-            }
-            if !row.contains_key("board") {
-                if let Some(board) = player
-                    .get("player_id")
-                    .and_then(Value::as_i64)
-                    .and_then(|player_id| boards_by_player_id.get(&player_id))
-                {
-                    row.insert("board".to_owned(), board.clone());
-                }
-            }
-            // Full relic pick order from `relic_history`
-            // ({ "1": {relic, round}, ... }) — the single `relic` field is
-            // only the latest pick. Emit every relic the player has taken,
-            // ordered by the round it was acquired.
-            if !row.contains_key("relics") {
-                if let Some(history) = player.get("relic_history").and_then(Value::as_object) {
-                    let mut picks: Vec<(i64, String)> = history
-                        .values()
-                        .filter_map(|entry| {
-                            let entry = entry.as_object()?;
-                            let relic = entry.get("relic")?.as_str()?.to_owned();
-                            let round = entry.get("round").and_then(Value::as_i64).unwrap_or(0);
-                            Some((round, relic))
-                        })
-                        .collect();
-                    picks.sort_by_key(|(round, _)| *round);
-                    if !picks.is_empty() {
-                        let relics = picks
-                            .into_iter()
-                            .map(|(_, relic)| Value::String(relic))
-                            .collect();
-                        row.insert("relics".to_owned(), Value::Array(relics));
-                    }
-                }
-            }
-        }
-    }
-
-    let mut players: Map<String, Value> = Map::new();
-    for row in rows {
-        if row.table_name.ends_with("player_info_table") && row.key == "player_info" {
-            if let Some(data) = row.raw.to_value().get("data") {
-                harvest(&mut players, data, &boards_by_player_id);
-            }
-        }
-    }
-    for row in rows {
-        if row.table_name.ends_with("dac_table") && row.key == "player_info" {
-            if let Some(info) = row.raw.to_value().get("info") {
-                harvest(&mut players, info, &boards_by_player_id);
-            }
-        }
-    }
-
-    let local_ids = match local_steam_id {
-        Some(id) if !id.is_empty() => vec![id.to_owned()],
-        // Local-only dumps carry a single player — treat that as "you".
-        _ if players.len() == 1 => players.keys().next().cloned().into_iter().collect(),
-        _ => Vec::new(),
-    };
-
-    (Value::Object(players), local_ids)
-}
-
-fn live_boards_by_player_id(rows: &[NettableRow]) -> HashMap<i64, serde_json::Value> {
-    rows.iter()
-        .filter(|row| row.table_name == "CustomNetTable_player_id_table")
-        .filter_map(|row| {
-            let player_id = row.key.strip_prefix("vchess_")?.parse::<i64>().ok()?;
-            let board = normalize_live_board(row.raw.to_value())?;
-            Some((player_id, board))
-        })
-        .collect()
-}
-
-fn normalize_live_board(value: serde_json::Value) -> Option<serde_json::Value> {
-    let mut pieces = value
-        .as_object()?
-        .iter()
-        .filter_map(|(slot_key, piece)| normalize_live_board_piece(slot_key, piece))
-        .collect::<Vec<_>>();
-    pieces.sort_by_key(|piece| {
-        let y = piece
-            .get("y")
-            .and_then(serde_json::Value::as_i64)
-            .unwrap_or(99);
-        let x = piece
-            .get("x")
-            .and_then(serde_json::Value::as_i64)
-            .unwrap_or(99);
-        (y, x)
-    });
-    (!pieces.is_empty()).then(|| serde_json::Value::Array(pieces))
-}
-
-fn normalize_live_board_piece(
-    slot_key: &str,
-    piece: &serde_json::Value,
-) -> Option<serde_json::Value> {
-    let chess = piece.get("chess")?.as_str()?.to_owned();
-    let name = normalize_chess_unit(&chess).unwrap_or_else(|| chess.clone());
-    let stars = name
-        .rsplit_once('(')
-        .and_then(|(_, suffix)| suffix.strip_suffix(')'))
-        .and_then(|suffix| suffix.parse::<i64>().ok())
-        .unwrap_or(1);
-    let mut out = serde_json::Map::new();
-    out.insert("slot_key".to_owned(), serde_json::json!(slot_key));
-    out.insert("chess".to_owned(), serde_json::json!(chess));
-    out.insert(
-        "name".to_owned(),
-        serde_json::json!(name.trim_end_matches(&format!("({stars})")).trim()),
-    );
-    out.insert("stars".to_owned(), serde_json::json!(stars));
-    for key in ["x", "y", "index", "buy_price", "water_id"] {
-        if let Some(value) = piece.get(key) {
-            out.insert(key.to_owned(), value.clone());
-        }
-    }
-    let items = sorted_string_values(piece.get("item"));
-    if !items.is_empty() {
-        out.insert("items".to_owned(), serde_json::Value::Array(items));
-    }
-    let last_items = sorted_string_values(piece.get("lastitem"));
-    if !last_items.is_empty() {
-        out.insert(
-            "last_items".to_owned(),
-            serde_json::Value::Array(last_items),
-        );
-    }
-    Some(serde_json::Value::Object(out))
-}
-
-fn sorted_string_values(value: Option<&serde_json::Value>) -> Vec<serde_json::Value> {
-    let mut values = value
-        .and_then(serde_json::Value::as_object)
-        .map(|object| {
-            let mut entries = object
-                .iter()
-                .filter_map(|(key, value)| Some((key.parse::<i64>().ok()?, value.as_str()?)))
-                .collect::<Vec<_>>();
-            entries.sort_by_key(|(key, _)| *key);
-            entries
-                .into_iter()
-                .map(|(_, value)| serde_json::Value::String(value.to_owned()))
-                .collect::<Vec<_>>()
-        })
-        .unwrap_or_default();
-    values.dedup();
-    values
-}
-
 /// How recently console.log must have been written for `-condebug` to count
 /// as "working right now". Live capture refreshes the file every few seconds,
 /// so a stale mtime means Dota is closed or condebug isn't doing its job.
@@ -1776,10 +1545,9 @@ where
 {
     match send_dump_keys(keys) {
         Ok(()) => {}
-        Err(err) => emit(format!(
-            r#"{{"type":"nettable_ingest_error","error":{}}}"#,
-            json_string(&format!("dump hotkey failed: {err}"))
-        )),
+        Err(err) => emit(event_json(&NettableIngestError::new(&format!(
+            "dump hotkey failed: {err}"
+        )))),
     }
 }
 
@@ -1813,23 +1581,19 @@ where
     F: Fn(String) + Send + Sync + 'static,
 {
     match finalize_without_end_board(cfg, rows) {
-        Ok(Some(match_id)) => emit(format!(
-            r#"{{"type":"nettable_game_ended","backend":"rust","message":{},"match_id":{},"at":{}}}"#,
-            json_string(message),
-            json_string(&match_id),
-            json_string(&now_iso_utc())
-        )),
-        Ok(None) => emit(format!(
-            r#"{{"type":"nettable_game_ended","backend":"rust","message":{},"at":{}}}"#,
-            json_string("End-board upload failed, and there was no usable live snapshot to save."),
-            json_string(&now_iso_utc())
-        )),
-        Err(err) => emit(format!(
-            r#"{{"type":"nettable_ingest_error","error":{}}}"#,
-            json_string(&format!(
-                "fallback finalize after end-board failure failed: {err}"
-            ))
-        )),
+        Ok(Some(match_id)) => emit(event_json(&NettableGameEnded::new(
+            message,
+            Some(&match_id),
+            &now_iso_utc(),
+        ))),
+        Ok(None) => emit(event_json(&NettableGameEnded::new(
+            "End-board upload failed, and there was no usable live snapshot to save.",
+            None,
+            &now_iso_utc(),
+        ))),
+        Err(err) => emit(event_json(&NettableIngestError::new(&format!(
+            "fallback finalize after end-board failure failed: {err}"
+        )))),
     }
 }
 
@@ -1867,24 +1631,24 @@ where
 {
     if !local_is_capture_owner(state) {
         let owner = capture_owner_steam_id(state).unwrap_or_else(|| "unknown".to_owned());
-        emit(format!(
-            r#"{{"type":"nettable_game_ended","backend":"rust","message":{},"at":{}}}"#,
-            json_string(&format!(
-                "Dota left the match; standing down for preferred capture owner {owner}."
-            )),
-            json_string(&now_iso_utc())
-        ));
+        let message =
+            format!("Dota left the match; standing down for preferred capture owner {owner}.");
+        emit(event_json(&NettableGameEnded::new(
+            &message,
+            None,
+            &now_iso_utc(),
+        )));
         return;
     }
     let rows = state
         .lock()
         .map(|s| s.latest_rows.clone())
         .unwrap_or_default();
-    emit(format!(
-        r#"{{"type":"nettable_game_ended","backend":"rust","message":{},"at":{}}}"#,
-        json_string("Dota left the match — finalizing from the last live snapshot."),
-        json_string(&now_iso_utc())
-    ));
+    emit(event_json(&NettableGameEnded::new(
+        "Dota left the match; finalizing from the last live snapshot.",
+        None,
+        &now_iso_utc(),
+    )));
     if let Some(client) = SupabaseClient::from_config(cfg) {
         if let Some(match_id) = finished_match_id_from_rows(&rows) {
             if end_board_already_uploaded(state, &match_id)
@@ -1897,39 +1661,33 @@ where
         match client.upload_finished_match_from_rows(&rows) {
             Ok(Some(match_id)) => {
                 mark_end_board_uploaded(state, &match_id);
-                emit(format!(
-                    r#"{{"type":"nettable_end_board_saved","backend":"rust","match_id":{},"at":{}}}"#,
-                    json_string(&match_id),
-                    json_string(&now_iso_utc())
-                ));
+                emit(event_json(&NettableEndBoardSaved::new(
+                    &match_id,
+                    &now_iso_utc(),
+                )));
                 return;
             }
             Ok(None) => {}
-            Err(err) => emit(format!(
-                r#"{{"type":"nettable_ingest_error","backend":"rust","error":{},"at":{}}}"#,
-                json_string(&format!("match-left end_board upload failed: {err}")),
-                json_string(&now_iso_utc())
-            )),
+            Err(err) => emit(event_json(&NettableIngestError::with_backend_at(
+                &format!("match-left end_board upload failed: {err}"),
+                &now_iso_utc(),
+            ))),
         }
     }
     match finalize_without_end_board(cfg, &rows) {
-        Ok(Some(match_id)) => emit(format!(
-            r#"{{"type":"nettable_game_ended","backend":"rust","message":{},"match_id":{},"at":{}}}"#,
-            json_string(
-                "Marked the match finished from the last live snapshot (no end board was emitted)."
-            ),
-            json_string(&match_id),
-            json_string(&now_iso_utc())
-        )),
-        Ok(None) => emit(format!(
-            r#"{{"type":"nettable_game_ended","backend":"rust","message":{},"at":{}}}"#,
-            json_string("Match ended, but there was no usable snapshot to finalize."),
-            json_string(&now_iso_utc())
-        )),
-        Err(err) => emit(format!(
-            r#"{{"type":"nettable_ingest_error","error":{}}}"#,
-            json_string(&format!("match-end finalize failed: {err}"))
-        )),
+        Ok(Some(match_id)) => emit(event_json(&NettableGameEnded::new(
+            "Marked the match finished from the last live snapshot (no end board was emitted).",
+            Some(&match_id),
+            &now_iso_utc(),
+        ))),
+        Ok(None) => emit(event_json(&NettableGameEnded::new(
+            "Match ended, but there was no usable snapshot to finalize.",
+            None,
+            &now_iso_utc(),
+        ))),
+        Err(err) => emit(event_json(&NettableIngestError::new(&format!(
+            "match-end finalize failed: {err}"
+        )))),
     }
 }
 
@@ -2462,6 +2220,10 @@ fn install_autoexec() -> io::Result<PathBuf> {
 }
 
 pub fn rows_json(rows: &[NettableRow]) -> String {
+    rows_value(rows).to_string()
+}
+
+fn rows_value(rows: &[NettableRow]) -> serde_json::Value {
     serde_json::Value::Array(
         rows.iter()
             .map(|row| {
@@ -2473,7 +2235,6 @@ pub fn rows_json(rows: &[NettableRow]) -> String {
             })
             .collect(),
     )
-    .to_string()
 }
 
 fn nettable_row_debug_json(row: &NettableRow) -> serde_json::Value {

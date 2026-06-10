@@ -2,6 +2,7 @@ mod config;
 mod gsi;
 mod hotkeys;
 mod ipc_events;
+mod nettable_live;
 mod nettable_parser;
 mod nettable_service;
 mod nettable_tail;
