@@ -81,7 +81,7 @@ pnpm run test:e2e  # Build, then run Playwright tests
 - **Backend migration status**: the Python/CV backend has been removed; `app/backend/` is the Rust backend.
 - **Runtime config**: stored in `~/.dac/config.json`; local capture/retry artifacts may also be written under `~/.dac/` (`outbox`, `replays`, `captures`, `nettable_dumps`, logs).
 - **Database**: Supabase PostgreSQL with RLS policies; current product tables include `users`, `player_seasons`, `mmr_snapshots`, `matches`, `match_players`, `match_timelines`, and `lineup_snapshots`.
-- **Storage**: Supabase Storage bucket `diagnostic-logs` receives diagnostic and raw nettable dump uploads; the legacy `dac_nettable_dumps` table has been dropped.
+- **Storage**: Supabase Storage bucket `diagnostic-logs` receives diagnostic and raw nettable dump uploads.
 - **Content pipeline**: `content/` JSON feeds generated web runtime data and desktop content readers; `data/` holds icons/config/extractor helpers.
 - **Release pipeline**: `.github/workflows/release.yml` triggers on `v*` tags, builds the Rust backend and Electron installer on Windows, and publishes `.exe` artifacts to GitHub Releases.
 - **Patch-note pipeline**: `.github/workflows/scrape-patch-notes.yml` runs hourly and commits `content/` updates when Steam Workshop changelog scraping changes files.

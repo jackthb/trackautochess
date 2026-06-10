@@ -25,7 +25,7 @@ impl SupabaseClient {
             .get("rows")
             .or_else(|| value.get("payload"))
             .unwrap_or(&value);
-        if table.is_empty() || table == "dac_nettable_dumps" {
+        if table.is_empty() {
             if let Some(rows) = body.as_array() {
                 let _ = self.upload_end_board_rows(rows);
                 self.upload_nettable_rows_blob(cfg, rows)?;

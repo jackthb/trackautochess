@@ -19,8 +19,6 @@ const t = {
     "Track Auto Chess is currently in pre-release, and this is our tooling to enable tracking in-game statistics.",
   copy3:
     "When Drodo exposes public profile data, we use that data. When Drodo data is not available, we fall back to manually tracked or imported match history.",
-  copy4:
-    "We run light advertisements to help cover hosting costs and support continued development of the tracker.",
   dataSources: "Data Sources",
   drodoTitle: "Drodo profile data",
   drodoDesc:
@@ -120,7 +118,6 @@ export function AboutContent() {
           </p>
           <p>{t.copy2}</p>
           <p>{t.copy3}</p>
-          <p>{t.copy4}</p>
         </div>
 
         <section className={styles.panel}>

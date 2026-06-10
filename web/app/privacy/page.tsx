@@ -9,7 +9,7 @@ import styles from "./privacy.module.css";
 
 const title = `Privacy | ${SITE_TITLE}`;
 const description =
-  "Privacy policy for Track Auto Chess: what data we collect, how cookies and advertising work, and how to contact us.";
+  "Privacy policy for Track Auto Chess: what data we collect, how cookies work, and how to contact us.";
 
 export const metadata: Metadata = {
   title,

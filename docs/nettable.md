@@ -36,8 +36,7 @@ then uploads the processed match representation to Supabase.
    for 2s), decodes them via `nettable_parser.parse_log`, optionally persists raw
    rows locally under `~/.dac/captures/` and `~/.dac/nettable_dumps/`, and processes them
    in-memory into `matches`, `match_players`, and `match_timelines`. Raw
-   nettable dump logs upload to Supabase Storage `diagnostic-logs`; the legacy
-   `dac_nettable_dumps` table has been dropped.
+   nettable dump logs upload to Supabase Storage `diagnostic-logs`.
 
 ## Active capture matrix / key binds
 
@@ -88,7 +87,7 @@ Representative Rust daemon event types include:
 
 ## What gets captured
 
-Normal Supabase writes use processed `matches`, `match_players`, `match_timelines`, and Queen ladder/profile rows. The legacy relational `dac_nettable_dumps` table has been dropped. Raw decoded nettable rows are local-only unless the backend uploads a JSON dump log to Supabase Storage under the private `diagnostic-logs` bucket.
+Normal Supabase writes use processed `matches`, `match_players`, `match_timelines`, and Queen ladder/profile rows. Raw decoded nettable rows are local-only unless the backend uploads a JSON dump log to Supabase Storage under the private `diagnostic-logs` bucket.
 
 Local raw dump persistence is controlled by the config field `keep_local_nettable_dumps`. When enabled, the backend writes `~/.dac/captures/latest_nettable_rows.json` and timestamped files under `~/.dac/nettable_dumps/`.
 
@@ -113,7 +112,7 @@ The Rust pipeline processes decoded rows in memory and uploads normalized produc
 
 - `supabase.upload_diagnostic_logs(...)` uploads tracker/console diagnostics to `diagnostic-logs`.
 - `supabase.upload_nettable_dump_log(...)` uploads raw nettable dump JSON logs to `diagnostic-logs/{steam_id}/nettable-dumps/`.
-- Outbox replay refuses legacy `dac_nettable_dumps` table payloads and treats them as diagnostic-log Storage uploads instead.
+- Outbox replay routes legacy table payloads to diagnostic-log Storage uploads.
 
 ### Open questions / current answers
 
