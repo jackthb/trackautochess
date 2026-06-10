@@ -66,11 +66,18 @@ export default function App() {
   // flickers between setup-incomplete and setup-complete on every return.
   const netTable = useNetTableEvents();
 
-  const handleImportResult = useCallback(() => {
-    gamesState.refresh();
-  }, [gamesState.refresh]);
+  const handleHistoryRefresh = useCallback(async () => {
+    await Promise.allSettled([
+      gamesState.refresh(),
+      drodoState.refresh(),
+    ]);
+  }, [gamesState.refresh, drodoState.refresh]);
 
-  const tracker = useTrackerEvents(handleImportResult, replaysState.refresh);
+  const tracker = useTrackerEvents(
+    handleHistoryRefresh,
+    replaysState.refresh,
+    handleHistoryRefresh
+  );
 
   // Telemetry: initialise PostHog once on mount and record app open. No-ops
   // cleanly when no token is configured (see src/lib/posthog.ts).
@@ -172,10 +179,10 @@ export default function App() {
             {activeTab === "history" && (
               <HistoryTab
                 {...gamesState}
+                refresh={handleHistoryRefresh}
+                refreshing={gamesState.refreshing || drodoState.loading}
                 drodo={drodoState.drodo}
-                drodoLoading={drodoState.loading}
                 drodoError={drodoState.error}
-                refreshDrodo={drodoState.refresh}
                 focusGameId={null}
                 onFocusHandled={() => {}}
               />
