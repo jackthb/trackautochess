@@ -1,4 +1,5 @@
 import type { NextApiRequest } from "next";
+import { mmrLevelToRank } from "@dac/shared/game-utils";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { RANK_BRACKETS } from "@dac/shared/game-utils";
 import { isBetaFeaturesEnabledForSteamId } from "@/lib/betaFeaturesServer";
@@ -11,11 +12,6 @@ function toApiReq(req: Request): NextApiRequest {
   return {
     headers: { authorization: req.headers.get("authorization") ?? undefined },
   } as unknown as NextApiRequest;
-}
-
-function mmrLevelToRank(level: number | null | undefined): string {
-  if (level == null || level < 1 || level > RANK_BRACKETS.length) return "";
-  return RANK_BRACKETS[level - 1].rank;
 }
 
 interface GameRow {

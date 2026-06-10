@@ -223,6 +223,15 @@ export function mmrToRank(mmr: number | null | undefined): string {
   return rank.replace("-", " ");
 }
 
+export function formatIsoDateLabel(iso: string): string {
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return "";
+  return d.toLocaleDateString(undefined, {
+    month: "short",
+    day: "numeric",
+  });
+}
+
 export function formatSize(bytes: number): string {
   if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(0) + " KB";
   if (bytes < 1024 * 1024 * 1024)

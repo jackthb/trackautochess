@@ -4,7 +4,7 @@ import { headers } from "next/headers";
 import { notFound } from "next/navigation";
 import { relicsData } from "@/generated/content-data";
 import type { Game, RelicInfo } from "@dac/shared/types";
-import { RANK_BRACKETS } from "@dac/shared/game-utils";
+import { mmrLevelToRank } from "@dac/shared/game-utils";
 import { fetchSteamProfile, type SteamProfile } from "@/lib/steam";
 import { absoluteUrl, getRequestSiteUrl } from "@/lib/site";
 import { createSupabaseAnonClient } from "@/lib/supabase";
@@ -16,11 +16,6 @@ import GameView, {
 import { buildGameSeo, parseRelicHistory } from "@/components/game/gameData";
 
 export const dynamic = "force-dynamic";
-
-function mmrLevelToRank(level: number | null | undefined): string {
-  if (level == null || level < 1 || level > RANK_BRACKETS.length) return "";
-  return RANK_BRACKETS[level - 1].rank.replace("-", " ");
-}
 
 interface MatchMetaRow {
   played_at: string;

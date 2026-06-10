@@ -1,4 +1,5 @@
 import { useMemo } from "react";
+import { formatIsoDateLabel } from "@dac/shared/game-utils";
 import styles from "./MmrSparkline.module.css";
 
 export interface MmrSnapshot {
@@ -33,15 +34,6 @@ const HEIGHT = 120;
 const PAD_X = 8;
 const PAD_Y = 12;
 
-function formatDate(iso: string): string {
-  const d = new Date(iso);
-  if (Number.isNaN(d.getTime())) return "";
-  return d.toLocaleDateString(undefined, {
-    month: "short",
-    day: "numeric",
-  });
-}
-
 function buildPoints(
   seasons: MmrSeasonAnchor[],
   snapshots: MmrSnapshot[]
@@ -62,7 +54,7 @@ function buildPoints(
     )
     .map((s) => ({
       mmr: s.mmr,
-      label: formatDate(s.snapshotted_at),
+      label: formatIsoDateLabel(s.snapshotted_at),
       kind: "snapshot",
     }));
 

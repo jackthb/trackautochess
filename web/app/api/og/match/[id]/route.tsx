@@ -10,7 +10,7 @@ import {
   relicStem,
   synIconName,
   unitStem,
-  RANK_BRACKETS,
+  mmrLevelToRank,
 } from "@dac/shared/game-utils";
 import {
   buildChessCodeUnitLookup,
@@ -20,11 +20,6 @@ import { relicsData, synergiesData, unitsFullData } from "@/generated/content-da
 import type { RelicInfo, SynergyInfo, UnitFullInfo } from "@dac/shared/types";
 import { fetchSteamProfile } from "@/lib/steam";
 import { UNIT_COSTS, computeSynergies, filterActiveSynergies } from "@/lib/units";
-
-function mmrLevelToRank(level: number | null | undefined): string {
-  if (level == null || level < 1 || level > RANK_BRACKETS.length) return "";
-  return RANK_BRACKETS[level - 1].rank.replace("-", " ");
-}
 
 const RELICS_MAP = (relicsData as { relics: Record<string, RelicInfo> }).relics;
 const REPEAT_RELIC_ID = "item_repeat_relic";
