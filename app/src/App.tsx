@@ -174,6 +174,7 @@ export default function App() {
                 {...gamesState}
                 drodo={drodoState.drodo}
                 drodoLoading={drodoState.loading}
+                drodoError={drodoState.error}
                 refreshDrodo={drodoState.refresh}
                 focusGameId={null}
                 onFocusHandled={() => {}}

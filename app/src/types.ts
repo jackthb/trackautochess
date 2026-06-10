@@ -273,11 +273,18 @@ export interface DrodoProfile {
   mmr: number | null;
   max_mmr: number | null;
   mmr_level: number | null;
+  queen_rank?: number | null;
   season: string | null;
   season_games: number | null;
+  candy?: number | null;
   chicken_count: number | null;
+  raw_data?: Record<string, unknown>;
   fetched_at: string | null;
   seasons?: SeasonSnapshot[];
+}
+
+export interface IpcErrorResult {
+  error: string;
 }
 
 // Window API types from preload.js
@@ -312,8 +319,8 @@ declare global {
       fetchItems: () => Promise<ItemsData>;
       fetchItemsFull: () => Promise<Record<string, ItemFullInfo>>;
       fetchTalents: () => Promise<Record<string, TalentInfo>>;
-      fetchDrodo: () => Promise<DrodoProfile | null>;
-      refreshDrodo: () => Promise<DrodoProfile | null>;
+      fetchDrodo: () => Promise<DrodoProfile | IpcErrorResult | null>;
+      refreshDrodo: () => Promise<DrodoProfile | IpcErrorResult | null>;
     };
   }
 }

@@ -20,6 +20,7 @@ interface HistoryTabProps {
   refresh: () => Promise<void>;
   drodo?: DrodoProfile | null;
   drodoLoading?: boolean;
+  drodoError?: string | null;
   refreshDrodo?: () => Promise<void>;
   focusGameId?: number | null;
   onFocusHandled?: () => void;
@@ -38,6 +39,7 @@ export function HistoryTab({
   refresh,
   drodo,
   drodoLoading,
+  drodoError,
   refreshDrodo,
   focusGameId,
   onFocusHandled,
@@ -159,6 +161,7 @@ export function HistoryTab({
               Stats {new Date(drodo.fetched_at).toLocaleString()}
             </span>
           )}
+          {drodoError && <span className="refresh-error">{drodoError}</span>}
         </div>
         <div className="table-wrap fade-up delay-1">
           <div className="table-header">

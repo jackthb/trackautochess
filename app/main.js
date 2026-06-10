@@ -921,18 +921,48 @@ ipcMain.handle("games:update", async (_event, gameId, fields) => {
 
 const DRODO_BASE = "http://autochess.ppbizon.com";
 
+function drodoUserRowToProfile(row, seasons = []) {
+  if (!row) return null;
+  return {
+    mmr: row.drodo_mmr ?? null,
+    max_mmr: row.drodo_max_mmr ?? null,
+    mmr_level: row.drodo_mmr_level ?? null,
+    season: row.drodo_season ?? null,
+    season_games: row.drodo_season_games ?? null,
+    chicken_count: row.drodo_chicken_count ?? 0,
+    fetched_at: row.drodo_last_fetched_at ?? null,
+    seasons,
+  };
+}
+
+function drodoProfileToUserPayload(profile) {
+  return {
+    steam_id: profile.steam_id,
+    drodo_mmr: profile.mmr,
+    drodo_max_mmr: profile.max_mmr,
+    drodo_mmr_level: profile.mmr_level,
+    drodo_season: profile.season,
+    drodo_season_games: profile.season_games,
+    drodo_candy: profile.candy,
+    drodo_chicken_count: profile.chicken_count,
+    drodo_raw_data: profile.raw_data,
+    drodo_last_fetched_at: profile.fetched_at,
+    drodo_profile_missing: false,
+  };
+}
+
 ipcMain.handle("drodo:fetch", async () => {
   const config = loadTrackerConfig();
   const url = config.supabase_url;
   const key = config.supabase_key;
   const steamId = config.steam_id;
 
-  if (!url || !key || !steamId) return null;
+  if (!url || !key || !steamId) return { error: "Tracker profile is not configured." };
 
   try {
     const [profileResp, seasonsResp] = await Promise.all([
       net.fetch(
-        `${url}/rest/v1/drodo_profiles?select=mmr,max_mmr,mmr_level,season,season_games,chicken_count,fetched_at&steam_id=eq.${steamId}`,
+        `${url}/rest/v1/users?select=steam_id,drodo_mmr,drodo_max_mmr,drodo_mmr_level,drodo_season,drodo_season_games,drodo_chicken_count,drodo_last_fetched_at&steam_id=eq.${steamId}`,
         {
           headers: {
             apikey: key,
@@ -953,15 +983,22 @@ ipcMain.handle("drodo:fetch", async () => {
       ),
     ]);
 
-    const profiles = profileResp.ok ? await profileResp.json() : [];
-    const seasons = seasonsResp.ok ? await seasonsResp.json() : [];
+    if (!profileResp.ok) {
+      return { error: `Could not load Auto Chess profile (${profileResp.status}).` };
+    }
+    if (!seasonsResp.ok) {
+      return { error: `Could not load Auto Chess seasons (${seasonsResp.status}).` };
+    }
+
+    const profiles = await profileResp.json();
+    const seasons = await seasonsResp.json();
     const profile = profiles[0] || null;
 
     if (!profile) return null;
-    return { ...profile, seasons };
+    return drodoUserRowToProfile(profile, seasons);
   } catch (e) {
     console.error("drodo:fetch error:", e);
-    return null;
+    return { error: e?.message || "Could not load Auto Chess profile." };
   }
 });
 
@@ -971,19 +1008,21 @@ ipcMain.handle("drodo:refresh", async () => {
   const key = config.supabase_key;
   const steamId = config.steam_id;
 
-  if (!url || !key || !steamId) return null;
+  if (!url || !key || !steamId) return { error: "Tracker profile is not configured." };
 
   // Fetch from Drodo API
   let drodoData;
   try {
     const resp = await net.fetch(`${DRODO_BASE}/courier/get/@${steamId}`);
-    if (!resp.ok) return null;
+    if (!resp.ok) return { error: `Drodo profile API returned ${resp.status}.` };
     const json = await resp.json();
-    if (json.err !== 0 || !json.user_info?.[steamId]) return null;
+    if (json.err !== 0 || !json.user_info?.[steamId]) {
+      return { error: "Drodo profile was not found for this Steam account." };
+    }
     drodoData = json.user_info[steamId];
   } catch (e) {
     console.error("drodo:refresh API error:", e);
-    return null;
+    return { error: e?.message || "Could not refresh Auto Chess profile." };
   }
 
   // Find current season
@@ -1007,16 +1046,20 @@ ipcMain.handle("drodo:refresh", async () => {
     mmr: mmrKey ? Number(drodoData[mmrKey]) || null : null,
     max_mmr: maxMmrKey ? Number(drodoData[maxMmrKey]) || null : null,
     mmr_level: Number(drodoData.mmr_level) || null,
+    queen_rank: Number(drodoData.queen_rank) || null,
     season: season || null,
     season_games: matchKey ? Number(drodoData[matchKey]) || null : null,
+    candy: Number(drodoData.candy) || null,
     chicken_count: Number(drodoData.chicken_count) || 0,
+    raw_data: drodoData,
     fetched_at: now,
   };
 
   // Upsert profile into Supabase
   try {
+    const userPayload = drodoProfileToUserPayload(profile);
     await net.fetch(
-      `${url}/rest/v1/drodo_profiles`,
+      `${url}/rest/v1/users`,
       {
         method: "POST",
         headers: {
@@ -1025,11 +1068,12 @@ ipcMain.handle("drodo:refresh", async () => {
           "Content-Type": "application/json",
           Prefer: "resolution=merge-duplicates",
         },
-        body: JSON.stringify(profile),
+        body: JSON.stringify(userPayload),
       }
     );
   } catch (e) {
     console.error("drodo:refresh upsert profile error:", e);
+    return { error: e?.message || "Could not save Auto Chess profile." };
   }
 
   // Extract and upsert all season snapshots
