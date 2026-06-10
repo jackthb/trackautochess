@@ -1,6 +1,10 @@
 use crate::{
     config::Config,
     hotkeys::{send_dump_keys, DumpKey},
+    ipc_events::{
+        event_json, NettableCreepRound, NettablePersonalGameEnded, NettableRankingScanned,
+        NettableRoundChanged,
+    },
     nettable_parser::{self, NettableRow, ParsedLog},
     queen_ladder,
     supabase::{finished_match_id_from_rows, queue_rows, SupabaseClient},
@@ -1090,18 +1094,9 @@ fn handle_rows_for_parity(state: &Arc<Mutex<NettableState>>, rows: &[NettableRow
         if state.last_round != Some(round) {
             let prev = state.last_round;
             state.last_round = Some(round);
-            events.push(format!(
-                r#"{{"type":"nettable_round_changed","backend":"rust","round":{},"prev_round":{},"at":{}}}"#,
-                round,
-                prev.map(|round| round.to_string()).unwrap_or_else(|| "null".to_owned()),
-                json_string(&now)
-            ));
+            events.push(event_json(&NettableRoundChanged::new(round, prev, &now)));
             if round > 0 && round % 5 == 0 {
-                events.push(format!(
-                    r#"{{"type":"nettable_creep_round","backend":"rust","round":{},"at":{}}}"#,
-                    round,
-                    json_string(&now)
-                ));
+                events.push(event_json(&NettableCreepRound::new(round, &now)));
             }
         }
     }
@@ -1171,13 +1166,12 @@ fn maybe_auto_upload_queen_ladder(
     let upserted = SupabaseClient::from_config(cfg)
         .map(|client| client.upsert_queen_ladder_players(&players).unwrap_or(0))
         .unwrap_or(0);
-    Some(format!(
-        r#"{{"type":"nettable_ranking_scanned","backend":"rust","player_count":{},"upserted_count":{},"season":{},"at":{}}}"#,
+    Some(event_json(&NettableRankingScanned::new(
         player_count,
         upserted,
-        json_string(&season),
-        json_string(&scanned_at)
-    ))
+        &season,
+        &scanned_at,
+    )))
 }
 
 fn build_match_timeline(
@@ -1273,13 +1267,12 @@ fn detect_personal_elimination(
         .or_else(|| payload.get("curr_rank"))
         .and_then(serde_json::Value::as_i64)
         .unwrap_or(0);
-    Some(format!(
-        r#"{{"type":"nettable_personal_game_ended","backend":"rust","at":{},"round":{},"rank":{},"late_capture":{}}}"#,
-        json_string(now),
+    Some(event_json(&NettablePersonalGameEnded::new(
+        now,
         round,
         rank,
-        if prev.is_none() { "true" } else { "false" }
-    ))
+        prev.is_none(),
+    )))
 }
 
 fn own_player_payload(

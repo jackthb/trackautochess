@@ -17,7 +17,7 @@ Game tracking and analysis for Dota Auto Chess.
 | `data/` | Non-CMS assets/config and extractor helpers, including icons and parser region config. |
 | `shared/` | Shared React components, styles, and TypeScript utilities consumed by app/web code. |
 | `scripts/` | Root automation for desktop setup/builds, content generation, patch-note scraping, and maintenance tasks. |
-| `supabase/migrations/` | Database and Storage migrations for Supabase. |
+| `supabase/migrations/` | Database and Storage migrations for Supabase. See [Supabase schema snapshot](./supabase-schema.md) for a readable current-schema reference. |
 
 ## Setup
 
