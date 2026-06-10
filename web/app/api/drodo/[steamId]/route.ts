@@ -184,12 +184,14 @@ async function handle(req: Request, ctx: { params: Promise<{ steamId: string }> 
   }
 
   // Check cache unless an authorised manual refresh is in flight.
+  let cachedRow: CachedUserDrodoRow | null = null;
   if (supabase && !forceRefresh) {
     const { data: cached } = await supabase
       .from("users")
       .select(USER_DRODO_SELECT)
       .filter("steam_id", "eq", steamId)
       .maybeSingle<CachedUserDrodoRow>();
+    cachedRow = cached ?? null;
 
     if (
       cached?.drodo_profile_missing &&
@@ -223,8 +225,17 @@ async function handle(req: Request, ctx: { params: Promise<{ steamId: string }> 
     }
   }
 
+  // Non-force fetches happen when a profile view found stale cache (the
+  // page's background refresh); use the same snapshot + poll-scheduling
+  // semantics the server render used when it refreshed inline.
   const result = await fetchAndCacheDrodo(steamId, supabase, {
-    snapshotOnSuccess: forceRefresh,
+    snapshotOnSuccess: true,
+    ...(forceRefresh
+      ? {}
+      : {
+          pollMode: cachedRow ? ("adaptive" as const) : ("reset" as const),
+          hotPoll: isCachedQueenProfile(cachedRow),
+        }),
   });
 
   if (!result.ok) {

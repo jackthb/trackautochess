@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { PlayerGame } from "@dac/shared/types";
 import { buildStatItems } from "@dac/shared/buildStatItems";
 import { Button } from "@dac/shared/Button";
@@ -18,6 +18,12 @@ import {
 } from "@/lib/manualRefreshQuota";
 import { isAdminSteamId } from "@/lib/admin";
 import { analyticsRoute, bucketCount, trackEvent } from "@/lib/analytics";
+import {
+  DRODO_FRESH_TTL_MS,
+  HOT_POLL_MAX_INTERVAL_SECONDS,
+  type DrodoProfileRow,
+} from "@/lib/drodo";
+import { drodoStatsFromProfile } from "@/components/player/playerData";
 import {
   steamProfileUrl,
   type SteamProfile,
@@ -334,6 +340,68 @@ export default function PlayerView({
     const timer = setInterval(() => setNowMs(Date.now()), LAST_FETCHED_TICK_MS);
     return () => clearInterval(timer);
   }, []);
+
+  // Stale-while-revalidate for profile stats: the server now renders whatever
+  // is cached without blocking on Drodo, so when that data is past its TTL,
+  // refresh it in the background through the same endpoint the Refresh button
+  // uses. A plain GET re-checks freshness server-side and consumes no
+  // manual-refresh quota; the Refresh button shows the loading state while it
+  // runs. First-ever views (no cached stats) are still fetched server-side.
+  const autoRefreshTriggered = useRef(false);
+  useEffect(() => {
+    if (autoRefreshTriggered.current) return;
+    if (!initialDrodo || initialDrodoProfileMissing) return;
+    const isHotProfile =
+      initialDrodo.queen_rank != null || queenRankHistory.length > 0;
+    const ttlMs = isHotProfile
+      ? HOT_POLL_MAX_INTERVAL_SECONDS * 1000
+      : DRODO_FRESH_TTL_MS;
+    const fetchedMs = initialDrodoLastFetchedAt
+      ? new Date(initialDrodoLastFetchedAt).getTime()
+      : NaN;
+    if (Number.isFinite(fetchedMs) && Date.now() - fetchedMs < ttlMs) return;
+    autoRefreshTriggered.current = true;
+
+    let cancelled = false;
+    setRefreshing(true);
+    void (async () => {
+      try {
+        const resp = await fetch(`/api/drodo/${encodeURIComponent(steamId)}`);
+        const data = await resp.json().catch(() => null);
+        if (cancelled) return;
+        if (resp.status === 404) {
+          setDrodo(null);
+          setDrodoProfileMissing(true);
+          if (typeof data?.fetched_at === "string") {
+            setDrodoLastFetchedAt(data.fetched_at);
+          }
+          return;
+        }
+        if (!resp.ok || !data) return;
+        const profile = data as DrodoProfileRow & { seasons?: unknown };
+        setDrodo(drodoStatsFromProfile(profile));
+        if (Array.isArray(profile.seasons)) {
+          setSeasons(profile.seasons as SeasonSnapshot[]);
+        }
+        if (typeof profile.fetched_at === "string") {
+          setDrodoLastFetchedAt(profile.fetched_at);
+        }
+      } catch {
+        // Keep the cached stats; the manual Refresh button still works.
+      } finally {
+        if (!cancelled) setRefreshing(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [
+    steamId,
+    initialDrodo,
+    initialDrodoProfileMissing,
+    initialDrodoLastFetchedAt,
+    queenRankHistory,
+  ]);
 
   useEffect(() => {
     if (!authReady) return;

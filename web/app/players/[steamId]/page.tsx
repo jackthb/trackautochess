@@ -15,13 +15,13 @@ import {
   isFreshCache,
   lastTop3FromDrodoData,
   lastWinFromDrodoData,
-  type DrodoProfileRow,
 } from "@/lib/drodo";
 import { fetchSteamProfile } from "@/lib/steam";
 import PlayerView, { type PlayerPageProps } from "@/components/player/PlayerView";
 import {
   buildPlayerSeo,
   cachedSteamProfile,
+  drodoStatsFromProfile,
   playerProfilePath,
   resolvePlayerRoute,
   USER_DRODO_SELECT,
@@ -48,21 +48,6 @@ function numberFromRawData(
     return Number.isFinite(parsed) ? parsed : null;
   }
   return null;
-}
-
-function drodoFromProfile(profile: DrodoProfileRow) {
-  return {
-    mmr: profile.mmr,
-    max_mmr: profile.max_mmr,
-    mmr_level: profile.mmr_level,
-    queen_rank: profile.queen_rank,
-    last_win_at: lastWinFromDrodoData(profile.raw_data),
-    last_top3_at: lastTop3FromDrodoData(profile.raw_data),
-    season: profile.season,
-    season_games: profile.season_games,
-    candy: profile.candy,
-    chicken_count: profile.chicken_count,
-  };
 }
 
 function drodoFromCachedRow(row: CachedUserDrodoRow) {
@@ -232,7 +217,11 @@ const loadPlayer = cache(async (rawSteamId: string): Promise<LoadResult> => {
     }
     if (seasonsResult.data) seasons = seasonsResult.data;
 
-    if (shouldRefreshDrodo) {
+    // When cached stats exist, serve them immediately even if stale —
+    // PlayerView refreshes from Drodo in the background with a loading state
+    // (via GET /api/drodo, which re-checks freshness server-side). Only block
+    // the render when there is nothing cached to show.
+    if (shouldRefreshDrodo && !drodo) {
       const initialDrodo = await fetchAndCacheDrodo(steamId, supabase, {
         snapshotOnSuccess: true,
         pollMode: cachedProfileRow ? "adaptive" : "reset",
@@ -246,7 +235,7 @@ const loadPlayer = cache(async (rawSteamId: string): Promise<LoadResult> => {
             target: steamId,
           });
         }
-        drodo = drodoFromProfile(initialDrodo.profile);
+        drodo = drodoStatsFromProfile(initialDrodo.profile);
         seasons = initialDrodo.seasonRows;
         drodoLastFetchedAt = mostRecentTimestamp(
           initialDrodo.profile.fetched_at,

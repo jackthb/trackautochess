@@ -3,6 +3,11 @@ import { SITE_TITLE } from "@/lib/site";
 import { mmrToRank } from "@dac/shared/game-utils";
 import { parseSteamId64, type SteamId64 } from "@dac/shared/steam";
 import {
+  lastTop3FromDrodoData,
+  lastWinFromDrodoData,
+  type DrodoProfileRow,
+} from "@/lib/drodo";
+import {
   parseSteamInput,
   playerProfilePath,
   resolveSteamInput,
@@ -10,6 +15,26 @@ import {
   type SteamProfile,
 } from "@/lib/steam";
 import type { PlayerPageProps } from "./PlayerView";
+
+/**
+ * Shape a Drodo profile row into the stats object PlayerView renders. Shared
+ * by the server page and the client background refresh so both paths produce
+ * identical data.
+ */
+export function drodoStatsFromProfile(profile: DrodoProfileRow) {
+  return {
+    mmr: profile.mmr,
+    max_mmr: profile.max_mmr,
+    mmr_level: profile.mmr_level,
+    queen_rank: profile.queen_rank,
+    last_win_at: lastWinFromDrodoData(profile.raw_data),
+    last_top3_at: lastTop3FromDrodoData(profile.raw_data),
+    season: profile.season,
+    season_games: profile.season_games,
+    candy: profile.candy,
+    chicken_count: profile.chicken_count,
+  };
+}
 
 export const USER_DRODO_SELECT = [
   "name",
