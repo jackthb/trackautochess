@@ -21,12 +21,10 @@ Game tracking and analysis for Dota Auto Chess.
 
 ## Setup
 
-Install the Node workspaces you plan to run:
+Install Node dependencies once from the repository root:
 
 ```bash
-pnpm --dir web install
-pnpm --dir app install
-pnpm --dir shared install
+pnpm install
 ```
 
 For the desktop app, also build or verify the Rust backend:

@@ -1,6 +1,7 @@
 {
   "name": "track-auto-chess",
   "private": true,
+  "packageManager": "pnpm@10.32.1",
   "scripts": {
     "build": "npm run build:desktop",
     "build:desktop": "pnpm --dir app run build",
@@ -12,7 +13,7 @@
     "dev:desktop": "node scripts/run-desktop.mjs dev",
     "start:desktop": "node scripts/run-desktop.mjs start",
     "install:desktop": "npm run install:desktop:app && npm run install:desktop:backend",
-    "install:desktop:app": "pnpm --dir app install --frozen-lockfile",
+    "install:desktop:app": "pnpm install --frozen-lockfile",
     "install:desktop:backend": "node scripts/setup-desktop-backend.mjs",
     "verify:desktop:backend": "node scripts/verify-desktop-backend.mjs",
     "web:data": "node scripts/generate-web-runtime-data.mjs",

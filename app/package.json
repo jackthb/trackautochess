@@ -1,5 +1,5 @@
 {
-  "name": "track-auto-chess",
+  "name": "@dac/desktop",
   "version": "0.1.2",
   "description": "Track Auto Chess desktop app",
   "main": "main.js",

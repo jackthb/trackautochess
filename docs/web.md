@@ -4,21 +4,21 @@ This is the Next.js 16 App Router site for [trackautochess.com](https://www.trac
 
 ## Development
 
-Install dependencies from the web workspace, then start Next.js:
+Install dependencies from the repository root, then start Next.js from the web workspace:
 
 ```bash
 pnpm install
-pnpm run dev
+pnpm --dir web run dev
 ```
 
-`pnpm run dev` runs `scripts/generate-web-runtime-data.mjs` first, then starts the dev server on [http://localhost:3000](http://localhost:3000). Keystatic is available at `/keystatic`.
+`pnpm --dir web run dev` runs `scripts/generate-web-runtime-data.mjs` first, then starts the dev server on [http://localhost:3000](http://localhost:3000). Keystatic is available at `/keystatic`.
 
 ## Build and tests
 
 ```bash
-pnpm run build     # generate runtime data, sync icons, and run next build
-pnpm run start     # serve the production build
-pnpm run test:e2e  # build, then run Playwright tests
+pnpm --dir web run build     # generate runtime data, sync icons, and run next build
+pnpm --dir web run start     # serve the production build
+pnpm --dir web run test:e2e  # build, then run Playwright tests
 ```
 
 ## Data flow
