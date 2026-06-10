@@ -20,8 +20,8 @@ export const EMPTY_DRODO_PROFILE_ERROR =
 export const POLL_MIN_INTERVAL_SECONDS = 10 * 60; // 10 minutes
 export const POLL_MAX_INTERVAL_SECONDS = 7 * 24 * 60 * 60; // 7 days
 export const POLL_BACKOFF_FACTOR = 1.5;
-export const QUEEN_POLL_MAX_INTERVAL_SECONDS = 60 * 60; // 1 hour
-export const QUEEN_POLL_BACKOFF_FACTOR = 1.25;
+export const HOT_POLL_MAX_INTERVAL_SECONDS = 30 * 60; // 30 minutes
+export const HOT_POLL_BACKOFF_FACTOR = 1.15;
 
 export interface SeasonSnapshotRow {
   steam_id: string;
@@ -308,11 +308,11 @@ export function nextPollSchedule(input: {
   changed: boolean;
   prevIntervalSeconds: number | null;
   missing?: boolean;
-  queen?: boolean;
+  hot?: boolean;
 }): PollSchedule {
-  const { mode, changed, prevIntervalSeconds, missing = false, queen = false } = input;
-  const maxInterval = queen ? QUEEN_POLL_MAX_INTERVAL_SECONDS : POLL_MAX_INTERVAL_SECONDS;
-  const backoffFactor = queen ? QUEEN_POLL_BACKOFF_FACTOR : POLL_BACKOFF_FACTOR;
+  const { mode, changed, prevIntervalSeconds, missing = false, hot = false } = input;
+  const maxInterval = hot ? HOT_POLL_MAX_INTERVAL_SECONDS : POLL_MAX_INTERVAL_SECONDS;
+  const backoffFactor = hot ? HOT_POLL_BACKOFF_FACTOR : POLL_BACKOFF_FACTOR;
   let intervalSeconds: number;
 
   if (missing) {
@@ -498,6 +498,7 @@ async function persistDrodoProfile(
   options: {
     snapshotOnSuccess?: boolean;
     pollMode: "adaptive" | "reset";
+    hotPoll?: boolean;
     prevSnapshot?: PollSnapshot | null;
   }
 ): Promise<void> {
@@ -507,7 +508,7 @@ async function persistDrodoProfile(
     mode: options.pollMode,
     changed,
     prevIntervalSeconds: options.prevSnapshot?.poll_interval_seconds ?? null,
-    queen,
+    hot: options.hotPoll || queen,
   });
   const userPayload: Record<string, unknown> = {
     ...drodoProfileToUserPayload(profile),
@@ -577,6 +578,7 @@ export async function fetchAndCacheDrodoBatch(
   options: {
     snapshotOnSuccess?: boolean;
     pollMode?: "adaptive" | "reset";
+    hotPoll?: boolean;
   } = {}
 ): Promise<FetchDrodoBatchResult[]> {
   const ids = [...new Set(steamIds.map(String).filter(Boolean))];
@@ -657,6 +659,7 @@ export async function fetchAndCacheDrodoBatch(
     await persistDrodoProfile(profile, seasonRows, supabase, {
       snapshotOnSuccess: options.snapshotOnSuccess,
       pollMode,
+      hotPoll: options.hotPoll,
       prevSnapshot: prevSnapshots.get(steamId) ?? null,
     });
     results.push({ steam_id: steamId, ok: true, profile, seasonRows });
@@ -679,6 +682,8 @@ export async function fetchAndCacheDrodo(
     snapshotOnSuccess?: boolean;
     /** "adaptive" backs off when nothing changed; "reset" always returns to the floor (manual refresh, first-pull). */
     pollMode?: "adaptive" | "reset";
+    /** Keep Queen/active players near the 10-minute floor instead of drifting onto the general background schedule. */
+    hotPoll?: boolean;
   } = {}
 ): Promise<FetchDrodoResult> {
   const pollMode = options.pollMode ?? "reset";
@@ -735,6 +740,7 @@ export async function fetchAndCacheDrodo(
   await persistDrodoProfile(profile, seasonRows, supabase, {
     snapshotOnSuccess: options.snapshotOnSuccess,
     pollMode,
+    hotPoll: options.hotPoll,
     prevSnapshot,
   });
 

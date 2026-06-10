@@ -1,7 +1,7 @@
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { fetchAndCacheDrodoBatch } from "@/lib/drodo";
 
-const POLL_BATCH_SIZE = 200;
+const DEFAULT_POLL_BATCH_SIZE = 200;
 const RECENT_SIGN_IN_WINDOW_MS = 14 * 24 * 60 * 60 * 1000;
 const GENERAL_SCAN_INTERVAL_MS = 24 * 60 * 60 * 1000;
 const GENERAL_SCAN_CANDIDATE_MULTIPLIER = 4;
@@ -20,6 +20,13 @@ function hasQueenRank(rawData: Record<string, unknown> | null): boolean {
   if (!rawData) return false;
   const value = rawData.queen_rank;
   return value != null && String(value).trim() !== "";
+}
+
+function pollBatchSize(): number {
+  const parsed = Number(process.env.DRODO_POLL_BATCH_SIZE);
+  return Number.isFinite(parsed) && parsed > 0
+    ? Math.floor(parsed)
+    : DEFAULT_POLL_BATCH_SIZE;
 }
 
 function isActiveSyncUser(
@@ -50,6 +57,7 @@ async function handle(req: Request) {
     auth: { autoRefreshToken: false, persistSession: false },
   });
   const now = new Date();
+  const pollBatchSizeLimit = pollBatchSize();
   const recentSignInCutoff = new Date(
     now.getTime() - RECENT_SIGN_IN_WINDOW_MS
   ).toISOString();
@@ -65,7 +73,7 @@ async function handle(req: Request) {
     .lte("next_poll_at", now.toISOString())
     .not("drodo_last_fetched_at", "is", null)
     .order("next_poll_at", { ascending: true })
-    .limit(POLL_BATCH_SIZE);
+    .limit(pollBatchSizeLimit);
 
   if (queryError) {
     return Response.json({ error: queryError.message }, { status: 500 });
@@ -78,7 +86,7 @@ async function handle(req: Request) {
     .is("drodo_last_fetched_at", null)
     .order("queen_ladder_last_seen_at", { ascending: false, nullsFirst: false })
     .order("steam_signed_in_at", { ascending: false, nullsFirst: false })
-    .limit(POLL_BATCH_SIZE);
+    .limit(pollBatchSizeLimit);
 
   const { data: generalScanUsers, error: generalScanError } = await supabase
     .from("users")
@@ -88,7 +96,7 @@ async function handle(req: Request) {
     .not("drodo_last_fetched_at", "is", null)
     .lte("drodo_last_fetched_at", generalScanCutoff)
     .order("drodo_last_fetched_at", { ascending: true })
-    .limit(POLL_BATCH_SIZE * GENERAL_SCAN_CANDIDATE_MULTIPLIER);
+    .limit(pollBatchSizeLimit * GENERAL_SCAN_CANDIDATE_MULTIPLIER);
 
   if (generalScanError) {
     return Response.json({ error: generalScanError.message }, { status: 500 });
@@ -109,7 +117,7 @@ async function handle(req: Request) {
       alreadyQueued.add(id);
       return true;
     })
-    .slice(0, POLL_BATCH_SIZE);
+    .slice(0, pollBatchSizeLimit);
 
   const results: Array<{
     steam_id: string;
@@ -121,6 +129,7 @@ async function handle(req: Request) {
   const repollResults = await fetchAndCacheDrodoBatch(ids, supabase, {
     snapshotOnSuccess: true,
     pollMode: "adaptive",
+    hotPoll: true,
   });
   for (const result of repollResults) {
     if (result.ok) {
@@ -137,6 +146,7 @@ async function handle(req: Request) {
   const seedResults = await fetchAndCacheDrodoBatch(seedIds, supabase, {
     snapshotOnSuccess: true,
     pollMode: "reset",
+    hotPoll: true,
   });
   for (const result of seedResults) {
     if (result.ok) {

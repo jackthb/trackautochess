@@ -8,8 +8,8 @@ const RECENT_SIGN_IN_WINDOW_MS = 14 * 24 * 60 * 60 * 1000;
 const POLL_MIN_INTERVAL_SECONDS = 10 * 60;
 const POLL_MAX_INTERVAL_SECONDS = 7 * 24 * 60 * 60;
 const POLL_BACKOFF_FACTOR = 1.5;
-const QUEEN_POLL_MAX_INTERVAL_SECONDS = 60 * 60;
-const QUEEN_POLL_BACKOFF_FACTOR = 1.25;
+const HOT_POLL_MAX_INTERVAL_SECONDS = 30 * 60;
+const HOT_POLL_BACKOFF_FACTOR = 1.15;
 const EMPTY_DRODO_PROFILE_ERROR =
   "Steam account has no Dota Auto Chess MMR or stats.";
 
@@ -189,9 +189,9 @@ function clampInterval(seconds, max = POLL_MAX_INTERVAL_SECONDS) {
   return Math.round(seconds);
 }
 
-function nextPollSchedule({ mode, changed, prevIntervalSeconds, missing = false, queen = false }) {
-  const maxInterval = queen ? QUEEN_POLL_MAX_INTERVAL_SECONDS : POLL_MAX_INTERVAL_SECONDS;
-  const backoffFactor = queen ? QUEEN_POLL_BACKOFF_FACTOR : POLL_BACKOFF_FACTOR;
+function nextPollSchedule({ mode, changed, prevIntervalSeconds, missing = false, hot = false }) {
+  const maxInterval = hot ? HOT_POLL_MAX_INTERVAL_SECONDS : POLL_MAX_INTERVAL_SECONDS;
+  const backoffFactor = hot ? HOT_POLL_BACKOFF_FACTOR : POLL_BACKOFF_FACTOR;
   let intervalSeconds;
   if (missing) {
     intervalSeconds = maxInterval;
@@ -404,7 +404,7 @@ async function persistDrodoProfile(profile, seasonRows, supabase, options) {
     mode: options.pollMode,
     changed,
     prevIntervalSeconds: options.prevSnapshot?.poll_interval_seconds ?? null,
-    queen,
+    hot: options.hotPoll || queen,
   });
   const userPayload = {
     ...drodoProfileToUserPayload(profile),
@@ -522,6 +522,7 @@ async function fetchAndCacheDrodoBatch(steamIds, supabase, options = {}) {
     await persistDrodoProfile(profile, seasonRows, supabase, {
       snapshotOnSuccess: options.snapshotOnSuccess,
       pollMode,
+      hotPoll: options.hotPoll,
       prevSnapshot: prevSnapshots.get(steamId) ?? null,
     });
     results.push({ steam_id: steamId, ok: true, profile, seasonRows });
@@ -575,10 +576,12 @@ async function main() {
     const repolled = await fetchAndCacheDrodoBatch(active.ids, supabase, {
       snapshotOnSuccess: true,
       pollMode: "adaptive",
+      hotPoll: true,
     });
     const seededResults = await fetchAndCacheDrodoBatch(active.seeded, supabase, {
       snapshotOnSuccess: true,
       pollMode: "reset",
+      hotPoll: true,
     });
     results = [...repolled, ...seededResults];
   } else {

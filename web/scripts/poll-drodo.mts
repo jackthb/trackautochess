@@ -158,10 +158,12 @@ async function main() {
     const repolled = await fetchAndCacheDrodoBatch(active.ids, supabase, {
       snapshotOnSuccess: true,
       pollMode: "adaptive",
+      hotPoll: true,
     });
     const seededResults = await fetchAndCacheDrodoBatch(active.seeded, supabase, {
       snapshotOnSuccess: true,
       pollMode: "reset",
+      hotPoll: true,
     });
     results = [...repolled, ...seededResults];
   } else {
