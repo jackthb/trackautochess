@@ -42,7 +42,7 @@ cms/.sanity/
 cms/dist/
 
 .vercel
-twitch-extension.zip
+twitch-extension*.zip
 twitch-extension/
 web/generated/
 ops/cronicle/.env
