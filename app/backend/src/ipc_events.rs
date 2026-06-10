@@ -1,10 +1,11 @@
 use serde::Serialize;
+use ts_rs::TS;
 
 pub fn event_json<T: Serialize>(event: &T) -> String {
     serde_json::to_string(event).expect("IPC event serialization should not fail")
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, TS)]
 pub struct BackendStatus<'a> {
     #[serde(rename = "type")]
     pub event_type: &'static str,
@@ -32,7 +33,7 @@ impl<'a> BackendStatus<'a> {
     }
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, TS)]
 pub struct ErrorEvent<'a> {
     #[serde(rename = "type")]
     pub event_type: &'static str,
@@ -48,7 +49,7 @@ impl<'a> ErrorEvent<'a> {
     }
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, TS)]
 pub struct PayloadQueued<'a> {
     #[serde(rename = "type")]
     pub event_type: &'static str,
@@ -64,7 +65,7 @@ impl<'a> PayloadQueued<'a> {
     }
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, TS)]
 pub struct ConfigUpdated<'a> {
     #[serde(rename = "type")]
     pub event_type: &'static str,
@@ -80,7 +81,7 @@ impl<'a> ConfigUpdated<'a> {
     }
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, TS)]
 pub struct SteamLogout {
     #[serde(rename = "type")]
     pub event_type: &'static str,
@@ -94,7 +95,7 @@ impl SteamLogout {
     }
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, TS)]
 pub struct SteamLoginUrl<'a> {
     #[serde(rename = "type")]
     pub event_type: &'static str,
@@ -110,7 +111,7 @@ impl<'a> SteamLoginUrl<'a> {
     }
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, TS)]
 pub struct SteamLogin<'a> {
     #[serde(rename = "type")]
     pub event_type: &'static str,
@@ -128,7 +129,7 @@ impl<'a> SteamLogin<'a> {
     }
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, TS)]
 pub struct NettablePaused {
     #[serde(rename = "type")]
     pub event_type: &'static str,
@@ -146,7 +147,7 @@ impl NettablePaused {
     }
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, TS)]
 pub struct UpdateApplyRequested {
     #[serde(rename = "type")]
     pub event_type: &'static str,
@@ -164,7 +165,7 @@ impl UpdateApplyRequested {
     }
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, TS)]
 pub struct DiagnosticsUploaded<'a> {
     #[serde(rename = "type")]
     pub event_type: &'static str,
@@ -219,7 +220,7 @@ impl<'a> DiagnosticsUploaded<'a> {
     }
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, TS)]
 pub struct NettableRoundChanged<'a> {
     #[serde(rename = "type")]
     pub event_type: &'static str,
@@ -241,7 +242,7 @@ impl<'a> NettableRoundChanged<'a> {
     }
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, TS)]
 pub struct NettableCreepRound<'a> {
     #[serde(rename = "type")]
     pub event_type: &'static str,
@@ -261,7 +262,7 @@ impl<'a> NettableCreepRound<'a> {
     }
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, TS)]
 pub struct NettablePersonalGameEnded<'a> {
     #[serde(rename = "type")]
     pub event_type: &'static str,
@@ -285,7 +286,7 @@ impl<'a> NettablePersonalGameEnded<'a> {
     }
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, TS)]
 pub struct NettableRankingScanned<'a> {
     #[serde(rename = "type")]
     pub event_type: &'static str,
@@ -296,7 +297,7 @@ pub struct NettableRankingScanned<'a> {
     pub at: &'a str,
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, TS)]
 pub struct NettableIngestComplete<'a> {
     #[serde(rename = "type")]
     pub event_type: &'static str,
@@ -318,7 +319,7 @@ impl<'a> NettableIngestComplete<'a> {
     }
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, TS)]
 pub struct NettableRows {
     #[serde(rename = "type")]
     pub event_type: &'static str,
@@ -334,7 +335,7 @@ impl NettableRows {
     }
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, TS)]
 pub struct NettableTimelineExtracted<'a> {
     #[serde(rename = "type")]
     pub event_type: &'static str,
@@ -356,7 +357,7 @@ impl<'a> NettableTimelineExtracted<'a> {
     }
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, TS)]
 pub struct NettableEndBoardSaved<'a> {
     #[serde(rename = "type")]
     pub event_type: &'static str,
@@ -376,7 +377,7 @@ impl<'a> NettableEndBoardSaved<'a> {
     }
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, TS)]
 pub struct NettableIngestError<'a> {
     #[serde(rename = "type")]
     pub event_type: &'static str,
@@ -407,7 +408,7 @@ impl<'a> NettableIngestError<'a> {
     }
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, TS)]
 pub struct NettableGameEnded<'a> {
     #[serde(rename = "type")]
     pub event_type: &'static str,
@@ -430,7 +431,7 @@ impl<'a> NettableGameEnded<'a> {
     }
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, TS)]
 pub struct NettableCheckActiveMatch<'a> {
     #[serde(rename = "type")]
     pub event_type: &'static str,
@@ -441,7 +442,7 @@ pub struct NettableCheckActiveMatch<'a> {
     pub at: &'a str,
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, TS)]
 pub struct NettableResyncComplete<'a> {
     #[serde(rename = "type")]
     pub event_type: &'static str,
@@ -471,7 +472,7 @@ impl<'a> NettableResyncComplete<'a> {
     }
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, TS)]
 pub struct NettableQueenUploadProgress<'a> {
     #[serde(rename = "type")]
     pub event_type: &'static str,
@@ -489,7 +490,7 @@ impl<'a> NettableQueenUploadProgress<'a> {
     }
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, TS)]
 pub struct NettableQueenUploadComplete<'a> {
     #[serde(rename = "type")]
     pub event_type: &'static str,
@@ -535,7 +536,7 @@ impl<'a> NettableQueenUploadComplete<'a> {
     }
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, TS)]
 pub struct NettableStateEvent {
     #[serde(rename = "type")]
     pub event_type: &'static str,
@@ -567,7 +568,7 @@ impl NettableStateEvent {
     }
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, TS)]
 pub struct NettableStatus<'a> {
     #[serde(rename = "type")]
     pub event_type: &'static str,
@@ -589,7 +590,7 @@ pub struct NettableStatus<'a> {
     pub log_active: bool,
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, TS)]
 pub struct NettableSetupProgress<'a> {
     #[serde(rename = "type")]
     pub event_type: &'a str,
@@ -607,7 +608,7 @@ impl<'a> NettableSetupProgress<'a> {
     }
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, TS)]
 pub struct NettableLaunchOptionsApplied<'a> {
     #[serde(rename = "type")]
     pub event_type: &'static str,
@@ -623,7 +624,7 @@ pub struct NettableLaunchOptionsApplied<'a> {
     pub gsi_cfg_path: Option<&'a str>,
 }
 
-#[derive(Debug, Serialize)]
+#[derive(Debug, Serialize, TS)]
 pub struct NettableLaunchOptionsError<'a> {
     #[serde(rename = "type")]
     pub event_type: &'static str,
@@ -672,6 +673,68 @@ impl<'a> NettableRankingScanned<'a> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use std::{fs, path::PathBuf};
+    use ts_rs::{Config as TsConfig, TS};
+
+    fn generated_bindings() -> String {
+        std::env::set_var("TS_RS_LARGE_INT", "number");
+        let cfg = TsConfig::default();
+        let mut out = String::from(
+            "// This file is generated from app/backend/src/ipc_events.rs. Do not edit.\n\n",
+        );
+        out.push_str(
+            "export type JsonValue = string | number | boolean | null | { [key: string]: JsonValue | undefined } | JsonValue[];\n\n",
+        );
+        macro_rules! push_decl {
+            ($ty:ty) => {{
+                let decl = <$ty as TS>::decl(&cfg);
+                out.push_str(
+                    &decl
+                        .replacen("type ", "export type ", 1)
+                        .replace("bigint", "number"),
+                );
+                out.push_str("\n\n");
+            }};
+        }
+        push_decl!(BackendStatus<'static>);
+        push_decl!(ErrorEvent<'static>);
+        push_decl!(PayloadQueued<'static>);
+        push_decl!(ConfigUpdated<'static>);
+        push_decl!(SteamLogout);
+        push_decl!(SteamLoginUrl<'static>);
+        push_decl!(SteamLogin<'static>);
+        push_decl!(NettablePaused);
+        push_decl!(UpdateApplyRequested);
+        push_decl!(DiagnosticsUploaded<'static>);
+        push_decl!(NettableRoundChanged<'static>);
+        push_decl!(NettableCreepRound<'static>);
+        push_decl!(NettablePersonalGameEnded<'static>);
+        push_decl!(NettableRankingScanned<'static>);
+        push_decl!(NettableIngestComplete<'static>);
+        push_decl!(NettableRows);
+        push_decl!(NettableTimelineExtracted<'static>);
+        push_decl!(NettableEndBoardSaved<'static>);
+        push_decl!(NettableIngestError<'static>);
+        push_decl!(NettableGameEnded<'static>);
+        push_decl!(NettableCheckActiveMatch<'static>);
+        push_decl!(NettableResyncComplete<'static>);
+        push_decl!(NettableQueenUploadProgress<'static>);
+        push_decl!(NettableQueenUploadComplete<'static>);
+        push_decl!(NettableStateEvent);
+        push_decl!(NettableStatus<'static>);
+        push_decl!(NettableSetupProgress<'static>);
+        push_decl!(NettableLaunchOptionsApplied<'static>);
+        push_decl!(NettableLaunchOptionsError<'static>);
+        out
+    }
+
+    #[test]
+    #[ignore = "generates app/src/backend-events.generated.ts"]
+    fn export_backend_event_bindings() {
+        let path = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+            .join("../src/backend-events.generated.ts");
+        fs::write(path, generated_bindings()).expect("write backend event bindings");
+    }
 
     #[test]
     fn serializes_round_changed_with_null_previous_round() {

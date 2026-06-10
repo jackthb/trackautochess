@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import type { TrackerEvent } from "../types";
+import type { LivePlayer, TrackerEvent } from "../types";
 
 /**
  * Activity feed for NetTable + import pipeline.
@@ -83,34 +83,6 @@ export interface NetTableActivityEntry {
  * (e.g. `player_info`, `ranking_top`) to the decoded VBKV dict.
  */
 export type NetTableState = Record<string, Record<string, unknown>>;
-
-/**
- * Extracted per-player live state emitted alongside the raw NetTableState.
- * Built backend-side from `player_info_table` (gap-filled from `dac_table`).
- * `lineup` is the raw `chess_*` code list (e.g. `chess_wl1,chess_br11,`);
- * the frontend resolves codes → names + stars where units_full.json lives.
- * `hp` is the live value (the dac_table hp=100 sentinel is handled backend-side).
- */
-export interface LivePlayer {
-  hp?: number;
-  level?: number;
-  placement?: number;
-  duration?: number;
-  lineup?: string;
-  lineup_value?: number;
-  total_money?: number;
-  win_round?: number;
-  lose_round?: number;
-  /** Current/latest relic code. */
-  relic?: string;
-  /** Every relic the player has taken, in pick order (from relic_history). */
-  relics?: string[];
-  mmr_level?: number;
-  candy?: number;
-  /** Raw synergy stems from the game: "is_mage:6,is_human:6,". */
-  buff?: string;
-  board?: import("@dac/shared/types").ChessBoardPiece[];
-}
 
 export interface NetTableActivityState {
   status: NetTableStatus | null;

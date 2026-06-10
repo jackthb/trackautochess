@@ -8,6 +8,7 @@
     "./drodo-core": "./drodo-core.ts",
     "./drodo-core.mjs": "./drodo-core.mjs",
     "./game-utils": "./game-utils.ts",
+    "./steam": "./steam.ts",
     "./buildStatItems": "./buildStatItems.ts",
     "./Button": "./Button.tsx",
     "./StatsGrid": "./StatsGrid.tsx",

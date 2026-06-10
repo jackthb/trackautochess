@@ -96,7 +96,7 @@ export async function markRowsWithGames(
   const { data } = await supabase
     .from("match_players")
     .select("steam_id::text")
-    .in("steam_id", ids)
+    .filter("steam_id", "in", `(${ids.join(",")})`)
     .limit(1000);
 
   const idsWithGames = new Set(

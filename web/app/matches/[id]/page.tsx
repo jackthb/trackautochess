@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 import { relicsData } from "@/generated/content-data";
 import type { Game, RelicInfo } from "@dac/shared/types";
 import { mmrLevelToRank } from "@dac/shared/game-utils";
+import { parseSteamId64 } from "@dac/shared/steam";
 import { fetchSteamProfile, type SteamProfile } from "@/lib/steam";
 import { absoluteUrl, getRequestSiteUrl } from "@/lib/site";
 import { createSupabaseAnonClient } from "@/lib/supabase";
@@ -87,6 +88,8 @@ const MP_SELECT = [
 const loadMatch = cache(
   async (rawId: string): Promise<Omit<GamePageProps, "route"> | null> => {
     if (!/^\d+$/.test(rawId)) return null;
+    const matchPlayerId = Number(rawId);
+    if (!Number.isSafeInteger(matchPlayerId)) return null;
 
     const hdrs = await headers();
     const baseUrl = getRequestSiteUrl({
@@ -100,11 +103,12 @@ const loadMatch = cache(
     const { data: focusRow } = await supabase
       .from("match_players")
       .select(MP_SELECT)
-      .eq("id", rawId)
+      .eq("id", matchPlayerId)
       .single();
 
     if (!focusRow) return null;
     const mp = focusRow as unknown as MatchPlayerRow;
+    const focusSteamId = parseSteamId64(String(mp.steam_id));
 
     // Fetch all players in this match + the match metadata in parallel.
     const [
@@ -123,7 +127,9 @@ const loadMatch = cache(
         .select("played_at, capture_status, is_finished, verification_source")
         .eq("match_id", mp.match_id)
         .maybeSingle(),
-      fetchSteamProfile(String(mp.steam_id), supabase),
+      focusSteamId
+        ? fetchSteamProfile(focusSteamId, supabase)
+        : Promise.resolve({ name: null, customUrl: null, avatarUrl: null }),
       supabase
         .from("match_timelines")
         .select("timeline")
@@ -157,7 +163,10 @@ const loadMatch = cache(
     const steamIds = [...new Set(players.map((p) => String(p.steam_id)))];
     await Promise.all(
       steamIds.map(async (sid) => {
-        matchProfiles[sid] = await fetchSteamProfile(sid, supabase);
+        const steamId = parseSteamId64(sid);
+        matchProfiles[sid] = steamId
+          ? await fetchSteamProfile(steamId, supabase)
+          : { name: null, customUrl: null, avatarUrl: null };
       })
     );
 

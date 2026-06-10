@@ -114,7 +114,7 @@ export async function GET(req: Request) {
       const exactSteamId = await supabase
         .from("users")
         .select(USER_SEARCH_SELECT)
-        .eq("steam_id", steamIdQuery)
+        .filter("steam_id", "eq", steamIdQuery)
         .limit(1);
 
       if (exactSteamId.error) {
@@ -174,7 +174,7 @@ export async function GET(req: Request) {
           ? supabase
               .from("match_players")
               .select("steam_id::text")
-              .eq("steam_id", resolvedSteamId)
+              .filter("steam_id", "eq", resolvedSteamId)
               .limit(1)
           : Promise.resolve({ data: [] as unknown[] }),
       ]);

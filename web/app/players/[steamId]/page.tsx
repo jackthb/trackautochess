@@ -145,7 +145,7 @@ const loadPlayer = cache(async (rawSteamId: string): Promise<LoadResult> => {
       : supabase
           .from("users")
           .select(USER_DRODO_SELECT)
-          .eq("steam_id", steamId)
+          .filter("steam_id", "eq", steamId)
           .maybeSingle<CachedUserDrodoRow>();
 
     const [profileResult, seasonsResult, snapshotsResult] = await Promise.all([
@@ -153,12 +153,12 @@ const loadPlayer = cache(async (rawSteamId: string): Promise<LoadResult> => {
       supabase
         .from("player_seasons")
         .select("season, mmr, max_mmr, games_played, chicken_count")
-        .eq("steam_id", steamId)
+        .filter("steam_id", "eq", steamId)
         .order("season", { ascending: true }),
       supabase
         .from("mmr_snapshots")
         .select("*")
-        .eq("steam_id", steamId)
+        .filter("steam_id", "eq", steamId)
         .not("mmr", "is", null)
         .order("snapshotted_at", { ascending: false })
         .limit(60),
@@ -245,7 +245,7 @@ const loadPlayer = cache(async (rawSteamId: string): Promise<LoadResult> => {
     ? supabase
         .from("match_players")
         .select("*, steam_id::text")
-        .eq("steam_id", steamId)
+        .filter("steam_id", "eq", steamId)
         .order("played_at", { ascending: false })
         .limit(100)
     : Promise.resolve({ data: [] as PlayerGame[] });

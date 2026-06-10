@@ -124,10 +124,7 @@ async function loadQueens(): Promise<{ rows: QueenRow[]; error: string | null }>
   const { data: snapshots, error: snapshotsError } = await supabase
     .from("mmr_snapshots")
     .select("steam_id::text, queen_rank, snapshotted_at")
-    .in(
-      "steam_id",
-      rows.map((row) => row.steam_id)
-    )
+    .filter("steam_id", "in", `(${rows.map((row) => row.steam_id).join(",")})`)
     .not("queen_rank", "is", null)
     .order("steam_id", { ascending: true })
     .order("snapshotted_at", { ascending: false })

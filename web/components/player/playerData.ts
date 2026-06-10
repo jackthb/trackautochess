@@ -1,6 +1,7 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { SITE_TITLE } from "@/lib/site";
 import { mmrToRank } from "@dac/shared/game-utils";
+import { parseSteamId64, type SteamId64 } from "@dac/shared/steam";
 import {
   parseSteamInput,
   playerProfilePath,
@@ -49,7 +50,7 @@ interface RouteUserRow extends CachedUserDrodoRow {
 }
 
 export interface ResolvedPlayerRoute {
-  steamId: string;
+  steamId: SteamId64;
   cachedProfileRow: CachedUserDrodoRow | null;
 }
 
@@ -76,7 +77,7 @@ export async function resolvePlayerRoute(
       const { data } = await supabase
         .from("users")
         .select(USER_DRODO_SELECT)
-        .eq("steam_id", parsed.value)
+        .filter("steam_id", "eq", parsed.value)
         .maybeSingle<CachedUserDrodoRow>();
       return { steamId: parsed.value, cachedProfileRow: data ?? null };
     }
@@ -92,7 +93,8 @@ export async function resolvePlayerRoute(
 
     if (data?.steam_id) {
       const { steam_id: steamId, ...cachedProfileRow } = data;
-      return { steamId: String(steamId), cachedProfileRow };
+      const parsedSteamId = parseSteamId64(String(steamId));
+      return parsedSteamId ? { steamId: parsedSteamId, cachedProfileRow } : null;
     }
   }
 

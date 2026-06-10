@@ -16,8 +16,14 @@
     "install:desktop:app": "pnpm install --frozen-lockfile",
     "install:desktop:backend": "node scripts/setup-desktop-backend.mjs",
     "verify:desktop:backend": "node scripts/verify-desktop-backend.mjs",
+    "generate:ipc-types": "cargo test --manifest-path app/backend/Cargo.toml export_backend_event_bindings -- --ignored",
+    "generate:supabase-types": "node scripts/generate-supabase-types.mjs",
+    "generate:types": "npm run generate:ipc-types && npm run generate:supabase-types",
     "test:drodo-core": "node scripts/smoke-drodo-core.mjs",
     "web:data": "node scripts/generate-web-runtime-data.mjs",
     "cms:dev": "pnpm --dir web run dev"
+  },
+  "devDependencies": {
+    "supabase": "2.105.0"
   }
 }

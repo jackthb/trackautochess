@@ -1,5 +1,6 @@
 import { createClient } from "@supabase/supabase-js";
 import type { SupabaseClient } from "@supabase/supabase-js";
+import type { Database } from "./database.generated.types";
 
 const SERVER_AUTH_OPTIONS = {
   auth: {
@@ -8,22 +9,24 @@ const SERVER_AUTH_OPTIONS = {
   },
 };
 
-let browserAnonClient: SupabaseClient | null = null;
-let anonClient: SupabaseClient | null = null;
-let serviceRoleClient: SupabaseClient | null = null;
-let serverClient: SupabaseClient | null = null;
+type DacSupabaseClient = SupabaseClient<Database>;
 
-export function createSupabaseClient(): SupabaseClient {
+let browserAnonClient: DacSupabaseClient | null = null;
+let anonClient: DacSupabaseClient | null = null;
+let serviceRoleClient: DacSupabaseClient | null = null;
+let serverClient: DacSupabaseClient | null = null;
+
+export function createSupabaseClient(): DacSupabaseClient {
   if (browserAnonClient) return browserAnonClient;
 
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
   if (!url || !key) {
-    return null as unknown as SupabaseClient;
+    return null as unknown as DacSupabaseClient;
   }
 
-  browserAnonClient = createClient(url, key, {
+  browserAnonClient = createClient<Database>(url, key, {
     auth: {
       detectSessionInUrl: true,
       flowType: "implicit",
@@ -32,7 +35,7 @@ export function createSupabaseClient(): SupabaseClient {
   return browserAnonClient;
 }
 
-export function createSupabaseAnonClient(): SupabaseClient | null {
+export function createSupabaseAnonClient(): DacSupabaseClient | null {
   if (anonClient) return anonClient;
 
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -42,11 +45,11 @@ export function createSupabaseAnonClient(): SupabaseClient | null {
     return null;
   }
 
-  anonClient = createClient(url, key);
+  anonClient = createClient<Database>(url, key);
   return anonClient;
 }
 
-export function createSupabaseServiceRoleClient(): SupabaseClient | null {
+export function createSupabaseServiceRoleClient(): DacSupabaseClient | null {
   if (serviceRoleClient) return serviceRoleClient;
 
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -56,11 +59,11 @@ export function createSupabaseServiceRoleClient(): SupabaseClient | null {
     return null;
   }
 
-  serviceRoleClient = createClient(url, key, SERVER_AUTH_OPTIONS);
+  serviceRoleClient = createClient<Database>(url, key, SERVER_AUTH_OPTIONS);
   return serviceRoleClient;
 }
 
-export function createSupabaseServiceRoleClientOrThrow(): SupabaseClient {
+export function createSupabaseServiceRoleClientOrThrow(): DacSupabaseClient {
   const client = createSupabaseServiceRoleClient();
   if (!client) {
     throw new Error("Supabase service role is not configured");
@@ -68,7 +71,7 @@ export function createSupabaseServiceRoleClientOrThrow(): SupabaseClient {
   return client;
 }
 
-export function createSupabaseServerClient(): SupabaseClient | null {
+export function createSupabaseServerClient(): DacSupabaseClient | null {
   if (serverClient) return serverClient;
 
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -80,6 +83,6 @@ export function createSupabaseServerClient(): SupabaseClient | null {
     return null;
   }
 
-  serverClient = createClient(url, key, SERVER_AUTH_OPTIONS);
+  serverClient = createClient<Database>(url, key, SERVER_AUTH_OPTIONS);
   return serverClient;
 }

@@ -3,6 +3,11 @@
  */
 
 import type { SupabaseClient } from "@supabase/supabase-js";
+import {
+  isSteamId64,
+  parseSteamId64,
+  type SteamId64,
+} from "@dac/shared/steam";
 
 export interface SteamProfile {
   name: string | null;
@@ -10,24 +15,11 @@ export interface SteamProfile {
   avatarUrl?: string | null;
 }
 
-export interface ParsedSteamInput {
-  kind: "id" | "slug";
-  value: string;
-}
+export type ParsedSteamInput =
+  | { kind: "id"; value: SteamId64 }
+  | { kind: "slug"; value: string };
 
-// BigInt(...) instead of n-literals so the ES2017 tsconfig target accepts them.
-const STEAM_ID64_MIN = BigInt("76561197960265728");
-const STEAM_ID64_MAX = BigInt("76561202255233023");
-
-export function isValidSteamId64(input: string): boolean {
-  if (!/^\d+$/.test(input)) return false;
-  try {
-    const value = BigInt(input);
-    return value >= STEAM_ID64_MIN && value <= STEAM_ID64_MAX;
-  } catch {
-    return false;
-  }
-}
+export const isValidSteamId64 = isSteamId64;
 
 interface SteamLookupOptions {
   persist?: boolean;
@@ -36,7 +28,7 @@ interface SteamLookupOptions {
 }
 
 interface SteamApiProfile extends SteamProfile {
-  steamId: string | null;
+  steamId: SteamId64 | null;
 }
 
 function parseSteamProfileXml(xml: string): SteamApiProfile {
@@ -53,7 +45,7 @@ function parseSteamProfileXml(xml: string): SteamApiProfile {
   );
 
   return {
-    steamId: steamIdMatch ? steamIdMatch[1] : null,
+    steamId: steamIdMatch ? parseSteamId64(steamIdMatch[1]) : null,
     name: nameMatch ? nameMatch[1] : null,
     customUrl: customUrlMatch ? customUrlMatch[1] : null,
     avatarUrl: avatarFullMatch?.[1] ?? avatarMediumMatch?.[1] ?? null,
@@ -80,7 +72,7 @@ async function fetchSteamProfileXml(url: string): Promise<SteamApiProfile> {
       /steamcommunity\.com\/profiles\/(\d+)/i
     );
     if (canonicalProfile) {
-      return { ...profile, steamId: canonicalProfile[1] };
+      return { ...profile, steamId: parseSteamId64(canonicalProfile[1]) };
     }
 
     return profile;
@@ -104,9 +96,8 @@ export function parseSteamInput(raw: string): ParsedSteamInput | null {
     /^(?:https?:\/\/)?(?:www\.)?steamcommunity\.com\/profiles\/(\d+)(?:[/?#].*)?$/i
   );
   if (profileMatch) {
-    return isValidSteamId64(profileMatch[1])
-      ? { kind: "id", value: profileMatch[1] }
-      : null;
+    const steamId = parseSteamId64(profileMatch[1]);
+    return steamId ? { kind: "id", value: steamId } : null;
   }
 
   const customUrlMatch = decoded.match(
@@ -115,7 +106,8 @@ export function parseSteamInput(raw: string): ParsedSteamInput | null {
   if (customUrlMatch) return { kind: "slug", value: customUrlMatch[1] };
 
   if (/^\d+$/.test(decoded)) {
-    return isValidSteamId64(decoded) ? { kind: "id", value: decoded } : null;
+    const steamId = parseSteamId64(decoded);
+    return steamId ? { kind: "id", value: steamId } : null;
   }
   if (/^[A-Za-z0-9_-]+$/.test(decoded)) {
     return { kind: "slug", value: decoded };
@@ -125,7 +117,7 @@ export function parseSteamInput(raw: string): ParsedSteamInput | null {
 }
 
 export async function upsertSteamUser(
-  steamId: string,
+  steamId: SteamId64,
   supabase?: SupabaseClient,
   profile?: (SteamProfile & { steamSignedInAt?: string }) | null
 ): Promise<void> {
@@ -161,11 +153,8 @@ export async function upsertSteamUser(
  * No API key required.
  */
 export async function fetchSteamProfileFromApi(
-  steamId: string
+  steamId: SteamId64
 ): Promise<SteamProfile> {
-  if (!isValidSteamId64(steamId)) {
-    return { name: null, customUrl: null, avatarUrl: null };
-  }
   const profile = await fetchSteamProfileXml(
     `https://steamcommunity.com/profiles/${steamId}/?xml=1`
   );
@@ -181,21 +170,17 @@ export async function fetchSteamProfileFromApi(
  * Steam API and cache the result in the DB for next time.
  */
 export async function fetchSteamProfile(
-  steamId: string,
+  steamId: SteamId64,
   supabase?: SupabaseClient,
   options: SteamLookupOptions = {}
 ): Promise<SteamProfile> {
-  if (!isValidSteamId64(steamId)) {
-    return { name: null, customUrl: null, avatarUrl: null };
-  }
-
   let cachedProfile: SteamProfile | null = null;
 
   if (supabase) {
     const { data } = await supabase
       .from("users")
       .select("name, custom_url, avatar_url")
-      .eq("steam_id", steamId)
+      .filter("steam_id", "eq", steamId)
       .maybeSingle();
 
     if (data) {
@@ -255,7 +240,7 @@ export async function resolveSteamId(
   slug: string,
   supabase?: SupabaseClient,
   options: SteamLookupOptions = {}
-): Promise<string | null> {
+): Promise<SteamId64 | null> {
   const parsed = parseSteamInput(slug);
   if (!parsed) return null;
   if (parsed.kind === "id") return parsed.value;
@@ -265,7 +250,7 @@ export async function resolveSteamId(
   const profile = await fetchSteamProfileXml(
     `https://steamcommunity.com/id/${encodeURIComponent(clean)}/?xml=1`
   );
-  if (!profile.steamId || !isValidSteamId64(profile.steamId)) return null;
+  if (!profile.steamId) return null;
 
   if (options.persist !== false) {
     await upsertSteamUser(profile.steamId, supabase, {
@@ -282,7 +267,7 @@ export async function resolveSteamInput(
   raw: string,
   supabase?: SupabaseClient,
   options: SteamLookupOptions = {}
-): Promise<string | null> {
+): Promise<SteamId64 | null> {
   const parsed = parseSteamInput(raw);
   if (!parsed) return null;
   if (parsed.kind === "id") return parsed.value;

@@ -3,15 +3,15 @@ import { captureServerEvent } from "@/lib/posthogServer";
 import { createSupabaseServiceRoleClientOrThrow } from "@/lib/supabase";
 import {
   fetchSteamProfileFromApi,
-  isValidSteamId64,
   upsertSteamUser,
 } from "@/lib/steam";
+import { parseSteamId64, type SteamId64 } from "@dac/shared/steam";
 
 const STEAM_OPENID_URL = "https://steamcommunity.com/openid/login";
 
 async function verifySteamAssertion(
   query: URLSearchParams
-): Promise<string | null> {
+): Promise<SteamId64 | null> {
   const params = new URLSearchParams();
   for (const [key, val] of query.entries()) {
     if (key.startsWith("openid.")) {
@@ -31,7 +31,7 @@ async function verifySteamAssertion(
 
   const claimed = query.get("openid.claimed_id") || "";
   const match = claimed.match(/\/id\/(\d+)$/);
-  return match && isValidSteamId64(match[1]) ? match[1] : null;
+  return match ? parseSteamId64(match[1]) : null;
 }
 
 export async function GET(req: Request) {

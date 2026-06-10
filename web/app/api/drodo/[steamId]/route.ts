@@ -169,7 +169,7 @@ async function handle(req: Request, ctx: { params: Promise<{ steamId: string }> 
     const { data: cached } = await supabase
       .from("users")
       .select(USER_DRODO_SELECT)
-      .eq("steam_id", steamId)
+      .filter("steam_id", "eq", steamId)
       .maybeSingle<CachedUserDrodoRow>();
 
     if (
@@ -190,7 +190,7 @@ async function handle(req: Request, ctx: { params: Promise<{ steamId: string }> 
       const { data: seasons } = await supabase
         .from("player_seasons")
         .select("season, mmr, max_mmr, games_played, chicken_count")
-        .eq("steam_id", steamId)
+        .filter("steam_id", "eq", steamId)
         .order("season", { ascending: true });
 
       if (hasDrodoStats(cachedProfile, seasons ?? [])) {
@@ -252,7 +252,7 @@ async function handle(req: Request, ctx: { params: Promise<{ steamId: string }> 
   const { data: seasons } = await supabase
     .from("player_seasons")
     .select("season, mmr, max_mmr, games_played, chicken_count")
-    .eq("steam_id", steamId)
+    .filter("steam_id", "eq", steamId)
     .order("season", { ascending: true });
 
   return Response.json(

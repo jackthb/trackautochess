@@ -1,232 +1,179 @@
+import type {
+  BackendStatus as GeneratedBackendStatus,
+  ConfigUpdated as GeneratedConfigUpdated,
+  DiagnosticsUploaded as GeneratedDiagnosticsUploaded,
+  ErrorEvent as GeneratedErrorEvent,
+  NettableCheckActiveMatch as GeneratedNettableCheckActiveMatch,
+  NettableCreepRound as GeneratedNettableCreepRound,
+  NettableEndBoardSaved as GeneratedNettableEndBoardSaved,
+  NettableGameEnded as GeneratedNettableGameEnded,
+  NettableIngestComplete as GeneratedNettableIngestComplete,
+  NettableIngestError as GeneratedNettableIngestError,
+  NettableLaunchOptionsApplied as GeneratedNettableLaunchOptionsApplied,
+  NettableLaunchOptionsError as GeneratedNettableLaunchOptionsError,
+  NettablePaused as GeneratedNettablePaused,
+  NettablePersonalGameEnded as GeneratedNettablePersonalGameEnded,
+  NettableQueenUploadComplete as GeneratedNettableQueenUploadComplete,
+  NettableQueenUploadProgress as GeneratedNettableQueenUploadProgress,
+  NettableRankingScanned as GeneratedNettableRankingScanned,
+  NettableResyncComplete as GeneratedNettableResyncComplete,
+  NettableRoundChanged as GeneratedNettableRoundChanged,
+  NettableRows as GeneratedNettableRows,
+  NettableSetupProgress as GeneratedNettableSetupProgress,
+  NettableStateEvent as GeneratedNettableStateEvent,
+  NettableStatus as GeneratedNettableStatus,
+  NettableTimelineExtracted as GeneratedNettableTimelineExtracted,
+  PayloadQueued as GeneratedPayloadQueued,
+  SteamLogin as GeneratedSteamLogin,
+  SteamLoginUrl as GeneratedSteamLoginUrl,
+  SteamLogout as GeneratedSteamLogout,
+  UpdateApplyRequested as GeneratedUpdateApplyRequested,
+} from "./backend-events.generated";
+
+export type * from "./backend-events.generated";
+
 export type BackendName = "rust";
 
-export interface BackendStatusEvent {
-  type: "status";
+type WithType<T, Type extends string> = Omit<T, "type"> & { type: Type };
+type WithBackendType<T, Type extends string> = Omit<T, "type" | "backend"> & {
+  type: Type;
   backend: BackendName;
-  recording: boolean;
-  focused: boolean;
-  logged_in: boolean;
-  steam_id: string;
-  steam_name: string;
-  replay_enabled: boolean;
+};
+
+/**
+ * Extracted per-player live state emitted alongside the raw NetTableState.
+ * Built backend-side from `player_info_table` and gap-filled from `dac_table`.
+ */
+export interface LivePlayer {
+  hp?: number;
+  level?: number;
+  placement?: number;
+  duration?: number;
+  lineup?: string;
+  lineup_value?: number;
+  total_money?: number;
+  win_round?: number;
+  lose_round?: number;
+  relic?: string;
+  relics?: string[];
+  mmr_level?: number;
+  candy?: number;
+  buff?: string;
+  board?: import("@dac/shared/types").ChessBoardPiece[];
 }
 
-export interface BackendErrorEvent {
-  type: "error";
-  message: string;
-}
+export type BackendStatusEvent = WithBackendType<GeneratedBackendStatus, "status">;
+export type BackendErrorEvent = WithType<GeneratedErrorEvent, "error">;
+export type PayloadQueuedEvent = WithType<GeneratedPayloadQueued, "payload_queued">;
+export type ConfigUpdatedEvent = WithType<GeneratedConfigUpdated, "config_updated">;
+export type SteamLoginUrlEvent = WithType<GeneratedSteamLoginUrl, "steam_login_url">;
+export type SteamLoginEvent = WithType<GeneratedSteamLogin, "steam_login">;
+export type SteamLogoutEvent = WithType<GeneratedSteamLogout, "steam_logout">;
+export type UpdateApplyRequestedEvent = WithBackendType<
+  GeneratedUpdateApplyRequested,
+  "update_apply_requested"
+>;
 
-export interface PayloadQueuedEvent {
-  type: "payload_queued";
-  path: string;
-}
-
-export interface ConfigUpdatedEvent {
-  type: "config_updated";
-  key: string;
-}
-
-export interface SteamLoginUrlEvent {
-  type: "steam_login_url";
-  url: string;
-}
-
-export interface SteamLoginEvent {
-  type: "steam_login";
-  steam_id: string;
-  steam_name: string;
-}
-
-export interface SteamLogoutEvent {
-  type: "steam_logout";
-}
-
-export interface UpdateApplyRequestedEvent {
-  type: "update_apply_requested";
-  backend: BackendName;
-  ok: boolean;
-}
-
-export interface DiagnosticsUploadedEvent {
-  type: "diagnostics_uploaded";
-  backend: BackendName;
-  storage_ok: boolean;
-  reason: string;
-  paths: Record<string, unknown>;
+export type DiagnosticsUploadedEvent = Omit<
+  WithBackendType<GeneratedDiagnosticsUploaded, "diagnostics_uploaded">,
+  "tracker_bytes" | "console_bytes" | "console_found" | "message"
+> & {
   tracker_bytes?: number;
   console_bytes?: number;
   console_found?: boolean;
   message?: string;
-}
+};
 
-export interface NettableRowsEvent {
-  type: "nettable_rows";
+export type NettableRowsEvent = Omit<WithType<GeneratedNettableRows, "nettable_rows">, "rows"> & {
   rows: Array<{
     table_name?: string;
     key?: string;
     raw?: unknown;
   }>;
-}
+};
 
-export interface NettableStateEvent {
-  type: "nettable_state";
-  backend: BackendName;
-  rows: unknown[];
-  state: Record<string, unknown>;
-  players: Record<string, import("./hooks/useNetTableEvents").LivePlayer>;
+export type NettableStateEvent = Omit<
+  WithBackendType<GeneratedNettableStateEvent, "nettable_state">,
+  "rows" | "state" | "players" | "local_steam_ids"
+> & {
+  rows: NettableRowsEvent["rows"];
+  state: Record<string, Record<string, unknown>>;
+  players: Record<string, LivePlayer>;
   local_steam_ids: string[];
-  at: string;
-}
+};
 
-export interface NettableStatusEvent {
-  type: "nettable_status";
-  backend: BackendName;
-  ok: boolean;
-  paused: boolean;
-  autoexec_installed: boolean;
-  gsi_cfg_installed: boolean;
-  log_path: string;
-  log_writable: boolean;
-  dota_dir: string;
-  remote_enabled: boolean;
-  launch_options: string | null;
-  has_condebug: boolean | null;
-  has_conclearlog: boolean | null;
-  has_gamestateintegration: boolean | null;
-  steam_running: boolean;
-  dota_running: boolean;
-  log_active: boolean;
-}
-
-export interface NettablePausedEvent {
-  type: "nettable_paused";
-  backend: BackendName;
-  paused: boolean;
-}
-
-export interface NettableCheckActiveMatchEvent {
-  type: "nettable_check_active_match";
-  backend: BackendName;
-  ok: boolean;
-  paused: boolean;
-  message: string;
-  at: string;
-}
-
-export interface NettableIngestCompleteEvent {
-  type: "nettable_ingest_complete";
-  backend: BackendName;
-  rows_written: number;
-  tables: string[];
-  at: string;
-}
-
-export interface NettableIngestErrorEvent {
-  type: "nettable_ingest_error";
+export type NettableStatusEvent = WithBackendType<GeneratedNettableStatus, "nettable_status">;
+export type NettablePausedEvent = WithBackendType<GeneratedNettablePaused, "nettable_paused">;
+export type NettableCheckActiveMatchEvent = WithBackendType<
+  GeneratedNettableCheckActiveMatch,
+  "nettable_check_active_match"
+>;
+export type NettableIngestCompleteEvent = WithBackendType<
+  GeneratedNettableIngestComplete,
+  "nettable_ingest_complete"
+>;
+export type NettableIngestErrorEvent = Omit<
+  WithType<GeneratedNettableIngestError, "nettable_ingest_error">,
+  "backend" | "at"
+> & {
   backend?: BackendName;
-  error: string;
   at?: string;
-}
-
-export interface NettableRoundChangedEvent {
-  type: "nettable_round_changed";
-  backend: BackendName;
-  round: number;
-  prev_round: number | null;
-  at: string;
-}
-
-export interface NettableCreepRoundEvent {
-  type: "nettable_creep_round";
-  backend: BackendName;
-  round: number;
-  at: string;
-}
-
-export interface NettablePersonalGameEndedEvent {
-  type: "nettable_personal_game_ended";
-  backend: BackendName;
-  at: string;
-  round: number;
-  rank: number;
-  late_capture: boolean;
-}
-
-export interface NettableGameEndedEvent {
-  type: "nettable_game_ended";
-  backend: BackendName;
-  message: string;
+};
+export type NettableRoundChangedEvent = WithBackendType<
+  GeneratedNettableRoundChanged,
+  "nettable_round_changed"
+>;
+export type NettableCreepRoundEvent = WithBackendType<
+  GeneratedNettableCreepRound,
+  "nettable_creep_round"
+>;
+export type NettablePersonalGameEndedEvent = WithBackendType<
+  GeneratedNettablePersonalGameEnded,
+  "nettable_personal_game_ended"
+>;
+export type NettableGameEndedEvent = Omit<
+  WithBackendType<GeneratedNettableGameEnded, "nettable_game_ended">,
+  "match_id"
+> & {
   match_id?: string;
-  at: string;
-}
-
-export interface NettableEndBoardSavedEvent {
-  type: "nettable_end_board_saved";
-  backend: BackendName;
-  match_id: string;
-  at: string;
-}
-
-export interface NettableTimelineExtractedEvent {
-  type: "nettable_timeline_extracted";
-  backend: BackendName;
-  match_id: string;
-  round_count: number;
-  at: string;
-}
-
-export interface NettableRankingScannedEvent {
-  type: "nettable_ranking_scanned";
-  backend: BackendName;
-  player_count: number;
-  upserted_count: number;
-  season: string;
-  at: string;
-}
-
-export interface NettableQueenUploadProgressEvent {
-  type: "nettable_queen_upload_progress";
-  message: string;
-  at: string;
-}
-
-export interface NettableQueenUploadCompleteEvent {
-  type: "nettable_queen_upload_complete";
-  ok: boolean;
-  player_count: number;
-  upserted_count: number;
+};
+export type NettableEndBoardSavedEvent = WithBackendType<
+  GeneratedNettableEndBoardSaved,
+  "nettable_end_board_saved"
+>;
+export type NettableTimelineExtractedEvent = WithBackendType<
+  GeneratedNettableTimelineExtracted,
+  "nettable_timeline_extracted"
+>;
+export type NettableRankingScannedEvent = WithBackendType<
+  GeneratedNettableRankingScanned,
+  "nettable_ranking_scanned"
+>;
+export type NettableQueenUploadProgressEvent = WithType<
+  GeneratedNettableQueenUploadProgress,
+  "nettable_queen_upload_progress"
+>;
+export type NettableQueenUploadCompleteEvent = Omit<
+  WithType<GeneratedNettableQueenUploadComplete, "nettable_queen_upload_complete">,
+  "season"
+> & {
   season?: string;
-  error: string | null;
-  at: string;
-}
-
-export interface NettableResyncCompleteEvent {
-  type: "nettable_resync_complete";
-  ok: boolean;
-  noop: boolean;
+};
+export type NettableResyncCompleteEvent = Omit<
+  WithType<GeneratedNettableResyncComplete, "nettable_resync_complete">,
+  "error"
+> & {
   error?: string;
-}
-
-export interface NettableSetupProgressEvent {
+};
+export type NettableSetupProgressEvent = Omit<
+  WithType<GeneratedNettableSetupProgress, "nettable_launch_options_progress" | "nettable_resync_progress">,
+  "type"
+> & {
   type: "nettable_launch_options_progress" | "nettable_resync_progress";
-  stage: string;
-  message: string;
-}
-
-export interface NettableLaunchOptionsAppliedEvent {
-  type: "nettable_launch_options_applied";
-  backend: BackendName;
-  ok: boolean;
-  noop?: boolean;
-  before?: string;
-  after?: string;
-  added?: string[];
-  config_path?: string;
-  backup_path?: string | null;
-  autoexec_path?: string;
-  gsi_cfg_path?: string | null;
-  error?: string;
-}
+};
+export type NettableLaunchOptionsAppliedEvent =
+  | WithBackendType<GeneratedNettableLaunchOptionsApplied, "nettable_launch_options_applied">
+  | WithBackendType<GeneratedNettableLaunchOptionsError, "nettable_launch_options_applied">;
 
 export type BackendEvent =
   | BackendStatusEvent

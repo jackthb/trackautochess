@@ -19,6 +19,7 @@ import {
 import { relicsData, synergiesData, unitsFullData } from "@/generated/content-data";
 import type { RelicInfo, SynergyInfo, UnitFullInfo } from "@dac/shared/types";
 import { fetchSteamProfile } from "@/lib/steam";
+import { parseSteamId64 } from "@dac/shared/steam";
 import { UNIT_COSTS, computeSynergies, filterActiveSynergies } from "@/lib/units";
 
 const RELICS_MAP = (relicsData as { relics: Record<string, RelicInfo> }).relics;
@@ -175,6 +176,10 @@ async function ogHandler(req: Request, ctx: { params: Promise<{ id: string }> })
   if (!rawId) {
     return new Response("Missing match player id", { status: 400 });
   }
+  const matchPlayerId = Number(rawId);
+  if (!Number.isSafeInteger(matchPlayerId)) {
+    return new Response("Invalid match player id", { status: 400 });
+  }
 
   const supabase = createSupabaseServerClient();
   if (!supabase) {
@@ -186,16 +191,17 @@ async function ogHandler(req: Request, ctx: { params: Promise<{ id: string }> })
     .select(
       "id, match_id, steam_id::text, placement, mmr_level, hero_level, chess_lineup, synergies, relic, relic_history, win_round, lose_round"
     )
-    .eq("id", rawId)
+    .eq("id", matchPlayerId)
     .single<MatchPlayerRow>();
 
   if (!mp) {
     return new Response("Match player not found", { status: 404 });
   }
+  const mpSteamId = mp.steam_id ? parseSteamId64(String(mp.steam_id)) : null;
 
   const [steamProfile, fonts, matchPlayersResult] = await Promise.all([
-    mp.steam_id
-      ? fetchSteamProfile(String(mp.steam_id), supabase)
+    mpSteamId
+      ? fetchSteamProfile(mpSteamId, supabase)
       : Promise.resolve({ name: null, customUrl: null, avatarUrl: null }),
     fontData,
     supabase

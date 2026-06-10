@@ -106,7 +106,7 @@ async function loadPollSnapshot(
     .select(
       "drodo_mmr, drodo_season_games, drodo_chicken_count, drodo_raw_data, queen_ladder_last_seen_at, poll_interval_seconds"
     )
-    .eq("steam_id", steamId)
+    .filter("steam_id", "eq", steamId)
     .maybeSingle<PollSnapshotRow>();
   return data ? pollSnapshotFromRow(data) : null;
 }
@@ -121,7 +121,7 @@ async function loadPollSnapshots(
     .select(
       "steam_id::text, drodo_mmr, drodo_season_games, drodo_chicken_count, drodo_raw_data, queen_ladder_last_seen_at, poll_interval_seconds"
     )
-    .in("steam_id", steamIds);
+    .filter("steam_id", "in", `(${steamIds.join(",")})`);
   return new Map(
     ((data ?? []) as unknown as PollSnapshotRow[]).map((row) => [
       String(row.steam_id),
@@ -173,7 +173,7 @@ export async function purgeDrodoCache(
   const { error: seasonsError } = await supabase
     .from("player_seasons")
     .delete()
-    .eq("steam_id", steamId);
+    .filter("steam_id", "eq", steamId);
   if (seasonsError) {
     console.error(
       "Failed to delete stale player_seasons:",
@@ -195,7 +195,7 @@ export async function purgeDrodoCache(
       drodo_last_fetched_at: new Date().toISOString(),
       drodo_profile_missing: true,
     })
-    .eq("steam_id", steamId);
+    .filter("steam_id", "eq", steamId);
   if (profileError) {
     console.error(
       "Failed to delete stale drodo profile:",
@@ -263,7 +263,7 @@ async function persistDrodoProfile(
     const { data: existingSeasons } = await supabase
       .from("player_seasons")
       .select("season, chicken_count")
-      .eq("steam_id", profile.steam_id);
+      .filter("steam_id", "eq", profile.steam_id);
     const existingChickenCounts = new Map(
       (existingSeasons ?? []).map((r) => [
         r.season,

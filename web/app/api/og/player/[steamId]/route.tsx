@@ -240,14 +240,14 @@ async function ogHandler(req: Request, ctx: { params: Promise<{ steamId: string 
       ? supabase
           .from("users")
           .select(USER_DRODO_SELECT)
-          .eq("steam_id", steamId)
+          .filter("steam_id", "eq", steamId)
           .maybeSingle()
       : Promise.resolve({ data: null }),
     supabase
       ? supabase
           .from("player_seasons")
           .select("season, mmr, max_mmr, games_played")
-          .eq("steam_id", steamId)
+          .filter("steam_id", "eq", steamId)
           .order("season", { ascending: false })
       : Promise.resolve({ data: [] }),
     fontData,

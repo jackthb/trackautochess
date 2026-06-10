@@ -158,7 +158,7 @@ export async function GET(req: Request) {
     const { data: userData } = await supabase
       .from("users")
       .select("steam_id::text, name, custom_url, avatar_url")
-      .in("steam_id", steamIds);
+      .filter("steam_id", "in", `(${steamIds.join(",")})`);
 
     const userMap = new Map<string, UserRow>();
     for (const u of (userData ?? []) as unknown as UserRow[]) {

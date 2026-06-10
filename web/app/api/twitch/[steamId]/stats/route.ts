@@ -102,7 +102,7 @@ export async function GET(
       .select(
         "drodo_mmr, drodo_max_mmr, drodo_mmr_level, drodo_season, drodo_season_games, drodo_candy, drodo_chicken_count, drodo_profile_missing, drodo_raw_data, queen_ladder_rank"
       )
-      .eq("steam_id", steamId)
+      .filter("steam_id", "eq", steamId)
       .maybeSingle(),
   ]);
 
