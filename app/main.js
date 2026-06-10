@@ -19,7 +19,6 @@ const { getElectronDesktopPaths } = require("./desktop-paths.cjs");
 const { createBackendSupervisor } = require("./main/backend-supervisor.cjs");
 const { createContentIpc } = require("./main/content.cjs");
 const { createReplays } = require("./main/replays.cjs");
-const { createSupabaseIpc } = require("./main/supabase-ipc.cjs");
 const { createTrackerLog } = require("./main/tracker-log.cjs");
 const { createUpdater } = require("./main/updater.cjs");
 
@@ -111,7 +110,6 @@ const updater = createUpdater({
   emitEvent: handleBackendEvent,
 });
 const content = createContentIpc({ ipcMain, fs, path, contentDir: CONTENT_DIR });
-const supabaseIpc = createSupabaseIpc({ ipcMain, net, fs, path, dacDir: DAC_DIR });
 const replays = createReplays({
   ipcMain,
   protocol,
@@ -126,7 +124,6 @@ const replays = createReplays({
 backend.onEvent(handleBackendEvent);
 trackerLog.registerIpc();
 content.register();
-supabaseIpc.register();
 replays.registerIpc();
 
 function focusMainWindow() {

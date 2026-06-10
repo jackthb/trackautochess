@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import type { UnitFullInfo, SynergyInfo, RelicInfo, ItemFullInfo } from "../types";
 import type { ChessBoardPiece } from "@dac/shared/types";
 import { ChessBoard } from "@dac/shared/ChessBoard";
+import type { MatchTimelineEvent } from "../backend-events";
+import { sendBackendRequest } from "../lib/backend-request";
 
 interface PlayerSnap {
   hp?: number;
@@ -62,11 +64,11 @@ export function MatchTimelinePanel({
   useEffect(() => {
     let cancelled = false;
     setLoading(true);
-    window.appApi
-      ?.fetchTimeline?.(matchId)
-      ?.then((raw) => {
+    sendBackendRequest<MatchTimelineEvent>({ cmd: "fetch_timeline", match_id: matchId })
+      .then((response) => {
         if (cancelled) return;
-        const t = raw as Timeline | null;
+        if (response.error) throw new Error(response.error);
+        const t = response.timeline as unknown as Timeline | null;
         setTimeline(t);
         // Default to the last round (most interesting view).
         if (t?.rounds?.length) {

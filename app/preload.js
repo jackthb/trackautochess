@@ -36,9 +36,6 @@ contextBridge.exposeInMainWorld("windowControls", {
 contextBridge.exposeInMainWorld("appApi", {
   openExternal: (url) => ipcRenderer.invoke("app:openExternal", url),
   getVersion: () => ipcRenderer.invoke("app:getVersion"),
-  fetchGames: () => ipcRenderer.invoke("games:fetch"),
-  fetchTimeline: (matchId) => ipcRenderer.invoke("timelines:fetch", matchId),
-  updateGame: (gameId, fields) => ipcRenderer.invoke("games:update", gameId, fields),
   fetchUnitsData: () => ipcRenderer.invoke("data:units"),
   fetchUnitsFull: () => ipcRenderer.invoke("data:units_full"),
   fetchSynergies: () => ipcRenderer.invoke("data:synergies"),
@@ -46,6 +43,4 @@ contextBridge.exposeInMainWorld("appApi", {
   fetchItems: () => ipcRenderer.invoke("data:items"),
   fetchItemsFull: () => ipcRenderer.invoke("data:items_full"),
   fetchTalents: () => ipcRenderer.invoke("data:talents"),
-  fetchDrodo: () => ipcRenderer.invoke("drodo:fetch"),
-  refreshDrodo: () => ipcRenderer.invoke("drodo:refresh"),
 });

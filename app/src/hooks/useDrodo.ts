@@ -1,17 +1,13 @@
 import { useState, useCallback, useEffect } from "react";
-import type { DrodoProfile, IpcErrorResult } from "../types";
+import type { DrodoProfile } from "../types";
+import type { DrodoProfileEvent } from "../backend-events";
+import { sendBackendRequest } from "../lib/backend-request";
 
 interface DrodoState {
   drodo: DrodoProfile | null;
   loading: boolean;
   error: string | null;
   refresh: () => Promise<void>;
-}
-
-function isErrorResult(
-  value: DrodoProfile | IpcErrorResult | null
-): value is IpcErrorResult {
-  return Boolean(value && "error" in value);
 }
 
 export function useDrodo(): DrodoState {
@@ -23,11 +19,11 @@ export function useDrodo(): DrodoState {
     setLoading(true);
     setError(null);
     try {
-      const data = await window.appApi.fetchDrodo();
-      if (isErrorResult(data)) {
-        setError(data.error);
-      } else if (data) {
-        setDrodo(data);
+      const response = await sendBackendRequest<DrodoProfileEvent>({ cmd: "fetch_drodo" });
+      if (response.error) {
+        setError(response.error);
+      } else if (response.profile) {
+        setDrodo(response.profile as unknown as DrodoProfile);
       }
     } catch (e) {
       console.error("Failed to fetch drodo profile:", e);
@@ -41,11 +37,11 @@ export function useDrodo(): DrodoState {
     setLoading(true);
     setError(null);
     try {
-      const data = await window.appApi.refreshDrodo();
-      if (isErrorResult(data)) {
-        setError(data.error);
-      } else if (data) {
-        setDrodo(data);
+      const response = await sendBackendRequest<DrodoProfileEvent>({ cmd: "refresh_drodo" }, { timeoutMs: 30_000 });
+      if (response.error) {
+        setError(response.error);
+      } else if (response.profile) {
+        setDrodo(response.profile as unknown as DrodoProfile);
       }
     } catch (e) {
       console.error("Failed to refresh drodo profile:", e);

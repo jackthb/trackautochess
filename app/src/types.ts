@@ -283,10 +283,6 @@ export interface DrodoProfile {
   seasons?: SeasonSnapshot[];
 }
 
-export interface IpcErrorResult {
-  error: string;
-}
-
 // Window API types from preload.js
 declare global {
   interface Window {
@@ -309,9 +305,6 @@ declare global {
     appApi: {
       openExternal: (url: string) => Promise<boolean>;
       getVersion: () => Promise<string>;
-      fetchGames: () => Promise<Game[]>;
-      fetchTimeline: (matchId: string) => Promise<unknown | null>;
-      updateGame: (gameId: number, fields: Partial<Game>) => Promise<boolean>;
       fetchUnitsData: () => Promise<UnitsData>;
       fetchUnitsFull: () => Promise<Record<string, UnitFullInfo>>;
       fetchSynergies: () => Promise<Record<string, SynergyInfo>>;
@@ -319,8 +312,6 @@ declare global {
       fetchItems: () => Promise<ItemsData>;
       fetchItemsFull: () => Promise<Record<string, ItemFullInfo>>;
       fetchTalents: () => Promise<Record<string, TalentInfo>>;
-      fetchDrodo: () => Promise<DrodoProfile | IpcErrorResult | null>;
-      refreshDrodo: () => Promise<DrodoProfile | IpcErrorResult | null>;
     };
   }
 }

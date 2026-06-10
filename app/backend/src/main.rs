@@ -15,8 +15,9 @@ mod unit_codes;
 
 use config::Config;
 use ipc_events::{
-    event_json, BackendStatus, ConfigUpdated, DiagnosticsUploaded, ErrorEvent, NettablePaused,
-    NettableRows, PayloadQueued, SteamLogin, SteamLoginUrl, SteamLogout, UpdateApplyRequested,
+    event_json, BackendStatus, ConfigUpdated, DiagnosticsUploaded, DrodoProfile, ErrorEvent,
+    GameUpdated, GamesList, MatchTimeline, NettablePaused, NettableRows, PayloadQueued, SteamLogin,
+    SteamLoginUrl, SteamLogout, UpdateApplyRequested,
 };
 use nettable_service::{parsed_json, rows_json, NettableService};
 use nettable_tail::NettableTailer;
@@ -26,6 +27,7 @@ use std::{
     env, fs,
     io::{self, BufRead, Write},
     path::PathBuf,
+    thread,
     time::Duration,
 };
 
@@ -193,6 +195,76 @@ fn run_daemon() -> io::Result<()> {
             "nettable_upload_queens" => nettable.upload_queens(&cfg, |line| {
                 let _ = emit(&line);
             }),
+            "fetch_games" => {
+                let request_id = json_string_field(&line, "request_id").unwrap_or_default();
+                let steam_id = cfg.steam_id.clone();
+                spawn_supabase_request(stdout_lock.clone(), cfg.clone(), move |client, emit_lock| {
+                    let event = match client.and_then(|client| client.fetch_games_for_steam_id(&steam_id)) {
+                        Ok(games) => event_json(&GamesList::ok(request_id, games)),
+                        Err(err) => event_json(&GamesList::error(request_id, err)),
+                    };
+                    emit_threaded(&emit_lock, &event);
+                });
+            }
+            "fetch_timeline" => {
+                let request_id = json_string_field(&line, "request_id").unwrap_or_default();
+                let match_id = json_string_field(&line, "match_id").unwrap_or_default();
+                spawn_supabase_request(stdout_lock.clone(), cfg.clone(), move |client, emit_lock| {
+                    let event = if match_id.is_empty() {
+                        event_json(&MatchTimeline::error(
+                            request_id,
+                            "fetch_timeline missing match_id".to_owned(),
+                        ))
+                    } else {
+                        match client.and_then(|client| client.fetch_match_timeline(&match_id)) {
+                            Ok(timeline) => event_json(&MatchTimeline::ok(request_id, timeline)),
+                            Err(err) => event_json(&MatchTimeline::error(request_id, err)),
+                        }
+                    };
+                    emit_threaded(&emit_lock, &event);
+                });
+            }
+            "update_game" => {
+                let request_id = json_string_field(&line, "request_id").unwrap_or_default();
+                let game_id = json_i64_field(&line, "id").unwrap_or_default();
+                let fields = json_object_value_field(&line, "fields").unwrap_or_default();
+                spawn_supabase_request(stdout_lock.clone(), cfg.clone(), move |client, emit_lock| {
+                    let event = if game_id == 0 {
+                        event_json(&GameUpdated::error(
+                            request_id,
+                            "update_game missing id".to_owned(),
+                        ))
+                    } else {
+                        match client.and_then(|client| client.update_game_fields(game_id, &fields)) {
+                            Ok(()) => event_json(&GameUpdated::ok(request_id)),
+                            Err(err) => event_json(&GameUpdated::error(request_id, err)),
+                        }
+                    };
+                    emit_threaded(&emit_lock, &event);
+                });
+            }
+            "fetch_drodo" => {
+                let request_id = json_string_field(&line, "request_id").unwrap_or_default();
+                let steam_id = cfg.steam_id.clone();
+                spawn_supabase_request(stdout_lock.clone(), cfg.clone(), move |client, emit_lock| {
+                    let event = match client.and_then(|client| client.fetch_drodo_profile(&steam_id)) {
+                        Ok(profile) => event_json(&DrodoProfile::ok(request_id, profile)),
+                        Err(err) => event_json(&DrodoProfile::error(request_id, err)),
+                    };
+                    emit_threaded(&emit_lock, &event);
+                });
+            }
+            "refresh_drodo" => {
+                let request_id = json_string_field(&line, "request_id").unwrap_or_default();
+                let steam_id = cfg.steam_id.clone();
+                spawn_supabase_request(stdout_lock.clone(), cfg.clone(), move |client, emit_lock| {
+                    let event = match client.and_then(|client| client.refresh_drodo_profile(&steam_id)) {
+                        Ok(profile) => event_json(&DrodoProfile::ok(request_id, profile)),
+                        Err(err) => event_json(&DrodoProfile::error(request_id, err)),
+                    };
+                    emit_threaded(&emit_lock, &event);
+                });
+            }
             "upload_logs" => {
                 let reason =
                     json_string_field(&line, "reason").unwrap_or_else(|| "manual".to_owned());
@@ -330,6 +402,10 @@ fn json_bool_field(body: &str, key: &str) -> Option<bool> {
     }
 }
 
+fn json_i64_field(body: &str, key: &str) -> Option<i64> {
+    json_field_raw(body, key)?.parse::<i64>().ok()
+}
+
 fn json_object_field(body: &str, key: &str) -> Option<String> {
     let marker = format!("\"{key}\"");
     let (_, rest) = body.split_once(&marker)?;
@@ -364,6 +440,26 @@ fn json_object_field(body: &str, key: &str) -> Option<String> {
         }
     }
     None
+}
+
+fn json_object_value_field(body: &str, key: &str) -> Option<serde_json::Value> {
+    json_object_field(body, key).and_then(|value| serde_json::from_str(&value).ok())
+}
+
+fn spawn_supabase_request<F>(stdout_lock: Arc<Mutex<()>>, cfg: Config, f: F)
+where
+    F: FnOnce(Result<supabase::SupabaseClient, String>, Arc<Mutex<()>>) + Send + 'static,
+{
+    thread::spawn(move || {
+        let client = supabase::SupabaseClient::from_config(&cfg)
+            .ok_or_else(|| "Supabase is not configured.".to_owned());
+        f(client, stdout_lock);
+    });
+}
+
+fn emit_threaded(stdout_lock: &Arc<Mutex<()>>, line: &str) {
+    let _guard = stdout_lock.lock().ok();
+    let _ = emit(line);
 }
 
 fn emit(line: &str) -> io::Result<()> {

@@ -42,6 +42,158 @@ impl SupabaseClient {
         )
     }
 
+    pub fn fetch_games_for_steam_id(&self, steam_id: &str) -> Result<Value, String> {
+        let rows = self.get_json(&format!(
+            "/rest/v1/match_players?select=*&steam_id=eq.{steam_id}&order=played_at.desc&limit=50"
+        ))?;
+        let games = rows
+            .as_array()
+            .cloned()
+            .unwrap_or_default()
+            .into_iter()
+            .map(|row| {
+                json!({
+                    "id": row.get("id").cloned().unwrap_or(Value::Null),
+                    "user_id": row.get("steam_id").map(|value| value.to_string().trim_matches('"').to_owned()).unwrap_or_default(),
+                    "placement": row.get("placement").map(|value| value.to_string().trim_matches('"').to_owned()).unwrap_or_default(),
+                    "lineup": row.get("chess_lineup").cloned().unwrap_or(Value::Null),
+                    "synergies": row.get("synergies").cloned().unwrap_or(Value::Null),
+                    "talents": row.get("talents").cloned().unwrap_or(Value::Null),
+                    "relic": row.get("relic").cloned().unwrap_or(Value::Null),
+                    "relic_history": row.get("relic_history").cloned().unwrap_or(Value::Null),
+                    "level": row.get("hero_level").map(|value| value.to_string().trim_matches('"').to_owned()).unwrap_or_default(),
+                    "wins": row.get("win_round").cloned().unwrap_or(Value::Null),
+                    "losses": row.get("lose_round").cloned().unwrap_or(Value::Null),
+                    "match_id": row.get("match_id").cloned().unwrap_or(Value::Null),
+                    "played_at": row.get("played_at").cloned().unwrap_or_else(|| json!("")),
+                    "created_at": row.get("created_at").cloned().unwrap_or_else(|| json!("")),
+                    "rank": mmr_level_to_app_rank(row.get("mmr_level")).map(Value::String).unwrap_or(Value::Null),
+                    "rank_change": Value::Null,
+                    "wl": Value::Null,
+                    "screenshot": Value::Null,
+                    "replay": Value::Null,
+                    "notes": Value::Null,
+                })
+            })
+            .collect::<Vec<_>>();
+        Ok(Value::Array(games))
+    }
+
+    pub fn fetch_match_timeline(&self, match_id: &str) -> Result<Value, String> {
+        let rows = self.get_json(&format!(
+            "/rest/v1/match_timelines?match_id=eq.{match_id}&select=timeline"
+        ))?;
+        Ok(rows
+            .as_array()
+            .and_then(|rows| rows.first())
+            .and_then(|row| row.get("timeline"))
+            .cloned()
+            .unwrap_or(Value::Null))
+    }
+
+    pub fn update_game_fields(&self, game_id: i64, fields: &Value) -> Result<(), String> {
+        self.patch_json(
+            &format!("/rest/v1/match_players?id=eq.{game_id}"),
+            fields,
+            "return=minimal",
+        )
+    }
+
+    pub fn fetch_drodo_profile(&self, steam_id: &str) -> Result<Value, String> {
+        let profile_rows = self.get_json(&format!(
+            "/rest/v1/users?select=steam_id,drodo_mmr,drodo_max_mmr,drodo_mmr_level,drodo_season,drodo_season_games,drodo_chicken_count,drodo_last_fetched_at&steam_id=eq.{steam_id}"
+        ))?;
+        let seasons = self.get_json(&format!(
+            "/rest/v1/player_seasons?select=season,mmr,max_mmr,games_played&steam_id=eq.{steam_id}&order=season.asc"
+        ))?;
+        let Some(row) = profile_rows.as_array().and_then(|rows| rows.first()) else {
+            return Ok(Value::Null);
+        };
+        Ok(drodo_user_row_to_profile(row, seasons))
+    }
+
+    pub fn refresh_drodo_profile(&self, steam_id: &str) -> Result<Value, String> {
+        let api_url = format!("http://autochess.ppbizon.com/courier/get/@{steam_id}");
+        let response = ureq::get(&api_url).call().map_err(describe_ureq_error)?;
+        let body_text = response.into_string().map_err(|err| err.to_string())?;
+        let body: Value = serde_json::from_str(&body_text).map_err(|err| err.to_string())?;
+        if body.get("err").and_then(Value::as_i64).unwrap_or(-1) != 0 {
+            return Err("Drodo profile API returned an error".to_owned());
+        }
+        let drodo_data = body
+            .get("user_info")
+            .and_then(|info| info.get(steam_id))
+            .cloned()
+            .ok_or_else(|| "Drodo profile was not found for this Steam account.".to_owned())?;
+
+        let mut max_season = 0;
+        let mut season = String::new();
+        if let Some(map) = drodo_data.as_object() {
+            for key in map.keys() {
+                if let Some(n) = key.strip_prefix("mmr_s").and_then(|value| value.parse::<i64>().ok()) {
+                    if n > max_season {
+                        max_season = n;
+                        season = format!("s{n}");
+                    }
+                }
+            }
+        }
+
+        let now = now_iso_utc();
+        let mmr_key = (!season.is_empty()).then(|| format!("mmr_{season}"));
+        let max_mmr_key = (!season.is_empty()).then(|| format!("max_mmr_{season}"));
+        let match_key = (!season.is_empty()).then(|| format!("match_{season}"));
+        let profile = json!({
+            "steam_id": steam_id,
+            "mmr": mmr_key.as_deref().and_then(|key| value_number(&drodo_data, key)),
+            "max_mmr": max_mmr_key.as_deref().and_then(|key| value_number(&drodo_data, key)),
+            "mmr_level": value_number(&drodo_data, "mmr_level"),
+            "queen_rank": value_number(&drodo_data, "queen_rank"),
+            "season": if season.is_empty() { Value::Null } else { json!(season) },
+            "season_games": match_key.as_deref().and_then(|key| value_number(&drodo_data, key)),
+            "candy": value_number(&drodo_data, "candy"),
+            "chicken_count": value_number(&drodo_data, "chicken_count").unwrap_or(0),
+            "raw_data": drodo_data,
+            "fetched_at": now,
+        });
+
+        let user_payload = drodo_profile_to_user_payload(&profile);
+        self.post_json(
+            "/rest/v1/users",
+            &user_payload,
+            "resolution=merge-duplicates,return=minimal",
+        )?;
+
+        let mut season_rows = Vec::new();
+        if let Some(map) = profile.get("raw_data").and_then(Value::as_object) {
+            for key in map.keys() {
+                let Some(n) = key.strip_prefix("mmr_s") else { continue };
+                let season_key = format!("s{n}");
+                season_rows.push(json!({
+                    "steam_id": steam_id,
+                    "season": season_key,
+                    "mmr": value_number(profile.get("raw_data").unwrap_or(&Value::Null), &format!("mmr_s{n}")),
+                    "max_mmr": value_number(profile.get("raw_data").unwrap_or(&Value::Null), &format!("max_mmr_s{n}")),
+                    "games_played": value_number(profile.get("raw_data").unwrap_or(&Value::Null), &format!("match_s{n}")),
+                    "fetched_at": now,
+                }));
+            }
+        }
+        if !season_rows.is_empty() {
+            self.post_json(
+                "/rest/v1/player_seasons?on_conflict=steam_id,season",
+                &Value::Array(season_rows.clone()),
+                "resolution=merge-duplicates,return=minimal",
+            )?;
+        }
+
+        let mut output = profile;
+        if let Some(obj) = output.as_object_mut() {
+            obj.insert("seasons".to_owned(), Value::Array(season_rows));
+        }
+        Ok(output)
+    }
+
     pub fn upload_nettable_dump_log(
         &self,
         cfg: &Config,
@@ -1094,6 +1246,59 @@ fn next_drodo_poll_at(interval_seconds: i64) -> String {
 
 fn now_iso_utc() -> String {
     chrono::Utc::now().to_rfc3339()
+}
+
+fn mmr_level_to_app_rank(value: Option<&Value>) -> Option<String> {
+    const RANKS: &[&str] = &[
+        "Pawn-1", "Pawn-2", "Pawn-3", "Pawn-4", "Pawn-5", "Pawn-6", "Pawn-7", "Pawn-8",
+        "Pawn-9", "Knight-1", "Knight-2", "Knight-3", "Knight-4", "Knight-5", "Knight-6",
+        "Knight-7", "Knight-8", "Knight-9", "Bishop-1", "Bishop-2", "Bishop-3",
+        "Bishop-4", "Bishop-5", "Bishop-6", "Bishop-7", "Bishop-8", "Bishop-9",
+        "Rook-1", "Rook-2", "Rook-3", "Rook-4", "Rook-5", "Rook-6", "Rook-7",
+        "Rook-8", "Rook-9", "King", "Queen",
+    ];
+    let n = value.and_then(Value::as_i64)?;
+    if n < 1 || n as usize > RANKS.len() {
+        return None;
+    }
+    Some(RANKS[n as usize - 1].to_owned())
+}
+
+fn drodo_user_row_to_profile(row: &Value, seasons: Value) -> Value {
+    json!({
+        "mmr": row.get("drodo_mmr").cloned().unwrap_or(Value::Null),
+        "max_mmr": row.get("drodo_max_mmr").cloned().unwrap_or(Value::Null),
+        "mmr_level": row.get("drodo_mmr_level").cloned().unwrap_or(Value::Null),
+        "season": row.get("drodo_season").cloned().unwrap_or(Value::Null),
+        "season_games": row.get("drodo_season_games").cloned().unwrap_or(Value::Null),
+        "chicken_count": row.get("drodo_chicken_count").cloned().unwrap_or_else(|| json!(0)),
+        "fetched_at": row.get("drodo_last_fetched_at").cloned().unwrap_or(Value::Null),
+        "seasons": seasons,
+    })
+}
+
+fn drodo_profile_to_user_payload(profile: &Value) -> Value {
+    json!({
+        "steam_id": profile.get("steam_id").cloned().unwrap_or(Value::Null),
+        "drodo_mmr": profile.get("mmr").cloned().unwrap_or(Value::Null),
+        "drodo_max_mmr": profile.get("max_mmr").cloned().unwrap_or(Value::Null),
+        "drodo_mmr_level": profile.get("mmr_level").cloned().unwrap_or(Value::Null),
+        "drodo_season": profile.get("season").cloned().unwrap_or(Value::Null),
+        "drodo_season_games": profile.get("season_games").cloned().unwrap_or(Value::Null),
+        "drodo_candy": profile.get("candy").cloned().unwrap_or(Value::Null),
+        "drodo_chicken_count": profile.get("chicken_count").cloned().unwrap_or_else(|| json!(0)),
+        "drodo_raw_data": profile.get("raw_data").cloned().unwrap_or(Value::Null),
+        "drodo_last_fetched_at": profile.get("fetched_at").cloned().unwrap_or(Value::Null),
+        "drodo_profile_missing": false,
+    })
+}
+
+fn value_number(value: &Value, key: &str) -> Option<i64> {
+    match value.get(key)? {
+        Value::Number(number) => number.as_i64().or_else(|| number.as_f64().map(|n| n as i64)),
+        Value::String(text) => text.parse::<i64>().ok(),
+        _ => None,
+    }
 }
 
 #[cfg(test)]

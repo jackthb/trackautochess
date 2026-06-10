@@ -10,6 +10,14 @@ export type PayloadQueued = { type: string, path: string, };
 
 export type ConfigUpdated = { type: string, key: string, };
 
+export type GamesList = { type: string, backend: string, request_id: string, games: JsonValue, error: string | null, };
+
+export type MatchTimeline = { type: string, backend: string, request_id: string, timeline: JsonValue, error: string | null, };
+
+export type GameUpdated = { type: string, backend: string, request_id: string, ok: boolean, error: string | null, };
+
+export type DrodoProfile = { type: string, backend: string, request_id: string, profile: JsonValue, error: string | null, };
+
 export type SteamLogout = { type: string, };
 
 export type SteamLoginUrl = { type: string, url: string, };

@@ -9,6 +9,8 @@ import type {
   ItemFullInfo,
   TalentInfo,
 } from "../types";
+import type { GameUpdatedEvent, GamesListEvent } from "../backend-events";
+import { sendBackendRequest } from "../lib/backend-request";
 
 interface GamesState {
   games: Game[];
@@ -94,20 +96,32 @@ export function useGames(): GamesState {
       }
     }
 
-    const data = await window.appApi.fetchGames();
-    const sorted = (data || []).slice().sort(
-      (a, b) => new Date(b.played_at).getTime() - new Date(a.played_at).getTime()
-    );
-    setGames(sorted);
-    setLastRefresh(new Date());
-    initialLoadDone.current = true;
-    setLoading(false);
-    setRefreshing(false);
+    try {
+      const response = await sendBackendRequest<GamesListEvent>({ cmd: "fetch_games" });
+      if (response.error) throw new Error(response.error);
+      const data = response.games as unknown as Game[];
+      const sorted = (data || []).slice().sort(
+        (a, b) => new Date(b.played_at).getTime() - new Date(a.played_at).getTime()
+      );
+      setGames(sorted);
+      setLastRefresh(new Date());
+      initialLoadDone.current = true;
+    } catch (e) {
+      console.error("Failed to fetch games:", e);
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
   }, [unitCosts]);
 
   const updateGame = useCallback(
     async (gameId: number, fields: Partial<Game>): Promise<boolean> => {
-      const ok = await window.appApi.updateGame(gameId, fields);
+      const response = await sendBackendRequest<GameUpdatedEvent>({
+        cmd: "update_game",
+        id: gameId,
+        fields,
+      });
+      const ok = response.ok && !response.error;
       if (ok) {
         setGames((prev) => {
           const updated = prev.map((g) => (g.id === gameId ? { ...g, ...fields } : g));

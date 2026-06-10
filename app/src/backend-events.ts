@@ -2,7 +2,11 @@ import type {
   BackendStatus as GeneratedBackendStatus,
   ConfigUpdated as GeneratedConfigUpdated,
   DiagnosticsUploaded as GeneratedDiagnosticsUploaded,
+  DrodoProfile as GeneratedDrodoProfile,
   ErrorEvent as GeneratedErrorEvent,
+  GameUpdated as GeneratedGameUpdated,
+  GamesList as GeneratedGamesList,
+  MatchTimeline as GeneratedMatchTimeline,
   NettableCheckActiveMatch as GeneratedNettableCheckActiveMatch,
   NettableCreepRound as GeneratedNettableCreepRound,
   NettableEndBoardSaved as GeneratedNettableEndBoardSaved,
@@ -66,6 +70,22 @@ export type BackendStatusEvent = WithBackendType<GeneratedBackendStatus, "status
 export type BackendErrorEvent = WithType<GeneratedErrorEvent, "error">;
 export type PayloadQueuedEvent = WithType<GeneratedPayloadQueued, "payload_queued">;
 export type ConfigUpdatedEvent = WithType<GeneratedConfigUpdated, "config_updated">;
+export type GamesListEvent = Omit<WithBackendType<GeneratedGamesList, "games_list">, "games"> & {
+  games: import("./backend-events.generated").JsonValue;
+};
+export type MatchTimelineEvent = Omit<
+  WithBackendType<GeneratedMatchTimeline, "match_timeline">,
+  "timeline"
+> & {
+  timeline: import("./backend-events.generated").JsonValue;
+};
+export type GameUpdatedEvent = WithBackendType<GeneratedGameUpdated, "game_updated">;
+export type DrodoProfileEvent = Omit<
+  WithBackendType<GeneratedDrodoProfile, "drodo_profile">,
+  "profile"
+> & {
+  profile: import("./backend-events.generated").JsonValue;
+};
 export type SteamLoginUrlEvent = WithType<GeneratedSteamLoginUrl, "steam_login_url">;
 export type SteamLoginEvent = WithType<GeneratedSteamLogin, "steam_login">;
 export type SteamLogoutEvent = WithType<GeneratedSteamLogout, "steam_logout">;
@@ -180,6 +200,10 @@ export type BackendEvent =
   | BackendErrorEvent
   | PayloadQueuedEvent
   | ConfigUpdatedEvent
+  | GamesListEvent
+  | MatchTimelineEvent
+  | GameUpdatedEvent
+  | DrodoProfileEvent
   | SteamLoginUrlEvent
   | SteamLoginEvent
   | SteamLogoutEvent

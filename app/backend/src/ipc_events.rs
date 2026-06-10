@@ -72,6 +72,134 @@ pub struct ConfigUpdated<'a> {
     pub key: &'a str,
 }
 
+#[derive(Debug, Serialize, TS)]
+pub struct GamesList {
+    #[serde(rename = "type")]
+    pub event_type: &'static str,
+    pub backend: &'static str,
+    pub request_id: String,
+    pub games: serde_json::Value,
+    pub error: Option<String>,
+}
+
+impl GamesList {
+    pub fn ok(request_id: String, games: serde_json::Value) -> Self {
+        Self {
+            event_type: "games_list",
+            backend: "rust",
+            request_id,
+            games,
+            error: None,
+        }
+    }
+
+    pub fn error(request_id: String, error: String) -> Self {
+        Self {
+            event_type: "games_list",
+            backend: "rust",
+            request_id,
+            games: serde_json::json!([]),
+            error: Some(error),
+        }
+    }
+}
+
+#[derive(Debug, Serialize, TS)]
+pub struct MatchTimeline {
+    #[serde(rename = "type")]
+    pub event_type: &'static str,
+    pub backend: &'static str,
+    pub request_id: String,
+    pub timeline: serde_json::Value,
+    pub error: Option<String>,
+}
+
+impl MatchTimeline {
+    pub fn ok(request_id: String, timeline: serde_json::Value) -> Self {
+        Self {
+            event_type: "match_timeline",
+            backend: "rust",
+            request_id,
+            timeline,
+            error: None,
+        }
+    }
+
+    pub fn error(request_id: String, error: String) -> Self {
+        Self {
+            event_type: "match_timeline",
+            backend: "rust",
+            request_id,
+            timeline: serde_json::Value::Null,
+            error: Some(error),
+        }
+    }
+}
+
+#[derive(Debug, Serialize, TS)]
+pub struct GameUpdated {
+    #[serde(rename = "type")]
+    pub event_type: &'static str,
+    pub backend: &'static str,
+    pub request_id: String,
+    pub ok: bool,
+    pub error: Option<String>,
+}
+
+impl GameUpdated {
+    pub fn ok(request_id: String) -> Self {
+        Self {
+            event_type: "game_updated",
+            backend: "rust",
+            request_id,
+            ok: true,
+            error: None,
+        }
+    }
+
+    pub fn error(request_id: String, error: String) -> Self {
+        Self {
+            event_type: "game_updated",
+            backend: "rust",
+            request_id,
+            ok: false,
+            error: Some(error),
+        }
+    }
+}
+
+#[derive(Debug, Serialize, TS)]
+pub struct DrodoProfile {
+    #[serde(rename = "type")]
+    pub event_type: &'static str,
+    pub backend: &'static str,
+    pub request_id: String,
+    pub profile: serde_json::Value,
+    pub error: Option<String>,
+}
+
+impl DrodoProfile {
+    pub fn ok(request_id: String, profile: serde_json::Value) -> Self {
+        Self {
+            event_type: "drodo_profile",
+            backend: "rust",
+            request_id,
+            profile,
+            error: None,
+        }
+    }
+
+    pub fn error(request_id: String, error: String) -> Self {
+        Self {
+            event_type: "drodo_profile",
+            backend: "rust",
+            request_id,
+            profile: serde_json::Value::Null,
+            error: Some(error),
+        }
+    }
+}
+
 impl<'a> ConfigUpdated<'a> {
     pub fn new(key: &'a str) -> Self {
         Self {
@@ -700,6 +828,10 @@ mod tests {
         push_decl!(ErrorEvent<'static>);
         push_decl!(PayloadQueued<'static>);
         push_decl!(ConfigUpdated<'static>);
+        push_decl!(GamesList);
+        push_decl!(MatchTimeline);
+        push_decl!(GameUpdated);
+        push_decl!(DrodoProfile);
         push_decl!(SteamLogout);
         push_decl!(SteamLoginUrl<'static>);
         push_decl!(SteamLogin<'static>);
