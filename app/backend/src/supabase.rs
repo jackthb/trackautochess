@@ -157,9 +157,9 @@ impl SupabaseClient {
         self.upload_end_board_rows(&row_values)
     }
 
-    pub fn finished_match_exists(&self, match_id: &str) -> bool {
+    pub fn finished_match_has_players(&self, match_id: &str) -> bool {
         self.get_json(&format!(
-            "/rest/v1/matches?select=match_id&match_id=eq.{match_id}&limit=1"
+            "/rest/v1/match_players?select=steam_id&match_id=eq.{match_id}&limit=1"
         ))
         .ok()
         .and_then(|value| value.as_array().map(|rows| !rows.is_empty()))
@@ -220,6 +220,15 @@ impl SupabaseClient {
             &match_row,
             "resolution=ignore-duplicates,return=minimal",
         )?;
+        let players = build_fallback_match_players(rows, &match_id, reason);
+        if !players.is_empty() {
+            self.ensure_match_player_users(&players)?;
+            self.post_json(
+                "/rest/v1/match_players?on_conflict=match_id,steam_id",
+                &Value::Array(players),
+                "resolution=merge-duplicates,return=minimal",
+            )?;
+        }
         Ok(Some(match_id))
     }
 
@@ -250,7 +259,10 @@ impl SupabaseClient {
             } else {
                 player.seen_at.clone()
             };
-            row.insert("queen_ladder_last_seen_at".to_owned(), json!(seen_at.clone()));
+            row.insert(
+                "queen_ladder_last_seen_at".to_owned(),
+                json!(seen_at.clone()),
+            );
             row.insert("drodo_last_fetched_at".to_owned(), json!(seen_at));
             row.insert("next_poll_at".to_owned(), json!(next_drodo_poll_at(600)));
             row.insert("poll_interval_seconds".to_owned(), json!(600));
@@ -572,7 +584,7 @@ impl SupabaseClient {
         match response {
             Ok(resp) if (200..300).contains(&resp.status()) => Ok(()),
             Ok(resp) => Err(format!("Supabase returned HTTP {}", resp.status())),
-            Err(err) => Err(err.to_string()),
+            Err(err) => Err(describe_ureq_error(err)),
         }
     }
 
@@ -586,7 +598,7 @@ impl SupabaseClient {
         match response {
             Ok(resp) if (200..300).contains(&resp.status()) => Ok(()),
             Ok(resp) => Err(format!("Supabase returned HTTP {}", resp.status())),
-            Err(err) => Err(err.to_string()),
+            Err(err) => Err(describe_ureq_error(err)),
         }
     }
 
@@ -601,8 +613,22 @@ impl SupabaseClient {
                 serde_json::from_str::<Value>(&body).map_err(|err| err.to_string())
             }
             Ok(resp) => Err(format!("Supabase returned HTTP {}", resp.status())),
-            Err(err) => Err(err.to_string()),
+            Err(err) => Err(describe_ureq_error(err)),
         }
+    }
+}
+
+fn describe_ureq_error(err: ureq::Error) -> String {
+    match err {
+        ureq::Error::Status(code, response) => {
+            let body = response.into_string().unwrap_or_default();
+            if body.trim().is_empty() {
+                format!("status code {code}")
+            } else {
+                format!("status code {code}: {body}")
+            }
+        }
+        err => err.to_string(),
     }
 }
 
@@ -900,6 +926,89 @@ fn build_fallback_match_row(rows: &[NettableRow], reason: &str, played_at: &str)
     }))
 }
 
+fn build_fallback_match_players(rows: &[NettableRow], match_id: &str, reason: &str) -> Vec<Value> {
+    let played_at = now_iso_utc();
+    let final_round = rows
+        .iter()
+        .filter(|row| row.table_name == "CustomNetTable_game_info" && row.key == "round_info")
+        .filter_map(|row| value_i64(row.raw.to_value().get("round")))
+        .max();
+    player_id_pairs(rows)
+        .into_iter()
+        .filter_map(|(steam_id, slot)| {
+            let steam_id_num = parse_valid_steam_id64(&steam_id)?;
+            let live_player = live_player_by_steam_id(rows, &steam_id);
+            let placement = live_player
+                .as_ref()
+                .and_then(|player| {
+                    value_i64(player.get("curr_rank").or_else(|| player.get("rank")))
+                })
+                .unwrap_or(0);
+            let mut row = serde_json::Map::new();
+            row.insert("match_id".to_owned(), json!(match_id));
+            row.insert("steam_id".to_owned(), json!(steam_id_num));
+            row.insert("placement".to_owned(), json!(placement));
+            row.insert("played_at".to_owned(), json!(played_at));
+            row.insert("created_at".to_owned(), json!(played_at));
+            if let Some(final_round) = final_round {
+                row.insert("final_round".to_owned(), json!(final_round));
+            }
+            if let Some(player) = live_player {
+                copy_fallback_player_field(&mut row, &player, "mmr_level");
+                copy_fallback_player_field(&mut row, &player, "hero_level");
+                copy_fallback_player_field(&mut row, &player, "duration");
+                copy_fallback_player_field(&mut row, &player, "total_money");
+                copy_fallback_player_field(&mut row, &player, "candy");
+                if let Some(lineup) = player
+                    .get("chess_lineup")
+                    .and_then(Value::as_str)
+                    .and_then(normalize_chess_lineup)
+                {
+                    row.insert("chess_lineup".to_owned(), json!(lineup));
+                }
+                if let Some(hand) = player
+                    .get("chess_hand")
+                    .and_then(Value::as_str)
+                    .and_then(normalize_chess_lineup)
+                {
+                    row.insert("chess_hand".to_owned(), json!(hand));
+                }
+                if let Some(synergies) =
+                    normalize_synergy_string(player.get("buff").and_then(Value::as_str))
+                {
+                    row.insert("synergies".to_owned(), json!(synergies));
+                }
+                if let Some(relic) = player.get("relic").filter(|value| !value.is_null()) {
+                    row.insert("relic".to_owned(), relic.clone());
+                }
+            }
+            if row.get("placement").and_then(Value::as_i64).unwrap_or(0) == 0 {
+                row.insert("placement".to_owned(), json!(slot));
+            }
+            row.insert("zhugong".to_owned(), json!(reason));
+            Some(Value::Object(row))
+        })
+        .collect()
+}
+
+fn live_player_by_steam_id(rows: &[NettableRow], steam_id: &str) -> Option<Value> {
+    rows.iter()
+        .find(|row| {
+            row.table_name == "CustomNetTable_player_info_table" && row.key == "player_info"
+        })
+        .and_then(|row| row.raw.to_value().get("data")?.get(steam_id).cloned())
+}
+
+fn copy_fallback_player_field(
+    row: &mut serde_json::Map<String, Value>,
+    player: &Value,
+    field: &str,
+) {
+    if let Some(value) = player.get(field).filter(|value| !value.is_null()) {
+        row.insert(field.to_owned(), value.clone());
+    }
+}
+
 fn player_id_pairs(rows: &[NettableRow]) -> Vec<(String, i64)> {
     rows.iter()
         .filter(|row| row.table_name == "CustomNetTable_player_id_table")
@@ -1049,6 +1158,70 @@ mod tests {
         assert_eq!(players.len(), 2);
         assert_eq!(players[0]["steam_id"], 76561198000000001u64);
         assert_eq!(players[1]["steam_id"], 76561198000000002u64);
+    }
+
+    #[test]
+    fn fallback_upload_builds_minimal_match_player_rows() {
+        use crate::nettable_parser::Value as RawValue;
+        use std::collections::BTreeMap;
+
+        fn object(entries: Vec<(&str, RawValue)>) -> RawValue {
+            RawValue::Object(
+                entries
+                    .into_iter()
+                    .map(|(key, value)| (key.to_owned(), value))
+                    .collect::<BTreeMap<_, _>>(),
+            )
+        }
+
+        let rows = vec![
+            NettableRow {
+                table_name: "CustomNetTable_player_id_table".to_owned(),
+                key: "player_1".to_owned(),
+                raw: object(vec![(
+                    "steam_id",
+                    RawValue::String("76561198000000001".to_owned()),
+                )]),
+                observed_at: None,
+                match_started_at: None,
+            },
+            NettableRow {
+                table_name: "CustomNetTable_player_info_table".to_owned(),
+                key: "player_info".to_owned(),
+                raw: object(vec![(
+                    "data",
+                    object(vec![(
+                        "76561198000000001",
+                        object(vec![
+                            ("curr_rank", RawValue::I32(3)),
+                            ("hero_level", RawValue::I32(10)),
+                            ("chess_lineup", RawValue::String("chess_ck1,".to_owned())),
+                            ("buff", RawValue::String("is_demon:2,".to_owned())),
+                        ]),
+                    )]),
+                )]),
+                observed_at: None,
+                match_started_at: None,
+            },
+            NettableRow {
+                table_name: "CustomNetTable_game_info".to_owned(),
+                key: "round_info".to_owned(),
+                raw: object(vec![("round", RawValue::I32(42))]),
+                observed_at: None,
+                match_started_at: None,
+            },
+        ];
+
+        let players =
+            build_fallback_match_players(&rows, "fallback-match", "post_game_no_end_board");
+        assert_eq!(players.len(), 1);
+        assert_eq!(players[0]["match_id"], "fallback-match");
+        assert_eq!(players[0]["steam_id"], 76561198000000001u64);
+        assert_eq!(players[0]["placement"], 3);
+        assert_eq!(players[0]["hero_level"], 10);
+        assert_eq!(players[0]["final_round"], 42);
+        assert_eq!(players[0]["chess_lineup"], "Chaos Knight(2)");
+        assert_eq!(players[0]["synergies"], "demon:2");
     }
 
     #[test]

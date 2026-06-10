@@ -1,5 +1,5 @@
 use std::{
-    io::{self, Read, Write},
+    io::{self, BufRead, BufReader, Read, Write},
     net::{TcpListener, TcpStream},
     sync::{Arc, Mutex},
     thread,
@@ -139,20 +139,48 @@ fn handle_stream<F>(
 where
     F: Fn(GsiEvent) + Send + Sync + 'static,
 {
-    let mut buffer = Vec::new();
-    stream.read_to_end(&mut buffer)?;
-    let request = String::from_utf8_lossy(&buffer);
-    if let Some(body) = request.split("\r\n\r\n").nth(1) {
+    stream.set_read_timeout(Some(Duration::from_secs(2)))?;
+    if let Some(body) = read_http_body(&mut stream)? {
         let event = state
             .lock()
             .expect("gsi state poisoned")
-            .apply_payload(body);
+            .apply_payload(&body);
         if event == GsiEvent::DacPostGame {
             on_event(event);
         }
     }
     stream.write_all(b"HTTP/1.1 200 OK\r\nContent-Length: 0\r\n\r\n")?;
     Ok(())
+}
+
+fn read_http_body(stream: &mut TcpStream) -> io::Result<Option<String>> {
+    let mut reader = BufReader::new(stream);
+    let mut content_length = None;
+    let mut line = String::new();
+
+    loop {
+        line.clear();
+        let bytes = reader.read_line(&mut line)?;
+        if bytes == 0 {
+            return Ok(None);
+        }
+        let trimmed = line.trim_end_matches(['\r', '\n']);
+        if trimmed.is_empty() {
+            break;
+        }
+        if let Some((name, value)) = trimmed.split_once(':') {
+            if name.eq_ignore_ascii_case("content-length") {
+                content_length = value.trim().parse::<usize>().ok();
+            }
+        }
+    }
+
+    let Some(content_length) = content_length else {
+        return Ok(None);
+    };
+    let mut body = vec![0; content_length];
+    reader.read_exact(&mut body)?;
+    Ok(Some(String::from_utf8_lossy(&body).into_owned()))
 }
 
 fn json_string(body: &str, key: &str) -> Option<String> {
@@ -180,6 +208,7 @@ fn json_string(body: &str, key: &str) -> Option<String> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use std::sync::mpsc;
 
     #[test]
     fn detects_dac_post_game_once() {
@@ -195,5 +224,46 @@ mod tests {
         let cfg = install_cfg_text(4001);
         assert!(cfg.contains("http://127.0.0.1:4001"));
         assert!(cfg.contains("heartbeat"));
+    }
+
+    #[test]
+    fn replies_without_waiting_for_client_to_close_connection() {
+        let listener = TcpListener::bind(("127.0.0.1", 0)).expect("test listener binds");
+        let addr = listener.local_addr().expect("test listener has address");
+        let (event_tx, event_rx) = mpsc::channel();
+
+        thread::spawn(move || {
+            let (stream, _) = listener.accept().expect("test connection accepted");
+            handle_stream(
+                stream,
+                Arc::new(Mutex::new(GsiState::default())),
+                Arc::new(move |event| {
+                    event_tx.send(event).expect("event sent");
+                }),
+            )
+            .expect("request handled");
+        });
+
+        let payload = r#"{"map":{"game_state":"DOTA_GAMERULES_STATE_POST_GAME","customgamename":"dota_addons/1613886175/dac"}}"#;
+        let request = format!(
+            "POST / HTTP/1.1\r\nHost: 127.0.0.1\r\nConnection: keep-alive\r\nContent-Length: {}\r\n\r\n{}",
+            payload.len(),
+            payload
+        );
+        let mut client = TcpStream::connect(addr).expect("test client connects");
+        client
+            .set_read_timeout(Some(Duration::from_secs(1)))
+            .expect("read timeout set");
+        client
+            .write_all(request.as_bytes())
+            .expect("request written");
+
+        let mut response = [0; 64];
+        let n = client.read(&mut response).expect("response read");
+        assert!(String::from_utf8_lossy(&response[..n]).starts_with("HTTP/1.1 200 OK"));
+        assert_eq!(
+            event_rx.recv_timeout(Duration::from_secs(1)).unwrap(),
+            GsiEvent::DacPostGame
+        );
     }
 }

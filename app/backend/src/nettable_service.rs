@@ -15,8 +15,6 @@ use std::{
     time::{Duration, Instant, SystemTime},
 };
 
-const POST_GAME_FINALIZE_ATTEMPTS: usize = 12;
-const POST_GAME_FINALIZE_INTERVAL: Duration = Duration::from_secs(4);
 const QUEEN_LADDER_AUTO_SYNC_INTERVAL: Duration = Duration::from_secs(600);
 const MAX_SESSION_ROUND_SNAPSHOTS: usize = 80;
 const DEFAULT_GSI_PORT: u16 = 4001;
@@ -168,7 +166,7 @@ impl NettableService {
                                 if let Some(client) = SupabaseClient::from_config(&cfg) {
                                     if let Some(match_id) = finished_match_id_from_rows(&rows) {
                                         if end_board_already_uploaded(&state, &match_id)
-                                            || client.finished_match_exists(&match_id)
+                                            || client.finished_match_has_players(&match_id)
                                         {
                                             mark_end_board_uploaded(&state, &match_id);
                                             continue;
@@ -198,11 +196,21 @@ impl NettableService {
                                             ));
                                         }
                                         Ok(None) => {}
-                                        Err(err) => emit(format!(
-                                            r#"{{"type":"nettable_ingest_error","backend":"rust","error":{},"at":{}}}"#,
-                                            json_string(&format!("end_board upload failed: {err}")),
-                                            json_string(&now_iso_utc())
-                                        )),
+                                        Err(err) => {
+                                            emit(format!(
+                                                r#"{{"type":"nettable_ingest_error","backend":"rust","error":{},"at":{}}}"#,
+                                                json_string(&format!(
+                                                    "end_board upload failed: {err}"
+                                                )),
+                                                json_string(&now_iso_utc())
+                                            ));
+                                            emit_fallback_finalize(&cfg, &rows, &emit, "End-board upload failed; saved a partial match from the last live snapshot.");
+                                            if let Some(match_id) =
+                                                finished_match_id_from_rows(&rows)
+                                            {
+                                                mark_end_board_uploaded(&state, &match_id);
+                                            }
+                                        }
                                     }
                                 }
                             }
@@ -406,67 +414,9 @@ impl NettableService {
             }
             emit(format!(
                 r#"{{"type":"nettable_game_ended","backend":"rust","message":{},"at":{}}}"#,
-                json_string("Dota reported post-game. Requesting the final board."),
+                json_string("Dota reported post-game — finalizing without extra dump hotkeys."),
                 json_string(&now_iso_utc())
             ));
-
-            for _ in 0..POST_GAME_FINALIZE_ATTEMPTS {
-                let _ = send_dump_keys(&[
-                    DumpKey::F21,
-                    DumpKey::F22,
-                    DumpKey::F20,
-                    DumpKey::F23,
-                    DumpKey::F24,
-                    DumpKey::F16,
-                ]);
-                thread::sleep(POST_GAME_FINALIZE_INTERVAL);
-
-                let rows = state
-                    .lock()
-                    .map(|state| state.latest_rows.clone())
-                    .unwrap_or_default();
-                if rows_have_end_board(&rows) {
-                    if let Some(client) = SupabaseClient::from_config(&cfg) {
-                        if let Some(match_id) = finished_match_id_from_rows(&rows) {
-                            if end_board_already_uploaded(&state, &match_id)
-                                || client.finished_match_exists(&match_id)
-                            {
-                                mark_end_board_uploaded(&state, &match_id);
-                                return;
-                            }
-                        }
-                        match client.upload_finished_match_from_rows(&rows) {
-                            Ok(Some(match_id)) => {
-                                mark_end_board_uploaded(&state, &match_id);
-                                emit(format!(
-                                    r#"{{"type":"nettable_end_board_saved","backend":"rust","match_id":{},"at":{}}}"#,
-                                    json_string(&match_id),
-                                    json_string(&now_iso_utc())
-                                ));
-                            }
-                            Ok(None) => emit(format!(
-                                r#"{{"type":"nettable_end_board_saved","backend":"rust","at":{}}}"#,
-                                json_string(&now_iso_utc())
-                            )),
-                            Err(err) => emit(format!(
-                                r#"{{"type":"nettable_ingest_error","backend":"rust","error":{},"at":{}}}"#,
-                                json_string(&format!("post-game end_board upload failed: {err}")),
-                                json_string(&now_iso_utc())
-                            )),
-                        }
-                    } else {
-                        emit(format!(
-                            r#"{{"type":"nettable_ingest_error","backend":"rust","error":{},"at":{}}}"#,
-                            json_string(
-                                "post-game end_board upload failed: Supabase is not configured"
-                            ),
-                            json_string(&now_iso_utc())
-                        ));
-                    }
-                    return;
-                }
-            }
-
             let rows = state
                 .lock()
                 .map(|state| state.latest_rows.clone())
@@ -865,21 +815,24 @@ mod tests {
             let mut state = state.lock().unwrap();
             for round in 1..=41 {
                 for poll in 0..8 {
-                    store_session_dump(&mut state, SessionDump {
-                        captured_at: format!("2026-06-08T00:{round:02}:{poll:02}Z"),
-                        rows: rows_from_json(vec![
-                            (
-                                "CustomNetTable_game_info",
-                                "round_info",
-                                serde_json::json!({"round": round}),
-                            ),
-                            (
-                                "CustomNetTable_player_info_table",
-                                "player_info",
-                                serde_json::json!({"data": {"76561198022169086": {"hp": 100 - round, "hero_level": 5, "curr_rank": 1}}}),
-                            ),
-                        ]),
-                    });
+                    store_session_dump(
+                        &mut state,
+                        SessionDump {
+                            captured_at: format!("2026-06-08T00:{round:02}:{poll:02}Z"),
+                            rows: rows_from_json(vec![
+                                (
+                                    "CustomNetTable_game_info",
+                                    "round_info",
+                                    serde_json::json!({"round": round}),
+                                ),
+                                (
+                                    "CustomNetTable_player_info_table",
+                                    "player_info",
+                                    serde_json::json!({"data": {"76561198022169086": {"hp": 100 - round, "hero_level": 5, "curr_rank": 1}}}),
+                                ),
+                            ]),
+                        },
+                    );
                 }
             }
         }
@@ -890,7 +843,10 @@ mod tests {
         assert_eq!(timeline["first_round"], 1);
         assert_eq!(timeline["last_round"], 41);
         assert_eq!(timeline["rounds"][0]["captured_at"], "2026-06-08T00:01:00Z");
-        assert_eq!(timeline["rounds"][40]["captured_at"], "2026-06-08T00:41:00Z");
+        assert_eq!(
+            timeline["rounds"][40]["captured_at"],
+            "2026-06-08T00:41:00Z"
+        );
     }
 
     #[test]
@@ -904,21 +860,24 @@ mod tests {
         {
             let mut state = state.lock().unwrap();
             for round in 1..=90 {
-                store_session_dump(&mut state, SessionDump {
-                    captured_at: format!("2026-06-08T00:{round:02}:00Z"),
-                    rows: rows_from_json(vec![
-                        (
-                            "CustomNetTable_game_info",
-                            "round_info",
-                            serde_json::json!({"round": round}),
-                        ),
-                        (
-                            "CustomNetTable_player_info_table",
-                            "player_info",
-                            serde_json::json!({"data": {"76561198022169086": {"hp": 100 - round, "hero_level": 5, "curr_rank": 1}}}),
-                        ),
-                    ]),
-                });
+                store_session_dump(
+                    &mut state,
+                    SessionDump {
+                        captured_at: format!("2026-06-08T00:{round:02}:00Z"),
+                        rows: rows_from_json(vec![
+                            (
+                                "CustomNetTable_game_info",
+                                "round_info",
+                                serde_json::json!({"round": round}),
+                            ),
+                            (
+                                "CustomNetTable_player_info_table",
+                                "player_info",
+                                serde_json::json!({"data": {"76561198022169086": {"hp": 100 - round, "hero_level": 5, "curr_rank": 1}}}),
+                            ),
+                        ]),
+                    },
+                );
             }
         }
 
@@ -1151,10 +1110,13 @@ fn handle_rows_for_parity(state: &Arc<Mutex<NettableState>>, rows: &[NettableRow
         events.push(event);
     }
 
-    store_session_dump(&mut state, SessionDump {
-        captured_at: now,
-        rows: rows.to_vec(),
-    });
+    store_session_dump(
+        &mut state,
+        SessionDump {
+            captured_at: now,
+            rows: rows.to_vec(),
+        },
+    );
     events
 }
 
@@ -1779,10 +1741,19 @@ fn maybe_fire_dump_hotkeys<F>(
 ) where
     F: Fn(String) + Send + Sync + 'static,
 {
-    let capture_owner = local_is_capture_owner(state);
-    if state.lock().map(|state| state.paused).unwrap_or(true) {
+    let (paused, in_match) = state
+        .lock()
+        .map(|state| {
+            (
+                state.paused,
+                state.last_ui_state.as_deref() == Some(DOTA_INGAME_STATE),
+            )
+        })
+        .unwrap_or((true, false));
+    if paused || !in_match {
         return;
     }
+    let capture_owner = local_is_capture_owner(state);
 
     let now = Instant::now();
     if now.duration_since(*last_game_info_fire) >= Duration::from_secs(3) {
@@ -1826,11 +1797,6 @@ where
     }
 }
 
-fn rows_have_end_board(rows: &[NettableRow]) -> bool {
-    rows.iter()
-        .any(|row| row.table_name == "CustomNetTable_dac_table" && row.key == "end_board")
-}
-
 fn end_board_already_uploaded(state: &Arc<Mutex<NettableState>>, match_id: &str) -> bool {
     state
         .lock()
@@ -1854,6 +1820,31 @@ fn finalize_without_end_board(
         return Ok(None);
     };
     client.upsert_fallback_finished_match(rows, "post_game_no_end_board")
+}
+
+fn emit_fallback_finalize<F>(cfg: &Config, rows: &[NettableRow], emit: &Arc<F>, message: &str)
+where
+    F: Fn(String) + Send + Sync + 'static,
+{
+    match finalize_without_end_board(cfg, rows) {
+        Ok(Some(match_id)) => emit(format!(
+            r#"{{"type":"nettable_game_ended","backend":"rust","message":{},"match_id":{},"at":{}}}"#,
+            json_string(message),
+            json_string(&match_id),
+            json_string(&now_iso_utc())
+        )),
+        Ok(None) => emit(format!(
+            r#"{{"type":"nettable_game_ended","backend":"rust","message":{},"at":{}}}"#,
+            json_string("End-board upload failed, and there was no usable live snapshot to save."),
+            json_string(&now_iso_utc())
+        )),
+        Err(err) => emit(format!(
+            r#"{{"type":"nettable_ingest_error","error":{}}}"#,
+            json_string(&format!(
+                "fallback finalize after end-board failure failed: {err}"
+            ))
+        )),
+    }
 }
 
 /// The Dota UI state string for "in a match" (note: not `..._STATE_INGAME`).
@@ -1911,7 +1902,7 @@ where
     if let Some(client) = SupabaseClient::from_config(cfg) {
         if let Some(match_id) = finished_match_id_from_rows(&rows) {
             if end_board_already_uploaded(state, &match_id)
-                || client.finished_match_exists(&match_id)
+                || client.finished_match_has_players(&match_id)
             {
                 mark_end_board_uploaded(state, &match_id);
                 return;
