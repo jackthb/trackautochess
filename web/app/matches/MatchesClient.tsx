@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { playerProfilePath } from "@/lib/steam";
+import { listAvatarUrl, playerProfilePath } from "@/lib/steam";
 import { createSupabaseClient } from "@/lib/supabase";
 import { useBetaFeaturesAccess } from "@/lib/betaFeatures";
 import { PageLayout } from "@/components/PageLayout";
@@ -184,7 +184,7 @@ export function MatchesClient() {
                         {winner?.avatarUrl ? (
                           <img
                             className={styles.avatar}
-                            src={winner.avatarUrl}
+                            src={listAvatarUrl(winner.avatarUrl)}
                             alt=""
                             width={28}
                             height={28}

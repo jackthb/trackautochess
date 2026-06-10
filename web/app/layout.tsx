@@ -43,6 +43,15 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           type="font/woff2"
           crossOrigin="anonymous"
         />
+        {/* Nav brand + page headings use the 400–600 variable face on every
+            page; without a preload it isn't discovered until CSS parses. */}
+        <link
+          rel="preload"
+          href="/fonts/Cinzel-wght.woff2"
+          as="font"
+          type="font/woff2"
+          crossOrigin="anonymous"
+        />
       </head>
       <body>
         <AppChrome>{children}</AppChrome>

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { cache } from "react";
+import { after } from "next/server";
 import { notFound, redirect } from "next/navigation";
 import type { PlayerGame } from "@dac/shared/types";
 import type { SeasonSnapshot } from "@dac/shared/SeasonHistoryGrid";
@@ -155,6 +156,7 @@ const loadPlayer = cache(async (rawSteamId: string): Promise<LoadResult> => {
   let seasons: SeasonSnapshot[] = [];
   let mmrHistory: MmrSnapshot[] = [];
   let queenRankHistory: QueenRankSnapshot[] = [];
+  let gamesRows: Record<string, unknown>[] = [];
   let shouldRefreshDrodo = false;
   let hotProfilePoll = false;
   if (supabase) {
@@ -166,7 +168,7 @@ const loadPlayer = cache(async (rawSteamId: string): Promise<LoadResult> => {
           .filter("steam_id", "eq", steamId)
           .maybeSingle<CachedUserDrodoRow>();
 
-    const [profileResult, seasonsResult, snapshotsResult] = await Promise.all([
+    const [profileResult, seasonsResult, snapshotsResult, gamesResult] = await Promise.all([
       profilePromise,
       supabase
         .from("player_seasons")
@@ -180,7 +182,14 @@ const loadPlayer = cache(async (rawSteamId: string): Promise<LoadResult> => {
         .not("mmr", "is", null)
         .order("snapshotted_at", { ascending: false })
         .limit(60),
+      supabase
+        .from("match_players")
+        .select("*, steam_id::text")
+        .filter("steam_id", "eq", steamId)
+        .order("played_at", { ascending: false })
+        .limit(100),
     ]);
+    gamesRows = (gamesResult.data as Record<string, unknown>[]) ?? [];
     cachedProfileRow = profileResult.data ?? null;
     mmrHistory = (snapshotsResult.data ?? []).map((row) => ({
       mmr: row.mmr as number | null,
@@ -270,27 +279,33 @@ const loadPlayer = cache(async (rawSteamId: string): Promise<LoadResult> => {
     }
   }
 
+  // A cached display name is enough to render the page. Blocking on the Steam
+  // community XML fetch just to fill a missing avatar or discover a vanity URL
+  // added ~0.5–2s to cold renders — and players with no vanity URL can never
+  // satisfy requireCustomUrl from cache, so their numeric pages paid the fetch
+  // on every revalidation. Refresh those fields after the response is sent;
+  // the next render (and its id→vanity redirect) picks them up from the cache.
   const profileRequirements = {
     requireAvatar: true,
     requireCustomUrl: /^\d+$/.test(rawSteamId),
   };
-  const steamProfile =
-    cachedSteamProfile(cachedProfileRow, profileRequirements) ??
-    (await fetchSteamProfile(steamId, supabase ?? undefined, {
+  let steamProfile = cachedSteamProfile(cachedProfileRow, {
+    requireAvatar: false,
+    requireCustomUrl: false,
+  });
+  if (!steamProfile?.name && !steamProfile?.customUrl) {
+    steamProfile = await fetchSteamProfile(steamId, supabase ?? undefined, {
       persist: true,
       ...profileRequirements,
-    }));
-
-  const gamesPromise = supabase
-    ? supabase
-        .from("match_players")
-        .select("*, steam_id::text")
-        .filter("steam_id", "eq", steamId)
-        .order("played_at", { ascending: false })
-        .limit(100)
-    : Promise.resolve({ data: [] as PlayerGame[] });
-
-  const gamesResult = await gamesPromise;
+    });
+  } else if (!cachedSteamProfile(cachedProfileRow, profileRequirements)) {
+    after(() =>
+      fetchSteamProfile(steamId, supabase ?? undefined, {
+        persist: true,
+        ...profileRequirements,
+      }).catch(() => {})
+    );
+  }
 
   if (
     steamProfile.customUrl &&
@@ -304,7 +319,7 @@ const loadPlayer = cache(async (rawSteamId: string): Promise<LoadResult> => {
   }
 
   // Map match_players rows → Game shape with legacy aliases for rendering.
-  const games: PlayerGame[] = ((gamesResult.data as Record<string, unknown>[]) || []).map(
+  const games: PlayerGame[] = gamesRows.map(
     (row) => ({
       ...row,
       user_id: String(row.steam_id),
@@ -353,7 +368,25 @@ interface PageProps {
 }
 
 export async function generateStaticParams() {
-  return [];
+  // Hourly patch-note commits redeploy the site, and each deploy wipes the
+  // ISR cache — every player page restarts cold. Prerender the top ladder at
+  // build time so the most-visited profiles are warm immediately after each
+  // deploy; everyone else stays on-demand.
+  const supabase = createSupabaseServerClient();
+  if (!supabase) return [];
+
+  const { data } = await supabase
+    .from("users")
+    .select("steam_id::text, custom_url")
+    .not("drodo_mmr", "is", null)
+    .not("drodo_last_fetched_at", "is", null)
+    .eq("drodo_profile_missing", false)
+    .order("drodo_mmr", { ascending: false })
+    .limit(100);
+
+  return (data ?? []).map((row) => ({
+    steamId: String(row.custom_url || row.steam_id),
+  }));
 }
 
 export async function generateMetadata({

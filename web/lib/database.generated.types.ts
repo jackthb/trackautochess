@@ -418,6 +418,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      auth_user_id_by_email: { Args: { p_email: string }; Returns: string }
       show_limit: { Args: never; Returns: number }
       show_trgm: { Args: { "": string }; Returns: string[] }
     }

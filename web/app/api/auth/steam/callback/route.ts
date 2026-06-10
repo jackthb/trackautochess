@@ -1,8 +1,10 @@
 import { NextResponse } from "next/server";
+import { after } from "next/server";
 import { captureServerEvent } from "@/lib/posthogServer";
 import { createSupabaseServiceRoleClientOrThrow } from "@/lib/supabase";
 import {
   fetchSteamProfileFromApi,
+  playerProfilePath,
   upsertSteamUser,
 } from "@/lib/steam";
 import { parseSteamId64, type SteamId64 } from "@dac/shared/steam";
@@ -36,27 +38,44 @@ async function verifySteamAssertion(
 
 export async function GET(req: Request) {
   const url = new URL(req.url);
-  const fail = async (error: string, steamId?: string | null) => {
+  const fail = (error: string, steamId?: string | null) => {
     if (steamId) {
-      await captureServerEvent("Steam Sign In Failed", steamId, {
-        source: "steam_auth_callback",
-        reason: error,
-      });
+      after(() =>
+        captureServerEvent("Steam Sign In Failed", steamId, {
+          source: "steam_auth_callback",
+          reason: error,
+        })
+      );
     }
 
     return NextResponse.redirect(new URL(`/?error=${error}`, req.url));
   };
+
+  // The profile fetch only reads public data keyed by the (still unverified)
+  // claimed id, so it can overlap the OpenID verification round trip; the
+  // result is used only after verification confirms the same id.
+  const claimedMatch = (url.searchParams.get("openid.claimed_id") || "").match(
+    /\/id\/(\d+)$/
+  );
+  const claimedSteamId = claimedMatch ? parseSteamId64(claimedMatch[1]) : null;
+  const profilePromise = claimedSteamId
+    ? fetchSteamProfileFromApi(claimedSteamId).catch(() => null)
+    : null;
 
   const steamId = await verifySteamAssertion(url.searchParams);
   if (!steamId) {
     return fail("steam_auth_failed");
   }
 
-  await captureServerEvent("Steam Sign In Callback Verified", steamId, {
-    source: "steam_auth_callback",
-  });
+  after(() =>
+    captureServerEvent("Steam Sign In Callback Verified", steamId, {
+      source: "steam_auth_callback",
+    })
+  );
 
-  const steamProfile = await fetchSteamProfileFromApi(steamId);
+  const steamProfile =
+    (steamId === claimedSteamId ? await profilePromise : null) ??
+    (await fetchSteamProfileFromApi(steamId));
   const steamName = steamProfile.name || steamId;
 
   const supabaseAdmin = createSupabaseServiceRoleClientOrThrow();
@@ -64,26 +83,28 @@ export async function GET(req: Request) {
   const email = `${steamId}@steam.local`;
   console.log("Steam verified:", steamId, steamName);
 
-  // Persist Steam display name in the public users table
-  await upsertSteamUser(steamId, supabaseAdmin, {
-    name: steamName === steamId ? null : steamName,
-    customUrl: steamProfile.customUrl,
-    avatarUrl: steamProfile.avatarUrl,
-    steamSignedInAt: new Date().toISOString(),
-  });
-
-  // Find or create user
-  const { data: users, error: listError } =
-    await supabaseAdmin.auth.admin.listUsers();
-  if (listError) {
-    console.error("Failed to list users:", listError.message);
-    return fail("list_users_failed", steamId);
+  // The public users upsert and the auth user lookup are independent. Auth
+  // accounts are keyed by the synthetic email, so a SQL helper resolves the
+  // user id directly instead of scanning auth.admin.listUsers pages (the old
+  // page-1-only scan broke sign-in once the project outgrew 50 accounts).
+  const [, lookup] = await Promise.all([
+    upsertSteamUser(steamId, supabaseAdmin, {
+      name: steamName === steamId ? null : steamName,
+      customUrl: steamProfile.customUrl,
+      avatarUrl: steamProfile.avatarUrl,
+      steamSignedInAt: new Date().toISOString(),
+    }),
+    supabaseAdmin.rpc("auth_user_id_by_email", { p_email: email }),
+  ]);
+  if (lookup.error) {
+    console.error("Failed to look up auth user:", lookup.error.message);
+    return fail("user_lookup_failed", steamId);
   }
-  const existingUser = users?.users?.find((u) => u.email === email);
-  let user = existingUser;
-  console.log("Existing user:", user?.id || "none");
+  const existingUserId = lookup.data ?? null;
+  let userId = existingUserId;
+  console.log("Existing user:", userId || "none");
 
-  if (!user) {
+  if (!userId) {
     const { data, error } = await supabaseAdmin.auth.admin.createUser({
       email,
       email_confirm: true,
@@ -99,17 +120,20 @@ export async function GET(req: Request) {
       console.error("Failed to create user:", error.message);
       return fail("user_creation_failed", steamId);
     }
-    user = data.user;
-    await captureServerEvent("user_signed_up", steamId, {
-      source: "steam_auth",
-      steam_id: steamId,
-      steam_name: steamName,
-      custom_url: steamProfile.customUrl,
-      avatar_url: steamProfile.avatarUrl,
-      user_id: user.id,
-    });
+    userId = data.user.id;
+    const createdUserId = userId;
+    after(() =>
+      captureServerEvent("user_signed_up", steamId, {
+        source: "steam_auth",
+        steam_id: steamId,
+        steam_name: steamName,
+        custom_url: steamProfile.customUrl,
+        avatar_url: steamProfile.avatarUrl,
+        user_id: createdUserId,
+      })
+    );
   } else {
-    await supabaseAdmin.auth.admin.updateUserById(user.id, {
+    await supabaseAdmin.auth.admin.updateUserById(userId, {
       user_metadata: {
         steam_id: steamId,
         steam_name: steamName,
@@ -161,16 +185,22 @@ export async function GET(req: Request) {
     return fail("session_failed", steamId);
   }
 
-  await captureServerEvent("Steam Sign In Completed", steamId, {
-    source: "steam_auth_callback",
-    user_created: !existingUser,
-    has_custom_url: Boolean(steamProfile.customUrl),
-    has_avatar: Boolean(steamProfile.avatarUrl),
-    user_id: user.id,
-  });
+  const finalUserId = userId;
+  after(() =>
+    captureServerEvent("Steam Sign In Completed", steamId, {
+      source: "steam_auth_callback",
+      user_created: !existingUserId,
+      has_custom_url: Boolean(steamProfile.customUrl),
+      has_avatar: Boolean(steamProfile.avatarUrl),
+      user_id: finalUserId,
+    })
+  );
 
-  // Redirect with tokens in hash fragment — Supabase JS client picks these up
-  // automatically via onAuthStateChange.
+  // Redirect with tokens in hash fragment — the shared Supabase client that
+  // AppChrome creates on every page picks these up via detectSessionInUrl.
+  // Land directly on the player profile instead of bouncing through the
+  // /dashboard client redirect, which cost a full document load plus an auth
+  // round trip before showing any content.
   const proto = req.headers.get("x-forwarded-proto") || "http";
   const host =
     req.headers.get("x-forwarded-host") || req.headers.get("host") || "localhost:3000";
@@ -183,5 +213,7 @@ export async function GET(req: Request) {
     type: "magiclink",
   }).toString();
 
-  return NextResponse.redirect(`${origin}/dashboard#${hash}`);
+  return NextResponse.redirect(
+    `${origin}${playerProfilePath(steamId, steamProfile.customUrl)}#${hash}`
+  );
 }

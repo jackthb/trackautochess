@@ -3,7 +3,7 @@ import Link from "next/link";
 import { PageLayout } from "@/components/PageLayout";
 import { SITE_NAME, SITE_TITLE } from "@/lib/site";
 import { createSupabaseServerClient } from "@/lib/supabase";
-import { playerProfilePath } from "@/lib/steam";
+import { listAvatarUrl, playerProfilePath } from "@/lib/steam";
 import styles from "../leaderboard/leaderboard.module.css";
 import { LastSyncedTime } from "./LastSyncedTime";
 
@@ -403,11 +403,12 @@ export default async function QueensPage() {
                     {row.avatar_url ? (
                       <img
                         className={styles.avatar}
-                        src={row.avatar_url}
+                        src={listAvatarUrl(row.avatar_url)}
                         alt=""
                         width={32}
                         height={32}
                         referrerPolicy="no-referrer"
+                        loading={index < 20 ? undefined : "lazy"}
                       />
                     ) : (
                       <div className={`${styles.avatar} ${styles["avatar-fallback"]}`}>

@@ -232,6 +232,23 @@ export function playerProfilePath(
 }
 
 /**
+ * Stored avatar URLs are the 184×184 `_full.jpg` variant, but list rows render
+ * at 28–32px, where the 64×64 `_medium.jpg` variant is sharp even at 2× DPR at
+ * a fraction of the bytes. Steam serves the same hash path from the legacy
+ * avatars.{akamai,fastly}.steamstatic.com hosts and the canonical
+ * avatars.steamstatic.com; normalizing to the canonical host lets a page of
+ * avatars share one connection (and the layout's existing preconnect).
+ */
+export function listAvatarUrl(url: string): string {
+  return url
+    .replace(
+      /^https:\/\/avatars\.(?:akamai|fastly)\.steamstatic\.com\//,
+      "https://avatars.steamstatic.com/"
+    )
+    .replace(/_full(\.[a-z]+)$/, "_medium$1");
+}
+
+/**
  * Resolve a vanity URL slug (e.g. "agit142" from steamcommunity.com/id/agit142)
  * to a numeric SteamID64. Steam is the authority for vanity URLs; cached
  * custom_url rows can go stale when users rename or transfer vanity slugs.

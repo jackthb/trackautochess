@@ -4,7 +4,7 @@ import { PageLayout } from "@/components/PageLayout";
 import { levelToRankName, mmrToLevel } from "@/lib/ranks";
 import { SITE_TITLE } from "@/lib/site";
 import { createSupabaseServerClient } from "@/lib/supabase";
-import { playerProfilePath } from "@/lib/steam";
+import { listAvatarUrl, playerProfilePath } from "@/lib/steam";
 import styles from "./leaderboard.module.css";
 
 interface LeaderboardRow {
@@ -162,7 +162,7 @@ export default async function LeaderboardPage() {
                   {row.avatar_url ? (
                     <img
                       className={styles.avatar}
-                      src={row.avatar_url}
+                      src={listAvatarUrl(row.avatar_url)}
                       alt=""
                       width={32}
                       height={32}

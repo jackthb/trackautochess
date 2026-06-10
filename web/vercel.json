@@ -1,3 +1,4 @@
 {
-  "ignoreCommand": "node scripts/ignore-build.mjs"
+  "ignoreCommand": "node scripts/ignore-build.mjs",
+  "regions": ["dub1"]
 }
