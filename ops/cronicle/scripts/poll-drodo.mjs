@@ -1,16 +1,13 @@
 #!/usr/bin/env node
 
 import {
-  DRODO_BASE,
-  DRODO_COURIER_BATCH_SIZE,
-  EMPTY_DRODO_PROFILE_ERROR,
-  buildDrodoProfile,
+  fetchDrodoProfileBatch,
   drodoProfileToUserPayload,
-  hasDrodoStats,
   isQueenProfile,
   nextPollSchedule,
   pollSnapshotFromRow,
   profileChanged,
+  summarizeDrodoResults,
 } from "../../../shared/drodo-core.mjs";
 
 const DEFAULT_BATCH_SIZE = 200;
@@ -262,92 +259,15 @@ async function persistDrodoProfile(profile, seasonRows, supabase, options) {
 }
 
 async function fetchAndCacheDrodoBatch(steamIds, supabase, options = {}) {
-  const ids = [...new Set(steamIds.map(String).filter(Boolean))];
-  if (ids.length === 0) return [];
-
-  if (ids.length > DRODO_COURIER_BATCH_SIZE) {
-    const results = [];
-    for (let i = 0; i < ids.length; i += DRODO_COURIER_BATCH_SIZE) {
-      results.push(
-        ...(await fetchAndCacheDrodoBatch(ids.slice(i, i + DRODO_COURIER_BATCH_SIZE), supabase, options))
-      );
-    }
-    return results;
-  }
-
-  const pollMode = options.pollMode ?? "reset";
-  const prevSnapshots = pollMode === "adaptive" ? await loadPollSnapshots(ids, supabase) : new Map();
-
-  let payload;
-  try {
-    const response = await fetch(`${DRODO_BASE}/courier/get/@${ids.join(",")}`);
-    if (!response.ok) {
-      return ids.map((steamId) => ({
-        steam_id: steamId,
-        ok: false,
-        kind: "upstream_error",
-        status: response.status,
-        error: "Drodo API error",
-      }));
-    }
-    payload = await response.json();
-  } catch {
-    return ids.map((steamId) => ({
-      steam_id: steamId,
-      ok: false,
-      kind: "upstream_error",
-      error: "Failed to reach Drodo API",
-    }));
-  }
-
-  const results = [];
-  for (const steamId of ids) {
-    const drodoData = payload.user_info?.[steamId];
-    if (payload.err !== 0 || !drodoData) {
-      const fetchedAt = await markDrodoMissing(steamId, supabase);
-      results.push({
-        steam_id: steamId,
-        ok: false,
-        kind: "missing",
-        error: "Player not found on Drodo",
-        fetchedAt,
-      });
-      continue;
-    }
-
-    const { profile, seasonRows } = buildDrodoProfile(steamId, drodoData);
-    if (!hasDrodoStats(profile, seasonRows)) {
-      const fetchedAt = await markDrodoMissing(steamId, supabase);
-      results.push({
-        steam_id: steamId,
-        ok: false,
-        kind: "missing",
-        error: EMPTY_DRODO_PROFILE_ERROR,
-        fetchedAt,
-      });
-      continue;
-    }
-
-    await persistDrodoProfile(profile, seasonRows, supabase, {
-      snapshotOnSuccess: options.snapshotOnSuccess,
-      pollMode,
-      hotPoll: options.hotPoll,
-      prevSnapshot: prevSnapshots.get(steamId) ?? null,
-    });
-    results.push({ steam_id: steamId, ok: true, profile, seasonRows });
-  }
-  return results;
-}
-
-function summarize(results) {
-  return results.reduce(
-    (summary, result) => {
-      if (result.ok) summary.ok += 1;
-      else if (result.kind === "missing") summary.missing += 1;
-      else summary.upstream_error += 1;
-      return summary;
+  return fetchDrodoProfileBatch(
+    steamIds,
+    {
+      loadPollSnapshots: (ids) => loadPollSnapshots(ids, supabase),
+      markMissing: (steamId) => markDrodoMissing(steamId, supabase),
+      persistProfile: (profile, seasonRows, persistOptions) =>
+        persistDrodoProfile(profile, seasonRows, supabase, persistOptions),
     },
-    { ok: 0, missing: 0, upstream_error: 0 }
+    options
   );
 }
 
@@ -407,7 +327,7 @@ async function main() {
     finished_at: new Date().toISOString(),
     polled: results.length,
     seeded,
-    ...summarize(results),
+    ...summarizeDrodoResults(results),
   };
   console.log(JSON.stringify(output, null, 2));
   await pingHealthcheck("", output);

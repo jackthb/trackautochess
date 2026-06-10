@@ -14,14 +14,17 @@ import {
   currentSeason as currentSeasonValue,
   drodoProfileToUserPayload as drodoProfileToUserPayloadValue,
   extractAllSeasons as extractAllSeasonsValue,
+  fetchDrodoProfileBatch as fetchDrodoProfileBatchValue,
   hasDrodoStats as hasDrodoStatsValue,
   isQueenProfile as isQueenProfileValue,
   lastTop3FromDrodoData as lastTop3FromDrodoDataValue,
   lastWinFromDrodoData as lastWinFromDrodoDataValue,
   nextPollSchedule as nextPollScheduleValue,
+  normalizeDrodoSteamIds as normalizeDrodoSteamIdsValue,
   numberFromDrodoData as numberFromDrodoDataValue,
   pollSnapshotFromRow as pollSnapshotFromRowValue,
   profileChanged as profileChangedValue,
+  summarizeDrodoResults as summarizeDrodoResultsValue,
   valueFromDrodoData as valueFromDrodoDataValue,
 } from "./drodo-core.mjs";
 
@@ -97,6 +100,52 @@ export type DrodoUserPayload = {
   drodo_profile_missing: false;
 };
 
+export type FetchDrodoResult =
+  | {
+      ok: true;
+      profile: DrodoProfileRow;
+      seasonRows: SeasonSnapshotRow[];
+    }
+  | {
+      ok: false;
+      kind: "upstream_error" | "missing";
+      status?: number;
+      error: string;
+      fetchedAt?: string;
+    };
+
+export type FetchDrodoBatchResult = FetchDrodoResult & { steam_id: string };
+
+export interface FetchDrodoBatchOptions {
+  snapshotOnSuccess?: boolean;
+  pollMode?: "adaptive" | "reset";
+  hotPoll?: boolean;
+}
+
+export interface DrodoPersistProfileOptions {
+  snapshotOnSuccess?: boolean;
+  pollMode: "adaptive" | "reset";
+  hotPoll?: boolean;
+  prevSnapshot?: PollSnapshot | null;
+}
+
+export interface DrodoBatchAdapter {
+  fetch?: typeof fetch;
+  loadPollSnapshots?: (steamIds: string[]) => Promise<Map<string, PollSnapshot>>;
+  markMissing: (steamId: string) => Promise<string>;
+  persistProfile: (
+    profile: DrodoProfileRow,
+    seasonRows: SeasonSnapshotRow[],
+    options: DrodoPersistProfileOptions
+  ) => Promise<void>;
+}
+
+export interface DrodoResultsSummary {
+  ok: number;
+  missing: number;
+  upstream_error: number;
+}
+
 export const currentSeason: (data: Record<string, unknown>) => string | null =
   currentSeasonValue;
 
@@ -171,3 +220,16 @@ export const profileChanged: (
   prev: PollSnapshot | null,
   next: DrodoProfileRow
 ) => boolean = profileChangedValue;
+
+export const normalizeDrodoSteamIds: (steamIds: unknown[]) => string[] =
+  normalizeDrodoSteamIdsValue;
+
+export const fetchDrodoProfileBatch: (
+  steamIds: string[],
+  adapter: DrodoBatchAdapter,
+  options?: FetchDrodoBatchOptions
+) => Promise<FetchDrodoBatchResult[]> = fetchDrodoProfileBatchValue;
+
+export const summarizeDrodoResults: (
+  results: FetchDrodoBatchResult[]
+) => DrodoResultsSummary = summarizeDrodoResultsValue;

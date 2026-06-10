@@ -206,3 +206,109 @@ export function profileChanged(prev, next) {
     prev.queen_rank !== next.queen_rank
   );
 }
+
+export function normalizeDrodoSteamIds(steamIds) {
+  return [...new Set(steamIds.map(String).filter(Boolean))];
+}
+
+function upstreamErrorResults(ids, error) {
+  return ids.map((steamId) => ({
+    steam_id: steamId,
+    ok: false,
+    kind: "upstream_error",
+    ...error,
+  }));
+}
+
+export async function fetchDrodoProfileBatch(steamIds, adapter, options = {}) {
+  const ids = normalizeDrodoSteamIds(steamIds);
+  if (ids.length === 0) return [];
+
+  if (ids.length > DRODO_COURIER_BATCH_SIZE) {
+    const results = [];
+    for (let i = 0; i < ids.length; i += DRODO_COURIER_BATCH_SIZE) {
+      results.push(
+        ...(await fetchDrodoProfileBatch(
+          ids.slice(i, i + DRODO_COURIER_BATCH_SIZE),
+          adapter,
+          options
+        ))
+      );
+    }
+    return results;
+  }
+
+  const pollMode = options.pollMode ?? "reset";
+  const prevSnapshots =
+    pollMode === "adaptive" && adapter.loadPollSnapshots
+      ? await adapter.loadPollSnapshots(ids)
+      : new Map();
+  const fetchImpl = adapter.fetch ?? fetch;
+
+  let payload;
+  try {
+    const response = await fetchImpl(`${DRODO_BASE}/courier/get/@${ids.join(",")}`);
+    if (!response.ok) {
+      return upstreamErrorResults(ids, {
+        status: response.status,
+        error: "Drodo API error",
+      });
+    }
+    payload = await response.json();
+  } catch {
+    return upstreamErrorResults(ids, {
+      error: "Failed to reach Drodo API",
+    });
+  }
+
+  const results = [];
+  for (const steamId of ids) {
+    const drodoData = payload.user_info?.[steamId];
+    if (payload.err !== 0 || !drodoData) {
+      const fetchedAt = await adapter.markMissing(steamId);
+      results.push({
+        steam_id: steamId,
+        ok: false,
+        kind: "missing",
+        error: "Player not found on Drodo",
+        fetchedAt,
+      });
+      continue;
+    }
+
+    const { profile, seasonRows } = buildDrodoProfile(steamId, drodoData);
+    if (!hasDrodoStats(profile, seasonRows)) {
+      const fetchedAt = await adapter.markMissing(steamId);
+      results.push({
+        steam_id: steamId,
+        ok: false,
+        kind: "missing",
+        error: EMPTY_DRODO_PROFILE_ERROR,
+        fetchedAt,
+      });
+      continue;
+    }
+
+    await adapter.persistProfile(profile, seasonRows, {
+      snapshotOnSuccess: options.snapshotOnSuccess,
+      pollMode,
+      hotPoll: options.hotPoll,
+      prevSnapshot: prevSnapshots.get(steamId) ?? null,
+    });
+    results.push({ steam_id: steamId, ok: true, profile, seasonRows });
+  }
+
+  return results;
+}
+
+export function summarizeDrodoResults(results) {
+  return results.reduce(
+    (summary, result) => {
+      if (result.ok) summary.ok += 1;
+      else if (result.kind === "missing") summary.missing += 1;
+      else summary.upstream_error += 1;
+      return summary;
+    },
+    { ok: 0, missing: 0, upstream_error: 0 }
+  );
+}
