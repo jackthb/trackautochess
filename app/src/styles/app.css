@@ -2134,12 +2134,41 @@ video {
   background: linear-gradient(180deg, var(--bg-deep) 0%, var(--bg-surface) 100%);
 }
 
+.nettable-home-empty {
+  flex-shrink: 0;
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-surface);
+  border-radius: var(--r-8);
+  padding: 16px 18px;
+}
+
+.nettable-home-empty-title {
+  font-size: var(--fs-14);
+  font-weight: var(--fw-bold);
+  color: var(--text-primary);
+  margin-bottom: 4px;
+}
+
+.nettable-home-empty-copy {
+  max-width: 680px;
+  font-size: var(--fs-13);
+  line-height: 1.45;
+  color: var(--text-secondary);
+}
+
+.nettable-home-empty-meta {
+  margin-top: 8px;
+  font-size: var(--fs-12);
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
 .nettable-home-grid {
-  flex: 1 1 auto;
-  min-height: 0;
+  flex: 0 0 auto;
+  min-height: auto;
   display: grid;
   grid-template-columns: minmax(280px, 360px) minmax(0, 1fr);
-  grid-template-rows: minmax(0, 1fr);
+  grid-template-rows: auto;
   grid-template-areas:
     "setup state";
   gap: 16px;
@@ -2175,7 +2204,7 @@ video {
   grid-area: state;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+  overflow: visible;
 }
 
 /* Apply-launch-options affordance inside the setup card */
@@ -2327,8 +2356,8 @@ video {
   display: flex;
   flex-direction: column;
   gap: 12px;
-  flex: 1;
-  min-height: 0;
+  flex: 0 0 auto;
+  min-height: auto;
 }
 
 .nettable-state-panel-header {

@@ -67,6 +67,11 @@ export interface NetTableQueenUploadResult {
   at?: string;
 }
 
+export interface NetTableGameEndedState {
+  message?: string;
+  at: string;
+}
+
 export interface NetTableActivityEntry {
   id: number;
   kind: NetTableActivityKind;
@@ -103,6 +108,8 @@ export interface NetTableActivityState {
   queenUpload: NetTableQueenUploadResult | null;
   /** Current progress message during manual Queen upload (null when idle). */
   queenUploadProgress: string | null;
+  /** Most recent match-end signal, used by the home screen after a game finishes. */
+  lastGameEnded: NetTableGameEndedState | null;
 }
 
 const MAX_ENTRIES = 50;
@@ -165,6 +172,7 @@ export function useNetTableEvents(): NetTableActivityState {
   const [resyncProgress, setResyncProgress] = useState<string | null>(null);
   const [queenUpload, setQueenUpload] = useState<NetTableQueenUploadResult | null>(null);
   const [queenUploadProgress, setQueenUploadProgress] = useState<string | null>(null);
+  const [lastGameEnded, setLastGameEnded] = useState<NetTableGameEndedState | null>(null);
   useEffect(() => {
     if (!window.tracker) return;
     let nextId = 1;
@@ -269,6 +277,7 @@ export function useNetTableEvents(): NetTableActivityState {
         case "nettable_rows": {
           const rows = Array.isArray(msg.rows) ? msg.rows : [];
           const tables = tablesFromRows(rows);
+          if (rows.length > 0) setLastGameEnded(null);
           setState(stateFromRows(rows));
           setStateAt(new Date().toISOString());
           push({
@@ -280,6 +289,10 @@ export function useNetTableEvents(): NetTableActivityState {
           break;
         }
         case "nettable_game_ended": {
+          setLastGameEnded({
+            message: msg.message,
+            at: new Date().toISOString(),
+          });
           push({
             kind: "nettable_game_ended",
             title: "Match ended",
@@ -426,5 +439,6 @@ export function useNetTableEvents(): NetTableActivityState {
     resyncProgress,
     queenUpload,
     queenUploadProgress,
+    lastGameEnded,
   };
 }

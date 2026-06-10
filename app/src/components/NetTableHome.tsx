@@ -47,11 +47,20 @@ export function NetTableHome({
     resyncProgress,
     queenUpload,
     queenUploadProgress,
+    lastGameEnded,
   } = netTable;
   // Live debug view — always on for the local player. Renders nothing
   // until a capture lands, so it's harmless before the first dump arrives.
 
   const round = currentRound(state);
+  const hasCaptureData =
+    round != null ||
+    Object.keys(livePlayers).length > 0 ||
+    Object.keys(state).length > 0;
+  const emptyTitle = lastGameEnded ? "Match complete" : "Waiting for a live match";
+  const emptyCopy = lastGameEnded
+    ? lastGameEnded.message || "The last match has ended. Start another lobby to resume live capture."
+    : "Start or join a Dota Auto Chess lobby, then keep Dota open while the tracker captures nettable updates.";
 
   return (
     <div className="nettable-home">
@@ -64,6 +73,18 @@ export function NetTableHome({
         relicsData={relicsData}
         itemsFull={itemsFull}
       />
+
+      {(!hasCaptureData || lastGameEnded) && (
+        <section className="nettable-home-empty" aria-live="polite">
+          <div className="nettable-home-empty-title">{emptyTitle}</div>
+          <div className="nettable-home-empty-copy">{emptyCopy}</div>
+          {lastGameEnded && (
+            <div className="nettable-home-empty-meta">
+              Ended {new Date(lastGameEnded.at).toLocaleTimeString()}
+            </div>
+          )}
+        </section>
+      )}
 
       <div className="nettable-home-grid">
         <div className="nettable-home-setup">
