@@ -6,6 +6,7 @@
   },
   "files": [
     "main.js",
+    "main/**/*",
     "desktop-paths.cjs",
     "preload.js",
     "dist/**/*",
