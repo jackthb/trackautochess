@@ -5,6 +5,8 @@
   "main": "game-utils.ts",
   "types": "game-utils.ts",
   "exports": {
+    "./drodo-core": "./drodo-core.ts",
+    "./drodo-core.mjs": "./drodo-core.mjs",
     "./game-utils": "./game-utils.ts",
     "./buildStatItems": "./buildStatItems.ts",
     "./Button": "./Button.tsx",
