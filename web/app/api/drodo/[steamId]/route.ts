@@ -50,6 +50,14 @@ function revalidatePlayerProfilePaths(
   }
 }
 
+function isCachedQueenProfile(row: CachedUserDrodoRow | null): boolean {
+  if (!row) return false;
+  return Boolean(
+    row.queen_ladder_last_seen_at ||
+      cachedUserToDrodoProfile(row).queen_rank != null
+  );
+}
+
 // Web `Request` headers expose a `Headers` instance; the shared abuse/session
 // helpers expect Node-style `IncomingHttpHeaders`. Build the plain map once and
 // hand the helpers a NextApiRequest-shaped shim so their logic is unchanged.
@@ -117,16 +125,27 @@ async function handle(req: Request, ctx: { params: Promise<{ steamId: string }> 
   const responseHeaders: Record<string, string> = {};
 
   // Manual refreshes are allowed for everyone: signed-in owners get a shorter
-  // cooldown, while anonymous and cross-profile refreshes are daily per profile.
+  // cooldown. Queen profiles use that same priority bucket even when viewed by
+  // someone else, while normal cross-profile refreshes are daily per profile.
   // Admins bypass the quota.
   let refreshQuota: ManualRefreshQuota | undefined;
   if (forceRefresh) {
     const session = await getSessionUser(reqShim, supabase);
     const isOwnProfile = session.steamId === steamId;
     const isAdmin = isAdminSteamId(session.steamId);
-    const refreshCadence: ManualRefreshCadence = isOwnProfile
-      ? "owner"
-      : "public";
+    let cachedProfileRow: CachedUserDrodoRow | null = null;
+    if (supabase && !isOwnProfile) {
+      const { data } = await supabase
+        .from("users")
+        .select(USER_DRODO_SELECT)
+        .filter("steam_id", "eq", steamId)
+        .maybeSingle<CachedUserDrodoRow>();
+      cachedProfileRow = data ?? null;
+    }
+    const refreshCadence: ManualRefreshCadence =
+      isOwnProfile || isCachedQueenProfile(cachedProfileRow)
+        ? "owner"
+        : "public";
 
     if (!isAdmin) {
       const nowMs = Date.now();

@@ -3,6 +3,7 @@ import {
   DRODO_FRESH_TTL_MS,
   DRODO_MISSING_TTL_MS,
   EMPTY_DRODO_PROFILE_ERROR,
+  HOT_POLL_MAX_INTERVAL_SECONDS,
   buildDrodoProfile,
   drodoProfileToUserPayload,
   fetchDrodoProfileBatch,
@@ -27,7 +28,12 @@ import {
  * Drodo returned no data for hold a longer 7-day cooldown so we don't
  * hammer their API for accounts that just don't exist on Auto Chess.
  */
-export { DRODO_FRESH_TTL_MS, DRODO_MISSING_TTL_MS, EMPTY_DRODO_PROFILE_ERROR };
+export {
+  DRODO_FRESH_TTL_MS,
+  DRODO_MISSING_TTL_MS,
+  EMPTY_DRODO_PROFILE_ERROR,
+  HOT_POLL_MAX_INTERVAL_SECONDS,
+};
 export {
   buildDrodoProfile,
   drodoProfileToUserPayload,
@@ -49,6 +55,7 @@ export interface CachedUserDrodoRow {
   drodo_chicken_count: number | null;
   drodo_raw_data: Record<string, unknown> | null;
   drodo_last_fetched_at: string | null;
+  queen_ladder_last_seen_at: string | null;
   drodo_profile_missing: boolean | null;
 }
 
@@ -63,6 +70,7 @@ export const USER_DRODO_SELECT = [
   "drodo_chicken_count",
   "drodo_raw_data",
   "drodo_last_fetched_at",
+  "queen_ladder_last_seen_at",
   "drodo_profile_missing",
 ].join(", ");
 

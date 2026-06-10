@@ -304,9 +304,11 @@ export default function PlayerView({
 
   const isAdmin = isAdminSteamId(sessionSteamId);
   const isOwnProfile = sessionSteamId !== null && sessionSteamId === steamId;
+  const isPriorityProfile =
+    drodo?.queen_rank != null || queenRankHistory.length > 0;
   const canViewHistory = authReady && sessionSteamId !== null;
   const refreshCadence: ManualRefreshCadence =
-    isAdmin || isOwnProfile ? "owner" : "public";
+    isAdmin || isOwnProfile || isPriorityProfile ? "owner" : "public";
   const canRefresh = authReady;
   const displayName = steamProfile.name || steamProfile.customUrl || steamId;
   const profileUrl = steamProfileUrl(steamId, steamProfile.customUrl);
@@ -395,7 +397,11 @@ export default function PlayerView({
   const refreshQuotaLabel = `${effectiveManualRefreshQuota.remaining}/${effectiveManualRefreshQuota.limit}`;
   const refreshQuotaResetLabel = formatRefreshReset(effectiveManualRefreshQuota, nowMs);
   const refreshQuotaTitle =
-    refreshCadence === "owner" ? "Your refreshes" : "Daily profile refresh";
+    refreshCadence === "owner"
+      ? isOwnProfile
+        ? "Your refreshes"
+        : "Priority refreshes"
+      : "Daily profile refresh";
 
   const handleRefresh = async () => {
     if (!canRefresh) {

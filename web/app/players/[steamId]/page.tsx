@@ -9,7 +9,9 @@ import type { QueenRankSnapshot } from "@/components/QueenRankSparkline";
 import { absoluteUrl, getSiteUrl } from "@/lib/site";
 import { getManualRefreshQuota } from "@/lib/manualRefreshQuota";
 import {
+  HOT_POLL_MAX_INTERVAL_SECONDS,
   fetchAndCacheDrodo,
+  isFreshCache,
   lastTop3FromDrodoData,
   lastWinFromDrodoData,
   type DrodoProfileRow,
@@ -92,6 +94,20 @@ function mostRecentTimestamp(
   return latestValue;
 }
 
+function isCachedQueenProfile(row: CachedUserDrodoRow | null): boolean {
+  return Boolean(
+    row?.queen_ladder_last_seen_at ||
+      numberFromRawData(row?.drodo_raw_data, "queen_rank") != null
+  );
+}
+
+function isHotCacheFresh(fetchedAt: string | null | undefined): boolean {
+  if (!fetchedAt) return false;
+  const fetchedTime = new Date(fetchedAt).getTime();
+  if (!Number.isFinite(fetchedTime)) return false;
+  return Date.now() - fetchedTime < HOT_POLL_MAX_INTERVAL_SECONDS * 1000;
+}
+
 /** Cached per request so generateMetadata and the page render share data. */
 const loadPlayer = cache(async (rawSteamId: string): Promise<LoadResult> => {
   if (!rawSteamId || typeof rawSteamId !== "string") {
@@ -126,7 +142,7 @@ const loadPlayer = cache(async (rawSteamId: string): Promise<LoadResult> => {
     };
   }
 
-  const manualRefreshQuota = getManualRefreshQuota(undefined, Date.now(), {
+  let manualRefreshQuota = getManualRefreshQuota(undefined, Date.now(), {
     cadence: "public",
     target: steamId,
   });
@@ -139,6 +155,8 @@ const loadPlayer = cache(async (rawSteamId: string): Promise<LoadResult> => {
   let seasons: SeasonSnapshot[] = [];
   let mmrHistory: MmrSnapshot[] = [];
   let queenRankHistory: QueenRankSnapshot[] = [];
+  let shouldRefreshDrodo = false;
+  let hotProfilePoll = false;
   if (supabase) {
     const profilePromise = cachedProfileRow
       ? Promise.resolve({ data: cachedProfileRow })
@@ -180,6 +198,19 @@ const loadPlayer = cache(async (rawSteamId: string): Promise<LoadResult> => {
         profileResult.data.drodo_last_fetched_at,
         profileResult.data.queen_ladder_last_seen_at
       );
+      hotProfilePoll = isCachedQueenProfile(profileResult.data);
+      if (hotProfilePoll) {
+        manualRefreshQuota = getManualRefreshQuota(undefined, Date.now(), {
+          cadence: "owner",
+          target: steamId,
+        });
+      }
+      shouldRefreshDrodo = hotProfilePoll && !drodoProfileMissing
+        ? !isHotCacheFresh(drodoLastFetchedAt)
+        : !isFreshCache(
+            profileResult.data.drodo_last_fetched_at,
+            drodoProfileMissing
+          );
       if (
         (profileResult.data.drodo_last_fetched_at ||
           profileResult.data.drodo_mmr != null) &&
@@ -187,16 +218,25 @@ const loadPlayer = cache(async (rawSteamId: string): Promise<LoadResult> => {
       ) {
         drodo = drodoFromCachedRow(profileResult.data);
       }
+    } else {
+      shouldRefreshDrodo = true;
     }
     if (seasonsResult.data) seasons = seasonsResult.data;
 
-    if (!drodo && !drodoProfileMissing) {
+    if (shouldRefreshDrodo) {
       const initialDrodo = await fetchAndCacheDrodo(steamId, supabase, {
         snapshotOnSuccess: true,
-        pollMode: "reset",
+        pollMode: cachedProfileRow ? "adaptive" : "reset",
+        hotPoll: hotProfilePoll,
       });
 
       if (initialDrodo.ok) {
+        if (initialDrodo.profile.queen_rank != null) {
+          manualRefreshQuota = getManualRefreshQuota(undefined, Date.now(), {
+            cadence: "owner",
+            target: steamId,
+          });
+        }
         drodo = drodoFromProfile(initialDrodo.profile);
         seasons = initialDrodo.seasonRows;
         drodoLastFetchedAt = mostRecentTimestamp(
