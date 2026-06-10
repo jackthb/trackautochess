@@ -33,8 +33,11 @@ chmod 600 ops/cronicle/.env
 docker compose -f ops/cronicle/docker-compose.yml up -d
 ```
 
-No web workspace install is needed for the poller. The Cronicle container only
-needs `node` plus the checked-in scripts mounted from this directory.
+No web workspace install or build step is needed for the poller. The Cronicle
+container only needs `node` plus the checked-in scripts mounted from this
+directory. `scripts/poll-drodo.mjs` imports shared runtime helpers directly from
+`shared/drodo-core.mjs`; keep that file plain Node-compatible so Pi jobs do not
+depend on TypeScript loaders or the web workspace.
 
 If Cronicle is installed directly on the Pi instead of via Docker, expose the
 same scripts path that the jobs below use:
@@ -111,6 +114,13 @@ docker compose -f ops/cronicle/docker-compose.yml exec cronicle \
 
 The scripts print a JSON summary and exit non-zero on failure, so Cronicle marks
 the run failed and keeps the stderr/stdout logs.
+
+The shared Drodo parser/polling flow can also be smoke-tested from the repo
+root without hitting Drodo or Supabase:
+
+```bash
+npm run test:drodo-core
+```
 
 ## Updating after pulling repo changes
 

@@ -232,6 +232,23 @@ export function formatIsoDateLabel(iso: string): string {
   });
 }
 
+const SHORT_MONTHS = [
+  "JAN", "FEB", "MAR", "APR", "MAY", "JUN",
+  "JUL", "AUG", "SEP", "OCT", "NOV", "DEC",
+] as const;
+
+export function formatIsoDateParts(
+  iso: string
+): { month: string; day: string; year: string } {
+  // Parse YYYY-MM-DD without timezone drift.
+  const [year, month, day] = iso.split("-").map((part) => parseInt(part, 10));
+  return {
+    month: SHORT_MONTHS[(month || 1) - 1] ?? "",
+    day: String(day || 1).padStart(2, "0"),
+    year: String(year || ""),
+  };
+}
+
 export function formatSize(bytes: number): string {
   if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(0) + " KB";
   if (bytes < 1024 * 1024 * 1024)

@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { cache } from "react";
 import { notFound, redirect } from "next/navigation";
-import { createClient } from "@supabase/supabase-js";
 import type { PlayerGame } from "@dac/shared/types";
 import type { SeasonSnapshot } from "@dac/shared/SeasonHistoryGrid";
 import { mmrLevelToRank } from "@dac/shared/game-utils";
@@ -25,6 +24,7 @@ import {
   USER_DRODO_SELECT,
   type CachedUserDrodoRow,
 } from "@/components/player/playerData";
+import { createSupabaseServerClient } from "@/lib/supabase";
 
 export const dynamic = "force-static";
 export const revalidate = 300;
@@ -98,11 +98,7 @@ const loadPlayer = cache(async (rawSteamId: string): Promise<LoadResult> => {
     return { kind: "notFound" };
   }
 
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const key =
-    process.env.SUPABASE_SERVICE_ROLE_KEY ||
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-  const supabase = url && key ? createClient(url, key) : null;
+  const supabase = createSupabaseServerClient();
 
   const baseUrl = getSiteUrl();
 

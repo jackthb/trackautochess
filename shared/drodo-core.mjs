@@ -208,7 +208,14 @@ export function profileChanged(prev, next) {
 }
 
 export function normalizeDrodoSteamIds(steamIds) {
-  return [...new Set(steamIds.map(String).filter(Boolean))];
+  return [
+    ...new Set(
+      steamIds
+        .filter((steamId) => steamId != null)
+        .map(String)
+        .filter(Boolean)
+    ),
+  ];
 }
 
 function upstreamErrorResults(ids, error) {
