@@ -60,7 +60,8 @@ function cleanSteamName(value: unknown): string {
 
 export function useTrackerEvents(
   onImportResult?: () => void,
-  onReplaySaved?: () => void
+  onReplaySaved?: () => void,
+  onMatchSaved?: () => void
 ): TrackerState {
   const [status, setStatus] = useState<TrackerStatus | null>(null);
   const [processingScreenshot, setProcessingScreenshot] =
@@ -73,8 +74,8 @@ export function useTrackerEvents(
   const [importing, setImporting] = useState(false);
   const [importProgress, setImportProgress] = useState<ImportProgress | null>(null);
   const importTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const callbacksRef = useRef({ onImportResult, onReplaySaved });
-  callbacksRef.current = { onImportResult, onReplaySaved };
+  const callbacksRef = useRef({ onImportResult, onReplaySaved, onMatchSaved });
+  callbacksRef.current = { onImportResult, onReplaySaved, onMatchSaved };
 
   const clearImportTimer = useCallback(() => {
     if (importTimeoutRef.current) {
@@ -196,6 +197,9 @@ export function useTrackerEvents(
         case "replay_saved":
           setStatus((prev) => prev ? { ...prev, recording: false } : prev);
           callbacksRef.current.onReplaySaved?.();
+          break;
+        case "nettable_end_board_saved":
+          callbacksRef.current.onMatchSaved?.();
           break;
         case "error":
           setProcessingScreenshot(null);

@@ -19,9 +19,7 @@ interface HistoryTabProps {
   lastRefresh: Date | null;
   refresh: () => Promise<void>;
   drodo?: DrodoProfile | null;
-  drodoLoading?: boolean;
   drodoError?: string | null;
-  refreshDrodo?: () => Promise<void>;
   focusGameId?: number | null;
   onFocusHandled?: () => void;
 }
@@ -38,9 +36,7 @@ export function HistoryTab({
   lastRefresh,
   refresh,
   drodo,
-  drodoLoading,
   drodoError,
-  refreshDrodo,
   focusGameId,
   onFocusHandled,
 }: HistoryTabProps) {
@@ -143,14 +139,6 @@ export function HistoryTab({
           >
             {refreshing ? "Refreshing" : "Refresh"}
           </Button>
-          {refreshDrodo && (
-            <Button
-              disabled={drodoLoading}
-              onClick={refreshDrodo}
-            >
-              {drodoLoading ? "Refreshing..." : "Refresh stats"}
-            </Button>
-          )}
           {lastRefresh && (
             <span className="refresh-time">
               Updated {lastRefresh.toLocaleTimeString()}
