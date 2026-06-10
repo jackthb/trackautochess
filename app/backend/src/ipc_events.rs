@@ -5,6 +5,221 @@ pub fn event_json<T: Serialize>(event: &T) -> String {
 }
 
 #[derive(Debug, Serialize)]
+pub struct BackendStatus<'a> {
+    #[serde(rename = "type")]
+    pub event_type: &'static str,
+    pub backend: &'static str,
+    pub recording: bool,
+    pub focused: bool,
+    pub logged_in: bool,
+    pub steam_id: &'a str,
+    pub steam_name: &'a str,
+    pub replay_enabled: bool,
+}
+
+impl<'a> BackendStatus<'a> {
+    pub fn new(steam_id: &'a str, steam_name: &'a str, replay_enabled: bool) -> Self {
+        Self {
+            event_type: "status",
+            backend: "rust",
+            recording: false,
+            focused: false,
+            logged_in: !steam_id.is_empty(),
+            steam_id,
+            steam_name,
+            replay_enabled,
+        }
+    }
+}
+
+#[derive(Debug, Serialize)]
+pub struct ErrorEvent<'a> {
+    #[serde(rename = "type")]
+    pub event_type: &'static str,
+    pub message: &'a str,
+}
+
+impl<'a> ErrorEvent<'a> {
+    pub fn new(message: &'a str) -> Self {
+        Self {
+            event_type: "error",
+            message,
+        }
+    }
+}
+
+#[derive(Debug, Serialize)]
+pub struct PayloadQueued<'a> {
+    #[serde(rename = "type")]
+    pub event_type: &'static str,
+    pub path: &'a str,
+}
+
+impl<'a> PayloadQueued<'a> {
+    pub fn new(path: &'a str) -> Self {
+        Self {
+            event_type: "payload_queued",
+            path,
+        }
+    }
+}
+
+#[derive(Debug, Serialize)]
+pub struct ConfigUpdated<'a> {
+    #[serde(rename = "type")]
+    pub event_type: &'static str,
+    pub key: &'a str,
+}
+
+impl<'a> ConfigUpdated<'a> {
+    pub fn new(key: &'a str) -> Self {
+        Self {
+            event_type: "config_updated",
+            key,
+        }
+    }
+}
+
+#[derive(Debug, Serialize)]
+pub struct SteamLogout {
+    #[serde(rename = "type")]
+    pub event_type: &'static str,
+}
+
+impl SteamLogout {
+    pub fn new() -> Self {
+        Self {
+            event_type: "steam_logout",
+        }
+    }
+}
+
+#[derive(Debug, Serialize)]
+pub struct SteamLoginUrl<'a> {
+    #[serde(rename = "type")]
+    pub event_type: &'static str,
+    pub url: &'a str,
+}
+
+impl<'a> SteamLoginUrl<'a> {
+    pub fn new(url: &'a str) -> Self {
+        Self {
+            event_type: "steam_login_url",
+            url,
+        }
+    }
+}
+
+#[derive(Debug, Serialize)]
+pub struct SteamLogin<'a> {
+    #[serde(rename = "type")]
+    pub event_type: &'static str,
+    pub steam_id: &'a str,
+    pub steam_name: &'a str,
+}
+
+impl<'a> SteamLogin<'a> {
+    pub fn new(steam_id: &'a str, steam_name: &'a str) -> Self {
+        Self {
+            event_type: "steam_login",
+            steam_id,
+            steam_name,
+        }
+    }
+}
+
+#[derive(Debug, Serialize)]
+pub struct NettablePaused {
+    #[serde(rename = "type")]
+    pub event_type: &'static str,
+    pub backend: &'static str,
+    pub paused: bool,
+}
+
+impl NettablePaused {
+    pub fn new(paused: bool) -> Self {
+        Self {
+            event_type: "nettable_paused",
+            backend: "rust",
+            paused,
+        }
+    }
+}
+
+#[derive(Debug, Serialize)]
+pub struct UpdateApplyRequested {
+    #[serde(rename = "type")]
+    pub event_type: &'static str,
+    pub backend: &'static str,
+    pub ok: bool,
+}
+
+impl UpdateApplyRequested {
+    pub fn new() -> Self {
+        Self {
+            event_type: "update_apply_requested",
+            backend: "rust",
+            ok: true,
+        }
+    }
+}
+
+#[derive(Debug, Serialize)]
+pub struct DiagnosticsUploaded<'a> {
+    #[serde(rename = "type")]
+    pub event_type: &'static str,
+    pub backend: &'static str,
+    pub storage_ok: bool,
+    pub reason: &'a str,
+    pub paths: serde_json::Value,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub tracker_bytes: Option<usize>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub console_bytes: Option<usize>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub console_found: Option<bool>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub message: Option<&'a str>,
+}
+
+impl<'a> DiagnosticsUploaded<'a> {
+    pub fn complete(
+        reason: &'a str,
+        storage_ok: bool,
+        paths: serde_json::Value,
+        tracker_bytes: usize,
+        console_bytes: usize,
+        console_found: bool,
+    ) -> Self {
+        Self {
+            event_type: "diagnostics_uploaded",
+            backend: "rust",
+            storage_ok,
+            reason,
+            paths,
+            tracker_bytes: Some(tracker_bytes),
+            console_bytes: Some(console_bytes),
+            console_found: Some(console_found),
+            message: None,
+        }
+    }
+
+    pub fn failed(reason: &'a str, message: &'a str) -> Self {
+        Self {
+            event_type: "diagnostics_uploaded",
+            backend: "rust",
+            storage_ok: false,
+            reason,
+            paths: serde_json::json!({}),
+            tracker_bytes: None,
+            console_bytes: None,
+            console_found: None,
+            message: Some(message),
+        }
+    }
+}
+
+#[derive(Debug, Serialize)]
 pub struct NettableRoundChanged<'a> {
     #[serde(rename = "type")]
     pub event_type: &'static str,
@@ -224,6 +439,208 @@ pub struct NettableCheckActiveMatch<'a> {
     pub paused: bool,
     pub message: &'a str,
     pub at: &'a str,
+}
+
+#[derive(Debug, Serialize)]
+pub struct NettableResyncComplete<'a> {
+    #[serde(rename = "type")]
+    pub event_type: &'static str,
+    pub ok: bool,
+    pub noop: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub error: Option<&'a str>,
+}
+
+impl<'a> NettableResyncComplete<'a> {
+    pub fn ok(noop: bool) -> Self {
+        Self {
+            event_type: "nettable_resync_complete",
+            ok: true,
+            noop,
+            error: None,
+        }
+    }
+
+    pub fn error(error: &'a str) -> Self {
+        Self {
+            event_type: "nettable_resync_complete",
+            ok: false,
+            noop: false,
+            error: Some(error),
+        }
+    }
+}
+
+#[derive(Debug, Serialize)]
+pub struct NettableQueenUploadProgress<'a> {
+    #[serde(rename = "type")]
+    pub event_type: &'static str,
+    pub message: &'a str,
+    pub at: &'a str,
+}
+
+impl<'a> NettableQueenUploadProgress<'a> {
+    pub fn new(message: &'a str, at: &'a str) -> Self {
+        Self {
+            event_type: "nettable_queen_upload_progress",
+            message,
+            at,
+        }
+    }
+}
+
+#[derive(Debug, Serialize)]
+pub struct NettableQueenUploadComplete<'a> {
+    #[serde(rename = "type")]
+    pub event_type: &'static str,
+    pub ok: bool,
+    pub player_count: usize,
+    pub upserted_count: usize,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub season: Option<&'a str>,
+    pub error: Option<&'a str>,
+    pub at: &'a str,
+}
+
+impl<'a> NettableQueenUploadComplete<'a> {
+    pub fn complete(
+        player_count: usize,
+        upserted_count: usize,
+        season: &'a str,
+        error: Option<&'a str>,
+        at: &'a str,
+    ) -> Self {
+        let ok = upserted_count > 0;
+        Self {
+            event_type: "nettable_queen_upload_complete",
+            ok,
+            player_count,
+            upserted_count,
+            season: Some(season),
+            error,
+            at,
+        }
+    }
+
+    pub fn failed(message: &'a str, at: &'a str) -> Self {
+        Self {
+            event_type: "nettable_queen_upload_complete",
+            ok: false,
+            player_count: 0,
+            upserted_count: 0,
+            season: None,
+            error: Some(message),
+            at,
+        }
+    }
+}
+
+#[derive(Debug, Serialize)]
+pub struct NettableStateEvent {
+    #[serde(rename = "type")]
+    pub event_type: &'static str,
+    pub backend: &'static str,
+    pub rows: serde_json::Value,
+    pub state: serde_json::Value,
+    pub players: serde_json::Value,
+    pub local_steam_ids: serde_json::Value,
+    pub at: String,
+}
+
+impl NettableStateEvent {
+    pub fn new(
+        rows: serde_json::Value,
+        state: serde_json::Value,
+        players: serde_json::Value,
+        local_steam_ids: serde_json::Value,
+        at: String,
+    ) -> Self {
+        Self {
+            event_type: "nettable_state",
+            backend: "rust",
+            rows,
+            state,
+            players,
+            local_steam_ids,
+            at,
+        }
+    }
+}
+
+#[derive(Debug, Serialize)]
+pub struct NettableStatus<'a> {
+    #[serde(rename = "type")]
+    pub event_type: &'static str,
+    pub backend: &'static str,
+    pub ok: bool,
+    pub paused: bool,
+    pub autoexec_installed: bool,
+    pub gsi_cfg_installed: bool,
+    pub log_path: &'a str,
+    pub log_writable: bool,
+    pub dota_dir: &'a str,
+    pub remote_enabled: bool,
+    pub launch_options: Option<&'a str>,
+    pub has_condebug: Option<bool>,
+    pub has_conclearlog: Option<bool>,
+    pub has_gamestateintegration: Option<bool>,
+    pub steam_running: bool,
+    pub dota_running: bool,
+    pub log_active: bool,
+}
+
+#[derive(Debug, Serialize)]
+pub struct NettableSetupProgress<'a> {
+    #[serde(rename = "type")]
+    pub event_type: &'a str,
+    pub stage: &'a str,
+    pub message: &'a str,
+}
+
+impl<'a> NettableSetupProgress<'a> {
+    pub fn new(event_type: &'a str, stage: &'a str, message: &'a str) -> Self {
+        Self {
+            event_type,
+            stage,
+            message,
+        }
+    }
+}
+
+#[derive(Debug, Serialize)]
+pub struct NettableLaunchOptionsApplied<'a> {
+    #[serde(rename = "type")]
+    pub event_type: &'static str,
+    pub backend: &'static str,
+    pub ok: bool,
+    pub noop: bool,
+    pub before: &'a str,
+    pub after: &'a str,
+    pub added: &'a [String],
+    pub config_path: &'a str,
+    pub backup_path: Option<&'a str>,
+    pub autoexec_path: &'a str,
+    pub gsi_cfg_path: Option<&'a str>,
+}
+
+#[derive(Debug, Serialize)]
+pub struct NettableLaunchOptionsError<'a> {
+    #[serde(rename = "type")]
+    pub event_type: &'static str,
+    pub backend: &'static str,
+    pub ok: bool,
+    pub error: &'a str,
+}
+
+impl<'a> NettableLaunchOptionsError<'a> {
+    pub fn new(error: &'a str) -> Self {
+        Self {
+            event_type: "nettable_launch_options_applied",
+            backend: "rust",
+            ok: false,
+            error,
+        }
+    }
 }
 
 impl<'a> NettableCheckActiveMatch<'a> {

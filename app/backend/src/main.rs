@@ -13,6 +13,10 @@ mod supabase;
 mod unit_codes;
 
 use config::Config;
+use ipc_events::{
+    event_json, BackendStatus, ConfigUpdated, DiagnosticsUploaded, ErrorEvent, NettablePaused,
+    NettableRows, PayloadQueued, SteamLogin, SteamLoginUrl, SteamLogout, UpdateApplyRequested,
+};
 use nettable_service::{parsed_json, rows_json, NettableService};
 use nettable_tail::NettableTailer;
 use outbox::Outbox;
@@ -131,19 +135,15 @@ fn run_daemon() -> io::Result<()> {
                 let payload =
                     json_object_field(&line, "payload").unwrap_or_else(|| "{}".to_owned());
                 let path = outbox.enqueue_str(&payload)?;
-                emit(&format!(
-                    r#"{{"type":"payload_queued","path":{}}}"#,
-                    json_string(&path.display().to_string())
-                ))?;
+                emit(&event_json(&PayloadQueued::new(
+                    &path.display().to_string(),
+                )))?;
             }
             "set_config" => {
                 if let Some(key) = json_string_field(&line, "key") {
                     let value = json_field_raw(&line, "value").unwrap_or_else(|| "null".to_owned());
                     cfg.save_value(&key, &value)?;
-                    emit(&format!(
-                        r#"{{"type":"config_updated","key":{}}}"#,
-                        json_string(&key)
-                    ))?;
+                    emit(&event_json(&ConfigUpdated::new(&key)))?;
                 } else {
                     emit_error("set_config missing key")?;
                 }
@@ -153,15 +153,11 @@ fn run_daemon() -> io::Result<()> {
                 cfg.save_value("steam_name", "\"\"")?;
                 cfg.steam_id.clear();
                 cfg.steam_name.clear();
-                emit(r#"{"type":"steam_logout"}"#)?;
+                emit(&event_json(&SteamLogout::new()))?;
             }
             "steam_login" => {
                 match steam_auth::steam_login_with_opener(Duration::from_secs(120), |url| {
-                    emit(&format!(
-                        r#"{{"type":"steam_login_url","url":{}}}"#,
-                        json_string(url)
-                    ))
-                    .map_err(|err| err.to_string())
+                    emit(&event_json(&SteamLoginUrl::new(url))).map_err(|err| err.to_string())
                 }) {
                     Ok((steam_id, steam_name)) => {
                         cfg.save_steam_user(&steam_id, &steam_name)?;
@@ -170,11 +166,7 @@ fn run_daemon() -> io::Result<()> {
                         if let Some(client) = supabase::SupabaseClient::from_config(&cfg) {
                             let _ = client.upsert_user(&steam_id, &steam_name);
                         }
-                        emit(&format!(
-                            r#"{{"type":"steam_login","steam_id":{},"steam_name":{}}}"#,
-                            json_string(&steam_id),
-                            json_string(&steam_name)
-                        ))?;
+                        emit(&event_json(&SteamLogin::new(&steam_id, &steam_name)))?;
                     }
                     Err(err) => emit_error(&format!("steam_login failed: {err}"))?,
                 }
@@ -195,10 +187,7 @@ fn run_daemon() -> io::Result<()> {
             "nettable_set_paused" => {
                 let paused = json_bool_field(&line, "paused").unwrap_or(false);
                 nettable.set_paused(paused);
-                emit(&format!(
-                    r#"{{"type":"nettable_paused","backend":"rust","paused":{}}}"#,
-                    if paused { "true" } else { "false" }
-                ))?;
+                emit(&event_json(&NettablePaused::new(paused)))?;
             }
             "nettable_upload_queens" => nettable.upload_queens(&cfg, |line| {
                 let _ = emit(&line);
@@ -212,27 +201,29 @@ fn run_daemon() -> io::Result<()> {
                         &reason,
                         nettable_service::find_console_log(),
                     ) {
-                        Ok(summary) => emit(&summary.event_json())?,
-                        Err(err) => emit(&format!(
-                            r#"{{"type":"diagnostics_uploaded","backend":"rust","storage_ok":false,"reason":{},"paths":{{}},"message":{}}}"#,
-                            json_string(&reason),
-                            json_string(&err)
-                        ))?,
+                        Ok(summary) => emit(&event_json(&DiagnosticsUploaded::complete(
+                            &summary.reason,
+                            summary.storage_ok,
+                            summary.paths,
+                            summary.tracker_bytes,
+                            summary.console_bytes,
+                            summary.console_found,
+                        )))?,
+                        Err(err) => emit(&event_json(&DiagnosticsUploaded::failed(&reason, &err)))?,
                     },
-                    None => emit(&format!(
-                        r#"{{"type":"diagnostics_uploaded","backend":"rust","storage_ok":false,"reason":{},"paths":{{}},"message":"Supabase is not configured."}}"#,
-                        json_string(&reason)
-                    ))?,
+                    None => emit(&event_json(&DiagnosticsUploaded::failed(
+                        &reason,
+                        "Supabase is not configured.",
+                    )))?,
                 }
             }
-            "do_update" => emit(r#"{"type":"update_apply_requested","backend":"rust","ok":true}"#)?,
+            "do_update" => emit(&event_json(&UpdateApplyRequested::new()))?,
             "parse_log" => {
                 if let Some(path) = json_string_field(&line, "path") {
                     match nettable_parser::extract_rows(PathBuf::from(path).as_path()) {
-                        Ok(rows) => emit(&format!(
-                            r#"{{"type":"nettable_rows","rows":{}}}"#,
-                            rows_json(&rows)
-                        ))?,
+                        Ok(rows) => emit(&event_json(&NettableRows::new(
+                            nettable_service::rows_value(&rows),
+                        )))?,
                         Err(err) => emit_error(&format!("parse_log failed: {err}"))?,
                     }
                 } else {
@@ -243,11 +234,10 @@ fn run_daemon() -> io::Result<()> {
                 if let Some(path) = json_string_field(&line, "path") {
                     let mut tailer = NettableTailer::new(PathBuf::from(path));
                     match tailer.poll() {
-                        Ok(Some(rows)) => emit(&format!(
-                            r#"{{"type":"nettable_rows","rows":{}}}"#,
-                            rows_json(&rows)
-                        ))?,
-                        Ok(None) => emit(r#"{"type":"nettable_rows","rows":[]}"#)?,
+                        Ok(Some(rows)) => emit(&event_json(&NettableRows::new(
+                            nettable_service::rows_value(&rows),
+                        )))?,
+                        Ok(None) => emit(&event_json(&NettableRows::new(serde_json::json!([]))))?,
                         Err(err) => emit_error(&format!("tail_log_once failed: {err}"))?,
                     }
                 } else {
@@ -263,17 +253,11 @@ fn run_daemon() -> io::Result<()> {
 }
 
 fn status_json(cfg: &Config) -> String {
-    format!(
-        r#"{{"type":"status","backend":"rust","recording":false,"focused":false,"logged_in":{},"steam_id":{},"steam_name":{},"replay_enabled":{}}}"#,
-        if cfg.steam_id.is_empty() {
-            "false"
-        } else {
-            "true"
-        },
-        json_string(&cfg.steam_id),
-        json_string(&cfg.steam_name),
-        if cfg.replay_enabled { "true" } else { "false" }
-    )
+    event_json(&BackendStatus::new(
+        &cfg.steam_id,
+        &cfg.steam_name,
+        cfg.replay_enabled,
+    ))
 }
 
 fn json_string(value: &str) -> String {
@@ -389,10 +373,7 @@ fn emit(line: &str) -> io::Result<()> {
 }
 
 fn emit_error(message: &str) -> io::Result<()> {
-    emit(&format!(
-        r#"{{"type":"error","message":{}}}"#,
-        json_string(message)
-    ))
+    emit(&event_json(&ErrorEvent::new(message)))
 }
 
 #[allow(dead_code)]

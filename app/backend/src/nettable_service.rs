@@ -4,8 +4,12 @@ use crate::{
     hotkeys::{send_dump_keys, DumpKey},
     ipc_events::{
         event_json, NettableCheckActiveMatch, NettableCreepRound, NettableEndBoardSaved,
-        NettableGameEnded, NettableIngestComplete, NettableIngestError, NettablePersonalGameEnded,
-        NettableRankingScanned, NettableRoundChanged, NettableRows, NettableTimelineExtracted,
+        NettableGameEnded, NettableIngestComplete, NettableIngestError,
+        NettableLaunchOptionsApplied as NettableLaunchOptionsAppliedEvent,
+        NettableLaunchOptionsError, NettablePersonalGameEnded, NettableQueenUploadComplete,
+        NettableQueenUploadProgress, NettableRankingScanned, NettableResyncComplete,
+        NettableRoundChanged, NettableRows, NettableSetupProgress, NettableStateEvent,
+        NettableStatus, NettableTimelineExtracted,
     },
     nettable_parser::{self, NettableRow, ParsedLog},
     queen_ladder,
@@ -320,7 +324,7 @@ impl NettableService {
         F: Fn(String),
     {
         if !is_steam_running() {
-            emit(r#"{"type":"nettable_resync_complete","ok":true,"noop":true}"#.to_owned());
+            emit(event_json(&NettableResyncComplete::ok(true)));
             emit(nettable_status_json(&self.state));
             return;
         }
@@ -330,10 +334,9 @@ impl NettableService {
             "Asking Steam to quit…",
         ));
         if !request_steam_shutdown() {
-            emit(format!(
-                r#"{{"type":"nettable_resync_complete","ok":false,"error":{}}}"#,
-                json_string("Couldn't find steam.exe to close Steam automatically.")
-            ));
+            emit(event_json(&NettableResyncComplete::error(
+                "Couldn't find steam.exe to close Steam automatically.",
+            )));
             return;
         }
         emit(setup_progress(
@@ -342,13 +345,12 @@ impl NettableService {
             "Waiting for Steam to flush its state…",
         ));
         if !wait_for_steam_exit(Duration::from_secs(20)) {
-            emit(format!(
-                r#"{{"type":"nettable_resync_complete","ok":false,"error":{}}}"#,
-                json_string("Steam didn't quit within 20s.")
-            ));
+            emit(event_json(&NettableResyncComplete::error(
+                "Steam didn't quit within 20s.",
+            )));
             return;
         }
-        emit(r#"{"type":"nettable_resync_complete","ok":true,"noop":false}"#.to_owned());
+        emit(event_json(&NettableResyncComplete::ok(false)));
         emit(nettable_status_json(&self.state));
     }
 
@@ -517,27 +519,23 @@ impl NettableService {
             Ok((player_count, upserted, season)) => {
                 let ok = upserted > 0;
                 let error = if ok {
-                    "null".to_owned()
+                    None
                 } else {
-                    json_string(&format!(
+                    Some(format!(
                         "Found {player_count} Queen players, but the database wrote 0 rows."
                     ))
                 };
-                emit(format!(
-                    r#"{{"type":"nettable_queen_upload_complete","ok":{},"player_count":{},"upserted_count":{},"season":{},"error":{},"at":{}}}"#,
-                    if ok { "true" } else { "false" },
+                emit(event_json(&NettableQueenUploadComplete::complete(
                     player_count,
                     upserted,
-                    json_string(&season),
-                    error,
-                    json_string(&at),
-                ));
+                    &season,
+                    error.as_deref(),
+                    &at,
+                )));
             }
-            Err(message) => emit(format!(
-                r#"{{"type":"nettable_queen_upload_complete","ok":false,"player_count":0,"upserted_count":0,"error":{},"at":{}}}"#,
-                json_string(&message),
-                json_string(&at),
-            )),
+            Err(message) => emit(event_json(&NettableQueenUploadComplete::failed(
+                &message, &at,
+            ))),
         }
     }
 }
@@ -1029,11 +1027,7 @@ fn queen_list_missing_message(log_path: &PathBuf) -> String {
 }
 
 fn queen_progress(message: &str, at: &str) -> String {
-    format!(
-        r#"{{"type":"nettable_queen_upload_progress","message":{},"at":{}}}"#,
-        json_string(message),
-        json_string(at)
-    )
+    event_json(&NettableQueenUploadProgress::new(message, at))
 }
 
 fn state_json_from(state: &Arc<Mutex<NettableState>>) -> String {
@@ -1046,14 +1040,13 @@ fn state_json_from(state: &Arc<Mutex<NettableState>>) -> String {
             .map(serde_json::Value::String)
             .collect(),
     );
-    format!(
-        r#"{{"type":"nettable_state","backend":"rust","rows":{},"state":{},"players":{},"local_steam_ids":{},"at":{}}}"#,
-        rows_json(&state.latest_rows),
-        parsed_json(&state.latest_parsed),
+    event_json(&NettableStateEvent::new(
+        rows_value(&state.latest_rows),
+        parsed_value(&state.latest_parsed),
         players,
         local_ids_json,
-        json_string(&now_iso_utc())
-    )
+        now_iso_utc(),
+    ))
 }
 
 fn handle_rows_for_parity(state: &Arc<Mutex<NettableState>>, rows: &[NettableRow]) -> Vec<String> {
@@ -1365,63 +1358,37 @@ fn nettable_status_json(state: &Arc<Mutex<NettableState>>) -> String {
         .and_then(|modified| SystemTime::now().duration_since(modified).ok())
         .map(|age| age <= LOG_ACTIVE_WINDOW)
         .unwrap_or(false);
-    format!(
-        r#"{{"type":"nettable_status","backend":"rust","ok":true,"paused":{},"autoexec_installed":{},"gsi_cfg_installed":{},"log_path":{},"log_writable":{},"dota_dir":{},"remote_enabled":true,"launch_options":{},"has_condebug":{},"has_conclearlog":{},"has_gamestateintegration":{},"steam_running":{},"dota_running":{},"log_active":{}}}"#,
-        if paused { "true" } else { "false" },
-        if find_autoexec_target().map(|p| p.exists()).unwrap_or(false) {
-            "true"
-        } else {
-            "false"
-        },
-        if find_gsi_cfg_target().map(|p| p.exists()).unwrap_or(false) {
-            "true"
-        } else {
-            "false"
-        },
-        json_string(
-            &log_path
-                .as_ref()
-                .map(|p| p.display().to_string())
-                .unwrap_or_default()
-        ),
-        if log_writable { "true" } else { "false" },
-        json_string(
-            &find_dota_dir()
-                .map(|p| p.display().to_string())
-                .unwrap_or_default()
-        ),
-        launch_options
-            .as_deref()
-            .map(json_string)
-            .unwrap_or_else(|| "null".to_owned()),
-        bool_or_null(
-            launch_known,
-            launch_tokens.iter().any(|token| token == "-condebug"),
-        ),
-        bool_or_null(
-            launch_known,
-            launch_tokens.iter().any(|token| token == "-conclearlog"),
-        ),
-        bool_or_null(
-            launch_known,
+    let log_path_string = log_path
+        .as_ref()
+        .map(|p| p.display().to_string())
+        .unwrap_or_default();
+    let dota_dir_string = find_dota_dir()
+        .map(|p| p.display().to_string())
+        .unwrap_or_default();
+    event_json(&NettableStatus {
+        event_type: "nettable_status",
+        backend: "rust",
+        ok: true,
+        paused,
+        autoexec_installed: find_autoexec_target().map(|p| p.exists()).unwrap_or(false),
+        gsi_cfg_installed: find_gsi_cfg_target().map(|p| p.exists()).unwrap_or(false),
+        log_path: &log_path_string,
+        log_writable,
+        dota_dir: &dota_dir_string,
+        remote_enabled: true,
+        launch_options: launch_options.as_deref(),
+        has_condebug: launch_known.then(|| launch_tokens.iter().any(|token| token == "-condebug")),
+        has_conclearlog: launch_known
+            .then(|| launch_tokens.iter().any(|token| token == "-conclearlog")),
+        has_gamestateintegration: launch_known.then(|| {
             launch_tokens
                 .iter()
-                .any(|token| token == "-gamestateintegration"),
-        ),
-        if is_steam_running() { "true" } else { "false" },
-        if is_dota_running() { "true" } else { "false" },
-        if log_active { "true" } else { "false" },
-    )
-}
-
-fn bool_or_null(known: bool, value: bool) -> &'static str {
-    if !known {
-        "null"
-    } else if value {
-        "true"
-    } else {
-        "false"
-    }
+                .any(|token| token == "-gamestateintegration")
+        }),
+        steam_running: is_steam_running(),
+        dota_running: is_dota_running(),
+        log_active,
+    })
 }
 
 fn table_names(rows: &[NettableRow]) -> Vec<String> {
@@ -1826,19 +1793,11 @@ fn is_dota_running() -> bool {
 }
 
 fn setup_progress(event_type: &str, stage: &str, message: &str) -> String {
-    format!(
-        r#"{{"type":{},"stage":{},"message":{}}}"#,
-        json_string(event_type),
-        json_string(stage),
-        json_string(message)
-    )
+    event_json(&NettableSetupProgress::new(event_type, stage, message))
 }
 
 fn setup_result_error(message: &str) -> String {
-    format!(
-        r#"{{"type":"nettable_launch_options_applied","backend":"rust","ok":false,"error":{}}}"#,
-        json_string(message)
-    )
+    event_json(&NettableLaunchOptionsError::new(message))
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -1854,30 +1813,26 @@ struct LaunchOptionsApplied {
 
 impl LaunchOptionsApplied {
     fn event_json(&self, autoexec: &Path, gsi_cfg: Option<&Path>) -> String {
-        let added = serde_json::Value::Array(
-            self.added
-                .iter()
-                .cloned()
-                .map(serde_json::Value::String)
-                .collect(),
-        );
-        format!(
-            r#"{{"type":"nettable_launch_options_applied","backend":"rust","ok":{},"noop":{},"before":{},"after":{},"added":{},"config_path":{},"backup_path":{},"autoexec_path":{},"gsi_cfg_path":{}}}"#,
-            if self.ok { "true" } else { "false" },
-            if self.noop { "true" } else { "false" },
-            json_string(&self.before),
-            json_string(&self.after),
-            added,
-            json_string(&self.config_path.display().to_string()),
-            self.backup_path
-                .as_ref()
-                .map(|path| json_string(&path.display().to_string()))
-                .unwrap_or_else(|| "null".to_owned()),
-            json_string(&autoexec.display().to_string()),
-            gsi_cfg
-                .map(|path| json_string(&path.display().to_string()))
-                .unwrap_or_else(|| "null".to_owned())
-        )
+        let config_path = self.config_path.display().to_string();
+        let backup_path = self
+            .backup_path
+            .as_ref()
+            .map(|path| path.display().to_string());
+        let autoexec_path = autoexec.display().to_string();
+        let gsi_cfg_path = gsi_cfg.map(|path| path.display().to_string());
+        event_json(&NettableLaunchOptionsAppliedEvent {
+            event_type: "nettable_launch_options_applied",
+            backend: "rust",
+            ok: self.ok,
+            noop: self.noop,
+            before: &self.before,
+            after: &self.after,
+            added: &self.added,
+            config_path: &config_path,
+            backup_path: backup_path.as_deref(),
+            autoexec_path: &autoexec_path,
+            gsi_cfg_path: gsi_cfg_path.as_deref(),
+        })
     }
 }
 
@@ -2223,7 +2178,7 @@ pub fn rows_json(rows: &[NettableRow]) -> String {
     rows_value(rows).to_string()
 }
 
-fn rows_value(rows: &[NettableRow]) -> serde_json::Value {
+pub fn rows_value(rows: &[NettableRow]) -> serde_json::Value {
     serde_json::Value::Array(
         rows.iter()
             .map(|row| {
@@ -2255,6 +2210,10 @@ fn nettable_row_debug_json(row: &NettableRow) -> serde_json::Value {
 }
 
 pub fn parsed_json(parsed: &ParsedLog) -> String {
+    parsed_value(parsed).to_string()
+}
+
+fn parsed_value(parsed: &ParsedLog) -> serde_json::Value {
     serde_json::Value::Object(
         parsed
             .iter()
@@ -2271,11 +2230,6 @@ pub fn parsed_json(parsed: &ParsedLog) -> String {
             })
             .collect(),
     )
-    .to_string()
-}
-
-fn json_string(value: &str) -> String {
-    serde_json::Value::String(value.to_owned()).to_string()
 }
 
 fn now_iso_utc() -> String {

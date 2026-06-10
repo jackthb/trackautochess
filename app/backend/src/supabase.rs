@@ -1433,22 +1433,6 @@ pub struct DiagnosticUploadSummary {
     pub console_found: bool,
 }
 
-impl DiagnosticUploadSummary {
-    pub fn event_json(&self) -> String {
-        json!({
-            "type": "diagnostics_uploaded",
-            "backend": "rust",
-            "reason": self.reason,
-            "storage_ok": self.storage_ok,
-            "paths": self.paths,
-            "tracker_bytes": self.tracker_bytes,
-            "console_bytes": self.console_bytes,
-            "console_found": self.console_found,
-        })
-        .to_string()
-    }
-}
-
 fn read_file_bytes(path: &Path) -> Option<Vec<u8>> {
     fs::read(path).ok().filter(|data| !data.is_empty())
 }

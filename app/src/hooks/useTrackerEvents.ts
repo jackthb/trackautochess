@@ -112,7 +112,18 @@ export function useTrackerEvents(
           });
           break;
         case "status":
-          setStatus({ ...msg, steam_name: cleanSteamName(msg.steam_name) });
+          setStatus((prev) => ({
+            type: "status",
+            recording: msg.recording,
+            focused: msg.focused,
+            version: prev?.version ?? "",
+            admin_mode: prev?.admin_mode ?? false,
+            recording_stats: prev?.recording_stats ?? null,
+            logged_in: msg.logged_in,
+            steam_id: msg.steam_id,
+            steam_name: cleanSteamName(msg.steam_name),
+            replay_enabled: msg.replay_enabled,
+          }));
           if (msg.logged_in) {
             setAuthError(null);
           }

@@ -63,7 +63,7 @@ export interface NetTableQueenUploadResult {
   player_count: number;
   upserted_count: number;
   season?: string;
-  error?: string;
+  error?: string | null;
   at?: string;
 }
 
@@ -135,122 +135,18 @@ export interface NetTableActivityState {
 
 const MAX_ENTRIES = 50;
 
-// Extra event shapes from the backend that aren't in types.ts yet.
-type NetTableStatusEvent = {
-  type: "nettable_status";
-  autoexec_installed: boolean;
-  log_path: string;
-  log_writable: boolean;
-  remote_enabled?: boolean;
-  launch_options: string | null;
-  has_condebug: boolean | null;
-  has_conclearlog: boolean | null;
-  has_gamestateintegration: boolean | null;
-  steam_running: boolean;
-  dota_running: boolean;
-  log_active: boolean;
-  paused: boolean;
-};
-type NetTableLaunchOptionsAppliedEvent = NetTableLaunchOptionsApplied & {
-  type: "nettable_launch_options_applied";
-};
-type NetTableLaunchOptionsProgressEvent = {
-  type: "nettable_launch_options_progress";
-  stage: "closing_steam" | "waiting_steam_exit" | "writing";
-  message: string;
-};
-type NetTableResyncProgressEvent = {
-  type: "nettable_resync_progress";
-  stage: "closing_steam" | "waiting_steam_exit";
-  message: string;
-};
-type NetTableResyncCompleteEvent = {
-  type: "nettable_resync_complete";
-  ok: boolean;
-  noop?: boolean;
-  error?: string;
-};
-type NetTableQueenUploadProgressEvent = {
-  type: "nettable_queen_upload_progress";
-  message: string;
-  at?: string;
-};
-type NetTableQueenUploadCompleteEvent = NetTableQueenUploadResult & {
-  type: "nettable_queen_upload_complete";
-};
 type NetTablePauseFiredEvent = {
   type: "nettable_pause_fired";
   at: string;
 };
+
 type NetTableDumpCapturedEvent = {
   type: "nettable_dump_captured";
   tables: string[];
   at: string;
 };
-type NetTableIngestCompleteEvent = {
-  type: "nettable_ingest_complete";
-  rows_written: number;
-  tables: string[];
-  at: string;
-};
-type NetTableIngestErrorEvent = {
-  type: "nettable_ingest_error";
-  error: string;
-};
-type NetTableCheckActiveMatchEvent = {
-  type: "nettable_check_active_match";
-  ok: boolean;
-  message?: string;
-  at?: string;
-};
-type NetTableRowEvent = {
-  type: "nettable_rows";
-  rows: Array<{
-    table_name?: string;
-    key?: string;
-    raw?: unknown;
-  }>;
-};
-type NetTableStateEvent = {
-  type: "nettable_state";
-  state: NetTableState;
-  players?: Record<string, LivePlayer>;
-  local_steam_ids?: string[];
-  at: string;
-};
-type NetTableGameEndedEvent = {
-  type: "nettable_game_ended";
-  message: string;
-  at: string;
-};
-type NetTableEndBoardSavedEvent = {
-  type: "nettable_end_board_saved";
-  at: string;
-};
-type NetTableCreepRoundEvent = {
-  type: "nettable_creep_round";
-  round: number;
-  at: string;
-};
-type Incoming =
-  | TrackerEvent
-  | NetTableStatusEvent
-  | NetTablePauseFiredEvent
-  | NetTableDumpCapturedEvent
-  | NetTableIngestCompleteEvent
-  | NetTableIngestErrorEvent
-  | NetTableCheckActiveMatchEvent
-  | NetTableRowEvent
-  | NetTableStateEvent
-  | NetTableGameEndedEvent
-  | NetTableEndBoardSavedEvent
-  | NetTableCreepRoundEvent
-  | NetTableLaunchOptionsAppliedEvent
-  | NetTableLaunchOptionsProgressEvent
-  | NetTableResyncProgressEvent
-  | NetTableResyncCompleteEvent
-  | NetTableQueenUploadProgressEvent
-  | NetTableQueenUploadCompleteEvent;
+
+type Incoming = TrackerEvent | NetTablePauseFiredEvent | NetTableDumpCapturedEvent;
 
 function summarizeTables(tables: string[]): string {
   if (tables.length === 0) return "no tables";

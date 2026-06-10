@@ -1,6 +1,8 @@
 import type { ItemFullInfo, RelicInfo, SynergyInfo, UnitFullInfo } from "@dac/shared/types";
+import type { BackendEvent } from "./backend-events";
 
 export type { ItemFullInfo, RelicInfo, SynergyInfo, UnitFullInfo } from "@dac/shared/types";
+export type * from "./backend-events";
 
 /** A row from the `games` table — one player's result in a match. */
 export interface Game {
@@ -220,9 +222,9 @@ export interface ImportProgressEvent {
 }
 
 export type TrackerEvent =
+  | BackendEvent
   | ParseResult
   | ProcessingScreenshot
-  | TrackerStatus
   | LogEntry
   | ImportResultEvent
   | ImportProgressEvent
@@ -230,10 +232,7 @@ export type TrackerEvent =
   | { type: "focus_gained" }
   | { type: "focus_lost" }
   | { type: "replay_started" }
-  | { type: "replay_saved" }
-  | { type: "error"; message: string }
-  | { type: "steam_login"; steam_id: string; steam_name: string }
-  | { type: "steam_logout" };
+  | { type: "replay_saved" };
 
 export interface UnitInfo {
   cost: number;
