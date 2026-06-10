@@ -1,3 +1,7 @@
+import type { ItemFullInfo, RelicInfo, SynergyInfo, UnitFullInfo } from "@dac/shared/types";
+
+export type { ItemFullInfo, RelicInfo, SynergyInfo, UnitFullInfo } from "@dac/shared/types";
+
 /** A row from the `games` table — one player's result in a match. */
 export interface Game {
   id: number;
@@ -241,34 +245,6 @@ export interface UnitsData {
   aliases?: Record<string, string>;
 }
 
-export interface UnitFullInfo {
-  synergies?: string[];
-  stats?: Record<string, {
-    hp: number;
-    atk: number | number[];
-    armor: number;
-    magic_resist: number;
-    mana: number;
-    atk_rate: number;
-  }>;
-  [key: string]: unknown;
-}
-
-export interface SynergyInfo {
-  name: string;
-  description?: string;
-  formatted?: string;
-  tiers?: number[];
-  lore?: string;
-  [key: string]: unknown;
-}
-
-export interface RelicInfo {
-  name: string;
-  description?: string;
-  [key: string]: unknown;
-}
-
 export interface ItemInfo {
   tier: number;
   icon?: string;
@@ -279,14 +255,6 @@ export interface ItemInfo {
 export interface ItemsData {
   items: Record<string, ItemInfo>;
   total?: number;
-}
-
-export interface ItemFullInfo {
-  name?: string;
-  texture?: string;
-  icon_url?: string | null;
-  description?: string;
-  [key: string]: unknown;
 }
 
 export interface TalentInfo {
