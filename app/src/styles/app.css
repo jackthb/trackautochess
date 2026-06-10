@@ -2396,6 +2396,8 @@ video {
   border: 1px solid var(--border);
   background: var(--bg);
   padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
 }
 
 .nettable-state-block-header {
@@ -2403,6 +2405,7 @@ video {
   align-items: baseline;
   justify-content: space-between;
   margin-bottom: 6px;
+  order: 0;
 }
 
 .nettable-state-block-heading {
@@ -2437,6 +2440,7 @@ video {
   color: var(--text-muted);
   font-size: 0.8rem;
   font-style: italic;
+  order: 1;
 }
 
 .nettable-state-keys {
@@ -2506,6 +2510,7 @@ video {
   padding: 10px;
   border: 1px solid rgba(224, 170, 84, 0.35);
   background: linear-gradient(135deg, rgba(224, 170, 84, 0.12), rgba(0, 0, 0, 0.12));
+  order: 2;
 }
 
 .nettable-best-bans-heading {
@@ -2589,6 +2594,7 @@ video {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
   gap: 8px;
+  order: 1;
 }
 
 .nettable-legendary-cell {
