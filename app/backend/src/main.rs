@@ -5,6 +5,7 @@ mod ipc_events;
 mod nettable_live;
 mod nettable_parser;
 mod nettable_service;
+mod nettable_setup;
 mod nettable_tail;
 mod outbox;
 mod queen_ladder;
@@ -199,7 +200,7 @@ fn run_daemon() -> io::Result<()> {
                     Some(client) => match client.upload_diagnostic_logs(
                         &cfg,
                         &reason,
-                        nettable_service::find_console_log(),
+                        nettable_setup::find_console_log(),
                     ) {
                         Ok(summary) => emit(&event_json(&DiagnosticsUploaded::complete(
                             &summary.reason,
