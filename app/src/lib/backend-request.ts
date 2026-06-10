@@ -1,8 +1,13 @@
 import type { TrackerEvent } from "../types";
+import type { BackendCommand as GeneratedBackendCommand } from "../backend-events.generated";
 
 const DEFAULT_TIMEOUT_MS = 15_000;
 
-export type BackendCommand = Record<string, unknown>;
+export type BackendCommand = GeneratedBackendCommand extends infer Command
+  ? Command extends { request_id: string }
+    ? Omit<Command, "request_id">
+    : Command
+  : never;
 
 export type BackendResponseMatcher<TResponse extends TrackerEvent> = (
   event: TrackerEvent,
@@ -110,7 +115,7 @@ export function sendBackendRequest<TResponse extends TrackerEvent = TrackerEvent
       window.tracker.sendCommand({
         ...command,
         request_id: requestId,
-      });
+      } as GeneratedBackendCommand);
     } catch (error) {
       settle(() => reject(error));
     }

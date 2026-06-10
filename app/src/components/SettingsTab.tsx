@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import type { TrackerStatus } from "../types";
+import type { BackendCommand } from "../backend-events.generated";
 
 interface SettingsTabProps {
   status: TrackerStatus | null;
@@ -22,7 +23,7 @@ export function SettingsTab({ status }: SettingsTabProps) {
   const steamName = status?.steam_name || "Not logged in";
   const steamId = status?.steam_id || "\u2014";
 
-  const sendCommand = (cmd: Record<string, unknown>) => {
+  const sendCommand = (cmd: BackendCommand) => {
     window.tracker.sendCommand(cmd);
   };
 

@@ -16,9 +16,9 @@ mod unit_codes;
 
 use config::Config;
 use ipc_events::{
-    event_json, BackendStatus, ConfigUpdated, DiagnosticsUploaded, DrodoProfile, ErrorEvent,
-    GameUpdated, GamesList, MatchTimeline, NettablePaused, NettableRows, PayloadQueued, SteamLogin,
-    SteamLoginUrl, SteamLogout, UpdateApplyRequested,
+    event_json, BackendCommand, BackendStatus, ConfigUpdated, DiagnosticsUploaded, DrodoProfile,
+    ErrorEvent, GameUpdated, GamesList, MatchTimeline, NettablePaused, NettableRows, PayloadQueued,
+    SteamLogin, SteamLoginUrl, SteamLogout, UpdateApplyRequested,
 };
 use nettable_service::{parsed_json, rows_json, NettableService};
 use nettable_tail::NettableTailer;
@@ -131,35 +131,38 @@ fn run_daemon() -> io::Result<()> {
 
     for line in io::stdin().lock().lines() {
         let line = line?;
-        let cmd = json_string_field(&line, "cmd").unwrap_or_default();
-        match cmd.as_str() {
-            "quit" => break,
-            "status" => emit(&status_json(&cfg))?,
-            "queue_ingest" | "queue_payload" => {
-                let payload =
-                    json_object_field(&line, "payload").unwrap_or_else(|| "{}".to_owned());
-                let path = outbox.enqueue_str(&payload)?;
+        let command = match serde_json::from_str::<BackendCommand>(&line) {
+            Ok(command) => command,
+            Err(err) => {
+                if err.to_string().contains("unknown variant") {
+                    emit_error(&format!("unknown command: {err}"))?;
+                } else {
+                    emit_error(&format!("invalid command: {err}"))?;
+                }
+                continue;
+            }
+        };
+        match command {
+            BackendCommand::Quit => break,
+            BackendCommand::Status => emit(&status_json(&cfg))?,
+            BackendCommand::QueueIngest { payload } | BackendCommand::QueuePayload { payload } => {
+                let path = outbox.enqueue_str(&payload.to_string())?;
                 emit(&event_json(&PayloadQueued::new(
                     &path.display().to_string(),
                 )))?;
             }
-            "set_config" => {
-                if let Some(key) = json_string_field(&line, "key") {
-                    let value = json_field_raw(&line, "value").unwrap_or_else(|| "null".to_owned());
-                    cfg.save_value(&key, &value)?;
-                    emit(&event_json(&ConfigUpdated::new(&key)))?;
-                } else {
-                    emit_error("set_config missing key")?;
-                }
+            BackendCommand::SetConfig { key, value } => {
+                cfg.save_value(&key, &value.to_string())?;
+                emit(&event_json(&ConfigUpdated::new(&key)))?;
             }
-            "steam_logout" => {
+            BackendCommand::SteamLogout => {
                 cfg.save_value("steam_id", "\"\"")?;
                 cfg.save_value("steam_name", "\"\"")?;
                 cfg.steam_id.clear();
                 cfg.steam_name.clear();
                 emit(&event_json(&SteamLogout::new()))?;
             }
-            "steam_login" => {
+            BackendCommand::SteamLogin => {
                 match steam_auth::steam_login_with_opener(Duration::from_secs(120), |url| {
                     emit(&event_json(&SteamLoginUrl::new(url))).map_err(|err| err.to_string())
                 }) {
@@ -175,29 +178,28 @@ fn run_daemon() -> io::Result<()> {
                     Err(err) => emit_error(&format!("steam_login failed: {err}"))?,
                 }
             }
-            "toggle_recording" => {
+            BackendCommand::ToggleRecording => {
                 emit_error("Replay recording is not available in the Rust-only nettable build")?
             }
-            "nettable_status" => emit(&nettable.status_json())?,
-            "nettable_get_state" => emit(&nettable.state_json())?,
-            "capture" => emit(&nettable.capture_once_json())?,
-            "nettable_apply_launch_options" => nettable.apply_launch_options(&cfg, |line| {
+            BackendCommand::NettableStatus => emit(&nettable.status_json())?,
+            BackendCommand::NettableGetState => emit(&nettable.state_json())?,
+            BackendCommand::Capture => emit(&nettable.capture_once_json())?,
+            BackendCommand::NettableApplyLaunchOptions { flags: _flags } => nettable
+                .apply_launch_options(&cfg, |line| {
+                    let _ = emit(&line);
+                }),
+            BackendCommand::NettableCheckActiveMatch => emit(&nettable.check_active_match_json())?,
+            BackendCommand::NettableResyncFromSteam => nettable.resync_from_steam(|line| {
                 let _ = emit(&line);
             }),
-            "nettable_check_active_match" => emit(&nettable.check_active_match_json())?,
-            "nettable_resync_from_steam" => nettable.resync_from_steam(|line| {
-                let _ = emit(&line);
-            }),
-            "nettable_set_paused" => {
-                let paused = json_bool_field(&line, "paused").unwrap_or(false);
+            BackendCommand::NettableSetPaused { paused } => {
                 nettable.set_paused(paused);
                 emit(&event_json(&NettablePaused::new(paused)))?;
             }
-            "nettable_upload_queens" => nettable.upload_queens(&cfg, |line| {
+            BackendCommand::NettableUploadQueens => nettable.upload_queens(&cfg, |line| {
                 let _ = emit(&line);
             }),
-            "fetch_games" => {
-                let request_id = json_string_field(&line, "request_id").unwrap_or_default();
+            BackendCommand::FetchGames { request_id } => {
                 let steam_id = cfg.steam_id.clone();
                 spawn_supabase_request(
                     stdout_lock.clone(),
@@ -213,9 +215,10 @@ fn run_daemon() -> io::Result<()> {
                     },
                 );
             }
-            "fetch_timeline" => {
-                let request_id = json_string_field(&line, "request_id").unwrap_or_default();
-                let match_id = json_string_field(&line, "match_id").unwrap_or_default();
+            BackendCommand::FetchTimeline {
+                request_id,
+                match_id,
+            } => {
                 spawn_supabase_request(
                     stdout_lock.clone(),
                     cfg.clone(),
@@ -237,23 +240,22 @@ fn run_daemon() -> io::Result<()> {
                     },
                 );
             }
-            "update_game" => {
-                let request_id = json_string_field(&line, "request_id").unwrap_or_default();
-                let game_id = json_i64_field(&line, "id").unwrap_or_default();
-                let fields = json_object_value_field(&line, "fields").unwrap_or_default();
+            BackendCommand::UpdateGame {
+                request_id,
+                id,
+                fields,
+            } => {
                 spawn_supabase_request(
                     stdout_lock.clone(),
                     cfg.clone(),
                     move |client, emit_lock| {
-                        let event = if game_id == 0 {
+                        let event = if id == 0 {
                             event_json(&GameUpdated::error(
                                 request_id,
                                 "update_game missing id".to_owned(),
                             ))
                         } else {
-                            match client
-                                .and_then(|client| client.update_game_fields(game_id, &fields))
-                            {
+                            match client.and_then(|client| client.update_game_fields(id, &fields)) {
                                 Ok(()) => event_json(&GameUpdated::ok(request_id)),
                                 Err(err) => event_json(&GameUpdated::error(request_id, err)),
                             }
@@ -262,8 +264,7 @@ fn run_daemon() -> io::Result<()> {
                     },
                 );
             }
-            "fetch_drodo" => {
-                let request_id = json_string_field(&line, "request_id").unwrap_or_default();
+            BackendCommand::FetchDrodo { request_id } => {
                 let steam_id = cfg.steam_id.clone();
                 spawn_supabase_request(
                     stdout_lock.clone(),
@@ -278,8 +279,7 @@ fn run_daemon() -> io::Result<()> {
                     },
                 );
             }
-            "refresh_drodo" => {
-                let request_id = json_string_field(&line, "request_id").unwrap_or_default();
+            BackendCommand::RefreshDrodo { request_id } => {
                 let steam_id = cfg.steam_id.clone();
                 spawn_supabase_request(
                     stdout_lock.clone(),
@@ -295,9 +295,8 @@ fn run_daemon() -> io::Result<()> {
                     },
                 );
             }
-            "upload_logs" => {
-                let reason =
-                    json_string_field(&line, "reason").unwrap_or_else(|| "manual".to_owned());
+            BackendCommand::UploadLogs { reason } => {
+                let reason = reason.unwrap_or_else(|| "manual".to_owned());
                 match supabase::SupabaseClient::from_config(&cfg) {
                     Some(client) => match client.upload_diagnostic_logs(
                         &cfg,
@@ -320,9 +319,9 @@ fn run_daemon() -> io::Result<()> {
                     )))?,
                 }
             }
-            "do_update" => emit(&event_json(&UpdateApplyRequested::new()))?,
-            "parse_log" => {
-                if let Some(path) = json_string_field(&line, "path") {
+            BackendCommand::DoUpdate => emit(&event_json(&UpdateApplyRequested::new()))?,
+            BackendCommand::ParseLog { path } => {
+                if let Some(path) = path {
                     match nettable_parser::extract_rows(PathBuf::from(path).as_path()) {
                         Ok(rows) => emit(&event_json(&NettableRows::new(
                             nettable_service::rows_value(&rows),
@@ -333,8 +332,8 @@ fn run_daemon() -> io::Result<()> {
                     emit_error("parse_log missing path")?;
                 }
             }
-            "tail_log_once" => {
-                if let Some(path) = json_string_field(&line, "path") {
+            BackendCommand::TailLogOnce { path } => {
+                if let Some(path) = path {
                     let mut tailer = NettableTailer::new(PathBuf::from(path));
                     match tailer.poll() {
                         Ok(Some(rows)) => emit(&event_json(&NettableRows::new(
@@ -347,8 +346,6 @@ fn run_daemon() -> io::Result<()> {
                     emit_error("tail_log_once missing path")?;
                 }
             }
-            "" => emit_error("missing cmd")?,
-            other => emit_error(&format!("unknown command: {other}"))?,
         }
     }
 
@@ -361,119 +358,6 @@ fn status_json(cfg: &Config) -> String {
         &cfg.steam_name,
         cfg.replay_enabled,
     ))
-}
-
-fn json_string(value: &str) -> String {
-    let mut out = String::from("\"");
-    for ch in value.chars() {
-        match ch {
-            '"' => out.push_str("\\\""),
-            '\\' => out.push_str("\\\\"),
-            '\n' => out.push_str("\\n"),
-            '\r' => out.push_str("\\r"),
-            '\t' => out.push_str("\\t"),
-            other => out.push(other),
-        }
-    }
-    out.push('"');
-    out
-}
-
-fn json_string_field(body: &str, key: &str) -> Option<String> {
-    let marker = format!("\"{key}\"");
-    let (_, rest) = body.split_once(&marker)?;
-    let (_, rest) = rest.split_once(':')?;
-    let start = rest.find('"')? + 1;
-    let mut out = String::new();
-    let mut escaped = false;
-    for ch in rest[start..].chars() {
-        if escaped {
-            out.push(ch);
-            escaped = false;
-        } else if ch == '\\' {
-            escaped = true;
-        } else if ch == '"' {
-            return Some(out);
-        } else {
-            out.push(ch);
-        }
-    }
-    None
-}
-
-fn json_field_raw(body: &str, key: &str) -> Option<String> {
-    let marker = format!("\"{key}\"");
-    let (_, rest) = body.split_once(&marker)?;
-    let (_, rest) = rest.split_once(':')?;
-    let value = rest.trim_start();
-    if value.starts_with('{') {
-        return json_object_field(body, key);
-    }
-    if value.starts_with('"') {
-        return json_string_field(body, key).map(|v| json_string(&v));
-    }
-    let end = value
-        .find(|ch: char| ch == ',' || ch == '}')
-        .unwrap_or(value.len());
-    Some(value[..end].trim().to_owned())
-}
-
-fn json_bool_field(body: &str, key: &str) -> Option<bool> {
-    let marker = format!("\"{key}\"");
-    let (_, rest) = body.split_once(&marker)?;
-    let (_, rest) = rest.split_once(':')?;
-    let value = rest.trim_start();
-    if value.starts_with("true") {
-        Some(true)
-    } else if value.starts_with("false") {
-        Some(false)
-    } else {
-        None
-    }
-}
-
-fn json_i64_field(body: &str, key: &str) -> Option<i64> {
-    json_field_raw(body, key)?.parse::<i64>().ok()
-}
-
-fn json_object_field(body: &str, key: &str) -> Option<String> {
-    let marker = format!("\"{key}\"");
-    let (_, rest) = body.split_once(&marker)?;
-    let (_, rest) = rest.split_once(':')?;
-    let start = rest.find('{')?;
-    let mut depth = 0i32;
-    let mut in_string = false;
-    let mut escaped = false;
-    for (idx, ch) in rest[start..].char_indices() {
-        if escaped {
-            escaped = false;
-            continue;
-        }
-        if in_string {
-            if ch == '\\' {
-                escaped = true;
-            } else if ch == '"' {
-                in_string = false;
-            }
-            continue;
-        }
-        match ch {
-            '"' => in_string = true,
-            '{' => depth += 1,
-            '}' => {
-                depth -= 1;
-                if depth == 0 {
-                    return Some(rest[start..start + idx + 1].to_owned());
-                }
-            }
-            _ => {}
-        }
-    }
-    None
-}
-
-fn json_object_value_field(body: &str, key: &str) -> Option<serde_json::Value> {
-    json_object_field(body, key).and_then(|value| serde_json::from_str(&value).ok())
 }
 
 fn spawn_supabase_request<F>(stdout_lock: Arc<Mutex<()>>, cfg: Config, f: F)

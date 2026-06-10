@@ -6,7 +6,7 @@ const TRACKER_LOG_INITIAL_TAIL_BYTES = 256 * 1024;
 const DOTA_LOG_INITIAL_TAIL_BYTES = 128 * 1024;
 const DOTA_NOISE_RE = /\[GCClient\]|^WriteSteamRemoteStorageFileAsync|^CAsyncWriteInProgress|^\[SteamNetSockets\]|\[Filesystem\].*\.vpk\b|\bbad VPK magic\b|\bVPK magic\b|\bvpk:.*\.vpk:/i;
 
-function createTrackerLog({ ipcMain, fs, path, appUserDataDir, getMainWindow }) {
+function createTrackerLog({ ipcMain, fs, path, appUserDataDir, getMainWindow, channels }) {
   const appLogDir = path.join(appUserDataDir, "logs");
   const trackerLogPath = path.join(appLogDir, "tracker.log");
   let trackerLogWatcher = null;
@@ -110,14 +110,14 @@ function createTrackerLog({ ipcMain, fs, path, appUserDataDir, getMainWindow }) 
   }
 
   function registerIpc() {
-    ipcMain.handle("trackerLog:read", () => {
+    ipcMain.handle(channels.trackerLog.read, () => {
       const tracker = readFileTail(trackerLogPath, TRACKER_LOG_INITIAL_TAIL_BYTES, parseTrackerLogLines);
       const dotaPath = dotaLogPath || resolveDotaLogPath();
       const dota = readFileTail(dotaPath, DOTA_LOG_INITIAL_TAIL_BYTES, parseDotaLogLines);
       return [...tracker, ...dota].sort((a, b) => a.ts - b.ts);
     });
 
-    ipcMain.handle("trackerLog:paths", () => ({
+    ipcMain.handle(channels.trackerLog.paths, () => ({
       tracker: trackerLogPath,
       dota: dotaLogPath || resolveDotaLogPath(),
     }));
@@ -143,7 +143,7 @@ function createTrackerLog({ ipcMain, fs, path, appUserDataDir, getMainWindow }) 
             const newEntries = parser(buf.toString("utf-8"));
             const mainWindow = getMainWindow();
             if (newEntries.length > 0 && mainWindow && !mainWindow.isDestroyed()) {
-              mainWindow.webContents.send("trackerLog:update", newEntries);
+              mainWindow.webContents.send(channels.trackerLog.update, newEntries);
             }
           } finally {
             fs.closeSync(fd);

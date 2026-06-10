@@ -3,14 +3,14 @@ function isPathInside(parent, child, path) {
   return relative === "" || (!relative.startsWith("..") && !path.isAbsolute(relative));
 }
 
-function createReplays({ ipcMain, protocol, net, shell, fs, path, replayDir, iconsDir }) {
+function createReplays({ ipcMain, protocol, net, shell, fs, path, replayDir, iconsDir, channels }) {
   function replayPath(filename) {
     const filePath = path.resolve(replayDir, String(filename || ""));
     return isPathInside(path.resolve(replayDir), filePath, path) ? filePath : null;
   }
 
   function registerIpc() {
-    ipcMain.handle("replays:list", async () => {
+    ipcMain.handle(channels.replays.list, async () => {
       if (!fs.existsSync(replayDir)) return [];
       const files = fs.readdirSync(replayDir).filter((f) => f.endsWith(".mp4"));
       return files
@@ -22,7 +22,7 @@ function createReplays({ ipcMain, protocol, net, shell, fs, path, replayDir, ico
         .sort((a, b) => b.mtime - a.mtime);
     });
 
-    ipcMain.handle("replays:delete", async (_event, filename) => {
+    ipcMain.handle(channels.replays.delete, async (_event, filename) => {
       const filePath = replayPath(filename);
       if (!filePath) return false;
       if (fs.existsSync(filePath)) {
@@ -32,7 +32,7 @@ function createReplays({ ipcMain, protocol, net, shell, fs, path, replayDir, ico
       return false;
     });
 
-    ipcMain.handle("replays:stats", async () => {
+    ipcMain.handle(channels.replays.stats, async () => {
       if (!fs.existsSync(replayDir)) return { count: 0, totalBytes: 0 };
       const files = fs.readdirSync(replayDir).filter((f) => f.endsWith(".mp4"));
       let totalBytes = 0;
@@ -40,11 +40,11 @@ function createReplays({ ipcMain, protocol, net, shell, fs, path, replayDir, ico
       return { count: files.length, totalBytes };
     });
 
-    ipcMain.handle("replays:openFolder", async () => {
+    ipcMain.handle(channels.replays.openFolder, async () => {
       await shell.openPath(replayDir);
     });
 
-    ipcMain.handle("replays:exists", async (_event, filename) => {
+    ipcMain.handle(channels.replays.exists, async (_event, filename) => {
       const filePath = replayPath(filename);
       return Boolean(filePath && fs.existsSync(filePath));
     });

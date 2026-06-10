@@ -1,5 +1,6 @@
 import type { ItemFullInfo, RelicInfo, SynergyInfo, UnitFullInfo } from "@dac/shared/types";
 import type { BackendEvent } from "./backend-events";
+import type { BackendCommand } from "./backend-events.generated";
 
 export type { ItemFullInfo, RelicInfo, SynergyInfo, UnitFullInfo } from "@dac/shared/types";
 export type * from "./backend-events";
@@ -299,7 +300,7 @@ declare global {
       exists: (filename: string) => Promise<boolean>;
     };
     tracker: {
-      sendCommand: (cmd: Record<string, unknown>) => void;
+      sendCommand: (cmd: BackendCommand) => void;
       onEvent: (callback: (msg: TrackerEvent) => void) => () => void;
     };
     appApi: {

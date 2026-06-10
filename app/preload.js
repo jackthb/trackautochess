@@ -1,46 +1,47 @@
 const { contextBridge, ipcRenderer } = require("electron");
+const { CHANNELS } = require("./ipc-channels.cjs");
 
 contextBridge.exposeInMainWorld("replays", {
-  list: () => ipcRenderer.invoke("replays:list"),
-  delete: (filename) => ipcRenderer.invoke("replays:delete", filename),
-  stats: () => ipcRenderer.invoke("replays:stats"),
-  openFolder: () => ipcRenderer.invoke("replays:openFolder"),
-  exists: (filename) => ipcRenderer.invoke("replays:exists", filename),
+  list: () => ipcRenderer.invoke(CHANNELS.replays.list),
+  delete: (filename) => ipcRenderer.invoke(CHANNELS.replays.delete, filename),
+  stats: () => ipcRenderer.invoke(CHANNELS.replays.stats),
+  openFolder: () => ipcRenderer.invoke(CHANNELS.replays.openFolder),
+  exists: (filename) => ipcRenderer.invoke(CHANNELS.replays.exists, filename),
 });
 
 contextBridge.exposeInMainWorld("tracker", {
-  sendCommand: (cmd) => ipcRenderer.send("tracker:command", cmd),
+  sendCommand: (cmd) => ipcRenderer.send(CHANNELS.tracker.command, cmd),
   onEvent: (callback) => {
     const handler = (_event, msg) => callback(msg);
-    ipcRenderer.on("tracker:event", handler);
-    return () => ipcRenderer.removeListener("tracker:event", handler);
+    ipcRenderer.on(CHANNELS.tracker.event, handler);
+    return () => ipcRenderer.removeListener(CHANNELS.tracker.event, handler);
   },
 });
 
 contextBridge.exposeInMainWorld("trackerLog", {
-  read: () => ipcRenderer.invoke("trackerLog:read"),
-  paths: () => ipcRenderer.invoke("trackerLog:paths"),
+  read: () => ipcRenderer.invoke(CHANNELS.trackerLog.read),
+  paths: () => ipcRenderer.invoke(CHANNELS.trackerLog.paths),
   onUpdate: (callback) => {
     const handler = (_event, entries) => callback(entries);
-    ipcRenderer.on("trackerLog:update", handler);
-    return () => ipcRenderer.removeListener("trackerLog:update", handler);
+    ipcRenderer.on(CHANNELS.trackerLog.update, handler);
+    return () => ipcRenderer.removeListener(CHANNELS.trackerLog.update, handler);
   },
 });
 
 contextBridge.exposeInMainWorld("windowControls", {
-  minimize: () => ipcRenderer.send("window:minimize"),
-  maximize: () => ipcRenderer.send("window:maximize"),
-  close: () => ipcRenderer.send("window:close"),
+  minimize: () => ipcRenderer.send(CHANNELS.window.minimize),
+  maximize: () => ipcRenderer.send(CHANNELS.window.maximize),
+  close: () => ipcRenderer.send(CHANNELS.window.close),
 });
 
 contextBridge.exposeInMainWorld("appApi", {
-  openExternal: (url) => ipcRenderer.invoke("app:openExternal", url),
-  getVersion: () => ipcRenderer.invoke("app:getVersion"),
-  fetchUnitsData: () => ipcRenderer.invoke("data:units"),
-  fetchUnitsFull: () => ipcRenderer.invoke("data:units_full"),
-  fetchSynergies: () => ipcRenderer.invoke("data:synergies"),
-  fetchRelics: () => ipcRenderer.invoke("data:relics"),
-  fetchItems: () => ipcRenderer.invoke("data:items"),
-  fetchItemsFull: () => ipcRenderer.invoke("data:items_full"),
-  fetchTalents: () => ipcRenderer.invoke("data:talents"),
+  openExternal: (url) => ipcRenderer.invoke(CHANNELS.app.openExternal, url),
+  getVersion: () => ipcRenderer.invoke(CHANNELS.app.getVersion),
+  fetchUnitsData: () => ipcRenderer.invoke(CHANNELS.data.units),
+  fetchUnitsFull: () => ipcRenderer.invoke(CHANNELS.data.unitsFull),
+  fetchSynergies: () => ipcRenderer.invoke(CHANNELS.data.synergies),
+  fetchRelics: () => ipcRenderer.invoke(CHANNELS.data.relics),
+  fetchItems: () => ipcRenderer.invoke(CHANNELS.data.items),
+  fetchItemsFull: () => ipcRenderer.invoke(CHANNELS.data.itemsFull),
+  fetchTalents: () => ipcRenderer.invoke(CHANNELS.data.talents),
 });

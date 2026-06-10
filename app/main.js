@@ -16,6 +16,7 @@ const https = require("https");
 const { spawn, execFile } = require("child_process");
 const readline = require("readline");
 const { getElectronDesktopPaths } = require("./desktop-paths.cjs");
+const { CHANNELS } = require("./ipc-channels.cjs");
 const { createBackendSupervisor } = require("./main/backend-supervisor.cjs");
 const { createContentIpc } = require("./main/content.cjs");
 const { createReplays } = require("./main/replays.cjs");
@@ -90,6 +91,7 @@ const trackerLog = createTrackerLog({
   path,
   appUserDataDir: app.getPath("userData"),
   getMainWindow,
+  channels: CHANNELS,
 });
 const backend = createBackendSupervisor({
   fs,
@@ -109,7 +111,7 @@ const updater = createUpdater({
   getTrackerStatus: () => trackerStatus,
   emitEvent: handleBackendEvent,
 });
-const content = createContentIpc({ ipcMain, fs, path, contentDir: CONTENT_DIR });
+const content = createContentIpc({ ipcMain, fs, path, contentDir: CONTENT_DIR, channels: CHANNELS });
 const replays = createReplays({
   ipcMain,
   protocol,
@@ -119,6 +121,7 @@ const replays = createReplays({
   path,
   replayDir: REPLAY_DIR,
   iconsDir: ICONS_DIR,
+  channels: CHANNELS,
 });
 
 backend.onEvent(handleBackendEvent);
@@ -137,7 +140,7 @@ function handleBackendEvent(msg) {
   trackerLog.logBackendEvent(msg);
 
   if (mainWindow && !mainWindow.isDestroyed()) {
-    mainWindow.webContents.send("tracker:event", msg);
+    mainWindow.webContents.send(CHANNELS.tracker.event, msg);
   }
 
   switch (msg.type) {
@@ -241,11 +244,11 @@ function registerShortcuts() {
   });
 }
 
-ipcMain.on("window:minimize", () => {
+ipcMain.on(CHANNELS.window.minimize, () => {
   if (mainWindow && !mainWindow.isDestroyed()) mainWindow.minimize();
 });
 
-ipcMain.on("window:maximize", () => {
+ipcMain.on(CHANNELS.window.maximize, () => {
   if (!mainWindow || mainWindow.isDestroyed()) return;
   if (mainWindow.isMaximized()) {
     mainWindow.unmaximize();
@@ -254,11 +257,11 @@ ipcMain.on("window:maximize", () => {
   }
 });
 
-ipcMain.on("window:close", () => {
+ipcMain.on(CHANNELS.window.close, () => {
   if (mainWindow && !mainWindow.isDestroyed()) mainWindow.close();
 });
 
-ipcMain.on("tracker:command", (_event, cmd) => {
+ipcMain.on(CHANNELS.tracker.command, (_event, cmd) => {
   if (cmd?.cmd === "do_update") {
     const url = cmd.download_url || cmd.downloadUrl || trackerStatus.update?.downloadUrl || trackerStatus.update?.htmlUrl;
     if (url) {
@@ -272,7 +275,7 @@ ipcMain.on("tracker:command", (_event, cmd) => {
   backend.send(cmd);
 });
 
-ipcMain.handle("app:openExternal", async (_event, url) => {
+ipcMain.handle(CHANNELS.app.openExternal, async (_event, url) => {
   try {
     const parsed = new URL(String(url || ""));
     if (parsed.protocol !== "http:" && parsed.protocol !== "https:") return false;
@@ -283,7 +286,7 @@ ipcMain.handle("app:openExternal", async (_event, url) => {
   }
 });
 
-ipcMain.handle("app:getVersion", () => app.getVersion());
+ipcMain.handle(CHANNELS.app.getVersion, () => app.getVersion());
 
 app.on("second-instance", () => {
   if (app.isReady()) {

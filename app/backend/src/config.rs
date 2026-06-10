@@ -1,8 +1,11 @@
+use serde::Serialize;
 use serde_json::{json, Value};
 use std::{env, fs, io, path::PathBuf};
+use ts_rs::TS;
 
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, TS)]
 pub struct Config {
+    #[ts(type = "string")]
     pub dac_dir: PathBuf,
     pub steam_id: String,
     pub steam_name: String,
@@ -33,9 +36,6 @@ impl Config {
         Ok(Self {
             dac_dir,
             steam_id: value_string(&value, "steam_id"),
-            // Sanitize on load: legacy configs (old backend) stored the raw
-            // Steam XML `<![CDATA[name]]>`, which otherwise renders as
-            // "C. Data <name>". normalize_steam_name strips that wrapper.
             steam_name: crate::steam_auth::normalize_steam_name(&value_string(
                 &value,
                 "steam_name",

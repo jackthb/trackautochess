@@ -4,6 +4,18 @@ Step-by-step instructions for fixing the findings from the June 2026 architectur
 Work through the phases in order — each phase leaves the repo shippable, and later phases
 assume the earlier ones are done. Validate after every phase with the checks listed.
 
+## Current status (2026-06-10)
+
+| Phase | Status | Branch / PR | Notes |
+| --- | --- | --- | --- |
+| Phase 1 | Merged to `main` | [#229](https://github.com/jackthb/dac-tools/pull/229) | Desktop Drodo profile query fix |
+| Phase 2 | Merged to `main` | [#230](https://github.com/jackthb/dac-tools/pull/230) | Electron main modularization |
+| Phase 3 | Merged to `main` | [#234](https://github.com/jackthb/dac-tools/pull/234) | Desktop data routed through Rust backend |
+| Phase 4 | Merged to `main` | [#232](https://github.com/jackthb/dac-tools/pull/232) | Backend module split |
+| Phase 5 | In progress | `codex/phase-5-typed-contracts-v2` | Fresh PR from `main`; [#233](https://github.com/jackthb/dac-tools/pull/233) was merged into an intermediate branch and is superseded |
+| Phase 6 | Paused / not started | no PR | Resume after Phase 5 lands |
+| Phase 7 | Not started | no PR | Requires Phase 6 and live-game fixture capture |
+
 ---
 
 ## Phase 1 — Fix the broken desktop Drodo feature (bug, ~1 hour)

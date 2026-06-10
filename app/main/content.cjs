@@ -1,4 +1,4 @@
-function createContentIpc({ ipcMain, fs, path, contentDir }) {
+function createContentIpc({ ipcMain, fs, path, contentDir, channels }) {
   let runtimeGameDataCache = null;
 
   function readJsonFile(file, fallback) {
@@ -78,16 +78,16 @@ function createContentIpc({ ipcMain, fs, path, contentDir }) {
   }
 
   function register() {
-    ipcMain.handle("data:units", async () => {
+    ipcMain.handle(channels.data.units, async () => {
       const data = getRuntimeGameData();
       return { units: data.unitsFull, aliases: data.aliases };
     });
-    ipcMain.handle("data:synergies", async () => getRuntimeGameData().synergies);
-    ipcMain.handle("data:relics", async () => getRuntimeGameData().relics);
-    ipcMain.handle("data:units_full", async () => getRuntimeGameData().unitsFull);
-    ipcMain.handle("data:items", async () => getRuntimeGameData().items);
-    ipcMain.handle("data:items_full", async () => getRuntimeGameData().itemsFull);
-    ipcMain.handle("data:talents", async () => getRuntimeGameData().talents);
+    ipcMain.handle(channels.data.synergies, async () => getRuntimeGameData().synergies);
+    ipcMain.handle(channels.data.relics, async () => getRuntimeGameData().relics);
+    ipcMain.handle(channels.data.unitsFull, async () => getRuntimeGameData().unitsFull);
+    ipcMain.handle(channels.data.items, async () => getRuntimeGameData().items);
+    ipcMain.handle(channels.data.itemsFull, async () => getRuntimeGameData().itemsFull);
+    ipcMain.handle(channels.data.talents, async () => getRuntimeGameData().talents);
   }
 
   return { register, getRuntimeGameData };

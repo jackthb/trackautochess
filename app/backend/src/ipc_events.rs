@@ -1,8 +1,69 @@
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 use ts_rs::TS;
 
 pub fn event_json<T: Serialize>(event: &T) -> String {
     serde_json::to_string(event).expect("IPC event serialization should not fail")
+}
+
+#[derive(Debug, Deserialize, TS)]
+#[serde(tag = "cmd", rename_all = "snake_case")]
+pub enum BackendCommand {
+    Quit,
+    Status,
+    QueueIngest {
+        payload: serde_json::Value,
+    },
+    QueuePayload {
+        payload: serde_json::Value,
+    },
+    SetConfig {
+        key: String,
+        value: serde_json::Value,
+    },
+    SteamLogout,
+    SteamLogin,
+    ToggleRecording,
+    NettableStatus,
+    NettableGetState,
+    Capture,
+    NettableApplyLaunchOptions {
+        #[serde(default)]
+        flags: Option<Vec<String>>,
+    },
+    NettableCheckActiveMatch,
+    NettableResyncFromSteam,
+    NettableSetPaused {
+        paused: bool,
+    },
+    NettableUploadQueens,
+    FetchGames {
+        request_id: String,
+    },
+    FetchTimeline {
+        request_id: String,
+        match_id: String,
+    },
+    UpdateGame {
+        request_id: String,
+        id: i64,
+        fields: serde_json::Value,
+    },
+    FetchDrodo {
+        request_id: String,
+    },
+    RefreshDrodo {
+        request_id: String,
+    },
+    UploadLogs {
+        reason: Option<String>,
+    },
+    DoUpdate,
+    ParseLog {
+        path: Option<String>,
+    },
+    TailLogOnce {
+        path: Option<String>,
+    },
 }
 
 #[derive(Debug, Serialize, TS)]
@@ -825,6 +886,8 @@ mod tests {
             }};
         }
         push_decl!(BackendStatus<'static>);
+        push_decl!(BackendCommand);
+        push_decl!(crate::config::Config);
         push_decl!(ErrorEvent<'static>);
         push_decl!(PayloadQueued<'static>);
         push_decl!(ConfigUpdated<'static>);
@@ -857,7 +920,12 @@ mod tests {
         push_decl!(NettableSetupProgress<'static>);
         push_decl!(NettableLaunchOptionsApplied<'static>);
         push_decl!(NettableLaunchOptionsError<'static>);
-        out
+        let trimmed = out
+            .lines()
+            .map(str::trim_end)
+            .collect::<Vec<_>>()
+            .join("\n");
+        format!("{trimmed}\n")
     }
 
     #[test]
