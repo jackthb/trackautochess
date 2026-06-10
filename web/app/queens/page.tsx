@@ -18,6 +18,7 @@ interface QueenRow {
   drodo_season_games: number | null;
   drodo_chicken_count: number | null;
   drodo_raw_data: Record<string, unknown> | null;
+  drodo_last_fetched_at: string | null;
   queen_ladder_rank: number | null;
   queen_ladder_mmr: number | null;
   queen_ladder_season: string | null;
@@ -76,6 +77,7 @@ const SELECT = [
   "drodo_season_games",
   "drodo_chicken_count",
   "drodo_raw_data",
+  "drodo_last_fetched_at",
   "queen_ladder_rank",
   "queen_ladder_mmr",
   "queen_ladder_season",
@@ -233,6 +235,30 @@ function effectiveQueenRank(row: QueenRow): number | null {
   return row.queen_ladder_rank ?? profileQueenRank(row);
 }
 
+function mostRecentTimestamp(
+  ...values: Array<string | null | undefined>
+): string | null {
+  let latestValue: string | null = null;
+  let latestTime = -Infinity;
+  for (const value of values) {
+    if (!value) continue;
+    const time = new Date(value).getTime();
+    if (!Number.isFinite(time) || time <= latestTime) continue;
+    latestTime = time;
+    latestValue = value;
+  }
+  return latestValue;
+}
+
+function queenLastUpdatedAt(rows: QueenRow[]): string | null {
+  return mostRecentTimestamp(
+    ...rows.flatMap((row) => [
+      row.queen_ladder_last_seen_at,
+      row.drodo_last_fetched_at,
+    ])
+  );
+}
+
 function compareQueenRows(a: QueenRow, b: QueenRow): number {
   const aRank = effectiveQueenRank(a) ?? Number.MAX_SAFE_INTEGER;
   const bRank = effectiveQueenRank(b) ?? Number.MAX_SAFE_INTEGER;
@@ -322,7 +348,7 @@ function StreamIcon({ platform }: { platform: ReturnType<typeof streamPlatform> 
 export default async function QueensPage() {
   const { rows, error } = await loadQueens();
   const season = rows.find((row) => row.queen_ladder_season)?.queen_ladder_season;
-  const lastSyncedAt = rows[0]?.queen_ladder_last_seen_at ?? null;
+  const lastUpdatedAt = queenLastUpdatedAt(rows);
 
   return (
     <PageLayout title="Queen Players">
@@ -344,8 +370,8 @@ export default async function QueensPage() {
       ) : (
         <>
           <div className={styles["snapshot-meta"]}>
-            <span>Last synced</span>
-            <LastSyncedTime value={lastSyncedAt} />
+            <span>Last updated</span>
+            <LastSyncedTime value={lastUpdatedAt} />
           </div>
           <div className={`${styles.table} ${styles["queen-table"]}`} role="table">
             <div className={`${styles.row} ${styles["header-row"]}`}>

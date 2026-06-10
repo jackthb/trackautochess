@@ -20,6 +20,8 @@ export const EMPTY_DRODO_PROFILE_ERROR =
 export const POLL_MIN_INTERVAL_SECONDS = 10 * 60; // 10 minutes
 export const POLL_MAX_INTERVAL_SECONDS = 7 * 24 * 60 * 60; // 7 days
 export const POLL_BACKOFF_FACTOR = 1.5;
+export const QUEEN_POLL_MAX_INTERVAL_SECONDS = 60 * 60; // 1 hour
+export const QUEEN_POLL_BACKOFF_FACTOR = 1.25;
 
 export interface SeasonSnapshotRow {
   steam_id: string;
@@ -284,6 +286,7 @@ interface PollSnapshot {
   drodo_season_games: number | null;
   drodo_chicken_count: number | null;
   queen_rank: number | null;
+  queen_ladder_last_seen_at: string | null;
   poll_interval_seconds: number | null;
 }
 
@@ -292,11 +295,11 @@ interface PollSnapshotRow extends PollSnapshot {
   drodo_raw_data: Record<string, unknown> | null;
 }
 
-function clampInterval(seconds: number): number {
+function clampInterval(seconds: number, max = POLL_MAX_INTERVAL_SECONDS): number {
   if (!Number.isFinite(seconds) || seconds < POLL_MIN_INTERVAL_SECONDS) {
     return POLL_MIN_INTERVAL_SECONDS;
   }
-  if (seconds > POLL_MAX_INTERVAL_SECONDS) return POLL_MAX_INTERVAL_SECONDS;
+  if (seconds > max) return max;
   return Math.round(seconds);
 }
 
@@ -305,20 +308,23 @@ export function nextPollSchedule(input: {
   changed: boolean;
   prevIntervalSeconds: number | null;
   missing?: boolean;
+  queen?: boolean;
 }): PollSchedule {
-  const { mode, changed, prevIntervalSeconds, missing = false } = input;
+  const { mode, changed, prevIntervalSeconds, missing = false, queen = false } = input;
+  const maxInterval = queen ? QUEEN_POLL_MAX_INTERVAL_SECONDS : POLL_MAX_INTERVAL_SECONDS;
+  const backoffFactor = queen ? QUEEN_POLL_BACKOFF_FACTOR : POLL_BACKOFF_FACTOR;
   let intervalSeconds: number;
 
   if (missing) {
-    intervalSeconds = POLL_MAX_INTERVAL_SECONDS;
+    intervalSeconds = maxInterval;
   } else if (mode === "reset" || changed) {
     intervalSeconds = POLL_MIN_INTERVAL_SECONDS;
   } else {
     const prev = prevIntervalSeconds ?? POLL_MIN_INTERVAL_SECONDS;
-    intervalSeconds = clampInterval(prev * POLL_BACKOFF_FACTOR);
+    intervalSeconds = clampInterval(prev * backoffFactor, maxInterval);
   }
 
-  intervalSeconds = clampInterval(intervalSeconds);
+  intervalSeconds = clampInterval(intervalSeconds, maxInterval);
   return {
     next_poll_at: new Date(Date.now() + intervalSeconds * 1000).toISOString(),
     poll_interval_seconds: intervalSeconds,
@@ -332,7 +338,7 @@ async function loadPollSnapshot(
   const { data } = await supabase
     .from("users")
     .select(
-      "drodo_mmr, drodo_season_games, drodo_chicken_count, drodo_raw_data, poll_interval_seconds"
+      "drodo_mmr, drodo_season_games, drodo_chicken_count, drodo_raw_data, queen_ladder_last_seen_at, poll_interval_seconds"
     )
     .eq("steam_id", steamId)
     .maybeSingle<PollSnapshotRow>();
@@ -347,7 +353,7 @@ async function loadPollSnapshots(
   const { data } = await supabase
     .from("users")
     .select(
-      "steam_id::text, drodo_mmr, drodo_season_games, drodo_chicken_count, drodo_raw_data, poll_interval_seconds"
+      "steam_id::text, drodo_mmr, drodo_season_games, drodo_chicken_count, drodo_raw_data, queen_ladder_last_seen_at, poll_interval_seconds"
     )
     .in("steam_id", steamIds);
   return new Map(
@@ -366,8 +372,20 @@ function pollSnapshotFromRow(row: PollSnapshotRow): PollSnapshot {
     queen_rank: row.drodo_raw_data
       ? numberFromDrodoData(row.drodo_raw_data, "queen_rank")
       : null,
+    queen_ladder_last_seen_at: row.queen_ladder_last_seen_at,
     poll_interval_seconds: row.poll_interval_seconds,
   };
+}
+
+function isQueenProfile(
+  profile: DrodoProfileRow,
+  prev: PollSnapshot | null | undefined
+): boolean {
+  return (
+    profile.queen_rank != null ||
+    prev?.queen_rank != null ||
+    prev?.queen_ladder_last_seen_at != null
+  );
 }
 
 function profileChanged(
@@ -484,21 +502,24 @@ async function persistDrodoProfile(
   }
 ): Promise<void> {
   const changed = profileChanged(options.prevSnapshot ?? null, profile);
+  const queen = isQueenProfile(profile, options.prevSnapshot);
   const schedule = nextPollSchedule({
     mode: options.pollMode,
     changed,
     prevIntervalSeconds: options.prevSnapshot?.poll_interval_seconds ?? null,
+    queen,
   });
+  const userPayload: Record<string, unknown> = {
+    ...drodoProfileToUserPayload(profile),
+    next_poll_at: schedule.next_poll_at,
+    poll_interval_seconds: schedule.poll_interval_seconds,
+  };
+  if (queen) {
+    userPayload.queen_ladder_last_seen_at = profile.fetched_at;
+  }
   const { error: upsertError } = await supabase
     .from("users")
-    .upsert(
-      {
-        ...drodoProfileToUserPayload(profile),
-        next_poll_at: schedule.next_poll_at,
-        poll_interval_seconds: schedule.poll_interval_seconds,
-      },
-      { onConflict: "steam_id" }
-    );
+    .upsert(userPayload, { onConflict: "steam_id" });
   if (upsertError) {
     console.error("Failed to cache Drodo profile:", upsertError.message);
   }

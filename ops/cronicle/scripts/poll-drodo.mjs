@@ -8,6 +8,8 @@ const RECENT_SIGN_IN_WINDOW_MS = 14 * 24 * 60 * 60 * 1000;
 const POLL_MIN_INTERVAL_SECONDS = 10 * 60;
 const POLL_MAX_INTERVAL_SECONDS = 7 * 24 * 60 * 60;
 const POLL_BACKOFF_FACTOR = 1.5;
+const QUEEN_POLL_MAX_INTERVAL_SECONDS = 60 * 60;
+const QUEEN_POLL_BACKOFF_FACTOR = 1.25;
 const EMPTY_DRODO_PROFILE_ERROR =
   "Steam account has no Dota Auto Chess MMR or stats.";
 
@@ -179,25 +181,27 @@ function drodoProfileToUserPayload(profile) {
   };
 }
 
-function clampInterval(seconds) {
+function clampInterval(seconds, max = POLL_MAX_INTERVAL_SECONDS) {
   if (!Number.isFinite(seconds) || seconds < POLL_MIN_INTERVAL_SECONDS) {
     return POLL_MIN_INTERVAL_SECONDS;
   }
-  if (seconds > POLL_MAX_INTERVAL_SECONDS) return POLL_MAX_INTERVAL_SECONDS;
+  if (seconds > max) return max;
   return Math.round(seconds);
 }
 
-function nextPollSchedule({ mode, changed, prevIntervalSeconds, missing = false }) {
+function nextPollSchedule({ mode, changed, prevIntervalSeconds, missing = false, queen = false }) {
+  const maxInterval = queen ? QUEEN_POLL_MAX_INTERVAL_SECONDS : POLL_MAX_INTERVAL_SECONDS;
+  const backoffFactor = queen ? QUEEN_POLL_BACKOFF_FACTOR : POLL_BACKOFF_FACTOR;
   let intervalSeconds;
   if (missing) {
-    intervalSeconds = POLL_MAX_INTERVAL_SECONDS;
+    intervalSeconds = maxInterval;
   } else if (mode === "reset" || changed) {
     intervalSeconds = POLL_MIN_INTERVAL_SECONDS;
   } else {
     const prev = prevIntervalSeconds ?? POLL_MIN_INTERVAL_SECONDS;
-    intervalSeconds = clampInterval(prev * POLL_BACKOFF_FACTOR);
+    intervalSeconds = clampInterval(prev * backoffFactor, maxInterval);
   }
-  intervalSeconds = clampInterval(intervalSeconds);
+  intervalSeconds = clampInterval(intervalSeconds, maxInterval);
   return {
     next_poll_at: new Date(Date.now() + intervalSeconds * 1000).toISOString(),
     poll_interval_seconds: intervalSeconds,
@@ -210,8 +214,17 @@ function pollSnapshotFromRow(row) {
     drodo_season_games: row.drodo_season_games,
     drodo_chicken_count: row.drodo_chicken_count,
     queen_rank: row.drodo_raw_data ? numberFromDrodoData(row.drodo_raw_data, "queen_rank") : null,
+    queen_ladder_last_seen_at: row.queen_ladder_last_seen_at,
     poll_interval_seconds: row.poll_interval_seconds,
   };
+}
+
+function isQueenProfile(profile, prev) {
+  return (
+    profile.queen_rank != null ||
+    prev?.queen_rank != null ||
+    prev?.queen_ladder_last_seen_at != null
+  );
 }
 
 function profileChanged(prev, next) {
@@ -348,7 +361,7 @@ async function loadAllIds(supabase, limit) {
 async function loadPollSnapshots(steamIds, supabase) {
   if (steamIds.length === 0) return new Map();
   const rows = await supabase.select("users", {
-    select: "steam_id::text,drodo_mmr,drodo_season_games,drodo_chicken_count,drodo_raw_data,poll_interval_seconds",
+    select: "steam_id::text,drodo_mmr,drodo_season_games,drodo_chicken_count,drodo_raw_data,queen_ladder_last_seen_at,poll_interval_seconds",
     steam_id: `in.(${steamIds.join(",")})`,
   });
   return new Map((rows ?? []).map((row) => [rowSteamId(row), pollSnapshotFromRow(row)]));
@@ -386,19 +399,25 @@ async function markDrodoMissing(steamId, supabase) {
 
 async function persistDrodoProfile(profile, seasonRows, supabase, options) {
   const changed = profileChanged(options.prevSnapshot ?? null, profile);
+  const queen = isQueenProfile(profile, options.prevSnapshot);
   const schedule = nextPollSchedule({
     mode: options.pollMode,
     changed,
     prevIntervalSeconds: options.prevSnapshot?.poll_interval_seconds ?? null,
+    queen,
   });
+  const userPayload = {
+    ...drodoProfileToUserPayload(profile),
+    next_poll_at: schedule.next_poll_at,
+    poll_interval_seconds: schedule.poll_interval_seconds,
+  };
+  if (queen) {
+    userPayload.queen_ladder_last_seen_at = profile.fetched_at;
+  }
 
   await supabase.upsert(
     "users",
-    {
-      ...drodoProfileToUserPayload(profile),
-      next_poll_at: schedule.next_poll_at,
-      poll_interval_seconds: schedule.poll_interval_seconds,
-    },
+    userPayload,
     "steam_id"
   );
 

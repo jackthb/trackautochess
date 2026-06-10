@@ -23,6 +23,7 @@ export const USER_DRODO_SELECT = [
   "drodo_chicken_count",
   "drodo_raw_data",
   "drodo_last_fetched_at",
+  "queen_ladder_last_seen_at",
   "drodo_profile_missing",
 ].join(", ");
 
@@ -39,6 +40,7 @@ export interface CachedUserDrodoRow {
   drodo_chicken_count: number | null;
   drodo_raw_data: Record<string, unknown> | null;
   drodo_last_fetched_at: string | null;
+  queen_ladder_last_seen_at: string | null;
   drodo_profile_missing: boolean | null;
 }
 

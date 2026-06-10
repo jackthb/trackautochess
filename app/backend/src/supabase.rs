@@ -250,7 +250,10 @@ impl SupabaseClient {
             } else {
                 player.seen_at.clone()
             };
-            row.insert("queen_ladder_last_seen_at".to_owned(), json!(seen_at));
+            row.insert("queen_ladder_last_seen_at".to_owned(), json!(seen_at.clone()));
+            row.insert("drodo_last_fetched_at".to_owned(), json!(seen_at));
+            row.insert("next_poll_at".to_owned(), json!(next_drodo_poll_at(600)));
+            row.insert("poll_interval_seconds".to_owned(), json!(600));
             if let Some(name) = player
                 .name
                 .as_deref()
@@ -373,6 +376,7 @@ impl SupabaseClient {
                     user_rows.push(json!({
                         "steam_id": steam_id,
                         "drodo_last_fetched_at": fetched_at,
+                        "queen_ladder_last_seen_at": fetched_at,
                         "drodo_profile_missing": true,
                         "next_poll_at": next_drodo_poll_at(600),
                         "poll_interval_seconds": 600,
@@ -402,6 +406,7 @@ impl SupabaseClient {
                     "drodo_chicken_count": chicken_count,
                     "drodo_raw_data": Value::Object(info.clone()),
                     "drodo_last_fetched_at": fetched_at,
+                    "queen_ladder_last_seen_at": fetched_at,
                     "drodo_profile_missing": false,
                     "next_poll_at": next_drodo_poll_at(600),
                     "poll_interval_seconds": 600,

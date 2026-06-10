@@ -84,6 +84,21 @@ function drodoFromCachedRow(row: CachedUserDrodoRow) {
   };
 }
 
+function mostRecentTimestamp(
+  ...values: Array<string | null | undefined>
+): string | null {
+  let latestValue: string | null = null;
+  let latestTime = -Infinity;
+  for (const value of values) {
+    if (!value) continue;
+    const time = new Date(value).getTime();
+    if (!Number.isFinite(time) || time <= latestTime) continue;
+    latestTime = time;
+    latestValue = value;
+  }
+  return latestValue;
+}
+
 /** Cached per request so generateMetadata and the page render share data. */
 const loadPlayer = cache(async (rawSteamId: string): Promise<LoadResult> => {
   if (!rawSteamId || typeof rawSteamId !== "string") {
@@ -172,7 +187,10 @@ const loadPlayer = cache(async (rawSteamId: string): Promise<LoadResult> => {
       .filter((row) => row.queen_rank != null);
     if (profileResult.data) {
       drodoProfileMissing = Boolean(profileResult.data.drodo_profile_missing);
-      drodoLastFetchedAt = profileResult.data.drodo_last_fetched_at;
+      drodoLastFetchedAt = mostRecentTimestamp(
+        profileResult.data.drodo_last_fetched_at,
+        profileResult.data.queen_ladder_last_seen_at
+      );
       if (
         (profileResult.data.drodo_last_fetched_at ||
           profileResult.data.drodo_mmr != null) &&
@@ -192,7 +210,10 @@ const loadPlayer = cache(async (rawSteamId: string): Promise<LoadResult> => {
       if (initialDrodo.ok) {
         drodo = drodoFromProfile(initialDrodo.profile);
         seasons = initialDrodo.seasonRows;
-        drodoLastFetchedAt = initialDrodo.profile.fetched_at;
+        drodoLastFetchedAt = mostRecentTimestamp(
+          initialDrodo.profile.fetched_at,
+          cachedProfileRow?.queen_ladder_last_seen_at
+        );
         drodoProfileMissing = false;
         mmrHistory = [
           {
@@ -212,7 +233,10 @@ const loadPlayer = cache(async (rawSteamId: string): Promise<LoadResult> => {
             ];
       } else if (initialDrodo.kind === "missing") {
         drodoProfileMissing = true;
-        drodoLastFetchedAt = initialDrodo.fetchedAt ?? null;
+        drodoLastFetchedAt = mostRecentTimestamp(
+          initialDrodo.fetchedAt,
+          cachedProfileRow?.queen_ladder_last_seen_at
+        );
       }
     }
   }

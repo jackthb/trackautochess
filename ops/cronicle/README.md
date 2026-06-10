@@ -73,8 +73,11 @@ Command:
 ```
 
 This polls active users: recently signed-in players, known Queen ladder players,
-and users with a known Drodo queen rank whose `next_poll_at` is due. Unseeded
-active users are also pulled once and then put on the adaptive schedule.
+and users with a known Drodo queen rank whose `next_poll_at` is due. Successful
+Queen pulls stamp both freshness fields and use a gentler adaptive schedule:
+changed rows reset to 10 minutes, unchanged rows back off slowly and cap at 1
+hour. Unseeded active users are also pulled once and start on the 10-minute
+cadence.
 
 ### Daily full poll
 
