@@ -81,6 +81,70 @@ pub struct NettableRankingScanned<'a> {
     pub at: &'a str,
 }
 
+#[derive(Debug, Serialize)]
+pub struct NettableIngestComplete<'a> {
+    #[serde(rename = "type")]
+    pub event_type: &'static str,
+    pub backend: &'static str,
+    pub rows_written: usize,
+    pub tables: Vec<String>,
+    pub at: &'a str,
+}
+
+impl<'a> NettableIngestComplete<'a> {
+    pub fn new(rows_written: usize, tables: Vec<String>, at: &'a str) -> Self {
+        Self {
+            event_type: "nettable_ingest_complete",
+            backend: "rust",
+            rows_written,
+            tables,
+            at,
+        }
+    }
+}
+
+#[derive(Debug, Serialize)]
+pub struct NettableTimelineExtracted<'a> {
+    #[serde(rename = "type")]
+    pub event_type: &'static str,
+    pub backend: &'static str,
+    pub match_id: &'a str,
+    pub round_count: u64,
+    pub at: &'a str,
+}
+
+impl<'a> NettableTimelineExtracted<'a> {
+    pub fn new(match_id: &'a str, round_count: u64, at: &'a str) -> Self {
+        Self {
+            event_type: "nettable_timeline_extracted",
+            backend: "rust",
+            match_id,
+            round_count,
+            at,
+        }
+    }
+}
+
+#[derive(Debug, Serialize)]
+pub struct NettableEndBoardSaved<'a> {
+    #[serde(rename = "type")]
+    pub event_type: &'static str,
+    pub backend: &'static str,
+    pub match_id: &'a str,
+    pub at: &'a str,
+}
+
+impl<'a> NettableEndBoardSaved<'a> {
+    pub fn new(match_id: &'a str, at: &'a str) -> Self {
+        Self {
+            event_type: "nettable_end_board_saved",
+            backend: "rust",
+            match_id,
+            at,
+        }
+    }
+}
+
 impl<'a> NettableRankingScanned<'a> {
     pub fn new(player_count: usize, upserted_count: usize, season: &'a str, at: &'a str) -> Self {
         Self {
@@ -118,6 +182,19 @@ mod tests {
         assert_eq!(
             json,
             r#"{"type":"nettable_personal_game_ended","backend":"rust","at":"2026-06-10T00:00:00Z","round":25,"rank":4,"late_capture":true}"#
+        );
+    }
+
+    #[test]
+    fn serializes_ingest_complete_with_table_array() {
+        let json = event_json(&NettableIngestComplete::new(
+            2,
+            vec!["CustomNetTable_game_info".to_owned()],
+            "2026-06-10T00:00:00Z",
+        ));
+        assert_eq!(
+            json,
+            r#"{"type":"nettable_ingest_complete","backend":"rust","rows_written":2,"tables":["CustomNetTable_game_info"],"at":"2026-06-10T00:00:00Z"}"#
         );
     }
 }

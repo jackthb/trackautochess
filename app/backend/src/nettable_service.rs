@@ -2,8 +2,9 @@ use crate::{
     config::Config,
     hotkeys::{send_dump_keys, DumpKey},
     ipc_events::{
-        event_json, NettableCreepRound, NettablePersonalGameEnded, NettableRankingScanned,
-        NettableRoundChanged,
+        event_json, NettableCreepRound, NettableEndBoardSaved, NettableIngestComplete,
+        NettablePersonalGameEnded, NettableRankingScanned, NettableRoundChanged,
+        NettableTimelineExtracted,
     },
     nettable_parser::{self, NettableRow, ParsedLog},
     queen_ladder,
@@ -153,12 +154,11 @@ impl NettableService {
                                 rows_json(&rows)
                             ));
                             emit(state_json_from(&state));
-                            emit(format!(
-                                r#"{{"type":"nettable_ingest_complete","backend":"rust","rows_written":{},"tables":{},"at":{}}}"#,
+                            emit(event_json(&NettableIngestComplete::new(
                                 rows.len(),
-                                tables_json(&rows),
-                                json_string(&now_iso_utc())
-                            ));
+                                table_names(&rows),
+                                &now_iso_utc(),
+                            )));
                             for event in handle_rows_for_parity(&state, &rows) {
                                 emit(event);
                             }
@@ -183,21 +183,20 @@ impl NettableService {
                                                 build_match_timeline(&state, &match_id)
                                             {
                                                 let _ = client.upsert_match_timeline(&timeline);
-                                                emit(format!(
-                                                    r#"{{"type":"nettable_timeline_extracted","backend":"rust","match_id":{},"round_count":{},"at":{}}}"#,
-                                                    json_string(&match_id),
-                                                    timeline
-                                                        .get("round_count")
-                                                        .and_then(serde_json::Value::as_u64)
-                                                        .unwrap_or(0),
-                                                    json_string(&now_iso_utc())
-                                                ));
+                                                let round_count = timeline
+                                                    .get("round_count")
+                                                    .and_then(serde_json::Value::as_u64)
+                                                    .unwrap_or(0);
+                                                emit(event_json(&NettableTimelineExtracted::new(
+                                                    &match_id,
+                                                    round_count,
+                                                    &now_iso_utc(),
+                                                )));
                                             }
-                                            emit(format!(
-                                                r#"{{"type":"nettable_end_board_saved","backend":"rust","match_id":{},"at":{}}}"#,
-                                                json_string(&match_id),
-                                                json_string(&now_iso_utc())
-                                            ));
+                                            emit(event_json(&NettableEndBoardSaved::new(
+                                                &match_id,
+                                                &now_iso_utc(),
+                                            )));
                                         }
                                         Ok(None) => {}
                                         Err(err) => {
@@ -1656,20 +1655,14 @@ fn bool_or_null(known: bool, value: bool) -> &'static str {
     }
 }
 
-fn tables_json(rows: &[NettableRow]) -> String {
+fn table_names(rows: &[NettableRow]) -> Vec<String> {
     let mut tables = rows
         .iter()
         .map(|row| row.table_name.as_str())
         .collect::<Vec<_>>();
     tables.sort_unstable();
     tables.dedup();
-    serde_json::Value::Array(
-        tables
-            .into_iter()
-            .map(|table| serde_json::Value::String(table.to_owned()))
-            .collect(),
-    )
-    .to_string()
+    tables.into_iter().map(str::to_owned).collect()
 }
 
 fn local_is_capture_owner(state: &Arc<Mutex<NettableState>>) -> bool {
