@@ -6,6 +6,7 @@ import { createSupabaseServerClient } from "@/lib/supabase";
 import { listAvatarUrl, playerProfilePath } from "@/lib/steam";
 import styles from "../leaderboard/leaderboard.module.css";
 import { LastSyncedTime } from "./LastSyncedTime";
+import { RefreshOnReturn } from "./RefreshOnReturn";
 
 interface QueenRow {
   steam_id: string;
@@ -342,6 +343,7 @@ export default async function QueensPage() {
 
   return (
     <PageLayout title="Queen Players">
+      <RefreshOnReturn />
       <p className={styles.lead}>
         Latest in-game Queen ladder output captured by the desktop tracker
         {season ? ` for ${season.replace(/_/g, " ").toUpperCase()}` : ""}. Rows are replaced when

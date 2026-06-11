@@ -64,6 +64,20 @@ function requireEnv(name: string): string {
   return value;
 }
 
+// This script writes Queen stats from outside the Next server, so it cannot
+// call revalidatePath itself; ping the public revalidate endpoint instead so
+// /queens rebuilds without waiting out its ISR window.
+async function pingQueensRevalidate() {
+  const url =
+    process.env.QUEENS_REVALIDATE_URL ??
+    "https://www.trackautochess.com/api/revalidate/queens";
+  try {
+    await fetch(url, { method: "POST" });
+  } catch {
+    // Best effort: the page's ISR window still applies.
+  }
+}
+
 async function loadActiveIds(supabase: SupabaseClient, limit: number): Promise<{
   ids: string[];
   seeded: string[];
@@ -172,6 +186,10 @@ async function main() {
       snapshotOnSuccess: true,
       pollMode: "adaptive",
     });
+  }
+
+  if (results.some((result) => result.ok)) {
+    await pingQueensRevalidate();
   }
 
   const output = {

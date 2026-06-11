@@ -223,6 +223,7 @@ async function persistDrodoProfile(
     pollMode: "adaptive" | "reset";
     hotPoll?: boolean;
     prevSnapshot?: PollSnapshot | null;
+    onQueenChange?: () => void;
   }
 ): Promise<void> {
   const changed = profileChanged(options.prevSnapshot ?? null, profile);
@@ -293,6 +294,19 @@ async function persistDrodoProfile(
       );
     }
   }
+
+  // Queen rows feed the ISR'd /queens table; notify the caller the moment a
+  // ladder player's stats move so it can rebuild the page instead of waiting
+  // out the revalidate window. A callback (rather than revalidatePath here)
+  // keeps server-only next/cache out of this module — client components and
+  // the standalone poll script import it too.
+  if (options.onQueenChange && queen && changed) {
+    try {
+      options.onQueenChange();
+    } catch (error) {
+      console.error("Queen change notification failed:", error);
+    }
+  }
 }
 
 export async function fetchAndCacheDrodoBatch(
@@ -302,6 +316,8 @@ export async function fetchAndCacheDrodoBatch(
     snapshotOnSuccess?: boolean;
     pollMode?: "adaptive" | "reset";
     hotPoll?: boolean;
+    /** Called when a persisted Queen profile's stats changed (e.g. to rebuild /queens). */
+    onQueenChange?: () => void;
   } = {}
 ): Promise<FetchDrodoBatchResult[]> {
   return fetchDrodoProfileBatch(
@@ -310,7 +326,10 @@ export async function fetchAndCacheDrodoBatch(
       loadPollSnapshots: (ids) => loadPollSnapshots(ids, supabase),
       markMissing: (steamId) => markDrodoMissing(steamId, supabase),
       persistProfile: (profile, seasonRows, persistOptions) =>
-        persistDrodoProfile(profile, seasonRows, supabase, persistOptions),
+        persistDrodoProfile(profile, seasonRows, supabase, {
+          ...persistOptions,
+          onQueenChange: options.onQueenChange,
+        }),
     },
     options
   );
@@ -332,6 +351,8 @@ export async function fetchAndCacheDrodo(
     pollMode?: "adaptive" | "reset";
     /** Keep Queen/active players near the 10-minute floor instead of drifting onto the general background schedule. */
     hotPoll?: boolean;
+    /** Called when a persisted Queen profile's stats changed (e.g. to rebuild /queens). */
+    onQueenChange?: () => void;
   } = {}
 ): Promise<FetchDrodoResult> {
   const result = await fetchDrodoProfileBatch(
@@ -345,7 +366,10 @@ export async function fetchAndCacheDrodo(
       markMissing: (id) => markDrodoMissing(id, supabase),
       persistProfile: async (profile, seasonRows, persistOptions) => {
         if (!supabase) return;
-        await persistDrodoProfile(profile, seasonRows, supabase, persistOptions);
+        await persistDrodoProfile(profile, seasonRows, supabase, {
+          ...persistOptions,
+          onQueenChange: options.onQueenChange,
+        });
       },
     },
     options

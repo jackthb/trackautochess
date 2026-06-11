@@ -19,6 +19,7 @@ import {
   type UserSearchRow,
 } from "@/lib/playerSearch";
 import { fetchAndCacheDrodo } from "@/lib/drodo";
+import { revalidateQueensPage } from "@/lib/queensRevalidate";
 
 // Adapt a Web Request into the minimal NextApiRequest shape consumed by the
 // abuseLog helpers (getClientIp reads req.headers["x-forwarded-for"] and
@@ -169,6 +170,7 @@ export async function GET(req: Request) {
         fetchAndCacheDrodo(resolvedSteamId, supabase ?? null, {
           snapshotOnSuccess: true,
           pollMode: "reset",
+          onQueenChange: revalidateQueensPage,
         }),
         supabase
           ? supabase

@@ -17,6 +17,7 @@ import {
   type ManualRefreshQuota,
 } from "@/lib/manualRefreshQuota";
 import { isAdminSteamId } from "@/lib/admin";
+import { revalidateQueensPage } from "@/lib/queensRevalidate";
 import { getSessionUser } from "@/lib/sessionUser";
 import {
   cachedUserToDrodoProfile,
@@ -230,6 +231,7 @@ async function handle(req: Request, ctx: { params: Promise<{ steamId: string }> 
   // semantics the server render used when it refreshed inline.
   const result = await fetchAndCacheDrodo(steamId, supabase, {
     snapshotOnSuccess: true,
+    onQueenChange: revalidateQueensPage,
     ...(forceRefresh
       ? {}
       : {
