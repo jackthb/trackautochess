@@ -15,6 +15,8 @@ import type {
   NettableIngestError as GeneratedNettableIngestError,
   NettableLaunchOptionsApplied as GeneratedNettableLaunchOptionsApplied,
   NettableLaunchOptionsError as GeneratedNettableLaunchOptionsError,
+  NettableMatchLeftPending as GeneratedNettableMatchLeftPending,
+  NettableMatchLeftResolved as GeneratedNettableMatchLeftResolved,
   NettablePaused as GeneratedNettablePaused,
   NettablePersonalGameEnded as GeneratedNettablePersonalGameEnded,
   NettableQueenUploadComplete as GeneratedNettableQueenUploadComplete,
@@ -161,6 +163,17 @@ export type NettableEndBoardSavedEvent = WithBackendType<
   GeneratedNettableEndBoardSaved,
   "nettable_end_board_saved"
 >;
+export type NettableMatchLeftPendingEvent = WithBackendType<
+  GeneratedNettableMatchLeftPending,
+  "nettable_match_left_pending"
+>;
+export type NettableMatchLeftResolvedEvent = Omit<
+  WithBackendType<GeneratedNettableMatchLeftResolved, "nettable_match_left_resolved">,
+  "outcome" | "match_id"
+> & {
+  outcome: "uploaded" | "cancelled" | "nothing_pending";
+  match_id?: string;
+};
 export type NettableTimelineExtractedEvent = WithBackendType<
   GeneratedNettableTimelineExtracted,
   "nettable_timeline_extracted"
@@ -221,6 +234,8 @@ export type BackendEvent =
   | NettablePersonalGameEndedEvent
   | NettableGameEndedEvent
   | NettableEndBoardSavedEvent
+  | NettableMatchLeftPendingEvent
+  | NettableMatchLeftResolvedEvent
   | NettableTimelineExtractedEvent
   | NettableRankingScannedEvent
   | NettableQueenUploadProgressEvent

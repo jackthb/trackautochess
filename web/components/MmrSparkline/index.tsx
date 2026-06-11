@@ -58,7 +58,13 @@ function buildPoints(
       kind: "snapshot",
     }));
 
-  return [...seasonPoints, ...snapshotPoints];
+  // The newest season anchor is the season currently in progress, which the
+  // snapshot series already covers — keeping it doubles the current MMR and
+  // kinks the line where anchors meet snapshots.
+  const anchorPoints =
+    snapshotPoints.length > 0 ? seasonPoints.slice(0, -1) : seasonPoints;
+
+  return [...anchorPoints, ...snapshotPoints];
 }
 
 export function MmrSparkline({ seasons = [], snapshots = [] }: MmrSparklineProps) {

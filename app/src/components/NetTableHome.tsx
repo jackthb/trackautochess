@@ -48,7 +48,12 @@ export function NetTableHome({
     queenUpload,
     queenUploadProgress,
     lastGameEnded,
+    pendingLeave,
   } = netTable;
+
+  const confirmMatchEnd = () => {
+    window.tracker?.sendCommand({ cmd: "nettable_confirm_match_end" });
+  };
   // Live debug view — always on for the local player. Renders nothing
   // until a capture lands, so it's harmless before the first dump arrives.
 
@@ -73,6 +78,26 @@ export function NetTableHome({
         relicsData={relicsData}
         itemsFull={itemsFull}
       />
+
+      {pendingLeave && (
+        <section className="nettable-home-empty nettable-pending-leave" aria-live="polite">
+          <div className="nettable-home-empty-title">You left the match early</div>
+          <div className="nettable-home-empty-copy">
+            If the game is over and you're not rejoining, upload it now with everyone's
+            last-known standings. Rejoining the match cancels this; otherwise it uploads
+            automatically at {new Date(pendingLeave.expiresAt).toLocaleTimeString()}.
+          </div>
+          <div className="nettable-home-empty-meta">
+            <button
+              type="button"
+              className="btn-ghost nettable-pending-leave-confirm"
+              onClick={confirmMatchEnd}
+            >
+              Game's over — upload now
+            </button>
+          </div>
+        </section>
+      )}
 
       {(!hasCaptureData || lastGameEnded) && (
         <section className="nettable-home-empty" aria-live="polite">

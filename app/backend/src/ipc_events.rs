@@ -36,6 +36,7 @@ pub enum BackendCommand {
         paused: bool,
     },
     NettableUploadQueens,
+    NettableConfirmMatchEnd,
     FetchGames {
         request_id: String,
     },
@@ -620,6 +621,63 @@ impl<'a> NettableGameEnded<'a> {
     }
 }
 
+/// The local player left a match that hadn't finished; the snapshot is held
+/// until they confirm they're not rejoining, the grace window lapses, or a
+/// rejoin cancels it.
+#[derive(Debug, Serialize, TS)]
+pub struct NettableMatchLeftPending<'a> {
+    #[serde(rename = "type")]
+    pub event_type: &'static str,
+    pub backend: &'static str,
+    pub message: &'a str,
+    /// RFC3339 time when the held snapshot auto-uploads as-is.
+    pub expires_at: &'a str,
+    pub at: &'a str,
+}
+
+impl<'a> NettableMatchLeftPending<'a> {
+    pub fn new(message: &'a str, expires_at: &'a str, at: &'a str) -> Self {
+        Self {
+            event_type: "nettable_match_left_pending",
+            backend: "rust",
+            message,
+            expires_at,
+            at,
+        }
+    }
+}
+
+#[derive(Debug, Serialize, TS)]
+pub struct NettableMatchLeftResolved<'a> {
+    #[serde(rename = "type")]
+    pub event_type: &'static str,
+    pub backend: &'static str,
+    /// "uploaded" | "cancelled" | "nothing_pending"
+    pub outcome: &'static str,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub match_id: Option<&'a str>,
+    pub message: &'a str,
+    pub at: &'a str,
+}
+
+impl<'a> NettableMatchLeftResolved<'a> {
+    pub fn new(
+        outcome: &'static str,
+        match_id: Option<&'a str>,
+        message: &'a str,
+        at: &'a str,
+    ) -> Self {
+        Self {
+            event_type: "nettable_match_left_resolved",
+            backend: "rust",
+            outcome,
+            match_id,
+            message,
+            at,
+        }
+    }
+}
+
 #[derive(Debug, Serialize, TS)]
 pub struct NettableCheckActiveMatch<'a> {
     #[serde(rename = "type")]
@@ -911,6 +969,8 @@ mod tests {
         push_decl!(NettableEndBoardSaved<'static>);
         push_decl!(NettableIngestError<'static>);
         push_decl!(NettableGameEnded<'static>);
+        push_decl!(NettableMatchLeftPending<'static>);
+        push_decl!(NettableMatchLeftResolved<'static>);
         push_decl!(NettableCheckActiveMatch<'static>);
         push_decl!(NettableResyncComplete<'static>);
         push_decl!(NettableQueenUploadProgress<'static>);

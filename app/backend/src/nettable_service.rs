@@ -1,18 +1,20 @@
 pub use crate::nettable_live::live_players_value;
 use crate::{
     config::Config,
-    hotkeys::{send_dump_keys, DumpKey},
+    hotkeys::{dump_console_commands, send_dump_keys, DumpKey},
     ipc_events::{
         event_json, NettableCheckActiveMatch, NettableCreepRound, NettableEndBoardSaved,
-        NettableGameEnded, NettableIngestComplete, NettableIngestError, NettablePersonalGameEnded,
-        NettableQueenUploadComplete, NettableQueenUploadProgress, NettableRankingScanned,
-        NettableResyncComplete, NettableRoundChanged, NettableRows, NettableStateEvent,
-        NettableStatus, NettableTimelineExtracted,
+        NettableGameEnded, NettableIngestComplete, NettableIngestError, NettableMatchLeftPending,
+        NettableMatchLeftResolved, NettablePersonalGameEnded, NettableQueenUploadComplete,
+        NettableQueenUploadProgress, NettableRankingScanned, NettableResyncComplete,
+        NettableRoundChanged, NettableRows, NettableStateEvent, NettableStatus,
+        NettableTimelineExtracted,
     },
     match_builder::{
         build_match_timeline, extract_death_team_from_rows, extract_round_from_rows,
         store_session_dump, SessionDump,
     },
+    netcon::{send_console_commands, NETCON_PORT},
     nettable_parser::{self, NettableRow, ParsedLog},
     nettable_setup::{
         apply_dota_launch_options, find_autoexec_target, find_console_log, find_dota_dir,
@@ -21,7 +23,7 @@ use crate::{
         tokenize_launch_options, wait_for_steam_exit, DEFAULT_GSI_PORT, REQUIRED_LAUNCH_FLAGS,
     },
     queen_ladder,
-    supabase::{finished_match_id_from_rows, queue_rows, SupabaseClient},
+    supabase::{finished_match_id_from_rows, parse_valid_steam_id64, queue_rows, SupabaseClient},
 };
 use std::{
     collections::HashSet,
@@ -33,6 +35,10 @@ use std::{
 };
 
 const QUEEN_LADDER_AUTO_SYNC_INTERVAL: Duration = Duration::from_secs(600);
+/// How long a left-match snapshot is held before it uploads as-is. DAC allows
+/// reconnecting to an ongoing game, so uploading immediately would
+/// double-record the match if the player rejoins and finishes it.
+const LEFT_MATCH_UPLOAD_GRACE: Duration = Duration::from_secs(30 * 60);
 const PREFERRED_CAPTURE_STEAM_IDS: &[&str] = &[
     "76561198022169086", // Jack
 ];
@@ -40,6 +46,16 @@ const PREFERRED_CAPTURE_STEAM_IDS: &[&str] = &[
 #[derive(Clone)]
 pub struct NettableService {
     state: Arc<Mutex<NettableState>>,
+}
+
+/// Snapshot of a match the local player left before it finished, held until
+/// the user confirms they're not rejoining, the grace window lapses, or a
+/// different lobby starts. Rejoining the same lobby discards it.
+#[derive(Debug)]
+struct PendingLeftMatch {
+    rows: Vec<NettableRow>,
+    roster: Vec<String>,
+    deadline: Instant,
 }
 
 #[derive(Debug, Default)]
@@ -89,6 +105,17 @@ struct NettableState {
     /// the finished end_board in console.log, so without this the poller would
     /// keep re-upserting and mutating played_at every heartbeat after a game.
     uploaded_end_board_match_ids: HashSet<String>,
+    /// Held snapshot of a match the local player left early. See
+    /// [`PendingLeftMatch`].
+    pending_left_match: Option<PendingLeftMatch>,
+    /// True when live data shows the game is decided (one player left with
+    /// HP). Drives a faster dac_table dump cadence so the end_board is
+    /// captured the moment it publishes instead of waiting out the normal
+    /// cadence — which misses it if the player tabs out or quits right away.
+    endgame_burst: bool,
+    /// A held snapshot that a *different* lobby superseded; staged so the
+    /// upload happens outside the state lock on the next loop tick.
+    pending_left_match_flush: Option<PendingLeftMatch>,
 }
 
 impl NettableService {
@@ -237,6 +264,9 @@ impl NettableService {
                 if match_ended {
                     finalize_on_match_left(&state, &cfg, &emit);
                 }
+                for line in tick_pending_left_match(&state, &cfg) {
+                    emit(line);
+                }
                 thread::sleep(Duration::from_millis(750));
             }
         });
@@ -245,6 +275,32 @@ impl NettableService {
     pub fn set_paused(&self, paused: bool) {
         if let Ok(mut state) = self.state.lock() {
             state.paused = paused;
+        }
+    }
+
+    /// User confirmed the match they left is over and they're not rejoining:
+    /// upload the held snapshot now instead of waiting out the grace window.
+    pub fn confirm_match_left<F>(&self, cfg: &Config, emit: F)
+    where
+        F: Fn(String),
+    {
+        let pending = self.state.lock().ok().and_then(|mut s| {
+            s.pending_left_match
+                .take()
+                .or_else(|| s.pending_left_match_flush.take())
+        });
+        match pending {
+            Some(pending) => {
+                for line in flush_pending_left_match(cfg, pending, "left_match_confirmed") {
+                    emit(line);
+                }
+            }
+            None => emit(event_json(&NettableMatchLeftResolved::new(
+                "nothing_pending",
+                None,
+                "No left match is waiting for confirmation.",
+                &now_iso_utc(),
+            ))),
         }
     }
 
@@ -342,7 +398,7 @@ impl NettableService {
 
     pub fn capture_once_json(&self) -> String {
         self.set_paused(false);
-        match send_dump_keys(&[DumpKey::F23, DumpKey::F22, DumpKey::F20, DumpKey::F21]) {
+        match send_dump_commands(&[DumpKey::F23, DumpKey::F22, DumpKey::F20, DumpKey::F21]) {
             Ok(()) => event_json(&NettableCheckActiveMatch::new(
                 "Requested a manual lobby snapshot.",
                 &now_iso_utc(),
@@ -355,7 +411,7 @@ impl NettableService {
 
     pub fn check_active_match_json(&self) -> String {
         self.set_paused(false);
-        match send_dump_keys(&[
+        match send_dump_commands(&[
             DumpKey::F23,
             DumpKey::F22,
             DumpKey::F20,
@@ -467,7 +523,7 @@ impl NettableService {
                 // F24 dumps ranking_top_table (+ player_id_table). Only worth
                 // sending when Dota is actually running — otherwise the keys go
                 // nowhere and we'd just be spamming the foreground app.
-                let _ = send_dump_keys(&[DumpKey::F24]);
+                let _ = send_dump_commands(&[DumpKey::F24]);
                 // Dota writes console.log asynchronously; give the stringtable
                 // block time to land before parsing the full file.
                 thread::sleep(Duration::from_millis(2500));
@@ -1019,6 +1075,27 @@ fn handle_rows_for_parity(state: &Arc<Mutex<NettableState>>, rows: &[NettableRow
             state.own_team_id = None;
             state.last_own_player_payload = None;
             state.last_ranking_top_sync_at = None;
+            state.endgame_burst = false;
+        }
+    }
+
+    // When only one player still has HP the game is decided and end_board is
+    // imminent; flag the dump loop to burst the dac_table dump so it lands
+    // before the player tabs out or leaves.
+    let (live_players, _) = live_players_value(rows, state.local_steam_id.as_deref());
+    if let Some(players) = live_players.as_object() {
+        if players.len() >= 2 {
+            let alive = players
+                .values()
+                .filter(|player| {
+                    player
+                        .get("hp")
+                        .and_then(serde_json::Value::as_f64)
+                        .unwrap_or(0.0)
+                        > 0.0
+                })
+                .count();
+            state.endgame_burst = alive == 1;
         }
     }
 
@@ -1029,6 +1106,23 @@ fn handle_rows_for_parity(state: &Arc<Mutex<NettableState>>, rows: &[NettableRow
             events.push(event_json(&NettableRoundChanged::new(round, prev, &now)));
             if round > 0 && round % 5 == 0 {
                 events.push(event_json(&NettableCreepRound::new(round, &now)));
+            }
+            // A fresh round proves we're actively in a lobby again (stale log
+            // rows never advance the round). If a left-match snapshot is on
+            // hold: the same roster means a rejoin, so discard it and let the
+            // game finalize normally; a different roster proves we're not
+            // rejoining, so stage the held snapshot for upload as-is.
+            if let Some(pending) = state.pending_left_match.take() {
+                if state.match_roster_fingerprint.as_deref() == Some(pending.roster.as_slice()) {
+                    events.push(event_json(&NettableMatchLeftResolved::new(
+                        "cancelled",
+                        None,
+                        "Rejoined the match — the held snapshot was discarded; the game will finalize normally.",
+                        &now,
+                    )));
+                } else {
+                    state.pending_left_match_flush = Some(pending);
+                }
             }
         }
     }
@@ -1298,6 +1392,23 @@ fn roster_steam_ids(rows: &[NettableRow]) -> Vec<String> {
         })
         .filter(|steam_id| !steam_id.is_empty())
         .collect::<Vec<_>>();
+    if ids.is_empty() {
+        // Current mod builds dump player_id_table without steam_ids; recover
+        // the roster from the steam-id-keyed player_info maps instead.
+        ids = rows
+            .iter()
+            .filter(|row| row.key == "player_info")
+            .filter_map(|row| {
+                row.raw
+                    .to_value()
+                    .get("data")
+                    .and_then(serde_json::Value::as_object)
+                    .map(|data| data.keys().cloned().collect::<Vec<_>>())
+            })
+            .flatten()
+            .filter(|steam_id| parse_valid_steam_id64(steam_id).is_some())
+            .collect();
+    }
     ids.sort();
     ids.dedup();
     ids
@@ -1312,26 +1423,35 @@ fn maybe_fire_dump_hotkeys<F>(
 ) where
     F: Fn(String) + Send + Sync + 'static,
 {
-    let (paused, in_match) = state
+    let (paused, in_match, endgame_burst) = state
         .lock()
         .map(|state| {
             (
                 state.paused,
                 state.last_ui_state.as_deref() == Some(DOTA_INGAME_STATE),
+                state.endgame_burst,
             )
         })
-        .unwrap_or((true, false));
+        .unwrap_or((true, false, false));
     if paused || !in_match {
         return;
     }
     let capture_owner = local_is_capture_owner(state);
+
+    // One player left with HP: end_board publishes any moment now, so dump
+    // dac_table every couple of seconds instead of the relaxed cadence.
+    let player_cadence = if endgame_burst {
+        Duration::from_secs(2)
+    } else {
+        Duration::from_secs(12)
+    };
 
     let now = Instant::now();
     if now.duration_since(*last_game_info_fire) >= Duration::from_secs(3) {
         *last_game_info_fire = now;
         fire_keys(emit, &[DumpKey::F23], "game_info");
     }
-    if capture_owner && now.duration_since(*last_player_fire) >= Duration::from_secs(12) {
+    if capture_owner && now.duration_since(*last_player_fire) >= player_cadence {
         *last_player_fire = now;
         // F21 dumps dac_table, which is where `end_board` (the full 8-player
         // final result) appears at game over. Without firing it here, end_board
@@ -1359,11 +1479,21 @@ fn fire_keys<F>(emit: &Arc<F>, keys: &[DumpKey], _label: &str)
 where
     F: Fn(String) + Send + Sync + 'static,
 {
-    match send_dump_keys(keys) {
+    match send_dump_commands(keys) {
         Ok(()) => {}
         Err(err) => emit(event_json(&NettableIngestError::new(&format!(
-            "dump hotkey failed: {err}"
+            "dump command failed: {err}"
         )))),
+    }
+}
+
+fn send_dump_commands(keys: &[DumpKey]) -> Result<(), String> {
+    let commands = dump_console_commands(keys);
+    match send_console_commands(NETCON_PORT, &commands) {
+        Ok(()) => Ok(()),
+        Err(netcon_err) => send_dump_keys(keys).map_err(|hotkey_err| {
+            format!("netcon failed ({netcon_err}); hotkey fallback failed ({hotkey_err})")
+        }),
     }
 }
 
@@ -1441,6 +1571,64 @@ fn is_match_end_transition(prev: Option<&str>, next: &str) -> bool {
 /// Finalize a match detected via the UI-state transition (no GSI). Tries the
 /// real end board first (in case it landed), then falls back to the last live
 /// snapshot so a finished game is always recorded and the UI reacts.
+/// Flush a held left-match snapshot when the grace window lapses or a
+/// different lobby supersedes it. Returns event lines for the caller to emit.
+fn tick_pending_left_match(state: &Arc<Mutex<NettableState>>, cfg: &Config) -> Vec<String> {
+    let (staged, expired) = match state.lock() {
+        Ok(mut s) => {
+            let staged = s.pending_left_match_flush.take();
+            let expired = match &s.pending_left_match {
+                Some(pending) if Instant::now() >= pending.deadline => s.pending_left_match.take(),
+                _ => None,
+            };
+            (staged, expired)
+        }
+        Err(_) => (None, None),
+    };
+    let mut events = Vec::new();
+    if let Some(pending) = staged {
+        events.extend(flush_pending_left_match(
+            cfg,
+            pending,
+            "left_match_superseded",
+        ));
+    }
+    if let Some(pending) = expired {
+        events.extend(flush_pending_left_match(cfg, pending, "left_match_timeout"));
+    }
+    events
+}
+
+fn flush_pending_left_match(cfg: &Config, pending: PendingLeftMatch, reason: &str) -> Vec<String> {
+    let now = now_iso_utc();
+    let Some(client) = SupabaseClient::from_config(cfg) else {
+        return vec![event_json(&NettableMatchLeftResolved::new(
+            "nothing_pending",
+            None,
+            "Supabase is not configured, so the match you left was not uploaded.",
+            &now,
+        ))];
+    };
+    match client.upsert_fallback_finished_match(&pending.rows, reason) {
+        Ok(Some(match_id)) => vec![event_json(&NettableMatchLeftResolved::new(
+            "uploaded",
+            Some(&match_id),
+            "Uploaded the match you left with everyone's last-known standings.",
+            &now,
+        ))],
+        Ok(None) => vec![event_json(&NettableMatchLeftResolved::new(
+            "nothing_pending",
+            None,
+            "The match you left had no usable snapshot to upload.",
+            &now,
+        ))],
+        Err(err) => vec![event_json(&NettableIngestError::with_backend_at(
+            &format!("left-match upload failed: {err}"),
+            &now,
+        ))],
+    }
+}
+
 fn finalize_on_match_left<F>(state: &Arc<Mutex<NettableState>>, cfg: &Config, emit: &Arc<F>)
 where
     F: Fn(String) + Send + Sync + 'static,
@@ -1460,6 +1648,38 @@ where
         .lock()
         .map(|s| s.latest_rows.clone())
         .unwrap_or_default();
+    // No end board means the local player left before the lobby finished.
+    // Don't upload the partial snapshot yet: DAC allows reconnecting, and an
+    // immediate upload would double-record the game if they rejoin and finish
+    // it. Hold the snapshot for user confirmation or the grace window instead.
+    if finished_match_id_from_rows(&rows).is_none() {
+        let roster = roster_steam_ids(&rows);
+        if roster.is_empty() {
+            emit(event_json(&NettableGameEnded::new(
+                "Match ended, but there was no usable snapshot to finalize.",
+                None,
+                &now_iso_utc(),
+            )));
+            return;
+        }
+        let expires_at = (chrono::Utc::now()
+            + chrono::Duration::from_std(LEFT_MATCH_UPLOAD_GRACE)
+                .unwrap_or_else(|_| chrono::Duration::minutes(30)))
+        .to_rfc3339();
+        if let Ok(mut s) = state.lock() {
+            s.pending_left_match = Some(PendingLeftMatch {
+                rows,
+                roster,
+                deadline: Instant::now() + LEFT_MATCH_UPLOAD_GRACE,
+            });
+        }
+        emit(event_json(&NettableMatchLeftPending::new(
+            "You left the match before it finished. Confirm the game is over to upload it now; otherwise it uploads as-is when the window lapses. Rejoining the match cancels the upload.",
+            &expires_at,
+            &now_iso_utc(),
+        )));
+        return;
+    }
     emit(event_json(&NettableGameEnded::new(
         "Dota left the match; finalizing from the last live snapshot.",
         None,

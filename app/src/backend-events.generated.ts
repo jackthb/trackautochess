@@ -4,7 +4,7 @@ export type JsonValue = string | number | boolean | null | { [key: string]: Json
 
 export type BackendStatus = { type: string, backend: string, recording: boolean, focused: boolean, logged_in: boolean, steam_id: string, steam_name: string, replay_enabled: boolean, };
 
-export type BackendCommand = { "cmd": "quit" } | { "cmd": "status" } | { "cmd": "queue_ingest", payload: JsonValue, } | { "cmd": "queue_payload", payload: JsonValue, } | { "cmd": "set_config", key: string, value: JsonValue, } | { "cmd": "steam_logout" } | { "cmd": "steam_login" } | { "cmd": "toggle_recording" } | { "cmd": "nettable_status" } | { "cmd": "nettable_get_state" } | { "cmd": "capture" } | { "cmd": "nettable_apply_launch_options", flags: Array<string> | null, } | { "cmd": "nettable_check_active_match" } | { "cmd": "nettable_resync_from_steam" } | { "cmd": "nettable_set_paused", paused: boolean, } | { "cmd": "nettable_upload_queens" } | { "cmd": "fetch_games", request_id: string, } | { "cmd": "fetch_timeline", request_id: string, match_id: string, } | { "cmd": "update_game", request_id: string, id: number, fields: JsonValue, } | { "cmd": "fetch_drodo", request_id: string, } | { "cmd": "refresh_drodo", request_id: string, } | { "cmd": "upload_logs", reason: string | null, } | { "cmd": "do_update" } | { "cmd": "parse_log", path: string | null, } | { "cmd": "tail_log_once", path: string | null, };
+export type BackendCommand = { "cmd": "quit" } | { "cmd": "status" } | { "cmd": "queue_ingest", payload: JsonValue, } | { "cmd": "queue_payload", payload: JsonValue, } | { "cmd": "set_config", key: string, value: JsonValue, } | { "cmd": "steam_logout" } | { "cmd": "steam_login" } | { "cmd": "toggle_recording" } | { "cmd": "nettable_status" } | { "cmd": "nettable_get_state" } | { "cmd": "capture" } | { "cmd": "nettable_apply_launch_options", flags: Array<string> | null, } | { "cmd": "nettable_check_active_match" } | { "cmd": "nettable_resync_from_steam" } | { "cmd": "nettable_set_paused", paused: boolean, } | { "cmd": "nettable_upload_queens" } | { "cmd": "nettable_confirm_match_end" } | { "cmd": "fetch_games", request_id: string, } | { "cmd": "fetch_timeline", request_id: string, match_id: string, } | { "cmd": "update_game", request_id: string, id: number, fields: JsonValue, } | { "cmd": "fetch_drodo", request_id: string, } | { "cmd": "refresh_drodo", request_id: string, } | { "cmd": "upload_logs", reason: string | null, } | { "cmd": "do_update" } | { "cmd": "parse_log", path: string | null, } | { "cmd": "tail_log_once", path: string | null, };
 
 export type Config = { dac_dir: string, steam_id: string, steam_name: string, replay_enabled: boolean,
 /**
@@ -65,6 +65,18 @@ export type NettableEndBoardSaved = { type: string, backend: string, match_id: s
 export type NettableIngestError = { type: string, backend: string | null, error: string, at: string | null, };
 
 export type NettableGameEnded = { type: string, backend: string, message: string, match_id: string | null, at: string, };
+
+export type NettableMatchLeftPending = { type: string, backend: string, message: string,
+/**
+ * RFC3339 time when the held snapshot auto-uploads as-is.
+ */
+expires_at: string, at: string, };
+
+export type NettableMatchLeftResolved = { type: string, backend: string,
+/**
+ * "uploaded" | "cancelled" | "nothing_pending"
+ */
+outcome: string, match_id: string | null, message: string, at: string, };
 
 export type NettableCheckActiveMatch = { type: string, backend: string, ok: boolean, paused: boolean, message: string, at: string, };
 

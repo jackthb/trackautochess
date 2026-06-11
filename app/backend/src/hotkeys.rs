@@ -15,6 +15,22 @@ pub enum DumpKey {
     F24,
 }
 
+impl DumpKey {
+    pub fn console_commands(self) -> &'static [&'static str] {
+        match self {
+            DumpKey::F16 => &["dumpstringtable CustomNetTable_chess_pool_table cl verbose"],
+            DumpKey::F20 => &["dumpstringtable CustomNetTable_player_id_table cl verbose"],
+            DumpKey::F21 => &["dumpstringtable CustomNetTable_dac_table cl verbose"],
+            DumpKey::F22 => &["dumpstringtable CustomNetTable_player_info_table cl verbose"],
+            DumpKey::F23 => &["dumpstringtable CustomNetTable_game_info cl verbose"],
+            DumpKey::F24 => &[
+                "dumpstringtable CustomNetTable_ranking_top_table cl verbose",
+                "dumpstringtable CustomNetTable_player_id_table cl verbose",
+            ],
+        }
+    }
+}
+
 #[cfg(target_os = "windows")]
 impl DumpKey {
     fn virtual_key(self) -> u16 {
@@ -27,6 +43,12 @@ impl DumpKey {
             DumpKey::F24 => 0x87,
         }
     }
+}
+
+pub fn dump_console_commands(keys: &[DumpKey]) -> Vec<&'static str> {
+    keys.iter()
+        .flat_map(|key| key.console_commands().iter().copied())
+        .collect()
 }
 
 pub fn send_dump_keys(keys: &[DumpKey]) -> Result<(), String> {

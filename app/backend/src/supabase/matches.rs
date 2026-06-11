@@ -552,7 +552,8 @@ fn copy_fallback_player_field(
 }
 
 fn player_id_pairs(rows: &[NettableRow]) -> Vec<(String, i64)> {
-    rows.iter()
+    let pairs: Vec<(String, i64)> = rows
+        .iter()
         .filter(|row| row.table_name == "CustomNetTable_player_id_table")
         .filter_map(|row| {
             let slot = row.key.strip_prefix("player_")?.parse::<i64>().ok()?;
@@ -570,6 +571,32 @@ fn player_id_pairs(rows: &[NettableRow]) -> Vec<(String, i64)> {
             }
             Some((steam_id, slot))
         })
+        .collect();
+    if pairs.len() >= 2 {
+        return pairs;
+    }
+    // Current mod builds dump player_id_table without steam_ids, which starved
+    // the fallback writer of a roster. Recover it from the steam-id-keyed
+    // player_info maps (dac_table / player_info_table); slot order is only an
+    // identity salt, so a sorted enumeration is fine.
+    let mut ids: Vec<String> = rows
+        .iter()
+        .filter(|row| row.key == "player_info")
+        .filter_map(|row| {
+            row.raw
+                .to_value()
+                .get("data")
+                .and_then(Value::as_object)
+                .map(|data| data.keys().cloned().collect::<Vec<_>>())
+        })
+        .flatten()
+        .filter(|steam_id| parse_valid_steam_id64(steam_id).is_some())
+        .collect();
+    ids.sort();
+    ids.dedup();
+    ids.into_iter()
+        .enumerate()
+        .map(|(slot, steam_id)| (steam_id, slot as i64))
         .collect()
 }
 

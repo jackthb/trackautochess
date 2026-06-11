@@ -2163,6 +2163,15 @@ video {
   font-variant-numeric: tabular-nums;
 }
 
+/* Held left-early match awaiting the "not rejoining" confirmation. */
+.nettable-pending-leave {
+  border-color: color-mix(in srgb, var(--text-primary) 35%, orange);
+}
+
+.nettable-pending-leave-confirm {
+  margin-top: 4px;
+}
+
 .nettable-home-grid {
   flex: 0 0 auto;
   min-height: auto;
