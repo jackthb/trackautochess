@@ -1,7 +1,7 @@
 pub use crate::nettable_live::live_players_value;
 use crate::{
     config::Config,
-    hotkeys::{send_dump_keys, DumpKey},
+    hotkeys::{dump_console_commands, send_dump_keys, DumpKey},
     ipc_events::{
         event_json, NettableCheckActiveMatch, NettableCreepRound, NettableEndBoardSaved,
         NettableGameEnded, NettableIngestComplete, NettableIngestError, NettableMatchLeftPending,
@@ -14,6 +14,7 @@ use crate::{
         build_match_timeline, extract_death_team_from_rows, extract_round_from_rows,
         store_session_dump, SessionDump,
     },
+    netcon::{send_console_commands, NETCON_PORT},
     nettable_parser::{self, NettableRow, ParsedLog},
     nettable_setup::{
         apply_dota_launch_options, find_autoexec_target, find_console_log, find_dota_dir,
@@ -399,7 +400,7 @@ impl NettableService {
 
     pub fn capture_once_json(&self) -> String {
         self.set_paused(false);
-        match send_dump_keys(&[DumpKey::F23, DumpKey::F22, DumpKey::F20, DumpKey::F21]) {
+        match send_dump_commands(&[DumpKey::F23, DumpKey::F22, DumpKey::F20, DumpKey::F21]) {
             Ok(()) => event_json(&NettableCheckActiveMatch::new(
                 "Requested a manual lobby snapshot.",
                 &now_iso_utc(),
@@ -412,7 +413,7 @@ impl NettableService {
 
     pub fn check_active_match_json(&self) -> String {
         self.set_paused(false);
-        match send_dump_keys(&[
+        match send_dump_commands(&[
             DumpKey::F23,
             DumpKey::F22,
             DumpKey::F20,
@@ -524,7 +525,7 @@ impl NettableService {
                 // F24 dumps ranking_top_table (+ player_id_table). Only worth
                 // sending when Dota is actually running — otherwise the keys go
                 // nowhere and we'd just be spamming the foreground app.
-                let _ = send_dump_keys(&[DumpKey::F24]);
+                let _ = send_dump_commands(&[DumpKey::F24]);
                 // Dota writes console.log asynchronously; give the stringtable
                 // block time to land before parsing the full file.
                 thread::sleep(Duration::from_millis(2500));
@@ -1480,11 +1481,21 @@ fn fire_keys<F>(emit: &Arc<F>, keys: &[DumpKey], _label: &str)
 where
     F: Fn(String) + Send + Sync + 'static,
 {
-    match send_dump_keys(keys) {
+    match send_dump_commands(keys) {
         Ok(()) => {}
         Err(err) => emit(event_json(&NettableIngestError::new(&format!(
-            "dump hotkey failed: {err}"
+            "dump command failed: {err}"
         )))),
+    }
+}
+
+fn send_dump_commands(keys: &[DumpKey]) -> Result<(), String> {
+    let commands = dump_console_commands(keys);
+    match send_console_commands(NETCON_PORT, &commands) {
+        Ok(()) => Ok(()),
+        Err(netcon_err) => send_dump_keys(keys).map_err(|hotkey_err| {
+            format!("netcon failed ({netcon_err}); hotkey fallback failed ({hotkey_err})")
+        }),
     }
 }
 

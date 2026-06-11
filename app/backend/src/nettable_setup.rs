@@ -1,3 +1,4 @@
+use crate::netcon::NETCON_PORT;
 use crate::{
     gsi,
     ipc_events::{
@@ -13,8 +14,15 @@ use std::{
 };
 
 pub(crate) const DEFAULT_GSI_PORT: u16 = 4001;
-pub(crate) const REQUIRED_LAUNCH_FLAGS: &[&str] =
-    &["-condebug", "-conclearlog", "-gamestateintegration"];
+pub(crate) const REQUIRED_LAUNCH_FLAGS: &[&str] = &[
+    "-condebug",
+    "-conclearlog",
+    "-gamestateintegration",
+    "-netconport",
+    NETCON_PORT_STR,
+];
+const NETCON_PORT_STR: &str = "2425";
+const _: () = assert!(NETCON_PORT == 2425);
 
 const STEAM_ID64_BASE: u64 = 76_561_197_960_265_728;
 const DOTA_APP_ID: &str = "570";
@@ -141,15 +149,16 @@ fn apply_dota_launch_options_to_file(
         .collect::<Vec<_>>();
     let mut lower = tokenize_launch_options(&before);
     let mut added = Vec::new();
-    for flag in flags {
-        if !lower
-            .iter()
-            .any(|token| token == &flag.to_ascii_lowercase())
-        {
-            tokens.push((*flag).to_owned());
-            lower.push(flag.to_ascii_lowercase());
-            added.push((*flag).to_owned());
+    let mut index = 0;
+    while index < flags.len() {
+        let flag = flags[index];
+        if flag.eq_ignore_ascii_case("-netconport") && index + 1 < flags.len() {
+            ensure_launch_option_pair(&mut tokens, &mut lower, &mut added, flag, flags[index + 1]);
+            index += 2;
+            continue;
         }
+        ensure_launch_option_token(&mut tokens, &mut lower, &mut added, flag);
+        index += 1;
     }
     let after = tokens.join(" ");
     if added.is_empty() {
@@ -197,6 +206,50 @@ fn apply_dota_launch_options_to_file(
         config_path: config_path.to_owned(),
         backup_path: Some(backup_path),
     })
+}
+
+fn ensure_launch_option_token(
+    tokens: &mut Vec<String>,
+    lower: &mut Vec<String>,
+    added: &mut Vec<String>,
+    flag: &str,
+) {
+    let flag_lower = flag.to_ascii_lowercase();
+    if !lower.iter().any(|token| token == &flag_lower) {
+        tokens.push(flag.to_owned());
+        lower.push(flag_lower);
+        added.push(flag.to_owned());
+    }
+}
+
+fn ensure_launch_option_pair(
+    tokens: &mut Vec<String>,
+    lower: &mut Vec<String>,
+    added: &mut Vec<String>,
+    flag: &str,
+    value: &str,
+) {
+    let flag_lower = flag.to_ascii_lowercase();
+    let value_lower = value.to_ascii_lowercase();
+    if let Some(pos) = lower.iter().position(|token| token == &flag_lower) {
+        if lower.get(pos + 1) == Some(&value_lower) {
+            return;
+        }
+        if pos + 1 < tokens.len() && !lower[pos + 1].starts_with('-') {
+            tokens[pos + 1] = value.to_owned();
+            lower[pos + 1] = value_lower;
+        } else {
+            tokens.insert(pos + 1, value.to_owned());
+            lower.insert(pos + 1, value_lower);
+        }
+        added.push(format!("{flag} {value}"));
+        return;
+    }
+    tokens.push(flag.to_owned());
+    tokens.push(value.to_owned());
+    lower.push(flag_lower);
+    lower.push(value_lower);
+    added.push(format!("{flag} {value}"));
 }
 
 fn find_launch_options_value(body: &str) -> Option<LaunchOptionsValue> {
@@ -467,8 +520,52 @@ mod tests {
             let _ = fs::remove_file(backup);
         }
 
-        assert_eq!(result.added, vec!["-conclearlog", "-gamestateintegration"]);
-        assert!(updated.contains("-console -condebug -conclearlog -gamestateintegration"));
+        assert_eq!(
+            result.added,
+            vec![
+                "-conclearlog".to_owned(),
+                "-gamestateintegration".to_owned(),
+                "-netconport 2425".to_owned()
+            ]
+        );
+        assert!(updated
+            .contains("-console -condebug -conclearlog -gamestateintegration -netconport 2425"));
         assert_eq!(updated.matches("-condebug").count(), 1);
+    }
+
+    #[test]
+    fn launch_options_update_existing_netcon_port_without_duplicate_flag() {
+        let path = std::env::temp_dir().join(format!(
+            "dac-localconfig-{}-{}.vdf",
+            std::process::id(),
+            chrono::Utc::now().timestamp_nanos_opt().unwrap_or_default()
+        ));
+        fs::write(
+            &path,
+            r#""UserLocalConfigStore"
+{
+    "apps"
+    {
+        "570"
+        {
+            "LaunchOptions"        "-condebug -conclearlog -gamestateintegration -netconport 1234"
+        }
+    }
+}
+"#,
+        )
+        .expect("write localconfig fixture");
+
+        let result = apply_dota_launch_options_to_file(&path, REQUIRED_LAUNCH_FLAGS)
+            .expect("launch options apply");
+        let updated = fs::read_to_string(&path).expect("read updated localconfig");
+        let _ = fs::remove_file(&path);
+        if let Some(backup) = result.backup_path.as_ref() {
+            let _ = fs::remove_file(backup);
+        }
+
+        assert_eq!(result.added, vec!["-netconport 2425"]);
+        assert!(updated.contains("-netconport 2425"));
+        assert_eq!(updated.matches("-netconport").count(), 1);
     }
 }

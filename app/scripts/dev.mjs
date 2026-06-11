@@ -10,7 +10,7 @@ function spawnChild(command, args) {
     cwd: process.cwd(),
     stdio: "inherit",
     env: process.env,
-    shell: isWindows,
+    windowsHide: false,
   });
   children.add(child);
   child.on("exit", () => children.delete(child));

@@ -567,10 +567,6 @@ function MatchPlayerRow({
 
 export { type GamePageProps, type MatchTimeline, type RelicTimelineEntry };
 
-/** SEO derivation extracted from the old GamePage body. The App Router server
- *  pages call this to feed Next `Metadata` (generateMetadata) and to render the
- *  JSON-LD <script>. Mirrors the previous pageTitle/description/structuredData
- *  computations verbatim. */
 export default function GameView({
   game,
   steamProfile,
@@ -730,14 +726,14 @@ export default function GameView({
             <strong>Match</strong>
             {matchDate && (
               <>
-                <span className={styles.sep}>{"·"}</span>
+                <span className={styles.sep}>{"-"}</span>
                 <span>
                   {matchDate}
                   {matchTime ? `, ${matchTime}` : ""}
                 </span>
               </>
             )}
-            <span className={styles.sep}>{"·"}</span>
+            <span className={styles.sep}>{"-"}</span>
             <span>
               {playerRows.length}{" "}
               {playerRows.length === 1 ? "player" : "players"}
@@ -751,7 +747,7 @@ export default function GameView({
             </div>
           )}
 
-          {/* Round scrubber — only rendered when nettable timeline exists. */}
+          {/* Round scrubber, only rendered when nettable timeline exists. */}
           {canSelectRounds && (
             <div className={styles.roundScrubber}>
               <div className={styles.rsHeader}>
@@ -790,7 +786,7 @@ export default function GameView({
             </div>
           )}
 
-          {/* Players table — viewed row pre-expanded */}
+          {/* Players table, viewed row pre-expanded */}
           <div className={styles.matchSection}>
             <div className={styles.matchSectionHeader}>
               <h3>
@@ -843,5 +839,5 @@ export default function GameView({
 }
 
 /** Convert the raw match_players.relic_history jsonb into a sorted timeline.
- *  Input shape (dict): {"1": {relic: "item_x", round: 11}, "2": {...}, …}
- *  Or array: [{relic, round}, …]. Maps internal item_* ids → display names. */
+ *  Input shape (dict): {"1": {relic: "item_x", round: 11}, "2": {...}, ...}
+ *  Or array: [{relic, round}, ...]. Maps internal item_* ids to display names. */

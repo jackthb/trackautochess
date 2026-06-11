@@ -13,3 +13,6 @@ sha2 = "0.10"
 ts-rs = { version = "12.0", features = ["serde-compat", "serde-json-impl"] }
 ureq = "2"
 windows-sys = { version = "0.59", features = ["Win32_UI_Input_KeyboardAndMouse"] }
+
+[lints.rust]
+unused = "deny"
