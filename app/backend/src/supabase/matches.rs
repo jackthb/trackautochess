@@ -4,6 +4,10 @@ use serde_json::{json, Value};
 use sha2::{Digest, Sha256};
 use std::collections::HashSet;
 
+/// Solo lobbies (practice/bot games with no other humans) are not real
+/// matches; require at least one opponent before recording anything.
+pub(super) const MIN_TRACKED_PLAYERS: usize = 2;
+
 impl SupabaseClient {
     pub fn upload_finished_match_from_rows(
         &self,
@@ -79,7 +83,7 @@ impl SupabaseClient {
             &match_row,
             "resolution=ignore-duplicates,return=minimal",
         )?;
-        let players = build_fallback_match_players(rows, &match_id, reason);
+        let players = unify_row_keys(build_fallback_match_players(rows, &match_id, reason));
         if !players.is_empty() {
             self.ensure_match_player_users(&players)?;
             self.post_json(
@@ -114,7 +118,7 @@ impl SupabaseClient {
             &upload.match_row,
             "resolution=merge-duplicates,return=minimal",
         )?;
-        let players = dedupe_match_players(upload.players);
+        let players = unify_row_keys(dedupe_match_players(upload.players));
         if !players.is_empty() {
             self.ensure_match_player_users(&players)?;
             self.post_json(
@@ -167,6 +171,29 @@ pub(super) fn dedupe_match_players(players: Vec<Value>) -> Vec<Value> {
         }
     }
     out
+}
+
+/// PostgREST bulk inserts reject arrays whose objects have differing key sets
+/// (PGRST102 "All object keys must match"). Player rows only carry the fields
+/// each player happened to have, so pad every row to the union of keys with
+/// explicit nulls before posting.
+pub(super) fn unify_row_keys(rows: Vec<Value>) -> Vec<Value> {
+    let mut keys = std::collections::BTreeSet::new();
+    for row in &rows {
+        if let Some(object) = row.as_object() {
+            keys.extend(object.keys().cloned());
+        }
+    }
+    rows.into_iter()
+        .map(|mut row| {
+            if let Some(object) = row.as_object_mut() {
+                for key in &keys {
+                    object.entry(key.clone()).or_insert(Value::Null);
+                }
+            }
+            row
+        })
+        .collect()
 }
 
 const MATCH_PLAYER_COLUMNS: &[&str] = &[
@@ -248,7 +275,7 @@ pub(super) fn build_end_board_upload(
         .get("raw")
         .and_then(|raw| raw.get("data"))
         .and_then(Value::as_object)?;
-    if data.is_empty() {
+    if data.len() < MIN_TRACKED_PLAYERS {
         return None;
     }
     let mut pairs = data
@@ -420,7 +447,7 @@ pub(super) fn build_fallback_match_row(
     played_at: &str,
 ) -> Option<Value> {
     let mut pairs = player_id_pairs(rows);
-    if pairs.is_empty() {
+    if pairs.len() < MIN_TRACKED_PLAYERS {
         return None;
     }
     pairs.sort();

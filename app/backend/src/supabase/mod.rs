@@ -159,6 +159,22 @@ mod tests {
     }
 
     #[test]
+    fn unify_row_keys_pads_ragged_rows_with_nulls() {
+        let rows = vec![
+            serde_json::json!({"steam_id": 1, "placement": 1, "relic": "doubloon"}),
+            serde_json::json!({"steam_id": 2, "placement": 2}),
+        ];
+        let unified = unify_row_keys(rows);
+        // PostgREST bulk inserts 400 (PGRST102) unless every object has the
+        // same key set, so the second row must gain an explicit null relic.
+        assert_eq!(unified[1]["relic"], serde_json::Value::Null);
+        for row in &unified {
+            let keys: Vec<_> = row.as_object().unwrap().keys().collect();
+            assert_eq!(keys, vec!["placement", "relic", "steam_id"]);
+        }
+    }
+
+    #[test]
     fn nettable_row_json_preserves_upload_shape() {
         let row = NettableRow {
             table_name: "CustomNetTable_dac_table".to_owned(),

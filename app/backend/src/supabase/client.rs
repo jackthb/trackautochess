@@ -193,7 +193,11 @@ impl SupabaseClient {
             .send_string(&body.to_string());
         match response {
             Ok(resp) if (200..300).contains(&resp.status()) => Ok(()),
-            Ok(resp) => Err(format!("Supabase returned HTTP {}", resp.status())),
+            Ok(resp) => {
+                let status = resp.status();
+                let detail = resp.into_string().unwrap_or_default();
+                Err(format!("Supabase returned HTTP {status}: {detail}"))
+            }
             Err(err) => Err(describe_ureq_error(err)),
         }
     }

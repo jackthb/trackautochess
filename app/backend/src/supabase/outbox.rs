@@ -27,7 +27,9 @@ impl SupabaseClient {
             .unwrap_or(&value);
         if table.is_empty() {
             if let Some(rows) = body.as_array() {
-                let _ = self.upload_end_board_rows(rows);
+                if let Err(err) = self.upload_end_board_rows(rows) {
+                    eprintln!("outbox end-board upload failed: {err}");
+                }
                 self.upload_nettable_rows_blob(cfg, rows)?;
             }
             return Ok(());

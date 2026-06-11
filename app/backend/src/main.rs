@@ -86,6 +86,23 @@ fn main() -> io::Result<()> {
             }
             Ok(())
         }
+        // One-shot replay of queued payloads. The daemon only replays the
+        // outbox at startup, so this is the recovery path when an upload
+        // failed and the daemon has been running ever since.
+        "outbox-flush" => {
+            let cfg = Config::load()?;
+            let outbox = Outbox::new(cfg.dac_dir.join("outbox"));
+            let Some(client) = supabase::SupabaseClient::from_config(&cfg) else {
+                return Err(io::Error::new(
+                    io::ErrorKind::InvalidInput,
+                    "Supabase is not configured",
+                ));
+            };
+            let pending = outbox.list()?.len();
+            let uploaded = client.replay_outbox(&cfg, &outbox)?;
+            println!("uploaded {uploaded} of {pending} pending payloads");
+            Ok(())
+        }
         "gsi-cfg" => {
             println!("{}", gsi::install_cfg_text(gsi::DEFAULT_PORT));
             Ok(())
