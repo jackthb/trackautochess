@@ -3,6 +3,7 @@
   "name": "Mango Tree",
   "slug": "mango-tree",
   "icon": "relics/mango_tree.png",
+  "commentary": "Mango Tree drops an Enchanted Mango only when your current home battle result differs from your previous home battle result. Each Enchanted Mango drop reduces the tree's health by 1; when that reaches 0, the tree breaks and no Golden Mango is created at that moment.\n\nGolden Mango is created when the relic expires or is replaced, but only if the Mango Tree still exists and has health above 0. In practice, preserve at least 1 tree health before expiration/replacement if you want the Golden Mango.\n\n| Situation | Best use | Why |\n|---|---|---|\n| Low courier level | Usually save Golden Mango value over forcing extra Enchanted Mango drops | Enchanted Mango scales from 1 to your courier level, so early drops are modest. |\n| Mid game with enough health | Farm Enchanted Mangoes by alternating win/loss results, but stop before the tree reaches 0 health | You can gain gold and XP while still preserving the Golden Mango payout. |\n| Near lethal damage | Prioritize keeping the tree alive for Golden Mango | Golden Mango can protect your courier from fatal damage for a round. |\n| Final relic rounds or replacing relic soon | Avoid spending the last tree health | The Golden Mango only appears if the tree is alive when the relic is removed. |",
   "source": {
     "name": "Mango Tree",
     "names": {

@@ -61,6 +61,21 @@ export function getItemRelations(): ItemRelation[] {
   return RELATIONS;
 }
 
+export function getRelicGeneratedItemSlugs(): Set<string> {
+  return new Set(
+    RELATIONS.filter(
+      (relation) =>
+        relation.category === "generated_item" &&
+        Boolean(relation.relic) &&
+        Boolean(relation.relatedItem),
+    )
+      .map((relation) =>
+        relation.relatedItem ? getItemSlugByName(relation.relatedItem) : null,
+      )
+      .filter((slug): slug is string => Boolean(slug)),
+  );
+}
+
 export function getRelatedItemsForSynergy(
   synergyName: string,
   locale: Locale = DEFAULT_LOCALE,

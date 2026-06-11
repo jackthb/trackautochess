@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { EntityDetail, type RelatedEntity } from "@/components/EntityDetail";
 import { EntityCommentaryList } from "@/components/PatchCommentary";
+import { Markdown } from "@/components/Markdown";
 import {
   getAllItems,
   getItemBySlug,
@@ -15,6 +16,7 @@ import {
   getRelatedEntitiesForItem,
   getRelatedItemsForItem,
   getRelatedSynergiesForItem,
+  getRelicGeneratedItemSlugs,
   ITEM_RELATION_CATEGORY_LABEL,
 } from "@/lib/itemRelations";
 import { absoluteUrl, SITE_NAME, SITE_TITLE } from "@/lib/site";
@@ -56,7 +58,10 @@ interface Props {
 export const dynamicParams = false;
 
 export function generateStaticParams() {
-  return getAllItems().map((item) => ({ slug: item.slug }));
+  const generatedItemSlugs = getRelicGeneratedItemSlugs();
+  return getAllItems()
+    .filter((item) => !generatedItemSlugs.has(item.slug))
+    .map((item) => ({ slug: item.slug }));
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
@@ -104,7 +109,7 @@ export default async function ItemDetailPage({ params }: Props) {
       (candidate) => candidate.tier === item.tier && candidate.slug !== item.slug
     )
     .slice(0, 8);
-  const commentary = getCommentaryForEntity("item", slug);
+  const patchCommentary = getCommentaryForEntity("item", slug);
 
   const tierLabel = TIER_LABEL[item.tier];
   const title = t.title(item.name);
@@ -187,8 +192,13 @@ export default async function ItemDetailPage({ params }: Props) {
         iconSrc={iconUrl(item)}
         bodySections={bodySections}
         commentary={
-          commentary.length > 0 ? (
-            <EntityCommentaryList entries={commentary} />
+          item.commentary || patchCommentary.length > 0 ? (
+            <>
+              {item.commentary ? <Markdown>{item.commentary}</Markdown> : null}
+              {patchCommentary.length > 0 ? (
+                <EntityCommentaryList entries={patchCommentary} />
+              ) : null}
+            </>
           ) : undefined
         }
         notes={item.notes.map(cleanText)}

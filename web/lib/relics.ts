@@ -6,6 +6,7 @@ import { DEFAULT_LOCALE, type Locale, pickLocalized } from "@/lib/i18n";
 interface RelicInfo {
   name: string;
   description: string;
+  commentary?: string;
   lore: string;
   names?: Record<string, string>;
   descriptions?: Record<string, string>;
@@ -21,6 +22,7 @@ export interface DisplayRelic {
   slug: string;
   name: string;
   description: string;
+  commentary: string;
   lore: string;
   iconStem: string;
   iconUrl: string;
@@ -37,12 +39,14 @@ function buildRelicsForLocale(locale: Locale): DisplayRelic[] {
       const localizedName = pickLocalized(relic.names, locale) || relic.name;
       const description =
         pickLocalized(relic.descriptions, locale) || relic.description;
+      const commentary = relic.commentary || "";
       const lore = pickLocalized(relic.lore_i18n, locale) || relic.lore || "";
       return {
         // Slug always uses the English canonical name.
         slug: slugifyName(relic.name),
         name: localizedName,
         description,
+        commentary,
         lore,
         iconStem: stem,
         iconUrl: relic.icon_url || `/icons/relics/${stem}.png`,

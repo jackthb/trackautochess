@@ -3,6 +3,7 @@
   "name": "Greevil Egg",
   "slug": "greevil-egg",
   "icon": "relics/greevil_egg.png",
+  "commentary": "The egg checks once at the beginning of each round while the player has hand entities and `relic_ttl <= 10`. If the stored piece still exists in the shared chess pool, it has a 50% chance to gain 1 point, up to a cap of 9, and each successful growth removes one matching base piece from the pool.\n\nHatching thresholds are 1/3/9 points: below 3 returns a 1-star copy, at least 3 returns a 2-star copy, and 9 returns a 3-star copy. Any unused points above the hatch threshold are returned to the chess pool. The egg growth logic is not gated by still having the egg relic modifier, so an egg can keep growing after the relic expires.",
   "source": {
     "name": "Greevil Egg",
     "names": {

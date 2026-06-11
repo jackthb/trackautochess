@@ -4,6 +4,7 @@ import { getAllItems } from "@/lib/items";
 import { getAllRelics } from "@/lib/relics";
 import { getAllUnits } from "@/lib/units";
 import { getAllSynergies } from "@/lib/synergies";
+import { getRelicGeneratedItemSlugs } from "@/lib/itemRelations";
 import { getSiteUrl, DEFAULT_SITE_URL } from "@/lib/site";
 
 // App Router sitemap (replaces pages/sitemap.xml.ts) — serves /sitemap.xml.
@@ -31,9 +32,12 @@ const STATIC_PATHS = [
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const base = getSiteUrl() ?? DEFAULT_SITE_URL;
+  const generatedItemSlugs = getRelicGeneratedItemSlugs();
   return [
     ...STATIC_PATHS.map((p) => ({ url: `${base}${p}` })),
-    ...getAllItems().map((i) => ({ url: `${base}/items/${i.slug}` })),
+    ...getAllItems()
+      .filter((i) => !generatedItemSlugs.has(i.slug))
+      .map((i) => ({ url: `${base}/items/${i.slug}` })),
     ...getAllUnits().map((u) => ({ url: `${base}/units/${u.slug}` })),
     ...getAllSynergies().map((s) => ({ url: `${base}/synergies/${s.slug}` })),
     ...getAllRelics().map((r) => ({ url: `${base}/relics/${r.slug}` })),

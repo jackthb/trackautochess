@@ -8,6 +8,7 @@ import { getRelicBySlug } from "@/lib/relics";
 import { getTalentByName } from "@/lib/talents";
 import { getUnitBySlug } from "@/lib/units";
 import { getSynergyBySlug } from "@/lib/synergies";
+import { getRelicGeneratedItemSlugs } from "@/lib/itemRelations";
 import { absoluteUrl, SITE_NAME, SITE_TITLE } from "@/lib/site";
 import { DEFAULT_LOCALE, pickLocalized } from "@/lib/i18n";
 import { type EntryKind, KIND_COLOR, KIND_LABEL } from "@/lib/patchKinds";
@@ -109,8 +110,9 @@ function resolveEntryMeta(entry: PatchEntry): EntryMeta {
   switch (entry.entity_type) {
     case "item": {
       const item = getItemBySlug(entry.entity_slug);
+      const isGeneratedRelicItem = getRelicGeneratedItemSlugs().has(entry.entity_slug);
       return {
-        href: `/items/${entry.entity_slug}`,
+        href: isGeneratedRelicItem ? null : `/items/${entry.entity_slug}`,
         iconSrc: item ? iconUrl(item) : null,
         tooltip: item ? `${item.name}: ${item.description}` : null,
       };

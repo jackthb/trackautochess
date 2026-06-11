@@ -7,7 +7,7 @@ import {
   getRelicBySlug,
   type DisplayRelic,
 } from "@/lib/relics";
-import { iconUrl, TIER_COLOR, TIER_LABEL } from "@/lib/items";
+import { getAllItems, iconUrl, TIER_COLOR, TIER_LABEL } from "@/lib/items";
 import {
   getRelatedEntitiesForRelic,
   getRelatedItemsForRelic,
@@ -16,6 +16,7 @@ import {
 import { absoluteUrl, SITE_NAME, SITE_TITLE } from "@/lib/site";
 import { DEFAULT_LOCALE } from "@/lib/i18n";
 import { getCommentaryForEntity } from "@/lib/patchCommentary";
+import { Markdown } from "@/components/Markdown";
 
 // Static detail page backed by committed JSON generated from content/.
 
@@ -77,6 +78,7 @@ export default async function RelicDetailPage({ params }: Props) {
   const { slug } = await params;
 
   const allRelics = getAllRelics(DEFAULT_LOCALE);
+  const allItems = getAllItems(DEFAULT_LOCALE);
   const relic = getRelicBySlug(slug, DEFAULT_LOCALE);
   if (!relic) notFound();
 
@@ -85,7 +87,7 @@ export default async function RelicDetailPage({ params }: Props) {
     .slice(0, 8);
   const cmsRelatedEntities = getRelatedEntitiesForRelic(relic.name, DEFAULT_LOCALE);
   const relatedItems = getRelatedItemsForRelic(relic.name, DEFAULT_LOCALE);
-  const commentary = getCommentaryForEntity("relic", slug);
+  const patchCommentary = getCommentaryForEntity("relic", slug);
 
   const title = `${relic.name} Relic Guide | ${SITE_TITLE}`;
   const description = buildDescription(relic);
@@ -142,6 +144,29 @@ export default async function RelicDetailPage({ params }: Props) {
       accentColor: TIER_COLOR[item.tier],
     }),
   );
+  const relatedItemDetailSlugs =
+    cmsRelatedEntities.length > 0
+      ? cmsRelatedEntities
+          .filter((entity) => entity.variant === "item")
+          .map((entity) => entity.slug)
+      : relatedItems.map(({ item }) => item.slug);
+  const relatedItemDetails = relatedItemDetailSlugs
+    .map((itemSlug) => allItems.find((item) => item.slug === itemSlug))
+    .filter((item) => item !== undefined);
+  const generatedItemsMarkdown = relatedItemDetails
+    .map((item) => {
+      const detail = [cleanText(item.description), item.commentary]
+        .filter(Boolean)
+        .join("\n\n");
+      return `### ${item.name}\n\n${detail}`;
+    })
+    .join("\n\n");
+  const visibleCmsRelatedEntities = generatedItemsMarkdown
+    ? cmsRelatedEntities.filter((entity) => entity.variant !== "item")
+    : cmsRelatedEntities;
+  const visibleRelatedItemEntities = generatedItemsMarkdown
+    ? []
+    : relatedItemEntities;
 
   return (
     <>
@@ -153,32 +178,47 @@ export default async function RelicDetailPage({ params }: Props) {
         variant="relic"
         name={relic.name}
         iconSrc={relic.iconUrl}
-        overview={<>{baseOverview}</>}
+        bodySections={[
+          { title: "Relic Overview", body: <>{baseOverview}</> },
+          ...(generatedItemsMarkdown
+            ? [
+                {
+                  title: "Generated Items",
+                  body: <Markdown>{generatedItemsMarkdown}</Markdown>,
+                },
+              ]
+            : []),
+        ]}
         commentary={
-          commentary.length > 0 ? (
-            <EntityCommentaryList entries={commentary} />
+          relic.commentary || patchCommentary.length > 0 ? (
+            <>
+              {relic.commentary ? <Markdown>{relic.commentary}</Markdown> : null}
+              {patchCommentary.length > 0 ? (
+                <EntityCommentaryList entries={patchCommentary} />
+              ) : null}
+            </>
           ) : undefined
         }
         lore={relic.lore ? cleanText(relic.lore) : undefined}
         relatedTitle={
-          cmsRelatedEntities.length > 0 || relatedItemEntities.length > 0
+          visibleCmsRelatedEntities.length > 0 || visibleRelatedItemEntities.length > 0
             ? "Related Entities"
             : "More Relics"
         }
         related={
-          cmsRelatedEntities.length > 0
-            ? cmsRelatedEntities
-            : relatedItemEntities.length > 0
-              ? relatedItemEntities
+          visibleCmsRelatedEntities.length > 0
+            ? visibleCmsRelatedEntities
+            : visibleRelatedItemEntities.length > 0
+              ? visibleRelatedItemEntities
               : relatedEntities
         }
         extraRelatedTitle={
-          cmsRelatedEntities.length > 0 || relatedItemEntities.length > 0
+          visibleCmsRelatedEntities.length > 0 || visibleRelatedItemEntities.length > 0
             ? "More Relics"
             : undefined
         }
         extraRelated={
-          cmsRelatedEntities.length > 0 || relatedItemEntities.length > 0
+          visibleCmsRelatedEntities.length > 0 || visibleRelatedItemEntities.length > 0
             ? relatedEntities
             : undefined
         }

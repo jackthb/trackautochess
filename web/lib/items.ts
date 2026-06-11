@@ -5,6 +5,7 @@ import { DEFAULT_LOCALE, type Locale, pickLocalized } from "@/lib/i18n";
 interface FullItem {
   name: string;
   description: string;
+  commentary?: string;
   lore: string;
   quality: string;
   texture: string;
@@ -30,6 +31,7 @@ export interface DisplayItem {
   slug: string;
   name: string;
   description: string;
+  commentary: string;
   lore: string;
   quality: string;
   notes: string[];
@@ -114,6 +116,7 @@ function buildItemsForLocale(locale: Locale): DisplayItem[] {
         description: normalizePunct(
           pickLocalized(full?.descriptions, locale) || full?.description || "",
         ),
+        commentary: full?.commentary ?? "",
         lore: normalizePunct(
           pickLocalized(full?.lore_i18n, locale) || full?.lore || "",
         ),
