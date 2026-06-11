@@ -13,7 +13,6 @@ import { ReplaysTab } from "./components/ReplaysTab";
 // import { ConfirmationTab } from "./components/ConfirmationTab";
 // import { LabTab } from "./components/LabTab";
 import { SettingsTab } from "./components/SettingsTab";
-import { LogTab } from "./components/LogTab";
 import { LoginScreen } from "./components/LoginScreen";
 import { NetTableHome } from "./components/NetTableHome";
 import { GlobalSearch } from "./components/GlobalSearch";
@@ -30,8 +29,7 @@ type TabId =
   // PARKED tabs — kept in the union so reviving them stays a one-line uncomment.
   | "history"
   | "replays"
-  | "settings"
-  | "log";
+  | "settings";
 
 // PARKED: admin/"preview as user" toggle. Single-view simplification — the
 // app now renders the same flow for everyone (including admins). Restore by
@@ -204,7 +202,6 @@ export default function App() {
             {activeTab === "settings" && (
               <SettingsTab status={tracker.status} />
             )}
-            {activeTab === "log" && <LogTab />}
           </div>
           <StatusBar status={tracker.status} />
           <GlobalSearch

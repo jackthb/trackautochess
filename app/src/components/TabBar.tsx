@@ -6,7 +6,7 @@ interface TabBarProps {
   onPreviewAsUser?: () => void;
 }
 
-// Single-view simplification: only home/lab/settings/log are surfaced.
+// Single-view simplification: only home/history/settings are surfaced.
 // Other entries are parked (commented inline) so reviving them is a one-line uncomment.
 const TABS = [
   { id: "home", label: "Home" },
@@ -15,7 +15,6 @@ const TABS = [
   // { id: "confirm", label: "Screenshots" },    // PARKED — screenshot UI
   // { id: "lab", label: "Lab" },                // PARKED — lab tools
   { id: "settings", label: "Settings" },
-  { id: "log", label: "Log" },
   // { id: "upload", label: "Upload" },          // PARKED — upload flow
 ];
 
