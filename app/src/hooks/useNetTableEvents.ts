@@ -17,6 +17,8 @@ export type NetTableActivityKind =
   | "nettable_queen_upload_complete"
   | "nettable_game_ended"
   | "nettable_end_board_saved"
+  | "nettable_match_left_pending"
+  | "nettable_match_left_resolved"
   | "nettable_creep_round"
   | "parse_result"
   | "import_result";
@@ -72,6 +74,14 @@ export interface NetTableGameEndedState {
   at: string;
 }
 
+/** A match the user left early; the backend holds its snapshot until the user
+ *  confirms the game is over, the window lapses, or they rejoin. */
+export interface NetTablePendingLeaveState {
+  message: string;
+  /** ISO time when the held snapshot auto-uploads as-is. */
+  expiresAt: string;
+}
+
 export interface NetTableActivityEntry {
   id: number;
   kind: NetTableActivityKind;
@@ -110,6 +120,8 @@ export interface NetTableActivityState {
   queenUploadProgress: string | null;
   /** Most recent match-end signal, used by the home screen after a game finishes. */
   lastGameEnded: NetTableGameEndedState | null;
+  /** Set while a left-early match snapshot awaits confirmation or timeout. */
+  pendingLeave: NetTablePendingLeaveState | null;
 }
 
 const MAX_ENTRIES = 50;
@@ -173,6 +185,7 @@ export function useNetTableEvents(): NetTableActivityState {
   const [queenUpload, setQueenUpload] = useState<NetTableQueenUploadResult | null>(null);
   const [queenUploadProgress, setQueenUploadProgress] = useState<string | null>(null);
   const [lastGameEnded, setLastGameEnded] = useState<NetTableGameEndedState | null>(null);
+  const [pendingLeave, setPendingLeave] = useState<NetTablePendingLeaveState | null>(null);
   useEffect(() => {
     if (!window.tracker) return;
     let nextId = 1;
@@ -310,6 +323,34 @@ export function useNetTableEvents(): NetTableActivityState {
           });
           break;
         }
+        case "nettable_match_left_pending": {
+          setPendingLeave({
+            message: msg.message,
+            expiresAt: msg.expires_at,
+          });
+          push({
+            kind: "nettable_match_left_pending",
+            title: "Left the match early",
+            detail: msg.message,
+            tone: "warning",
+          });
+          break;
+        }
+        case "nettable_match_left_resolved": {
+          setPendingLeave(null);
+          push({
+            kind: "nettable_match_left_resolved",
+            title:
+              msg.outcome === "uploaded"
+                ? "Left match uploaded"
+                : msg.outcome === "cancelled"
+                  ? "Rejoined the match"
+                  : "Left match",
+            detail: msg.message,
+            tone: msg.outcome === "uploaded" ? "success" : "info",
+          });
+          break;
+        }
         case "nettable_creep_round": {
           push({
             kind: "nettable_creep_round",
@@ -440,5 +481,6 @@ export function useNetTableEvents(): NetTableActivityState {
     queenUpload,
     queenUploadProgress,
     lastGameEnded,
+    pendingLeave,
   };
 }

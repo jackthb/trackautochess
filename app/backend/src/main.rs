@@ -107,6 +107,44 @@ fn main() -> io::Result<()> {
             println!("{}", gsi::install_cfg_text(gsi::DEFAULT_PORT));
             Ok(())
         }
+        // Recover a match from a console.log that holds its rows but whose
+        // upload never happened (capture stopped, daemon restarted, etc.).
+        // Tries the end-board path first, then the same fallback writer the
+        // daemon uses for left-early matches.
+        "finalize-log" => {
+            let path = args
+                .get(1)
+                .map(PathBuf::from)
+                .or_else(nettable_setup::find_console_log)
+                .ok_or_else(|| {
+                    io::Error::new(
+                        io::ErrorKind::InvalidInput,
+                        "finalize-log needs a console.log path (none auto-detected)",
+                    )
+                })?;
+            let rows = nettable_parser::extract_rows(&path)?;
+            let cfg = Config::load()?;
+            let Some(client) = supabase::SupabaseClient::from_config(&cfg) else {
+                return Err(io::Error::new(
+                    io::ErrorKind::InvalidInput,
+                    "Supabase is not configured",
+                ));
+            };
+            match client.upload_finished_match_from_rows(&rows) {
+                Ok(Some(match_id)) => {
+                    println!("uploaded end-board match {match_id}");
+                    return Ok(());
+                }
+                Ok(None) => {}
+                Err(err) => eprintln!("end-board upload failed: {err}"),
+            }
+            match client.upsert_fallback_finished_match(&rows, "manual_finalize") {
+                Ok(Some(match_id)) => println!("uploaded fallback match {match_id}"),
+                Ok(None) => println!("no usable match data found in the log"),
+                Err(err) => return Err(io::Error::new(io::ErrorKind::Other, err)),
+            }
+            Ok(())
+        }
         other => Err(io::Error::new(
             io::ErrorKind::InvalidInput,
             format!("unknown command: {other}"),
@@ -214,6 +252,9 @@ fn run_daemon() -> io::Result<()> {
                 emit(&event_json(&NettablePaused::new(paused)))?;
             }
             BackendCommand::NettableUploadQueens => nettable.upload_queens(&cfg, |line| {
+                let _ = emit(&line);
+            }),
+            BackendCommand::NettableConfirmMatchEnd => nettable.confirm_match_left(&cfg, |line| {
                 let _ = emit(&line);
             }),
             BackendCommand::FetchGames { request_id } => {

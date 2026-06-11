@@ -44,7 +44,7 @@ fn describe_ureq_error(err: ureq::Error) -> String {
     }
 }
 
-fn parse_valid_steam_id64(value: &str) -> Option<u64> {
+pub(crate) fn parse_valid_steam_id64(value: &str) -> Option<u64> {
     let steam_id = value.trim().parse::<u64>().ok()?;
     (STEAM_ID64_MIN..=STEAM_ID64_MAX)
         .contains(&steam_id)
