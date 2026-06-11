@@ -65,15 +65,48 @@ impl SupabaseClient {
             return Ok(0);
         }
         let count = rows.len();
+        // Resolve never-pulled profiles BEFORE the upsert: the rows above stamp
+        // `drodo_last_fetched_at` for every ladder player, which would hide new
+        // players from the hydration query below.
+        let unpulled_ids = self.unpulled_queen_profile_ids(&seen_ids).unwrap_or_default();
         self.post_json(
             "/rest/v1/users",
             &Value::Array(rows),
             "resolution=merge-duplicates,return=minimal",
         )?;
         let _ = self.upsert_queen_ladder_snapshots(players);
-        let _ = self.hydrate_unpulled_queen_profiles(&seen_ids);
+        let _ = self.hydrate_queen_profiles(&unpulled_ids);
         let _ = self.clear_stale_queen_ladder_snapshot(&seen_ids);
+        let _ = revalidate_queens_page();
         Ok(count)
+    }
+
+    /// Ladder Steam IDs whose Drodo profile has never been fetched — either
+    /// brand-new `users` rows or existing rows with a null
+    /// `drodo_last_fetched_at`.
+    fn unpulled_queen_profile_ids(&self, current_steam_ids: &[u64]) -> Result<Vec<u64>, String> {
+        if current_steam_ids.is_empty() {
+            return Ok(Vec::new());
+        }
+        let ids = current_steam_ids
+            .iter()
+            .map(u64::to_string)
+            .collect::<Vec<_>>()
+            .join(",");
+        let pulled = self.get_json(&format!(
+            "/rest/v1/users?select=steam_id&drodo_last_fetched_at=not.is.null&steam_id=in.({ids})"
+        ))?;
+        let pulled = pulled
+            .as_array()
+            .into_iter()
+            .flatten()
+            .filter_map(|row| row.get("steam_id").and_then(Value::as_u64))
+            .collect::<HashSet<u64>>();
+        Ok(current_steam_ids
+            .iter()
+            .copied()
+            .filter(|id| !pulled.contains(id))
+            .collect())
     }
 
     fn upsert_queen_ladder_snapshots(&self, players: &[QueenPlayer]) -> Result<usize, String> {
@@ -108,24 +141,7 @@ impl SupabaseClient {
         Ok(count)
     }
 
-    fn hydrate_unpulled_queen_profiles(&self, current_steam_ids: &[u64]) -> Result<usize, String> {
-        if current_steam_ids.is_empty() {
-            return Ok(0);
-        }
-        let ids = current_steam_ids
-            .iter()
-            .map(u64::to_string)
-            .collect::<Vec<_>>()
-            .join(",");
-        let unpulled = self.get_json(&format!(
-            "/rest/v1/users?select=steam_id&drodo_last_fetched_at=is.null&steam_id=in.({ids})"
-        ))?;
-        let ids = unpulled
-            .as_array()
-            .into_iter()
-            .flatten()
-            .filter_map(|row| row.get("steam_id").and_then(Value::as_u64))
-            .collect::<Vec<_>>();
+    fn hydrate_queen_profiles(&self, ids: &[u64]) -> Result<usize, String> {
         if ids.is_empty() {
             return Ok(0);
         }
@@ -238,6 +254,19 @@ impl SupabaseClient {
             "return=minimal",
         )
     }
+}
+
+const QUEENS_REVALIDATE_URL: &str = "https://trackautochess.com/api/revalidate/queens";
+
+/// Ask the public site to rebuild /queens now that the fresh ladder rows and
+/// any newly hydrated profiles are in the database. Best effort: the page
+/// still revalidates on its own ISR schedule if this fails.
+fn revalidate_queens_page() -> Result<(), String> {
+    ureq::post(QUEENS_REVALIDATE_URL)
+        .timeout(std::time::Duration::from_secs(10))
+        .call()
+        .map(|_| ())
+        .map_err(|err| err.to_string())
 }
 
 pub(super) fn queen_ladder_stale_clear_path(current_steam_ids: &[u64]) -> String {
