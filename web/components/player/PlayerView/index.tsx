@@ -20,7 +20,7 @@ import { isAdminSteamId } from "@/lib/admin";
 import { analyticsRoute, bucketCount, trackEvent } from "@/lib/analytics";
 import {
   DRODO_FRESH_TTL_MS,
-  HOT_POLL_MAX_INTERVAL_SECONDS,
+  HOT_PROFILE_REFRESH_TTL_SECONDS,
   type DrodoProfileRow,
 } from "@/lib/drodo";
 import { drodoStatsFromProfile } from "@/components/player/playerData";
@@ -350,7 +350,7 @@ export default function PlayerView({
     const isHotProfile =
       initialDrodo.queen_rank != null || queenRankHistory.length > 0;
     const ttlMs = isHotProfile
-      ? HOT_POLL_MAX_INTERVAL_SECONDS * 1000
+      ? HOT_PROFILE_REFRESH_TTL_SECONDS * 1000
       : DRODO_FRESH_TTL_MS;
     const fetchedMs = initialDrodoLastFetchedAt
       ? new Date(initialDrodoLastFetchedAt).getTime()

@@ -1,4 +1,5 @@
 import type { NextApiRequest } from "next";
+import type { IncomingHttpHeaders } from "node:http";
 
 /**
  * Structured abuse-signal logging. Emits a single JSON line per event so
@@ -45,4 +46,19 @@ export function getClientIp(req: NextApiRequest): string {
 export function getUserAgent(req: NextApiRequest): string {
   const ua = req.headers["user-agent"];
   return typeof ua === "string" ? ua.slice(0, 240) : "";
+}
+
+export function toIncomingHeaders(req: Request): IncomingHttpHeaders {
+  const headers: IncomingHttpHeaders = {};
+  req.headers.forEach((value, key) => {
+    headers[key] = value;
+  });
+  return headers;
+}
+
+export function toApiReq(req: Request): NextApiRequest {
+  return {
+    headers: toIncomingHeaders(req),
+    socket: { remoteAddress: undefined },
+  } as unknown as NextApiRequest;
 }

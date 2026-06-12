@@ -1,7 +1,6 @@
-import type { NextApiRequest } from "next";
 import { checkBotId } from "botid/server";
 import { RateLimiterMemory } from "rate-limiter-flexible";
-import { getClientIp, getUserAgent, logAbuse } from "@/lib/abuseLog";
+import { getClientIp, getUserAgent, logAbuse, toApiReq, toIncomingHeaders } from "@/lib/abuseLog";
 import { createSupabaseServerClient } from "@/lib/supabase";
 import {
   fetchSteamProfile,
@@ -21,19 +20,6 @@ import {
 import { fetchAndCacheDrodo } from "@/lib/drodo";
 import { revalidateQueensPage } from "@/lib/queensRevalidate";
 
-// Adapt a Web Request into the minimal NextApiRequest shape consumed by the
-// abuseLog helpers (getClientIp reads req.headers["x-forwarded-for"] and
-// req.socket.remoteAddress; getUserAgent reads req.headers["user-agent"]).
-function toApiReq(req: Request): NextApiRequest {
-  return {
-    headers: {
-      "x-forwarded-for": req.headers.get("x-forwarded-for") ?? undefined,
-      "user-agent": req.headers.get("user-agent") ?? undefined,
-    },
-    socket: { remoteAddress: undefined },
-  } as unknown as NextApiRequest;
-}
-
 const rateLimiter = new RateLimiterMemory({ points: 60, duration: 60 });
 
 export async function GET(req: Request) {
@@ -43,7 +29,7 @@ export async function GET(req: Request) {
   const ua = getUserAgent(apiReq);
 
   const botCheck = await checkBotId({
-    advancedOptions: { headers: Object.fromEntries(req.headers) },
+    advancedOptions: { headers: toIncomingHeaders(req) },
   });
   if (botCheck.isBot && !botCheck.isVerifiedBot) {
     logAbuse("bot_blocked", { path, ip, ua });

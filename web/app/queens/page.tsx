@@ -4,27 +4,22 @@ import { PageLayout } from "@/components/PageLayout";
 import { SITE_NAME, SITE_TITLE } from "@/lib/site";
 import { createSupabaseServerClient } from "@/lib/supabase";
 import { listAvatarUrl, playerProfilePath } from "@/lib/steam";
+import {
+  effectiveQueenRank,
+  loadQueenCandidates,
+  profileQueenRank,
+  queenMmr,
+  selectDisplayedQueens,
+  type QueenRow as BaseQueenRow,
+} from "@/lib/queens";
+import { mostRecentTimestamp } from "@/lib/timestamps";
 import { loadCreatorLiveStreams } from "@/lib/creators";
 import styles from "../leaderboard/leaderboard.module.css";
 import { LastSyncedTime } from "./LastSyncedTime";
-import { RefreshOnReturn } from "./RefreshOnReturn";
+import { QueensAutoRefresh } from "./QueensAutoRefresh";
+import { RelativeAge } from "./RelativeAge";
 
-interface QueenRow {
-  steam_id: string;
-  name: string | null;
-  custom_url: string | null;
-  avatar_url: string | null;
-  stream_link: string | null;
-  drodo_mmr: number | null;
-  drodo_season: string | null;
-  drodo_season_games: number | null;
-  drodo_chicken_count: number | null;
-  drodo_raw_data: Record<string, unknown> | null;
-  drodo_last_fetched_at: string | null;
-  queen_ladder_rank: number | null;
-  queen_ladder_mmr: number | null;
-  queen_ladder_season: string | null;
-  queen_ladder_last_seen_at: string | null;
+interface QueenRow extends BaseQueenRow {
   move?: QueenMove | null;
 }
 
@@ -66,25 +61,6 @@ export const metadata: Metadata = {
 };
 
 export const revalidate = 600;
-const QUEEN_TABLE_LIMIT = 100;
-
-const SELECT = [
-  "steam_id::text",
-  "name",
-  "custom_url",
-  "avatar_url",
-  "stream_link",
-  "drodo_mmr",
-  "drodo_season",
-  "drodo_season_games",
-  "drodo_chicken_count",
-  "drodo_raw_data",
-  "drodo_last_fetched_at",
-  "queen_ladder_rank",
-  "queen_ladder_mmr",
-  "queen_ladder_season",
-  "queen_ladder_last_seen_at",
-].join(", ");
 
 async function loadQueens(): Promise<{ rows: QueenRow[]; error: string | null }> {
   const supabase = createSupabaseServerClient();
@@ -92,32 +68,15 @@ async function loadQueens(): Promise<{ rows: QueenRow[]; error: string | null }>
     return { rows: [], error: "Database is not configured." };
   }
 
-  const { data, error } = await supabase
-    .from("users")
-    .select(SELECT)
-    .or("queen_ladder_last_seen_at.not.is.null,drodo_raw_data->>queen_rank.not.is.null")
-    .order("queen_ladder_last_seen_at", { ascending: false, nullsFirst: false })
-    .order("queen_ladder_rank", { ascending: true, nullsFirst: false })
-    .order("queen_ladder_mmr", { ascending: false, nullsFirst: false })
-    .order("drodo_mmr", { ascending: false, nullsFirst: false })
-    .limit(300);
-
-  if (error) return { rows: [], error: error.message };
-  const normalizedRows = ((data ?? []) as unknown as QueenRow[]).map((row) => ({
-    ...row,
-    steam_id: String(row.steam_id),
-  }));
-  const latestSeenAt = normalizedRows[0]?.queen_ladder_last_seen_at ?? null;
-  const rankedRows = (latestSeenAt
-    ? normalizedRows.filter(
-        (row) => row.queen_ladder_last_seen_at === latestSeenAt || profileQueenRank(row) != null
-      )
-    : normalizedRows.filter((row) => profileQueenRank(row) != null)
-  ).sort(compareQueenRows).filter((row) => {
-    const rank = effectiveQueenRank(row);
-    return rank == null || rank <= QUEEN_TABLE_LIMIT;
-  });
-  const rows = dedupeQueenRanks(rankedRows).slice(0, QUEEN_TABLE_LIMIT);
+  let rows: QueenRow[];
+  try {
+    rows = selectDisplayedQueens(await loadQueenCandidates(supabase));
+  } catch (error) {
+    return {
+      rows: [],
+      error: error instanceof Error ? error.message : "Failed to load Queen rows",
+    };
+  }
 
   if (rows.length === 0) {
     return { rows, error: null };
@@ -206,42 +165,6 @@ function formatWinTotal(wins: number | null): string {
   return `${wins.toLocaleString()}`;
 }
 
-function queenMmr(row: QueenRow): number | null {
-  // `queen_ladder_mmr` is captured directly from the in-game ladder/pool.
-  // `drodo_mmr` is available only after a full profile search/hydration, so it
-  // must be a fallback rather than a prerequisite for newly discovered Queens.
-  return row.queen_ladder_mmr ?? row.drodo_mmr ?? null;
-}
-
-function profileQueenRank(row: QueenRow): number | null {
-  const value = row.drodo_raw_data?.queen_rank;
-  if (typeof value === "number" && Number.isFinite(value)) return value;
-  if (typeof value === "string" && value.trim()) {
-    const parsed = Number(value);
-    return Number.isFinite(parsed) ? parsed : null;
-  }
-  return null;
-}
-
-function effectiveQueenRank(row: QueenRow): number | null {
-  return row.queen_ladder_rank ?? profileQueenRank(row);
-}
-
-function mostRecentTimestamp(
-  ...values: Array<string | null | undefined>
-): string | null {
-  let latestValue: string | null = null;
-  let latestTime = -Infinity;
-  for (const value of values) {
-    if (!value) continue;
-    const time = new Date(value).getTime();
-    if (!Number.isFinite(time) || time <= latestTime) continue;
-    latestTime = time;
-    latestValue = value;
-  }
-  return latestValue;
-}
-
 function queenLastUpdatedAt(rows: QueenRow[]): string | null {
   return mostRecentTimestamp(
     ...rows.flatMap((row) => [
@@ -251,38 +174,26 @@ function queenLastUpdatedAt(rows: QueenRow[]): string | null {
   );
 }
 
-function compareQueenRows(a: QueenRow, b: QueenRow): number {
-  const aRank = effectiveQueenRank(a) ?? Number.MAX_SAFE_INTEGER;
-  const bRank = effectiveQueenRank(b) ?? Number.MAX_SAFE_INTEGER;
-  return aRank - bRank || (queenMmr(b) ?? -1) - (queenMmr(a) ?? -1);
+function rowUpdatedAt(row: QueenRow): string | null {
+  return mostRecentTimestamp(
+    row.queen_ladder_last_seen_at,
+    row.drodo_last_fetched_at
+  );
 }
 
-function isBetterRankRow(candidate: QueenRow, current: QueenRow): boolean {
-  const candidateSeenAt = candidate.queen_ladder_last_seen_at;
-  const currentSeenAt = current.queen_ladder_last_seen_at;
-  if (candidateSeenAt && !currentSeenAt) return true;
-  if (!candidateSeenAt && currentSeenAt) return false;
-  if (candidateSeenAt && currentSeenAt && candidateSeenAt !== currentSeenAt) {
-    return candidateSeenAt > currentSeenAt;
-  }
-  return (queenMmr(candidate) ?? -1) > (queenMmr(current) ?? -1);
-}
-
-function dedupeQueenRanks(rows: QueenRow[]): QueenRow[] {
-  const ranked = new Map<number, QueenRow>();
-  const unranked: QueenRow[] = [];
+/** Oldest per-row timestamp — the table's worst-case staleness. */
+function queenOldestUpdatedAt(rows: QueenRow[]): string | null {
+  let oldest: string | null = null;
+  let oldestTime = Infinity;
   for (const row of rows) {
-    const rank = effectiveQueenRank(row);
-    if (rank == null) {
-      unranked.push(row);
-      continue;
-    }
-    const current = ranked.get(rank);
-    if (!current || isBetterRankRow(row, current)) {
-      ranked.set(rank, row);
-    }
+    const value = rowUpdatedAt(row);
+    if (!value) continue;
+    const time = new Date(value).getTime();
+    if (!Number.isFinite(time) || time >= oldestTime) continue;
+    oldestTime = time;
+    oldest = value;
   }
-  return [...ranked.values(), ...unranked].sort(compareQueenRows);
+  return oldest;
 }
 
 function formatMove(move: QueenMove | null | undefined): string {
@@ -352,6 +263,7 @@ export default async function QueensPage() {
   ]);
   const season = rows.find((row) => row.queen_ladder_season)?.queen_ladder_season;
   const lastUpdatedAt = queenLastUpdatedAt(rows);
+  const oldestUpdatedAt = queenOldestUpdatedAt(rows);
   const liveSteamIds = new Set(
     streams
       .map((stream) => stream.steamId)
@@ -360,13 +272,14 @@ export default async function QueensPage() {
 
   return (
     <PageLayout title="Queen Players">
-      <RefreshOnReturn />
+      <QueensAutoRefresh />
       <p className={styles.lead}>
         Latest in-game Queen ladder output captured by the desktop tracker
         {season ? ` for ${season.replace(/_/g, " ").toUpperCase()}` : ""}. Rows are replaced when
         a fresh ladder upload is accepted. Season stats fill in after a profile
-        is refreshed; Queens and recently signed-in users are checked about every 10 minutes in the
-        background. The table is capped to the known top 100; profile refreshes
+        is refreshed; opening this page re-polls every tracked Queen on the spot,
+        and the Updated column shows each row&apos;s data age. Less active players
+        are re-checked hourly in the background. The table is capped to the known top 100; profile refreshes
         are used to fill missing ranks when we know them, so visible rank numbers
         may skip slots until the next full in-game ladder capture fills the
         surrounding players.
@@ -381,6 +294,8 @@ export default async function QueensPage() {
           <div className={styles["snapshot-meta"]}>
             <span>Last updated</span>
             <LastSyncedTime value={lastUpdatedAt} />
+            <span>· Oldest row</span>
+            <RelativeAge value={oldestUpdatedAt} />
           </div>
           <div className={`${styles.table} ${styles["queen-table"]}`} role="table">
             <div className={`${styles.row} ${styles["header-row"]}`}>
@@ -392,6 +307,7 @@ export default async function QueensPage() {
               <div className={`${styles.cell} ${styles["hide-sm"]}`}>Wins</div>
               <div className={`${styles.cell} ${styles["hide-sm"]}`}>Games</div>
               <div className={`${styles.cell} ${styles["hide-sm"]}`}>Win rate</div>
+              <div className={`${styles.cell} ${styles["hide-sm"]}`}>Updated</div>
             </div>
             {rows.map((row, index) => {
               const ladderRank = effectiveQueenRank(row) ?? index + 1;
@@ -470,6 +386,9 @@ export default async function QueensPage() {
                   </div>
                   <div className={`${styles.cell} ${styles["cell-meta"]} ${styles["hide-sm"]}`}>
                     {formatWinRate(wins, games)}
+                  </div>
+                  <div className={`${styles.cell} ${styles["cell-age"]} ${styles["hide-sm"]}`}>
+                    <RelativeAge value={rowUpdatedAt(row)} />
                   </div>
                 </div>
               );

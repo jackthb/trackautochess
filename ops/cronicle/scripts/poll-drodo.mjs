@@ -211,6 +211,7 @@ async function persistDrodoProfile(profile, seasonRows, supabase, options) {
     changed,
     prevIntervalSeconds: options.prevSnapshot?.poll_interval_seconds ?? null,
     hot: options.hotPoll || queen,
+    fixedHot: queen,
   });
   const userPayload = {
     ...drodoProfileToUserPayload(profile),

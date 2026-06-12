@@ -15,6 +15,7 @@ import {
   numberFromDrodoData,
   pollSnapshotFromRow,
   profileChanged,
+  summarizeDrodoResults,
   type DrodoProfileRow,
   type FetchDrodoBatchResult,
   type FetchDrodoResult,
@@ -34,6 +35,8 @@ export {
   EMPTY_DRODO_PROFILE_ERROR,
   HOT_POLL_MAX_INTERVAL_SECONDS,
 };
+
+export const HOT_PROFILE_REFRESH_TTL_SECONDS = HOT_POLL_MAX_INTERVAL_SECONDS;
 export {
   buildDrodoProfile,
   drodoProfileToUserPayload,
@@ -41,6 +44,7 @@ export {
   lastTop3FromDrodoData,
   lastWinFromDrodoData,
   nextPollSchedule,
+  summarizeDrodoResults,
 };
 export type { DrodoProfileRow, SeasonSnapshotRow };
 
@@ -233,6 +237,7 @@ async function persistDrodoProfile(
     changed,
     prevIntervalSeconds: options.prevSnapshot?.poll_interval_seconds ?? null,
     hot: options.hotPoll || queen,
+    fixedHot: queen,
   });
   const userPayload: Record<string, unknown> = {
     ...drodoProfileToUserPayload(profile),
@@ -349,7 +354,7 @@ export async function fetchAndCacheDrodo(
     snapshotOnSuccess?: boolean;
     /** "adaptive" backs off when nothing changed; "reset" always returns to the floor (manual refresh, first-pull). */
     pollMode?: "adaptive" | "reset";
-    /** Keep Queen/active players near the 10-minute floor instead of drifting onto the general background schedule. */
+    /** Keep hot profiles capped to the short background cadence. Queens may opt into a fixed cadence when persisted. */
     hotPoll?: boolean;
     /** Called when a persisted Queen profile's stats changed (e.g. to rebuild /queens). */
     onQueenChange?: () => void;

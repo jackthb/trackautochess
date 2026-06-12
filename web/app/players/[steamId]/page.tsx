@@ -10,12 +10,13 @@ import type { QueenRankSnapshot } from "@/components/QueenRankSparkline";
 import { absoluteUrl, getSiteUrl } from "@/lib/site";
 import { getManualRefreshQuota } from "@/lib/manualRefreshQuota";
 import {
-  HOT_POLL_MAX_INTERVAL_SECONDS,
+  HOT_PROFILE_REFRESH_TTL_SECONDS,
   fetchAndCacheDrodo,
   isFreshCache,
   lastTop3FromDrodoData,
   lastWinFromDrodoData,
 } from "@/lib/drodo";
+import { mostRecentTimestamp } from "@/lib/timestamps";
 import { fetchSteamProfile } from "@/lib/steam";
 import PlayerView, { type PlayerPageProps } from "@/components/player/PlayerView";
 import {
@@ -65,21 +66,6 @@ function drodoFromCachedRow(row: CachedUserDrodoRow) {
   };
 }
 
-function mostRecentTimestamp(
-  ...values: Array<string | null | undefined>
-): string | null {
-  let latestValue: string | null = null;
-  let latestTime = -Infinity;
-  for (const value of values) {
-    if (!value) continue;
-    const time = new Date(value).getTime();
-    if (!Number.isFinite(time) || time <= latestTime) continue;
-    latestTime = time;
-    latestValue = value;
-  }
-  return latestValue;
-}
-
 function isCachedQueenProfile(row: CachedUserDrodoRow | null): boolean {
   return Boolean(
     row?.queen_ladder_last_seen_at ||
@@ -91,7 +77,7 @@ function isHotCacheFresh(fetchedAt: string | null | undefined): boolean {
   if (!fetchedAt) return false;
   const fetchedTime = new Date(fetchedAt).getTime();
   if (!Number.isFinite(fetchedTime)) return false;
-  return Date.now() - fetchedTime < HOT_POLL_MAX_INTERVAL_SECONDS * 1000;
+  return Date.now() - fetchedTime < HOT_PROFILE_REFRESH_TTL_SECONDS * 1000;
 }
 
 /** Cached per request so generateMetadata and the page render share data. */

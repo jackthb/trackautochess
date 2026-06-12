@@ -9,8 +9,7 @@ export const EMPTY_DRODO_PROFILE_ERROR =
 export const POLL_MIN_INTERVAL_SECONDS = 10 * 60;
 export const POLL_MAX_INTERVAL_SECONDS = 7 * 24 * 60 * 60;
 export const POLL_BACKOFF_FACTOR = 1.5;
-export const HOT_POLL_MAX_INTERVAL_SECONDS = 30 * 60;
-export const HOT_POLL_BACKOFF_FACTOR = 1.15;
+export const HOT_POLL_MAX_INTERVAL_SECONDS = 60 * 60;
 
 function steamIdValue(steamId) {
   return String(steamId);
@@ -159,17 +158,28 @@ export function clampInterval(seconds, max = POLL_MAX_INTERVAL_SECONDS) {
   return Math.round(seconds);
 }
 
-export function nextPollSchedule({ mode, changed, prevIntervalSeconds, missing = false, hot = false }) {
-  const maxInterval = hot ? HOT_POLL_MAX_INTERVAL_SECONDS : POLL_MAX_INTERVAL_SECONDS;
-  const backoffFactor = hot ? HOT_POLL_BACKOFF_FACTOR : POLL_BACKOFF_FACTOR;
+export function nextPollSchedule({
+  mode,
+  changed,
+  prevIntervalSeconds,
+  missing = false,
+  hot = false,
+  fixedHot = false,
+}) {
+  const maxInterval = hot || fixedHot ? HOT_POLL_MAX_INTERVAL_SECONDS : POLL_MAX_INTERVAL_SECONDS;
   let intervalSeconds;
   if (missing) {
+    intervalSeconds = maxInterval;
+  } else if (fixedHot) {
+    // Queens and active players hold a fixed hourly background cadence —
+    // /queens page views refresh them on demand, so the background poll only
+    // needs to capture rank changes for players nobody is watching.
     intervalSeconds = maxInterval;
   } else if (mode === "reset" || changed) {
     intervalSeconds = POLL_MIN_INTERVAL_SECONDS;
   } else {
     const prev = prevIntervalSeconds ?? POLL_MIN_INTERVAL_SECONDS;
-    intervalSeconds = clampInterval(prev * backoffFactor, maxInterval);
+    intervalSeconds = clampInterval(prev * POLL_BACKOFF_FACTOR, maxInterval);
   }
   intervalSeconds = clampInterval(intervalSeconds, maxInterval);
   return {

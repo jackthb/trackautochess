@@ -42,7 +42,7 @@
   overflow: hidden;
 }
 .queen-table {
-  grid-template-columns: 56px 64px 44px minmax(180px, 1fr) 96px 82px 96px 84px;
+  grid-template-columns: 56px 64px 44px minmax(180px, 1fr) 96px 82px 96px 84px 76px;
 }
 .row {
   display: contents;
@@ -175,6 +175,14 @@
   color: var(--text-secondary);
   font-variant-numeric: tabular-nums;
 }
+.cell-age {
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+  font-size: var(--fs-12);
+}
+.age-stale {
+  color: #fbbf24;
+}
 .dim {
   color: var(--text-muted);
   opacity: 0.6;
@@ -204,6 +212,6 @@
 
 @media (min-width: 761px) and (max-width: 980px) {
   .queen-table {
-    grid-template-columns: 50px 56px 40px minmax(150px, 1fr) 86px 74px 86px 78px;
+    grid-template-columns: 50px 56px 40px minmax(150px, 1fr) 86px 74px 86px 78px 64px;
   }
 }

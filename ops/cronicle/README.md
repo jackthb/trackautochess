@@ -63,10 +63,10 @@ Create two **Shell Script** jobs in the Cronicle UI.
 
 ### Active/high-priority poll
 
-Schedule: every 10 minutes
+Schedule: hourly
 
 ```cron
-*/10 * * * *
+0 * * * *
 ```
 
 Command:
@@ -77,9 +77,10 @@ Command:
 
 This polls active users: recently signed-in players, known Queen ladder players,
 and users with a known Drodo queen rank whose `next_poll_at` is due. Successful
-Queen/active pulls use a hot adaptive schedule: changed rows reset to 10
-minutes, unchanged rows back off slowly and cap at 30 minutes. Unseeded active
-users are also pulled once and start on the 10-minute cadence.
+Queen/active pulls hold a fixed hourly hot cadence — /queens page views re-poll
+the whole Queen set on demand (and seed newly captured ladder players), so this
+job is the safety net for hours nobody is watching the page. Unseeded active
+users are also pulled once and join that hourly cadence.
 
 ### Daily full poll
 

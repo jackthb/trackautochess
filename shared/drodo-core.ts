@@ -4,7 +4,6 @@ import {
   DRODO_FRESH_TTL_MS as DRODO_FRESH_TTL_MS_VALUE,
   DRODO_MISSING_TTL_MS as DRODO_MISSING_TTL_MS_VALUE,
   EMPTY_DRODO_PROFILE_ERROR as EMPTY_DRODO_PROFILE_ERROR_VALUE,
-  HOT_POLL_BACKOFF_FACTOR as HOT_POLL_BACKOFF_FACTOR_VALUE,
   HOT_POLL_MAX_INTERVAL_SECONDS as HOT_POLL_MAX_INTERVAL_SECONDS_VALUE,
   POLL_BACKOFF_FACTOR as POLL_BACKOFF_FACTOR_VALUE,
   POLL_MAX_INTERVAL_SECONDS as POLL_MAX_INTERVAL_SECONDS_VALUE,
@@ -39,7 +38,6 @@ export const POLL_MIN_INTERVAL_SECONDS: number = POLL_MIN_INTERVAL_SECONDS_VALUE
 export const POLL_MAX_INTERVAL_SECONDS: number = POLL_MAX_INTERVAL_SECONDS_VALUE;
 export const POLL_BACKOFF_FACTOR: number = POLL_BACKOFF_FACTOR_VALUE;
 export const HOT_POLL_MAX_INTERVAL_SECONDS: number = HOT_POLL_MAX_INTERVAL_SECONDS_VALUE;
-export const HOT_POLL_BACKOFF_FACTOR: number = HOT_POLL_BACKOFF_FACTOR_VALUE;
 
 export interface SeasonSnapshotRow {
   steam_id: string;
@@ -206,6 +204,7 @@ export const nextPollSchedule: (input: {
   prevIntervalSeconds: number | null;
   missing?: boolean;
   hot?: boolean;
+  fixedHot?: boolean;
 }) => PollSchedule = nextPollScheduleValue;
 
 export const pollSnapshotFromRow: (row: PollSnapshotRow) => PollSnapshot =

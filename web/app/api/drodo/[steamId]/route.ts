@@ -1,10 +1,9 @@
 import type { NextApiRequest } from "next";
 import { revalidatePath } from "next/cache";
-import type { IncomingHttpHeaders } from "node:http";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { checkBotId } from "botid/server";
 import { RateLimiterMemory } from "rate-limiter-flexible";
-import { getClientIp, getUserAgent, logAbuse } from "@/lib/abuseLog";
+import { getClientIp, getUserAgent, logAbuse, toIncomingHeaders } from "@/lib/abuseLog";
 import { createSupabaseServiceRoleClient } from "@/lib/supabase";
 import {
   fetchSteamProfile,
@@ -57,17 +56,6 @@ function isCachedQueenProfile(row: CachedUserDrodoRow | null): boolean {
     row.queen_ladder_last_seen_at ||
       cachedUserToDrodoProfile(row).queen_rank != null
   );
-}
-
-// Web `Request` headers expose a `Headers` instance; the shared abuse/session
-// helpers expect Node-style `IncomingHttpHeaders`. Build the plain map once and
-// hand the helpers a NextApiRequest-shaped shim so their logic is unchanged.
-function toIncomingHeaders(req: Request): IncomingHttpHeaders {
-  const headers: IncomingHttpHeaders = {};
-  req.headers.forEach((value, key) => {
-    headers[key] = value;
-  });
-  return headers;
 }
 
 async function handle(req: Request, ctx: { params: Promise<{ steamId: string }> }) {
