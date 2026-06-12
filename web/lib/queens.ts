@@ -50,7 +50,7 @@ export function profileQueenRank(row: QueenRow): number | null {
 }
 
 export function effectiveQueenRank(row: QueenRow): number | null {
-  return row.queen_ladder_rank ?? profileQueenRank(row);
+  return profileQueenRank(row) ?? row.queen_ladder_rank;
 }
 
 export function queenMmr(row: QueenRow): number | null {
@@ -64,6 +64,19 @@ export function compareQueenRows(a: QueenRow, b: QueenRow): number {
 }
 
 function isBetterRankRow(candidate: QueenRow, current: QueenRow): boolean {
+  const candidateProfileRank = profileQueenRank(candidate);
+  const currentProfileRank = profileQueenRank(current);
+  if (candidateProfileRank != null && currentProfileRank == null) return true;
+  if (candidateProfileRank == null && currentProfileRank != null) return false;
+
+  const candidateFetchedAt = candidate.drodo_last_fetched_at;
+  const currentFetchedAt = current.drodo_last_fetched_at;
+  if (candidateFetchedAt && currentFetchedAt && candidateFetchedAt !== currentFetchedAt) {
+    return candidateFetchedAt > currentFetchedAt;
+  }
+  if (candidateFetchedAt && !currentFetchedAt) return true;
+  if (!candidateFetchedAt && currentFetchedAt) return false;
+
   const candidateSeenAt = candidate.queen_ladder_last_seen_at;
   const currentSeenAt = current.queen_ladder_last_seen_at;
   if (candidateSeenAt && !currentSeenAt) return true;

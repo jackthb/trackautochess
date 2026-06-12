@@ -279,10 +279,9 @@ export default async function QueensPage() {
         a fresh ladder upload is accepted. Season stats fill in after a profile
         is refreshed; opening this page re-polls every tracked Queen on the spot,
         and the Updated column shows each row&apos;s data age. Less active players
-        are re-checked hourly in the background. The table is capped to the known top 100; profile refreshes
-        are used to fill missing ranks when we know them, so visible rank numbers
-        may skip slots until the next full in-game ladder capture fills the
-        surrounding players.
+        are re-checked hourly in the background. The table is capped to the known top 100; refreshed profile ranks
+        take priority over older ladder captures, with ladder ranks filling gaps
+        until a profile refresh lands.
       </p>
 
       {error ? (
