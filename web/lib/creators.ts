@@ -53,6 +53,12 @@ interface CreatorUserRow {
   custom_url: string | null;
   avatar_url: string | null;
   stream_link: string | null;
+  drodo_mmr: number | null;
+  drodo_season_games: number | null;
+  drodo_chicken_count: number | null;
+  drodo_raw_data: Record<string, unknown> | null;
+  queen_ladder_rank: number | null;
+  queen_ladder_last_seen_at: string | null;
 }
 
 interface ResolvedYouTubeChannel {
@@ -94,7 +100,9 @@ async function databaseCreatorConfigRows(): Promise<CreatorConfig[]> {
 
   const { data, error } = await supabase
     .from("users")
-    .select("steam_id, name, custom_url, avatar_url, stream_link")
+    .select(
+      "steam_id, name, custom_url, avatar_url, stream_link, drodo_mmr, drodo_season_games, drodo_chicken_count, drodo_raw_data, queen_ladder_rank, queen_ladder_last_seen_at"
+    )
     .not("stream_link", "is", null)
     .order("queen_ladder_rank", { ascending: true, nullsFirst: false })
     .limit(100);
@@ -107,16 +115,24 @@ async function databaseCreatorConfigRows(): Promise<CreatorConfig[]> {
   const creators: CreatorConfig[] = [];
   for (const row of (data as CreatorUserRow[] | null) ?? []) {
     const streamUrl = row.stream_link?.trim();
+    if (!streamUrl) continue;
     const steamId = String(row.steam_id);
-    const name = firstNonEmpty(row.name, row.custom_url, steamId);
-    if (!streamUrl || !name) continue;
+    const name = firstNonEmpty(
+      nonSteamIdText(row.name),
+      nonSteamIdText(row.custom_url),
+      creatorNameFromStreamUrl(streamUrl),
+      streamPlatform(streamUrl) === "douyu" ? "Douyu" : null
+    );
+    if (!name) continue;
     creators.push({
       id: `steam-${steamId}`,
       name,
       steamId,
       avatarUrl: row.avatar_url ?? undefined,
       streamUrl,
-      profileUrl: playerProfilePath(steamId, row.custom_url),
+      profileUrl: hasPublicAutoChessProfile(row)
+        ? playerProfilePath(steamId, row.custom_url)
+        : undefined,
       includeTerms: DEFAULT_INCLUDE_TERMS,
       excludeTerms: DEFAULT_EXCLUDE_TERMS,
     });
@@ -188,6 +204,91 @@ function firstNonEmpty(
     if (trimmed) return trimmed;
   }
   return null;
+}
+
+function numberFromRawData(
+  rawData: Record<string, unknown> | null | undefined,
+  key: string
+): number | null {
+  const value = rawData?.[key];
+  if (typeof value === "number") return Number.isFinite(value) ? value : null;
+  if (typeof value === "string" && value.trim()) {
+    const parsed = Number(value);
+    return Number.isFinite(parsed) ? parsed : null;
+  }
+  return null;
+}
+
+function nonSteamIdText(value: string | null | undefined): string | null {
+  const trimmed = value?.trim();
+  if (!trimmed || /^\d{16,17}$/.test(trimmed)) return null;
+  return trimmed;
+}
+
+function creatorNameFromStreamUrl(url: string): string | null {
+  const twitch = twitchLogin(url);
+  if (twitch) return twitch;
+  try {
+    const parsed = new URL(url);
+    if (parsed.hostname.toLowerCase().includes("douyu.com")) {
+      return null;
+    }
+    return nonSteamIdText(
+      parsed.pathname
+        .split("/")
+        .map((segment) => segment.trim())
+        .filter(Boolean)[0] ?? parsed.hostname.replace(/^www\./, "")
+    );
+  } catch {
+    return null;
+  }
+}
+
+function hasPublicAutoChessProfile(row: CreatorUserRow): boolean {
+  return Boolean(
+    row.queen_ladder_rank != null ||
+      row.queen_ladder_last_seen_at ||
+      row.drodo_mmr != null ||
+      row.drodo_season_games != null ||
+      row.drodo_chicken_count != null ||
+      numberFromRawData(row.drodo_raw_data, "queen_rank") != null
+  );
+}
+
+export function canonicalCreatorStreamUrl(url: string): string {
+  try {
+    const parsed = new URL(url);
+    parsed.hash = "";
+    if (parsed.pathname !== "/") {
+      parsed.pathname = parsed.pathname.replace(/\/+$/, "");
+    }
+    return parsed.toString().replace(/\/$/, "").toLowerCase();
+  } catch {
+    return url.trim().replace(/\/+$/, "").toLowerCase();
+  }
+}
+
+function dedupeLiveStreams(streams: CreatorLiveStream[]): CreatorLiveStream[] {
+  const byUrl = new Map<string, CreatorLiveStream>();
+  for (const stream of streams) {
+    const key = canonicalCreatorStreamUrl(stream.url);
+    const current = byUrl.get(key);
+    if (!current) {
+      byUrl.set(key, stream);
+      continue;
+    }
+    byUrl.set(key, {
+      ...current,
+      steamId: current.steamId ?? stream.steamId,
+      name: current.name === "Douyu" ? stream.name : current.name,
+      description: current.description ?? stream.description,
+      avatarUrl: current.avatarUrl ?? stream.avatarUrl,
+      profilePath: current.profilePath ?? stream.profilePath,
+      title: current.title ?? stream.title,
+      thumbnailUrl: current.thumbnailUrl ?? stream.thumbnailUrl,
+    });
+  }
+  return [...byUrl.values()];
 }
 
 function stableIdFromUrl(url: string): string {
@@ -396,7 +497,7 @@ async function fetchTwitchLiveStream(
     },
     body: JSON.stringify({
       query:
-        "query CreatorLiveStatus($login: String!) { user(login: $login) { stream { id type title previewImageURL(width: 640, height: 360) } } }",
+        "query CreatorLiveStatus($login: String!) { user(login: $login) { displayName profileImageURL(width: 96) stream { id type title previewImageURL(width: 640, height: 360) } } }",
       variables: { login },
     }),
   });
@@ -405,6 +506,8 @@ async function fetchTwitchLiveStream(
     | {
         data?: {
           user?: {
+            displayName?: string;
+            profileImageURL?: string;
             stream?: {
               id?: string;
               type?: string;
@@ -421,11 +524,11 @@ async function fetchTwitchLiveStream(
   return {
     id: `${creator.id}-live-twitch-${stream.id ?? login}`,
     steamId: creator.steamId ?? null,
-    name: creator.name,
+    name: firstNonEmpty(nonSteamIdText(payload?.data?.user?.displayName), creator.name, login) ?? login,
     description: creator.description ?? null,
     url: creator.streamUrl,
     platform: "twitch",
-    avatarUrl: creator.avatarUrl ?? null,
+    avatarUrl: creator.avatarUrl ?? payload?.data?.user?.profileImageURL ?? null,
     profilePath: creator.profileUrl ?? null,
     title: stream.title ?? null,
     thumbnailUrl: stream.previewImageURL ?? null,
@@ -452,6 +555,7 @@ async function fetchDouyuLiveStream(
         error?: number;
         data?: {
           room_status?: string | number;
+          owner_name?: string;
           room_name?: string;
           room_thumb?: string;
         };
@@ -463,7 +567,7 @@ async function fetchDouyuLiveStream(
   return {
     id: `${creator.id}-live-douyu-${roomId}`,
     steamId: creator.steamId ?? null,
-    name: creator.name,
+    name: firstNonEmpty(nonSteamIdText(payload.data?.owner_name), creator.name) ?? creator.name,
     description: creator.description ?? null,
     url: creator.streamUrl,
     platform: "douyu",
@@ -526,10 +630,11 @@ export async function loadCreatorLiveStreams(): Promise<{
     })
   );
 
+  const streams = results.filter((stream): stream is CreatorLiveStream =>
+    Boolean(stream)
+  );
   return {
-    streams: results.filter((stream): stream is CreatorLiveStream =>
-      Boolean(stream)
-    ),
+    streams: dedupeLiveStreams(streams),
     error: null,
   };
 }

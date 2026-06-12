@@ -3,20 +3,17 @@
 import { useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 
-// Keep an open tab in step with the visible-tab interval below without
+// Keep an open tab in step with the visitor-scoped server refresh without
 // re-pinging on every quick tab flip.
-const PING_COOLDOWN_MS = 30 * 1000;
-const VISIBLE_POLL_INTERVAL_MS = 60 * 1000;
+const PING_COOLDOWN_MS = 5 * 60 * 1000;
+const VISIBLE_POLL_INTERVAL_MS = 5 * 60 * 1000;
 const PING_COOLDOWN_KEY = "dac:queens-refresh-last-ping";
 
 // /queens is ISR'd: the server rebuilds it the moment a Queen's stats change,
 // but the background poll only re-checks Queens hourly — page viewers are
-// what keep the table truly current. Whenever the user is looking at the page
-// (mount, tab return, bfcache restore, and a slow tick while visible) this
-// component (1) re-fetches the ISR payload so the view matches the latest
-// build, and (2) asks the server to re-poll the whole Queen set, re-fetching
-// again once new data lands. The cooldown keeps this comfortably under the
-// endpoint's per-IP rate limit.
+// what keep the table truly current. Hard page loads refresh server-side before
+// rows render; this client fallback keeps parked tabs current on the same
+// 5-minute cadence without multiplying work across tabs.
 export function QueensAutoRefresh() {
   const router = useRouter();
   const lastPingAtRef = useRef(0);

@@ -1,8 +1,12 @@
 import type { Metadata } from "next";
+import { headers } from "next/headers";
 import Link from "next/link";
 import { PageLayout } from "@/components/PageLayout";
 import { SITE_NAME, SITE_TITLE } from "@/lib/site";
-import { createSupabaseServerClient } from "@/lib/supabase";
+import {
+  createSupabaseServerClient,
+  createSupabaseServiceRoleClient,
+} from "@/lib/supabase";
 import { listAvatarUrl, playerProfilePath } from "@/lib/steam";
 import {
   effectiveQueenRank,
@@ -12,8 +16,13 @@ import {
   selectDisplayedQueens,
   type QueenRow as BaseQueenRow,
 } from "@/lib/queens";
+import { refreshDisplayedQueens } from "@/lib/queensRefresh";
+import {
+  QUEENS_VIEW_REFRESH_COOLDOWN_MS,
+  QUEENS_VISITOR_HEADER,
+} from "@/lib/queensVisitor";
 import { mostRecentTimestamp } from "@/lib/timestamps";
-import { loadCreatorLiveStreams } from "@/lib/creators";
+import { canonicalCreatorStreamUrl, loadCreatorLiveStreams } from "@/lib/creators";
 import styles from "../leaderboard/leaderboard.module.css";
 import { LastSyncedTime } from "./LastSyncedTime";
 import { QueensAutoRefresh } from "./QueensAutoRefresh";
@@ -60,7 +69,43 @@ export const metadata: Metadata = {
   },
 };
 
-export const revalidate = 600;
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
+const visitorRefreshes = new Map<string, number>();
+
+function claimVisitorRefresh(visitorId: string): boolean {
+  const now = Date.now();
+  const lastRefreshAt = visitorRefreshes.get(visitorId) ?? 0;
+  if (now - lastRefreshAt < QUEENS_VIEW_REFRESH_COOLDOWN_MS) return false;
+  visitorRefreshes.set(visitorId, now);
+
+  if (visitorRefreshes.size > 5000) {
+    const oldestAllowedAt = now - QUEENS_VIEW_REFRESH_COOLDOWN_MS;
+    for (const [id, refreshedAt] of visitorRefreshes) {
+      if (refreshedAt < oldestAllowedAt) visitorRefreshes.delete(id);
+    }
+  }
+  return true;
+}
+
+async function refreshQueensForVisitor(): Promise<void> {
+  const requestHeaders = await headers();
+  const visitorId = requestHeaders.get(QUEENS_VISITOR_HEADER);
+  if (!visitorId || !claimVisitorRefresh(visitorId)) return;
+
+  const supabase = createSupabaseServiceRoleClient();
+  if (!supabase) return;
+
+  try {
+    await refreshDisplayedQueens(supabase);
+  } catch (error) {
+    console.error(
+      "Failed to refresh Queen players before page render:",
+      error instanceof Error ? error.message : error
+    );
+  }
+}
 
 async function loadQueens(): Promise<{ rows: QueenRow[]; error: string | null }> {
   const supabase = createSupabaseServerClient();
@@ -257,6 +302,8 @@ function StreamIcon({ platform }: { platform: ReturnType<typeof streamPlatform> 
 }
 
 export default async function QueensPage() {
+  await refreshQueensForVisitor();
+
   const [{ rows, error }, { streams }] = await Promise.all([
     loadQueens(),
     loadCreatorLiveStreams(),
@@ -269,6 +316,9 @@ export default async function QueensPage() {
       .map((stream) => stream.steamId)
       .filter((steamId): steamId is string => Boolean(steamId))
   );
+  const liveStreamUrls = new Set(
+    streams.map((stream) => canonicalCreatorStreamUrl(stream.url))
+  );
 
   return (
     <PageLayout title="Queen Players">
@@ -277,11 +327,12 @@ export default async function QueensPage() {
         Latest in-game Queen ladder output captured by the desktop tracker
         {season ? ` for ${season.replace(/_/g, " ").toUpperCase()}` : ""}. Rows are replaced when
         a fresh ladder upload is accepted. Season stats fill in after a profile
-        is refreshed; opening this page re-polls every tracked Queen on the spot,
-        and the Updated column shows each row&apos;s data age. Less active players
-        are re-checked hourly in the background. The table is capped to the known top 100; refreshed profile ranks
-        take priority over older ladder captures, with ladder ranks filling gaps
-        until a profile refresh lands.
+        is refreshed; loading this page re-polls the visible Queen set before
+        rendering when your visitor cooldown allows it, and the Updated column
+        shows each row&apos;s data age. Less active players are re-checked hourly in
+        the background. The table is capped to the known top 100; refreshed
+        profile ranks take priority over older ladder captures, with ladder
+        ranks filling gaps until a profile refresh lands.
       </p>
 
       {error ? (
@@ -312,7 +363,11 @@ export default async function QueensPage() {
               const ladderRank = effectiveQueenRank(row) ?? index + 1;
               const mmr = queenMmr(row);
               const display = row.name || row.custom_url || row.steam_id;
-              const isLive = liveSteamIds.has(row.steam_id);
+              const isLive =
+                liveSteamIds.has(row.steam_id) ||
+                (row.stream_link
+                  ? liveStreamUrls.has(canonicalCreatorStreamUrl(row.stream_link))
+                  : false);
               const initial = display.charAt(0).toUpperCase() || "?";
               const games = seasonGames(row);
               const wins = seasonWins(row);
