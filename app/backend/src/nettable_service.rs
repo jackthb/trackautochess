@@ -23,9 +23,7 @@ use crate::{
         tokenize_launch_options, wait_for_steam_exit, DEFAULT_GSI_PORT, REQUIRED_LAUNCH_FLAGS,
     },
     queen_ladder,
-    supabase::{
-        finished_match_id_from_rows, parse_valid_steam_id64, queue_rows, SupabaseClient,
-    },
+    supabase::{finished_match_id_from_rows, parse_valid_steam_id64, queue_rows, SupabaseClient},
 };
 use std::{
     collections::HashSet,
@@ -41,6 +39,8 @@ const QUEEN_LADDER_AUTO_SYNC_INTERVAL: Duration = Duration::from_secs(600);
 /// reconnecting to an ongoing game, so uploading immediately would
 /// double-record the match if the player rejoins and finishes it.
 const LEFT_MATCH_UPLOAD_GRACE: Duration = Duration::from_secs(30 * 60);
+const POST_GAME_END_BOARD_ATTEMPTS: usize = 10;
+const POST_GAME_DUMP_WAIT: Duration = Duration::from_millis(1200);
 const PREFERRED_CAPTURE_STEAM_IDS: &[&str] = &[
     "76561198022169086", // Jack
 ];
@@ -453,18 +453,19 @@ impl NettableService {
                 )));
                 return;
             }
-            emit(event_json(&NettableGameEnded::new(
-                "Dota reported post-game; finalizing without extra dump hotkeys.",
-                None,
-                &now_iso_utc(),
-            )));
-            let rows = state
-                .lock()
-                .map(|state| state.latest_rows.clone())
-                .unwrap_or_default();
+            let rows = chase_post_game_end_board(&state, &cfg, &emit, "Dota reported post-game");
+            if upload_end_board_if_present(
+                &state,
+                &cfg,
+                &rows,
+                &emit,
+                "post-game end_board upload failed",
+            ) {
+                return;
+            }
             match finalize_without_end_board(&cfg, &rows) {
                 Ok(Some(match_id)) => emit(event_json(&NettableGameEnded::new(
-                    "Marked the match finished from the last live snapshot; end_board never appeared.",
+                    "Marked the match finished from the last live snapshot after end_board did not appear.",
                     Some(&match_id),
                     &now_iso_utc(),
                 ))),
@@ -1514,6 +1515,114 @@ fn mark_end_board_uploaded(state: &Arc<Mutex<NettableState>>, match_id: &str) {
     }
 }
 
+fn upload_end_board_if_present<F>(
+    state: &Arc<Mutex<NettableState>>,
+    cfg: &Config,
+    rows: &[NettableRow],
+    emit: &Arc<F>,
+    error_context: &str,
+) -> bool
+where
+    F: Fn(String) + Send + Sync + 'static,
+{
+    let Some(match_id) = finished_match_id_from_rows(rows) else {
+        return false;
+    };
+    let Some(client) = SupabaseClient::from_config(cfg) else {
+        return false;
+    };
+    if end_board_already_uploaded(state, &match_id) || client.finished_match_has_players(&match_id)
+    {
+        mark_end_board_uploaded(state, &match_id);
+        return true;
+    }
+    match client.upload_finished_match_from_rows(rows) {
+        Ok(Some(uploaded_match_id)) => {
+            mark_end_board_uploaded(state, &uploaded_match_id);
+            if let Some(timeline) = build_match_timeline_from_state(state, &uploaded_match_id) {
+                let _ = client.upsert_match_timeline(&timeline);
+                let round_count = timeline
+                    .get("round_count")
+                    .and_then(serde_json::Value::as_u64)
+                    .unwrap_or(0);
+                emit(event_json(&NettableTimelineExtracted::new(
+                    &uploaded_match_id,
+                    round_count,
+                    &now_iso_utc(),
+                )));
+            }
+            emit(event_json(&NettableEndBoardSaved::new(
+                &uploaded_match_id,
+                &now_iso_utc(),
+            )));
+            true
+        }
+        Ok(None) => false,
+        Err(err) => {
+            emit(event_json(&NettableIngestError::with_backend_at(
+                &format!("{error_context}: {err}"),
+                &now_iso_utc(),
+            )));
+            false
+        }
+    }
+}
+
+fn latest_rows(state: &Arc<Mutex<NettableState>>) -> Vec<NettableRow> {
+    state
+        .lock()
+        .map(|state| state.latest_rows.clone())
+        .unwrap_or_default()
+}
+
+fn chase_post_game_end_board<F>(
+    state: &Arc<Mutex<NettableState>>,
+    cfg: &Config,
+    emit: &Arc<F>,
+    reason: &str,
+) -> Vec<NettableRow>
+where
+    F: Fn(String) + Send + Sync + 'static,
+{
+    let mut rows = latest_rows(state);
+    if finished_match_id_from_rows(&rows).is_some() {
+        return rows;
+    }
+
+    emit(event_json(&NettableGameEnded::new(
+        &format!("{reason}; requesting end-board dumps."),
+        None,
+        &now_iso_utc(),
+    )));
+
+    for _ in 0..POST_GAME_END_BOARD_ATTEMPTS {
+        if let Err(err) =
+            send_dump_commands(&[DumpKey::F23, DumpKey::F22, DumpKey::F20, DumpKey::F21])
+        {
+            emit(event_json(&NettableIngestError::with_backend_at(
+                &format!("post-game dump command failed: {err}"),
+                &now_iso_utc(),
+            )));
+            break;
+        }
+
+        thread::sleep(POST_GAME_DUMP_WAIT);
+        match poll_once(state, cfg) {
+            Ok(Some(fresh_rows)) if !fresh_rows.is_empty() => rows = fresh_rows,
+            Ok(_) => rows = latest_rows(state),
+            Err(err) => emit(event_json(&NettableIngestError::with_backend_at(
+                &format!("post-game log poll failed: {err}"),
+                &now_iso_utc(),
+            ))),
+        }
+        if finished_match_id_from_rows(&rows).is_some() {
+            return rows;
+        }
+    }
+
+    rows
+}
+
 fn finalize_without_end_board(
     cfg: &Config,
     rows: &[NettableRow],
@@ -1589,7 +1698,11 @@ fn tick_pending_left_match(state: &Arc<Mutex<NettableState>>, cfg: &Config) -> V
     };
     let mut events = Vec::new();
     if let Some(pending) = staged {
-        events.extend(flush_pending_left_match(cfg, pending, "left_match_superseded"));
+        events.extend(flush_pending_left_match(
+            cfg,
+            pending,
+            "left_match_superseded",
+        ));
     }
     if let Some(pending) = expired {
         events.extend(flush_pending_left_match(cfg, pending, "left_match_timeout"));
@@ -1642,14 +1755,12 @@ where
         )));
         return;
     }
-    let rows = state
-        .lock()
-        .map(|s| s.latest_rows.clone())
-        .unwrap_or_default();
-    // No end board means the local player left before the lobby finished.
-    // Don't upload the partial snapshot yet: DAC allows reconnecting, and an
-    // immediate upload would double-record the game if they rejoin and finish
-    // it. Hold the snapshot for user confirmation or the grace window instead.
+    let rows = chase_post_game_end_board(state, cfg, emit, "Dota left the match");
+    // No end board after an explicit post-game chase usually means the local
+    // player left before the lobby finished. Don't upload the partial snapshot
+    // yet: DAC allows reconnecting, and an immediate upload would double-record
+    // the game if they rejoin and finish it. Hold the snapshot for user
+    // confirmation or the grace window instead.
     if finished_match_id_from_rows(&rows).is_none() {
         let roster = roster_steam_ids(&rows);
         if roster.is_empty() {
@@ -1679,34 +1790,18 @@ where
         return;
     }
     emit(event_json(&NettableGameEnded::new(
-        "Dota left the match; finalizing from the last live snapshot.",
+        "Dota left the match; finalizing from the captured end board.",
         None,
         &now_iso_utc(),
     )));
-    if let Some(client) = SupabaseClient::from_config(cfg) {
-        if let Some(match_id) = finished_match_id_from_rows(&rows) {
-            if end_board_already_uploaded(state, &match_id)
-                || client.finished_match_has_players(&match_id)
-            {
-                mark_end_board_uploaded(state, &match_id);
-                return;
-            }
-        }
-        match client.upload_finished_match_from_rows(&rows) {
-            Ok(Some(match_id)) => {
-                mark_end_board_uploaded(state, &match_id);
-                emit(event_json(&NettableEndBoardSaved::new(
-                    &match_id,
-                    &now_iso_utc(),
-                )));
-                return;
-            }
-            Ok(None) => {}
-            Err(err) => emit(event_json(&NettableIngestError::with_backend_at(
-                &format!("match-left end_board upload failed: {err}"),
-                &now_iso_utc(),
-            ))),
-        }
+    if upload_end_board_if_present(
+        state,
+        cfg,
+        &rows,
+        emit,
+        "match-left end_board upload failed",
+    ) {
+        return;
     }
     match finalize_without_end_board(cfg, &rows) {
         Ok(Some(match_id)) => emit(event_json(&NettableGameEnded::new(
