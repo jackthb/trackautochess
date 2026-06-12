@@ -1,6 +1,7 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { fetchAndCacheDrodoBatch, summarizeDrodoResults } from "@/lib/drodo";
 import { loadQueenCandidates, selectDisplayedQueens } from "@/lib/queens";
+import { QUEENS_REFRESH_COOLDOWN_MS } from "@/lib/queensVisitor";
 
 export interface QueensRefreshSummary {
   polled: number;
@@ -27,20 +28,18 @@ async function runQueensRefresh(
     return { polled: 0, ok: 0, missing: 0, upstream_error: 0 };
   }
 
-  const floorMs = options.floorMs ?? 0;
-  if (floorMs > 0) {
-    const hasNeverFetchedRow = rows.some((row) => !row.drodo_last_fetched_at);
-    let newestFetchMs = -Infinity;
-    for (const row of rows) {
-      if (!row.drodo_last_fetched_at) continue;
-      const fetchedMs = new Date(row.drodo_last_fetched_at).getTime();
-      if (Number.isFinite(fetchedMs) && fetchedMs > newestFetchMs) {
-        newestFetchMs = fetchedMs;
-      }
+  const floorMs = options.floorMs ?? QUEENS_REFRESH_COOLDOWN_MS;
+  const hasNeverFetchedRow = rows.some((row) => !row.drodo_last_fetched_at);
+  let newestFetchMs = -Infinity;
+  for (const row of rows) {
+    if (!row.drodo_last_fetched_at) continue;
+    const fetchedMs = new Date(row.drodo_last_fetched_at).getTime();
+    if (Number.isFinite(fetchedMs) && fetchedMs > newestFetchMs) {
+      newestFetchMs = fetchedMs;
     }
-    if (!hasNeverFetchedRow && Date.now() - newestFetchMs < floorMs) {
-      return { polled: 0, ok: 0, missing: 0, upstream_error: 0 };
-    }
+  }
+  if (!hasNeverFetchedRow && Date.now() - newestFetchMs < floorMs) {
+    return { polled: 0, ok: 0, missing: 0, upstream_error: 0 };
   }
 
   const results = await fetchAndCacheDrodoBatch(

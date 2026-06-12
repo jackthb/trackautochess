@@ -1,13 +1,15 @@
 import { spawn } from "node:child_process";
 import http from "node:http";
+import path from "node:path";
 
-const isWindows = process.platform === "win32";
-const pnpm = isWindows ? "pnpm.cmd" : "pnpm";
 const children = new Set();
+const appRoot = process.cwd();
+const viteBin = path.join(appRoot, "node_modules", "vite", "bin", "vite.js");
+const electronBin = path.join(appRoot, "node_modules", "electron", "cli.js");
 
-function spawnChild(command, args) {
+function spawnChild(label, command, args) {
   const child = spawn(command, args, {
-    cwd: process.cwd(),
+    cwd: appRoot,
     stdio: "inherit",
     env: process.env,
     windowsHide: false,
@@ -15,7 +17,7 @@ function spawnChild(command, args) {
   children.add(child);
   child.on("exit", () => children.delete(child));
   child.on("error", (error) => {
-    console.error(error.message);
+    console.error(`Failed to start ${label}: ${error.message}`);
     shutdown(1);
   });
   return child;
@@ -55,7 +57,7 @@ for (const signal of ["SIGINT", "SIGTERM"]) {
   process.on(signal, () => shutdown(0));
 }
 
-const vite = spawnChild(pnpm, ["exec", "vite", "--host", "127.0.0.1"]);
+const vite = spawnChild("Vite", process.execPath, [viteBin, "--host", "127.0.0.1"]);
 
 try {
   await waitForVite("http://127.0.0.1:5173");
@@ -64,8 +66,11 @@ try {
   shutdown(1);
 }
 
-const electron = spawnChild(pnpm, ["exec", "electron", ".", "--dev"]);
+const electron = spawnChild("Electron", process.execPath, [electronBin, ".", "--dev"]);
 electron.on("exit", (code) => {
   if (!vite.killed) vite.kill();
+  if (code && code !== 0) {
+    console.error(`Electron exited with code ${code}`);
+  }
   process.exit(code ?? 0);
 });

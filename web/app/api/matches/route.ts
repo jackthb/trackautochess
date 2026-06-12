@@ -69,6 +69,23 @@ export interface MatchSummary {
 const PAGE_LIMIT = 100;
 const GAMES_FETCH = 800;
 
+function matchGroupKey(row: GameRow): string {
+  if (row.match_id) return row.match_id;
+  return `played:${row.played_at || row.created_at || row.id}`;
+}
+
+function dedupeMatchRows(rows: GameRow[]): GameRow[] {
+  const byPlayer = new Map<string, GameRow>();
+  for (const row of rows) {
+    const key = row.steam_id || `row:${row.id}`;
+    const current = byPlayer.get(key);
+    if (!current || row.id > current.id) {
+      byPlayer.set(key, row);
+    }
+  }
+  return [...byPlayer.values()];
+}
+
 export async function GET(req: Request) {
   const supabase: SupabaseClient | null = createSupabaseAnonClient();
 
@@ -98,7 +115,7 @@ export async function GET(req: Request) {
 
   const grouped = new Map<string, GameRow[]>();
   for (const g of games) {
-    const key = g.match_id || `solo:${g.id}`;
+    const key = matchGroupKey(g);
     const arr = grouped.get(key);
     if (arr) arr.push(g);
     else grouped.set(key, [g]);
@@ -106,7 +123,7 @@ export async function GET(req: Request) {
 
   const matches: MatchSummary[] = Array.from(grouped.entries())
     .map(([key, rows]) => {
-      const sorted = [...rows].sort((a, b) => {
+      const sorted = dedupeMatchRows(rows).sort((a, b) => {
         const pa = a.placement ?? 99;
         const pb = b.placement ?? 99;
         return pa - pb;
@@ -116,7 +133,7 @@ export async function GET(req: Request) {
         sorted[0].played_at || sorted[0].created_at || ""
       );
       return {
-        matchId: key.startsWith("solo:") ? null : key,
+        matchId: key.startsWith("played:") ? null : key,
         representativeGameId: sorted[0].id,
         playedAt,
         rows: sorted,

@@ -228,7 +228,13 @@ export function playerProfilePath(
   steamId: string,
   customUrl?: string | null
 ): string {
-  return `/players/${encodeURIComponent(customUrl || steamId)}`;
+  const cleanCustomUrl = customUrl?.trim();
+  // Numeric path segments are parsed as SteamID64s by /players/[steamId].
+  // Short numeric vanity-looking values such as Douyu room ids would become
+  // permanent 404 links, so fall back to the real SteamID64 for those rows.
+  const routeId =
+    cleanCustomUrl && !/^\d+$/.test(cleanCustomUrl) ? cleanCustomUrl : steamId;
+  return `/players/${encodeURIComponent(routeId)}`;
 }
 
 /**

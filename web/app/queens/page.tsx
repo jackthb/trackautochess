@@ -25,6 +25,7 @@ import { mostRecentTimestamp } from "@/lib/timestamps";
 import { canonicalCreatorStreamUrl, loadCreatorLiveStreams } from "@/lib/creators";
 import styles from "../leaderboard/leaderboard.module.css";
 import { LastSyncedTime } from "./LastSyncedTime";
+import { NextRefreshTime } from "./NextRefreshTime";
 import { QueensAutoRefresh } from "./QueensAutoRefresh";
 import { RelativeAge } from "./RelativeAge";
 
@@ -201,13 +202,32 @@ function seasonWins(row: QueenRow): number | null {
 }
 
 function formatWinRate(wins: number | null, games: number | null): string {
-  if (wins == null || games == null || games <= 0) return "—";
+  if (wins == null || games == null || games <= 0) return "-";
   return `${Math.round((wins / games) * 100)}%`;
 }
 
 function formatWinTotal(wins: number | null): string {
-  if (wins == null) return "—";
+  if (wins == null) return "-";
   return `${wins.toLocaleString()}`;
+}
+
+function newestDrodoFetchedAt(rows: QueenRow[]): string | null {
+  return mostRecentTimestamp(...rows.map((row) => row.drodo_last_fetched_at));
+}
+
+function oldestDrodoFetchedAt(rows: QueenRow[]): string | null {
+  let oldest: string | null = null;
+  let oldestTime = Infinity;
+  for (const row of rows) {
+    if (!row.drodo_last_fetched_at) return null;
+    const time = new Date(row.drodo_last_fetched_at).getTime();
+    if (!Number.isFinite(time)) return null;
+    if (time < oldestTime) {
+      oldestTime = time;
+      oldest = row.drodo_last_fetched_at;
+    }
+  }
+  return oldest;
 }
 
 function queenLastUpdatedAt(rows: QueenRow[]): string | null {
@@ -226,7 +246,7 @@ function rowUpdatedAt(row: QueenRow): string | null {
   );
 }
 
-/** Oldest per-row timestamp — the table's worst-case staleness. */
+/** Oldest per-row timestamp: the table's worst-case staleness. */
 function queenOldestUpdatedAt(rows: QueenRow[]): string | null {
   let oldest: string | null = null;
   let oldestTime = Infinity;
@@ -242,9 +262,9 @@ function queenOldestUpdatedAt(rows: QueenRow[]): string | null {
 }
 
 function formatMove(move: QueenMove | null | undefined): string {
-  if (!move || move.delta == null) return "—";
+  if (!move || move.delta == null) return "-";
   if (move.delta === 0) return "0";
-  return move.delta > 0 ? `↑${move.delta}` : `↓${Math.abs(move.delta)}`;
+  return move.delta > 0 ? `+${move.delta}` : `-${Math.abs(move.delta)}`;
 }
 
 function moveClass(move: QueenMove | null | undefined): string {
@@ -309,8 +329,8 @@ export default async function QueensPage() {
     loadCreatorLiveStreams(),
   ]);
   const season = rows.find((row) => row.queen_ladder_season)?.queen_ladder_season;
-  const lastUpdatedAt = queenLastUpdatedAt(rows);
-  const oldestUpdatedAt = queenOldestUpdatedAt(rows);
+  const lastUpdatedAt = newestDrodoFetchedAt(rows) ?? queenLastUpdatedAt(rows);
+  const oldestUpdatedAt = oldestDrodoFetchedAt(rows) ?? queenOldestUpdatedAt(rows);
   const liveSteamIds = new Set(
     streams
       .map((stream) => stream.steamId)
@@ -324,15 +344,11 @@ export default async function QueensPage() {
     <PageLayout title="Queen Players">
       <QueensAutoRefresh />
       <p className={styles.lead}>
-        Latest in-game Queen ladder output captured by the desktop tracker
-        {season ? ` for ${season.replace(/_/g, " ").toUpperCase()}` : ""}. Rows are replaced when
-        a fresh ladder upload is accepted. Season stats fill in after a profile
-        is refreshed; loading this page re-polls the visible Queen set before
-        rendering when your visitor cooldown allows it, and the Updated column
-        shows each row&apos;s data age. Less active players are re-checked hourly in
-        the background. The table is capped to the known top 100; refreshed
-        profile ranks take priority over older ladder captures, with ladder
-        ranks filling gaps until a profile refresh lands.
+        Known Queen players{season ? ` for ${season.replace(/_/g, " ").toUpperCase()}` : ""}.
+        A page load can refresh the visible set once every 5 minutes; between
+        refresh windows the table shows the last cached Drodo profile data.
+        Profile ranks win over older ladder captures, and ladder rows fill gaps
+        until Drodo has been refreshed.
       </p>
 
       {error ? (
@@ -342,9 +358,14 @@ export default async function QueensPage() {
       ) : (
         <>
           <div className={styles["snapshot-meta"]}>
-            <span>Last updated</span>
+            <span>Last profile refresh</span>
             <LastSyncedTime value={lastUpdatedAt} />
-            <span>· Oldest row</span>
+            <span>Next refresh</span>
+            <NextRefreshTime
+              latestFetchedAt={lastUpdatedAt}
+              cooldownMs={QUEENS_VIEW_REFRESH_COOLDOWN_MS}
+            />
+            <span>Oldest profile</span>
             <RelativeAge value={oldestUpdatedAt} />
           </div>
           <div className={`${styles.table} ${styles["queen-table"]}`} role="table">
@@ -357,7 +378,6 @@ export default async function QueensPage() {
               <div className={`${styles.cell} ${styles["hide-sm"]}`}>Wins</div>
               <div className={`${styles.cell} ${styles["hide-sm"]}`}>Games</div>
               <div className={`${styles.cell} ${styles["hide-sm"]}`}>Win rate</div>
-              <div className={`${styles.cell} ${styles["hide-sm"]}`}>Updated</div>
             </div>
             {rows.map((row, index) => {
               const ladderRank = effectiveQueenRank(row) ?? index + 1;
@@ -430,19 +450,16 @@ export default async function QueensPage() {
                     ) : null}
                   </div>
                   <div className={`${styles.cell} ${styles["cell-mmr"]}`}>
-                    {mmr != null ? mmr.toLocaleString() : "—"}
+                    {mmr != null ? mmr.toLocaleString() : "-"}
                   </div>
                   <div className={`${styles.cell} ${styles["cell-meta"]} ${styles["hide-sm"]}`}>
                     {formatWinTotal(wins)}
                   </div>
                   <div className={`${styles.cell} ${styles["cell-meta"]} ${styles["hide-sm"]}`}>
-                    {games?.toLocaleString() ?? "—"}
+                    {games?.toLocaleString() ?? "-"}
                   </div>
                   <div className={`${styles.cell} ${styles["cell-meta"]} ${styles["hide-sm"]}`}>
                     {formatWinRate(wins, games)}
-                  </div>
-                  <div className={`${styles.cell} ${styles["cell-age"]} ${styles["hide-sm"]}`}>
-                    <RelativeAge value={rowUpdatedAt(row)} />
                   </div>
                 </div>
               );
