@@ -9,23 +9,18 @@
   padding: 32px 32px 72px;
   position: relative;
 }
-.rankLadder {
-  position: absolute;
-  top: 32px;
-  left: -176px;
-  width: 156px;
-}
-@media (max-width: 1552px) {
-  .rankLadder {
-    display: none;
-  }
-}
 .playerHeader {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
   gap: 24px;
   margin-bottom: 24px;
+}
+.rankLadder {
+  position: absolute;
+  top: 32px;
+  left: -176px;
+  width: 156px;
 }
 .playerIdentity {
   display: flex;
@@ -59,18 +54,6 @@
   font-weight: 700;
   color: var(--text-primary);
   margin-bottom: 4px;
-}
-.playerMeta {
-  font-size: 13px;
-  color: var(--text-muted);
-  letter-spacing: 0.5px;
-}
-.playerMeta a {
-  color: var(--text-muted);
-  transition: color 0.15s;
-}
-.playerMeta a:hover {
-  color: var(--text-secondary);
 }
 .leaderboardRank {
   display: inline-flex;
@@ -416,5 +399,10 @@
   .deltaCard {
     grid-template-columns: 1fr;
     gap: 4px;
+  }
+}
+@media (max-width: 1552px) {
+  .rankLadder {
+    display: none;
   }
 }

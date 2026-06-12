@@ -18,10 +18,10 @@ const t = {
   species: "Species",
   relics: "Relics",
   talents: "Talents",
-  ranks: "Ranks",
   queens: "Queens",
   leaderboard: "Leaderboard",
   matches: "Matches",
+  creators: "Creators",
   patchNotes: "Patch Notes",
   cms: "Admin CMS",
   signOut: "Sign out",
@@ -152,9 +152,6 @@ export function AppNavBar({ supabase }: AppNavBarProps) {
       <Link href="/talents" className={styles.navLink} prefetch={false} onClick={() => trackNavClick("talents")}>
         {t.talents}
       </Link>
-      <Link href="/ranks" className={styles.navLink} prefetch={false} onClick={() => trackNavClick("ranks")}>
-        {t.ranks}
-      </Link>
       <Link href="/queens" className={styles.navLink} prefetch={false} onClick={() => trackNavClick("queens")}>
         {t.queens}
       </Link>
@@ -166,6 +163,11 @@ export function AppNavBar({ supabase }: AppNavBarProps) {
       {canSeeBetaFeatures && (
         <Link href="/matches" className={styles.navLink} prefetch={false} onClick={() => trackNavClick("matches")}>
           {t.matches}
+        </Link>
+      )}
+      {isAdmin && (
+        <Link href="/creators" className={styles.navLink} prefetch={false} onClick={() => trackNavClick("creators")}>
+          {t.creators}
         </Link>
       )}
       <Link href="/patch-notes" className={styles.navLink} prefetch={false} onClick={() => trackNavClick("patch_notes")}>

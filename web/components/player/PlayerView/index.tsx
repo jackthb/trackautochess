@@ -24,10 +24,7 @@ import {
   type DrodoProfileRow,
 } from "@/lib/drodo";
 import { drodoStatsFromProfile } from "@/components/player/playerData";
-import {
-  steamProfileUrl,
-  type SteamProfile,
-} from "@/lib/steam";
+import { type SteamProfile } from "@/lib/steam";
 import styles from "./PlayerView.module.css";
 
 const LAST_FETCHED_TICK_MS = 1000;
@@ -317,7 +314,6 @@ export default function PlayerView({
     isAdmin || isOwnProfile || isPriorityProfile ? "owner" : "public";
   const canRefresh = authReady;
   const displayName = steamProfile.name || steamProfile.customUrl || steamId;
-  const profileUrl = steamProfileUrl(steamId, steamProfile.customUrl);
 
   const totalChickenCount = useMemo(() => {
     const sum = seasons.reduce((acc, s) => acc + (s.chicken_count ?? 0), 0);
@@ -605,17 +601,6 @@ export default function PlayerView({
               )}
               <div className={styles.playerHeading}>
                 <div className={styles.playerName}>{displayName}</div>
-                <div className={styles.playerMeta}>
-                  <a
-                    href={profileUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    {steamProfile.customUrl
-                      ? `steamcommunity.com/id/${steamProfile.customUrl}`
-                      : `Steam ID: ${steamId}`}
-                  </a>
-                </div>
                 {isAdmin && leaderboardPosition && (
                   <div className={styles.leaderboardRank}>
                     <a href="/leaderboard">
@@ -664,7 +649,6 @@ export default function PlayerView({
               </div>
             </div>
           </div>
-
           {drodoProfileMissing && !drodo && (
             <div className={styles.tableWrap} style={{ marginBottom: 32 }}>
               <div className={styles.emptyState}>

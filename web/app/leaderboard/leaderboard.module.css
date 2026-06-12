@@ -133,7 +133,7 @@
   min-width: 0;
 }
 .stream-link {
-  color: var(--accent);
+  color: var(--text-muted);
   text-decoration: none;
   display: inline-flex;
   align-items: center;
@@ -153,6 +153,13 @@
 .stream-link:hover {
   color: var(--text-primary);
   opacity: 1;
+}
+.stream-link-live {
+  color: var(--accent);
+}
+.stream-link-live:hover {
+  color: var(--accent);
+  opacity: 0.9;
 }
 .player-vanity {
   color: var(--text-muted);

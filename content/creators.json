@@ -1,0 +1,35 @@
+{
+  "creators": [
+    {
+      "id": "mattyunie",
+      "name": "MattyUnie",
+      "youtubeHandle": "@mattyunie",
+      "profileUrl": "https://www.youtube.com/@mattyunie",
+      "seedVideoIds": ["rEyc_lxwheA"],
+      "includeTerms": ["dota auto chess", "auto chess", "dac", "dota chess"]
+    },
+    {
+      "id": "snail-tofu",
+      "name": "蛞蝓豆腐",
+      "youtubeHandle": "@蛞蝓豆腐",
+      "profileUrl": "https://www.youtube.com/@%E8%9B%9E%E8%9D%93%E8%B1%86%E8%85%90",
+      "seedVideoIds": ["NqWjHC-1-Vo"],
+      "includeTerms": ["刀塔自走棋", "自走棋", "dota auto chess", "auto chess", "dac"]
+    },
+    {
+      "id": "fail-pingu-renn",
+      "name": "Fail Pingu Renn",
+      "youtubeHandle": "@FailPinguRenn",
+      "profileUrl": "https://www.youtube.com/@FailPinguRenn",
+      "seedVideoIds": ["ZeRC9EDKpfo"],
+      "includeTerms": ["dota auto chess", "auto chess", "dac", "dota chess"]
+    },
+    {
+      "id": "serbian-butcher",
+      "name": "Serbian Butcher",
+      "youtubeHandle": "@SerbianButcher",
+      "profileUrl": "https://www.youtube.com/@SerbianButcher",
+      "includeTerms": ["dota auto chess", "auto chess", "dac", "dota chess"]
+    }
+  ]
+}

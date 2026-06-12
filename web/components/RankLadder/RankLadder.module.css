@@ -38,12 +38,12 @@
 .rank {
   flex: 1;
 }
-.level {
+.mmr {
   font-variant-numeric: tabular-nums;
   color: var(--text-muted);
   font-size: var(--fs-11, 11px);
   opacity: 0.7;
-  min-width: 24px;
+  min-width: 42px;
   text-align: right;
 }
 .current {
@@ -51,7 +51,7 @@
   color: var(--text-primary);
   font-weight: 600;
 }
-.current .level {
+.current .mmr {
   color: var(--text-secondary);
   opacity: 1;
 }

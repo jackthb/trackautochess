@@ -4,6 +4,7 @@ import { PageLayout } from "@/components/PageLayout";
 import { SITE_NAME, SITE_TITLE } from "@/lib/site";
 import { createSupabaseServerClient } from "@/lib/supabase";
 import { listAvatarUrl, playerProfilePath } from "@/lib/steam";
+import { loadCreatorLiveStreams } from "@/lib/creators";
 import styles from "../leaderboard/leaderboard.module.css";
 import { LastSyncedTime } from "./LastSyncedTime";
 import { RefreshOnReturn } from "./RefreshOnReturn";
@@ -295,12 +296,13 @@ function moveClass(move: QueenMove | null | undefined): string {
   return move.delta > 0 ? styles.up : styles.down;
 }
 
-function streamPlatform(url: string): "twitch" | "youtube" | "kick" | "stream" {
+function streamPlatform(url: string): "twitch" | "youtube" | "kick" | "douyu" | "stream" {
   try {
     const hostname = new URL(url).hostname.replace(/^www\./, "");
     if (hostname.includes("twitch.tv")) return "twitch";
     if (hostname.includes("youtube.com") || hostname.includes("youtu.be")) return "youtube";
     if (hostname.includes("kick.com")) return "kick";
+    if (hostname.includes("douyu.com")) return "douyu";
   } catch {
     // Fall through to the generic stream icon for malformed stored URLs.
   }
@@ -322,6 +324,13 @@ function StreamIcon({ platform }: { platform: ReturnType<typeof streamPlatform> 
       </svg>
     );
   }
+  if (platform === "douyu") {
+    return (
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        <path d="M4 5h16v10.5A3.5 3.5 0 0 1 16.5 19h-9A3.5 3.5 0 0 1 4 15.5V5Zm2 2v8.5A1.5 1.5 0 0 0 7.5 17h9a1.5 1.5 0 0 0 1.5-1.5V7H6Zm3 2.5 5.2 2.5L9 14.5v-5Z" />
+      </svg>
+    );
+  }
   if (platform === "twitch") {
     return (
       <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
@@ -337,9 +346,17 @@ function StreamIcon({ platform }: { platform: ReturnType<typeof streamPlatform> 
 }
 
 export default async function QueensPage() {
-  const { rows, error } = await loadQueens();
+  const [{ rows, error }, { streams }] = await Promise.all([
+    loadQueens(),
+    loadCreatorLiveStreams(),
+  ]);
   const season = rows.find((row) => row.queen_ladder_season)?.queen_ladder_season;
   const lastUpdatedAt = queenLastUpdatedAt(rows);
+  const liveSteamIds = new Set(
+    streams
+      .map((stream) => stream.steamId)
+      .filter((steamId): steamId is string => Boolean(steamId))
+  );
 
   return (
     <PageLayout title="Queen Players">
@@ -380,6 +397,7 @@ export default async function QueensPage() {
               const ladderRank = effectiveQueenRank(row) ?? index + 1;
               const mmr = queenMmr(row);
               const display = row.name || row.custom_url || row.steam_id;
+              const isLive = liveSteamIds.has(row.steam_id);
               const initial = display.charAt(0).toUpperCase() || "?";
               const games = seasonGames(row);
               const wins = seasonWins(row);
@@ -428,12 +446,14 @@ export default async function QueensPage() {
                     </Link>
                     {row.stream_link ? (
                       <a
-                        className={styles["stream-link"]}
+                        className={`${styles["stream-link"]} ${
+                          isLive ? styles["stream-link-live"] : ""
+                        }`}
                         href={row.stream_link}
                         target="_blank"
                         rel="noopener noreferrer"
                         aria-label={`${display} stream`}
-                        title={`${display} stream`}
+                        title={row.stream_link}
                       >
                         <StreamIcon platform={streamPlatform(row.stream_link)} />
                       </a>

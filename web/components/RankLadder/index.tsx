@@ -1,4 +1,5 @@
 import {
+  levelMinMmr,
   levelToRankName,
   mmrToLevel,
   MAX_LEVEL,
@@ -25,7 +26,7 @@ export function RankLadder({ mmr, queenRank, span = 4 }: RankLadderProps) {
 
   return (
     <aside className={styles.ladder} aria-label="Rank ladder">
-      <div className={styles.header}>Rank Ladder</div>
+      <div className={styles.header}>Rank MMR</div>
       <ol className={styles.list}>
         {levels.map((level) => {
           const isCurrent = level === current;
@@ -39,7 +40,7 @@ export function RankLadder({ mmr, queenRank, span = 4 }: RankLadderProps) {
             <li key={level} className={`${styles.row} ${cls}`}>
               {showQueenRank && <span className={styles.position}>#{queenRank}</span>}
               <span className={styles.rank}>{levelToRankName(level)}</span>
-              <span className={styles.level}>{level}</span>
+              <span className={styles.mmr}>{levelMinMmr(level).toLocaleString()}</span>
             </li>
           );
         })}

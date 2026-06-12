@@ -1,4 +1,4 @@
-import { collection, config, fields } from "@keystatic/core";
+import { collection, config, fields, singleton } from "@keystatic/core";
 import React from "react";
 import ReactMarkdown from "react-markdown";
 import remarkBreaks from "remark-breaks";
@@ -201,6 +201,49 @@ function MarkdownTextInput({
   );
 }
 
+const creatorSchema = fields.object(
+  {
+    id: fields.text({
+      label: "Creator ID",
+      description: "Stable lowercase ID used for feed item keys, e.g. mattyunie.",
+    }),
+    name: fields.text({ label: "Display name" }),
+    description: fields.text({ label: "Description", multiline: true }),
+    profileUrl: fields.url({ label: "Creator/channel URL" }),
+    avatarUrl: fields.url({ label: "Avatar URL" }),
+    youtubeChannelId: fields.text({
+      label: "YouTube channel ID",
+      description:
+        "Preferred for RSS. Starts with UC... Leave blank if using a handle and the site can resolve it.",
+    }),
+    youtubeHandle: fields.text({
+      label: "YouTube handle",
+      description: "For example @mattyunie. Used when a channel ID is not set.",
+    }),
+    youtubePlaylistId: fields.text({
+      label: "YouTube playlist ID",
+      description: "Optional override to read uploads from a specific playlist feed.",
+    }),
+    includeTerms: fields.array(fields.text({ label: "Required term" }), {
+      label: "Dota Auto Chess include terms",
+      itemLabel: (props) => props.value || "Term",
+      description:
+        "Videos must contain at least one of these terms in the title or RSS description.",
+    }),
+    excludeTerms: fields.array(fields.text({ label: "Excluded term" }), {
+      label: "Exclude terms",
+      itemLabel: (props) => props.value || "Term",
+    }),
+    seedVideoIds: fields.array(fields.text({ label: "Video ID" }), {
+      label: "Reference video IDs",
+      itemLabel: (props) => props.value || "Video ID",
+      description:
+        "Optional notes for humans when adding a creator; the public feed uses the channel/playlist RSS.",
+    }),
+  },
+  { label: "Creator" },
+);
+
 const createEntitySchema = ({ showTechnicalFields = true } = {}): Record<string, any> => ({
   gameId: showTechnicalFields
     ? fields.text({ label: "Game ID" })
@@ -235,6 +278,20 @@ const createEntitySchema = ({ showTechnicalFields = true } = {}): Record<string,
 
 export default config({
   storage,
+  singletons: {
+    creators: singleton({
+      label: "Creators Feed",
+      path: `${contentPath}/creators`,
+      format: { data: "json" },
+      schema: {
+        creators: fields.array(creatorSchema, {
+          label: "Creators",
+          itemLabel: (props) =>
+            props.fields.name.value || props.fields.id.value || "Creator",
+        }),
+      },
+    }),
+  },
   collections: {
     patchNotes: collection({
       label: "Patch Notes",
