@@ -49,6 +49,18 @@ const RELICS_DATA = (relicsData as any).relics as Record<string, RelicInfo>;
 const ITEMS_FULL = itemsFullData as Record<string, ItemFullInfo>;
 
 const iconUrl = resolveIconUrl;
+const MATCH_DATE_FORMATTER = new Intl.DateTimeFormat("en-US", {
+  month: "short",
+  day: "numeric",
+  year: "numeric",
+  timeZone: "UTC",
+});
+const MATCH_TIME_FORMATTER = new Intl.DateTimeFormat("en-US", {
+  hour: "2-digit",
+  minute: "2-digit",
+  hour12: false,
+  timeZone: "UTC",
+});
 
 /** One entry in a player's relic-acquisition timeline. */
 interface RelicTimelineEntry {
@@ -110,6 +122,19 @@ function normalizeName(value: string | null | undefined): string {
   return String(value || "")
     .trim()
     .toLowerCase();
+}
+
+function formatMatchDateTime(value: string | null | undefined): {
+  date: string | null;
+  time: string | null;
+} {
+  if (!value) return { date: null, time: null };
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return { date: null, time: null };
+  return {
+    date: MATCH_DATE_FORMATTER.format(date),
+    time: `${MATCH_TIME_FORMATTER.format(date)} UTC`,
+  };
 }
 
 /** The "expanded" detail panel for a player row — bigger icons, full relic
@@ -703,19 +728,9 @@ export default function GameView({
     route,
   ]);
 
-  const matchDate = game.played_at
-    ? new Date(game.played_at).toLocaleDateString(undefined, {
-        month: "short",
-        day: "numeric",
-        year: "numeric",
-      })
-    : null;
-  const matchTime = game.played_at
-    ? new Date(game.played_at).toLocaleTimeString(undefined, {
-        hour: "2-digit",
-        minute: "2-digit",
-      })
-    : null;
+  const { date: matchDate, time: matchTime } = formatMatchDateTime(
+    game.played_at,
+  );
 
   return (
     <>
