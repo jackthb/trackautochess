@@ -20,7 +20,7 @@ import { relicsData, synergiesData, unitsFullData } from "@/generated/content-da
 import type { RelicInfo, SynergyInfo, UnitFullInfo } from "@dac/shared/types";
 import { fetchSteamProfile } from "@/lib/steam";
 import { parseSteamId64 } from "@dac/shared/steam";
-import { UNIT_COSTS, computeSynergies, filterActiveSynergies } from "@/lib/units";
+import { UNIT_COSTS, computeSynergies } from "@/lib/units";
 
 const RELICS_MAP = (relicsData as { relics: Record<string, RelicInfo> }).relics;
 const REPEAT_RELIC_ID = "item_repeat_relic";
@@ -155,10 +155,10 @@ function capSynergyCounts(synergies: SynergyBadge[]): SynergyBadge[] {
 }
 
 function rowSynergies(row: Pick<MatchPlayerRow, "chess_lineup" | "synergies">): SynergyBadge[] {
-  const lineup = rowLineup(row);
-  const parsed = parseSynergies(row.synergies);
+  // Derive from the lineup (unique species); the stored string only tops up
+  // item-linkable synergies (Spider Leg → Aqir) — see computeSynergies.
   return capSynergyCounts(
-    parsed.length > 0 ? filterActiveSynergies(parsed) : computeSynergies(lineup)
+    computeSynergies(rowLineup(row), parseSynergies(row.synergies))
   );
 }
 

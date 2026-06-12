@@ -13,7 +13,35 @@ import {
   parseRelicHistory,
   parseWL,
 } from "./game-utils";
+import {
+  buildSynergyMinCountByName,
+  buildUnitSynergyLookup,
+  computeLineupSynergies,
+} from "./game-structure";
 import { TooltipWrap, type TooltipData } from "./Tooltip";
+
+// Per-payload lookup caches: rows in a list all share the same content
+// objects, so the lookups are built once instead of per row.
+const UNIT_SYNERGY_CACHE = new WeakMap<object, Record<string, string[]>>();
+const MIN_COUNT_CACHE = new WeakMap<object, Record<string, number>>();
+
+function unitSynergyLookup(unitsFull: Record<string, UnitFullInfo>) {
+  let lookup = UNIT_SYNERGY_CACHE.get(unitsFull);
+  if (!lookup) {
+    lookup = buildUnitSynergyLookup(unitsFull);
+    UNIT_SYNERGY_CACHE.set(unitsFull, lookup);
+  }
+  return lookup;
+}
+
+function synergyMinCountLookup(synergiesData: Record<string, SynergyInfo>) {
+  let lookup = MIN_COUNT_CACHE.get(synergiesData);
+  if (!lookup) {
+    lookup = buildSynergyMinCountByName(synergiesData);
+    MIN_COUNT_CACHE.set(synergiesData, lookup);
+  }
+  return lookup;
+}
 
 export interface GameRowDisplayProps {
   game: Game;
@@ -30,6 +58,10 @@ export interface GameRowDisplayProps {
   unitsFull?: Record<string, UnitFullInfo>;
   synergiesData?: Record<string, SynergyInfo>;
   relicsData?: Record<string, RelicInfo>;
+  /** Item id/name → counts-as synergy (buildItemSynergyLookup). Lets the
+   *  stored in-game count raise an item-linkable synergy (Spider Leg → Aqir)
+   *  above the species count derived from the lineup. */
+  itemSynergies?: Record<string, string>;
 }
 
 export function GameRowDisplay({
@@ -43,6 +75,7 @@ export function GameRowDisplay({
   unitsFull,
   synergiesData,
   relicsData,
+  itemSynergies,
 }: GameRowDisplayProps) {
   const tooltipData: TooltipData | null =
     unitsFull || synergiesData || relicsData
@@ -56,7 +89,21 @@ export function GameRowDisplay({
   const tier = rankParts[0] || "";
   const rankNum = rankParts[1] || "";
   const lineup = parseLineup(game.lineup, unitCosts);
-  const syns = parseSynergies(game.synergies);
+  // Derive synergies from the lineup actually shown (unique species, plus the
+  // stored count for item-linkable synergies like Aqir via Spider Leg). The
+  // raw stored string is the game's `buff` capture, which is often stale and
+  // lists species the player never ended with — only fall back to it when the
+  // content lookups or the lineup itself are unavailable.
+  const storedSyns = parseSynergies(game.synergies);
+  const syns =
+    unitsFull && synergiesData && lineup.length > 0
+      ? computeLineupSynergies(lineup, {
+          unitSynergies: unitSynergyLookup(unitsFull),
+          synergyMinCount: synergyMinCountLookup(synergiesData),
+          itemCountsAsSynergy: itemSynergies,
+          storedSynergies: storedSyns,
+        })
+      : storedSyns;
   // Prefer the full round-by-round pick list from relic_history; the single
   // `relic` column only holds the final active relic (and is the only source
   // for older CV-captured rows that have no history).

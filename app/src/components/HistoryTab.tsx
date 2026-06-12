@@ -16,6 +16,7 @@ interface HistoryTabProps {
   synergiesData: Record<string, SynergyInfo>;
   relicsData: Record<string, RelicInfo>;
   itemsFull: Record<string, ItemFullInfo>;
+  itemSynergies: Record<string, string>;
   lastRefresh: Date | null;
   refresh: () => Promise<void>;
   drodo?: DrodoProfile | null;
@@ -33,6 +34,7 @@ export function HistoryTab({
   synergiesData,
   relicsData,
   itemsFull,
+  itemSynergies,
   lastRefresh,
   refresh,
   drodo,
@@ -177,6 +179,7 @@ export function HistoryTab({
                 synergiesData={synergiesData}
                 relicsData={relicsData}
                 itemsFull={itemsFull}
+                itemSynergies={itemSynergies}
                 expanded={expandedId === g.id}
                 onToggle={() => setExpandedId(expandedId === g.id ? null : g.id)}
               />

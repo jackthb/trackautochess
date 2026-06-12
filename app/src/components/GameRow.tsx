@@ -12,6 +12,7 @@ interface GameRowProps {
   synergiesData: Record<string, SynergyInfo>;
   relicsData: Record<string, RelicInfo>;
   itemsFull: Record<string, ItemFullInfo>;
+  itemSynergies?: Record<string, string>;
   expanded: boolean;
   onToggle: () => void;
 }
@@ -23,6 +24,7 @@ export function GameRow({
   synergiesData,
   relicsData,
   itemsFull,
+  itemSynergies,
   expanded,
   onToggle,
 }: GameRowProps) {
@@ -46,6 +48,7 @@ export function GameRow({
         unitsFull={unitsFull}
         synergiesData={synergiesData}
         relicsData={relicsData}
+        itemSynergies={itemSynergies}
         iconUrl={(type, stem) => `icons://${type}/${stem}.png`}
         shareUrl={`https://trackautochess.com/games/${game.id}`}
         onClick={onToggle}

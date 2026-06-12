@@ -312,6 +312,9 @@ declare global {
       fetchRelics: () => Promise<{ relics: Record<string, RelicInfo> }>;
       fetchItems: () => Promise<ItemsData>;
       fetchItemsFull: () => Promise<Record<string, ItemFullInfo>>;
+      fetchItemLinks: () => Promise<{
+        links?: { item?: string; synergy?: string; category?: string }[];
+      }>;
       fetchTalents: () => Promise<Record<string, TalentInfo>>;
     };
   }

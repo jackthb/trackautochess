@@ -10,6 +10,7 @@ import type {
   TalentInfo,
 } from "../types";
 import type { GameUpdatedEvent, GamesListEvent } from "../backend-events";
+import { buildItemSynergyLookup } from "@dac/shared/game-structure";
 import { sendBackendRequest } from "../lib/backend-request";
 
 interface GamesState {
@@ -22,6 +23,7 @@ interface GamesState {
   relicsData: Record<string, RelicInfo>;
   itemsData: Record<string, ItemInfo>;
   itemsFull: Record<string, ItemFullInfo>;
+  itemSynergies: Record<string, string>;
   talentsData: Record<string, TalentInfo>;
   lastRefresh: Date | null;
   refresh: () => Promise<void>;
@@ -41,6 +43,7 @@ export function useGames(): GamesState {
   const [relicsData, setRelicsData] = useState<Record<string, RelicInfo>>({});
   const [itemsData, setItemsData] = useState<Record<string, ItemInfo>>({});
   const [itemsFull, setItemsFull] = useState<Record<string, ItemFullInfo>>({});
+  const [itemSynergies, setItemSynergies] = useState<Record<string, string>>({});
   const [talentsData, setTalentsData] = useState<Record<string, TalentInfo>>({});
   const [lastRefresh, setLastRefresh] = useState<Date | null>(null);
 
@@ -53,13 +56,14 @@ export function useGames(): GamesState {
     // Load reference data if needed
     if (Object.keys(unitCosts).length === 0) {
       try {
-        const [unitsRes, fullRes, synRes, relRes, itemsRes, itemsFullRes, talentsRes] = await Promise.all([
+        const [unitsRes, fullRes, synRes, relRes, itemsRes, itemsFullRes, itemLinksRes, talentsRes] = await Promise.all([
           window.appApi.fetchUnitsData(),
           window.appApi.fetchUnitsFull(),
           window.appApi.fetchSynergies(),
           window.appApi.fetchRelics(),
           window.appApi.fetchItems(),
           window.appApi.fetchItemsFull(),
+          window.appApi.fetchItemLinks(),
           window.appApi.fetchTalents(),
         ]);
         if (unitsRes?.units) {
@@ -90,6 +94,9 @@ export function useGames(): GamesState {
         if (relRes?.relics) setRelicsData(relRes.relics);
         if (itemsRes?.items) setItemsData(itemsRes.items);
         if (itemsFullRes) setItemsFull(itemsFullRes);
+        if (itemLinksRes) {
+          setItemSynergies(buildItemSynergyLookup(itemLinksRes, itemsFullRes));
+        }
         if (talentsRes) setTalentsData(talentsRes);
       } catch (e) {
         console.error("Failed to load reference data:", e);
@@ -149,6 +156,7 @@ export function useGames(): GamesState {
     relicsData,
     itemsData,
     itemsFull,
+    itemSynergies,
     talentsData,
     lastRefresh,
     refresh,

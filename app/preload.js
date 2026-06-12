@@ -14,6 +14,7 @@ const CHANNELS = {
     relics: "data:relics",
     items: "data:items",
     itemsFull: "data:items_full",
+    itemLinks: "data:item_links",
     talents: "data:talents",
   },
   replays: {
@@ -81,5 +82,6 @@ contextBridge.exposeInMainWorld("appApi", {
   fetchRelics: () => ipcRenderer.invoke(CHANNELS.data.relics),
   fetchItems: () => ipcRenderer.invoke(CHANNELS.data.items),
   fetchItemsFull: () => ipcRenderer.invoke(CHANNELS.data.itemsFull),
+  fetchItemLinks: () => ipcRenderer.invoke(CHANNELS.data.itemLinks),
   fetchTalents: () => ipcRenderer.invoke(CHANNELS.data.talents),
 });

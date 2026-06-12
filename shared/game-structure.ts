@@ -1,4 +1,4 @@
-import type { SynergyInfo, UnitFullInfo } from "./types";
+import type { ItemFullInfo, SynergyInfo, UnitFullInfo } from "./types";
 
 export interface UnitCodeInfo {
   name: string;
@@ -128,6 +128,137 @@ export function parseNettableSynergyBuff(
       if (scoreDiff !== 0) return scoreDiff;
       return b.count - a.count;
     });
+}
+
+/** A fielded piece for synergy counting: display name plus carried items
+ *  (ids or display names) when board data is available. */
+export interface SynergyCountPiece {
+  name: string;
+  items?: string[];
+}
+
+export interface ComputeLineupSynergiesOptions {
+  /** Unit display name → synergy display names ("Aqir", "Demon Hunter", …). */
+  unitSynergies: Record<string, string[]>;
+  /** Synergy display name → first active tier (buildSynergyMinCountByName). */
+  synergyMinCount: Record<string, number>;
+  /** Item id/display name → synergy the carrier counts as (counts_as_synergy
+   *  links: Spider Leg → Aqir, Kobold Cup → Kobold). */
+  itemCountsAsSynergy?: Record<string, string>;
+  /** Synergy counts captured from the game (`buff`). Only consulted for
+   *  item-linkable synergies — items can raise a count above the species
+   *  count, and rows without board-item data can't see that any other way.
+   *  Don't pass this when `pieces` carry real item data. */
+  storedSynergies?: { name: string; count: number }[];
+}
+
+/**
+ * Derive the synergies a player actually has from their fielded pieces.
+ *
+ * Synergy counts in DAC are per unique species — duplicate copies of a unit
+ * never add to a count — plus item carriers for counts_as_synergy items.
+ * This is the single source of truth for synergy badges; the game's raw
+ * `buff` capture is unreliable (often stale from an earlier round, and full
+ * of inactive one-piece entries), so it must never be displayed directly.
+ * Returns active synergies only, sorted by count descending.
+ */
+export function computeLineupSynergies(
+  pieces: SynergyCountPiece[],
+  options: ComputeLineupSynergiesOptions,
+): { name: string; count: number }[] {
+  const { unitSynergies, synergyMinCount, itemCountsAsSynergy, storedSynergies } = options;
+
+  // Species contributing to each synergy; a species counts at most once per
+  // synergy whether via its own traits or a counts_as item.
+  const speciesBySynergy = new Map<string, Set<string>>();
+  const add = (synergy: string, species: string) => {
+    let set = speciesBySynergy.get(synergy);
+    if (!set) {
+      set = new Set();
+      speciesBySynergy.set(synergy, set);
+    }
+    set.add(species);
+  };
+
+  for (const piece of pieces) {
+    if (!piece.name) continue;
+    for (const synergy of unitSynergies[piece.name] ?? []) {
+      add(synergy, piece.name);
+    }
+    if (itemCountsAsSynergy) {
+      for (const item of piece.items ?? []) {
+        const synergy = itemCountsAsSynergy[item];
+        if (synergy) add(synergy, piece.name);
+      }
+    }
+  }
+
+  const counts = new Map<string, number>();
+  for (const [synergy, species] of speciesBySynergy) {
+    counts.set(synergy, species.size);
+  }
+
+  if (storedSynergies && itemCountsAsSynergy) {
+    const itemLinkable = new Set(Object.values(itemCountsAsSynergy));
+    for (const stored of storedSynergies) {
+      if (!itemLinkable.has(stored.name)) continue;
+      if (stored.count > (counts.get(stored.name) ?? 0)) {
+        counts.set(stored.name, stored.count);
+      }
+    }
+  }
+
+  return filterActiveSynergiesWithThresholds(
+    [...counts.entries()].map(([name, count]) => ({ name, count })),
+    synergyMinCount,
+  ).sort((a, b) => b.count - a.count);
+}
+
+interface ItemLinkEntry {
+  item?: string;
+  synergy?: string;
+  category?: string;
+}
+
+/**
+ * Build the item → counts-as-synergy lookup from content item-links plus the
+ * items catalog, keyed by both display name ("Spider Leg") and internal id
+ * ("item_wangchongtui") so board piece item ids resolve directly.
+ */
+export function buildItemSynergyLookup(
+  itemLinks: { links?: ItemLinkEntry[] } | ItemLinkEntry[] | null | undefined,
+  itemsFull?: Record<string, ItemFullInfo>,
+): Record<string, string> {
+  const links = Array.isArray(itemLinks) ? itemLinks : itemLinks?.links ?? [];
+  const byName: Record<string, string> = {};
+  for (const link of links) {
+    if (link?.category === "counts_as_synergy" && link.item && link.synergy) {
+      byName[link.item] = link.synergy;
+    }
+  }
+  const out: Record<string, string> = { ...byName };
+  if (itemsFull) {
+    for (const [id, info] of Object.entries(itemsFull)) {
+      const synergy = info?.name ? byName[info.name] : undefined;
+      if (synergy) out[id] = synergy;
+    }
+  }
+  return out;
+}
+
+/** Unit display name → synergy display names, from a units_full payload. */
+export function buildUnitSynergyLookup(
+  unitsFull: Record<string, UnitFullInfo>,
+): Record<string, string[]> {
+  const out: Record<string, string[]> = {};
+  for (const [name, info] of Object.entries(unitsFull)) {
+    if (Array.isArray(info?.synergies)) {
+      out[name] = info.synergies.filter(
+        (synergy): synergy is string => typeof synergy === "string",
+      );
+    }
+  }
+  return out;
 }
 
 /** Build a `chess_*` code lookup from units_full.json once per units payload. */

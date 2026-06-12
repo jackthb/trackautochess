@@ -35,6 +35,7 @@ function createContentIpc({ ipcMain, fs, path, contentDir, channels }) {
 
     const aliases = readJsonFile(path.join(contentDir, "game", "aliases.json"), {});
     const items = readJsonFile(path.join(contentDir, "game", "curated-items.json"), {});
+    const itemLinks = readJsonFile(path.join(contentDir, "game", "item-links.json"), { links: [] });
 
     const unitsFull = {};
     for (const entry of readContentCollection("units")) {
@@ -68,6 +69,7 @@ function createContentIpc({ ipcMain, fs, path, contentDir, channels }) {
     runtimeGameDataCache = {
       aliases,
       items,
+      itemLinks,
       unitsFull,
       synergies,
       relics: { relics },
@@ -87,6 +89,7 @@ function createContentIpc({ ipcMain, fs, path, contentDir, channels }) {
     ipcMain.handle(channels.data.unitsFull, async () => getRuntimeGameData().unitsFull);
     ipcMain.handle(channels.data.items, async () => getRuntimeGameData().items);
     ipcMain.handle(channels.data.itemsFull, async () => getRuntimeGameData().itemsFull);
+    ipcMain.handle(channels.data.itemLinks, async () => getRuntimeGameData().itemLinks);
     ipcMain.handle(channels.data.talents, async () => getRuntimeGameData().talents);
   }
 

@@ -10,6 +10,7 @@ const CHANNELS = {
     relics: "data:relics",
     items: "data:items",
     itemsFull: "data:items_full",
+    itemLinks: "data:item_links",
     talents: "data:talents",
   },
   replays: {

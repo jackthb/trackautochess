@@ -2,11 +2,8 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import {
-  UNIT_COSTS,
-  computeSynergies,
-  filterActiveSynergies,
-} from "@/lib/units";
+import { UNIT_COSTS, computeSynergies } from "@/lib/units";
+import type { SynergyCountPiece } from "@dac/shared/game-structure";
 import {
   itemsFullData,
   relicsData,
@@ -346,11 +343,25 @@ function MatchPlayerRow({
   const hand = parseLineup(snap?.hand ?? "", UNIT_COSTS);
 
   const isScrubbing = snapRound !== null && !isLastRound;
-  const parsedSyn = !isScrubbing ? parseSynergies(game.synergies) : [];
-  const synergies =
-    parsedSyn.length > 0
-      ? filterActiveSynergies(parsedSyn)
-      : computeSynergies(lineup);
+  // Synergies always derive from the pieces actually shown. The round
+  // snapshot board carries per-piece items, so counts-as items (Spider Leg →
+  // Aqir) are exact there; lineup-only rows fall back to the stored in-game
+  // count for item-linkable synergies. The raw stored string is never shown
+  // as-is — it's the game's `buff` capture and routinely disagrees with the
+  // final board.
+  const boardPieces = snap?.board;
+  const synergyPieces: SynergyCountPiece[] = boardPieces?.length
+    ? boardPieces.map((piece) => ({
+        name: piece.name ?? "",
+        items: piece.items?.length ? piece.items : piece.last_items,
+      }))
+    : lineup;
+  const synergies = computeSynergies(
+    synergyPieces,
+    !isScrubbing && !boardPieces?.length
+      ? parseSynergies(game.synergies)
+      : undefined,
+  );
 
   // Compact-view relic list: prefer the full set from relic_history, fall
   // back to the single `relic` field for CV-captured rows. When scrubber

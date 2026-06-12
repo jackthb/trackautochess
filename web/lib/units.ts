@@ -1,11 +1,21 @@
 import { unitStem } from "@dac/shared/game-utils";
 import {
+  buildItemSynergyLookup,
   buildSynergyMinCountByName,
+  computeLineupSynergies,
   filterActiveSynergiesWithThresholds,
+  type SynergyCountPiece,
 } from "@dac/shared/game-structure";
+import type { ItemFullInfo } from "@dac/shared/types";
 // aliasesData is a flat { alt-spelling: canonical } map. Cost/synergy data
 // comes from content/game/units via the generated runtime module.
-import { aliasesData, synergiesData, unitsFullData } from "@/generated/content-data";
+import {
+  aliasesData,
+  itemLinksData,
+  itemsFullData,
+  synergiesData,
+  unitsFullData,
+} from "@/generated/content-data";
 import { slugifyName } from "@/lib/slugs";
 import { DEFAULT_LOCALE, type Locale, pickLocalized } from "@/lib/i18n";
 
@@ -212,9 +222,17 @@ export const UNIT_SYNERGIES: Readonly<Record<string, string[]>> =
 // synergies activate at 2, but a few (Demon, Pandaren) activate at 1. A lineup
 // holding a single Beast or Faceless has NOT activated that synergy, so it must
 // not be shown; a single Demon HAS.
-const SYNERGY_MIN_COUNT = buildSynergyMinCountByName(
+export const SYNERGY_MIN_COUNT = buildSynergyMinCountByName(
   synergiesData as Record<string, { name: string; tiers?: number[] }>,
 );
+
+/** Item id/display name → counts-as synergy (Spider Leg → Aqir, Kobold Cup →
+ *  Kobold), keyed by both internal item id and display name. */
+export const ITEM_SYNERGIES: Readonly<Record<string, string>> =
+  buildItemSynergyLookup(
+    itemLinksData as { links?: { item?: string; synergy?: string; category?: string }[] },
+    itemsFullData as Record<string, ItemFullInfo>,
+  );
 
 /**
  * Keep only synergies that have reached their activation threshold (first
@@ -229,20 +247,21 @@ export function filterActiveSynergies(
 }
 
 /**
- * Derive active synergies from a lineup when the stored synergies field is
- * empty: count synergy occurrences across the lineup, keep those that have
- * reached their activation tier, sorted by count descending.
+ * Derive the active synergies a player actually has from their fielded
+ * pieces: unique species per synergy (duplicate copies never add), plus
+ * counts-as items (Spider Leg → Aqir, Kobold Cup → Kobold) when pieces carry
+ * item data, plus the stored in-game count as a top-up for item-linkable
+ * synergies when they don't (`storedSynergies`). Active tiers only, sorted by
+ * count descending.
  */
 export function computeSynergies(
-  lineup: { name: string; stars: number }[],
+  pieces: SynergyCountPiece[],
+  storedSynergies?: { name: string; count: number }[],
 ): { name: string; count: number }[] {
-  const counts: Record<string, number> = {};
-  for (const u of lineup) {
-    for (const syn of UNIT_SYNERGIES[u.name] || []) {
-      counts[syn] = (counts[syn] || 0) + 1;
-    }
-  }
-  return filterActiveSynergies(
-    Object.entries(counts).map(([name, count]) => ({ name, count })),
-  ).sort((a, b) => b.count - a.count);
+  return computeLineupSynergies(pieces, {
+    unitSynergies: UNIT_SYNERGIES as Record<string, string[]>,
+    synergyMinCount: SYNERGY_MIN_COUNT,
+    itemCountsAsSynergy: ITEM_SYNERGIES as Record<string, string>,
+    storedSynergies,
+  });
 }

@@ -4,12 +4,18 @@ import type { ReactNode } from "react";
 import { useRouter } from "next/navigation";
 import { GameRowDisplay } from "@dac/shared/GameRowDisplay";
 import type { PlayerGame, RelicInfo, UnitFullInfo, SynergyInfo } from "@dac/shared/types";
-import { relicsData as relicsJson } from "@/generated/content-data";
-import { UNIT_COSTS } from "@/lib/units";
+import {
+  relicsData as relicsJson,
+  synergiesData as synergiesJson,
+  unitsFullData,
+} from "@/generated/content-data";
+import { ITEM_SYNERGIES, UNIT_COSTS } from "@/lib/units";
 import { resolveIconUrl } from "@/lib/icons";
 import styles from "./MatchHistoryList.module.css";
 
 const RELICS_MAP = (relicsJson as { relics?: Record<string, RelicInfo> }).relics ?? {};
+const UNITS_FULL = unitsFullData as Record<string, UnitFullInfo>;
+const SYNERGIES_MAP = synergiesJson as Record<string, SynergyInfo>;
 
 interface MatchHistoryListProps {
   games: PlayerGame[];
@@ -22,8 +28,8 @@ interface MatchHistoryListProps {
 
 export function MatchHistoryList({
   games,
-  unitsFull,
-  synergiesData,
+  unitsFull = UNITS_FULL,
+  synergiesData = SYNERGIES_MAP,
   relicsData = RELICS_MAP,
   getHref = (game) => `/matches/${game.id}`,
   getDateExtra,
@@ -66,6 +72,7 @@ export function MatchHistoryList({
                 unitsFull={unitsFull}
                 synergiesData={synergiesData}
                 relicsData={relicsData}
+                itemSynergies={ITEM_SYNERGIES as Record<string, string>}
                 iconUrl={resolveIconUrl}
                 shareUrl={href}
                 dateExtra={dateExtra ? <div className={styles.dateExtra}>{dateExtra}</div> : undefined}

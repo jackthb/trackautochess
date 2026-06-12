@@ -12,6 +12,7 @@ import {
   NUMBERED_RANK_TIERS,
 } from "@dac/shared/game-utils";
 import { GameRowDisplay } from "@dac/shared/GameRowDisplay";
+import { ITEM_SYNERGIES } from "@/lib/units";
 import { resolveIconUrl } from "@/lib/icons";
 
 interface GameRowProps {
@@ -381,6 +382,7 @@ export function GameRow({
           unitsFull={unitsFull}
           synergiesData={synergiesData}
           relicsData={relicsData}
+          itemSynergies={ITEM_SYNERGIES as Record<string, string>}
           iconUrl={resolveIconUrl}
           onClick={handleToggle}
           style={{ cursor: "pointer" }}
