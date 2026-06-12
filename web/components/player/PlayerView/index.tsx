@@ -29,11 +29,6 @@ import styles from "./PlayerView.module.css";
 
 const LAST_FETCHED_TICK_MS = 1000;
 
-export interface LeaderboardPosition {
-  rank: number;
-  total: number;
-}
-
 export interface PlayerPageProps {
   route: string;
   steamId: string;
@@ -54,7 +49,6 @@ export interface PlayerPageProps {
   seasons: SeasonSnapshot[];
   mmrHistory: MmrSnapshot[];
   queenRankHistory: QueenRankSnapshot[];
-  leaderboardPosition: LeaderboardPosition | null;
   drodoProfileMissing: boolean;
   drodoLastFetchedAt: string | null;
   manualRefreshQuota: ManualRefreshQuota;
@@ -234,7 +228,6 @@ export default function PlayerView({
   seasons: initialSeasons,
   mmrHistory,
   queenRankHistory,
-  leaderboardPosition,
   drodoProfileMissing: initialDrodoProfileMissing,
   drodoLastFetchedAt: initialDrodoLastFetchedAt,
   manualRefreshQuota: initialManualRefreshQuota,
@@ -416,13 +409,11 @@ export default function PlayerView({
       has_games: games.length > 0,
       game_bucket: bucketCount(games.length),
       season_bucket: bucketCount(initialSeasons.length),
-      has_leaderboard_rank: Boolean(leaderboardPosition),
     });
   }, [
     games.length,
     initialDrodo?.mmr,
     initialSeasons.length,
-    leaderboardPosition,
     route,
     steamId,
   ]);
@@ -601,19 +592,6 @@ export default function PlayerView({
               )}
               <div className={styles.playerHeading}>
                 <div className={styles.playerName}>{displayName}</div>
-                {isAdmin && leaderboardPosition && (
-                  <div className={styles.leaderboardRank}>
-                    <a href="/leaderboard">
-                      Rank{" "}
-                      <span className={styles.leaderboardRankNum}>
-                        #{leaderboardPosition.rank}
-                      </span>{" "}
-                      <span className={styles.leaderboardRankTotal}>
-                        of {leaderboardPosition.total}
-                      </span>
-                    </a>
-                  </div>
-                )}
               </div>
             </div>
             <div className={styles.playerActions}>

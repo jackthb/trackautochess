@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import styles from "../leaderboard/leaderboard.module.css";
+import styles from "./queens.module.css";
 
 const TICK_MS = 30 * 1000;
 const QUEEN_ROW_STALE_THRESHOLD_MS = 60 * 60 * 1000;

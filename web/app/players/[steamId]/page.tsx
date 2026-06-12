@@ -325,7 +325,6 @@ const loadPlayer = cache(async (rawSteamId: string): Promise<LoadResult> => {
       seasons,
       mmrHistory,
       queenRankHistory,
-      leaderboardPosition: null,
       drodoProfileMissing,
       drodoLastFetchedAt,
       manualRefreshQuota,

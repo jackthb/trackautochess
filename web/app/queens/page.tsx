@@ -23,7 +23,7 @@ import {
 } from "@/lib/queensVisitor";
 import { mostRecentTimestamp } from "@/lib/timestamps";
 import { canonicalCreatorStreamUrl, loadCreatorLiveStreams } from "@/lib/creators";
-import styles from "../leaderboard/leaderboard.module.css";
+import styles from "./queens.module.css";
 import { LastSyncedTime } from "./LastSyncedTime";
 import { NextRefreshTime } from "./NextRefreshTime";
 import { QueensAutoRefresh } from "./QueensAutoRefresh";

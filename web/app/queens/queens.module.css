@@ -1,6 +1,4 @@
-/* Ported verbatim from the styled-jsx block in the former pages/leaderboard.tsx.
-   Hyphenated class names are preserved and accessed via bracket notation in the
-   client island (styles["header-row"], etc.). */
+/* Shared Queens table styles. */
 .lead {
   font-family: var(--font-mono);
   font-size: var(--fs-13);

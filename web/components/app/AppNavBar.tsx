@@ -19,7 +19,6 @@ const t = {
   relics: "Relics",
   talents: "Talents",
   queens: "Queens",
-  leaderboard: "Leaderboard",
   matches: "Matches",
   creators: "Creators",
   patchNotes: "Patch Notes",
@@ -155,11 +154,6 @@ export function AppNavBar({ supabase }: AppNavBarProps) {
       <Link href="/queens" className={styles.navLink} prefetch={false} onClick={() => trackNavClick("queens")}>
         {t.queens}
       </Link>
-      {canSeeBetaFeatures && (
-        <Link href="/leaderboard" className={styles.navLink} prefetch={false} onClick={() => trackNavClick("leaderboard")}>
-          {t.leaderboard}
-        </Link>
-      )}
       {canSeeBetaFeatures && (
         <Link href="/matches" className={styles.navLink} prefetch={false} onClick={() => trackNavClick("matches")}>
           {t.matches}

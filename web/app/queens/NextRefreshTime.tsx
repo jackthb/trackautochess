@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import styles from "../leaderboard/leaderboard.module.css";
+import styles from "./queens.module.css";
 
 const TICK_MS = 1000;
 
