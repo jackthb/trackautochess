@@ -419,6 +419,16 @@ fn normalize_synergy_string(value: Option<&str>) -> Option<String> {
             let (name, count) = entry.split_once(':')?;
             let name = name.trim().strip_prefix("is_").unwrap_or(name.trim());
             let count = count.trim();
+            let count = if name.eq_ignore_ascii_case("demon") {
+                count
+                    .parse::<i64>()
+                    .ok()
+                    .filter(|value| *value > 1)
+                    .map(|_| "1")
+                    .unwrap_or(count)
+            } else {
+                count
+            };
             (!name.is_empty() && !count.is_empty()).then(|| format!("{name}:{count}"))
         })
         .collect::<Vec<_>>()
@@ -451,7 +461,9 @@ pub(super) fn build_fallback_match_row(
         return None;
     }
     pairs.sort();
-    let match_id = generate_fallback_match_id(&pairs, reason, played_at);
+    let final_round = fallback_final_round(rows);
+    let identity_time = fallback_identity_time(rows).unwrap_or(played_at);
+    let match_id = generate_fallback_match_id(&pairs, reason, identity_time, final_round);
     Some(json!({
         "match_id": match_id,
         "played_at": played_at,
@@ -600,6 +612,34 @@ fn player_id_pairs(rows: &[NettableRow]) -> Vec<(String, i64)> {
         .collect()
 }
 
+fn fallback_final_round(rows: &[NettableRow]) -> Option<i64> {
+    rows.iter()
+        .filter(|row| row.table_name == "CustomNetTable_game_info" && row.key == "round_info")
+        .filter_map(|row| value_i64(row.raw.to_value().get("round")))
+        .max()
+        .or_else(|| {
+            rows.iter()
+                .filter(|row| row.key == "player_info")
+                .filter_map(|row| row.raw.to_value().get("data").cloned())
+                .filter_map(|data| data.as_object().cloned())
+                .flat_map(|data| data.into_values())
+                .filter_map(|player| value_i64(player.get("round")))
+                .max()
+        })
+}
+
+fn fallback_identity_time(rows: &[NettableRow]) -> Option<&str> {
+    rows.iter()
+        .filter_map(|row| row.match_started_at.as_deref())
+        .find(|value| !value.trim().is_empty())
+        .or_else(|| {
+            rows.iter()
+                .filter_map(|row| row.observed_at.as_deref())
+                .filter(|value| !value.trim().is_empty())
+                .max()
+        })
+}
+
 pub(super) fn generate_live_match_id(
     pairs: &[(String, i64)],
     final_round: Option<i64>,
@@ -618,11 +658,17 @@ pub(super) fn generate_live_match_id(
     format!("{digest:x}")[..16].to_owned()
 }
 
-fn generate_fallback_match_id(pairs: &[(String, i64)], reason: &str, played_at: &str) -> String {
+fn generate_fallback_match_id(
+    pairs: &[(String, i64)],
+    reason: &str,
+    identity_time: &str,
+    final_round: Option<i64>,
+) -> String {
     let seed = json!({
         "kind": "fallback_no_end_board",
         "reason": reason,
-        "played_at": played_at,
+        "identity_time": identity_time,
+        "final_round": final_round,
         "players": pairs,
     });
     let digest = Sha256::digest(seed.to_string().as_bytes());

@@ -1,4 +1,5 @@
 import type { ItemFullInfo, SynergyInfo, UnitFullInfo } from "./types";
+import { normalizeDisplaySynergyCount } from "./game-utils";
 
 export interface UnitCodeInfo {
   name: string;
@@ -209,7 +210,10 @@ export function computeLineupSynergies(
   }
 
   return filterActiveSynergiesWithThresholds(
-    [...counts.entries()].map(([name, count]) => ({ name, count })),
+    [...counts.entries()].map(([name, count]) => ({
+      name,
+      count: normalizeDisplaySynergyCount(name, count),
+    })),
     synergyMinCount,
   ).sort((a, b) => b.count - a.count);
 }

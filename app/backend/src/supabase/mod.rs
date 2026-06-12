@@ -278,7 +278,7 @@ mod tests {
         assert_eq!(players[0]["hero_level"], 10);
         assert_eq!(players[0]["final_round"], 42);
         assert_eq!(players[0]["chess_lineup"], "Chaos Knight(2)");
-        assert_eq!(players[0]["synergies"], "demon:2");
+        assert_eq!(players[0]["synergies"], "demon:1");
     }
 
     #[test]
@@ -362,7 +362,7 @@ mod tests {
         assert_eq!(second["mmr_level"], 4200);
         assert_eq!(second["final_round"], 34);
         assert_eq!(second["duration"], 2084.5);
-        assert_eq!(second["synergies"], "demon:5|demonhunter:2|warlock:2");
+        assert_eq!(second["synergies"], "demon:1|demonhunter:2|warlock:2");
         assert_eq!(second["talents"], "talent_1b_losebonus|talent_2b_promotion");
         assert_eq!(second["chess_lineup"], "Axe(2)");
         assert_eq!(second["chess_hand"], "Chaos Knight(2)|Lion");
@@ -441,7 +441,7 @@ mod tests {
         let row = build_fallback_match_row(&rows, "post_game_no_end_board", "2026-06-07T12:00:00Z")
             .expect("player_id_table should be enough to build fallback match row");
 
-        assert_eq!(row["match_id"], "070e139568e352a7");
+        assert_eq!(row["match_id"], "05ca0c23f3fab115");
         assert_eq!(row["player_count"], 2);
         assert_eq!(row["capture_status"], "partial");
         assert_eq!(row["is_finished"], true);
@@ -452,7 +452,22 @@ mod tests {
                 .expect("later fallback should also build");
         assert_ne!(
             later["match_id"], row["match_id"],
-            "fallback IDs must not collide across sessions"
+            "fallback IDs without captured timing still use upload time as a last-resort salt"
+        );
+
+        let mut timed_rows = rows.clone();
+        for row in &mut timed_rows {
+            row.match_started_at = Some("2026-06-07T11:45:00Z".to_owned());
+        }
+        let timed =
+            build_fallback_match_row(&timed_rows, "post_game_no_end_board", "2026-06-07T12:00:00Z")
+                .expect("timed fallback should build");
+        let timed_retry =
+            build_fallback_match_row(&timed_rows, "post_game_no_end_board", "2026-06-07T12:01:00Z")
+                .expect("timed retry fallback should build");
+        assert_eq!(
+            timed_retry["match_id"], timed["match_id"],
+            "fallback retries with captured match timing should be idempotent"
         );
     }
 }

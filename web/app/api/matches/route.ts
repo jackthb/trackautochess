@@ -27,6 +27,8 @@ interface GameRow {
   relic_history: unknown;
   win_round: number | null;
   lose_round: number | null;
+  final_round: number | null;
+  duration: number | null;
   played_at: string;
   created_at: string;
   matches?: {
@@ -68,10 +70,28 @@ export interface MatchSummary {
 
 const PAGE_LIMIT = 100;
 const GAMES_FETCH = 800;
+const DUPLICATE_MATCH_WINDOW_MS = 90 * 60 * 1000;
 
 function matchGroupKey(row: GameRow): string {
   if (row.match_id) return row.match_id;
   return `played:${row.played_at || row.created_at || row.id}`;
+}
+
+function timeBucket(value: string, windowMs: number): number {
+  const time = new Date(value).getTime();
+  if (!Number.isFinite(time)) return 0;
+  return Math.floor(time / windowMs);
+}
+
+function duplicateMatchKey(rows: GameRow[], playedAt: string): string {
+  const roster = rows
+    .map((row) => `${row.steam_id ?? "unknown"}:${row.placement ?? "?"}`)
+    .sort()
+    .join("|");
+  return [
+    timeBucket(playedAt, DUPLICATE_MATCH_WINDOW_MS),
+    roster,
+  ].join("::");
 }
 
 function dedupeMatchRows(rows: GameRow[]): GameRow[] {
@@ -84,6 +104,30 @@ function dedupeMatchRows(rows: GameRow[]): GameRow[] {
     }
   }
   return [...byPlayer.values()];
+}
+
+function captureRank(rows: GameRow[]): number {
+  const statuses = rows.map((row) => row.matches?.capture_status);
+  if (statuses.includes("complete")) return 3;
+  if (statuses.includes("partial")) return 2;
+  return 1;
+}
+
+function pickBetterMatch<T extends { rows: GameRow[]; playedAt: string }>(
+  current: T,
+  candidate: T
+): T {
+  const currentRank = captureRank(current.rows);
+  const candidateRank = captureRank(candidate.rows);
+  if (candidateRank !== currentRank) {
+    return candidateRank > currentRank ? candidate : current;
+  }
+  if (candidate.rows.length !== current.rows.length) {
+    return candidate.rows.length > current.rows.length ? candidate : current;
+  }
+  const currentLatestId = Math.max(...current.rows.map((row) => row.id));
+  const candidateLatestId = Math.max(...candidate.rows.map((row) => row.id));
+  return candidateLatestId > currentLatestId ? candidate : current;
 }
 
 export async function GET(req: Request) {
@@ -101,7 +145,7 @@ export async function GET(req: Request) {
   const { data: gamesData, error: gamesError } = await supabase
     .from("match_players")
     .select(
-      "id, steam_id::text, match_id, placement, mmr_level, hero_level, chess_lineup, synergies, relic, relic_history, win_round, lose_round, played_at, created_at, matches!inner(capture_status, is_finished)"
+      "id, steam_id::text, match_id, placement, mmr_level, hero_level, chess_lineup, synergies, relic, relic_history, win_round, lose_round, final_round, duration, played_at, created_at, matches!inner(capture_status, is_finished)"
     )
     .eq("matches.is_finished", true)
     .order("id", { ascending: false })
@@ -121,7 +165,7 @@ export async function GET(req: Request) {
     else grouped.set(key, [g]);
   }
 
-  const matches: MatchSummary[] = Array.from(grouped.entries())
+  const rawMatches = Array.from(grouped.entries())
     .map(([key, rows]) => {
       const sorted = dedupeMatchRows(rows).sort((a, b) => {
         const pa = a.placement ?? 99;
@@ -139,6 +183,19 @@ export async function GET(req: Request) {
         rows: sorted,
       };
     })
+    .filter((match) => match.rows.length > 0);
+
+  const dedupedBySignature = new Map<string, (typeof rawMatches)[number]>();
+  for (const match of rawMatches) {
+    const key = duplicateMatchKey(match.rows, match.playedAt);
+    const current = dedupedBySignature.get(key);
+    dedupedBySignature.set(
+      key,
+      current ? pickBetterMatch(current, match) : match
+    );
+  }
+
+  const matches: MatchSummary[] = Array.from(dedupedBySignature.values())
     .sort((a, b) => b.playedAt.localeCompare(a.playedAt))
     .slice(0, PAGE_LIMIT)
     .map((m) => ({

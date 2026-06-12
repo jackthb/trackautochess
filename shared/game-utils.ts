@@ -81,6 +81,11 @@ const SYNERGY_STEM_TO_NAME: Record<string, string> = {
   element: "Elemental",
 };
 
+export function normalizeDisplaySynergyCount(name: string, count: number): number {
+  if (name.toLowerCase() === "demon") return Math.min(count, 1);
+  return count;
+}
+
 export function parseLineup(
   lineup: string | null,
   unitCosts: Record<string, number>
@@ -111,7 +116,7 @@ export function parseSynergies(
     .map((entry) => {
       const [raw, count] = entry.split(":");
       const name = SYNERGY_STEM_TO_NAME[raw.toLowerCase()] || capitalize(raw);
-      return { name, count: parseInt(count) || 0 };
+      return { name, count: normalizeDisplaySynergyCount(name, parseInt(count) || 0) };
     })
     .filter((s) => s.count > 0)
     .sort((a, b) => b.count - a.count);

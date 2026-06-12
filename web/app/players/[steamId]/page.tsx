@@ -80,6 +80,46 @@ function isHotCacheFresh(fetchedAt: string | null | undefined): boolean {
   return Date.now() - fetchedTime < HOT_PROFILE_REFRESH_TTL_SECONDS * 1000;
 }
 
+const PLAYER_DUPLICATE_WINDOW_MS = 90 * 60 * 1000;
+
+function playerHistoryDuplicateKey(row: Record<string, unknown>): string {
+  const playedAt = typeof row.played_at === "string" ? row.played_at : "";
+  const playedAtMs = new Date(playedAt).getTime();
+  const bucket = Number.isFinite(playedAtMs)
+    ? Math.floor(playedAtMs / PLAYER_DUPLICATE_WINDOW_MS)
+    : 0;
+  return [
+    bucket,
+    row.steam_id ?? "",
+    row.placement ?? "",
+    row.chess_lineup ?? "",
+    row.synergies ?? "",
+    row.relic ?? "",
+    row.win_round ?? "",
+    row.lose_round ?? "",
+  ].join("::");
+}
+
+function dedupePlayerHistoryRows(
+  rows: Record<string, unknown>[]
+): Record<string, unknown>[] {
+  const bySignature = new Map<string, Record<string, unknown>>();
+  for (const row of rows) {
+    const key = playerHistoryDuplicateKey(row);
+    const current = bySignature.get(key);
+    const rowId = typeof row.id === "number" ? row.id : 0;
+    const currentId = typeof current?.id === "number" ? current.id : 0;
+    if (!current || rowId > currentId) {
+      bySignature.set(key, row);
+    }
+  }
+  return [...bySignature.values()].sort((a, b) => {
+    const aTime = typeof a.played_at === "string" ? a.played_at : "";
+    const bTime = typeof b.played_at === "string" ? b.played_at : "";
+    return bTime.localeCompare(aTime);
+  });
+}
+
 /** Cached per request so generateMetadata and the page render share data. */
 const loadPlayer = cache(async (rawSteamId: string): Promise<LoadResult> => {
   if (!rawSteamId || typeof rawSteamId !== "string") {
@@ -294,7 +334,7 @@ const loadPlayer = cache(async (rawSteamId: string): Promise<LoadResult> => {
   }
 
   // Map match_players rows → Game shape with legacy aliases for rendering.
-  const games: PlayerGame[] = gamesRows.map(
+  const games: PlayerGame[] = dedupePlayerHistoryRows(gamesRows).map(
     (row) => ({
       ...row,
       user_id: String(row.steam_id),
