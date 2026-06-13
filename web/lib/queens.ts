@@ -39,12 +39,7 @@ export const QUEEN_SELECT = [
 
 export function profileQueenRank(row: QueenRow): number | null {
   const value = row.drodo_queen_rank;
-  if (typeof value === "number" && Number.isFinite(value)) return value;
-  if (typeof value === "string" && value.trim()) {
-    const parsed = Number(value);
-    return Number.isFinite(parsed) ? parsed : null;
-  }
-  return null;
+  return typeof value === "number" && Number.isFinite(value) ? value : null;
 }
 
 export function effectiveQueenRank(row: QueenRow): number | null {

@@ -79,7 +79,7 @@ export interface PollSnapshot {
   poll_interval_seconds: number | null;
 }
 
-export interface PollSnapshotRow extends PollSnapshot {
+export interface PollSnapshotRow extends Omit<PollSnapshot, "queen_rank"> {
   steam_id?: string;
   drodo_queen_rank?: number | null;
   queen_rank?: number | string | null;
