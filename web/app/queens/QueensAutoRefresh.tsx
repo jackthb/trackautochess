@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
+import { nextQueensRefreshDelayMs } from "./refreshTiming";
 
 const MIN_RETRY_MS = 30 * 1000;
 
@@ -30,11 +31,8 @@ export function QueensAutoRefresh({
       timer = null;
     };
 
-    const nextDelayMs = () => {
-      const latestFetchedMs = latestFetchedAt ? new Date(latestFetchedAt).getTime() : NaN;
-      if (!Number.isFinite(latestFetchedMs)) return 0;
-      return Math.max(0, latestFetchedMs + cooldownMs - Date.now());
-    };
+    const nextDelayMs = () =>
+      nextQueensRefreshDelayMs(latestFetchedAt, cooldownMs);
 
     const scheduleNext = (fallbackMs = MIN_RETRY_MS) => {
       clearTimer();
