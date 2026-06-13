@@ -57,6 +57,7 @@ export interface CachedUserDrodoRow {
   drodo_season_games: number | null;
   drodo_candy: number | null;
   drodo_chicken_count: number | null;
+  drodo_queen_rank: number | null;
   drodo_raw_data: Record<string, unknown> | null;
   drodo_last_fetched_at: string | null;
   queen_ladder_last_seen_at: string | null;
@@ -96,8 +97,8 @@ export function cachedUserToDrodoProfile(row: CachedUserDrodoRow): DrodoProfileR
     max_mmr: row.drodo_max_mmr,
     mmr_level: row.drodo_mmr_level,
     queen_rank: row.drodo_raw_data
-      ? numberFromDrodoData(row.drodo_raw_data, "queen_rank")
-      : null,
+      ? row.drodo_queen_rank ?? numberFromDrodoData(row.drodo_raw_data, "queen_rank")
+      : row.drodo_queen_rank,
     last_win_at: row.drodo_raw_data ? lastWinFromDrodoData(row.drodo_raw_data) : null,
     last_top3_at: row.drodo_raw_data ? lastTop3FromDrodoData(row.drodo_raw_data) : null,
     season: row.drodo_season,
@@ -116,7 +117,7 @@ async function loadPollSnapshot(
   const { data } = await supabase
     .from("users")
     .select(
-      "drodo_mmr, drodo_season_games, drodo_chicken_count, drodo_raw_data, queen_ladder_last_seen_at, poll_interval_seconds"
+      "drodo_mmr, drodo_season_games, drodo_chicken_count, drodo_queen_rank, queen_ladder_last_seen_at, poll_interval_seconds"
     )
     .filter("steam_id", "eq", steamId)
     .maybeSingle<PollSnapshotRow>();
@@ -131,7 +132,7 @@ async function loadPollSnapshots(
   const { data } = await supabase
     .from("users")
     .select(
-      "steam_id::text, drodo_mmr, drodo_season_games, drodo_chicken_count, drodo_raw_data, queen_ladder_last_seen_at, poll_interval_seconds"
+      "steam_id::text, drodo_mmr, drodo_season_games, drodo_chicken_count, drodo_queen_rank, queen_ladder_last_seen_at, poll_interval_seconds"
     )
     .filter("steam_id", "in", `(${steamIds.join(",")})`);
   return new Map(
@@ -164,6 +165,7 @@ export async function markDrodoMissing(
       drodo_season_games: null,
       drodo_candy: null,
       drodo_chicken_count: 0,
+      drodo_queen_rank: null,
       drodo_raw_data: null,
       drodo_last_fetched_at: fetchedAt,
       drodo_profile_missing: true,
@@ -203,6 +205,7 @@ export async function purgeDrodoCache(
       drodo_season_games: null,
       drodo_candy: null,
       drodo_chicken_count: 0,
+      drodo_queen_rank: null,
       drodo_raw_data: null,
       drodo_last_fetched_at: new Date().toISOString(),
       drodo_profile_missing: true,

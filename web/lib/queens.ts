@@ -10,10 +10,9 @@ export interface QueenRow {
   drodo_season: string | null;
   drodo_season_games: number | null;
   drodo_chicken_count: number | null;
-  drodo_raw_data: Record<string, unknown> | null;
+  drodo_queen_rank: number | null;
   drodo_last_fetched_at: string | null;
   queen_ladder_rank: number | null;
-  queen_ladder_mmr: number | null;
   queen_ladder_season: string | null;
   queen_ladder_last_seen_at: string | null;
 }
@@ -31,16 +30,15 @@ export const QUEEN_SELECT = [
   "drodo_season",
   "drodo_season_games",
   "drodo_chicken_count",
-  "drodo_raw_data",
+  "drodo_queen_rank",
   "drodo_last_fetched_at",
   "queen_ladder_rank",
-  "queen_ladder_mmr",
   "queen_ladder_season",
   "queen_ladder_last_seen_at",
 ].join(", ");
 
 export function profileQueenRank(row: QueenRow): number | null {
-  const value = row.drodo_raw_data?.queen_rank;
+  const value = row.drodo_queen_rank;
   if (typeof value === "number" && Number.isFinite(value)) return value;
   if (typeof value === "string" && value.trim()) {
     const parsed = Number(value);
@@ -54,7 +52,7 @@ export function effectiveQueenRank(row: QueenRow): number | null {
 }
 
 export function queenMmr(row: QueenRow): number | null {
-  return row.queen_ladder_mmr ?? row.drodo_mmr ?? null;
+  return row.drodo_mmr ?? null;
 }
 
 export function compareQueenRows(a: QueenRow, b: QueenRow): number {
@@ -135,10 +133,9 @@ export async function loadQueenCandidates(
   const { data, error } = await supabase
     .from("users")
     .select(QUEEN_SELECT)
-    .or("queen_ladder_last_seen_at.not.is.null,drodo_raw_data->>queen_rank.not.is.null")
+    .or("queen_ladder_last_seen_at.not.is.null,drodo_queen_rank.not.is.null")
     .order("queen_ladder_last_seen_at", { ascending: false, nullsFirst: false })
     .order("queen_ladder_rank", { ascending: true, nullsFirst: false })
-    .order("queen_ladder_mmr", { ascending: false, nullsFirst: false })
     .order("drodo_mmr", { ascending: false, nullsFirst: false })
     .limit(QUEEN_CANDIDATE_LIMIT);
 

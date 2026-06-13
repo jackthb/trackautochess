@@ -113,7 +113,7 @@ function rowSteamId(row) {
 async function loadActiveIds(supabase, limit) {
   const now = new Date();
   const recentSignInCutoff = new Date(now.getTime() - RECENT_SIGN_IN_WINDOW_MS).toISOString();
-  const activeSyncFilter = `steam_signed_in_at.gte.${recentSignInCutoff},queen_ladder_last_seen_at.not.is.null,drodo_raw_data->>queen_rank.not.is.null`;
+  const activeSyncFilter = `steam_signed_in_at.gte.${recentSignInCutoff},queen_ladder_last_seen_at.not.is.null,drodo_queen_rank.not.is.null`;
 
   const dueUsers = await supabase.select("users", {
     select: "steam_id::text",
@@ -150,7 +150,7 @@ async function loadAllIds(supabase, limit) {
   for (let offset = 0; ids.length < limit; offset += 1000) {
     const pageLimit = Math.min(1000, limit - ids.length);
     const rows = await supabase.select("users", {
-      select: "steam_id::text,steam_signed_in_at,queen_ladder_last_seen_at,drodo_raw_data",
+      select: "steam_id::text,steam_signed_in_at,queen_ladder_last_seen_at,drodo_queen_rank",
       drodo_profile_missing: "eq.false",
       drodo_last_fetched_at: "not.is.null",
       order: "drodo_last_fetched_at.asc",
@@ -167,7 +167,7 @@ async function loadAllIds(supabase, limit) {
 async function loadPollSnapshots(steamIds, supabase) {
   if (steamIds.length === 0) return new Map();
   const rows = await supabase.select("users", {
-    select: "steam_id::text,drodo_mmr,drodo_season_games,drodo_chicken_count,drodo_raw_data,queen_ladder_last_seen_at,poll_interval_seconds",
+    select: "steam_id::text,drodo_mmr,drodo_season_games,drodo_chicken_count,drodo_queen_rank,queen_ladder_last_seen_at,poll_interval_seconds",
     steam_id: `in.(${steamIds.join(",")})`,
   });
   return new Map((rows ?? []).map((row) => [rowSteamId(row), pollSnapshotFromRow(row)]));
@@ -192,6 +192,7 @@ async function markDrodoMissing(steamId, supabase) {
       drodo_season_games: null,
       drodo_candy: null,
       drodo_chicken_count: 0,
+      drodo_queen_rank: null,
       drodo_raw_data: null,
       drodo_last_fetched_at: fetchedAt,
       drodo_profile_missing: true,

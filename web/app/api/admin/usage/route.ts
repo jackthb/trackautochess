@@ -13,7 +13,7 @@ interface TableVolume {
 }
 
 const ACTIVE_SYNC_FILTER =
-  "steam_signed_in_at.gte.__RECENT__,queen_ladder_last_seen_at.not.is.null,drodo_raw_data->>queen_rank.not.is.null";
+  "steam_signed_in_at.gte.__RECENT__,queen_ladder_last_seen_at.not.is.null,drodo_queen_rank.not.is.null";
 
 const RECENT_SIGN_IN_WINDOW_MS = 14 * 24 * 60 * 60 * 1000;
 const TABLE_WINDOWS: Array<{ table: string; timestamp: string | null }> = [

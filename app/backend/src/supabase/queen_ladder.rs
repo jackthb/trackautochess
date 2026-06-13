@@ -48,13 +48,6 @@ impl SupabaseClient {
             if player.rank >= 1 {
                 row.insert("queen_ladder_rank".to_owned(), json!(player.rank));
             }
-            if let Some(mmr) = player.mmr.filter(|mmr| *mmr >= 0) {
-                row.insert("queen_ladder_mmr".to_owned(), json!(mmr));
-                // The Queen ladder consists of Queen players; setting these lets
-                // public leaderboards show them before a Drodo profile refresh.
-                row.insert("drodo_mmr".to_owned(), json!(mmr));
-                row.insert("drodo_mmr_level".to_owned(), json!(38));
-            }
             rows.push(Value::Object(row));
             seen_ids.push(steam_id);
         }
@@ -199,6 +192,7 @@ impl SupabaseClient {
                     "drodo_season_games": season_games,
                     "drodo_candy": number_from_object(info, "candy"),
                     "drodo_chicken_count": chicken_count,
+                    "drodo_queen_rank": queen_rank,
                     "drodo_raw_data": Value::Object(info.clone()),
                     "drodo_last_fetched_at": fetched_at,
                     "queen_ladder_last_seen_at": fetched_at,
@@ -241,7 +235,6 @@ impl SupabaseClient {
         }
         let body = json!({
             "queen_ladder_rank": Value::Null,
-            "queen_ladder_mmr": Value::Null,
             "queen_ladder_season": Value::Null,
             "queen_ladder_last_seen_at": Value::Null,
         });

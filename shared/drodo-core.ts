@@ -81,7 +81,9 @@ export interface PollSnapshot {
 
 export interface PollSnapshotRow extends PollSnapshot {
   steam_id?: string;
-  drodo_raw_data: Record<string, unknown> | null;
+  drodo_queen_rank?: number | null;
+  queen_rank?: number | string | null;
+  drodo_raw_data?: Record<string, unknown> | null;
 }
 
 export type DrodoUserPayload = {
@@ -93,6 +95,7 @@ export type DrodoUserPayload = {
   drodo_season_games: number | null;
   drodo_candy: number | null;
   drodo_chicken_count: number;
+  drodo_queen_rank: number | null;
   drodo_raw_data: Record<string, unknown>;
   drodo_last_fetched_at: string;
   drodo_profile_missing: false;
