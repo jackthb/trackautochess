@@ -1,0 +1,34 @@
+name: Refresh Queen Players
+
+on:
+  schedule:
+    # Every hour at :07 past.
+    - cron: "7 * * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: refresh-queens
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Hit /api/cron/queens-refresh
+        env:
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+        run: |
+          set -eo pipefail
+          if [ -z "$CRON_SECRET" ]; then
+            echo "CRON_SECRET secret is not set in this repo" >&2
+            exit 1
+          fi
+          status=$(curl -sS -o /tmp/resp.json -w '%{http_code}' \
+            -X POST "https://www.trackautochess.com/api/cron/queens-refresh" \
+            -H "Authorization: Bearer $CRON_SECRET")
+          echo "HTTP $status"
+          cat /tmp/resp.json
+          if [ "$status" != "200" ]; then
+            exit 1
+          fi

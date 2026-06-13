@@ -1,10 +1,4 @@
 {
   "ignoreCommand": "node scripts/ignore-build.mjs",
-  "regions": ["dub1"],
-  "crons": [
-    {
-      "path": "/api/cron/queens-refresh",
-      "schedule": "0 * * * *"
-    }
-  ]
+  "regions": ["dub1"]
 }
