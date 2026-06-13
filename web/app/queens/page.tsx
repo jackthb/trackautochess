@@ -329,6 +329,7 @@ export default async function QueensPage() {
   const season = rows.find((row) => row.queen_ladder_season)?.queen_ladder_season;
   const lastUpdatedAt = newestDrodoFetchedAt(rows) ?? queenLastUpdatedAt(rows);
   const oldestUpdatedAt = oldestDrodoFetchedAt(rows) ?? queenOldestUpdatedAt(rows);
+  const refreshAnchorAt = oldestUpdatedAt ?? lastUpdatedAt;
   const liveSteamIds = new Set(
     streams
       .map((stream) => stream.steamId)
@@ -340,7 +341,10 @@ export default async function QueensPage() {
 
   return (
     <PageLayout title="Queen Players">
-      <QueensAutoRefresh />
+      <QueensAutoRefresh
+        latestFetchedAt={refreshAnchorAt}
+        cooldownMs={QUEENS_VIEW_REFRESH_COOLDOWN_MS}
+      />
       <p className={styles.lead}>
         Known Queen players{season ? ` for ${season.replace(/_/g, " ").toUpperCase()}` : ""}.
         Opening this page updates the visible profiles when the 5-minute cooldown
@@ -356,7 +360,7 @@ export default async function QueensPage() {
           <div className={styles["snapshot-meta"]}>
             <span>Next update</span>
             <NextRefreshTime
-              latestFetchedAt={oldestUpdatedAt ?? lastUpdatedAt}
+              latestFetchedAt={refreshAnchorAt}
               cooldownMs={QUEENS_VIEW_REFRESH_COOLDOWN_MS}
             />
           </div>
