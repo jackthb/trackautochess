@@ -10,9 +10,9 @@ import styles from "./HomeSearch.module.css";
 
 const t = {
   description:
-    "Look up Dota Auto Chess player MMR, season history, and tracked match stats by Steam vanity URL or Steam ID.",
+    "Look up Dota Auto Chess player MMR, season history, and tracked match stats by Steam vanity URL or SteamID64.",
   tagline: "MMR, rank & season history for any Auto Chess player.",
-  placeholder: "Steam vanity, profile URL, or ID",
+  placeholder: "Steam profile URL or SteamID64",
   signinDivider: "or",
   viewProfile: "View your profile",
 };

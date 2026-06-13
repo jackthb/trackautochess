@@ -25,7 +25,7 @@ export function ProfileSearch({
   autoFocus = false,
   className = "",
   analyticsSource = "profile_search",
-  placeholder = "Steam vanity URL, profile URL, or Steam ID",
+  placeholder = "Steam profile URL or SteamID64",
   exampleUrl,
 }: ProfileSearchProps) {
   const router = useRouter();
@@ -101,7 +101,7 @@ export function ProfileSearch({
         reason: "not_found",
       });
       setLookupError(
-        "We couldn't find that Steam profile. Check the ID or URL.",
+        "We couldn't find that Steam profile. Check the SteamID64 or URL.",
       );
     } catch {
       if (reqId !== lookupReqRef.current) return;
@@ -121,7 +121,7 @@ export function ProfileSearch({
     if (!val || lookupLoading || lookupDone) return;
 
     if (!parseSteamInput(val)) {
-      setLookupError("Enter a Steam ID, vanity name, or profile URL.");
+      setLookupError("Enter a SteamID64, vanity name, or profile URL.");
       return;
     }
 
