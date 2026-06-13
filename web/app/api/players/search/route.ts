@@ -18,7 +18,7 @@ import {
   type UserSearchRow,
 } from "@/lib/playerSearch";
 import { fetchAndCacheDrodo } from "@/lib/drodo";
-import { revalidateQueensPage } from "@/lib/queensRevalidate";
+import { revalidateQueenPages } from "@/lib/queensRevalidate";
 
 const rateLimiter = new RateLimiterMemory({ points: 60, duration: 60 });
 
@@ -156,7 +156,7 @@ export async function GET(req: Request) {
         fetchAndCacheDrodo(resolvedSteamId, supabase ?? null, {
           snapshotOnSuccess: true,
           pollMode: "reset",
-          onQueenChange: revalidateQueensPage,
+          onQueenChange: revalidateQueenPages,
         }),
         supabase
           ? supabase

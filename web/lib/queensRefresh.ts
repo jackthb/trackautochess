@@ -1,6 +1,7 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { fetchAndCacheDrodoBatch, summarizeDrodoResults } from "@/lib/drodo";
 import { loadQueenCandidates, selectDisplayedQueens } from "@/lib/queens";
+import type { QueenRevalidationTarget } from "@/lib/queensRevalidate";
 import { QUEENS_REFRESH_COOLDOWN_MS } from "@/lib/queensVisitor";
 
 export interface QueensRefreshSummary {
@@ -13,7 +14,7 @@ export interface QueensRefreshSummary {
 interface RefreshOptions {
   floorMs?: number;
   lockTtlMs?: number;
-  onQueenChange?: () => void;
+  onQueenChange?: (target: QueenRevalidationTarget) => void;
 }
 
 const QUEENS_REFRESH_LOCK_KEY = "queens_refresh";
@@ -65,6 +66,9 @@ async function runQueensRefresh(
     return { polled: 0, ok: 0, missing: 0, upstream_error: 0 };
   }
 
+  const profileRoutes = new Map(
+    rows.map((row) => [row.steam_id, row.custom_url] as const)
+  );
   const results = await fetchAndCacheDrodoBatch(
     rows.map((row) => row.steam_id),
     supabase,
@@ -72,7 +76,13 @@ async function runQueensRefresh(
       snapshotOnSuccess: true,
       pollMode: "adaptive",
       hotPoll: true,
-      onQueenChange: options.onQueenChange,
+      onQueenChange: options.onQueenChange
+        ? (profile) =>
+            options.onQueenChange?.({
+              steam_id: profile.steam_id,
+              custom_url: profileRoutes.get(profile.steam_id) ?? null,
+            })
+        : undefined,
     }
   );
   const summary = summarizeDrodoResults(results);

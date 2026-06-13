@@ -230,7 +230,7 @@ async function persistDrodoProfile(
     pollMode: "adaptive" | "reset";
     hotPoll?: boolean;
     prevSnapshot?: PollSnapshot | null;
-    onQueenChange?: () => void;
+    onQueenChange?: (profile: DrodoProfileRow) => void;
   }
 ): Promise<void> {
   const changed = profileChanged(options.prevSnapshot ?? null, profile);
@@ -310,7 +310,7 @@ async function persistDrodoProfile(
   // the standalone poll script import it too.
   if (options.onQueenChange && queen && changed) {
     try {
-      options.onQueenChange();
+      options.onQueenChange(profile);
     } catch (error) {
       console.error("Queen change notification failed:", error);
     }
@@ -325,7 +325,7 @@ export async function fetchAndCacheDrodoBatch(
     pollMode?: "adaptive" | "reset";
     hotPoll?: boolean;
     /** Called when a persisted Queen profile's stats changed (e.g. to rebuild /queens). */
-    onQueenChange?: () => void;
+    onQueenChange?: (profile: DrodoProfileRow) => void;
   } = {}
 ): Promise<FetchDrodoBatchResult[]> {
   return fetchDrodoProfileBatch(
@@ -360,7 +360,7 @@ export async function fetchAndCacheDrodo(
     /** Keep hot profiles capped to the short background cadence. Queens may opt into a fixed cadence when persisted. */
     hotPoll?: boolean;
     /** Called when a persisted Queen profile's stats changed (e.g. to rebuild /queens). */
-    onQueenChange?: () => void;
+    onQueenChange?: (profile: DrodoProfileRow) => void;
   } = {}
 ): Promise<FetchDrodoResult> {
   const result = await fetchDrodoProfileBatch(

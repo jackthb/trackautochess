@@ -81,8 +81,13 @@ export interface PollSnapshot {
 
 export interface PollSnapshotRow extends Omit<PollSnapshot, "queen_rank"> {
   steam_id?: string;
+  drodo_mmr: number | null;
+  drodo_season_games: number | null;
+  drodo_chicken_count: number | null;
   drodo_queen_rank?: number | null;
   queen_rank?: number | string | null;
+  queen_ladder_last_seen_at: string | null;
+  poll_interval_seconds: number | null;
   drodo_raw_data?: Record<string, unknown> | null;
 }
 

@@ -1,6 +1,6 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { fetchAndCacheDrodoBatch } from "@/lib/drodo";
-import { revalidateQueensPage } from "@/lib/queensRevalidate";
+import { revalidateQueenPages } from "@/lib/queensRevalidate";
 import { createSupabaseServiceRoleClient } from "@/lib/supabase";
 
 const DEFAULT_POLL_BATCH_SIZE = 200;
@@ -124,7 +124,7 @@ async function handle(req: Request) {
     snapshotOnSuccess: true,
     pollMode: "adaptive",
     hotPoll: true,
-    onQueenChange: revalidateQueensPage,
+    onQueenChange: revalidateQueenPages,
   });
   for (const result of repollResults) {
     if (result.ok) {
@@ -142,7 +142,7 @@ async function handle(req: Request) {
     snapshotOnSuccess: true,
     pollMode: "reset",
     hotPoll: true,
-    onQueenChange: revalidateQueensPage,
+    onQueenChange: revalidateQueenPages,
   });
   for (const result of seedResults) {
     if (result.ok) {
@@ -160,7 +160,7 @@ async function handle(req: Request) {
   const generalResults = await fetchAndCacheDrodoBatch(generalIds, supabase, {
     snapshotOnSuccess: true,
     pollMode: "adaptive",
-    onQueenChange: revalidateQueensPage,
+    onQueenChange: revalidateQueenPages,
   });
   for (const result of generalResults) {
     if (result.ok) {

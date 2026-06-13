@@ -1,5 +1,5 @@
 import { refreshDisplayedQueens } from "@/lib/queensRefresh";
-import { revalidateQueensPage } from "@/lib/queensRevalidate";
+import { revalidateQueenPages } from "@/lib/queensRevalidate";
 import { createSupabaseServiceRoleClient } from "@/lib/supabase";
 import { QUEENS_VIEW_REFRESH_COOLDOWN_MS } from "@/lib/queensVisitor";
 
@@ -20,11 +20,11 @@ async function handle(req: Request) {
   const summary = await refreshDisplayedQueens(supabase, {
     floorMs: HOURLY_REFRESH_FLOOR_MS,
     lockTtlMs: QUEENS_VIEW_REFRESH_COOLDOWN_MS,
-    onQueenChange: revalidateQueensPage,
+    onQueenChange: revalidateQueenPages,
   });
 
   if (summary.ok > 0) {
-    revalidateQueensPage();
+    revalidateQueenPages();
   }
 
   return Response.json({

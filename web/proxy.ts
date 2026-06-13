@@ -3,7 +3,7 @@ import { QUEENS_VISITOR_COOKIE, QUEENS_VISITOR_HEADER } from "@/lib/queensVisito
 
 const VISITOR_MAX_AGE_SECONDS = 60 * 60 * 24 * 30;
 
-export function middleware(req: NextRequest) {
+export function proxy(req: NextRequest) {
   const requestHeaders = new Headers(req.headers);
   const existingVisitorId = req.cookies.get(QUEENS_VISITOR_COOKIE)?.value;
   const visitorId = existingVisitorId || crypto.randomUUID();

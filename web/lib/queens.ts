@@ -10,7 +10,7 @@ export interface QueenRow {
   drodo_season: string | null;
   drodo_season_games: number | null;
   drodo_chicken_count: number | null;
-  drodo_queen_rank: number | null;
+  drodo_queen_rank: number | string | null;
   drodo_last_fetched_at: string | null;
   queen_ladder_rank: number | null;
   queen_ladder_season: string | null;

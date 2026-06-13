@@ -3,7 +3,7 @@ import { checkBotId } from "botid/server";
 import { RateLimiterMemory } from "rate-limiter-flexible";
 import { getClientIp, getUserAgent, logAbuse, toIncomingHeaders } from "@/lib/abuseLog";
 import { refreshDisplayedQueens } from "@/lib/queensRefresh";
-import { revalidateQueensPage } from "@/lib/queensRevalidate";
+import { revalidateQueenPages } from "@/lib/queensRevalidate";
 import { createSupabaseServiceRoleClient } from "@/lib/supabase";
 import { QUEENS_VIEW_REFRESH_COOLDOWN_MS } from "@/lib/queensVisitor";
 
@@ -42,10 +42,10 @@ export async function POST(req: Request) {
   try {
     const summary = await refreshDisplayedQueens(supabase, {
       floorMs: QUEENS_VIEW_REFRESH_COOLDOWN_MS,
-      onQueenChange: revalidateQueensPage,
+      onQueenChange: revalidateQueenPages,
     });
     if (summary.ok > 0) {
-      revalidateQueensPage();
+      revalidateQueenPages();
     }
     return Response.json(summary);
   } catch (err) {
