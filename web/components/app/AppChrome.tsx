@@ -6,6 +6,7 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 import { BotIdClient } from "botid/client";
 import type { AuthChangeEvent, Session, SupabaseClient } from "@supabase/supabase-js";
 import { AppNavBar } from "@/components/app/AppNavBar";
+import { SiteStatusBanner } from "@/components/SiteStatusBanner";
 import { Footer } from "@/components/Footer";
 import { trackEvent } from "@/lib/analytics";
 import { getPostHog } from "@/lib/posthog";
@@ -95,6 +96,7 @@ export function AppChrome({ children }: { children: ReactNode }) {
       {process.env.NODE_ENV === "production" && (
         <BotIdClient protect={BOT_ID_PROTECTED_ROUTES} />
       )}
+      <SiteStatusBanner />
       <AppNavBar supabase={supabase} />
       {children}
       <Footer />

@@ -1,0 +1,29 @@
+.banner {
+  width: 100%;
+  padding: 0.6rem 1rem;
+  text-align: center;
+  font-size: 0.9rem;
+  line-height: 1.35;
+  font-weight: 500;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.25);
+}
+
+.message {
+  display: inline-block;
+  max-width: 70ch;
+}
+
+.info {
+  background: #1f3a5f;
+  color: #eaf2ff;
+}
+
+.warning {
+  background: #5a3d12;
+  color: #ffe9c7;
+}
+
+.error {
+  background: #5a1a1a;
+  color: #ffd9d9;
+}

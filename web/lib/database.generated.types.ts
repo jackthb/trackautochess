@@ -16,6 +16,30 @@ export type Database = {
   }
   public: {
     Tables: {
+      site_status: {
+        Row: {
+          active: boolean
+          id: number
+          level: string
+          message: string | null
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          id?: number
+          level?: string
+          message?: string | null
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          id?: number
+          level?: string
+          message?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       lineup_snapshots: {
         Row: {
           captured_at: string | null
