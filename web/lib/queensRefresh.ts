@@ -51,15 +51,15 @@ async function runQueensRefresh(
   }
 
   const hasNeverFetchedRow = rows.some((row) => !row.drodo_last_fetched_at);
-  let newestFetchMs = -Infinity;
+  let oldestFetchMs = Infinity;
   for (const row of rows) {
     if (!row.drodo_last_fetched_at) continue;
     const fetchedMs = new Date(row.drodo_last_fetched_at).getTime();
-    if (Number.isFinite(fetchedMs) && fetchedMs > newestFetchMs) {
-      newestFetchMs = fetchedMs;
+    if (Number.isFinite(fetchedMs) && fetchedMs < oldestFetchMs) {
+      oldestFetchMs = fetchedMs;
     }
   }
-  if (!hasNeverFetchedRow && Date.now() - newestFetchMs < floorMs) {
+  if (!hasNeverFetchedRow && Date.now() - oldestFetchMs < floorMs) {
     return { polled: 0, ok: 0, missing: 0, upstream_error: 0 };
   }
 

@@ -1,0 +1,164 @@
+.shell {
+  width: min(1180px, calc(100vw - 32px));
+  margin: 0 auto;
+  padding: 36px 0 56px;
+}
+
+.header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 24px;
+}
+
+.header h1 {
+  margin: 0 0 8px;
+  font-size: 34px;
+  line-height: 1.1;
+}
+
+.header p,
+.header span,
+.note {
+  margin: 0;
+  color: var(--text-muted);
+}
+
+.header span {
+  font-family: var(--font-mono);
+  font-size: 12px;
+}
+
+.metrics {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.metric,
+.panel {
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-surface);
+  border-radius: var(--r-4);
+}
+
+.metric {
+  padding: 16px;
+}
+
+.metric span,
+.panel h2,
+.row:first-child,
+.list dt {
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.metric strong {
+  display: block;
+  margin-top: 10px;
+  color: var(--text-primary);
+  font-size: 28px;
+  line-height: 1;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.panel {
+  padding: 18px;
+}
+
+.panel h2 {
+  margin: 0 0 14px;
+}
+
+.table {
+  display: grid;
+  gap: 1px;
+  overflow: hidden;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--r-4);
+}
+
+.row {
+  display: grid;
+  grid-template-columns: minmax(130px, 1fr) 96px 96px;
+  gap: 12px;
+  align-items: center;
+  padding: 10px 12px;
+  background: var(--bg);
+}
+
+.row span:nth-child(n + 2) {
+  text-align: right;
+  font-family: var(--font-mono);
+}
+
+.list {
+  display: grid;
+  gap: 1px;
+  margin: 0;
+  overflow: hidden;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--r-4);
+}
+
+.list div {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 11px 12px;
+  background: var(--bg);
+}
+
+.list dt,
+.list dd {
+  margin: 0;
+}
+
+.list dd {
+  text-align: right;
+  font-family: var(--font-mono);
+}
+
+.list small {
+  color: var(--text-muted);
+}
+
+.note {
+  margin-bottom: 12px;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+@media (max-width: 820px) {
+  .shell {
+    width: min(100vw - 24px, 680px);
+    padding-top: 24px;
+  }
+
+  .header,
+  .list div {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .metrics,
+  .grid {
+    grid-template-columns: 1fr;
+  }
+
+  .row {
+    grid-template-columns: minmax(100px, 1fr) 80px 70px;
+  }
+}

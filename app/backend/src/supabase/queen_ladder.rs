@@ -33,9 +33,6 @@ impl SupabaseClient {
                 "queen_ladder_last_seen_at".to_owned(),
                 json!(seen_at.clone()),
             );
-            row.insert("drodo_last_fetched_at".to_owned(), json!(seen_at));
-            row.insert("next_poll_at".to_owned(), json!(next_drodo_poll_at(600)));
-            row.insert("poll_interval_seconds".to_owned(), json!(600));
             if let Some(name) = player
                 .name
                 .as_deref()

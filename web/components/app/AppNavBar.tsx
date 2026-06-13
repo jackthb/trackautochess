@@ -21,6 +21,7 @@ const t = {
   queens: "Queens",
   matches: "Matches",
   creators: "Creators",
+  usage: "Usage",
   patchNotes: "Patch Notes",
   cms: "Admin CMS",
   signOut: "Sign out",
@@ -162,6 +163,11 @@ export function AppNavBar({ supabase }: AppNavBarProps) {
       {isAdmin && (
         <Link href="/creators" className={styles.navLink} prefetch={false} onClick={() => trackNavClick("creators")}>
           {t.creators}
+        </Link>
+      )}
+      {isAdmin && (
+        <Link href="/dashboard/usage" className={styles.navLink} prefetch={false} onClick={() => trackNavClick("usage")}>
+          {t.usage}
         </Link>
       )}
       <Link href="/patch-notes" className={styles.navLink} prefetch={false} onClick={() => trackNavClick("patch_notes")}>

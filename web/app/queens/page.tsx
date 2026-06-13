@@ -24,10 +24,8 @@ import {
 import { mostRecentTimestamp } from "@/lib/timestamps";
 import { canonicalCreatorStreamUrl, loadCreatorLiveStreams } from "@/lib/creators";
 import styles from "./queens.module.css";
-import { LastSyncedTime } from "./LastSyncedTime";
 import { NextRefreshTime } from "./NextRefreshTime";
 import { QueensAutoRefresh } from "./QueensAutoRefresh";
-import { RelativeAge } from "./RelativeAge";
 
 interface QueenRow extends BaseQueenRow {
   move?: QueenMove | null;
@@ -345,10 +343,8 @@ export default async function QueensPage() {
       <QueensAutoRefresh />
       <p className={styles.lead}>
         Known Queen players{season ? ` for ${season.replace(/_/g, " ").toUpperCase()}` : ""}.
-        A page load can refresh the visible set once every 5 minutes; between
-        refresh windows the table shows the last cached Drodo profile data.
-        Profile ranks win over older ladder captures, and ladder rows fill gaps
-        until Drodo has been refreshed.
+        Opening this page updates the visible profiles when the 5-minute cooldown
+        has elapsed. Between updates the table shows cached Drodo profile data.
       </p>
 
       {error ? (
@@ -358,15 +354,11 @@ export default async function QueensPage() {
       ) : (
         <>
           <div className={styles["snapshot-meta"]}>
-            <span>Last profile refresh</span>
-            <LastSyncedTime value={lastUpdatedAt} />
-            <span>Next refresh</span>
+            <span>Next update</span>
             <NextRefreshTime
-              latestFetchedAt={lastUpdatedAt}
+              latestFetchedAt={oldestUpdatedAt ?? lastUpdatedAt}
               cooldownMs={QUEENS_VIEW_REFRESH_COOLDOWN_MS}
             />
-            <span>Oldest profile</span>
-            <RelativeAge value={oldestUpdatedAt} />
           </div>
           <div className={`${styles.table} ${styles["queen-table"]}`} role="table">
             <div className={`${styles.row} ${styles["header-row"]}`}>
