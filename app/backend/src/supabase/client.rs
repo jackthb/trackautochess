@@ -216,6 +216,19 @@ impl SupabaseClient {
         }
     }
 
+    pub(super) fn delete_rows(&self, path: &str) -> Result<(), String> {
+        let response = ureq::request("DELETE", &format!("{}{}", self.url, path))
+            .set("apikey", &self.key)
+            .set("Authorization", &format!("Bearer {}", self.key))
+            .set("Prefer", "return=minimal")
+            .call();
+        match response {
+            Ok(resp) if (200..300).contains(&resp.status()) => Ok(()),
+            Ok(resp) => Err(format!("Supabase returned HTTP {}", resp.status())),
+            Err(err) => Err(describe_ureq_error(err)),
+        }
+    }
+
     pub(super) fn get_json(&self, path: &str) -> Result<Value, String> {
         let response = ureq::get(&format!("{}{}", self.url, path))
             .set("apikey", &self.key)

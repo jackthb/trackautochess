@@ -159,6 +159,51 @@ mod tests {
     }
 
     #[test]
+    fn same_game_window_emits_postgrest_safe_utc_bounds() {
+        // now_iso_utc() emits a +00:00 offset; the window must come back
+        // Z-suffixed or PostgREST reads the '+' as a space and the filter 400s.
+        let (start, end) = same_game_window("2026-06-11T14:42:16+00:00").expect("window");
+        assert_eq!(start, "2026-06-11T14:12:16Z");
+        assert_eq!(end, "2026-06-11T15:12:16Z");
+        assert!(same_game_window("not-a-timestamp").is_none());
+    }
+
+    #[test]
+    fn steam_id_sets_match_between_fallback_rows_and_end_board_players() {
+        // The supersede check compares the fallback roster against the
+        // end-board roster; both must reduce to the same steam_id set.
+        let players = vec![
+            json!({"steam_id": 76561198000000002u64, "placement": 1}),
+            json!({"steam_id": 76561198000000001u64, "placement": 2}),
+            json!({"placement": 3}),
+        ];
+        let id_row = |slot: u32, steam_id: u64| NettableRow {
+            table_name: "CustomNetTable_player_id_table".to_owned(),
+            key: format!("player_{slot}"),
+            raw: crate::nettable_parser::Value::Object(
+                [(
+                    "steam_id".to_owned(),
+                    crate::nettable_parser::Value::U64(steam_id),
+                )]
+                .into_iter()
+                .collect(),
+            ),
+            observed_at: None,
+            match_started_at: None,
+        };
+        let rows = vec![
+            id_row(1, 76561198000000002),
+            id_row(2, 76561198000000001),
+        ];
+        let expected: std::collections::BTreeSet<u64> =
+            [76561198000000001u64, 76561198000000002u64]
+                .into_iter()
+                .collect();
+        assert_eq!(player_steam_id_set(&players), expected);
+        assert_eq!(rows_steam_id_set(&rows), expected);
+    }
+
+    #[test]
     fn unify_row_keys_pads_ragged_rows_with_nulls() {
         let rows = vec![
             serde_json::json!({"steam_id": 1, "placement": 1, "relic": "doubloon"}),

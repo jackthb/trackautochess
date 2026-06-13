@@ -2,11 +2,20 @@ use super::{now_iso_utc, parse_valid_steam_id64, SupabaseClient};
 use crate::{nettable_parser::NettableRow, unit_codes::normalize_chess_lineup};
 use serde_json::{json, Value};
 use sha2::{Digest, Sha256};
-use std::collections::HashSet;
+use std::collections::{BTreeSet, HashSet};
 
 /// Solo lobbies (practice/bot games with no other humans) are not real
 /// matches; require at least one opponent before recording anything.
 pub(super) const MIN_TRACKED_PLAYERS: usize = 2;
+
+/// Two matches with an identical player set whose played_at timestamps fall
+/// within this window are the same game captured twice: the fallback and
+/// end-board paths hash different fields into match_id, so a fallback that
+/// fires near an end-board upload records the game under a second id (the
+/// 2026-06-11 duplicate incident). Kept narrow so a premade lobby replaying
+/// with the same roster is never mistaken for a duplicate — a full game
+/// cannot start and finish inside this window.
+pub(super) const SAME_GAME_WINDOW_MINUTES: i64 = 30;
 
 impl SupabaseClient {
     pub fn upload_finished_match_from_rows(
@@ -70,9 +79,21 @@ impl SupabaseClient {
         rows: &[NettableRow],
         reason: &str,
     ) -> Result<Option<String>, String> {
-        let Some(match_row) = build_fallback_match_row(rows, reason, &now_iso_utc()) else {
+        let played_at = now_iso_utc();
+        let Some(match_row) = build_fallback_match_row(rows, reason, &played_at) else {
             return Ok(None);
         };
+        // The fallback match_id is salted with the upload time, so retriggering
+        // (manual finalize after the end board already landed, a second flush
+        // after a daemon restart) would record the same game under a new id.
+        // If any match with this exact player set exists in the same-game
+        // window, report that one instead of uploading a duplicate.
+        let steam_ids = rows_steam_id_set(rows);
+        if let Ok(existing) = self.find_same_game_match_ids(&steam_ids, &played_at, None, None) {
+            if let Some(existing_id) = existing.into_iter().next() {
+                return Ok(Some(existing_id));
+            }
+        }
         let match_id = match_row
             .get("match_id")
             .and_then(Value::as_str)
@@ -123,11 +144,99 @@ impl SupabaseClient {
             self.ensure_match_player_users(&players)?;
             self.post_json(
                 "/rest/v1/match_players?on_conflict=match_id,steam_id",
-                &Value::Array(players),
+                &Value::Array(players.clone()),
                 "resolution=merge-duplicates,return=minimal",
             )?;
         }
+        // A fallback upload that fired moments before this complete capture
+        // recorded the same game under a different content-hash id; the
+        // complete row supersedes it. Cleanup failure must not fail the
+        // upload (an outbox retry would then re-post the whole match).
+        let played_at = upload
+            .match_row
+            .get("played_at")
+            .and_then(Value::as_str)
+            .unwrap_or_default();
+        if let Err(err) =
+            self.supersede_partial_matches(&match_id, &player_steam_id_set(&players), played_at)
+        {
+            eprintln!("superseding partial duplicates of {match_id} failed: {err}");
+        }
         Ok(Some(match_id))
+    }
+
+    /// Delete recent `capture_status=partial` matches that captured the same
+    /// game as the freshly uploaded complete match (identical player set,
+    /// played_at inside the same-game window).
+    fn supersede_partial_matches(
+        &self,
+        match_id: &str,
+        steam_ids: &BTreeSet<u64>,
+        played_at: &str,
+    ) -> Result<(), String> {
+        for partial in
+            self.find_same_game_match_ids(steam_ids, played_at, Some("partial"), Some(match_id))?
+        {
+            self.delete_rows(&format!("/rest/v1/match_players?match_id=eq.{partial}"))?;
+            self.delete_rows(&format!("/rest/v1/match_timelines?match_id=eq.{partial}"))?;
+            self.delete_rows(&format!("/rest/v1/matches?match_id=eq.{partial}"))?;
+        }
+        Ok(())
+    }
+
+    /// Match ids whose played_at lies within the same-game window of
+    /// `played_at` and whose match_players steam_id set equals `steam_ids`,
+    /// optionally restricted to one capture_status.
+    fn find_same_game_match_ids(
+        &self,
+        steam_ids: &BTreeSet<u64>,
+        played_at: &str,
+        capture_status: Option<&str>,
+        exclude_match_id: Option<&str>,
+    ) -> Result<Vec<String>, String> {
+        if steam_ids.len() < MIN_TRACKED_PLAYERS {
+            return Ok(Vec::new());
+        }
+        let Some((window_start, window_end)) = same_game_window(played_at) else {
+            return Ok(Vec::new());
+        };
+        let mut path = format!(
+            "/rest/v1/matches?select=match_id&played_at=gte.{window_start}&played_at=lte.{window_end}"
+        );
+        if let Some(status) = capture_status {
+            path.push_str(&format!("&capture_status=eq.{status}"));
+        }
+        if let Some(exclude) = exclude_match_id {
+            path.push_str(&format!("&match_id=neq.{exclude}"));
+        }
+        let candidates = self
+            .get_json(&path)?
+            .as_array()
+            .map(|rows| {
+                rows.iter()
+                    .filter_map(|row| row.get("match_id").and_then(Value::as_str))
+                    .map(str::to_owned)
+                    .collect::<Vec<_>>()
+            })
+            .unwrap_or_default();
+        let mut same_game = Vec::new();
+        for candidate in candidates {
+            let candidate_players = self
+                .get_json(&format!(
+                    "/rest/v1/match_players?select=steam_id&match_id=eq.{candidate}"
+                ))?
+                .as_array()
+                .map(|rows| {
+                    rows.iter()
+                        .filter_map(|row| row.get("steam_id").and_then(Value::as_u64))
+                        .collect::<BTreeSet<_>>()
+                })
+                .unwrap_or_default();
+            if candidate_players == *steam_ids {
+                same_game.push(candidate);
+            }
+        }
+        Ok(same_game)
     }
 
     pub(super) fn ensure_match_player_users(&self, players: &[Value]) -> Result<(), String> {
@@ -147,6 +256,34 @@ impl SupabaseClient {
             "resolution=ignore-duplicates,return=minimal",
         )
     }
+}
+
+/// Inclusive played_at bounds for "this is the same game", as PostgREST-safe
+/// UTC timestamps (always `Z`-suffixed — a `+00:00` offset would be eaten as
+/// a space in the query string).
+pub(super) fn same_game_window(played_at: &str) -> Option<(String, String)> {
+    let center = chrono::DateTime::parse_from_rfc3339(played_at)
+        .ok()?
+        .with_timezone(&chrono::Utc);
+    let window = chrono::Duration::minutes(SAME_GAME_WINDOW_MINUTES);
+    let fmt = |at: chrono::DateTime<chrono::Utc>| {
+        at.to_rfc3339_opts(chrono::SecondsFormat::Secs, true)
+    };
+    Some((fmt(center - window), fmt(center + window)))
+}
+
+pub(super) fn player_steam_id_set(players: &[Value]) -> BTreeSet<u64> {
+    players
+        .iter()
+        .filter_map(|player| player.get("steam_id").and_then(Value::as_u64))
+        .collect()
+}
+
+pub(super) fn rows_steam_id_set(rows: &[NettableRow]) -> BTreeSet<u64> {
+    player_id_pairs(rows)
+        .iter()
+        .filter_map(|(steam_id, _)| parse_valid_steam_id64(steam_id))
+        .collect()
 }
 
 pub(super) fn dedupe_match_players(players: Vec<Value>) -> Vec<Value> {
