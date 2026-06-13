@@ -57,14 +57,26 @@ export function TooltipWrap({
   data,
 }: TooltipWrapProps) {
   const [visible, setVisible] = useState(false);
-  const [pos, setPos] = useState({ x: 0, y: 0 });
+  const [pos, setPos] = useState<{
+    x: number;
+    y: number;
+    placement: "above" | "below";
+  }>({ x: 0, y: 0, placement: "above" });
   const timer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   const show = useCallback((e: MouseEvent) => {
     const target = e.currentTarget as HTMLElement;
     timer.current = setTimeout(() => {
       const rect = target.getBoundingClientRect();
-      setPos({ x: rect.left + rect.width / 2, y: rect.top });
+      // The tooltip is tall (stats can run ~240px). When the target sits near
+      // the top of the viewport, flipping it below keeps it on-screen and
+      // readable instead of being clipped above the fold.
+      const placement = rect.top < 260 ? "below" : "above";
+      setPos({
+        x: rect.left + rect.width / 2,
+        y: placement === "below" ? rect.bottom : rect.top,
+        placement,
+      });
       setVisible(true);
     }, 200);
   }, []);
@@ -92,8 +104,12 @@ export function TooltipWrap({
             className="tooltip visible"
             style={{
               left: Math.max(4, Math.min(pos.x - 160, window.innerWidth - 324)),
-              top: Math.max(4, pos.y - 8),
-              transform: "translateY(-100%)",
+              top:
+                pos.placement === "below"
+                  ? pos.y + 8
+                  : Math.max(4, pos.y - 8),
+              transform:
+                pos.placement === "below" ? undefined : "translateY(-100%)",
             }}
           >
             {content}

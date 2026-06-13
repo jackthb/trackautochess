@@ -21,8 +21,9 @@ export interface MmrPoint {
 
 interface MmrSparklineProps {
   /**
-   * Per-season historical MMR (S41, S42…). Used as anchors so the graph
-   * renders something even before snapshots accumulate.
+   * Per-season historical MMR (S41, S42…). No longer plotted — season
+   * summaries aren't a time series. Kept on the props for call-site compat;
+   * the season grid below the chart presents this data properly.
    */
   seasons?: MmrSeasonAnchor[];
   /** Snapshot points captured each time the user refreshed Drodo. */
@@ -30,21 +31,18 @@ interface MmrSparklineProps {
 }
 
 const WIDTH = 560;
-const HEIGHT = 120;
+const HEIGHT = 132;
 const PAD_X = 8;
-const PAD_Y = 12;
+const PAD_Y = 22;
 
-function buildPoints(
-  seasons: MmrSeasonAnchor[],
-  snapshots: MmrSnapshot[]
-): MmrPoint[] {
-  const seasonPoints: MmrPoint[] = seasons
-    .filter((s): s is MmrSeasonAnchor & { mmr: number } => typeof s.mmr === "number")
-    .slice()
-    .sort((a, b) => a.season.localeCompare(b.season))
-    .map((s) => ({ mmr: s.mmr, label: s.season.toUpperCase(), kind: "season" }));
-
-  const snapshotPoints: MmrPoint[] = snapshots
+/**
+ * Build the plotted series — a *tracked* MMR timeline of refresh snapshots,
+ * starting at the first one we ever recorded. Returns the points only when
+ * there are at least two; the caller shows a "not enough data" state below
+ * that threshold rather than inventing a line from season summaries.
+ */
+function buildPoints(snapshots: MmrSnapshot[]): MmrPoint[] {
+  return snapshots
     .filter((s): s is MmrSnapshot & { mmr: number } => typeof s.mmr === "number")
     .slice()
     .sort(
@@ -57,25 +55,39 @@ function buildPoints(
       label: formatIsoDateLabel(s.snapshotted_at),
       kind: "snapshot",
     }));
-
-  // The newest season anchor is the season currently in progress, which the
-  // snapshot series already covers — keeping it doubles the current MMR and
-  // kinks the line where anchors meet snapshots.
-  const anchorPoints =
-    snapshotPoints.length > 0 ? seasonPoints.slice(0, -1) : seasonPoints;
-
-  return [...anchorPoints, ...snapshotPoints];
 }
 
-export function MmrSparkline({ seasons = [], snapshots = [] }: MmrSparklineProps) {
-  const points = useMemo(() => buildPoints(seasons, snapshots), [seasons, snapshots]);
+/** Where to anchor a value label so it never spills past the chart edges. */
+function anchorFor(x: number): "start" | "middle" | "end" {
+  if (x < 48) return "start";
+  if (x > WIDTH - 48) return "end";
+  return "middle";
+}
 
-  if (points.length < 2) return null;
+export function MmrSparkline({ snapshots = [] }: MmrSparklineProps) {
+  const points = useMemo(() => buildPoints(snapshots), [snapshots]);
+
+  // Need at least two tracked snapshots to draw a line. Below that, say so
+  // plainly rather than padding the chart with season summaries.
+  if (points.length < 2) {
+    return (
+      <section className={styles.wrap} aria-label="MMR history">
+        <div className={styles.head}>
+          <span className={styles.label}>MMR History</span>
+        </div>
+        <p className={styles.empty}>
+          Not enough tracked data yet. A timeline builds up each time this
+          profile is refreshed.
+        </p>
+      </section>
+    );
+  }
 
   const mmrs = points.map((p) => p.mmr);
   const minMmr = Math.min(...mmrs);
   const maxMmr = Math.max(...mmrs);
   const range = maxMmr - minMmr || 1;
+  const hasSpread = maxMmr > minMmr;
 
   const innerW = WIDTH - PAD_X * 2;
   const innerH = HEIGHT - PAD_Y * 2;
@@ -87,23 +99,31 @@ export function MmrSparkline({ seasons = [], snapshots = [] }: MmrSparklineProps
   });
 
   const polylinePoints = coords.map((c) => `${c.x},${c.y}`).join(" ");
-  const last = coords[coords.length - 1];
   const first = coords[0];
+  const last = coords[coords.length - 1];
+  const lastIdx = coords.length - 1;
 
-  const seasonCount = points.filter((p) => p.kind === "season").length;
-  const snapshotCount = points.length - seasonCount;
-  const metaParts: string[] = [];
-  if (seasonCount > 0) metaParts.push(`${seasonCount} season${seasonCount === 1 ? "" : "s"}`);
-  if (snapshotCount > 0) metaParts.push(`${snapshotCount} snapshot${snapshotCount === 1 ? "" : "s"}`);
+  // Peak / trough = first occurrence of the max / min MMR across the series.
+  let peakIdx = 0;
+  let troughIdx = 0;
+  points.forEach((p, i) => {
+    if (p.mmr > points[peakIdx].mmr) peakIdx = i;
+    if (p.mmr < points[troughIdx].mmr) troughIdx = i;
+  });
+  const peak = coords[peakIdx];
+  const trough = coords[troughIdx];
+
+  const metaParts: string[] = [
+    `${points.length} tracked point${points.length === 1 ? "" : "s"}`,
+    `peak ${maxMmr}`,
+    `low ${minMmr}`,
+  ];
 
   return (
     <section className={styles.wrap} aria-label="MMR history">
       <div className={styles.head}>
         <span className={styles.label}>MMR History</span>
-        <span className={styles.meta}>
-          {metaParts.join(" · ")} · range{" "}
-          <strong>{minMmr}</strong>–<strong>{maxMmr}</strong>
-        </span>
+        <span className={styles.meta}>{metaParts.join(" · ")}</span>
       </div>
       <div className={styles.chartWrap}>
         <svg
@@ -116,31 +136,74 @@ export function MmrSparkline({ seasons = [], snapshots = [] }: MmrSparklineProps
             points={`${first.x},${HEIGHT - PAD_Y} ${polylinePoints} ${last.x},${HEIGHT - PAD_Y}`}
           />
           <polyline className={styles.line} points={polylinePoints} />
-          {coords.slice(0, -1).map((c, i) => (
-            <circle
-              key={i}
-              className={`${styles.dot}${c.kind === "season" ? ` ${styles.season}` : ""}`}
-              cx={c.x}
-              cy={c.y}
-              r={c.kind === "season" ? 2.5 : 1.8}
-            />
+
+          {coords.map((c, i) => (
+            <circle key={i} className={styles.dot} cx={c.x} cy={c.y} r={1.8} />
           ))}
+
+          {/* Trough (low) marker + value, when there's any spread to show. */}
+          {hasSpread && (
+            <>
+              <circle className={styles.troughDot} cx={trough.x} cy={trough.y} r={3} />
+              {troughIdx > 0 && troughIdx < lastIdx && (
+                <text
+                  className={`${styles.axis} ${styles.troughLabel}`}
+                  x={trough.x}
+                  y={trough.y + 13}
+                  textAnchor={anchorFor(trough.x)}
+                >
+                  {minMmr}
+                </text>
+              )}
+            </>
+          )}
+
+          {/* Peak (high) marker + value. */}
+          {hasSpread && (
+            <>
+              <circle className={styles.peakDot} cx={peak.x} cy={peak.y} r={3} />
+              {peakIdx > 0 && peakIdx < lastIdx && (
+                <text
+                  className={`${styles.axis} ${styles.peakLabel}`}
+                  x={peak.x}
+                  y={peak.y - 7}
+                  textAnchor={anchorFor(peak.x)}
+                >
+                  {maxMmr}
+                </text>
+              )}
+            </>
+          )}
+
+          {/* First tracked point — flagged so it's clear the line starts where
+              tracking began, not where the player's MMR journey did. */}
+          <circle className={styles.firstDot} cx={first.x} cy={first.y} r={3} />
+          <text
+            className={`${styles.axis} ${styles.firstLabel}`}
+            x={PAD_X}
+            y={11}
+          >
+            First tracked
+          </text>
+
+          {/* Current value. */}
           <circle className={styles.lastDot} cx={last.x} cy={last.y} r={2.8} />
           <text
             className={styles.axis}
             x={last.x - 4}
-            y={last.y - 6}
+            y={last.y - 7}
             textAnchor="end"
           >
             {last.mmr}
           </text>
-          <text className={styles.axis} x={PAD_X} y={HEIGHT - 2}>
+
+          <text className={styles.axis} x={PAD_X} y={HEIGHT - 4}>
             {first.label}
           </text>
           <text
             className={styles.axis}
             x={WIDTH - PAD_X}
-            y={HEIGHT - 2}
+            y={HEIGHT - 4}
             textAnchor="end"
           >
             {last.label}
@@ -148,9 +211,8 @@ export function MmrSparkline({ seasons = [], snapshots = [] }: MmrSparklineProps
         </svg>
       </div>
       <p className={styles.note}>
-        Season anchors come from your end-of-season MMR. New points are added
-        each time you refresh this profile, with a shorter cooldown when it is
-        your signed-in Steam account.
+        This timeline begins at the first MMR we tracked — not your all-time
+        start. New points are added each time the profile is refreshed.
       </p>
     </section>
   );

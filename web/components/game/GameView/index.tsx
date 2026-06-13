@@ -46,6 +46,31 @@ const RELICS_DATA = (relicsData as any).relics as Record<string, RelicInfo>;
 const ITEMS_FULL = itemsFullData as Record<string, ItemFullInfo>;
 
 const iconUrl = resolveIconUrl;
+
+// Synergy display-name → ascending tier thresholds (e.g. Beast → [2, 4, 6]).
+const SYNERGY_TIERS_BY_NAME: Record<string, number[]> = (() => {
+  const map: Record<string, number[]> = {};
+  for (const info of Object.values(SYNERGIES_DATA)) {
+    if (info?.name && Array.isArray(info.tiers) && info.tiers.length > 0) {
+      map[info.name] = info.tiers;
+    }
+  }
+  return map;
+})();
+
+/** The active synergy tier for a fielded count — the highest tier threshold
+ *  the count satisfies. Three Beasts (tiers 2/4/6) shows "2", not "3": the
+ *  badge reflects the synergy bonus in play, not the raw unit count. */
+function activeSynergyTier(name: string, count: number): number {
+  const tiers = SYNERGY_TIERS_BY_NAME[name];
+  if (!tiers) return count;
+  let active = tiers[0];
+  for (const t of tiers) {
+    if (count >= t) active = t;
+  }
+  return active;
+}
+
 const MATCH_DATE_FORMATTER = new Intl.DateTimeFormat("en-US", {
   month: "short",
   day: "numeric",
@@ -139,7 +164,6 @@ function formatMatchDateTime(value: string | null | undefined): {
  *  the same snap-aware arrays power both the compact view and this panel. */
 function PlayerDetail({
   lineup,
-  synergies,
   relicsToShow,
   hasRelicTimeline,
   tooltipData,
@@ -152,7 +176,6 @@ function PlayerDetail({
   lineup: { name: string; stars: number }[];
   lineupStr: string | null;
   hand: { name: string; stars: number }[];
-  synergies: { name: string; count: number }[];
   relicsToShow: RelicTimelineEntry[];
   hasRelicTimeline: boolean;
   tooltipData: TooltipData;
@@ -172,6 +195,9 @@ function PlayerDetail({
         <div className={styles.pdSection}>
           <div className={styles.pdLabel}>BOARD</div>
           <div className={styles.pdBoard}>
+            {/* No tooltipData here: hovering a board piece shows only its
+                items, not the unit stat card (which collides with the item
+                popover). */}
             <ChessBoard
               board={board}
               lineup={lineupStr}
@@ -181,77 +207,13 @@ function PlayerDetail({
               unitCosts={UNIT_COSTS}
               iconUrl={iconUrl}
               itemsFull={ITEMS_FULL}
-              tooltipData={tooltipData}
             />
           </div>
         </div>
       )}
-      {lineup.length > 0 && (
-        <div className={styles.pdSection}>
-          <div className={styles.pdLabel}>Lineup</div>
-          <div className={styles.pdLineup}>
-            {lineup.map((u, i) => (
-              <TooltipWrap
-                key={i}
-                type="unit"
-                name={u.name}
-                stars={u.stars}
-                data={tooltipData}
-              >
-                <div className={`unit-icon-wrap ${styles.pdUnit}`}>
-                  <img
-                    className="unit-icon"
-                    src={iconUrl("units", unitStem(u.name))}
-                    alt={u.name}
-                    loading="lazy"
-                    style={{
-                      borderColor: costBorderColor(UNIT_COSTS[u.name] || 1),
-                    }}
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).style.display = "none";
-                    }}
-                  />
-                  {u.stars > 1 && (
-                    <span className={`unit-stars s${u.stars}`}>
-                      {"★".repeat(u.stars)}
-                    </span>
-                  )}
-                </div>
-              </TooltipWrap>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {synergies.length > 0 && (
-        <div className={styles.pdSection}>
-          <div className={styles.pdLabel}>Synergies</div>
-          <div className={styles.pdSynergies}>
-            {synergies.map((s, i) => (
-              <TooltipWrap
-                key={i}
-                type="synergy"
-                name={s.name}
-                count={s.count}
-                data={tooltipData}
-              >
-                <div className={`syn-badge ${styles.pdSynBadge}`}>
-                  <img
-                    className="syn-icon"
-                    src={iconUrl("synergies", synIconName(s.name))}
-                    alt={s.name}
-                    loading="lazy"
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).style.display = "none";
-                    }}
-                  />
-                  <span className="syn-count">{s.count}</span>
-                </div>
-              </TooltipWrap>
-            ))}
-          </div>
-        </div>
-      )}
+      {/* Lineup + synergies intentionally omitted here: the board above
+          already shows every fielded unit (with items), and the compact row
+          shows the active synergies. Repeating them below was redundant. */}
 
       {relicsToShow.length > 0 && (
         <div className={styles.pdSection}>
@@ -301,7 +263,6 @@ function MatchPlayerRow({
   onToggle,
   relicTimeline,
   snap,
-  prevSnap,
   snapRound,
   isLastRound,
   displayPosition,
@@ -315,7 +276,6 @@ function MatchPlayerRow({
   onToggle: () => void;
   relicTimeline: RelicTimelineEntry[] | undefined;
   snap: TimelinePlayerSnap | null;
-  prevSnap: TimelinePlayerSnap | null;
   snapRound: number | null;
   isLastRound: boolean;
   displayPosition: number | null;
@@ -400,18 +360,6 @@ function MatchPlayerRow({
       ? mmrLevelToRank(snap.mmr_level)
       : null);
 
-  const roundResult =
-    snap && prevSnap && snapRound !== null
-      ? (() => {
-          const eliminated = snap.hp === 0 && (prevSnap.hp ?? 0) > 0;
-          const won = (snap.win_round ?? 0) > (prevSnap.win_round ?? 0);
-          const lost = (snap.lose_round ?? 0) > (prevSnap.lose_round ?? 0);
-          if (eliminated) return "out" as const;
-          if (won) return "w" as const;
-          if (lost) return "l" as const;
-          return "d" as const;
-        })()
-      : null;
   const visibleDeathRound =
     deathRound != null && (snapRound == null || snapRound >= deathRound)
       ? deathRound
@@ -512,39 +460,19 @@ function MatchPlayerRow({
                       (e.target as HTMLImageElement).style.display = "none";
                     }}
                   />
-                  <span className="syn-count">{s.count}</span>
+                  <span className="syn-count">
+                    {activeSynergyTier(s.name, s.count)}
+                  </span>
                 </div>
               </TooltipWrap>
             ))}
           </div>
         )}
       </div>
-      {roundResult && (
-        <span
-          className={
-            styles.mpRoundResult +
-            " " +
-            (roundResult === "out"
-              ? styles.mpRoundOut
-              : roundResult === "w"
-                ? styles.mpRoundW
-                : roundResult === "l"
-                  ? styles.mpRoundL
-                  : styles.mpRoundD)
-          }
-        >
-          {roundResult === "out"
-            ? visibleDeathRound != null
-              ? `Out R${visibleDeathRound}`
-              : "Out"
-            : roundResult === "w"
-              ? "Won"
-              : roundResult === "l"
-                ? "Lost"
-                : "Draw"}
-        </span>
-      )}
-      {!roundResult && visibleDeathRound != null && (
+      {/* Per-round win/loss/draw label removed: the game's win/lose_round
+          capture is unreliable and routinely disagreed with reality. Death
+          (derived from the HP timeline) is accurate, so it stays. */}
+      {visibleDeathRound != null && (
         <span className={`${styles.mpRoundResult} ${styles.mpDeathRound}`}>
           Died R{visibleDeathRound}
         </span>
@@ -586,7 +514,6 @@ function MatchPlayerRow({
       {isOpen && (
         <PlayerDetail
           lineup={lineup}
-          synergies={synergies}
           relicsToShow={compactRelics}
           hasRelicTimeline={hasRelicTimeline}
           tooltipData={tooltipData}
@@ -825,10 +752,6 @@ export default function GameView({
               </span>
             </div>
             {playerRows.map((g, rowIdx) => {
-              const prevRound: TimelineRound | null =
-                hasTimeline && selectedRoundIdx > 0
-                  ? (timeline!.rounds[selectedRoundIdx - 1] ?? null)
-                  : null;
               return (
                 <MatchPlayerRow
                   key={g.id}
@@ -844,7 +767,6 @@ export default function GameView({
                   onToggle={() => toggleExpand(g.id)}
                   relicTimeline={relicTimelines[String(g.user_id)]}
                   snap={currentSnap?.players?.[String(g.user_id)] ?? null}
-                  prevSnap={prevRound?.players?.[String(g.user_id)] ?? null}
                   snapRound={selectedRound}
                   isLastRound={isLastRound}
                   displayPosition={
