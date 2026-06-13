@@ -7,7 +7,7 @@ const TICK_MS = 1000;
 
 function formatRemaining(ms: number): string {
   const seconds = Math.ceil(ms / 1000);
-  if (seconds <= 0) return "ready now";
+  if (seconds <= 0) return "updating";
   const minutes = Math.floor(seconds / 60);
   const rest = seconds % 60;
   if (minutes <= 0) return `${rest}s`;
@@ -32,7 +32,7 @@ export function NextRefreshTime({
   const latestFetchedMs = latestFetchedAt ? new Date(latestFetchedAt).getTime() : NaN;
   if (nowMs == null) return <strong>...</strong>;
   if (!Number.isFinite(latestFetchedMs)) {
-    return <strong className={styles["refresh-ready"]}>ready now</strong>;
+    return <strong className={styles["refresh-ready"]}>updating</strong>;
   }
 
   const availableAtMs = latestFetchedMs + cooldownMs;

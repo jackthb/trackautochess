@@ -12,6 +12,7 @@ export interface QueensRefreshSummary {
 
 interface RefreshOptions {
   floorMs?: number;
+  lockTtlMs?: number;
   onQueenChange?: () => void;
 }
 
@@ -39,9 +40,6 @@ async function runQueensRefresh(
   options: RefreshOptions
 ): Promise<QueensRefreshSummary> {
   const floorMs = options.floorMs ?? QUEENS_REFRESH_COOLDOWN_MS;
-  if (!(await claimRefreshLease(supabase, floorMs))) {
-    return { polled: 0, ok: 0, missing: 0, upstream_error: 0 };
-  }
 
   // Match /queens exactly: same candidate query, ordering, tiebreakers,
   // dedupe, and visible-table cap. If a row is displayed, this can refresh it.
@@ -60,6 +58,10 @@ async function runQueensRefresh(
     }
   }
   if (!hasNeverFetchedRow && Date.now() - oldestFetchMs < floorMs) {
+    return { polled: 0, ok: 0, missing: 0, upstream_error: 0 };
+  }
+
+  if (!(await claimRefreshLease(supabase, options.lockTtlMs ?? floorMs))) {
     return { polled: 0, ok: 0, missing: 0, upstream_error: 0 };
   }
 

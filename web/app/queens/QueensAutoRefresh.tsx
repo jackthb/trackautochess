@@ -3,10 +3,6 @@
 import { useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 
-// Keep an open tab in step with the visitor-scoped server refresh without
-// re-pinging on every quick tab flip.
-const PING_COOLDOWN_MS = 5 * 60 * 1000;
-const PING_COOLDOWN_KEY = "dac:queens-refresh-last-ping";
 const MIN_RETRY_MS = 30 * 1000;
 
 // /queens is ISR'd: the server rebuilds it the moment a Queen's stats change,
@@ -22,7 +18,6 @@ export function QueensAutoRefresh({
   cooldownMs: number;
 }) {
   const router = useRouter();
-  const lastPingAtRef = useRef(0);
   const pingInFlightRef = useRef(false);
 
   useEffect(() => {
@@ -41,26 +36,6 @@ export function QueensAutoRefresh({
       return Math.max(0, latestFetchedMs + cooldownMs - Date.now());
     };
 
-    const sharedLastPingAt = () => {
-      try {
-        const stored = window.localStorage.getItem(PING_COOLDOWN_KEY);
-        const parsed = stored ? Number(stored) : NaN;
-        return Number.isFinite(parsed) ? parsed : 0;
-      } catch {
-        return lastPingAtRef.current;
-      }
-    };
-
-    const setSharedLastPingAt = (value: number) => {
-      lastPingAtRef.current = value;
-      try {
-        window.localStorage.setItem(PING_COOLDOWN_KEY, String(value));
-      } catch {
-        // Storage can be unavailable in privacy modes or embedded webviews;
-        // the in-memory ref still throttles this tab.
-      }
-    };
-
     const scheduleNext = (fallbackMs = MIN_RETRY_MS) => {
       clearTimer();
       if (document.visibilityState !== "visible") return;
@@ -72,20 +47,16 @@ export function QueensAutoRefresh({
 
     const pingStaleRefresh = async () => {
       if (pingInFlightRef.current) return;
-      const lastPingAt = Math.max(lastPingAtRef.current, sharedLastPingAt());
-      const sharedCooldownRemaining = PING_COOLDOWN_MS - (Date.now() - lastPingAt);
-      if (sharedCooldownRemaining > 0 || nextDelayMs() > 0) {
-        scheduleNext(Math.max(MIN_RETRY_MS, sharedCooldownRemaining));
+      if (nextDelayMs() > 0) {
+        scheduleNext();
         return;
       }
       pingInFlightRef.current = true;
-      setSharedLastPingAt(Date.now());
       try {
         const resp = await fetch("/api/queens/refresh", { method: "POST" });
         if (disposed) return;
         if (resp.status === 429) {
-          setSharedLastPingAt(Date.now());
-          scheduleNext(PING_COOLDOWN_MS);
+          scheduleNext(MIN_RETRY_MS);
           return;
         }
         if (!resp.ok) {
