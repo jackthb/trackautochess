@@ -6,14 +6,14 @@ import { createSupabaseServiceRoleClient } from "@/lib/supabase";
 
 const DEFAULT_POLL_BATCH_SIZE = 200;
 const RECENT_SIGN_IN_WINDOW_MS = 14 * 24 * 60 * 60 * 1000;
-const GENERAL_SCAN_INTERVAL_MS = 24 * 60 * 60 * 1000;
-const GENERAL_SCAN_CANDIDATE_MULTIPLIER = 4;
+const INACTIVE_SCAN_INTERVAL_MS = 7 * 24 * 60 * 60 * 1000;
+const INACTIVE_SCAN_CANDIDATE_MULTIPLIER = 4;
 
 interface DueUser {
   steam_id: string;
 }
 
-interface GeneralScanUser extends DueUser {
+interface InactiveScanUser extends DueUser {
   steam_signed_in_at: string | null;
   queen_ladder_rank: number | null;
   queen_ladder_last_seen_at: string | null;
@@ -28,7 +28,7 @@ function pollBatchSize(): number {
 }
 
 function isActiveSyncUser(
-  user: GeneralScanUser,
+  user: InactiveScanUser,
   recentSignInCutoff: string
 ): boolean {
   return (
@@ -59,8 +59,8 @@ async function handle(req: Request) {
   const recentSignInCutoff = new Date(
     now.getTime() - RECENT_SIGN_IN_WINDOW_MS
   ).toISOString();
-  const generalScanCutoff = new Date(
-    now.getTime() - GENERAL_SCAN_INTERVAL_MS
+  const inactiveScanCutoff = new Date(
+    now.getTime() - INACTIVE_SCAN_INTERVAL_MS
   ).toISOString();
   const activeSyncFilter = [
     `steam_signed_in_at.gte.${recentSignInCutoff}`,
@@ -90,18 +90,18 @@ async function handle(req: Request) {
     .order("steam_signed_in_at", { ascending: false, nullsFirst: false })
     .limit(pollBatchSizeLimit);
 
-  const { data: generalScanUsers, error: generalScanError } = await supabase
+  const { data: inactiveScanUsers, error: inactiveScanError } = await supabase
     .from("users")
     .select(
       "steam_id::text, steam_signed_in_at, queen_ladder_rank, queen_ladder_last_seen_at, poll_interval_seconds"
     )
     .not("drodo_last_fetched_at", "is", null)
-    .lte("drodo_last_fetched_at", generalScanCutoff)
+    .lte("drodo_last_fetched_at", inactiveScanCutoff)
     .order("drodo_last_fetched_at", { ascending: true })
-    .limit(pollBatchSizeLimit * GENERAL_SCAN_CANDIDATE_MULTIPLIER);
+    .limit(pollBatchSizeLimit * INACTIVE_SCAN_CANDIDATE_MULTIPLIER);
 
-  if (generalScanError) {
-    return Response.json({ error: generalScanError.message }, { status: 500 });
+  if (inactiveScanError) {
+    return Response.json({ error: inactiveScanError.message }, { status: 500 });
   }
 
   const ids = ((dueUsers ?? []) as unknown as DueUser[]).map((row) =>
@@ -111,7 +111,7 @@ async function handle(req: Request) {
     .map((row) => String(row.steam_id))
     .filter((id) => !ids.includes(id));
   const alreadyQueued = new Set([...ids, ...seedIds]);
-  const generalIds = ((generalScanUsers ?? []) as unknown as GeneralScanUser[])
+  const inactiveIds = ((inactiveScanUsers ?? []) as unknown as InactiveScanUser[])
     .filter((row) => !isActiveSyncUser(row, recentSignInCutoff))
     .map((row) => String(row.steam_id))
     .filter((id) => {
@@ -165,12 +165,12 @@ async function handle(req: Request) {
     }
   }
 
-  const generalResults = await fetchAndCacheDrodoBatch(generalIds, supabase, {
+  const inactiveResults = await fetchAndCacheDrodoBatch(inactiveIds, supabase, {
     snapshotOnSuccess: true,
     pollMode: "adaptive",
     onQueenChange: revalidateQueenPages,
   });
-  for (const result of generalResults) {
+  for (const result of inactiveResults) {
     if (result.ok) {
       results.push({ steam_id: result.steam_id, outcome: "ok" });
     } else {
@@ -186,7 +186,7 @@ async function handle(req: Request) {
     polled: results.length,
     repolled: ids.length,
     seeded: seedIds.length,
-    general: generalIds.length,
+    inactive_weekly: inactiveIds.length,
     results,
   });
 }

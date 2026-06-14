@@ -102,10 +102,24 @@ Command:
 /opt/cronicle/dac-scripts/poll-drodo-all.sh
 ```
 
-This walks cached non-missing users from oldest `drodo_last_fetched_at` first and
-uses the same adaptive backoff/snapshot logic as the active poller. It defaults
-to up to 10000 users per run (`DRODO_POLL_ALL_BATCH_SIZE`), so it should cover
-everyone daily unless the user table grows past that.
+This walks cached non-missing users from oldest `drodo_last_fetched_at` first,
+but it does not hit every inactive account every day. The daily sweep includes:
+
+- Active users, using the same active-cohort definition as the hourly job.
+- Long-inactive users only when their cached Drodo profile is at least 7 days
+  old.
+
+That gives quiet accounts a weekly refresh cadence instead of wasting daily
+polls on players who have not logged in or changed for ages. It defaults to up
+to 10000 users per run (`DRODO_POLL_ALL_BATCH_SIZE`).
+
+At the start of a new Auto Chess season, run the same script once with
+`--season-sweep` to ignore the weekly inactive gate and check all cached
+non-missing users for fresh season activity:
+
+```bash
+/opt/cronicle/dac-scripts/poll-drodo-all.sh --season-sweep
+```
 
 ## Manual smoke tests
 
@@ -117,6 +131,9 @@ docker compose -f ops/cronicle/docker-compose.yml exec cronicle \
 
 docker compose -f ops/cronicle/docker-compose.yml exec cronicle \
   /opt/cronicle/dac-scripts/poll-drodo-all.sh
+
+docker compose -f ops/cronicle/docker-compose.yml exec cronicle \
+  /opt/cronicle/dac-scripts/poll-drodo-all.sh --season-sweep
 ```
 
 The scripts print a JSON summary and exit non-zero on failure, so Cronicle marks

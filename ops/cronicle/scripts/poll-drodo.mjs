@@ -14,6 +14,7 @@ import {
 const DEFAULT_BATCH_SIZE = 200;
 const DEFAULT_ALL_BATCH_SIZE = 10000;
 const RECENT_SIGN_IN_WINDOW_MS = 14 * 24 * 60 * 60 * 1000;
+const INACTIVE_POLL_INTERVAL_MS = 7 * 24 * 60 * 60 * 1000;
 
 function argValue(name) {
   const prefix = `${name}=`;
@@ -36,6 +37,11 @@ function batchSize(selectedMode) {
     process.env.DRODO_POLL_BATCH_SIZE;
   const parsed = raw ? Number(raw) : fallback;
   return Number.isFinite(parsed) && parsed > 0 ? Math.floor(parsed) : fallback;
+}
+
+function flagEnabled(name, envName) {
+  const raw = argValue(name) ?? process.env[envName] ?? "false";
+  return ["1", "true", "yes", "on"].includes(String(raw).toLowerCase());
 }
 
 function requireEnv(name) {
@@ -111,18 +117,22 @@ function rowSteamId(row) {
   return String(row.steam_id);
 }
 
-async function loadActiveIds(supabase, limit) {
-  const now = new Date();
-  const recentSignInCutoff = new Date(now.getTime() - RECENT_SIGN_IN_WINDOW_MS).toISOString();
-  const activeSyncFilter = [
+function activeSyncFilter(recentSignInCutoff) {
+  return [
     `steam_signed_in_at.gte.${recentSignInCutoff}`,
     "queen_ladder_rank.not.is.null",
     `poll_interval_seconds.lte.${HOT_POLL_MAX_INTERVAL_SECONDS}`,
   ].join(",");
+}
+
+async function loadActiveIds(supabase, limit) {
+  const now = new Date();
+  const recentSignInCutoff = new Date(now.getTime() - RECENT_SIGN_IN_WINDOW_MS).toISOString();
+  const activeFilter = activeSyncFilter(recentSignInCutoff);
 
   const dueUsers = await supabase.select("users", {
     select: "steam_id::text",
-    or: `(${activeSyncFilter})`,
+    or: `(${activeFilter})`,
     next_poll_at: `lte.${now.toISOString()}`,
     drodo_last_fetched_at: "not.is.null",
     order: "next_poll_at.asc",
@@ -131,7 +141,7 @@ async function loadActiveIds(supabase, limit) {
 
   const unseededUsers = await supabase.select("users", {
     select: "steam_id::text",
-    or: `(${activeSyncFilter})`,
+    or: `(${activeFilter})`,
     drodo_last_fetched_at: "is.null",
     order: "queen_ladder_last_seen_at.desc.nullslast,steam_signed_in_at.desc.nullslast",
     limit,
@@ -150,18 +160,27 @@ async function loadActiveIds(supabase, limit) {
   return { ids, seeded };
 }
 
-async function loadAllIds(supabase, limit) {
+async function loadAllIds(supabase, limit, { seasonSweep = false } = {}) {
   const ids = [];
+  const now = new Date();
+  const recentSignInCutoff = new Date(now.getTime() - RECENT_SIGN_IN_WINDOW_MS).toISOString();
+  const inactiveCutoff = new Date(now.getTime() - INACTIVE_POLL_INTERVAL_MS).toISOString();
+  const eligibilityFilter = seasonSweep
+    ? undefined
+    : `${activeSyncFilter(recentSignInCutoff)},drodo_last_fetched_at.lte.${inactiveCutoff}`;
+
   for (let offset = 0; ids.length < limit; offset += 1000) {
     const pageLimit = Math.min(1000, limit - ids.length);
-    const rows = await supabase.select("users", {
+    const query = {
       select: "steam_id::text,steam_signed_in_at,queen_ladder_rank,queen_ladder_last_seen_at",
       drodo_profile_missing: "eq.false",
       drodo_last_fetched_at: "not.is.null",
       order: "drodo_last_fetched_at.asc",
       limit: pageLimit,
       offset,
-    });
+    };
+    if (eligibilityFilter) query.or = `(${eligibilityFilter})`;
+    const rows = await supabase.select("users", query);
     if (!rows?.length) break;
     ids.push(...rows.map(rowSteamId));
     if (rows.length < pageLimit) break;
@@ -290,6 +309,7 @@ async function pingHealthcheck(suffix = "", body) {
 async function main() {
   const selectedMode = mode();
   const limit = batchSize(selectedMode);
+  const seasonSweep = flagEnabled("--season-sweep", "DRODO_POLL_SEASON_SWEEP");
   const supabase = new SupabaseRest(
     requireEnv("NEXT_PUBLIC_SUPABASE_URL"),
     requireEnv("SUPABASE_SERVICE_ROLE_KEY")
@@ -316,7 +336,7 @@ async function main() {
     });
     results = [...repolled, ...seededResults];
   } else {
-    const ids = await loadAllIds(supabase, limit);
+    const ids = await loadAllIds(supabase, limit, { seasonSweep });
     results = await fetchAndCacheDrodoBatch(ids, supabase, {
       snapshotOnSuccess: true,
       pollMode: "adaptive",
@@ -327,6 +347,7 @@ async function main() {
     mode: selectedMode,
     started_at: startedAt,
     finished_at: new Date().toISOString(),
+    season_sweep: selectedMode === "all" ? seasonSweep : false,
     polled: results.length,
     seeded,
     ...summarizeDrodoResults(results),
