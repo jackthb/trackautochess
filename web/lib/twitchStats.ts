@@ -8,7 +8,7 @@ import {
 
 const SITE_HOST =
   process.env.NEXT_PUBLIC_SITE_HOST?.replace(/\/$/, "") ||
-  "https://trackautochess.com";
+  "https://www.trackautochess.com";
 
 export interface TwitchStatsResponse {
   player: {

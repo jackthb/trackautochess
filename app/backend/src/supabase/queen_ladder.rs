@@ -246,7 +246,7 @@ impl SupabaseClient {
     }
 }
 
-const QUEENS_REVALIDATE_URL: &str = "https://trackautochess.com/api/revalidate/queens";
+const QUEENS_REVALIDATE_URL: &str = "https://www.trackautochess.com/api/revalidate/queens";
 
 /// Ask the public site to rebuild /queens now that the fresh ladder rows and
 /// any newly hydrated profiles are in the database. Best effort: the page

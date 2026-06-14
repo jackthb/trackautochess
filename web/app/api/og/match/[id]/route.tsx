@@ -95,7 +95,7 @@ function placementColorHex(p: number): string {
 }
 
 function getSiteHost(): string {
-  return (process.env.NEXT_PUBLIC_SITE_URL || "https://trackautochess.com")
+  return (process.env.NEXT_PUBLIC_SITE_URL || "https://www.trackautochess.com")
     .replace(/^https?:\/\//, "")
     .replace(/\/+$/, "");
 }

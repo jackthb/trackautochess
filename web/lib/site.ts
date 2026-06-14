@@ -4,7 +4,7 @@ export const SITE_NAME = "Track Auto Chess";
 export const SITE_TITLE = "Track Dota Auto Chess";
 export const SITE_DESCRIPTION =
   "Track Auto Chess helps Dota Auto Chess players browse items and relics, read patch notes, and track matches.";
-export const DEFAULT_SITE_URL = "https://trackautochess.com";
+export const DEFAULT_SITE_URL = "https://www.trackautochess.com";
 
 function normalizeUrl(raw: string | null | undefined): string | null {
   if (!raw) return null;

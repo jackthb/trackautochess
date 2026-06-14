@@ -50,7 +50,7 @@ export function GameRow({
         relicsData={relicsData}
         itemSynergies={itemSynergies}
         iconUrl={(type, stem) => `icons://${type}/${stem}.png`}
-        shareUrl={`https://trackautochess.com/games/${game.id}`}
+        shareUrl={`https://www.trackautochess.com/matches/${game.id}`}
         onClick={onToggle}
         style={{ cursor: "pointer" }}
         dateExtra={

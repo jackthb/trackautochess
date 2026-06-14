@@ -113,7 +113,7 @@ export function AboutContent() {
         <div className={styles.copy}>
           <p>
             {t.copy1pre}
-            <a href="https://trackautochess.com">trackautochess.com</a>
+            <a href="https://www.trackautochess.com">trackautochess.com</a>
             {t.copy1post}
           </p>
           <p>{t.copy2}</p>
