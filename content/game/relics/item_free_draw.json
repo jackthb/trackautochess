@@ -3,6 +3,7 @@
   "name": "Weighted Dice",
   "slug": "weighted-dice",
   "icon": "relics/weighted_dice.png",
+  "commentary": "If your shop has a piece on your board or bench, and you don't purchase it and instead choose to reroll, your re-roll will return 1-2 gold i.e. it will be either free or half price.\n\nVery useful for rolling boards where you might prioritise certain units early.",
   "source": {
     "name": "Weighted Dice",
     "names": {
@@ -17,5 +18,8 @@
     "lore": "",
     "lore_i18n": {}
   },
-  "overrides": {}
+  "overrides": {
+    "notes": []
+  },
+  "relatedEntities": []
 }
