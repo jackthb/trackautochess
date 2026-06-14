@@ -183,7 +183,6 @@ impl SupabaseClient {
                     .as_deref()
                     .and_then(|season| number_from_object(info, &format!("match_{season}")));
                 let chicken_count = number_from_object(info, "chicken_count").unwrap_or(0);
-                let queen_rank = number_from_object(info, "queen_rank");
                 user_rows.push(json!({
                     "steam_id": steam_id,
                     "drodo_mmr": mmr,
@@ -193,7 +192,6 @@ impl SupabaseClient {
                     "drodo_season_games": season_games,
                     "drodo_candy": number_from_object(info, "candy"),
                     "drodo_chicken_count": chicken_count,
-                    "drodo_queen_rank": queen_rank,
                     "drodo_raw_data": Value::Object(info.clone()),
                     "drodo_last_fetched_at": fetched_at,
                     "drodo_profile_missing": false,
@@ -205,7 +203,7 @@ impl SupabaseClient {
                     "season": season,
                     "mmr": mmr,
                     "chicken_count": chicken_count,
-                    "queen_rank": queen_rank,
+                    "queen_rank": Value::Null,
                     "snapshotted_at": fetched_at,
                 }));
             }

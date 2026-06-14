@@ -118,7 +118,6 @@ fn drodo_profile_to_user_payload(profile: &Value) -> Value {
         "drodo_season_games": profile.get("season_games").cloned().unwrap_or(Value::Null),
         "drodo_candy": profile.get("candy").cloned().unwrap_or(Value::Null),
         "drodo_chicken_count": profile.get("chicken_count").cloned().unwrap_or_else(|| json!(0)),
-        "drodo_queen_rank": profile.get("queen_rank").cloned().unwrap_or(Value::Null),
         "drodo_raw_data": profile.get("raw_data").cloned().unwrap_or(Value::Null),
         "drodo_last_fetched_at": profile.get("fetched_at").cloned().unwrap_or(Value::Null),
         "drodo_profile_missing": false,

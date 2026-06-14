@@ -206,19 +206,6 @@ function firstNonEmpty(
   return null;
 }
 
-function numberFromRawData(
-  rawData: Record<string, unknown> | null | undefined,
-  key: string
-): number | null {
-  const value = rawData?.[key];
-  if (typeof value === "number") return Number.isFinite(value) ? value : null;
-  if (typeof value === "string" && value.trim()) {
-    const parsed = Number(value);
-    return Number.isFinite(parsed) ? parsed : null;
-  }
-  return null;
-}
-
 function nonSteamIdText(value: string | null | undefined): string | null {
   const trimmed = value?.trim();
   if (!trimmed || /^\d{16,17}$/.test(trimmed)) return null;
@@ -250,8 +237,7 @@ function hasPublicAutoChessProfile(row: CreatorUserRow): boolean {
       row.queen_ladder_last_seen_at ||
       row.drodo_mmr != null ||
       row.drodo_season_games != null ||
-      row.drodo_chicken_count != null ||
-      numberFromRawData(row.drodo_raw_data, "queen_rank") != null
+      row.drodo_chicken_count != null
   );
 }
 

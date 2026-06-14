@@ -371,7 +371,6 @@ export type Database = {
           drodo_mmr: number | null
           drodo_mmr_level: number | null
           drodo_profile_missing: boolean
-          drodo_queen_rank: number | null
           drodo_raw_data: Json | null
           drodo_season: string | null
           drodo_season_games: number | null
@@ -396,7 +395,6 @@ export type Database = {
           drodo_mmr?: number | null
           drodo_mmr_level?: number | null
           drodo_profile_missing?: boolean
-          drodo_queen_rank?: number | null
           drodo_raw_data?: Json | null
           drodo_season?: string | null
           drodo_season_games?: number | null
@@ -421,7 +419,6 @@ export type Database = {
           drodo_mmr?: number | null
           drodo_mmr_level?: number | null
           drodo_profile_missing?: boolean
-          drodo_queen_rank?: number | null
           drodo_raw_data?: Json | null
           drodo_season?: string | null
           drodo_season_games?: number | null

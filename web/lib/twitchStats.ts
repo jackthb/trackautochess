@@ -54,19 +54,6 @@ export class TwitchStatsError extends Error {
   }
 }
 
-function numberFromRawData(
-  rawData: Record<string, unknown> | null | undefined,
-  key: string
-): number | null {
-  const value = rawData?.[key];
-  if (typeof value === "number") return Number.isFinite(value) ? value : null;
-  if (typeof value === "string" && value.trim()) {
-    const parsed = Number(value);
-    return Number.isFinite(parsed) ? parsed : null;
-  }
-  return null;
-}
-
 export async function fetchTwitchStats(
   rawSteamInput: string,
   supabase: SupabaseClient
@@ -92,10 +79,7 @@ export async function fetchTwitchStats(
   const drodo = drodoRes.data;
   const hasStats = Boolean(drodo && !drodo.drodo_profile_missing);
   const mmr = hasStats ? (drodo?.drodo_mmr ?? null) : null;
-  const queenLadderRank = hasStats
-    ? (drodo?.queen_ladder_rank ??
-      numberFromRawData(drodo?.drodo_raw_data, "queen_rank"))
-    : null;
+  const queenLadderRank = hasStats ? (drodo?.queen_ladder_rank ?? null) : null;
 
   return {
     player: {

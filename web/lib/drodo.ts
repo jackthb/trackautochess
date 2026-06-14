@@ -56,7 +56,6 @@ export interface CachedUserDrodoRow {
   drodo_season_games: number | null;
   drodo_candy: number | null;
   drodo_chicken_count: number | null;
-  drodo_queen_rank: number | null;
   drodo_raw_data: Record<string, unknown> | null;
   drodo_last_fetched_at: string | null;
   queen_ladder_rank: number | null;
@@ -116,7 +115,7 @@ async function loadPollSnapshot(
   const { data } = await supabase
     .from("users")
     .select(
-      "drodo_mmr, drodo_season_games, drodo_chicken_count, drodo_queen_rank, queen_ladder_last_seen_at, poll_interval_seconds"
+      "drodo_mmr, drodo_season_games, drodo_chicken_count, queen_ladder_rank, queen_ladder_last_seen_at, poll_interval_seconds"
     )
     .filter("steam_id", "eq", steamId)
     .maybeSingle<PollSnapshotRow>();
@@ -131,7 +130,7 @@ async function loadPollSnapshots(
   const { data } = await supabase
     .from("users")
     .select(
-      "steam_id::text, drodo_mmr, drodo_season_games, drodo_chicken_count, drodo_queen_rank, queen_ladder_last_seen_at, poll_interval_seconds"
+      "steam_id::text, drodo_mmr, drodo_season_games, drodo_chicken_count, queen_ladder_rank, queen_ladder_last_seen_at, poll_interval_seconds"
     )
     .filter("steam_id", "in", `(${steamIds.join(",")})`);
   return new Map(
@@ -164,7 +163,6 @@ export async function markDrodoMissing(
       drodo_season_games: null,
       drodo_candy: null,
       drodo_chicken_count: 0,
-      drodo_queen_rank: null,
       drodo_raw_data: null,
       drodo_last_fetched_at: fetchedAt,
       drodo_profile_missing: true,
@@ -204,7 +202,6 @@ export async function purgeDrodoCache(
       drodo_season_games: null,
       drodo_candy: null,
       drodo_chicken_count: 0,
-      drodo_queen_rank: null,
       drodo_raw_data: null,
       drodo_last_fetched_at: new Date().toISOString(),
       drodo_profile_missing: true,
@@ -262,7 +259,7 @@ async function persistDrodoProfile(
           mmr: profile.mmr,
           season: profile.season,
           chicken_count: profile.chicken_count,
-          queen_rank: profile.queen_rank,
+          queen_rank: null,
           snapshotted_at: new Date().toISOString(),
         },
         { onConflict: "steam_id,season,mmr,chicken_count,queen_rank" }

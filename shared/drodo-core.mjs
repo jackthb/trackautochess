@@ -144,7 +144,6 @@ export function drodoProfileToUserPayload(profile) {
     drodo_season_games: profile.season_games,
     drodo_candy: profile.candy,
     drodo_chicken_count: profile.chicken_count,
-    drodo_queen_rank: profile.queen_rank,
     drodo_raw_data: profile.raw_data,
     drodo_last_fetched_at: profile.fetched_at,
     drodo_profile_missing: false,
@@ -190,17 +189,14 @@ export function nextPollSchedule({
 }
 
 export function pollSnapshotFromRow(row) {
-  const queenRank = row.drodo_queen_rank ?? row.queen_rank ?? null;
   return {
     drodo_mmr: row.drodo_mmr,
     drodo_season_games: row.drodo_season_games,
     drodo_chicken_count: row.drodo_chicken_count,
     queen_rank:
-      typeof queenRank === "number" && Number.isFinite(queenRank)
-        ? queenRank
-        : row.drodo_raw_data
-          ? numberFromDrodoData(row.drodo_raw_data, "queen_rank")
-          : null,
+      typeof row.queen_ladder_rank === "number" && Number.isFinite(row.queen_ladder_rank)
+        ? row.queen_ladder_rank
+        : null,
     queen_ladder_last_seen_at: row.queen_ladder_last_seen_at,
     poll_interval_seconds: row.poll_interval_seconds,
   };
@@ -208,7 +204,6 @@ export function pollSnapshotFromRow(row) {
 
 export function isQueenProfile(profile, prev) {
   return (
-    profile.queen_rank != null ||
     prev?.queen_rank != null ||
     prev?.queen_ladder_last_seen_at != null
   );
@@ -219,8 +214,7 @@ export function profileChanged(prev, next) {
   return (
     prev.drodo_mmr !== next.mmr ||
     prev.drodo_season_games !== next.season_games ||
-    prev.drodo_chicken_count !== next.chicken_count ||
-    prev.queen_rank !== next.queen_rank
+    prev.drodo_chicken_count !== next.chicken_count
   );
 }
 
