@@ -175,16 +175,8 @@ export function MmrSparkline({ snapshots = [] }: MmrSparklineProps) {
             </>
           )}
 
-          {/* First tracked point — flagged so it's clear the line starts where
-              tracking began, not where the player's MMR journey did. */}
+          {/* First tracked point: the line starts where tracking began. */}
           <circle className={styles.firstDot} cx={first.x} cy={first.y} r={3} />
-          <text
-            className={`${styles.axis} ${styles.firstLabel}`}
-            x={PAD_X}
-            y={11}
-          >
-            First tracked
-          </text>
 
           {/* Current value. */}
           <circle className={styles.lastDot} cx={last.x} cy={last.y} r={2.8} />

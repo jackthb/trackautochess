@@ -60,14 +60,6 @@
   stroke: currentColor;
   stroke-width: 1.5;
 }
-.firstLabel {
-  fill: var(--text-muted);
-  font-size: 7px;
-  font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 0.03em;
-  opacity: 0.78;
-}
 .peakDot {
   fill: none;
   stroke: var(--green-bright, #4eaa62);
