@@ -11,8 +11,8 @@ interface DueUser {
 
 interface ActiveUser extends DueUser {
   steam_signed_in_at: string | null;
+  queen_ladder_rank: number | null;
   queen_ladder_last_seen_at: string | null;
-  drodo_queen_rank: number | null;
 }
 
 function argValue(name: string): string | null {
@@ -78,7 +78,7 @@ async function loadActiveIds(supabase: SupabaseClient, limit: number): Promise<{
 }> {
   const now = new Date();
   const recentSignInCutoff = new Date(now.getTime() - RECENT_SIGN_IN_WINDOW_MS).toISOString();
-  const activeSyncFilter = `steam_signed_in_at.gte.${recentSignInCutoff},queen_ladder_last_seen_at.not.is.null,drodo_queen_rank.not.is.null`;
+  const activeSyncFilter = `steam_signed_in_at.gte.${recentSignInCutoff},queen_ladder_rank.not.is.null`;
 
   const { data: dueUsers, error: dueError } = await supabase
     .from("users")
@@ -119,7 +119,7 @@ async function loadAllIds(supabase: SupabaseClient, limit: number): Promise<stri
     const to = from + Math.min(999, limit - ids.length - 1);
     const { data, error } = await supabase
       .from("users")
-      .select("steam_id::text, steam_signed_in_at, queen_ladder_last_seen_at, drodo_queen_rank")
+      .select("steam_id::text, steam_signed_in_at, queen_ladder_rank, queen_ladder_last_seen_at")
       .eq("drodo_profile_missing", false)
       .not("drodo_last_fetched_at", "is", null)
       .order("drodo_last_fetched_at", { ascending: true })

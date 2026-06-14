@@ -37,6 +37,10 @@ class FakeQueryBuilder {
     return this;
   }
 
+  not() {
+    return this;
+  }
+
   or() {
     return this;
   }
@@ -130,7 +134,6 @@ function queenRow(overrides: Record<string, unknown> = {}) {
     drodo_season: "s26",
     drodo_season_games: 87,
     drodo_chicken_count: 11,
-    drodo_queen_rank: 9,
     drodo_raw_data: { queen_rank: 9 },
     drodo_last_fetched_at: new Date(0).toISOString(),
     queen_ladder_rank: 9,
@@ -166,13 +169,14 @@ async function smokeDrodoPersistenceCallback() {
     );
     assert.ok(userUpsert, "fresh Queen profile must be persisted to users");
     assert.equal(
-      (userUpsert.payload as Record<string, unknown>).drodo_queen_rank,
-      7
+      "drodo_queen_rank" in (userUpsert.payload as Record<string, unknown>),
+      false,
+      "Drodo profile refreshes must not write the removed Queen rank column"
     );
     assert.equal(
-      typeof (userUpsert.payload as Record<string, unknown>).queen_ladder_last_seen_at,
-      "string",
-      "Queen profiles must update queen_ladder_last_seen_at for polling cadence"
+      "queen_ladder_last_seen_at" in (userUpsert.payload as Record<string, unknown>),
+      false,
+      "Drodo profile refreshes must not overwrite captured ladder timestamps"
     );
 
     assert.ok(
