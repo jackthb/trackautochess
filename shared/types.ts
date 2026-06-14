@@ -34,6 +34,7 @@ export interface Game {
   relic_history?: unknown;
   win_round?: number | null;
   lose_round?: number | null;
+  final_round?: number | null;
 }
 
 /** @deprecated Use Game instead. */

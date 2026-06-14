@@ -39,6 +39,7 @@ interface MatchPlayerRow {
   relic_history: unknown;
   win_round: number | null;
   lose_round: number | null;
+  final_round: number | null;
   played_at: string | null;
 }
 
@@ -57,6 +58,7 @@ function mpToGame(mp: MatchPlayerRow): Game {
     rank_change: null,
     wins: mp.win_round,
     losses: mp.lose_round,
+    final_round: mp.final_round,
     wl: null,
     screenshot: null,
     notes: null,
@@ -80,6 +82,7 @@ const MP_SELECT = [
   "relic_history",
   "win_round",
   "lose_round",
+  "final_round",
   "played_at",
 ].join(", ");
 

@@ -361,7 +361,8 @@ function MatchPlayerRow({
       : null);
 
   const visibleDeathRound =
-    deathRound != null && (snapRound == null || snapRound >= deathRound)
+    deathRound != null &&
+    (isLastRound || snapRound == null || snapRound >= deathRound)
       ? deathRound
       : null;
 
@@ -606,6 +607,19 @@ export default function GameView({
   // For a single-row match (no companions in `games` for the same match_id),
   // synthesize a one-element list so the same table renders for both cases.
   const basePlayerRows = matchGames.length > 0 ? matchGames : [game];
+  const deathRounds = new Map<string, number>();
+  for (const g of basePlayerRows) {
+    const placement = parseInt(g.placement) || 0;
+    if (placement <= 1 || typeof g.final_round !== "number") continue;
+    deathRounds.set(String(g.user_id), g.final_round);
+  }
+  const isFinishedBySelectedRound = (g: Game): boolean => {
+    const deathRound = deathRounds.get(String(g.user_id));
+    return (
+      deathRound != null &&
+      (selectedRound == null || selectedRound >= deathRound)
+    );
+  };
   const playerRows: Game[] = [...basePlayerRows].sort((a, b) => {
     const finalPlacementDelta =
       (parseInt(a.placement) || 99) - (parseInt(b.placement) || 99);
@@ -621,6 +635,9 @@ export default function GameView({
     const bHasHp = typeof bHp === "number";
     if (aHasHp !== bHasHp) return aHasHp ? -1 : 1;
     if (aHasHp && bHasHp && aHp !== bHp) return bHp - aHp;
+    if (isFinishedBySelectedRound(a) && isFinishedBySelectedRound(b)) {
+      return finalPlacementDelta;
+    }
 
     const aProfile = matchProfiles[String(a.user_id)];
     const bProfile = matchProfiles[String(b.user_id)];
@@ -631,23 +648,6 @@ export default function GameView({
     });
     return nameDelta || finalPlacementDelta;
   });
-
-  const deathRounds = new Map<string, number>();
-  if (hasTimeline) {
-    for (const g of basePlayerRows) {
-      const playerKey = String(g.user_id);
-      let previousHp: number | null = null;
-      for (const round of timeline!.rounds) {
-        const hp = round.players?.[playerKey]?.hp;
-        if (typeof hp !== "number") continue;
-        if (hp <= 0 && previousHp != null && previousHp > 0) {
-          deathRounds.set(playerKey, round.round);
-          break;
-        }
-        if (hp > 0) previousHp = hp;
-      }
-    }
-  }
 
   useEffect(() => {
     trackEvent("Game Detail Viewed", {
@@ -752,6 +752,13 @@ export default function GameView({
               </span>
             </div>
             {playerRows.map((g, rowIdx) => {
+              const deathRound = deathRounds.get(String(g.user_id)) ?? null;
+              const finalPosition = parseInt(g.placement) || null;
+              const showFinalPosition =
+                deathRound != null &&
+                (isLastRound ||
+                  selectedRound == null ||
+                  selectedRound >= deathRound);
               return (
                 <MatchPlayerRow
                   key={g.id}
@@ -770,11 +777,11 @@ export default function GameView({
                   snapRound={selectedRound}
                   isLastRound={isLastRound}
                   displayPosition={
-                    hasTimeline && !isLastRound
+                    hasTimeline && !isLastRound && !showFinalPosition
                       ? rowIdx + 1
-                      : parseInt(g.placement) || null
+                      : finalPosition
                   }
-                  deathRound={deathRounds.get(String(g.user_id)) ?? null}
+                  deathRound={deathRound}
                   tooltipData={tooltipData}
                 />
               );

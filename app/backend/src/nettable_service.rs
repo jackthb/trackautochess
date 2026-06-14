@@ -925,6 +925,71 @@ mod tests {
     }
 
     #[test]
+    fn timeline_adds_final_round_from_end_board_when_live_round_lags() {
+        let state = Arc::new(Mutex::new(NettableState {
+            local_steam_id: Some("76561198022169086".to_owned()),
+            match_roster_fingerprint: Some(vec![
+                "76561198022169086".to_owned(),
+                "76561198085219046".to_owned(),
+            ]),
+            ..NettableState::default()
+        }));
+
+        {
+            let mut state = state.lock().unwrap();
+            store_session_dump(
+                &mut state.session_dumps,
+                SessionDump {
+                    captured_at: "2026-06-13T23:26:31Z".to_owned(),
+                    rows: rows_from_json(vec![
+                        (
+                            "CustomNetTable_game_info",
+                            "round_info",
+                            serde_json::json!({"round": 49}),
+                        ),
+                        (
+                            "CustomNetTable_player_info_table",
+                            "player_info",
+                            serde_json::json!({"data": {
+                                "76561198022169086": {"hp": 37, "hero_level": 11, "curr_rank": 1},
+                                "76561198085219046": {"hp": 11, "hero_level": 11, "curr_rank": 2}
+                            }}),
+                        ),
+                        (
+                            "CustomNetTable_dac_table",
+                            "end_board",
+                            serde_json::json!({"data": {
+                                "76561198022169086": {"round": 50, "hp": 37, "hero_level": 11, "curr_rank": 1, "chess_lineup": "chess_lion,"},
+                                "76561198085219046": {"round": 50, "hp": 11, "hero_level": 11, "curr_rank": 2, "chess_lineup": "chess_ck1,"}
+                            }}),
+                        ),
+                    ]),
+                },
+            );
+        }
+
+        let timeline = build_match_timeline_from_state(&state, "match-1").expect("timeline builds");
+
+        assert_eq!(timeline["round_count"], 2);
+        assert_eq!(timeline["last_round"], 50);
+        assert_eq!(timeline["rounds"][0]["round"], 49);
+        assert_eq!(timeline["rounds"][1]["round"], 50);
+        assert_eq!(timeline["rounds"][1]["source"], "end_board");
+        assert_eq!(
+            timeline["rounds"][1]["players"]["76561198022169086"]["hp"],
+            37
+        );
+        assert_eq!(
+            timeline["rounds"][1]["players"]["76561198085219046"]["hp"],
+            0
+        );
+        assert_eq!(
+            timeline["rounds"][1]["players"]["76561198085219046"]["placement"],
+            2
+        );
+    }
+
+    #[test]
     fn automatic_queen_scan_is_throttled_to_sync_interval() {
         let state = Arc::new(Mutex::new(NettableState::default()));
         let cfg = Config {
