@@ -552,7 +552,27 @@ export default function PlayerView({
           ? bucketCount(data.refresh_quota.remaining)
           : "unknown",
       });
-      window.location.reload();
+      if (!data) {
+        // No body to apply — fall back to a reload so the user still sees fresh
+        // server-rendered stats.
+        window.location.reload();
+        return;
+      }
+      // Apply the freshly fetched profile to state directly. A reload would
+      // re-serve this force-static page from the ISR cache (revalidate=300) and
+      // show the same stale stats, so update in place like the auto-refresh does.
+      const profile = data as DrodoProfileRow & { seasons?: unknown };
+      setDrodoProfileMissing(false);
+      setDrodo((current) => ({
+        ...drodoStatsFromProfile(profile),
+        queen_rank: current?.queen_rank ?? null,
+      }));
+      if (Array.isArray(profile.seasons)) {
+        setSeasons(profile.seasons as SeasonSnapshot[]);
+      }
+      if (typeof profile.fetched_at === "string") {
+        setDrodoLastFetchedAt(profile.fetched_at);
+      }
     } catch (error) {
       trackEvent("Player Refresh Failed", {
         route: analyticsRoute(route),
