@@ -204,6 +204,8 @@ async function smokeDisplayedQueensRefreshTarget() {
 
     assert.equal(summary.polled, 1);
     assert.equal(summary.ok, 1);
+    assert.equal(summary.changed, 1);
+    assert.match(summary.checked_at ?? "", /^\d{4}-\d{2}-\d{2}T/);
     assert.deepEqual(targets, [{ steam_id: STEAM_ID, custom_url: CUSTOM_URL }]);
   } finally {
     restoreFetch();

@@ -9,6 +9,8 @@ export interface QueensRefreshSummary {
   ok: number;
   missing: number;
   upstream_error: number;
+  changed: number;
+  checked_at: string | null;
 }
 
 interface RefreshOptions {
@@ -46,7 +48,14 @@ async function runQueensRefresh(
   // dedupe, and visible-table cap. If a row is displayed, this can refresh it.
   const rows = selectDisplayedQueens(await loadQueenCandidates(supabase));
   if (rows.length === 0) {
-    return { polled: 0, ok: 0, missing: 0, upstream_error: 0 };
+    return {
+      polled: 0,
+      ok: 0,
+      missing: 0,
+      upstream_error: 0,
+      changed: 0,
+      checked_at: null,
+    };
   }
 
   const hasNeverFetchedRow = rows.some((row) => !row.drodo_last_fetched_at);
@@ -59,16 +68,31 @@ async function runQueensRefresh(
     }
   }
   if (!hasNeverFetchedRow && Date.now() - oldestFetchMs < floorMs) {
-    return { polled: 0, ok: 0, missing: 0, upstream_error: 0 };
+    return {
+      polled: 0,
+      ok: 0,
+      missing: 0,
+      upstream_error: 0,
+      changed: 0,
+      checked_at: null,
+    };
   }
 
   if (!(await claimRefreshLease(supabase, options.lockTtlMs ?? floorMs))) {
-    return { polled: 0, ok: 0, missing: 0, upstream_error: 0 };
+    return {
+      polled: 0,
+      ok: 0,
+      missing: 0,
+      upstream_error: 0,
+      changed: 0,
+      checked_at: null,
+    };
   }
 
   const profileRoutes = new Map(
     rows.map((row) => [row.steam_id, row.custom_url] as const)
   );
+  let changed = 0;
   const results = await fetchAndCacheDrodoBatch(
     rows.map((row) => row.steam_id),
     supabase,
@@ -76,17 +100,22 @@ async function runQueensRefresh(
       snapshotOnSuccess: true,
       pollMode: "adaptive",
       hotPoll: true,
-      onQueenChange: options.onQueenChange
-        ? (profile) =>
-            options.onQueenChange?.({
-              steam_id: profile.steam_id,
-              custom_url: profileRoutes.get(profile.steam_id) ?? null,
-            })
-        : undefined,
+      onQueenChange: (profile) => {
+        changed += 1;
+        options.onQueenChange?.({
+          steam_id: profile.steam_id,
+          custom_url: profileRoutes.get(profile.steam_id) ?? null,
+        });
+      },
     }
   );
   const summary = summarizeDrodoResults(results);
-  return { polled: rows.length, ...summary };
+  return {
+    polled: rows.length,
+    ...summary,
+    changed,
+    checked_at: new Date().toISOString(),
+  };
 }
 
 export function refreshDisplayedQueens(

@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import { QUEENS_REFRESH_CHECKED_EVENT } from "./NextRefreshTime";
 import { nextQueensRefreshDelayMs } from "./refreshTiming";
 import styles from "./queens.module.css";
 
@@ -9,6 +10,11 @@ const MIN_RETRY_MS = 30 * 1000;
 const STATUS_CLEAR_MS = 8 * 1000;
 
 type RefreshStatus = "idle" | "loading" | "current" | "updated" | "rate-limited" | "error";
+
+interface QueensRefreshResponse {
+  changed?: unknown;
+  checked_at?: unknown;
+}
 
 // /queens is ISR'd: the page renders cached rows quickly, then this client
 // keeps visible tabs current by asking the refresh endpoint to poll Drodo after
@@ -22,7 +28,12 @@ export function QueensAutoRefresh({
 }) {
   const router = useRouter();
   const pingInFlightRef = useRef(false);
+  const latestFetchedAtRef = useRef(latestFetchedAt);
   const [status, setStatus] = useState<RefreshStatus>("idle");
+
+  useEffect(() => {
+    latestFetchedAtRef.current = latestFetchedAt;
+  }, [latestFetchedAt]);
 
   useEffect(() => {
     let disposed = false;
@@ -51,7 +62,7 @@ export function QueensAutoRefresh({
     };
 
     const nextDelayMs = () =>
-      nextQueensRefreshDelayMs(latestFetchedAt, cooldownMs);
+      nextQueensRefreshDelayMs(latestFetchedAtRef.current, cooldownMs);
 
     const scheduleNext = (fallbackMs = MIN_RETRY_MS) => {
       clearTimer();
@@ -83,12 +94,22 @@ export function QueensAutoRefresh({
           scheduleNext(MIN_RETRY_MS);
           return;
         }
-        const data: unknown = await resp.json().catch(() => null);
+        const data = (await resp.json().catch(() => null)) as
+          | QueensRefreshResponse
+          | null;
+        if (typeof data?.checked_at === "string") {
+          latestFetchedAtRef.current = data.checked_at;
+          window.dispatchEvent(
+            new CustomEvent(QUEENS_REFRESH_CHECKED_EVENT, {
+              detail: { checkedAt: data.checked_at },
+            })
+          );
+        }
         const refreshed =
           data != null &&
           typeof data === "object" &&
-          typeof (data as { ok?: unknown }).ok === "number" &&
-          (data as { ok: number }).ok > 0;
+          typeof data.changed === "number" &&
+          data.changed > 0;
         showStatus(refreshed ? "updated" : "current");
         if (refreshed) router.refresh();
       } catch {
@@ -127,7 +148,7 @@ export function QueensAutoRefresh({
       document.removeEventListener("visibilitychange", onVisible);
       window.removeEventListener("pageshow", onPageShow);
     };
-  }, [cooldownMs, latestFetchedAt, router]);
+  }, [cooldownMs, router]);
 
   if (status === "idle") return null;
 
