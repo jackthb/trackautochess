@@ -10,7 +10,6 @@ export interface QueenRow {
   drodo_season: string | null;
   drodo_season_games: number | null;
   drodo_chicken_count: number | null;
-  drodo_queen_rank: number | string | null;
   drodo_last_fetched_at: string | null;
   queen_ladder_rank: number | null;
   queen_ladder_season: string | null;
@@ -30,20 +29,14 @@ export const QUEEN_SELECT = [
   "drodo_season",
   "drodo_season_games",
   "drodo_chicken_count",
-  "drodo_queen_rank",
   "drodo_last_fetched_at",
   "queen_ladder_rank",
   "queen_ladder_season",
   "queen_ladder_last_seen_at",
 ].join(", ");
 
-export function profileQueenRank(row: QueenRow): number | null {
-  const value = row.drodo_queen_rank;
-  return typeof value === "number" && Number.isFinite(value) ? value : null;
-}
-
 export function effectiveQueenRank(row: QueenRow): number | null {
-  return row.queen_ladder_rank ?? profileQueenRank(row);
+  return row.queen_ladder_rank;
 }
 
 export function queenMmr(row: QueenRow): number | null {
@@ -57,18 +50,6 @@ export function compareQueenRows(a: QueenRow, b: QueenRow): number {
 }
 
 function isBetterRankRow(candidate: QueenRow, current: QueenRow): boolean {
-  if (candidate.queen_ladder_rank != null && current.queen_ladder_rank == null) {
-    return true;
-  }
-  if (candidate.queen_ladder_rank == null && current.queen_ladder_rank != null) {
-    return false;
-  }
-
-  const candidateProfileRank = profileQueenRank(candidate);
-  const currentProfileRank = profileQueenRank(current);
-  if (candidateProfileRank != null && currentProfileRank == null) return true;
-  if (candidateProfileRank == null && currentProfileRank != null) return false;
-
   const candidateFetchedAt = candidate.drodo_last_fetched_at;
   const currentFetchedAt = current.drodo_last_fetched_at;
   if (candidateFetchedAt && currentFetchedAt && candidateFetchedAt !== currentFetchedAt) {
@@ -106,7 +87,7 @@ function dedupeQueenRanks(rows: QueenRow[]): QueenRow[] {
 
 export function selectDisplayedQueens(rows: QueenRow[]): QueenRow[] {
   const rankedRows = rows
-    .filter((row) => row.queen_ladder_rank != null || profileQueenRank(row) != null)
+    .filter((row) => row.queen_ladder_rank != null)
     .sort(compareQueenRows)
     .filter((row) => {
       const rank = effectiveQueenRank(row);
@@ -128,7 +109,7 @@ export async function loadQueenCandidates(
   const { data, error } = await supabase
     .from("users")
     .select(QUEEN_SELECT)
-    .or("queen_ladder_last_seen_at.not.is.null,drodo_queen_rank.not.is.null")
+    .not("queen_ladder_rank", "is", null)
     .order("queen_ladder_last_seen_at", { ascending: false, nullsFirst: false })
     .order("queen_ladder_rank", { ascending: true, nullsFirst: false })
     .order("drodo_mmr", { ascending: false, nullsFirst: false })

@@ -38,25 +38,12 @@ type LoadResult =
   | { kind: "redirect"; destination: string }
   | { kind: "ok"; data: Omit<PlayerPageProps, "route"> };
 
-function numberFromRawData(
-  rawData: Record<string, unknown> | null | undefined,
-  key: string
-): number | null {
-  const value = rawData?.[key];
-  if (typeof value === "number") return Number.isFinite(value) ? value : null;
-  if (typeof value === "string" && value.trim()) {
-    const parsed = Number(value);
-    return Number.isFinite(parsed) ? parsed : null;
-  }
-  return null;
-}
-
 function drodoFromCachedRow(row: CachedUserDrodoRow) {
   return {
     mmr: row.drodo_mmr,
     max_mmr: row.drodo_max_mmr,
     mmr_level: row.drodo_mmr_level,
-    queen_rank: numberFromRawData(row.drodo_raw_data, "queen_rank"),
+    queen_rank: row.queen_ladder_rank,
     last_win_at: row.drodo_raw_data ? lastWinFromDrodoData(row.drodo_raw_data) : null,
     last_top3_at: row.drodo_raw_data ? lastTop3FromDrodoData(row.drodo_raw_data) : null,
     season: row.drodo_season,
@@ -68,8 +55,7 @@ function drodoFromCachedRow(row: CachedUserDrodoRow) {
 
 function isCachedQueenProfile(row: CachedUserDrodoRow | null): boolean {
   return Boolean(
-    row?.queen_ladder_last_seen_at ||
-      numberFromRawData(row?.drodo_raw_data, "queen_rank") != null
+    row?.queen_ladder_rank != null || row?.queen_ladder_last_seen_at
   );
 }
 
@@ -255,13 +241,16 @@ const loadPlayer = cache(async (rawSteamId: string): Promise<LoadResult> => {
       });
 
       if (initialDrodo.ok) {
-        if (initialDrodo.profile.queen_rank != null) {
+        if (cachedProfileRow?.queen_ladder_rank != null) {
           manualRefreshQuota = getManualRefreshQuota(undefined, Date.now(), {
             cadence: "owner",
             target: steamId,
           });
         }
-        drodo = drodoStatsFromProfile(initialDrodo.profile);
+        drodo = {
+          ...drodoStatsFromProfile(initialDrodo.profile),
+          queen_rank: cachedProfileRow?.queen_ladder_rank ?? null,
+        };
         seasons = initialDrodo.seasonRows;
         drodoLastFetchedAt = mostRecentTimestamp(
           initialDrodo.profile.fetched_at,
@@ -275,11 +264,11 @@ const loadPlayer = cache(async (rawSteamId: string): Promise<LoadResult> => {
           },
           ...mmrHistory,
         ];
-        queenRankHistory = initialDrodo.profile.queen_rank == null
+        queenRankHistory = cachedProfileRow?.queen_ladder_rank == null
           ? queenRankHistory
           : [
               {
-                queen_rank: initialDrodo.profile.queen_rank,
+                queen_rank: cachedProfileRow.queen_ladder_rank,
                 snapshotted_at: initialDrodo.profile.fetched_at,
               },
               ...queenRankHistory,

@@ -12,7 +12,6 @@ import {
   lastTop3FromDrodoData,
   lastWinFromDrodoData,
   nextPollSchedule,
-  numberFromDrodoData,
   pollSnapshotFromRow,
   profileChanged,
   summarizeDrodoResults,
@@ -60,6 +59,7 @@ export interface CachedUserDrodoRow {
   drodo_queen_rank: number | null;
   drodo_raw_data: Record<string, unknown> | null;
   drodo_last_fetched_at: string | null;
+  queen_ladder_rank: number | null;
   queen_ladder_last_seen_at: string | null;
   drodo_profile_missing: boolean | null;
 }
@@ -75,6 +75,7 @@ export const USER_DRODO_SELECT = [
   "drodo_chicken_count",
   "drodo_raw_data",
   "drodo_last_fetched_at",
+  "queen_ladder_rank",
   "queen_ladder_last_seen_at",
   "drodo_profile_missing",
 ].join(", ");
@@ -96,9 +97,7 @@ export function cachedUserToDrodoProfile(row: CachedUserDrodoRow): DrodoProfileR
     mmr: row.drodo_mmr,
     max_mmr: row.drodo_max_mmr,
     mmr_level: row.drodo_mmr_level,
-    queen_rank: row.drodo_raw_data
-      ? row.drodo_queen_rank ?? numberFromDrodoData(row.drodo_raw_data, "queen_rank")
-      : row.drodo_queen_rank,
+    queen_rank: row.queen_ladder_rank,
     last_win_at: row.drodo_raw_data ? lastWinFromDrodoData(row.drodo_raw_data) : null,
     last_top3_at: row.drodo_raw_data ? lastTop3FromDrodoData(row.drodo_raw_data) : null,
     season: row.drodo_season,

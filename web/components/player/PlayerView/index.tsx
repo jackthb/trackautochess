@@ -368,7 +368,10 @@ export default function PlayerView({
         }
         if (!resp.ok || !data) return;
         const profile = data as DrodoProfileRow & { seasons?: unknown };
-        setDrodo(drodoStatsFromProfile(profile));
+        setDrodo((current) => ({
+          ...drodoStatsFromProfile(profile),
+          queen_rank: current?.queen_rank ?? null,
+        }));
         if (Array.isArray(profile.seasons)) {
           setSeasons(profile.seasons as SeasonSnapshot[]);
         }

@@ -11,7 +11,6 @@ import { listAvatarUrl, playerProfilePath } from "@/lib/steam";
 import {
   effectiveQueenRank,
   loadQueenCandidates,
-  profileQueenRank,
   queenMmr,
   selectDisplayedQueens,
   type QueenRow as BaseQueenRow,
