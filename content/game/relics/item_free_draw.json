@@ -3,7 +3,7 @@
   "name": "Weighted Dice",
   "slug": "weighted-dice",
   "icon": "relics/weighted_dice.png",
-  "commentary": "If your shop has a piece on your board or bench, and you don't purchase it and instead choose to reroll, your re-roll will return 1-2 gold i.e. it will be either free or half price.\n\nVery useful for rolling boards where you might prioritise certain units early.",
+  "commentary": "If you reroll a shop and **none** of the new pieces are units already on your board or bench, you're refunded 1–2 gold, making that reroll either free or half price. (If an owned piece does show up, you get nothing.)\n\nVery useful for roll-heavy boards, especially early when you own few units, so most rerolls whiff and trigger the refund.",
   "source": {
     "name": "Weighted Dice",
     "names": {
