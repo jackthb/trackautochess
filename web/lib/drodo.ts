@@ -47,6 +47,15 @@ export {
 };
 export type { DrodoProfileRow, SeasonSnapshotRow };
 
+// Drodo's upstream (autochess.ppbizon.com) is intermittently slow/unreachable.
+// Without a timeout a stalled connection holds the serverless invocation until
+// it dies as `fetch failed`; cap it so the batch returns an upstream_error
+// cleanly instead. Mirrors the 10s cap on the Rust backend's poller.
+const DRODO_FETCH_TIMEOUT_MS = 10_000;
+
+const drodoFetch: typeof fetch = (input, init) =>
+  fetch(input, { ...init, signal: AbortSignal.timeout(DRODO_FETCH_TIMEOUT_MS) });
+
 export interface CachedUserDrodoRow {
   steam_id: string;
   drodo_mmr: number | null;
@@ -324,6 +333,7 @@ export async function fetchAndCacheDrodoBatch(
   return fetchDrodoProfileBatch(
     steamIds,
     {
+      fetch: drodoFetch,
       loadPollSnapshots: (ids) => loadPollSnapshots(ids, supabase),
       markMissing: (steamId) => markDrodoMissing(steamId, supabase),
       persistProfile: (profile, seasonRows, persistOptions) =>
@@ -359,6 +369,7 @@ export async function fetchAndCacheDrodo(
   const result = await fetchDrodoProfileBatch(
     [steamId],
     {
+      fetch: drodoFetch,
       loadPollSnapshots: async (ids) => {
         if (!supabase || options.pollMode !== "adaptive") return new Map();
         const snapshot = await loadPollSnapshot(ids[0], supabase);

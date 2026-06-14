@@ -98,8 +98,10 @@ async function refreshQueensForVisitor(): Promise<void> {
   try {
     await refreshDisplayedQueens(supabase);
   } catch (error) {
-    console.error(
-      "Failed to refresh Queen players before page render:",
+    // Best-effort: the page still renders cached Drodo data, so a transient
+    // upstream/network blip here is expected noise, not an error to alert on.
+    console.warn(
+      "Skipped Queen refresh before page render:",
       error instanceof Error ? error.message : error
     );
   }
