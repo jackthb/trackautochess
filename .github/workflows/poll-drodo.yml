@@ -1,6 +1,8 @@
 name: Poll Drodo (MMR snapshots)
 
 on:
+  schedule:
+    - cron: "*/5 * * * *"
   workflow_dispatch:
 
 concurrency:
