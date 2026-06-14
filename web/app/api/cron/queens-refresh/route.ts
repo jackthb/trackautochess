@@ -3,8 +3,6 @@ import { revalidateQueenPages } from "@/lib/queensRevalidate";
 import { createSupabaseServiceRoleClient } from "@/lib/supabase";
 import { QUEENS_VIEW_REFRESH_COOLDOWN_MS } from "@/lib/queensVisitor";
 
-const HOURLY_REFRESH_FLOOR_MS = 60 * 60 * 1000;
-
 async function handle(req: Request) {
   const cronSecret = process.env.CRON_SECRET;
   const auth = req.headers.get("authorization");
@@ -18,7 +16,7 @@ async function handle(req: Request) {
   }
 
   const summary = await refreshDisplayedQueens(supabase, {
-    floorMs: HOURLY_REFRESH_FLOOR_MS,
+    floorMs: QUEENS_VIEW_REFRESH_COOLDOWN_MS,
     lockTtlMs: QUEENS_VIEW_REFRESH_COOLDOWN_MS,
     onQueenChange: revalidateQueenPages,
   });
@@ -28,7 +26,7 @@ async function handle(req: Request) {
   }
 
   return Response.json({
-    mode: "hourly",
+    mode: "five-minute",
     ...summary,
   });
 }

@@ -2,8 +2,8 @@ name: Refresh Queen Players
 
 on:
   schedule:
-    # Every hour at :07 past.
-    - cron: "7 * * * *"
+    # Every 5 minutes.
+    - cron: "*/5 * * * *"
   workflow_dispatch:
 
 concurrency:

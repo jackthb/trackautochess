@@ -7,9 +7,8 @@ import { revalidateQueenPages } from "@/lib/queensRevalidate";
 import { createSupabaseServiceRoleClient } from "@/lib/supabase";
 import { QUEENS_VIEW_REFRESH_COOLDOWN_MS } from "@/lib/queensVisitor";
 
-// Already-open /queens tabs use this as a fallback. Hard page loads refresh
-// server-side before rows are read; this endpoint keeps parked tabs fresh
-// without letting them repoll Drodo more often than the same 5-minute window.
+// /queens renders cached rows quickly; visible tabs call this endpoint after
+// the displayed countdown reaches zero so Drodo polling never blocks HTML.
 const ipRateLimiter = new RateLimiterMemory({ points: 30, duration: 60 });
 
 export async function POST(req: Request) {

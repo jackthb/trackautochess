@@ -2,34 +2,42 @@ import { expect, test } from "@playwright/test";
 
 test.describe.configure({ mode: "serial" });
 
-test("Queens page renders and can call the refresh endpoint from the browser", async ({
+test("Queens page renders and shows background refresh status", async ({
   page,
 }) => {
   let refreshCalls = 0;
-
-  await page.route("**/api/queens/refresh", async (route) => {
-    refreshCalls += 1;
-    await route.fulfill({
-      contentType: "application/json",
-      body: JSON.stringify({
-        polled: 1,
-        ok: 1,
-        missing: 0,
-        upstream_error: 0,
-      }),
+  let releaseRefresh: () => void = () => {};
+  const refreshStarted = new Promise<void>((resolve) => {
+    void page.route("**/api/queens/refresh", async (route) => {
+      refreshCalls += 1;
+      resolve();
+      await new Promise<void>((release) => {
+        releaseRefresh = release;
+      });
+      await route.fulfill({
+        contentType: "application/json",
+        body: JSON.stringify({
+          polled: 1,
+          ok: 1,
+          missing: 0,
+          upstream_error: 0,
+        }),
+      });
     });
+  });
+
+  await page.addInitScript(() => {
+    Date.now = () => new Date("2099-01-01T00:00:00.000Z").getTime();
   });
 
   await page.goto("/queens", { waitUntil: "domcontentloaded" });
   await expect(page.getByRole("heading", { name: "Queen Players" })).toBeVisible();
-  const response = await page.evaluate(async () => {
-    const resp = await fetch("/api/queens/refresh", { method: "POST" });
-    return { ok: resp.ok, body: await resp.json() };
-  });
-  expect(response).toEqual({
-    ok: true,
-    body: { polled: 1, ok: 1, missing: 0, upstream_error: 0 },
-  });
+  await refreshStarted;
+  await expect(page.getByRole("status")).toHaveText("Refreshing Queen profiles...");
+  releaseRefresh();
+  await expect(page.getByRole("status")).toHaveText(
+    "Profiles refreshed. Updating table..."
+  );
   expect(refreshCalls).toBe(1);
 });
 

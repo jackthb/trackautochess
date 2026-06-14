@@ -1,12 +1,8 @@
 import type { Metadata } from "next";
-import { headers } from "next/headers";
 import Link from "next/link";
 import { PageLayout } from "@/components/PageLayout";
 import { SITE_NAME, SITE_TITLE } from "@/lib/site";
-import {
-  createSupabaseServerClient,
-  createSupabaseServiceRoleClient,
-} from "@/lib/supabase";
+import { createSupabaseServerClient } from "@/lib/supabase";
 import { listAvatarUrl, playerProfilePath } from "@/lib/steam";
 import {
   effectiveQueenRank,
@@ -15,10 +11,9 @@ import {
   selectDisplayedQueens,
   type QueenRow as BaseQueenRow,
 } from "@/lib/queens";
-import { refreshDisplayedQueens } from "@/lib/queensRefresh";
 import {
+  QUEENS_REFRESH_COOLDOWN_MS,
   QUEENS_VIEW_REFRESH_COOLDOWN_MS,
-  QUEENS_VISITOR_HEADER,
 } from "@/lib/queensVisitor";
 import { mostRecentTimestamp } from "@/lib/timestamps";
 import { canonicalCreatorStreamUrl, loadCreatorLiveStreams } from "@/lib/creators";
@@ -67,45 +62,10 @@ export const metadata: Metadata = {
   },
 };
 
-export const dynamic = "force-dynamic";
-export const revalidate = 0;
+export const revalidate = 300;
 
-const visitorRefreshes = new Map<string, number>();
-
-function claimVisitorRefresh(visitorId: string): boolean {
-  const now = Date.now();
-  const lastRefreshAt = visitorRefreshes.get(visitorId) ?? 0;
-  if (now - lastRefreshAt < QUEENS_VIEW_REFRESH_COOLDOWN_MS) return false;
-  visitorRefreshes.set(visitorId, now);
-
-  if (visitorRefreshes.size > 5000) {
-    const oldestAllowedAt = now - QUEENS_VIEW_REFRESH_COOLDOWN_MS;
-    for (const [id, refreshedAt] of visitorRefreshes) {
-      if (refreshedAt < oldestAllowedAt) visitorRefreshes.delete(id);
-    }
-  }
-  return true;
-}
-
-async function refreshQueensForVisitor(): Promise<void> {
-  const requestHeaders = await headers();
-  const visitorId = requestHeaders.get(QUEENS_VISITOR_HEADER);
-  if (!visitorId || !claimVisitorRefresh(visitorId)) return;
-
-  const supabase = createSupabaseServiceRoleClient();
-  if (!supabase) return;
-
-  try {
-    await refreshDisplayedQueens(supabase);
-  } catch (error) {
-    // Best-effort: the page still renders cached Drodo data, so a transient
-    // upstream/network blip here is expected noise, not an error to alert on.
-    console.warn(
-      "Skipped Queen refresh before page render:",
-      error instanceof Error ? error.message : error
-    );
-  }
-}
+const LIVE_STREAM_TIMEOUT_MS = 1500;
+const QUEENS_REVALIDATE_SECONDS = QUEENS_REFRESH_COOLDOWN_MS / 1000;
 
 async function loadQueens(): Promise<{ rows: QueenRow[]; error: string | null }> {
   const supabase = createSupabaseServerClient();
@@ -271,6 +231,28 @@ function moveClass(move: QueenMove | null | undefined): string {
   return move.delta > 0 ? styles.up : styles.down;
 }
 
+async function loadCreatorLiveStreamsWithTimeout(): Promise<
+  Awaited<ReturnType<typeof loadCreatorLiveStreams>>
+> {
+  let timer: ReturnType<typeof setTimeout> | null = null;
+  try {
+    const timeout = new Promise<Awaited<ReturnType<typeof loadCreatorLiveStreams>>>(
+      (resolve) => {
+        timer = setTimeout(
+          () => resolve({ streams: [], error: "Live stream lookup timed out." }),
+          LIVE_STREAM_TIMEOUT_MS
+        );
+      }
+    );
+    return await Promise.race([
+      loadCreatorLiveStreams({ revalidateSeconds: QUEENS_REVALIDATE_SECONDS }),
+      timeout,
+    ]);
+  } finally {
+    if (timer) clearTimeout(timer);
+  }
+}
+
 function streamPlatform(url: string): "twitch" | "youtube" | "kick" | "douyu" | "stream" {
   try {
     const hostname = new URL(url).hostname.replace(/^www\./, "");
@@ -321,11 +303,9 @@ function StreamIcon({ platform }: { platform: ReturnType<typeof streamPlatform> 
 }
 
 export default async function QueensPage() {
-  await refreshQueensForVisitor();
-
   const [{ rows, error }, { streams }] = await Promise.all([
     loadQueens(),
-    loadCreatorLiveStreams(),
+    loadCreatorLiveStreamsWithTimeout(),
   ]);
   const season = rows.find((row) => row.queen_ladder_season)?.queen_ladder_season;
   const lastUpdatedAt = newestDrodoFetchedAt(rows) ?? queenLastUpdatedAt(rows);
@@ -348,8 +328,8 @@ export default async function QueensPage() {
       />
       <p className={styles.lead}>
         Known Queen players{season ? ` for ${season.replace(/_/g, " ").toUpperCase()}` : ""}.
-        Opening this page updates the visible profiles when the 5-minute cooldown
-        has elapsed. Between updates the table shows cached Drodo profile data.
+        The table renders cached Drodo profile data immediately, then refreshes
+        visible profiles when the 5-minute cooldown has elapsed.
       </p>
 
       {error ? (

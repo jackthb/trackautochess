@@ -1,16 +1,18 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { nextQueensRefreshDelayMs } from "./refreshTiming";
+import styles from "./queens.module.css";
 
 const MIN_RETRY_MS = 30 * 1000;
+const STATUS_CLEAR_MS = 8 * 1000;
 
-// /queens is ISR'd: the server rebuilds it the moment a Queen's stats change,
-// but the background poll only re-checks Queens hourly — page viewers are
-// what keep the table truly current. Hard page loads refresh server-side before
-// rows render; this client fallback keeps parked tabs current on the same
-// displayed countdown reaches zero without multiplying work across tabs.
+type RefreshStatus = "idle" | "loading" | "current" | "updated" | "rate-limited" | "error";
+
+// /queens is ISR'd: the page renders cached rows quickly, then this client
+// keeps visible tabs current by asking the refresh endpoint to poll Drodo after
+// the displayed countdown reaches zero.
 export function QueensAutoRefresh({
   latestFetchedAt,
   cooldownMs,
@@ -20,15 +22,32 @@ export function QueensAutoRefresh({
 }) {
   const router = useRouter();
   const pingInFlightRef = useRef(false);
+  const [status, setStatus] = useState<RefreshStatus>("idle");
 
   useEffect(() => {
     let disposed = false;
     let timer: ReturnType<typeof setTimeout> | null = null;
+    let statusTimer: ReturnType<typeof setTimeout> | null = null;
 
     const clearTimer = () => {
       if (!timer) return;
       clearTimeout(timer);
       timer = null;
+    };
+
+    const clearStatusTimer = () => {
+      if (!statusTimer) return;
+      clearTimeout(statusTimer);
+      statusTimer = null;
+    };
+
+    const showStatus = (nextStatus: RefreshStatus) => {
+      clearStatusTimer();
+      setStatus(nextStatus);
+      if (nextStatus === "loading") return;
+      statusTimer = setTimeout(() => {
+        if (!disposed) setStatus("idle");
+      }, STATUS_CLEAR_MS);
     };
 
     const nextDelayMs = () =>
@@ -50,14 +69,17 @@ export function QueensAutoRefresh({
         return;
       }
       pingInFlightRef.current = true;
+      showStatus("loading");
       try {
         const resp = await fetch("/api/queens/refresh", { method: "POST" });
         if (disposed) return;
         if (resp.status === 429) {
+          showStatus("rate-limited");
           scheduleNext(MIN_RETRY_MS);
           return;
         }
         if (!resp.ok) {
+          showStatus("error");
           scheduleNext(MIN_RETRY_MS);
           return;
         }
@@ -67,8 +89,10 @@ export function QueensAutoRefresh({
           typeof data === "object" &&
           typeof (data as { ok?: unknown }).ok === "number" &&
           (data as { ok: number }).ok > 0;
+        showStatus(refreshed ? "updated" : "current");
         if (refreshed) router.refresh();
       } catch {
+        showStatus("error");
         // Network hiccups just leave the table on the last build; the next
         // trigger retries.
       } finally {
@@ -82,7 +106,7 @@ export function QueensAutoRefresh({
       void pingStaleRefresh();
     };
 
-    sync(true);
+    sync(false);
     const onVisible = () => {
       if (document.visibilityState === "visible") {
         sync(true);
@@ -99,10 +123,35 @@ export function QueensAutoRefresh({
     return () => {
       disposed = true;
       clearTimer();
+      clearStatusTimer();
       document.removeEventListener("visibilitychange", onVisible);
       window.removeEventListener("pageshow", onPageShow);
     };
   }, [cooldownMs, latestFetchedAt, router]);
 
-  return null;
+  if (status === "idle") return null;
+
+  const label =
+    status === "loading"
+      ? "Refreshing Queen profiles..."
+      : status === "updated"
+        ? "Profiles refreshed. Updating table..."
+        : status === "current"
+          ? "Queen profiles are already current."
+          : status === "rate-limited"
+            ? "Refresh queued. Trying again shortly."
+            : "Refresh failed. Retrying shortly.";
+
+  return (
+    <div
+      className={`${styles["refresh-status"]} ${
+        status === "loading" ? styles["refresh-status-loading"] : ""
+      }`}
+      role="status"
+      aria-live="polite"
+    >
+      {status === "loading" ? <span className={styles.spinner} aria-hidden="true" /> : null}
+      <span>{label}</span>
+    </div>
+  );
 }

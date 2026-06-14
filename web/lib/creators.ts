@@ -424,14 +424,15 @@ async function fetchCreatorUploads(
 }
 
 async function fetchYouTubeLiveStream(
-  creator: CreatorConfig
+  creator: CreatorConfig,
+  revalidateSeconds = 120
 ): Promise<CreatorLiveStream | null> {
   const channelUrl = creatorYouTubeUrl(creator);
   if (!channelUrl && !creator.streamUrl) return null;
 
   const liveUrl = creator.streamUrl ?? `${channelUrl}/live`;
   const response = await fetch(liveUrl, {
-    next: { revalidate: 120 },
+    next: { revalidate: revalidateSeconds },
     redirect: "follow",
     headers: { "user-agent": "Mozilla/5.0" },
   });
@@ -468,7 +469,8 @@ async function fetchYouTubeLiveStream(
 }
 
 async function fetchTwitchLiveStream(
-  creator: CreatorConfig
+  creator: CreatorConfig,
+  revalidateSeconds = 120
 ): Promise<CreatorLiveStream | null> {
   if (!creator.streamUrl) return null;
   const login = twitchLogin(creator.streamUrl);
@@ -476,7 +478,7 @@ async function fetchTwitchLiveStream(
 
   const response = await fetch("https://gql.twitch.tv/gql", {
     method: "POST",
-    next: { revalidate: 120 },
+    next: { revalidate: revalidateSeconds },
     headers: {
       "client-id": "kimne78kx3ncx6brgo4mv6wki5h1ko",
       "content-type": "application/json",
@@ -523,7 +525,8 @@ async function fetchTwitchLiveStream(
 }
 
 async function fetchDouyuLiveStream(
-  creator: CreatorConfig
+  creator: CreatorConfig,
+  revalidateSeconds = 120
 ): Promise<CreatorLiveStream | null> {
   if (!creator.streamUrl) return null;
   const roomId = douyuRoomId(creator.streamUrl);
@@ -532,7 +535,7 @@ async function fetchDouyuLiveStream(
   const response = await fetch(
     `https://open.douyucdn.cn/api/RoomApi/room/${encodeURIComponent(roomId)}`,
     {
-      next: { revalidate: 120 },
+      next: { revalidate: revalidateSeconds },
       headers: { "user-agent": "Mozilla/5.0" },
     }
   );
@@ -566,16 +569,17 @@ async function fetchDouyuLiveStream(
 }
 
 async function fetchGenericLiveStream(
-  creator: CreatorConfig
+  creator: CreatorConfig,
+  revalidateSeconds = 120
 ): Promise<CreatorLiveStream | null> {
   if (!creator.streamUrl) return null;
   const platform = streamPlatform(creator.streamUrl);
-  if (platform === "youtube") return fetchYouTubeLiveStream(creator);
-  if (platform === "twitch") return fetchTwitchLiveStream(creator);
-  if (platform === "douyu") return fetchDouyuLiveStream(creator);
+  if (platform === "youtube") return fetchYouTubeLiveStream(creator, revalidateSeconds);
+  if (platform === "twitch") return fetchTwitchLiveStream(creator, revalidateSeconds);
+  if (platform === "douyu") return fetchDouyuLiveStream(creator, revalidateSeconds);
 
   const response = await fetch(creator.streamUrl, {
-    next: { revalidate: 120 },
+    next: { revalidate: revalidateSeconds },
     headers: { "user-agent": "Mozilla/5.0" },
   });
   if (!response.ok) return null;
@@ -601,7 +605,11 @@ async function fetchGenericLiveStream(
   };
 }
 
-export async function loadCreatorLiveStreams(): Promise<{
+export async function loadCreatorLiveStreams({
+  revalidateSeconds = 120,
+}: {
+  revalidateSeconds?: number;
+} = {}): Promise<{
   streams: CreatorLiveStream[];
   error: string | null;
 }> {
@@ -609,7 +617,7 @@ export async function loadCreatorLiveStreams(): Promise<{
   const results = await Promise.all(
     creators.map(async (creator) => {
       try {
-        return await fetchGenericLiveStream(creator);
+        return await fetchGenericLiveStream(creator, revalidateSeconds);
       } catch (error) {
         console.error(`Failed to load live stream for ${creator.id}:`, error);
         return null;
