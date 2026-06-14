@@ -15,6 +15,7 @@ const BOT_ID_PROTECTED_ROUTES = [
   { path: "/api/drodo/*", method: "GET" },
   { path: "/api/drodo/*", method: "POST" },
   { path: "/api/players/search", method: "GET" },
+  { path: "/api/queens/refresh", method: "POST" },
   { path: "/api/support", method: "POST" },
 ];
 
