@@ -1,4 +1,5 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { HOT_POLL_MAX_INTERVAL_SECONDS } from "@dac/shared/drodo-core";
 import { fetchAndCacheDrodoBatch } from "@/lib/drodo";
 import { revalidateQueenPages } from "@/lib/queensRevalidate";
 import { createSupabaseServiceRoleClient } from "@/lib/supabase";
@@ -16,6 +17,7 @@ interface GeneralScanUser extends DueUser {
   steam_signed_in_at: string | null;
   queen_ladder_rank: number | null;
   queen_ladder_last_seen_at: string | null;
+  poll_interval_seconds: number | null;
 }
 
 function pollBatchSize(): number {
@@ -33,7 +35,9 @@ function isActiveSyncUser(
     (user.steam_signed_in_at != null &&
       user.steam_signed_in_at >= recentSignInCutoff) ||
     user.queen_ladder_rank != null ||
-    user.queen_ladder_last_seen_at != null
+    user.queen_ladder_last_seen_at != null ||
+    (user.poll_interval_seconds != null &&
+      user.poll_interval_seconds <= HOT_POLL_MAX_INTERVAL_SECONDS)
   );
 }
 
@@ -58,7 +62,11 @@ async function handle(req: Request) {
   const generalScanCutoff = new Date(
     now.getTime() - GENERAL_SCAN_INTERVAL_MS
   ).toISOString();
-  const activeSyncFilter = `steam_signed_in_at.gte.${recentSignInCutoff},queen_ladder_rank.not.is.null`;
+  const activeSyncFilter = [
+    `steam_signed_in_at.gte.${recentSignInCutoff}`,
+    "queen_ladder_rank.not.is.null",
+    `poll_interval_seconds.lte.${HOT_POLL_MAX_INTERVAL_SECONDS}`,
+  ].join(",");
 
   const { data: dueUsers, error: queryError } = await supabase
     .from("users")
@@ -85,7 +93,7 @@ async function handle(req: Request) {
   const { data: generalScanUsers, error: generalScanError } = await supabase
     .from("users")
     .select(
-      "steam_id::text, steam_signed_in_at, queen_ladder_rank, queen_ladder_last_seen_at"
+      "steam_id::text, steam_signed_in_at, queen_ladder_rank, queen_ladder_last_seen_at, poll_interval_seconds"
     )
     .not("drodo_last_fetched_at", "is", null)
     .lte("drodo_last_fetched_at", generalScanCutoff)

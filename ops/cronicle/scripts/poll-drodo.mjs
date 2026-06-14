@@ -3,6 +3,7 @@
 import {
   fetchDrodoProfileBatch,
   drodoProfileToUserPayload,
+  HOT_POLL_MAX_INTERVAL_SECONDS,
   isQueenProfile,
   nextPollSchedule,
   pollSnapshotFromRow,
@@ -113,7 +114,11 @@ function rowSteamId(row) {
 async function loadActiveIds(supabase, limit) {
   const now = new Date();
   const recentSignInCutoff = new Date(now.getTime() - RECENT_SIGN_IN_WINDOW_MS).toISOString();
-  const activeSyncFilter = `steam_signed_in_at.gte.${recentSignInCutoff},queen_ladder_rank.not.is.null`;
+  const activeSyncFilter = [
+    `steam_signed_in_at.gte.${recentSignInCutoff}`,
+    "queen_ladder_rank.not.is.null",
+    `poll_interval_seconds.lte.${HOT_POLL_MAX_INTERVAL_SECONDS}`,
+  ].join(",");
 
   const dueUsers = await supabase.select("users", {
     select: "steam_id::text",

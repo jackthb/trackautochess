@@ -61,7 +61,7 @@ Default login for the packaged image is `admin` / `admin`. Change it first.
 
 Create two **Shell Script** jobs in the Cronicle UI.
 
-### Active/high-priority poll
+### Hourly active/high-priority poll
 
 Schedule: hourly
 
@@ -75,12 +75,18 @@ Command:
 /opt/cronicle/dac-scripts/poll-drodo-active.sh
 ```
 
-This polls active users: recently signed-in players, known Queen ladder players,
-and users with a known Drodo queen rank whose `next_poll_at` is due. Successful
-Queen/active pulls hold a fixed hourly hot cadence — /queens page views re-poll
-the whole Queen set on demand (and seed newly captured ladder players), so this
-job is the safety net for hours nobody is watching the page. Unseeded active
-users are also pulled once and join that hourly cadence.
+This polls the active cohort whose `next_poll_at` is due:
+
+- Steam players who signed in recently.
+- Known Queen ladder players.
+- Players whose Drodo stats have been changing recently. The adaptive poller
+  represents this as a short `poll_interval_seconds` value, currently at or
+  below the one-hour hot-poll cap.
+
+Unseeded active users are also pulled once and then join the adaptive cadence.
+This hourly job is the high-priority background poll; /queens page views and the
+five-minute Queen refresh endpoint can still update the visible Queen table
+between hourly runs.
 
 ### Daily full poll
 
