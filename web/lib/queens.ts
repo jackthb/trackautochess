@@ -43,7 +43,7 @@ export function profileQueenRank(row: QueenRow): number | null {
 }
 
 export function effectiveQueenRank(row: QueenRow): number | null {
-  return profileQueenRank(row) ?? row.queen_ladder_rank;
+  return row.queen_ladder_rank ?? profileQueenRank(row);
 }
 
 export function queenMmr(row: QueenRow): number | null {
