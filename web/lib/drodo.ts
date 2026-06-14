@@ -247,9 +247,6 @@ async function persistDrodoProfile(
     next_poll_at: schedule.next_poll_at,
     poll_interval_seconds: schedule.poll_interval_seconds,
   };
-  if (queen) {
-    userPayload.queen_ladder_last_seen_at = profile.fetched_at;
-  }
   const { error: upsertError } = await supabase
     .from("users")
     .upsert(userPayload, { onConflict: "steam_id" });

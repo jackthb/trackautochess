@@ -58,7 +58,9 @@ impl SupabaseClient {
         // Resolve never-pulled profiles BEFORE the upsert: the rows above stamp
         // `drodo_last_fetched_at` for every ladder player, which would hide new
         // players from the hydration query below.
-        let unpulled_ids = self.unpulled_queen_profile_ids(&seen_ids).unwrap_or_default();
+        let unpulled_ids = self
+            .unpulled_queen_profile_ids(&seen_ids)
+            .unwrap_or_default();
         self.post_json(
             "/rest/v1/users",
             &Value::Array(rows),
@@ -164,7 +166,6 @@ impl SupabaseClient {
                     user_rows.push(json!({
                         "steam_id": steam_id,
                         "drodo_last_fetched_at": fetched_at,
-                        "queen_ladder_last_seen_at": fetched_at,
                         "drodo_profile_missing": true,
                         "next_poll_at": next_drodo_poll_at(600),
                         "poll_interval_seconds": 600,
@@ -195,7 +196,6 @@ impl SupabaseClient {
                     "drodo_queen_rank": queen_rank,
                     "drodo_raw_data": Value::Object(info.clone()),
                     "drodo_last_fetched_at": fetched_at,
-                    "queen_ladder_last_seen_at": fetched_at,
                     "drodo_profile_missing": false,
                     "next_poll_at": next_drodo_poll_at(600),
                     "poll_interval_seconds": 600,

@@ -57,6 +57,13 @@ export function compareQueenRows(a: QueenRow, b: QueenRow): number {
 }
 
 function isBetterRankRow(candidate: QueenRow, current: QueenRow): boolean {
+  if (candidate.queen_ladder_rank != null && current.queen_ladder_rank == null) {
+    return true;
+  }
+  if (candidate.queen_ladder_rank == null && current.queen_ladder_rank != null) {
+    return false;
+  }
+
   const candidateProfileRank = profileQueenRank(candidate);
   const currentProfileRank = profileQueenRank(current);
   if (candidateProfileRank != null && currentProfileRank == null) return true;
@@ -98,15 +105,8 @@ function dedupeQueenRanks(rows: QueenRow[]): QueenRow[] {
 }
 
 export function selectDisplayedQueens(rows: QueenRow[]): QueenRow[] {
-  const latestSeenAt = rows[0]?.queen_ladder_last_seen_at ?? null;
-  const rankedRows = (latestSeenAt
-    ? rows.filter(
-        (row) =>
-          row.queen_ladder_last_seen_at === latestSeenAt ||
-          profileQueenRank(row) != null
-      )
-    : rows.filter((row) => profileQueenRank(row) != null)
-  )
+  const rankedRows = rows
+    .filter((row) => row.queen_ladder_rank != null || profileQueenRank(row) != null)
     .sort(compareQueenRows)
     .filter((row) => {
       const rank = effectiveQueenRank(row);
