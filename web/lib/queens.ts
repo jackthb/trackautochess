@@ -1,4 +1,5 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { STEAM_ID_TEXT_SELECT } from "@/lib/supabaseSelect";
 
 export interface QueenRow {
   steam_id: string;
@@ -19,21 +20,8 @@ export interface QueenRow {
 export const QUEEN_TABLE_LIMIT = 100;
 export const QUEEN_CANDIDATE_LIMIT = 300;
 
-export const QUEEN_SELECT = [
-  "steam_id::text",
-  "name",
-  "custom_url",
-  "avatar_url",
-  "stream_link",
-  "drodo_mmr",
-  "drodo_season",
-  "drodo_season_games",
-  "drodo_chicken_count",
-  "drodo_last_fetched_at",
-  "queen_ladder_rank",
-  "queen_ladder_season",
-  "queen_ladder_last_seen_at",
-].join(", ");
+export const QUEEN_SELECT =
+  `${STEAM_ID_TEXT_SELECT}, name, custom_url, avatar_url, stream_link, drodo_mmr, drodo_season, drodo_season_games, drodo_chicken_count, drodo_last_fetched_at, queen_ladder_rank, queen_ladder_season, queen_ladder_last_seen_at` as const;
 
 export function effectiveQueenRank(row: QueenRow): number | null {
   return row.queen_ladder_rank;

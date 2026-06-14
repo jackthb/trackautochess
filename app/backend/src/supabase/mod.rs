@@ -9,10 +9,12 @@ pub use matches::finished_match_id_from_rows;
 pub use outbox::queue_rows;
 
 use serde_json::{json, Value};
+use std::time::Duration;
 
 const STEAM_ID64_MIN: u64 = 76_561_197_960_265_728;
 const STEAM_ID64_MAX: u64 = 76_561_202_255_233_023;
 const DRODO_COURIER_BATCH_SIZE: usize = 100;
+const HTTP_TIMEOUT: Duration = Duration::from_secs(15);
 
 #[derive(Debug, Clone)]
 pub struct SupabaseClient {

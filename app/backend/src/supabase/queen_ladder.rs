@@ -1,10 +1,10 @@
 use super::{
     current_drodo_season, next_drodo_poll_at, now_iso_utc, number_from_object,
-    parse_valid_steam_id64, SupabaseClient, DRODO_COURIER_BATCH_SIZE,
+    parse_valid_steam_id64, SupabaseClient, DRODO_COURIER_BATCH_SIZE, HTTP_TIMEOUT,
 };
 use crate::{queen_ladder, queen_ladder::QueenPlayer};
 use serde_json::{json, Value};
-use std::collections::HashSet;
+use std::{collections::HashSet, thread};
 
 impl SupabaseClient {
     pub fn upsert_queen_ladder_players(&self, players: &[QueenPlayer]) -> Result<usize, String> {
@@ -55,22 +55,26 @@ impl SupabaseClient {
             return Ok(0);
         }
         let count = rows.len();
-        // Resolve never-pulled profiles BEFORE the upsert: the rows above stamp
-        // `drodo_last_fetched_at` for every ladder player, which would hide new
-        // players from the hydration query below.
-        let unpulled_ids = self
-            .unpulled_queen_profile_ids(&seen_ids)
-            .unwrap_or_default();
         self.post_json(
             "/rest/v1/users",
             &Value::Array(rows),
             "resolution=merge-duplicates,return=minimal",
         )?;
-        let _ = self.upsert_queen_ladder_snapshots(players);
-        let _ = self.hydrate_queen_profiles(&unpulled_ids);
-        let _ = self.clear_stale_queen_ladder_snapshot(&seen_ids);
-        let _ = revalidate_queens_page();
+        self.spawn_queen_ladder_followups(players.to_vec(), seen_ids);
         Ok(count)
+    }
+
+    fn spawn_queen_ladder_followups(&self, players: Vec<QueenPlayer>, seen_ids: Vec<u64>) {
+        let client = self.clone();
+        thread::spawn(move || {
+            let unpulled_ids = client
+                .unpulled_queen_profile_ids(&seen_ids)
+                .unwrap_or_default();
+            let _ = client.hydrate_queen_profiles(&unpulled_ids);
+            let _ = client.clear_stale_queen_ladder_snapshot(&seen_ids);
+            let _ = client.upsert_queen_ladder_snapshots(&players);
+            let _ = revalidate_queens_page();
+        });
     }
 
     /// Ladder Steam IDs whose Drodo profile has never been fetched — either
@@ -149,6 +153,7 @@ impl SupabaseClient {
             let response = ureq::get(&format!(
                 "http://autochess.ppbizon.com/courier/get/@{joined}"
             ))
+            .timeout(HTTP_TIMEOUT)
             .call()
             .map_err(|err| err.to_string())?;
             if !(200..300).contains(&response.status()) {
@@ -251,7 +256,7 @@ const QUEENS_REVALIDATE_URL: &str = "https://www.trackautochess.com/api/revalida
 /// still revalidates on its own ISR schedule if this fails.
 fn revalidate_queens_page() -> Result<(), String> {
     ureq::post(QUEENS_REVALIDATE_URL)
-        .timeout(std::time::Duration::from_secs(10))
+        .timeout(HTTP_TIMEOUT)
         .call()
         .map(|_| ())
         .map_err(|err| err.to_string())

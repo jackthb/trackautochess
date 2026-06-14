@@ -1,6 +1,7 @@
 use super::{
     describe_ureq_error, drodo_profile_to_user_payload, drodo_user_row_to_profile,
     mmr_level_to_app_rank, now_iso_utc, parse_valid_steam_id64, value_number, SupabaseClient,
+    HTTP_TIMEOUT,
 };
 use crate::config::Config;
 use serde_json::{json, Value};
@@ -99,7 +100,10 @@ impl SupabaseClient {
 
     pub fn refresh_drodo_profile(&self, steam_id: &str) -> Result<Value, String> {
         let api_url = format!("http://autochess.ppbizon.com/courier/get/@{steam_id}");
-        let response = ureq::get(&api_url).call().map_err(describe_ureq_error)?;
+        let response = ureq::get(&api_url)
+            .timeout(HTTP_TIMEOUT)
+            .call()
+            .map_err(describe_ureq_error)?;
         let body_text = response.into_string().map_err(|err| err.to_string())?;
         let body: Value = serde_json::from_str(&body_text).map_err(|err| err.to_string())?;
         if body.get("err").and_then(Value::as_i64).unwrap_or(-1) != 0 {
@@ -186,6 +190,7 @@ impl SupabaseClient {
 
     pub(super) fn post_json(&self, path: &str, body: &Value, prefer: &str) -> Result<(), String> {
         let response = ureq::post(&format!("{}{}", self.url, path))
+            .timeout(HTTP_TIMEOUT)
             .set("apikey", &self.key)
             .set("Authorization", &format!("Bearer {}", self.key))
             .set("Content-Type", "application/json")
@@ -204,6 +209,7 @@ impl SupabaseClient {
 
     pub(super) fn patch_json(&self, path: &str, body: &Value, prefer: &str) -> Result<(), String> {
         let response = ureq::request("PATCH", &format!("{}{}", self.url, path))
+            .timeout(HTTP_TIMEOUT)
             .set("apikey", &self.key)
             .set("Authorization", &format!("Bearer {}", self.key))
             .set("Content-Type", "application/json")
@@ -218,6 +224,7 @@ impl SupabaseClient {
 
     pub(super) fn delete_rows(&self, path: &str) -> Result<(), String> {
         let response = ureq::request("DELETE", &format!("{}{}", self.url, path))
+            .timeout(HTTP_TIMEOUT)
             .set("apikey", &self.key)
             .set("Authorization", &format!("Bearer {}", self.key))
             .set("Prefer", "return=minimal")
@@ -231,6 +238,7 @@ impl SupabaseClient {
 
     pub(super) fn get_json(&self, path: &str) -> Result<Value, String> {
         let response = ureq::get(&format!("{}{}", self.url, path))
+            .timeout(HTTP_TIMEOUT)
             .set("apikey", &self.key)
             .set("Authorization", &format!("Bearer {}", self.key))
             .call();

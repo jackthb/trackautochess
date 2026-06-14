@@ -1,4 +1,4 @@
-use super::SupabaseClient;
+use super::{SupabaseClient, HTTP_TIMEOUT};
 
 impl SupabaseClient {
     pub(super) fn upload_storage_object(
@@ -12,6 +12,7 @@ impl SupabaseClient {
             "{}/storage/v1/object/diagnostic-logs/{}",
             self.url, object_path
         ))
+        .timeout(HTTP_TIMEOUT)
         .set("apikey", &self.key)
         .set("Authorization", &format!("Bearer {}", self.key))
         .set("Content-Type", content_type);

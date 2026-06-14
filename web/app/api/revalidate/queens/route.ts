@@ -1,6 +1,7 @@
 import { revalidatePath } from "next/cache";
 import { createSupabaseServerClient } from "@/lib/supabase";
 import { playerProfilePath } from "@/lib/steam";
+import { STEAM_ID_TEXT_SELECT } from "@/lib/supabaseSelect";
 
 interface LadderPlayerRow {
   steam_id: string;
@@ -13,6 +14,7 @@ interface LadderPlayerRow {
 // windows. Unauthenticated by design: desktop clients cannot hold a secret, and
 // the worst case is an extra render of pages that revalidate on a timer anyway.
 async function handle() {
+  revalidatePath("/creators");
   revalidatePath("/queens");
 
   let players = 0;
@@ -20,7 +22,7 @@ async function handle() {
   if (supabase) {
     const { data, error } = await supabase
       .from("users")
-      .select("steam_id::text, custom_url")
+      .select(`${STEAM_ID_TEXT_SELECT}, custom_url`)
       .not("queen_ladder_last_seen_at", "is", null)
       .limit(300);
     if (error) {

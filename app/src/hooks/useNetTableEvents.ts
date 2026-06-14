@@ -387,6 +387,7 @@ export function useNetTableEvents(): NetTableActivityState {
           break;
         }
         case "nettable_queen_upload_progress": {
+          setQueenUpload(null);
           setQueenUploadProgress(msg.message);
           break;
         }

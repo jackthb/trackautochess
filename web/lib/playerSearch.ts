@@ -1,4 +1,5 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { STEAM_ID_TEXT_SELECT } from "@/lib/supabaseSelect";
 
 export interface SearchResult {
   steam_id: string;
@@ -18,7 +19,7 @@ export interface UserSearchRow {
 }
 
 export const USER_SEARCH_SELECT =
-  "steam_id::text, name, custom_url, drodo_last_fetched_at, drodo_profile_missing";
+  `${STEAM_ID_TEXT_SELECT}, name, custom_url, drodo_last_fetched_at, drodo_profile_missing` as const;
 
 export function toSearchResult(row: UserSearchRow): SearchResult {
   return {
@@ -95,7 +96,7 @@ export async function markRowsWithGames(
 
   const { data } = await supabase
     .from("match_players")
-    .select("steam_id::text")
+    .select(STEAM_ID_TEXT_SELECT)
     .filter("steam_id", "in", `(${ids.join(",")})`)
     .limit(1000);
 

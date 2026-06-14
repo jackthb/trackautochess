@@ -1,6 +1,7 @@
 import creatorsConfig from "../../content/creators.json";
 import { playerProfilePath } from "@/lib/steam";
 import { createSupabaseAnonClient } from "@/lib/supabase";
+import { STEAM_ID_TEXT_SELECT } from "@/lib/supabaseSelect";
 
 export type CreatorPlatform = "twitch" | "youtube" | "kick" | "douyu" | "website";
 
@@ -48,7 +49,7 @@ interface CreatorConfigFile {
 }
 
 interface CreatorUserRow {
-  steam_id: number | string;
+  steam_id: string;
   name: string | null;
   custom_url: string | null;
   avatar_url: string | null;
@@ -82,6 +83,8 @@ const DEFAULT_INCLUDE_TERMS = [
 ];
 
 const DEFAULT_EXCLUDE_TERMS = ["teamfight tactics", "tft", "hearthstone", "battlegrounds"];
+const CREATOR_USER_SELECT =
+  `${STEAM_ID_TEXT_SELECT}, name, custom_url, avatar_url, stream_link, drodo_mmr, drodo_season_games, drodo_chicken_count, drodo_raw_data, queen_ladder_rank, queen_ladder_last_seen_at` as const;
 
 function contentCreatorConfigRows(): CreatorConfig[] {
   return ((creatorsConfig as CreatorConfigFile).creators ?? [])
@@ -100,9 +103,7 @@ async function databaseCreatorConfigRows(): Promise<CreatorConfig[]> {
 
   const { data, error } = await supabase
     .from("users")
-    .select(
-      "steam_id, name, custom_url, avatar_url, stream_link, drodo_mmr, drodo_season_games, drodo_chicken_count, drodo_raw_data, queen_ladder_rank, queen_ladder_last_seen_at"
-    )
+    .select(CREATOR_USER_SELECT)
     .not("stream_link", "is", null)
     .order("queen_ladder_rank", { ascending: true, nullsFirst: false })
     .limit(100);
