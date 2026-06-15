@@ -19,6 +19,7 @@ import {
   isFreshCache,
   lastTop3FromDrodoData,
   lastWinFromDrodoData,
+  numberFromDrodoData,
 } from "@/lib/drodo";
 import { mostRecentTimestamp } from "@/lib/timestamps";
 import { fetchSteamProfile } from "@/lib/steam";
@@ -53,7 +54,9 @@ function drodoFromCachedRow(row: CachedUserDrodoRow) {
     mmr: row.drodo_mmr,
     max_mmr: row.drodo_max_mmr,
     mmr_level: row.drodo_mmr_level,
-    queen_rank: row.queen_ladder_rank,
+    queen_rank:
+      row.queen_ladder_rank ??
+      (row.drodo_raw_data ? numberFromDrodoData(row.drodo_raw_data, "queen_rank") : null),
     last_win_at: row.drodo_raw_data ? lastWinFromDrodoData(row.drodo_raw_data) : null,
     last_top3_at: row.drodo_raw_data ? lastTop3FromDrodoData(row.drodo_raw_data) : null,
     season: row.drodo_season,
@@ -65,7 +68,9 @@ function drodoFromCachedRow(row: CachedUserDrodoRow) {
 
 function isCachedQueenProfile(row: CachedUserDrodoRow | null): boolean {
   return Boolean(
-    row?.queen_ladder_rank != null || row?.queen_ladder_last_seen_at
+    row?.queen_ladder_rank != null ||
+      row?.queen_ladder_last_seen_at ||
+      (row?.drodo_raw_data && numberFromDrodoData(row.drodo_raw_data, "queen_rank") != null)
   );
 }
 

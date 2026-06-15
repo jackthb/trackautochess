@@ -179,9 +179,17 @@ async function smokeDrodoPersistenceCallback() {
       "Drodo profile refreshes must not overwrite captured ladder timestamps"
     );
 
+    const snapshotUpsert = state.calls.find(
+      (call) => call.table === "mmr_snapshots" && call.op === "upsert"
+    );
     assert.ok(
-      state.calls.some((call) => call.table === "mmr_snapshots" && call.op === "upsert"),
+      snapshotUpsert,
       "successful profile refresh must snapshot MMR/Queen rank history"
+    );
+    assert.equal(
+      (snapshotUpsert.payload as Record<string, unknown>).queen_rank,
+      7,
+      "Queen profile refreshes must persist the reported Queen rank into history"
     );
   } finally {
     restoreFetch();

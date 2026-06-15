@@ -12,6 +12,7 @@ import {
   lastTop3FromDrodoData,
   lastWinFromDrodoData,
   nextPollSchedule,
+  numberFromDrodoData,
   pollSnapshotFromRow,
   profileChanged,
   summarizeDrodoResults,
@@ -43,6 +44,7 @@ export {
   lastTop3FromDrodoData,
   lastWinFromDrodoData,
   nextPollSchedule,
+  numberFromDrodoData,
   summarizeDrodoResults,
 };
 export type { DrodoProfileRow, SeasonSnapshotRow };
@@ -105,7 +107,9 @@ export function cachedUserToDrodoProfile(row: CachedUserDrodoRow): DrodoProfileR
     mmr: row.drodo_mmr,
     max_mmr: row.drodo_max_mmr,
     mmr_level: row.drodo_mmr_level,
-    queen_rank: row.queen_ladder_rank,
+    queen_rank:
+      row.queen_ladder_rank ??
+      (row.drodo_raw_data ? numberFromDrodoData(row.drodo_raw_data, "queen_rank") : null),
     last_win_at: row.drodo_raw_data ? lastWinFromDrodoData(row.drodo_raw_data) : null,
     last_top3_at: row.drodo_raw_data ? lastTop3FromDrodoData(row.drodo_raw_data) : null,
     season: row.drodo_season,
@@ -268,7 +272,7 @@ async function persistDrodoProfile(
           mmr: profile.mmr,
           season: profile.season,
           chicken_count: profile.chicken_count,
-          queen_rank: null,
+          queen_rank: profile.queen_rank,
           snapshotted_at: new Date().toISOString(),
         },
         { onConflict: "steam_id,season,mmr,chicken_count,queen_rank" }

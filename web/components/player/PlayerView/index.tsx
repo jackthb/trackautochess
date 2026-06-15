@@ -398,7 +398,7 @@ export default function PlayerView({
         const profile = data as RefreshedDrodoProfile;
         setDrodo((current) => ({
           ...drodoStatsFromProfile(profile),
-          queen_rank: current?.queen_rank ?? null,
+          queen_rank: profile.queen_rank ?? current?.queen_rank ?? null,
         }));
         if (Array.isArray(profile.seasons)) {
           setSeasons(profile.seasons as SeasonSnapshot[]);
@@ -601,7 +601,7 @@ export default function PlayerView({
       setDrodoProfileMissing(false);
       setDrodo((current) => ({
         ...drodoStatsFromProfile(profile),
-        queen_rank: current?.queen_rank ?? null,
+        queen_rank: profile.queen_rank ?? current?.queen_rank ?? null,
       }));
       if (Array.isArray(profile.seasons)) {
         setSeasons(profile.seasons as SeasonSnapshot[]);

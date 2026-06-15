@@ -204,6 +204,7 @@ export function pollSnapshotFromRow(row) {
 
 export function isQueenProfile(profile, prev) {
   return (
+    profile?.queen_rank != null ||
     prev?.queen_rank != null ||
     prev?.queen_ladder_last_seen_at != null
   );
