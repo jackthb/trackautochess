@@ -5,6 +5,8 @@ export const SITE_TITLE = "Track Dota Auto Chess";
 export const SITE_DESCRIPTION =
   "Track Auto Chess helps Dota Auto Chess players browse items and relics, read patch notes, and track matches.";
 export const DEFAULT_SITE_URL = "https://www.trackautochess.com";
+const CANONICAL_HOST = "www.trackautochess.com";
+const ROOT_HOST = "trackautochess.com";
 
 function normalizeUrl(raw: string | null | undefined): string | null {
   if (!raw) return null;
@@ -13,7 +15,17 @@ function normalizeUrl(raw: string | null | undefined): string | null {
   const withProtocol = /^https?:\/\//i.test(trimmed)
     ? trimmed
     : `https://${trimmed}`;
-  return withProtocol.replace(/\/+$/, "");
+  try {
+    const url = new URL(withProtocol);
+    if (url.hostname === ROOT_HOST || url.hostname === CANONICAL_HOST) {
+      url.protocol = "https:";
+      url.hostname = CANONICAL_HOST;
+      url.port = "";
+    }
+    return url.toString().replace(/\/+$/, "");
+  } catch {
+    return withProtocol.replace(/\/+$/, "");
+  }
 }
 
 export function getSiteUrl(): string | null {

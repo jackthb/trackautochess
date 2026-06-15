@@ -1,4 +1,12 @@
 {
   "ignoreCommand": "node scripts/ignore-build.mjs",
+  "redirects": [
+    {
+      "source": "/:path*",
+      "has": [{ "type": "host", "value": "trackautochess.com" }],
+      "destination": "https://www.trackautochess.com/:path*",
+      "permanent": true
+    }
+  ],
   "regions": ["dub1"]
 }

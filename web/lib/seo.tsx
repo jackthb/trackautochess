@@ -112,12 +112,6 @@ export function SeoHead({
 }
 
 function ogLocale(locale: Locale): string {
-  switch (locale) {
-    case "ru":
-      return "ru_RU";
-    case "zh":
-      return "zh_CN";
-    default:
-      return "en_US";
-  }
+  void locale;
+  return "en_US";
 }

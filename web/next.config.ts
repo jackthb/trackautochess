@@ -38,8 +38,7 @@ const nextConfig: NextConfig = {
   },
   // i18n routing was removed (en/ru/zh; ~3.4% of traffic, little translated
   // content). The site now serves a single English locale; localization will
-  // be rebuilt on the App Router via next-intl when there's a reason to. The
-  // /ru/* and /zh/* redirects below preserve link equity for the old URLs.
+  // be rebuilt on the App Router via next-intl when there's a reason to.
   async headers() {
     const immutableAssetCache = [
       {
@@ -103,13 +102,8 @@ const nextConfig: NextConfig = {
       },
     ];
   },
-  // The old locale-prefixed URLs now redirect to their English equivalents so
-  // existing links and indexed pages don't 404. Covers /ru/privacy -> /privacy
-  // (App Router) and e.g. /ru/units/abaddon -> /units/abaddon (Pages Router).
   async redirects() {
     return [
-      { source: "/ru/:path*", destination: "/:path*", permanent: true },
-      { source: "/zh/:path*", destination: "/:path*", permanent: true },
       // /synergies is an alias for the classes listing (was a getServerSideProps
       // redirect in pages/synergies.tsx before the App Router migration).
       { source: "/synergies", destination: "/classes", permanent: true },

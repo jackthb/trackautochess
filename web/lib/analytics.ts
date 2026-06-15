@@ -18,7 +18,7 @@ export function bucketCount(count: number): string {
 }
 
 export function analyticsRoute(pathname: string): string {
-  const localeMatch = pathname.match(/^\/(en|ru)(?=\/|$)/);
+  const localeMatch = pathname.match(/^\/en(?=\/|$)/);
   const prefix = localeMatch?.[0] ?? "";
   const path = prefix ? pathname.slice(prefix.length) || "/" : pathname;
 
