@@ -1,0 +1,16 @@
+{
+  "title": "Poll Drodo (MMR snapshots) - full",
+  "name": "poll-drodo-all",
+  "description": "Daily Drodo sweep: active cohort plus inactive users on a weekly cadence (profile >= 7 days old)",
+  "plugin": "command",
+  "command": "/opt/cronicle/dac-scripts/poll-drodo-all.sh",
+  "workdir": "/workspace",
+  "schedule": "17 4 * * *",
+  "timezone": "Europe/London",
+  "timeout": 3600,
+  "enabled": 1,
+  "catchup": 1,
+  "env": {
+    "NODE_ENV": "production"
+  }
+}
