@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { QUEENS_REFRESH_CHECKED_EVENT } from "./NextRefreshTime";
+import { NextRefreshTime, QUEENS_REFRESH_CHECKED_EVENT } from "./NextRefreshTime";
 import { nextQueensRefreshDelayMs } from "./refreshTiming";
 import styles from "./queens.module.css";
 
@@ -150,8 +150,6 @@ export function QueensAutoRefresh({
     };
   }, [cooldownMs, router]);
 
-  if (status === "idle") return null;
-
   const label =
     status === "loading"
       ? "Refreshing Queen profiles..."
@@ -161,7 +159,9 @@ export function QueensAutoRefresh({
           ? "Queen profiles are already current."
           : status === "rate-limited"
             ? "Refresh queued. Trying again shortly."
-            : "Refresh failed. Retrying shortly.";
+            : status === "error"
+              ? "Refresh failed. Retrying shortly."
+              : null;
 
   return (
     <div
@@ -172,7 +172,17 @@ export function QueensAutoRefresh({
       aria-live="polite"
     >
       {status === "loading" ? <span className={styles.spinner} aria-hidden="true" /> : null}
-      <span>{label}</span>
+      {label ? (
+        <span>{label}</span>
+      ) : (
+        <>
+          <span>Next update</span>
+          <NextRefreshTime
+            latestFetchedAt={latestFetchedAt}
+            cooldownMs={cooldownMs}
+          />
+        </>
+      )}
     </div>
   );
 }

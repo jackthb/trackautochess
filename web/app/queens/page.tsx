@@ -18,7 +18,6 @@ import {
 import { mostRecentTimestamp } from "@/lib/timestamps";
 import { canonicalCreatorStreamUrl, loadCreatorLiveStreams } from "@/lib/creators";
 import styles from "./queens.module.css";
-import { NextRefreshTime } from "./NextRefreshTime";
 import { QueensAutoRefresh } from "./QueensAutoRefresh";
 
 interface QueenRow extends BaseQueenRow {
@@ -338,13 +337,6 @@ export default async function QueensPage() {
         <div className={styles.empty}>No Queen players tracked yet.</div>
       ) : (
         <>
-          <div className={styles["snapshot-meta"]}>
-            <span>Next update</span>
-            <NextRefreshTime
-              latestFetchedAt={refreshAnchorAt}
-              cooldownMs={QUEENS_VIEW_REFRESH_COOLDOWN_MS}
-            />
-          </div>
           <div className={`${styles.table} ${styles["queen-table"]}`} role="table">
             <div className={`${styles.row} ${styles["header-row"]}`}>
               <div className={`${styles.cell} ${styles["cell-rank"]}`}>Rank</div>
