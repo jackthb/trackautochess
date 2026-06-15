@@ -53,6 +53,12 @@ pub(crate) fn parse_valid_steam_id64(value: &str) -> Option<u64> {
         .then_some(steam_id)
 }
 
+pub(crate) fn steam_id64_to_account_id(value: &str) -> Option<String> {
+    parse_valid_steam_id64(value)?
+        .checked_sub(STEAM_ID64_MIN)
+        .map(|account| account.to_string())
+}
+
 fn number_from_object(object: &serde_json::Map<String, Value>, key: &str) -> Option<i64> {
     let value = object.get(key)?;
     match value {
@@ -193,10 +199,7 @@ mod tests {
             observed_at: None,
             match_started_at: None,
         };
-        let rows = vec![
-            id_row(1, 76561198000000002),
-            id_row(2, 76561198000000001),
-        ];
+        let rows = vec![id_row(1, 76561198000000002), id_row(2, 76561198000000001)];
         let expected: std::collections::BTreeSet<u64> =
             [76561198000000001u64, 76561198000000002u64]
                 .into_iter()
@@ -341,6 +344,15 @@ mod tests {
         assert_eq!(parse_valid_steam_id64("76561197960265727"), None);
         assert_eq!(parse_valid_steam_id64("76561202255233024"), None);
         assert_eq!(parse_valid_steam_id64("not-a-steam-id"), None);
+    }
+
+    #[test]
+    fn steam_id64_to_account_id_uses_standard_valve_offset() {
+        assert_eq!(
+            steam_id64_to_account_id("76561198022169086"),
+            Some("61903358".to_owned())
+        );
+        assert_eq!(steam_id64_to_account_id("not-a-steam-id"), None);
     }
 
     #[test]
@@ -506,12 +518,18 @@ mod tests {
         for row in &mut timed_rows {
             row.match_started_at = Some("2026-06-07T11:45:00Z".to_owned());
         }
-        let timed =
-            build_fallback_match_row(&timed_rows, "post_game_no_end_board", "2026-06-07T12:00:00Z")
-                .expect("timed fallback should build");
-        let timed_retry =
-            build_fallback_match_row(&timed_rows, "post_game_no_end_board", "2026-06-07T12:01:00Z")
-                .expect("timed retry fallback should build");
+        let timed = build_fallback_match_row(
+            &timed_rows,
+            "post_game_no_end_board",
+            "2026-06-07T12:00:00Z",
+        )
+        .expect("timed fallback should build");
+        let timed_retry = build_fallback_match_row(
+            &timed_rows,
+            "post_game_no_end_board",
+            "2026-06-07T12:01:00Z",
+        )
+        .expect("timed retry fallback should build");
         assert_eq!(
             timed_retry["match_id"], timed["match_id"],
             "fallback retries with captured match timing should be idempotent"

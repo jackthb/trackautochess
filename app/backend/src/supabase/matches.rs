@@ -266,9 +266,8 @@ pub(super) fn same_game_window(played_at: &str) -> Option<(String, String)> {
         .ok()?
         .with_timezone(&chrono::Utc);
     let window = chrono::Duration::minutes(SAME_GAME_WINDOW_MINUTES);
-    let fmt = |at: chrono::DateTime<chrono::Utc>| {
-        at.to_rfc3339_opts(chrono::SecondsFormat::Secs, true)
-    };
+    let fmt =
+        |at: chrono::DateTime<chrono::Utc>| at.to_rfc3339_opts(chrono::SecondsFormat::Secs, true);
     Some((fmt(center - window), fmt(center + window)))
 }
 

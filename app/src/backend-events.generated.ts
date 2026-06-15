@@ -78,7 +78,7 @@ export type NettableMatchLeftResolved = { type: string, backend: string,
  */
 outcome: string, match_id: string | null, message: string, at: string, };
 
-export type NettableCheckActiveMatch = { type: string, backend: string, ok: boolean, paused: boolean, message: string, at: string, };
+export type NettableCheckActiveMatch = { type: string, backend: string, ok: boolean, paused: boolean, message: string, command_transport: string | null, at: string, };
 
 export type NettableResyncComplete = { type: string, ok: boolean, noop: boolean, error: string | null, };
 
@@ -88,7 +88,7 @@ export type NettableQueenUploadComplete = { type: string, ok: boolean, player_co
 
 export type NettableStateEvent = { type: string, backend: string, rows: JsonValue, state: JsonValue, players: JsonValue, local_steam_ids: JsonValue, at: string, };
 
-export type NettableStatus = { type: string, backend: string, ok: boolean, paused: boolean, autoexec_installed: boolean, gsi_cfg_installed: boolean, log_path: string, log_writable: boolean, dota_dir: string, remote_enabled: boolean, launch_options: string | null, has_condebug: boolean | null, has_conclearlog: boolean | null, has_gamestateintegration: boolean | null, steam_running: boolean, dota_running: boolean, log_active: boolean, };
+export type NettableStatus = { type: string, backend: string, ok: boolean, paused: boolean, autoexec_installed: boolean, gsi_cfg_installed: boolean, log_path: string, log_writable: boolean, dota_dir: string, remote_enabled: boolean, launch_options: string | null, has_console: boolean | null, has_condebug: boolean | null, has_conclearlog: boolean | null, has_gamestateintegration: boolean | null, dota_focused: boolean, steam_running: boolean, dota_running: boolean, log_active: boolean, };
 
 export type NettableSetupProgress = { type: string, stage: string, message: string, };
 

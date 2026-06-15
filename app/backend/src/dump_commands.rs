@@ -15,22 +15,6 @@ pub enum DumpKey {
     F24,
 }
 
-impl DumpKey {
-    pub fn console_commands(self) -> &'static [&'static str] {
-        match self {
-            DumpKey::F16 => &["dumpstringtable CustomNetTable_chess_pool_table cl verbose"],
-            DumpKey::F20 => &["dumpstringtable CustomNetTable_player_id_table cl verbose"],
-            DumpKey::F21 => &["dumpstringtable CustomNetTable_dac_table cl verbose"],
-            DumpKey::F22 => &["dumpstringtable CustomNetTable_player_info_table cl verbose"],
-            DumpKey::F23 => &["dumpstringtable CustomNetTable_game_info cl verbose"],
-            DumpKey::F24 => &[
-                "dumpstringtable CustomNetTable_ranking_top_table cl verbose",
-                "dumpstringtable CustomNetTable_player_id_table cl verbose",
-            ],
-        }
-    }
-}
-
 #[cfg(target_os = "windows")]
 impl DumpKey {
     fn virtual_key(self) -> u16 {
@@ -45,10 +29,35 @@ impl DumpKey {
     }
 }
 
-pub fn dump_console_commands(keys: &[DumpKey]) -> Vec<&'static str> {
-    keys.iter()
-        .flat_map(|key| key.console_commands().iter().copied())
-        .collect()
+pub fn send_dump_keys_if_dota_focused(keys: &[DumpKey]) -> Result<(), String> {
+    if !dota_has_foreground_focus() {
+        return Err("Dota is not focused".to_owned());
+    }
+    send_dump_keys(keys)
+}
+
+#[cfg(target_os = "windows")]
+pub fn dota_has_foreground_focus() -> bool {
+    let Some(dota_pid) = dota_process_id() else {
+        return false;
+    };
+    let hwnd = unsafe { windows_sys::Win32::UI::WindowsAndMessaging::GetForegroundWindow() };
+    if hwnd.is_null() {
+        return false;
+    }
+    let mut foreground_pid = 0_u32;
+    unsafe {
+        windows_sys::Win32::UI::WindowsAndMessaging::GetWindowThreadProcessId(
+            hwnd,
+            &mut foreground_pid,
+        );
+    }
+    foreground_pid == dota_pid
+}
+
+#[cfg(not(target_os = "windows"))]
+pub fn dota_has_foreground_focus() -> bool {
+    false
 }
 
 pub fn send_dump_keys(keys: &[DumpKey]) -> Result<(), String> {
@@ -107,5 +116,27 @@ fn send_key(key: DumpKey) -> Result<(), String> {
 
 #[cfg(not(target_os = "windows"))]
 fn send_key(_key: DumpKey) -> Result<(), String> {
-    Err("dump hotkeys are only supported on Windows".to_owned())
+    Err("focused dump-key fallback is only supported on Windows".to_owned())
+}
+
+#[cfg(target_os = "windows")]
+fn dota_process_id() -> Option<u32> {
+    use std::os::windows::process::CommandExt;
+    const CREATE_NO_WINDOW: u32 = 0x0800_0000;
+
+    let output = std::process::Command::new("tasklist")
+        .args(["/FI", "IMAGENAME eq dota2.exe", "/FO", "CSV", "/NH"])
+        .creation_flags(CREATE_NO_WINDOW)
+        .output()
+        .ok()?;
+    let text = String::from_utf8_lossy(&output.stdout);
+    text.lines().find_map(|line| {
+        let mut fields = line.trim().trim_matches('"').split("\",\"");
+        let image = fields.next()?;
+        let pid = fields.next()?;
+        image
+            .eq_ignore_ascii_case("dota2.exe")
+            .then(|| pid.parse::<u32>().ok())
+            .flatten()
+    })
 }

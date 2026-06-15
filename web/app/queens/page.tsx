@@ -302,10 +302,12 @@ function StreamIcon({ platform }: { platform: ReturnType<typeof streamPlatform> 
 }
 
 export default async function QueensPage() {
-  const [{ rows, error }, { streams }] = await Promise.all([
+  const [{ rows, error }, liveStreamsResult] = await Promise.all([
     loadQueens(),
     loadCreatorLiveStreamsWithTimeout(),
   ]);
+  const { streams, error: liveStreamsError } = liveStreamsResult;
+  const liveStatusAvailable = !liveStreamsError;
   const season = rows.find((row) => row.queen_ladder_season)?.queen_ladder_season;
   const lastUpdatedAt = newestDrodoFetchedAt(rows) ?? queenLastUpdatedAt(rows);
   const oldestUpdatedAt = oldestDrodoFetchedAt(rows) ?? queenOldestUpdatedAt(rows);
@@ -330,6 +332,11 @@ export default async function QueensPage() {
         The table renders cached Drodo profile data immediately, then refreshes
         visible profiles when the 5-minute cooldown has elapsed.
       </p>
+      {liveStreamsError ? (
+        <p className={styles["live-status-note"]}>
+          Live stream status is unavailable right now; stream links are still shown.
+        </p>
+      ) : null}
 
       {error ? (
         <div className={styles.gate}>Failed to load Queen players: {error}</div>
@@ -357,6 +364,18 @@ export default async function QueensPage() {
                 (row.stream_link
                   ? liveStreamUrls.has(canonicalCreatorStreamUrl(row.stream_link))
                   : false);
+              const streamLinkClass = [
+                styles["stream-link"],
+                isLive ? styles["stream-link-live"] : "",
+                !liveStatusAvailable ? styles["stream-link-unknown"] : "",
+              ]
+                .filter(Boolean)
+                .join(" ");
+              const streamTitle = isLive
+                ? `${display} stream is live`
+                : liveStatusAvailable
+                  ? row.stream_link ?? `${display} stream`
+                  : `${display} stream (live status unavailable)`;
               const initial = display.charAt(0).toUpperCase() || "?";
               const games = seasonGames(row);
               const wins = seasonWins(row);
@@ -405,14 +424,18 @@ export default async function QueensPage() {
                     </Link>
                     {row.stream_link ? (
                       <a
-                        className={`${styles["stream-link"]} ${
-                          isLive ? styles["stream-link-live"] : ""
-                        }`}
+                        className={streamLinkClass}
                         href={row.stream_link}
                         target="_blank"
                         rel="noopener noreferrer"
-                        aria-label={`${display} stream`}
-                        title={row.stream_link}
+                        aria-label={
+                          isLive
+                            ? `${display} stream is live`
+                            : liveStatusAvailable
+                              ? `${display} stream`
+                              : `${display} stream; live status unavailable`
+                        }
+                        title={streamTitle}
                       >
                         <StreamIcon platform={streamPlatform(row.stream_link)} />
                       </a>

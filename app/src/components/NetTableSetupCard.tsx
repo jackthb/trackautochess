@@ -17,7 +17,11 @@ interface NetTableSetupCardProps {
 
 // Internal Dota integration flags applied by the backend. Keep these out of
 // user-facing copy; the UI should describe setup state, not implementation.
-const REQUIRED_FLAGS = ["-condebug", "-conclearlog", "-gamestateintegration"];
+const REQUIRED_FLAGS = [
+  "-condebug",
+  "-conclearlog",
+  "-gamestateintegration",
+];
 
 /**
  * Setup card driven by **empirical** signals, not config parsing.
@@ -93,26 +97,31 @@ export function NetTableSetupCard({
   const condebugSet = status?.has_condebug === true;
   const conclearlogSet = status?.has_conclearlog === true;
   const gsiSet = status?.has_gamestateintegration === true;
+  const dotaFocused = status?.dota_focused === true;
   const flagsSet = condebugSet && conclearlogSet && gsiSet;
-  // Empirical signal trumps config-derived signal: Steam doesn't flush
-  // localconfig.vdf to disk until it exits, so `flagsSet` can be stale
-  // while Steam is running. If `log_active` is true, the flags ARE
-  // working right now — don't pester the user to "set them for me".
-  const needsApply = flagsKnown && !flagsSet && !logActive;
+  // console.log activity alone does not prove capture can request dumps. Dota
+  // must be focused so the app-owned dump binds go to Dota and not another app.
+  const commandDeliveryReady = dotaRunning ? dotaFocused : flagsSet;
+  const needsApply = flagsKnown && !flagsSet;
 
   // "All good" requires:
   //   - autoexec installed AND
-  //   - Either Dota is running with -condebug verifiably working
-  //     (empirical: console.log is being written), OR
+  //   - Either Dota is running with -condebug and focused for dump-key delivery, OR
   //   - Dota isn't running but config says the flags are set (will work
   //     when launched).
   // Crucially: if Dota isn't running AND flags aren't confirmed set in
   // localconfig, we are NOT done — don't pretend we are.
   const paused = status?.paused === true;
   const remoteEnabled = status?.remote_enabled !== false;
-  const tracking = dotaRunning && logActive;
+  const tracking = dotaRunning && logActive && commandDeliveryReady;
+  const waitingForFocus = Boolean(dotaRunning && flagsSet && !commandDeliveryReady);
   const allOk = Boolean(
-    status && remoteEnabled && autoexecOk && (tracking || (!dotaRunning && flagsSet)),
+    status &&
+      remoteEnabled &&
+      autoexecOk &&
+      flagsSet &&
+      commandDeliveryReady &&
+      (tracking || (!dotaRunning && flagsSet)),
   );
   const notSetup = Boolean(status && remoteEnabled && (!autoexecOk || needsApply));
   const cantTell = !status || Boolean(status && remoteEnabled && !allOk && !notSetup);
@@ -169,10 +178,16 @@ export function NetTableSetupCard({
   }
 
   const buttonLabel = applying ? "Setting up…" : "Set up automatically";
-  const setupTitle = notSetup ? "Setup needs update" : "Might be set up";
+  const setupTitle = notSetup
+    ? "Setup needs update"
+    : waitingForFocus
+      ? "Waiting for Dota"
+      : "Might be set up";
   const setupDetail = notSetup
     ? "Run automatic setup, then restart Dota."
-    : "We've applied the Dota setup we can check. We can't confirm it is working until Dota writes lobby data, so try a practice lobby and play one round.";
+    : waitingForFocus
+      ? "Dota is running but not focused. Bring Dota to the foreground so the app can request dumps; it will catch up immediately on refocus."
+    : "We've applied the Dota setup we can check. We can't confirm it is working until Dota is focused and writing lobby data, so try a practice lobby.";
 
   return (
     <div className="nettable-setup-card">

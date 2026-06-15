@@ -219,6 +219,30 @@ function MmrDeltaCard({ snapshots }: { snapshots: MmrSnapshot[] }) {
   );
 }
 
+type RefreshedDrodoProfile = DrodoProfileRow & {
+  seasons?: unknown;
+  mmr_history?: unknown;
+  queen_rank_history?: unknown;
+};
+
+function isMmrSnapshot(value: unknown): value is MmrSnapshot {
+  if (!value || typeof value !== "object") return false;
+  const row = value as Record<string, unknown>;
+  return (
+    (typeof row.mmr === "number" || row.mmr === null) &&
+    typeof row.snapshotted_at === "string"
+  );
+}
+
+function isQueenRankSnapshot(value: unknown): value is QueenRankSnapshot {
+  if (!value || typeof value !== "object") return false;
+  const row = value as Record<string, unknown>;
+  return (
+    (typeof row.queen_rank === "number" || row.queen_rank === null) &&
+    typeof row.snapshotted_at === "string"
+  );
+}
+
 export default function PlayerView({
   route,
   steamId,
@@ -226,14 +250,18 @@ export default function PlayerView({
   games,
   drodo: initialDrodo,
   seasons: initialSeasons,
-  mmrHistory,
-  queenRankHistory,
+  mmrHistory: initialMmrHistory,
+  queenRankHistory: initialQueenRankHistory,
   drodoProfileMissing: initialDrodoProfileMissing,
   drodoLastFetchedAt: initialDrodoLastFetchedAt,
   manualRefreshQuota: initialManualRefreshQuota,
 }: PlayerPageProps) {
   const [drodo, setDrodo] = useState(initialDrodo);
   const [seasons, setSeasons] = useState(initialSeasons);
+  const [mmrHistory, setMmrHistory] = useState(initialMmrHistory);
+  const [queenRankHistory, setQueenRankHistory] = useState(
+    initialQueenRankHistory
+  );
   const [drodoProfileMissing, setDrodoProfileMissing] = useState(
     initialDrodoProfileMissing
   );
@@ -367,13 +395,21 @@ export default function PlayerView({
           return;
         }
         if (!resp.ok || !data) return;
-        const profile = data as DrodoProfileRow & { seasons?: unknown };
+        const profile = data as RefreshedDrodoProfile;
         setDrodo((current) => ({
           ...drodoStatsFromProfile(profile),
           queen_rank: current?.queen_rank ?? null,
         }));
         if (Array.isArray(profile.seasons)) {
           setSeasons(profile.seasons as SeasonSnapshot[]);
+        }
+        if (Array.isArray(profile.mmr_history)) {
+          setMmrHistory(profile.mmr_history.filter(isMmrSnapshot));
+        }
+        if (Array.isArray(profile.queen_rank_history)) {
+          setQueenRankHistory(
+            profile.queen_rank_history.filter(isQueenRankSnapshot)
+          );
         }
         if (typeof profile.fetched_at === "string") {
           setDrodoLastFetchedAt(profile.fetched_at);
@@ -561,7 +597,7 @@ export default function PlayerView({
       // Apply the freshly fetched profile to state directly. A reload would
       // re-serve this force-static page from the ISR cache (revalidate=300) and
       // show the same stale stats, so update in place like the auto-refresh does.
-      const profile = data as DrodoProfileRow & { seasons?: unknown };
+      const profile = data as RefreshedDrodoProfile;
       setDrodoProfileMissing(false);
       setDrodo((current) => ({
         ...drodoStatsFromProfile(profile),
@@ -569,6 +605,14 @@ export default function PlayerView({
       }));
       if (Array.isArray(profile.seasons)) {
         setSeasons(profile.seasons as SeasonSnapshot[]);
+      }
+      if (Array.isArray(profile.mmr_history)) {
+        setMmrHistory(profile.mmr_history.filter(isMmrSnapshot));
+      }
+      if (Array.isArray(profile.queen_rank_history)) {
+        setQueenRankHistory(
+          profile.queen_rank_history.filter(isQueenRankSnapshot)
+        );
       }
       if (typeof profile.fetched_at === "string") {
         setDrodoLastFetchedAt(profile.fetched_at);

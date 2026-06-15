@@ -1,4 +1,4 @@
-use crate::netcon::NETCON_PORT;
+use crate::supabase::steam_id64_to_account_id;
 use crate::{
     gsi,
     ipc_events::{
@@ -14,17 +14,9 @@ use std::{
 };
 
 pub(crate) const DEFAULT_GSI_PORT: u16 = 4001;
-pub(crate) const REQUIRED_LAUNCH_FLAGS: &[&str] = &[
-    "-condebug",
-    "-conclearlog",
-    "-gamestateintegration",
-    "-netconport",
-    NETCON_PORT_STR,
-];
-const NETCON_PORT_STR: &str = "2425";
-const _: () = assert!(NETCON_PORT == 2425);
+pub(crate) const REQUIRED_LAUNCH_FLAGS: &[&str] =
+    &["-condebug", "-conclearlog", "-gamestateintegration"];
 
-const STEAM_ID64_BASE: u64 = 76_561_197_960_265_728;
 const DOTA_APP_ID: &str = "570";
 const AUTOEXEC_BLOCK: &str = r#"// >>> Track Auto Chess nettable capture >>>
 bind "F20" "dumpstringtable CustomNetTable_player_id_table cl verbose"
@@ -148,20 +140,16 @@ fn apply_dota_launch_options_to_file(
         .map(str::to_owned)
         .collect::<Vec<_>>();
     let mut lower = tokenize_launch_options(&before);
+    let removed_netcon = remove_launch_option_pair(&mut tokens, &mut lower, "-netconport");
     let mut added = Vec::new();
     let mut index = 0;
     while index < flags.len() {
         let flag = flags[index];
-        if flag.eq_ignore_ascii_case("-netconport") && index + 1 < flags.len() {
-            ensure_launch_option_pair(&mut tokens, &mut lower, &mut added, flag, flags[index + 1]);
-            index += 2;
-            continue;
-        }
         ensure_launch_option_token(&mut tokens, &mut lower, &mut added, flag);
         index += 1;
     }
     let after = tokens.join(" ");
-    if added.is_empty() {
+    if added.is_empty() && !removed_netcon {
         return Ok(LaunchOptionsApplied {
             ok: true,
             noop: true,
@@ -208,6 +196,25 @@ fn apply_dota_launch_options_to_file(
     })
 }
 
+fn remove_launch_option_pair(
+    tokens: &mut Vec<String>,
+    lower: &mut Vec<String>,
+    flag: &str,
+) -> bool {
+    let flag_lower = flag.to_ascii_lowercase();
+    let mut removed = false;
+    while let Some(pos) = lower.iter().position(|token| token == &flag_lower) {
+        tokens.remove(pos);
+        lower.remove(pos);
+        if pos < lower.len() && !lower[pos].starts_with('-') {
+            tokens.remove(pos);
+            lower.remove(pos);
+        }
+        removed = true;
+    }
+    removed
+}
+
 fn ensure_launch_option_token(
     tokens: &mut Vec<String>,
     lower: &mut Vec<String>,
@@ -220,36 +227,6 @@ fn ensure_launch_option_token(
         lower.push(flag_lower);
         added.push(flag.to_owned());
     }
-}
-
-fn ensure_launch_option_pair(
-    tokens: &mut Vec<String>,
-    lower: &mut Vec<String>,
-    added: &mut Vec<String>,
-    flag: &str,
-    value: &str,
-) {
-    let flag_lower = flag.to_ascii_lowercase();
-    let value_lower = value.to_ascii_lowercase();
-    if let Some(pos) = lower.iter().position(|token| token == &flag_lower) {
-        if lower.get(pos + 1) == Some(&value_lower) {
-            return;
-        }
-        if pos + 1 < tokens.len() && !lower[pos + 1].starts_with('-') {
-            tokens[pos + 1] = value.to_owned();
-            lower[pos + 1] = value_lower;
-        } else {
-            tokens.insert(pos + 1, value.to_owned());
-            lower.insert(pos + 1, value_lower);
-        }
-        added.push(format!("{flag} {value}"));
-        return;
-    }
-    tokens.push(flag.to_owned());
-    tokens.push(value.to_owned());
-    lower.push(flag_lower);
-    lower.push(value_lower);
-    added.push(format!("{flag} {value}"));
 }
 
 fn find_launch_options_value(body: &str) -> Option<LaunchOptionsValue> {
@@ -298,7 +275,11 @@ fn find_app_block_bounds(text: &str, app_id: &str) -> Option<(usize, usize)> {
     None
 }
 
-pub(crate) fn find_dota_launch_options(account_id: Option<&str>) -> Option<String> {
+pub(crate) fn find_any_dota_launch_options() -> Option<String> {
+    find_dota_launch_options_for_account_id(None)
+}
+
+fn find_dota_launch_options_for_account_id(account_id: Option<&str>) -> Option<String> {
     let config_path = find_localconfig_vdf(account_id)?;
     let text = fs::read_to_string(config_path).ok()?;
     let (body_start, body_end) = find_app_block_bounds(&text, DOTA_APP_ID)?;
@@ -310,11 +291,9 @@ pub(crate) fn find_dota_launch_options(account_id: Option<&str>) -> Option<Strin
     )
 }
 
-fn steam_id64_to_account_id(steam_id64: &str) -> Option<String> {
-    let steam_id = steam_id64.trim().parse::<u64>().ok()?;
-    steam_id
-        .checked_sub(STEAM_ID64_BASE)
-        .map(|account| account.to_string())
+pub(crate) fn find_dota_launch_options_for_steam_id(steam_id64: &str) -> Option<String> {
+    let account_id = steam_id64_to_account_id(steam_id64);
+    find_dota_launch_options_for_account_id(account_id.as_deref())
 }
 
 fn find_localconfig_vdf(account_id: Option<&str>) -> Option<PathBuf> {
@@ -525,16 +504,15 @@ mod tests {
             vec![
                 "-conclearlog".to_owned(),
                 "-gamestateintegration".to_owned(),
-                "-netconport 2425".to_owned()
             ]
         );
-        assert!(updated
-            .contains("-console -condebug -conclearlog -gamestateintegration -netconport 2425"));
+        assert!(updated.contains("-condebug -conclearlog -gamestateintegration"));
+        assert!(!updated.contains("-netconport"));
         assert_eq!(updated.matches("-condebug").count(), 1);
     }
 
     #[test]
-    fn launch_options_update_existing_netcon_port_without_duplicate_flag() {
+    fn launch_options_remove_existing_netcon_port() {
         let path = std::env::temp_dir().join(format!(
             "dac-localconfig-{}-{}.vdf",
             std::process::id(),
@@ -564,8 +542,9 @@ mod tests {
             let _ = fs::remove_file(backup);
         }
 
-        assert_eq!(result.added, vec!["-netconport 2425"]);
-        assert!(updated.contains("-netconport 2425"));
-        assert_eq!(updated.matches("-netconport").count(), 1);
+        assert!(result.added.is_empty());
+        assert!(updated.contains("-condebug -conclearlog -gamestateintegration"));
+        assert!(!updated.contains("-netconport"));
+        assert!(!updated.contains("1234"));
     }
 }

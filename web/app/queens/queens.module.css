@@ -10,6 +10,13 @@
 .lead strong {
   color: var(--text-primary);
 }
+.live-status-note {
+  margin: -12px 0 20px;
+  color: #fbbf24;
+  font-family: var(--font-mono);
+  font-size: var(--fs-12);
+  line-height: var(--lh-relaxed);
+}
 .refresh-status {
   display: inline-flex;
   align-items: center;
@@ -176,6 +183,13 @@
 .stream-link-live:hover {
   color: var(--accent);
   opacity: 0.9;
+}
+.stream-link-unknown {
+  color: #fbbf24;
+  opacity: 1;
+}
+.stream-link-unknown:hover {
+  color: #fcd34d;
 }
 .player-vanity {
   color: var(--text-muted);

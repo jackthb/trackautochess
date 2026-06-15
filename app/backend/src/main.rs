@@ -1,9 +1,8 @@
 mod config;
+mod dump_commands;
 mod gsi;
-mod hotkeys;
 mod ipc_events;
 mod match_builder;
-mod netcon;
 mod nettable_live;
 mod nettable_parser;
 mod nettable_service;

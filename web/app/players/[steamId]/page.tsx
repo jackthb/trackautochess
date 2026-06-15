@@ -2,9 +2,13 @@ import type { Metadata } from "next";
 import { cache } from "react";
 import { after } from "next/server";
 import { notFound, redirect } from "next/navigation";
-import type { PlayerGame } from "@dac/shared/types";
+import type { PlayerGame, UnitFullInfo } from "@dac/shared/types";
 import type { SeasonSnapshot } from "@dac/shared/SeasonHistoryGrid";
-import { mmrLevelToRank } from "@dac/shared/game-utils";
+import { mmrLevelToRank, parseSynergies } from "@dac/shared/game-utils";
+import {
+  buildChessCodeUnitLookup,
+  resolveChessLineup,
+} from "@dac/shared/game-structure";
 import type { MmrSnapshot } from "@/components/MmrSparkline";
 import type { QueenRankSnapshot } from "@/components/QueenRankSparkline";
 import { absoluteUrl, getSiteUrl } from "@/lib/site";
@@ -29,6 +33,12 @@ import {
   type CachedUserDrodoRow,
 } from "@/components/player/playerData";
 import { createSupabaseServerClient } from "@/lib/supabase";
+import { unitsFullData } from "@/generated/content-data";
+import { computeSynergies } from "@/lib/units";
+
+const CHESS_CODE_UNITS = buildChessCodeUnitLookup(
+  unitsFullData as Record<string, UnitFullInfo>
+);
 
 export const dynamic = "force-static";
 export const revalidate = 300;
@@ -104,6 +114,18 @@ function dedupePlayerHistoryRows(
     const bTime = typeof b.played_at === "string" ? b.played_at : "";
     return bTime.localeCompare(aTime);
   });
+}
+
+function serializeResolvedLineup(lineup: { name: string; stars: number }[]): string {
+  return lineup
+    .map((unit) => `${unit.name}${unit.stars > 1 ? `(${unit.stars})` : ""}`)
+    .join("|");
+}
+
+function serializeComputedSynergies(
+  synergies: { name: string; count: number }[]
+): string {
+  return synergies.map((synergy) => `${synergy.name}:${synergy.count}`).join("|");
 }
 
 /** Cached per request so generateMetadata and the page render share data. */
@@ -324,24 +346,42 @@ const loadPlayer = cache(async (rawSteamId: string): Promise<LoadResult> => {
 
   // Map match_players rows → Game shape with legacy aliases for rendering.
   const games: PlayerGame[] = dedupePlayerHistoryRows(gamesRows).map(
-    (row) => ({
-      ...row,
-      user_id: String(row.steam_id),
-      placement: row.placement != null ? String(row.placement) : "",
-      played_at: (row.played_at as string) ?? "",
-      created_at: (row.created_at as string) ?? "",
-      lineup: row.chess_lineup as string | null,
-      level: row.hero_level ? String(row.hero_level) : null,
-      rank:
-        typeof row.mmr_level === "number"
-          ? mmrLevelToRank(row.mmr_level) || null
-          : null,
-      rank_change: null,
-      wl: null,
-      wins: row.win_round as number | null,
-      losses: row.lose_round as number | null,
-      match_id: (row.match_id as string) ?? null,
-    })
+    (row) => {
+      const resolvedLineup = resolveChessLineup(
+        row.chess_lineup as string | undefined,
+        CHESS_CODE_UNITS
+      );
+      const lineup = resolvedLineup.length
+        ? serializeResolvedLineup(resolvedLineup)
+        : (row.chess_lineup as string | null);
+      const synergies = resolvedLineup.length
+        ? serializeComputedSynergies(
+            computeSynergies(
+              resolvedLineup,
+              parseSynergies(row.synergies as string | null)
+            )
+          )
+        : (row.synergies as string | null);
+      return {
+        ...row,
+        user_id: String(row.steam_id),
+        placement: row.placement != null ? String(row.placement) : "",
+        played_at: (row.played_at as string) ?? "",
+        created_at: (row.created_at as string) ?? "",
+        lineup,
+        synergies,
+        level: row.hero_level ? String(row.hero_level) : null,
+        rank:
+          typeof row.mmr_level === "number"
+            ? mmrLevelToRank(row.mmr_level) || null
+            : null,
+        rank_change: null,
+        wl: null,
+        wins: row.win_round as number | null,
+        losses: row.lose_round as number | null,
+        match_id: (row.match_id as string) ?? null,
+      };
+    }
   ) as PlayerGame[];
 
   return {

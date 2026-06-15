@@ -80,6 +80,7 @@ pnpm run test:e2e  # Build, then run Playwright tests
 - **Package managers**: pnpm for Node.js workspaces, Cargo for the Rust backend.
 - **Backend migration status**: the Python/CV backend has been removed; `app/backend/` is the Rust backend.
 - **Runtime config**: stored in `~/.dac/config.json`; local capture/retry artifacts may also be written under `~/.dac/` (`outbox`, `replays`, `captures`, `nettable_dumps`, logs).
+- **Steam ID helpers**: reuse shared Steam ID helpers instead of duplicating conversion/validation logic. Frontend/shared TypeScript should use `shared/steam.ts`; Rust backend code should use the existing `app/backend/src/supabase/mod.rs` helpers such as `parse_valid_steam_id64` and `steam_id64_to_account_id`.
 - **Database**: Supabase PostgreSQL with RLS policies; current product tables include `users`, `player_seasons`, `mmr_snapshots`, `matches`, `match_players`, `match_timelines`, and `lineup_snapshots`.
 - **Storage**: Supabase Storage bucket `diagnostic-logs` receives diagnostic and raw nettable dump uploads.
 - **Content pipeline**: `content/` JSON feeds generated web runtime data and desktop content readers; `data/` holds icons/config/extractor helpers.

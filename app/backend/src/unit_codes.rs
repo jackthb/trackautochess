@@ -86,6 +86,7 @@ fn load_unit_codes() -> HashMap<String, String> {
 
 fn candidate_unit_dirs() -> Vec<PathBuf> {
     let mut dirs = Vec::new();
+    dirs.push(PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../content/game/units"));
     if let Ok(cwd) = std::env::current_dir() {
         dirs.push(cwd.join("content/game/units"));
         dirs.push(cwd.join("../content/game/units"));

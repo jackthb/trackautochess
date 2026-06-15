@@ -32,12 +32,13 @@ export interface NetTableStatus {
   /** Raw launch-options string from Steam's localconfig.vdf, or null if we couldn't read it. */
   launch_options: string | null;
   /** True/false when localconfig was read; null if unknown. */
+  has_console: boolean | null;
   has_condebug: boolean | null;
   has_conclearlog: boolean | null;
-  /** -gamestateintegration: required for the GSI listener to receive payloads,
-   *  which gates the SendInput cascade. Without it live capture silently
-   *  never fires. Null if we couldn't read localconfig. */
+  /** -gamestateintegration: required for the GSI listener to receive payloads. */
   has_gamestateintegration: boolean | null;
+  /** True when Dota owns the foreground window, enabling dump-key capture. */
+  dota_focused: boolean;
   /** True if steam.exe was running at the moment we last checked. */
   steam_running: boolean;
   /** Empirical: dota2.exe is currently a running process. */
@@ -212,11 +213,13 @@ export function useNetTableEvents(): NetTableActivityState {
               autoexec_installed: msg.autoexec_installed,
               log_path: msg.log_path,
               log_writable: msg.log_writable,
-              remote_enabled: msg.remote_enabled ?? true,
-              launch_options: msg.launch_options ?? null,
+                remote_enabled: msg.remote_enabled ?? true,
+                launch_options: msg.launch_options ?? null,
+                has_console: msg.has_console ?? null,
               has_condebug: msg.has_condebug ?? null,
               has_conclearlog: msg.has_conclearlog ?? null,
               has_gamestateintegration: msg.has_gamestateintegration ?? null,
+              dota_focused: msg.dota_focused ?? false,
               steam_running: msg.steam_running,
               dota_running: msg.dota_running,
               log_active: msg.log_active,
@@ -279,10 +282,13 @@ export function useNetTableEvents(): NetTableActivityState {
           break;
         }
         case "nettable_check_active_match": {
+          const transport = msg.command_transport
+            ? ` via ${msg.command_transport}`
+            : "";
           push({
             kind: "nettable_check_active_match",
             title: "Checking active match",
-            detail: msg.message,
+            detail: `${msg.message}${transport}`,
             tone: msg.ok ? "info" : "warning",
           });
           break;

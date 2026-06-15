@@ -197,15 +197,40 @@ async function handle(req: Request, ctx: { params: Promise<{ steamId: string }> 
 
     if (cached && isFreshCache(cached.drodo_last_fetched_at, false)) {
       const cachedProfile = cachedUserToDrodoProfile(cached);
-      const { data: seasons } = await supabase
-        .from("player_seasons")
-        .select("season, mmr, max_mmr, games_played, chicken_count")
-        .filter("steam_id", "eq", steamId)
-        .order("season", { ascending: true });
+      const [seasonsResult, snapshotsResult] = await Promise.all([
+        supabase
+          .from("player_seasons")
+          .select("season, mmr, max_mmr, games_played, chicken_count")
+          .filter("steam_id", "eq", steamId)
+          .order("season", { ascending: true }),
+        supabase
+          .from("mmr_snapshots")
+          .select("mmr, queen_rank, snapshotted_at")
+          .filter("steam_id", "eq", steamId)
+          .not("mmr", "is", null)
+          .order("snapshotted_at", { ascending: false })
+          .limit(60),
+      ]);
+      const seasons = seasonsResult.data ?? [];
+      const snapshots = snapshotsResult.data ?? [];
 
-      if (hasDrodoStats(cachedProfile, seasons ?? [])) {
+      if (hasDrodoStats(cachedProfile, seasons)) {
         return Response.json(
-          { ...cachedProfile, seasons: seasons ?? [] },
+          {
+            ...cachedProfile,
+            seasons,
+            mmr_history: snapshots.map((row) => ({
+              mmr: row.mmr as number | null,
+              snapshotted_at: row.snapshotted_at as string,
+            })),
+            queen_rank_history: snapshots
+              .map((row) => ({
+                queen_rank:
+                  typeof row.queen_rank === "number" ? row.queen_rank : null,
+                snapshotted_at: row.snapshotted_at as string,
+              }))
+              .filter((row) => row.queen_rank != null),
+          },
           { status: 200, headers: responseHeaders }
         );
       }
@@ -269,16 +294,37 @@ async function handle(req: Request, ctx: { params: Promise<{ steamId: string }> 
   }
 
   // Re-read season history so the response reflects merged historical rows.
-  const { data: seasons } = await supabase
-    .from("player_seasons")
-    .select("season, mmr, max_mmr, games_played, chicken_count")
-    .filter("steam_id", "eq", steamId)
-    .order("season", { ascending: true });
+  const [seasonsResult, snapshotsResult] = await Promise.all([
+    supabase
+      .from("player_seasons")
+      .select("season, mmr, max_mmr, games_played, chicken_count")
+      .filter("steam_id", "eq", steamId)
+      .order("season", { ascending: true }),
+    supabase
+      .from("mmr_snapshots")
+      .select("mmr, queen_rank, snapshotted_at")
+      .filter("steam_id", "eq", steamId)
+      .not("mmr", "is", null)
+      .order("snapshotted_at", { ascending: false })
+      .limit(60),
+  ]);
+  const seasons = seasonsResult.data ?? [];
+  const snapshots = snapshotsResult.data ?? [];
 
   return Response.json(
     {
       ...result.profile,
-      seasons: seasons ?? [],
+      seasons,
+      mmr_history: snapshots.map((row) => ({
+        mmr: row.mmr as number | null,
+        snapshotted_at: row.snapshotted_at as string,
+      })),
+      queen_rank_history: snapshots
+        .map((row) => ({
+          queen_rank: typeof row.queen_rank === "number" ? row.queen_rank : null,
+          snapshotted_at: row.snapshotted_at as string,
+        }))
+        .filter((row) => row.queen_rank != null),
       ...(refreshQuota ? { refresh_quota: refreshQuota } : {}),
     },
     { status: 200, headers: responseHeaders }

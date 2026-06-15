@@ -1,7 +1,7 @@
 pub use crate::nettable_live::live_players_value;
 use crate::{
     config::Config,
-    hotkeys::{dump_console_commands, send_dump_keys, DumpKey},
+    dump_commands::{dota_has_foreground_focus, send_dump_keys_if_dota_focused, DumpKey},
     ipc_events::{
         event_json, NettableCheckActiveMatch, NettableCreepRound, NettableEndBoardSaved,
         NettableGameEnded, NettableIngestComplete, NettableIngestError, NettableMatchLeftPending,
@@ -14,13 +14,13 @@ use crate::{
         build_match_timeline, extract_death_team_from_rows, extract_round_from_rows,
         store_session_dump, SessionDump,
     },
-    netcon::{send_console_commands, NETCON_PORT},
     nettable_parser::{self, NettableRow, ParsedLog},
     nettable_setup::{
-        apply_dota_launch_options, find_autoexec_target, find_console_log, find_dota_dir,
-        find_dota_launch_options, find_gsi_cfg_target, install_autoexec, install_gsi_cfg,
-        is_steam_running, request_steam_shutdown, setup_progress, setup_result_error,
-        tokenize_launch_options, wait_for_steam_exit, DEFAULT_GSI_PORT, REQUIRED_LAUNCH_FLAGS,
+        apply_dota_launch_options, find_any_dota_launch_options, find_autoexec_target,
+        find_console_log, find_dota_dir, find_dota_launch_options_for_steam_id,
+        find_gsi_cfg_target, install_autoexec, install_gsi_cfg, is_steam_running,
+        request_steam_shutdown, setup_progress, setup_result_error, tokenize_launch_options,
+        wait_for_steam_exit, DEFAULT_GSI_PORT, REQUIRED_LAUNCH_FLAGS,
     },
     queen_ladder,
     supabase::{finished_match_id_from_rows, parse_valid_steam_id64, queue_rows, SupabaseClient},
@@ -44,6 +44,11 @@ const POST_GAME_DUMP_WAIT: Duration = Duration::from_millis(1200);
 const PREFERRED_CAPTURE_STEAM_IDS: &[&str] = &[
     "76561198022169086", // Jack
 ];
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+struct DumpCommandResult {
+    transport: &'static str,
+}
 
 #[derive(Clone)]
 pub struct NettableService {
@@ -75,7 +80,7 @@ struct NettableState {
     last_ui_state: Option<String>,
     /// Console timestamp for the transition into the active match. This is the
     /// stable per-game identity salt; unlike end_board dump time it does not
-    /// change if post-game dump hotkeys fire repeatedly.
+    /// change if post-game dump commands run repeatedly.
     match_started_at: Option<String>,
     /// Set by `poll_once` when the UI left `DOTA_GAME_UI_DOTA_INGAME`; the
     /// capture loop consumes it to finalize the match (GSI-independent).
@@ -149,13 +154,15 @@ impl NettableService {
             let mut last_player_fire = Instant::now() - Duration::from_secs(30);
             let mut last_metadata_fire = Instant::now() - Duration::from_secs(60);
             let mut last_status_fire = Instant::now() - Duration::from_secs(10);
+            let mut last_dota_focused = false;
             loop {
-                maybe_fire_dump_hotkeys(
+                maybe_fire_dump_commands(
                     &state,
                     &emit,
                     &mut last_game_info_fire,
                     &mut last_player_fire,
                     &mut last_metadata_fire,
+                    &mut last_dota_focused,
                 );
                 // Re-publish status on a heartbeat so the setup card reflects
                 // reality (Dota launched, log went stale) without the user
@@ -401,8 +408,9 @@ impl NettableService {
     pub fn capture_once_json(&self) -> String {
         self.set_paused(false);
         match send_dump_commands(&[DumpKey::F23, DumpKey::F22, DumpKey::F20, DumpKey::F21]) {
-            Ok(()) => event_json(&NettableCheckActiveMatch::new(
+            Ok(result) => event_json(&NettableCheckActiveMatch::new(
                 "Requested a manual lobby snapshot.",
+                Some(result.transport),
                 &now_iso_utc(),
             )),
             Err(err) => event_json(&NettableIngestError::new(&format!(
@@ -421,8 +429,9 @@ impl NettableService {
             DumpKey::F16,
             DumpKey::F21,
         ]) {
-            Ok(()) => event_json(&NettableCheckActiveMatch::new(
+            Ok(result) => event_json(&NettableCheckActiveMatch::new(
                 "Requested a full live lobby snapshot. If Dota is focused, new rows should appear within a few seconds.",
+                Some(result.transport),
                 &now_iso_utc(),
             )),
             Err(err) => event_json(&NettableIngestError::new(&format!(
@@ -1350,13 +1359,21 @@ const LOG_ACTIVE_WINDOW: Duration = Duration::from_secs(120);
 /// We report what we can actually measure: Dota process presence and whether
 /// console.log is being written within the active window.
 fn nettable_status_json(state: &Arc<Mutex<NettableState>>) -> String {
-    let (paused, log_path) = {
+    let (paused, log_path, local_steam_id) = {
         let state = state.lock().unwrap();
-        (state.paused, state.log_path.clone())
+        (
+            state.paused,
+            state.log_path.clone(),
+            state.local_steam_id.clone(),
+        )
     };
     let log_path = log_path.or_else(find_console_log);
     let log_writable = log_path.as_ref().map(|path| path.exists()).unwrap_or(false);
-    let launch_options = find_dota_launch_options(None);
+    let launch_options = local_steam_id
+        .as_deref()
+        .filter(|steam_id| !steam_id.is_empty())
+        .and_then(find_dota_launch_options_for_steam_id)
+        .or_else(find_any_dota_launch_options);
     let launch_tokens = launch_options
         .as_deref()
         .map(tokenize_launch_options)
@@ -1388,6 +1405,7 @@ fn nettable_status_json(state: &Arc<Mutex<NettableState>>) -> String {
         dota_dir: &dota_dir_string,
         remote_enabled: true,
         launch_options: launch_options.as_deref(),
+        has_console: launch_known.then(|| launch_tokens.iter().any(|token| token == "-console")),
         has_condebug: launch_known.then(|| launch_tokens.iter().any(|token| token == "-condebug")),
         has_conclearlog: launch_known
             .then(|| launch_tokens.iter().any(|token| token == "-conclearlog")),
@@ -1396,6 +1414,7 @@ fn nettable_status_json(state: &Arc<Mutex<NettableState>>) -> String {
                 .iter()
                 .any(|token| token == "-gamestateintegration")
         }),
+        dota_focused: dota_has_foreground_focus(),
         steam_running: is_steam_running(),
         dota_running: is_dota_running(),
         log_active,
@@ -1482,26 +1501,35 @@ fn roster_steam_ids(rows: &[NettableRow]) -> Vec<String> {
     ids
 }
 
-fn maybe_fire_dump_hotkeys<F>(
+fn maybe_fire_dump_commands<F>(
     state: &Arc<Mutex<NettableState>>,
     emit: &Arc<F>,
     last_game_info_fire: &mut Instant,
     last_player_fire: &mut Instant,
     last_metadata_fire: &mut Instant,
+    last_dota_focused: &mut bool,
 ) where
     F: Fn(String) + Send + Sync + 'static,
 {
-    let (paused, in_match, endgame_burst) = state
+    let (paused, in_match, endgame_burst, last_round, has_hidden_legendary_pool) = state
         .lock()
         .map(|state| {
             (
                 state.paused,
                 state.last_ui_state.as_deref() == Some(DOTA_INGAME_STATE),
                 state.endgame_burst,
+                state.last_round,
+                state_has_hidden_legendary_pool(&state),
             )
         })
-        .unwrap_or((true, false, false));
+        .unwrap_or((true, false, false, None, true));
+    let dota_focused = dota_has_foreground_focus();
     if paused || !in_match {
+        *last_dota_focused = dota_focused;
+        return;
+    }
+    if !dota_focused {
+        *last_dota_focused = false;
         return;
     }
     let capture_owner = local_is_capture_owner(state);
@@ -1515,9 +1543,39 @@ fn maybe_fire_dump_hotkeys<F>(
     };
 
     let now = Instant::now();
+    if !*last_dota_focused {
+        *last_dota_focused = true;
+        if capture_owner {
+            fire_dump_commands(
+                emit,
+                &[
+                    DumpKey::F23,
+                    DumpKey::F22,
+                    DumpKey::F20,
+                    DumpKey::F24,
+                    DumpKey::F16,
+                    DumpKey::F21,
+                ],
+                "refocus catch-up snapshot",
+            );
+        } else {
+            fire_dump_commands(
+                emit,
+                &[DumpKey::F23, DumpKey::F24],
+                "refocus roster snapshot",
+            );
+        }
+        *last_game_info_fire = now;
+        *last_player_fire = now;
+        *last_metadata_fire = now;
+        return;
+    }
     if now.duration_since(*last_game_info_fire) >= Duration::from_secs(3) {
         *last_game_info_fire = now;
-        fire_keys(emit, &[DumpKey::F23], "game_info");
+        fire_dump_commands(emit, &[DumpKey::F23], "game_info");
+        if capture_owner && last_round.unwrap_or(0) >= 1 && !has_hidden_legendary_pool {
+            fire_dump_commands(emit, &[DumpKey::F16], "hidden legendary pool");
+        }
     }
     if capture_owner && now.duration_since(*last_player_fire) >= player_cadence {
         *last_player_fire = now;
@@ -1525,7 +1583,7 @@ fn maybe_fire_dump_hotkeys<F>(
         // final result) appears at game over. Without firing it here, end_board
         // is only ever dumped by the GSI post-game handler — which never fires
         // for many setups — so a finished match has no full-board data to save.
-        fire_keys(
+        fire_dump_commands(
             emit,
             &[DumpKey::F22, DumpKey::F20, DumpKey::F21],
             "player snapshot",
@@ -1534,35 +1592,31 @@ fn maybe_fire_dump_hotkeys<F>(
     if now.duration_since(*last_metadata_fire) >= Duration::from_secs(30) {
         *last_metadata_fire = now;
         if capture_owner {
-            fire_keys(emit, &[DumpKey::F24, DumpKey::F16], "metadata snapshot");
+            fire_dump_commands(emit, &[DumpKey::F24, DumpKey::F16], "metadata snapshot");
         } else {
             // Keep the lightweight roster dump running so a non-owner can
             // recover if the preferred owner leaves the next lobby.
-            fire_keys(emit, &[DumpKey::F24], "metadata roster snapshot");
+            fire_dump_commands(emit, &[DumpKey::F24], "metadata roster snapshot");
         }
     }
 }
 
-fn fire_keys<F>(emit: &Arc<F>, keys: &[DumpKey], _label: &str)
+fn fire_dump_commands<F>(emit: &Arc<F>, keys: &[DumpKey], _label: &str)
 where
     F: Fn(String) + Send + Sync + 'static,
 {
     match send_dump_commands(keys) {
-        Ok(()) => {}
+        Ok(_) => {}
         Err(err) => emit(event_json(&NettableIngestError::new(&format!(
             "dump command failed: {err}"
         )))),
     }
 }
 
-fn send_dump_commands(keys: &[DumpKey]) -> Result<(), String> {
-    let commands = dump_console_commands(keys);
-    match send_console_commands(NETCON_PORT, &commands) {
-        Ok(()) => Ok(()),
-        Err(netcon_err) => send_dump_keys(keys).map_err(|hotkey_err| {
-            format!("netcon failed ({netcon_err}); hotkey fallback failed ({hotkey_err})")
-        }),
-    }
+fn send_dump_commands(keys: &[DumpKey]) -> Result<DumpCommandResult, String> {
+    send_dump_keys_if_dota_focused(keys).map(|()| DumpCommandResult {
+        transport: "focused_sendinput",
+    })
 }
 
 fn end_board_already_uploaded(state: &Arc<Mutex<NettableState>>, match_id: &str) -> bool {
@@ -1916,7 +1970,7 @@ fn poll_once(
     }
     // Read the log once: parse the stringtables AND scan the UI-state line.
     let text = fs::read_to_string(&path)?;
-    let (parsed, mut rows) = nettable_parser::parse_log_text_with_rows(&text);
+    let (_, mut rows) = nettable_parser::parse_log_text_with_rows(&text);
     let ui_state = latest_ui_state(&text);
     let mut state = state.lock().unwrap();
     state.last_modified = Some(modified);
@@ -1924,6 +1978,14 @@ fn poll_once(
         if state.last_ui_state.as_deref() != Some(DOTA_INGAME_STATE) && next == DOTA_INGAME_STATE {
             state.match_started_at = observed_at.or_else(|| Some(now_iso_utc()));
             state.uploaded_end_board_match_ids.clear();
+            state.latest_parsed.clear();
+            state.latest_rows.clear();
+            state.session_dumps.clear();
+            state.last_round = None;
+            state.endgame_burst = false;
+            state.pending_match_end = false;
+            state.prev_personal_death_team = None;
+            state.personal_end_recorded = false;
         }
         if is_match_end_transition(state.last_ui_state.as_deref(), &next) {
             state.pending_match_end = true;
@@ -1931,10 +1993,13 @@ fn poll_once(
         state.last_ui_state = Some(next);
     }
     let match_started_at = state.match_started_at.clone();
+    if let Some(started_at) = match_started_at.as_deref() {
+        rows.retain(|row| row_observed_at_or_after_match_start(row, started_at));
+    }
     for row in &mut rows {
         row.match_started_at = match_started_at.clone();
     }
-    state.latest_parsed = parsed;
+    state.latest_parsed = parsed_from_rows(&rows);
     state.latest_rows = rows.clone();
     update_capture_owner_from_rows(&mut state, &rows);
     if cfg.keep_local_nettable_dumps && !rows.is_empty() {
@@ -1975,8 +2040,8 @@ fn persist_local_nettable_dump(cfg: &Config, rows: &[NettableRow]) {
 /// Detect whether dota2.exe is currently a running process.
 ///
 /// Ported from the Python backend's `is_dota_running`: shell out to `tasklist`
-/// with the no-window flag so we don't pop a console. Used to avoid sending
-/// dump hotkeys into the foreground app when Dota isn't even open.
+/// with the no-window flag so we don't pop a console. Used to avoid trying to
+/// request dumps when Dota isn't even open.
 #[cfg(target_os = "windows")]
 fn is_dota_running() -> bool {
     use std::os::windows::process::CommandExt;
@@ -2058,4 +2123,36 @@ fn parsed_value(parsed: &ParsedLog) -> serde_json::Value {
 
 fn now_iso_utc() -> String {
     chrono::Utc::now().to_rfc3339()
+}
+
+fn parsed_from_rows(rows: &[NettableRow]) -> ParsedLog {
+    let mut parsed = ParsedLog::new();
+    for row in rows {
+        parsed
+            .entry(row.table_name.clone())
+            .or_default()
+            .insert(row.key.clone(), row.raw.clone());
+    }
+    parsed
+}
+
+fn state_has_hidden_legendary_pool(state: &NettableState) -> bool {
+    state.latest_rows.iter().any(|row| {
+        row.table_name.ends_with("chess_pool_table")
+            && (row.key == "revealed_legendary_chess_list"
+                || row.key == "unrevealed_legendary_chess_list")
+    })
+}
+
+fn row_observed_at_or_after_match_start(row: &NettableRow, match_started_at: &str) -> bool {
+    let Some(observed_at) = row.observed_at.as_deref() else {
+        return true;
+    };
+    let Ok(observed_at) = chrono::DateTime::parse_from_rfc3339(observed_at) else {
+        return true;
+    };
+    let Ok(match_started_at) = chrono::DateTime::parse_from_rfc3339(match_started_at) else {
+        return true;
+    };
+    observed_at >= match_started_at
 }

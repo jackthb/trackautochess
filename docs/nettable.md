@@ -6,22 +6,25 @@ then uploads the processed match representation to Supabase.
 
 ## How it works
 
-1. Dota launches with `-condebug -conclearlog` in launch options. `condebug`
-   tees the in-game console to `<dota>/game/dota/console.log`;
-   `conclearlog` truncates it at each launch, so ingest is idempotent
-   across sessions.
+1. Dota launches with `-condebug -conclearlog -gamestateintegration`
+   in launch options. `condebug` tees the in-game console to
+   `<dota>/game/dota/console.log`; `conclearlog` truncates it at each launch,
+   so ingest is idempotent across sessions.
 2. When the user applies nettable setup, the Rust `nettable_service` writes a marked Track
    Auto Chess block inside `<dota>/game/dota/cfg/autoexec.cfg`. If the user has
    their own autoexec, it appends/replaces only our marked block and preserves
    the rest of the file.
-3. The capture module tails `console.log` and sends key presses to the Dota
-   HWND (via `SendInput`) on these cadences:
+3. The capture module tails `console.log` and sends dump commands through the
+   app-owned extended F-key binds only while Dota is the foreground window.
+   There is no focus stealing and no sending keys into other apps. If the user
+   tabs out, dumps pause; when Dota regains focus, the backend immediately sends
+   a catch-up snapshot before resuming the normal cadence:
    - **Every 2s**: F23 (`game_info` — round/death tracking)
    - **On round change**: F22 (`player_info_table`) + F20 (`player_id_table` — slot/board metadata refresh)
    - **Once at match/session opening**: F24 (`ranking_top_table` + `player_id_table`) then F16 (`chess_pool_table`)
    - **On POST_GAME**: burst of F21 to capture `end_board`
-4. Each key fires a single `dumpstringtable` command; the engine writes
-   binary VBKV payloads into console.log.
+4. Each key bind runs one or more `dumpstringtable` calls. Dota writes binary
+   VBKV payloads into `console.log`, which the tailer parses.
 5. Match-session continuity is keyed by the exact sorted Steam-ID roster from
    `player_info_table.player_info.data`. If DAC emits `GAME_IN_PROGRESS` again
    after a disconnect/rejoin but the roster is identical, the app keeps the
@@ -38,11 +41,28 @@ then uploads the processed match representation to Supabase.
    in-memory into `matches`, `match_players`, and `match_timelines`. Raw
    nettable dump logs upload to Supabase Storage `diagnostic-logs`.
 
-## Active capture matrix / key binds
+## Netconport
 
-All binds use extended F-keys (F20-F25) plus F16 to avoid conflicting with
-normal user keyboard shortcuts. Most binds dump one table. F24 deliberately
-dumps `ranking_top_table` and `player_id_table` together so the one-time lobby
+`-netconport` is intentionally not part of desktop capture. In practice it does
+not work reliably for Windows Dota, and public Valve issues report the same
+Windows/Linux split in Dota 2 and CS2. Do not add `-netconport` back to setup,
+status checks, or capture delivery unless there is new evidence that Windows
+Dota accepts remote-console connections consistently.
+
+References documenting the upstream issue:
+
+- Dota 2 issue: `-netconport` has been reported broken on Windows while Linux
+  works: <https://github.com/ValveSoftware/Dota2-Gameplay/issues/11998>
+- CS2 issue with the same Windows/Linux split and Workshop Tools note:
+  <https://github.com/ValveSoftware/csgo-osx-linux/issues/3603>
+- HLAE/advancedfx documents a related `-afxFixNetCon` workaround for Source 2
+  netcon initialization: <https://github.com/advancedfx/advancedfx>
+
+## Active capture matrix / console commands
+
+The key names below are the app-owned autoexec binds. The app triggers them only
+when Dota is focused. Most commands dump one table. F24 deliberately dumps
+`ranking_top_table` and `player_id_table` together so the one-time lobby
 metadata snapshot includes both the Queen ladder and the slot mapping.
 
 | Key | Table(s) | Automatic trigger / cadence | Important keys | What it means / what we use it for | Raw-upload storage filter |
@@ -59,11 +79,11 @@ metadata snapshot includes both the Queen ladder and the slot mapping.
 
 | File | Role |
 |---|---|
-| `app/backend/src/nettable_service.rs` | Autoexec/GSI setup helpers, log tailer orchestration, hotkey cadence, live state, match/timeline extraction, local dump persistence, and renderer events. |
+| `app/backend/src/nettable_service.rs` | Autoexec/GSI setup helpers, log tailer orchestration, console command cadence, live state, match/timeline extraction, local dump persistence, and renderer events. |
 | `app/backend/src/nettable_parser.rs` | Pure VBKV decoder and `console.log` walker used by the CLI, daemon, and tests. |
 | `app/backend/src/main.rs` | JSON-lines daemon and CLI commands (`parse-log`, `parse-log-full`, `parse-live`, `queue`, `outbox-list`, `gsi-cfg`). |
 | `app/backend/src/supabase.rs` | Processed match/timeline/Queen uploads, outbox replay, diagnostic-log Storage uploads, and raw nettable dump-log Storage uploads. |
-| `app/backend/src/hotkeys.rs` | Windows `SendInput` wrapper for the extended F-key dump cadence. |
+| `app/backend/src/dump_commands.rs` | Dump command identifiers, console command strings, focused key delivery, and Dota foreground detection. |
 
 `AUTOEXEC_CFG_CONTENT` is the marked Track Auto Chess cfg block in `nettable_service.rs`. The setup path upserts that block instead of replacing the user's whole `autoexec.cfg`.
 

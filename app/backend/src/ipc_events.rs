@@ -686,6 +686,8 @@ pub struct NettableCheckActiveMatch<'a> {
     pub ok: bool,
     pub paused: bool,
     pub message: &'a str,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub command_transport: Option<&'a str>,
     pub at: &'a str,
 }
 
@@ -829,9 +831,11 @@ pub struct NettableStatus<'a> {
     pub dota_dir: &'a str,
     pub remote_enabled: bool,
     pub launch_options: Option<&'a str>,
+    pub has_console: Option<bool>,
     pub has_condebug: Option<bool>,
     pub has_conclearlog: Option<bool>,
     pub has_gamestateintegration: Option<bool>,
+    pub dota_focused: bool,
     pub steam_running: bool,
     pub dota_running: bool,
     pub log_active: bool,
@@ -892,13 +896,14 @@ impl<'a> NettableLaunchOptionsError<'a> {
 }
 
 impl<'a> NettableCheckActiveMatch<'a> {
-    pub fn new(message: &'a str, at: &'a str) -> Self {
+    pub fn new(message: &'a str, command_transport: Option<&'a str>, at: &'a str) -> Self {
         Self {
             event_type: "nettable_check_active_match",
             backend: "rust",
             ok: true,
             paused: false,
             message,
+            command_transport,
             at,
         }
     }
