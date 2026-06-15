@@ -12,8 +12,26 @@ on:
   workflow_dispatch:
 
 jobs:
+  gate:
+    runs-on: ubuntu-latest
+    outputs:
+      configured: ${{ steps.check.outputs.configured }}
+    steps:
+      - name: Check Cronicle CD secrets
+        id: check
+        env:
+          CRONICLE_CONFIG_REPO: ${{ secrets.CRONICLE_CONFIG_REPO }}
+          CRONICLE_CD_TOKEN: ${{ secrets.CRONICLE_CD_TOKEN }}
+        run: |
+          if [ -n "$CRONICLE_CONFIG_REPO" ] && [ -n "$CRONICLE_CD_TOKEN" ]; then
+            echo "configured=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "configured=false" >> "$GITHUB_OUTPUT"
+          fi
+
   sync-to-config-repo:
-    if: ${{ secrets.CRONICLE_CONFIG_REPO != '' && secrets.CRONICLE_CD_TOKEN != '' }}
+    needs: gate
+    if: ${{ needs.gate.outputs.configured == 'true' }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -58,7 +76,8 @@ jobs:
           git push origin "HEAD:${CRONICLE_CD_BRANCH}"
 
   sync-skipped:
-    if: ${{ secrets.CRONICLE_CONFIG_REPO == '' || secrets.CRONICLE_CD_TOKEN == '' }}
+    needs: gate
+    if: ${{ needs.gate.outputs.configured == 'false' }}
     runs-on: ubuntu-latest
     steps:
       - name: Manual fallback required
