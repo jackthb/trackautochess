@@ -20,7 +20,6 @@ const t = {
   species: "Species",
   relics: "Relics",
   talents: "Talents",
-  ranks: "Ranks",
   patchNotes: "Patch notes",
   disclaimer:
     "Not affiliated with or endorsed by Valve Corporation or Drodo Studio. Dota, Dota 2, and Dota Auto Chess are trademarks of their respective owners. Game data and assets are property of their respective owners and are used here for informational purposes only.",
@@ -46,7 +45,6 @@ export function Footer() {
             <h3 className={styles.colHeading}>{t.referenceHeading}</h3>
             <div className={styles.colLinks}>
               <Link href="/talents" className={styles.link} prefetch={false}>{t.talents}</Link>
-              <Link href="/ranks" className={styles.link} prefetch={false}>{t.ranks}</Link>
               <Link href="/patch-notes" className={styles.link} prefetch={false}>
                 {t.patchNotes}
               </Link>

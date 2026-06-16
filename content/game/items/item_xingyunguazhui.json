@@ -3,6 +3,7 @@
   "name": "Lucky Pendant",
   "slug": "lucky-pendant",
   "icon": "items/slark_fish_bait.png",
+  "commentary": "Lucky Pendant improves probability-based synergy triggers for its carrier. It does not boost every synergy with random wording: if the synergy trigger is guaranteed and only the selected target/unit is random, Lucky Pendant does not appear to add value.\n\nSynergies where Lucky Pendant has a real trigger to improve:\n\n| Synergy | What it can improve |\n|---|---|\n| Assassin | Coup de Grace critical strike chance at (3)/(6). |\n| Elemental | Elemental Essence stone trigger chance at (2)/(4). |\n| Elf | Evasion/dodge chance, including the (9) Elf follow-up that happens after a dodge. |\n| Hunter | Aimed Shot precise-shot chance at (3). The (6)/(9) Hunter precise shot is already 100%, so Lucky Pendant should not matter there. |\n| Knight | Divine Protection shield proc chance at (2)/(4)/(6). |\n| Monk | Drunken Stagger trigger chance for the execute/halve-health effects at (2)/(4). |\n| Pandaren | Hospitality invite rolls. Pandaren uses its own +25% carrier formula; see the Pandaren page for the table. |\n\nLikely non-targets despite random text: Aqir hatches a random Aqir after its condition is met, Goblin grants stats to a random ally, and Shaman transforms into a random higher-level piece. Those are random outcomes, not obviously Lucky Pendant-boosted probability checks.",
   "source": {
     "name": "Lucky Pendant",
     "names": {
