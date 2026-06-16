@@ -3,6 +3,7 @@
   "name": "Pandaren",
   "slug": "pandaren",
   "icon": "synergies/pandaman.png",
+  "commentary": "Lucky Pendant is normally a flat +30% relative boost to luck-based synergies, but Pandaren Hospitality appears to be hardcoded to the old +25% formula. That may be a bug.\n\nFor Pandaren, Lucky Pendant boosts both Hospitality rolls: the 10% random same-species fish roll and the 15% same-Panda roll from having 2 or more Pandas.\n\nThe Pandaren formula counts units carrying Lucky Pendant, not duplicate pendants stacked on the same unit: `1 + (0.25 * Lucky Pendant carriers / Pandas)`.\n\n| Pandas | Lucky Pendant carriers | Random same-species roll | Each same-Panda roll | At least one fish |\n|---:|---:|---:|---:|---:|\n| 1 | 0 | 10.00% | - | 10.00% |\n| 1 | 1 | 12.50% | - | 12.50% |\n| 1 | 2 | 15.00% | - | 15.00% |\n| 2 | 0 | 10.00% | 15.00% | 34.98% |\n| 2 | 1 | 11.25% | 16.88% | 38.68% |\n| 2 | 2 | 12.50% | 18.75% | 42.24% |\n| 3 | 0 | 10.00% | 15.00% | 44.73% |\n| 3 | 1 | 10.83% | 16.25% | 47.62% |\n| 3 | 2 | 11.67% | 17.50% | 50.40% |\n\nYou usually get more Pandaren value by adding more Pandas than by fishing for Lucky Pendant.",
   "source": {
     "name": "Pandaren",
     "names": {

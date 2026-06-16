@@ -7,6 +7,7 @@ interface SynergyInfo {
   name: string;
   description: string;
   lore: string;
+  commentary?: string;
   names?: Record<string, string>;
   descriptions?: Record<string, string>;
   lore_i18n?: Record<string, string>;
@@ -22,6 +23,7 @@ export interface DisplaySynergy {
   name: string;
   description: string;
   lore: string;
+  commentary?: string;
   iconStem: string;
   iconUrl: string;
   iconDimensions: { width: number; height: number } | null;
@@ -53,6 +55,7 @@ function buildSynergiesForLocale(locale: Locale): DisplaySynergy[] {
         name: localizedName,
         description,
         lore,
+        commentary: syn.commentary,
         iconStem: stem,
         iconUrl: syn.icon_url || `/icons/synergies/${stem}.png`,
         iconDimensions: syn.icon_dimensions ?? null,

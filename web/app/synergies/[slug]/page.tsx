@@ -2,7 +2,10 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { EntityDetail, type RelatedEntity } from "@/components/EntityDetail";
 import { SynergyDescription } from "@/components/SynergyDescription";
-import { EntityCommentaryList } from "@/components/PatchCommentary";
+import {
+  EntityCommentaryList,
+  EntryCommentary,
+} from "@/components/PatchCommentary";
 import {
   getAllSynergies,
   getSynergyBySlug,
@@ -95,6 +98,17 @@ export default async function SynergyDetailPage({ params }: Props) {
     .slice(0, 8);
 
   const commentary = getCommentaryForEntity("synergy", slug);
+  const commentaryContent =
+    synergy.commentary || commentary.length > 0 ? (
+      <>
+        {synergy.commentary && (
+          <EntryCommentary commentary={synergy.commentary} />
+        )}
+        {commentary.length > 0 && (
+          <EntityCommentaryList entries={commentary} />
+        )}
+      </>
+    ) : undefined;
 
   const description = t.description(synergy.name);
   const translateSyn = getSynergyNameTranslator(DEFAULT_LOCALE);
@@ -166,11 +180,7 @@ export default async function SynergyDetailPage({ params }: Props) {
         name={synergy.name}
         iconSrc={synergy.iconUrl}
         overview={<SynergyDescription description={synergy.description || description} />}
-        commentary={
-          commentary.length > 0 ? (
-            <EntityCommentaryList entries={commentary} />
-          ) : undefined
-        }
+        commentary={commentaryContent}
         lore={synergy.lore || undefined}
         indexLabel={indexLabel}
         indexPath={indexPath}
