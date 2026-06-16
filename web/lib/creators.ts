@@ -200,6 +200,20 @@ function twitchLogin(url: string): string | null {
   }
 }
 
+function kickSlug(url: string): string | null {
+  try {
+    const parsed = new URL(url);
+    if (!parsed.hostname.toLowerCase().includes("kick.com")) return null;
+    const slug = parsed.pathname
+      .split("/")
+      .map((segment) => segment.trim())
+      .filter(Boolean)[0];
+    return slug && /^[a-z0-9_-]{2,50}$/i.test(slug) ? slug : null;
+  } catch {
+    return null;
+  }
+}
+
 function firstNonEmpty(
   ...values: Array<string | null | undefined>
 ): string | null {
@@ -571,6 +585,69 @@ async function fetchDouyuLiveStream(
   };
 }
 
+async function fetchKickLiveStream(
+  creator: CreatorConfig,
+  revalidateSeconds = 120
+): Promise<CreatorLiveStream | null> {
+  if (!creator.streamUrl) return null;
+  const slug = kickSlug(creator.streamUrl);
+  if (!slug) return null;
+
+  const response = await fetch(
+    `https://kick.com/api/v2/channels/${encodeURIComponent(slug)}`,
+    {
+      next: { revalidate: revalidateSeconds },
+      headers: {
+        accept: "application/json",
+        "user-agent": "Mozilla/5.0",
+      },
+    }
+  );
+  if (!response.ok) return null;
+
+  const payload = (await response.json().catch(() => null)) as
+    | {
+        slug?: string;
+        user?: {
+          username?: string;
+          profile_pic?: string;
+        };
+        livestream?: {
+          id?: string | number;
+          session_title?: string;
+          title?: string;
+          thumbnail?: string | { url?: string; src?: string };
+        } | null;
+      }
+    | null;
+  const livestream = payload?.livestream;
+  if (!livestream) return null;
+
+  const thumbnail =
+    typeof livestream.thumbnail === "string"
+      ? livestream.thumbnail
+      : livestream.thumbnail?.url ?? livestream.thumbnail?.src ?? null;
+
+  return {
+    id: `${creator.id}-live-kick-${livestream.id ?? slug}`,
+    steamId: creator.steamId ?? null,
+    name:
+      firstNonEmpty(
+        nonSteamIdText(payload?.user?.username),
+        payload?.slug,
+        creator.name,
+        slug
+      ) ?? creator.name,
+    description: creator.description ?? null,
+    url: creator.streamUrl,
+    platform: "kick",
+    avatarUrl: creator.avatarUrl ?? payload?.user?.profile_pic ?? null,
+    profilePath: creator.profileUrl ?? null,
+    title: livestream.session_title ?? livestream.title ?? null,
+    thumbnailUrl: thumbnail,
+  };
+}
+
 async function fetchGenericLiveStream(
   creator: CreatorConfig,
   revalidateSeconds = 120
@@ -580,6 +657,7 @@ async function fetchGenericLiveStream(
   if (platform === "youtube") return fetchYouTubeLiveStream(creator, revalidateSeconds);
   if (platform === "twitch") return fetchTwitchLiveStream(creator, revalidateSeconds);
   if (platform === "douyu") return fetchDouyuLiveStream(creator, revalidateSeconds);
+  if (platform === "kick") return fetchKickLiveStream(creator, revalidateSeconds);
 
   const response = await fetch(creator.streamUrl, {
     next: { revalidate: revalidateSeconds },

@@ -255,7 +255,8 @@ function StreamIcon({ platform }: { platform: ReturnType<typeof streamPlatform> 
   if (platform === "douyu") {
     return (
       <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-        <path d="M4 5h16v10.5A3.5 3.5 0 0 1 16.5 19h-9A3.5 3.5 0 0 1 4 15.5V5Zm2 2v8.5A1.5 1.5 0 0 0 7.5 17h9a1.5 1.5 0 0 0 1.5-1.5V7H6Zm3 2.5 5.2 2.5L9 14.5v-5Z" />
+        <path d="M4 5.5h16v13H4v-13Zm2 2v9h12v-9H6Z" />
+        <path d="M7.5 10h2.2c1.6 0 2.7 1 2.7 2.5S11.3 15 9.7 15H7.5v-5Zm1.6 1.3v2.4h.5c.7 0 1.2-.4 1.2-1.2s-.5-1.2-1.2-1.2h-.5Zm3.8-1.3h1.7l1 1.8 1-1.8h1.7l-1.9 3.1V15h-1.6v-1.9L12.9 10Z" />
       </svg>
     );
   }
