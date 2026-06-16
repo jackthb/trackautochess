@@ -10,13 +10,6 @@
 .lead strong {
   color: var(--text-primary);
 }
-.live-status-note {
-  margin: -12px 0 20px;
-  color: #fbbf24;
-  font-family: var(--font-mono);
-  font-size: var(--fs-12);
-  line-height: var(--lh-relaxed);
-}
 .refresh-status {
   display: inline-flex;
   align-items: center;
@@ -171,6 +164,14 @@
   opacity: 0.9;
   transition: color 0.15s, opacity 0.15s;
 }
+.stream-live-label {
+  display: none;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 0;
+  text-transform: uppercase;
+}
 .stream-link svg {
   display: block;
   width: 18px;
@@ -182,18 +183,23 @@
   opacity: 1;
 }
 .stream-link-live {
-  color: var(--accent);
-}
-.stream-link-live:hover {
-  color: var(--accent);
-  opacity: 0.9;
-}
-.stream-link-unknown {
-  color: #fbbf24;
+  width: auto;
+  height: 22px;
+  gap: 4px;
+  padding: 0 6px 0 4px;
+  border: 1px solid rgba(74, 222, 128, 0.45);
+  border-radius: 999px;
+  background: rgba(74, 222, 128, 0.12);
+  color: #4ade80;
   opacity: 1;
 }
-.stream-link-unknown:hover {
-  color: #fcd34d;
+.stream-link-live:hover {
+  color: #86efac;
+  border-color: rgba(134, 239, 172, 0.65);
+  opacity: 1;
+}
+.stream-link-live .stream-live-label {
+  display: inline;
 }
 .player-vanity {
   color: var(--text-muted);

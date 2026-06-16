@@ -11,12 +11,9 @@ import {
   selectDisplayedQueens,
   type QueenRow as BaseQueenRow,
 } from "@/lib/queens";
-import {
-  QUEENS_REFRESH_COOLDOWN_MS,
-  QUEENS_VIEW_REFRESH_COOLDOWN_MS,
-} from "@/lib/queensVisitor";
+import { QUEENS_VIEW_REFRESH_COOLDOWN_MS } from "@/lib/queensVisitor";
 import { mostRecentTimestamp } from "@/lib/timestamps";
-import { canonicalCreatorStreamUrl, loadCreatorLiveStreams } from "@/lib/creators";
+import { canonicalCreatorStreamUrl, loadCachedCreatorLiveStreams } from "@/lib/creators";
 import styles from "./queens.module.css";
 import { QueensAutoRefresh } from "./QueensAutoRefresh";
 
@@ -62,9 +59,6 @@ export const metadata: Metadata = {
 };
 
 export const revalidate = 300;
-
-const LIVE_STREAM_TIMEOUT_MS = 1500;
-const QUEENS_REVALIDATE_SECONDS = QUEENS_REFRESH_COOLDOWN_MS / 1000;
 
 async function loadQueens(): Promise<{ rows: QueenRow[]; error: string | null }> {
   const supabase = createSupabaseServerClient();
@@ -230,28 +224,6 @@ function moveClass(move: QueenMove | null | undefined): string {
   return move.delta > 0 ? styles.up : styles.down;
 }
 
-async function loadCreatorLiveStreamsWithTimeout(): Promise<
-  Awaited<ReturnType<typeof loadCreatorLiveStreams>>
-> {
-  let timer: ReturnType<typeof setTimeout> | null = null;
-  try {
-    const timeout = new Promise<Awaited<ReturnType<typeof loadCreatorLiveStreams>>>(
-      (resolve) => {
-        timer = setTimeout(
-          () => resolve({ streams: [], error: "Live stream lookup timed out." }),
-          LIVE_STREAM_TIMEOUT_MS
-        );
-      }
-    );
-    return await Promise.race([
-      loadCreatorLiveStreams({ revalidateSeconds: QUEENS_REVALIDATE_SECONDS }),
-      timeout,
-    ]);
-  } finally {
-    if (timer) clearTimeout(timer);
-  }
-}
-
 function streamPlatform(url: string): "twitch" | "youtube" | "kick" | "douyu" | "stream" {
   try {
     const hostname = new URL(url).hostname.replace(/^www\./, "");
@@ -302,12 +274,10 @@ function StreamIcon({ platform }: { platform: ReturnType<typeof streamPlatform> 
 }
 
 export default async function QueensPage() {
-  const [{ rows, error }, liveStreamsResult] = await Promise.all([
+  const [{ rows, error }, { streams }] = await Promise.all([
     loadQueens(),
-    loadCreatorLiveStreamsWithTimeout(),
+    loadCachedCreatorLiveStreams(),
   ]);
-  const { streams, error: liveStreamsError } = liveStreamsResult;
-  const liveStatusAvailable = !liveStreamsError;
   const season = rows.find((row) => row.queen_ladder_season)?.queen_ladder_season;
   const lastUpdatedAt = newestDrodoFetchedAt(rows) ?? queenLastUpdatedAt(rows);
   const oldestUpdatedAt = oldestDrodoFetchedAt(rows) ?? queenOldestUpdatedAt(rows);
@@ -332,12 +302,6 @@ export default async function QueensPage() {
         The table renders cached Drodo profile data immediately, then refreshes
         visible profiles when the 5-minute cooldown has elapsed.
       </p>
-      {liveStreamsError ? (
-        <p className={styles["live-status-note"]}>
-          Live stream status is unavailable right now; stream links are still shown.
-        </p>
-      ) : null}
-
       {error ? (
         <div className={styles.gate}>Failed to load Queen players: {error}</div>
       ) : rows.length === 0 ? (
@@ -367,15 +331,12 @@ export default async function QueensPage() {
               const streamLinkClass = [
                 styles["stream-link"],
                 isLive ? styles["stream-link-live"] : "",
-                !liveStatusAvailable ? styles["stream-link-unknown"] : "",
               ]
                 .filter(Boolean)
                 .join(" ");
               const streamTitle = isLive
                 ? `${display} stream is live`
-                : liveStatusAvailable
-                  ? row.stream_link ?? `${display} stream`
-                  : `${display} stream (live status unavailable)`;
+                : row.stream_link ?? `${display} stream`;
               const initial = display.charAt(0).toUpperCase() || "?";
               const games = seasonGames(row);
               const wins = seasonWins(row);
@@ -431,13 +392,14 @@ export default async function QueensPage() {
                         aria-label={
                           isLive
                             ? `${display} stream is live`
-                            : liveStatusAvailable
-                              ? `${display} stream`
-                              : `${display} stream; live status unavailable`
+                            : `${display} stream`
                         }
                         title={streamTitle}
                       >
                         <StreamIcon platform={streamPlatform(row.stream_link)} />
+                        {isLive ? (
+                          <span className={styles["stream-live-label"]}>Live</span>
+                        ) : null}
                       </a>
                     ) : null}
                   </div>

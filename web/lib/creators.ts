@@ -1,4 +1,5 @@
 import creatorsConfig from "../../content/creators.json";
+import { unstable_cache } from "next/cache";
 import { playerProfilePath } from "@/lib/steam";
 import { createSupabaseAnonClient } from "@/lib/supabase";
 import { STEAM_ID_TEXT_SELECT } from "@/lib/supabaseSelect";
@@ -69,6 +70,8 @@ interface ResolvedYouTubeChannel {
 
 const YOUTUBE_FEED_BASE = "https://www.youtube.com/feeds/videos.xml";
 const CREATOR_FEED_REVALIDATE_SECONDS = 900;
+export const CREATOR_LIVE_STREAM_REVALIDATE_SECONDS = 300;
+const CREATOR_LIVE_STREAM_TIMEOUT_MS = 1500;
 const MAX_UPLOADS_PER_CREATOR = 12;
 export const MAX_CREATOR_UPLOADS = 30;
 
@@ -605,6 +608,24 @@ async function fetchGenericLiveStream(
   };
 }
 
+async function fetchCreatorLiveStreamWithTimeout(
+  creator: CreatorConfig,
+  revalidateSeconds: number
+): Promise<CreatorLiveStream | null> {
+  let timer: ReturnType<typeof setTimeout> | null = null;
+  try {
+    const timeout = new Promise<null>((resolve) => {
+      timer = setTimeout(() => resolve(null), CREATOR_LIVE_STREAM_TIMEOUT_MS);
+    });
+    return await Promise.race([
+      fetchGenericLiveStream(creator, revalidateSeconds),
+      timeout,
+    ]);
+  } finally {
+    if (timer) clearTimeout(timer);
+  }
+}
+
 export async function loadCreatorLiveStreams({
   revalidateSeconds = 120,
 }: {
@@ -617,7 +638,7 @@ export async function loadCreatorLiveStreams({
   const results = await Promise.all(
     creators.map(async (creator) => {
       try {
-        return await fetchGenericLiveStream(creator, revalidateSeconds);
+        return await fetchCreatorLiveStreamWithTimeout(creator, revalidateSeconds);
       } catch (error) {
         console.error(`Failed to load live stream for ${creator.id}:`, error);
         return null;
@@ -633,6 +654,18 @@ export async function loadCreatorLiveStreams({
     error: null,
   };
 }
+
+export const loadCachedCreatorLiveStreams = unstable_cache(
+  () =>
+    loadCreatorLiveStreams({
+      revalidateSeconds: CREATOR_LIVE_STREAM_REVALIDATE_SECONDS,
+    }),
+  ["creator-live-streams"],
+  {
+    revalidate: CREATOR_LIVE_STREAM_REVALIDATE_SECONDS,
+    tags: ["creator-live-streams"],
+  }
+);
 
 export async function loadCreatorUploads(): Promise<CreatorUpload[]> {
   const creators = contentCreatorConfigRows();
