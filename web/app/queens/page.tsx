@@ -254,10 +254,12 @@ function StreamIcon({ platform }: { platform: ReturnType<typeof streamPlatform> 
   }
   if (platform === "douyu") {
     return (
-      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-        <path d="M4 5.5h16v13H4v-13Zm2 2v9h12v-9H6Z" />
-        <path d="M7.5 10h2.2c1.6 0 2.7 1 2.7 2.5S11.3 15 9.7 15H7.5v-5Zm1.6 1.3v2.4h.5c.7 0 1.2-.4 1.2-1.2s-.5-1.2-1.2-1.2h-.5Zm3.8-1.3h1.7l1 1.8 1-1.8h1.7l-1.9 3.1V15h-1.6v-1.9L12.9 10Z" />
-      </svg>
+      <img
+        className={styles["stream-platform-logo"]}
+        src="/stream-platforms/douyu.svg"
+        alt=""
+        aria-hidden="true"
+      />
     );
   }
   if (platform === "twitch") {
@@ -332,6 +334,9 @@ export default async function QueensPage() {
               const streamLinkClass = [
                 styles["stream-link"],
                 isLive ? styles["stream-link-live"] : "",
+                row.stream_link && streamPlatform(row.stream_link) === "douyu"
+                  ? styles["stream-link-douyu"]
+                  : "",
               ]
                 .filter(Boolean)
                 .join(" ");

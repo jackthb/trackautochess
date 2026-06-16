@@ -178,6 +178,15 @@
   height: 18px;
   fill: currentColor;
 }
+.stream-platform-logo {
+  display: block;
+  width: 26px;
+  height: 18px;
+  object-fit: contain;
+}
+.stream-link-douyu {
+  width: 28px;
+}
 .stream-link:hover {
   color: var(--text-primary);
   opacity: 1;
