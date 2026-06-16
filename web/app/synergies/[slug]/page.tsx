@@ -2,10 +2,8 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { EntityDetail, type RelatedEntity } from "@/components/EntityDetail";
 import { SynergyDescription } from "@/components/SynergyDescription";
-import {
-  EntityCommentaryList,
-  EntryCommentary,
-} from "@/components/PatchCommentary";
+import { EntityCommentaryList } from "@/components/PatchCommentary";
+import { Markdown } from "@/components/Markdown";
 import {
   getAllSynergies,
   getSynergyBySlug,
@@ -101,9 +99,7 @@ export default async function SynergyDetailPage({ params }: Props) {
   const commentaryContent =
     synergy.commentary || commentary.length > 0 ? (
       <>
-        {synergy.commentary && (
-          <EntryCommentary commentary={synergy.commentary} />
-        )}
+        {synergy.commentary && <Markdown>{synergy.commentary}</Markdown>}
         {commentary.length > 0 && (
           <EntityCommentaryList entries={commentary} />
         )}
