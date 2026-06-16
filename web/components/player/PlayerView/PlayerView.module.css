@@ -346,11 +346,28 @@
   background: var(--bg-surface);
 }
 @media (max-width: 620px) {
+  .dashboard {
+    padding: 24px 16px 56px;
+  }
   .playerHeader {
     flex-direction: column;
+    gap: 16px;
   }
   .playerIdentity {
     align-items: flex-start;
+    gap: 12px;
+  }
+  .playerAvatar {
+    width: 56px;
+    height: 56px;
+  }
+  .playerAvatarFallback {
+    font-size: 24px;
+  }
+  .playerName {
+    font-size: 24px;
+    line-height: 1.15;
+    overflow-wrap: anywhere;
   }
   .playerActions,
   .lastFetched,

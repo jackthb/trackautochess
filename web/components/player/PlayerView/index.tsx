@@ -8,7 +8,11 @@ import { StatsGrid } from "@dac/shared/StatsGrid";
 import { SeasonHistoryGrid, type SeasonSnapshot } from "@dac/shared/SeasonHistoryGrid";
 import { MmrSparkline, type MmrSnapshot } from "@/components/MmrSparkline";
 import { MatchHistoryList } from "@/components/matches/MatchHistoryList";
-import { QueenRankSparkline, type QueenRankSnapshot } from "@/components/QueenRankSparkline";
+import {
+  QueenRankSparkline,
+  hasQueenRankHistory,
+  type QueenRankSnapshot,
+} from "@/components/QueenRankSparkline";
 import { RankLadder } from "@/components/RankLadder";
 import { SteamSignInButton } from "@/components/SteamSignInButton";
 import {
@@ -132,6 +136,36 @@ function latestMmrDelta(snapshots: MmrSnapshot[]) {
     latestMmr: latest.mmr,
     previousMmr: previous.mmr,
   };
+}
+
+function historyWithCurrentMmr(
+  snapshots: MmrSnapshot[],
+  mmr: number | null | undefined,
+  snapshottedAt: string | null | undefined
+): MmrSnapshot[] {
+  if (typeof mmr !== "number" || !snapshottedAt) return snapshots;
+  return [
+    ...snapshots,
+    {
+      mmr,
+      snapshotted_at: snapshottedAt,
+    },
+  ];
+}
+
+function historyWithCurrentQueenRank(
+  snapshots: QueenRankSnapshot[],
+  queenRank: number | null | undefined,
+  snapshottedAt: string | null | undefined
+): QueenRankSnapshot[] {
+  if (typeof queenRank !== "number" || !snapshottedAt) return snapshots;
+  return [
+    ...snapshots,
+    {
+      queen_rank: queenRank,
+      snapshotted_at: snapshottedAt,
+    },
+  ];
 }
 
 function HistoryLockedPanel() {
@@ -345,7 +379,21 @@ export default function PlayerView({
     () => buildStatItems(games, drodo ? { ...drodo, total_chicken_count: totalChickenCount } : null),
     [games, drodo, totalChickenCount]
   );
-  const showQueenRankHistory = Boolean(drodo?.queen_rank) && queenRankHistory.length >= 2;
+  const effectiveMmrHistory = useMemo(
+    () => historyWithCurrentMmr(mmrHistory, drodo?.mmr, drodoLastFetchedAt),
+    [mmrHistory, drodo?.mmr, drodoLastFetchedAt]
+  );
+  const effectiveQueenRankHistory = useMemo(
+    () =>
+      historyWithCurrentQueenRank(
+        queenRankHistory,
+        drodo?.queen_rank,
+        drodoLastFetchedAt
+      ),
+    [queenRankHistory, drodo?.queen_rank, drodoLastFetchedAt]
+  );
+  const showQueenRankHistory =
+    Boolean(drodo?.queen_rank) && hasQueenRankHistory(effectiveQueenRankHistory);
 
   // TODO: ingest total matches / avg rank / wins / preferred lineup / max damage from history pages for server-side season snapshots.
   useEffect(() => {
@@ -742,13 +790,13 @@ export default function PlayerView({
                     </button>
                   </div>
                   {historyTab === "queen" ? (
-                    <QueenRankSparkline snapshots={queenRankHistory} />
+                    <QueenRankSparkline snapshots={effectiveQueenRankHistory} />
                   ) : (
-                    <MmrSparkline seasons={seasons} snapshots={mmrHistory} />
+                    <MmrSparkline seasons={seasons} snapshots={effectiveMmrHistory} />
                   )}
                 </div>
               ) : (
-                <MmrSparkline seasons={seasons} snapshots={mmrHistory} />
+                <MmrSparkline seasons={seasons} snapshots={effectiveMmrHistory} />
               )}
 
               <SeasonHistoryGrid seasons={seasons} />

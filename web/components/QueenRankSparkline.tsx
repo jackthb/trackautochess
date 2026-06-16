@@ -21,19 +21,37 @@ const HEIGHT = 120;
 const PAD_X = 8;
 const PAD_Y = 12;
 
+function utcDayKey(iso: string): string | null {
+  const date = new Date(iso);
+  if (!Number.isFinite(date.getTime())) return null;
+  return date.toISOString().slice(0, 10);
+}
+
 function buildPoints(snapshots: QueenRankSnapshot[]): QueenRankPoint[] {
-  return snapshots
-    .filter((s): s is QueenRankSnapshot & { queen_rank: number } => typeof s.queen_rank === "number")
+  const byDay = new Map<string, QueenRankSnapshot & { queen_rank: number }>();
+  for (const snapshot of snapshots
+    .filter(
+      (s): s is QueenRankSnapshot & { queen_rank: number } =>
+        typeof s.queen_rank === "number"
+    )
     .slice()
     .sort(
       (a, b) =>
         new Date(a.snapshotted_at).getTime() -
         new Date(b.snapshotted_at).getTime()
-    )
-    .map((s) => ({
-      rank: s.queen_rank,
-      label: formatIsoDateLabel(s.snapshotted_at),
-    }));
+    )) {
+    const key = utcDayKey(snapshot.snapshotted_at);
+    if (key) byDay.set(key, snapshot);
+  }
+
+  return [...byDay.values()].map((s) => ({
+    rank: s.queen_rank,
+    label: formatIsoDateLabel(s.snapshotted_at),
+  }));
+}
+
+export function hasQueenRankHistory(snapshots: QueenRankSnapshot[]): boolean {
+  return buildPoints(snapshots).length >= 2;
 }
 
 export function QueenRankSparkline({ snapshots = [] }: QueenRankSparklineProps) {
@@ -45,11 +63,11 @@ export function QueenRankSparkline({ snapshots = [] }: QueenRankSparklineProps) 
         <div className={styles.head}>
           <span className={styles.label}>Queen Rank History</span>
           <span className={styles.meta}>
-            {points.length} snapshot{points.length === 1 ? "" : "s"}
+            {points.length} daily point{points.length === 1 ? "" : "s"}
           </span>
         </div>
         <p className={styles.note}>
-          Queen rank history needs at least two refreshed snapshots while this
+          Queen rank history needs snapshots from at least two days while this
           player is Queen.
         </p>
       </section>
@@ -80,8 +98,8 @@ export function QueenRankSparkline({ snapshots = [] }: QueenRankSparklineProps) 
       <div className={styles.head}>
         <span className={styles.label}>Queen Rank History</span>
         <span className={styles.meta}>
-          {points.length} snapshot{points.length === 1 ? "" : "s"} · range{" "}
-          <strong>#{bestRank}</strong>–<strong>#{worstRank}</strong>
+          {points.length} daily point{points.length === 1 ? "" : "s"} - range{" "}
+          <strong>#{bestRank}</strong>-<strong>#{worstRank}</strong>
         </span>
       </div>
       <div className={styles.chartWrap}>
@@ -128,7 +146,8 @@ export function QueenRankSparkline({ snapshots = [] }: QueenRankSparklineProps) 
       </div>
       <p className={styles.note}>
         Queen ladder points are captured when this profile is refreshed while
-        Drodo reports a Queen ladder position.
+        Drodo reports a Queen ladder position. Multiple refreshes on the same
+        UTC day are shown as one point.
       </p>
     </section>
   );

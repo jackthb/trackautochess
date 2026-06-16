@@ -120,10 +120,14 @@
 }
 .cell-avatar {
   padding: 6px 0;
+  justify-content: center;
 }
 .avatar {
   width: 32px;
   height: 32px;
+  min-width: 32px;
+  flex: 0 0 32px;
+  aspect-ratio: 1;
   border-radius: 50%;
   object-fit: cover;
   border: 1px solid var(--border);

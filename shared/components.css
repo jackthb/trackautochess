@@ -726,6 +726,7 @@ select.edit-field { cursor: pointer; }
   font-weight: 700;
   color: var(--text-primary);
   margin-bottom: 6px;
+  overflow-wrap: anywhere;
 }
 
 .stat-value.gold { color: var(--gold); }
@@ -806,5 +807,18 @@ select.edit-field { cursor: pointer; }
 }
 
 @media (max-width: 460px) {
-  .stats-bar { grid-template-columns: 1fr; }
+  .stats-bar {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .stat-cell {
+    padding: 14px 10px;
+  }
+  .stat-value {
+    font-size: clamp(20px, 7vw, 28px);
+  }
+  .stat-label {
+    font-size: 11px;
+    letter-spacing: 0.8px;
+    line-height: 1.25;
+  }
 }

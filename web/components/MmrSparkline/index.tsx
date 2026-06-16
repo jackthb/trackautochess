@@ -35,6 +35,12 @@ const HEIGHT = 132;
 const PAD_X = 8;
 const PAD_Y = 22;
 
+function utcDayKey(iso: string): string | null {
+  const date = new Date(iso);
+  if (!Number.isFinite(date.getTime())) return null;
+  return date.toISOString().slice(0, 10);
+}
+
 /**
  * Build the plotted series — a *tracked* MMR timeline of refresh snapshots,
  * starting at the first one we ever recorded. Returns the points only when
@@ -42,19 +48,24 @@ const PAD_Y = 22;
  * that threshold rather than inventing a line from season summaries.
  */
 function buildPoints(snapshots: MmrSnapshot[]): MmrPoint[] {
-  return snapshots
+  const byDay = new Map<string, MmrSnapshot & { mmr: number }>();
+  for (const snapshot of snapshots
     .filter((s): s is MmrSnapshot & { mmr: number } => typeof s.mmr === "number")
     .slice()
     .sort(
       (a, b) =>
         new Date(a.snapshotted_at).getTime() -
         new Date(b.snapshotted_at).getTime()
-    )
-    .map((s) => ({
-      mmr: s.mmr,
-      label: formatIsoDateLabel(s.snapshotted_at),
-      kind: "snapshot",
-    }));
+    )) {
+    const key = utcDayKey(snapshot.snapshotted_at);
+    if (key) byDay.set(key, snapshot);
+  }
+
+  return [...byDay.values()].map((s) => ({
+    mmr: s.mmr,
+    label: formatIsoDateLabel(s.snapshotted_at),
+    kind: "snapshot",
+  }));
 }
 
 /** Where to anchor a value label so it never spills past the chart edges. */
@@ -114,7 +125,7 @@ export function MmrSparkline({ snapshots = [] }: MmrSparklineProps) {
   const trough = coords[troughIdx];
 
   const metaParts: string[] = [
-    `${points.length} tracked point${points.length === 1 ? "" : "s"}`,
+    `${points.length} daily point${points.length === 1 ? "" : "s"}`,
     `peak ${maxMmr}`,
     `low ${minMmr}`,
   ];
@@ -204,7 +215,7 @@ export function MmrSparkline({ snapshots = [] }: MmrSparklineProps) {
       </div>
       <p className={styles.note}>
         This timeline begins at the first MMR we tracked — not your all-time
-        start. New points are added each time the profile is refreshed.
+        start. Multiple refreshes on the same UTC day are shown as one point.
       </p>
     </section>
   );
