@@ -4,10 +4,16 @@ import {
   DRODO_FRESH_TTL_MS as DRODO_FRESH_TTL_MS_VALUE,
   DRODO_MISSING_TTL_MS as DRODO_MISSING_TTL_MS_VALUE,
   EMPTY_DRODO_PROFILE_ERROR as EMPTY_DRODO_PROFILE_ERROR_VALUE,
+  ACTIVE_SIGN_IN_WINDOW_MS as ACTIVE_SIGN_IN_WINDOW_MS_VALUE,
   HOT_POLL_MAX_INTERVAL_SECONDS as HOT_POLL_MAX_INTERVAL_SECONDS_VALUE,
+  POLL_ACTIVE_INTERVAL_SECONDS as POLL_ACTIVE_INTERVAL_SECONDS_VALUE,
   POLL_BACKOFF_FACTOR as POLL_BACKOFF_FACTOR_VALUE,
+  POLL_INACTIVE_INTERVAL_SECONDS as POLL_INACTIVE_INTERVAL_SECONDS_VALUE,
   POLL_MAX_INTERVAL_SECONDS as POLL_MAX_INTERVAL_SECONDS_VALUE,
   POLL_MIN_INTERVAL_SECONDS as POLL_MIN_INTERVAL_SECONDS_VALUE,
+  QUEENS_REFRESH_COOLDOWN_MS as QUEENS_REFRESH_COOLDOWN_MS_VALUE,
+  QUEENS_VIEW_REFRESH_COOLDOWN_MS as QUEENS_VIEW_REFRESH_COOLDOWN_MS_VALUE,
+  activePollOrFilter as activePollOrFilterValue,
   buildDrodoProfile as buildDrodoProfileValue,
   clampInterval as clampIntervalValue,
   currentSeason as currentSeasonValue,
@@ -15,6 +21,8 @@ import {
   extractAllSeasons as extractAllSeasonsValue,
   fetchDrodoProfileBatch as fetchDrodoProfileBatchValue,
   hasDrodoStats as hasDrodoStatsValue,
+  inactivePollCutoff as inactivePollCutoffValue,
+  isActivePollUser as isActivePollUserValue,
   isQueenProfile as isQueenProfileValue,
   lastTop3FromDrodoData as lastTop3FromDrodoDataValue,
   lastWinFromDrodoData as lastWinFromDrodoDataValue,
@@ -23,6 +31,7 @@ import {
   numberFromDrodoData as numberFromDrodoDataValue,
   pollSnapshotFromRow as pollSnapshotFromRowValue,
   profileChanged as profileChangedValue,
+  recentSignInCutoff as recentSignInCutoffValue,
   summarizeDrodoResults as summarizeDrodoResultsValue,
   valueFromDrodoData as valueFromDrodoDataValue,
 } from "./drodo-core.mjs";
@@ -34,10 +43,19 @@ export const DRODO_FRESH_TTL_MS: number = DRODO_FRESH_TTL_MS_VALUE;
 export const DRODO_MISSING_TTL_MS: number = DRODO_MISSING_TTL_MS_VALUE;
 export const EMPTY_DRODO_PROFILE_ERROR: string = EMPTY_DRODO_PROFILE_ERROR_VALUE;
 
+export const POLL_ACTIVE_INTERVAL_SECONDS: number =
+  POLL_ACTIVE_INTERVAL_SECONDS_VALUE;
+export const POLL_INACTIVE_INTERVAL_SECONDS: number =
+  POLL_INACTIVE_INTERVAL_SECONDS_VALUE;
 export const POLL_MIN_INTERVAL_SECONDS: number = POLL_MIN_INTERVAL_SECONDS_VALUE;
 export const POLL_MAX_INTERVAL_SECONDS: number = POLL_MAX_INTERVAL_SECONDS_VALUE;
 export const POLL_BACKOFF_FACTOR: number = POLL_BACKOFF_FACTOR_VALUE;
 export const HOT_POLL_MAX_INTERVAL_SECONDS: number = HOT_POLL_MAX_INTERVAL_SECONDS_VALUE;
+export const ACTIVE_SIGN_IN_WINDOW_MS: number = ACTIVE_SIGN_IN_WINDOW_MS_VALUE;
+export const QUEENS_REFRESH_COOLDOWN_MS: number =
+  QUEENS_REFRESH_COOLDOWN_MS_VALUE;
+export const QUEENS_VIEW_REFRESH_COOLDOWN_MS: number =
+  QUEENS_VIEW_REFRESH_COOLDOWN_MS_VALUE;
 
 export interface SeasonSnapshotRow {
   steam_id: string;
@@ -202,6 +220,26 @@ export const drodoProfileToUserPayload: (
 
 export const clampInterval: (seconds: number, max?: number) => number =
   clampIntervalValue;
+
+export const recentSignInCutoff: (now?: Date) => string =
+  recentSignInCutoffValue;
+
+export const activePollOrFilter: (cutoffIso: string) => string =
+  activePollOrFilterValue;
+
+export const isActivePollUser: (
+  user:
+    | {
+        steam_signed_in_at?: string | null;
+        queen_ladder_rank?: number | null;
+      }
+    | null
+    | undefined,
+  cutoffIso: string
+) => boolean = isActivePollUserValue;
+
+export const inactivePollCutoff: (now?: Date) => string =
+  inactivePollCutoffValue;
 
 export const nextPollSchedule: (input: {
   mode: "reset" | "adaptive";

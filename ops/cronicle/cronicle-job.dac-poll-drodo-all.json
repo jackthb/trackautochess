@@ -1,7 +1,7 @@
 {
   "title": "Poll Drodo (MMR snapshots) - full",
   "name": "poll-drodo-all",
-  "description": "Daily Drodo sweep: active cohort plus inactive users on a weekly cadence (profile >= 7 days old)",
+  "description": "Daily Drodo sweep of cached non-missing users whose shared next_poll_at is due",
   "plugin": "command",
   "command": "/opt/cronicle/dac-scripts/poll-drodo-all.sh",
   "workdir": "/workspace",

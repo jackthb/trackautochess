@@ -98,6 +98,7 @@ Steam changelog ->  scripts/scrape-patch-notes.mjs  ->  content/patch-notes + co
 
 ### Cronicle Drodo polling
 
+The target background polling policy is documented in [polling.md](polling.md).
 Cronicle is the primary operations path for Drodo MMR polling. See [ops/cronicle/README.md](../ops/cronicle/README.md) for setup, schedule, and runbook details.
 
 The `.github/workflows/poll-drodo.yml` workflow is an emergency fallback and should remain disabled unless it is intentionally re-enabled for an incident or Cronicle outage.

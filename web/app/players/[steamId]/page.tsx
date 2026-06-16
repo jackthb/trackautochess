@@ -15,12 +15,12 @@ import { absoluteUrl, getSiteUrl } from "@/lib/site";
 import { getManualRefreshQuota } from "@/lib/manualRefreshQuota";
 import {
   HOT_PROFILE_REFRESH_TTL_SECONDS,
-  fetchAndCacheDrodo,
   isFreshCache,
   lastTop3FromDrodoData,
   lastWinFromDrodoData,
   numberFromDrodoData,
 } from "@/lib/drodo";
+import { readThroughDrodoProfile } from "@/lib/drodoReadThrough";
 import { mostRecentTimestamp } from "@/lib/timestamps";
 import { fetchSteamProfile } from "@/lib/steam";
 import PlayerView, { type PlayerPageProps } from "@/components/player/PlayerView";
@@ -261,13 +261,15 @@ const loadPlayer = cache(async (rawSteamId: string): Promise<LoadResult> => {
     // (via GET /api/drodo, which re-checks freshness server-side). Only block
     // the render when there is nothing cached to show.
     if (shouldRefreshDrodo && !drodo) {
-      const initialDrodo = await fetchAndCacheDrodo(steamId, supabase, {
+      const initialDrodo = await readThroughDrodoProfile({
+        steamId,
+        supabase,
         snapshotOnSuccess: true,
         pollMode: cachedProfileRow ? "adaptive" : "reset",
         hotPoll: hotProfilePoll,
       });
 
-      if (initialDrodo.ok) {
+      if (initialDrodo.kind === "profile") {
         if (cachedProfileRow?.queen_ladder_rank != null) {
           manualRefreshQuota = getManualRefreshQuota(undefined, Date.now(), {
             cadence: "owner",
@@ -275,19 +277,19 @@ const loadPlayer = cache(async (rawSteamId: string): Promise<LoadResult> => {
           });
         }
         drodo = {
-          ...drodoStatsFromProfile(initialDrodo.profile),
+          ...drodoStatsFromProfile(initialDrodo.payload),
           queen_rank: cachedProfileRow?.queen_ladder_rank ?? null,
         };
-        seasons = initialDrodo.seasonRows;
+        seasons = initialDrodo.payload.seasons;
         drodoLastFetchedAt = mostRecentTimestamp(
-          initialDrodo.profile.fetched_at,
+          initialDrodo.payload.fetched_at,
           cachedProfileRow?.queen_ladder_last_seen_at
         );
         drodoProfileMissing = false;
         mmrHistory = [
           {
-            mmr: initialDrodo.profile.mmr,
-            snapshotted_at: initialDrodo.profile.fetched_at,
+            mmr: initialDrodo.payload.mmr,
+            snapshotted_at: initialDrodo.payload.fetched_at,
           },
           ...mmrHistory,
         ];
@@ -296,14 +298,14 @@ const loadPlayer = cache(async (rawSteamId: string): Promise<LoadResult> => {
           : [
               {
                 queen_rank: cachedProfileRow.queen_ladder_rank,
-                snapshotted_at: initialDrodo.profile.fetched_at,
+                snapshotted_at: initialDrodo.payload.fetched_at,
               },
               ...queenRankHistory,
             ];
       } else if (initialDrodo.kind === "missing") {
         drodoProfileMissing = true;
         drodoLastFetchedAt = mostRecentTimestamp(
-          initialDrodo.fetchedAt,
+          initialDrodo.fetched_at,
           cachedProfileRow?.queen_ladder_last_seen_at
         );
       }

@@ -1,12 +1,15 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { HOT_POLL_MAX_INTERVAL_SECONDS } from "@dac/shared/drodo-core";
+import {
+  activePollOrFilter,
+  inactivePollCutoff,
+  isActivePollUser,
+  recentSignInCutoff,
+} from "@dac/shared/drodo-core";
 import { fetchAndCacheDrodoBatch } from "@/lib/drodo";
 import { revalidateQueenPages } from "@/lib/queensRevalidate";
 import { createSupabaseServiceRoleClient } from "@/lib/supabase";
 
 const DEFAULT_POLL_BATCH_SIZE = 200;
-const RECENT_SIGN_IN_WINDOW_MS = 14 * 24 * 60 * 60 * 1000;
-const INACTIVE_SCAN_INTERVAL_MS = 7 * 24 * 60 * 60 * 1000;
 const INACTIVE_SCAN_CANDIDATE_MULTIPLIER = 4;
 
 interface DueUser {
@@ -29,16 +32,9 @@ function pollBatchSize(): number {
 
 function isActiveSyncUser(
   user: InactiveScanUser,
-  recentSignInCutoff: string
+  cutoffIso: string
 ): boolean {
-  return (
-    (user.steam_signed_in_at != null &&
-      user.steam_signed_in_at >= recentSignInCutoff) ||
-    user.queen_ladder_rank != null ||
-    user.queen_ladder_last_seen_at != null ||
-    (user.poll_interval_seconds != null &&
-      user.poll_interval_seconds <= HOT_POLL_MAX_INTERVAL_SECONDS)
-  );
+  return isActivePollUser(user, cutoffIso);
 }
 
 async function handle(req: Request) {
@@ -56,17 +52,9 @@ async function handle(req: Request) {
   const supabase = createSupabaseServiceRoleClient() as SupabaseClient;
   const now = new Date();
   const pollBatchSizeLimit = pollBatchSize();
-  const recentSignInCutoff = new Date(
-    now.getTime() - RECENT_SIGN_IN_WINDOW_MS
-  ).toISOString();
-  const inactiveScanCutoff = new Date(
-    now.getTime() - INACTIVE_SCAN_INTERVAL_MS
-  ).toISOString();
-  const activeSyncFilter = [
-    `steam_signed_in_at.gte.${recentSignInCutoff}`,
-    "queen_ladder_rank.not.is.null",
-    `poll_interval_seconds.lte.${HOT_POLL_MAX_INTERVAL_SECONDS}`,
-  ].join(",");
+  const recentSignIn = recentSignInCutoff(now);
+  const inactiveScanCutoff = inactivePollCutoff(now);
+  const activeSyncFilter = activePollOrFilter(recentSignIn);
 
   const { data: dueUsers, error: queryError } = await supabase
     .from("users")
@@ -95,6 +83,7 @@ async function handle(req: Request) {
     .select(
       "steam_id::text, steam_signed_in_at, queen_ladder_rank, queen_ladder_last_seen_at, poll_interval_seconds"
     )
+    .eq("drodo_profile_missing", false)
     .not("drodo_last_fetched_at", "is", null)
     .lte("drodo_last_fetched_at", inactiveScanCutoff)
     .order("drodo_last_fetched_at", { ascending: true })
@@ -112,7 +101,7 @@ async function handle(req: Request) {
     .filter((id) => !ids.includes(id));
   const alreadyQueued = new Set([...ids, ...seedIds]);
   const inactiveIds = ((inactiveScanUsers ?? []) as unknown as InactiveScanUser[])
-    .filter((row) => !isActiveSyncUser(row, recentSignInCutoff))
+    .filter((row) => !isActiveSyncUser(row, recentSignIn))
     .map((row) => String(row.steam_id))
     .filter((id) => {
       if (alreadyQueued.has(id)) return false;
@@ -186,7 +175,7 @@ async function handle(req: Request) {
     polled: results.length,
     repolled: ids.length,
     seeded: seedIds.length,
-    inactive_weekly: inactiveIds.length,
+    inactive_daily: inactiveIds.length,
     results,
   });
 }

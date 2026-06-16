@@ -61,12 +61,12 @@ Default login for the packaged image is `admin` / `admin`. Change it first.
 
 Create two **Shell Script** jobs in the Cronicle UI.
 
-### Hourly active/high-priority poll
+### Daily active poll
 
-Schedule: hourly
+Schedule: once per day, before the full poll
 
 ```cron
-0 * * * *
+17 3 * * *
 ```
 
 Command:
@@ -79,14 +79,10 @@ This polls the active cohort whose `next_poll_at` is due:
 
 - Steam players who signed in recently.
 - Known Queen ladder players.
-- Players whose Drodo stats have been changing recently. The adaptive poller
-  represents this as a short `poll_interval_seconds` value, currently at or
-  below the one-hour hot-poll cap.
 
 Unseeded active users are also pulled once and then join the adaptive cadence.
-This hourly job is the high-priority background poll; /queens page views and the
-five-minute Queen refresh endpoint can still update the visible Queen table
-between hourly runs.
+The five-minute Queen refresh endpoint still updates the visible Queen table
+between daily background runs.
 
 ### Daily full poll
 
@@ -102,19 +98,13 @@ Command:
 /opt/cronicle/dac-scripts/poll-drodo-all.sh
 ```
 
-This walks cached non-missing users from oldest `drodo_last_fetched_at` first,
-but it does not hit every inactive account every day. The daily sweep includes:
-
-- Active users, using the same active-cohort definition as the hourly job.
-- Long-inactive users only when their cached Drodo profile is at least 7 days
-  old.
-
-That gives quiet accounts a weekly refresh cadence instead of wasting daily
-polls on players who have not logged in or changed for ages. It defaults to up
-to 10000 users per run (`DRODO_POLL_ALL_BATCH_SIZE`).
+This walks cached non-missing users whose shared `next_poll_at` is due, oldest
+`drodo_last_fetched_at` first. Under the simple policy in `shared/drodo-core.mjs`,
+active and inactive cached users are due daily. It defaults to up to 10000 users
+per run (`DRODO_POLL_ALL_BATCH_SIZE`).
 
 At the start of a new Auto Chess season, run the same script once with
-`--season-sweep` to ignore the weekly inactive gate and check all cached
+`--season-sweep` to ignore `next_poll_at` and check all cached
 non-missing users for fresh season activity:
 
 ```bash

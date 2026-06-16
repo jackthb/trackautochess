@@ -1,20 +1,19 @@
 #!/usr/bin/env node
 
 import {
+  activePollOrFilter,
   fetchDrodoProfileBatch,
   drodoProfileToUserPayload,
-  HOT_POLL_MAX_INTERVAL_SECONDS,
   isQueenProfile,
   nextPollSchedule,
   pollSnapshotFromRow,
   profileChanged,
+  recentSignInCutoff,
   summarizeDrodoResults,
 } from "../../../shared/drodo-core.mjs";
 
 const DEFAULT_BATCH_SIZE = 200;
 const DEFAULT_ALL_BATCH_SIZE = 10000;
-const RECENT_SIGN_IN_WINDOW_MS = 14 * 24 * 60 * 60 * 1000;
-const INACTIVE_POLL_INTERVAL_MS = 7 * 24 * 60 * 60 * 1000;
 
 function argValue(name) {
   const prefix = `${name}=`;
@@ -118,17 +117,13 @@ function rowSteamId(row) {
 }
 
 function activeSyncFilter(recentSignInCutoff) {
-  return [
-    `steam_signed_in_at.gte.${recentSignInCutoff}`,
-    "queen_ladder_rank.not.is.null",
-    `poll_interval_seconds.lte.${HOT_POLL_MAX_INTERVAL_SECONDS}`,
-  ].join(",");
+  return activePollOrFilter(recentSignInCutoff);
 }
 
 async function loadActiveIds(supabase, limit) {
   const now = new Date();
-  const recentSignInCutoff = new Date(now.getTime() - RECENT_SIGN_IN_WINDOW_MS).toISOString();
-  const activeFilter = activeSyncFilter(recentSignInCutoff);
+  const recentSignIn = recentSignInCutoff(now);
+  const activeFilter = activeSyncFilter(recentSignIn);
 
   const dueUsers = await supabase.select("users", {
     select: "steam_id::text",
@@ -163,11 +158,6 @@ async function loadActiveIds(supabase, limit) {
 async function loadAllIds(supabase, limit, { seasonSweep = false } = {}) {
   const ids = [];
   const now = new Date();
-  const recentSignInCutoff = new Date(now.getTime() - RECENT_SIGN_IN_WINDOW_MS).toISOString();
-  const inactiveCutoff = new Date(now.getTime() - INACTIVE_POLL_INTERVAL_MS).toISOString();
-  const eligibilityFilter = seasonSweep
-    ? undefined
-    : `${activeSyncFilter(recentSignInCutoff)},drodo_last_fetched_at.lte.${inactiveCutoff}`;
 
   for (let offset = 0; ids.length < limit; offset += 1000) {
     const pageLimit = Math.min(1000, limit - ids.length);
@@ -179,7 +169,7 @@ async function loadAllIds(supabase, limit, { seasonSweep = false } = {}) {
       limit: pageLimit,
       offset,
     };
-    if (eligibilityFilter) query.or = `(${eligibilityFilter})`;
+    if (!seasonSweep) query.next_poll_at = `lte.${now.toISOString()}`;
     const rows = await supabase.select("users", query);
     if (!rows?.length) break;
     ids.push(...rows.map(rowSteamId));

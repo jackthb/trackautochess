@@ -1,8 +1,15 @@
 import assert from "node:assert/strict";
 import {
+  activePollOrFilter,
+  inactivePollCutoff,
+  isActivePollUser,
   EMPTY_DRODO_PROFILE_ERROR,
   fetchDrodoProfileBatch,
   normalizeDrodoSteamIds,
+  POLL_ACTIVE_INTERVAL_SECONDS,
+  POLL_INACTIVE_INTERVAL_SECONDS,
+  QUEENS_REFRESH_COOLDOWN_MS,
+  recentSignInCutoff,
   summarizeDrodoResults,
 } from "../shared/drodo-core.mjs";
 
@@ -10,6 +17,40 @@ assert.deepEqual(normalizeDrodoSteamIds(["1", 1, "", null, undefined, "2"]), [
   "1",
   "2",
 ]);
+
+assert.equal(POLL_ACTIVE_INTERVAL_SECONDS, 24 * 60 * 60);
+assert.equal(POLL_INACTIVE_INTERVAL_SECONDS, 24 * 60 * 60);
+assert.equal(QUEENS_REFRESH_COOLDOWN_MS, 5 * 60 * 1000);
+
+const policyNow = new Date("2026-06-16T12:00:00.000Z");
+const policyCutoff = recentSignInCutoff(policyNow);
+assert.equal(policyCutoff, "2026-06-02T12:00:00.000Z");
+assert.equal(
+  activePollOrFilter(policyCutoff),
+  "steam_signed_in_at.gte.2026-06-02T12:00:00.000Z,queen_ladder_rank.not.is.null"
+);
+assert.equal(
+  isActivePollUser(
+    { steam_signed_in_at: "2026-06-10T00:00:00.000Z", queen_ladder_rank: null },
+    policyCutoff
+  ),
+  true
+);
+assert.equal(
+  isActivePollUser(
+    { steam_signed_in_at: null, queen_ladder_rank: 42 },
+    policyCutoff
+  ),
+  true
+);
+assert.equal(
+  isActivePollUser(
+    { steam_signed_in_at: "2026-05-01T00:00:00.000Z", queen_ladder_rank: null },
+    policyCutoff
+  ),
+  false
+);
+assert.equal(inactivePollCutoff(policyNow), "2026-06-15T12:00:00.000Z");
 
 const persisted = [];
 const markedMissing = [];

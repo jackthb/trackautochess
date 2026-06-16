@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { nextQueensRefreshDelayMs } from "../app/queens/refreshTiming";
 import { fetchAndCacheDrodoBatch } from "../lib/drodo";
+import { readThroughDrodoProfile } from "../lib/drodoReadThrough";
 import { refreshDisplayedQueens } from "../lib/queensRefresh";
 
 const STEAM_ID = "76561198000000001";
@@ -18,6 +19,7 @@ interface QueryCall {
 interface SmokeState {
   rows: Record<string, unknown>[];
   calls: QueryCall[];
+  lockGranted: boolean;
 }
 
 class FakeQueryBuilder {
@@ -53,6 +55,14 @@ class FakeQueryBuilder {
     return this;
   }
 
+  maybeSingle(): Promise<QueryResult<Record<string, unknown> | null>> {
+    this.state.calls.push({ table: this.table, op: "select" });
+    if (this.table === "users") {
+      return Promise.resolve({ data: this.state.rows[0] ?? null, error: null });
+    }
+    return Promise.resolve({ data: null, error: null });
+  }
+
   upsert(payload: unknown): Promise<QueryResult<null>> {
     this.state.calls.push({ table: this.table, op: "upsert", payload });
     return Promise.resolve({ data: null, error: null });
@@ -79,11 +89,18 @@ class FakeQueryBuilder {
   }
 }
 
-function fakeSupabase(rows: Record<string, unknown>[]): SupabaseClient {
-  const state: SmokeState = { rows, calls: [] };
+function fakeSupabase(
+  rows: Record<string, unknown>[],
+  options: { lockGranted?: boolean } = {}
+): SupabaseClient {
+  const state: SmokeState = {
+    rows,
+    calls: [],
+    lockGranted: options.lockGranted ?? true,
+  };
   return {
     __state: state,
-    rpc: async () => ({ data: true, error: null }),
+    rpc: async () => ({ data: state.lockGranted, error: null }),
     from: (table: string) => new FakeQueryBuilder(table, state),
   } as unknown as SupabaseClient;
 }
@@ -131,17 +148,53 @@ function queenRow(overrides: Record<string, unknown> = {}) {
     avatar_url: null,
     stream_link: null,
     drodo_mmr: 4000,
+    drodo_max_mmr: 4200,
+    drodo_mmr_level: 38,
     drodo_season: "s26",
     drodo_season_games: 87,
+    drodo_candy: 0,
     drodo_chicken_count: 11,
     drodo_raw_data: { queen_rank: 9 },
     drodo_last_fetched_at: new Date(0).toISOString(),
+    drodo_profile_missing: false,
     queen_ladder_rank: 9,
     queen_ladder_season: "s26",
     queen_ladder_last_seen_at: new Date(0).toISOString(),
     poll_interval_seconds: 3600,
     ...overrides,
   };
+}
+
+async function smokeReadThroughProfileLock() {
+  const originalFetch = globalThis.fetch;
+  globalThis.fetch = (async () => {
+    throw new Error("read-through lock smoke must not call Drodo");
+  }) as typeof fetch;
+  const supabase = fakeSupabase([queenRow()], { lockGranted: false });
+
+  try {
+    const result = await readThroughDrodoProfile({
+      steamId: STEAM_ID,
+      supabase,
+      forceRefresh: true,
+    });
+
+    assert.equal(result.kind, "profile");
+    if (result.kind === "profile") {
+      assert.equal(result.source, "stale");
+      assert.equal(result.payload.mmr, 4000);
+      assert.equal(result.payload.refresh_pending, true);
+    }
+
+    const state = supabaseState(supabase);
+    assert.equal(
+      state.calls.some((call) => call.table === "users" && call.op === "upsert"),
+      false,
+      "a locked read-through refresh must not write a duplicate profile"
+    );
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
 }
 
 async function smokeDrodoPersistenceCallback() {
@@ -236,6 +289,7 @@ function smokeQueensRefreshTiming() {
 }
 
 smokeQueensRefreshTiming();
+await smokeReadThroughProfileLock();
 await smokeDrodoPersistenceCallback();
 await smokeDisplayedQueensRefreshTarget();
 

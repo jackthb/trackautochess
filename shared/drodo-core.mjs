@@ -6,10 +6,38 @@ export const DRODO_MISSING_TTL_MS = 7 * 24 * 60 * 60 * 1000;
 export const EMPTY_DRODO_PROFILE_ERROR =
   "Steam account has no Dota Auto Chess MMR or stats.";
 
-export const POLL_MIN_INTERVAL_SECONDS = 10 * 60;
-export const POLL_MAX_INTERVAL_SECONDS = 7 * 24 * 60 * 60;
+export const POLL_ACTIVE_INTERVAL_SECONDS = 24 * 60 * 60;
+export const POLL_INACTIVE_INTERVAL_SECONDS = 24 * 60 * 60;
+export const POLL_MIN_INTERVAL_SECONDS = POLL_ACTIVE_INTERVAL_SECONDS;
+export const POLL_MAX_INTERVAL_SECONDS = POLL_INACTIVE_INTERVAL_SECONDS;
 export const POLL_BACKOFF_FACTOR = 1.5;
-export const HOT_POLL_MAX_INTERVAL_SECONDS = 60 * 60;
+export const HOT_POLL_MAX_INTERVAL_SECONDS = POLL_ACTIVE_INTERVAL_SECONDS;
+export const ACTIVE_SIGN_IN_WINDOW_MS = 14 * 24 * 60 * 60 * 1000;
+export const QUEENS_REFRESH_COOLDOWN_MS = 5 * 60 * 1000;
+export const QUEENS_VIEW_REFRESH_COOLDOWN_MS = QUEENS_REFRESH_COOLDOWN_MS;
+
+export function recentSignInCutoff(now = new Date()) {
+  return new Date(now.getTime() - ACTIVE_SIGN_IN_WINDOW_MS).toISOString();
+}
+
+export function activePollOrFilter(cutoffIso) {
+  return [
+    `steam_signed_in_at.gte.${cutoffIso}`,
+    "queen_ladder_rank.not.is.null",
+  ].join(",");
+}
+
+export function isActivePollUser(user, cutoffIso) {
+  return (
+    (user?.steam_signed_in_at != null &&
+      user.steam_signed_in_at >= cutoffIso) ||
+    user?.queen_ladder_rank != null
+  );
+}
+
+export function inactivePollCutoff(now = new Date()) {
+  return new Date(now.getTime() - POLL_INACTIVE_INTERVAL_SECONDS * 1000).toISOString();
+}
 
 function steamIdValue(steamId) {
   return String(steamId);
@@ -171,9 +199,8 @@ export function nextPollSchedule({
   if (missing) {
     intervalSeconds = maxInterval;
   } else if (fixedHot) {
-    // Queens and active players hold a fixed hourly background cadence —
-    // /queens page views refresh them on demand, so the background poll only
-    // needs to capture rank changes for players nobody is watching.
+    // Queens count as active for the simple daily background policy. The
+    // visible Queen board has its own five-minute refresh path.
     intervalSeconds = maxInterval;
   } else if (mode === "reset" || changed) {
     intervalSeconds = POLL_MIN_INTERVAL_SECONDS;

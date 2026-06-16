@@ -1,11 +1,11 @@
 {
   "title": "Poll Drodo (MMR snapshots) - active users",
   "name": "poll-drodo-active",
-  "description": "Hourly hot poll of the active cohort: recently signed-in, Queen-ladder, and recently-changing Drodo users whose next_poll_at is due",
+  "description": "Daily poll of the active cohort: recently signed-in and Queen-ladder users whose next_poll_at is due, plus never-fetched active users",
   "plugin": "command",
   "command": "/opt/cronicle/dac-scripts/poll-drodo-active.sh",
   "workdir": "/workspace",
-  "schedule": "0 * * * *",
+  "schedule": "17 3 * * *",
   "timezone": "Europe/London",
   "timeout": 1800,
   "enabled": 1,

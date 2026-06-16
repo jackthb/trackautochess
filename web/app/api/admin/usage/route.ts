@@ -1,3 +1,4 @@
+import { activePollOrFilter, recentSignInCutoff } from "@dac/shared/drodo-core";
 import { createSupabaseAnonClient, createSupabaseServiceRoleClient } from "@/lib/supabase";
 import { isAdminSteamId } from "@/lib/admin";
 import { loadQueenCandidates, selectDisplayedQueens } from "@/lib/queens";
@@ -12,10 +13,6 @@ interface TableVolume {
   last_24h: number | null;
 }
 
-const ACTIVE_SYNC_FILTER =
-  "steam_signed_in_at.gte.__RECENT__,queen_ladder_rank.not.is.null";
-
-const RECENT_SIGN_IN_WINDOW_MS = 14 * 24 * 60 * 60 * 1000;
 const TABLE_WINDOWS: Array<{ table: string; timestamp: string | null }> = [
   { table: "users", timestamp: "created_at" },
   { table: "matches", timestamp: "played_at" },
@@ -98,8 +95,7 @@ export async function GET(req: Request) {
   const since1h = new Date(now.getTime() - 60 * 60 * 1000).toISOString();
   const since24h = new Date(now.getTime() - 24 * 60 * 60 * 1000).toISOString();
   const since7d = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000).toISOString();
-  const recentSignIn = new Date(now.getTime() - RECENT_SIGN_IN_WINDOW_MS).toISOString();
-  const activeFilter = ACTIVE_SYNC_FILTER.replace("__RECENT__", recentSignIn);
+  const activeFilter = activePollOrFilter(recentSignInCutoff(now));
 
   try {
     const [

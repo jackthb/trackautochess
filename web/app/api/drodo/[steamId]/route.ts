@@ -18,16 +18,12 @@ import {
 import { isAdminSteamId } from "@/lib/admin";
 import { revalidateQueenPages } from "@/lib/queensRevalidate";
 import { getSessionUser } from "@/lib/sessionUser";
+import type { CachedUserDrodoRow } from "@/lib/drodo";
 import {
-  cachedUserToDrodoProfile,
-  EMPTY_DRODO_PROFILE_ERROR,
-  fetchAndCacheDrodo,
-  hasDrodoStats,
-  isFreshCache,
-  purgeDrodoCache,
-  USER_DRODO_SELECT,
-  type CachedUserDrodoRow,
-} from "@/lib/drodo";
+  isCachedQueenProfile,
+  loadCachedDrodoRow,
+  readThroughDrodoProfile,
+} from "@/lib/drodoReadThrough";
 
 // --- Bot / rate-limit protection ---
 
@@ -48,14 +44,6 @@ function revalidatePlayerProfilePaths(
   if (customUrl) {
     revalidatePath(playerProfilePath(steamId, customUrl));
   }
-}
-
-function isCachedQueenProfile(row: CachedUserDrodoRow | null): boolean {
-  if (!row) return false;
-  return Boolean(
-    row.queen_ladder_last_seen_at ||
-      cachedUserToDrodoProfile(row).queen_rank != null
-  );
 }
 
 async function handle(req: Request, ctx: { params: Promise<{ steamId: string }> }) {
@@ -124,12 +112,7 @@ async function handle(req: Request, ctx: { params: Promise<{ steamId: string }> 
     const isAdmin = isAdminSteamId(session.steamId);
     let cachedProfileRow: CachedUserDrodoRow | null = null;
     if (supabase && !isOwnProfile) {
-      const { data } = await supabase
-        .from("users")
-        .select(USER_DRODO_SELECT)
-        .filter("steam_id", "eq", steamId)
-        .maybeSingle<CachedUserDrodoRow>();
-      cachedProfileRow = data ?? null;
+      cachedProfileRow = await loadCachedDrodoRow(supabase, steamId);
     }
     const refreshCadence: ManualRefreshCadence =
       isOwnProfile || isCachedQueenProfile(cachedProfileRow)
@@ -172,162 +155,64 @@ async function handle(req: Request, ctx: { params: Promise<{ steamId: string }> 
     }
   }
 
-  // Check cache unless an authorised manual refresh is in flight.
-  let cachedRow: CachedUserDrodoRow | null = null;
-  if (supabase && !forceRefresh) {
-    const { data: cached } = await supabase
-      .from("users")
-      .select(USER_DRODO_SELECT)
-      .filter("steam_id", "eq", steamId)
-      .maybeSingle<CachedUserDrodoRow>();
-    cachedRow = cached ?? null;
-
-    if (
-      cached?.drodo_profile_missing &&
-      isFreshCache(cached.drodo_last_fetched_at, true)
-    ) {
-      return Response.json(
-        {
-          error: EMPTY_DRODO_PROFILE_ERROR,
-          fetched_at: cached.drodo_last_fetched_at,
-        },
-        { status: 404, headers: responseHeaders }
-      );
-    }
-
-    if (cached && isFreshCache(cached.drodo_last_fetched_at, false)) {
-      const cachedProfile = cachedUserToDrodoProfile(cached);
-      const [seasonsResult, snapshotsResult] = await Promise.all([
-        supabase
-          .from("player_seasons")
-          .select("season, mmr, max_mmr, games_played, chicken_count")
-          .filter("steam_id", "eq", steamId)
-          .order("season", { ascending: true }),
-        supabase
-          .from("mmr_snapshots")
-          .select("mmr, queen_rank, snapshotted_at")
-          .filter("steam_id", "eq", steamId)
-          .not("mmr", "is", null)
-          .order("snapshotted_at", { ascending: false })
-          .limit(60),
-      ]);
-      const seasons = seasonsResult.data ?? [];
-      const snapshots = snapshotsResult.data ?? [];
-
-      if (hasDrodoStats(cachedProfile, seasons)) {
-        return Response.json(
-          {
-            ...cachedProfile,
-            seasons,
-            mmr_history: snapshots.map((row) => ({
-              mmr: row.mmr as number | null,
-              snapshotted_at: row.snapshotted_at as string,
-            })),
-            queen_rank_history: snapshots
-              .map((row) => ({
-                queen_rank:
-                  typeof row.queen_rank === "number" ? row.queen_rank : null,
-                snapshotted_at: row.snapshotted_at as string,
-              }))
-              .filter((row) => row.queen_rank != null),
-          },
-          { status: 200, headers: responseHeaders }
-        );
-      }
-
-      await purgeDrodoCache(steamId, supabase);
-    }
-  }
-
-  // Non-force fetches happen when a profile view found stale cache (the
-  // page's background refresh); use the same snapshot + poll-scheduling
-  // semantics the server render used when it refreshed inline.
-  const result = await fetchAndCacheDrodo(steamId, supabase, {
+  const result = await readThroughDrodoProfile({
+    steamId,
+    supabase,
+    forceRefresh,
     snapshotOnSuccess: true,
     onQueenChange: revalidateQueenPages,
-    ...(forceRefresh
-      ? {}
-      : {
-          pollMode: cachedRow ? ("adaptive" as const) : ("reset" as const),
-          hotPoll: isCachedQueenProfile(cachedRow),
-        }),
   });
 
-  if (!result.ok) {
-    if (result.kind === "missing") {
-      if (forceRefresh) {
-        revalidatePlayerProfilePaths(steamId);
-      }
-      return Response.json(
-        {
-          error: result.error,
-          fetched_at: result.fetchedAt,
-          ...(refreshQuota ? { refresh_quota: refreshQuota } : {}),
-        },
-        { status: 404, headers: responseHeaders }
-      );
+  if (result.kind === "profile") {
+    const steamProfile = forceRefresh
+      ? await fetchSteamProfile(steamId, supabase ?? undefined)
+      : null;
+    if (forceRefresh) {
+      revalidatePlayerProfilePaths(steamId, steamProfile?.customUrl);
     }
     return Response.json(
       {
-        error: result.error,
-        ...(result.status ? { status: result.status } : {}),
-        ...(refreshQuota ? { refresh_quota: refreshQuota } : {}),
-      },
-      { status: 502, headers: responseHeaders }
-    );
-  }
-
-  const steamProfile = await fetchSteamProfile(steamId, supabase ?? undefined);
-  if (forceRefresh) {
-    revalidatePlayerProfilePaths(steamId, steamProfile.customUrl);
-  }
-
-  if (!supabase) {
-    return Response.json(
-      {
-        ...result.profile,
-        seasons: result.seasonRows,
+        ...result.payload,
         ...(refreshQuota ? { refresh_quota: refreshQuota } : {}),
       },
       { status: 200, headers: responseHeaders }
     );
   }
 
-  // Re-read season history so the response reflects merged historical rows.
-  const [seasonsResult, snapshotsResult] = await Promise.all([
-    supabase
-      .from("player_seasons")
-      .select("season, mmr, max_mmr, games_played, chicken_count")
-      .filter("steam_id", "eq", steamId)
-      .order("season", { ascending: true }),
-    supabase
-      .from("mmr_snapshots")
-      .select("mmr, queen_rank, snapshotted_at")
-      .filter("steam_id", "eq", steamId)
-      .not("mmr", "is", null)
-      .order("snapshotted_at", { ascending: false })
-      .limit(60),
-  ]);
-  const seasons = seasonsResult.data ?? [];
-  const snapshots = snapshotsResult.data ?? [];
+  if (result.kind === "missing") {
+    if (forceRefresh) {
+      revalidatePlayerProfilePaths(steamId);
+    }
+    return Response.json(
+      {
+        error: result.error,
+        fetched_at: result.fetched_at,
+        ...(refreshQuota ? { refresh_quota: refreshQuota } : {}),
+      },
+      { status: 404, headers: responseHeaders }
+    );
+  }
+
+  if (result.kind === "refresh_in_progress") {
+    return Response.json(
+      {
+        error: "Refresh already in progress.",
+        refresh_pending: true,
+        ...(result.stale ?? {}),
+        ...(refreshQuota ? { refresh_quota: refreshQuota } : {}),
+      },
+      { status: result.stale ? 200 : 202, headers: responseHeaders }
+    );
+  }
 
   return Response.json(
     {
-      ...result.profile,
-      seasons,
-      mmr_history: snapshots.map((row) => ({
-        mmr: row.mmr as number | null,
-        snapshotted_at: row.snapshotted_at as string,
-      })),
-      queen_rank_history: snapshots
-        .map((row) => ({
-          queen_rank: typeof row.queen_rank === "number" ? row.queen_rank : null,
-          snapshotted_at: row.snapshotted_at as string,
-        }))
-        .filter((row) => row.queen_rank != null),
+      error: result.error,
+      ...(result.status ? { status: result.status } : {}),
+      ...(result.stale ? { ...result.stale } : {}),
       ...(refreshQuota ? { refresh_quota: refreshQuota } : {}),
     },
-    { status: 200, headers: responseHeaders }
+    { status: result.stale ? 200 : 502, headers: responseHeaders }
   );
 }
 

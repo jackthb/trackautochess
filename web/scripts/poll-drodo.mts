@@ -1,9 +1,12 @@
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
+import {
+  activePollOrFilter,
+  recentSignInCutoff,
+} from "@dac/shared/drodo-core";
 import { fetchAndCacheDrodoBatch } from "../lib/drodo";
 
 const DEFAULT_BATCH_SIZE = 200;
 const DEFAULT_ALL_BATCH_SIZE = 10000;
-const RECENT_SIGN_IN_WINDOW_MS = 14 * 24 * 60 * 60 * 1000;
 
 interface DueUser {
   steam_id: string;
@@ -77,8 +80,7 @@ async function loadActiveIds(supabase: SupabaseClient, limit: number): Promise<{
   seeded: string[];
 }> {
   const now = new Date();
-  const recentSignInCutoff = new Date(now.getTime() - RECENT_SIGN_IN_WINDOW_MS).toISOString();
-  const activeSyncFilter = `steam_signed_in_at.gte.${recentSignInCutoff},queen_ladder_rank.not.is.null`;
+  const activeSyncFilter = activePollOrFilter(recentSignInCutoff(now));
 
   const { data: dueUsers, error: dueError } = await supabase
     .from("users")
@@ -115,6 +117,7 @@ async function loadActiveIds(supabase: SupabaseClient, limit: number): Promise<{
 
 async function loadAllIds(supabase: SupabaseClient, limit: number): Promise<string[]> {
   const ids: string[] = [];
+  const now = new Date();
   for (let from = 0; ids.length < limit; from += 1000) {
     const to = from + Math.min(999, limit - ids.length - 1);
     const { data, error } = await supabase
@@ -122,6 +125,7 @@ async function loadAllIds(supabase: SupabaseClient, limit: number): Promise<stri
       .select("steam_id::text, steam_signed_in_at, queen_ladder_rank, queen_ladder_last_seen_at")
       .eq("drodo_profile_missing", false)
       .not("drodo_last_fetched_at", "is", null)
+      .lte("next_poll_at", now.toISOString())
       .order("drodo_last_fetched_at", { ascending: true })
       .range(from, to);
     if (error) throw error;
