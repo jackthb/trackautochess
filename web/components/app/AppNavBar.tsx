@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { NavigationMenu } from "@base-ui/react/navigation-menu";
 import { useRouter, usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import type { SupabaseClient, User } from "@supabase/supabase-js";
@@ -8,10 +9,13 @@ import { SITE_NAME } from "@/lib/site";
 import { trackEvent } from "@/lib/analytics";
 import { isAdminSteamId } from "@/lib/admin";
 import { useBetaFeaturesEnabled } from "@/lib/betaFeatures";
+import { EntityIcon } from "@/components/EntityIcon";
 import { SteamSignInButton } from "@/components/SteamSignInButton";
 import styles from "./AppNavBar.module.css";
 
 const t = {
+  entities: "Entities",
+  synergies: "Synergies",
   items: "Items",
   units: "Units",
   classes: "Classes",
@@ -31,6 +35,41 @@ const t = {
   openMenu: "Open menu",
   closeMenu: "Close menu",
 };
+
+interface MenuLink {
+  href: string;
+  label: string;
+  key: string;
+  /** Representative entity icon (we have entity icons but no category icons). */
+  icon: string;
+}
+
+/** Pieces, items, and relics — the "things" in the game. */
+const ENTITY_LINKS: MenuLink[] = [
+  { href: "/units", label: t.units, key: "units", icon: "/icons/units/tidehunter.png" },
+  { href: "/items", label: t.items, key: "items", icon: "/icons/items/radiance.png" },
+  { href: "/relics", label: t.relics, key: "relics", icon: "/icons/relics/malefic_rapture.png" },
+];
+
+/** Class and species bonuses. */
+const SYNERGY_LINKS: MenuLink[] = [
+  { href: "/classes", label: t.classes, key: "classes", icon: "/icons/synergies/mage.png" },
+  { href: "/species", label: t.species, key: "species", icon: "/icons/synergies/dragon.png" },
+];
+
+function CaretDownIcon() {
+  return (
+    <svg viewBox="0 0 10 6" fill="none" aria-hidden="true" width="10" height="6">
+      <path
+        d="M1 1l4 4 4-4"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
 
 interface AppNavBarProps {
   supabase?: SupabaseClient | null;
@@ -59,6 +98,7 @@ export function AppNavBar({ supabase }: AppNavBarProps) {
   }, [supabase]);
 
   // App Router has no router.events; close the mobile menu when the path changes.
+  // (The Base UI navigation menu manages its own open state and escape handling.)
   useEffect(() => {
     setMenuOpen(false);
   }, [pathname]);
@@ -131,48 +171,128 @@ export function AppNavBar({ supabase }: AppNavBarProps) {
   const trackNavClick = (destination: string) => {
     trackEvent("Navigation Link Clicked", { source: "nav", destination });
   };
+  const isActive = (href: string) =>
+    pathname === href || pathname.startsWith(`${href}/`);
+  const groupActive = (links: MenuLink[]) => links.some((l) => isActive(l.href));
 
-  const navLinks = (
+  // Standalone links (no dropdown), shared between desktop and mobile.
+  const standaloneLinks: { href: string; label: string; key: string }[] = [
+    { href: "/talents", label: t.talents, key: "talents" },
+    { href: "/queens", label: t.queens, key: "queens" },
+    ...(canSeeBetaFeatures
+      ? [{ href: "/matches", label: t.matches, key: "matches" }]
+      : []),
+    ...(isAdmin
+      ? [
+          { href: "/creators", label: t.creators, key: "creators" },
+          { href: "/dashboard/usage", label: t.usage, key: "usage" },
+        ]
+      : []),
+    { href: "/patch-notes", label: t.patchNotes, key: "patch_notes" },
+  ];
+
+  const renderMenuGroup = (label: string, links: MenuLink[]) => (
+    <NavigationMenu.Item>
+      <NavigationMenu.Trigger
+        className={styles.navTrigger}
+        data-active={groupActive(links) || undefined}
+      >
+        {label}
+        <NavigationMenu.Icon className={styles.navTriggerIcon}>
+          <CaretDownIcon />
+        </NavigationMenu.Icon>
+      </NavigationMenu.Trigger>
+      <NavigationMenu.Content className={styles.navContent}>
+        <ul className={styles.navMenuGrid}>
+          {links.map((link) => (
+            <li key={link.key}>
+              <NavigationMenu.Link
+                className={styles.navMenuCard}
+                closeOnClick
+                onClick={() => trackNavClick(link.key)}
+                render={<Link href={link.href} prefetch={false} />}
+              >
+                <EntityIcon src={link.icon} alt="" size="sm" />
+                <span className={styles.navMenuCardName}>{link.label}</span>
+              </NavigationMenu.Link>
+            </li>
+          ))}
+        </ul>
+      </NavigationMenu.Content>
+    </NavigationMenu.Item>
+  );
+
+  const desktopNav = (
+    <NavigationMenu.Root className={styles.navMenu} delay={100} closeDelay={120}>
+      <NavigationMenu.List className={styles.navMenuList}>
+        {renderMenuGroup(t.entities, ENTITY_LINKS)}
+        {renderMenuGroup(t.synergies, SYNERGY_LINKS)}
+        {standaloneLinks.map((link) => (
+          <NavigationMenu.Item key={link.key}>
+            <NavigationMenu.Link
+              className={styles.navTrigger}
+              active={isActive(link.href)}
+              onClick={() => trackNavClick(link.key)}
+              render={<Link href={link.href} prefetch={false} />}
+            >
+              {link.label}
+            </NavigationMenu.Link>
+          </NavigationMenu.Item>
+        ))}
+      </NavigationMenu.List>
+
+      <NavigationMenu.Portal>
+        <NavigationMenu.Positioner
+          className={styles.navPositioner}
+          sideOffset={12}
+          align="start"
+          collisionPadding={{ top: 5, bottom: 5, left: 12, right: 12 }}
+        >
+          <NavigationMenu.Popup className={styles.navPopup}>
+            <NavigationMenu.Viewport className={styles.navViewport} />
+          </NavigationMenu.Popup>
+        </NavigationMenu.Positioner>
+      </NavigationMenu.Portal>
+    </NavigationMenu.Root>
+  );
+
+  const mobileNav = (
     <>
-      <Link href="/items" className={styles.navLink} prefetch={false} onClick={() => trackNavClick("items")}>
-        {t.items}
-      </Link>
-      <Link href="/units" className={styles.navLink} prefetch={false} onClick={() => trackNavClick("units")}>
-        {t.units}
-      </Link>
-      <Link href="/classes" className={styles.navLink} prefetch={false} onClick={() => trackNavClick("classes")}>
-        {t.classes}
-      </Link>
-      <Link href="/species" className={styles.navLink} prefetch={false} onClick={() => trackNavClick("species")}>
-        {t.species}
-      </Link>
-      <Link href="/relics" className={styles.navLink} prefetch={false} onClick={() => trackNavClick("relics")}>
-        {t.relics}
-      </Link>
-      <Link href="/talents" className={styles.navLink} prefetch={false} onClick={() => trackNavClick("talents")}>
-        {t.talents}
-      </Link>
-      <Link href="/queens" className={styles.navLink} prefetch={false} onClick={() => trackNavClick("queens")}>
-        {t.queens}
-      </Link>
-      {canSeeBetaFeatures && (
-        <Link href="/matches" className={styles.navLink} prefetch={false} onClick={() => trackNavClick("matches")}>
-          {t.matches}
+      <span className={styles.mobileGroupLabel}>{t.entities}</span>
+      {ENTITY_LINKS.map((link) => (
+        <Link
+          key={link.key}
+          href={link.href}
+          className={styles.navLink}
+          prefetch={false}
+          onClick={() => trackNavClick(link.key)}
+        >
+          {link.label}
         </Link>
-      )}
-      {isAdmin && (
-        <Link href="/creators" className={styles.navLink} prefetch={false} onClick={() => trackNavClick("creators")}>
-          {t.creators}
+      ))}
+      <span className={styles.mobileGroupLabel}>{t.synergies}</span>
+      {SYNERGY_LINKS.map((link) => (
+        <Link
+          key={link.key}
+          href={link.href}
+          className={styles.navLink}
+          prefetch={false}
+          onClick={() => trackNavClick(link.key)}
+        >
+          {link.label}
         </Link>
-      )}
-      {isAdmin && (
-        <Link href="/dashboard/usage" className={styles.navLink} prefetch={false} onClick={() => trackNavClick("usage")}>
-          {t.usage}
+      ))}
+      {standaloneLinks.map((link) => (
+        <Link
+          key={link.key}
+          href={link.href}
+          className={styles.navLink}
+          prefetch={false}
+          onClick={() => trackNavClick(link.key)}
+        >
+          {link.label}
         </Link>
-      )}
-      <Link href="/patch-notes" className={styles.navLink} prefetch={false} onClick={() => trackNavClick("patch_notes")}>
-        {t.patchNotes}
-      </Link>
+      ))}
     </>
   );
 
@@ -183,7 +303,7 @@ export function AppNavBar({ supabase }: AppNavBarProps) {
           <Link href="/" className={styles.navLogo} aria-label={t.home(SITE_NAME)} prefetch={false}>
             <img src="/logo.svg" alt={SITE_NAME} />
           </Link>
-          <div className={styles.navLinks}>{navLinks}</div>
+          <div className={styles.navLinks}>{desktopNav}</div>
         </div>
         <div className={styles.navRight}>
           {ready ? (
@@ -261,7 +381,7 @@ export function AppNavBar({ supabase }: AppNavBarProps) {
         aria-label={t.openMenu}
         aria-hidden={!menuOpen}
       >
-        <div className={styles.mobileLinks}>{navLinks}</div>
+        <div className={styles.mobileLinks}>{mobileNav}</div>
       </div>
     </>
   );

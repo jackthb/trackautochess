@@ -1,0 +1,136 @@
+/* Talents page — reproduces the in-game "Select a Talent" tree: two distinct
+   option rectangles per round with a dark channel between them, and a glowing
+   round-number node sitting in the channel, slightly overlapping each rectangle.
+   A spine runs down the channel linking the nodes. */
+
+.intro {
+  font-size: var(--fs-13);
+  line-height: var(--lh-relaxed);
+  color: var(--text-secondary);
+  max-width: 640px;
+  margin-bottom: var(--s-32);
+}
+
+.introLink {
+  color: var(--gold);
+  text-decoration: none;
+  border-bottom: 1px solid color-mix(in srgb, var(--gold) 40%, transparent);
+  transition: color var(--t-base) var(--t-easing);
+}
+.introLink:hover {
+  color: var(--text-primary);
+}
+
+.tree {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-8);
+  max-width: 760px;
+}
+
+/* The 44px column gap is the channel; the page background shows through it. */
+.row {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: 44px;
+  align-items: stretch;
+}
+/* Spine through the channel: a segment within the row plus one across the gap
+   to the next round, so it reads as one continuous line behind the nodes. */
+.row::before,
+.row:not(:last-child)::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  width: 3px;
+  transform: translateX(-50%);
+  background: var(--gold-dim);
+  z-index: 0;
+}
+.row::before {
+  top: 0;
+  bottom: 0;
+}
+.row:first-child::before {
+  top: 50%;
+}
+.row:last-child::before {
+  bottom: 50%;
+}
+.row:not(:last-child)::after {
+  bottom: calc(-1 * var(--s-8));
+  height: var(--s-8);
+}
+
+/* Each option is a clearly separate, flat rectangle. */
+.option {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  text-align: center;
+  gap: var(--s-4);
+  min-height: 68px;
+  padding: var(--s-12) var(--s-16);
+  border: 1px solid var(--border);
+  border-radius: var(--r-4);
+  background: var(--bg-surface);
+}
+/* Inner padding leaves room for the node's slight overlap. */
+.optionLeft {
+  padding-right: 28px;
+}
+.optionRight {
+  padding-left: 28px;
+}
+
+.optionName {
+  font-size: var(--fs-14);
+  font-weight: var(--fw-semibold);
+  color: var(--text-primary);
+}
+.optionDesc {
+  font-size: var(--fs-12);
+  line-height: var(--lh-body);
+  color: var(--text-secondary);
+}
+
+/* Flat node, a touch wider than the channel so it laps onto each rectangle's
+   inner edge. */
+.circle {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  font-family: var(--font-display);
+  font-size: var(--fs-24);
+  font-weight: var(--fw-bold);
+  color: var(--gold);
+  background: var(--bg-deep);
+  border: 2px solid var(--gold-dim);
+  font-variant-numeric: tabular-nums;
+}
+
+@media (max-width: 560px) {
+  .row {
+    column-gap: 32px;
+  }
+  .optionLeft {
+    padding: var(--s-10) 22px var(--s-10) var(--s-10);
+  }
+  .optionRight {
+    padding: var(--s-10) var(--s-10) var(--s-10) 22px;
+  }
+  .circle {
+    width: 48px;
+    height: 48px;
+    font-size: var(--fs-18);
+  }
+}

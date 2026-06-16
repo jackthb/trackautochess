@@ -1,14 +1,14 @@
 import type { Metadata } from "next";
 import { SITE_NAME, SITE_TITLE } from "@/lib/site";
 import { DEFAULT_LOCALE } from "@/lib/i18n";
-import { getAllTalents, getTierLabel, type DisplayTalent } from "@/lib/talents";
-import browserStyles from "@/components/EntityBrowser/EntityBrowser.module.css";
-import cardStyles from "@/components/EntityCard/EntityCard.module.css";
+import Link from "next/link";
+import { getAllTalents, getTierRound, type DisplayTalent } from "@/lib/talents";
 import { PageLayout } from "@/components/PageLayout";
+import styles from "./talents.module.css";
 
 const title = `Talents | ${SITE_TITLE}`;
 const description =
-  "Browse all Dota Auto Chess talent choices by round, compare branch A/B effects, and quickly cross-reference patch notes updates.";
+  "Browse every Dota Auto Chess talent by milestone round, see both options for each, and cross-reference patch-note updates.";
 
 export const metadata: Metadata = {
   title,
@@ -48,7 +48,9 @@ export default function TalentsPage() {
     if (!tiers.has(tt.tier)) tiers.set(tt.tier, []);
     tiers.get(tt.tier)!.push(tt);
   }
-  const tierRows = [...tiers.entries()].sort(([a], [b]) => a - b);
+  // In-game the talent tree reads top-down from the latest milestone, so show
+  // the highest round first.
+  const tierRows = [...tiers.entries()].sort(([a], [b]) => b - a);
 
   return (
     <>
@@ -57,30 +59,49 @@ export default function TalentsPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
       />
       <PageLayout title="Talents">
-        {tierRows.map(([tier, entries]) => (
-          <section key={tier} className={browserStyles.panel}>
-            <div className={browserStyles.panelHeader}>
-              <span>{getTierLabel(tier)}</span>
-              <span className={browserStyles.count}>{entries.length}</span>
-            </div>
-            <div className={`${browserStyles.grid} ${browserStyles.gridRelic}`}>
-              {entries.map((tt) => (
-                <div
-                  key={tt.key}
-                  className={`${cardStyles.card} ${cardStyles.relic}`}
-                  style={{ cursor: "default" }}
-                >
-                  <div className={cardStyles.body}>
-                    <div className={cardStyles.name}>{tt.name}</div>
-                    <div className={cardStyles.desc}>{tt.description}</div>
-                  </div>
-                  <div className={cardStyles.level}>{tt.branch}</div>
-                </div>
-              ))}
-            </div>
-          </section>
-        ))}
+        <p className={styles.intro}>
+          At each milestone round you settle one of two talents for your
+          courier. The option you skip stays locked until round 45, when every
+          talent unlocks for all players. The{" "}
+          <Link href="/relics/leafy-essence" className={styles.introLink}>
+            Leafy Essence
+          </Link>{" "}
+          relic unlocks all of your skipped talents early.
+        </p>
+        <div className={styles.tree}>
+          {tierRows.map(([tier, entries]) => {
+            const [left, right] = [...entries].sort((a, b) =>
+              a.branch.localeCompare(b.branch),
+            );
+            const round = getTierRound(tier);
+            return (
+              <div key={tier} className={styles.row}>
+                <Option talent={left} side="left" />
+                <span className={styles.circle}>{round ?? tier}</span>
+                <Option talent={right} side="right" />
+              </div>
+            );
+          })}
+        </div>
       </PageLayout>
     </>
+  );
+}
+
+function Option({
+  talent,
+  side,
+}: {
+  talent: DisplayTalent | undefined;
+  side: "left" | "right";
+}) {
+  if (!talent) return <div className={styles.option} />;
+  return (
+    <div
+      className={`${styles.option} ${side === "left" ? styles.optionLeft : styles.optionRight}`}
+    >
+      <div className={styles.optionName}>{talent.name}</div>
+      <div className={styles.optionDesc}>{talent.description}</div>
+    </div>
   );
 }

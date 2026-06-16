@@ -21,6 +21,7 @@ const t = {
   relics: "Relics",
   talents: "Talents",
   patchNotes: "Patch notes",
+  customGameStats: "Custom Game Stats",
   disclaimer:
     "Not affiliated with or endorsed by Valve Corporation or Drodo Studio. Dota, Dota 2, and Dota Auto Chess are trademarks of their respective owners. Game data and assets are property of their respective owners and are used here for informational purposes only.",
 };
@@ -48,6 +49,14 @@ export function Footer() {
               <Link href="/patch-notes" className={styles.link} prefetch={false}>
                 {t.patchNotes}
               </Link>
+              <a
+                href="https://www.customgamestats.com/games/1613886175"
+                className={styles.link}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {t.customGameStats}
+              </a>
             </div>
           </div>
           <div>

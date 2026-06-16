@@ -118,11 +118,25 @@ Keystatic generates the GitHub App values during its GitHub connection flow; cop
 
 With no Keystatic branch prefix configured, edits are committed directly to the repository's default branch (`main`).
 
+## UI components
+
+The web app is migrating its hand-rolled interactive UI to [Base UI](https://base-ui.com)
+(`@base-ui/react`) — headless, accessible React primitives from the MUI/Radix
+team — so behaviour like focus management, keyboard navigation, and dismissal is
+handled by a maintained library instead of bespoke code. Styling stays in our CSS
+Modules using the shared design tokens.
+
+This is intentionally incremental. **Migrated so far:** the nav mega-menu
+(`web/components/app/AppNavBar.tsx`, using `NavigationMenu`). **Still to migrate:**
+other custom dropdowns, dialogs/modals, tooltips, and popovers across `web/`.
+When adding or reworking one of those, reach for the Base UI primitive rather than
+hand-rolling state.
+
 ## Tech stack
 
 | Layer | Tech |
 |-------|------|
-| Web | Next.js 16, React 19, Vercel |
+| Web | Next.js 16, React 19, Base UI, Vercel |
 | CMS | Keystatic + committed JSON |
 | Database | Supabase (PostgreSQL + Storage) |
 | Desktop | Electron, React 19, Vite |

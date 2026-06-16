@@ -15,15 +15,20 @@ interface RawTalent {
   titles?: Record<string, string>;
 }
 
-const TIER_LABELS: Record<number, string> = {
-  1: "Round 5",
-  2: "Round 15",
-  3: "Round 25",
-  4: "Round 35",
+const TIER_ROUNDS: Record<number, number> = {
+  1: 5,
+  2: 15,
+  3: 25,
+  4: 35,
 };
 
+export function getTierRound(tier: number): number | null {
+  return TIER_ROUNDS[tier] ?? null;
+}
+
 export function getTierLabel(tier: number): string {
-  return TIER_LABELS[tier] ?? `Tier ${tier}`;
+  const round = TIER_ROUNDS[tier];
+  return round != null ? `Round ${round}` : `Tier ${tier}`;
 }
 
 function buildTalentsForLocale(locale: Locale): DisplayTalent[] {
