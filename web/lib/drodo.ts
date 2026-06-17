@@ -251,35 +251,34 @@ async function persistDrodoProfile(
     hot: options.hotPoll || queen,
     fixedHot: queen,
   });
-  const userPayload: Record<string, unknown> = {
-    ...drodoProfileToUserPayload(profile),
+  const heartbeatPayload = {
+    steam_id: profile.steam_id,
+    drodo_profile_missing: false,
+    drodo_last_fetched_at: profile.fetched_at,
     next_poll_at: schedule.next_poll_at,
     poll_interval_seconds: schedule.poll_interval_seconds,
   };
-  const { error: upsertError } = await supabase
-    .from("users")
-    .upsert(userPayload, { onConflict: "steam_id" });
-  if (upsertError) {
-    console.error("Failed to cache Drodo profile:", upsertError.message);
+  if (!changed) {
+    const { error: heartbeatError } = await supabase
+      .from("users")
+      .upsert(heartbeatPayload, { onConflict: "steam_id" });
+    if (heartbeatError) {
+      console.error("Failed to heartbeat Drodo profile:", heartbeatError.message);
+    }
+    return;
   }
 
-  if (options.snapshotOnSuccess) {
-    const { error: snapshotError } = await supabase
-      .from("mmr_snapshots")
-      .upsert(
-        {
-          steam_id: profile.steam_id,
-          mmr: profile.mmr,
-          season: profile.season,
-          chicken_count: profile.chicken_count,
-          queen_rank: profile.queen_rank,
-          snapshotted_at: new Date().toISOString(),
-        },
-        { onConflict: "steam_id,season,mmr,chicken_count,queen_rank" }
-      );
-    if (snapshotError) {
-      console.error("Failed to upsert mmr_snapshot:", snapshotError.message);
-    }
+  const { error: upsertError } = await supabase
+    .from("users")
+    .upsert(
+      {
+        ...heartbeatPayload,
+        ...drodoProfileToUserPayload(profile),
+      },
+      { onConflict: "steam_id" }
+    );
+  if (upsertError) {
+    console.error("Failed to cache Drodo profile:", upsertError.message);
   }
 
   if (seasonRows.length > 0) {
@@ -306,6 +305,25 @@ async function persistDrodoProfile(
         "Failed to upsert player_seasons:",
         seasonsError.message
       );
+    }
+  }
+
+  if (options.snapshotOnSuccess) {
+    const { error: snapshotError } = await supabase
+      .from("mmr_snapshots")
+      .upsert(
+        {
+          steam_id: profile.steam_id,
+          mmr: profile.mmr,
+          season: profile.season,
+          chicken_count: profile.chicken_count,
+          queen_rank: profile.queen_rank,
+          snapshotted_at: new Date().toISOString(),
+        },
+        { onConflict: "steam_id,season,mmr,chicken_count,queen_rank" }
+      );
+    if (snapshotError) {
+      console.error("Failed to upsert mmr_snapshot:", snapshotError.message);
     }
   }
 
