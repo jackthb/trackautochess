@@ -1,11 +1,17 @@
 import { spawn } from "node:child_process";
 import http from "node:http";
 import path from "node:path";
+import { createRequire } from "node:module";
 
+const require = createRequire(import.meta.url);
 const children = new Set();
 const appRoot = process.cwd();
-const viteBin = path.join(appRoot, "node_modules", "vite", "bin", "vite.js");
-const electronBin = path.join(appRoot, "node_modules", "electron", "cli.js");
+// Resolve bins via Node module resolution so they work whether dependencies are
+// installed app-local or hoisted to the workspace root (.npmrc node-linker=hoisted).
+// vite's package.json "exports" blocks the bin subpath, so derive it from the
+// package dir instead.
+const viteBin = path.join(path.dirname(require.resolve("vite/package.json")), "bin", "vite.js");
+const electronBin = require.resolve("electron/cli.js");
 
 function spawnChild(label, command, args) {
   const child = spawn(command, args, {
