@@ -24,6 +24,7 @@ const STATIC_PATHS = [
   "/relics",
   "/talents",
   "/queens",
+  "/creators",
   "/about",
   "/privacy",
   "/patch-notes",

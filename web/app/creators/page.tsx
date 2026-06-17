@@ -9,7 +9,6 @@ import {
   type CreatorPlatform,
   type CreatorUpload,
 } from "@/lib/creators";
-import { CreatorsGate } from "./CreatorsGate";
 import styles from "./creators.module.css";
 
 const title = `Creators | ${SITE_TITLE}`;
@@ -20,7 +19,6 @@ export const metadata: Metadata = {
   title,
   description,
   alternates: { canonical: "/creators" },
-  robots: "noindex, nofollow",
   openGraph: {
     title,
     description,
@@ -175,7 +173,7 @@ export default async function CreatorsPage() {
   };
 
   return (
-    <CreatorsGate>
+    <>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
@@ -242,6 +240,6 @@ export default async function CreatorsPage() {
           )}
         </section>
       </PageLayout>
-    </CreatorsGate>
+    </>
   );
 }

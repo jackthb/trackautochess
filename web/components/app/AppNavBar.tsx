@@ -25,7 +25,6 @@ const t = {
   queens: "Queens",
   matches: "Matches",
   creators: "Creators",
-  usage: "Usage",
   patchNotes: "Patch Notes",
   cms: "Admin CMS",
   signOut: "Sign out",
@@ -179,14 +178,9 @@ export function AppNavBar({ supabase }: AppNavBarProps) {
   const standaloneLinks: { href: string; label: string; key: string }[] = [
     { href: "/talents", label: t.talents, key: "talents" },
     { href: "/queens", label: t.queens, key: "queens" },
+    { href: "/creators", label: t.creators, key: "creators" },
     ...(canSeeBetaFeatures
       ? [{ href: "/matches", label: t.matches, key: "matches" }]
-      : []),
-    ...(isAdmin
-      ? [
-          { href: "/creators", label: t.creators, key: "creators" },
-          { href: "/dashboard/usage", label: t.usage, key: "usage" },
-        ]
       : []),
     { href: "/patch-notes", label: t.patchNotes, key: "patch_notes" },
   ];
