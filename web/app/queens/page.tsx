@@ -36,6 +36,8 @@ interface QueenMove {
 const title = `Queen Players | ${SITE_TITLE}`;
 const description =
   "Latest Dota Auto Chess Queen players captured from the in-game Queen ladder and refreshed profile snapshots, with MMR, rank movement, and available season stats.";
+const QUEEN_MOVE_LOOKBACK_MS = 24 * 60 * 60 * 1000;
+const QUEEN_MOVE_LOOKBACK_LABEL = "24h";
 
 export const metadata: Metadata = {
   title,
@@ -80,11 +82,13 @@ async function loadQueens(): Promise<{ rows: QueenRow[]; error: string | null }>
     return { rows, error: null };
   }
 
+  const movementCutoff = new Date(Date.now() - QUEEN_MOVE_LOOKBACK_MS).toISOString();
   const { data: snapshots, error: snapshotsError } = await supabase
     .from("mmr_snapshots")
     .select("steam_id::text, queen_rank, snapshotted_at")
     .filter("steam_id", "in", `(${rows.map((row) => row.steam_id).join(",")})`)
     .not("queen_rank", "is", null)
+    .gte("snapshotted_at", movementCutoff)
     .order("steam_id", { ascending: true })
     .order("snapshotted_at", { ascending: false })
     .limit(rows.length * 8);
@@ -119,8 +123,7 @@ function buildQueenMoves(snapshots: QueenSnapshotRow[]): Map<string, QueenMove> 
     );
     const latestRank = ordered[0]?.queen_rank ?? null;
     if (latestRank == null) continue;
-    const previousRank =
-      ordered.find((snapshot) => snapshot.queen_rank !== latestRank)?.queen_rank ?? null;
+    const previousRank = ordered.length > 1 ? ordered[ordered.length - 1]?.queen_rank ?? null : null;
     moves.set(steamId, {
       latestRank,
       previousRank,
@@ -314,7 +317,7 @@ export default async function QueensPage() {
           <div className={`${styles.table} ${styles["queen-table"]}`} role="table">
             <div className={`${styles.row} ${styles["header-row"]}`}>
               <div className={`${styles.cell} ${styles["cell-rank"]}`}>Rank</div>
-              <div className={`${styles.cell} ${styles["cell-move"]}`}>Move</div>
+                <div className={`${styles.cell} ${styles["cell-move"]}`}>Move ({QUEEN_MOVE_LOOKBACK_LABEL})</div>
               <div className={styles.cell} aria-hidden="true" />
               <div className={styles.cell}>Player</div>
               <div className={styles.cell}>MMR</div>
