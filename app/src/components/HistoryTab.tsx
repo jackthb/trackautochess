@@ -11,6 +11,7 @@ interface HistoryTabProps {
   games: Game[];
   loading: boolean;
   refreshing: boolean;
+  error: string | null;
   unitCosts: Record<string, number>;
   unitsFull: Record<string, UnitFullInfo>;
   synergiesData: Record<string, SynergyInfo>;
@@ -29,6 +30,7 @@ export function HistoryTab({
   games,
   loading,
   refreshing,
+  error,
   unitCosts,
   unitsFull,
   synergiesData,
@@ -151,6 +153,7 @@ export function HistoryTab({
               Stats {new Date(drodo.fetched_at).toLocaleString()}
             </span>
           )}
+          {error && <span className="refresh-error">{error}</span>}
           {drodoError && <span className="refresh-error">{drodoError}</span>}
         </div>
         <div className="table-wrap fade-up delay-1">

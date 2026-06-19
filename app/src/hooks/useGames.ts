@@ -18,6 +18,7 @@ interface GamesState {
   games: Game[];
   loading: boolean;
   refreshing: boolean;
+  error: string | null;
   unitCosts: Record<string, number>;
   unitsFull: Record<string, UnitFullInfo>;
   synergiesData: Record<string, SynergyInfo>;
@@ -35,6 +36,7 @@ export function useGames(): GamesState {
   const [games, setGames] = useState<Game[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const initialLoadDone = useRef(false);
   const [unitCosts, setUnitCosts] = useState<Record<string, number>>({});
   const [unitsFull, setUnitsFull] = useState<Record<string, UnitFullInfo>>({});
@@ -53,6 +55,7 @@ export function useGames(): GamesState {
       setLoading(true);
     }
     setRefreshing(true);
+    setError(null);
 
     // Load reference data if needed
     if (Object.keys(unitCosts).length === 0) {
@@ -115,7 +118,10 @@ export function useGames(): GamesState {
       setLastRefresh(new Date());
       initialLoadDone.current = true;
     } catch (e) {
+      const message = e instanceof Error ? e.message : "Failed to fetch match history.";
       console.error("Failed to fetch games:", e);
+      setError(message);
+      setGames([]);
     } finally {
       setLoading(false);
       setRefreshing(false);
@@ -151,6 +157,7 @@ export function useGames(): GamesState {
     games,
     loading,
     refreshing,
+    error,
     unitCosts,
     unitsFull,
     synergiesData,

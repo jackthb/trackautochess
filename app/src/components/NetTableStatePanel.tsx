@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { unitStem } from "../lib/game-utils";
 import {
   buildChessCodeUnitLookup,
@@ -20,27 +20,13 @@ interface Props {
 
 const PREFIX = "CustomNetTable_";
 
-const TABLE_LABELS: Record<string, string> = {
-  CustomNetTable_ranking_top_table: "Queen ladder",
-  CustomNetTable_match_history_table: "Match history",
-  CustomNetTable_dac_table: "Game state",
-  CustomNetTable_player_id_table: "Lobby slots",
-  CustomNetTable_player_info_table: "Player info",
-  CustomNetTable_game_info: "Game info",
-};
-
-const HIDDEN_CURRENT_CAPTURE_TABLES = new Set([
-  "CustomNetTable_chess_pool_table",
-]);
-
 /**
- * Live view of the most recent CustomNetTable dump. Updates whenever the
+ * Live guidance from the most recent CustomNetTable dump. Updates whenever the
  * backend emits `nettable_state` (which happens after each successful F12
- * dump → ingest cycle). Renders one collapsible section per table with the
- * decoded entries as JSON underneath — drill-down for debugging, not a
- * pretty data view.
+ * dump -> ingest cycle). This intentionally renders only player-facing
+ * legendary pool guidance, not the raw current-capture tables.
  *
- * Entirely local UI — nothing on this panel is synced to Supabase or
+ * Entirely local UI - nothing on this panel is synced to Supabase or
  * exposed via any web endpoint, so private-to-the-player data
  * (e.g. unrevealed legendary pool) stays on your machine.
  */
@@ -56,31 +42,21 @@ export function NetTableStatePanel({
     () => extractHiddenLegendaries(state, unitsFull),
     [state, unitsFull],
   );
-  const tables = useMemo(() => {
-    return Object.keys(state)
-      .filter((table) => !HIDDEN_CURRENT_CAPTURE_TABLES.has(table))
-      .sort((a, b) => {
-        const aLabel = TABLE_LABELS[a] ?? a;
-        const bLabel = TABLE_LABELS[b] ?? b;
-        return aLabel.localeCompare(bLabel);
-      });
-  }, [state]);
 
-  const empty = tables.length === 0 && hiddenLegendaries === null;
+  const empty = hiddenLegendaries === null;
 
   return (
     <section className="nettable-state-panel">
       <header className="nettable-state-panel-header">
-        <h2>Current capture</h2>
+        <h2>Legendary guidance</h2>
         <span className="nettable-state-panel-meta">
-          {stateAt ? `last capture · ${formatTime(stateAt)}` : "no capture yet"}
+          {stateAt ? `updated ${formatTime(stateAt)}` : "waiting for match data"}
         </span>
       </header>
 
       {empty ? (
         <p className="nettable-state-panel-empty">
-          Press Pause in Dota (or wait for the auto-trigger) to capture the
-          current lobby state.
+          Waiting for legendary pool data from the current match.
         </p>
       ) : (
         <div className="nettable-state-panel-list">
@@ -93,9 +69,6 @@ export function NetTableStatePanel({
               synergiesData={synergiesData}
             />
           )}
-          {tables.map((table) => (
-            <TableBlock key={table} table={table} entries={state[table]} />
-          ))}
         </div>
       )}
     </section>
@@ -140,6 +113,7 @@ function HiddenLegendaries({
   synergiesData: Record<string, SynergyInfo>;
 }) {
   const fullPool = [...revealed, ...unrevealed];
+  const revealedCodes = new Set(revealed.map((u) => u.code));
   const banContext = inferBanContext(
     fullPool,
     livePlayers,
@@ -159,10 +133,10 @@ function HiddenLegendaries({
     <div className="nettable-state-block">
       <div className="nettable-state-block-header">
         <span className="nettable-state-block-title">
-          Hidden legendaries (yours only)
+          Legendaries in pool
         </span>
         <span className="nettable-state-block-count">
-          {unrevealed.length}
+          {fullPool.length}
         </span>
       </div>
       {bestBans.length > 0 && (
@@ -217,15 +191,16 @@ function HiddenLegendaries({
         </div>
       )}
 
-      {unrevealed.length === 0 ? (
+      {fullPool.length === 0 ? (
         <div className="nettable-state-block-empty">
-          {revealed.length === 0
-            ? "Waiting for a capture — the pool is set once the match starts."
-            : "Every legendary in this match's pool has been revealed."}
+          Waiting for legendary pool data from the current match.
         </div>
       ) : (
         <ul className="nettable-legendary-grid">
-          {unrevealed.map((u) => (
+          {fullPool.map((u) => {
+            const isRevealed = revealedCodes.has(u.code);
+
+            return (
             <li key={u.code} className="nettable-legendary-cell" title={u.code}>
               <img
                 className="nettable-legendary-icon"
@@ -241,8 +216,12 @@ function HiddenLegendaries({
                 }}
               />
               <span className="nettable-legendary-name">{u.name}</span>
+              <span className="nettable-legendary-status">
+                {isRevealed ? "Revealed" : "Hidden"}
+              </span>
             </li>
-          ))}
+            );
+          })}
         </ul>
       )}
     </div>
@@ -387,85 +366,6 @@ function toEntries(
       };
     })
     .sort((a, b) => a.name.localeCompare(b.name));
-}
-
-function TableBlock({
-  table,
-  entries,
-}: {
-  table: string;
-  entries: Record<string, unknown>;
-}) {
-  const [openKey, setOpenKey] = useState<string | null>(null);
-  const label = TABLE_LABELS[table] ?? table.replace(PREFIX, "");
-  const keys = Object.keys(entries);
-
-  return (
-    <div className="nettable-state-block">
-      <div className="nettable-state-block-header">
-        <span className="nettable-state-block-heading">
-          <span className="nettable-state-block-title">{label}</span>
-          <code className="nettable-state-block-table">{table}</code>
-        </span>
-        <span className="nettable-state-block-count">{keys.length}</span>
-      </div>
-      {keys.length === 0 ? (
-        <div className="nettable-state-block-empty">no entries</div>
-      ) : (
-        <ul className="nettable-state-keys">
-          {keys.map((k) => {
-            const isOpen = openKey === k;
-            const value = entries[k];
-            return (
-              <li key={k} className="nettable-state-key">
-                <button
-                  type="button"
-                  className="nettable-state-key-toggle"
-                  onClick={() => setOpenKey(isOpen ? null : k)}
-                  aria-expanded={isOpen}
-                >
-                  <span className="nettable-state-key-name">{k}</span>
-                  <span className="nettable-state-key-summary">
-                    {summarize(value)}
-                  </span>
-                </button>
-                {isOpen && (
-                  <pre className="nettable-state-key-body">
-                    {safeStringify(value)}
-                  </pre>
-                )}
-              </li>
-            );
-          })}
-        </ul>
-      )}
-    </div>
-  );
-}
-
-function summarize(value: unknown): string {
-  if (value == null) return "null";
-  if (typeof value === "string") {
-    if (value.length === 0) return '""';
-    return value.length > 60 ? `"${value.slice(0, 60)}…"` : `"${value}"`;
-  }
-  if (typeof value === "number" || typeof value === "boolean") return String(value);
-  if (Array.isArray(value)) return `[${value.length}]`;
-  if (typeof value === "object") {
-    const obj = value as Record<string, unknown>;
-    if ("_decode_error" in obj) return "decode error";
-    const keys = Object.keys(obj);
-    return `{${keys.length} field${keys.length === 1 ? "" : "s"}}`;
-  }
-  return typeof value;
-}
-
-function safeStringify(value: unknown): string {
-  try {
-    return JSON.stringify(value, null, 2);
-  } catch {
-    return String(value);
-  }
 }
 
 function formatTime(iso: string): string {

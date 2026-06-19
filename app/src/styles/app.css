@@ -2630,6 +2630,13 @@ video {
   word-break: break-word;
 }
 
+.nettable-legendary-status {
+  font-size: var(--fs-11);
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: var(--tr-body);
+}
+
 /* Setup card */
 
 .nettable-setup-card {
@@ -2864,4 +2871,139 @@ video {
 
 .nettable-pause-btn {
   padding: 4px 10px;
+}
+.timeline-panel {
+  margin-top: 12px;
+  padding: 12px;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--r-8);
+  background: color-mix(in srgb, var(--surface-elevated) 82%, transparent);
+}
+
+.timeline-panel-loading,
+.timeline-panel-error,
+.timeline-panel-empty {
+  padding: 10px 12px;
+  color: var(--text-muted);
+  font-size: var(--fs-13);
+}
+
+.timeline-panel-error {
+  color: var(--danger);
+}
+
+.timeline-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.timeline-panel-title {
+  font-weight: 700;
+  color: var(--text);
+}
+
+.timeline-panel-subtitle {
+  margin-top: 2px;
+  color: var(--text-muted);
+  font-size: var(--fs-12);
+}
+
+.timeline-activity-toggle {
+  min-height: 32px;
+  padding: 6px 10px;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--r-6);
+  background: var(--surface);
+  color: var(--text);
+  cursor: pointer;
+}
+
+.timeline-round-picker {
+  display: grid;
+  gap: 8px;
+  color: var(--text-muted);
+  font-size: var(--fs-12);
+}
+
+.timeline-round-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.timeline-player-card {
+  min-width: 0;
+  padding: 10px;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--r-6);
+  background: var(--surface);
+}
+
+.timeline-player-name {
+  overflow: hidden;
+  color: var(--text);
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.timeline-player-line {
+  margin-top: 4px;
+  color: var(--text-muted);
+  font-size: var(--fs-12);
+}
+
+.timeline-activity-log {
+  display: grid;
+  max-height: 340px;
+  gap: 6px;
+  margin-top: 14px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.timeline-activity-entry {
+  display: grid;
+  grid-template-columns: 46px minmax(90px, 160px) 1fr;
+  gap: 8px;
+  align-items: center;
+  padding: 8px 10px;
+  border: 1px solid var(--border-subtle);
+  border-left-width: 3px;
+  border-radius: var(--r-6);
+  background: var(--surface);
+  color: var(--text);
+  font-size: var(--fs-13);
+}
+
+.timeline-activity-buy {
+  border-left-color: var(--success);
+}
+
+.timeline-activity-sell {
+  border-left-color: var(--danger);
+}
+
+.timeline-activity-item {
+  border-left-color: var(--accent);
+}
+
+.timeline-activity-relic {
+  border-left-color: var(--warning);
+}
+
+.timeline-activity-round,
+.timeline-activity-player {
+  overflow: hidden;
+  color: var(--text-muted);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.timeline-activity-text {
+  min-width: 0;
 }

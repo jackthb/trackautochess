@@ -1,195 +1,380 @@
-import { useEffect, useState } from "react";
-import type { UnitFullInfo, SynergyInfo, RelicInfo, ItemFullInfo } from "../types";
-import type { ChessBoardPiece } from "@dac/shared/types";
-import { ChessBoard } from "@dac/shared/ChessBoard";
+import { useEffect, useMemo, useState } from "react";
+import type { ItemFullInfo, RelicInfo, SynergyInfo, UnitFullInfo } from "../types";
 import type { MatchTimelineEvent } from "../backend-events";
 import { sendBackendRequest } from "../lib/backend-request";
 
-interface PlayerSnap {
-  hp?: number;
-  level?: number;
-  placement?: number;
-  duration?: number;
-  lineup?: string;
-  lineup_value?: number;
-  total_money?: number;
-  win_round?: number;
-  lose_round?: number;
-  courier_level?: number;
-  win_streak?: number;
-  relic?: string;
-  relic_ttl?: number;
-  mmr_level?: number;
-  team_id?: number;
-  hero_index?: number;
-  player_id?: number;
-  board?: ChessBoardPiece[];
-}
+type JsonRecord = Record<string, unknown>;
 
 interface RoundSnap {
-  round: number;
-  captured_at?: string;
-  players?: Record<string, PlayerSnap>;
-  draft?: { bans?: Record<string, string>; legendaries_revealed?: unknown[] };
-  death_team?: Record<string, unknown>;
+  round?: number | string | null;
+  players?: unknown;
+  [key: string]: unknown;
 }
 
 interface Timeline {
-  match_id: string;
-  played_at: string;
-  round_count: number;
-  first_round: number;
-  last_round: number;
   rounds: RoundSnap[];
 }
 
-interface Props {
+interface ParsedPlayerSnapshot {
+  id: string;
+  label: string;
+  round: number;
+  units: string[];
+  items: string[];
+  relics: string[];
+}
+
+interface ActivityLogEntry {
+  key: string;
+  round: number;
+  playerLabel: string;
+  text: string;
+  tone: "buy" | "sell" | "item" | "relic";
+}
+
+interface MatchTimelinePanelProps {
   matchId: string;
   unitCosts: Record<string, number>;
-  unitsFull?: Record<string, UnitFullInfo>;
-  synergiesData?: Record<string, SynergyInfo>;
-  relicsData?: Record<string, RelicInfo>;
-  itemsFull?: Record<string, ItemFullInfo>;
+  unitsFull: Record<string, UnitFullInfo>;
+  synergiesData: Record<string, SynergyInfo>;
+  relicsData: Record<string, RelicInfo>;
+  itemsFull: Record<string, ItemFullInfo>;
+}
+
+function isRecord(value: unknown): value is JsonRecord {
+  return Boolean(value) && typeof value === "object" && !Array.isArray(value);
+}
+
+function asRecordArray(value: unknown): JsonRecord[] {
+  if (Array.isArray(value)) return value.filter(isRecord);
+  if (isRecord(value)) return Object.values(value).filter(isRecord);
+  return [];
+}
+
+function timelineFromValue(value: unknown): Timeline | null {
+  if (!isRecord(value)) return null;
+  const rawRounds = value.rounds;
+  const rounds = Array.isArray(rawRounds)
+    ? rawRounds.filter(isRecord)
+    : isRecord(rawRounds)
+      ? Object.entries(rawRounds)
+          .filter(([, round]) => isRecord(round))
+          .map(([roundKey, round]) => ({ round: roundKey, ...(round as JsonRecord) }))
+      : [];
+  if (rounds.length === 0) return null;
+  return { rounds };
+}
+
+function stringValue(record: JsonRecord, keys: string[]): string | null {
+  for (const key of keys) {
+    const value = record[key];
+    if (typeof value === "string" && value.trim()) return value.trim();
+    if (typeof value === "number" && Number.isFinite(value)) return String(value);
+  }
+  return null;
+}
+
+function roundNumber(round: RoundSnap, fallback: number): number {
+  const value = round.round ?? round.round_num ?? round.roundNumber ?? round.round_id;
+  const parsed = typeof value === "number" ? value : typeof value === "string" ? Number(value) : NaN;
+  return Number.isFinite(parsed) ? parsed : fallback + 1;
+}
+
+function normalizeCode(value: string): string {
+  return value.trim().replace(/^npc_dota_/, "").replace(/^dac_/, "");
+}
+
+function codeFromEntry(entry: unknown, keys: string[]): string | null {
+  if (typeof entry === "string" || typeof entry === "number") {
+    const code = normalizeCode(String(entry));
+    return code || null;
+  }
+  if (!isRecord(entry)) return null;
+  const code = stringValue(entry, keys);
+  return code ? normalizeCode(code) : null;
+}
+
+function collectCodes(record: JsonRecord, sourceKeys: string[], entryKeys: string[]): string[] {
+  const codes: string[] = [];
+  for (const sourceKey of sourceKeys) {
+    const source = record[sourceKey];
+    const values = Array.isArray(source)
+      ? source
+      : isRecord(source)
+        ? Object.values(source)
+        : typeof source === "string"
+          ? source.split(/[,\s]+/)
+          : [];
+    for (const value of values) {
+      const code = codeFromEntry(value, entryKeys);
+      if (code) codes.push(code);
+    }
+  }
+  return codes;
+}
+
+function playerId(record: JsonRecord, index: number): string {
+  return (
+    stringValue(record, [
+      "steam_id",
+      "steam_id64",
+      "account_id",
+      "player_id",
+      "player_slot",
+      "seat",
+      "team",
+      "id",
+    ]) ?? `seat-${index + 1}`
+  );
+}
+
+function playerLabel(record: JsonRecord, id: string, index: number): string {
+  return (
+    stringValue(record, ["name", "player_name", "steam_name", "nickname"]) ??
+    (id.startsWith("seat-") ? `Player ${index + 1}` : id)
+  );
+}
+
+function playerRecordsForRound(round: RoundSnap): JsonRecord[] {
+  for (const key of ["players", "player_snapshots", "lineups", "seats"]) {
+    const players = asRecordArray(round[key]);
+    if (players.length > 0) return players;
+  }
+  return asRecordArray(round);
+}
+
+function parsePlayerSnapshots(timeline: Timeline): ParsedPlayerSnapshot[] {
+  const snapshots: ParsedPlayerSnapshot[] = [];
+  timeline.rounds.forEach((round, roundIndex) => {
+    const roundNo = roundNumber(round, roundIndex);
+    playerRecordsForRound(round).forEach((player, playerIndex) => {
+      const id = playerId(player, playerIndex);
+      snapshots.push({
+        id,
+        label: playerLabel(player, id, playerIndex),
+        round: roundNo,
+        units: collectCodes(
+          player,
+          ["units", "board", "lineup", "pieces", "chess", "army"],
+          ["unit", "unit_id", "unit_name", "hero", "hero_id", "chess_id", "name", "code", "id"],
+        ),
+        items: collectCodes(
+          player,
+          ["items", "item_codes", "inventory", "equipment", "equipped_items"],
+          ["item", "item_id", "item_name", "name", "code", "id"],
+        ),
+        relics: collectCodes(
+          player,
+          ["relics", "relic_codes", "relic_items"],
+          ["relic", "relic_id", "relic_name", "name", "code", "id"],
+        ),
+      });
+    });
+  });
+  return snapshots;
+}
+
+function diffCounts(previous: string[], next: string[]) {
+  const previousCounts = new Map<string, number>();
+  const nextCounts = new Map<string, number>();
+  previous.forEach((code) => previousCounts.set(code, (previousCounts.get(code) ?? 0) + 1));
+  next.forEach((code) => nextCounts.set(code, (nextCounts.get(code) ?? 0) + 1));
+
+  const added: string[] = [];
+  const removed: string[] = [];
+  const codes = new Set([...previousCounts.keys(), ...nextCounts.keys()]);
+  codes.forEach((code) => {
+    const delta = (nextCounts.get(code) ?? 0) - (previousCounts.get(code) ?? 0);
+    for (let i = 0; i < Math.abs(delta); i += 1) {
+      if (delta > 0) added.push(code);
+      if (delta < 0) removed.push(code);
+    }
+  });
+  return { added, removed };
+}
+
+function displayName(
+  code: string,
+  lookup: Record<string, { name?: string; displayName?: string; title?: string }>,
+): string {
+  const info = lookup[code] ?? lookup[`npc_dota_${code}`] ?? lookup[`item_${code}`];
+  return info?.name ?? info?.displayName ?? info?.title ?? code.replace(/^item_/, "").replace(/_/g, " ");
+}
+
+function buildActivityLog(
+  timeline: Timeline,
+  unitsFull: Record<string, UnitFullInfo>,
+  relicsData: Record<string, RelicInfo>,
+  itemsFull: Record<string, ItemFullInfo>,
+): ActivityLogEntry[] {
+  const byPlayer = new Map<string, ParsedPlayerSnapshot[]>();
+  for (const snapshot of parsePlayerSnapshots(timeline)) {
+    const entries = byPlayer.get(snapshot.id) ?? [];
+    entries.push(snapshot);
+    byPlayer.set(snapshot.id, entries);
+  }
+
+  const activity: ActivityLogEntry[] = [];
+  byPlayer.forEach((snapshots, playerIdKey) => {
+    const sorted = snapshots.slice().sort((a, b) => a.round - b.round);
+    for (let i = 1; i < sorted.length; i += 1) {
+      const previous = sorted[i - 1];
+      const next = sorted[i];
+      const unitDiff = diffCounts(previous.units, next.units);
+      const itemDiff = diffCounts(previous.items, next.items);
+      const relicDiff = diffCounts(previous.relics, next.relics);
+
+      unitDiff.added.forEach((code, idx) =>
+        activity.push({
+          key: `${playerIdKey}-${next.round}-buy-${code}-${idx}`,
+          round: next.round,
+          playerLabel: next.label,
+          text: `Bought ${displayName(code, unitsFull)}`,
+          tone: "buy",
+        }),
+      );
+      unitDiff.removed.forEach((code, idx) =>
+        activity.push({
+          key: `${playerIdKey}-${next.round}-sell-${code}-${idx}`,
+          round: next.round,
+          playerLabel: next.label,
+          text: `Sold ${displayName(code, unitsFull)}`,
+          tone: "sell",
+        }),
+      );
+      itemDiff.added.forEach((code, idx) =>
+        activity.push({
+          key: `${playerIdKey}-${next.round}-item-${code}-${idx}`,
+          round: next.round,
+          playerLabel: next.label,
+          text: `Picked item ${displayName(code, itemsFull)}`,
+          tone: "item",
+        }),
+      );
+      relicDiff.added.forEach((code, idx) =>
+        activity.push({
+          key: `${playerIdKey}-${next.round}-relic-${code}-${idx}`,
+          round: next.round,
+          playerLabel: next.label,
+          text: `Picked relic ${displayName(code, relicsData)}`,
+          tone: "relic",
+        }),
+      );
+    }
+  });
+
+  return activity.sort((a, b) => a.round - b.round || a.playerLabel.localeCompare(b.playerLabel));
 }
 
 export function MatchTimelinePanel({
   matchId,
-  unitCosts,
+  unitsFull,
+  relicsData,
   itemsFull,
-}: Props) {
+}: MatchTimelinePanelProps) {
   const [timeline, setTimeline] = useState<Timeline | null>(null);
-  const [loading, setLoading] = useState(true);
   const [selectedRoundIdx, setSelectedRoundIdx] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [showActivity, setShowActivity] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
     setLoading(true);
+    setError(null);
+    setTimeline(null);
+    setSelectedRoundIdx(0);
+    setShowActivity(false);
+
     sendBackendRequest<MatchTimelineEvent>({ cmd: "fetch_timeline", match_id: matchId })
       .then((response) => {
         if (cancelled) return;
-        if (response.error) throw new Error(response.error);
-        const t = response.timeline as unknown as Timeline | null;
-        setTimeline(t);
-        // Default to the last round (most interesting view).
-        if (t?.rounds?.length) {
-          setSelectedRoundIdx(t.rounds.length - 1);
+        const parsed = timelineFromValue(response.timeline);
+        if (!parsed) {
+          setError("No timeline snapshots were saved for this match.");
+          return;
         }
-        setLoading(false);
+        setTimeline(parsed);
+        setSelectedRoundIdx(Math.max(0, parsed.rounds.length - 1));
       })
-      .catch(() => {
+      .catch((err) => {
+        if (!cancelled) setError(err instanceof Error ? err.message : "Failed to load timeline.");
+      })
+      .finally(() => {
         if (!cancelled) setLoading(false);
       });
+
     return () => {
       cancelled = true;
     };
   }, [matchId]);
 
-  if (loading) {
-    return <div className="timeline-panel-loading">Loading match timeline…</div>;
-  }
-  if (!timeline || !timeline.rounds?.length) {
-    return (
-      <div className="timeline-panel-empty">
-        No timeline data for this match. Captured matches need round-by-round dumps to build a timeline.
-      </div>
-    );
-  }
+  const selectedRound = timeline?.rounds[selectedRoundIdx] ?? null;
+  const selectedPlayers = selectedRound ? parsePlayerSnapshots({ rounds: [selectedRound] }) : [];
+  const activityLog = useMemo(
+    () => (showActivity && timeline ? buildActivityLog(timeline, unitsFull, relicsData, itemsFull) : []),
+    [itemsFull, relicsData, showActivity, timeline, unitsFull],
+  );
 
-  const round = timeline.rounds[selectedRoundIdx];
-
-  const isLastRound = selectedRoundIdx === timeline.rounds.length - 1;
-
-  // While scrubbing through earlier rounds, rank players by the HP they had in
-  // that snapshot instead of freezing the final placement order. Equal-HP early
-  // rounds fall back to Steam ID for a deterministic alphabetical-ish order; the
-  // final round keeps the stored placement order so the end state is unchanged.
-  const playerRows = Object.entries(round.players || {}).sort(([aSid, a], [bSid, b]) => {
-    const placementDelta = (a.placement ?? 99) - (b.placement ?? 99);
-    if (isLastRound) return placementDelta;
-
-    const aHasHp = typeof a.hp === "number";
-    const bHasHp = typeof b.hp === "number";
-    if (aHasHp !== bHasHp) return aHasHp ? -1 : 1;
-    if (aHasHp && bHasHp) {
-      const aHp = a.hp as number;
-      const bHp = b.hp as number;
-      const hpDelta = bHp - aHp;
-      if (hpDelta !== 0) return hpDelta;
-    }
-
-    const sidDelta = aSid.localeCompare(bSid, undefined, { numeric: true });
-    return sidDelta || placementDelta;
-  });
+  if (loading) return <div className="timeline-panel-loading">Loading timeline...</div>;
+  if (error) return <div className="timeline-panel-error">{error}</div>;
+  if (!timeline) return null;
 
   return (
-    <div className="timeline-panel" style={{ padding: 12, borderTop: "1px solid #333", marginTop: 12 }}>
-      <div style={{ marginBottom: 8 }}>
-        <strong>Match timeline:</strong> rounds {timeline.first_round}–{timeline.last_round} ({timeline.round_count} snapshots)
-      </div>
-      <input
-        type="range"
-        min={0}
-        max={timeline.rounds.length - 1}
-        value={selectedRoundIdx}
-        onChange={(e) => setSelectedRoundIdx(Number(e.target.value))}
-        style={{ width: "100%" }}
-      />
-      <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, color: "#888" }}>
-        <span>Round {timeline.first_round}</span>
-        <strong style={{ color: "#fff" }}>Round {round.round}</strong>
-        <span>Round {timeline.last_round}</span>
+    <div className="timeline-panel">
+      <div className="timeline-panel-header">
+        <div>
+          <div className="timeline-panel-title">Timeline</div>
+          <div className="timeline-panel-subtitle">{timeline.rounds.length} snapshots saved</div>
+        </div>
+        <button
+          type="button"
+          className="timeline-activity-toggle"
+          onClick={() => setShowActivity((value) => !value)}
+        >
+          {showActivity ? "Hide activity log" : "Show activity log"}
+        </button>
       </div>
 
-      <div style={{ marginTop: 12 }}>
-        <table style={{ width: "100%", marginTop: 4, fontSize: 13, borderCollapse: "collapse" }}>
-          <thead>
-            <tr style={{ textAlign: "left", color: "#888" }}>
-              <th style={{ padding: "4px 8px" }}>#</th>
-              <th style={{ padding: "4px 8px" }}>Steam ID</th>
-              <th style={{ padding: "4px 8px" }}>HP</th>
-              <th style={{ padding: "4px 8px" }}>Lvl</th>
-              <th style={{ padding: "4px 8px" }}>W-L</th>
-              <th style={{ padding: "4px 8px", width: "100%" }}>Board</th>
-            </tr>
-          </thead>
-          <tbody>
-            {playerRows.map(([sid, p], rowIdx) => {
-              const dead = (p.hp ?? 0) <= 0;
-              return (
-                <tr
-                  key={sid}
-                  style={{ borderTop: "1px solid #222", opacity: dead ? 0.45 : 1 }}
-                >
-                  <td style={{ padding: "4px 8px" }}>{isLastRound ? p.placement ?? "-" : rowIdx + 1}</td>
-                  <td style={{ padding: "4px 8px", fontFamily: "monospace", fontSize: 11 }}>{sid}</td>
-                  <td style={{ padding: "4px 8px" }}>{p.hp ?? "-"}</td>
-                  <td style={{ padding: "4px 8px" }}>{p.level ?? "-"}</td>
-                  <td style={{ padding: "4px 8px" }}>{p.win_round ?? 0}-{p.lose_round ?? 0}</td>
-                  <td style={{ padding: "4px 8px" }}>
-                    <ChessBoard
-                      board={p.board}
-                      lineup={p.lineup || ""}
-                      unitCosts={unitCosts}
-                      iconUrl={(type, stem) => `icons://${type}/${stem}.png`}
-                      itemsFull={itemsFull}
-                      compact
-                    />
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
+      <label className="timeline-round-picker">
+        <span>Round {selectedRound ? roundNumber(selectedRound, selectedRoundIdx) : selectedRoundIdx + 1}</span>
+        <input
+          type="range"
+          min={0}
+          max={Math.max(0, timeline.rounds.length - 1)}
+          value={selectedRoundIdx}
+          onChange={(event) => setSelectedRoundIdx(Number(event.target.value))}
+        />
+      </label>
+
+      <div className="timeline-round-grid">
+        {selectedPlayers.length === 0 ? (
+          <div className="timeline-panel-empty">No player snapshots in this round.</div>
+        ) : (
+          selectedPlayers.map((player) => (
+            <div className="timeline-player-card" key={player.id}>
+              <div className="timeline-player-name">{player.label}</div>
+              <div className="timeline-player-line">Units: {player.units.length || 0}</div>
+              <div className="timeline-player-line">Items: {player.items.length || 0}</div>
+              <div className="timeline-player-line">Relics: {player.relics.length || 0}</div>
+            </div>
+          ))
+        )}
       </div>
 
-      {round.draft?.bans && Object.keys(round.draft.bans).length > 0 && (
-        <div style={{ marginTop: 8, fontSize: 12 }}>
-          <strong>Bans:</strong>{" "}
-          {Object.entries(round.draft.bans).map(([pid, ban]) => (
-            <span key={pid} style={{ marginRight: 8, color: "#aaa" }}>
-              p{pid}: {String(ban)}
-            </span>
-          ))}
+      {showActivity && (
+        <div className="timeline-activity-log">
+          {activityLog.length === 0 ? (
+            <div className="timeline-panel-empty">No unit, item, or relic changes were detected.</div>
+          ) : (
+            activityLog.map((entry) => (
+              <div className={`timeline-activity-entry timeline-activity-${entry.tone}`} key={entry.key}>
+                <span className="timeline-activity-round">R{entry.round}</span>
+                <span className="timeline-activity-player">{entry.playerLabel}</span>
+                <span className="timeline-activity-text">{entry.text}</span>
+              </div>
+            ))
+          )}
         </div>
       )}
     </div>
