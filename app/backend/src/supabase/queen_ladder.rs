@@ -72,7 +72,13 @@ impl SupabaseClient {
                 .unpulled_queen_profile_ids(&seen_ids)
                 .unwrap_or_default();
             let _ = client.hydrate_queen_profiles(&unpulled_ids);
-            let _ = client.clear_stale_queen_ladder_snapshot(&seen_ids);
+            // The web poll now owns queen_ladder_rank and clears players who drop
+            // off the ladder on their next profile poll (queen_rank comes back
+            // null). Blanket-nulling everyone absent from this single capture
+            // would fight those web writes and flap the leaderboard, so it is
+            // parked rather than run. Kept (not deleted) in case capture-driven
+            // clearing is wanted again.
+            // let _ = client.clear_stale_queen_ladder_snapshot(&seen_ids);
             let _ = client.upsert_queen_ladder_snapshots(&players);
             let _ = revalidate_queens_page();
         });
@@ -232,6 +238,7 @@ impl SupabaseClient {
         Ok(0)
     }
 
+    #[allow(dead_code)] // Parked: web poll now owns queen_ladder_rank (see spawn_queen_ladder_followups).
     fn clear_stale_queen_ladder_snapshot(&self, current_steam_ids: &[u64]) -> Result<(), String> {
         if current_steam_ids.is_empty() {
             return Ok(());
@@ -263,6 +270,7 @@ fn revalidate_queens_page() -> Result<(), String> {
         .map_err(|err| err.to_string())
 }
 
+#[allow(dead_code)] // Parked alongside clear_stale_queen_ladder_snapshot.
 pub(super) fn queen_ladder_stale_clear_path(current_steam_ids: &[u64]) -> String {
     let ids = current_steam_ids
         .iter()

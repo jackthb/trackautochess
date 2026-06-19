@@ -246,7 +246,8 @@ function profileChangedValue(prev, next) {
         return true;
     return (profileMetricValue(prev, "drodo_mmr", "mmr") !== profileMetricValue(next, "drodo_mmr", "mmr") ||
         profileMetricValue(prev, "drodo_season_games", "season_games") !== profileMetricValue(next, "drodo_season_games", "season_games") ||
-        profileMetricValue(prev, "drodo_chicken_count", "chicken_count") !== profileMetricValue(next, "drodo_chicken_count", "chicken_count"));
+        profileMetricValue(prev, "drodo_chicken_count", "chicken_count") !== profileMetricValue(next, "drodo_chicken_count", "chicken_count") ||
+        profileMetricValue(prev, "queen_rank", "queen_rank") !== profileMetricValue(next, "queen_rank", "queen_rank"));
 }
 function normalizeDrodoSteamIdsValue(steamIds) {
     return [

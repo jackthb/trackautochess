@@ -269,7 +269,11 @@ function profileChangedValue(prev: DrodoProfileRow | PollSnapshot | null | undef
   return (
     profileMetricValue(prev, "drodo_mmr", "mmr") !== profileMetricValue(next, "drodo_mmr", "mmr") ||
     profileMetricValue(prev, "drodo_season_games", "season_games") !== profileMetricValue(next, "drodo_season_games", "season_games") ||
-    profileMetricValue(prev, "drodo_chicken_count", "chicken_count") !== profileMetricValue(next, "drodo_chicken_count", "chicken_count")
+    profileMetricValue(prev, "drodo_chicken_count", "chicken_count") !== profileMetricValue(next, "drodo_chicken_count", "chicken_count") ||
+    // Queen rank can move without any MMR/games/chicken change; count it so a
+    // rank-only update still rewrites drodo_raw_data and snapshots the new rank
+    // (keeps the queen-rank sparkline accurate, not just the queen_ladder_rank column).
+    profileMetricValue(prev, "queen_rank", "queen_rank") !== profileMetricValue(next, "queen_rank", "queen_rank")
   );
 }
 

@@ -18,7 +18,6 @@ import {
   isFreshCache,
   lastTop3FromDrodoData,
   lastWinFromDrodoData,
-  numberFromDrodoData,
 } from "@/lib/drodo";
 import { readThroughDrodoProfile } from "@/lib/drodoReadThrough";
 import { mostRecentTimestamp } from "@/lib/timestamps";
@@ -41,8 +40,13 @@ const CHESS_CODE_UNITS = buildChessCodeUnitLookup(
   unitsFullData as Record<string, UnitFullInfo>
 );
 
-export const dynamic = "force-static";
-export const revalidate = 300;
+// Rendered dynamically (live DB read per request) instead of ISR-cached. With
+// force-static + revalidate=300 a hard reload served the prerendered page until
+// the timer/revalidation rebuilt it, so the queen rank (and other fields) lagged
+// even after the data changed. Cached Drodo stats are still served immediately
+// from the DB row and refreshed in the background by PlayerView, so a live read
+// stays fast.
+export const dynamic = "force-dynamic";
 
 type LoadResult =
   | { kind: "notFound" }
@@ -54,9 +58,9 @@ function drodoFromCachedRow(row: CachedUserDrodoRow) {
     mmr: row.drodo_mmr,
     max_mmr: row.drodo_max_mmr,
     mmr_level: row.drodo_mmr_level,
-    queen_rank:
-      row.queen_ladder_rank ??
-      (row.drodo_raw_data ? numberFromDrodoData(row.drodo_raw_data, "queen_rank") : null),
+    // queen_ladder_rank is the denormalized source of truth; drodo_raw_data is
+    // kept only as an archival snapshot, not read for the rank.
+    queen_rank: row.queen_ladder_rank ?? null,
     last_win_at: row.drodo_raw_data ? lastWinFromDrodoData(row.drodo_raw_data) : null,
     last_top3_at: row.drodo_raw_data ? lastTop3FromDrodoData(row.drodo_raw_data) : null,
     season: row.drodo_season,
@@ -67,11 +71,7 @@ function drodoFromCachedRow(row: CachedUserDrodoRow) {
 }
 
 function isCachedQueenProfile(row: CachedUserDrodoRow | null): boolean {
-  return Boolean(
-    row?.queen_ladder_rank != null ||
-      row?.queen_ladder_last_seen_at ||
-      (row?.drodo_raw_data && numberFromDrodoData(row.drodo_raw_data, "queen_rank") != null)
-  );
+  return Boolean(row?.queen_ladder_rank != null || row?.queen_ladder_last_seen_at);
 }
 
 function isHotCacheFresh(fetchedAt: string | null | undefined): boolean {
@@ -415,28 +415,6 @@ const loadPlayer = cache(async (rawSteamId: string): Promise<LoadResult> => {
 
 interface PageProps {
   params: Promise<{ steamId: string }>;
-}
-
-export async function generateStaticParams() {
-  // Hourly patch-note commits redeploy the site, and each deploy wipes the
-  // ISR cache — every player page restarts cold. Prerender the top ladder at
-  // build time so the most-visited profiles are warm immediately after each
-  // deploy; everyone else stays on-demand.
-  const supabase = createSupabaseServerClient();
-  if (!supabase) return [];
-
-  const { data } = await supabase
-    .from("users")
-    .select("steam_id::text, custom_url")
-    .not("drodo_mmr", "is", null)
-    .not("drodo_last_fetched_at", "is", null)
-    .eq("drodo_profile_missing", false)
-    .order("drodo_mmr", { ascending: false })
-    .limit(100);
-
-  return (data ?? []).map((row) => ({
-    steamId: String(row.custom_url || row.steam_id),
-  }));
 }
 
 export async function generateMetadata({

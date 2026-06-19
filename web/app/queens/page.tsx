@@ -60,7 +60,13 @@ export const metadata: Metadata = {
   },
 };
 
-export const revalidate = 300;
+// Rendered dynamically (live DB read per request) rather than ISR-cached. The
+// leaderboard changes constantly and a 300s Full Route Cache meant a hard page
+// reload showed stale ranks until the timer/revalidation caught up, while
+// router.refresh() (the auto-refresh client) masked it with a live render. A
+// ≤100-row query per load is cheap; the QueensAutoRefresh client polling on top
+// keeps an open tab live without a manual reload.
+export const dynamic = "force-dynamic";
 
 async function loadQueens(): Promise<{ rows: QueenRow[]; error: string | null }> {
   const supabase = createSupabaseServerClient();

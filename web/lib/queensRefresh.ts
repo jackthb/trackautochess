@@ -93,6 +93,9 @@ async function runQueensRefresh(
     rows.map((row) => [row.steam_id, row.custom_url] as const)
   );
   let changed = 0;
+  // persistDrodoProfile writes the fresh queen_ladder_rank for every polled
+  // profile (web poll owns that column), so the displayed order re-ranks itself
+  // from this batch — no separate rank sync needed here.
   const results = await fetchAndCacheDrodoBatch(
     rows.map((row) => row.steam_id),
     supabase,

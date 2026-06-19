@@ -107,9 +107,9 @@ export function cachedUserToDrodoProfile(row: CachedUserDrodoRow): DrodoProfileR
     mmr: row.drodo_mmr,
     max_mmr: row.drodo_max_mmr,
     mmr_level: row.drodo_mmr_level,
-    queen_rank:
-      row.queen_ladder_rank ??
-      (row.drodo_raw_data ? numberFromDrodoData(row.drodo_raw_data, "queen_rank") : null),
+    // queen_ladder_rank is the denormalized source of truth; drodo_raw_data is
+    // kept only as an archival snapshot, not read for the rank.
+    queen_rank: row.queen_ladder_rank ?? null,
     last_win_at: row.drodo_raw_data ? lastWinFromDrodoData(row.drodo_raw_data) : null,
     last_top3_at: row.drodo_raw_data ? lastTop3FromDrodoData(row.drodo_raw_data) : null,
     season: row.drodo_season,
@@ -251,12 +251,28 @@ async function persistDrodoProfile(
     hot: options.hotPoll || queen,
     fixedHot: queen,
   });
+  const queenRank =
+    typeof profile.queen_rank === "number" ? profile.queen_rank : null;
   const heartbeatPayload = {
     steam_id: profile.steam_id,
     drodo_profile_missing: false,
     drodo_last_fetched_at: profile.fetched_at,
     next_poll_at: schedule.next_poll_at,
     poll_interval_seconds: schedule.poll_interval_seconds,
+    // Denormalize the freshly polled Queen ladder rank onto its own indexed
+    // column — the one source of truth the /queens table and player pages read,
+    // instead of digging it out of the drodo_raw_data JSON (which only updated
+    // when MMR moved, so rank-only changes rotted). The web poll owns this
+    // column. Written on the heartbeat path too so a rank-only move still lands.
+    // Only touched for Queen profiles; a successful poll that returns no
+    // queen_rank means they dropped off the ladder, so clear it.
+    ...(queen
+      ? {
+          queen_ladder_rank: queenRank,
+          queen_ladder_last_seen_at:
+            queenRank == null ? null : profile.fetched_at,
+        }
+      : {}),
   };
   if (!changed) {
     const { error: heartbeatError } = await supabase
