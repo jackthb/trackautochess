@@ -14,7 +14,7 @@ impl SupabaseClient {
         ))
         .timeout(HTTP_TIMEOUT)
         .set("apikey", &self.key)
-        .set("Authorization", &format!("Bearer {}", self.key))
+        .set("Authorization", &format!("Bearer {}", self.bearer_token()))
         .set("Content-Type", content_type);
         if upsert {
             request = request.set("x-upsert", "true");

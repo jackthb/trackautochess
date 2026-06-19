@@ -189,7 +189,7 @@ export function LiveMatchStatus({ players, localSteamIds, round, unitsFull, syne
           const hasBoardUnits = Array.isArray(player.board) && player.board.length > 0;
           const hasAnyUnits = hasBoardUnits || fallbackLineup.length > 0;
           const synergies = parseNettableSynergyBuff(player.buff, synergiesData);
-          const relicCodes =
+          const relicCodes: string[] =
             player.relics && player.relics.length > 0
               ? player.relics
               : player.relic

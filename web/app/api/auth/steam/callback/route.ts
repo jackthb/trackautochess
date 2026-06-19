@@ -3,13 +3,14 @@ import { after } from "next/server";
 import { captureServerEvent } from "@/lib/posthogServer";
 import { createSupabaseServiceRoleClientOrThrow } from "@/lib/supabase";
 import {
-  fetchSteamProfileFromApi,
+  fetchSteamProfile,
   playerProfilePath,
   upsertSteamUser,
 } from "@/lib/steam";
 import { parseSteamId64, type SteamId64 } from "@dac/shared/steam";
 
 const STEAM_OPENID_URL = "https://steamcommunity.com/openid/login";
+const STEAM_PROFILE_REFRESH_INTERVAL_MS = 7 * 24 * 60 * 60 * 1000;
 
 async function verifySteamAssertion(
   query: URLSearchParams
@@ -38,6 +39,7 @@ async function verifySteamAssertion(
 
 export async function GET(req: Request) {
   const url = new URL(req.url);
+  const isDesktop = url.searchParams.get("desktop") === "1";
   const fail = (error: string, steamId?: string | null) => {
     if (steamId) {
       after(() =>
@@ -48,24 +50,18 @@ export async function GET(req: Request) {
       );
     }
 
+    if (isDesktop) {
+      return NextResponse.json({ error }, { status: 400 });
+    }
+
     return NextResponse.redirect(new URL(`/?error=${error}`, req.url));
   };
-
-  // The profile fetch only reads public data keyed by the (still unverified)
-  // claimed id, so it can overlap the OpenID verification round trip; the
-  // result is used only after verification confirms the same id.
-  const claimedMatch = (url.searchParams.get("openid.claimed_id") || "").match(
-    /\/id\/(\d+)$/
-  );
-  const claimedSteamId = claimedMatch ? parseSteamId64(claimedMatch[1]) : null;
-  const profilePromise = claimedSteamId
-    ? fetchSteamProfileFromApi(claimedSteamId).catch(() => null)
-    : null;
 
   const steamId = await verifySteamAssertion(url.searchParams);
   if (!steamId) {
     return fail("steam_auth_failed");
   }
+  const supabaseAdmin = createSupabaseServiceRoleClientOrThrow();
 
   after(() =>
     captureServerEvent("Steam Sign In Callback Verified", steamId, {
@@ -73,12 +69,13 @@ export async function GET(req: Request) {
     })
   );
 
-  const steamProfile =
-    (steamId === claimedSteamId ? await profilePromise : null) ??
-    (await fetchSteamProfileFromApi(steamId));
+  const steamProfile = await fetchSteamProfile(steamId, supabaseAdmin, {
+    maxAgeMs: STEAM_PROFILE_REFRESH_INTERVAL_MS,
+  }).catch((error) => {
+    console.error("Failed to refresh Steam profile:", error);
+    return { name: null, customUrl: null, avatarUrl: null };
+  });
   const steamName = steamProfile.name || steamId;
-
-  const supabaseAdmin = createSupabaseServiceRoleClientOrThrow();
 
   const email = `${steamId}@steam.local`;
   console.log("Steam verified:", steamId, steamName);
@@ -195,6 +192,18 @@ export async function GET(req: Request) {
       user_id: finalUserId,
     })
   );
+
+  if (isDesktop) {
+    return NextResponse.json({
+      steam_id: steamId,
+      steam_name: steamName,
+      access_token: session.access_token,
+      refresh_token: session.refresh_token,
+      expires_at: session.expires_at ?? null,
+      expires_in: session.expires_in ?? null,
+      token_type: session.token_type || "bearer",
+    });
+  }
 
   // Redirect with tokens in hash fragment — the shared Supabase client that
   // AppChrome creates on every page picks these up via detectSessionInUrl.

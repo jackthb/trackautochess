@@ -4,6 +4,7 @@ use std::{env, fs, io, path::PathBuf};
 use ts_rs::TS;
 
 const LEGACY_SUPABASE_URL: &str = "https://ismxtcfkuwpvfyuojnaa.supabase.co";
+const DEFAULT_SUPABASE_AUTH_URL: &str = "https://www.trackautochess.com/api/auth/steam/callback";
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, TS)]
 pub struct Config {
@@ -23,6 +24,10 @@ pub struct Config {
     pub local_only: bool,
     pub supabase_url: String,
     pub supabase_key: String,
+    pub supabase_auth_url: String,
+    pub supabase_access_token: String,
+    pub supabase_refresh_token: String,
+    pub supabase_token_expires_at: String,
 }
 
 impl Config {
@@ -54,6 +59,10 @@ impl Config {
             local_only: local_only_mode_from(&value),
             supabase_url: value_string(&value, "supabase_url"),
             supabase_key: value_string(&value, "supabase_key"),
+            supabase_auth_url: value_string(&value, "supabase_auth_url"),
+            supabase_access_token: value_string(&value, "supabase_access_token"),
+            supabase_refresh_token: value_string(&value, "supabase_refresh_token"),
+            supabase_token_expires_at: value_string(&value, "supabase_token_expires_at"),
         })
     }
 
@@ -75,6 +84,26 @@ impl Config {
         if let Value::Object(map) = &mut value {
             map.insert("steam_id".to_owned(), json!(steam_id));
             map.insert("steam_name".to_owned(), json!(steam_name));
+        }
+        fs::write(path, serde_json::to_string_pretty(&value).unwrap_or(body))
+    }
+
+    pub fn save_supabase_session(
+        &self,
+        access_token: &str,
+        refresh_token: &str,
+        expires_at: Option<i64>,
+    ) -> io::Result<()> {
+        let path = self.dac_dir.join("config.json");
+        let body = fs::read_to_string(&path).unwrap_or_else(|_| default_config_json().to_owned());
+        let mut value = parse_config_json(&body);
+        if let Value::Object(map) = &mut value {
+            map.insert("supabase_access_token".to_owned(), json!(access_token));
+            map.insert("supabase_refresh_token".to_owned(), json!(refresh_token));
+            map.insert(
+                "supabase_token_expires_at".to_owned(),
+                json!(expires_at.map(|value| value.to_string()).unwrap_or_default()),
+            );
         }
         fs::write(path, serde_json::to_string_pretty(&value).unwrap_or(body))
     }
@@ -102,6 +131,10 @@ fn default_config_json() -> &'static str {
   "hotkey": "F6",
   "supabase_url": "https://xkfxykorskdltcmvgihh.supabase.co",
   "supabase_key": "sb_publishable_Tk7hBHGJImbtzxxZzEIgKQ_kwnKuCaK",
+  "supabase_auth_url": "https://www.trackautochess.com/api/auth/steam/callback",
+  "supabase_access_token": "",
+  "supabase_refresh_token": "",
+  "supabase_token_expires_at": "",
   "local_only": false,
   "steam_id": "",
   "steam_name": "",
@@ -124,22 +157,30 @@ fn apply_config_migrations(value: &mut Value) -> bool {
     let current_url = value_string(value, "supabase_url");
     let should_replace_supabase = current_url.trim().is_empty()
         || current_url.trim_end_matches('/') == LEGACY_SUPABASE_URL;
-
-    if !should_replace_supabase {
-        return false;
-    }
+    let should_set_auth_url = value_string(value, "supabase_auth_url").trim().is_empty();
 
     let defaults = parse_config_json(default_config_json());
     let Some(map) = value.as_object_mut() else {
         return false;
     };
 
-    for key in ["supabase_url", "supabase_key"] {
-        if let Some(default_value) = defaults.get(key) {
-            map.insert(key.to_owned(), default_value.clone());
+    let mut changed = false;
+    if should_replace_supabase {
+        for key in ["supabase_url", "supabase_key"] {
+            if let Some(default_value) = defaults.get(key) {
+                map.insert(key.to_owned(), default_value.clone());
+                changed = true;
+            }
         }
     }
-    true
+    if should_set_auth_url {
+        map.insert(
+            "supabase_auth_url".to_owned(),
+            json!(DEFAULT_SUPABASE_AUTH_URL),
+        );
+        changed = true;
+    }
+    changed
 }
 
 fn value_string(value: &Value, key: &str) -> String {

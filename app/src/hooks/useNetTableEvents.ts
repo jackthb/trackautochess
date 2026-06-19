@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import type { LivePlayer, TrackerEvent } from "../types";
 
+export type { LivePlayer } from "../types";
+
 /**
  * Activity feed for NetTable + import pipeline.
  *
@@ -156,9 +158,24 @@ function summarizeTableList(tables: string[]): string {
   return extra > 0 ? `${headStr} · ${extra} more` : headStr;
 }
 
-function stateFromRows(rows: NetTableRowEvent["rows"]): NetTableState {
+type NetTableRow = {
+  table_name: string;
+  key: string;
+  raw: unknown;
+};
+
+function parseNetTableRows(rows: unknown): NetTableRow[] {
+  if (!Array.isArray(rows)) return [];
+  return rows.filter((row): row is NetTableRow => {
+    if (row === null || typeof row !== "object" || Array.isArray(row)) return false;
+    const candidate = row as Record<string, unknown>;
+    return typeof candidate.table_name === "string" && typeof candidate.key === "string";
+  });
+}
+
+function stateFromRows(rows: unknown): NetTableState {
   const next: NetTableState = {};
-  for (const row of rows) {
+  for (const row of parseNetTableRows(rows)) {
     if (!row.table_name || !row.key) continue;
     next[row.table_name] ??= {};
     next[row.table_name][row.key] = row.raw;
@@ -166,9 +183,9 @@ function stateFromRows(rows: NetTableRowEvent["rows"]): NetTableState {
   return next;
 }
 
-function tablesFromRows(rows: NetTableRowEvent["rows"]): string[] {
+function tablesFromRows(rows: unknown): string[] {
   return Array.from(
-    new Set(rows.map((row) => row.table_name).filter((table): table is string => Boolean(table))),
+    new Set(parseNetTableRows(rows).map((row) => row.table_name)),
   ).sort((a, b) => a.localeCompare(b));
 }
 
@@ -406,28 +423,36 @@ export function useNetTableEvents(): NetTableActivityState {
             title: rest.ok ? "Queens uploaded" : "Queens upload failed",
             detail: rest.ok
               ? `${rest.upserted_count}/${rest.player_count} player${rest.player_count === 1 ? "" : "s"} saved`
-              : rest.error,
+              : rest.error ?? "Queens upload failed",
             tone: rest.ok ? "success" : "error",
           });
           break;
         }
         case "nettable_launch_options_applied": {
           const { type: _type, ...rest } = msg;
-          setLaunchOptionsApplied(rest);
           setLaunchOptionsProgress(null);
-          if (rest.ok && !rest.noop) {
-            push({
-              kind: "nettable_ingest_complete",
-              title: "Setup updated",
-              detail: "Restart Steam, then Dota.",
-              tone: "success",
-            });
-          } else if (!rest.ok) {
+          if ("error" in rest) {
+            setLaunchOptionsApplied(null);
             push({
               kind: "nettable_ingest_error",
               title: "Couldn't update setup",
               detail: rest.error,
               tone: "error",
+            });
+            break;
+          }
+          const applied = {
+            ...rest,
+            backup_path: rest.backup_path ?? undefined,
+            gsi_cfg_path: rest.gsi_cfg_path ?? undefined,
+          };
+          setLaunchOptionsApplied(applied);
+          if (!applied.noop) {
+            push({
+              kind: "nettable_ingest_complete",
+              title: "Setup updated",
+              detail: "Restart Steam, then Dota.",
+              tone: "success",
             });
           }
           break;

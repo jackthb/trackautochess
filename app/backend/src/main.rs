@@ -145,6 +145,33 @@ fn main() -> io::Result<()> {
             }
             Ok(())
         }
+        "finalize-dump" => {
+            let path = args.get(1).map(PathBuf::from).ok_or_else(|| {
+                io::Error::new(io::ErrorKind::InvalidInput, "finalize-dump needs a dump path")
+            })?;
+            let rows = nettable_parser::extract_dump_rows(&path)?;
+            let cfg = Config::load()?;
+            let Some(client) = supabase::SupabaseClient::from_config(&cfg) else {
+                return Err(io::Error::new(
+                    io::ErrorKind::InvalidInput,
+                    "Supabase is not configured",
+                ));
+            };
+            match client.upload_finished_match_from_rows(&rows) {
+                Ok(Some(match_id)) => {
+                    println!("uploaded end-board match {match_id}");
+                    return Ok(());
+                }
+                Ok(None) => {}
+                Err(err) => eprintln!("end-board upload failed: {err}"),
+            }
+            match client.upsert_fallback_finished_match(&rows, "manual_finalize_dump") {
+                Ok(Some(match_id)) => println!("uploaded fallback match {match_id}"),
+                Ok(None) => println!("no usable match data found in the dump"),
+                Err(err) => return Err(io::Error::new(io::ErrorKind::Other, err)),
+            }
+            Ok(())
+        }
         other => Err(io::Error::new(
             io::ErrorKind::InvalidInput,
             format!("unknown command: {other}"),
@@ -218,17 +245,37 @@ fn run_daemon() -> io::Result<()> {
                 emit(&event_json(&SteamLogout::new()))?;
             }
             BackendCommand::SteamLogin => {
-                match steam_auth::steam_login_with_opener(Duration::from_secs(120), |url| {
-                    emit(&event_json(&SteamLoginUrl::new(url))).map_err(|err| err.to_string())
-                }) {
-                    Ok((steam_id, steam_name)) => {
-                        cfg.save_steam_user(&steam_id, &steam_name)?;
-                        cfg.steam_id = steam_id.clone();
-                        cfg.steam_name = steam_name.clone();
-                        if let Some(client) = supabase::SupabaseClient::from_config(&cfg) {
-                            let _ = client.upsert_user(&steam_id, &steam_name);
+                match steam_auth::steam_login_with_opener(
+                    Duration::from_secs(120),
+                    Some(&cfg.supabase_auth_url),
+                    |url| {
+                        emit(&event_json(&SteamLoginUrl::new(url))).map_err(|err| err.to_string())
+                    },
+                ) {
+                    Ok(login) => {
+                        cfg.save_steam_user(&login.steam_id, &login.steam_name)?;
+                        cfg.steam_id = login.steam_id.clone();
+                        cfg.steam_name = login.steam_name.clone();
+                        if let Some(session) = login.supabase_session {
+                            cfg.save_supabase_session(
+                                &session.access_token,
+                                &session.refresh_token,
+                                session.expires_at,
+                            )?;
+                            cfg.supabase_access_token = session.access_token;
+                            cfg.supabase_refresh_token = session.refresh_token;
+                            cfg.supabase_token_expires_at = session
+                                .expires_at
+                                .map(|value| value.to_string())
+                                .unwrap_or_default();
                         }
-                        emit(&event_json(&SteamLogin::new(&steam_id, &steam_name)))?;
+                        if let Some(client) = supabase::SupabaseClient::from_config(&cfg) {
+                            let _ = client.upsert_user(&login.steam_id, &login.steam_name);
+                        }
+                        emit(&event_json(&SteamLogin::new(
+                            &login.steam_id,
+                            &login.steam_name,
+                        )))?;
                     }
                     Err(err) => emit_error(&format!("steam_login failed: {err}"))?,
                 }

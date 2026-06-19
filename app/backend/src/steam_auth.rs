@@ -8,7 +8,25 @@ use std::{
 const STEAM_OPENID_URL: &str = "https://steamcommunity.com/openid/login";
 const RETURN_PORT: u16 = 27034;
 
-pub fn steam_login_with_opener<F>(timeout: Duration, open: F) -> Result<(String, String), String>
+#[derive(Debug, Clone)]
+pub struct SteamLoginResult {
+    pub steam_id: String,
+    pub steam_name: String,
+    pub supabase_session: Option<SupabaseSession>,
+}
+
+#[derive(Debug, Clone)]
+pub struct SupabaseSession {
+    pub access_token: String,
+    pub refresh_token: String,
+    pub expires_at: Option<i64>,
+}
+
+pub fn steam_login_with_opener<F>(
+    timeout: Duration,
+    supabase_auth_url: Option<&str>,
+    open: F,
+) -> Result<SteamLoginResult, String>
 where
     F: FnOnce(&str) -> Result<(), String>,
 {
@@ -44,7 +62,16 @@ where
                     .to_owned();
                 verify_assertion(&params)?;
                 let name = fetch_steam_name(&steam_id).unwrap_or_else(|| steam_id.clone());
-                return Ok((steam_id, name));
+                let supabase_session = supabase_auth_url
+                    .map(str::trim)
+                    .filter(|value| !value.is_empty())
+                    .map(|url| exchange_supabase_session(url, &params))
+                    .transpose()?;
+                return Ok(SteamLoginResult {
+                    steam_id,
+                    steam_name: name,
+                    supabase_session,
+                });
             }
             Err(err) if err.kind() == std::io::ErrorKind::WouldBlock => {
                 std::thread::sleep(Duration::from_millis(100));
@@ -53,6 +80,53 @@ where
         }
     }
     Err("Steam login timed out".to_owned())
+}
+
+fn exchange_supabase_session(
+    auth_url: &str,
+    params: &BTreeMap<String, String>,
+) -> Result<SupabaseSession, String> {
+    let mut query = params
+        .iter()
+        .filter(|(key, _)| key.starts_with("openid."))
+        .map(|(key, value)| format!("{}={}", enc(key), enc(value)))
+        .collect::<Vec<_>>();
+    query.push("desktop=1".to_owned());
+    let separator = if auth_url.contains('?') { '&' } else { '?' };
+    let url = format!("{auth_url}{separator}{}", query.join("&"));
+    let response = ureq::get(&url).call().map_err(|err| err.to_string())?;
+    let body = response.into_string().map_err(|err| err.to_string())?;
+    let value = serde_json::from_str::<serde_json::Value>(&body).map_err(|err| err.to_string())?;
+    if let Some(error) = value.get("error").and_then(serde_json::Value::as_str) {
+        return Err(format!("Supabase auth exchange failed: {error}"));
+    }
+    let access_token = value
+        .get("access_token")
+        .and_then(serde_json::Value::as_str)
+        .filter(|value| !value.is_empty())
+        .ok_or_else(|| "Supabase auth exchange did not return an access token".to_owned())?
+        .to_owned();
+    let refresh_token = value
+        .get("refresh_token")
+        .and_then(serde_json::Value::as_str)
+        .filter(|value| !value.is_empty())
+        .ok_or_else(|| "Supabase auth exchange did not return a refresh token".to_owned())?
+        .to_owned();
+    let expires_at = value
+        .get("expires_at")
+        .and_then(serde_json::Value::as_i64)
+        .or_else(|| {
+            value
+                .get("expires_at")
+                .and_then(serde_json::Value::as_str)
+                .and_then(|value| value.parse::<i64>().ok())
+        });
+
+    Ok(SupabaseSession {
+        access_token,
+        refresh_token,
+        expires_at,
+    })
 }
 
 fn handle_callback(mut stream: TcpStream) -> Result<BTreeMap<String, String>, String> {

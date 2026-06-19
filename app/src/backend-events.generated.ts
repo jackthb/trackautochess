@@ -18,7 +18,7 @@ keep_local_nettable_dumps: boolean,
  * a logging/reprocessing safety net, not a Postgres table dependency and
  * not the user-facing match data model.
  */
-upload_raw_nettable_dumps: boolean, local_only: boolean, supabase_url: string, supabase_key: string, };
+upload_raw_nettable_dumps: boolean, local_only: boolean, supabase_url: string, supabase_key: string, supabase_auth_url: string, supabase_access_token: string, supabase_refresh_token: string, supabase_token_expires_at: string, };
 
 export type ErrorEvent = { type: string, message: string, };
 
@@ -95,4 +95,3 @@ export type NettableSetupProgress = { type: string, stage: string, message: stri
 export type NettableLaunchOptionsApplied = { type: string, backend: string, ok: boolean, noop: boolean, before: string, after: string, added: Array<string>, config_path: string, backup_path: string | null, autoexec_path: string, gsi_cfg_path: string | null, };
 
 export type NettableLaunchOptionsError = { type: string, backend: string, ok: boolean, error: string, };
-

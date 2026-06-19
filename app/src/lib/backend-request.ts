@@ -44,6 +44,11 @@ function describeCommand(command: BackendCommand): string {
   return typeof cmd === "string" && cmd.length > 0 ? cmd : "backend command";
 }
 
+function eventMessage(event: TrackerEvent): string {
+  const message = (event as { message?: unknown }).message;
+  return typeof message === "string" && message.length > 0 ? message : "Backend request failed";
+}
+
 export function sendBackendRequest<TResponse extends TrackerEvent = TrackerEvent>(
   command: BackendCommand,
   options: BackendRequestOptions<TResponse> = {},
@@ -92,7 +97,7 @@ export function sendBackendRequest<TResponse extends TrackerEvent = TrackerEvent
       if (!matches(event, requestId)) return;
 
       if (event.type === "error") {
-        settle(() => reject(new Error(event.message)));
+        settle(() => reject(new Error(eventMessage(event))));
         return;
       }
 

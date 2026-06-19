@@ -10,6 +10,7 @@ import type {
   TalentInfo,
 } from "../types";
 import type { GameUpdatedEvent, GamesListEvent } from "../backend-events";
+import type { JsonValue } from "../backend-events.generated";
 import { buildItemSynergyLookup } from "@dac/shared/game-structure";
 import { sendBackendRequest } from "../lib/backend-request";
 
@@ -126,7 +127,7 @@ export function useGames(): GamesState {
       const response = await sendBackendRequest<GameUpdatedEvent>({
         cmd: "update_game",
         id: gameId,
-        fields,
+        fields: fields as unknown as JsonValue,
       });
       const ok = response.ok && !response.error;
       if (ok) {

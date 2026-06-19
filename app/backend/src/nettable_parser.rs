@@ -221,8 +221,90 @@ pub fn extract_rows(path: &Path) -> io::Result<Vec<NettableRow>> {
     Ok(rows_from_log_text(&body))
 }
 
+pub fn extract_dump_rows(path: &Path) -> io::Result<Vec<NettableRow>> {
+    let body = fs::read_to_string(path)?;
+    let value = serde_json::from_str::<serde_json::Value>(&body)
+        .map_err(|err| io::Error::new(io::ErrorKind::InvalidData, err))?;
+    let rows = value
+        .get("rows")
+        .and_then(serde_json::Value::as_array)
+        .or_else(|| value.as_array())
+        .ok_or_else(|| io::Error::new(io::ErrorKind::InvalidData, "dump has no rows array"))?;
+
+    rows.iter()
+        .map(nettable_row_from_json)
+        .collect::<io::Result<Vec<_>>>()
+}
+
 pub fn rows_from_log_text(body: &str) -> Vec<NettableRow> {
     rows_from_parsed_with_observed_at(parse_log_text_with_observed_at(body))
+}
+
+fn nettable_row_from_json(value: &serde_json::Value) -> io::Result<NettableRow> {
+    let table_name = json_string_field(value, "table_name")?;
+    let key = json_string_field(value, "key")?;
+    let raw = value
+        .get("raw")
+        .map(value_from_json)
+        .ok_or_else(|| io::Error::new(io::ErrorKind::InvalidData, "dump row is missing raw"))?;
+    let observed_at = value
+        .get("observed_at")
+        .and_then(serde_json::Value::as_str)
+        .map(str::to_owned);
+    let match_started_at = value
+        .get("match_started_at")
+        .and_then(serde_json::Value::as_str)
+        .map(str::to_owned);
+
+    Ok(NettableRow {
+        table_name,
+        key,
+        raw,
+        observed_at,
+        match_started_at,
+    })
+}
+
+fn json_string_field(value: &serde_json::Value, key: &str) -> io::Result<String> {
+    value
+        .get(key)
+        .and_then(serde_json::Value::as_str)
+        .map(str::to_owned)
+        .ok_or_else(|| {
+            io::Error::new(
+                io::ErrorKind::InvalidData,
+                format!("dump row is missing string field {key}"),
+            )
+        })
+}
+
+fn value_from_json(value: &serde_json::Value) -> Value {
+    match value {
+        serde_json::Value::Object(map) => Value::Object(
+            map.iter()
+                .map(|(key, value)| (key.clone(), value_from_json(value)))
+                .collect(),
+        ),
+        serde_json::Value::Array(values) => {
+            Value::Array(values.iter().map(value_from_json).collect())
+        }
+        serde_json::Value::String(value) => Value::String(value.clone()),
+        serde_json::Value::Number(number) => {
+            if let Some(value) = number.as_i64().and_then(|value| i32::try_from(value).ok()) {
+                Value::I32(value)
+            } else if let Some(value) = number.as_u64().and_then(|value| u32::try_from(value).ok()) {
+                Value::U32(value)
+            } else if let Some(value) = number.as_u64() {
+                Value::U64(value)
+            } else if let Some(value) = number.as_f64() {
+                Value::F32(value as f32)
+            } else {
+                Value::String(number.to_string())
+            }
+        }
+        serde_json::Value::Bool(value) => Value::I32(i32::from(*value)),
+        serde_json::Value::Null => Value::String(String::new()),
+    }
 }
 
 #[cfg(test)]

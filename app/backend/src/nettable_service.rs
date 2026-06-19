@@ -1011,6 +1011,10 @@ mod tests {
             local_only: true,
             supabase_url: String::new(),
             supabase_key: String::new(),
+            supabase_auth_url: String::new(),
+            supabase_access_token: String::new(),
+            supabase_refresh_token: String::new(),
+            supabase_token_expires_at: String::new(),
         };
         let rows = rows_from_json(vec![(
             "CustomNetTable_ranking_top_table",

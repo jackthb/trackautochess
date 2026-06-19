@@ -22,6 +22,7 @@ const QUEENS_REVALIDATE_URL_ENV: &str = "DAC_QUEENS_REVALIDATE_URL";
 pub struct SupabaseClient {
     url: String,
     key: String,
+    auth_token: Option<String>,
 }
 
 #[derive(Debug, Clone, PartialEq)]

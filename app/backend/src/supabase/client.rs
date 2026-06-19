@@ -15,6 +15,8 @@ impl SupabaseClient {
         Some(Self {
             url: supabase_url,
             key: cfg.supabase_key.clone(),
+            auth_token: (!cfg.supabase_access_token.trim().is_empty())
+                .then(|| cfg.supabase_access_token.clone()),
         })
     }
 
@@ -193,7 +195,7 @@ impl SupabaseClient {
         let response = ureq::post(&format!("{}{}", self.url, path))
             .timeout(HTTP_TIMEOUT)
             .set("apikey", &self.key)
-            .set("Authorization", &format!("Bearer {}", self.key))
+            .set("Authorization", &format!("Bearer {}", self.bearer_token()))
             .set("Content-Type", "application/json")
             .set("Prefer", prefer)
             .send_string(&body.to_string());
@@ -212,7 +214,7 @@ impl SupabaseClient {
         let response = ureq::request("PATCH", &format!("{}{}", self.url, path))
             .timeout(HTTP_TIMEOUT)
             .set("apikey", &self.key)
-            .set("Authorization", &format!("Bearer {}", self.key))
+            .set("Authorization", &format!("Bearer {}", self.bearer_token()))
             .set("Content-Type", "application/json")
             .set("Prefer", prefer)
             .send_string(&body.to_string());
@@ -227,7 +229,7 @@ impl SupabaseClient {
         let response = ureq::request("DELETE", &format!("{}{}", self.url, path))
             .timeout(HTTP_TIMEOUT)
             .set("apikey", &self.key)
-            .set("Authorization", &format!("Bearer {}", self.key))
+            .set("Authorization", &format!("Bearer {}", self.bearer_token()))
             .set("Prefer", "return=minimal")
             .call();
         match response {
@@ -241,7 +243,7 @@ impl SupabaseClient {
         let response = ureq::get(&format!("{}{}", self.url, path))
             .timeout(HTTP_TIMEOUT)
             .set("apikey", &self.key)
-            .set("Authorization", &format!("Bearer {}", self.key))
+            .set("Authorization", &format!("Bearer {}", self.bearer_token()))
             .call();
         match response {
             Ok(resp) if (200..300).contains(&resp.status()) => {
@@ -251,5 +253,9 @@ impl SupabaseClient {
             Ok(resp) => Err(format!("Supabase returned HTTP {}", resp.status())),
             Err(err) => Err(describe_ureq_error(err)),
         }
+    }
+
+    pub(super) fn bearer_token(&self) -> &str {
+        self.auth_token.as_deref().unwrap_or(&self.key)
     }
 }
