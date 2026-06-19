@@ -207,7 +207,11 @@ fn run_daemon() -> io::Result<()> {
         });
     }
     if let Some(client) = supabase::SupabaseClient::from_config(&cfg) {
-        let _ = client.replay_outbox(&cfg, &outbox);
+        let cfg_for_replay = cfg.clone();
+        let outbox_for_replay = outbox.clone();
+        thread::spawn(move || {
+            let _ = client.replay_outbox(&cfg_for_replay, &outbox_for_replay);
+        });
     }
     emit(&status_json(&cfg))?;
 

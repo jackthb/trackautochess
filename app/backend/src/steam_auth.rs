@@ -30,6 +30,9 @@ pub fn steam_login_with_opener<F>(
 where
     F: FnOnce(&str) -> Result<(), String>,
 {
+    let supabase_auth_url = supabase_auth_url
+        .map(str::trim)
+        .filter(|value| !value.is_empty());
     let listener = TcpListener::bind(("127.0.0.1", RETURN_PORT))
         .or_else(|_| TcpListener::bind(("127.0.0.1", 0)))
         .map_err(|err| format!("failed to start Steam callback listener: {err}"))?;
@@ -60,11 +63,11 @@ where
                     .filter(|value| value.chars().all(|ch| ch.is_ascii_digit()))
                     .ok_or_else(|| "Steam callback did not include a Steam ID".to_owned())?
                     .to_owned();
-                verify_assertion(&params)?;
+                if supabase_auth_url.is_none() {
+                    verify_assertion(&params)?;
+                }
                 let name = fetch_steam_name(&steam_id).unwrap_or_else(|| steam_id.clone());
                 let supabase_session = supabase_auth_url
-                    .map(str::trim)
-                    .filter(|value| !value.is_empty())
                     .map(|url| exchange_supabase_session(url, &params))
                     .transpose()?;
                 return Ok(SteamLoginResult {
@@ -94,7 +97,9 @@ fn exchange_supabase_session(
     query.push("desktop=1".to_owned());
     let separator = if auth_url.contains('?') { '&' } else { '?' };
     let url = format!("{auth_url}{separator}{}", query.join("&"));
-    let response = ureq::get(&url).call().map_err(|err| err.to_string())?;
+    let response = ureq::get(&url)
+        .call()
+        .map_err(describe_auth_exchange_error)?;
     let body = response.into_string().map_err(|err| err.to_string())?;
     let value = serde_json::from_str::<serde_json::Value>(&body).map_err(|err| err.to_string())?;
     if let Some(error) = value.get("error").and_then(serde_json::Value::as_str) {
@@ -127,6 +132,20 @@ fn exchange_supabase_session(
         refresh_token,
         expires_at,
     })
+}
+
+fn describe_auth_exchange_error(err: ureq::Error) -> String {
+    match err {
+        ureq::Error::Status(code, response) => {
+            let body = response.into_string().unwrap_or_default();
+            if body.trim().is_empty() {
+                format!("status code {code}")
+            } else {
+                format!("status code {code}: {body}")
+            }
+        }
+        err => err.to_string(),
+    }
 }
 
 fn handle_callback(mut stream: TcpStream) -> Result<BTreeMap<String, String>, String> {

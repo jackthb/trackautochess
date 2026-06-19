@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import type { DrodoProfile } from "../types";
 import type { DrodoProfileEvent } from "../backend-events";
 import { sendBackendRequest } from "../lib/backend-request";
@@ -14,8 +14,11 @@ export function useDrodo(): DrodoState {
   const [drodo, setDrodo] = useState<DrodoProfile | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const fetchInFlight = useRef<Promise<void> | null>(null);
 
   const fetch = useCallback(async () => {
+    if (fetchInFlight.current) return fetchInFlight.current;
+    const run = (async () => {
     setLoading(true);
     setError(null);
     try {
@@ -30,7 +33,11 @@ export function useDrodo(): DrodoState {
       setError(e instanceof Error ? e.message : "Failed to fetch Auto Chess profile.");
     } finally {
       setLoading(false);
+      fetchInFlight.current = null;
     }
+    })();
+    fetchInFlight.current = run;
+    return run;
   }, []);
 
   const refresh = useCallback(async () => {

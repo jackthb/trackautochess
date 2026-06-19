@@ -7,7 +7,7 @@ use crate::{
         NettableGameEnded, NettableIngestComplete, NettableIngestError, NettableMatchLeftPending,
         NettableMatchLeftResolved, NettablePersonalGameEnded, NettableQueenUploadComplete,
         NettableQueenUploadProgress, NettableRankingScanned, NettableResyncComplete,
-        NettableRoundChanged, NettableRows, NettableStateEvent, NettableStatus,
+        NettableRoundChanged, NettableStateEvent, NettableStatus,
         NettableTimelineExtracted,
     },
     match_builder::{
@@ -175,7 +175,6 @@ impl NettableService {
                 match result {
                     Ok(Some(rows)) => {
                         if !rows.is_empty() {
-                            emit(event_json(&NettableRows::new(rows_value(&rows))));
                             emit(state_json_from(&state));
                             emit(event_json(&NettableIngestComplete::new(
                                 rows.len(),
@@ -1128,7 +1127,7 @@ fn state_json_from(state: &Arc<Mutex<NettableState>>) -> String {
             .collect(),
     );
     event_json(&NettableStateEvent::new(
-        rows_value(&state.latest_rows),
+        serde_json::Value::Array(Vec::new()),
         parsed_value(&state.latest_parsed),
         players,
         local_ids_json,

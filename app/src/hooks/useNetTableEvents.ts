@@ -493,7 +493,6 @@ export function useNetTableEvents(): NetTableActivityState {
     });
 
     window.tracker.sendCommand({ cmd: "nettable_status" });
-    window.tracker.sendCommand({ cmd: "nettable_get_state" });
 
     return () => {
       unsubscribe();

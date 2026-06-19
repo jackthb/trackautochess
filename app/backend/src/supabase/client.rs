@@ -1,4 +1,4 @@
-use super::{
+﻿use super::{
     describe_ureq_error, drodo_courier_api_url, drodo_profile_to_user_payload, drodo_user_row_to_profile,
     mmr_level_to_app_rank, now_iso_utc, parse_valid_steam_id64, value_number, SupabaseClient,
     HTTP_TIMEOUT,
@@ -32,6 +32,8 @@ impl SupabaseClient {
     }
 
     pub fn fetch_games_for_steam_id(&self, steam_id: &str) -> Result<Value, String> {
+        let steam_id = parse_valid_steam_id64(steam_id)
+            .ok_or_else(|| "Steam login is required before fetching games.".to_owned())?;
         let rows = self.get_json(&format!(
             "/rest/v1/match_players?select=*&steam_id=eq.{steam_id}&order=played_at.desc&limit=50"
         ))?;
@@ -89,6 +91,8 @@ impl SupabaseClient {
     }
 
     pub fn fetch_drodo_profile(&self, steam_id: &str) -> Result<Value, String> {
+        let steam_id = parse_valid_steam_id64(steam_id)
+            .ok_or_else(|| "Steam login is required before fetching Drodo profile.".to_owned())?;
         let profile_rows = self.get_json(&format!(
             "/rest/v1/users?select=steam_id,drodo_mmr,drodo_max_mmr,drodo_mmr_level,drodo_season,drodo_season_games,drodo_chicken_count,drodo_last_fetched_at&steam_id=eq.{steam_id}"
         ))?;
@@ -259,3 +263,4 @@ impl SupabaseClient {
         self.auth_token.as_deref().unwrap_or(&self.key)
     }
 }
+

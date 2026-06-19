@@ -14,7 +14,7 @@ use std::{env, time::Duration};
 const STEAM_ID64_MIN: u64 = 76_561_197_960_265_728;
 const STEAM_ID64_MAX: u64 = 76_561_202_255_233_023;
 const DRODO_COURIER_BATCH_SIZE: usize = 100;
-const HTTP_TIMEOUT: Duration = Duration::from_secs(15);
+const HTTP_TIMEOUT: Duration = Duration::from_secs(4);
 const DRODO_COURIER_API_BASE_URL: &str = "http://autochess.ppbizon.com";
 const QUEENS_REVALIDATE_URL_ENV: &str = "DAC_QUEENS_REVALIDATE_URL";
 

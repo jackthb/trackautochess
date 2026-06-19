@@ -38,6 +38,7 @@ export function useGames(): GamesState {
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const initialLoadDone = useRef(false);
+  const refreshInFlight = useRef(false);
   const [unitCosts, setUnitCosts] = useState<Record<string, number>>({});
   const [unitsFull, setUnitsFull] = useState<Record<string, UnitFullInfo>>({});
   const [synergiesData, setSynergiesData] = useState<
@@ -51,6 +52,8 @@ export function useGames(): GamesState {
   const [lastRefresh, setLastRefresh] = useState<Date | null>(null);
 
   const refresh = useCallback(async () => {
+    if (refreshInFlight.current) return;
+    refreshInFlight.current = true;
     if (!initialLoadDone.current) {
       setLoading(true);
     }
@@ -125,6 +128,7 @@ export function useGames(): GamesState {
     } finally {
       setLoading(false);
       setRefreshing(false);
+      refreshInFlight.current = false;
     }
   }, [unitCosts]);
 

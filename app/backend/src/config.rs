@@ -1,9 +1,11 @@
-use serde::Serialize;
+﻿use serde::Serialize;
 use serde_json::{json, Value};
 use std::{env, fs, io, path::PathBuf};
 use ts_rs::TS;
 
-const LEGACY_SUPABASE_URL: &str = "https://ismxtcfkuwpvfyuojnaa.supabase.co";
+const DEFAULT_SUPABASE_URL: &str = "https://ismxtcfkuwpvfyuojnaa.supabase.co";
+const LEGACY_SUPABASE_URL: &str = "https://xkfxykorskdltcmvgihh.supabase.co";
+const LEGACY_SUPABASE_KEY: &str = "sb_publishable_Tk7hBHGJImbtzxxZzEIgKQ_kwnKuCaK";
 const DEFAULT_SUPABASE_AUTH_URL: &str = "https://www.trackautochess.com/api/auth/steam/callback";
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, TS)]
@@ -129,8 +131,8 @@ fn default_config_json() -> &'static str {
     r#"{
   "player_name": "jack",
   "hotkey": "F6",
-  "supabase_url": "https://xkfxykorskdltcmvgihh.supabase.co",
-  "supabase_key": "sb_publishable_Tk7hBHGJImbtzxxZzEIgKQ_kwnKuCaK",
+  "supabase_url": "https://ismxtcfkuwpvfyuojnaa.supabase.co",
+  "supabase_key": "sb_publishable_C7GbRNcYQPPrCyqAbl0dcA_IAW0wnY-",
   "supabase_auth_url": "https://www.trackautochess.com/api/auth/steam/callback",
   "supabase_access_token": "",
   "supabase_refresh_token": "",
@@ -149,14 +151,18 @@ fn default_config_json() -> &'static str {
 }
 
 fn parse_config_json(body: &str) -> Value {
-    serde_json::from_str(body)
+    serde_json::from_str(body.trim_start_matches('\u{feff}'))
         .unwrap_or_else(|_| serde_json::from_str(default_config_json()).unwrap())
 }
 
 fn apply_config_migrations(value: &mut Value) -> bool {
     let current_url = value_string(value, "supabase_url");
+    let current_key = value_string(value, "supabase_key");
     let should_replace_supabase = current_url.trim().is_empty()
         || current_url.trim_end_matches('/') == LEGACY_SUPABASE_URL;
+    let should_replace_supabase_key = current_key.trim().is_empty()
+        || current_key == LEGACY_SUPABASE_KEY
+        || should_replace_supabase;
     let should_set_auth_url = value_string(value, "supabase_auth_url").trim().is_empty();
 
     let defaults = parse_config_json(default_config_json());
@@ -165,12 +171,23 @@ fn apply_config_migrations(value: &mut Value) -> bool {
     };
 
     let mut changed = false;
-    if should_replace_supabase {
+    if should_replace_supabase || should_replace_supabase_key {
         for key in ["supabase_url", "supabase_key"] {
-            if let Some(default_value) = defaults.get(key) {
-                map.insert(key.to_owned(), default_value.clone());
-                changed = true;
+            if key == "supabase_url" && !should_replace_supabase {
+                continue;
             }
+            if key == "supabase_key" && !should_replace_supabase_key {
+                continue;
+            }
+            if let Some(default_value) = defaults.get(key) {
+                let value = if key == "supabase_url" {
+                    json!(DEFAULT_SUPABASE_URL)
+            } else {
+                default_value.clone()
+            };
+            map.insert(key.to_owned(), value);
+            changed = true;
+        }
         }
     }
     if should_set_auth_url {
@@ -225,16 +242,30 @@ mod tests {
     fn migrates_legacy_supabase_project() {
         let mut value = json!({
             "supabase_url": LEGACY_SUPABASE_URL,
-            "supabase_key": "old",
+            "supabase_key": LEGACY_SUPABASE_KEY,
             "steam_id": "123"
         });
 
         assert!(apply_config_migrations(&mut value));
         assert_eq!(
             value_string(&value, "supabase_url"),
-            "https://xkfxykorskdltcmvgihh.supabase.co"
+            DEFAULT_SUPABASE_URL
         );
-        assert_ne!(value_string(&value, "supabase_key"), "old");
+        assert_ne!(value_string(&value, "supabase_key"), LEGACY_SUPABASE_KEY);
+        assert_eq!(value_string(&value, "steam_id"), "123");
+    }
+
+    #[test]
+    fn migrates_legacy_supabase_key_when_url_is_current() {
+        let mut value = json!({
+            "supabase_url": DEFAULT_SUPABASE_URL,
+            "supabase_key": LEGACY_SUPABASE_KEY,
+            "steam_id": "123"
+        });
+
+        assert!(apply_config_migrations(&mut value));
+        assert_eq!(value_string(&value, "supabase_url"), DEFAULT_SUPABASE_URL);
+        assert_ne!(value_string(&value, "supabase_key"), LEGACY_SUPABASE_KEY);
         assert_eq!(value_string(&value, "steam_id"), "123");
     }
 }
