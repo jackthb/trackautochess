@@ -97,11 +97,17 @@ export function QueensAutoRefresh({
         const data = (await resp.json().catch(() => null)) as
           | QueensRefreshResponse
           | null;
+        const checkedAt =
+          data != null &&
+          typeof data === "object" &&
+          typeof data.checked_at === "string"
+            ? data.checked_at
+            : null;
         if (typeof data?.checked_at === "string") {
-          latestFetchedAtRef.current = data.checked_at;
+          latestFetchedAtRef.current = checkedAt;
           window.dispatchEvent(
             new CustomEvent(QUEENS_REFRESH_CHECKED_EVENT, {
-              detail: { checkedAt: data.checked_at },
+              detail: { checkedAt },
             })
           );
         }
@@ -111,7 +117,9 @@ export function QueensAutoRefresh({
           typeof data.changed === "number" &&
           data.changed > 0;
         showStatus(refreshed ? "updated" : "current");
-        if (refreshed) router.refresh();
+        if (checkedAt) {
+          router.refresh();
+        }
       } catch {
         showStatus("error");
         // Network hiccups just leave the table on the last build; the next

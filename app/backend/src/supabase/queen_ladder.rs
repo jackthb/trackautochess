@@ -1,6 +1,7 @@
 use super::{
     current_drodo_season, next_drodo_poll_at, now_iso_utc, number_from_object,
-    parse_valid_steam_id64, SupabaseClient, DRODO_COURIER_BATCH_SIZE, HTTP_TIMEOUT,
+    parse_valid_steam_id64, queens_revalidate_url, drodo_courier_api_url, SupabaseClient,
+    DRODO_COURIER_BATCH_SIZE, HTTP_TIMEOUT,
 };
 use crate::{queen_ladder, queen_ladder::QueenPlayer};
 use serde_json::{json, Value};
@@ -150,12 +151,11 @@ impl SupabaseClient {
                 .map(u64::to_string)
                 .collect::<Vec<_>>()
                 .join(",");
-            let response = ureq::get(&format!(
-                "http://autochess.ppbizon.com/courier/get/@{joined}"
-            ))
-            .timeout(HTTP_TIMEOUT)
-            .call()
-            .map_err(|err| err.to_string())?;
+            let api_url = drodo_courier_api_url(&format!("courier/get/@{joined}"));
+            let response = ureq::get(&api_url)
+                .timeout(HTTP_TIMEOUT)
+                .call()
+                .map_err(|err| err.to_string())?;
             if !(200..300).contains(&response.status()) {
                 return Err(format!("Drodo returned HTTP {}", response.status()));
             }
@@ -249,13 +249,14 @@ impl SupabaseClient {
     }
 }
 
-const QUEENS_REVALIDATE_URL: &str = "https://www.trackautochess.com/api/revalidate/queens";
-
 /// Ask the public site to rebuild /queens now that the fresh ladder rows and
 /// any newly hydrated profiles are in the database. Best effort: the page
 /// still revalidates on its own ISR schedule if this fails.
 fn revalidate_queens_page() -> Result<(), String> {
-    ureq::post(QUEENS_REVALIDATE_URL)
+    let Some(url) = queens_revalidate_url() else {
+        return Ok(());
+    };
+    ureq::post(&url)
         .timeout(HTTP_TIMEOUT)
         .call()
         .map(|_| ())

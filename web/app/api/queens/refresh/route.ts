@@ -43,7 +43,7 @@ export async function POST(req: Request) {
       floorMs: QUEENS_VIEW_REFRESH_COOLDOWN_MS,
       onQueenChange: revalidateQueenPages,
     });
-    if (summary.changed > 0) {
+    if (summary.checked_at) {
       revalidateQueenPages();
     }
     return Response.json(summary);

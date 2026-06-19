@@ -21,7 +21,7 @@ async function handle(req: Request) {
     onQueenChange: revalidateQueenPages,
   });
 
-  if (summary.changed > 0) {
+  if (summary.checked_at) {
     revalidateQueenPages();
   }
 

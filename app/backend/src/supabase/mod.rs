@@ -9,12 +9,14 @@ pub use matches::finished_match_id_from_rows;
 pub use outbox::queue_rows;
 
 use serde_json::{json, Value};
-use std::time::Duration;
+use std::{env, time::Duration};
 
 const STEAM_ID64_MIN: u64 = 76_561_197_960_265_728;
 const STEAM_ID64_MAX: u64 = 76_561_202_255_233_023;
 const DRODO_COURIER_BATCH_SIZE: usize = 100;
 const HTTP_TIMEOUT: Duration = Duration::from_secs(15);
+const DRODO_COURIER_API_BASE_URL: &str = "http://autochess.ppbizon.com";
+const QUEENS_REVALIDATE_URL_ENV: &str = "DAC_QUEENS_REVALIDATE_URL";
 
 #[derive(Debug, Clone)]
 pub struct SupabaseClient {
@@ -86,6 +88,21 @@ fn next_drodo_poll_at(interval_seconds: i64) -> String {
 
 fn now_iso_utc() -> String {
     chrono::Utc::now().to_rfc3339()
+}
+
+pub(crate) fn drodo_courier_api_url(path: &str) -> String {
+    format!(
+        "{}/{}",
+        DRODO_COURIER_API_BASE_URL,
+        path.trim_start_matches('/')
+    )
+}
+
+pub(crate) fn queens_revalidate_url() -> Option<String> {
+    env::var(QUEENS_REVALIDATE_URL_ENV)
+        .ok()
+        .map(|value| value.trim().to_owned())
+        .filter(|value| !value.is_empty())
 }
 
 fn mmr_level_to_app_rank(value: Option<&Value>) -> Option<String> {

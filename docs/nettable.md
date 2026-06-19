@@ -118,7 +118,7 @@ These showed up in older VPK/triage notes, but they are not in the current autom
 | Table | Current status | Notes |
 |---|---|---|
 | `match_history_table` | Not currently bound/captured | Previously investigated and observed to be empty in practice, so we do not treat it as a useful source unless a future patch proves otherwise. |
-| `hp_bar_table` | Not currently bound/captured | Likely duplicates HP fields already present in player state. Still an open question if it adds cleaner live HP. |
+| `hp_bar_table` | Not currently bound/captured | Appears HUD-oriented: `hp_bar` maps unit indices to `{is_hero, unit_index, unit_name}`. It does **not** provide per-player elimination rows or reliable match-lifecycle state, so it is not used for live death detection in the current pipeline. |
 | `quest_table` | Not currently bound/captured | Battle-pass/quest noise; not part of the normal capture cadence. |
 | `casino_table` | Not currently bound/captured | Pass/minigame noise; not part of the normal capture cadence. |
 | `hero_available_items`, `other_available_items` | Not currently bound/captured | In-game available-item UI state; not used by the tracker. |
@@ -142,9 +142,11 @@ The Rust pipeline processes decoded rows in memory and uploads normalized produc
 | Should `player_id_table.vchess_*` be dropped as an unknown VCHESS thing? | No. We now know this is the board-state table: unit entries keyed by board coordinates, with unit name/id/items/other per-piece fields. Keep it. |
 | Do we need `mmr_level_*`? | Keep for now. It gives rank/candy baseline by slot and is small. |
 | Is `death_team` redundant with HP or destroy info? | Maybe, but it is the cleanest local-player-death signal we currently have, so keep it. |
-| Does `hp_bar_table` add anything over `player_info.hp`? | Unknown because it is not currently captured. If HP timing is bad, this is the first table to test. |
+| Does `CustomNetTable_game_info` only contain `round_info`? | No. In observed payloads it has four keys: `round_info`, `death_team`, `game_version`, and `quest`. For processing, only `round_info.round` and `death_team` are used; the other two are debug metadata. |
+| Does `hp_bar_table` add anything over `player_info.hp`? | It currently looks like a HUD-oriented unit index map (hero unit IDs and flags), not a direct player death/health timeline. We haven’t used it because it has no obvious per-team/per-player elimination state. If HP timing becomes unreliable, it is the next table to sample. |
 | Do we need static `chess_pool_table` lists like `chess_list_by_mana`? | Not for normal processing, because VPK/content data is the source of truth. Current code still keeps them in the one-shot local/raw capture because the table is not polled repeatedly and it can expose patch drift. |
-| Do we store the chess-pool relic list in processed match data? | Not currently. `chess_pool_table.relic_list` is present in local/raw dumps, but processed player/timeline rows use active per-player relic state from `player_id_table.relic_ttl_<n>`. |
+| Do we store the chess-pool relic list in processed match data? | Not currently. `chess_pool_table.relic_list` is present in local/raw dumps, but processed player/timeline rows currently use active per-player relic state from `player_id_table.relic_ttl_<n>`. |
+| Can we list all legendaries in one match from captured data? | Yes, from one-shot `CustomNetTable_chess_pool_table`: `legendary_info`, `revealed_legendary_chess_list`, and `unrevealed_legendary_chess_list` contain the pool state/history, but only `revealed_legendary_chess_list` is currently promoted into processed timeline data. |
 
 ## Example raw output by table
 

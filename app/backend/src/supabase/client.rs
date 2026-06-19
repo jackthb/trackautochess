@@ -1,5 +1,5 @@
 use super::{
-    describe_ureq_error, drodo_profile_to_user_payload, drodo_user_row_to_profile,
+    describe_ureq_error, drodo_courier_api_url, drodo_profile_to_user_payload, drodo_user_row_to_profile,
     mmr_level_to_app_rank, now_iso_utc, parse_valid_steam_id64, value_number, SupabaseClient,
     HTTP_TIMEOUT,
 };
@@ -8,11 +8,12 @@ use serde_json::{json, Value};
 
 impl SupabaseClient {
     pub fn from_config(cfg: &Config) -> Option<Self> {
-        if cfg.local_only || cfg.supabase_url.is_empty() || cfg.supabase_key.is_empty() {
+        let supabase_url = cfg.supabase_url.trim_end_matches('/').to_owned();
+        if cfg.local_only || supabase_url.is_empty() || cfg.supabase_key.is_empty() {
             return None;
         }
         Some(Self {
-            url: cfg.supabase_url.trim_end_matches('/').to_owned(),
+            url: supabase_url,
             key: cfg.supabase_key.clone(),
         })
     }
@@ -99,7 +100,7 @@ impl SupabaseClient {
     }
 
     pub fn refresh_drodo_profile(&self, steam_id: &str) -> Result<Value, String> {
-        let api_url = format!("http://autochess.ppbizon.com/courier/get/@{steam_id}");
+        let api_url = drodo_courier_api_url(&format!("courier/get/@{steam_id}"));
         let response = ureq::get(&api_url)
             .timeout(HTTP_TIMEOUT)
             .call()
