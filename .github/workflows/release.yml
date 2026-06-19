@@ -25,7 +25,7 @@ jobs:
         with:
           node-version: "20"
           cache: "pnpm"
-          cache-dependency-path: app/pnpm-lock.yaml
+          cache-dependency-path: pnpm-lock.yaml
 
       - name: Set up Rust
         uses: dtolnay/rust-toolchain@stable
@@ -39,18 +39,17 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/AppData/Local/electron-builder/Cache
-          key: electron-builder-${{ runner.os }}-${{ hashFiles('app/pnpm-lock.yaml') }}
+          key: electron-builder-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
           restore-keys: |
             electron-builder-${{ runner.os }}-
 
       - name: Build Electron app & installer
         shell: pwsh
         run: |
-          cd app
           pnpm install --frozen-lockfile
-          pnpm run build:backend
-          pnpm run build
-          pnpm exec electron-builder --win --config electron-builder.json
+          pnpm --dir app run build:backend
+          pnpm --dir app run build
+          npm run build:desktop:installer
 
       - name: Upload release
         uses: softprops/action-gh-release@v2

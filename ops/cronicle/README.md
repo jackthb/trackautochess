@@ -36,8 +36,8 @@ docker compose -f ops/cronicle/docker-compose.yml up -d
 No web workspace install or build step is needed for the poller. The Cronicle
 container only needs `node` plus the checked-in scripts mounted from this
 directory. `scripts/poll-drodo.mjs` imports shared runtime helpers directly from
-`shared/drodo-core.mjs`; keep that file plain Node-compatible so Pi jobs do not
-depend on TypeScript loaders or the web workspace.
+`shared/drodo-core.mjs`, generated from `shared/drodo-core.ts`; edit the
+TypeScript source and run `npm run build:drodo-core` before deploying Pi jobs.
 
 If Cronicle is installed directly on the Pi instead of via Docker, expose the
 same scripts path that the jobs below use:
@@ -99,7 +99,7 @@ Command:
 ```
 
 This walks cached non-missing users whose shared `next_poll_at` is due, oldest
-`drodo_last_fetched_at` first. Under the simple policy in `shared/drodo-core.mjs`,
+`drodo_last_fetched_at` first. Under the simple policy in `shared/drodo-core.ts`,
 active and inactive cached users are due daily. It defaults to up to 10000 users
 per run (`DRODO_POLL_ALL_BATCH_SIZE`).
 

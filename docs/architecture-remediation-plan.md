@@ -13,7 +13,7 @@ assume the earlier ones are done. Validate after every phase with the checks lis
 | Phase 3 | Merged to `main` | [#234](https://github.com/jackthb/dac-tools/pull/234) | Desktop data routed through Rust backend |
 | Phase 4 | Merged to `main` | [#232](https://github.com/jackthb/dac-tools/pull/232) | Backend module split |
 | Phase 5 | In progress | `codex/phase-5-typed-contracts-v2` | Fresh PR from `main`; [#233](https://github.com/jackthb/dac-tools/pull/233) was merged into an intermediate branch and is superseded |
-| Phase 6 | Paused / not started | no PR | Resume after Phase 5 lands |
+| Phase 6 | In progress | #264 | `drodo-core.ts` now compiles generated runtime/types |
 | Phase 7 | Not started | no PR | Requires Phase 6 and live-game fixture capture |
 
 ---
@@ -35,7 +35,7 @@ The data now lives on `users`. The desktop MMR/profile panel silently returns no
    app reads; do not guess.
 3. In the `drodo:refresh` handler, replace the `drodo_profiles` upsert with an upsert
    to `users` (again mirroring `web/lib/drodo.ts` / `shared/drodo-core` payload shape —
-   `drodoProfileToUserPayload` in `shared/drodo-core.mjs` already builds this payload;
+   `drodoProfileToUserPayload` in `shared/drodo-core.ts` already builds this payload;
    use it instead of hand-rolling the field mapping).
 4. While there: make the failure loud. Both handlers currently swallow errors into
    `console.error` and return `null`. At minimum, return `{ error: string }` so the
@@ -188,7 +188,7 @@ with no shared schema).
 
 ## Phase 6 — Unify `drodo-core` and Drodo poll orchestration (~half a day)
 
-**Problem (a):** `shared/drodo-core.ts` re-exports `shared/drodo-core.mjs` values with
+**Problem (a):** `shared/drodo-core.ts` previously re-exported `shared/drodo-core.mjs` values with
 hand-written type assertions — the types are unchecked claims and will drift.
 
 **Steps:**

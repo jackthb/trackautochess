@@ -2,6 +2,7 @@
 set -eu
 
 SCRIPT_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd -P)
+export DAC_REPO_ROOT=${DAC_REPO_ROOT:-/workspace}
 
 for env_file in \
   "$SCRIPT_DIR/../.env" \

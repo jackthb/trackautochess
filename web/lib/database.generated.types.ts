@@ -381,6 +381,7 @@ export type Database = {
           queen_ladder_rank: number | null
           queen_ladder_season: string | null
           steam_id: number
+          steam_profile_refreshed_at: string | null
           steam_signed_in_at: string | null
           stream_link: string | null
         }
@@ -405,6 +406,7 @@ export type Database = {
           queen_ladder_rank?: number | null
           queen_ladder_season?: string | null
           steam_id: number
+          steam_profile_refreshed_at?: string | null
           steam_signed_in_at?: string | null
           stream_link?: string | null
         }
@@ -429,6 +431,7 @@ export type Database = {
           queen_ladder_rank?: number | null
           queen_ladder_season?: string | null
           steam_id?: number
+          steam_profile_refreshed_at?: string | null
           steam_signed_in_at?: string | null
           stream_link?: string | null
         }

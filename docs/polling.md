@@ -71,8 +71,8 @@ Keep the policy in shared code when changing cadence in production:
 
 Known places wired to, or expected to stay aligned with, the shared policy:
 
-- `shared/drodo-core.mjs`
-- `shared/drodo-core.ts`
+- `shared/drodo-core.ts` (source)
+- `shared/drodo-core.mjs` / `shared/drodo-core.d.mts` (generated runtime/types)
 - `ops/cronicle/scripts/poll-drodo.mjs`
 - `ops/cronicle/cronicle-job.dac-poll-drodo-active.json`
 - `ops/cronicle/cronicle-job.dac-poll-drodo-all.json`

@@ -112,7 +112,7 @@ export function AppNavBar({ supabase }: AppNavBarProps) {
   }, [menuOpen]);
 
   useEffect(() => {
-    if (!supabase || !user) {
+    if (!user) {
       setAvatarUrl(null);
       return;
     }
@@ -121,32 +121,10 @@ export function AppNavBar({ supabase }: AppNavBarProps) {
       typeof user.user_metadata?.avatar_url === "string"
         ? user.user_metadata.avatar_url
         : typeof user.user_metadata?.picture === "string"
-          ? user.user_metadata.picture
-          : null;
+        ? user.user_metadata.picture
+        : null;
     setAvatarUrl(metadataAvatar);
-
-    if (metadataAvatar) return;
-
-    const steamId = user.user_metadata?.steam_id;
-    if (!steamId) return;
-
-    let cancelled = false;
-    supabase
-      .from("users")
-      .select("avatar_url")
-      .eq("steam_id", steamId)
-      .maybeSingle()
-      .then(({ data }) => {
-        if (cancelled) return;
-        if (typeof data?.avatar_url === "string" && data.avatar_url) {
-          setAvatarUrl(data.avatar_url);
-        }
-      });
-
-    return () => {
-      cancelled = true;
-    };
-  }, [supabase, user]);
+  }, [user]);
 
   const handleLogout = async () => {
     if (!supabase) return;

@@ -9,7 +9,7 @@
 -- Current simple background polling policy:
 --   * Visible Queen board: refreshed every 5 minutes.
 --   * Active players: signed in with Steam within the active window, currently
---     14 days in shared/drodo-core.mjs, or known Queen ladder players.
+--     14 days in shared/drodo-core.ts, or known Queen ladder players.
 --   * Inactive players: tracked users with a cached non-missing Drodo profile
 --     who are not active players. Inactive polling is daily and oldest-first by
 --     drodo_last_fetched_at.
@@ -35,7 +35,7 @@
 -- ---------------------------------------------------------------------------
 -- 1. Read-only inactive cohort review.
 -- ---------------------------------------------------------------------------
--- Keep these constants aligned with shared/drodo-core.mjs and web/lib/queens.ts.
+-- Keep these constants aligned with shared/drodo-core.ts and web/lib/queens.ts.
 WITH params AS (
   SELECT
     now() AS as_of,

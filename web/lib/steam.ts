@@ -25,10 +25,18 @@ interface SteamLookupOptions {
   persist?: boolean;
   requireAvatar?: boolean;
   requireCustomUrl?: boolean;
+  maxAgeMs?: number;
 }
 
 interface SteamApiProfile extends SteamProfile {
   steamId: SteamId64 | null;
+}
+
+function isFreshTimestamp(value: string | null | undefined, maxAgeMs?: number): boolean {
+  if (!maxAgeMs) return true;
+  if (!value) return false;
+  const timestamp = Date.parse(value);
+  return Number.isFinite(timestamp) && Date.now() - timestamp < maxAgeMs;
 }
 
 function parseSteamProfileXml(xml: string): SteamApiProfile {
@@ -119,7 +127,7 @@ export function parseSteamInput(raw: string): ParsedSteamInput | null {
 export async function upsertSteamUser(
   steamId: SteamId64,
   supabase?: SupabaseClient,
-  profile?: (SteamProfile & { steamSignedInAt?: string }) | null
+  profile?: (SteamProfile & { steamSignedInAt?: string; steamProfileRefreshedAt?: string }) | null
 ): Promise<void> {
   if (!supabase || !isValidSteamId64(steamId)) return;
 
@@ -129,12 +137,16 @@ export async function upsertSteamUser(
     custom_url?: string;
     avatar_url?: string;
     steam_signed_in_at?: string;
+    steam_profile_refreshed_at?: string;
   } = { steam_id: steamId };
 
   if (profile?.name) payload.name = profile.name;
   if (profile?.customUrl) payload.custom_url = profile.customUrl;
   if (profile?.avatarUrl) payload.avatar_url = profile.avatarUrl;
   if (profile?.steamSignedInAt) payload.steam_signed_in_at = profile.steamSignedInAt;
+  if (profile?.steamProfileRefreshedAt) {
+    payload.steam_profile_refreshed_at = profile.steamProfileRefreshedAt;
+  }
 
   const { error } = await supabase
     .from("users")
@@ -179,7 +191,7 @@ export async function fetchSteamProfile(
   if (supabase) {
     const { data } = await supabase
       .from("users")
-      .select("name, custom_url, avatar_url")
+      .select("name, custom_url, avatar_url, steam_profile_refreshed_at")
       .filter("steam_id", "eq", steamId)
       .maybeSingle();
 
@@ -191,8 +203,13 @@ export async function fetchSteamProfile(
       };
       const hasCachedProfile =
         cachedProfile.name || cachedProfile.customUrl || cachedProfile.avatarUrl;
+      const hasFreshProfile = isFreshTimestamp(
+        data.steam_profile_refreshed_at ?? null,
+        options.maxAgeMs
+      );
       if (
         hasCachedProfile &&
+        hasFreshProfile &&
         (!options.requireAvatar || cachedProfile.avatarUrl) &&
         (!options.requireCustomUrl || cachedProfile.customUrl)
       ) {
@@ -202,6 +219,7 @@ export async function fetchSteamProfile(
   }
 
   const apiProfile = await fetchSteamProfileFromApi(steamId);
+  const refreshedAt = new Date().toISOString();
   const profile = {
     name: apiProfile.name ?? cachedProfile?.name ?? null,
     customUrl: apiProfile.customUrl ?? cachedProfile?.customUrl ?? null,
@@ -209,7 +227,10 @@ export async function fetchSteamProfile(
   };
 
   if (options.persist !== false) {
-    await upsertSteamUser(steamId, supabase, profile);
+    await upsertSteamUser(steamId, supabase, {
+      ...profile,
+      steamProfileRefreshedAt: refreshedAt,
+    });
   }
   return profile;
 }

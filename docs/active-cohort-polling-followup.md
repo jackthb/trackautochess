@@ -30,7 +30,7 @@ it and the adaptive scheduler rewrites `next_poll_at` / `poll_interval_seconds` 
 and even that only sets a short ("hot") interval for **queen** profiles, not
 regular ones.
 
-### 2. The active-cohort filter is duplicated in four places
+### 2. The active-cohort filter is duplicated in three runtime places
 
 Any change must be applied to all of them or they silently desync:
 
@@ -39,10 +39,9 @@ Any change must be applied to all of them or they silently desync:
 | `ops/cronicle/scripts/poll-drodo.mjs` | `activeSyncFilter()` — adds `poll_interval_seconds.lte.HOT_POLL_MAX_INTERVAL_SECONDS` |
 | `web/scripts/poll-drodo.mts` | `steam_signed_in_at.gte.X, queen_ladder_rank.not.is.null` |
 | `web/app/api/cron/poll-drodo/route.ts` | same family |
-| `web/app/api/admin/usage/route.ts` | drives the usage dashboard's "active" count |
 
 Ideally the filter is defined once (e.g. in `shared/drodo-core`) and imported by
-all four, so it can never drift again.
+all three runtime paths, so it can never drift again.
 
 ## Options for "accessed the site recently"
 
@@ -63,7 +62,7 @@ all four, so it can never drift again.
 
 Pick one of the three options above (whether to add a real `last_viewed_at`
 column or lean on the adaptive-cadence proxy), then apply the chosen filter
-consistently across all four files and update `ops/cronicle/README.md`.
+consistently across all three runtime paths and update `ops/cronicle/README.md`.
 
 ## Watch out for
 
@@ -71,5 +70,3 @@ consistently across all four files and update `ops/cronicle/README.md`.
   public `/queens` ladder stays fresh during hours nobody is viewing). Confirm the
   on-demand `/queens` refresh path adequately covers ladder freshness before
   relying on it.
-- Keep the usage dashboard's "active" definition in sync with the poller's, or
-  the dashboard's active count will stop matching what actually gets polled.

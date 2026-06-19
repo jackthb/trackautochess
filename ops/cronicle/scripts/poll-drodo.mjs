@@ -1,6 +1,13 @@
 #!/usr/bin/env node
 
-import {
+import path from "node:path";
+import { pathToFileURL } from "node:url";
+
+const drodoCoreUrl = process.env.DAC_REPO_ROOT
+  ? pathToFileURL(path.join(process.env.DAC_REPO_ROOT, "shared", "drodo-core.mjs")).href
+  : new URL("../../../shared/drodo-core.mjs", import.meta.url).href;
+
+const {
   activePollOrFilter,
   fetchDrodoProfileBatch,
   drodoProfileToUserPayload,
@@ -10,7 +17,7 @@ import {
   profileChanged,
   recentSignInCutoff,
   summarizeDrodoResults,
-} from "../../../shared/drodo-core.mjs";
+} = await import(drodoCoreUrl);
 
 const DEFAULT_BATCH_SIZE = 200;
 const DEFAULT_ALL_BATCH_SIZE = 10000;

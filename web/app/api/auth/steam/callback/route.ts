@@ -7,6 +7,7 @@ import {
   playerProfilePath,
   upsertSteamUser,
 } from "@/lib/steam";
+import { DEFAULT_SITE_URL, getSiteUrl } from "@/lib/site";
 import { parseSteamId64, type SteamId64 } from "@dac/shared/steam";
 
 const STEAM_OPENID_URL = "https://steamcommunity.com/openid/login";
@@ -29,7 +30,6 @@ async function verifySteamAssertion(
     body: params.toString(),
   });
   const body = await resp.text();
-  console.log("Steam verify response:", body);
   if (!body.includes("is_valid:true")) return null;
 
   const claimed = query.get("openid.claimed_id") || "";
@@ -170,15 +170,19 @@ export async function GET(req: Request) {
   });
 
   const verifyBody = await verifyResp.text();
-  console.log("Verify response:", verifyResp.status, verifyBody.substring(0, 300));
   if (!verifyResp.ok) {
-    console.error("Token verify failed:", verifyResp.status, verifyBody);
+    console.error("Token verify failed:", verifyResp.status);
     return fail("session_failed", steamId);
   }
 
   const session = JSON.parse(verifyBody);
   if (!session.access_token || !session.refresh_token) {
-    console.error("No tokens in verify response:", JSON.stringify(session));
+    console.error("No tokens in verify response:", {
+      hasAccessToken: Boolean(session.access_token),
+      hasRefreshToken: Boolean(session.refresh_token),
+      tokenType: typeof session.token_type,
+      expiresIn: typeof session.expires_in,
+    });
     return fail("session_failed", steamId);
   }
 
@@ -210,10 +214,7 @@ export async function GET(req: Request) {
   // Land directly on the player profile instead of bouncing through the
   // /dashboard client redirect, which cost a full document load plus an auth
   // round trip before showing any content.
-  const proto = req.headers.get("x-forwarded-proto") || "http";
-  const host =
-    req.headers.get("x-forwarded-host") || req.headers.get("host") || "localhost:3000";
-  const origin = `${proto}://${host}`;
+  const origin = getSiteUrl() ?? DEFAULT_SITE_URL;
   const hash = new URLSearchParams({
     access_token: session.access_token,
     refresh_token: session.refresh_token,
