@@ -3,6 +3,8 @@ use serde_json::{json, Value};
 use std::{env, fs, io, path::PathBuf};
 use ts_rs::TS;
 
+const LEGACY_SUPABASE_URL: &str = "https://ismxtcfkuwpvfyuojnaa.supabase.co";
+
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, TS)]
 pub struct Config {
     #[ts(type = "string")]
@@ -32,7 +34,13 @@ impl Config {
             fs::write(&path, default_config_json())?;
         }
         let body = fs::read_to_string(&path)?;
-        let value = parse_config_json(&body);
+        let mut value = parse_config_json(&body);
+        if apply_config_migrations(&mut value) {
+            fs::write(
+                &path,
+                serde_json::to_string_pretty(&value).unwrap_or_else(|_| body.clone()),
+            )?;
+        }
         Ok(Self {
             dac_dir,
             steam_id: value_string(&value, "steam_id"),
@@ -76,6 +84,9 @@ pub fn dac_dir() -> PathBuf {
     if let Some(value) = env::var_os("DAC_DIR") {
         return PathBuf::from(value);
     }
+    if let Some(value) = env::var_os("APPDATA") {
+        return PathBuf::from(value).join("@dac").join("desktop");
+    }
     if let Some(value) = env::var_os("HOME") {
         return PathBuf::from(value).join(".dac");
     }
@@ -107,6 +118,28 @@ fn default_config_json() -> &'static str {
 fn parse_config_json(body: &str) -> Value {
     serde_json::from_str(body)
         .unwrap_or_else(|_| serde_json::from_str(default_config_json()).unwrap())
+}
+
+fn apply_config_migrations(value: &mut Value) -> bool {
+    let current_url = value_string(value, "supabase_url");
+    let should_replace_supabase = current_url.trim().is_empty()
+        || current_url.trim_end_matches('/') == LEGACY_SUPABASE_URL;
+
+    if !should_replace_supabase {
+        return false;
+    }
+
+    let defaults = parse_config_json(default_config_json());
+    let Some(map) = value.as_object_mut() else {
+        return false;
+    };
+
+    for key in ["supabase_url", "supabase_key"] {
+        if let Some(default_value) = defaults.get(key) {
+            map.insert(key.to_owned(), default_value.clone());
+        }
+    }
+    true
 }
 
 fn value_string(value: &Value, key: &str) -> String {
@@ -145,5 +178,22 @@ mod tests {
         assert_eq!(value_string(&value, "steam_id"), "123");
         assert_eq!(value_string(&value, "steam_name"), "abc");
         assert!(!value_bool(&value, "replay_enabled", true));
+    }
+
+    #[test]
+    fn migrates_legacy_supabase_project() {
+        let mut value = json!({
+            "supabase_url": LEGACY_SUPABASE_URL,
+            "supabase_key": "old",
+            "steam_id": "123"
+        });
+
+        assert!(apply_config_migrations(&mut value));
+        assert_eq!(
+            value_string(&value, "supabase_url"),
+            "https://xkfxykorskdltcmvgihh.supabase.co"
+        );
+        assert_ne!(value_string(&value, "supabase_key"), "old");
+        assert_eq!(value_string(&value, "steam_id"), "123");
     }
 }

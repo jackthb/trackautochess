@@ -45,9 +45,11 @@ protocol.registerSchemesAsPrivileged([
 
 const IS_PACKAGED = app.isPackaged;
 const RESOURCES_DIR = IS_PACKAGED ? process.resourcesPath : path.join(__dirname, "..");
+const USER_DATA_DIR = app.getPath("userData");
+const LEGACY_DAC_DIR = path.join(os.homedir(), ".dac");
 const DESKTOP_PATHS = getElectronDesktopPaths(__dirname, {
   dacDir: process.env.DAC_DIR,
-  defaultDacDir: path.join(os.homedir(), ".dac"),
+  defaultDacDir: USER_DATA_DIR,
   isPackaged: IS_PACKAGED,
   resourcesDir: RESOURCES_DIR,
 });
@@ -62,6 +64,25 @@ const gotSingleInstanceLock = app.requestSingleInstanceLock();
 if (!gotSingleInstanceLock) {
   app.quit();
 }
+
+function migrateLegacyDacDir(fromDir, toDir) {
+  if (process.env.DAC_DIR || path.resolve(fromDir) === path.resolve(toDir)) return;
+  if (!fs.existsSync(fromDir)) return;
+  if (!fs.existsSync(toDir)) fs.mkdirSync(toDir, { recursive: true });
+
+  for (const name of fs.readdirSync(fromDir)) {
+    const source = path.join(fromDir, name);
+    const target = path.join(toDir, name);
+    if (fs.existsSync(target)) continue;
+    try {
+      fs.cpSync(source, target, { recursive: true });
+    } catch (err) {
+      console.warn(`Failed to migrate ${source} to ${target}:`, err);
+    }
+  }
+}
+
+migrateLegacyDacDir(LEGACY_DAC_DIR, DAC_DIR);
 
 for (const dir of [DAC_DIR, REPLAY_DIR]) {
   if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });

@@ -38,7 +38,7 @@ function createBackendSupervisor({
 
     backendProcess = spawn(command, args, {
       cwd,
-      env: { ...env, TRACK_AUTO_CHESS_LOG_PATH: trackerLogPath },
+      env: { ...env, DAC_DIR: desktopPaths.dacDir, TRACK_AUTO_CHESS_LOG_PATH: trackerLogPath },
       stdio: ["pipe", "pipe", "pipe"],
     });
 
