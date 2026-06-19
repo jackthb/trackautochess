@@ -63,13 +63,23 @@ where
                     .filter(|value| value.chars().all(|ch| ch.is_ascii_digit()))
                     .ok_or_else(|| "Steam callback did not include a Steam ID".to_owned())?
                     .to_owned();
-                if supabase_auth_url.is_none() {
-                    verify_assertion(&params)?;
-                }
                 let name = fetch_steam_name(&steam_id).unwrap_or_else(|| steam_id.clone());
-                let supabase_session = supabase_auth_url
-                    .map(|url| exchange_supabase_session(url, &params))
-                    .transpose()?;
+                let supabase_session = match supabase_auth_url {
+                    Some(url) => match exchange_supabase_session(url, &params) {
+                        Ok(session) => Some(session),
+                        Err(err) => {
+                            verify_assertion(&params)?;
+                            eprintln!(
+                                "Steam login succeeded, but Supabase auth exchange failed: {err}"
+                            );
+                            None
+                        }
+                    },
+                    None => {
+                        verify_assertion(&params)?;
+                        None
+                    }
+                };
                 return Ok(SteamLoginResult {
                     steam_id,
                     steam_name: name,
