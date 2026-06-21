@@ -14,7 +14,7 @@
   /* ── Text — cool slate ramp, lifted ── */
   --text-primary: #e4e7ee;
   --text-secondary: #9096ac;
-  --text-muted: #5c6278;
+  --text-muted: #7f859d; /* lifted from #5c6278: ~2.35:1 → ~3.9:1 on --bg-surface */
 
   /* ── Placement / game tiers — chess-gold ── */
   --gold: #c9a84c;

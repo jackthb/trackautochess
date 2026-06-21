@@ -9,7 +9,28 @@
   display: flex;
   align-items: baseline;
   justify-content: space-between;
+  gap: 12px;
   margin-bottom: 12px;
+}
+.headLead {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.delta {
+  font-family: var(--font-mono);
+  font-size: var(--fs-12);
+  font-weight: 600;
+}
+.deltaUp {
+  color: var(--green-bright, #4eaa62);
+}
+.deltaDown {
+  color: var(--red-bright, #e35d5b);
+}
+.deltaFlat {
+  color: var(--text-muted);
 }
 .label {
   font-family: var(--font-mono);
@@ -28,7 +49,8 @@
 }
 .chartWrap {
   width: 100%;
-  overflow: hidden;
+  /* visible so the hover tooltip can sit just above the line near the top */
+  overflow: visible;
 }
 .svg {
   display: block;
@@ -82,6 +104,10 @@
   font-family: var(--font-mono);
   font-size: 10px;
   fill: var(--text-muted);
+}
+.lastLabel {
+  fill: var(--text-primary);
+  font-weight: 600;
 }
 .empty {
   margin: 4px 0 2px;

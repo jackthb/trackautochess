@@ -116,6 +116,9 @@ function formatLastFetchedAge(value: string | null, nowMs: number | null) {
   return `${Math.floor(hours / 24)}d ${hours % 24}h ago`;
 }
 
+// Parked: the "since last refresh" delta now renders inside the MmrSparkline
+// header. Kept here (commented) so the standalone card can be revived easily.
+/*
 function latestMmrDelta(snapshots: MmrSnapshot[]) {
   const points = snapshots
     .filter((snapshot): snapshot is MmrSnapshot & { mmr: number } =>
@@ -137,6 +140,7 @@ function latestMmrDelta(snapshots: MmrSnapshot[]) {
     previousMmr: previous.mmr,
   };
 }
+*/
 
 function historyWithCurrentMmr(
   snapshots: MmrSnapshot[],
@@ -222,6 +226,8 @@ function SteamTrustNote({ source }: { source: string }) {
   );
 }
 
+// Parked alongside latestMmrDelta above — see note there.
+/*
 function MmrDeltaCard({ snapshots }: { snapshots: MmrSnapshot[] }) {
   const delta = latestMmrDelta(snapshots);
   if (!delta) return null;
@@ -252,6 +258,7 @@ function MmrDeltaCard({ snapshots }: { snapshots: MmrSnapshot[] }) {
     </div>
   );
 }
+*/
 
 type RefreshedDrodoProfile = DrodoProfileRow & {
   seasons?: unknown;
@@ -766,7 +773,9 @@ export default function PlayerView({
 
           {canViewHistory ? (
             <>
-              <MmrDeltaCard snapshots={mmrHistory} />
+              {/* Delta now lives in the MmrSparkline header (see component),
+                  so the standalone pill is parked rather than removed. */}
+              {/* <MmrDeltaCard snapshots={mmrHistory} /> */}
               {showQueenRankHistory ? (
                 <div className={styles.historyPanel}>
                   <div className={styles.historyTabs} role="tablist" aria-label="Rating history">
