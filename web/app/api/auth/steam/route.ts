@@ -1,10 +1,9 @@
 import { NextResponse } from "next/server";
-import { DEFAULT_SITE_URL, getSiteUrl } from "@/lib/site";
 
 const STEAM_OPENID_URL = "https://steamcommunity.com/openid/login";
 
-export function GET() {
-  const origin = getSiteUrl() ?? DEFAULT_SITE_URL;
+export function GET(req: Request) {
+  const origin = new URL(req.url).origin;
   const returnTo = `${origin}/api/auth/steam/callback`;
 
   const params = new URLSearchParams({

@@ -11,6 +11,7 @@ import { isAdminSteamId } from "@/lib/admin";
 import { useBetaFeaturesEnabled } from "@/lib/betaFeatures";
 import { EntityIcon } from "@/components/EntityIcon";
 import { SteamSignInButton } from "@/components/SteamSignInButton";
+import { playerProfilePath } from "@/lib/steam";
 import styles from "./AppNavBar.module.css";
 
 const t = {
@@ -28,7 +29,6 @@ const t = {
   patchNotes: "Patch Notes",
   cms: "Admin CMS",
   signOut: "Sign out",
-  placeholderName: "Steam Player Name",
   home: (n: string) => `${n} home`,
   fallbackPlayer: "Player",
   openMenu: "Open menu",
@@ -84,16 +84,25 @@ export function AppNavBar({ supabase }: AppNavBarProps) {
 
   useEffect(() => {
     if (!supabase) return;
-    supabase.auth.getUser().then(({ data: { user } }) => {
-      setUser(user);
+    let cancelled = false;
+
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (cancelled) return;
+      setUser(session?.user ?? null);
       setReady(true);
     });
+
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
+      setReady(true);
       setUser(session?.user ?? null);
     });
-    return () => subscription.unsubscribe();
+
+    return () => {
+      cancelled = true;
+      subscription.unsubscribe();
+    };
   }, [supabase]);
 
   // App Router has no router.events; close the mobile menu when the path changes.
@@ -143,6 +152,13 @@ export function AppNavBar({ supabase }: AppNavBarProps) {
     typeof user?.user_metadata?.steam_id === "string"
       ? user.user_metadata.steam_id
       : null;
+  const sessionCustomUrl =
+    typeof user?.user_metadata?.custom_url === "string"
+      ? user.user_metadata.custom_url
+      : null;
+  const profileHref = sessionSteamId
+    ? playerProfilePath(sessionSteamId, sessionCustomUrl)
+    : "/dashboard";
   const canSeeBetaFeatures = useBetaFeaturesEnabled(sessionSteamId);
   const isAdmin = isAdminSteamId(sessionSteamId);
   const trackNavClick = (destination: string) => {
@@ -281,7 +297,7 @@ export function AppNavBar({ supabase }: AppNavBarProps) {
           {ready ? (
             user ? (
               <>
-                <Link href="/dashboard" className={styles.navUserLink} prefetch={false} onClick={() => trackNavClick("dashboard")}>
+                <Link href={profileHref} className={styles.navUserLink} prefetch={false} onClick={() => trackNavClick("player_profile")}>
                   {avatarUrl ? (
                     <img
                       className={styles.navAvatar}
@@ -314,11 +330,6 @@ export function AppNavBar({ supabase }: AppNavBarProps) {
             ) : (
               <SteamSignInButton source="nav" size="sm" />
             )
-          ) : supabase ? (
-            <div className={styles.navAuthPlaceholder} aria-hidden="true">
-              <span className={styles.navUser}>{t.placeholderName}</span>
-              <span className={styles.navBtn}>{t.signOut}</span>
-            </div>
           ) : null}
           <button
             type="button"

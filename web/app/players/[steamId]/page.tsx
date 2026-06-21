@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { cache } from "react";
 import { after } from "next/server";
-import { notFound, redirect } from "next/navigation";
+import { notFound } from "next/navigation";
 import type { PlayerGame, UnitFullInfo } from "@dac/shared/types";
 import type { SeasonSnapshot } from "@dac/shared/SeasonHistoryGrid";
 import { mmrLevelToRank, parseSynergies } from "@dac/shared/game-utils";
@@ -50,7 +50,6 @@ export const dynamic = "force-dynamic";
 
 type LoadResult =
   | { kind: "notFound" }
-  | { kind: "redirect"; destination: string }
   | { kind: "ok"; data: Omit<PlayerPageProps, "route"> };
 
 function drodoFromCachedRow(row: CachedUserDrodoRow) {
@@ -148,24 +147,6 @@ const loadPlayer = cache(async (rawSteamId: string): Promise<LoadResult> => {
     return { kind: "notFound" };
   }
   const { steamId } = resolved;
-
-  // Short-circuit the id→vanity redirect using the custom_url we already have,
-  // before any heavy loading (Supabase queries, Steam/Drodo fetches). Visiting
-  // by numeric Steam ID otherwise paid a full ~1.5s render just to compute the
-  // redirect target. The cold case (no cached custom_url) still falls through to
-  // the late redirect below once a fresh Steam profile is fetched.
-  const cachedCustomUrl = resolved.cachedProfileRow?.custom_url ?? null;
-  if (
-    /^\d+$/.test(rawSteamId) &&
-    rawSteamId === steamId &&
-    cachedCustomUrl &&
-    cachedCustomUrl !== rawSteamId
-  ) {
-    return {
-      kind: "redirect",
-      destination: playerProfilePath(steamId, cachedCustomUrl),
-    };
-  }
 
   let manualRefreshQuota = getManualRefreshQuota(undefined, Date.now(), {
     cadence: "public",
@@ -314,10 +295,8 @@ const loadPlayer = cache(async (rawSteamId: string): Promise<LoadResult> => {
 
   // A cached display name is enough to render the page. Blocking on the Steam
   // community XML fetch just to fill a missing avatar or discover a vanity URL
-  // added ~0.5–2s to cold renders — and players with no vanity URL can never
-  // satisfy requireCustomUrl from cache, so their numeric pages paid the fetch
-  // on every revalidation. Refresh those fields after the response is sent;
-  // the next render (and its id→vanity redirect) picks them up from the cache.
+  // added ~0.5–2s to cold renders. Refresh those fields after the response is
+  // sent; the next render can use them for display and canonical metadata.
   const profileRequirements = {
     requireAvatar: true,
     requireCustomUrl: /^\d+$/.test(rawSteamId),
@@ -338,17 +317,6 @@ const loadPlayer = cache(async (rawSteamId: string): Promise<LoadResult> => {
         ...profileRequirements,
       }).catch(() => {})
     );
-  }
-
-  if (
-    steamProfile.customUrl &&
-    rawSteamId !== steamProfile.customUrl &&
-    rawSteamId === steamId
-  ) {
-    return {
-      kind: "redirect",
-      destination: playerProfilePath(steamId, steamProfile.customUrl),
-    };
   }
 
   // Map match_players rows → Game shape with legacy aliases for rendering.
@@ -452,7 +420,6 @@ export default async function PlayerProfilePage({ params }: PageProps) {
   const { steamId } = await params;
   const result = await loadPlayer(steamId);
 
-  if (result.kind === "redirect") redirect(result.destination);
   if (result.kind !== "ok") notFound();
 
   const { structuredData } = buildPlayerSeo(result.data);

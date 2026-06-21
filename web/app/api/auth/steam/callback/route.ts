@@ -1,13 +1,12 @@
 import { NextResponse } from "next/server";
 import { after } from "next/server";
 import { captureServerEvent } from "@/lib/posthogServer";
-import { createSupabaseServiceRoleClientOrThrow } from "@/lib/supabase";
+import { createSupabaseServiceRoleClient } from "@/lib/supabase";
 import {
   fetchSteamProfile,
   playerProfilePath,
   upsertSteamUser,
 } from "@/lib/steam";
-import { DEFAULT_SITE_URL, getSiteUrl } from "@/lib/site";
 import { parseSteamId64, type SteamId64 } from "@dac/shared/steam";
 
 const STEAM_OPENID_URL = "https://steamcommunity.com/openid/login";
@@ -61,7 +60,11 @@ export async function GET(req: Request) {
   if (!steamId) {
     return fail("steam_auth_failed");
   }
-  const supabaseAdmin = createSupabaseServiceRoleClientOrThrow();
+  const supabaseAdmin = createSupabaseServiceRoleClient();
+  if (!supabaseAdmin) {
+    console.error("Supabase service role is not configured");
+    return fail("server_config_missing", steamId);
+  }
 
   after(() =>
     captureServerEvent("Steam Sign In Callback Verified", steamId, {
@@ -214,7 +217,7 @@ export async function GET(req: Request) {
   // Land directly on the player profile instead of bouncing through the
   // /dashboard client redirect, which cost a full document load plus an auth
   // round trip before showing any content.
-  const origin = getSiteUrl() ?? DEFAULT_SITE_URL;
+  const origin = url.origin;
   const hash = new URLSearchParams({
     access_token: session.access_token,
     refresh_token: session.refresh_token,

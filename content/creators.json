@@ -71,6 +71,62 @@
       "includeTerms": [],
       "excludeTerms": [],
       "seedVideoIds": []
+    },
+    {
+      "id": "crazyyypanda",
+      "name": "CrazyyyPanda",
+      "profileUrl": "https://www.youtube.com/@CrazyyyPanda",
+      "youtubeHandle": "@CrazyyyPanda",
+      "includeTerms": [
+        "dota auto chess",
+        "auto chess",
+        "dac",
+        "dota chess"
+      ],
+      "excludeTerms": [],
+      "seedVideoIds": []
+    },
+    {
+      "id": "murzik-viskas-dota",
+      "name": "Murzik Viskas Dota",
+      "profileUrl": "https://www.youtube.com/@MurzikViskasDota",
+      "youtubeHandle": "@MurzikViskasDota",
+      "includeTerms": [
+        "dota auto chess",
+        "auto chess",
+        "dac",
+        "dota chess"
+      ],
+      "excludeTerms": [],
+      "seedVideoIds": []
+    },
+    {
+      "id": "envy-chilling",
+      "name": "envy_chilling5870",
+      "profileUrl": "https://www.youtube.com/@envy_chilling5870",
+      "youtubeHandle": "@envy_chilling5870",
+      "includeTerms": [
+        "dota auto chess",
+        "auto chess",
+        "dac",
+        "dota chess"
+      ],
+      "excludeTerms": [],
+      "seedVideoIds": []
+    },
+    {
+      "id": "papudantes",
+      "name": "papudantes",
+      "profileUrl": "https://www.youtube.com/@papudantes",
+      "youtubeHandle": "@papudantes",
+      "includeTerms": [
+        "dota auto chess",
+        "auto chess",
+        "dac",
+        "dota chess"
+      ],
+      "excludeTerms": [],
+      "seedVideoIds": []
     }
   ]
 }

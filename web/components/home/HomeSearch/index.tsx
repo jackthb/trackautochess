@@ -6,6 +6,7 @@ import type { User } from "@supabase/supabase-js";
 import { ProfileSearch } from "@/components/ProfileSearch";
 import { SteamSignInButton } from "@/components/SteamSignInButton";
 import { createSupabaseClient } from "@/lib/supabase";
+import { playerProfilePath } from "@/lib/steam";
 import styles from "./HomeSearch.module.css";
 
 const t = {
@@ -31,17 +32,38 @@ export default function HomeSearch() {
       setAuthReady(true);
       return;
     }
-    supabase.auth.getUser().then(({ data }) => {
-      setUser(data.user ?? null);
+    let cancelled = false;
+
+    supabase.auth.getSession().then(({ data }) => {
+      if (cancelled) return;
+      setUser(data.session?.user ?? null);
       setAuthReady(true);
     });
+
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((_event, session) => {
+      setAuthReady(true);
       setUser(session?.user ?? null);
     });
-    return () => subscription.unsubscribe();
+
+    return () => {
+      cancelled = true;
+      subscription.unsubscribe();
+    };
   }, []);
+
+  const userSteamId =
+    typeof user?.user_metadata?.steam_id === "string"
+      ? user.user_metadata.steam_id
+      : null;
+  const userCustomUrl =
+    typeof user?.user_metadata?.custom_url === "string"
+      ? user.user_metadata.custom_url
+      : null;
+  const profileHref = userSteamId
+    ? playerProfilePath(userSteamId, userCustomUrl)
+    : "/dashboard";
 
   return (
     <div className={styles.page}>
@@ -77,7 +99,7 @@ export default function HomeSearch() {
           {authReady && (
             <div className={styles.primaryCta}>
               {user ? (
-                <Link href="/dashboard" className={styles.profileCta}>
+                <Link href={profileHref} className={styles.profileCta}>
                   {t.viewProfile}
                 </Link>
               ) : (

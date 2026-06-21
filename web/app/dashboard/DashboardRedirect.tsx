@@ -1,11 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { createSupabaseClient } from "@/lib/supabase";
 import { trackEvent } from "@/lib/analytics";
 import { playerProfilePath } from "@/lib/steam";
-import styles from "./dashboard.module.css";
 
 /**
  * Client island for /dashboard: resolves the signed-in user and redirects to
@@ -14,7 +13,6 @@ import styles from "./dashboard.module.css";
  */
 export function DashboardRedirect() {
   const router = useRouter();
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const supabase = createSupabaseClient();
@@ -24,8 +22,8 @@ export function DashboardRedirect() {
       return;
     }
 
-    supabase.auth.getUser().then(({ data: { user } }) => {
-      setLoading(false);
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      const user = session?.user ?? null;
       if (!user) {
         trackEvent("Dashboard Redirect Failed", { reason: "signed_out" });
         router.replace("/");
@@ -50,5 +48,5 @@ export function DashboardRedirect() {
     return () => subscription.unsubscribe();
   }, [router]);
 
-  return <div className={styles.loading}>{loading ? "Loading" : "Redirecting"}</div>;
+  return null;
 }
