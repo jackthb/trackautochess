@@ -45,6 +45,11 @@ export interface CreatorUpload {
   thumbnailUrl: string | null;
 }
 
+export interface CreatorMedia {
+  uploads: CreatorUpload[];
+  liveStreams: CreatorUpload[];
+}
+
 interface CreatorConfigFile {
   creators: CreatorConfig[];
 }
@@ -72,7 +77,9 @@ const YOUTUBE_FEED_BASE = "https://www.youtube.com/feeds/videos.xml";
 const CREATOR_FEED_REVALIDATE_SECONDS = 900;
 export const CREATOR_LIVE_STREAM_REVALIDATE_SECONDS = 300;
 const CREATOR_LIVE_STREAM_TIMEOUT_MS = 1500;
-const MAX_UPLOADS_PER_CREATOR = 12;
+const MAX_FEED_ENTRIES_PER_CREATOR = 12;
+const MAX_UPLOADS_PER_CREATOR = 5;
+const MAX_LIVE_STREAMS_PER_CREATOR = 1;
 export const MAX_CREATOR_UPLOADS = 30;
 
 const DEFAULT_INCLUDE_TERMS = [
@@ -393,10 +400,12 @@ function contentIncludesTerm(content: string, term: string): boolean {
   return content.includes(term);
 }
 
-function parseYouTubeFeed(xml: string, creator: CreatorConfig): CreatorUpload[] {
+type FeedUpload = CreatorUpload & { searchableText: string };
+
+function parseYouTubeFeed(xml: string, creator: CreatorConfig): FeedUpload[] {
   const entries = xml.match(/<entry>[\s\S]*?<\/entry>/gi) ?? [];
   return entries
-    .slice(0, MAX_UPLOADS_PER_CREATOR)
+    .slice(0, MAX_FEED_ENTRIES_PER_CREATOR)
     .map((entry) => {
       const videoId =
         xmlText(entry, "yt:videoId") ??
@@ -417,27 +426,70 @@ function parseYouTubeFeed(xml: string, creator: CreatorConfig): CreatorUpload[] 
         searchableText: `${title}\n${description}`,
       };
     })
-    .filter((upload) => contentMatchesCreatorFilter(upload.searchableText, creator))
-    .map(({ searchableText: _searchableText, ...upload }) => upload);
+    .filter((upload) => contentMatchesCreatorFilter(upload.searchableText, creator));
 }
 
-async function fetchCreatorUploads(
+function publishedTime(upload: CreatorUpload): number {
+  return upload.publishedAt ? new Date(upload.publishedAt).getTime() || 0 : 0;
+}
+
+async function isYouTubeLiveStreamVideo(url: string): Promise<boolean> {
+  try {
+    const response = await fetch(url, {
+      next: { revalidate: CREATOR_FEED_REVALIDATE_SECONDS },
+      headers: { "user-agent": "Mozilla/5.0" },
+    });
+    if (!response.ok) return false;
+    const html = await response.text();
+    return (
+      html.includes('"isLiveContent":true') ||
+      html.includes('"isLiveBroadcast":true') ||
+      html.includes('"status":"LIVE_STREAMING"') ||
+      html.includes('"liveBroadcastDetails"')
+    );
+  } catch {
+    return false;
+  }
+}
+
+async function fetchCreatorMedia(
   creator: CreatorConfig
-): Promise<CreatorUpload[]> {
+): Promise<CreatorMedia> {
   const params = new URLSearchParams();
   if (creator.youtubePlaylistId) {
     params.set("playlist_id", creator.youtubePlaylistId);
   } else {
     const { channelId } = await resolveYouTubeChannel(creator);
-    if (!channelId) return [];
+    if (!channelId) return { uploads: [], liveStreams: [] };
     params.set("channel_id", channelId);
   }
 
   const response = await fetch(`${YOUTUBE_FEED_BASE}?${params.toString()}`, {
     next: { revalidate: CREATOR_FEED_REVALIDATE_SECONDS },
   });
-  if (!response.ok) return [];
-  return parseYouTubeFeed(await response.text(), creator);
+  if (!response.ok) return { uploads: [], liveStreams: [] };
+
+  const feedUploads = parseYouTubeFeed(await response.text(), creator);
+  const classified = await Promise.all(
+    feedUploads.map(async ({ searchableText: _searchableText, ...upload }) => ({
+      ...upload,
+      isLiveStream: await isYouTubeLiveStreamVideo(upload.url),
+    }))
+  );
+
+  const uploads = classified
+    .filter((upload) => !upload.isLiveStream)
+    .sort((a, b) => publishedTime(b) - publishedTime(a))
+    .slice(0, MAX_UPLOADS_PER_CREATOR)
+    .map(({ isLiveStream: _isLiveStream, ...upload }) => upload);
+
+  const liveStreams = classified
+    .filter((upload) => upload.isLiveStream)
+    .sort((a, b) => publishedTime(b) - publishedTime(a))
+    .slice(0, MAX_LIVE_STREAMS_PER_CREATOR)
+    .map(({ isLiveStream: _isLiveStream, ...upload }) => upload);
+
+  return { uploads, liveStreams };
 }
 
 async function fetchYouTubeLiveStream(
@@ -745,25 +797,26 @@ export const loadCachedCreatorLiveStreams = unstable_cache(
   }
 );
 
-export async function loadCreatorUploads(): Promise<CreatorUpload[]> {
+export async function loadCreatorUploads(): Promise<CreatorMedia> {
   const creators = contentCreatorConfigRows();
-  const uploads = await Promise.all(
+  const media = await Promise.all(
     creators.map(async (creator) => {
       try {
-        return await fetchCreatorUploads(creator);
+        return await fetchCreatorMedia(creator);
       } catch (error) {
-        console.error(`Failed to load creator uploads for ${creator.id}:`, error);
-        return [];
+        console.error(`Failed to load creator media for ${creator.id}:`, error);
+        return { uploads: [], liveStreams: [] };
       }
     })
   );
 
-  return uploads
-    .flat()
-    .sort((a, b) => {
-      const at = a.publishedAt ? new Date(a.publishedAt).getTime() : 0;
-      const bt = b.publishedAt ? new Date(b.publishedAt).getTime() : 0;
-      return bt - at;
-    })
-    .slice(0, MAX_CREATOR_UPLOADS);
+  return {
+    uploads: media
+      .flatMap((entry) => entry.uploads)
+      .sort((a, b) => publishedTime(b) - publishedTime(a))
+      .slice(0, MAX_CREATOR_UPLOADS),
+    liveStreams: media
+      .flatMap((entry) => entry.liveStreams)
+      .sort((a, b) => publishedTime(b) - publishedTime(a)),
+  };
 }

@@ -171,10 +171,11 @@ function UploadCard({ upload }: { upload: CreatorUpload }) {
 }
 
 export default async function CreatorsPage() {
-  const [{ streams, error }, uploads] = await Promise.all([
+  const [{ streams, error }, creatorMedia] = await Promise.all([
     loadCreatorLiveStreams(),
     loadCreatorUploads(),
   ]);
+  const { uploads, liveStreams } = creatorMedia;
 
   const structuredData = {
     "@context": "https://schema.org",
@@ -240,6 +241,30 @@ export default async function CreatorsPage() {
             </div>
           )}
         </section>
+
+        {liveStreams.length > 0 && (
+          <section
+            className={styles.section}
+            aria-labelledby="youtube-live-streams-heading"
+          >
+            <div className={styles.sectionHeader}>
+              <h2
+                id="youtube-live-streams-heading"
+                className={styles.sectionTitle}
+              >
+                Recent YouTube live streams
+              </h2>
+              <span className={styles.sectionKicker}>
+                Latest per creator
+              </span>
+            </div>
+            <div className={styles.uploadGrid}>
+              {liveStreams.map((upload) => (
+                <UploadCard key={upload.id} upload={upload} />
+              ))}
+            </div>
+          </section>
+        )}
 
         <section
           className={styles.section}
