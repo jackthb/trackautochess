@@ -258,7 +258,20 @@
   }
 }
 @media (max-width: 520px) {
+  .searchForm {
+    flex-direction: column;
+  }
+
+  .inputWrap,
+  .searchButton {
+    width: 100%;
+  }
+
   .searchButton {
     padding: 0 16px;
+  }
+
+  .searchHelp {
+    flex-wrap: wrap;
   }
 }
