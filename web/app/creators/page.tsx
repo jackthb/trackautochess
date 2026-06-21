@@ -57,6 +57,25 @@ function formatDate(value: string | null): string {
   }).format(date);
 }
 
+function youtubeEmbedUrl(videoUrl: string): string | null {
+  try {
+    const parsed = new URL(videoUrl);
+    const hostname = parsed.hostname.toLowerCase().replace(/^www\./, "");
+    const videoId =
+      hostname === "youtu.be"
+        ? parsed.pathname.split("/").filter(Boolean)[0]
+        : hostname.endsWith("youtube.com")
+          ? parsed.searchParams.get("v")
+          : null;
+
+    return videoId
+      ? `https://www.youtube.com/embed/${encodeURIComponent(videoId)}`
+      : null;
+  } catch {
+    return null;
+  }
+}
+
 function StreamCard({ stream }: { stream: CreatorLiveStream }) {
   const initial = stream.name.trim().charAt(0) || "?";
   const displayUrl = stream.url
@@ -162,14 +181,20 @@ export default async function CreatorsPage() {
     "@type": "CollectionPage",
     name: "Dota Auto Chess creators",
     description,
-    hasPart: uploads.slice(0, 10).map((upload) => ({
-      "@type": "VideoObject",
-      name: upload.title,
-      url: upload.url,
-      uploadDate: upload.publishedAt ?? undefined,
-      thumbnailUrl: upload.thumbnailUrl ?? undefined,
-      author: { "@type": "Person", name: upload.creatorName },
-    })),
+    hasPart: uploads.slice(0, 10).map((upload) => {
+      const embedUrl = youtubeEmbedUrl(upload.url);
+
+      return {
+        "@type": "VideoObject",
+        name: upload.title,
+        description: `${upload.title} by ${upload.creatorName}, featured in the Track Auto Chess creators feed.`,
+        url: upload.url,
+        ...(embedUrl ? { embedUrl } : { contentUrl: upload.url }),
+        uploadDate: upload.publishedAt ?? undefined,
+        thumbnailUrl: upload.thumbnailUrl ?? undefined,
+        author: { "@type": "Person", name: upload.creatorName },
+      };
+    }),
   };
 
   return (
