@@ -139,7 +139,13 @@ function StreamCard({ stream }: { stream: CreatorLiveStream }) {
   );
 }
 
-function UploadCard({ upload }: { upload: CreatorUpload }) {
+function UploadCard({
+  upload,
+  label = "Upload",
+}: {
+  upload: CreatorUpload;
+  label?: string;
+}) {
   return (
     <a
       className={styles.uploadCard}
@@ -162,6 +168,7 @@ function UploadCard({ upload }: { upload: CreatorUpload }) {
       <div className={styles.uploadBody}>
         <div className={styles.uploadMeta}>
           <span>{upload.creatorName}</span>
+          <span className={styles.mediaType}>{label}</span>
           <span>{formatDate(upload.publishedAt)}</span>
         </div>
         <h3 className={styles.uploadTitle}>{upload.title}</h3>
@@ -209,8 +216,12 @@ export default async function CreatorsPage() {
           A community hub for Auto Chess creators. This page only shows creators
           that are detected as live right now, plus the most recent Dota Auto
           Chess uploads from configured YouTube channels.{" "}
+          <Link href="/streamers" prefetch={false}>
+            Add the Twitch chat command
+          </Link>{" "}
+          for MMR lookups, or{" "}
           <Link href="/support" prefetch={false}>
-            Use the support form
+            use the support form
           </Link>{" "}
           to suggest another creator.
         </p>
@@ -260,7 +271,11 @@ export default async function CreatorsPage() {
             </div>
             <div className={styles.uploadGrid}>
               {liveStreams.map((upload) => (
-                <UploadCard key={upload.id} upload={upload} />
+                <UploadCard
+                  key={upload.id}
+                  upload={upload}
+                  label="Stream replay"
+                />
               ))}
             </div>
           </section>
@@ -278,7 +293,7 @@ export default async function CreatorsPage() {
           {uploads.length > 0 ? (
             <div className={styles.uploadGrid}>
               {uploads.map((upload) => (
-                <UploadCard key={upload.id} upload={upload} />
+                <UploadCard key={upload.id} upload={upload} label="Upload" />
               ))}
             </div>
           ) : (

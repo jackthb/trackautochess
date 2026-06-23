@@ -347,18 +347,6 @@ async function ogHandler(req: Request, ctx: { params: Promise<{ steamId: string 
             <div
               style={{
                 display: "flex",
-                color: "#c94f3d",
-                fontFamily: "JetBrains Mono",
-                fontSize: 18,
-                fontWeight: 700,
-                letterSpacing: 1.2,
-              }}
-            >
-              trackautochess.com
-            </div>
-            <div
-              style={{
-                display: "flex",
                 fontFamily: "JetBrains Mono",
                 fontSize: 54,
                 fontWeight: 700,

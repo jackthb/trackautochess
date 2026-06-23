@@ -2,6 +2,13 @@ import { createClient } from "@supabase/supabase-js";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "./database.generated.types";
 
+const DEFAULT_SUPABASE_URL = "https://ismxtcfkuwpvfyuojnaa.supabase.co";
+const LEGACY_SUPABASE_URL = "https://xkfxykorskdltcmvgihh.supabase.co";
+const DEFAULT_SUPABASE_PUBLISHABLE_KEY =
+  "sb_publishable_C7GbRNcYQPPrCyqAbl0dcA_IAW0wnY-";
+const LEGACY_SUPABASE_PUBLISHABLE_KEY =
+  "sb_publishable_Tk7hBHGJImbtzxxZzEIgKQ_kwnKuCaK";
+
 const SERVER_AUTH_OPTIONS = {
   auth: {
     autoRefreshToken: false,
@@ -16,11 +23,42 @@ let anonClient: DacSupabaseClient | null = null;
 let serviceRoleClient: DacSupabaseClient | null = null;
 let serverClient: DacSupabaseClient | null = null;
 
+function normalizeSupabaseUrl(url: string | undefined): string | null {
+  const trimmed = url?.trim();
+  if (!trimmed) return null;
+  return trimmed.replace(/\/+$/, "") === LEGACY_SUPABASE_URL
+    ? DEFAULT_SUPABASE_URL
+    : trimmed;
+}
+
+function normalizePublishableKey(key: string | undefined): string | null {
+  const trimmed = key?.trim();
+  if (!trimmed) return null;
+  return trimmed === LEGACY_SUPABASE_PUBLISHABLE_KEY
+    ? DEFAULT_SUPABASE_PUBLISHABLE_KEY
+    : trimmed;
+}
+
+function getSupabaseUrl(): string | null {
+  return normalizeSupabaseUrl(
+    process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL,
+  );
+}
+
+function getSupabasePublishableKey(): string | null {
+  return normalizePublishableKey(
+    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ||
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
+      process.env.SUPABASE_PUBLISHABLE_KEY ||
+      process.env.SUPABASE_ANON_KEY,
+  );
+}
+
 export function createSupabaseClient(): DacSupabaseClient {
   if (browserAnonClient) return browserAnonClient;
 
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  const url = getSupabaseUrl();
+  const key = getSupabasePublishableKey();
 
   if (!url || !key) {
     return null as unknown as DacSupabaseClient;
@@ -38,8 +76,8 @@ export function createSupabaseClient(): DacSupabaseClient {
 export function createSupabaseAnonClient(): DacSupabaseClient | null {
   if (anonClient) return anonClient;
 
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  const url = getSupabaseUrl();
+  const key = getSupabasePublishableKey();
 
   if (!url || !key) {
     return null;
@@ -52,7 +90,7 @@ export function createSupabaseAnonClient(): DacSupabaseClient | null {
 export function createSupabaseServiceRoleClient(): DacSupabaseClient | null {
   if (serviceRoleClient) return serviceRoleClient;
 
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const url = getSupabaseUrl();
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
   if (!url || !key) {
@@ -74,10 +112,9 @@ export function createSupabaseServiceRoleClientOrThrow(): DacSupabaseClient {
 export function createSupabaseServerClient(): DacSupabaseClient | null {
   if (serverClient) return serverClient;
 
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const url = getSupabaseUrl();
   const key =
-    process.env.SUPABASE_SERVICE_ROLE_KEY ||
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+    process.env.SUPABASE_SERVICE_ROLE_KEY || getSupabasePublishableKey();
 
   if (!url || !key) {
     return null;

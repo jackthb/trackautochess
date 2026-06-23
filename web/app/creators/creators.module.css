@@ -134,6 +134,13 @@
   color: var(--text-muted);
 }
 
+.mediaType {
+  border: 1px solid color-mix(in srgb, var(--accent) 42%, var(--border));
+  border-radius: var(--r-4);
+  color: var(--accent);
+  padding: 2px 6px;
+}
+
 .creatorName,
 .uploadTitle {
   color: var(--text-primary);

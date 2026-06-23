@@ -93,6 +93,16 @@ const DEFAULT_INCLUDE_TERMS = [
 ];
 
 const DEFAULT_EXCLUDE_TERMS = ["teamfight tactics", "tft", "hearthstone", "battlegrounds"];
+const LIVESTREAM_ARCHIVE_TERMS = [
+  "live",
+  "livestream",
+  "live stream",
+  "stream",
+  "streaming",
+  "стрим",
+  "трансляция",
+  "прямая трансляция",
+];
 const CREATOR_USER_SELECT =
   `${STEAM_ID_TEXT_SELECT}, name, custom_url, avatar_url, stream_link, drodo_mmr, drodo_season_games, drodo_chicken_count, drodo_raw_data, queen_ladder_rank, queen_ladder_last_seen_at` as const;
 
@@ -433,6 +443,13 @@ function publishedTime(upload: CreatorUpload): number {
   return upload.publishedAt ? new Date(upload.publishedAt).getTime() || 0 : 0;
 }
 
+function isLikelyYouTubeLiveStreamArchive(upload: FeedUpload): boolean {
+  const content = upload.searchableText.toLowerCase();
+  return LIVESTREAM_ARCHIVE_TERMS.some((term) =>
+    contentIncludesTerm(content, term)
+  );
+}
+
 async function isYouTubeLiveStreamVideo(url: string): Promise<boolean> {
   try {
     const response = await fetch(url, {
@@ -473,7 +490,11 @@ async function fetchCreatorMedia(
   const classified = await Promise.all(
     feedUploads.map(async ({ searchableText: _searchableText, ...upload }) => ({
       ...upload,
-      isLiveStream: await isYouTubeLiveStreamVideo(upload.url),
+      isLiveStream:
+        isLikelyYouTubeLiveStreamArchive({
+          ...upload,
+          searchableText: _searchableText,
+        }) || (await isYouTubeLiveStreamVideo(upload.url)),
     }))
   );
 
