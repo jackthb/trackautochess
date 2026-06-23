@@ -12,7 +12,6 @@ const {
 const path = require("path");
 const fs = require("fs");
 const os = require("os");
-const https = require("https");
 const { spawn, execFile } = require("child_process");
 const readline = require("readline");
 const { getElectronDesktopPaths } = require("./desktop-paths.cjs");
@@ -127,9 +126,7 @@ const backend = createBackendSupervisor({
 });
 const updater = createUpdater({
   app,
-  https,
   isPackaged: IS_PACKAGED,
-  getTrackerStatus: () => trackerStatus,
   emitEvent: handleBackendEvent,
 });
 const content = createContentIpc({ ipcMain, fs, path, contentDir: CONTENT_DIR, channels: CHANNELS });
@@ -195,8 +192,33 @@ function handleBackendEvent(msg) {
     case "update_available":
       trackerStatus.update = {
         tag: msg.tag,
-        downloadUrl: msg.download_url,
-        htmlUrl: msg.html_url,
+        version: msg.version,
+        state: "available",
+      };
+      break;
+    case "update_download_progress":
+      trackerStatus.update = {
+        ...(trackerStatus.update || {}),
+        version: msg.version || trackerStatus.update?.version,
+        state: "downloading",
+        percent: msg.percent,
+      };
+      break;
+    case "update_downloaded":
+      trackerStatus.update = {
+        tag: msg.tag,
+        version: msg.version,
+        state: "downloaded",
+      };
+      break;
+    case "update_not_available":
+      trackerStatus.update = undefined;
+      break;
+    case "update_error":
+      trackerStatus.update = {
+        ...(trackerStatus.update || {}),
+        state: "error",
+        message: msg.message,
       };
       break;
   }
@@ -284,13 +306,7 @@ ipcMain.on(CHANNELS.window.close, () => {
 
 ipcMain.on(CHANNELS.tracker.command, (_event, cmd) => {
   if (cmd?.cmd === "do_update") {
-    const url = cmd.download_url || cmd.downloadUrl || trackerStatus.update?.downloadUrl || trackerStatus.update?.htmlUrl;
-    if (url) {
-      shell.openExternal(url);
-      handleBackendEvent({ type: "update_apply_requested", backend: "electron", ok: true });
-    } else {
-      handleBackendEvent({ type: "error", message: "No update URL is available." });
-    }
+    updater.installUpdate();
     return;
   }
   backend.send(cmd);

@@ -11,8 +11,7 @@
     "ipc-channels.cjs",
     "desktop-paths.cjs",
     "preload.js",
-    "dist/**/*",
-    "!node_modules/**/*"
+    "dist/**/*"
   ],
   "extraResources": [
     {
@@ -56,6 +55,7 @@
     "icon": "../data/icons/track_auto_chess.png"
   },
   "nsis": {
+    "artifactName": "Track-Auto-Chess-Setup-${version}.${ext}",
     "oneClick": true,
     "perMachine": false,
     "allowToChangeInstallationDirectory": false,

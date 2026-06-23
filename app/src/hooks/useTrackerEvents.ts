@@ -120,6 +120,7 @@ export function useTrackerEvents(
             version: prev?.version ?? "",
             admin_mode: prev?.admin_mode ?? false,
             recording_stats: prev?.recording_stats ?? null,
+            update: prev?.update,
             logged_in: msg.logged_in,
             steam_id: msg.steam_id,
             steam_name: cleanSteamName(msg.steam_name),
@@ -139,6 +140,7 @@ export function useTrackerEvents(
             replay_enabled: prev?.replay_enabled ?? true,
             recording_stats: prev?.recording_stats ?? null,
             admin_mode: prev?.admin_mode ?? false,
+            update: prev?.update,
             logged_in: true,
             steam_id: msg.steam_id,
             steam_name: cleanSteamName(msg.steam_name),
@@ -200,6 +202,65 @@ export function useTrackerEvents(
           break;
         case "nettable_end_board_saved":
           callbacksRef.current.onMatchSaved?.();
+          break;
+        case "update_available":
+          setStatus((prev) =>
+            prev
+              ? {
+                  ...prev,
+                  update: {
+                    state: "available",
+                    tag: msg.tag,
+                    version: msg.version,
+                  },
+                }
+              : prev
+          );
+          break;
+        case "update_download_progress":
+          setStatus((prev) =>
+            prev
+              ? {
+                  ...prev,
+                  update: {
+                    state: "downloading",
+                    version: msg.version || prev.update?.version,
+                    percent: msg.percent,
+                  },
+                }
+              : prev
+          );
+          break;
+        case "update_downloaded":
+          setStatus((prev) =>
+            prev
+              ? {
+                  ...prev,
+                  update: {
+                    state: "downloaded",
+                    tag: msg.tag,
+                    version: msg.version,
+                  },
+                }
+              : prev
+          );
+          break;
+        case "update_not_available":
+          setStatus((prev) => (prev ? { ...prev, update: undefined } : prev));
+          break;
+        case "update_error":
+          setStatus((prev) =>
+            prev
+              ? {
+                  ...prev,
+                  update: {
+                    ...(prev.update || { state: "error" as const }),
+                    state: "error",
+                    message: msg.message,
+                  },
+                }
+              : prev
+          );
           break;
         case "error":
           setProcessingScreenshot(null);

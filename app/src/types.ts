@@ -174,6 +174,14 @@ export interface RecordingStats {
   size_mb: number;
 }
 
+export interface UpdateStatus {
+  state: "available" | "downloading" | "downloaded" | "error";
+  tag?: string;
+  version?: string;
+  percent?: number;
+  message?: string;
+}
+
 export interface TrackerStatus {
   type: "status";
   recording: boolean;
@@ -185,6 +193,7 @@ export interface TrackerStatus {
   admin_mode: boolean;
   replay_enabled: boolean;
   recording_stats: RecordingStats | null;
+  update?: UpdateStatus;
 }
 
 export interface LogEntry {

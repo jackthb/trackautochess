@@ -138,6 +138,46 @@
   white-space: nowrap;
 }
 
+/* ── Status bar ────────────────────────────────────────── */
+
+.status-bar {
+  align-items: center;
+  background: color-mix(in srgb, var(--accent) 10%, var(--bg-surface));
+  border-top: 1px solid color-mix(in srgb, var(--accent) 38%, var(--border));
+  color: var(--text-secondary);
+  display: flex;
+  flex-shrink: 0;
+  gap: 14px;
+  justify-content: center;
+  min-height: 42px;
+  padding: 8px 16px;
+}
+
+.status-bar-message {
+  font-family: var(--font-mono);
+  font-size: var(--fs-12);
+  line-height: var(--lh-normal);
+}
+
+.status-bar-action {
+  background: var(--accent);
+  border: 1px solid var(--accent);
+  border-radius: var(--r-4);
+  color: var(--bg-deep);
+  cursor: pointer;
+  font-family: var(--font-mono);
+  font-size: var(--fs-12);
+  font-weight: var(--fw-semibold);
+  min-height: 28px;
+  padding: 0 12px;
+  transition: background var(--t-base) var(--t-easing), border-color var(--t-base) var(--t-easing);
+}
+
+.status-bar-action:hover {
+  background: var(--accent-hover);
+  border-color: var(--accent-hover);
+}
+
 /* ── Shared: btn-ghost ─────────────────────────────────── */
 
 .btn-ghost {

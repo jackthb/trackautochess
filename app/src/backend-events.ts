@@ -95,6 +95,35 @@ export type UpdateApplyRequestedEvent = WithBackendType<
   GeneratedUpdateApplyRequested,
   "update_apply_requested"
 >;
+export type UpdateAvailableEvent = {
+  type: "update_available";
+  backend: "electron";
+  tag?: string;
+  version?: string;
+};
+export type UpdateDownloadProgressEvent = {
+  type: "update_download_progress";
+  backend: "electron";
+  version?: string;
+  percent: number;
+  transferred?: number;
+  total?: number;
+};
+export type UpdateDownloadedEvent = {
+  type: "update_downloaded";
+  backend: "electron";
+  tag?: string;
+  version?: string;
+};
+export type UpdateNotAvailableEvent = {
+  type: "update_not_available";
+  backend: "electron";
+};
+export type UpdateErrorEvent = {
+  type: "update_error";
+  backend: "electron";
+  message: string;
+};
 
 export type DiagnosticsUploadedEvent = Omit<
   WithBackendType<GeneratedDiagnosticsUploaded, "diagnostics_uploaded">,
@@ -221,6 +250,11 @@ export type BackendEvent =
   | SteamLoginEvent
   | SteamLogoutEvent
   | UpdateApplyRequestedEvent
+  | UpdateAvailableEvent
+  | UpdateDownloadProgressEvent
+  | UpdateDownloadedEvent
+  | UpdateNotAvailableEvent
+  | UpdateErrorEvent
   | DiagnosticsUploadedEvent
   | NettableRowsEvent
   | NettableStateEvent

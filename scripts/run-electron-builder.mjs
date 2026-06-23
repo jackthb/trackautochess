@@ -1,5 +1,5 @@
 import path from "node:path";
-import { existsSync, readFileSync } from "node:fs";
+import { cpSync, existsSync, lstatSync, mkdirSync, readFileSync, rmSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { spawn } from "node:child_process";
 import { createRequire } from "node:module";
@@ -16,6 +16,53 @@ if (!existsSync(appNodeModulesDir)) {
   );
   process.exit(1);
 }
+
+const runtimeDependencies = [
+  "electron-updater",
+  "builder-util-runtime",
+  "argparse",
+  "debug",
+  "fs-extra",
+  "graceful-fs",
+  "js-yaml",
+  "jsonfile",
+  "lazy-val",
+  "lodash.escaperegexp",
+  "lodash.isequal",
+  "ms",
+  "sax",
+  "semver",
+  "tiny-typed-emitter",
+  "universalify",
+];
+
+function ensureRuntimeDependencyCopies() {
+  const rootNodeModulesDir = path.join(repoDir, "node_modules");
+  mkdirSync(appNodeModulesDir, { recursive: true });
+
+  for (const name of runtimeDependencies) {
+    const source = path.join(rootNodeModulesDir, name);
+    const target = path.join(appNodeModulesDir, name);
+    if (!existsSync(source)) continue;
+    if (existsSync(target)) {
+      try {
+        if (lstatSync(target).isSymbolicLink()) {
+          rmSync(target, { recursive: true, force: true });
+        }
+      } catch {
+        continue;
+      }
+    }
+
+    try {
+      cpSync(source, target, { recursive: true, dereference: true, force: true });
+    } catch (error) {
+      console.warn(`Unable to copy runtime dependency ${name}: ${error.message}`);
+    }
+  }
+}
+
+ensureRuntimeDependencyCopies();
 const args = process.argv.slice(2);
 const signingConfigured = Boolean(
   process.env.WIN_CSC_LINK ||

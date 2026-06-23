@@ -1,77 +1,104 @@
 const UPDATE_CHECK_INTERVAL_MS = 6 * 3600 * 1000;
-const GITHUB_RELEASES_API = "https://api.github.com/repos/jackthb/dac-tools/releases/latest";
 
-function parseSemver(tag) {
-  const match = String(tag || "").match(/^v?(\d+)\.(\d+)\.(\d+)/);
-  return match ? match.slice(1).map((part) => Number.parseInt(part, 10)) : [0, 0, 0];
-}
+function createUpdater({ app, isPackaged, emitEvent }) {
+  let autoUpdater = null;
+  let updateDownloaded = false;
+  let latestVersion = "";
 
-function isNewerVersion(remoteTag, currentVersion) {
-  const remote = parseSemver(remoteTag);
-  const current = parseSemver(currentVersion);
-  for (let i = 0; i < 3; i += 1) {
-    if (remote[i] > current[i]) return true;
-    if (remote[i] < current[i]) return false;
+  function emit(payload) {
+    emitEvent(payload);
   }
-  return false;
-}
 
-function fetchJson(https, url) {
-  return new Promise((resolve, reject) => {
-    const req = https.get(
-      url,
-      {
-        headers: {
-          Accept: "application/vnd.github.v3+json",
-          "User-Agent": "Track-Auto-Chess-Updater",
-        },
-        timeout: 15000,
-      },
-      (res) => {
-        let body = "";
-        res.setEncoding("utf8");
-        res.on("data", (chunk) => {
-          body += chunk;
-        });
-        res.on("end", () => {
-          if (res.statusCode < 200 || res.statusCode >= 300) {
-            reject(new Error(`GitHub releases API returned ${res.statusCode}`));
-            return;
-          }
-          try {
-            resolve(JSON.parse(body));
-          } catch (e) {
-            reject(e);
-          }
-        });
-      },
-    );
-    req.on("timeout", () => req.destroy(new Error("GitHub releases API timed out")));
-    req.on("error", reject);
-  });
-}
+  function getUpdater() {
+    if (!isPackaged) return null;
+    if (autoUpdater) return autoUpdater;
 
-function createUpdater({ app, https, isPackaged, getTrackerStatus, emitEvent }) {
-  async function checkForUpdate() {
-    if (!isPackaged) return;
     try {
-      const data = await fetchJson(https, GITHUB_RELEASES_API);
-      const remoteTag = data?.tag_name || "";
-      if (!remoteTag || !isNewerVersion(remoteTag, app.getVersion())) return;
-      const asset = (data.assets || []).find((item) =>
-        String(item?.name || "").toLowerCase().endsWith(".exe"),
-      );
-      if (!asset?.browser_download_url) return;
-      if (getTrackerStatus().update?.tag === remoteTag) return;
-      emitEvent({
-        type: "update_available",
-        tag: remoteTag,
-        download_url: asset.browser_download_url,
-        html_url: data.html_url || "",
-      });
-    } catch (e) {
-      console.error("Update check failed:", e);
+      ({ autoUpdater } = require("electron-updater"));
+    } catch (error) {
+      console.error("Failed to load electron-updater:", error);
+      return null;
     }
+
+    autoUpdater.autoDownload = true;
+    autoUpdater.autoInstallOnAppQuit = true;
+    autoUpdater.logger = console;
+
+    autoUpdater.on("checking-for-update", () => {
+      emit({ type: "update_checking", backend: "electron" });
+    });
+
+    autoUpdater.on("update-available", (info) => {
+      latestVersion = info?.version || "";
+      updateDownloaded = false;
+      emit({
+        type: "update_available",
+        backend: "electron",
+        tag: latestVersion ? `v${latestVersion}` : "",
+        version: latestVersion,
+      });
+    });
+
+    autoUpdater.on("update-not-available", () => {
+      emit({ type: "update_not_available", backend: "electron" });
+    });
+
+    autoUpdater.on("download-progress", (progress) => {
+      emit({
+        type: "update_download_progress",
+        backend: "electron",
+        version: latestVersion,
+        percent: Math.max(0, Math.min(100, progress?.percent || 0)),
+        transferred: progress?.transferred || 0,
+        total: progress?.total || 0,
+      });
+    });
+
+    autoUpdater.on("update-downloaded", (info) => {
+      latestVersion = info?.version || latestVersion;
+      updateDownloaded = true;
+      emit({
+        type: "update_downloaded",
+        backend: "electron",
+        tag: latestVersion ? `v${latestVersion}` : "",
+        version: latestVersion,
+      });
+    });
+
+    autoUpdater.on("error", (error) => {
+      emit({
+        type: "update_error",
+        backend: "electron",
+        message: error?.message || String(error),
+      });
+    });
+
+    return autoUpdater;
+  }
+
+  async function checkForUpdate() {
+    const updater = getUpdater();
+    if (!updater) return;
+    try {
+      await updater.checkForUpdates();
+    } catch (error) {
+      console.error("Update check failed:", error);
+    }
+  }
+
+  function installUpdate() {
+    const updater = getUpdater();
+    if (!updater) {
+      emit({ type: "error", message: "Auto updater is unavailable." });
+      return false;
+    }
+    if (!updateDownloaded) {
+      emit({ type: "error", message: "No downloaded update is ready to install." });
+      return false;
+    }
+    emit({ type: "update_apply_requested", backend: "electron", ok: true });
+    setImmediate(() => updater.quitAndInstall(false, true));
+    return true;
   }
 
   function start() {
@@ -80,13 +107,9 @@ function createUpdater({ app, https, isPackaged, getTrackerStatus, emitEvent }) 
     setInterval(checkForUpdate, UPDATE_CHECK_INTERVAL_MS);
   }
 
-  return { start, checkForUpdate };
+  return { start, checkForUpdate, installUpdate };
 }
 
 module.exports = {
-  GITHUB_RELEASES_API,
-  parseSemver,
-  isNewerVersion,
-  fetchJson,
   createUpdater,
 };

@@ -22,12 +22,13 @@
     "electron": "^33.0.0",
     "electron-builder": "^26.8.1",
     "lightningcss-linux-x64-gnu": "1.32.0",
+    "posthog-js": "^1.373.4",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
     "typescript": "^5.9.3",
     "vite": "^8.0.0"
   },
   "dependencies": {
-    "posthog-js": "^1.373.4",
-    "react": "^19.2.4",
-    "react-dom": "^19.2.4"
+    "electron-updater": "^6.8.9"
   }
 }
