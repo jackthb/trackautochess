@@ -6,7 +6,7 @@
     "build": "npm run build:desktop",
     "build:desktop": "pnpm --dir app run build",
     "build:desktop:backend": "pnpm --dir app run build:backend",
-    "build:desktop:installer": "node scripts/run-electron-builder.mjs --win",
+    "build:desktop:installer": "node scripts/run-electron-builder.mjs --win --publish never",
     "build:desktop:installer:linux": "node scripts/run-electron-builder.mjs --linux AppImage",
     "build:desktop:installer:dir": "node scripts/run-electron-builder.mjs --dir",
     "build:desktop:all": "pnpm --dir app run build:all",
