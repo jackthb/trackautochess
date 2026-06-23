@@ -234,67 +234,6 @@ export default async function CreatorsPage() {
         {error && <p className={styles.notice}>{error}</p>}
 
         <section
-          id="chatbot-commands"
-          className={styles.section}
-          aria-labelledby="chatbot-commands-heading"
-        >
-          <div className={styles.sectionHeader}>
-            <h2 id="chatbot-commands-heading" className={styles.sectionTitle}>
-              Twitch chat commands
-            </h2>
-            <span className={styles.sectionKicker}>MMR lookup</span>
-          </div>
-          <div className={styles.commandStack}>
-            <div className={styles.commandIntro}>
-              <p>
-                Add an <code>!mmr</code> command to Twitch chat so viewers can
-                look up Dota Auto Chess MMR from a Steam ID64, Steam profile
-                URL, or Steam vanity name.
-              </p>
-              <div className={styles.example}>
-                <span>Chat usage</span>
-                <CodeBlock>{`!mmr 76561198000000000
-!mmr https://steamcommunity.com/id/someone
-!mmr someone`}</CodeBlock>
-              </div>
-            </div>
-
-            <div className={styles.commandGrid}>
-              <article className={styles.commandCard}>
-                <h3>Nightbot</h3>
-                <CodeBlock>
-                  {
-                    "!commands add !mmr $(urlfetch https://www.trackautochess.com/api/twitch/mmr?steam=$(querystring))"
-                  }
-                </CodeBlock>
-              </article>
-
-              <article className={styles.commandCard}>
-                <h3>StreamElements</h3>
-                <p>
-                  In the StreamElements dashboard, set the command response to
-                  this and use a Steam ID64 or Steam vanity name:
-                </p>
-                <CodeBlock>
-                  {
-                    "${customapi.https://www.trackautochess.com/api/twitch/${1}/mmr}"
-                  }
-                </CodeBlock>
-              </article>
-
-              <article className={styles.commandCard}>
-                <h3>Streamlabs</h3>
-                <p>
-                  Create a custom command named <code>!mmr</code> and use the
-                  command argument text as the <code>steam</code> query value.
-                </p>
-                <CodeBlock>{`${chatbotEndpoint}<command arguments>`}</CodeBlock>
-              </article>
-            </div>
-          </div>
-        </section>
-
-        <section
           className={styles.section}
           aria-labelledby="live-streams-heading"
         >
@@ -371,6 +310,63 @@ export default async function CreatorsPage() {
             </div>
           )}
         </section>
+
+        <details id="chatbot-commands" className={styles.commandDetails}>
+          <summary className={styles.commandSummary}>
+            <span id="chatbot-commands-heading" className={styles.sectionTitle}>
+              Twitch chat commands
+            </span>
+            <span className={styles.sectionKicker}>MMR lookup</span>
+          </summary>
+          <div className={styles.commandStack}>
+            <div className={styles.commandIntro}>
+              <p>
+                Add an <code>!mmr</code> command to Twitch chat so viewers can
+                look up Dota Auto Chess MMR from a Steam ID64, Steam profile
+                URL, or Steam vanity name.
+              </p>
+              <div className={styles.example}>
+                <span>Chat usage</span>
+                <CodeBlock>{`!mmr 76561198000000000
+!mmr https://steamcommunity.com/id/someone
+!mmr someone`}</CodeBlock>
+              </div>
+            </div>
+
+            <div className={styles.commandGrid}>
+              <article className={styles.commandCard}>
+                <h3>Nightbot</h3>
+                <CodeBlock>
+                  {
+                    "!commands add !mmr $(urlfetch https://www.trackautochess.com/api/twitch/mmr?steam=$(querystring))"
+                  }
+                </CodeBlock>
+              </article>
+
+              <article className={styles.commandCard}>
+                <h3>StreamElements</h3>
+                <p>
+                  In the StreamElements dashboard, set the command response to
+                  this and use a Steam ID64 or Steam vanity name:
+                </p>
+                <CodeBlock>
+                  {
+                    "${customapi.https://www.trackautochess.com/api/twitch/${1}/mmr}"
+                  }
+                </CodeBlock>
+              </article>
+
+              <article className={styles.commandCard}>
+                <h3>Streamlabs</h3>
+                <p>
+                  Create a custom command named <code>!mmr</code> and use the
+                  command argument text as the <code>steam</code> query value.
+                </p>
+                <CodeBlock>{`${chatbotEndpoint}<command arguments>`}</CodeBlock>
+              </article>
+            </div>
+          </div>
+        </details>
       </PageLayout>
     </>
   );
