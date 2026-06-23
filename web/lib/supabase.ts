@@ -40,18 +40,11 @@ function normalizePublishableKey(key: string | undefined): string | null {
 }
 
 function getSupabaseUrl(): string | null {
-  return normalizeSupabaseUrl(
-    process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL,
-  );
+  return normalizeSupabaseUrl(process.env.NEXT_PUBLIC_SUPABASE_URL);
 }
 
 function getSupabasePublishableKey(): string | null {
-  return normalizePublishableKey(
-    process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ||
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
-      process.env.SUPABASE_PUBLISHABLE_KEY ||
-      process.env.SUPABASE_ANON_KEY,
-  );
+  return normalizePublishableKey(process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
 }
 
 export function createSupabaseClient(): DacSupabaseClient {
