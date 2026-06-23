@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import HomeSearch from "@/components/home/HomeSearch";
+import { fetchDotaAutoChessMetrics } from "@/lib/customGameStats";
 import { absoluteUrl, SITE_DESCRIPTION, SITE_NAME, SITE_TITLE } from "@/lib/site";
 
 export const revalidate = 300;
@@ -59,14 +60,16 @@ const structuredData = [
   },
 ];
 
-export default function HomePage() {
+export default async function HomePage() {
+  const metrics = await fetchDotaAutoChessMetrics();
+
   return (
     <>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
       />
-      <HomeSearch />
+      <HomeSearch metrics={metrics} />
     </>
   );
 }

@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import type { User } from "@supabase/supabase-js";
 import { ProfileSearch } from "@/components/ProfileSearch";
 import { SteamSignInButton } from "@/components/SteamSignInButton";
+import type { CustomGameMetrics } from "@/lib/customGameStats";
 import { createSupabaseClient } from "@/lib/supabase";
 import { playerProfilePath } from "@/lib/steam";
 import styles from "./HomeSearch.module.css";
@@ -18,7 +19,15 @@ const t = {
   viewProfile: "View your profile",
 };
 
-export default function HomeSearch() {
+function formatMetric(value: number): string {
+  return value.toLocaleString("en-US");
+}
+
+export default function HomeSearch({
+  metrics,
+}: {
+  metrics: CustomGameMetrics | null;
+}) {
   // Mirror the nav's auth check (AppNavBar): once we know the visitor is signed
   // in, the hero's "Sign in through Steam" CTA is wrong — swap it for a link to
   // their own profile. Gate on `authReady` so logged-in users never flash the
@@ -121,6 +130,28 @@ export default function HomeSearch() {
               exampleUrl="https://steamcommunity.com/profiles/76561198022169086"
             />
           </div>
+
+          {metrics && (
+            <a
+              className={styles.liveStats}
+              href={`https://www.customgamestats.com/games/${metrics.id}`}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <span>
+                <strong>{formatMetric(metrics.playerCount)}</strong>
+                active players
+              </span>
+              <span>
+                <strong>{formatMetric(metrics.dailyPeak)}</strong>
+                today peak
+              </span>
+              <span>
+                <strong>{formatMetric(metrics.allTimePeak)}</strong>
+                all-time peak
+              </span>
+            </a>
+          )}
         </main>
       </div>
     </div>

@@ -153,6 +153,41 @@
   opacity: 0;
   animation: arrive 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.72s forwards;
 }
+.liveStats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1px;
+  width: min(100%, 560px);
+  margin-top: 20px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: var(--r-8);
+  background: var(--border);
+  text-decoration: none;
+  opacity: 0;
+  animation: arrive 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.78s forwards;
+}
+.liveStats span {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 4px;
+  background: rgba(13, 15, 18, 0.82);
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: var(--fs-11);
+  letter-spacing: 0.9px;
+  padding: 12px 10px;
+  text-transform: uppercase;
+}
+.liveStats strong {
+  color: var(--text-primary);
+  font-size: var(--fs-16);
+  letter-spacing: 0;
+}
+.liveStats:hover span {
+  background: var(--bg-elevated);
+}
 .signinDivider::before,
 .signinDivider::after {
   content: "";
@@ -212,6 +247,9 @@
   }
   .title {
     letter-spacing: 6px;
+  }
+  .liveStats {
+    grid-template-columns: 1fr;
   }
 }
 
