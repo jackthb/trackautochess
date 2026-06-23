@@ -271,9 +271,13 @@ export default async function CreatorsPage() {
 
               <article className={styles.commandCard}>
                 <h3>StreamElements</h3>
+                <p>
+                  In the StreamElements dashboard, set the command response to
+                  this and use a Steam ID64 or Steam vanity name:
+                </p>
                 <CodeBlock>
                   {
-                    "!command add !mmr $(customapi https://www.trackautochess.com/api/twitch/mmr?steam=$(queryescape $(args)))"
+                    "${customapi.https://www.trackautochess.com/api/twitch/${1}/mmr}"
                   }
                 </CodeBlock>
               </article>
