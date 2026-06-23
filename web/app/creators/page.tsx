@@ -17,7 +17,7 @@ const description =
 
 const chatbotEndpoint = "https://www.trackautochess.com/api/twitch/mmr?steam=";
 const streamElementsCommandUrl =
-  "https://streamelements.com/dashboard/bot/commands/custom?data=%7B%22cooldown%22%3A%7B%22user%22%3A15%2C%22global%22%3A5%7D%2C%22aliases%22%3A%5B%5D%2C%22keywords%22%3A%5B%5D%2C%22titleKeywords%22%3A%5B%5D%2C%22enabled%22%3Atrue%2C%22enabledOnline%22%3Atrue%2C%22enabledOffline%22%3Atrue%2C%22hidden%22%3Afalse%2C%22cost%22%3A0%2C%22type%22%3A%22say%22%2C%22accessLevel%22%3A100%2C%22command%22%3A%22mmr%22%2C%22reply%22%3A%22%24%7Bcustomapi.https%3A%2F%2Fwww.trackautochess.com%2Fapi%2Ftwitch%2F%24%7B1%7D%2Fmmr%7D%22%2C%22regex%22%3A%22%22%7D";
+  "https://streamelements.com/dashboard/bot/commands/custom?data=JTdCJTIyY29vbGRvd24lMjIlM0ElN0IlMjJ1c2VyJTIyJTNBMTUlMkMlMjJnbG9iYWwlMjIlM0E1JTdEJTJDJTIyYWxpYXNlcyUyMiUzQSU1QiU1RCUyQyUyMmtleXdvcmRzJTIyJTNBJTVCJTVEJTJDJTIydGl0bGVLZXl3b3JkcyUyMiUzQSU1QiU1RCUyQyUyMmVuYWJsZWQlMjIlM0F0cnVlJTJDJTIyZW5hYmxlZE9ubGluZSUyMiUzQXRydWUlMkMlMjJlbmFibGVkT2ZmbGluZSUyMiUzQXRydWUlMkMlMjJoaWRkZW4lMjIlM0FmYWxzZSUyQyUyMmNvc3QlMjIlM0EwJTJDJTIydHlwZSUyMiUzQSUyMnNheSUyJTJDJTIyYWNjZXNzTGV2ZWwlMjIlM0ExMDAlMkMlMjJjb21tYW5kJTIyJTNBJTIybW1yJTIyJTJDJTIycmVwbHklMjIlM0ElMjIlMjQlN0JjdXN0b21hcGkuaHR0cHMlM0ElMkYlMkZ3d3cudHJhY2thdXRvY2hlc3MuY29tJTJGYXBpJTJGdHdpdGNoJTJGJTI0JTdCMSU3RCUyRm1tciU3RCUyMiUyQyUyMnJlZ2V4JTIyJTNBJTIyJTIyJTdE";
 
 export const metadata: Metadata = {
   title,
