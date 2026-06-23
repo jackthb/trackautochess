@@ -72,7 +72,7 @@ const signingConfigured = Boolean(
 );
 const effectiveArgs = signingConfigured
   ? args
-  : [...args, "--config.win.signAndEditExecutable=false"];
+  : [...args, "--config.win.signExecutable=false"];
 
 function resolveElectronBuilderCli() {
   const require = createRequire(import.meta.url);
