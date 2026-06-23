@@ -78,8 +78,7 @@ const CREATOR_FEED_REVALIDATE_SECONDS = 900;
 export const CREATOR_LIVE_STREAM_REVALIDATE_SECONDS = 300;
 const CREATOR_LIVE_STREAM_TIMEOUT_MS = 1500;
 const MAX_FEED_ENTRIES_PER_CREATOR = 12;
-const MAX_UPLOADS_PER_CREATOR = 5;
-const MAX_LIVE_STREAMS_PER_CREATOR = 1;
+const MAX_MEDIA_PER_CREATOR = 3;
 export const MAX_CREATOR_UPLOADS = 30;
 
 const DEFAULT_INCLUDE_TERMS = [
@@ -497,17 +496,20 @@ async function fetchCreatorMedia(
         }) || (await isYouTubeLiveStreamVideo(upload.url)),
     }))
   );
+  const sorted = classified.sort((a, b) => publishedTime(b) - publishedTime(a));
+  const normalUploads = sorted.filter((upload) => !upload.isLiveStream);
+  const streamReplays = sorted.filter((upload) => upload.isLiveStream);
+  const selected = [
+    ...normalUploads,
+    ...streamReplays,
+  ].slice(0, MAX_MEDIA_PER_CREATOR);
 
-  const uploads = classified
+  const uploads = selected
     .filter((upload) => !upload.isLiveStream)
-    .sort((a, b) => publishedTime(b) - publishedTime(a))
-    .slice(0, MAX_UPLOADS_PER_CREATOR)
     .map(({ isLiveStream: _isLiveStream, ...upload }) => upload);
 
-  const liveStreams = classified
+  const liveStreams = selected
     .filter((upload) => upload.isLiveStream)
-    .sort((a, b) => publishedTime(b) - publishedTime(a))
-    .slice(0, MAX_LIVE_STREAMS_PER_CREATOR)
     .map(({ isLiveStream: _isLiveStream, ...upload }) => upload);
 
   return { uploads, liveStreams };

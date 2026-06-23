@@ -6,7 +6,6 @@ export interface CustomGameMetrics {
   playerCount: number;
   spectatorCount: number;
   dailyPeak: number;
-  allTimePeak: number;
   subscriptions: number;
   favorites: number;
   lastUpdate: string | null;
@@ -17,7 +16,6 @@ interface CustomGameMetricsPayload {
   player_count?: number;
   spectator_count?: number;
   dailyPeak?: number;
-  allTimePeak?: number;
   subscriptions?: number;
   favorites?: number;
   last_update?: number;
@@ -45,7 +43,6 @@ export async function fetchDotaAutoChessMetrics(): Promise<CustomGameMetrics | n
       playerCount: numeric(payload.player_count),
       spectatorCount: numeric(payload.spectator_count),
       dailyPeak: numeric(payload.dailyPeak),
-      allTimePeak: numeric(payload.allTimePeak),
       subscriptions: numeric(payload.subscriptions),
       favorites: numeric(payload.favorites),
       lastUpdate: payload.last_update

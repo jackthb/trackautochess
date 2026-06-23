@@ -214,8 +214,8 @@ export default async function CreatorsPage() {
       <PageLayout title="Creators">
         <p className={styles.lead}>
           A community hub for Auto Chess creators. This page only shows creators
-          that are detected as live right now, plus the most recent Dota Auto
-          Chess uploads from configured YouTube channels.{" "}
+          that are detected as live right now, plus recent Dota Auto Chess
+          videos from configured YouTube channels.{" "}
           <Link href="/streamers" prefetch={false}>
             Add the Twitch chat command
           </Link>{" "}
@@ -266,7 +266,7 @@ export default async function CreatorsPage() {
                 Recent YouTube live streams
               </h2>
               <span className={styles.sectionKicker}>
-                Latest per creator
+                Replays used when uploads are sparse
               </span>
             </div>
             <div className={styles.uploadGrid}>
