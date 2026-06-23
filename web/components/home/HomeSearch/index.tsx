@@ -23,16 +23,6 @@ function formatMetric(value: number): string {
   return value.toLocaleString("en-US");
 }
 
-function formatMetricTime(value: string | null): string {
-  if (!value) return "recently";
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return "recently";
-  return new Intl.DateTimeFormat(undefined, {
-    hour: "numeric",
-    minute: "2-digit",
-  }).format(date);
-}
-
 export default function HomeSearch({
   metrics,
 }: {
@@ -155,10 +145,6 @@ export default function HomeSearch({
               <span>
                 <strong>{formatMetric(metrics.dailyPeak)}</strong>
                 today peak
-              </span>
-              <span>
-                <strong>{formatMetricTime(metrics.lastUpdate)}</strong>
-                your time
               </span>
             </a>
           )}
