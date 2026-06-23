@@ -16,6 +16,8 @@ const description =
   "Find live Dota Auto Chess creators, latest community uploads, and Twitch chatbot commands in one Track Auto Chess feed.";
 
 const chatbotEndpoint = "https://www.trackautochess.com/api/twitch/mmr?steam=";
+const streamElementsCommandUrl =
+  "https://streamelements.com/dashboard/bot/commands/custom?data=%7B%22cooldown%22%3A%7B%22user%22%3A15%2C%22global%22%3A5%7D%2C%22aliases%22%3A%5B%5D%2C%22keywords%22%3A%5B%5D%2C%22titleKeywords%22%3A%5B%5D%2C%22enabled%22%3Atrue%2C%22enabledOnline%22%3Atrue%2C%22enabledOffline%22%3Atrue%2C%22hidden%22%3Afalse%2C%22cost%22%3A0%2C%22type%22%3A%22say%22%2C%22accessLevel%22%3A100%2C%22command%22%3A%22mmr%22%2C%22reply%22%3A%22%24%7Bcustomapi.https%3A%2F%2Fwww.trackautochess.com%2Fapi%2Ftwitch%2F%24%7B1%7D%2Fmmr%7D%22%2C%22regex%22%3A%22%22%7D";
 
 export const metadata: Metadata = {
   title,
@@ -354,6 +356,14 @@ export default async function CreatorsPage() {
                     "${customapi.https://www.trackautochess.com/api/twitch/${1}/mmr}"
                   }
                 </CodeBlock>
+                <a
+                  className={styles.commandLink}
+                  href={streamElementsCommandUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Open StreamElements setup
+                </a>
               </article>
 
               <article className={styles.commandCard}>

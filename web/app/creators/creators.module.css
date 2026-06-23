@@ -148,6 +148,27 @@
   text-transform: uppercase;
 }
 
+.commandLink {
+  align-items: center;
+  border: 1px solid var(--border);
+  border-radius: var(--r-6);
+  color: var(--text-primary);
+  display: inline-flex;
+  font-family: var(--font-mono);
+  font-size: var(--fs-12);
+  justify-content: center;
+  margin-top: 12px;
+  min-height: 34px;
+  padding: 0 12px;
+  text-decoration: none;
+  transition: border-color 0.15s ease, color 0.15s ease, background 0.15s ease;
+}
+
+.commandLink:hover {
+  background: var(--bg-elevated);
+  border-color: color-mix(in srgb, var(--accent) 60%, var(--border));
+}
+
 .code {
   margin: 0;
   overflow-x: auto;
