@@ -13,7 +13,9 @@ import styles from "./creators.module.css";
 
 const title = `Creators | ${SITE_TITLE}`;
 const description =
-  "Find live Dota Auto Chess creators and the latest community uploads in one Track Auto Chess feed.";
+  "Find live Dota Auto Chess creators, latest community uploads, and Twitch chatbot commands in one Track Auto Chess feed.";
+
+const chatbotEndpoint = "https://www.trackautochess.com/api/twitch/mmr?steam=";
 
 export const metadata: Metadata = {
   title,
@@ -74,6 +76,10 @@ function youtubeEmbedUrl(videoUrl: string): string | null {
   } catch {
     return null;
   }
+}
+
+function CodeBlock({ children }: { children: string }) {
+  return <pre className={styles.code}>{children}</pre>;
 }
 
 function StreamCard({ stream }: { stream: CreatorLiveStream }) {
@@ -216,7 +222,7 @@ export default async function CreatorsPage() {
           A community hub for Auto Chess creators. This page only shows creators
           that are detected as live right now, plus recent Dota Auto Chess
           videos from configured YouTube channels.{" "}
-          <Link href="/streamers" prefetch={false}>
+          <Link href="#chatbot-commands" prefetch={false}>
             Add the Twitch chat command
           </Link>{" "}
           for MMR lookups, or{" "}
@@ -226,6 +232,63 @@ export default async function CreatorsPage() {
           to suggest another creator.
         </p>
         {error && <p className={styles.notice}>{error}</p>}
+
+        <section
+          id="chatbot-commands"
+          className={styles.section}
+          aria-labelledby="chatbot-commands-heading"
+        >
+          <div className={styles.sectionHeader}>
+            <h2 id="chatbot-commands-heading" className={styles.sectionTitle}>
+              Twitch chat commands
+            </h2>
+            <span className={styles.sectionKicker}>MMR lookup</span>
+          </div>
+          <div className={styles.commandStack}>
+            <div className={styles.commandIntro}>
+              <p>
+                Add an <code>!mmr</code> command to Twitch chat so viewers can
+                look up Dota Auto Chess MMR from a Steam ID64, Steam profile
+                URL, or Steam vanity name.
+              </p>
+              <div className={styles.example}>
+                <span>Chat usage</span>
+                <CodeBlock>{`!mmr 76561198000000000
+!mmr https://steamcommunity.com/id/someone
+!mmr someone`}</CodeBlock>
+              </div>
+            </div>
+
+            <div className={styles.commandGrid}>
+              <article className={styles.commandCard}>
+                <h3>Nightbot</h3>
+                <CodeBlock>
+                  {
+                    "!commands add !mmr $(urlfetch https://www.trackautochess.com/api/twitch/mmr?steam=$(querystring))"
+                  }
+                </CodeBlock>
+              </article>
+
+              <article className={styles.commandCard}>
+                <h3>StreamElements</h3>
+                <CodeBlock>
+                  {
+                    "!command add !mmr $(customapi https://www.trackautochess.com/api/twitch/mmr?steam=$(queryescape $(args)))"
+                  }
+                </CodeBlock>
+              </article>
+
+              <article className={styles.commandCard}>
+                <h3>Streamlabs</h3>
+                <p>
+                  Create a custom command named <code>!mmr</code> and use the
+                  command argument text as the <code>steam</code> query value.
+                </p>
+                <CodeBlock>{`${chatbotEndpoint}<command arguments>`}</CodeBlock>
+              </article>
+            </div>
+          </div>
+        </section>
 
         <section
           className={styles.section}
