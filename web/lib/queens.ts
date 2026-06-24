@@ -76,12 +76,37 @@ function dedupeQueenRanks(rows: QueenRow[]): QueenRow[] {
 export function selectDisplayedQueens(rows: QueenRow[]): QueenRow[] {
   const rankedRows = rows
     .filter((row) => row.queen_ladder_rank != null)
-    .sort(compareQueenRows)
+    .sort(compareQueenRows);
+  return dedupeQueenRanks(rankedRows).slice(0, QUEEN_TABLE_LIMIT);
+}
+
+export function selectQueensRefreshRows(rows: QueenRow[]): QueenRow[] {
+  const displayed = selectDisplayedQueens(rows);
+  const bySteamId = new Map(displayed.map((row) => [row.steam_id, row]));
+  const topRankCounts = new Map<number, number>();
+
+  for (const row of rows) {
+    const rank = effectiveQueenRank(row);
+    if (rank == null || rank > QUEEN_TABLE_LIMIT) continue;
+    topRankCounts.set(rank, (topRankCounts.get(rank) ?? 0) + 1);
+  }
+
+  const duplicateRankRows = rows
     .filter((row) => {
       const rank = effectiveQueenRank(row);
-      return rank == null || rank <= QUEEN_TABLE_LIMIT;
-    });
-  return dedupeQueenRanks(rankedRows).slice(0, QUEEN_TABLE_LIMIT);
+      return (
+        rank != null &&
+        rank <= QUEEN_TABLE_LIMIT &&
+        (topRankCounts.get(rank) ?? 0) > 1
+      );
+    })
+    .sort(compareQueenRows);
+
+  for (const row of duplicateRankRows) {
+    bySteamId.set(row.steam_id, row);
+  }
+
+  return [...bySteamId.values()];
 }
 
 function normalizeQueenRows(rows: QueenRow[]): QueenRow[] {

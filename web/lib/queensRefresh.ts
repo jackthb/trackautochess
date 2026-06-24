@@ -1,6 +1,6 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { fetchAndCacheDrodoBatch, summarizeDrodoResults } from "@/lib/drodo";
-import { loadQueenCandidates, selectDisplayedQueens } from "@/lib/queens";
+import { loadQueenCandidates, selectQueensRefreshRows } from "@/lib/queens";
 import type { QueenRevalidationTarget } from "@/lib/queensRevalidate";
 import { QUEENS_REFRESH_COOLDOWN_MS } from "@/lib/queensVisitor";
 
@@ -44,9 +44,9 @@ async function runQueensRefresh(
 ): Promise<QueensRefreshSummary> {
   const floorMs = options.floorMs ?? QUEENS_REFRESH_COOLDOWN_MS;
 
-  // Match /queens exactly: same candidate query, ordering, tiebreakers,
-  // dedupe, and visible-table cap. If a row is displayed, this can refresh it.
-  const rows = selectDisplayedQueens(await loadQueenCandidates(supabase));
+  // Refresh displayed rows plus every candidate involved in a duplicate
+  // top-100 rank, so stale collisions get resolved instead of only hidden.
+  const rows = selectQueensRefreshRows(await loadQueenCandidates(supabase));
   if (rows.length === 0) {
     return {
       polled: 0,
