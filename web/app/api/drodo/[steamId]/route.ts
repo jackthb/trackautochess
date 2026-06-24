@@ -106,10 +106,12 @@ async function handle(req: Request, ctx: { params: Promise<{ steamId: string }> 
   // someone else, while normal cross-profile refreshes are daily per profile.
   // Admins bypass the quota.
   let refreshQuota: ManualRefreshQuota | undefined;
+  let forceSteamProfileRefresh = false;
   if (forceRefresh) {
     const session = await getSessionUser(reqShim, supabase);
     const isOwnProfile = session.steamId === steamId;
     const isAdmin = isAdminSteamId(session.steamId);
+    forceSteamProfileRefresh = isAdmin;
     let cachedProfileRow: CachedUserDrodoRow | null = null;
     if (supabase && !isOwnProfile) {
       cachedProfileRow = await loadCachedDrodoRow(supabase, steamId);
@@ -162,11 +164,13 @@ async function handle(req: Request, ctx: { params: Promise<{ steamId: string }> 
     snapshotOnSuccess: true,
     onQueenChange: revalidateQueenPages,
   });
+  const steamProfile = forceRefresh
+    ? await fetchSteamProfile(steamId, supabase ?? undefined, {
+        force: forceSteamProfileRefresh,
+      })
+    : null;
 
   if (result.kind === "profile") {
-    const steamProfile = forceRefresh
-      ? await fetchSteamProfile(steamId, supabase ?? undefined)
-      : null;
     if (forceRefresh) {
       revalidatePlayerProfilePaths(steamId, steamProfile?.customUrl);
     }
@@ -181,7 +185,7 @@ async function handle(req: Request, ctx: { params: Promise<{ steamId: string }> 
 
   if (result.kind === "missing") {
     if (forceRefresh) {
-      revalidatePlayerProfilePaths(steamId);
+      revalidatePlayerProfilePaths(steamId, steamProfile?.customUrl);
     }
     return Response.json(
       {

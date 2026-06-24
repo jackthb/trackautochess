@@ -23,6 +23,7 @@ export const isValidSteamId64 = isSteamId64;
 
 interface SteamLookupOptions {
   persist?: boolean;
+  force?: boolean;
   requireAvatar?: boolean;
   requireCustomUrl?: boolean;
   maxAgeMs?: number;
@@ -208,6 +209,7 @@ export async function fetchSteamProfile(
         options.maxAgeMs
       );
       if (
+        !options.force &&
         hasCachedProfile &&
         hasFreshProfile &&
         (!options.requireAvatar || cachedProfile.avatarUrl) &&
