@@ -140,12 +140,36 @@ function mockDrodoFetch(queenRank: number) {
   };
 }
 
+function mockSteamFetch() {
+  const originalFetch = globalThis.fetch;
+  globalThis.fetch = (async (url: string | URL | Request) => {
+    assert.match(String(url), /steamcommunity\.com\/profiles\//);
+    return new Response(
+      [
+        "<profile>",
+        `<steamID64>${STEAM_ID}</steamID64>`,
+        "<steamID><![CDATA[Hydrated Queen]]></steamID>",
+        "<customURL><![CDATA[hydratedqueen]]></customURL>",
+        "<avatarFull><![CDATA[https://avatars.steamstatic.com/hydrated_full.jpg]]></avatarFull>",
+        "</profile>",
+      ].join(""),
+      {
+        status: 200,
+        headers: { "content-type": "application/xml" },
+      }
+    );
+  }) as typeof fetch;
+  return () => {
+    globalThis.fetch = originalFetch;
+  };
+}
+
 function queenRow(overrides: Record<string, unknown> = {}) {
   return {
     steam_id: STEAM_ID,
     name: "Smoke Queen",
     custom_url: CUSTOM_URL,
-    avatar_url: null,
+    avatar_url: "https://avatars.steamstatic.com/smoke_full.jpg",
     stream_link: null,
     drodo_mmr: 4000,
     drodo_max_mmr: 4200,
@@ -273,6 +297,52 @@ async function smokeDisplayedQueensRefreshTarget() {
   }
 }
 
+async function smokeDisplayedQueensSteamIdentityRefresh() {
+  const restoreFetch = mockSteamFetch();
+  const supabase = fakeSupabase([
+    queenRow({
+      name: null,
+      custom_url: null,
+      avatar_url: null,
+      drodo_last_fetched_at: new Date().toISOString(),
+    }),
+  ]);
+  const targets: Array<{ steam_id: string; custom_url?: string | null }> = [];
+
+  try {
+    const summary = await refreshDisplayedQueens(supabase, {
+      floorMs: 60 * 60 * 1000,
+      onQueenChange: (target) => {
+        targets.push(target);
+      },
+    });
+
+    assert.equal(summary.polled, 0);
+    assert.equal(summary.ok, 0);
+    assert.equal(summary.changed, 1);
+    assert.match(summary.checked_at ?? "", /^\d{4}-\d{2}-\d{2}T/);
+    assert.deepEqual(targets, [
+      { steam_id: STEAM_ID, custom_url: "hydratedqueen" },
+    ]);
+
+    const state = supabaseState(supabase);
+    const userUpsert = state.calls.find(
+      (call) => call.table === "users" && call.op === "upsert"
+    );
+    assert.ok(userUpsert, "Steam identity refresh must persist to users");
+    assert.equal(
+      (userUpsert.payload as Record<string, unknown>).name,
+      "Hydrated Queen"
+    );
+    assert.equal(
+      (userUpsert.payload as Record<string, unknown>).avatar_url,
+      "https://avatars.steamstatic.com/hydrated_full.jpg"
+    );
+  } finally {
+    restoreFetch();
+  }
+}
+
 function smokeQueensRefreshTiming() {
   const cooldownMs = 5 * 60 * 1000;
   const nowMs = Date.UTC(2026, 5, 13, 12, 0, 0);
@@ -292,5 +362,6 @@ smokeQueensRefreshTiming();
 await smokeReadThroughProfileLock();
 await smokeDrodoPersistenceCallback();
 await smokeDisplayedQueensRefreshTarget();
+await smokeDisplayedQueensSteamIdentityRefresh();
 
 console.log("Queens refresh smoke passed");

@@ -1,6 +1,10 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { fetchAndCacheDrodoBatch, summarizeDrodoResults } from "@/lib/drodo";
-import { loadQueenCandidates, selectQueensRefreshRows } from "@/lib/queens";
+import {
+  hydrateQueenSteamProfiles,
+  loadQueenCandidates,
+  selectQueensRefreshRows,
+} from "@/lib/queens";
 import type { QueenRevalidationTarget } from "@/lib/queensRevalidate";
 import { QUEENS_REFRESH_COOLDOWN_MS } from "@/lib/queensVisitor";
 
@@ -46,7 +50,7 @@ async function runQueensRefresh(
 
   // Refresh displayed rows plus every candidate involved in a duplicate
   // top-100 rank, so stale collisions get resolved instead of only hidden.
-  const rows = selectQueensRefreshRows(await loadQueenCandidates(supabase));
+  let rows = selectQueensRefreshRows(await loadQueenCandidates(supabase));
   if (rows.length === 0) {
     return {
       polled: 0,
@@ -57,6 +61,18 @@ async function runQueensRefresh(
       checked_at: null,
     };
   }
+
+  let changed = 0;
+  const identityRefresh = await hydrateQueenSteamProfiles(rows, supabase, {
+    onProfileChange: (row) => {
+      changed += 1;
+      options.onQueenChange?.({
+        steam_id: row.steam_id,
+        custom_url: row.custom_url,
+      });
+    },
+  });
+  rows = identityRefresh.rows;
 
   const hasNeverFetchedRow = rows.some((row) => !row.drodo_last_fetched_at);
   let oldestFetchMs = Infinity;
@@ -73,8 +89,8 @@ async function runQueensRefresh(
       ok: 0,
       missing: 0,
       upstream_error: 0,
-      changed: 0,
-      checked_at: null,
+      changed,
+      checked_at: changed > 0 ? new Date().toISOString() : null,
     };
   }
 
@@ -84,15 +100,14 @@ async function runQueensRefresh(
       ok: 0,
       missing: 0,
       upstream_error: 0,
-      changed: 0,
-      checked_at: null,
+      changed,
+      checked_at: changed > 0 ? new Date().toISOString() : null,
     };
   }
 
   const profileRoutes = new Map(
     rows.map((row) => [row.steam_id, row.custom_url] as const)
   );
-  let changed = 0;
   // persistDrodoProfile writes the fresh queen_ladder_rank for every polled
   // profile (web poll owns that column), so the displayed order re-ranks itself
   // from this batch — no separate rank sync needed here.

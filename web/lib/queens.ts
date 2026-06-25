@@ -1,4 +1,6 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { parseSteamId64 } from "@dac/shared/steam";
+import { fetchSteamProfile } from "@/lib/steam";
 import { STEAM_ID_TEXT_SELECT } from "@/lib/supabaseSelect";
 
 export interface QueenRow {
@@ -29,6 +31,82 @@ export function effectiveQueenRank(row: QueenRow): number | null {
 
 export function queenMmr(row: QueenRow): number | null {
   return row.drodo_mmr ?? null;
+}
+
+export function queenNeedsSteamProfile(row: QueenRow): boolean {
+  return !row.name || !row.avatar_url;
+}
+
+function applySteamProfile(row: QueenRow, profile: {
+  name?: string | null;
+  customUrl?: string | null;
+  avatarUrl?: string | null;
+}): QueenRow {
+  return {
+    ...row,
+    name: row.name || profile.name || null,
+    custom_url: row.custom_url || profile.customUrl || null,
+    avatar_url: row.avatar_url || profile.avatarUrl || null,
+  };
+}
+
+function steamProfileImproved(row: QueenRow, next: QueenRow): boolean {
+  return (
+    row.name !== next.name ||
+    row.custom_url !== next.custom_url ||
+    row.avatar_url !== next.avatar_url
+  );
+}
+
+export async function hydrateQueenSteamProfiles(
+  rows: QueenRow[],
+  supabase: SupabaseClient,
+  options: {
+    concurrency?: number;
+    limit?: number;
+    onProfileChange?: (row: QueenRow) => void;
+  } = {}
+): Promise<{ rows: QueenRow[]; changed: number }> {
+  const candidates = rows
+    .filter(queenNeedsSteamProfile)
+    .slice(0, options.limit ?? rows.length);
+  if (candidates.length === 0) return { rows, changed: 0 };
+
+  const nextRows = new Map(rows.map((row) => [row.steam_id, row]));
+  const concurrency = Math.max(1, options.concurrency ?? 6);
+  let changed = 0;
+
+  for (let i = 0; i < candidates.length; i += concurrency) {
+    const chunk = candidates.slice(i, i + concurrency);
+    await Promise.all(
+      chunk.map(async (row) => {
+        const steamId = parseSteamId64(row.steam_id);
+        if (!steamId) return;
+        try {
+          const profile = await fetchSteamProfile(steamId, supabase, {
+            persist: true,
+            force: !row.name,
+            requireAvatar: true,
+          });
+          const next = applySteamProfile(row, profile);
+          if (!steamProfileImproved(row, next)) return;
+          nextRows.set(row.steam_id, next);
+          changed += 1;
+          options.onProfileChange?.(next);
+        } catch (error) {
+          console.error("Failed to refresh Queen Steam profile:", {
+            steamId: row.steam_id,
+            error,
+          });
+        }
+      })
+    );
+  }
+
+  return {
+    rows: rows.map((row) => nextRows.get(row.steam_id) ?? row),
+    changed,
+  };
 }
 
 export function compareQueenRows(a: QueenRow, b: QueenRow): number {

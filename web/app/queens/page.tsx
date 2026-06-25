@@ -7,6 +7,7 @@ import { listAvatarUrl, playerProfilePath } from "@/lib/steam";
 import {
   effectiveQueenRank,
   loadQueenCandidates,
+  queenNeedsSteamProfile,
   queenMmr,
   selectDisplayedQueens,
   type QueenRow as BaseQueenRow,
@@ -293,7 +294,10 @@ export default async function QueensPage() {
   const season = rows.find((row) => row.queen_ladder_season)?.queen_ladder_season;
   const lastUpdatedAt = newestDrodoFetchedAt(rows) ?? queenLastUpdatedAt(rows);
   const oldestUpdatedAt = oldestDrodoFetchedAt(rows) ?? queenOldestUpdatedAt(rows);
-  const refreshAnchorAt = oldestUpdatedAt ?? lastUpdatedAt;
+  const hasMissingSteamProfile = rows.some(queenNeedsSteamProfile);
+  const refreshAnchorAt = hasMissingSteamProfile
+    ? null
+    : oldestUpdatedAt ?? lastUpdatedAt;
   const liveSteamIds = new Set(
     streams
       .map((stream) => stream.steamId)
