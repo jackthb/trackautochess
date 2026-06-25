@@ -2,8 +2,6 @@ import { createClient } from "@supabase/supabase-js";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "./database.generated.types";
 
-const DEFAULT_SUPABASE_URL = "https://ismxtcfkuwpvfyuojnaa.supabase.co";
-const LEGACY_SUPABASE_URL = "https://xkfxykorskdltcmvgihh.supabase.co";
 const DEFAULT_SUPABASE_PUBLISHABLE_KEY =
   "sb_publishable_C7GbRNcYQPPrCyqAbl0dcA_IAW0wnY-";
 const LEGACY_SUPABASE_PUBLISHABLE_KEY =
@@ -23,14 +21,6 @@ let anonClient: DacSupabaseClient | null = null;
 let serviceRoleClient: DacSupabaseClient | null = null;
 let serverClient: DacSupabaseClient | null = null;
 
-function normalizeSupabaseUrl(url: string | undefined): string | null {
-  const trimmed = url?.trim();
-  if (!trimmed) return null;
-  return trimmed.replace(/\/+$/, "") === LEGACY_SUPABASE_URL
-    ? DEFAULT_SUPABASE_URL
-    : trimmed;
-}
-
 function normalizePublishableKey(key: string | undefined): string | null {
   const trimmed = key?.trim();
   if (!trimmed) return null;
@@ -40,7 +30,7 @@ function normalizePublishableKey(key: string | undefined): string | null {
 }
 
 function getSupabaseUrl(): string | null {
-  return normalizeSupabaseUrl(process.env.NEXT_PUBLIC_SUPABASE_URL);
+  return process.env.NEXT_PUBLIC_SUPABASE_URL?.trim() || null;
 }
 
 function getSupabasePublishableKey(): string | null {

@@ -3,19 +3,48 @@ use crate::{config::Config, nettable_parser::NettableRow, outbox::Outbox};
 use serde_json::{json, Value};
 use std::{io, path::PathBuf};
 
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct OutboxReplaySummary {
+    pub pending: usize,
+    pub uploaded: usize,
+    pub failed: usize,
+    pub last_error: Option<String>,
+}
+
 impl SupabaseClient {
     pub fn replay_outbox(&self, cfg: &Config, outbox: &Outbox) -> io::Result<usize> {
+        self.replay_outbox_summary(cfg, outbox)
+            .map(|summary| summary.uploaded)
+    }
+
+    pub fn replay_outbox_summary(
+        &self,
+        cfg: &Config,
+        outbox: &Outbox,
+    ) -> io::Result<OutboxReplaySummary> {
         let mut uploaded = 0;
-        for item in outbox.list()? {
+        let mut failed = 0;
+        let mut last_error = None;
+        let items = outbox.list()?;
+        let pending = items.len();
+        for item in items {
             match self.post_raw_payload(cfg, &item.payload) {
                 Ok(()) => {
                     outbox.mark_uploaded(&item.path)?;
                     uploaded += 1;
                 }
-                Err(_) => {}
+                Err(err) => {
+                    failed += 1;
+                    last_error = Some(err);
+                }
             }
         }
-        Ok(uploaded)
+        Ok(OutboxReplaySummary {
+            pending,
+            uploaded,
+            failed,
+            last_error,
+        })
     }
 
     fn post_raw_payload(&self, cfg: &Config, payload: &str) -> Result<(), String> {
@@ -27,8 +56,10 @@ impl SupabaseClient {
             .unwrap_or(&value);
         if table.is_empty() {
             if let Some(rows) = body.as_array() {
-                if let Err(err) = self.upload_end_board_rows(rows) {
-                    eprintln!("outbox end-board upload failed: {err}");
+                if rows.iter().any(is_end_board_row) {
+                    self.upload_end_board_rows(rows)?;
+                    let _ = self.upload_nettable_rows_blob(cfg, rows);
+                    return Ok(());
                 }
                 self.upload_nettable_rows_blob(cfg, rows)?;
             }
@@ -36,6 +67,11 @@ impl SupabaseClient {
         }
         self.post_json(&format!("/rest/v1/{table}"), body, "return=minimal")
     }
+}
+
+fn is_end_board_row(row: &Value) -> bool {
+    row.get("table_name").and_then(Value::as_str) == Some("CustomNetTable_dac_table")
+        && row.get("key").and_then(Value::as_str) == Some("end_board")
 }
 
 pub fn queue_rows(outbox_dir: PathBuf, rows: &[NettableRow]) -> io::Result<Option<PathBuf>> {

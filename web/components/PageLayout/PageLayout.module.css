@@ -9,11 +9,6 @@
   margin: 0 auto;
 }
 
-.layoutNarrow {
-  max-width: 900px;
-  margin: 0 auto;
-}
-
 .container {
   min-width: 0;
   padding: var(--s-40) var(--s-32) var(--s-48);

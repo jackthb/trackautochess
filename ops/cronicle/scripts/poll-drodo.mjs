@@ -246,6 +246,7 @@ async function persistDrodoProfile(profile, seasonRows, supabase, options) {
   );
 
   if (options.snapshotOnSuccess) {
+    const snapshottedAt = new Date().toISOString();
     await supabase.upsert(
       "mmr_snapshots",
       {
@@ -253,10 +254,11 @@ async function persistDrodoProfile(profile, seasonRows, supabase, options) {
         mmr: profile.mmr,
         season: profile.season,
         chicken_count: profile.chicken_count,
-        queen_rank: null,
-        snapshotted_at: new Date().toISOString(),
+        queen_rank: profile.queen_rank,
+        snapshotted_at: snapshottedAt,
+        snapshot_date: snapshottedAt.slice(0, 10),
       },
-      "steam_id,season,mmr,chicken_count,queen_rank"
+      "steam_id,season,snapshot_date,mmr,chicken_count,queen_rank"
     );
   }
 

@@ -91,6 +91,13 @@ interface RelicTimelineEntry {
   name: string;
 }
 
+interface PandarenDropEntry {
+  round: number;
+  name: string;
+  unit?: string;
+  raw?: string;
+}
+
 /** Per-player state at a single round, captured by the live nettable
  *  ingest. Shape mirrors what nettable_capture._extract_players_state_from_rows
  *  writes into the local timeline JSON. */
@@ -106,6 +113,7 @@ interface TimelinePlayerSnap {
   lose_round?: number;
   mmr_level?: number;
   board?: ChessBoardPiece[];
+  pandaren_drops?: PandarenDropEntry[];
 }
 
 interface TimelineRound {
@@ -172,12 +180,14 @@ function PlayerDetail({
   board,
   lineupStr,
   hand,
+  pandarenDrops,
 }: {
   lineup: { name: string; stars: number }[];
   lineupStr: string | null;
   hand: { name: string; stars: number }[];
   relicsToShow: RelicTimelineEntry[];
   hasRelicTimeline: boolean;
+  pandarenDrops: PandarenDropEntry[];
   tooltipData: TooltipData;
   hp: number | null;
   gold: number | null;
@@ -244,6 +254,37 @@ function PlayerDetail({
                 </TooltipWrap>
                 {r.round > 0 && (
                   <span className={styles.pdRelicRound}>R{r.round}</span>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {pandarenDrops.length > 0 && (
+        <div className={styles.pdSection}>
+          <div className={styles.pdLabel}>Pandaren drops</div>
+          <div className={styles.pdDrops}>
+            {pandarenDrops.map((drop, i) => (
+              <div key={`${drop.raw || drop.name}-${i}`} className={styles.pdDrop}>
+                <TooltipWrap
+                  type="unit"
+                  name={drop.name}
+                  data={tooltipData}
+                >
+                  <img
+                    className={styles.pdDropIcon}
+                    src={iconUrl("units", unitStem(drop.name))}
+                    alt={drop.name}
+                    loading="lazy"
+                    onError={(e) => {
+                      (e.currentTarget as HTMLImageElement).style.display = "none";
+                    }}
+                  />
+                </TooltipWrap>
+                <span className={styles.pdDropName}>{drop.name}</span>
+                {drop.round > 0 && (
+                  <span className={styles.pdRelicRound}>R{drop.round}</span>
                 )}
               </div>
             ))}
@@ -334,6 +375,11 @@ function MatchPlayerRow({
     snapRound !== null
       ? allRelics.filter((r) => r.round === 0 || r.round <= snapRound)
       : allRelics;
+  const pandarenDrops =
+    snap?.pandaren_drops?.filter((drop) => {
+      if (snapRound === null || !drop.round) return true;
+      return drop.round <= snapRound;
+    }) ?? [];
 
   // Snapshot may override level + record while scrubbing.
   const displayGame: Game = snap
@@ -523,6 +569,7 @@ function MatchPlayerRow({
           board={snap?.board}
           lineupStr={lineupStr}
           hand={hand}
+          pandarenDrops={pandarenDrops}
         />
       )}
     </div>

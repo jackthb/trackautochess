@@ -325,6 +325,7 @@ async function persistDrodoProfile(
   }
 
   if (options.snapshotOnSuccess) {
+    const snapshottedAt = new Date().toISOString();
     const { error: snapshotError } = await supabase
       .from("mmr_snapshots")
       .upsert(
@@ -334,9 +335,13 @@ async function persistDrodoProfile(
           season: profile.season,
           chicken_count: profile.chicken_count,
           queen_rank: profile.queen_rank,
-          snapshotted_at: new Date().toISOString(),
+          snapshotted_at: snapshottedAt,
+          snapshot_date: snapshottedAt.slice(0, 10),
         },
-        { onConflict: "steam_id,season,mmr,chicken_count,queen_rank" }
+        {
+          onConflict:
+            "steam_id,season,snapshot_date,mmr,chicken_count,queen_rank",
+        }
       );
     if (snapshotError) {
       console.error("Failed to upsert mmr_snapshot:", snapshotError.message);

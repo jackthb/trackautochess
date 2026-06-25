@@ -17,8 +17,8 @@ mod unit_codes;
 use config::Config;
 use ipc_events::{
     event_json, BackendCommand, BackendStatus, ConfigUpdated, DiagnosticsUploaded, DrodoProfile,
-    ErrorEvent, GameUpdated, GamesList, MatchTimeline, NettablePaused, NettableRows, PayloadQueued,
-    SteamLogin, SteamLoginUrl, SteamLogout, UpdateApplyRequested,
+    ErrorEvent, GameUpdated, GamesList, MatchTimeline, NettablePaused, NettableRows,
+    OutboxFlushed, PayloadQueued, SteamLogin, SteamLoginUrl, SteamLogout, UpdateApplyRequested,
 };
 use nettable_service::{parsed_json, rows_json, NettableService};
 use nettable_tail::NettableTailer;
@@ -99,8 +99,11 @@ fn main() -> io::Result<()> {
                 ));
             };
             let pending = outbox.list()?.len();
-            let uploaded = client.replay_outbox(&cfg, &outbox)?;
-            println!("uploaded {uploaded} of {pending} pending payloads");
+            let summary = client.replay_outbox_summary(&cfg, &outbox)?;
+            println!(
+                "uploaded {} of {pending} pending payloads ({} failed)",
+                summary.uploaded, summary.failed
+            );
             Ok(())
         }
         "gsi-cfg" => {
@@ -399,6 +402,34 @@ fn run_daemon() -> io::Result<()> {
                         {
                             Ok(profile) => event_json(&DrodoProfile::ok(request_id, profile)),
                             Err(err) => event_json(&DrodoProfile::error(request_id, err)),
+                        };
+                        emit_threaded(&emit_lock, &event);
+                    },
+                );
+            }
+            BackendCommand::FlushOutbox { request_id } => {
+                let cfg_for_outbox = cfg.clone();
+                spawn_supabase_request(
+                    stdout_lock.clone(),
+                    cfg.clone(),
+                    move |client, emit_lock| {
+                        let event = match client {
+                            Ok(client) => {
+                                let outbox = Outbox::new(cfg_for_outbox.dac_dir.join("outbox"));
+                                match client.replay_outbox_summary(&cfg_for_outbox, &outbox) {
+                                    Ok(summary) => event_json(&OutboxFlushed::complete(
+                                        request_id,
+                                        summary.pending,
+                                        summary.uploaded,
+                                        summary.failed,
+                                        summary.last_error,
+                                    )),
+                                    Err(err) => {
+                                        event_json(&OutboxFlushed::error(request_id, err.to_string()))
+                                    }
+                                }
+                            }
+                            Err(err) => event_json(&OutboxFlushed::error(request_id, err)),
                         };
                         emit_threaded(&emit_lock, &event);
                     },

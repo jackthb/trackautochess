@@ -55,6 +55,9 @@ pub enum BackendCommand {
     RefreshDrodo {
         request_id: String,
     },
+    FlushOutbox {
+        request_id: String,
+    },
     UploadLogs {
         reason: Option<String>,
     },
@@ -116,6 +119,53 @@ pub struct PayloadQueued<'a> {
     #[serde(rename = "type")]
     pub event_type: &'static str,
     pub path: &'a str,
+}
+
+#[derive(Debug, Serialize, TS)]
+pub struct OutboxFlushed {
+    #[serde(rename = "type")]
+    pub event_type: &'static str,
+    pub backend: &'static str,
+    pub request_id: String,
+    pub ok: bool,
+    pub pending: usize,
+    pub uploaded: usize,
+    pub failed: usize,
+    pub error: Option<String>,
+}
+
+impl OutboxFlushed {
+    pub fn complete(
+        request_id: String,
+        pending: usize,
+        uploaded: usize,
+        failed: usize,
+        error: Option<String>,
+    ) -> Self {
+        Self {
+            event_type: "outbox_flushed",
+            backend: "rust",
+            request_id,
+            ok: failed == 0,
+            pending,
+            uploaded,
+            failed,
+            error,
+        }
+    }
+
+    pub fn error(request_id: String, error: String) -> Self {
+        Self {
+            event_type: "outbox_flushed",
+            backend: "rust",
+            request_id,
+            ok: false,
+            pending: 0,
+            uploaded: 0,
+            failed: 0,
+            error: Some(error),
+        }
+    }
 }
 
 impl<'a> PayloadQueued<'a> {
@@ -953,6 +1003,7 @@ mod tests {
         push_decl!(crate::config::Config);
         push_decl!(ErrorEvent<'static>);
         push_decl!(PayloadQueued<'static>);
+        push_decl!(OutboxFlushed);
         push_decl!(ConfigUpdated<'static>);
         push_decl!(GamesList);
         push_decl!(MatchTimeline);

@@ -29,6 +29,7 @@ import type {
   NettableStateEvent as GeneratedNettableStateEvent,
   NettableStatus as GeneratedNettableStatus,
   NettableTimelineExtracted as GeneratedNettableTimelineExtracted,
+  OutboxFlushed as GeneratedOutboxFlushed,
   PayloadQueued as GeneratedPayloadQueued,
   SteamLogin as GeneratedSteamLogin,
   SteamLoginUrl as GeneratedSteamLoginUrl,
@@ -71,6 +72,7 @@ export interface LivePlayer {
 export type BackendStatusEvent = WithBackendType<GeneratedBackendStatus, "status">;
 export type BackendErrorEvent = WithType<GeneratedErrorEvent, "error">;
 export type PayloadQueuedEvent = WithType<GeneratedPayloadQueued, "payload_queued">;
+export type OutboxFlushedEvent = WithBackendType<GeneratedOutboxFlushed, "outbox_flushed">;
 export type ConfigUpdatedEvent = WithType<GeneratedConfigUpdated, "config_updated">;
 export type GamesListEvent = Omit<WithBackendType<GeneratedGamesList, "games_list">, "games"> & {
   games: import("./backend-events.generated").JsonValue;
@@ -241,6 +243,7 @@ export type BackendEvent =
   | BackendStatusEvent
   | BackendErrorEvent
   | PayloadQueuedEvent
+  | OutboxFlushedEvent
   | ConfigUpdatedEvent
   | GamesListEvent
   | MatchTimelineEvent

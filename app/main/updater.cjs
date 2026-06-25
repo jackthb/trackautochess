@@ -1,4 +1,34 @@
 const UPDATE_CHECK_INTERVAL_MS = 6 * 3600 * 1000;
+const MAX_UPDATE_ERROR_MESSAGE_LENGTH = 140;
+
+function formatUpdateError(error) {
+  const rawMessage = error?.message || String(error || "");
+  const compactMessage = rawMessage.replace(/\r?\n/g, " ").replace(/\s+/g, " ").trim();
+
+  if (!compactMessage) {
+    return "Update check failed.";
+  }
+
+  if (/\b404\b|not found|releases\.atom/i.test(compactMessage)) {
+    return "Could not check for updates (release feed returned 404).";
+  }
+
+  if (/authentication token|security reasons.*actual status/i.test(compactMessage)) {
+    return "Could not check for updates (release feed authentication failed).";
+  }
+
+  const withoutHeaders = compactMessage
+    .replace(/\bHeaders\s*:\s*\{.*$/i, "")
+    .replace(/\b(set-cookie|authorization|cookie)\b.*$/i, "")
+    .trim();
+  const safeMessage = withoutHeaders || "Update check failed.";
+
+  if (safeMessage.length <= MAX_UPDATE_ERROR_MESSAGE_LENGTH) {
+    return safeMessage;
+  }
+
+  return `${safeMessage.slice(0, MAX_UPDATE_ERROR_MESSAGE_LENGTH - 3)}...`;
+}
 
 function createUpdater({ app, isPackaged, emitEvent }) {
   let autoUpdater = null;
@@ -69,7 +99,7 @@ function createUpdater({ app, isPackaged, emitEvent }) {
       emit({
         type: "update_error",
         backend: "electron",
-        message: error?.message || String(error),
+        message: formatUpdateError(error),
       });
     });
 
@@ -82,7 +112,13 @@ function createUpdater({ app, isPackaged, emitEvent }) {
     try {
       await updater.checkForUpdates();
     } catch (error) {
-      console.error("Update check failed:", error);
+      const message = formatUpdateError(error);
+      console.warn(`Update check failed: ${message}`);
+      emit({
+        type: "update_error",
+        backend: "electron",
+        message,
+      });
     }
   }
 

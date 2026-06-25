@@ -488,6 +488,41 @@
   font-weight: 600;
   font-variant-numeric: tabular-nums;
 }
+.pdDrops {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  align-items: stretch;
+}
+.pdDrop {
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 8px;
+  min-width: 180px;
+  max-width: 240px;
+  padding: 7px 9px;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--r-4);
+  background: var(--bg-elevated);
+}
+.pdDropIcon {
+  width: 34px;
+  height: 34px;
+  object-fit: cover;
+  border: 1px solid var(--border);
+  border-radius: var(--r-3);
+  background: var(--bg-deep);
+}
+.pdDropName {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--text-secondary);
+  font-size: 12px;
+  font-weight: 600;
+}
 
 @media (max-width: 720px) {
   .mpToggle {

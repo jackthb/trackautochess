@@ -24,6 +24,7 @@ const t = {
   relics: "Relics",
   talents: "Talents",
   queens: "Queens",
+  builds: "Builds",
   matches: "Matches",
   creators: "Creators",
   patchNotes: "Patch Notes",
@@ -172,6 +173,7 @@ export function AppNavBar({ supabase }: AppNavBarProps) {
   const standaloneLinks: { href: string; label: string; key: string }[] = [
     { href: "/talents", label: t.talents, key: "talents" },
     { href: "/queens", label: t.queens, key: "queens" },
+    ...(isAdmin ? [{ href: "/builds", label: t.builds, key: "builds" }] : []),
     { href: "/creators", label: t.creators, key: "creators" },
     ...(canSeeBetaFeatures
       ? [{ href: "/matches", label: t.matches, key: "matches" }]

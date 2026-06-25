@@ -298,6 +298,7 @@ export type Database = {
           mmr: number | null
           queen_rank: number | null
           season: string | null
+          snapshot_date: string
           snapshotted_at: string
           steam_id: number
         }
@@ -307,6 +308,7 @@ export type Database = {
           mmr?: number | null
           queen_rank?: number | null
           season?: string | null
+          snapshot_date?: string
           snapshotted_at?: string
           steam_id: number
         }
@@ -316,6 +318,7 @@ export type Database = {
           mmr?: number | null
           queen_rank?: number | null
           season?: string | null
+          snapshot_date?: string
           snapshotted_at?: string
           steam_id?: number
         }

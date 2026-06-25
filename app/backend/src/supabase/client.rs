@@ -196,10 +196,11 @@ impl SupabaseClient {
     }
 
     pub(super) fn post_json(&self, path: &str, body: &Value, prefer: &str) -> Result<(), String> {
+        let bearer_token = self.authenticated_bearer_token()?;
         let response = ureq::post(&format!("{}{}", self.url, path))
             .timeout(HTTP_TIMEOUT)
             .set("apikey", &self.key)
-            .set("Authorization", &format!("Bearer {}", self.bearer_token()))
+            .set("Authorization", &format!("Bearer {bearer_token}"))
             .set("Content-Type", "application/json")
             .set("Prefer", prefer)
             .send_string(&body.to_string());
@@ -215,10 +216,11 @@ impl SupabaseClient {
     }
 
     pub(super) fn patch_json(&self, path: &str, body: &Value, prefer: &str) -> Result<(), String> {
+        let bearer_token = self.authenticated_bearer_token()?;
         let response = ureq::request("PATCH", &format!("{}{}", self.url, path))
             .timeout(HTTP_TIMEOUT)
             .set("apikey", &self.key)
-            .set("Authorization", &format!("Bearer {}", self.bearer_token()))
+            .set("Authorization", &format!("Bearer {bearer_token}"))
             .set("Content-Type", "application/json")
             .set("Prefer", prefer)
             .send_string(&body.to_string());
@@ -230,10 +232,11 @@ impl SupabaseClient {
     }
 
     pub(super) fn delete_rows(&self, path: &str) -> Result<(), String> {
+        let bearer_token = self.authenticated_bearer_token()?;
         let response = ureq::request("DELETE", &format!("{}{}", self.url, path))
             .timeout(HTTP_TIMEOUT)
             .set("apikey", &self.key)
-            .set("Authorization", &format!("Bearer {}", self.bearer_token()))
+            .set("Authorization", &format!("Bearer {bearer_token}"))
             .set("Prefer", "return=minimal")
             .call();
         match response {
@@ -262,5 +265,11 @@ impl SupabaseClient {
     pub(super) fn bearer_token(&self) -> &str {
         self.auth_token.as_deref().unwrap_or(&self.key)
     }
-}
 
+    fn authenticated_bearer_token(&self) -> Result<&str, String> {
+        self.auth_token
+            .as_deref()
+            .filter(|token| !token.trim().is_empty())
+            .ok_or_else(|| "Steam login is required before uploading to Supabase.".to_owned())
+    }
+}

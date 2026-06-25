@@ -2,6 +2,8 @@ import { useState, useRef, useEffect, useCallback } from "react";
 import { Button } from "@dac/shared/Button";
 import { SeasonHistoryGrid } from "@dac/shared/SeasonHistoryGrid";
 import type { Game, UnitFullInfo, SynergyInfo, RelicInfo, ItemFullInfo, DrodoProfile } from "../types";
+import type { OutboxFlushedEvent } from "../backend-events";
+import { sendBackendRequest } from "../lib/backend-request";
 import { StatsBar } from "./StatsBar";
 import { GameRow } from "./GameRow";
 
@@ -47,6 +49,9 @@ export function HistoryTab({
   const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
   const [highlightId, setHighlightId] = useState<number | null>(null);
   const [expandedId, setExpandedId] = useState<number | null>(null);
+  const [flushingOutbox, setFlushingOutbox] = useState(false);
+  const [outboxStatus, setOutboxStatus] = useState<string | null>(null);
+  const [outboxError, setOutboxError] = useState<string | null>(null);
   const sentinelRef = useRef<HTMLDivElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const gameRefs = useRef<Map<number, HTMLDivElement>>(new Map());
@@ -124,6 +129,35 @@ export function HistoryTab({
 
   const visibleGames = games.slice(0, visibleCount);
 
+  const flushOutbox = async () => {
+    setFlushingOutbox(true);
+    setOutboxStatus(null);
+    setOutboxError(null);
+    try {
+      const result = await sendBackendRequest<OutboxFlushedEvent>(
+        { cmd: "flush_outbox" },
+        { timeoutMs: 60_000 },
+      );
+      if (result.ok) {
+        setOutboxStatus(
+          result.pending === 0
+            ? "No queued games"
+            : `Uploaded ${result.uploaded} queued game${result.uploaded === 1 ? "" : "s"}`,
+        );
+        await refresh();
+      } else {
+        setOutboxError(
+          result.error ||
+            `Uploaded ${result.uploaded}; ${result.failed} queued game${result.failed === 1 ? "" : "s"} still pending`,
+        );
+      }
+    } catch (err) {
+      setOutboxError(err instanceof Error ? err.message : "Failed to push queued games");
+    } finally {
+      setFlushingOutbox(false);
+    }
+  };
+
   return (
     <div className="history-tab" ref={containerRef}>
       <div className="history-container">
@@ -143,6 +177,13 @@ export function HistoryTab({
           >
             {refreshing ? "Refreshing" : "Refresh"}
           </Button>
+          <Button
+            className={flushingOutbox ? "btn-loading" : undefined}
+            disabled={flushingOutbox || refreshing}
+            onClick={flushOutbox}
+          >
+            {flushingOutbox ? "Pushing" : "Push queued"}
+          </Button>
           {lastRefresh && (
             <span className="refresh-time">
               Updated {lastRefresh.toLocaleTimeString()}
@@ -153,8 +194,10 @@ export function HistoryTab({
               Stats {new Date(drodo.fetched_at).toLocaleString()}
             </span>
           )}
+          {outboxStatus && <span className="refresh-success">{outboxStatus}</span>}
           {error && <span className="refresh-error">{error}</span>}
           {drodoError && <span className="refresh-error">{drodoError}</span>}
+          {outboxError && <span className="refresh-error">{outboxError}</span>}
         </div>
         <div className="table-wrap fade-up delay-1">
           <div className="table-header">

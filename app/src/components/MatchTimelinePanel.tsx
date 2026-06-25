@@ -195,10 +195,16 @@ function diffCounts(previous: string[], next: string[]) {
 
 function displayName(
   code: string,
-  lookup: Record<string, { name?: string; displayName?: string; title?: string }>,
+  lookup: Record<string, unknown>,
 ): string {
   const info = lookup[code] ?? lookup[`npc_dota_${code}`] ?? lookup[`item_${code}`];
-  return info?.name ?? info?.displayName ?? info?.title ?? code.replace(/^item_/, "").replace(/_/g, " ");
+  if (isRecord(info)) {
+    for (const key of ["name", "displayName", "display_name", "title"]) {
+      const value = info[key];
+      if (typeof value === "string" && value.trim()) return value;
+    }
+  }
+  return code.replace(/^item_/, "").replace(/_/g, " ");
 }
 
 function buildActivityLog(

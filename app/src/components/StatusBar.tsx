@@ -13,18 +13,21 @@ export function StatusBar({ status }: StatusBarProps) {
     update.state === "downloading" && typeof update.percent === "number"
       ? ` ${Math.round(update.percent)}%`
       : "";
+  const errorDetail = update.state === "error" ? update.message?.trim() : "";
   const message =
     update.state === "downloaded"
       ? `Update ${version} is ready.`
       : update.state === "downloading"
         ? `Downloading update ${version}.${progress}`
         : update.state === "error"
-          ? `Update failed${update.message ? `: ${update.message}` : "."}`
+          ? `Update check failed${errorDetail ? `: ${errorDetail}` : "."}`
           : `Update ${version} is available.`;
 
   return (
     <div className="status-bar">
-      <span className="status-bar-message">{message}</span>
+      <span className="status-bar-message" title={errorDetail || undefined}>
+        {message}
+      </span>
       {update.state === "downloaded" && (
         <button
           className="status-bar-action"

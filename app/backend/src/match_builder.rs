@@ -1,6 +1,6 @@
 use crate::{
     nettable_live::live_players_value, nettable_parser::NettableRow,
-    unit_codes::normalize_chess_lineup,
+    unit_codes::{normalize_chess_lineup, normalize_chess_unit},
 };
 
 const MAX_SESSION_ROUND_SNAPSHOTS: usize = 80;
@@ -141,6 +141,9 @@ fn extract_end_board_snapshot_from_rows(rows: &[NettableRow]) -> Option<(i64, se
         ] {
             insert_if_present_as(&mut row, dst, player.get(src));
         }
+        if let Some(drops) = parse_pandaren_drops(player.get("pandaman_getlist")) {
+            row.insert("pandaren_drops".to_owned(), drops);
+        }
         players.insert(steam_id, serde_json::Value::Object(row));
     }
     Some((round, serde_json::Value::Object(players)))
@@ -187,6 +190,37 @@ fn insert_normalized_lineup(
             .unwrap_or_else(|| value.clone());
         row.insert(key.to_owned(), normalized);
     }
+}
+
+fn parse_pandaren_drops(value: Option<&serde_json::Value>) -> Option<serde_json::Value> {
+    let object = value?.as_object()?;
+    let mut drops = object
+        .iter()
+        .filter_map(|(slot, value)| {
+            let raw = value.as_str()?.trim();
+            if raw.is_empty() {
+                return None;
+            }
+            let (unit_code, round) = raw
+                .rsplit_once('_')
+                .and_then(|(unit, round)| Some((unit, round.parse::<i64>().ok()?)))
+                .unwrap_or((raw, 0));
+            let name = normalize_chess_unit(unit_code).unwrap_or_else(|| unit_code.to_owned());
+            Some(serde_json::json!({
+                "slot": slot,
+                "raw": raw,
+                "unit": unit_code,
+                "name": name,
+                "round": round,
+            }))
+        })
+        .collect::<Vec<_>>();
+    drops.sort_by_key(|drop| {
+        drop.get("round")
+            .and_then(serde_json::Value::as_i64)
+            .unwrap_or(0)
+    });
+    (!drops.is_empty()).then(|| serde_json::Value::Array(drops))
 }
 
 pub(crate) fn extract_round_from_rows(rows: &[NettableRow]) -> Option<i64> {

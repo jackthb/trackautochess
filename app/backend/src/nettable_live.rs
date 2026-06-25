@@ -105,6 +105,11 @@ pub fn live_players_value(
                     }
                 }
             }
+            if !row.contains_key("pandaren_drops") {
+                if let Some(drops) = parse_pandaren_drops(player.get("pandaman_getlist")) {
+                    row.insert("pandaren_drops".to_owned(), drops);
+                }
+            }
         }
     }
 
@@ -220,4 +225,35 @@ fn sorted_string_values(value: Option<&serde_json::Value>) -> Vec<serde_json::Va
         .unwrap_or_default();
     values.dedup();
     values
+}
+
+fn parse_pandaren_drops(value: Option<&serde_json::Value>) -> Option<serde_json::Value> {
+    let object = value?.as_object()?;
+    let mut drops = object
+        .iter()
+        .filter_map(|(slot, value)| {
+            let raw = value.as_str()?.trim();
+            if raw.is_empty() {
+                return None;
+            }
+            let (unit_code, round) = raw
+                .rsplit_once('_')
+                .and_then(|(unit, round)| Some((unit, round.parse::<i64>().ok()?)))
+                .unwrap_or((raw, 0));
+            let name = normalize_chess_unit(unit_code).unwrap_or_else(|| unit_code.to_owned());
+            Some(serde_json::json!({
+                "slot": slot,
+                "raw": raw,
+                "unit": unit_code,
+                "name": name,
+                "round": round,
+            }))
+        })
+        .collect::<Vec<_>>();
+    drops.sort_by_key(|drop| {
+        drop.get("round")
+            .and_then(serde_json::Value::as_i64)
+            .unwrap_or(0)
+    });
+    (!drops.is_empty()).then(|| serde_json::Value::Array(drops))
 }
