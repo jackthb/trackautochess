@@ -6,7 +6,9 @@ import { createSupabaseServerClient } from "@/lib/supabase";
 import { listAvatarUrl, playerProfilePath } from "@/lib/steam";
 import {
   effectiveQueenRank,
+  hydrateQueenSteamProfiles,
   loadQueenCandidates,
+  queenDisplayName,
   queenNeedsSteamProfile,
   queenMmr,
   selectDisplayedQueens,
@@ -78,6 +80,9 @@ async function loadQueens(): Promise<{ rows: QueenRow[]; error: string | null }>
   let rows: QueenRow[];
   try {
     rows = selectDisplayedQueens(await loadQueenCandidates(supabase));
+    if (rows.some(queenNeedsSteamProfile)) {
+      rows = (await hydrateQueenSteamProfiles(rows, supabase)).rows;
+    }
   } catch (error) {
     return {
       rows: [],
@@ -294,10 +299,7 @@ export default async function QueensPage() {
   const season = rows.find((row) => row.queen_ladder_season)?.queen_ladder_season;
   const lastUpdatedAt = newestDrodoFetchedAt(rows) ?? queenLastUpdatedAt(rows);
   const oldestUpdatedAt = oldestDrodoFetchedAt(rows) ?? queenOldestUpdatedAt(rows);
-  const hasMissingSteamProfile = rows.some(queenNeedsSteamProfile);
-  const refreshAnchorAt = hasMissingSteamProfile
-    ? null
-    : oldestUpdatedAt ?? lastUpdatedAt;
+  const refreshAnchorAt = oldestUpdatedAt ?? lastUpdatedAt;
   const liveSteamIds = new Set(
     streams
       .map((stream) => stream.steamId)
@@ -338,7 +340,7 @@ export default async function QueensPage() {
             {rows.map((row, index) => {
               const ladderRank = effectiveQueenRank(row) ?? index + 1;
               const mmr = queenMmr(row);
-              const display = row.name || row.custom_url || row.steam_id;
+              const display = queenDisplayName(row, ladderRank);
               const isLive =
                 liveSteamIds.has(row.steam_id) ||
                 (row.stream_link

@@ -33,6 +33,12 @@ export function queenMmr(row: QueenRow): number | null {
   return row.drodo_mmr ?? null;
 }
 
+export function queenDisplayName(row: QueenRow, rank?: number | null): string {
+  const display = row.name?.trim() || row.custom_url?.trim();
+  if (display) return display;
+  return rank ? `Queen #${rank}` : "Queen Player";
+}
+
 export function queenNeedsSteamProfile(row: QueenRow): boolean {
   return !row.name || !row.avatar_url;
 }
