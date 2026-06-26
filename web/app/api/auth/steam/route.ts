@@ -3,8 +3,23 @@ import { NextResponse } from "next/server";
 const STEAM_OPENID_URL = "https://steamcommunity.com/openid/login";
 
 export function GET(req: Request) {
-  const origin = new URL(req.url).origin;
-  const returnTo = `${origin}/api/auth/steam/callback`;
+  const url = new URL(req.url);
+  const origin = url.origin;
+  const desktopReturnToParam = url.searchParams.get("desktop_return_to");
+  const desktopReturnTo = desktopReturnToParam
+    ? loopbackDesktopReturnTo(desktopReturnToParam)
+    : null;
+  if (desktopReturnToParam && !desktopReturnTo) {
+    return NextResponse.json(
+      { error: "invalid_desktop_return_to" },
+      { status: 400 }
+    );
+  }
+  const callbackUrl = new URL("/api/auth/steam/callback", origin);
+  if (desktopReturnTo) {
+    callbackUrl.searchParams.set("desktop_return_to", desktopReturnTo);
+  }
+  const returnTo = callbackUrl.toString();
 
   const params = new URLSearchParams({
     "openid.ns": "http://specs.openid.net/auth/2.0",
@@ -16,4 +31,19 @@ export function GET(req: Request) {
   });
 
   return NextResponse.redirect(`${STEAM_OPENID_URL}?${params.toString()}`);
+}
+
+function loopbackDesktopReturnTo(value: string): string | null {
+  try {
+    const url = new URL(value);
+    const hostname = url.hostname.toLowerCase();
+    const isLoopback =
+      hostname === "127.0.0.1" || hostname === "localhost" || hostname === "[::1]";
+    if (url.protocol !== "http:" || !isLoopback || url.username || url.password) {
+      return null;
+    }
+    return url.toString();
+  } catch {
+    return null;
+  }
 }

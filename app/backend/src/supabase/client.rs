@@ -1,10 +1,12 @@
-﻿use super::{
-    describe_ureq_error, drodo_courier_api_url, drodo_profile_to_user_payload, drodo_user_row_to_profile,
-    mmr_level_to_app_rank, now_iso_utc, parse_valid_steam_id64, value_number, SupabaseClient,
-    HTTP_TIMEOUT,
+use super::{
+    describe_ureq_error, drodo_courier_api_url, drodo_profile_to_user_payload,
+    drodo_user_row_to_profile, mmr_level_to_app_rank, now_iso_utc, parse_valid_steam_id64,
+    value_number, SupabaseClient, HTTP_TIMEOUT,
 };
 use crate::config::Config;
 use serde_json::{json, Value};
+
+const TOKEN_REFRESH_SKEW_SECONDS: i64 = 60;
 
 impl SupabaseClient {
     pub fn from_config(cfg: &Config) -> Option<Self> {
@@ -272,4 +274,98 @@ impl SupabaseClient {
             .filter(|token| !token.trim().is_empty())
             .ok_or_else(|| "Steam login is required before uploading to Supabase.".to_owned())
     }
+}
+
+pub fn ensure_fresh_session(cfg: &mut Config) -> Result<(), String> {
+    if cfg.local_only
+        || cfg.supabase_url.trim().is_empty()
+        || cfg.supabase_key.trim().is_empty()
+        || cfg.supabase_refresh_token.trim().is_empty()
+    {
+        return Ok(());
+    }
+
+    let should_refresh = cfg.supabase_access_token.trim().is_empty()
+        || cfg
+            .supabase_token_expires_at
+            .trim()
+            .parse::<i64>()
+            .map(|expires_at| {
+                expires_at <= chrono::Utc::now().timestamp() + TOKEN_REFRESH_SKEW_SECONDS
+            })
+            .unwrap_or(true);
+    if !should_refresh {
+        return Ok(());
+    }
+
+    let session = refresh_session(cfg)?;
+    cfg.save_supabase_session(
+        &session.access_token,
+        &session.refresh_token,
+        session.expires_at,
+    )
+    .map_err(|err| err.to_string())?;
+    cfg.supabase_access_token = session.access_token;
+    cfg.supabase_refresh_token = session.refresh_token;
+    cfg.supabase_token_expires_at = session
+        .expires_at
+        .map(|value| value.to_string())
+        .unwrap_or_default();
+    Ok(())
+}
+
+struct RefreshedSession {
+    access_token: String,
+    refresh_token: String,
+    expires_at: Option<i64>,
+}
+
+fn refresh_session(cfg: &Config) -> Result<RefreshedSession, String> {
+    let supabase_url = cfg.supabase_url.trim_end_matches('/');
+    let response = ureq::post(&format!(
+        "{supabase_url}/auth/v1/token?grant_type=refresh_token"
+    ))
+    .timeout(HTTP_TIMEOUT)
+    .set("apikey", &cfg.supabase_key)
+    .set("Content-Type", "application/json")
+    .send_string(&json!({ "refresh_token": cfg.supabase_refresh_token }).to_string())
+    .map_err(describe_ureq_error)?;
+    let body = response.into_string().map_err(|err| err.to_string())?;
+    let value = serde_json::from_str::<Value>(&body).map_err(|err| err.to_string())?;
+    if let Some(error) = value.get("error").and_then(Value::as_str) {
+        return Err(format!("Supabase token refresh failed: {error}"));
+    }
+    let access_token = value
+        .get("access_token")
+        .and_then(Value::as_str)
+        .filter(|value| !value.trim().is_empty())
+        .ok_or_else(|| "Supabase token refresh did not return an access token".to_owned())?
+        .to_owned();
+    let refresh_token = value
+        .get("refresh_token")
+        .and_then(Value::as_str)
+        .filter(|value| !value.trim().is_empty())
+        .unwrap_or(&cfg.supabase_refresh_token)
+        .to_owned();
+    let expires_at = value
+        .get("expires_at")
+        .and_then(Value::as_i64)
+        .or_else(|| {
+            value
+                .get("expires_at")
+                .and_then(Value::as_str)
+                .and_then(|value| value.parse::<i64>().ok())
+        })
+        .or_else(|| {
+            value
+                .get("expires_in")
+                .and_then(Value::as_i64)
+                .map(|seconds| chrono::Utc::now().timestamp() + seconds)
+        });
+
+    Ok(RefreshedSession {
+        access_token,
+        refresh_token,
+        expires_at,
+    })
 }

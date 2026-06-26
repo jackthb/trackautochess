@@ -1,4 +1,4 @@
-﻿use serde::Serialize;
+use serde::Serialize;
 use serde_json::{json, Value};
 use std::{env, fs, io, path::PathBuf};
 use ts_rs::TS;
@@ -104,10 +104,16 @@ impl Config {
             map.insert("supabase_refresh_token".to_owned(), json!(refresh_token));
             map.insert(
                 "supabase_token_expires_at".to_owned(),
-                json!(expires_at.map(|value| value.to_string()).unwrap_or_default()),
+                json!(expires_at
+                    .map(|value| value.to_string())
+                    .unwrap_or_default()),
             );
         }
         fs::write(path, serde_json::to_string_pretty(&value).unwrap_or(body))
+    }
+
+    pub fn clear_supabase_session(&self) -> io::Result<()> {
+        self.save_supabase_session("", "", None)
     }
 }
 
@@ -158,8 +164,8 @@ fn parse_config_json(body: &str) -> Value {
 fn apply_config_migrations(value: &mut Value) -> bool {
     let current_url = value_string(value, "supabase_url");
     let current_key = value_string(value, "supabase_key");
-    let should_replace_supabase = current_url.trim().is_empty()
-        || current_url.trim_end_matches('/') == LEGACY_SUPABASE_URL;
+    let should_replace_supabase =
+        current_url.trim().is_empty() || current_url.trim_end_matches('/') == LEGACY_SUPABASE_URL;
     let should_replace_supabase_key = current_key.trim().is_empty()
         || current_key == LEGACY_SUPABASE_KEY
         || should_replace_supabase;
@@ -182,12 +188,12 @@ fn apply_config_migrations(value: &mut Value) -> bool {
             if let Some(default_value) = defaults.get(key) {
                 let value = if key == "supabase_url" {
                     json!(DEFAULT_SUPABASE_URL)
-            } else {
-                default_value.clone()
-            };
-            map.insert(key.to_owned(), value);
-            changed = true;
-        }
+                } else {
+                    default_value.clone()
+                };
+                map.insert(key.to_owned(), value);
+                changed = true;
+            }
         }
     }
     if should_set_auth_url {
@@ -247,10 +253,7 @@ mod tests {
         });
 
         assert!(apply_config_migrations(&mut value));
-        assert_eq!(
-            value_string(&value, "supabase_url"),
-            DEFAULT_SUPABASE_URL
-        );
+        assert_eq!(value_string(&value, "supabase_url"), DEFAULT_SUPABASE_URL);
         assert_ne!(value_string(&value, "supabase_key"), LEGACY_SUPABASE_KEY);
         assert_eq!(value_string(&value, "steam_id"), "123");
     }

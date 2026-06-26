@@ -17,8 +17,8 @@ mod unit_codes;
 use config::Config;
 use ipc_events::{
     event_json, BackendCommand, BackendStatus, ConfigUpdated, DiagnosticsUploaded, DrodoProfile,
-    ErrorEvent, GameUpdated, GamesList, MatchTimeline, NettablePaused, NettableRows,
-    OutboxFlushed, PayloadQueued, SteamLogin, SteamLoginUrl, SteamLogout, UpdateApplyRequested,
+    ErrorEvent, GameUpdated, GamesList, MatchTimeline, NettablePaused, NettableRows, OutboxFlushed,
+    PayloadQueued, SteamLogin, SteamLoginUrl, SteamLogout, UpdateApplyRequested,
 };
 use nettable_service::{parsed_json, rows_json, NettableService};
 use nettable_tail::NettableTailer;
@@ -150,7 +150,10 @@ fn main() -> io::Result<()> {
         }
         "finalize-dump" => {
             let path = args.get(1).map(PathBuf::from).ok_or_else(|| {
-                io::Error::new(io::ErrorKind::InvalidInput, "finalize-dump needs a dump path")
+                io::Error::new(
+                    io::ErrorKind::InvalidInput,
+                    "finalize-dump needs a dump path",
+                )
             })?;
             let rows = nettable_parser::extract_dump_rows(&path)?;
             let cfg = Config::load()?;
@@ -247,8 +250,12 @@ fn run_daemon() -> io::Result<()> {
             BackendCommand::SteamLogout => {
                 cfg.save_value("steam_id", "\"\"")?;
                 cfg.save_value("steam_name", "\"\"")?;
+                cfg.clear_supabase_session()?;
                 cfg.steam_id.clear();
                 cfg.steam_name.clear();
+                cfg.supabase_access_token.clear();
+                cfg.supabase_refresh_token.clear();
+                cfg.supabase_token_expires_at.clear();
                 emit(&event_json(&SteamLogout::new()))?;
             }
             BackendCommand::SteamLogin => {
@@ -275,6 +282,11 @@ fn run_daemon() -> io::Result<()> {
                                 .expires_at
                                 .map(|value| value.to_string())
                                 .unwrap_or_default();
+                        } else {
+                            cfg.clear_supabase_session()?;
+                            cfg.supabase_access_token.clear();
+                            cfg.supabase_refresh_token.clear();
+                            cfg.supabase_token_expires_at.clear();
                         }
                         if let Some(client) = supabase::SupabaseClient::from_config(&cfg) {
                             let _ = client.upsert_user(&login.steam_id, &login.steam_name);
@@ -424,9 +436,10 @@ fn run_daemon() -> io::Result<()> {
                                         summary.failed,
                                         summary.last_error,
                                     )),
-                                    Err(err) => {
-                                        event_json(&OutboxFlushed::error(request_id, err.to_string()))
-                                    }
+                                    Err(err) => event_json(&OutboxFlushed::error(
+                                        request_id,
+                                        err.to_string(),
+                                    )),
                                 }
                             }
                             Err(err) => event_json(&OutboxFlushed::error(request_id, err)),
@@ -505,8 +518,11 @@ where
     F: FnOnce(Result<supabase::SupabaseClient, String>, Arc<Mutex<()>>) + Send + 'static,
 {
     thread::spawn(move || {
-        let client = supabase::SupabaseClient::from_config(&cfg)
-            .ok_or_else(|| "Supabase is not configured.".to_owned());
+        let mut cfg = cfg;
+        let client = supabase::ensure_fresh_session(&mut cfg).and_then(|()| {
+            supabase::SupabaseClient::from_config(&cfg)
+                .ok_or_else(|| "Supabase is not configured.".to_owned())
+        });
         f(client, stdout_lock);
     });
 }

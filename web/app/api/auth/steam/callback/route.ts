@@ -39,12 +39,24 @@ async function verifySteamAssertion(
 export async function GET(req: Request) {
   const url = new URL(req.url);
   const isDesktop = url.searchParams.get("desktop") === "1";
+  const desktopReturnTo = loopbackDesktopReturnTo(
+    url.searchParams.get("desktop_return_to")
+  );
   const fail = (error: string, steamId?: string | null) => {
     if (steamId) {
       after(() =>
         captureServerEvent("Steam Sign In Failed", steamId, {
           source: "steam_auth_callback",
           reason: error,
+        })
+      );
+    }
+
+    if (desktopReturnTo) {
+      return NextResponse.redirect(
+        desktopRedirectUrl(desktopReturnTo, {
+          error,
+          steam_id: steamId,
         })
       );
     }
@@ -200,6 +212,20 @@ export async function GET(req: Request) {
     })
   );
 
+  if (desktopReturnTo) {
+    return NextResponse.redirect(
+      desktopRedirectUrl(desktopReturnTo, {
+        steam_id: steamId,
+        steam_name: steamName,
+        access_token: session.access_token,
+        refresh_token: session.refresh_token,
+        expires_at: session.expires_at ?? null,
+        expires_in: session.expires_in ?? null,
+        token_type: session.token_type || "bearer",
+      })
+    );
+  }
+
   if (isDesktop) {
     return NextResponse.json({
       steam_id: steamId,
@@ -229,4 +255,33 @@ export async function GET(req: Request) {
   return NextResponse.redirect(
     `${origin}${playerProfilePath(steamId, steamProfile.customUrl)}#${hash}`
   );
+}
+
+function loopbackDesktopReturnTo(value: string | null): string | null {
+  if (!value) return null;
+  try {
+    const url = new URL(value);
+    const hostname = url.hostname.toLowerCase();
+    const isLoopback =
+      hostname === "127.0.0.1" || hostname === "localhost" || hostname === "[::1]";
+    if (url.protocol !== "http:" || !isLoopback || url.username || url.password) {
+      return null;
+    }
+    return url.toString();
+  } catch {
+    return null;
+  }
+}
+
+function desktopRedirectUrl(
+  returnTo: string,
+  params: Record<string, string | number | null | undefined>
+) {
+  const url = new URL(returnTo);
+  for (const [key, value] of Object.entries(params)) {
+    if (value !== null && value !== undefined) {
+      url.searchParams.set(key, String(value));
+    }
+  }
+  return url;
 }

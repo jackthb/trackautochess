@@ -41,14 +41,9 @@ where
         .map_err(|err| format!("failed to configure Steam callback listener: {err}"))?;
     let port = listener.local_addr().map_err(|err| err.to_string())?.port();
     let return_url = format!("http://127.0.0.1:{port}");
-    let login_url = format!(
-        "{STEAM_OPENID_URL}?openid.ns={}&openid.mode=checkid_setup&openid.return_to={}&openid.realm={}&openid.identity={}&openid.claimed_id={}",
-        enc("http://specs.openid.net/auth/2.0"),
-        enc(&return_url),
-        enc(&return_url),
-        enc("http://specs.openid.net/auth/2.0/identifier_select"),
-        enc("http://specs.openid.net/auth/2.0/identifier_select"),
-    );
+    let login_url = supabase_auth_url
+        .map(|url| desktop_auth_start_url(url, &return_url))
+        .unwrap_or_else(|| steam_openid_login_url(&return_url));
     open(&login_url)?;
 
     let deadline = Instant::now() + timeout;
@@ -56,6 +51,12 @@ where
         match listener.accept() {
             Ok((stream, _)) => {
                 let params = handle_callback(stream)?;
+                if let Some(error) = params.get("error").filter(|value| !value.trim().is_empty()) {
+                    return Err(format!("Supabase auth exchange failed: {error}"));
+                }
+                if let Some(login) = desktop_session_login_from_params(&params)? {
+                    return Ok(login);
+                }
                 let claimed = params.get("openid.claimed_id").cloned().unwrap_or_default();
                 let steam_id = claimed
                     .rsplit('/')
@@ -93,6 +94,81 @@ where
         }
     }
     Err("Steam login timed out".to_owned())
+}
+
+fn steam_openid_login_url(return_url: &str) -> String {
+    format!(
+        "{STEAM_OPENID_URL}?openid.ns={}&openid.mode=checkid_setup&openid.return_to={}&openid.realm={}&openid.identity={}&openid.claimed_id={}",
+        enc("http://specs.openid.net/auth/2.0"),
+        enc(return_url),
+        enc(return_url),
+        enc("http://specs.openid.net/auth/2.0/identifier_select"),
+        enc("http://specs.openid.net/auth/2.0/identifier_select"),
+    )
+}
+
+fn desktop_auth_start_url(auth_url: &str, return_url: &str) -> String {
+    let mut base = auth_url.trim().to_owned();
+    let query = base
+        .find('?')
+        .map(|index| base.split_off(index))
+        .unwrap_or_default();
+    if base.ends_with("/callback") {
+        base.truncate(base.len() - "/callback".len());
+    }
+    let separator = if query.is_empty() { '?' } else { '&' };
+    format!(
+        "{base}{query}{separator}desktop_return_to={}",
+        enc(return_url)
+    )
+}
+
+fn desktop_session_login_from_params(
+    params: &BTreeMap<String, String>,
+) -> Result<Option<SteamLoginResult>, String> {
+    let Some(steam_id) = params
+        .get("steam_id")
+        .filter(|value| value.chars().all(|ch| ch.is_ascii_digit()))
+        .cloned()
+    else {
+        return Ok(None);
+    };
+    let access_token = params
+        .get("access_token")
+        .filter(|value| !value.trim().is_empty())
+        .cloned()
+        .ok_or_else(|| "Desktop auth callback did not include an access token".to_owned())?;
+    let refresh_token = params
+        .get("refresh_token")
+        .filter(|value| !value.trim().is_empty())
+        .cloned()
+        .ok_or_else(|| "Desktop auth callback did not include a refresh token".to_owned())?;
+    let steam_name = params
+        .get("steam_name")
+        .filter(|value| !value.trim().is_empty())
+        .map(|value| normalize_steam_name(value))
+        .unwrap_or_else(|| steam_id.clone());
+    Ok(Some(SteamLoginResult {
+        steam_id,
+        steam_name,
+        supabase_session: Some(SupabaseSession {
+            access_token,
+            refresh_token,
+            expires_at: session_expires_at(params),
+        }),
+    }))
+}
+
+fn session_expires_at(params: &BTreeMap<String, String>) -> Option<i64> {
+    params
+        .get("expires_at")
+        .and_then(|value| value.parse::<i64>().ok())
+        .or_else(|| {
+            params
+                .get("expires_in")
+                .and_then(|value| value.parse::<i64>().ok())
+                .map(|seconds| chrono::Utc::now().timestamp() + seconds)
+        })
 }
 
 fn exchange_supabase_session(
@@ -135,6 +211,12 @@ fn exchange_supabase_session(
                 .get("expires_at")
                 .and_then(serde_json::Value::as_str)
                 .and_then(|value| value.parse::<i64>().ok())
+        })
+        .or_else(|| {
+            value
+                .get("expires_in")
+                .and_then(serde_json::Value::as_i64)
+                .map(|seconds| chrono::Utc::now().timestamp() + seconds)
         });
 
     Ok(SupabaseSession {
@@ -170,11 +252,18 @@ fn handle_callback(mut stream: TcpStream) -> Result<BTreeMap<String, String>, St
         .ok_or_else(|| "bad Steam callback request".to_owned())?;
     let query = path.split_once('?').map(|(_, query)| query).unwrap_or("");
     let params = parse_query(query);
-    let ok = params.contains_key("openid.claimed_id");
+    let ok = params.contains_key("openid.claimed_id")
+        || params
+            .get("access_token")
+            .filter(|value| !value.trim().is_empty())
+            .is_some();
+    let error = params.get("error").filter(|value| !value.trim().is_empty());
     let message = if ok {
-        "Login successful. You can close this tab."
+        "Login successful. You can close this tab.".to_owned()
+    } else if let Some(error) = error {
+        format!("Login failed: {error}")
     } else {
-        "Login failed. No Steam ID was returned."
+        "Login failed. No Steam ID was returned.".to_owned()
     };
     let status = if ok { "200 OK" } else { "400 Bad Request" };
     let body = format!("<!doctype html><body style=\"font-family:sans-serif;padding:48px\"><h2>{message}</h2></body>");
@@ -184,7 +273,7 @@ fn handle_callback(mut stream: TcpStream) -> Result<BTreeMap<String, String>, St
         body.len()
     )
     .map_err(|err| err.to_string())?;
-    if ok {
+    if ok || error.is_some() {
         Ok(params)
     } else {
         Err("Steam callback missing claimed_id".to_owned())
@@ -283,7 +372,14 @@ fn html_unescape(value: &str) -> String {
 
 #[cfg(test)]
 mod tests {
-    use super::normalize_steam_name;
+    use super::{dec, enc, normalize_steam_name, steam_login_with_opener};
+    use std::{
+        io::{Read, Write},
+        net::TcpStream,
+        sync::{Arc, Mutex},
+        thread,
+        time::Duration,
+    };
 
     #[test]
     fn normalize_steam_name_strips_cdata() {
@@ -293,5 +389,91 @@ mod tests {
     #[test]
     fn normalize_steam_name_unescapes_xml_entities() {
         assert_eq!(normalize_steam_name("Jack &amp; Jill"), "Jack & Jill");
+    }
+
+    #[test]
+    fn desktop_supabase_login_opens_web_start_and_accepts_session_callback() {
+        let callback_thread = Arc::new(Mutex::new(None));
+        let callback_thread_for_open = callback_thread.clone();
+
+        let result = steam_login_with_opener(
+            Duration::from_secs(2),
+            Some("https://www.trackautochess.test/api/auth/steam/callback"),
+            |url| {
+                assert!(
+                    url.starts_with("https://www.trackautochess.test/api/auth/steam?"),
+                    "desktop auth should start on the web auth route, opened {url}"
+                );
+                let return_to =
+                    query_param(url, "desktop_return_to").expect("desktop_return_to param");
+                let handle = thread::spawn(move || {
+                    send_session_callback(&return_to);
+                });
+                *callback_thread_for_open.lock().unwrap() = Some(handle);
+                Ok(())
+            },
+        )
+        .expect("desktop Supabase login should succeed");
+
+        if let Some(handle) = callback_thread.lock().unwrap().take() {
+            handle.join().expect("callback thread should finish");
+        }
+
+        assert_eq!(result.steam_id, "76561198022169086");
+        assert_eq!(result.steam_name, "Jack");
+        let session = result
+            .supabase_session
+            .expect("desktop callback should include Supabase session");
+        assert_eq!(session.access_token, "access-token");
+        assert_eq!(session.refresh_token, "refresh-token");
+        assert!(
+            session.expires_at.unwrap_or_default() > chrono::Utc::now().timestamp(),
+            "expires_in should be converted to an absolute timestamp"
+        );
+    }
+
+    fn query_param(url: &str, key: &str) -> Option<String> {
+        let query = url.split_once('?')?.1;
+        query.split('&').find_map(|pair| {
+            let (name, value) = pair.split_once('=')?;
+            (dec(name) == key).then(|| dec(value))
+        })
+    }
+
+    fn send_session_callback(return_to: &str) {
+        let target = return_to
+            .strip_prefix("http://")
+            .expect("desktop return URL should be http loopback");
+        let (authority, path) = target
+            .split_once('/')
+            .map(|(authority, path)| (authority, format!("/{path}")))
+            .unwrap_or((target, "/".to_owned()));
+        let query = [
+            ("steam_id", "76561198022169086"),
+            ("steam_name", "Jack"),
+            ("access_token", "access-token"),
+            ("refresh_token", "refresh-token"),
+            ("expires_in", "3600"),
+        ]
+        .into_iter()
+        .map(|(key, value)| format!("{}={}", enc(key), enc(value)))
+        .collect::<Vec<_>>()
+        .join("&");
+        let path = if path.contains('?') {
+            format!("{path}&{query}")
+        } else {
+            format!("{path}?{query}")
+        };
+        let mut stream = TcpStream::connect(authority).expect("connect to desktop callback");
+        write!(
+            stream,
+            "GET {path} HTTP/1.1\r\nHost: {authority}\r\nConnection: close\r\n\r\n"
+        )
+        .expect("write callback request");
+        let mut response = String::new();
+        stream
+            .read_to_string(&mut response)
+            .expect("read callback response");
+        assert!(response.contains("Login successful"));
     }
 }
