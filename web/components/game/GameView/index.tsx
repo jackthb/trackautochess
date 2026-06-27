@@ -1,7 +1,6 @@
 "use client";
 
-import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { UNIT_COSTS, computeSynergies } from "@/lib/units";
 import type { SynergyCountPiece } from "@dac/shared/game-structure";
 import {
@@ -30,11 +29,7 @@ import {
 } from "@dac/shared/game-utils";
 import { TooltipWrap, type TooltipData } from "@dac/shared/Tooltip";
 import { ChessBoard } from "@dac/shared/ChessBoard";
-import {
-  playerProfilePath,
-  steamProfileUrl,
-  type SteamProfile,
-} from "@/lib/steam";
+import { type SteamProfile } from "@/lib/steam";
 import { absoluteUrl } from "@/lib/site";
 import { analyticsRoute, bucketCount, trackEvent } from "@/lib/analytics";
 import { resolveIconUrl } from "@/lib/icons";
@@ -332,11 +327,6 @@ function MatchPlayerRow({
     profile.name ||
     ocrName ||
     (game.user_id ? String(game.user_id) : `Player #${game.placement}`);
-  const hasProfile = Boolean(game.user_id);
-  const profileUrl = hasProfile
-    ? steamProfileUrl(String(game.user_id), profile.customUrl)
-    : null;
-
   // When the scrubber is active, prefer the snapshot's lineup. Falls back
   // to the static games.lineup for rows without a snapshot at this round.
   const lineupStr = snap?.lineup ?? game.lineup;
@@ -397,7 +387,9 @@ function MatchPlayerRow({
     lineup.length > 0 ||
     hand.length > 0 ||
     synergies.length > 0 ||
-    compactRelics.length > 0;
+    compactRelics.length > 0 ||
+    Boolean(boardPieces?.length) ||
+    pandarenDrops.length > 0;
   const isOpen = expanded && hasContent;
 
   const rankLabel =
@@ -422,19 +414,15 @@ function MatchPlayerRow({
       </div>
       <div className={styles.mpInfo}>
         <div className={styles.mpNameRow}>
-          {profileUrl ? (
-            <Link
-              href={playerProfilePath(String(game.user_id), profile.customUrl)}
-              className={styles.mpName}
-              onClick={(e) => e.stopPropagation()}
-            >
-              {displayName}
-            </Link>
-          ) : (
-            <span className={`${styles.mpName} ${styles.mpNameUnknown}`}>
-              {displayName}
-            </span>
-          )}
+          <span
+            className={
+              profile.name || ocrName
+                ? styles.mpName
+                : `${styles.mpName} ${styles.mpNameUnknown}`
+            }
+          >
+            {displayName}
+          </span>
         </div>
         {rankLabel && <span className={styles.mpRank}>{rankLabel}</span>}
       </div>
@@ -611,6 +599,23 @@ export default function GameView({
     ? selectedRoundIdx === timeline!.rounds.length - 1
     : true;
   const canSelectRounds = hasTimeline && timeline!.rounds.length > 1;
+  const roundButtonRefs = useRef<Array<HTMLButtonElement | null>>([]);
+  const roundWheelRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    const wheel = roundWheelRef.current;
+    const button = roundButtonRefs.current[selectedRoundIdx];
+    if (!wheel || !button) return;
+    const buttonTop = button.offsetTop;
+    const buttonBottom = buttonTop + button.offsetHeight;
+    const visibleTop = wheel.scrollTop;
+    const visibleBottom = visibleTop + wheel.clientHeight;
+    if (buttonTop < visibleTop) {
+      wheel.scrollTop = buttonTop;
+    } else if (buttonBottom > visibleBottom) {
+      wheel.scrollTop = buttonBottom - wheel.clientHeight;
+    }
+  }, [selectedRoundIdx]);
 
   const tooltipData: TooltipData = {
     unitCosts: UNIT_COSTS,
@@ -660,32 +665,9 @@ export default function GameView({
     if (placement <= 1 || typeof g.final_round !== "number") continue;
     deathRounds.set(String(g.user_id), g.final_round);
   }
-  const isFinishedBySelectedRound = (g: Game): boolean => {
-    const deathRound = deathRounds.get(String(g.user_id));
-    return (
-      deathRound != null &&
-      (selectedRound == null || selectedRound >= deathRound)
-    );
-  };
   const playerRows: Game[] = [...basePlayerRows].sort((a, b) => {
     const finalPlacementDelta =
       (parseInt(a.placement) || 99) - (parseInt(b.placement) || 99);
-    if (!hasTimeline || isLastRound || !currentSnap?.players) {
-      return finalPlacementDelta;
-    }
-
-    const aSnap = currentSnap.players[String(a.user_id)];
-    const bSnap = currentSnap.players[String(b.user_id)];
-    const aHp = aSnap?.hp;
-    const bHp = bSnap?.hp;
-    const aHasHp = typeof aHp === "number";
-    const bHasHp = typeof bHp === "number";
-    if (aHasHp !== bHasHp) return aHasHp ? -1 : 1;
-    if (aHasHp && bHasHp && aHp !== bHp) return bHp - aHp;
-    if (isFinishedBySelectedRound(a) && isFinishedBySelectedRound(b)) {
-      return finalPlacementDelta;
-    }
-
     const aProfile = matchProfiles[String(a.user_id)];
     const bProfile = matchProfiles[String(b.user_id)];
     const aName = aProfile?.name || a.notes || String(a.user_id || a.id);
@@ -693,7 +675,7 @@ export default function GameView({
     const nameDelta = aName.localeCompare(bName, undefined, {
       sensitivity: "base",
     });
-    return nameDelta || finalPlacementDelta;
+    return finalPlacementDelta || nameDelta;
   });
 
   useEffect(() => {
@@ -747,45 +729,6 @@ export default function GameView({
             </div>
           )}
 
-          {/* Round scrubber, only rendered when nettable timeline exists. */}
-          {canSelectRounds && (
-            <div className={styles.roundScrubber}>
-              <div className={styles.rsHeader}>
-                <span className={styles.rsLabel}>Round</span>
-                <strong className={styles.rsValue}>{selectedRound}</strong>
-                <span className={styles.rsMeta}>
-                  {" "}
-                  / {timeline!.last_round}
-                  {isLastRound ? " (final)" : ""}
-                </span>
-                {!isLastRound && (
-                  <button
-                    type="button"
-                    className={styles.rsJumpEnd}
-                    onClick={() =>
-                      setSelectedRoundIdx(timeline!.rounds.length - 1)
-                    }
-                  >
-                    Jump to end
-                  </button>
-                )}
-              </div>
-              <input
-                className={styles.rsRange}
-                type="range"
-                min={0}
-                max={timeline!.rounds.length - 1}
-                value={selectedRoundIdx}
-                onChange={(e) => setSelectedRoundIdx(Number(e.target.value))}
-                aria-label="Scrub through match rounds"
-              />
-              <div className={styles.rsEnds}>
-                <span>R{timeline!.first_round}</span>
-                <span>R{timeline!.last_round}</span>
-              </div>
-            </div>
-          )}
-
           {/* Players table, viewed row pre-expanded */}
           <div className={styles.matchSection}>
             <div className={styles.matchSectionHeader}>
@@ -798,41 +741,107 @@ export default function GameView({
                 {playerRows.length === 1 ? "player" : "players"}
               </span>
             </div>
-            {playerRows.map((g, rowIdx) => {
-              const deathRound = deathRounds.get(String(g.user_id)) ?? null;
-              const finalPosition = parseInt(g.placement) || null;
-              const showFinalPosition =
-                deathRound != null &&
-                (isLastRound ||
-                  selectedRound == null ||
-                  selectedRound >= deathRound);
-              return (
-                <MatchPlayerRow
-                  key={g.id}
-                  game={g}
-                  profile={
-                    matchProfiles[String(g.user_id)] ||
-                    (g.id === game.id
-                      ? steamProfile
-                      : { name: null, customUrl: null })
-                  }
-                  highlighted={isHighlightedRow(g)}
-                  expanded={expandedIds.has(g.id)}
-                  onToggle={() => toggleExpand(g.id)}
-                  relicTimeline={relicTimelines[String(g.user_id)]}
-                  snap={currentSnap?.players?.[String(g.user_id)] ?? null}
-                  snapRound={selectedRound}
-                  isLastRound={isLastRound}
-                  displayPosition={
-                    hasTimeline && !isLastRound && !showFinalPosition
-                      ? rowIdx + 1
-                      : finalPosition
-                  }
-                  deathRound={deathRound}
-                  tooltipData={tooltipData}
-                />
-              );
-            })}
+            <div
+              className={
+                canSelectRounds
+                  ? styles.matchSectionBody
+                  : styles.matchSectionBodyNoRail
+              }
+            >
+              {canSelectRounds && (
+                <div className={styles.roundScrubber}>
+                  <div className={styles.rsHeader}>
+                    <div>
+                      <span className={styles.rsLabel}>Round</span>
+                      <div className={styles.rsCurrent}>
+                        <strong className={styles.rsValue}>
+                          {selectedRound}
+                        </strong>
+                        <span className={styles.rsMeta}>
+                          / {timeline!.last_round}
+                          {isLastRound ? " final" : ""}
+                        </span>
+                      </div>
+                    </div>
+                    {!isLastRound && (
+                      <button
+                        type="button"
+                        className={styles.rsJumpEnd}
+                        onClick={() =>
+                          setSelectedRoundIdx(timeline!.rounds.length - 1)
+                        }
+                      >
+                        End
+                      </button>
+                    )}
+                  </div>
+                  <div className={styles.rsBody}>
+                    <div
+                      className={styles.rsWheel}
+                      ref={roundWheelRef}
+                      role="listbox"
+                      aria-label="Select match round"
+                      aria-activedescendant={`round-option-${selectedRoundIdx}`}
+                    >
+                      {timeline!.rounds.map((round, index) => {
+                        const roundNumber = round.round ?? index + 1;
+                        const selected = index === selectedRoundIdx;
+                        return (
+                          <button
+                            key={`${roundNumber}-${index}`}
+                            id={`round-option-${index}`}
+                            ref={(node) => {
+                              roundButtonRefs.current[index] = node;
+                            }}
+                            type="button"
+                            role="option"
+                            aria-selected={selected}
+                            className={
+                              styles.rsRoundButton +
+                              (selected
+                                ? ` ${styles.rsRoundButtonSelected}`
+                                : "")
+                            }
+                            onClick={() => setSelectedRoundIdx(index)}
+                          >
+                            R{roundNumber}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </div>
+              )}
+              <div className={styles.playersList}>
+                {playerRows.map((g) => {
+                  const deathRound =
+                    deathRounds.get(String(g.user_id)) ?? null;
+                  const finalPosition = parseInt(g.placement) || null;
+                  return (
+                    <MatchPlayerRow
+                      key={g.id}
+                      game={g}
+                      profile={
+                        matchProfiles[String(g.user_id)] ||
+                        (g.id === game.id
+                          ? steamProfile
+                          : { name: null, customUrl: null })
+                      }
+                      highlighted={isHighlightedRow(g)}
+                      expanded={expandedIds.has(g.id)}
+                      onToggle={() => toggleExpand(g.id)}
+                      relicTimeline={relicTimelines[String(g.user_id)]}
+                      snap={currentSnap?.players?.[String(g.user_id)] ?? null}
+                      snapRound={selectedRound}
+                      isLastRound={isLastRound}
+                      displayPosition={finalPosition}
+                      deathRound={deathRound}
+                      tooltipData={tooltipData}
+                    />
+                  );
+                })}
+              </div>
+            </div>
           </div>
         </div>
       </div>

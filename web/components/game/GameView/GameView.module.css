@@ -57,16 +57,20 @@
 
 /* ── Round scrubber ────────────────────────────── */
 .roundScrubber {
-  border: 1px solid var(--border);
-  border-radius: var(--r-8);
-  background: var(--bg-surface);
-  padding: 14px 20px 12px;
-  margin-bottom: 16px;
+  align-self: stretch;
+  border-right: 1px solid var(--border-subtle);
+  background: rgba(0, 0, 0, 0.08);
+  padding: 12px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
 }
 .rsHeader {
   display: flex;
-  align-items: baseline;
-  gap: 6px;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
   font-size: 12px;
   color: var(--text-muted);
 }
@@ -80,17 +84,24 @@
 .rsValue {
   font-family: var(--font-display);
   color: var(--text-primary);
-  font-size: 18px;
+  font-size: 22px;
   font-weight: 700;
   font-variant-numeric: tabular-nums;
-  margin-left: 4px;
+}
+.rsCurrent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+  margin-top: 2px;
 }
 .rsMeta {
   color: var(--text-muted);
   font-variant-numeric: tabular-nums;
+  font-size: 10px;
 }
 .rsJumpEnd {
-  margin-left: auto;
+  width: 100%;
   background: var(--bg-elevated);
   border: 1px solid var(--border-subtle);
   color: var(--text-secondary);
@@ -104,18 +115,50 @@
 .rsJumpEnd:hover {
   color: var(--text-primary);
 }
-.rsRange {
-  width: 100%;
-  margin: 10px 0 4px;
-  accent-color: var(--accent);
-}
-.rsEnds {
+.rsBody {
+  min-width: 0;
+  min-height: 0;
   display: flex;
-  justify-content: space-between;
-  font-size: 10px;
+  justify-content: center;
+  flex: 1;
+}
+.rsWheel {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  width: 58px;
+  height: 100%;
+  max-height: none;
+  overflow-y: auto;
+  padding: 2px 4px 2px 0;
+  scroll-snap-type: y proximity;
+  scrollbar-width: thin;
+}
+.rsRoundButton {
+  flex: 0 0 30px;
+  scroll-snap-align: center;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--r-3);
+  background: var(--bg-elevated);
   color: var(--text-muted);
+  font-size: 10px;
   font-variant-numeric: tabular-nums;
-  letter-spacing: 0.4px;
+  font-weight: 700;
+  letter-spacing: 0.6px;
+  cursor: pointer;
+  transition:
+    color var(--t-base) var(--t-easing),
+    border-color var(--t-base) var(--t-easing),
+    background var(--t-base) var(--t-easing);
+}
+.rsRoundButton:hover {
+  color: var(--text-secondary);
+  border-color: var(--border);
+}
+.rsRoundButtonSelected {
+  background: rgba(224, 64, 42, 0.16);
+  border-color: var(--accent);
+  color: var(--text-primary);
 }
 
 /* ── Players table ─────────────────────────────── */
@@ -125,10 +168,22 @@
   background: var(--bg-surface);
   overflow: hidden;
 }
+.matchSectionBody {
+  display: grid;
+  grid-template-columns: 82px minmax(0, 1fr);
+  align-items: stretch;
+}
+.matchSectionBodyNoRail {
+  display: block;
+}
+.playersList {
+  min-width: 0;
+}
 .matchSectionHeader {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 16px;
   padding: 16px 24px;
   border-bottom: 1px solid var(--border-subtle);
   background: rgba(0, 0, 0, 0.12);
@@ -187,7 +242,8 @@
   background: rgba(224, 64, 42, 0.06);
 }
 .mpToggle {
-  display: flex;
+  display: grid;
+  grid-template-columns: 36px minmax(112px, 150px) minmax(78px, 112px) minmax(0, 1fr) auto auto;
   align-items: center;
   gap: 12px;
   width: 100%;
@@ -227,8 +283,6 @@
   flex-shrink: 0;
 }
 .mpInfo {
-  width: 150px;
-  flex-shrink: 0;
   min-width: 0;
   display: flex;
   flex-direction: column;
@@ -244,14 +298,10 @@
   font-weight: 600;
   color: var(--text-primary);
   text-decoration: none;
-  transition: color var(--t-base) var(--t-easing);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
   max-width: 100%;
-}
-.mpName:hover {
-  color: #fff;
 }
 .mpNameUnknown {
   color: var(--text-muted);
@@ -273,8 +323,8 @@
   display: flex;
   gap: 10px;
   align-items: center;
-  width: 112px;
-  flex-shrink: 0;
+  min-width: 0;
+  flex-wrap: wrap;
 }
 .mpStat {
   display: inline-flex;
@@ -338,7 +388,6 @@
   color: var(--red-bright);
 }
 .mpColLineup {
-  flex: 1;
   min-width: 0;
   overflow: visible;
 }
@@ -347,7 +396,7 @@
 .mpLineup {
   display: flex;
   gap: 4px;
-  flex-wrap: nowrap;
+  flex-wrap: wrap;
   align-items: center;
   overflow: visible;
 }
@@ -378,7 +427,6 @@
   height: 36px;
 }
 .mpCaret {
-  flex-shrink: 0;
   width: 22px;
   height: 22px;
   display: flex;
@@ -525,32 +573,73 @@
 }
 
 @media (max-width: 720px) {
+  .playerDetail {
+    padding: 16px 20px 20px 20px;
+  }
+}
+
+@media (max-width: 720px) {
+  .matchSectionBody {
+    grid-template-columns: 58px minmax(0, 1fr);
+  }
+  .roundScrubber {
+    padding: 10px 4px;
+  }
+  .rsHeader {
+    gap: 6px;
+  }
+  .rsLabel {
+    display: none;
+  }
+  .rsValue {
+    font-size: 18px;
+  }
+  .rsMeta {
+    font-size: 9px;
+  }
+  .rsBody {
+    justify-content: center;
+  }
+  .rsWheel {
+    width: 46px;
+    max-height: none;
+  }
+  .rsRoundButton {
+    flex-basis: 28px;
+    font-size: 9px;
+  }
+  .matchSectionHeader {
+    padding: 14px 16px;
+  }
   .mpToggle {
-    flex-wrap: wrap;
-    padding: 10px 16px;
+    grid-template-columns: 34px minmax(0, 1fr) auto;
+    padding: 12px 16px;
     gap: 8px;
   }
+  .mpPlacement {
+    width: 34px;
+    height: 34px;
+  }
   .mpInfo {
+    grid-column: 2;
     width: auto;
-    flex: 1;
   }
   .mpColStats {
+    grid-column: 2 / 4;
+    grid-row: 2;
     width: auto;
   }
   .mpColLineup {
-    flex-basis: 100%;
-    order: 10;
+    grid-column: 1 / 4;
+    grid-row: 3;
   }
-  /* Phones are too narrow for a full board on one line — let it wrap
-     here so no units get clipped. */
-  .mpLineup {
-    flex-wrap: wrap;
-    overflow: visible;
+  .mpRoundResult {
+    grid-column: 2;
+    grid-row: 4;
   }
   .mpCaret {
-    margin-left: auto;
-  }
-  .playerDetail {
-    padding: 16px 20px 20px 20px;
+    grid-column: 3;
+    grid-row: 1;
+    margin-left: 0;
   }
 }
