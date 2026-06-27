@@ -7,8 +7,7 @@ use crate::{
         NettableGameEnded, NettableIngestComplete, NettableIngestError, NettableMatchLeftPending,
         NettableMatchLeftResolved, NettablePersonalGameEnded, NettableQueenUploadComplete,
         NettableQueenUploadProgress, NettableRankingScanned, NettableResyncComplete,
-        NettableRoundChanged, NettableStateEvent, NettableStatus,
-        NettableTimelineExtracted,
+        NettableRoundChanged, NettableStateEvent, NettableStatus, NettableTimelineExtracted,
     },
     match_builder::{
         build_match_timeline, extract_death_team_from_rows, extract_round_from_rows,
@@ -191,10 +190,16 @@ impl NettableService {
                             if local_is_capture_owner(&state) {
                                 if let Some(client) = SupabaseClient::from_config(&cfg) {
                                     if let Some(match_id) = finished_match_id_from_rows(&rows) {
-                                        if end_board_already_uploaded(&state, &match_id)
-                                            || client.finished_match_has_players(&match_id)
-                                        {
+                                        if end_board_already_uploaded(&state, &match_id) {
+                                            continue;
+                                        }
+                                        if client.finished_match_has_players(&match_id) {
                                             mark_end_board_uploaded(&state, &match_id);
+                                            if let Some(timeline) =
+                                                build_match_timeline_from_state(&state, &match_id)
+                                            {
+                                                let _ = client.upsert_match_timeline(&timeline);
+                                            }
                                             continue;
                                         }
                                     }
@@ -229,11 +234,6 @@ impl NettableService {
                                                 ),
                                             ));
                                             emit_fallback_finalize(&cfg, &rows, &emit, "End-board upload failed; saved a partial match from the last live snapshot.");
-                                            if let Some(match_id) =
-                                                finished_match_id_from_rows(&rows)
-                                            {
-                                                mark_end_board_uploaded(&state, &match_id);
-                                            }
                                         }
                                     }
                                 }
