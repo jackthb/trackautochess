@@ -84,13 +84,18 @@ pub struct BackendStatus<'a> {
 }
 
 impl<'a> BackendStatus<'a> {
-    pub fn new(steam_id: &'a str, steam_name: &'a str, replay_enabled: bool) -> Self {
+    pub fn new(
+        steam_id: &'a str,
+        steam_name: &'a str,
+        replay_enabled: bool,
+        logged_in: bool,
+    ) -> Self {
         Self {
             event_type: "status",
             backend: "rust",
             recording: false,
             focused: false,
-            logged_in: !steam_id.is_empty(),
+            logged_in,
             steam_id,
             steam_name,
             replay_enabled,

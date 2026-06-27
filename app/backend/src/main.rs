@@ -510,7 +510,18 @@ fn status_json(cfg: &Config) -> String {
         &cfg.steam_id,
         &cfg.steam_name,
         cfg.replay_enabled,
+        has_upload_auth_session(cfg),
     ))
+}
+
+fn has_upload_auth_session(cfg: &Config) -> bool {
+    if cfg.steam_id.trim().is_empty() {
+        return false;
+    }
+    if cfg.local_only || cfg.supabase_url.trim().is_empty() || cfg.supabase_key.trim().is_empty() {
+        return true;
+    }
+    !cfg.supabase_access_token.trim().is_empty() || !cfg.supabase_refresh_token.trim().is_empty()
 }
 
 fn spawn_supabase_request<F>(stdout_lock: Arc<Mutex<()>>, cfg: Config, f: F)

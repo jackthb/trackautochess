@@ -16,11 +16,11 @@ export function SettingsTab({ status }: SettingsTabProps) {
 
   // Clear login loading when steam status changes
   useEffect(() => {
-    if (status?.steam_name) setLoggingIn(false);
-  }, [status?.steam_name]);
+    if (status?.logged_in) setLoggingIn(false);
+  }, [status?.logged_in]);
 
-  const loggedIn = !!status?.steam_name;
-  const steamName = status?.steam_name || "Not logged in";
+  const loggedIn = !!status?.logged_in;
+  const steamName = loggedIn ? status?.steam_name || "Steam" : "Not logged in";
   const steamId = status?.steam_id || "\u2014";
 
   const sendCommand = (cmd: BackendCommand) => {
