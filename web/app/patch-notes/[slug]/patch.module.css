@@ -70,6 +70,16 @@
   border-color: var(--text-muted);
   background: var(--bg-hover);
 }
+.patch-image {
+  display: block;
+  width: 100%;
+  max-height: 560px;
+  object-fit: contain;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-8);
+  margin-bottom: var(--s-32);
+}
 .summary {
   padding: var(--s-20) var(--s-24);
   background: var(--bg-surface);

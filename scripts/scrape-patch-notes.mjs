@@ -20,8 +20,10 @@ const ROOT_CONTENT = join(__dirname, "..", "content");
 const PATCH_NOTES_DIR = join(ROOT_CONTENT, "patch-notes");
 const GAME_CONTENT_DIR = join(ROOT_CONTENT, "game");
 const ITEMS_PATH = join(GAME_CONTENT_DIR, "curated-items.json");
+const ITEMS_DIR = join(GAME_CONTENT_DIR, "items");
 const UNITS_DIR = join(GAME_CONTENT_DIR, "units");
 const SYNERGIES_DIR = join(GAME_CONTENT_DIR, "synergies");
+const RELICS_DIR = join(GAME_CONTENT_DIR, "relics");
 const PUBLISHED_FILE_ID = "1613886175";
 const CHANGELOG_URL =
   `https://steamcommunity.com/sharedfiles/filedetails/changelog/${PUBLISHED_FILE_ID}`;
@@ -51,6 +53,10 @@ const CHANGELOG_FILE_ARG = process.argv.find((arg) =>
   arg.startsWith("--changelog-file=")
 );
 const CHANGELOG_FILE = CHANGELOG_FILE_ARG?.split("=").slice(1).join("=");
+const ANNOTATE_PATCH_ARG = process.argv.find((arg) =>
+  arg.startsWith("--annotate-patch=")
+);
+const ANNOTATE_PATCH = ANNOTATE_PATCH_ARG?.split("=").slice(1).join("=");
 
 function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -386,17 +392,28 @@ async function fetchGoogleDoc(url) {
   }
 }
 
-function htmlToText(html) {
-  return html
-    .replace(/<[^>]+>/g, "")
+function decodeHtmlEntities(value) {
+  return (value || "")
     .replace(/&amp;/g, "&")
     .replace(/&lt;/g, "<")
     .replace(/&gt;/g, ">")
     .replace(/&quot;/g, '"')
     .replace(/&#39;/g, "'")
-    .replace(/&nbsp;/g, " ")
+    .replace(/&nbsp;/g, " ");
+}
+
+function htmlToText(html) {
+  return decodeHtmlEntities(html.replace(/<[^>]+>/g, ""))
     .replace(/●\s*/g, "")
     .trim();
+}
+
+function extractFirstImageUrl(html) {
+  for (const match of html.matchAll(/<img\b[^>]*\bsrc="([^"]+)"/gi)) {
+    const url = decodeHtmlEntities(match[1]).trim();
+    if (/^https?:\/\//i.test(url)) return url;
+  }
+  return null;
 }
 
 const SECTION_PATTERNS = [
@@ -420,7 +437,8 @@ function parseGoogleDoc(html) {
   const contentMatch = html.match(
     /<div[^>]*class="[^"]*doc-content[^"]*"[^>]*>([\s\S]*)<\/div>/i
   );
-  if (!contentMatch) return { title, sections: [] };
+  const image = extractFirstImageUrl(contentMatch?.[1] || html);
+  if (!contentMatch) return { title, image, sections: [] };
   // Move <hr> tags out of <p> tags so splitting on <hr> doesn't break entries
   const body = contentMatch[1].replace(/<hr\s*\/?>\s*<\/p>/gi, "</p><hr>");
 
@@ -475,7 +493,7 @@ function parseGoogleDoc(html) {
     if (section.entries.length > 0) sections.push(section);
   }
 
-  return { title, sections };
+  return { title, image, sections };
 }
 
 function normalizeContent(value) {
@@ -737,6 +755,200 @@ function writeJsonFile(file, data) {
   writeFileSync(file, JSON.stringify(data, null, 2) + "\n");
 }
 
+let patchEntityIndex = null;
+
+function entityAliasKeys(value) {
+  const key = slugifyName(String(value || ""));
+  if (!key) return [];
+  const compact = key.replace(/-/g, "");
+  return compact && compact !== key ? [key, compact] : [key];
+}
+
+function addEntityAlias(byType, record, value) {
+  for (const key of entityAliasKeys(value)) {
+    const aliases = byType.get(record.type);
+    if (!aliases.has(key)) aliases.set(key, []);
+    const records = aliases.get(key);
+    if (!records.some((existing) => existing.entityKey === record.entityKey)) {
+      records.push(record);
+    }
+  }
+}
+
+function addEntityAliases(byType, record, data, fileBase) {
+  const aliases = [
+    record.name,
+    record.slug,
+    fileBase,
+    data.source?.name,
+    data.source?.names?.en,
+  ];
+
+  if (record.type === "synergy" && fileBase.startsWith("is_")) {
+    aliases.push(fileBase.slice(3).replace(/[_-]+/g, " "));
+  }
+
+  if (record.type === "unit") {
+    aliases.push(record.name.replace(/^Abyssal\s+/i, ""));
+    aliases.push(record.name.replace(/\s+Warrunner$/i, ""));
+  }
+
+  for (const alias of aliases) {
+    if (alias) addEntityAlias(byType, record, alias);
+  }
+}
+
+function readEntityRecords({ type, dir }) {
+  const records = [];
+  for (const file of readdirSync(dir)) {
+    if (!file.endsWith(".json")) continue;
+    const fileBase = file.replace(/\.json$/, "");
+    const data = readJsonFile(join(dir, file));
+    const name = data.name || data.source?.name || data.source?.names?.en || fileBase;
+    const slug = data.slug || slugifyName(name);
+    if (!slug) continue;
+    records.push({ type, slug, name, fileBase, data, entityKey: `${type}__${slug}` });
+  }
+  return records;
+}
+
+function buildPatchEntityIndex() {
+  const byType = new Map([
+    ["unit", new Map()],
+    ["item", new Map()],
+    ["synergy", new Map()],
+    ["relic", new Map()],
+  ]);
+  const byTypeAndSlug = new Map();
+
+  for (const collection of [
+    { type: "unit", dir: UNITS_DIR },
+    { type: "item", dir: ITEMS_DIR },
+    { type: "synergy", dir: SYNERGIES_DIR },
+    { type: "relic", dir: RELICS_DIR },
+  ]) {
+    for (const record of readEntityRecords(collection)) {
+      byTypeAndSlug.set(`${record.type}:${record.slug}`, record);
+      addEntityAliases(byType, record, record.data, record.fileBase);
+    }
+  }
+
+  for (const [type, alias, slug] of [
+    ["unit", "Underlord", "abyssal-underlord"],
+    ["unit", "Centaur", "centaur-warrunner"],
+    ["synergy", "Element", "elemental"],
+    ["synergy", "Elements", "elemental"],
+  ]) {
+    const record = byTypeAndSlug.get(`${type}:${slug}`);
+    if (record) addEntityAlias(byType, record, alias);
+  }
+
+  return { byType };
+}
+
+function getPatchEntityIndex() {
+  if (!patchEntityIndex) patchEntityIndex = buildPatchEntityIndex();
+  return patchEntityIndex;
+}
+
+function entryEntityNameCandidates(name) {
+  const raw = String(name || "").trim();
+  if (!raw) return [];
+
+  const beforeDash = raw.split(/\s+[-\u2013\u2014]\s+/)[0].trim();
+  const withoutParens = beforeDash.replace(/\s*\([^)]*\)\s*$/g, "").trim();
+  const candidates = [withoutParens, beforeDash, raw]
+    .map((candidate) => candidate.trim())
+    .filter(Boolean)
+    .filter((candidate) => !candidate.includes(","));
+
+  return [...new Set(candidates)];
+}
+
+function preferredEntityTypesForSection(heading) {
+  const normalized = String(heading || "").toLowerCase();
+  if (/chess|piece|unit/.test(normalized)) return ["unit", "synergy", "item", "relic"];
+  if (/synerg/.test(normalized)) return ["synergy", "unit", "item", "relic"];
+  if (/item/.test(normalized)) return ["item", "relic", "unit", "synergy"];
+  if (/relic/.test(normalized)) return ["relic", "item", "unit", "synergy"];
+  return ["unit", "item", "synergy", "relic"];
+}
+
+function lookupEntityRecord(index, type, candidate) {
+  const aliases = index.byType.get(type);
+  if (!aliases) return null;
+  for (const key of entityAliasKeys(candidate)) {
+    const matches = aliases.get(key) || [];
+    if (matches.length === 1) return matches[0];
+  }
+  return null;
+}
+
+function findEntryEntityRecord(entry, sectionHeading) {
+  if (entry.entityKey || entry.entity) return null;
+
+  const index = getPatchEntityIndex();
+  const candidates = entryEntityNameCandidates(entry.name);
+  const preferredTypes = preferredEntityTypesForSection(sectionHeading);
+
+  for (const type of preferredTypes) {
+    for (const candidate of candidates) {
+      const record = lookupEntityRecord(index, type, candidate);
+      if (record) return record;
+    }
+  }
+
+  return null;
+}
+
+function annotatePatchSections(sections) {
+  let linked = 0;
+  for (const section of sections || []) {
+    for (const entry of section.entries || []) {
+      const record = findEntryEntityRecord(entry, section.heading);
+      if (!record) continue;
+      entry.entityKey = record.entityKey;
+      linked += 1;
+    }
+  }
+  return linked;
+}
+
+async function annotateExistingPatch(slugOrFile) {
+  const file =
+    slugOrFile.endsWith(".json") && /[\\/]/.test(slugOrFile)
+      ? slugOrFile
+      : join(PATCH_NOTES_DIR, slugOrFile.endsWith(".json") ? slugOrFile : `${slugOrFile}.json`);
+  const patch = readJsonFile(file);
+  const linked = annotatePatchSections(patch.sections || []);
+  let imageAdded = false;
+
+  if (!patch.image && /^https:\/\/docs\.google\.com\//i.test(patch.source || "")) {
+    console.log(`Fetching Google Doc image: ${patch.source}`);
+    const docHtml = await fetchGoogleDoc(patch.source);
+    const image = docHtml ? parseGoogleDoc(docHtml).image : null;
+    if (image) {
+      patch.image = image;
+      imageAdded = true;
+    }
+  }
+
+  if (DRY_RUN) {
+    console.log(
+      `[dry-run] Would annotate ${slugOrFile}: ${linked} entity link(s), image ${imageAdded ? "added" : "unchanged"}.`
+    );
+    console.log(JSON.stringify(patch, null, 2));
+    return;
+  }
+
+  if (linked > 0 || imageAdded) {
+    writeFileSync(file, patchNoteToJson(patch));
+  }
+  console.log(
+    `Annotated ${slugOrFile}: ${linked} entity link(s), image ${imageAdded ? "added" : "unchanged"}.`
+  );
+}
+
 function applyContentGameDataChanges(sections) {
   const items = readJsonFile(ITEMS_PATH);
   let changed = false;
@@ -852,6 +1064,11 @@ function applyContentGameDataChanges(sections) {
 }
 
 async function main() {
+  if (ANNOTATE_PATCH) {
+    await annotateExistingPatch(ANNOTATE_PATCH);
+    return;
+  }
+
   console.log("Fetching Steam Workshop changelog...");
   const { html, entries } = await fetchChangelogWithEntries();
 
@@ -935,6 +1152,7 @@ async function main() {
     const docsUrl = dayEntries.find((e) => e.docsUrl)?.docsUrl;
     let title = "Rebalance Patch";
     let sections;
+    let image;
 
     if (docsUrl) {
       console.log(`Fetching Google Doc: ${docsUrl}`);
@@ -943,12 +1161,18 @@ async function main() {
         const parsed = parseGoogleDoc(docHtml);
         title = parsed.title;
         sections = parsed.sections;
+        image = parsed.image;
       }
     }
 
     if (!sections || sections.length === 0) {
       const combined = dayEntries.map((e) => e.content).join("\n\n");
       sections = contentToSections(combined);
+    }
+
+    const linkedEntities = annotatePatchSections(sections);
+    if (linkedEntities > 0) {
+      console.log(`Linked ${linkedEntities} patch entr${linkedEntities === 1 ? "y" : "ies"} to game entities.`);
     }
 
     // Hotfix folding: a small *generic* patch landing within a couple of days
@@ -983,6 +1207,7 @@ async function main() {
       title,
       source: docsUrl || CHANGELOG_URL,
       workshopUrl: docsUrl ? CHANGELOG_URL : undefined,
+      image: image || undefined,
       // New patches carry game-data changes that have NOT yet been pulled from
       // the VPK into content/game/*.json. Flipped true by the
       // /sync-patch-entities skill or scripts/mark-patch-synced.mjs.

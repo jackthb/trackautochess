@@ -308,6 +308,7 @@ export default config({
         title: fields.slug({ name: { label: "Title" } }),
         source: fields.url({ label: "Source" }),
         workshopUrl: fields.url({ label: "Workshop URL" }),
+        image: fields.url({ label: "Image URL" }),
         flavor: fields.text({ label: "Flavor", multiline: true }),
         entitiesSynced: fields.checkbox({ label: "Entities synced" }),
         entitiesSyncedAt: fields.ignored(),

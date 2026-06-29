@@ -41,6 +41,7 @@ interface Patch {
   titles?: Record<string, string> | null;
   source?: string;
   workshop_url?: string;
+  image?: string;
   flavor?: string;
   summary?: string;
   sections: PatchSection[];
@@ -175,6 +176,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     pickLocalized(patch.titles ?? undefined, DEFAULT_LOCALE) || patch.title;
   const title = `${localizedTitle} | Patch Notes | ${SITE_TITLE}`;
   const description = buildPatchDescription(patch);
+  const previewImage = patch.image || "/logo.svg";
 
   return {
     title,
@@ -188,13 +190,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       siteName: SITE_NAME,
       url: `/patch-notes/${slug}`,
       locale: "en_US",
-      images: ["/logo.svg"],
+      images: [previewImage],
     },
     twitter: {
       card: "summary_large_image",
       title,
       description,
-      images: ["/logo.svg"],
+      images: [previewImage],
     },
   };
 }
@@ -220,6 +222,7 @@ export default async function PatchDetailPage({ params }: Props) {
       description,
       datePublished: patch.date,
       dateModified: patch.date,
+      ...(patch.image ? { image: patch.image } : {}),
       ...(pageUrl ? { url: pageUrl, mainEntityOfPage: pageUrl } : {}),
       publisher: {
         "@type": "Organization",
@@ -296,6 +299,15 @@ export default async function PatchDetailPage({ params }: Props) {
                 </a>
               )}
             </div>
+          )}
+
+          {patch.image && (
+            <img
+              className={styles["patch-image"]}
+              src={patch.image}
+              alt={`${localizedTitle} patch art`}
+              loading="eager"
+            />
           )}
 
           {patch.flavor && <div className={styles.flavor}>{patch.flavor}</div>}
