@@ -31,6 +31,13 @@ const CHANGELOG_FETCH_URLS = [
   CHANGELOG_FETCH_URL,
   `${CHANGELOG_FETCH_URL}&p=1`,
 ];
+// GitHub-hosted runners currently receive the Steam changelog shell without
+// changeLogCtn entries. The reader endpoint fetches the same public page from a
+// non-runner network and returns markdown that still includes update dates,
+// Google Doc links, and the short changelog text.
+const CHANGELOG_READER_URLS = CHANGELOG_FETCH_URLS.map(
+  (url) => `https://r.jina.ai/http://${url}`
+);
 
 const REQUEST_HEADERS = {
   "User-Agent":
@@ -58,7 +65,7 @@ async function fetchChangelogUrl(url) {
 async function fetchChangelogWithEntries() {
   if (CHANGELOG_FILE) {
     const html = readFileSync(CHANGELOG_FILE, "utf-8");
-    return { html, entries: parseChangelogEntries(html) };
+    return { html, entries: parseChangelogPayload(html) };
   }
 
   let firstHtml = "";
@@ -87,10 +94,59 @@ async function fetchChangelogWithEntries() {
     }
   }
 
+  console.warn(
+    "Steam changelog returned 0 direct HTML entries; trying text-rendered fallback..."
+  );
+  const fallback = await fetchReaderChangelogWithEntries();
+  if (fallback.entries.length > 0) return fallback;
+
   if (firstHtml) {
     return { html: firstHtml, entries: [] };
   }
   throw firstError || new Error("Could not fetch Steam changelog");
+}
+
+async function fetchReaderChangelogWithEntries() {
+  let firstHtml = "";
+  let firstError = null;
+  const urls = [
+    ...CHANGELOG_READER_URLS,
+    ...CHANGELOG_READER_URLS.map((url) => `${url}&_=${Date.now()}`),
+  ];
+
+  for (let i = 0; i < urls.length; i += 1) {
+    try {
+      const html = await fetchChangelogUrl(urls[i]);
+      if (!firstHtml) firstHtml = html;
+      const entries = parseChangelogReaderEntries(html);
+      if (entries.length > 0) {
+        const latestUpdateId = await fetchLatestSteamUpdateId().catch((err) => {
+          console.warn(`Could not fetch latest Steam update id: ${err.message}`);
+          return null;
+        });
+        if (latestUpdateId && !entries[0].sourceId) {
+          entries[0] = { ...entries[0], sourceId: latestUpdateId };
+        }
+        console.warn(`Text-rendered fallback returned ${entries.length} entries.`);
+        return { html, entries };
+      }
+      if (i < urls.length - 1) {
+        console.warn(`Text-rendered fallback attempt ${i + 1} returned 0 entries; retrying...`);
+        await sleep(750);
+      }
+    } catch (err) {
+      if (!firstError) firstError = err;
+      if (i < urls.length - 1) {
+        console.warn(`Text-rendered fallback attempt ${i + 1} failed: ${err.message}; retrying...`);
+        await sleep(750);
+      }
+    }
+  }
+
+  if (firstError) {
+    console.warn(`Text-rendered fallback failed: ${firstError.message}`);
+  }
+  return { html: firstHtml, entries: [] };
 }
 
 async function fetchLatestSteamUpdateId() {
@@ -183,6 +239,86 @@ function parseChangelogEntries(html) {
     if (!content) continue;
 
     entries.push({ date: isoDate, time, content, docsUrl, sourceId });
+  }
+
+  return entries;
+}
+
+function parseChangelogPayload(payload) {
+  const htmlEntries = parseChangelogEntries(payload);
+  if (htmlEntries.length > 0) return htmlEntries;
+  return parseChangelogReaderEntries(payload);
+}
+
+function parseChangelogReaderEntries(markdown) {
+  const entries = [];
+  const currentYear = new Date().getFullYear();
+  const updateRegex =
+    /^Update:\s*(?:(\d+)\s+(\w+)|(\w+)\s+(\d+))\s+@\s*([\d:]+[ap]m)\s*$/gim;
+  const matches = [...markdown.matchAll(updateRegex)];
+
+  for (let i = 0; i < matches.length; i += 1) {
+    const match = matches[i];
+    const day = match[1] || match[4];
+    const month = match[2] || match[3];
+    const time = match[5];
+    const monthIndex = ["jan","feb","mar","apr","may","jun","jul","aug","sep","oct","nov","dec"]
+      .indexOf(month.toLowerCase().slice(0, 3));
+    if (monthIndex === -1) continue;
+
+    const isoDate = `${currentYear}-${String(monthIndex + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+    const start = match.index + match[0].length;
+    const end = i + 1 < matches.length ? matches[i + 1].index : markdown.length;
+    const block = markdown.slice(start, end);
+    const lines = block
+      .split(/\r?\n/)
+      .map((line) => line.trim())
+      .filter(Boolean);
+
+    let docsUrl = null;
+    const contentLines = [];
+    for (const line of lines) {
+      if (
+        line.startsWith("![") ||
+        /^Title:/i.test(line) ||
+        /^URL Source:/i.test(line) ||
+        /^Published Time:/i.test(line) ||
+        /^Markdown Content:/i.test(line) ||
+        /^Click the title link/i.test(line) ||
+        /^Discuss this update/i.test(line)
+      ) {
+        continue;
+      }
+
+      const docsLink = line.match(
+        /\[([^\]]+)\]\((https:\/\/steamcommunity\.com\/linkfilter\/\?u=([^)]+))\)(?:\[docs\.google\.com\])?/i
+      );
+      if (docsLink) {
+        docsUrl = decodeURIComponent(docsLink[3]);
+        contentLines.push(docsLink[1].trim());
+        continue;
+      }
+
+      const directDocsLink = line.match(
+        /\[([^\]]+)\]\((https:\/\/docs\.google\.com\/document\/d\/[^)]+\/pub)\)/i
+      );
+      if (directDocsLink) {
+        docsUrl = directDocsLink[2];
+        contentLines.push(directDocsLink[1].trim());
+        continue;
+      }
+
+      contentLines.push(
+        line
+          .replace(/\[([^\]]+)\]\([^)]+\)/g, "$1")
+          .replace(/^●\s*/, "")
+          .trim()
+      );
+    }
+
+    const content = contentLines.filter(Boolean).join("\n").trim();
+    if (!content) continue;
+    entries.push({ date: isoDate, time, content, docsUrl, sourceId: null });
   }
 
   return entries;
