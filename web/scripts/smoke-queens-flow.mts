@@ -273,6 +273,57 @@ async function smokeDrodoPersistenceCallback() {
   }
 }
 
+async function smokeUnchangedDrodoRefreshSnapshots() {
+  const restoreFetch = mockDrodoFetch(9);
+  const supabase = fakeSupabase([
+    queenRow({
+      drodo_mmr: 4120,
+      drodo_season_games: 88,
+      drodo_chicken_count: 12,
+      queen_ladder_rank: 9,
+      drodo_raw_data: { queen_rank: 9 },
+    }),
+  ]);
+  const changedProfiles: string[] = [];
+
+  try {
+    const results = await fetchAndCacheDrodoBatch([STEAM_ID], supabase, {
+      snapshotOnSuccess: true,
+      pollMode: "adaptive",
+      hotPoll: true,
+      onQueenChange: (profile) => {
+        changedProfiles.push(`${profile.steam_id}:${profile.queen_rank}`);
+      },
+    });
+
+    assert.equal(results.length, 1);
+    assert.equal(results[0]?.ok, true);
+    assert.deepEqual(
+      changedProfiles,
+      [],
+      "unchanged adaptive polls must not trigger Queen change callbacks"
+    );
+
+    const state = supabaseState(supabase);
+    const snapshotUpsert = state.calls.find(
+      (call) => call.table === "mmr_snapshots" && call.op === "upsert"
+    );
+    assert.ok(
+      snapshotUpsert,
+      "unchanged successful profile refresh must still write a daily MMR snapshot"
+    );
+    const snapshot = snapshotUpsert.payload as Record<string, unknown>;
+    assert.equal(snapshot.mmr, 4120);
+    assert.equal(snapshot.queen_rank, 9);
+    assert.equal(
+      snapshot.snapshot_date,
+      String(snapshot.snapshotted_at).slice(0, 10)
+    );
+  } finally {
+    restoreFetch();
+  }
+}
+
 async function smokeDisplayedQueensRefreshTarget() {
   const restoreFetch = mockDrodoFetch(6);
   const supabase = fakeSupabase([queenRow()]);
@@ -361,6 +412,7 @@ function smokeQueensRefreshTiming() {
 smokeQueensRefreshTiming();
 await smokeReadThroughProfileLock();
 await smokeDrodoPersistenceCallback();
+await smokeUnchangedDrodoRefreshSnapshots();
 await smokeDisplayedQueensRefreshTarget();
 await smokeDisplayedQueensSteamIdentityRefresh();
 

@@ -89,7 +89,7 @@ Steam changelog ->  scripts/scrape-patch-notes.mjs  ->  content/patch-notes + co
 - Desktop runtime config is stored in `~/.dac/config.json`.
 - The Rust backend may also use `~/.dac/outbox`, `~/.dac/replays`, `~/.dac/captures`, `~/.dac/nettable_dumps`, and tracker logs for local-first capture, replay, diagnostics, and retry behavior.
 - Supabase stores public product data in tables such as `users`, `player_seasons`, `mmr_snapshots`, `matches`, `match_players`, `match_timelines`, and `lineup_snapshots`.
-- Supabase Storage bucket `diagnostic-logs` stores uploaded diagnostic and raw nettable dump logs.
+- Supabase Storage bucket `diagnostic-logs` stores uploaded diagnostics. Raw nettable dump logs upload through the web app to Cloudflare R2.
 
 ## Automation
 

@@ -1,6 +1,7 @@
 node_modules/
 *.env.local
 *.part
+.local/
 data/*.png
 data/debug_*.txt
 data/filter_*.txt

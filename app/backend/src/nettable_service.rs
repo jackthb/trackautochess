@@ -1,6 +1,7 @@
 pub use crate::nettable_live::live_players_value;
 use crate::{
     config::Config,
+    gsi::GsiState,
     dump_commands::{dota_has_foreground_focus, send_dump_keys_if_dota_focused, DumpKey},
     ipc_events::{
         event_json, NettableCheckActiveMatch, NettableCreepRound, NettableEndBoardSaved,
@@ -52,6 +53,8 @@ struct DumpCommandResult {
 #[derive(Clone)]
 pub struct NettableService {
     state: Arc<Mutex<NettableState>>,
+    /// Shared with the GsiServer so all clones see the same GSI state.
+    gsi: Arc<Mutex<Option<Arc<Mutex<GsiState>>>>>,
 }
 
 /// Snapshot of a match the local player left before it finished, held until
@@ -114,6 +117,10 @@ struct NettableState {
     /// Held snapshot of a match the local player left early. See
     /// [`PendingLeftMatch`].
     pending_left_match: Option<PendingLeftMatch>,
+    /// True once we have seen at least one DAC-specific table in the current
+    /// match. Guards against recording or uploading dumps from regular Dota
+    /// games that also produce `DOTA_GAME_UI_DOTA_INGAME` transitions.
+    is_dac_match: bool,
     /// True when live data shows the game is decided (one player left with
     /// HP). Drives a faster dac_table dump cadence so the end_board is
     /// captured the moment it publishes instead of waiting out the normal
@@ -132,6 +139,13 @@ impl NettableService {
                 log_path,
                 ..NettableState::default()
             })),
+            gsi: Arc::new(Mutex::new(None)),
+        }
+    }
+
+    pub fn set_gsi(&self, gsi_state: Arc<Mutex<GsiState>>) {
+        if let Ok(mut g) = self.gsi.lock() {
+            *g = Some(gsi_state);
         }
     }
 
@@ -147,6 +161,7 @@ impl NettableService {
         let _ = install_autoexec();
         let _ = install_gsi_cfg(DEFAULT_GSI_PORT);
         let state = self.state.clone();
+        let gsi = self.gsi.clone();
         let emit = Arc::new(emit);
         thread::spawn(move || {
             let mut last_game_info_fire = Instant::now() - Duration::from_secs(10);
@@ -174,6 +189,12 @@ impl NettableService {
                 match result {
                     Ok(Some(rows)) => {
                         if !rows.is_empty() {
+                            // Latch is_dac_match from GSI workshop ID confirmation.
+                            if gsi_state_is_dac_active(&gsi) {
+                                if let Ok(mut s) = state.lock() {
+                                    s.is_dac_match = true;
+                                }
+                            }
                             emit(state_json_from(&state));
                             emit(event_json(&NettableIngestComplete::new(
                                 rows.len(),
@@ -238,7 +259,8 @@ impl NettableService {
                                     }
                                 }
                             }
-                            if cfg.upload_raw_nettable_dumps && local_is_capture_owner(&state) {
+                            let is_dac = state.lock().map(|s| s.is_dac_match).unwrap_or(false);
+                        if cfg.upload_raw_nettable_dumps && local_is_capture_owner(&state) && is_dac {
                                 let raw_end_board_already_uploaded =
                                     finished_match_id_from_rows(&rows)
                                         .as_deref()
@@ -1007,6 +1029,7 @@ mod tests {
             replay_enabled: true,
             keep_local_nettable_dumps: false,
             upload_raw_nettable_dumps: false,
+            nettable_dump_upload_url: String::new(),
             local_only: true,
             supabase_url: String::new(),
             supabase_key: String::new(),
@@ -1211,13 +1234,15 @@ fn handle_rows_for_parity(state: &Arc<Mutex<NettableState>>, rows: &[NettableRow
         events.push(event);
     }
 
-    store_session_dump(
-        &mut state.session_dumps,
-        SessionDump {
-            captured_at: now,
-            rows: rows.to_vec(),
-        },
-    );
+    if state.is_dac_match {
+        store_session_dump(
+            &mut state.session_dumps,
+            SessionDump {
+                captured_at: now,
+                rows: rows.to_vec(),
+            },
+        );
+    }
     events
 }
 
@@ -1985,6 +2010,7 @@ fn poll_once(
             state.latest_rows.clear();
             state.session_dumps.clear();
             state.last_round = None;
+            state.is_dac_match = false;
             state.endgame_burst = false;
             state.pending_match_end = false;
             state.prev_personal_death_team = None;
@@ -2137,6 +2163,13 @@ fn parsed_from_rows(rows: &[NettableRow]) -> ParsedLog {
             .insert(row.key.clone(), row.raw.clone());
     }
     parsed
+}
+
+fn gsi_state_is_dac_active(gsi: &Arc<Mutex<Option<Arc<Mutex<GsiState>>>>>) -> bool {
+    gsi.lock()
+        .ok()
+        .and_then(|g| g.as_ref().map(|gs| gs.lock().ok().map(|s| s.is_dac_active()).unwrap_or(false)))
+        .unwrap_or(false)
 }
 
 fn state_has_hidden_legendary_pool(state: &NettableState) -> bool {

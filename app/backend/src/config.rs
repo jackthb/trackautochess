@@ -7,6 +7,8 @@ const DEFAULT_SUPABASE_URL: &str = "https://ismxtcfkuwpvfyuojnaa.supabase.co";
 const LEGACY_SUPABASE_URL: &str = "https://xkfxykorskdltcmvgihh.supabase.co";
 const LEGACY_SUPABASE_KEY: &str = "sb_publishable_Tk7hBHGJImbtzxxZzEIgKQ_kwnKuCaK";
 const DEFAULT_SUPABASE_AUTH_URL: &str = "https://www.trackautochess.com/api/auth/steam/callback";
+const DEFAULT_NETTABLE_DUMP_UPLOAD_URL: &str =
+    "https://www.trackautochess.com/api/uploads/nettable-dump";
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, TS)]
 pub struct Config {
@@ -19,10 +21,13 @@ pub struct Config {
     /// post-hoc reprocessing. Product views should use processed matches,
     /// players, and timelines instead of depending on these raw dumps.
     pub keep_local_nettable_dumps: bool,
-    /// Upload the same raw captures as private Supabase Storage blobs. This is
-    /// a logging/reprocessing safety net, not a Postgres table dependency and
+    /// Upload the same raw captures as private object-storage blobs. This is a
+    /// logging/reprocessing safety net, not a Postgres table dependency and
     /// not the user-facing match data model.
     pub upload_raw_nettable_dumps: bool,
+    /// Server-side upload endpoint for raw nettable dump blobs. The desktop app
+    /// sends authenticated dump JSON here so R2 credentials stay server-side.
+    pub nettable_dump_upload_url: String,
     pub local_only: bool,
     pub supabase_url: String,
     pub supabase_key: String,
@@ -58,6 +63,7 @@ impl Config {
             replay_enabled: value_bool(&value, "replay_enabled", true),
             keep_local_nettable_dumps: value_bool(&value, "keep_local_nettable_dumps", true),
             upload_raw_nettable_dumps: value_bool(&value, "upload_raw_nettable_dumps", true),
+            nettable_dump_upload_url: nettable_dump_upload_url_from(&value),
             local_only: local_only_mode_from(&value),
             supabase_url: value_string(&value, "supabase_url"),
             supabase_key: value_string(&value, "supabase_key"),
@@ -150,6 +156,7 @@ fn default_config_json() -> &'static str {
   "replay_max_gb": 15,
   "keep_local_nettable_dumps": true,
   "upload_raw_nettable_dumps": true,
+  "nettable_dump_upload_url": "https://www.trackautochess.com/api/uploads/nettable-dump",
   "local_nettable_retention_days": 14,
   "local_nettable_max_mb": 500
 }
@@ -203,6 +210,13 @@ fn apply_config_migrations(value: &mut Value) -> bool {
         );
         changed = true;
     }
+    if !map.contains_key("nettable_dump_upload_url") {
+        map.insert(
+            "nettable_dump_upload_url".to_owned(),
+            json!(DEFAULT_NETTABLE_DUMP_UPLOAD_URL),
+        );
+        changed = true;
+    }
     changed
 }
 
@@ -229,6 +243,13 @@ fn local_only_mode_from(value: &Value) -> bool {
         _ => {}
     }
     value_bool(value, "local_only", false)
+}
+
+fn nettable_dump_upload_url_from(value: &Value) -> String {
+    match env::var("DAC_NETTABLE_DUMP_UPLOAD_URL") {
+        Ok(value) => value.trim().to_owned(),
+        Err(_) => value_string(value, "nettable_dump_upload_url"),
+    }
 }
 
 #[cfg(test)]

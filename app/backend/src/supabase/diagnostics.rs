@@ -44,14 +44,14 @@ impl SupabaseClient {
             "rows": rows,
         });
         let bytes = serde_json::to_vec_pretty(&body).map_err(|err| err.to_string())?;
-        self.upload_storage_object(
+        self.upload_nettable_dump_object(
+            cfg,
             &format!(
                 "{user_id}/nettable-dumps/{}.json",
                 captured_at.format("%Y%m%d_%H%M%S_%6f")
             ),
             &bytes,
             "application/json",
-            true,
         )?;
         Ok(format!("{} rows", rows.len()))
     }

@@ -10,7 +10,7 @@ This crate is the Rust local-services backend spawned by the Electron desktop ap
 - `nettable_tail`: polls `console.log` for stable dump blocks and feeds rows to the capture pipeline.
 - `nettable_service`: applies Dota launch/config setup, fires dump hotkeys, tracks live state, builds match/timeline payloads, and handles queen-ladder uploads.
 - `steam_auth`: performs Steam OpenID login and stores the signed-in Steam identity in config.
-- `supabase`: uploads processed match rows, match timelines, Queen ladder data, diagnostic logs, and queued outbox payloads.
+- `supabase`: uploads processed match rows, match timelines, Queen ladder data, diagnostic logs, raw nettable dump blobs, and queued outbox payloads.
 - `outbox`: stores local-first payloads under `~/.dac/outbox` so uploads can be retried later.
 - `main`: exposes the Electron-compatible JSON-lines daemon plus CLI helpers.
 
@@ -42,6 +42,6 @@ npm run dev:desktop                     # backend setup/check + Vite + Electron
 - The daemon starts GSI and nettable capture automatically when Electron launches it.
 - Dota launch/config setup is exposed through the `nettable_apply_launch_options` IPC command and writes a marked DAC Tracker block to Dota `autoexec.cfg`.
 - Processed match data uploads to `matches`, `match_players`, and `match_timelines`; Queen ladder rows update user/rank-related Supabase data.
-- Diagnostic uploads and raw nettable dump logs go to the private Supabase Storage bucket `diagnostic-logs`.
+- Diagnostic uploads still go to the private Supabase Storage bucket `diagnostic-logs`. Raw nettable dump logs post to the configured `nettable_dump_upload_url`, which stores them in Cloudflare R2 server-side.
 - Replay recording is still not available in the Rust-only nettable build; `toggle_recording` returns a structured error.
 - `do_update` currently acknowledges an update-apply request for the Electron layer but does not perform installer replacement inside the backend.

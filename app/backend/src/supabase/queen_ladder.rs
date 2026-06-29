@@ -137,7 +137,7 @@ impl SupabaseClient {
         }
         let count = rows.len();
         self.post_json(
-            "/rest/v1/mmr_snapshots?on_conflict=steam_id,season,mmr,chicken_count,queen_rank",
+            "/rest/v1/mmr_snapshots?on_conflict=steam_id,season,snapshot_date,mmr,chicken_count,queen_rank",
             &Value::Array(rows),
             "resolution=merge-duplicates,return=minimal",
         )?;
@@ -229,7 +229,7 @@ impl SupabaseClient {
         if !snapshot_rows.is_empty() {
             let snapshot_count = snapshot_rows.len();
             let _ = self.post_json(
-                "/rest/v1/mmr_snapshots?on_conflict=steam_id,season,mmr,chicken_count,queen_rank",
+                "/rest/v1/mmr_snapshots?on_conflict=steam_id,season,snapshot_date,mmr,chicken_count,queen_rank",
                 &Value::Array(snapshot_rows),
                 "resolution=merge-duplicates,return=minimal",
             );

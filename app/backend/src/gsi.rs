@@ -110,6 +110,10 @@ impl GsiServer {
             .expect("gsi state poisoned")
             .is_dac_active()
     }
+
+    pub fn state_arc(&self) -> Arc<Mutex<GsiState>> {
+        Arc::clone(&self.state)
+    }
 }
 
 pub fn install_cfg_text(port: u16) -> String {

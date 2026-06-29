@@ -124,7 +124,7 @@ export function MmrSparkline({ snapshots = [] }: MmrSparklineProps) {
           <span className={styles.label}>MMR History</span>
           <span className={`${styles.delta} ${deltaClass}`}>
             {deltaSign}
-            {Math.abs(delta)} since last refresh
+            {Math.abs(delta)} since prior point
           </span>
         </div>
         <span className={styles.meta}>{metaParts.join(" · ")}</span>
@@ -141,7 +141,8 @@ export function MmrSparkline({ snapshots = [] }: MmrSparklineProps) {
       </div>
       <p className={styles.note}>
         This timeline begins at the first MMR we tracked — not your all-time
-        start. Multiple refreshes on the same UTC day are shown as one point.
+        start. Multiple refreshes on the same UTC day use the last point from
+        that day.
       </p>
     </section>
   );

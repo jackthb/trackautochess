@@ -95,7 +95,7 @@ export function QueenRankSparkline({ snapshots = [] }: QueenRankSparklineProps) 
       <p className={styles.note}>
         Queen ladder points are captured when this profile is refreshed while
         Drodo reports a Queen ladder position. Multiple refreshes on the same
-        UTC day are shown as one point.
+        UTC day use the last point from that day.
       </p>
     </section>
   );

@@ -192,18 +192,23 @@ fn run_daemon() -> io::Result<()> {
     let nettable = NettableService::new();
     let _gsi = {
         let stdout_lock = stdout_lock.clone();
-        let nettable = nettable.clone();
+        let nettable_for_gsi = nettable.clone();
+        let nettable_for_set = nettable.clone();
         let cfg = cfg.clone();
-        gsi::GsiServer::spawn_with_callback(gsi::DEFAULT_PORT, move |event| {
+        let gsi = gsi::GsiServer::spawn_with_callback(gsi::DEFAULT_PORT, move |event| {
             if event == gsi::GsiEvent::DacPostGame {
                 let stdout_lock = stdout_lock.clone();
-                nettable.handle_post_game(cfg.clone(), move |line| {
+                nettable_for_gsi.handle_post_game(cfg.clone(), move |line| {
                     let _guard = stdout_lock.lock().ok();
                     let _ = emit(&line);
                 });
             }
         })
-        .ok()
+        .ok();
+        if let Some(ref g) = gsi {
+            nettable_for_set.set_gsi(g.state_arc());
+        }
+        gsi
     };
     {
         let stdout_lock = stdout_lock.clone();

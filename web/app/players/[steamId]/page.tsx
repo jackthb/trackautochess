@@ -14,6 +14,7 @@ import type { QueenRankSnapshot } from "@/components/QueenRankSparkline";
 import { absoluteUrl, getSiteUrl } from "@/lib/site";
 import { getManualRefreshQuota } from "@/lib/manualRefreshQuota";
 import {
+  DRODO_HISTORY_SNAPSHOT_LIMIT,
   HOT_PROFILE_REFRESH_TTL_SECONDS,
   isFreshCache,
   lastTop3FromDrodoData,
@@ -182,11 +183,11 @@ const loadPlayer = cache(async (rawSteamId: string): Promise<LoadResult> => {
         .order("season", { ascending: true }),
       supabase
         .from("mmr_snapshots")
-        .select("*")
+        .select("mmr, queen_rank, snapshotted_at")
         .filter("steam_id", "eq", steamId)
         .not("mmr", "is", null)
         .order("snapshotted_at", { ascending: false })
-        .limit(60),
+        .limit(DRODO_HISTORY_SNAPSHOT_LIMIT),
       supabase
         .from("match_players")
         .select("*, steam_id::text")

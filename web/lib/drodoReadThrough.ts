@@ -1,6 +1,7 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import {
   cachedUserToDrodoProfile,
+  DRODO_HISTORY_SNAPSHOT_LIMIT,
   EMPTY_DRODO_PROFILE_ERROR,
   fetchAndCacheDrodo,
   hasDrodoStats,
@@ -96,7 +97,7 @@ export async function loadDrodoHistory(
       .filter("steam_id", "eq", steamId)
       .not("mmr", "is", null)
       .order("snapshotted_at", { ascending: false })
-      .limit(60),
+      .limit(DRODO_HISTORY_SNAPSHOT_LIMIT),
   ]);
 
   const seasons = (seasonsResult.data ?? []) as SeasonSnapshotRow[];

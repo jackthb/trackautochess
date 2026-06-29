@@ -39,7 +39,7 @@ then uploads the processed match representation to Supabase.
    for 2s), decodes them via `nettable_parser.parse_log`, optionally persists raw
    rows locally under `~/.dac/captures/` and `~/.dac/nettable_dumps/`, and processes them
    in-memory into `matches`, `match_players`, and `match_timelines`. Raw
-   nettable dump logs upload to Supabase Storage `diagnostic-logs`.
+   nettable dump logs upload through the web API to Cloudflare R2.
 
 ## Netconport
 
@@ -82,7 +82,7 @@ metadata snapshot includes both the Queen ladder and the slot mapping.
 | `app/backend/src/nettable_service.rs` | Autoexec/GSI setup helpers, log tailer orchestration, console command cadence, live state, match/timeline extraction, local dump persistence, and renderer events. |
 | `app/backend/src/nettable_parser.rs` | Pure VBKV decoder and `console.log` walker used by the CLI, daemon, and tests. |
 | `app/backend/src/main.rs` | JSON-lines daemon and CLI commands (`parse-log`, `parse-log-full`, `parse-live`, `queue`, `outbox-list`, `gsi-cfg`). |
-| `app/backend/src/supabase.rs` | Processed match/timeline/Queen uploads, outbox replay, diagnostic-log Storage uploads, and raw nettable dump-log Storage uploads. |
+| `app/backend/src/supabase.rs` | Processed match/timeline/Queen uploads, outbox replay, diagnostic-log Storage uploads, and raw nettable dump-log uploads. |
 | `app/backend/src/dump_commands.rs` | Dump command identifiers, console command strings, focused key delivery, and Dota foreground detection. |
 
 `AUTOEXEC_CFG_CONTENT` is the marked Track Auto Chess cfg block in `nettable_service.rs`. The setup path upserts that block instead of replacing the user's whole `autoexec.cfg`.
@@ -107,7 +107,7 @@ Representative Rust daemon event types include:
 
 ## What gets captured
 
-Normal Supabase writes use processed `matches`, `match_players`, `match_timelines`, and Queen ladder/profile rows. Raw decoded nettable rows are local-only unless the backend uploads a JSON dump log to Supabase Storage under the private `diagnostic-logs` bucket.
+Normal Supabase writes use processed `matches`, `match_players`, `match_timelines`, and Queen ladder/profile rows. Raw decoded nettable rows are local-only unless the backend uploads a JSON dump log through `nettable_dump_upload_url`; the production endpoint stores it in Cloudflare R2.
 
 Local raw dump persistence is controlled by the config field `keep_local_nettable_dumps`. When enabled, the backend writes `~/.dac/captures/latest_nettable_rows.json` and timestamped files under `~/.dac/nettable_dumps/`.
 
@@ -128,11 +128,11 @@ These showed up in older VPK/triage notes, but they are not in the current autom
 
 ### Current storage behavior
 
-The Rust pipeline processes decoded rows in memory and uploads normalized product data. Diagnostic/raw dump artifacts are Storage objects, not table rows:
+The Rust pipeline processes decoded rows in memory and uploads normalized product data. Diagnostic/raw dump artifacts are object-storage blobs, not table rows:
 
 - `supabase.upload_diagnostic_logs(...)` uploads tracker/console diagnostics to `diagnostic-logs`.
-- `supabase.upload_nettable_dump_log(...)` uploads raw nettable dump JSON logs to `diagnostic-logs/{steam_id}/nettable-dumps/`.
-- Outbox replay routes legacy table payloads to diagnostic-log Storage uploads.
+- `supabase.upload_nettable_dump_log(...)` uploads raw nettable dump JSON logs to R2 keys shaped like `{steam_id}/nettable-dumps/{timestamp}.json`.
+- Outbox replay routes legacy raw row payloads through the same raw nettable dump upload path.
 
 ### Open questions / current answers
 
@@ -16085,4 +16085,4 @@ cargo run --manifest-path app/backend/Cargo.toml -- parse-live <path-to-console.
 
 ## Supabase auth
 
-Normal live capture uploads use the app's configured Supabase URL/key for processed `matches`, `match_players`, and `match_timelines` rows. Diagnostic and raw nettable dump logs upload to Supabase Storage bucket `diagnostic-logs` using the same configured client path and Storage policies.
+Normal live capture uploads use the app's configured Supabase URL/key for processed `matches`, `match_players`, and `match_timelines` rows. Diagnostic logs upload to Supabase Storage bucket `diagnostic-logs`; raw nettable dump logs upload to `nettable_dump_upload_url`, which authenticates the desktop's Supabase session and writes to Cloudflare R2.

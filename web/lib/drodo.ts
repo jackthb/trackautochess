@@ -230,6 +230,36 @@ export async function purgeDrodoCache(
 
 export type { FetchDrodoBatchResult, FetchDrodoResult };
 
+export const DRODO_HISTORY_SNAPSHOT_LIMIT = 1000;
+const MMR_SNAPSHOT_ON_CONFLICT =
+  "steam_id,season,snapshot_date,mmr,chicken_count,queen_rank";
+
+async function snapshotDrodoProfile(
+  profile: DrodoProfileRow,
+  supabase: SupabaseClient
+): Promise<void> {
+  const snapshottedAt = new Date().toISOString();
+  const { error: snapshotError } = await supabase
+    .from("mmr_snapshots")
+    .upsert(
+      {
+        steam_id: profile.steam_id,
+        mmr: profile.mmr,
+        season: profile.season,
+        chicken_count: profile.chicken_count,
+        queen_rank: profile.queen_rank,
+        snapshotted_at: snapshottedAt,
+        snapshot_date: snapshottedAt.slice(0, 10),
+      },
+      {
+        onConflict: MMR_SNAPSHOT_ON_CONFLICT,
+      }
+    );
+  if (snapshotError) {
+    console.error("Failed to upsert mmr_snapshot:", snapshotError.message);
+  }
+}
+
 async function persistDrodoProfile(
   profile: DrodoProfileRow,
   seasonRows: SeasonSnapshotRow[],
@@ -264,13 +294,13 @@ async function persistDrodoProfile(
     // instead of digging it out of the drodo_raw_data JSON (which only updated
     // when MMR moved, so rank-only changes rotted). The web poll owns this
     // column. Written on the heartbeat path too so a rank-only move still lands.
+    // The ladder "last seen" timestamp comes from in-game ladder captures, not
+    // Drodo profile refreshes.
     // Only touched for Queen profiles; a successful poll that returns no
     // queen_rank means they dropped off the ladder, so clear it.
     ...(queen
       ? {
           queen_ladder_rank: queenRank,
-          queen_ladder_last_seen_at:
-            queenRank == null ? null : profile.fetched_at,
         }
       : {}),
   };
@@ -280,6 +310,9 @@ async function persistDrodoProfile(
       .upsert(heartbeatPayload, { onConflict: "steam_id" });
     if (heartbeatError) {
       console.error("Failed to heartbeat Drodo profile:", heartbeatError.message);
+    }
+    if (options.snapshotOnSuccess) {
+      await snapshotDrodoProfile(profile, supabase);
     }
     return;
   }
@@ -325,27 +358,7 @@ async function persistDrodoProfile(
   }
 
   if (options.snapshotOnSuccess) {
-    const snapshottedAt = new Date().toISOString();
-    const { error: snapshotError } = await supabase
-      .from("mmr_snapshots")
-      .upsert(
-        {
-          steam_id: profile.steam_id,
-          mmr: profile.mmr,
-          season: profile.season,
-          chicken_count: profile.chicken_count,
-          queen_rank: profile.queen_rank,
-          snapshotted_at: snapshottedAt,
-          snapshot_date: snapshottedAt.slice(0, 10),
-        },
-        {
-          onConflict:
-            "steam_id,season,snapshot_date,mmr,chicken_count,queen_rank",
-        }
-      );
-    if (snapshotError) {
-      console.error("Failed to upsert mmr_snapshot:", snapshotError.message);
-    }
+    await snapshotDrodoProfile(profile, supabase);
   }
 
   // Queen rows feed the ISR'd /queens table; notify the caller the moment a

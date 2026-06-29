@@ -16,6 +16,7 @@ ALTER TABLE mmr_snapshots
 CREATE OR REPLACE FUNCTION public.set_mmr_snapshot_date()
 RETURNS trigger
 LANGUAGE plpgsql
+SET search_path = public, pg_temp
 AS $$
 BEGIN
   NEW.snapshot_date := (NEW.snapshotted_at AT TIME ZONE 'UTC')::date;
