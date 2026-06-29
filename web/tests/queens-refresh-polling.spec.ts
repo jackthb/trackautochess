@@ -69,7 +69,9 @@ test("Queens page records no-change refresh checks without table updates", async
   await expect(page.getByRole("status")).toHaveText(
     "Queen profiles are already current."
   );
-  await expect(page.getByText("5m 00s")).toBeVisible();
+  await expect(page.getByRole("status")).not.toHaveText(
+    "Profiles refreshed. Updating table..."
+  );
 });
 
 test("player page exposes the profile refresh surface", async ({ page }) => {

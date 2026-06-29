@@ -12,7 +12,7 @@ type QueryResult<T> = { data: T; error: null };
 
 interface QueryCall {
   table: string;
-  op: "select" | "upsert";
+  op: "select" | "upsert" | "update";
   payload?: unknown;
 }
 
@@ -66,6 +66,11 @@ class FakeQueryBuilder {
   upsert(payload: unknown): Promise<QueryResult<null>> {
     this.state.calls.push({ table: this.table, op: "upsert", payload });
     return Promise.resolve({ data: null, error: null });
+  }
+
+  update(payload: unknown) {
+    this.state.calls.push({ table: this.table, op: "update", payload });
+    return this;
   }
 
   then<TResult1 = QueryResult<Record<string, unknown>[]>, TResult2 = never>(
@@ -134,6 +139,28 @@ function mockDrodoFetch(queenRank: number) {
       status: 200,
       headers: { "content-type": "application/json" },
     });
+  }) as typeof fetch;
+  return () => {
+    globalThis.fetch = originalFetch;
+  };
+}
+
+function mockEmptyDrodoFetch() {
+  const originalFetch = globalThis.fetch;
+  globalThis.fetch = (async (url: string | URL | Request) => {
+    assert.match(String(url), /autochess\.ppbizon\.com\/courier\/get/);
+    return new Response(
+      JSON.stringify({
+        err: 0,
+        user_info: {
+          [STEAM_ID]: {},
+        },
+      }),
+      {
+        status: 200,
+        headers: { "content-type": "application/json" },
+      }
+    );
   }) as typeof fetch;
   return () => {
     globalThis.fetch = originalFetch;
@@ -218,6 +245,57 @@ async function smokeReadThroughProfileLock() {
     );
   } finally {
     globalThis.fetch = originalFetch;
+  }
+}
+
+async function smokeReadThroughMissingKeepsKnownProfileStale() {
+  const restoreFetch = mockEmptyDrodoFetch();
+  const supabase = fakeSupabase([queenRow()]);
+
+  try {
+    const result = await readThroughDrodoProfile({
+      steamId: STEAM_ID,
+      supabase,
+      forceRefresh: true,
+    });
+
+    assert.equal(result.kind, "profile");
+    if (result.kind === "profile") {
+      assert.equal(result.source, "stale");
+      assert.equal(result.payload.mmr, 4000);
+      assert.equal(result.payload.season, "s26");
+      assert.equal(result.payload.refresh_pending, true);
+    }
+
+    const state = supabaseState(supabase);
+    const destructiveMissingWrite = state.calls.find(
+      (call) =>
+        call.table === "users" &&
+        call.op === "upsert" &&
+        (call.payload as Record<string, unknown>).drodo_profile_missing === true
+    );
+    assert.equal(
+      destructiveMissingWrite,
+      undefined,
+      "empty rollover responses must not clear a known Drodo profile"
+    );
+    const preserveUpdate = state.calls.find(
+      (call) =>
+        call.table === "users" &&
+        call.op === "update" &&
+        (call.payload as Record<string, unknown>).drodo_profile_missing === false
+    );
+    assert.ok(
+      preserveUpdate,
+      "empty rollover responses should heartbeat the known profile"
+    );
+    assert.equal(
+      "drodo_mmr" in (preserveUpdate.payload as Record<string, unknown>),
+      false,
+      "known-profile heartbeat must not overwrite MMR"
+    );
+  } finally {
+    restoreFetch();
   }
 }
 
@@ -411,6 +489,7 @@ function smokeQueensRefreshTiming() {
 
 smokeQueensRefreshTiming();
 await smokeReadThroughProfileLock();
+await smokeReadThroughMissingKeepsKnownProfileStale();
 await smokeDrodoPersistenceCallback();
 await smokeUnchangedDrodoRefreshSnapshots();
 await smokeDisplayedQueensRefreshTarget();

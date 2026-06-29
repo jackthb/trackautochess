@@ -121,6 +121,32 @@ export function cachedUserToDrodoProfile(row: CachedUserDrodoRow): DrodoProfileR
   };
 }
 
+type DrodoMissingCacheRow = Pick<
+  CachedUserDrodoRow,
+  | "drodo_mmr"
+  | "drodo_max_mmr"
+  | "drodo_season"
+  | "drodo_season_games"
+  | "drodo_chicken_count"
+  | "queen_ladder_rank"
+  | "queen_ladder_last_seen_at"
+  | "drodo_profile_missing"
+>;
+
+function hasKnownDrodoProfile(row: DrodoMissingCacheRow | null | undefined): boolean {
+  if (!row || row.drodo_profile_missing) return false;
+  return Boolean(
+    row.drodo_mmr != null ||
+      row.drodo_max_mmr != null ||
+      row.drodo_season != null ||
+      row.drodo_season_games != null ||
+      (typeof row.drodo_chicken_count === "number" &&
+        row.drodo_chicken_count > 0) ||
+      row.queen_ladder_rank != null ||
+      row.queen_ladder_last_seen_at != null
+  );
+}
+
 async function loadPollSnapshot(
   steamId: string,
   supabase: SupabaseClient
@@ -166,6 +192,43 @@ export async function markDrodoMissing(
     prevIntervalSeconds: null,
     missing: true,
   });
+  const { data: existing, error: existingError } = await supabase
+    .from("users")
+    .select(
+      [
+        "drodo_mmr",
+        "drodo_max_mmr",
+        "drodo_season",
+        "drodo_season_games",
+        "drodo_chicken_count",
+        "queen_ladder_rank",
+        "queen_ladder_last_seen_at",
+        "drodo_profile_missing",
+      ].join(", ")
+    )
+    .filter("steam_id", "eq", steamId)
+    .maybeSingle<DrodoMissingCacheRow>();
+  if (existingError) {
+    console.error("Failed to inspect cached Drodo profile:", existingError.message);
+  }
+  if (hasKnownDrodoProfile(existing)) {
+    const { error: heartbeatError } = await supabase
+      .from("users")
+      .update({
+        drodo_last_fetched_at: fetchedAt,
+        drodo_profile_missing: false,
+        next_poll_at: schedule.next_poll_at,
+        poll_interval_seconds: schedule.poll_interval_seconds,
+      })
+      .filter("steam_id", "eq", steamId);
+    if (heartbeatError) {
+      console.error(
+        "Failed to preserve cached Drodo profile:",
+        heartbeatError.message
+      );
+    }
+    return fetchedAt;
+  }
   const { error } = await supabase.from("users").upsert(
     {
       steam_id: steamId,

@@ -259,6 +259,9 @@ export async function readThroughDrodoProfile({
     };
   }
   if (result.kind === "missing") {
+    if (stalePayload) {
+      return { kind: "profile", source: "stale", payload: stalePayload };
+    }
     return {
       kind: "missing",
       source: "drodo",

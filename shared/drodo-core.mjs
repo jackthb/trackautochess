@@ -13,6 +13,7 @@ const HOT_POLL_MAX_INTERVAL_SECONDS_VALUE = POLL_ACTIVE_INTERVAL_SECONDS_VALUE;
 const ACTIVE_SIGN_IN_WINDOW_MS_VALUE = 14 * 24 * 60 * 60 * 1000;
 const QUEENS_REFRESH_COOLDOWN_MS_VALUE = 5 * 60 * 1000;
 const QUEENS_VIEW_REFRESH_COOLDOWN_MS_VALUE = QUEENS_REFRESH_COOLDOWN_MS_VALUE;
+const SEASON_FIELD_KEY_VALUE = /^(?:mmr|max_mmr|match)_s(\d+)$/;
 function recentSignInCutoffValue(now = new Date()) {
     return new Date(now.getTime() - ACTIVE_SIGN_IN_WINDOW_MS_VALUE).toISOString();
 }
@@ -35,37 +36,36 @@ function inactivePollCutoffValue(now = new Date()) {
 function steamIdValue(steamId) {
     return String(steamId);
 }
-function currentSeasonValue(data) {
-    let max = 0;
-    let season = "";
+function seasonNumbersValue(data) {
+    const seasons = new Set();
     for (const key of Object.keys(data)) {
-        const match = key.match(/^mmr_s(\d+)$/);
+        const match = key.match(SEASON_FIELD_KEY_VALUE);
         if (!match)
             continue;
         const n = parseInt(match[1], 10);
-        if (n > max) {
-            max = n;
-            season = `s${n}`;
-        }
+        if (Number.isFinite(n) && n > 0)
+            seasons.add(n);
     }
-    return season || null;
+    return [...seasons].sort((a, b) => a - b);
+}
+function currentSeasonValue(data) {
+    const latest = seasonNumbersValue(data).at(-1);
+    return latest ? `s${latest}` : null;
 }
 function extractAllSeasonsValue(steamId, data, currentSeasonKey) {
     const now = new Date().toISOString();
     const seasons = [];
-    for (const key of Object.keys(data)) {
-        const match = key.match(/^mmr_s(\d+)$/);
-        if (!match)
-            continue;
-        const n = match[1];
+    for (const n of seasonNumbersValue(data)) {
         const seasonKey = `s${n}`;
         seasons.push({
             steam_id: steamIdValue(steamId),
             season: seasonKey,
-            mmr: Number(data[`mmr_s${n}`]) || null,
-            max_mmr: Number(data[`max_mmr_s${n}`]) || null,
-            games_played: Number(data[`match_s${n}`]) || null,
-            chicken_count: seasonKey === currentSeasonKey ? (Number(data.chicken_count) || null) : null,
+            mmr: positiveNumberFromDrodoDataValue(data, `mmr_s${n}`),
+            max_mmr: positiveNumberFromDrodoDataValue(data, `max_mmr_s${n}`),
+            games_played: positiveNumberFromDrodoDataValue(data, `match_s${n}`),
+            chicken_count: seasonKey === currentSeasonKey
+                ? positiveNumberFromDrodoDataValue(data, "chicken_count")
+                : null,
             fetched_at: now,
         });
     }
@@ -82,6 +82,10 @@ function numberFromDrodoDataValue(data, key) {
         return Number.isFinite(parsed) ? parsed : null;
     }
     return null;
+}
+function positiveNumberFromDrodoDataValue(data, key) {
+    const value = numberFromDrodoDataValue(data, key);
+    return value !== null && value > 0 ? value : null;
 }
 function valueFromDrodoDataValue(data, keys) {
     if (!data)
@@ -128,15 +132,15 @@ function buildDrodoProfileValue(steamId, drodoData) {
     const matchKey = season ? `match_${season}` : null;
     const profile = {
         steam_id: steamIdValue(steamId),
-        mmr: mmrKey ? Number(drodoData[mmrKey]) || null : null,
-        max_mmr: maxMmrKey ? Number(drodoData[maxMmrKey]) || null : null,
-        mmr_level: Number(drodoData.mmr_level) || null,
+        mmr: mmrKey ? positiveNumberFromDrodoDataValue(drodoData, mmrKey) : null,
+        max_mmr: maxMmrKey ? positiveNumberFromDrodoDataValue(drodoData, maxMmrKey) : null,
+        mmr_level: positiveNumberFromDrodoDataValue(drodoData, "mmr_level"),
         queen_rank: numberFromDrodoDataValue(drodoData, "queen_rank"),
         last_win_at: lastWinFromDrodoDataValue(drodoData),
         last_top3_at: lastTop3FromDrodoDataValue(drodoData),
         season,
-        season_games: matchKey ? Number(drodoData[matchKey]) || null : null,
-        candy: Number(drodoData.candy) || null,
+        season_games: matchKey ? positiveNumberFromDrodoDataValue(drodoData, matchKey) : null,
+        candy: positiveNumberFromDrodoDataValue(drodoData, "candy"),
         chicken_count: Number(drodoData.chicken_count) || 0,
         raw_data: drodoData,
         fetched_at: new Date().toISOString(),
@@ -162,9 +166,9 @@ function hasDrodoStatsValue(profile, seasonRows = []) {
         hasPositiveNumericField(profile, "chicken_count")) {
         return true;
     }
-    return seasonRows.some((row) => hasPositiveNumericField(row, "mmr") ||
-        hasPositiveNumericField(row, "max_mmr") ||
-        hasPositiveNumericField(row, "games_played"));
+    if (seasonRows.length > 0)
+        return true;
+    return false;
 }
 function drodoProfileToUserPayloadValue(profile) {
     return {
