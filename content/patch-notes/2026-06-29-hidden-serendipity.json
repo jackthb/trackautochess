@@ -20,37 +20,44 @@
         {
           "kind": "buff",
           "name": "Centaur - Stampede",
-          "detail": "Stun duration increased from 0.75s to 1s."
+          "detail": "Stun duration increased from 0.75s to 1s.",
+          "entityKey": "unit__centaur-warrunner"
         },
         {
           "kind": "buff",
           "name": "Element - Elemental Essence",
-          "detail": "(4) Elements: Petrification duration increased from 3s to 4s"
+          "detail": "(4) Elements: Petrification duration increased from 3s to 4s",
+          "entityKey": "synergy__elemental"
         },
         {
           "kind": "buff",
           "name": "Warrior  - Fortified Armor",
-          "detail": "(6) Warriors: Armor bonus increased from 11 to 12."
+          "detail": "(6) Warriors: Armor bonus increased from 11 to 12.",
+          "entityKey": "synergy__warrior"
         },
         {
           "kind": "buff",
           "name": "God - Overweening Superiority",
-          "detail": "(2)(4) Gods: Cooldown reduction increased from -30% to -40%."
+          "detail": "(2)(4) Gods: Cooldown reduction increased from -30% to -40%.",
+          "entityKey": "synergy__god"
         },
         {
           "kind": "buff",
           "name": "Orc - Battle Hardened",
-          "detail": "(4) Orcs: Max HP bonus increased from 300 to 400."
+          "detail": "(4) Orcs: Max HP bonus increased from 300 to 400.",
+          "entityKey": "synergy__orc"
         },
         {
           "kind": "fix",
           "name": "Assassin - Coup de Grace",
-          "detail": "(9) Assassins: Auto-backstab jump refresh cooldown changed from fixed 10s to random 8~10s."
+          "detail": "(9) Assassins: Auto-backstab jump refresh cooldown changed from fixed 10s to random 8~10s.",
+          "entityKey": "synergy__assassin"
         },
         {
           "kind": "nerf",
           "name": "Kobold - Divided We Stand",
-          "detail": "(4) Kobolds: Shapeshift cast time decreased from random 5~7s to random 4~6s."
+          "detail": "(4) Kobolds: Shapeshift cast time decreased from random 5~7s to random 4~6s.",
+          "entityKey": "synergy__kobold"
         }
       ]
     },
@@ -60,17 +67,20 @@
         {
           "kind": "nerf",
           "name": "Shadow Shaman - Fiends Grasp",
-          "detail": "Duration reduced from 4/6/8s to 3/5/7s."
+          "detail": "Duration reduced from 4/6/8s to 3/5/7s.",
+          "entityKey": "unit__shadow-shaman"
         },
         {
           "kind": "buff",
           "name": "Dark Willow - Bramble Maze",
-          "detail": "Root duration increased from 3/2/2s to 4/3/3s."
+          "detail": "Root duration increased from 3/2/2s to 4/3/3s.",
+          "entityKey": "unit__dark-willow"
         },
         {
           "kind": "buff",
           "name": "Oracle - Rain of Destiny",
-          "detail": "The rain now centers on the caster. Area of effect increased from 250/300/400 to 300/350/450. Affected allied units gain +10%/20%/30% Lucky Aura."
+          "detail": "The rain now centers on the caster. Area of effect increased from 250/300/400 to 300/350/450. Affected allied units gain +10%/20%/30% Lucky Aura.",
+          "entityKey": "unit__oracle"
         },
         {
           "kind": "change",
@@ -80,47 +90,56 @@
         {
           "kind": "change",
           "name": "Lycan (Human/Beast/Hunter)",
-          "detail": "Class corrected from Warrior to Hunter."
+          "detail": "Class corrected from Warrior to Hunter.",
+          "entityKey": "unit__lycan"
         },
         {
           "kind": "change",
           "name": "Venomancer - Plague Ward",
-          "detail": "Wards now prioritize targets without the Venom debuff."
+          "detail": "Wards now prioritize targets without the Venom debuff.",
+          "entityKey": "unit__venomancer"
         },
         {
           "kind": "change",
           "name": "Enigma - Midnight Pulse",
-          "detail": "Duration rebalanced from 4/5/7s to 5/5/6s."
+          "detail": "Duration rebalanced from 4/5/7s to 5/5/6s.",
+          "entityKey": "unit__enigma"
         },
         {
           "kind": "nerf",
           "name": "Storm Spirit - Static Storm",
-          "detail": "Maximum damage reduced from 150/225/300 to 150/200/250."
+          "detail": "Maximum damage reduced from 150/225/300 to 150/200/250.",
+          "entityKey": "unit__storm-spirit"
         },
         {
           "kind": "buff",
           "name": "Medusa",
-          "detail": "Number of Split Shot targets increased from 2/3/4 to 3/3/4."
+          "detail": "Number of Split Shot targets increased from 2/3/4 to 3/3/4.",
+          "entityKey": "unit__medusa"
         },
         {
           "kind": "change",
           "name": "Alchemist - Chemical Rage",
-          "detail": "Now grants an additional 250/500/1000 maximum HP."
+          "detail": "Now grants an additional 250/500/1000 maximum HP.",
+          "entityKey": "unit__alchemist"
         },
         {
           "kind": "nerf",
           "name": "Warlock - Chaotic Offering",
-          "detail": "Stun radius of Infernos reduced from 300 to 205 (1 tile). Inferno duration lowered from random 5~15s to random 5~10s."
+          "detail": "Stun radius of Infernos reduced from 300 to 205 (1 tile). Inferno duration lowered from random 5~15s to random 5~10s.",
+          "entityKey": "unit__warlock"
         },
         {
           "kind": "nerf",
           "name": "Troll Warlord - Fervor",
-          "detail": "Internal cooldown of throwing axes reduced from 3/2/1s to 2.5/1.5/0.5s."
+          "detail": "Internal cooldown of throwing axes reduced from 3/2/1s to 2.5/1.5/0.5s.",
+          "entityKey": "unit__troll-warlord"
         },
         {
           "kind": "change",
           "name": "Underlord - Fiend's Gate",
-          "detail": "Summon interval adjusted from flat 4s to 5.5/4.5/4s."
+          "detail": "Summon interval adjusted from flat 4s to 5.5/4.5/4s.",
+          "entityKey": "unit__abyssal-underlord"
         }
       ]
     },
@@ -128,9 +147,10 @@
       "heading": "Items",
       "entries": [
         {
-          "kind": "new",
+          "kind": "nerf",
           "name": "Satanic",
-          "detail": "Added passive: The carrier counts as a Faceless unit. Active lifesteal potency slightly nerfed."
+          "detail": "Added passive: The carrier counts as a Faceless unit. Active lifesteal potency slightly nerfed.",
+          "entityKey": "item__satanic"
         }
       ]
     },
@@ -140,12 +160,14 @@
         {
           "kind": "change",
           "name": "Lucid Star",
-          "detail": "Dynamic chance rebalanced from 22%/20%/18%/16%/14% to 25%/22%/19%/16%/13%."
+          "detail": "Dynamic chance rebalanced from 22%/20%/18%/16%/14% to 25%/22%/19%/16%/13%.",
+          "entityKey": "relic__lucid-star"
         },
         {
           "kind": "change",
           "name": "Magic Seed",
-          "detail": "Chances keep increasing by 3% instead of 2% per round."
+          "detail": "Chances keep increasing by 3% instead of 2% per round.",
+          "entityKey": "relic__magic-seed"
         }
       ]
     },
@@ -153,19 +175,15 @@
       "heading": "Season Awards",
       "entries": [
         {
-          "kind": "change",
-          "name": "S43 Stella Ranger(May, 1st - June, 30th) Awards will be granted as follows:",
-          "detail": "S43 Stella Ranger(May, 1st - June, 30th) Awards will be granted as follows:"
+          "kind": "note",
+          "name": "S43 Stella Ranger(May, 1st - June, 30th) Awards will be granted as follows:"
         },
         {
-          "kind": "change",
-          "name": "Badges will be settled by the final ranking of the Season. All other awards will be settled by the highest rank in Season.",
-          "detail": "Badges will be settled by the final ranking of the Season. All other awards will be settled by the highest rank in Season."
+          "kind": "note",
+          "detail": "Badges will be settled by the final ranking of the Season. All other awards will be settled by the highest rank in Season.\n\nThe last day of the season will be a casual day to settle the awards. You can play casual games without rankings. New Season S44 Crimson Monk Season will be kicked off on July 1st, 2026."
         },
         {
-          "kind": "new",
-          "name": "The last day of the season will be a casual day to settle the awards. You can play casual games without rankings. New Season S44 Crimson Monk Season will be kicked off on July 1st, 2026.",
-          "detail": "The last day of the season will be a casual day to settle the awards. You can play casual games without rankings. New Season S44 Crimson Monk Season will be kicked off on July 1st, 2026."
+          "kind": "note"
         }
       ]
     }
