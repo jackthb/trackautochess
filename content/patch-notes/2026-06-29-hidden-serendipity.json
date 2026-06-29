@@ -21,7 +21,7 @@
           "kind": "buff",
           "name": "Centaur - Stampede",
           "detail": "Stun duration increased from 0.75s to 1s.",
-          "entityKey": "unit__centaur-warrunner"
+          "entityKey": "synergy__centaur"
         },
         {
           "kind": "buff",
@@ -48,13 +48,13 @@
           "entityKey": "synergy__orc"
         },
         {
-          "kind": "fix",
+          "kind": "buff",
           "name": "Assassin - Coup de Grace",
           "detail": "(9) Assassins: Auto-backstab jump refresh cooldown changed from fixed 10s to random 8~10s.",
           "entityKey": "synergy__assassin"
         },
         {
-          "kind": "nerf",
+          "kind": "buff",
           "name": "Kobold - Divided We Stand",
           "detail": "(4) Kobolds: Shapeshift cast time decreased from random 5~7s to random 4~6s.",
           "entityKey": "synergy__kobold"
@@ -118,7 +118,7 @@
           "entityKey": "unit__medusa"
         },
         {
-          "kind": "change",
+          "kind": "buff",
           "name": "Alchemist - Chemical Rage",
           "detail": "Now grants an additional 250/500/1000 maximum HP.",
           "entityKey": "unit__alchemist"
@@ -130,13 +130,13 @@
           "entityKey": "unit__warlock"
         },
         {
-          "kind": "nerf",
+          "kind": "buff",
           "name": "Troll Warlord - Fervor",
           "detail": "Internal cooldown of throwing axes reduced from 3/2/1s to 2.5/1.5/0.5s.",
           "entityKey": "unit__troll-warlord"
         },
         {
-          "kind": "change",
+          "kind": "nerf",
           "name": "Underlord - Fiend's Gate",
           "detail": "Summon interval adjusted from flat 4s to 5.5/4.5/4s.",
           "entityKey": "unit__abyssal-underlord"
@@ -147,7 +147,7 @@
       "heading": "Items",
       "entries": [
         {
-          "kind": "nerf",
+          "kind": "rework",
           "name": "Satanic",
           "detail": "Added passive: The carrier counts as a Faceless unit. Active lifesteal potency slightly nerfed.",
           "entityKey": "item__satanic"
@@ -158,13 +158,13 @@
       "heading": "Relics",
       "entries": [
         {
-          "kind": "change",
+          "kind": "nerf",
           "name": "Lucid Star",
           "detail": "Dynamic chance rebalanced from 22%/20%/18%/16%/14% to 25%/22%/19%/16%/13%.",
           "entityKey": "relic__lucid-star"
         },
         {
-          "kind": "change",
+          "kind": "buff",
           "name": "Magic Seed",
           "detail": "Chances keep increasing by 3% instead of 2% per round.",
           "entityKey": "relic__magic-seed"
@@ -181,9 +181,6 @@
         {
           "kind": "note",
           "detail": "Badges will be settled by the final ranking of the Season. All other awards will be settled by the highest rank in Season.\n\nThe last day of the season will be a casual day to settle the awards. You can play casual games without rankings. New Season S44 Crimson Monk Season will be kicked off on July 1st, 2026."
-        },
-        {
-          "kind": "note"
         }
       ]
     }
