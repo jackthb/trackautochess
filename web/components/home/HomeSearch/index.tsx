@@ -76,15 +76,15 @@ export default function HomeSearch({
 
   return (
     <div className={styles.page}>
-      {Date.now() < new Date("2026-06-15").getTime() && (
+      {Date.now() < new Date("2026-07-15").getTime() && (
         <Link
-          href="/patch-notes/2026-05-24-kobold-cheers-poof-appears"
+          href="/patch-notes/2026-06-29-hidden-serendipity"
           className={styles.banner}
         >
           <span className={styles.bannerTag}>NEW PATCH</span>
           <span className={styles.bannerText}>
-            Kobold rework, Monk &amp; Mech (6), new Kobold Cup — read patch
-            notes
+            Hidden Serendipity: Gods, Warriors, Orcs &amp; Medusa buffs
+            &mdash; read patch notes
           </span>
           <span className={styles.bannerArrow}>&rarr;</span>
         </Link>
