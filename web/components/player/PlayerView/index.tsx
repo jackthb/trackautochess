@@ -801,11 +801,19 @@ export default function PlayerView({
                   {historyTab === "queen" ? (
                     <QueenRankSparkline snapshots={effectiveQueenRankHistory} />
                   ) : (
-                    <MmrSparkline seasons={seasons} snapshots={effectiveMmrHistory} />
+                    <MmrSparkline
+                      seasons={seasons}
+                      snapshots={effectiveMmrHistory}
+                      queenRank={drodo?.queen_rank}
+                    />
                   )}
                 </div>
               ) : (
-                <MmrSparkline seasons={seasons} snapshots={effectiveMmrHistory} />
+                <MmrSparkline
+                  seasons={seasons}
+                  snapshots={effectiveMmrHistory}
+                  queenRank={drodo?.queen_rank}
+                />
               )}
 
               <SeasonHistoryGrid seasons={seasons} />

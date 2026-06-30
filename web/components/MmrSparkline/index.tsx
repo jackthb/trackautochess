@@ -4,27 +4,13 @@ import {
   mmrToRank,
   RANK_BRACKETS,
 } from "@dac/shared/game-utils";
-import {
-  Sparkline,
-  type SparkBand,
-  type SparkPoint,
-} from "@/components/Sparkline";
+import { Sparkline, type SparkPoint } from "@/components/Sparkline";
 import styles from "./MmrSparkline.module.css";
 
-// Major rank thresholds (where the tier name changes) as reference lines —
-// Sparkline only draws the ones inside the visible MMR range.
-const TIER_BANDS: SparkBand[] = (() => {
-  const bands: SparkBand[] = [];
-  let prevTier = "";
-  for (const bracket of RANK_BRACKETS) {
-    const tier = bracket.rank.split("-")[0];
-    if (tier !== prevTier) {
-      bands.push({ value: bracket.mmr, label: tier });
-      prevTier = tier;
-    }
-  }
-  return bands;
-})();
+// Static Queen tier floor. Live Queen ladder positions are separate and can move
+// independently of this MMR threshold.
+const QUEEN_MIN_MMR =
+  RANK_BRACKETS.find((bracket) => bracket.rank === "Queen")?.mmr ?? 3380;
 
 export interface MmrSnapshot {
   mmr: number | null;
@@ -46,6 +32,8 @@ interface MmrSparklineProps {
   seasons?: MmrSeasonAnchor[];
   /** Snapshot points captured each time the user refreshed Drodo. */
   snapshots?: MmrSnapshot[];
+  /** Current Queen ladder position, when Drodo exposes one. */
+  queenRank?: number | null;
 }
 
 function utcDayKey(iso: string): string | null {
@@ -81,7 +69,27 @@ function buildPoints(snapshots: MmrSnapshot[]): SparkPoint[] {
   }));
 }
 
-export function MmrSparkline({ snapshots = [] }: MmrSparklineProps) {
+function queenStatusForMmr(
+  latestMmr: number,
+  queenRank: number | null | undefined
+): string {
+  if (
+    typeof queenRank === "number" &&
+    Number.isFinite(queenRank) &&
+    queenRank > 0
+  ) {
+    return `Queen #${queenRank}`;
+  }
+
+  if (latestMmr >= QUEEN_MIN_MMR) return "Queen tier";
+
+  return `${QUEEN_MIN_MMR - latestMmr} MMR to Queen tier`;
+}
+
+export function MmrSparkline({
+  snapshots = [],
+  queenRank,
+}: MmrSparklineProps) {
   const points = useMemo(() => buildPoints(snapshots), [snapshots]);
 
   // Need at least two tracked snapshots to draw a line. Below that, say so
@@ -110,9 +118,11 @@ export function MmrSparkline({ snapshots = [] }: MmrSparklineProps) {
   const deltaSign = delta > 0 ? "+" : delta < 0 ? "−" : "±";
   const deltaClass =
     delta > 0 ? styles.deltaUp : delta < 0 ? styles.deltaDown : styles.deltaFlat;
+  const latestMmr = values[values.length - 1];
 
   const metaParts = [
     `${points.length} daily point${points.length === 1 ? "" : "s"}`,
+    queenStatusForMmr(latestMmr, queenRank),
     `peak ${maxMmr}`,
     `low ${minMmr}`,
   ];
@@ -133,7 +143,6 @@ export function MmrSparkline({ snapshots = [] }: MmrSparklineProps) {
         <Sparkline
           points={points}
           height={150}
-          bands={TIER_BANDS}
           goodLabel="Peak"
           badLabel="Low"
           ariaLabel="MMR history"
@@ -142,7 +151,8 @@ export function MmrSparkline({ snapshots = [] }: MmrSparklineProps) {
       <p className={styles.note}>
         This timeline begins at the first MMR we tracked — not your all-time
         start. Multiple refreshes on the same UTC day use the last point from
-        that day.
+        that day. Queen ladder rank is tracked separately because leaderboard
+        positions move between refreshes.
       </p>
     </section>
   );

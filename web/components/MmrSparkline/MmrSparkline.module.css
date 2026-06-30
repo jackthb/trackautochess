@@ -9,6 +9,7 @@
   display: flex;
   align-items: baseline;
   justify-content: space-between;
+  flex-wrap: wrap;
   gap: 12px;
   margin-bottom: 12px;
 }
@@ -43,6 +44,8 @@
   font-family: var(--font-mono);
   font-size: var(--fs-12);
   color: var(--text-muted);
+  text-align: right;
+  overflow-wrap: anywhere;
 }
 .meta strong {
   color: var(--text-primary);
