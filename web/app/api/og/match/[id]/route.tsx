@@ -74,7 +74,6 @@ function relicDisplayName(raw: string): string {
 
 const fontDir = path.join(process.cwd(), "public", "fonts");
 const fontData = Promise.all([
-  readFile(path.join(fontDir, "Cinzel-Bold.woff")),
   readFile(path.join(fontDir, "JetBrainsMono-Regular.ttf")),
   readFile(path.join(fontDir, "JetBrainsMono-Bold.ttf")),
 ]);
@@ -762,9 +761,8 @@ async function ogHandler(req: Request, ctx: { params: Promise<{ id: string }> })
       width: 1200,
       height: 630,
       fonts: [
-        { name: "Cinzel", data: fonts[0], weight: 700 as const, style: "normal" as const },
-        { name: "JetBrains Mono", data: fonts[1], weight: 400 as const, style: "normal" as const },
-        { name: "JetBrains Mono", data: fonts[2], weight: 700 as const, style: "normal" as const },
+        { name: "JetBrains Mono", data: fonts[0], weight: 400 as const, style: "normal" as const },
+        { name: "JetBrains Mono", data: fonts[1], weight: 700 as const, style: "normal" as const },
       ],
     }
   );

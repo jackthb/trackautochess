@@ -2,7 +2,9 @@ import type { Metadata } from "next";
 import { Fragment } from "react";
 import Link from "next/link";
 import { formatIsoDateParts } from "@dac/shared/game-utils";
+import PatchPromo from "@/components/patch/PatchPromo";
 import { patchIndexData } from "@/generated/content-data";
+import { getLatestPatchPromo, getLatestPatchSlug, getPatchPromo } from "@/lib/latestPatch";
 import { SITE_NAME, SITE_TITLE } from "@/lib/site";
 import { DEFAULT_LOCALE, pickLocalized } from "@/lib/i18n";
 import styles from "./patch-notes.module.css";
@@ -49,9 +51,11 @@ const structuredData = {
 };
 
 export default function PatchNotesPage() {
-  const patches = [...((patchIndexData as { patches: IndexPatch[] }).patches)].sort((a, b) =>
-    b.date.localeCompare(a.date)
-  );
+  const latestSlug = getLatestPatchSlug();
+  const featuredPatch = latestSlug ? getPatchPromo(latestSlug) : null;
+  const patches = [...((patchIndexData as { patches: IndexPatch[] }).patches)]
+    .sort((a, b) => b.date.localeCompare(a.date))
+    .filter((patch) => patch.slug !== featuredPatch?.slug);
 
   let lastYear = "";
 
@@ -65,6 +69,8 @@ export default function PatchNotesPage() {
       <div className={styles.page}>
         <div className={styles.container}>
           <h1 className={styles.pageTitle}>Patch Notes</h1>
+
+          {featuredPatch && <PatchPromo variant="featured" patch={featuredPatch} />}
 
           <div className={styles.timeline}>
             {patches.map((patch) => {

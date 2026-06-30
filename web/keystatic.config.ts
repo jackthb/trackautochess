@@ -309,6 +309,18 @@ export default config({
         source: fields.url({ label: "Source" }),
         workshopUrl: fields.url({ label: "Workshop URL" }),
         image: fields.url({ label: "Image URL" }),
+        highlight: fields.object(
+          {
+            kind: entryKind,
+            name: fields.text({ label: "Name" }),
+            detail: fields.text({ label: "Detail", multiline: true }),
+          },
+          {
+            label: "Highlight",
+            description:
+              "Single featured change shown on the homepage and patch notes index.",
+          },
+        ),
         flavor: fields.text({ label: "Flavor", multiline: true }),
         entitiesSynced: fields.checkbox({ label: "Entities synced" }),
         entitiesSyncedAt: fields.ignored(),

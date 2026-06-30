@@ -36,7 +36,7 @@
   /* ── Typography ── */
   --font-ui: 'JetBrains Mono', 'Segoe UI', 'Noto Sans', 'Noto Sans CJK SC', 'Microsoft YaHei', 'PingFang SC', 'Hiragino Sans GB', 'Arial Unicode MS', sans-serif;
   --font-mono: 'JetBrains Mono', 'Segoe UI Mono', 'Cascadia Mono', 'Noto Sans Mono', 'Noto Sans CJK SC', 'Microsoft YaHei', ui-monospace, Menlo, monospace;
-  --font-display: 'Cinzel', 'Trajan Pro', 'Segoe UI', 'Noto Sans', 'Noto Sans CJK SC', 'Microsoft YaHei', 'PingFang SC', serif;
+  --font-display: var(--font-ui);
 
   /* Body / UI sizes */
   --fs-11: 11px;   /* status bar, tiny meta */
@@ -59,8 +59,8 @@
   --tr-ui: 1px;
   --tr-upper: 1.5px;    /* uppercase section labels */
   --tr-upper-wide: 2px; /* section-title on marketing */
-  --tr-display: 3px;    /* Cinzel logo */
-  --tr-hero: 10px;      /* Cinzel hero */
+  --tr-display: 2px;    /* display headings */
+  --tr-hero: 6px;       /* landing hero */
 
   /* Font-weight */
   --fw-regular: 400;

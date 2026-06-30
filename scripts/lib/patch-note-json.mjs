@@ -5,6 +5,7 @@ const PATCH_NOTE_KEY_ORDER = [
   "workshopUrl",
   "workshop_url",
   "image",
+  "highlight",
   "entitiesSynced",
   "entitiesSyncedAt",
   "sourceEntries",

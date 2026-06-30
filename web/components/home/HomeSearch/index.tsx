@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import type { User } from "@supabase/supabase-js";
 import { ProfileSearch } from "@/components/ProfileSearch";
 import { SteamSignInButton } from "@/components/SteamSignInButton";
@@ -25,8 +25,10 @@ function formatMetric(value: number): string {
 
 export default function HomeSearch({
   metrics,
+  children,
 }: {
   metrics: CustomGameMetrics | null;
+  children?: ReactNode;
 }) {
   // Mirror the nav's auth check (AppNavBar): once we know the visitor is signed
   // in, the hero's "Sign in through Steam" CTA is wrong — swap it for a link to
@@ -76,19 +78,7 @@ export default function HomeSearch({
 
   return (
     <div className={styles.page}>
-      {Date.now() < new Date("2026-07-15").getTime() && (
-        <Link
-          href="/patch-notes/2026-06-29-hidden-serendipity"
-          className={styles.banner}
-        >
-          <span className={styles.bannerTag}>NEW PATCH</span>
-          <span className={styles.bannerText}>
-            Hidden Serendipity: Gods, Warriors, Orcs &amp; Medusa buffs
-            &mdash; read patch notes
-          </span>
-          <span className={styles.bannerArrow}>&rarr;</span>
-        </Link>
-      )}
+      {children}
       <div className={styles.hero}>
         <div className={styles.grid} />
         <div className={styles.glow} />

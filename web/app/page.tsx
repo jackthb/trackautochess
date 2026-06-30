@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import HomeSearch from "@/components/home/HomeSearch";
+import PatchPromo from "@/components/patch/PatchPromo";
 import { fetchDotaAutoChessMetrics } from "@/lib/customGameStats";
 import { absoluteUrl, SITE_DESCRIPTION, SITE_NAME, SITE_TITLE } from "@/lib/site";
 
@@ -69,7 +70,9 @@ export default async function HomePage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
       />
-      <HomeSearch metrics={metrics} />
+      <HomeSearch metrics={metrics}>
+        <PatchPromo variant="compact" />
+      </HomeSearch>
     </>
   );
 }

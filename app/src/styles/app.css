@@ -14,7 +14,7 @@
 }
 
 .titlebar-logo {
-  font-family: 'Cinzel', serif;
+  font-family: var(--font-display);
   font-size: 13px;
   font-weight: 600;
   letter-spacing: 3px;

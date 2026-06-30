@@ -4,6 +4,11 @@
   "source": "https://docs.google.com/document/d/e/2PACX-1vTjmpKwLPreIG1GA61gxZkAPl8P8mt7Erq8qs6-1XXeglkEcUmHR8UMfNbQgTPR67Bs9SxKl-hvap5H/pub",
   "workshopUrl": "https://steamcommunity.com/sharedfiles/filedetails/changelog/1613886175",
   "image": "/patch-banners/2026-06-29-hidden-serendipity.jpg",
+  "highlight": {
+    "kind": "rework",
+    "name": "Hidden Serendipity",
+    "detail": "Units with low popularity gain the Hidden Serendipity effect: Recruit cost -2."
+  },
   "entitiesSynced": false,
   "sourceEntries": [
     {
