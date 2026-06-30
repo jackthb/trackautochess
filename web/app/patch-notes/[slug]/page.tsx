@@ -302,12 +302,14 @@ export default async function PatchDetailPage({ params }: Props) {
           )}
 
           {patch.image && (
-            <img
-              className={styles["patch-image"]}
-              src={patch.image}
-              alt={`${localizedTitle} patch art`}
-              loading="eager"
-            />
+            <div className={styles["patch-image-wrap"]}>
+              <img
+                className={styles["patch-image"]}
+                src={patch.image}
+                alt={`${localizedTitle} patch art`}
+                loading="eager"
+              />
+            </div>
           )}
 
           {patch.flavor && <div className={styles.flavor}>{patch.flavor}</div>}
