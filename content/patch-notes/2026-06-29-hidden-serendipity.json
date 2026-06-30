@@ -10,6 +10,9 @@
     "detail": "Units with low popularity gain the Hidden Serendipity effect: Recruit cost -2."
   },
   "entitiesSynced": false,
+  "absorbedDates": [
+    "2026-06-30"
+  ],
   "sourceEntries": [
     {
       "sourceId": "1782748712",
@@ -30,15 +33,12 @@
       "contentHash": "32ad75277838ae40"
     }
   ],
-  "absorbedDates": [
-    "2026-06-30"
-  ],
   "sections": [
     {
       "heading": "Games rules update",
       "entries": [
         {
-          "kind": "rework",
+          "kind": "new",
           "name": "Units with low popularity gain the Hidden Serendipity effect: Recruit cost -2.",
           "detail": "Units affected by Hidden Serendipity are real-time updated, varying every game.\n\nThe real-time lowest-popular piece among each cost tier ($1~$5) is affected. Their recruit cost cannot drop below $0."
         }
