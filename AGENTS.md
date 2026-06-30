@@ -130,3 +130,22 @@ rtk pip list            rtk pnpm install        rtk npm run <script>
 - For debugging, use raw command without rtk prefix
 - `rtk proxy <cmd>` runs command without filtering but tracks usage
 <!-- /headroom:rtk-instructions -->
+
+## Cursor Cloud specific instructions
+
+These notes cover running this repo in a headless Linux cloud VM (no Windows, no GPU/display by default). The startup update script already runs `pnpm install` and pins Rust to the `stable` toolchain.
+
+### What can/can't run on Linux
+- **Web Viewer (`web/`) is the primary runnable product on Linux.** Start it with `pnpm --dir web run dev` (or `npm run cms:dev`) ? http://localhost:3000. The `predev` hook regenerates `web/generated/content-data.ts` from committed `content/` JSON (no network needed).
+- The site boots with **no env vars**: Supabase clients degrade gracefully (return null), so static/content pages (`/units`, `/items`, `/classes`, `/patch-notes`, etc.) render fully, while DB-backed pages (player lookup, leaderboards, match history) and Steam auth are empty/disabled. To exercise live data, set `NEXT_PUBLIC_SUPABASE_URL`/`NEXT_PUBLIC_SUPABASE_ANON_KEY` (+ `SUPABASE_SERVICE_ROLE_KEY` for server/cron routes) or run a local `supabase start`. See `web/.env.example` for the full optional list.
+- **Rust backend (`app/backend/`)** compiles and `cargo test` runs on Linux. Note: full capture (`daemon`, `parse-live`, hotkeys) uses `windows-sys` Win32 APIs and only functions on Windows + a running Dota 2 client; offline `parse-log` works anywhere.
+- **Electron desktop app (`app/`)** is not meaningfully testable headless — its core function captures live Dota console/nettable data on Windows.
+
+### Toolchain caveat (important)
+- The Rust backend depends on crates requiring `edition2024`, so it needs **Rust ? 1.85**. The VM's default `rustc` may be older (e.g. 1.83) which fails with `feature edition2024 is required`; the update script sets `rustup default stable` to fix this.
+
+### Lint/typecheck
+- There is **no ESLint config or `lint` script** in this repo. Use TypeScript for the web quality check: `pnpm --dir web exec tsc --noEmit`. For Rust: `cargo build` / `cargo test` in `app/backend/`.
+
+### Known pre-existing test failure
+- `cargo test` in `app/backend/` currently has one failing test, `nettable_service::tests::parity_events_emit_round_creep_and_personal_elimination` (asserts `session_dumps.len() == 1`). It is a pure in-memory logic test (not environment-related) and fails on a clean checkout; unrelated to setup.
