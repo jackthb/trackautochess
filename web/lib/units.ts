@@ -11,6 +11,7 @@ import type { ItemFullInfo } from "@dac/shared/types";
 // comes from content/game/units via the generated runtime module.
 import {
   aliasesData,
+  abilitiesData,
   itemLinksData,
   itemsFullData,
   synergiesData,
@@ -19,10 +20,31 @@ import {
 import { slugifyName } from "@/lib/slugs";
 import { DEFAULT_LOCALE, type Locale, pickLocalized } from "@/lib/i18n";
 
-interface UnitAbility {
+export interface UnitAbility {
   id: string;
   name: string;
   description: string;
+  cooldown: string;
+  manaCost: string;
+  castRange: string;
+  abilitySpecial: Record<string, string>;
+}
+
+interface UnitAbilitySource {
+  id: string;
+  name: string;
+  description: string;
+}
+
+interface AbilityInfo {
+  name?: string;
+  names?: Record<string, string>;
+  description?: string;
+  descriptions?: Record<string, string>;
+  cooldown?: string;
+  mana_cost?: string;
+  cast_range?: string;
+  ability_special?: Record<string, string>;
 }
 
 export interface UnitStats {
@@ -45,7 +67,7 @@ interface UnitInfo {
   cost: number;
   synergies?: string[];
   attack_type?: string;
-  abilities?: UnitAbility[] | null;
+  abilities?: UnitAbilitySource[] | null;
   stats?: UnitStatsByStar;
   names?: Record<string, string>;
   icon_url?: string | null;
@@ -76,6 +98,22 @@ export interface DisplayUnit {
   commentary: string;
 }
 
+function resolveAbility(ability: UnitAbilitySource, locale: Locale): UnitAbility {
+  const details = (abilitiesData as Record<string, AbilityInfo>)[ability.id];
+  return {
+    id: ability.id,
+    name: pickLocalized(details?.names, locale) || details?.name || ability.name,
+    description:
+      pickLocalized(details?.descriptions, locale) ||
+      details?.description ||
+      ability.description,
+    cooldown: details?.cooldown ?? "",
+    manaCost: details?.mana_cost ?? "",
+    castRange: details?.cast_range ?? "",
+    abilitySpecial: details?.ability_special ?? {},
+  };
+}
+
 function buildUnitsForLocale(locale: Locale): DisplayUnit[] {
   return Object.entries(unitsFullData as Record<string, UnitInfo>)
     .map(([canonicalName, data]) => {
@@ -88,7 +126,9 @@ function buildUnitsForLocale(locale: Locale): DisplayUnit[] {
         cost: data.cost ?? 0,
         synergies: data.synergies ?? [],
         attackType: data.attack_type ?? "",
-        abilities: data.abilities ?? [],
+        abilities: (data.abilities ?? []).map((ability) =>
+          resolveAbility(ability, locale)
+        ),
         stats: data.stats ?? null,
         iconStem: stem,
         iconUrl: data.icon_url || `/icons/units/${stem}.png`,

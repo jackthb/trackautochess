@@ -44,6 +44,8 @@ interface Patch {
   image?: string;
   flavor?: string;
   summary?: string;
+  entitiesSynced?: boolean;
+  entitiesSyncedAt?: string;
   sections: PatchSection[];
 }
 
@@ -59,6 +61,15 @@ interface Props {
 
 export const dynamicParams = false;
 
+const SYNCED_TOOLTIP =
+  "Entities and synergies have been updated with the new changes.";
+const PENDING_TOOLTIP =
+  "Entities and synergies still need to be synced with this patch.";
+
+function syncTooltip(isSynced: boolean): string {
+  return isSynced ? SYNCED_TOOLTIP : PENDING_TOOLTIP;
+}
+
 function cleanText(value: string): string {
   return value.replace(/\s+/g, " ").trim();
 }
@@ -66,6 +77,13 @@ function cleanText(value: string): string {
 function truncate(value: string, maxLength: number): string {
   if (value.length <= maxLength) return value;
   return `${value.slice(0, maxLength - 3).trimEnd()}...`;
+}
+
+function latestPatchSlug(): string | null {
+  const patches = [...((patchIndexData as { patches: IndexPatch[] }).patches)].sort(
+    (a, b) => b.date.localeCompare(a.date) || b.slug.localeCompare(a.slug)
+  );
+  return patches[0]?.slug ?? null;
 }
 
 function buildPatchDescription(patch: Patch): string {
@@ -214,6 +232,10 @@ export default async function PatchDetailPage({ params }: Props) {
   const pagePath = `/patch-notes/${slug}`;
   const pageUrl = absoluteUrl(pagePath);
   const patchIndexUrl = absoluteUrl("/patch-notes");
+  const isLatestPatch = slug === latestPatchSlug();
+  const showSyncStatus =
+    isLatestPatch || typeof patch.entitiesSynced === "boolean";
+  const isSynced = patch.entitiesSynced === true;
   const structuredData = [
     {
       "@context": "https://schema.org",
@@ -273,7 +295,27 @@ export default async function PatchDetailPage({ params }: Props) {
             <span>/</span>
             <span>{localizedTitle}</span>
           </nav>
-          <div className={styles.date}>{patch.date}</div>
+          <div className={styles["header-meta"]}>
+            <span className={styles.date}>{patch.date}</span>
+            {showSyncStatus && (
+              <span
+                className={`${styles["sync-badge"]} ${
+                  isSynced
+                    ? styles["sync-badge-synced"]
+                    : styles["sync-badge-pending"]
+                }`}
+                data-tooltip={syncTooltip(isSynced)}
+                title={syncTooltip(isSynced)}
+                aria-label={`${
+                  isSynced ? "Game data synced" : "Game data pending"
+                }. ${syncTooltip(isSynced)}`}
+                tabIndex={0}
+              >
+                <span className={styles["sync-light"]} aria-hidden />
+                {isSynced ? "Game data synced" : "Game data pending"}
+              </span>
+            )}
+          </div>
           <h1 className={styles.title}>{localizedTitle}</h1>
 
           {(patch.source || patch.workshop_url) && (

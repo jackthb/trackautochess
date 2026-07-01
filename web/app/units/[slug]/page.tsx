@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { EntityDetail, type RelatedEntity } from "@/components/EntityDetail";
 import { EntityCommentaryList } from "@/components/PatchCommentary";
+import { UnitAbilities } from "@/components/UnitAbilities";
 import { UnitStatsTable } from "@/components/UnitStatsTable";
 import { getAllUnits, getUnitBySlug } from "@/lib/units";
 import { getAllSynergies } from "@/lib/synergies";
@@ -131,16 +132,7 @@ export default async function UnitDetailPage({ params }: Props) {
       ? [
           {
             title: t.abilities,
-            body: (
-              <div>
-                {unit.abilities.map((ability) => (
-                  <section key={ability.id}>
-                    <strong>{ability.name}</strong>
-                    <p>{ability.description}</p>
-                  </section>
-                ))}
-              </div>
-            ),
+            body: <UnitAbilities abilities={unit.abilities} />,
           },
         ]
       : []),

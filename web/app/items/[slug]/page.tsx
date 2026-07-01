@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { EntityDetail, type RelatedEntity } from "@/components/EntityDetail";
-import { EntityCommentaryList } from "@/components/PatchCommentary";
-import { Markdown } from "@/components/Markdown";
+import { type RelatedEntity } from "@/components/EntityDetail";
+import { ItemDetailClient } from "@/components/ItemDetailClient";
 import {
   getAllItems,
   getItemBySlug,
@@ -11,7 +10,6 @@ import {
   TIER_COLOR,
   TIER_LABEL,
 } from "@/lib/items";
-import { parseItemDescription } from "@/lib/itemDescription";
 import {
   getRelatedEntitiesForItem,
   getRelatedItemsForItem,
@@ -31,8 +29,6 @@ const t = {
   moreOf: (t: string) => `More ${t} Items`,
   relatedSynergies: "Related Synergies",
   fallbackTier: (n: string, t: string) => `${n} is a ${t} Dota Auto Chess item.`,
-  activeAbility: "Active Ability",
-  stats: "Stats",
 };
 
 function cleanText(value: string): string {
@@ -112,7 +108,6 @@ export default async function ItemDetailPage({ params }: Props) {
   const patchCommentary = getCommentaryForEntity("item", slug);
 
   const tierLabel = TIER_LABEL[item.tier];
-  const title = t.title(item.name);
   const description = buildDescription(item);
   const pageUrl = absoluteUrl(`/items/${item.slug}`);
   const itemsUrl = absoluteUrl("/items");
@@ -147,12 +142,6 @@ export default async function ItemDetailPage({ params }: Props) {
     },
   ];
 
-  const { active, stats } = parseItemDescription(item.description);
-  const bodySections = [
-    ...(active ? [{ title: t.activeAbility, body: active }] : []),
-    ...(stats ? [{ title: t.stats, body: stats }] : []),
-  ];
-
   const synergyEntities: RelatedEntity[] = relatedSynergies.map(({ synergy, relation }) => ({
     slug: synergy.slug,
     name: synergy.name,
@@ -179,6 +168,24 @@ export default async function ItemDetailPage({ params }: Props) {
     description: cleanText(r.description),
     iconSrc: iconUrl(r),
   }));
+  const relatedTitle =
+    cmsRelatedEntities.length > 0 || explicitRelatedItemEntities.length > 0
+      ? "Related Entities"
+      : synergyEntities.length > 0
+        ? t.relatedSynergies
+        : t.moreOf(tierLabel);
+  const resolvedRelated =
+    cmsRelatedEntities.length > 0
+      ? cmsRelatedEntities
+      : explicitRelatedItemEntities.length > 0
+        ? explicitRelatedItemEntities
+        : synergyEntities.length > 0
+          ? synergyEntities
+          : relatedEntities;
+  const hasPrimaryRelations =
+    cmsRelatedEntities.length > 0 ||
+    explicitRelatedItemEntities.length > 0 ||
+    synergyEntities.length > 0;
 
   return (
     <>
@@ -186,51 +193,23 @@ export default async function ItemDetailPage({ params }: Props) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
       />
-      <EntityDetail
-        variant="item"
-        name={item.name}
-        iconSrc={iconUrl(item)}
-        bodySections={bodySections}
-        commentary={
-          item.commentary || patchCommentary.length > 0 ? (
-            <>
-              {item.commentary ? <Markdown>{item.commentary}</Markdown> : null}
-              {patchCommentary.length > 0 ? (
-                <EntityCommentaryList entries={patchCommentary} />
-              ) : null}
-            </>
-          ) : undefined
-        }
-        notes={item.notes.map(cleanText)}
-        lore={item.lore ? cleanText(item.lore) : undefined}
-        tag={{ label: tierLabel, color: tierColor }}
-        relatedTitle={
-          cmsRelatedEntities.length > 0 || explicitRelatedItemEntities.length > 0
-            ? "Related Entities"
-            : synergyEntities.length > 0
-              ? t.relatedSynergies
-              : t.moreOf(tierLabel)
-        }
-        related={
-          cmsRelatedEntities.length > 0
-            ? cmsRelatedEntities
-            : explicitRelatedItemEntities.length > 0
-              ? explicitRelatedItemEntities
-              : synergyEntities.length > 0
-                ? synergyEntities
-                : relatedEntities
-        }
-        extraRelatedTitle={
-          cmsRelatedEntities.length > 0 || explicitRelatedItemEntities.length > 0 || synergyEntities.length > 0
-            ? t.moreOf(tierLabel)
-            : undefined
-        }
-        extraRelated={
-          cmsRelatedEntities.length > 0 || explicitRelatedItemEntities.length > 0 || synergyEntities.length > 0
-            ? relatedEntities
-            : undefined
-        }
+      <ItemDetailClient
+        item={{
+          slug: item.slug,
+          name: item.name,
+          iconUrl: iconUrl(item),
+          commentary: item.commentary,
+          notes: item.notes,
+          translations: item.translations,
+        }}
+        tierLabel={tierLabel}
+        tierColor={tierColor}
+        relatedTitle={relatedTitle}
+        related={resolvedRelated}
+        extraRelatedTitle={hasPrimaryRelations ? t.moreOf(tierLabel) : undefined}
+        extraRelated={hasPrimaryRelations ? relatedEntities : undefined}
         accentColor={tierColor}
+        patchCommentary={patchCommentary}
       />
     </>
   );

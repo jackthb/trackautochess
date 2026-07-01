@@ -12,6 +12,8 @@ export interface PatchPromoData {
   date: string;
   title: string;
   image?: string;
+  entitiesSynced?: boolean;
+  entitiesSyncedAt?: string;
   highlight: PatchHighlight;
 }
 
@@ -19,12 +21,16 @@ interface IndexPatch {
   date: string;
   title: string;
   slug: string;
+  entitiesSynced?: boolean;
+  entitiesSyncedAt?: string;
 }
 
 interface RuntimePatch {
   date: string;
   title: string;
   image?: string;
+  entitiesSynced?: boolean;
+  entitiesSyncedAt?: string;
   highlight?: PatchHighlight;
   highlights?: PatchHighlight[];
 }
@@ -73,6 +79,8 @@ export function getPatchPromo(
     date: patch.date,
     title: patch.title,
     image: patch.image,
+    entitiesSynced: patch.entitiesSynced,
+    entitiesSyncedAt: patch.entitiesSyncedAt,
     highlight,
   };
 }

@@ -27,7 +27,7 @@
         "mana": 100,
         "atk": [
           50,
-          100
+          80
         ],
         "armor": 3,
         "magic_resist": 0,
@@ -39,7 +39,7 @@
         "mana": 100,
         "atk": [
           100,
-          200
+          160
         ],
         "armor": 3,
         "magic_resist": 0,
@@ -51,7 +51,7 @@
         "mana": 100,
         "atk": [
           200,
-          400
+          320
         ],
         "armor": 3,
         "magic_resist": 0,

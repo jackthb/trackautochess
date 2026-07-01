@@ -1,0 +1,37 @@
+.switcher {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 2px;
+  border: 1px solid var(--border);
+  border-radius: var(--r-4);
+  background: var(--bg-elevated);
+}
+
+.option {
+  min-width: 44px;
+  min-height: 28px;
+  padding: var(--s-4) var(--s-8);
+  border: 0;
+  border-radius: var(--r-3);
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-family: var(--font-mono);
+  font-size: var(--fs-11);
+  letter-spacing: var(--tr-upper);
+  text-transform: uppercase;
+  transition:
+    background var(--t-base) var(--t-easing),
+    color var(--t-base) var(--t-easing);
+}
+
+.option:hover {
+  color: var(--text-primary);
+  background: var(--bg-hover);
+}
+
+.optionActive {
+  color: var(--text-primary);
+  background: color-mix(in srgb, var(--accent) 18%, transparent);
+}

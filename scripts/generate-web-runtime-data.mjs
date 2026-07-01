@@ -265,6 +265,10 @@ async function main() {
       title: patch.title,
       slug,
       ...(patch.titles ? { titles: patch.titles } : {}),
+      ...(typeof patch.entitiesSynced === "boolean"
+        ? { entitiesSynced: patch.entitiesSynced }
+        : {}),
+      ...(patch.entitiesSyncedAt ? { entitiesSyncedAt: patch.entitiesSyncedAt } : {}),
     });
   }
   patchEntries.sort((a, b) => b.date.localeCompare(a.date) || b.slug.localeCompare(a.slug));

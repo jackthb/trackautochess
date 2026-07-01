@@ -17,6 +17,14 @@ interface FullItem {
   icon_dimensions?: { width: number; height: number } | null;
 }
 
+export interface ItemTranslation {
+  locale: string;
+  label: string;
+  name: string;
+  description: string;
+  lore: string;
+}
+
 interface SimpleItem {
   tier?: number;
   icon?: string;
@@ -44,6 +52,7 @@ export interface DisplayItem {
    */
   iconUrl: string;
   iconDimensions: { width: number; height: number } | null;
+  translations: ItemTranslation[];
 }
 
 export const TIER_LABEL: Record<number, string> = {
@@ -88,6 +97,49 @@ function normalizePunct(value: string): string {
     .replace(/\.\s*\./g, ".");
 }
 
+const ITEM_TRANSLATION_LOCALES = [
+  { locale: "en", label: "EN" },
+  { locale: "ru", label: "RU" },
+  { locale: "zh-cn", label: "ZH-CN" },
+  { locale: "zh-tw", label: "ZH-TW" },
+] as const;
+
+function hasTranslation(full: FullItem | undefined, locale: string): boolean {
+  if (locale === "en") return true;
+  return Boolean(
+    full?.names?.[locale] ||
+      full?.descriptions?.[locale] ||
+      full?.lore_i18n?.[locale],
+  );
+}
+
+function buildTranslations(
+  full: FullItem | undefined,
+  fallbackName: string,
+): ItemTranslation[] {
+  return ITEM_TRANSLATION_LOCALES.filter(({ locale }) =>
+    hasTranslation(full, locale),
+  ).map(({ locale, label }) => ({
+    locale,
+    label,
+    name: normalizePunct(
+      (locale === "en" ? full?.name : full?.names?.[locale]) ||
+        full?.name ||
+        fallbackName,
+    ),
+    description: normalizePunct(
+      (locale === "en" ? full?.description : full?.descriptions?.[locale]) ||
+        full?.description ||
+        "",
+    ),
+    lore: normalizePunct(
+      (locale === "en" ? full?.lore : full?.lore_i18n?.[locale]) ||
+        full?.lore ||
+        "",
+    ),
+  }));
+}
+
 function buildItemsForLocale(locale: Locale): DisplayItem[] {
   const simple = (itemsSimpleData as { items: Record<string, SimpleItem> }).items;
   const fullByNorm = new Map<string, FullItem>();
@@ -127,6 +179,7 @@ function buildItemsForLocale(locale: Locale): DisplayItem[] {
         texture: full?.texture ?? "",
         iconUrl: remoteUrl || localUrl,
         iconDimensions: basic?.icon_dimensions ?? full?.icon_dimensions ?? null,
+        translations: buildTranslations(full, canonicalName),
       };
     })
     .sort((a, b) => {

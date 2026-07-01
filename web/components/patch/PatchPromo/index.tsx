@@ -19,14 +19,25 @@ function formatPatchDate(date: string): string {
   });
 }
 
+const SYNCED_TOOLTIP =
+  "Entities and synergies have been updated with the new changes.";
+const PENDING_TOOLTIP =
+  "Entities and synergies still need to be synced with this patch.";
+
+function syncTooltip(isSynced: boolean): string {
+  return isSynced ? SYNCED_TOOLTIP : PENDING_TOOLTIP;
+}
+
 export default function PatchPromo({
   variant = "featured",
   slug,
   patch,
+  showSyncStatus = false,
 }: {
   variant?: "compact" | "featured";
   slug?: string;
   patch?: PatchPromoData | null;
+  showSyncStatus?: boolean;
 }) {
   const promo = patch ?? (slug ? getPatchPromo(slug) : getLatestPatchPromo());
   if (!promo) return null;
@@ -34,6 +45,14 @@ export default function PatchPromo({
   const isCompact = variant === "compact";
   const { highlight } = promo;
   const highlightText = formatHighlightText(highlight);
+  const isSynced = promo.entitiesSynced === true;
+  const syncLabel = isSynced
+    ? isCompact
+      ? "Synced"
+      : "Game data synced"
+    : isCompact
+      ? "Pending"
+      : "Game data pending";
 
   return (
     <section
@@ -63,6 +82,19 @@ export default function PatchPromo({
         >
           <div className={styles.meta}>
             <span className={styles.tag}>New patch</span>
+            {showSyncStatus && (
+              <span
+                className={`${styles.syncBadge} ${
+                  isSynced ? styles.syncBadgeSynced : styles.syncBadgePending
+                }`}
+                data-tooltip={syncTooltip(isSynced)}
+                title={syncTooltip(isSynced)}
+                aria-label={`${syncLabel}. ${syncTooltip(isSynced)}`}
+              >
+                <span className={styles.syncLight} aria-hidden />
+                {syncLabel}
+              </span>
+            )}
             {!isCompact && (
               <span className={styles.date}>{formatPatchDate(promo.date)}</span>
             )}

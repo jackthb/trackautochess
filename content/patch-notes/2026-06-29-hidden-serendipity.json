@@ -9,7 +9,8 @@
     "name": "Hidden Serendipity",
     "detail": "Units with low popularity gain the Hidden Serendipity effect: Recruit cost -2."
   },
-  "entitiesSynced": false,
+  "entitiesSynced": true,
+  "entitiesSyncedAt": "2026-06-30T20:44:26.807Z",
   "absorbedDates": [
     "2026-06-30"
   ],
@@ -38,7 +39,7 @@
       "heading": "Games rules update",
       "entries": [
         {
-          "kind": "new",
+          "kind": "rework",
           "name": "Units with low popularity gain the Hidden Serendipity effect: Recruit cost -2.",
           "detail": "Units affected by Hidden Serendipity are real-time updated, varying every game.\n\nThe real-time lowest-popular piece among each cost tier ($1~$5) is affected. Their recruit cost cannot drop below $0."
         }
@@ -211,26 +212,6 @@
         {
           "kind": "note",
           "detail": "Badges will be settled by the final ranking of the Season. All other awards will be settled by the highest rank in Season.\n\nThe last day of the season will be a casual day to settle the awards. You can play casual games without rankings. New Season S44 Crimson Monk Season will be kicked off on July 1st, 2026."
-        }
-      ]
-    },
-    {
-      "heading": "Hotfix — 2026-06-30",
-      "entries": [
-        {
-          "kind": "new",
-          "name": "S44 has been kicked off! Enjoy the new season and ...",
-          "detail": "S44 has been kicked off! Enjoy the new season and claim your S43 Award in Event Panel"
-        },
-        {
-          "kind": "change",
-          "name": "You’ll need 5 games to settle your ranking as usual.",
-          "detail": "You’ll need 5 games to settle your ranking as usual."
-        },
-        {
-          "kind": "new",
-          "name": "New season!",
-          "detail": "New season!"
         }
       ]
     }

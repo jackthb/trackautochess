@@ -274,10 +274,9 @@ def extract_all(pak):
     loc = all_loc.get('en', {})
 
     # ── Localized-string helper ──
-    # Locales we surface in the JSON cache. Korean / Chinese parse fine
-    # but only Russian is part of the SEO target right now. Add more
-    # entries here to expand language support.
-    LOCALE_KEYS = ('en', 'ru')
+    # Locales we surface in the JSON cache. Korean parses fine too, but the
+    # public item switcher currently exposes English, Russian, and Chinese.
+    LOCALE_KEYS = ('en', 'ru', 'zh-cn', 'zh-tw')
     _placeholder = re.compile(r'%([A-Za-z_][A-Za-z0-9_]*)%')
 
     def loc_strings(prefix, suffixes=('',), process=None, placeholders=None):
@@ -314,6 +313,7 @@ def extract_all(pak):
     raw_abilities = pak['scripts/npc/npc_abilities_custom.txt'].read().decode('utf-8')
     raw_items = pak['scripts/npc/npc_items_custom.txt'].read().decode('utf-8')
     raw_units = pak['scripts/npc/npc_units_custom.txt'].read().decode('utf-8')
+    raw_lua = pak['scripts/vscripts/addon_game_mode.lua'].read().decode('utf-8', errors='replace')
 
     abilities_kv = parse_kv(raw_abilities)
     items_kv = parse_kv(raw_items)
@@ -326,6 +326,25 @@ def extract_all(pak):
         items_kv = next(iter(items_kv.values()))
     if len(units_kv) == 1:
         units_kv = next(iter(units_kv.values()))
+
+    def extract_lua_item_ids(name):
+        m = re.search(re.escape(name) + r'\s*=\s*\{', raw_lua)
+        if not m:
+            return []
+        start = m.end()
+        depth = 1
+        i = start
+        while i < len(raw_lua) and depth > 0:
+            if raw_lua[i] == '{':
+                depth += 1
+            elif raw_lua[i] == '}':
+                depth -= 1
+            i += 1
+        block = re.sub(r'--.*', '', raw_lua[start:i - 1])
+        return re.findall(r'"(item_\w+)"|\'(item_\w+)\'', block)
+
+    def flatten_lua_ids(matches):
+        return [a or b for a, b in matches]
 
     # ── Build synergy ID -> display name map ──
     syn_id_to_name = {}
@@ -417,9 +436,18 @@ def extract_all(pak):
                             vals[fk] = fv
         return vals
 
+    # npc_items_custom contains every item definition, including old, commented,
+    # test, generated, and helper records. The live normal item pool is the Lua
+    # tier table.
+    active_item_ids = set(flatten_lua_ids(extract_lua_item_ids('_G.ITEM_LIST_BY_LEVEL')))
+    if not active_item_ids:
+        raise RuntimeError('Could not parse _G.ITEM_LIST_BY_LEVEL from addon_game_mode.lua')
+
     items = {}
     for iid, idata in sorted(items_kv.items()):
         if not iid.startswith('item_') or not isinstance(idata, dict):
+            continue
+        if iid not in active_item_ids:
             continue
 
         prefix = f'DOTA_Tooltip_ability_{iid}'
@@ -475,15 +503,11 @@ def extract_all(pak):
             return ''
         return value
 
-    # Extract relic IDs from DROP_RELIC_LIST in addon_game_mode.lua
+    # Extract active relic IDs from DROP_RELIC_LIST in addon_game_mode.lua.
     # Note: quest_2_relic_list has seasonal/quest relics — not included
-    raw_lua = pak['scripts/vscripts/addon_game_mode.lua'].read().decode('utf-8', errors='replace')
-
-    relic_ids = []
-    for m in re.finditer(r'DROP_RELIC_LIST\s*=\s*\{([^}]*)\}', raw_lua):
-        ids = re.findall(r'"(item_\w+)"', m.group(1))
-        if ids:
-            relic_ids = ids
+    relic_ids = flatten_lua_ids(extract_lua_item_ids('_G.DROP_RELIC_LIST'))
+    if not relic_ids:
+        raise RuntimeError('Could not parse _G.DROP_RELIC_LIST from addon_game_mode.lua')
     # item_stolen_vault is the "discard all" escape option, always available
     relic_ids.append('item_stolen_vault')
 
@@ -758,36 +782,14 @@ def extract_all(pak):
     # 7. GAME MODE CONSTANTS (from addon_game_mode.lua)
     # ════════════════════════════════════════════════════════════════
 
-    def extract_lua_list(name):
-        m = re.search(re.escape(name) + r'\s*=\s*\{', raw_lua)
-        if not m:
-            return None
-        start = m.end()
-        depth = 1
-        i = start
-        while i < len(raw_lua) and depth > 0:
-            if raw_lua[i] == '{': depth += 1
-            elif raw_lua[i] == '}': depth -= 1
-            i += 1
-        block = re.sub(r'--.*', '', raw_lua[start:i - 1])
-        return re.findall(r'"(item_\w+)"|\'(item_\w+)\'', block)
-
     def extract_lua_number(name):
         m = re.search(re.escape(name) + r'\s*=\s*(-?\d+\.?\d*)', raw_lua)
         return float(m.group(1)) if m else None
 
-    drop_relic_list = []
-    quest_relic_list = []
-    for m in re.finditer(r'DROP_RELIC_LIST\s*=\s*\{([^}]*)\}', raw_lua):
-        block = re.sub(r'--.*', '', m.group(1))
-        drop_relic_list = re.findall(r'"(item_\w+)"', block)
-    for m in re.finditer(r'quest_2_relic_list\s*=\s*\{([^}]*)\}', raw_lua):
-        block = re.sub(r'--.*', '', m.group(1))
-        quest_relic_list = re.findall(r'"(item_\w+)"', block)
-
     game_mode_out = {
-        'drop_relic_list': drop_relic_list,
-        'quest_2_relic_list': quest_relic_list,
+        'item_list_by_level': sorted(active_item_ids),
+        'drop_relic_list': relic_ids,
+        'quest_2_relic_list': flatten_lua_ids(extract_lua_item_ids('quest_2_relic_list')),
         'prepare_timer': extract_lua_number('_G.prepare_timer'),
         'battle_timer': extract_lua_number('_G.battle_timer'),
     }
@@ -1005,6 +1007,7 @@ def relic_icon_stem(name):
 
 
 def content_entity(game_id, name, source, icon, existing):
+    existing = existing or {}
     source_without_legacy_icons = dict(source)
     source_without_legacy_icons.pop('icon', None)
     source_without_legacy_icons.pop('icon_url', None)
@@ -1014,8 +1017,12 @@ def content_entity(game_id, name, source, icon, existing):
         'name': name,
         'slug': slugify(name or game_id),
         'source': source_without_legacy_icons,
-        'overrides': (existing or {}).get('overrides', {}),
+        'overrides': existing.get('overrides', {}),
     }
+    if existing.get('commentary'):
+        entity['commentary'] = existing['commentary']
+    if 'relatedEntities' in existing:
+        entity['relatedEntities'] = existing['relatedEntities']
     if icon:
         entity['icon'] = icon
     return entity

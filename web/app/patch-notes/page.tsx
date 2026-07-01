@@ -70,7 +70,13 @@ export default function PatchNotesPage() {
         <div className={styles.container}>
           <h1 className={styles.pageTitle}>Patch Notes</h1>
 
-          {featuredPatch && <PatchPromo variant="featured" patch={featuredPatch} />}
+          {featuredPatch && (
+            <PatchPromo
+              variant="featured"
+              patch={featuredPatch}
+              showSyncStatus
+            />
+          )}
 
           <div className={styles.timeline}>
             {patches.map((patch) => {

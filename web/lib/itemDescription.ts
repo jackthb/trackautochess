@@ -4,9 +4,13 @@
  * paragraph; the items page renders them as separate sections so the
  * active ability — the most game-relevant part — reads at the top.
  *
- * Pattern in the data is consistently:
+ * English pattern in the data is consistently:
  *   "<stats sentence(s)>\n\nActive ability: <trigger>\n<effect>\n\n<meta>"
  * with the leading stats sometimes empty (Blink Dagger, Mekansm, etc.).
+ *
+ * Localized VPK text uses equivalent headings, so the parser also recognizes
+ * Russian and Chinese active-skill labels for the client-side item language
+ * switcher.
  */
 export interface ItemDescriptionParts {
   /** The "Active ability: ..." block, or "" if the item has no active. */
@@ -15,7 +19,8 @@ export interface ItemDescriptionParts {
   stats: string;
 }
 
-const ACTIVE_HEADER = /\bActive(?:\s+ability|\s+Ability):/;
+const ACTIVE_HEADER =
+  /\bActive(?:\s+ability|\s+Ability):|Активка:|Активируется|主动(?:技能|技|效果)[:：]?/i;
 
 export function parseItemDescription(raw: string): ItemDescriptionParts {
   if (!raw) return { active: "", stats: "" };

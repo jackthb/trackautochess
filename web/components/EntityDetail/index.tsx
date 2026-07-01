@@ -60,6 +60,8 @@ interface EntityDetailProps {
   notesEditAttr?: string;
   /** Small chip rendered below the title (e.g. tier label). */
   tag?: { label: string; color?: string };
+  /** Optional interactive controls or metadata rendered below the title/tag. */
+  heroAddon?: ReactNode;
   /** Color applied to the hero title text. When set, overrides the
    *  variant default (e.g. tier color on item pages). */
   titleColor?: string;
@@ -100,6 +102,7 @@ export function EntityDetail({
   loreEditAttr,
   notesEditAttr,
   tag,
+  heroAddon,
   titleColor,
   relatedTitle,
   related,
@@ -150,6 +153,7 @@ export function EntityDetail({
                 {tag.label}
               </div>
             )}
+            {heroAddon && <div className={styles.heroAddon}>{heroAddon}</div>}
           </div>
         </section>
 
