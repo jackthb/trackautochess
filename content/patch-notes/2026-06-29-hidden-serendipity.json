@@ -189,7 +189,7 @@
       "heading": "Relics",
       "entries": [
         {
-          "kind": "nerf",
+          "kind": "rework",
           "name": "Lucid Star",
           "detail": "Dynamic chance rebalanced from 22%/20%/18%/16%/14% to 25%/22%/19%/16%/13%.",
           "entityKey": "relic__lucid-star"
