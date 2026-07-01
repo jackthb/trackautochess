@@ -16,7 +16,11 @@ import {
 
 export interface DrodoHistory {
   seasons: SeasonSnapshotRow[];
-  mmr_history: Array<{ mmr: number | null; snapshotted_at: string }>;
+  mmr_history: Array<{
+    mmr: number | null;
+    season: string | null;
+    snapshotted_at: string;
+  }>;
   queen_rank_history: Array<{ queen_rank: number; snapshotted_at: string }>;
 }
 
@@ -93,7 +97,7 @@ export async function loadDrodoHistory(
       .order("season", { ascending: true }),
     supabase
       .from("mmr_snapshots")
-      .select("mmr, queen_rank, snapshotted_at")
+      .select("mmr, queen_rank, season, snapshotted_at")
       .filter("steam_id", "eq", steamId)
       .not("mmr", "is", null)
       .order("snapshotted_at", { ascending: false })
@@ -104,6 +108,7 @@ export async function loadDrodoHistory(
   const snapshots = (snapshotsResult.data ?? []) as Array<{
     mmr: number | null;
     queen_rank: number | null;
+    season: string | null;
     snapshotted_at: string;
   }>;
 
@@ -111,6 +116,7 @@ export async function loadDrodoHistory(
     seasons,
     mmr_history: snapshots.map((row) => ({
       mmr: row.mmr,
+      season: row.season,
       snapshotted_at: row.snapshotted_at,
     })),
     queen_rank_history: snapshots

@@ -145,6 +145,7 @@ function latestMmrDelta(snapshots: MmrSnapshot[]) {
 function historyWithCurrentMmr(
   snapshots: MmrSnapshot[],
   mmr: number | null | undefined,
+  season: string | null | undefined,
   snapshottedAt: string | null | undefined
 ): MmrSnapshot[] {
   if (typeof mmr !== "number" || !snapshottedAt) return snapshots;
@@ -152,6 +153,7 @@ function historyWithCurrentMmr(
     ...snapshots,
     {
       mmr,
+      season,
       snapshotted_at: snapshottedAt,
     },
   ];
@@ -266,12 +268,15 @@ type RefreshedDrodoProfile = DrodoProfileRow & {
   queen_rank_history?: unknown;
 };
 
+type HistoryTab = "mmr" | "queen";
+
 function isMmrSnapshot(value: unknown): value is MmrSnapshot {
   if (!value || typeof value !== "object") return false;
   const row = value as Record<string, unknown>;
   return (
     (typeof row.mmr === "number" || row.mmr === null) &&
-    typeof row.snapshotted_at === "string"
+    typeof row.snapshotted_at === "string" &&
+    (typeof row.season === "string" || row.season == null)
   );
 }
 
@@ -313,7 +318,7 @@ export default function PlayerView({
     initialManualRefreshQuota
   );
   const [refreshError, setRefreshError] = useState<string | null>(null);
-  const [historyTab, setHistoryTab] = useState<"mmr" | "queen">("mmr");
+  const [historyTab, setHistoryTab] = useState<HistoryTab>("mmr");
   const [nowMs, setNowMs] = useState<number | null>(null);
   const [refreshing, setRefreshing] = useState(false);
   const [avatarFailed, setAvatarFailed] = useState(false);
@@ -387,8 +392,14 @@ export default function PlayerView({
     [games, drodo, totalChickenCount]
   );
   const effectiveMmrHistory = useMemo(
-    () => historyWithCurrentMmr(mmrHistory, drodo?.mmr, drodoLastFetchedAt),
-    [mmrHistory, drodo?.mmr, drodoLastFetchedAt]
+    () =>
+      historyWithCurrentMmr(
+        mmrHistory,
+        drodo?.mmr,
+        drodo?.season,
+        drodoLastFetchedAt
+      ),
+    [mmrHistory, drodo?.mmr, drodo?.season, drodoLastFetchedAt]
   );
   const effectiveQueenRankHistory = useMemo(
     () =>
@@ -401,11 +412,27 @@ export default function PlayerView({
   );
   const showQueenRankHistory =
     Boolean(drodo?.queen_rank) && hasQueenRankHistory(effectiveQueenRankHistory);
+  const historyTabs = useMemo(
+    () =>
+      [
+        { key: "mmr" as const, label: "MMR History" },
+        ...(showQueenRankHistory
+          ? [{ key: "queen" as const, label: "Queen Rank" }]
+          : []),
+      ],
+    [showQueenRankHistory]
+  );
 
   // TODO: ingest total matches / avg rank / wins / preferred lineup / max damage from history pages for server-side season snapshots.
   useEffect(() => {
     setAvatarFailed(false);
   }, [steamProfile.avatarUrl]);
+
+  useEffect(() => {
+    if (!historyTabs.some((tab) => tab.key === historyTab)) {
+      setHistoryTab("mmr");
+    }
+  }, [historyTab, historyTabs]);
 
   useEffect(() => {
     setNowMs(Date.now());
@@ -773,49 +800,39 @@ export default function PlayerView({
 
           {canViewHistory ? (
             <>
-              {/* Delta now lives in the MmrSparkline header (see component),
-                  so the standalone pill is parked rather than removed. */}
-              {/* <MmrDeltaCard snapshots={mmrHistory} /> */}
-              {showQueenRankHistory ? (
-                <div className={styles.historyPanel}>
-                  <div className={styles.historyTabs} role="tablist" aria-label="Rating history">
-                    <button
-                      type="button"
-                      className={`${styles.historyTab} ${historyTab === "mmr" ? styles.historyTabActive : ""}`}
-                      onClick={() => setHistoryTab("mmr")}
-                      role="tab"
-                      aria-selected={historyTab === "mmr"}
-                    >
-                      MMR
-                    </button>
-                    <button
-                      type="button"
-                      className={`${styles.historyTab} ${historyTab === "queen" ? styles.historyTabActive : ""}`}
-                      onClick={() => setHistoryTab("queen")}
-                      role="tab"
-                      aria-selected={historyTab === "queen"}
-                    >
-                      Queen Rank
-                    </button>
+              <div className={styles.historyPanel}>
+                {historyTabs.length > 1 && (
+                  <div
+                    className={styles.historyTabs}
+                    role="tablist"
+                    aria-label="Rating history"
+                  >
+                    {historyTabs.map((tab) => (
+                      <button
+                        key={tab.key}
+                        type="button"
+                        className={`${styles.historyTab} ${historyTab === tab.key ? styles.historyTabActive : ""}`}
+                        onClick={() => setHistoryTab(tab.key)}
+                        role="tab"
+                        aria-selected={historyTab === tab.key}
+                      >
+                        {tab.label}
+                      </button>
+                    ))}
                   </div>
+                )}
+                <div className={styles.historyTabPanel} role="tabpanel">
                   {historyTab === "queen" ? (
                     <QueenRankSparkline snapshots={effectiveQueenRankHistory} />
                   ) : (
                     <MmrSparkline
-                      seasons={seasons}
                       snapshots={effectiveMmrHistory}
+                      currentSeason={drodo?.season}
                       queenRank={drodo?.queen_rank}
                     />
                   )}
                 </div>
-              ) : (
-                <MmrSparkline
-                  seasons={seasons}
-                  snapshots={effectiveMmrHistory}
-                  queenRank={drodo?.queen_rank}
-                />
-              )}
-
+              </div>
               <SeasonHistoryGrid seasons={seasons} />
             </>
           ) : authReady ? (

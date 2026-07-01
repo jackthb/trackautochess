@@ -8,11 +8,17 @@ export interface SeasonSnapshot {
   chicken_count?: number | null;
 }
 
-export function SeasonHistoryGrid({ seasons }: { seasons: SeasonSnapshot[] }) {
+export function SeasonHistoryGrid({
+  seasons,
+  showTitle = true,
+}: {
+  seasons: SeasonSnapshot[];
+  showTitle?: boolean;
+}) {
   if (seasons.length <= 1) return null;
   return (
     <>
-      <div className="section-title">Season History</div>
+      {showTitle && <div className="section-title">Season History</div>}
       <div className="seasons-grid">
         {[...seasons].reverse().map((season) => (
           <div key={season.season} className="season-card">

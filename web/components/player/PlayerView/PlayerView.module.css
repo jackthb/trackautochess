@@ -84,34 +84,41 @@
 }
 .historyPanel {
   display: grid;
-  gap: 10px;
+  gap: 0;
+  margin-bottom: 24px;
 }
 .historyTabs {
   display: inline-flex;
   width: fit-content;
-  gap: 4px;
-  padding: 4px;
-  border: 1px solid var(--border-subtle);
-  border-radius: var(--r-8);
-  background: var(--bg-surface);
+  max-width: 100%;
+  gap: 2px;
+  margin: 0 0 -1px;
+  overflow-x: auto;
 }
 .historyTab {
-  border: 0;
-  border-radius: var(--r-6, 6px);
-  padding: 6px 12px;
+  position: relative;
+  border: 1px solid var(--border-subtle);
+  border-bottom: 0;
+  border-radius: var(--r-6, 6px) var(--r-6, 6px) 0 0;
+  padding: 7px 12px 8px;
   font: inherit;
   font-family: var(--font-mono);
   font-size: var(--fs-12);
   color: var(--text-muted);
-  background: transparent;
+  background: rgba(255, 255, 255, 0.025);
   cursor: pointer;
 }
 .historyTab:hover {
   color: var(--text-secondary);
 }
 .historyTabActive {
+  z-index: 1;
   color: var(--text-primary);
-  background: rgba(255, 255, 255, 0.06);
+  border-color: var(--border);
+  background: var(--bg-surface);
+}
+.historyTabPanel {
+  min-width: 0;
 }
 .historyLocked {
   position: relative;

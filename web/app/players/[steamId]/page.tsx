@@ -183,7 +183,7 @@ const loadPlayer = cache(async (rawSteamId: string): Promise<LoadResult> => {
         .order("season", { ascending: true }),
       supabase
         .from("mmr_snapshots")
-        .select("mmr, queen_rank, snapshotted_at")
+        .select("mmr, queen_rank, season, snapshotted_at")
         .filter("steam_id", "eq", steamId)
         .not("mmr", "is", null)
         .order("snapshotted_at", { ascending: false })
@@ -199,6 +199,7 @@ const loadPlayer = cache(async (rawSteamId: string): Promise<LoadResult> => {
     cachedProfileRow = profileResult.data ?? null;
     mmrHistory = (snapshotsResult.data ?? []).map((row) => ({
       mmr: row.mmr as number | null,
+      season: row.season as string | null,
       snapshotted_at: row.snapshotted_at as string,
     }));
     queenRankHistory = (snapshotsResult.data ?? [])
@@ -271,6 +272,7 @@ const loadPlayer = cache(async (rawSteamId: string): Promise<LoadResult> => {
         mmrHistory = [
           {
             mmr: initialDrodo.payload.mmr,
+            season: initialDrodo.payload.season,
             snapshotted_at: initialDrodo.payload.fetched_at,
           },
           ...mmrHistory,

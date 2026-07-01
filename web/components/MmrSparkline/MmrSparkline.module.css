@@ -1,8 +1,13 @@
 .wrap {
   margin: 0 0 24px;
+}
+.fileBody {
   padding: 18px 20px 14px;
   border: 1px solid var(--border);
   background: var(--bg-surface);
+  border-radius: 0 var(--r-8) var(--r-8) var(--r-8);
+}
+.fileBodyFull {
   border-radius: var(--r-8);
 }
 .head {
@@ -33,6 +38,12 @@
 .deltaFlat {
   color: var(--text-muted);
 }
+.seasonLabel {
+  font-family: var(--font-mono);
+  font-size: var(--fs-12);
+  font-weight: 600;
+  color: var(--text-secondary);
+}
 .label {
   font-family: var(--font-mono);
   font-size: var(--fs-12);
@@ -54,6 +65,39 @@
   width: 100%;
   /* visible so the hover tooltip can sit just above the line near the top */
   overflow: visible;
+}
+.seasonTabs {
+  display: inline-flex;
+  width: fit-content;
+  max-width: 100%;
+  gap: 2px;
+  margin: 0 0 -1px;
+  padding: 0;
+  overflow-x: auto;
+  background: transparent;
+}
+.seasonTab {
+  position: relative;
+  flex: 0 0 auto;
+  border: 1px solid var(--border-subtle);
+  border-bottom: 0;
+  border-radius: var(--r-6, 6px) var(--r-6, 6px) 0 0;
+  padding: 7px 12px 8px;
+  font: inherit;
+  font-family: var(--font-mono);
+  font-size: var(--fs-12);
+  color: var(--text-muted);
+  background: rgba(255, 255, 255, 0.025);
+  cursor: pointer;
+}
+.seasonTab:hover {
+  color: var(--text-secondary);
+}
+.seasonTabActive {
+  z-index: 1;
+  color: var(--text-primary);
+  border-color: var(--border);
+  background: var(--bg-surface);
 }
 .svg {
   display: block;
@@ -119,12 +163,4 @@
   font-size: var(--fs-12);
   color: var(--text-muted);
   text-align: center;
-}
-.note {
-  margin-top: 10px;
-  font-family: var(--font-mono);
-  font-size: var(--fs-11, 11px);
-  color: var(--text-muted);
-  opacity: 0.85;
-  line-height: 1.5;
 }
