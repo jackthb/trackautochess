@@ -1,5 +1,5 @@
-use super::{matches::nettable_row_json, DiagnosticUploadSummary, SupabaseClient};
-use crate::{config::Config, nettable_parser::NettableRow};
+use super::{DiagnosticUploadSummary, SupabaseClient};
+use crate::config::Config;
 use serde_json::{json, Value};
 use std::{
     env, fs,
@@ -7,55 +7,6 @@ use std::{
 };
 
 impl SupabaseClient {
-    pub fn upload_nettable_dump_log(
-        &self,
-        cfg: &Config,
-        rows: &[NettableRow],
-    ) -> Result<usize, String> {
-        if rows.is_empty() {
-            return Ok(0);
-        }
-        let row_values = rows.iter().map(nettable_row_json).collect::<Vec<_>>();
-        self.upload_end_board_rows(&row_values)?;
-        self.upload_nettable_rows_blob(cfg, &row_values)?;
-        Ok(rows.len())
-    }
-
-    pub(super) fn upload_nettable_rows_blob(
-        &self,
-        cfg: &Config,
-        rows: &[Value],
-    ) -> Result<String, String> {
-        let user_id = cfg.steam_id.trim();
-        if user_id.is_empty() {
-            return Err("nettable dump logging needs steam_id for storage path".to_owned());
-        }
-        let captured_at = chrono::Utc::now();
-        let mut tables = rows
-            .iter()
-            .filter_map(|row| row.get("table_name").and_then(Value::as_str))
-            .collect::<Vec<_>>();
-        tables.sort_unstable();
-        tables.dedup();
-        let body = json!({
-            "kind": "nettable_dump_log",
-            "captured_at": captured_at.to_rfc3339(),
-            "tables": tables,
-            "rows": rows,
-        });
-        let bytes = serde_json::to_vec_pretty(&body).map_err(|err| err.to_string())?;
-        self.upload_nettable_dump_object(
-            cfg,
-            &format!(
-                "{user_id}/nettable-dumps/{}.json",
-                captured_at.format("%Y%m%d_%H%M%S_%6f")
-            ),
-            &bytes,
-            "application/json",
-        )?;
-        Ok(format!("{} rows", rows.len()))
-    }
-
     pub fn upload_diagnostic_logs(
         &self,
         cfg: &Config,

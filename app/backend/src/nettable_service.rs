@@ -23,7 +23,7 @@ use crate::{
         wait_for_steam_exit, DEFAULT_GSI_PORT, REQUIRED_LAUNCH_FLAGS,
     },
     queen_ladder,
-    supabase::{finished_match_id_from_rows, parse_valid_steam_id64, queue_rows, SupabaseClient},
+    supabase::{finished_match_id_from_rows, parse_valid_steam_id64, SupabaseClient},
 };
 use std::{
     collections::HashSet,
@@ -256,25 +256,6 @@ impl NettableService {
                                             ));
                                             emit_fallback_finalize(&cfg, &rows, &emit, "End-board upload failed; saved a partial match from the last live snapshot.");
                                         }
-                                    }
-                                }
-                            }
-                            let is_dac = state.lock().map(|s| s.is_dac_match).unwrap_or(false);
-                        if cfg.upload_raw_nettable_dumps && local_is_capture_owner(&state) && is_dac {
-                                let raw_end_board_already_uploaded =
-                                    finished_match_id_from_rows(&rows)
-                                        .as_deref()
-                                        .map(|match_id| {
-                                            end_board_already_uploaded(&state, match_id)
-                                        })
-                                        .unwrap_or(false);
-                                if !raw_end_board_already_uploaded {
-                                    if let Some(client) = SupabaseClient::from_config(&cfg) {
-                                        if client.upload_nettable_dump_log(&cfg, &rows).is_err() {
-                                            let _ = queue_rows(cfg.dac_dir.join("outbox"), &rows);
-                                        }
-                                    } else {
-                                        let _ = queue_rows(cfg.dac_dir.join("outbox"), &rows);
                                     }
                                 }
                             }
@@ -1028,8 +1009,6 @@ mod tests {
             steam_name: String::new(),
             replay_enabled: true,
             keep_local_nettable_dumps: false,
-            upload_raw_nettable_dumps: false,
-            nettable_dump_upload_url: String::new(),
             local_only: true,
             supabase_url: String::new(),
             supabase_key: String::new(),

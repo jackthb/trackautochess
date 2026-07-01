@@ -107,7 +107,7 @@ Representative Rust daemon event types include:
 
 ## What gets captured
 
-Normal Supabase writes use processed `matches`, `match_players`, `match_timelines`, and Queen ladder/profile rows. Raw decoded nettable rows are local-only unless the backend uploads a JSON dump log through `nettable_dump_upload_url`; the production endpoint stores it in Cloudflare R2.
+Normal Supabase writes use processed `matches`, `match_players`, `match_timelines`, and Queen ladder/profile rows. Raw decoded nettable rows are local-only; remote raw dump uploads were removed entirely on 2026-07-02 (previously Supabase Storage, then Cloudflare R2 via `nettable_dump_upload_url`).
 
 Local raw dump persistence is controlled by the config field `keep_local_nettable_dumps`. When enabled, the backend writes `~/.dac/captures/latest_nettable_rows.json` and timestamped files under `~/.dac/nettable_dumps/`.
 
@@ -131,8 +131,8 @@ These showed up in older VPK/triage notes, but they are not in the current autom
 The Rust pipeline processes decoded rows in memory and uploads normalized product data. Diagnostic/raw dump artifacts are object-storage blobs, not table rows:
 
 - `supabase.upload_diagnostic_logs(...)` uploads tracker/console diagnostics to `diagnostic-logs`.
-- `supabase.upload_nettable_dump_log(...)` uploads raw nettable dump JSON logs to R2 keys shaped like `{steam_id}/nettable-dumps/{timestamp}.json`.
-- Outbox replay routes legacy raw row payloads through the same raw nettable dump upload path.
+- Raw nettable dump uploads were removed (2026-07-02): dumps stay local under `~/.dac/nettable_dumps/` and are never uploaded.
+- Outbox replay still uploads queued end-board rows (match data) but acks legacy raw row payloads without uploading, so stale outboxes drain.
 
 ### Open questions / current answers
 

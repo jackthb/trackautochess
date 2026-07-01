@@ -7,7 +7,6 @@ mod storage;
 
 pub use client::ensure_fresh_session;
 pub use matches::finished_match_id_from_rows;
-pub use outbox::queue_rows;
 
 use serde_json::{json, Value};
 use std::{env, time::Duration};

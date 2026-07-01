@@ -22,7 +22,6 @@
     "build:drodo-core": "node scripts/build-drodo-core.mjs",
     "test:drodo-core": "npm run build:drodo-core && node scripts/smoke-drodo-core.mjs",
     "import:legacy-mmr-snapshots": "node scripts/import-legacy-mmr-snapshots.mjs",
-    "download:nettable-dumps": "node scripts/download-nettable-dumps.mjs",
     "web:data": "node scripts/generate-web-runtime-data.mjs",
     "cms:dev": "pnpm --dir web run dev"
   },
