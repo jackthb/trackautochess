@@ -3,7 +3,7 @@
   "name": "Lucid Star",
   "slug": "lucid-star",
   "icon": "relics/lucid_star.png",
-  "commentary": "Chance of upgrade:\n22% for 1 cost\n20% for 2 cost\n18% for 3 cost\n16% for 4 cost\n14% for 5 cost",
+  "commentary": "Chance of upgrade:\n25% for 1 cost\n22% for 2 cost\n19% for 3 cost\n16% for 4 cost\n13% for 5 cost\n\n\n25%/22%/19%/16%/13%.",
   "source": {
     "name": "Lucid Star",
     "names": {
