@@ -1,6 +1,6 @@
 {
   "name": "@dac/desktop",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "author": "Track Auto Chess",
   "description": "Track Auto Chess desktop app",
   "main": "main.js",
