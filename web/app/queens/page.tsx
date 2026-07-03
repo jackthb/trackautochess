@@ -19,6 +19,11 @@ import { mostRecentTimestamp } from "@/lib/timestamps";
 import { canonicalCreatorStreamUrl, loadCachedCreatorLiveStreams } from "@/lib/creators";
 import styles from "./queens.module.css";
 import { QueensAutoRefresh } from "./QueensAutoRefresh";
+import {
+  formatQueensAvailableDate,
+  queensLeaderboardAvailableOn,
+  queensSeasonNormalizing,
+} from "./seasonGate";
 
 interface QueenRow extends BaseQueenRow {
   move?: QueenMove | null;
@@ -292,10 +297,12 @@ function StreamIcon({ platform }: { platform: ReturnType<typeof streamPlatform> 
 }
 
 export default async function QueensPage() {
-  const [{ rows, error }, { streams }] = await Promise.all([
-    loadQueens(),
-    loadCachedCreatorLiveStreams(),
-  ]);
+  const seasonNormalizing = queensSeasonNormalizing();
+  const leaderboardAvailableOn = queensLeaderboardAvailableOn();
+
+  const [{ rows, error }, { streams }] = seasonNormalizing
+    ? [{ rows: [], error: null }, { streams: [] }]
+    : await Promise.all([loadQueens(), loadCachedCreatorLiveStreams()]);
   const season = rows.find((row) => row.queen_ladder_season)?.queen_ladder_season;
   const lastUpdatedAt = newestDrodoFetchedAt(rows) ?? queenLastUpdatedAt(rows);
   const oldestUpdatedAt = oldestDrodoFetchedAt(rows) ?? queenOldestUpdatedAt(rows);
@@ -311,18 +318,28 @@ export default async function QueensPage() {
 
   return (
     <PageLayout title="Queen Players">
-      <QueensAutoRefresh
-        latestFetchedAt={refreshAnchorAt}
-        cooldownMs={QUEENS_VIEW_REFRESH_COOLDOWN_MS}
-      />
+      {!seasonNormalizing ? (
+        <QueensAutoRefresh
+          latestFetchedAt={refreshAnchorAt}
+          cooldownMs={QUEENS_VIEW_REFRESH_COOLDOWN_MS}
+        />
+      ) : null}
+      {seasonNormalizing && leaderboardAvailableOn ? (
+        <div className={styles["season-notice"]} role="status">
+          <strong>Waiting for Queen ranks to normalise.</strong> It&apos;s a new
+          season and the in-game Queen ladder needs time to settle. The
+          leaderboard will return around{" "}
+          {formatQueensAvailableDate(leaderboardAvailableOn)}.
+        </div>
+      ) : null}
       <p className={styles.lead}>
-        Known Queen players{season ? ` for ${season.replace(/_/g, " ").toUpperCase()}` : ""}.
-        The table renders cached Drodo profile data immediately, then refreshes
-        visible profiles when the 5-minute cooldown has elapsed.
+        {seasonNormalizing
+          ? "Queen players are tracked each season. Rankings will appear here once the ladder has stabilised."
+          : `Known Queen players${season ? ` for ${season.replace(/_/g, " ").toUpperCase()}` : ""}. The table renders cached Drodo profile data immediately, then refreshes visible profiles when the 5-minute cooldown has elapsed.`}
       </p>
       {error ? (
         <div className={styles.gate}>Failed to load Queen players: {error}</div>
-      ) : rows.length === 0 ? (
+      ) : seasonNormalizing ? null : rows.length === 0 ? (
         <div className={styles.empty}>No Queen players tracked yet.</div>
       ) : (
         <>

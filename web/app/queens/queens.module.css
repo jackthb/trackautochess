@@ -49,6 +49,21 @@
   color: var(--text-muted);
   letter-spacing: 0.4px;
 }
+.season-notice {
+  margin: 0 0 24px;
+  padding: 16px 18px;
+  max-width: 720px;
+  border: 1px solid color-mix(in srgb, var(--accent) 38%, var(--border));
+  border-radius: var(--r-8);
+  background: color-mix(in srgb, var(--accent) 8%, var(--bg-surface));
+  color: var(--text-secondary);
+  font-family: var(--font-mono);
+  font-size: var(--fs-13);
+  line-height: var(--lh-relaxed);
+}
+.season-notice strong {
+  color: var(--text-primary);
+}
 .table {
   display: grid;
   grid-template-columns: 56px 44px 1fr 96px 64px 84px 80px 80px;
