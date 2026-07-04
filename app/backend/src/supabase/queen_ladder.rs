@@ -138,10 +138,26 @@ impl SupabaseClient {
         let count = rows.len();
         self.post_json(
             "/rest/v1/mmr_snapshots?on_conflict=steam_id,season,snapshot_date,mmr,chicken_count,queen_rank",
-            &Value::Array(rows),
+            &Value::Array(rows.clone()),
             "resolution=merge-duplicates,return=minimal",
         )?;
+        let steam_ids = rows
+            .iter()
+            .filter_map(|row| row.get("steam_id").and_then(Value::as_u64))
+            .collect::<Vec<_>>();
+        let _ = self.sync_player_season_queen_ranks(&steam_ids);
         Ok(count)
+    }
+
+    fn sync_player_season_queen_ranks(&self, steam_ids: &[u64]) -> Result<(), String> {
+        for steam_id in steam_ids {
+            let _ = self.post_json(
+                "/rest/v1/rpc/sync_player_season_queen_ranks",
+                &json!({ "p_steam_id": steam_id }),
+                "return=minimal",
+            );
+        }
+        Ok(())
     }
 
     fn hydrate_queen_profiles(&self, ids: &[u64]) -> Result<usize, String> {

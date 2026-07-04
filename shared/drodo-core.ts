@@ -430,6 +430,8 @@ export interface SeasonSnapshotRow {
   max_mmr: number | null;
   games_played: number | null;
   chicken_count: number | null;
+  queen_rank?: number | null;
+  peak_queen_rank?: number | null;
   fetched_at: string;
 }
 

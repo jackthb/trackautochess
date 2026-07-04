@@ -92,7 +92,7 @@ export async function loadDrodoHistory(
   const [seasonsResult, snapshotsResult] = await Promise.all([
     supabase
       .from("player_seasons")
-      .select("season, mmr, max_mmr, games_played, chicken_count")
+      .select("season, mmr, max_mmr, games_played, chicken_count, queen_rank, peak_queen_rank")
       .filter("steam_id", "eq", steamId)
       .order("season", { ascending: true }),
     supabase

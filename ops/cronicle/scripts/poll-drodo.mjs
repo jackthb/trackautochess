@@ -110,6 +110,14 @@ class SupabaseRest {
     });
   }
 
+  rpc(functionName, body) {
+    return this.request(`rpc/${functionName}`, {
+      method: "POST",
+      body,
+      headers: { Prefer: "return=minimal" },
+    });
+  }
+
   delete(table, query) {
     return this.request(table, {
       method: "DELETE",
@@ -260,6 +268,9 @@ async function persistDrodoProfile(profile, seasonRows, supabase, options) {
       },
       "steam_id,season,snapshot_date,mmr,chicken_count,queen_rank"
     );
+    await supabase.rpc("sync_player_season_queen_ranks", {
+      p_steam_id: profile.steam_id,
+    });
   }
 
   if (seasonRows.length > 0) {

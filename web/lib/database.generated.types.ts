@@ -331,6 +331,8 @@ export type Database = {
           games_played: number | null
           max_mmr: number | null
           mmr: number | null
+          peak_queen_rank: number | null
+          queen_rank: number | null
           season: string
           steam_id: number
         }
@@ -340,6 +342,8 @@ export type Database = {
           games_played?: number | null
           max_mmr?: number | null
           mmr?: number | null
+          peak_queen_rank?: number | null
+          queen_rank?: number | null
           season: string
           steam_id: number
         }
@@ -349,6 +353,8 @@ export type Database = {
           games_played?: number | null
           max_mmr?: number | null
           mmr?: number | null
+          peak_queen_rank?: number | null
+          queen_rank?: number | null
           season?: string
           steam_id?: number
         }
@@ -446,6 +452,10 @@ export type Database = {
     }
     Functions: {
       auth_user_id_by_email: { Args: { p_email: string }; Returns: string }
+      sync_player_season_queen_ranks: {
+        Args: { p_steam_id: number }
+        Returns: undefined
+      }
       show_limit: { Args: never; Returns: number }
       show_trgm: { Args: { "": string }; Returns: string[] }
     }

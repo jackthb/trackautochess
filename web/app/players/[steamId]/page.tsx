@@ -178,7 +178,7 @@ const loadPlayer = cache(async (rawSteamId: string): Promise<LoadResult> => {
       profilePromise,
       supabase
         .from("player_seasons")
-        .select("season, mmr, max_mmr, games_played, chicken_count")
+        .select("season, mmr, max_mmr, games_played, chicken_count, queen_rank, peak_queen_rank")
         .filter("steam_id", "eq", steamId)
         .order("season", { ascending: true }),
       supabase

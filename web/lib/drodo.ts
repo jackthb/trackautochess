@@ -297,6 +297,21 @@ export const DRODO_HISTORY_SNAPSHOT_LIMIT = 1000;
 const MMR_SNAPSHOT_ON_CONFLICT =
   "steam_id,season,snapshot_date,mmr,chicken_count,queen_rank";
 
+async function syncPlayerSeasonQueenRanks(
+  supabase: SupabaseClient,
+  steamId: string
+): Promise<void> {
+  const { error } = await supabase.rpc("sync_player_season_queen_ranks", {
+    p_steam_id: steamId,
+  });
+  if (error) {
+    console.error(
+      "Failed to sync player_seasons queen ranks:",
+      error.message
+    );
+  }
+}
+
 async function snapshotDrodoProfile(
   profile: DrodoProfileRow,
   supabase: SupabaseClient
@@ -321,6 +336,7 @@ async function snapshotDrodoProfile(
   if (snapshotError) {
     console.error("Failed to upsert mmr_snapshot:", snapshotError.message);
   }
+  await syncPlayerSeasonQueenRanks(supabase, profile.steam_id);
 }
 
 async function persistDrodoProfile(

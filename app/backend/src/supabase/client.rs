@@ -99,7 +99,7 @@ impl SupabaseClient {
             "/rest/v1/users?select=steam_id,drodo_mmr,drodo_max_mmr,drodo_mmr_level,drodo_season,drodo_season_games,drodo_chicken_count,drodo_last_fetched_at&steam_id=eq.{steam_id}"
         ))?;
         let seasons = self.get_json(&format!(
-            "/rest/v1/player_seasons?select=season,mmr,max_mmr,games_played&steam_id=eq.{steam_id}&order=season.asc"
+            "/rest/v1/player_seasons?select=season,mmr,max_mmr,games_played,queen_rank,peak_queen_rank&steam_id=eq.{steam_id}&order=season.asc"
         ))?;
         let Some(row) = profile_rows.as_array().and_then(|rows| rows.first()) else {
             return Ok(Value::Null);

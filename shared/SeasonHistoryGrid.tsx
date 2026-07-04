@@ -6,6 +6,8 @@ export interface SeasonSnapshot {
   max_mmr: number | null;
   games_played: number | null;
   chicken_count?: number | null;
+  queen_rank?: number | null;
+  peak_queen_rank?: number | null;
 }
 
 export function SeasonHistoryGrid({
@@ -26,10 +28,24 @@ export function SeasonHistoryGrid({
             {season.mmr != null ? (
               <>
                 <div className="season-mmr">{season.mmr}</div>
-                <div className="season-meta season-rank">{mmrToRank(season.mmr) || "Unranked"}</div>
+                <div className="season-meta season-rank">
+                  {season.queen_rank != null
+                    ? `Queen #${season.queen_rank}`
+                    : mmrToRank(season.mmr) || "Unranked"}
+                </div>
+              </>
+            ) : season.queen_rank != null ? (
+              <>
+                <div className="season-mmr">Queen #{season.queen_rank}</div>
+                <div className="season-meta season-rank">Final rank</div>
               </>
             ) : (
               <div className="season-mmr dim">-</div>
+            )}
+            {season.peak_queen_rank != null && (
+              <div className="season-meta">
+                Peak Queen <span className="season-peak">#{season.peak_queen_rank}</span>
+              </div>
             )}
             {season.max_mmr != null && (
               <div className="season-meta">
