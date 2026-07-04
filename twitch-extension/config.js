@@ -17,6 +17,14 @@ const API_HOST = (() => {
 
 const CONFIG_VERSION = "1";
 
+let extensionToken = null;
+
+function authHeaders() {
+  return extensionToken
+    ? { Authorization: `Bearer ${extensionToken}` }
+    : {};
+}
+
 const els = {
   form: document.getElementById("form"),
   input: document.getElementById("steamInput"),
@@ -57,7 +65,7 @@ function readCurrentConfig() {
 async function validate(input) {
   const resp = await fetch(
     `${API_HOST}/api/twitch/${encodeURIComponent(input)}/stats`,
-    { cache: "no-store" }
+    { cache: "no-store", headers: authHeaders() }
   );
   if (resp.status === 404) throw new Error("That profile wasn't found.");
   if (!resp.ok) throw new Error(`Validation failed (HTTP ${resp.status}).`);
@@ -128,7 +136,8 @@ function bootstrap() {
   els.form.addEventListener("submit", onSubmit);
 
   if (window.Twitch?.ext?.onAuthorized) {
-    window.Twitch.ext.onAuthorized(() => {
+    window.Twitch.ext.onAuthorized((auth) => {
+      extensionToken = auth.token;
       showCurrent();
     });
     window.Twitch.ext.configuration.onChanged?.(() => {

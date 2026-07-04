@@ -33,6 +33,13 @@ const els = {
 
 let pollHandle = null;
 let lastSteamId = null;
+let extensionToken = null;
+
+function authHeaders() {
+  return extensionToken
+    ? { Authorization: `Bearer ${extensionToken}` }
+    : {};
+}
 
 function show(state) {
   for (const key of ["loading", "unconfigured", "content", "error"]) {
@@ -96,7 +103,7 @@ async function fetchStats(steamId) {
   try {
     const resp = await fetch(
       `${API_HOST}/api/twitch/${encodeURIComponent(steamId)}/stats`,
-      { cache: "no-store" }
+      { cache: "no-store", headers: authHeaders() }
     );
     if (resp.status === 404) {
       els.error.textContent = "Profile not found. Check the username in setup.";
@@ -104,7 +111,12 @@ async function fetchStats(steamId) {
       return;
     }
     if (!resp.ok) {
-      els.error.textContent = `Failed to load rank (HTTP ${resp.status}).`;
+      let detail = "";
+      try {
+        const body = await resp.json();
+        if (body?.error) detail = `: ${body.error}`;
+      } catch {}
+      els.error.textContent = `Failed to load rank (HTTP ${resp.status})${detail}.`;
       show("error");
       return;
     }
@@ -154,7 +166,8 @@ function bootstrap() {
     return;
   }
 
-  window.Twitch.ext.onAuthorized(() => {
+  window.Twitch.ext.onAuthorized((auth) => {
+    extensionToken = auth.token;
     const sid = readConfig();
     if (sid) startPolling(sid);
     else show("unconfigured");
