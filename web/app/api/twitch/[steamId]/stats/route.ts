@@ -4,10 +4,9 @@
  * Returns a compact payload with the broadcaster player's current rank. The
  * panel intentionally renders this directly and does not include match history.
  *
- * Requires a Twitch Extension JWT; cached at the edge for 30 minutes.
+ * Public; CORS open; cached at the edge for 30 minutes.
  */
 import { createSupabaseServerClient } from "@/lib/supabase";
-import { verifyTwitchExtensionRequest } from "@/lib/twitchExtensionAuth";
 import {
   fetchTwitchStats,
   TwitchStatsError,
@@ -30,28 +29,9 @@ export async function OPTIONS() {
 }
 
 export async function GET(
-  req: Request,
+  _req: Request,
   ctx: { params: Promise<{ steamId: string }> }
 ) {
-  try {
-    const auth = verifyTwitchExtensionRequest(req);
-    if (!auth) {
-      return Response.json(
-        { error: "Invalid Twitch Extension token" },
-        { status: 401, headers: CORS_HEADERS }
-      );
-    }
-  } catch (error) {
-    const message =
-      error instanceof Error
-        ? error.message
-        : "Twitch Extension auth is not configured";
-    return Response.json(
-      { error: message },
-      { status: 503, headers: CORS_HEADERS }
-    );
-  }
-
   const { steamId: raw } = await ctx.params;
   if (!raw) {
     return Response.json(
