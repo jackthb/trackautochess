@@ -1,18 +1,10 @@
-import type { NextApiRequest } from "next";
 import { mmrLevelToRank } from "@dac/shared/game-utils";
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { RANK_BRACKETS } from "@dac/shared/game-utils";
+import { toApiReq } from "@/lib/abuseLog";
 import { isBetaFeaturesEnabledForSteamId } from "@/lib/betaFeaturesServer";
+import { duplicateMatchTimeBucket } from "@/lib/matches";
 import { getSessionUser } from "@/lib/sessionUser";
 import { createSupabaseAnonClient } from "@/lib/supabase";
-
-// Adapt a Web Request into the minimal NextApiRequest shape consumed by
-// getSessionUser (it reads req.headers.authorization).
-function toApiReq(req: Request): NextApiRequest {
-  return {
-    headers: { authorization: req.headers.get("authorization") ?? undefined },
-  } as unknown as NextApiRequest;
-}
 
 interface GameRow {
   id: number;
@@ -70,17 +62,10 @@ export interface MatchSummary {
 
 const PAGE_LIMIT = 100;
 const GAMES_FETCH = 800;
-const DUPLICATE_MATCH_WINDOW_MS = 90 * 60 * 1000;
 
 function matchGroupKey(row: GameRow): string {
   if (row.match_id) return row.match_id;
   return `played:${row.played_at || row.created_at || row.id}`;
-}
-
-function timeBucket(value: string, windowMs: number): number {
-  const time = new Date(value).getTime();
-  if (!Number.isFinite(time)) return 0;
-  return Math.floor(time / windowMs);
 }
 
 function duplicateMatchKey(rows: GameRow[], playedAt: string): string {
@@ -88,10 +73,7 @@ function duplicateMatchKey(rows: GameRow[], playedAt: string): string {
     .map((row) => `${row.steam_id ?? "unknown"}:${row.placement ?? "?"}`)
     .sort()
     .join("|");
-  return [
-    timeBucket(playedAt, DUPLICATE_MATCH_WINDOW_MS),
-    roster,
-  ].join("::");
+  return [duplicateMatchTimeBucket(playedAt), roster].join("::");
 }
 
 function dedupeMatchRows(rows: GameRow[]): GameRow[] {

@@ -10,6 +10,7 @@ import { getUnitBySlug } from "@/lib/units";
 import { getSynergyBySlug } from "@/lib/synergies";
 import { getRelicGeneratedItemSlugs } from "@/lib/itemRelations";
 import { absoluteUrl, SITE_NAME, SITE_TITLE } from "@/lib/site";
+import { cleanText, truncate } from "@/lib/text";
 import { DEFAULT_LOCALE, pickLocalized } from "@/lib/i18n";
 import { type EntryKind, KIND_COLOR, KIND_LABEL } from "@/lib/patchKinds";
 import { EntryCommentary } from "@/components/PatchCommentary";
@@ -68,15 +69,6 @@ const PENDING_TOOLTIP =
 
 function syncTooltip(isSynced: boolean): string {
   return isSynced ? SYNCED_TOOLTIP : PENDING_TOOLTIP;
-}
-
-function cleanText(value: string): string {
-  return value.replace(/\s+/g, " ").trim();
-}
-
-function truncate(value: string, maxLength: number): string {
-  if (value.length <= maxLength) return value;
-  return `${value.slice(0, maxLength - 3).trimEnd()}...`;
 }
 
 function latestPatchSlug(): string | null {

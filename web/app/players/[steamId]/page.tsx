@@ -2,25 +2,23 @@ import type { Metadata } from "next";
 import { cache } from "react";
 import { after } from "next/server";
 import { notFound } from "next/navigation";
-import type { PlayerGame, UnitFullInfo } from "@dac/shared/types";
+import type { PlayerGame } from "@dac/shared/types";
 import type { SeasonSnapshot } from "@dac/shared/SeasonHistoryGrid";
-import { mmrLevelToRank, parseSynergies } from "@dac/shared/game-utils";
-import {
-  buildChessCodeUnitLookup,
-  resolveChessLineup,
-} from "@dac/shared/game-structure";
 import type { MmrSnapshot } from "@/components/MmrSparkline";
 import type { QueenRankSnapshot } from "@/components/QueenRankSparkline";
 import { absoluteUrl, getSiteUrl } from "@/lib/site";
 import { getManualRefreshQuota } from "@/lib/manualRefreshQuota";
 import {
-  DRODO_HISTORY_SNAPSHOT_LIMIT,
-  HOT_PROFILE_REFRESH_TTL_SECONDS,
+  drodoStatsFromCachedRow,
+  isCachedQueenProfile,
   isFreshCache,
-  lastTop3FromDrodoData,
-  lastWinFromDrodoData,
+  isHotCacheFresh,
 } from "@/lib/drodo";
-import { readThroughDrodoProfile } from "@/lib/drodoReadThrough";
+import { loadDrodoHistory, readThroughDrodoProfile } from "@/lib/drodoReadThrough";
+import {
+  fetchPlayerHistoryRows,
+  playerHistoryToGames,
+} from "@/lib/playerHistory";
 import { mostRecentTimestamp } from "@/lib/timestamps";
 import { fetchSteamProfile } from "@/lib/steam";
 import PlayerView, { type PlayerPageProps } from "@/components/player/PlayerView";
@@ -30,16 +28,10 @@ import {
   drodoStatsFromProfile,
   playerProfilePath,
   resolvePlayerRoute,
-  USER_DRODO_SELECT,
-  type CachedUserDrodoRow,
+  PLAYER_PROFILE_DRODO_SELECT,
+  type PlayerProfileDrodoRow,
 } from "@/components/player/playerData";
 import { createSupabaseServerClient } from "@/lib/supabase";
-import { unitsFullData } from "@/generated/content-data";
-import { computeSynergies } from "@/lib/units";
-
-const CHESS_CODE_UNITS = buildChessCodeUnitLookup(
-  unitsFullData as Record<string, UnitFullInfo>
-);
 
 // Rendered dynamically (live DB read per request) instead of ISR-cached. With
 // force-static + revalidate=300 a hard reload served the prerendered page until
@@ -52,86 +44,6 @@ export const dynamic = "force-dynamic";
 type LoadResult =
   | { kind: "notFound" }
   | { kind: "ok"; data: Omit<PlayerPageProps, "route"> };
-
-function drodoFromCachedRow(row: CachedUserDrodoRow) {
-  return {
-    mmr: row.drodo_mmr,
-    max_mmr: row.drodo_max_mmr,
-    mmr_level: row.drodo_mmr_level,
-    // queen_ladder_rank is the denormalized source of truth; drodo_raw_data is
-    // kept only as an archival snapshot, not read for the rank.
-    queen_rank: row.queen_ladder_rank ?? null,
-    last_win_at: row.drodo_raw_data ? lastWinFromDrodoData(row.drodo_raw_data) : null,
-    last_top3_at: row.drodo_raw_data ? lastTop3FromDrodoData(row.drodo_raw_data) : null,
-    season: row.drodo_season,
-    season_games: row.drodo_season_games,
-    candy: row.drodo_candy,
-    chicken_count: row.drodo_chicken_count,
-  };
-}
-
-function isCachedQueenProfile(row: CachedUserDrodoRow | null): boolean {
-  return Boolean(row?.queen_ladder_rank != null || row?.queen_ladder_last_seen_at);
-}
-
-function isHotCacheFresh(fetchedAt: string | null | undefined): boolean {
-  if (!fetchedAt) return false;
-  const fetchedTime = new Date(fetchedAt).getTime();
-  if (!Number.isFinite(fetchedTime)) return false;
-  return Date.now() - fetchedTime < HOT_PROFILE_REFRESH_TTL_SECONDS * 1000;
-}
-
-const PLAYER_DUPLICATE_WINDOW_MS = 90 * 60 * 1000;
-
-function playerHistoryDuplicateKey(row: Record<string, unknown>): string {
-  const playedAt = typeof row.played_at === "string" ? row.played_at : "";
-  const playedAtMs = new Date(playedAt).getTime();
-  const bucket = Number.isFinite(playedAtMs)
-    ? Math.floor(playedAtMs / PLAYER_DUPLICATE_WINDOW_MS)
-    : 0;
-  return [
-    bucket,
-    row.steam_id ?? "",
-    row.placement ?? "",
-    row.chess_lineup ?? "",
-    row.synergies ?? "",
-    row.relic ?? "",
-    row.win_round ?? "",
-    row.lose_round ?? "",
-  ].join("::");
-}
-
-function dedupePlayerHistoryRows(
-  rows: Record<string, unknown>[]
-): Record<string, unknown>[] {
-  const bySignature = new Map<string, Record<string, unknown>>();
-  for (const row of rows) {
-    const key = playerHistoryDuplicateKey(row);
-    const current = bySignature.get(key);
-    const rowId = typeof row.id === "number" ? row.id : 0;
-    const currentId = typeof current?.id === "number" ? current.id : 0;
-    if (!current || rowId > currentId) {
-      bySignature.set(key, row);
-    }
-  }
-  return [...bySignature.values()].sort((a, b) => {
-    const aTime = typeof a.played_at === "string" ? a.played_at : "";
-    const bTime = typeof b.played_at === "string" ? b.played_at : "";
-    return bTime.localeCompare(aTime);
-  });
-}
-
-function serializeResolvedLineup(lineup: { name: string; stars: number }[]): string {
-  return lineup
-    .map((unit) => `${unit.name}${unit.stars > 1 ? `(${unit.stars})` : ""}`)
-    .join("|");
-}
-
-function serializeComputedSynergies(
-  synergies: { name: string; count: number }[]
-): string {
-  return synergies.map((synergy) => `${synergy.name}:${synergy.count}`).join("|");
-}
 
 /** Cached per request so generateMetadata and the page render share data. */
 const loadPlayer = cache(async (rawSteamId: string): Promise<LoadResult> => {
@@ -154,7 +66,7 @@ const loadPlayer = cache(async (rawSteamId: string): Promise<LoadResult> => {
     target: steamId,
   });
 
-  let cachedProfileRow: CachedUserDrodoRow | null = resolved.cachedProfileRow;
+  let cachedProfileRow: PlayerProfileDrodoRow | null = resolved.cachedProfileRow;
 
   let drodo = null;
   let drodoProfileMissing = false;
@@ -170,44 +82,20 @@ const loadPlayer = cache(async (rawSteamId: string): Promise<LoadResult> => {
       ? Promise.resolve({ data: cachedProfileRow })
       : supabase
           .from("users")
-          .select(USER_DRODO_SELECT)
+          .select(PLAYER_PROFILE_DRODO_SELECT)
           .filter("steam_id", "eq", steamId)
-          .maybeSingle<CachedUserDrodoRow>();
+          .maybeSingle<PlayerProfileDrodoRow>();
 
-    const [profileResult, seasonsResult, snapshotsResult, gamesResult] = await Promise.all([
+    const [profileResult, history, historyRows] = await Promise.all([
       profilePromise,
-      supabase
-        .from("player_seasons")
-        .select("season, mmr, max_mmr, games_played, chicken_count, queen_rank, peak_queen_rank")
-        .filter("steam_id", "eq", steamId)
-        .order("season", { ascending: true }),
-      supabase
-        .from("mmr_snapshots")
-        .select("mmr, queen_rank, season, snapshotted_at")
-        .filter("steam_id", "eq", steamId)
-        .not("mmr", "is", null)
-        .order("snapshotted_at", { ascending: false })
-        .limit(DRODO_HISTORY_SNAPSHOT_LIMIT),
-      supabase
-        .from("match_players")
-        .select("*, steam_id::text")
-        .filter("steam_id", "eq", steamId)
-        .order("played_at", { ascending: false })
-        .limit(100),
+      loadDrodoHistory(supabase, steamId),
+      fetchPlayerHistoryRows(supabase, steamId),
     ]);
-    gamesRows = (gamesResult.data as Record<string, unknown>[]) ?? [];
+    gamesRows = historyRows;
     cachedProfileRow = profileResult.data ?? null;
-    mmrHistory = (snapshotsResult.data ?? []).map((row) => ({
-      mmr: row.mmr as number | null,
-      season: row.season as string | null,
-      snapshotted_at: row.snapshotted_at as string,
-    }));
-    queenRankHistory = (snapshotsResult.data ?? [])
-      .map((row) => ({
-        queen_rank: typeof row.queen_rank === "number" ? row.queen_rank : null,
-        snapshotted_at: row.snapshotted_at as string,
-      }))
-      .filter((row) => row.queen_rank != null);
+    mmrHistory = history.mmr_history;
+    queenRankHistory = history.queen_rank_history;
+    seasons = history.seasons;
     if (profileResult.data) {
       drodoProfileMissing = Boolean(profileResult.data.drodo_profile_missing);
       drodoLastFetchedAt = mostRecentTimestamp(
@@ -232,12 +120,11 @@ const loadPlayer = cache(async (rawSteamId: string): Promise<LoadResult> => {
           profileResult.data.drodo_mmr != null) &&
         !drodoProfileMissing
       ) {
-        drodo = drodoFromCachedRow(profileResult.data);
+        drodo = drodoStatsFromCachedRow(profileResult.data);
       }
     } else {
       shouldRefreshDrodo = true;
     }
-    if (seasonsResult.data) seasons = seasonsResult.data;
 
     // When cached stats exist, serve them immediately even if stale —
     // PlayerView refreshes from Drodo in the background with a loading state
@@ -322,45 +209,8 @@ const loadPlayer = cache(async (rawSteamId: string): Promise<LoadResult> => {
     );
   }
 
-  // Map match_players rows → Game shape with legacy aliases for rendering.
-  const games: PlayerGame[] = dedupePlayerHistoryRows(gamesRows).map(
-    (row) => {
-      const resolvedLineup = resolveChessLineup(
-        row.chess_lineup as string | undefined,
-        CHESS_CODE_UNITS
-      );
-      const lineup = resolvedLineup.length
-        ? serializeResolvedLineup(resolvedLineup)
-        : (row.chess_lineup as string | null);
-      const synergies = resolvedLineup.length
-        ? serializeComputedSynergies(
-            computeSynergies(
-              resolvedLineup,
-              parseSynergies(row.synergies as string | null)
-            )
-          )
-        : (row.synergies as string | null);
-      return {
-        ...row,
-        user_id: String(row.steam_id),
-        placement: row.placement != null ? String(row.placement) : "",
-        played_at: (row.played_at as string) ?? "",
-        created_at: (row.created_at as string) ?? "",
-        lineup,
-        synergies,
-        level: row.hero_level ? String(row.hero_level) : null,
-        rank:
-          typeof row.mmr_level === "number"
-            ? mmrLevelToRank(row.mmr_level) || null
-            : null,
-        rank_change: null,
-        wl: null,
-        wins: row.win_round as number | null,
-        losses: row.lose_round as number | null,
-        match_id: (row.match_id as string) ?? null,
-      };
-    }
-  ) as PlayerGame[];
+  // Dedupe duplicate uploads and map match_players rows → Game render shape.
+  const games: PlayerGame[] = playerHistoryToGames(gamesRows);
 
   return {
     kind: "ok",

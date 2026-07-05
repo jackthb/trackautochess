@@ -1,5 +1,6 @@
 import { mmrToRank } from "@dac/shared/game-utils";
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { createSupabaseServerClient } from "@/lib/supabase";
 import {
   fetchSteamProfile,
   playerProfilePath,
@@ -117,4 +118,57 @@ export function formatTwitchMmrChatMessage(stats: TwitchStatsResponse): string {
     mmrText,
     `Profile: ${stats.player.profile_url}`,
   ].join(" | ");
+}
+
+// --- Plain-text chatbot endpoint plumbing -------------------------------
+// Shared by /api/twitch/mmr (query param) and /api/twitch/[steamId]/mmr
+// (path param). Chatbot URL-fetch variables generally only print the response
+// body for HTTP 200 responses, so these always return user-facing text with
+// 200, even when a player cannot be resolved or the backend is unavailable.
+
+export const TWITCH_CHAT_CORS_HEADERS: Record<string, string> = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Methods": "GET, OPTIONS",
+  "Access-Control-Allow-Headers": "Content-Type",
+};
+
+const CHATBOT_HEADERS = {
+  ...TWITCH_CHAT_CORS_HEADERS,
+  "Cache-Control": "public, s-maxage=1800, stale-while-revalidate=300",
+  "Content-Type": "text/plain; charset=utf-8",
+};
+
+export function twitchChatTextResponse(message: string): Response {
+  return new Response(message, { status: 200, headers: CHATBOT_HEADERS });
+}
+
+export function twitchChatOptionsResponse(): Response {
+  return new Response(null, { status: 204, headers: TWITCH_CHAT_CORS_HEADERS });
+}
+
+/**
+ * Resolve a raw Steam input (ID64, vanity name, or profile URL) and return
+ * the one-line MMR chat message as a plain-text Response.
+ */
+export async function twitchMmrChatResponse(rawSteamInput: string): Promise<Response> {
+  const supabase = createSupabaseServerClient();
+  if (!supabase) {
+    return twitchChatTextResponse(
+      "Track Auto Chess stats are temporarily unavailable."
+    );
+  }
+
+  try {
+    const stats = await fetchTwitchStats(rawSteamInput, supabase);
+    return twitchChatTextResponse(formatTwitchMmrChatMessage(stats));
+  } catch (error) {
+    if (error instanceof TwitchStatsError && error.status === 404) {
+      return twitchChatTextResponse(
+        "Player not found. Try a Steam ID64, Steam profile URL, or Steam vanity name."
+      );
+    }
+    return twitchChatTextResponse(
+      "Track Auto Chess stats are temporarily unavailable."
+    );
+  }
 }

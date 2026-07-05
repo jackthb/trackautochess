@@ -1,11 +1,13 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { SITE_TITLE } from "@/lib/site";
+import { originFromUrl, SITE_TITLE } from "@/lib/site";
 import { mmrToRank } from "@dac/shared/game-utils";
 import { parseSteamId64, type SteamId64 } from "@dac/shared/steam";
 import {
   lastTop3FromDrodoData,
   lastWinFromDrodoData,
+  USER_DRODO_STAT_COLUMNS,
   type DrodoProfileRow,
+  type UserDrodoStatsRow,
 } from "@/lib/drodo";
 import {
   parseSteamInput,
@@ -36,58 +38,27 @@ export function drodoStatsFromProfile(profile: DrodoProfileRow) {
   };
 }
 
-export const USER_DRODO_SELECT = [
+/** Cached Drodo stats plus the Steam profile columns the player page renders. */
+export const PLAYER_PROFILE_DRODO_SELECT = [
   "name",
   "custom_url",
   "avatar_url",
-  "drodo_mmr",
-  "drodo_max_mmr",
-  "drodo_mmr_level",
-  "drodo_season",
-  "drodo_season_games",
-  "drodo_candy",
-  "drodo_chicken_count",
-  "drodo_raw_data",
-  "drodo_last_fetched_at",
-  "queen_ladder_rank",
-  "queen_ladder_last_seen_at",
-  "drodo_profile_missing",
+  ...USER_DRODO_STAT_COLUMNS,
 ].join(", ");
 
-export interface CachedUserDrodoRow {
+export interface PlayerProfileDrodoRow extends UserDrodoStatsRow {
   name: string | null;
   custom_url: string | null;
   avatar_url: string | null;
-  drodo_mmr: number | null;
-  drodo_max_mmr: number | null;
-  drodo_mmr_level: number | null;
-  drodo_season: string | null;
-  drodo_season_games: number | null;
-  drodo_candy: number | null;
-  drodo_chicken_count: number | null;
-  drodo_raw_data: Record<string, unknown> | null;
-  drodo_last_fetched_at: string | null;
-  queen_ladder_rank: number | null;
-  queen_ladder_last_seen_at: string | null;
-  drodo_profile_missing: boolean | null;
 }
 
-interface RouteUserRow extends CachedUserDrodoRow {
+interface RouteUserRow extends PlayerProfileDrodoRow {
   steam_id: string;
 }
 
 export interface ResolvedPlayerRoute {
   steamId: SteamId64;
-  cachedProfileRow: CachedUserDrodoRow | null;
-}
-
-function originFromUrl(value: string | null): string | null {
-  if (!value) return null;
-  try {
-    return new URL(value).origin;
-  } catch {
-    return null;
-  }
+  cachedProfileRow: PlayerProfileDrodoRow | null;
 }
 
 export async function resolvePlayerRoute(
@@ -103,9 +74,9 @@ export async function resolvePlayerRoute(
     if (supabase) {
       const { data } = await supabase
         .from("users")
-        .select(USER_DRODO_SELECT)
+        .select(PLAYER_PROFILE_DRODO_SELECT)
         .filter("steam_id", "eq", parsed.value)
-        .maybeSingle<CachedUserDrodoRow>();
+        .maybeSingle<PlayerProfileDrodoRow>();
       return { steamId: parsed.value, cachedProfileRow: data ?? null };
     }
     return { steamId: parsed.value, cachedProfileRow: null };
@@ -114,7 +85,7 @@ export async function resolvePlayerRoute(
   if (supabase) {
     const { data } = await supabase
       .from("users")
-      .select(`steam_id::text, ${USER_DRODO_SELECT}`)
+      .select(`steam_id::text, ${PLAYER_PROFILE_DRODO_SELECT}`)
       .eq("custom_url", parsed.value)
       .maybeSingle<RouteUserRow>();
 
@@ -132,7 +103,7 @@ export async function resolvePlayerRoute(
 }
 
 export function cachedSteamProfile(
-  row: CachedUserDrodoRow | null | undefined,
+  row: PlayerProfileDrodoRow | null | undefined,
   options: { requireAvatar: boolean; requireCustomUrl: boolean }
 ): SteamProfile | null {
   if (!row) return null;

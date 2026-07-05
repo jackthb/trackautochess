@@ -4,11 +4,11 @@ import Link from "next/link";
 import { NavigationMenu } from "@base-ui/react/navigation-menu";
 import { useRouter, usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
-import type { SupabaseClient, User } from "@supabase/supabase-js";
 import { SITE_NAME } from "@/lib/site";
 import { trackEvent } from "@/lib/analytics";
 import { isAdminSteamId } from "@/lib/admin";
 import { useBetaFeaturesEnabled } from "@/lib/betaFeatures";
+import { useSupabaseSession } from "@/lib/useSupabaseSession";
 import { EntityIcon } from "@/components/EntityIcon";
 import { SteamSignInButton } from "@/components/SteamSignInButton";
 import { playerProfilePath } from "@/lib/steam";
@@ -71,40 +71,18 @@ function CaretDownIcon() {
   );
 }
 
-interface AppNavBarProps {
-  supabase?: SupabaseClient | null;
-}
-
-export function AppNavBar({ supabase }: AppNavBarProps) {
+export function AppNavBar() {
   const router = useRouter();
   const pathname = usePathname();
-  const [user, setUser] = useState<User | null>(null);
-  const [ready, setReady] = useState(false);
+  const {
+    supabase,
+    user,
+    ready,
+    steamId: sessionSteamId,
+    customUrl: sessionCustomUrl,
+  } = useSupabaseSession();
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [menuOpen, setMenuOpen] = useState(false);
-
-  useEffect(() => {
-    if (!supabase) return;
-    let cancelled = false;
-
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (cancelled) return;
-      setUser(session?.user ?? null);
-      setReady(true);
-    });
-
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      setReady(true);
-      setUser(session?.user ?? null);
-    });
-
-    return () => {
-      cancelled = true;
-      subscription.unsubscribe();
-    };
-  }, [supabase]);
 
   // App Router has no router.events; close the mobile menu when the path changes.
   // (The Base UI navigation menu manages its own open state and escape handling.)
@@ -140,7 +118,6 @@ export function AppNavBar({ supabase }: AppNavBarProps) {
     if (!supabase) return;
     trackEvent("Steam Sign Out Clicked", { source: "nav" });
     await supabase.auth.signOut();
-    setUser(null);
     router.replace("/");
   };
 
@@ -149,14 +126,6 @@ export function AppNavBar({ supabase }: AppNavBarProps) {
     user?.user_metadata?.full_name ||
     t.fallbackPlayer;
 
-  const sessionSteamId =
-    typeof user?.user_metadata?.steam_id === "string"
-      ? user.user_metadata.steam_id
-      : null;
-  const sessionCustomUrl =
-    typeof user?.user_metadata?.custom_url === "string"
-      ? user.user_metadata.custom_url
-      : null;
   const profileHref = sessionSteamId
     ? playerProfilePath(sessionSteamId, sessionCustomUrl)
     : "/dashboard";

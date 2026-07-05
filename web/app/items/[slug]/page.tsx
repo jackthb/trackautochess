@@ -18,6 +18,7 @@ import {
   ITEM_RELATION_CATEGORY_LABEL,
 } from "@/lib/itemRelations";
 import { absoluteUrl, SITE_NAME, SITE_TITLE } from "@/lib/site";
+import { cleanText, truncate } from "@/lib/text";
 import { DEFAULT_LOCALE } from "@/lib/i18n";
 import { getCommentaryForEntity } from "@/lib/patchCommentary";
 
@@ -30,15 +31,6 @@ const t = {
   relatedSynergies: "Related Synergies",
   fallbackTier: (n: string, t: string) => `${n} is a ${t} Dota Auto Chess item.`,
 };
-
-function cleanText(value: string): string {
-  return value.replace(/\s+/g, " ").trim();
-}
-
-function truncate(value: string, maxLength: number): string {
-  if (value.length <= maxLength) return value;
-  return `${value.slice(0, maxLength - 3).trimEnd()}...`;
-}
 
 function buildDescription(item: DisplayItem): string {
   const tier = TIER_LABEL[item.tier];

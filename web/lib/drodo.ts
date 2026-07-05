@@ -58,8 +58,8 @@ const DRODO_FETCH_TIMEOUT_MS = 10_000;
 const drodoFetch: typeof fetch = (input, init) =>
   fetch(input, { ...init, signal: AbortSignal.timeout(DRODO_FETCH_TIMEOUT_MS) });
 
-export interface CachedUserDrodoRow {
-  steam_id: string;
+/** Cached Drodo stat columns on the users table (no identity columns). */
+export interface UserDrodoStatsRow {
   drodo_mmr: number | null;
   drodo_max_mmr: number | null;
   drodo_mmr_level: number | null;
@@ -74,8 +74,12 @@ export interface CachedUserDrodoRow {
   drodo_profile_missing: boolean | null;
 }
 
-export const USER_DRODO_SELECT = [
-  "steam_id::text",
+export interface CachedUserDrodoRow extends UserDrodoStatsRow {
+  steam_id: string;
+}
+
+/** Canonical list of the cached Drodo stat columns; compose selects from it. */
+export const USER_DRODO_STAT_COLUMNS = [
   "drodo_mmr",
   "drodo_max_mmr",
   "drodo_mmr_level",
@@ -88,6 +92,11 @@ export const USER_DRODO_SELECT = [
   "queen_ladder_rank",
   "queen_ladder_last_seen_at",
   "drodo_profile_missing",
+] as const;
+
+export const USER_DRODO_SELECT = [
+  "steam_id::text",
+  ...USER_DRODO_STAT_COLUMNS,
 ].join(", ");
 
 export function isFreshCache(
@@ -99,6 +108,44 @@ export function isFreshCache(
   if (!Number.isFinite(fetchedTime)) return false;
   const ttl = missing ? DRODO_MISSING_TTL_MS : DRODO_FRESH_TTL_MS;
   return Date.now() - fetchedTime < ttl;
+}
+
+/** Freshness against the short "hot" (Queen-ladder) refresh cadence. */
+export function isHotCacheFresh(fetchedAt: string | null | undefined): boolean {
+  if (!fetchedAt) return false;
+  const fetchedTime = new Date(fetchedAt).getTime();
+  if (!Number.isFinite(fetchedTime)) return false;
+  return Date.now() - fetchedTime < HOT_PROFILE_REFRESH_TTL_SECONDS * 1000;
+}
+
+/** Whether a cached row belongs to a Queen-ladder profile (hot-poll cadence). */
+export function isCachedQueenProfile(
+  row: Pick<
+    UserDrodoStatsRow,
+    "queen_ladder_rank" | "queen_ladder_last_seen_at"
+  > | null
+): boolean {
+  return Boolean(
+    row && (row.queen_ladder_rank != null || row.queen_ladder_last_seen_at)
+  );
+}
+
+/** Shape cached Drodo stat columns into the stats object PlayerView renders. */
+export function drodoStatsFromCachedRow(row: UserDrodoStatsRow) {
+  return {
+    mmr: row.drodo_mmr,
+    max_mmr: row.drodo_max_mmr,
+    mmr_level: row.drodo_mmr_level,
+    // queen_ladder_rank is the denormalized source of truth; drodo_raw_data is
+    // kept only as an archival snapshot, not read for the rank.
+    queen_rank: row.queen_ladder_rank ?? null,
+    last_win_at: row.drodo_raw_data ? lastWinFromDrodoData(row.drodo_raw_data) : null,
+    last_top3_at: row.drodo_raw_data ? lastTop3FromDrodoData(row.drodo_raw_data) : null,
+    season: row.drodo_season,
+    season_games: row.drodo_season_games,
+    candy: row.drodo_candy,
+    chicken_count: row.drodo_chicken_count,
+  };
 }
 
 export function cachedUserToDrodoProfile(row: CachedUserDrodoRow): DrodoProfileRow {

@@ -5,16 +5,10 @@ import { UNIT_COSTS, computeSynergies } from "@/lib/units";
 import type { SynergyCountPiece } from "@dac/shared/game-structure";
 import {
   itemsFullData,
-  relicsData,
   synergiesData,
   unitsFullData,
 } from "@/generated/content-data";
-import type {
-  Game,
-  UnitFullInfo,
-  SynergyInfo,
-  RelicInfo,
-} from "@dac/shared/types";
+import type { Game, UnitFullInfo, SynergyInfo } from "@dac/shared/types";
 import type { ChessBoardPiece, ItemFullInfo } from "@dac/shared/types";
 import {
   parseLineup,
@@ -26,7 +20,9 @@ import {
   synIconName,
   relicStem,
   mmrLevelToRank,
+  type RelicTimelineEntry,
 } from "@dac/shared/game-utils";
+import { getRelicsMap } from "@/lib/relics";
 import { TooltipWrap, type TooltipData } from "@dac/shared/Tooltip";
 import { ChessBoard } from "@dac/shared/ChessBoard";
 import { type SteamProfile } from "@/lib/steam";
@@ -37,7 +33,7 @@ import styles from "./GameView.module.css";
 
 const UNITS_FULL = unitsFullData as Record<string, UnitFullInfo>;
 const SYNERGIES_DATA = synergiesData as Record<string, SynergyInfo>;
-const RELICS_DATA = (relicsData as any).relics as Record<string, RelicInfo>;
+const RELICS_DATA = getRelicsMap();
 const ITEMS_FULL = itemsFullData as Record<string, ItemFullInfo>;
 
 const iconUrl = resolveIconUrl;
@@ -78,13 +74,6 @@ const MATCH_TIME_FORMATTER = new Intl.DateTimeFormat("en-US", {
   hour12: false,
   timeZone: "UTC",
 });
-
-/** One entry in a player's relic-acquisition timeline. */
-interface RelicTimelineEntry {
-  round: number;
-  /** Display name like "Magic Seed". */
-  name: string;
-}
 
 interface PandarenDropEntry {
   round: number;
@@ -848,7 +837,3 @@ export default function GameView({
     </>
   );
 }
-
-/** Convert the raw match_players.relic_history jsonb into a sorted timeline.
- *  Input shape (dict): {"1": {relic: "item_x", round: 11}, "2": {...}, ...}
- *  Or array: [{relic, round}, ...]. Maps internal item_* ids to display names. */

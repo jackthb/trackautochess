@@ -1,6 +1,7 @@
 import { checkBotId } from "botid/server";
 import { RateLimiterMemory } from "rate-limiter-flexible";
 import { getClientIp, getUserAgent, logAbuse, toApiReq } from "@/lib/abuseLog";
+import { truncate } from "@/lib/text";
 
 const rateLimiter = new RateLimiterMemory({
   points: 3,
@@ -17,11 +18,6 @@ interface SupportRequest {
 function clean(value: unknown, maxLength: number): string {
   if (typeof value !== "string") return "";
   return value.replace(/\s+/g, " ").trim().slice(0, maxLength);
-}
-
-function truncate(value: string, maxLength: number): string {
-  if (value.length <= maxLength) return value;
-  return `${value.slice(0, maxLength - 3).trimEnd()}...`;
 }
 
 export async function POST(req: Request) {

@@ -3,7 +3,8 @@ import { relicsData } from "@/generated/content-data";
 import { slugifyName } from "@/lib/slugs";
 import { DEFAULT_LOCALE, type Locale, pickLocalized } from "@/lib/i18n";
 
-interface RelicInfo {
+/** Raw relic record shape emitted into generated content data. */
+export interface RawRelic {
   name: string;
   description: string;
   commentary?: string;
@@ -11,8 +12,20 @@ interface RelicInfo {
   names?: Record<string, string>;
   descriptions?: Record<string, string>;
   lore_i18n?: Record<string, string>;
+  icon?: string | null;
   icon_url?: string | null;
   icon_dimensions?: { width: number; height: number } | null;
+  [key: string]: unknown;
+}
+
+const RELICS_MAP = (relicsData as { relics: Record<string, RawRelic> }).relics;
+
+/**
+ * Raw relic records keyed by internal item id (e.g. "item_super_uprank").
+ * Single accessor so callers don't each unwrap the generated JSON shape.
+ */
+export function getRelicsMap(): Record<string, RawRelic> {
+  return RELICS_MAP;
 }
 
 export interface DisplayRelic {
@@ -30,9 +43,7 @@ export interface DisplayRelic {
 }
 
 function buildRelicsForLocale(locale: Locale): DisplayRelic[] {
-  return Object.values(
-    (relicsData as { relics: Record<string, RelicInfo> }).relics
-  )
+  return Object.values(RELICS_MAP)
     .filter((relic) => relic.name && relic.name.trim())
     .map((relic) => {
       const stem = relicStem(relic.name);

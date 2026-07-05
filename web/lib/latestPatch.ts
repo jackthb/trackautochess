@@ -1,5 +1,6 @@
 import { patchIndexData, patchesBySlugData } from "@/generated/content-data";
 import type { EntryKind } from "@/lib/patchKinds";
+import { cleanText } from "@/lib/text";
 
 export interface PatchHighlight {
   kind: EntryKind;
@@ -36,10 +37,6 @@ interface RuntimePatch {
 }
 
 const PROMO_WINDOW_MS = 30 * 24 * 60 * 60 * 1000;
-
-function cleanText(value: string): string {
-  return value.replace(/\s+/g, " ").trim();
-}
 
 function resolveHighlight(patch: RuntimePatch): PatchHighlight | null {
   const entry = patch.highlight ?? patch.highlights?.[0];

@@ -50,6 +50,16 @@ export function getRequestSiteUrl(headers: IncomingHttpHeaders): string | null {
   return getSiteUrl();
 }
 
+/** Extract the origin (scheme + host) from an absolute URL, or null. */
+export function originFromUrl(value: string | null): string | null {
+  if (!value) return null;
+  try {
+    return new URL(value).origin;
+  } catch {
+    return null;
+  }
+}
+
 export function absoluteUrl(
   pathname: string,
   baseUrl: string | null = getSiteUrl()

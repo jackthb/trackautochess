@@ -16,13 +16,19 @@ import {
   buildChessCodeUnitLookup,
   resolveChessLineup,
 } from "@dac/shared/game-structure";
-import { relicsData, synergiesData, unitsFullData } from "@/generated/content-data";
-import type { RelicInfo, SynergyInfo, UnitFullInfo } from "@dac/shared/types";
+import { synergiesData, unitsFullData } from "@/generated/content-data";
+import type { SynergyInfo, UnitFullInfo } from "@dac/shared/types";
 import { fetchSteamProfile } from "@/lib/steam";
 import { parseSteamId64 } from "@dac/shared/steam";
 import { UNIT_COSTS, computeSynergies } from "@/lib/units";
+import { getRelicsMap } from "@/lib/relics";
+import {
+  fetchMatchPlayer,
+  fetchMatchRoster,
+  type MatchPlayerRow,
+} from "@/lib/matches";
 
-const RELICS_MAP = (relicsData as { relics: Record<string, RelicInfo> }).relics;
+const RELICS_MAP = getRelicsMap();
 const REPEAT_RELIC_ID = "item_repeat_relic";
 const STAR_ICON_DATA_URL =
   "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23c9a84c' d='M12 1.8l2.95 6.1 6.72.96-4.86 4.73 1.15 6.68L12 17.12l-5.96 3.15 1.15-6.68-4.86-4.73 6.72-.96L12 1.8z'/%3E%3C/svg%3E";
@@ -41,21 +47,6 @@ type SynergyBadge = ReturnType<typeof parseSynergies>[number];
 interface DisplayRelic {
   name: string;
   repeated: boolean;
-}
-
-interface MatchPlayerRow {
-  id: number;
-  match_id: string;
-  steam_id: string | number | null;
-  placement: number | null;
-  mmr_level: number | null;
-  hero_level: number | null;
-  chess_lineup: string | null;
-  synergies: string | null;
-  relic: string | null;
-  relic_history: unknown;
-  win_round: number | null;
-  lose_round: number | null;
 }
 
 interface SidebarBuild {
@@ -185,31 +176,18 @@ async function ogHandler(req: Request, ctx: { params: Promise<{ id: string }> })
     return new Response("Missing Supabase config", { status: 500 });
   }
 
-  const { data: mp } = await supabase
-    .from("match_players")
-    .select(
-      "id, match_id, steam_id::text, placement, mmr_level, hero_level, chess_lineup, synergies, relic, relic_history, win_round, lose_round"
-    )
-    .eq("id", matchPlayerId)
-    .single<MatchPlayerRow>();
-
+  const mp = await fetchMatchPlayer(supabase, matchPlayerId);
   if (!mp) {
     return new Response("Match player not found", { status: 404 });
   }
   const mpSteamId = mp.steam_id ? parseSteamId64(String(mp.steam_id)) : null;
 
-  const [steamProfile, fonts, matchPlayersResult] = await Promise.all([
+  const [steamProfile, fonts, matchPlayers] = await Promise.all([
     mpSteamId
       ? fetchSteamProfile(mpSteamId, supabase)
       : Promise.resolve({ name: null, customUrl: null, avatarUrl: null }),
     fontData,
-    supabase
-      .from("match_players")
-      .select(
-        "id, match_id, steam_id::text, placement, mmr_level, hero_level, chess_lineup, synergies, relic, relic_history, win_round, lose_round"
-      )
-      .eq("match_id", mp.match_id)
-      .order("placement", { ascending: true }),
+    fetchMatchRoster(supabase, mp.match_id),
   ]);
 
   const p = mp.placement || 0;
@@ -226,7 +204,6 @@ async function ogHandler(req: Request, ctx: { params: Promise<{ id: string }> })
   const siteBase = process.env.NEXT_PUBLIC_SITE_URL || "https://www.trackautochess.com";
   const toAbs = (url: string) => (url.startsWith("/") ? `${siteBase}${url}` : url);
 
-  const matchPlayers = (matchPlayersResult.data as MatchPlayerRow[] | null) ?? [];
   const sidebarRows = matchPlayers
     .filter((row) => row.id !== mp.id && row.placement != null)
     .sort((a, b) => (a.placement ?? 99) - (b.placement ?? 99))

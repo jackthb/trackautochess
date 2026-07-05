@@ -1,12 +1,8 @@
-import {
-  itemLinksData,
-  itemsFullData,
-  relicsData,
-} from "@/generated/content-data";
+import { itemLinksData, itemsFullData } from "@/generated/content-data";
 import type { RelatedEntity } from "@/components/EntityDetail";
 import { getAllItems, getItemSlugByName, iconUrl, type DisplayItem } from "@/lib/items";
 import { getAllSynergies, getSynergySlugByName, type DisplaySynergy } from "@/lib/synergies";
-import { getAllRelics } from "@/lib/relics";
+import { getAllRelics, getRelicsMap } from "@/lib/relics";
 import { getAllUnits } from "@/lib/units";
 import { DEFAULT_LOCALE, type Locale } from "@/lib/i18n";
 
@@ -154,10 +150,10 @@ function getCmsRelationsForItem(itemName: string): CmsRelatedEntity[] {
 }
 
 function getCmsRelationsForRelic(relicName: string): CmsRelatedEntity[] {
-  const relic = Object.values(
-    (relicsData as { relics: Record<string, RuntimeEntityWithRelations> }).relics,
-  ).find((candidate) => norm(candidate.name) === norm(relicName));
-  return relic?.relatedEntities ?? [];
+  const relic = Object.values(getRelicsMap()).find(
+    (candidate) => norm(candidate.name) === norm(relicName),
+  );
+  return (relic?.relatedEntities as CmsRelatedEntity[] | undefined) ?? [];
 }
 
 function resolveCmsRelatedEntity(

@@ -28,6 +28,7 @@ import {
   type DrodoProfileRow,
 } from "@/lib/drodo";
 import { drodoStatsFromProfile } from "@/components/player/playerData";
+import { useSupabaseSession } from "@/lib/useSupabaseSession";
 import { type SteamProfile } from "@/lib/steam";
 import styles from "./PlayerView.module.css";
 
@@ -322,55 +323,11 @@ export default function PlayerView({
   const [nowMs, setNowMs] = useState<number | null>(null);
   const [refreshing, setRefreshing] = useState(false);
   const [avatarFailed, setAvatarFailed] = useState(false);
-  const [sessionSteamId, setSessionSteamId] = useState<string | null>(null);
-  const [accessToken, setAccessToken] = useState<string | null>(null);
-  const [authReady, setAuthReady] = useState(false);
-
-  useEffect(() => {
-    let cancelled = false;
-    let unsubscribe: (() => void) | null = null;
-
-    void import("@/lib/supabase").then(({ createSupabaseClient }) => {
-      if (cancelled) return;
-      const supabase = createSupabaseClient();
-      if (!supabase) {
-        setAuthReady(true);
-        return;
-      }
-
-      supabase.auth.getSession().then(({ data }) => {
-        if (cancelled) return;
-        const meta = data.session?.user?.user_metadata as
-          | { steam_id?: unknown }
-          | null
-          | undefined;
-        setSessionSteamId(
-          meta && typeof meta.steam_id === "string" ? meta.steam_id : null
-        );
-        setAccessToken(data.session?.access_token ?? null);
-        setAuthReady(true);
-      });
-      const {
-        data: { subscription },
-      } = supabase.auth.onAuthStateChange((_event, session) => {
-        const meta = session?.user?.user_metadata as
-          | { steam_id?: unknown }
-          | null
-          | undefined;
-        setSessionSteamId(
-          meta && typeof meta.steam_id === "string" ? meta.steam_id : null
-        );
-        setAccessToken(session?.access_token ?? null);
-        setAuthReady(true);
-      });
-      unsubscribe = () => subscription.unsubscribe();
-    });
-
-    return () => {
-      cancelled = true;
-      unsubscribe?.();
-    };
-  }, []);
+  const {
+    ready: authReady,
+    steamId: sessionSteamId,
+    accessToken,
+  } = useSupabaseSession();
 
   const isAdmin = isAdminSteamId(sessionSteamId);
   const isOwnProfile = sessionSteamId !== null && sessionSteamId === steamId;

@@ -18,9 +18,8 @@ import {
 import { isAdminSteamId } from "@/lib/admin";
 import { revalidateQueenPages } from "@/lib/queensRevalidate";
 import { getSessionUser } from "@/lib/sessionUser";
-import type { CachedUserDrodoRow } from "@/lib/drodo";
+import { isCachedQueenProfile, type CachedUserDrodoRow } from "@/lib/drodo";
 import {
-  isCachedQueenProfile,
   loadCachedDrodoRow,
   readThroughDrodoProfile,
 } from "@/lib/drodoReadThrough";

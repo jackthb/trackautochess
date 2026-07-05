@@ -4,23 +4,17 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { listAvatarUrl, playerProfilePath } from "@/lib/steam";
-import { createSupabaseClient } from "@/lib/supabase";
 import { useBetaFeaturesAccess } from "@/lib/betaFeatures";
+import { useSupabaseSession } from "@/lib/useSupabaseSession";
 import { PageLayout } from "@/components/PageLayout";
 import type { MatchSummary } from "@/app/api/matches/route";
 import styles from "./matches.module.css";
 
 // Client island for /matches: owns beta gating (PostHog feature flag +
 // Supabase session token), data fetching from /api/matches, all state,
-// and rendering. Creates its own Supabase client since there's no _app-provided
-// prop in the App Router. styled-jsx was ported to matches.module.css.
+// and rendering. styled-jsx was ported to matches.module.css.
 
 type Phase = "loading" | "forbidden" | "ready" | "error";
-
-interface ViewerSession {
-  token: string | null;
-  steamId: string | null;
-}
 
 function formatPlayedAt(iso: string): string {
   const date = new Date(iso);
@@ -37,44 +31,17 @@ function formatPlayedAt(iso: string): string {
 export function MatchesClient() {
   const router = useRouter();
   const [phase, setPhase] = useState<Phase>("loading");
-  const [viewerSession, setViewerSession] = useState<ViewerSession | null>(null);
+  const { ready: authReady, steamId, accessToken } = useSupabaseSession();
   const [matches, setMatches] = useState<MatchSummary[]>([]);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const betaAccess = useBetaFeaturesAccess(viewerSession?.steamId ?? null);
+  const betaAccess = useBetaFeaturesAccess(steamId);
 
   useEffect(() => {
-    const supabase = createSupabaseClient();
-    if (!supabase) {
-      setPhase("forbidden");
-      return;
-    }
-    let cancelled = false;
-
-    supabase.auth.getSession().then(({ data }) => {
-      const meta = data.session?.user?.user_metadata as
-        | { steam_id?: unknown }
-        | null
-        | undefined;
-      const steamId = meta && typeof meta.steam_id === "string" ? meta.steam_id : null;
-      if (!cancelled) {
-        setViewerSession({
-          token: data.session?.access_token ?? null,
-          steamId,
-        });
-      }
-    });
-
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
-  useEffect(() => {
-    if (!viewerSession) {
+    if (!authReady) {
       setPhase("loading");
       return;
     }
-    if (!viewerSession.token || !viewerSession.steamId) {
+    if (!accessToken || !steamId) {
       setPhase("forbidden");
       return;
     }
@@ -93,7 +60,7 @@ export function MatchesClient() {
       setPhase("loading");
       try {
         const resp = await fetch("/api/matches", {
-          headers: { Authorization: `Bearer ${viewerSession.token}` },
+          headers: { Authorization: `Bearer ${accessToken}` },
         });
         if (!resp.ok) {
           const body = await resp.json().catch(() => null);
@@ -121,7 +88,7 @@ export function MatchesClient() {
     return () => {
       cancelled = true;
     };
-  }, [betaAccess, viewerSession]);
+  }, [authReady, accessToken, steamId, betaAccess]);
 
   return (
     <PageLayout title="Matches">

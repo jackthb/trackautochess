@@ -7,6 +7,7 @@ import { Markdown } from "@/components/Markdown";
 import { parseItemDescription } from "@/lib/itemDescription";
 import type { EntityCommentary } from "@/lib/patchCommentaryTypes";
 import type { ItemTranslation } from "@/lib/items";
+import { cleanText } from "@/lib/text";
 import styles from "./ItemDetailClient.module.css";
 
 const STORAGE_KEY = "dac:item-text-locale";
@@ -28,10 +29,6 @@ interface ItemDetailClientProps {
   extraRelated?: RelatedEntity[];
   accentColor: string;
   patchCommentary: EntityCommentary[];
-}
-
-function cleanText(value: string): string {
-  return value.replace(/\s+/g, " ").trim();
 }
 
 function pickTranslation(

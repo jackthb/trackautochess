@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { renderOgImage } from "@/lib/og";
+import { imageToDataUrl, renderOgImage } from "@/lib/og";
 import { createSupabaseServerClient } from "@/lib/supabase";
 import { readFile } from "node:fs/promises";
 import path from "node:path";
@@ -43,7 +43,9 @@ const fontData = Promise.all([
   readFile(path.join(fontDir, "JetBrainsMono-Regular.ttf")),
   readFile(path.join(fontDir, "JetBrainsMono-Bold.ttf")),
 ]);
-const USER_DRODO_SELECT = [
+// Narrow OG-only select: the image needs headline stats but not the heavy
+// drodo_raw_data JSON that the full player-page select pulls.
+const OG_USER_DRODO_SELECT = [
   "steam_id::text",
   "drodo_mmr",
   "drodo_max_mmr",
@@ -62,19 +64,6 @@ function getSiteHost(): string {
   return (process.env.NEXT_PUBLIC_SITE_URL || "https://www.trackautochess.com")
     .replace(/^https?:\/\//, "")
     .replace(/\/+$/, "");
-}
-
-async function imageToDataUrl(url: string | null | undefined): Promise<string | null> {
-  if (!url) return null;
-  try {
-    const response = await fetch(url);
-    if (!response.ok) return null;
-    const contentType = response.headers.get("content-type") || "image/jpeg";
-    const buffer = Buffer.from(await response.arrayBuffer());
-    return `data:${contentType};base64,${buffer.toString("base64")}`;
-  } catch {
-    return null;
-  }
 }
 
 function Stat({
@@ -238,7 +227,7 @@ async function ogHandler(req: Request, ctx: { params: Promise<{ steamId: string 
     supabase
       ? supabase
           .from("users")
-          .select(USER_DRODO_SELECT)
+          .select(OG_USER_DRODO_SELECT)
           .filter("steam_id", "eq", steamId)
           .maybeSingle()
       : Promise.resolve({ data: null }),

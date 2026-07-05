@@ -1,12 +1,11 @@
-import { relicStem, synIconName, unitStem } from "@dac/shared/game-utils";
-import { itemIconStem } from "../../shared/game-utils";
-import type { ItemFullInfo } from "../../shared/types";
+import { itemIconStem, relicStem, synIconName, unitStem } from "@dac/shared/game-utils";
+import type { ItemFullInfo } from "@dac/shared/types";
 import {
   itemsFullData,
-  relicsData,
   synergiesData,
   unitsFullData,
 } from "@/generated/content-data";
+import { getRelicsMap } from "@/lib/relics";
 
 interface CmsIconFields {
   icon?: string | null;
@@ -46,8 +45,7 @@ function buildSynergyMap(): IconMap {
 
 function buildRelicMap(): IconMap {
   const map: IconMap = {};
-  const relics = (relicsData as { relics: Record<string, CmsIconFields & { name?: string }> }).relics;
-  for (const data of Object.values(relics)) {
+  for (const data of Object.values(getRelicsMap())) {
     const icon = iconPath(data);
     if (data?.name && icon) {
       map[relicStem(data.name)] = icon;

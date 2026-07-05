@@ -1,12 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState, type ReactNode } from "react";
-import type { User } from "@supabase/supabase-js";
+import type { ReactNode } from "react";
 import { ProfileSearch } from "@/components/ProfileSearch";
 import { SteamSignInButton } from "@/components/SteamSignInButton";
 import type { CustomGameMetrics } from "@/lib/customGameStats";
-import { createSupabaseClient } from "@/lib/supabase";
+import { useSupabaseSession } from "@/lib/useSupabaseSession";
 import { playerProfilePath } from "@/lib/steam";
 import styles from "./HomeSearch.module.css";
 
@@ -34,44 +33,12 @@ export default function HomeSearch({
   // in, the hero's "Sign in through Steam" CTA is wrong — swap it for a link to
   // their own profile. Gate on `authReady` so logged-in users never flash the
   // sign-in button first.
-  const [user, setUser] = useState<User | null>(null);
-  const [authReady, setAuthReady] = useState(false);
-
-  useEffect(() => {
-    const supabase = createSupabaseClient();
-    if (!supabase) {
-      setAuthReady(true);
-      return;
-    }
-    let cancelled = false;
-
-    supabase.auth.getSession().then(({ data }) => {
-      if (cancelled) return;
-      setUser(data.session?.user ?? null);
-      setAuthReady(true);
-    });
-
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      setAuthReady(true);
-      setUser(session?.user ?? null);
-    });
-
-    return () => {
-      cancelled = true;
-      subscription.unsubscribe();
-    };
-  }, []);
-
-  const userSteamId =
-    typeof user?.user_metadata?.steam_id === "string"
-      ? user.user_metadata.steam_id
-      : null;
-  const userCustomUrl =
-    typeof user?.user_metadata?.custom_url === "string"
-      ? user.user_metadata.custom_url
-      : null;
+  const {
+    user,
+    ready: authReady,
+    steamId: userSteamId,
+    customUrl: userCustomUrl,
+  } = useSupabaseSession();
   const profileHref = userSteamId
     ? playerProfilePath(userSteamId, userCustomUrl)
     : "/dashboard";

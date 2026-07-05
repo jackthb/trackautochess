@@ -41,9 +41,8 @@ const t = {
 
 /**
  * Client island for /about: the support/contact form (state + submit handler
- * posting to /api/support) and all rendered page content. Migrated verbatim
- * from pages/about.tsx; the SeoHead/structuredData moved to the Server
- * Component page.tsx.
+ * posting to /api/support) and all rendered page content. Page metadata and
+ * structured data live in the Server Component page.tsx.
  */
 export function AboutContent() {
   const [contact, setContact] = useState("");

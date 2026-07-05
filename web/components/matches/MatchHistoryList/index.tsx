@@ -5,15 +5,15 @@ import { useRouter } from "next/navigation";
 import { GameRowDisplay } from "@dac/shared/GameRowDisplay";
 import type { PlayerGame, RelicInfo, UnitFullInfo, SynergyInfo } from "@dac/shared/types";
 import {
-  relicsData as relicsJson,
   synergiesData as synergiesJson,
   unitsFullData,
 } from "@/generated/content-data";
 import { ITEM_SYNERGIES, UNIT_COSTS } from "@/lib/units";
 import { resolveIconUrl } from "@/lib/icons";
+import { getRelicsMap } from "@/lib/relics";
 import styles from "./MatchHistoryList.module.css";
 
-const RELICS_MAP = (relicsJson as { relics?: Record<string, RelicInfo> }).relics ?? {};
+const RELICS_MAP: Record<string, RelicInfo> = getRelicsMap();
 const UNITS_FULL = unitsFullData as Record<string, UnitFullInfo>;
 const SYNERGIES_MAP = synergiesJson as Record<string, SynergyInfo>;
 

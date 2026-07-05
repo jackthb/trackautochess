@@ -4,8 +4,8 @@ import { DEFAULT_LOCALE } from "@/lib/i18n";
 import { getAllItems } from "@/lib/items";
 import { getAllUnits } from "@/lib/units";
 import { SITE_NAME, SITE_TITLE } from "@/lib/site";
+import { AdminGate } from "@/components/app/AdminGate";
 import { BuildPlanner, type BuilderItem, type BuilderUnit } from "./BuildPlanner";
-import { BuildsAdminGate } from "./BuildsAdminGate";
 
 const title = `Builds | ${SITE_TITLE}`;
 const description =
@@ -50,9 +50,9 @@ export default function BuildsPage() {
 
   return (
     <PageLayout title="Builds">
-      <BuildsAdminGate>
+      <AdminGate>
         <BuildPlanner units={units} items={items} />
-      </BuildsAdminGate>
+      </AdminGate>
     </PageLayout>
   );
 }

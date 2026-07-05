@@ -5,6 +5,7 @@ import {
   EMPTY_DRODO_PROFILE_ERROR,
   fetchAndCacheDrodo,
   hasDrodoStats,
+  isCachedQueenProfile,
   isFreshCache,
   purgeDrodoCache,
   USER_DRODO_SELECT,
@@ -64,14 +65,6 @@ export interface ReadThroughDrodoProfileOptions {
 }
 
 const PROFILE_REFRESH_LOCK_TTL_MS = 60_000;
-
-export function isCachedQueenProfile(row: CachedUserDrodoRow | null): boolean {
-  if (!row) return false;
-  return Boolean(
-    row.queen_ladder_last_seen_at ||
-      cachedUserToDrodoProfile(row).queen_rank != null
-  );
-}
 
 export async function loadCachedDrodoRow(
   supabase: SupabaseClient,
