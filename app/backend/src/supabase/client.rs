@@ -276,6 +276,19 @@ impl SupabaseClient {
     }
 }
 
+pub fn client_with_fresh_session(cfg: &mut Config) -> Result<SupabaseClient, String> {
+    ensure_fresh_session(cfg)?;
+    SupabaseClient::from_config(cfg)
+        .ok_or_else(|| "Supabase is not configured.".to_owned())
+}
+
+/// Reload config from disk, refresh the Supabase session when needed, and
+/// return a client. Refreshed tokens are persisted to config.json.
+pub fn fresh_client_from_disk() -> Result<SupabaseClient, String> {
+    let mut cfg = Config::load().map_err(|err| err.to_string())?;
+    client_with_fresh_session(&mut cfg)
+}
+
 pub fn ensure_fresh_session(cfg: &mut Config) -> Result<(), String> {
     if cfg.local_only
         || cfg.supabase_url.trim().is_empty()

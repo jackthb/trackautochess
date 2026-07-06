@@ -5,7 +5,7 @@ mod outbox;
 mod queen_ladder;
 mod storage;
 
-pub use client::ensure_fresh_session;
+pub use client::{client_with_fresh_session, fresh_client_from_disk};
 pub use matches::finished_match_id_from_rows;
 
 use serde_json::{json, Value};

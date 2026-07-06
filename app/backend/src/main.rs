@@ -90,14 +90,11 @@ fn main() -> io::Result<()> {
         // outbox at startup, so this is the recovery path when an upload
         // failed and the daemon has been running ever since.
         "outbox-flush" => {
-            let cfg = Config::load()?;
+            let mut cfg = Config::load()?;
             let outbox = Outbox::new(cfg.dac_dir.join("outbox"));
-            let Some(client) = supabase::SupabaseClient::from_config(&cfg) else {
-                return Err(io::Error::new(
-                    io::ErrorKind::InvalidInput,
-                    "Supabase is not configured",
-                ));
-            };
+            let client = supabase::client_with_fresh_session(&mut cfg).map_err(|err| {
+                io::Error::new(io::ErrorKind::InvalidInput, err)
+            })?;
             let pending = outbox.list()?.len();
             let summary = client.replay_outbox_summary(&cfg, &outbox)?;
             println!(
@@ -126,13 +123,10 @@ fn main() -> io::Result<()> {
                     )
                 })?;
             let rows = nettable_parser::extract_rows(&path)?;
-            let cfg = Config::load()?;
-            let Some(client) = supabase::SupabaseClient::from_config(&cfg) else {
-                return Err(io::Error::new(
-                    io::ErrorKind::InvalidInput,
-                    "Supabase is not configured",
-                ));
-            };
+            let mut cfg = Config::load()?;
+            let client = supabase::client_with_fresh_session(&mut cfg).map_err(|err| {
+                io::Error::new(io::ErrorKind::InvalidInput, err)
+            })?;
             match client.upload_finished_match_from_rows(&rows) {
                 Ok(Some(match_id)) => {
                     println!("uploaded end-board match {match_id}");
@@ -156,13 +150,10 @@ fn main() -> io::Result<()> {
                 )
             })?;
             let rows = nettable_parser::extract_dump_rows(&path)?;
-            let cfg = Config::load()?;
-            let Some(client) = supabase::SupabaseClient::from_config(&cfg) else {
-                return Err(io::Error::new(
-                    io::ErrorKind::InvalidInput,
-                    "Supabase is not configured",
-                ));
-            };
+            let mut cfg = Config::load()?;
+            let client = supabase::client_with_fresh_session(&mut cfg).map_err(|err| {
+                io::Error::new(io::ErrorKind::InvalidInput, err)
+            })?;
             match client.upload_finished_match_from_rows(&rows) {
                 Ok(Some(match_id)) => {
                     println!("uploaded end-board match {match_id}");
@@ -217,13 +208,14 @@ fn run_daemon() -> io::Result<()> {
             let _ = emit(&line);
         });
     }
-    if let Some(client) = supabase::SupabaseClient::from_config(&cfg) {
-        let cfg_for_replay = cfg.clone();
-        let outbox_for_replay = outbox.clone();
-        thread::spawn(move || {
-            let _ = client.replay_outbox(&cfg_for_replay, &outbox_for_replay);
+    let outbox_for_replay = outbox.clone();
+    thread::spawn(move || {
+        let _ = supabase::fresh_client_from_disk().and_then(|client| {
+            Config::load()
+                .map_err(|err| err.to_string())
+                .and_then(|cfg| client.replay_outbox(&cfg, &outbox_for_replay).map_err(|err| err.to_string()))
         });
-    }
+    });
     emit(&status_json(&cfg))?;
 
     for line in io::stdin().lock().lines() {
@@ -455,12 +447,16 @@ fn run_daemon() -> io::Result<()> {
             }
             BackendCommand::UploadLogs { reason } => {
                 let reason = reason.unwrap_or_else(|| "manual".to_owned());
-                match supabase::SupabaseClient::from_config(&cfg) {
-                    Some(client) => match client.upload_diagnostic_logs(
-                        &cfg,
-                        &reason,
-                        nettable_setup::find_console_log(),
-                    ) {
+                match supabase::fresh_client_from_disk() {
+                    Ok(client) => match Config::load().and_then(|cfg| {
+                        client
+                            .upload_diagnostic_logs(
+                                &cfg,
+                                &reason,
+                                nettable_setup::find_console_log(),
+                            )
+                            .map_err(|err| io::Error::new(io::ErrorKind::Other, err))
+                    }) {
                         Ok(summary) => emit(&event_json(&DiagnosticsUploaded::complete(
                             &summary.reason,
                             summary.storage_ok,
@@ -469,12 +465,12 @@ fn run_daemon() -> io::Result<()> {
                             summary.console_bytes,
                             summary.console_found,
                         )))?,
-                        Err(err) => emit(&event_json(&DiagnosticsUploaded::failed(&reason, &err)))?,
+                        Err(err) => emit(&event_json(&DiagnosticsUploaded::failed(
+                            &reason,
+                            &err.to_string(),
+                        )))?,
                     },
-                    None => emit(&event_json(&DiagnosticsUploaded::failed(
-                        &reason,
-                        "Supabase is not configured.",
-                    )))?,
+                    Err(err) => emit(&event_json(&DiagnosticsUploaded::failed(&reason, &err)))?,
                 }
             }
             BackendCommand::DoUpdate => emit(&event_json(&UpdateApplyRequested::new()))?,
@@ -535,10 +531,7 @@ where
 {
     thread::spawn(move || {
         let mut cfg = cfg;
-        let client = supabase::ensure_fresh_session(&mut cfg).and_then(|()| {
-            supabase::SupabaseClient::from_config(&cfg)
-                .ok_or_else(|| "Supabase is not configured.".to_owned())
-        });
+        let client = supabase::client_with_fresh_session(&mut cfg);
         f(client, stdout_lock);
     });
 }

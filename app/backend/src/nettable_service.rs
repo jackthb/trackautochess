@@ -23,7 +23,7 @@ use crate::{
         wait_for_steam_exit, DEFAULT_GSI_PORT, REQUIRED_LAUNCH_FLAGS,
     },
     queen_ladder,
-    supabase::{finished_match_id_from_rows, parse_valid_steam_id64, SupabaseClient},
+    supabase::{finished_match_id_from_rows, fresh_client_from_disk, parse_valid_steam_id64},
 };
 use std::{
     collections::HashSet,
@@ -204,12 +204,16 @@ impl NettableService {
                             for event in handle_rows_for_parity(&state, &rows) {
                                 emit(event);
                             }
-                            if let Some(event) = maybe_auto_upload_queen_ladder(&state, &cfg, &rows)
+                            if let Some(event) = maybe_auto_upload_queen_ladder(&state, &rows)
                             {
                                 emit(event);
                             }
                             if local_is_capture_owner(&state) {
-                                if let Some(client) = SupabaseClient::from_config(&cfg) {
+                                let needs_upload = finished_match_id_from_rows(&rows)
+                                    .map(|match_id| !end_board_already_uploaded(&state, &match_id))
+                                    .unwrap_or(false);
+                                match fresh_client_from_disk() {
+                                    Ok(client) => {
                                     if let Some(match_id) = finished_match_id_from_rows(&rows) {
                                         if end_board_already_uploaded(&state, &match_id) {
                                             continue;
@@ -254,9 +258,18 @@ impl NettableService {
                                                     &now_iso_utc(),
                                                 ),
                                             ));
-                                            emit_fallback_finalize(&cfg, &rows, &emit, "End-board upload failed; saved a partial match from the last live snapshot.");
+                                            emit_fallback_finalize(&rows, &emit, "End-board upload failed; saved a partial match from the last live snapshot.");
                                         }
                                     }
+                                    }
+                                    Err(err) if needs_upload => {
+                                        emit(event_json(&NettableIngestError::with_backend_at(
+                                            &format!("end_board upload failed: {err}"),
+                                            &now_iso_utc(),
+                                        )));
+                                        emit_fallback_finalize(&rows, &emit, "End-board upload failed; saved a partial match from the last live snapshot.");
+                                    }
+                                    Err(_) => {}
                                 }
                             }
                         }
@@ -291,7 +304,7 @@ impl NettableService {
 
     /// User confirmed the match they left is over and they're not rejoining:
     /// upload the held snapshot now instead of waiting out the grace window.
-    pub fn confirm_match_left<F>(&self, cfg: &Config, emit: F)
+    pub fn confirm_match_left<F>(&self, _cfg: &Config, emit: F)
     where
         F: Fn(String),
     {
@@ -302,7 +315,7 @@ impl NettableService {
         });
         match pending {
             Some(pending) => {
-                for line in flush_pending_left_match(cfg, pending, "left_match_confirmed") {
+                for line in flush_pending_left_match(pending, "left_match_confirmed") {
                     emit(line);
                 }
             }
@@ -467,14 +480,13 @@ impl NettableService {
             let rows = chase_post_game_end_board(&state, &cfg, &emit, "Dota reported post-game");
             if upload_end_board_if_present(
                 &state,
-                &cfg,
                 &rows,
                 &emit,
                 "post-game end_board upload failed",
             ) {
                 return;
             }
-            match finalize_without_end_board(&cfg, &rows) {
+            match finalize_without_end_board(&rows) {
                 Ok(Some(match_id)) => emit(event_json(&NettableGameEnded::new(
                     "Marked the match finished from the last live snapshot after end_board did not appear.",
                     Some(&match_id),
@@ -563,8 +575,8 @@ impl NettableService {
             }
             let season = players[0].season.clone().unwrap_or_default();
 
-            let client = SupabaseClient::from_config(cfg).ok_or_else(|| {
-                "Supabase is not configured; cannot upload the Queen ladder.".to_owned()
+            let client = fresh_client_from_disk().map_err(|err| {
+                format!("Supabase session is not ready; cannot upload the Queen ladder: {err}")
             })?;
             let upserted = client.upsert_queen_ladder_players(&players)?;
             Ok((players.len(), upserted, season))
@@ -1003,34 +1015,20 @@ mod tests {
     #[test]
     fn automatic_queen_scan_is_throttled_to_sync_interval() {
         let state = Arc::new(Mutex::new(NettableState::default()));
-        let cfg = Config {
-            dac_dir: std::env::temp_dir(),
-            steam_id: String::new(),
-            steam_name: String::new(),
-            replay_enabled: true,
-            keep_local_nettable_dumps: false,
-            local_only: true,
-            supabase_url: String::new(),
-            supabase_key: String::new(),
-            supabase_auth_url: String::new(),
-            supabase_access_token: String::new(),
-            supabase_refresh_token: String::new(),
-            supabase_token_expires_at: String::new(),
-        };
         let rows = rows_from_json(vec![(
             "CustomNetTable_ranking_top_table",
             "ranking_top",
             serde_json::json!({"season": "s40", "ranking_top": {"1": {"steam_id": "76561198022169086", "name": "Jack", "rank": 1, "mmr": 4200}}}),
         )]);
 
-        let first = maybe_auto_upload_queen_ladder(&state, &cfg, &rows).expect("scan event");
-        let second = maybe_auto_upload_queen_ladder(&state, &cfg, &rows);
+        let first = maybe_auto_upload_queen_ladder(&state, &rows).expect("scan event");
+        let second = maybe_auto_upload_queen_ladder(&state, &rows);
         {
             let mut state = state.lock().unwrap();
             state.last_ranking_top_sync_at =
                 Some(Instant::now() - QUEEN_LADDER_AUTO_SYNC_INTERVAL - Duration::from_secs(1));
         }
-        let third = maybe_auto_upload_queen_ladder(&state, &cfg, &rows).expect("resync event");
+        let third = maybe_auto_upload_queen_ladder(&state, &rows).expect("resync event");
 
         assert!(first.contains("nettable_ranking_scanned"));
         assert!(first.contains("\"player_count\":1"));
@@ -1227,7 +1225,6 @@ fn handle_rows_for_parity(state: &Arc<Mutex<NettableState>>, rows: &[NettableRow
 
 fn maybe_auto_upload_queen_ladder(
     state: &Arc<Mutex<NettableState>>,
-    cfg: &Config,
     rows: &[NettableRow],
 ) -> Option<String> {
     let now = Instant::now();
@@ -1255,8 +1252,9 @@ fn maybe_auto_upload_queen_ladder(
         return None;
     }
     let season = players[0].season.clone().unwrap_or_default();
-    let upserted = SupabaseClient::from_config(cfg)
-        .map(|client| client.upsert_queen_ladder_players(&players).unwrap_or(0))
+    let upserted = fresh_client_from_disk()
+        .ok()
+        .and_then(|client| client.upsert_queen_ladder_players(&players).ok())
         .unwrap_or(0);
     Some(event_json(&NettableRankingScanned::new(
         player_count,
@@ -1643,7 +1641,6 @@ fn mark_end_board_uploaded(state: &Arc<Mutex<NettableState>>, match_id: &str) {
 
 fn upload_end_board_if_present<F>(
     state: &Arc<Mutex<NettableState>>,
-    cfg: &Config,
     rows: &[NettableRow],
     emit: &Arc<F>,
     error_context: &str,
@@ -1654,8 +1651,15 @@ where
     let Some(match_id) = finished_match_id_from_rows(rows) else {
         return false;
     };
-    let Some(client) = SupabaseClient::from_config(cfg) else {
-        return false;
+    let client = match fresh_client_from_disk() {
+        Ok(client) => client,
+        Err(err) => {
+            emit(event_json(&NettableIngestError::with_backend_at(
+                &format!("{error_context}: {err}"),
+                &now_iso_utc(),
+            )));
+            return false;
+        }
     };
     if end_board_already_uploaded(state, &match_id) || client.finished_match_has_players(&match_id)
     {
@@ -1749,21 +1753,16 @@ where
     rows
 }
 
-fn finalize_without_end_board(
-    cfg: &Config,
-    rows: &[NettableRow],
-) -> Result<Option<String>, String> {
-    let Some(client) = SupabaseClient::from_config(cfg) else {
-        return Ok(None);
-    };
+fn finalize_without_end_board(rows: &[NettableRow]) -> Result<Option<String>, String> {
+    let client = fresh_client_from_disk()?;
     client.upsert_fallback_finished_match(rows, "post_game_no_end_board")
 }
 
-fn emit_fallback_finalize<F>(cfg: &Config, rows: &[NettableRow], emit: &Arc<F>, message: &str)
+fn emit_fallback_finalize<F>(rows: &[NettableRow], emit: &Arc<F>, message: &str)
 where
     F: Fn(String) + Send + Sync + 'static,
 {
-    match finalize_without_end_board(cfg, rows) {
+    match finalize_without_end_board(rows) {
         Ok(Some(match_id)) => emit(event_json(&NettableGameEnded::new(
             message,
             Some(&match_id),
@@ -1810,7 +1809,7 @@ fn is_match_end_transition(prev: Option<&str>, next: &str) -> bool {
 /// snapshot so a finished game is always recorded and the UI reacts.
 /// Flush a held left-match snapshot when the grace window lapses or a
 /// different lobby supersedes it. Returns event lines for the caller to emit.
-fn tick_pending_left_match(state: &Arc<Mutex<NettableState>>, cfg: &Config) -> Vec<String> {
+fn tick_pending_left_match(state: &Arc<Mutex<NettableState>>, _cfg: &Config) -> Vec<String> {
     let (staged, expired) = match state.lock() {
         Ok(mut s) => {
             let staged = s.pending_left_match_flush.take();
@@ -1825,26 +1824,26 @@ fn tick_pending_left_match(state: &Arc<Mutex<NettableState>>, cfg: &Config) -> V
     let mut events = Vec::new();
     if let Some(pending) = staged {
         events.extend(flush_pending_left_match(
-            cfg,
             pending,
             "left_match_superseded",
         ));
     }
     if let Some(pending) = expired {
-        events.extend(flush_pending_left_match(cfg, pending, "left_match_timeout"));
+        events.extend(flush_pending_left_match(pending, "left_match_timeout"));
     }
     events
 }
 
-fn flush_pending_left_match(cfg: &Config, pending: PendingLeftMatch, reason: &str) -> Vec<String> {
+fn flush_pending_left_match(pending: PendingLeftMatch, reason: &str) -> Vec<String> {
     let now = now_iso_utc();
-    let Some(client) = SupabaseClient::from_config(cfg) else {
-        return vec![event_json(&NettableMatchLeftResolved::new(
-            "nothing_pending",
-            None,
-            "Supabase is not configured, so the match you left was not uploaded.",
-            &now,
-        ))];
+    let client = match fresh_client_from_disk() {
+        Ok(client) => client,
+        Err(err) => {
+            return vec![event_json(&NettableIngestError::with_backend_at(
+                &format!("left-match upload failed: {err}"),
+                &now,
+            ))];
+        }
     };
     match client.upsert_fallback_finished_match(&pending.rows, reason) {
         Ok(Some(match_id)) => vec![event_json(&NettableMatchLeftResolved::new(
@@ -1922,14 +1921,13 @@ where
     )));
     if upload_end_board_if_present(
         state,
-        cfg,
         &rows,
         emit,
         "match-left end_board upload failed",
     ) {
         return;
     }
-    match finalize_without_end_board(cfg, &rows) {
+    match finalize_without_end_board(&rows) {
         Ok(Some(match_id)) => emit(event_json(&NettableGameEnded::new(
             "Marked the match finished from the last live snapshot (no end board was emitted).",
             Some(&match_id),
