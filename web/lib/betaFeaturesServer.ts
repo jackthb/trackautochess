@@ -1,4 +1,7 @@
-import { WEBSITE_BETA_FEATURES_FLAG } from "@/lib/betaFlags";
+import {
+  WEBSITE_BETA_FEATURES_FLAG,
+  WEBSITE_CHATBOT_FLAG,
+} from "@/lib/betaFlags";
 
 type FlagValue =
   | boolean
@@ -36,8 +39,9 @@ function flagEnabled(value: FlagValue): boolean {
   return false;
 }
 
-export async function isBetaFeaturesEnabledForSteamId(
+export async function isPostHogFlagEnabledForSteamId(
   steamId: string | null | undefined,
+  flagKey: string,
 ): Promise<boolean> {
   const token = process.env.NEXT_PUBLIC_POSTHOG_PROJECT_TOKEN;
   if (!token || !steamId) return false;
@@ -56,10 +60,24 @@ export async function isBetaFeaturesEnabledForSteamId(
 
     const data = (await resp.json()) as FlagsResponse;
     return flagEnabled(
-      data.flags?.[WEBSITE_BETA_FEATURES_FLAG] ??
-        data.featureFlags?.[WEBSITE_BETA_FEATURES_FLAG]
+      data.flags?.[flagKey] ?? data.featureFlags?.[flagKey],
     );
   } catch {
     return false;
   }
+}
+
+export async function isBetaFeaturesEnabledForSteamId(
+  steamId: string | null | undefined,
+): Promise<boolean> {
+  return isPostHogFlagEnabledForSteamId(
+    steamId,
+    WEBSITE_BETA_FEATURES_FLAG,
+  );
+}
+
+export async function isChatbotEnabledForSteamId(
+  steamId: string | null | undefined,
+): Promise<boolean> {
+  return isPostHogFlagEnabledForSteamId(steamId, WEBSITE_CHATBOT_FLAG);
 }

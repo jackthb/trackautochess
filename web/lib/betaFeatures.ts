@@ -1,12 +1,16 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { WEBSITE_BETA_FEATURES_FLAG } from "@/lib/betaFlags";
+import {
+  WEBSITE_BETA_FEATURES_FLAG,
+  WEBSITE_CHATBOT_FLAG,
+} from "@/lib/betaFlags";
 import { getPostHog } from "@/lib/posthog";
 
 export type BetaFeatureAccess = "loading" | "enabled" | "disabled";
 
-export function useBetaFeaturesAccess(
+export function usePostHogFlagAccess(
+  flagKey: string,
   steamId: string | null | undefined,
 ): BetaFeatureAccess {
   const [access, setAccess] = useState<BetaFeatureAccess>("disabled");
@@ -27,9 +31,7 @@ export function useBetaFeaturesAccess(
       const update = () => {
         if (!cancelled) {
           setAccess(
-            posthog.isFeatureEnabled(WEBSITE_BETA_FEATURES_FLAG) === true
-              ? "enabled"
-              : "disabled"
+            posthog.isFeatureEnabled(flagKey) === true ? "enabled" : "disabled",
           );
         }
       };
@@ -43,9 +45,21 @@ export function useBetaFeaturesAccess(
       cancelled = true;
       unsubscribe?.();
     };
-  }, [steamId]);
+  }, [flagKey, steamId]);
 
   return access;
+}
+
+export function useBetaFeaturesAccess(
+  steamId: string | null | undefined,
+): BetaFeatureAccess {
+  return usePostHogFlagAccess(WEBSITE_BETA_FEATURES_FLAG, steamId);
+}
+
+export function useChatbotAccess(
+  steamId: string | null | undefined,
+): BetaFeatureAccess {
+  return usePostHogFlagAccess(WEBSITE_CHATBOT_FLAG, steamId);
 }
 
 export function useBetaFeaturesEnabled(
