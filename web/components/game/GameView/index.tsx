@@ -806,6 +806,14 @@ export default function GameView({
                   const deathRound =
                     deathRounds.get(String(g.user_id)) ?? null;
                   const finalPosition = parseInt(g.placement) || null;
+                  const snapPlayer =
+                    currentSnap?.players?.[String(g.user_id)] ?? null;
+                  const livePlacement =
+                    snapPlayer?.placement != null &&
+                    Number(snapPlayer.placement) > 0
+                      ? Number(snapPlayer.placement)
+                      : null;
+                  const displayPosition = livePlacement ?? finalPosition;
                   return (
                     <MatchPlayerRow
                       key={g.id}
@@ -820,10 +828,10 @@ export default function GameView({
                       expanded={expandedIds.has(g.id)}
                       onToggle={() => toggleExpand(g.id)}
                       relicTimeline={relicTimelines[String(g.user_id)]}
-                      snap={currentSnap?.players?.[String(g.user_id)] ?? null}
+                      snap={snapPlayer}
                       snapRound={selectedRound}
                       isLastRound={isLastRound}
-                      displayPosition={finalPosition}
+                      displayPosition={displayPosition}
                       deathRound={deathRound}
                       tooltipData={tooltipData}
                     />
