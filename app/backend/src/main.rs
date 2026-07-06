@@ -154,19 +154,83 @@ fn main() -> io::Result<()> {
             let client = supabase::client_with_fresh_session(&mut cfg).map_err(|err| {
                 io::Error::new(io::ErrorKind::InvalidInput, err)
             })?;
+            let local_steam_id = (!cfg.steam_id.is_empty()).then(|| cfg.steam_id.as_str());
+            let mut match_id = None;
             match client.upload_finished_match_from_rows(&rows) {
-                Ok(Some(match_id)) => {
-                    println!("uploaded end-board match {match_id}");
-                    return Ok(());
+                Ok(Some(uploaded)) => {
+                    println!("uploaded end-board match {uploaded}");
+                    match_id = Some(uploaded);
                 }
                 Ok(None) => {}
                 Err(err) => eprintln!("end-board upload failed: {err}"),
             }
-            match client.upsert_fallback_finished_match(&rows, "manual_finalize_dump") {
-                Ok(Some(match_id)) => println!("uploaded fallback match {match_id}"),
-                Ok(None) => println!("no usable match data found in the dump"),
-                Err(err) => return Err(io::Error::new(io::ErrorKind::Other, err)),
+            if match_id.is_none() {
+                match client.upsert_fallback_finished_match(&rows, "manual_finalize_dump") {
+                    Ok(Some(uploaded)) => {
+                        println!("uploaded fallback match {uploaded}");
+                        match_id = Some(uploaded);
+                    }
+                    Ok(None) => println!("no usable match data found in the dump"),
+                    Err(err) => return Err(io::Error::new(io::ErrorKind::Other, err)),
+                }
             }
+            if let Some(match_id) = match_id {
+                let played_at = rows
+                    .iter()
+                    .find(|row| row.key == "end_board")
+                    .and_then(|row| row.observed_at.as_deref())
+                    .unwrap_or("");
+                if let Some(timeline) = match_builder::build_timeline_from_rows(
+                    &rows,
+                    local_steam_id,
+                    &match_id,
+                    played_at,
+                ) {
+                    match client.upsert_match_timeline(&timeline) {
+                        Ok(()) => {
+                            let round_count = timeline
+                                .get("round_count")
+                                .and_then(serde_json::Value::as_u64)
+                                .unwrap_or(0);
+                            println!("uploaded match timeline ({round_count} rounds)");
+                        }
+                        Err(err) => eprintln!("match timeline upload failed: {err}"),
+                    }
+                }
+            }
+            Ok(())
+        }
+        "timeline-from-dump" => {
+            let path = args.get(1).map(PathBuf::from).ok_or_else(|| {
+                io::Error::new(
+                    io::ErrorKind::InvalidInput,
+                    "timeline-from-dump needs a dump path and match_id",
+                )
+            })?;
+            let match_id = args.get(2).ok_or_else(|| {
+                io::Error::new(
+                    io::ErrorKind::InvalidInput,
+                    "timeline-from-dump needs a dump path and match_id",
+                )
+            })?;
+            let rows = nettable_parser::extract_dump_rows(&path)?;
+            let cfg = Config::load()?;
+            let local_steam_id = (!cfg.steam_id.is_empty()).then(|| cfg.steam_id.as_str());
+            let played_at = rows
+                .iter()
+                .find(|row| row.key == "end_board")
+                .and_then(|row| row.observed_at.as_deref())
+                .unwrap_or("");
+            let timeline = match_builder::build_timeline_from_rows(
+                &rows,
+                local_steam_id,
+                match_id,
+                played_at,
+            )
+            .ok_or_else(|| {
+                io::Error::new(io::ErrorKind::InvalidData, "no timeline could be built from dump")
+            })?;
+            println!("{}", timeline);
             Ok(())
         }
         other => Err(io::Error::new(

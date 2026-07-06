@@ -2,6 +2,7 @@ use crate::{
     nettable_live::live_players_value, nettable_parser::NettableRow,
     unit_codes::{normalize_chess_lineup, normalize_chess_unit},
 };
+use serde_json::Value;
 
 const MAX_SESSION_ROUND_SNAPSHOTS: usize = 80;
 
@@ -38,7 +39,9 @@ pub(crate) fn build_match_timeline(
     let mut by_round = std::collections::BTreeMap::<i64, serde_json::Value>::new();
     for dump in session_dumps {
         let Some(round) = extract_round_from_rows(&dump.rows) else {
-            if let Some((round, players)) = extract_end_board_snapshot_from_rows(&dump.rows) {
+            if let Some((round, players)) =
+                end_board_snapshot_with_live_boards(&dump.rows, local_steam_id)
+            {
                 let snapshot = serde_json::json!({
                     "round": round,
                     "captured_at": dump.captured_at,
@@ -60,7 +63,9 @@ pub(crate) fn build_match_timeline(
             "death_team": extract_death_team_from_rows(&dump.rows),
         });
         by_round.entry(round).or_insert(snapshot);
-        if let Some((end_round, players)) = extract_end_board_snapshot_from_rows(&dump.rows) {
+        if let Some((end_round, players)) =
+            end_board_snapshot_with_live_boards(&dump.rows, local_steam_id)
+        {
             if end_round > round {
                 let snapshot = serde_json::json!({
                     "round": end_round,
@@ -92,6 +97,68 @@ pub(crate) fn build_match_timeline(
         "last_round": last_round,
         "rounds": rounds,
     }))
+}
+
+pub(crate) fn build_timeline_from_rows(
+    rows: &[NettableRow],
+    local_steam_id: Option<&str>,
+    match_id: &str,
+    played_at: &str,
+) -> Option<serde_json::Value> {
+    let captured_at = rows
+        .iter()
+        .find(|row| row.key == "end_board")
+        .and_then(|row| row.observed_at.as_deref())
+        .unwrap_or(played_at);
+    build_match_timeline(
+        &[SessionDump {
+            captured_at: captured_at.to_owned(),
+            rows: rows.to_vec(),
+        }],
+        local_steam_id,
+        None,
+        match_id,
+        played_at,
+    )
+}
+
+fn end_board_snapshot_with_live_boards(
+    rows: &[NettableRow],
+    local_steam_id: Option<&str>,
+) -> Option<(i64, serde_json::Value)> {
+    let (round, mut players) = extract_end_board_snapshot_from_rows(rows)?;
+    let (live_players, _) = live_players_value(rows, local_steam_id);
+    merge_live_board_fields_into_players(&mut players, &live_players);
+    Some((round, players))
+}
+
+fn merge_live_board_fields_into_players(
+    end_board_players: &mut Value,
+    live_players: &Value,
+) {
+    let (Some(end_obj), Some(live_obj)) = (end_board_players.as_object_mut(), live_players.as_object())
+    else {
+        return;
+    };
+    for (steam_id, end_player) in end_obj.iter_mut() {
+        let Some(live_player) = live_obj.get(steam_id).and_then(Value::as_object) else {
+            continue;
+        };
+        let Some(end_row) = end_player.as_object_mut() else {
+            continue;
+        };
+        for key in ["board", "hand"] {
+            let missing = end_row
+                .get(key)
+                .map(|value| value.is_null() || value.as_array().is_some_and(|items| items.is_empty()))
+                .unwrap_or(true);
+            if missing {
+                if let Some(value) = live_player.get(key).filter(|value| !value.is_null()) {
+                    end_row.insert(key.to_owned(), value.clone());
+                }
+            }
+        }
+    }
 }
 
 fn extract_end_board_snapshot_from_rows(rows: &[NettableRow]) -> Option<(i64, serde_json::Value)> {
