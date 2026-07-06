@@ -1,10 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import {
-  WEBSITE_BETA_FEATURES_FLAG,
-  WEBSITE_CHATBOT_FLAG,
-} from "@/lib/betaFlags";
+import { isAdminSteamId } from "@/lib/admin";
+import { WEBSITE_BETA_FEATURES_FLAG } from "@/lib/betaFlags";
 import { getPostHog } from "@/lib/posthog";
 
 export type BetaFeatureAccess = "loading" | "enabled" | "disabled";
@@ -59,7 +57,8 @@ export function useBetaFeaturesAccess(
 export function useChatbotAccess(
   steamId: string | null | undefined,
 ): BetaFeatureAccess {
-  return usePostHogFlagAccess(WEBSITE_CHATBOT_FLAG, steamId);
+  if (!steamId) return "disabled";
+  return isAdminSteamId(steamId) ? "enabled" : "disabled";
 }
 
 export function useBetaFeaturesEnabled(

@@ -1,7 +1,5 @@
-import {
-  WEBSITE_BETA_FEATURES_FLAG,
-  WEBSITE_CHATBOT_FLAG,
-} from "@/lib/betaFlags";
+import { isAdminSteamId } from "@/lib/admin";
+import { WEBSITE_BETA_FEATURES_FLAG } from "@/lib/betaFlags";
 
 type FlagValue =
   | boolean
@@ -79,5 +77,5 @@ export async function isBetaFeaturesEnabledForSteamId(
 export async function isChatbotEnabledForSteamId(
   steamId: string | null | undefined,
 ): Promise<boolean> {
-  return isPostHogFlagEnabledForSteamId(steamId, WEBSITE_CHATBOT_FLAG);
+  return isAdminSteamId(steamId);
 }
