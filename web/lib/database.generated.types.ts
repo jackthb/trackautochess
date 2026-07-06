@@ -446,12 +446,59 @@ export type Database = {
         }
         Relationships: []
       }
+      content_embeddings: {
+        Row: {
+          id: string
+          doc_type: string
+          title: string
+          content: string
+          url_path: string | null
+          content_hash: string
+          embedding: string
+          updated_at: string
+        }
+        Insert: {
+          id: string
+          doc_type: string
+          title: string
+          content: string
+          url_path?: string | null
+          content_hash: string
+          embedding: string | number[]
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          doc_type?: string
+          title?: string
+          content?: string
+          url_path?: string | null
+          content_hash?: string
+          embedding?: string | number[]
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
       auth_user_id_by_email: { Args: { p_email: string }; Returns: string }
+      match_content_docs: {
+        Args: {
+          query_embedding: number[] | string
+          match_count?: number
+        }
+        Returns: {
+          id: string
+          doc_type: string
+          title: string
+          content: string
+          url_path: string | null
+          similarity: number
+        }[]
+      }
       sync_player_season_queen_ranks: {
         Args: { p_steam_id: number }
         Returns: undefined

@@ -11,10 +11,19 @@ import { trackEvent } from "@/lib/analytics";
 import { getPostHog } from "@/lib/posthog";
 import { useSupabaseSession } from "@/lib/useSupabaseSession";
 
+const ChatWidget = dynamic(
+  () =>
+    import("@/components/ChatWidget").then((module) => ({
+      default: module.ChatWidget,
+    })),
+  { ssr: false },
+);
+
 const BOT_ID_PROTECTED_ROUTES = [
   { path: "/api/drodo/*", method: "GET" },
   { path: "/api/drodo/*", method: "POST" },
   { path: "/api/players/search", method: "GET" },
+  { path: "/api/chat", method: "POST" },
   { path: "/api/queens/refresh", method: "POST" },
   { path: "/api/support", method: "POST" },
 ];
@@ -95,6 +104,7 @@ export function AppChrome({ children }: { children: ReactNode }) {
       <Footer />
       <SpeedInsights />
       <CookieConsentBanner />
+      <ChatWidget />
     </>
   );
 }
