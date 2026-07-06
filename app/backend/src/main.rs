@@ -233,6 +233,35 @@ fn main() -> io::Result<()> {
             println!("{}", timeline);
             Ok(())
         }
+        "timeline-from-log" => {
+            let path = args.get(1).map(PathBuf::from).ok_or_else(|| {
+                io::Error::new(
+                    io::ErrorKind::InvalidInput,
+                    "timeline-from-log needs a console.log path and match_id",
+                )
+            })?;
+            let match_id = args.get(2).ok_or_else(|| {
+                io::Error::new(
+                    io::ErrorKind::InvalidInput,
+                    "timeline-from-log needs a console.log path and match_id",
+                )
+            })?;
+            let body = fs::read_to_string(&path)?;
+            let cfg = Config::load()?;
+            let local_steam_id = (!cfg.steam_id.is_empty()).then(|| cfg.steam_id.as_str());
+            let played_at = args.get(3).map(String::as_str).unwrap_or("");
+            let timeline = match_builder::build_timeline_from_log(
+                &body,
+                local_steam_id,
+                match_id,
+                played_at,
+            )
+            .ok_or_else(|| {
+                io::Error::new(io::ErrorKind::InvalidData, "no timeline could be built from log")
+            })?;
+            println!("{}", timeline);
+            Ok(())
+        }
         other => Err(io::Error::new(
             io::ErrorKind::InvalidInput,
             format!("unknown command: {other}"),

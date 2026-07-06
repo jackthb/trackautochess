@@ -1,5 +1,6 @@
 use crate::{
-    nettable_live::live_players_value, nettable_parser::NettableRow,
+    nettable_live::live_players_value,
+    nettable_parser::{self, NettableRow},
     unit_codes::{normalize_chess_lineup, normalize_chess_unit},
 };
 use serde_json::Value;
@@ -79,6 +80,7 @@ pub(crate) fn build_match_timeline(
             }
         }
     }
+    collapse_adjacent_duplicate_board_rounds(&mut by_round);
     if by_round.is_empty() {
         return None;
     }
@@ -97,6 +99,78 @@ pub(crate) fn build_match_timeline(
         "last_round": last_round,
         "rounds": rounds,
     }))
+}
+
+pub(crate) fn replay_session_dumps_from_log(body: &str) -> Vec<SessionDump> {
+    let mut matches: Vec<Vec<SessionDump>> = Vec::new();
+    let mut current: Vec<SessionDump> = Vec::new();
+    let mut last_round: Option<i64> = None;
+
+    let mut finish_match = |current: &mut Vec<SessionDump>| {
+        if !current.is_empty() {
+            matches.push(std::mem::take(current));
+        }
+    };
+
+    nettable_parser::replay_round_snapshots_from_log(body, |captured_at, rows| {
+        if rows.is_empty() {
+            return;
+        }
+        let has_end_board = rows
+            .iter()
+            .any(|row| row.table_name.ends_with("dac_table") && row.key == "end_board");
+        if has_end_board {
+            store_session_dump(
+                &mut current,
+                SessionDump {
+                    captured_at: captured_at.clone(),
+                    rows,
+                },
+            );
+            finish_match(&mut current);
+            last_round = None;
+            return;
+        }
+        let Some(round) = extract_round_from_rows(&rows) else {
+            return;
+        };
+        if round == 1 && last_round.is_some_and(|prev| prev > 5) {
+            finish_match(&mut current);
+            last_round = None;
+        }
+        if last_round == Some(round) {
+            return;
+        }
+        store_session_dump(
+            &mut current,
+            SessionDump {
+                captured_at,
+                rows,
+            },
+        );
+        last_round = Some(round);
+    });
+    finish_match(&mut current);
+    matches.into_iter().last().unwrap_or_default()
+}
+
+pub(crate) fn build_timeline_from_log(
+    body: &str,
+    local_steam_id: Option<&str>,
+    match_id: &str,
+    played_at: &str,
+) -> Option<serde_json::Value> {
+    let session_dumps = replay_session_dumps_from_log(body);
+    if session_dumps.is_empty() {
+        return None;
+    }
+    build_match_timeline(
+        &session_dumps,
+        local_steam_id,
+        None,
+        match_id,
+        played_at,
+    )
 }
 
 pub(crate) fn build_timeline_from_rows(
@@ -120,6 +194,50 @@ pub(crate) fn build_timeline_from_rows(
         match_id,
         played_at,
     )
+}
+
+fn collapse_adjacent_duplicate_board_rounds(by_round: &mut std::collections::BTreeMap<i64, Value>) {
+    let keys: Vec<i64> = by_round.keys().copied().collect();
+    for window in keys.windows(2) {
+        let [prev, next] = window else {
+            continue;
+        };
+        let (Some(prev_round), Some(next_round)) = (by_round.get(prev), by_round.get(next)) else {
+            continue;
+        };
+        if round_boards_equivalent(prev_round, next_round) {
+            by_round.remove(prev);
+        }
+    }
+}
+
+fn round_boards_equivalent(left: &Value, right: &Value) -> bool {
+    let (Some(left_players), Some(right_players)) = (
+        left.get("players").and_then(Value::as_object),
+        right.get("players").and_then(Value::as_object),
+    ) else {
+        return false;
+    };
+    let mut compared_boards = false;
+    for (steam_id, left_player) in left_players {
+        let Some(right_player) = right_players.get(steam_id) else {
+            return false;
+        };
+        let (Some(left_board), Some(right_board)) = (
+            left_player.get("board").and_then(Value::as_array),
+            right_player.get("board").and_then(Value::as_array),
+        ) else {
+            continue;
+        };
+        if left_board.is_empty() || right_board.is_empty() {
+            continue;
+        }
+        compared_boards = true;
+        if left_board != right_board {
+            return false;
+        }
+    }
+    compared_boards
 }
 
 fn end_board_snapshot_with_live_boards(

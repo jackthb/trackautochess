@@ -325,6 +325,114 @@ pub fn rows_from_parsed(parsed: ParsedLog) -> Vec<NettableRow> {
     )
 }
 
+/// Walk a console.log in chronological order and emit a full nettable snapshot
+/// after each `round_info` or `end_board` key lands.
+pub fn replay_round_snapshots_from_log<F>(body: &str, mut on_snapshot: F)
+where
+    F: FnMut(String, Vec<NettableRow>),
+{
+    let mut parsed: ParsedLogWithObservedAt = BTreeMap::new();
+    let mut table: Option<String> = None;
+    let mut key: Option<String> = None;
+    let mut key_observed_at: Option<String> = None;
+    let mut hex = String::new();
+
+    let mut flush = |parsed: &mut ParsedLogWithObservedAt,
+                     table: &Option<String>,
+                     key: &Option<String>,
+                     key_observed_at: &Option<String>,
+                     hex: &mut String| {
+        if let (Some(table), Some(key)) = (table, key) {
+            let raw_hex = hex.clone();
+            let decoded = decode_hex(hex);
+            let should_skip = decoded
+                .as_ref()
+                .map(|bytes| bytes.len() < 8 || &bytes[..4] != b"VBKV")
+                .unwrap_or_else(|_| raw_hex.trim().is_empty());
+            if should_skip {
+                hex.clear();
+                return;
+            }
+            if let Ok(value) = decoded.and_then(|bytes| parse_vbkv(&bytes)) {
+                parsed
+                    .entry(table.clone())
+                    .or_default()
+                    .insert(key.clone(), (value, key_observed_at.clone()));
+                if key == "round_info" || key == "end_board" {
+                    let captured_at = key_observed_at
+                        .clone()
+                        .unwrap_or_else(|| chrono::Utc::now().to_rfc3339());
+                    let rows = rows_from_parsed_with_observed_at(parsed.clone());
+                    on_snapshot(captured_at, rows);
+                }
+            }
+        }
+        hex.clear();
+    };
+
+    for line in body.lines() {
+        let Some(idx) = line.find("[stringtables]") else {
+            continue;
+        };
+        let observed_at = console_line_observed_at(line);
+        let trimmed = &line[idx..];
+        if let Some(rest) = trimmed.strip_prefix("[stringtables] table ") {
+            flush(
+                &mut parsed,
+                &table,
+                &key,
+                &key_observed_at,
+                &mut hex,
+            );
+            table = rest.split_whitespace().next().map(str::to_owned);
+            key = None;
+            key_observed_at = None;
+            continue;
+        }
+        if let Some(idx) = trimmed.find(">>") {
+            let after = &trimmed[idx + 2..];
+            let tokens = after.split_whitespace().collect::<Vec<_>>();
+            let mut trailing_hex = Vec::new();
+            for token in tokens.iter().rev() {
+                if (2..=8).contains(&token.len())
+                    && token.len() % 2 == 0
+                    && token.chars().all(|c| c.is_ascii_hexdigit())
+                {
+                    trailing_hex.push(*token);
+                } else {
+                    break;
+                }
+            }
+            for token in trailing_hex.iter().rev() {
+                hex.push_str(token);
+            }
+            continue;
+        }
+        if let Some((_, rest)) = trimmed.split_once(':') {
+            let candidate = rest.trim();
+            if !candidate.starts_with('>') && !candidate.is_empty() {
+                flush(
+                    &mut parsed,
+                    &table,
+                    &key,
+                    &key_observed_at,
+                    &mut hex,
+                );
+                key = Some(candidate.to_owned());
+                key_observed_at = observed_at;
+                continue;
+            }
+        }
+    }
+    flush(
+        &mut parsed,
+        &table,
+        &key,
+        &key_observed_at,
+        &mut hex,
+    );
+}
+
 fn rows_from_parsed_with_observed_at(parsed: ParsedLogWithObservedAt) -> Vec<NettableRow> {
     let mut rows = Vec::new();
     for (table_name, entries) in parsed {
