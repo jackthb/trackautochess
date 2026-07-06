@@ -1,10 +1,9 @@
--- Repair production drift: desktop capture authenticates as the PostgREST
--- `authenticated` role but some migrations were never applied remotely.
--- Idempotent so it is safe whether or not earlier migrations landed.
+-- Desktop capture authenticates as PostgREST `authenticated`. Earlier grant
+-- migrations were never applied on the linked project; this idempotent repair
+-- unblocks match uploads without depending on later chatbot migrations.
 
 BEGIN;
 
--- ── player_seasons.queen_rank (from 20260703170000) ──────────────────────────
 ALTER TABLE public.player_seasons
     ADD COLUMN IF NOT EXISTS queen_rank int,
     ADD COLUMN IF NOT EXISTS peak_queen_rank int;
@@ -48,7 +47,6 @@ $$;
 GRANT EXECUTE ON FUNCTION public.sync_player_season_queen_ranks(bigint)
     TO anon, authenticated, service_role;
 
--- ── authenticated capture writes (from 20260619123000 + matches policies) ───
 GRANT USAGE ON SCHEMA public TO authenticated;
 
 GRANT SELECT, INSERT, UPDATE ON public.users TO authenticated;
