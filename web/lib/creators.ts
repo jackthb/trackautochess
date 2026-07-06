@@ -843,3 +843,12 @@ export async function loadCreatorUploads(): Promise<CreatorMedia> {
       .sort((a, b) => publishedTime(b) - publishedTime(a)),
   };
 }
+
+export const loadCachedCreatorUploads = unstable_cache(
+  loadCreatorUploads,
+  ["creator-uploads"],
+  {
+    revalidate: CREATOR_FEED_REVALIDATE_SECONDS,
+    tags: ["creator-uploads"],
+  }
+);
