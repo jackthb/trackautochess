@@ -3,8 +3,8 @@ import Link from "next/link";
 import { PageLayout } from "@/components/PageLayout";
 import { SITE_NAME, SITE_TITLE } from "@/lib/site";
 import {
-  loadCreatorLiveStreams,
-  loadCreatorUploads,
+  loadCachedCreatorLiveStreams,
+  loadCachedCreatorUploads,
   type CreatorLiveStream,
   type CreatorPlatform,
   type CreatorUpload,
@@ -187,8 +187,8 @@ function UploadCard({
 
 export default async function CreatorsPage() {
   const [{ streams, error }, creatorMedia] = await Promise.all([
-    loadCreatorLiveStreams(),
-    loadCreatorUploads(),
+    loadCachedCreatorLiveStreams(),
+    loadCachedCreatorUploads(),
   ]);
   const { uploads, liveStreams } = creatorMedia;
 
