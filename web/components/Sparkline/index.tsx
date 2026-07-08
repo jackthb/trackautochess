@@ -47,7 +47,7 @@ interface SparklineProps {
   ariaLabel?: string;
 }
 
-const MARGIN = { top: 16, right: 12, bottom: 22, left: 12 };
+const MARGIN = { top: 16, right: 28, bottom: 22, left: 28 };
 
 /**
  * Shared MMR/Queen-Rank trend chart, built on visx. The hover interaction is
