@@ -36,7 +36,7 @@ export function LoginScreen({ status, authError, onClearAuthError }: LoginScreen
         <h1 className="login-title">Login with Steam</h1>
         <p className="login-copy">
           {backendReady
-            ? "Sign in to load your match history, replays, and synced profile data."
+            ? "Sign in to capture live matches and sync them to your profile."
             : "Connecting to the tracker backend..."}
         </p>
         <button

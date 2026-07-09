@@ -1,5 +1,29 @@
+const fs = require("fs");
+const path = require("path");
+
 const UPDATE_CHECK_INTERVAL_MS = 6 * 3600 * 1000;
 const MAX_UPDATE_ERROR_MESSAGE_LENGTH = 140;
+
+function findUpdateConfigPath() {
+  const candidates = [
+    path.join(process.resourcesPath, "app-update.yml"),
+    path.join(process.resourcesPath, "app-update.yaml"),
+  ];
+  return candidates.find((candidate) => fs.existsSync(candidate)) ?? null;
+}
+
+function isBenignUpdateError(error) {
+  const rawMessage = error?.message || String(error || "");
+  const compactMessage = rawMessage.replace(/\r?\n/g, " ").replace(/\s+/g, " ").trim().toLowerCase();
+
+  if (!compactMessage) return false;
+
+  return (
+    /enoent|no such file or directory/.test(compactMessage) ||
+    /app-update\.ya?ml/.test(compactMessage) ||
+    /release[\\/]+win-unpacked/.test(compactMessage)
+  );
+}
 
 function formatUpdateError(error) {
   const rawMessage = error?.message || String(error || "");
@@ -7,6 +31,10 @@ function formatUpdateError(error) {
 
   if (!compactMessage) {
     return "Update check failed.";
+  }
+
+  if (isBenignUpdateError(error)) {
+    return null;
   }
 
   if (/\b404\b|not found|releases\.atom/i.test(compactMessage)) {
@@ -30,17 +58,52 @@ function formatUpdateError(error) {
   return `${safeMessage.slice(0, MAX_UPDATE_ERROR_MESSAGE_LENGTH - 3)}...`;
 }
 
-function createUpdater({ app, isPackaged, emitEvent }) {
+function createUpdater({ isPackaged, emitEvent }) {
   let autoUpdater = null;
   let updateDownloaded = false;
   let latestVersion = "";
+  let updaterEnabled = null;
 
   function emit(payload) {
     emitEvent(payload);
   }
 
+  function isUpdaterEnabled() {
+    if (updaterEnabled !== null) return updaterEnabled;
+    if (!isPackaged) {
+      updaterEnabled = false;
+      return false;
+    }
+    if (process.env.DAC_DISABLE_UPDATES === "1") {
+      updaterEnabled = false;
+      return false;
+    }
+    updaterEnabled = Boolean(findUpdateConfigPath());
+    return updaterEnabled;
+  }
+
+  function emitUpdateError(error) {
+    if (isBenignUpdateError(error)) {
+      console.info(
+        "Auto-updater skipped:",
+        error?.message || String(error || "missing update metadata"),
+      );
+      return;
+    }
+
+    const message = formatUpdateError(error);
+    if (!message) return;
+
+    console.warn(`Update check failed: ${message}`);
+    emit({
+      type: "update_error",
+      backend: "electron",
+      message,
+    });
+  }
+
   function getUpdater() {
-    if (!isPackaged) return null;
+    if (!isUpdaterEnabled()) return null;
     if (autoUpdater) return autoUpdater;
 
     try {
@@ -95,13 +158,7 @@ function createUpdater({ app, isPackaged, emitEvent }) {
       });
     });
 
-    autoUpdater.on("error", (error) => {
-      emit({
-        type: "update_error",
-        backend: "electron",
-        message: formatUpdateError(error),
-      });
-    });
+    autoUpdater.on("error", emitUpdateError);
 
     return autoUpdater;
   }
@@ -112,13 +169,7 @@ function createUpdater({ app, isPackaged, emitEvent }) {
     try {
       await updater.checkForUpdates();
     } catch (error) {
-      const message = formatUpdateError(error);
-      console.warn(`Update check failed: ${message}`);
-      emit({
-        type: "update_error",
-        backend: "electron",
-        message,
-      });
+      emitUpdateError(error);
     }
   }
 
@@ -138,7 +189,14 @@ function createUpdater({ app, isPackaged, emitEvent }) {
   }
 
   function start() {
-    if (!isPackaged) return;
+    if (!isUpdaterEnabled()) {
+      if (isPackaged) {
+        console.info(
+          "Auto-updater disabled: this build has no app-update.yml (expected for local win-unpacked builds).",
+        );
+      }
+      return;
+    }
     setTimeout(checkForUpdate, 10_000);
     setInterval(checkForUpdate, UPDATE_CHECK_INTERVAL_MS);
   }

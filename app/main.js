@@ -125,7 +125,6 @@ const backend = createBackendSupervisor({
   appendLog: trackerLog.append,
 });
 const updater = createUpdater({
-  app,
   isPackaged: IS_PACKAGED,
   emitEvent: handleBackendEvent,
 });
