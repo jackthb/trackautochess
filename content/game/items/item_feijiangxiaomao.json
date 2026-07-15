@@ -3,7 +3,7 @@
   "name": "Ascetics Cap",
   "slug": "ascetics-cap",
   "icon": "items/ascetic_cap.png",
-  "commentary": "The transformation chance depends on the carrier's base shop cost, not the current round or star level.\n\n| Carrier cost | Script threshold |\n|---:|---:|\n| 1 | 90% |\n| 2 | 80% |\n| 3 | 70% |\n| 4 | 60% |\n| 5 | 50% |\n\nOn success, the carrier is replaced by a random Undead piece of the same cost and star level. At most one piece can transform per round.\n\nA 3-star Druid is treated as costing 1 less for both the roll and the resulting Undead. Consequently, a 3-star 1-cost Druid is treated as cost 0 and cannot transform.\n\nImplementation detail: the game rolls `RandomInt(1, 100) < threshold`, so the literal effective chances are 89%, 79%, 69%, 59%, and 49%, despite the advertised 90%–50% thresholds.",
+  "commentary": "The transformation chance depends on the carrier's base shop cost.\n\n| Carrier cost | Script threshold |\n|---:|---:|\n| 1 | 90% |\n| 2 | 80% |\n| 3 | 70% |\n| 4 | 60% |\n| 5 | 50% |\n\nOn success, the carrier is replaced by a random Undead piece of the same cost and star level. At most one piece can transform per round.\n\nA 3-star Druid is treated as costing 1 less for both the roll and the resulting Undead, i.e. a 3-star 1-cost Druid is treated as 0-cost and cannot transform.\n\nImplementation detail: the game rolls `RandomInt(1, 100) < threshold`, so the literal effective chances are 89%, 79%, 69%, 59%, and 49%, despite the advertised 90%–50% thresholds.",
   "source": {
     "name": "Ascetics Cap",
     "names": {
