@@ -3,6 +3,7 @@
   "name": "Ascetics Cap",
   "slug": "ascetics-cap",
   "icon": "items/ascetic_cap.png",
+  "commentary": "The transformation chance depends on the carrier's base shop cost.\n\n| Carrier cost | Script threshold |\n|---:|---:|\n| 1 | 90% |\n| 2 | 80% |\n| 3 | 70% |\n| 4 | 60% |\n| 5 | 50% |\n\nOn success, the carrier is replaced by a random Undead piece of the same cost and star level. At most one piece can transform per round.\n\nA 3-star Druid is treated as costing 1 less for both the roll and the resulting Undead, i.e. a 3-star 1-cost Druid is treated as 0-cost and cannot transform.",
   "source": {
     "name": "Ascetics Cap",
     "names": {

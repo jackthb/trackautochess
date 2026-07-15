@@ -1,166 +1,86 @@
 .wrap {
-  margin: 0 0 24px;
+  padding: 16px 18px 18px;
 }
-.fileBody {
-  padding: 18px 20px 14px;
-  border: 1px solid var(--border);
-  background: var(--bg-surface);
-  border-radius: 0 var(--r-8) var(--r-8) var(--r-8);
-}
-.fileBodyFull {
-  border-radius: var(--r-8);
-}
-.head {
+
+.statsRow {
   display: flex;
-  align-items: baseline;
-  justify-content: space-between;
   flex-wrap: wrap;
-  gap: 12px;
-  margin-bottom: 12px;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 14px;
 }
-.headLead {
-  display: flex;
-  align-items: baseline;
-  gap: 10px;
-  flex-wrap: wrap;
-}
-.delta {
+
+.deltaBadge {
   font-family: var(--font-mono);
   font-size: var(--fs-12);
-  font-weight: 600;
+  font-weight: var(--fw-semibold);
+  border-radius: var(--r-3);
+  padding: 4px 10px;
+  border: 1px solid transparent;
 }
+
 .deltaUp {
   color: var(--green-bright, #4eaa62);
+  background: rgba(78, 170, 98, 0.1);
+  border-color: rgba(78, 170, 98, 0.22);
 }
+
 .deltaDown {
   color: var(--red-bright, #e35d5b);
+  background: rgba(227, 93, 91, 0.1);
+  border-color: rgba(227, 93, 91, 0.22);
 }
+
 .deltaFlat {
   color: var(--text-muted);
+  background: var(--bg-deep);
+  border-color: var(--border-subtle);
 }
-.seasonLabel {
+
+.statChip {
   font-family: var(--font-mono);
-  font-size: var(--fs-12);
-  font-weight: 600;
+  font-size: var(--fs-11);
+  letter-spacing: var(--tr-ui);
   color: var(--text-secondary);
+  background: var(--bg-deep);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--r-3);
+  padding: 4px 9px;
 }
-.label {
-  font-family: var(--font-mono);
-  font-size: var(--fs-12);
-  letter-spacing: var(--tr-upper);
-  text-transform: uppercase;
-  color: var(--text-muted);
-}
-.meta {
-  font-family: var(--font-mono);
-  font-size: var(--fs-12);
-  color: var(--text-muted);
-  text-align: right;
-  overflow-wrap: anywhere;
-}
-.meta strong {
+
+.statChip strong {
   color: var(--text-primary);
+  font-weight: var(--fw-semibold);
 }
+
+.chartWell {
+  background: rgba(0, 0, 0, 0.18);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--r-4);
+  padding: 6px 2px 2px;
+}
+
 .chartWrap {
   width: 100%;
-  /* visible so the hover tooltip can sit just above the line near the top */
   overflow: visible;
 }
-.seasonTabs {
-  display: inline-flex;
-  width: fit-content;
-  max-width: 100%;
-  gap: 2px;
-  margin: 0 0 -1px;
-  padding: 0;
-  overflow-x: auto;
-  background: transparent;
-}
-.seasonTab {
-  position: relative;
-  flex: 0 0 auto;
-  border: 1px solid var(--border-subtle);
-  border-bottom: 0;
-  border-radius: var(--r-6, 6px) var(--r-6, 6px) 0 0;
-  padding: 7px 12px 8px;
-  font: inherit;
-  font-family: var(--font-mono);
-  font-size: var(--fs-12);
-  color: var(--text-muted);
-  background: rgba(255, 255, 255, 0.025);
-  cursor: pointer;
-}
-.seasonTab:hover {
-  color: var(--text-secondary);
-}
-.seasonTabActive {
-  z-index: 1;
-  color: var(--text-primary);
-  border-color: var(--border);
-  background: var(--bg-surface);
-}
-.svg {
-  display: block;
-  width: 100%;
-  height: auto;
-  color: var(--accent);
-}
-.area {
-  fill: currentColor;
-  opacity: 0.08;
-}
-.line {
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 1.5;
-}
-.dot {
-  fill: currentColor;
-  opacity: 0.6;
-}
-.dot.season {
-  opacity: 0.85;
-}
-.lastDot {
-  fill: currentColor;
-}
-.firstDot {
-  fill: var(--bg-surface);
-  stroke: currentColor;
-  stroke-width: 1.5;
-}
-.peakDot {
-  fill: none;
-  stroke: var(--green-bright, #4eaa62);
-  stroke-width: 1.5;
-}
-.peakLabel {
-  fill: var(--green-bright, #4eaa62);
-  font-weight: 600;
-}
-.troughDot {
-  fill: none;
-  stroke: var(--red-bright, #e35d5b);
-  stroke-width: 1.5;
-}
-.troughLabel {
-  fill: var(--red-bright, #e35d5b);
-  font-weight: 600;
-}
-.axis {
-  font-family: var(--font-mono);
-  font-size: 10px;
-  fill: var(--text-muted);
-}
-.lastLabel {
-  fill: var(--text-primary);
-  font-weight: 600;
-}
+
 .empty {
-  margin: 4px 0 2px;
-  padding: 18px 0;
+  margin: 0;
+  padding: 28px 12px;
   font-family: var(--font-mono);
   font-size: var(--fs-12);
   color: var(--text-muted);
   text-align: center;
+  line-height: var(--lh-body);
+}
+
+.note {
+  margin: 14px 0 0;
+  padding-top: 12px;
+  border-top: 1px solid var(--border-subtle);
+  font-family: var(--font-mono);
+  font-size: var(--fs-11, 11px);
+  color: var(--text-muted);
+  line-height: var(--lh-body);
 }

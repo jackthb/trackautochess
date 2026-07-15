@@ -7,6 +7,10 @@ import { Button } from "@dac/shared/Button";
 import { StatsGrid } from "@dac/shared/StatsGrid";
 import { SeasonHistoryGrid, type SeasonSnapshot } from "@dac/shared/SeasonHistoryGrid";
 import { MmrSparkline, type MmrSnapshot } from "@/components/MmrSparkline";
+import {
+  buildMmrSeasonTabs,
+  preferredMmrSeasonKey,
+} from "@/components/MmrSparkline/seasonHistory";
 import { MatchHistoryList } from "@/components/matches/MatchHistoryList";
 import {
   QueenRankSparkline,
@@ -320,6 +324,7 @@ export default function PlayerView({
   );
   const [refreshError, setRefreshError] = useState<string | null>(null);
   const [historyTab, setHistoryTab] = useState<HistoryTab>("mmr");
+  const [mmrSeasonKey, setMmrSeasonKey] = useState<string | null>(null);
   const [nowMs, setNowMs] = useState<number | null>(null);
   const [refreshing, setRefreshing] = useState(false);
   const [avatarFailed, setAvatarFailed] = useState(false);
@@ -358,6 +363,19 @@ export default function PlayerView({
       ),
     [mmrHistory, drodo?.mmr, drodo?.season, drodoLastFetchedAt]
   );
+  const mmrSeasonTabs = useMemo(
+    () => buildMmrSeasonTabs(effectiveMmrHistory, drodo?.season),
+    [effectiveMmrHistory, drodo?.season]
+  );
+  const defaultMmrSeasonKey = useMemo(
+    () =>
+      preferredMmrSeasonKey(
+        mmrSeasonTabs,
+        effectiveMmrHistory,
+        drodo?.season
+      ),
+    [mmrSeasonTabs, effectiveMmrHistory, drodo?.season]
+  );
   const effectiveQueenRankHistory = useMemo(
     () =>
       historyWithCurrentQueenRank(
@@ -372,9 +390,9 @@ export default function PlayerView({
   const historyTabs = useMemo(
     () =>
       [
-        { key: "mmr" as const, label: "MMR History" },
+        { key: "mmr" as const, label: "MMR" },
         ...(showQueenRankHistory
-          ? [{ key: "queen" as const, label: "Queen Rank" }]
+          ? [{ key: "queen" as const, label: "Queen rank" }]
           : []),
       ],
     [showQueenRankHistory]
@@ -390,6 +408,15 @@ export default function PlayerView({
       setHistoryTab("mmr");
     }
   }, [historyTab, historyTabs]);
+
+  useEffect(() => {
+    setMmrSeasonKey(defaultMmrSeasonKey);
+  }, [defaultMmrSeasonKey]);
+
+  useEffect(() => {
+    if (mmrSeasonTabs.some((tab) => tab.key === mmrSeasonKey)) return;
+    setMmrSeasonKey(defaultMmrSeasonKey);
+  }, [defaultMmrSeasonKey, mmrSeasonKey, mmrSeasonTabs]);
 
   useEffect(() => {
     setNowMs(Date.now());
@@ -758,36 +785,66 @@ export default function PlayerView({
           {canViewHistory ? (
             <>
               <div className={styles.historyPanel}>
-                {historyTabs.length > 1 && (
-                  <div
-                    className={styles.historyTabs}
-                    role="tablist"
-                    aria-label="Rating history"
-                  >
-                    {historyTabs.map((tab) => (
-                      <button
-                        key={tab.key}
-                        type="button"
-                        className={`${styles.historyTab} ${historyTab === tab.key ? styles.historyTabActive : ""}`}
-                        onClick={() => setHistoryTab(tab.key)}
-                        role="tab"
-                        aria-selected={historyTab === tab.key}
-                      >
-                        {tab.label}
-                      </button>
-                    ))}
-                  </div>
-                )}
-                <div className={styles.historyTabPanel} role="tabpanel">
-                  {historyTab === "queen" ? (
-                    <QueenRankSparkline snapshots={effectiveQueenRankHistory} />
-                  ) : (
-                    <MmrSparkline
-                      snapshots={effectiveMmrHistory}
-                      currentSeason={drodo?.season}
-                      queenRank={drodo?.queen_rank}
-                    />
+                <div className={styles.historyCard}>
+                  {(historyTabs.length > 1 || mmrSeasonTabs.length > 1) && (
+                    <div className={styles.historyHeader}>
+                      {historyTabs.length > 1 && (
+                        <div
+                          className={styles.segmented}
+                          role="tablist"
+                          aria-label="Rating history"
+                        >
+                          {historyTabs.map((tab) => (
+                            <button
+                              key={tab.key}
+                              type="button"
+                              className={`${styles.segment} ${historyTab === tab.key ? styles.segmentActive : ""}`}
+                              onClick={() => setHistoryTab(tab.key)}
+                              role="tab"
+                              aria-selected={historyTab === tab.key}
+                            >
+                              {tab.label}
+                            </button>
+                          ))}
+                        </div>
+                      )}
+                      {historyTab === "mmr" && mmrSeasonTabs.length > 1 && (
+                        <div className={styles.historyHeaderTools}>
+                          <div
+                            className={styles.segmented}
+                            role="tablist"
+                            aria-label="MMR history season"
+                          >
+                            {mmrSeasonTabs.map((tab) => (
+                              <button
+                                key={tab.key}
+                                type="button"
+                                className={`${styles.segment} ${mmrSeasonKey === tab.key ? styles.segmentActive : ""}`}
+                                onClick={() => setMmrSeasonKey(tab.key)}
+                                role="tab"
+                                aria-selected={mmrSeasonKey === tab.key}
+                              >
+                                {tab.label}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
                   )}
+                  <div className={styles.historyTabPanel} role="tabpanel">
+                    {historyTab === "queen" ? (
+                      <QueenRankSparkline
+                        snapshots={effectiveQueenRankHistory}
+                      />
+                    ) : (
+                      <MmrSparkline
+                        snapshots={effectiveMmrHistory}
+                        activeSeasonKey={mmrSeasonKey}
+                        queenRank={drodo?.queen_rank}
+                      />
+                    )}
+                  </div>
                 </div>
               </div>
               <SeasonHistoryGrid seasons={seasons} />

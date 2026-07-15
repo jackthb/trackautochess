@@ -52,7 +52,9 @@ export function buildStatItems(
         : `MMR · ${rank}`;
     drodoItems.push({ key: "drodo-mmr", value: drodo.mmr, label: rankLabel, source: "drodo" });
   }
-  if (drodo?.max_mmr != null) drodoItems.push({ key: "drodo-peak", value: drodo.max_mmr, label: "Peak MMR", tone: "gold", source: "drodo" });
+  if (drodo?.max_mmr != null && drodo.max_mmr !== drodo.mmr) {
+    drodoItems.push({ key: "drodo-peak", value: drodo.max_mmr, label: "Peak MMR", tone: "gold", source: "drodo" });
+  }
   if (drodo?.season_games != null && drodo.season_games > 0 && drodo?.chicken_count != null) {
     const winPct = ((drodo.chicken_count / drodo.season_games) * 100).toFixed(0);
     drodoItems.push({ key: "drodo-win-rate", value: `${winPct}%`, label: "Win Rate", tone: "gold", source: "drodo" });
