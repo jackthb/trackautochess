@@ -1,6 +1,7 @@
-import { mmrToRank } from "@dac/shared/game-utils";
+import { mmrLevelToRank, mmrToRank } from "@dac/shared/game-utils";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { createSupabaseServerClient } from "@/lib/supabase";
+import { DRODO_LIVE_FETCH_ENABLED } from "@/lib/drodoLive";
 import {
   fetchSteamProfile,
   playerProfilePath,
@@ -79,8 +80,13 @@ export async function fetchTwitchStats(
 
   const drodo = drodoRes.data;
   const hasStats = Boolean(drodo && !drodo.drodo_profile_missing);
-  const mmr = hasStats ? (drodo?.drodo_mmr ?? null) : null;
+  const mmr = hasStats && DRODO_LIVE_FETCH_ENABLED ? (drodo?.drodo_mmr ?? null) : null;
+  const mmrLevel = hasStats ? (drodo?.drodo_mmr_level ?? null) : null;
   const queenLadderRank = hasStats ? (drodo?.queen_ladder_rank ?? null) : null;
+  const rank =
+    (mmr != null ? mmrToRank(mmr) : null) ||
+    mmrLevelToRank(mmrLevel) ||
+    null;
 
   return {
     player: {
@@ -91,13 +97,14 @@ export async function fetchTwitchStats(
     },
     stats: {
       mmr,
-      max_mmr: hasStats ? (drodo?.drodo_max_mmr ?? null) : null,
+      max_mmr:
+        hasStats && DRODO_LIVE_FETCH_ENABLED ? (drodo?.drodo_max_mmr ?? null) : null,
       season: hasStats ? (drodo?.drodo_season ?? null) : null,
       season_games: hasStats ? (drodo?.drodo_season_games ?? null) : null,
       candy: hasStats ? (drodo?.drodo_candy ?? null) : null,
       chicken_count: hasStats ? (drodo?.drodo_chicken_count ?? null) : null,
-      rank: mmrToRank(mmr) || null,
-      mmr_level: hasStats ? (drodo?.drodo_mmr_level ?? null) : null,
+      rank,
+      mmr_level: mmrLevel,
       queen_ladder_rank: queenLadderRank,
     },
     generated_at: new Date().toISOString(),
@@ -110,7 +117,9 @@ export function formatTwitchMmrChatMessage(stats: TwitchStatsResponse): string {
   const mmrText =
     typeof stats.stats.mmr === "number"
       ? `${stats.stats.mmr.toLocaleString("en-US")} MMR${rankSuffix}`
-      : "MMR unavailable";
+      : stats.stats.rank
+        ? `Rank: ${stats.stats.rank} — live MMR unavailable`
+        : "MMR unavailable";
 
   return [
     displayName,

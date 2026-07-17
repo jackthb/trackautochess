@@ -201,7 +201,7 @@ async function loadPollSnapshot(
   const { data } = await supabase
     .from("users")
     .select(
-      "drodo_mmr, drodo_season_games, drodo_chicken_count, queen_ladder_rank, queen_ladder_last_seen_at, poll_interval_seconds"
+      "drodo_mmr, drodo_max_mmr, drodo_season, drodo_season_games, drodo_chicken_count, queen_ladder_rank, queen_ladder_last_seen_at, poll_interval_seconds"
     )
     .filter("steam_id", "eq", steamId)
     .maybeSingle<PollSnapshotRow>();
@@ -216,7 +216,7 @@ async function loadPollSnapshots(
   const { data } = await supabase
     .from("users")
     .select(
-      "steam_id::text, drodo_mmr, drodo_season_games, drodo_chicken_count, queen_ladder_rank, queen_ladder_last_seen_at, poll_interval_seconds"
+      "steam_id::text, drodo_mmr, drodo_max_mmr, drodo_season, drodo_season_games, drodo_chicken_count, queen_ladder_rank, queen_ladder_last_seen_at, poll_interval_seconds"
     )
     .filter("steam_id", "in", `(${steamIds.join(",")})`);
   return new Map(
@@ -546,7 +546,7 @@ export async function fetchAndCacheDrodo(
     {
       fetch: drodoFetch,
       loadPollSnapshots: async (ids) => {
-        if (!supabase || options.pollMode !== "adaptive") return new Map();
+        if (!supabase) return new Map();
         const snapshot = await loadPollSnapshot(ids[0], supabase);
         return snapshot ? new Map([[ids[0], snapshot]]) : new Map();
       },

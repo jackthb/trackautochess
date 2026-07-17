@@ -16,9 +16,17 @@ should not be used as part of the background polling cadence.
 
 | Cohort | Cadence | Notes |
 | --- | --- | --- |
-| Visible Queen board | Capture-driven (Drodo refresh parked) | `/queens` shows the saved in-game ladder snapshot. The 5-minute Drodo view refresh is behind `QUEENS_DRODO_VIEW_REFRESH_ENABLED` until Drodo returns `queen_rank` / season MMR again. |
-| Active players | Once per day | Recently signed in with Steam (14-day window). Queen ladder rank does **not** count as active. |
-| Inactive players | Once per week | Tracked users who are not in the active cohort. |
+| All Drodo live fetch | **Parked** | Public `/courier/get` no longer returns season MMR. Flip `DRODO_LIVE_FETCH_ENABLED` in `web/lib/drodoLive.ts` (and Cronicle `DRODO_LIVE_FETCH_ENABLED=1`) only if Drodo restores those fields. |
+| Visible Queen board | Capture-driven (Drodo refresh parked) | `/queens` shows the saved in-game ladder snapshot. The 5-minute Drodo view refresh is behind `QUEENS_DRODO_VIEW_REFRESH_ENABLED`. |
+| Active players | Once per day | Parked while live fetch is off. |
+| Inactive players | Once per week | Parked while live fetch is off. |
+
+## Season MMR omission
+
+Drodo's public `/courier/get` payload currently omits `mmr_s*`, `max_mmr_s*`,
+`match_s*`, and `queen_rank` for most accounts while still returning
+`mmr_level` / `chicken_count` / cosmetics. Live polling and profile refresh are
+disabled site-wide; profiles show rank from `mmr_level` only.
 
 ## Cohort Definitions
 

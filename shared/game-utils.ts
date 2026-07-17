@@ -214,7 +214,8 @@ export const RANK_TIERS = ["Pawn", "Knight", "Bishop", "Rook", "King", "Queen"] 
 export const NUMBERED_RANK_TIERS = ["Pawn", "Knight", "Bishop", "Rook"] as const;
 
 export function mmrLevelToRank(level: number | null | undefined): string {
-  if (level == null || level < 1 || level > RANK_BRACKETS.length) return "";
+  if (level == null || level < 1) return "";
+  if (level > RANK_BRACKETS.length) return "Queen";
   return RANK_BRACKETS[level - 1].rank.replace("-", " ");
 }
 

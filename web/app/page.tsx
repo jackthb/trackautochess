@@ -7,7 +7,7 @@ import { absoluteUrl, SITE_DESCRIPTION, SITE_NAME, SITE_TITLE } from "@/lib/site
 export const revalidate = 300;
 
 const description =
-  "Look up Dota Auto Chess player MMR, season history, and tracked match stats by Steam vanity URL or SteamID64.";
+  "Look up Dota Auto Chess player rank and tracked match stats by Steam vanity URL or SteamID64. Live MMR is unavailable.";
 
 export const metadata: Metadata = {
   title: SITE_TITLE,

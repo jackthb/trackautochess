@@ -6,6 +6,7 @@ import {
   recentSignInCutoff,
 } from "@dac/shared/drodo-core";
 import { fetchAndCacheDrodoBatch } from "@/lib/drodo";
+import { DRODO_LIVE_FETCH_ENABLED } from "@/lib/drodoLive";
 import { revalidateQueenPages } from "@/lib/queensRevalidate";
 import { createSupabaseServiceRoleClient } from "@/lib/supabase";
 
@@ -42,6 +43,19 @@ async function handle(req: Request) {
   const auth = req.headers.get("authorization");
   if (!cronSecret || auth !== `Bearer ${cronSecret}`) {
     return Response.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  if (!DRODO_LIVE_FETCH_ENABLED) {
+    return Response.json({
+      disabled: true,
+      reason:
+        "Drodo live fetch is parked — public courier no longer returns season MMR.",
+      polled: 0,
+      repolled: 0,
+      seeded: 0,
+      inactive_daily: 0,
+      results: [],
+    });
   }
 
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;

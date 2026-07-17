@@ -1,5 +1,5 @@
 import type { StatItem } from "./StatsGrid";
-import { mmrToRank } from "./game-utils";
+import { mmrLevelToRank, mmrToRank } from "./game-utils";
 
 interface GameForStats {
   placement: string | number;
@@ -8,11 +8,14 @@ interface GameForStats {
 interface DrodoForStats {
   mmr?: number | null;
   max_mmr?: number | null;
+  mmr_level?: number | null;
   queen_rank?: number | null;
   season_games?: number | null;
   candy?: number | null;
   chicken_count?: number | null;
   total_chicken_count?: number | null;
+  /** When true, hide numeric MMR and show rank from mmr_level only. */
+  rankOnly?: boolean;
 }
 
 export interface StatGroups {
@@ -43,7 +46,22 @@ export function buildStatItems(
   }
 
   const drodoItems: StatItem[] = [];
-  if (drodo?.mmr != null) {
+  const rankOnly = Boolean(drodo?.rankOnly);
+  if (rankOnly && drodo?.mmr_level != null && drodo.mmr_level > 0) {
+    const rank = mmrLevelToRank(drodo.mmr_level) || "Rank";
+    const rankLabel =
+      rank === "Queen" && drodo.queen_rank != null
+        ? `Rank · Queen #${drodo.queen_rank}`
+        : rank === "Rank"
+          ? "Rank"
+          : `Rank · ${rank}`;
+    drodoItems.push({
+      key: "drodo-rank",
+      value: rank,
+      label: rankLabel,
+      source: "drodo",
+    });
+  } else if (!rankOnly && drodo?.mmr != null) {
     const rank = mmrToRank(drodo.mmr) || "MMR";
     const rankLabel = rank === "Queen" && drodo.queen_rank != null
       ? `MMR · Queen #${drodo.queen_rank}`
@@ -52,7 +70,7 @@ export function buildStatItems(
         : `MMR · ${rank}`;
     drodoItems.push({ key: "drodo-mmr", value: drodo.mmr, label: rankLabel, source: "drodo" });
   }
-  if (drodo?.max_mmr != null && drodo.max_mmr !== drodo.mmr) {
+  if (!rankOnly && drodo?.max_mmr != null && drodo.max_mmr !== drodo.mmr) {
     drodoItems.push({ key: "drodo-peak", value: drodo.max_mmr, label: "Peak MMR", tone: "gold", source: "drodo" });
   }
   if (drodo?.season_games != null && drodo.season_games > 0 && drodo?.chicken_count != null) {

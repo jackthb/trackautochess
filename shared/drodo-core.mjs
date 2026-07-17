@@ -213,6 +213,8 @@ function nextPollScheduleValue({ mode, changed, prevIntervalSeconds, missing = f
 function pollSnapshotFromRowValue(row) {
     return {
         drodo_mmr: row.drodo_mmr,
+        drodo_max_mmr: row.drodo_max_mmr ?? null,
+        drodo_season: row.drodo_season ?? null,
         drodo_season_games: row.drodo_season_games,
         drodo_chicken_count: row.drodo_chicken_count,
         queen_rank: typeof row.queen_ladder_rank === "number" && Number.isFinite(row.queen_ladder_rank)
@@ -220,6 +222,25 @@ function pollSnapshotFromRowValue(row) {
             : null,
         queen_ladder_last_seen_at: row.queen_ladder_last_seen_at,
         poll_interval_seconds: row.poll_interval_seconds,
+    };
+}
+function preserveOmittedDrodoFieldsValue(prev, next) {
+    if (!prev)
+        return next;
+    const prevMmr = profileMetricValue(prev, "drodo_mmr", "mmr");
+    const prevMaxMmr = profileMetricValue(prev, "drodo_max_mmr", "max_mmr");
+    const prevSeasonGames = profileMetricValue(prev, "drodo_season_games", "season_games");
+    const prevQueenRank = profileMetricValue(prev, "queen_rank", "queen_rank");
+    const prevSeason = "drodo_season" in prev
+        ? (prev.drodo_season ?? null)
+        : (prev.season ?? null);
+    return {
+        ...next,
+        mmr: next.mmr ?? prevMmr,
+        max_mmr: next.max_mmr ?? prevMaxMmr,
+        season: next.season ?? prevSeason,
+        season_games: next.season_games ?? prevSeasonGames,
+        queen_rank: next.queen_rank ?? prevQueenRank,
     };
 }
 function isQueenProfileValue(profile, prev = null) {
@@ -279,7 +300,7 @@ async function fetchDrodoProfileBatchValue(steamIds, adapter, options = {}) {
         return results;
     }
     const pollMode = options.pollMode ?? "reset";
-    const prevSnapshots = pollMode === "adaptive" && adapter.loadPollSnapshots
+    const prevSnapshots = adapter.loadPollSnapshots
         ? await adapter.loadPollSnapshots(ids)
         : new Map();
     const fetchImpl = adapter.fetch ?? fetch;
@@ -313,7 +334,10 @@ async function fetchDrodoProfileBatchValue(steamIds, adapter, options = {}) {
             });
             continue;
         }
-        const { profile, seasonRows } = buildDrodoProfileValue(steamId, drodoData);
+        const prevSnapshot = prevSnapshots.get(steamId) ?? null;
+        const built = buildDrodoProfileValue(steamId, drodoData);
+        const profile = preserveOmittedDrodoFieldsValue(prevSnapshot, built.profile);
+        const { seasonRows } = built;
         if (!hasDrodoStatsValue(profile, seasonRows)) {
             const fetchedAt = await adapter.markMissing(steamId);
             results.push({
@@ -329,7 +353,7 @@ async function fetchDrodoProfileBatchValue(steamIds, adapter, options = {}) {
             snapshotOnSuccess: options.snapshotOnSuccess,
             pollMode,
             hotPoll: options.hotPoll,
-            prevSnapshot: prevSnapshots.get(steamId) ?? null,
+            prevSnapshot,
         });
         results.push({ steam_id: steamId, ok: true, profile, seasonRows });
     }
@@ -379,6 +403,7 @@ export const isActivePollUser = isActivePollUserValue;
 export const inactivePollCutoff = inactivePollCutoffValue;
 export const nextPollSchedule = nextPollScheduleValue;
 export const pollSnapshotFromRow = pollSnapshotFromRowValue;
+export const preserveOmittedDrodoFields = preserveOmittedDrodoFieldsValue;
 export const isQueenProfile = isQueenProfileValue;
 export const profileChanged = profileChangedValue;
 export const normalizeDrodoSteamIds = normalizeDrodoSteamIdsValue;

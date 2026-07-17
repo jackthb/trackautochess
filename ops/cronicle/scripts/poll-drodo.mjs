@@ -196,7 +196,7 @@ async function loadAllIds(supabase, limit, { seasonSweep = false } = {}) {
 async function loadPollSnapshots(steamIds, supabase) {
   if (steamIds.length === 0) return new Map();
   const rows = await supabase.select("users", {
-    select: "steam_id::text,drodo_mmr,drodo_season_games,drodo_chicken_count,queen_ladder_rank,queen_ladder_last_seen_at,poll_interval_seconds",
+    select: "steam_id::text,drodo_mmr,drodo_max_mmr,drodo_season,drodo_season_games,drodo_chicken_count,queen_ladder_rank,queen_ladder_last_seen_at,poll_interval_seconds",
     steam_id: `in.(${steamIds.join(",")})`,
   });
   return new Map((rows ?? []).map((row) => [rowSteamId(row), pollSnapshotFromRow(row)]));
@@ -210,6 +210,37 @@ async function markDrodoMissing(steamId, supabase) {
     prevIntervalSeconds: null,
     missing: true,
   });
+  const existingRows = await supabase.select("users", {
+    select:
+      "drodo_mmr,drodo_max_mmr,drodo_season,drodo_season_games,drodo_chicken_count,queen_ladder_rank,queen_ladder_last_seen_at,drodo_profile_missing",
+    steam_id: `eq.${steamId}`,
+  });
+  const existing = existingRows?.[0] ?? null;
+  const hasKnown =
+    existing &&
+    !existing.drodo_profile_missing &&
+    (existing.drodo_mmr != null ||
+      existing.drodo_max_mmr != null ||
+      existing.drodo_season != null ||
+      existing.drodo_season_games != null ||
+      (typeof existing.drodo_chicken_count === "number" &&
+        existing.drodo_chicken_count > 0) ||
+      existing.queen_ladder_rank != null ||
+      existing.queen_ladder_last_seen_at != null);
+  if (hasKnown) {
+    await supabase.upsert(
+      "users",
+      {
+        steam_id: String(steamId),
+        drodo_last_fetched_at: fetchedAt,
+        drodo_profile_missing: false,
+        next_poll_at: schedule.next_poll_at,
+        poll_interval_seconds: schedule.poll_interval_seconds,
+      },
+      "steam_id"
+    );
+    return fetchedAt;
+  }
   await supabase.upsert(
     "users",
     {
@@ -317,6 +348,27 @@ async function pingHealthcheck(suffix = "", body) {
 }
 
 async function main() {
+  // Drodo public courier no longer returns season MMR. Keep the job installed
+  // but do not hit upstream until DRODO_LIVE_FETCH_ENABLED is flipped back on
+  // in web/lib/drodoLive.ts (and this guard is removed).
+  if (process.env.DRODO_LIVE_FETCH_ENABLED !== "1") {
+    const output = {
+      mode: mode(),
+      disabled: true,
+      reason:
+        "Drodo live fetch is parked — public courier no longer returns season MMR.",
+      started_at: new Date().toISOString(),
+      finished_at: new Date().toISOString(),
+      polled: 0,
+      ok: 0,
+      missing: 0,
+      upstream_error: 0,
+    };
+    console.log(JSON.stringify(output));
+    await pingHealthcheck("", JSON.stringify(output));
+    return;
+  }
+
   const selectedMode = mode();
   const limit = batchSize(selectedMode);
   const seasonSweep = flagEnabled("--season-sweep", "DRODO_POLL_SEASON_SWEEP");

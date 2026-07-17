@@ -31,6 +31,10 @@ import {
   HOT_PROFILE_REFRESH_TTL_SECONDS,
   type DrodoProfileRow,
 } from "@/lib/drodo";
+import {
+  DRODO_LIVE_FETCH_ENABLED,
+  DRODO_OUTAGE_NOTICE,
+} from "@/lib/drodoLive";
 import { drodoStatsFromProfile } from "@/components/player/playerData";
 import { useSupabaseSession } from "@/lib/useSupabaseSession";
 import { type SteamProfile } from "@/lib/steam";
@@ -350,7 +354,17 @@ export default function PlayerView({
   }, [seasons]);
 
   const { tracked: trackedItems, drodo: drodoItems } = useMemo(
-    () => buildStatItems(games, drodo ? { ...drodo, total_chicken_count: totalChickenCount } : null),
+    () =>
+      buildStatItems(
+        games,
+        drodo
+          ? {
+              ...drodo,
+              total_chicken_count: totalChickenCount,
+              rankOnly: !DRODO_LIVE_FETCH_ENABLED,
+            }
+          : null
+      ),
     [games, drodo, totalChickenCount]
   );
   const effectiveMmrHistory = useMemo(
@@ -424,14 +438,11 @@ export default function PlayerView({
     return () => clearInterval(timer);
   }, []);
 
-  // Stale-while-revalidate for profile stats: the server now renders whatever
-  // is cached without blocking on Drodo, so when that data is past its TTL,
-  // refresh it in the background through the same endpoint the Refresh button
-  // uses. A plain GET re-checks freshness server-side and consumes no
-  // manual-refresh quota; the Refresh button shows the loading state while it
-  // runs. First-ever views (no cached stats) are still fetched server-side.
+  // Stale-while-revalidate for profile stats: parked while Drodo live fetch is
+  // off (public courier no longer returns season MMR).
   const autoRefreshTriggered = useRef(false);
   useEffect(() => {
+    if (!DRODO_LIVE_FETCH_ENABLED) return;
     if (autoRefreshTriggered.current) return;
     if (!initialDrodo || initialDrodoProfileMissing) return;
     const isHotProfile =
@@ -701,9 +712,18 @@ export default function PlayerView({
   return (
     <div className={styles.page}>
       <div className={styles.dashboard}>
-          {drodo?.mmr != null && (
+          {!DRODO_LIVE_FETCH_ENABLED && (
+            <div className={styles.outageNotice} role="status">
+              {DRODO_OUTAGE_NOTICE}
+            </div>
+          )}
+          {(drodo?.mmr_level != null || drodo?.mmr != null) && (
             <div className={styles.rankLadder}>
-              <RankLadder mmr={drodo.mmr} queenRank={drodo.queen_rank} />
+              <RankLadder
+                mmr={DRODO_LIVE_FETCH_ENABLED ? drodo.mmr : null}
+                mmrLevel={drodo.mmr_level}
+                queenRank={drodo.queen_rank}
+              />
             </div>
           )}
           <div className={styles.playerHeader}>
@@ -728,14 +748,16 @@ export default function PlayerView({
               </div>
             </div>
             <div className={styles.playerActions}>
-              <Button disabled={refreshDisabled} onClick={handleRefresh}>
-                {!authReady
-                  ? "Checking..."
-                  : refreshing
-                    ? "Refreshing..."
-                    : "Refresh Stats"}
-              </Button>
-              {showQuota && (
+              {DRODO_LIVE_FETCH_ENABLED ? (
+                <Button disabled={refreshDisabled} onClick={handleRefresh}>
+                  {!authReady
+                    ? "Checking..."
+                    : refreshing
+                      ? "Refreshing..."
+                      : "Refresh Stats"}
+                </Button>
+              ) : null}
+              {DRODO_LIVE_FETCH_ENABLED && showQuota && (
                 <div className={styles.refreshQuota}>
                   <span>{refreshQuotaTitle}</span>
                   <span className={styles.refreshQuotaValue}>
@@ -746,18 +768,20 @@ export default function PlayerView({
               {refreshError && (
                 <div className={styles.refreshError}>{refreshError}</div>
               )}
-              <div className={styles.lastFetched}>
-                <span className={styles.lastFetchedLabel}>Last fetched</span>
-                <time
-                  className={styles.lastFetchedValue}
-                  dateTime={drodoLastFetchedAt ?? undefined}
-                >
-                  {lastFetchedTimestamp}
-                </time>
-                {lastFetchedAge && (
-                  <span className={styles.lastFetchedAge}>{lastFetchedAge}</span>
-                )}
-              </div>
+              {DRODO_LIVE_FETCH_ENABLED && (
+                <div className={styles.lastFetched}>
+                  <span className={styles.lastFetchedLabel}>Last fetched</span>
+                  <time
+                    className={styles.lastFetchedValue}
+                    dateTime={drodoLastFetchedAt ?? undefined}
+                  >
+                    {lastFetchedTimestamp}
+                  </time>
+                  {lastFetchedAge && (
+                    <span className={styles.lastFetchedAge}>{lastFetchedAge}</span>
+                  )}
+                </div>
+              )}
             </div>
           </div>
           {drodoProfileMissing && !drodo && (

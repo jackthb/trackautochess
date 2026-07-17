@@ -9,6 +9,17 @@
   padding: 32px 32px 72px;
   position: relative;
 }
+.outageNotice {
+  margin: 0 0 20px;
+  padding: 12px 14px;
+  border: 1px solid color-mix(in srgb, var(--accent, #c45c26) 45%, var(--border));
+  border-radius: var(--r-8);
+  background: color-mix(in srgb, var(--accent, #c45c26) 12%, var(--bg-surface));
+  color: var(--text-primary);
+  font-size: 14px;
+  line-height: 1.45;
+  max-width: 52rem;
+}
 .playerHeader {
   display: flex;
   align-items: flex-start;

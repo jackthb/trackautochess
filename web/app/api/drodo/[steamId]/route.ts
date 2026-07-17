@@ -19,6 +19,7 @@ import { isAdminSteamId } from "@/lib/admin";
 import { revalidateQueenPages } from "@/lib/queensRevalidate";
 import { getSessionUser } from "@/lib/sessionUser";
 import { isCachedQueenProfile, type CachedUserDrodoRow } from "@/lib/drodo";
+import { DRODO_LIVE_FETCH_ENABLED, DRODO_OUTAGE_NOTICE } from "@/lib/drodoLive";
 import {
   loadCachedDrodoRow,
   readThroughDrodoProfile,
@@ -96,6 +97,16 @@ async function handle(req: Request, ctx: { params: Promise<{ steamId: string }> 
   }
 
   const forceRefresh = refresh === "1" && req.method === "POST";
+
+  if (forceRefresh && !DRODO_LIVE_FETCH_ENABLED) {
+    return Response.json(
+      {
+        error: DRODO_OUTAGE_NOTICE,
+        disabled: true,
+      },
+      { status: 503 }
+    );
+  }
 
   // Response headers accumulated alongside the JSON body (Set-Cookie / Retry-After).
   const responseHeaders: Record<string, string> = {};

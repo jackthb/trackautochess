@@ -90,6 +90,20 @@
   opacity: 0;
   animation: arrive 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.5s forwards;
 }
+.outageNotice {
+  margin: 16px 0 0;
+  padding: 12px 14px;
+  max-width: 440px;
+  border: 1px solid color-mix(in srgb, var(--accent) 45%, var(--border));
+  border-radius: var(--r-8);
+  background: color-mix(in srgb, var(--accent) 12%, var(--bg-surface));
+  color: var(--text-primary);
+  font-size: 13px;
+  line-height: 1.45;
+  letter-spacing: 0.2px;
+  opacity: 0;
+  animation: arrive 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.55s forwards;
+}
 
 /* Sign-in CTA leads (most prominent); search follows below the divider. */
 .primaryCta {

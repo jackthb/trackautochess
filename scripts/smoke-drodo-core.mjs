@@ -224,6 +224,72 @@ assert.deepEqual(summarizeDrodoResults(results), {
   upstream_error: 0,
 });
 
+// Drodo currently omits season MMR keys for many accounts while still returning
+// chicken_count / mmr_level. A refresh must not wipe the cached MMR.
+const omitMmrPersisted = [];
+const omitMmrResults = await fetchDrodoProfileBatch(
+  ["555"],
+  {
+    fetch: async () => ({
+      ok: true,
+      json: async () => ({
+        err: 0,
+        user_info: {
+          555: {
+            chicken_count: "4",
+            candy: "100",
+            mmr_level: "18",
+            award_season_mmr_level: "22",
+          },
+        },
+      }),
+    }),
+    loadPollSnapshots: async () =>
+      new Map([
+        [
+          "555",
+          {
+            drodo_mmr: 1713,
+            drodo_max_mmr: 1995,
+            drodo_season: "s44",
+            drodo_season_games: 40,
+            drodo_chicken_count: 3,
+            queen_rank: null,
+            queen_ladder_last_seen_at: null,
+            poll_interval_seconds: 86400,
+          },
+        ],
+      ]),
+    markMissing: async () => {
+      throw new Error("omit-MMR profile should not be marked missing");
+    },
+    persistProfile: async (profile, _seasonRows, options) => {
+      omitMmrPersisted.push({
+        mmr: profile.mmr,
+        max_mmr: profile.max_mmr,
+        season: profile.season,
+        season_games: profile.season_games,
+        chicken_count: profile.chicken_count,
+        mmr_level: profile.mmr_level,
+        changedFromPrev: options.prevSnapshot?.drodo_mmr !== profile.mmr,
+      });
+    },
+  },
+  { pollMode: "reset", snapshotOnSuccess: true }
+);
+assert.equal(omitMmrResults[0]?.ok, true);
+assert.deepEqual(omitMmrPersisted, [
+  {
+    mmr: 1713,
+    max_mmr: 1995,
+    season: "s44",
+    season_games: 40,
+    chicken_count: 4,
+    mmr_level: 18,
+    changedFromPrev: false,
+  },
+]);
+
 const upstreamResults = await fetchDrodoProfileBatch(["999"], {
   fetch: async () => ({ ok: false, status: 503, json: async () => ({}) }),
   markMissing: async () => {

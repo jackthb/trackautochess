@@ -18,6 +18,8 @@ import {
   type UserSearchRow,
 } from "@/lib/playerSearch";
 import { fetchAndCacheDrodo } from "@/lib/drodo";
+import { DRODO_LIVE_FETCH_ENABLED } from "@/lib/drodoLive";
+import { loadCachedDrodoRow } from "@/lib/drodoReadThrough";
 import { revalidateQueenPages } from "@/lib/queensRevalidate";
 
 const rateLimiter = new RateLimiterMemory({ points: 60, duration: 60 });
@@ -153,11 +155,27 @@ export async function GET(req: Request) {
       // profile or tracked games. Otherwise the client errors instead of
       // opening an empty profile.
       const [drodoResult, gamesCheck] = await Promise.all([
-        fetchAndCacheDrodo(resolvedSteamId, supabase ?? null, {
-          snapshotOnSuccess: true,
-          pollMode: "reset",
-          onQueenChange: revalidateQueenPages,
-        }),
+        DRODO_LIVE_FETCH_ENABLED
+          ? fetchAndCacheDrodo(resolvedSteamId, supabase ?? null, {
+              snapshotOnSuccess: true,
+              pollMode: "reset",
+              onQueenChange: revalidateQueenPages,
+            })
+          : supabase
+            ? loadCachedDrodoRow(supabase, resolvedSteamId).then((row) =>
+                row && !row.drodo_profile_missing
+                  ? ({ ok: true as const, profile: row })
+                  : ({
+                      ok: false as const,
+                      kind: "missing" as const,
+                      error: "cached",
+                    })
+              )
+            : Promise.resolve({
+                ok: false as const,
+                kind: "missing" as const,
+                error: "cached",
+              }),
         supabase
           ? supabase
               .from("match_players")

@@ -22,6 +22,10 @@ user-directed refreshes.
 The GitHub Actions schedule for `Poll Drodo (MMR snapshots)` has been disabled;
 it remains manually runnable only as an emergency/operator-triggered fallback.
 
+**Current status:** Drodo live polling is parked. `scripts/poll-drodo.mjs` exits
+immediately unless `DRODO_LIVE_FETCH_ENABLED=1` is set. Public `/courier/get` no
+longer returns season MMR, so scheduled jobs should stay off.
+
 ## One-time Pi setup
 
 From the repository root on the Pi:

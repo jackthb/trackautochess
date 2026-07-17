@@ -1,6 +1,6 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { originFromUrl, SITE_TITLE } from "@/lib/site";
-import { mmrToRank } from "@dac/shared/game-utils";
+import { mmrLevelToRank, mmrToRank } from "@dac/shared/game-utils";
 import { parseSteamId64, type SteamId64 } from "@dac/shared/steam";
 import {
   lastTop3FromDrodoData,
@@ -9,6 +9,7 @@ import {
   type DrodoProfileRow,
   type UserDrodoStatsRow,
 } from "@/lib/drodo";
+import { DRODO_LIVE_FETCH_ENABLED } from "@/lib/drodoLive";
 import {
   parseSteamInput,
   playerProfilePath,
@@ -134,9 +135,18 @@ export function buildPlayerSeo(props: Omit<PlayerPageProps, "route">): {
   const displayName = steamProfile.name || steamProfile.customUrl || steamId;
   const profileUrl = steamProfileUrl(steamId, steamProfile.customUrl);
   const title = `${displayName} | ${SITE_TITLE}`;
-  const description = drodo?.mmr
-    ? `${displayName} is ${mmrToRank(drodo.mmr)} at ${drodo.mmr.toLocaleString("en-US")} MMR.`
-    : `Dota Auto Chess profile for ${displayName}.`;
+  const rankLabel =
+    (DRODO_LIVE_FETCH_ENABLED && drodo?.mmr != null
+      ? mmrToRank(drodo.mmr)
+      : null) ||
+    mmrLevelToRank(drodo?.mmr_level) ||
+    null;
+  const description =
+    DRODO_LIVE_FETCH_ENABLED && drodo?.mmr
+      ? `${displayName} is ${mmrToRank(drodo.mmr)} at ${drodo.mmr.toLocaleString("en-US")} MMR.`
+      : rankLabel
+        ? `${displayName} is ${rankLabel}. Live MMR is currently unavailable.`
+        : `Dota Auto Chess profile for ${displayName}.`;
   const imageAlt = `${displayName} Auto Chess profile stats`;
   const structuredDataBase = originFromUrl(canonicalUrl);
 

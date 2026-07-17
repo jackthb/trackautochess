@@ -135,19 +135,50 @@ fn drodo_user_row_to_profile(row: &Value, seasons: Value) -> Value {
 }
 
 fn drodo_profile_to_user_payload(profile: &Value) -> Value {
-    json!({
+    let mut payload = json!({
         "steam_id": profile.get("steam_id").cloned().unwrap_or(Value::Null),
-        "drodo_mmr": profile.get("mmr").cloned().unwrap_or(Value::Null),
-        "drodo_max_mmr": profile.get("max_mmr").cloned().unwrap_or(Value::Null),
         "drodo_mmr_level": profile.get("mmr_level").cloned().unwrap_or(Value::Null),
-        "drodo_season": profile.get("season").cloned().unwrap_or(Value::Null),
-        "drodo_season_games": profile.get("season_games").cloned().unwrap_or(Value::Null),
         "drodo_candy": profile.get("candy").cloned().unwrap_or(Value::Null),
         "drodo_chicken_count": profile.get("chicken_count").cloned().unwrap_or_else(|| json!(0)),
         "drodo_raw_data": profile.get("raw_data").cloned().unwrap_or(Value::Null),
         "drodo_last_fetched_at": profile.get("fetched_at").cloned().unwrap_or(Value::Null),
         "drodo_profile_missing": false,
-    })
+    });
+    // Drodo's public courier payload currently omits season MMR / queen_rank for
+    // many accounts. Never write null over a previously cached value.
+    if let Some(obj) = payload.as_object_mut() {
+        for (payload_key, profile_key) in [
+            ("drodo_mmr", "mmr"),
+            ("drodo_max_mmr", "max_mmr"),
+            ("drodo_season", "season"),
+            ("drodo_season_games", "season_games"),
+        ] {
+            if let Some(value) = profile.get(profile_key).filter(|value| !value.is_null()) {
+                obj.insert(payload_key.to_owned(), value.clone());
+            }
+        }
+    }
+    payload
+}
+
+fn preserve_omitted_drodo_fields(existing: &Value, profile: &mut Value) {
+    let Some(obj) = profile.as_object_mut() else {
+        return;
+    };
+    for (profile_key, existing_key) in [
+        ("mmr", "drodo_mmr"),
+        ("max_mmr", "drodo_max_mmr"),
+        ("season", "drodo_season"),
+        ("season_games", "drodo_season_games"),
+    ] {
+        let missing = obj.get(profile_key).map_or(true, Value::is_null);
+        if !missing {
+            continue;
+        }
+        if let Some(value) = existing.get(existing_key).filter(|value| !value.is_null()) {
+            obj.insert(profile_key.to_owned(), value.clone());
+        }
+    }
 }
 
 fn value_number(value: &Value, key: &str) -> Option<i64> {

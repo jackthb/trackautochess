@@ -235,6 +235,8 @@ function nextPollScheduleValue({ mode, changed, prevIntervalSeconds, missing = f
 function pollSnapshotFromRowValue(row: PollSnapshotRow): PollSnapshot {
   return {
     drodo_mmr: row.drodo_mmr,
+    drodo_max_mmr: row.drodo_max_mmr ?? null,
+    drodo_season: row.drodo_season ?? null,
     drodo_season_games: row.drodo_season_games,
     drodo_chicken_count: row.drodo_chicken_count,
     queen_rank:
@@ -243,6 +245,40 @@ function pollSnapshotFromRowValue(row: PollSnapshotRow): PollSnapshot {
         : null,
     queen_ladder_last_seen_at: row.queen_ladder_last_seen_at,
     poll_interval_seconds: row.poll_interval_seconds,
+  };
+}
+
+/**
+ * Drodo's public courier payload intermittently omits season MMR / queen_rank.
+ * When a field is absent on the fresh payload, keep the previously cached value
+ * so a refresh cannot wipe a good profile down to null.
+ */
+function preserveOmittedDrodoFieldsValue(
+  prev: DrodoProfileRow | PollSnapshot | null | undefined,
+  next: DrodoProfileRow
+): DrodoProfileRow {
+  if (!prev) return next;
+
+  const prevMmr = profileMetricValue(prev, "drodo_mmr", "mmr");
+  const prevMaxMmr = profileMetricValue(prev, "drodo_max_mmr", "max_mmr");
+  const prevSeasonGames = profileMetricValue(
+    prev,
+    "drodo_season_games",
+    "season_games"
+  );
+  const prevQueenRank = profileMetricValue(prev, "queen_rank", "queen_rank");
+  const prevSeason =
+    "drodo_season" in prev
+      ? ((prev as PollSnapshot).drodo_season ?? null)
+      : ((prev as DrodoProfileRow).season ?? null);
+
+  return {
+    ...next,
+    mmr: next.mmr ?? prevMmr,
+    max_mmr: next.max_mmr ?? prevMaxMmr,
+    season: next.season ?? prevSeason,
+    season_games: next.season_games ?? prevSeasonGames,
+    queen_rank: next.queen_rank ?? prevQueenRank,
   };
 }
 
@@ -320,10 +356,11 @@ async function fetchDrodoProfileBatchValue(steamIds: unknown[], adapter: DrodoBa
   }
 
   const pollMode = options.pollMode ?? "reset";
-  const prevSnapshots =
-    pollMode === "adaptive" && adapter.loadPollSnapshots
-      ? await adapter.loadPollSnapshots(ids)
-      : new Map();
+  // Always load prior cache when available — even on manual "reset" polls —
+  // so omitted Drodo fields (season MMR, queen_rank) can be preserved.
+  const prevSnapshots = adapter.loadPollSnapshots
+    ? await adapter.loadPollSnapshots(ids)
+    : new Map();
   const fetchImpl = adapter.fetch ?? fetch;
 
   let payload;
@@ -357,7 +394,10 @@ async function fetchDrodoProfileBatchValue(steamIds: unknown[], adapter: DrodoBa
       continue;
     }
 
-    const { profile, seasonRows } = buildDrodoProfileValue(steamId, drodoData);
+    const prevSnapshot = prevSnapshots.get(steamId) ?? null;
+    const built = buildDrodoProfileValue(steamId, drodoData);
+    const profile = preserveOmittedDrodoFieldsValue(prevSnapshot, built.profile);
+    const { seasonRows } = built;
     if (!hasDrodoStatsValue(profile, seasonRows)) {
       const fetchedAt = await adapter.markMissing(steamId);
       results.push({
@@ -374,7 +414,7 @@ async function fetchDrodoProfileBatchValue(steamIds: unknown[], adapter: DrodoBa
       snapshotOnSuccess: options.snapshotOnSuccess,
       pollMode,
       hotPoll: options.hotPoll,
-      prevSnapshot: prevSnapshots.get(steamId) ?? null,
+      prevSnapshot,
     });
     results.push({ steam_id: steamId, ok: true as const, profile, seasonRows });
   }
@@ -454,6 +494,8 @@ export interface PollSchedule {
 
 export interface PollSnapshot {
   drodo_mmr: number | null;
+  drodo_max_mmr: number | null;
+  drodo_season: string | null;
   drodo_season_games: number | null;
   drodo_chicken_count: number | null;
   queen_rank: number | null;
@@ -464,6 +506,8 @@ export interface PollSnapshot {
 export interface PollSnapshotRow extends Omit<PollSnapshot, "queen_rank"> {
   steam_id?: string;
   drodo_mmr: number | null;
+  drodo_max_mmr: number | null;
+  drodo_season: string | null;
   drodo_season_games: number | null;
   drodo_chicken_count: number | null;
   queen_ladder_rank?: number | null;
@@ -616,6 +660,11 @@ export const nextPollSchedule: (input: {
 
 export const pollSnapshotFromRow: (row: PollSnapshotRow) => PollSnapshot =
   pollSnapshotFromRowValue;
+
+export const preserveOmittedDrodoFields: (
+  prev: DrodoProfileRow | PollSnapshot | null | undefined,
+  next: DrodoProfileRow
+) => DrodoProfileRow = preserveOmittedDrodoFieldsValue;
 
 export const isQueenProfile: (
   profile: DrodoProfileRow,

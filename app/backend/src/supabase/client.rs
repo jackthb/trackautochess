@@ -1,7 +1,7 @@
 use super::{
     describe_ureq_error, drodo_courier_api_url, drodo_profile_to_user_payload,
     drodo_user_row_to_profile, mmr_level_to_app_rank, now_iso_utc, parse_valid_steam_id64,
-    value_number, SupabaseClient, HTTP_TIMEOUT,
+    preserve_omitted_drodo_fields, value_number, SupabaseClient, HTTP_TIMEOUT,
 };
 use crate::config::Config;
 use serde_json::{json, Value};
@@ -144,7 +144,7 @@ impl SupabaseClient {
         let mmr_key = (!season.is_empty()).then(|| format!("mmr_{season}"));
         let max_mmr_key = (!season.is_empty()).then(|| format!("max_mmr_{season}"));
         let match_key = (!season.is_empty()).then(|| format!("match_{season}"));
-        let profile = json!({
+        let mut profile = json!({
             "steam_id": steam_id,
             "mmr": mmr_key.as_deref().and_then(|key| value_number(&drodo_data, key)),
             "max_mmr": max_mmr_key.as_deref().and_then(|key| value_number(&drodo_data, key)),
@@ -157,6 +157,13 @@ impl SupabaseClient {
             "raw_data": drodo_data,
             "fetched_at": now,
         });
+
+        let existing_rows = self.get_json(&format!(
+            "/rest/v1/users?select=drodo_mmr,drodo_max_mmr,drodo_season,drodo_season_games&steam_id=eq.{steam_id}"
+        ))?;
+        if let Some(existing) = existing_rows.as_array().and_then(|rows| rows.first()) {
+            preserve_omitted_drodo_fields(existing, &mut profile);
+        }
 
         let user_payload = drodo_profile_to_user_payload(&profile);
         self.post_json(

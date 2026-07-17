@@ -20,6 +20,10 @@ Player profile lookup. Multiple IDs comma-separated.
 - `award_season_mmr_level`, `award_available`, `vip_info`
 - `zhugong_count`, `zhugong_total_count`, `is_author`
 
+**Current omission (2026-07):** many accounts no longer receive `mmr_s*`,
+`max_mmr_s*`, `match_s*`, or `queen_rank` on this public endpoint. Cache writes
+must preserve prior season MMR when those keys are absent.
+
 With auth the game also gets: `badgeall`, `match_history` (bundled inside `/game/new`).
 
 #### `mmr_level` tier mapping

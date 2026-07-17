@@ -7,12 +7,17 @@ import { SteamSignInButton } from "@/components/SteamSignInButton";
 import type { CustomGameMetrics } from "@/lib/customGameStats";
 import { useSupabaseSession } from "@/lib/useSupabaseSession";
 import { playerProfilePath } from "@/lib/steam";
+import {
+  DRODO_OUTAGE_NOTICE,
+  DRODO_OUTAGE_TAGLINE,
+} from "@/lib/drodoLive";
 import styles from "./HomeSearch.module.css";
 
 const t = {
   description:
-    "Look up Dota Auto Chess player MMR, season history, and tracked match stats by Steam vanity URL or SteamID64.",
-  tagline: "MMR, rank & season history for any Dota Auto Chess player.",
+    "Look up Dota Auto Chess player rank and tracked match stats by Steam vanity URL or SteamID64.",
+  tagline: DRODO_OUTAGE_TAGLINE,
+  notice: DRODO_OUTAGE_NOTICE,
   placeholder: "Steam profile URL or SteamID64",
   signinDivider: "or",
   viewProfile: "View your profile",
@@ -59,6 +64,9 @@ export default function HomeSearch({
           <div className={styles.rule} />
 
           <p className={styles.tagline}>{t.tagline}</p>
+          <p className={styles.outageNotice} role="status">
+            {t.notice}
+          </p>
 
           {/* Sign-in is the fastest path (and unlocks daily auto-tracking), so
               it leads. Search is the no-login fallback below the divider. */}

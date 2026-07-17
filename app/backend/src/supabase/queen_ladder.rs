@@ -207,13 +207,9 @@ impl SupabaseClient {
                     .as_deref()
                     .and_then(|season| number_from_object(info, &format!("match_{season}")));
                 let chicken_count = number_from_object(info, "chicken_count").unwrap_or(0);
-                user_rows.push(json!({
+                let mut row = json!({
                     "steam_id": steam_id,
-                    "drodo_mmr": mmr,
-                    "drodo_max_mmr": max_mmr,
                     "drodo_mmr_level": number_from_object(info, "mmr_level"),
-                    "drodo_season": season,
-                    "drodo_season_games": season_games,
                     "drodo_candy": number_from_object(info, "candy"),
                     "drodo_chicken_count": chicken_count,
                     "drodo_raw_data": Value::Object(info.clone()),
@@ -221,15 +217,34 @@ impl SupabaseClient {
                     "drodo_profile_missing": false,
                     "next_poll_at": next_drodo_poll_at(600),
                     "poll_interval_seconds": 600,
-                }));
-                snapshot_rows.push(json!({
-                    "steam_id": steam_id,
-                    "season": season,
-                    "mmr": mmr,
-                    "chicken_count": chicken_count,
-                    "queen_rank": Value::Null,
-                    "snapshotted_at": fetched_at,
-                }));
+                });
+                // Omit null season MMR fields so a Drodo response without mmr_s*
+                // cannot wipe previously cached values on upsert.
+                if let Some(obj) = row.as_object_mut() {
+                    if let Some(value) = mmr {
+                        obj.insert("drodo_mmr".to_owned(), json!(value));
+                    }
+                    if let Some(value) = max_mmr {
+                        obj.insert("drodo_max_mmr".to_owned(), json!(value));
+                    }
+                    if let Some(value) = &season {
+                        obj.insert("drodo_season".to_owned(), json!(value));
+                    }
+                    if let Some(value) = season_games {
+                        obj.insert("drodo_season_games".to_owned(), json!(value));
+                    }
+                }
+                user_rows.push(row);
+                if mmr.is_some() || season.is_some() {
+                    snapshot_rows.push(json!({
+                        "steam_id": steam_id,
+                        "season": season,
+                        "mmr": mmr,
+                        "chicken_count": chicken_count,
+                        "queen_rank": Value::Null,
+                        "snapshotted_at": fetched_at,
+                    }));
+                }
             }
         }
         if !user_rows.is_empty() {

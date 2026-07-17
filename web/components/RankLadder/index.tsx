@@ -8,15 +8,22 @@ import {
 import styles from "./RankLadder.module.css";
 
 interface RankLadderProps {
-  mmr: number | null | undefined;
+  mmr?: number | null;
+  /** Prefer this when numeric MMR is unavailable — Drodo still returns mmr_level. */
+  mmrLevel?: number | null;
   queenRank?: number | null;
   /** How many ranks to show above and below the current. */
   span?: number;
 }
 
-export function RankLadder({ mmr, queenRank, span = 4 }: RankLadderProps) {
-  if (mmr == null || !Number.isFinite(mmr)) return null;
-  const current = mmrToLevel(mmr);
+export function RankLadder({ mmr, mmrLevel, queenRank, span = 4 }: RankLadderProps) {
+  const rawCurrent =
+    typeof mmrLevel === "number" && Number.isFinite(mmrLevel) && mmrLevel > 0
+      ? Math.floor(mmrLevel)
+      : mmr != null && Number.isFinite(mmr)
+        ? mmrToLevel(mmr)
+        : 0;
+  const current = Math.min(MAX_LEVEL, rawCurrent);
   if (current < MIN_LEVEL) return null;
 
   const top = Math.min(MAX_LEVEL, current + span);
@@ -26,7 +33,7 @@ export function RankLadder({ mmr, queenRank, span = 4 }: RankLadderProps) {
 
   return (
     <aside className={styles.ladder} aria-label="Rank ladder">
-      <div className={styles.header}>Rank MMR</div>
+      <div className={styles.header}>Rank</div>
       <ol className={styles.list}>
         {levels.map((level) => {
           const isCurrent = level === current;

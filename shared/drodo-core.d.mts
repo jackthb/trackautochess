@@ -45,6 +45,8 @@ export interface PollSchedule {
 }
 export interface PollSnapshot {
     drodo_mmr: number | null;
+    drodo_max_mmr: number | null;
+    drodo_season: string | null;
     drodo_season_games: number | null;
     drodo_chicken_count: number | null;
     queen_rank: number | null;
@@ -54,6 +56,8 @@ export interface PollSnapshot {
 export interface PollSnapshotRow extends Omit<PollSnapshot, "queen_rank"> {
     steam_id?: string;
     drodo_mmr: number | null;
+    drodo_max_mmr: number | null;
+    drodo_season: string | null;
     drodo_season_games: number | null;
     drodo_chicken_count: number | null;
     queen_ladder_rank?: number | null;
@@ -138,6 +142,7 @@ export declare const nextPollSchedule: (input: {
     fixedHot?: boolean;
 }) => PollSchedule;
 export declare const pollSnapshotFromRow: (row: PollSnapshotRow) => PollSnapshot;
+export declare const preserveOmittedDrodoFields: (prev: DrodoProfileRow | PollSnapshot | null | undefined, next: DrodoProfileRow) => DrodoProfileRow;
 export declare const isQueenProfile: (profile: DrodoProfileRow, prev: PollSnapshot | null | undefined) => boolean;
 export declare const profileChanged: (prev: PollSnapshot | null, next: DrodoProfileRow) => boolean;
 export declare const normalizeDrodoSteamIds: (steamIds: unknown[]) => string[];

@@ -22,7 +22,7 @@ const t = {
   dataSources: "Data Sources",
   drodoTitle: "Drodo profile data",
   drodoDesc:
-    "Current rank, MMR, peak MMR, season games, candies, wins, and season snapshots when Drodo returns them publicly.",
+    "Rank from Drodo when available. Live numeric MMR is currently unavailable — Drodo stopped publishing it publicly.",
   trackedTitle: "Tracked match history",
   trackedDesc:
     "Match-level stats captured or checked manually when public Drodo profile data is missing, stale, or incomplete.",

@@ -15,6 +15,7 @@ import {
   isHotCacheFresh,
 } from "@/lib/drodo";
 import { loadDrodoHistory, readThroughDrodoProfile } from "@/lib/drodoReadThrough";
+import { DRODO_LIVE_FETCH_ENABLED } from "@/lib/drodoLive";
 import {
   fetchPlayerHistoryRows,
   playerHistoryToGames,
@@ -129,8 +130,9 @@ const loadPlayer = cache(async (rawSteamId: string): Promise<LoadResult> => {
     // When cached stats exist, serve them immediately even if stale —
     // PlayerView refreshes from Drodo in the background with a loading state
     // (via GET /api/drodo, which re-checks freshness server-side). Only block
-    // the render when there is nothing cached to show.
-    if (shouldRefreshDrodo && !drodo) {
+    // the render when there is nothing cached to show. Live Drodo fetch is
+    // currently parked (no public season MMR).
+    if (DRODO_LIVE_FETCH_ENABLED && shouldRefreshDrodo && !drodo) {
       const initialDrodo = await readThroughDrodoProfile({
         steamId,
         supabase,
