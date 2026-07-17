@@ -479,6 +479,93 @@ export type Database = {
         }
         Relationships: []
       }
+      community_builds: {
+        Row: {
+          id: string
+          author_steam_id: number
+          name: string
+          description: string
+          payload: Json
+          status: string
+          upvote_count: number
+          created_at: string
+          updated_at: string
+          submitted_at: string | null
+          reviewed_at: string | null
+          reviewed_by: number | null
+        }
+        Insert: {
+          id?: string
+          author_steam_id: number
+          name: string
+          description?: string
+          payload: Json
+          status?: string
+          upvote_count?: number
+          created_at?: string
+          updated_at?: string
+          submitted_at?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: number | null
+        }
+        Update: {
+          id?: string
+          author_steam_id?: number
+          name?: string
+          description?: string
+          payload?: Json
+          status?: string
+          upvote_count?: number
+          created_at?: string
+          updated_at?: string
+          submitted_at?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: number | null
+        }
+        Relationships: []
+      }
+      community_build_votes: {
+        Row: {
+          build_id: string
+          steam_id: number
+          created_at: string
+        }
+        Insert: {
+          build_id: string
+          steam_id: number
+          created_at?: string
+        }
+        Update: {
+          build_id?: string
+          steam_id?: number
+          created_at?: string
+        }
+        Relationships: []
+      }
+      community_build_comments: {
+        Row: {
+          id: string
+          build_id: string
+          author_steam_id: number
+          body: string
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          build_id: string
+          author_steam_id: number
+          body: string
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          build_id?: string
+          author_steam_id?: number
+          body?: string
+          created_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

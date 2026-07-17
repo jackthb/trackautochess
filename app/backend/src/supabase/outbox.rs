@@ -1,5 +1,5 @@
 use super::SupabaseClient;
-use crate::{config::Config, outbox::Outbox};
+use crate::{config::Config, outbox::Outbox, queen_ladder};
 use serde_json::Value;
 use std::io;
 
@@ -49,6 +49,16 @@ impl SupabaseClient {
 
     fn post_raw_payload(&self, _cfg: &Config, payload: &str) -> Result<(), String> {
         let value = serde_json::from_str::<Value>(payload).map_err(|err| err.to_string())?;
+        if let Some(players) = queen_ladder::parse_queen_ladder_outbox(&value) {
+            if players.is_empty() {
+                return Ok(());
+            }
+            let upserted = self.upsert_queen_ladder_players(&players)?;
+            if upserted == 0 {
+                return Err("Queen ladder outbox replay wrote 0 rows".to_owned());
+            }
+            return Ok(());
+        }
         let table = value.get("table").and_then(Value::as_str).unwrap_or("");
         let body = value
             .get("rows")

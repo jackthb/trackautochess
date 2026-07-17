@@ -415,20 +415,13 @@ async function persistDrodoProfile(
     drodo_last_fetched_at: profile.fetched_at,
     next_poll_at: schedule.next_poll_at,
     poll_interval_seconds: schedule.poll_interval_seconds,
-    // Denormalize the freshly polled Queen ladder rank onto its own indexed
-    // column — the one source of truth the /queens table and player pages read,
-    // instead of digging it out of the drodo_raw_data JSON (which only updated
-    // when MMR moved, so rank-only changes rotted). The web poll owns this
-    // column. Written on the heartbeat path too so a rank-only move still lands.
-    // The ladder "last seen" timestamp comes from in-game ladder captures, not
-    // Drodo profile refreshes.
-    // Only touched for Queen profiles; a successful poll that returns no
-    // queen_rank means they dropped off the ladder, so clear it.
-    ...(queen
-      ? {
-          queen_ladder_rank: queenRank,
-        }
-      : {}),
+    // Prefer Drodo's queen_rank when present so rank-only moves still land on
+    // the indexed column the /queens table reads. Do NOT clear on null — Drodo
+    // often omits queen_rank even for active ladder players, and wiping here
+    // races desktop in-game ladder uploads. Drop-offs are cleared by the next
+    // ladder capture (absent players), not by a missing Drodo field.
+    // queen_ladder_last_seen_at still comes only from those captures.
+    ...(queen && queenRank != null ? { queen_ladder_rank: queenRank } : {}),
   };
   if (!changed) {
     const { error: heartbeatError } = await supabase

@@ -2,7 +2,10 @@ pub use crate::nettable_live::live_players_value;
 use crate::{
     config::Config,
     gsi::GsiState,
-    dump_commands::{dota_has_foreground_focus, send_dump_keys_if_dota_focused, DumpKey},
+    dump_commands::{
+        dota_has_foreground_focus, send_dump_keys_forcing_dota_focus,
+        send_dump_keys_if_dota_focused, DumpKey,
+    },
     ipc_events::{
         event_json, NettableCheckActiveMatch, NettableCreepRound, NettableEndBoardSaved,
         NettableGameEnded, NettableIngestComplete, NettableIngestError, NettableMatchLeftPending,
@@ -22,13 +25,14 @@ use crate::{
         request_steam_shutdown, setup_progress, setup_result_error, tokenize_launch_options,
         wait_for_steam_exit, DEFAULT_GSI_PORT, REQUIRED_LAUNCH_FLAGS,
     },
+    outbox::Outbox,
     queen_ladder,
     supabase::{finished_match_id_from_rows, fresh_client_from_disk, parse_valid_steam_id64},
 };
 use std::{
     collections::HashSet,
     fs, io,
-    path::PathBuf,
+    path::{Path, PathBuf},
     sync::{Arc, Mutex},
     thread,
     time::{Duration, Instant, SystemTime},
@@ -204,7 +208,8 @@ impl NettableService {
                             for event in handle_rows_for_parity(&state, &rows) {
                                 emit(event);
                             }
-                            if let Some(event) = maybe_auto_upload_queen_ladder(&state, &rows)
+                            if let Some(event) =
+                                maybe_auto_upload_queen_ladder(&state, &rows, &cfg.dac_dir)
                             {
                                 emit(event);
                             }
@@ -422,7 +427,8 @@ impl NettableService {
 
     pub fn capture_once_json(&self) -> String {
         self.set_paused(false);
-        match send_dump_commands(&[DumpKey::F23, DumpKey::F22, DumpKey::F20, DumpKey::F21]) {
+        match send_dump_commands_forcing_focus(&[DumpKey::F23, DumpKey::F22, DumpKey::F20, DumpKey::F21])
+        {
             Ok(result) => event_json(&NettableCheckActiveMatch::new(
                 "Requested a manual lobby snapshot.",
                 Some(result.transport),
@@ -436,7 +442,7 @@ impl NettableService {
 
     pub fn check_active_match_json(&self) -> String {
         self.set_paused(false);
-        match send_dump_commands(&[
+        match send_dump_commands_forcing_focus(&[
             DumpKey::F23,
             DumpKey::F22,
             DumpKey::F20,
@@ -445,7 +451,7 @@ impl NettableService {
             DumpKey::F21,
         ]) {
             Ok(result) => event_json(&NettableCheckActiveMatch::new(
-                "Requested a full live lobby snapshot. If Dota is focused, new rows should appear within a few seconds.",
+                "Requested a full live lobby snapshot. Dota was focused briefly if needed so dump keys could land.",
                 Some(result.transport),
                 &now_iso_utc(),
             )),
@@ -549,7 +555,7 @@ impl NettableService {
                 // F24 dumps ranking_top_table (+ player_id_table). Only worth
                 // sending when Dota is actually running — otherwise the keys go
                 // nowhere and we'd just be spamming the foreground app.
-                let _ = send_dump_commands(&[DumpKey::F24]);
+                let _ = send_dump_commands_forcing_focus(&[DumpKey::F24]);
                 // Dota writes console.log asynchronously; give the stringtable
                 // block time to land before parsing the full file.
                 thread::sleep(Duration::from_millis(2500));
@@ -569,16 +575,26 @@ impl NettableService {
                 .map(|value| value.to_value())
                 .ok_or_else(|| queen_list_missing_message(&log_path))?;
 
-            let players = queen_ladder::extract_ranking_top_players(&ranking_raw, &now_iso_utc());
+            let scanned_at = now_iso_utc();
+            let players = queen_ladder::extract_ranking_top_players(&ranking_raw, &scanned_at);
             if players.is_empty() {
                 return Err("Found the Queen list, but it did not contain any players.".to_owned());
             }
             let season = players[0].season.clone().unwrap_or_default();
-
-            let client = fresh_client_from_disk().map_err(|err| {
-                format!("Supabase session is not ready; cannot upload the Queen ladder: {err}")
-            })?;
-            let upserted = client.upsert_queen_ladder_players(&players)?;
+            let outbox_path = persist_queen_ladder_locally(&cfg.dac_dir, &players, &scanned_at)?;
+            emit(queen_progress(
+                &format!(
+                    "Saved {} Queen players locally; uploading…",
+                    players.len()
+                ),
+                &scanned_at,
+            ));
+            let upserted = upload_persisted_queen_ladder(&cfg.dac_dir, &outbox_path, &players)
+                .map_err(|err| {
+                    format!(
+                        "{err} (saved locally in outbox until the next successful push)"
+                    )
+                })?;
             Ok((players.len(), upserted, season))
         })();
 
@@ -590,7 +606,7 @@ impl NettableService {
                     None
                 } else {
                     Some(format!(
-                        "Found {player_count} Queen players, but the database wrote 0 rows."
+                        "Found {player_count} Queen players, but the database wrote 0 rows. Kept locally until the next successful push."
                     ))
                 };
                 emit(event_json(&NettableQueenUploadComplete::complete(
@@ -1014,6 +1030,13 @@ mod tests {
 
     #[test]
     fn automatic_queen_scan_is_throttled_to_sync_interval() {
+        let dac_dir = std::env::temp_dir().join(format!(
+            "dac-queen-throttle-{}",
+            SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .unwrap()
+                .as_nanos()
+        ));
         let state = Arc::new(Mutex::new(NettableState::default()));
         let rows = rows_from_json(vec![(
             "CustomNetTable_ranking_top_table",
@@ -1021,14 +1044,14 @@ mod tests {
             serde_json::json!({"season": "s40", "ranking_top": {"1": {"steam_id": "76561198022169086", "name": "Jack", "rank": 1, "mmr": 4200}}}),
         )]);
 
-        let first = maybe_auto_upload_queen_ladder(&state, &rows).expect("scan event");
-        let second = maybe_auto_upload_queen_ladder(&state, &rows);
+        let first = maybe_auto_upload_queen_ladder(&state, &rows, &dac_dir).expect("scan event");
+        let second = maybe_auto_upload_queen_ladder(&state, &rows, &dac_dir);
         {
             let mut state = state.lock().unwrap();
             state.last_ranking_top_sync_at =
                 Some(Instant::now() - QUEEN_LADDER_AUTO_SYNC_INTERVAL - Duration::from_secs(1));
         }
-        let third = maybe_auto_upload_queen_ladder(&state, &rows).expect("resync event");
+        let third = maybe_auto_upload_queen_ladder(&state, &rows, &dac_dir).expect("resync event");
 
         assert!(first.contains("nettable_ranking_scanned"));
         assert!(first.contains("\"player_count\":1"));
@@ -1038,6 +1061,46 @@ mod tests {
         );
         assert!(third.contains("nettable_ranking_scanned"));
         assert!(third.contains("\"player_count\":1"));
+        assert!(
+            dac_dir.join("captures").join("latest_queen_ladder.json").is_file(),
+            "queen ladder must be saved locally on every scan"
+        );
+        // Outbox is cleared only after a successful remote upsert. In CI without
+        // credentials it stays queued; with a live session it may already be gone.
+        let pending = Outbox::new(dac_dir.join("outbox")).list().unwrap().len();
+        assert!(
+            pending <= 1,
+            "identical ladder scans should dedupe to at most one outbox item"
+        );
+        let _ = fs::remove_dir_all(dac_dir);
+    }
+
+    #[test]
+    fn persist_queen_ladder_locally_writes_latest_and_outbox() {
+        let dac_dir = std::env::temp_dir().join(format!(
+            "dac-queen-persist-{}",
+            SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .unwrap()
+                .as_nanos()
+        ));
+        let players = vec![queen_ladder::QueenPlayer {
+            steam_id: "76561198000000001".to_owned(),
+            name: Some("alice".to_owned()),
+            rank: 1,
+            mmr: Some(4200),
+            season: Some("s44".to_owned()),
+            seen_at: "2026-07-17T01:00:00Z".to_owned(),
+        }];
+        let path = persist_queen_ladder_locally(&dac_dir, &players, "2026-07-17T01:00:00Z")
+            .expect("persist");
+        assert!(path.is_file());
+        let latest = fs::read_to_string(dac_dir.join("captures").join("latest_queen_ladder.json"))
+            .expect("latest");
+        let parsed: serde_json::Value = serde_json::from_str(&latest).expect("json");
+        assert_eq!(parsed["kind"], queen_ladder::QUEEN_LADDER_OUTBOX_KIND);
+        assert_eq!(parsed["players"].as_array().unwrap().len(), 1);
+        let _ = fs::remove_dir_all(dac_dir);
     }
 
     fn player_id_rows(steam_ids: &[&str]) -> Vec<NettableRow> {
@@ -1226,6 +1289,7 @@ fn handle_rows_for_parity(state: &Arc<Mutex<NettableState>>, rows: &[NettableRow
 fn maybe_auto_upload_queen_ladder(
     state: &Arc<Mutex<NettableState>>,
     rows: &[NettableRow],
+    dac_dir: &Path,
 ) -> Option<String> {
     let now = Instant::now();
     let should_sync = {
@@ -1245,23 +1309,59 @@ fn maybe_auto_upload_queen_ladder(
     let scanned_at = now_iso_utc();
     let players = queen_ladder::extract_ranking_top_players(&ranking_raw, &scanned_at);
     let player_count = players.len();
-    if let Ok(mut state) = state.lock() {
-        state.last_ranking_top_sync_at = Some(now);
-    }
     if player_count == 0 {
         return None;
     }
+    // Persist before throttling/upload so a failed push still leaves a durable
+    // copy for startup/outbox-flush replay.
+    let outbox_path = persist_queen_ladder_locally(dac_dir, &players, &scanned_at).ok()?;
+    if let Ok(mut state) = state.lock() {
+        state.last_ranking_top_sync_at = Some(now);
+    }
     let season = players[0].season.clone().unwrap_or_default();
-    let upserted = fresh_client_from_disk()
-        .ok()
-        .and_then(|client| client.upsert_queen_ladder_players(&players).ok())
-        .unwrap_or(0);
+    let upserted =
+        upload_persisted_queen_ladder(dac_dir, &outbox_path, &players).unwrap_or(0);
     Some(event_json(&NettableRankingScanned::new(
         player_count,
         upserted,
         &season,
         &scanned_at,
     )))
+}
+
+/// Write the ladder under `captures/latest_queen_ladder.json` and enqueue a
+/// typed outbox payload. Deleted from outbox only after a successful upsert.
+fn persist_queen_ladder_locally(
+    dac_dir: &Path,
+    players: &[queen_ladder::QueenPlayer],
+    scanned_at: &str,
+) -> Result<PathBuf, String> {
+    let payload = queen_ladder::queen_ladder_outbox_payload(players, scanned_at);
+    let payload_str = payload.to_string();
+    let captures = dac_dir.join("captures");
+    fs::create_dir_all(&captures).map_err(|err| err.to_string())?;
+    fs::write(captures.join("latest_queen_ladder.json"), &payload_str)
+        .map_err(|err| format!("Could not save Queen ladder locally: {err}"))?;
+    let outbox = Outbox::new(dac_dir.join("outbox"));
+    outbox
+        .enqueue_str(&payload_str)
+        .map_err(|err| format!("Could not queue Queen ladder for upload: {err}"))
+}
+
+fn upload_persisted_queen_ladder(
+    dac_dir: &Path,
+    outbox_path: &Path,
+    players: &[queen_ladder::QueenPlayer],
+) -> Result<usize, String> {
+    let client = fresh_client_from_disk().map_err(|err| {
+        format!("Supabase session is not ready; cannot upload the Queen ladder: {err}")
+    })?;
+    let upserted = client.upsert_queen_ladder_players(players)?;
+    if upserted > 0 {
+        let outbox = Outbox::new(dac_dir.join("outbox"));
+        let _ = outbox.mark_uploaded(outbox_path);
+    }
+    Ok(upserted)
 }
 
 fn build_match_timeline_from_state(
@@ -1624,6 +1724,12 @@ fn send_dump_commands(keys: &[DumpKey]) -> Result<DumpCommandResult, String> {
     })
 }
 
+fn send_dump_commands_forcing_focus(keys: &[DumpKey]) -> Result<DumpCommandResult, String> {
+    send_dump_keys_forcing_dota_focus(keys).map(|()| DumpCommandResult {
+        transport: "focus_steal_sendinput",
+    })
+}
+
 fn end_board_already_uploaded(state: &Arc<Mutex<NettableState>>, match_id: &str) -> bool {
     state
         .lock()
@@ -1726,9 +1832,12 @@ where
     )));
 
     for _ in 0..POST_GAME_END_BOARD_ATTEMPTS {
-        if let Err(err) =
-            send_dump_commands(&[DumpKey::F23, DumpKey::F22, DumpKey::F20, DumpKey::F21])
-        {
+        if let Err(err) = send_dump_commands_forcing_focus(&[
+            DumpKey::F23,
+            DumpKey::F22,
+            DumpKey::F20,
+            DumpKey::F21,
+        ]) {
             emit(event_json(&NettableIngestError::with_backend_at(
                 &format!("post-game dump command failed: {err}"),
                 &now_iso_utc(),

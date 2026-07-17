@@ -2907,6 +2907,11 @@ video {
   color: var(--text-muted);
 }
 
+.nettable-setup-complete.waiting-focus {
+  border-color: color-mix(in srgb, var(--gold) 55%, var(--border));
+  color: var(--text-secondary);
+}
+
 .nettable-setup-complete-dot {
   display: inline-block;
   width: 8px;
@@ -2917,6 +2922,10 @@ video {
 
 .nettable-setup-complete-dot.paused {
   background: var(--text-muted);
+}
+
+.nettable-setup-complete-dot.waiting-focus {
+  background: var(--gold);
 }
 
 .nettable-pause-btn {

@@ -15,14 +15,17 @@ then uploads the processed match representation to Supabase.
    their own autoexec, it appends/replaces only our marked block and preserves
    the rest of the file.
 3. The capture module tails `console.log` and sends dump commands through the
-   app-owned extended F-key binds only while Dota is the foreground window.
-   There is no focus stealing and no sending keys into other apps. If the user
-   tabs out, dumps pause; when Dota regains focus, the backend immediately sends
-   a catch-up snapshot before resuming the normal cadence:
+   app-owned extended F-key binds. Live cadence only fires while Dota is the
+   foreground window (so keys never land in other apps). If the user tabs out,
+   cadence pauses; when Dota regains focus, the backend immediately sends a
+   catch-up snapshot before resuming:
    - **Every 2s**: F23 (`game_info` — round/death tracking)
    - **On round change**: F22 (`player_info_table`) + F20 (`player_id_table` — slot/board metadata refresh)
    - **Once at match/session opening**: F24 (`ranking_top_table` + `player_id_table`) then F16 (`chess_pool_table`)
-   - **On POST_GAME**: burst of F21 to capture `end_board`
+   - **On POST_GAME / Check active match**: briefly force-focus Dota
+     (`SetForegroundWindow` + `AttachThreadInput`), fire the dump burst
+     (including F21 for `end_board`), then restore the previous foreground
+     window when possible.
 4. Each key bind runs one or more `dumpstringtable` calls. Dota writes binary
    VBKV payloads into `console.log`, which the tailer parses.
 5. Match-session continuity is keyed by the exact sorted Steam-ID roster from

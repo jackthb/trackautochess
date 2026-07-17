@@ -4,18 +4,17 @@ import { DEFAULT_LOCALE } from "@/lib/i18n";
 import { getAllItems } from "@/lib/items";
 import { getAllUnits } from "@/lib/units";
 import { SITE_NAME, SITE_TITLE } from "@/lib/site";
-import { AdminGate } from "@/components/app/AdminGate";
-import { BuildPlanner, type BuilderItem, type BuilderUnit } from "./BuildPlanner";
+import { BuildsPageClient } from "./BuildsPageClient";
+import type { BuilderItem, BuilderUnit } from "./BuildPlanner";
 
 const title = `Builds | ${SITE_TITLE}`;
 const description =
-  "Plan Dota Auto Chess boards with pieces, items, draft status, and saved build snapshots.";
+  "Plan Dota Auto Chess boards, submit builds for the public list, and browse community lineups.";
 
 export const metadata: Metadata = {
   title,
   description,
   alternates: { canonical: "/builds" },
-  robots: "noindex, nofollow",
   openGraph: {
     title,
     description,
@@ -50,9 +49,7 @@ export default function BuildsPage() {
 
   return (
     <PageLayout title="Builds">
-      <AdminGate>
-        <BuildPlanner units={units} items={items} />
-      </AdminGate>
+      <BuildsPageClient units={units} items={items} />
     </PageLayout>
   );
 }

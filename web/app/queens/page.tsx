@@ -153,7 +153,7 @@ export default async function QueensPage() {
 
   return (
     <PageLayout title="Queen Players">
-      {!seasonNormalizing ? (
+      {!seasonNormalizing && rows.length > 0 ? (
         <QueensAutoRefresh
           latestFetchedAt={refreshAnchorAt}
           cooldownMs={QUEENS_VIEW_REFRESH_COOLDOWN_MS}

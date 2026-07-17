@@ -143,13 +143,17 @@ Facts that make it tractable:
 - DAC lets you **spectate to the end** after elimination — the client keeps receiving
   nettable updates if you don't quit.
 
-**Planned fix (revisit):**
-1. On GSI post-game, **force Dota to foreground** (`SetForegroundWindow` + `AttachThreadInput`
-   to beat the foreground lock), fire the `dac_table` dump to lift `end_board`, restore focus.
+**Implemented fix:**
+1. On GSI post-game (and manual "Check active match"), **force Dota to foreground**
+   (`SetForegroundWindow` + `AttachThreadInput` to beat the foreground lock), fire
+   the dump burst to lift `end_board`, restore the previous foreground window.
 2. **Don't stop capture on the observer's own elimination** — keep going until `end_board`
    or disconnect.
 3. **Drop end-lobby screenshots** entirely — structured `end_board` replaces them (the dead
    `screenshots` storage bucket is a leftover of this).
+
+Live cadence still does **not** steal focus every few seconds (that would be miserable);
+only critical dumps do.
 
 ### Hard constraint (input requires focus)
 Effectively, input can't reach the Dota window unless it is focused/foreground — for any

@@ -142,7 +142,7 @@ export function AppNavBar() {
   const standaloneLinks: { href: string; label: string; key: string }[] = [
     { href: "/talents", label: t.talents, key: "talents" },
     { href: "/queens", label: t.queens, key: "queens" },
-    ...(isAdmin ? [{ href: "/builds", label: t.builds, key: "builds" }] : []),
+    { href: "/builds", label: t.builds, key: "builds" },
     { href: "/creators", label: t.creators, key: "creators" },
     ...(canSeeBetaFeatures
       ? [{ href: "/matches", label: t.matches, key: "matches" }]

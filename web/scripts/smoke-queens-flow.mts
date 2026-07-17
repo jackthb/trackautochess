@@ -333,6 +333,11 @@ async function smokeDrodoPersistenceCallback() {
       false,
       "Drodo profile refreshes must not overwrite captured ladder timestamps"
     );
+    assert.equal(
+      (userUpsert.payload as Record<string, unknown>).queen_ladder_rank,
+      7,
+      "Drodo polls that return queen_rank must denormalize it onto users"
+    );
 
     const snapshotUpsert = state.calls.find(
       (call) => call.table === "mmr_snapshots" && call.op === "upsert"
@@ -348,6 +353,46 @@ async function smokeDrodoPersistenceCallback() {
     );
   } finally {
     restoreFetch();
+  }
+}
+
+async function smokeNullDrodoQueenRankPreservesLadderRank() {
+  const originalFetch = globalThis.fetch;
+  globalThis.fetch = (async (url: string | URL | Request) => {
+    assert.match(String(url), /autochess\.ppbizon\.com\/courier\/get/);
+    const payload = drodoPayload(9);
+    delete payload.user_info[STEAM_ID].queen_rank;
+    return new Response(JSON.stringify(payload), {
+      status: 200,
+      headers: { "content-type": "application/json" },
+    });
+  }) as typeof fetch;
+  const supabase = fakeSupabase([queenRow({ queen_ladder_rank: 9 })]);
+
+  try {
+    const results = await fetchAndCacheDrodoBatch([STEAM_ID], supabase, {
+      snapshotOnSuccess: true,
+      pollMode: "adaptive",
+      hotPoll: true,
+    });
+
+    assert.equal(results.length, 1);
+    assert.equal(results[0]?.ok, true);
+
+    const state = supabaseState(supabase);
+    const userUpserts = state.calls.filter(
+      (call) => call.table === "users" && call.op === "upsert"
+    );
+    assert.ok(userUpserts.length > 0, "profile refresh must persist to users");
+    for (const call of userUpserts) {
+      assert.equal(
+        "queen_ladder_rank" in (call.payload as Record<string, unknown>),
+        false,
+        "null/missing Drodo queen_rank must not clear capture-owned ladder ranks"
+      );
+    }
+  } finally {
+    globalThis.fetch = originalFetch;
   }
 }
 
@@ -491,6 +536,7 @@ smokeQueensRefreshTiming();
 await smokeReadThroughProfileLock();
 await smokeReadThroughMissingKeepsKnownProfileStale();
 await smokeDrodoPersistenceCallback();
+await smokeNullDrodoQueenRankPreservesLadderRank();
 await smokeUnchangedDrodoRefreshSnapshots();
 await smokeDisplayedQueensRefreshTarget();
 await smokeDisplayedQueensSteamIdentityRefresh();

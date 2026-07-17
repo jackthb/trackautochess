@@ -1,8 +1,11 @@
 //! Queen-ladder extraction from the `ranking_top_table` CustomNetTable.
 
-use serde_json::{Map, Value};
+use serde::{Deserialize, Serialize};
+use serde_json::{json, Map, Value};
 
-#[derive(Debug, Clone, PartialEq)]
+pub const QUEEN_LADDER_OUTBOX_KIND: &str = "queen_ladder";
+
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 pub struct QueenPlayer {
     pub steam_id: String,
     pub name: Option<String>,
@@ -10,6 +13,25 @@ pub struct QueenPlayer {
     pub mmr: Option<i64>,
     pub season: Option<String>,
     pub seen_at: String,
+}
+
+/// Durable outbox / latest-capture payload for a Queen ladder scan.
+pub fn queen_ladder_outbox_payload(players: &[QueenPlayer], scanned_at: &str) -> Value {
+    json!({
+        "kind": QUEEN_LADDER_OUTBOX_KIND,
+        "scanned_at": scanned_at,
+        "players": players,
+    })
+}
+
+/// Parse a typed Queen-ladder outbox payload. Returns `None` for other kinds.
+pub fn parse_queen_ladder_outbox(value: &Value) -> Option<Vec<QueenPlayer>> {
+    let kind = value.get("kind").and_then(Value::as_str)?;
+    if kind != QUEEN_LADDER_OUTBOX_KIND {
+        return None;
+    }
+    let players = value.get("players")?;
+    serde_json::from_value(players.clone()).ok()
 }
 
 /// Return normalized Queen-ladder rows from a decoded `ranking_top` payload.
@@ -142,7 +164,23 @@ fn first_present_int(obj: &Map<String, Value>, keys: &[&str], lo: Option<i64>) -
 #[cfg(test)]
 mod tests {
     use super::*;
-    use serde_json::json;
+
+    #[test]
+    fn outbox_payload_round_trips_players() {
+        let players = vec![QueenPlayer {
+            steam_id: "76561198000000001".to_owned(),
+            name: Some("alice".to_owned()),
+            rank: 1,
+            mmr: Some(4200),
+            season: Some("Season 44".to_owned()),
+            seen_at: "2026-07-17T01:00:00Z".to_owned(),
+        }];
+        let payload = queen_ladder_outbox_payload(&players, "2026-07-17T01:00:00Z");
+        assert_eq!(payload["kind"], QUEEN_LADDER_OUTBOX_KIND);
+        let parsed = parse_queen_ladder_outbox(&payload).expect("typed payload");
+        assert_eq!(parsed, players);
+        assert!(parse_queen_ladder_outbox(&json!({"kind": "other", "players": []})).is_none());
+    }
 
     #[test]
     fn extracts_players_with_explicit_rank_and_mmr() {

@@ -104,27 +104,24 @@ export function NetTableSetupCard({
   const commandDeliveryReady = dotaRunning ? dotaFocused : flagsSet;
   const needsApply = flagsKnown && !flagsSet;
 
-  // "All good" requires:
-  //   - autoexec installed AND
-  //   - Either Dota is running with -condebug and focused for dump-key delivery, OR
-  //   - Dota isn't running but config says the flags are set (will work
-  //     when launched).
-  // Crucially: if Dota isn't running AND flags aren't confirmed set in
-  // localconfig, we are NOT done — don't pretend we are.
+  // Setup is healthy when autoexec + launch flags are in place. Dump keys still
+  // need Dota focused (Win32), but alt-tabbing / opening this app must not look
+  // like broken setup — that's a normal mid-match pause that catches up on refocus.
   const paused = status?.paused === true;
   const remoteEnabled = status?.remote_enabled !== false;
   const tracking = dotaRunning && logActive && commandDeliveryReady;
-  const waitingForFocus = Boolean(dotaRunning && flagsSet && !commandDeliveryReady);
-  const allOk = Boolean(
+  const waitingForFocus = Boolean(
+    dotaRunning && autoexecOk && flagsSet && !dotaFocused,
+  );
+  const setupHealthy = Boolean(
     status &&
       remoteEnabled &&
       autoexecOk &&
       flagsSet &&
-      commandDeliveryReady &&
-      (tracking || (!dotaRunning && flagsSet)),
+      (tracking || waitingForFocus || (!dotaRunning && flagsSet)),
   );
   const notSetup = Boolean(status && remoteEnabled && (!autoexecOk || needsApply));
-  const cantTell = !status || Boolean(status && remoteEnabled && !allOk && !notSetup);
+  const cantTell = !status || Boolean(status && remoteEnabled && !setupHealthy && !notSetup);
 
   const togglePause = useCallback(() => {
     if (!window.tracker) return;
@@ -154,12 +151,33 @@ export function NetTableSetupCard({
     );
   }
 
-  if (allOk) {
-    const statusLabel = paused ? "Paused" : tracking ? "Capturing" : "Ready";
+  if (setupHealthy) {
+    const statusLabel = paused
+      ? "Paused"
+      : tracking
+        ? "Capturing"
+        : waitingForFocus
+          ? "Waiting for focus"
+          : "Ready";
+    const statusModifier = paused
+      ? " paused"
+      : waitingForFocus
+        ? " waiting-focus"
+        : "";
     return (
       <div className="nettable-status-row">
-        <div className={`nettable-setup-complete${paused ? " paused" : ""}`}>
-          <span className={`nettable-setup-complete-dot${paused ? " paused" : ""}`} aria-hidden="true" />
+        <div
+          className={`nettable-setup-complete${statusModifier}`}
+            title={
+            waitingForFocus
+              ? "Live dumps pause while another window is focused. Post-game and Check active match briefly focus Dota so the end board still saves."
+              : undefined
+          }
+        >
+          <span
+            className={`nettable-setup-complete-dot${statusModifier}`}
+            aria-hidden="true"
+          />
           {statusLabel}
         </div>
         <button type="button" className="btn-ghost nettable-pause-btn" onClick={togglePause}>
@@ -178,16 +196,10 @@ export function NetTableSetupCard({
   }
 
   const buttonLabel = applying ? "Setting up…" : "Set up automatically";
-  const setupTitle = notSetup
-    ? "Setup needs update"
-    : waitingForFocus
-      ? "Waiting for Dota"
-      : "Might be set up";
+  const setupTitle = notSetup ? "Setup needs update" : "Might be set up";
   const setupDetail = notSetup
     ? "Run automatic setup, then restart Dota."
-    : waitingForFocus
-      ? "Dota is running but not focused. Bring Dota to the foreground so the app can request dumps; it will catch up immediately on refocus."
-    : "We've applied the Dota setup we can check. We can't confirm it is working until Dota is focused and writing lobby data, so try a practice lobby.";
+    : "We've applied the Dota setup we can check. We can't confirm it is working until Dota is writing lobby data, so try a practice lobby.";
 
   return (
     <div className="nettable-setup-card">

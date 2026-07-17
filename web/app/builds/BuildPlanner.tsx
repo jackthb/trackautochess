@@ -14,6 +14,17 @@ import {
 } from "@dnd-kit/core";
 import { CSS } from "@dnd-kit/utilities";
 import { EntityIcon } from "@/components/EntityIcon";
+import { SteamSignInButton } from "@/components/SteamSignInButton";
+import { fetchMyBuilds, saveBuild, submitBuild } from "@/lib/builds/client";
+import {
+  isUuid,
+  type BuildItemPick,
+  type BuildPiece,
+  type BuildSnapshot,
+  type CommunityBuildStatus,
+  type SavedBuild,
+} from "@/lib/builds/types";
+import { useSupabaseSession } from "@/lib/useSupabaseSession";
 import styles from "./builds.module.css";
 
 const STORAGE_KEY = "dac-build-planner-v1";
@@ -37,39 +48,6 @@ export interface BuilderItem {
   iconUrl: string;
 }
 
-interface BuildItemPick extends BuilderItem {
-  pickId: string;
-}
-
-interface BuildPiece {
-  id: string;
-  unitSlug: string;
-  name: string;
-  iconUrl: string;
-  cost: number;
-  stars: number;
-  x: number;
-  y: number;
-  items: BuildItemPick[];
-}
-
-interface BuildSnapshot {
-  id: string;
-  label: string;
-  round: number;
-  focusNote: string;
-  pieces: BuildPiece[];
-}
-
-interface SavedBuild {
-  id: string;
-  name: string;
-  description: string;
-  status: "draft" | "published";
-  updatedAt: string;
-  snapshots: BuildSnapshot[];
-}
-
 interface PlannerStore {
   builds: SavedBuild[];
   activeId: string;
@@ -77,6 +55,33 @@ interface PlannerStore {
 
 interface SharedBuildPayload {
   build: SavedBuild;
+}
+
+function statusLabel(status: CommunityBuildStatus) {
+  if (status === "pending") return "Pending review";
+  if (status === "approved") return "Approved";
+  if (status === "rejected") return "Rejected";
+  return "Draft";
+}
+
+function statusChipClass(status: CommunityBuildStatus) {
+  if (status === "pending") return styles.statusPending;
+  if (status === "approved") return styles.statusApproved;
+  if (status === "rejected") return styles.statusRejected;
+  return "";
+}
+
+function normalizeLegacyStatus(status: unknown): CommunityBuildStatus {
+  if (status === "published") return "draft";
+  if (
+    status === "draft" ||
+    status === "pending" ||
+    status === "approved" ||
+    status === "rejected"
+  ) {
+    return status;
+  }
+  return "draft";
 }
 
 function makeId(prefix: string) {
@@ -133,7 +138,13 @@ function readStore(): PlannerStore {
     if (!Array.isArray(parsed.builds) || parsed.builds.length === 0) {
       throw new Error("empty");
     }
-    return parsed;
+    return {
+      ...parsed,
+      builds: parsed.builds.map((build) => ({
+        ...build,
+        status: normalizeLegacyStatus(build.status),
+      })),
+    };
   } catch {
     const build = emptyBuild();
     return { builds: [build], activeId: build.id };
@@ -538,6 +549,7 @@ export function BuildPlanner({
   units: BuilderUnit[];
   items: BuilderItem[];
 }) {
+  const { steamId, accessToken, ready: sessionReady } = useSupabaseSession();
   const [store, setStore] = useState<PlannerStore>(() => initialStore());
   const [hydrated, setHydrated] = useState(false);
   const [unitQuery, setUnitQuery] = useState("");
@@ -547,6 +559,8 @@ export function BuildPlanner({
   const [activeSnapshotId, setActiveSnapshotId] = useState<string | null>(null);
   const [activeDragId, setActiveDragId] = useState<string | null>(null);
   const [shareStatus, setShareStatus] = useState("");
+  const [saveStatus, setSaveStatus] = useState("");
+  const [busyAction, setBusyAction] = useState<"save" | "submit" | null>(null);
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 4 } }));
 
   useEffect(() => {
@@ -559,17 +573,51 @@ export function BuildPlanner({
         activeId: sharedBuild.id,
       }));
       setActiveSnapshotId(sharedBuild.snapshots[0]?.id ?? null);
-    } else {
-      const loaded = readStore();
-      setStore(loaded);
-      setActiveSnapshotId(
-        loaded.builds.find((build) => build.id === loaded.activeId)?.snapshots[0]?.id ??
-          loaded.builds[0]?.snapshots[0]?.id ??
-          null,
-      );
+      setHydrated(true);
+      return;
     }
+    const loaded = readStore();
+    setStore(loaded);
+    setActiveSnapshotId(
+      loaded.builds.find((build) => build.id === loaded.activeId)?.snapshots[0]?.id ??
+        loaded.builds[0]?.snapshots[0]?.id ??
+        null,
+    );
     setHydrated(true);
   }, []);
+
+  useEffect(() => {
+    if (!hydrated || !sessionReady || !accessToken || !steamId) return;
+    let cancelled = false;
+    void fetchMyBuilds(accessToken)
+      .then((remoteBuilds) => {
+        if (cancelled || remoteBuilds.length === 0) return;
+        setStore((current) => {
+          const byId = new Map(current.builds.map((build) => [build.id, build]));
+          for (const remote of remoteBuilds) {
+            byId.set(remote.payload.id, {
+              ...remote.payload,
+              id: remote.id,
+              status: remote.status,
+              updatedAt: remote.updatedAt,
+            });
+          }
+          const builds = [...byId.values()].sort((a, b) =>
+            (b.updatedAt || "").localeCompare(a.updatedAt || ""),
+          );
+          const activeId = builds.some((build) => build.id === current.activeId)
+            ? current.activeId
+            : builds[0]?.id ?? current.activeId;
+          return { builds, activeId };
+        });
+      })
+      .catch(() => {
+        // Keep local drafts if sync fails.
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [hydrated, sessionReady, accessToken, steamId]);
 
   useEffect(() => {
     if (!hydrated) return;
@@ -587,7 +635,9 @@ export function BuildPlanner({
   const selectedUnit =
     units.find((unit) => unit.slug === selectedUnitSlug) ?? null;
 
-  const publishedBuilds = store.builds.filter((build) => build.status === "published");
+  const sidebarBuilds = store.builds.slice(0, 12);
+  const canEditServer =
+    activeBuild.status === "draft" || activeBuild.status === "rejected";
   const unitsByCost = useMemo(() => {
     const query = unitQuery.trim().toLowerCase();
     const buckets: BuilderUnit[][] = [[], [], [], [], []];
@@ -793,6 +843,75 @@ export function BuildPlanner({
     window.setTimeout(() => setShareStatus(""), 1800);
   };
 
+  const applyServerBuild = (next: SavedBuild, previousId: string) => {
+    setStore((current) => ({
+      builds: [
+        next,
+        ...current.builds.filter(
+          (build) => build.id !== previousId && build.id !== next.id,
+        ),
+      ],
+      activeId: next.id,
+    }));
+  };
+
+  const handleSave = async () => {
+    if (!accessToken) {
+      setSaveStatus("Sign in to save");
+      window.setTimeout(() => setSaveStatus(""), 2200);
+      return;
+    }
+    if (!canEditServer) {
+      setSaveStatus("Copy the build to edit");
+      window.setTimeout(() => setSaveStatus(""), 2200);
+      return;
+    }
+    setBusyAction("save");
+    setSaveStatus("Saving…");
+    try {
+      const result = await saveBuild(
+        { ...activeBuild, status: "draft" },
+        accessToken,
+      );
+      applyServerBuild(result.payload, activeBuild.id);
+      setSaveStatus("Saved");
+    } catch (err) {
+      setSaveStatus(err instanceof Error ? err.message : "Save failed");
+    } finally {
+      setBusyAction(null);
+      window.setTimeout(() => setSaveStatus(""), 2200);
+    }
+  };
+
+  const handleSubmit = async () => {
+    if (!accessToken) {
+      setSaveStatus("Sign in to submit");
+      window.setTimeout(() => setSaveStatus(""), 2200);
+      return;
+    }
+    setBusyAction("submit");
+    setSaveStatus("Submitting…");
+    try {
+      let buildId = activeBuild.id;
+      if (!isUuid(buildId) || canEditServer) {
+        const saved = await saveBuild(
+          { ...activeBuild, status: "draft" },
+          accessToken,
+        );
+        applyServerBuild(saved.payload, activeBuild.id);
+        buildId = saved.id;
+      }
+      const submitted = await submitBuild(buildId, accessToken);
+      applyServerBuild(submitted.payload, buildId);
+      setSaveStatus("Submitted for review");
+    } catch (err) {
+      setSaveStatus(err instanceof Error ? err.message : "Submit failed");
+    } finally {
+      setBusyAction(null);
+      window.setTimeout(() => setSaveStatus(""), 2800);
+    }
+  };
+
   const addItemToSelectedPiece = (item: BuilderItem) => {
     if (!selectedPieceId) return;
     addItemToPiece(selectedPieceId, item);
@@ -938,15 +1057,13 @@ export function BuildPlanner({
       <div className={styles.planner}>
       <aside className={styles.library}>
         <div className={styles.panelHeader}>
-          <h2>Published</h2>
+          <h2>My builds</h2>
           <button type="button" className={styles.smallButton} onClick={newBuild}>
             New
           </button>
         </div>
         <div className={styles.buildList}>
-          {[activeBuild, ...publishedBuilds.filter((build) => build.id !== activeBuild.id)]
-            .slice(0, 12)
-            .map((build) => (
+          {sidebarBuilds.map((build) => (
               <button
                 type="button"
                 key={build.id}
@@ -956,16 +1073,23 @@ export function BuildPlanner({
                 onClick={() => {
                   setStore((current) => ({ ...current, activeId: build.id }));
                   setSelectedPieceId(null);
+                  setActiveSnapshotId(build.snapshots[0]?.id ?? null);
                 }}
               >
                 <span>{build.name || "Untitled build"}</span>
-                <small>{build.status}</small>
+                <small>{statusLabel(build.status)}</small>
               </button>
             ))}
         </div>
       </aside>
 
       <section className={styles.editor}>
+        {!steamId && sessionReady && (
+          <div className={styles.signInHint}>
+            <span>Sign in with Steam to save drafts and submit for the public list.</span>
+            <SteamSignInButton source="builds" size="sm" />
+          </div>
+        )}
         <div className={styles.editorHeader}>
           <div className={styles.titleFields}>
             <input
@@ -975,6 +1099,7 @@ export function BuildPlanner({
                 updateActiveBuild((build) => ({ ...build, name: e.target.value }))
               }
               aria-label="Build name"
+              disabled={!canEditServer && isUuid(activeBuild.id)}
             />
             <textarea
               className={styles.descriptionInput}
@@ -987,28 +1112,33 @@ export function BuildPlanner({
               }
               aria-label="Build description"
               rows={2}
+              disabled={!canEditServer && isUuid(activeBuild.id)}
             />
           </div>
           <div className={styles.statusControls}>
+            <span className={`${styles.statusChip} ${statusChipClass(activeBuild.status)}`}>
+              {statusLabel(activeBuild.status)}
+            </span>
             <button
               type="button"
-              className={`${styles.statusButton} ${
-                activeBuild.status === "draft" ? styles.activeStatus : ""
-              }`}
-              onClick={() => updateActiveBuild((build) => ({ ...build, status: "draft" }))}
+              className={styles.smallButton}
+              onClick={handleSave}
+              disabled={busyAction !== null || (!!steamId && !canEditServer)}
             >
-              Draft
+              Save
             </button>
             <button
               type="button"
-              className={`${styles.statusButton} ${
-                activeBuild.status === "published" ? styles.activeStatus : ""
-              }`}
-              onClick={() =>
-                updateActiveBuild((build) => ({ ...build, status: "published" }))
+              className={styles.statusButton}
+              onClick={handleSubmit}
+              disabled={
+                busyAction !== null ||
+                !steamId ||
+                activeBuild.status === "pending" ||
+                activeBuild.status === "approved"
               }
             >
-              Publish
+              Submit for public list
             </button>
             <button type="button" className={styles.smallButton} onClick={duplicateBuild}>
               Copy
@@ -1016,7 +1146,9 @@ export function BuildPlanner({
             <button type="button" className={styles.smallButton} onClick={shareBuild}>
               Share
             </button>
-            {shareStatus && <span className={styles.shareStatus}>{shareStatus}</span>}
+            {(shareStatus || saveStatus) && (
+              <span className={styles.shareStatus}>{saveStatus || shareStatus}</span>
+            )}
           </div>
         </div>
 
