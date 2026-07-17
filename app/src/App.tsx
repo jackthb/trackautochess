@@ -1,25 +1,17 @@
-import { useState, useCallback, useRef, useEffect } from "react";
+import { useRef, useEffect } from "react";
 import { capture, identify, reset } from "./lib/posthog";
 import { TitleBar } from "./components/TitleBar";
-import { TabBar } from "./components/TabBar";
 import { StatusBar } from "./components/StatusBar";
-import { SettingsTab } from "./components/SettingsTab";
 import { LoginScreen } from "./components/LoginScreen";
-import { NetTableHome } from "./components/NetTableHome";
-import { GlobalSearch } from "./components/GlobalSearch";
+import { TrackerHome } from "./components/TrackerHome";
 import { FeedbackSurveyButton } from "./components/FeedbackSurveyButton";
 import { useTrackerEvents } from "./hooks/useTrackerEvents";
 import { useNetTableEvents } from "./hooks/useNetTableEvents";
-import { useContentData } from "./hooks/useContentData";
+import { useUnitsFull } from "./hooks/useUnitsFull";
 import "./styles/app.css";
 
-type TabId = "home" | "settings";
-
 export default function App() {
-  const [activeTab, setActiveTab] = useState<TabId>("home");
-  const [searchOpen, setSearchOpen] = useState(false);
-
-  const content = useContentData();
+  const { unitsFull } = useUnitsFull();
   const netTable = useNetTableEvents();
   const tracker = useTrackerEvents();
 
@@ -53,26 +45,6 @@ export default function App() {
 
   const showLoginScreen = !tracker.status?.logged_in;
 
-  useEffect(() => {
-    if (showLoginScreen) {
-      setSearchOpen(false);
-      return;
-    }
-    function onKey(e: KeyboardEvent) {
-      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
-        e.preventDefault();
-        setSearchOpen((o) => !o);
-      }
-    }
-    document.addEventListener("keydown", onKey);
-    return () => document.removeEventListener("keydown", onKey);
-  }, [showLoginScreen]);
-
-  const handleTabChange = useCallback((tab: string) => {
-    setActiveTab(tab as TabId);
-    capture("tab_viewed", { tab });
-  }, []);
-
   return (
     <>
       <TitleBar />
@@ -84,36 +56,14 @@ export default function App() {
         />
       ) : (
         <>
-          <TabBar
-            active={activeTab}
-            onChange={handleTabChange}
-            userName={steamName ?? undefined}
-          />
           <div style={{ flex: 1, overflow: "hidden", display: "flex" }}>
-            {activeTab === "home" && (
-              <NetTableHome
-                unitsFull={content.unitsFull}
-                synergiesData={content.synergiesData}
-                relicsData={content.relicsData}
-                itemsFull={content.itemsFull}
-                netTable={netTable}
-              />
-            )}
-            {activeTab === "settings" && (
-              <SettingsTab status={tracker.status} />
-            )}
+            <TrackerHome
+              unitsFull={unitsFull}
+              netTable={netTable}
+              status={tracker.status}
+            />
           </div>
           <StatusBar status={tracker.status} />
-          <GlobalSearch
-            open={searchOpen}
-            onClose={() => setSearchOpen(false)}
-            unitsFull={content.unitsFull}
-            unitCosts={content.unitCosts}
-            synergiesData={content.synergiesData}
-            relicsData={content.relicsData}
-            itemsData={content.itemsData}
-            talentsData={content.talentsData}
-          />
           <FeedbackSurveyButton status={tracker.status} />
         </>
       )}

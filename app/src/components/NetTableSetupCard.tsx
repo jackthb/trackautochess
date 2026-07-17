@@ -107,7 +107,6 @@ export function NetTableSetupCard({
   // Setup is healthy when autoexec + launch flags are in place. Dump keys still
   // need Dota focused (Win32), but alt-tabbing / opening this app must not look
   // like broken setup — that's a normal mid-match pause that catches up on refocus.
-  const paused = status?.paused === true;
   const remoteEnabled = status?.remote_enabled !== false;
   const tracking = dotaRunning && logActive && commandDeliveryReady;
   const waitingForFocus = Boolean(
@@ -123,11 +122,10 @@ export function NetTableSetupCard({
   const notSetup = Boolean(status && remoteEnabled && (!autoexecOk || needsApply));
   const cantTell = !status || Boolean(status && remoteEnabled && !setupHealthy && !notSetup);
 
-  const togglePause = useCallback(() => {
-    if (!window.tracker) return;
-    window.tracker.sendCommand({ cmd: "nettable_set_paused", paused: !paused });
-    capture("recording_toggled", { paused: !paused });
-  }, [paused]);
+  const closeApp = useCallback(() => {
+    capture("app_close_clicked", { source: "setup_card" });
+    window.windowControls?.close();
+  }, []);
 
   if (status && !remoteEnabled) {
     return (
@@ -152,37 +150,8 @@ export function NetTableSetupCard({
   }
 
   if (setupHealthy) {
-    const statusLabel = paused
-      ? "Paused"
-      : tracking
-        ? "Capturing"
-        : waitingForFocus
-          ? "Waiting for focus"
-          : "Ready";
-    const statusModifier = paused
-      ? " paused"
-      : waitingForFocus
-        ? " waiting-focus"
-        : "";
     return (
       <div className="nettable-status-row">
-        <div
-          className={`nettable-setup-complete${statusModifier}`}
-            title={
-            waitingForFocus
-              ? "Live dumps pause while another window is focused. Post-game and Check active match briefly focus Dota so the end board still saves."
-              : undefined
-          }
-        >
-          <span
-            className={`nettable-setup-complete-dot${statusModifier}`}
-            aria-hidden="true"
-          />
-          {statusLabel}
-        </div>
-        <button type="button" className="btn-ghost nettable-pause-btn" onClick={togglePause}>
-          {paused ? "Resume" : "Pause"}
-        </button>
         <ActiveMatchControl onCheck={checkActiveMatch} compact />
         <QueenUploadControl
           uploading={uploadingQueens}
@@ -191,6 +160,14 @@ export function NetTableSetupCard({
           onUpload={uploadQueens}
           compact
         />
+        <button
+          type="button"
+          className="btn-ghost nettable-pause-btn"
+          onClick={closeApp}
+          title="Close Track Auto Chess"
+        >
+          Close app
+        </button>
       </div>
     );
   }
@@ -332,43 +309,3 @@ function QueenUploadControl({
   );
 }
 
-function StatusBadge({
-  ok,
-  unknown,
-  okLabel = "installed",
-  badLabel = "missing",
-}: {
-  ok: boolean;
-  unknown: boolean;
-  okLabel?: string;
-  badLabel?: string;
-}) {
-  if (unknown) {
-    return (
-      <span className="nettable-status-badge unknown">
-        <span className="nettable-status-mark" aria-hidden="true">
-          ?
-        </span>
-        checking
-      </span>
-    );
-  }
-  if (ok) {
-    return (
-      <span className="nettable-status-badge ok">
-        <span className="nettable-status-mark" aria-hidden="true">
-          ✓
-        </span>
-        {okLabel}
-      </span>
-    );
-  }
-  return (
-    <span className="nettable-status-badge bad">
-      <span className="nettable-status-mark" aria-hidden="true">
-        ✗
-      </span>
-      {badLabel}
-    </span>
-  );
-}
