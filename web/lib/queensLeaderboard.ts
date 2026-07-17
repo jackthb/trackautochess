@@ -141,6 +141,12 @@ export function newestDrodoFetchedAt(rows: QueenRow[]): string | null {
   return mostRecentTimestamp(...rows.map((row) => row.drodo_last_fetched_at));
 }
 
+export function newestQueenLadderSeenAt(rows: QueenRow[]): string | null {
+  return mostRecentTimestamp(
+    ...rows.map((row) => row.queen_ladder_last_seen_at)
+  );
+}
+
 export function oldestDrodoFetchedAt(rows: QueenRow[]): string | null {
   let oldest: string | null = null;
   let oldestTime = Infinity;

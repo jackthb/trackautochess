@@ -77,12 +77,12 @@ Command:
 
 This polls the active cohort whose `next_poll_at` is due:
 
-- Steam players who signed in recently.
-- Known Queen ladder players.
+- Steam players who signed in recently (14-day window).
+
+Queen ladder rank alone does not keep a user in this cohort. The public
+`/queens` board is capture-driven; Drodo view refresh is parked.
 
 Unseeded active users are also pulled once and then join the adaptive cadence.
-The five-minute Queen refresh endpoint still updates the visible Queen table
-between daily background runs.
 
 ### Daily full poll
 
@@ -99,9 +99,9 @@ Command:
 ```
 
 This walks cached non-missing users whose shared `next_poll_at` is due, oldest
-`drodo_last_fetched_at` first. Under the simple policy in `shared/drodo-core.ts`,
-active and inactive cached users are due daily. It defaults to up to 10000 users
-per run (`DRODO_POLL_ALL_BATCH_SIZE`).
+`drodo_last_fetched_at` first. Under the policy in `shared/drodo-core.ts`,
+active users are due daily and inactive users weekly. It defaults to up to
+10000 users per run (`DRODO_POLL_ALL_BATCH_SIZE`).
 
 At the start of a new Auto Chess season, run the same script once with
 `--season-sweep` to ignore `next_poll_at` and check all cached

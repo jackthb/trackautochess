@@ -1,6 +1,7 @@
 # Follow-up: gate the active Drodo poll on real user activity
 
-**Status:** not started — captured for a future iteration.
+**Status:** done (option 3) — Queen ladder rank dropped from the active cohort;
+inactive cadence is weekly. See `docs/polling.md`.
 
 ## What we want
 

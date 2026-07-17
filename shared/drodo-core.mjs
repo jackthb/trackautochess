@@ -5,7 +5,7 @@ const DRODO_FRESH_TTL_MS_VALUE = 24 * 60 * 60 * 1000;
 const DRODO_MISSING_TTL_MS_VALUE = 7 * 24 * 60 * 60 * 1000;
 const EMPTY_DRODO_PROFILE_ERROR_VALUE = "Steam account has no Dota Auto Chess MMR or stats.";
 const POLL_ACTIVE_INTERVAL_SECONDS_VALUE = 24 * 60 * 60;
-const POLL_INACTIVE_INTERVAL_SECONDS_VALUE = 24 * 60 * 60;
+const POLL_INACTIVE_INTERVAL_SECONDS_VALUE = 7 * 24 * 60 * 60;
 const POLL_MIN_INTERVAL_SECONDS_VALUE = POLL_ACTIVE_INTERVAL_SECONDS_VALUE;
 const POLL_MAX_INTERVAL_SECONDS_VALUE = POLL_INACTIVE_INTERVAL_SECONDS_VALUE;
 const POLL_BACKOFF_FACTOR_VALUE = 1.5;
@@ -18,17 +18,12 @@ function recentSignInCutoffValue(now = new Date()) {
     return new Date(now.getTime() - ACTIVE_SIGN_IN_WINDOW_MS_VALUE).toISOString();
 }
 function activePollOrFilterValue(cutoffIso) {
-    return [
-        `steam_signed_in_at.gte.${cutoffIso}`,
-        "queen_ladder_rank.not.is.null",
-    ].join(",");
+    return `steam_signed_in_at.gte.${cutoffIso}`;
 }
 function isActivePollUserValue(user, cutoffIso) {
     if (!user)
         return false;
-    return ((user?.steam_signed_in_at != null &&
-        user.steam_signed_in_at >= cutoffIso) ||
-        user?.queen_ladder_rank != null);
+    return user.steam_signed_in_at != null && user.steam_signed_in_at >= cutoffIso;
 }
 function inactivePollCutoffValue(now = new Date()) {
     return new Date(now.getTime() - POLL_INACTIVE_INTERVAL_SECONDS_VALUE * 1000).toISOString();

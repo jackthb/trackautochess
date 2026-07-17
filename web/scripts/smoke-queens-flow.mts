@@ -361,8 +361,12 @@ async function smokeNullDrodoQueenRankPreservesLadderRank() {
   globalThis.fetch = (async (url: string | URL | Request) => {
     assert.match(String(url), /autochess\.ppbizon\.com\/courier\/get/);
     const payload = drodoPayload(9);
-    delete payload.user_info[STEAM_ID].queen_rank;
-    return new Response(JSON.stringify(payload), {
+    const { queen_rank: _ignored, ...userInfo } = payload.user_info[STEAM_ID];
+    const payloadWithoutQueenRank = {
+      err: 0,
+      user_info: { [STEAM_ID]: userInfo },
+    };
+    return new Response(JSON.stringify(payloadWithoutQueenRank), {
       status: 200,
       headers: { "content-type": "application/json" },
     });

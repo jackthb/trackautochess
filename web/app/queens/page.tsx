@@ -6,16 +6,16 @@ import { listAvatarUrl, playerProfilePath } from "@/lib/steam";
 import { effectiveQueenRank, queenDisplayName, queenMmr } from "@/lib/queens";
 import {
   loadQueensLeaderboard,
-  newestDrodoFetchedAt,
-  oldestDrodoFetchedAt,
+  newestQueenLadderSeenAt,
   QUEEN_MOVE_LOOKBACK_LABEL,
-  queenLastUpdatedAt,
-  queenOldestUpdatedAt,
   queenSeasonGames,
   queenSeasonWins,
   type QueenMove,
 } from "@/lib/queensLeaderboard";
-import { QUEENS_VIEW_REFRESH_COOLDOWN_MS } from "@/lib/queensVisitor";
+import {
+  QUEENS_DRODO_VIEW_REFRESH_ENABLED,
+  QUEENS_VIEW_REFRESH_COOLDOWN_MS,
+} from "@/lib/queensVisitor";
 import { canonicalCreatorStreamUrl, loadCachedCreatorLiveStreams } from "@/lib/creators";
 import styles from "./queens.module.css";
 import { QueensAutoRefresh } from "./QueensAutoRefresh";
@@ -27,7 +27,7 @@ import {
 
 const title = `Queen Players | ${SITE_TITLE}`;
 const description =
-  "Latest Dota Auto Chess Queen players captured from the in-game Queen ladder and refreshed profile snapshots, with MMR, rank movement, and available season stats.";
+  "Latest Dota Auto Chess Queen players captured from the in-game Queen ladder, with rank movement and available season stats.";
 
 export const metadata: Metadata = {
   title,
@@ -50,13 +50,25 @@ export const metadata: Metadata = {
   },
 };
 
-// Rendered dynamically (live DB read per request) rather than ISR-cached. The
-// leaderboard changes constantly and a 300s Full Route Cache meant a hard page
-// reload showed stale ranks until the timer/revalidation caught up, while
-// router.refresh() (the auto-refresh client) masked it with a live render. A
-// ≤100-row query per load is cheap; the QueensAutoRefresh client polling on top
-// keeps an open tab live without a manual reload.
+// Live DB read per request. Optional Drodo view-refresh stays behind
+// QUEENS_DRODO_VIEW_REFRESH_ENABLED — when Drodo omits queen_rank / season MMR,
+// the page just shows the last in-game ladder capture.
 export const dynamic = "force-dynamic";
+
+function formatLadderUpdatedAt(iso: string | null): string | null {
+  if (!iso) return null;
+  const date = new Date(iso);
+  if (!Number.isFinite(date.getTime())) return null;
+  return date.toLocaleString("en-GB", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    timeZone: "UTC",
+    timeZoneName: "short",
+  });
+}
 
 function formatWinRate(wins: number | null, games: number | null): string {
   if (wins == null || games == null || games <= 0) return "-";
@@ -139,9 +151,8 @@ export default async function QueensPage() {
     ? [{ rows: [], error: null }, { streams: [] }]
     : await Promise.all([loadQueensLeaderboard(), loadCachedCreatorLiveStreams()]);
   const season = rows.find((row) => row.queen_ladder_season)?.queen_ladder_season;
-  const lastUpdatedAt = newestDrodoFetchedAt(rows) ?? queenLastUpdatedAt(rows);
-  const oldestUpdatedAt = oldestDrodoFetchedAt(rows) ?? queenOldestUpdatedAt(rows);
-  const refreshAnchorAt = oldestUpdatedAt ?? lastUpdatedAt;
+  const ladderUpdatedAt = newestQueenLadderSeenAt(rows);
+  const ladderUpdatedLabel = formatLadderUpdatedAt(ladderUpdatedAt);
   const liveSteamIds = new Set(
     streams
       .map((stream) => stream.steamId)
@@ -153,11 +164,21 @@ export default async function QueensPage() {
 
   return (
     <PageLayout title="Queen Players">
-      {!seasonNormalizing && rows.length > 0 ? (
+      {QUEENS_DRODO_VIEW_REFRESH_ENABLED &&
+      !seasonNormalizing &&
+      rows.length > 0 ? (
         <QueensAutoRefresh
-          latestFetchedAt={refreshAnchorAt}
+          latestFetchedAt={ladderUpdatedAt}
           cooldownMs={QUEENS_VIEW_REFRESH_COOLDOWN_MS}
         />
+      ) : null}
+      {!QUEENS_DRODO_VIEW_REFRESH_ENABLED &&
+      !seasonNormalizing &&
+      ladderUpdatedLabel ? (
+        <div className={styles["refresh-status"]} role="status">
+          <span>Ladder updated</span>
+          <strong title={ladderUpdatedAt ?? undefined}>{ladderUpdatedLabel}</strong>
+        </div>
       ) : null}
       {seasonNormalizing && leaderboardAvailableOn ? (
         <div className={styles["season-notice"]} role="status">
@@ -170,7 +191,7 @@ export default async function QueensPage() {
       <p className={styles.lead}>
         {seasonNormalizing
           ? "Queen players are tracked each season. Rankings will appear here once the ladder has stabilised."
-          : `Known Queen players${season ? ` for ${season.replace(/_/g, " ").toUpperCase()}` : ""}. The table renders cached Drodo profile data immediately, then refreshes visible profiles when the 5-minute cooldown has elapsed.`}
+          : `Known Queen players${season ? ` for ${season.replace(/_/g, " ").toUpperCase()}` : ""}. Ranks come from the in-game Queen ladder capture; the table shows that saved snapshot.`}
       </p>
       {error ? (
         <div className={styles.gate}>Failed to load Queen players: {error}</div>

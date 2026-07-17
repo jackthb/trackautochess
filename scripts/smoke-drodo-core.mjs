@@ -23,7 +23,7 @@ assert.deepEqual(normalizeDrodoSteamIds(["1", 1, "", null, undefined, "2"]), [
 ]);
 
 assert.equal(POLL_ACTIVE_INTERVAL_SECONDS, 24 * 60 * 60);
-assert.equal(POLL_INACTIVE_INTERVAL_SECONDS, 24 * 60 * 60);
+assert.equal(POLL_INACTIVE_INTERVAL_SECONDS, 7 * 24 * 60 * 60);
 assert.equal(QUEENS_REFRESH_COOLDOWN_MS, 5 * 60 * 1000);
 
 const policyNow = new Date("2026-06-16T12:00:00.000Z");
@@ -31,7 +31,7 @@ const policyCutoff = recentSignInCutoff(policyNow);
 assert.equal(policyCutoff, "2026-06-02T12:00:00.000Z");
 assert.equal(
   activePollOrFilter(policyCutoff),
-  "steam_signed_in_at.gte.2026-06-02T12:00:00.000Z,queen_ladder_rank.not.is.null"
+  "steam_signed_in_at.gte.2026-06-02T12:00:00.000Z"
 );
 assert.equal(
   isActivePollUser(
@@ -45,7 +45,7 @@ assert.equal(
     { steam_signed_in_at: null, queen_ladder_rank: 42 },
     policyCutoff
   ),
-  true
+  false
 );
 assert.equal(
   isActivePollUser(
@@ -54,7 +54,7 @@ assert.equal(
   ),
   false
 );
-assert.equal(inactivePollCutoff(policyNow), "2026-06-15T12:00:00.000Z");
+assert.equal(inactivePollCutoff(policyNow), "2026-06-09T12:00:00.000Z");
 
 const rolloverData = {
   mmr_s43: "8120",

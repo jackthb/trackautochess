@@ -1,13 +1,31 @@
 import { refreshDisplayedQueens } from "@/lib/queensRefresh";
 import { revalidateQueenPages } from "@/lib/queensRevalidate";
 import { createSupabaseServiceRoleClient } from "@/lib/supabase";
-import { QUEENS_VIEW_REFRESH_COOLDOWN_MS } from "@/lib/queensVisitor";
+import {
+  QUEENS_DRODO_VIEW_REFRESH_ENABLED,
+  QUEENS_VIEW_REFRESH_COOLDOWN_MS,
+} from "@/lib/queensVisitor";
 
 async function handle(req: Request) {
   const cronSecret = process.env.CRON_SECRET;
   const auth = req.headers.get("authorization");
   if (!cronSecret || auth !== `Bearer ${cronSecret}`) {
     return Response.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  if (!QUEENS_DRODO_VIEW_REFRESH_ENABLED) {
+    return Response.json({
+      mode: "five-minute",
+      disabled: true,
+      reason:
+        "Queen Drodo view refresh is off; /queens shows the saved ladder capture.",
+      polled: 0,
+      ok: 0,
+      missing: 0,
+      upstream_error: 0,
+      changed: 0,
+      checked_at: null,
+    });
   }
 
   const supabase = createSupabaseServiceRoleClient();

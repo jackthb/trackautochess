@@ -1,7 +1,7 @@
 {
   "title": "Poll Drodo (MMR snapshots) - active users",
   "name": "poll-drodo-active",
-  "description": "Daily poll of the active cohort: recently signed-in and Queen-ladder users whose next_poll_at is due, plus never-fetched active users",
+  "description": "Daily poll of the active cohort: recently signed-in Steam users whose next_poll_at is due, plus never-fetched active users",
   "plugin": "command",
   "command": "/opt/cronicle/dac-scripts/poll-drodo-active.sh",
   "workdir": "/workspace",

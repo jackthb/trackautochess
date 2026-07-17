@@ -5,14 +5,32 @@ import { getClientIp, getUserAgent, logAbuse, toIncomingHeaders } from "@/lib/ab
 import { refreshDisplayedQueens } from "@/lib/queensRefresh";
 import { revalidateQueenPages } from "@/lib/queensRevalidate";
 import { createSupabaseServiceRoleClient } from "@/lib/supabase";
-import { QUEENS_VIEW_REFRESH_COOLDOWN_MS } from "@/lib/queensVisitor";
+import {
+  QUEENS_DRODO_VIEW_REFRESH_ENABLED,
+  QUEENS_VIEW_REFRESH_COOLDOWN_MS,
+} from "@/lib/queensVisitor";
 
-// /queens renders cached rows quickly; visible tabs call this endpoint after
-// the displayed countdown reaches zero so Drodo polling never blocks HTML.
+// Kept for when Drodo returns queen_rank / season MMR again. While
+// QUEENS_DRODO_VIEW_REFRESH_ENABLED is false, /queens shows the saved ladder
+// capture and this route no-ops.
 const ipRateLimiter = new RateLimiterMemory({ points: 30, duration: 60 });
 
 export async function POST(req: Request) {
   const path = "/api/queens/refresh";
+  if (!QUEENS_DRODO_VIEW_REFRESH_ENABLED) {
+    return Response.json({
+      disabled: true,
+      reason:
+        "Queen Drodo view refresh is off; /queens shows the saved ladder capture.",
+      polled: 0,
+      ok: 0,
+      missing: 0,
+      upstream_error: 0,
+      changed: 0,
+      checked_at: null,
+    });
+  }
+
   const nodeHeaders = toIncomingHeaders(req);
   const reqShim = { headers: nodeHeaders } as unknown as NextApiRequest;
   const ip = getClientIp(reqShim);

@@ -6,8 +6,9 @@ should not be used as part of the background polling cadence.
 
 ## Goals
 
-- Keep the public Queen board fresh without polling every tracked user.
-- Keep active and inactive tracked players on a predictable daily cadence.
+- Keep the public Queen board on the saved in-game ladder capture (not Drodo).
+- Keep recently signed-in players on a predictable daily cadence.
+- Poll everyone else weekly — Drodo no longer returns useful Queen ladder fields.
 - Define polling cohorts once so web routes, Cronicle jobs, admin dashboards,
   and documentation cannot drift.
 
@@ -15,9 +16,9 @@ should not be used as part of the background polling cadence.
 
 | Cohort | Cadence | Notes |
 | --- | --- | --- |
-| Visible Queen board | Every 5 minutes | Refresh the rows shown on `/queens`, currently the displayed top 100 after ranking, dedupe, and tie-break rules. |
-| Active players | Once per day | A player is active when they have recently signed in with Steam or currently have a Queen ladder rank. |
-| Inactive players | Once per day | Covers tracked users who are not active players. |
+| Visible Queen board | Capture-driven (Drodo refresh parked) | `/queens` shows the saved in-game ladder snapshot. The 5-minute Drodo view refresh is behind `QUEENS_DRODO_VIEW_REFRESH_ENABLED` until Drodo returns `queen_rank` / season MMR again. |
+| Active players | Once per day | Recently signed in with Steam (14-day window). Queen ladder rank does **not** count as active. |
+| Inactive players | Once per week | Tracked users who are not in the active cohort. |
 
 ## Cohort Definitions
 
@@ -26,20 +27,16 @@ should not be used as part of the background polling cadence.
 The visible Queen board cohort is the set of users that actually appear on the
 public `/queens` table after applying the page's display logic.
 
-This is intentionally not the same as "every known Queen player." The visible
-board refresh is a separate five-minute path for the public table. Known Queen
-players also count as active for the daily background poll.
+Board freshness comes from desktop ladder capture uploads. The parked Drodo
+view-refresh path can be re-enabled later if Drodo starts returning ranks again.
 
 ### Active Players
 
-An active player is a user with a recent `steam_signed_in_at` value or a current
-`queen_ladder_rank`. The exact sign-in window should live in shared code and be
-imported everywhere the polling cohort is computed.
+An active player is a user with a recent `steam_signed_in_at` value. The exact
+sign-in window lives in shared code (`ACTIVE_SIGN_IN_WINDOW_MS` / helpers in
+`shared/drodo-core.ts`) and is imported everywhere the polling cohort is computed.
 
-Queen status counts as active because a player can push into the Queen ranking
-between visible-board refreshes. The visible Queen board refresh covers the
-public table, while the daily active poll keeps known Queen profiles moving even
-when they are not currently on the displayed page.
+Queen ladder membership alone does not keep a user in the active cohort.
 
 ### Inactive Players
 
@@ -47,7 +44,7 @@ An inactive player is any tracked user with a cached non-missing Drodo profile
 who is not currently in the active cohort.
 
 Inactive polling should be oldest-first by `drodo_last_fetched_at` and should
-only select rows that are at least one daily interval old.
+only select rows that are at least one inactive interval old (7 days).
 
 ## Out of Scope
 
