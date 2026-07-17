@@ -1967,113 +1967,147 @@ video {
 
 /* ── Global search (Cmd+K / Ctrl+K) ───────────────────────────────────────── */
 
-/* Admin legendary pool floating overlay */
-.legendary-pool-fab {
-  position: fixed;
-  right: 16px;
-  bottom: 48px;
-  z-index: 40;
-  padding: 8px 12px;
-  border: 1px solid var(--border);
-  background: var(--bg-surface);
-  color: var(--text-bright);
-  font-size: 0.78rem;
-  font-weight: 600;
-  cursor: pointer;
+/* Admin legendary pool — Discord-styled always-on-top overlay window */
+html.legendary-overlay-root,
+body.legendary-overlay-root {
+  background: transparent !important;
+  overflow: hidden !important;
+  margin: 0;
+  width: 100%;
+  height: 100%;
+  display: block !important;
 }
 
-.legendary-pool-fab:hover {
-  border-color: var(--accent, #e0aa54);
+body.legendary-overlay-root::before {
+  display: none !important;
 }
 
-.legendary-pool-overlay {
-  position: fixed;
-  right: 16px;
-  bottom: 48px;
-  z-index: 40;
-  width: min(360px, calc(100vw - 32px));
-  max-height: min(420px, calc(100vh - 96px));
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  padding: 12px;
-  border: 1px solid var(--border);
-  background: var(--bg-surface);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+body.legendary-overlay-root #root {
+  width: 100%;
+  height: 100%;
+  background: transparent;
+  display: block;
   overflow: hidden;
 }
 
-.legendary-pool-overlay-header {
+.disc-overlay {
+  box-sizing: border-box;
+  width: max-content;
+  height: max-content;
+  padding: 0;
+  font-family: "Segoe UI", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  color: #dbdee1;
+  -webkit-app-region: no-drag;
+}
+
+.disc-overlay-card {
+  box-sizing: border-box;
+  width: 260px;
   display: flex;
-  align-items: flex-start;
+  flex-direction: column;
+  padding: 8px;
+  border-radius: 8px;
+  background: #2b2d31;
+  overflow: hidden;
+}
+
+.disc-overlay-header {
+  display: flex;
+  align-items: center;
   justify-content: space-between;
-  gap: 12px;
+  gap: 8px;
+  padding: 2px 2px 6px;
+  -webkit-app-region: drag;
+  cursor: move;
 }
 
-.legendary-pool-overlay-title {
-  font-size: 0.8rem;
-  font-weight: 700;
+.disc-overlay-title {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: var(--text-bright);
+  color: #949ba4;
 }
 
-.legendary-pool-overlay-meta {
-  margin-top: 2px;
-  font-size: 0.72rem;
-  color: var(--text-muted);
-}
-
-.legendary-pool-overlay-close {
+.disc-overlay-close {
   flex-shrink: 0;
+  width: 22px;
+  height: 22px;
+  border: none;
+  border-radius: 4px;
+  padding: 0;
+  background: transparent;
+  color: #949ba4;
+  font-size: 18px;
+  line-height: 20px;
+  cursor: pointer;
+  -webkit-app-region: no-drag;
 }
 
-.legendary-pool-overlay-empty {
+.disc-overlay-close:hover {
+  background: #35373c;
+  color: #dbdee1;
+}
+
+.disc-overlay-empty {
   margin: 0;
-  font-size: 0.78rem;
-  color: var(--text-muted);
+  padding: 8px 4px 4px;
+  font-size: 12px;
   line-height: 1.35;
+  color: #949ba4;
 }
 
-.legendary-pool-grid {
+.disc-overlay-list {
   list-style: none;
   margin: 0;
   padding: 0;
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(88px, 1fr));
-  gap: 8px;
-  overflow: auto;
-}
-
-.legendary-pool-cell {
   display: flex;
   flex-direction: column;
+  gap: 2px;
+  overflow: hidden;
+}
+
+.disc-overlay-row {
+  display: grid;
+  grid-template-columns: 24px 1fr;
   align-items: center;
-  gap: 4px;
-  padding: 6px 4px;
-  border: 1px solid var(--border);
-  background: var(--bg-inset, rgba(0, 0, 0, 0.25));
+  gap: 8px;
+  padding: 5px 6px;
+  border-radius: 4px;
 }
 
-.legendary-pool-icon {
-  width: 36px;
-  height: 36px;
+.disc-overlay-row.is-unlocked {
+  background: rgba(35, 165, 89, 0.16);
+}
+
+.disc-overlay-row.is-locked {
+  background: rgba(0, 0, 0, 0.22);
+}
+
+.disc-overlay-row.is-locked .disc-overlay-icon {
+  opacity: 0.45;
+  filter: grayscale(0.8);
+}
+
+.disc-overlay-row.is-locked .disc-overlay-name {
+  color: #87898c;
+}
+
+.disc-overlay-icon {
+  width: 24px;
+  height: 24px;
   object-fit: contain;
-  flex-shrink: 0;
+  border-radius: 50%;
+  background: #1e1f22;
 }
 
-.legendary-pool-name {
-  font-size: 0.72rem;
-  text-align: center;
-  line-height: 1.2;
-  word-break: break-word;
-}
-
-.legendary-pool-status {
-  font-size: var(--fs-11);
-  color: var(--text-muted);
-  text-transform: uppercase;
-  letter-spacing: var(--tr-body);
+.disc-overlay-name {
+  font-size: 13px;
+  font-weight: 500;
+  color: #f2f3f5;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 /* Setup card */

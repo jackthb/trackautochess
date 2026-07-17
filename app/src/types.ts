@@ -326,5 +326,25 @@ declare global {
       }>;
       fetchTalents: () => Promise<Record<string, TalentInfo>>;
     };
+    legendaryOverlay?: {
+      update: (payload: {
+        revealed: { code: string; name: string }[];
+        unrevealed: { code: string; name: string }[];
+        stateAt: string | null;
+      } | null) => Promise<boolean>;
+      hide: () => Promise<boolean>;
+      show: () => Promise<boolean>;
+      ready: () => void;
+      resize: (size: { width: number; height: number }) => void;
+      onPush: (
+        callback: (
+          payload: {
+            revealed: { code: string; name: string }[];
+            unrevealed: { code: string; name: string }[];
+            stateAt: string | null;
+          } | null,
+        ) => void,
+      ) => () => void;
+    };
   }
 }

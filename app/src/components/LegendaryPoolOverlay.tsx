@@ -1,9 +1,54 @@
-import { useMemo, useState } from "react";
-import { createPortal } from "react-dom";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { unitStem } from "../lib/game-utils";
 import { buildChessCodeUnitLookup } from "@dac/shared/game-structure";
 import type { NetTableState } from "../hooks/useNetTableEvents";
 import type { UnitFullInfo } from "../types";
+
+export interface LegendaryEntry {
+  code: string;
+  name: string;
+}
+
+export interface LegendaryPoolPayload {
+  revealed: LegendaryEntry[];
+  unrevealed: LegendaryEntry[];
+  stateAt: string | null;
+}
+
+/**
+ * Pushes legendary pool state to a Discord-styled always-on-top overlay window.
+ * Renders nothing in the main app.
+ */
+export function LegendaryPoolOverlay({ state, stateAt, unitsFull }: Props) {
+  const pool = useMemo(
+    () => extractHiddenLegendaries(state, unitsFull),
+    [state, unitsFull],
+  );
+
+  useEffect(() => {
+    const api = window.legendaryOverlay;
+    if (!api) return;
+
+    if (!pool) {
+      void api.update(null);
+      return;
+    }
+
+    void api.update({
+      revealed: pool.revealed,
+      unrevealed: pool.unrevealed,
+      stateAt,
+    } satisfies LegendaryPoolPayload);
+  }, [pool, stateAt]);
+
+  useEffect(() => {
+    return () => {
+      void window.legendaryOverlay?.update(null);
+    };
+  }, []);
+
+  return null;
+}
 
 interface Props {
   state: NetTableState;
@@ -11,99 +56,84 @@ interface Props {
   unitsFull: Record<string, UnitFullInfo>;
 }
 
-interface LegendaryEntry {
-  code: string;
-  name: string;
-}
+/** Discord-styled panel rendered inside the always-on-top overlay window. */
+export function LegendaryDiscordOverlayApp() {
+  const [payload, setPayload] = useState<LegendaryPoolPayload | null>(null);
+  const cardRef = useRef<HTMLDivElement>(null);
 
-/**
- * Admin-only floating overlay for legendaries still in the match pool.
- * No ban-efficiency meters — just revealed vs hidden units.
- */
-export function LegendaryPoolOverlay({ state, stateAt, unitsFull }: Props) {
-  const [open, setOpen] = useState(true);
-  const pool = useMemo(
-    () => extractHiddenLegendaries(state, unitsFull),
-    [state, unitsFull],
-  );
+  useEffect(() => {
+    const api = window.legendaryOverlay;
+    if (!api) return;
+    const unsub = api.onPush((next) => setPayload(next));
+    api.ready();
+    return unsub;
+  }, []);
 
-  if (!pool) return null;
+  useLayoutEffect(() => {
+    const el = cardRef.current;
+    if (!el || !window.legendaryOverlay?.resize) return;
+    const rect = el.getBoundingClientRect();
+    window.legendaryOverlay.resize({
+      width: Math.ceil(rect.width),
+      height: Math.ceil(rect.height),
+    });
+  }, [payload]);
 
-  const { revealed, unrevealed } = pool;
+  const revealed = payload?.revealed ?? [];
+  const unrevealed = payload?.unrevealed ?? [];
   const fullPool = [...revealed, ...unrevealed];
   const revealedCodes = new Set(revealed.map((u) => u.code));
 
-  if (!open) {
-    return createPortal(
-      <button
-        type="button"
-        className="legendary-pool-fab"
-        onClick={() => setOpen(true)}
-        title="Show legendary pool"
-      >
-        Legendaries ({fullPool.length})
-      </button>,
-      document.body,
-    );
-  }
+  return (
+    <div className="disc-overlay">
+      <div className="disc-overlay-card" ref={cardRef}>
+        <header className="disc-overlay-header">
+          <div className="disc-overlay-title">Legendaries</div>
+          <button
+            type="button"
+            className="disc-overlay-close"
+            onClick={() => void window.legendaryOverlay?.hide()}
+            aria-label="Close"
+          >
+            ×
+          </button>
+        </header>
 
-  return createPortal(
-    <aside className="legendary-pool-overlay" aria-label="Legendaries in pool">
-      <header className="legendary-pool-overlay-header">
-        <div>
-          <div className="legendary-pool-overlay-title">Legendaries in pool</div>
-          <div className="legendary-pool-overlay-meta">
-            {stateAt ? `updated ${formatTime(stateAt)}` : "waiting for match data"}
-            {" · "}
-            {fullPool.length} total
-          </div>
-        </div>
-        <button
-          type="button"
-          className="btn-ghost legendary-pool-overlay-close"
-          onClick={() => setOpen(false)}
-          aria-label="Hide legendary pool"
-        >
-          Hide
-        </button>
-      </header>
-
-      {fullPool.length === 0 ? (
-        <p className="legendary-pool-overlay-empty">
-          Waiting for legendary pool data from the current match.
-        </p>
-      ) : (
-        <ul className="legendary-pool-grid">
-          {fullPool.map((u) => {
-            const isRevealed = revealedCodes.has(u.code);
-            return (
-              <li key={u.code} className="legendary-pool-cell" title={u.code}>
-                <img
-                  className="legendary-pool-icon"
-                  src={`icons://units/${unitStem(u.name)}.png`}
-                  alt=""
-                  width={36}
-                  height={36}
-                  onError={(e) => {
-                    (e.currentTarget as HTMLImageElement).style.visibility =
-                      "hidden";
-                  }}
-                />
-                <span className="legendary-pool-name">{u.name}</span>
-                <span className="legendary-pool-status">
-                  {isRevealed ? "Revealed" : "Hidden"}
-                </span>
-              </li>
-            );
-          })}
-        </ul>
-      )}
-    </aside>,
-    document.body,
+        {fullPool.length === 0 ? (
+          <p className="disc-overlay-empty">Waiting for match pool…</p>
+        ) : (
+          <ul className="disc-overlay-list">
+            {fullPool.map((u) => {
+              const isRevealed = revealedCodes.has(u.code);
+              return (
+                <li
+                  key={u.code}
+                  className={`disc-overlay-row${isRevealed ? " is-unlocked" : " is-locked"}`}
+                  title={u.code}
+                >
+                  <img
+                    className="disc-overlay-icon"
+                    src={`icons://units/${unitStem(u.name)}.png`}
+                    alt=""
+                    width={24}
+                    height={24}
+                    onError={(e) => {
+                      (e.currentTarget as HTMLImageElement).style.visibility =
+                        "hidden";
+                    }}
+                  />
+                  <span className="disc-overlay-name">{u.name}</span>
+                </li>
+              );
+            })}
+          </ul>
+        )}
+      </div>
+    </div>
   );
 }
 
-function extractHiddenLegendaries(
+export function extractHiddenLegendaries(
   state: NetTableState,
   unitsFull: Record<string, UnitFullInfo>,
 ): { revealed: LegendaryEntry[]; unrevealed: LegendaryEntry[] } | null {
@@ -139,18 +169,4 @@ function toEntries(
       };
     })
     .sort((a, b) => a.name.localeCompare(b.name));
-}
-
-function formatTime(iso: string): string {
-  try {
-    const d = new Date(iso);
-    if (Number.isNaN(d.getTime())) return iso;
-    return d.toLocaleTimeString([], {
-      hour: "2-digit",
-      minute: "2-digit",
-      second: "2-digit",
-    });
-  } catch {
-    return iso;
-  }
 }

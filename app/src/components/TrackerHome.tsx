@@ -17,7 +17,7 @@ interface TrackerHomeProps {
 
 /**
  * Single tracker screen: setup + account. Live match UI lives on the website;
- * admin-only legendary overlay stays desktop-side.
+ * admin-only legendary popup is a Discord-styled always-on-top overlay.
  */
 export function TrackerHome({ unitsFull, netTable, status }: TrackerHomeProps) {
   const {
@@ -162,6 +162,16 @@ export function TrackerHome({ unitsFull, netTable, status }: TrackerHomeProps) {
                 <span className="settings-value refresh-error">{outboxError}</span>
               </div>
             )}
+            <div className="settings-row">
+              <span className="settings-label">Legendary overlay</span>
+              <button
+                type="button"
+                className="btn-ghost"
+                onClick={() => void window.legendaryOverlay?.show()}
+              >
+                Show overlay
+              </button>
+            </div>
           </div>
         )}
 

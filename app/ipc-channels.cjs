@@ -34,6 +34,14 @@ const CHANNELS = {
     maximize: "window:maximize",
     close: "window:close",
   },
+  legendaryOverlay: {
+    update: "legendaryOverlay:update",
+    hide: "legendaryOverlay:hide",
+    show: "legendaryOverlay:show",
+    ready: "legendaryOverlay:ready",
+    push: "legendaryOverlay:push",
+    resize: "legendaryOverlay:resize",
+  },
 };
 
 module.exports = { CHANNELS };

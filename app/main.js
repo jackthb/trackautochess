@@ -21,6 +21,7 @@ const { createContentIpc } = require("./main/content.cjs");
 const { createReplays } = require("./main/replays.cjs");
 const { createTrackerLog } = require("./main/tracker-log.cjs");
 const { createUpdater } = require("./main/updater.cjs");
+const { createLegendaryOverlay } = require("./main/legendary-overlay.cjs");
 
 protocol.registerSchemesAsPrivileged([
   {
@@ -140,11 +141,23 @@ const replays = createReplays({
   iconsDir: ICONS_DIR,
   channels: CHANNELS,
 });
+const legendaryOverlay = createLegendaryOverlay({
+  BrowserWindow,
+  ipcMain,
+  path,
+  channels: CHANNELS,
+  preloadPath: path.join(__dirname, "preload.js"),
+  getIndexLoad: () =>
+    IS_DEV
+      ? { kind: "url", target: "http://localhost:5173" }
+      : { kind: "file", target: path.join(__dirname, "dist", "index.html") },
+});
 
 backend.onEvent(handleBackendEvent);
 trackerLog.registerIpc();
 content.register();
 replays.registerIpc();
+legendaryOverlay.register();
 
 function focusMainWindow() {
   if (!mainWindow || mainWindow.isDestroyed()) return;
@@ -360,6 +373,7 @@ app.on("will-quit", () => {
   globalShortcut.unregisterAll();
   trackerLog.stop();
   backend.stop();
+  legendaryOverlay.destroy();
   if (dotaPollInterval) clearInterval(dotaPollInterval);
 });
 

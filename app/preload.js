@@ -38,6 +38,14 @@ const CHANNELS = {
     maximize: "window:maximize",
     close: "window:close",
   },
+  legendaryOverlay: {
+    update: "legendaryOverlay:update",
+    hide: "legendaryOverlay:hide",
+    show: "legendaryOverlay:show",
+    ready: "legendaryOverlay:ready",
+    push: "legendaryOverlay:push",
+    resize: "legendaryOverlay:resize",
+  },
 };
 
 contextBridge.exposeInMainWorld("replays", {
@@ -84,4 +92,17 @@ contextBridge.exposeInMainWorld("appApi", {
   fetchItemsFull: () => ipcRenderer.invoke(CHANNELS.data.itemsFull),
   fetchItemLinks: () => ipcRenderer.invoke(CHANNELS.data.itemLinks),
   fetchTalents: () => ipcRenderer.invoke(CHANNELS.data.talents),
+});
+
+contextBridge.exposeInMainWorld("legendaryOverlay", {
+  update: (payload) => ipcRenderer.invoke(CHANNELS.legendaryOverlay.update, payload),
+  hide: () => ipcRenderer.invoke(CHANNELS.legendaryOverlay.hide),
+  show: () => ipcRenderer.invoke(CHANNELS.legendaryOverlay.show),
+  ready: () => ipcRenderer.send(CHANNELS.legendaryOverlay.ready),
+  resize: (size) => ipcRenderer.send(CHANNELS.legendaryOverlay.resize, size),
+  onPush: (callback) => {
+    const handler = (_event, payload) => callback(payload);
+    ipcRenderer.on(CHANNELS.legendaryOverlay.push, handler);
+    return () => ipcRenderer.removeListener(CHANNELS.legendaryOverlay.push, handler);
+  },
 });
