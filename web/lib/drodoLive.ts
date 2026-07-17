@@ -7,6 +7,3 @@ export const DRODO_LIVE_FETCH_ENABLED = false;
 
 export const DRODO_OUTAGE_NOTICE =
   "Live MMR isn't available anymore — Drodo stopped publishing it. We can only show rank. Sorry.";
-
-export const DRODO_OUTAGE_TAGLINE =
-  "Rank only for now. Live MMR is unavailable until Drodo publishes it again.";

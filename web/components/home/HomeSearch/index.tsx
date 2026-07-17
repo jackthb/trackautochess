@@ -7,16 +7,13 @@ import { SteamSignInButton } from "@/components/SteamSignInButton";
 import type { CustomGameMetrics } from "@/lib/customGameStats";
 import { useSupabaseSession } from "@/lib/useSupabaseSession";
 import { playerProfilePath } from "@/lib/steam";
-import {
-  DRODO_OUTAGE_NOTICE,
-  DRODO_OUTAGE_TAGLINE,
-} from "@/lib/drodoLive";
+import { DRODO_OUTAGE_NOTICE } from "@/lib/drodoLive";
 import styles from "./HomeSearch.module.css";
 
 const t = {
   description:
     "Look up Dota Auto Chess player rank and tracked match stats by Steam vanity URL or SteamID64.",
-  tagline: DRODO_OUTAGE_TAGLINE,
+  tagline: "Rank & season history for any Dota Auto Chess player.",
   notice: DRODO_OUTAGE_NOTICE,
   placeholder: "Steam profile URL or SteamID64",
   signinDivider: "or",
