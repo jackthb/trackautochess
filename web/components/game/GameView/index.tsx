@@ -316,13 +316,16 @@ function MatchPlayerRow({
     profile.name ||
     ocrName ||
     (game.user_id ? String(game.user_id) : `Player #${game.placement}`);
-  // When the scrubber is active, prefer the snapshot's lineup. Falls back
-  // to the static games.lineup for rows without a snapshot at this round.
-  const lineupStr = snap?.lineup ?? game.lineup;
+  const isScrubbing = snapRound !== null && !isLastRound;
+  // When the scrubber is active, prefer the snapshot's lineup. While scrubbing,
+  // never fall back to the final end-of-match lineup — that makes every round
+  // look identical for players whose mid-match snap omitted lineup/board.
+  const lineupStr = isScrubbing
+    ? (snap?.lineup ?? "")
+    : (snap?.lineup ?? game.lineup);
   const lineup = parseLineup(lineupStr, UNIT_COSTS);
   const hand = parseLineup(snap?.hand ?? "", UNIT_COSTS);
 
-  const isScrubbing = snapRound !== null && !isLastRound;
   // Synergies always derive from the pieces actually shown. The round
   // snapshot board carries per-piece items, so counts-as items (Spider Leg →
   // Aqir) are exact there; lineup-only rows fall back to the stored in-game

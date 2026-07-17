@@ -15,11 +15,18 @@ pub(crate) struct SessionDump {
 
 pub(crate) fn store_session_dump(dumps: &mut Vec<SessionDump>, dump: SessionDump) {
     if let Some(round) = extract_round_from_rows(&dump.rows) {
-        if dumps
+        if let Some(idx) = dumps
             .iter()
-            .rev()
-            .any(|existing| extract_round_from_rows(&existing.rows) == Some(round))
+            .rposition(|existing| extract_round_from_rows(&existing.rows) == Some(round))
         {
+            // Round-change polls (F23) often land before F20/F22 refresh the
+            // boards. Keeping the first dump froze opponent boards for the
+            // whole round. Prefer a later dump when it has at least as many
+            // positioned board pieces; never replace a board-rich snap with an
+            // empty one.
+            if dump_board_piece_count(&dump.rows) >= dump_board_piece_count(&dumps[idx].rows) {
+                dumps[idx] = dump;
+            }
             return;
         }
     }
@@ -28,6 +35,19 @@ pub(crate) fn store_session_dump(dumps: &mut Vec<SessionDump>, dump: SessionDump
         let excess = dumps.len() - MAX_SESSION_ROUND_SNAPSHOTS;
         dumps.drain(0..excess);
     }
+}
+
+fn dump_board_piece_count(rows: &[NettableRow]) -> usize {
+    let (players, _) = live_players_value(rows, None);
+    players
+        .as_object()
+        .map(|obj| {
+            obj.values()
+                .filter_map(|player| player.get("board").and_then(Value::as_array))
+                .map(std::vec::Vec::len)
+                .sum()
+        })
+        .unwrap_or(0)
 }
 
 pub(crate) fn build_match_timeline(
@@ -137,9 +157,6 @@ pub(crate) fn replay_session_dumps_from_log(body: &str) -> Vec<SessionDump> {
         if round == 1 && last_round.is_some_and(|prev| prev > 5) {
             finish_match(&mut current);
             last_round = None;
-        }
-        if last_round == Some(round) {
-            return;
         }
         store_session_dump(
             &mut current,

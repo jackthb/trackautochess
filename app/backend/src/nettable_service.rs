@@ -810,11 +810,22 @@ mod tests {
     }
 
     #[test]
-    fn timeline_ignores_duplicate_snapshots_per_round() {
+    fn timeline_prefers_later_board_rich_snapshot_per_round() {
+        // Simulate F23 round tick (no boards) then F20 board dump for the same
+        // round. The timeline must keep the board-rich snap, not the first one.
         let state = Arc::new(Mutex::new(NettableState {
             local_steam_id: Some("76561198022169086".to_owned()),
-            match_roster_fingerprint: Some(vec!["76561198022169086".to_owned()]),
-            session_dumps: vec![
+            match_roster_fingerprint: Some(vec![
+                "76561198022169086".to_owned(),
+                "76561198000000001".to_owned(),
+            ]),
+            ..NettableState::default()
+        }));
+
+        {
+            let mut state = state.lock().unwrap();
+            store_session_dump(
+                &mut state.session_dumps,
                 SessionDump {
                     captured_at: "2026-06-08T00:00:00Z".to_owned(),
                     rows: rows_from_json(vec![
@@ -826,10 +837,16 @@ mod tests {
                         (
                             "CustomNetTable_player_info_table",
                             "player_info",
-                            serde_json::json!({"data": {"76561198022169086": {"hp": 99, "hero_level": 4, "curr_rank": 1}}}),
+                            serde_json::json!({"data": {
+                                "76561198022169086": {"hp": 99, "hero_level": 4, "curr_rank": 1, "player_id": 0},
+                                "76561198000000001": {"hp": 100, "hero_level": 3, "curr_rank": 2, "player_id": 1, "chess_lineup": "chess_dazzle"}
+                            }}),
                         ),
                     ]),
                 },
+            );
+            store_session_dump(
+                &mut state.session_dumps,
                 SessionDump {
                     captured_at: "2026-06-08T00:01:00Z".to_owned(),
                     rows: rows_from_json(vec![
@@ -841,7 +858,10 @@ mod tests {
                         (
                             "CustomNetTable_player_info_table",
                             "player_info",
-                            serde_json::json!({"data": {"76561198022169086": {"hp": 88, "hero_level": 5, "curr_rank": 1, "player_id": 0, "chess_hand": "chess_lion,chess_ck1,"}}}),
+                            serde_json::json!({"data": {
+                                "76561198022169086": {"hp": 88, "hero_level": 5, "curr_rank": 1, "player_id": 0, "chess_hand": "chess_lion,chess_ck1,"},
+                                "76561198000000001": {"hp": 90, "hero_level": 4, "curr_rank": 2, "player_id": 1, "chess_lineup": "chess_dazzle,chess_sd"}
+                            }}),
                         ),
                         (
                             "CustomNetTable_player_id_table",
@@ -859,11 +879,24 @@ mod tests {
                                 }
                             }),
                         ),
+                        (
+                            "CustomNetTable_player_id_table",
+                            "vchess_1",
+                            serde_json::json!({
+                                "1_1": {
+                                    "chess": "chess_sd",
+                                    "x": 1,
+                                    "y": 1,
+                                    "buy_price": 1,
+                                    "index": 50,
+                                    "water_id": 2
+                                }
+                            }),
+                        ),
                     ]),
                 },
-            ],
-            ..NettableState::default()
-        }));
+            );
+        }
 
         let timeline = build_match_timeline_from_state(&state, "match-1").expect("timeline builds");
 
@@ -871,7 +904,93 @@ mod tests {
         assert_eq!(timeline["round_count"], 1);
         assert_eq!(timeline["first_round"], 1);
         assert_eq!(timeline["last_round"], 1);
+        assert_eq!(timeline["rounds"][0]["captured_at"], "2026-06-08T00:01:00Z");
+        assert_eq!(
+            timeline["rounds"][0]["players"]["76561198022169086"]["hp"],
+            88
+        );
+        assert_eq!(
+            timeline["rounds"][0]["players"]["76561198022169086"]["board"][0]["chess"],
+            "chess_ck1"
+        );
+        assert_eq!(
+            timeline["rounds"][0]["players"]["76561198000000001"]["board"][0]["chess"],
+            "chess_sd"
+        );
+        assert_eq!(
+            timeline["rounds"][0]["players"]["76561198000000001"]["lineup"],
+            "Dazzle|Shadow Demon"
+        );
+    }
+
+    #[test]
+    fn timeline_does_not_replace_board_rich_snap_with_empty_later_poll() {
+        let state = Arc::new(Mutex::new(NettableState {
+            local_steam_id: Some("76561198022169086".to_owned()),
+            match_roster_fingerprint: Some(vec!["76561198022169086".to_owned()]),
+            ..NettableState::default()
+        }));
+
+        {
+            let mut state = state.lock().unwrap();
+            store_session_dump(
+                &mut state.session_dumps,
+                SessionDump {
+                    captured_at: "2026-06-08T00:00:00Z".to_owned(),
+                    rows: rows_from_json(vec![
+                        (
+                            "CustomNetTable_game_info",
+                            "round_info",
+                            serde_json::json!({"round": 1}),
+                        ),
+                        (
+                            "CustomNetTable_player_info_table",
+                            "player_info",
+                            serde_json::json!({"data": {"76561198022169086": {"hp": 99, "hero_level": 4, "curr_rank": 1, "player_id": 0}}}),
+                        ),
+                        (
+                            "CustomNetTable_player_id_table",
+                            "vchess_0",
+                            serde_json::json!({
+                                "2_3": {
+                                    "chess": "chess_ck1",
+                                    "x": 3,
+                                    "y": 2,
+                                    "buy_price": 4,
+                                    "index": 123,
+                                    "water_id": 9
+                                }
+                            }),
+                        ),
+                    ]),
+                },
+            );
+            store_session_dump(
+                &mut state.session_dumps,
+                SessionDump {
+                    captured_at: "2026-06-08T00:01:00Z".to_owned(),
+                    rows: rows_from_json(vec![
+                        (
+                            "CustomNetTable_game_info",
+                            "round_info",
+                            serde_json::json!({"round": 1}),
+                        ),
+                        (
+                            "CustomNetTable_player_info_table",
+                            "player_info",
+                            serde_json::json!({"data": {"76561198022169086": {"hp": 88, "hero_level": 5, "curr_rank": 1, "player_id": 0}}}),
+                        ),
+                    ]),
+                },
+            );
+        }
+
+        let timeline = build_match_timeline_from_state(&state, "match-1").expect("timeline builds");
         assert_eq!(timeline["rounds"][0]["captured_at"], "2026-06-08T00:00:00Z");
+        assert_eq!(
+            timeline["rounds"][0]["players"]["76561198022169086"]["board"][0]["chess"],
+            "chess_ck1"
+        );
         assert_eq!(
             timeline["rounds"][0]["players"]["76561198022169086"]["hp"],
             99
@@ -917,10 +1036,11 @@ mod tests {
         assert_eq!(timeline["round_count"], 41);
         assert_eq!(timeline["first_round"], 1);
         assert_eq!(timeline["last_round"], 41);
-        assert_eq!(timeline["rounds"][0]["captured_at"], "2026-06-08T00:01:00Z");
+        // Equal board richness → keep the latest poll within each round.
+        assert_eq!(timeline["rounds"][0]["captured_at"], "2026-06-08T00:01:07Z");
         assert_eq!(
             timeline["rounds"][40]["captured_at"],
-            "2026-06-08T00:41:00Z"
+            "2026-06-08T00:41:07Z"
         );
     }
 
