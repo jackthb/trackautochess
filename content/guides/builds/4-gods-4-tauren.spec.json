@@ -1,0 +1,124 @@
+{
+  "name": "4 Gods + 4 Tauren Stampede",
+  "description": "A Gods/Tauren stampede comp that perma-stuns the enemy board while Omniknight halves incoming damage and Leshrac melts everything with AoE magic. Sourced from the 'HOW TO PLAY New Patch 4 Gods + 4 Tauren' video.",
+  "snapshots": [
+    {
+      "label": "Final board",
+      "round": 35,
+      "focusNote": "Level 11: 4 Gods + 4 Centaur (Stampede) + the three Taurens for totems. Leshrac carries in the back corner behind the charging Centaurs; Omniknight's Guardian Angel keeps the line alive through the perma-stun.",
+      "pieces": [
+        {
+          "unitSlug": "leshrac",
+          "name": "Leshrac",
+          "cost": 5,
+          "stars": 3,
+          "x": 2,
+          "y": 4,
+          "items": [
+            { "slug": "refresher_orb", "name": "Refresher Orb", "tier": 4 },
+            { "slug": "kaya", "name": "Kaya", "tier": 2 },
+            { "slug": "linkens_sphere", "name": "Linkens Sphere", "tier": 3 }
+          ]
+        },
+        {
+          "unitSlug": "rubick",
+          "name": "Rubick",
+          "cost": 3,
+          "stars": 2,
+          "x": 4,
+          "y": 3,
+          "items": []
+        },
+        {
+          "unitSlug": "zeus",
+          "name": "Zeus",
+          "cost": 5,
+          "stars": 2,
+          "x": 6,
+          "y": 3,
+          "items": []
+        },
+        {
+          "unitSlug": "enchantress",
+          "name": "Enchantress",
+          "cost": 1,
+          "stars": 3,
+          "x": 2,
+          "y": 3,
+          "items": []
+        },
+        {
+          "unitSlug": "queen-of-pain",
+          "name": "Queen of Pain",
+          "cost": 5,
+          "stars": 2,
+          "x": 7,
+          "y": 2,
+          "items": [
+            { "slug": "dagon", "name": "Dagon", "tier": 4 },
+            { "slug": "bloodthorn", "name": "Bloodthorn", "tier": 4 }
+          ]
+        },
+        {
+          "unitSlug": "elder-titan",
+          "name": "Elder Titan",
+          "cost": 4,
+          "stars": 2,
+          "x": 4,
+          "y": 2,
+          "items": []
+        },
+        {
+          "unitSlug": "magnus",
+          "name": "Magnus",
+          "cost": 4,
+          "stars": 2,
+          "x": 1,
+          "y": 2,
+          "items": [
+            { "slug": "minotaur_horn", "name": "Minotaur Horn", "tier": 4 },
+            { "slug": "bottle", "name": "Bottle", "tier": 2 }
+          ]
+        },
+        {
+          "unitSlug": "omniknight",
+          "name": "Omniknight",
+          "cost": 5,
+          "stars": 2,
+          "x": 4,
+          "y": 1,
+          "items": [
+            { "slug": "guardian_greaves", "name": "Guardian Greaves", "tier": 4 }
+          ]
+        },
+        {
+          "unitSlug": "centaur-warrunner",
+          "name": "Centaur Warrunner",
+          "cost": 2,
+          "stars": 2,
+          "x": 3,
+          "y": 1,
+          "items": []
+        },
+        {
+          "unitSlug": "earthshaker",
+          "name": "Earthshaker",
+          "cost": 3,
+          "stars": 2,
+          "x": 5,
+          "y": 1,
+          "items": []
+        },
+        {
+          "unitSlug": "spirit-breaker",
+          "name": "Spirit Breaker",
+          "cost": 1,
+          "stars": 2,
+          "x": 8,
+          "y": 1,
+          "items": []
+        }
+      ]
+    }
+  ]
+}

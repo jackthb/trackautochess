@@ -1,0 +1,21 @@
+{
+  "name": "Marci 6 Elves / 4 Monk",
+  "description": "A three-star Marci carry backed by 6 Elves for evasion and 2 Wizards to unlock the elf bonus early, with Monks to trigger Marci's execute passive. Sourced from the YouTube guide 'HOW TO PLAY Marci 6/9 Elves RAMPAGE Build In Auto Chess'.",
+  "snapshots": [
+    {
+      "label": "Final board",
+      "round": 28,
+      "focusNote": "5 elves + 2 wizards (Dark Willow counts as both) trip the 6-Elf 40% evasion tier. Marci sits back-corner-adjacent, blinks to the enemy backline, and her Monk passive executes low-health targets. Treant/Furion summons stall while she cleans up.",
+      "pieces": [
+        { "unitSlug": "treant-protector", "name": "Treant Protector", "cost": 3, "stars": 2, "x": 3, "y": 4 },
+        { "unitSlug": "anti-mage", "name": "Anti-mage", "cost": 4, "stars": 2, "x": 4, "y": 4 },
+        { "unitSlug": "brewmaster", "name": "Brewmaster", "cost": 1, "stars": 2, "x": 5, "y": 4 },
+        { "unitSlug": "furion", "name": "Furion", "cost": 2, "stars": 2, "x": 3, "y": 3 },
+        { "unitSlug": "monkey-king", "name": "Monkey King", "cost": 4, "stars": 2, "x": 5, "y": 3 },
+        { "unitSlug": "rubick", "name": "Rubick", "cost": 3, "stars": 2, "x": 4, "y": 2 },
+        { "unitSlug": "marci", "name": "Marci", "cost": 3, "stars": 3, "x": 2, "y": 1, "items": [ { "slug": "blink-dagger", "name": "Blink Dagger", "tier": 1 }, { "slug": "manta-style", "name": "Manta Style", "tier": 4 }, { "slug": "butterfly", "name": "Butterfly", "tier": 4 } ] },
+        { "unitSlug": "dark-willow", "name": "Dark Willow", "cost": 1, "stars": 2, "x": 7, "y": 1 }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "name": "Kez Rampage — 4 Gods / Harpy",
+  "description": "A three-star Kez carry that rampages under 4-God cooldown reduction and 2-Harpy multi-target spells, while Earthshaker + Elder Titan's Tauren totems chain-stun, silence and disarm the enemy board. Stealth-assassin Riki cleans the backline. Sourced from the YouTube guide 'HOW TO PLAY New Patch Kez Rampage Build In Auto Chess'.",
+  "snapshots": [
+    {
+      "label": "Final board",
+      "round": 38,
+      "focusNote": "4 Gods cut skill cooldowns so Kez and Earthshaker chain their casts; 2 Harpy (Kez + Skywrath) add +1 target to single-target spells; Earthshaker + Elder Titan's Tauren totems disarm/silence non-stop. Linkens Sphere on Kez is mandatory to stop hex/silence lockdown. Swap wizards to Naga Siren vs heavy mages.",
+      "pieces": [
+        { "unitSlug": "tiny", "name": "Tiny", "cost": 2, "stars": 2, "x": 3, "y": 4 },
+        { "unitSlug": "earthshaker", "name": "Earthshaker", "cost": 3, "stars": 2, "x": 4, "y": 4 },
+        { "unitSlug": "elder-titan", "name": "Elder Titan", "cost": 4, "stars": 2, "x": 5, "y": 4 },
+        { "unitSlug": "mars", "name": "Mars", "cost": 1, "stars": 2, "x": 6, "y": 4 },
+        { "unitSlug": "kez", "name": "Kez", "cost": 3, "stars": 3, "x": 4, "y": 3, "items": [ { "slug": "linkens-sphere", "name": "Linkens Sphere", "tier": 3 }, { "slug": "battle-fury", "name": "Battle Fury", "tier": 4 }, { "slug": "manta-style", "name": "Manta Style", "tier": 4 } ] },
+        { "unitSlug": "riki", "name": "Riki", "cost": 3, "stars": 3, "x": 6, "y": 3, "items": [ { "slug": "satanic", "name": "Satanic", "tier": 5 } ] },
+        { "unitSlug": "rubick", "name": "Rubick", "cost": 3, "stars": 2, "x": 3, "y": 2 },
+        { "unitSlug": "lion", "name": "Lion", "cost": 4, "stars": 1, "x": 5, "y": 2 },
+        { "unitSlug": "skywrath-mage", "name": "Skywrath Mage", "cost": 1, "stars": 2, "x": 2, "y": 1 },
+        { "unitSlug": "zeus", "name": "Zeus", "cost": 5, "stars": 1, "x": 7, "y": 1 }
+      ]
+    }
+  ]
+}

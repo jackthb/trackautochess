@@ -1,0 +1,111 @@
+{
+  "name": "Endgame Void (Faceless)",
+  "description": "A late-game scaling comp built entirely of purple units and legendaries with no active synergy except Faceless, granting full immunity to stuns, silences and debuffs. Sourced from the 'Endgame VOID Build' video.",
+  "snapshots": [
+    {
+      "label": "Final board",
+      "round": 40,
+      "focusNote": "Level 10: only the Faceless trait is active — every other synergy is deliberately broken (exactly two Demons so Demon stays off, at most two Assassins, no doubled classes). Faceless Void enables full debuff immunity; the rest are the strongest solo carriers you can find, itemised for armor, magic resist and lifesteal.",
+      "pieces": [
+        {
+          "unitSlug": "doom",
+          "name": "Doom",
+          "cost": 4,
+          "stars": 3,
+          "x": 4,
+          "y": 1,
+          "items": [
+            { "slug": "giants_ring", "name": "Giants Ring", "tier": 4 }
+          ]
+        },
+        {
+          "unitSlug": "sven",
+          "name": "Sven",
+          "cost": 5,
+          "stars": 2,
+          "x": 3,
+          "y": 1,
+          "items": [
+            { "slug": "guardian_greaves", "name": "Guardian Greaves", "tier": 4 }
+          ]
+        },
+        {
+          "unitSlug": "monkey-king",
+          "name": "Monkey King",
+          "cost": 4,
+          "stars": 3,
+          "x": 8,
+          "y": 1,
+          "items": []
+        },
+        {
+          "unitSlug": "faceless-void",
+          "name": "Faceless Void",
+          "cost": 2,
+          "stars": 2,
+          "x": 5,
+          "y": 2,
+          "items": []
+        },
+        {
+          "unitSlug": "anti-mage",
+          "name": "Anti-Mage",
+          "cost": 4,
+          "stars": 3,
+          "x": 3,
+          "y": 2,
+          "items": [
+            { "slug": "battle_fury", "name": "Battle Fury", "tier": 4 }
+          ]
+        },
+        {
+          "unitSlug": "chen",
+          "name": "Chen",
+          "cost": 4,
+          "stars": 2,
+          "x": 6,
+          "y": 2,
+          "items": []
+        },
+        {
+          "unitSlug": "medusa",
+          "name": "Medusa",
+          "cost": 4,
+          "stars": 3,
+          "x": 4,
+          "y": 3,
+          "items": [
+            { "slug": "refresher_orb", "name": "Refresher Orb", "tier": 4 }
+          ]
+        },
+        {
+          "unitSlug": "templar-assassin",
+          "name": "Templar Assassin",
+          "cost": 5,
+          "stars": 2,
+          "x": 3,
+          "y": 3,
+          "items": []
+        },
+        {
+          "unitSlug": "zeus",
+          "name": "Zeus",
+          "cost": 5,
+          "stars": 2,
+          "x": 6,
+          "y": 3,
+          "items": []
+        },
+        {
+          "unitSlug": "gyrocopter",
+          "name": "Gyrocopter",
+          "cost": 5,
+          "stars": 2,
+          "x": 4,
+          "y": 4,
+          "items": []
+        }
+      ]
+    }
+  ]
+}

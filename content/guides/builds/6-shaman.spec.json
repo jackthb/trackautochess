@@ -1,0 +1,119 @@
+{
+  "name": "6 Shaman",
+  "description": "Economy-hungry Shaman transformation comp. Anchor Disruptor and Arc Warden, stack Orc for a huge HP pool, then blink-transform every caster into a random higher-tier unit. Sourced from the YouTube guide 'STRONGEST Endgame 6 Shaman Builds In Dota 2 Auto Chess'.",
+  "snapshots": [
+    {
+      "label": "Final board - 6 Shaman / 6 Orc",
+      "round": 30,
+      "focusNote": "Front-line Orcs soak damage while Shamans blink, transform (+2 levels), and revive into stronger units. Arc Warden hides in the corner. Instant-cast items (Blink Dagger, Minotaur Horn) trigger the transform the moment the fight starts.",
+      "pieces": [
+        {
+          "unitSlug": "axe",
+          "name": "Axe",
+          "cost": 1,
+          "stars": 2,
+          "x": 2,
+          "y": 3,
+          "items": [
+            { "slug": "mask-of-madness", "name": "Mask of Madness", "tier": 2 }
+          ]
+        },
+        {
+          "unitSlug": "juggernaut",
+          "name": "Juggernaut",
+          "cost": 2,
+          "stars": 2,
+          "x": 3,
+          "y": 3,
+          "items": []
+        },
+        {
+          "unitSlug": "chen",
+          "name": "Chen",
+          "cost": 4,
+          "stars": 2,
+          "x": 4,
+          "y": 3,
+          "items": [
+            { "slug": "guardian-greaves", "name": "Guardian Greaves", "tier": 4 }
+          ]
+        },
+        {
+          "unitSlug": "warlock",
+          "name": "Warlock",
+          "cost": 5,
+          "stars": 2,
+          "x": 5,
+          "y": 3,
+          "items": []
+        },
+        {
+          "unitSlug": "blood-seeker",
+          "name": "Blood Seeker",
+          "cost": 2,
+          "stars": 2,
+          "x": 2,
+          "y": 2,
+          "items": [
+            { "slug": "blink-dagger", "name": "Blink Dagger", "tier": 1 }
+          ]
+        },
+        {
+          "unitSlug": "disruptor",
+          "name": "Disruptor",
+          "cost": 5,
+          "stars": 2,
+          "x": 3,
+          "y": 2,
+          "items": [
+            { "slug": "minotaur-horn", "name": "Minotaur Horn", "tier": 4 },
+            { "slug": "blink-dagger", "name": "Blink Dagger", "tier": 1 }
+          ]
+        },
+        {
+          "unitSlug": "shadow-shaman",
+          "name": "Shadow Shaman",
+          "cost": 1,
+          "stars": 3,
+          "x": 4,
+          "y": 2,
+          "items": [
+            { "slug": "arcane-boots", "name": "Arcane Boots", "tier": 3 }
+          ]
+        },
+        {
+          "unitSlug": "earthshaker",
+          "name": "Earthshaker",
+          "cost": 3,
+          "stars": 2,
+          "x": 5,
+          "y": 2,
+          "items": [
+            { "slug": "blink-dagger", "name": "Blink Dagger", "tier": 1 }
+          ]
+        },
+        {
+          "unitSlug": "razor",
+          "name": "Razor",
+          "cost": 3,
+          "stars": 2,
+          "x": 6,
+          "y": 2,
+          "items": []
+        },
+        {
+          "unitSlug": "arc-warden",
+          "name": "Arc Warden",
+          "cost": 5,
+          "stars": 2,
+          "x": 1,
+          "y": 1,
+          "items": [
+            { "slug": "necronomicon", "name": "Necronomicon", "tier": 4 },
+            { "slug": "blink-dagger", "name": "Blink Dagger", "tier": 1 }
+          ]
+        }
+      ]
+    }
+  ]
+}

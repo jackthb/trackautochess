@@ -1,0 +1,119 @@
+{
+  "name": "9 Warriors",
+  "description": "A traditional armor-stacking Warrior comp that out-tanks physical builds and reflects damage back, with Doom as the pure-damage carry and a Naga splash for magic resistance. Sourced from the 'BEST Rank Up 9 Warriors Build' video.",
+  "snapshots": [
+    {
+      "label": "Final board",
+      "round": 33,
+      "focusNote": "Level 11: 9 Warriors for maximum armor and reflected damage, plus a two-Naga splash (Medusa + Tidehunter) for magic resistance and a ravage. Doom holds the best items as the pure-damage carry; the higher-base-stat legendary Warriors tank the front while everyone reflects.",
+      "pieces": [
+        {
+          "unitSlug": "primal-beast",
+          "name": "Primal Beast",
+          "cost": 5,
+          "stars": 2,
+          "x": 4,
+          "y": 1,
+          "items": []
+        },
+        {
+          "unitSlug": "sven",
+          "name": "Sven",
+          "cost": 5,
+          "stars": 2,
+          "x": 3,
+          "y": 1,
+          "items": []
+        },
+        {
+          "unitSlug": "troll-warlord",
+          "name": "Troll Warlord",
+          "cost": 5,
+          "stars": 2,
+          "x": 5,
+          "y": 1,
+          "items": []
+        },
+        {
+          "unitSlug": "centaur-warrunner",
+          "name": "Centaur Warrunner",
+          "cost": 2,
+          "stars": 2,
+          "x": 2,
+          "y": 1,
+          "items": []
+        },
+        {
+          "unitSlug": "mars",
+          "name": "Mars",
+          "cost": 1,
+          "stars": 2,
+          "x": 6,
+          "y": 1,
+          "items": [
+            { "slug": "vanguard", "name": "Vanguard", "tier": 2 },
+            { "slug": "buckler", "name": "Buckler", "tier": 1 }
+          ]
+        },
+        {
+          "unitSlug": "doom",
+          "name": "Doom",
+          "cost": 4,
+          "stars": 3,
+          "x": 4,
+          "y": 2,
+          "items": [
+            { "slug": "refresher_orb", "name": "Refresher Orb", "tier": 4 },
+            { "slug": "giants_ring", "name": "Giants Ring", "tier": 4 },
+            { "slug": "vladmirs_offering", "name": "Vladimirs Offering", "tier": 2 }
+          ]
+        },
+        {
+          "unitSlug": "tiny",
+          "name": "Tiny",
+          "cost": 2,
+          "stars": 2,
+          "x": 3,
+          "y": 2,
+          "items": []
+        },
+        {
+          "unitSlug": "pudge",
+          "name": "Pudge",
+          "cost": 3,
+          "stars": 2,
+          "x": 5,
+          "y": 2,
+          "items": []
+        },
+        {
+          "unitSlug": "slardar",
+          "name": "Slardar",
+          "cost": 3,
+          "stars": 2,
+          "x": 6,
+          "y": 2,
+          "items": []
+        },
+        {
+          "unitSlug": "medusa",
+          "name": "Medusa",
+          "cost": 4,
+          "stars": 2,
+          "x": 4,
+          "y": 3,
+          "items": []
+        },
+        {
+          "unitSlug": "tidehunter",
+          "name": "Tidehunter",
+          "cost": 5,
+          "stars": 2,
+          "x": 3,
+          "y": 3,
+          "items": []
+        }
+      ]
+    }
+  ]
+}

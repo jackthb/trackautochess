@@ -1,0 +1,109 @@
+{
+  "name": "Lina Mages (Harpy Hyper-Roll)",
+  "description": "A hyper-roll mage comp that spikes early on a three-star Lina; Harpy and Spell Prism give her extra targets while Centaur Warrunner tanks. Sourced from the 'LINA MAGES' video.",
+  "snapshots": [
+    {
+      "label": "Final board",
+      "round": 30,
+      "focusNote": "Level 10: 6 Mages plus the Harpy pair (Skywrath Mage + Kez) so Lina's single-target bolt hits multiple enemies; Ogre Magi multicasts and Rubick/Zeus give a two-God bonus. Lina sits in the back corner with all spell damage and Spell Prism; Centaur Warrunner is the lone front-line tank.",
+      "pieces": [
+        {
+          "unitSlug": "lina",
+          "name": "Lina",
+          "cost": 2,
+          "stars": 3,
+          "x": 1,
+          "y": 4,
+          "items": [
+            { "slug": "spell_prism", "name": "Spell Prism", "tier": 3 },
+            { "slug": "dagon", "name": "Dagon", "tier": 4 },
+            { "slug": "bloodthorn", "name": "Bloodthorn", "tier": 4 }
+          ]
+        },
+        {
+          "unitSlug": "centaur-warrunner",
+          "name": "Centaur Warrunner",
+          "cost": 2,
+          "stars": 3,
+          "x": 4,
+          "y": 1,
+          "items": [
+            { "slug": "pavise", "name": "Pavise", "tier": 2 }
+          ]
+        },
+        {
+          "unitSlug": "crystal-maiden",
+          "name": "Crystal Maiden",
+          "cost": 1,
+          "stars": 3,
+          "x": 3,
+          "y": 3,
+          "items": []
+        },
+        {
+          "unitSlug": "skywrath-mage",
+          "name": "Skywrath Mage",
+          "cost": 1,
+          "stars": 3,
+          "x": 2,
+          "y": 3,
+          "items": []
+        },
+        {
+          "unitSlug": "ogre-magi",
+          "name": "Ogre Magi",
+          "cost": 3,
+          "stars": 2,
+          "x": 4,
+          "y": 3,
+          "items": []
+        },
+        {
+          "unitSlug": "keeper-of-the-light",
+          "name": "Keeper of the Light",
+          "cost": 4,
+          "stars": 2,
+          "x": 5,
+          "y": 3,
+          "items": []
+        },
+        {
+          "unitSlug": "zeus",
+          "name": "Zeus",
+          "cost": 5,
+          "stars": 2,
+          "x": 6,
+          "y": 3,
+          "items": []
+        },
+        {
+          "unitSlug": "kez",
+          "name": "Kez",
+          "cost": 3,
+          "stars": 2,
+          "x": 3,
+          "y": 2,
+          "items": []
+        },
+        {
+          "unitSlug": "rubick",
+          "name": "Rubick",
+          "cost": 3,
+          "stars": 2,
+          "x": 5,
+          "y": 2,
+          "items": []
+        },
+        {
+          "unitSlug": "tidehunter",
+          "name": "Tidehunter",
+          "cost": 5,
+          "stars": 2,
+          "x": 4,
+          "y": 2,
+          "items": []
+        }
+      ]
+    }
+  ]
+}

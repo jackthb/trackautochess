@@ -1,0 +1,23 @@
+{
+  "name": "6 Undead + Dragon / Harpy",
+  "description": "A snowball board that plagues both teams for -40% max health, then out-damages everyone with Lich, Necrophos and Spectre while Wraith King revives the dead. Dragons give instant casts and 2 Harpies multiply single-target spells. Built off the Ascetics Cap round-3 tech. Sourced from the YouTube guide 'HOW TO PLAY The Strongest 6 Undead Build In Auto Chess'.",
+  "snapshots": [
+    {
+      "label": "Final board",
+      "round": 38,
+      "focusNote": "6 different Undead halve enemy health (-40% plague); 3 Dragons + Winter Wyvern feed 100 starting mana for near-instant Lich/Necrophos casts; Vengeful Spirit + Skywrath Mage give 2 Harpy so those single-target nukes hit an extra target. Wraith King revives fallen undead for a second fight.",
+      "pieces": [
+        { "unitSlug": "pudge", "name": "Pudge", "cost": 3, "stars": 2, "x": 3, "y": 4 },
+        { "unitSlug": "wraith-king", "name": "Wraith King", "cost": 5, "stars": 2, "x": 4, "y": 4, "items": [ { "slug": "assault-cuirass", "name": "Assault Cuirass", "tier": 5 } ] },
+        { "unitSlug": "dragon-knight", "name": "Dragon Knight", "cost": 4, "stars": 1, "x": 5, "y": 4 },
+        { "unitSlug": "spectres", "name": "Spectres", "cost": 5, "stars": 2, "x": 6, "y": 4, "items": [ { "slug": "manta-style", "name": "Manta Style", "tier": 4 } ] },
+        { "unitSlug": "vengeful-spirit", "name": "Vengeful Spirit", "cost": 2, "stars": 2, "x": 3, "y": 3 },
+        { "unitSlug": "jakiro", "name": "Jakiro", "cost": 5, "stars": 1, "x": 5, "y": 3 },
+        { "unitSlug": "lich", "name": "Lich", "cost": 4, "stars": 2, "x": 3, "y": 2, "items": [ { "slug": "spell-prism", "name": "Spell Prism", "tier": 3 } ] },
+        { "unitSlug": "necrophos", "name": "Necrophos", "cost": 5, "stars": 2, "x": 5, "y": 2, "items": [ { "slug": "spell-prism", "name": "Spell Prism", "tier": 3 }, { "slug": "refresher-orb", "name": "Refresher Orb", "tier": 4 } ] },
+        { "unitSlug": "winter-wyvern", "name": "Winter Wyvern", "cost": 1, "stars": 2, "x": 4, "y": 1 },
+        { "unitSlug": "skywrath-mage", "name": "Skywrath Mage", "cost": 1, "stars": 2, "x": 6, "y": 1 }
+      ]
+    }
+  ]
+}

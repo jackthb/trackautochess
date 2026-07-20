@@ -1,0 +1,23 @@
+{
+  "name": "6 Mech / 6 Goblin Legendary Hunt",
+  "description": "A Mech + Goblin board that uses the 6-Mech AWESOME Invention payoff (plus Wheel of Wonder and Magic Box relics) to discover and three-star almost any Legendary. Sourced from the YouTube guide 'HOW TO FIND ANY Legendary Units This Way! HYPER 6 Mech Build'.",
+  "snapshots": [
+    {
+      "label": "Final board",
+      "round": 32,
+      "focusNote": "6 Goblin gives the whole team armour/regen while 6 Mech's Golden Invention discovers Legendaries every won home battle. Techies and Gyrocopter are the damage core; Warlock and Spectre are flexible Legendary adds.",
+      "pieces": [
+        { "unitSlug": "timbersaw", "name": "Timbersaw", "cost": 2, "stars": 2, "x": 3, "y": 4 },
+        { "unitSlug": "clockwerk", "name": "Clockwerk", "cost": 1, "stars": 2, "x": 4, "y": 4 },
+        { "unitSlug": "meepo", "name": "Meepo", "cost": 2, "stars": 2, "x": 5, "y": 4 },
+        { "unitSlug": "alchemist", "name": "Alchemist", "cost": 4, "stars": 2, "x": 3, "y": 3, "items": [ { "slug": "desolator", "name": "Desolator", "tier": 3 } ] },
+        { "unitSlug": "bounty-hunter", "name": "Bounty Hunter", "cost": 1, "stars": 2, "x": 6, "y": 3 },
+        { "unitSlug": "techies", "name": "Techies", "cost": 5, "stars": 3, "x": 3, "y": 2, "items": [ { "slug": "telescope", "name": "Telescope", "tier": 2 }, { "slug": "refresher-orb", "name": "Refresher Orb", "tier": 4 } ] },
+        { "unitSlug": "gyrocopter", "name": "Gyrocopter", "cost": 5, "stars": 2, "x": 5, "y": 2, "items": [ { "slug": "mask-of-madness", "name": "Mask of Madness", "tier": 2 }, { "slug": "radiance", "name": "Radiance", "tier": 4 } ] },
+        { "unitSlug": "warlock", "name": "Warlock", "cost": 5, "stars": 2, "x": 4, "y": 1, "items": [ { "slug": "necronomicon", "name": "Necronomicon", "tier": 4 } ] },
+        { "unitSlug": "spectres", "name": "Spectres", "cost": 5, "stars": 2, "x": 2, "y": 1, "items": [ { "slug": "manta-style", "name": "Manta Style", "tier": 4 } ] },
+        { "unitSlug": "tinker", "name": "Tinker", "cost": 1, "stars": 2, "x": 6, "y": 1 }
+      ]
+    }
+  ]
+}

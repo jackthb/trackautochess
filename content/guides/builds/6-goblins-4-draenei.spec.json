@@ -1,0 +1,109 @@
+{
+  "name": "6 Goblins + 4 Draenei",
+  "description": "A three-star hyper-roll comp where Draenei convert overhealing into AoE pure damage; Mekansm bursts the enemy front while Timbersaw face-tanks. Sourced from the 'HOW TO PLAY New Patch 6 Goblins + 4 Darenei' video.",
+  "snapshots": [
+    {
+      "label": "Final board",
+      "round": 32,
+      "focusNote": "Level 10: 6 Goblin + 4 Draenei, everything three-starred. Mekansm and heavy sustain trigger the Draenei healing-to-pure-damage conversion; Timbersaw is the durable centerpiece holding every top-tier item.",
+      "pieces": [
+        {
+          "unitSlug": "timbersaw",
+          "name": "Timbersaw",
+          "cost": 2,
+          "stars": 3,
+          "x": 4,
+          "y": 1,
+          "items": [
+            { "slug": "mekansm", "name": "Mekansm", "tier": 3 },
+            { "slug": "giants_ring", "name": "Giants Ring", "tier": 4 },
+            { "slug": "radiance", "name": "Radiance", "tier": 4 }
+          ]
+        },
+        {
+          "unitSlug": "clockwerk",
+          "name": "Clockwerk",
+          "cost": 1,
+          "stars": 3,
+          "x": 3,
+          "y": 1,
+          "items": []
+        },
+        {
+          "unitSlug": "dawnbreaker",
+          "name": "Dawnbreaker",
+          "cost": 3,
+          "stars": 2,
+          "x": 5,
+          "y": 1,
+          "items": []
+        },
+        {
+          "unitSlug": "shadow-demon",
+          "name": "Shadow Demon",
+          "cost": 1,
+          "stars": 3,
+          "x": 6,
+          "y": 1,
+          "items": []
+        },
+        {
+          "unitSlug": "tinker",
+          "name": "Tinker",
+          "cost": 1,
+          "stars": 3,
+          "x": 3,
+          "y": 2,
+          "items": []
+        },
+        {
+          "unitSlug": "snapfire",
+          "name": "Snapfire",
+          "cost": 4,
+          "stars": 2,
+          "x": 5,
+          "y": 2,
+          "items": []
+        },
+        {
+          "unitSlug": "bounty-hunter",
+          "name": "Bounty Hunter",
+          "cost": 1,
+          "stars": 3,
+          "x": 4,
+          "y": 2,
+          "items": []
+        },
+        {
+          "unitSlug": "darkseer",
+          "name": "Dark Seer",
+          "cost": 2,
+          "stars": 3,
+          "x": 2,
+          "y": 3,
+          "items": []
+        },
+        {
+          "unitSlug": "alchemist",
+          "name": "Alchemist",
+          "cost": 4,
+          "stars": 2,
+          "x": 6,
+          "y": 3,
+          "items": []
+        },
+        {
+          "unitSlug": "techies",
+          "name": "Techies",
+          "cost": 5,
+          "stars": 2,
+          "x": 4,
+          "y": 3,
+          "items": [
+            { "slug": "refresher_orb", "name": "Refresher Orb", "tier": 4 }
+          ]
+        }
+      ]
+    }
+  ]
+}

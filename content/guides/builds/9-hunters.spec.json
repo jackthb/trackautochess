@@ -1,0 +1,22 @@
+{
+  "name": "9 Hunters",
+  "description": "The classic glass-cannon hunter board: six cheap hunters three-starred early, then Tidehunter as the ninth hunter for the knockback + extra-attack payoff. Telescope grants the Dwarf range/damage bonus. Sourced from the YouTube guide 'HOW TO PLAY 9 Hunters Build In Auto Chess | 3 Variations'.",
+  "snapshots": [
+    {
+      "label": "Final board",
+      "round": 35,
+      "focusNote": "9 Hunters = 100% precise shots, -10 armour, and a knockback that adds an extra attack. Telescope on Windranger makes 2 Dwarves with Sniper for +200 range and distance-scaling damage. Spread wide for max range vs mages/early game; ball up in a corner vs assassins so they can't leap the backline.",
+      "pieces": [
+        { "unitSlug": "tidehunter", "name": "Tidehunter", "cost": 5, "stars": 2, "x": 4, "y": 4, "items": [ { "slug": "vanguard", "name": "Vanguard", "tier": 2 } ] },
+        { "unitSlug": "beastmaster", "name": "Beastmaster", "cost": 2, "stars": 3, "x": 5, "y": 4, "items": [ { "slug": "necronomicon", "name": "Necronomicon", "tier": 4 } ] },
+        { "unitSlug": "medusa", "name": "Medusa", "cost": 4, "stars": 2, "x": 4, "y": 3 },
+        { "unitSlug": "broodmother", "name": "Broodmother", "cost": 4, "stars": 1, "x": 6, "y": 3 },
+        { "unitSlug": "bounty-hunter", "name": "Bounty Hunter", "cost": 1, "stars": 3, "x": 2, "y": 2 },
+        { "unitSlug": "hoodwink", "name": "Hoodwink", "cost": 1, "stars": 3, "x": 4, "y": 2 },
+        { "unitSlug": "mirana", "name": "Mirana", "cost": 1, "stars": 3, "x": 6, "y": 2 },
+        { "unitSlug": "sniper", "name": "Sniper", "cost": 2, "stars": 3, "x": 1, "y": 1, "items": [ { "slug": "desolator", "name": "Desolator", "tier": 3 } ] },
+        { "unitSlug": "windranger", "name": "Windranger", "cost": 2, "stars": 3, "x": 8, "y": 1, "items": [ { "slug": "telescope", "name": "Telescope", "tier": 2 }, { "slug": "havoc", "name": "Havoc", "tier": 5 } ] }
+      ]
+    }
+  ]
+}

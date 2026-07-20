@@ -1,0 +1,109 @@
+{
+  "name": "6 Beast Summoner Combo",
+  "description": "A summoner combo where Magnus stampedes in and AoE-stuns, Arc Warden clones him and the Necronomicon, and the 6-Beast physical-damage-taken debuff stacks off an army of summons. Sourced from the 'Mega Combo SAVAGE Summoner Build' video.",
+  "snapshots": [
+    {
+      "label": "Final board",
+      "round": 30,
+      "focusNote": "Level 11: 6 Beasts for the stacking physical-damage debuff, Centaur stampede stun on entry. Magnus (Minotaur Horn) charges and stuns; Arc Warden duplicates him for a near-permanent lock while Warlock and Lone Druid flood summons that carry the Necronomicon and the debuff.",
+      "pieces": [
+        {
+          "unitSlug": "magnus",
+          "name": "Magnus",
+          "cost": 4,
+          "stars": 2,
+          "x": 1,
+          "y": 1,
+          "items": [
+            { "slug": "minotaur_horn", "name": "Minotaur Horn", "tier": 4 }
+          ]
+        },
+        {
+          "unitSlug": "primal-beast",
+          "name": "Primal Beast",
+          "cost": 5,
+          "stars": 2,
+          "x": 4,
+          "y": 1,
+          "items": []
+        },
+        {
+          "unitSlug": "monkey-king",
+          "name": "Monkey King",
+          "cost": 4,
+          "stars": 2,
+          "x": 8,
+          "y": 1,
+          "items": []
+        },
+        {
+          "unitSlug": "centaur-warrunner",
+          "name": "Centaur Warrunner",
+          "cost": 2,
+          "stars": 2,
+          "x": 3,
+          "y": 2,
+          "items": []
+        },
+        {
+          "unitSlug": "lycan",
+          "name": "Lycan",
+          "cost": 3,
+          "stars": 2,
+          "x": 5,
+          "y": 2,
+          "items": []
+        },
+        {
+          "unitSlug": "tusk",
+          "name": "Tusk",
+          "cost": 1,
+          "stars": 2,
+          "x": 6,
+          "y": 2,
+          "items": []
+        },
+        {
+          "unitSlug": "warlock",
+          "name": "Warlock",
+          "cost": 5,
+          "stars": 2,
+          "x": 3,
+          "y": 3,
+          "items": [
+            { "slug": "necronomicon_3", "name": "Necronomicon", "tier": 4 },
+            { "slug": "refresher_orb", "name": "Refresher Orb", "tier": 4 },
+            { "slug": "gleipnir", "name": "Gleipnir", "tier": 4 }
+          ]
+        },
+        {
+          "unitSlug": "lone-druid",
+          "name": "Lone Druid",
+          "cost": 4,
+          "stars": 3,
+          "x": 5,
+          "y": 3,
+          "items": []
+        },
+        {
+          "unitSlug": "enchantress",
+          "name": "Enchantress",
+          "cost": 1,
+          "stars": 2,
+          "x": 4,
+          "y": 3,
+          "items": []
+        },
+        {
+          "unitSlug": "arc-warden",
+          "name": "Arc Warden",
+          "cost": 5,
+          "stars": 2,
+          "x": 4,
+          "y": 4,
+          "items": []
+        }
+      ]
+    }
+  ]
+}

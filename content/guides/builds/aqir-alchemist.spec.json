@@ -1,0 +1,114 @@
+{
+  "name": "Aqir Infinite Summons (Alchemist)",
+  "description": "Alchemist + Ogre + 4 Aqir summon-loop. Keep duplicate 2-star Aqir pieces (autofuse OFF) so deaths hatch fresh, higher-tier Aqir all fight long, while Ogre Magi multicasts and Alchemist eats units to become a raid boss. Sourced from the YouTube guide 'BEST Rank Up AQIR Infinite Summons Build In Auto Chess'.",
+  "snapshots": [
+    {
+      "label": "Final board - 4 Aqir / 2 Ogre",
+      "round": 30,
+      "focusNote": "Autofuse OFF: hold two 2-star copies of each Aqir so the loop keeps hatching. Alchemist (3-star) eats the cross of units around it at fight start for HP/damage; Ogre Magi multicasts Sand King stuns and Venomancer wards. Keep one of each name alive to sustain the chain.",
+      "pieces": [
+        {
+          "unitSlug": "alchemist",
+          "name": "Alchemist",
+          "cost": 4,
+          "stars": 3,
+          "x": 4,
+          "y": 3,
+          "items": [
+            { "slug": "blink-dagger", "name": "Blink Dagger", "tier": 1 },
+            { "slug": "tranquil-boots", "name": "Tranquil Boots", "tier": 2 },
+            { "slug": "radiance", "name": "Radiance", "tier": 4 },
+            { "slug": "battle-fury", "name": "Battle Fury", "tier": 4 }
+          ]
+        },
+        {
+          "unitSlug": "ogre-magi",
+          "name": "Ogre Magi",
+          "cost": 3,
+          "stars": 2,
+          "x": 5,
+          "y": 3,
+          "items": [
+            { "slug": "spider-leg", "name": "Spider Leg", "tier": 2 }
+          ]
+        },
+        {
+          "unitSlug": "sand-king",
+          "name": "Sand King",
+          "cost": 3,
+          "stars": 2,
+          "x": 3,
+          "y": 3,
+          "items": [
+            { "slug": "maelstrom", "name": "Maelstrom", "tier": 2 }
+          ]
+        },
+        {
+          "unitSlug": "sand-king",
+          "name": "Sand King",
+          "cost": 3,
+          "stars": 2,
+          "x": 4,
+          "y": 4,
+          "items": []
+        },
+        {
+          "unitSlug": "venomancer",
+          "name": "Venomancer",
+          "cost": 3,
+          "stars": 2,
+          "x": 4,
+          "y": 2,
+          "items": []
+        },
+        {
+          "unitSlug": "venomancer",
+          "name": "Venomancer",
+          "cost": 3,
+          "stars": 2,
+          "x": 2,
+          "y": 3,
+          "items": []
+        },
+        {
+          "unitSlug": "broodmother",
+          "name": "Broodmother",
+          "cost": 4,
+          "stars": 2,
+          "x": 3,
+          "y": 2,
+          "items": []
+        },
+        {
+          "unitSlug": "broodmother",
+          "name": "Broodmother",
+          "cost": 4,
+          "stars": 2,
+          "x": 5,
+          "y": 2,
+          "items": []
+        },
+        {
+          "unitSlug": "nyx-assassin",
+          "name": "Nyx Assassin",
+          "cost": 4,
+          "stars": 2,
+          "x": 2,
+          "y": 2,
+          "items": []
+        },
+        {
+          "unitSlug": "arc-warden",
+          "name": "Arc Warden",
+          "cost": 5,
+          "stars": 2,
+          "x": 1,
+          "y": 1,
+          "items": [
+            { "slug": "scythe-of-vyse", "name": "Scythe of Vyse", "tier": 5 }
+          ]
+        }
+      ]
+    }
+  ]
+}

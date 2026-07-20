@@ -1,0 +1,112 @@
+{
+  "name": "Raid Boss Gyrocopter (6 Beast)",
+  "description": "Turn Gyrocopter into an Ogre with Ogre Hood so it eats your board for 6000+ HP and ~1000 base damage, backed by 6 Beast for the physical-damage debuff and Magnus/Enchantress Stampede stuns. A one-unit raid boss. Sourced from the YouTube guide 'How To Play RAID BOSS GYROCOPTER x6 BEAST In Dota Auto Chess'.",
+  "snapshots": [
+    {
+      "label": "Final board - 6 Beast + Ogre-Cap Gyro",
+      "round": 35,
+      "focusNote": "Gyrocopter wears Ogre Hood so it eats adjacent lower-level allies at fight start for their HP and base damage, becoming a 6000+ HP raid boss. 6 Beast stacks a physical-damage-taken debuff on targets; Magnus + Enchantress give 2 Centaur Stampede stuns; Sniper adds the 2nd Dwarf for Gyro damage. Blink + crit + Manta illusions finish.",
+      "pieces": [
+        {
+          "unitSlug": "gyrocopter",
+          "name": "Gyrocopter",
+          "cost": 5,
+          "stars": 2,
+          "x": 4,
+          "y": 3,
+          "items": [
+            { "slug": "ogre-hood", "name": "Ogre Hood", "tier": 5 },
+            { "slug": "blink-dagger", "name": "Blink Dagger", "tier": 1 },
+            { "slug": "crystalys", "name": "Crystalys", "tier": 1 },
+            { "slug": "manta-style", "name": "Manta Style", "tier": 4 }
+          ]
+        },
+        {
+          "unitSlug": "primal-beast",
+          "name": "Primal Beast",
+          "cost": 5,
+          "stars": 2,
+          "x": 3,
+          "y": 3,
+          "items": [
+            { "slug": "vanguard", "name": "Vanguard", "tier": 2 }
+          ]
+        },
+        {
+          "unitSlug": "monkey-king",
+          "name": "Monkey King",
+          "cost": 4,
+          "stars": 2,
+          "x": 5,
+          "y": 3,
+          "items": []
+        },
+        {
+          "unitSlug": "lone-druid",
+          "name": "Lone Druid",
+          "cost": 4,
+          "stars": 2,
+          "x": 4,
+          "y": 4,
+          "items": []
+        },
+        {
+          "unitSlug": "enchantress",
+          "name": "Enchantress",
+          "cost": 1,
+          "stars": 2,
+          "x": 4,
+          "y": 2,
+          "items": []
+        },
+        {
+          "unitSlug": "venomancer",
+          "name": "Venomancer",
+          "cost": 3,
+          "stars": 2,
+          "x": 2,
+          "y": 2,
+          "items": []
+        },
+        {
+          "unitSlug": "tusk",
+          "name": "Tusk",
+          "cost": 1,
+          "stars": 2,
+          "x": 3,
+          "y": 2,
+          "items": []
+        },
+        {
+          "unitSlug": "magnus",
+          "name": "Magnus",
+          "cost": 4,
+          "stars": 2,
+          "x": 5,
+          "y": 2,
+          "items": [
+            { "slug": "minotaur-horn", "name": "Minotaur Horn", "tier": 4 }
+          ]
+        },
+        {
+          "unitSlug": "sniper",
+          "name": "Sniper",
+          "cost": 2,
+          "stars": 2,
+          "x": 6,
+          "y": 1,
+          "items": []
+        },
+        {
+          "unitSlug": "arc-warden",
+          "name": "Arc Warden",
+          "cost": 5,
+          "stars": 1,
+          "x": 1,
+          "y": 1,
+          "items": []
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "name": "Knights — Legion Commander / Chaos Knight",
+  "description": "The stable 6 Troll / 4 Knight board, with a raid-boss Legion Commander that permanently scales attack damage every home battle she survives. 2 Wizards unlock the 6th troll and 4th knight tiers. Sourced from the YouTube guide 'HOW TO PLAY Legion Commander/CK Knights Build In Auto Chess'.",
+  "snapshots": [
+    {
+      "label": "Final board",
+      "round": 35,
+      "focusNote": "5 trolls + 2 wizards = 6-Troll attack-speed stacking; 4 knights (Batrider bridges troll and knight) give team shields. Dazzle's Shadow Grave keeps three-star carries alive; Legion Commander blinks the backline while Chaos Knight and Luna grind the front.",
+      "pieces": [
+        { "unitSlug": "huskar", "name": "Huskar", "cost": 3, "stars": 2, "x": 3, "y": 4 },
+        { "unitSlug": "chaos-knight", "name": "Chaos Knight", "cost": 2, "stars": 3, "x": 4, "y": 4, "items": [ { "slug": "pipe-of-insight", "name": "Pipe of Insight", "tier": 3 } ] },
+        { "unitSlug": "dazzle", "name": "Dazzle", "cost": 1, "stars": 3, "x": 5, "y": 4 },
+        { "unitSlug": "batrider", "name": "Batrider", "cost": 2, "stars": 2, "x": 6, "y": 4 },
+        { "unitSlug": "luna", "name": "Luna", "cost": 2, "stars": 3, "x": 3, "y": 3, "items": [ { "slug": "maelstrom", "name": "Maelstrom", "tier": 2 } ] },
+        { "unitSlug": "witch-doctor", "name": "Witch Doctor", "cost": 1, "stars": 2, "x": 5, "y": 3 },
+        { "unitSlug": "shadow-shaman", "name": "Shadow Shaman", "cost": 1, "stars": 2, "x": 6, "y": 3 },
+        { "unitSlug": "rubick", "name": "Rubick", "cost": 3, "stars": 1, "x": 4, "y": 2 },
+        { "unitSlug": "legion-commander", "name": "Legion Commander", "cost": 3, "stars": 3, "x": 2, "y": 1, "items": [ { "slug": "blink-dagger", "name": "Blink Dagger", "tier": 1 }, { "slug": "battle-fury", "name": "Battle Fury", "tier": 4 }, { "slug": "aegis-of-immortal", "name": "Aegis of Immortal", "tier": 3 } ] },
+        { "unitSlug": "dark-willow", "name": "Dark Willow", "cost": 1, "stars": 1, "x": 7, "y": 1 }
+      ]
+    }
+  ]
+}
