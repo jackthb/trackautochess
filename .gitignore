@@ -54,4 +54,8 @@ data/vscripts/
 data/vscripts_prev/
 data/vscript_diffs/
 
+# Build-guide video transcripts — third-party creator content, not ours to
+# host. Regenerate locally on demand via scripts/build-guides/fetch-transcript.mjs.
+scripts/build-guides/cache/
+
 .vercel

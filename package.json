@@ -23,9 +23,12 @@
     "test:drodo-core": "npm run build:drodo-core && node scripts/smoke-drodo-core.mjs",
     "import:legacy-mmr-snapshots": "node scripts/import-legacy-mmr-snapshots.mjs",
     "web:data": "node scripts/generate-web-runtime-data.mjs",
-    "cms:dev": "pnpm --dir web run dev"
+    "cms:dev": "pnpm --dir web run dev",
+    "guide:fetch": "node scripts/build-guides/fetch-transcript.mjs",
+    "guide:match": "node scripts/build-guides/match-entities.mjs"
   },
   "devDependencies": {
-    "supabase": "2.105.0"
+    "supabase": "2.105.0",
+    "youtube-transcript": "^1.2.1"
   }
 }
