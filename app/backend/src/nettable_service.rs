@@ -97,6 +97,8 @@ struct NettableState {
     /// Last observed DAC round. Round changes drive frontend notifications and
     /// let us keep parity with the Python capture cascade.
     last_round: Option<i64>,
+    /// First DAC round observed in the current match (for "rounds X–Y" status).
+    first_round: Option<i64>,
     /// Current match roster fingerprint, if known. Used to segment buffered
     /// dumps into match sessions for timeline extraction.
     match_roster_fingerprint: Option<Vec<String>>,
@@ -1366,6 +1368,9 @@ fn handle_rows_for_parity(state: &Arc<Mutex<NettableState>>, rows: &[NettableRow
         if state.last_round != Some(round) {
             let prev = state.last_round;
             state.last_round = Some(round);
+            if state.first_round.is_none() {
+                state.first_round = Some(round);
+            }
             events.push(event_json(&NettableRoundChanged::new(round, prev, &now)));
             if round > 0 && round % 5 == 0 {
                 events.push(event_json(&NettableCreepRound::new(round, &now)));
@@ -1584,12 +1589,32 @@ const LOG_ACTIVE_WINDOW: Duration = Duration::from_secs(120);
 /// We report what we can actually measure: Dota process presence and whether
 /// console.log is being written within the active window.
 fn nettable_status_json(state: &Arc<Mutex<NettableState>>) -> String {
-    let (paused, log_path, local_steam_id) = {
+    let (paused, log_path, local_steam_id, in_match, first_round, current_round, players_alive) = {
         let state = state.lock().unwrap();
+        let players_alive = {
+            let (live_players, _) =
+                live_players_value(&state.latest_rows, state.local_steam_id.as_deref());
+            live_players.as_object().map(|players| {
+                players
+                    .values()
+                    .filter(|player| {
+                        player
+                            .get("hp")
+                            .and_then(serde_json::Value::as_f64)
+                            .unwrap_or(0.0)
+                            > 0.0
+                    })
+                    .count() as u32
+            })
+        };
         (
             state.paused,
             state.log_path.clone(),
             state.local_steam_id.clone(),
+            state.last_ui_state.as_deref() == Some(DOTA_INGAME_STATE),
+            state.first_round,
+            state.last_round,
+            players_alive,
         )
     };
     let log_path = log_path.or_else(find_console_log);
@@ -1643,6 +1668,10 @@ fn nettable_status_json(state: &Arc<Mutex<NettableState>>) -> String {
         steam_running: is_steam_running(),
         dota_running: is_dota_running(),
         log_active,
+        in_match,
+        first_round,
+        current_round,
+        players_alive,
     })
 }
 
@@ -2216,6 +2245,7 @@ fn poll_once(
             state.latest_rows.clear();
             state.session_dumps.clear();
             state.last_round = None;
+            state.first_round = None;
             state.is_dac_match = false;
             state.endgame_burst = false;
             state.pending_match_end = false;

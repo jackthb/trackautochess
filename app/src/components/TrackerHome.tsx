@@ -24,6 +24,8 @@ export function TrackerHome({ unitsFull, netTable, status }: TrackerHomeProps) {
     status: netStatus,
     state,
     stateAt,
+    livePlayers,
+    localSteamIds,
     launchOptionsApplied,
     launchOptionsProgress,
     resyncProgress,
@@ -93,6 +95,8 @@ export function TrackerHome({ unitsFull, netTable, status }: TrackerHomeProps) {
             resyncProgress={resyncProgress}
             queenUpload={queenUpload}
             queenUploadProgress={queenUploadProgress}
+            livePlayers={livePlayers}
+            localSteamIds={localSteamIds}
           />
         </div>
 
@@ -164,12 +168,16 @@ export function TrackerHome({ unitsFull, netTable, status }: TrackerHomeProps) {
             )}
             <div className="settings-row">
               <span className="settings-label">Legendary overlay</span>
+              <span className="settings-value dim">Ctrl+Shift+L toggles · docks to Dota</span>
+            </div>
+            <div className="settings-row">
+              <span className="settings-label" />
               <button
                 type="button"
                 className="btn-ghost"
-                onClick={() => void window.legendaryOverlay?.show()}
+                onClick={() => void window.legendaryOverlay?.toggle()}
               >
-                Show overlay
+                Toggle overlay
               </button>
             </div>
           </div>
@@ -189,6 +197,7 @@ export function TrackerHome({ unitsFull, netTable, status }: TrackerHomeProps) {
           state={state}
           stateAt={stateAt}
           unitsFull={unitsFull}
+          inMatch={netStatus?.in_match === true}
         />
       )}
     </div>

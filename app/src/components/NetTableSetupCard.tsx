@@ -1,5 +1,8 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { parseNettableSynergyBuff } from "@dac/shared/game-structure";
+import type { SynergyInfo } from "@dac/shared/types";
 import { capture } from "../lib/posthog";
+import type { LivePlayer } from "../backend-events";
 import type {
   NetTableLaunchOptionsApplied,
   NetTableQueenUploadResult,
@@ -13,6 +16,8 @@ interface NetTableSetupCardProps {
   resyncProgress: string | null;
   queenUpload: NetTableQueenUploadResult | null;
   queenUploadProgress: string | null;
+  livePlayers?: Record<string, LivePlayer>;
+  localSteamIds?: string[];
 }
 
 // Internal Dota integration flags applied by the backend. Keep these out of
@@ -47,9 +52,21 @@ export function NetTableSetupCard({
   resyncProgress,
   queenUpload,
   queenUploadProgress,
+  livePlayers = {},
+  localSteamIds = [],
 }: NetTableSetupCardProps) {
   const [applying, setApplying] = useState(false);
   const [uploadingQueens, setUploadingQueens] = useState(false);
+  const [synergies, setSynergies] = useState<Record<string, SynergyInfo>>({});
+
+  useEffect(() => {
+    void window.appApi.fetchSynergies().then(setSynergies).catch(() => {});
+  }, []);
+
+  const localComp = useMemo(
+    () => formatLocalComp(livePlayers, localSteamIds, synergies),
+    [livePlayers, localSteamIds, synergies],
+  );
 
   const applyLaunchOptions = useCallback(() => {
     if (!window.tracker) return;
@@ -150,24 +167,49 @@ export function NetTableSetupCard({
   }
 
   if (setupHealthy) {
+    const trackingDetail = formatTrackingDetail(status, localComp);
+    const activelyTracking = tracking || waitingForFocus;
+    const trackingLabel = activelyTracking
+      ? trackingDetail
+        ? `Tracking · ${trackingDetail}`
+        : "Tracking in progress"
+      : dotaRunning
+        ? "Ready"
+        : "Ready — start a match in Dota";
+    // Focus loss is normal while reading this app — don't restyle as a warning.
+    const trackingModifier = activelyTracking ? " tracking" : " paused";
+
     return (
-      <div className="nettable-status-row">
-        <ActiveMatchControl onCheck={checkActiveMatch} compact />
-        <QueenUploadControl
-          uploading={uploadingQueens}
-          progress={queenUploadProgress}
-          result={queenUpload}
-          onUpload={uploadQueens}
-          compact
-        />
-        <button
-          type="button"
-          className="btn-ghost nettable-pause-btn"
-          onClick={closeApp}
-          title="Close Track Auto Chess"
+      <div className="nettable-status-block">
+        <div
+          className={`nettable-setup-complete${trackingModifier}`}
+          role="status"
+          aria-live="polite"
         >
-          Close app
-        </button>
+          <span
+            className={`nettable-setup-complete-dot${trackingModifier}`}
+            aria-hidden="true"
+          />
+          <span className="nettable-setup-complete-text">{trackingLabel}</span>
+        </div>
+        <div className="nettable-status-row">
+          <ActiveMatchControl onCheck={checkActiveMatch} compact />
+          <QueenUploadControl
+            uploading={uploadingQueens}
+            progress={queenUploadProgress}
+            result={queenUpload}
+            onUpload={uploadQueens}
+            compact
+          />
+          <button
+            type="button"
+            className="btn-ghost nettable-pause-btn"
+            onClick={closeApp}
+            title="Close Track Auto Chess"
+          >
+            Close app
+          </button>
+        </div>
       </div>
     );
   }
@@ -244,6 +286,52 @@ export function NetTableSetupCard({
       )}
     </div>
   );
+}
+
+function formatLocalComp(
+  livePlayers: Record<string, LivePlayer>,
+  localSteamIds: string[],
+  synergiesData: Record<string, SynergyInfo>,
+): string | null {
+  const localId =
+    localSteamIds.find((id) => livePlayers[id]) ??
+    Object.keys(livePlayers)[0];
+  const buff = localId ? livePlayers[localId]?.buff : undefined;
+  if (!buff || Object.keys(synergiesData).length === 0) return null;
+  const active = parseNettableSynergyBuff(buff, synergiesData, {
+    activeOnly: true,
+    includeOnePieceActive: false,
+  });
+  if (active.length === 0) return null;
+  return active
+    .slice(0, 4)
+    .map((s) => `${s.count} ${s.name}`)
+    .join(" · ");
+}
+
+function formatTrackingDetail(
+  status: NetTableStatus | null,
+  localComp: string | null,
+): string | null {
+  if (!status) return localComp;
+  const parts: string[] = [];
+  const first = status.first_round;
+  const current = status.current_round;
+  if (typeof first === "number" && typeof current === "number") {
+    parts.push(
+      first === current ? `round ${current}` : `rounds ${first}–${current}`,
+    );
+  } else if (typeof current === "number") {
+    parts.push(`round ${current}`);
+  }
+  if (typeof status.players_alive === "number") {
+    parts.push(`${status.players_alive} alive`);
+  }
+  if (localComp) parts.push(localComp);
+  if (status.in_match && parts.length === 0) {
+    parts.push("in match");
+  }
+  return parts.length > 0 ? parts.join(" · ") : null;
 }
 
 function ActiveMatchControl({

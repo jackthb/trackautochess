@@ -334,6 +334,7 @@ declare global {
       } | null) => Promise<boolean>;
       hide: () => Promise<boolean>;
       show: () => Promise<boolean>;
+      toggle: () => Promise<boolean>;
       ready: () => void;
       resize: (size: { width: number; height: number }) => void;
       onPush: (

@@ -42,6 +42,7 @@ const CHANNELS = {
     update: "legendaryOverlay:update",
     hide: "legendaryOverlay:hide",
     show: "legendaryOverlay:show",
+    toggle: "legendaryOverlay:toggle",
     ready: "legendaryOverlay:ready",
     push: "legendaryOverlay:push",
     resize: "legendaryOverlay:resize",
@@ -98,6 +99,7 @@ contextBridge.exposeInMainWorld("legendaryOverlay", {
   update: (payload) => ipcRenderer.invoke(CHANNELS.legendaryOverlay.update, payload),
   hide: () => ipcRenderer.invoke(CHANNELS.legendaryOverlay.hide),
   show: () => ipcRenderer.invoke(CHANNELS.legendaryOverlay.show),
+  toggle: () => ipcRenderer.invoke(CHANNELS.legendaryOverlay.toggle),
   ready: () => ipcRenderer.send(CHANNELS.legendaryOverlay.ready),
   resize: (size) => ipcRenderer.send(CHANNELS.legendaryOverlay.resize, size),
   onPush: (callback) => {

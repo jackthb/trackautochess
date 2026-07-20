@@ -894,6 +894,14 @@ pub struct NettableStatus<'a> {
     pub steam_running: bool,
     pub dota_running: bool,
     pub log_active: bool,
+    /// True while Dota's UI state is the in-game Auto Chess match screen.
+    pub in_match: bool,
+    /// First round observed in the current match, if any.
+    pub first_round: Option<i64>,
+    /// Latest round observed in the current match, if any.
+    pub current_round: Option<i64>,
+    /// Players still above 0 HP in the latest live snapshot, if known.
+    pub players_alive: Option<u32>,
 }
 
 #[derive(Debug, Serialize, TS)]

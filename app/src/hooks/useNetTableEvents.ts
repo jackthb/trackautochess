@@ -50,6 +50,14 @@ export interface NetTableStatus {
    *  independent of what Steam's localconfig.vdf claims. */
   log_active: boolean;
   paused: boolean;
+  /** True while Dota's UI is the in-game Auto Chess match screen. */
+  in_match: boolean;
+  /** First round observed in the current match, if any. */
+  first_round: number | null;
+  /** Latest round observed in the current match, if any. */
+  current_round: number | null;
+  /** Players still above 0 HP in the latest live snapshot, if known. */
+  players_alive: number | null;
 }
 
 export interface NetTableLaunchOptionsApplied {
@@ -241,6 +249,10 @@ export function useNetTableEvents(): NetTableActivityState {
               dota_running: msg.dota_running,
               log_active: msg.log_active,
               paused: msg.paused ?? false,
+              in_match: msg.in_match ?? false,
+              first_round: msg.first_round ?? null,
+              current_round: msg.current_round ?? null,
+              players_alive: msg.players_alive ?? null,
             };
             // Surface a one-time warning when Dota launches but console.log
             // doesn't start writing — that's the empirical "you forgot
@@ -329,6 +341,17 @@ export function useNetTableEvents(): NetTableActivityState {
             message: msg.message,
             at: new Date().toISOString(),
           });
+          setStatus((prev) =>
+            prev
+              ? {
+                  ...prev,
+                  in_match: false,
+                  first_round: null,
+                  current_round: null,
+                  players_alive: null,
+                }
+              : prev,
+          );
           push({
             kind: "nettable_game_ended",
             title: "Match ended",
@@ -379,6 +402,20 @@ export function useNetTableEvents(): NetTableActivityState {
             kind: "nettable_creep_round",
             title: `Creep round ${msg.round}`,
             tone: "info",
+          });
+          break;
+        }
+        case "nettable_round_changed": {
+          setStatus((prev) => {
+            if (!prev) return prev;
+            const round = typeof msg.round === "number" ? msg.round : null;
+            if (round == null) return prev;
+            return {
+              ...prev,
+              in_match: true,
+              first_round: prev.first_round ?? round,
+              current_round: round,
+            };
           });
           break;
         }

@@ -38,6 +38,7 @@ const CHANNELS = {
     update: "legendaryOverlay:update",
     hide: "legendaryOverlay:hide",
     show: "legendaryOverlay:show",
+    toggle: "legendaryOverlay:toggle",
     ready: "legendaryOverlay:ready",
     push: "legendaryOverlay:push",
     resize: "legendaryOverlay:resize",

@@ -145,8 +145,12 @@ const legendaryOverlay = createLegendaryOverlay({
   BrowserWindow,
   ipcMain,
   path,
+  fs,
+  spawn,
+  globalShortcut,
   channels: CHANNELS,
   preloadPath: path.join(__dirname, "preload.js"),
+  dacDir: DAC_DIR,
   getIndexLoad: () =>
     IS_DEV
       ? { kind: "url", target: "http://localhost:5173" }
@@ -297,6 +301,7 @@ function registerShortcuts() {
   globalShortcut.register("F7", () => {
     backend.send({ cmd: "toggle_recording" });
   });
+  legendaryOverlay.registerHotkey();
 }
 
 ipcMain.on(CHANNELS.window.minimize, () => {

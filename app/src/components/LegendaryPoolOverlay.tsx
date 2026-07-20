@@ -16,10 +16,15 @@ export interface LegendaryPoolPayload {
 }
 
 /**
- * Pushes legendary pool state to a Discord-styled always-on-top overlay window.
- * Renders nothing in the main app.
+ * Pushes legendary pool state to a Discord-style Dota game overlay.
+ * Only while in an active match — Ctrl+Shift+L toggles visibility.
  */
-export function LegendaryPoolOverlay({ state, stateAt, unitsFull }: Props) {
+export function LegendaryPoolOverlay({
+  state,
+  stateAt,
+  unitsFull,
+  inMatch,
+}: Props) {
   const pool = useMemo(
     () => extractHiddenLegendaries(state, unitsFull),
     [state, unitsFull],
@@ -29,17 +34,19 @@ export function LegendaryPoolOverlay({ state, stateAt, unitsFull }: Props) {
     const api = window.legendaryOverlay;
     if (!api) return;
 
-    if (!pool) {
+    // Keep a payload while in-match even before the pool dump arrives —
+    // otherwise Ctrl+Shift+L has nothing to show and looks broken.
+    if (!inMatch) {
       void api.update(null);
       return;
     }
 
     void api.update({
-      revealed: pool.revealed,
-      unrevealed: pool.unrevealed,
+      revealed: pool?.revealed ?? [],
+      unrevealed: pool?.unrevealed ?? [],
       stateAt,
     } satisfies LegendaryPoolPayload);
-  }, [pool, stateAt]);
+  }, [pool, stateAt, inMatch]);
 
   useEffect(() => {
     return () => {
@@ -54,6 +61,7 @@ interface Props {
   state: NetTableState;
   stateAt: string | null;
   unitsFull: Record<string, UnitFullInfo>;
+  inMatch: boolean;
 }
 
 /** Discord-styled panel rendered inside the always-on-top overlay window. */
@@ -72,51 +80,65 @@ export function LegendaryDiscordOverlayApp() {
   useLayoutEffect(() => {
     const el = cardRef.current;
     if (!el || !window.legendaryOverlay?.resize) return;
-    const rect = el.getBoundingClientRect();
-    window.legendaryOverlay.resize({
-      width: Math.ceil(rect.width),
-      height: Math.ceil(rect.height),
-    });
+
+    const publishSize = () => {
+      const width = Math.ceil(el.scrollWidth);
+      const height = Math.ceil(el.scrollHeight);
+      if (width <= 0 || height <= 0) return;
+      window.legendaryOverlay?.resize({ width, height });
+    };
+
+    publishSize();
+    const ro = new ResizeObserver(publishSize);
+    ro.observe(el);
+    return () => ro.disconnect();
   }, [payload]);
 
   const revealed = payload?.revealed ?? [];
   const unrevealed = payload?.unrevealed ?? [];
-  const fullPool = [...revealed, ...unrevealed];
-  const revealedCodes = new Set(revealed.map((u) => u.code));
+  const revealedCodes = useMemo(
+    () => new Set(revealed.map((u) => u.code)),
+    [revealed],
+  );
+  // Stable 2×5 order by name — unlock state only recolors, never reshuffles.
+  const gridUnits = useMemo(() => {
+    const byCode = new Map<string, LegendaryEntry>();
+    for (const u of [...revealed, ...unrevealed]) byCode.set(u.code, u);
+    return [...byCode.values()]
+      .sort((a, b) => a.name.localeCompare(b.name))
+      .slice(0, 10);
+  }, [revealed, unrevealed]);
 
   return (
     <div className="disc-overlay">
       <div className="disc-overlay-card" ref={cardRef}>
         <header className="disc-overlay-header">
           <div className="disc-overlay-title">Legendaries</div>
-          <button
-            type="button"
-            className="disc-overlay-close"
-            onClick={() => void window.legendaryOverlay?.hide()}
-            aria-label="Close"
-          >
-            ×
-          </button>
+          <span className="disc-overlay-hotkey">⌃⇧L</span>
         </header>
 
-        {fullPool.length === 0 ? (
+        {gridUnits.length === 0 ? (
           <p className="disc-overlay-empty">Waiting for match pool…</p>
         ) : (
-          <ul className="disc-overlay-list">
-            {fullPool.map((u) => {
-              const isRevealed = revealedCodes.has(u.code);
+          <ul className="disc-overlay-grid" aria-label="Legendaries">
+            {Array.from({ length: 10 }, (_, i) => {
+              const u = gridUnits[i];
+              if (!u) {
+                return <li key={`empty-${i}`} className="disc-overlay-row is-empty" />;
+              }
+              const isUnlocked = revealedCodes.has(u.code);
               return (
                 <li
                   key={u.code}
-                  className={`disc-overlay-row${isRevealed ? " is-unlocked" : " is-locked"}`}
+                  className={`disc-overlay-row${isUnlocked ? " is-unlocked" : " is-locked"}`}
                   title={u.code}
                 >
                   <img
                     className="disc-overlay-icon"
                     src={`icons://units/${unitStem(u.name)}.png`}
                     alt=""
-                    width={24}
-                    height={24}
+                    width={20}
+                    height={20}
                     onError={(e) => {
                       (e.currentTarget as HTMLImageElement).style.visibility =
                         "hidden";
