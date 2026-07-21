@@ -1,5 +1,5 @@
 import { toApiReq } from "@/lib/abuseLog";
-import { isAdminSteamId } from "@/lib/admin";
+import { isAdminSteamId } from "@/lib/adminServer";
 import { getSessionUser } from "@/lib/sessionUser";
 import { createSupabaseAnonClient } from "@/lib/supabase";
 import { guideIndexData } from "@/generated/content-data";
@@ -13,7 +13,7 @@ interface IndexGuide {
 export async function GET(req: Request) {
   const anon = createSupabaseAnonClient();
   const session = await getSessionUser(toApiReq(req), anon);
-  if (!isAdminSteamId(session.steamId)) {
+  if (!(await isAdminSteamId(session.steamId))) {
     return Response.json({ error: "Forbidden" }, { status: 403 });
   }
 

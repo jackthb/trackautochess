@@ -1,4 +1,4 @@
-import { isAdminSteamId } from "@/lib/admin";
+import { ADMIN_ACCESS_FLAG } from "@/lib/adminFlags";
 import { WEBSITE_BETA_FEATURES_FLAG } from "@/lib/betaFlags";
 
 type FlagValue =
@@ -77,5 +77,5 @@ export async function isBetaFeaturesEnabledForSteamId(
 export async function isChatbotEnabledForSteamId(
   steamId: string | null | undefined,
 ): Promise<boolean> {
-  return isAdminSteamId(steamId);
+  return isPostHogFlagEnabledForSteamId(steamId, ADMIN_ACCESS_FLAG);
 }

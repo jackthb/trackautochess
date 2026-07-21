@@ -6,7 +6,7 @@ import { useRouter, usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { SITE_NAME } from "@/lib/site";
 import { trackEvent } from "@/lib/analytics";
-import { isAdminSteamId } from "@/lib/admin";
+import { useIsAdmin } from "@/lib/admin";
 import { useBetaFeaturesEnabled } from "@/lib/betaFeatures";
 import { useSupabaseSession } from "@/lib/useSupabaseSession";
 import { EntityIcon } from "@/components/EntityIcon";
@@ -130,7 +130,7 @@ export function AppNavBar() {
     ? playerProfilePath(sessionSteamId, sessionCustomUrl)
     : "/dashboard";
   const canSeeBetaFeatures = useBetaFeaturesEnabled(sessionSteamId);
-  const isAdmin = isAdminSteamId(sessionSteamId);
+  const isAdmin = useIsAdmin(sessionSteamId);
   const trackNavClick = (destination: string) => {
     trackEvent("Navigation Link Clicked", { source: "nav", destination });
   };

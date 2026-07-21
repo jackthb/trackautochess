@@ -2,13 +2,14 @@
 
 import type { ReactNode } from "react";
 import { notFound } from "next/navigation";
-import { isAdminSteamId } from "@/lib/admin";
+import { useAdminAccess } from "@/lib/admin";
 import { useSupabaseSession } from "@/lib/useSupabaseSession";
 
 /**
  * Client-side admin gate: renders children only for signed-in admin Steam
- * accounts, otherwise 404s. This is a UI convenience — real protection lives
- * in server-side auth/RLS. Used by /keystatic and /builds.
+ * accounts (PostHog `admin_access` flag), otherwise 404s. This is a UI
+ * convenience — real protection lives in server-side auth checks. Used by
+ * /keystatic and /builds.
  */
 export function AdminGate({
   children,
@@ -20,10 +21,11 @@ export function AdminGate({
 }) {
   const bypass = allowDevBypass && process.env.NODE_ENV === "development";
   const { ready, steamId } = useSupabaseSession();
+  const adminAccess = useAdminAccess(steamId);
 
   if (bypass) return <>{children}</>;
-  if (!ready) return null;
-  if (!isAdminSteamId(steamId)) notFound();
+  if (!ready || adminAccess === "loading") return null;
+  if (adminAccess !== "enabled") notFound();
 
   return <>{children}</>;
 }

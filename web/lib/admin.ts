@@ -1,11 +1,23 @@
-/**
- * Admin Steam IDs. Admins bypass the manual refresh quota and may refresh any
- * profile. The list is public because the client uses it to decide whether to
- * render the refresh button on other people's profiles.
- */
-const ADMIN_STEAM_IDS = new Set(["76561198022169086"]);
+"use client";
 
-export function isAdminSteamId(steamId: string | null | undefined): boolean {
-  if (!steamId) return false;
-  return ADMIN_STEAM_IDS.has(String(steamId));
+import { ADMIN_ACCESS_FLAG } from "@/lib/adminFlags";
+import {
+  usePostHogFlagAccess,
+  type BetaFeatureAccess,
+} from "@/lib/betaFeatures";
+
+export type AdminAccess = BetaFeatureAccess;
+
+/**
+ * Client-side admin check via the PostHog `admin_access` feature flag.
+ * Manage membership in PostHog (cohort / person release conditions), not in code.
+ */
+export function useAdminAccess(
+  steamId: string | null | undefined,
+): AdminAccess {
+  return usePostHogFlagAccess(ADMIN_ACCESS_FLAG, steamId);
+}
+
+export function useIsAdmin(steamId: string | null | undefined): boolean {
+  return useAdminAccess(steamId) === "enabled";
 }
