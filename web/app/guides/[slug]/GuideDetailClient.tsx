@@ -56,6 +56,42 @@ function StarRow({ stars }: { stars: number }) {
   return <span className={styles.stars}>{"★".repeat(stars)}</span>;
 }
 
+function youtubeVideoId(url: string): string | null {
+  try {
+    const parsed = new URL(url);
+    if (parsed.hostname.includes("youtu.be")) return parsed.pathname.slice(1) || null;
+    return parsed.searchParams.get("v");
+  } catch {
+    return null;
+  }
+}
+
+function SourceCard({ source }: { source: GuideSource }) {
+  const videoId = youtubeVideoId(source.url);
+  return (
+    <a href={source.url} target="_blank" rel="noreferrer" className={styles.sourceCard}>
+      {videoId ? (
+        <div className={styles.sourceThumbWrap}>
+          <img
+            src={`https://i.ytimg.com/vi/${videoId}/mqdefault.jpg`}
+            alt=""
+            className={styles.sourceThumb}
+            loading="lazy"
+          />
+          <span className={styles.sourcePlay} aria-hidden>
+            ▶
+          </span>
+        </div>
+      ) : (
+        <span className={styles.sourcePlay} aria-hidden>
+          ▶
+        </span>
+      )}
+      <span className={styles.sourceTitle}>{source.label}</span>
+    </a>
+  );
+}
+
 function BoardIcons({ shareLink }: { shareLink: string }) {
   const snapshots = useMemo(() => decodeShareLink(shareLink), [shareLink]);
   if (!snapshots || snapshots.length === 0) return null;
@@ -144,15 +180,7 @@ export function GuideDetailClient({ slug }: { slug: string }) {
         {guide.sources.length > 0 && (
           <div className={styles.sources}>
             {guide.sources.map((source) => (
-              <a
-                key={source.url}
-                href={source.url}
-                target="_blank"
-                rel="noreferrer"
-                className={styles.sourceLink}
-              >
-                ▶ Watch: {source.label}
-              </a>
+              <SourceCard key={source.url} source={source} />
             ))}
           </div>
         )}
