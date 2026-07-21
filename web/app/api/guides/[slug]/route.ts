@@ -1,5 +1,6 @@
 import { toApiReq } from "@/lib/abuseLog";
 import { isAdminSteamId } from "@/lib/admin";
+import { linkifyGuideBody } from "@/lib/guideLinks";
 import { getSessionUser } from "@/lib/sessionUser";
 import { createSupabaseAnonClient } from "@/lib/supabase";
 import { guidesBySlugData } from "@/generated/content-data";
@@ -17,10 +18,13 @@ export async function GET(req: Request, { params }: Props) {
   }
 
   const { slug } = await params;
-  const guide = (guidesBySlugData as Record<string, unknown>)[slug];
+  const guide = (guidesBySlugData as Record<string, { body?: string } | undefined>)[slug];
   if (!guide) {
     return Response.json({ error: "Not found" }, { status: 404 });
   }
 
-  return Response.json({ guide });
+  const linked =
+    typeof guide.body === "string" ? { ...guide, body: linkifyGuideBody(guide.body) } : guide;
+
+  return Response.json({ guide: linked });
 }
