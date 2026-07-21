@@ -430,6 +430,7 @@ function createLegendaryOverlay({
       clearTimeout(clearTimer);
       clearTimer = null;
     }
+    unregister();
     stopDockLoop();
     stopFinder();
     lastPayload = null;
@@ -450,7 +451,19 @@ function createLegendaryOverlay({
     }
   }
 
+  function unregister() {
+    ipcMain.removeHandler(channels.legendaryOverlay.update);
+    ipcMain.removeHandler(channels.legendaryOverlay.hide);
+    ipcMain.removeHandler(channels.legendaryOverlay.show);
+    ipcMain.removeHandler(channels.legendaryOverlay.toggle);
+    ipcMain.removeAllListeners(channels.legendaryOverlay.resize);
+    ipcMain.removeAllListeners(channels.legendaryOverlay.ready);
+  }
+
   function register() {
+    // Re-registering the same channel throws; clear any prior handlers first so
+    // register() is idempotent and the invoke handlers exist before any window.
+    unregister();
     ipcMain.handle(channels.legendaryOverlay.update, (_event, payload) => {
       update(payload || null);
       return true;

@@ -95,11 +95,20 @@ contextBridge.exposeInMainWorld("appApi", {
   fetchTalents: () => ipcRenderer.invoke(CHANNELS.data.talents),
 });
 
+// The overlay handlers live in the main process for the app's lifetime, but a
+// renderer can still invoke during teardown/reload — after the window is gone
+// but before its React cleanup stops firing — when no handler is registered.
+// `invoke` then rejects with "No handler registered for '…'", which surfaces as
+// an unhandled rejection / crash. These calls are best-effort UI signals, so
+// swallow the rejection and resolve to `false` instead of letting it escape.
+const safeInvoke = (channel, ...args) =>
+  ipcRenderer.invoke(channel, ...args).catch(() => false);
+
 contextBridge.exposeInMainWorld("legendaryOverlay", {
-  update: (payload) => ipcRenderer.invoke(CHANNELS.legendaryOverlay.update, payload),
-  hide: () => ipcRenderer.invoke(CHANNELS.legendaryOverlay.hide),
-  show: () => ipcRenderer.invoke(CHANNELS.legendaryOverlay.show),
-  toggle: () => ipcRenderer.invoke(CHANNELS.legendaryOverlay.toggle),
+  update: (payload) => safeInvoke(CHANNELS.legendaryOverlay.update, payload),
+  hide: () => safeInvoke(CHANNELS.legendaryOverlay.hide),
+  show: () => safeInvoke(CHANNELS.legendaryOverlay.show),
+  toggle: () => safeInvoke(CHANNELS.legendaryOverlay.toggle),
   ready: () => ipcRenderer.send(CHANNELS.legendaryOverlay.ready),
   resize: (size) => ipcRenderer.send(CHANNELS.legendaryOverlay.resize, size),
   onPush: (callback) => {
