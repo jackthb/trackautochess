@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { Markdown } from "@/components/Markdown";
 import { useSupabaseSession } from "@/lib/useSupabaseSession";
@@ -16,6 +16,87 @@ interface Guide {
   sources: GuideSource[];
   shareLink?: string | null;
   body: string;
+}
+
+interface BuildItemPick {
+  slug: string;
+  name: string;
+  iconUrl: string;
+}
+
+interface BuildPiece {
+  unitSlug: string;
+  name: string;
+  iconUrl: string;
+  stars: number;
+  items: BuildItemPick[];
+}
+
+interface BuildSnapshot {
+  label: string;
+  pieces: BuildPiece[];
+}
+
+/** Decodes the same base64url payload web/app/builds/BuildPlanner.tsx encodes. */
+function decodeShareLink(shareLink: string): BuildSnapshot[] | null {
+  try {
+    const b = new URL(shareLink, "https://placeholder.invalid").searchParams.get("b");
+    if (!b) return null;
+    const padded = b.replaceAll("-", "+").replaceAll("_", "/");
+    const json = decodeURIComponent(escape(atob(padded)));
+    const payload = JSON.parse(json);
+    const snapshots = payload?.build?.snapshots;
+    return Array.isArray(snapshots) ? snapshots : null;
+  } catch {
+    return null;
+  }
+}
+
+function StarRow({ stars }: { stars: number }) {
+  return <span className={styles.stars}>{"★".repeat(stars)}</span>;
+}
+
+function BoardIcons({ shareLink }: { shareLink: string }) {
+  const snapshots = useMemo(() => decodeShareLink(shareLink), [shareLink]);
+  if (!snapshots || snapshots.length === 0) return null;
+
+  // The last snapshot is the final/strongest board — that's the one worth
+  // showing at a glance; earlier snapshots (e.g. an early win-streak setup)
+  // are still fully described in the write-up below.
+  const snapshot = snapshots[snapshots.length - 1];
+  if (!snapshot.pieces?.length) return null;
+
+  return (
+    <div className={styles.board}>
+      <div className={styles.boardLabel}>{snapshot.label}</div>
+      <div className={styles.boardGrid}>
+        {snapshot.pieces.map((piece) => (
+          <div key={piece.unitSlug} className={styles.piece}>
+            <div className={styles.pieceUnit}>
+              <img src={piece.iconUrl} alt="" className={styles.unitIcon} />
+              <div>
+                <div className={styles.pieceName}>{piece.name}</div>
+                <StarRow stars={piece.stars} />
+              </div>
+            </div>
+            {piece.items.length > 0 && (
+              <div className={styles.pieceItems}>
+                {piece.items.map((item) => (
+                  <img
+                    key={item.slug}
+                    src={item.iconUrl}
+                    alt={item.name}
+                    title={item.name}
+                    className={styles.itemIcon}
+                  />
+                ))}
+              </div>
+            )}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
 }
 
 export function GuideDetailClient({ slug }: { slug: string }) {
@@ -77,9 +158,12 @@ export function GuideDetailClient({ slug }: { slug: string }) {
         )}
 
         {guide.shareLink && (
-          <Link href={guide.shareLink} className={styles.shareLink} prefetch={false}>
-            Open this board in the Build Planner →
-          </Link>
+          <>
+            <BoardIcons shareLink={guide.shareLink} />
+            <Link href={guide.shareLink} className={styles.shareLink} prefetch={false}>
+              Open this board in the Build Planner →
+            </Link>
+          </>
         )}
 
         <Markdown className={styles.body}>{guide.body}</Markdown>

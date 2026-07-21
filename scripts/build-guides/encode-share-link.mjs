@@ -7,10 +7,33 @@
 // Usage:
 //   node scripts/build-guides/encode-share-link.mjs <spec.json>
 
-import { readFile } from "node:fs/promises";
+import { readFile, readdir } from "node:fs/promises";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const CONTENT_DIR = path.join(__dirname, "..", "..", "content", "game");
 
 function makeId(prefix) {
   return `${prefix}_${Math.random().toString(36).slice(2, 10)}`;
+}
+
+// The unit/item `slug` field (URL-friendly, hyphenated) is NOT reliably the
+// same as its actual icon filename stem (e.g. "skull-basher"'s file is
+// basher.png, "aegis-of-immortal"'s is aegis.png) — that mapping only lives
+// in each entity's own `icon` field. Build a real slug -> stem lookup from
+// content/game instead of guessing via string transforms.
+async function buildIconLookup(subdir) {
+  const dir = path.join(CONTENT_DIR, subdir);
+  const lookup = new Map();
+  for (const file of await readdir(dir)) {
+    if (!file.endsWith(".json")) continue;
+    const data = JSON.parse(await readFile(path.join(dir, file), "utf-8"));
+    if (data.slug && data.icon) {
+      lookup.set(data.slug, data.icon.replace(/^(units|items)\//, "").replace(/\.png$/, ""));
+    }
+  }
+  return lookup;
 }
 
 function unitIconUrl(stem) {
@@ -21,12 +44,14 @@ function itemIconUrl(stem) {
   return `/icons/items/${stem}.png`;
 }
 
-function normalizePiece(piece) {
+function normalizePiece(piece, unitIcons, itemIcons) {
   return {
     id: makeId("piece"),
     unitSlug: piece.unitSlug,
     name: piece.name,
-    iconUrl: piece.iconUrl || unitIconUrl(piece.iconStem || piece.unitSlug.replace(/-/g, "_")),
+    iconUrl:
+      piece.iconUrl ||
+      unitIconUrl(piece.iconStem || unitIcons.get(piece.unitSlug) || piece.unitSlug.replace(/-/g, "_")),
     cost: piece.cost,
     stars: piece.stars,
     x: piece.x,
@@ -36,18 +61,20 @@ function normalizePiece(piece) {
       slug: item.slug,
       name: item.name,
       tier: item.tier,
-      iconUrl: item.iconUrl || itemIconUrl(item.iconStem || item.slug),
+      iconUrl:
+        item.iconUrl ||
+        itemIconUrl(item.iconStem || itemIcons.get(item.slug) || item.slug.replace(/-/g, "_")),
     })),
   };
 }
 
-function normalizeSnapshot(snap) {
+function normalizeSnapshot(snap, unitIcons, itemIcons) {
   return {
     id: makeId("snap"),
     label: snap.label,
     round: snap.round,
     focusNote: snap.focusNote || "",
-    pieces: (snap.pieces || []).map(normalizePiece),
+    pieces: (snap.pieces || []).map((piece) => normalizePiece(piece, unitIcons, itemIcons)),
   };
 }
 
@@ -77,6 +104,10 @@ async function main() {
     process.exit(1);
   }
   const spec = JSON.parse(await readFile(specPath, "utf-8"));
+  const [unitIcons, itemIcons] = await Promise.all([
+    buildIconLookup("units"),
+    buildIconLookup("items"),
+  ]);
 
   const build = {
     id: makeId("build"),
@@ -84,7 +115,7 @@ async function main() {
     description: spec.description,
     status: "draft",
     updatedAt: new Date().toISOString(),
-    snapshots: spec.snapshots.map(normalizeSnapshot),
+    snapshots: spec.snapshots.map((snap) => normalizeSnapshot(snap, unitIcons, itemIcons)),
   };
 
   const encoded = encodeShare(build);

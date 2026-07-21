@@ -78,6 +78,82 @@
   color: var(--surface);
 }
 
+.board {
+  margin-bottom: var(--s-24);
+  padding: var(--s-16);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface-raised);
+}
+
+.boardLabel {
+  font-size: 12px;
+  font-weight: var(--fw-semibold);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+  margin-bottom: var(--s-12);
+}
+
+.boardGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: var(--s-12);
+}
+
+.piece {
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-8);
+  padding: var(--s-8);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+}
+
+.pieceUnit {
+  display: flex;
+  align-items: center;
+  gap: var(--s-8);
+}
+
+.unitIcon {
+  width: 36px;
+  height: 36px;
+  border-radius: 6px;
+  object-fit: cover;
+  flex-shrink: 0;
+  background: var(--surface-raised);
+}
+
+.pieceName {
+  font-size: 13px;
+  font-weight: var(--fw-medium);
+  color: var(--text-primary);
+  line-height: 1.2;
+}
+
+.stars {
+  display: block;
+  font-size: 11px;
+  color: var(--accent);
+  letter-spacing: 1px;
+}
+
+.pieceItems {
+  display: flex;
+  gap: var(--s-4);
+  flex-wrap: wrap;
+}
+
+.itemIcon {
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+  object-fit: cover;
+  background: var(--surface-raised);
+}
+
 .body {
   font-size: 15px;
   line-height: 1.7;
