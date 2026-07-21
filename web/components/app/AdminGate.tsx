@@ -9,7 +9,7 @@ import { useSupabaseSession } from "@/lib/useSupabaseSession";
  * Client-side admin gate: renders children only for signed-in admin Steam
  * accounts (PostHog `admin_access` flag), otherwise 404s. This is a UI
  * convenience — real protection lives in server-side auth checks. Used by
- * /keystatic and /builds.
+ * /keystatic, /guides, and /builds.
  */
 export function AdminGate({
   children,

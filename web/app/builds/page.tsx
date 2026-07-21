@@ -1,35 +1,17 @@
 import type { Metadata } from "next";
+import { AdminGate } from "@/components/app/AdminGate";
 import { PageLayout } from "@/components/PageLayout";
 import { DEFAULT_LOCALE } from "@/lib/i18n";
 import { getAllItems } from "@/lib/items";
 import { getAllUnits } from "@/lib/units";
-import { SITE_NAME, SITE_TITLE } from "@/lib/site";
 import { BuildsPageClient } from "./BuildsPageClient";
 import type { BuilderItem, BuilderUnit } from "./BuildPlanner";
 
-const title = `Builds | ${SITE_TITLE}`;
-const description =
-  "Plan Dota Auto Chess boards, submit builds for the public list, and browse community lineups.";
-
+// Admin-only — see AdminGate (PostHog `admin_access`). Deliberately no public
+// SEO metadata and noindex until this ships to everyone.
 export const metadata: Metadata = {
-  title,
-  description,
-  alternates: { canonical: "/builds" },
-  openGraph: {
-    title,
-    description,
-    type: "website",
-    siteName: SITE_NAME,
-    url: "/builds",
-    locale: "en_US",
-    images: ["/logo.svg"],
-  },
-  twitter: {
-    card: "summary_large_image",
-    title,
-    description,
-    images: ["/logo.svg"],
-  },
+  title: "Builds",
+  robots: "noindex, nofollow",
 };
 
 export default function BuildsPage() {
@@ -48,8 +30,10 @@ export default function BuildsPage() {
   }));
 
   return (
-    <PageLayout title="Builds">
-      <BuildsPageClient units={units} items={items} />
-    </PageLayout>
+    <AdminGate>
+      <PageLayout title="Builds">
+        <BuildsPageClient units={units} items={items} />
+      </PageLayout>
+    </AdminGate>
   );
 }

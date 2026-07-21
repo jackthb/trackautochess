@@ -139,10 +139,11 @@ export function AppNavBar() {
   const groupActive = (links: MenuLink[]) => links.some((l) => isActive(l.href));
 
   // Standalone links (no dropdown), shared between desktop and mobile.
+  // Builds is admin-only (PostHog `admin_access`) until it ships publicly.
   const standaloneLinks: { href: string; label: string; key: string }[] = [
     { href: "/talents", label: t.talents, key: "talents" },
     { href: "/queens", label: t.queens, key: "queens" },
-    { href: "/builds", label: t.builds, key: "builds" },
+    ...(isAdmin ? [{ href: "/builds", label: t.builds, key: "builds" }] : []),
     { href: "/creators", label: t.creators, key: "creators" },
     ...(canSeeBetaFeatures
       ? [{ href: "/matches", label: t.matches, key: "matches" }]

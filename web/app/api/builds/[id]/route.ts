@@ -1,5 +1,6 @@
 import { RateLimiterMemory } from "rate-limiter-flexible";
 import { getClientIp, logAbuse, toApiReq } from "@/lib/abuseLog";
+import { isAdminSteamId } from "@/lib/adminServer";
 import {
   fetchUsersBySteamIds,
   parseSteamId,
@@ -51,6 +52,9 @@ export async function GET(req: Request, context: RouteContext) {
 
   const anon = createSupabaseAnonClient();
   const session = await getSessionUser(toApiReq(req), anon);
+  if (!(await isAdminSteamId(session.steamId))) {
+    return Response.json({ error: "Forbidden" }, { status: 403 });
+  }
   const viewerSteamIdNum = session.steamId ? parseSteamId(session.steamId) : null;
   const isOwner =
     viewerSteamIdNum != null && row.author_steam_id === viewerSteamIdNum;
@@ -100,6 +104,9 @@ export async function PATCH(req: Request, context: RouteContext) {
   const session = await getSessionUser(apiReq, anon);
   const steamIdNum = session.steamId ? parseSteamId(session.steamId) : null;
   if (steamIdNum == null || row.author_steam_id !== steamIdNum) {
+    return Response.json({ error: "Forbidden" }, { status: 403 });
+  }
+  if (!(await isAdminSteamId(session.steamId))) {
     return Response.json({ error: "Forbidden" }, { status: 403 });
   }
 
