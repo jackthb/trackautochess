@@ -771,6 +771,11 @@ mod tests {
     fn parity_events_emit_round_creep_and_personal_elimination() {
         let state = Arc::new(Mutex::new(NettableState {
             local_steam_id: Some("76561198022169086".to_owned()),
+            // Session dumps only accumulate once GSI has confirmed we're in
+            // an actual DAC match (see the is_dac_match gate below) — a real
+            // dump loop would already have latched this by the time rows
+            // start flowing.
+            is_dac_match: true,
             ..NettableState::default()
         }));
         let rows = rows_from_json(vec![
@@ -1468,9 +1473,34 @@ fn persist_queen_ladder_locally(
     fs::write(captures.join("latest_queen_ladder.json"), &payload_str)
         .map_err(|err| format!("Could not save Queen ladder locally: {err}"))?;
     let outbox = Outbox::new(dac_dir.join("outbox"));
+    // Dedup key deliberately excludes `scanned_at`/`seen_at`: those are
+    // stamped fresh on every scan, so hashing the full payload (as
+    // enqueue_str does) would never dedupe two scans of an unchanged ladder.
+    // Hashing on the actual ranking content instead means repeated scans
+    // that haven't changed collapse to a single pending outbox item.
+    let dedup_key = queen_ladder_dedup_key(players);
     outbox
-        .enqueue_str(&payload_str)
+        .enqueue_with_key(&dedup_key, &payload_str)
         .map_err(|err| format!("Could not queue Queen ladder for upload: {err}"))
+}
+
+/// Stable content key for a Queen ladder scan, independent of when it was
+/// scanned — see `persist_queen_ladder_locally`.
+fn queen_ladder_dedup_key(players: &[queen_ladder::QueenPlayer]) -> String {
+    let mut rows: Vec<(String, i64, Option<i64>, Option<String>, Option<String>)> = players
+        .iter()
+        .map(|p| {
+            (
+                p.steam_id.clone(),
+                p.rank,
+                p.mmr,
+                p.name.clone(),
+                p.season.clone(),
+            )
+        })
+        .collect();
+    rows.sort();
+    serde_json::to_string(&rows).unwrap_or_default()
 }
 
 fn upload_persisted_queen_ladder(

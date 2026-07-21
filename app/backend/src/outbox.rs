@@ -21,8 +21,16 @@ impl Outbox {
     }
 
     pub fn enqueue_str(&self, payload: &str) -> io::Result<PathBuf> {
+        self.enqueue_with_key(payload, payload)
+    }
+
+    /// Like `enqueue_str`, but dedupes on `key` instead of the payload body.
+    /// Use this when the payload embeds volatile fields (e.g. a scan
+    /// timestamp) that would otherwise defeat content-hash dedup even though
+    /// the underlying data is unchanged.
+    pub fn enqueue_with_key(&self, key: &str, payload: &str) -> io::Result<PathBuf> {
         fs::create_dir_all(&self.dir)?;
-        let name = format!("{:016x}.json", stable_hash(payload));
+        let name = format!("{:016x}.json", stable_hash(key));
         let path = self.dir.join(name);
         if !path.exists() {
             fs::write(&path, payload)?;
