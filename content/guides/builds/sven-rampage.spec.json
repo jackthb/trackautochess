@@ -1,0 +1,116 @@
+{
+  "name": "Sven 9 Warriors",
+  "description": "A 9-Warrior board where Sven is kept as the only Demon so the Fel Power trait converts his attacks to stacking pure damage, then layered with 2 God (Rubick + Mars) and 2 Naga (Slardar + Medusa) for cooldowns and magic resistance. Sourced from the YouTube guide 'HOW TO PLAY 3-Star Sven RAMPAGE Build In Auto Chess' (youtube.com/watch?v=5a1wlR1I6pE).",
+  "snapshots": [
+    {
+      "label": "Final board",
+      "round": 45,
+      "focusNote": "3-star Sven blinks the backline with BKB + Linkens for immunity to hex/doom; nine distinct Warriors reflect pure damage below 50% HP, and Medusa + Slardar add Naga magic resist against the mage lobbies.",
+      "pieces": [
+        {
+          "unitSlug": "axe",
+          "name": "Axe",
+          "cost": 1,
+          "stars": 2,
+          "x": 3,
+          "y": 1,
+          "items": []
+        },
+        {
+          "unitSlug": "centaur-warrunner",
+          "name": "Centaur Warrunner",
+          "cost": 2,
+          "stars": 2,
+          "x": 4,
+          "y": 1,
+          "items": []
+        },
+        {
+          "unitSlug": "tiny",
+          "name": "Tiny",
+          "cost": 2,
+          "stars": 2,
+          "x": 5,
+          "y": 1,
+          "items": []
+        },
+        {
+          "unitSlug": "slardar",
+          "name": "Slardar",
+          "cost": 3,
+          "stars": 2,
+          "x": 6,
+          "y": 1,
+          "items": []
+        },
+        {
+          "unitSlug": "juggernaut",
+          "name": "Juggernaut",
+          "cost": 2,
+          "stars": 2,
+          "x": 4,
+          "y": 2,
+          "items": []
+        },
+        {
+          "unitSlug": "kunkka",
+          "name": "Kunkka",
+          "cost": 4,
+          "stars": 2,
+          "x": 5,
+          "y": 2,
+          "items": []
+        },
+        {
+          "unitSlug": "mars",
+          "name": "Mars",
+          "cost": 1,
+          "stars": 2,
+          "x": 6,
+          "y": 2,
+          "items": []
+        },
+        {
+          "unitSlug": "huskar",
+          "name": "Huskar",
+          "cost": 3,
+          "stars": 2,
+          "x": 3,
+          "y": 3,
+          "items": []
+        },
+        {
+          "unitSlug": "medusa",
+          "name": "Medusa",
+          "cost": 4,
+          "stars": 2,
+          "x": 5,
+          "y": 3,
+          "items": []
+        },
+        {
+          "unitSlug": "rubick",
+          "name": "Rubick",
+          "cost": 3,
+          "stars": 2,
+          "x": 3,
+          "y": 4,
+          "items": []
+        },
+        {
+          "unitSlug": "sven",
+          "name": "Sven",
+          "cost": 5,
+          "stars": 3,
+          "x": 7,
+          "y": 4,
+          "items": [
+            { "slug": "black-king-bar", "name": "Black King Bar", "tier": 4 },
+            { "slug": "linkens-sphere", "name": "Linkens Sphere", "tier": 3 },
+            { "slug": "blink-dagger", "name": "Blink Dagger", "tier": 1 }
+          ]
+        }
+      ]
+    }
+  ]
+}

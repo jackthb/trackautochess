@@ -1,0 +1,120 @@
+{
+  "name": "Luna 2x Telescope Knights",
+  "description": "A 6-Troll / 4-Knight board that turns the 2-cost Luna into a raid boss by stacking two Telescopes for extreme range and per-distance projectile damage, then adding late-game Naga for magic resistance versus mages. Sourced from the YouTube guide 'NEW 3-Star Luna 2x Telescope RAMPAGE Build For Dota Auto Chess' (youtube.com/watch?v=VZ3ukut_lt8).",
+  "snapshots": [
+    {
+      "label": "Final board",
+      "round": 40,
+      "focusNote": "3-star Luna hides in the back corner behind Chaos Knight and Batrider with two Telescopes plus Daedalus; Medusa and Naga Siren add magic resist and a stun layer against the mage lobbies.",
+      "pieces": [
+        {
+          "unitSlug": "chaos-knight",
+          "name": "Chaos Knight",
+          "cost": 2,
+          "stars": 3,
+          "x": 6,
+          "y": 1,
+          "items": [
+            { "slug": "aegis-of-immortal", "name": "Aegis of Immortal", "tier": 3 }
+          ]
+        },
+        {
+          "unitSlug": "batrider",
+          "name": "Batrider",
+          "cost": 2,
+          "stars": 2,
+          "x": 7,
+          "y": 1,
+          "items": [
+            { "slug": "drum-of-endurance", "name": "Drum of Endurance", "tier": 2 }
+          ]
+        },
+        {
+          "unitSlug": "troll-warlord",
+          "name": "Troll Warlord",
+          "cost": 5,
+          "stars": 2,
+          "x": 5,
+          "y": 2,
+          "items": []
+        },
+        {
+          "unitSlug": "huskar",
+          "name": "Huskar",
+          "cost": 3,
+          "stars": 2,
+          "x": 6,
+          "y": 2,
+          "items": []
+        },
+        {
+          "unitSlug": "medusa",
+          "name": "Medusa",
+          "cost": 4,
+          "stars": 2,
+          "x": 4,
+          "y": 3,
+          "items": []
+        },
+        {
+          "unitSlug": "snapfire",
+          "name": "Snapfire",
+          "cost": 4,
+          "stars": 1,
+          "x": 6,
+          "y": 3,
+          "items": []
+        },
+        {
+          "unitSlug": "shadow-shaman",
+          "name": "Shadow Shaman",
+          "cost": 1,
+          "stars": 3,
+          "x": 3,
+          "y": 4,
+          "items": []
+        },
+        {
+          "unitSlug": "witch-doctor",
+          "name": "Witch Doctor",
+          "cost": 1,
+          "stars": 2,
+          "x": 4,
+          "y": 4,
+          "items": []
+        },
+        {
+          "unitSlug": "dazzle",
+          "name": "Dazzle",
+          "cost": 1,
+          "stars": 2,
+          "x": 5,
+          "y": 4,
+          "items": []
+        },
+        {
+          "unitSlug": "naga-siren",
+          "name": "Naga Siren",
+          "cost": 3,
+          "stars": 2,
+          "x": 6,
+          "y": 4,
+          "items": []
+        },
+        {
+          "unitSlug": "luna",
+          "name": "Luna",
+          "cost": 2,
+          "stars": 3,
+          "x": 8,
+          "y": 4,
+          "items": [
+            { "slug": "telescope", "name": "Telescope", "tier": 2 },
+            { "slug": "telescope", "name": "Telescope", "tier": 2 },
+            { "slug": "daedalus", "name": "Daedalus", "tier": 5 }
+          ]
+        }
+      ]
+    }
+  ]
+}

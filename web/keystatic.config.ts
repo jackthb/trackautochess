@@ -293,6 +293,27 @@ export default config({
     }),
   },
   collections: {
+    guides: collection({
+      label: "Guides",
+      path: `${contentPath}/guides/*`,
+      slugField: "title",
+      format: { data: "json" },
+      schema: {
+        title: fields.slug({ name: { label: "Title" } }),
+        sources: fields.array(
+          fields.object({
+            label: fields.text({ label: "Label" }),
+            url: fields.url({ label: "URL" }),
+          }),
+          {
+            label: "Sources",
+            itemLabel: (props) => props.fields.label.value || "Source",
+          },
+        ),
+        shareLink: fields.text({ label: "Share link (/builds?b=...)" }),
+        body: markdownText({ label: "Body" }),
+      },
+    }),
     patchNotes: collection({
       label: "Patch Notes",
       path: `${contentPath}/patch-notes/*`,

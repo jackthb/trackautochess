@@ -1,0 +1,72 @@
+{
+  "name": "4 Priests Mind Control",
+  "description": "A deliberately small 4-Priest board that runs fewer pieces than its capacity so every priest mind-controls an enemy unit each round, using Witless Shako to steal higher-level targets and Luna as the lone damage dealer. Sourced from the YouTube guide 'How To Play 3-Star PRIESTS In Dota Auto Chess' (youtube.com/watch?v=uFXo8FdNDdw).",
+  "snapshots": [
+    {
+      "label": "Final board",
+      "round": 30,
+      "focusNote": "Board is kept under capacity so the 4-Priest bond hijacks three enemy units per round; Witless Shako on the highest-level priest (Chen) lets it steal tier-four and neutral targets, priests are spread out to dodge Riki smoke, and Luna carries the actual damage.",
+      "pieces": [
+        {
+          "unitSlug": "troll-warlord",
+          "name": "Troll Warlord",
+          "cost": 5,
+          "stars": 1,
+          "x": 4,
+          "y": 1,
+          "items": []
+        },
+        {
+          "unitSlug": "dazzle",
+          "name": "Dazzle",
+          "cost": 1,
+          "stars": 3,
+          "x": 5,
+          "y": 2,
+          "items": []
+        },
+        {
+          "unitSlug": "oracle",
+          "name": "Oracle",
+          "cost": 2,
+          "stars": 2,
+          "x": 3,
+          "y": 2,
+          "items": []
+        },
+        {
+          "unitSlug": "chen",
+          "name": "Chen",
+          "cost": 4,
+          "stars": 2,
+          "x": 2,
+          "y": 4,
+          "items": [
+            { "slug": "witless-shako", "name": "Witless Shako", "tier": 1 }
+          ]
+        },
+        {
+          "unitSlug": "shadow-demon",
+          "name": "Shadow Demon",
+          "cost": 1,
+          "stars": 3,
+          "x": 7,
+          "y": 4,
+          "items": []
+        },
+        {
+          "unitSlug": "luna",
+          "name": "Luna",
+          "cost": 2,
+          "stars": 3,
+          "x": 4,
+          "y": 4,
+          "items": [
+            { "slug": "daedalus", "name": "Daedalus", "tier": 5 },
+            { "slug": "satanic", "name": "Satanic", "tier": 5 }
+          ]
+        }
+      ]
+    }
+  ]
+}

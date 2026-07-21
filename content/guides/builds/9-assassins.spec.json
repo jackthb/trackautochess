@@ -1,0 +1,119 @@
+{
+  "name": "9 Assassins High-Roll",
+  "description": "A 9-Assassin board that leans on two-star legendary carries (Magnus, Templar Assassin, Queen of Pain) rather than cheap three-stars, with Leshrac added for the 2-Centaur Stampede so Magnus charges into the enemy cluster and lands his stun. Sourced from the YouTube guide 'HOW TO PLAY 3-Star / 9 Assassins Build In Auto Chess' (youtube.com/watch?v=mO1xaL76Xgc).",
+  "snapshots": [
+    {
+      "label": "Final board",
+      "round": 32,
+      "focusNote": "9-Assassin refresh-leap keeps a permanent crit; Magnus and Sand King sit front to gain mana before leaping, Leshrac completes 2-Centaur so Magnus charges the densest enemy grid, and Assault Cuirass shreds the warrior armor that hard-counters assassins.",
+      "pieces": [
+        {
+          "unitSlug": "magnus",
+          "name": "Magnus",
+          "cost": 4,
+          "stars": 3,
+          "x": 4,
+          "y": 1,
+          "items": [
+            { "slug": "refresher-orb", "name": "Refresher Orb", "tier": 4 },
+            { "slug": "minotaur-horn", "name": "Minotaur Horn", "tier": 4 },
+            { "slug": "assault-cuirass", "name": "Assault Cuirass", "tier": 5 }
+          ]
+        },
+        {
+          "unitSlug": "sand-king",
+          "name": "Sand King",
+          "cost": 3,
+          "stars": 2,
+          "x": 5,
+          "y": 1,
+          "items": [
+            { "slug": "bottle", "name": "Bottle", "tier": 2 }
+          ]
+        },
+        {
+          "unitSlug": "spirit-breaker",
+          "name": "Spirit Breaker",
+          "cost": 1,
+          "stars": 2,
+          "x": 3,
+          "y": 2,
+          "items": [
+            { "slug": "mask-of-madness", "name": "Mask of Madness", "tier": 2 }
+          ]
+        },
+        {
+          "unitSlug": "riki",
+          "name": "Riki",
+          "cost": 3,
+          "stars": 2,
+          "x": 5,
+          "y": 2,
+          "items": []
+        },
+        {
+          "unitSlug": "slark",
+          "name": "Slark",
+          "cost": 2,
+          "stars": 2,
+          "x": 6,
+          "y": 2,
+          "items": []
+        },
+        {
+          "unitSlug": "leshrac",
+          "name": "Leshrac",
+          "cost": 5,
+          "stars": 1,
+          "x": 3,
+          "y": 3,
+          "items": []
+        },
+        {
+          "unitSlug": "pangolier",
+          "name": "Pangolier",
+          "cost": 4,
+          "stars": 2,
+          "x": 5,
+          "y": 3,
+          "items": [
+            { "slug": "battle-fury", "name": "Battle Fury", "tier": 4 }
+          ]
+        },
+        {
+          "unitSlug": "phantom-assassin",
+          "name": "Phantom Assassin",
+          "cost": 4,
+          "stars": 2,
+          "x": 4,
+          "y": 4,
+          "items": [
+            { "slug": "battle-fury", "name": "Battle Fury", "tier": 4 }
+          ]
+        },
+        {
+          "unitSlug": "queen-of-pain",
+          "name": "Queen of Pain",
+          "cost": 5,
+          "stars": 2,
+          "x": 6,
+          "y": 4,
+          "items": [
+            { "slug": "gleipnir", "name": "Gleipnir", "tier": 4 }
+          ]
+        },
+        {
+          "unitSlug": "templar-assassin",
+          "name": "Templar Assassin",
+          "cost": 5,
+          "stars": 2,
+          "x": 2,
+          "y": 4,
+          "items": [
+            { "slug": "havoc", "name": "Havoc", "tier": 5 }
+          ]
+        }
+      ]
+    }
+  ]
+}

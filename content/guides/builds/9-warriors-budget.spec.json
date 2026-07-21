@@ -1,0 +1,116 @@
+{
+  "name": "9 Warriors",
+  "description": "Rank-up Warrior build: 3-star the six cheapest Warriors (Axe, Mars, Tusk, Centaur Warrunner, Juggernaut, Tiny) and fill the board to 9 distinct Warrior pieces for the class's pure-damage reflect. Sourced from the YouTube guide 'ENDGAME Rank Up ALL 3-Star Warrior Build For Dota Auto Chess' (youtube.com/watch?v=XcyjjfOKAFk).",
+  "snapshots": [
+    {
+      "label": "Final board",
+      "round": 30,
+      "focusNote": "9 distinct Warrior pieces on board with the low-cost six all at 3-star; armor items feed the level-9 pure-damage reflect.",
+      "pieces": [
+        {
+          "unitSlug": "centaur-warrunner",
+          "name": "Centaur Warrunner",
+          "cost": 2,
+          "stars": 3,
+          "x": 4,
+          "y": 1,
+          "items": [
+            { "slug": "aegis-of-immortal", "name": "Aegis of Immortal", "tier": 3 },
+            { "slug": "pipe-of-insight", "name": "Pipe of Insight", "tier": 3 },
+            { "slug": "mekansm", "name": "Mekansm", "tier": 3 }
+          ]
+        },
+        {
+          "unitSlug": "juggernaut",
+          "name": "Juggernaut",
+          "cost": 2,
+          "stars": 3,
+          "x": 5,
+          "y": 1,
+          "items": [
+            { "slug": "assault-cuirass", "name": "Assault Cuirass", "tier": 5 },
+            { "slug": "heavens-halberd", "name": "Heavens Halberd", "tier": 3 },
+            { "slug": "radiance", "name": "Radiance", "tier": 4 }
+          ]
+        },
+        {
+          "unitSlug": "axe",
+          "name": "Axe",
+          "cost": 1,
+          "stars": 3,
+          "x": 3,
+          "y": 1,
+          "items": [
+            { "slug": "sliver", "name": "Sliver", "tier": 2 },
+            { "slug": "vanguard", "name": "Vanguard", "tier": 2 }
+          ]
+        },
+        {
+          "unitSlug": "mars",
+          "name": "Mars",
+          "cost": 1,
+          "stars": 3,
+          "x": 6,
+          "y": 1,
+          "items": [
+            { "slug": "guardian-greaves", "name": "Guardian Greaves", "tier": 4 },
+            { "slug": "shivas-guard", "name": "Shivas Guard", "tier": 3 }
+          ]
+        },
+        {
+          "unitSlug": "tusk",
+          "name": "Tusk",
+          "cost": 1,
+          "stars": 3,
+          "x": 2,
+          "y": 1,
+          "items": []
+        },
+        {
+          "unitSlug": "tiny",
+          "name": "Tiny",
+          "cost": 2,
+          "stars": 3,
+          "x": 4,
+          "y": 2,
+          "items": [
+            { "slug": "giants-ring", "name": "Giants Ring", "tier": 4 },
+            { "slug": "pavise", "name": "Pavise", "tier": 2 },
+            { "slug": "crimson-guard", "name": "Crimson Guard", "tier": 3 }
+          ]
+        },
+        {
+          "unitSlug": "doom",
+          "name": "Doom",
+          "cost": 4,
+          "stars": 1,
+          "x": 7,
+          "y": 1,
+          "items": [
+            { "slug": "ogre-hood", "name": "Ogre Hood", "tier": 5 }
+          ]
+        },
+        {
+          "unitSlug": "kunkka",
+          "name": "Kunkka",
+          "cost": 4,
+          "stars": 1,
+          "x": 3,
+          "y": 2,
+          "items": []
+        },
+        {
+          "unitSlug": "slardar",
+          "name": "Slardar",
+          "cost": 3,
+          "stars": 1,
+          "x": 5,
+          "y": 2,
+          "items": [
+            { "slug": "mirror-shield", "name": "Mirror Shield", "tier": 5 }
+          ]
+        }
+      ]
+    }
+  ]
+}

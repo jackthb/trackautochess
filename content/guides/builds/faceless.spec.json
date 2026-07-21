@@ -1,0 +1,104 @@
+{
+  "name": "Faceless Void Control",
+  "description": "A crowd-control legendary board anchored by the 2-Faceless bond (Faceless Void + Bane) for full CC immunity, then stacked with high-cost control casters like Tidehunter and Primal Beast. Every other unit is chosen so no second synergy activates, keeping Faceless the only active bond. Sourced from the YouTube guide 'ENDGAME Rank Up 3-Star FACELESS Build For Dota Auto Chess' (youtube.com/watch?v=07zJZ8Dc19c).",
+  "snapshots": [
+    {
+      "label": "Final board",
+      "round": 30,
+      "focusNote": "Faceless Void + Bane give the whole board crowd-control immunity; Tidehunter and Techies carry the damage with Refresher Orb, while Doom holds a second Demon so the Demon bond stays broken.",
+      "pieces": [
+        {
+          "unitSlug": "bane",
+          "name": "Bane",
+          "cost": 1,
+          "stars": 2,
+          "x": 3,
+          "y": 1,
+          "items": []
+        },
+        {
+          "unitSlug": "primal-beast",
+          "name": "Primal Beast",
+          "cost": 5,
+          "stars": 2,
+          "x": 4,
+          "y": 1,
+          "items": [
+            { "slug": "minotaur-horn", "name": "Minotaur Horn", "tier": 4 }
+          ]
+        },
+        {
+          "unitSlug": "faceless-void",
+          "name": "Faceless Void",
+          "cost": 2,
+          "stars": 2,
+          "x": 5,
+          "y": 1,
+          "items": []
+        },
+        {
+          "unitSlug": "doom",
+          "name": "Doom",
+          "cost": 4,
+          "stars": 2,
+          "x": 6,
+          "y": 1,
+          "items": []
+        },
+        {
+          "unitSlug": "tidehunter",
+          "name": "Tidehunter",
+          "cost": 5,
+          "stars": 2,
+          "x": 5,
+          "y": 2,
+          "items": [
+            { "slug": "refresher-orb", "name": "Refresher Orb", "tier": 4 },
+            { "slug": "minotaur-horn", "name": "Minotaur Horn", "tier": 4 }
+          ]
+        },
+        {
+          "unitSlug": "queen-of-pain",
+          "name": "Queen of Pain",
+          "cost": 5,
+          "stars": 2,
+          "x": 3,
+          "y": 3,
+          "items": []
+        },
+        {
+          "unitSlug": "snapfire",
+          "name": "Snapfire",
+          "cost": 4,
+          "stars": 3,
+          "x": 6,
+          "y": 3,
+          "items": [
+            { "slug": "satanic", "name": "Satanic", "tier": 5 }
+          ]
+        },
+        {
+          "unitSlug": "techies",
+          "name": "Techies",
+          "cost": 5,
+          "stars": 2,
+          "x": 3,
+          "y": 4,
+          "items": [
+            { "slug": "refresher-orb", "name": "Refresher Orb", "tier": 4 },
+            { "slug": "dagon", "name": "Dagon", "tier": 4 }
+          ]
+        },
+        {
+          "unitSlug": "phoenix",
+          "name": "Phoenix",
+          "cost": 4,
+          "stars": 2,
+          "x": 5,
+          "y": 4,
+          "items": []
+        }
+      ]
+    }
+  ]
+}

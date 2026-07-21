@@ -1,0 +1,74 @@
+{
+  "name": "Naga into 6 Monks",
+  "description": "6 Naga (2x magic reflect) into 6 Monks finish, anchored by 3-star Largo. Hold level 6 for 3-star Largo before pushing 8. Ban Knights early. Weighted Dice + Lucid Star are the priority relics; Second Chance later for Aegis of Immortal rerolls. Sourced from the YouTube guide 'NEW META Rank Up ALL 3-Star 6 Naga + 6 Monks Build' (youtube.com/watch?v=rEyc_lxwheA).",
+  "snapshots": [
+    {
+      "label": "Early win streak",
+      "round": 9,
+      "focusNote": "Win-streak into Slark with Mask of Madness + Skull Basher up front; hold Weighted Dice / Lucid Star for rerolls once offered.",
+      "pieces": [
+        {
+          "unitSlug": "slark",
+          "name": "Slark",
+          "cost": 2,
+          "stars": 2,
+          "x": 4,
+          "y": 1,
+          "items": [
+            { "slug": "mask-of-madness", "name": "Mask of Madness", "tier": 2 },
+            { "slug": "skull-basher", "name": "Skull Basher", "tier": 1 }
+          ]
+        },
+        { "unitSlug": "largo", "name": "Largo", "cost": 2, "stars": 1, "x": 3, "y": 1, "items": [] },
+        { "unitSlug": "brewmaster", "name": "Brewmaster", "cost": 1, "stars": 1, "x": 5, "y": 1, "items": [] },
+        { "unitSlug": "tidehunter", "name": "Tidehunter", "cost": 5, "stars": 1, "x": 4, "y": 2, "items": [] }
+      ]
+    },
+    {
+      "label": "Final board — 6 Naga / 6 Monk / 4 Gods",
+      "round": 51,
+      "focusNote": "3-star Largo is the anchor (tanks alone up front). 6 Naga complete first for the 2x reflect spike, then fill out 6 Monk. Elder Titan added late for a 4th Gods piece.",
+      "pieces": [
+        {
+          "unitSlug": "largo",
+          "name": "Largo",
+          "cost": 2,
+          "stars": 3,
+          "x": 4,
+          "y": 1,
+          "items": [
+            { "slug": "radiance", "name": "Radiance", "tier": 4 },
+            { "slug": "aegis-of-immortal", "name": "Aegis of Immortal", "tier": 3 },
+            { "slug": "mirror-shield", "name": "Mirror Shield", "tier": 5 }
+          ]
+        },
+        {
+          "unitSlug": "slark",
+          "name": "Slark",
+          "cost": 2,
+          "stars": 3,
+          "x": 2,
+          "y": 4,
+          "items": [ { "slug": "assault-cuirass", "name": "Assault Cuirass", "tier": 5 } ]
+        },
+        { "unitSlug": "naga-siren", "name": "Naga Siren", "cost": 3, "stars": 3, "x": 3, "y": 4, "items": [] },
+        { "unitSlug": "slardar", "name": "Slardar", "cost": 3, "stars": 3, "x": 4, "y": 4, "items": [] },
+        {
+          "unitSlug": "medusa",
+          "name": "Medusa",
+          "cost": 4,
+          "stars": 2,
+          "x": 5,
+          "y": 4,
+          "items": [ { "slug": "pipe-of-insight", "name": "Pipe of Insight", "tier": 3 } ]
+        },
+        { "unitSlug": "marci", "name": "Marci", "cost": 3, "stars": 3, "x": 6, "y": 4, "items": [] },
+        { "unitSlug": "monkey-king", "name": "Monkey King", "cost": 4, "stars": 2, "x": 2, "y": 3, "items": [] },
+        { "unitSlug": "void-spirit", "name": "Void Spirit", "cost": 4, "stars": 2, "x": 3, "y": 3, "items": [] },
+        { "unitSlug": "ringmaster", "name": "Ringmaster", "cost": 5, "stars": 1, "x": 6, "y": 3, "items": [] },
+        { "unitSlug": "elder-titan", "name": "Elder Titan", "cost": 4, "stars": 2, "x": 7, "y": 3, "items": [] },
+        { "unitSlug": "tidehunter", "name": "Tidehunter", "cost": 5, "stars": 1, "x": 5, "y": 3, "items": [] }
+      ]
+    }
+  ]
+}

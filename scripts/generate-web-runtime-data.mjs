@@ -273,6 +273,15 @@ async function main() {
   }
   patchEntries.sort((a, b) => b.date.localeCompare(a.date) || b.slug.localeCompare(a.slug));
 
+  const guides = {};
+  const guideEntries = [];
+  for (const { file, entry } of await readCollection("guides")) {
+    const slug = file.replace(/\.json$/, "");
+    guides[slug] = entry;
+    guideEntries.push({ slug, title: entry.title });
+  }
+  guideEntries.sort((a, b) => a.title.localeCompare(b.title));
+
   const text = [
     "/* This file is generated from content/. Do not edit by hand. */\n",
     exportJson("aliasesData", aliases),
@@ -286,6 +295,8 @@ async function main() {
     exportJson("abilitiesData", abilities),
     exportJson("patchIndexData", { patches: patchEntries }),
     exportJson("patchesBySlugData", patches),
+    exportJson("guideIndexData", { guides: guideEntries }),
+    exportJson("guidesBySlugData", guides),
   ].join("");
 
   await mkdir(path.dirname(outputFile), { recursive: true });
