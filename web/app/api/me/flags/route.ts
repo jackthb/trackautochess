@@ -10,9 +10,18 @@ import { createSupabaseAnonClient } from "@/lib/supabase";
  */
 export async function GET(req: Request) {
   const anon = createSupabaseAnonClient();
+  if (!anon) {
+    return Response.json({ error: "Auth not configured" }, { status: 500 });
+  }
   const session = await getSessionUser(toApiReq(req), anon);
   if (!session.steamId) {
-    return Response.json({ error: "Sign in required" }, { status: 401 });
+    return Response.json(
+      {
+        error: "Sign in required",
+        hint: "Session has no steam_id — sign out and back in through Steam.",
+      },
+      { status: 401 },
+    );
   }
 
   const [adminAccess, betaFeatures] = await Promise.all([

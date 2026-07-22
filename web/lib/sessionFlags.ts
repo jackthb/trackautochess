@@ -9,6 +9,7 @@ import {
   type ReactNode,
 } from "react";
 import { useSupabaseSession } from "@/lib/useSupabaseSession";
+import { isHardcodedAdminSteamId } from "@/lib/adminFlags";
 
 export type FlagAccess = "loading" | "enabled" | "disabled";
 
@@ -71,7 +72,12 @@ export function SessionFlagsProvider({ children }: { children: ReactNode }) {
       })
       .catch(() => {
         if (!cancelled) {
-          setFlags({ admin_access: false, website_beta_features: false });
+          // Fail closed for strangers; hardcoded admins still get in if PostHog dies.
+          const admin = isHardcodedAdminSteamId(steamId);
+          setFlags({
+            admin_access: admin,
+            website_beta_features: admin,
+          });
         }
       })
       .finally(() => {
@@ -98,8 +104,14 @@ export function SessionFlagsProvider({ children }: { children: ReactNode }) {
     return {
       ready: true,
       steamId,
-      admin: flags?.admin_access ? "enabled" : "disabled",
-      beta: flags?.website_beta_features ? "enabled" : "disabled",
+      admin:
+        flags?.admin_access || isHardcodedAdminSteamId(steamId)
+          ? "enabled"
+          : "disabled",
+      beta:
+        flags?.website_beta_features || isHardcodedAdminSteamId(steamId)
+          ? "enabled"
+          : "disabled",
     };
   }, [authReady, accessToken, steamId, loading, flags]);
 
