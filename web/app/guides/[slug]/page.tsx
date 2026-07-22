@@ -1,12 +1,11 @@
 import type { Metadata } from "next";
-import { BetaFeaturesGate } from "@/components/app/BetaFeaturesGate";
+import { AdminGate } from "@/components/app/AdminGate";
 import { GuideDetailClient } from "./GuideDetailClient";
 
 interface Props {
   params: Promise<{ slug: string }>;
 }
 
-// Beta-flagged — see BetaFeaturesGate / website_beta_features. Admins bypass.
 export const metadata: Metadata = {
   title: "Guide",
   robots: "noindex, nofollow",
@@ -15,8 +14,8 @@ export const metadata: Metadata = {
 export default async function GuideDetailPage({ params }: Props) {
   const { slug } = await params;
   return (
-    <BetaFeaturesGate title="Guide">
+    <AdminGate title="Guide">
       <GuideDetailClient slug={slug} />
-    </BetaFeaturesGate>
+    </AdminGate>
   );
 }

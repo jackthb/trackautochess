@@ -1,12 +1,12 @@
 import { toApiReq } from "@/lib/abuseLog";
-import { isAdminSteamId } from "@/lib/adminServer";
-import { isBetaFeaturesEnabledForSteamId } from "@/lib/betaFeaturesServer";
+import { ADMIN_ACCESS_FLAG } from "@/lib/adminFlags";
+import { probePostHogFlagForSteamId } from "@/lib/betaFeaturesServer";
 import { getSessionUser } from "@/lib/sessionUser";
 import { createSupabaseAnonClient } from "@/lib/supabase";
 
 /**
  * Session feature flags for nav/gates. Evaluated server-side so ad blockers /
- * cookieless PostHog clients can't hide Builds/Guides/Matches/CMS forever.
+ * cookieless PostHog clients can't hide gated pages forever.
  */
 export async function GET(req: Request) {
   const anon = createSupabaseAnonClient();
@@ -24,14 +24,39 @@ export async function GET(req: Request) {
     );
   }
 
-  const [adminAccess, betaFeatures] = await Promise.all([
-    isAdminSteamId(session.steamId),
-    isBetaFeaturesEnabledForSteamId(session.steamId),
-  ]);
+  const probe = await probePostHogFlagForSteamId(
+    session.steamId,
+    ADMIN_ACCESS_FLAG,
+  );
+
+  if (process.env.NODE_ENV === "development") {
+    console.info("[flags]", {
+      steamId: session.steamId,
+      admin_access: probe.enabled,
+      host: probe.host,
+      hasToken: probe.hasToken,
+      httpStatus: probe.httpStatus,
+      flagPresent: probe.flagPresent,
+      raw: probe.raw,
+      error: probe.error,
+    });
+  }
 
   return Response.json({
     steamId: session.steamId,
-    admin_access: adminAccess,
-    website_beta_features: betaFeatures,
+    admin_access: probe.enabled,
+    ...(process.env.NODE_ENV === "development"
+      ? {
+          debug: {
+            flag: ADMIN_ACCESS_FLAG,
+            host: probe.host,
+            hasToken: probe.hasToken,
+            httpStatus: probe.httpStatus,
+            flagPresent: probe.flagPresent,
+            raw: probe.raw,
+            error: probe.error,
+          },
+        }
+      : {}),
   });
 }

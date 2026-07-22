@@ -1,6 +1,4 @@
-import { isAdminSteamId } from "@/lib/adminServer";
 import { ADMIN_ACCESS_FLAG } from "@/lib/adminFlags";
-import { WEBSITE_BETA_FEATURES_FLAG } from "@/lib/betaFlags";
 
 type FlagValue =
   | boolean
@@ -17,6 +15,16 @@ interface FlagsResponse {
   flags?: Record<string, FlagValue>;
   featureFlags?: Record<string, FlagValue>;
 }
+
+export type PostHogFlagProbe = {
+  enabled: boolean;
+  host: string;
+  hasToken: boolean;
+  httpStatus: number | null;
+  flagPresent: boolean;
+  raw: FlagValue;
+  error: string | null;
+};
 
 function posthogFlagsHost(): string {
   const apiHost = process.env.NEXT_PUBLIC_POSTHOG_API_HOST?.trim();
@@ -38,15 +46,27 @@ function flagEnabled(value: FlagValue): boolean {
   return false;
 }
 
-export async function isPostHogFlagEnabledForSteamId(
+export async function probePostHogFlagForSteamId(
   steamId: string | null | undefined,
   flagKey: string,
-): Promise<boolean> {
+): Promise<PostHogFlagProbe> {
   const token = process.env.NEXT_PUBLIC_POSTHOG_PROJECT_TOKEN;
-  if (!token || !steamId) return false;
+  const host = posthogFlagsHost();
+
+  if (!token || !steamId) {
+    return {
+      enabled: false,
+      host,
+      hasToken: Boolean(token),
+      httpStatus: null,
+      flagPresent: false,
+      raw: undefined,
+      error: !steamId ? "missing_steam_id" : "missing_project_token",
+    };
+  }
 
   try {
-    const resp = await fetch(`${posthogFlagsHost()}/flags?v=2`, {
+    const resp = await fetch(`${host}/flags?v=2`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -55,25 +75,50 @@ export async function isPostHogFlagEnabledForSteamId(
       }),
       cache: "no-store",
     });
-    if (!resp.ok) return false;
+
+    if (!resp.ok) {
+      const detail = await resp.text().catch(() => "");
+      return {
+        enabled: false,
+        host,
+        hasToken: true,
+        httpStatus: resp.status,
+        flagPresent: false,
+        raw: undefined,
+        error: detail.slice(0, 300) || `http_${resp.status}`,
+      };
+    }
 
     const data = (await resp.json()) as FlagsResponse;
-    return flagEnabled(
-      data.flags?.[flagKey] ?? data.featureFlags?.[flagKey],
-    );
-  } catch {
-    return false;
+    const raw = data.flags?.[flagKey] ?? data.featureFlags?.[flagKey];
+    return {
+      enabled: flagEnabled(raw),
+      host,
+      hasToken: true,
+      httpStatus: resp.status,
+      flagPresent: raw !== undefined,
+      raw,
+      error: null,
+    };
+  } catch (err) {
+    return {
+      enabled: false,
+      host,
+      hasToken: true,
+      httpStatus: null,
+      flagPresent: false,
+      raw: undefined,
+      error: err instanceof Error ? err.message : "fetch_failed",
+    };
   }
 }
 
-export async function isBetaFeaturesEnabledForSteamId(
+export async function isPostHogFlagEnabledForSteamId(
   steamId: string | null | undefined,
+  flagKey: string,
 ): Promise<boolean> {
-  if (await isAdminSteamId(steamId)) return true;
-  return isPostHogFlagEnabledForSteamId(
-    steamId,
-    WEBSITE_BETA_FEATURES_FLAG,
-  );
+  const probe = await probePostHogFlagForSteamId(steamId, flagKey);
+  return probe.enabled;
 }
 
 export async function isChatbotEnabledForSteamId(

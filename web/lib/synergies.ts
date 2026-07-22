@@ -134,3 +134,26 @@ export function getSynergyNameTranslator(
   }
   return (en) => map.get(en) ?? en;
 }
+
+const SYNERGY_TIERS_BY_NAME: Record<string, number[]> = (() => {
+  const map: Record<string, number[]> = {};
+  for (const info of Object.values(
+    synergiesData as Record<string, { name?: string; tiers?: number[] }>,
+  )) {
+    if (info?.name && Array.isArray(info.tiers) && info.tiers.length > 0) {
+      map[info.name] = info.tiers;
+    }
+  }
+  return map;
+})();
+
+/** Highest synergy tier threshold satisfied by `count` (Beasts ×3 with tiers 2/4/6 → 2). */
+export function getActiveSynergyTier(name: string, count: number): number {
+  const tiers = SYNERGY_TIERS_BY_NAME[name];
+  if (!tiers) return count;
+  let active = tiers[0];
+  for (const tier of tiers) {
+    if (count >= tier) active = tier;
+  }
+  return active;
+}

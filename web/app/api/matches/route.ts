@@ -1,7 +1,7 @@
 import { mmrLevelToRank } from "@dac/shared/game-utils";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { toApiReq } from "@/lib/abuseLog";
-import { isBetaFeaturesEnabledForSteamId } from "@/lib/betaFeaturesServer";
+import { isAdminSteamId } from "@/lib/adminServer";
 import { duplicateMatchTimeBucket } from "@/lib/matches";
 import { getSessionUser } from "@/lib/sessionUser";
 import { createSupabaseAnonClient } from "@/lib/supabase";
@@ -122,7 +122,7 @@ export async function GET(req: Request) {
   }
 
   const session = await getSessionUser(toApiReq(req), supabase);
-  if (!(await isBetaFeaturesEnabledForSteamId(session.steamId))) {
+  if (!(await isAdminSteamId(session.steamId))) {
     return Response.json({ error: "Forbidden" }, { status: 403 });
   }
 

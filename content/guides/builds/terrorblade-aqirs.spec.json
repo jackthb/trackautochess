@@ -1,11 +1,11 @@
 {
-  "name": "Terrorblade Illusions",
-  "description": "Rank-up Terrorblade build: 3-star Terrorblade and stack a defensive + offensive Tier 5 item on it so its transform ability spreads itemized illusion copies across the board. Sourced from the YouTube guide 'ENDGAME Rank Up ALL 3-Star MEGA Build For Dota Auto Chess' (youtube.com/watch?v=A4OUVwEj5uw).",
+  "name": "Terrorblade Aqirs",
+  "description": "3-star Terrorblade carry with Sand King and Venomancer Aqir bodies, 4 Warlock lifesteal, and 2 Beast — all items stacked on Terrorblade so illusions inherit them. Sourced from the YouTube guide 'ENDGAME Rank Up ALL 3-Star MEGA Build For Dota Auto Chess' (youtube.com/watch?v=A4OUVwEj5uw).",
   "snapshots": [
     {
       "label": "Final board",
       "round": 32,
-      "focusNote": "3-star Terrorblade with a Tier 5 offense/defense item pair; Spirit Breaker and Riki sit adjacent as priority transform targets, Bane fears the front line first.",
+      "focusNote": "3-star Terrorblade with Aeon Disk + Daedalus + Minotaur Horn; Spirit Breaker and Riki adjacent as transform targets (no items on them); Sand King stuns then transforms.",
       "pieces": [
         {
           "unitSlug": "terrorblade",
@@ -36,9 +36,7 @@
           "stars": 3,
           "x": 6,
           "y": 2,
-          "items": [
-            { "slug": "linkens-sphere", "name": "Linkens Sphere", "tier": 3 }
-          ]
+          "items": []
         },
         {
           "unitSlug": "sand-king",
@@ -47,9 +45,7 @@
           "stars": 2,
           "x": 5,
           "y": 1,
-          "items": [
-            { "slug": "moon-shard", "name": "Moon Shard", "tier": 3 }
-          ]
+          "items": []
         },
         {
           "unitSlug": "bane",

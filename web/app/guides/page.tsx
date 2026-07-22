@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
-import { BetaFeaturesGate } from "@/components/app/BetaFeaturesGate";
+import { AdminGate } from "@/components/app/AdminGate";
 import { GuidesIndexClient } from "./GuidesIndexClient";
 
-// Beta-flagged — see BetaFeaturesGate / website_beta_features. Admins bypass.
 export const metadata: Metadata = {
   title: "Guides",
   robots: "noindex, nofollow",
@@ -10,8 +9,8 @@ export const metadata: Metadata = {
 
 export default function GuidesIndexPage() {
   return (
-    <BetaFeaturesGate title="Guides">
+    <AdminGate title="Guides">
       <GuidesIndexClient />
-    </BetaFeaturesGate>
+    </AdminGate>
   );
 }

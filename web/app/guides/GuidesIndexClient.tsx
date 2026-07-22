@@ -2,12 +2,38 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { EntityIcon } from "@/components/EntityIcon";
 import { useSupabaseSession } from "@/lib/useSupabaseSession";
 import styles from "./guides.module.css";
+
+interface GuidePreviewIcon {
+  href: string;
+  iconUrl: string;
+  name: string;
+}
 
 interface IndexGuide {
   slug: string;
   title: string;
+  icons: GuidePreviewIcon[];
+}
+
+function GuideIconRow({ icons }: { icons: GuidePreviewIcon[] }) {
+  if (icons.length === 0) return null;
+  return (
+    <div className={styles.iconRow}>
+      {icons.map((icon) => (
+        <EntityIcon
+          key={icon.href}
+          src={icon.iconUrl}
+          alt={icon.name}
+          size="sm"
+          bordered={false}
+          className={styles.guideIcon}
+        />
+      ))}
+    </div>
+  );
 }
 
 export function GuidesIndexClient() {
@@ -47,8 +73,14 @@ export function GuidesIndexClient() {
         <h1 className={styles.pageTitle}>Guides</h1>
 
         {howTo && (
-          <Link href={`/guides/${howTo.slug}`} prefetch={false} className={styles.featured}>
+          <Link
+            href={`/guides/${howTo.slug}`}
+            prefetch={false}
+            className={styles.featured}
+            title={howTo.title}
+          >
             <span className={styles.featuredLabel}>Start here</span>
+            <GuideIconRow icons={howTo.icons} />
             <span className={styles.featuredTitle}>{howTo.title}</span>
           </Link>
         )}
@@ -62,7 +94,8 @@ export function GuidesIndexClient() {
               prefetch={false}
               className={styles.card}
             >
-              {guide.title}
+              <GuideIconRow icons={guide.icons} />
+              <span className={styles.cardTitle}>{guide.title}</span>
             </Link>
           ))}
         </div>

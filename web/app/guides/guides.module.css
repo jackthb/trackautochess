@@ -68,18 +68,53 @@
 
 .card {
   display: flex;
+  flex-direction: column;
   align-items: center;
+  justify-content: center;
+  gap: var(--s-12);
+  min-height: 96px;
   padding: var(--s-16) var(--s-20);
   border: 1px solid var(--border);
   border-radius: 10px;
   background: var(--surface);
   color: var(--text-primary);
   text-decoration: none;
-  font-weight: var(--fw-medium);
   transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.iconRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: var(--s-8);
+}
+
+.guideIcon {
+  width: 24px;
+  height: 24px;
+  max-width: 24px;
+  max-height: 24px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--surface-raised);
+  padding: 2px;
+  box-sizing: border-box;
+  object-fit: contain;
+}
+
+.cardTitle {
+  font-size: 16px;
+  font-weight: var(--fw-semibold);
+  text-align: center;
+  line-height: 1.35;
 }
 
 .card:hover {
   border-color: var(--accent);
   background: var(--surface-raised);
+}
+
+.card:hover .guideIcon {
+  border-color: color-mix(in srgb, var(--accent) 55%, var(--border));
 }

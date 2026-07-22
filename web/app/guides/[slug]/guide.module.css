@@ -118,12 +118,8 @@
   color: var(--surface);
 }
 
-.board {
+.boardSection {
   margin-bottom: var(--s-24);
-  padding: var(--s-16);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  background: var(--surface-raised);
 }
 
 .boardLabel {
@@ -135,82 +131,60 @@
   margin-bottom: var(--s-12);
 }
 
-.boardGrid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-  gap: var(--s-12);
-}
-
-.piece {
-  display: flex;
-  flex-direction: column;
-  gap: var(--s-8);
-  padding: var(--s-8);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  background: var(--surface);
-}
-
-.pieceUnit {
-  display: flex;
-  align-items: center;
-  gap: var(--s-8);
-}
-
-.unitIcon {
-  width: 36px;
-  height: 36px;
-  border-radius: 6px;
-  object-fit: cover;
-  flex-shrink: 0;
-  background: var(--surface-raised);
-}
-
-.pieceName {
-  font-size: 13px;
+.boardFocus {
+  text-transform: none;
+  letter-spacing: normal;
   font-weight: var(--fw-medium);
   color: var(--text-primary);
-  line-height: 1.2;
-}
-
-.stars {
-  display: block;
-  font-size: 11px;
-  color: var(--accent);
-  letter-spacing: 1px;
-}
-
-.pieceItems {
-  display: flex;
-  gap: var(--s-4);
-  flex-wrap: wrap;
-}
-
-.itemIcon {
-  width: 20px;
-  height: 20px;
-  border-radius: 4px;
-  object-fit: cover;
-  background: var(--surface-raised);
 }
 
 .body {
   font-size: 15px;
-  line-height: 1.7;
+  line-height: 1.8;
   color: var(--text-primary);
+}
+
+.body :global(p) {
+  margin: 0 0 var(--s-16);
+}
+
+.body :global(ul),
+.body :global(ol) {
+  margin: 0 0 var(--s-16);
+  padding-left: var(--s-24);
+}
+
+.body :global(li) {
+  margin: var(--s-8) 0;
+}
+
+.body :global(li p) {
+  margin: var(--s-8) 0;
+}
+
+.body :global(blockquote) {
+  margin: 0 0 var(--s-16);
+  padding: var(--s-12) var(--s-16);
 }
 
 .body :global(h2) {
   font-family: var(--font-display);
   font-size: 18px;
   font-weight: var(--fw-semibold);
-  margin: var(--s-32) 0 var(--s-12);
+  margin: var(--s-40) 0 var(--s-16);
+}
+
+.body :global(h3) {
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: var(--fw-semibold);
+  margin: var(--s-24) 0 var(--s-12);
 }
 
 .body :global(table) {
   width: 100%;
   border-collapse: collapse;
-  margin: var(--s-16) 0;
+  margin: var(--s-20) 0 var(--s-24);
 }
 
 .body :global(th),

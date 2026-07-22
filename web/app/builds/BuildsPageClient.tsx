@@ -1,9 +1,9 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { SteamSignInButton } from "@/components/SteamSignInButton";
-import { useIsAdmin } from "@/lib/admin";
 import { fetchPublicBuilds } from "@/lib/builds/client";
 import type { CommunityBuildSummary } from "@/lib/builds/types";
 import { useSupabaseSession } from "@/lib/useSupabaseSession";
@@ -21,12 +21,27 @@ export function BuildsPageClient({
   items: BuilderItem[];
   initialTab?: Tab;
 }) {
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
   const { steamId, accessToken, ready } = useSupabaseSession();
-  const [tab, setTab] = useState<Tab>(initialTab);
+  const [tab, setTabState] = useState<Tab>(initialTab);
   const [builds, setBuilds] = useState<CommunityBuildSummary[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const isAdmin = useIsAdmin(steamId);
+
+  useEffect(() => {
+    setTabState(initialTab);
+  }, [initialTab]);
+
+  const setTab = (next: Tab) => {
+    setTabState(next);
+    const params = new URLSearchParams(searchParams.toString());
+    if (next === "planner") params.delete("tab");
+    else params.set("tab", next);
+    const query = params.toString();
+    router.replace(query ? `${pathname}?${query}` : pathname, { scroll: false });
+  };
 
   useEffect(() => {
     if (tab !== "public" || !ready) return;
@@ -67,11 +82,6 @@ export function BuildsPageClient({
         >
           Public builds
         </button>
-        {isAdmin && (
-          <Link href="/builds/review" className={styles.pageTab}>
-            Review queue
-          </Link>
-        )}
       </div>
 
       {tab === "planner" ? (

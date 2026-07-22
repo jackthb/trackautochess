@@ -4,13 +4,13 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { listAvatarUrl, playerProfilePath } from "@/lib/steam";
-import { useBetaFeaturesAccess } from "@/lib/betaFeatures";
+import { useAdminAccess } from "@/lib/admin";
 import { useSupabaseSession } from "@/lib/useSupabaseSession";
 import { PageLayout } from "@/components/PageLayout";
 import type { MatchSummary } from "@/app/api/matches/route";
 import styles from "./matches.module.css";
 
-// Client island for /matches: owns beta gating (PostHog feature flag +
+// Client island for /matches: owns admin gating (PostHog admin_access +
 // Supabase session token), data fetching from /api/matches, all state,
 // and rendering. styled-jsx was ported to matches.module.css.
 
@@ -45,7 +45,7 @@ export function MatchesClient() {
   const { ready: authReady, steamId, accessToken } = useSupabaseSession();
   const [matches, setMatches] = useState<MatchSummary[]>([]);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const betaAccess = useBetaFeaturesAccess(steamId);
+  const adminAccess = useAdminAccess(steamId);
 
   useEffect(() => {
     if (!authReady) {
@@ -56,11 +56,11 @@ export function MatchesClient() {
       setPhase("forbidden");
       return;
     }
-    if (betaAccess === "loading") {
+    if (adminAccess === "loading") {
       setPhase("loading");
       return;
     }
-    if (betaAccess !== "enabled") {
+    if (adminAccess !== "enabled") {
       setPhase("forbidden");
       return;
     }
@@ -99,7 +99,7 @@ export function MatchesClient() {
     return () => {
       cancelled = true;
     };
-  }, [authReady, accessToken, steamId, betaAccess]);
+  }, [authReady, accessToken, steamId, adminAccess]);
 
   return (
     <PageLayout title="Matches">

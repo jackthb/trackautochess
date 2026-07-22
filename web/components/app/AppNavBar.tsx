@@ -3,10 +3,10 @@
 import Link from "next/link";
 import { NavigationMenu } from "@base-ui/react/navigation-menu";
 import { useRouter, usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { memo, useEffect, useMemo, useState } from "react";
 import { SITE_NAME } from "@/lib/site";
 import { trackEvent } from "@/lib/analytics";
-import { useBetaFeaturesEnabled } from "@/lib/betaFeatures";
+import { useIsAdmin } from "@/lib/admin";
 import { useSupabaseSession } from "@/lib/useSupabaseSession";
 import { EntityIcon } from "@/components/EntityIcon";
 import { SteamSignInButton } from "@/components/SteamSignInButton";
@@ -56,6 +56,19 @@ const SYNERGY_LINKS: MenuLink[] = [
   { href: "/species", label: t.species, key: "species", icon: "/icons/synergies/dragon.png" },
 ];
 
+const ADMIN_NAV_LINKS: { href: string; label: string; key: string }[] = [
+  { href: "/builds", label: t.builds, key: "builds" },
+  { href: "/guides", label: "Guides", key: "guides" },
+  { href: "/matches", label: t.matches, key: "matches" },
+];
+
+const PUBLIC_NAV_LINKS: { href: string; label: string; key: string }[] = [
+  { href: "/talents", label: t.talents, key: "talents" },
+  { href: "/queens", label: t.queens, key: "queens" },
+  { href: "/creators", label: t.creators, key: "creators" },
+  { href: "/patch-notes", label: t.patchNotes, key: "patch_notes" },
+];
+
 function CaretDownIcon() {
   return (
     <svg viewBox="0 0 10 6" fill="none" aria-hidden="true" width="10" height="6">
@@ -70,7 +83,7 @@ function CaretDownIcon() {
   );
 }
 
-export function AppNavBar() {
+export const AppNavBar = memo(function AppNavBar() {
   const router = useRouter();
   const pathname = usePathname();
   const {
@@ -128,7 +141,7 @@ export function AppNavBar() {
   const profileHref = sessionSteamId
     ? playerProfilePath(sessionSteamId, sessionCustomUrl)
     : "/dashboard";
-  const canSeeBetaFeatures = useBetaFeaturesEnabled(sessionSteamId);
+  const isAdmin = useIsAdmin();
   const trackNavClick = (destination: string) => {
     trackEvent("Navigation Link Clicked", { source: "nav", destination });
   };
@@ -136,21 +149,14 @@ export function AppNavBar() {
     pathname === href || pathname.startsWith(`${href}/`);
   const groupActive = (links: MenuLink[]) => links.some((l) => isActive(l.href));
 
-  // Standalone links (no dropdown), shared between desktop and mobile.
-  // Builds / Guides / Matches are behind website_beta_features (admins bypass).
-  const standaloneLinks: { href: string; label: string; key: string }[] = [
-    { href: "/talents", label: t.talents, key: "talents" },
-    { href: "/queens", label: t.queens, key: "queens" },
-    { href: "/creators", label: t.creators, key: "creators" },
-    ...(canSeeBetaFeatures
-      ? [
-          { href: "/builds", label: t.builds, key: "builds" },
-          { href: "/guides", label: "Guides", key: "guides" },
-          { href: "/matches", label: t.matches, key: "matches" },
-        ]
-      : []),
-    { href: "/patch-notes", label: t.patchNotes, key: "patch_notes" },
-  ];
+  const standaloneLinks = useMemo(
+    () => [
+      ...PUBLIC_NAV_LINKS.slice(0, 3),
+      ...(isAdmin ? ADMIN_NAV_LINKS : []),
+      PUBLIC_NAV_LINKS[3],
+    ],
+    [isAdmin],
+  );
 
   const renderMenuGroup = (label: string, links: MenuLink[]) => (
     <NavigationMenu.Item>
@@ -291,7 +297,7 @@ export function AppNavBar() {
                   )}
                   <span className={styles.navUser}>{displayName}</span>
                 </Link>
-                {canSeeBetaFeatures && (
+                {isAdmin && (
                   <Link href="/keystatic" className={styles.navBtn} prefetch={false} onClick={() => trackNavClick("keystatic")}>
                     {t.cms}
                   </Link>
@@ -341,4 +347,4 @@ export function AppNavBar() {
       </div>
     </>
   );
-}
+});

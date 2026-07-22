@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { ADMIN_ACCESS_FLAG } from "@/lib/adminFlags";
-import { WEBSITE_BETA_FEATURES_FLAG } from "@/lib/betaFlags";
 import { getPostHog } from "@/lib/posthog";
 import { useSessionFlags, type FlagAccess } from "@/lib/sessionFlags";
 
@@ -63,23 +62,9 @@ export function usePostHogFlagAccess(
   return access;
 }
 
-export function useBetaFeaturesAccess(
-  _steamId?: string | null,
-): BetaFeatureAccess {
-  const { beta } = useSessionFlags();
-  return beta;
-}
-
 export function useChatbotAccess(_steamId?: string | null): BetaFeatureAccess {
   const { admin } = useSessionFlags();
   return admin;
 }
 
-export function useBetaFeaturesEnabled(
-  steamId?: string | null | undefined,
-): boolean {
-  return useBetaFeaturesAccess(steamId) === "enabled";
-}
-
-// Re-export flag keys for callers that still import them from here.
-export { ADMIN_ACCESS_FLAG, WEBSITE_BETA_FEATURES_FLAG };
+export { ADMIN_ACCESS_FLAG };

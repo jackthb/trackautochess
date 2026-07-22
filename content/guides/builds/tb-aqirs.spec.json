@@ -1,0 +1,102 @@
+{
+  "name": "TB AQIRS",
+  "description": "Rank-up Terrorblade build: 3-star Terrorblade and stack a defensive + offensive Tier 5 item on it so its transform ability spreads itemized illusion copies across the board. Sourced from the YouTube guide 'ENDGAME Rank Up ALL 3-Star MEGA Build For Dota Auto Chess' (youtube.com/watch?v=A4OUVwEj5uw).",
+  "snapshots": [
+    {
+      "label": "Final board",
+      "round": 32,
+      "focusNote": "3-star Terrorblade with a Tier 5 offense/defense item pair; Spirit Breaker and Riki sit adjacent as priority transform targets, Bane fears the front line first.",
+      "pieces": [
+        {
+          "unitSlug": "terrorblade",
+          "name": "Terrorblade",
+          "cost": 3,
+          "stars": 3,
+          "x": 5,
+          "y": 2,
+          "items": [
+            { "slug": "aeon-disk", "name": "Aeon Disk", "tier": 5 },
+            { "slug": "daedalus", "name": "Daedalus", "tier": 5 },
+            { "slug": "minotaur-horn", "name": "Minotaur Horn", "tier": 4 }
+          ]
+        },
+        {
+          "unitSlug": "spirit-breaker",
+          "name": "Spirit Breaker",
+          "cost": 1,
+          "stars": 3,
+          "x": 4,
+          "y": 2,
+          "items": []
+        },
+        {
+          "unitSlug": "riki",
+          "name": "Riki",
+          "cost": 3,
+          "stars": 3,
+          "x": 6,
+          "y": 2,
+          "items": [
+            { "slug": "linkens-sphere", "name": "Linkens Sphere", "tier": 3 }
+          ]
+        },
+        {
+          "unitSlug": "sand-king",
+          "name": "Sand King",
+          "cost": 3,
+          "stars": 2,
+          "x": 5,
+          "y": 1,
+          "items": [
+            { "slug": "moon-shard", "name": "Moon Shard", "tier": 3 }
+          ]
+        },
+        {
+          "unitSlug": "bane",
+          "name": "Bane",
+          "cost": 1,
+          "stars": 2,
+          "x": 3,
+          "y": 1,
+          "items": []
+        },
+        {
+          "unitSlug": "venomancer",
+          "name": "Venomancer",
+          "cost": 3,
+          "stars": 2,
+          "x": 4,
+          "y": 3,
+          "items": []
+        },
+        {
+          "unitSlug": "witch-doctor",
+          "name": "Witch Doctor",
+          "cost": 1,
+          "stars": 1,
+          "x": 3,
+          "y": 4,
+          "items": []
+        },
+        {
+          "unitSlug": "lifestealer",
+          "name": "Lifestealer",
+          "cost": 2,
+          "stars": 1,
+          "x": 5,
+          "y": 4,
+          "items": []
+        },
+        {
+          "unitSlug": "monkey-king",
+          "name": "Monkey King",
+          "cost": 4,
+          "stars": 1,
+          "x": 6,
+          "y": 3,
+          "items": []
+        }
+      ]
+    }
+  ]
+}

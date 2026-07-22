@@ -1,0 +1,39 @@
+.entityMention {
+  display: inline;
+  white-space: nowrap;
+  margin: 0 2px;
+}
+
+.entityLinkText {
+  color: inherit;
+}
+
+.entityIconLink {
+  display: inline-flex;
+  align-items: center;
+  vertical-align: middle;
+  margin-left: 6px;
+  margin-right: 4px;
+  line-height: 0;
+  border-radius: 4px;
+  transition: transform 0.12s ease, box-shadow 0.12s ease;
+}
+
+.entityIconLink:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 0 0 1px var(--accent);
+}
+
+.entityLinkIcon {
+  width: 23px;
+  height: 23px;
+  flex-shrink: 0;
+  border-radius: 4px;
+  border: 1px solid var(--border);
+  object-fit: contain;
+  background: var(--surface-raised);
+}
+
+.entityIconLink:hover .entityLinkIcon {
+  border-color: color-mix(in srgb, var(--accent) 55%, var(--border));
+}
