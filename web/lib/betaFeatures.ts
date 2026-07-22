@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { isAdminSteamId } from "@/lib/admin";
+import { ADMIN_ACCESS_FLAG } from "@/lib/adminFlags";
 import { WEBSITE_BETA_FEATURES_FLAG } from "@/lib/betaFlags";
 import { getPostHog } from "@/lib/posthog";
 
@@ -52,17 +52,17 @@ export function useBetaFeaturesAccess(
   steamId: string | null | undefined,
 ): BetaFeatureAccess {
   const flagAccess = usePostHogFlagAccess(WEBSITE_BETA_FEATURES_FLAG, steamId);
-  // Admins always see beta pages (Matches nav, /matches, etc.) even when the
-  // PostHog flag is off or hasn't loaded for their distinct_id.
-  if (isAdminSteamId(steamId)) return "enabled";
+  const adminAccess = usePostHogFlagAccess(ADMIN_ACCESS_FLAG, steamId);
+  // Admins always see beta pages even when website_beta_features is off.
+  if (adminAccess === "enabled") return "enabled";
+  if (adminAccess === "loading" || flagAccess === "loading") return "loading";
   return flagAccess;
 }
 
 export function useChatbotAccess(
   steamId: string | null | undefined,
 ): BetaFeatureAccess {
-  if (!steamId) return "disabled";
-  return isAdminSteamId(steamId) ? "enabled" : "disabled";
+  return usePostHogFlagAccess(ADMIN_ACCESS_FLAG, steamId);
 }
 
 export function useBetaFeaturesEnabled(

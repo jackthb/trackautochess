@@ -14,6 +14,9 @@ export default defineConfig({
   build: {
     outDir: "dist",
     emptyOutDir: true,
+    // Emit source maps so PostHog error tracking can symbolicate minified
+    // renderer frames (e.g. the NetTableSetupCard crashes) back to real source.
+    sourcemap: true,
   },
   server: {
     port: 5173,

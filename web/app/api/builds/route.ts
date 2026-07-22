@@ -1,5 +1,6 @@
 import { RateLimiterMemory } from "rate-limiter-flexible";
 import { getClientIp, logAbuse, toApiReq } from "@/lib/abuseLog";
+import { isAdminSteamId } from "@/lib/adminServer";
 import {
   fetchUsersBySteamIds,
   parseSteamId,
@@ -58,6 +59,7 @@ function sanitizePayload(build: SavedBuild): SavedBuild {
   };
 }
 
+/** Admin-only while /builds is gated on PostHog `admin_access`. */
 export async function GET(req: Request) {
   const { service, error } = await requireService();
   if (error || !service) return error!;
@@ -68,6 +70,9 @@ export async function GET(req: Request) {
 
   const anon = createSupabaseAnonClient();
   const session = await getSessionUser(toApiReq(req), anon);
+  if (!(await isAdminSteamId(session.steamId))) {
+    return Response.json({ error: "Forbidden" }, { status: 403 });
+  }
   const viewerSteamIdNum = session.steamId ? parseSteamId(session.steamId) : null;
 
   if (mine) {
@@ -152,7 +157,10 @@ export async function POST(req: Request) {
 
   const sessionResult = await requireSession(req);
   if ("error" in sessionResult) return sessionResult.error!;
-  const { steamIdNum } = sessionResult;
+  const { steamId, steamIdNum } = sessionResult;
+  if (!(await isAdminSteamId(steamId))) {
+    return Response.json({ error: "Forbidden" }, { status: 403 });
+  }
 
   const { service, error } = await requireService();
   if (error || !service) return error!;

@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { SteamSignInButton } from "@/components/SteamSignInButton";
-import { isAdminSteamId } from "@/lib/admin";
+import { useIsAdmin } from "@/lib/admin";
 import { fetchPublicBuilds } from "@/lib/builds/client";
 import type { CommunityBuildSummary } from "@/lib/builds/types";
 import { useSupabaseSession } from "@/lib/useSupabaseSession";
@@ -26,7 +26,7 @@ export function BuildsPageClient({
   const [builds, setBuilds] = useState<CommunityBuildSummary[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const isAdmin = isAdminSteamId(steamId);
+  const isAdmin = useIsAdmin(steamId);
 
   useEffect(() => {
     if (tab !== "public" || !ready) return;

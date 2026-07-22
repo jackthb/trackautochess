@@ -34,8 +34,11 @@ type PostHogClient = {
   ) => void;
   identify: (distinctId: string, properties?: Record<string, unknown>) => void;
   init: (token: string, config: Record<string, unknown>) => void;
+  isFeatureEnabled: (flagKey: string) => boolean | undefined;
+  onFeatureFlags: (callback: () => void) => () => void;
   onSurveysLoaded?: (callback: () => void) => void;
   register: (properties: Record<string, unknown>) => void;
+  reloadFeatureFlags: () => void;
   reset: () => void;
   startSessionRecording: (
     override?: boolean | { sampling?: boolean; linked_flag?: boolean },

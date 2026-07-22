@@ -1,5 +1,6 @@
 import { RateLimiterMemory } from "rate-limiter-flexible";
 import { getClientIp, logAbuse, toApiReq } from "@/lib/abuseLog";
+import { isAdminSteamId } from "@/lib/adminServer";
 import {
   fetchUsersBySteamIds,
   parseSteamId,
@@ -17,7 +18,13 @@ const writeLimiter = new RateLimiterMemory({ points: 20, duration: 60 });
 
 type RouteContext = { params: Promise<{ id: string }> };
 
-export async function GET(_req: Request, context: RouteContext) {
+export async function GET(req: Request, context: RouteContext) {
+  const anon = createSupabaseAnonClient();
+  const session = await getSessionUser(toApiReq(req), anon);
+  if (!(await isAdminSteamId(session.steamId))) {
+    return Response.json({ error: "Forbidden" }, { status: 403 });
+  }
+
   const { id } = await context.params;
   if (!isUuid(id)) {
     return Response.json({ error: "Not found" }, { status: 404 });
@@ -95,6 +102,9 @@ export async function POST(req: Request, context: RouteContext) {
   const steamIdNum = session.steamId ? parseSteamId(session.steamId) : null;
   if (steamIdNum == null) {
     return Response.json({ error: "Sign in required" }, { status: 401 });
+  }
+  if (!(await isAdminSteamId(session.steamId))) {
+    return Response.json({ error: "Forbidden" }, { status: 403 });
   }
 
   const { data: build, error: buildError } = await service

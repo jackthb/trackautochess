@@ -5,7 +5,7 @@ import type { BackendCommand } from "../backend-events.generated";
 import type { OutboxFlushedEvent } from "../backend-events";
 import type { NetTableActivityState } from "../hooks/useNetTableEvents";
 import { sendBackendRequest } from "../lib/backend-request";
-import { isAdminSteamId } from "../lib/admin";
+import { useIsAdmin } from "../lib/admin";
 import { NetTableSetupCard } from "./NetTableSetupCard";
 import { LegendaryPoolOverlay } from "./LegendaryPoolOverlay";
 
@@ -41,7 +41,7 @@ export function TrackerHome({ unitsFull, netTable, status }: TrackerHomeProps) {
 
   const steamId = status?.steam_id ?? null;
   const steamName = status?.steam_name || "Steam";
-  const isAdmin = isAdminSteamId(steamId);
+  const isAdmin = useIsAdmin(steamId);
   const setupNeedsWork = Boolean(
     !netStatus ||
       netStatus.remote_enabled === false ||
@@ -50,7 +50,6 @@ export function TrackerHome({ unitsFull, netTable, status }: TrackerHomeProps) {
       netStatus.has_conclearlog !== true ||
       netStatus.has_gamestateintegration !== true,
   );
-
   useEffect(() => {
     window.appApi.getVersion().then(setVersion);
   }, []);

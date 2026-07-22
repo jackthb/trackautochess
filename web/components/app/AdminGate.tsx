@@ -3,13 +3,13 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { isAdminSteamId } from "@/lib/admin";
+import { useAdminAccess } from "@/lib/admin";
 import { useSupabaseSession } from "@/lib/useSupabaseSession";
 import { SteamSignInButton } from "@/components/SteamSignInButton";
 
 /**
- * Client-side admin gate: renders children only for signed-in admin Steam
- * accounts. Real protection lives in server-side auth/RLS.
+ * Client-side admin gate: PostHog `admin_access` flag. Real protection lives
+ * in server-side auth checks.
  */
 export function AdminGate({
   children,
@@ -21,16 +21,16 @@ export function AdminGate({
 }) {
   const bypass = allowDevBypass && process.env.NODE_ENV === "development";
   const { ready, steamId, user } = useSupabaseSession();
+  const adminAccess = useAdminAccess(steamId);
 
   if (bypass) return <>{children}</>;
-  if (!ready) return null;
+  if (!ready || adminAccess === "loading") return null;
 
-  if (isAdminSteamId(steamId)) {
+  if (adminAccess === "enabled") {
     return <>{children}</>;
   }
 
-  // Logged-in non-admin → 404. Signed-out → ask to sign in (don't pretend
-  // the page doesn't exist when the real issue is auth).
+  // Logged-in non-admin → 404. Signed-out → ask to sign in.
   if (user) notFound();
 
   return (

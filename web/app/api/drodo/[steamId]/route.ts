@@ -15,7 +15,7 @@ import {
   type ManualRefreshCadence,
   type ManualRefreshQuota,
 } from "@/lib/manualRefreshQuota";
-import { isAdminSteamId } from "@/lib/admin";
+import { isAdminSteamId } from "@/lib/adminServer";
 import { revalidateQueenPages } from "@/lib/queensRevalidate";
 import { getSessionUser } from "@/lib/sessionUser";
 import { isCachedQueenProfile, type CachedUserDrodoRow } from "@/lib/drodo";
@@ -120,7 +120,7 @@ async function handle(req: Request, ctx: { params: Promise<{ steamId: string }> 
   if (forceRefresh) {
     const session = await getSessionUser(reqShim, supabase);
     const isOwnProfile = session.steamId === steamId;
-    const isAdmin = isAdminSteamId(session.steamId);
+    const isAdmin = await isAdminSteamId(session.steamId);
     forceSteamProfileRefresh = isAdmin;
     let cachedProfileRow: CachedUserDrodoRow | null = null;
     if (supabase && !isOwnProfile) {

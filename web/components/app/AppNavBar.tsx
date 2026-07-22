@@ -137,6 +137,7 @@ export function AppNavBar() {
   const groupActive = (links: MenuLink[]) => links.some((l) => isActive(l.href));
 
   // Standalone links (no dropdown), shared between desktop and mobile.
+  // Builds / Guides / Matches are behind website_beta_features (admins bypass).
   const standaloneLinks: { href: string; label: string; key: string }[] = [
     { href: "/talents", label: t.talents, key: "talents" },
     { href: "/queens", label: t.queens, key: "queens" },

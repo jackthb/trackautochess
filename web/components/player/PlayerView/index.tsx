@@ -24,7 +24,7 @@ import {
   type ManualRefreshCadence,
   type ManualRefreshQuota,
 } from "@/lib/manualRefreshQuota";
-import { isAdminSteamId } from "@/lib/admin";
+import { useIsAdmin } from "@/lib/admin";
 import { analyticsRoute, bucketCount, trackEvent } from "@/lib/analytics";
 import {
   DRODO_FRESH_TTL_MS,
@@ -338,7 +338,7 @@ export default function PlayerView({
     accessToken,
   } = useSupabaseSession();
 
-  const isAdmin = isAdminSteamId(sessionSteamId);
+  const isAdmin = useIsAdmin(sessionSteamId);
   const isOwnProfile = sessionSteamId !== null && sessionSteamId === steamId;
   const isPriorityProfile =
     drodo?.queen_rank != null || queenRankHistory.length > 0;
