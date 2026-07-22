@@ -95,3 +95,7 @@ CREATE POLICY community_build_comments_select ON community_build_comments
 GRANT SELECT ON community_builds TO anon, authenticated;
 GRANT SELECT ON community_build_votes TO anon, authenticated;
 GRANT SELECT ON community_build_comments TO anon, authenticated;
+
+GRANT SELECT, INSERT, UPDATE, DELETE ON community_builds TO service_role;
+GRANT SELECT, INSERT, UPDATE, DELETE ON community_build_votes TO service_role;
+GRANT SELECT, INSERT, UPDATE, DELETE ON community_build_comments TO service_role;

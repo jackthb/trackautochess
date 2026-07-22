@@ -2,6 +2,7 @@ mod config;
 mod dump_commands;
 mod gsi;
 mod ipc_events;
+mod local_cache;
 mod match_builder;
 mod nettable_live;
 mod nettable_parser;
@@ -271,6 +272,18 @@ fn main() -> io::Result<()> {
 
 fn run_daemon() -> io::Result<()> {
     let mut cfg = Config::load()?;
+    let max_bytes = local_cache::max_bytes_from_gb(cfg.local_game_cache_max_gb.max(1));
+    if let Ok(result) = local_cache::enforce_budget(&cfg.dac_dir, max_bytes) {
+        if result.deleted > 0 {
+            eprintln!(
+                "local game cache: pruned {} old entries ({:.1} MB -> {:.1} MB, cap {} GB)",
+                result.deleted,
+                result.bytes_before as f64 / (1024.0 * 1024.0),
+                result.bytes_after as f64 / (1024.0 * 1024.0),
+                cfg.local_game_cache_max_gb.max(1)
+            );
+        }
+    }
     let outbox = Outbox::new(cfg.dac_dir.join("outbox"));
     let stdout_lock = Arc::new(Mutex::new(()));
     let nettable = NettableService::new();

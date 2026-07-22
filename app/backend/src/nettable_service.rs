@@ -13,6 +13,7 @@ use crate::{
         NettableQueenUploadProgress, NettableRankingScanned, NettableResyncComplete,
         NettableRoundChanged, NettableStateEvent, NettableStatus, NettableTimelineExtracted,
     },
+    local_cache,
     match_builder::{
         build_match_timeline, extract_death_team_from_rows, extract_round_from_rows,
         store_session_dump, SessionDump,
@@ -195,8 +196,12 @@ impl NettableService {
                 match result {
                     Ok(Some(rows)) => {
                         if !rows.is_empty() {
-                            // Latch is_dac_match from GSI workshop ID confirmation.
-                            if gsi_state_is_dac_active(&gsi) {
+                            // Latch DAC from GSI workshop ID *or* nettable round
+                            // evidence. GSI alone is too flaky — without this,
+                            // end_board uploads often have no per-round timeline.
+                            if gsi_state_is_dac_active(&gsi)
+                                || extract_round_from_rows(&rows).is_some()
+                            {
                                 if let Ok(mut s) = state.lock() {
                                     s.is_dac_match = true;
                                 }
@@ -227,21 +232,28 @@ impl NettableService {
                                         }
                                         if client.finished_match_has_players(&match_id) {
                                             mark_end_board_uploaded(&state, &match_id);
-                                            if let Some(timeline) =
-                                                build_match_timeline_from_state(&state, &match_id)
-                                            {
-                                                let _ = client.upsert_match_timeline(&timeline);
+                                            let timeline =
+                                                build_match_timeline_from_state(&state, &match_id);
+                                            if let Some(ref timeline) = timeline {
+                                                let _ = client.upsert_match_timeline(timeline);
                                             }
+                                            archive_finished_match(
+                                                &cfg,
+                                                &state,
+                                                &match_id,
+                                                timeline.as_ref(),
+                                                "end_board_existing",
+                                            );
                                             continue;
                                         }
                                     }
                                     match client.upload_finished_match_from_rows(&rows) {
                                         Ok(Some(match_id)) => {
                                             mark_end_board_uploaded(&state, &match_id);
-                                            if let Some(timeline) =
-                                                build_match_timeline_from_state(&state, &match_id)
-                                            {
-                                                let _ = client.upsert_match_timeline(&timeline);
+                                            let timeline =
+                                                build_match_timeline_from_state(&state, &match_id);
+                                            if let Some(ref timeline) = timeline {
+                                                let _ = client.upsert_match_timeline(timeline);
                                                 let round_count = timeline
                                                     .get("round_count")
                                                     .and_then(serde_json::Value::as_u64)
@@ -252,6 +264,13 @@ impl NettableService {
                                                     &now_iso_utc(),
                                                 )));
                                             }
+                                            archive_finished_match(
+                                                &cfg,
+                                                &state,
+                                                &match_id,
+                                                timeline.as_ref(),
+                                                "end_board",
+                                            );
                                             emit(event_json(&NettableEndBoardSaved::new(
                                                 &match_id,
                                                 &now_iso_utc(),
@@ -322,7 +341,11 @@ impl NettableService {
         });
         match pending {
             Some(pending) => {
-                for line in flush_pending_left_match(pending, "left_match_confirmed") {
+                for line in flush_pending_left_match(
+                    &self.state,
+                    pending,
+                    "left_match_confirmed",
+                ) {
                     emit(line);
                 }
             }
@@ -768,13 +791,33 @@ mod tests {
     }
 
     #[test]
+    fn session_dumps_latch_dac_from_round_without_gsi() {
+        // GSI never fired; round_info alone must still accumulate dumps so the
+        // per-round scrubber can upload later.
+        let state = Arc::new(Mutex::new(NettableState {
+            local_steam_id: Some("76561198022169086".to_owned()),
+            is_dac_match: false,
+            ..NettableState::default()
+        }));
+        let rows = rows_from_json(vec![(
+            "CustomNetTable_game_info",
+            "round_info",
+            serde_json::json!({"round": 7}),
+        )]);
+
+        let _ = handle_rows_for_parity(&state, &rows);
+
+        let locked = state.lock().unwrap();
+        assert!(locked.is_dac_match);
+        assert_eq!(locked.session_dumps.len(), 1);
+    }
+
+    #[test]
     fn parity_events_emit_round_creep_and_personal_elimination() {
         let state = Arc::new(Mutex::new(NettableState {
             local_steam_id: Some("76561198022169086".to_owned()),
-            // Session dumps only accumulate once GSI has confirmed we're in
-            // an actual DAC match (see the is_dac_match gate below) — a real
-            // dump loop would already have latched this by the time rows
-            // start flowing.
+            // Session dumps accumulate once DAC is latched (GSI or round
+            // evidence). Seed true here so this test stays focused on events.
             is_dac_match: true,
             ..NettableState::default()
         }));
@@ -1404,6 +1447,12 @@ fn handle_rows_for_parity(state: &Arc<Mutex<NettableState>>, rows: &[NettableRow
         events.push(event);
     }
 
+    // Prefer GSI latch, but also treat an extractable DAC round as proof we're
+    // in Auto Chess — otherwise session_dumps stay empty and the scrubber never
+    // appears on uploaded matches.
+    if !state.is_dac_match && extract_round_from_rows(rows).is_some() {
+        state.is_dac_match = true;
+    }
     if state.is_dac_match {
         store_session_dump(
             &mut state.session_dumps,
@@ -1531,6 +1580,64 @@ fn build_match_timeline_from_state(
         match_id,
         &now_iso_utc(),
     )
+}
+
+fn session_dumps_json(state: &NettableState) -> serde_json::Value {
+    serde_json::Value::Array(
+        state
+            .session_dumps
+            .iter()
+            .map(|dump| {
+                serde_json::json!({
+                    "captured_at": dump.captured_at,
+                    "rows": dump
+                        .rows
+                        .iter()
+                        .map(nettable_row_debug_json)
+                        .collect::<Vec<_>>(),
+                })
+            })
+            .collect(),
+    )
+}
+
+/// Keep a local copy of the finished match (round dumps + timeline) and prune
+/// the cache once it exceeds the configured GB budget.
+fn archive_finished_match(
+    cfg: &Config,
+    state: &Arc<Mutex<NettableState>>,
+    match_id: &str,
+    timeline: Option<&serde_json::Value>,
+    source: &str,
+) {
+    let dumps = match state.lock() {
+        Ok(locked) => session_dumps_json(&locked),
+        Err(_) => return,
+    };
+    let _ = local_cache::persist_match_archive(
+        &cfg.dac_dir,
+        match_id,
+        dumps,
+        timeline,
+        source,
+    );
+    enforce_local_cache_budget(cfg);
+}
+
+fn enforce_local_cache_budget(cfg: &Config) {
+    let max_bytes = local_cache::max_bytes_from_gb(cfg.local_game_cache_max_gb.max(1));
+    let _ = local_cache::enforce_budget(&cfg.dac_dir, max_bytes);
+}
+
+fn archive_finished_match_from_disk(
+    state: &Arc<Mutex<NettableState>>,
+    match_id: &str,
+    timeline: Option<&serde_json::Value>,
+    source: &str,
+) {
+    if let Ok(cfg) = Config::load() {
+        archive_finished_match(&cfg, state, match_id, timeline, source);
+    }
 }
 
 fn detect_personal_elimination(
@@ -1949,13 +2056,21 @@ where
     if end_board_already_uploaded(state, &match_id) || client.finished_match_has_players(&match_id)
     {
         mark_end_board_uploaded(state, &match_id);
+        // Still try to attach a timeline — another client may have uploaded the
+        // board while our session dumps were the only ones with round history.
+        let timeline = build_match_timeline_from_state(state, &match_id);
+        if let Some(ref timeline) = timeline {
+            let _ = client.upsert_match_timeline(timeline);
+        }
+        archive_finished_match_from_disk(state, &match_id, timeline.as_ref(), "end_board_existing");
         return true;
     }
     match client.upload_finished_match_from_rows(rows) {
         Ok(Some(uploaded_match_id)) => {
             mark_end_board_uploaded(state, &uploaded_match_id);
-            if let Some(timeline) = build_match_timeline_from_state(state, &uploaded_match_id) {
-                let _ = client.upsert_match_timeline(&timeline);
+            let timeline = build_match_timeline_from_state(state, &uploaded_match_id);
+            if let Some(ref timeline) = timeline {
+                let _ = client.upsert_match_timeline(timeline);
                 let round_count = timeline
                     .get("round_count")
                     .and_then(serde_json::Value::as_u64)
@@ -1966,6 +2081,12 @@ where
                     &now_iso_utc(),
                 )));
             }
+            archive_finished_match_from_disk(
+                state,
+                &uploaded_match_id,
+                timeline.as_ref(),
+                "end_board",
+            );
             emit(event_json(&NettableEndBoardSaved::new(
                 &uploaded_match_id,
                 &now_iso_utc(),
@@ -2112,17 +2233,26 @@ fn tick_pending_left_match(state: &Arc<Mutex<NettableState>>, _cfg: &Config) -> 
     let mut events = Vec::new();
     if let Some(pending) = staged {
         events.extend(flush_pending_left_match(
+            state,
             pending,
             "left_match_superseded",
         ));
     }
     if let Some(pending) = expired {
-        events.extend(flush_pending_left_match(pending, "left_match_timeout"));
+        events.extend(flush_pending_left_match(
+            state,
+            pending,
+            "left_match_timeout",
+        ));
     }
     events
 }
 
-fn flush_pending_left_match(pending: PendingLeftMatch, reason: &str) -> Vec<String> {
+fn flush_pending_left_match(
+    state: &Arc<Mutex<NettableState>>,
+    pending: PendingLeftMatch,
+    reason: &str,
+) -> Vec<String> {
     let now = now_iso_utc();
     let client = match fresh_client_from_disk() {
         Ok(client) => client,
@@ -2134,12 +2264,31 @@ fn flush_pending_left_match(pending: PendingLeftMatch, reason: &str) -> Vec<Stri
         }
     };
     match client.upsert_fallback_finished_match(&pending.rows, reason) {
-        Ok(Some(match_id)) => vec![event_json(&NettableMatchLeftResolved::new(
-            "uploaded",
-            Some(&match_id),
-            "Uploaded the match you left with everyone's last-known standings.",
-            &now,
-        ))],
+        Ok(Some(match_id)) => {
+            let mut events = vec![event_json(&NettableMatchLeftResolved::new(
+                "uploaded",
+                Some(&match_id),
+                "Uploaded the match you left with everyone's last-known standings.",
+                &now,
+            ))];
+            let timeline = build_match_timeline_from_state(state, &match_id);
+            if let Some(ref timeline) = timeline {
+                let _ = client.upsert_match_timeline(timeline);
+                let round_count = timeline
+                    .get("round_count")
+                    .and_then(serde_json::Value::as_u64)
+                    .unwrap_or(0);
+                if round_count > 0 {
+                    events.push(event_json(&NettableTimelineExtracted::new(
+                        &match_id,
+                        round_count,
+                        &now,
+                    )));
+                }
+            }
+            archive_finished_match_from_disk(state, &match_id, timeline.as_ref(), reason);
+            events
+        }
         Ok(None) => vec![event_json(&NettableMatchLeftResolved::new(
             "nothing_pending",
             None,
@@ -2330,6 +2479,7 @@ fn persist_local_nettable_dump(cfg: &Config, rows: &[NettableRow]) {
     if let Ok(body) = serde_json::to_string_pretty(&dump) {
         let _ = fs::write(dumps_dir.join(file_name), body);
     }
+    enforce_local_cache_budget(cfg);
 }
 
 /// Detect whether dota2.exe is currently a running process.

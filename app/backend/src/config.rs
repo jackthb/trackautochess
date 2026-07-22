@@ -19,6 +19,9 @@ pub struct Config {
     /// post-hoc reprocessing. Product views should use processed matches,
     /// players, and timelines instead of depending on these raw dumps.
     pub keep_local_nettable_dumps: bool,
+    /// Soft cap for `game_cache/` + `nettable_dumps/`. Oldest entries are
+    /// deleted once total size exceeds this many gigabytes.
+    pub local_game_cache_max_gb: u64,
     pub local_only: bool,
     pub supabase_url: String,
     pub supabase_key: String,
@@ -53,6 +56,7 @@ impl Config {
             )),
             replay_enabled: value_bool(&value, "replay_enabled", true),
             keep_local_nettable_dumps: value_bool(&value, "keep_local_nettable_dumps", true),
+            local_game_cache_max_gb: value_u64(&value, "local_game_cache_max_gb", 5),
             local_only: local_only_mode_from(&value),
             supabase_url: value_string(&value, "supabase_url"),
             supabase_key: value_string(&value, "supabase_key"),
@@ -144,8 +148,7 @@ fn default_config_json() -> &'static str {
   "replay_enabled": true,
   "replay_max_gb": 15,
   "keep_local_nettable_dumps": true,
-  "local_nettable_retention_days": 14,
-  "local_nettable_max_mb": 500
+  "local_game_cache_max_gb": 5
 }
 "#
 }
@@ -197,6 +200,10 @@ fn apply_config_migrations(value: &mut Value) -> bool {
         );
         changed = true;
     }
+    if !map.contains_key("local_game_cache_max_gb") {
+        map.insert("local_game_cache_max_gb".to_owned(), json!(5));
+        changed = true;
+    }
     changed
 }
 
@@ -210,6 +217,17 @@ fn value_string(value: &Value, key: &str) -> String {
 
 fn value_bool(value: &Value, key: &str, fallback: bool) -> bool {
     value.get(key).and_then(Value::as_bool).unwrap_or(fallback)
+}
+
+fn value_u64(value: &Value, key: &str, fallback: u64) -> u64 {
+    value
+        .get(key)
+        .and_then(|v| {
+            v.as_u64()
+                .or_else(|| v.as_i64().and_then(|n| u64::try_from(n).ok()))
+                .or_else(|| v.as_f64().and_then(|n| if n.is_finite() && n >= 0.0 { Some(n as u64) } else { None }))
+        })
+        .unwrap_or(fallback)
 }
 
 fn local_only_mode_from(value: &Value) -> bool {

@@ -28,6 +28,17 @@ function formatPlayedAt(iso: string): string {
   });
 }
 
+function winnerDisplayName(winner: MatchSummary["players"][number] | undefined): string {
+  if (!winner) return "Unknown";
+  if (winner.name?.trim()) return winner.name.trim();
+  if (winner.customUrl?.trim()) return winner.customUrl.trim();
+  if (winner.steamId) {
+    const id = winner.steamId;
+    return `Player …${id.slice(-4)}`;
+  }
+  return "Unknown";
+}
+
 export function MatchesClient() {
   const router = useRouter();
   const [phase, setPhase] = useState<Phase>("loading");
@@ -110,6 +121,8 @@ export function MatchesClient() {
         <>
           <p className={styles.lead}>
             The {matches.length} most recent uploaded matches across all players.
+            Click a row for the match page — per-round scrubbing appears when that
+            match was captured with a timeline.
           </p>
 
           {matches.length === 0 ? (
@@ -120,13 +133,15 @@ export function MatchesClient() {
                 <div className={styles.cell}>#</div>
                 <div className={`${styles.cell} ${styles.hideSm}`}>Date</div>
                 <div className={styles.cell}>Winner</div>
+                <div className={`${styles.cell} ${styles.hideSm}`}>Rounds</div>
                 <div className={styles.cell}>Players</div>
               </div>
               {matches.map((m, i) => {
                 const winner = m.players[0];
-                const display =
-                  winner?.name || winner?.customUrl || winner?.steamId || "Unknown";
-                const initial = (display.charAt(0) || "?").toUpperCase();
+                const display = winnerDisplayName(winner);
+                const initial = /^\d+$/.test(display)
+                  ? "?"
+                  : (display.charAt(0) || "?").toUpperCase();
                 const matchHref = `/matches/${m.representativeGameId}`;
                 return (
                   <div
@@ -180,6 +195,17 @@ export function MatchesClient() {
                           )}
                         </span>
                       </div>
+                    </div>
+                    <div className={`${styles.cell} ${styles.hideSm}`}>
+                      {m.hasTimeline ? (
+                        <span className={styles.roundsYes} title="Per-round scrubber available">
+                          {m.roundCount}
+                        </span>
+                      ) : (
+                        <span className={styles.roundsNo} title="Final board only — no timeline">
+                          —
+                        </span>
+                      )}
                     </div>
                     <div className={`${styles.cell} ${styles.placement}`}>
                       {m.players.length}

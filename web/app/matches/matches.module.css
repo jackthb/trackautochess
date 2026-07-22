@@ -18,7 +18,7 @@
 }
 .table {
   display: grid;
-  grid-template-columns: 56px 180px 1fr 64px;
+  grid-template-columns: 56px 180px 1fr 72px 64px;
   border: 1px solid var(--border);
   background: var(--bg-surface);
   border-radius: var(--r-8);
@@ -98,6 +98,14 @@
 }
 .placement {
   font-variant-numeric: tabular-nums;
+  color: var(--text-muted);
+}
+.roundsYes {
+  font-variant-numeric: tabular-nums;
+  color: var(--accent);
+  font-weight: 600;
+}
+.roundsNo {
   color: var(--text-muted);
 }
 .empty {

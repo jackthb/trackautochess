@@ -57,6 +57,8 @@ export interface MatchSummary {
   matchId: string | null;
   representativeGameId: number;
   playedAt: string;
+  hasTimeline: boolean;
+  roundCount: number;
   players: MatchPlayer[];
 }
 
@@ -184,6 +186,8 @@ export async function GET(req: Request) {
       matchId: m.matchId,
       representativeGameId: m.representativeGameId,
       playedAt: m.playedAt,
+      hasTimeline: false,
+      roundCount: 0,
       players: m.rows.map((r) => ({
         gameId: r.id,
         steamId: r.steam_id,
@@ -210,11 +214,35 @@ export async function GET(req: Request) {
     ),
   ];
 
+  const matchIds = matches
+    .map((m) => m.matchId)
+    .filter((id): id is string => Boolean(id));
+
+  if (matchIds.length > 0) {
+    const { data: timelineData } = await supabase
+      .from("match_timelines")
+      .select("match_id, timeline")
+      .in("match_id", matchIds);
+
+    const timelineMap = new Map<string, number>();
+    for (const row of timelineData ?? []) {
+      const rounds = (row.timeline as { rounds?: unknown[] } | null)?.rounds;
+      const count = Array.isArray(rounds) ? rounds.length : 0;
+      timelineMap.set(String(row.match_id), count);
+    }
+    for (const m of matches) {
+      if (!m.matchId) continue;
+      const count = timelineMap.get(m.matchId) ?? 0;
+      m.roundCount = count;
+      m.hasTimeline = count > 1;
+    }
+  }
+
   if (steamIds.length > 0) {
     const { data: userData } = await supabase
       .from("users")
       .select("steam_id::text, name, custom_url, avatar_url")
-      .filter("steam_id", "in", `(${steamIds.join(",")})`);
+      .in("steam_id", steamIds);
 
     const userMap = new Map<string, UserRow>();
     for (const u of (userData ?? []) as unknown as UserRow[]) {
