@@ -16,7 +16,7 @@ interface TrackerHomeProps {
 }
 
 /**
- * Single tracker screen: setup + account. Live match UI lives on the website;
+ * Single tracker screen: status + account. Live match UI lives on the website;
  * admin-only legendary popup is a Discord-styled always-on-top overlay.
  */
 export function TrackerHome({ unitsFull, netTable, status }: TrackerHomeProps) {
@@ -42,6 +42,14 @@ export function TrackerHome({ unitsFull, netTable, status }: TrackerHomeProps) {
   const steamId = status?.steam_id ?? null;
   const steamName = status?.steam_name || "Steam";
   const isAdmin = isAdminSteamId(steamId);
+  const setupNeedsWork = Boolean(
+    !netStatus ||
+      netStatus.remote_enabled === false ||
+      netStatus.autoexec_installed !== true ||
+      netStatus.has_condebug !== true ||
+      netStatus.has_conclearlog !== true ||
+      netStatus.has_gamestateintegration !== true,
+  );
 
   useEffect(() => {
     window.appApi.getVersion().then(setVersion);
@@ -83,11 +91,39 @@ export function TrackerHome({ unitsFull, netTable, status }: TrackerHomeProps) {
     }
   };
 
+  const autoUploadAt = pendingLeave
+    ? new Date(pendingLeave.expiresAt).toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+      })
+    : null;
+
   return (
     <div className="settings-tab">
-      <div className="settings-container">
+      <div className="settings-container tracker-home">
+        {pendingLeave && (
+          <section className="tracker-pending" aria-label="Pending match upload">
+            <div className="tracker-pending-copy">
+              <div className="tracker-pending-title">Match ready to upload</div>
+              <p className="tracker-pending-detail">
+                Left the lobby early. Upload now, or it goes up automatically at{" "}
+                {autoUploadAt}.
+              </p>
+            </div>
+            <button
+              type="button"
+              className="tracker-pending-action"
+              onClick={confirmMatchEnd}
+            >
+              Upload match
+            </button>
+          </section>
+        )}
+
         <div className="settings-section">
-          <div className="settings-section-title">Setup</div>
+          <div className="settings-section-title">
+            {setupNeedsWork ? "Setup" : "Status"}
+          </div>
           <NetTableSetupCard
             status={netStatus}
             lastApply={launchOptionsApplied}
@@ -97,36 +133,19 @@ export function TrackerHome({ unitsFull, netTable, status }: TrackerHomeProps) {
             queenUploadProgress={queenUploadProgress}
             livePlayers={livePlayers}
             localSteamIds={localSteamIds}
+            showQueenUpload={isAdmin}
           />
         </div>
 
-        {pendingLeave && (
-          <div className="settings-section">
-            <div className="settings-section-title">Upload</div>
-            <div className="settings-value dim" style={{ padding: "0 20px 12px", lineHeight: 1.45 }}>
-              If the game is over and you're not rejoining, upload it now. Otherwise
-              it uploads automatically at{" "}
-              {new Date(pendingLeave.expiresAt).toLocaleTimeString()}.
-            </div>
-            <button
-              type="button"
-              className="btn-ghost"
-              onClick={confirmMatchEnd}
-            >
-              Game's over — upload now
-            </button>
-          </div>
-        )}
-
         <div className="settings-section">
-          <div className="settings-section-title">Steam Account</div>
+          <div className="settings-section-title">Account</div>
           <div className="settings-row">
-            <span className="settings-label">Status</span>
+            <span className="settings-label">Steam</span>
             <span className="settings-value">{steamName}</span>
           </div>
           {steamId && (
             <div className="settings-row">
-              <span className="settings-label">Steam ID</span>
+              <span className="settings-label">ID</span>
               <span className="settings-value dim">{steamId}</span>
             </div>
           )}
@@ -136,14 +155,14 @@ export function TrackerHome({ unitsFull, netTable, status }: TrackerHomeProps) {
               className="btn-ghost"
               onClick={() => sendCommand({ cmd: "steam_logout" })}
             >
-              Logout
+              Log out
             </button>
           </div>
         </div>
 
         {isAdmin && (
           <div className="settings-section">
-            <div className="settings-section-title">Sync</div>
+            <div className="settings-section-title">Admin</div>
             <div className="settings-row">
               <span className="settings-label">Queued uploads</span>
               <Button
@@ -168,7 +187,7 @@ export function TrackerHome({ unitsFull, netTable, status }: TrackerHomeProps) {
             )}
             <div className="settings-row">
               <span className="settings-label">Legendary overlay</span>
-              <span className="settings-value dim">Ctrl+Shift+L toggles · docks to Dota</span>
+              <span className="settings-value dim">Ctrl+Shift+L</span>
             </div>
             <div className="settings-row">
               <span className="settings-label" />

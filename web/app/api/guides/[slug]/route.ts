@@ -1,5 +1,5 @@
 import { toApiReq } from "@/lib/abuseLog";
-import { isAdminSteamId } from "@/lib/admin";
+import { isBetaFeaturesEnabledForSteamId } from "@/lib/betaFeaturesServer";
 import { linkifyGuideBody } from "@/lib/guideLinks";
 import { getSessionUser } from "@/lib/sessionUser";
 import { createSupabaseAnonClient } from "@/lib/supabase";
@@ -9,11 +9,11 @@ interface Props {
   params: Promise<{ slug: string }>;
 }
 
-/** Admin-only single guide. Not public — see AdminGate on /guides/[slug]. */
+/** Beta-flagged single guide. Admins bypass via isBetaFeaturesEnabledForSteamId. */
 export async function GET(req: Request, { params }: Props) {
   const anon = createSupabaseAnonClient();
   const session = await getSessionUser(toApiReq(req), anon);
-  if (!isAdminSteamId(session.steamId)) {
+  if (!(await isBetaFeaturesEnabledForSteamId(session.steamId))) {
     return Response.json({ error: "Forbidden" }, { status: 403 });
   }
 

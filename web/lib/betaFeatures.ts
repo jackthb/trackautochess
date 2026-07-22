@@ -51,7 +51,11 @@ export function usePostHogFlagAccess(
 export function useBetaFeaturesAccess(
   steamId: string | null | undefined,
 ): BetaFeatureAccess {
-  return usePostHogFlagAccess(WEBSITE_BETA_FEATURES_FLAG, steamId);
+  const flagAccess = usePostHogFlagAccess(WEBSITE_BETA_FEATURES_FLAG, steamId);
+  // Admins always see beta pages (Matches nav, /matches, etc.) even when the
+  // PostHog flag is off or hasn't loaded for their distinct_id.
+  if (isAdminSteamId(steamId)) return "enabled";
+  return flagAccess;
 }
 
 export function useChatbotAccess(

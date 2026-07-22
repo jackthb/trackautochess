@@ -1,10 +1,8 @@
 import type { Metadata } from "next";
-import { AdminGate } from "@/components/app/AdminGate";
+import { BetaFeaturesGate } from "@/components/app/BetaFeaturesGate";
 import { GuidesIndexClient } from "./GuidesIndexClient";
 
-// Admin-only — see AdminGate. Deliberately no per-content SEO metadata and
-// noindex, since this page (and the data it fetches from /api/guides) is not
-// meant to be public yet.
+// Beta-flagged — see BetaFeaturesGate / website_beta_features. Admins bypass.
 export const metadata: Metadata = {
   title: "Guides",
   robots: "noindex, nofollow",
@@ -12,8 +10,8 @@ export const metadata: Metadata = {
 
 export default function GuidesIndexPage() {
   return (
-    <AdminGate>
+    <BetaFeaturesGate title="Guides">
       <GuidesIndexClient />
-    </AdminGate>
+    </BetaFeaturesGate>
   );
 }

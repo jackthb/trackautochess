@@ -1,5 +1,5 @@
 import { toApiReq } from "@/lib/abuseLog";
-import { isAdminSteamId } from "@/lib/admin";
+import { isBetaFeaturesEnabledForSteamId } from "@/lib/betaFeaturesServer";
 import { getSessionUser } from "@/lib/sessionUser";
 import { createSupabaseAnonClient } from "@/lib/supabase";
 import { guideIndexData } from "@/generated/content-data";
@@ -9,11 +9,11 @@ interface IndexGuide {
   title: string;
 }
 
-/** Admin-only guide index. Not public — see AdminGate on /guides. */
+/** Beta-flagged guide index. Admins bypass via isBetaFeaturesEnabledForSteamId. */
 export async function GET(req: Request) {
   const anon = createSupabaseAnonClient();
   const session = await getSessionUser(toApiReq(req), anon);
-  if (!isAdminSteamId(session.steamId)) {
+  if (!(await isBetaFeaturesEnabledForSteamId(session.steamId))) {
     return Response.json({ error: "Forbidden" }, { status: 403 });
   }
 

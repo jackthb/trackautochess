@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { PageLayout } from "@/components/PageLayout";
+import { BetaFeaturesGate } from "@/components/app/BetaFeaturesGate";
 import { DEFAULT_LOCALE } from "@/lib/i18n";
 import { getAllItems } from "@/lib/items";
 import { getAllUnits } from "@/lib/units";
@@ -14,6 +15,7 @@ const description =
 export const metadata: Metadata = {
   title,
   description,
+  robots: "noindex, nofollow",
   alternates: { canonical: "/builds" },
   openGraph: {
     title,
@@ -48,8 +50,10 @@ export default function BuildsPage() {
   }));
 
   return (
-    <PageLayout title="Builds">
-      <BuildsPageClient units={units} items={items} />
-    </PageLayout>
+    <BetaFeaturesGate title="Builds">
+      <PageLayout title="Builds">
+        <BuildsPageClient units={units} items={items} />
+      </PageLayout>
+    </BetaFeaturesGate>
   );
 }

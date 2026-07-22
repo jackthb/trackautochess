@@ -1,5 +1,6 @@
 import type { NextApiRequest } from "next";
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { normalizeSteamId64 } from "@/lib/admin";
 
 export interface SessionUser {
   steamId: string | null;
@@ -26,6 +27,5 @@ export async function getSessionUser(
     | { steam_id?: unknown }
     | null
     | undefined;
-  const steamId = meta && typeof meta.steam_id === "string" ? meta.steam_id : null;
-  return { steamId };
+  return { steamId: normalizeSteamId64(meta?.steam_id) };
 }

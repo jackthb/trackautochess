@@ -1,14 +1,14 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { AdminGate } from "@/components/app/AdminGate";
+import { BetaFeaturesGate } from "@/components/app/BetaFeaturesGate";
 
 const KeystaticApp = dynamic(() => import("./keystatic"), { ssr: false });
 
 export default function KeystaticAdminGate() {
   return (
-    <AdminGate allowDevBypass>
+    <BetaFeaturesGate title="CMS" allowDevBypass bare>
       <KeystaticApp />
-    </AdminGate>
+    </BetaFeaturesGate>
   );
 }

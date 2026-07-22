@@ -1,7 +1,6 @@
-"use client";
-
 import { useEffect, useState } from "react";
 import type { Session, SupabaseClient, User } from "@supabase/supabase-js";
+import { normalizeSteamId64 } from "@/lib/admin";
 
 /**
  * Shared browser auth-session state. Loads the singleton Supabase client
@@ -71,7 +70,7 @@ export function useSupabaseSession(): SupabaseSessionState {
     supabase,
     session,
     user,
-    steamId: metadataString(user, "steam_id"),
+    steamId: normalizeSteamId64(user?.user_metadata?.steam_id),
     customUrl: metadataString(user, "custom_url"),
     accessToken: session?.access_token ?? null,
     ready,

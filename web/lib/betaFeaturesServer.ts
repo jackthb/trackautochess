@@ -68,6 +68,7 @@ export async function isPostHogFlagEnabledForSteamId(
 export async function isBetaFeaturesEnabledForSteamId(
   steamId: string | null | undefined,
 ): Promise<boolean> {
+  if (isAdminSteamId(steamId)) return true;
   return isPostHogFlagEnabledForSteamId(
     steamId,
     WEBSITE_BETA_FEATURES_FLAG,

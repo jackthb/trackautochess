@@ -6,7 +6,6 @@ import { useRouter, usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { SITE_NAME } from "@/lib/site";
 import { trackEvent } from "@/lib/analytics";
-import { isAdminSteamId } from "@/lib/admin";
 import { useBetaFeaturesEnabled } from "@/lib/betaFeatures";
 import { useSupabaseSession } from "@/lib/useSupabaseSession";
 import { EntityIcon } from "@/components/EntityIcon";
@@ -28,7 +27,7 @@ const t = {
   matches: "Matches",
   creators: "Creators",
   patchNotes: "Patch Notes",
-  cms: "Admin CMS",
+  cms: "CMS",
   signOut: "Sign out",
   home: (n: string) => `${n} home`,
   fallbackPlayer: "Player",
@@ -130,7 +129,6 @@ export function AppNavBar() {
     ? playerProfilePath(sessionSteamId, sessionCustomUrl)
     : "/dashboard";
   const canSeeBetaFeatures = useBetaFeaturesEnabled(sessionSteamId);
-  const isAdmin = isAdminSteamId(sessionSteamId);
   const trackNavClick = (destination: string) => {
     trackEvent("Navigation Link Clicked", { source: "nav", destination });
   };
@@ -142,10 +140,13 @@ export function AppNavBar() {
   const standaloneLinks: { href: string; label: string; key: string }[] = [
     { href: "/talents", label: t.talents, key: "talents" },
     { href: "/queens", label: t.queens, key: "queens" },
-    { href: "/builds", label: t.builds, key: "builds" },
     { href: "/creators", label: t.creators, key: "creators" },
     ...(canSeeBetaFeatures
-      ? [{ href: "/matches", label: t.matches, key: "matches" }]
+      ? [
+          { href: "/builds", label: t.builds, key: "builds" },
+          { href: "/guides", label: "Guides", key: "guides" },
+          { href: "/matches", label: t.matches, key: "matches" },
+        ]
       : []),
     { href: "/patch-notes", label: t.patchNotes, key: "patch_notes" },
   ];
@@ -289,7 +290,7 @@ export function AppNavBar() {
                   )}
                   <span className={styles.navUser}>{displayName}</span>
                 </Link>
-                {isAdmin && (
+                {canSeeBetaFeatures && (
                   <Link href="/keystatic" className={styles.navBtn} prefetch={false} onClick={() => trackNavClick("keystatic")}>
                     {t.cms}
                   </Link>

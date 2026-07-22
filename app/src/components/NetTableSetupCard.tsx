@@ -18,6 +18,8 @@ interface NetTableSetupCardProps {
   queenUploadProgress: string | null;
   livePlayers?: Record<string, LivePlayer>;
   localSteamIds?: string[];
+  /** Admin-only tools (Queen ladder push). */
+  showQueenUpload?: boolean;
 }
 
 // Internal Dota integration flags applied by the backend. Keep these out of
@@ -54,6 +56,7 @@ export function NetTableSetupCard({
   queenUploadProgress,
   livePlayers = {},
   localSteamIds = [],
+  showQueenUpload = false,
 }: NetTableSetupCardProps) {
   const [applying, setApplying] = useState(false);
   const [uploadingQueens, setUploadingQueens] = useState(false);
@@ -139,11 +142,6 @@ export function NetTableSetupCard({
   const notSetup = Boolean(status && remoteEnabled && (!autoexecOk || needsApply));
   const cantTell = !status || Boolean(status && remoteEnabled && !setupHealthy && !notSetup);
 
-  const closeApp = useCallback(() => {
-    capture("app_close_clicked", { source: "setup_card" });
-    window.windowControls?.close();
-  }, []);
-
   if (status && !remoteEnabled) {
     return (
       <div className="nettable-status-disabled" role="status" aria-live="polite">
@@ -155,13 +153,18 @@ export function NetTableSetupCard({
           Game tracking is currently turned off remotely. Dota setup and logs can still be checked,
           but live capture will not run until tracking is re-enabled.
         </div>
-        <ActiveMatchControl onCheck={checkActiveMatch} />
-        <QueenUploadControl
-          uploading={uploadingQueens}
-          progress={queenUploadProgress}
-          result={queenUpload}
-          onUpload={uploadQueens}
-        />
+        <div className="tracker-tool-row">
+          <ActiveMatchControl onCheck={checkActiveMatch} compact />
+          {showQueenUpload && (
+            <QueenUploadControl
+              uploading={uploadingQueens}
+              progress={queenUploadProgress}
+              result={queenUpload}
+              onUpload={uploadQueens}
+              compact
+            />
+          )}
+        </div>
       </div>
     );
   }
@@ -176,39 +179,25 @@ export function NetTableSetupCard({
       : dotaRunning
         ? "Ready"
         : "Ready — start a match in Dota";
-    // Focus loss is normal while reading this app — don't restyle as a warning.
     const trackingModifier = activelyTracking ? " tracking" : " paused";
 
     return (
-      <div className="nettable-status-block">
-        <div
-          className={`nettable-setup-complete${trackingModifier}`}
-          role="status"
-          aria-live="polite"
-        >
-          <span
-            className={`nettable-setup-complete-dot${trackingModifier}`}
-            aria-hidden="true"
-          />
-          <span className="nettable-setup-complete-text">{trackingLabel}</span>
+      <div className="tracker-home-status" role="status" aria-live="polite">
+        <div className={`tracker-home-status-line${trackingModifier}`}>
+          <span className={`tracker-home-status-dot${trackingModifier}`} aria-hidden="true" />
+          <span className="tracker-home-status-text">{trackingLabel}</span>
         </div>
-        <div className="nettable-status-row">
+        <div className="tracker-tool-row">
           <ActiveMatchControl onCheck={checkActiveMatch} compact />
-          <QueenUploadControl
-            uploading={uploadingQueens}
-            progress={queenUploadProgress}
-            result={queenUpload}
-            onUpload={uploadQueens}
-            compact
-          />
-          <button
-            type="button"
-            className="btn-ghost nettable-pause-btn"
-            onClick={closeApp}
-            title="Close Track Auto Chess"
-          >
-            Close app
-          </button>
+          {showQueenUpload && (
+            <QueenUploadControl
+              uploading={uploadingQueens}
+              progress={queenUploadProgress}
+              result={queenUpload}
+              onUpload={uploadQueens}
+              compact
+            />
+          )}
         </div>
       </div>
     );
@@ -222,8 +211,6 @@ export function NetTableSetupCard({
 
   return (
     <div className="nettable-setup-card">
-      <div className="nettable-setup-header">Setup</div>
-
       <div className="nettable-setup-step">
         <div className={`nettable-setup-summary${notSetup ? " not-setup" : " unknown"}`}>
           <div className="nettable-setup-summary-title">{setupTitle}</div>
@@ -345,7 +332,7 @@ function ActiveMatchControl({
     <div className={`nettable-active-match-check${compact ? " compact" : ""}`}>
       <button
         type="button"
-        className="btn-ghost nettable-active-match-button"
+        className={compact ? "tracker-tool-link" : "btn-ghost nettable-active-match-button"}
         onClick={onCheck}
         title="Unpauses live capture and requests a full Dota Auto Chess lobby snapshot."
       >
@@ -382,11 +369,15 @@ function QueenUploadControl({
     <div className={`nettable-queen-upload${compact ? " compact" : ""}`}>
       <button
         type="button"
-        className={`btn-ghost nettable-queen-upload-button${uploading ? " btn-loading" : ""}`}
+        className={
+          compact
+            ? `tracker-tool-link${uploading ? " is-busy" : ""}`
+            : `btn-ghost nettable-queen-upload-button${uploading ? " btn-loading" : ""}`
+        }
         onClick={onUpload}
         disabled={uploading}
       >
-        {uploading ? "Uploading Queens…" : "Upload Queens now"}
+        {uploading ? "Uploading Queens…" : "Upload Queens"}
       </button>
       {(progress || resultText) && (
         <span className={`nettable-queen-upload-note${result && !result.ok ? " error" : ""}`}>

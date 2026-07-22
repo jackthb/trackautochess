@@ -1,14 +1,12 @@
 import type { Metadata } from "next";
-import { AdminGate } from "@/components/app/AdminGate";
+import { BetaFeaturesGate } from "@/components/app/BetaFeaturesGate";
 import { GuideDetailClient } from "./GuideDetailClient";
 
 interface Props {
   params: Promise<{ slug: string }>;
 }
 
-// Admin-only — see AdminGate. Deliberately no per-content SEO metadata and
-// noindex, since this page (and the data it fetches from /api/guides/[slug])
-// is not meant to be public yet.
+// Beta-flagged — see BetaFeaturesGate / website_beta_features. Admins bypass.
 export const metadata: Metadata = {
   title: "Guide",
   robots: "noindex, nofollow",
@@ -17,8 +15,8 @@ export const metadata: Metadata = {
 export default async function GuideDetailPage({ params }: Props) {
   const { slug } = await params;
   return (
-    <AdminGate>
+    <BetaFeaturesGate title="Guide">
       <GuideDetailClient slug={slug} />
-    </AdminGate>
+    </BetaFeaturesGate>
   );
 }
