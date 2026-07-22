@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import type { Session, SupabaseClient, User } from "@supabase/supabase-js";
-import { normalizeSteamId64 } from "@/lib/admin";
+import { normalizeSteamId64 } from "@dac/shared/steam";
 
 /**
  * Shared browser auth-session state. Loads the singleton Supabase client

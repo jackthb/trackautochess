@@ -20,6 +20,13 @@ export function parseSteamId64(input: string): SteamId64 | null {
   return isSteamId64(input) ? input : null;
 }
 
+/** Normalize session/metadata steam ids without Number() (ID64s exceed safe int). */
+export function normalizeSteamId64(value: unknown): string | null {
+  if (typeof value !== "string") return null;
+  const trimmed = value.trim();
+  return isSteamId64(trimmed) ? trimmed : null;
+}
+
 export function steamId64ToString(steamId: SteamId64): string {
   return steamId;
 }

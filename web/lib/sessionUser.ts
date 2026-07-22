@@ -1,6 +1,6 @@
 import type { NextApiRequest } from "next";
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { normalizeSteamId64 } from "@/lib/admin";
+import { normalizeSteamId64 } from "@dac/shared/steam";
 
 export interface SessionUser {
   steamId: string | null;
