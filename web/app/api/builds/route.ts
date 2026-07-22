@@ -1,6 +1,6 @@
 import { RateLimiterMemory } from "rate-limiter-flexible";
 import { getClientIp, logAbuse, toApiReq } from "@/lib/abuseLog";
-import { isAdminSteamId } from "@/lib/adminServer";
+import { isBetaFeaturesEnabledForSteamId } from "@/lib/betaFeaturesServer";
 import {
   fetchUsersBySteamIds,
   parseSteamId,
@@ -59,7 +59,7 @@ function sanitizePayload(build: SavedBuild): SavedBuild {
   };
 }
 
-/** Admin-only while /builds is gated on PostHog `admin_access`. */
+/** Beta-flagged while /builds is gated on website_beta_features (admins bypass). */
 export async function GET(req: Request) {
   const { service, error } = await requireService();
   if (error || !service) return error!;
@@ -70,7 +70,7 @@ export async function GET(req: Request) {
 
   const anon = createSupabaseAnonClient();
   const session = await getSessionUser(toApiReq(req), anon);
-  if (!(await isAdminSteamId(session.steamId))) {
+  if (!(await isBetaFeaturesEnabledForSteamId(session.steamId))) {
     return Response.json({ error: "Forbidden" }, { status: 403 });
   }
   const viewerSteamIdNum = session.steamId ? parseSteamId(session.steamId) : null;
@@ -158,7 +158,7 @@ export async function POST(req: Request) {
   const sessionResult = await requireSession(req);
   if ("error" in sessionResult) return sessionResult.error!;
   const { steamId, steamIdNum } = sessionResult;
-  if (!(await isAdminSteamId(steamId))) {
+  if (!(await isBetaFeaturesEnabledForSteamId(steamId))) {
     return Response.json({ error: "Forbidden" }, { status: 403 });
   }
 

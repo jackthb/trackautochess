@@ -9,6 +9,7 @@ import { AppNavBar } from "@/components/app/AppNavBar";
 import { Footer } from "@/components/Footer";
 import { trackEvent } from "@/lib/analytics";
 import { getPostHog } from "@/lib/posthog";
+import { SessionFlagsProvider } from "@/lib/sessionFlags";
 import { useSupabaseSession } from "@/lib/useSupabaseSession";
 
 const ChatWidget = dynamic(
@@ -95,7 +96,7 @@ export function AppChrome({ children }: { children: ReactNode }) {
   }, [supabase]);
 
   return (
-    <>
+    <SessionFlagsProvider>
       {process.env.NODE_ENV === "production" && (
         <BotIdClient protect={BOT_ID_PROTECTED_ROUTES} />
       )}
@@ -105,6 +106,6 @@ export function AppChrome({ children }: { children: ReactNode }) {
       <SpeedInsights />
       <CookieConsentBanner />
       <ChatWidget />
-    </>
+    </SessionFlagsProvider>
   );
 }

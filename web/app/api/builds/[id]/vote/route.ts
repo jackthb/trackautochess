@@ -1,6 +1,6 @@
 import { RateLimiterMemory } from "rate-limiter-flexible";
 import { getClientIp, logAbuse, toApiReq } from "@/lib/abuseLog";
-import { isAdminSteamId } from "@/lib/adminServer";
+import { isBetaFeaturesEnabledForSteamId } from "@/lib/betaFeaturesServer";
 import { parseSteamId, type CommunityBuildRow } from "@/lib/builds/server";
 import { isUuid } from "@/lib/builds/types";
 import { getSessionUser } from "@/lib/sessionUser";
@@ -41,7 +41,7 @@ export async function POST(req: Request, context: RouteContext) {
   if (steamIdNum == null) {
     return Response.json({ error: "Sign in required" }, { status: 401 });
   }
-  if (!(await isAdminSteamId(session.steamId))) {
+  if (!(await isBetaFeaturesEnabledForSteamId(session.steamId))) {
     return Response.json({ error: "Forbidden" }, { status: 403 });
   }
 

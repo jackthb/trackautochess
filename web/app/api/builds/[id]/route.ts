@@ -1,6 +1,6 @@
 import { RateLimiterMemory } from "rate-limiter-flexible";
 import { getClientIp, logAbuse, toApiReq } from "@/lib/abuseLog";
-import { isAdminSteamId } from "@/lib/adminServer";
+import { isBetaFeaturesEnabledForSteamId } from "@/lib/betaFeaturesServer";
 import {
   fetchUsersBySteamIds,
   parseSteamId,
@@ -52,7 +52,7 @@ export async function GET(req: Request, context: RouteContext) {
 
   const anon = createSupabaseAnonClient();
   const session = await getSessionUser(toApiReq(req), anon);
-  if (!(await isAdminSteamId(session.steamId))) {
+  if (!(await isBetaFeaturesEnabledForSteamId(session.steamId))) {
     return Response.json({ error: "Forbidden" }, { status: 403 });
   }
   const viewerSteamIdNum = session.steamId ? parseSteamId(session.steamId) : null;
@@ -106,7 +106,7 @@ export async function PATCH(req: Request, context: RouteContext) {
   if (steamIdNum == null || row.author_steam_id !== steamIdNum) {
     return Response.json({ error: "Forbidden" }, { status: 403 });
   }
-  if (!(await isAdminSteamId(session.steamId))) {
+  if (!(await isBetaFeaturesEnabledForSteamId(session.steamId))) {
     return Response.json({ error: "Forbidden" }, { status: 403 });
   }
 

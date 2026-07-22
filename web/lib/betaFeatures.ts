@@ -4,25 +4,40 @@ import { useEffect, useState } from "react";
 import { ADMIN_ACCESS_FLAG } from "@/lib/adminFlags";
 import { WEBSITE_BETA_FEATURES_FLAG } from "@/lib/betaFlags";
 import { getPostHog } from "@/lib/posthog";
+import { useSessionFlags, type FlagAccess } from "@/lib/sessionFlags";
 
-export type BetaFeatureAccess = "loading" | "enabled" | "disabled";
+export type BetaFeatureAccess = FlagAccess;
 
+/** @deprecated Prefer useSessionFlags — kept for any direct PostHog flag reads. */
 export function usePostHogFlagAccess(
   flagKey: string,
   steamId: string | null | undefined,
 ): BetaFeatureAccess {
-  const [access, setAccess] = useState<BetaFeatureAccess>("disabled");
+  const [access, setAccess] = useState<BetaFeatureAccess>(
+    steamId ? "loading" : "disabled",
+  );
 
   useEffect(() => {
-    setAccess("disabled");
-    if (!steamId) return;
+    if (!steamId) {
+      setAccess("disabled");
+      return;
+    }
 
     let cancelled = false;
-    let unsubscribe: (() => void) | undefined;
-
     setAccess("loading");
+
+    const failSafe = window.setTimeout(() => {
+      if (!cancelled) {
+        setAccess((prev) => (prev === "loading" ? "disabled" : prev));
+      }
+    }, 6_000);
+
     void getPostHog().then((posthog) => {
-      if (cancelled || !posthog) return;
+      if (cancelled) return;
+      if (!posthog) {
+        setAccess("disabled");
+        return;
+      }
 
       posthog.identify(steamId, { steam_id: steamId });
 
@@ -35,13 +50,13 @@ export function usePostHogFlagAccess(
       };
 
       update();
-      unsubscribe = posthog.onFeatureFlags(update);
+      posthog.onFeatureFlags(update);
       posthog.reloadFeatureFlags();
     });
 
     return () => {
       cancelled = true;
-      unsubscribe?.();
+      window.clearTimeout(failSafe);
     };
   }, [flagKey, steamId]);
 
@@ -49,24 +64,22 @@ export function usePostHogFlagAccess(
 }
 
 export function useBetaFeaturesAccess(
-  steamId: string | null | undefined,
+  _steamId?: string | null,
 ): BetaFeatureAccess {
-  const flagAccess = usePostHogFlagAccess(WEBSITE_BETA_FEATURES_FLAG, steamId);
-  const adminAccess = usePostHogFlagAccess(ADMIN_ACCESS_FLAG, steamId);
-  // Admins always see beta pages even when website_beta_features is off.
-  if (adminAccess === "enabled") return "enabled";
-  if (adminAccess === "loading" || flagAccess === "loading") return "loading";
-  return flagAccess;
+  const { beta } = useSessionFlags();
+  return beta;
 }
 
-export function useChatbotAccess(
-  steamId: string | null | undefined,
-): BetaFeatureAccess {
-  return usePostHogFlagAccess(ADMIN_ACCESS_FLAG, steamId);
+export function useChatbotAccess(_steamId?: string | null): BetaFeatureAccess {
+  const { admin } = useSessionFlags();
+  return admin;
 }
 
 export function useBetaFeaturesEnabled(
-  steamId: string | null | undefined,
+  steamId?: string | null | undefined,
 ): boolean {
   return useBetaFeaturesAccess(steamId) === "enabled";
 }
+
+// Re-export flag keys for callers that still import them from here.
+export { ADMIN_ACCESS_FLAG, WEBSITE_BETA_FEATURES_FLAG };

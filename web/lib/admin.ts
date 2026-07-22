@@ -1,13 +1,9 @@
 "use client";
 
 import { isSteamId64 } from "@dac/shared/steam";
-import { ADMIN_ACCESS_FLAG } from "@/lib/adminFlags";
-import {
-  usePostHogFlagAccess,
-  type BetaFeatureAccess,
-} from "@/lib/betaFeatures";
+import { useSessionFlags, type FlagAccess } from "@/lib/sessionFlags";
 
-export type AdminAccess = BetaFeatureAccess;
+export type AdminAccess = FlagAccess;
 
 /** Normalize session/metadata steam ids without Number() (ID64s exceed safe int). */
 export function normalizeSteamId64(value: unknown): string | null {
@@ -19,15 +15,15 @@ export function normalizeSteamId64(value: unknown): string | null {
 }
 
 /**
- * Client-side admin check via the PostHog `admin_access` feature flag.
- * Manage membership in PostHog (cohort / person release conditions), not in code.
+ * Client-side admin check via server-evaluated PostHog `admin_access`.
  */
 export function useAdminAccess(
-  steamId: string | null | undefined,
+  _steamId?: string | null | undefined,
 ): AdminAccess {
-  return usePostHogFlagAccess(ADMIN_ACCESS_FLAG, steamId);
+  const { admin } = useSessionFlags();
+  return admin;
 }
 
-export function useIsAdmin(steamId: string | null | undefined): boolean {
+export function useIsAdmin(steamId?: string | null | undefined): boolean {
   return useAdminAccess(steamId) === "enabled";
 }
