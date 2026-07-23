@@ -2,23 +2,28 @@
   "gameId": "is_assassin",
   "name": "Assassin",
   "slug": "assassin",
-  "icon": "synergies/assassin.png",
   "source": {
     "name": "Assassin",
     "names": {
       "en": "Assassin",
-      "ru": "Assassin"
+      "ru": "Assassin",
+      "zh-cn": "刺客",
+      "zh-tw": "刺客"
     },
-    "description": "The first movement of Assassin pieces in each round causes Assassins to leap over to the back of the enemy lineup. The first blow after Backstab Leap is always a critical strike with a random bonus damage amplifier.\n\nClass Perk: Coup de Grace\n Active when you have at least (N) different Assassin pieces on board. (Multiple effects stack)\n\n(3) Assassins: All friendly assassins have 15% chance to critical hit for 300% damage.\n(6) Assassins: All assassins have 15% chance to critical hit for 400% damage.\n(9) Assassins: All assassins refresh a Backstab Leap move after killing an enemy or a certain duration. This Backstab Leap always deals the maximum possible critical damage.",
+    "description": "The first movement of Assassin pieces in each round causes Assassins to leap over to the back of the enemy lineup. The first blow after Backstab Leap is always a critical strike with a random bonus damage amplifier.\n\nClass Perk: Coup de Grace\n Active when you have at least (N) different Assassin pieces on board. (Multiple effects stack)\n\n(3) Assassins: All friendly assassins have 15% chance to critical hit for 200% damage.\n(6) Assassins: All assassins have 15% chance to critical hit for 400% damage.\n(9) Assassins: All assassins refresh a Backstab Leap move after killing an enemy or a certain duration. This Backstab Leap always deals the maximum possible critical damage.",
     "descriptions": {
-      "en": "The first movement of Assassin pieces in each round causes Assassins to leap over to the back of the enemy lineup. The first blow after Backstab Leap is always a critical strike with a random bonus damage amplifier.\n\nClass Perk: Coup de Grace\n Active when you have at least (N) different Assassin pieces on board. (Multiple effects stack)\n\n(3) Assassins: All friendly assassins have 15% chance to critical hit for 300% damage.\n(6) Assassins: All assassins have 15% chance to critical hit for 400% damage.\n(9) Assassins: All assassins refresh a Backstab Leap move after killing an enemy or a certain duration. This Backstab Leap always deals the maximum possible critical damage.",
-      "ru": "Первым движением фигуры ассасинов в каждом раунде прыгают за врагов. Первый удар после прыжка с ударом в спину всегда является критическим ударом, который увеличивает случайный дополнительный урон.\n\nClass Perk: Coup de Grace\n Активен, когда у вас на столе есть минимум (N) различных фигур Ассасинов. (Эффекты складываются)\n\n(3) Ассасины: Все дружественные Ассасины имеют 15% шанс нанести критический удар, наносящий 300% урона.\n(6) Ассасины: Все дружественные Ассасины имеют 15% шанс нанести критический удар, наносящий 400% урона.\n(9) Ассасины: Все ассасины обновляют Удар в спину после убийства врага или по истечении определенного времени. Удар в спину всегда наносит максимально возможный критический урон."
+      "en": "The first movement of Assassin pieces in each round causes Assassins to leap over to the back of the enemy lineup. The first blow after Backstab Leap is always a critical strike with a random bonus damage amplifier.\n\nClass Perk: Coup de Grace\n Active when you have at least (N) different Assassin pieces on board. (Multiple effects stack)\n\n(3) Assassins: All friendly assassins have 15% chance to critical hit for 200% damage.\n(6) Assassins: All assassins have 15% chance to critical hit for 400% damage.\n(9) Assassins: All assassins refresh a Backstab Leap move after killing an enemy or a certain duration. This Backstab Leap always deals the maximum possible critical damage.",
+      "ru": "Первым движением фигуры ассасинов в каждом раунде прыгают за врагов. Первый удар после прыжка с ударом в спину всегда является критическим ударом, который увеличивает случайный дополнительный урон.\n\nClass Perk: Coup de Grace\n Активен, когда у вас на столе есть минимум (N) различных фигур Ассасинов. (Эффекты складываются)\n\n(3) Ассасины: Все дружественные Ассасины имеют 15% шанс нанести критический удар, наносящий 300% урона.\n(6) Ассасины: Все дружественные Ассасины имеют 15% шанс нанести критический удар, наносящий 400% урона.\n(9) Ассасины: Все ассасины обновляют Удар в спину после убийства врага или по истечении определенного времени. Удар в спину всегда наносит максимально возможный критический урон.",
+      "zh-cn": "刺客棋子开始战斗时会直接背刺跳跃到敌方阵型后方，背刺跳跃后的第一次攻击必造成随机可能倍数的暴击伤害。\n\n职业技能：致命一击\n 需要己方场上有至少（N）个不同的此职业的棋子来触发效果（触发的多层效果可以叠加）。\n\n（3）刺客：所有友方刺客的攻击有15%概率造成2倍伤害。\n（6）刺客：所有友方刺客的攻击有15%概率造成4倍伤害。\n（9）刺客：所有友方刺客的背刺跳跃总是造成最高可能倍数的暴击伤害，每当击杀敌人或隔一段时间获得一次额外的背刺跳跃。",
+      "zh-tw": "刺客棋子開始戰鬥時會直接背刺跳躍到敵方陣型後方，背刺跳躍後的第一次攻擊必造成隨機可能倍數的暴擊傷害。\n\n職業技能：致命一擊\n 需要己方場上有至少（N）個不同的此職業的棋子來觸發效果（觸發的多層效果可以疊加）。\n\n（3）刺客：所有友方刺客的攻擊有15%概率造成2倍傷害。\n（6）刺客：所有友方刺客的攻擊有15%概率造成4倍傷害。\n（9）刺客：所有友方刺客的背刺跳躍總是造成最高可能倍數的暴擊傷害，每當擊殺敵人或隔一段時間獲得一次額外的背刺跳躍。"
     },
-    "description_html": "The first movement of Assassin pieces in each round causes Assassins to leap over to the back of the enemy lineup. The first blow after Backstab Leap is always a critical strike with a random bonus damage amplifier.\n<h1>Class Perk: Coup de Grace</h1><font color=\"#656585\">Active when you have at least (N) different Assassin pieces on board. (Multiple effects stack)</font><br><br>(3) Assassins: All friendly assassins have 15% chance to critical hit for 300% damage.<br>(6) Assassins: All assassins have 15% chance to critical hit for 400% damage.<br>(9) Assassins: All assassins refresh a Backstab Leap move after killing an enemy or a certain duration. This Backstab Leap always deals the maximum possible critical damage.",
+    "description_html": "The first movement of Assassin pieces in each round causes Assassins to leap over to the back of the enemy lineup. The first blow after Backstab Leap is always a critical strike with a random bonus damage amplifier.\n<h1>Class Perk: Coup de Grace</h1><font color=\"#656585\">Active when you have at least (N) different Assassin pieces on board. (Multiple effects stack)</font><br><br>(3) Assassins: All friendly assassins have 15% chance to critical hit for 200% damage.<br>(6) Assassins: All assassins have 15% chance to critical hit for 400% damage.<br>(9) Assassins: All assassins refresh a Backstab Leap move after killing an enemy or a certain duration. This Backstab Leap always deals the maximum possible critical damage.",
     "lore": "Assassins are skilled executioners that leap into enemy backlines. Together, they gain a keen eye for weaknesses in enemy armor, gaining the ability to deliver devastating critical hits.",
     "lore_i18n": {
       "en": "Assassins are skilled executioners that leap into enemy backlines. Together, they gain a keen eye for weaknesses in enemy armor, gaining the ability to deliver devastating critical hits.",
-      "ru": "Assassins — искусные убийцы, прыгающие в тыл врага. Вместе они лучше видят уязвимости в броне и получают способность наносить разрушительные критические удары."
+      "ru": "Assassins — искусные убийцы, прыгающие в тыл врага. Вместе они лучше видят уязвимости в броне и получают способность наносить разрушительные критические удары.",
+      "zh-cn": "刺客的信条就是契约，而荣誉则可以用金钱来交易。这些雇佣兵们不会被良知束缚，习惯依赖于残忍而高效的战术。",
+      "zh-tw": "刺客的信條就是契約，而榮譽則可以用金錢來交易。這些僱傭兵們不會被良知束縛，習慣依賴於殘忍而高效的戰術。"
     },
     "notes": [],
     "tiers": [
@@ -28,5 +33,6 @@
     ],
     "ability_special": {}
   },
-  "overrides": {}
+  "overrides": {},
+  "icon": "synergies/assassin.png"
 }

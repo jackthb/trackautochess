@@ -2,26 +2,32 @@
   "gameId": "item_ahalimushenzhang",
   "name": "Aghanims Scepter",
   "slug": "aghanims-scepter",
-  "icon": "items/ultimate_scepter.png",
   "source": {
     "name": "Aghanims Scepter",
     "names": {
       "en": "Aghanims Scepter",
-      "ru": "Aghanims Scepter"
+      "ru": "Aghanims Scepter",
+      "zh-cn": "阿哈利姆神杖",
+      "zh-tw": "阿哈利姆神杖"
     },
     "description": "+40% Magic Damage.\nChess piece skill level +1 of the carrier.",
     "descriptions": {
       "en": "+40% Magic Damage.\nChess piece skill level +1 of the carrier.",
-      "ru": "+40% Маг.урона.\nПоднимает уровень способности фигуры на +1"
+      "ru": "+40% Маг.урона.\nПоднимает уровень способности фигуры на +1",
+      "zh-cn": "魔法伤害+40%。\n携带者的棋子技能等级+1。",
+      "zh-tw": "魔法傷害+40%。\n攜帶者的棋子技能等級+1。"
     },
     "lore": "The scepter of a wizard with demigod-like powers.",
     "lore_i18n": {
       "en": "The scepter of a wizard with demigod-like powers.",
-      "ru": "Скипетр мага с силой полубога."
+      "ru": "Скипетр мага с силой полубога.",
+      "zh-cn": "这把权杖属于拥有半神之力的法师。",
+      "zh-tw": "這把權杖屬於擁有半神之力的法師。"
     },
     "quality": "consumable",
     "texture": "ultimate_scepter",
     "notes": []
   },
-  "overrides": {}
+  "overrides": {},
+  "icon": "items/ultimate_scepter.png"
 }

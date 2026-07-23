@@ -2,23 +2,28 @@
   "gameId": "is_ogre",
   "name": "Ogre",
   "slug": "ogre",
-  "icon": "synergies/ogre.png",
   "source": {
     "name": "Ogre",
     "names": {
       "en": "Ogre",
-      "ru": "Ogre"
+      "ru": "Ogre",
+      "zh-cn": "食人魔",
+      "zh-tw": "食人魔"
     },
     "description": "SPECIES TRAIT: Iron Fist\n Active when you have at least (N) different pieces of this species on board. (Multiple effects stack)\n\n(2) Ogres: Each ogre can eat up allies nearby (A cross of 4 grids) whose level is lower than itself and gains their 60% HP and Damage. Deals extra damage to enemys courier equals to the sum of all its victims when winning an away-home battle.",
     "descriptions": {
       "en": "SPECIES TRAIT: Iron Fist\n Active when you have at least (N) different pieces of this species on board. (Multiple effects stack)\n\n(2) Ogres: Each ogre can eat up allies nearby (A cross of 4 grids) whose level is lower than itself and gains their 60% HP and Damage. Deals extra damage to enemys courier equals to the sum of all its victims when winning an away-home battle.",
-      "ru": "SPECIES TRAIT: Iron Fist\n Активна, когда минимум (N) разных Ogre на столе.(Эффекты складываются)\n\n(2) Ogres: Каждый огр может съедать союзников, находящихся рядом (крест из 4 клеток), чьи уровни ниже его, и получает 60% их здоровья и урона. Наносит дополнительный урон курьеру врага, равный сумме всех его жертв, при победе на вражеском поле."
+      "ru": "SPECIES TRAIT: Iron Fist\n Активна, когда минимум (N) разных Ogre на столе.(Эффекты складываются)\n\n(2) Ogres: Каждый огр может съедать союзников, находящихся рядом (крест из 4 клеток), чьи уровни ниже его, и получает 60% их здоровья и урона. Наносит дополнительный урон курьеру врага, равный сумме всех его жертв, при победе на вражеском поле.",
+      "zh-cn": "种族技能：高丽亚铁腕\n 需要己方场上有至少（N）个不同的此种族的棋子来触发效果（触发的多层效果可以叠加）。\n\n（2）食人魔：所有食人魔棋子获得效果：开始战斗前吞食上下左右四个格子的等级不高于自己的友方棋子，获得它们60%的生命值和攻击力。",
+      "zh-tw": "種族技能：高麗亞鐵腕\n 需要己方場上有至少（N）個不同的此種族的棋子來觸發效果（觸發的多層效果可以疊加）。\n\n（2）食人魔：所有食人魔棋子獲得效果：開始戰鬥前吞食上下左右四個格子的等級不高於自己的友方棋子，獲得它們60%的生命值和攻擊力。"
     },
     "description_html": "<h1>SPECIES TRAIT: Iron Fist</h1><font color=\"#656585\">Active when you have at least (N) different pieces of this species on board. (Multiple effects stack)</font><br><br>(2) Ogres:  Each ogre can eat up allies nearby (A cross of 4 grids) whose level is lower than itself and gains their 60% HP and Damage. Deals extra damage to enemys courier equals to the sum of all its victims when winning an away-home battle.",
     "lore": "Ogres have two heads, or was it three? More heads, more stamina!",
     "lore_i18n": {
       "en": "Ogres have two heads, or was it three? More heads, more stamina!",
-      "ru": "У огров две головы, или три? Чем больше голов, тем больше выносливости!"
+      "ru": "У огров две головы, или три? Чем больше голов, тем больше выносливости!",
+      "zh-cn": "食人魔是一个曾经统治啦啦星球的拥有部分双头成员的强大种族，他们拥有自己的文化和城市，他们有不亚于兽人的种群和氏族。",
+      "zh-tw": "食人魔是一個曾經統治啦啦星球的擁有部分雙頭成員的強大種族，他們擁有自己的文化和城市，他們有不亞於獸人的種羣和氏族。"
     },
     "notes": [
       "Deals extra damage to enemys courier equals to the sum of all its victims when winning an away-home battle."
@@ -28,5 +33,6 @@
     ],
     "ability_special": {}
   },
-  "overrides": {}
+  "overrides": {},
+  "icon": "synergies/ogre.png"
 }

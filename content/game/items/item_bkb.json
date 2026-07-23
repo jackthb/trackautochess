@@ -2,26 +2,32 @@
   "gameId": "item_bkb",
   "name": "Black King Bar",
   "slug": "black-king-bar",
-  "icon": "items/black_king_bar.png",
   "source": {
     "name": "Black King Bar",
     "names": {
       "en": "Black King Bar",
-      "ru": "Black King Bar"
+      "ru": "Black King Bar",
+      "zh-cn": "黑皇杖",
+      "zh-tw": "黑皇杖"
     },
     "description": "+600 HP. \n\nActive ability: Activates when taking damage\nGrants spell immunity and 75% magic resistance for 4 sec. Dispels negative statuses from the caster on activation.",
     "descriptions": {
       "en": "+600 HP. \n\nActive ability: Activates when taking damage\nGrants spell immunity and 75% magic resistance for 4 sec. Dispels negative statuses from the caster on activation.",
-      "ru": "+600 к Здоровью. \n\nАктивка: Активируется при получении урона\nДаёт иммунитет к заклинаниям и 75% сопротивления магии на 4 секунды. Снимает отрицательные статусы с заклинателя при активации."
+      "ru": "+600 к Здоровью. \n\nАктивка: Активируется при получении урона\nДаёт иммунитет к заклинаниям и 75% сопротивления магии на 4 секунды. Снимает отрицательные статусы с заклинателя при активации.",
+      "zh-cn": "生命值+600。\n\n主动技能：受伤时激活\n驱散自身的不良状态，并获得75%魔法抗性和技能免疫，持续4秒。",
+      "zh-tw": "生命值+600。\n\n主動技能：受傷時激活\n驅散自身的不良狀態，並獲得75%魔法抗性和技能免疫，持續4秒。"
     },
     "lore": "A powerful staff imbued with the strength of giants.",
     "lore_i18n": {
       "en": "A powerful staff imbued with the strength of giants.",
-      "ru": "Мощный посох, наделенный силой великанов."
+      "ru": "Мощный посох, наделенный силой великанов.",
+      "zh-cn": "渗透了巨人之力的强大法杖。",
+      "zh-tw": "滲透了巨人之力的強大法杖。"
     },
     "quality": "rare",
     "texture": "item_black_king_bar",
     "notes": []
   },
-  "overrides": {}
+  "overrides": {},
+  "icon": "items/black_king_bar.png"
 }

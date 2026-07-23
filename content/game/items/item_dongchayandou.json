@@ -2,26 +2,32 @@
   "gameId": "item_dongchayandou",
   "name": "Pipe of Insight",
   "slug": "pipe-of-insight",
-  "icon": "items/pipe.png",
   "source": {
     "name": "Pipe of Insight",
     "names": {
       "en": "Pipe of Insight",
-      "ru": "Pipe of Insight"
+      "ru": "Pipe of Insight",
+      "zh-cn": "洞察烟斗",
+      "zh-tw": "洞察菸斗"
     },
     "description": "+10 health regeneration, +50% magic resistance.\n\nActive ability: Activates when taking damage\nGrants ranged allies with +10 health regeneration, +50% magic resistance for 10 sec.\n\nRange:500",
     "descriptions": {
       "en": "+10 health regeneration, +50% magic resistance.\n\nActive ability: Activates when taking damage\nGrants ranged allies with +10 health regeneration, +50% magic resistance for 10 sec.\n\nRange:500",
-      "ru": "+10 к восстановлению здоровья, +50% маг.резисту.\n\nАктивка: При получении урона\nДаёт союзникам +10 к регенерации здоровья, +50% сопротивления магии на 10 секунд, в радусе действия. \n\nРадиус:500"
+      "ru": "+10 к восстановлению здоровья,\n +50% маг.резисту.\n\nАктивка: При получении урона\nДаёт союзникам +10 к регенерации здоровья, +50% сопротивления магии на 10 секунд, в радусе действия. \n\nРадиус:500",
+      "zh-cn": "魔法抗性+50%，生命回复+10。\n\n主动技能：受伤时激活\n使范围内所有友军获得：魔法抗性+50%，生命回复+10，持续10秒。",
+      "zh-tw": "魔法抗性+50%，生命回覆+10。\n\n主動技能：受傷時激活\n使範圍內所有友軍獲得：魔法抗性+50%，生命回覆+10，持續10秒。"
     },
     "lore": "A powerful artifact of mysterious origin, it creates barriers against magical forces.",
     "lore_i18n": {
       "en": "A powerful artifact of mysterious origin, it creates barriers against magical forces.",
-      "ru": "Мощный артефакт таинственного происхождения создает барьеры, препятствующие воздействию магических сил."
+      "ru": "Мощный артефакт таинственного происхождения создает барьеры, препятствующие воздействию магических сил.",
+      "zh-cn": "一件来源神秘的强大古物，能制造出抵挡法术攻击的护盾。",
+      "zh-tw": "一件來源神祕的強大古物，能製造出抵擋法術攻擊的護盾。"
     },
     "quality": "rare",
     "texture": "item_pipe",
     "notes": []
   },
-  "overrides": {}
+  "overrides": {},
+  "icon": "items/pipe.png"
 }

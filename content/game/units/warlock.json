@@ -2,7 +2,6 @@
   "gameId": "chess_wl",
   "name": "Warlock",
   "slug": "warlock",
-  "icon": "units/warlock.png",
   "source": {
     "id": "chess_wl",
     "cost": 5,
@@ -60,5 +59,6 @@
       }
     }
   },
-  "overrides": {}
+  "overrides": {},
+  "icon": "units/warlock.png"
 }

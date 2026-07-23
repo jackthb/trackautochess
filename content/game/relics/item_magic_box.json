@@ -2,20 +2,27 @@
   "gameId": "item_magic_box",
   "name": "Magic box",
   "slug": "magic-box",
-  "icon": "relics/magic_box.png",
   "source": {
     "name": "Magic box",
     "names": {
       "en": "Magic box",
-      "ru": "Magic box"
+      "ru": "Magic box",
+      "zh-cn": "魔术箱",
+      "zh-tw": "魔術箱"
     },
-    "description": "Packs an ally piece, at the beginning of next round, transforms it into a randon new piece of the same Level and Rank. 12 times available.",
+    "description": "Packs an ally piece, at the beginning of next round, transforms it into a randon new piece of the same Level and Rank. 15 times available.",
     "descriptions": {
-      "en": "Packs an ally piece, at the beginning of next round, transforms it into a randon new piece of the same Level and Rank. 12 times available.",
-      "ru": "Упаковывает союзную фигуру, и в начале следующего раунда превращает её в случайную фигуру того же уровня и ранга. Доступно 12 зарядов."
+      "en": "Packs an ally piece, at the beginning of next round, transforms it into a randon new piece of the same Level and Rank. 15 times available.",
+      "ru": "Упаковывает союзную фигуру. В начале следующего раунда превращает её в случайную новую фигуру того же уровня и ранга. Можно использовать 15 раз.",
+      "zh-cn": "圣物消耗品：点击使用\n指定一个等待席上的友方棋子，在下一回合开始时将它们变成同等级同星的其他棋子。可以使用15次。",
+      "zh-tw": "聖物消耗品：點擊使用\n指定一個等待席上的友方棋子，在下一回合開始時將它們變成同等級同星的其他棋子。可以使用15次。"
     },
     "lore": "",
-    "lore_i18n": {}
+    "lore_i18n": {
+      "zh-cn": "来自：圣物宝箱",
+      "zh-tw": "來自：聖物寶箱"
+    }
   },
-  "overrides": {}
+  "overrides": {},
+  "icon": "relics/magic_box.png"
 }

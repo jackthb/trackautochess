@@ -2,7 +2,6 @@
   "gameId": "chess_ds",
   "name": "DarkSeer",
   "slug": "darkseer",
-  "icon": "units/dark_seer.png",
   "source": {
     "id": "chess_ds",
     "cost": 2,
@@ -60,5 +59,6 @@
       }
     }
   },
-  "overrides": {}
+  "overrides": {},
+  "icon": "units/dark_seer.png"
 }

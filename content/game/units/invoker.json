@@ -2,7 +2,6 @@
   "gameId": "chess_kael",
   "name": "Invoker",
   "slug": "invoker",
-  "icon": "units/invoker.png",
   "source": {
     "id": "chess_kael",
     "cost": 5,
@@ -60,5 +59,6 @@
       }
     }
   },
-  "overrides": {}
+  "overrides": {},
+  "icon": "units/invoker.png"
 }

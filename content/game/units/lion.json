@@ -2,7 +2,6 @@
   "gameId": "chess_lion",
   "name": "Lion",
   "slug": "lion",
-  "icon": "units/lion.png",
   "source": {
     "id": "chess_lion",
     "cost": 4,
@@ -60,5 +59,6 @@
       }
     }
   },
-  "overrides": {}
+  "overrides": {},
+  "icon": "units/lion.png"
 }

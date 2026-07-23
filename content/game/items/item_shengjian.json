@@ -2,26 +2,32 @@
   "gameId": "item_shengjian",
   "name": "Rapier",
   "slug": "rapier",
-  "icon": "items/rapier.png",
   "source": {
     "name": "Rapier",
     "names": {
       "en": "Rapier",
-      "ru": "Rapier"
+      "ru": "Rapier",
+      "zh-cn": "圣剑",
+      "zh-tw": "聖劍"
     },
     "description": "Basic Attack Damage: +350, Skill Damage: +25%.\n If defeated on home battle and the courier takes damage, it drops to a random other player. Cannot be reforged.",
     "descriptions": {
       "en": "Basic Attack Damage: +350, Skill Damage: +25%.\n If defeated on home battle and the courier takes damage, it drops to a random other player. Cannot be reforged.",
-      "ru": "Урон от базовой атаки: +350, урон от навыков: +25%.\n Если курьер получает урон при поражении на домашнем поле, он передается случайному игроку. Перековке не подлежит."
+      "ru": "Урон от базовой атаки: +350, урон от навыков: +25%.\n Если курьер получает урон при поражении на домашнем поле, он передается случайному игроку. Перековке не подлежит.",
+      "zh-cn": "基础攻击力+350，技能伤害+25%。\n如果主场战败且信使受到伤害，则会掉落给一个随机其他玩家。不可被重铸。",
+      "zh-tw": "基礎攻擊力+350，技能傷害+25%。\n如果主場戰敗且信使受到傷害，則會掉落給一個隨機其他玩家。不可被重鑄。"
     },
     "lore": "So powerful, it cannot have a single owner.",
     "lore_i18n": {
       "en": "So powerful, it cannot have a single owner.",
-      "ru": "Он настолько могущественен, что у него не может быть одного владельца."
+      "ru": "Он настолько могущественен, что у него не может быть одного владельца.",
+      "zh-cn": "它强横无匹，并不满足于侍奉唯一的主人。",
+      "zh-tw": "它強橫無匹，並不滿足於侍奉唯一的主人。"
     },
     "quality": "artifact",
     "texture": "item_rapier",
     "notes": []
   },
-  "overrides": {}
+  "overrides": {},
+  "icon": "items/rapier.png"
 }

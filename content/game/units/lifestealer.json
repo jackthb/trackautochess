@@ -2,7 +2,6 @@
   "gameId": "chess_naix",
   "name": "Lifestealer",
   "slug": "lifestealer",
-  "icon": "units/lifestealer.png",
   "source": {
     "id": "chess_naix",
     "cost": 2,
@@ -61,5 +60,6 @@
       }
     }
   },
-  "overrides": {}
+  "overrides": {},
+  "icon": "units/lifestealer.png"
 }

@@ -2,7 +2,6 @@
   "gameId": "chess_kez",
   "name": "Kez",
   "slug": "kez",
-  "icon": "units/kez.png",
   "source": {
     "id": "chess_kez",
     "cost": 3,
@@ -60,5 +59,6 @@
       }
     }
   },
-  "overrides": {}
+  "overrides": {},
+  "icon": "units/kez.png"
 }

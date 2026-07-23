@@ -1,0 +1,24 @@
+{
+  "gameId": "item_exchange_items",
+  "name": "Armory Array",
+  "slug": "armory-array",
+  "source": {
+    "name": "Armory Array",
+    "names": {
+      "en": "Armory Array",
+      "ru": "Armory Array",
+      "zh-cn": "武器阵列",
+      "zh-tw": "武器陣列"
+    },
+    "description": "Relic Consumable: Click to use\nConsumes (item level) charges to replace the item carried by the courier with a random item of the same level. Can be used 15 times.",
+    "descriptions": {
+      "en": "Relic Consumable: Click to use\nConsumes (item level) charges to replace the item carried by the courier with a random item of the same level. Can be used 15 times.",
+      "ru": "Расходуемый реликт: Нажмите, чтобы использовать.\nРасходует заряд, чтобы заменить предмет курьера случайным предметом того же уровня. Можно использовать 15 раз.",
+      "zh-cn": "圣物消耗品：点击使用\n消耗（装备等级）点使用次数，将信使携带的装备替换为随机同等级装备。可以使用15次。",
+      "zh-tw": "聖物消耗品：點擊使用\n消耗（裝備等級）點使用次數，將信使攜帶的裝備替換爲隨機同等級裝備。可以使用15次。"
+    },
+    "lore": "",
+    "lore_i18n": {}
+  },
+  "overrides": {}
+}

@@ -2,26 +2,32 @@
   "gameId": "item_linkenfaqiu",
   "name": "Linkens Sphere",
   "slug": "linkens-sphere",
-  "icon": "items/sphere.png",
   "source": {
     "name": "Linkens Sphere",
     "names": {
       "en": "Linkens Sphere",
-      "ru": "Linkens Sphere"
+      "ru": "Linkens Sphere",
+      "zh-cn": "林肯法球",
+      "zh-tw": "林肯法球"
     },
     "description": "+300 health, +100% mana regeneration.\nBlocks targeted spell or item.",
     "descriptions": {
       "en": "+300 health, +100% mana regeneration.\nBlocks targeted spell or item.",
-      "ru": "+300 ХП, +100% мана герен.\nБлокирует нацеленное заклинание или предмет."
+      "ru": "+300 ХП, +100% мана герен.\nБлокирует нацеленное заклинание или предмет.",
+      "zh-cn": "生命值+300，法力获取+100%。\n抵挡指向性法术或物品。",
+      "zh-tw": "生命值+300，法力獲取+100%。\n抵擋指向性法術或物品。"
     },
     "lore": "This magical sphere once protected one of the most famous heroes in history.",
     "lore_i18n": {
       "en": "This magical sphere once protected one of the most famous heroes in history.",
-      "ru": "Эта магическая сфера когда-то защищала одного из самых прославленных героев в истории."
+      "ru": "Эта магическая сфера когда-то защищала одного из самых прославленных героев в истории.",
+      "zh-cn": "这个有魔力的球体曾经保护了一位历史上最有名的英雄。",
+      "zh-tw": "這個有魔力的球體曾經保護了一位歷史上最有名的英雄。"
     },
     "quality": "rare",
     "texture": "item_sphere",
     "notes": []
   },
-  "overrides": {}
+  "overrides": {},
+  "icon": "items/sphere.png"
 }

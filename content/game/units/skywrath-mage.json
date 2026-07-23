@@ -2,7 +2,6 @@
   "gameId": "chess_sm",
   "name": "Skywrath Mage",
   "slug": "skywrath-mage",
-  "icon": "units/skywrath_mage.png",
   "source": {
     "id": "chess_sm",
     "cost": 1,
@@ -60,5 +59,6 @@
       }
     }
   },
-  "overrides": {}
+  "overrides": {},
+  "icon": "units/skywrath_mage.png"
 }

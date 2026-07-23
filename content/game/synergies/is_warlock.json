@@ -2,23 +2,28 @@
   "gameId": "is_warlock",
   "name": "Warlock",
   "slug": "warlock",
-  "icon": "synergies/warlock.png",
   "source": {
     "name": "Warlock",
     "names": {
       "en": "Warlock",
-      "ru": "Warlock"
+      "ru": "Warlock",
+      "zh-cn": "术士",
+      "zh-tw": "術士"
     },
     "description": "Warlock pieces convert 25% of their health into 50% mana when a battle starts.\n\nClass Perk: Soul Leech\n Active when you have at least (N) different Warlock pieces on board. (Multiple effects stack)\n\n(2) Warlocks: All allies have All allies have +5% lifesteal from all damage dealt.\n(4) Warlocks: All allies have All allies have +20% lifesteal from all damage dealt.\n(6) Warlocks: All ally warlocks steal a max health of 0.5x damage on every attack.",
     "descriptions": {
       "en": "Warlock pieces convert 25% of their health into 50% mana when a battle starts.\n\nClass Perk: Soul Leech\n Active when you have at least (N) different Warlock pieces on board. (Multiple effects stack)\n\n(2) Warlocks: All allies have All allies have +5% lifesteal from all damage dealt.\n(4) Warlocks: All allies have All allies have +20% lifesteal from all damage dealt.\n(6) Warlocks: All ally warlocks steal a max health of 0.5x damage on every attack.",
-      "ru": "Варлоки обменивают 25% своего здоровья в 50% маны в начале боя.\n\nClass Perk: Soul Leech\n Активен, когда хотя бы (N) разных Warlocks на доске. (Эффекты складываются)\n\n(2) Warlocks: Все союзники получают +5% вампиризма от всего нанесенного урона.\n(4) Warlocks: Все союзники получают +20% вампиризма от всего нанесенного урона.\n(6) Warlocks: Все союзные варлоки крадут максимальное здоровье, равное нанесенному урону, 0.5x при каждой атаке."
+      "ru": "Варлоки обменивают 25% своего здоровья в 50% маны в начале боя.\n\nClass Perk: Soul Leech\n Активен, когда хотя бы (N) разных Warlocks на доске. (Эффекты складываются)\n\n(2) Warlocks: Все союзники получают +5% вампиризма от всего нанесенного урона.\n(4) Warlocks: Все союзники получают +20% вампиризма от всего нанесенного урона.\n(6) Warlocks: Все союзные варлоки крадут максимальное здоровье, равное нанесенному урону, 0.5x при каждой атаке.",
+      "zh-cn": "术士棋子会在开始战斗时将自己的25%生命值转换为50%的法力值。\n\n职业技能：灵魂榨取\n 需要己方场上有至少（N）个不同的此职业的棋子来触发效果（触发的多层效果可以叠加）。\n\n（2）术士：使所有友军获得效果：造成的所有伤害+5%吸血。\n（4）术士：使所有友军获得效果：造成的所有伤害+20%吸血。\n（6）术士：友方术士棋子造成的所有伤害会同时吸取目标（伤害量×0.5）点生命值上限。",
+      "zh-tw": "術士棋子會在開始戰鬥時將自己的25%生命值轉換爲50%的法力值。\n\n職業技能：靈魂榨取\n 需要己方場上有至少（N）個不同的此職業的棋子來觸發效果（觸發的多層效果可以疊加）。\n\n（2）術士：使所有友軍獲得效果：造成的所有傷害+5%吸血。\n（4）術士：使所有友軍獲得效果：造成的所有傷害+20%吸血。\n（6）術士：友方術士棋子造成的所有傷害會同時吸取目標（傷害量×0.5）點生命值上限。"
     },
     "description_html": "Warlock pieces convert 25% of their health into 50% mana when a battle starts.\n<h1>Class Perk: Soul Leech</h1><font color=\"#656585\">Active when you have at least (N) different Warlock pieces on board. (Multiple effects stack)</font><br><br>(2) Warlocks: All allies have All allies have +5% lifesteal from all damage dealt.<br>(4) Warlocks: All allies have All allies have +20% lifesteal from all damage dealt.<br>(6) Warlocks: All ally warlocks steal a max health of 0.5x damage on every attack.",
     "lore": "Warlocks are cursed sorcerers who use demonic power to drain the life force from their enemies, restoring themselves to continue their cursed battle.",
     "lore_i18n": {
       "en": "Warlocks are cursed sorcerers who use demonic power to drain the life force from their enemies, restoring themselves to continue their cursed battle.",
-      "ru": "Warlocks — проклятые чародеи, использующие демоническую силу, чтобы высасывать жизненную энергию врагов и восстанавливать себя для продолжения своей проклятой битвы."
+      "ru": "Warlocks — проклятые чародеи, использующие демоническую силу, чтобы высасывать жизненную энергию врагов и восстанавливать себя для продолжения своей проклятой битвы.",
+      "zh-cn": "面对恶魔的力量时，大多数英雄只看到了死亡。但术士看到的却只有机遇。他们的目标是支配这样的力量，并且在黑暗魔法中找到了手段。",
+      "zh-tw": "面對惡魔的力量時，大多數英雄只看到了死亡。但術士看到的卻只有機遇。他們的目標是支配這樣的力量，並且在黑暗魔法中找到了手段。"
     },
     "notes": [],
     "tiers": [
@@ -28,5 +33,6 @@
     ],
     "ability_special": {}
   },
-  "overrides": {}
+  "overrides": {},
+  "icon": "synergies/warlock.png"
 }

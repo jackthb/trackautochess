@@ -2,7 +2,6 @@
   "gameId": "chess_sven",
   "name": "Sven",
   "slug": "sven",
-  "icon": "units/sven.png",
   "source": {
     "id": "chess_sven",
     "cost": 5,
@@ -60,5 +59,6 @@
       }
     }
   },
-  "overrides": {}
+  "overrides": {},
+  "icon": "units/sven.png"
 }

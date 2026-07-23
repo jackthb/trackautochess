@@ -2,26 +2,32 @@
   "gameId": "item_sadan",
   "name": "Satanic",
   "slug": "satanic",
-  "icon": "items/satanic.png",
   "source": {
     "name": "Satanic",
     "names": {
       "en": "Satanic",
-      "ru": "Satanic"
+      "ru": "Satanic",
+      "zh-cn": "撒旦之邪力",
+      "zh-tw": "撒旦之邪力"
     },
-    "description": "+600HP, +50% lifesteal.\n\nActive ability: Activates when taking damage\nGains +150% Lifesteal for 6 sec.",
+    "description": "Carrier counts as Faceless.+600HP, +50% lifesteal.\n\nActive ability: Activates when taking damage\nGains +100% Lifesteal for 6 sec.",
     "descriptions": {
-      "en": "+600HP, +50% lifesteal.\n\nActive ability: Activates when taking damage\nGains +150% Lifesteal for 6 sec.",
-      "ru": "+600HP, +50% вампиризма.\n\nАктивируется при получении урона\nПолучает +150% вампиризма на 6 секунд."
+      "en": "Carrier counts as Faceless.+600HP, +50% lifesteal.\n\nActive ability: Activates when taking damage\nGains +100% Lifesteal for 6 sec.",
+      "ru": "Носитель считается Faceless.+600HP, +50% вампиризма.\n\nАктивка: Активируется при получении урона\nПолучает +100% Вампиризма на 6 сек..",
+      "zh-cn": "携带者视为 无面者。\n生命值+600，攻击吸血+50%。\n\n主动技能：受伤时激活\n在6秒内+100%吸血。",
+      "zh-tw": "攜帶者視爲 無面者。\n生命值+600，攻擊吸血+50%。\n\n主動技能：受傷時激活\n在6秒內+100%吸血。"
     },
     "lore": "Immense power at the cost of your soul.",
     "lore_i18n": {
       "en": "Immense power at the cost of your soul.",
-      "ru": "Невероятная сила ценой твоей души."
+      "ru": "Невероятная сила ценой твоей души.",
+      "zh-cn": "无穷的力量，需要你付出灵魂作为代价。",
+      "zh-tw": "無窮的力量，需要你付出靈魂作爲代價。"
     },
     "quality": "artifact",
     "texture": "item_satanic",
     "notes": []
   },
-  "overrides": {}
+  "overrides": {},
+  "icon": "items/satanic.png"
 }

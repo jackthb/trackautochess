@@ -2,26 +2,32 @@
   "gameId": "item_shuaxinqiu",
   "name": "Refresher Orb",
   "slug": "refresher-orb",
-  "icon": "items/refresher.png",
   "source": {
     "name": "Refresher Orb",
     "names": {
       "en": "Refresher Orb",
-      "ru": "Refresher Orb"
+      "ru": "Refresher Orb",
+      "zh-cn": "刷新球",
+      "zh-tw": "刷新球"
     },
     "description": "+200% mana regeneration\n\nActive ability: Activates when ability or items incur cooldown\nResets the cooldown of abilities and other items.",
     "descriptions": {
       "en": "+200% mana regeneration\n\nActive ability: Activates when ability or items incur cooldown\nResets the cooldown of abilities and other items.",
-      "ru": "+200% mana regeneration\n\nАктивка: Когда появляется КД\nСбрасывает время перезарядки способностей и других предметов."
+      "ru": "+200% mana regeneration\n\nАктивка: Когда появляется КД\nСбрасывает время перезарядки способностей и других предметов.",
+      "zh-cn": "法力获取+200%。\n\n主动技能：技能或物品冷却时激活\n立即刷新棋子技能和其他物品的冷却时间。",
+      "zh-tw": "法力獲取+200%。\n\n主動技能：技能或物品冷卻時激活\n立即刷新棋子技能和其他物品的冷卻時間。"
     },
     "lore": "A powerful artifact created for wizards.",
     "lore_i18n": {
       "en": "A powerful artifact created for wizards.",
-      "ru": "Мощный артефакт, созданный для магов.."
+      "ru": "Мощный артефакт, созданный для магов..",
+      "zh-cn": "一件为巫师量身定做的强力物品。",
+      "zh-tw": "一件爲巫師量身定做的強力物品。"
     },
     "quality": "rare",
     "texture": "item_refresher",
     "notes": []
   },
-  "overrides": {}
+  "overrides": {},
+  "icon": "items/refresher.png"
 }

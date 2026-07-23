@@ -2,21 +2,28 @@
   "gameId": "item_bench_contract",
   "name": "Magic Seed",
   "slug": "magic-seed",
-  "icon": "relics/magic_seed.png",
-  "commentary": "Magic Seed creates up to 8 bench sprouts with `buy_price = 1`; if a sprout cannot be created, that slot is immediately paid out as 1 gold instead.\n\nAt the beginning of each round while Magic Seed is active and `relic_ttl <= 10`, each sprout independently has a `battle_round * 2 + 20` percent chance to gain +1 sell value. For example: round 5 is 30%, round 10 is 40%, round 20 is 60%, and round 40 is 100%. Selling a sprout pays its current `buy_price`.",
   "source": {
     "name": "Magic Seed",
     "names": {
       "en": "Magic Seed",
-      "ru": "Magic Seed"
+      "ru": "Magic Seed",
+      "zh-cn": "魔法种子",
+      "zh-tw": "魔法種子"
     },
     "description": "Fill your bench with magic vegetable sprouts. The sell value of these sprouts has a dynamic chance to increase by 1 at the beginning of every round. You can sell the sprouts any time to reuse the bench.",
     "descriptions": {
       "en": "Fill your bench with magic vegetable sprouts. The sell value of these sprouts has a dynamic chance to increase by 1 at the beginning of every round. You can sell the sprouts any time to reuse the bench.",
-      "ru": "Заполняет лавку магическими репками. Их цена продажи имеет шанс увеличиться на 1 в начале каждого раунда. Репки можно продать в любой момент, чтобы освободить лавку."
+      "ru": "Заполните скамейку магическими репками. В начале каждого раунда существует шанс увеличить стоимость продажи каждого ростка на 1. Ростки можно продать в любой момент, чтобы освободить место на скамейке.",
+      "zh-cn": "用菜苗填满你的等待席，回合开始时每颗菜的出售价值都有概率+1。你可以随时出售它们而启用等待席。",
+      "zh-tw": "用菜苗填滿你的等待席，回合開始時每顆菜的出售價值都有概率+1。你可以隨時出售它們而啓用等待席。"
     },
     "lore": "",
-    "lore_i18n": {}
+    "lore_i18n": {
+      "zh-cn": "来自：圣物宝箱",
+      "zh-tw": "來自：聖物寶箱"
+    }
   },
-  "overrides": {}
+  "overrides": {},
+  "commentary": "Magic Seed creates up to 8 bench sprouts with `buy_price = 1`; if a sprout cannot be created, that slot is immediately paid out as 1 gold instead.\n\nAt the beginning of each round while Magic Seed is active and `relic_ttl <= 10`, each sprout independently has a `battle_round * 2 + 20` percent chance to gain +1 sell value. For example: round 5 is 30%, round 10 is 40%, round 20 is 60%, and round 40 is 100%. Selling a sprout pays its current `buy_price`.",
+  "icon": "relics/magic_seed.png"
 }

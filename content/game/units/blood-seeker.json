@@ -2,7 +2,6 @@
   "gameId": "chess_bs",
   "name": "Blood Seeker",
   "slug": "blood-seeker",
-  "icon": "units/bloodseeker.png",
   "source": {
     "id": "chess_bs",
     "cost": 2,
@@ -60,5 +59,6 @@
       }
     }
   },
-  "overrides": {}
+  "overrides": {},
+  "icon": "units/bloodseeker.png"
 }

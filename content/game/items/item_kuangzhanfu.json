@@ -2,26 +2,32 @@
   "gameId": "item_kuangzhanfu",
   "name": "Battle Fury",
   "slug": "battle-fury",
-  "icon": "items/bfury.png",
   "source": {
     "name": "Battle Fury",
     "names": {
       "en": "Battle Fury",
-      "ru": "Battle Fury"
+      "ru": "Battle Fury",
+      "zh-cn": "狂战斧",
+      "zh-tw": "狂戰斧"
     },
     "description": "+50 damage.\nMelee attacks deal 50% cleave damage in a range of 1 square.",
     "descriptions": {
       "en": "+50 damage.\nMelee attacks deal 50% cleave damage in a range of 1 square.",
-      "ru": "+50 к урону.\nАтаки в ближнем бою наносят 50% урона по области в радиусе 1 клетки."
+      "ru": "+50 к урону.\nАтаки в ближнем бою наносят 50% урона по области в радиусе 1 клетки.",
+      "zh-cn": "攻击力+50。\n近战攻击会对1格范围内的其他敌人造成50%的溅射伤害。",
+      "zh-tw": "攻擊力+50。\n近戰攻擊會對1格範圍內的其他敵人造成50%的濺射傷害。"
     },
     "lore": "The Drodo Island Committee has banned private tree-cutting activities here, with permission granted to a small batch of contractors. This decent replica of the legendary tool is offered for entertainment purposes only.",
     "lore_i18n": {
       "en": "The Drodo Island Committee has banned private tree-cutting activities here, with permission granted to a small batch of contractors. This decent replica of the legendary tool is offered for entertainment purposes only.",
-      "ru": "The Drodo Island Committee has banned private tree-cutting activities here, with permission granted to a small batch of contractors. This decent replica of the legendary tool is offered for entertainment purposes only."
+      "ru": "The Drodo Island Committee has banned private tree-cutting activities here, with permission granted to a small batch of contractors. This decent replica of the legendary tool is offered for entertainment purposes only.",
+      "zh-cn": "近战不出狂战斧，不如回家卖红薯！",
+      "zh-tw": "近戰不出狂戰斧，不如回家賣紅薯！"
     },
     "quality": "artifact",
     "texture": "item_bfury",
     "notes": []
   },
-  "overrides": {}
+  "overrides": {},
+  "icon": "items/bfury.png"
 }

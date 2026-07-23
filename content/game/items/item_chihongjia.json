@@ -2,26 +2,32 @@
   "gameId": "item_chihongjia",
   "name": "Crimson Guard",
   "slug": "crimson-guard",
-  "icon": "items/crimson_guard.png",
   "source": {
     "name": "Crimson Guard",
     "names": {
       "en": "Crimson Guard",
-      "ru": "Crimson Guard"
+      "ru": "Crimson Guard",
+      "zh-cn": "赤红甲",
+      "zh-tw": "赤紅甲"
     },
     "description": "+5 armor, Block 30 damage.\n\nActive ability: Activates when taking damage\nGrants all allies within the range 50% chance to block 100 damage for melee pieces and 30 damage for ranged pieces. Lasts 8 sec.\n\nRange: 400",
     "descriptions": {
       "en": "+5 armor, Block 30 damage.\n\nActive ability: Activates when taking damage\nGrants all allies within the range 50% chance to block 100 damage for melee pieces and 30 damage for ranged pieces. Lasts 8 sec.\n\nRange: 400",
-      "ru": "+5 брони, Блокирует 30 урона.\n\nАктивируется при получении урона\nДаёт всем союзникам в радиусе 50% шанс блокировать 100 урона для ближних фигур и 30 урона для дальних. Длится 8 секунд.\n\nРадиус: 400"
+      "ru": "+5 брони, Блокирует 30 урона.\n\nАктивируется при получении урона\nДаёт всем союзникам в радиусе 50% шанс блокировать 100 урона для ближних фигур и 30 урона для дальних. Длится 8 секунд.\n\nРадиус: 400",
+      "zh-cn": "护甲+5，物理格挡+25。\n\n主动技能：受伤时激活\n使范围内所有友军护甲+5，物理格挡+50，持续8秒。",
+      "zh-tw": "護甲+5，物理格擋+25。\n\n主動技能：受傷時激活\n使範圍內所有友軍護甲+5，物理格擋+50，持續8秒。"
     },
     "lore": "A cuirass originally built to protect against the dreaded Year Beast.",
     "lore_i18n": {
       "en": "A cuirass originally built to protect against the dreaded Year Beast.",
-      "ru": "Кираса, изначально созданная для защиты от ужасного Year Beast."
+      "ru": "Кираса, изначально созданная для защиты от ужасного Year Beast.",
+      "zh-cn": "原为低于可怕的年兽所打造的铠甲。",
+      "zh-tw": "原爲低於可怕的年獸所打造的鎧甲。"
     },
     "quality": "rare",
     "texture": "item_crimson_guard",
     "notes": []
   },
-  "overrides": {}
+  "overrides": {},
+  "icon": "items/crimson_guard.png"
 }

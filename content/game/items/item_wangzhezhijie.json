@@ -2,17 +2,20 @@
   "gameId": "item_wangzhezhijie",
   "name": "Ring of Basilius",
   "slug": "ring-of-basilius",
-  "icon": "items/ring_of_basilius.png",
   "source": {
     "name": "Ring of Basilius",
     "names": {
       "en": "Ring of Basilius",
-      "ru": "Ring of Basilius"
+      "ru": "Ring of Basilius",
+      "zh-cn": "王者之戒",
+      "zh-tw": "王者之戒"
     },
     "description": "MP regen +50%.",
     "descriptions": {
       "en": "MP regen +50%.",
-      "ru": "Мана реген +50%."
+      "ru": "Мана реген +50%.",
+      "zh-cn": "法力获取+50%。",
+      "zh-tw": "法力獲取+50%。"
     },
     "lore": "",
     "lore_i18n": {},
@@ -20,5 +23,6 @@
     "texture": "ring_of_basilius",
     "notes": []
   },
-  "overrides": {}
+  "overrides": {},
+  "icon": "items/ring_of_basilius.png"
 }

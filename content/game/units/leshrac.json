@@ -2,7 +2,6 @@
   "gameId": "chess_ts",
   "name": "Leshrac",
   "slug": "leshrac",
-  "icon": "units/leshrac.png",
   "source": {
     "id": "chess_ts",
     "cost": 5,
@@ -61,5 +60,6 @@
       }
     }
   },
-  "overrides": {}
+  "overrides": {},
+  "icon": "units/leshrac.png"
 }

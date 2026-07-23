@@ -2,7 +2,6 @@
   "gameId": "chess_io",
   "name": "Io",
   "slug": "io",
-  "icon": "units/io.png",
   "source": {
     "id": "chess_io",
     "cost": 5,
@@ -65,5 +64,6 @@
       }
     }
   },
-  "overrides": {}
+  "overrides": {},
+  "icon": "units/io.png"
 }

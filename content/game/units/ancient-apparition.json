@@ -2,7 +2,6 @@
   "gameId": "chess_aa",
   "name": "Ancient Apparition",
   "slug": "ancient-apparition",
-  "icon": "units/ancient_apparition.png",
   "source": {
     "id": "chess_aa",
     "cost": 1,
@@ -31,7 +30,7 @@
         ],
         "armor": 2,
         "magic_resist": 10,
-        "atk_rate": 1.5,
+        "atk_rate": 1.3,
         "atk_range": 400
       },
       "2_star": {
@@ -43,7 +42,7 @@
         ],
         "armor": 2,
         "magic_resist": 10,
-        "atk_rate": 1.5,
+        "atk_rate": 1.3,
         "atk_range": 600
       },
       "3_star": {
@@ -55,10 +54,11 @@
         ],
         "armor": 2,
         "magic_resist": 10,
-        "atk_rate": 1.5,
+        "atk_rate": 1.3,
         "atk_range": 800
       }
     }
   },
-  "overrides": {}
+  "overrides": {},
+  "icon": "units/ancient_apparition.png"
 }

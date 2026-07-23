@@ -2,17 +2,20 @@
   "gameId": "item_gulonghaojiao",
   "name": "Minotaur Horn",
   "slug": "minotaur-horn",
-  "icon": "items/minotaur_horn.png",
   "source": {
     "name": "Minotaur Horn",
     "names": {
       "en": "Minotaur Horn",
-      "ru": "Minotaur Horn"
+      "ru": "Minotaur Horn",
+      "zh-cn": "古龙号角",
+      "zh-tw": "古龍號角"
     },
     "description": "Carrier counts as Dragon and has 100 initial mana.",
     "descriptions": {
       "en": "Carrier counts as Dragon and has 100 initial mana.",
-      "ru": "Владелец становится Драконом и получает 100 маны."
+      "ru": "Владелец становится Драконом и получает 100 маны.",
+      "zh-cn": "携带者视为龙，并且初始法力值为100。",
+      "zh-tw": "攜帶者視爲龍，並且初始法力值爲100。"
     },
     "lore": "",
     "lore_i18n": {},
@@ -20,5 +23,6 @@
     "texture": "item_minotaur_horn",
     "notes": []
   },
-  "overrides": {}
+  "overrides": {},
+  "icon": "items/minotaur_horn.png"
 }

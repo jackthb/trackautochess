@@ -2,17 +2,20 @@
   "gameId": "item_jingubang",
   "name": "Monkey King Bar",
   "slug": "monkey-king-bar",
-  "icon": "items/monkey_king_bar.png",
   "source": {
     "name": "Monkey King Bar",
     "names": {
       "en": "Monkey King Bar",
-      "ru": "Monkey King Bar"
+      "ru": "Monkey King Bar",
+      "zh-cn": "金箍棒",
+      "zh-tw": "金箍棒"
     },
     "description": "+40% attack speed.\nAttacks pierce through evasion and deal an extra 50 magical damage.",
     "descriptions": {
       "en": "+40% attack speed.\nAttacks pierce through evasion and deal an extra 50 magical damage.",
-      "ru": "+40% скорости атаки.\nАтаки проходят сквозь уклонение и наносят дополнительно 50 магического урона."
+      "ru": "+40% скорости атаки.\nАтаки проходят сквозь уклонение и наносят дополнительно 50 магического урона.",
+      "zh-cn": "攻击速度+40%。\n攻击无法被闪避并额外造成50点魔法伤害。",
+      "zh-tw": "攻擊速度+40%。\n攻擊無法被閃避並額外造成50點魔法傷害。"
     },
     "lore": "",
     "lore_i18n": {},
@@ -20,5 +23,6 @@
     "texture": "item_monkey_king_bar",
     "notes": []
   },
-  "overrides": {}
+  "overrides": {},
+  "icon": "items/monkey_king_bar.png"
 }

@@ -2,18 +2,20 @@
   "gameId": "item_free_draw",
   "name": "Weighted Dice",
   "slug": "weighted-dice",
-  "icon": "relics/weighted_dice.png",
-  "commentary": "If you reroll a shop and **none** of the new pieces are units already on your board or bench, you're refunded 1–2 gold, making that reroll either free or half price (if an owned piece does show up, you get nothing). The same check also runs on the free shop at the start of each round.\n\nThe amount scales with consecutive whiffs: the first four misses in a row always refund 1 gold, then 2 gold becomes possible from the 5th miss onward (reaching a coin flip by the 8th). Any shop that shows an owned piece resets the streak.\n\nVery useful for roll-heavy boards, especially early when you own few units, so most rerolls whiff and trigger the refund.",
   "source": {
     "name": "Weighted Dice",
     "names": {
       "en": "Weighted Dice",
-      "ru": "Weighted Dice"
+      "ru": "Weighted Dice",
+      "zh-cn": "加重骰子",
+      "zh-tw": "加重骰子"
     },
     "description": "Refund 1~2 random Gold if you fail to recruit any owned chess piece.",
     "descriptions": {
       "en": "Refund 1~2 random Gold if you fail to recruit any owned chess piece.",
-      "ru": "Возвращает 1-2 Золота, если ролл не содержит ни одной имеющейся фигуры."
+      "ru": "Возвращает 1-2 Золота, если ролл не содержит ни одной имеющейся фигуры.",
+      "zh-cn": "招募棋子时如果未招募到已有棋子，会返还随机（1~2）金币。",
+      "zh-tw": "招募棋子時如果未招募到已有棋子，會返還隨機（1~2）金幣。"
     },
     "lore": "",
     "lore_i18n": {}
@@ -21,5 +23,7 @@
   "overrides": {
     "notes": []
   },
-  "relatedEntities": []
+  "commentary": "If you reroll a shop and **none** of the new pieces are units already on your board or bench, you're refunded 1–2 gold, making that reroll either free or half price (if an owned piece does show up, you get nothing). The same check also runs on the free shop at the start of each round.\n\nThe amount scales with consecutive whiffs: the first four misses in a row always refund 1 gold, then 2 gold becomes possible from the 5th miss onward (reaching a coin flip by the 8th). Any shop that shows an owned piece resets the streak.\n\nVery useful for roll-heavy boards, especially early when you own few units, so most rerolls whiff and trigger the refund.",
+  "relatedEntities": [],
+  "icon": "relics/weighted_dice.png"
 }

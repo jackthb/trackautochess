@@ -2,7 +2,6 @@
   "gameId": "chess_aw",
   "name": "Arc Warden",
   "slug": "arc-warden",
-  "icon": "units/arc_warden.png",
   "source": {
     "id": "chess_aw",
     "cost": 5,
@@ -31,7 +30,7 @@
         ],
         "armor": 7,
         "magic_resist": 0,
-        "atk_rate": 1,
+        "atk_rate": 1.0,
         "atk_range": 600
       },
       "2_star": {
@@ -60,5 +59,6 @@
       }
     }
   },
-  "overrides": {}
+  "overrides": {},
+  "icon": "units/arc_warden.png"
 }

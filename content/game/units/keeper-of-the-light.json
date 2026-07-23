@@ -2,7 +2,6 @@
   "gameId": "chess_light",
   "name": "Keeper of the Light",
   "slug": "keeper-of-the-light",
-  "icon": "units/keeper_of_the_light.png",
   "source": {
     "id": "chess_light",
     "cost": 4,
@@ -60,5 +59,6 @@
       }
     }
   },
-  "overrides": {}
+  "overrides": {},
+  "icon": "units/keeper_of_the_light.png"
 }

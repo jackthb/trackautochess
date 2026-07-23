@@ -2,26 +2,32 @@
   "gameId": "item_yangdao",
   "name": "Scythe of Vyse",
   "slug": "scythe-of-vyse",
-  "icon": "items/sheepstick.png",
   "source": {
     "name": "Scythe of Vyse",
     "names": {
       "en": "Scythe of Vyse",
-      "ru": "Scythe of Vyse"
+      "ru": "Scythe of Vyse",
+      "zh-cn": "邪恶镰刀",
+      "zh-tw": "邪惡鐮刀"
     },
     "description": "Magic damage +60%。\n\nActive Ability: Instant\nTransforms an enemy piece of the highest level into a harmless animal for 5 sec.",
     "descriptions": {
       "en": "Magic damage +60%。\n\nActive Ability: Instant\nTransforms an enemy piece of the highest level into a harmless animal for 5 sec.",
-      "ru": "Магический урон +60%。\n\nАктивка: Мгновенно\nПревращает фигуру противника самого высокого уровня в безвредное животное на 5 секунд."
+      "ru": "Магический урон +60%。\n\nАктивка: Мгновенно\nПревращает фигуру противника самого высокого уровня в безвредное животное на 5 секунд.",
+      "zh-cn": "魔法伤害+60%。\n\n主动技能：立即激活\n使一个等级最高的敌方棋子变成可爱的小动物，持续5秒。",
+      "zh-tw": "魔法傷害+60%。\n\n主動技能：立即激活\n使一個等級最高的敵方棋子變成可愛的小動物，持續5秒。"
     },
     "lore": "The most guarded relic among the cult of Vyse, it is the most coveted weapon among magi.",
     "lore_i18n": {
       "en": "The most guarded relic among the cult of Vyse, it is the most coveted weapon among magi.",
-      "ru": "Это самая охраняемая реликвия культа Вайса и самое желанное оружие среди магов."
+      "ru": "Это самая охраняемая реликвия культа Вайса и самое желанное оружие среди магов.",
+      "zh-cn": "武功再高，也怕羊刀！",
+      "zh-tw": "武功再高，也怕羊刀！"
     },
     "quality": "common",
     "texture": "item_sheepstick",
     "notes": []
   },
-  "overrides": {}
+  "overrides": {},
+  "icon": "items/sheepstick.png"
 }

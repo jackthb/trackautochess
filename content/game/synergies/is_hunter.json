@@ -2,23 +2,28 @@
   "gameId": "is_hunter",
   "name": "Hunter",
   "slug": "hunter",
-  "icon": "synergies/hunter.png",
   "source": {
     "name": "Hunter",
     "names": {
       "en": "Hunter",
-      "ru": "Hunter"
+      "ru": "Hunter",
+      "zh-cn": "猎人",
+      "zh-tw": "獵人"
     },
-    "description": "Hunter pieces always focus on attacking the lowest health enemy within attack range.\n\nClass Perk: Aimed Shot\n Active when you have at least (N) different Hunter pieces on board. (Multiple effects stack)\n\n(3) Hunters: Every attack of all ally hunters has a 50% chance to perform a precise shot, penetrates evasion and -5 armor, lasts for 5 seconds.\n(6) Hunters: Every attack of all ally hunters has a 100% chance to perform a precise shot, penetrates evasion and -10 armor, lasts for 10 seconds.\n(9) Hunters: Every precise shot will knock back the victim for 1 grid on hit and perform an extra attack.",
+    "description": "Hunter pieces always focus on attacking the lowest health enemy within attack range.\n\nClass Perk: Aimed Shot\n Active when you have at least (N) different Hunter pieces on board. (Multiple effects stack)\n\n(3) Hunters: Every attack of all ally hunters has a 50% chance to perform a precise shot, penetrates evasion and -5 armor, lasts for 5 seconds.\n(6) Hunters: Every attack of all ally hunters has a 80% chance to perform a precise shot, penetrates evasion and -8 armor, lasts for 8 seconds.\n(9) Hunters: Every precise shot will knock back the victim for 1 grid on hit and perform an extra attack.",
     "descriptions": {
-      "en": "Hunter pieces always focus on attacking the lowest health enemy within attack range.\n\nClass Perk: Aimed Shot\n Active when you have at least (N) different Hunter pieces on board. (Multiple effects stack)\n\n(3) Hunters: Every attack of all ally hunters has a 50% chance to perform a precise shot, penetrates evasion and -5 armor, lasts for 5 seconds.\n(6) Hunters: Every attack of all ally hunters has a 100% chance to perform a precise shot, penetrates evasion and -10 armor, lasts for 10 seconds.\n(9) Hunters: Every precise shot will knock back the victim for 1 grid on hit and perform an extra attack.",
-      "ru": "Охотники всегда фокусируются на атаке противника с наименьшим здоровьем в радиусе атаки.\n\nClass Perk: Aimed Shot\n Active when you have at least (N) different Hunter pieces on board. (Бонусы синергий складываются)\n\n(3) Hunters: Каждая атака всех союзных охотников имеет 50% шанс произвести точный выстрел, пробивающий уклонение и снижающий -5 брони, длится 5 секунд, может складываться.\n(6) Hunters: Каждая атака всех союзных охотников имеет 100% шанс произвести точный выстрел, пробивающий уклонение и снижающий -10 брони, длится 10 секунд, может складываться.\n(9) Hunters: Каждый точный выстрел оттолкнет жертву на 1 клетки при попадании и произведет дополнительную атаку."
+      "en": "Hunter pieces always focus on attacking the lowest health enemy within attack range.\n\nClass Perk: Aimed Shot\n Active when you have at least (N) different Hunter pieces on board. (Multiple effects stack)\n\n(3) Hunters: Every attack of all ally hunters has a 50% chance to perform a precise shot, penetrates evasion and -5 armor, lasts for 5 seconds.\n(6) Hunters: Every attack of all ally hunters has a 80% chance to perform a precise shot, penetrates evasion and -8 armor, lasts for 8 seconds.\n(9) Hunters: Every precise shot will knock back the victim for 1 grid on hit and perform an extra attack.",
+      "ru": "DOTA_Tooltip_ability_is_hunter_Description",
+      "zh-cn": "猎人棋子总是优先攻击攻击距离内的生命值较少的敌人。\n\n职业技能：精准射击\n 需要己方场上有至少（N）个不同的此职业的棋子来触发效果（触发的多层效果可以叠加）。\n\n（3）猎人：所有友方猎人的攻击有50%概率发动一次精准射击，无视闪避并使目标护甲-5，持续5秒。\n（6）猎人：所有友方猎人的攻击有80%概率发动一次精准射击，无视闪避并使目标护甲-8，持续8秒。\n（9）猎人：精准射击会同时击退敌人1格，并且发动一次额外攻击。",
+      "zh-tw": "獵人棋子總是優先攻擊攻擊距離內的生命值較少的敵人。\n\n職業技能：精準射擊\n 需要己方場上有至少（N）個不同的此職業的棋子來觸發效果（觸發的多層效果可以疊加）。\n\n（3）獵人：所有友方獵人的攻擊有50%概率發動一次精準射擊，無視閃避並使目標護甲-5，持續5秒。\n（6）獵人：所有友方獵人的攻擊有80%概率發動一次精準射擊，無視閃避並使目標護甲-8，持續8秒。\n（9）獵人：精準射擊會同時擊退敵人1格，並且發動一次額外攻擊。"
     },
-    "description_html": "Hunter pieces always focus on attacking the lowest health enemy within attack range.\n<h1>Class Perk: Aimed Shot</h1><font color=\"#656585\">Active when you have at least (N) different Hunter pieces on board. (Multiple effects stack)</font><br><br>(3) Hunters: Every attack of all ally hunters has a 50% chance to perform a precise shot, penetrates evasion and -5 armor, lasts for 5 seconds.<br>(6) Hunters: Every attack of all ally hunters has a 100% chance to perform a precise shot, penetrates evasion and -10 armor, lasts for 10 seconds.<br>(9) Hunters: Every precise shot will knock back the victim for 1 grid on hit and perform an extra attack.",
+    "description_html": "Hunter pieces always focus on attacking the lowest health enemy within attack range.\n<h1>Class Perk: Aimed Shot</h1><font color=\"#656585\">Active when you have at least (N) different Hunter pieces on board. (Multiple effects stack)</font><br><br>(3) Hunters: Every attack of all ally hunters has a 50% chance to perform a precise shot, penetrates evasion and -5 armor, lasts for 5 seconds.<br>(6) Hunters: Every attack of all ally hunters has a 80% chance to perform a precise shot, penetrates evasion and -8 armor, lasts for 8 seconds.<br>(9) Hunters: Every precise shot will knock back the victim for 1 grid on hit and perform an extra attack.",
     "lore": "Since time immemorial, the call of the wild has driven some adventurers from the comfort of their home to venture into unforgiving primeval worlds. Those who persist become hunters.",
     "lore_i18n": {
       "en": "Since time immemorial, the call of the wild has driven some adventurers from the comfort of their home to venture into unforgiving primeval worlds. Those who persist become hunters.",
-      "ru": "С незапамятных времён зов дикой природы уводил некоторых искателей приключений из уюта дома в суровые первобытные миры. Те, кто выдерживает это испытание, становятся охотниками."
+      "ru": "С незапамятных времён зов дикой природы уводил некоторых искателей приключений из уюта дома в суровые первобытные миры. Те, кто выдерживает это испытание, становятся охотниками.",
+      "zh-cn": "自远古以来，荒野的召唤就会让一些冒险者离开舒适的家，到无情的原始世界冒险。那些坚持下来的人就成为了猎人。",
+      "zh-tw": "自遠古以來，荒野的召喚就會讓一些冒險者離開舒適的家，到無情的原始世界冒險。那些堅持下來的人就成爲了獵人。"
     },
     "notes": [],
     "tiers": [
@@ -28,5 +33,6 @@
     ],
     "ability_special": {}
   },
-  "overrides": {}
+  "overrides": {},
+  "icon": "synergies/hunter.png"
 }

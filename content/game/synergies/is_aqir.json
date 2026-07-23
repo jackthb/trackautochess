@@ -2,23 +2,28 @@
   "gameId": "is_aqir",
   "name": "Aqir",
   "slug": "aqir",
-  "icon": "synergies/aqir.png",
   "source": {
     "name": "Aqir",
     "names": {
       "en": "Aqir",
-      "ru": "Aqir"
+      "ru": "Aqir",
+      "zh-cn": "虫",
+      "zh-tw": "蟲"
     },
     "description": "Species Trait: Infection\n Active when there are at least (N) different Aqir chess pieces on the chessboard. (Multiple effects stack)\n\n(2) Aqirs: Grants all non-Aqir allies: Upon death, if there is any Infected friendly piece of the same name on the chessboard, immediately hatches a random Aqir piece.\n(4) Aqirs: Rank 1 effect now also applies to all friendly Aqir pieces, and will hatch a random higher-level Aqir piece.",
     "descriptions": {
       "en": "Species Trait: Infection\n Active when there are at least (N) different Aqir chess pieces on the chessboard. (Multiple effects stack)\n\n(2) Aqirs: Grants all non-Aqir allies: Upon death, if there is any Infected friendly piece of the same name on the chessboard, immediately hatches a random Aqir piece.\n(4) Aqirs: Rank 1 effect now also applies to all friendly Aqir pieces, and will hatch a random higher-level Aqir piece.",
-      "ru": "Species Trait: Infection\n Активно когда у вас есть (N) разных Aqir фигур на столе. (Эффекты складываются)\n\n(2) Aqirs: дает всем союзным не-Aqir: при смерти, если на поле есть заражённый союзник с тем же именем, немедленно вылупляется случайная фигура Aqir.\n(4) Aqirs: Акиры могут вылуплятся из союзных Aqir фигур, воскрешая фигуру Aqir более высокого уровня."
+      "ru": "Species Trait: Infection\n Активно когда у вас есть (N) разных Aqir фигур на столе. (Эффекты складываются)\n\n(2) Aqirs: дает всем союзным не-Aqir: при смерти, если на поле есть заражённый союзник с тем же именем, немедленно вылупляется случайная фигура Aqir.\n(4) Aqirs: Акиры могут вылуплятся из союзных Aqir фигур, воскрешая фигуру Aqir более высокого уровня.",
+      "zh-cn": "种族技能：感染\n 需要己方场上有至少（N）个不同的此种族的棋子来触发效果（触发的多层效果可以叠加）。\n\n（2）虫：使所有非虫族友方棋子获得亡语：如果场上有与它同名的被感染的友方棋子存活，原地孵化一只随机虫族棋子。\n（4）虫：使所有友方虫族棋子也获得该亡语，并且孵化的虫族棋子更加强壮。",
+      "zh-tw": "種族技能：感染\n 需要己方場上有至少（N）個不同的此種族的棋子來觸發效果（觸發的多層效果可以疊加）。\n\n（2）蟲：使所有非蟲族友方棋子獲得亡語：如果場上有與它同名的被感染的友方棋子存活，原地孵化一隻隨機蟲族棋子。\n（4）蟲：使所有友方蟲族棋子也獲得該亡語，並且孵化的蟲族棋子更加強壯。"
     },
     "description_html": "<h1>Species Trait: Infection</h1><font color=\"#656585\">Active when there are at least (N) different Aqir chess pieces on the chessboard. (Multiple effects stack)</font><br><br>(2) Aqirs: Grants all non-Aqir allies: Upon death, if there is any Infected friendly piece of the same name on the chessboard, immediately hatches a random Aqir piece.<br>(4) Aqirs: Rank 1 effect now also applies to all friendly Aqir pieces , and will hatch a random higher-level Aqir piece.",
     "lore": "From time to time, the Aqirs dwelled on and beneath the ancient land of Drodo Island. Though most of their powers are sealed by the holy Gods, remained powers from the insanity within the Aqir blood draws their insectoid instinct to reside on the flesh of other creatures.",
     "lore_i18n": {
       "en": "From time to time, the Aqirs dwelled on and beneath the ancient land of Drodo Island. Though most of their powers are sealed by the holy Gods, remained powers from the insanity within the Aqir blood draws their insectoid instinct to reside on the flesh of other creatures.",
-      "ru": "Время от времени Акиры обитали на древней земле Острова Дродо и под ней. Хотя большинство их сил запечатаны святыми богами, оставшиеся силы, вызванные безумием в их крови, побуждают их насекомоподобный инстинкт интересоваться, как же они работают."
+      "ru": "Время от времени Акиры обитали на древней земле Острова Дродо и под ней. Хотя большинство их сил запечатаны святыми богами, оставшиеся силы, вызванные безумием в их крови, побуждают их насекомоподобный инстинкт интересоваться, как же они работают.",
+      "zh-cn": "作为上古时代就存在多多岛的异形生物，亚基虫族早已褪去了克克帝国的辉煌。现在它们分成了不同的部族，被封印在地下世界，或者寄生在别的物种体内。",
+      "zh-tw": "作爲上古時代就存在多多島的異形生物，亞基蟲族早已褪去了剋剋帝國的輝煌。現在它們分成了不同的部族，被封印在地下世界，或者寄生在別的物種體內。"
     },
     "notes": [
       "Aqirs do not infect on chess pieces with a expiration duration.",
@@ -30,5 +35,6 @@
     ],
     "ability_special": {}
   },
-  "overrides": {}
+  "overrides": {},
+  "icon": "synergies/aqir.png"
 }

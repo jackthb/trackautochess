@@ -117,7 +117,8 @@
         {
           "kind": "new",
           "name": "New Relic",
-          "detail": "Armory Array"
+          "detail": "Armory Array",
+          "entityKey": "relic__armory-array"
         },
         {
           "kind": "fix",

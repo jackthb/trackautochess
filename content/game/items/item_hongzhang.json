@@ -2,26 +2,32 @@
   "gameId": "item_hongzhang",
   "name": "Dagon",
   "slug": "dagon",
-  "icon": "items/dagon_4.png",
   "source": {
     "name": "Dagon",
     "names": {
       "en": "Dagon",
-      "ru": "Dagon"
+      "ru": "Dagon",
+      "zh-cn": "达贡之神力",
+      "zh-tw": "達貢之神力"
     },
     "description": "+40% magical damage.\n\nActive ability: Instant\nDeals 700 magical damage to a random enemy chess piece.",
     "descriptions": {
       "en": "+40% magical damage.\n\nActive ability: Instant\nDeals 700 magical damage to a random enemy chess piece.",
-      "ru": "Магический урон +40%。\n\nАктивка: Мгновенная\nНаносит 700 магического урона случайной вражеской фигуре."
+      "ru": "Магический урон +40%。\n\nАктивка: Мгновенная\nНаносит 700 магического урона случайной вражеской фигуре.",
+      "zh-cn": "魔法伤害+40%。\n\n主动技能：立即激活\n对一个随机敌方棋子造成700点魔法伤害。",
+      "zh-tw": "魔法傷害+40%。\n\n主動技能：立即激活\n對一個隨機敵方棋子造成700點魔法傷害。"
     },
     "lore": "A powerful secondary staff that allows the wielders magic to surge from their fingertips.",
     "lore_i18n": {
       "en": "A powerful secondary staff that allows the wielders magic to surge from their fingertips.",
-      "ru": "Мощный посох, позволяющий магии владельца струиться из кончиков пальцев."
+      "ru": "Мощный посох, позволяющий магии владельца струиться из кончиков пальцев.",
+      "zh-cn": "威力强大的次级法杖，让持有者的魔法从指间喷涌而出。",
+      "zh-tw": "威力強大的次級法杖，讓持有者的魔法從指間噴湧而出。"
     },
     "quality": "epic",
     "texture": "item_dagon_4",
     "notes": []
   },
-  "overrides": {}
+  "overrides": {},
+  "icon": "items/dagon_4.png"
 }

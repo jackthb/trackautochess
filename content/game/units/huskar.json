@@ -2,7 +2,6 @@
   "gameId": "chess_huskar",
   "name": "Huskar",
   "slug": "huskar",
-  "icon": "units/huskar.png",
   "source": {
     "id": "chess_huskar",
     "cost": 3,
@@ -60,5 +59,6 @@
       }
     }
   },
-  "overrides": {}
+  "overrides": {},
+  "icon": "units/huskar.png"
 }

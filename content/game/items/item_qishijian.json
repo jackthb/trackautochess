@@ -2,26 +2,32 @@
   "gameId": "item_qishijian",
   "name": "Paladin Sword",
   "slug": "paladin-sword",
-  "icon": "items/paladin_sword.png",
   "source": {
     "name": "Paladin Sword",
     "names": {
       "en": "Paladin Sword",
-      "ru": "Paladin Sword"
+      "ru": "Paladin Sword",
+      "zh-cn": "骑士剑",
+      "zh-tw": "騎士劍"
     },
     "description": "Damage +25, Lifesteal + 20%.\nCarrier deals +50% damage to Undead and Demon pieces.",
     "descriptions": {
       "en": "Damage +25, Lifesteal + 20%.\nCarrier deals +50% damage to Undead and Demon pieces.",
-      "ru": "Урон +25, Вампиризм + 20%.\nВладелец наносит на 50% больше урона нежити и демонам."
+      "ru": "Урон +25, Вампиризм + 20%.\nВладелец наносит на 50% больше урона нежити и демонам.",
+      "zh-cn": "攻击力+25，攻击吸血+25%。\n携带者对恶魔和亡灵造成的伤害+50%。",
+      "zh-tw": "攻擊力+25，攻擊吸血+25%。\n攜帶者對惡魔和亡靈造成的傷害+50%。"
     },
     "lore": "A legendary Sword owned by a divine Paladin before he was exiled.",
     "lore_i18n": {
       "en": "A legendary Sword owned by a divine Paladin before he was exiled.",
-      "ru": "Легендарный меч, принадлежавший божественному Палладину Мигелю до его изгнания."
+      "ru": "Легендарный меч, принадлежавший божественному Палладину Мигелю до его изгнания.",
+      "zh-cn": "这把徽记之剑曾为一代传奇——高斯瑞的伊荷斯修士所有，后来他遭到排挤被逐出教会时长剑也失去了剑鞘。",
+      "zh-tw": "這把徽記之劍曾爲一代傳奇——高斯瑞的伊荷斯修士所有，後來他遭到排擠被逐出教會時長劍也失去了劍鞘。"
     },
     "quality": "rare",
     "texture": "item_paladin_sword",
     "notes": []
   },
-  "overrides": {}
+  "overrides": {},
+  "icon": "items/paladin_sword.png"
 }

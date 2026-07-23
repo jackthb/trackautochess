@@ -2,17 +2,20 @@
   "gameId": "item_qiangxi",
   "name": "Assault Cuirass",
   "slug": "assault-cuirass",
-  "icon": "items/assault.png",
   "source": {
     "name": "Assault Cuirass",
     "names": {
       "en": "Assault Cuirass",
-      "ru": "Assault Cuirass"
+      "ru": "Assault Cuirass",
+      "zh-cn": "强袭胸甲",
+      "zh-tw": "強襲胸甲"
     },
     "description": "+15 Armor.+20 Attack speed.\n\nAura\nGrants +10 armor to allies nearby.\nEnemies nearby suffer -10 armor.",
     "descriptions": {
       "en": "+15 Armor.+20 Attack speed.\n\nAura\nGrants +10 armor to allies nearby.\nEnemies nearby suffer -10 armor.",
-      "ru": "+15 брони. +20 скорости атаки.\n\nАура\nДаёт +10 брони союзникам поблизости.\nВраги поблизости теряют -10 брони."
+      "ru": "+15 брони. +20 скорости атаки.\n\nАура\nДаёт +10 брони союзникам поблизости.\nВраги поблизости теряют -10 брони.",
+      "zh-cn": "护甲+15，攻击速度+20%。\n\n光环效果\n周围友军护甲+10。\n周围敌军护甲-10。",
+      "zh-tw": "護甲+15，攻擊速度+20%。\n\n光環效果\n周圍友軍護甲+10。\n周圍敵軍護甲-10。"
     },
     "lore": "",
     "lore_i18n": {},
@@ -20,5 +23,6 @@
     "texture": "item_assault",
     "notes": []
   },
-  "overrides": {}
+  "overrides": {},
+  "icon": "items/assault.png"
 }

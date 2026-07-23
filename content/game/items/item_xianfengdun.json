@@ -2,17 +2,20 @@
   "gameId": "item_xianfengdun",
   "name": "Vanguard",
   "slug": "vanguard",
-  "icon": "items/vanguard.png",
   "source": {
     "name": "Vanguard",
     "names": {
       "en": "Vanguard",
-      "ru": "Vanguard"
+      "ru": "Vanguard",
+      "zh-cn": "先锋盾",
+      "zh-tw": "先鋒盾"
     },
     "description": "Block 40 damage on melee pieces.",
     "descriptions": {
       "en": "Block 40 damage on melee pieces.",
-      "ru": "Блокирует 40 урона на героях ближнего боя и 20 дальнего."
+      "ru": "Блокирует 40 урона на героях ближнего боя и 20 дальнего.",
+      "zh-cn": "物理格挡+25。近战携带者有50%概率额外+25物理格挡。",
+      "zh-tw": "物理格擋+25。近戰攜帶者有50%概率額外+25物理格擋。"
     },
     "lore": "",
     "lore_i18n": {},
@@ -20,5 +23,6 @@
     "texture": "item_vanguard",
     "notes": []
   },
-  "overrides": {}
+  "overrides": {},
+  "icon": "items/vanguard.png"
 }

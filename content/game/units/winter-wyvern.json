@@ -2,7 +2,6 @@
   "gameId": "chess_ww",
   "name": "Winter Wyvern",
   "slug": "winter-wyvern",
-  "icon": "units/winter_wyvern.png",
   "source": {
     "id": "chess_ww",
     "cost": 1,
@@ -61,5 +60,6 @@
       }
     }
   },
-  "overrides": {}
+  "overrides": {},
+  "icon": "units/winter_wyvern.png"
 }

@@ -2,7 +2,6 @@
   "gameId": "chess_bh",
   "name": "Bounty Hunter",
   "slug": "bounty-hunter",
-  "icon": "units/bounty_hunter.png",
   "source": {
     "id": "chess_bh",
     "cost": 1,
@@ -32,7 +31,7 @@
         ],
         "armor": 1,
         "magic_resist": 0,
-        "atk_rate": 1,
+        "atk_rate": 1.0,
         "atk_range": 205
       },
       "2_star": {
@@ -44,7 +43,7 @@
         ],
         "armor": 1,
         "magic_resist": 0,
-        "atk_rate": 1,
+        "atk_rate": 1.0,
         "atk_range": 205
       },
       "3_star": {
@@ -56,10 +55,11 @@
         ],
         "armor": 1,
         "magic_resist": 0,
-        "atk_rate": 1,
+        "atk_rate": 1.0,
         "atk_range": 205
       }
     }
   },
-  "overrides": {}
+  "overrides": {},
+  "icon": "units/bounty_hunter.png"
 }

@@ -2,17 +2,20 @@
   "gameId": "item_jipin",
   "name": "Vladimirs Offering",
   "slug": "vladimirs-offering",
-  "icon": "items/vladmir.png",
   "source": {
     "name": "Vladimirs Offering",
     "names": {
       "en": "Vladimirs Offering",
-      "ru": "Vladimirs Offering"
+      "ru": "Vladimirs Offering",
+      "zh-cn": "弗拉迪米尔的祭品",
+      "zh-tw": "弗拉迪米爾的祭品"
     },
     "description": "Aura Effect\nAllied units in the surrounding area gain the effect: Lifesteal +25%.",
     "descriptions": {
       "en": "Aura Effect\nAllied units in the surrounding area gain the effect: Lifesteal +25%.",
-      "ru": "Aura Effect\nСоюзные юниты в радиусе получают эффект: Вампиризм +25%."
+      "ru": "Aura Effect\nСоюзные юниты в радиусе получают эффект: Вампиризм +25%.",
+      "zh-cn": "光环效果\n周围范围内的友军获得效果：攻击吸血+25%。",
+      "zh-tw": "光環效果\n周圍範圍內的友軍獲得效果：攻擊吸血+25%。"
     },
     "lore": "",
     "lore_i18n": {},
@@ -20,5 +23,6 @@
     "texture": "item_vladmir",
     "notes": []
   },
-  "overrides": {}
+  "overrides": {},
+  "icon": "items/vladmir.png"
 }

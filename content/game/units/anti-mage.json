@@ -2,7 +2,6 @@
   "gameId": "chess_am",
   "name": "Anti-mage",
   "slug": "anti-mage",
-  "icon": "units/anti_mage.png",
   "source": {
     "id": "chess_am",
     "cost": 4,
@@ -60,5 +59,6 @@
       }
     }
   },
-  "overrides": {}
+  "overrides": {},
+  "icon": "units/anti_mage.png"
 }

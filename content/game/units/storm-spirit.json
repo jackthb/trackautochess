@@ -2,7 +2,6 @@
   "gameId": "chess_storm",
   "name": "Storm Spirit",
   "slug": "storm-spirit",
-  "icon": "units/storm_spirit.png",
   "source": {
     "id": "chess_storm",
     "cost": 4,
@@ -60,5 +59,6 @@
       }
     }
   },
-  "overrides": {}
+  "overrides": {},
+  "icon": "units/storm_spirit.png"
 }

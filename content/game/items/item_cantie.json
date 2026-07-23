@@ -2,17 +2,20 @@
   "gameId": "item_cantie",
   "name": "Sliver",
   "slug": "sliver",
-  "icon": "items/jushencantie.png",
   "source": {
     "name": "Sliver",
     "names": {
       "en": "Sliver",
-      "ru": "Sliver"
+      "ru": "Sliver",
+      "zh-cn": "残铁",
+      "zh-tw": "殘鐵"
     },
     "description": "+25 damage.\nConsidered as Tier 3 Item.",
     "descriptions": {
       "en": "+25 damage.\nConsidered as Tier 3 Item.",
-      "ru": "+25 урона.\nСчитается предметом Т3."
+      "ru": "+25 урона.\nСчитается предметом Т3.",
+      "zh-cn": "攻击力+25。\n该物品等级视为3。",
+      "zh-tw": "攻擊力+25。\n該物品等級視爲3。"
     },
     "lore": "",
     "lore_i18n": {},
@@ -20,5 +23,6 @@
     "texture": "custom/jushencantie",
     "notes": []
   },
-  "overrides": {}
+  "overrides": {},
+  "icon": "items/jushencantie.png"
 }

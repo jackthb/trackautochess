@@ -2,7 +2,6 @@
   "gameId": "chess_tusk",
   "name": "Tusk",
   "slug": "tusk",
-  "icon": "units/tusk.png",
   "source": {
     "id": "chess_tusk",
     "cost": 1,
@@ -60,5 +59,6 @@
       }
     }
   },
-  "overrides": {}
+  "overrides": {},
+  "icon": "units/tusk.png"
 }

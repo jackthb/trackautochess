@@ -2,26 +2,32 @@
   "gameId": "item_hudie",
   "name": "Butterfly",
   "slug": "butterfly",
-  "icon": "items/butterfly.png",
   "source": {
     "name": "Butterfly",
     "names": {
       "en": "Butterfly",
-      "ru": "Butterfly"
+      "ru": "Butterfly",
+      "zh-cn": "蝴蝶",
+      "zh-tw": "蝴蝶"
     },
     "description": "Evasion +40%，Attack Speed +20%.\n\nActive ability: Activates upon taking damage\nThe bonuses provided by Butterfly are doubled for 6 seconds.",
     "descriptions": {
       "en": "Evasion +40%，Attack Speed +20%.\n\nActive ability: Activates upon taking damage\nThe bonuses provided by Butterfly are doubled for 6 seconds.",
-      "ru": "Уклонения +40%，Скорость атаки +20%.\n\nАктивка: Активируется при получении урона\nБонусы от Butterfly удваиваются на 6 секунд."
+      "ru": "Уклонения +40%,\nСкорость атаки +20%.\n\nАктивка: Активируется при получении урона\nБонусы от Butterfly удваиваются на 6 секунд.",
+      "zh-cn": "闪避+40%，攻击速度+30%。\n\n主动技能：受伤时激活\n在6秒内蝴蝶提供的加成翻倍。",
+      "zh-tw": "閃避+40%，攻擊速度+30%。\n\n主動技能：受傷時激活\n在6秒內蝴蝶提供的加成翻倍。"
     },
     "lore": "Only the mightiest and most experienced of warriors can wield the Butterfly, but it provides incredible dexterity in combat.",
     "lore_i18n": {
       "en": "Only the mightiest and most experienced of warriors can wield the Butterfly, but it provides incredible dexterity in combat.",
-      "ru": "Только самые могучие и опытные воины могут владеть Butterfly, но она обеспечивает невероятную ловкость в бою."
+      "ru": "Только самые могучие и опытные воины могут владеть Butterfly, но она обеспечивает невероятную ловкость в бою.",
+      "zh-cn": "只有最强大最老练的战士才能携带蝴蝶，但它也提供无可比拟的战斗灵活力作为回报。",
+      "zh-tw": "只有最強大最老練的戰士才能攜帶蝴蝶，但它也提供無可比擬的戰鬥靈活力作爲回報。"
     },
     "quality": "rare",
     "texture": "item_butterfly",
     "notes": []
   },
-  "overrides": {}
+  "overrides": {},
+  "icon": "items/butterfly.png"
 }

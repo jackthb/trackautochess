@@ -2,23 +2,28 @@
   "gameId": "is_beast",
   "name": "Beast",
   "slug": "beast",
-  "icon": "synergies/beast.png",
   "source": {
     "name": "Beast",
     "names": {
       "en": "Beast",
-      "ru": "Beast"
+      "ru": "Beast",
+      "zh-cn": "野兽",
+      "zh-tw": "野獸"
     },
     "description": "Species Trait: Power of the Wild\n Active when you have at least (N) different Beast pieces on board. (Multiple effects stack)\n\n(2) Beasts: All allies have +10% attack damage, including summoned units.\n(4) Beasts: All allies have +25% attack damage, including summoned units.\n(6) Beasts: Attacks from all allies increase physical damage taken by the target by 10%. This effect stacks up to a maximum of 10 and can be applied by friendly summoned units.",
     "descriptions": {
       "en": "Species Trait: Power of the Wild\n Active when you have at least (N) different Beast pieces on board. (Multiple effects stack)\n\n(2) Beasts: All allies have +10% attack damage, including summoned units.\n(4) Beasts: All allies have +25% attack damage, including summoned units.\n(6) Beasts: Attacks from all allies increase physical damage taken by the target by 10%. This effect stacks up to a maximum of 10 and can be applied by friendly summoned units.",
-      "ru": "Species Trait: Power of the Wild\n Активна, когда минимум (N) разных Beast на столе.(Эффекты складываются)\n\n(2) Beasts: Все союзники получают +10% урона атаки, включая призывных юнитов.\n(4) Beasts: Все союзники получают +25% урона атаки, включая призывных юнитов.\n(6) Beasts: Атаки от всех союзников увеличивают физический урон целью на 10%. Этот эффект суммируется максимум до 10 и работает на дружественных призванных юнитов."
+      "ru": "Species Trait: Power of the Wild\n Активна, когда минимум (N) разных Beast на столе.(Эффекты складываются)\n\n(2) Beasts: Все союзники получают +10% урона атаки, включая призывных юнитов.\n(4) Beasts: Все союзники получают +25% урона атаки, включая призывных юнитов.\n(6) Beasts: Атаки от всех союзников увеличивают физический урон целью на 10%. Этот эффект суммируется максимум до 10 и работает на дружественных призванных юнитов.",
+      "zh-cn": "种族技能：野性之力\n 需要己方场上有至少（N）个不同的此种族的棋子来触发效果（触发的多层效果可以叠加）。\n\n（2）野兽：所有友军的攻击力+10%，可以被召唤物继承。\n（4）野兽：所有友军的攻击力+25%，可以被召唤物继承。\n（6）野兽：所有友军获得效果：造成物理伤害会使敌人永久叠加10%的物理易伤，最多叠加10层。",
+      "zh-tw": "種族技能：野性之力\n 需要己方場上有至少（N）個不同的此種族的棋子來觸發效果（觸發的多層效果可以疊加）。\n\n（2）野獸：所有友軍的攻擊力+10%，可以被召喚物繼承。\n（4）野獸：所有友軍的攻擊力+25%，可以被召喚物繼承。\n（6）野獸：所有友軍獲得效果：造成物理傷害會使敵人永久疊加10%的物理易傷，最多疊加10層。"
     },
     "description_html": "<h1>Species Trait: Power of the Wild</h1><font color=\"#656585\">Active when you have at least (N) different Beast pieces on board. (Multiple effects stack)</font><br><br>(2) Beasts: All allies have +10% attack damage, including summoned units.<br>(4) Beasts: All allies have +25% attack damage, including summoned units.<br>(6) Beasts: Attacks from all allies increase physical damage taken by the target by 10%. This effect stacks up to a maximum of 10 and can be applied by friendly summoned units.",
     "lore": "Beasts have superhuman strength, stamina and speed, and are good at group predation.",
     "lore_i18n": {
       "en": "Beasts have superhuman strength, stamina and speed, and are good at group predation.",
-      "ru": "Звери обладают сверхчеловеческой силой, выносливостью и скоростью, а также искусны в групповой охоте."
+      "ru": "Звери обладают сверхчеловеческой силой, выносливостью и скоростью, а также искусны в групповой охоте.",
+      "zh-cn": "野兽拥有超人的力量、耐力和速度，擅长群体捕食。",
+      "zh-tw": "野獸擁有超人的力量、耐力和速度，擅長羣體捕食。"
     },
     "notes": [],
     "tiers": [
@@ -28,5 +33,6 @@
     ],
     "ability_special": {}
   },
-  "overrides": {}
+  "overrides": {},
+  "icon": "synergies/beast.png"
 }

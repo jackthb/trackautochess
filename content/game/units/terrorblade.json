@@ -2,7 +2,6 @@
   "gameId": "chess_tb",
   "name": "Terrorblade",
   "slug": "terrorblade",
-  "icon": "units/terrorblade.png",
   "source": {
     "id": "chess_tb",
     "cost": 3,
@@ -55,10 +54,11 @@
         ],
         "armor": 5,
         "magic_resist": 20,
-        "atk_rate": 1.1,
+        "atk_rate": 1.3,
         "atk_range": 205
       }
     }
   },
-  "overrides": {}
+  "overrides": {},
+  "icon": "units/terrorblade.png"
 }

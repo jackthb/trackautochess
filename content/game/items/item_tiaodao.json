@@ -2,22 +2,27 @@
   "gameId": "item_tiaodao",
   "name": "Blink Dagger",
   "slug": "blink-dagger",
-  "icon": "items/blink.png",
   "source": {
     "name": "Blink Dagger",
     "names": {
       "en": "Blink Dagger",
-      "ru": "Blink Dagger"
+      "ru": "Blink Dagger",
+      "zh-cn": "闪烁匕首",
+      "zh-tw": "閃爍匕首"
     },
-    "description": "Active ability: Instant\nInstantly teleports off the farthest square that allows it to attack an enemy. \n\nRange: 800",
+    "description": "Active ability: Instant\nInstantly teleports off the furthest square that allows it to attack an enemy. \n\nRange: 800",
     "descriptions": {
-      "en": "Active ability: Instant\nInstantly teleports off the farthest square that allows it to attack an enemy. \n\nRange: 800",
-      "ru": "Активка: Мгновенная\nМгновенно телепортирует на самую дальнюю клетку, с которой можно атаковать врага. \n\nRange: 800"
+      "en": "Active ability: Instant\nInstantly teleports off the furthest square that allows it to attack an enemy. \n\nRange: 800",
+      "ru": "Активка: Мгновенная\nМгновенно телепортирует на самую дальнюю клетку, с которой можно атаковать врага. \n\nRange: 800",
+      "zh-cn": "主动技能：立即激活\n瞬间移动到范围内能攻击到敌人的最远的格子。\n\n最远距离：800",
+      "zh-tw": "主動技能：立即激活\n瞬間移動到範圍內能攻擊到敵人的最遠的格子。\n\n最遠距離：800"
     },
     "lore": "The fabled dagger used by the fastest assassin ever to walk the lands.",
     "lore_i18n": {
       "en": "The fabled dagger used by the fastest assassin ever to walk the lands.",
-      "ru": "Легендарный кинжал, принадлежавший самому быстрому убийце, когда-либо ступавшему по этим землям."
+      "ru": "Легендарный кинжал, принадлежавший самому быстрому убийце, когда-либо ступавшему по этим землям.",
+      "zh-cn": "传说中这片大陆上来去如风的刺客使用的匕首。",
+      "zh-tw": "傳說中這片大陸上來去如風的刺客使用的匕首。"
     },
     "quality": "rare",
     "texture": "item_blink",
@@ -25,5 +30,6 @@
       "Chess Pieces with fast movement can be immune to attacks and projectiles."
     ]
   },
-  "overrides": {}
+  "overrides": {},
+  "icon": "items/blink.png"
 }

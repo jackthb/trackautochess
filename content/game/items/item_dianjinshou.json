@@ -2,26 +2,32 @@
   "gameId": "item_dianjinshou",
   "name": "Hand of Midas",
   "slug": "hand-of-midas",
-  "icon": "items/hand_of_midas.png",
   "source": {
     "name": "Hand of Midas",
     "names": {
       "en": "Hand of Midas",
-      "ru": "Hand of Midas"
+      "ru": "Hand of Midas",
+      "zh-cn": "迈达斯之手",
+      "zh-tw": "邁達斯之手"
     },
     "description": "Active ability: Instant Activation\n Immediately eliminates a summoned or illusion piece with health lower than the carrier. In-home battles, drops 1 gold coins.",
     "descriptions": {
       "en": "Active ability: Instant Activation\n Immediately eliminates a summoned or illusion piece with health lower than the carrier. In-home battles, drops 1 gold coins.",
-      "ru": "Нацеленная Активка: Мгновенная\n Немедленно уничтожает призванную или иллюзорную фигуру с меньшим здоровьем, чем у носителя. В домашних битвах дает 1 золотую монету."
+      "ru": "Нацеленная Активка: Мгновенная\n Немедленно уничтожает призванную или иллюзорную фигуру с меньшим здоровьем, чем у носителя. В домашних битвах дает 1 золотую монету.",
+      "zh-cn": "主动技能：立即激活\n立即消灭一个生命值低于携带者的召唤物或幻象。如果是主场作战，同时会掉落1个金币。",
+      "zh-tw": "主動技能：立即激活\n立即消滅一個生命值低於攜帶者的召喚物或幻象。如果是主場作戰，同時會掉落1個金幣。"
     },
     "lore": "Preserved through unknown magical means, the Hand of Midas is a weapon of greed, sacrificing animals to line the owners pockets.",
     "lore_i18n": {
       "en": "Preserved through unknown magical means, the Hand of Midas is a weapon of greed, sacrificing animals to line the owners pockets.",
-      "ru": "Preserved through unknown magical means, the Hand of Midas is a weapon of greed, sacrificing animals to line the owners pockets."
+      "ru": "Preserved through unknown magical means, the Hand of Midas is a weapon of greed, sacrificing animals to line the owners pockets.",
+      "zh-cn": "以未知的魔法手段维持着的迈达斯之手，是件贪婪的武器，通过炼化生灵来装满持有者的腰包。",
+      "zh-tw": "以未知的魔法手段維持着的邁達斯之手，是件貪婪的武器，通過煉化生靈來裝滿持有者的腰包。"
     },
     "quality": "common",
     "texture": "item_hand_of_midas",
     "notes": []
   },
-  "overrides": {}
+  "overrides": {},
+  "icon": "items/hand_of_midas.png"
 }

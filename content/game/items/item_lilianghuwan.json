@@ -2,17 +2,20 @@
   "gameId": "item_lilianghuwan",
   "name": "Bracer",
   "slug": "bracer",
-  "icon": "items/bracer.png",
   "source": {
     "name": "Bracer",
     "names": {
       "en": "Bracer",
-      "ru": "Bracer"
+      "ru": "Bracer",
+      "zh-cn": "力量护腕",
+      "zh-tw": "力量護腕"
     },
     "description": "HP +300.",
     "descriptions": {
       "en": "HP +300.",
-      "ru": "Здоровье +300."
+      "ru": "Здоровье +300.",
+      "zh-cn": "生命值+300。",
+      "zh-tw": "生命值+300。"
     },
     "lore": "",
     "lore_i18n": {},
@@ -20,5 +23,6 @@
     "texture": "bracer",
     "notes": []
   },
-  "overrides": {}
+  "overrides": {},
+  "icon": "items/bracer.png"
 }

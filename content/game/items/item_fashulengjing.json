@@ -2,17 +2,20 @@
   "gameId": "item_fashulengjing",
   "name": "Spell Prism",
   "slug": "spell-prism",
-  "icon": "items/spell_prism.png",
   "source": {
     "name": "Spell Prism",
     "names": {
       "en": "Spell Prism",
-      "ru": "Spell Prism"
+      "ru": "Spell Prism",
+      "zh-cn": "法术棱镜",
+      "zh-tw": "法術棱鏡"
     },
     "description": "magical damage +20%。\n Target quantity of enemy-directed targeted spells or items +1.",
     "descriptions": {
       "en": "magical damage +20%。\n Target quantity of enemy-directed targeted spells or items +1.",
-      "ru": "Магический урон +20%。\n Количество заклинаний или предметов, направленных на цель, +1 (удваивается)."
+      "ru": "Магический урон +20%。\n Количество заклинаний или предметов, направленных на цель, +1 (удваивается).",
+      "zh-cn": "魔法伤害+20%。\n对敌方施放的指向性法术或物品的目标数量+1。",
+      "zh-tw": "魔法傷害+20%。\n對敵方施放的指向性法術或物品的目標數量+1。"
     },
     "lore": "",
     "lore_i18n": {},
@@ -22,5 +25,6 @@
       "Casting skills and certain special target selection targeted spells are ineffective."
     ]
   },
-  "overrides": {}
+  "overrides": {},
+  "icon": "items/spell_prism.png"
 }

@@ -2,7 +2,6 @@
   "gameId": "chess_pudge",
   "name": "Pudge",
   "slug": "pudge",
-  "icon": "units/pudge.png",
   "source": {
     "id": "chess_pudge",
     "cost": 3,
@@ -31,7 +30,7 @@
         ],
         "armor": 6,
         "magic_resist": 30,
-        "atk_rate": 2,
+        "atk_rate": 2.0,
         "atk_range": 205
       },
       "2_star": {
@@ -43,7 +42,7 @@
         ],
         "armor": 6,
         "magic_resist": 30,
-        "atk_rate": 2,
+        "atk_rate": 2.0,
         "atk_range": 205
       },
       "3_star": {
@@ -55,10 +54,11 @@
         ],
         "armor": 6,
         "magic_resist": 30,
-        "atk_rate": 2,
+        "atk_rate": 2.0,
         "atk_range": 205
       }
     }
   },
-  "overrides": {}
+  "overrides": {},
+  "icon": "units/pudge.png"
 }

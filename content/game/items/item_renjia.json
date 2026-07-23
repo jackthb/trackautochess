@@ -2,17 +2,20 @@
   "gameId": "item_renjia",
   "name": "Blade Mail",
   "slug": "blade-mail",
-  "icon": "items/blade_mail.png",
   "source": {
     "name": "Blade Mail",
     "names": {
       "en": "Blade Mail",
-      "ru": "Blade Mail"
+      "ru": "Blade Mail",
+      "zh-cn": "刃甲",
+      "zh-tw": "刃甲"
     },
     "description": "+5 armor.\n\nActive ability: Activates when taking damage\nDuplicates 50% of the damage taken back to the unit that dealt the damage for 7 sec.",
     "descriptions": {
       "en": "+5 armor.\n\nActive ability: Activates when taking damage\nDuplicates 50% of the damage taken back to the unit that dealt the damage for 7 sec.",
-      "ru": "+5 брони.\n\nActive ability: Активируется когда получает урон\nВозвращает 50% полученного урона в юнита нанесшего урон в течении 7 секунд."
+      "ru": "+5 брони.\n\nActive ability: Активируется когда получает урон\nВозвращает 50% полученного урона в юнита нанесшего урон в течении 7 секунд.",
+      "zh-cn": "护甲+5。\n\n主动技能：受伤时激活\n开启尖刺，将受到的所有伤害反弹为50%的纯粹伤害，持续7秒。",
+      "zh-tw": "護甲+5。\n\n主動技能：受傷時激活\n開啓尖刺，將受到的所有傷害反彈爲50%的純粹傷害，持續7秒。"
     },
     "lore": "",
     "lore_i18n": {},
@@ -20,5 +23,6 @@
     "texture": "item_blade_mail",
     "notes": []
   },
-  "overrides": {}
+  "overrides": {},
+  "icon": "items/blade_mail.png"
 }

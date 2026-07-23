@@ -2,7 +2,6 @@
   "gameId": "chess_tech",
   "name": "Techies",
   "slug": "techies",
-  "icon": "units/techies.png",
   "source": {
     "id": "chess_tech",
     "cost": 5,
@@ -60,5 +59,6 @@
       }
     }
   },
-  "overrides": {}
+  "overrides": {},
+  "icon": "units/techies.png"
 }

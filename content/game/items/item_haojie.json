@@ -2,17 +2,20 @@
   "gameId": "item_haojie",
   "name": "Havoc",
   "slug": "havoc",
-  "icon": "items/haojie.png",
   "source": {
     "name": "Havoc",
     "names": {
       "en": "Havoc",
-      "ru": "Havoc"
+      "ru": "Havoc",
+      "zh-cn": "浩劫",
+      "zh-tw": "浩劫"
     },
     "description": "Attack damage +50.\n All carriers damage settled as Pure Damage.",
     "descriptions": {
       "en": "Attack damage +50.\n All carriers damage settled as Pure Damage.",
-      "ru": "Урон атаки +50.\n Весь урон носителя становится чистым."
+      "ru": "Урон атаки +50.\n Весь урон носителя становится чистым.",
+      "zh-cn": "攻击力+50。\n携带者造成的所有伤害都结算为纯粹伤害。",
+      "zh-tw": "攻擊力+50。\n攜帶者造成的所有傷害都結算爲純粹傷害。"
     },
     "lore": "",
     "lore_i18n": {},
@@ -20,5 +23,6 @@
     "texture": "custom/haojie",
     "notes": []
   },
-  "overrides": {}
+  "overrides": {},
+  "icon": "items/haojie.png"
 }

@@ -2,23 +2,28 @@
   "gameId": "is_god",
   "name": "God",
   "slug": "god",
-  "icon": "synergies/god.png",
   "source": {
     "name": "God",
     "names": {
       "en": "God",
-      "ru": "God"
+      "ru": "God",
+      "zh-cn": "神",
+      "zh-tw": "神"
     },
-    "description": "SPECIES TRAIT: Overweening superiority\n Active when you have at least (N) different pieces of this species on board. (Multiple effects stack)\n\n(2)Gods: All allies get the effect: skill cooldown time -30%.\n(4)Gods: All allies get the effect: skill cooldown time -30%.\n(6) Gods: All allies get the effect: Using skills that consume mana will reduce the current remaining cooldown time of active abilities and items by 60%.",
+    "description": "SPECIES TRAIT: Overweening superiority\n Active when you have at least (N) different pieces of this species on board. (Multiple effects stack)\n\n(2)Gods: All allies get the effect: skill cooldown time -40%.\n(4)Gods: All allies get the effect: skill cooldown time -40%.\n(6) Gods: All allies get the effect: Using skills that consume mana will reduce the current remaining cooldown time of active abilities and items by 60%.",
     "descriptions": {
-      "en": "SPECIES TRAIT: Overweening superiority\n Active when you have at least (N) different pieces of this species on board. (Multiple effects stack)\n\n(2)Gods: All allies get the effect: skill cooldown time -30%.\n(4)Gods: All allies get the effect: skill cooldown time -30%.\n(6) Gods: All allies get the effect: Using skills that consume mana will reduce the current remaining cooldown time of active abilities and items by 60%.",
-      "ru": "SPECIES TRAIT: Overweening superiority\n Активируется, когда на поле есть хотя бы (N) разных фигур этого вида. (Эффекты складываются)\n\n(2) Gods: Все союзники получают эффект: время перезарядки навыков -30%.\n(4) Gods: Все союзники получают эффект: время перезарядки навыков -30%.\n(6) Gods: Все союзники получают эффект: использование навыков, которые требуют маны, уменьшает оставшееся время перезарядки активных способностей и предметов на 60%."
+      "en": "SPECIES TRAIT: Overweening superiority\n Active when you have at least (N) different pieces of this species on board. (Multiple effects stack)\n\n(2)Gods: All allies get the effect: skill cooldown time -40%.\n(4)Gods: All allies get the effect: skill cooldown time -40%.\n(6) Gods: All allies get the effect: Using skills that consume mana will reduce the current remaining cooldown time of active abilities and items by 60%.",
+      "ru": "SPECIES TRAIT: Overweening superiority\n Активируется, когда на поле есть хотя бы (N) разных фигур этого вида. (Эффекты складываются)\n\n(2) Gods: Все союзники получают эффект: время перезарядки навыков -40%.\n(4) Gods: Все союзники получают эффект: время перезарядки навыков -40%.\n(6) Gods: Все союзники получают эффект: использование навыков, которые требуют маны, уменьшает оставшееся время перезарядки активных способностей и предметов на 60%.",
+      "zh-cn": "种族技能：独尊\n 需要己方场上有至少（N）个不同的此种族的棋子来触发效果（触发的多层效果可以叠加）。\n\n（2）神：所有友方棋子获得效果：技能冷却时间-40%。\n（4）神：所有友方棋子获得效果：技能冷却时间-40%。\n（6）神：所有友方棋子获得效果：消耗法力值释放的技能会使主动技能和物品的当前剩余冷却时间-60%。",
+      "zh-tw": "種族技能：獨尊\n 需要己方場上有至少（N）個不同的此種族的棋子來觸發效果（觸發的多層效果可以疊加）。\n\n（2）神：所有友方棋子獲得效果：技能冷卻時間-40%。\n（4）神：所有友方棋子獲得效果：技能冷卻時間-40%。\n（6）神：所有友方棋子獲得效果：消耗法力值釋放的技能會使主動技能和物品的當前剩餘冷卻時間-60%。"
     },
-    "description_html": "<h1>SPECIES TRAIT: Overweening superiority</h1><font color=\"#656585\">Active when you have at least (N) different pieces of this species on board. (Multiple effects stack)</font><br><br>(2)Gods: All allies get the effect: skill cooldown time -30%.<br>(4)Gods: All allies get the effect: skill cooldown time -30%.<br>(6) Gods: All allies get the effect: Using skills that consume mana  will reduce the current remaining cooldown time of active abilities and items by 60%.",
+    "description_html": "<h1>SPECIES TRAIT: Overweening superiority</h1><font color=\"#656585\">Active when you have at least (N) different pieces of this species on board. (Multiple effects stack)</font><br><br>(2)Gods: All allies get the effect: skill cooldown time -40%.<br>(4)Gods: All allies get the effect: skill cooldown time -40%.<br>(6) Gods: All allies get the effect: Using skills that consume mana  will reduce the current remaining cooldown time of active abilities and items by 60%.",
     "lore": "The highly worshipped Gods are considered as the creators of Drodo Island. Being both arrogant and prideful, the loyal beliefs from their creations have forged the supreme powers that Gods possess, granting them the most significant potential among all creatures which can completely change the outcome of a battle.",
     "lore_i18n": {
       "en": "The highly worshipped Gods are considered as the creators of Drodo Island. Being both arrogant and prideful, the loyal beliefs from their creations have forged the supreme powers that Gods possess, granting them the most significant potential among all creatures which can completely change the outcome of a battle.",
-      "ru": "Боги, которым поклоняются с особым почтением, считаются создателями острова Дродо. Высокомерие и гордыня, а также вера в их творения наделили богов высшей силой, которая дает им самый значительный потенциал среди всех существ и может полностью изменить исход битвы."
+      "ru": "Боги, которым поклоняются с особым почтением, считаются создателями острова Дродо. Высокомерие и гордыня, а также вера в их творения наделили богов высшей силой, которая дает им самый значительный потенциал среди всех существ и может полностью изменить исход битвы.",
+      "zh-cn": "高高在上的神明被认为是多多岛的造物者。在将神力赐予了守护巨龙之后，神明们很少亲自涉事凡人的世界，直到多多岛遇到了来自扭曲虚空的空前危机。",
+      "zh-tw": "高高在上的神明被認爲是多多島的造物者。在將神力賜予了守護巨龍之後，神明們很少親自涉事凡人的世界，直到多多島遇到了來自扭曲虛空的空前危機。"
     },
     "notes": [
       "Overweening superiority does not reduce the cooldown time of passive items."
@@ -30,5 +35,6 @@
     ],
     "ability_special": {}
   },
-  "overrides": {}
+  "overrides": {},
+  "icon": "synergies/god.png"
 }

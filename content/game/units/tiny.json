@@ -2,7 +2,6 @@
   "gameId": "chess_tiny",
   "name": "Tiny",
   "slug": "tiny",
-  "icon": "units/tiny.png",
   "source": {
     "id": "chess_tiny",
     "cost": 2,
@@ -66,5 +65,6 @@
       }
     }
   },
-  "overrides": {}
+  "overrides": {},
+  "icon": "units/tiny.png"
 }

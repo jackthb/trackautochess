@@ -2,20 +2,27 @@
   "gameId": "item_more_creep",
   "name": "March of The Beasts",
   "slug": "march-of-the-beasts",
-  "icon": "relics/march_of_the_beasts.png",
   "source": {
     "name": "March of The Beasts",
     "names": {
       "en": "March of The Beasts",
-      "ru": "March of The Beasts"
+      "ru": "March of The Beasts",
+      "zh-cn": "百兽大游行",
+      "zh-tw": "百獸大遊行"
     },
     "description": "All creeps duplicate themselves and counted as level +1.",
     "descriptions": {
       "en": "All creeps duplicate themselves and counted as level +1.",
-      "ru": "Все крипы удваиваются и считаются на один уровень выше."
+      "ru": "Все крипы удваиваются и считаются на один уровень выше.",
+      "zh-cn": "你在战利品回合迎战的野怪数量×2，并且视为等级+1。",
+      "zh-tw": "你在戰利品回合迎戰的野怪數量×2，並且視爲等級+1。"
     },
     "lore": "",
-    "lore_i18n": {}
+    "lore_i18n": {
+      "zh-cn": "来自：圣物宝箱",
+      "zh-tw": "來自：聖物寶箱"
+    }
   },
-  "overrides": {}
+  "overrides": {},
+  "icon": "relics/march_of_the_beasts.png"
 }

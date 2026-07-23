@@ -2,7 +2,6 @@
   "gameId": "chess_doom",
   "name": "Doom",
   "slug": "doom",
-  "icon": "units/doom.png",
   "source": {
     "id": "chess_doom",
     "cost": 4,
@@ -60,5 +59,6 @@
       }
     }
   },
-  "overrides": {}
+  "overrides": {},
+  "icon": "units/doom.png"
 }

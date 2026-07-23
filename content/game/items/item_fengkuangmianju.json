@@ -2,26 +2,32 @@
   "gameId": "item_fengkuangmianju",
   "name": "Mask of Madness",
   "slug": "mask-of-madness",
-  "icon": "items/mask_of_madness.png",
   "source": {
     "name": "Mask of Madness",
     "names": {
       "en": "Mask of Madness",
-      "ru": "Mask of Madness"
+      "ru": "Mask of Madness",
+      "zh-cn": "疯狂面具",
+      "zh-tw": "瘋狂面具"
     },
     "description": "+15% attack speed, lifesteal +20%, but silences the carrier.",
     "descriptions": {
       "en": "+15% attack speed, lifesteal +20%, but silences the carrier.",
-      "ru": "+20% скорости атаки, лайфстил +20%, но обезмалвливает носителя."
+      "ru": "+20% скорости атаки, лайфстил +20%, но обезмалвливает носителя.",
+      "zh-cn": "沉默自己，攻击吸血+25%，攻击速度+20%。",
+      "zh-tw": "沉默自己，攻擊吸血+25%，攻擊速度+20%。"
     },
     "lore": "Once this mask is worn, its bearer becomes an uncontrollable aggressive force.",
     "lore_i18n": {
       "en": "Once this mask is worn, its bearer becomes an uncontrollable aggressive force.",
-      "ru": "Тот, кто надел эту маску, превращается в неуправляемую агрессивную силу."
+      "ru": "Тот, кто надел эту маску, превращается в неуправляемую агрессивную силу.",
+      "zh-cn": "我发起疯来连自己都害怕。",
+      "zh-tw": "我發起瘋來連自己都害怕。"
     },
     "quality": "rare",
     "texture": "item_mask_of_madness",
     "notes": []
   },
-  "overrides": {}
+  "overrides": {},
+  "icon": "items/mask_of_madness.png"
 }

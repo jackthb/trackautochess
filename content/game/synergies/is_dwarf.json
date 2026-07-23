@@ -2,23 +2,28 @@
   "gameId": "is_dwarf",
   "name": "Dwarf",
   "slug": "dwarf",
-  "icon": "synergies/dwarf.png",
   "source": {
     "name": "Dwarf",
     "names": {
       "en": "Dwarf",
-      "ru": "Dwarf"
+      "ru": "Dwarf",
+      "zh-cn": "矮人",
+      "zh-tw": "矮人"
     },
     "description": "Species Trait: Take Aim\n Active when you have at least (N) different Dwarf pieces on board. (Multiple effects stack)\n\n(2) Dwarves: All dwarves’ attack range +200, physical damage deals 15% increased damage for every 1 square away from the target.",
     "descriptions": {
       "en": "Species Trait: Take Aim\n Active when you have at least (N) different Dwarf pieces on board. (Multiple effects stack)\n\n(2) Dwarves: All dwarves’ attack range +200, physical damage deals 15% increased damage for every 1 square away from the target.",
-      "ru": "Species Trait: Take Aim\n Активируется, когда на поле есть хотя бы (N) разных Dwarf фигур. (Эффекты складываются)\n\n(2) Dwarves: Все физические атаки дворфов наносят на 15% больше урона за каждые 1 клетку расстояния до цели."
+      "ru": "Species Trait: Take Aim\n Активируется, когда на поле есть хотя бы (N) разных Dwarf фигур. (Эффекты складываются)\n\n(2) Dwarves: Все физические атаки дворфов наносят на 15% больше урона за каждые 1 клетку расстояния до цели.",
+      "zh-cn": "种族技能：硬化氪金狗眼\n 需要己方场上有至少（N）个不同的此种族的远程棋子来触发效果（触发的多层效果可以叠加）。\n\n（2）矮人：所有友方远程矮人棋子获得效果：攻击距离+200，对敌人造成的任何物理伤害都会有每1格距离+15%的伤害加成。",
+      "zh-tw": "種族技能：硬化氪金狗眼\n 需要己方場上有至少（N）個不同的此種族的遠程棋子來觸發效果（觸發的多層效果可以疊加）。\n\n（2）矮人：所有友方遠程矮人棋子獲得效果：攻擊距離+200，對敵人造成的任何物理傷害都會有每1格距離+15%的傷害加成。"
     },
     "description_html": "<h1>Species Trait: Take Aim</h1><font color=\"#656585\">Active when you have at least (N) different Dwarf pieces on board. (Multiple effects stack)</font><br><br>(2) Dwarves: All dwarves’ attack range +200, physical damage deals 15% increased damage for every 1 square away from the target.",
     "lore": "Dwarves are a bold and courageous species of humanoids that excel in creating and refining weapons and gadgets, allowing them to slay their foes from afar.",
     "lore_i18n": {
       "en": "Dwarves are a bold and courageous species of humanoids that excel in creating and refining weapons and gadgets, allowing them to slay their foes from afar.",
-      "ru": "Dwarves are a bold and courageous species of humanoids that excel in creating and refining weapons and gadgets, allowing them to slay their foes from afar."
+      "ru": "Dwarves are a bold and courageous species of humanoids that excel in creating and refining weapons and gadgets, allowing them to slay their foes from afar.",
+      "zh-cn": "大胆而勇敢的矮人族是一支古老的种族，它起源于早期多多岛的神明用具有活力的石头创造的土灵。擅长采矿和制造的矮人在这个世界上寻找泰坦的遗产，因为他们坚信是泰坦在创世之初用石头创造了矮人。",
+      "zh-tw": "大膽而勇敢的矮人族是一支古老的種族，它起源於早期多多島的神明用具有活力的石頭創造的土靈。擅長採礦和製造的矮人在這個世界上尋找泰坦的遺產，因爲他們堅信是泰坦在創世之初用石頭創造了矮人。"
     },
     "notes": [],
     "tiers": [
@@ -26,5 +31,6 @@
     ],
     "ability_special": {}
   },
-  "overrides": {}
+  "overrides": {},
+  "icon": "synergies/dwarf.png"
 }

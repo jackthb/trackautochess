@@ -2,7 +2,6 @@
   "gameId": "chess_ta",
   "name": "Templar Assassin",
   "slug": "templar-assassin",
-  "icon": "units/templar_assassin.png",
   "source": {
     "id": "chess_ta",
     "cost": 5,
@@ -60,5 +59,6 @@
       }
     }
   },
-  "overrides": {}
+  "overrides": {},
+  "icon": "units/templar_assassin.png"
 }

@@ -2,17 +2,20 @@
   "gameId": "item_zhusidoupeng",
   "name": "Gossamer Cape",
   "slug": "gossamer-cape",
-  "icon": "items/gossamer_cape.png",
   "source": {
     "name": "Gossamer Cape",
     "names": {
       "en": "Gossamer Cape",
-      "ru": "Gossamer Cape"
+      "ru": "Gossamer Cape",
+      "zh-cn": "蛛丝斗篷",
+      "zh-tw": "蛛絲斗篷"
     },
     "description": "+25% magical resistance. Its carrier and all minions are immune to mind control.",
     "descriptions": {
       "en": "+25% magical resistance. Its carrier and all minions are immune to mind control.",
-      "ru": "+25% сопротивления магии. Носитель и призывные существа невосприимчивы к контролю разума."
+      "ru": "+25% сопротивления магии. Носитель и призывные существа невосприимчивы к контролю разума.",
+      "zh-cn": "携带者和它的召唤物获得效果：魔法抗性+25%，免疫精神控制。",
+      "zh-tw": "攜帶者和它的召喚物獲得效果：魔法抗性+25%，免疫精神控制。"
     },
     "lore": "",
     "lore_i18n": {},
@@ -20,5 +23,6 @@
     "texture": "gossamer_cape",
     "notes": []
   },
-  "overrides": {}
+  "overrides": {},
+  "icon": "items/gossamer_cape.png"
 }

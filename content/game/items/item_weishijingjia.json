@@ -2,26 +2,32 @@
   "gameId": "item_weishijingjia",
   "name": "Guardian Greaves",
   "slug": "guardian-greaves",
-  "icon": "items/guardian_greaves.png",
   "source": {
     "name": "Guardian Greaves",
     "names": {
       "en": "Guardian Greaves",
-      "ru": "Guardian Greaves"
+      "ru": "Guardian Greaves",
+      "zh-cn": "卫士胫甲",
+      "zh-tw": "衛士脛甲"
     },
     "description": "Enables quick movement\n\nActive ability: Activates when many allied chess pieces are injured.\nGrants 500 maximum health and 30 mana to all allied units in the area and dispels negative effects incurred during battle.\n\nEffect Range:500",
     "descriptions": {
       "en": "Enables quick movement\n\nActive ability: Activates when many allied chess pieces are injured.\nGrants 500 maximum health and 30 mana to all allied units in the area and dispels negative effects incurred during battle.\n\nEffect Range:500",
-      "ru": "Enables quick movement\n\nActive ability:Активируется, когда много союзных фигур ранены.\nДарует 500 максимального здоровья и 30 маны всем союзным юнитам в зоне действия и снимает отрицательные эффекты, полученные в бою.\n\nEffect Range:500"
+      "ru": "Enables quick movement\n\nActive ability:Активируется, когда много союзных фигур ранены.\nДарует 500 максимального здоровья и 30 маны всем союзным юнитам в зоне действия и снимает отрицательные эффекты, полученные в бою.\n\nEffect Range:500",
+      "zh-cn": "快速移动。\n\n主动技能：友方棋子有较多受伤时激活\n使范围内所有友军获得500点最大生命值和30点法力值，同时驱散战斗时产生的不良状态。",
+      "zh-tw": "快速移動。\n\n主動技能：友方棋子有較多受傷時激活\n使範圍內所有友軍獲得500點最大生命值和30點法力值，同時驅散戰鬥時產生的不良狀態。"
     },
     "lore": "One of many holy instruments constructed to honor the Omniscience.",
     "lore_i18n": {
       "en": "One of many holy instruments constructed to honor the Omniscience.",
-      "ru": "Один из множества священных инструментов, созданных в честь Omniscience."
+      "ru": "Один из множества священных инструментов, созданных в честь Omniscience.",
+      "zh-cn": "为了向全能之神致敬所打造的众多圣器之一。",
+      "zh-tw": "爲了向全能之神致敬所打造的衆多聖器之一。"
     },
     "quality": "epic",
     "texture": "item_guardian_greaves",
     "notes": []
   },
-  "overrides": {}
+  "overrides": {},
+  "icon": "items/guardian_greaves.png"
 }

@@ -2,7 +2,6 @@
   "gameId": "chess_thd",
   "name": "Jakiro",
   "slug": "jakiro",
-  "icon": "units/jakiro.png",
   "source": {
     "id": "chess_thd",
     "cost": 5,
@@ -60,5 +59,6 @@
       }
     }
   },
-  "overrides": {}
+  "overrides": {},
+  "icon": "units/jakiro.png"
 }

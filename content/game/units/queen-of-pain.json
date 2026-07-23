@@ -2,7 +2,6 @@
   "gameId": "chess_qop",
   "name": "Queen of Pain",
   "slug": "queen-of-pain",
-  "icon": "units/queen_of_pain.png",
   "source": {
     "id": "chess_qop",
     "cost": 5,
@@ -60,5 +59,6 @@
       }
     }
   },
-  "overrides": {}
+  "overrides": {},
+  "icon": "units/queen_of_pain.png"
 }

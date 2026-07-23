@@ -2,17 +2,20 @@
   "gameId": "item_dapao",
   "name": "Daedalus",
   "slug": "daedalus",
-  "icon": "items/greater_crit.png",
   "source": {
     "name": "Daedalus",
     "names": {
       "en": "Daedalus",
-      "ru": "Daedalus"
+      "ru": "Daedalus",
+      "zh-cn": "代达罗斯之殇",
+      "zh-tw": "代達羅斯之殤"
     },
     "description": "+75 damage.\nAttacks have a 20% chance to critically strike for 400% damage.",
     "descriptions": {
       "en": "+75 damage.\nAttacks have a 20% chance to critically strike for 400% damage.",
-      "ru": "+75 damage.\nАтаки имеют 20% шанс на критический удар, наносящий 400% урона."
+      "ru": "+75 damage.\nАтаки имеют 20% шанс на критический удар, наносящий 400% урона.",
+      "zh-cn": "攻击力+75。\n攻击有20%概率造成4倍暴击。",
+      "zh-tw": "攻擊力+75。\n攻擊有20%概率造成4倍暴擊。"
     },
     "lore": "",
     "lore_i18n": {},
@@ -20,5 +23,6 @@
     "texture": "item_greater_crit",
     "notes": []
   },
-  "overrides": {}
+  "overrides": {},
+  "icon": "items/greater_crit.png"
 }

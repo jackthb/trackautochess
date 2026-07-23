@@ -2,26 +2,32 @@
   "gameId": "item_yonghengzhipan",
   "name": "Aeon Disk",
   "slug": "aeon-disk",
-  "icon": "items/aeon_disk.png",
   "source": {
     "name": "Aeon Disk",
     "names": {
       "en": "Aeon Disk",
-      "ru": "Aeon Disk"
+      "ru": "Aeon Disk",
+      "zh-cn": "永恒之盘",
+      "zh-tw": "永恆之盤"
     },
     "description": "Carrier and its minions will be a\n permanent chess piece.\n\nActive ability: Activates when at low health.\nGrants 100% damage block for 3.5 seconds.",
     "descriptions": {
       "en": "Carrier and its minions will be a\n permanent chess piece.\n\nActive ability: Activates when at low health.\nGrants 100% damage block for 3.5 seconds.",
-      "ru": "Носитель и его призывные юниты\n становятся постояннымми фигурами.\n\nАктивируется при низком HP\nДаёт 100% блокировку урона на 3.5 секунды."
+      "ru": "Носитель и его призывные юниты\n становятся постояннымми фигурами.\n\nАктивируется при низком HP\nДаёт 100% блокировку урона на 3.5 секунды.",
+      "zh-cn": "携带者和它的变身形态/召唤物始终视为\n永久棋子。\n\n主动技能：濒死时激活\n免疫所有伤害，持续3.5秒。",
+      "zh-tw": "攜帶者和它的變身形態/召喚物始終視爲\n永久棋子。\n\n主動技能：瀕死時激活\n免疫所有傷害，持續3.5秒。"
     },
     "lore": "A powerful artifact long ago smuggled out of the Ivory Incubarium. Or so many believe.",
     "lore_i18n": {
       "en": "A powerful artifact long ago smuggled out of the Ivory Incubarium. Or so many believe.",
-      "ru": "Мощный артефакт, некогда тайно вывезенный из Слоновой Инкубарии. По крайней мере, так считают многие."
+      "ru": "Мощный артефакт, некогда тайно вывезенный из Слоновой Инкубарии. По крайней мере, так считают многие.",
+      "zh-cn": "一件多年以前被偷偷运出象牙孵巢的强力宝物。很多人都信以为真了。",
+      "zh-tw": "一件多年以前被偷偷運出象牙孵巢的強力寶物。很多人都信以爲真了。"
     },
     "quality": "rare",
     "texture": "item_aeon_disk",
     "notes": []
   },
-  "overrides": {}
+  "overrides": {},
+  "icon": "items/aeon_disk.png"
 }

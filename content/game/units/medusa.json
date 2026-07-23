@@ -2,7 +2,6 @@
   "gameId": "chess_medusa",
   "name": "Medusa",
   "slug": "medusa",
-  "icon": "units/medusa.png",
   "source": {
     "id": "chess_medusa",
     "cost": 4,
@@ -31,7 +30,7 @@
         ],
         "armor": 7,
         "magic_resist": 10,
-        "atk_rate": 1,
+        "atk_rate": 1.0,
         "atk_range": 400
       },
       "2_star": {
@@ -43,7 +42,7 @@
         ],
         "armor": 7,
         "magic_resist": 10,
-        "atk_rate": 1,
+        "atk_rate": 1.0,
         "atk_range": 400
       },
       "3_star": {
@@ -55,10 +54,11 @@
         ],
         "armor": 7,
         "magic_resist": 10,
-        "atk_rate": 1,
+        "atk_rate": 1.0,
         "atk_range": 400
       }
     }
   },
-  "overrides": {}
+  "overrides": {},
+  "icon": "units/medusa.png"
 }

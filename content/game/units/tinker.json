@@ -2,7 +2,6 @@
   "gameId": "chess_tk",
   "name": "Tinker",
   "slug": "tinker",
-  "icon": "units/tinker.png",
   "source": {
     "id": "chess_tk",
     "cost": 1,
@@ -60,5 +59,6 @@
       }
     }
   },
-  "overrides": {}
+  "overrides": {},
+  "icon": "units/tinker.png"
 }

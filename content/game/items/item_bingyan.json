@@ -2,26 +2,32 @@
   "gameId": "item_bingyan",
   "name": "Eye of Skadi",
   "slug": "eye-of-skadi",
-  "icon": "items/skadi.png",
   "source": {
     "name": "Eye of Skadi",
     "names": {
       "en": "Eye of Skadi",
-      "ru": "Eye of Skadi"
+      "ru": "Eye of Skadi",
+      "zh-cn": "斯嘉蒂之眼",
+      "zh-tw": "斯嘉蒂之眼"
     },
     "description": "+600 max health.\nAttack speed, Attack damage, Move speed, mana restoration and healing effectiveness -50%.",
     "descriptions": {
       "en": "+600 max health.\nAttack speed, Attack damage, Move speed, mana restoration and healing effectiveness -50%.",
-      "ru": "+600 здоровья.\nПоражённые цели: скорость атаки, урона, скорость передвижения, восстановление маны и эффективность лечения - снижены на 50%."
+      "ru": "+600 здоровья.\nПоражённые цели: скорость атаки, урона, скорость передвижения, восстановление маны и эффективность лечения - снижены на 50%.",
+      "zh-cn": "生命值+600。\n任何受到持有者伤害的目标都会获得效果：攻击速度、攻击力、移动速度、法力获取和受到治疗-50%。",
+      "zh-tw": "生命值+600。\n任何受到持有者傷害的目標都會獲得效果：攻擊速度、攻擊力、移動速度、法力獲取和受到治療-50%。"
     },
     "lore": "Extremely rare artifact, guarded by the azure dragons.",
     "lore_i18n": {
       "en": "Extremely rare artifact, guarded by the azure dragons.",
-      "ru": "Чрезвычайно редкий артефакт, охраняемый лазурными драконами."
+      "ru": "Чрезвычайно редкий артефакт, охраняемый лазурными драконами.",
+      "zh-cn": "极度罕见的古物，由苍空之龙看管。",
+      "zh-tw": "極度罕見的古物，由蒼空之龍看管。"
     },
     "quality": "rare",
     "texture": "item_skadi",
     "notes": []
   },
-  "overrides": {}
+  "overrides": {},
+  "icon": "items/skadi.png"
 }

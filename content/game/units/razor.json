@@ -2,7 +2,6 @@
   "gameId": "chess_razor",
   "name": "Razor",
   "slug": "razor",
-  "icon": "units/razor.png",
   "source": {
     "id": "chess_razor",
     "cost": 3,
@@ -60,5 +59,6 @@
       }
     }
   },
-  "overrides": {}
+  "overrides": {},
+  "icon": "units/razor.png"
 }

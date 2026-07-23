@@ -2,17 +2,20 @@
   "gameId": "item_changdun",
   "name": "Pavise",
   "slug": "pavise",
-  "icon": "items/pavise.png",
   "source": {
     "name": "Pavise",
     "names": {
       "en": "Pavise",
-      "ru": "Pavise"
+      "ru": "Pavise",
+      "zh-cn": "长盾",
+      "zh-tw": "長盾"
     },
     "description": "+5 Armor.\nChances to gain +1 armor permanently on its carrier on damage taken in home battle.",
     "descriptions": {
       "en": "+5 Armor.\nChances to gain +1 armor permanently on its carrier on damage taken in home battle.",
-      "ru": "+5 брони.\nШанс получить +1 брони носителю навсегда, при получении урона в домашнем бою."
+      "ru": "+5 брони.\nШанс получить +1 брони носителю навсегда, при получении урона в домашнем бою.",
+      "zh-cn": "护甲+5。\n每当主场战斗时持有者首次受到伤害，有概率永久获得+1护甲。",
+      "zh-tw": "護甲+5。\n每當主場戰鬥時持有者首次受到傷害，有概率永久獲得+1護甲。"
     },
     "lore": "",
     "lore_i18n": {},
@@ -20,5 +23,6 @@
     "texture": "item_pavise",
     "notes": []
   },
-  "overrides": {}
+  "overrides": {},
+  "icon": "items/pavise.png"
 }

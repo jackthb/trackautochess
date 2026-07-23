@@ -2,23 +2,28 @@
   "gameId": "is_dragon",
   "name": "Dragon",
   "slug": "dragon",
-  "icon": "synergies/dragon.png",
   "source": {
     "name": "Dragon",
     "names": {
       "en": "Dragon",
-      "ru": "Dragon"
+      "ru": "Dragon",
+      "zh-cn": "龙",
+      "zh-tw": "龍"
     },
     "description": "Species Trait: Attunement\n Active when you have at least (N) different pieces of this species on board. (Multiple effects stack).\n\n(3) Dragons: All friendly Dragons have an initial mana value of 100.\n(5) Dragons: All allies have an initial mana value of 100.",
     "descriptions": {
       "en": "Species Trait: Attunement\n Active when you have at least (N) different pieces of this species on board. (Multiple effects stack).\n\n(3) Dragons: All friendly Dragons have an initial mana value of 100.\n(5) Dragons: All allies have an initial mana value of 100.",
-      "ru": "Species Trait: Attunement\n Активна, когда минимум (N) разных Dragon на столе.(Эффекты складываются)\n\n(3) Dragons: Все дружественные Dragons начинают бой со 100 маны.\n(5) Dragons: Все союзники начинают бой с 100 маны."
+      "ru": "Species Trait: Attunement\n Активна, когда минимум (N) разных Dragon на столе.(Эффекты складываются)\n\n(3) Dragons: Все дружественные Dragons начинают бой со 100 маны.\n(5) Dragons: Все союзники начинают бой с 100 маны.",
+      "zh-cn": "种族技能：战吼\n 需要己方场上有至少（N）个不同的此种族的棋子来触发效果（触发的多层效果可以叠加）。\n\n（3）龙：所有友方龙棋子的初始法力值为100。\n（5）龙：所有友军的初始法力值为100。",
+      "zh-tw": "種族技能：戰吼\n 需要己方場上有至少（N）個不同的此種族的棋子來觸發效果（觸發的多層效果可以疊加）。\n\n（3）龍：所有友方龍棋子的初始法力值爲100。\n（5）龍：所有友軍的初始法力值爲100。"
     },
     "description_html": "<h1>Species Trait:  Attunement</h1><font color=\"#656585\">Active when you have at least (N) different pieces of this species on board. (Multiple effects stack).</font><br><br>(3) Dragons: All friendly Dragons have an initial mana value of 100.<br>(5) Dragons: All allies have an initial mana value of 100.",
     "lore": "Dragons were among the first creatures to exist on this ancient land. They possess unimaginable powers, deep within, which they like to show off when they commune together.",
     "lore_i18n": {
       "en": "Dragons were among the first creatures to exist on this ancient land. They possess unimaginable powers, deep within, which they like to show off when they commune together.",
-      "ru": "Драконы были одними из первых существ, появившихся на этой древней земле. В глубине их душ таятся невообразимые силы, которые они любят демонстрировать, когда собираются вместе."
+      "ru": "Драконы были одними из первых существ, появившихся на этой древней земле. В глубине их душ таятся невообразимые силы, которые они любят демонстрировать, когда собираются вместе.",
+      "zh-cn": "龙族是多多岛上古老的住民，它们拥有庞大的身躯、超乎想象的力量，被视为神圣而强大的存在。",
+      "zh-tw": "龍族是多多島上古老的住民，它們擁有龐大的身軀、超乎想象的力量，被視爲神聖而強大的存在。"
     },
     "notes": [],
     "tiers": [
@@ -27,5 +32,6 @@
     ],
     "ability_special": {}
   },
-  "overrides": {}
+  "overrides": {},
+  "icon": "synergies/dragon.png"
 }

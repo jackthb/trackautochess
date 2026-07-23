@@ -2,26 +2,32 @@
   "gameId": "item_suiluchui",
   "name": "Skull Basher",
   "slug": "skull-basher",
-  "icon": "items/basher.png",
   "source": {
     "name": "Skull Basher",
     "names": {
       "en": "Skull Basher",
-      "ru": "Skull Basher"
+      "ru": "Skull Basher",
+      "zh-cn": "碎颅锤",
+      "zh-tw": "碎顱錘"
     },
     "description": "Grants melee hero 20% chance on hit to stun the target for 2s.",
     "descriptions": {
       "en": "Grants melee hero 20% chance on hit to stun the target for 2s.",
-      "ru": "Предоставляет герою ближнего боя 20% шанс при ударе оглушить цель на 2 секунды."
+      "ru": "Предоставляет герою ближнего боя 20% шанс при ударе оглушить цель на 2 секунды.",
+      "zh-cn": "近战携带者攻击有20%概率击晕目标2秒。",
+      "zh-tw": "近戰攜帶者攻擊有20%概率擊暈目標2秒。"
     },
     "lore": "A feared weapon in the right hands, this maul’s ability to shatter the defenses of its opponents should not be underestimated.",
     "lore_i18n": {
       "en": "A feared weapon in the right hands, this maul’s ability to shatter the defenses of its opponents should not be underestimated.",
-      "ru": "Грозное оружие в умелых руках: эта булава способна сокрушать защиту врагов, и недооценивать её не стоит."
+      "ru": "Грозное оружие в умелых руках: эта булава способна сокрушать защиту врагов, и недооценивать её не стоит.",
+      "zh-cn": "用对了敌方会让人闻风丧胆的武器，千万不要低估这把大锤粉碎对手防御的能力。",
+      "zh-tw": "用對了敵方會讓人聞風喪膽的武器，千萬不要低估這把大錘粉碎對手防禦的能力。"
     },
     "quality": "common",
     "texture": "basher",
     "notes": []
   },
-  "overrides": {}
+  "overrides": {},
+  "icon": "items/basher.png"
 }

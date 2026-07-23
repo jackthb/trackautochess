@@ -2,7 +2,6 @@
   "gameId": "chess_dk",
   "name": "Dragon Knight",
   "slug": "dragon-knight",
-  "icon": "units/dragon_knight.png",
   "source": {
     "id": "chess_dk",
     "cost": 4,
@@ -61,5 +60,6 @@
       }
     }
   },
-  "overrides": {}
+  "overrides": {},
+  "icon": "units/dragon_knight.png"
 }

@@ -2,20 +2,27 @@
   "gameId": "item_stolen_vault",
   "name": "Stolen Vault",
   "slug": "stolen-vault",
-  "icon": "relics/stolen_vault.png",
   "source": {
     "name": "Stolen Vault",
     "names": {
       "en": "Stolen Vault",
-      "ru": "Stolen Vault"
+      "ru": "Stolen Vault",
+      "zh-cn": "失窃的宝库",
+      "zh-tw": "失竊的寶庫"
     },
     "description": "Discard all 3 relics and get a Stolen Vault with random 10 ~ 15 gold.",
     "descriptions": {
       "en": "Discard all 3 relics and get a Stolen Vault with random 10 ~ 15 gold.",
-      "ru": "Отказаться от выбора реликвии и получить Stolen Vault с случайными 10-15 золота."
+      "ru": "Отказаться от выбора реликвии и получить Stolen Vault с случайными 10-15 золота.",
+      "zh-cn": "放弃本次选择圣物，立刻随机获得10～15金币。",
+      "zh-tw": "放棄本次選擇聖物，立刻隨機獲得10～15金幣。"
     },
     "lore": "",
-    "lore_i18n": {}
+    "lore_i18n": {
+      "zh-cn": "来自：放弃圣物选择",
+      "zh-tw": "來自：放棄聖物選擇"
+    }
   },
-  "overrides": {}
+  "overrides": {},
+  "icon": "relics/stolen_vault.png"
 }

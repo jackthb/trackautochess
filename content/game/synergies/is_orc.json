@@ -2,23 +2,28 @@
   "gameId": "is_orc",
   "name": "Orc",
   "slug": "orc",
-  "icon": "synergies/orc.png",
   "source": {
     "name": "Orc",
     "names": {
       "en": "Orc",
-      "ru": "Orc"
+      "ru": "Orc",
+      "zh-cn": "兽人",
+      "zh-tw": "獸人"
     },
-    "description": "SPECIES TRAIT: Battle Hardened\n Active when you have at least (N) different pieces of this species on board. (Multiple effects stack)\n\n(2) Orcs: All allies have +100 Health.\n(4) Orcs: All allies have +300 Health.\n(6) Orcs: All allies have +10x(Courier health lost) Health.",
+    "description": "SPECIES TRAIT: Battle Hardened\n Active when you have at least (N) different pieces of this species on board. (Multiple effects stack)\n\n(2) Orcs: All allies have +100 Health.\n(4) Orcs: All allies have +400 Health.\n(6) Orcs: All allies have +10x(Courier health lost) Health.",
     "descriptions": {
-      "en": "SPECIES TRAIT: Battle Hardened\n Active when you have at least (N) different pieces of this species on board. (Multiple effects stack)\n\n(2) Orcs: All allies have +100 Health.\n(4) Orcs: All allies have +300 Health.\n(6) Orcs: All allies have +10x(Courier health lost) Health.",
-      "ru": "SPECIES TRAIT: Battle Hardened\n Активна, когда минимум (N) разных Orcs на столе.(Эффекты складываются)\n\n(2) Orcs: +100 HP союзным фигурам.\n(4) Orcs: +300 HP союзным фигурам. \n(6) Orcs: Все союзные фигуры получают +10x(потерянное здоровье курьера)."
+      "en": "SPECIES TRAIT: Battle Hardened\n Active when you have at least (N) different pieces of this species on board. (Multiple effects stack)\n\n(2) Orcs: All allies have +100 Health.\n(4) Orcs: All allies have +400 Health.\n(6) Orcs: All allies have +10x(Courier health lost) Health.",
+      "ru": "SPECIES TRAIT: Battle Hardened\n Активна, когда минимум (N) разных Orcs на столе.(Эффекты складываются)\n\n(2) Orcs: +100 HP союзным фигурам.\n(4) Orcs: +400 HP союзным фигурам. \n(6) Orcs: Все союзные фигуры получают +10x(потерянное здоровье курьера).",
+      "zh-cn": "种族技能：强壮身躯\n 需要己方场上有至少（N）个不同的此种族的棋子来触发效果（触发的多层效果可以叠加）。\n\n（2）兽人：所有友军的最大生命值+100。\n（4）兽人：所有友军的最大生命值+400。\n（6）兽人：所有友军获得最大生命值+（你的信使当前已损失的生命值×10）。",
+      "zh-tw": "種族技能：強壯身軀\n 需要己方場上有至少（N）個不同的此種族的棋子來觸發效果（觸發的多層效果可以疊加）。\n\n（2）獸人：所有友軍的最大生命值+100。\n（4）獸人：所有友軍的最大生命值+400。\n（6）獸人：所有友軍獲得最大生命值+（你的信使當前已損失的生命值×10）。"
     },
-    "description_html": "<h1>SPECIES TRAIT: Battle Hardened</h1><font color=\"#656585\">Active when you have at least (N) different pieces of this species on board. (Multiple effects stack)</font><br><br>(2) Orcs: All allies have +100 Health.<br>(4) Orcs: All allies have +300 Health.<br>(6) Orcs: All allies have +10x(Courier health lost) Health.",
+    "description_html": "<h1>SPECIES TRAIT: Battle Hardened</h1><font color=\"#656585\">Active when you have at least (N) different pieces of this species on board. (Multiple effects stack)</font><br><br>(2) Orcs: All allies have +100 Health.<br>(4) Orcs: All allies have +400 Health.<br>(6) Orcs: All allies have +10x(Courier health lost) Health.",
     "lore": "The Orcs are a prolific and physically powerful race, excellent at tolerating pain and injury. Being exotic to Drodolands, their home was a once-lush world but now a shattered realm. They abandoned their peaceful culture when the demon lord cunningly corrupted the Orcs and used them in his vengeful plot against the his own people.",
     "lore_i18n": {
       "en": "The Orcs are a prolific and physically powerful race, excellent at tolerating pain and injury. Being exotic to Drodolands, their home was a once-lush world but now a shattered realm. They abandoned their peaceful culture when the demon lord cunningly corrupted the Orcs and used them in his vengeful plot against the his own people.",
-      "ru": "Orcs — многочисленная и физически сильная раса, отлично переносящая боль и ранения. Будучи чужаками в Drodolands, они происходят из некогда цветущего мира, ныне ставшего разрушенным. Они отказались от своей мирной культуры, когда демон-владыка коварно развратил Orcs и использовал их в своей мстительной войне против собственного народа."
+      "ru": "Orcs — многочисленная и физически сильная раса, отлично переносящая боль и ранения. Будучи чужаками в Drodolands, они происходят из некогда цветущего мира, ныне ставшего разрушенным. Они отказались от своей мирной культуры, когда демон-владыка коварно развратил Orcs и использовал их в своей мстительной войне против собственного народа.",
+      "zh-cn": "兽人不是多多岛的原住民。起初，他们以萨满部族的身份居住在苍翠繁茂的啦啦星球。当恶魔领主腐化兽人，利用他们对抗从鸡蛋的家园逃离的德国人以完成自己的复仇阴谋时，兽人抛弃了他们原本和平生活的文化。",
+      "zh-tw": "獸人不是多多島的原住民。起初，他們以薩滿部族的身份居住在蒼翠繁茂的啦啦星球。當惡魔領主腐化獸人，利用他們對抗從雞蛋的家園逃離的德國人以完成自己的復仇陰謀時，獸人拋棄了他們原本和平生活的文化。"
     },
     "notes": [],
     "tiers": [
@@ -28,5 +33,6 @@
     ],
     "ability_special": {}
   },
-  "overrides": {}
+  "overrides": {},
+  "icon": "synergies/orc.png"
 }

@@ -2,26 +2,32 @@
   "gameId": "item_xuejingshi",
   "name": "Bloodstone",
   "slug": "bloodstone",
-  "icon": "items/bloodstone.png",
   "source": {
     "name": "Bloodstone",
     "names": {
       "en": "Bloodstone",
-      "ru": "Bloodstone"
+      "ru": "Bloodstone",
+      "zh-cn": "血精石",
+      "zh-tw": "血精石"
     },
     "description": "+600 Health.\nIf an enemy chess piece on the hosts side is killed, the holder has a 15% chance of gaining 1 energy point. Each energy point will increase the magic damage the holder inflicts by 10%.\nIf the holder is killed, half of the energy points will be lost.",
     "descriptions": {
       "en": "+600 Health.\nIf an enemy chess piece on the hosts side is killed, the holder has a 15% chance of gaining 1 energy point. Each energy point will increase the magic damage the holder inflicts by 10%.\nIf the holder is killed, half of the energy points will be lost.",
-      "ru": "+600 Здоровья.\nЕсли вражеская фигура умирает на домашнем столе, то носитель с 15% вероятностью получит заряд. Каждый заряд увиличивает маг. урон владельца на 10%.\nЕсли носитель погибает, то теряет половину зарядов."
+      "ru": "+600 Здоровья.\nЕсли вражеская фигура умирает на домашнем столе, то носитель с 15% вероятностью получит заряд. Каждый заряд увиличивает маг. урон владельца на 10%.\nЕсли носитель погибает, то теряет половину зарядов.",
+      "zh-cn": "生命值+600。\n每当主场的敌方棋子阵亡，持有者都有15%的概率获得1点能量点数，每点能量点数会提高10%持有者造成的魔法伤害。\n亡语：损失一半的能量点数。",
+      "zh-tw": "生命值+600。\n每當主場的敵方棋子陣亡，持有者都有15%的概率獲得1點能量點數，每點能量點數會提高10%持有者造成的魔法傷害。\n亡語：損失一半的能量點數。"
     },
     "lore": "The Bloodstones bright ruby color is unmistakable on the battlefield, as the owner seems to have infinite vitality and spirit.",
     "lore_i18n": {
       "en": "The Bloodstones bright ruby color is unmistakable on the battlefield, as the owner seems to have infinite vitality and spirit.",
-      "ru": "The Bloodstones яркий рубиновый цвет безошибочно выделяется на поле боя, а владелец будто обладает бесконечной жизненной силой и духом."
+      "ru": "The Bloodstones яркий рубиновый цвет безошибочно выделяется на поле боя, а владелец будто обладает бесконечной жизненной силой и духом.",
+      "zh-cn": "血精石鲜红的色彩在战场上绝对不会被看错，拥有者似乎有无限的生命力和精力。",
+      "zh-tw": "血精石鮮紅的色彩在戰場上絕對不會被看錯，擁有者似乎有無限的生命力和精力。"
     },
     "quality": "rare",
     "texture": "item_bloodstone",
     "notes": []
   },
-  "overrides": {}
+  "overrides": {},
+  "icon": "items/bloodstone.png"
 }

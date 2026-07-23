@@ -2,26 +2,32 @@
   "gameId": "item_meiken",
   "name": "Mekansm",
   "slug": "mekansm",
-  "icon": "items/mekansm.png",
   "source": {
     "name": "Mekansm",
     "names": {
       "en": "Mekansm",
-      "ru": "Mekansm"
+      "ru": "Mekansm",
+      "zh-cn": "梅肯斯姆",
+      "zh-tw": "梅肯斯姆"
     },
     "description": "Active ability: Activate when most allies are wounded\nHeals 500 health to all allied units within the range. \n\nRange:400",
     "descriptions": {
       "en": "Active ability: Activate when most allies are wounded\nHeals 500 health to all allied units within the range. \n\nRange:400",
-      "ru": "Active ability: Activate when most allies are wounded\nИсцеляет 500 здоровья всем союзным юнитам в радиусе."
+      "ru": "Активка: Активируется при получении урона\nИсцеляет 500 здоровья всем союзным юнитам в радиусе.",
+      "zh-cn": "主动技能：友方棋子有较多受伤时激活\n范围内所有友军获得500点治疗。",
+      "zh-tw": "主動技能：友方棋子有較多受傷時激活\n範圍內所有友軍獲得500點治療。"
     },
     "lore": "A glowing jewel formed out of assorted parts that somehow fit together perfectly.",
     "lore_i18n": {
       "en": "A glowing jewel formed out of assorted parts that somehow fit together perfectly.",
-      "ru": "A glowing jewel formed out of assorted parts that somehow fit together perfectly."
+      "ru": "A glowing jewel formed out of assorted parts that somehow fit together perfectly.",
+      "zh-cn": "各种散件不知是怎样完美地组合起来，形成的散发着光芒的珠宝。",
+      "zh-tw": "各種散件不知是怎樣完美地組合起來，形成的散發着光芒的珠寶。"
     },
     "quality": "rare",
     "texture": "item_mekansm",
     "notes": []
   },
-  "overrides": {}
+  "overrides": {},
+  "icon": "items/mekansm.png"
 }

@@ -2,7 +2,6 @@
   "gameId": "chess_mars",
   "name": "Mars",
   "slug": "mars",
-  "icon": "units/mars.png",
   "source": {
     "id": "chess_mars",
     "cost": 1,
@@ -60,5 +59,6 @@
       }
     }
   },
-  "overrides": {}
+  "overrides": {},
+  "icon": "units/mars.png"
 }

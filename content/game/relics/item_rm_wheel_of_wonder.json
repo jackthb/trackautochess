@@ -2,20 +2,27 @@
   "gameId": "item_rm_wheel_of_wonder",
   "name": "Wheel of Wonder",
   "slug": "wheel-of-wonder",
-  "icon": "relics/wheel_of_wonder.png",
   "source": {
     "name": "Wheel of Wonder",
     "names": {
       "en": "Wheel of Wonder",
-      "ru": "Wheel of Wonder"
+      "ru": "Wheel of Wonder",
+      "zh-cn": "奇观轮",
+      "zh-tw": "奇觀輪"
     },
     "description": "Relic Consumable: Click to Use\nChoose an ally piece and put it into the wheel of wonder, DISCOVER a special version of it with an extra random synergy.",
     "descriptions": {
       "en": "Relic Consumable: Click to Use\nChoose an ally piece and put it into the wheel of wonder, DISCOVER a special version of it with an extra random synergy.",
-      "ru": "Нажмите для использования\nВыберите союзную фигуру и откройте уникальную версию с дополнительной случайной синергией."
+      "ru": "Нажмите для использования\nВыберите союзную фигуру и откройте уникальную версию с дополнительной случайной синергией.",
+      "zh-cn": "圣物消耗品：点击使用\n指定一个友方棋子投入奇观轮，从它的五个获得额外种族或职业的同名棋子中进行一次发现。",
+      "zh-tw": "聖物消耗品：點擊使用\n指定一個友方棋子投入奇觀輪，從它的五個獲得額外種族或職業的同名棋子中進行一次發現。"
     },
     "lore": "",
-    "lore_i18n": {}
+    "lore_i18n": {
+      "zh-cn": "来自：圣物宝箱",
+      "zh-tw": "來自：聖物寶箱"
+    }
   },
-  "overrides": {}
+  "overrides": {},
+  "icon": "relics/wheel_of_wonder.png"
 }

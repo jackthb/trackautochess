@@ -2,23 +2,28 @@
   "gameId": "is_shaman",
   "name": "Shaman",
   "slug": "shaman",
-  "icon": "synergies/shaman.png",
   "source": {
     "name": "Shaman",
     "names": {
       "en": "Shaman",
-      "ru": "Shaman"
+      "ru": "Shaman",
+      "zh-cn": "萨满祭司",
+      "zh-tw": "薩滿祭司"
     },
     "description": "Shaman pieces spend 25% less mana when casting spells.\n\nClass Perk: Hex\n Active when you have at least (N) different Shaman pieces on board. (Multiple effects stack)\n\n(3)All friendly Shaman chess pieces gain the effect: Transform into a random chess piece of +2 levels after casting an active skill or using an active item.\n(6)Shaman: Equipped items carried by transformed chess pieces will also transform into random items of +2 levels.",
     "descriptions": {
       "en": "Shaman pieces spend 25% less mana when casting spells.\n\nClass Perk: Hex\n Active when you have at least (N) different Shaman pieces on board. (Multiple effects stack)\n\n(3)All friendly Shaman chess pieces gain the effect: Transform into a random chess piece of +2 levels after casting an active skill or using an active item.\n(6)Shaman: Equipped items carried by transformed chess pieces will also transform into random items of +2 levels.",
-      "ru": "Шаманы тратят на 25% меньше маны при применении заклинаний.\n\nClass Perk: Hex\n Активна, когда минимум (N) разных Shamans на столе.(Эффекты складываются)\n\n(3)Все дружественные фигуры Шаманов получают эффект: превращаются в случайную фигуру на +2 уровня выше после использования активного навыка или предмета.\n(6)Shaman: Экипированные предметы у превращённых фигур также трансформируются в случайные предметы на +2 уровня выше."
+      "ru": "Шаманы тратят на 25% меньше маны при применении заклинаний.\n\nClass Perk: Hex\n Активна, когда минимум (N) разных Shamans на столе.(Эффекты складываются)\n\n(3)Все дружественные фигуры Шаманов получают эффект: превращаются в случайную фигуру на +2 уровня выше после использования активного навыка или предмета.\n(6)Shaman: Экипированные предметы у превращённых фигур также трансформируются в случайные предметы на +2 уровня выше.",
+      "zh-cn": "萨满祭司棋子技能的法力值消耗-25%。\n\n职业技能：妖术\n 需要己方场上有至少（N）个不同的此职业的棋子来触发效果（触发的多层效果可以叠加）。\n\n（3）萨满：所有友方萨满祭司棋子获得效果：施放主动技能或主动物品后会变形为等级+2的随机棋子。\n（6）萨满：变形棋子携带的装备也会变形为等级+2的随机装备。",
+      "zh-tw": "薩滿祭司棋子技能的法力值消耗-25%。\n\n職業技能：妖術\n 需要己方場上有至少（N）個不同的此職業的棋子來觸發效果（觸發的多層效果可以疊加）。\n\n（3）薩滿：所有友方薩滿祭司棋子獲得效果：施放主動技能或主動物品後會變形爲等級+2的隨機棋子。\n（6）薩滿：變形棋子攜帶的裝備也會變形爲等級+2的隨機裝備。"
     },
     "description_html": "Shaman pieces spend 25% less mana when casting spells.\n<h1>Class Perk: Hex</h1><font color=\"#656585\">Active when you have at least (N) different Shaman pieces on board. (Multiple effects stack)</font><br><br>(3)All friendly Shaman chess pieces gain the effect: Transform into a random chess piece of +2 levels after casting an active skill or using an active item.<br>(6)Shaman: Equipped items carried by transformed chess pieces will also transform into random items of +2 levels.",
     "lore": "Mortal mediators of the ancient elements. Following the guide of ancestral spirits, Shaman learn to wield unseemingly mysterious power over generations to protect their family and clans.",
     "lore_i18n": {
       "en": "Mortal mediators of the ancient elements. Following the guide of ancestral spirits, Shaman learn to wield unseemingly mysterious power over generations to protect their family and clans.",
-      "ru": "Mortal mediators of the ancient elements. Following the guide of ancestral spirits, Shaman learn to wield unseemingly mysterious power over generations to protect their family and clans."
+      "ru": "Mortal mediators of the ancient elements. Following the guide of ancestral spirits, Shaman learn to wield unseemingly mysterious power over generations to protect their family and clans.",
+      "zh-cn": "萨满祭司是灵魂的指引者，他们侍奉的不是神灵，而是每一种元素。",
+      "zh-tw": "薩滿祭司是靈魂的指引者，他們侍奉的不是神靈，而是每一種元素。"
     },
     "notes": [
       "Transformed chess pieces levels will not exceed the current level of the courier. Transformation takes 1.5 seconds to cast.",
@@ -31,5 +36,6 @@
     ],
     "ability_special": {}
   },
-  "overrides": {}
+  "overrides": {},
+  "icon": "synergies/shaman.png"
 }

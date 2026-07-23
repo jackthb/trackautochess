@@ -2,17 +2,20 @@
   "gameId": "item_rengu",
   "name": "Drum of Endurance",
   "slug": "drum-of-endurance",
-  "icon": "items/ancient_janggo.png",
   "source": {
     "name": "Drum of Endurance",
     "names": {
       "en": "Drum of Endurance",
-      "ru": "Drum of Endurance"
+      "ru": "Drum of Endurance",
+      "zh-cn": "韧鼓",
+      "zh-tw": "韌鼓"
     },
     "description": "h1>Aura Effect\nAllied units in the surrounding area gain the effect: Attack speed +25%.",
     "descriptions": {
       "en": "h1>Aura Effect\nAllied units in the surrounding area gain the effect: Attack speed +25%.",
-      "ru": "h1>Aura Effect\nСоюзные юниты поблизости получают эффект: скорость атаки +25%."
+      "ru": "Aura Effect\nСоюзные юниты поблизости получают эффект: скорость атаки +25%.",
+      "zh-cn": "光环效果\n周围范围内的友军获得效果：攻击速度+25%。",
+      "zh-tw": "光環效果\n周圍範圍內的友軍獲得效果：攻擊速度+25%。"
     },
     "lore": "",
     "lore_i18n": {},
@@ -20,5 +23,6 @@
     "texture": "item_ancient_janggo",
     "notes": []
   },
-  "overrides": {}
+  "overrides": {},
+  "icon": "items/ancient_janggo.png"
 }

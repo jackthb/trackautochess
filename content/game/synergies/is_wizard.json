@@ -2,23 +2,28 @@
   "gameId": "is_wizard",
   "name": "Wizard",
   "slug": "wizard",
-  "icon": "synergies/wizard.png",
   "source": {
     "name": "Wizard",
     "names": {
       "en": "Wizard",
-      "ru": "Wizard"
+      "ru": "Wizard",
+      "zh-cn": "巫师",
+      "zh-tw": "巫師"
     },
     "description": "Wizard chess pieces are never considered priority targets by enemies.\n\nClass Perk: Something from Nothing\n Active when you have at least (N) different Wizard pieces on board. (Multiple effects stack)\n\n(2) Wizards: During the combat round, reduce the required number of chess pieces for the activation of race/class skills by 1, if there are (4) or more chess pieces needed.\n(4) Wizards: If you trigger the unique non-Wizard race/class skill during the combat round, unlock all of its layers.",
     "descriptions": {
       "en": "Wizard chess pieces are never considered priority targets by enemies.\n\nClass Perk: Something from Nothing\n Active when you have at least (N) different Wizard pieces on board. (Multiple effects stack)\n\n(2) Wizards: During the combat round, reduce the required number of chess pieces for the activation of race/class skills by 1, if there are (4) or more chess pieces needed.\n(4) Wizards: If you trigger the unique non-Wizard race/class skill during the combat round, unlock all of its layers.",
-      "ru": "Wizard являются не приоритетными целями для врагов.\n\nClass Perk: Something from Nothing\n Активна, когда минимум (N) разных Wizard на столе.(Эффекты складываются)\n\n(2) Wizards: Во время раунда боя уменьшает необходимое количество фигур для активации навыков расы/класса на 1, если требуется 4 или более фигур.\n(4) Wizards: Если во время раунда-боя активен только один уникальный навык расы/класса (не Wizard), активируются все его уровни."
+      "ru": "Wizard являются не приоритетными целями для врагов.\n\nClass Perk: Something from Nothing\n Активна, когда минимум (N) разных Wizard на столе.(Эффекты складываются)\n\n(2) Wizards: Во время раунда боя уменьшает необходимое количество фигур для активации навыков расы/класса на 1, если требуется 4 или более фигур.\n(4) Wizards: Если во время раунда-боя активен только один уникальный навык расы/класса (не Wizard), активируются все его уровни.",
+      "zh-cn": "巫师棋子始终不会被敌人视为优先攻击的目标。\n\n职业技能：无中生有\n 需要己方场上有至少（N）个不同的此职业的棋子来触发效果（触发的多层效果可以叠加）。\n\n（2）巫师：在战斗回合使需要（4）个及以上棋子的种族/职业技能触发所需要的棋子数-1。\n（4）巫师：如果你只触发了唯一一个的非巫师的种族/职业技能，在战斗回合解锁它的所有层数。",
+      "zh-tw": "巫師棋子始終不會被敵人視爲優先攻擊的目標。\n\n職業技能：無中生有\n 需要己方場上有至少（N）個不同的此職業的棋子來觸發效果（觸發的多層效果可以疊加）。\n\n（2）巫師：在戰鬥回合使需要（4）個及以上棋子的種族/職業技能觸發所需要的棋子數-1。\n（4）巫師：如果你只觸發了唯一一個的非巫師的種族/職業技能，在戰鬥回合解鎖它的所有層數。"
     },
     "description_html": "Wizard chess pieces are never considered priority targets by enemies.\n<h1>Class Perk: Something from Nothing</h1><font color=\"#656585\">Active when you have at least (N) different Wizard pieces on board. (Multiple effects stack)</font><br><br>(2) Wizards: During the combat round, reduce the required number of chess pieces for the activation of race/class skills by 1, if there are (4) or more chess pieces needed.<br>(4) Wizards: If you trigger the unique non-Wizard race/class skill during the combat round, unlock all of its layers.",
     "lore": "Wizards play an ancient yet mysterious role. Even though they mostly comprehend oracles and do minor entertaining tricks, Wizards are regarded as evil by many others because of the uncertainty of their purpose of action. The unique power Wizards possess awakes the inner potential of others, leading to a more united alliance.",
     "lore_i18n": {
       "en": "Wizards play an ancient yet mysterious role. Even though they mostly comprehend oracles and do minor entertaining tricks, Wizards are regarded as evil by many others because of the uncertainty of their purpose of action. The unique power Wizards possess awakes the inner potential of others, leading to a more united alliance.",
-      "ru": "Wizards — загадочные существа, пробуждающие потенциал союзников, но из-за своей непредсказуемости считаются злом."
+      "ru": "Wizards — загадочные существа, пробуждающие потенциал союзников, но из-за своей непредсказуемости считаются злом.",
+      "zh-cn": "巫师是一个古老而又神秘的职业，虽然他们从事的是传示神谕，解读魔术牌，玩弄戏法等一些类似的活动，巫师们还是因为装神弄鬼经常被人们与邪恶画上等号。",
+      "zh-tw": "巫師是一個古老而又神祕的職業，雖然他們從事的是傳示神諭，解讀魔術牌，玩弄戲法等一些類似的活動，巫師們還是因爲裝神弄鬼經常被人們與邪惡畫上等號。"
     },
     "notes": [],
     "tiers": [
@@ -27,5 +32,6 @@
     ],
     "ability_special": {}
   },
-  "overrides": {}
+  "overrides": {},
+  "icon": "synergies/wizard.png"
 }

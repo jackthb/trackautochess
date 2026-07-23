@@ -2,22 +2,27 @@
   "gameId": "item_shirenmozhimao",
   "name": "Ogre Hood",
   "slug": "ogre-hood",
-  "icon": "items/shirenmozhimao.png",
   "source": {
     "name": "Ogre Hood",
     "names": {
       "en": "Ogre Hood",
-      "ru": "Ogre Hood"
+      "ru": "Ogre Hood",
+      "zh-cn": "食人魔之帽",
+      "zh-tw": "食人魔之帽"
     },
     "description": "+900 HP, +25% magical resistance.\nThe carrier also counts as Ogre and +2 level.",
     "descriptions": {
       "en": "+900 HP, +25% magical resistance.\nThe carrier also counts as Ogre and +2 level.",
-      "ru": "HP +900, +25% сопротивления магии.\nНоситель также становится Ogre и получает +2 уровня."
+      "ru": "HP +900, +25% сопротивления магии.\nНоситель также становится Ogre и получает +2 уровня.",
+      "zh-cn": "生命值+900，魔法抗性+25%。\n携带者视为+2等级的 食人魔。",
+      "zh-tw": "生命值+900，魔法抗性+25%。\n攜帶者視爲+2等級的 食人魔。"
     },
     "lore": "Not only one Ogre knows what proper strength is.",
     "lore_i18n": {
       "en": "Not only one Ogre knows what proper strength is.",
-      "ru": "Не только один Ogre знает, что такое настоящая сила."
+      "ru": "Не только один Ogre знает, что такое настоящая сила.",
+      "zh-cn": "不是只有古加尔一人知道怎样才能强大。",
+      "zh-tw": "不是隻有古加爾一人知道怎樣才能強大。"
     },
     "quality": "common",
     "texture": "custom/shirenmozhimao",
@@ -25,5 +30,6 @@
       "The bearer retains its original Species as well."
     ]
   },
-  "overrides": {}
+  "overrides": {},
+  "icon": "items/shirenmozhimao.png"
 }

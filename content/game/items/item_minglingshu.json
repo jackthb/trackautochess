@@ -2,22 +2,27 @@
   "gameId": "item_minglingshu",
   "name": "Necronomicon",
   "slug": "necronomicon",
-  "icon": "items/necronomicon_3.png",
   "source": {
     "name": "Necronomicon",
     "names": {
       "en": "Necronomicon",
-      "ru": "Necronomicon"
+      "ru": "Necronomicon",
+      "zh-cn": "死灵书",
+      "zh-tw": "死靈書"
     },
     "description": "Summons 2 necro creeps",
     "descriptions": {
       "en": "Summons 2 necro creeps",
-      "ru": "Призывает 2 некро-крипа. Удваивает кол-во призываемых юнитов."
+      "ru": "Призывает 2 некро-крипа.\nУдваивает кол-во призываемых юнитов.",
+      "zh-cn": "使你的召唤物获得效果：召唤数量+1。\n\n主动技能：立即激活\n召唤2个死灵士兵为你战斗。",
+      "zh-tw": "使你的召喚物獲得效果：召喚數量+1。\n\n主動技能：立即激活\n召喚2個死靈士兵爲你戰鬥。"
     },
     "lore": "A record of the final reckoning. With one page torn out.",
     "lore_i18n": {
       "en": "A record of the final reckoning. With one page torn out.",
-      "ru": "Запись последнего суда, с вырванной страницей."
+      "ru": "Запись последнего суда, с вырванной страницей.",
+      "zh-cn": "记载着最终之战，其中的一页被人撕下。",
+      "zh-tw": "記載着最終之戰，其中的一頁被人撕下。"
     },
     "quality": "epic",
     "texture": "item_necronomicon_3",
@@ -25,5 +30,6 @@
       "Melee carrier summons 2 necro warriors while Ranged carrier summons 2 necro archers."
     ]
   },
-  "overrides": {}
+  "overrides": {},
+  "icon": "items/necronomicon_3.png"
 }

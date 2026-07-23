@@ -2,22 +2,27 @@
   "gameId": "item_ahalimumojing",
   "name": "Aghanims Shard",
   "slug": "aghanims-shard",
-  "icon": "items/aghanims_shard.png",
   "source": {
     "name": "Aghanims Shard",
     "names": {
       "en": "Aghanims Shard",
-      "ru": "Aghanims Shard"
+      "ru": "Aghanims Shard",
+      "zh-cn": "阿哈利姆魔晶",
+      "zh-tw": "阿哈利姆魔晶"
     },
     "description": "Magic Regen +75%.\nThe carrier permanently gains a random enemy chess pieces active skill as an additional skill.",
     "descriptions": {
       "en": "Magic Regen +75%.\nThe carrier permanently gains a random enemy chess pieces active skill as an additional skill.",
-      "ru": "Мана реген +75%.\nНоситель навсегда получает активный навык случайной враждебной шахматной фигуры как дополнительный навык."
+      "ru": "Мана реген +75%.\nНоситель навсегда получает активный навык случайной враждебной шахматной фигуры как дополнительный навык.",
+      "zh-cn": "法力获取+75%。\n携带者会永久获得一个随机的敌方棋子的主动技能作为自己的额外技能。",
+      "zh-tw": "法力獲取+75%。\n攜帶者會永久獲得一個隨機的敵方棋子的主動技能作爲自己的額外技能。"
     },
     "lore": "With origins known only to a single wizard, fragments of this impossible crystal are nearly as coveted as the renowned scepter itself.",
     "lore_i18n": {
       "en": "With origins known only to a single wizard, fragments of this impossible crystal are nearly as coveted as the renowned scepter itself.",
-      "ru": "Осколки этого загадочного кристалла почти так же ценны, как и сам легендарный скипетр."
+      "ru": "Осколки этого загадочного кристалла почти так же ценны, как и сам легендарный скипетр.",
+      "zh-cn": "这块不可思议的水晶只有一名巫师知道它的起源，而水晶的碎片几乎与赫赫有名的神杖一样让人梦寐以求。",
+      "zh-tw": "這塊不可思議的水晶只有一名巫師知道它的起源，而水晶的碎片幾乎與赫赫有名的神杖一樣讓人夢寐以求。"
     },
     "quality": "consumable",
     "texture": "aghanims_shard",
@@ -26,5 +31,6 @@
       "Additional skill will be removed after chess pieces upgraded."
     ]
   },
-  "overrides": {}
+  "overrides": {},
+  "icon": "items/aghanims_shard.png"
 }

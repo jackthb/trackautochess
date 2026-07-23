@@ -2,7 +2,6 @@
   "gameId": "chess_na",
   "name": "Nyx Assassin",
   "slug": "nyx-assassin",
-  "icon": "units/nyx_assassin.png",
   "source": {
     "id": "chess_na",
     "cost": 4,
@@ -61,5 +60,6 @@
       }
     }
   },
-  "overrides": {}
+  "overrides": {},
+  "icon": "units/nyx_assassin.png"
 }

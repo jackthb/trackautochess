@@ -2,17 +2,20 @@
   "gameId": "item_yuanlingxidai",
   "name": "Wraith Band",
   "slug": "wraith-band",
-  "icon": "items/wraith_band.png",
   "source": {
     "name": "Wraith Band",
     "names": {
       "en": "Wraith Band",
-      "ru": "Wraith Band"
+      "ru": "Wraith Band",
+      "zh-cn": "怨灵系带",
+      "zh-tw": "怨靈繫帶"
     },
     "description": "Attack speed +20%。",
     "descriptions": {
       "en": "Attack speed +20%。",
-      "ru": "Скорость атаки +20%."
+      "ru": "Скорость атаки +20%.",
+      "zh-cn": "攻击速度+20%。",
+      "zh-tw": "攻擊速度+20%。"
     },
     "lore": "",
     "lore_i18n": {},
@@ -20,5 +23,6 @@
     "texture": "wraith_band",
     "notes": []
   },
-  "overrides": {}
+  "overrides": {},
+  "icon": "items/wraith_band.png"
 }

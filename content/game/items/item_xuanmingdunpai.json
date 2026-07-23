@@ -2,17 +2,20 @@
   "gameId": "item_xuanmingdunpai",
   "name": "Buckler",
   "slug": "buckler",
-  "icon": "items/buckler.png",
   "source": {
     "name": "Buckler",
     "names": {
       "en": "Buckler",
-      "ru": "Buckler"
+      "ru": "Buckler",
+      "zh-cn": "玄冥盾牌",
+      "zh-tw": "玄冥盾牌"
     },
     "description": "Armor +5。",
     "descriptions": {
       "en": "Armor +5。",
-      "ru": "Броня +5."
+      "ru": "Броня +5.",
+      "zh-cn": "护甲+5。",
+      "zh-tw": "護甲+5。"
     },
     "lore": "",
     "lore_i18n": {},
@@ -20,5 +23,6 @@
     "texture": "buckler",
     "notes": []
   },
-  "overrides": {}
+  "overrides": {},
+  "icon": "items/buckler.png"
 }

@@ -2,23 +2,28 @@
   "gameId": "is_harpy",
   "name": "Harpy",
   "slug": "harpy",
-  "icon": "synergies/harpy.png",
   "source": {
     "name": "Harpy",
     "names": {
       "en": "Harpy",
-      "ru": "Harpy"
+      "ru": "Harpy",
+      "zh-cn": "鹰身人",
+      "zh-tw": "鷹身人"
     },
     "description": "Species Trait: Windfury\n Active when you have at least (N) different pieces of this species on board. (Multiple effects stack).\n\n(2) Harpies: All allies gain the effect - Targeted spells +1 additional targets.\n(4) Harpies: All allies gain the effect - Targeted spells +1 additional targets.",
     "descriptions": {
       "en": "Species Trait: Windfury\n Active when you have at least (N) different pieces of this species on board. (Multiple effects stack).\n\n(2) Harpies: All allies gain the effect - Targeted spells +1 additional targets.\n(4) Harpies: All allies gain the effect - Targeted spells +1 additional targets.",
-      "ru": "Species Trait: Windfury\n Активен, когда хотя бы (N) разных Harpy на доске. (Эффекты складываются).\n\n(2) Harpies: Все союзники получают эффект - целевые заклинания по +1 доп. цель.\n(4) Harpies: Все союзники получают эффект - целевые заклинания по +1 доп. цель."
+      "ru": "Species Trait: Windfury\n Активен, когда хотя бы (N) разных Harpy на доске. (Эффекты складываются).\n\n(2) Harpies: Все союзники получают эффект - целевые заклинания по +1 доп. цель.\n(4) Harpies: Все союзники получают эффект - целевые заклинания по +1 доп. цель.",
+      "zh-cn": "种族技能：风怒\n 需要己方场上有至少（N）个不同的此种族的棋子来触发效果（触发的多层效果可以叠加）。\n\n（2）鹰身人：所有友方棋子获得效果：对敌人施放的指向性法术+1目标数量。\n（4）鹰身人：所有友方棋子获得效果：对敌人施放的指向性法术+1目标数量。",
+      "zh-tw": "種族技能：風怒\n 需要己方場上有至少（N）個不同的此種族的棋子來觸發效果（觸發的多層效果可以疊加）。\n\n（2）鷹身人：所有友方棋子獲得效果：對敵人施放的指向性法術+1目標數量。\n（4）鷹身人：所有友方棋子獲得效果：對敵人施放的指向性法術+1目標數量。"
     },
     "description_html": "<h1>Species Trait: Windfury</h1><font color=\"#656585\">Active when you have at least (N) different pieces of this species on board. (Multiple effects stack).</font><br><br>(2) Harpies: All allies gain the effect - Targeted spells +1 additional targets.<br>(4) Harpies: All allies gain the effect - Targeted spells +1 additional targets.",
     "lore": "Harpies believe they survived from an ancient age. Their ancestors are transformed into bird-like bodies after betraying the Night Elves Queen.",
     "lore_i18n": {
       "en": "Harpies believe they survived from an ancient age. Their ancestors are transformed into bird-like bodies after betraying the Night Elves Queen.",
-      "ru": "Harpies верят, что они сохранились с незапамятных времен. Их предки превратились в птицеподобных после того, как предали королеву Ночных эльфов."
+      "ru": "Harpies верят, что они сохранились с незапамятных времен. Их предки превратились в птицеподобных после того, как предали королеву Ночных эльфов.",
+      "zh-cn": "鹰身人相信她们的血脉可以上溯到远古时代，由于她们背叛了玩弄巫术的暗夜精灵女王，而被罚变成了丑陋的鸟形生物。",
+      "zh-tw": "鷹身人相信她們的血脈可以上溯到遠古時代，由於她們背叛了玩弄巫術的暗夜精靈女王，而被罰變成了醜陋的鳥形生物。"
     },
     "notes": [],
     "tiers": [
@@ -27,5 +32,6 @@
     ],
     "ability_special": {}
   },
-  "overrides": {}
+  "overrides": {},
+  "icon": "synergies/harpy.png"
 }

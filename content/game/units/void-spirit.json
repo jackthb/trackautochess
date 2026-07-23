@@ -2,7 +2,6 @@
   "gameId": "chess_void",
   "name": "Void Spirit",
   "slug": "void-spirit",
-  "icon": "units/void_spirit.png",
   "source": {
     "id": "chess_void",
     "cost": 4,
@@ -60,5 +59,6 @@
       }
     }
   },
-  "overrides": {}
+  "overrides": {},
+  "icon": "units/void_spirit.png"
 }

@@ -2,7 +2,6 @@
   "gameId": "chess_dr",
   "name": "Drow Ranger",
   "slug": "drow-ranger",
-  "icon": "units/drow_ranger.png",
   "source": {
     "id": "chess_dr",
     "cost": 3,
@@ -60,5 +59,6 @@
       }
     }
   },
-  "overrides": {}
+  "overrides": {},
+  "icon": "units/drow_ranger.png"
 }

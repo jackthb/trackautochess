@@ -2,7 +2,6 @@
   "gameId": "chess_wr",
   "name": "Windranger",
   "slug": "windranger",
-  "icon": "units/windranger.png",
   "source": {
     "id": "chess_wr",
     "cost": 2,
@@ -31,7 +30,7 @@
         ],
         "armor": 3,
         "magic_resist": 0,
-        "atk_rate": 1,
+        "atk_rate": 1.0,
         "atk_range": 600
       },
       "2_star": {
@@ -43,7 +42,7 @@
         ],
         "armor": 3,
         "magic_resist": 0,
-        "atk_rate": 1,
+        "atk_rate": 1.0,
         "atk_range": 600
       },
       "3_star": {
@@ -55,10 +54,11 @@
         ],
         "armor": 3,
         "magic_resist": 0,
-        "atk_rate": 1,
+        "atk_rate": 1.0,
         "atk_range": 600
       }
     }
   },
-  "overrides": {}
+  "overrides": {},
+  "icon": "units/windranger.png"
 }

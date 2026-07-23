@@ -2,26 +2,32 @@
   "gameId": "item_yuanlifazhang",
   "name": "Force Staff",
   "slug": "force-staff",
-  "icon": "items/force_staff.png",
   "source": {
     "name": "Force Staff",
     "names": {
       "en": "Force Staff",
-      "ru": "Force Staff"
+      "ru": "Force Staff",
+      "zh-cn": "原力法杖",
+      "zh-tw": "原力法杖"
     },
     "description": "Magic Damage +10%.\n\nActive ability: Activated when Hp is low\nPush the carrier to a safe grid that cannot be reached by enemy attacks, and restore 20 mana immediately.",
     "descriptions": {
       "en": "Magic Damage +10%.\n\nActive ability: Activated when Hp is low\nPush the carrier to a safe grid that cannot be reached by enemy attacks, and restore 20 mana immediately.",
-      "ru": "Маг. Урон+10%.\n\nАктивируется при низком здоровье\nПеремещает носителя на безопасную клетку, недоступную для вражеских атак, и немедленно восстанавливает 20 маны."
+      "ru": "Маг. Урон+10%.\n\nАктивируется при низком здоровье\nПеремещает носителя на безопасную клетку, недоступную для вражеских атак, и немедленно восстанавливает 20 маны.",
+      "zh-cn": "魔法伤害+10%。\n\n主动技能：生命值过低或远程被近身时激活\n将携带者推送到一个不能被敌方攻击到的安全格子，并且回复20点法力值。",
+      "zh-tw": "魔法傷害+10%。\n\n主動技能：生命值過低或遠程被近身時激活\n將攜帶者推送到一個不能被敵方攻擊到的安全格子，並且回覆20點法力值。"
     },
     "lore": "Allows you to manipulate others, for good or evil.",
     "lore_i18n": {
       "en": "Allows you to manipulate others, for good or evil.",
-      "ru": "Allows you to manipulate others, for good or evil."
+      "ru": "Allows you to manipulate others, for good or evil.",
+      "zh-cn": "让你可以操纵自己或他人，无论出于善与恶。",
+      "zh-tw": "讓你可以操縱自己或他人，無論出於善與惡。"
     },
     "quality": "common",
     "texture": "item_force_staff",
     "notes": []
   },
-  "overrides": {}
+  "overrides": {},
+  "icon": "items/force_staff.png"
 }

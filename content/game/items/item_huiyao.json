@@ -2,26 +2,32 @@
   "gameId": "item_huiyao",
   "name": "Radiance",
   "slug": "radiance",
-  "icon": "items/radiance.png",
   "source": {
     "name": "Radiance",
     "names": {
       "en": "Radiance",
-      "ru": "Radiance"
+      "ru": "Radiance",
+      "zh-cn": "辉耀",
+      "zh-tw": "輝耀"
     },
     "description": "+25% Evasion.\n\nAura\nDeals 100 pure damage to surrounding enemies every 3 secs and forces them to have a 25% chance to miss the attack.",
     "descriptions": {
       "en": "+25% Evasion.\n\nAura\nDeals 100 pure damage to surrounding enemies every 3 secs and forces them to have a 25% chance to miss the attack.",
-      "ru": "+25% уклонения.\n\nAura\nНаносит 100 чистого урона врагам в радиусе каждые 3 секунды и заставляет их с шансом в 25% промахиваться атакой."
+      "ru": "+25% уклонения.\n\nAura\nНаносит 100 чистого урона врагам в радиусе каждые 3 секунды и заставляет их с шансом в 25% промахиваться атакой.",
+      "zh-cn": "闪避+25%。\n\n光环效果\n对周围的敌人每3秒造成100点纯粹伤害并使其有25%概率攻击落空。",
+      "zh-tw": "閃避+25%。\n\n光環效果\n對周圍的敵人每3秒造成100點純粹傷害並使其有25%概率攻擊落空。"
     },
     "lore": "A divine weapon that causes damage and a bright burning effect that lays waste to nearby enemies.",
     "lore_i18n": {
       "en": "A divine weapon that causes damage and a bright burning effect that lays waste to nearby enemies.",
-      "ru": "Божественное оружие, наносящее урон и оставляющее после себя яркое пламя, уничтожающее ближайших врагов."
+      "ru": "Божественное оружие, наносящее урон и оставляющее после себя яркое пламя, уничтожающее ближайших врагов.",
+      "zh-cn": "一把神圣的武器，剑身的耀眼光芒能将敌人化为灰烬。",
+      "zh-tw": "一把神聖的武器，劍身的耀眼光芒能將敵人化爲灰燼。"
     },
     "quality": "epic",
     "texture": "item_radiance",
     "notes": []
   },
-  "overrides": {}
+  "overrides": {},
+  "icon": "items/radiance.png"
 }

@@ -2,7 +2,6 @@
   "gameId": "chess_troll",
   "name": "Troll Warlord",
   "slug": "troll-warlord",
-  "icon": "units/troll_warlord.png",
   "source": {
     "id": "chess_troll",
     "cost": 5,
@@ -60,5 +59,6 @@
       }
     }
   },
-  "overrides": {}
+  "overrides": {},
+  "icon": "units/troll_warlord.png"
 }

@@ -2,7 +2,6 @@
   "gameId": "chess_ok",
   "name": "Omniknight",
   "slug": "omniknight",
-  "icon": "units/omniknight.png",
   "source": {
     "id": "chess_ok",
     "cost": 5,
@@ -60,5 +59,6 @@
       }
     }
   },
-  "overrides": {}
+  "overrides": {},
+  "icon": "units/omniknight.png"
 }

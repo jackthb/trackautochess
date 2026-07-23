@@ -2,20 +2,27 @@
   "gameId": "item_both_leaves",
   "name": "Leafy Essence",
   "slug": "leafy-essence",
-  "icon": "relics/leafy_essence.png",
   "source": {
     "name": "Leafy Essence",
     "names": {
       "en": "Leafy Essence",
-      "ru": "Leafy Essence"
+      "ru": "Leafy Essence",
+      "zh-cn": "复叶精魂",
+      "zh-tw": "複葉精魂"
     },
     "description": "All offside branches unlock automatically in this single game.",
     "descriptions": {
       "en": "All offside branches unlock automatically in this single game.",
-      "ru": "Все боковые ветки талантов будут разблокированы автоматически в этой игре."
+      "ru": "Все боковые ветки талантов будут разблокированы автоматически в этой игре.",
+      "zh-cn": "在本局游戏中，你会自动解锁天赋树的另一边天赋。",
+      "zh-tw": "在本局遊戲中，你會自動解鎖天賦樹的另一邊天賦。"
     },
     "lore": "",
-    "lore_i18n": {}
+    "lore_i18n": {
+      "zh-cn": "来自：圣物宝箱",
+      "zh-tw": "來自：聖物寶箱"
+    }
   },
-  "overrides": {}
+  "overrides": {},
+  "icon": "relics/leafy_essence.png"
 }

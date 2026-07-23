@@ -2,17 +2,20 @@
   "gameId": "item_wuzhixiaomao",
   "name": "Witless Shako",
   "slug": "witless-shako",
-  "icon": "items/witless_shako.png",
   "source": {
     "name": "Witless Shako",
     "names": {
       "en": "Witless Shako",
-      "ru": "Witless Shako"
+      "ru": "Witless Shako",
+      "zh-cn": "无知小帽",
+      "zh-tw": "無知小帽"
     },
     "description": "+25% magical resistance. The carrier +1 level.",
     "descriptions": {
       "en": "+25% magical resistance. The carrier +1 level.",
-      "ru": "+25% сопротивления магии. Носитель считается на 1 уровень выше."
+      "ru": "+25% сопротивления магии. Носитель считается на 1 уровень выше.",
+      "zh-cn": "魔法抗性+25%，携带者视为+1等级。",
+      "zh-tw": "魔法抗性+25%，攜帶者視爲+1等級。"
     },
     "lore": "",
     "lore_i18n": {},
@@ -22,5 +25,6 @@
       "+1 Level Only valid on chess pieces."
     ]
   },
-  "overrides": {}
+  "overrides": {},
+  "icon": "items/witless_shako.png"
 }

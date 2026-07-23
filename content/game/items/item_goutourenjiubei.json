@@ -2,26 +2,32 @@
   "gameId": "item_goutourenjiubei",
   "name": "Kobold Cup",
   "slug": "kobold-cup",
-  "icon": "items/kobold_cup.png",
   "source": {
     "name": "Kobold Cup",
     "names": {
       "en": "Kobold Cup",
-      "ru": "Kobold Cup"
+      "ru": "Kobold Cup",
+      "zh-cn": "狗头人酒杯",
+      "zh-tw": "狗頭人酒杯"
     },
     "description": "Carrier counts as Kobold.\nThe carrier and pieces of the same name gain +25% attack speed, inheritable after shapeshift.",
     "descriptions": {
       "en": "Carrier counts as Kobold.\nThe carrier and pieces of the same name gain +25% attack speed, inheritable after shapeshift.",
-      "ru": "Носитель считается Kobold.\nНоситель и фигуры с тем же именем получают +25% к скорости атаки; эффект сохраняется после превращения."
+      "ru": "Носитель считается Kobold.\nНоситель и фигуры с тем же именем получают +25% к скорости атаки; эффект сохраняется после превращения.",
+      "zh-cn": "携带者视为 狗头人。\n携带者及其同名棋子攻速+25%，变身棋子可以继承。",
+      "zh-tw": "攜帶者視爲 狗頭人。\n攜帶者及其同名棋子攻速+25%，變身棋子可以繼承。"
     },
     "lore": "King of the Kobold enjoys drinking.",
     "lore_i18n": {
       "en": "King of the Kobold enjoys drinking.",
-      "ru": "Король Кобольдов любит выпить."
+      "ru": "Король Кобольдов любит выпить.",
+      "zh-cn": "狗头人之王只要开心了就会喝一口。",
+      "zh-tw": "狗頭人之王只要開心了就會喝一口。"
     },
     "quality": "common",
     "texture": "kobold_cup",
     "notes": []
   },
-  "overrides": {}
+  "overrides": {},
+  "icon": "items/kobold_cup.png"
 }

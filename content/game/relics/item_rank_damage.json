@@ -2,20 +2,24 @@
   "gameId": "item_rank_damage",
   "name": "Defiant Shell",
   "slug": "defiant-shell",
-  "icon": "relics/defiant_shell.png",
   "source": {
     "name": "Defiant Shell",
     "names": {
       "en": "Defiant Shell",
-      "ru": "Defiant Shell"
+      "ru": "Defiant Shell",
+      "zh-cn": "不羁甲壳",
+      "zh-tw": "不羈甲殼"
     },
     "description": "Reduces damage taken from home defeats or increases damage dealt in away-home victories by your (current rank + 1)",
     "descriptions": {
       "en": "Reduces damage taken from home defeats or increases damage dealt in away-home victories by your (current rank + 1)",
-      "ru": "Уменьшает урон, получаемый при домашних поражениях, или увеличивает урон, наносимый при выездных победах на Позицию в игре+1 (по здоровью)"
+      "ru": "Уменьшает урон, получаемый при домашних поражениях, или увеличивает урон, наносимый при выездных победах на Позицию в игре+1 (по здоровью)",
+      "zh-cn": "根据你的（当前排名+1），降低主场战败受到的伤害和提高客场战胜造成的伤害。",
+      "zh-tw": "根據你的（當前排名+1），降低主場戰敗受到的傷害和提高客場戰勝造成的傷害。"
     },
     "lore": "",
     "lore_i18n": {}
   },
-  "overrides": {}
+  "overrides": {},
+  "icon": "relics/defiant_shell.png"
 }

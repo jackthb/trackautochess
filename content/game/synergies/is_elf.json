@@ -2,23 +2,28 @@
   "gameId": "is_elf",
   "name": "Elf",
   "slug": "elf",
-  "icon": "synergies/elf.png",
   "source": {
     "name": "Elf",
     "names": {
       "en": "Elf",
-      "ru": "Elf"
+      "ru": "Elf",
+      "zh-cn": "精灵",
+      "zh-tw": "精靈"
     },
     "description": "Species Trait: Evasion\n Active when you have at least (N) different Elf pieces on board. (Multiple effects stack)\n\n(3) Elves: All friendly elves have +25% evasion.\n(6) Elves: All friendly elves have +40% evasion.\n(9) Elves: Friendly elves gain the effect: Dodging any attack will conceal itself for 1 second and create a mirrored attack from the attacker, targeting the enemy.",
     "descriptions": {
       "en": "Species Trait: Evasion\n Active when you have at least (N) different Elf pieces on board. (Multiple effects stack)\n\n(3) Elves: All friendly elves have +25% evasion.\n(6) Elves: All friendly elves have +40% evasion.\n(9) Elves: Friendly elves gain the effect: Dodging any attack will conceal itself for 1 second and create a mirrored attack from the attacker, targeting the enemy.",
-      "ru": "Species Trait: Evasion\n Активируется, когда на поле есть хотя бы (N) разных Elf фигур. (Эффекты складываются)\n\n(3) Elves: Все дружественные Elves получают +25% уклонения.\n(6) Elves: Все дружественные Elves получают +40% уклонения.\n(9) Elves: Дружественные Elves получают эффект: уклоняясь от любой атаки, фигура скрывается на 1 секунду и создаёт зеркальную атаку от атакующего, нацеливая её на врага."
+      "ru": "Species Trait: Evasion\n Активируется, когда на поле есть хотя бы (N) разных Elf фигур. (Эффекты складываются)\n\n(3) Elves: Все дружественные Elves получают +25% уклонения.\n(6) Elves: Все дружественные Elves получают +40% уклонения.\n(9) Elves: Дружественные Elves получают эффект: уклоняясь от любой атаки, фигура скрывается на 1 секунду и создаёт зеркальную атаку от атакующего, нацеливая её на врага.",
+      "zh-cn": "种族技能：隐蔽\n 需要己方场上有至少（N）个不同的此种族的棋子来触发效果（触发的多层效果可以叠加）。\n\n（3）精灵：所有友方精灵有25%几率闪避敌人的攻击。\n（6）精灵：所有友方精灵有40%几率闪避敌人的攻击。\n（9）精灵：所有友方精灵获得效果：任何闪避都会隐身1秒，并复制一个攻击者的镜像攻击敌人。",
+      "zh-tw": "種族技能：隱蔽\n 需要己方場上有至少（N）個不同的此種族的棋子來觸發效果（觸發的多層效果可以疊加）。\n\n（3）精靈：所有友方精靈有25%幾率閃避敵人的攻擊。\n（6）精靈：所有友方精靈有40%幾率閃避敵人的攻擊。\n（9）精靈：所有友方精靈獲得效果：任何閃避都會隱身1秒，並複製一個攻擊者的鏡像攻擊敵人。"
     },
     "description_html": "<h1>Species Trait: Evasion</h1><font color=\"#656585\">Active when you have at least (N) different Elf pieces on board. (Multiple effects stack)</font><br><br>(3) Elves: All friendly elves have +25% evasion.<br>(6) Elves: All friendly elves have +40% evasion.<br>(9) Elves: Friendly elves gain the effect: Dodging any attack will conceal itself for 1 second and create a mirrored attack from the attacker, targeting the enemy.",
     "lore": "Nimble Elves who live on the crown of the World Tree are one of the most important primal protectors of Drodo Island. Their belief in the Goddess of the Moon and natural harmony has profoundly affected their lifestyle.",
     "lore_i18n": {
       "en": "Nimble Elves who live on the crown of the World Tree are one of the most important primal protectors of Drodo Island. Their belief in the Goddess of the Moon and natural harmony has profoundly affected their lifestyle.",
-      "ru": "Проворные Elves, живущие в кроне World Tree, являются одними из важнейших первородных защитников Drodo Island. Их вера в Goddess of the Moon и гармонию природы глубоко влияет на их образ жизни."
+      "ru": "Проворные Elves, живущие в кроне World Tree, являются одними из важнейших первородных защитников Drodo Island. Их вера в Goddess of the Moon и гармонию природы глубоко влияет на их образ жизни.",
+      "zh-cn": "生活在世界之树之上的精灵们，是多多岛最重要的保护者之一，其月神信仰与自然平衡信仰渗透在生活之中点点滴滴。",
+      "zh-tw": "生活在世界之樹之上的精靈們，是多多島最重要的保護者之一，其月神信仰與自然平衡信仰滲透在生活之中點點滴滴。"
     },
     "notes": [],
     "tiers": [
@@ -28,5 +33,6 @@
     ],
     "ability_special": {}
   },
-  "overrides": {}
+  "overrides": {},
+  "icon": "synergies/elf.png"
 }

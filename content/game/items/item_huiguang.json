@@ -2,17 +2,20 @@
   "gameId": "item_huiguang",
   "name": "Kaya",
   "slug": "kaya",
-  "icon": "items/kaya.png",
   "source": {
     "name": "Kaya",
     "names": {
       "en": "Kaya",
-      "ru": "Kaya"
+      "ru": "Kaya",
+      "zh-cn": "慧光",
+      "zh-tw": "慧光"
     },
     "description": "Mana restoration + 25%. Magical damage +30%.",
     "descriptions": {
       "en": "Mana restoration + 25%. Magical damage +30%.",
-      "ru": "Восстановление маны + 25%. Магический урон +30%."
+      "ru": "Восстановление маны + 25%. Магический урон +30%.",
+      "zh-cn": "法力获取+25%，魔法伤害+30%。",
+      "zh-tw": "法力獲取+25%，魔法傷害+30%。"
     },
     "lore": "",
     "lore_i18n": {},
@@ -20,5 +23,6 @@
     "texture": "kaya",
     "notes": []
   },
-  "overrides": {}
+  "overrides": {},
+  "icon": "items/kaya.png"
 }

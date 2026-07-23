@@ -2,23 +2,28 @@
   "gameId": "is_element",
   "name": "Elemental",
   "slug": "elemental",
-  "icon": "synergies/element.png",
   "source": {
     "name": "Elemental",
     "names": {
       "en": "Elemental",
-      "ru": "Elemental"
+      "ru": "Elemental",
+      "zh-cn": "元素",
+      "zh-tw": "元素"
     },
-    "description": "Elemental Essence\n Active when you have at least (N) different Element pieces on board. (Multiple effects stack)\n\n(2) Elements: All friendly elementals have +15% chance to turn melee aggressors into stone for 3 sec.\n(4) Elements: All allies have +15% chance to turn melee and ranged aggressors into stone for 3 sec.\n(6) Elements: Aggressors are stoned for 1 sec longer and take +100% damage.",
+    "description": "Elemental Essence\n Active when you have at least (N) different Element pieces on board. (Multiple effects stack)\n\n(2) Elements: All friendly elementals have +15% chance to turn melee aggressors into stone for 3 sec.\n(4) Elements: All allies have +15% chance to turn melee and ranged aggressors into stone for 4 sec.\n(6) Elements: Aggressors are stoned for 1 sec longer and take +100% damage.",
     "descriptions": {
-      "en": "Elemental Essence\n Active when you have at least (N) different Element pieces on board. (Multiple effects stack)\n\n(2) Elements: All friendly elementals have +15% chance to turn melee aggressors into stone for 3 sec.\n(4) Elements: All allies have +15% chance to turn melee and ranged aggressors into stone for 3 sec.\n(6) Elements: Aggressors are stoned for 1 sec longer and take +100% damage.",
-      "ru": "Elemental Essence\n Активна, когда минимум (N) разных Element на столе.(Эффекты складываются)\n\n(2) Element: Все союзные Element имеют 15% шанс превратить врага ближнего боя в камень на 3 сек.\n(4) Element: Все союзные Element имеют 15% шанс превратить любого врага в камень на 3 сек.\n(6) Element: Все враги превращаются в камень на 1 сек дольше и получают +100% урона."
+      "en": "Elemental Essence\n Active when you have at least (N) different Element pieces on board. (Multiple effects stack)\n\n(2) Elements: All friendly elementals have +15% chance to turn melee aggressors into stone for 3 sec.\n(4) Elements: All allies have +15% chance to turn melee and ranged aggressors into stone for 4 sec.\n(6) Elements: Aggressors are stoned for 1 sec longer and take +100% damage.",
+      "ru": "Elemental Essence\n Активна, когда минимум (N) разных Element на столе.(Эффекты складываются)\n\n(2) Element: Все союзные Element имеют 15% шанс превратить врага ближнего боя в камень на 3 сек.\n(4) Element: Все союзные фигуры имеют 15% шанс превратить любого врага в камень на 4 сек.\n(6) Element: Все враги превращаются в камень на 1 сек дольше и получают +100% урона.",
+      "zh-cn": "种族技能：大地灵气\n 需要己方场上有至少（N）个不同的此种族的棋子来触发效果（触发的多层效果可以叠加）。\n\n（2）元素：所有友方元素获得效果：被近战攻击的时候有15%概率使攻击者石化3秒。\n（4）元素：所有友军获得效果：被近战或远程攻击的时候有10%概率使攻击者石化4秒。\n（6）元素：石化的持续时间增加1秒，被石化的敌人受到的所有伤害+100%。",
+      "zh-tw": "種族技能：大地靈氣\n 需要己方場上有至少（N）個不同的此種族的棋子來觸發效果（觸發的多層效果可以疊加）。\n\n（2）元素：所有友方元素獲得效果：被近戰攻擊的時候有15%概率使攻擊者石化3秒。\n（4）元素：所有友軍獲得效果：被近戰或遠程攻擊的時候有10%概率使攻擊者石化4秒。\n（6）元素：石化的持續時間增加1秒，被石化的敵人受到的所有傷害+100%。"
     },
-    "description_html": "<h1>Elemental Essence</h1><font color=\"#656585\">Active when you have at least (N) different Element pieces on board. (Multiple effects stack)</font><br><br>(2) Elements: All friendly elementals have +15% chance to turn melee aggressors into stone for 3 sec.<br>(4) Elements: All allies have +15% chance to turn melee and ranged aggressors into stone for 3 sec.<br>(6) Elements: Aggressors are stoned for 1 sec longer and take +100% damage.",
+    "description_html": "<h1>Elemental Essence</h1><font color=\"#656585\">Active when you have at least (N) different Element pieces on board. (Multiple effects stack)</font><br><br>(2) Elements: All friendly elementals have +15% chance to turn melee aggressors into stone for 3 sec.<br>(4) Elements: All allies have +15% chance to turn melee and ranged aggressors into stone for 4 sec.<br>(6) Elements: Aggressors are stoned for 1 sec longer and take +100% damage.",
     "lore": "Elementals are unstable beings that radiate mysterious energy when attacked. This gives them a chance to turn their melee aggressors to stone.",
     "lore_i18n": {
       "en": "Elementals are unstable beings that radiate mysterious energy when attacked. This gives them a chance to turn their melee aggressors to stone.",
-      "ru": "Elementals — нестабильные существа, излучающие загадочную энергию при получении урона. Это даёт им шанс обращать атакующих в ближнем бою врагов в камень."
+      "ru": "Elementals — нестабильные существа, излучающие загадочную энергию при получении урона. Это даёт им шанс обращать атакующих в ближнем бою врагов в камень.",
+      "zh-cn": "元素位面是一处充满暴力且危险的地方，在那里每一种元素都和其他元素战斗着，在永无止境的冲突中试图扩展自己的疆土。",
+      "zh-tw": "元素位面是一處充滿暴力且危險的地方，在那裏每一種元素都和其他元素戰鬥着，在永無止境的衝突中試圖擴展自己的疆土。"
     },
     "notes": [],
     "tiers": [
@@ -28,5 +33,6 @@
     ],
     "ability_special": {}
   },
-  "overrides": {}
+  "overrides": {},
+  "icon": "synergies/element.png"
 }

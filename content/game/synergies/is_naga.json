@@ -2,23 +2,28 @@
   "gameId": "is_naga",
   "name": "Naga",
   "slug": "naga",
-  "icon": "synergies/naga.png",
   "source": {
     "name": "Naga",
     "names": {
       "en": "Naga",
-      "ru": "Naga"
+      "ru": "Naga",
+      "zh-cn": "娜迦",
+      "zh-tw": "娜迦"
     },
     "description": "Species Trait: Scale Armor\n Active when you have at least (N) different Naga pieces on board. (Multiple effects stack)\n\n(2) Naga: Grants allies 15% magic resistance.\n(4) Naga: Grants allies 35% magic resistance.\n(6) Naga: When taking non-pure damage, reflect 1.5 times the magical resistance.",
     "descriptions": {
       "en": "Species Trait: Scale Armor\n Active when you have at least (N) different Naga pieces on board. (Multiple effects stack)\n\n(2) Naga: Grants allies 15% magic resistance.\n(4) Naga: Grants allies 35% magic resistance.\n(6) Naga: When taking non-pure damage, reflect 1.5 times the magical resistance.",
-      "ru": "Species Trait: Scale Armor\n Активна, когда минимум (N) разных Наг на столе.(Эффекты складываются)\n\n(2) Naga: Дает союзникам 15% маг.резиста.\n(4) Naga: Дает союзникам 35% маг.резиста.\n(6) Naga: При получении нечистого урона, отражает в 1.5 раза больше урона, уменьшенного маг.резистом."
+      "ru": "Species Trait: Scale Armor\n Активна, когда минимум (N) разных Наг на столе.(Эффекты складываются)\n\n(2) Naga: Дает союзникам 15% маг.резиста.\n(4) Naga: Дает союзникам 35% маг.резиста.\n(6) Naga: При получении нечистого урона, отражает в 1.5 раза больше урона, уменьшенного маг.резистом.",
+      "zh-cn": "种族技能：鳞甲\n 需要己方场上有至少（N）个不同的此种族的棋子来触发效果（触发的多层效果可以叠加）。\n\n（2）娜迦：所有友军的魔法抗性+15%。\n（4）娜迦：所有友军的魔法抗性+35%。\n（6）娜迦：所有友方娜迦棋子获得效果：每次受到非纯粹伤害时，会反弹（自身魔法抗性×1.5）点纯粹伤害。",
+      "zh-tw": "種族技能：鱗甲\n 需要己方場上有至少（N）個不同的此種族的棋子來觸發效果（觸發的多層效果可以疊加）。\n\n（2）娜迦：所有友軍的魔法抗性+15%。\n（4）娜迦：所有友軍的魔法抗性+35%。\n（6）娜迦：所有友方娜迦棋子獲得效果：每次受到非純粹傷害時，會反彈（自身魔法抗性×1.5）點純粹傷害。"
     },
     "description_html": "<h1>Species Trait: Scale Armor</h1><font color=\"#656585\">Active when you have at least (N) different Naga pieces on board. (Multiple effects stack)</font><br><br>(2) Naga: Grants allies 15% magic resistance.<br>(4) Naga: Grants allies 35% magic resistance.<br>(6) Naga: When taking non-pure damage, reflect 1.5 times the magical resistance.",
     "lore": "Nagas are cursed sea-dwellers that haunt the ocean floor. Their hardened, scaly skin acts as an effective defense against spells.",
     "lore_i18n": {
       "en": "Nagas are cursed sea-dwellers that haunt the ocean floor. Their hardened, scaly skin acts as an effective defense against spells.",
-      "ru": "Nagas are cursed sea-dwellers that haunt the ocean floor. Their hardened, scaly skin acts as an effective defense against spells."
+      "ru": "Nagas are cursed sea-dwellers that haunt the ocean floor. Their hardened, scaly skin acts as an effective defense against spells.",
+      "zh-cn": "娜迦族原本是暗夜精灵的贵族，这些权贵们被哼哼井的能量所迷惑而无节制地滥用魔法。上古之战哼哼井崩塌后，沉入海底的上层精灵因受到永远的诅咒而变型为妖怪一般的娜迦。",
+      "zh-tw": "娜迦族原本是暗夜精靈的貴族，這些權貴們被哼哼井的能量所迷惑而無節制地濫用魔法。上古之戰哼哼井崩塌後，沉入海底的上層精靈因受到永遠的詛咒而變型爲妖怪一般的娜迦。"
     },
     "notes": [],
     "tiers": [
@@ -28,5 +33,6 @@
     ],
     "ability_special": {}
   },
-  "overrides": {}
+  "overrides": {},
+  "icon": "synergies/naga.png"
 }

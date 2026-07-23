@@ -2,17 +2,20 @@
   "gameId": "item_jingmixie",
   "name": "Tranquil Boots",
   "slug": "tranquil-boots",
-  "icon": "items/tranquil_boots.png",
   "source": {
     "name": "Tranquil Boots",
     "names": {
       "en": "Tranquil Boots",
-      "ru": "Tranquil Boots"
+      "ru": "Tranquil Boots",
+      "zh-cn": "静谧鞋",
+      "zh-tw": "靜謐鞋"
     },
     "description": "Fast movement. Recharges 20 health for allies around per 2 seconds.",
     "descriptions": {
       "en": "Fast movement. Recharges 20 health for allies around per 2 seconds.",
-      "ru": "Быстрое передвижение. Восстанавливает 20 здоровья союзникам раз в 2 секунды."
+      "ru": "Быстрое передвижение.\n Восстанавливает 20 здоровья союзникам раз в 2 секунды.",
+      "zh-cn": "快速移动，携带者使范围内的友军每2秒获得20点治疗。",
+      "zh-tw": "快速移動，攜帶者使範圍內的友軍每2秒獲得20點治療。"
     },
     "lore": "",
     "lore_i18n": {},
@@ -22,5 +25,6 @@
       "Immune to attack and ability when jumping"
     ]
   },
-  "overrides": {}
+  "overrides": {},
+  "icon": "items/tranquil_boots.png"
 }

@@ -2,7 +2,6 @@
   "gameId": "chess_au",
   "name": "Abyssal Underlord",
   "slug": "abyssal-underlord",
-  "icon": "units/abyssal_underlord.png",
   "source": {
     "id": "chess_au",
     "cost": 5,
@@ -60,5 +59,6 @@
       }
     }
   },
-  "overrides": {}
+  "overrides": {},
+  "icon": "units/abyssal_underlord.png"
 }

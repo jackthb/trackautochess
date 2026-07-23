@@ -2,7 +2,6 @@
   "gameId": "chess_chen",
   "name": "Chen",
   "slug": "chen",
-  "icon": "units/chen.png",
   "source": {
     "id": "chess_chen",
     "cost": 4,
@@ -60,5 +59,6 @@
       }
     }
   },
-  "overrides": {}
+  "overrides": {},
+  "icon": "units/chen.png"
 }

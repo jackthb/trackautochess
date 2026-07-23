@@ -2,26 +2,31 @@
   "gameId": "is_centaur",
   "name": "Centaur",
   "slug": "centaur",
-  "icon": "synergies/centaur.png",
   "source": {
     "name": "Centaur",
     "names": {
       "en": "Centaur",
-      "ru": "Centaur"
+      "ru": "Centaur",
+      "zh-cn": "半人马",
+      "zh-tw": "半人馬"
     },
     "description": "SPECIES TRAIT: Stampede\n Active when you have at least (N) different pieces of this species on board. (Multiple effects stack).\n\n(2)Centaurs: All friendly Centaurs gain the effect: when starting a battle, immediately charge to the target grid with the most enemy pieces around, and stun the enemy pieces on the path.\n(4)Centaurs: Every move of all melee-friendly pieces is a Stampede.",
     "descriptions": {
       "en": "SPECIES TRAIT: Stampede\n Active when you have at least (N) different pieces of this species on board. (Multiple effects stack).\n\n(2)Centaurs: All friendly Centaurs gain the effect: when starting a battle, immediately charge to the target grid with the most enemy pieces around, and stun the enemy pieces on the path.\n(4)Centaurs: Every move of all melee-friendly pieces is a Stampede.",
-      "ru": "SPECIES TRAIT: Stampede\n Активна, когда минимум (N) разных Centaurs на столе.(Эффекты складываются).\n\n(2)Centaurs: Все союзные Centaurs получают эффект: при начале битвы они немедленно мчатся к клетке с наибольшим количеством вражеских фигур вокруг и оглушают врагов на пути.\n(4)Centaurs: Каждое движение всех ближних союзных фигур является Stampede."
+      "ru": "SPECIES TRAIT: Stampede\n Активна, когда минимум (N) разных Centaurs на столе.(Эффекты складываются).\n\n(2)Centaurs: Все союзные Centaurs получают эффект: при начале битвы они немедленно мчатся к клетке с наибольшим количеством вражеских фигур вокруг и оглушают врагов на пути.\n(4)Centaurs: Каждое движение всех ближних союзных фигур является Stampede.",
+      "zh-cn": "种族技能：奔袭冲撞\n 需要己方场上有至少（N）个不同的此种族的棋子来触发效果（触发的多层效果可以叠加）。\n\n（2）半人马：所有友方半人马棋子获得效果：开始战斗时立即冲锋到周围敌方棋子最多的目标格子，并撞晕路径上的敌方棋子。\n（4）半人马：所有近战友方棋子的每次移动都是奔袭冲撞。",
+      "zh-tw": "種族技能：奔襲衝撞\n 需要己方場上有至少（N）個不同的此種族的棋子來觸發效果（觸發的多層效果可以疊加）。\n\n（2）半人馬：所有友方半人馬棋子獲得效果：開始戰鬥時立即衝鋒到周圍敵方棋子最多的目標格子，並撞暈路徑上的敵方棋子。\n（4）半人馬：所有近戰友方棋子的每次移動都是奔襲衝撞。"
     },
     "description_html": "<h1>SPECIES TRAIT: Stampede</h1><font color=\"#656585\">Active when you have at least (N) different pieces of this species on board. (Multiple effects stack).</font><br><br>(2)Centaurs: All friendly Centaurs gain the effect: when starting a battle, immediately charge to the target grid with the most enemy pieces around, and stun the enemy pieces on the path.<br>(4)Centaurs:  Every move of all melee-friendly pieces is a Stampede.",
-    "lore": "Centaurs are of noble blood, they are given birth by Half-god’s elder son Zaetar and only daughter of Princess Theradras. Cruelty and fierceness fill their blood, generation by generation.",
+    "lore": "Centaurs are a half-humanoid, half-beast, war-like tribal race. Being born from the conceiving of the Demi-gods son and the earth elemental, the race shows an extreme aggressiveness towards other tribes.",
     "lore_i18n": {
-      "en": "Centaurs are of noble blood, they are given birth by Half-god’s elder son Zaetar and only daughter of Princess Theradras. Cruelty and fierceness fill their blood, generation by generation.",
-      "ru": "Centaurs — благородного происхождения: они рождены от старшего сына полубога Zaetar и единственной дочери принцессы Theradras. Жестокость и свирепость передаются в их крови из поколения в поколение."
+      "en": "Centaurs are a half-humanoid, half-beast, war-like tribal race. Being born from the conceiving of the Demi-gods son and the earth elemental, the race shows an extreme aggressiveness towards other tribes.",
+      "ru": "Centaurs — воинственная племенная раса, сочетающая черты человека и зверя. Рожденные от союза сына полубога и духа земли, они отличаются крайней агрессивностью по отношению к другим племенам.",
+      "zh-cn": "半人马族的种族基因其实异常高贵，它们是由半神德鲁伊的长子扎尔塔与石母唯一的女儿瑟莱德丝公主结合而诞生。半人马整个种族都异常残暴，具有非常强的侵略性和攻击性。",
+      "zh-tw": "半人馬族的種族基因其實異常高貴，它們是由半神德魯伊的長子扎爾塔與石母唯一的女兒瑟萊德絲公主結合而誕生。半人馬整個種族都異常殘暴，具有非常強的侵略性和攻擊性。"
     },
     "notes": [
-      "Duration: 0.75s"
+      "Duration: 1s"
     ],
     "tiers": [
       2,
@@ -29,5 +34,6 @@
     ],
     "ability_special": {}
   },
-  "overrides": {}
+  "overrides": {},
+  "icon": "synergies/centaur.png"
 }

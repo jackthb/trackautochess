@@ -2,7 +2,6 @@
   "gameId": "chess_rubick",
   "name": "Rubick",
   "slug": "rubick",
-  "icon": "units/rubick.png",
   "source": {
     "id": "chess_rubick",
     "cost": 3,
@@ -60,5 +59,6 @@
       }
     }
   },
-  "overrides": {}
+  "overrides": {},
+  "icon": "units/rubick.png"
 }

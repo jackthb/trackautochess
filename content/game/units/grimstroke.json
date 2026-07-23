@@ -2,7 +2,6 @@
   "gameId": "chess_gs",
   "name": "Grimstroke",
   "slug": "grimstroke",
-  "icon": "units/grimstroke.png",
   "source": {
     "id": "chess_gs",
     "cost": 2,
@@ -66,5 +65,6 @@
       }
     }
   },
-  "overrides": {}
+  "overrides": {},
+  "icon": "units/grimstroke.png"
 }

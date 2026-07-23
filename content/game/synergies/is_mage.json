@@ -2,23 +2,28 @@
   "gameId": "is_mage",
   "name": "Mage",
   "slug": "mage",
-  "icon": "synergies/mage.png",
   "source": {
     "name": "Mage",
     "names": {
       "en": "Mage",
-      "ru": "Mage"
+      "ru": "Mage",
+      "zh-cn": "法师",
+      "zh-tw": "法師"
     },
     "description": "For every standing friendly Mage on the chessboard, Mage pieces receive +10% bonus mana restoration, up to a maximum of 60%.\n\nClass Perk: Magical Vulnerability\n Active when you have at least (N) different mage pieces on board. (Multiple effects stack) \n\n(3) Mages: All enemies suffer -30% magic resistance.\n(6) Mages: All enemies suffer -35% magic resistance.\n(9) Mages: All enemies are cursed with frost incantation, which freezes them upon receiving magical damage. Lasts longer for more increased damage taken.",
     "descriptions": {
       "en": "For every standing friendly Mage on the chessboard, Mage pieces receive +10% bonus mana restoration, up to a maximum of 60%.\n\nClass Perk: Magical Vulnerability\n Active when you have at least (N) different mage pieces on board. (Multiple effects stack) \n\n(3) Mages: All enemies suffer -30% magic resistance.\n(6) Mages: All enemies suffer -35% magic resistance.\n(9) Mages: All enemies are cursed with frost incantation, which freezes them upon receiving magical damage. Lasts longer for more increased damage taken.",
-      "ru": "За каждого стоящего на доске дружественного Мага фигуры Магов получают бонус к восстановлению маны +10%, максимум до 60%.\n\nClass Perk: Magical Vulnerability\n Активна, когда минимум (N) разных Магов на столе.(Эффекты складываются) \n\n(3) Mages: Магический резист врагов снижен на 30%.\n(6) Mages: Магический резист врагов снижен на 35%.\n(9) Mages: Все враги заражены чумой, которая замораживает их при получении маг. урона. Длительность зависит от кол-ва полученного урона."
+      "ru": "За каждого стоящего на доске дружественного Мага фигуры Магов получают бонус к восстановлению маны +10%, максимум до 60%.\n\nClass Perk: Magical Vulnerability\n Активна, когда минимум (N) разных Магов на столе.(Эффекты складываются) \n\n(3) Mages: Магический резист врагов снижен на 30%.\n(6) Mages: Магический резист врагов снижен на 35%.\n(9) Mages: Все враги заражены чумой, которая замораживает их при получении маг. урона. Длительность зависит от кол-ва полученного урона.",
+      "zh-cn": "场上每有一个存活的友方法师棋子，法师棋子就获得+10%的法力获取，最多+60%。\n\n职业技能：法术易伤\n 需要己方场上有至少（N）个不同的此职业的棋子来触发效果（触发的多层效果可以叠加）。\n\n（3）法师：使所有敌军的魔法抗性-30%。\n（6）法师：使所有敌军的魔法抗性-35%。\n（9）法师：使所有敌军获得效果：受到魔法伤害时冻结，魔法伤害越高，冻结时间越长。",
+      "zh-tw": "場上每有一個存活的友方法師棋子，法師棋子就獲得+10%的法力獲取，最多+60%。\n\n職業技能：法術易傷\n 需要己方場上有至少（N）個不同的此職業的棋子來觸發效果（觸發的多層效果可以疊加）。\n\n（3）法師：使所有敵軍的魔法抗性-30%。\n（6）法師：使所有敵軍的魔法抗性-35%。\n（9）法師：使所有敵軍獲得效果：受到魔法傷害時凍結，魔法傷害越高，凍結時間越長。"
     },
     "description_html": "For every standing friendly Mage on the chessboard, Mage pieces receive +10% bonus mana restoration, up to a maximum of 60%.\n<h1>Class Perk: Magical Vulnerability</h1><font color=\"#656585\">Active when you have at least (N) different mage pieces on board. (Multiple effects stack) </font><br><br>(3) Mages: All enemies suffer -30% magic resistance.<br>(6) Mages: All enemies suffer -35% magic resistance.<br>(9) Mages: All enemies are cursed with frost incantation, which freezes them upon receiving magical damage. Lasts longer for more increased damage taken.",
     "lore": "Mages are keen intellectuals who have spent years studying arcane knowledge. This allows them to make their victims more vulnerable to magic damage.",
     "lore_i18n": {
       "en": "Mages are keen intellectuals who have spent years studying arcane knowledge. This allows them to make their victims more vulnerable to magic damage.",
-      "ru": "Mages — проницательные интеллектуалы, посвятившие годы изучению тайных знаний. Это позволяет им делать врагов более уязвимыми к магическому урону."
+      "ru": "Mages — проницательные интеллектуалы, посвятившие годы изучению тайных знаний. Это позволяет им делать врагов более уязвимыми к магическому урону.",
+      "zh-cn": "只有最敏锐、聪慧、严于律己的学生才能够走上法师之路。法师所能够掌握的奥术魔法太过强大而危险，只有最专注的研习者才能够窥见其中的奥秘。",
+      "zh-tw": "只有最敏銳、聰慧、嚴於律己的學生才能夠走上法師之路。法師所能夠掌握的奧術魔法太過強大而危險，只有最專注的研習者才能夠窺見其中的奧祕。"
     },
     "notes": [
       "Freeze duration equals to magical damage/400 with a minimum of 0.5s."
@@ -30,5 +35,6 @@
     ],
     "ability_special": {}
   },
-  "overrides": {}
+  "overrides": {},
+  "icon": "synergies/mage.png"
 }

@@ -2,7 +2,6 @@
   "gameId": "chess_muerta",
   "name": "Muerta",
   "slug": "muerta",
-  "icon": "units/muerta.png",
   "source": {
     "id": "chess_muerta",
     "cost": 2,
@@ -60,5 +59,6 @@
       }
     }
   },
-  "overrides": {}
+  "overrides": {},
+  "icon": "units/muerta.png"
 }

@@ -2,7 +2,6 @@
   "gameId": "chess_sniper",
   "name": "Sniper",
   "slug": "sniper",
-  "icon": "units/sniper.png",
   "source": {
     "id": "chess_sniper",
     "cost": 2,
@@ -60,5 +59,6 @@
       }
     }
   },
-  "overrides": {}
+  "overrides": {},
+  "icon": "units/sniper.png"
 }

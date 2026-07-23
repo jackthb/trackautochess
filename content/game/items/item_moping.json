@@ -2,17 +2,20 @@
   "gameId": "item_moping",
   "name": "Bottle",
   "slug": "bottle",
-  "icon": "items/bottle.png",
   "source": {
     "name": "Bottle",
     "names": {
       "en": "Bottle",
-      "ru": "Bottle"
+      "ru": "Bottle",
+      "zh-cn": "魔瓶",
+      "zh-tw": "魔瓶"
     },
     "description": "MP +50.",
     "descriptions": {
       "en": "MP +50.",
-      "ru": "Мана +50."
+      "ru": "Мана +50.",
+      "zh-cn": "法力值+50。",
+      "zh-tw": "法力值+50。"
     },
     "lore": "",
     "lore_i18n": {},
@@ -20,5 +23,6 @@
     "texture": "bottle",
     "notes": []
   },
-  "overrides": {}
+  "overrides": {},
+  "icon": "items/bottle.png"
 }

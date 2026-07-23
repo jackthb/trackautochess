@@ -2,23 +2,27 @@
   "gameId": "item_feijiangxiaomao",
   "name": "Ascetics Cap",
   "slug": "ascetics-cap",
-  "icon": "items/ascetic_cap.png",
-  "commentary": "The transformation chance depends on the carrier's base shop cost.\n\n| Carrier cost | Script threshold |\n|---:|---:|\n| 1 | 90% |\n| 2 | 80% |\n| 3 | 70% |\n| 4 | 60% |\n| 5 | 50% |\n\nOn success, the carrier is replaced by a random Undead piece of the same cost and star level. At most one piece can transform per round.\n\nA 3-star Druid is treated as costing 1 less for both the roll and the resulting Undead, i.e. a 3-star 1-cost Druid is treated as 0-cost and cannot transform.",
   "source": {
     "name": "Ascetics Cap",
     "names": {
       "en": "Ascetics Cap",
-      "ru": "Ascetics Cap"
+      "ru": "Ascetics Cap",
+      "zh-cn": "飞僵小帽",
+      "zh-tw": "飛僵小帽"
     },
     "description": "+25% magical resistance. A non-Undead carrier has a chance to be reborn into an undead piece of the same rank and level.",
     "descriptions": {
       "en": "+25% magical resistance. A non-Undead carrier has a chance to be reborn into an undead piece of the same rank and level.",
-      "ru": "+25% маг.резиста. Носитель не-Undead имеет шанс переродиться в фигуру Undead с тем же рангом и уровнем."
+      "ru": "+25% маг.резиста. Носитель не-Undead имеет шанс переродиться в фигуру Undead с тем же рангом и уровнем.",
+      "zh-cn": "魔法抗性+25%，非亡灵携带者获得效果：回合开始时有概率被转化为一个同等级同星的随机亡灵棋子。",
+      "zh-tw": "魔法抗性+25%，非亡靈攜帶者獲得效果：回合開始時有概率被轉化爲一個同等級同星的隨機亡靈棋子。"
     },
     "lore": "An austere cap from Undery.",
     "lore_i18n": {
       "en": "An austere cap from Undery.",
-      "ru": "Шляпа Аскета"
+      "ru": "Шляпа Аскета",
+      "zh-cn": "一顶朴素的帽子，看上去源自幽幽城。",
+      "zh-tw": "一頂樸素的帽子，看上去源自幽幽城。"
     },
     "quality": "rare",
     "texture": "item_ascetic_cap",
@@ -27,5 +31,7 @@
       "IO cannot resurrect. Independent with Dismiss."
     ]
   },
-  "overrides": {}
+  "overrides": {},
+  "commentary": "The transformation chance depends on the carrier's base shop cost.\n\n| Carrier cost | Script threshold |\n|---:|---:|\n| 1 | 90% |\n| 2 | 80% |\n| 3 | 70% |\n| 4 | 60% |\n| 5 | 50% |\n\nOn success, the carrier is replaced by a random Undead piece of the same cost and star level. At most one piece can transform per round.\n\nA 3-star Druid is treated as costing 1 less for both the roll and the resulting Undead, i.e. a 3-star 1-cost Druid is treated as 0-cost and cannot transform.",
+  "icon": "items/ascetic_cap.png"
 }

@@ -2,23 +2,28 @@
   "gameId": "is_tauren",
   "name": "Tauren",
   "slug": "tauren",
-  "icon": "synergies/tauren.png",
   "source": {
     "name": "Tauren",
     "names": {
       "en": "Tauren",
-      "ru": "Tauren"
+      "ru": "Tauren",
+      "zh-cn": "牛头人",
+      "zh-tw": "牛頭人"
     },
     "description": "SPECIES TRAIT: Totem of the Clan\n Active when you have at least (N) different pieces of this species on board. (Multiple effects stack)\n\n(2) Taurens: Summons a Taunt Totem at the start of the battle.\n(4) Taurens: Summons a Woodpecker Totem and a Horn Totem at the start of the battle.",
     "descriptions": {
       "en": "SPECIES TRAIT: Totem of the Clan\n Active when you have at least (N) different pieces of this species on board. (Multiple effects stack)\n\n(2) Taurens: Summons a Taunt Totem at the start of the battle.\n(4) Taurens: Summons a Woodpecker Totem and a Horn Totem at the start of the battle.",
-      "ru": "SPECIES TRAIT: Totem of the Clan\n Активна, когда минимум (N) разных Taurens на столе.(Эффекты складываются)\n\n(2) Taurens: Призывает Totem Taunt в начале битвы.\n(4) Taurens: Призывает Totem Woodpecker и Totem Horn в начале битвы."
+      "ru": "SPECIES TRAIT: Totem of the Clan\n Активна, когда минимум (N) разных Taurens на столе.(Эффекты складываются)\n\n(2) Taurens: Призывает Totem Taunt в начале битвы.\n(4) Taurens: Призывает Totem Woodpecker и Totem Horn в начале битвы.",
+      "zh-cn": "种族技能：高岭图腾\n 需要己方场上有至少（N）个不同的此种族的棋子来触发效果（触发的多层效果可以叠加）。\n\n（2）牛头人：战斗开始时召唤一个稻草人图腾。\n（4）牛头人：战斗开始时召唤一个啄木鸟图腾和一个蛮牛角图腾。",
+      "zh-tw": "種族技能：高嶺圖騰\n 需要己方場上有至少（N）個不同的此種族的棋子來觸發效果（觸發的多層效果可以疊加）。\n\n（2）牛頭人：戰鬥開始時召喚一個稻草人圖騰。\n（4）牛頭人：戰鬥開始時召喚一個啄木鳥圖騰和一個蠻牛角圖騰。"
     },
     "description_html": "<h1>SPECIES TRAIT: Totem of the Clan</h1><font color=\"#656585\">Active when you have at least (N) different pieces of this species on board. (Multiple effects stack)</font><br><br>(2) Taurens: Summons a Taunt Totem at the start of the battle.<br>(4) Taurens: Summons a Woodpecker Totem and a Horn Totem at the start of the battle.",
     "lore": "Peace-loving Taurens live on mountain-high plateaus of the barren Drodoland. They strive to preserve the balance of nature at the behest of the Earth Mother.",
     "lore_i18n": {
       "en": "Peace-loving Taurens live on mountain-high plateaus of the barren Drodoland. They strive to preserve the balance of nature at the behest of the Earth Mother.",
-      "ru": "Taurens с высокогорных плато Drodoland служат Earth Mother и оберегают баланс природы."
+      "ru": "Taurens с высокогорных плато Drodoland служат Earth Mother и оберегают баланс природы.",
+      "zh-cn": "爱好和平的牛头人长期居住在多多大陆贫瘠地区的高山上，它们在大地母亲的护佑下，努力保护大自然的平衡。",
+      "zh-tw": "愛好和平的牛頭人長期居住在多多大陸貧瘠地區的高山上，它們在大地母親的護佑下，努力保護大自然的平衡。"
     },
     "notes": [],
     "tiers": [
@@ -27,5 +32,6 @@
     ],
     "ability_special": {}
   },
-  "overrides": {}
+  "overrides": {},
+  "icon": "synergies/tauren.png"
 }

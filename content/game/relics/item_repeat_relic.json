@@ -2,20 +2,27 @@
   "gameId": "item_repeat_relic",
   "name": "Time-Space Replica",
   "slug": "time-space-replica",
-  "icon": "relics/time_space_replica.png",
   "source": {
     "name": "Time-Space Replica",
     "names": {
       "en": "Time-Space Replica",
-      "ru": "Time-Space Replica"
+      "ru": "Time-Space Replica",
+      "zh-cn": "复刻时空",
+      "zh-tw": "復刻時空"
     },
     "description": "Replicate your last relic.",
     "descriptions": {
       "en": "Replicate your last relic.",
-      "ru": "Повторите свою прошлую реликвию."
+      "ru": "Повторите свою прошлую реликвию.",
+      "zh-cn": "重复使用你的上一个圣物。",
+      "zh-tw": "重複使用你的上一個聖物。"
     },
     "lore": "",
-    "lore_i18n": {}
+    "lore_i18n": {
+      "zh-cn": "来自：圣物宝箱",
+      "zh-tw": "來自：聖物寶箱"
+    }
   },
-  "overrides": {}
+  "overrides": {},
+  "icon": "relics/time_space_replica.png"
 }

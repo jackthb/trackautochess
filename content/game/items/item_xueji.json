@@ -2,26 +2,32 @@
   "gameId": "item_xueji",
   "name": "Bloodthorn",
   "slug": "bloodthorn",
-  "icon": "items/bloodthorn.png",
   "source": {
     "name": "Bloodthorn",
     "names": {
       "en": "Bloodthorn",
-      "ru": "Bloodthorn"
+      "ru": "Bloodthorn",
+      "zh-cn": "血棘",
+      "zh-tw": "血棘"
     },
     "description": "+20% Attack speed.\n\nActive ability: Instant\nRoots and silences the highest-level enemy chess piece in the attack range for 6 seconds. Any attacks to the victim causes 200% critical damage and all allies with in the attack range focus attacking the victim within the duration.",
     "descriptions": {
       "en": "+20% Attack speed.\n\nActive ability: Instant\nRoots and silences the highest-level enemy chess piece in the attack range for 6 seconds. Any attacks to the victim causes 200% critical damage and all allies with in the attack range focus attacking the victim within the duration.",
-      "ru": "+20% Скорости атаки.\n\nАктивка: Мгновенная\nНакладывает Молчание на вражескую фигуру с самым высоким уровнем в зоне атаки на 6 секунд. Все атаки по цели наносят 200% критического урона, а союзники в радиусе атаки сосредотачиваются на атаке цели в течение действия эффекта."
+      "ru": "+20% Скорости атаки.\n\nАктивка: Мгновенная\nНакладывает Молчание на вражескую фигуру с самым высоким уровнем в зоне атаки на 6 секунд. Все атаки по цели наносят 200% критического урона, а союзники в радиусе атаки сосредотачиваются на атаке цели в течение действия эффекта.",
+      "zh-cn": "攻击速度+20%。\n\n主动技能：立即激活\n使一个攻击范围内等级最高的敌方棋子 沉默，并获得效果：受到的任何攻击都会造成2倍的暴击，并使攻击范围内的友方棋子都倾向于攻击此目标，持续6秒。",
+      "zh-tw": "攻擊速度+20%。\n\n主動技能：立即激活\n使一個攻擊範圍內等級最高的敵方棋子 沉默，並獲得效果：受到的任何攻擊都會造成2倍的暴擊，並使攻擊範圍內的友方棋子都傾向於攻擊此目標，持續6秒。"
     },
     "lore": "A reviled blade that bites deeper with each wriggle of its victims final throes.",
     "lore_i18n": {
       "en": "A reviled blade that bites deeper with each wriggle of its victims final throes.",
-      "ru": "Проклятый клинок, который вонзается всё глубже с каждой конвульсией умирающей жертвы."
+      "ru": "Проклятый клинок, который вонзается всё глубже с каждой конвульсией умирающей жертвы.",
+      "zh-cn": "一把亵渎之刃，受害者临死前的每次挣扎都会使其砍得更深。",
+      "zh-tw": "一把褻瀆之刃，受害者臨死前的每次掙扎都會使其砍得更深。"
     },
     "quality": "rare",
     "texture": "item_bloodthorn",
     "notes": []
   },
-  "overrides": {}
+  "overrides": {},
+  "icon": "items/bloodthorn.png"
 }

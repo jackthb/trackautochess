@@ -2,22 +2,28 @@
   "gameId": "item_second_chance",
   "name": "Second Chance",
   "slug": "second-chance",
-  "icon": "relics/second_chance.png",
   "source": {
     "name": "Second Chance",
     "names": {
       "en": "Second Chance",
-      "ru": "Second Chance"
+      "ru": "Second Chance",
+      "zh-cn": "第二次机会",
+      "zh-tw": "第二次機會"
     },
     "description": "When you use consumable items of the choice category, you can refresh the selection panel and acquire different options.",
     "descriptions": {
       "en": "When you use consumable items of the choice category, you can refresh the selection panel and acquire different options.",
-      "ru": "Позволяет обновить выбор в сундуке - вместо случайного предмета вы снова получаете 3 новых варианта на выбор."
+      "ru": "Позволяет обновить выбор в сундуке - вместо случайного предмета вы снова получаете 3 новых варианта на выбор.",
+      "zh-cn": "当你使用选项类消耗性物品，或每回合开始自动招募棋子时有机会刷新一次选项面板，获取其他的选择。",
+      "zh-tw": "當你使用選項類消耗性物品，或每回合開始自動招募棋子時有機會刷新一次選項面板，獲取其他的選擇。"
     },
     "lore": "",
     "lore_i18n": {
-      "ru": "Из Relicbox"
+      "ru": "Из Relicbox",
+      "zh-cn": "来自：圣物宝箱",
+      "zh-tw": "來自：聖物寶箱"
     }
   },
-  "overrides": {}
+  "overrides": {},
+  "icon": "relics/second_chance.png"
 }

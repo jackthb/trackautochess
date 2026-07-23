@@ -2,23 +2,28 @@
   "gameId": "is_priest",
   "name": "Priest",
   "slug": "priest",
-  "icon": "synergies/priest.png",
   "source": {
     "name": "Priest",
     "names": {
       "en": "Priest",
-      "ru": "Priest"
+      "ru": "Priest",
+      "zh-cn": "牧师",
+      "zh-tw": "牧師"
     },
     "description": "Priest Pieces are determined, and cannot be mind controlled.\nClass Perk: Salvation\n Active when you have at least (N) different Priest pieces on board. (Multiple effects stack)\n\n(2) Priests: Get a Tango when defeated in a home battle with courier health lost if your pieces on board are less than your max pieces capacity.\n(4) Priest: Every Priest piece will Mind Control an enemy whose level equals to or less than itself if your pieces on board are less than your max pieces capacity. (Max control count = Your capacity - Your pieces on board)",
     "descriptions": {
       "en": "Priest Pieces are determined, and cannot be mind controlled.\nClass Perk: Salvation\n Active when you have at least (N) different Priest pieces on board. (Multiple effects stack)\n\n(2) Priests: Get a Tango when defeated in a home battle with courier health lost if your pieces on board are less than your max pieces capacity.\n(4) Priest: Every Priest piece will Mind Control an enemy whose level equals to or less than itself if your pieces on board are less than your max pieces capacity. (Max control count = Your capacity - Your pieces on board)",
-      "ru": "Priest фигуры не могут быть под контролем разума.\nClass Perk: Salvation\n Активна, когда минимум (N) разных Priest на столе.(Эффекты складываются)\n\n(2) Priests: Получите Тангo, если вас победили в домашнем бою, при этом здоровье курьера теряется, если на поле меньше фигур, чем ваша максимальная вместимость.\n(4) Priest: Каждая фигура Priest будет контролировать разум врага, уровень которого равен или ниже её собственного, если на поле меньше фигур, чем ваша максимальная вместимость. (Максимальное количество контролируемых = Ваша вместимость - Ваши фигуры на поле)"
+      "ru": "Priest фигуры не могут быть под контролем разума.\nClass Perk: Salvation\n Активна, когда минимум (N) разных Priest на столе.(Эффекты складываются)\n\n(2) Priests: Получите Тангo, если вас победили в домашнем бою, при этом здоровье курьера теряется, если на поле меньше фигур, чем ваша максимальная вместимость.\n(4) Priest: Каждая фигура Priest будет контролировать разум врага, уровень которого равен или ниже её собственного, если на поле меньше фигур, чем ваша максимальная вместимость. (Максимальное количество контролируемых = Ваша вместимость - Ваши фигуры на поле)",
+      "zh-cn": "牧师棋子信仰坚定，不会因为被精神控制而改变所属权。\n\n职业技能：救赎\n 需要己方场上有至少（N）个不同的此职业的棋子来触发效果（触发的多层效果可以叠加）。\n\n（2）牧师：如果你场上棋子未满，每当主场战败信使受到伤害时会获得一个树之祭祀。\n（4）牧师：每个牧师棋子战斗开始后都会精神控制一个不高于自己等级的敌方棋子，最多控制（场上未满棋子数）个。",
+      "zh-tw": "牧師棋子信仰堅定，不會因爲被精神控制而改變所屬權。\n\n職業技能：救贖\n 需要己方場上有至少（N）個不同的此職業的棋子來觸發效果（觸發的多層效果可以疊加）。\n\n（2）牧師：如果你場上棋子未滿，每當主場戰敗信使受到傷害時會獲得一個樹之祭祀。\n（4）牧師：每個牧師棋子戰鬥開始後都會精神控制一個不高於自己等級的敵方棋子，最多控制（場上未滿棋子數）個。"
     },
     "description_html": "Priest Pieces are determined, and cannot be mind controlled.<h1>Class Perk: Salvation</h1><font color=\"#656585\">Active when you have at least (N) different Priest pieces on board. (Multiple effects stack)</font><br><br>(2) Priests: Get a Tango when defeated in a home battle with courier health lost if your pieces on board are less than your max pieces capacity.<br>(4) Priest: Every Priest piece will Mind Control an enemy whose level equals to or less than itself if your pieces on board are less than your max pieces capacity. (Max control count = Your capacity - Your pieces on board)",
     "lore": "Priests are blessed invokers of light and darkness, who express their determined spirits through dedicated service to the people. For numerous battles, with the mastery of light and shadow energies they have weaved the most reliable life-saving protections for their allies.",
     "lore_i18n": {
       "en": "Priests are blessed invokers of light and darkness, who express their determined spirits through dedicated service to the people. For numerous battles, with the mastery of light and shadow energies they have weaved the most reliable life-saving protections for their allies.",
-      "ru": "Priests — благословенные заклинатели света и тьмы, выражающие свою решимость служением людям. Во множестве сражений, владея энергиями света и тени, они создают самые надёжные защитные чары, спасающие союзников."
+      "ru": "Priests — благословенные заклинатели света и тьмы, выражающие свою решимость служением людям. Во множестве сражений, владея энергиями света и тени, они создают самые надёжные защитные чары, спасающие союзников.",
+      "zh-cn": "牧师致力于升华他们的精神，通过造福大众来表达他们坚定不移的信念。 在过去的千百年中，每当多多岛遭受战火、盟友需要他们支援的时候，他们都会抛开舒适的生活，离开与世隔绝的神殿。",
+      "zh-tw": "牧師致力於昇華他們的精神，通過造福大衆來表達他們堅定不移的信念。 在過去的千百年中，每當多多島遭受戰火、盟友需要他們支援的時候，他們都會拋開舒適的生活，離開與世隔絕的神殿。"
     },
     "notes": [
       "The duration of Mind Control is now equal to pieces level ×2 + 1."
@@ -29,5 +34,6 @@
     ],
     "ability_special": {}
   },
-  "overrides": {}
+  "overrides": {},
+  "icon": "synergies/priest.png"
 }

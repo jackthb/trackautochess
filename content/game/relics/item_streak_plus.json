@@ -2,20 +2,27 @@
   "gameId": "item_streak_plus",
   "name": "Chiaroscuro Certainty",
   "slug": "chiaroscuro-certainty",
-  "icon": "relics/chiaroscuro_certainty.png",
   "source": {
     "name": "Chiaroscuro Certainty",
     "names": {
       "en": "Chiaroscuro Certainty",
-      "ru": "Chiaroscuro Certainty"
+      "ru": "Chiaroscuro Certainty",
+      "zh-cn": "明暗终途",
+      "zh-tw": "明暗終途"
     },
     "description": "Your win or lose streak will not be terminated and when the relic disappears, you will receive a corresponding level loot token based on the highest reward/compensation held during that time.",
     "descriptions": {
       "en": "Your win or lose streak will not be terminated and when the relic disappears, you will receive a corresponding level loot token based on the highest reward/compensation held during that time.",
-      "ru": "Ваша серия побед или поражений не будет прервана, и когда реликвия исчезнет, вы получите жетон, уровень которого соответствует самой высокой награде/компенсации, полученной за это время."
+      "ru": "Ваша серия побед или поражений не будет прервана, и когда реликвия исчезнет, вы получите жетон, уровень которого соответствует самой высокой награде/компенсации, полученной за это время.",
+      "zh-cn": "你的连胜/连败不会中断。圣物消失时将根据持有期间最高的奖励/补偿和本局已选取圣物数量获得一个战利品代币。",
+      "zh-tw": "你的連勝/連敗不會中斷。聖物消失時將根據持有期間最高的獎勵/補償和本局已選取聖物數量獲得一個戰利品代幣。"
     },
     "lore": "",
-    "lore_i18n": {}
+    "lore_i18n": {
+      "zh-cn": "来自：圣物宝箱",
+      "zh-tw": "來自：聖物寶箱"
+    }
   },
-  "overrides": {}
+  "overrides": {},
+  "icon": "relics/chiaroscuro_certainty.png"
 }

@@ -2,7 +2,6 @@
   "gameId": "chess_dw",
   "name": "Dark Willow",
   "slug": "dark-willow",
-  "icon": "units/dark_willow.png",
   "source": {
     "id": "chess_dw",
     "cost": 1,
@@ -60,5 +59,6 @@
       }
     }
   },
-  "overrides": {}
+  "overrides": {},
+  "icon": "units/dark_willow.png"
 }

@@ -2,24 +2,28 @@
   "gameId": "is_pandaman",
   "name": "Pandaren",
   "slug": "pandaren",
-  "icon": "synergies/pandaman.png",
-  "commentary": "Lucky Pendant is normally a flat +30% relative boost to luck-based synergies, but Pandaren Hospitality appears to be hardcoded to the old +25% formula. That may be a bug.\n\nFor Pandaren, Lucky Pendant boosts both Hospitality rolls: the 10% random same-species fish roll and the 15% same-Panda roll from having 2 or more Pandas.\n\nThe Pandaren formula counts units carrying Lucky Pendant, not duplicate pendants stacked on the same unit: `1 + (0.25 * Lucky Pendant carriers / Pandas)`.\n\n| Pandas | Lucky Pendant carriers | Random same-species roll | Each same-Panda roll | At least one fish |\n|---:|---:|---:|---:|---:|\n| 1 | 0 | 10.00% | - | 10.00% |\n| 1 | 1 | 12.50% | - | 12.50% |\n| 1 | 2 | 15.00% | - | 15.00% |\n| 2 | 0 | 10.00% | 15.00% | 34.98% |\n| 2 | 1 | 11.25% | 16.88% | 38.68% |\n| 2 | 2 | 12.50% | 18.75% | 42.24% |\n| 3 | 0 | 10.00% | 15.00% | 44.73% |\n| 3 | 1 | 10.83% | 16.25% | 47.62% |\n| 3 | 2 | 11.67% | 17.50% | 50.40% |\n\nYou usually get more Pandaren value by adding more Pandas than by fishing for Lucky Pendant.",
   "source": {
     "name": "Pandaren",
     "names": {
       "en": "Pandaren",
-      "ru": "Pandaren"
+      "ru": "Pandaren",
+      "zh-cn": "熊猫人",
+      "zh-tw": "熊貓人"
     },
     "description": "SPECIES TRAIT: Hospitality\n Active when you have at least (N) different pieces of this species on board. (Multiple effects stack)\n\n(1) Pandaren: Have a chance to invite a random un-emerged chess piece of the same species with a chess piece on the board from the chess piece pool to join the team at the beginning of the round.\n(2) Pandaren: Each Pandaren chess piece on board has a chance to invite a piece of the same name with it.",
     "descriptions": {
       "en": "SPECIES TRAIT: Hospitality\n Active when you have at least (N) different pieces of this species on board. (Multiple effects stack)\n\n(1) Pandaren: Have a chance to invite a random un-emerged chess piece of the same species with a chess piece on the board from the chess piece pool to join the team at the beginning of the round.\n(2) Pandaren: Each Pandaren chess piece on board has a chance to invite a piece of the same name with it.",
-      "ru": "SPECIES TRAIT: Hospitality\n Активен, когда хотя бы (N) разных Pandaren на доске. (Эффекты складываются)\n\n(1) Pandaren: В начале раунда есть шанс призвать случайную невыставленную фигуру той же расы из пула, что и одна из фигур на поле.\n(2) Pandaren: Каждая фигура Pandaren на поле имеет шанс призвать копию себя."
+      "ru": "SPECIES TRAIT: Hospitality\n Активен, когда хотя бы (N) разных Pandaren на доске. (Эффекты складываются)\n\n(1) Pandaren: В начале раунда есть шанс призвать случайную невыставленную фигуру той же расы из пула, что и одна из фигур на поле.\n(2) Pandaren: Каждая фигура Pandaren на поле имеет шанс призвать копию себя.",
+      "zh-cn": "种族技能：好客\n 需要己方场上有至少（N）个不同的此种族的棋子来触发效果（触发的多层效果可以叠加）。\n\n（1）熊猫人：回合开始时有10%的概率邀请一个与场上友方棋子同种族的不在场棋子。\n（2）熊猫人：回合开始时场上每个友方熊猫人棋子都有15%的概率邀请一个同名熊猫人棋子。",
+      "zh-tw": "種族技能：好客\n 需要己方場上有至少（N）個不同的此種族的棋子來觸發效果（觸發的多層效果可以疊加）。\n\n（1）熊貓人：回合開始時有10%的概率邀請一個與場上友方棋子同種族的不在場棋子。\n（2）熊貓人：回合開始時場上每個友方熊貓人棋子都有15%的概率邀請一個同名熊貓人棋子。"
     },
     "description_html": "<h1>SPECIES TRAIT: Hospitality</h1><font color=\"#656585\">Active when you have at least (N) different pieces of this species on board. (Multiple effects stack)</font><br><br>(1) Pandaren: Have a chance to invite a random un-emerged chess piece of the same species with a chess piece on the board from the chess piece pool to join the team at the beginning of the round.<br>(2) Pandaren: Each Pandaren chess piece on board has a chance to invite a piece of the same name with it.",
     "lore": "Ten thousand years ago the last emperor of the Pandaren Empire surrounded his entire territory in the misty protection in order to save his people from the Great Havoc. Now the ancient species has once again revealed themselves and they are literally a mist to the others.",
     "lore_i18n": {
       "en": "Ten thousand years ago the last emperor of the Pandaren Empire surrounded his entire territory in the misty protection in order to save his people from the Great Havoc. Now the ancient species has once again revealed themselves and they are literally a mist to the others.",
-      "ru": "Ten thousand years ago the last emperor of the Pandaren Empire surrounded his entire territory in the misty protection in order to save his people from the Great Havoc. Now the ancient species has once again revealed themselves and they are literally a mist to the others."
+      "ru": "Ten thousand years ago the last emperor of the Pandaren Empire surrounded his entire territory in the misty protection in order to save his people from the Great Havoc. Now the ancient species has once again revealed themselves and they are literally a mist to the others.",
+      "zh-cn": "一万年之前世界将要分裂之际，熊猫人帝国的最后一位皇帝将整个潘潘大陆笼罩在云雾中从而逃过了劫难。所以直到现在它们重见天日的时候，对世界上的其他种族来说，熊猫人的一切都是谜。",
+      "zh-tw": "一萬年之前世界將要分裂之際，熊貓人帝國的最後一位皇帝將整個潘潘大陸籠罩在雲霧中從而逃過了劫難。所以直到現在它們重見天日的時候，對世界上的其他種族來說，熊貓人的一切都是謎。"
     },
     "notes": [
       "(1) Pandaren do not invite pieces you already have on board."
@@ -30,5 +34,7 @@
     ],
     "ability_special": {}
   },
-  "overrides": {}
+  "overrides": {},
+  "commentary": "Lucky Pendant is normally a flat +30% relative boost to luck-based synergies, but Pandaren Hospitality appears to be hardcoded to the old +25% formula. That may be a bug.\n\nFor Pandaren, Lucky Pendant boosts both Hospitality rolls: the 10% random same-species fish roll and the 15% same-Panda roll from having 2 or more Pandas.\n\nThe Pandaren formula counts units carrying Lucky Pendant, not duplicate pendants stacked on the same unit: `1 + (0.25 * Lucky Pendant carriers / Pandas)`.\n\n| Pandas | Lucky Pendant carriers | Random same-species roll | Each same-Panda roll | At least one fish |\n|---:|---:|---:|---:|---:|\n| 1 | 0 | 10.00% | - | 10.00% |\n| 1 | 1 | 12.50% | - | 12.50% |\n| 1 | 2 | 15.00% | - | 15.00% |\n| 2 | 0 | 10.00% | 15.00% | 34.98% |\n| 2 | 1 | 11.25% | 16.88% | 38.68% |\n| 2 | 2 | 12.50% | 18.75% | 42.24% |\n| 3 | 0 | 10.00% | 15.00% | 44.73% |\n| 3 | 1 | 10.83% | 16.25% | 47.62% |\n| 3 | 2 | 11.67% | 17.50% | 50.40% |\n\nYou usually get more Pandaren value by adding more Pandas than by fishing for Lucky Pendant.",
+  "icon": "synergies/pandaman.png"
 }
