@@ -1,0 +1,142 @@
+{
+  "date": "2026-07-23",
+  "title": "Aegis Prediction &Arsenal Stroke",
+  "source": "https://docs.google.com/document/d/e/2PACX-1vRmIhOUouI0hFzxjrpjcQS_LSOWyeepI4gBLVZMtj-oJff2dI4hRakU_FmxkzQ_Mhv5oH-4YOQv4VGF/pub",
+  "workshopUrl": "https://steamcommunity.com/sharedfiles/filedetails/changelog/1613886175",
+  "image": "https://docs.google.com/docs-images-rt/APuouOfCCit6EtbaqeJ2psX8CgEB9LmpXfxxxaI4frn6cYbSnj-zAr7pGDPviQQXMLEUpHjoQGRW5Ymlx4hVDGPknMsScGi5zDqbxY__g8zI_KuPbehgurSC8JzwZpdffpcRLshPj6YnPTWQ-hu0HKwzQxvJsDo3Pha0aU95stjoJEoX=s2048",
+  "entitiesSynced": false,
+  "sourceEntries": [
+    {
+      "sourceId": "1784796141",
+      "date": "2026-07-23",
+      "time": "1:42am",
+      "contentHash": "3d0bedd01b25c7d3"
+    },
+    {
+      "date": "2026-07-23",
+      "time": "12:37am",
+      "docsUrl": "https://docs.google.com/document/d/e/2PACX-1vRmIhOUouI0hFzxjrpjcQS_LSOWyeepI4gBLVZMtj-oJff2dI4hRakU_FmxkzQ_Mhv5oH-4YOQv4VGF/pub",
+      "contentHash": "c502c9c2a412732f"
+    }
+  ],
+  "sections": [
+    {
+      "heading": "Chess Pieces",
+      "entries": [
+        {
+          "kind": "change",
+          "name": "Returning Piece",
+          "detail": "Grimstroke ($2/Demon/Warlock). Skill reworked to Stroke of Fate."
+        },
+        {
+          "kind": "nerf",
+          "name": "Ancient Apparition",
+          "detail": "Base attack interval reduced from 1.5s to 1.3s.",
+          "entityKey": "unit__ancient-apparition"
+        },
+        {
+          "kind": "buff",
+          "name": "Slark - Essence Shift",
+          "detail": "Max stacks increased from 5/10/15 to 10/15/20.",
+          "entityKey": "unit__slark"
+        },
+        {
+          "kind": "buff",
+          "name": "Faceless Void - Time Zone",
+          "detail": "Attack speed bonus/reduction changed from 25%/35%/50% to 30%/40%/50%.",
+          "entityKey": "unit__faceless-void"
+        },
+        {
+          "kind": "buff",
+          "name": "Treant Protector - Leech Seed",
+          "detail": "Healing increased from 60/90/120 to 80/110/150.",
+          "entityKey": "unit__treant-protector"
+        },
+        {
+          "kind": "buff",
+          "name": "Terrorblade - Metamorphosis",
+          "detail": "Attack interval during Metamorphosis increased from 1.1s to 1.3s.",
+          "entityKey": "unit__terrorblade"
+        },
+        {
+          "kind": "buff",
+          "name": "Viper - Viper Strike",
+          "detail": "Targets struck by Viper Strike now take 10%/20%/40% increased damage (affects all damage types).",
+          "entityKey": "unit__viper"
+        },
+        {
+          "kind": "nerf",
+          "name": "Lich - Chain Frost",
+          "detail": "Base damage reduced from 100/150/200 to 75/125/175.",
+          "entityKey": "unit__lich"
+        },
+        {
+          "kind": "nerf",
+          "name": "Death Prophet",
+          "detail": "Skill duration reduced from 8s to 6s. Cooldown changed from 8s to 10/8/6s. Number of spirits reduced from 6/8/12 to 6/8/10.",
+          "entityKey": "unit__death-prophet"
+        },
+        {
+          "kind": "nerf",
+          "name": "Zeus - Thundergod’s Wrath",
+          "detail": "Cooldown reduced from 15/12/9s to 12/10/8s.",
+          "entityKey": "unit__zeus"
+        },
+        {
+          "kind": "buff",
+          "name": "Jakiro",
+          "detail": "Macropyre duration increased from 4s to 5s. Ice Path duration increased from 2.5/3/3.5s to 3/3.5/4s.",
+          "entityKey": "unit__jakiro"
+        },
+        {
+          "kind": "change",
+          "name": "Underlord - Fiend Gate",
+          "detail": "Fiend Gate is no longer immune to spell damage; it now takes 1 or 2 damage per hit, similar to totems.",
+          "entityKey": "unit__abyssal-underlord"
+        }
+      ]
+    },
+    {
+      "heading": "Talents",
+      "entries": [
+        {
+          "kind": "fix",
+          "name": "Talent 2B - Ascendency",
+          "detail": "Chance for Ascendency is now dynamically adjusted based on the global pick rate of Greedy/Ascendency (previously a fixed 50% or 60%)."
+        }
+      ]
+    },
+    {
+      "heading": "Relics",
+      "entries": [
+        {
+          "kind": "new",
+          "name": "New Relic",
+          "detail": "Armory Array"
+        },
+        {
+          "kind": "fix",
+          "name": "Greevil Egg",
+          "detail": "Chance to grow up now depends on the cost of the piece in the egg, from fixed 50% into 80%/70%/60%/50%/40% of $1/$2/$3/$4/$5",
+          "entityKey": "relic__greevil-egg"
+        },
+        {
+          "kind": "new",
+          "name": "Items used in reforging are now added to the exclusion list. They will no longer appear when opening tokens or using Armory Array.",
+          "detail": "Items used in reforging are now added to the exclusion list. They will no longer appear when opening tokens or using Armory Array."
+        },
+        {
+          "kind": "buff",
+          "name": "Magic Box",
+          "detail": "Available charges increased from 12 to 15.",
+          "entityKey": "relic__magic-box"
+        },
+        {
+          "kind": "removed",
+          "name": "Temporarily removed Relic",
+          "detail": "Gaoler’s Master Key."
+        }
+      ]
+    }
+  ]
+}
