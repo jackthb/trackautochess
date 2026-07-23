@@ -1,0 +1,70 @@
+{
+  "gameId": "chess_gs",
+  "name": "Grimstroke",
+  "slug": "grimstroke",
+  "icon": "units/grimstroke.png",
+  "source": {
+    "id": "chess_gs",
+    "cost": 2,
+    "pool": "standard",
+    "synergies": [
+      "Demon",
+      "Wizard"
+    ],
+    "names": {
+      "en": "Grimstroke",
+      "lore": "Grimstroke",
+      "ko": "그림스트로크",
+      "ru": "Grimstroke",
+      "zh-cn": "天涯墨客",
+      "zh-tw": "天涯墨客"
+    },
+    "attack_type": "ranged",
+    "abilities": [
+      {
+        "id": "grimstroke_stroke_of_fate_lua",
+        "name": "Stroke of Fate",
+        "description": "Battlecry ability (activates on battle). Grimstroke paints an ink trail, reducing the attack speed and mana regeneration of enemies on hit."
+      }
+    ],
+    "stats": {
+      "1_star": {
+        "hp": 500,
+        "mana": 0,
+        "atk": [
+          40,
+          60
+        ],
+        "armor": 1,
+        "magic_resist": 0,
+        "atk_rate": 1.4,
+        "atk_range": 400
+      },
+      "2_star": {
+        "hp": 1000,
+        "mana": 0,
+        "atk": [
+          80,
+          120
+        ],
+        "armor": 1,
+        "magic_resist": 0,
+        "atk_rate": 1.4,
+        "atk_range": 400
+      },
+      "3_star": {
+        "hp": 2000,
+        "mana": 0,
+        "atk": [
+          160,
+          240
+        ],
+        "armor": 1,
+        "magic_resist": 0,
+        "atk_rate": 1.4,
+        "atk_range": 400
+      }
+    }
+  },
+  "overrides": {}
+}

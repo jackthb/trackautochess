@@ -83,11 +83,15 @@ def local_diff() -> str:
         ["git", "diff", "--no-index", "--", str(PREV_DIR), str(OUT_DIR)],
         cwd=REPO_ROOT,
         capture_output=True,
-        text=True,
     )
     # `git diff --no-index` exits 1 when files differ — that's the normal case,
     # not an error; the diff text we want is on stdout either way.
-    return result.stdout
+    #
+    # Decode as UTF-8 explicitly: the mod's Lua contains non-ASCII bytes, and
+    # subprocess's default text-mode decoding uses the console's locale
+    # encoding (cp1252 on Windows), which raises UnicodeDecodeError and
+    # silently drops the diff output instead of surfacing it.
+    return result.stdout.decode("utf-8", errors="replace")
 
 
 def main():

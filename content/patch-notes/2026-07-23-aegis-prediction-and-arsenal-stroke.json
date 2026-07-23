@@ -7,7 +7,8 @@
   "highlight": {
     "kind": "change"
   },
-  "entitiesSynced": false,
+  "entitiesSynced": true,
+  "entitiesSyncedAt": "2026-07-23T18:33:47.344Z",
   "sourceEntries": [
     {
       "sourceId": "1784796141",
@@ -29,7 +30,8 @@
         {
           "kind": "change",
           "name": "Returning Piece",
-          "detail": "Grimstroke ($2/Demon/Warlock). Skill reworked to Stroke of Fate."
+          "detail": "Grimstroke ($2/Demon/Warlock). Skill reworked to Stroke of Fate.",
+          "entityKey": "unit__grimstroke"
         },
         {
           "kind": "nerf",
