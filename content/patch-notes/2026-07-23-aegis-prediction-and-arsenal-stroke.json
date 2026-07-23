@@ -5,7 +5,9 @@
   "workshopUrl": "https://steamcommunity.com/sharedfiles/filedetails/changelog/1613886175",
   "image": "https://docs.google.com/docs-images-rt/APuouOfUpe2xO5qQMYrrkYwT1uMSzInYiZXlIOQYKJ-pcCuyWXf6Ynz8lPCP6wlsNp-n4gvpaUtCTIHfC0V5M7LGiznQQfU7r0PAh558y8HBRcckzjCRta9l7Vyifiw5Hbve33oIAUbevVz80LaWxsHouPJWTBBHWKNPVUP_Q-wPRhYS=s2048",
   "highlight": {
-    "kind": "change"
+    "kind": "change",
+    "name": "Returning Piece",
+    "detail": "Grimstroke ($2/Demon/Warlock). Skill reworked to Stroke of Fate."
   },
   "entitiesSynced": true,
   "entitiesSyncedAt": "2026-07-23T18:33:47.344Z",
