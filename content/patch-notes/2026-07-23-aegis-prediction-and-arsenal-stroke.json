@@ -6,10 +6,11 @@
   "image": "https://docs.google.com/docs-images-rt/APuouOcjQTtEHdT9zUcxUo5IrKBpU4ikxph3vgb5T5t8LQbddBzB2uZXrtD-Ns3NNpGF6xh0YFFTF9HV-43ev7Pa9dPpaIwouwLqiH1Cyyv2LeuJXLP2MWSc3ooSIKUl2UXjQ_jjQKGK_8YuXwqHUUNVkP4dmgWf0rIHPzqoyknXzZNc=s2048",
   "highlight": {
     "kind": "change",
-    "name": "Aegis Prediction & Arsenal Stroke",
-    "detail": "Grim"
+    "name": "Returning Piece",
+    "detail": "Grimstroke ($2/Demon/Warlock). Skill reworked to Stroke of Fate."
   },
-  "entitiesSynced": false,
+  "entitiesSynced": true,
+  "entitiesSyncedAt": "2026-07-23T23:20:23.000Z",
   "sourceEntries": [
     {
       "sourceId": "1784796141",
