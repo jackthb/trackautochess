@@ -5,8 +5,18 @@ use super::{
 };
 use crate::config::Config;
 use serde_json::{json, Value};
+use std::sync::Mutex;
 
 const TOKEN_REFRESH_SKEW_SECONDS: i64 = 60;
+
+/// Serializes refresh-token use and the config.json write that follows it.
+/// Several independent threads (outbox replay, nettable auto-upload, manual
+/// CLI commands) each load their own `Config` and call `ensure_fresh_session`
+/// around the same time. Without this lock they can race Supabase's
+/// rotate-on-use refresh endpoint with the same refresh token, so one of them
+/// gets "Already Used" and both writers can clobber each other's config.json
+/// update.
+static SESSION_REFRESH_LOCK: Mutex<()> = Mutex::new(());
 
 impl SupabaseClient {
     pub fn from_config(cfg: &Config) -> Option<Self> {
@@ -305,20 +315,41 @@ pub fn ensure_fresh_session(cfg: &mut Config) -> Result<(), String> {
         return Ok(());
     }
 
-    let should_refresh = cfg.supabase_access_token.trim().is_empty()
-        || cfg
-            .supabase_token_expires_at
-            .trim()
-            .parse::<i64>()
-            .map(|expires_at| {
-                expires_at <= chrono::Utc::now().timestamp() + TOKEN_REFRESH_SKEW_SECONDS
-            })
-            .unwrap_or(true);
-    if !should_refresh {
+    if !needs_refresh(cfg) {
         return Ok(());
     }
 
-    let session = refresh_session(cfg)?;
+    let _guard = SESSION_REFRESH_LOCK
+        .lock()
+        .unwrap_or_else(|poisoned| poisoned.into_inner());
+
+    // Another thread may have refreshed (or invalidated) the session while
+    // we were waiting for the lock, so re-check against the latest state on
+    // disk instead of the possibly-stale copy the caller loaded earlier.
+    let on_disk = Config::load().map_err(|err| err.to_string())?;
+    cfg.supabase_access_token = on_disk.supabase_access_token;
+    cfg.supabase_refresh_token = on_disk.supabase_refresh_token;
+    cfg.supabase_token_expires_at = on_disk.supabase_token_expires_at;
+
+    if cfg.supabase_refresh_token.trim().is_empty() {
+        return Err("Supabase session was cleared; Steam login is required.".to_owned());
+    }
+    if !needs_refresh(cfg) {
+        return Ok(());
+    }
+
+    let session = match refresh_session(cfg) {
+        Ok(session) => session,
+        Err(err) => {
+            if is_invalid_refresh_token_error(&err) {
+                let _ = cfg.clear_supabase_session();
+                cfg.supabase_access_token.clear();
+                cfg.supabase_refresh_token.clear();
+                cfg.supabase_token_expires_at.clear();
+            }
+            return Err(err);
+        }
+    };
     cfg.save_supabase_session(
         &session.access_token,
         &session.refresh_token,
@@ -332,6 +363,31 @@ pub fn ensure_fresh_session(cfg: &mut Config) -> Result<(), String> {
         .map(|value| value.to_string())
         .unwrap_or_default();
     Ok(())
+}
+
+fn needs_refresh(cfg: &Config) -> bool {
+    cfg.supabase_access_token.trim().is_empty()
+        || cfg
+            .supabase_token_expires_at
+            .trim()
+            .parse::<i64>()
+            .map(|expires_at| {
+                expires_at <= chrono::Utc::now().timestamp() + TOKEN_REFRESH_SKEW_SECONDS
+            })
+            .unwrap_or(true)
+}
+
+/// Supabase's GoTrue rejects a refresh token that has already been rotated
+/// away by a concurrent refresh with an `invalid_grant` / "Already Used"
+/// error. Treat that as a dead session rather than a retryable failure —
+/// otherwise every later upload attempt keeps retrying the same poisoned
+/// token and failing forever.
+fn is_invalid_refresh_token_error(err: &str) -> bool {
+    let lower = err.to_ascii_lowercase();
+    lower.contains("invalid_grant")
+        || lower.contains("invalid refresh token")
+        || lower.contains("already used")
+        || lower.contains("refresh_token_not_found")
 }
 
 struct RefreshedSession {
@@ -388,4 +444,65 @@ fn refresh_session(cfg: &Config) -> Result<RefreshedSession, String> {
         refresh_token,
         expires_at,
     })
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn detects_invalid_refresh_token_errors_case_insensitively() {
+        assert!(is_invalid_refresh_token_error(
+            "status code 400: {\"error\":\"invalid_grant\",\"error_description\":\"Invalid Refresh Token: Already Used\"}"
+        ));
+        assert!(is_invalid_refresh_token_error(
+            "Supabase token refresh failed: refresh_token_not_found"
+        ));
+    }
+
+    #[test]
+    fn does_not_treat_network_errors_as_invalid_refresh_token() {
+        assert!(!is_invalid_refresh_token_error("status code 503: upstream timeout"));
+        assert!(!is_invalid_refresh_token_error("network unreachable"));
+    }
+
+    fn base_config() -> Config {
+        Config {
+            dac_dir: std::env::temp_dir(),
+            steam_id: String::new(),
+            steam_name: String::new(),
+            replay_enabled: true,
+            keep_local_nettable_dumps: true,
+            local_game_cache_max_gb: 5,
+            local_only: false,
+            supabase_url: "https://example.supabase.co".to_owned(),
+            supabase_key: "key".to_owned(),
+            supabase_auth_url: String::new(),
+            supabase_access_token: String::new(),
+            supabase_refresh_token: String::new(),
+            supabase_token_expires_at: String::new(),
+        }
+    }
+
+    #[test]
+    fn needs_refresh_when_access_token_is_empty() {
+        let cfg = base_config();
+        assert!(needs_refresh(&cfg));
+    }
+
+    #[test]
+    fn needs_refresh_when_expiry_is_within_skew_window() {
+        let mut cfg = base_config();
+        cfg.supabase_access_token = "token".to_owned();
+        cfg.supabase_token_expires_at = (chrono::Utc::now().timestamp() + 10).to_string();
+        assert!(needs_refresh(&cfg));
+    }
+
+    #[test]
+    fn does_not_need_refresh_when_token_is_comfortably_valid() {
+        let mut cfg = base_config();
+        cfg.supabase_access_token = "token".to_owned();
+        cfg.supabase_token_expires_at = (chrono::Utc::now().timestamp() + 3600).to_string();
+        assert!(!needs_refresh(&cfg));
+    }
 }
