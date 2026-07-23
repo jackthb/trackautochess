@@ -40,6 +40,11 @@ const CHANGELOG_FETCH_URLS = [
 const CHANGELOG_READER_URLS = CHANGELOG_FETCH_URLS.map(
   (url) => `https://r.jina.ai/http://${url}`
 );
+// Rarely, Steam blocks both the direct fetch and the reader's fetch in the
+// same run (an anti-bot challenge, not just an IP-reputation block). A real
+// browser navigation clears that challenge, so it's the last fallback before
+// giving up. Playwright is not a hard dependency of this script — it's only
+// installed by the workflow when the cheaper fetch paths above have failed.
 
 const REQUEST_HEADERS = {
   "User-Agent":
@@ -106,10 +111,54 @@ async function fetchChangelogWithEntries() {
   const fallback = await fetchReaderChangelogWithEntries();
   if (fallback.entries.length > 0) return fallback;
 
-  if (firstHtml) {
-    return { html: firstHtml, entries: [] };
+  console.warn(
+    "Text-rendered fallback returned 0 entries; trying browser-rendered fallback..."
+  );
+  const browserFallback = await fetchChangelogWithBrowserEntries();
+  if (browserFallback.entries.length > 0) return browserFallback;
+
+  const html = firstHtml || fallback.html || browserFallback.html;
+  if (html) {
+    return { html, entries: [] };
   }
   throw firstError || new Error("Could not fetch Steam changelog");
+}
+
+async function fetchChangelogViaBrowser(url) {
+  const { chromium } = await import("playwright");
+  const browser = await chromium.launch();
+  try {
+    const page = await browser.newPage({
+      userAgent: REQUEST_HEADERS["User-Agent"],
+      locale: "en-US",
+    });
+    await page.goto(url, { waitUntil: "networkidle", timeout: 30000 });
+    return await page.content();
+  } finally {
+    await browser.close();
+  }
+}
+
+async function fetchChangelogWithBrowserEntries() {
+  let firstHtml = "";
+  let firstError = null;
+
+  for (let i = 0; i < CHANGELOG_FETCH_URLS.length; i += 1) {
+    try {
+      const html = await fetchChangelogViaBrowser(CHANGELOG_FETCH_URLS[i]);
+      if (!firstHtml) firstHtml = html;
+      const entries = parseChangelogEntries(html);
+      if (entries.length > 0) return { html, entries };
+    } catch (err) {
+      if (!firstError) firstError = err;
+      console.warn(`Browser-rendered fetch attempt ${i + 1} failed: ${err.message}`);
+    }
+  }
+
+  if (firstError && !firstHtml) {
+    console.warn(`Browser-rendered fallback unavailable: ${firstError.message}`);
+  }
+  return { html: firstHtml, entries: [] };
 }
 
 async function fetchReaderChangelogWithEntries() {

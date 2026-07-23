@@ -16,7 +16,7 @@ permissions:
 jobs:
   scrape:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
 
@@ -25,6 +25,23 @@ jobs:
           node-version: 24
 
       - name: Scrape changelog
+        id: scrape
+        run: node scripts/scrape-patch-notes.mjs
+        continue-on-error: true
+
+      # The script has no dependencies for its normal fetch/reader-fallback
+      # path, so most runs never reach this. It only runs when Steam blocked
+      # both of those (see comments in scrape-patch-notes.mjs), and installs
+      # Playwright just for that retry so headless Chromium can clear the
+      # anti-bot challenge a plain fetch can't.
+      - name: Install browser fallback
+        if: steps.scrape.outcome == 'failure'
+        run: |
+          npm install --no-save --no-package-lock playwright@1.60.0
+          npx playwright install --with-deps chromium
+
+      - name: Retry scrape with browser fallback
+        if: steps.scrape.outcome == 'failure'
         run: node scripts/scrape-patch-notes.mjs
 
       - name: Check for changes
