@@ -1,5 +1,6 @@
 /** Collapse whitespace runs into single spaces and trim. */
-export function cleanText(value: string): string {
+export function cleanText(value: string | null | undefined): string {
+  if (!value) return "";
   return value.replace(/\s+/g, " ").trim();
 }
 
