@@ -93,15 +93,13 @@ Steam changelog ->  scripts/scrape-patch-notes.mjs  ->  content/patch-notes + co
 
 ## Automation
 
-- `.github/workflows/scrape-patch-notes.yml` runs hourly at minute 17 and commits changes under `content/` when the Steam Workshop changelog produces updates.
 - `.github/workflows/release.yml` runs on `v*` tags, builds the Windows Electron app and Rust backend, and uploads installer `.exe` artifacts to the GitHub Release.
 
-### Cronicle Drodo polling
+### Cronicle jobs on the Pi
 
-The target background polling policy is documented in [polling.md](polling.md).
-Cronicle is the primary operations path for Drodo MMR polling. See [ops/cronicle/README.md](../ops/cronicle/README.md) for setup, schedule, and runbook details.
+Cronicle is the primary operations path for both Drodo MMR polling (policy documented in [polling.md](polling.md)) and the DAC patch-notes scrape. See [ops/cronicle/README.md](../ops/cronicle/README.md) for setup, schedules, and runbook details.
 
-The `.github/workflows/poll-drodo.yml` workflow is an emergency fallback and should remain disabled unless it is intentionally re-enabled for an incident or Cronicle outage.
+The `.github/workflows/poll-drodo.yml` and `.github/workflows/scrape-patch-notes.yml` workflows are emergency fallbacks and should remain disabled (schedule-wise) unless intentionally re-enabled for an incident or Cronicle outage. The patch-notes scrape moved here because Steam occasionally serves GitHub-hosted runner IPs an anti-bot response with no changelog content; the Pi's residential IP avoids that.
 
 ## Editing content from a phone
 

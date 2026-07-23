@@ -1,0 +1,16 @@
+{
+  "title": "Scrape DAC Patch Notes",
+  "name": "scrape-patch-notes",
+  "description": "Hourly scrape of the Steam Workshop changelog for DAC patch notes; commits and pushes content/ updates directly",
+  "plugin": "command",
+  "command": "/opt/cronicle/dac-scripts/scrape-patch-notes.sh",
+  "workdir": "/workspace",
+  "schedule": "17 * * * *",
+  "timezone": "Europe/London",
+  "timeout": 300,
+  "enabled": 1,
+  "catchup": 1,
+  "env": {
+    "NODE_ENV": "production"
+  }
+}

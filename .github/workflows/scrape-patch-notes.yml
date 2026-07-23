@@ -1,9 +1,10 @@
+# Cronicle on the Pi (ops/cronicle/cronicle-job.dac-scrape-patch-notes.json)
+# is now the primary hourly scrape, run from a residential IP that Steam's
+# anti-bot checks don't flag. This workflow is an emergency/operator-triggered
+# fallback only — keep the schedule disabled unless Cronicle is down.
 name: Scrape DAC Patch Notes
 
 on:
-  schedule:
-    # Every hour at :17 past
-    - cron: "17 * * * *"
   workflow_dispatch:
 
 concurrency:

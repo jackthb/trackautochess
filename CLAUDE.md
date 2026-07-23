@@ -84,7 +84,7 @@ pnpm run test:e2e  # Build, then run Playwright tests
 - **Storage**: Supabase Storage bucket `diagnostic-logs` receives diagnostic and raw nettable dump uploads.
 - **Content pipeline**: `content/` JSON feeds generated web runtime data and desktop content readers; `data/` holds icons/config/extractor helpers.
 - **Release pipeline**: `.github/workflows/release.yml` triggers on `v*` tags, builds the Rust backend and Electron installer on Windows, and publishes `.exe` artifacts to GitHub Releases.
-- **Patch-note pipeline**: `.github/workflows/scrape-patch-notes.yml` runs hourly and commits `content/` updates when Steam Workshop changelog scraping changes files.
+- **Patch-note pipeline**: `scripts/scrape-patch-notes.mjs` scrapes the Steam Workshop changelog and commits `content/` updates. It runs hourly via Cronicle on the Pi (`ops/cronicle/cronicle-job.dac-scrape-patch-notes.json`), which pushes directly using that checkout's git credentials; `.github/workflows/scrape-patch-notes.yml` is a disabled-schedule, manual-only fallback (Steam intermittently serves GitHub-hosted runner IPs an anti-bot shell with no changelog entries, which a residential IP avoids).
 
 ## Workflow
 
