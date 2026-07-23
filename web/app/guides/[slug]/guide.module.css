@@ -5,7 +5,7 @@
 }
 
 .container {
-  max-width: 820px;
+  max-width: 720px;
   margin: 0 auto;
   padding: var(--s-48) var(--s-32);
 }
@@ -33,14 +33,15 @@
   font-size: 28px;
   font-weight: var(--fw-semibold);
   color: var(--text-primary);
-  margin-bottom: var(--s-16);
+  margin-bottom: var(--s-24);
+  line-height: 1.2;
 }
 
 .sources {
   display: flex;
   flex-wrap: wrap;
   gap: var(--s-12);
-  margin-bottom: var(--s-24);
+  margin-bottom: var(--s-40);
 }
 
 .sourceCard {
@@ -104,7 +105,7 @@
   width: fit-content;
   align-items: center;
   padding: var(--s-8) var(--s-16);
-  margin-bottom: var(--s-32);
+  margin-bottom: var(--s-48);
   border: 1px solid var(--accent);
   border-radius: 8px;
   color: var(--accent);
@@ -119,7 +120,7 @@
 }
 
 .boardSection {
-  margin-bottom: var(--s-24);
+  margin-bottom: var(--s-20);
 }
 
 .boardLabel {
@@ -139,64 +140,14 @@
 }
 
 .body {
-  font-size: 15px;
-  line-height: 1.8;
+  font-size: 16px;
+  line-height: 1.75;
   color: var(--text-primary);
 }
 
-.body :global(p) {
-  margin: 0 0 var(--s-16);
-}
-
-.body :global(ul),
-.body :global(ol) {
-  margin: 0 0 var(--s-16);
-  padding-left: var(--s-24);
-}
-
-.body :global(li) {
-  margin: var(--s-8) 0;
-}
-
-.body :global(li p) {
-  margin: var(--s-8) 0;
-}
-
-.body :global(blockquote) {
-  margin: 0 0 var(--s-16);
-  padding: var(--s-12) var(--s-16);
-}
-
-.body :global(h2) {
-  font-family: var(--font-display);
-  font-size: 18px;
-  font-weight: var(--fw-semibold);
-  margin: var(--s-40) 0 var(--s-16);
-}
-
-.body :global(h3) {
-  font-family: var(--font-display);
-  font-size: 16px;
-  font-weight: var(--fw-semibold);
-  margin: var(--s-24) 0 var(--s-12);
-}
-
-.body :global(table) {
-  width: 100%;
-  border-collapse: collapse;
-  margin: var(--s-20) 0 var(--s-24);
-}
-
-.body :global(th),
-.body :global(td) {
-  border: 1px solid var(--border);
-  padding: var(--s-8) var(--s-12);
-  text-align: left;
-}
-
 .footer {
-  margin-top: var(--s-48);
-  padding-top: var(--s-24);
+  margin-top: var(--s-64, 4rem);
+  padding-top: var(--s-32);
   border-top: 1px solid var(--border);
 }
 

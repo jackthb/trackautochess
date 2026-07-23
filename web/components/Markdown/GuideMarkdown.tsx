@@ -2,26 +2,25 @@
 
 import Link from "next/link";
 import ReactMarkdown from "react-markdown";
-import remarkBreaks from "remark-breaks";
 import remarkGfm from "remark-gfm";
 import { resolveEntityFromHref } from "@/lib/entityFromHref";
 import styles from "./GuideMarkdown.module.css";
-import baseStyles from "./Markdown.module.css";
 
 interface GuideMarkdownProps {
   children: string;
   className?: string;
 }
 
+/** Drop a leading H1 — the page already renders the guide title. */
+function stripLeadingTitle(markdown: string): string {
+  return markdown.replace(/^#\s+[^\n]+\n+/, "");
+}
+
 export function GuideMarkdown({ children, className }: GuideMarkdownProps) {
   return (
-    <div
-      className={
-        className ? `${baseStyles.markdown} ${className}` : baseStyles.markdown
-      }
-    >
+    <div className={className ? `${styles.prose} ${className}` : styles.prose}>
       <ReactMarkdown
-        remarkPlugins={[remarkGfm, remarkBreaks]}
+        remarkPlugins={[remarkGfm]}
         components={{
           a: ({ href, children: label }) => {
             const entity = resolveEntityFromHref(href);
@@ -54,7 +53,7 @@ export function GuideMarkdown({ children, className }: GuideMarkdownProps) {
           },
         }}
       >
-        {children}
+        {stripLeadingTitle(children)}
       </ReactMarkdown>
     </div>
   );

@@ -16,6 +16,39 @@
   color: var(--text-muted);
   letter-spacing: 0.4px;
 }
+.banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s-16);
+  margin: 0 0 24px;
+  padding: 12px 14px;
+  border: 1px solid color-mix(in srgb, var(--accent) 45%, var(--border));
+  border-radius: var(--r-8);
+  background: color-mix(in srgb, var(--accent) 12%, var(--bg-surface));
+  font-family: var(--font-mono);
+  font-size: var(--fs-13);
+  color: var(--text-primary);
+}
+.bannerText {
+  line-height: 1.45;
+}
+.bannerRetry {
+  flex-shrink: 0;
+  padding: 6px 14px;
+  border: 1px solid var(--accent);
+  border-radius: var(--r-8);
+  background: transparent;
+  color: var(--accent);
+  font-family: var(--font-mono);
+  font-size: var(--fs-13);
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+.bannerRetry:hover {
+  background: var(--accent);
+  color: var(--bg-surface);
+}
 .table {
   display: grid;
   grid-template-columns: 56px 180px 1fr 72px 64px;

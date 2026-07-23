@@ -45,6 +45,7 @@ export function MatchesClient() {
   const { ready: authReady, steamId, accessToken } = useSupabaseSession();
   const [matches, setMatches] = useState<MatchSummary[]>([]);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [retryToken, setRetryToken] = useState(0);
   const adminAccess = useAdminAccess(steamId);
 
   useEffect(() => {
@@ -99,7 +100,7 @@ export function MatchesClient() {
     return () => {
       cancelled = true;
     };
-  }, [authReady, accessToken, steamId, adminAccess]);
+  }, [authReady, accessToken, steamId, adminAccess, retryToken]);
 
   return (
     <PageLayout title="Matches">
@@ -112,8 +113,17 @@ export function MatchesClient() {
       )}
 
       {phase === "error" && (
-        <div className={styles.gate}>
-          Failed to load matches{errorMessage ? `: ${errorMessage}` : "."}
+        <div className={styles.banner} role="alert">
+          <span className={styles.bannerText}>
+            Failed to load matches{errorMessage ? `: ${errorMessage}` : "."}
+          </span>
+          <button
+            type="button"
+            className={styles.bannerRetry}
+            onClick={() => setRetryToken((t) => t + 1)}
+          >
+            Retry
+          </button>
         </div>
       )}
 
