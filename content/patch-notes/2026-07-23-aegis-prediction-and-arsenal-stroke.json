@@ -1,16 +1,15 @@
 {
   "date": "2026-07-23",
-  "title": "Aegis Prediction &Arsenal Stroke",
+  "title": "Aegis Prediction & Arsenal Stroke",
   "source": "https://docs.google.com/document/d/e/2PACX-1vRmIhOUouI0hFzxjrpjcQS_LSOWyeepI4gBLVZMtj-oJff2dI4hRakU_FmxkzQ_Mhv5oH-4YOQv4VGF/pub",
   "workshopUrl": "https://steamcommunity.com/sharedfiles/filedetails/changelog/1613886175",
-  "image": "https://docs.google.com/docs-images-rt/APuouOfUpe2xO5qQMYrrkYwT1uMSzInYiZXlIOQYKJ-pcCuyWXf6Ynz8lPCP6wlsNp-n4gvpaUtCTIHfC0V5M7LGiznQQfU7r0PAh558y8HBRcckzjCRta9l7Vyifiw5Hbve33oIAUbevVz80LaWxsHouPJWTBBHWKNPVUP_Q-wPRhYS=s2048",
+  "image": "https://docs.google.com/docs-images-rt/APuouOcjQTtEHdT9zUcxUo5IrKBpU4ikxph3vgb5T5t8LQbddBzB2uZXrtD-Ns3NNpGF6xh0YFFTF9HV-43ev7Pa9dPpaIwouwLqiH1Cyyv2LeuJXLP2MWSc3ooSIKUl2UXjQ_jjQKGK_8YuXwqHUUNVkP4dmgWf0rIHPzqoyknXzZNc=s2048",
   "highlight": {
     "kind": "change",
-    "name": "Returning Piece",
-    "detail": "Grimstroke ($2/Demon/Warlock). Skill reworked to Stroke of Fate."
+    "name": "Aegis Prediction & Arsenal Stroke",
+    "detail": "Grim"
   },
-  "entitiesSynced": true,
-  "entitiesSyncedAt": "2026-07-23T18:33:47.344Z",
+  "entitiesSynced": false,
   "sourceEntries": [
     {
       "sourceId": "1784796141",
@@ -32,8 +31,7 @@
         {
           "kind": "change",
           "name": "Returning Piece",
-          "detail": "Grimstroke ($2/Demon/Warlock). Skill reworked to Stroke of Fate.",
-          "entityKey": "unit__grimstroke"
+          "detail": "Grimstroke ($2/Demon/Warlock). Skill reworked to Stroke of Fate."
         },
         {
           "kind": "nerf",
