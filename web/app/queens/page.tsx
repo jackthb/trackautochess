@@ -3,7 +3,7 @@ import Link from "next/link";
 import { PageLayout } from "@/components/PageLayout";
 import { SITE_NAME, SITE_TITLE } from "@/lib/site";
 import { listAvatarUrl, playerProfilePath } from "@/lib/steam";
-import { effectiveQueenRank, queenDisplayName, queenMmr } from "@/lib/queens";
+import { effectiveQueenRank, queenDisplayName } from "@/lib/queens";
 import {
   loadQueensLeaderboard,
   newestQueenLadderSeenAt,
@@ -205,14 +205,12 @@ export default async function QueensPage() {
                 <div className={`${styles.cell} ${styles["cell-move"]}`}>Move ({QUEEN_MOVE_LOOKBACK_LABEL})</div>
               <div className={styles.cell} aria-hidden="true" />
               <div className={styles.cell}>Player</div>
-              <div className={styles.cell}>MMR</div>
               <div className={`${styles.cell} ${styles["hide-sm"]}`}>Wins</div>
               <div className={`${styles.cell} ${styles["hide-sm"]}`}>Games</div>
               <div className={`${styles.cell} ${styles["hide-sm"]}`}>Win rate</div>
             </div>
             {rows.map((row, index) => {
               const ladderRank = effectiveQueenRank(row) ?? index + 1;
-              const mmr = queenMmr(row);
               const display = queenDisplayName(row, ladderRank);
               const isLive =
                 liveSteamIds.has(row.steam_id) ||
@@ -296,9 +294,6 @@ export default async function QueensPage() {
                         ) : null}
                       </a>
                     ) : null}
-                  </div>
-                  <div className={`${styles.cell} ${styles["cell-mmr"]}`}>
-                    {mmr != null ? mmr.toLocaleString() : "-"}
                   </div>
                   <div className={`${styles.cell} ${styles["cell-meta"]} ${styles["hide-sm"]}`}>
                     {formatWinTotal(wins)}
