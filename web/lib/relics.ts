@@ -15,6 +15,7 @@ export interface RawRelic {
   icon?: string | null;
   icon_url?: string | null;
   icon_dimensions?: { width: number; height: number } | null;
+  hidden?: boolean;
   [key: string]: unknown;
 }
 
@@ -44,7 +45,7 @@ export interface DisplayRelic {
 
 function buildRelicsForLocale(locale: Locale): DisplayRelic[] {
   return Object.values(RELICS_MAP)
-    .filter((relic) => relic.name && relic.name.trim())
+    .filter((relic) => relic.name && relic.name.trim() && !relic.hidden)
     .map((relic) => {
       const stem = relicStem(relic.name);
       const localizedName = pickLocalized(relic.names, locale) || relic.name;

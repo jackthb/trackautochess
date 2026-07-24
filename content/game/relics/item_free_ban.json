@@ -19,5 +19,7 @@
       "ru": "Из Relicbox"
     }
   },
-  "overrides": {}
+  "overrides": {
+    "hidden": true
+  }
 }
