@@ -5,7 +5,6 @@ import type { BackendCommand } from "../backend-events.generated";
 import type { OutboxFlushedEvent } from "../backend-events";
 import type { NetTableActivityState } from "../hooks/useNetTableEvents";
 import { sendBackendRequest } from "../lib/backend-request";
-import { useIsAdmin } from "../lib/admin";
 import { NetTableSetupCard } from "./NetTableSetupCard";
 import { LegendaryPoolOverlay } from "./LegendaryPoolOverlay";
 
@@ -17,7 +16,7 @@ interface TrackerHomeProps {
 
 /**
  * Single tracker screen: status + account. Live match UI lives on the website;
- * admin-only legendary popup is a Discord-styled always-on-top overlay.
+ * the legendary popup is a Discord-styled always-on-top overlay.
  */
 export function TrackerHome({ unitsFull, netTable, status }: TrackerHomeProps) {
   const {
@@ -41,7 +40,6 @@ export function TrackerHome({ unitsFull, netTable, status }: TrackerHomeProps) {
 
   const steamId = status?.steam_id ?? null;
   const steamName = status?.steam_name || "Steam";
-  const isAdmin = useIsAdmin(steamId);
   const setupNeedsWork = Boolean(
     !netStatus ||
       netStatus.remote_enabled === false ||
@@ -132,7 +130,7 @@ export function TrackerHome({ unitsFull, netTable, status }: TrackerHomeProps) {
             queenUploadProgress={queenUploadProgress}
             livePlayers={livePlayers}
             localSteamIds={localSteamIds}
-            showQueenUpload={isAdmin}
+            showQueenUpload
           />
         </div>
 
@@ -159,47 +157,45 @@ export function TrackerHome({ unitsFull, netTable, status }: TrackerHomeProps) {
           </div>
         </div>
 
-        {isAdmin && (
-          <div className="settings-section">
-            <div className="settings-section-title">Admin</div>
-            <div className="settings-row">
-              <span className="settings-label">Queued uploads</span>
-              <Button
-                className={flushingOutbox ? "btn-loading" : undefined}
-                disabled={flushingOutbox}
-                onClick={flushOutbox}
-              >
-                {flushingOutbox ? "Pushing" : "Push queued"}
-              </Button>
-            </div>
-            {outboxStatus && (
-              <div className="settings-row">
-                <span className="settings-label" />
-                <span className="settings-value refresh-success">{outboxStatus}</span>
-              </div>
-            )}
-            {outboxError && (
-              <div className="settings-row">
-                <span className="settings-label" />
-                <span className="settings-value refresh-error">{outboxError}</span>
-              </div>
-            )}
-            <div className="settings-row">
-              <span className="settings-label">Legendary overlay</span>
-              <span className="settings-value dim">Ctrl+Shift+L</span>
-            </div>
+        <div className="settings-section">
+          <div className="settings-section-title">Advanced</div>
+          <div className="settings-row">
+            <span className="settings-label">Queued uploads</span>
+            <Button
+              className={flushingOutbox ? "btn-loading" : undefined}
+              disabled={flushingOutbox}
+              onClick={flushOutbox}
+            >
+              {flushingOutbox ? "Pushing" : "Push queued"}
+            </Button>
+          </div>
+          {outboxStatus && (
             <div className="settings-row">
               <span className="settings-label" />
-              <button
-                type="button"
-                className="btn-ghost"
-                onClick={() => void window.legendaryOverlay?.toggle()}
-              >
-                Toggle overlay
-              </button>
+              <span className="settings-value refresh-success">{outboxStatus}</span>
             </div>
+          )}
+          {outboxError && (
+            <div className="settings-row">
+              <span className="settings-label" />
+              <span className="settings-value refresh-error">{outboxError}</span>
+            </div>
+          )}
+          <div className="settings-row">
+            <span className="settings-label">Legendary overlay</span>
+            <span className="settings-value dim">Ctrl+Shift+L</span>
           </div>
-        )}
+          <div className="settings-row">
+            <span className="settings-label" />
+            <button
+              type="button"
+              className="btn-ghost"
+              onClick={() => void window.legendaryOverlay?.toggle()}
+            >
+              Toggle overlay
+            </button>
+          </div>
+        </div>
 
         <div className="settings-section">
           <div className="settings-section-title">About</div>
@@ -210,14 +206,12 @@ export function TrackerHome({ unitsFull, netTable, status }: TrackerHomeProps) {
         </div>
       </div>
 
-      {isAdmin && (
-        <LegendaryPoolOverlay
-          state={state}
-          stateAt={stateAt}
-          unitsFull={unitsFull}
-          inMatch={netStatus?.in_match === true}
-        />
-      )}
+      <LegendaryPoolOverlay
+        state={state}
+        stateAt={stateAt}
+        unitsFull={unitsFull}
+        inMatch={netStatus?.in_match === true}
+      />
     </div>
   );
 }
