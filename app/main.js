@@ -106,6 +106,21 @@ function getMainWindow() {
   return mainWindow;
 }
 
+// Reported to the renderer's PostHog client (the main process has no
+// PostHog client of its own) so crashes here still surface as capture events.
+function reportMainError(source, err) {
+  console.error(`[main:${source}]`, err);
+  if (!mainWindow || mainWindow.isDestroyed()) return;
+  mainWindow.webContents.send(CHANNELS.app.error, {
+    source,
+    message: err instanceof Error ? err.message : String(err),
+    stack: err instanceof Error ? err.stack : undefined,
+  });
+}
+
+process.on("uncaughtException", (err) => reportMainError("uncaughtException", err));
+process.on("unhandledRejection", (reason) => reportMainError("unhandledRejection", reason));
+
 const trackerLog = createTrackerLog({
   ipcMain,
   fs,

@@ -6,6 +6,7 @@ const CHANNELS = {
   app: {
     openExternal: "app:openExternal",
     getVersion: "app:getVersion",
+    error: "app:error",
   },
   data: {
     units: "data:units",
@@ -93,6 +94,11 @@ contextBridge.exposeInMainWorld("appApi", {
   fetchItemsFull: () => ipcRenderer.invoke(CHANNELS.data.itemsFull),
   fetchItemLinks: () => ipcRenderer.invoke(CHANNELS.data.itemLinks),
   fetchTalents: () => ipcRenderer.invoke(CHANNELS.data.talents),
+  onError: (callback) => {
+    const handler = (_event, payload) => callback(payload);
+    ipcRenderer.on(CHANNELS.app.error, handler);
+    return () => ipcRenderer.removeListener(CHANNELS.app.error, handler);
+  },
 });
 
 // The overlay handlers live in the main process for the app's lifetime, but a

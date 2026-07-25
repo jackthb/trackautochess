@@ -12,9 +12,16 @@ export type Config = { dac_dir: string, steam_id: string, steam_name: string, re
  * post-hoc reprocessing. Product views should use processed matches,
  * players, and timelines instead of depending on these raw dumps.
  */
-keep_local_nettable_dumps: boolean, local_only: boolean, supabase_url: string, supabase_key: string, supabase_auth_url: string, supabase_access_token: string, supabase_refresh_token: string, supabase_token_expires_at: string, };
+keep_local_nettable_dumps: boolean,
+/**
+ * Soft cap for `game_cache/` + `nettable_dumps/`. Oldest entries are
+ * deleted once total size exceeds this many gigabytes.
+ */
+local_game_cache_max_gb: number, local_only: boolean, supabase_url: string, supabase_key: string, supabase_auth_url: string, supabase_access_token: string, supabase_refresh_token: string, supabase_token_expires_at: string, };
 
 export type ErrorEvent = { type: string, message: string, };
+
+export type PanicEvent = { type: string, backend: string, message: string, location: string | null, };
 
 export type PayloadQueued = { type: string, path: string, };
 
@@ -84,7 +91,23 @@ export type NettableQueenUploadComplete = { type: string, ok: boolean, player_co
 
 export type NettableStateEvent = { type: string, backend: string, rows: JsonValue, state: JsonValue, players: JsonValue, local_steam_ids: JsonValue, at: string, };
 
-export type NettableStatus = { type: string, backend: string, ok: boolean, paused: boolean, autoexec_installed: boolean, gsi_cfg_installed: boolean, log_path: string, log_writable: boolean, dota_dir: string, remote_enabled: boolean, launch_options: string | null, has_console: boolean | null, has_condebug: boolean | null, has_conclearlog: boolean | null, has_gamestateintegration: boolean | null, dota_focused: boolean, steam_running: boolean, dota_running: boolean, log_active: boolean, in_match: boolean, first_round: number | null, current_round: number | null, players_alive: number | null, };
+export type NettableStatus = { type: string, backend: string, ok: boolean, paused: boolean, autoexec_installed: boolean, gsi_cfg_installed: boolean, log_path: string, log_writable: boolean, dota_dir: string, remote_enabled: boolean, launch_options: string | null, has_console: boolean | null, has_condebug: boolean | null, has_conclearlog: boolean | null, has_gamestateintegration: boolean | null, dota_focused: boolean, steam_running: boolean, dota_running: boolean, log_active: boolean,
+/**
+ * True while Dota's UI state is the in-game Auto Chess match screen.
+ */
+in_match: boolean,
+/**
+ * First round observed in the current match, if any.
+ */
+first_round: number | null,
+/**
+ * Latest round observed in the current match, if any.
+ */
+current_round: number | null,
+/**
+ * Players still above 0 HP in the latest live snapshot, if known.
+ */
+players_alive: number | null, };
 
 export type NettableSetupProgress = { type: string, stage: string, message: string, };
 

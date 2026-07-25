@@ -2,6 +2,7 @@ const CHANNELS = {
   app: {
     openExternal: "app:openExternal",
     getVersion: "app:getVersion",
+    error: "app:error",
   },
   data: {
     units: "data:units",

@@ -19,7 +19,7 @@ use config::Config;
 use ipc_events::{
     event_json, BackendCommand, BackendStatus, ConfigUpdated, DiagnosticsUploaded, DrodoProfile,
     ErrorEvent, GameUpdated, GamesList, MatchTimeline, NettablePaused, NettableRows, OutboxFlushed,
-    PayloadQueued, SteamLogin, SteamLoginUrl, SteamLogout, UpdateApplyRequested,
+    PanicEvent, PayloadQueued, SteamLogin, SteamLoginUrl, SteamLogout, UpdateApplyRequested,
 };
 use nettable_service::{parsed_json, rows_json, NettableService};
 use nettable_tail::NettableTailer;
@@ -286,6 +286,7 @@ fn run_daemon() -> io::Result<()> {
     }
     let outbox = Outbox::new(cfg.dac_dir.join("outbox"));
     let stdout_lock = Arc::new(Mutex::new(()));
+    install_panic_reporter(stdout_lock.clone());
     let nettable = NettableService::new();
     let _gsi = {
         let stdout_lock = stdout_lock.clone();
@@ -645,6 +646,28 @@ where
 fn emit_threaded(stdout_lock: &Arc<Mutex<()>>, line: &str) {
     let _guard = stdout_lock.lock().ok();
     let _ = emit(line);
+}
+
+/// Reports panics on any thread (main or spawned) to Electron over the same
+/// stdout JSON-lines stream, so PostHog in the renderer can capture them as
+/// crash events. Chains the default hook so local `RUST_BACKTRACE` output is
+/// unaffected.
+fn install_panic_reporter(stdout_lock: Arc<Mutex<()>>) {
+    let default_hook = std::panic::take_hook();
+    std::panic::set_hook(Box::new(move |info| {
+        let payload = info.payload();
+        let message = payload
+            .downcast_ref::<&str>()
+            .map(|s| s.to_string())
+            .or_else(|| payload.downcast_ref::<String>().cloned())
+            .unwrap_or_else(|| "unknown panic".to_string());
+        let location = info.location().map(|l| l.to_string());
+        emit_threaded(
+            &stdout_lock,
+            &event_json(&PanicEvent::new(&message, location.as_deref())),
+        );
+        default_hook(info);
+    }));
 }
 
 fn emit(line: &str) -> io::Result<()> {

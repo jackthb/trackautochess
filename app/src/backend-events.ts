@@ -30,6 +30,7 @@ import type {
   NettableStatus as GeneratedNettableStatus,
   NettableTimelineExtracted as GeneratedNettableTimelineExtracted,
   OutboxFlushed as GeneratedOutboxFlushed,
+  PanicEvent as GeneratedPanicEvent,
   PayloadQueued as GeneratedPayloadQueued,
   SteamLogin as GeneratedSteamLogin,
   SteamLoginUrl as GeneratedSteamLoginUrl,
@@ -71,6 +72,9 @@ export interface LivePlayer {
 
 export type BackendStatusEvent = WithBackendType<GeneratedBackendStatus, "status">;
 export type BackendErrorEvent = WithType<GeneratedErrorEvent, "error">;
+export type PanicEvent = Omit<WithBackendType<GeneratedPanicEvent, "panic">, "location"> & {
+  location?: string;
+};
 export type PayloadQueuedEvent = WithType<GeneratedPayloadQueued, "payload_queued">;
 export type OutboxFlushedEvent = WithBackendType<GeneratedOutboxFlushed, "outbox_flushed">;
 export type ConfigUpdatedEvent = WithType<GeneratedConfigUpdated, "config_updated">;
@@ -242,6 +246,7 @@ export type NettableLaunchOptionsAppliedEvent =
 export type BackendEvent =
   | BackendStatusEvent
   | BackendErrorEvent
+  | PanicEvent
   | PayloadQueuedEvent
   | OutboxFlushedEvent
   | ConfigUpdatedEvent

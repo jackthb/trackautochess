@@ -1,5 +1,6 @@
 import { useRef, useEffect } from "react";
 import { capture, identify, reset } from "./lib/posthog";
+import { initErrorReporting } from "./lib/errorReporting";
 import { TitleBar } from "./components/TitleBar";
 import { StatusBar } from "./components/StatusBar";
 import { LoginScreen } from "./components/LoginScreen";
@@ -18,6 +19,8 @@ export default function App() {
   useEffect(() => {
     capture("app_opened");
   }, []);
+
+  useEffect(() => initErrorReporting(), []);
 
   const identifiedRef = useRef<string | null>(null);
   const steamId = tracker.status?.steam_id;

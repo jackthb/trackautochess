@@ -315,6 +315,9 @@ declare global {
     appApi: {
       openExternal: (url: string) => Promise<boolean>;
       getVersion: () => Promise<string>;
+      onError: (
+        callback: (payload: { source: string; message: string; stack?: string }) => void,
+      ) => () => void;
       fetchUnitsData: () => Promise<UnitsData>;
       fetchUnitsFull: () => Promise<Record<string, UnitFullInfo>>;
       fetchSynergies: () => Promise<Record<string, SynergyInfo>>;

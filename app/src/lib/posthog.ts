@@ -1,5 +1,6 @@
 type PostHogClient = {
   capture: (event: string, properties?: Record<string, unknown>) => void;
+  captureException: (error: unknown, additionalProperties?: Record<string, unknown>) => void;
   displaySurvey: (
     surveyId: string,
     options: {
@@ -115,6 +116,13 @@ export function capture(
   properties?: Record<string, unknown>,
 ): void {
   void getPostHog().then((ph) => ph?.capture(event, properties));
+}
+
+export function captureException(
+  error: unknown,
+  additionalProperties?: Record<string, unknown>,
+): void {
+  void getPostHog().then((ph) => ph?.captureException(error, additionalProperties));
 }
 
 export function identify(

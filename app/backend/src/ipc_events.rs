@@ -120,6 +120,27 @@ impl<'a> ErrorEvent<'a> {
 }
 
 #[derive(Debug, Serialize, TS)]
+pub struct PanicEvent<'a> {
+    #[serde(rename = "type")]
+    pub event_type: &'static str,
+    pub backend: &'static str,
+    pub message: &'a str,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub location: Option<&'a str>,
+}
+
+impl<'a> PanicEvent<'a> {
+    pub fn new(message: &'a str, location: Option<&'a str>) -> Self {
+        Self {
+            event_type: "panic",
+            backend: "rust",
+            message,
+            location,
+        }
+    }
+}
+
+#[derive(Debug, Serialize, TS)]
 pub struct PayloadQueued<'a> {
     #[serde(rename = "type")]
     pub event_type: &'static str,
@@ -1015,6 +1036,7 @@ mod tests {
         push_decl!(BackendCommand);
         push_decl!(crate::config::Config);
         push_decl!(ErrorEvent<'static>);
+        push_decl!(PanicEvent<'static>);
         push_decl!(PayloadQueued<'static>);
         push_decl!(OutboxFlushed);
         push_decl!(ConfigUpdated<'static>);
