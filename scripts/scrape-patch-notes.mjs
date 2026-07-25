@@ -9,15 +9,16 @@
  *   node scripts/scrape-patch-notes.mjs [--dry-run]
  */
 
-import { readFileSync, writeFileSync, readdirSync } from "fs";
+import { readFileSync, writeFileSync, readdirSync, mkdirSync } from "fs";
 import { createHash } from "crypto";
-import { join, dirname } from "path";
+import { join, dirname, basename } from "path";
 import { fileURLToPath } from "url";
 import { patchNoteToJson } from "./lib/patch-note-json.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT_CONTENT = join(__dirname, "..", "content");
 const PATCH_NOTES_DIR = join(ROOT_CONTENT, "patch-notes");
+const PATCH_BANNERS_DIR = join(__dirname, "..", "web", "public", "patch-banners");
 const GAME_CONTENT_DIR = join(ROOT_CONTENT, "game");
 const ITEMS_PATH = join(GAME_CONTENT_DIR, "curated-items.json");
 const ITEMS_DIR = join(GAME_CONTENT_DIR, "items");
@@ -463,6 +464,32 @@ function extractFirstImageUrl(html) {
     if (/^https?:\/\//i.test(url)) return url;
   }
   return null;
+}
+
+const IMAGE_EXT_BY_CONTENT_TYPE = {
+  "image/png": "png",
+  "image/jpeg": "jpg",
+  "image/webp": "webp",
+  "image/gif": "gif",
+};
+
+// Google Docs' image URLs are served with a CORP header that blocks them from
+// being hotlinked/embedded on any other site, so patch banners must be
+// downloaded and served from our own origin instead of storing the raw URL.
+async function downloadPatchBanner(slug, imageUrl) {
+  try {
+    const resp = await fetch(imageUrl, { headers: REQUEST_HEADERS });
+    if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+    const contentType = resp.headers.get("content-type")?.split(";")[0]?.trim();
+    const ext = IMAGE_EXT_BY_CONTENT_TYPE[contentType] || "png";
+    const buffer = Buffer.from(await resp.arrayBuffer());
+    mkdirSync(PATCH_BANNERS_DIR, { recursive: true });
+    writeFileSync(join(PATCH_BANNERS_DIR, `${slug}.${ext}`), buffer);
+    return `/patch-banners/${slug}.${ext}`;
+  } catch (err) {
+    console.warn(`Failed to self-host patch banner image (${imageUrl}): ${err.message}`);
+    return null;
+  }
 }
 
 const SECTION_PATTERNS = [
@@ -975,10 +1002,16 @@ async function annotateExistingPatch(slugOrFile) {
   if (!patch.image && /^https:\/\/docs\.google\.com\//i.test(patch.source || "")) {
     console.log(`Fetching Google Doc image: ${patch.source}`);
     const docHtml = await fetchGoogleDoc(patch.source);
-    const image = docHtml ? parseGoogleDoc(docHtml).image : null;
-    if (image) {
-      patch.image = image;
+    const rawImage = docHtml ? parseGoogleDoc(docHtml).image : null;
+    if (rawImage && DRY_RUN) {
       imageAdded = true;
+    } else if (rawImage) {
+      const slug = basename(file, ".json");
+      const hosted = await downloadPatchBanner(slug, rawImage);
+      if (hosted) {
+        patch.image = hosted;
+        imageAdded = true;
+      }
     }
   }
 
@@ -1251,12 +1284,14 @@ async function main() {
     if (existingSlugs.has(slug)) continue;
     const filePath = join(PATCH_NOTES_DIR, `${slug}.json`);
 
+    const hostedImage = image && !DRY_RUN ? await downloadPatchBanner(slug, image) : undefined;
+
     const patchData = {
       date,
       title,
       source: docsUrl || CHANGELOG_URL,
       workshopUrl: docsUrl ? CHANGELOG_URL : undefined,
-      image: image || undefined,
+      image: hostedImage || undefined,
       // New patches carry game-data changes that have NOT yet been pulled from
       // the VPK into content/game/*.json. Flipped true by the
       // /sync-patch-entities skill or scripts/mark-patch-synced.mjs.
