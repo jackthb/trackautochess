@@ -160,12 +160,10 @@ const legendaryOverlay = createLegendaryOverlay({
   BrowserWindow,
   ipcMain,
   path,
-  fs,
   spawn,
   globalShortcut,
   channels: CHANNELS,
   preloadPath: path.join(__dirname, "preload.js"),
-  dacDir: DAC_DIR,
   getIndexLoad: () =>
     IS_DEV
       ? { kind: "url", target: "http://localhost:5173" }
@@ -274,10 +272,10 @@ function startDotaPoller() {
 
 function createWindow() {
   mainWindow = new BrowserWindow({
-    width: 1200,
-    height: 800,
-    minWidth: 800,
-    minHeight: 600,
+    width: 720,
+    height: 820,
+    minWidth: 600,
+    minHeight: 560,
     backgroundColor: "#1e2130",
     icon: path.join(ICONS_DIR, ICON_FILENAME),
     frame: false,

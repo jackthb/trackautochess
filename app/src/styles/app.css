@@ -1457,7 +1457,9 @@ video {
 }
 
 .settings-container {
+  width: 100%;
   max-width: 600px;
+  margin: 0 auto;
   padding: 32px;
   display: flex;
   flex-direction: column;
@@ -2016,8 +2018,6 @@ body.legendary-overlay-root #root {
   border-radius: 8px;
   background: rgba(43, 45, 49, 0.98);
   overflow: hidden;
-  -webkit-app-region: drag;
-  cursor: move;
 }
 
 .disc-overlay-header {
@@ -2026,8 +2026,6 @@ body.legendary-overlay-root #root {
   justify-content: space-between;
   gap: 6px;
   padding: 0 1px 3px;
-  -webkit-app-region: drag;
-  cursor: move;
 }
 
 .disc-overlay-title {

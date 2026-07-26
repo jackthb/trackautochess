@@ -26,6 +26,9 @@ public static class DotaFind {
   [DllImport("user32.dll")]
   public static extern bool IsIconic(IntPtr hWnd);
 
+  [DllImport("user32.dll")]
+  public static extern IntPtr GetForegroundWindow();
+
   [StructLayout(LayoutKind.Sequential)]
   public struct RECT {
     public int L;
@@ -40,6 +43,12 @@ public static class DotaFind {
       try { pids.Add((uint)p.Id); } catch {}
     }
     if (pids.Count == 0) return "";
+
+    // Only report bounds when Dota is the window the user is actively looking at.
+    // Otherwise the overlay would hover over the desktop/browser after alt-tabbing.
+    uint fgPid;
+    GetWindowThreadProcessId(GetForegroundWindow(), out fgPid);
+    if (!pids.Contains(fgPid)) return "";
 
     IntPtr best = IntPtr.Zero;
     int bestArea = 0;

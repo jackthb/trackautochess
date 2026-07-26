@@ -9,24 +9,21 @@ const TOGGLE_ACCELERATORS = [
   "CommandOrControl+Alt+L",
   "CommandOrControl+Shift+;",
 ];
-const POSITION_FILE = "legendary-overlay-position.json";
 
 /**
- * Admin legendary pool as a Discord-style game overlay:
- * docks to the Dota window, draggable within it, toggled with a hotkey.
- * Drag position is persisted and kept relative to Dota.
+ * Admin legendary pool as a Discord-style game overlay: locked to a fixed
+ * corner of the Dota window, click-through, and only visible while Dota is the
+ * foreground window. Toggled with a hotkey.
  */
 function createLegendaryOverlay({
   BrowserWindow,
   ipcMain,
   path,
-  fs,
   spawn,
   globalShortcut,
   channels,
   preloadPath,
   getIndexLoad,
-  dacDir,
 }) {
   let overlayWindow = null;
   let lastPayload = null;
@@ -39,13 +36,9 @@ function createLegendaryOverlay({
   let pendingFind = null;
   let currentSize = { width: OVERLAY_WIDTH, height: OVERLAY_HEIGHT };
   let lastDotaBounds = null;
-  /** @type {{ right: number, bottom: number } | null} */
-  let userOffset = loadSavedOffset(path, fs, dacDir);
   let ignoringMove = false;
-  let dragging = false;
   let boundAccelerator = null;
   const finderScript = path.join(__dirname, "find-dota-window-daemon.ps1");
-  const positionPath = path.join(dacDir, POSITION_FILE);
   const EMPTY_PAYLOAD = { revealed: [], unrevealed: [], stateAt: null };
 
   function isAlive() {
@@ -55,16 +48,6 @@ function createLegendaryOverlay({
   function sameBounds(a, b) {
     if (!a || !b) return false;
     return a.x === b.x && a.y === b.y && a.width === b.width && a.height === b.height;
-  }
-
-  function saveOffset(offset) {
-    if (!offset) return;
-    try {
-      fs.mkdirSync(dacDir, { recursive: true });
-      fs.writeFileSync(positionPath, JSON.stringify(offset), "utf8");
-    } catch (err) {
-      console.warn("Failed to save legendary overlay position:", err);
-    }
   }
 
   function ensureFinder() {
@@ -182,12 +165,11 @@ function createLegendaryOverlay({
   }
 
   function placeOnDota(dota) {
-    if (!isAlive() || !dota || dragging) return;
+    if (!isAlive() || !dota) return;
     lastDotaBounds = dota;
-    const right = userOffset?.right ?? DOCK_MARGIN;
-    const bottom = userOffset?.bottom ?? DOCK_MARGIN;
-    const rawX = dota.x + dota.width - currentSize.width - right;
-    const rawY = dota.y + dota.height - currentSize.height - bottom;
+    // Pinned to the top-right corner of the Dota window — not user-movable.
+    const rawX = dota.x + dota.width - currentSize.width - DOCK_MARGIN;
+    const rawY = dota.y + DOCK_MARGIN;
     const { x, y } = clampToDota(dota, rawX, rawY);
     ignoringMove = true;
     overlayWindow.setBounds({
@@ -199,43 +181,6 @@ function createLegendaryOverlay({
     setTimeout(() => {
       ignoringMove = false;
     }, 80);
-  }
-
-  function placeOnScreen() {
-    if (!isAlive() || dragging) return;
-    lastDotaBounds = null;
-    const display = screen.getPrimaryDisplay();
-    const { x: wx, y: wy, width: ww, height: wh } = display.workArea;
-    const x = Math.round(wx + ww - currentSize.width - DOCK_MARGIN);
-    const y = Math.round(wy + wh - currentSize.height - DOCK_MARGIN);
-    ignoringMove = true;
-    overlayWindow.setBounds({
-      x,
-      y,
-      width: currentSize.width,
-      height: currentSize.height,
-    });
-    setTimeout(() => {
-      ignoringMove = false;
-    }, 80);
-  }
-
-  function rememberUserOffset() {
-    if (!isAlive() || !lastDotaBounds || ignoringMove) return;
-    const [x, y] = overlayWindow.getPosition();
-    const { x: clampedX, y: clampedY } = clampToDota(lastDotaBounds, x, y);
-    if (clampedX !== x || clampedY !== y) {
-      ignoringMove = true;
-      overlayWindow.setPosition(clampedX, clampedY);
-      setTimeout(() => {
-        ignoringMove = false;
-      }, 80);
-    }
-    userOffset = {
-      right: lastDotaBounds.x + lastDotaBounds.width - (clampedX + currentSize.width),
-      bottom: lastDotaBounds.y + lastDotaBounds.height - (clampedY + currentSize.height),
-    };
-    saveOffset(userOffset);
   }
 
   function ensureWindow() {
@@ -252,8 +197,8 @@ function createLegendaryOverlay({
       maximizable: false,
       minimizable: false,
       fullscreenable: false,
-      focusable: true,
-      movable: true,
+      focusable: false,
+      movable: false,
       hasShadow: false,
       show: false,
       backgroundColor: "#00000000",
@@ -266,6 +211,9 @@ function createLegendaryOverlay({
 
     overlayWindow.setAlwaysOnTop(true, "screen-saver");
     overlayWindow.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true });
+    // Display-only overlay: let every click fall through to Dota so it can never
+    // steal focus or get in the way.
+    overlayWindow.setIgnoreMouseEvents(true);
 
     const { kind, target } = getIndexLoad();
     if (kind === "url") {
@@ -275,16 +223,8 @@ function createLegendaryOverlay({
     }
 
     overlayWindow.webContents.setWindowOpenHandler(() => ({ action: "deny" }));
-    overlayWindow.on("will-move", () => {
-      dragging = true;
-    });
-    overlayWindow.on("moved", () => {
-      dragging = false;
-      rememberUserOffset();
-    });
     overlayWindow.on("closed", () => {
       overlayWindow = null;
-      dragging = false;
     });
 
     return overlayWindow;
@@ -300,24 +240,30 @@ function createLegendaryOverlay({
       if (isAlive() && overlayWindow.isVisible()) overlayWindow.hide();
       return;
     }
-    if (dragging) return;
 
-    const dota = await findDotaBounds();
+    // The finder only reports bounds while Dota is the foreground window; a null
+    // result means the user is looking at something else, so hide rather than
+    // leaving the overlay floating over the desktop.
+    const dotaPhysical = await findDotaBounds();
+    if (!dotaPhysical) {
+      lastDotaBounds = null;
+      if (isAlive() && overlayWindow.isVisible()) overlayWindow.hide();
+      return;
+    }
+
+    // The finder reports Win32 GetWindowRect bounds in physical pixels; Electron's
+    // setBounds works in DIPs. On any display not at 100% scaling those disagree, so
+    // convert to DIPs here to keep the overlay pinned to the Dota window.
+    const dota =
+      process.platform === "win32"
+        ? screen.screenToDipRect(null, dotaPhysical)
+        : dotaPhysical;
     const wasVisible = isAlive() && overlayWindow.isVisible();
     ensureWindow();
-    if (dota) {
-      const dotaMoved = !sameBounds(lastDotaBounds, dota);
-      if (!wasVisible || dotaMoved) {
-        placeOnDota(dota);
-      } else {
-        lastDotaBounds = dota;
-      }
+    if (!wasVisible || !sameBounds(lastDotaBounds, dota)) {
+      placeOnDota(dota);
     } else {
-      // Still show — otherwise Ctrl+Shift+L looks dead when the finder
-      // misses Dota (minimized, cold PowerShell, etc.).
-      if (!wasVisible || lastDotaBounds) {
-        placeOnScreen();
-      }
+      lastDotaBounds = dota;
     }
     if (!overlayWindow.isVisible()) {
       overlayWindow.showInactive();
@@ -373,7 +319,7 @@ function createLegendaryOverlay({
   }
 
   function resizeToContent(size) {
-    if (!size || dragging) return;
+    if (!size) return;
     const width = Math.max(1, Math.round(Number(size.width) || OVERLAY_WIDTH));
     const height = Math.max(1, Math.round(Number(size.height) || OVERLAY_HEIGHT));
     if (width === currentSize.width && height === currentSize.height) return;
@@ -436,7 +382,6 @@ function createLegendaryOverlay({
     lastPayload = null;
     userHidden = false;
     lastDotaBounds = null;
-    dragging = false;
     if (boundAccelerator) {
       try {
         globalShortcut.unregister(boundAccelerator);
@@ -521,19 +466,6 @@ function createLegendaryOverlay({
     update,
     getToggleAccelerator: () => boundAccelerator || TOGGLE_ACCELERATORS[0],
   };
-}
-
-function loadSavedOffset(path, fs, dacDir) {
-  try {
-    const raw = fs.readFileSync(path.join(dacDir, POSITION_FILE), "utf8");
-    const parsed = JSON.parse(raw);
-    if (typeof parsed.right === "number" && typeof parsed.bottom === "number") {
-      return { right: parsed.right, bottom: parsed.bottom };
-    }
-  } catch {
-    // first run / missing file
-  }
-  return null;
 }
 
 module.exports = { createLegendaryOverlay };
