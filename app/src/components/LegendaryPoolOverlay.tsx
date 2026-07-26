@@ -1,5 +1,5 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
-import { unitStem } from "../lib/game-utils";
+import { unitStem } from "@dac/shared/game-utils";
 import { buildChessCodeUnitLookup } from "@dac/shared/game-structure";
 import type { NetTableState } from "../hooks/useNetTableEvents";
 import type { UnitFullInfo } from "../types";

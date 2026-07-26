@@ -3,9 +3,15 @@
 import path from "node:path";
 import { pathToFileURL } from "node:url";
 
-const drodoCoreUrl = process.env.DAC_REPO_ROOT
-  ? pathToFileURL(path.join(process.env.DAC_REPO_ROOT, "shared", "drodo-core.mjs")).href
-  : new URL("../../../shared/drodo-core.mjs", import.meta.url).href;
+const repoModuleUrl = (...segments) =>
+  process.env.DAC_REPO_ROOT
+    ? pathToFileURL(path.join(process.env.DAC_REPO_ROOT, ...segments)).href
+    : new URL(`../../../${segments.join("/")}`, import.meta.url).href;
+
+const drodoCoreUrl = repoModuleUrl("shared", "drodo-core.mjs");
+const supabaseRestUrl = repoModuleUrl("scripts", "lib", "supabase-rest.mjs");
+
+const { SupabaseRest } = await import(supabaseRestUrl);
 
 const {
   activePollOrFilter,
@@ -54,77 +60,6 @@ function requireEnv(name) {
   const value = process.env[name];
   if (!value) throw new Error(`${name} is required`);
   return value;
-}
-
-class SupabaseRest {
-  constructor(url, key) {
-    this.base = `${url.replace(/\/$/, "")}/rest/v1`;
-    this.key = key;
-  }
-
-  async request(path, { method = "GET", query, body, headers = {} } = {}) {
-    const url = new URL(`${this.base}/${path}`);
-    if (query) {
-      for (const [key, value] of Object.entries(query)) {
-        if (value !== undefined && value !== null) url.searchParams.append(key, String(value));
-      }
-    }
-    const response = await fetch(url, {
-      method,
-      headers: {
-        apikey: this.key,
-        Authorization: `Bearer ${this.key}`,
-        ...(body === undefined ? {} : { "Content-Type": "application/json" }),
-        ...headers,
-      },
-      body: body === undefined ? undefined : JSON.stringify(body),
-    });
-    if (!response.ok) {
-      const text = await response.text();
-      throw new Error(`${method} ${url.pathname}${url.search} failed: ${response.status} ${text}`);
-    }
-    if (response.status === 204) return null;
-    const text = await response.text();
-    return text ? JSON.parse(text) : null;
-  }
-
-  select(table, query) {
-    return this.request(table, { query });
-  }
-
-  upsert(table, rows, onConflict) {
-    return this.request(table, {
-      method: "POST",
-      query: { on_conflict: onConflict },
-      body: rows,
-      headers: { Prefer: "resolution=merge-duplicates,return=minimal" },
-    });
-  }
-
-  patch(table, query, body) {
-    return this.request(table, {
-      method: "PATCH",
-      query,
-      body,
-      headers: { Prefer: "return=minimal" },
-    });
-  }
-
-  rpc(functionName, body) {
-    return this.request(`rpc/${functionName}`, {
-      method: "POST",
-      body,
-      headers: { Prefer: "return=minimal" },
-    });
-  }
-
-  delete(table, query) {
-    return this.request(table, {
-      method: "DELETE",
-      query,
-      headers: { Prefer: "return=minimal" },
-    });
-  }
 }
 
 function rowSteamId(row) {

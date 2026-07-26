@@ -2,6 +2,7 @@ import { mmrLevelToRank, mmrToRank } from "@dac/shared/game-utils";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { createSupabaseServerClient } from "@/lib/supabase";
 import { DRODO_LIVE_FETCH_ENABLED } from "@/lib/drodoLive";
+import type { UserDrodoStatsRow } from "@/lib/drodo";
 import {
   fetchSteamProfile,
   playerProfilePath,
@@ -33,18 +34,29 @@ interface TwitchStatsResponse {
   generated_at: string;
 }
 
-interface UserDrodoStatsRow {
-  drodo_mmr: number | null;
-  drodo_max_mmr: number | null;
-  drodo_mmr_level: number | null;
-  drodo_season: string | null;
-  drodo_season_games: number | null;
-  drodo_candy: number | null;
-  drodo_chicken_count: number | null;
-  drodo_profile_missing: boolean | null;
-  drodo_raw_data: Record<string, unknown> | null;
-  queen_ladder_rank: number | null;
-}
+/**
+ * The subset of the cached Drodo columns this endpoint reads. Declaring it as
+ * keys of the canonical `UserDrodoStatsRow` means the select string below and
+ * the row type can no longer drift apart — a typo here is a compile error, and
+ * columns the query doesn't ask for stay off the type.
+ */
+const TWITCH_DRODO_COLUMNS = [
+  "drodo_mmr",
+  "drodo_max_mmr",
+  "drodo_mmr_level",
+  "drodo_season",
+  "drodo_season_games",
+  "drodo_candy",
+  "drodo_chicken_count",
+  "drodo_profile_missing",
+  "drodo_raw_data",
+  "queen_ladder_rank",
+] as const satisfies readonly (keyof UserDrodoStatsRow)[];
+
+type TwitchDrodoRow = Pick<
+  UserDrodoStatsRow,
+  (typeof TWITCH_DRODO_COLUMNS)[number]
+>;
 
 class TwitchStatsError extends Error {
   constructor(
@@ -71,11 +83,9 @@ async function fetchTwitchStats(
     fetchSteamProfile(steamId, supabase, { persist: false }),
     supabase
       .from("users")
-      .select(
-        "drodo_mmr, drodo_max_mmr, drodo_mmr_level, drodo_season, drodo_season_games, drodo_candy, drodo_chicken_count, drodo_profile_missing, drodo_raw_data, queen_ladder_rank"
-      )
+      .select(TWITCH_DRODO_COLUMNS.join(", "))
       .filter("steam_id", "eq", steamId)
-      .maybeSingle<UserDrodoStatsRow>(),
+      .maybeSingle<TwitchDrodoRow>(),
   ]);
 
   const drodo = drodoRes.data;

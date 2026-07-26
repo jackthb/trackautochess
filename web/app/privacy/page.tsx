@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { SITE_NAME, SITE_TITLE } from "@/lib/site";
+import { pageMetadata, SITE_TITLE } from "@/lib/site";
 import styles from "./privacy.module.css";
 
 // First page migrated to the App Router (pilot — see app/layout.tsx). It is
@@ -11,27 +11,11 @@ const title = `Privacy | ${SITE_TITLE}`;
 const description =
   "Privacy policy for Track Auto Chess: what data we collect, how cookies work, and how to contact us.";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title,
   description,
-  alternates: { canonical: "/privacy" },
-  robots: "index, follow, max-image-preview:large",
-  openGraph: {
-    title,
-    description,
-    type: "website",
-    siteName: SITE_NAME,
-    url: "/privacy",
-    locale: "en_US",
-    images: ["/logo.svg"],
-  },
-  twitter: {
-    card: "summary_large_image",
-    title,
-    description,
-    images: ["/logo.svg"],
-  },
-};
+  path: "/privacy",
+});
 
 export default function PrivacyPage() {
   return (

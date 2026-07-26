@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { EntityBrowser, type BrowsableEntity } from "@/components/EntityBrowser";
-import { SITE_NAME, SITE_TITLE } from "@/lib/site";
+import { pageMetadata, SITE_TITLE } from "@/lib/site";
 import { DEFAULT_LOCALE } from "@/lib/i18n";
 import { COST_COLOR, COST_LABEL, getUnitsByCost } from "@/lib/units";
 import { getAllSynergies, getSynergyNameTranslator } from "@/lib/synergies";
@@ -10,27 +10,11 @@ const title = `Units | ${SITE_TITLE}`;
 const description =
   "Browse every Dota Auto Chess unit by cost tier, search heroes by name, and open dedicated unit pages on Track Auto Chess.";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title,
   description,
-  alternates: { canonical: "/units" },
-  robots: "index, follow, max-image-preview:large",
-  openGraph: {
-    title,
-    description,
-    type: "website",
-    siteName: SITE_NAME,
-    url: "/units",
-    locale: "en_US",
-    images: ["/logo.svg"],
-  },
-  twitter: {
-    card: "summary_large_image",
-    title,
-    description,
-    images: ["/logo.svg"],
-  },
-};
+  path: "/units",
+});
 
 const structuredData = {
   "@context": "https://schema.org",

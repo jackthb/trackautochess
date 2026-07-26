@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { PageLayout } from "@/components/PageLayout";
-import { SITE_NAME, SITE_TITLE } from "@/lib/site";
+import { pageMetadata, SITE_TITLE } from "@/lib/site";
 import { listAvatarUrl, playerProfilePath } from "@/lib/steam";
 import { effectiveQueenRank, queenDisplayName } from "@/lib/queens";
 import {
@@ -29,26 +29,11 @@ const title = `Queen Players | ${SITE_TITLE}`;
 const description =
   "Latest Dota Auto Chess Queen players captured from the in-game Queen ladder, with rank movement and available season stats.";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title,
   description,
-  alternates: { canonical: "/queens" },
-  robots: "index, follow, max-image-preview:large",
-  openGraph: {
-    title,
-    description,
-    type: "website",
-    siteName: SITE_NAME,
-    url: "/queens",
-    images: ["/logo.svg"],
-  },
-  twitter: {
-    card: "summary_large_image",
-    title,
-    description,
-    images: ["/logo.svg"],
-  },
-};
+  path: "/queens",
+});
 
 // Live DB read per request. Optional Drodo view-refresh stays behind
 // QUEENS_DRODO_VIEW_REFRESH_ENABLED — when Drodo omits queen_rank / season MMR,

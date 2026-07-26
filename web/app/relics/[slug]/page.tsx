@@ -13,7 +13,7 @@ import {
   getRelatedItemsForRelic,
   ITEM_RELATION_CATEGORY_LABEL,
 } from "@/lib/itemRelations";
-import { absoluteUrl, SITE_NAME, SITE_TITLE } from "@/lib/site";
+import { absoluteUrl, pageMetadata, SITE_TITLE } from "@/lib/site";
 import { cleanText, truncate } from "@/lib/text";
 import { DEFAULT_LOCALE } from "@/lib/i18n";
 import { getCommentaryForEntity } from "@/lib/patchCommentary";
@@ -43,27 +43,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!relic) return {};
   const title = `${relic.name} Relic Guide | ${SITE_TITLE}`;
   const description = buildDescription(relic);
-  return {
+  return pageMetadata({
     title,
     description,
-    alternates: { canonical: `/relics/${relic.slug}` },
-    robots: "index, follow, max-image-preview:large",
-    openGraph: {
-      title,
-      description,
-      type: "article",
-      siteName: SITE_NAME,
-      url: `/relics/${relic.slug}`,
-      locale: "en_US",
-      images: ["/logo.svg"],
-    },
-    twitter: {
-      card: "summary_large_image",
-      title,
-      description,
-      images: ["/logo.svg"],
-    },
-  };
+    path: `/relics/${relic.slug}`,
+    type: "article",
+  });
 }
 
 export default async function RelicDetailPage({ params }: Props) {

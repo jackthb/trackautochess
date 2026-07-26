@@ -1,94 +1,48 @@
 import { RateLimiterMemory } from "rate-limiter-flexible";
-import { getClientIp, logAbuse, toApiReq } from "@/lib/abuseLog";
-import { isAdminSteamId } from "@/lib/adminServer";
+import {
+  asJson,
+  jsonError,
+  loadBuildRow,
+  openBuildRoute,
+  type BuildRouteContext,
+} from "@/lib/builds/route";
 import {
   fetchUsersBySteamIds,
-  parseSteamId,
   toDetail,
   toSavedBuild,
   type CommunityBuildRow,
 } from "@/lib/builds/server";
-import { isUuid, type SavedBuild } from "@/lib/builds/types";
-import type { Json } from "@/lib/database.generated.types";
-import { getSessionUser } from "@/lib/sessionUser";
-import {
-  createSupabaseAnonClient,
-  createSupabaseServiceRoleClient,
-} from "@/lib/supabase";
+import type { SavedBuild } from "@/lib/builds/types";
 
 const writeLimiter = new RateLimiterMemory({ points: 20, duration: 60 });
 
-type RouteContext = { params: Promise<{ id: string }> };
+export async function POST(req: Request, context: BuildRouteContext) {
+  const gate = await openBuildRoute(req, context, {
+    path: "/api/builds/[id]/submit",
+    limiter: writeLimiter,
+    requireSignIn: true,
+    requireAdmin: true,
+  });
+  if (!gate.ok) return gate.response;
+  const { id, service, steamIdNum } = gate.ctx;
 
-function asJson(value: SavedBuild): Json {
-  return JSON.parse(JSON.stringify(value)) as Json;
-}
+  const build = await loadBuildRow(service, id);
+  if (!build.ok) return build.response;
+  const row = build.ctx;
 
-export async function POST(req: Request, context: RouteContext) {
-  const path = "/api/builds/[id]/submit";
-  const apiReq = toApiReq(req);
-  const ip = getClientIp(apiReq);
-
-  try {
-    await writeLimiter.consume(ip);
-  } catch {
-    logAbuse("rate_limit_exceeded", { path, ip });
-    return Response.json({ error: "Too many requests" }, { status: 429 });
-  }
-
-  const { id } = await context.params;
-  if (!isUuid(id)) {
-    return Response.json({ error: "Not found" }, { status: 404 });
-  }
-
-  const service = createSupabaseServiceRoleClient();
-  if (!service) {
-    return Response.json({ error: "Database not configured" }, { status: 500 });
-  }
-
-  const anon = createSupabaseAnonClient();
-  const session = await getSessionUser(apiReq, anon);
-  const steamIdNum = session.steamId ? parseSteamId(session.steamId) : null;
-  if (steamIdNum == null) {
-    return Response.json({ error: "Sign in required" }, { status: 401 });
-  }
-  if (!(await isAdminSteamId(session.steamId))) {
-    return Response.json({ error: "Forbidden" }, { status: 403 });
-  }
-
-  const { data, error } = await service
-    .from("community_builds")
-    .select("*")
-    .eq("id", id)
-    .maybeSingle();
-
-  if (error) {
-    return Response.json({ error: error.message }, { status: 500 });
-  }
-  if (!data) {
-    return Response.json({ error: "Not found" }, { status: 404 });
-  }
-
-  const row = data as CommunityBuildRow;
   if (row.author_steam_id !== steamIdNum) {
-    return Response.json({ error: "Forbidden" }, { status: 403 });
+    return jsonError("Forbidden", 403);
   }
   if (row.status !== "draft" && row.status !== "rejected") {
-    return Response.json(
-      { error: "Only draft or rejected builds can be submitted" },
-      { status: 409 },
-    );
+    return jsonError("Only draft or rejected builds can be submitted", 409);
   }
   if (!row.name.trim() || row.name.trim() === "Untitled build") {
-    return Response.json({ error: "Name your build before submitting" }, { status: 400 });
+    return jsonError("Name your build before submitting", 400);
   }
 
   const payload = toSavedBuild(row);
   if (!payload.snapshots.some((snap) => snap.pieces.length > 0)) {
-    return Response.json(
-      { error: "Add at least one piece before submitting" },
-      { status: 400 },
-    );
+    return jsonError("Add at least one piece before submitting", 400);
   }
 
   const now = new Date().toISOString();
@@ -113,10 +67,7 @@ export async function POST(req: Request, context: RouteContext) {
     .single();
 
   if (updateError || !updated) {
-    return Response.json(
-      { error: updateError?.message ?? "Submit failed" },
-      { status: 500 },
-    );
+    return jsonError(updateError?.message ?? "Submit failed", 500);
   }
 
   const next = updated as CommunityBuildRow;

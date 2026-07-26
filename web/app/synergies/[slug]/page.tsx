@@ -12,7 +12,7 @@ import {
 import { getAllUnits } from "@/lib/units";
 import { TIER_COLOR, TIER_LABEL, iconUrl } from "@/lib/items";
 import { getRelatedItemsForSynergy } from "@/lib/itemRelations";
-import { absoluteUrl, SITE_NAME, SITE_TITLE } from "@/lib/site";
+import { absoluteUrl, pageMetadata, SITE_TITLE } from "@/lib/site";
 import { DEFAULT_LOCALE } from "@/lib/i18n";
 import { getCommentaryForEntity } from "@/lib/patchCommentary";
 
@@ -45,27 +45,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!synergy) return {};
   const title = t.title(synergy.name);
   const description = t.description(synergy.name);
-  return {
+  return pageMetadata({
     title,
     description,
-    alternates: { canonical: `/synergies/${synergy.slug}` },
-    robots: "index, follow, max-image-preview:large",
-    openGraph: {
-      title,
-      description,
-      type: "article",
-      siteName: SITE_NAME,
-      url: `/synergies/${synergy.slug}`,
-      locale: "en_US",
-      images: ["/logo.svg"],
-    },
-    twitter: {
-      card: "summary_large_image",
-      title,
-      description,
-      images: ["/logo.svg"],
-    },
-  };
+    path: `/synergies/${synergy.slug}`,
+    type: "article",
+  });
 }
 
 export default async function SynergyDetailPage({ params }: Props) {

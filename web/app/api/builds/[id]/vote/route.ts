@@ -1,66 +1,29 @@
 import { RateLimiterMemory } from "rate-limiter-flexible";
-import { getClientIp, logAbuse, toApiReq } from "@/lib/abuseLog";
-import { isAdminSteamId } from "@/lib/adminServer";
-import { parseSteamId, type CommunityBuildRow } from "@/lib/builds/server";
-import { isUuid } from "@/lib/builds/types";
-import { getSessionUser } from "@/lib/sessionUser";
 import {
-  createSupabaseAnonClient,
-  createSupabaseServiceRoleClient,
-} from "@/lib/supabase";
+  jsonError,
+  loadBuildRow,
+  openBuildRoute,
+  type BuildRouteContext,
+} from "@/lib/builds/route";
 
 const writeLimiter = new RateLimiterMemory({ points: 40, duration: 60 });
 
-type RouteContext = { params: Promise<{ id: string }> };
+export async function POST(req: Request, context: BuildRouteContext) {
+  const gate = await openBuildRoute(req, context, {
+    path: "/api/builds/[id]/vote",
+    limiter: writeLimiter,
+    requireSignIn: true,
+    requireAdmin: true,
+  });
+  if (!gate.ok) return gate.response;
+  const { id, service, steamIdNum } = gate.ctx;
 
-export async function POST(req: Request, context: RouteContext) {
-  const path = "/api/builds/[id]/vote";
-  const apiReq = toApiReq(req);
-  const ip = getClientIp(apiReq);
+  const build = await loadBuildRow(service, id);
+  if (!build.ok) return build.response;
+  const row = build.ctx;
 
-  try {
-    await writeLimiter.consume(ip);
-  } catch {
-    logAbuse("rate_limit_exceeded", { path, ip });
-    return Response.json({ error: "Too many requests" }, { status: 429 });
-  }
-
-  const { id } = await context.params;
-  if (!isUuid(id)) {
-    return Response.json({ error: "Not found" }, { status: 404 });
-  }
-
-  const service = createSupabaseServiceRoleClient();
-  if (!service) {
-    return Response.json({ error: "Database not configured" }, { status: 500 });
-  }
-
-  const anon = createSupabaseAnonClient();
-  const session = await getSessionUser(apiReq, anon);
-  const steamIdNum = session.steamId ? parseSteamId(session.steamId) : null;
-  if (steamIdNum == null) {
-    return Response.json({ error: "Sign in required" }, { status: 401 });
-  }
-  if (!(await isAdminSteamId(session.steamId))) {
-    return Response.json({ error: "Forbidden" }, { status: 403 });
-  }
-
-  const { data, error } = await service
-    .from("community_builds")
-    .select("*")
-    .eq("id", id)
-    .maybeSingle();
-
-  if (error) {
-    return Response.json({ error: error.message }, { status: 500 });
-  }
-  if (!data) {
-    return Response.json({ error: "Not found" }, { status: 404 });
-  }
-
-  const row = data as CommunityBuildRow;
   if (row.status !== "approved") {
-    return Response.json({ error: "Only approved builds can be upvoted" }, { status: 409 });
+    return jsonError("Only approved builds can be upvoted", 409);
   }
 
   const { data: existing } = await service
@@ -77,7 +40,7 @@ export async function POST(req: Request, context: RouteContext) {
       .eq("build_id", id)
       .eq("steam_id", steamIdNum);
     if (deleteError) {
-      return Response.json({ error: deleteError.message }, { status: 500 });
+      return jsonError(deleteError.message, 500);
     }
     const nextCount = Math.max(0, row.upvote_count - 1);
     await service
@@ -92,7 +55,7 @@ export async function POST(req: Request, context: RouteContext) {
     steam_id: steamIdNum,
   });
   if (insertError) {
-    return Response.json({ error: insertError.message }, { status: 500 });
+    return jsonError(insertError.message, 500);
   }
   const nextCount = row.upvote_count + 1;
   await service

@@ -1,3 +1,5 @@
+import { createLazyPostHog } from "@dac/shared/posthog";
+
 type PostHogClient = {
   capture: (event: string, properties?: Record<string, unknown>) => void;
   captureException: (error: unknown, additionalProperties?: Record<string, unknown>) => void;
@@ -46,9 +48,6 @@ type PostHogClient = {
   ) => void;
 };
 
-let initialized = false;
-let cachedClient: PostHogClient | null = null;
-
 // Reuses the SAME PostHog project as the web viewer, so a person's web + app
 // activity stitch into one profile (shared steam_id distinct_id). This is the
 // project's PUBLIC, write-only ingestion key — safe to embed (it already ships
@@ -67,71 +66,40 @@ const UI_HOST = "https://eu.posthog.com";
 // kill switch governs the backend capture feature, not this — so the renderer
 // deliberately does not gate its events/replay on any flag.
 
-export async function getPostHog(): Promise<PostHogClient | null> {
-  if (typeof window === "undefined" || !KEY) return null;
-  if (cachedClient) return cachedClient;
-  const mod = await import("posthog-js/dist/module.full.no-external");
-  const posthog = mod.default as PostHogClient;
-  if (!initialized) {
-    posthog.init(KEY, {
-      api_host: API_HOST,
-      ui_host: UI_HOST,
-      // Single-page Electron app: no real navigation, so disable automatic
-      // pageviews and emit manual `tab_viewed` events instead.
-      capture_pageview: false,
-      autocapture: true,
-      // Only create person profiles after `identify()` so events are keyed to
-      // the logged-in steam_id rather than anonymous device ids.
-      person_profiles: "identified_only",
-      surveys: true,
-      // Deliberate product decision (opposite to web): session replay ON.
-      // This is a desktop game tracker with low PII and consenting friends,
-      // so we keep PostHog's default masking and record everything else.
-      disable_session_recording: false,
-      session_recording: {
-        maskAllInputs: false,
-        maskTextSelector: undefined,
-      },
-    });
-    // Shared project with the web viewer — tag every desktop event so web
-    // funnels/dashboards can filter on `source`.
-    posthog.register({ source: "desktop_app" });
+export const { getPostHog, capture, captureException, identify, reset } =
+  createLazyPostHog<PostHogClient>({
+    enabled: () => Boolean(KEY),
+    load: async () =>
+      (await import("posthog-js/dist/module.full.no-external"))
+        .default as PostHogClient,
+    init: (posthog) => {
+      posthog.init(KEY, {
+        api_host: API_HOST,
+        ui_host: UI_HOST,
+        // Single-page Electron app: no real navigation, so disable automatic
+        // pageviews and emit manual `tab_viewed` events instead.
+        capture_pageview: false,
+        autocapture: true,
+        // Only create person profiles after `identify()` so events are keyed to
+        // the logged-in steam_id rather than anonymous device ids.
+        person_profiles: "identified_only",
+        surveys: true,
+        // Deliberate product decision (opposite to web): session replay ON.
+        // This is a desktop game tracker with low PII and consenting friends,
+        // so we keep PostHog's default masking and record everything else.
+        disable_session_recording: false,
+        session_recording: {
+          maskAllInputs: false,
+          maskTextSelector: undefined,
+        },
+      });
+      // Shared project with the web viewer — tag every desktop event so web
+      // funnels/dashboards can filter on `source`.
+      posthog.register({ source: "desktop_app" });
 
-    // Force replay on for every desktop app session. Passing `true` overrides
-    // sampling / linked-flag controls for this recording session, so packaged
-    // clients don't silently depend on project defaults.
-    posthog.startSessionRecording(true);
-
-    initialized = true;
-  }
-  cachedClient = posthog;
-  return posthog;
-}
-
-/**
- * Best-effort capture; safely no-ops when no token is configured.
- */
-export function capture(
-  event: string,
-  properties?: Record<string, unknown>,
-): void {
-  void getPostHog().then((ph) => ph?.capture(event, properties));
-}
-
-export function captureException(
-  error: unknown,
-  additionalProperties?: Record<string, unknown>,
-): void {
-  void getPostHog().then((ph) => ph?.captureException(error, additionalProperties));
-}
-
-export function identify(
-  distinctId: string,
-  properties?: Record<string, unknown>,
-): void {
-  void getPostHog().then((ph) => ph?.identify(distinctId, properties));
-}
-
-export function reset(): void {
-  void getPostHog().then((ph) => ph?.reset());
-}
+      // Force replay on for every desktop app session. Passing `true` overrides
+      // sampling / linked-flag controls for this recording session, so packaged
+      // clients don't silently depend on project defaults.
+      posthog.startSessionRecording(true);
+    },
+  });

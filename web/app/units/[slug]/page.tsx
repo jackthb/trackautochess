@@ -7,7 +7,7 @@ import { UnitStatsTable } from "@/components/UnitStatsTable";
 import { getAllUnits, getUnitBySlug } from "@/lib/units";
 import { getAllSynergies } from "@/lib/synergies";
 import { slugifyName } from "@/lib/slugs";
-import { absoluteUrl, SITE_NAME, SITE_TITLE } from "@/lib/site";
+import { absoluteUrl, pageMetadata, SITE_TITLE } from "@/lib/site";
 import { DEFAULT_LOCALE } from "@/lib/i18n";
 import { getCommentaryForEntity } from "@/lib/patchCommentary";
 
@@ -47,27 +47,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!unit) return {};
   const title = t.title(unit.name);
   const description = t.description(unit.name, unit.cost);
-  return {
+  return pageMetadata({
     title,
     description,
-    alternates: { canonical: `/units/${unit.slug}` },
-    robots: "index, follow, max-image-preview:large",
-    openGraph: {
-      title,
-      description,
-      type: "article",
-      siteName: SITE_NAME,
-      url: `/units/${unit.slug}`,
-      locale: "en_US",
-      images: ["/logo.svg"],
-    },
-    twitter: {
-      card: "summary_large_image",
-      title,
-      description,
-      images: ["/logo.svg"],
-    },
-  };
+    path: `/units/${unit.slug}`,
+    type: "article",
+  });
 }
 
 export default async function UnitDetailPage({ params }: Props) {

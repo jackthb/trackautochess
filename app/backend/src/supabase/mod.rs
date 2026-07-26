@@ -35,7 +35,10 @@ pub struct DiagnosticUploadSummary {
     pub console_found: bool,
 }
 
-fn describe_ureq_error(err: ureq::Error) -> String {
+/// Renders a `ureq` failure as a message that keeps the response body when the
+/// server sent one — HTTP status alone rarely says why Supabase or Steam
+/// rejected a request.
+pub(crate) fn describe_ureq_error(err: ureq::Error) -> String {
     match err {
         ureq::Error::Status(code, response) => {
             let body = response.into_string().unwrap_or_default();

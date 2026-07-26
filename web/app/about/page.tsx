@@ -1,32 +1,16 @@
 import type { Metadata } from "next";
-import { SITE_NAME, SITE_TITLE } from "@/lib/site";
+import { pageMetadata, SITE_TITLE } from "@/lib/site";
 import { AboutContent } from "./AboutContent";
 
 const title = `About | ${SITE_TITLE}`;
 const description =
   "How Track Auto Chess surfaces Dota Auto Chess player statistics from Drodo profile data and manually tracked match history.";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title,
   description,
-  alternates: { canonical: "/about" },
-  robots: "index, follow, max-image-preview:large",
-  openGraph: {
-    title,
-    description,
-    type: "website",
-    siteName: SITE_NAME,
-    url: "/about",
-    locale: "en_US",
-    images: ["/logo.svg"],
-  },
-  twitter: {
-    card: "summary_large_image",
-    title,
-    description,
-    images: ["/logo.svg"],
-  },
-};
+  path: "/about",
+});
 
 const structuredData = {
   "@context": "https://schema.org",

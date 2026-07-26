@@ -17,7 +17,7 @@ import {
   getRelicGeneratedItemSlugs,
   ITEM_RELATION_CATEGORY_LABEL,
 } from "@/lib/itemRelations";
-import { absoluteUrl, SITE_NAME, SITE_TITLE } from "@/lib/site";
+import { absoluteUrl, pageMetadata, SITE_TITLE } from "@/lib/site";
 import { cleanText, truncate } from "@/lib/text";
 import { DEFAULT_LOCALE } from "@/lib/i18n";
 import { getCommentaryForEntity } from "@/lib/patchCommentary";
@@ -58,27 +58,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   if (!item) return {};
   const title = t.title(item.name);
   const description = buildDescription(item);
-  return {
+  return pageMetadata({
     title,
     description,
-    alternates: { canonical: `/items/${item.slug}` },
-    robots: "index, follow, max-image-preview:large",
-    openGraph: {
-      title,
-      description,
-      type: "article",
-      siteName: SITE_NAME,
-      url: `/items/${item.slug}`,
-      locale: "en_US",
-      images: ["/logo.svg"],
-    },
-    twitter: {
-      card: "summary_large_image",
-      title,
-      description,
-      images: ["/logo.svg"],
-    },
-  };
+    path: `/items/${item.slug}`,
+    type: "article",
+  });
 }
 
 export default async function ItemDetailPage({ params }: Props) {

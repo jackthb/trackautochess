@@ -515,6 +515,45 @@ async function fetchCreatorMedia(
   return { uploads, liveStreams };
 }
 
+/**
+ * The parts of a live stream that vary by platform. Everything else on
+ * `CreatorLiveStream` is the same `creator.X` fallback on every platform, so
+ * `toLiveStream` fills it in rather than each fetcher repeating it.
+ */
+interface LiveStreamShape {
+  /** Appended to `${creator.id}-live-` to form a stable, per-platform id. */
+  idSuffix: string;
+  platform: CreatorPlatform;
+  /** Watch URL — usually the configured stream URL, but YouTube resolves a video URL. */
+  url: string;
+  title: string | null;
+  thumbnailUrl: string | null;
+  /** Upstream display name, when it beats the configured `creator.name`. */
+  name?: string;
+  /** Upstream avatar, used only when the creator has no configured one. */
+  fallbackAvatarUrl?: string | null;
+  /** Profile link to use when the creator has no configured `profileUrl`. */
+  fallbackProfilePath?: string | null;
+}
+
+function toLiveStream(
+  creator: CreatorConfig,
+  shape: LiveStreamShape
+): CreatorLiveStream {
+  return {
+    id: `${creator.id}-live-${shape.idSuffix}`,
+    steamId: creator.steamId ?? null,
+    name: shape.name ?? creator.name,
+    description: creator.description ?? null,
+    url: shape.url,
+    platform: shape.platform,
+    avatarUrl: creator.avatarUrl ?? shape.fallbackAvatarUrl ?? null,
+    profilePath: creator.profileUrl ?? shape.fallbackProfilePath ?? null,
+    title: shape.title,
+    thumbnailUrl: shape.thumbnailUrl,
+  };
+}
+
 async function fetchYouTubeLiveStream(
   creator: CreatorConfig,
   revalidateSeconds = 120
@@ -545,19 +584,15 @@ async function fetchYouTubeLiveStream(
     ? liveUrl
     : `https://www.youtube.com/watch?v=${videoId}`;
 
-  return {
-    id: `${creator.id}-live-${videoId}`,
-    steamId: creator.steamId ?? null,
-    name: creator.name,
-    description: creator.description ?? null,
-    url: watchUrl,
+  return toLiveStream(creator, {
+    idSuffix: videoId,
     platform: "youtube",
-    avatarUrl: creator.avatarUrl ?? null,
-    profilePath: creator.profileUrl ?? channelUrl,
+    url: watchUrl,
+    fallbackProfilePath: channelUrl,
     title: htmlJsonValue(html, "title") ?? null,
     thumbnailUrl:
       html.match(/https:\/\/i\.ytimg\.com\/vi\/[^"\\]+/)?.[0] ?? null,
-  };
+  });
 }
 
 async function fetchTwitchLiveStream(
@@ -602,18 +637,17 @@ async function fetchTwitchLiveStream(
   const stream = payload?.data?.user?.stream;
   if (!stream || stream.type?.toLowerCase() !== "live") return null;
 
-  return {
-    id: `${creator.id}-live-twitch-${stream.id ?? login}`,
-    steamId: creator.steamId ?? null,
-    name: firstNonEmpty(nonSteamIdText(payload?.data?.user?.displayName), creator.name, login) ?? login,
-    description: creator.description ?? null,
-    url: creator.streamUrl,
+  return toLiveStream(creator, {
+    idSuffix: `twitch-${stream.id ?? login}`,
     platform: "twitch",
-    avatarUrl: creator.avatarUrl ?? payload?.data?.user?.profileImageURL ?? null,
-    profilePath: creator.profileUrl ?? null,
+    url: creator.streamUrl,
+    name:
+      firstNonEmpty(nonSteamIdText(payload?.data?.user?.displayName), creator.name, login) ??
+      login,
+    fallbackAvatarUrl: payload?.data?.user?.profileImageURL,
     title: stream.title ?? null,
     thumbnailUrl: stream.previewImageURL ?? null,
-  };
+  });
 }
 
 async function fetchDouyuLiveStream(
@@ -646,18 +680,16 @@ async function fetchDouyuLiveStream(
   if (!payload || payload.error !== 0) return null;
   if (String(payload.data?.room_status) !== "1") return null;
 
-  return {
-    id: `${creator.id}-live-douyu-${roomId}`,
-    steamId: creator.steamId ?? null,
-    name: firstNonEmpty(nonSteamIdText(payload.data?.owner_name), creator.name) ?? creator.name,
-    description: creator.description ?? null,
-    url: creator.streamUrl,
+  return toLiveStream(creator, {
+    idSuffix: `douyu-${roomId}`,
     platform: "douyu",
-    avatarUrl: creator.avatarUrl ?? null,
-    profilePath: creator.profileUrl ?? null,
+    url: creator.streamUrl,
+    name:
+      firstNonEmpty(nonSteamIdText(payload.data?.owner_name), creator.name) ??
+      creator.name,
     title: payload.data?.room_name ?? null,
     thumbnailUrl: payload.data?.room_thumb ?? null,
-  };
+  });
 }
 
 async function fetchKickLiveStream(
@@ -703,9 +735,10 @@ async function fetchKickLiveStream(
       ? livestream.thumbnail
       : livestream.thumbnail?.url ?? livestream.thumbnail?.src ?? null;
 
-  return {
-    id: `${creator.id}-live-kick-${livestream.id ?? slug}`,
-    steamId: creator.steamId ?? null,
+  return toLiveStream(creator, {
+    idSuffix: `kick-${livestream.id ?? slug}`,
+    platform: "kick",
+    url: creator.streamUrl,
     name:
       firstNonEmpty(
         nonSteamIdText(payload?.user?.username),
@@ -713,14 +746,10 @@ async function fetchKickLiveStream(
         creator.name,
         slug
       ) ?? creator.name,
-    description: creator.description ?? null,
-    url: creator.streamUrl,
-    platform: "kick",
-    avatarUrl: creator.avatarUrl ?? payload?.user?.profile_pic ?? null,
-    profilePath: creator.profileUrl ?? null,
+    fallbackAvatarUrl: payload?.user?.profile_pic,
     title: livestream.session_title ?? livestream.title ?? null,
     thumbnailUrl: thumbnail,
-  };
+  });
 }
 
 async function fetchGenericLiveStream(
@@ -747,18 +776,13 @@ async function fetchGenericLiveStream(
     html.includes('"livestream":true');
   if (!isLive) return null;
 
-  return {
-    id: `${creator.id}-live-${stableIdFromUrl(creator.streamUrl)}`,
-    steamId: creator.steamId ?? null,
-    name: creator.name,
-    description: creator.description ?? null,
-    url: creator.streamUrl,
+  return toLiveStream(creator, {
+    idSuffix: stableIdFromUrl(creator.streamUrl),
     platform,
-    avatarUrl: creator.avatarUrl ?? null,
-    profilePath: creator.profileUrl ?? null,
+    url: creator.streamUrl,
     title: htmlJsonValue(html, "title") ?? null,
     thumbnailUrl: null,
-  };
+  });
 }
 
 async function fetchCreatorLiveStreamWithTimeout(

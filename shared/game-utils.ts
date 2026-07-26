@@ -1,28 +1,67 @@
 import type { ItemFullInfo, RelicInfo } from "./types";
 
+/**
+ * Placement/cost palettes live here as single tables so every surface agrees.
+ *
+ * Renderers that can read CSS custom properties use the `var(--…)` variants;
+ * renderers that cannot — Satori/`ImageResponse` in the OG routes — use the
+ * `…Hex` variants. Both are derived from the same tier lookup, so a palette
+ * change lands everywhere at once instead of drifting per call site.
+ */
+export type PlacementTier = "first" | "top3" | "fourth" | "bottom";
+
+export function placementTier(p: number): PlacementTier {
+  if (p === 1) return "first";
+  if (p <= 3) return "top3";
+  if (p === 4) return "fourth";
+  return "bottom";
+}
+
+const PLACEMENT_COLOR_VAR: Record<PlacementTier, string> = {
+  first: "var(--gold)",
+  top3: "var(--silver)",
+  fourth: "var(--text-secondary)",
+  bottom: "var(--red-bright)",
+};
+
+// Resolved values of the tokens above (see shared/tokens.css).
+const PLACEMENT_COLOR_HEX: Record<PlacementTier, string> = {
+  first: "#c9a84c",
+  top3: "#8a92a8",
+  fourth: "#9096ac",
+  bottom: "#c44e4e",
+};
+
+const PLACEMENT_BG: Record<PlacementTier, string> = {
+  first: "rgba(201,168,76,0.08)",
+  top3: "rgba(138,146,168,0.05)",
+  fourth: "transparent",
+  bottom: "rgba(155,58,58,0.05)",
+};
+
 export function placementColor(p: number): string {
-  if (p === 1) return "var(--gold)";
-  if (p <= 3) return "var(--silver)";
-  if (p === 4) return "var(--text-secondary)";
-  return "var(--red-bright)";
+  return PLACEMENT_COLOR_VAR[placementTier(p)];
+}
+
+export function placementColorHex(p: number): string {
+  return PLACEMENT_COLOR_HEX[placementTier(p)];
 }
 
 export function placementBg(p: number): string {
-  if (p === 1) return "rgba(201,168,76,0.08)";
-  if (p <= 3) return "rgba(138,146,168,0.05)";
-  if (p === 4) return "transparent";
-  return "rgba(155,58,58,0.05)";
+  return PLACEMENT_BG[placementTier(p)];
 }
 
+const COST_BORDER_COLOR: Record<number, string> = {
+  1: "#5c6278",
+  2: "#5a8fd5",
+  3: "#2a4a8a",
+  4: "#c44ea0",
+  5: "#c9a84c",
+};
+
+/** Already a literal hex, so it doubles as the OG-image (Satori) palette. */
 export function costBorderColor(cost: number): string {
-  switch (cost) {
-    case 1: return "#5c6278";
-    case 2: return "#5a8fd5";
-    case 3: return "#2a4a8a";
-    case 4: return "#c44ea0";
-    case 5: return "#c9a84c";
-    default: return "#5c6278";
-  }
+  return COST_BORDER_COLOR[cost] ?? COST_BORDER_COLOR[1];
 }
 
 // Canonical unit name → icon filename stem overrides.
@@ -253,13 +292,6 @@ export function formatIsoDateParts(
     day: String(day || 1).padStart(2, "0"),
     year: String(year || ""),
   };
-}
-
-export function formatSize(bytes: number): string {
-  if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(0) + " KB";
-  if (bytes < 1024 * 1024 * 1024)
-    return (bytes / (1024 * 1024)).toFixed(1) + " MB";
-  return (bytes / (1024 * 1024 * 1024)).toFixed(2) + " GB";
 }
 
 export function formatDate(ms: number): string {

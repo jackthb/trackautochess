@@ -4,9 +4,11 @@ import { createSupabaseServerClient } from "@/lib/supabase";
 import { readFile } from "node:fs/promises";
 import path from "node:path";
 import {
+  costBorderColor,
   parseLineup,
   parseRelics,
   parseSynergies,
+  placementColorHex,
   relicStem,
   synIconName,
   unitStem,
@@ -68,21 +70,6 @@ const fontData = Promise.all([
   readFile(path.join(fontDir, "JetBrainsMono-Regular.ttf")),
   readFile(path.join(fontDir, "JetBrainsMono-Bold.ttf")),
 ]);
-
-function costBorderColorHex(cost: number): string {
-  if (cost >= 5) return "#c9a84c";
-  if (cost === 4) return "#9b59b6";
-  if (cost === 3) return "#3498db";
-  if (cost === 2) return "#27ae60";
-  return "#7f8c8d";
-}
-
-function placementColorHex(p: number): string {
-  if (p === 1) return "#c9a84c";
-  if (p <= 3) return "#8a92a8";
-  if (p === 4) return "#9096ac";
-  return "#c44e4e";
-}
 
 function getSiteHost(): string {
   return (process.env.NEXT_PUBLIC_SITE_URL || "https://www.trackautochess.com")
@@ -495,7 +482,7 @@ async function ogHandler(req: Request, ctx: { params: Promise<{ id: string }> })
                           height={52}
                           style={{
                             borderRadius: 6,
-                            border: `2px solid ${costBorderColorHex(UNIT_COSTS[u.name] || 1)}`,
+                            border: `2px solid ${costBorderColor(UNIT_COSTS[u.name] || 1)}`,
                             flexShrink: 0,
                           }}
                         />
@@ -719,7 +706,7 @@ async function ogHandler(req: Request, ctx: { params: Promise<{ id: string }> })
                             src={build.unitIcons[i]!}
                             width={30}
                             height={30}
-                            style={{ borderRadius: 4, border: `1px solid ${costBorderColorHex(UNIT_COSTS[u.name] || 1)}` }}
+                            style={{ borderRadius: 4, border: `1px solid ${costBorderColor(UNIT_COSTS[u.name] || 1)}` }}
                           />
                         ) : (
                           <div key={i} style={{ display: "flex", width: 30, height: 30, borderRadius: 4, background: "#111419" }} />

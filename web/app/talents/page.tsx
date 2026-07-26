@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { SITE_NAME, SITE_TITLE } from "@/lib/site";
+import { pageMetadata, SITE_TITLE } from "@/lib/site";
 import { DEFAULT_LOCALE } from "@/lib/i18n";
 import Link from "next/link";
 import { getAllTalents, getTierRound, type DisplayTalent } from "@/lib/talents";
@@ -10,27 +10,11 @@ const title = `Talents | ${SITE_TITLE}`;
 const description =
   "Browse every Dota Auto Chess talent by milestone round, see both options for each, and cross-reference patch-note updates.";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title,
   description,
-  alternates: { canonical: "/talents" },
-  robots: "index, follow, max-image-preview:large",
-  openGraph: {
-    title,
-    description,
-    type: "website",
-    siteName: SITE_NAME,
-    url: "/talents",
-    locale: "en_US",
-    images: ["/logo.svg"],
-  },
-  twitter: {
-    card: "summary_large_image",
-    title,
-    description,
-    images: ["/logo.svg"],
-  },
-};
+  path: "/talents",
+});
 
 const structuredData = {
   "@context": "https://schema.org",

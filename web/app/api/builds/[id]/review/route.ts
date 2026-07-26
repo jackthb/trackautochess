@@ -1,92 +1,49 @@
 import { RateLimiterMemory } from "rate-limiter-flexible";
-import { getClientIp, logAbuse, toApiReq } from "@/lib/abuseLog";
-import { isAdminSteamId } from "@/lib/adminServer";
+import {
+  asJson,
+  jsonError,
+  loadBuildRow,
+  openBuildRoute,
+  readJsonBody,
+  type BuildRouteContext,
+} from "@/lib/builds/route";
 import {
   fetchUsersBySteamIds,
-  parseSteamId,
   toDetail,
   toSavedBuild,
   type CommunityBuildRow,
 } from "@/lib/builds/server";
-import {
-  isUuid,
-  type CommunityBuildStatus,
-  type SavedBuild,
-} from "@/lib/builds/types";
-import type { Json } from "@/lib/database.generated.types";
-import { getSessionUser } from "@/lib/sessionUser";
-import {
-  createSupabaseAnonClient,
-  createSupabaseServiceRoleClient,
-} from "@/lib/supabase";
+import type { CommunityBuildStatus, SavedBuild } from "@/lib/builds/types";
 
 const writeLimiter = new RateLimiterMemory({ points: 40, duration: 60 });
 
-type RouteContext = { params: Promise<{ id: string }> };
+export async function POST(req: Request, context: BuildRouteContext) {
+  const gate = await openBuildRoute(req, context, {
+    path: "/api/builds/[id]/review",
+    limiter: writeLimiter,
+    requireAdmin: true,
+  });
+  if (!gate.ok) return gate.response;
+  const { id, service, steamIdNum: reviewerId } = gate.ctx;
 
-function asJson(value: SavedBuild): Json {
-  return JSON.parse(JSON.stringify(value)) as Json;
-}
-
-export async function POST(req: Request, context: RouteContext) {
-  const path = "/api/builds/[id]/review";
-  const apiReq = toApiReq(req);
-  const ip = getClientIp(apiReq);
-
-  try {
-    await writeLimiter.consume(ip);
-  } catch {
-    logAbuse("rate_limit_exceeded", { path, ip });
-    return Response.json({ error: "Too many requests" }, { status: 429 });
-  }
-
-  const { id } = await context.params;
-  if (!isUuid(id)) {
-    return Response.json({ error: "Not found" }, { status: 404 });
-  }
-
-  const service = createSupabaseServiceRoleClient();
-  if (!service) {
-    return Response.json({ error: "Database not configured" }, { status: 500 });
-  }
-
-  const anon = createSupabaseAnonClient();
-  const session = await getSessionUser(apiReq, anon);
-  if (!(await isAdminSteamId(session.steamId))) {
-    return Response.json({ error: "Forbidden" }, { status: 403 });
-  }
-  const reviewerId = session.steamId ? parseSteamId(session.steamId) : null;
   if (reviewerId == null) {
-    return Response.json({ error: "Forbidden" }, { status: 403 });
+    return jsonError("Forbidden", 403);
   }
 
-  let body: { action?: string };
-  try {
-    body = (await req.json()) as { action?: string };
-  } catch {
-    return Response.json({ error: "Invalid JSON body" }, { status: 400 });
-  }
+  const parsed = await readJsonBody<{ action?: string }>(req);
+  if (!parsed.ok) return parsed.response;
+  const body = parsed.ctx;
 
   if (body.action !== "approve" && body.action !== "reject") {
-    return Response.json({ error: "action must be approve or reject" }, { status: 400 });
+    return jsonError("action must be approve or reject", 400);
   }
 
-  const { data, error } = await service
-    .from("community_builds")
-    .select("*")
-    .eq("id", id)
-    .maybeSingle();
+  const build = await loadBuildRow(service, id);
+  if (!build.ok) return build.response;
+  const row = build.ctx;
 
-  if (error) {
-    return Response.json({ error: error.message }, { status: 500 });
-  }
-  if (!data) {
-    return Response.json({ error: "Not found" }, { status: 404 });
-  }
-
-  const row = data as CommunityBuildRow;
   if (row.status !== "pending") {
-    return Response.json({ error: "Build is not pending review" }, { status: 409 });
+    return jsonError("Build is not pending review", 409);
   }
 
   const now = new Date().toISOString();
@@ -112,10 +69,7 @@ export async function POST(req: Request, context: RouteContext) {
     .single();
 
   if (updateError || !updated) {
-    return Response.json(
-      { error: updateError?.message ?? "Review failed" },
-      { status: 500 },
-    );
+    return jsonError(updateError?.message ?? "Review failed", 500);
   }
 
   const next = updated as CommunityBuildRow;

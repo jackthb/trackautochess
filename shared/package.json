@@ -11,6 +11,7 @@
       "default": "./drodo-core.mjs"
     },
     "./game-utils": "./game-utils.ts",
+    "./posthog": "./posthog.ts",
     "./steam": "./steam.ts",
     "./buildStatItems": "./buildStatItems.ts",
     "./Button": "./Button.tsx",

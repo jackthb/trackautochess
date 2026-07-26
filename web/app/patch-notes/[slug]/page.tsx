@@ -9,7 +9,12 @@ import { getTalentByName } from "@/lib/talents";
 import { getUnitBySlug } from "@/lib/units";
 import { getSynergyBySlug } from "@/lib/synergies";
 import { getRelicGeneratedItemSlugs } from "@/lib/itemRelations";
-import { absoluteUrl, SITE_NAME, SITE_TITLE } from "@/lib/site";
+import {
+  absoluteUrl,
+  pageMetadata,
+  SITE_NAME,
+  SITE_TITLE,
+} from "@/lib/site";
 import { cleanText, truncate } from "@/lib/text";
 import { DEFAULT_LOCALE, pickLocalized } from "@/lib/i18n";
 import { type EntryKind, KIND_COLOR, KIND_LABEL } from "@/lib/patchKinds";
@@ -188,27 +193,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const description = buildPatchDescription(patch);
   const previewImage = patch.image || "/logo.svg";
 
-  return {
+  return pageMetadata({
     title,
     description,
-    alternates: { canonical: `/patch-notes/${slug}` },
-    robots: "index, follow, max-image-preview:large",
-    openGraph: {
-      title,
-      description,
-      type: "article",
-      siteName: SITE_NAME,
-      url: `/patch-notes/${slug}`,
-      locale: "en_US",
-      images: [previewImage],
-    },
-    twitter: {
-      card: "summary_large_image",
-      title,
-      description,
-      images: [previewImage],
-    },
-  };
+    path: `/patch-notes/${slug}`,
+    type: "article",
+    image: previewImage,
+  });
 }
 
 export default async function PatchDetailPage({ params }: Props) {

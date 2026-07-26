@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { PageLayout } from "@/components/PageLayout";
-import { SITE_NAME, SITE_TITLE } from "@/lib/site";
+import { pageMetadata, SITE_TITLE } from "@/lib/site";
 import {
   loadCachedCreatorLiveStreams,
   loadCachedCreatorUploads,
@@ -19,26 +19,11 @@ const chatbotEndpoint = "https://www.trackautochess.com/api/twitch/mmr?steam=";
 const streamElementsCommandUrl =
   "https://streamelements.com/dashboard/bot/commands/custom?data=JTdCJTIyY29vbGRvd24lMjIlM0ElN0IlMjJ1c2VyJTIyJTNBMTUlMkMlMjJnbG9iYWwlMjIlM0E1JTdEJTJDJTIyYWxpYXNlcyUyMiUzQSU1QiU1RCUyQyUyMmtleXdvcmRzJTIyJTNBJTVCJTVEJTJDJTIydGl0bGVLZXl3b3JkcyUyMiUzQSU1QiU1RCUyQyUyMmVuYWJsZWQlMjIlM0F0cnVlJTJDJTIyZW5hYmxlZE9ubGluZSUyMiUzQXRydWUlMkMlMjJlbmFibGVkT2ZmbGluZSUyMiUzQXRydWUlMkMlMjJoaWRkZW4lMjIlM0FmYWxzZSUyQyUyMmNvc3QlMjIlM0EwJTJDJTIydHlwZSUyMiUzQSUyMnNheSUyJTJDJTIyYWNjZXNzTGV2ZWwlMjIlM0ExMDAlMkMlMjJjb21tYW5kJTIyJTNBJTIybW1yJTIyJTJDJTIycmVwbHklMjIlM0ElMjIlMjQlN0JjdXN0b21hcGkuaHR0cHMlM0ElMkYlMkZ3d3cudHJhY2thdXRvY2hlc3MuY29tJTJGYXBpJTJGdHdpdGNoJTJGJTI0JTdCMSU3RCUyRm1tciU3RCUyMiUyQyUyMnJlZ2V4JTIyJTNBJTIyJTIyJTdE";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title,
   description,
-  alternates: { canonical: "/creators" },
-  openGraph: {
-    title,
-    description,
-    type: "website",
-    siteName: SITE_NAME,
-    url: "/creators",
-    locale: "en_US",
-    images: ["/logo.svg"],
-  },
-  twitter: {
-    card: "summary_large_image",
-    title,
-    description,
-    images: ["/logo.svg"],
-  },
-};
+  path: "/creators",
+});
 
 export const revalidate = 900;
 

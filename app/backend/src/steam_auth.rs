@@ -185,7 +185,7 @@ fn exchange_supabase_session(
     let url = format!("{auth_url}{separator}{}", query.join("&"));
     let response = ureq::get(&url)
         .call()
-        .map_err(describe_auth_exchange_error)?;
+        .map_err(crate::supabase::describe_ureq_error)?;
     let body = response.into_string().map_err(|err| err.to_string())?;
     let value = serde_json::from_str::<serde_json::Value>(&body).map_err(|err| err.to_string())?;
     if let Some(error) = value.get("error").and_then(serde_json::Value::as_str) {
@@ -224,20 +224,6 @@ fn exchange_supabase_session(
         refresh_token,
         expires_at,
     })
-}
-
-fn describe_auth_exchange_error(err: ureq::Error) -> String {
-    match err {
-        ureq::Error::Status(code, response) => {
-            let body = response.into_string().unwrap_or_default();
-            if body.trim().is_empty() {
-                format!("status code {code}")
-            } else {
-                format!("status code {code}: {body}")
-            }
-        }
-        err => err.to_string(),
-    }
 }
 
 fn handle_callback(mut stream: TcpStream) -> Result<BTreeMap<String, String>, String> {

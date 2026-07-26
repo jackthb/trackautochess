@@ -2,34 +2,24 @@ import type { Metadata } from "next";
 import HomeSearch from "@/components/home/HomeSearch";
 import PatchPromo from "@/components/patch/PatchPromo";
 import { fetchDotaAutoChessMetrics } from "@/lib/customGameStats";
-import { absoluteUrl, SITE_DESCRIPTION, SITE_NAME, SITE_TITLE } from "@/lib/site";
+import {
+  absoluteUrl,
+  pageMetadata,
+  SITE_DESCRIPTION,
+  SITE_NAME,
+  SITE_TITLE,
+} from "@/lib/site";
 
 export const revalidate = 300;
 
 const description =
   "Look up Dota Auto Chess player rank and tracked match stats by Steam vanity URL or SteamID64. Live MMR is unavailable.";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: SITE_TITLE,
   description,
-  alternates: { canonical: "/" },
-  robots: "index, follow, max-image-preview:large",
-  openGraph: {
-    title: SITE_TITLE,
-    description,
-    type: "website",
-    siteName: SITE_NAME,
-    url: "/",
-    locale: "en_US",
-    images: ["/logo.svg"],
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: SITE_TITLE,
-    description,
-    images: ["/logo.svg"],
-  },
-};
+  path: "/",
+});
 
 const siteUrl = absoluteUrl("/");
 const structuredData = [

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { EntityBrowser, type BrowsableEntity } from "@/components/EntityBrowser";
-import { SITE_NAME, SITE_TITLE } from "@/lib/site";
+import { pageMetadata, SITE_TITLE } from "@/lib/site";
 import { DEFAULT_LOCALE } from "@/lib/i18n";
 import { getSpecies } from "@/lib/synergies";
 
@@ -8,27 +8,11 @@ const title = `Species | ${SITE_TITLE}`;
 const description =
   "Browse all Dota Auto Chess species traits like Beast and Demon, then open each species detail page.";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title,
   description,
-  alternates: { canonical: "/species" },
-  robots: "index, follow, max-image-preview:large",
-  openGraph: {
-    title,
-    description,
-    type: "website",
-    siteName: SITE_NAME,
-    url: "/species",
-    locale: "en_US",
-    images: ["/logo.svg"],
-  },
-  twitter: {
-    card: "summary_large_image",
-    title,
-    description,
-    images: ["/logo.svg"],
-  },
-};
+  path: "/species",
+});
 
 const structuredData = {
   "@context": "https://schema.org",

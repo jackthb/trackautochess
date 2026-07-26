@@ -5,7 +5,7 @@ import { formatIsoDateParts } from "@dac/shared/game-utils";
 import PatchPromo from "@/components/patch/PatchPromo";
 import { patchIndexData } from "@/generated/content-data";
 import { getLatestPatchPromo, getLatestPatchSlug, getPatchPromo } from "@/lib/latestPatch";
-import { SITE_NAME, SITE_TITLE } from "@/lib/site";
+import { pageMetadata, SITE_TITLE } from "@/lib/site";
 import { DEFAULT_LOCALE, pickLocalized } from "@/lib/i18n";
 import styles from "./patch-notes.module.css";
 
@@ -20,27 +20,11 @@ const title = `Patch Notes | ${SITE_TITLE}`;
 const description =
   "Read the latest Dota Auto Chess patch notes, including new relics, new items, balance changes, and update history on Track Auto Chess.";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title,
   description,
-  alternates: { canonical: "/patch-notes" },
-  robots: "index, follow, max-image-preview:large",
-  openGraph: {
-    title,
-    description,
-    type: "website",
-    siteName: SITE_NAME,
-    url: "/patch-notes",
-    locale: "en_US",
-    images: ["/logo.svg"],
-  },
-  twitter: {
-    card: "summary_large_image",
-    title,
-    description,
-    images: ["/logo.svg"],
-  },
-};
+  path: "/patch-notes",
+});
 
 const structuredData = {
   "@context": "https://schema.org",

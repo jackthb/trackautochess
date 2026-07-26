@@ -2,6 +2,7 @@
 
 import fs from "node:fs";
 import path from "node:path";
+import { SupabaseRest } from "./lib/supabase-rest.mjs";
 
 const ROOT = process.cwd();
 const ENV_PATH = path.join(ROOT, "web", ".env.local");
@@ -88,38 +89,8 @@ function uniqueRows(rows) {
   return unique;
 }
 
-class SupabaseRest {
-  constructor(url, key) {
-    this.base = `${url.replace(/\/$/, "")}/rest/v1`;
-    this.key = key;
-  }
-
-  async request(path, { method = "GET", query, body, headers = {} } = {}) {
-    const url = new URL(`${this.base}/${path}`);
-    for (const [key, value] of Object.entries(query ?? {})) {
-      if (value !== undefined && value !== null) {
-        url.searchParams.set(key, String(value));
-      }
-    }
-    const response = await fetch(url, {
-      method,
-      headers: {
-        apikey: this.key,
-        Authorization: `Bearer ${this.key}`,
-        ...(body === undefined ? {} : { "Content-Type": "application/json" }),
-        ...headers,
-      },
-      body: body === undefined ? undefined : JSON.stringify(body),
-    });
-    if (!response.ok) {
-      const text = await response.text().catch(() => "");
-      throw new Error(`${method} ${url.pathname}${url.search} failed: ${response.status} ${text}`);
-    }
-    if (response.status === 204) return null;
-    const text = await response.text();
-    return text ? JSON.parse(text) : null;
-  }
-
+/** Adds the snapshot-specific verbs this importer needs to the shared client. */
+class SnapshotRest extends SupabaseRest {
   selectSnapshots({ limit, offset, steamId, since, until }) {
     return this.request("mmr_snapshots", {
       query: {
@@ -174,8 +145,8 @@ async function main() {
     throw new Error("Missing NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY");
   }
 
-  const source = new SupabaseRest(sourceUrl, sourceKey);
-  const target = new SupabaseRest(targetUrl, targetKey);
+  const source = new SnapshotRest(sourceUrl, sourceKey);
+  const target = new SnapshotRest(targetUrl, targetKey);
   const summary = {
     apply,
     scanned: 0,
