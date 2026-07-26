@@ -30,10 +30,12 @@ pnpm --dir web run test:e2e  # build, then run Playwright tests
 
 ## Twitch integrations
 
-The site exposes public, CORS-enabled Twitch endpoints for stream overlays and chat bots. Both endpoints accept a Steam ID64, Steam profile URL, or Steam vanity name in the `:steamId` segment and cache responses at the edge for 30 minutes.
+The site exposes public, CORS-enabled Twitch chat bot endpoints. They accept a Steam ID64, Steam profile URL, or Steam vanity name and cache responses at the edge for 30 minutes.
 
-- `/api/twitch/:steamId/stats` returns the JSON payload used by Twitch panels/extensions.
-- `/api/twitch/:steamId/mmr` returns a one-line `text/plain` response for chat bot commands. For example, a Nightbot `!mmr` command can use `$(urlfetch https://www.trackautochess.com/api/twitch/76561198000000000/mmr)` and chat will receive the player's Steam ID, current MMR/rank when available, and Track Auto Chess profile link. StreamElements can use the equivalent `$(customapi https://www.trackautochess.com/api/twitch/76561198000000000/mmr)` response. Bots that do not support URL-fetch/custom API variables, such as basic OWN3D custom-command templates, need either an equivalent HTTP-request feature or a small custom Twitch IRC bot that calls this endpoint.
+- `/api/twitch/:steamId/mmr` takes the Steam input in the path segment.
+- `/api/twitch/mmr?steam=...` takes it as a query parameter, which is easier to wire into bot marketplaces because profile URLs only need query escaping.
+
+Both return a one-line `text/plain` response for chat bot commands. For example, a Nightbot `!mmr` command can use `$(urlfetch https://www.trackautochess.com/api/twitch/76561198000000000/mmr)` and chat will receive the player's Steam ID, current MMR/rank when available, and Track Auto Chess profile link. StreamElements can use the equivalent `$(customapi https://www.trackautochess.com/api/twitch/76561198000000000/mmr)` response. Bots that do not support URL-fetch/custom API variables, such as basic OWN3D custom-command templates, need either an equivalent HTTP-request feature or a small custom Twitch IRC bot that calls this endpoint.
 
 ## Content editing
 

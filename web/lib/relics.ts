@@ -91,9 +91,3 @@ export function getRelicBySlug(
   ensureLoaded(locale);
   return RELICS_BY_SLUG_CACHE.get(locale)!.get(slug) ?? null;
 }
-
-export function getRelicSlugByName(name: string): string | null {
-  ensureLoaded(DEFAULT_LOCALE);
-  const slug = slugifyName(name);
-  return RELICS_BY_SLUG_CACHE.get(DEFAULT_LOCALE)!.has(slug) ? slug : null;
-}

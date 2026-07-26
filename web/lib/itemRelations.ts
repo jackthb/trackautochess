@@ -53,10 +53,6 @@ export const ITEM_RELATION_CATEGORY_LABEL: Record<ItemRelationCategory, string> 
   generated_item: "Generated item",
 };
 
-export function getItemRelations(): ItemRelation[] {
-  return RELATIONS;
-}
-
 export function getRelicGeneratedItemSlugs(): Set<string> {
   return new Set(
     RELATIONS.filter(
@@ -234,8 +230,4 @@ export function getRelatedEntitiesForRelic(
   return getCmsRelationsForRelic(relicName)
     .map((relation) => resolveCmsRelatedEntity(relation, locale))
     .filter((entry): entry is RelatedEntity => entry !== null);
-}
-
-export function relatedItemIcon(item: DisplayItem): string {
-  return iconUrl(item);
 }

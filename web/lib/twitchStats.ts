@@ -12,7 +12,7 @@ const SITE_HOST =
   process.env.NEXT_PUBLIC_SITE_HOST?.replace(/\/$/, "") ||
   "https://www.trackautochess.com";
 
-export interface TwitchStatsResponse {
+interface TwitchStatsResponse {
   player: {
     steam_id: string;
     name: string | null;
@@ -46,7 +46,7 @@ interface UserDrodoStatsRow {
   queen_ladder_rank: number | null;
 }
 
-export class TwitchStatsError extends Error {
+class TwitchStatsError extends Error {
   constructor(
     message: string,
     public readonly status: number
@@ -56,7 +56,7 @@ export class TwitchStatsError extends Error {
   }
 }
 
-export async function fetchTwitchStats(
+async function fetchTwitchStats(
   rawSteamInput: string,
   supabase: SupabaseClient
 ): Promise<TwitchStatsResponse> {

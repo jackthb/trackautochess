@@ -137,58 +137,8 @@ export function queenSeasonWins(row: QueenRow): number | null {
 
 // --- Staleness helpers ----------------------------------------------------
 
-export function newestDrodoFetchedAt(rows: QueenRow[]): string | null {
-  return mostRecentTimestamp(...rows.map((row) => row.drodo_last_fetched_at));
-}
-
 export function newestQueenLadderSeenAt(rows: QueenRow[]): string | null {
   return mostRecentTimestamp(
     ...rows.map((row) => row.queen_ladder_last_seen_at)
   );
-}
-
-export function oldestDrodoFetchedAt(rows: QueenRow[]): string | null {
-  let oldest: string | null = null;
-  let oldestTime = Infinity;
-  for (const row of rows) {
-    if (!row.drodo_last_fetched_at) return null;
-    const time = new Date(row.drodo_last_fetched_at).getTime();
-    if (!Number.isFinite(time)) return null;
-    if (time < oldestTime) {
-      oldestTime = time;
-      oldest = row.drodo_last_fetched_at;
-    }
-  }
-  return oldest;
-}
-
-export function queenLastUpdatedAt(rows: QueenRow[]): string | null {
-  return mostRecentTimestamp(
-    ...rows.flatMap((row) => [
-      row.queen_ladder_last_seen_at,
-      row.drodo_last_fetched_at,
-    ])
-  );
-}
-
-function rowUpdatedAt(row: QueenRow): string | null {
-  return mostRecentTimestamp(
-    row.queen_ladder_last_seen_at,
-    row.drodo_last_fetched_at
-  );
-}
-
-/** Oldest per-row timestamp: the table's worst-case staleness. */
-export function queenOldestUpdatedAt(rows: QueenRow[]): string | null {
-  let oldest: string | null = null;
-  let oldestTime = Infinity;
-  for (const row of rows) {
-    const value = rowUpdatedAt(row);
-    if (!value) continue;
-    const time = new Date(value).getTime();
-    if (!Number.isFinite(time) || time >= oldestTime) continue;
-    oldestTime = time;
-    oldest = value;
-  }
-  return oldest;
 }

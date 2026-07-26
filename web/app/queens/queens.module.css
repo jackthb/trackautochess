@@ -239,9 +239,6 @@
   font-variant-numeric: tabular-nums;
   font-size: var(--fs-12);
 }
-.age-stale {
-  color: #fbbf24;
-}
 .refresh-ready {
   color: #4ade80;
 }

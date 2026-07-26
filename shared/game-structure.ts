@@ -284,17 +284,6 @@ export function buildChessCodeUnitLookup(
   return out;
 }
 
-/** Unit display-name → buy cost for icon borders and lineup sorting. */
-export function buildUnitCostLookup(
-  unitsFull: Record<string, UnitFullInfo>,
-): Record<string, number> {
-  const out: Record<string, number> = {};
-  for (const [name, info] of Object.entries(unitsFull)) {
-    out[name] = Number((info as { cost?: unknown }).cost) || 0;
-  }
-  return out;
-}
-
 /**
  * Resolve a raw nettable `chess_lineup` string into display names and stars.
  * Star level is encoded by trailing `1`s (`chess_wl1` = 2★,

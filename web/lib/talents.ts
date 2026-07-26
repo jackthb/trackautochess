@@ -26,11 +26,6 @@ export function getTierRound(tier: number): number | null {
   return TIER_ROUNDS[tier] ?? null;
 }
 
-export function getTierLabel(tier: number): string {
-  const round = TIER_ROUNDS[tier];
-  return round != null ? `Round ${round}` : `Tier ${tier}`;
-}
-
 function buildTalentsForLocale(locale: Locale): DisplayTalent[] {
   return Object.entries(talentsData as Record<string, RawTalent>)
     .map(([key, value]) => {

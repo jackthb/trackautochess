@@ -26,7 +26,3 @@ export function normalizeSteamId64(value: unknown): string | null {
   const trimmed = value.trim();
   return isSteamId64(trimmed) ? trimmed : null;
 }
-
-export function steamId64ToString(steamId: SteamId64): string {
-  return steamId;
-}

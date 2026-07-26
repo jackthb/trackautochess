@@ -3,7 +3,6 @@ import {
   buildItemSynergyLookup,
   buildSynergyMinCountByName,
   computeLineupSynergies,
-  filterActiveSynergiesWithThresholds,
   type SynergyCountPiece,
 } from "@dac/shared/game-structure";
 import type { ItemFullInfo } from "@dac/shared/types";
@@ -193,39 +192,6 @@ export function getUnitBySlug(
   return UNIT_BY_SLUG_CACHE.get(locale)!.get(slug) ?? null;
 }
 
-const UNIT_SLUG_ALIASES: Record<string, string> = {
-  spectre: "spectres",
-  bloodseeker: "blood-seeker",
-  "soul-breaker": "spirit-breaker",
-  "dark-seer": "darkseer",
-  "terror-blade": "terrorblade",
-  "centaur-warrior": "centaur-warrunner",
-  abbadon: "abaddon",
-  "beast-master": "beastmaster",
-  "chao-knight": "chaos-knight",
-  "tide-hunter": "tidehunter",
-  "elter-titan": "elder-titan",
-  "ring-master": "ringmaster",
-  worlock: "warlock",
-  necrolyte: "necrophos",
-  antimage: "anti-mage",
-  "life-stealer": "lifestealer",
-};
-
-export function getUnitSlugByName(name: string): string | null {
-  ensureLoaded(DEFAULT_LOCALE);
-  const cache = UNIT_BY_SLUG_CACHE.get(DEFAULT_LOCALE)!;
-
-  const bare = name.replace(/\s*-\s+.*$/, "").replace(/\s*\(.*\)$/, "").trim();
-  const slug = slugifyName(bare);
-  if (cache.has(slug)) return slug;
-
-  const aliased = UNIT_SLUG_ALIASES[slug];
-  if (aliased && cache.has(aliased)) return aliased;
-
-  return null;
-}
-
 // ── Lineup lookups: unit name → cost / synergies ─────────────────────────────
 // The match and game pages (and their OG image handlers) resolve a unit *name*
 // — as it appears in a stored lineup string, including a few alias spellings —
@@ -273,18 +239,6 @@ export const ITEM_SYNERGIES: Readonly<Record<string, string>> =
     itemLinksData as { links?: { item?: string; synergy?: string; category?: string }[] },
     itemsFullData as Record<string, ItemFullInfo>,
   );
-
-/**
- * Keep only synergies that have reached their activation threshold (first
- * tier), preserving the input order. Synergies with no known threshold fall
- * back to 2 (the common case). Use this on any synergy list before display —
- * raw counts include partial synergies that aren't actually active in-game.
- */
-export function filterActiveSynergies(
-  synergies: { name: string; count: number }[],
-): { name: string; count: number }[] {
-  return filterActiveSynergiesWithThresholds(synergies, SYNERGY_MIN_COUNT);
-}
 
 /**
  * Derive the active synergies a player actually has from their fielded
