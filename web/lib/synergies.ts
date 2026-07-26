@@ -8,6 +8,8 @@ interface SynergyInfo {
   description: string;
   lore: string;
   commentary?: string;
+  /** Official tooltip footnotes extracted from the VPK (edge-case rules). */
+  notes?: string[];
   names?: Record<string, string>;
   descriptions?: Record<string, string>;
   lore_i18n?: Record<string, string>;
@@ -24,6 +26,7 @@ export interface DisplaySynergy {
   description: string;
   lore: string;
   commentary?: string;
+  notes: string[];
   iconStem: string;
   iconUrl: string;
   iconDimensions: { width: number; height: number } | null;
@@ -56,6 +59,7 @@ function buildSynergiesForLocale(locale: Locale): DisplaySynergy[] {
         description,
         lore,
         commentary: syn.commentary,
+        notes: Array.isArray(syn.notes) ? syn.notes : [],
         iconStem: stem,
         iconUrl: syn.icon_url || `/icons/synergies/${stem}.png`,
         iconDimensions: syn.icon_dimensions ?? null,

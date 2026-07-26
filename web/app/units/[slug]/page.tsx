@@ -101,18 +101,6 @@ export default async function UnitDetailPage({ params }: Props) {
       title: t.overview,
       body: unit.attackType ? t.attackType(unit.attackType) : description,
     },
-    // Generic editorial commentary authored in the CMS, distinct from the
-    // patch-note commentary rendered in the commentary slot below.
-    ...(unit.commentary
-      ? [
-          {
-            title: t.commentary,
-            body: (
-              <p style={{ whiteSpace: "pre-line", margin: 0 }}>{unit.commentary}</p>
-            ),
-          },
-        ]
-      : []),
     ...(unit.abilities.length > 0
       ? [
           {
@@ -168,8 +156,17 @@ export default async function UnitDetailPage({ params }: Props) {
         tag={{ label: t.cost(unit.cost) }}
         bodySections={bodySections}
         commentary={
-          commentary.length > 0 ? (
-            <EntityCommentaryList entries={commentary} />
+          unit.commentary || commentary.length > 0 ? (
+            <>
+              {unit.commentary ? (
+                <p style={{ whiteSpace: "pre-line", margin: 0 }}>
+                  {unit.commentary}
+                </p>
+              ) : null}
+              {commentary.length > 0 ? (
+                <EntityCommentaryList entries={commentary} />
+              ) : null}
+            </>
           ) : undefined
         }
         relatedTitle={RELATED_LABELS.unitSynergies(unit.name)}

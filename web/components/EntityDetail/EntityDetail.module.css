@@ -102,11 +102,18 @@
   color: var(--accent);
 }
 
+/* Extracted tooltip footnotes trailing the last overview section: offset from
+   the body copy above so they read as related fine print, not body text. */
 .notes {
-  margin: 0;
+  margin: var(--s-14) 0 0;
   padding-left: var(--s-20);
-  color: var(--text-secondary);
+  color: var(--text-muted);
+  font-size: var(--fs-13);
   line-height: var(--lh-relaxed);
+}
+/* When the footnotes stand alone (no overview section), drop the top offset. */
+.section > .notes:only-child {
+  margin-top: 0;
 }
 
 .relatedGrid {

@@ -161,6 +161,7 @@ export default async function SynergyDetailPage({ params }: Props) {
         name={synergy.name}
         iconSrc={synergy.iconUrl}
         overview={<SynergyDescription description={synergy.description || description} />}
+        notes={synergy.notes.length > 0 ? synergy.notes : undefined}
         commentary={commentaryContent}
         lore={synergy.lore || undefined}
         indexLabel={indexLabel}

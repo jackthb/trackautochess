@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import Link from "next/link";
 import { EntityCard, type EntityCardVariant } from "@/components/EntityCard";
 import { EntityIcon } from "@/components/EntityIcon";
+import { CommentaryByline } from "@/components/PatchCommentary";
 import styles from "./EntityDetail.module.css";
 
 const t = {
@@ -130,6 +131,7 @@ export function EntityDetail({
       ? [{ title: t.overview[variant], body: overview, editAttr: overviewEditAttr }]
       : []
   );
+  const hasNotes = Boolean(notes && notes.length > 0);
 
   return (
     <div className={styles.page}>
@@ -163,24 +165,35 @@ export function EntityDetail({
             <div className={styles.bodyCopy} data-edit-field={s.editAttr}>
               {s.body}
             </div>
+            {/* Official tooltip footnotes (extracted from the VPK) are fine
+                print on the mechanics, so they trail the last overview section
+                rather than standing alone or living under Commentary. */}
+            {hasNotes && i === sections.length - 1 && (
+              <ul className={styles.notes} data-edit-field={notesEditAttr}>
+                {notes!.map((note, j) => (
+                  <li key={j}>{note}</li>
+                ))}
+              </ul>
+            )}
           </section>
         ))}
+
+        {/* No overview section to trail: give the footnotes their own card. */}
+        {hasNotes && sections.length === 0 && (
+          <section className={styles.section}>
+            <ul className={styles.notes} data-edit-field={notesEditAttr}>
+              {notes!.map((note, j) => (
+                <li key={j}>{note}</li>
+              ))}
+            </ul>
+          </section>
+        )}
 
         {commentary && (
           <section className={styles.section}>
             <h2 className={styles.sectionTitle}>{t.commentary}</h2>
+            <CommentaryByline />
             <div className={styles.bodyCopy}>{commentary}</div>
-          </section>
-        )}
-
-        {notes && notes.length > 0 && (
-          <section className={styles.section}>
-            <h2 className={styles.sectionTitle}>{t.notes}</h2>
-            <ul className={styles.notes} data-edit-field={notesEditAttr}>
-              {notes.map((note, i) => (
-                <li key={i}>{note}</li>
-              ))}
-            </ul>
           </section>
         )}
 

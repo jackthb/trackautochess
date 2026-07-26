@@ -38,9 +38,26 @@ export interface DisplayRelic {
   description: string;
   commentary: string;
   lore: string;
+  /** Where the relic is acquired, in English (e.g. "Relic Chest"). Empty when
+   *  the game ships no acquisition line for it. */
+  source: string;
   iconStem: string;
   iconUrl: string;
   iconDimensions: { width: number; height: number } | null;
+}
+
+// Relics have no English flavour lore — the game only ships a Chinese
+// acquisition line (the `来自：…` = "From: …" string in lore_i18n). We surface
+// that as a plain English source fact rather than leaving relic pages blank.
+// Keyed on the Simplified value, which every relic carries.
+const RELIC_SOURCE_EN: Record<string, string> = {
+  "来自：圣物宝箱": "Relic Chest",
+  "来自：放弃圣物选择": "Forgoing a relic choice",
+};
+
+function relicSource(relic: RawRelic): string {
+  const zh = relic.lore_i18n?.["zh-cn"] || relic.lore_i18n?.["zh-tw"] || "";
+  return RELIC_SOURCE_EN[zh] ?? "";
 }
 
 function buildRelicsForLocale(locale: Locale): DisplayRelic[] {
@@ -60,6 +77,7 @@ function buildRelicsForLocale(locale: Locale): DisplayRelic[] {
         description,
         commentary,
         lore,
+        source: relicSource(relic),
         iconStem: stem,
         iconUrl: relic.icon_url || `/icons/relics/${stem}.png`,
         iconDimensions: relic.icon_dimensions ?? null,

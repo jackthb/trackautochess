@@ -8,9 +8,36 @@ import {
 } from "@/lib/patchCommentaryTypes";
 import styles from "./PatchCommentary.module.css";
 
+/**
+ * Attribution byline for editorial commentary. Signals the text is the
+ * author's own analysis, not the official (often machine-translated) notes.
+ * Rendered per-entry inline on the patch detail page, or once at the top of
+ * an entity page's Commentary section.
+ */
+export function CommentaryByline() {
+  return (
+    <div className={styles.label}>
+      TAC Explained
+      <span
+        className={styles.info}
+        tabIndex={0}
+        role="note"
+        aria-label="My own analysis"
+        data-tooltip="My own analysis. The official text is often machine-translated; so the above is my understanding of the change, usually backed via data obtained from the VPK itself."
+      >
+        ⓘ
+      </span>
+    </div>
+  );
+}
+
 interface EntryCommentaryProps {
   commentary?: string;
   evidence?: PatchEvidence[];
+  /** Show the "TAC Explained" byline above the commentary. Off when a
+   *  section-level byline already attributes the whole block (entity pages);
+   *  on for standalone inline entries (patch detail page). */
+  showByline?: boolean;
 }
 
 /**
@@ -21,6 +48,7 @@ interface EntryCommentaryProps {
 export function EntryCommentary({
   commentary,
   evidence,
+  showByline = true,
 }: EntryCommentaryProps) {
   const hasEvidence = Array.isArray(evidence) && evidence.length > 0;
   if (!commentary && !hasEvidence) return null;
@@ -29,18 +57,7 @@ export function EntryCommentary({
     <div className={styles.commentary}>
       {commentary && (
         <>
-          <div className={styles.label}>
-            TAC Explained
-            <span
-              className={styles.info}
-              tabIndex={0}
-              role="note"
-              aria-label="My own analysis of this change"
-              data-tooltip="My own analysis of this change. The official text is often machine-translated; so the above is my understanding of the changed, usually backed via data obtained from the VPK itself."
-            >
-              ⓘ
-            </span>
-          </div>
+          {showByline && <CommentaryByline />}
           <Markdown className={styles.body}>{commentary}</Markdown>
         </>
       )}
@@ -106,7 +123,11 @@ export function EntityCommentaryList({ entries }: EntityCommentaryListProps) {
             {e.date && <span className={styles.date}>{e.date}</span>}
           </div>
           {e.detail && <div className={styles.detail}>{e.detail}</div>}
-          <EntryCommentary commentary={e.commentary} evidence={e.evidence} />
+          <EntryCommentary
+            commentary={e.commentary}
+            evidence={e.evidence}
+            showByline={false}
+          />
         </div>
       ))}
     </div>

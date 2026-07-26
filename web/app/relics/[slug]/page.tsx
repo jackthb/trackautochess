@@ -155,6 +155,7 @@ export default async function RelicDetailPage({ params }: Props) {
         variant="relic"
         name={relic.name}
         iconSrc={relic.iconUrl}
+        tag={relic.source ? { label: relic.source } : undefined}
         bodySections={[
           { title: "Relic Overview", body: <>{baseOverview}</> },
           ...(generatedItemsMarkdown
