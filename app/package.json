@@ -16,13 +16,11 @@
     "build:all": "pnpm run build:backend && pnpm run build:installer"
   },
   "devDependencies": {
-    "@rolldown/binding-linux-x64-gnu": "1.0.0-rc.9",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^6.0.1",
     "electron": "^33.0.0",
     "electron-builder": "^26.8.1",
-    "lightningcss-linux-x64-gnu": "1.32.0",
     "posthog-js": "^1.373.4",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",

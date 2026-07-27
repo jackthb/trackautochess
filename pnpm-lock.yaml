@@ -21,9 +21,6 @@ importers:
         specifier: ^6.8.9
         version: 6.8.9
     devDependencies:
-      '@rolldown/binding-linux-x64-gnu':
-        specifier: 1.0.0-rc.9
-        version: 1.0.0-rc.9
       '@types/react':
         specifier: ^19.2.14
         version: 19.2.17
@@ -39,9 +36,6 @@ importers:
       electron-builder:
         specifier: ^26.8.1
         version: 26.15.2(electron-builder-squirrel-windows@26.15.2)
-      lightningcss-linux-x64-gnu:
-        specifier: 1.32.0
-        version: 1.32.0
       posthog-js:
         specifier: ^1.373.4
         version: 1.384.3
@@ -1969,12 +1963,6 @@ packages:
     os: [linux]
     libc: [glibc]
 
-  '@rolldown/binding-linux-x64-gnu@1.0.0-rc.9':
-    resolution: {integrity: sha512-cVEl1vZtBsBZna3YMjGXNvnYYrOJ7RzuWvZU0ffvJUexWkukMaDuGhUXn0rjnV0ptzGVkvc+vW9Yqy6h8YX4pg==}
-    engines: {node: ^20.19.0 || >=22.12.0}
-    cpu: [x64]
-    os: [linux]
-
   '@rolldown/binding-linux-x64-gnu@1.0.3':
     resolution: {integrity: sha512-B8m6tD5+/N5FeNQFbKlLA/2yVq9ycQP1SeedyEYYKWBNR3ZQbkvIUcNnDNM03lO1l5F2roiiFJGgvoLLyZXtSg==}
     engines: {node: ^20.19.0 || >=22.12.0}
@@ -3376,6 +3364,7 @@ packages:
     engines: {node: '>= 12.0.0'}
     cpu: [x64]
     os: [linux]
+    libc: [glibc]
 
   lightningcss-linux-x64-musl@1.32.0:
     resolution: {integrity: sha512-bYcLp+Vb0awsiXg/80uCRezCYHNg1/l3mt0gzHnWV9XP1W5sKa5/TCdGWaR/zBM2PeF/HbsQv/j2URNOiVuxWg==}
@@ -6550,8 +6539,6 @@ snapshots:
   '@rolldown/binding-linux-s390x-gnu@1.0.3':
     optional: true
 
-  '@rolldown/binding-linux-x64-gnu@1.0.0-rc.9': {}
-
   '@rolldown/binding-linux-x64-gnu@1.0.3':
     optional: true
 
@@ -7971,7 +7958,8 @@ snapshots:
   lightningcss-linux-arm64-musl@1.32.0:
     optional: true
 
-  lightningcss-linux-x64-gnu@1.32.0: {}
+  lightningcss-linux-x64-gnu@1.32.0:
+    optional: true
 
   lightningcss-linux-x64-musl@1.32.0:
     optional: true
