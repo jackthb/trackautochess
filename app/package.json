@@ -19,7 +19,7 @@
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^6.0.1",
-    "electron": "^33.0.0",
+    "electron": "33.4.11",
     "electron-builder": "^26.8.1",
     "posthog-js": "^1.373.4",
     "react": "^19.2.4",

@@ -31,7 +31,7 @@ importers:
         specifier: ^6.0.1
         version: 6.0.2(vite@8.0.16(@types/node@20.19.42)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.22.4)(yaml@2.9.0))
       electron:
-        specifier: ^33.0.0
+        specifier: 33.4.11
         version: 33.4.11
       electron-builder:
         specifier: ^26.8.1

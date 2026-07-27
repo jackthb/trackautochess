@@ -37,19 +37,15 @@ But four places still describe the removed path as current:
 clearest signal here: line 113 was updated at removal time, lines 45 and 16091
 were not.
 
-## 2. `docs/web.md:60` documents a deleted module
+## 2. `docs/web.md:60` documents a deleted module — **resolved 2026-07-27**
 
-> Ad slots are controlled by `web/lib/ads.ts`. Set `NEXT_PUBLIC_ADS_ENABLED=false`
-> to pause every slot, or set the `NEXT_PUBLIC_DIRECT_AD_*` variables to run a
-> first-party sponsor/job placement without third-party ad scripts. Adsterra keys
-> remain optional and unset slots render nothing.
+The analytics section carried a trailing paragraph documenting a module that
+had been deleted, along with the environment variables that configured it.
+None of it existed in the codebase any more.
 
-`web/lib/ads.ts` does not exist, no ad-slot component remains under
-`web/components/`, and none of the referenced environment variables are read
-anywhere in the codebase.
-
-**Correction:** delete the paragraph. The matching dead block in
-`web/.env.example` (lines 49–73) is tracked in the config-drift report.
+Resolved: the paragraph is gone, the section is now just "Analytics", and the
+matching block in `web/.env.example` was removed at the same time. Nothing in
+the repository references that removed feature now.
 
 ## 3. `docs/nettable.md:88` points at a file that was split into a module
 

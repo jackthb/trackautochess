@@ -41,7 +41,7 @@ Both return a one-line `text/plain` response for chat bot commands. For example,
 
 Keystatic is configured in `web/app/keystatic/keystatic.ts` and edits committed JSON content. Local development writes files directly. Production can use GitHub-backed storage when the root README's Keystatic environment variables are configured.
 
-## Analytics and monetization
+## Analytics
 
 The site uses PostHog through privacy-scoped helpers in `web/lib/analytics.ts`. Product events intentionally avoid raw Steam IDs, profile names, search text, tokens, and private admin/dashboard URLs. Set `NEXT_PUBLIC_PRODUCT_ANALYTICS=false` to pause custom product events.
 
@@ -58,5 +58,3 @@ Use a neutral proxy hostname such as `t.trackautochess.com`. Avoid hostnames con
 NEXT_PUBLIC_POSTHOG_API_HOST=https://t.trackautochess.com
 NEXT_PUBLIC_POSTHOG_HOST=https://eu.posthog.com
 ```
-
-Ad slots are controlled by `web/lib/ads.ts`. Set `NEXT_PUBLIC_ADS_ENABLED=false` to pause every slot, or set the `NEXT_PUBLIC_DIRECT_AD_*` variables to run a first-party sponsor/job placement without third-party ad scripts. Adsterra keys remain optional and unset slots render nothing.

@@ -34,6 +34,12 @@ npm run install:desktop:backend
 npm run verify:desktop:backend
 ```
 
+Environment variables are documented in three example files, one per surface:
+`web/.env.example` for the Next.js app, `.env.example` at the repository root
+for the `scripts/` automation (`generate:supabase-types`,
+`import:legacy-mmr-snapshots`), and `ops/cronicle/.env.example` for the Pi
+poller. Copy the ones you need to `.env.local` (`.env` on the Pi).
+
 ## Common commands
 
 ### Desktop app

@@ -1,7 +1,6 @@
 {
   "appId": "com.trackautochess.app",
   "productName": "Track Auto Chess",
-  "electronVersion": "33.4.11",
   "directories": {
     "output": "release"
   },

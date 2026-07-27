@@ -23,8 +23,10 @@ Two direct dependencies account for most of the exposure:
   XSS). A single bump to **>= 16.2.11** clears all 28.
 - **`app` → `electron` 33.4.11** — 17 advisories including a high-severity
   use-after-free. Clearing all of them needs **>= 39.8.5**, i.e. a major-version
-  jump from the pinned `^33.0.0`. Note `app/electron-builder.json` also hard-pins
-  `"electronVersion": "33.4.11"` and must be updated in lockstep.
+  jump from `33.4.11`. (This report originally noted a second pin in
+  `app/electron-builder.json`; that `electronVersion` key was removed on
+  2026-07-27 and `app/package.json` now carries an exact pin, so it is the only
+  place to change.)
 
 The remaining advisories are transitive. By blast radius:
 
@@ -39,7 +41,7 @@ The remaining advisories are transitive. By blast radius:
 ## Suggested order of work
 
 1. `next` → `>= 16.2.11` (clears 28 advisories, incl. `postcss`/`sharp` if their pins move with it).
-2. `electron` → `>= 39.8.5` + matching `electronVersion` in `app/electron-builder.json` (major bump; needs a smoke test of the desktop app).
+2. `electron` → `>= 39.8.5` in `app/package.json` (major bump; needs a smoke test of the desktop app).
 3. `electron-builder` → latest, to pull fixed `tar`/`form-data`/`brace-expansion`/`js-yaml`/`fast-uri`/`undici`.
 4. `posthog-js` → a release carrying `dompurify >= 3.4.12`.
 5. `vite`/`esbuild` refresh — lowest priority.
