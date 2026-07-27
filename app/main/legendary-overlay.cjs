@@ -38,7 +38,12 @@ function createLegendaryOverlay({
   let lastDotaBounds = null;
   let ignoringMove = false;
   let boundAccelerator = null;
-  const finderScript = path.join(__dirname, "find-dota-window-daemon.ps1");
+  // powershell.exe reads from the real filesystem, so it cannot open a script
+  // that only exists inside app.asar. electron-builder's `asarUnpack` writes a
+  // real copy under app.asar.unpacked/ — point at that in packaged builds.
+  const finderScript = path
+    .join(__dirname, "find-dota-window-daemon.ps1")
+    .replace(`${path.sep}app.asar${path.sep}`, `${path.sep}app.asar.unpacked${path.sep}`);
   const EMPTY_PAYLOAD = { revealed: [], unrevealed: [], stateAt: null };
 
   function isAlive() {
@@ -61,6 +66,17 @@ function createLegendaryOverlay({
       ["-NoProfile", "-ExecutionPolicy", "Bypass", "-File", finderScript],
       { windowsHide: true, stdio: ["pipe", "pipe", "pipe"] },
     );
+
+    // A finder that never starts leaves the overlay permanently hidden (no Dota
+    // bounds means no placement), so surface its failures instead of swallowing them.
+    finderProc.on("error", (err) => {
+      console.warn("Legendary overlay: could not start the Dota window finder:", err);
+    });
+    finderProc.stderr.setEncoding("utf8");
+    finderProc.stderr.on("data", (chunk) => {
+      const text = String(chunk).trim();
+      if (text) console.warn(`Legendary overlay finder: ${text}`);
+    });
 
     finderProc.stdout.setEncoding("utf8");
     finderProc.stdout.on("data", (chunk) => {
@@ -99,7 +115,10 @@ function createLegendaryOverlay({
       }
     });
 
-    finderProc.on("exit", () => {
+    finderProc.on("exit", (code) => {
+      if (code) {
+        console.warn(`Legendary overlay: Dota window finder exited with code ${code}`);
+      }
       finderProc = null;
       finderReady = false;
       if (pendingFind) {

@@ -12,6 +12,9 @@
     "preload.js",
     "dist/**/*"
   ],
+  "asarUnpack": [
+    "main/*.ps1"
+  ],
   "extraResources": [
     {
       "from": "backend/dist/headless",
