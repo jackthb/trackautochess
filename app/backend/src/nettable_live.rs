@@ -208,10 +208,18 @@ fn normalize_live_board_piece(
     Some(serde_json::Value::Object(out))
 }
 
+/// Item slots off a board piece (`item` / `lastitem`).
+///
+/// The nettable normally sends a slot-keyed table (`{"1": "item_x"}`), but the
+/// same field has shipped as a plain list and as a single delimited string
+/// depending on the build. Only the table shape used to be read, so any other
+/// shape silently dropped every item off the board. Accept all three.
 fn sorted_string_values(value: Option<&serde_json::Value>) -> Vec<serde_json::Value> {
-    let mut values = value
-        .and_then(serde_json::Value::as_object)
-        .map(|object| {
+    let Some(value) = value else {
+        return Vec::new();
+    };
+    let mut values = match value {
+        serde_json::Value::Object(object) => {
             let mut entries = object
                 .iter()
                 .filter_map(|(key, value)| Some((key.parse::<i64>().ok()?, value.as_str()?)))
@@ -219,12 +227,27 @@ fn sorted_string_values(value: Option<&serde_json::Value>) -> Vec<serde_json::Va
             entries.sort_by_key(|(key, _)| *key);
             entries
                 .into_iter()
-                .map(|(_, value)| serde_json::Value::String(value.to_owned()))
+                .map(|(_, value)| value.to_owned())
                 .collect::<Vec<_>>()
-        })
-        .unwrap_or_default();
+        }
+        serde_json::Value::Array(items) => items
+            .iter()
+            .filter_map(|item| item.as_str().map(str::to_owned))
+            .collect(),
+        serde_json::Value::String(raw) => raw
+            .split([',', '|', ';'])
+            .map(str::trim)
+            .filter(|entry| !entry.is_empty())
+            .map(str::to_owned)
+            .collect(),
+        _ => Vec::new(),
+    };
+    values.retain(|entry| !entry.is_empty());
     values.dedup();
     values
+        .into_iter()
+        .map(serde_json::Value::String)
+        .collect()
 }
 
 fn parse_pandaren_drops(value: Option<&serde_json::Value>) -> Option<serde_json::Value> {
@@ -256,4 +279,57 @@ fn parse_pandaren_drops(value: Option<&serde_json::Value>) -> Option<serde_json:
             .unwrap_or(0)
     });
     (!drops.is_empty()).then(|| serde_json::Value::Array(drops))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use serde_json::json;
+
+    fn strings(value: serde_json::Value) -> Vec<String> {
+        sorted_string_values(Some(&value))
+            .into_iter()
+            .map(|entry| entry.as_str().unwrap_or_default().to_owned())
+            .collect()
+    }
+
+    #[test]
+    fn reads_items_from_every_shape_the_nettable_uses() {
+        // Slot-keyed table: ordered by slot, not by hash order.
+        assert_eq!(
+            strings(json!({ "2": "item_b", "1": "item_a" })),
+            vec!["item_a", "item_b"]
+        );
+        // Plain list.
+        assert_eq!(
+            strings(json!(["item_a", "item_b"])),
+            vec!["item_a", "item_b"]
+        );
+        // Single delimited string.
+        assert_eq!(
+            strings(json!("item_a|item_b")),
+            vec!["item_a", "item_b"]
+        );
+        assert_eq!(strings(json!("item_a")), vec!["item_a"]);
+        // Empty entries never become items.
+        assert!(strings(json!("")).is_empty());
+        assert!(strings(json!({})).is_empty());
+        assert!(strings(json!(0)).is_empty());
+    }
+
+    #[test]
+    fn board_piece_keeps_its_items() {
+        let piece = json!({
+            "chess": "chess_dk",
+            "x": 4,
+            "y": 3,
+            "item": "item_gulonghaojiao",
+        });
+        let normalized = normalize_live_board_piece("3_4", &piece).expect("piece");
+        assert_eq!(
+            normalized["items"],
+            json!(["item_gulonghaojiao"]),
+            "a Minotaur Horn carrier must keep the item that makes it a Dragon"
+        );
+    }
 }

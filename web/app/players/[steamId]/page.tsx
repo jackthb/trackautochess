@@ -116,9 +116,15 @@ const loadPlayer = cache(async (rawSteamId: string): Promise<LoadResult> => {
             profileResult.data.drodo_last_fetched_at,
             drodoProfileMissing
           );
+      // Any cached rank material is enough to render. Gating on
+      // drodo_last_fetched_at/drodo_mmr alone hid the rank of every row whose
+      // only Drodo data is a level or a Queen-ladder placement — which, with
+      // numeric MMR gone, is most of them.
       if (
         (profileResult.data.drodo_last_fetched_at ||
-          profileResult.data.drodo_mmr != null) &&
+          profileResult.data.drodo_mmr != null ||
+          profileResult.data.drodo_mmr_level != null ||
+          profileResult.data.queen_ladder_rank != null) &&
         !drodoProfileMissing
       ) {
         drodo = drodoStatsFromCachedRow(profileResult.data);
@@ -130,8 +136,7 @@ const loadPlayer = cache(async (rawSteamId: string): Promise<LoadResult> => {
     // When cached stats exist, serve them immediately even if stale —
     // PlayerView refreshes from Drodo in the background with a loading state
     // (via GET /api/drodo, which re-checks freshness server-side). Only block
-    // the render when there is nothing cached to show. Live Drodo fetch is
-    // currently parked (no public season MMR).
+    // the render when there is nothing cached to show.
     if (DRODO_LIVE_FETCH_ENABLED && shouldRefreshDrodo && !drodo) {
       const initialDrodo = await readThroughDrodoProfile({
         steamId,

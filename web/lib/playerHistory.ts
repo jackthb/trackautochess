@@ -1,12 +1,11 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { PlayerGame, UnitFullInfo } from "@dac/shared/types";
-import { mmrLevelToRank, parseSynergies } from "@dac/shared/game-utils";
+import { mmrLevelToRank } from "@dac/shared/game-utils";
 import {
   buildChessCodeUnitLookup,
   resolveChessLineup,
 } from "@dac/shared/game-structure";
 import { unitsFullData } from "@/generated/content-data";
-import { computeSynergies } from "@/lib/units";
 import { duplicateMatchTimeBucket } from "@/lib/matches";
 
 // Player match-history loading/shaping for the player profile page: fetch
@@ -59,12 +58,6 @@ function serializeResolvedLineup(lineup: { name: string; stars: number }[]): str
     .join("|");
 }
 
-function serializeComputedSynergies(
-  synergies: { name: string; count: number }[]
-): string {
-  return synergies.map((synergy) => `${synergy.name}:${synergy.count}`).join("|");
-}
-
 /** Fetch the raw recent match_players rows for one player. */
 export async function fetchPlayerHistoryRows(
   supabase: SupabaseClient,
@@ -89,14 +82,6 @@ export function playerHistoryToGames(rows: HistoryRow[]): PlayerGame[] {
     const lineup = resolvedLineup.length
       ? serializeResolvedLineup(resolvedLineup)
       : (row.chess_lineup as string | null);
-    const synergies = resolvedLineup.length
-      ? serializeComputedSynergies(
-          computeSynergies(
-            resolvedLineup,
-            parseSynergies(row.synergies as string | null)
-          )
-        )
-      : (row.synergies as string | null);
     return {
       ...row,
       user_id: String(row.steam_id),
@@ -104,7 +89,11 @@ export function playerHistoryToGames(rows: HistoryRow[]): PlayerGame[] {
       played_at: (row.played_at as string) ?? "",
       created_at: (row.created_at as string) ?? "",
       lineup,
-      synergies,
+      // `synergies` stays the raw in-game `buff` capture. GameRowDisplay
+      // derives the badges from the lineup and uses this only as a bounded
+      // floor — pre-computing here would erase the one record of a
+      // Ringmaster class roll before the row ever reaches the UI.
+      synergies: row.synergies as string | null,
       level: row.hero_level ? String(row.hero_level) : null,
       rank:
         typeof row.mmr_level === "number"

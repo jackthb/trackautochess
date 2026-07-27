@@ -40,7 +40,10 @@ interface TooltipWrapProps {
   type: "unit" | "synergy" | "relic";
   name: string;
   stars?: number;
+  /** For synergies: the activated tier (what the badge shows). */
   count?: number;
+  /** For synergies: bodies on board, when it differs from the tier. */
+  pieceCount?: number;
   relicIndex?: number;
   data: TooltipData;
 }
@@ -53,6 +56,7 @@ export function TooltipWrap({
   name,
   stars = 1,
   count = 0,
+  pieceCount,
   relicIndex,
   data,
 }: TooltipWrapProps) {
@@ -86,7 +90,7 @@ export function TooltipWrap({
     setVisible(false);
   }, []);
 
-  const content = buildContent(type, name, stars, count, relicIndex, data);
+  const content = buildContent(type, name, stars, count, pieceCount, relicIndex, data);
   if (!content) {
     return <>{children}</>;
   }
@@ -157,6 +161,7 @@ function buildContent(
   name: string,
   stars: number,
   count: number,
+  pieceCount: number | undefined,
   relicIndex: number | undefined,
   data: TooltipData
 ): ReactNode {
@@ -223,7 +228,13 @@ function buildContent(
           />
           <div>
             <div className="tooltip-name">{info.name || name}</div>
-            <div className="tooltip-sub">{count} units</div>
+            <div className="tooltip-sub">
+              {/* `count` is the activated tier. When Wizards discount the
+                  requirement it outruns the bodies on board, so show both. */}
+              {pieceCount != null && pieceCount !== count
+                ? `${pieceCount} units · (${count}) active`
+                : `${count} units`}
+            </div>
           </div>
         </div>
         {info.tiers && info.tiers.length > 0 && (

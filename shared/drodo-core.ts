@@ -156,7 +156,12 @@ function buildDrodoProfileValue(steamId: string, drodoData: Record<string, unkno
   return { profile, seasonRows: extractAllSeasonsValue(steamId, drodoData, season) };
 }
 
-type DrodoStatsLike = Partial<Pick<DrodoProfileRow, "mmr" | "max_mmr" | "season_games" | "chicken_count">>;
+type DrodoStatsLike = Partial<
+  Pick<
+    DrodoProfileRow,
+    "mmr" | "max_mmr" | "mmr_level" | "queen_rank" | "season_games" | "chicken_count"
+  >
+>;
 
 function numericField(record: object | null | undefined, key: string): number | null {
   if (!record || !(key in record)) return null;
@@ -176,6 +181,16 @@ function hasDrodoStatsValue(profile: DrodoStatsLike | null | undefined, seasonRo
     hasPositiveNumericField(profile, "max_mmr") ||
     hasPositiveNumericField(profile, "season_games") ||
     hasPositiveNumericField(profile, "chicken_count")
+  ) {
+    return true;
+  }
+  // Rank-only payloads: the public courier stopped returning season MMR but
+  // still returns mmr_level, and the ladder still returns queen rank. A
+  // profile with either is a real Auto Chess profile — marking it "missing"
+  // would blank the very rank the page is now built around.
+  if (
+    hasPositiveNumericField(profile, "mmr_level") ||
+    hasPositiveNumericField(profile, "queen_rank")
   ) {
     return true;
   }
@@ -236,6 +251,7 @@ function pollSnapshotFromRowValue(row: PollSnapshotRow): PollSnapshot {
   return {
     drodo_mmr: row.drodo_mmr,
     drodo_max_mmr: row.drodo_max_mmr ?? null,
+    drodo_mmr_level: row.drodo_mmr_level ?? null,
     drodo_season: row.drodo_season ?? null,
     drodo_season_games: row.drodo_season_games,
     drodo_chicken_count: row.drodo_chicken_count,
@@ -249,9 +265,10 @@ function pollSnapshotFromRowValue(row: PollSnapshotRow): PollSnapshot {
 }
 
 /**
- * Drodo's public courier payload intermittently omits season MMR / queen_rank.
- * When a field is absent on the fresh payload, keep the previously cached value
- * so a refresh cannot wipe a good profile down to null.
+ * Drodo's public courier payload intermittently omits season MMR / mmr_level /
+ * queen_rank. When a field is absent on the fresh payload, keep the previously
+ * cached value so a refresh cannot wipe a good profile down to null — mmr_level
+ * especially, since rank is derived from it.
  */
 function preserveOmittedDrodoFieldsValue(
   prev: DrodoProfileRow | PollSnapshot | null | undefined,
@@ -266,6 +283,7 @@ function preserveOmittedDrodoFieldsValue(
     "drodo_season_games",
     "season_games"
   );
+  const prevMmrLevel = profileMetricValue(prev, "drodo_mmr_level", "mmr_level");
   const prevQueenRank = profileMetricValue(prev, "queen_rank", "queen_rank");
   const prevSeason =
     "drodo_season" in prev
@@ -276,6 +294,7 @@ function preserveOmittedDrodoFieldsValue(
     ...next,
     mmr: next.mmr ?? prevMmr,
     max_mmr: next.max_mmr ?? prevMaxMmr,
+    mmr_level: next.mmr_level ?? prevMmrLevel,
     season: next.season ?? prevSeason,
     season_games: next.season_games ?? prevSeasonGames,
     queen_rank: next.queen_rank ?? prevQueenRank,
@@ -495,6 +514,7 @@ export interface PollSchedule {
 export interface PollSnapshot {
   drodo_mmr: number | null;
   drodo_max_mmr: number | null;
+  drodo_mmr_level: number | null;
   drodo_season: string | null;
   drodo_season_games: number | null;
   drodo_chicken_count: number | null;
@@ -507,6 +527,7 @@ export interface PollSnapshotRow extends Omit<PollSnapshot, "queen_rank"> {
   steam_id?: string;
   drodo_mmr: number | null;
   drodo_max_mmr: number | null;
+  drodo_mmr_level: number | null;
   drodo_season: string | null;
   drodo_season_games: number | null;
   drodo_chicken_count: number | null;

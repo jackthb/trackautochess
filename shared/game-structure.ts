@@ -62,8 +62,17 @@ export function firstSynergyTier(
 export function isSynergyActive(
   synergy: { name: string; count: number },
   synergyMinCount: Record<string, number>,
+  wizardDiscount = 0,
+  synergyTiers?: Record<string, number[]>,
 ): boolean {
-  return synergy.count >= (synergyMinCount[synergy.name] ?? 2);
+  const tiers = synergyTiers?.[synergy.name];
+  if (tiers && tiers.length > 0) {
+    return activeSynergyTier(synergy.count, tiers, wizardDiscount) > 0;
+  }
+  const minCount = synergyMinCount[synergy.name] ?? 2;
+  const required =
+    minCount >= WIZARD_DISCOUNT_MIN_TIER ? minCount - wizardDiscount : minCount;
+  return synergy.count >= required;
 }
 
 export function buildSynergyMinCountByName(
@@ -78,11 +87,66 @@ export function buildSynergyMinCountByName(
   return map;
 }
 
+/** Synergy display name → ascending tier thresholds (Beast → [2, 4, 6]). */
+export function buildSynergyTiersByName(
+  synergiesData: Record<string, SynergyInfo>,
+): Record<string, number[]> {
+  const map: Record<string, number[]> = {};
+  for (const data of Object.values(synergiesData)) {
+    if (data?.name && Array.isArray(data.tiers) && data.tiers.length > 0) {
+      map[data.name] = data.tiers;
+    }
+  }
+  return map;
+}
+
+export const WIZARD_SYNERGY_NAME = "Wizard";
+/** Wizard pieces needed before the threshold discount applies. */
+export const WIZARD_DISCOUNT_MIN_PIECES = 2;
+/** Only thresholds this large or larger are discounted. */
+export const WIZARD_DISCOUNT_MIN_TIER = 4;
+
+/**
+ * Wizard's class perk ("Something from Nothing"): with (2) different Wizard
+ * pieces on board, every race/class tier that needs (4) or more pieces
+ * activates one piece early. Eight Mages therefore activate the 9-Mage tier.
+ *
+ * The (4) Wizard half of the perk — unlocking every layer of a triggered
+ * non-Wizard skill — is a combat-time effect on the skill itself, not on tier
+ * activation, so it does not change the tier shown here.
+ */
+export function wizardTierDiscount(wizardCount: number): number {
+  return wizardCount >= WIZARD_DISCOUNT_MIN_PIECES ? 1 : 0;
+}
+
+/**
+ * The tier a fielded count has activated — the highest threshold it meets,
+ * after the Wizard discount. Returns the nominal tier (9), not the discounted
+ * requirement (8), because that is the bonus actually in play. 0 = inactive.
+ */
+export function activeSynergyTier(
+  count: number,
+  tiers: number[] | undefined,
+  discount = 0,
+): number {
+  if (!tiers || tiers.length === 0) return count;
+  let active = 0;
+  for (const tier of tiers) {
+    const required = tier >= WIZARD_DISCOUNT_MIN_TIER ? tier - discount : tier;
+    if (count >= required) active = tier;
+  }
+  return active;
+}
+
 export function filterActiveSynergiesWithThresholds<T extends { name: string; count: number }>(
   synergies: T[],
   synergyMinCount: Record<string, number>,
+  wizardDiscount = 0,
+  synergyTiers?: Record<string, number[]>,
 ): T[] {
-  return synergies.filter((synergy) => isSynergyActive(synergy, synergyMinCount));
+  return synergies.filter((synergy) =>
+    isSynergyActive(synergy, synergyMinCount, wizardDiscount, synergyTiers),
+  );
 }
 
 /**
@@ -143,14 +207,25 @@ export interface ComputeLineupSynergiesOptions {
   unitSynergies: Record<string, string[]>;
   /** Synergy display name → first active tier (buildSynergyMinCountByName). */
   synergyMinCount: Record<string, number>;
+  /** Synergy display name → every tier (buildSynergyTiersByName). Needed to
+   *  report the activated tier; without it `tier` falls back to the count. */
+  synergyTiers?: Record<string, number[]>;
   /** Item id/display name → synergy the carrier counts as (counts_as_synergy
-   *  links: Spider Leg → Aqir, Kobold Cup → Kobold). */
+   *  links: Spider Leg → Aqir, Minotaur Horn → Dragon). */
   itemCountsAsSynergy?: Record<string, string>;
-  /** Synergy counts captured from the game (`buff`). Only consulted for
-   *  item-linkable synergies — items can raise a count above the species
-   *  count, and rows without board-item data can't see that any other way.
-   *  Don't pass this when `pieces` carry real item data. */
+  /** Synergy counts captured from the game (`buff`). Used as a bounded floor:
+   *  items can raise a count above the species count, and pieces whose traits
+   *  are not in content — Ringmaster rolls 3 random classes per match — are
+   *  invisible to the static lookup. Safe to pass alongside board items. */
   storedSynergies?: { name: string; count: number }[];
+}
+
+export interface LineupSynergy {
+  name: string;
+  /** Pieces contributing: unique bodies plus counts-as item carriers. */
+  count: number;
+  /** Nominal tier those pieces have activated, Wizard discount included. */
+  tier: number;
 }
 
 /**
@@ -160,14 +235,23 @@ export interface ComputeLineupSynergiesOptions {
  * never add to a count — plus item carriers for counts_as_synergy items.
  * This is the single source of truth for synergy badges; the game's raw
  * `buff` capture is unreliable (often stale from an earlier round, and full
- * of inactive one-piece entries), so it must never be displayed directly.
- * Returns active synergies only, sorted by count descending.
+ * of inactive one-piece entries), so it is only ever used as a bounded floor
+ * (see `storedSynergies`), never displayed directly.
+ *
+ * Returns active synergies only — each with the piece count and the tier that
+ * count activates — sorted by tier descending.
  */
 export function computeLineupSynergies(
   pieces: SynergyCountPiece[],
   options: ComputeLineupSynergiesOptions,
-): { name: string; count: number }[] {
-  const { unitSynergies, synergyMinCount, itemCountsAsSynergy, storedSynergies } = options;
+): LineupSynergy[] {
+  const {
+    unitSynergies,
+    synergyMinCount,
+    synergyTiers,
+    itemCountsAsSynergy,
+    storedSynergies,
+  } = options;
 
   // Species contributing to each synergy; a species counts at most once per
   // synergy whether via its own traits or a counts_as item.
@@ -181,9 +265,16 @@ export function computeLineupSynergies(
     set.add(species);
   };
 
+  // Pieces content cannot resolve traits for: Ringmaster (no race, 3 random
+  // classes rerolled every match) and any unit newer than the local content
+  // snapshot. Each can be worth at most one body in any single synergy, which
+  // is what bounds the stored-count floor below.
+  let unresolvedPieces = 0;
   for (const piece of pieces) {
     if (!piece.name) continue;
-    for (const synergy of unitSynergies[piece.name] ?? []) {
+    const traits = unitSynergies[piece.name];
+    if (!traits || traits.length === 0) unresolvedPieces += 1;
+    for (const synergy of traits ?? []) {
       add(synergy, piece.name);
     }
     if (itemCountsAsSynergy) {
@@ -199,15 +290,27 @@ export function computeLineupSynergies(
     counts.set(synergy, species.size);
   }
 
-  if (storedSynergies && itemCountsAsSynergy) {
-    const itemLinkable = new Set(Object.values(itemCountsAsSynergy));
+  // The game's own count can legitimately exceed what the pieces show: a
+  // counts-as item on a row with no per-piece item data, or a Ringmaster class
+  // roll. Let it raise a synergy the board already has, but never by more than
+  // those two sources could account for — that keeps a stale `buff` from
+  // inventing bodies the player no longer fields.
+  if (storedSynergies) {
+    const itemLinkable = new Set(Object.values(itemCountsAsSynergy ?? {}));
     for (const stored of storedSynergies) {
-      if (!itemLinkable.has(stored.name)) continue;
-      if (stored.count > (counts.get(stored.name) ?? 0)) {
-        counts.set(stored.name, stored.count);
-      }
+      const derived = counts.get(stored.name);
+      if (derived == null) continue;
+      const headroom = itemLinkable.has(stored.name)
+        ? pieces.length
+        : unresolvedPieces;
+      const raised = Math.min(stored.count, derived + headroom);
+      if (raised > derived) counts.set(stored.name, raised);
     }
   }
+
+  const wizardDiscount = wizardTierDiscount(
+    counts.get(WIZARD_SYNERGY_NAME) ?? 0,
+  );
 
   return filterActiveSynergiesWithThresholds(
     [...counts.entries()].map(([name, count]) => ({
@@ -215,7 +318,15 @@ export function computeLineupSynergies(
       count: normalizeDisplaySynergyCount(name, count),
     })),
     synergyMinCount,
-  ).sort((a, b) => b.count - a.count);
+    wizardDiscount,
+    synergyTiers,
+  )
+    .map(({ name, count }) => ({
+      name,
+      count,
+      tier: activeSynergyTier(count, synergyTiers?.[name], wizardDiscount),
+    }))
+    .sort((a, b) => b.tier - a.tier || b.count - a.count || a.name.localeCompare(b.name));
 }
 
 interface ItemLinkEntry {

@@ -3,7 +3,7 @@ import { imageToDataUrl, renderOgImage } from "@/lib/og";
 import { createSupabaseServerClient } from "@/lib/supabase";
 import { readFile } from "node:fs/promises";
 import path from "node:path";
-import { mmrToRank } from "@dac/shared/game-utils";
+import { mmrLevelToRank, mmrToRank } from "@dac/shared/game-utils";
 import {
   fetchSteamProfile,
   parseSteamInput,
@@ -31,6 +31,7 @@ interface CachedDrodoOgRow {
   steam_id: string;
   drodo_mmr: number | null;
   drodo_max_mmr: number | null;
+  drodo_mmr_level: number | null;
   drodo_season: string | null;
   drodo_season_games: number | null;
   drodo_candy: number | null;
@@ -49,6 +50,7 @@ const OG_USER_DRODO_SELECT = [
   "steam_id::text",
   "drodo_mmr",
   "drodo_max_mmr",
+  "drodo_mmr_level",
   "drodo_season",
   "drodo_season_games",
   "drodo_candy",
@@ -269,9 +271,15 @@ async function ogHandler(req: Request, ctx: { params: Promise<{ steamId: string 
     (season) =>
       season.mmr != null || season.max_mmr != null || season.games_played != null
   );
-  const hasCurrentStats = drodo?.mmr != null;
-  const primaryMmr = hasCurrentStats ? drodo?.mmr : latestRecordedSeason?.mmr;
-  const rank = primaryMmr != null ? mmrToRank(primaryMmr) || "Unranked" : "No Data";
+  // Rank comes from mmr_level when there is no numeric MMR to derive it from
+  // — with season MMR unpublished that is the normal case, and falling
+  // straight through to "No Data" made every card look like an empty profile.
+  const currentRank = mmrLevelToRank(cachedDrodo?.drodo_mmr_level) || null;
+  const hasCurrentStats = drodo?.mmr != null || currentRank != null;
+  const primaryMmr = drodo?.mmr != null ? drodo.mmr : latestRecordedSeason?.mmr;
+  const rank =
+    currentRank ||
+    (primaryMmr != null ? mmrToRank(primaryMmr) || "Unranked" : "No Data");
   const season = hasCurrentStats
     ? drodo?.season?.toUpperCase() || "CURRENT"
     : latestRecordedSeason?.season.toUpperCase() || "CURRENT";

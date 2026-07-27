@@ -46,6 +46,7 @@ export interface PollSchedule {
 export interface PollSnapshot {
     drodo_mmr: number | null;
     drodo_max_mmr: number | null;
+    drodo_mmr_level: number | null;
     drodo_season: string | null;
     drodo_season_games: number | null;
     drodo_chicken_count: number | null;
@@ -57,6 +58,7 @@ export interface PollSnapshotRow extends Omit<PollSnapshot, "queen_rank"> {
     steam_id?: string;
     drodo_mmr: number | null;
     drodo_max_mmr: number | null;
+    drodo_mmr_level: number | null;
     drodo_season: string | null;
     drodo_season_games: number | null;
     drodo_chicken_count: number | null;

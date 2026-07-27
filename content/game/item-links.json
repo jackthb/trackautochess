@@ -15,6 +15,27 @@
       "description": "Carrier also counts as Aqir and can participate in friendly Infection spawning."
     },
     {
+      "item": "Minotaur Horn",
+      "synergy": "Dragon",
+      "category": "counts_as_synergy",
+      "label": "Counts as Dragon",
+      "description": "Carrier counts as Dragon and starts each round with 100 mana."
+    },
+    {
+      "item": "Ogre Hood",
+      "synergy": "Ogre",
+      "category": "counts_as_synergy",
+      "label": "Counts as Ogre",
+      "description": "Carrier also counts as Ogre on top of the hood's HP, magic resistance, and level bonus."
+    },
+    {
+      "item": "Satanic",
+      "synergy": "Faceless",
+      "category": "counts_as_synergy",
+      "label": "Counts as Faceless",
+      "description": "Carrier counts as Faceless alongside the item's HP and lifesteal."
+    },
+    {
       "item": "Heart of the Machine",
       "synergy": "Mech",
       "category": "synergy_reward",

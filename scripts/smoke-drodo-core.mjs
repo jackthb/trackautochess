@@ -10,6 +10,7 @@ import {
   EMPTY_DRODO_PROFILE_ERROR,
   fetchDrodoProfileBatch,
   normalizeDrodoSteamIds,
+  preserveOmittedDrodoFields,
   POLL_ACTIVE_INTERVAL_SECONDS,
   POLL_INACTIVE_INTERVAL_SECONDS,
   QUEENS_REFRESH_COOLDOWN_MS,
@@ -104,6 +105,40 @@ assert.equal(
     []
   ),
   false
+);
+
+// Rank-only payloads are real profiles. The courier stopped returning season
+// MMR; if these counted as "missing" every refreshed profile would blank out.
+assert.equal(
+  hasDrodoStats(
+    { mmr: null, max_mmr: null, mmr_level: 32, season_games: null, chicken_count: 0 },
+    []
+  ),
+  true
+);
+assert.equal(
+  hasDrodoStats(
+    { mmr: null, max_mmr: null, queen_rank: 14, season_games: null, chicken_count: 0 },
+    []
+  ),
+  true
+);
+
+// A payload that omits mmr_level must not wipe the cached rank.
+assert.equal(
+  preserveOmittedDrodoFields(
+    { drodo_mmr: 3200, drodo_mmr_level: 33, drodo_season: "s21" },
+    { mmr: null, max_mmr: null, mmr_level: null, season: null, season_games: null, queen_rank: null }
+  ).mmr_level,
+  33
+);
+assert.equal(
+  preserveOmittedDrodoFields(
+    { drodo_mmr_level: 33 },
+    { mmr_level: 34, mmr: null, max_mmr: null, season: null, season_games: null, queen_rank: null }
+  ).mmr_level,
+  34,
+  "a fresh mmr_level always wins over the cached one"
 );
 
 const persisted = [];

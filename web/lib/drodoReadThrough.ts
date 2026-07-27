@@ -183,8 +183,8 @@ export async function readThroughDrodoProfile({
   cachedRow,
   onQueenChange,
 }: ReadThroughDrodoProfileOptions): Promise<ReadThroughDrodoProfileResult> {
-  // Drodo no longer returns numeric season MMR on the public courier API.
-  // Serve cache only — never hit upstream for live profile refreshes.
+  // Kill switch for the live courier call: flip DRODO_LIVE_FETCH_ENABLED off
+  // and every read-through degrades to cache instead of failing.
   if (!DRODO_LIVE_FETCH_ENABLED) {
     if (!supabase) {
       return {

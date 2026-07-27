@@ -8,7 +8,7 @@ import {
   synergiesData as synergiesJson,
   unitsFullData,
 } from "@/generated/content-data";
-import { ITEM_SYNERGIES, UNIT_COSTS } from "@/lib/units";
+import { ITEM_SYNERGIES, UNIT_COSTS, UNIT_SYNERGIES } from "@/lib/units";
 import { resolveIconUrl } from "@/lib/icons";
 import { getRelicsMap } from "@/lib/relics";
 import styles from "./MatchHistoryList.module.css";
@@ -73,6 +73,7 @@ export function MatchHistoryList({
                 synergiesData={synergiesData}
                 relicsData={relicsData}
                 itemSynergies={ITEM_SYNERGIES as Record<string, string>}
+                unitSynergies={UNIT_SYNERGIES as Record<string, string[]>}
                 iconUrl={resolveIconUrl}
                 shareUrl={href}
                 dateExtra={dateExtra ? <div className={styles.dateExtra}>{dateExtra}</div> : undefined}

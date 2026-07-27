@@ -33,6 +33,7 @@ import {
 } from "@/lib/drodo";
 import {
   DRODO_LIVE_FETCH_ENABLED,
+  DRODO_MMR_ENABLED,
   DRODO_OUTAGE_NOTICE,
 } from "@/lib/drodoLive";
 import { drodoStatsFromProfile } from "@/components/player/playerData";
@@ -361,7 +362,7 @@ export default function PlayerView({
           ? {
               ...drodo,
               total_chicken_count: totalChickenCount,
-              rankOnly: !DRODO_LIVE_FETCH_ENABLED,
+              rankOnly: !DRODO_MMR_ENABLED,
             }
           : null
       ),
@@ -438,8 +439,9 @@ export default function PlayerView({
     return () => clearInterval(timer);
   }, []);
 
-  // Stale-while-revalidate for profile stats: parked while Drodo live fetch is
-  // off (public courier no longer returns season MMR).
+  // Stale-while-revalidate for profile stats. In rank-only mode this is what
+  // keeps a rank current on a page hit: cached stats render immediately, then
+  // a background /api/drodo call refreshes mmr_level and queen rank.
   const autoRefreshTriggered = useRef(false);
   useEffect(() => {
     if (!DRODO_LIVE_FETCH_ENABLED) return;
@@ -712,7 +714,7 @@ export default function PlayerView({
   return (
     <div className={styles.page}>
       <div className={styles.dashboard}>
-          {!DRODO_LIVE_FETCH_ENABLED && (
+          {!DRODO_MMR_ENABLED && (
             <div className={styles.outageNotice} role="status">
               {DRODO_OUTAGE_NOTICE}
             </div>
@@ -720,7 +722,7 @@ export default function PlayerView({
           {(drodo?.mmr_level != null || drodo?.mmr != null) && (
             <div className={styles.rankLadder}>
               <RankLadder
-                mmr={DRODO_LIVE_FETCH_ENABLED ? drodo.mmr : null}
+                mmr={DRODO_MMR_ENABLED ? drodo.mmr : null}
                 mmrLevel={drodo.mmr_level}
                 queenRank={drodo.queen_rank}
               />

@@ -6,7 +6,7 @@ import {
   recentSignInCutoff,
 } from "@dac/shared/drodo-core";
 import { fetchAndCacheDrodoBatch } from "@/lib/drodo";
-import { DRODO_LIVE_FETCH_ENABLED } from "@/lib/drodoLive";
+import { DRODO_BACKGROUND_POLL_ENABLED } from "@/lib/drodoLive";
 import { revalidateQueenPages } from "@/lib/queensRevalidate";
 import { createSupabaseServiceRoleClient } from "@/lib/supabase";
 
@@ -45,11 +45,11 @@ async function handle(req: Request) {
     return Response.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  if (!DRODO_LIVE_FETCH_ENABLED) {
+  if (!DRODO_BACKGROUND_POLL_ENABLED) {
     return Response.json({
       disabled: true,
       reason:
-        "Drodo live fetch is parked — public courier no longer returns season MMR.",
+        "Scheduled Drodo polling is parked — ranks refresh on page hits instead.",
       polled: 0,
       repolled: 0,
       seeded: 0,

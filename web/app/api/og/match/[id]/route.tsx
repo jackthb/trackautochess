@@ -18,8 +18,8 @@ import {
   buildChessCodeUnitLookup,
   resolveChessLineup,
 } from "@dac/shared/game-structure";
-import { synergiesData, unitsFullData } from "@/generated/content-data";
-import type { SynergyInfo, UnitFullInfo } from "@dac/shared/types";
+import { unitsFullData } from "@/generated/content-data";
+import type { UnitFullInfo } from "@dac/shared/types";
 import { fetchSteamProfile } from "@/lib/steam";
 import { parseSteamId64 } from "@dac/shared/steam";
 import { UNIT_COSTS, computeSynergies } from "@/lib/units";
@@ -37,12 +37,6 @@ const STAR_ICON_DATA_URL =
 const CHESS_CODE_UNITS = buildChessCodeUnitLookup(
   unitsFullData as Record<string, UnitFullInfo>
 );
-const SYNERGY_MAX_TIER_BY_NAME = Object.fromEntries(
-  Object.values(synergiesData as Record<string, SynergyInfo>)
-    .filter((synergy) => synergy.name && Array.isArray(synergy.tiers) && synergy.tiers.length > 0)
-    .map((synergy) => [synergy.name, Math.max(...synergy.tiers!)])
-);
-
 type LineupUnit = ReturnType<typeof parseLineup>[number];
 type SynergyBadge = ReturnType<typeof parseSynergies>[number];
 
@@ -124,18 +118,12 @@ function rowLineup(row: Pick<MatchPlayerRow, "chess_lineup">): LineupUnit[] {
   return resolved.length > 0 ? resolved : parseLineup(row.chess_lineup, UNIT_COSTS);
 }
 
-function capSynergyCounts(synergies: SynergyBadge[]): SynergyBadge[] {
-  return synergies.map((synergy) => ({
-    ...synergy,
-    count: Math.min(synergy.count, SYNERGY_MAX_TIER_BY_NAME[synergy.name] ?? synergy.count),
-  }));
-}
-
 function rowSynergies(row: Pick<MatchPlayerRow, "chess_lineup" | "synergies">): SynergyBadge[] {
-  // Derive from the lineup (unique species); the stored string only tops up
-  // item-linkable synergies (Spider Leg → Aqir) — see computeSynergies.
-  return capSynergyCounts(
-    computeSynergies(rowLineup(row), parseSynergies(row.synergies))
+  // Derive from the lineup (unique species), with the stored string as a
+  // bounded floor — see computeSynergies. The badge shows the activated tier,
+  // matching the match page and the profile match list.
+  return computeSynergies(rowLineup(row), parseSynergies(row.synergies)).map(
+    (synergy) => ({ name: synergy.name, count: synergy.tier })
   );
 }
 

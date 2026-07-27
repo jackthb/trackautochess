@@ -9,7 +9,7 @@ import {
   type DrodoProfileRow,
   type UserDrodoStatsRow,
 } from "@/lib/drodo";
-import { DRODO_LIVE_FETCH_ENABLED } from "@/lib/drodoLive";
+import { DRODO_MMR_ENABLED } from "@/lib/drodoLive";
 import {
   parseSteamInput,
   playerProfilePath,
@@ -136,13 +136,13 @@ export function buildPlayerSeo(props: Omit<PlayerPageProps, "route">): {
   const profileUrl = steamProfileUrl(steamId, steamProfile.customUrl);
   const title = `${displayName} | ${SITE_TITLE}`;
   const rankLabel =
-    (DRODO_LIVE_FETCH_ENABLED && drodo?.mmr != null
+    (DRODO_MMR_ENABLED && drodo?.mmr != null
       ? mmrToRank(drodo.mmr)
       : null) ||
     mmrLevelToRank(drodo?.mmr_level) ||
     null;
   const description =
-    DRODO_LIVE_FETCH_ENABLED && drodo?.mmr
+    DRODO_MMR_ENABLED && drodo?.mmr
       ? `${displayName} is ${mmrToRank(drodo.mmr)} at ${drodo.mmr.toLocaleString("en-US")} MMR.`
       : rankLabel
         ? `${displayName} is ${rankLabel}. Live MMR is currently unavailable.`

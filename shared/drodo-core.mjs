@@ -161,6 +161,10 @@ function hasDrodoStatsValue(profile, seasonRows = []) {
         hasPositiveNumericField(profile, "chicken_count")) {
         return true;
     }
+    if (hasPositiveNumericField(profile, "mmr_level") ||
+        hasPositiveNumericField(profile, "queen_rank")) {
+        return true;
+    }
     if (seasonRows.length > 0)
         return true;
     return false;
@@ -214,6 +218,7 @@ function pollSnapshotFromRowValue(row) {
     return {
         drodo_mmr: row.drodo_mmr,
         drodo_max_mmr: row.drodo_max_mmr ?? null,
+        drodo_mmr_level: row.drodo_mmr_level ?? null,
         drodo_season: row.drodo_season ?? null,
         drodo_season_games: row.drodo_season_games,
         drodo_chicken_count: row.drodo_chicken_count,
@@ -230,6 +235,7 @@ function preserveOmittedDrodoFieldsValue(prev, next) {
     const prevMmr = profileMetricValue(prev, "drodo_mmr", "mmr");
     const prevMaxMmr = profileMetricValue(prev, "drodo_max_mmr", "max_mmr");
     const prevSeasonGames = profileMetricValue(prev, "drodo_season_games", "season_games");
+    const prevMmrLevel = profileMetricValue(prev, "drodo_mmr_level", "mmr_level");
     const prevQueenRank = profileMetricValue(prev, "queen_rank", "queen_rank");
     const prevSeason = "drodo_season" in prev
         ? (prev.drodo_season ?? null)
@@ -238,6 +244,7 @@ function preserveOmittedDrodoFieldsValue(prev, next) {
         ...next,
         mmr: next.mmr ?? prevMmr,
         max_mmr: next.max_mmr ?? prevMaxMmr,
+        mmr_level: next.mmr_level ?? prevMmrLevel,
         season: next.season ?? prevSeason,
         season_games: next.season_games ?? prevSeasonGames,
         queen_rank: next.queen_rank ?? prevQueenRank,

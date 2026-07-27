@@ -1,7 +1,7 @@
 import { mmrLevelToRank, mmrToRank } from "@dac/shared/game-utils";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { createSupabaseServerClient } from "@/lib/supabase";
-import { DRODO_LIVE_FETCH_ENABLED } from "@/lib/drodoLive";
+import { DRODO_MMR_ENABLED } from "@/lib/drodoLive";
 import type { UserDrodoStatsRow } from "@/lib/drodo";
 import {
   fetchSteamProfile,
@@ -90,7 +90,7 @@ async function fetchTwitchStats(
 
   const drodo = drodoRes.data;
   const hasStats = Boolean(drodo && !drodo.drodo_profile_missing);
-  const mmr = hasStats && DRODO_LIVE_FETCH_ENABLED ? (drodo?.drodo_mmr ?? null) : null;
+  const mmr = hasStats && DRODO_MMR_ENABLED ? (drodo?.drodo_mmr ?? null) : null;
   const mmrLevel = hasStats ? (drodo?.drodo_mmr_level ?? null) : null;
   const queenLadderRank = hasStats ? (drodo?.queen_ladder_rank ?? null) : null;
   const rank =
@@ -108,7 +108,7 @@ async function fetchTwitchStats(
     stats: {
       mmr,
       max_mmr:
-        hasStats && DRODO_LIVE_FETCH_ENABLED ? (drodo?.drodo_max_mmr ?? null) : null,
+        hasStats && DRODO_MMR_ENABLED ? (drodo?.drodo_max_mmr ?? null) : null,
       season: hasStats ? (drodo?.drodo_season ?? null) : null,
       season_games: hasStats ? (drodo?.drodo_season_games ?? null) : null,
       candy: hasStats ? (drodo?.drodo_candy ?? null) : null,

@@ -21,6 +21,7 @@
     "generate:types": "npm run generate:ipc-types && npm run generate:supabase-types",
     "build:drodo-core": "node scripts/build-drodo-core.mjs",
     "test:drodo-core": "npm run build:drodo-core && node scripts/smoke-drodo-core.mjs",
+    "test:synergies": "node --no-warnings=MODULE_TYPELESS_PACKAGE_JSON --import ./scripts/lib/register-ts.mjs scripts/smoke-synergies.mjs",
     "import:legacy-mmr-snapshots": "node scripts/import-legacy-mmr-snapshots.mjs",
     "web:data": "node scripts/generate-web-runtime-data.mjs",
     "cms:dev": "pnpm --dir web run dev",

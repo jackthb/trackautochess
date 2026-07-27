@@ -2,7 +2,9 @@ import { unitStem } from "@dac/shared/game-utils";
 import {
   buildItemSynergyLookup,
   buildSynergyMinCountByName,
+  buildSynergyTiersByName,
   computeLineupSynergies,
+  type LineupSynergy,
   type SynergyCountPiece,
 } from "@dac/shared/game-structure";
 import type { ItemFullInfo } from "@dac/shared/types";
@@ -232,6 +234,11 @@ export const SYNERGY_MIN_COUNT = buildSynergyMinCountByName(
   synergiesData as Record<string, { name: string; tiers?: number[] }>,
 );
 
+/** Synergy name → every tier threshold, for reporting the activated tier. */
+export const SYNERGY_TIERS = buildSynergyTiersByName(
+  synergiesData as Record<string, { name: string; tiers?: number[] }>,
+);
+
 /** Item id/display name → counts-as synergy (Spider Leg → Aqir, Kobold Cup →
  *  Kobold), keyed by both internal item id and display name. */
 export const ITEM_SYNERGIES: Readonly<Record<string, string>> =
@@ -243,18 +250,22 @@ export const ITEM_SYNERGIES: Readonly<Record<string, string>> =
 /**
  * Derive the active synergies a player actually has from their fielded
  * pieces: unique species per synergy (duplicate copies never add), plus
- * counts-as items (Spider Leg → Aqir, Kobold Cup → Kobold) when pieces carry
- * item data, plus the stored in-game count as a top-up for item-linkable
- * synergies when they don't (`storedSynergies`). Active tiers only, sorted by
- * count descending.
+ * counts-as items (Minotaur Horn → Dragon, Spider Leg → Aqir) when pieces
+ * carry item data, plus the stored in-game count as a bounded floor for what
+ * the pieces cannot show (`storedSynergies`). Active tiers only, each with the
+ * tier it activates, sorted by tier descending.
+ *
+ * Every synergy badge on the site goes through here, so the match page and
+ * the profile match list cannot drift apart.
  */
 export function computeSynergies(
   pieces: SynergyCountPiece[],
   storedSynergies?: { name: string; count: number }[],
-): { name: string; count: number }[] {
+): LineupSynergy[] {
   return computeLineupSynergies(pieces, {
     unitSynergies: UNIT_SYNERGIES as Record<string, string[]>,
     synergyMinCount: SYNERGY_MIN_COUNT,
+    synergyTiers: SYNERGY_TIERS,
     itemCountsAsSynergy: ITEM_SYNERGIES as Record<string, string>,
     storedSynergies,
   });

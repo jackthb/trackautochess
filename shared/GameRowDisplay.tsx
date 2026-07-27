@@ -15,6 +15,7 @@ import {
 } from "./game-utils";
 import {
   buildSynergyMinCountByName,
+  buildSynergyTiersByName,
   buildUnitSynergyLookup,
   computeLineupSynergies,
 } from "./game-structure";
@@ -24,6 +25,7 @@ import { TooltipWrap, type TooltipData } from "./Tooltip";
 // objects, so the lookups are built once instead of per row.
 const UNIT_SYNERGY_CACHE = new WeakMap<object, Record<string, string[]>>();
 const MIN_COUNT_CACHE = new WeakMap<object, Record<string, number>>();
+const TIERS_CACHE = new WeakMap<object, Record<string, number[]>>();
 
 function unitSynergyLookup(unitsFull: Record<string, UnitFullInfo>) {
   let lookup = UNIT_SYNERGY_CACHE.get(unitsFull);
@@ -39,6 +41,15 @@ function synergyMinCountLookup(synergiesData: Record<string, SynergyInfo>) {
   if (!lookup) {
     lookup = buildSynergyMinCountByName(synergiesData);
     MIN_COUNT_CACHE.set(synergiesData, lookup);
+  }
+  return lookup;
+}
+
+function synergyTiersLookup(synergiesData: Record<string, SynergyInfo>) {
+  let lookup = TIERS_CACHE.get(synergiesData);
+  if (!lookup) {
+    lookup = buildSynergyTiersByName(synergiesData);
+    TIERS_CACHE.set(synergiesData, lookup);
   }
   return lookup;
 }
@@ -59,9 +70,12 @@ export interface GameRowDisplayProps {
   synergiesData?: Record<string, SynergyInfo>;
   relicsData?: Record<string, RelicInfo>;
   /** Item id/name → counts-as synergy (buildItemSynergyLookup). Lets the
-   *  stored in-game count raise an item-linkable synergy (Spider Leg → Aqir)
-   *  above the species count derived from the lineup. */
+   *  stored in-game count raise an item-linkable synergy (Minotaur Horn →
+   *  Dragon) above the species count derived from the lineup. */
   itemSynergies?: Record<string, string>;
+  /** Unit display name → synergy names. Pass the alias-aware lookup so rows
+   *  agree with the match page; defaults to the plain units_full lookup. */
+  unitSynergies?: Record<string, string[]>;
 }
 
 export function GameRowDisplay({
@@ -76,6 +90,7 @@ export function GameRowDisplay({
   synergiesData,
   relicsData,
   itemSynergies,
+  unitSynergies,
 }: GameRowDisplayProps) {
   const tooltipData: TooltipData | null =
     unitsFull || synergiesData || relicsData
@@ -90,20 +105,21 @@ export function GameRowDisplay({
   const rankNum = rankParts[1] || "";
   const lineup = parseLineup(game.lineup, unitCosts);
   // Derive synergies from the lineup actually shown (unique species, plus the
-  // stored count for item-linkable synergies like Aqir via Spider Leg). The
-  // raw stored string is the game's `buff` capture, which is often stale and
-  // lists species the player never ended with — only fall back to it when the
-  // content lookups or the lineup itself are unavailable.
+  // stored count as a bounded floor for counts-as items and Ringmaster's
+  // rolled classes). The raw stored string is the game's `buff` capture, which
+  // is often stale and lists species the player never ended with — only fall
+  // back to it wholesale when the content lookups or the lineup are missing.
   const storedSyns = parseSynergies(game.synergies);
   const syns =
     unitsFull && synergiesData && lineup.length > 0
       ? computeLineupSynergies(lineup, {
-          unitSynergies: unitSynergyLookup(unitsFull),
+          unitSynergies: unitSynergies ?? unitSynergyLookup(unitsFull),
           synergyMinCount: synergyMinCountLookup(synergiesData),
+          synergyTiers: synergyTiersLookup(synergiesData),
           itemCountsAsSynergy: itemSynergies,
           storedSynergies: storedSyns,
         })
-      : storedSyns;
+      : storedSyns.map((syn) => ({ ...syn, tier: syn.count }));
   // Prefer the full round-by-round pick list from relic_history; the single
   // `relic` column only holds the final active relic (and is the only source
   // for older CV-captured rows that have no history).
@@ -164,8 +180,10 @@ export function GameRowDisplay({
         {syns.length > 0 && (
           <div className="synergies">
             {syns.map((s, i) => {
+              // The badge shows the activated tier, not the body count: with
+              // 2 Wizards on board 8 Mages activate the 9-Mage tier.
               const badge = (
-                <div key={i} className="syn-badge" title={tooltipData ? undefined : `${s.name}: ${s.count}`}>
+                <div key={i} className="syn-badge" title={tooltipData ? undefined : `${s.name}: ${s.tier}`}>
                   <img
                     className="syn-icon"
                     src={iconUrl("synergies", synIconName(s.name))}
@@ -175,11 +193,11 @@ export function GameRowDisplay({
                       (e.target as HTMLImageElement).style.display = "none";
                     }}
                   />
-                  <span className="syn-count">{s.count}</span>
+                  <span className="syn-count">{s.tier}</span>
                 </div>
               );
               return tooltipData ? (
-                <TooltipWrap key={i} type="synergy" name={s.name} count={s.count} data={tooltipData}>
+                <TooltipWrap key={i} type="synergy" name={s.name} count={s.tier} pieceCount={s.count} data={tooltipData}>
                   {badge}
                 </TooltipWrap>
               ) : badge;

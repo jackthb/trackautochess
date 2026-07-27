@@ -38,30 +38,6 @@ const ITEMS_FULL = itemsFullData as Record<string, ItemFullInfo>;
 
 const iconUrl = resolveIconUrl;
 
-// Synergy display-name → ascending tier thresholds (e.g. Beast → [2, 4, 6]).
-const SYNERGY_TIERS_BY_NAME: Record<string, number[]> = (() => {
-  const map: Record<string, number[]> = {};
-  for (const info of Object.values(SYNERGIES_DATA)) {
-    if (info?.name && Array.isArray(info.tiers) && info.tiers.length > 0) {
-      map[info.name] = info.tiers;
-    }
-  }
-  return map;
-})();
-
-/** The active synergy tier for a fielded count — the highest tier threshold
- *  the count satisfies. Three Beasts (tiers 2/4/6) shows "2", not "3": the
- *  badge reflects the synergy bonus in play, not the raw unit count. */
-function activeSynergyTier(name: string, count: number): number {
-  const tiers = SYNERGY_TIERS_BY_NAME[name];
-  if (!tiers) return count;
-  let active = tiers[0];
-  for (const t of tiers) {
-    if (count >= t) active = t;
-  }
-  return active;
-}
-
 const MATCH_DATE_FORMATTER = new Intl.DateTimeFormat("en-US", {
   month: "short",
   day: "numeric",
@@ -327,11 +303,12 @@ function MatchPlayerRow({
   const hand = parseLineup(snap?.hand ?? "", UNIT_COSTS);
 
   // Synergies always derive from the pieces actually shown. The round
-  // snapshot board carries per-piece items, so counts-as items (Spider Leg →
-  // Aqir) are exact there; lineup-only rows fall back to the stored in-game
-  // count for item-linkable synergies. The raw stored string is never shown
-  // as-is — it's the game's `buff` capture and routinely disagrees with the
-  // final board.
+  // snapshot board carries per-piece items, so counts-as items (Minotaur Horn
+  // → Dragon) are exact there; lineup-only rows lean on the stored count for
+  // those. The raw stored string is never shown as-is — it's the game's `buff`
+  // capture and routinely disagrees with the final board — but it is the only
+  // record of Ringmaster's per-match class roll, so it is passed as a bounded
+  // floor whenever it describes this same end state.
   const boardPieces = snap?.board;
   const synergyPieces: SynergyCountPiece[] = boardPieces?.length
     ? boardPieces.map((piece) => ({
@@ -341,9 +318,7 @@ function MatchPlayerRow({
     : lineup;
   const synergies = computeSynergies(
     synergyPieces,
-    !isScrubbing && !boardPieces?.length
-      ? parseSynergies(game.synergies)
-      : undefined,
+    isScrubbing ? undefined : parseSynergies(game.synergies),
   );
 
   // Compact-view relic list: prefer the full set from relic_history, fall
@@ -474,7 +449,8 @@ function MatchPlayerRow({
                 key={i}
                 type="synergy"
                 name={s.name}
-                count={s.count}
+                count={s.tier}
+                pieceCount={s.count}
                 data={tooltipData}
               >
                 <div className={`syn-badge ${styles.mpSynBadge}`}>
@@ -487,9 +463,7 @@ function MatchPlayerRow({
                       (e.target as HTMLImageElement).style.display = "none";
                     }}
                   />
-                  <span className="syn-count">
-                    {activeSynergyTier(s.name, s.count)}
-                  </span>
+                  <span className="syn-count">{s.tier}</span>
                 </div>
               </TooltipWrap>
             ))}

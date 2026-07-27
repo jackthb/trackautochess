@@ -282,7 +282,11 @@ fn merge_live_board_fields_into_players(
         let Some(end_row) = end_player.as_object_mut() else {
             continue;
         };
-        for key in ["board", "hand"] {
+        // `pandaren_drops` belongs here with board/hand: the end_board table
+        // only carries `pandaman_getlist` for players it captured it for, so
+        // without this backfill a Brewmaster's drops are dropped from the
+        // final round and the match page never shows them.
+        for key in ["board", "hand", "pandaren_drops"] {
             let missing = end_row
                 .get(key)
                 .map(|value| value.is_null() || value.as_array().is_some_and(|items| items.is_empty()))
@@ -480,4 +484,61 @@ pub(crate) fn extract_death_team_from_rows(
         }
     }
     serde_json::Map::new()
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn merges_pandaren_drops_from_live_rows() {
+        // The end_board table has the player but no drops; the live tables do.
+        let mut end_board = serde_json::json!({
+            "76561198000000001": { "placement": 1, "board": [] },
+        });
+        let live = serde_json::json!({
+            "76561198000000001": {
+                "board": [{ "name": "Brewmaster", "x": 1, "y": 1 }],
+                "pandaren_drops": [{ "name": "Puck", "round": 12 }],
+            },
+        });
+
+        merge_live_board_fields_into_players(&mut end_board, &live);
+
+        let player = end_board
+            .get("76561198000000001")
+            .and_then(Value::as_object)
+            .expect("player row");
+        assert_eq!(
+            player.get("pandaren_drops").and_then(Value::as_array).map(Vec::len),
+            Some(1),
+            "Brewmaster drops must survive into the final-round snapshot"
+        );
+        assert_eq!(
+            player.get("board").and_then(Value::as_array).map(Vec::len),
+            Some(1),
+            "an empty end_board board is still backfilled from the live rows"
+        );
+    }
+
+    #[test]
+    fn keeps_end_board_values_over_live_rows() {
+        let mut end_board = serde_json::json!({
+            "76561198000000001": {
+                "pandaren_drops": [{ "name": "Lina", "round": 3 }],
+            },
+        });
+        let live = serde_json::json!({
+            "76561198000000001": {
+                "pandaren_drops": [{ "name": "Puck", "round": 12 }],
+            },
+        });
+
+        merge_live_board_fields_into_players(&mut end_board, &live);
+
+        let drops = end_board["76561198000000001"]["pandaren_drops"]
+            .as_array()
+            .expect("drops");
+        assert_eq!(drops[0]["name"], "Lina");
+    }
 }
