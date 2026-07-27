@@ -24,6 +24,6 @@
     }
   },
   "overrides": {},
-  "commentary": "Magic Seed creates up to 8 bench sprouts with `buy_price = 1`; if a sprout cannot be created, that slot is immediately paid out as 1 gold instead.\n\nAt the beginning of each round while Magic Seed is active and `relic_ttl <= 10`, each sprout independently has a `battle_round * 2 + 20` percent chance to gain +1 sell value. For example: round 5 is 30%, round 10 is 40%, round 20 is 60%, and round 40 is 100%. Selling a sprout pays its current `buy_price`.",
+  "commentary": "Magic Seed creates up to 8 bench sprouts with `buy_price = 1`; if a sprout cannot be created, that slot is immediately paid out as 1 gold instead.\n\nAt the beginning of each round while Magic Seed is active and `relic_ttl <= 10`, each sprout independently has a `battle_round * 2 + 20` percent chance to gain +1 sell value. Selling a sprout pays its current `buy_price`.\n\n| Round | Chance per sprout |\n| --- | --- |\n| 5 | 30% |\n| 10 | 40% |\n| 20 | 60% |\n| 40 | 100% |",
   "icon": "relics/magic_seed.png"
 }
