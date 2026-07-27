@@ -1,0 +1,38 @@
+{
+  "date": "2026-07-27",
+  "title": "Rebalance Patch",
+  "source": "https://steamcommunity.com/sharedfiles/filedetails/changelog/1613886175",
+  "entitiesSynced": false,
+  "sourceEntries": [
+    {
+      "sourceId": "1785140128",
+      "date": "2026-07-27",
+      "time": "1:15am",
+      "contentHash": "7d95f5ce17e705d7"
+    }
+  ],
+  "sections": [
+    {
+      "heading": "Changes",
+      "entries": [
+        {
+          "kind": "change",
+          "name": "Rebalance Patch 1",
+          "detail": "Rebalance Patch 1"
+        },
+        {
+          "kind": "buff",
+          "name": "Greevil Egg",
+          "detail": "Chance to grow up increased by 5%",
+          "entityKey": "relic__greevil-egg"
+        },
+        {
+          "kind": "change",
+          "name": "Armory Array",
+          "detail": "Remained charges will be reforged into  random 0~2 Slivers when expired.",
+          "entityKey": "relic__armory-array"
+        }
+      ]
+    }
+  ]
+}
