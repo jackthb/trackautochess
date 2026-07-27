@@ -1,0 +1,146 @@
+/* Pre-release beta signup in the home hero.
+   Deliberately NOT the ProfileSearch treatment: search is a boxed input plus a
+   filled accent button, so this is a gold-keyed panel with an underline input
+   and an outline button. The two forms sit near each other and must not read
+   as the same control. */
+
+.card {
+  width: 100%;
+  padding: 16px 18px;
+  border-left: 2px solid var(--gold);
+  background: color-mix(in srgb, var(--gold) 5%, transparent);
+  text-align: left;
+}
+
+.heading {
+  margin: 0 0 8px;
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: var(--fw-semibold);
+  letter-spacing: 0.4px;
+  color: var(--text-primary);
+}
+
+.blurb {
+  margin: 0 0 16px;
+  font-size: 13px;
+  line-height: 1.65;
+  color: var(--text-secondary);
+}
+.blurb a {
+  color: var(--gold);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  transition: color var(--t-base) var(--t-easing);
+}
+.blurb a:hover {
+  color: var(--text-primary);
+}
+
+.form {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+/* Underline, not a box — the visual opposite of the search field above it. */
+.input {
+  flex: 1;
+  min-width: 0;
+  height: 36px;
+  font-family: var(--font-mono);
+  font-size: var(--fs-13);
+  color: var(--text-primary);
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid var(--border);
+  border-radius: 0;
+  padding: 0 2px;
+  letter-spacing: var(--tr-body);
+  transition: border-color var(--t-base) var(--t-easing);
+}
+.input::placeholder {
+  color: var(--text-muted);
+}
+.input:focus {
+  outline: none;
+  border-bottom-color: var(--gold);
+}
+
+/* Outline, not filled — the search button is the only filled accent button. */
+.submit {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 36px;
+  padding: 0 18px;
+  font-family: var(--font-mono);
+  font-size: var(--fs-13);
+  font-weight: var(--fw-semibold);
+  letter-spacing: 0.4px;
+  color: var(--gold);
+  background: none;
+  border: 1px solid var(--gold-dim);
+  border-radius: var(--r-3);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background var(--t-base) var(--t-easing),
+    border-color var(--t-base) var(--t-easing),
+    color var(--t-base) var(--t-easing);
+}
+.submit:hover:not(:disabled) {
+  background: var(--gold);
+  border-color: var(--gold);
+  color: var(--bg-deep);
+}
+.submit:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+
+.done {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--gold);
+}
+
+.error {
+  margin: 10px 0 0;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--accent);
+}
+
+/* Honeypot: off-screen rather than display:none so naive bots still fill it. */
+.honeypot {
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (max-width: 620px) {
+  .form {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+  .submit {
+    width: 100%;
+  }
+}

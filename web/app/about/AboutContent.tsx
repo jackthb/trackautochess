@@ -16,13 +16,13 @@ const t = {
   copy1post:
     " surfaces Dota Auto Chess player statistics from the best source available for a profile.",
   copy2:
-    "Track Auto Chess is currently in pre-release, and this is our tooling to enable tracking in-game statistics.",
+    "Our main tooling to enable match tracking is currently pre-release. It captures each game as you play it — final board, synergies, relics, and placement — and posts it to your profile.",
   copy3:
-    "When Drodo exposes public profile data, we use that data. When Drodo data is not available, we fall back to manually tracked or imported match history.",
+    "Drodo previously exposed MMR data, however it is now hidden, which means we can only show the rank. When Drodo exposes public profile data, we use that data. When Drodo data is not available, we fall back to manually tracked or imported match history.",
   dataSources: "Data Sources",
   drodoTitle: "Drodo profile data",
   drodoDesc:
-    "Rank from Drodo when available. Live numeric MMR is currently unavailable — Drodo stopped publishing it publicly.",
+    "Rank from Drodo when available. Drodo previously exposed MMR data, but it is now hidden, so we can only show the rank.",
   trackedTitle: "Tracked match history",
   trackedDesc:
     "Match-level stats captured or checked manually when public Drodo profile data is missing, stale, or incomplete.",

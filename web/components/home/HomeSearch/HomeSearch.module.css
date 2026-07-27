@@ -91,27 +91,35 @@
   opacity: 0;
   animation: arrive 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.5s forwards;
 }
+/* Site-status strip pinned to the top of the page, above the patch promo. Slim
+   and full-bleed so it reads as a notice rather than competing with the hero. */
 .outageNotice {
-  margin: 16px 0 0;
-  padding: 12px 14px;
-  max-width: 440px;
-  border: 1px solid color-mix(in srgb, var(--accent) 45%, var(--border));
-  border-radius: var(--r-8);
-  background: color-mix(in srgb, var(--accent) 12%, var(--bg-surface));
-  color: var(--text-primary);
-  font-size: 13px;
-  line-height: 1.45;
+  margin: 0;
+  padding: 9px 24px;
+  width: 100%;
+  border-bottom: 1px solid color-mix(in srgb, var(--accent) 35%, var(--border));
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+  color: var(--text-secondary);
+  font-size: 12px;
+  line-height: 1.5;
   letter-spacing: 0.2px;
-  opacity: 0;
-  animation: arrive 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.55s forwards;
+  text-align: center;
 }
 
-/* Sign-in CTA leads (most prominent); search follows below the divider. */
+/* Signed-in visitors only: a direct link to their own profile. */
 .primaryCta {
   width: min(100%, 560px);
   margin-top: 34px;
   display: flex;
   justify-content: center;
+  opacity: 0;
+  animation: arrive 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.6s forwards;
+}
+
+/* Signup leads the hero; search follows under the divider. */
+.betaWrap {
+  width: min(100%, 560px);
+  margin-top: 34px;
   opacity: 0;
   animation: arrive 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.6s forwards;
 }
@@ -123,19 +131,26 @@
   margin: 18px 0;
   color: var(--text-muted);
   font-size: 12px;
-  /* No uppercase/tracking on a 2-letter word — it reads as noise */
+  /* No uppercase/tracking on the divider label — it reads as noise */
   letter-spacing: 0.3px;
   opacity: 0;
-  animation: arrive 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.66s forwards;
+  animation: arrive 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.68s forwards;
 }
-
+.signinDivider::before,
+.signinDivider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--border-subtle);
+}
 .searchWrap {
   position: relative;
   z-index: 5;
   width: min(100%, 560px);
   opacity: 0;
-  animation: arrive 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.72s forwards;
+  animation: arrive 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.76s forwards;
 }
+
 .liveStats {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -148,7 +163,7 @@
   background: var(--border);
   text-decoration: none;
   opacity: 0;
-  animation: arrive 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.78s forwards;
+  animation: arrive 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.84s forwards;
 }
 .liveStats span {
   display: flex;
@@ -176,13 +191,6 @@
 }
 .liveStats:hover strong {
   color: var(--accent-hover);
-}
-.signinDivider::before,
-.signinDivider::after {
-  content: "";
-  flex: 1;
-  height: 1px;
-  background: var(--border-subtle);
 }
 
 /* Signed-in CTA: a filled accent button at the Steam button's 42px height so
@@ -236,9 +244,30 @@
 }
 
 /* ── Currently unused — parked, not deleted ──────────────────────────────────
-   The hero corner ticks, the season-preview table, and a couple of label
-   variants aren't rendered right now but are kept for the planned preview UI.
+   The hero corner ticks, the season-preview table, a couple of label variants,
+   and the two-column split row (kept in case the stacked hero needs to go
+   side-by-side again) aren't rendered right now but are kept.
    (See feedback: park unused styling rather than delete it.) */
+.split {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 28px;
+  align-items: start;
+  width: 100%;
+  margin-top: 34px;
+  text-align: left;
+}
+.splitCol {
+  min-width: 0;
+}
+.splitLabel {
+  margin-bottom: 12px;
+  font-family: var(--font-mono);
+  font-size: var(--fs-11);
+  letter-spacing: var(--tr-upper-wide);
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
 .searchGuidanceLabel {
   font-size: 12px;
   color: var(--text-secondary);

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import HomeSearch from "@/components/home/HomeSearch";
 import PatchPromo from "@/components/patch/PatchPromo";
 import { fetchDotaAutoChessMetrics } from "@/lib/customGameStats";
+import { fetchFeaturedMatch } from "@/lib/featuredMatch";
 import {
   absoluteUrl,
   pageMetadata,
@@ -13,7 +14,7 @@ import {
 export const revalidate = 300;
 
 const description =
-  "Look up Dota Auto Chess player rank and tracked match stats by Steam vanity URL or SteamID64. Live MMR is unavailable.";
+  "Look up any Dota Auto Chess player's rank by Steam vanity URL or SteamID64. Drodo stopped publishing MMR stats, so profiles show rank only.";
 
 export const metadata: Metadata = pageMetadata({
   title: SITE_TITLE,
@@ -52,7 +53,10 @@ const structuredData = [
 ];
 
 export default async function HomePage() {
-  const metrics = await fetchDotaAutoChessMetrics();
+  const [metrics, featuredMatch] = await Promise.all([
+    fetchDotaAutoChessMetrics(),
+    fetchFeaturedMatch(),
+  ]);
 
   return (
     <>
@@ -60,7 +64,7 @@ export default async function HomePage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
       />
-      <HomeSearch metrics={metrics}>
+      <HomeSearch metrics={metrics} featuredMatch={featuredMatch}>
         <PatchPromo variant="compact" />
       </HomeSearch>
     </>

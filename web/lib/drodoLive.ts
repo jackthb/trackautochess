@@ -6,4 +6,4 @@
 export const DRODO_LIVE_FETCH_ENABLED = false;
 
 export const DRODO_OUTAGE_NOTICE =
-  "Live MMR isn't available anymore — Drodo stopped publishing it. We can only show rank. Sorry.";
+  "Drodo stopped publishing MMR stats, so we can't show MMR anymore. Profile search shows a player's rank only.";

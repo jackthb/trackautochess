@@ -27,6 +27,7 @@ const BOT_ID_PROTECTED_ROUTES = [
   { path: "/api/chat", method: "POST" },
   { path: "/api/queens/refresh", method: "POST" },
   { path: "/api/support", method: "POST" },
+  { path: "/api/beta-signup", method: "POST" },
 ];
 
 const CookieConsentBanner = dynamic(

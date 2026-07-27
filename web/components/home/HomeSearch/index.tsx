@@ -2,9 +2,10 @@
 
 import Link from "next/link";
 import type { ReactNode } from "react";
+import BetaSignup from "@/components/home/BetaSignup";
 import { ProfileSearch } from "@/components/ProfileSearch";
-import { SteamSignInButton } from "@/components/SteamSignInButton";
 import type { CustomGameMetrics } from "@/lib/customGameStats";
+import type { FeaturedMatch } from "@/lib/featuredMatch";
 import { useSupabaseSession } from "@/lib/useSupabaseSession";
 import { playerProfilePath } from "@/lib/steam";
 import { DRODO_OUTAGE_NOTICE } from "@/lib/drodoLive";
@@ -12,11 +13,11 @@ import styles from "./HomeSearch.module.css";
 
 const t = {
   description:
-    "Look up Dota Auto Chess player rank and tracked match stats by Steam vanity URL or SteamID64.",
-  tagline: "Rank & season history for any Dota Auto Chess player.",
+    "Look up any Dota Auto Chess player's rank by Steam vanity URL or SteamID64.",
+  tagline: "Rank and tracked match history for any Dota Auto Chess player.",
   notice: DRODO_OUTAGE_NOTICE,
   placeholder: "Steam profile URL or SteamID64",
-  signinDivider: "or",
+  lookupDivider: "or look up a player",
   viewProfile: "View your profile",
 };
 
@@ -26,15 +27,17 @@ function formatMetric(value: number): string {
 
 export default function HomeSearch({
   metrics,
+  featuredMatch,
   children,
 }: {
   metrics: CustomGameMetrics | null;
+  featuredMatch?: FeaturedMatch | null;
   children?: ReactNode;
 }) {
-  // Mirror the nav's auth check (AppNavBar): once we know the visitor is signed
-  // in, the hero's "Sign in through Steam" CTA is wrong — swap it for a link to
-  // their own profile. Gate on `authReady` so logged-in users never flash the
-  // sign-in button first.
+  // The hero no longer carries its own "Sign in through Steam" button — the nav
+  // shows one on every page, and a second copy was one of three competing CTAs
+  // in a single centred column. Signed-in visitors still get a direct link to
+  // their profile; gate on `authReady` so it never flashes for logged-out users.
   const {
     user,
     ready: authReady,
@@ -47,6 +50,11 @@ export default function HomeSearch({
 
   return (
     <div className={styles.page}>
+      {/* The MMR notice is site-status, not hero content — it sits at the top
+          of the page as a slim strip so the hero stays uncluttered. */}
+      <p className={styles.outageNotice} role="status">
+        {t.notice}
+      </p>
       {children}
       <div className={styles.hero}>
         <div className={styles.grid} />
@@ -61,35 +69,34 @@ export default function HomeSearch({
           <div className={styles.rule} />
 
           <p className={styles.tagline}>{t.tagline}</p>
-          <p className={styles.outageNotice} role="status">
-            {t.notice}
-          </p>
 
-          {/* Sign-in is the fastest path (and unlocks daily auto-tracking), so
-              it leads. Search is the no-login fallback below the divider. */}
-          {authReady && (
+          {authReady && user && (
             <div className={styles.primaryCta}>
-              {user ? (
-                <Link href={profileHref} className={styles.profileCta}>
-                  {t.viewProfile}
-                </Link>
-              ) : (
-                <SteamSignInButton source="home_hero" size="md" />
-              )}
+              <Link href={profileHref} className={styles.profileCta}>
+                {t.viewProfile}
+              </Link>
             </div>
           )}
 
-          {authReady && (
-            <div className={styles.signinDivider}>
-              <span>{t.signinDivider}</span>
-            </div>
-          )}
+          {/* Signup leads — it's the action we actually want — and player
+              search follows below the divider as the secondary path. */}
+          <div className={styles.betaWrap}>
+            <BetaSignup
+              source="home_hero"
+              exampleHref={
+                featuredMatch ? `/matches/${featuredMatch.matchPlayerId}` : null
+              }
+            />
+          </div>
+
+          <div className={styles.signinDivider}>
+            <span>{t.lookupDivider}</span>
+          </div>
 
           <div className={styles.searchWrap}>
             <ProfileSearch
               analyticsSource="home_hero"
               placeholder={t.placeholder}
-              exampleUrl="https://steamcommunity.com/profiles/76561198022169086"
             />
           </div>
 
