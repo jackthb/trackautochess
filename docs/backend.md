@@ -42,6 +42,6 @@ npm run dev:desktop                     # backend setup/check + Vite + Electron
 - The daemon starts GSI and nettable capture automatically when Electron launches it.
 - Dota launch/config setup is exposed through the `nettable_apply_launch_options` IPC command and writes a marked DAC Tracker block to Dota `autoexec.cfg`.
 - Processed match data uploads to `matches`, `match_players`, and `match_timelines`; Queen ladder rows update user/rank-related Supabase data.
-- Diagnostic uploads still go to the private Supabase Storage bucket `diagnostic-logs`. Raw nettable dump logs post to the configured `nettable_dump_upload_url`, which stores them in Cloudflare R2 server-side.
+- Diagnostic uploads still go to the private Supabase Storage bucket `diagnostic-logs`. Raw nettable dump logs are local-only, under `~/.dac/nettable_dumps`; remote raw dump uploads were removed on 2026-07-02.
 - Replay recording is still not available in the Rust-only nettable build; `toggle_recording` returns a structured error.
 - `do_update` currently acknowledges an update-apply request for the Electron layer but does not perform installer replacement inside the backend.

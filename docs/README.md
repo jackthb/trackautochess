@@ -66,6 +66,19 @@ cargo run --manifest-path app/backend/Cargo.toml -- parse-live <path-to-console.
 cargo test --manifest-path app/backend/Cargo.toml
 ```
 
+`main.rs` dispatches twelve subcommands in total. Alongside those above:
+
+| Subcommand | Purpose |
+| --- | --- |
+| `queue <payload.json>` | Queue a payload into the local outbox. |
+| `outbox-list` | List pending outbox payloads. |
+| `outbox-flush` | Replay the outbox to Supabase and report uploaded/failed counts. |
+| `gsi-cfg` | Print the GSI config file contents. |
+| `finalize-log [console.log]` | Recover and upload a match from a `console.log` whose upload never happened. Falls back to the left-early writer. |
+| `finalize-dump <dump>` | Same recovery, from a saved nettable dump. |
+| `timeline-from-log <console.log> <match_id>` | Rebuild and upload just the timeline for a known match. |
+| `timeline-from-dump <dump> <match_id>` | Same, from a saved nettable dump. |
+
 ### Web app
 
 ```bash
@@ -94,8 +107,8 @@ Steam changelog ->  scripts/scrape-patch-notes.mjs  ->  content/patch-notes + co
 
 - Desktop runtime config is stored in `~/.dac/config.json`.
 - The Rust backend may also use `~/.dac/outbox`, `~/.dac/replays`, `~/.dac/captures`, `~/.dac/nettable_dumps`, and tracker logs for local-first capture, replay, diagnostics, and retry behavior.
-- Supabase stores public product data in tables such as `users`, `player_seasons`, `mmr_snapshots`, `matches`, `match_players`, `match_timelines`, and `lineup_snapshots`.
-- Supabase Storage bucket `diagnostic-logs` stores uploaded diagnostics. Raw nettable dump logs upload through the web app to Cloudflare R2.
+- Supabase stores public product data in `users`, `player_seasons`, `mmr_snapshots`, `matches`, `match_players`, `match_timelines`, `lineup_snapshots`, `community_builds`, `community_build_votes`, `community_build_comments`, `content_embeddings`, and `site_status`.
+- Supabase Storage bucket `diagnostic-logs` stores uploaded diagnostics. Raw nettable dump logs are never uploaded — they stay local under `~/.dac/nettable_dumps`.
 
 ## Automation
 

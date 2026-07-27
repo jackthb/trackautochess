@@ -33,7 +33,7 @@ the manual cross-referencing done for the first Naga/Monks build.
 Read `cache/<videoId>.txt` + `cache/<videoId>.matches.json` together to
 construct the actual `SavedBuild` JSON (units, items, board positions,
 snapshots per round) and generate a `/builds?b=...` share link, same as
-`gen-build-link.mjs` did for the Naga/Monks build. Always credit/backlink
+`encode-share-link.mjs` does. Always credit/backlink
 the source video (`cache/<videoId>.meta.json` has the URL) in the build's
 `description`.
 

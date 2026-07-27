@@ -15,7 +15,7 @@ DAC Tools is a monorepo for Dota Auto Chess game tracking and analysis. It inclu
 - Rust backend (`app/backend/`) handles: Dota console/nettable capture, GSI post-game detection, hotkey-driven table dumps, Steam auth, local outbox retry, Supabase sync, and diagnostic/raw-log uploads to Supabase Storage
 
 **Rust backend (`app/backend/`)** — Local services backend.
-- CLI commands include `daemon`, `parse-log`, `parse-log-full`, `parse-live`, `queue`, `outbox-list`, and `gsi-cfg`.
+- CLI commands: `daemon`, `parse-log`, `parse-log-full`, `parse-live`, `queue`, `outbox-list`, `outbox-flush`, `gsi-cfg`, `finalize-log`, `finalize-dump`, `timeline-from-log`, and `timeline-from-dump`.
 - The packaged binary is copied to `app/backend/dist/headless/` by `pnpm --dir app run build:backend`.
 
 **Content (`content/`)** — Source of truth for committed game/CMS JSON, including game data and patch notes.
@@ -62,9 +62,18 @@ cargo run -- parse-log-full <path-to-console.log>
 cargo run -- parse-live <path-to-console.log> [local-steam-id]
 cargo run -- queue <payload.json>
 cargo run -- outbox-list
+cargo run -- outbox-flush
 cargo run -- gsi-cfg
+cargo run -- finalize-log [path-to-console.log]
+cargo run -- finalize-dump <path-to-dump>
+cargo run -- timeline-from-log <path-to-console.log> <match-id>
+cargo run -- timeline-from-dump <path-to-dump> <match-id>
 cargo test
 ```
+
+The `finalize-*` and `timeline-from-*` commands are recovery paths: they
+re-upload a match, or just its timeline, from a log or dump whose live upload
+never landed.
 
 ### Web Viewer (`web/`)
 ```bash
@@ -80,8 +89,8 @@ pnpm run test:e2e  # Build, then run Playwright tests
 - **Package managers**: pnpm for Node.js workspaces, Cargo for the Rust backend.
 - **Backend migration status**: the Python/CV backend has been removed; `app/backend/` is the Rust backend.
 - **Runtime config**: stored in `~/.dac/config.json`; local capture/retry artifacts may also be written under `~/.dac/` (`outbox`, `replays`, `captures`, `nettable_dumps`, logs).
-- **Database**: Supabase PostgreSQL with RLS policies; current product tables include `users`, `player_seasons`, `mmr_snapshots`, `matches`, `match_players`, `match_timelines`, and `lineup_snapshots`.
-- **Storage**: Supabase Storage bucket `diagnostic-logs` receives diagnostic and raw nettable dump uploads.
+- **Database**: Supabase PostgreSQL with RLS policies; current product tables are `users`, `player_seasons`, `mmr_snapshots`, `matches`, `match_players`, `match_timelines`, `lineup_snapshots`, `community_builds`, `community_build_votes`, `community_build_comments`, `content_embeddings`, and `site_status`.
+- **Storage**: Supabase Storage bucket `diagnostic-logs` receives diagnostic uploads. Raw nettable dumps are local-only under `~/.dac/nettable_dumps`.
 - **Content pipeline**: `content/` JSON feeds generated web runtime data and desktop content readers; `data/` holds icons/config/extractor helpers.
 - **Release pipeline**: `.github/workflows/release.yml` triggers on `v*` tags, builds the Rust backend and Electron installer on Windows, and publishes `.exe` artifacts to GitHub Releases.
 - **Patch-note pipeline**: `scripts/scrape-patch-notes.mjs` scrapes the Steam Workshop changelog and commits `content/` updates. It runs hourly via Cronicle on the Pi (`ops/cronicle/cronicle-job.dac-scrape-patch-notes.json`), which pushes directly using that checkout's git credentials; `.github/workflows/scrape-patch-notes.yml` is a disabled-schedule, manual-only fallback (Steam intermittently serves GitHub-hosted runner IPs an anti-bot shell with no changelog entries, which a residential IP avoids).
