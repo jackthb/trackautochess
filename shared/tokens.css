@@ -36,7 +36,9 @@
   /* ── Typography ── */
   --font-ui: 'JetBrains Mono', 'Segoe UI', 'Noto Sans', 'Noto Sans CJK SC', 'Microsoft YaHei', 'PingFang SC', 'Hiragino Sans GB', 'Arial Unicode MS', sans-serif;
   --font-mono: 'JetBrains Mono', 'Segoe UI Mono', 'Cascadia Mono', 'Noto Sans Mono', 'Noto Sans CJK SC', 'Microsoft YaHei', ui-monospace, Menlo, monospace;
-  --font-display: var(--font-ui);
+  /* Cinzel is loaded by each consumer (web: @font-face in globals.css; app: Google Fonts in index.html).
+     Falls back to Georgia for any context where Cinzel hasn't loaded yet. */
+  --font-display: 'Cinzel', Georgia, 'Times New Roman', serif;
 
   /* Body / UI sizes */
   --fs-11: 11px;   /* status bar, tiny meta */
@@ -54,13 +56,15 @@
   --lh-body: 1.5;
   --lh-relaxed: 1.7;
 
-  /* Letter-spacing — tracked-out uppercase hierarchy */
+  /* Letter-spacing — tracked-out uppercase hierarchy.
+     Note: Cinzel has optical spacing built in; display/hero values are
+     intentionally lower than they would be for a geometric sans. */
   --tr-body: 0.5px;
   --tr-ui: 1px;
-  --tr-upper: 1.5px;    /* uppercase section labels */
-  --tr-upper-wide: 2px; /* section-title on marketing */
-  --tr-display: 2px;    /* display headings */
-  --tr-hero: 6px;       /* landing hero */
+  --tr-upper: 1.5px;    /* uppercase section labels (mono) */
+  --tr-upper-wide: 2px; /* section-title on marketing (mono) */
+  --tr-display: 1.5px;  /* Cinzel display headings — reduced from 2px */
+  --tr-hero: 4px;       /* Cinzel hero — reduced from 6px */
 
   /* Font-weight */
   --fw-regular: 400;

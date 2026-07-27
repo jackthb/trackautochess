@@ -16,9 +16,10 @@
 
 .pageTitle {
   font-family: var(--font-display);
-  font-size: 28px;
+  font-size: 26px;
   font-weight: var(--fw-semibold);
-  letter-spacing: 4px;
+  /* Cinzel has built-in optical spacing; 2px tracking is enough */
+  letter-spacing: 2px;
   text-transform: uppercase;
   color: var(--text-primary);
   margin-bottom: var(--s-24);

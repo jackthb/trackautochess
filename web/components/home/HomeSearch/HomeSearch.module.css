@@ -60,7 +60,7 @@
   font-family: var(--font-display);
   font-size: clamp(42px, 7vw, 72px);
   font-weight: var(--fw-bold);
-  letter-spacing: 10px;
+  letter-spacing: var(--tr-hero);
   text-transform: uppercase;
   line-height: 1;
   opacity: 0;
@@ -84,7 +84,8 @@
 .tagline {
   font-size: 14px;
   color: var(--text-muted);
-  letter-spacing: 1.5px;
+  /* Body text should not be tracked out — reserve tracking for uppercase labels */
+  letter-spacing: 0.2px;
   max-width: 440px;
   line-height: 1.7;
   opacity: 0;
@@ -121,9 +122,9 @@
   width: min(100%, 560px);
   margin: 18px 0;
   color: var(--text-muted);
-  font-size: 11px;
-  letter-spacing: 1.5px;
-  text-transform: uppercase;
+  font-size: 12px;
+  /* No uppercase/tracking on a 2-letter word — it reads as noise */
+  letter-spacing: 0.3px;
   opacity: 0;
   animation: arrive 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.66s forwards;
 }
@@ -143,7 +144,7 @@
   margin-top: 20px;
   overflow: hidden;
   border: 1px solid var(--border);
-  border-radius: var(--r-8);
+  border-radius: var(--r-4);
   background: var(--border);
   text-decoration: none;
   opacity: 0;
@@ -153,22 +154,28 @@
   display: flex;
   min-width: 0;
   flex-direction: column;
-  gap: 4px;
+  gap: 5px;
   background: rgba(13, 15, 18, 0.82);
   color: var(--text-muted);
   font-family: var(--font-mono);
   font-size: var(--fs-11);
   letter-spacing: 0.9px;
-  padding: 12px 10px;
+  padding: 14px 16px;
   text-transform: uppercase;
+  transition: background var(--t-base) var(--t-easing);
 }
 .liveStats strong {
   color: var(--text-primary);
   font-size: var(--fs-16);
   letter-spacing: 0;
+  font-variant-numeric: tabular-nums;
+  transition: color var(--t-base) var(--t-easing);
 }
 .liveStats:hover span {
   background: var(--bg-elevated);
+}
+.liveStats:hover strong {
+  color: var(--accent-hover);
 }
 .signinDivider::before,
 .signinDivider::after {
@@ -221,7 +228,7 @@
     padding: 42px 18px;
   }
   .title {
-    letter-spacing: 6px;
+    letter-spacing: var(--tr-hero);
   }
   .liveStats {
     grid-template-columns: 1fr;

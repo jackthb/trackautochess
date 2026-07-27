@@ -163,8 +163,12 @@
 
 .login-title {
   margin: 0 0 12px;
-  font-size: 36px;
-  line-height: 1.05;
+  font-family: var(--font-display);
+  font-size: 32px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  line-height: 1.1;
   color: var(--text-primary);
 }
 
@@ -180,8 +184,9 @@
   padding: 14px 18px;
   border: 1px solid var(--accent);
   border-radius: var(--r-4);
-  background: color-mix(in srgb, var(--accent) 14%, transparent);
-  color: var(--text-primary);
+  /* Solid CTA — not ghost. Ghost buttons on primary actions are a vibe-code tell. */
+  background: var(--accent);
+  color: #fff;
   font-family: inherit;
   font-size: var(--fs-14);
   letter-spacing: var(--tr-ui);
@@ -191,7 +196,8 @@
 }
 
 .login-button:hover {
-  background: color-mix(in srgb, var(--accent) 22%, transparent);
+  background: var(--accent-hover);
+  border-color: var(--accent-hover);
 }
 
 .login-button:disabled {
@@ -1472,13 +1478,15 @@ video {
 }
 
 .settings-section-title {
-  font-size: 13px;
-  letter-spacing: 1.5px;
+  font-size: 11px;
+  letter-spacing: 1.8px;
   text-transform: uppercase;
   color: var(--text-muted);
-  padding: 14px 20px;
+  padding: 12px 20px 12px 16px;
   background: var(--bg-surface);
   border-bottom: 1px solid var(--border);
+  /* Accent left-border gives sections visual hierarchy without adding noise */
+  border-left: 2px solid var(--accent-dim);
 }
 
 .settings-row {
