@@ -18,16 +18,32 @@ export function CommentaryByline() {
   return (
     <div className={styles.label}>
       TAC Explained
-      <span
-        className={styles.info}
-        tabIndex={0}
-        role="note"
-        aria-label="My own analysis"
-        data-tooltip="My own analysis. The official text is often machine-translated; so the above is my understanding of the change, usually backed via data obtained from the VPK itself."
-      >
-        ⓘ
-      </span>
+      <CommentaryInfo />
     </div>
+  );
+}
+
+/**
+ * The bare ⓘ affordance and its popover, without the "TAC Explained" text.
+ * Entity pages already head the block with a "Commentary" section title, so
+ * they hang this off that heading rather than stacking a second label under it.
+ */
+export function CommentaryInfo() {
+  return (
+    <span
+      className={styles.info}
+      tabIndex={0}
+      role="note"
+      aria-label="TAC Explained — my own analysis"
+    >
+      ⓘ
+      <span className={styles.tooltip}>
+        <span className={styles.tooltipTitle}>TAC Explained</span>
+        My own analysis. The official text is often machine-translated; so the
+        above is my understanding of the change, usually backed via data
+        obtained from the VPK itself.
+      </span>
+    </span>
   );
 }
 

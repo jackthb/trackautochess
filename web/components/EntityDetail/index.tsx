@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 import Link from "next/link";
 import { EntityCard, type EntityCardVariant } from "@/components/EntityCard";
 import { EntityIcon } from "@/components/EntityIcon";
-import { CommentaryByline } from "@/components/PatchCommentary";
+import { CommentaryInfo } from "@/components/PatchCommentary";
 import styles from "./EntityDetail.module.css";
 
 const t = {
@@ -191,8 +191,10 @@ export function EntityDetail({
 
         {commentary && (
           <section className={styles.section}>
-            <h2 className={styles.sectionTitle}>{t.commentary}</h2>
-            <CommentaryByline />
+            <h2 className={styles.sectionTitle}>
+              {t.commentary}
+              <CommentaryInfo />
+            </h2>
             <div className={styles.bodyCopy}>{commentary}</div>
           </section>
         )}
