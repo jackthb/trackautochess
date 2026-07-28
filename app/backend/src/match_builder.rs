@@ -609,4 +609,53 @@ mod tests {
             .expect("drops");
         assert_eq!(drops[0]["name"], "Lina");
     }
+
+    // Guards the whole end-of-match board path against a real dump. `end_board`
+    // carries no board at all — only a flat `chess_lineup` string with no
+    // coordinates and no items — so positions and items can only come from the
+    // live `vchess_*` rows, and only via `lastitem`: the game leaves `item`
+    // empty from the mid-game onward. If either link breaks the match page
+    // renders bare units on an empty board.
+    #[test]
+    fn end_board_snapshot_takes_positions_and_items_from_live_boards() {
+        let fixture = std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
+            .join("tests/fixtures/nettable_dumps/end_board_with_live_boards.json");
+        let rows = nettable_parser::extract_dump_rows(&fixture).expect("fixture parses");
+
+        let (round, players) =
+            end_board_snapshot_with_live_boards(&rows, None).expect("end_board snapshot");
+        // The end_board rows carry their own final round, one past round_info.
+        assert_eq!(round, 40);
+
+        let players = players.as_object().expect("players is an object");
+        assert_eq!(players.len(), 8);
+
+        // Every player gets a positioned board, not just the local one.
+        let mut pieces_with_items = 0;
+        for (steam_id, player) in players {
+            let board = player
+                .get("board")
+                .and_then(Value::as_array)
+                .unwrap_or_else(|| panic!("{steam_id} has no board"));
+            assert!(!board.is_empty(), "{steam_id} has an empty board");
+            for piece in board {
+                assert!(
+                    piece.get("x").is_some() && piece.get("y").is_some(),
+                    "{steam_id} has a piece with no coordinates"
+                );
+                let items = piece
+                    .get("items")
+                    .or_else(|| piece.get("last_items"))
+                    .and_then(Value::as_array);
+                if items.is_some_and(|items| !items.is_empty()) {
+                    pieces_with_items += 1;
+                }
+            }
+        }
+
+        assert_eq!(
+            pieces_with_items, 19,
+            "items must survive onto the final board"
+        );
+    }
 }

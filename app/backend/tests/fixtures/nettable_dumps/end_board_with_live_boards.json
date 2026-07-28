@@ -1,0 +1,1758 @@
+{
+ "captured_at": "2026-07-28T12:21:29.253555300+00:00",
+ "rows": [
+  {
+   "key": "end_board",
+   "observed_at": "2026-07-27T23:29:28+01:00",
+   "raw": {
+    "data": {
+     "76561198022169086": {
+      "chess_hand": "chess_dk,chess_aa,chess_cm,",
+      "chess_lineup": "chess_lc1,chess_riki,chess_puck1,chess_lina1,chess_dk1,chess_phx,chess_lyc1,chess_naga1,chess_om1,chess_cm,chess_thd1,chess_lion1,chess_rm1,chess_light1,",
+      "curr_rank": 1,
+      "delta": 52,
+      "hero_level": 14,
+      "hp": 65,
+      "level_delta": 1,
+      "mmr_level": 21,
+      "mvp_chess_items": "item_gulonghaojiao,item_hongzhang",
+      "pandaman_getlist": {
+       "1": "chess_lc_15",
+       "2": "chess_huskar_17"
+      },
+      "player_id": 5,
+      "rank": 0,
+      "relic": "item_super_uprank",
+      "relic_history": {
+       "1": {
+        "relic": "item_mangotree",
+        "round": 11
+       },
+       "2": {
+        "relic": "item_free_draw",
+        "round": 21
+       },
+       "3": {
+        "relic": "item_super_uprank",
+        "round": 31
+       }
+      },
+      "round": 40,
+      "steam_id": "76561198022169086",
+      "team_id": 11
+     },
+     "76561198041650294": {
+      "chess_hand": "chess_lina1,chess_sniper1,chess_vs,chess_vs,chess_sniper,chess_sniper,",
+      "chess_lineup": "chess_kez1,chess_sm11,chess_sniper1,chess_rubick1,chess_ct11,chess_bs,chess_lina1,",
+      "curr_rank": 8,
+      "delta": -148,
+      "hero_level": 7,
+      "hp": 0,
+      "level_delta": -1,
+      "mmr_level": 18,
+      "mvp_chess_items": "",
+      "pandaman_getlist": {
+       "1": "chess_light_9"
+      },
+      "player_id": 4,
+      "rank": 8,
+      "relic": "item_stolen_vault",
+      "relic_history": {
+       "1": {
+        "relic": "item_super_uprank",
+        "round": 16
+       },
+       "2": {
+        "relic": "item_stolen_vault",
+        "round": 24
+       }
+      },
+      "round": 29,
+      "steam_id": "76561198041650294",
+      "team_id": 10
+     },
+     "76561198054438370": {
+      "chess_hand": "chess_lina,chess_luna,chess_light,chess_light,chess_lina,chess_puck,chess_tech,chess_luna1,",
+      "chess_lineup": "chess_db1,chess_lion1,chess_kunkka1,chess_luna1,chess_wl,chess_cm1,chess_puck,chess_dk,chess_thd,",
+      "curr_rank": 7,
+      "delta": -128,
+      "hero_level": 9,
+      "hp": 0,
+      "level_delta": -1,
+      "mmr_level": 18,
+      "mvp_chess_items": "item_yuanlifazhang",
+      "pandaman_getlist": {},
+      "player_id": 0,
+      "rank": 7,
+      "relic": "item_stolen_vault",
+      "relic_history": {
+       "1": {
+        "relic": "item_rm_wheel_of_wonder",
+        "round": 11
+       },
+       "2": {
+        "relic": "item_stolen_vault",
+        "round": 21
+       },
+       "3": {
+        "relic": "item_stolen_vault",
+        "round": 31
+       }
+      },
+      "round": 33,
+      "steam_id": "76561198054438370",
+      "team_id": 7
+     },
+     "76561198056498892": {
+      "chess_hand": "chess_snap,chess_tk1,chess_clock1,chess_tk,chess_tk,chess_ga,",
+      "chess_lineup": "chess_meepo1,chess_snap1,chess_ga1,chess_tk1,chess_gyro,chess_clock1,chess_snap1,chess_shredder1,chess_bh1,chess_ga1,",
+      "curr_rank": 4,
+      "delta": 67,
+      "hero_level": 10,
+      "hp": 0,
+      "level_delta": 1,
+      "mmr_level": 17,
+      "mvp_chess_items": "item_jipin,item_suiluchui,item_tiaozhantoujin,item_yongqizhiguang,item_meiken",
+      "pandaman_getlist": {
+       "1": "chess_tk_10",
+       "2": "chess_storm_19"
+      },
+      "player_id": 2,
+      "rank": 4,
+      "relic": "item_mangotree",
+      "relic_history": {
+       "1": {
+        "relic": "item_rm_wheel_of_wonder",
+        "round": 11
+       },
+       "2": {
+        "relic": "item_magic_box",
+        "round": 21
+       },
+       "3": {
+        "relic": "item_mangotree",
+        "round": 31
+       }
+      },
+      "round": 39,
+      "steam_id": "76561198056498892",
+      "team_id": 8
+     },
+     "76561198074465891": {
+      "chess_hand": "chess_morph,chess_morph,chess_ck1,chess_huskar,chess_sven,chess_huskar,chess_dk,",
+      "chess_lineup": "chess_lc1,chess_huskar1,chess_dw1,chess_ck1,chess_pom1,chess_dk,chess_rubick1,chess_troll1,chess_bat1,chess_luna1,",
+      "curr_rank": 2,
+      "delta": 127,
+      "hero_level": 11,
+      "hp": 0,
+      "level_delta": 2,
+      "mmr_level": 18,
+      "mvp_chess_items": "item_lilianghuwan,item_sanchaji,item_huiyao,item_zhusidoupeng,item_shuijingjian",
+      "pandaman_getlist": {
+       "1": "chess_void_4"
+      },
+      "player_id": 1,
+      "rank": 2,
+      "relic": "item_malefic_rapture",
+      "relic_history": {
+       "1": {
+        "relic": "item_free_draw",
+        "round": 11
+       },
+       "2": {
+        "relic": "item_mangotree",
+        "round": 21
+       },
+       "3": {
+        "relic": "item_malefic_rapture",
+        "round": 31
+       }
+      },
+      "round": 40,
+      "steam_id": "76561198074465891",
+      "team_id": 6
+     },
+     "76561198259272391": {
+      "chess_hand": "chess_io,magic_box,chess_io,magic_box,",
+      "chess_lineup": "chess_bs,chess_viper,chess_light1,chess_thd,chess_kunkka1,chess_puck1,chess_dk1,chess_light1,chess_lina1,",
+      "curr_rank": 5,
+      "delta": 27,
+      "hero_level": 9,
+      "hp": 0,
+      "level_delta": 0,
+      "mmr_level": 18,
+      "mvp_chess_items": "item_hongzhang,item_shuaxinqiu",
+      "pandaman_getlist": {
+       "1": "chess_pa_11"
+      },
+      "player_id": 7,
+      "rank": 5,
+      "relic": "item_magic_box",
+      "relic_history": {
+       "1": {
+        "relic": "item_bench_contract",
+        "round": 11
+       },
+       "2": {
+        "relic": "item_stolen_vault",
+        "round": 21
+       },
+       "3": {
+        "relic": "item_magic_box",
+        "round": 31
+       }
+      },
+      "round": 38,
+      "steam_id": "76561198259272391",
+      "team_id": 13
+     },
+     "76561198408444744": {
+      "chess_hand": "chess_aa1,chess_et1,chess_cm,",
+      "chess_lineup": "chess_rubick1,chess_thd,chess_lina1,chess_ww1,chess_puck1,chess_rm,chess_aa1,chess_naga1,chess_light1,chess_phx1,",
+      "curr_rank": 3,
+      "delta": 12,
+      "hero_level": 10,
+      "hp": 0,
+      "level_delta": 0,
+      "mmr_level": 20,
+      "mvp_chess_items": "item_gulonghaojiao,item_yuanlifazhang,item_minglingshu",
+      "pandaman_getlist": {},
+      "player_id": 3,
+      "rank": 3,
+      "relic": "item_super_uprank",
+      "relic_history": {
+       "1": {
+        "relic": "item_rm_wheel_of_wonder",
+        "round": 14
+       },
+       "2": {
+        "relic": "item_free_draw",
+        "round": 21
+       },
+       "3": {
+        "relic": "item_super_uprank",
+        "round": 31
+       }
+      },
+      "round": 39,
+      "steam_id": "76561198408444744",
+      "team_id": 9
+     },
+     "76561199574035922": {
+      "chess_hand": "chess_io,chess_lyc1,chess_fur11,chess_et1,chess_ld,chess_brew1,chess_lyc,",
+      "chess_lineup": "chess_ember1,chess_ld1,chess_tp11,chess_tp11,chess_fur11,chess_mk1,chess_eh11,chess_pangolier1,",
+      "curr_rank": 6,
+      "delta": -7,
+      "hero_level": 8,
+      "hp": 0,
+      "level_delta": 0,
+      "mmr_level": 0,
+      "mvp_chess_items": "",
+      "pandaman_getlist": {
+       "1": "chess_pangolier_7",
+       "2": "chess_ember_24",
+       "3": "chess_ember_26"
+      },
+      "player_id": 6,
+      "rank": 6,
+      "relic": "item_upgrade_lootbox",
+      "relic_history": {
+       "1": {
+        "relic": "item_bench_contract",
+        "round": 11
+       },
+       "2": {
+        "relic": "item_more_creep",
+        "round": 21
+       },
+       "3": {
+        "relic": "item_upgrade_lootbox",
+        "round": 31
+       }
+      },
+      "round": 34,
+      "steam_id": "76561199574035922",
+      "team_id": 12
+     }
+    },
+    "hehe": 7728
+   },
+   "table_name": "CustomNetTable_dac_table"
+  },
+  {
+   "key": "player_info",
+   "observed_at": "2026-07-27T23:29:28+01:00",
+   "raw": {
+    "hehe": 306,
+    "info": {
+     "76561198022169086": {
+      "hero_index": 241,
+      "mmr_level": 20,
+      "player_id": 5,
+      "steam_id": "76561198022169086"
+     },
+     "76561198041650294": {
+      "hero_index": 433,
+      "mmr_level": 19,
+      "player_id": 4,
+      "steam_id": "76561198041650294"
+     },
+     "76561198054438370": {
+      "hero_index": 209,
+      "mmr_level": 19,
+      "player_id": 0,
+      "steam_id": "76561198054438370"
+     },
+     "76561198056498892": {
+      "hero_index": 337,
+      "mmr_level": 16,
+      "player_id": 2,
+      "steam_id": "76561198056498892"
+     },
+     "76561198074465891": {
+      "hero_index": 273,
+      "mmr_level": 16,
+      "player_id": 1,
+      "steam_id": "76561198074465891"
+     },
+     "76561198259272391": {
+      "hero_index": 369,
+      "mmr_level": 18,
+      "player_id": 7,
+      "steam_id": "76561198259272391"
+     },
+     "76561198408444744": {
+      "hero_index": 401,
+      "mmr_level": 20,
+      "player_id": 3,
+      "steam_id": "76561198408444744"
+     },
+     "76561199574035922": {
+      "hero_index": 305,
+      "mmr_level": 0,
+      "player_id": 6,
+      "steam_id": "76561199574035922"
+     }
+    }
+   },
+   "table_name": "CustomNetTable_dac_table"
+  },
+  {
+   "key": "round_info",
+   "observed_at": "2026-07-27T23:29:26+01:00",
+   "raw": {
+    "round": 39
+   },
+   "table_name": "CustomNetTable_game_info"
+  },
+  {
+   "key": "vchess_0",
+   "observed_at": "2026-07-27T23:29:28+01:00",
+   "raw": {
+    "1_1": {
+     "buy_price": 3,
+     "changdun_count": 0,
+     "chess": "chess_cm1",
+     "grow_count": 0,
+     "index": 3282,
+     "item": {},
+     "lastitem": {},
+     "press_count": 0,
+     "water_id": 55,
+     "x": 1,
+     "xuejingshi_count": 0,
+     "y": 1
+    },
+    "1_4": {
+     "buy_price": 12,
+     "changdun_count": 0,
+     "chess": "chess_lion1",
+     "grow_count": 0,
+     "index": 1785,
+     "item": {},
+     "lastitem": {},
+     "press_count": 0,
+     "x": 4,
+     "xuejingshi_count": 0,
+     "y": 1
+    },
+    "1_5": {
+     "buy_price": 4,
+     "chess": "chess_dk",
+     "index": 1074,
+     "item": {},
+     "lastitem": {},
+     "water_id": 68,
+     "x": 5,
+     "y": 1
+    },
+    "1_6": {
+     "buy_price": 5,
+     "chess": "chess_wl",
+     "index": 524,
+     "item": {},
+     "lastitem": {},
+     "water_id": 61,
+     "x": 6,
+     "y": 1
+    },
+    "1_7": {
+     "buy_price": 2,
+     "chess": "chess_puck",
+     "index": 891,
+     "item": {},
+     "lastitem": {},
+     "water_id": 37,
+     "x": 7,
+     "y": 1
+    },
+    "1_8": {
+     "buy_price": 5,
+     "chess": "chess_thd",
+     "index": 562,
+     "item": {},
+     "lastitem": {
+      "1": "item_yuanlifazhang"
+     },
+     "water_id": 65,
+     "x": 8,
+     "y": 1
+    },
+    "2_6": {
+     "buy_price": 6,
+     "changdun_count": 0,
+     "chess": "chess_db1",
+     "grow_count": 0,
+     "index": 605,
+     "item": {},
+     "lastitem": {},
+     "press_count": 0,
+     "water_id": 42,
+     "x": 6,
+     "xuejingshi_count": 0,
+     "y": 2
+    },
+    "2_7": {
+     "buy_price": 12,
+     "changdun_count": 0,
+     "chess": "chess_kunkka1",
+     "grow_count": 0,
+     "index": 778,
+     "item": {},
+     "lastitem": {},
+     "press_count": 0,
+     "water_id": 60,
+     "x": 7,
+     "xuejingshi_count": 0,
+     "y": 2
+    },
+    "2_8": {
+     "buy_price": 6,
+     "changdun_count": 0,
+     "chess": "chess_luna1",
+     "extra_synergy": {
+      "1": "is_mage"
+     },
+     "grow_count": 0,
+     "index": 1353,
+     "item": {},
+     "lastitem": {
+      "1": "item_shuijingjian",
+      "2": "item_jipin",
+      "3": "item_fengkuangmianju",
+      "4": "item_yuanlingxidai"
+     },
+     "press_count": 0,
+     "water_id": 30,
+     "x": 8,
+     "xuejingshi_count": 0,
+     "y": 2
+    }
+   },
+   "table_name": "CustomNetTable_player_id_table"
+  },
+  {
+   "key": "vchess_1",
+   "observed_at": "2026-07-27T23:29:28+01:00",
+   "raw": {
+    "1_4": {
+     "buy_price": 5,
+     "changdun_count": 0,
+     "chess": "chess_huskar1",
+     "grow_count": 0,
+     "index": 1411,
+     "item": {},
+     "lastitem": {
+      "1": "item_shuijingjian"
+     },
+     "press_count": 0,
+     "water_id": 74,
+     "x": 4,
+     "xuejingshi_count": 0,
+     "y": 1
+    },
+    "1_5": {
+     "buy_price": 5,
+     "changdun_count": 0,
+     "chess": "chess_troll1",
+     "grow_count": 0,
+     "index": 2311,
+     "item": {},
+     "lastitem": {
+      "1": "item_lilianghuwan",
+      "2": "item_sanchaji",
+      "3": "item_huiyao",
+      "4": "item_zhusidoupeng",
+      "5": "item_shuijingjian"
+     },
+     "press_count": 0,
+     "water_id": 79,
+     "x": 5,
+     "xuejingshi_count": 0,
+     "y": 1
+    },
+    "1_6": {
+     "buy_price": 3,
+     "changdun_count": 0,
+     "chess": "chess_pom1",
+     "grow_count": 0,
+     "index": 3091,
+     "item": {},
+     "lastitem": {},
+     "press_count": 0,
+     "water_id": 37,
+     "x": 6,
+     "xuejingshi_count": 0,
+     "y": 1
+    },
+    "1_7": {
+     "buy_price": 8,
+     "changdun_count": 0,
+     "chess": "chess_rubick1",
+     "grow_count": 0,
+     "index": 1531,
+     "item": {},
+     "lastitem": {
+      "1": "item_konglingguajian"
+     },
+     "press_count": 0,
+     "rubick_range": 205,
+     "water_id": 40,
+     "x": 7,
+     "xuejingshi_count": 0,
+     "y": 1
+    },
+    "1_8": {
+     "buy_price": 3,
+     "changdun_count": 0,
+     "chess": "chess_luna1",
+     "grow_count": 0,
+     "index": 760,
+     "item": {},
+     "lastitem": {
+      "1": "item_yuanlingxidai",
+      "2": "item_fengkuangmianju",
+      "3": "item_jipin",
+      "4": "item_zhusidoupeng",
+      "5": "item_wuzhixiaomao",
+      "6": "item_jingmixie"
+     },
+     "press_count": 0,
+     "water_id": 72,
+     "x": 8,
+     "xuejingshi_count": 0,
+     "y": 1
+    },
+    "2_4": {
+     "buy_price": 4,
+     "chess": "chess_dk",
+     "index": 2119,
+     "item": {},
+     "lastitem": {},
+     "water_id": 47,
+     "x": 4,
+     "y": 2
+    },
+    "2_5": {
+     "buy_price": 4,
+     "changdun_count": 0,
+     "chess": "chess_bat1",
+     "grow_count": 0,
+     "index": 680,
+     "item": {},
+     "lastitem": {},
+     "press_count": 0,
+     "water_id": 67,
+     "x": 5,
+     "xuejingshi_count": 0,
+     "y": 2
+    },
+    "2_6": {
+     "buy_price": 5,
+     "changdun_count": 0,
+     "chess": "chess_lc1",
+     "grow_count": 0,
+     "index": 1795,
+     "item": {},
+     "lastitem": {
+      "1": "item_zhusidoupeng",
+      "2": "item_lilianghuwan"
+     },
+     "press_count": 9,
+     "water_id": 43,
+     "x": 6,
+     "xuejingshi_count": 0,
+     "y": 2
+    },
+    "2_7": {
+     "buy_price": 3,
+     "changdun_count": 0,
+     "chess": "chess_dw1",
+     "grow_count": 0,
+     "index": 1569,
+     "item": {},
+     "lastitem": {},
+     "press_count": 0,
+     "water_id": 34,
+     "x": 7,
+     "xuejingshi_count": 0,
+     "y": 2
+    },
+    "2_8": {
+     "buy_price": 3,
+     "changdun_count": 0,
+     "chess": "chess_ck1",
+     "grow_count": 0,
+     "index": 2010,
+     "item": {},
+     "lastitem": {},
+     "press_count": 0,
+     "water_id": 50,
+     "x": 8,
+     "xuejingshi_count": 0,
+     "y": 2
+    }
+   },
+   "table_name": "CustomNetTable_player_id_table"
+  },
+  {
+   "key": "vchess_2",
+   "observed_at": "2026-07-27T23:29:28+01:00",
+   "raw": {
+    "1_2": {
+     "buy_price": 5,
+     "chess": "chess_gyro",
+     "index": 1783,
+     "item": {},
+     "lastitem": {},
+     "water_id": 72,
+     "x": 2,
+     "y": 1
+    },
+    "1_3": {
+     "bh_gold": 1,
+     "buy_price": 2,
+     "changdun_count": 0,
+     "chess": "chess_bh1",
+     "grow_count": 0,
+     "index": 2767,
+     "item": {},
+     "lastitem": {},
+     "press_count": 0,
+     "water_id": 16,
+     "x": 3,
+     "xuejingshi_count": 0,
+     "y": 1
+    },
+    "1_4": {
+     "buy_price": 8,
+     "changdun_count": 0,
+     "chess": "chess_snap1",
+     "grow_count": 0,
+     "index": 2616,
+     "item": {},
+     "lastitem": {
+      "1": "item_jipin",
+      "2": "item_suiluchui",
+      "3": "item_tiaozhantoujin",
+      "4": "item_yongqizhiguang",
+      "5": "item_meiken",
+      "6": "item_xueji"
+     },
+     "press_count": 0,
+     "water_id": 24,
+     "x": 4,
+     "xuejingshi_count": 0,
+     "y": 1
+    },
+    "1_6": {
+     "buy_price": 2,
+     "changdun_count": 0,
+     "chess": "chess_tk1",
+     "grow_count": 0,
+     "index": 2255,
+     "item": {},
+     "lastitem": {
+      "1": "item_yuanlifazhang",
+      "2": "item_qinwangduandao"
+     },
+     "press_count": 0,
+     "water_id": 15,
+     "x": 6,
+     "xuejingshi_count": 0,
+     "y": 1
+    },
+    "1_7": {
+     "buy_price": 12,
+     "changdun_count": 0,
+     "chess": "chess_snap1",
+     "grow_count": 0,
+     "index": 904,
+     "item": {},
+     "lastitem": {
+      "1": "item_lilianghuwan",
+      "2": "item_yongqizhiguang",
+      "3": "item_sanchaji",
+      "4": "item_xuanmingdunpai"
+     },
+     "press_count": 0,
+     "water_id": 58,
+     "x": 7,
+     "xuejingshi_count": 0,
+     "y": 1
+    },
+    "2_2": {
+     "buy_price": 9,
+     "changdun_count": 0,
+     "chess": "chess_meepo1",
+     "grow_count": 0,
+     "index": 3372,
+     "item": {},
+     "lastitem": {},
+     "press_count": 0,
+     "water_id": 71,
+     "x": 2,
+     "xuejingshi_count": 0,
+     "y": 2
+    },
+    "2_4": {
+     "buy_price": 8,
+     "changdun_count": 0,
+     "chess": "chess_ga1",
+     "grow_count": 0,
+     "index": 1208,
+     "item": {},
+     "lastitem": {
+      "1": "item_linglichangbian"
+     },
+     "press_count": 0,
+     "water_id": 62,
+     "x": 4,
+     "xuejingshi_count": 0,
+     "y": 2
+    },
+    "2_7": {
+     "buy_price": 13,
+     "changdun_count": 0,
+     "chess": "chess_ga1",
+     "grow_count": 0,
+     "index": 1820,
+     "item": {},
+     "lastitem": {},
+     "press_count": 0,
+     "water_id": 68,
+     "x": 7,
+     "xuejingshi_count": 0,
+     "y": 2
+    },
+    "3_4": {
+     "buy_price": 4,
+     "changdun_count": 0,
+     "chess": "chess_shredder1",
+     "grow_count": 0,
+     "index": 1451,
+     "item": {},
+     "lastitem": {},
+     "press_count": 0,
+     "water_id": 27,
+     "x": 4,
+     "xuejingshi_count": 0,
+     "y": 3
+    },
+    "3_5": {
+     "buy_price": 3,
+     "changdun_count": 0,
+     "chess": "chess_clock1",
+     "grow_count": 0,
+     "index": 2034,
+     "item": {},
+     "lastitem": {},
+     "press_count": 0,
+     "water_id": 6,
+     "x": 5,
+     "xuejingshi_count": 0,
+     "y": 3
+    }
+   },
+   "table_name": "CustomNetTable_player_id_table"
+  },
+  {
+   "key": "vchess_3",
+   "observed_at": "2026-07-27T23:29:28+01:00",
+   "raw": {
+    "1_1": {
+     "buy_price": 4,
+     "chess": "chess_light1",
+     "index": 2270,
+     "item": {},
+     "lastitem": {
+      "1": "item_gulonghaojiao",
+      "2": "item_yuanlifazhang",
+      "3": "item_minglingshu"
+     },
+     "water_id": 77,
+     "x": 1,
+     "y": 1
+    },
+    "1_3": {
+     "buy_price": 5,
+     "chess": "chess_rm",
+     "index": 691,
+     "item": {},
+     "water_id": 75,
+     "x": 3,
+     "y": 1
+    },
+    "1_8": {
+     "buy_price": 4,
+     "changdun_count": 0,
+     "chess": "chess_lina1",
+     "extra_synergy": {
+      "1": "is_god"
+     },
+     "grow_count": 0,
+     "index": 2960,
+     "item": {},
+     "lastitem": {},
+     "press_count": 0,
+     "water_id": 72,
+     "x": 8,
+     "xuejingshi_count": 0,
+     "y": 1
+    },
+    "2_1": {
+     "buy_price": 12,
+     "changdun_count": 0,
+     "chess": "chess_phx1",
+     "grow_count": 0,
+     "index": 3114,
+     "item": {},
+     "lastitem": {},
+     "press_count": 0,
+     "x": 1,
+     "xuejingshi_count": 0,
+     "y": 2
+    },
+    "2_4": {
+     "buy_price": 6,
+     "changdun_count": 0,
+     "chess": "chess_puck1",
+     "grow_count": 0,
+     "index": 1154,
+     "item": {},
+     "lastitem": {},
+     "press_count": 0,
+     "water_id": 74,
+     "x": 4,
+     "xuejingshi_count": 0,
+     "y": 2
+    },
+    "2_6": {
+     "buy_price": 6,
+     "changdun_count": 0,
+     "chess": "chess_rubick1",
+     "grow_count": 0,
+     "index": 888,
+     "item": {},
+     "lastitem": {
+      "1": "item_xueji",
+      "2": "item_yuanlifazhang"
+     },
+     "press_count": 0,
+     "rubick_range": 205,
+     "water_id": 70,
+     "x": 6,
+     "xuejingshi_count": 0,
+     "y": 2
+    },
+    "3_8": {
+     "buy_price": 5,
+     "chess": "chess_thd",
+     "index": 743,
+     "item": {},
+     "lastitem": {},
+     "water_id": 51,
+     "x": 8,
+     "y": 3
+    },
+    "4_1": {
+     "buy_price": 9,
+     "changdun_count": 0,
+     "chess": "chess_naga1",
+     "grow_count": 0,
+     "index": 1065,
+     "item": {},
+     "lastitem": {},
+     "press_count": 0,
+     "water_id": 65,
+     "x": 1,
+     "xuejingshi_count": 0,
+     "y": 4
+    },
+    "4_3": {
+     "buy_price": 0,
+     "chess": "chess_aa1",
+     "index": 726,
+     "item": {},
+     "water_id": 80,
+     "x": 3,
+     "y": 4
+    },
+    "4_6": {
+     "buy_price": 3,
+     "chess": "chess_ww1",
+     "index": 2697,
+     "item": {},
+     "lastitem": {},
+     "water_id": 25,
+     "x": 6,
+     "y": 4
+    }
+   },
+   "table_name": "CustomNetTable_player_id_table"
+  },
+  {
+   "key": "vchess_4",
+   "observed_at": "2026-07-27T23:29:28+01:00",
+   "raw": {
+    "1_1": {
+     "buy_price": 4,
+     "changdun_count": 0,
+     "chess": "chess_sniper1",
+     "grow_count": 0,
+     "index": 2676,
+     "item": {},
+     "lastitem": {},
+     "press_count": 0,
+     "water_id": 59,
+     "x": 1,
+     "xuejingshi_count": 0,
+     "y": 1
+    },
+    "1_3": {
+     "buy_price": 7,
+     "changdun_count": 0,
+     "chess": "chess_rubick1",
+     "grow_count": 0,
+     "index": 2513,
+     "item": {},
+     "lastitem": {},
+     "press_count": 0,
+     "rubick_a": "siren_song",
+     "rubick_range": 205,
+     "x": 3,
+     "xuejingshi_count": 0,
+     "y": 1
+    },
+    "1_4": {
+     "buy_price": 5,
+     "changdun_count": 0,
+     "chess": "chess_kez1",
+     "grow_count": 0,
+     "index": 667,
+     "item": {},
+     "lastitem": {},
+     "press_count": 0,
+     "water_id": 82,
+     "x": 4,
+     "xuejingshi_count": 0,
+     "y": 1
+    },
+    "1_6": {
+     "buy_price": 5,
+     "changdun_count": 0,
+     "chess": "chess_sm11",
+     "grow_count": 0,
+     "index": 2744,
+     "item": {},
+     "lastitem": {},
+     "press_count": 0,
+     "water_id": 69,
+     "x": 6,
+     "xuejingshi_count": 0,
+     "y": 1
+    },
+    "1_8": {
+     "buy_price": 4,
+     "changdun_count": 0,
+     "chess": "chess_lina1",
+     "grow_count": 0,
+     "index": 2959,
+     "item": {},
+     "lastitem": {
+      "1": "item_wangyuanjing",
+      "2": "item_fashulengjing",
+      "3": "item_yuanlifazhang"
+     },
+     "press_count": 0,
+     "water_id": 34,
+     "x": 8,
+     "xuejingshi_count": 0,
+     "y": 1
+    },
+    "2_5": {
+     "buy_price": 2,
+     "chess": "chess_bs",
+     "index": 2489,
+     "item": {},
+     "water_id": 85,
+     "x": 5,
+     "y": 2
+    },
+    "3_4": {
+     "buy_price": 8,
+     "changdun_count": 0,
+     "chess": "chess_ct11",
+     "grow_count": 0,
+     "index": 2786,
+     "item": {},
+     "press_count": 0,
+     "water_id": 87,
+     "x": 4,
+     "xuejingshi_count": 0,
+     "y": 3
+    }
+   },
+   "table_name": "CustomNetTable_player_id_table"
+  },
+  {
+   "key": "vchess_5",
+   "observed_at": "2026-07-27T23:29:28+01:00",
+   "raw": {
+    "1_1": {
+     "buy_price": 4,
+     "chess": "chess_phx",
+     "index": 2695,
+     "item": {},
+     "lastitem": {},
+     "water_id": 89,
+     "x": 1,
+     "y": 1
+    },
+    "1_6": {
+     "buy_price": 3,
+     "chess": "chess_riki",
+     "index": 3489,
+     "item": {},
+     "water_id": 85,
+     "x": 6,
+     "y": 1
+    },
+    "1_7": {
+     "buy_price": 1,
+     "chess": "chess_cm",
+     "index": 1661,
+     "item": {},
+     "lastitem": {},
+     "water_id": 21,
+     "x": 7,
+     "y": 1
+    },
+    "1_8": {
+     "buy_price": 12,
+     "changdun_count": 0,
+     "chess": "chess_light1",
+     "grow_count": 0,
+     "index": 2853,
+     "item": {},
+     "lastitem": {
+      "1": "item_gulonghaojiao",
+      "2": "item_hongzhang"
+     },
+     "press_count": 0,
+     "water_id": 92,
+     "x": 8,
+     "xuejingshi_count": 0,
+     "y": 1
+    },
+    "2_3": {
+     "buy_price": 9,
+     "changdun_count": 0,
+     "chess": "chess_om1",
+     "grow_count": 0,
+     "index": 609,
+     "item": {},
+     "lastitem": {},
+     "press_count": 0,
+     "water_id": 82,
+     "x": 3,
+     "xuejingshi_count": 0,
+     "y": 2
+    },
+    "2_4": {
+     "buy_price": 15,
+     "changdun_count": 0,
+     "chess": "chess_rm1",
+     "grow_count": 0,
+     "index": 2759,
+     "item": {},
+     "lastitem": {},
+     "press_count": 0,
+     "water_id": 84,
+     "x": 4,
+     "xuejingshi_count": 0,
+     "y": 2
+    },
+    "2_8": {
+     "buy_price": 6,
+     "changdun_count": 0,
+     "chess": "chess_lina1",
+     "grow_count": 0,
+     "index": 3028,
+     "item": {},
+     "press_count": 0,
+     "water_id": 94,
+     "x": 8,
+     "xuejingshi_count": 0,
+     "y": 2
+    },
+    "3_1": {
+     "buy_price": 15,
+     "changdun_count": 0,
+     "chess": "chess_thd1",
+     "grow_count": 0,
+     "index": 341,
+     "item": {},
+     "lastitem": {
+      "1": "item_linkenfaqiu",
+      "2": "item_xueji"
+     },
+     "press_count": 0,
+     "water_id": 73,
+     "x": 1,
+     "xuejingshi_count": 0,
+     "y": 3
+    },
+    "3_3": {
+     "buy_price": 6,
+     "changdun_count": 0,
+     "chess": "chess_puck1",
+     "grow_count": 0,
+     "index": 2018,
+     "item": {},
+     "lastitem": {},
+     "press_count": 0,
+     "water_id": 87,
+     "x": 3,
+     "xuejingshi_count": 0,
+     "y": 3
+    },
+    "3_4": {
+     "buy_price": 12,
+     "changdun_count": 0,
+     "chess": "chess_lion1",
+     "grow_count": 0,
+     "index": 3043,
+     "item": {},
+     "lastitem": {},
+     "press_count": 0,
+     "water_id": 46,
+     "x": 4,
+     "xuejingshi_count": 0,
+     "y": 3
+    },
+    "3_5": {
+     "buy_price": 9,
+     "changdun_count": 0,
+     "chess": "chess_naga1",
+     "grow_count": 0,
+     "index": 1259,
+     "item": {},
+     "lastitem": {},
+     "press_count": 0,
+     "water_id": 76,
+     "x": 5,
+     "xuejingshi_count": 0,
+     "y": 3
+    },
+    "4_2": {
+     "buy_price": 8,
+     "changdun_count": 0,
+     "chess": "chess_lc1",
+     "grow_count": 0,
+     "index": 1502,
+     "item": {},
+     "press_count": 11,
+     "water_id": 70,
+     "x": 2,
+     "xuejingshi_count": 0,
+     "y": 4
+    },
+    "4_4": {
+     "buy_price": 9,
+     "changdun_count": 0,
+     "chess": "chess_lyc1",
+     "grow_count": 0,
+     "index": 2547,
+     "item": {},
+     "lastitem": {},
+     "press_count": 0,
+     "water_id": 34,
+     "x": 4,
+     "xuejingshi_count": 0,
+     "y": 4
+    },
+    "4_5": {
+     "buy_price": 12,
+     "changdun_count": 0,
+     "chess": "chess_dk1",
+     "grow_count": 0,
+     "index": 2414,
+     "item": {},
+     "lastitem": {},
+     "press_count": 0,
+     "water_id": 79,
+     "x": 5,
+     "xuejingshi_count": 0,
+     "y": 4
+    }
+   },
+   "table_name": "CustomNetTable_player_id_table"
+  },
+  {
+   "key": "vchess_6",
+   "observed_at": "2026-07-27T23:29:28+01:00",
+   "raw": {
+    "1_2": {
+     "buy_price": 12,
+     "changdun_count": 0,
+     "chess": "chess_tp11",
+     "grow_count": 0,
+     "index": 2661,
+     "item": {},
+     "lastitem": {},
+     "press_count": 0,
+     "water_id": 55,
+     "x": 2,
+     "xuejingshi_count": 0,
+     "y": 1
+    },
+    "1_6": {
+     "buy_price": 12,
+     "changdun_count": 0,
+     "chess": "chess_tp11",
+     "grow_count": 0,
+     "index": 1446,
+     "item": {},
+     "lastitem": {},
+     "press_count": 0,
+     "water_id": 41,
+     "x": 6,
+     "xuejingshi_count": 0,
+     "y": 1
+    },
+    "2_1": {
+     "buy_price": 6,
+     "changdun_count": 0,
+     "chess": "chess_pangolier1",
+     "grow_count": 0,
+     "index": 1425,
+     "item": {},
+     "lastitem": {},
+     "press_count": 0,
+     "water_id": 53,
+     "x": 1,
+     "xuejingshi_count": 0,
+     "y": 2
+    },
+    "2_3": {
+     "buy_price": 8,
+     "changdun_count": 0,
+     "chess": "chess_fur11",
+     "grow_count": 0,
+     "index": 2426,
+     "item": {},
+     "press_count": 0,
+     "water_id": 80,
+     "x": 3,
+     "xuejingshi_count": 0,
+     "y": 2
+    },
+    "2_4": {
+     "buy_price": 13,
+     "changdun_count": 0,
+     "chess": "chess_mk1",
+     "grow_count": 0,
+     "index": 1929,
+     "item": {},
+     "lastitem": {},
+     "press_count": 0,
+     "water_id": 75,
+     "x": 4,
+     "xuejingshi_count": 0,
+     "y": 2
+    },
+    "2_5": {
+     "buy_price": 4,
+     "changdun_count": 0,
+     "chess": "chess_eh11",
+     "grow_count": 0,
+     "index": 1615,
+     "item": {},
+     "lastitem": {},
+     "press_count": 0,
+     "water_id": 69,
+     "x": 5,
+     "xuejingshi_count": 0,
+     "y": 2
+    },
+    "2_7": {
+     "buy_price": 9,
+     "changdun_count": 0,
+     "chess": "chess_ember1",
+     "grow_count": 0,
+     "index": 714,
+     "item": {},
+     "lastitem": {},
+     "press_count": 0,
+     "water_id": 67,
+     "x": 7,
+     "xuejingshi_count": 0,
+     "y": 2
+    },
+    "2_8": {
+     "buy_price": 8,
+     "changdun_count": 0,
+     "chess": "chess_ld1",
+     "grow_count": 0,
+     "index": 3382,
+     "item": {},
+     "lastitem": {
+      "1": "item_huanyingfu",
+      "2": "item_tiaodao"
+     },
+     "press_count": 0,
+     "water_id": 45,
+     "x": 8,
+     "xuejingshi_count": 0,
+     "y": 2
+    }
+   },
+   "table_name": "CustomNetTable_player_id_table"
+  },
+  {
+   "key": "vchess_7",
+   "observed_at": "2026-07-27T23:29:28+01:00",
+   "raw": {
+    "1_1": {
+     "buy_price": 8,
+     "changdun_count": 0,
+     "chess": "chess_light1",
+     "grow_count": 0,
+     "index": 597,
+     "item": {},
+     "lastitem": {
+      "1": "item_hongzhang",
+      "2": "item_shuaxinqiu"
+     },
+     "press_count": 0,
+     "water_id": 64,
+     "x": 1,
+     "xuejingshi_count": 0,
+     "y": 1
+    },
+    "1_5": {
+     "buy_price": 3,
+     "chess": "chess_viper",
+     "index": 1371,
+     "item": {},
+     "lastitem": {},
+     "water_id": 76,
+     "x": 5,
+     "y": 1
+    },
+    "1_7": {
+     "buy_price": 5,
+     "chess": "chess_thd",
+     "index": 3082,
+     "item": {},
+     "lastitem": {},
+     "water_id": 74,
+     "x": 7,
+     "y": 1
+    },
+    "1_8": {
+     "buy_price": 8,
+     "chess": "chess_light1",
+     "index": 2003,
+     "item": {},
+     "lastitem": {},
+     "water_id": 78,
+     "x": 8,
+     "y": 1
+    },
+    "2_1": {
+     "buy_price": 4,
+     "changdun_count": 0,
+     "chess": "chess_lina1",
+     "grow_count": 0,
+     "index": 1736,
+     "item": {},
+     "lastitem": {},
+     "press_count": 0,
+     "water_id": 41,
+     "x": 1,
+     "xuejingshi_count": 0,
+     "y": 2
+    },
+    "3_1": {
+     "buy_price": 4,
+     "changdun_count": 0,
+     "chess": "chess_puck1",
+     "grow_count": 0,
+     "index": 2884,
+     "item": {},
+     "lastitem": {},
+     "press_count": 0,
+     "water_id": 42,
+     "x": 1,
+     "xuejingshi_count": 0,
+     "y": 3
+    },
+    "4_2": {
+     "buy_price": 2,
+     "chess": "chess_bs",
+     "index": 2636,
+     "item": {},
+     "water_id": 89,
+     "x": 2,
+     "y": 4
+    },
+    "4_4": {
+     "buy_price": 13,
+     "changdun_count": 0,
+     "chess": "chess_kunkka1",
+     "grow_count": 0,
+     "index": 548,
+     "item": {},
+     "lastitem": {
+      "1": "item_gulonghaojiao",
+      "2": "item_minglingshu"
+     },
+     "press_count": 0,
+     "water_id": 53,
+     "x": 4,
+     "xuejingshi_count": 0,
+     "y": 4
+    },
+    "4_8": {
+     "buy_price": 12,
+     "changdun_count": 0,
+     "chess": "chess_dk1",
+     "grow_count": 0,
+     "index": 1430,
+     "item": {},
+     "lastitem": {},
+     "press_count": 0,
+     "water_id": 49,
+     "x": 8,
+     "xuejingshi_count": 0,
+     "y": 4
+    }
+   },
+   "table_name": "CustomNetTable_player_id_table"
+  },
+  {
+   "key": "player_info",
+   "observed_at": "2026-07-27T23:29:28+01:00",
+   "raw": {
+    "data": {
+     "76561198022169086": {
+      "chess_hand": "chess_dk,chess_aa,chess_cm,",
+      "chess_lineup": "chess_lc1,chess_riki,chess_puck1,chess_lina1,chess_dk1,chess_phx,chess_lyc1,chess_naga1,chess_om1,chess_cm,chess_thd1,chess_lion1,chess_rm1,chess_light1,",
+      "curr_rank": 1,
+      "hero_level": 14,
+      "hp": 65,
+      "mmr_level": 20,
+      "mvp_chess_items": "item_gulonghaojiao,item_hongzhang",
+      "pandaman_getlist": {
+       "1": "chess_lc_15",
+       "2": "chess_huskar_17"
+      },
+      "player_id": 5,
+      "rank": 0,
+      "relic": "item_super_uprank",
+      "relic_history": {
+       "1": {
+        "relic": "item_mangotree",
+        "round": 11
+       },
+       "2": {
+        "relic": "item_free_draw",
+        "round": 21
+       },
+       "3": {
+        "relic": "item_super_uprank",
+        "round": 31
+       }
+      },
+      "round": 40,
+      "steam_id": "76561198022169086",
+      "team_id": 11
+     },
+     "76561198041650294": {
+      "chess_hand": "chess_lina1,chess_sniper1,chess_vs,chess_vs,chess_sniper,chess_sniper,",
+      "chess_lineup": "chess_kez1,chess_sm11,chess_sniper1,chess_rubick1,chess_ct11,chess_bs,chess_lina1,",
+      "curr_rank": 8,
+      "delta": -148,
+      "hero_level": 7,
+      "hp": 0,
+      "level_delta": -1,
+      "mmr_level": 18,
+      "mvp_chess_items": "",
+      "pandaman_getlist": {
+       "1": "chess_light_9"
+      },
+      "player_id": 4,
+      "rank": 8,
+      "relic": "item_stolen_vault",
+      "relic_history": {
+       "1": {
+        "relic": "item_super_uprank",
+        "round": 16
+       },
+       "2": {
+        "relic": "item_stolen_vault",
+        "round": 24
+       }
+      },
+      "round": 29,
+      "steam_id": "76561198041650294",
+      "team_id": 10
+     },
+     "76561198054438370": {
+      "chess_hand": "chess_lina,chess_luna,chess_light,chess_light,chess_lina,chess_puck,chess_tech,chess_luna1,",
+      "chess_lineup": "chess_db1,chess_lion1,chess_kunkka1,chess_luna1,chess_wl,chess_cm1,chess_puck,chess_dk,chess_thd,",
+      "curr_rank": 7,
+      "delta": -128,
+      "hero_level": 9,
+      "hp": 0,
+      "level_delta": -1,
+      "mmr_level": 18,
+      "mvp_chess_items": "item_yuanlifazhang",
+      "pandaman_getlist": {},
+      "player_id": 0,
+      "rank": 7,
+      "relic": "item_stolen_vault",
+      "relic_history": {
+       "1": {
+        "relic": "item_rm_wheel_of_wonder",
+        "round": 11
+       },
+       "2": {
+        "relic": "item_stolen_vault",
+        "round": 21
+       },
+       "3": {
+        "relic": "item_stolen_vault",
+        "round": 31
+       }
+      },
+      "round": 33,
+      "steam_id": "76561198054438370",
+      "team_id": 7
+     },
+     "76561198056498892": {
+      "chess_hand": "chess_snap,chess_tk1,chess_clock1,chess_tk,chess_tk,chess_ga,",
+      "chess_lineup": "chess_meepo1,chess_snap1,chess_ga1,chess_tk1,chess_gyro,chess_clock1,chess_snap1,chess_shredder1,chess_bh1,chess_ga1,",
+      "curr_rank": 4,
+      "delta": 67,
+      "hero_level": 10,
+      "hp": 0,
+      "level_delta": 1,
+      "mmr_level": 17,
+      "mvp_chess_items": "item_jipin,item_suiluchui,item_tiaozhantoujin,item_yongqizhiguang,item_meiken",
+      "pandaman_getlist": {
+       "1": "chess_tk_10",
+       "2": "chess_storm_19"
+      },
+      "player_id": 2,
+      "rank": 4,
+      "relic": "item_mangotree",
+      "relic_history": {
+       "1": {
+        "relic": "item_rm_wheel_of_wonder",
+        "round": 11
+       },
+       "2": {
+        "relic": "item_magic_box",
+        "round": 21
+       },
+       "3": {
+        "relic": "item_mangotree",
+        "round": 31
+       }
+      },
+      "round": 39,
+      "steam_id": "76561198056498892",
+      "team_id": 8
+     },
+     "76561198074465891": {
+      "chess_hand": "chess_morph,chess_morph,chess_ck1,chess_huskar,chess_sven,chess_huskar,chess_dk,",
+      "chess_lineup": "chess_lc1,chess_huskar1,chess_dw1,chess_ck1,chess_pom1,chess_dk,chess_rubick1,chess_troll1,chess_bat1,chess_luna1,",
+      "curr_rank": 2,
+      "hero_level": 11,
+      "hp": 0,
+      "mmr_level": 16,
+      "mvp_chess_items": "item_lilianghuwan,item_sanchaji,item_huiyao,item_zhusidoupeng,item_shuijingjian",
+      "pandaman_getlist": {
+       "1": "chess_void_4"
+      },
+      "player_id": 1,
+      "rank": 2,
+      "relic": "item_malefic_rapture",
+      "relic_history": {
+       "1": {
+        "relic": "item_free_draw",
+        "round": 11
+       },
+       "2": {
+        "relic": "item_mangotree",
+        "round": 21
+       },
+       "3": {
+        "relic": "item_malefic_rapture",
+        "round": 31
+       }
+      },
+      "round": 40,
+      "steam_id": "76561198074465891",
+      "team_id": 6
+     },
+     "76561198259272391": {
+      "chess_hand": "chess_io,magic_box,chess_io,magic_box,",
+      "chess_lineup": "chess_bs,chess_viper,chess_light1,chess_thd,chess_kunkka1,chess_puck1,chess_dk1,chess_light1,chess_lina1,",
+      "curr_rank": 5,
+      "delta": 27,
+      "hero_level": 9,
+      "hp": 0,
+      "level_delta": 0,
+      "mmr_level": 18,
+      "mvp_chess_items": "item_hongzhang,item_shuaxinqiu",
+      "pandaman_getlist": {
+       "1": "chess_pa_11"
+      },
+      "player_id": 7,
+      "rank": 5,
+      "relic": "item_magic_box",
+      "relic_history": {
+       "1": {
+        "relic": "item_bench_contract",
+        "round": 11
+       },
+       "2": {
+        "relic": "item_stolen_vault",
+        "round": 21
+       },
+       "3": {
+        "relic": "item_magic_box",
+        "round": 31
+       }
+      },
+      "round": 38,
+      "steam_id": "76561198259272391",
+      "team_id": 13
+     },
+     "76561198408444744": {
+      "chess_hand": "chess_aa1,chess_et1,chess_cm,",
+      "chess_lineup": "chess_rubick1,chess_thd,chess_lina1,chess_ww1,chess_puck1,chess_rm,chess_aa1,chess_naga1,chess_light1,chess_phx1,",
+      "curr_rank": 3,
+      "delta": 12,
+      "hero_level": 10,
+      "hp": 0,
+      "level_delta": 0,
+      "mmr_level": 20,
+      "mvp_chess_items": "item_gulonghaojiao,item_yuanlifazhang,item_minglingshu",
+      "pandaman_getlist": {},
+      "player_id": 3,
+      "rank": 3,
+      "relic": "item_super_uprank",
+      "relic_history": {
+       "1": {
+        "relic": "item_rm_wheel_of_wonder",
+        "round": 14
+       },
+       "2": {
+        "relic": "item_free_draw",
+        "round": 21
+       },
+       "3": {
+        "relic": "item_super_uprank",
+        "round": 31
+       }
+      },
+      "round": 39,
+      "steam_id": "76561198408444744",
+      "team_id": 9
+     },
+     "76561199574035922": {
+      "chess_hand": "chess_io,chess_lyc1,chess_fur11,chess_et1,chess_ld,chess_brew1,chess_lyc,",
+      "chess_lineup": "chess_ember1,chess_ld1,chess_tp11,chess_tp11,chess_fur11,chess_mk1,chess_eh11,chess_pangolier1,",
+      "curr_rank": 6,
+      "delta": -7,
+      "hero_level": 8,
+      "hp": 0,
+      "level_delta": 0,
+      "mmr_level": 0,
+      "mvp_chess_items": "",
+      "pandaman_getlist": {
+       "1": "chess_pangolier_7",
+       "2": "chess_ember_24",
+       "3": "chess_ember_26"
+      },
+      "player_id": 6,
+      "rank": 6,
+      "relic": "item_upgrade_lootbox",
+      "relic_history": {
+       "1": {
+        "relic": "item_bench_contract",
+        "round": 11
+       },
+       "2": {
+        "relic": "item_more_creep",
+        "round": 21
+       },
+       "3": {
+        "relic": "item_upgrade_lootbox",
+        "round": 31
+       }
+      },
+      "round": 34,
+      "steam_id": "76561199574035922",
+      "team_id": 12
+     }
+    },
+    "hehe": 52468
+   },
+   "table_name": "CustomNetTable_player_info_table"
+  }
+ ],
+ "tables": [
+  "CustomNetTable_chess_pool_table",
+  "CustomNetTable_dac_table",
+  "CustomNetTable_game_info",
+  "CustomNetTable_player_id_table",
+  "CustomNetTable_player_info_table",
+  "CustomNetTable_ranking_top_table"
+ ]
+}
