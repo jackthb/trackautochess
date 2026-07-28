@@ -19,6 +19,14 @@ const LIVE_PLAYER_FIELDS: &[(&str, &str)] = &[
     ("win_round", "win_round"),
     ("lose_round", "lose_round"),
     ("buff", "buff"),
+    // `buff` is every species/class on board with its count, including the
+    // ones that activate nothing. `show_buff` is the subset the game's own
+    // panel shows, and `chess_synergies` is the list of tiers it actually
+    // activated — `is_pandaman` plus `is_pandaman1` when both Pandaren tiers
+    // are live. Those two are the game's own answer to "what is active", which
+    // no amount of deriving from the board can be sure of.
+    ("show_buff", "show_buff"),
+    ("chess_synergies", "chess_synergies"),
     ("relic", "relic"),
     ("mmr_level", "mmr_level"),
     ("candy", "candy"),

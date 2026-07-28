@@ -209,6 +209,37 @@ const phantom = byName(
 );
 assert.equal(phantom.Undead, undefined, "buff-only synergies are not displayed");
 
+// --- Against a real capture -------------------------------------------------
+// Round 10 of a captured match: Marci, Meepo, Meepo, Brewmaster 2★, Earth
+// Spirit. The game reported `is_monk:2,is_pandaman:2,is_shaman:1,is_mech:1,
+// is_kobold:1,is_elf:1` — so two Meepos count as one Kobold, confirming the
+// unique-species rule, and our derivation has to reproduce those counts
+// exactly with no stored buff to lean on.
+const capturedBoard = [
+  { name: "Marci" },
+  { name: "Meepo" },
+  { name: "Meepo" },
+  { name: "Brewmaster" },
+  { name: "Earth Spirit" },
+];
+const captured = byName(computeLineupSynergies(capturedBoard, options));
+assert.equal(captured.Monk.count, 2);
+assert.equal(captured.Monk.tier, 2);
+// Pandaren tiers are (1)/(2), and the capture listed both as active
+// (`is_pandaman` + `is_pandaman1`), which is tier 2.
+assert.equal(captured.Pandaren.count, 2);
+assert.equal(captured.Pandaren.tier, 2);
+// Single-piece species stay hidden.
+for (const name of ["Elf", "Mech", "Shaman"]) {
+  assert.equal(captured[name], undefined, `a lone ${name} is not active`);
+}
+// KNOWN DIVERGENCE: the same capture's `chess_synergies` lists is_kobold as
+// active off a single Kobold species (two Meepo bodies), against Kobold's
+// (2) first tier. We follow the tier table and hide it. The game's own
+// activation list is now captured per round, so this can be settled with data
+// rather than inference.
+assert.equal(captured.Kobold, undefined);
+
 // --- Wizard perk edges ------------------------------------------------------
 
 // One Wizard is not enough for the discount. (The buff has to agree that
