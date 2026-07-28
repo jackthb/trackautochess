@@ -40,7 +40,7 @@ then uploads the processed match representation to Supabase.
    `observer_steam_id` for audit/debugging.
 7. The tailer detects stable dump blocks (no new `[stringtables]` lines
    for 2s), decodes them via `nettable_parser.parse_log`, optionally persists raw
-   rows locally under `~/.dac/captures/` and `~/.dac/nettable_dumps/`, and processes them
+   rows locally under `captures/` and `nettable_dumps/` in the DAC data dir, and processes them
    in-memory into `matches`, `match_players`, and `match_timelines`. Raw
    nettable dump logs stay on disk; they are never uploaded.
 
@@ -112,7 +112,7 @@ Representative Rust daemon event types include:
 
 Normal Supabase writes use processed `matches`, `match_players`, `match_timelines`, and Queen ladder/profile rows. Raw decoded nettable rows are local-only; remote raw dump uploads were removed entirely on 2026-07-02 (previously Supabase Storage, then Cloudflare R2 via `nettable_dump_upload_url`).
 
-Local raw dump persistence is controlled by the config field `keep_local_nettable_dumps`. When enabled, the backend writes `~/.dac/captures/latest_nettable_rows.json` and timestamped files under `~/.dac/nettable_dumps/`.
+Local raw dump persistence is controlled by the config field `keep_local_nettable_dumps`. When enabled, the backend writes `captures/latest_nettable_rows.json` and timestamped files under `nettable_dumps/`, both inside the DAC data dir (`%APPDATA%\@dac\desktop` on Windows, `~/.dac` elsewhere; `DAC_DIR` overrides both). Both are written by the same call, so if one is stale the other is too. Dumps are never deleted on a successful upload — the only deleter is the `local_game_cache_max_gb` budget, which evicts oldest first.
 
 ### Known DAC nettables not currently captured by the app
 
@@ -134,7 +134,7 @@ These showed up in older VPK/triage notes, but they are not in the current autom
 The Rust pipeline processes decoded rows in memory and uploads normalized product data. Diagnostic/raw dump artifacts are object-storage blobs, not table rows:
 
 - `supabase.upload_diagnostic_logs(...)` uploads tracker/console diagnostics to `diagnostic-logs`.
-- Raw nettable dump uploads were removed (2026-07-02): dumps stay local under `~/.dac/nettable_dumps/` and are never uploaded.
+- Raw nettable dump uploads were removed (2026-07-02): dumps stay local under `nettable_dumps/` in the DAC data dir and are never uploaded.
 - Outbox replay still uploads queued end-board rows (match data) but acks legacy raw row payloads without uploading, so stale outboxes drain.
 
 ### Open questions / current answers
@@ -16088,4 +16088,4 @@ cargo run --manifest-path app/backend/Cargo.toml -- parse-live <path-to-console.
 
 ## Supabase auth
 
-Normal live capture uploads use the app's configured Supabase URL/key for processed `matches`, `match_players`, and `match_timelines` rows. Diagnostic logs upload to Supabase Storage bucket `diagnostic-logs`. Raw nettable dump logs are not uploaded anywhere — they stay under `~/.dac/nettable_dumps` (see "Storage" below).
+Normal live capture uploads use the app's configured Supabase URL/key for processed `matches`, `match_players`, and `match_timelines` rows. Diagnostic logs upload to Supabase Storage bucket `diagnostic-logs`. Raw nettable dump logs are not uploaded anywhere — they stay under `nettable_dumps/` in the DAC data dir (see "Storage" below).

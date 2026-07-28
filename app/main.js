@@ -136,7 +136,11 @@ const backend = createBackendSupervisor({
   readline,
   desktopPaths: DESKTOP_PATHS,
   isDev: IS_DEV,
-  env: process.env,
+  // Pin the backend to the same data dir Electron resolved. Without this the
+  // Rust side re-derives it from APPDATA and the two agree only as long as
+  // app.getName() stays "@dac/desktop" — set a productName or extraMetadata
+  // and they would silently write to two different folders.
+  env: { ...process.env, DAC_DIR },
   trackerLogPath: trackerLog.trackerLogPath,
   appendLog: trackerLog.append,
 });

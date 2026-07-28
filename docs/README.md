@@ -105,10 +105,10 @@ Steam changelog ->  scripts/scrape-patch-notes.mjs  ->  content/patch-notes + co
 
 ## Runtime data and storage
 
-- Desktop runtime config is stored in `~/.dac/config.json`.
-- The Rust backend may also use `~/.dac/outbox`, `~/.dac/replays`, `~/.dac/captures`, `~/.dac/nettable_dumps`, and tracker logs for local-first capture, replay, diagnostics, and retry behavior.
+- Desktop runtime config is stored in `config.json` inside the DAC data dir (`%APPDATA%\@dac\desktop` on Windows, `~/.dac` elsewhere; `DAC_DIR` overrides both). On Windows that is `C:\Users\<user>\AppData\Roaming\@dac\desktop`; `~/.dac` there is the legacy location, copied forward once on upgrade and never written to again.
+- The Rust backend may also use `outbox/`, `replays/`, `captures/`, `nettable_dumps/`, and tracker logs inside that same dir for local-first capture, replay, diagnostics, and retry behavior.
 - Supabase stores public product data in `users`, `player_seasons`, `mmr_snapshots`, `matches`, `match_players`, `match_timelines`, `lineup_snapshots`, `community_builds`, `community_build_votes`, `community_build_comments`, `content_embeddings`, and `site_status`.
-- Supabase Storage bucket `diagnostic-logs` stores uploaded diagnostics. Raw nettable dump logs are never uploaded — they stay local under `~/.dac/nettable_dumps`.
+- Supabase Storage bucket `diagnostic-logs` stores uploaded diagnostics. Raw nettable dump logs are never uploaded — they stay local under `nettable_dumps/` in the DAC data dir.
 
 ## Automation
 
