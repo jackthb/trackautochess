@@ -449,6 +449,7 @@ pub(crate) fn extract_round_from_rows(rows: &[NettableRow]) -> Option<i64> {
 pub(crate) fn extract_draft_state_from_rows(rows: &[NettableRow]) -> serde_json::Value {
     let mut bans = serde_json::Map::new();
     let mut legendaries = Vec::new();
+    let mut ringmaster_classes = Vec::new();
     for row in rows {
         if !row.table_name.ends_with("chess_pool_table") {
             continue;
@@ -468,9 +469,44 @@ pub(crate) fn extract_draft_state_from_rows(rows: &[NettableRow]) -> serde_json:
             } else if let Some(values) = raw.as_array() {
                 legendaries.extend(values.iter().cloned());
             }
+        } else if row.key == "chess_rm_class" {
+            // Ringmaster has no race and three classes rolled per match
+            // (`{"1": "is_demonhunter", ...}`). Without this the site cannot
+            // know what its pieces counted toward — nothing else in the
+            // capture states the roll.
+            ringmaster_classes = slot_ordered_strings(&raw);
         }
     }
-    serde_json::json!({"bans": bans, "legendaries_revealed": legendaries})
+    serde_json::json!({
+        "bans": bans,
+        "legendaries_revealed": legendaries,
+        "ringmaster_classes": ringmaster_classes,
+    })
+}
+
+/// Values of a slot-keyed table (`{"1": "a", "2": "b"}`) in slot order.
+fn slot_ordered_strings(value: &Value) -> Vec<Value> {
+    let Some(object) = value.as_object() else {
+        return value
+            .as_array()
+            .map(|items| {
+                items
+                    .iter()
+                    .filter(|item| item.is_string())
+                    .cloned()
+                    .collect()
+            })
+            .unwrap_or_default();
+    };
+    let mut entries = object
+        .iter()
+        .filter_map(|(slot, entry)| Some((slot.parse::<i64>().ok()?, entry.as_str()?)))
+        .collect::<Vec<_>>();
+    entries.sort_by_key(|(slot, _)| *slot);
+    entries
+        .into_iter()
+        .map(|(_, entry)| Value::String(entry.to_owned()))
+        .collect()
 }
 
 pub(crate) fn extract_death_team_from_rows(
@@ -519,6 +555,38 @@ mod tests {
             Some(1),
             "an empty end_board board is still backfilled from the live rows"
         );
+    }
+
+    #[test]
+    fn extracts_ringmasters_rolled_classes_from_the_pool_table() {
+        use crate::nettable_parser::Value as RawValue;
+        use std::collections::BTreeMap;
+
+        let mut slots = BTreeMap::new();
+        slots.insert("2".to_owned(), RawValue::String("is_assassin".to_owned()));
+        slots.insert("1".to_owned(), RawValue::String("is_demonhunter".to_owned()));
+        slots.insert("3".to_owned(), RawValue::String("is_druid".to_owned()));
+        let rows = vec![NettableRow {
+            table_name: "CustomNetTable_chess_pool_table".to_owned(),
+            key: "chess_rm_class".to_owned(),
+            raw: RawValue::Object(slots),
+            observed_at: None,
+            match_started_at: None,
+        }];
+
+        let draft = extract_draft_state_from_rows(&rows);
+
+        assert_eq!(
+            draft["ringmaster_classes"],
+            serde_json::json!(["is_demonhunter", "is_assassin", "is_druid"]),
+            "classes come back in slot order, not map order"
+        );
+    }
+
+    #[test]
+    fn draft_state_without_a_pool_table_has_no_ringmaster_classes() {
+        let draft = extract_draft_state_from_rows(&[]);
+        assert_eq!(draft["ringmaster_classes"], serde_json::json!([]));
     }
 
     #[test]

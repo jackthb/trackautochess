@@ -205,6 +205,11 @@ export interface SynergyCountPiece {
 export interface ComputeLineupSynergiesOptions {
   /** Unit display name → synergy display names ("Aqir", "Demon Hunter", …). */
   unitSynergies: Record<string, string[]>;
+  /** Per-match trait overrides, consulted before `unitSynergies`. Ringmaster
+   *  rolls three classes per match and the roll is captured in the match's
+   *  `chess_rm_class`, so where that reached us we count it exactly instead of
+   *  inferring it from the game's synergy counts. */
+  unitSynergyOverrides?: Record<string, string[]>;
   /** Synergy display name → first active tier (buildSynergyMinCountByName). */
   synergyMinCount: Record<string, number>;
   /** Synergy display name → every tier (buildSynergyTiersByName). Needed to
@@ -247,6 +252,7 @@ export function computeLineupSynergies(
 ): LineupSynergy[] {
   const {
     unitSynergies,
+    unitSynergyOverrides,
     synergyMinCount,
     synergyTiers,
     itemCountsAsSynergy,
@@ -265,14 +271,14 @@ export function computeLineupSynergies(
     set.add(species);
   };
 
-  // Pieces content cannot resolve traits for: Ringmaster (no race, 3 random
-  // classes rerolled every match) and any unit newer than the local content
-  // snapshot. Each can be worth at most one body in any single synergy, which
-  // is what bounds the stored-count floor below.
+  // Pieces whose traits are still unknown after the per-match overrides: a
+  // Ringmaster from a match captured before the class roll was recorded, or a
+  // unit newer than the local content snapshot. Each can be worth at most one
+  // body in any single synergy, which is what bounds the floor below.
   let unresolvedPieces = 0;
   for (const piece of pieces) {
     if (!piece.name) continue;
-    const traits = unitSynergies[piece.name];
+    const traits = unitSynergyOverrides?.[piece.name] ?? unitSynergies[piece.name];
     if (!traits || traits.length === 0) unresolvedPieces += 1;
     for (const synergy of traits ?? []) {
       add(synergy, piece.name);

@@ -261,12 +261,34 @@ export const ITEM_SYNERGIES: Readonly<Record<string, string>> =
 export function computeSynergies(
   pieces: SynergyCountPiece[],
   storedSynergies?: { name: string; count: number }[],
+  unitSynergyOverrides?: Record<string, string[]>,
 ): LineupSynergy[] {
   return computeLineupSynergies(pieces, {
     unitSynergies: UNIT_SYNERGIES as Record<string, string[]>,
+    unitSynergyOverrides,
     synergyMinCount: SYNERGY_MIN_COUNT,
     synergyTiers: SYNERGY_TIERS,
     itemCountsAsSynergy: ITEM_SYNERGIES as Record<string, string>,
     storedSynergies,
   });
+}
+
+/** Unit whose traits are rolled per match rather than fixed in content. */
+export const RINGMASTER_UNIT_NAME = "Ringmaster";
+
+/**
+ * Turn a match's captured `chess_rm_class` (`["is_demonhunter", …]`) into the
+ * per-match trait override computeSynergies takes. Unknown keys are dropped
+ * rather than guessed, so a renamed synergy degrades to the stored-count
+ * fallback instead of inventing a trait.
+ */
+export function ringmasterSynergyOverride(
+  classKeys: readonly string[] | null | undefined,
+): Record<string, string[]> | undefined {
+  if (!classKeys || classKeys.length === 0) return undefined;
+  const synergies = synergiesData as Record<string, { name?: string }>;
+  const names = classKeys
+    .map((key) => synergies[key]?.name ?? synergies[`is_${key}`]?.name)
+    .filter((name): name is string => Boolean(name));
+  return names.length > 0 ? { [RINGMASTER_UNIT_NAME]: names } : undefined;
 }

@@ -1,7 +1,11 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import { UNIT_COSTS, computeSynergies } from "@/lib/units";
+import { useEffect, useMemo, useRef, useState } from "react";
+import {
+  UNIT_COSTS,
+  computeSynergies,
+  ringmasterSynergyOverride,
+} from "@/lib/units";
 import type { SynergyCountPiece } from "@dac/shared/game-structure";
 import {
   itemsFullData,
@@ -76,10 +80,16 @@ interface TimelinePlayerSnap {
   pandaren_drops?: PandarenDropEntry[];
 }
 
+interface TimelineDraftState {
+  /** Ringmaster's three classes for this match, as captured `is_*` keys. */
+  ringmaster_classes?: string[];
+}
+
 interface TimelineRound {
   round: number;
   captured_at?: string;
   players?: Record<string, TimelinePlayerSnap>;
+  draft?: TimelineDraftState;
 }
 
 interface MatchTimeline {
@@ -269,6 +279,7 @@ function MatchPlayerRow({
   displayPosition,
   deathRound,
   tooltipData,
+  unitSynergyOverrides,
 }: {
   game: Game;
   profile: SteamProfile;
@@ -282,6 +293,7 @@ function MatchPlayerRow({
   displayPosition: number | null;
   deathRound: number | null;
   tooltipData: TooltipData;
+  unitSynergyOverrides: Record<string, string[]> | undefined;
 }) {
   const p = displayPosition ?? (parseInt(game.placement) || 0);
   const pColor = placementColor(p);
@@ -305,10 +317,10 @@ function MatchPlayerRow({
   // Synergies always derive from the pieces actually shown. The round
   // snapshot board carries per-piece items, so counts-as items (Minotaur Horn
   // → Dragon) are exact there; lineup-only rows lean on the stored count for
-  // those. The raw stored string is never shown as-is — it's the game's `buff`
-  // capture and routinely disagrees with the final board — but it is the only
-  // record of Ringmaster's per-match class roll, so it is passed as a bounded
-  // floor whenever it describes this same end state.
+  // those. Ringmaster's per-match class roll comes from the timeline's
+  // captured `chess_rm_class`. The raw stored string is never shown as-is —
+  // it's the game's `buff` capture and routinely disagrees with the final
+  // board — but it still backs up anything the pieces cannot account for.
   const boardPieces = snap?.board;
   const synergyPieces: SynergyCountPiece[] = boardPieces?.length
     ? boardPieces.map((piece) => ({
@@ -319,6 +331,7 @@ function MatchPlayerRow({
   const synergies = computeSynergies(
     synergyPieces,
     isScrubbing ? undefined : parseSynergies(game.synergies),
+    unitSynergyOverrides,
   );
 
   // Compact-view relic list: prefer the full set from relic_history, fall
@@ -583,6 +596,19 @@ export default function GameView({
     }
   }, [selectedRoundIdx]);
 
+  // Ringmaster's three classes are rolled once per match and captured in the
+  // pool table, which only the opening dump carries — so take them from the
+  // first round that recorded them, not from the selected round.
+  const unitSynergyOverrides = useMemo(
+    () =>
+      ringmasterSynergyOverride(
+        timeline?.rounds?.find(
+          (round) => round.draft?.ringmaster_classes?.length,
+        )?.draft?.ringmaster_classes,
+      ),
+    [timeline],
+  );
+
   const tooltipData: TooltipData = {
     unitCosts: UNIT_COSTS,
     unitsFull: UNITS_FULL,
@@ -807,6 +833,7 @@ export default function GameView({
                       relicTimeline={relicTimelines[String(g.user_id)]}
                       snap={snapPlayer}
                       snapRound={selectedRound}
+                      unitSynergyOverrides={unitSynergyOverrides}
                       isLastRound={isLastRound}
                       displayPosition={displayPosition}
                       deathRound={deathRound}

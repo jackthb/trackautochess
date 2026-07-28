@@ -92,9 +92,23 @@ for (const [item, synergy] of [
 }
 
 // Ringmaster has no static traits by design (no race, 3 classes rolled per
-// match). If that ever changes in content, the stored-buff floor below is no
-// longer the only way to see its classes.
+// match); the roll is captured per match in `chess_rm_class` instead.
 assert.deepEqual(unitsFull.Ringmaster.synergies, []);
+
+// Those captured classes are raw `is_*` keys. They have to resolve to the same
+// display names the unit lookup uses, or the override silently counts nothing.
+for (const [key, name] of [
+  ["is_demonhunter", "Demon Hunter"],
+  ["is_assassin", "Assassin"],
+  ["is_druid", "Druid"],
+  ["is_mage", "Mage"],
+]) {
+  assert.equal(synergies[key]?.name, name, `${key} must resolve to "${name}"`);
+  assert.ok(
+    options.synergyTiers[name],
+    `"${name}" must be a synergy the tier lookup knows`,
+  );
+}
 
 // --- jack's 27 Jul board ----------------------------------------------------
 // 8 Mages (7 static + Ringmaster's roll), 6 Humans, 4 Dragons (3 static + a
@@ -148,6 +162,29 @@ for (const name of ["Mage", "Human", "Dragon", "Wizard", "Knight", "Demon"]) {
     `${name} tier must match across the match page and the profile row`,
   );
 }
+
+// --- Ringmaster's captured class roll ---------------------------------------
+// `chess_rm_class` records the roll per match, so where a match carries it the
+// classes are counted exactly rather than inferred from the game's counts.
+const ringmasterRolledMage = {
+  ...options,
+  unitSynergyOverrides: { Ringmaster: ["Mage", "Assassin", "Druid"] },
+};
+const exact = byName(computeLineupSynergies(board, ringmasterRolledMage));
+assert.equal(exact.Mage.count, 8, "the rolled Mage class counts with no buff at all");
+assert.equal(exact.Mage.tier, 9);
+
+// A roll that did not include Mage must not be inflated to 9 by a stale buff:
+// Ringmaster is resolved now, so it no longer buys headroom.
+const rolledElsewhere = byName(
+  computeLineupSynergies(board, {
+    ...options,
+    unitSynergyOverrides: { Ringmaster: ["Assassin", "Druid", "Hunter"] },
+    storedSynergies: storedBuff,
+  }),
+);
+assert.equal(rolledElsewhere.Mage.count, 7);
+assert.equal(rolledElsewhere.Mage.tier, 6);
 
 // --- Floor bounding ---------------------------------------------------------
 
