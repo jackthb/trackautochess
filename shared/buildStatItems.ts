@@ -49,16 +49,18 @@ export function buildStatItems(
   const rankOnly = Boolean(drodo?.rankOnly);
   if (rankOnly && drodo?.mmr_level != null && drodo.mmr_level > 0) {
     const rank = mmrLevelToRank(drodo.mmr_level) || "Rank";
-    const rankLabel =
+    // The tile stacks value over label, so the rank belongs in one or the
+    // other — carrying it in both printed it twice ("Bishop 4" / "Rank ·
+    // Bishop 4"). The MMR branch below reads correctly only because its
+    // value is a number.
+    const rankValue =
       rank === "Queen" && drodo.queen_rank != null
-        ? `Rank · Queen #${drodo.queen_rank}`
-        : rank === "Rank"
-          ? "Rank"
-          : `Rank · ${rank}`;
+        ? `Queen #${drodo.queen_rank}`
+        : rank;
     drodoItems.push({
       key: "drodo-rank",
-      value: rank,
-      label: rankLabel,
+      value: rankValue,
+      label: "Rank",
       source: "drodo",
     });
   } else if (!rankOnly && drodo?.mmr != null) {
