@@ -1,0 +1,26 @@
+{
+  "date": "2026-07-31",
+  "title": "Rebalance Patch",
+  "source": "https://steamcommunity.com/sharedfiles/filedetails/changelog/1613886175",
+  "entitiesSynced": false,
+  "sourceEntries": [
+    {
+      "sourceId": "1785550292",
+      "date": "2026-07-31",
+      "time": "7:11pm",
+      "contentHash": "34b11c18df3228d6"
+    }
+  ],
+  "sections": [
+    {
+      "heading": "Changes",
+      "entries": [
+        {
+          "kind": "fix",
+          "name": "Fix mouse blocking bug and ranking mode will open up soon",
+          "detail": "Fix mouse blocking bug and ranking mode will open up soon"
+        }
+      ]
+    }
+  ]
+}
