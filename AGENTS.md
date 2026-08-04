@@ -12,10 +12,10 @@ Track Auto Chess is a monorepo for Dota Auto Chess game tracking and analysis. I
 - React 19 + TypeScript + Vite frontend (`app/src/`)
 - Electron main process (`app/main.js`) spawns the Rust backend as a subprocess
 - **IPC Protocol**: Electron â†” Rust communicate via JSON Lines over stdin/stdout (one JSON object per line)
-- Rust backend (`app/backend/`) handles: Dota console/nettable capture, GSI post-game detection, hotkey-driven table dumps, Steam auth, local outbox retry, Supabase sync, and diagnostic/raw-log uploads to Supabase Storage
+- Rust backend (`app/backend/`) handles: Dota console/nettable capture, GSI post-game detection, hotkey-driven table dumps, Steam auth, local outbox retry, Supabase sync, and diagnostic uploads to Supabase Storage
 
 **Rust backend (`app/backend/`)** â€” Local services backend.
-- CLI commands include `daemon`, `parse-log`, `parse-log-full`, `parse-live`, `queue`, `outbox-list`, and `gsi-cfg`.
+- CLI commands: `daemon`, `parse-log`, `parse-log-full`, `parse-live`, `queue`, `outbox-list`, `outbox-flush`, `gsi-cfg`, `finalize-log`, `finalize-dump`, `timeline-from-log`, and `timeline-from-dump`.
 - The packaged binary is copied to `app/backend/dist/headless/` by `pnpm --dir app run build:backend`.
 
 **Content (`content/`)** â€” Source of truth for committed game/CMS JSON, including game data and patch notes.
@@ -62,9 +62,18 @@ cargo run -- parse-log-full <path-to-console.log>
 cargo run -- parse-live <path-to-console.log> [local-steam-id]
 cargo run -- queue <payload.json>
 cargo run -- outbox-list
+cargo run -- outbox-flush
 cargo run -- gsi-cfg
+cargo run -- finalize-log [path-to-console.log]
+cargo run -- finalize-dump <path-to-dump>
+cargo run -- timeline-from-log <path-to-console.log> <match-id>
+cargo run -- timeline-from-dump <path-to-dump> <match-id>
 cargo test
 ```
+
+The `finalize-*` and `timeline-from-*` commands are recovery paths: they
+re-upload a match, or just its timeline, from a log or dump whose live upload
+never landed.
 
 ### Web Viewer (`web/`)
 ```bash
@@ -81,11 +90,11 @@ pnpm run test:e2e  # Build, then run Playwright tests
 - **Backend migration status**: the Python/CV backend has been removed; `app/backend/` is the Rust backend.
 - **Runtime config**: stored in `config.json` inside the DAC data dir (`%APPDATA%\@dac\desktop` on Windows, `~/.dac` elsewhere; `DAC_DIR` overrides both). Local capture/retry artifacts live beside it (`outbox`, `replays`, `captures`, `nettable_dumps`, logs). Electron resolves the dir via `app.getPath("userData")` and passes it to the Rust backend as `DAC_DIR`; a leftover `~/.dac` on Windows is the pre-migration copy, not live data.
 - **Steam ID helpers**: reuse shared Steam ID helpers instead of duplicating conversion/validation logic. Frontend/shared TypeScript should use `shared/steam.ts`; Rust backend code should use the existing `app/backend/src/supabase/mod.rs` helpers such as `parse_valid_steam_id64` and `steam_id64_to_account_id`.
-- **Database**: Supabase PostgreSQL with RLS policies; current product tables include `users`, `player_seasons`, `mmr_snapshots`, `matches`, `match_players`, `match_timelines`, and `lineup_snapshots`.
-- **Storage**: Supabase Storage bucket `diagnostic-logs` receives diagnostic and raw nettable dump uploads.
+- **Database**: Supabase PostgreSQL with RLS policies; current product tables are `users`, `player_seasons`, `mmr_snapshots`, `matches`, `match_players`, `match_timelines`, `lineup_snapshots`, `community_builds`, `community_build_votes`, `community_build_comments`, `content_embeddings`, and `site_status`.
+- **Storage**: Supabase Storage bucket `diagnostic-logs` receives diagnostic uploads. Raw nettable dumps are local-only, under `nettable_dumps/` in the DAC data dir; remote raw dump uploads were removed on 2026-07-02.
 - **Content pipeline**: `content/` JSON feeds generated web runtime data and desktop content readers; `data/` holds icons/config/extractor helpers.
 - **Release pipeline**: `.github/workflows/release.yml` triggers on `v*` tags, builds the Rust backend and Electron installer on Windows, and publishes `.exe` artifacts to GitHub Releases.
-- **Patch-note pipeline**: `.github/workflows/scrape-patch-notes.yml` runs hourly and commits `content/` updates when Steam Workshop changelog scraping changes files.
+- **Patch-note pipeline**: `scripts/scrape-patch-notes.mjs` scrapes the Steam Workshop changelog and commits `content/` updates. It runs hourly via Cronicle on the Pi (`ops/cronicle/cronicle-job.dac-scrape-patch-notes.json`), which pushes directly using that checkout's git credentials; `.github/workflows/scrape-patch-notes.yml` is a disabled-schedule, manual-only fallback (Steam intermittently serves GitHub-hosted runner IPs an anti-bot shell with no changelog entries, which a residential IP avoids).
 
 
 <!-- headroom:rtk-instructions -->
@@ -93,7 +102,7 @@ pnpm run test:e2e  # Build, then run Playwright tests
 
 When running shell commands, **always prefix with `rtk`**. This reduces context
 usage by 60-90% with zero behavior change. If rtk has no filter for a command,
-it passes through unchanged — so it is always safe to use.
+it passes through unchanged ï¿½ so it is always safe to use.
 
 ## Key Commands
 ```bash
@@ -104,10 +113,10 @@ rtk git status          rtk git diff            rtk git log
 rtk ls <path>           rtk read <file>         rtk grep <pattern>
 rtk find <pattern>      rtk diff <file>
 
-# Test (90-99% savings) — shows failures only
+# Test (90-99% savings) ï¿½ shows failures only
 rtk pytest tests/       rtk cargo test          rtk test <cmd>
 
-# Build & Lint (80-90% savings) — shows errors only
+# Build & Lint (80-90% savings) ï¿½ shows errors only
 rtk tsc                 rtk lint                rtk cargo build
 rtk prettier --check    rtk mypy                rtk ruff check
 
@@ -139,7 +148,7 @@ These notes cover running this repo in a headless Linux cloud VM (no Windows, no
 - **Web Viewer (`web/`) is the primary runnable product on Linux.** Start it with `pnpm --dir web run dev` (or `npm run cms:dev`) ? http://localhost:3000. The `predev` hook regenerates `web/generated/content-data.ts` from committed `content/` JSON (no network needed).
 - The site boots with **no env vars**: Supabase clients degrade gracefully (return null), so static/content pages (`/units`, `/items`, `/classes`, `/patch-notes`, etc.) render fully, while DB-backed pages (player lookup, leaderboards, match history) and Steam auth are empty/disabled. To exercise live data, set `NEXT_PUBLIC_SUPABASE_URL`/`NEXT_PUBLIC_SUPABASE_ANON_KEY` (+ `SUPABASE_SERVICE_ROLE_KEY` for server/cron routes) or run a local `supabase start`. See `web/.env.example` for the full optional list.
 - **Rust backend (`app/backend/`)** compiles and `cargo test` runs on Linux. Note: full capture (`daemon`, `parse-live`, hotkeys) uses `windows-sys` Win32 APIs and only functions on Windows + a running Dota 2 client; offline `parse-log` works anywhere.
-- **Electron desktop app (`app/`)** is not meaningfully testable headless — its core function captures live Dota console/nettable data on Windows.
+- **Electron desktop app (`app/`)** is not meaningfully testable headless ï¿½ its core function captures live Dota console/nettable data on Windows.
 
 ### Toolchain caveat (important)
 - The Rust backend depends on crates requiring `edition2024`, so it needs **Rust ? 1.85**. The VM's default `rustc` may be older (e.g. 1.83) which fails with `feature edition2024 is required`; the update script sets `rustup default stable` to fix this.

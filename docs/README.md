@@ -38,7 +38,21 @@ Environment variables are documented in three example files, one per surface:
 `web/.env.example` for the Next.js app, `.env.example` at the repository root
 for the `scripts/` automation (`generate:supabase-types`,
 `import:legacy-mmr-snapshots`), and `ops/cronicle/.env.example` for the Pi
-poller. Copy the ones you need to `.env.local` (`.env` on the Pi).
+poller.
+
+Where each one goes differs, so copy by destination rather than alongside the
+example file:
+
+| Example | Copy to | Loaded by |
+| --- | --- | --- |
+| `web/.env.example` | `web/.env.local` | Next.js |
+| `ops/cronicle/.env.example` | `ops/cronicle/.env` | Cronicle on the Pi |
+| `.env.example` (root), `SUPABASE_PROJECT_ID` / `SUPABASE_SCHEMAS` | nothing — export in your shell | read from `process.env` only |
+| `.env.example` (root), `NEXT_PUBLIC_SUPABASE_URL` / `SUPABASE_SERVICE_ROLE_KEY` | `web/.env.local` | `scripts/import-legacy-mmr-snapshots.mjs`, `scripts/backfill-match-player-synergies.mjs` |
+
+Nothing reads a `.env.local` at the repository root. Because `.gitignore` has
+`*.env.local`, a file created there is silently ignored rather than erroring —
+the symptom is a "missing variable" failure for values you just set.
 
 ## Common commands
 
