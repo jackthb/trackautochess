@@ -18,6 +18,7 @@ import {
   synergiesData,
   unitsFullData,
 } from "@/generated/content-data";
+import { createLocaleRegistry } from "@/lib/localeRegistry";
 import { slugifyName } from "@/lib/slugs";
 import { DEFAULT_LOCALE, type Locale, pickLocalized } from "@/lib/i18n";
 
@@ -143,16 +144,7 @@ function buildUnitsForLocale(locale: Locale): DisplayUnit[] {
     });
 }
 
-const UNIT_CACHE = new Map<Locale, DisplayUnit[]>();
-const UNIT_BY_SLUG_CACHE = new Map<Locale, Map<string, DisplayUnit>>();
-
-function ensureLoaded(locale: Locale) {
-  if (!UNIT_CACHE.has(locale)) {
-    const list = buildUnitsForLocale(locale);
-    UNIT_CACHE.set(locale, list);
-    UNIT_BY_SLUG_CACHE.set(locale, new Map(list.map((unit) => [unit.slug, unit])));
-  }
-}
+const UNITS = createLocaleRegistry(buildUnitsForLocale, (unit) => unit.slug);
 
 export const COST_LABEL: Record<number, string> = {
   1: "Cost 1",
@@ -171,8 +163,7 @@ export const COST_COLOR: Record<number, string> = {
 };
 
 export function getAllUnits(locale: Locale = DEFAULT_LOCALE): DisplayUnit[] {
-  ensureLoaded(locale);
-  return UNIT_CACHE.get(locale)!;
+  return UNITS.getAll(locale);
 }
 
 export function getUnitsByCost(
@@ -190,8 +181,7 @@ export function getUnitBySlug(
   slug: string,
   locale: Locale = DEFAULT_LOCALE,
 ): DisplayUnit | null {
-  ensureLoaded(locale);
-  return UNIT_BY_SLUG_CACHE.get(locale)!.get(slug) ?? null;
+  return UNITS.getByKey(slug, locale);
 }
 
 // ── Lineup lookups: unit name → cost / synergies ─────────────────────────────

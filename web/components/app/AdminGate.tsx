@@ -28,7 +28,7 @@ export function AdminGate({
 }) {
   const bypass = allowDevBypass && process.env.NODE_ENV === "development";
   const { ready, steamId, user, accessToken } = useSupabaseSession();
-  const adminAccess = useAdminAccess(steamId);
+  const adminAccess = useAdminAccess();
 
   const wrap = (node: ReactNode) => {
     if (bare || !title) return <>{node}</>;

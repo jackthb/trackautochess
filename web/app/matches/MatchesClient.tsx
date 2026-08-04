@@ -46,7 +46,7 @@ export function MatchesClient() {
   const [matches, setMatches] = useState<MatchSummary[]>([]);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [retryToken, setRetryToken] = useState(0);
-  const adminAccess = useAdminAccess(steamId);
+  const adminAccess = useAdminAccess();
 
   useEffect(() => {
     if (!authReady) {

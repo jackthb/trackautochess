@@ -14,6 +14,13 @@ const SERVER_AUTH_OPTIONS = {
   },
 };
 
+/**
+ * `steam_id` is a bigint in Postgres, which exceeds JS safe-integer range.
+ * Every select that reads it casts to text so the value survives the round
+ * trip intact.
+ */
+export const STEAM_ID_TEXT_SELECT = "steam_id::text";
+
 type DacSupabaseClient = SupabaseClient<Database>;
 
 let browserAnonClient: DacSupabaseClient | null = null;

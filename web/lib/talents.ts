@@ -1,4 +1,5 @@
 import { talentsData } from "@/generated/content-data";
+import { createLocaleRegistry } from "@/lib/localeRegistry";
 import { DEFAULT_LOCALE, type Locale, pickLocalized } from "@/lib/i18n";
 
 export interface DisplayTalent {
@@ -42,29 +43,19 @@ function buildTalentsForLocale(locale: Locale): DisplayTalent[] {
     .sort((a, b) => a.tier - b.tier || a.branch.localeCompare(b.branch));
 }
 
-const TALENTS_CACHE = new Map<Locale, DisplayTalent[]>();
-const TALENT_BY_NAME_CACHE = new Map<Locale, Map<string, DisplayTalent>>();
-
-function ensureLoaded(locale: Locale) {
-  if (!TALENTS_CACHE.has(locale)) {
-    const list = buildTalentsForLocale(locale);
-    TALENTS_CACHE.set(locale, list);
-    TALENT_BY_NAME_CACHE.set(
-      locale,
-      new Map(list.map((talent) => [talent.name.toLowerCase(), talent])),
-    );
-  }
-}
+// Talents are looked up by display name rather than slug, so the registry key
+// is the lowercased name.
+const TALENTS = createLocaleRegistry(buildTalentsForLocale, (talent) =>
+  talent.name.toLowerCase(),
+);
 
 export function getAllTalents(locale: Locale = DEFAULT_LOCALE): DisplayTalent[] {
-  ensureLoaded(locale);
-  return TALENTS_CACHE.get(locale)!;
+  return TALENTS.getAll(locale);
 }
 
 export function getTalentByName(
   name: string,
   locale: Locale = DEFAULT_LOCALE,
 ): DisplayTalent | null {
-  ensureLoaded(locale);
-  return TALENT_BY_NAME_CACHE.get(locale)!.get(name.toLowerCase()) ?? null;
+  return TALENTS.getByKey(name.toLowerCase(), locale);
 }

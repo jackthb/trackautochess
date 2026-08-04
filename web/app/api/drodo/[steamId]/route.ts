@@ -1,9 +1,8 @@
-import type { NextApiRequest } from "next";
 import { revalidatePath } from "next/cache";
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { checkBotId } from "botid/server";
 import { RateLimiterMemory } from "rate-limiter-flexible";
-import { getClientIp, getUserAgent, logAbuse, toIncomingHeaders } from "@/lib/abuseLog";
+import { logAbuse } from "@/lib/abuseLog";
+import { openApiRoute } from "@/lib/apiGuard";
 import { createSupabaseServiceRoleClient } from "@/lib/supabase";
 import {
   fetchSteamProfile,
@@ -48,23 +47,9 @@ function revalidatePlayerProfilePaths(
 
 async function handle(req: Request, ctx: { params: Promise<{ steamId: string }> }) {
   const path = "/api/drodo/[steamId]";
-  const nodeHeaders = toIncomingHeaders(req);
-  const reqShim = { headers: nodeHeaders } as unknown as NextApiRequest;
-  const ip = getClientIp(reqShim);
-  const ua = getUserAgent(reqShim);
-
-  const botCheck = await checkBotId({ advancedOptions: { headers: nodeHeaders } });
-  if (botCheck.isBot && !botCheck.isVerifiedBot) {
-    logAbuse("bot_blocked", { path, ip, ua });
-    return Response.json({ error: "Forbidden" }, { status: 403 });
-  }
-
-  try {
-    await ipRateLimiter.consume(ip);
-  } catch {
-    logAbuse("rate_limit_exceeded", { path, ip, ua });
-    return Response.json({ error: "Too many requests" }, { status: 429 });
-  }
+  const gate = await openApiRoute(req, { path, limiter: ipRateLimiter });
+  if (!gate.ok) return gate.response;
+  const { apiReq, headers: nodeHeaders, ip, ua } = gate.ctx;
 
   if (req.method !== "GET" && req.method !== "POST") {
     return Response.json(
@@ -118,7 +103,7 @@ async function handle(req: Request, ctx: { params: Promise<{ steamId: string }> 
   let refreshQuota: ManualRefreshQuota | undefined;
   let forceSteamProfileRefresh = false;
   if (forceRefresh) {
-    const session = await getSessionUser(reqShim, supabase);
+    const session = await getSessionUser(apiReq, supabase);
     const isOwnProfile = session.steamId === steamId;
     const isAdmin = await isAdminSteamId(session.steamId);
     forceSteamProfileRefresh = isAdmin;

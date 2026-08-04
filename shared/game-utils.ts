@@ -290,3 +290,76 @@ export function formatIsoDateParts(
     year: String(year || ""),
   };
 }
+// ── Shared date/time rendering ───────────────────────────────────────────────
+// "Jul 28, 2026" and "14:32" were each being rebuilt inline in several
+// components — some with a module-level Intl formatter, some with an ad-hoc
+// toLocaleDateString call — which is how the site ended up rendering the same
+// kind of value four different ways. These are the two shapes worth sharing.
+
+type DateInput = Date | string | number | null | undefined;
+
+function toDate(value: DateInput): Date | null {
+  if (value == null) return null;
+  const date = value instanceof Date ? value : new Date(value);
+  return Number.isNaN(date.getTime()) ? null : date;
+}
+
+// Intl formatters are expensive to construct and these render inside lists,
+// so keep one per distinct option set.
+const mediumDateFormatters = new Map<string, Intl.DateTimeFormat>();
+const timeFormatters = new Map<string, Intl.DateTimeFormat>();
+
+/**
+ * Medium date, e.g. "Jul 28, 2026".
+ *
+ * Pass `timeZone: "UTC"` for date-only values (a bare `YYYY-MM-DD`, or a
+ * timestamp whose calendar date is the fact being shown) so a viewer west of
+ * UTC doesn't see the previous day. `fallback` is returned for null/unparseable
+ * input and defaults to "".
+ */
+export function formatMediumDate(
+  value: DateInput,
+  options: { timeZone?: string; fallback?: string } = {},
+): string {
+  const date = toDate(value);
+  if (!date) return options.fallback ?? "";
+
+  const key = options.timeZone ?? "local";
+  let formatter = mediumDateFormatters.get(key);
+  if (!formatter) {
+    formatter = new Intl.DateTimeFormat("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+      ...(options.timeZone ? { timeZone: options.timeZone } : {}),
+    });
+    mediumDateFormatters.set(key, formatter);
+  }
+  return formatter.format(date);
+}
+
+/**
+ * Hour and minute, e.g. "14:32". Renders in the viewer's locale unless
+ * `hour12` forces a clock; pass `timeZone: "UTC"` to pin the zone.
+ */
+export function formatTimeLabel(
+  value: DateInput,
+  options: { timeZone?: string; hour12?: boolean } = {},
+): string {
+  const date = toDate(value);
+  if (!date) return "";
+
+  const key = `${options.timeZone ?? "local"}|${options.hour12 ?? "auto"}`;
+  let formatter = timeFormatters.get(key);
+  if (!formatter) {
+    formatter = new Intl.DateTimeFormat(undefined, {
+      hour: "2-digit",
+      minute: "2-digit",
+      ...(options.timeZone ? { timeZone: options.timeZone } : {}),
+      ...(options.hour12 === undefined ? {} : { hour12: options.hour12 }),
+    });
+    timeFormatters.set(key, formatter);
+  }
+  return formatter.format(date);
+}
+

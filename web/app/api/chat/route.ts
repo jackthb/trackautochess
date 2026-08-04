@@ -1,4 +1,3 @@
-import { checkBotId } from "botid/server";
 import {
   convertToModelMessages,
   createUIMessageStream,
@@ -7,14 +6,9 @@ import {
   type UIMessage,
 } from "ai";
 import { RateLimiterMemory } from "rate-limiter-flexible";
-import {
-  getClientIp,
-  getUserAgent,
-  logAbuse,
-  toApiReq,
-  toIncomingHeaders,
-} from "@/lib/abuseLog";
-import { isChatbotEnabledForSteamId } from "@/lib/betaFeaturesServer";
+import { logAbuse } from "@/lib/abuseLog";
+import { openApiRoute } from "@/lib/apiGuard";
+import { isAdminSteamId } from "@/lib/adminServer";
 import {
   CHAT_MAX_HISTORY_MESSAGES,
   CHAT_MAX_OUTPUT_TOKENS,
@@ -45,24 +39,9 @@ function toSources(docs: Awaited<ReturnType<typeof retrieveContentDocs>>): ChatS
 
 export async function POST(req: Request) {
   const path = "/api/chat";
-  const apiReq = toApiReq(req);
-  const ip = getClientIp(apiReq);
-  const ua = getUserAgent(apiReq);
-
-  const botCheck = await checkBotId({
-    advancedOptions: { headers: toIncomingHeaders(req) },
-  });
-  if (botCheck.isBot && !botCheck.isVerifiedBot) {
-    logAbuse("bot_blocked", { path, ip, ua });
-    return Response.json({ error: "Forbidden" }, { status: 403 });
-  }
-
-  try {
-    await rateLimiter.consume(ip);
-  } catch {
-    logAbuse("rate_limit_exceeded", { path, ip, ua });
-    return Response.json({ error: "Too many requests" }, { status: 429 });
-  }
+  const gate = await openApiRoute(req, { path, limiter: rateLimiter });
+  if (!gate.ok) return gate.response;
+  const { apiReq, ip, ua } = gate.ctx;
 
   if (!tryConsumeDailyChatSlot()) {
     logAbuse("rate_limit_exceeded", { path, ip, ua, reason: "daily_cap" });
@@ -79,7 +58,9 @@ export async function POST(req: Request) {
     return Response.json({ error: "Forbidden" }, { status: 403 });
   }
 
-  if (!(await isChatbotEnabledForSteamId(session.steamId))) {
+  // The chatbot beta is gated on the `admin_access` flag for now; give it its
+  // own flag here and in ChatWidget when it opens up more widely.
+  if (!(await isAdminSteamId(session.steamId))) {
     logAbuse("bot_blocked", {
       path,
       ip,

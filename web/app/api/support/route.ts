@@ -1,7 +1,6 @@
-import { checkBotId } from "botid/server";
 import { RateLimiterMemory } from "rate-limiter-flexible";
-import { getClientIp, getUserAgent, logAbuse, toApiReq } from "@/lib/abuseLog";
-import { truncate } from "@/lib/text";
+import { openApiRoute } from "@/lib/apiGuard";
+import { cleanField, truncate } from "@/lib/text";
 
 const rateLimiter = new RateLimiterMemory({
   points: 3,
@@ -15,43 +14,24 @@ interface SupportRequest {
   company?: string;
 }
 
-function clean(value: unknown, maxLength: number): string {
-  if (typeof value !== "string") return "";
-  return value.replace(/\s+/g, " ").trim().slice(0, maxLength);
-}
-
 export async function POST(req: Request) {
   const body = ((await req.json().catch(() => ({}))) ?? {}) as SupportRequest;
   if (body.company) {
     return Response.json({ ok: true });
   }
 
-  const path = "/api/support";
-  const apiReq = toApiReq(req);
-  const ip = getClientIp(apiReq);
-  const ua = getUserAgent(apiReq);
-
-  const botCheck = await checkBotId({
-    advancedOptions: { headers: Object.fromEntries(req.headers) },
+  const gate = await openApiRoute(req, {
+    path: "/api/support",
+    limiter: rateLimiter,
+    okFlag: true,
+    rateLimitMessage:
+      "Too many requests. Please wait before sending another message.",
   });
-  if (botCheck.isBot && !botCheck.isVerifiedBot) {
-    logAbuse("bot_blocked", { path, ip, ua });
-    return Response.json({ ok: false, error: "Forbidden" }, { status: 403 });
-  }
+  if (!gate.ok) return gate.response;
 
-  try {
-    await rateLimiter.consume(ip);
-  } catch {
-    logAbuse("rate_limit_exceeded", { path, ip, ua });
-    return Response.json(
-      { ok: false, error: "Too many requests. Please wait before sending another message." },
-      { status: 429 }
-    );
-  }
-
-  const contact = clean(body.contact, 160);
-  const message = clean(body.message, 1800);
-  const page = clean(body.page, 240);
+  const contact = cleanField(body.contact, 160);
+  const message = cleanField(body.message, 1800);
+  const page = cleanField(body.page, 240);
 
   if (!message || message.length < 20) {
     return Response.json(

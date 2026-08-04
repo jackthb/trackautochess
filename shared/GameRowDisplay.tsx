@@ -12,6 +12,8 @@ import {
   parseRelics,
   parseRelicHistory,
   parseWL,
+  formatIsoDateLabel,
+  formatTimeLabel,
 } from "./game-utils";
 import {
   buildSynergyMinCountByName,
@@ -263,18 +265,8 @@ export function GameRowDisplay({
       <div className="cell date-cell">
         {game.played_at ? (
           <>
-            <div>
-              {new Date(game.played_at).toLocaleDateString(undefined, {
-                month: "short",
-                day: "numeric",
-              })}
-            </div>
-            <div>
-              {new Date(game.played_at).toLocaleTimeString(undefined, {
-                hour: "2-digit",
-                minute: "2-digit",
-              })}
-            </div>
+            <div>{formatIsoDateLabel(game.played_at)}</div>
+            <div>{formatTimeLabel(game.played_at)}</div>
           </>
         ) : (
           "\u2014"

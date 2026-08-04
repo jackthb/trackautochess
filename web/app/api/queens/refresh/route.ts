@@ -1,7 +1,5 @@
-import type { NextApiRequest } from "next";
-import { checkBotId } from "botid/server";
 import { RateLimiterMemory } from "rate-limiter-flexible";
-import { getClientIp, getUserAgent, logAbuse, toIncomingHeaders } from "@/lib/abuseLog";
+import { openApiRoute } from "@/lib/apiGuard";
 import { refreshDisplayedQueens } from "@/lib/queensRefresh";
 import { revalidateQueenPages } from "@/lib/queensRevalidate";
 import { createSupabaseServiceRoleClient } from "@/lib/supabase";
@@ -31,25 +29,8 @@ export async function POST(req: Request) {
     });
   }
 
-  const nodeHeaders = toIncomingHeaders(req);
-  const reqShim = { headers: nodeHeaders } as unknown as NextApiRequest;
-  const ip = getClientIp(reqShim);
-  const ua = getUserAgent(reqShim);
-
-  const botCheck = await checkBotId({
-    advancedOptions: { headers: nodeHeaders },
-  });
-  if (botCheck.isBot && !botCheck.isVerifiedBot) {
-    logAbuse("bot_blocked", { path, ip, ua });
-    return Response.json({ error: "Forbidden" }, { status: 403 });
-  }
-
-  try {
-    await ipRateLimiter.consume(ip);
-  } catch {
-    logAbuse("rate_limit_exceeded", { path, ip, ua });
-    return Response.json({ error: "Too many requests" }, { status: 429 });
-  }
+  const gate = await openApiRoute(req, { path, limiter: ipRateLimiter });
+  if (!gate.ok) return gate.response;
 
   const supabase = createSupabaseServiceRoleClient();
   if (!supabase) {

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { formatMediumDate } from "@dac/shared/game-utils";
 import {
   formatHighlightText,
   getLatestPatchPromo,
@@ -7,17 +8,6 @@ import {
 } from "@/lib/latestPatch";
 import { KIND_COLOR, KIND_LABEL } from "@/lib/patchKinds";
 import styles from "./PatchPromo.module.css";
-
-function formatPatchDate(date: string): string {
-  const parsed = new Date(`${date}T00:00:00Z`);
-  if (Number.isNaN(parsed.getTime())) return date;
-  return parsed.toLocaleDateString("en-US", {
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-    timeZone: "UTC",
-  });
-}
 
 const SYNCED_TOOLTIP =
   "Entities and synergies have been updated with the new changes.";
@@ -96,7 +86,7 @@ export default function PatchPromo({
               </span>
             )}
             {!isCompact && (
-              <span className={styles.date}>{formatPatchDate(promo.date)}</span>
+              <span className={styles.date}>{formatMediumDate(`${promo.date}T00:00:00Z`, { timeZone: "UTC", fallback: promo.date })}</span>
             )}
             {isCompact && (
               <span className={styles.titleCompactInline}>{promo.title}</span>

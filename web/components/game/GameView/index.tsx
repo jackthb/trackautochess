@@ -24,6 +24,8 @@ import {
   synIconName,
   relicStem,
   mmrLevelToRank,
+  formatMediumDate,
+  formatTimeLabel,
   type RelicTimelineEntry,
 } from "@dac/shared/game-utils";
 import { getRelicsMap } from "@/lib/relics";
@@ -42,18 +44,6 @@ const ITEMS_FULL = itemsFullData as Record<string, ItemFullInfo>;
 
 const iconUrl = resolveIconUrl;
 
-const MATCH_DATE_FORMATTER = new Intl.DateTimeFormat("en-US", {
-  month: "short",
-  day: "numeric",
-  year: "numeric",
-  timeZone: "UTC",
-});
-const MATCH_TIME_FORMATTER = new Intl.DateTimeFormat("en-US", {
-  hour: "2-digit",
-  minute: "2-digit",
-  hour12: false,
-  timeZone: "UTC",
-});
 
 interface PandarenDropEntry {
   round: number;
@@ -132,8 +122,8 @@ function formatMatchDateTime(value: string | null | undefined): {
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return { date: null, time: null };
   return {
-    date: MATCH_DATE_FORMATTER.format(date),
-    time: `${MATCH_TIME_FORMATTER.format(date)} UTC`,
+    date: formatMediumDate(date, { timeZone: "UTC" }),
+    time: `${formatTimeLabel(date, { timeZone: "UTC", hour12: false })} UTC`,
   };
 }
 

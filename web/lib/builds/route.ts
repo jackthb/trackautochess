@@ -50,11 +50,10 @@ export interface BuildRouteOptions {
   requireAdmin?: boolean;
 }
 
-export interface BuildRequest {
+/** What every builds handler resolves, with or without an `[id]` param. */
+export interface BuildsRequest {
   apiReq: NextApiRequest;
   ip: string;
-  /** The `[id]` route param, already validated as a UUID. */
-  id: string;
   service: BuildsSupabaseClient;
   session: SessionUser;
   /**
@@ -64,8 +63,85 @@ export interface BuildRequest {
   steamIdNum: number | null;
 }
 
+export interface BuildRequest extends BuildsRequest {
+  /** The `[id]` route param, already validated as a UUID. */
+  id: string;
+}
+
 /** `BuildRequest` once `requireSignIn` has ruled out the signed-out case. */
 export type SignedInBuildRequest = BuildRequest & { steamIdNum: number };
+
+/** `BuildsRequest` once `requireSignIn` has ruled out the signed-out case. */
+export type SignedInBuildsRequest = BuildsRequest & { steamIdNum: number };
+
+/** Rate-limit step. Returns a 429 to hand back, or null to continue. */
+async function consumeRateLimit(
+  options: BuildRouteOptions,
+  ip: string,
+): Promise<Response | null> {
+  if (!options.limiter) return null;
+  try {
+    await options.limiter.consume(ip);
+    return null;
+  } catch {
+    logAbuse("rate_limit_exceeded", { path: options.path, ip });
+    return jsonError("Too many requests", 429);
+  }
+}
+
+/** Session + sign-in + admin steps, shared by both entry points. */
+async function resolveSession(
+  apiReq: NextApiRequest,
+  options: BuildRouteOptions,
+): Promise<Gate<{ session: SessionUser; steamIdNum: number | null }>> {
+  const anon = createSupabaseAnonClient();
+  const session = await getSessionUser(apiReq, anon);
+  const steamIdNum = session.steamId ? parseSteamId(session.steamId) : null;
+
+  if (options.requireSignIn && steamIdNum == null) {
+    return { ok: false, response: jsonError("Sign in required", 401) };
+  }
+  if (options.requireAdmin && !(await isAdminSteamId(session.steamId))) {
+    return { ok: false, response: jsonError("Forbidden", 403) };
+  }
+  return { ok: true, ctx: { session, steamIdNum } };
+}
+
+/**
+ * Guards for the collection handlers (`/api/builds`), which have no `[id]`:
+ * rate limit → service client → session → sign-in → admin.
+ */
+export async function openBuildsRoute(
+  req: Request,
+  options: BuildRouteOptions & { requireSignIn: true },
+): Promise<Gate<SignedInBuildsRequest>>;
+export async function openBuildsRoute(
+  req: Request,
+  options: BuildRouteOptions,
+): Promise<Gate<BuildsRequest>>;
+export async function openBuildsRoute(
+  req: Request,
+  options: BuildRouteOptions,
+): Promise<Gate<BuildsRequest>> {
+  const apiReq = toApiReq(req);
+  const ip = getClientIp(apiReq);
+
+  const limited = await consumeRateLimit(options, ip);
+  if (limited) return { ok: false, response: limited };
+
+  const service = createSupabaseServiceRoleClient();
+  if (!service) {
+    return { ok: false, response: jsonError("Database not configured", 500) };
+  }
+
+  const resolved = await resolveSession(apiReq, options);
+  if (!resolved.ok) return resolved;
+
+  return {
+    ok: true,
+    ctx: { apiReq, ip, service, ...resolved.ctx },
+  };
+}
 
 /**
  * Runs the common guards in a fixed order: rate limit → id → service client →
@@ -90,14 +166,8 @@ export async function openBuildRoute(
   const apiReq = toApiReq(req);
   const ip = getClientIp(apiReq);
 
-  if (options.limiter) {
-    try {
-      await options.limiter.consume(ip);
-    } catch {
-      logAbuse("rate_limit_exceeded", { path: options.path, ip });
-      return { ok: false, response: jsonError("Too many requests", 429) };
-    }
-  }
+  const limited = await consumeRateLimit(options, ip);
+  if (limited) return { ok: false, response: limited };
 
   const { id } = await context.params;
   if (!isUuid(id)) {
@@ -109,18 +179,13 @@ export async function openBuildRoute(
     return { ok: false, response: jsonError("Database not configured", 500) };
   }
 
-  const anon = createSupabaseAnonClient();
-  const session = await getSessionUser(apiReq, anon);
-  const steamIdNum = session.steamId ? parseSteamId(session.steamId) : null;
+  const resolved = await resolveSession(apiReq, options);
+  if (!resolved.ok) return resolved;
 
-  if (options.requireSignIn && steamIdNum == null) {
-    return { ok: false, response: jsonError("Sign in required", 401) };
-  }
-  if (options.requireAdmin && !(await isAdminSteamId(session.steamId))) {
-    return { ok: false, response: jsonError("Forbidden", 403) };
-  }
-
-  return { ok: true, ctx: { apiReq, ip, id, service, session, steamIdNum } };
+  return {
+    ok: true,
+    ctx: { apiReq, ip, id, service, ...resolved.ctx },
+  };
 }
 
 /** Fetches one build row, mapping a query error to 500 and a miss to 404. */

@@ -1,4 +1,5 @@
 import { itemsFullData, itemsSimpleData } from "@/generated/content-data";
+import { createLocaleRegistry } from "@/lib/localeRegistry";
 import { slugifyName } from "@/lib/slugs";
 import { DEFAULT_LOCALE, type Locale, pickLocalized } from "@/lib/i18n";
 
@@ -188,34 +189,22 @@ function buildItemsForLocale(locale: Locale): DisplayItem[] {
     });
 }
 
-const ITEMS_CACHE = new Map<Locale, DisplayItem[]>();
-const ITEMS_BY_SLUG_CACHE = new Map<Locale, Map<string, DisplayItem>>();
-
-function ensureLoaded(locale: Locale) {
-  if (!ITEMS_CACHE.has(locale)) {
-    const list = buildItemsForLocale(locale);
-    ITEMS_CACHE.set(locale, list);
-    ITEMS_BY_SLUG_CACHE.set(locale, new Map(list.map((item) => [item.slug, item])));
-  }
-}
+const ITEMS = createLocaleRegistry(buildItemsForLocale, (item) => item.slug);
 
 export function getAllItems(locale: Locale = DEFAULT_LOCALE): DisplayItem[] {
-  ensureLoaded(locale);
-  return ITEMS_CACHE.get(locale)!;
+  return ITEMS.getAll(locale);
 }
 
 export function getItemBySlug(
   slug: string,
   locale: Locale = DEFAULT_LOCALE,
 ): DisplayItem | null {
-  ensureLoaded(locale);
-  return ITEMS_BY_SLUG_CACHE.get(locale)!.get(slug) ?? null;
+  return ITEMS.getByKey(slug, locale);
 }
 
 export function getItemSlugByName(name: string): string | null {
-  ensureLoaded(DEFAULT_LOCALE);
   const slug = slugifyName(name);
-  return ITEMS_BY_SLUG_CACHE.get(DEFAULT_LOCALE)!.has(slug) ? slug : null;
+  return ITEMS.hasKey(slug) ? slug : null;
 }
 
 /**

@@ -1,52 +1,24 @@
 import { RateLimiterMemory } from "rate-limiter-flexible";
-import { getClientIp, logAbuse, toApiReq } from "@/lib/abuseLog";
-import { isAdminSteamId } from "@/lib/adminServer";
+import {
+  asJson,
+  jsonError,
+  openBuildsRoute,
+  readJsonBody,
+} from "@/lib/builds/route";
 import {
   fetchUsersBySteamIds,
-  parseSteamId,
   toDetail,
   toSavedBuild,
   toSummary,
   type CommunityBuildRow,
 } from "@/lib/builds/server";
-import type { Json } from "@/lib/database.generated.types";
 import {
   isSavedBuildPayload,
   isUuid,
   type SavedBuild,
 } from "@/lib/builds/types";
-import { getSessionUser } from "@/lib/sessionUser";
-import {
-  createSupabaseAnonClient,
-  createSupabaseServiceRoleClient,
-} from "@/lib/supabase";
 
 const writeLimiter = new RateLimiterMemory({ points: 30, duration: 60 });
-
-async function requireService() {
-  const service = createSupabaseServiceRoleClient();
-  if (!service) {
-    return { error: Response.json({ error: "Database not configured" }, { status: 500 }) };
-  }
-  return { service };
-}
-
-async function requireSession(req: Request) {
-  const anon = createSupabaseAnonClient();
-  const session = await getSessionUser(toApiReq(req), anon);
-  if (!session.steamId) {
-    return { error: Response.json({ error: "Sign in required" }, { status: 401 }) };
-  }
-  const steamIdNum = parseSteamId(session.steamId);
-  if (steamIdNum == null) {
-    return { error: Response.json({ error: "Invalid session" }, { status: 401 }) };
-  }
-  return { steamId: session.steamId, steamIdNum };
-}
-
-function asJson(value: SavedBuild): Json {
-  return JSON.parse(JSON.stringify(value)) as Json;
-}
 
 function sanitizePayload(build: SavedBuild): SavedBuild {
   return {
@@ -61,23 +33,20 @@ function sanitizePayload(build: SavedBuild): SavedBuild {
 
 /** Admin-gated builds API. */
 export async function GET(req: Request) {
-  const { service, error } = await requireService();
-  if (error || !service) return error!;
+  const gate = await openBuildsRoute(req, {
+    path: "/api/builds",
+    requireAdmin: true,
+  });
+  if (!gate.ok) return gate.response;
+  const { service, steamIdNum: viewerSteamIdNum } = gate.ctx;
 
   const url = new URL(req.url);
   const mine = url.searchParams.get("mine") === "1";
   const status = url.searchParams.get("status");
 
-  const anon = createSupabaseAnonClient();
-  const session = await getSessionUser(toApiReq(req), anon);
-  if (!(await isAdminSteamId(session.steamId))) {
-    return Response.json({ error: "Forbidden" }, { status: 403 });
-  }
-  const viewerSteamIdNum = session.steamId ? parseSteamId(session.steamId) : null;
-
   if (mine) {
-    if (!session.steamId || viewerSteamIdNum == null) {
-      return Response.json({ error: "Sign in required" }, { status: 401 });
+    if (viewerSteamIdNum == null) {
+      return jsonError("Sign in required", 401);
     }
     const { data, error: queryError } = await service
       .from("community_builds")
@@ -86,7 +55,7 @@ export async function GET(req: Request) {
       .order("updated_at", { ascending: false });
 
     if (queryError) {
-      return Response.json({ error: queryError.message }, { status: 500 });
+      return jsonError(queryError.message, 500);
     }
 
     const rows = (data ?? []) as CommunityBuildRow[];
@@ -102,7 +71,7 @@ export async function GET(req: Request) {
   if (status === "pending") {
     // Admin pending list is handled via review page + service checks there;
     // keep this public endpoint locked to approved unless caller is handled elsewhere.
-    return Response.json({ error: "Forbidden" }, { status: 403 });
+    return jsonError("Forbidden", 403);
   }
 
   const { data, error: queryError } = await service
@@ -114,7 +83,7 @@ export async function GET(req: Request) {
     .limit(100);
 
   if (queryError) {
-    return Response.json({ error: queryError.message }, { status: 500 });
+    return jsonError(queryError.message, 500);
   }
 
   const rows = (data ?? []) as CommunityBuildRow[];
@@ -144,39 +113,24 @@ export async function GET(req: Request) {
 }
 
 export async function POST(req: Request) {
-  const path = "/api/builds";
-  const apiReq = toApiReq(req);
-  const ip = getClientIp(apiReq);
+  const gate = await openBuildsRoute(req, {
+    path: "/api/builds",
+    limiter: writeLimiter,
+    requireSignIn: true,
+    requireAdmin: true,
+  });
+  if (!gate.ok) return gate.response;
+  const { service, steamIdNum } = gate.ctx;
 
-  try {
-    await writeLimiter.consume(ip);
-  } catch {
-    logAbuse("rate_limit_exceeded", { path, ip });
-    return Response.json({ error: "Too many requests" }, { status: 429 });
+  const parsed = await readJsonBody<{ build?: unknown }>(req);
+  if (!parsed.ok) return parsed.response;
+
+  const build = parsed.ctx.build;
+  if (!isSavedBuildPayload(build)) {
+    return jsonError("Invalid build payload", 400);
   }
 
-  const sessionResult = await requireSession(req);
-  if ("error" in sessionResult) return sessionResult.error!;
-  const { steamId, steamIdNum } = sessionResult;
-  if (!(await isAdminSteamId(steamId))) {
-    return Response.json({ error: "Forbidden" }, { status: 403 });
-  }
-
-  const { service, error } = await requireService();
-  if (error || !service) return error!;
-
-  let body: { build?: unknown };
-  try {
-    body = (await req.json()) as { build?: unknown };
-  } catch {
-    return Response.json({ error: "Invalid JSON body" }, { status: 400 });
-  }
-
-  if (!isSavedBuildPayload(body.build)) {
-    return Response.json({ error: "Invalid build payload" }, { status: 400 });
-  }
-
-  const sanitized = sanitizePayload(body.build);
+  const sanitized = sanitizePayload(build);
   const now = new Date().toISOString();
 
   if (isUuid(sanitized.id)) {
@@ -187,19 +141,16 @@ export async function POST(req: Request) {
       .maybeSingle();
 
     if (existingError) {
-      return Response.json({ error: existingError.message }, { status: 500 });
+      return jsonError(existingError.message, 500);
     }
 
     if (existing) {
       const row = existing as CommunityBuildRow;
       if (row.author_steam_id !== steamIdNum) {
-        return Response.json({ error: "Forbidden" }, { status: 403 });
+        return jsonError("Forbidden", 403);
       }
       if (row.status === "pending" || row.status === "approved") {
-        return Response.json(
-          { error: "Withdraw or copy the build before editing" },
-          { status: 409 },
-        );
+        return jsonError("Withdraw or copy the build before editing", 409);
       }
 
       const { data: updated, error: updateError } = await service
@@ -218,10 +169,7 @@ export async function POST(req: Request) {
         .single();
 
       if (updateError || !updated) {
-        return Response.json(
-          { error: updateError?.message ?? "Update failed" },
-          { status: 500 },
-        );
+        return jsonError(updateError?.message ?? "Update failed", 500);
       }
 
       const authors = await fetchUsersBySteamIds(service, [steamIdNum]);
@@ -249,10 +197,7 @@ export async function POST(req: Request) {
     .single();
 
   if (insertError || !inserted) {
-    return Response.json(
-      { error: insertError?.message ?? "Insert failed" },
-      { status: 500 },
-    );
+    return jsonError(insertError?.message ?? "Insert failed", 500);
   }
 
   const row = inserted as CommunityBuildRow;

@@ -11,6 +11,10 @@
       "default": "./drodo-core.mjs"
     },
     "./game-utils": "./game-utils.ts",
+    "./slugify.mjs": {
+      "types": "./slugify.d.mts",
+      "default": "./slugify.mjs"
+    },
     "./posthog": "./posthog.ts",
     "./steam": "./steam.ts",
     "./buildStatItems": "./buildStatItems.ts",

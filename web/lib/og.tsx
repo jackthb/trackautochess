@@ -1,7 +1,31 @@
 import satori from "satori";
 import { Resvg } from "@resvg/resvg-js";
 import sharp from "sharp";
+import { readFile } from "node:fs/promises";
+import path from "node:path";
 import type { ReactNode } from "react";
+
+/**
+ * Bare host for the watermark the OG cards render. Both card routes had an
+ * identical private copy of this.
+ */
+export function getSiteHost(): string {
+  return (process.env.NEXT_PUBLIC_SITE_URL || "https://www.trackautochess.com")
+    .replace(/^https?:\/\//, "")
+    .replace(/\/+$/, "");
+}
+
+const fontDir = path.join(process.cwd(), "public", "fonts");
+
+/**
+ * The JetBrains Mono regular/bold pair every OG card uses, read once per
+ * process. Awaiting the same promise twice is free, so routes can await it
+ * per-request.
+ */
+export const ogFontData: Promise<[Buffer, Buffer]> = Promise.all([
+  readFile(path.join(fontDir, "JetBrainsMono-Regular.ttf")),
+  readFile(path.join(fontDir, "JetBrainsMono-Bold.ttf")),
+]);
 
 interface OgFont {
   name: string;

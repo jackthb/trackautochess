@@ -1,8 +1,9 @@
 import creatorsConfig from "../../content/creators.json";
 import { unstable_cache } from "next/cache";
 import { playerProfilePath } from "@/lib/steam";
-import { createSupabaseAnonClient } from "@/lib/supabase";
-import { STEAM_ID_TEXT_SELECT } from "@/lib/supabaseSelect";
+import { createSupabaseAnonClient,
+  STEAM_ID_TEXT_SELECT,
+} from "@/lib/supabase";
 
 export type CreatorPlatform = "twitch" | "youtube" | "kick" | "douyu" | "website";
 

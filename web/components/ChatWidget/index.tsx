@@ -7,7 +7,7 @@ import remarkGfm from "remark-gfm";
 import { DefaultChatTransport, type UIMessage } from "ai";
 import { useChat } from "@ai-sdk/react";
 import { createSupabaseClient } from "@/lib/supabase";
-import { useChatbotAccess } from "@/lib/betaFeatures";
+import { useAdminAccess } from "@/lib/admin";
 import type { ChatSource } from "@/lib/chat/types";
 import styles from "./ChatWidget.module.css";
 
@@ -43,7 +43,9 @@ export function ChatWidget() {
   const [open, setOpen] = useState(false);
   const [input, setInput] = useState("");
   const [viewerSession, setViewerSession] = useState<ViewerSession | null>(null);
-  const chatbotAccess = useChatbotAccess(viewerSession?.steamId ?? null);
+  // The chatbot beta is gated on the `admin_access` flag for now; give it its
+  // own flag here and in /api/chat when it opens up more widely.
+  const chatbotAccess = useAdminAccess();
 
   useEffect(() => {
     const supabase = createSupabaseClient();

@@ -1,7 +1,7 @@
+import { STEAM_ID_TEXT_SELECT } from "@/lib/supabase";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { parseSteamId64 } from "@dac/shared/steam";
 import { fetchSteamProfile } from "@/lib/steam";
-import { STEAM_ID_TEXT_SELECT } from "@/lib/supabaseSelect";
 
 export interface QueenRow {
   steam_id: string;

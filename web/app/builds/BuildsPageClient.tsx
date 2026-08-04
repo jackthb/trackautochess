@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
+import { formatMediumDate } from "@dac/shared/game-utils";
 import { SteamSignInButton } from "@/components/SteamSignInButton";
 import { fetchPublicBuilds } from "@/lib/builds/client";
 import type { CommunityBuildSummary } from "@/lib/builds/types";
@@ -104,7 +105,7 @@ export function BuildsPageClient({
               {build.description && <p>{build.description}</p>}
               <div className={styles.publicMeta}>
                 <span>{build.authorName || build.authorSteamId}</span>
-                <span>Updated {new Date(build.updatedAt).toLocaleDateString()}</span>
+                <span>Updated {formatMediumDate(build.updatedAt)}</span>
               </div>
             </Link>
           ))}

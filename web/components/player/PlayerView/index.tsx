@@ -339,7 +339,7 @@ export default function PlayerView({
     accessToken,
   } = useSupabaseSession();
 
-  const isAdmin = useIsAdmin(sessionSteamId);
+  const isAdmin = useIsAdmin();
   const isOwnProfile = sessionSteamId !== null && sessionSteamId === steamId;
   const isPriorityProfile =
     drodo?.queen_rank != null || queenRankHistory.length > 0;

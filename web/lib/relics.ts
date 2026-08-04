@@ -1,5 +1,6 @@
 import { relicStem } from "@dac/shared/game-utils";
 import { relicsData } from "@/generated/content-data";
+import { createLocaleRegistry } from "@/lib/localeRegistry";
 import { slugifyName } from "@/lib/slugs";
 import { DEFAULT_LOCALE, type Locale, pickLocalized } from "@/lib/i18n";
 
@@ -86,26 +87,15 @@ function buildRelicsForLocale(locale: Locale): DisplayRelic[] {
     .sort((a, b) => a.name.localeCompare(b.name, locale));
 }
 
-const RELICS_CACHE = new Map<Locale, DisplayRelic[]>();
-const RELICS_BY_SLUG_CACHE = new Map<Locale, Map<string, DisplayRelic>>();
-
-function ensureLoaded(locale: Locale) {
-  if (!RELICS_CACHE.has(locale)) {
-    const list = buildRelicsForLocale(locale);
-    RELICS_CACHE.set(locale, list);
-    RELICS_BY_SLUG_CACHE.set(locale, new Map(list.map((r) => [r.slug, r])));
-  }
-}
+const RELICS = createLocaleRegistry(buildRelicsForLocale, (relic) => relic.slug);
 
 export function getAllRelics(locale: Locale = DEFAULT_LOCALE): DisplayRelic[] {
-  ensureLoaded(locale);
-  return RELICS_CACHE.get(locale)!;
+  return RELICS.getAll(locale);
 }
 
 export function getRelicBySlug(
   slug: string,
   locale: Locale = DEFAULT_LOCALE,
 ): DisplayRelic | null {
-  ensureLoaded(locale);
-  return RELICS_BY_SLUG_CACHE.get(locale)!.get(slug) ?? null;
+  return RELICS.getByKey(slug, locale);
 }

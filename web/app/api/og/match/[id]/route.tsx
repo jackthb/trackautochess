@@ -1,4 +1,4 @@
-import { renderOgImage, imageToDataUrl } from "@/lib/og";
+import { getSiteHost, imageToDataUrl, ogFontData, renderOgImage } from "@/lib/og";
 import { resolveIconUrl } from "@/lib/icons";
 import { createSupabaseServerClient } from "@/lib/supabase";
 import { readFile } from "node:fs/promises";
@@ -59,17 +59,7 @@ function relicDisplayName(raw: string): string {
   return RELICS_MAP[raw]?.name || raw;
 }
 
-const fontDir = path.join(process.cwd(), "public", "fonts");
-const fontData = Promise.all([
-  readFile(path.join(fontDir, "JetBrainsMono-Regular.ttf")),
-  readFile(path.join(fontDir, "JetBrainsMono-Bold.ttf")),
-]);
 
-function getSiteHost(): string {
-  return (process.env.NEXT_PUBLIC_SITE_URL || "https://www.trackautochess.com")
-    .replace(/^https?:\/\//, "")
-    .replace(/\/+$/, "");
-}
 
 function displayRelicsFromRow(row: Pick<MatchPlayerRow, "relic" | "relic_history">): DisplayRelic[] {
   const fallbackRelics = parseRelics(row.relic).map((raw) => ({
@@ -161,7 +151,7 @@ async function ogHandler(req: Request, ctx: { params: Promise<{ id: string }> })
     mpSteamId
       ? fetchSteamProfile(mpSteamId, supabase)
       : Promise.resolve({ name: null, customUrl: null, avatarUrl: null }),
-    fontData,
+    ogFontData,
     fetchMatchRoster(supabase, mp.match_id),
   ]);
 

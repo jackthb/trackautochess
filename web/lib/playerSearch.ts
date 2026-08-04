@@ -1,5 +1,5 @@
+import { STEAM_ID_TEXT_SELECT } from "@/lib/supabase";
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { STEAM_ID_TEXT_SELECT } from "@/lib/supabaseSelect";
 
 export interface SearchResult {
   steam_id: string;

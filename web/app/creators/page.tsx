@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { formatMediumDate } from "@dac/shared/game-utils";
 import { PageLayout } from "@/components/PageLayout";
 import { pageMetadata, SITE_TITLE } from "@/lib/site";
 import {
@@ -34,17 +35,6 @@ const platformLabels: Record<CreatorPlatform, string> = {
   douyu: "Douyu",
   website: "Stream",
 };
-
-function formatDate(value: string | null): string {
-  if (!value) return "Recent upload";
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return "Recent upload";
-  return new Intl.DateTimeFormat("en", {
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-  }).format(date);
-}
 
 function youtubeEmbedUrl(videoUrl: string): string | null {
   try {
@@ -162,7 +152,7 @@ function UploadCard({
         <div className={styles.uploadMeta}>
           <span>{upload.creatorName}</span>
           <span className={styles.mediaType}>{label}</span>
-          <span>{formatDate(upload.publishedAt)}</span>
+          <span>{formatMediumDate(upload.publishedAt, { fallback: "Recent upload" })}</span>
         </div>
         <h3 className={styles.uploadTitle}>{upload.title}</h3>
       </div>

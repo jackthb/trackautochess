@@ -1,5 +1,3 @@
-import { ADMIN_ACCESS_FLAG } from "@/lib/adminFlags";
-
 type FlagValue =
   | boolean
   | string
@@ -119,10 +117,4 @@ export async function isPostHogFlagEnabledForSteamId(
 ): Promise<boolean> {
   const probe = await probePostHogFlagForSteamId(steamId, flagKey);
   return probe.enabled;
-}
-
-export async function isChatbotEnabledForSteamId(
-  steamId: string | null | undefined,
-): Promise<boolean> {
-  return isPostHogFlagEnabledForSteamId(steamId, ADMIN_ACCESS_FLAG);
 }

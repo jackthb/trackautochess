@@ -1,6 +1,5 @@
-import { checkBotId } from "botid/server";
 import { RateLimiterMemory } from "rate-limiter-flexible";
-import { getClientIp, getUserAgent, logAbuse, toApiReq, toIncomingHeaders } from "@/lib/abuseLog";
+import { openApiRoute } from "@/lib/apiGuard";
 import { createSupabaseServerClient } from "@/lib/supabase";
 import {
   fetchSteamProfile,
@@ -25,25 +24,11 @@ import { revalidateQueenPages } from "@/lib/queensRevalidate";
 const rateLimiter = new RateLimiterMemory({ points: 60, duration: 60 });
 
 export async function GET(req: Request) {
-  const path = "/api/players/search";
-  const apiReq = toApiReq(req);
-  const ip = getClientIp(apiReq);
-  const ua = getUserAgent(apiReq);
-
-  const botCheck = await checkBotId({
-    advancedOptions: { headers: toIncomingHeaders(req) },
+  const gate = await openApiRoute(req, {
+    path: "/api/players/search",
+    limiter: rateLimiter,
   });
-  if (botCheck.isBot && !botCheck.isVerifiedBot) {
-    logAbuse("bot_blocked", { path, ip, ua });
-    return Response.json({ error: "Forbidden" }, { status: 403 });
-  }
-
-  try {
-    await rateLimiter.consume(ip);
-  } catch {
-    logAbuse("rate_limit_exceeded", { path, ip, ua });
-    return Response.json({ error: "Too many requests" }, { status: 429 });
-  }
+  if (!gate.ok) return gate.response;
 
   const searchParams = new URL(req.url).searchParams;
   const rawQuery = searchParams.get("q") ?? undefined;

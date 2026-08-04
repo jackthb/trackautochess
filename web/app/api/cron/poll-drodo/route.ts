@@ -5,6 +5,7 @@ import {
   isActivePollUser,
   recentSignInCutoff,
 } from "@dac/shared/drodo-core";
+import { requireCronAuth } from "@/lib/cronAuth";
 import { fetchAndCacheDrodoBatch } from "@/lib/drodo";
 import { DRODO_BACKGROUND_POLL_ENABLED } from "@/lib/drodoLive";
 import { revalidateQueenPages } from "@/lib/queensRevalidate";
@@ -31,19 +32,9 @@ function pollBatchSize(): number {
     : DEFAULT_POLL_BATCH_SIZE;
 }
 
-function isActiveSyncUser(
-  user: InactiveScanUser,
-  cutoffIso: string
-): boolean {
-  return isActivePollUser(user, cutoffIso);
-}
-
 async function handle(req: Request) {
-  const cronSecret = process.env.CRON_SECRET;
-  const auth = req.headers.get("authorization");
-  if (!cronSecret || auth !== `Bearer ${cronSecret}`) {
-    return Response.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const unauthorized = requireCronAuth(req);
+  if (unauthorized) return unauthorized;
 
   if (!DRODO_BACKGROUND_POLL_ENABLED) {
     return Response.json({
@@ -58,12 +49,12 @@ async function handle(req: Request) {
     });
   }
 
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  if (!supabaseUrl || !serviceKey) {
+  // createSupabaseServiceRoleClient() already returns null when the URL or the
+  // service-role key is missing, so one null check covers both.
+  const supabase = createSupabaseServiceRoleClient() as SupabaseClient | null;
+  if (!supabase) {
     return Response.json({ error: "Database not configured" }, { status: 500 });
   }
-  const supabase = createSupabaseServiceRoleClient() as SupabaseClient;
   const now = new Date();
   const pollBatchSizeLimit = pollBatchSize();
   const recentSignIn = recentSignInCutoff(now);
@@ -115,7 +106,7 @@ async function handle(req: Request) {
     .filter((id) => !ids.includes(id));
   const alreadyQueued = new Set([...ids, ...seedIds]);
   const inactiveIds = ((inactiveScanUsers ?? []) as unknown as InactiveScanUser[])
-    .filter((row) => !isActiveSyncUser(row, recentSignIn))
+    .filter((row) => !isActivePollUser(row, recentSignIn))
     .map((row) => String(row.steam_id))
     .filter((id) => {
       if (alreadyQueued.has(id)) return false;

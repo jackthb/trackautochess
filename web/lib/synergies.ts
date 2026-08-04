@@ -1,5 +1,6 @@
 import { synIconName } from "@dac/shared/game-utils";
 import { synergiesData } from "@/generated/content-data";
+import { createLocaleRegistry } from "@/lib/localeRegistry";
 import { slugifyName } from "@/lib/slugs";
 import { DEFAULT_LOCALE, type Locale, pickLocalized } from "@/lib/i18n";
 
@@ -78,28 +79,20 @@ function inferCategory(description: string): "species" | "class" | "other" {
   return "other";
 }
 
-const SYNERGY_CACHE = new Map<Locale, DisplaySynergy[]>();
-const SLUG_CACHE = new Map<Locale, Map<string, DisplaySynergy>>();
-
-function ensureLoaded(locale: Locale) {
-  if (!SYNERGY_CACHE.has(locale)) {
-    const list = buildSynergiesForLocale(locale);
-    SYNERGY_CACHE.set(locale, list);
-    SLUG_CACHE.set(locale, new Map(list.map((syn) => [syn.slug, syn])));
-  }
-}
+const SYNERGIES = createLocaleRegistry(
+  buildSynergiesForLocale,
+  (syn) => syn.slug,
+);
 
 export function getAllSynergies(locale: Locale = DEFAULT_LOCALE): DisplaySynergy[] {
-  ensureLoaded(locale);
-  return SYNERGY_CACHE.get(locale)!;
+  return SYNERGIES.getAll(locale);
 }
 
 export function getSynergyBySlug(
   slug: string,
   locale: Locale = DEFAULT_LOCALE,
 ): DisplaySynergy | null {
-  ensureLoaded(locale);
-  return SLUG_CACHE.get(locale)!.get(slug) ?? null;
+  return SYNERGIES.getByKey(slug, locale);
 }
 
 export function getSpecies(locale: Locale = DEFAULT_LOCALE): DisplaySynergy[] {
@@ -118,10 +111,9 @@ export function getClasses(locale: Locale = DEFAULT_LOCALE): DisplaySynergy[] {
  * lookups remain stable.
  */
 export function getSynergySlugByName(name: string): string | null {
-  ensureLoaded(DEFAULT_LOCALE);
   const bare = name.replace(/\s*-\s+.*$/, "").replace(/\s*\(.*\)$/, "").trim();
   const slug = slugifyName(bare);
-  return SLUG_CACHE.get(DEFAULT_LOCALE)!.has(slug) ? slug : null;
+  return SYNERGIES.hasKey(slug) ? slug : null;
 }
 
 export function getSynergyNameTranslator(

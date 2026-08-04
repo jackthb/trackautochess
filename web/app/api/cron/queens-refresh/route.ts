@@ -1,3 +1,4 @@
+import { requireCronAuth } from "@/lib/cronAuth";
 import { refreshDisplayedQueens } from "@/lib/queensRefresh";
 import { revalidateQueenPages } from "@/lib/queensRevalidate";
 import { createSupabaseServiceRoleClient } from "@/lib/supabase";
@@ -7,11 +8,8 @@ import {
 } from "@/lib/queensVisitor";
 
 async function handle(req: Request) {
-  const cronSecret = process.env.CRON_SECRET;
-  const auth = req.headers.get("authorization");
-  if (!cronSecret || auth !== `Bearer ${cronSecret}`) {
-    return Response.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const unauthorized = requireCronAuth(req);
+  if (unauthorized) return unauthorized;
 
   if (!QUEENS_DRODO_VIEW_REFRESH_ENABLED) {
     return Response.json({

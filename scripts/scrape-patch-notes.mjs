@@ -14,6 +14,7 @@ import { createHash } from "crypto";
 import { join, dirname, basename } from "path";
 import { fileURLToPath } from "url";
 import { patchNoteToJson } from "./lib/patch-note-json.mjs";
+import { slugifyName } from "../shared/slugify.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const ROOT_CONTENT = join(__dirname, "..", "content");
@@ -645,10 +646,6 @@ function isEntryRepresented(entry, existingPatches, knownSourceEntryKeys, knownS
   }
 
   return false;
-}
-
-function slugifyName(value) {
-  return value.toLowerCase().replace(/&/g, " and ").replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
 }
 
 // ── Hotfix folding ────────────────────────────────────────────────

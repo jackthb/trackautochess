@@ -1,7 +1,8 @@
 import { revalidatePath } from "next/cache";
-import { createSupabaseServerClient } from "@/lib/supabase";
+import { createSupabaseServerClient,
+  STEAM_ID_TEXT_SELECT,
+} from "@/lib/supabase";
 import { playerProfilePath } from "@/lib/steam";
-import { STEAM_ID_TEXT_SELECT } from "@/lib/supabaseSelect";
 
 interface LadderPlayerRow {
   steam_id: string;
