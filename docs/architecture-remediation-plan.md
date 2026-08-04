@@ -4,7 +4,7 @@ Step-by-step instructions for fixing the findings from the June 2026 architectur
 Work through the phases in order — each phase leaves the repo shippable, and later phases
 assume the earlier ones are done. Validate after every phase with the checks listed.
 
-## Current status (2026-06-10)
+## Current status (2026-08-02)
 
 | Phase | Status | Branch / PR | Notes |
 | --- | --- | --- | --- |
@@ -12,9 +12,14 @@ assume the earlier ones are done. Validate after every phase with the checks lis
 | Phase 2 | Merged to `main` | [#230](https://github.com/jackthb/dac-tools/pull/230) | Electron main modularization |
 | Phase 3 | Merged to `main` | [#234](https://github.com/jackthb/dac-tools/pull/234) | Desktop data routed through Rust backend |
 | Phase 4 | Merged to `main` | [#232](https://github.com/jackthb/dac-tools/pull/232) | Backend module split |
-| Phase 5 | In progress | `codex/phase-5-typed-contracts-v2` | Fresh PR from `main`; [#233](https://github.com/jackthb/dac-tools/pull/233) was merged into an intermediate branch and is superseded |
-| Phase 6 | In progress | #264 | `drodo-core.ts` now compiles generated runtime/types |
-| Phase 7 | Not started | no PR | Requires Phase 6 and live-game fixture capture |
+| Phase 5 | Merged to `main` | `codex/phase-5-typed-contracts-v2` | `app/src/backend-events.generated.ts` is committed; `npm run generate:ipc-types` regenerates it |
+| Phase 6 | Merged to `main` | #264 | `shared/drodo-core.mjs` + `.d.mts` are committed; `npm run build:drodo-core` / `test:drodo-core` are wired up |
+| Phase 7 | Not started | no PR | Requires live-game fixture capture. The only open item. |
+
+**Read the phase sections below as history, not as instructions.** Phases 1–6
+have shipped, and several shipped differently from what is written here — where
+they diverge, the code is right and this document is the record of intent.
+Divergences worth knowing about are called out inline.
 
 ---
 
@@ -62,6 +67,12 @@ and window management, with ~15 module-level mutable globals.
    self-contained commit; the app must boot after each one):
    - `app/main/updater.cjs` — `parseSemver`, `isNewerVersion`, `fetchJson`,
      `checkForUpdate`, the update-check interval, and `GITHUB_RELEASES_API`.
+     **Shipped differently:** the hand-rolled GitHub Releases API poller was
+     replaced rather than moved. `updater.cjs` exports a single
+     `createUpdater({ isPackaged, emitEvent })` and delegates to
+     `electron-updater`, keeping only `UPDATE_CHECK_INTERVAL_MS` and
+     `MAX_UPDATE_ERROR_MESSAGE_LENGTH`. None of the identifiers named above
+     exist.
    - `app/main/backend-supervisor.cjs` — backend spawn/restart/readline plumbing
      (`backendProcess`, `backendRL`, `backendRestarting`, `backendRestartTimer`,
      `backendWatchers`), exposing `start()`, `stop()`, `send(cmd)`, and an
@@ -132,7 +143,11 @@ feature, which would otherwise land in the same giant file.
 
 **Steps (pure moves — no behavior changes, no signature changes beyond visibility):**
 
-1. Create `app/backend/src/steam_setup.rs`: move Steam/Dota environment discovery and
+1. Create `app/backend/src/steam_setup.rs` — **shipped as `nettable_setup.rs`**;
+   no `steam_setup.rs` exists, and the similarly-named `steam_auth.rs` is a
+   different module (Steam OpenID login). `is_dota_running` ended up in
+   `nettable_service.rs` and `steam_id64_to_account_id` in `supabase/mod.rs`.
+   Move Steam/Dota environment discovery and
    mutation — `find_dota_dir`, `find_console_log`, `is_dota_running`,
    `is_steam_running`, `process_running`, `request_steam_shutdown`,
    `candidate_steam_dirs`, `find_localconfig_vdf`, `localconfig_has_dota`,
@@ -254,8 +269,11 @@ Phase 4's `match_builder.rs` extraction), so tests are cheap.
   behind a Supabase Edge Function that validates the Steam-auth session and
   sanity-checks payloads (roster sizes, round monotonicity, owner = authed user).
   Phase 3 makes this cheap later: only `supabase/` in the Rust crate changes.
-- **Import hygiene:** standardize `app/src` on `@dac/shared/...` imports (one stray
+- ~~**Import hygiene:** standardize `app/src` on `@dac/shared/...` imports (one stray
   relative import in `app/src/lib/game-utils.ts`; CSS `@import`s of
-  `shared/tokens.css`/`components.css` can stay relative).
+  `shared/tokens.css`/`components.css` can stay relative).~~ **Done.** `app/src`
+  has no relative imports into `shared/` left, and there is no
+  `app/src/lib/game-utils.ts` — the module is `shared/game-utils.ts`, whose own
+  `./types` import is intra-package and correct.
 - **`shared/` layout:** flat is fine at current size; split `ui/` vs `domain/` when it
   next grows past ~25 files.

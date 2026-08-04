@@ -88,7 +88,7 @@ metadata snapshot includes both the Queen ladder and the slot mapping.
 | `app/backend/src/supabase/` | Processed match/timeline/Queen uploads, outbox replay, and diagnostic-log Storage uploads. Split by concern: `client.rs`, `matches.rs`, `queen_ladder.rs`, `outbox.rs`, `diagnostics.rs`, `storage.rs`. |
 | `app/backend/src/dump_commands.rs` | Dump command identifiers, console command strings, focused key delivery, and Dota foreground detection. |
 
-`AUTOEXEC_CFG_CONTENT` is the marked Track Auto Chess cfg block in `nettable_service.rs`. The setup path upserts that block instead of replacing the user's whole `autoexec.cfg`.
+`AUTOEXEC_BLOCK` is the marked Track Auto Chess cfg block in `nettable_setup.rs`. The setup path upserts that block instead of replacing the user's whole `autoexec.cfg`.
 
 ## Events emitted (consumed by `useNetTableEvents` in the renderer)
 

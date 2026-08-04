@@ -39,7 +39,7 @@ Both return a one-line `text/plain` response for chat bot commands. For example,
 
 ## Content editing
 
-Keystatic is configured in `web/app/keystatic/keystatic.ts` and edits committed JSON content. Local development writes files directly. Production can use GitHub-backed storage when the root README's Keystatic environment variables are configured.
+Keystatic is configured in `web/app/keystatic/keystatic.ts` and edits committed JSON content. Local development writes files directly. Production can use GitHub-backed storage when the Keystatic environment variables are configured — see "Editing content from a phone" in [README.md](README.md), or `web/.env.example`.
 
 ## Analytics
 

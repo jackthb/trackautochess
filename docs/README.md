@@ -4,7 +4,7 @@ Game tracking and analysis for Dota Auto Chess.
 
 - **Web** - [trackautochess.com](https://www.trackautochess.com) - player lookup, match history, patch notes, item/unit/synergy/relic/talent guides, and Keystatic content editing.
 - **Desktop App** - Electron + React + Rust tracker that captures Dota console/nettable data locally and syncs processed match data to Supabase.
-- **Patch note scraper** - GitHub Actions job and local script that poll the Steam Workshop changelog and commit content updates.
+- **Patch note scraper** - Local script that polls the Steam Workshop changelog and commits content updates, run hourly by Cronicle on the Pi with a manual GitHub Actions fallback.
 
 ## Repository layout
 
@@ -127,6 +127,7 @@ Steam changelog ->  scripts/scrape-patch-notes.mjs  ->  content/patch-notes + co
 ## Automation
 
 - `.github/workflows/release.yml` runs on `v*` tags, builds the Windows Electron app and Rust backend, and uploads installer `.exe` artifacts to the GitHub Release.
+- `.github/workflows/refresh-queens.yml` is the only workflow on a live schedule (`*/5 * * * *`). It POSTs `/api/cron/queens-refresh`. That route currently early-returns on every firing: the Drodo view refresh is gated behind `QUEENS_DRODO_VIEW_REFRESH_ENABLED`, which is `false` in `web/lib/queensVisitor.ts` while Drodo's public `/courier/get` omits season MMR. See [polling.md](polling.md).
 
 ### Cronicle jobs on the Pi
 
