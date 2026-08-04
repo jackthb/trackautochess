@@ -29,12 +29,6 @@ app/release/
 /dist/
 .pnpm-store/
 
-# Parser-Lab debug scratch files (calibration / per-row crops / overlays)
-tmp_*.png
-tmp_*.jpg
-tmp_*.html
-app/backend/_tmp_*.py
-
 # Sanity CMS
 cms/node_modules/
 cms/.env

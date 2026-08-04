@@ -4,8 +4,6 @@ import { useSessionFlags, type FlagAccess } from "@/lib/sessionFlags";
 
 export type AdminAccess = FlagAccess;
 
-export { normalizeSteamId64 } from "@dac/shared/steam";
-
 /**
  * Client-side admin check via server-evaluated PostHog `admin_access`.
  */

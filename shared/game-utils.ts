@@ -249,9 +249,6 @@ export const RANK_BRACKETS = [
   { rank: "Queen", mmr: 3380 },
 ] as const;
 
-export const RANK_TIERS = ["Pawn", "Knight", "Bishop", "Rook", "King", "Queen"] as const;
-export const NUMBERED_RANK_TIERS = ["Pawn", "Knight", "Bishop", "Rook"] as const;
-
 export function mmrLevelToRank(level: number | null | undefined): string {
   if (level == null || level < 1) return "";
   if (level > RANK_BRACKETS.length) return "Queen";
@@ -292,21 +289,4 @@ export function formatIsoDateParts(
     day: String(day || 1).padStart(2, "0"),
     year: String(year || ""),
   };
-}
-
-export function formatDate(ms: number): string {
-  const d = new Date(ms);
-  const now = new Date();
-  const diffDays = Math.floor((now.getTime() - d.getTime()) / 86400000);
-  const time = d.toLocaleTimeString([], {
-    hour: "2-digit",
-    minute: "2-digit",
-  });
-  if (diffDays === 0) return `Today ${time}`;
-  if (diffDays === 1) return `Yesterday ${time}`;
-  if (diffDays < 7)
-    return `${d.toLocaleDateString([], { weekday: "short" })} ${time}`;
-  return (
-    d.toLocaleDateString([], { month: "short", day: "numeric" }) + ` ${time}`
-  );
 }

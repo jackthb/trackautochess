@@ -50,11 +50,6 @@ export interface Screenshot {
   screenType: "my_matches" | "game_over" | "final_ranking" | "unknown" | null;
 }
 
-export interface SavedParseResult {
-  rows: ParseResultRow[];
-  timestamps: string[];
-}
-
 export interface ReplayStats {
   count: number;
   totalBytes: number;
@@ -90,82 +85,6 @@ export interface ProcessingScreenshot {
   screenshot_path?: string;
   screen_type?: "my_matches" | "game_over" | "final_ranking" | "unknown";
   message?: string;
-}
-
-// ── Parser Lab ───────────────────────────────────────────────────────────────
-
-export type LabRegionKind = "ocr" | "template" | "grid" | "band";
-
-export interface LabRegion {
-  name: string;
-  kind: LabRegionKind;
-  category: string;
-  bbox: [number, number, number, number];
-  label: string;
-  row_index: number | null;
-}
-
-export interface LabParseFullResult {
-  ok: boolean;
-  error?: string;
-  screen_type?: "my_matches" | "game_over" | "final_ranking" | "unknown";
-  width?: number;
-  height?: number;
-  regions?: LabRegion[];
-}
-
-export interface LabParseRegionResult {
-  ok: boolean;
-  error?: string;
-  name?: string;
-  category?: string;
-  bbox?: [number, number, number, number];
-  label?: string;
-  crop_b64?: string;
-}
-
-export interface LabScreenshotGroup {
-  label: string;
-  files: Array<{ name: string; path: string; size: number; mtime: number }>;
-}
-
-export interface LabFixture {
-  name: string;
-  path: string;
-  screenshot_path: string;
-  screen_type: string;
-  row_count: number;
-}
-
-export interface LabConfigBundle {
-  defaults: Record<string, unknown> | null;
-  overrides: Record<string, unknown> | null;
-}
-
-export interface LabPytestEvent {
-  seq: number;
-  kind: "stdout" | "stderr" | "exit" | "error";
-  text: string;
-}
-
-export interface LabApi {
-  listScreenshots: () => Promise<LabScreenshotGroup[]>;
-  loadConfig: () => Promise<LabConfigBundle>;
-  saveConfig: (config: Record<string, unknown>) => Promise<{ ok: boolean; path?: string }>;
-  resetConfig: () => Promise<{ ok: boolean }>;
-  parseFull: (payload: { path: string }) => Promise<LabParseFullResult>;
-  parseRegion: (payload: {
-    path: string;
-    name: string;
-    category: string;
-    bbox: [number, number, number, number];
-  }) => Promise<LabParseRegionResult>;
-  listFixtures: () => Promise<LabFixture[]>;
-  saveFixture: (name: string, data: unknown) => Promise<{ ok: boolean; path?: string }>;
-  deleteFixture: (name: string) => Promise<{ ok: boolean; error?: string }>;
-  imageData: (filePath: string) => Promise<string | null>;
-  runFixtures: () => Promise<{ ok: boolean; seq: number }>;
-  onPytestOutput: (callback: (msg: LabPytestEvent) => void) => () => void;
 }
 
 export interface RecordingStats {

@@ -20,7 +20,7 @@ DAC Tools is a monorepo for Dota Auto Chess game tracking and analysis. It inclu
 
 **Content (`content/`)** — Source of truth for committed game/CMS JSON, including game data and patch notes.
 
-**Data helpers/assets (`data/`)** — Non-CMS assets/config such as icons, parser regions, and extractor scripts.
+**Data helpers/assets (`data/`)** — Non-CMS assets/config such as icons and extractor scripts.
 
 **Shared package (`shared/`)** — Shared React components, styles, and utilities consumed by app/web code.
 

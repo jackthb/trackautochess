@@ -62,7 +62,6 @@ function getElectronDesktopPaths(appDir, options = {}) {
 }
 
 module.exports = {
-  getBackendExecutableName: getRustBackendExecutableName,
   getRustBackendExecutableName,
   getElectronDesktopPaths,
   getIconFilename,

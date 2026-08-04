@@ -89,7 +89,7 @@ npm run web:data          # regenerate web/generated runtime data from content/
 
 ## Data pipeline
 
-Game/CMS data lives in committed JSON files under `content/`. The app, web runtime, scraper, and VPK extractor all use that content shape directly. `data/` is for non-CMS assets/config such as icons, parser regions, and local extractor helper scripts.
+Game/CMS data lives in committed JSON files under `content/`. The app, web runtime, scraper, and VPK extractor all use that content shape directly. `data/` is for non-CMS assets/config such as icons and local extractor helper scripts.
 
 ```text
 content/*.json  ->  web generated runtime module    ->  web
