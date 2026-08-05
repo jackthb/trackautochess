@@ -21,6 +21,7 @@ import { absoluteUrl, pageMetadata, SITE_TITLE } from "@/lib/site";
 import { cleanText, truncate } from "@/lib/text";
 import { DEFAULT_LOCALE } from "@/lib/i18n";
 import { getCommentaryForEntity } from "@/lib/patchCommentary";
+import { breadcrumbList, entityWebPage, JsonLd } from "@/lib/structuredData";
 
 // Static detail page backed by committed JSON generated from content/.
 
@@ -91,32 +92,16 @@ export default async function ItemDetailPage({ params }: Props) {
   const tierColor = TIER_COLOR[item.tier];
 
   const structuredData = [
-    {
-      "@context": "https://schema.org",
-      "@type": "WebPage",
+    entityWebPage({
       name: `${item.name} item guide`,
       description,
-      ...(pageUrl ? { url: pageUrl } : {}),
-      about: { "@type": "Thing", name: item.name },
-    },
-    {
-      "@context": "https://schema.org",
-      "@type": "BreadcrumbList",
-      itemListElement: [
-        {
-          "@type": "ListItem",
-          position: 1,
-          name: "Items",
-          ...(itemsUrl ? { item: itemsUrl } : {}),
-        },
-        {
-          "@type": "ListItem",
-          position: 2,
-          name: item.name,
-          ...(pageUrl ? { item: pageUrl } : {}),
-        },
-      ],
-    },
+      url: pageUrl,
+      about: item.name,
+    }),
+    breadcrumbList([
+      { name: "Items", url: itemsUrl },
+      { name: item.name, url: pageUrl },
+    ]),
   ];
 
   const synergyEntities: RelatedEntity[] = relatedSynergies.map(({ synergy, relation }) => ({
@@ -166,10 +151,7 @@ export default async function ItemDetailPage({ params }: Props) {
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
-      />
+      <JsonLd data={structuredData} />
       <ItemDetailClient
         item={{
           slug: item.slug,

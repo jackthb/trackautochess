@@ -20,6 +20,7 @@ import { DEFAULT_LOCALE, pickLocalized } from "@/lib/i18n";
 import { type EntryKind, KIND_COLOR, KIND_LABEL } from "@/lib/patchKinds";
 import { EntryCommentary } from "@/components/PatchCommentary";
 import type { PatchEvidence } from "@/lib/patchCommentaryTypes";
+import { breadcrumbList, JsonLd } from "@/lib/structuredData";
 import styles from "./patch.module.css";
 
 // Static patch-note detail page backed by committed JSON generated from
@@ -234,24 +235,10 @@ export default async function PatchDetailPage({ params }: Props) {
         name: SITE_NAME,
       },
     },
-    {
-      "@context": "https://schema.org",
-      "@type": "BreadcrumbList",
-      itemListElement: [
-        {
-          "@type": "ListItem",
-          position: 1,
-          name: "Patch Notes",
-          ...(patchIndexUrl ? { item: patchIndexUrl } : {}),
-        },
-        {
-          "@type": "ListItem",
-          position: 2,
-          name: localizedTitle,
-          ...(pageUrl ? { item: pageUrl } : {}),
-        },
-      ],
-    },
+    breadcrumbList([
+      { name: "Patch Notes", url: patchIndexUrl },
+      { name: localizedTitle, url: pageUrl },
+    ]),
   ];
 
   const summaryLines = (patch.summary || "")
@@ -264,10 +251,7 @@ export default async function PatchDetailPage({ params }: Props) {
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
-      />
+      <JsonLd data={structuredData} />
 
       <div className={styles.page}>
         <div className={styles.container}>

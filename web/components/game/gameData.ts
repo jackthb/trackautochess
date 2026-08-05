@@ -1,6 +1,11 @@
 import type { GamePageProps } from "./GameView";
 import { absoluteUrl, originFromUrl } from "@/lib/site";
 import { playerProfilePath } from "@/lib/steam";
+import {
+  breadcrumbList,
+  entityWebPage,
+  type JsonLdNode,
+} from "@/lib/structuredData";
 
 // Server-safe pure helpers for the game/match pages. They live OUTSIDE the
 // "use client" GameView module because the App Router pages call them during
@@ -34,33 +39,17 @@ export function buildGameSeo(props: Omit<GamePageProps, "route">): {
     : `Dota Auto Chess match details for ${displayName}.`;
   const imageAlt = `${displayName} placed #${game.placement} in a Dota Auto Chess match`;
 
-  const structuredData: Array<Record<string, unknown>> = [
-    {
-      "@context": "https://schema.org",
-      "@type": "WebPage",
+  const structuredData: JsonLdNode[] = [
+    entityWebPage({
       name: title,
       description,
-      ...(canonicalUrl ? { url: canonicalUrl } : {}),
-      about: { "@type": "Thing", name: "Dota Auto Chess match" },
-    },
-    {
-      "@context": "https://schema.org",
-      "@type": "BreadcrumbList",
-      itemListElement: [
-        {
-          "@type": "ListItem",
-          position: 1,
-          name: displayName,
-          item: playerCanonicalUrl,
-        },
-        {
-          "@type": "ListItem",
-          position: 2,
-          name: "Match",
-          ...(canonicalUrl ? { item: canonicalUrl } : {}),
-        },
-      ],
-    },
+      url: canonicalUrl,
+      about: "Dota Auto Chess match",
+    }),
+    breadcrumbList([
+      { name: displayName, url: playerCanonicalUrl },
+      { name: "Match", url: canonicalUrl },
+    ]),
   ];
 
   return { title, description, canonicalUrl, ogImageUrl, imageAlt, structuredData };

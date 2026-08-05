@@ -5,6 +5,7 @@ import { DEFAULT_LOCALE } from "@/lib/i18n";
 import { COST_COLOR, COST_LABEL, getUnitsByCost } from "@/lib/units";
 import { getAllSynergies, getSynergyNameTranslator } from "@/lib/synergies";
 import { slugifyName } from "@/lib/slugs";
+import { collectionPage, JsonLd } from "@/lib/structuredData";
 
 const title = `Units | ${SITE_TITLE}`;
 const description =
@@ -16,13 +17,11 @@ export const metadata: Metadata = pageMetadata({
   path: "/units",
 });
 
-const structuredData = {
-  "@context": "https://schema.org",
-  "@type": "CollectionPage",
+const structuredData = collectionPage({
   name: "Dota Auto Chess units",
   description,
   about: "Dota Auto Chess units",
-};
+});
 
 const cost = (c: number) => `Cost ${c}`;
 
@@ -51,10 +50,7 @@ export default function UnitsPage() {
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
-      />
+      <JsonLd data={structuredData} />
       <EntityBrowser
         title="Units"
         variant="unit"

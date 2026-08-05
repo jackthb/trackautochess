@@ -10,6 +10,7 @@ import { slugifyName } from "@/lib/slugs";
 import { absoluteUrl, pageMetadata, SITE_TITLE } from "@/lib/site";
 import { DEFAULT_LOCALE } from "@/lib/i18n";
 import { getCommentaryForEntity } from "@/lib/patchCommentary";
+import { breadcrumbList, entityWebPage, JsonLd } from "@/lib/structuredData";
 
 // Static detail page backed by committed JSON generated from content/.
 
@@ -115,40 +116,21 @@ export default async function UnitDetailPage({ params }: Props) {
   const pageUrl = absoluteUrl(`/units/${unit.slug}`);
   const unitsUrl = absoluteUrl("/units");
   const structuredData = [
-    {
-      "@context": "https://schema.org",
-      "@type": "WebPage",
+    entityWebPage({
       name: `${unit.name} unit guide`,
       description,
-      ...(pageUrl ? { url: pageUrl } : {}),
-      about: { "@type": "Thing", name: unit.name },
-    },
-    {
-      "@context": "https://schema.org",
-      "@type": "BreadcrumbList",
-      itemListElement: [
-        {
-          "@type": "ListItem",
-          position: 1,
-          name: t.crumbUnits,
-          ...(unitsUrl ? { item: unitsUrl } : {}),
-        },
-        {
-          "@type": "ListItem",
-          position: 2,
-          name: unit.name,
-          ...(pageUrl ? { item: pageUrl } : {}),
-        },
-      ],
-    },
+      url: pageUrl,
+      about: unit.name,
+    }),
+    breadcrumbList([
+      { name: t.crumbUnits, url: unitsUrl },
+      { name: unit.name, url: pageUrl },
+    ]),
   ];
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
-      />
+      <JsonLd data={structuredData} />
       <EntityDetail
         variant="unit"
         name={unit.name}

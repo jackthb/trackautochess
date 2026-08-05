@@ -10,6 +10,7 @@ import {
   type CreatorPlatform,
   type CreatorUpload,
 } from "@/lib/creators";
+import { collectionPage, JsonLd } from "@/lib/structuredData";
 import styles from "./creators.module.css";
 
 const title = `Creators | ${SITE_TITLE}`;
@@ -168,10 +169,7 @@ export default async function CreatorsPage() {
   const { uploads, liveStreams } = creatorMedia;
 
   const structuredData = {
-    "@context": "https://schema.org",
-    "@type": "CollectionPage",
-    name: "Dota Auto Chess creators",
-    description,
+    ...collectionPage({ name: "Dota Auto Chess creators", description }),
     hasPart: uploads.slice(0, 10).map((upload) => {
       const embedUrl = youtubeEmbedUrl(upload.url);
 
@@ -190,10 +188,7 @@ export default async function CreatorsPage() {
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
-      />
+      <JsonLd data={structuredData} />
       <PageLayout title="Creators">
         <p className={styles.lead}>
           A community hub for Auto Chess creators. This page only shows creators

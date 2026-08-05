@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { loopbackDesktopReturnTo } from "@/lib/desktopReturnTo";
 
 const STEAM_OPENID_URL = "https://steamcommunity.com/openid/login";
 
@@ -33,17 +34,3 @@ export function GET(req: Request) {
   return NextResponse.redirect(`${STEAM_OPENID_URL}?${params.toString()}`);
 }
 
-function loopbackDesktopReturnTo(value: string): string | null {
-  try {
-    const url = new URL(value);
-    const hostname = url.hostname.toLowerCase();
-    const isLoopback =
-      hostname === "127.0.0.1" || hostname === "localhost" || hostname === "[::1]";
-    if (url.protocol !== "http:" || !isLoopback || url.username || url.password) {
-      return null;
-    }
-    return url.toString();
-  } catch {
-    return null;
-  }
-}

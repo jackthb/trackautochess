@@ -7,6 +7,7 @@ import { patchIndexData } from "@/generated/content-data";
 import { getLatestPatchPromo, getLatestPatchSlug, getPatchPromo } from "@/lib/latestPatch";
 import { pageMetadata, SITE_TITLE } from "@/lib/site";
 import { DEFAULT_LOCALE, pickLocalized } from "@/lib/i18n";
+import { collectionPage, JsonLd } from "@/lib/structuredData";
 import styles from "./patch-notes.module.css";
 
 interface IndexPatch {
@@ -26,13 +27,11 @@ export const metadata: Metadata = pageMetadata({
   path: "/patch-notes",
 });
 
-const structuredData = {
-  "@context": "https://schema.org",
-  "@type": "CollectionPage",
+const structuredData = collectionPage({
   name: "Dota Auto Chess patch notes",
   description,
   about: "Dota Auto Chess patch notes",
-};
+});
 
 export default function PatchNotesPage() {
   const latestSlug = getLatestPatchSlug();
@@ -45,10 +44,7 @@ export default function PatchNotesPage() {
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
-      />
+      <JsonLd data={structuredData} />
 
       <div className={styles.page}>
         <div className={styles.container}>

@@ -10,6 +10,7 @@ import {
   SITE_NAME,
   SITE_TITLE,
 } from "@/lib/site";
+import { JsonLd } from "@/lib/structuredData";
 
 export const revalidate = 300;
 
@@ -60,10 +61,7 @@ export default async function HomePage() {
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
-      />
+      <JsonLd data={structuredData} />
       <HomeSearch metrics={metrics} featuredMatch={featuredMatch}>
         <PatchPromo variant="compact" />
       </HomeSearch>

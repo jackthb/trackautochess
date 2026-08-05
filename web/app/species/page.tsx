@@ -3,6 +3,7 @@ import { EntityBrowser, type BrowsableEntity } from "@/components/EntityBrowser"
 import { pageMetadata, SITE_TITLE } from "@/lib/site";
 import { DEFAULT_LOCALE } from "@/lib/i18n";
 import { getSpecies } from "@/lib/synergies";
+import { collectionPage, JsonLd } from "@/lib/structuredData";
 
 const title = `Species | ${SITE_TITLE}`;
 const description =
@@ -14,13 +15,11 @@ export const metadata: Metadata = pageMetadata({
   path: "/species",
 });
 
-const structuredData = {
-  "@context": "https://schema.org",
-  "@type": "CollectionPage",
+const structuredData = collectionPage({
   name: "Dota Auto Chess species",
   description,
   about: "Dota Auto Chess species synergies",
-};
+});
 
 export default function SpeciesPage() {
   const data: BrowsableEntity[] = getSpecies(DEFAULT_LOCALE).map((s) => ({
@@ -33,10 +32,7 @@ export default function SpeciesPage() {
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
-      />
+      <JsonLd data={structuredData} />
       <EntityBrowser
         title="Species"
         variant="synergy"

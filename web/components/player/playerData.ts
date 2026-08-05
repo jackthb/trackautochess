@@ -17,6 +17,7 @@ import {
   steamProfileUrl,
   type SteamProfile,
 } from "@/lib/steam";
+import { breadcrumbList } from "@/lib/structuredData";
 import type { PlayerPageProps } from "./PlayerView";
 
 /**
@@ -163,24 +164,13 @@ export function buildPlayerSeo(props: Omit<PlayerPageProps, "route">): {
         sameAs: profileUrl,
       },
     },
-    {
-      "@context": "https://schema.org",
-      "@type": "BreadcrumbList",
-      itemListElement: [
-        {
-          "@type": "ListItem",
-          position: 1,
-          name: "Track Auto Chess",
-          ...(structuredDataBase ? { item: `${structuredDataBase}/` } : {}),
-        },
-        {
-          "@type": "ListItem",
-          position: 2,
-          name: displayName,
-          ...(canonicalUrl ? { item: canonicalUrl } : {}),
-        },
-      ],
-    },
+    breadcrumbList([
+      {
+        name: "Track Auto Chess",
+        url: structuredDataBase ? `${structuredDataBase}/` : null,
+      },
+      { name: displayName, url: canonicalUrl },
+    ]),
   ];
 
   return {

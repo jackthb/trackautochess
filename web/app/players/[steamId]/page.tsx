@@ -33,6 +33,7 @@ import {
   type PlayerProfileDrodoRow,
 } from "@/components/player/playerData";
 import { createSupabaseServerClient } from "@/lib/supabase";
+import { JsonLd } from "@/lib/structuredData";
 
 // Rendered dynamically (live DB read per request) instead of ISR-cached. With
 // force-static + revalidate=300 a hard reload served the prerendered page until
@@ -286,10 +287,7 @@ export default async function PlayerProfilePage({ params }: PageProps) {
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
-      />
+      <JsonLd data={structuredData} />
       <PlayerView route="/players/[steamId]" {...result.data} />
     </>
   );

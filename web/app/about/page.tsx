@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { pageMetadata, SITE_TITLE } from "@/lib/site";
+import { JsonLd } from "@/lib/structuredData";
 import { AboutContent } from "./AboutContent";
 
 const title = `About | ${SITE_TITLE}`;
@@ -22,10 +23,7 @@ const structuredData = {
 export default function AboutPage() {
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
-      />
+      <JsonLd data={structuredData} />
       <AboutContent />
     </>
   );

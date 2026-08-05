@@ -18,6 +18,7 @@ import GameView, {
   type MatchTimeline,
 } from "@/components/game/GameView";
 import { buildGameSeo } from "@/components/game/gameData";
+import { JsonLd } from "@/lib/structuredData";
 
 export const dynamic = "force-dynamic";
 
@@ -163,10 +164,7 @@ export default async function MatchDetailPage({ params }: PageProps) {
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
-      />
+      <JsonLd data={structuredData} />
       <GameView route="/matches/[id]" {...data} />
     </>
   );

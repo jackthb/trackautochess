@@ -3,6 +3,7 @@ import { EntityBrowser, type BrowsableEntity } from "@/components/EntityBrowser"
 import { pageMetadata, SITE_TITLE } from "@/lib/site";
 import { DEFAULT_LOCALE } from "@/lib/i18n";
 import { getAllItems, iconUrl, TIER_COLOR, TIER_LABEL } from "@/lib/items";
+import { collectionPage, JsonLd } from "@/lib/structuredData";
 
 const title = `Items | ${SITE_TITLE}`;
 const description =
@@ -14,13 +15,11 @@ export const metadata: Metadata = pageMetadata({
   path: "/items",
 });
 
-const structuredData = {
-  "@context": "https://schema.org",
-  "@type": "CollectionPage",
+const structuredData = collectionPage({
   name: "Dota Auto Chess items",
   description,
   about: "Dota Auto Chess items",
-};
+});
 
 export default function ItemsPage() {
   const tiers: BrowsableEntity[][] = [[], [], [], [], []];
@@ -40,10 +39,7 @@ export default function ItemsPage() {
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
-      />
+      <JsonLd data={structuredData} />
       <EntityBrowser
         title="Items"
         variant="item"

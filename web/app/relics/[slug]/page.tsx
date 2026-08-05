@@ -18,6 +18,7 @@ import { cleanText, truncate } from "@/lib/text";
 import { DEFAULT_LOCALE } from "@/lib/i18n";
 import { getCommentaryForEntity } from "@/lib/patchCommentary";
 import { Markdown } from "@/components/Markdown";
+import { breadcrumbList, entityWebPage, JsonLd } from "@/lib/structuredData";
 
 // Static detail page backed by committed JSON generated from content/.
 
@@ -72,32 +73,16 @@ export default async function RelicDetailPage({ params }: Props) {
   const relicsUrl = absoluteUrl("/relics");
 
   const structuredData = [
-    {
-      "@context": "https://schema.org",
-      "@type": "WebPage",
+    entityWebPage({
       name: `${relic.name} relic guide`,
       description,
-      ...(pageUrl ? { url: pageUrl } : {}),
-      about: { "@type": "Thing", name: relic.name },
-    },
-    {
-      "@context": "https://schema.org",
-      "@type": "BreadcrumbList",
-      itemListElement: [
-        {
-          "@type": "ListItem",
-          position: 1,
-          name: "Relics",
-          ...(relicsUrl ? { item: relicsUrl } : {}),
-        },
-        {
-          "@type": "ListItem",
-          position: 2,
-          name: relic.name,
-          ...(pageUrl ? { item: pageUrl } : {}),
-        },
-      ],
-    },
+      url: pageUrl,
+      about: relic.name,
+    }),
+    breadcrumbList([
+      { name: "Relics", url: relicsUrl },
+      { name: relic.name, url: pageUrl },
+    ]),
   ];
 
   const baseOverview =
@@ -147,10 +132,7 @@ export default async function RelicDetailPage({ params }: Props) {
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
-      />
+      <JsonLd data={structuredData} />
       <EntityDetail
         variant="relic"
         name={relic.name}

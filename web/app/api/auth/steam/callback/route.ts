@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { after } from "next/server";
+import { loopbackDesktopReturnTo } from "@/lib/desktopReturnTo";
 import { captureServerEvent } from "@/lib/posthogServer";
 import { createSupabaseServiceRoleClient } from "@/lib/supabase";
 import {
@@ -257,21 +258,6 @@ export async function GET(req: Request) {
   );
 }
 
-function loopbackDesktopReturnTo(value: string | null): string | null {
-  if (!value) return null;
-  try {
-    const url = new URL(value);
-    const hostname = url.hostname.toLowerCase();
-    const isLoopback =
-      hostname === "127.0.0.1" || hostname === "localhost" || hostname === "[::1]";
-    if (url.protocol !== "http:" || !isLoopback || url.username || url.password) {
-      return null;
-    }
-    return url.toString();
-  } catch {
-    return null;
-  }
-}
 
 function desktopRedirectUrl(
   returnTo: string,

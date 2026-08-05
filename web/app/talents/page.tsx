@@ -4,6 +4,7 @@ import { DEFAULT_LOCALE } from "@/lib/i18n";
 import Link from "next/link";
 import { getAllTalents, getTierRound, type DisplayTalent } from "@/lib/talents";
 import { PageLayout } from "@/components/PageLayout";
+import { collectionPage, JsonLd } from "@/lib/structuredData";
 import styles from "./talents.module.css";
 
 const title = `Talents | ${SITE_TITLE}`;
@@ -16,13 +17,11 @@ export const metadata: Metadata = pageMetadata({
   path: "/talents",
 });
 
-const structuredData = {
-  "@context": "https://schema.org",
-  "@type": "CollectionPage",
+const structuredData = collectionPage({
   name: "Dota Auto Chess talents",
   description,
   about: "Dota Auto Chess talents",
-};
+});
 
 export default function TalentsPage() {
   const talents = getAllTalents(DEFAULT_LOCALE);
@@ -38,10 +37,7 @@ export default function TalentsPage() {
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
-      />
+      <JsonLd data={structuredData} />
       <PageLayout title="Talents">
         <p className={styles.intro}>
           At each milestone round you settle one of two talents for your

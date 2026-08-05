@@ -15,6 +15,7 @@ import { getRelatedItemsForSynergy } from "@/lib/itemRelations";
 import { absoluteUrl, pageMetadata, SITE_TITLE } from "@/lib/site";
 import { DEFAULT_LOCALE } from "@/lib/i18n";
 import { getCommentaryForEntity } from "@/lib/patchCommentary";
+import { breadcrumbList, entityWebPage, JsonLd } from "@/lib/structuredData";
 
 // Static detail page backed by committed JSON generated from content/.
 
@@ -122,40 +123,21 @@ export default async function SynergyDetailPage({ params }: Props) {
   const pageUrl = absoluteUrl(`/synergies/${synergy.slug}`);
   const indexUrl = absoluteUrl(indexPath);
   const structuredData = [
-    {
-      "@context": "https://schema.org",
-      "@type": "WebPage",
+    entityWebPage({
       name: `${synergy.name} synergy guide`,
       description,
-      ...(pageUrl ? { url: pageUrl } : {}),
-      about: { "@type": "Thing", name: synergy.name },
-    },
-    {
-      "@context": "https://schema.org",
-      "@type": "BreadcrumbList",
-      itemListElement: [
-        {
-          "@type": "ListItem",
-          position: 1,
-          name: indexLabel,
-          ...(indexUrl ? { item: indexUrl } : {}),
-        },
-        {
-          "@type": "ListItem",
-          position: 2,
-          name: synergy.name,
-          ...(pageUrl ? { item: pageUrl } : {}),
-        },
-      ],
-    },
+      url: pageUrl,
+      about: synergy.name,
+    }),
+    breadcrumbList([
+      { name: indexLabel, url: indexUrl },
+      { name: synergy.name, url: pageUrl },
+    ]),
   ];
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
-      />
+      <JsonLd data={structuredData} />
       <EntityDetail
         variant="synergy"
         name={synergy.name}
