@@ -8,7 +8,6 @@ pub struct Outbox {
     dir: PathBuf,
 }
 
-#[allow(dead_code)]
 #[derive(Debug, Clone)]
 pub struct OutboxItem {
     pub path: PathBuf,
@@ -59,7 +58,6 @@ impl Outbox {
             .collect()
     }
 
-    #[allow(dead_code)]
     pub fn mark_uploaded(&self, path: &Path) -> io::Result<()> {
         fs::remove_file(path)
     }

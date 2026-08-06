@@ -680,8 +680,3 @@ fn emit(line: &str) -> io::Result<()> {
 fn emit_error(message: &str) -> io::Result<()> {
     emit(&event_json(&ErrorEvent::new(message)))
 }
-
-#[allow(dead_code)]
-fn sleep_interval() -> Duration {
-    Duration::from_millis(250)
-}

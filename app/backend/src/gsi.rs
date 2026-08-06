@@ -51,7 +51,6 @@ impl GsiState {
         GsiEvent::Payload
     }
 
-    #[allow(dead_code)]
     pub fn is_dac_active(&self) -> bool {
         let Some(last_payload) = self.last_payload else {
             return false;
@@ -66,17 +65,11 @@ pub enum GsiEvent {
     DacPostGame,
 }
 
-#[allow(dead_code)]
 pub struct GsiServer {
     state: Arc<Mutex<GsiState>>,
 }
 
 impl GsiServer {
-    #[allow(dead_code)]
-    pub fn spawn(port: u16) -> io::Result<Self> {
-        Self::spawn_with_callback(port, |_| {})
-    }
-
     pub fn spawn_with_callback<F>(port: u16, on_event: F) -> io::Result<Self>
     where
         F: Fn(GsiEvent) + Send + Sync + 'static,
@@ -96,19 +89,6 @@ impl GsiServer {
             })
             .map_err(io::Error::other)?;
         Ok(Self { state })
-    }
-
-    #[allow(dead_code)]
-    pub fn state(&self) -> GsiState {
-        self.state.lock().expect("gsi state poisoned").clone()
-    }
-
-    #[allow(dead_code)]
-    pub fn is_dac_active(&self) -> bool {
-        self.state
-            .lock()
-            .expect("gsi state poisoned")
-            .is_dac_active()
     }
 
     pub fn state_arc(&self) -> Arc<Mutex<GsiState>> {
