@@ -19,7 +19,8 @@ use config::Config;
 use ipc_events::{
     event_json, BackendCommand, BackendStatus, ConfigUpdated, DiagnosticsUploaded, DrodoProfile,
     ErrorEvent, GameUpdated, GamesList, MatchTimeline, NettablePaused, NettableRows, OutboxFlushed,
-    PanicEvent, PayloadQueued, SteamLogin, SteamLoginUrl, SteamLogout, UpdateApplyRequested,
+    OutboxStatusReport, PanicEvent, PayloadQueued, SteamLogin, SteamLoginUrl, SteamLogout,
+    UpdateApplyRequested,
 };
 use nettable_service::{parsed_json, rows_json, NettableService};
 use nettable_tail::NettableTailer;
@@ -551,6 +552,20 @@ fn run_daemon() -> io::Result<()> {
                         emit_threaded(&emit_lock, &event);
                     },
                 );
+            }
+            BackendCommand::OutboxStatus { request_id } => {
+                // Just a directory listing — answer inline rather than paying
+                // for a Supabase session the caller does not need.
+                let outbox = Outbox::new(cfg.dac_dir.join("outbox"));
+                let event = match outbox.list() {
+                    Ok(items) => {
+                        event_json(&OutboxStatusReport::complete(request_id, items.len()))
+                    }
+                    Err(err) => {
+                        event_json(&OutboxStatusReport::error(request_id, err.to_string()))
+                    }
+                };
+                emit(&event)?;
             }
             BackendCommand::UploadLogs { reason } => {
                 let reason = reason.unwrap_or_else(|| "manual".to_owned());

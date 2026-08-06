@@ -58,6 +58,11 @@ pub enum BackendCommand {
     FlushOutbox {
         request_id: String,
     },
+    /// Read-only count of queued uploads. Unlike `FlushOutbox` this touches no
+    /// network, so the UI can ask for it on open without pushing anything.
+    OutboxStatus {
+        request_id: String,
+    },
     UploadLogs {
         reason: Option<String>,
     },
@@ -189,6 +194,38 @@ impl OutboxFlushed {
             pending: 0,
             uploaded: 0,
             failed: 0,
+            error: Some(error),
+        }
+    }
+}
+
+#[derive(Debug, Serialize, TS)]
+pub struct OutboxStatusReport {
+    #[serde(rename = "type")]
+    pub event_type: &'static str,
+    pub backend: &'static str,
+    pub request_id: String,
+    pub pending: usize,
+    pub error: Option<String>,
+}
+
+impl OutboxStatusReport {
+    pub fn complete(request_id: String, pending: usize) -> Self {
+        Self {
+            event_type: "outbox_status",
+            backend: "rust",
+            request_id,
+            pending,
+            error: None,
+        }
+    }
+
+    pub fn error(request_id: String, error: String) -> Self {
+        Self {
+            event_type: "outbox_status",
+            backend: "rust",
+            request_id,
+            pending: 0,
             error: Some(error),
         }
     }
@@ -1039,6 +1076,7 @@ mod tests {
         push_decl!(PanicEvent<'static>);
         push_decl!(PayloadQueued<'static>);
         push_decl!(OutboxFlushed);
+        push_decl!(OutboxStatusReport);
         push_decl!(ConfigUpdated<'static>);
         push_decl!(GamesList);
         push_decl!(MatchTimeline);

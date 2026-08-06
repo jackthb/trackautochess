@@ -4,7 +4,7 @@ export type JsonValue = string | number | boolean | null | { [key: string]: Json
 
 export type BackendStatus = { type: string, backend: string, recording: boolean, focused: boolean, logged_in: boolean, steam_id: string, steam_name: string, replay_enabled: boolean, };
 
-export type BackendCommand = { "cmd": "quit" } | { "cmd": "status" } | { "cmd": "queue_ingest", payload: JsonValue, } | { "cmd": "queue_payload", payload: JsonValue, } | { "cmd": "set_config", key: string, value: JsonValue, } | { "cmd": "steam_logout" } | { "cmd": "steam_login" } | { "cmd": "toggle_recording" } | { "cmd": "nettable_status" } | { "cmd": "nettable_get_state" } | { "cmd": "capture" } | { "cmd": "nettable_apply_launch_options", flags: Array<string> | null, } | { "cmd": "nettable_check_active_match" } | { "cmd": "nettable_resync_from_steam" } | { "cmd": "nettable_set_paused", paused: boolean, } | { "cmd": "nettable_upload_queens" } | { "cmd": "nettable_confirm_match_end" } | { "cmd": "fetch_games", request_id: string, } | { "cmd": "fetch_timeline", request_id: string, match_id: string, } | { "cmd": "update_game", request_id: string, id: number, fields: JsonValue, } | { "cmd": "fetch_drodo", request_id: string, } | { "cmd": "refresh_drodo", request_id: string, } | { "cmd": "flush_outbox", request_id: string, } | { "cmd": "upload_logs", reason: string | null, } | { "cmd": "do_update" } | { "cmd": "parse_log", path: string | null, } | { "cmd": "tail_log_once", path: string | null, };
+export type BackendCommand = { "cmd": "quit" } | { "cmd": "status" } | { "cmd": "queue_ingest", payload: JsonValue, } | { "cmd": "queue_payload", payload: JsonValue, } | { "cmd": "set_config", key: string, value: JsonValue, } | { "cmd": "steam_logout" } | { "cmd": "steam_login" } | { "cmd": "toggle_recording" } | { "cmd": "nettable_status" } | { "cmd": "nettable_get_state" } | { "cmd": "capture" } | { "cmd": "nettable_apply_launch_options", flags: Array<string> | null, } | { "cmd": "nettable_check_active_match" } | { "cmd": "nettable_resync_from_steam" } | { "cmd": "nettable_set_paused", paused: boolean, } | { "cmd": "nettable_upload_queens" } | { "cmd": "nettable_confirm_match_end" } | { "cmd": "fetch_games", request_id: string, } | { "cmd": "fetch_timeline", request_id: string, match_id: string, } | { "cmd": "update_game", request_id: string, id: number, fields: JsonValue, } | { "cmd": "fetch_drodo", request_id: string, } | { "cmd": "refresh_drodo", request_id: string, } | { "cmd": "flush_outbox", request_id: string, } | { "cmd": "outbox_status", request_id: string, } | { "cmd": "upload_logs", reason: string | null, } | { "cmd": "do_update" } | { "cmd": "parse_log", path: string | null, } | { "cmd": "tail_log_once", path: string | null, };
 
 export type Config = { dac_dir: string, steam_id: string, steam_name: string, replay_enabled: boolean,
 /**
@@ -26,6 +26,8 @@ export type PanicEvent = { type: string, backend: string, message: string, locat
 export type PayloadQueued = { type: string, path: string, };
 
 export type OutboxFlushed = { type: string, backend: string, request_id: string, ok: boolean, pending: number, uploaded: number, failed: number, error: string | null, };
+
+export type OutboxStatusReport = { type: string, backend: string, request_id: string, pending: number, error: string | null, };
 
 export type ConfigUpdated = { type: string, key: string, };
 

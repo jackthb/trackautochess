@@ -1503,6 +1503,32 @@ video {
 .settings-value { font-size: 14px; color: var(--text-primary); }
 .settings-value.dim { color: var(--text-muted); }
 
+/* Label plus an explanatory line, for rows whose control needs a sentence to
+   make sense on its own. */
+.settings-label-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+  padding-right: 16px;
+}
+
+.settings-sublabel {
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--text-muted);
+  max-width: 46ch;
+}
+
+/* Groups a value and its control on the right of a settings row so they read
+   as one unit instead of needing a row each. */
+.settings-row-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+
 .feedback-survey-global {
   position: fixed;
   right: 18px;

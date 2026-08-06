@@ -30,6 +30,7 @@ import type {
   NettableStatus as GeneratedNettableStatus,
   NettableTimelineExtracted as GeneratedNettableTimelineExtracted,
   OutboxFlushed as GeneratedOutboxFlushed,
+  OutboxStatusReport as GeneratedOutboxStatusReport,
   PanicEvent as GeneratedPanicEvent,
   PayloadQueued as GeneratedPayloadQueued,
   SteamLogin as GeneratedSteamLogin,
@@ -77,6 +78,7 @@ export type PanicEvent = Omit<WithBackendType<GeneratedPanicEvent, "panic">, "lo
 };
 export type PayloadQueuedEvent = WithType<GeneratedPayloadQueued, "payload_queued">;
 export type OutboxFlushedEvent = WithBackendType<GeneratedOutboxFlushed, "outbox_flushed">;
+export type OutboxStatusEvent = WithBackendType<GeneratedOutboxStatusReport, "outbox_status">;
 export type ConfigUpdatedEvent = WithType<GeneratedConfigUpdated, "config_updated">;
 export type GamesListEvent = Omit<WithBackendType<GeneratedGamesList, "games_list">, "games"> & {
   games: import("./backend-events.generated").JsonValue;
@@ -249,6 +251,7 @@ export type BackendEvent =
   | PanicEvent
   | PayloadQueuedEvent
   | OutboxFlushedEvent
+  | OutboxStatusEvent
   | ConfigUpdatedEvent
   | GamesListEvent
   | MatchTimelineEvent

@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Button } from "@dac/shared/Button";
 import type { UnitFullInfo, TrackerStatus } from "../types";
 import type { BackendCommand } from "../backend-events.generated";
-import type { OutboxFlushedEvent } from "../backend-events";
+import type { OutboxFlushedEvent, OutboxStatusEvent } from "../backend-events";
 import type { NetTableActivityState } from "../hooks/useNetTableEvents";
 import { sendBackendRequest } from "../lib/backend-request";
 import { NetTableSetupCard } from "./NetTableSetupCard";
@@ -37,6 +37,10 @@ export function TrackerHome({ unitsFull, netTable, status }: TrackerHomeProps) {
   const [flushingOutbox, setFlushingOutbox] = useState(false);
   const [outboxStatus, setOutboxStatus] = useState<string | null>(null);
   const [outboxError, setOutboxError] = useState<string | null>(null);
+  // "loading" until the first count arrives, so the row does not flash "None" at
+  // a user who does have games waiting. "unknown" if the count cannot be read —
+  // the push button stays available in that case rather than stranding them.
+  const [pendingUploads, setPendingUploads] = useState<number | "loading" | "unknown">("loading");
 
   const steamId = status?.steam_id ?? null;
   const steamName = status?.steam_name || "Steam";
@@ -50,6 +54,21 @@ export function TrackerHome({ unitsFull, netTable, status }: TrackerHomeProps) {
   );
   useEffect(() => {
     window.appApi.getVersion().then(setVersion);
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+    sendBackendRequest<OutboxStatusEvent>({ cmd: "outbox_status" }, { timeoutMs: 10_000 })
+      .then((result) => {
+        if (cancelled) return;
+        setPendingUploads(result.error ? "unknown" : result.pending);
+      })
+      .catch(() => {
+        if (!cancelled) setPendingUploads("unknown");
+      });
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   const confirmMatchEnd = () => {
@@ -69,6 +88,8 @@ export function TrackerHome({ unitsFull, netTable, status }: TrackerHomeProps) {
         { cmd: "flush_outbox" },
         { timeoutMs: 60_000 },
       );
+      // `pending` is what is left after the flush, so it doubles as the fresh count.
+      setPendingUploads(result.pending);
       if (result.ok) {
         setOutboxStatus(
           result.pending === 0
@@ -160,14 +181,33 @@ export function TrackerHome({ unitsFull, netTable, status }: TrackerHomeProps) {
         <div className="settings-section">
           <div className="settings-section-title">Advanced</div>
           <div className="settings-row">
-            <span className="settings-label">Queued uploads</span>
-            <Button
-              className={flushingOutbox ? "btn-loading" : undefined}
-              disabled={flushingOutbox}
-              onClick={flushOutbox}
-            >
-              {flushingOutbox ? "Pushing" : "Push queued"}
-            </Button>
+            <div className="settings-label-stack">
+              <span className="settings-label">Queued uploads</span>
+              <span className="settings-sublabel">
+                Games held on this PC because their upload failed. They retry on
+                their own — pushing just retries now.
+              </span>
+            </div>
+            <div className="settings-row-actions">
+              {pendingUploads === "loading" && (
+                <span className="settings-value dim">Checking…</span>
+              )}
+              {pendingUploads === 0 && <span className="settings-value dim">None</span>}
+              {typeof pendingUploads === "number" && pendingUploads > 0 && (
+                <span className="settings-value">
+                  {pendingUploads} game{pendingUploads === 1 ? "" : "s"}
+                </span>
+              )}
+              {pendingUploads !== "loading" && pendingUploads !== 0 && (
+                <Button
+                  className={flushingOutbox ? "btn-loading" : undefined}
+                  disabled={flushingOutbox}
+                  onClick={flushOutbox}
+                >
+                  {flushingOutbox ? "Pushing" : "Push now"}
+                </Button>
+              )}
+            </div>
           </div>
           {outboxStatus && (
             <div className="settings-row">
@@ -182,18 +222,24 @@ export function TrackerHome({ unitsFull, netTable, status }: TrackerHomeProps) {
             </div>
           )}
           <div className="settings-row">
-            <span className="settings-label">Legendary overlay</span>
-            <span className="settings-value dim">Ctrl+Shift+L</span>
-          </div>
-          <div className="settings-row">
-            <span className="settings-label" />
-            <button
-              type="button"
-              className="btn-ghost"
-              onClick={() => void window.legendaryOverlay?.toggle()}
-            >
-              Toggle overlay
-            </button>
+            <div className="settings-label-stack">
+              <span className="settings-label">Legendary overlay</span>
+              <span className="settings-sublabel">
+                Lists which legendaries are still left in the shared pool, pinned
+                over the Dota window. It only appears while Dota is the window
+                you are looking at.
+              </span>
+            </div>
+            <div className="settings-row-actions">
+              <span className="settings-value dim">Ctrl+Shift+L</span>
+              <button
+                type="button"
+                className="btn-ghost"
+                onClick={() => void window.legendaryOverlay?.toggle()}
+              >
+                Show / hide
+              </button>
+            </div>
           </div>
         </div>
 
