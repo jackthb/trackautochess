@@ -127,7 +127,7 @@ Steam changelog ->  scripts/scrape-patch-notes.mjs  ->  content/patch-notes + co
 ## Automation
 
 - `.github/workflows/release.yml` runs on `v*` tags, builds the Windows Electron app and Rust backend, and uploads installer `.exe` artifacts to the GitHub Release.
-- `.github/workflows/refresh-queens.yml` is the only workflow on a live schedule (`*/5 * * * *`). It POSTs `/api/cron/queens-refresh`. That route currently early-returns on every firing: the Drodo view refresh is gated behind `QUEENS_DRODO_VIEW_REFRESH_ENABLED`, which is `false` in `web/lib/queensVisitor.ts` while Drodo's public `/courier/get` omits season MMR. See [polling.md](polling.md).
+- No workflow is on a live schedule. `refresh-queens.yml` used to POST `/api/cron/queens-refresh` every 5 minutes and was deleted: the route early-returns on every call because the Drodo view refresh is gated behind `QUEENS_DRODO_VIEW_REFRESH_ENABLED`, which is `false` in `web/lib/queensVisitor.ts` while Drodo's public `/courier/get` omits season MMR. The route and its client stay wired up, so re-enabling means flipping that flag and adding a scheduled caller back. See [polling.md](polling.md).
 
 ### Cronicle jobs on the Pi
 
