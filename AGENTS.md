@@ -156,5 +156,5 @@ These notes cover running this repo in a headless Linux cloud VM (no Windows, no
 ### Lint/typecheck
 - There is **no ESLint config or `lint` script** in this repo. Use TypeScript for the web quality check: `pnpm --dir web exec tsc --noEmit`. For Rust: `cargo build` / `cargo test` in `app/backend/`.
 
-### Known pre-existing test failure
-- `cargo test` in `app/backend/` currently has one failing test, `nettable_service::tests::parity_events_emit_round_creep_and_personal_elimination` (asserts `session_dumps.len() == 1`). It is a pure in-memory logic test (not environment-related) and fails on a clean checkout; unrelated to setup.
+### Test suite status
+- `cargo test` in `app/backend/` is green on a clean checkout: 77 passing (75 unit tests plus the `nettable_daemon` and `nettable_golden` integration tests), 0 failing, 1 ignored (`export_backend_event_bindings`, which `npm run generate:ipc-types` runs explicitly). This section previously documented `nettable_service::tests::parity_events_emit_round_creep_and_personal_elimination` as a known failure; that test passes and a failure there should be treated as a real regression, not a pre-existing condition.
