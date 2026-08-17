@@ -1,7 +1,4 @@
-import { toApiReq } from "@/lib/abuseLog";
-import { isAdminSteamId } from "@/lib/adminServer";
-import { getSessionUser } from "@/lib/sessionUser";
-import { createSupabaseAnonClient } from "@/lib/supabase";
+import { requireAdminSession } from "@/lib/adminServer";
 import { getGuidePreviewIcons, type GuidePreviewIcon } from "@/lib/guidePreviewIcons";
 import { guidesBySlugData, guideIndexData } from "@/generated/content-data";
 
@@ -13,11 +10,8 @@ interface IndexGuide {
 
 /** Admin-gated guide index. */
 export async function GET(req: Request) {
-  const anon = createSupabaseAnonClient();
-  const session = await getSessionUser(toApiReq(req), anon);
-  if (!(await isAdminSteamId(session.steamId))) {
-    return Response.json({ error: "Forbidden" }, { status: 403 });
-  }
+  const gate = await requireAdminSession(req);
+  if (!gate.ok) return gate.response;
 
   const guidesBySlug = guidesBySlugData as Record<
     string,

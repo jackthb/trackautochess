@@ -1,10 +1,6 @@
 import { mmrLevelToRank } from "@dac/shared/game-utils";
-import type { SupabaseClient } from "@supabase/supabase-js";
-import { toApiReq } from "@/lib/abuseLog";
-import { isAdminSteamId } from "@/lib/adminServer";
+import { requireAdminSession } from "@/lib/adminServer";
 import { duplicateMatchTimeBucket } from "@/lib/matches";
-import { getSessionUser } from "@/lib/sessionUser";
-import { createSupabaseAnonClient } from "@/lib/supabase";
 
 interface GameRow {
   id: number;
@@ -115,15 +111,12 @@ function pickBetterMatch<T extends { rows: GameRow[]; playedAt: string }>(
 }
 
 export async function GET(req: Request) {
-  const supabase: SupabaseClient | null = createSupabaseAnonClient();
+  const gate = await requireAdminSession(req);
+  if (!gate.ok) return gate.response;
 
+  const supabase = gate.anon;
   if (!supabase) {
     return Response.json({ error: "Database not configured" }, { status: 500 });
-  }
-
-  const session = await getSessionUser(toApiReq(req), supabase);
-  if (!(await isAdminSteamId(session.steamId))) {
-    return Response.json({ error: "Forbidden" }, { status: 403 });
   }
 
   const { data: gamesData, error: gamesError } = await supabase

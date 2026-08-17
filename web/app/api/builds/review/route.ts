@@ -1,28 +1,20 @@
-import { toApiReq } from "@/lib/abuseLog";
-import { isAdminSteamId } from "@/lib/adminServer";
+import { requireAdminSession } from "@/lib/adminServer";
 import {
   fetchUsersBySteamIds,
   toDetail,
   toSavedBuild,
   type CommunityBuildRow,
 } from "@/lib/builds/server";
-import { getSessionUser } from "@/lib/sessionUser";
-import {
-  createSupabaseAnonClient,
-  createSupabaseServiceRoleClient,
-} from "@/lib/supabase";
+import { createSupabaseServiceRoleClient } from "@/lib/supabase";
 
 /** Admin-only pending queue. */
 export async function GET(req: Request) {
+  const gate = await requireAdminSession(req);
+  if (!gate.ok) return gate.response;
+
   const service = createSupabaseServiceRoleClient();
   if (!service) {
     return Response.json({ error: "Database not configured" }, { status: 500 });
-  }
-
-  const anon = createSupabaseAnonClient();
-  const session = await getSessionUser(toApiReq(req), anon);
-  if (!(await isAdminSteamId(session.steamId))) {
-    return Response.json({ error: "Forbidden" }, { status: 403 });
   }
 
   const { data, error } = await service

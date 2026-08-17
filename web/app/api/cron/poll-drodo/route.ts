@@ -101,10 +101,17 @@ async function handle(req: Request) {
   const ids = ((dueUsers ?? []) as unknown as DueUser[]).map((row) =>
     String(row.steam_id)
   );
+  // Set membership, matching the Cronicle poller — the two selections have to
+  // agree on which ids count as already queued, and `ids` runs to the batch
+  // size (200+), so a linear scan per candidate is the wrong shape here.
+  const alreadyQueued = new Set(ids);
   const seedIds = ((unseededUsers ?? []) as unknown as DueUser[])
     .map((row) => String(row.steam_id))
-    .filter((id) => !ids.includes(id));
-  const alreadyQueued = new Set([...ids, ...seedIds]);
+    .filter((id) => {
+      if (alreadyQueued.has(id)) return false;
+      alreadyQueued.add(id);
+      return true;
+    });
   const inactiveIds = ((inactiveScanUsers ?? []) as unknown as InactiveScanUser[])
     .filter((row) => !isActivePollUser(row, recentSignIn))
     .map((row) => String(row.steam_id))
