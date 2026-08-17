@@ -10,6 +10,10 @@ Parked and unfinished work. Plan each item separately before implementing.
 
 - [ ] **Guides** — `/guides` is also admin-gated (same `admin_access` flag). Not a public launch yet.
 
+- [ ] **Guide Core Units table** — Replace markdown table-as-essay with scannable rows (unit icon + name, cost, synergy chips, short priority/role tag); move long explanations to prose below the table.
+
+- [ ] **Guide typography** — Fix heading hierarchy so h2/h3 clearly outrank body text (current h2 at ~1.25rem reads flat against 16px body).
+
 ## Capture / desktop
 
 - [ ] **Architecture Phase 7** — Golden-payload tests for match finalization heuristics. Needs a live-game fixture. The only open item in `docs/architecture-remediation-plan.md`.
