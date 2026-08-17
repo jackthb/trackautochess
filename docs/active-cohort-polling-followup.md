@@ -38,8 +38,8 @@ Any change must be applied to all of them or they silently desync:
 | File | Notes |
 |------|-------|
 | `ops/cronicle/scripts/poll-drodo.mjs` | `activeSyncFilter()` — adds `poll_interval_seconds.lte.HOT_POLL_MAX_INTERVAL_SECONDS` |
-| `web/scripts/poll-drodo.mts` | `steam_signed_in_at.gte.X, queen_ladder_rank.not.is.null` |
-| `web/app/api/cron/poll-drodo/route.ts` | same family |
+| `web/scripts/poll-drodo.mts` | later deleted as an orphaned third copy |
+| `web/app/api/cron/poll-drodo/route.ts` | later deleted with the GitHub poll-drodo cron |
 
 Ideally the filter is defined once (e.g. in `shared/drodo-core`) and imported by
 all three runtime paths, so it can never drift again.

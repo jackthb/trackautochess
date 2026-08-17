@@ -79,11 +79,9 @@ Known places wired to, or expected to stay aligned with, the shared policy:
 - `shared/drodo-core.ts` (source)
 - `shared/drodo-core.mjs` / `shared/drodo-core.d.mts` (generated runtime/types)
 - `ops/cronicle/scripts/poll-drodo.mjs`
-- `ops/cronicle/cronicle-job.dac-poll-drodo-active.json`
-- `ops/cronicle/cronicle-job.dac-poll-drodo-all.json`
+- `ops/cronicle/cronicle-job.dac-poll-drodo-active.json` (disabled while parked)
+- `ops/cronicle/cronicle-job.dac-poll-drodo-all.json` (disabled while parked)
 - `ops/cronicle/README.md`
-- `web/app/api/cron/poll-drodo/route.ts`
-- `web/app/api/cron/queens-refresh/route.ts`
 - `web/lib/queensRefresh.ts`
 - `web/lib/queensVisitor.ts`
 - Any admin/usage view that reports active polling counts.

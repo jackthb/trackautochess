@@ -11,7 +11,7 @@ export const DRODO_LIVE_FETCH_ENABLED = true;
 export const DRODO_MMR_ENABLED = false;
 
 /** Scheduled background polling stays parked: rank refreshes ride on page
- *  hits and manual refreshes, so the cron job would only add upstream load. */
+ *  hits and manual refreshes, so a Drodo cron would only add upstream load. */
 export const DRODO_BACKGROUND_POLL_ENABLED = false;
 
 export const DRODO_OUTAGE_NOTICE =

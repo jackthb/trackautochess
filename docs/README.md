@@ -127,13 +127,13 @@ Steam changelog ->  scripts/scrape-patch-notes.mjs  ->  content/patch-notes + co
 ## Automation
 
 - `.github/workflows/release.yml` runs on `v*` tags, builds the Windows Electron app and Rust backend, and uploads installer `.exe` artifacts to the GitHub Release.
-- No workflow is on a live schedule. `refresh-queens.yml` used to POST `/api/cron/queens-refresh` every 5 minutes and was deleted: the route early-returns on every call because the Drodo view refresh is gated behind `QUEENS_DRODO_VIEW_REFRESH_ENABLED`, which is `false` in `web/lib/queensVisitor.ts` while Drodo's public `/courier/get` omits season MMR. The route and its client stay wired up, so re-enabling means flipping that flag and adding a scheduled caller back. See [polling.md](polling.md).
+- No workflow is on a live schedule. The old Queen-player and Drodo poll crons (`refresh-queens.yml`, `poll-drodo.yml`, and the `/api/cron/*` routes they called) were removed: `/queens` is capture-driven while `QUEENS_DRODO_VIEW_REFRESH_ENABLED` is `false`, and Drodo background polling stays parked. See [polling.md](polling.md).
 
 ### Cronicle jobs on the Pi
 
-Cronicle is the primary operations path for both Drodo MMR polling (policy documented in [polling.md](polling.md)) and the DAC patch-notes scrape. See [ops/cronicle/README.md](../ops/cronicle/README.md) for setup, schedules, and runbook details.
+Cronicle on the Pi is the live scheduler for the DAC patch-notes scrape. Drodo MMR polling jobs exist in `ops/cronicle/` but are disabled while live fetch is parked (policy in [polling.md](polling.md)). See [ops/cronicle/README.md](../ops/cronicle/README.md) for setup, schedules, and runbook details.
 
-The `.github/workflows/poll-drodo.yml` and `.github/workflows/scrape-patch-notes.yml` workflows are emergency fallbacks and should remain disabled (schedule-wise) unless intentionally re-enabled for an incident or Cronicle outage. The patch-notes scrape moved here because Steam occasionally serves GitHub-hosted runner IPs an anti-bot response with no changelog content; the Pi's residential IP avoids that.
+`.github/workflows/scrape-patch-notes.yml` is an emergency fallback and should remain `workflow_dispatch`-only unless Cronicle is down. The scrape lives on the Pi because Steam occasionally serves GitHub-hosted runner IPs an anti-bot response with no changelog content; the Pi's residential IP avoids that.
 
 ## Editing content from a phone
 

@@ -222,19 +222,19 @@ hand-written type assertions — the types are unchecked claims and will drift.
    passes against the unified module.
 
 **Problem (b):** Poll orchestration (selecting due users, upserting, snapshots) is
-implemented twice — `web/lib/drodo.ts` (behind `/api/cron/poll-drodo`) and
-`ops/cronicle/scripts/poll-drodo.mjs`.
+implemented twice — `web/lib/drodo.ts` (the old `/api/cron/poll-drodo` route,
+since removed) and `ops/cronicle/scripts/poll-drodo.mjs`.
 
 **Steps:**
 
 4. Decide which scheduler is live (Cronicle, per `ops/cronicle/README.md`). If yes:
-   change `poll-drodo-active.sh` / `poll-drodo-all.sh` to `curl` the
-   `/api/cron/poll-drodo` endpoint with `CRON_SECRET` (exactly like
-   `.github/workflows/poll-drodo.yml` does), and delete `poll-drodo.mjs`'s
-   selection/upsert logic. If the endpoint lacks an `all` mode, add a
-   `?mode=all` parameter to the route rather than keeping a second implementation.
-5. Document in `ops/cronicle/README.md` which trigger is authoritative and that the
-   GitHub workflow is manual-dispatch-only backup.
+   keep `ops/cronicle/scripts/poll-drodo.mjs` as the single poll orchestrator
+   (the later `/api/cron/poll-drodo` GitHub/Vercel path was removed). If the
+   endpoint is ever rebuilt, add a `?mode=all` parameter rather than a second
+   implementation.
+5. Document in `ops/cronicle/README.md` which trigger is authoritative. GitHub
+   Actions is no longer a Drodo poll fallback; only the patch-notes scrape
+   workflow remains as `workflow_dispatch` backup.
 
 ---
 

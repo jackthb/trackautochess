@@ -8,7 +8,7 @@
   "schedule": "17 3 * * *",
   "timezone": "Europe/London",
   "timeout": 1800,
-  "enabled": 1,
+  "enabled": 0,
   "catchup": 1,
   "env": {
     "NODE_ENV": "production"

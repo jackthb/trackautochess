@@ -21,13 +21,15 @@ The actual poller script runs locally on the Pi with plain Node.js and talks
 directly to Drodo and Supabase. The Vercel API can stay focused on
 user-directed refreshes.
 
-The GitHub Actions schedules for `Poll Drodo (MMR snapshots)` and
-`Scrape DAC Patch Notes` have both been disabled; each remains manually
-runnable only as an emergency/operator-triggered fallback.
+The GitHub Actions schedule for `Scrape DAC Patch Notes` is disabled; that
+workflow remains `workflow_dispatch`-only as an emergency fallback. The old
+`Poll Drodo (MMR snapshots)` GitHub workflow was removed.
 
-**Current status:** Drodo live polling is parked. `scripts/poll-drodo.mjs` exits
-immediately unless `DRODO_LIVE_FETCH_ENABLED=1` is set. Public `/courier/get` no
-longer returns season MMR, so scheduled jobs should stay off.
+**Current status:** Drodo live polling is parked. The Cronicle Drodo job
+definitions ship with `"enabled": 0`, and `scripts/poll-drodo.mjs` also exits
+immediately unless `DRODO_LIVE_FETCH_ENABLED=1` is set. Public `/courier/get`
+no longer returns season MMR, so those jobs should stay off. The patch-notes
+scrape is the only Cronicle job that should run.
 
 Unlike the Drodo poller, the patch-notes scrape commits and pushes to `main`
 directly (`git add content/ && git commit && git push`), using the `/workspace`
@@ -71,9 +73,13 @@ Default login for the packaged image is `admin` / `admin`. Change it first.
 
 ## Cronicle jobs to create
 
-Create three **Shell Script** jobs in the Cronicle UI.
+Create the patch-notes **Shell Script** job in the Cronicle UI and leave the
+two Drodo poll jobs disabled until live fetch is un-parked.
 
-### Daily active poll
+### Daily active poll (disabled)
+
+Do not enable this while Drodo live fetch is parked. The job file ships with
+`"enabled": 0`.
 
 Schedule: once per day, before the full poll
 
@@ -96,7 +102,10 @@ Queen ladder rank alone does not keep a user in this cohort. The public
 
 Unseeded active users are also pulled once and then join the adaptive cadence.
 
-### Daily full poll
+### Daily full poll (disabled)
+
+Do not enable this while Drodo live fetch is parked. The job file ships with
+`"enabled": 0`.
 
 Schedule: once per day, off peak
 
