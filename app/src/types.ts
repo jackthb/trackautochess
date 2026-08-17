@@ -5,49 +5,11 @@ import type { BackendCommand } from "./backend-events.generated";
 export type { ItemFullInfo, RelicInfo, SynergyInfo, UnitFullInfo } from "@dac/shared/types";
 export type * from "./backend-events";
 
-/** A row from the `games` table — one player's result in a match. */
-export interface Game {
-  id: number;
-  user_id: string;
-  placement: string;
-  rank: string | null;
-  rank_change: "up" | "down" | "none" | null;
-  lineup: string | null;
-  synergies: string | null;
-  talents: string | null;
-  relic: string | null;
-  /** Round-by-round relic picks (jsonb from match_players). Rendered as the
-   *  full relic list in the History row; `relic` alone is just the final
-   *  active relic. */
-  relic_history?: unknown;
-  level: string | null;
-  wl: string | null;
-  wins: number | null;
-  losses: number | null;
-  screenshot: string | null;
-  replay: string | null;
-  notes: string | null;
-  match_id: string | null;
-  played_at: string;
-  created_at: string;
-}
-
 export interface Replay {
   name: string;
   path: string;
   size: number;
   mtime: number;
-}
-
-export interface Screenshot {
-  name: string;
-  path: string;
-  size: number;
-  mtime: number;
-  uploaded: boolean;
-  hasParsed: boolean;
-  hasImported: boolean;
-  screenType: "my_matches" | "game_over" | "final_ranking" | "unknown" | null;
 }
 
 export interface ReplayStats {
@@ -189,27 +151,6 @@ export interface TalentInfo {
   title: string;
   description?: string;
   [key: string]: unknown;
-}
-
-export interface SeasonSnapshot {
-  season: string;
-  mmr: number | null;
-  max_mmr: number | null;
-  games_played: number | null;
-}
-
-export interface DrodoProfile {
-  mmr: number | null;
-  max_mmr: number | null;
-  mmr_level: number | null;
-  queen_rank?: number | null;
-  season: string | null;
-  season_games: number | null;
-  candy?: number | null;
-  chicken_count: number | null;
-  raw_data?: Record<string, unknown>;
-  fetched_at: string | null;
-  seasons?: SeasonSnapshot[];
 }
 
 // Window API types from preload.js
