@@ -22,6 +22,13 @@ syncPublicIcons();
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
+  // Version-skew protection: stamp every asset/data request with the deploy it
+  // was served by so an open tab keeps loading chunks from *its* deployment
+  // even after a newer one ships (removing the cause of the ChunkLoadError the
+  // error boundaries recover from). `VERCEL_DEPLOYMENT_ID` is injected on
+  // Vercel when Skew Protection is enabled for the project; it is undefined
+  // locally, where this is a harmless no-op.
+  deploymentId: process.env.VERCEL_DEPLOYMENT_ID,
   transpilePackages: ["@dac/shared"],
   webpack(config) {
     config.resolve.alias = {
