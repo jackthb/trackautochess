@@ -6,7 +6,7 @@ Parked and unfinished work. Plan each item separately before implementing.
 
 - [ ] **Builds** — Community planner, share links, submit/review, votes, and comments already exist. `/builds` and `/builds/[id]` are behind PostHog `admin_access` (`AdminGate` + `requireAdmin` on every API, including GET of approved builds). Nav hides Builds unless you are admin. Pages are `noindex`. `/builds/review` stays admin-only.
 
-- [ ] **Chatbot** — Signed-in RAG widget over units, synergies, items, relics, talents, and patch notes. Vercel AI Gateway (`google/gemini-2.5-flash` + `text-embedding-3-small`), streaming UI, sources with links, 10 req/min, 2000/day global cap. The code already says to split off a dedicated flag. Embeddings refresh is a manual `pnpm --dir web run embed-content`.
+- [ ] **Chatbot** — Admin-gated streaming widget via Vercel AI Gateway (`alibaba/qwen3.7-flash`). Synergy questions are grounded in committed content (plus that synergy's units). Unit/item lookup, guides, and embeddings are later. Access is the existing `admin_access` check.
 
 - [ ] **Guides** — `/guides` is also admin-gated (same `admin_access` flag). Not a public launch yet.
 

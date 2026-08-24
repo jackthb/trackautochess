@@ -42,6 +42,15 @@ const nextConfig: NextConfig = {
   serverExternalPackages: ["@resvg/resvg-js"],
   turbopack: {
     root: path.resolve(__dirname, ".."),
+    resolveAlias: {
+      "@tailwindcss/postcss": path.resolve(
+        __dirname,
+        "..",
+        "node_modules",
+        "@tailwindcss",
+        "postcss",
+      ),
+    },
   },
   // i18n routing was removed (en/ru/zh; ~3.4% of traffic, little translated
   // content). The site now serves a single English locale; localization will

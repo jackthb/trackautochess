@@ -1,4 +1,5 @@
 export type ContentDocType =
+  | "guide"
   | "unit"
   | "synergy"
   | "item"

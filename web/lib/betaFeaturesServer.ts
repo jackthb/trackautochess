@@ -48,8 +48,22 @@ export async function probePostHogFlagForSteamId(
   steamId: string | null | undefined,
   flagKey: string,
 ): Promise<PostHogFlagProbe> {
-  const token = process.env.NEXT_PUBLIC_POSTHOG_PROJECT_TOKEN;
+  const token =
+    process.env.POSTHOG_PROJECT_TOKEN ||
+    process.env.NEXT_PUBLIC_POSTHOG_PROJECT_TOKEN;
   const host = posthogFlagsHost();
+
+  if (process.env.NODE_ENV === "development") {
+    return {
+      enabled: Boolean(steamId),
+      host,
+      hasToken: Boolean(token),
+      httpStatus: null,
+      flagPresent: false,
+      raw: undefined,
+      error: steamId ? null : "missing_steam_id",
+    };
+  }
 
   if (!token || !steamId) {
     return {

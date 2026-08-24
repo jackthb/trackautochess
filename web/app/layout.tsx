@@ -19,7 +19,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="en" className="dark">
       <head>
         {supabaseUrl && (
           <link rel="preconnect" href={supabaseUrl} crossOrigin="anonymous" />

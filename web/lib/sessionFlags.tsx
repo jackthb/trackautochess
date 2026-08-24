@@ -73,6 +73,11 @@ export function SessionFlagsProvider({ children }: { children: ReactNode }) {
           steamId,
           admin: data.admin_access === true,
         });
+      })
+      .catch(() => {
+        if (cancelled) return;
+        fetchedFor.current = steamId;
+        setResolved({ steamId, admin: false });
       });
 
     return () => {

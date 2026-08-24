@@ -28,6 +28,24 @@ pnpm --dir web run test:e2e  # build, then run Playwright tests
 - The web app imports shared UI and utility code from the local `@dac/shared` package in `../shared`.
 - Supabase access is handled through server/client helpers under `web/lib/` and API routes under `web/app/api/`.
 
+## Game assistant
+
+The site includes an admin-gated Game assistant widget. It streams answers from Vercel AI Gateway (`alibaba/qwen3.7-flash` by default). Named synergy questions are grounded in committed game content (plus that synergy's units). Other questions fall back to general Dota Auto Chess knowledge.
+
+**Production:** Vercel OIDC authenticates AI Gateway automatically. Enable AI Gateway on the `trackautochess` project. Keep `NEXT_PUBLIC_POSTHOG_PROJECT_TOKEN` set so `admin_access` can show the widget. No `AI_GATEWAY_API_KEY` is required on Vercel.
+
+**Local:**
+
+1. Link the `trackautochess` Vercel project if needed (`vercel link` from `web/` or the repo root).
+2. Refresh OIDC credentials: `vercel env pull .env.local --yes`. The token lasts about 24 hours. If `web/.env.development.local` also has `VERCEL_OIDC_TOKEN`, remove that line so it cannot shadow the pulled token.
+3. Sign in with a Steam account that has PostHog `admin_access` (in development, any signed-in Steam user is treated as admin).
+4. Open the `?` button at the bottom-right and send a message.
+
+Optional environment:
+
+- `CHAT_GENERATION_MODEL` overrides the Gateway model slug.
+- `AI_GATEWAY_API_KEY` is a static fallback when `VERCEL_OIDC_TOKEN` is not available.
+
 ## Twitch integrations
 
 The site exposes public, CORS-enabled Twitch chat bot endpoints. They accept a Steam ID64, Steam profile URL, or Steam vanity name and cache responses at the edge for 30 minutes.

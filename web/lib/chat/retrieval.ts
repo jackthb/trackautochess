@@ -6,6 +6,7 @@ import type { ContentDocType, MatchedContentDoc } from "@/lib/chat/types";
 
 function asDocType(value: string): ContentDocType {
   if (
+    value === "guide" ||
     value === "unit" ||
     value === "synergy" ||
     value === "item" ||

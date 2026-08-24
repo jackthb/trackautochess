@@ -1,7 +1,7 @@
 import { gateway } from "@ai-sdk/gateway";
 import {
   CHAT_EMBEDDING_MODEL,
-  CHAT_GENERATION_MODEL,
+  chatGenerationModelId,
 } from "@/lib/chat/config";
 
 export function chatEmbeddingModel() {
@@ -9,5 +9,5 @@ export function chatEmbeddingModel() {
 }
 
 export function chatGenerationModel() {
-  return gateway(CHAT_GENERATION_MODEL);
+  return gateway(chatGenerationModelId());
 }
