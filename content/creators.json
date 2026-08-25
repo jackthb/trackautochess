@@ -127,6 +127,14 @@
       ],
       "excludeTerms": [],
       "seedVideoIds": []
+    },
+    {
+      "id": "MIO_DAC",
+      "profileUrl": "https://www.youtube.com/@MIO_DAC",
+      "youtubeChannelId": "UCVSiUcZ1hUCylzLaWcLjhdg",
+      "includeTerms": [],
+      "excludeTerms": [],
+      "seedVideoIds": []
     }
   ]
 }
