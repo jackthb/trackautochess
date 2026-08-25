@@ -17,10 +17,6 @@ const title = `Creators | ${SITE_TITLE}`;
 const description =
   "Find live Dota Auto Chess creators, latest community uploads, and Twitch chatbot commands in one Track Auto Chess feed.";
 
-const chatbotEndpoint = "https://www.trackautochess.com/api/twitch/mmr?steam=";
-const streamElementsCommandUrl =
-  "https://streamelements.com/dashboard/bot/commands/custom?data=JTdCJTIyY29vbGRvd24lMjIlM0ElN0IlMjJ1c2VyJTIyJTNBMTUlMkMlMjJnbG9iYWwlMjIlM0E1JTdEJTJDJTIyYWxpYXNlcyUyMiUzQSU1QiU1RCUyQyUyMmtleXdvcmRzJTIyJTNBJTVCJTVEJTJDJTIydGl0bGVLZXl3b3JkcyUyMiUzQSU1QiU1RCUyQyUyMmVuYWJsZWQlMjIlM0F0cnVlJTJDJTIyZW5hYmxlZE9ubGluZSUyMiUzQXRydWUlMkMlMjJlbmFibGVkT2ZmbGluZSUyMiUzQXRydWUlMkMlMjJoaWRkZW4lMjIlM0FmYWxzZSUyQyUyMmNvc3QlMjIlM0EwJTJDJTIydHlwZSUyMiUzQSUyMnNheSUyJTJDJTIyYWNjZXNzTGV2ZWwlMjIlM0ExMDAlMkMlMjJjb21tYW5kJTIyJTNBJTIybW1yJTIyJTJDJTIycmVwbHklMjIlM0ElMjIlMjQlN0JjdXN0b21hcGkuaHR0cHMlM0ElMkYlMkZ3d3cudHJhY2thdXRvY2hlc3MuY29tJTJGYXBpJTJGdHdpdGNoJTJGJTI0JTdCMSU3RCUyRm1tciU3RCUyMiUyQyUyMnJlZ2V4JTIyJTNBJTIyJTIyJTdE";
-
 export const metadata: Metadata = pageMetadata({
   title,
   description,
@@ -54,10 +50,6 @@ function youtubeEmbedUrl(videoUrl: string): string | null {
   } catch {
     return null;
   }
-}
-
-function CodeBlock({ children }: { children: string }) {
-  return <pre className={styles.code}>{children}</pre>;
 }
 
 function StreamCard({ stream }: { stream: CreatorLiveStream }) {
@@ -194,12 +186,8 @@ export default async function CreatorsPage() {
           A community hub for Auto Chess creators. This page only shows creators
           that are detected as live right now, plus recent Dota Auto Chess
           videos from configured YouTube channels.{" "}
-          <Link href="#chatbot-commands" prefetch={false}>
-            Add the Twitch chat command
-          </Link>{" "}
-          for MMR lookups, or{" "}
           <Link href="/support" prefetch={false}>
-            use the support form
+            Use the support form
           </Link>{" "}
           to suggest another creator.
         </p>
@@ -282,71 +270,6 @@ export default async function CreatorsPage() {
             </div>
           )}
         </section>
-
-        <details id="chatbot-commands" className={styles.commandDetails}>
-          <summary className={styles.commandSummary}>
-            <span id="chatbot-commands-heading" className={styles.sectionTitle}>
-              Twitch chat commands
-            </span>
-            <span className={styles.sectionKicker}>MMR lookup</span>
-          </summary>
-          <div className={styles.commandStack}>
-            <div className={styles.commandIntro}>
-              <p>
-                Add an <code>!mmr</code> command to Twitch chat so viewers can
-                look up Dota Auto Chess MMR from a Steam ID64, Steam profile
-                URL, or Steam vanity name.
-              </p>
-              <div className={styles.example}>
-                <span>Chat usage</span>
-                <CodeBlock>{`!mmr 76561198000000000
-!mmr https://steamcommunity.com/id/someone
-!mmr someone`}</CodeBlock>
-              </div>
-            </div>
-
-            <div className={styles.commandGrid}>
-              <article className={styles.commandCard}>
-                <h3>Nightbot</h3>
-                <CodeBlock>
-                  {
-                    "!commands add !mmr $(urlfetch https://www.trackautochess.com/api/twitch/mmr?steam=$(querystring))"
-                  }
-                </CodeBlock>
-              </article>
-
-              <article className={styles.commandCard}>
-                <h3>StreamElements</h3>
-                <p>
-                  In the StreamElements dashboard, set the command response to
-                  this and use a Steam ID64 or Steam vanity name:
-                </p>
-                <CodeBlock>
-                  {
-                    "${customapi.https://www.trackautochess.com/api/twitch/${1}/mmr}"
-                  }
-                </CodeBlock>
-                <a
-                  className={styles.commandLink}
-                  href={streamElementsCommandUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  Open StreamElements setup
-                </a>
-              </article>
-
-              <article className={styles.commandCard}>
-                <h3>Streamlabs</h3>
-                <p>
-                  Create a custom command named <code>!mmr</code> and use the
-                  command argument text as the <code>steam</code> query value.
-                </p>
-                <CodeBlock>{`${chatbotEndpoint}<command arguments>`}</CodeBlock>
-              </article>
-            </div>
-          </div>
-        </details>
       </PageLayout>
     </>
   );

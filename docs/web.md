@@ -46,15 +46,6 @@ Optional environment:
 - `CHAT_GENERATION_MODEL` overrides the Gateway model slug.
 - `AI_GATEWAY_API_KEY` is a static fallback when `VERCEL_OIDC_TOKEN` is not available.
 
-## Twitch integrations
-
-The site exposes public, CORS-enabled Twitch chat bot endpoints. They accept a Steam ID64, Steam profile URL, or Steam vanity name and cache responses at the edge for 30 minutes.
-
-- `/api/twitch/:steamId/mmr` takes the Steam input in the path segment.
-- `/api/twitch/mmr?steam=...` takes it as a query parameter, which is easier to wire into bot marketplaces because profile URLs only need query escaping.
-
-Both return a one-line `text/plain` response for chat bot commands. For example, a Nightbot `!mmr` command can use `$(urlfetch https://www.trackautochess.com/api/twitch/76561198000000000/mmr)` and chat will receive the player's Steam ID, current MMR/rank when available, and Track Auto Chess profile link. StreamElements can use the equivalent `$(customapi https://www.trackautochess.com/api/twitch/76561198000000000/mmr)` response. Bots that do not support URL-fetch/custom API variables, such as basic OWN3D custom-command templates, need either an equivalent HTTP-request feature or a small custom Twitch IRC bot that calls this endpoint.
-
 ## Content editing
 
 Keystatic is configured in `web/app/keystatic/keystatic.ts` and edits committed JSON content. Local development writes files directly. Production can use GitHub-backed storage when the Keystatic environment variables are configured — see "Editing content from a phone" in [README.md](README.md), or `web/.env.example`.
