@@ -1,0 +1,104 @@
+{
+  "date": "2026-08-30",
+  "title": "Aegis Prediction & Hidden Serendipity(Part 2)",
+  "source": "https://docs.google.com/document/d/e/2PACX-1vSD8SIDXgcmCaACajnNXHiO6-PQ1lc7VOeMTosmrwL0AMTLvR3dICtqrbDZujj31OvFKMDnP6YUHxSe/pub",
+  "workshopUrl": "https://steamcommunity.com/sharedfiles/filedetails/changelog/1613886175",
+  "image": "/patch-banners/2026-08-30-aegis-prediction-and-hidden-serendipity-part-2.png",
+  "entitiesSynced": false,
+  "sourceEntries": [
+    {
+      "sourceId": "1788104473",
+      "date": "2026-08-30",
+      "time": "8:41am",
+      "docsUrl": "https://docs.google.com/document/d/e/2PACX-1vSD8SIDXgcmCaACajnNXHiO6-PQ1lc7VOeMTosmrwL0AMTLvR3dICtqrbDZujj31OvFKMDnP6YUHxSe/pub",
+      "contentHash": "a0c613a07509fdad"
+    }
+  ],
+  "sections": [
+    {
+      "heading": "Chess Pieces",
+      "entries": [
+        {
+          "kind": "change",
+          "name": "Dismiss",
+          "detail": "Price Curve adjusted."
+        }
+      ]
+    },
+    {
+      "heading": "Chess Pieces",
+      "entries": [
+        {
+          "kind": "nerf",
+          "name": "Skyrage Mage - Arcane Bolt",
+          "detail": "Damage decreased from 150/250/350 to 100/200/300"
+        },
+        {
+          "kind": "buff",
+          "name": "Grimstroke - Stroke of Fate",
+          "detail": "Restriction effect decreased from 10/30/50% to 10/20/40% while duration increased from 6s to 8s",
+          "entityKey": "unit__grimstroke"
+        },
+        {
+          "kind": "nerf",
+          "name": "Kez - Kazurai Katana",
+          "detail": "Damage decreased from 300/400/600 to 200/300/500, percentage damage decreased from 15%/20%/30% to 10%/15%/25%",
+          "entityKey": "unit__kez"
+        }
+      ]
+    },
+    {
+      "heading": "Items",
+      "entries": [
+        {
+          "kind": "removed",
+          "name": "Eye of Skadi",
+          "detail": "Attack damage -50% removed",
+          "entityKey": "item__eye-of-skadi"
+        }
+      ]
+    },
+    {
+      "heading": "Relics",
+      "entries": [
+        {
+          "kind": "new",
+          "name": "New Relic",
+          "detail": "Serendipity Compass"
+        },
+        {
+          "kind": "change",
+          "name": "Magic Seed",
+          "detail": "Have a chance of +$2 if the probability is higher than 100% instead of maximum +$1.",
+          "entityKey": "relic__magic-seed"
+        },
+        {
+          "kind": "nerf",
+          "name": "Weighted Dice",
+          "detail": "Slightly decreased the chance to refund $2.",
+          "entityKey": "relic__weighted-dice"
+        }
+      ]
+    },
+    {
+      "heading": "Season Awards",
+      "entries": [
+        {
+          "kind": "change",
+          "name": "S44 Crimson Monk(July, 1st - Aug, 31st) Awards will be granted as follows:",
+          "detail": "S44 Crimson Monk(July, 1st - Aug, 31st) Awards will be granted as follows:"
+        },
+        {
+          "kind": "change",
+          "name": "Badges will be settled by the final ranking of the Season. All other awards will be settled by the highest rank in Season.",
+          "detail": "Badges will be settled by the final ranking of the Season. All other awards will be settled by the highest rank in Season."
+        },
+        {
+          "kind": "new",
+          "name": "The last day of the season will be a casual day to settle the awards. You can play casual games without rankings. New Season S45 Grub 11  Season will be kicked off on Sep 1st, 2026.",
+          "detail": "The last day of the season will be a casual day to settle the awards. You can play casual games without rankings. New Season S45 Grub 11  Season will be kicked off on Sep 1st, 2026."
+        }
+      ]
+    }
+  ]
+}
