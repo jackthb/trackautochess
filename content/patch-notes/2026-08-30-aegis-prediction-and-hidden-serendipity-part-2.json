@@ -12,7 +12,16 @@
       "time": "8:41am",
       "docsUrl": "https://docs.google.com/document/d/e/2PACX-1vSD8SIDXgcmCaACajnNXHiO6-PQ1lc7VOeMTosmrwL0AMTLvR3dICtqrbDZujj31OvFKMDnP6YUHxSe/pub",
       "contentHash": "a0c613a07509fdad"
+    },
+    {
+      "sourceId": "1788189219",
+      "date": "2026-08-31",
+      "time": "8:13am",
+      "contentHash": "8ad86bcf0c7613e2"
     }
+  ],
+  "absorbedDates": [
+    "2026-08-31"
   ],
   "sections": [
     {
@@ -97,6 +106,21 @@
           "kind": "new",
           "name": "The last day of the season will be a casual day to settle the awards. You can play casual games without rankings. New Season S45 Grub 11  Season will be kicked off on Sep 1st, 2026.",
           "detail": "The last day of the season will be a casual day to settle the awards. You can play casual games without rankings. New Season S45 Grub 11  Season will be kicked off on Sep 1st, 2026."
+        }
+      ]
+    },
+    {
+      "heading": "Hotfix — 2026-08-31",
+      "entries": [
+        {
+          "kind": "new",
+          "name": "S45 has been kicked off! Enjoy the new season and ...",
+          "detail": "S45 has been kicked off! Enjoy the new season and claim your S44 Award in Event Panel"
+        },
+        {
+          "kind": "change",
+          "name": "You’ll need 5 games to settle your ranking as usual.",
+          "detail": "You’ll need 5 games to settle your ranking as usual."
         }
       ]
     }
