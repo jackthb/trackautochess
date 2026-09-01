@@ -41,32 +41,6 @@ jobs:
           restore-keys: |
             electron-builder-${{ runner.os }}-
 
-      - name: Configure Windows code signing
-        shell: pwsh
-        env:
-          WINDOWS_CERTIFICATE_BASE64: ${{ secrets.WINDOWS_CERTIFICATE_BASE64 }}
-          WINDOWS_CERTIFICATE_PASSWORD: ${{ secrets.WINDOWS_CERTIFICATE_PASSWORD }}
-        run: |
-          if ([string]::IsNullOrWhiteSpace($env:WINDOWS_CERTIFICATE_BASE64)) {
-            throw "WINDOWS_CERTIFICATE_BASE64 is required; refusing to publish an unsigned installer."
-          }
-
-          $certificatePath = Join-Path $env:RUNNER_TEMP "track-auto-chess-signing.pfx"
-          try {
-            $certificateBytes = [Convert]::FromBase64String(
-              ($env:WINDOWS_CERTIFICATE_BASE64 -replace '\s', '')
-            )
-          } catch {
-            throw "WINDOWS_CERTIFICATE_BASE64 is not valid base64."
-          }
-          [IO.File]::WriteAllBytes($certificatePath, $certificateBytes)
-
-          "WIN_CSC_LINK=$certificatePath" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
-          if (-not [string]::IsNullOrWhiteSpace($env:WINDOWS_CERTIFICATE_PASSWORD)) {
-            "WIN_CSC_KEY_PASSWORD=$env:WINDOWS_CERTIFICATE_PASSWORD" |
-              Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
-          }
-
       - name: Build Electron app & installer
         shell: pwsh
         run: |
@@ -74,23 +48,6 @@ jobs:
           pnpm --dir app run build:backend
           pnpm --dir app run build
           npm run build:desktop:installer
-
-      - name: Verify Windows signatures
-        shell: pwsh
-        run: |
-          $application = Get-Item "app/release/win-unpacked/Track Auto Chess.exe"
-          $installers = @(Get-ChildItem "app/release" -Filter "*.exe" -File)
-          if ($installers.Count -eq 0) {
-            throw "No Windows installer was produced."
-          }
-
-          foreach ($file in @($application) + $installers) {
-            $signature = Get-AuthenticodeSignature $file.FullName
-            if ($signature.Status -ne "Valid") {
-              throw "$($file.Name) has an invalid Authenticode signature: $($signature.StatusMessage)"
-            }
-            Write-Host "Verified Authenticode signature: $($file.Name)"
-          }
 
       - name: Upload release
         uses: softprops/action-gh-release@v2
@@ -100,8 +57,3 @@ jobs:
             app/release/*.blockmap
             app/release/latest*.yml
           generate_release_notes: true
-
-      - name: Remove signing certificate
-        if: always()
-        shell: pwsh
-        run: Remove-Item (Join-Path $env:RUNNER_TEMP "track-auto-chess-signing.pfx") -Force -ErrorAction SilentlyContinue
