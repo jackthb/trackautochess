@@ -15,6 +15,7 @@ const STEAM_ID64_MIN: u64 = 76_561_197_960_265_728;
 const STEAM_ID64_MAX: u64 = 76_561_202_255_233_023;
 const DRODO_COURIER_BATCH_SIZE: usize = 100;
 const HTTP_TIMEOUT: Duration = Duration::from_secs(4);
+const MATCH_INGEST_HTTP_TIMEOUT: Duration = Duration::from_secs(15);
 const DRODO_COURIER_API_BASE_URL: &str = "http://autochess.ppbizon.com";
 const QUEENS_REVALIDATE_URL_ENV: &str = "DAC_QUEENS_REVALIDATE_URL";
 
@@ -256,7 +257,11 @@ mod tests {
             [76561198000000001u64, 76561198000000002u64]
                 .into_iter()
                 .collect();
-        assert_eq!(player_steam_id_set(&players), expected);
+        let player_ids = players
+            .iter()
+            .filter_map(|player| player.get("steam_id").and_then(Value::as_u64))
+            .collect::<std::collections::BTreeSet<_>>();
+        assert_eq!(player_ids, expected);
         assert_eq!(rows_steam_id_set(&rows), expected);
     }
 
@@ -274,6 +279,17 @@ mod tests {
             let keys: Vec<_> = row.as_object().unwrap().keys().collect();
             assert_eq!(keys, vec!["placement", "relic", "steam_id"]);
         }
+    }
+
+    #[test]
+    fn match_ingest_serializes_steam_ids_without_javascript_precision_loss() {
+        let rows = match_ingest_player_rows(vec![json!({
+            "match_id": "0123456789abcdef",
+            "steam_id": 76561198000000001u64,
+            "placement": 1,
+        })]);
+
+        assert_eq!(rows[0]["steam_id"], "76561198000000001");
     }
 
     #[test]
@@ -453,7 +469,10 @@ mod tests {
                 .match_row["match_id"],
             "same end_board content should be stable across upload retries"
         );
-        assert_eq!(upload.match_row["player_count"], 3);
+        assert_eq!(
+            upload.match_row["player_count"], 2,
+            "invalid Steam IDs must not inflate the validated roster size"
+        );
         assert_eq!(upload.match_row["final_round"], 42);
         assert_eq!(upload.match_row["duration"], 2400.0);
         assert_eq!(upload.match_row["capture_status"], "complete");

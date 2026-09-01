@@ -2,6 +2,7 @@ use super::{
     describe_ureq_error, drodo_courier_api_url, drodo_profile_to_user_payload,
     drodo_user_row_to_profile, mmr_level_to_app_rank, now_iso_utc, parse_valid_steam_id64,
     preserve_omitted_drodo_fields, value_number, SupabaseClient, HTTP_TIMEOUT,
+    MATCH_INGEST_HTTP_TIMEOUT,
 };
 use crate::config::Config;
 use serde_json::{json, Value};
@@ -95,11 +96,12 @@ impl SupabaseClient {
     }
 
     pub fn update_game_fields(&self, game_id: i64, fields: &Value) -> Result<(), String> {
-        self.patch_json(
-            &format!("/rest/v1/match_players?id=eq.{game_id}"),
-            fields,
-            "return=minimal",
-        )
+        self.invoke_match_ingest(&json!({
+            "action": "update_match_player",
+            "id": game_id,
+            "fields": fields,
+        }))
+        .map(|_| ())
     }
 
     pub fn fetch_drodo_profile(&self, steam_id: &str) -> Result<Value, String> {
@@ -250,17 +252,24 @@ impl SupabaseClient {
         }
     }
 
-    pub(super) fn delete_rows(&self, path: &str) -> Result<(), String> {
+    pub(super) fn invoke_match_ingest(&self, body: &Value) -> Result<Value, String> {
         let bearer_token = self.authenticated_bearer_token()?;
-        let response = ureq::request("DELETE", &format!("{}{}", self.url, path))
-            .timeout(HTTP_TIMEOUT)
+        let response = ureq::post(&format!("{}/functions/v1/match-ingest", self.url))
+            .timeout(MATCH_INGEST_HTTP_TIMEOUT)
             .set("apikey", &self.key)
             .set("Authorization", &format!("Bearer {bearer_token}"))
-            .set("Prefer", "return=minimal")
-            .call();
+            .set("Content-Type", "application/json")
+            .send_string(&body.to_string());
         match response {
-            Ok(resp) if (200..300).contains(&resp.status()) => Ok(()),
-            Ok(resp) => Err(format!("Supabase returned HTTP {}", resp.status())),
+            Ok(resp) if (200..300).contains(&resp.status()) => {
+                let response_body = resp.into_string().map_err(|err| err.to_string())?;
+                serde_json::from_str(&response_body).map_err(|err| err.to_string())
+            }
+            Ok(resp) => {
+                let status = resp.status();
+                let detail = resp.into_string().unwrap_or_default();
+                Err(format!("match ingest returned HTTP {status}: {detail}"))
+            }
             Err(err) => Err(describe_ureq_error(err)),
         }
     }

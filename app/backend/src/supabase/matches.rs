@@ -39,39 +39,11 @@ impl SupabaseClient {
     }
 
     pub fn upsert_match_timeline(&self, timeline: &Value) -> Result<(), String> {
-        let match_id = timeline
-            .get("match_id")
-            .and_then(Value::as_str)
-            .ok_or_else(|| "timeline missing match_id".to_owned())?;
-        let round_count = timeline
-            .get("round_count")
-            .and_then(Value::as_u64)
-            .unwrap_or(0);
-        if let Ok(existing) = self.get_json(&format!(
-            "/rest/v1/match_timelines?select=round_count&match_id=eq.{match_id}&limit=1"
-        )) {
-            let existing_round_count = existing
-                .as_array()
-                .and_then(|rows| rows.first())
-                .and_then(|row| row.get("round_count"))
-                .and_then(Value::as_u64)
-                .unwrap_or(0);
-            if existing_round_count >= round_count && existing_round_count > 0 {
-                return Ok(());
-            }
-        }
-        let row = json!({
-            "match_id": match_id,
-            "round_count": round_count,
-            "first_round": timeline.get("first_round").cloned().unwrap_or(Value::Null),
-            "last_round": timeline.get("last_round").cloned().unwrap_or(Value::Null),
+        self.invoke_match_ingest(&json!({
+            "action": "upsert_timeline",
             "timeline": timeline,
-        });
-        self.post_json(
-            "/rest/v1/match_timelines?on_conflict=match_id",
-            &row,
-            "resolution=merge-duplicates,return=minimal",
-        )
+        }))
+        .map(|_| ())
     }
 
     pub fn upsert_fallback_finished_match(
@@ -99,20 +71,12 @@ impl SupabaseClient {
             .and_then(Value::as_str)
             .unwrap_or_default()
             .to_owned();
-        self.post_json(
-            "/rest/v1/matches",
-            &match_row,
-            "resolution=ignore-duplicates,return=minimal",
-        )?;
         let players = unify_row_keys(build_fallback_match_players(rows, &match_id, reason));
-        if !players.is_empty() {
-            self.ensure_match_player_users(&players)?;
-            self.post_json(
-                "/rest/v1/match_players?on_conflict=match_id,steam_id",
-                &Value::Array(players),
-                "resolution=merge-duplicates,return=minimal",
-            )?;
-        }
+        self.invoke_match_ingest(&json!({
+            "action": "ingest_match",
+            "match": match_row,
+            "players": match_ingest_player_rows(players),
+        }))?;
         Ok(Some(match_id))
     }
 
@@ -134,54 +98,13 @@ impl SupabaseClient {
             .and_then(Value::as_str)
             .unwrap_or_default()
             .to_owned();
-        self.post_json(
-            "/rest/v1/matches",
-            &upload.match_row,
-            "resolution=merge-duplicates,return=minimal",
-        )?;
         let players = unify_row_keys(dedupe_match_players(upload.players));
-        if !players.is_empty() {
-            self.ensure_match_player_users(&players)?;
-            self.post_json(
-                "/rest/v1/match_players?on_conflict=match_id,steam_id",
-                &Value::Array(players.clone()),
-                "resolution=merge-duplicates,return=minimal",
-            )?;
-        }
-        // A fallback upload that fired moments before this complete capture
-        // recorded the same game under a different content-hash id; the
-        // complete row supersedes it. Cleanup failure must not fail the
-        // upload (an outbox retry would then re-post the whole match).
-        let played_at = upload
-            .match_row
-            .get("played_at")
-            .and_then(Value::as_str)
-            .unwrap_or_default();
-        if let Err(err) =
-            self.supersede_partial_matches(&match_id, &player_steam_id_set(&players), played_at)
-        {
-            eprintln!("superseding partial duplicates of {match_id} failed: {err}");
-        }
+        self.invoke_match_ingest(&json!({
+            "action": "ingest_match",
+            "match": upload.match_row,
+            "players": match_ingest_player_rows(players),
+        }))?;
         Ok(Some(match_id))
-    }
-
-    /// Delete recent `capture_status=partial` matches that captured the same
-    /// game as the freshly uploaded complete match (identical player set,
-    /// played_at inside the same-game window).
-    fn supersede_partial_matches(
-        &self,
-        match_id: &str,
-        steam_ids: &BTreeSet<u64>,
-        played_at: &str,
-    ) -> Result<(), String> {
-        for partial in
-            self.find_same_game_match_ids(steam_ids, played_at, Some("partial"), Some(match_id))?
-        {
-            self.delete_rows(&format!("/rest/v1/match_players?match_id=eq.{partial}"))?;
-            self.delete_rows(&format!("/rest/v1/match_timelines?match_id=eq.{partial}"))?;
-            self.delete_rows(&format!("/rest/v1/matches?match_id=eq.{partial}"))?;
-        }
-        Ok(())
     }
 
     /// Match ids whose played_at lies within the same-game window of
@@ -239,23 +162,6 @@ impl SupabaseClient {
         Ok(same_game)
     }
 
-    pub(super) fn ensure_match_player_users(&self, players: &[Value]) -> Result<(), String> {
-        let mut seen = HashSet::new();
-        let rows = players
-            .iter()
-            .filter_map(|player| player.get("steam_id").and_then(Value::as_u64))
-            .filter(|steam_id| seen.insert(*steam_id))
-            .map(|steam_id| json!({ "steam_id": steam_id }))
-            .collect::<Vec<_>>();
-        if rows.is_empty() {
-            return Ok(());
-        }
-        self.post_json(
-            "/rest/v1/users",
-            &Value::Array(rows),
-            "resolution=ignore-duplicates,return=minimal",
-        )
-    }
 }
 
 /// Inclusive played_at bounds for "this is the same game", as PostgREST-safe
@@ -269,13 +175,6 @@ pub(super) fn same_game_window(played_at: &str) -> Option<(String, String)> {
     let fmt =
         |at: chrono::DateTime<chrono::Utc>| at.to_rfc3339_opts(chrono::SecondsFormat::Secs, true);
     Some((fmt(center - window), fmt(center + window)))
-}
-
-pub(super) fn player_steam_id_set(players: &[Value]) -> BTreeSet<u64> {
-    players
-        .iter()
-        .filter_map(|player| player.get("steam_id").and_then(Value::as_u64))
-        .collect()
 }
 
 pub(super) fn rows_steam_id_set(rows: &[NettableRow]) -> BTreeSet<u64> {
@@ -330,6 +229,22 @@ pub(super) fn unify_row_keys(rows: Vec<Value>) -> Vec<Value> {
             row
         })
         .collect()
+}
+
+/// SteamID64 values exceed JavaScript's safe integer range. Edge Functions
+/// parse request JSON in JavaScript, so send roster IDs as decimal strings;
+/// Postgres accepts those strings for bigint columns without precision loss.
+pub(super) fn match_ingest_player_rows(mut rows: Vec<Value>) -> Vec<Value> {
+    for row in &mut rows {
+        let steam_id = row
+            .get("steam_id")
+            .and_then(Value::as_u64)
+            .map(|value| value.to_string());
+        if let (Some(object), Some(steam_id)) = (row.as_object_mut(), steam_id) {
+            object.insert("steam_id".to_owned(), Value::String(steam_id));
+        }
+    }
+    rows
 }
 
 const MATCH_PLAYER_COLUMNS: &[&str] = &[
@@ -446,7 +361,7 @@ pub(super) fn build_end_board_upload(
         "played_at": played_at,
         "duration": duration,
         "final_round": final_round,
-        "player_count": data.len(),
+        "player_count": data.keys().filter(|steam_id| parse_valid_steam_id64(steam_id).is_some()).count(),
         "capture_status": "complete",
         "is_finished": true,
         "verification_source": "end_board",

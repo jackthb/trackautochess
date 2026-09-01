@@ -121,6 +121,9 @@ export async function GET(req: Request) {
     const { data, error } = await supabaseAdmin.auth.admin.createUser({
       email,
       email_confirm: true,
+      app_metadata: {
+        steam_id: steamId,
+      },
       user_metadata: {
         steam_id: steamId,
         steam_name: steamName,
@@ -146,7 +149,10 @@ export async function GET(req: Request) {
       })
     );
   } else {
-    await supabaseAdmin.auth.admin.updateUserById(userId, {
+    const { error } = await supabaseAdmin.auth.admin.updateUserById(userId, {
+      app_metadata: {
+        steam_id: steamId,
+      },
       user_metadata: {
         steam_id: steamId,
         steam_name: steamName,
@@ -155,6 +161,10 @@ export async function GET(req: Request) {
         full_name: steamName,
       },
     });
+    if (error) {
+      console.error("Failed to update Steam auth user:", error.message);
+      return fail("user_update_failed", steamId);
+    }
   }
 
   // Generate a magic link and extract the token
