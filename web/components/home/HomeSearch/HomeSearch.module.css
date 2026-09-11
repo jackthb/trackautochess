@@ -91,19 +91,34 @@
   opacity: 0;
   animation: arrive 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.5s forwards;
 }
-/* Site-status strip pinned to the top of the page, above the patch promo. Slim
-   and full-bleed so it reads as a notice rather than competing with the hero. */
+/* Announcement strip pinned above the patch promo. Slim and full-bleed so it
+   stays prominent without competing with the hero. */
 .outageNotice {
   margin: 0;
   padding: 9px 24px;
   width: 100%;
-  border-bottom: 1px solid color-mix(in srgb, var(--accent) 35%, var(--border));
-  background: color-mix(in srgb, var(--accent) 10%, transparent);
+  border-bottom: 1px solid color-mix(in srgb, var(--gold) 35%, var(--border));
+  background: color-mix(in srgb, var(--gold) 8%, transparent);
   color: var(--text-secondary);
   font-size: 12px;
   line-height: 1.5;
   letter-spacing: 0.2px;
   text-align: center;
+}
+.outageNotice a {
+  color: inherit;
+  font-weight: var(--fw-semibold);
+  text-decoration: none;
+}
+.outageNotice a:hover {
+  color: var(--gold);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.outageNotice a:focus-visible {
+  color: var(--gold);
+  outline: 2px solid var(--gold);
+  outline-offset: 3px;
 }
 
 /* Signed-in visitors only: a direct link to their own profile. */

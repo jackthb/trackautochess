@@ -8,14 +8,14 @@ import type { CustomGameMetrics } from "@/lib/customGameStats";
 import type { FeaturedMatch } from "@/lib/featuredMatch";
 import { useSupabaseSession } from "@/lib/useSupabaseSession";
 import { playerProfilePath } from "@/lib/steam";
-import { DRODO_OUTAGE_NOTICE } from "@/lib/drodoLive";
 import styles from "./HomeSearch.module.css";
 
 const t = {
   description:
     "Look up any Dota Auto Chess player's rank by Steam vanity URL or SteamID64.",
   tagline: "Rank and tracked match history for any Dota Auto Chess player.",
-  notice: DRODO_OUTAGE_NOTICE,
+  notice:
+    "Apocalypse Tournament · 11–13 September · hosted by Dumpstered & Arthur · Join on Discord →",
   placeholder: "Steam profile URL or SteamID64",
   lookupDivider: "or look up a player",
   viewProfile: "View your profile",
@@ -50,11 +50,16 @@ export default function HomeSearch({
 
   return (
     <div className={styles.page}>
-      {/* The MMR notice is site-status, not hero content — it sits at the top
-          of the page as a slim strip so the hero stays uncluttered. */}
-      <p className={styles.outageNotice} role="status">
-        {t.notice}
-      </p>
+      <div className={styles.outageNotice} role="status">
+        <a
+          href="https://discord.gg/rGtg2yJdS"
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="Join the Apocalypse Tournament Discord"
+        >
+          {t.notice}
+        </a>
+      </div>
       {children}
       <div className={styles.hero}>
         <div className={styles.grid} />
