@@ -22,7 +22,7 @@
     "abilities": null,
     "stats": {
       "1_star": {
-        "hp": 550,
+        "hp": 500,
         "mana": 100,
         "atk": [
           50,
@@ -34,7 +34,7 @@
         "atk_range": 205
       },
       "2_star": {
-        "hp": 1100,
+        "hp": 1000,
         "mana": 100,
         "atk": [
           100,
@@ -46,7 +46,7 @@
         "atk_range": 205
       },
       "3_star": {
-        "hp": 2200,
+        "hp": 2000,
         "mana": 100,
         "atk": [
           200,

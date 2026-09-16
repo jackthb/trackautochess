@@ -2,7 +2,8 @@
   "date": "2026-09-07",
   "title": "Rebalance Patch",
   "source": "https://steamcommunity.com/sharedfiles/filedetails/changelog/1613886175",
-  "entitiesSynced": false,
+  "entitiesSynced": true,
+  "entitiesSyncedAt": "2026-09-14T09:02:19.964Z",
   "sourceEntries": [
     {
       "sourceId": "1788769830",
