@@ -10,6 +10,7 @@
     "start": "next start",
     "test:e2e": "pnpm run build && playwright test",
     "test:chat": "tsx --test lib/chat/config.test.ts lib/chat/prompt.test.ts lib/chat/matchSynergies.test.ts lib/chat/matchContent.test.ts",
+    "test:analytics": "tsx --test lib/posthog.test.ts",
     "test:smoke": "tsx scripts/smoke-queens-flow.mts && pnpm run build && playwright test queens-refresh-polling.spec.ts",
     "embed-content": "tsx scripts/embed-content.mts"
   },
