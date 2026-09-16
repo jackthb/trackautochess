@@ -1,5 +1,6 @@
 import type { NextConfig } from "next";
 import { withBotId } from "botid/next/config";
+import { withPostHogConfig } from "@posthog/nextjs-config";
 import { cpSync, existsSync, mkdirSync } from "fs";
 import path from "path";
 
@@ -129,4 +130,16 @@ const nextConfig: NextConfig = {
   skipTrailingSlashRedirect: true,
 };
 
-export default withBotId(nextConfig);
+// Upload browser source maps to PostHog during `next build` so client stack
+// traces symbolicate instead of pointing at minified frames. Gated on
+// POSTHOG_API_KEY, so local and preview builds without the secret skip the
+// upload rather than fail. deleteAfterUpload keeps the maps off the public CDN.
+export default withPostHogConfig(withBotId(nextConfig), {
+  personalApiKey: process.env.POSTHOG_API_KEY ?? "",
+  projectId: process.env.POSTHOG_PROJECT_ID,
+  host: process.env.NEXT_PUBLIC_POSTHOG_HOST || "https://eu.posthog.com",
+  sourcemaps: {
+    enabled: Boolean(process.env.POSTHOG_API_KEY),
+    deleteAfterUpload: true,
+  },
+});

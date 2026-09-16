@@ -41,6 +41,9 @@ overrides:
   esbuild: "^0.28.1"
 
 allowBuilds:
+  # Downloads the posthog-cli binary that @posthog/nextjs-config runs to upload
+  # web source maps during `next build`.
+  "@posthog/cli": true
   core-js: true
   electron: true
   electron-winstaller: true
