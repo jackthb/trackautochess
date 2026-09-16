@@ -30,7 +30,7 @@
   line-height: 1.4;
 }
 .position {
-  color: var(--gold, #d4af37);
+  color: var(--text-muted);
   font-size: var(--fs-11, 11px);
   font-variant-numeric: tabular-nums;
   min-width: 28px;
@@ -52,8 +52,8 @@
   font-weight: 600;
 }
 .current .mmr {
-  color: var(--text-secondary);
-  opacity: 1;
+  color: var(--text-muted);
+  opacity: 0.7;
 }
 .above {
   opacity: 0.65;

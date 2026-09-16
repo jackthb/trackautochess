@@ -89,7 +89,7 @@
   gap: 6px;
 }
 .tipValue {
-  color: var(--text-primary);
+  color: var(--text-muted);
   font-weight: 600;
   font-size: 13px;
 }

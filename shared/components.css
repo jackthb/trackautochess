@@ -732,6 +732,7 @@ select.edit-field { cursor: pointer; }
 
 .stat-value.gold { color: var(--gold); }
 .stat-value.green { color: var(--green-bright); }
+.stat-value.muted { color: var(--text-muted); }
 
 .stat-label {
   font-size: 13px;
@@ -786,14 +787,14 @@ select.edit-field { cursor: pointer; }
 .season-mmr {
   font-size: 28px;
   font-weight: 700;
-  color: var(--text-primary);
+  color: var(--text-muted);
   margin-bottom: 3px;
 }
 
 .season-mmr.dim { color: var(--text-muted); }
 .season-meta { font-size: 13px; color: var(--text-muted); }
 .season-meta.season-rank { font-size: 12px; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 6px; }
-.season-peak { color: var(--gold); }
+.season-peak { color: var(--text-muted); }
 
 @media (max-width: 720px) {
   .stat-cell {

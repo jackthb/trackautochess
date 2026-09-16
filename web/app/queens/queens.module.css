@@ -114,17 +114,13 @@
   color: #fb7185;
 }
 .top-rank {
-  color: var(--text-primary);
+  color: var(--text-muted);
   font-weight: 600;
 }
-.gold {
-  color: var(--gold, #d4af37);
-}
-.silver {
-  color: #c0c0c0;
-}
+.gold,
+.silver,
 .bronze {
-  color: #cd7f32;
+  color: var(--text-muted);
 }
 .cell-avatar {
   padding: 6px 0;

@@ -62,6 +62,7 @@ export function buildStatItems(
       value: rankValue,
       label: "Rank",
       source: "drodo",
+      tone: rank === "Queen" && drodo.queen_rank != null ? "muted" : undefined,
     });
   } else if (!rankOnly && drodo?.mmr != null) {
     const rank = mmrToRank(drodo.mmr) || "MMR";
@@ -70,10 +71,10 @@ export function buildStatItems(
       : rank === "MMR"
         ? "MMR"
         : `MMR · ${rank}`;
-    drodoItems.push({ key: "drodo-mmr", value: drodo.mmr, label: rankLabel, source: "drodo" });
+    drodoItems.push({ key: "drodo-mmr", value: drodo.mmr, label: rankLabel, source: "drodo", tone: "muted" });
   }
   if (!rankOnly && drodo?.max_mmr != null && drodo.max_mmr !== drodo.mmr) {
-    drodoItems.push({ key: "drodo-peak", value: drodo.max_mmr, label: "Peak MMR", tone: "gold", source: "drodo" });
+    drodoItems.push({ key: "drodo-peak", value: drodo.max_mmr, label: "Peak MMR", tone: "muted", source: "drodo" });
   }
   if (drodo?.season_games != null && drodo.season_games > 0 && drodo?.chicken_count != null) {
     const winPct = ((drodo.chicken_count / drodo.season_games) * 100).toFixed(0);

@@ -4,7 +4,7 @@ export interface StatItem {
   key: string;
   value: ReactNode;
   label: string;
-  tone?: "default" | "gold" | "green";
+  tone?: "default" | "gold" | "green" | "muted";
   source?: "tracked" | "drodo";
 }
 

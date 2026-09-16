@@ -49,7 +49,7 @@
 }
 
 .statChip strong {
-  color: var(--text-primary);
+  color: var(--text-muted);
   font-weight: var(--fw-semibold);
 }
 
