@@ -14,6 +14,7 @@ import { createHash } from "crypto";
 import { join, dirname, basename } from "path";
 import { fileURLToPath } from "url";
 import { patchNoteToJson } from "./lib/patch-note-json.mjs";
+import { classifyPatchNoteKind } from "./lib/patch-note-kind.mjs";
 import { slugifyName } from "../shared/slugify.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -381,30 +382,6 @@ function parseChangelogReaderEntries(markdown) {
   return entries;
 }
 
-function classifyEntry(line) {
-  const l = line.toLowerCase();
-  if (l.includes("rework")) return "change";
-  if (l.includes("added") || l.includes("new ")) return "new";
-  if (l.includes("removed") || l.includes("temporarily removed"))
-    return "removed";
-  if (l.includes("fix")) return "fix";
-  if (
-    l.includes("increased") ||
-    l.includes("bonus") ||
-    l.includes("duration increased") ||
-    l.includes("radius increased")
-  )
-    return "buff";
-  if (
-    l.includes("decreased") ||
-    l.includes("reduced") ||
-    l.includes("downgrade") ||
-    l.includes("nerfed")
-  )
-    return "nerf";
-  return "change";
-}
-
 function contentToSections(content) {
   const lines = content
     .split("\n")
@@ -416,13 +393,13 @@ function contentToSections(content) {
     const match = line.match(/^([^:–—]+?)\s*[:–—]\s*(.+)$/);
     if (match) {
       entries.push({
-        kind: classifyEntry(line),
+        kind: classifyPatchNoteKind(match[2]),
         name: match[1].trim(),
         detail: match[2].trim(),
       });
     } else {
       entries.push({
-        kind: classifyEntry(line),
+        kind: classifyPatchNoteKind(line),
         name: line.length > 60 ? line.slice(0, 50) + "..." : line,
         detail: line,
       });
@@ -554,13 +531,13 @@ function parseGoogleDoc(html) {
       const parsed = entryText.match(/^([^:–—]+?)\s*[:–—]\s*(.+)$/);
       if (parsed) {
         section.entries.push({
-          kind: classifyEntry(entryText),
+          kind: classifyPatchNoteKind(parsed[2]),
           name: parsed[1].trim(),
           detail: parsed[2].trim(),
         });
       } else if (entryText.length > 3) {
         section.entries.push({
-          kind: classifyEntry(entryText),
+          kind: classifyPatchNoteKind(entryText),
           name: entryText,
           detail: entryText,
         });

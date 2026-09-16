@@ -95,6 +95,8 @@ pnpm run test:e2e  # Build, then run Playwright tests
 - **Content pipeline**: `content/` JSON feeds generated web runtime data and desktop content readers; `data/` holds icons/config/extractor helpers.
 - **Release pipeline**: `.github/workflows/release.yml` triggers on `v*` tags, builds the Rust backend and Electron installer on Windows, and publishes `.exe` artifacts to GitHub Releases.
 - **Patch-note pipeline**: `scripts/scrape-patch-notes.mjs` scrapes the Steam Workshop changelog and commits `content/` updates. It runs hourly via Cronicle on the Pi (`ops/cronicle/cronicle-job.dac-scrape-patch-notes.json`), which pushes directly using that checkout's git credentials; `.github/workflows/scrape-patch-notes.yml` is a disabled-schedule, manual-only fallback (Steam intermittently serves GitHub-hosted runner IPs an anti-bot shell with no changelog entries, which a residential IP avoids).
+  - On JACK-PC, first let Steam update Workshop item `1613886175` (launch Dota 2 if needed), then run `npm run patch-notes:local`. This extracts and saves the local VScript diff, validates the newest patch-note JSON with the scraper's shared kind rules, and performs a non-fatal best-effort diff cross-check.
+  - To validate without Steam, run `npm run validate:patch-notes -- [content/patch-notes/file.json]`; add `--diff path/to/vscripts.diff` when a saved diff is available. Extraction is local-only and must not be added to CI because hosted runners cannot access Jack's Steam Workshop content.
 
 
 <!-- headroom:rtk-instructions -->
