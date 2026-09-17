@@ -160,3 +160,20 @@ These notes cover running this repo in a headless Linux cloud VM (no Windows, no
 
 ### Test suite status
 - `cargo test` in `app/backend/` is green on a clean checkout: 77 passing (75 unit tests plus the `nettable_daemon` and `nettable_golden` integration tests), 0 failing, 1 ignored (`export_backend_event_bindings`, which `npm run generate:ipc-types` runs explicitly). This section previously documented `nettable_service::tests::parity_events_emit_round_creep_and_personal_elimination` as a known failure; that test passes and a failure there should be treated as a real regression, not a pre-existing condition.
+
+## Content PR visual review
+
+For every PR touching `content/**`, delegate a sub-agent to capture actual
+before/after screenshots of the relevant web pages and publish them inline in
+a PR comment. Compare the exact merge-base commit with the exact PR head SHA;
+record those full SHAs and the current base-tip SHA. Re-run when head or base
+tip changes. Use identical browser settings and cover the affected routes and
+supported locales; describe changes with no visible UI effect honestly.
+
+Follow `docs/content-pr-screenshots.md` for isolated builds, capture, and private
+GitHub attachment publication. Maintain one publisher-owned comment marked
+`<!-- dac-content-screenshots:v1 -->`, updating the identified comment rather
+than posting duplicates or overwriting unrelated comments. Never fabricate
+screenshots or treat artifact links as inline images. If capture or attachment
+publication is blocked, report the specific blocker and incomplete coverage.
+
