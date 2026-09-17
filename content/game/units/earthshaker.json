@@ -19,7 +19,13 @@
       "zh-tw": "撼地神牛"
     },
     "attack_type": "melee",
-    "abilities": null,
+    "abilities": [
+      {
+        "id": "gouhe",
+        "name": "Fissure",
+        "description": "Slams the ground with a mighty totem, creating an impassable ridge of stone. Enemy chess pieces along the line are stunned and knocked to the nearest vacant squares, and suffer physical damage."
+      }
+    ],
     "stats": {
       "1_star": {
         "hp": 700,

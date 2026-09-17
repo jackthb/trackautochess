@@ -19,7 +19,13 @@
       "zh-tw": "幽鬼"
     },
     "attack_type": "melee",
-    "abilities": null,
+    "abilities": [
+      {
+        "id": "spe_haunt",
+        "name": "Haunt",
+        "description": "Active ability: Activate on full mana\nCreates a spectral nemesis behind every enemy chess piece to attack them. Spectre and her haunts always attack with Desolate effect to targets that do not have allies around them."
+      }
+    ],
     "stats": {
       "1_star": {
         "hp": 1000,

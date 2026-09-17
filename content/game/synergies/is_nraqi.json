@@ -15,7 +15,7 @@
       "en": "Species Trait: Whisper of Darkness\n Active when you have at least (N) different Faceless pieces on board. (Multiple effects stack)\n\n(2) Facelesses: If you have no other active synergies except Whisper of Darkness, all friendly chess pieces are immune to all negative effects during combat.",
       "ru": "Species Trait: Whisper of Darkness\n Активен, когда хотя бы (N) разных Faceless на доске. (Эффекты складываются)\n\n(2) Facelesses: Если нет других активных синергиий, все союзные фигуры получают иммунитет ко всем негативным эффектам во время раунда.",
       "zh-cn": "种族技能：黑暗低语\n 需要己方场上有至少（N）个不同的此种族的棋子来触发效果（触发的多层效果可以叠加）。\n\n（2）无面者：除无面者以外，如果你没有触发任何种族/职业技能，全体友军获得效果：免疫所有战斗时产生的不良状态。",
-      "zh-tw": "種族技能：黑暗低語\n 需要己方場上有至少（N）個不同的此種族的棋子來觸發效果（觸發的多層效果可以疊加）。\n\n（2）無面者：除無面者以外，如果你沒有觸發任何種族/職業技能，全體友軍獲得效果：免疫所有戰鬥時產生的不良狀態。"
+      "zh-tw": "種族技能：黑暗低語\n 需要己方場上有至少（N）個不同的此種族的棋子來觸發效果（觸發的多層效果可以疊加）。\n\n（2）無面者：除無面者以外，如果妳沒有觸發任何種族/職業技能，全體友軍獲得效果：免疫所有戰鬥時産生的不良狀態。"
     },
     "description_html": "<h1>Species Trait: Whisper of Darkness</h1><font color=\"#656585\">Active when you have at least (N) different Faceless pieces on board. (Multiple effects stack)</font><br><br>(2) Facelesses: If you have no other active synergies except Whisper of Darkness, all friendly chess pieces are immune to all negative effects during combat.",
     "lore": "The Faceless, otherwise known as the Faceless Ones or N'raqi, are a monstrous race that arose from the organic matter that seeped from the Old Gods' blighted forms during the primordial era of Drodo Island. Cunning and intelligent, they serve their eldritch masters with fanatical loyalty and possess the power from the Void.",
@@ -23,7 +23,7 @@
       "en": "The Faceless, otherwise known as the Faceless Ones or N'raqi, are a monstrous race that arose from the organic matter that seeped from the Old Gods' blighted forms during the primordial era of Drodo Island. Cunning and intelligent, they serve their eldritch masters with fanatical loyalty and possess the power from the Void.",
       "ru": "The Faceless, также известные как Faceless Ones или N'raqi, — чудовищная раса, возникшая из органической материи, просочившейся из осквернённых форм Old Gods в первобытную эпоху Drodo Island. Хитрые и разумные, они с фанатичной преданностью служат своим потусторонним владыкам и обладают силой Пустоты.",
       "zh-cn": "恩拉基俗称无面之物或无面者，是从上古之神的枯萎形态中渗出的有机物质催生出的种族。他们狡诈而聪明，作为上古之神的肉体形态，他们狂热地效忠于他们的虚空主人。",
-      "zh-tw": "恩拉基俗稱無面之物或無面者，是從上古之神的枯萎形態中滲出的有機物質催生出的種族。他們狡詐而聰明，作爲上古之神的肉體形態，他們狂熱地效忠於他們的虛空主人。"
+      "zh-tw": "恩拉基俗稱無面之物或無面者，是從上古之神的枯萎形態中滲出的有機物質催生出的種族。他們狡詐而聰明，作爲上古之神的肉體形態，他們狂熱地效忠于他們的虛空主人。"
     },
     "notes": [],
     "tiers": [

@@ -19,7 +19,13 @@
       "zh-tw": "孽主"
     },
     "attack_type": "melee",
-    "abilities": null,
+    "abilities": [
+      {
+        "id": "au_portal",
+        "name": "Fiends Gate",
+        "description": ""
+      }
+    ],
     "stats": {
       "1_star": {
         "hp": 1250,

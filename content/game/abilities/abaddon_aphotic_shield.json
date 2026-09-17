@@ -1,0 +1,17 @@
+{
+  "gameId": "abaddon_aphotic_shield",
+  "name": "Aphotic Shield",
+  "description": "Active ability: Activates on Full Mana\nSummons dark energies around a most-damaged ally unit, creating a shield that absorbs a set amount of damage before expiring. When the shield is destroyed it will burst and deal damage equal to the amount absorbed to an area of 3-grid radius around it.",
+  "cooldown": "",
+  "mana_cost": "100",
+  "cast_range": "9999",
+  "ability_special": {
+    "AbilityCooldown": "10 8 6",
+    "duration": "15.0",
+    "radius": "300",
+    "damage_absorb": "150 200 250",
+    "regen": "0",
+    "absorb_to_damage": "0",
+    "absorb_damage_aoe": "0"
+  }
+}

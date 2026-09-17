@@ -19,7 +19,13 @@
       "zh-tw": "月之騎士"
     },
     "attack_type": "ranged",
-    "abilities": null,
+    "abilities": [
+      {
+        "id": "luna_moon_glaive",
+        "name": "Moon Glaives",
+        "description": "Passive Ability\n Strengthens Lunas Moon Glaive, allowing her attacks to bounce among enemy chess pieces. Each bounce reduces the damage dealt."
+      }
+    ],
     "stats": {
       "1_star": {
         "hp": 600,

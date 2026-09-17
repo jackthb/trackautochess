@@ -19,7 +19,13 @@
       "zh-tw": "大地之靈"
     },
     "attack_type": "melee",
-    "abilities": null,
+    "abilities": [
+      {
+        "id": "earth_rock_roll",
+        "name": "Rolling Boulder",
+        "description": "Earth Spirit calls upon boulders from the surrounding to roll across the chessboard, striking and stunning all enemies in a row or column.\nKilling blows immediately reset this ability."
+      }
+    ],
     "stats": {
       "1_star": {
         "hp": 900,

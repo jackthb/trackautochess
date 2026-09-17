@@ -15,7 +15,7 @@
       "en": "SPECIES TRAIT: Fear \n Active when you have at least (N) different pieces on board. (Multiple effects stack.)\n\n(2) Satyr: Allied Satyr chess pieces gain the effect: If there is more than 1 enemy nearby, they cause those enemies to lose control due to fear.",
       "ru": "SPECIES TRAIT: Fear \n Активна, когда минимум (N) разных Satyr на столе.(Эффекты складываются)\n\n(2) Satyr: Союзные Сатиры имеют эффект: если поблизости больше одного врага, они заставляют их потерять контроль от страха.",
       "zh-cn": "种族技能：恐惧\n 需要己方场上有至少（N）个不同的此种族的棋子来触发效果（触发的多层效果可以叠加）。\n\n（2）萨特：友方萨特棋子获得效果：如果身边有超过1个敌人，会使它们由于害怕而失去控制。",
-      "zh-tw": "種族技能：恐懼\n 需要己方場上有至少（N）個不同的此種族的棋子來觸發效果（觸發的多層效果可以疊加）。\n\n（2）薩特：友方薩特棋子獲得效果：如果身邊有超過1個敵人，會使它們由於害怕而失去控制。"
+      "zh-tw": "種族技能：恐懼\n 需要己方場上有至少（N）個不同的此種族的棋子來觸發效果（觸發的多層效果可以疊加）。\n\n（2）薩特：友方薩特棋子獲得效果：如果身邊有超過1個敵人，會使它們由于害怕而失去控制。"
     },
     "description_html": "<h1>SPECIES TRAIT: Fear </h1><font color=\"#656585\">Active when you have at least (N) different pieces on board. (Multiple effects stack.)</font><br><br>(2) Satyr: Allied Satyr chess pieces gain the effect: If there is more than 1 enemy nearby, they cause those enemies to lose control due to fear.",
     "lore": "Demonic species rose from twisted elves, experts at concealing themselves in nightmares, and fanatics in spreading blood and agony.",
@@ -23,7 +23,7 @@
       "en": "Demonic species rose from twisted elves, experts at concealing themselves in nightmares, and fanatics in spreading blood and agony.",
       "ru": "Demonic произошли от искажённых эльфов, скрываются в кошмарах и сеют кровь и боль.",
       "zh-cn": "一种由精灵被扭曲而诞生的堕落恶魔。萨特擅长把自己隐藏在梦魇中，热衷于制造血腥与痛苦。",
-      "zh-tw": "一種由精靈被扭曲而誕生的墮落惡魔。薩特擅長把自己隱藏在夢魘中，熱衷於製造血腥與痛苦。"
+      "zh-tw": "壹種由精靈被扭曲而誕生的墮落惡魔。薩特擅長把自己隱藏在夢魇中，熱衷于制造血腥與痛苦。"
     },
     "notes": [
       "The fear effect has an internal cooldown and cannot trigger continuously."

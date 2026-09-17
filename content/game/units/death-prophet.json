@@ -19,7 +19,13 @@
       "zh-tw": "死亡先知"
     },
     "attack_type": "ranged",
-    "abilities": null,
+    "abilities": [
+      {
+        "id": "death_prophet_exorcism",
+        "name": "Exorcism",
+        "description": "Active ability: Activates on Full Mana\nUnleashes evil spirits to drain the life of nearby enemy chess pieces. At the end of the spells duration, Death Prophet is healed in proportion to the damage dealt."
+      }
+    ],
     "stats": {
       "1_star": {
         "hp": 900,

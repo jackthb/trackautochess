@@ -1,0 +1,25 @@
+{
+  "gameId": "shadow_fiend_requiem_of_souls_lua",
+  "name": "Requiem of Souls",
+  "description": "Active ability: Activates on Full Mana\nShadow Fiend gathers captured souls and releases them in multiple streams of magical energy in all directions, dealing magic damage.\nIn addition to the initial quantity, every 1 layer of demonic power will add an extra +1 shadow energy.",
+  "cooldown": "10",
+  "mana_cost": "100",
+  "cast_range": "1000",
+  "ability_special": {
+    "cast_time_tooltip": "1.67",
+    "requiem_radius": "700 800 900",
+    "requiem_reduction_ms": "10 15 25",
+    "requiem_reduction_damage": "0",
+    "requiem_reduction_tooltip": "0",
+    "requiem_slow_duration": "5.0",
+    "requiem_reduction_radius": "700",
+    "requiem_soul_conversion": "1",
+    "requiem_line_width_start": "150",
+    "requiem_line_width_end": "250",
+    "requiem_line_speed": "700",
+    "soul_death_release": "0",
+    "requiem_heal_pct_scepter": "100",
+    "requiem_damage_pct_scepter": "40",
+    "base_soul_count": "4 5 6"
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "gameId": "ld_bear",
+  "name": "Summon Spirit Bear",
+  "description": "Active ability: Activates on Full Mana\nSummons a powerful Spirit Bear companion in a nearby vacant square to battle for Lone Druid.",
+  "cooldown": "60",
+  "mana_cost": "100",
+  "cast_range": "",
+  "ability_special": {
+    "summon_duration": "40"
+  }
+}

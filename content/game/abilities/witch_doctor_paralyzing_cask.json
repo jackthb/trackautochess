@@ -1,0 +1,20 @@
+{
+  "gameId": "witch_doctor_paralyzing_cask",
+  "name": "Paralyzing Cask",
+  "description": "Targeted Active ability: Activates on Full Mana\nLaunches a cask of paralyzing powder that ricochets between enemy chess pieces, stunning and damaging those it hits.",
+  "cooldown": "10 8 6",
+  "mana_cost": "100",
+  "cast_range": "9999",
+  "ability_special": {
+    "AbilityCooldown": "10 8 6",
+    "hero_duration": "1.0",
+    "creep_duration": "1.0",
+    "base_damage": "30 40 50",
+    "bounce_range": "300",
+    "bounces": "4 5 7",
+    "speed": "1000",
+    "bounce_delay": "0.3",
+    "bounce_bonus_damage": "0",
+    "creep_damage_pct": "100"
+  }
+}

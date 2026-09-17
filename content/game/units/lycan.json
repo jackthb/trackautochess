@@ -20,7 +20,13 @@
       "zh-tw": "狼人"
     },
     "attack_type": "melee",
-    "abilities": null,
+    "abilities": [
+      {
+        "id": "lyc_wolf",
+        "name": "Shapeshift",
+        "description": "Active ability: Activates on Full Mana\nLycan assumes his lupine form, granting him bonus health and healing himself for the same amount. Meanwhile summons multiple wolves in nearby vacant grids to battle for Lycan."
+      }
+    ],
     "stats": {
       "1_star": {
         "hp": 700,

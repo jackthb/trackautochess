@@ -1,0 +1,15 @@
+{
+  "gameId": "oracle_rain_of_destiny_datadriven",
+  "name": "Rain of Destiny",
+  "description": "Active Ability: Activate on full mana\nBring forth rain to the target area and heal allies in.",
+  "cooldown": "12 10 8",
+  "mana_cost": "100",
+  "cast_range": "9999",
+  "ability_special": {
+    "radius": "300 350 450",
+    "duration": "5 7 10",
+    "hps": "100 100 100",
+    "tick_rate": "1.0",
+    "lucky_bonus": "10 20 30"
+  }
+}

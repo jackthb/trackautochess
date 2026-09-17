@@ -1,0 +1,13 @@
+{
+  "gameId": "smoke_screen_trigger",
+  "name": "Smoke Screen",
+  "description": "Passive Ability\nHides your position during the preparation phase.\n\nBattlecry Ability: Activates before the battle starts\nImmediately throws a smoke bomb. If there are enemy chess pieces nearby, the smoke bomb will be thrown at the position of the Riki; otherwise, it will be thrown at the symmetrical center point of the board relative to Riki. Enemies within the smoke are silenced and blinded(attacks have a chance to miss)",
+  "cooldown": "",
+  "mana_cost": "",
+  "cast_range": "",
+  "ability_special": {
+    "radius": "200 300 500",
+    "duration": "1.5 2.5 3.5",
+    "miss_rate": "20 30 40"
+  }
+}

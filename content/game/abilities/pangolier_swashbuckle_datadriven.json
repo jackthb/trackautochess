@@ -1,0 +1,14 @@
+{
+  "gameId": "pangolier_swashbuckle_datadriven",
+  "name": "Swashbuckle",
+  "description": "Active ability: Activates on Full Mana\nPangolier dashes along a target line, then slashes all enemies in the direction with several quick swipes, dealing attack damage.",
+  "cooldown": "10 8 6",
+  "mana_cost": "100",
+  "cast_range": "",
+  "ability_special": {
+    "attack_interval": "0.1",
+    "end_radius": "150",
+    "strikes": "4 5 6",
+    "max_distance": "550 600 650"
+  }
+}

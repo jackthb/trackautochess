@@ -15,14 +15,14 @@
       "en": "+25% magical resistance. A non-Undead carrier has a chance to be reborn into an undead piece of the same rank and level.",
       "ru": "+25% маг.резиста. Носитель не-Undead имеет шанс переродиться в фигуру Undead с тем же рангом и уровнем.",
       "zh-cn": "魔法抗性+25%，非亡灵携带者获得效果：回合开始时有概率被转化为一个同等级同星的随机亡灵棋子。",
-      "zh-tw": "魔法抗性+25%，非亡靈攜帶者獲得效果：回合開始時有概率被轉化爲一個同等級同星的隨機亡靈棋子。"
+      "zh-tw": "魔法抗性+25%，非亡靈攜帶者獲得效果：回合開始時有概率被轉化爲壹個同等級同星的隨機亡靈棋子。"
     },
     "lore": "An austere cap from Undery.",
     "lore_i18n": {
       "en": "An austere cap from Undery.",
       "ru": "Шляпа Аскета",
       "zh-cn": "一顶朴素的帽子，看上去源自幽幽城。",
-      "zh-tw": "一頂樸素的帽子，看上去源自幽幽城。"
+      "zh-tw": "壹頂樸素的帽子，看上去源自幽幽城。"
     },
     "quality": "rare",
     "texture": "item_ascetic_cap",

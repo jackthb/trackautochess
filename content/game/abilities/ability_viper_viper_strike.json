@@ -1,0 +1,21 @@
+{
+  "gameId": "ability_viper_viper_strike",
+  "name": "Viper Strike",
+  "description": "Targeted active ability: Activates on Full Mana\nViper Strike targets an enemy piece with the highest attack damage, reducing its attack speed and dealing ongoing poison. The victim also takes extra damage on hit. magic damage. Attack speed gradually recovers during the poison’s duration.",
+  "cooldown": "6 5 4",
+  "mana_cost": "100",
+  "cast_range": "9999",
+  "ability_special": {
+    "duration": "6 8 10",
+    "damage": "40 60 100",
+    "bonus_movement_speed": "-40 -60 -100",
+    "bonus_attack_speed": "-40 -60 -100",
+    "mana_cost_scepter": "100",
+    "cooldown_scepter": "6 8 10",
+    "cast_range_scepter": "9999",
+    "projectile_speed": "1200",
+    "max_charges": "1",
+    "charge_restore_time": "0.0",
+    "damage_bounus": "10 20 40"
+  }
+}

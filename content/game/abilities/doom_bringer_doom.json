@@ -1,0 +1,17 @@
+{
+  "gameId": "doom_bringer_doom",
+  "name": "Doom",
+  "description": "Targeted Active ability: Activates on full mana\nInflicts a curse that prevents an enemy chess piece from casting spells or using items or being healed, while taking damage over time.",
+  "cooldown": "10",
+  "mana_cost": "100",
+  "cast_range": "9999",
+  "ability_special": {
+    "duration": "7 10 20",
+    "damage": "60 90 150",
+    "deniable_pct": "25 25 25",
+    "AbilityCooldown": "10",
+    "does_break": "0",
+    "does_mute": "0",
+    "scepter_aura_radius": "0"
+  }
+}

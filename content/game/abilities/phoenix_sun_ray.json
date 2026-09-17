@@ -1,0 +1,25 @@
+{
+  "gameId": "phoenix_sun_ray",
+  "name": "Sun Ray",
+  "description": "Active Ability: Activate Instant\nPhoenix expels a beam of light at the cost of its own health. The beam damages enemies and heals allies for a base amount plus a percentage of their health. The percentage increases as the beam continues to fire.",
+  "cooldown": "10 8 6",
+  "mana_cost": "0",
+  "cast_range": "800 1000 1200",
+  "ability_special": {
+    "hp_cost_perc_per_second": "3",
+    "base_damage": "35 70 105",
+    "hp_perc_damage": "0.5 1 2",
+    "base_heal": "50 75 125",
+    "hp_perc_heal": "0.25 0.5 1",
+    "radius": "150",
+    "tick_interval": "0.2",
+    "forward_move_speed": "0",
+    "turn_rate_initial": "250",
+    "turn_rate": "25",
+    "focal_point_max_multiplier": "0",
+    "focal_point_start_length_pct": "0",
+    "focal_point_full_length_tooltip_only": "0",
+    "focal_point_blind_stack_multiplier": "0",
+    "duration": "4.0 5.0 6.0"
+  }
+}

@@ -16,10 +16,16 @@
       "ko": "미포",
       "ru": "Meepo",
       "zh-cn": "地卜师",
-      "zh-tw": "地卜師"
+      "zh-tw": "地蔔師"
     },
     "attack_type": "melee",
-    "abilities": null,
+    "abilities": [
+      {
+        "id": "poof",
+        "name": "Poof",
+        "description": "Passive Ability\nWhen Meepo is upgraded to ★★★, one will be copied. \n\nActive ability: Activate when full mana\n By drawing mysterious energy from the earth, all Meepo can be teleported from the underground to the location of the designated enemy. Each Meepo will attack nearby areas in the area it reaches. Enemies deal pure damage."
+      }
+    ],
     "stats": {
       "1_star": {
         "hp": 600,

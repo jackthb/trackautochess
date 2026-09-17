@@ -1,0 +1,19 @@
+{
+  "gameId": "largo_frogstomp",
+  "name": "Frogstomp",
+  "description": "Largo tosses froglings to an area, they stomps the ground every 1 second, dealing damage and ministuns, enemies in the area have reduced speed.",
+  "cooldown": "10 8 6",
+  "mana_cost": "100",
+  "cast_range": "",
+  "ability_special": {
+    "AbilityCooldown": "10 8 6",
+    "damage_per_stomp": "30 40 50",
+    "total_ticks": "3 4 5",
+    "slow": "10 20 30",
+    "radius": "200 300 400",
+    "AbilityCastRange": "9999",
+    "stun_duration": "0.1 0.2 0.3",
+    "stomp_interval": "1",
+    "delay": "0.5"
+  }
+}

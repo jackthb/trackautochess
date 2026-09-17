@@ -15,14 +15,14 @@
       "en": "Summons 2 necro creeps",
       "ru": "Призывает 2 некро-крипа.\nУдваивает кол-во призываемых юнитов.",
       "zh-cn": "使你的召唤物获得效果：召唤数量+1。\n\n主动技能：立即激活\n召唤2个死灵士兵为你战斗。",
-      "zh-tw": "使你的召喚物獲得效果：召喚數量+1。\n\n主動技能：立即激活\n召喚2個死靈士兵爲你戰鬥。"
+      "zh-tw": "使妳的召喚物獲得效果：召喚數量+1。\n\n主動技能：立即激活\n召喚2個死靈士兵爲妳戰鬥。"
     },
     "lore": "A record of the final reckoning. With one page torn out.",
     "lore_i18n": {
       "en": "A record of the final reckoning. With one page torn out.",
       "ru": "Запись последнего суда, с вырванной страницей.",
       "zh-cn": "记载着最终之战，其中的一页被人撕下。",
-      "zh-tw": "記載着最終之戰，其中的一頁被人撕下。"
+      "zh-tw": "記載著最終之戰，其中的壹頁被人撕下。"
     },
     "quality": "epic",
     "texture": "item_necronomicon_3",

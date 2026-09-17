@@ -1,0 +1,17 @@
+{
+  "gameId": "dark_seer_ion_shell",
+  "name": "Ion Shell",
+  "description": "Active ability: Activates on Full Mana\nSurrounds a friendly piece in a bristling shield, causing it to take less damage and deal continuous damage to surrounding enemies magic damage.",
+  "cooldown": "10 8 6",
+  "mana_cost": "100",
+  "cast_range": "9999",
+  "ability_special": {
+    "radius": "260",
+    "damage_per_second": "50 75 100",
+    "duration": "10 15 20",
+    "tick_interval": "0.5",
+    "AbilityCharges": "0",
+    "bonus_health": "0",
+    "reduction_per": "10 15 20"
+  }
+}

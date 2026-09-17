@@ -19,7 +19,13 @@
       "zh-tw": "神靈武士"
     },
     "attack_type": "ranged",
-    "abilities": null,
+    "abilities": [
+      {
+        "id": "burning_spear_datadriven",
+        "name": "Berserkers Blood",
+        "description": "Passive Ability\nHuskar ignites his spear with boiling blood. Each normal attack will cause magical damage to himself, while also causing stackable continuous damage to enemy pieces. \nBased on the percentage of Huskars missing health, he will gain attack speed, magic resistance, and percentage health regeneration bonuses."
+      }
+    ],
     "stats": {
       "1_star": {
         "hp": 700,

@@ -19,7 +19,13 @@
       "zh-tw": "樹精衛士"
     },
     "attack_type": "melee",
-    "abilities": null,
+    "abilities": [
+      {
+        "id": "tp_seed",
+        "name": "Leech Seed",
+        "description": "Targeted Active ability: Activates on Full Mana\nPlant a leech Seed in enemys body, decreases its attack and movement speed and takes magical damage to heal enemies around per second."
+      }
+    ],
     "stats": {
       "1_star": {
         "hp": 700,

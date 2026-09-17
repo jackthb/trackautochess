@@ -1,0 +1,27 @@
+{
+  "gameId": "death_prophet_exorcism",
+  "name": "Exorcism",
+  "description": "Active ability: Activates on Full Mana\nUnleashes evil spirits to drain the life of nearby enemy chess pieces. At the end of the spells duration, Death Prophet is healed in proportion to the damage dealt.",
+  "cooldown": "10 8 6",
+  "mana_cost": "100",
+  "cast_range": "9999",
+  "ability_special": {
+    "radius": "700 700 700",
+    "spirits": "6 8 10",
+    "spirit_speed": "500 500 500",
+    "max_distance": "1000 1000 1000",
+    "give_up_distance": "800 800 800",
+    "min_damage": "200",
+    "max_damage": "200",
+    "hero_spirit_min_damage": "0",
+    "hero_spirit_max_damage": "0",
+    "heal_percent": "25 25 25",
+    "average_damage": "200",
+    "ghost_spawn_rate": "0.4 0.3 0.2",
+    "scepter_movespeed_slow": "100",
+    "scepter_movespeed_debuff_duration": "0.3",
+    "scepter_spirit_life_duration": "20",
+    "scepter_spirit_bonus_damage": "50",
+    "movement_bonus": "12 16 20"
+  }
+}

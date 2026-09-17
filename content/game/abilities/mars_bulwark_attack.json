@@ -1,0 +1,19 @@
+{
+  "gameId": "mars_bulwark_attack",
+  "name": "Bulwark",
+  "description": "Passive Ability\nWhenever Mars is attacked from the front or sides, he swings his massive shield to block a certain percentage of the damage.\n\nActive ability: Activates upon completing cooldown.\nAt regular intervals, Mars raises his shield to unleash Gods Rebuke, pushing back enemy chess pieces within 3 grids in front of him and dealing physical damage.",
+  "cooldown": "8",
+  "mana_cost": "0",
+  "cast_range": "",
+  "ability_special": {
+    "physical_damage_reduction": "30 45 60",
+    "forward_angle": "90",
+    "physical_damage_reduction_side": "15 23 30",
+    "side_angle": "180",
+    "redirect_chance": "0",
+    "redirect_range": "0",
+    "redirect_speed_penatly": "0",
+    "shield_bash_radius": "200",
+    "shield_bash_damage": "200 250 350"
+  }
+}

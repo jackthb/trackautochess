@@ -15,7 +15,7 @@
       "en": "SPECIES TRAIT: Fel Power\n Active when you control only 1 type of Demon on the chessboard.\n\n(1) Demon: Normal attack damage caused by allied demon chess pieces is settled as pure damage. Fel Powers damage is increased by 15%,with a maximum stack count of 7.",
       "ru": "Species Trait: Fel Power\n Активен, если на поле только один Demon. Допускаются несколько одинаковых.\n\n(1) Demon: Урон от обычных атак, наносимый союзными демоническими фигурами, считается чистым уроном. Урон Fel Powers увеличивается на 15%, с максимальным кол-во стаков 7.",
       "zh-cn": "种族技能：邪能之力\n 需要己方场上有唯一一种恶魔来触发效果。\n\n（1）恶魔：友方恶魔棋子造成的普通攻击伤害都结算为纯粹伤害。每有一个同种类的友方恶魔棋子，邪能之力的伤害都会提高15%，最多叠加7层。",
-      "zh-tw": "種族技能：邪能之力\n 需要己方場上有唯一一種惡魔來觸發效果。\n\n（1）惡魔：友方惡魔棋子造成的普通攻擊傷害都結算爲純粹傷害。每有一個同種類的友方惡魔棋子，邪能之力的傷害都會提高15%，最多疊加7層。"
+      "zh-tw": "種族技能：邪能之力\n 需要己方場上有唯壹壹種惡魔來觸發效果。\n\n（1）惡魔：友方惡魔棋子造成的普通攻擊傷害都結算爲純粹傷害。每有壹個同種類的友方惡魔棋子，邪能之力的傷害都會提高15%，最多疊加7層。"
     },
     "description_html": "<h1>SPECIES TRAIT: Fel Power</h1><font color=\"#656585\">Active when you control only 1 type of Demon on the chessboard.</font><br><br>(1) Demon: Normal attack damage caused by allied demon chess pieces is settled as pure damage. Fel Powers damage is increased by 15%,with a maximum stack count of 7.",
     "lore": "Chaotic beings that emerged from a dimensional fissure.",

@@ -1,0 +1,14 @@
+{
+  "gameId": "templar_assassin_refraction",
+  "name": "Refraction",
+  "description": "Passive Ability\nThe normal attack of the Templar Assassin always has the effect of Psychic Blade. The attack can penetrate the enemy and cause Pure damage to the enemy pieces directly behind it.. \n\nActive ability: Activate when full mana\n The Templar Assassin becomes very elusive, gaining an attack power bonus while avoiding damage. \nThe attack power bonus and damage avoidance effects are independent of each other, and they are both effects that can only be used a certain number of times.",
+  "cooldown": "8 7 6",
+  "mana_cost": "100",
+  "cast_range": "9999",
+  "ability_special": {
+    "instances": "4 6 8",
+    "shield_per_instance": "60 90 120",
+    "bonus_damage": "80 120 160",
+    "duration": "6"
+  }
+}

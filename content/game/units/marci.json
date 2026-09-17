@@ -19,7 +19,13 @@
       "zh-tw": "月之哨衛"
     },
     "attack_type": "ranged",
-    "abilities": null,
+    "abilities": [
+      {
+        "id": "marci_unleash",
+        "name": "Unleash",
+        "description": "Active ability: Activate on full mana\nMarci taps a hidden power, gaining Fury charges that allow her to deliver a rapid sequence of strikes. The last strike in every Fury combo creates a damaging pulse for magical damage around the target that slows movement and attack speed of the victims."
+      }
+    ],
     "stats": {
       "1_star": {
         "hp": 700,

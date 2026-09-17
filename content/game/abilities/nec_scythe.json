@@ -1,0 +1,15 @@
+{
+  "gameId": "nec_scythe",
+  "name": "Reapers Scythe",
+  "description": "Targeted Active ability: Activates on full mana\nDeals (base + percentage of max health) pure damage to an enemy with his Reaper’s Scythe and prevents its victim from deathrattle. And emits an aura that stops the heartbeat of his enemies around, dealing percentage damage based on their max health.",
+  "cooldown": "12 10 8",
+  "mana_cost": "100",
+  "cast_range": "9999",
+  "ability_special": {
+    "stun_duration": "2.0",
+    "base_damage": "300 400 600",
+    "hp_xishu": "30 40 60",
+    "heartstopper_hp_per": "1 1.5 2.5",
+    "radius": "350 400 500"
+  }
+}

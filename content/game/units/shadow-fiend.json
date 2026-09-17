@@ -19,7 +19,13 @@
       "zh-tw": "影魔"
     },
     "attack_type": "ranged",
-    "abilities": null,
+    "abilities": [
+      {
+        "id": "shadow_fiend_requiem_of_souls_lua",
+        "name": "Requiem of Souls",
+        "description": "Active ability: Activates on Full Mana\nShadow Fiend gathers captured souls and releases them in multiple streams of magical energy in all directions, dealing magic damage.\nIn addition to the initial quantity, every 1 layer of demonic power will add an extra +1 shadow energy."
+      }
+    ],
     "stats": {
       "1_star": {
         "hp": 600,

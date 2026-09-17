@@ -1,0 +1,12 @@
+{
+  "gameId": "dazzle_bozang",
+  "name": "Shallow Grave",
+  "description": "Bless allied pieces with Shallow Grave, preventing the targets from dying while under its protection, no matter how close to death. The blessed ally takes +50% healing from all sources for the duration.",
+  "cooldown": "15",
+  "mana_cost": "100",
+  "cast_range": "9999",
+  "ability_special": {
+    "count": "1 2 3",
+    "duration": "4 4 4"
+  }
+}

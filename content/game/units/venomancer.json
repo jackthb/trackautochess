@@ -20,7 +20,13 @@
       "zh-tw": "劇毒術士"
     },
     "attack_type": "ranged",
-    "abilities": null,
+    "abilities": [
+      {
+        "id": "veno_ward",
+        "name": "Plague Ward",
+        "description": "Active ability: Activates on Full Mana\nSummons a plague ward in a nearby vacant square to attack enemy units. The ward is immune to spell damage. Attacks of the wards reduce the attack rate of the target by 0.3."
+      }
+    ],
     "stats": {
       "1_star": {
         "hp": 550,

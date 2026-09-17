@@ -79,9 +79,9 @@
     "item_zhusidoupeng"
   ],
   "drop_relic_list": [
+    "item_remainder_seeker",
     "item_upgrade_lootbox",
     "item_streak_plus",
-    "item_second_chance",
     "item_egg",
     "item_bench_contract",
     "item_mangotree",

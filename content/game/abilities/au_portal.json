@@ -1,0 +1,11 @@
+{
+  "gameId": "au_portal",
+  "name": "Fiends Gate",
+  "description": "",
+  "cooldown": "0.0",
+  "mana_cost": "0",
+  "cast_range": "",
+  "ability_special": {
+    "interval": "5.5 4.5 4"
+  }
+}

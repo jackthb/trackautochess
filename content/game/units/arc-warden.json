@@ -19,7 +19,13 @@
       "zh-tw": "天穹守望者"
     },
     "attack_type": "ranged",
-    "abilities": null,
+    "abilities": [
+      {
+        "id": "arc_double",
+        "name": "Tempest Double",
+        "description": "Battle Cry Ability: Activates before the battle starts\nBriefly refocusing its fractured elements into a single form, the Arc Warden creates a perfect electrical duplication of itself."
+      }
+    ],
     "stats": {
       "1_star": {
         "hp": 900,

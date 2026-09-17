@@ -1,0 +1,13 @@
+{
+  "gameId": "lc_qianggong",
+  "name": "Press the Attack",
+  "description": "Passive Ability\nAfter being attacked, the legion commander has a chance to immediately carry out a counterattack, with a blood-sucking effect. \nIf the legion commander wins the home battle and survives, the piece will gain a permanent effect: Increased attack power.",
+  "cooldown": "",
+  "mana_cost": "",
+  "cast_range": "",
+  "ability_special": {
+    "damage_bouns_per_victory": "10 10 10",
+    "fanji_per": "15 25 35",
+    "fanji_xixue": "25"
+  }
+}

@@ -19,7 +19,13 @@
       "zh-tw": "灰燼之靈"
     },
     "attack_type": "melee",
-    "abilities": null,
+    "abilities": [
+      {
+        "id": "sleight_of_fist_datadriven",
+        "name": "Sleight of Fist",
+        "description": "Active ability: Activates on Full Mana\nEmber Spirit dashes around with blazing speed, attacking all enemies in the targeted area of effect, then returning to his start location. Each attack deals bonus physical damage.\nKilling an enemy chess piece instantly resets the cooldown of Sleight of Fist."
+      }
+    ],
     "stats": {
       "1_star": {
         "hp": 700,

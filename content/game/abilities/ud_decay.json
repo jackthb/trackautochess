@@ -1,0 +1,13 @@
+{
+  "gameId": "ud_decay",
+  "name": "Decay",
+  "description": "Targeted Active ability: Activates on Full Mana\nUndying steals Max HP from enemies through an ally, and deals pure damage to heal the ally chosen.",
+  "cooldown": "10 9 8",
+  "mana_cost": "100",
+  "cast_range": "9999",
+  "ability_special": {
+    "radius": "250 300 350",
+    "hp_per": "4 6 8",
+    "damage": "100 150 200"
+  }
+}

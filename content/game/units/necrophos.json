@@ -19,7 +19,13 @@
       "zh-tw": "死靈法師"
     },
     "attack_type": "ranged",
-    "abilities": null,
+    "abilities": [
+      {
+        "id": "nec_scythe",
+        "name": "Reapers Scythe",
+        "description": "Targeted Active ability: Activates on full mana\nDeals (base + percentage of max health) pure damage to an enemy with his Reaper’s Scythe and prevents its victim from deathrattle. And emits an aura that stops the heartbeat of his enemies around, dealing percentage damage based on their max health."
+      }
+    ],
     "stats": {
       "1_star": {
         "hp": 1000,

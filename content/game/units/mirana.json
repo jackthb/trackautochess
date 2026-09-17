@@ -19,7 +19,13 @@
       "zh-tw": "月之女祭司"
     },
     "attack_type": "ranged",
-    "abilities": null,
+    "abilities": [
+      {
+        "id": "pom_arrow_far",
+        "name": "Sacred Arrow",
+        "description": "Active ability: Activates on Full Mana\nFires a long-range arrow with deadly precision to an enemy chess in another chessboard currently under attack/defense from friendly chess pieces, dealing damage and stun to the target. Damage and stun duration increase with range."
+      }
+    ],
     "stats": {
       "1_star": {
         "hp": 450,

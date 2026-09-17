@@ -19,7 +19,13 @@
       "zh-tw": "隱形刺客"
     },
     "attack_type": "melee",
-    "abilities": null,
+    "abilities": [
+      {
+        "id": "smoke_screen_trigger",
+        "name": "Smoke Screen",
+        "description": "Passive Ability\nHides your position during the preparation phase.\n\nBattlecry Ability: Activates before the battle starts\nImmediately throws a smoke bomb. If there are enemy chess pieces nearby, the smoke bomb will be thrown at the position of the Riki; otherwise, it will be thrown at the symmetrical center point of the board relative to Riki. Enemies within the smoke are silenced and blinded(attacks have a chance to miss)"
+      }
+    ],
     "stats": {
       "1_star": {
         "hp": 500,

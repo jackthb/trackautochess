@@ -1,0 +1,15 @@
+{
+  "gameId": "winter_wyvern_cold_embrace",
+  "name": "Cold Embrace",
+  "description": "Active ability: Activates on Full Mana\nEncases an ally in an icy cocoon, freezing them solid while healing a base amount as well as a percentage of their maximum health each second. The cocoon blocks all physical damage.",
+  "cooldown": "12 10 8",
+  "mana_cost": "100",
+  "cast_range": "9999",
+  "ability_special": {
+    "duration": "2.0 3.0 4.0",
+    "heal_additive": "20",
+    "heal_percentage": "10",
+    "shard_cooldown_reduction": "4.0",
+    "shard_splinter_range": "1200"
+  }
+}

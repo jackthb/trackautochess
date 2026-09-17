@@ -16,10 +16,16 @@
       "ko": "혼돈 기사",
       "ru": "Chaos Knight",
       "zh-cn": "混沌骑士",
-      "zh-tw": "混沌騎士"
+      "zh-tw": "混噸騎士"
     },
     "attack_type": "melee",
-    "abilities": null,
+    "abilities": [
+      {
+        "id": "chaos_knight_chaos_strike",
+        "name": "Chaos Strike",
+        "description": "Passive Ability\nChaos Knights attacks have a chance to deal a critical strike of varying strength, in addition to a lifesteal for percentage of the damage."
+      }
+    ],
     "stats": {
       "1_star": {
         "hp": 650,

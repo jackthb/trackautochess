@@ -19,7 +19,13 @@
       "zh-tw": "石鱗劍士"
     },
     "attack_type": "melee",
-    "abilities": null,
+    "abilities": [
+      {
+        "id": "pangolier_swashbuckle_datadriven",
+        "name": "Swashbuckle",
+        "description": "Active ability: Activates on Full Mana\nPangolier dashes along a target line, then slashes all enemies in the direction with several quick swipes, dealing attack damage."
+      }
+    ],
     "stats": {
       "1_star": {
         "hp": 850,

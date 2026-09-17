@@ -19,7 +19,13 @@
       "zh-tw": "卓爾遊俠"
     },
     "attack_type": "ranged",
-    "abilities": null,
+    "abilities": [
+      {
+        "id": "ability_drow_ranger_wave_of_silence",
+        "name": "Gust",
+        "description": "Active ability: Activates on full mana\nReleases a wave that silences and knocks back enemy pieces with magical damage dealt."
+      }
+    ],
     "stats": {
       "1_star": {
         "hp": 600,

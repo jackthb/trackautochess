@@ -15,7 +15,7 @@
       "en": "Inventors arm themselves with the latest technology that allows them to receive +50% healing from other sources.\n\nClass Perk: Heart of the Machine\n Active when you have at least (N) different Inventor pieces on board. (Multiple effects stack)\n\n(3) Inventors: Summon an AWESOME Invention after winning a home battle last round with at least 1 friendly Inventor who survived.\n(6) Inventors: Heart of the Machine now summons a Golden AWESOME Invention.",
       "ru": "Inventors arm themselves with the latest technology that allows them to receive +50% healing from other sources.\n\nClass Perk: Heart of the Machine\n Активна, когда минимум (N) разных Мехов на столе.(Эффекты складываются)\n\n(3) Меха: Вы получаете бесплатный ролл после победы в домашней битве, если хотя бы 1 мех выжил.\n(6) Мехов: Вы получаете шанс на золотой ролл после победы в домашней битве, если хотя бы 1 мех выжил. Шанс зависит от уровня курьера.",
       "zh-cn": "工匠棋子具有自我修复能力，受到的治疗或生命值回复效果+50%。\n\n职业技能：机械之心\n 需要己方场上有至少（N）个不同的此职业的棋子来触发效果（触发的多层效果可以叠加）。\n\n（3）工匠：如果主场战斗获胜有至少1个友方工匠存活，在下回合的准备回合开始时进行一次伟大的发明。\n（6）工匠：伟大发明有概率升级为金色！",
-      "zh-tw": "工匠棋子具有自我修復能力，受到的治療或生命值回覆效果+50%。\n\n職業技能：機械之心\n 需要己方場上有至少（N）個不同的此職業的棋子來觸發效果（觸發的多層效果可以疊加）。\n\n（3）工匠：如果主場戰鬥獲勝有至少1個友方工匠存活，在下回合的準備回合開始時進行一次偉大的發明。\n（6）工匠：偉大發明有概率升級爲金色！"
+      "zh-tw": "工匠棋子具有自我修複能力，受到的治療或生命值回複效果+50%。\n\n職業技能：機械之心\n 需要己方場上有至少（N）個不同的此職業的棋子來觸發效果（觸發的多層效果可以疊加）。\n\n（3）工匠：如果主場戰鬥獲勝有至少1個友方工匠存活，在下回合的准備回合開始時進行壹次偉大的發明。\n（6）工匠：偉大發明有概率升級爲金色！"
     },
     "description_html": "Inventors arm themselves with the latest technology that allows them to receive +50% healing from other sources.\n<h1>Class Perk: Heart of the Machine</h1><font color=\"#656585\">Active when you have at least (N) different Inventor pieces on board. (Multiple effects stack)</font><br><br>(3) Inventors: Summon an AWESOME Invention after winning a home battle last round with at least 1 friendly Inventor who survived.<br>(6) Inventors: Heart of the Machine now summons a Golden AWESOME Invention.",
     "lore": "Inventors are usually the ones within a race who possess the most profound knowledge, and the are ambitious in discover new methods and creations. Though most of the time the inventions are problematic and not-so-reliable, they do invoke miracles sometimes.",
@@ -23,7 +23,7 @@
       "en": "Inventors are usually the ones within a race who possess the most profound knowledge, and the are ambitious in discover new methods and creations. Though most of the time the inventions are problematic and not-so-reliable, they do invoke miracles sometimes.",
       "ru": "Изобретатели обычно являются представителями расы с наиболее глубокими знаниями и стремятся открывать новые методы и создавать новые изобретения. Хотя их творения часто оказываются проблемными и ненадёжными, но иногда они всё же совершают настоящие чудеса.",
       "zh-cn": "钻研工程学的地精、侏儒、矮人工匠制造了无数的震撼人心的发明。",
-      "zh-tw": "鑽研工程學的地精、侏儒、矮人工匠製造了無數的震撼人心的發明。"
+      "zh-tw": "鑽研工程學的地精、侏儒、矮人工匠制造了無數的震撼人心的發明。"
     },
     "notes": [
       "Heart of the Machine: Refresh your recruitment panel for free.",

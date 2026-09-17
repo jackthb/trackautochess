@@ -20,7 +20,13 @@
       "zh-tw": "噬魂鬼"
     },
     "attack_type": "melee",
-    "abilities": null,
+    "abilities": [
+      {
+        "id": "life_stealer_rage",
+        "name": "Rage",
+        "description": "Active ability: Activates instant\nLaunch into a maddened rage, becoming Debuff Immune and Pure damage Immune and increasing magic resistance."
+      }
+    ],
     "stats": {
       "1_star": {
         "hp": 700,

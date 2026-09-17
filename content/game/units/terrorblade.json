@@ -19,7 +19,13 @@
       "zh-tw": "靈魂守衛"
     },
     "attack_type": "melee",
-    "abilities": null,
+    "abilities": [
+      {
+        "id": "tb_mohua_new",
+        "name": "Metamorphosis",
+        "description": "Active ability: Activate on Full Mana\nTerrorblade transforms into a powerful demonic form with a ranged attack, removing most of the status effects from himself. Rank 2 or higher Terrorblade also transforms his nearest ally into a demon with a rank equal to the transformed chess piece(no higher than the rank of Terrorblade)."
+      }
+    ],
     "stats": {
       "1_star": {
         "hp": 700,
@@ -54,7 +60,7 @@
         ],
         "armor": 5,
         "magic_resist": 20,
-        "atk_rate": 1.3,
+        "atk_rate": 1.1,
         "atk_range": 205
       }
     }

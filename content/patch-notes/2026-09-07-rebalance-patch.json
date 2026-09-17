@@ -2,8 +2,7 @@
   "date": "2026-09-07",
   "title": "Rebalance Patch",
   "source": "https://steamcommunity.com/sharedfiles/filedetails/changelog/1613886175",
-  "entitiesSynced": true,
-  "entitiesSyncedAt": "2026-09-14T09:02:19.964Z",
+  "entitiesSynced": false,
   "sourceEntries": [
     {
       "sourceId": "1788769830",
@@ -29,7 +28,8 @@
         {
           "kind": "buff",
           "name": "Serendipity Compass",
-          "detail": "Conditions for -2/-1 recruit cost changed to (0-2 / 3-8 of this unit already recruited) (old: 0 / 1-4)"
+          "detail": "Conditions for -2/-1 recruit cost changed to (0-2 / 3-8 of this unit already recruited) (old: 0 / 1-4)",
+          "entityKey": "relic__serendipity-compass"
         },
         {
           "kind": "buff",

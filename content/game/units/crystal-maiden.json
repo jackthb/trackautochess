@@ -19,7 +19,13 @@
       "zh-tw": "水晶室女"
     },
     "attack_type": "ranged",
-    "abilities": null,
+    "abilities": [
+      {
+        "id": "cm_mana_aura",
+        "name": "Arcane Aura",
+        "description": "Aura: \nGrants periodic mana regeneration for all allied chess pieces."
+      }
+    ],
     "stats": {
       "1_star": {
         "hp": 450,

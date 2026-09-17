@@ -1,0 +1,14 @@
+{
+  "gameId": "ability_disruptor_static_storm",
+  "name": "Static Storm",
+  "description": "Active ability: Activates on Full Mana\nCreates a damaging static storm that also silences all enemy chess pieces in the area for the duration. The damage starts off weak, but increases in power over the duration.",
+  "cooldown": "20 15 10",
+  "mana_cost": "75",
+  "cast_range": "9999",
+  "ability_special": {
+    "radius": "350 400 450",
+    "pulses": "8 12 16",
+    "damage_max": "100 150 200",
+    "duration": "4 6 8"
+  }
+}

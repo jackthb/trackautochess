@@ -15,7 +15,7 @@
       "en": "SPECIES TRAIT: Blessing of the Naaru\n Active when you have at least (N) different pieces of this species on board. (Multiple effects stack)\n\n(2) Draeneis: All friendly Draenei gain the effect: Every 4 seconds, steal 50+2% max health from the nearest enemy chess piece to heal themselves.\n(4) Draeneis: All friendly pieces gain effects: Whenever a cumulative total of more than 100 points of healing is taken it is split (cumulative healing) points of pure damage among the surrounding enemies.",
       "ru": "SPECIES TRAIT: Blessing of the Naaru\n Активна, когда минимум (N) разных Draenei на столе.(Эффекты складываются)\n\n(2) Draeneis: Дренеи получают эффект: каждые 4 секунд крадут 50+2% от максимального здоровья ближайшей вражеской фигуры, чтобы исцелить себя.\n(4) Draeneis: Все дружественные фигуры получают эффект благославения: когда общее исцеление превышает 100 очков, оно превращается в чистый урон, который наносится ближайшим врагам.",
       "zh-cn": "种族技能：纳鲁的洗礼\n 需要己方场上有至少（N）个不同的此种族的棋子来触发效果（触发的多层效果可以叠加）。\n\n（2）德莱尼：每4秒从最近的敌方棋子偷取（50+2%最大生命值）点生命值治疗自己。\n（4）德莱尼：所有友方棋子获得效果：每当累计受到超过100点治疗会对周围敌人造成等于（累计治疗量）的纯粹伤害。",
-      "zh-tw": "種族技能：納魯的洗禮\n 需要己方場上有至少（N）個不同的此種族的棋子來觸發效果（觸發的多層效果可以疊加）。\n\n（2）德萊尼：每4秒從最近的敵方棋子偷取（50+2%最大生命值）點生命值治療自己。\n（4）德萊尼：所有友方棋子獲得效果：每當累計受到超過100點治療會對周圍敵人造成等於（累計治療量）的純粹傷害。"
+      "zh-tw": "種族技能：納魯的洗禮\n 需要己方場上有至少（N）個不同的此種族的棋子來觸發效果（觸發的多層效果可以疊加）。\n\n（2）德萊尼：每4秒從最近的敵方棋子偷取（50+2%最大生命值）點生命值治療自己。\n（4）德萊尼：所有友方棋子獲得效果：每當累計受到超過100點治療會對周圍敵人造成等于（累計治療量）的純粹傷害。"
     },
     "description_html": "<h1>SPECIES TRAIT: Blessing of the Naaru</h1><font color=\"#656585\">Active when you have at least (N) different pieces of this species on board. (Multiple effects stack)</font><br><br>(2) Draeneis: All friendly Draenei gain the effect: Every 4 seconds, steal 50+2% max health from the nearest enemy chess piece to heal themselves.<br>(4) Draeneis: All friendly pieces gain effects: Whenever a cumulative total of more than 100 points of healing is taken it is split (cumulative healing) points of pure damage among the surrounding enemies.",
     "lore": "To evade the Burning Legions clutches, a congregation led by the Farseer fled their homelands, faithful to the Naaru and the Holy Light. They named themselves Draenei, the Exiled Ones.",
@@ -23,7 +23,7 @@
       "en": "To evade the Burning Legions clutches, a congregation led by the Farseer fled their homelands, faithful to the Naaru and the Holy Light. They named themselves Draenei, the Exiled Ones.",
       "ru": "Чтобы избежать хватки Пылающих Легионов, конгрегация, возглавляемая Провидцем, покинула свои родные земли, веруя в Наару и Священный Свет. Они назвали себя Дренеями, народ прозвал их Жижей.",
       "zh-cn": "为了避免被燃烧军团奴役为恶魔，在大先知的带领下逃离了自己家园的这群信仰纳鲁和圣光的异族生物，将自己称为德莱尼，或者“流亡者”。",
-      "zh-tw": "爲了避免被燃燒軍團奴役爲惡魔，在大先知的帶領下逃離了自己家園的這羣信仰納魯和聖光的異族生物，將自己稱爲德萊尼，或者“流亡者”。"
+      "zh-tw": "爲了避免被燃燒軍團奴役爲惡魔，在大先知的帶領下逃離了自己家園的這群信仰納魯和聖光的異族生物，將自己稱爲德萊尼，或者“流亡者”。"
     },
     "notes": [
       "The blessings will not trigger for a while if there are no enemies in range.",

@@ -19,7 +19,13 @@
       "zh-tw": "海軍上將"
     },
     "attack_type": "melee",
-    "abilities": null,
+    "abilities": [
+      {
+        "id": "kunkka_ship",
+        "name": "Ghostship",
+        "description": "Active ability: Activates on Full Mana\nSummons a ghostly ship that sails through the battle before smashing apart, damaging and stunning all enemies caught near the wreckage."
+      }
+    ],
     "stats": {
       "1_star": {
         "hp": 950,

@@ -1,0 +1,16 @@
+{
+  "gameId": "wl_inferno",
+  "name": "Chaotic Offering",
+  "description": "Active ability: Activates on Full Mana\nSummons a Golem from the depths, dealing random stuns and random pure damage to enemies hit. The Golem has Permanent Immolation and Flaming Fists on attack. After 3 seconds there may come another Golem.",
+  "cooldown": "60",
+  "mana_cost": "100",
+  "cast_range": "",
+  "ability_special": {
+    "stun_radius": "200 200 250",
+    "stun_duration": "1",
+    "damage": "100",
+    "inferno_count": "1 2 3",
+    "inferno_duration": "7.5",
+    "another_inferno_per": "50"
+  }
+}

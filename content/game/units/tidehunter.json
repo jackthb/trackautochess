@@ -19,7 +19,13 @@
       "zh-tw": "潮汐獵人"
     },
     "attack_type": "melee",
-    "abilities": null,
+    "abilities": [
+      {
+        "id": "tidehunter_ravage",
+        "name": "Ravage",
+        "description": "Active ability: Activates on full mana\nSlams the ground, causing tentacles to erupt in all directions, damaging and stunning all nearby enemies within a 6-grid maximum range."
+      }
+    ],
     "stats": {
       "1_star": {
         "hp": 1100,

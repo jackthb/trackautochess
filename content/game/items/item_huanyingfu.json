@@ -15,14 +15,14 @@
       "en": "Damage +25.\nActive ability: Instant\nCreates 2 images of the caster that last 7 seconds.",
       "ru": "Урон +25.\nActive ability: Instant\nСоздаёт 2 копии заклинателя, которые длятся 7 секунд.",
       "zh-cn": "攻击力+25。\n\n主动技能：立即激活\n复制两个自身的镜像棋子，持续7秒。",
-      "zh-tw": "攻擊力+25。\n\n主動技能：立即激活\n複製兩個自身的鏡像棋子，持續7秒。"
+      "zh-tw": "攻擊力+25。\n\n主動技能：立即激活\n複制兩個自身的鏡像棋子，持續7秒。"
     },
     "lore": "An axe made of reflective materials that confuse enemy ranks.",
     "lore_i18n": {
       "en": "An axe made of reflective materials that confuse enemy ranks.",
       "ru": "Топор из отражающих материалов, сбивающий строй врагов с толку.",
       "zh-cn": "用反光材料制成的斧头，能够混淆敌军。",
-      "zh-tw": "用反光材料製成的斧頭，能夠混淆敵軍。"
+      "zh-tw": "用反光材料制成的斧頭，能夠混淆敵軍。"
     },
     "quality": "common",
     "texture": "item_manta",

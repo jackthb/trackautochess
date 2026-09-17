@@ -8,14 +8,14 @@
       "en": "Time-Space Replica",
       "ru": "Time-Space Replica",
       "zh-cn": "复刻时空",
-      "zh-tw": "復刻時空"
+      "zh-tw": "複刻時空"
     },
     "description": "Replicate your last relic.",
     "descriptions": {
       "en": "Replicate your last relic.",
       "ru": "Повторите свою прошлую реликвию.",
       "zh-cn": "重复使用你的上一个圣物。",
-      "zh-tw": "重複使用你的上一個聖物。"
+      "zh-tw": "重複使用妳的上壹個聖物。"
     },
     "lore": "",
     "lore_i18n": {

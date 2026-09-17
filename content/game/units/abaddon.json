@@ -19,7 +19,13 @@
       "zh-tw": "死亡騎士"
     },
     "attack_type": "melee",
-    "abilities": null,
+    "abilities": [
+      {
+        "id": "abaddon_aphotic_shield",
+        "name": "Aphotic Shield",
+        "description": "Active ability: Activates on Full Mana\nSummons dark energies around a most-damaged ally unit, creating a shield that absorbs a set amount of damage before expiring. When the shield is destroyed it will burst and deal damage equal to the amount absorbed to an area of 3-grid radius around it."
+      }
+    ],
     "stats": {
       "1_star": {
         "hp": 700,

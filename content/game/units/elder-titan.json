@@ -20,7 +20,13 @@
       "zh-tw": "上古巨神"
     },
     "attack_type": "melee",
-    "abilities": null,
+    "abilities": [
+      {
+        "id": "et_earth_splitter",
+        "name": "Earth Splitter",
+        "description": "Active ability: Activates on Full Mana\nSends forth a jagged crack in front of Elder Titan. After 3 seconds, the crack implodes, stunning while dealing damage to each enemy based on their maximum life. Half of the damage dealt is Magical damage, while the other half is Physical damage."
+      }
+    ],
     "stats": {
       "1_star": {
         "hp": 900,

@@ -1,0 +1,15 @@
+{
+  "gameId": "void_astralstep",
+  "name": "Astral Step",
+  "description": "Active: Activate on full mana\nVoid Spirit tears a rift, attacking several unmarked enemies successively along the path, giving each of them a void mark to slow down and detonate with magical damage after a short delay. Killing an enemy chess piece instantly resets the cooldown of Astral Step.",
+  "cooldown": "6 5 4",
+  "mana_cost": "100",
+  "cast_range": "",
+  "ability_special": {
+    "steps": "3 4 6",
+    "damage": "300 400 600",
+    "movement_slow_pct": "20 30 40",
+    "delay": "1.25",
+    "area": "370"
+  }
+}

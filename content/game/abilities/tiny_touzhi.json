@@ -1,0 +1,13 @@
+{
+  "gameId": "tiny_touzhi",
+  "name": "Toss",
+  "description": "Passive Ability\nGains 100 max health permanently if killed in a home battle.\n\nActive ability: Activates on Full Mana\nGrabs a nearby enemy, and launches it at the farthest enemy 3 squares away from the victim, or directly up into the air, to deal damage and stun where they land.",
+  "cooldown": "10 8 6",
+  "mana_cost": "100",
+  "cast_range": "9999",
+  "ability_special": {
+    "damage_radius": "200",
+    "damage": "100 200 300",
+    "stun_duration": "1 1.5 2"
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "gameId": "dk_dragon_form",
+  "name": "Elder Dragon Form",
+  "description": "Active ability: Activate on full mana\nDavion transforms into one of three powerful elder dragons, granting him new Dragon Breath powers.\nLEVEL 1 Red Dragon: Attacks deal splash damage to all enemy units in a 2-square range.\nLEVEL 2 Blue Dragon: Attacks slow movement speed and attack speed of enemy units in a 2-square range.\nLEVEL 3 Black Dragon: Attacks additionally deal magic damage over time to enemy units in a 2-square range, equal to a percentage of their health.",
+  "cooldown": "60",
+  "mana_cost": "100",
+  "cast_range": "0",
+  "ability_special": {
+    "splash_percent": "25",
+    "slow_percent": "-25",
+    "poison_percent": "5",
+    "dragon_form_ad": "200 300 400"
+  }
+}

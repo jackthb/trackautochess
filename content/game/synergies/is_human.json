@@ -15,7 +15,7 @@
       "en": "Species Perk: Spark of Mind\n Active when you have at least (N) different human pieces on board. (Multiple effects stack) \n\n(3) Humans: Gain 2 experience points at the start of each round.\n(6) Humans: Gain (Courier Level - 2) points of experience points at the start of each round if you won your last home battle.",
       "ru": "Species Perk: Spark of Mind\n Активна, когда минимум (N) разных Human на столе.(Эффекты складываются) \n\n(3) Humans: Получаете 2 опыта в начале каждого раунда.\n(6) Humans: Получаете (Уровень Курьера -2) очков опыта в начале каждого раунда, если вы выиграли последнюю домашнюю битву.",
       "zh-cn": "种族技能：思想火花\n 需要己方场上有至少（N）个不同的此种族的棋子来触发效果（触发的多层效果可以叠加）。\n\n（3）人类：准备回合开始时获得2点经验值。\n（6）人类：如果主场战斗获胜有至少1个友方人类存活，额外获得（信使等级-2）点经验值。",
-      "zh-tw": "種族技能：思想火花\n 需要己方場上有至少（N）個不同的此種族的棋子來觸發效果（觸發的多層效果可以疊加）。\n\n（3）人類：準備回合開始時獲得2點經驗值。\n（6）人類：如果主場戰鬥獲勝有至少1個友方人類存活，額外獲得（信使等級-2）點經驗值。"
+      "zh-tw": "種族技能：思想火花\n 需要己方場上有至少（N）個不同的此種族的棋子來觸發效果（觸發的多層效果可以疊加）。\n\n（3）人類：准備回合開始時獲得2點經驗值。\n（6）人類：如果主場戰鬥獲勝有至少1個友方人類存活，額外獲得（信使等級-2）點經驗值。"
     },
     "description_html": "<h1>Species Perk: Spark of Mind</h1><font color=\"#656585\">Active when you have at least (N) different human pieces on board. (Multiple effects stack) </font><br><br>(3) Humans: Gain 2 experience points at the start of each round.<br>(6) Humans: Gain (Courier Level - 2) points of experience points at the start of each round if you won your last home battle.",
     "lore": "Humans are an intelligent species that values kindness and cooperation, and silences any who they deem unworthy.",
@@ -23,7 +23,7 @@
       "en": "Humans are an intelligent species that values kindness and cooperation, and silences any who they deem unworthy.",
       "ru": "Humans — разумная раса, ценящая доброту и сотрудничество, и заставляющая молчать тех, кого считает недостойными.",
       "zh-cn": "人类是受到尤导血肉诅咒的野蛮维库人退化的后代。几千年以来，早期的人类主要是以分散的部落形式生活的，直到逐渐增长的外界压力迫使他们统一起来。",
-      "zh-tw": "人類是受到尤導血肉詛咒的野蠻維庫人退化的後代。幾千年以來，早期的人類主要是以分散的部落形式生活的，直到逐漸增長的外界壓力迫使他們統一起來。"
+      "zh-tw": "人類是受到尤導血肉詛咒的野蠻維庫人退化的後代。幾千年以來，早期的人類主要是以分散的部落形式生活的，直到逐漸增長的外界壓力迫使他們統壹起來。"
     },
     "notes": [
       "Experience gained by Spark of Mind is not restricted by the max level of 10."

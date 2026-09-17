@@ -20,5 +20,6 @@
     "lore": "",
     "lore_i18n": {}
   },
-  "overrides": {}
+  "overrides": {},
+  "icon": "relics/armory_array.png"
 }

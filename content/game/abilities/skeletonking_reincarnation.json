@@ -1,0 +1,12 @@
+{
+  "gameId": "skeletonking_reincarnation",
+  "name": "Reincarnation",
+  "description": "Aura\nGrants deathrattle to all nearby allies whose level is no more than Wraith King: Reincarnation once directly on death.",
+  "cooldown": "",
+  "mana_cost": "0",
+  "cast_range": "250 300 400",
+  "ability_special": {
+    "radius": "250 300 400",
+    "duration": "10 15 20"
+  }
+}

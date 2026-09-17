@@ -1,0 +1,14 @@
+{
+  "gameId": "midnight_pulse_datadriven",
+  "name": "Midnight Pulse",
+  "description": "Active ability: Activates on Full Mana\nSteeps an area of 3-square radius in dark resonance, damaging enemy chess pieces within based on their maximum health.",
+  "cooldown": "12 10 8",
+  "mana_cost": "100",
+  "cast_range": "9999",
+  "ability_special": {
+    "radius": "350 400 450",
+    "damage_per": "4 5 6",
+    "duration": "5 5 6",
+    "damage_tick": "0.5"
+  }
+}

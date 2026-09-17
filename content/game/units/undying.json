@@ -19,7 +19,13 @@
       "zh-tw": "不朽屍王"
     },
     "attack_type": "melee",
-    "abilities": null,
+    "abilities": [
+      {
+        "id": "ud_decay",
+        "name": "Decay",
+        "description": "Targeted Active ability: Activates on Full Mana\nUndying steals Max HP from enemies through an ally, and deals pure damage to heal the ally chosen."
+      }
+    ],
     "stats": {
       "1_star": {
         "hp": 1000,

@@ -17,10 +17,16 @@
       "ko": "복수 혼령",
       "ru": "Vengeful Spirit",
       "zh-cn": "复仇之魂",
-      "zh-tw": "復仇之魂"
+      "zh-tw": "複仇之魂"
     },
     "attack_type": "ranged",
-    "abilities": null,
+    "abilities": [
+      {
+        "id": "vs_swap",
+        "name": "Nether Swap",
+        "description": "Targeted active ability: Instant\nSwap positions with one or more enemy chess pieces whose star level is no higher than(Nether Swap skill level)"
+      }
+    ],
     "stats": {
       "1_star": {
         "hp": 500,

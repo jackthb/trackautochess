@@ -19,7 +19,13 @@
       "zh-tw": "大魔導師"
     },
     "attack_type": "ranged",
-    "abilities": null,
+    "abilities": [
+      {
+        "id": "rubick_qiequ",
+        "name": "Spell Steal",
+        "description": "BATTLECRY ABILITY: Activates on battle\nRubick studies the trace magical essence of the enemy piece, learning the secrets of the spell the piece has.\nAt the start of a combat, Rubick randomly steals the active ability and attack range of an enemy piece who has mana to replace Spell Steal. \n Rubick on the chessboard resets his ability to Spell Steal when losing a home battle."
+      }
+    ],
     "stats": {
       "1_star": {
         "hp": 500,

@@ -1,0 +1,12 @@
+{
+  "gameId": "sd_disseminate",
+  "name": "Disseminate",
+  "description": "Targeted Active ability: Instant Activation>\nApplying the toxic curse of Shadow Demons attacks: Nearby allies will receive damage of the same type as a percentage when taking damage, and nearby enemies will also receive healing as a percentage when receiving healing.",
+  "cooldown": "5",
+  "mana_cost": "0",
+  "cast_range": "9999",
+  "ability_special": {
+    "damage_reflection_pct": "20 30 40",
+    "radius": "205 250 300"
+  }
+}

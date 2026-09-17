@@ -19,7 +19,13 @@
       "zh-tw": "虛空假面"
     },
     "attack_type": "melee",
-    "abilities": null,
+    "abilities": [
+      {
+        "id": "fv_zhao_new",
+        "name": "Time Zone",
+        "description": "Active ability: Activates on full mana.Creates a blister in spacetime, altering the movement, attack speed of all units inside. Allies have increased speed and enemies have decreased speed"
+      }
+    ],
     "stats": {
       "1_star": {
         "hp": 550,

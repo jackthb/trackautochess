@@ -1,0 +1,28 @@
+{
+  "gameId": "marci_unleash",
+  "name": "Unleash",
+  "description": "Active ability: Activate on full mana\nMarci taps a hidden power, gaining Fury charges that allow her to deliver a rapid sequence of strikes. The last strike in every Fury combo creates a damaging pulse for magical damage around the target that slows movement and attack speed of the victims.",
+  "cooldown": "16 13 10",
+  "mana_cost": "100",
+  "cast_range": "9999",
+  "ability_special": {
+    "duration": "10",
+    "charges_per_flurry": "3 4 5",
+    "flurry_bonus_attack_speed": "400 500 600",
+    "time_between_flurries": "2.00",
+    "pulse_radius": "200 300 400",
+    "pulse_debuff_duration": "3.0",
+    "pulse_damage": "100 150 250",
+    "pulse_move_slow_pct": "30.0",
+    "pulse_attack_slow_pct": "30.0 50.0 70.0",
+    "max_time_window_per_hit": "1.0",
+    "bonus_movespeed": "15",
+    "recovery_fixed_attack_rate": "2.0",
+    "shard_push_length": "300",
+    "scepter_cooldown_reduction": "10.0",
+    "dispel": "0",
+    "pulse_silence_duration": "0",
+    "AbilityCooldown": "16 13 10",
+    "AbilityManaCost": "100"
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "gameId": "shredder_whirling_death",
+  "name": "Whirling Death",
+  "description": "Active ability: Activates on full mana\nTimbersaw whirls extremely sharp edges, damaging enemies within 2 grids.",
+  "cooldown": "6 5 4",
+  "mana_cost": "100",
+  "cast_range": "9999",
+  "ability_special": {
+    "whirling_radius": "300",
+    "whirling_damage": "200 250 300",
+    "tree_damage_scale": "0",
+    "whirling_tick": "0.3",
+    "stat_loss_pct": "0",
+    "stat_loss_univ": "0",
+    "duration": "0"
+  }
+}

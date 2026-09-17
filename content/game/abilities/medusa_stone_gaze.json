@@ -1,0 +1,24 @@
+{
+  "gameId": "medusa_stone_gaze",
+  "name": "Stone Gaze",
+  "description": "Passive Ability\nThe normal attack can always be split into multiple arrows to attack multiple target enemies.\n\nActive ability: Activate when full mana\nAny enemy pieces staring at Medusa will be Stone Gazed. The victims will suffer extra pure damage once based on its max health on gaze start.",
+  "cooldown": "25 20 15",
+  "mana_cost": "100",
+  "cast_range": "9999",
+  "ability_special": {
+    "split_count": "3 3 4",
+    "split_damage_per": "50",
+    "AbilityCastRange": "600 800 1000",
+    "AbilityCooldown": "25 20 15",
+    "AbilityManaCost": "100",
+    "radius": "600 800 1000",
+    "duration": "3 4 5",
+    "slow": "30",
+    "stone_duration": "2 2.5 3",
+    "face_duration": "2.0",
+    "vision_cone": "0.5",
+    "bonus_physical_damage": "0",
+    "speed_boost": "0",
+    "extra_damage_per": "30 40 50"
+  }
+}

@@ -19,7 +19,13 @@
       "zh-tw": "雙頭龍"
     },
     "attack_type": "ranged",
-    "abilities": null,
+    "abilities": [
+      {
+        "id": "jakiro_macropyre",
+        "name": "Macropyre",
+        "description": "Jakiro exhales a wide line of lasting flames, which deals damage per second to any enemy units caught in the fire. Switches to Ice Path after cast."
+      }
+    ],
     "stats": {
       "1_star": {
         "hp": 1000,

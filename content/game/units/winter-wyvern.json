@@ -20,7 +20,13 @@
       "zh-tw": "寒冬飛龍"
     },
     "attack_type": "ranged",
-    "abilities": null,
+    "abilities": [
+      {
+        "id": "winter_wyvern_cold_embrace",
+        "name": "Cold Embrace",
+        "description": "Active ability: Activates on Full Mana\nEncases an ally in an icy cocoon, freezing them solid while healing a base amount as well as a percentage of their maximum health each second. The cocoon blocks all physical damage."
+      }
+    ],
     "stats": {
       "1_star": {
         "hp": 550,

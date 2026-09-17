@@ -19,7 +19,13 @@
       "zh-tw": "矮人直升機"
     },
     "attack_type": "ranged",
-    "abilities": null,
+    "abilities": [
+      {
+        "id": "gyro_flak_cannon",
+        "name": "Flak Cannon",
+        "description": "Passive Ability\nThe secondary cannon on the side of the Gyrocopter will continuously attack the furthest enemy piece. \n\nActive ability: Activate immediately\nThe attack of the main artillery will simultaneously shoot all enemy pieces within the attack range that are not close, and continue to attack for several times."
+      }
+    ],
     "stats": {
       "1_star": {
         "hp": 900,

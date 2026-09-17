@@ -19,7 +19,13 @@
       "zh-tw": "修補匠"
     },
     "attack_type": "ranged",
-    "abilities": null,
+    "abilities": [
+      {
+        "id": "a108",
+        "name": "Heat Seeking Missile",
+        "description": "Active ability: Activates on Full Mana\nLaunches 3 3 4 rockets to strike random enemy chess pieces."
+      }
+    ],
     "stats": {
       "1_star": {
         "hp": 500,

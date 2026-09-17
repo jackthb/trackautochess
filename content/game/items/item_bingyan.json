@@ -10,12 +10,12 @@
       "zh-cn": "斯嘉蒂之眼",
       "zh-tw": "斯嘉蒂之眼"
     },
-    "description": "+600 max health.\nAttack speed, Attack damage, Move speed, mana restoration and healing effectiveness -50%.",
+    "description": "+600 max health.\nAttack speed, Move speed, mana restoration and healing effectiveness -50%.",
     "descriptions": {
-      "en": "+600 max health.\nAttack speed, Attack damage, Move speed, mana restoration and healing effectiveness -50%.",
-      "ru": "+600 здоровья.\nПоражённые цели: скорость атаки, урона, скорость передвижения, восстановление маны и эффективность лечения - снижены на 50%.",
-      "zh-cn": "生命值+600。\n任何受到持有者伤害的目标都会获得效果：攻击速度、攻击力、移动速度、法力获取和受到治疗-50%。",
-      "zh-tw": "生命值+600。\n任何受到持有者傷害的目標都會獲得效果：攻擊速度、攻擊力、移動速度、法力獲取和受到治療-50%。"
+      "en": "+600 max health.\nAttack speed, Move speed, mana restoration and healing effectiveness -50%.",
+      "ru": "+600 здоровья.\nПоражённые цели: скорость атаки, скорость передвижения, восстановление маны и эффективность лечения - снижены на 50%.",
+      "zh-cn": "生命值+600。\n任何受到持有者伤害的目标都会获得效果：攻击速度、移动速度、法力获取和受到治疗-50%。",
+      "zh-tw": "生命值+600。\n任何受到持有者傷害的目標都會獲得效果：攻擊速度、移動速度、法力獲取和受到治療-50%。"
     },
     "lore": "Extremely rare artifact, guarded by the azure dragons.",
     "lore_i18n": {

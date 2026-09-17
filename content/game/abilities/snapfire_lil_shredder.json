@@ -1,0 +1,19 @@
+{
+  "gameId": "snapfire_lil_shredder",
+  "name": "Lil' Shredder",
+  "description": "Active ability: Activate on full mana\nSnapfire heats up her mounted turret to rapidly fire attacks that deal physical damage equal to her attack damage per hit. Each attack slows the enemys attack speed and reduces enemys armor, effect stackable.",
+  "cooldown": "8 6 4",
+  "mana_cost": "100",
+  "cast_range": "800",
+  "ability_special": {
+    "damage": "150 200 250",
+    "buffed_attacks": "8 12 20",
+    "damage_pct": "0",
+    "attack_speed_bonus": "300",
+    "attack_range_bonus": "250",
+    "buff_duration_tooltip": "8",
+    "base_attack_time": "0.75",
+    "armor_reduction_per_attack": "1 1 2",
+    "armor_duration": "5.0"
+  }
+}

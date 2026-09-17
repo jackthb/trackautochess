@@ -1,0 +1,15 @@
+{
+  "gameId": "phantom_assassin_coup_de_grace",
+  "name": "Coup de Grace",
+  "description": "Passive Ability\nPhantom Assassin refines her combat abilities, gaining a chance of delivering a devastating critical strike to enemy units and evading Ability Damage.",
+  "cooldown": "",
+  "mana_cost": "",
+  "cast_range": "",
+  "ability_special": {
+    "crit_chance": "20",
+    "dagger_crit_chance": "0",
+    "crit_bonus": "300 400 500",
+    "duration": "6 8 10",
+    "miss_per": "50"
+  }
+}

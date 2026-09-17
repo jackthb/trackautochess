@@ -19,7 +19,13 @@
       "zh-tw": "黑暗賢者"
     },
     "attack_type": "melee",
-    "abilities": null,
+    "abilities": [
+      {
+        "id": "dark_seer_ion_shell",
+        "name": "Ion Shell",
+        "description": "Active ability: Activates on Full Mana\nSurrounds a friendly piece in a bristling shield, causing it to take less damage and deal continuous damage to surrounding enemies magic damage."
+      }
+    ],
     "stats": {
       "1_star": {
         "hp": 700,

@@ -1,0 +1,11 @@
+{
+  "gameId": "tusk_walrus_punch_lua",
+  "name": "Walrus PUNCH!",
+  "description": "Active ability: Activates on full mana\nTusk connects with his mighty Walrus Punch, a critical strike so powerful it launches a nearby enemy within 1 grid into the air.",
+  "cooldown": "5 4 3",
+  "mana_cost": "100",
+  "cast_range": "400",
+  "ability_special": {
+    "crit_multiplier": "200 275 350"
+  }
+}

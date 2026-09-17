@@ -1,0 +1,13 @@
+{
+  "gameId": "sven_gods_strength",
+  "name": "Gods strength",
+  "description": "Passive Ability\nSvens regular attacks always cause 50% splash damage. \n\nActive ability: Activates at Full Mana\nThe Wanderer Swordsman becomes formidable, receiving a significant increase in attack power. Additionally, all allied chess pieces with the power of Fel Energy experience a substantial boost in their attack power.",
+  "cooldown": "30",
+  "mana_cost": "100",
+  "cast_range": "",
+  "ability_special": {
+    "gods_strength_damage": "80 120 200",
+    "bonus_slow_resistance": "0",
+    "damage_per_demon": "40 60 100"
+  }
+}

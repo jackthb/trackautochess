@@ -20,7 +20,13 @@
       "zh-tw": "龍騎士"
     },
     "attack_type": "melee",
-    "abilities": null,
+    "abilities": [
+      {
+        "id": "dk_dragon_form",
+        "name": "Elder Dragon Form",
+        "description": "Active ability: Activate on full mana\nDavion transforms into one of three powerful elder dragons, granting him new Dragon Breath powers.\nLEVEL 1 Red Dragon: Attacks deal splash damage to all enemy units in a 2-square range.\nLEVEL 2 Blue Dragon: Attacks slow movement speed and attack speed of enemy units in a 2-square range.\nLEVEL 3 Black Dragon: Attacks additionally deal magic damage over time to enemy units in a 2-square range, equal to a percentage of their health."
+      }
+    ],
     "stats": {
       "1_star": {
         "hp": 900,

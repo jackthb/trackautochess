@@ -19,7 +19,13 @@
       "zh-tw": "巫妖"
     },
     "attack_type": "ranged",
-    "abilities": null,
+    "abilities": [
+      {
+        "id": "lich_chain_frost",
+        "name": "Chain Frost",
+        "description": "Targeted Active ability: Activates on Full Mana\nReleases an orb of frost that bounces between nearby enemy units, slowing and dealing magical damage each time it hits."
+      }
+    ],
     "stats": {
       "1_star": {
         "hp": 800,

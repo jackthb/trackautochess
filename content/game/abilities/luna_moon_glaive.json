@@ -1,0 +1,23 @@
+{
+  "gameId": "luna_moon_glaive",
+  "name": "Moon Glaives",
+  "description": "Passive Ability\n Strengthens Lunas Moon Glaive, allowing her attacks to bounce among enemy chess pieces. Each bounce reduces the damage dealt.",
+  "cooldown": "",
+  "mana_cost": "",
+  "cast_range": "",
+  "ability_special": {
+    "range": "300",
+    "bounces": "3 4 5",
+    "damage_reduction_percent": "30",
+    "rotating_glaives_duration": "0",
+    "rotating_glaives": "0",
+    "rotating_glaives_collision_damage": "0",
+    "rotating_glaives_damage_reduction": "0",
+    "rotating_glaives_hit_radius": "0",
+    "rotating_glaives_movement_radius": "0",
+    "unclamp_max_radius": "0",
+    "rotating_glaives_speed": "0",
+    "AbilityCooldown": "0",
+    "AbilityManaCost": "0"
+  }
+}

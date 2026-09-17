@@ -1,0 +1,13 @@
+{
+  "gameId": "veno_ward",
+  "name": "Plague Ward",
+  "description": "Active ability: Activates on Full Mana\nSummons a plague ward in a nearby vacant square to attack enemy units. The ward is immune to spell damage. Attacks of the wards reduce the attack rate of the target by 0.3.",
+  "cooldown": "4 4 6",
+  "mana_cost": "100",
+  "cast_range": "",
+  "ability_special": {
+    "count": "1 1 2",
+    "summon_duration": "30 30 20",
+    "magic_ass": "80"
+  }
+}

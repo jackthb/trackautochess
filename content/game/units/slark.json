@@ -19,7 +19,13 @@
       "zh-tw": "魚人夜行者"
     },
     "attack_type": "melee",
-    "abilities": null,
+    "abilities": [
+      {
+        "id": "slark_nengliangzhuanyi",
+        "name": "Essence Shift",
+        "description": "Passive Ability\nSlark steals the attack speed of enemy pieces with his attacks."
+      }
+    ],
     "stats": {
       "1_star": {
         "hp": 600,

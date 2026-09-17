@@ -1,0 +1,13 @@
+{
+  "gameId": "bh_shuriken",
+  "name": "Jinada Toss",
+  "description": "Targeted Passive Ability\nGets a bag of gold when killing an enemy for the first time\n\nActive ability: Activates at Full Mana\nthrows a deadly dart at the enemy chess piece with the lowest health, dealing magical damageand a brief Stun.",
+  "cooldown": "9 7 5",
+  "mana_cost": "100",
+  "cast_range": "9999",
+  "ability_special": {
+    "damage": "300 400 600",
+    "ministun": "1",
+    "gold_count": "1 3 5"
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "gameId": "chess_tech_bomb",
+  "name": "Explosive Bomb",
+  "description": "Active ability: Activates on Full Mana\nPlant an explosive that automatically detonates after a brief delay, dealing massive physical damage to enemies within a range of 4-grid radius.",
+  "cooldown": "12 10 8",
+  "mana_cost": "100",
+  "cast_range": "9999",
+  "ability_special": {
+    "explode_delay": "3",
+    "damage": "800 1200 2000",
+    "range": "600",
+    "scale": "1.2 1.5 1.8"
+  }
+}

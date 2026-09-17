@@ -1,0 +1,14 @@
+{
+  "gameId": "mag_reverse_polarity",
+  "name": "Reverse Polarity",
+  "description": "Active ability: Activates on full mana\nMagnus changes the property of matter, sucking all enemies to him and stunning them with a powerful slam and dealing damage.",
+  "cooldown": "15 12 9",
+  "mana_cost": "100",
+  "cast_range": "",
+  "ability_special": {
+    "radius": "350 400 500",
+    "stun_duration": "1.5 1.5 2",
+    "stun_duration_step": "0.5",
+    "damage": "150 200 300"
+  }
+}

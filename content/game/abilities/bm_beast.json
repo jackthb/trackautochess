@@ -1,0 +1,11 @@
+{
+  "gameId": "bm_beast",
+  "name": "Call of the Wild",
+  "description": "Active ability: Activates on Full Mana\nBeastmaster summons his powerful companions to aid in the battlefield.\nLevel 1: Summons a Boar.\nLevel 2: Summons a Hawk.\nLevel 3: Summons a Battle Bear with Taunt ability.",
+  "cooldown": "20",
+  "mana_cost": "100",
+  "cast_range": "",
+  "ability_special": {
+    "summon_duration": "30"
+  }
+}

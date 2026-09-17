@@ -19,7 +19,13 @@
       "zh-tw": "娜迦海妖"
     },
     "attack_type": "melee",
-    "abilities": null,
+    "abilities": [
+      {
+        "id": "siren_song",
+        "name": "Song of the Siren",
+        "description": "Active: Activate on full mana\nAll enemies in range of the Naga Siren have a chance to be put into a sleep every 0.5 sec, where they cannot act or be attacked. Any non-ability damage will cause the victim to wake up."
+      }
+    ],
     "stats": {
       "1_star": {
         "hp": 650,

@@ -1,0 +1,16 @@
+{
+  "gameId": "burning_spear_datadriven",
+  "name": "Berserkers Blood",
+  "description": "Passive Ability\nHuskar ignites his spear with boiling blood. Each normal attack will cause magical damage to himself, while also causing stackable continuous damage to enemy pieces. \nBased on the percentage of Huskars missing health, he will gain attack speed, magic resistance, and percentage health regeneration bonuses.",
+  "cooldown": "0.0 0.0 0.0",
+  "mana_cost": "0 0 0",
+  "cast_range": "",
+  "ability_special": {
+    "health_cost": "15 20 25",
+    "burning_spear_duration": "5",
+    "burning_spear_damage": "15 20 25",
+    "attack_speed_per_level": "7 10 15",
+    "magic_resist_per_level": "8",
+    "hp_regain_per_level": "0.4"
+  }
+}

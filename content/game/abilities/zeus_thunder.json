@@ -1,0 +1,13 @@
+{
+  "gameId": "zeus_thunder",
+  "name": "Thundergods Wrath",
+  "description": "Active ability: Activates on full mana\nStrikes all enemies on the chessboard standing on the squares of the same color as Zeus stands on, with a bolt of lightning that deals magical damage plus additional magical damage based on the remaining health of the victim.\n Zeus additionally deals Thunder damage based on the current Courier health to enemy Courier after winning a visiting battle while standing to the last.",
+  "cooldown": "12 10 8",
+  "mana_cost": "100",
+  "cast_range": "",
+  "ability_special": {
+    "damage": "300 400 600",
+    "damage_per": "10 20 40",
+    "damage_courier_per": "10 15 20"
+  }
+}

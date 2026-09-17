@@ -1,0 +1,14 @@
+{
+  "gameId": "earth_rock_roll",
+  "name": "Rolling Boulder",
+  "description": "Earth Spirit calls upon boulders from the surrounding to roll across the chessboard, striking and stunning all enemies in a row or column.\nKilling blows immediately reset this ability.",
+  "cooldown": "6 5 4",
+  "mana_cost": "75",
+  "cast_range": "",
+  "ability_special": {
+    "duration": "2 3 4",
+    "roll_count": "1 2 3",
+    "stun_duration": "3 3 4",
+    "damage": "300 400 600"
+  }
+}

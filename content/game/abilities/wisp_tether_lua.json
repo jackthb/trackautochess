@@ -1,0 +1,14 @@
+{
+  "gameId": "wisp_tether_lua",
+  "name": "Tether",
+  "description": "Battlecry Ability: Activates before the battle starts\nIO tethers with allies around, granting percentage damage reduction. Health percentage will be distributed equally among all tethered allies at set intervals.",
+  "cooldown": "",
+  "mana_cost": "0",
+  "cast_range": "",
+  "ability_special": {
+    "damage_reduction_per": "10 15 25",
+    "radius": "300 350 400",
+    "max_distance": "400 450 500",
+    "tether_interval": "4 3 2"
+  }
+}

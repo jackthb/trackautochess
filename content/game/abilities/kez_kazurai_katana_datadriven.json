@@ -1,0 +1,13 @@
+{
+  "gameId": "kez_kazurai_katana_datadriven",
+  "name": "Kazurai Katana",
+  "description": "Targeted Active ability: Activates on full mana\nKez attacks with his Kanata, stuns the victim and deals Physical Damage equals to a percentage of the victim's Max Health. Stab forward and back each deals half the damage and affiliates his base attack damage.",
+  "cooldown": "10 8 6",
+  "mana_cost": "100",
+  "cast_range": "400",
+  "ability_special": {
+    "damage": "200 300 500",
+    "damage_per": "10 15 25",
+    "stun_duration": "2.0 2.5 3.0"
+  }
+}

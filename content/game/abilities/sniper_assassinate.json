@@ -1,0 +1,13 @@
+{
+  "gameId": "sniper_assassinate",
+  "name": "Assassinate",
+  "description": "Targeted Active ability: Activate on full mana\nSniper locks onto a target enemy chess piece and, after a short aiming duration, fires a devastating shot that deals massive physical damage at long range.",
+  "cooldown": "10 8 6",
+  "mana_cost": "100",
+  "cast_range": "9999",
+  "ability_special": {
+    "damage": "400 600 1000",
+    "projectile_speed": "2500 2500 2500",
+    "cooldown_reduction_on_kill": "0"
+  }
+}

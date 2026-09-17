@@ -19,7 +19,13 @@
       "zh-tw": "術士"
     },
     "attack_type": "ranged",
-    "abilities": null,
+    "abilities": [
+      {
+        "id": "wl_inferno",
+        "name": "Chaotic Offering",
+        "description": "Active ability: Activates on Full Mana\nSummons a Golem from the depths, dealing random stuns and random pure damage to enemies hit. The Golem has Permanent Immolation and Flaming Fists on attack. After 3 seconds there may come another Golem."
+      }
+    ],
     "stats": {
       "1_star": {
         "hp": 850,

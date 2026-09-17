@@ -19,7 +19,13 @@
       "zh-tw": "劍聖"
     },
     "attack_type": "melee",
-    "abilities": null,
+    "abilities": [
+      {
+        "id": "juggernaut_blade_fury_lua",
+        "name": "Blade Fury",
+        "description": "Active ability: Activates on Full Mana\nCauses a bladestorm of destructive force around Juggernaut, dealing damage to nearby enemies within 2 grids. magical damage.\nDuring the spin the Juggernaut gets 80% Magical Resistance.As Juggernauts attack speed increases, the interval between the damages of Blade Fury decreases."
+      }
+    ],
     "stats": {
       "1_star": {
         "hp": 600,

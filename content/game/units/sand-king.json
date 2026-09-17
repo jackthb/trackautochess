@@ -19,7 +19,13 @@
       "zh-tw": "沙王"
     },
     "attack_type": "melee",
-    "abilities": null,
+    "abilities": [
+      {
+        "id": "sandking_burrowstrike",
+        "name": "Burrowstrike",
+        "description": "Active ability: Activates on Full Mana\nSand King burrows into the ground and tunnels forward, damaging and stunning enemies above him as he resurfaces."
+      }
+    ],
     "stats": {
       "1_star": {
         "hp": 600,

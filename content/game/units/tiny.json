@@ -24,6 +24,11 @@
         "id": "tiny_grow_new",
         "name": "Grow",
         "description": "Gains 100 max health permanently if killed in a home battle."
+      },
+      {
+        "id": "tiny_touzhi",
+        "name": "Toss",
+        "description": "Passive Ability\nGains 100 max health permanently if killed in a home battle.\n\nActive ability: Activates on Full Mana\nGrabs a nearby enemy, and launches it at the farthest enemy 3 squares away from the victim, or directly up into the air, to deal damage and stun where they land."
       }
     ],
     "stats": {

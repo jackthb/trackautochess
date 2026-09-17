@@ -1,0 +1,21 @@
+{
+  "gameId": "storm_spirit_ball_lightning_datadriven",
+  "name": "Ball Lightning",
+  "description": "Active ability: Activates on Full Mana\nStorm Spirit becomes volatile electricity, charging across the battlefield, dealing magical damage to enemies in the path. The damage is increased per 100 distance traveled.\nKilling an enemy chess piece instantly resets the cooldown of Ball Lightning.",
+  "cooldown": "6 5 4",
+  "mana_cost": "100",
+  "cast_range": "9999",
+  "ability_special": {
+    "ball_lightning_initial_mana_percentage": "0",
+    "ball_lightning_initial_mana_base": "0",
+    "ball_lightning_move_speed": "1000 1250 1500",
+    "ball_lightning_aoe": "125 150 200",
+    "ball_lightning_travel_cost_base": "0",
+    "ball_lightning_travel_cost_percent": "0",
+    "ball_lightning_vision_radius": "1000",
+    "tree_destroy_radius": "100",
+    "distance_per_mana": "100",
+    "tree_destroy_interval": "0.01",
+    "distance_per_damage": "128"
+  }
+}

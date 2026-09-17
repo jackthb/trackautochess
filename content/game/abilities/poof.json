@@ -1,0 +1,12 @@
+{
+  "gameId": "poof",
+  "name": "Poof",
+  "description": "Passive Ability\nWhen Meepo is upgraded to ★★★, one will be copied. \n\nActive ability: Activate when full mana\n By drawing mysterious energy from the earth, all Meepo can be teleported from the underground to the location of the designated enemy. Each Meepo will attack nearby areas in the area it reaches. Enemies deal pure damage.",
+  "cooldown": "6 5 4",
+  "mana_cost": "100",
+  "cast_range": "9999",
+  "ability_special": {
+    "pure_damage": "150 300 600",
+    "damage_radius": "205"
+  }
+}

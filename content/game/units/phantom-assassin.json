@@ -19,7 +19,13 @@
       "zh-tw": "幻影刺客"
     },
     "attack_type": "melee",
-    "abilities": null,
+    "abilities": [
+      {
+        "id": "phantom_assassin_coup_de_grace",
+        "name": "Coup de Grace",
+        "description": "Passive Ability\nPhantom Assassin refines her combat abilities, gaining a chance of delivering a devastating critical strike to enemy units and evading Ability Damage."
+      }
+    ],
     "stats": {
       "1_star": {
         "hp": 800,

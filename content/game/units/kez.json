@@ -19,7 +19,13 @@
       "zh-tw": "影武者"
     },
     "attack_type": "ranged",
-    "abilities": null,
+    "abilities": [
+      {
+        "id": "kez_kazurai_katana_datadriven",
+        "name": "Kazurai Katana",
+        "description": "Targeted Active ability: Activates on full mana\nKez attacks with his Kanata, stuns the victim and deals Physical Damage equals to a percentage of the victim's Max Health. Stab forward and back each deals half the damage and affiliates his base attack damage."
+      }
+    ],
     "stats": {
       "1_star": {
         "hp": 650,

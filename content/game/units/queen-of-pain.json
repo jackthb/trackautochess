@@ -19,7 +19,13 @@
       "zh-tw": "痛苦女王"
     },
     "attack_type": "ranged",
-    "abilities": null,
+    "abilities": [
+      {
+        "id": "queenofpain_sonic_wave_datadriven",
+        "name": "Sonic Wave",
+        "description": "Active ability: Activates on Full Mana\nCreates a gigantic wave of sound in front of Queen of Pain, dealing heavy pure damage to all enemy units in its wake and disorienting the victims"
+      }
+    ],
     "stats": {
       "1_star": {
         "hp": 950,

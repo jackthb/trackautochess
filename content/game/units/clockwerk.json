@@ -19,7 +19,13 @@
       "zh-tw": "發條技師"
     },
     "attack_type": "melee",
-    "abilities": null,
+    "abilities": [
+      {
+        "id": "rattletrap_battery_assault",
+        "name": "Battery Assault",
+        "description": "Active ability: Activates on Full Mana\nDischarges high-powered shrapnel at random nearby enemy chess pieces within 2 grids, dealing minor magical damage and ministun."
+      }
+    ],
     "stats": {
       "1_star": {
         "hp": 700,

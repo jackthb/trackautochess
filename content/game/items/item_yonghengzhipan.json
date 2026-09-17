@@ -8,7 +8,7 @@
       "en": "Aeon Disk",
       "ru": "Aeon Disk",
       "zh-cn": "永恒之盘",
-      "zh-tw": "永恆之盤"
+      "zh-tw": "永恒之盤"
     },
     "description": "Carrier and its minions will be a\n permanent chess piece.\n\nActive ability: Activates when at low health.\nGrants 100% damage block for 3.5 seconds.",
     "descriptions": {
@@ -22,7 +22,7 @@
       "en": "A powerful artifact long ago smuggled out of the Ivory Incubarium. Or so many believe.",
       "ru": "Мощный артефакт, некогда тайно вывезенный из Слоновой Инкубарии. По крайней мере, так считают многие.",
       "zh-cn": "一件多年以前被偷偷运出象牙孵巢的强力宝物。很多人都信以为真了。",
-      "zh-tw": "一件多年以前被偷偷運出象牙孵巢的強力寶物。很多人都信以爲真了。"
+      "zh-tw": "壹件多年以前被偷偷運出象牙孵巢的強力寶物。很多人都信以爲真了。"
     },
     "quality": "rare",
     "texture": "item_aeon_disk",

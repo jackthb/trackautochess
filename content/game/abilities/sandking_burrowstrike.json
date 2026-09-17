@@ -1,0 +1,19 @@
+{
+  "gameId": "sandking_burrowstrike",
+  "name": "Burrowstrike",
+  "description": "Active ability: Activates on Full Mana\nSand King burrows into the ground and tunnels forward, damaging and stunning enemies above him as he resurfaces.",
+  "cooldown": "12 10 8",
+  "mana_cost": "100",
+  "cast_range": "9999",
+  "ability_special": {
+    "AbilityCooldown": "12 10 8",
+    "burrow_width": "150",
+    "burrow_duration": "1.5 1.5 2",
+    "burrow_speed": "2000",
+    "burrow_anim_time": "0.52",
+    "AbilityCastRange": "9999",
+    "burrow_speed_scepter": "3000",
+    "scepter_channel_time": "2",
+    "scepter_max_power": "2"
+  }
+}

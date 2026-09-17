@@ -16,10 +16,16 @@
       "ko": "메두사",
       "ru": "Medusa",
       "zh-cn": "蛇发女妖",
-      "zh-tw": "蛇髮女妖"
+      "zh-tw": "蛇發女妖"
     },
     "attack_type": "ranged",
-    "abilities": null,
+    "abilities": [
+      {
+        "id": "medusa_stone_gaze",
+        "name": "Stone Gaze",
+        "description": "Passive Ability\nThe normal attack can always be split into multiple arrows to attack multiple target enemies.\n\nActive ability: Activate when full mana\nAny enemy pieces staring at Medusa will be Stone Gazed. The victims will suffer extra pure damage once based on its max health on gaze start."
+      }
+    ],
     "stats": {
       "1_star": {
         "hp": 750,

@@ -1,0 +1,15 @@
+{
+  "gameId": "tp_seed",
+  "name": "Leech Seed",
+  "description": "Targeted Active ability: Activates on Full Mana\nPlant a leech Seed in enemys body, decreases its attack and movement speed and takes magical damage to heal enemies around per second.",
+  "cooldown": "8 7 6",
+  "mana_cost": "100",
+  "cast_range": "9999",
+  "ability_special": {
+    "damage_heal": "80 110 150",
+    "damage_interval": "1",
+    "movement_speed": "-10 -20 -30",
+    "radius": "400",
+    "duration": "5"
+  }
+}

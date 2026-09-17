@@ -1,9 +1,19 @@
 {
   "gameId": "grimstroke_stroke_of_fate_lua",
   "name": "Stroke of Fate",
-  "description": "Battlecry ability (activates on battle). Grimstroke paints an ink trail, reducing the attack speed and mana regeneration of enemies on hit.\nAttack speed reduction: 10%/30%/60%\nMana regen reduction: 10%/30%/60%\nDuration: 10s",
+  "description": "BATTLECRY ABILITY: Activates on battle\nGrimstroke paints an ink trail, reducing the attack speed and mana regeneration of enemies on hit.",
   "cooldown": "5",
   "mana_cost": "0",
   "cast_range": "9999",
-  "ability_special": {}
+  "ability_special": {
+    "start_radius": "160",
+    "end_radius": "160 180 200",
+    "projectile_speed": "2000",
+    "movement_slow_pct": "0",
+    "activation_delay": "0.1",
+    "slow_duration": "8.0",
+    "bonus_damage_per_target": "0",
+    "attack_slow_pct": "10 20 40",
+    "recharge_slow_pct": "10 20 40"
+  }
 }

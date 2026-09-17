@@ -1,0 +1,15 @@
+{
+  "gameId": "bloodseeker_blood_bath_lua",
+  "name": "Blood Rite",
+  "description": "Active ability: Activates on Full Mana\nBloodseeker baptizes an area centred at himself in sacred blood. After the ritual completes, any enemies caught in the area take Pure Damage， and become silenced。",
+  "cooldown": "10 8 6",
+  "mana_cost": "75",
+  "cast_range": "9999",
+  "ability_special": {
+    "radius": "300 400 500",
+    "silence_duration": "2 2 3",
+    "damage": "200 250 350",
+    "delay": "2.6",
+    "delay_plus_castpoint_tooltip": "2.9"
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "gameId": "queenofpain_sonic_wave_datadriven",
+  "name": "Sonic Wave",
+  "description": "Active ability: Activates on Full Mana\nCreates a gigantic wave of sound in front of Queen of Pain, dealing heavy pure damage to all enemy units in its wake and disorienting the victims",
+  "cooldown": "20 15 10",
+  "mana_cost": "100",
+  "cast_range": "9999",
+  "ability_special": {
+    "starting_aoe": "200",
+    "distance": "900",
+    "final_aoe": "350",
+    "speed": "1100",
+    "damage": "250 350 550",
+    "cooldown_scepter": "40",
+    "damage_scepter": "250 350 550",
+    "chaos_duration": "1.5 2 3"
+  }
+}

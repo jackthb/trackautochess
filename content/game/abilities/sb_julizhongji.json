@@ -1,0 +1,13 @@
+{
+  "gameId": "sb_julizhongji",
+  "name": "Greater Bash",
+  "description": "Passive Ability\nAttacks have a chance to stun and knockback the enemy and deal bonus damage.",
+  "cooldown": "",
+  "mana_cost": "",
+  "cast_range": "",
+  "ability_special": {
+    "per": "30 40 50",
+    "stun": "2",
+    "damage": "100 150 200"
+  }
+}

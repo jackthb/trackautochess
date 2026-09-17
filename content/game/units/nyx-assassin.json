@@ -20,7 +20,13 @@
       "zh-tw": "司夜刺客"
     },
     "attack_type": "melee",
-    "abilities": null,
+    "abilities": [
+      {
+        "id": "nyx_assassin_spiked_carapace_datadriven",
+        "name": "Spiked Carapace",
+        "description": "Active ability: Activates on Full Mana\nNyx Assassin takes his defensive form, reflects and negates damage dealt to him (max once from each source), as well as stunning the source of the damage."
+      }
+    ],
     "stats": {
       "1_star": {
         "hp": 950,

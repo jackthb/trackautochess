@@ -1,0 +1,13 @@
+{
+  "gameId": "gouhe",
+  "name": "Fissure",
+  "description": "Slams the ground with a mighty totem, creating an impassable ridge of stone. Enemy chess pieces along the line are stunned and knocked to the nearest vacant squares, and suffer physical damage.",
+  "cooldown": "10 8 6",
+  "mana_cost": "75",
+  "cast_range": "",
+  "ability_special": {
+    "duration": "6 8 12",
+    "stun": "2 3 4",
+    "damage": "100 200 400"
+  }
+}

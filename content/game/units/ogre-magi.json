@@ -19,7 +19,13 @@
       "zh-tw": "食人魔魔法師"
     },
     "attack_type": "melee",
-    "abilities": null,
+    "abilities": [
+      {
+        "id": "om_multi_cast_aura",
+        "name": "Multicast Aura",
+        "description": "Aura\n Grants all allies around: Have a chance to recast its ability and gain a bloodlust effect with bonus attack speed."
+      }
+    ],
     "stats": {
       "1_star": {
         "hp": 950,

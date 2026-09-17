@@ -1,0 +1,14 @@
+{
+  "gameId": "tidehunter_ravage",
+  "name": "Ravage",
+  "description": "Active ability: Activates on full mana\nSlams the ground, causing tentacles to erupt in all directions, damaging and stunning all nearby enemies within a 6-grid maximum range.",
+  "cooldown": "",
+  "mana_cost": "100",
+  "cast_range": "400 500 700",
+  "ability_special": {
+    "radius": "450 550 750",
+    "speed": "725",
+    "duration": "3 3.5 4.5",
+    "AbilityCooldown": "20 15 10"
+  }
+}

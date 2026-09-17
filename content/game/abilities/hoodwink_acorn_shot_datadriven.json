@@ -1,0 +1,13 @@
+{
+  "gameId": "hoodwink_acorn_shot_datadriven",
+  "name": "Acorn Shot",
+  "description": "Targeted Active ability: Activates instantly\nHoodwink attacked with an acorn at the target unit. The acorn bounces to nearby targets, bouncing it to several nearby threatening enemy chess pieces, dealing physical damage, and granting a 100% chance for probable effects of all allies’ synergy on its victims.",
+  "cooldown": "12 8 4",
+  "mana_cost": "0",
+  "cast_range": "9999",
+  "ability_special": {
+    "bounce_count": "2 3 4",
+    "damage": "50 75 100",
+    "duration": "3 5 7"
+  }
+}

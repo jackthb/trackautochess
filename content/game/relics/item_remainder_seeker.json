@@ -1,0 +1,28 @@
+{
+  "gameId": "item_remainder_seeker",
+  "name": "Serendipity Compass",
+  "slug": "serendipity-compass",
+  "source": {
+    "name": "Serendipity Compass",
+    "names": {
+      "en": "Serendipity Compass",
+      "ru": "Serendipity Compass",
+      "zh-cn": "寻幽罗盘",
+      "zh-tw": "尋幽羅盤"
+    },
+    "description": "Underused pieces are at lower prices.",
+    "descriptions": {
+      "en": "Underused pieces are at lower prices.",
+      "ru": "Неиспользуемые фигуры имеют более низкую цену.",
+      "zh-cn": "当你招募棋子时，可以以较低的价格购买冷门棋子（在本局游戏中当前使用率较低的棋子）。",
+      "zh-tw": "當妳招募棋子時，可以以較低的價格購買冷門棋子（在本局遊戲中當前使用率較低的棋子）。"
+    },
+    "lore": "",
+    "lore_i18n": {
+      "ru": "Из Relicbox",
+      "zh-cn": "来自：圣物宝箱",
+      "zh-tw": "來自：聖物寶箱"
+    }
+  },
+  "overrides": {}
+}

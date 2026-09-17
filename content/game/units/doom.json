@@ -19,7 +19,13 @@
       "zh-tw": "末日使者"
     },
     "attack_type": "melee",
-    "abilities": null,
+    "abilities": [
+      {
+        "id": "doom_bringer_doom",
+        "name": "Doom",
+        "description": "Targeted Active ability: Activates on full mana\nInflicts a curse that prevents an enemy chess piece from casting spells or using items or being healed, while taking damage over time."
+      }
+    ],
     "stats": {
       "1_star": {
         "hp": 1050,

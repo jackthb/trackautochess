@@ -19,7 +19,13 @@
       "zh-tw": "風行者"
     },
     "attack_type": "ranged",
-    "abilities": null,
+    "abilities": [
+      {
+        "id": "windrunner_shackleshot",
+        "name": "Shackleshot",
+        "description": "Targeted Active ability: Activates on full mana\nBind the target enemy chess piece to the enemy chess piece or tree directly behind it, causing them to bestunned."
+      }
+    ],
     "stats": {
       "1_star": {
         "hp": 550,

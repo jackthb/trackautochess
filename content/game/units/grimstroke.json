@@ -23,7 +23,7 @@
       {
         "id": "grimstroke_stroke_of_fate_lua",
         "name": "Stroke of Fate",
-        "description": "Battlecry ability (activates on battle). Grimstroke paints an ink trail, reducing the attack speed and mana regeneration of enemies on hit."
+        "description": "BATTLECRY ABILITY: Activates on battle\nGrimstroke paints an ink trail, reducing the attack speed and mana regeneration of enemies on hit."
       }
     ],
     "stats": {

@@ -19,7 +19,13 @@
       "zh-tw": "瓊英碧靈"
     },
     "attack_type": "ranged",
-    "abilities": null,
+    "abilities": [
+      {
+        "id": "muerta_pierce_the_veil",
+        "name": "Pierce the veil",
+        "description": "Passive Ability\nWhen Muerta attacks, she has a chance to shoot another target. \n\nActive ability: Activate when full mana\n Muerta enters the void form, immune to all physical damage, and gains attack power bonus And all her attack damage is magical damage."
+      }
+    ],
     "stats": {
       "1_star": {
         "hp": 600,

@@ -19,7 +19,13 @@
       "zh-tw": "巨魔戰將"
     },
     "attack_type": "ranged",
-    "abilities": null,
+    "abilities": [
+      {
+        "id": "troll_axe",
+        "name": "Berserkers Rage",
+        "description": "Passive Ability\nEach time the Troll Warlord hits an attack, there is a probability of launching Whirling Axes(Melee) or based on the distance from the target. Whirling Axes(remote), causing physical damage with 1 normal attack, and slow or blinding effect. \nWhen the Troll Warlord switches attack targets, he must launch a whirlwind axe."
+      }
+    ],
     "stats": {
       "1_star": {
         "hp": 1000,

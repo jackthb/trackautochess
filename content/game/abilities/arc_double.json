@@ -1,0 +1,11 @@
+{
+  "gameId": "arc_double",
+  "name": "Tempest Double",
+  "description": "Battle Cry Ability: Activates before the battle starts\nBriefly refocusing its fractured elements into a single form, the Arc Warden creates a perfect electrical duplication of itself.",
+  "cooldown": "",
+  "mana_cost": "0",
+  "cast_range": "",
+  "ability_special": {
+    "duration": "10 20 30"
+  }
+}

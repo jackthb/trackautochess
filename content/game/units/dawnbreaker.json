@@ -19,7 +19,13 @@
       "zh-tw": "破曉辰星"
     },
     "attack_type": "melee",
-    "abilities": null,
+    "abilities": [
+      {
+        "id": "dawnbreaker_fire_wreath",
+        "name": "Fire wreath",
+        "description": "Active ability: Activates on Full Mana\n Dawnbreaker whirls her hammer around 3 times, damaging enemies with her attack physical damage.On the final strike, she smashes her hammer down, stunning and damaging enemies in front of her. Stunning."
+      }
+    ],
     "stats": {
       "1_star": {
         "hp": 700,

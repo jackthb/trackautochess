@@ -15,7 +15,7 @@
       "en": "Knight pieces who have nearby allies will gain a Divine Protection shield immediately.\n\nClass Perk: Divine Protection\n Active when you have at least (N) different Knight pieces on board. (Multiple effects stack)\n\n(2) Knights: All friendly knights have a 25% chance to procure a shield every 3 seconds in combat for 3 seconds.\n(4) Knights: All allies have a +25% chance to procure a shield every 3 seconds in combat.\n(6) Knights: All allies have a +25% chance to procure a shield every 3 seconds in combat. Procing a shield instantly heals for 500.",
       "ru": "Рыцари, находящиеся рядом с союзниками, незамедлительно обретают щит Божественной Защиты.\n\nClass Perk: Divine Protection\n Active when you have at least (N) different Knight pieces on board. (Мульти-эффекты складываются)\n\n(2) Knights: Все рыцари имеют 25% шанс получить щит каждые 3 секунды в бою на 3 секунды.\n(4) Knights: Все союзники имеют +25% шанс получать щит каждые 3 секунды в бою.\n(6) Knights: Все союзники имеют шанс +25% Шанс получить щит каждые 3 секунды в бою. При получении щита моментально восстанавливает 500 здоровья.",
       "zh-cn": "有相邻骑士友军的骑士棋子在开始战斗后会立即开启一层王者祝福减伤护盾。\n\n职业技能：王者祝福\n 需要己方场上有至少（N）个不同的此职业的棋子来触发效果（触发的多层效果可以叠加）。\n\n（2）骑士：所有友方骑士每3秒有25%概率开启一层减伤护盾。\n（4）骑士：所有友军每3秒有25%概率开启一层减伤护盾。\n（6）骑士：所有友军每3秒有25%概率开启一层减伤护盾，开启任何一层减伤护盾的时候都会获得500点治疗。",
-      "zh-tw": "有相鄰騎士友軍的騎士棋子在開始戰鬥後會立即開啓一層王者祝福減傷護盾。\n\n職業技能：王者祝福\n 需要己方場上有至少（N）個不同的此職業的棋子來觸發效果（觸發的多層效果可以疊加）。\n\n（2）騎士：所有友方騎士每3秒有25%概率開啓一層減傷護盾。\n（4）騎士：所有友軍每3秒有25%概率開啓一層減傷護盾。\n（6）騎士：所有友軍每3秒有25%概率開啓一層減傷護盾，開啓任何一層減傷護盾的時候都會獲得500點治療。"
+      "zh-tw": "有相鄰騎士友軍的騎士棋子在開始戰鬥後會立即開啓壹層王者祝福減傷護盾。\n\n職業技能：王者祝福\n 需要己方場上有至少（N）個不同的此職業的棋子來觸發效果（觸發的多層效果可以疊加）。\n\n（2）騎士：所有友方騎士每3秒有25%概率開啓壹層減傷護盾。\n（4）騎士：所有友軍每3秒有25%概率開啓壹層減傷護盾。\n（6）騎士：所有友軍每3秒有25%概率開啓壹層減傷護盾，開啓任何壹層減傷護盾的時候都會獲得500點治療。"
     },
     "description_html": "Knight pieces who have nearby allies will gain a Divine Protection shield immediately.\n<h1>Class Perk: Divine Protection</h1> <font color=\"#656585\">Active when you have at least (N) different Knight pieces on board. (Multiple effects stack)</font><br><br>(2) Knights: All friendly knights have a 25% chance to procure a shield every 3 seconds in combat for 3 seconds.<br>(4) Knights: All allies have a +25% chance to procure a shield every 3 seconds in combat.<br>(6) Knights: All allies have a +25% chance to procure a shield every 3 seconds in combat. Procing a shield instantly heals for 500.",
     "lore": "Knights are respected defenders of the realm. As they engage in battle, the Omniscience may bless them with a divine shield.",
@@ -23,7 +23,7 @@
       "en": "Knights are respected defenders of the realm. As they engage in battle, the Omniscience may bless them with a divine shield.",
       "ru": "Рыцари — уважаемые защитники королевства. В бою Всеведущее может благословить их божественным щитом.",
       "zh-cn": "骑士的天职：匡扶弱小，伸张正义，消灭来自世界最黑暗角落的邪恶力量。这些神圣的战士们身着板甲，以对抗最强大的敌人。",
-      "zh-tw": "騎士的天職：匡扶弱小，伸張正義，消滅來自世界最黑暗角落的邪惡力量。這些神聖的戰士們身着板甲，以對抗最強大的敵人。"
+      "zh-tw": "騎士的天職：匡扶弱小，伸張正義，消滅來自世界最黑暗角落的邪惡力量。這些神聖的戰士們身著板甲，以對抗最強大的敵人。"
     },
     "notes": [
       "A Divine Protection shield reduces incoming physical and magical damage by 50%. Does not work on pure damage.",

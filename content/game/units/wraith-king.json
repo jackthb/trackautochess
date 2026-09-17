@@ -19,7 +19,13 @@
       "zh-tw": "冥魂大帝"
     },
     "attack_type": "melee",
-    "abilities": null,
+    "abilities": [
+      {
+        "id": "skeletonking_reincarnation",
+        "name": "Reincarnation",
+        "description": "Aura\nGrants deathrattle to all nearby allies whose level is no more than Wraith King: Reincarnation once directly on death."
+      }
+    ],
     "stats": {
       "1_star": {
         "hp": 1300,

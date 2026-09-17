@@ -1,0 +1,14 @@
+{
+  "gameId": "mk_ruyibangfa",
+  "name": "Jingu Mastery",
+  "description": "Passive Ability\nAlways sensitive to the moods of its master, the Jingu Bang radiates power when Monkey Kings combat fervor is on full display. Monkey Kings attacks awaken the Jingu Bangs power. Upon the fourth hit of his attack, Monkey King unleashes Boundless Strike, causes critical damage and stun based on normal attacks to enemy pieces in a straight line.",
+  "cooldown": "",
+  "mana_cost": "",
+  "cast_range": "",
+  "ability_special": {
+    "attack_count": "5 4 3",
+    "stun_duration": "1 1.5 2",
+    "damage_multiple": "150 175 200",
+    "damage_range": "1200"
+  }
+}

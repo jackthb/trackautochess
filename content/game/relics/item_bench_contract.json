@@ -10,12 +10,12 @@
       "zh-cn": "魔法种子",
       "zh-tw": "魔法種子"
     },
-    "description": "Fill your bench with magic vegetable sprouts. The sell value of these sprouts has a dynamic chance to increase by 1 at the beginning of every round. You can sell the sprouts any time to reuse the bench.",
+    "description": "Fill your bench with magic vegetable sprouts. The sell value of these sprouts has a dynamic chance to increase at the beginning of every round. You can sell the sprouts any time to reuse the bench.",
     "descriptions": {
-      "en": "Fill your bench with magic vegetable sprouts. The sell value of these sprouts has a dynamic chance to increase by 1 at the beginning of every round. You can sell the sprouts any time to reuse the bench.",
-      "ru": "Заполните скамейку магическими репками. В начале каждого раунда существует шанс увеличить стоимость продажи каждого ростка на 1. Ростки можно продать в любой момент, чтобы освободить место на скамейке.",
-      "zh-cn": "用菜苗填满你的等待席，回合开始时每颗菜的出售价值都有概率+1。你可以随时出售它们而启用等待席。",
-      "zh-tw": "用菜苗填滿你的等待席，回合開始時每顆菜的出售價值都有概率+1。你可以隨時出售它們而啓用等待席。"
+      "en": "Fill your bench with magic vegetable sprouts. The sell value of these sprouts has a dynamic chance to increase at the beginning of every round. You can sell the sprouts any time to reuse the bench.",
+      "ru": "Заполните свою скамью магическими ростками овощей. Стоимость продажи этих ростков имеет динамический шанс увеличиться в начале каждого раунда. Вы можете продать ростки в любое время, чтобы освободить скамью для повторного использования.",
+      "zh-cn": "用菜苗填满你的等待席，回合开始时每颗菜的出售价值都有概率提高。你可以随时出售它们而启用等待席。",
+      "zh-tw": "用菜苗填滿妳的等待席，回合開始時每顆菜的出售價值都有概率提高。妳可以隨時出售它們而啓用等待席。"
     },
     "lore": "",
     "lore_i18n": {

@@ -1,0 +1,23 @@
+{
+  "gameId": "brewmaster_cinder_brew",
+  "name": "Cinder Brew",
+  "description": "Active ability: Activates on Full Mana\nDrenches an area in alcohol, causing enemy chess pieces within the area to lose some of their attacks. Taking spell damage causes affected enemies to ignite and extends the duration of igition on the enemies.",
+  "cooldown": "12 10 8",
+  "mana_cost": "100",
+  "cast_range": "9999",
+  "ability_special": {
+    "duration": "5",
+    "total_ignite_damage": "100 150 200",
+    "movement_slow": "30",
+    "radius": "300 400 500",
+    "extra_duration": "3 4 5",
+    "projectile_speed": "1600",
+    "projectile_width": "250",
+    "barrel_width": "0",
+    "barrel_impact_damage": "0",
+    "AbilityCastRange": "700",
+    "min_movement": "0",
+    "max_movement": "0",
+    "miss_per": "30 50 70"
+  }
+}

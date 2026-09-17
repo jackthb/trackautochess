@@ -1,0 +1,17 @@
+{
+  "gameId": "batrider_firefly",
+  "name": "Firefly",
+  "description": "Active ability: Activates on Full Mana\nBatrider flis towards the farthest cell which allows him to attack an enemy, laying down a trail of flames from the air. The fire damages any enemies it touches, causing damage over time.",
+  "cooldown": "15 12 9",
+  "mana_cost": "100",
+  "cast_range": "",
+  "ability_special": {
+    "damage_per_second": "50 75 100",
+    "movement_speed": "0",
+    "radius": "200",
+    "duration": "10",
+    "tick_interval": "0.5",
+    "tree_radius": "200 200 200",
+    "bonus_vision": "100 200 300"
+  }
+}

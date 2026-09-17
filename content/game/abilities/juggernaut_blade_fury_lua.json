@@ -1,0 +1,15 @@
+{
+  "gameId": "juggernaut_blade_fury_lua",
+  "name": "Blade Fury",
+  "description": "Active ability: Activates on Full Mana\nCauses a bladestorm of destructive force around Juggernaut, dealing damage to nearby enemies within 2 grids. magical damage.\nDuring the spin the Juggernaut gets 80% Magical Resistance.As Juggernauts attack speed increases, the interval between the damages of Blade Fury decreases.",
+  "cooldown": "12 10 8",
+  "mana_cost": "100",
+  "cast_range": "",
+  "ability_special": {
+    "blade_fury_damage_tick": "0.55",
+    "blade_fury_radius": "250",
+    "blade_fury_damage": "60 100 140",
+    "duration": "5.0",
+    "magic_ass": "80"
+  }
+}

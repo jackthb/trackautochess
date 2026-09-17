@@ -1,0 +1,13 @@
+{
+  "gameId": "sleight_of_fist_datadriven",
+  "name": "Sleight of Fist",
+  "description": "Active ability: Activates on Full Mana\nEmber Spirit dashes around with blazing speed, attacking all enemies in the targeted area of effect, then returning to his start location. Each attack deals bonus physical damage.\nKilling an enemy chess piece instantly resets the cooldown of Sleight of Fist.",
+  "cooldown": "6 5 4",
+  "mana_cost": "100",
+  "cast_range": "9999",
+  "ability_special": {
+    "radius": "300 350 400",
+    "bonus_hero_damage": "100 200 300",
+    "attack_interval": "0.2"
+  }
+}

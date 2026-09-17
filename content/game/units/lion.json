@@ -19,7 +19,13 @@
       "zh-tw": "惡魔巫師"
     },
     "attack_type": "ranged",
-    "abilities": null,
+    "abilities": [
+      {
+        "id": "lion_finger_of_death",
+        "name": "Finger of Death",
+        "description": "Active ability: Activates on full mana\nTear into an enemy, inflicting a substantial amount of pure damage. For each stack of the Fel Power effect, it will deal additional pure damage"
+      }
+    ],
     "stats": {
       "1_star": {
         "hp": 750,

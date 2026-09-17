@@ -1,0 +1,27 @@
+{
+  "gameId": "dawnbreaker_fire_wreath",
+  "name": "Fire wreath",
+  "description": "Active ability: Activates on Full Mana\n Dawnbreaker whirls her hammer around 3 times, damaging enemies with her attack physical damage.On the final strike, she smashes her hammer down, stunning and damaging enemies in front of her. Stunning.",
+  "cooldown": "10 8 6",
+  "mana_cost": "100",
+  "cast_range": "9999",
+  "ability_special": {
+    "AbilityCooldown": "10 8 6",
+    "duration": "1.1",
+    "swipe_radius": "210",
+    "swipe_damage": "15 30 45",
+    "smash_radius": "210 210 260",
+    "smash_damage": "100 150 200",
+    "movement_speed": "215",
+    "total_attacks": "3",
+    "smash_stun_duration": "0.5 1 1.5",
+    "sweep_stun_duration": "0.12",
+    "self_stun_duration": "0.2",
+    "swipe_slow": "-100",
+    "smash_distance_from_hero": "120",
+    "animation_rate": "0",
+    "turn_rate": "90",
+    "shard_cast_point": "0.1",
+    "shard_movement_penalty": "0"
+  }
+}

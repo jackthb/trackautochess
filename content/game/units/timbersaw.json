@@ -19,7 +19,13 @@
       "zh-tw": "伐木機"
     },
     "attack_type": "melee",
-    "abilities": null,
+    "abilities": [
+      {
+        "id": "shredder_whirling_death",
+        "name": "Whirling Death",
+        "description": "Active ability: Activates on full mana\nTimbersaw whirls extremely sharp edges, damaging enemies within 2 grids."
+      }
+    ],
     "stats": {
       "1_star": {
         "hp": 750,

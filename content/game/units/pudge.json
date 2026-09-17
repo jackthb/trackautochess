@@ -19,7 +19,13 @@
       "zh-tw": "屠夫"
     },
     "attack_type": "melee",
-    "abilities": null,
+    "abilities": [
+      {
+        "id": "pudge_meat_hook_lua",
+        "name": "Meat Hook",
+        "description": "Targeted Active ability: Activates instantly\nLaunches a bloody hook toward the farthest enemy, dragging it back to Pudge and dealing pure damage, and alias will prioritize attacking this target."
+      }
+    ],
     "stats": {
       "1_star": {
         "hp": 1100,

@@ -1,0 +1,14 @@
+{
+  "gameId": "lion_voodoo",
+  "name": "Croak!",
+  "description": "Targeted Active ability: Activates on Full Mana\nTransform an enemy into a harmless creature, disabling their attacks, abilities and items.",
+  "cooldown": "8 6 4",
+  "mana_cost": "75",
+  "cast_range": "9999",
+  "ability_special": {
+    "AbilityCooldown": "8 6 4",
+    "duration": "4 4 5",
+    "movespeed": "120",
+    "radius": "0"
+  }
+}

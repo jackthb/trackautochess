@@ -19,7 +19,13 @@
       "zh-tw": "祈求者"
     },
     "attack_type": "ranged",
-    "abilities": null,
+    "abilities": [
+      {
+        "id": "invoke",
+        "name": "Invoke",
+        "description": "Passive Ability\nSummons three random elemental essences and fuses them into an invocation spell for the supplicant to cast. Each time the skill is cast, three random elemental essences are re-summoned and merged into another invocation spell.\n\nInvocation Spell List\n E.M.P., Forge Spirit, Alacrity, Deafening Blast, Sun Strike, Chaos Meteor, Ice Wall"
+      }
+    ],
     "stats": {
       "1_star": {
         "hp": 900,

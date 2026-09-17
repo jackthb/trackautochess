@@ -1,0 +1,15 @@
+{
+  "gameId": "bane_fiends_grip",
+  "name": "Fiends Grip",
+  "description": "Active Skill: Activates at Full Mana\nChanneling Spell: Grabs a random enemy chess piece, rendering it unable to act and dealing pure damage.",
+  "cooldown": "6",
+  "mana_cost": "100",
+  "cast_range": "9999",
+  "ability_special": {
+    "fiend_grip_tick_interval": "0.5",
+    "fiend_grip_mana_drain": "0",
+    "AbilityChannelTime": "3 5 7",
+    "fiend_grip_damage": "75 100 125",
+    "AbilityCooldown": "6"
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "gameId": "br_web_new",
+  "name": "Silken Bola",
+  "description": "Passive Ability\nThe Broodmother will often entangle the nearest target, making it unable to move and causing attacks to miss. The target will suffer additional magical damage when attacked. If the target dies, a small spider will hatch.",
+  "cooldown": "5 4 3",
+  "mana_cost": "0",
+  "cast_range": "",
+  "ability_special": {
+    "duration": "6",
+    "projectile_speed": "1200",
+    "impact_damage": "50 75 100",
+    "attack_damage": "10 20 30",
+    "miss_chance": "40 60 80"
+  }
+}

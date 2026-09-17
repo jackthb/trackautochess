@@ -1,0 +1,14 @@
+{
+  "gameId": "axe_berserkers_call",
+  "name": "Berserkers Call",
+  "description": "Active ability: Activates on full mana\nAxe taunts enemies within 1 grid, forcing them to attack him, while he gains bonus armor during the duration.",
+  "cooldown": "8",
+  "mana_cost": "100",
+  "cast_range": "9999",
+  "ability_special": {
+    "radius": "192",
+    "bonus_armor": "10 15 25",
+    "duration": "4 6 8",
+    "bonus_attack_speed": "0"
+  }
+}

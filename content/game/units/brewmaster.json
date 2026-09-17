@@ -19,7 +19,13 @@
       "zh-tw": "熊貓酒仙"
     },
     "attack_type": "melee",
-    "abilities": null,
+    "abilities": [
+      {
+        "id": "brewmaster_cinder_brew",
+        "name": "Cinder Brew",
+        "description": "Active ability: Activates on Full Mana\nDrenches an area in alcohol, causing enemy chess pieces within the area to lose some of their attacks. Taking spell damage causes affected enemies to ignite and extends the duration of igition on the enemies."
+      }
+    ],
     "stats": {
       "1_star": {
         "hp": 600,

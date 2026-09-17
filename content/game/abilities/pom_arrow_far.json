@@ -1,0 +1,15 @@
+{
+  "gameId": "pom_arrow_far",
+  "name": "Sacred Arrow",
+  "description": "Active ability: Activates on Full Mana\nFires a long-range arrow with deadly precision to an enemy chess in another chessboard currently under attack/defense from friendly chess pieces, dealing damage and stun to the target. Damage and stun duration increase with range.",
+  "cooldown": "10 9 8",
+  "mana_cost": "100",
+  "cast_range": "99999",
+  "ability_special": {
+    "min_damage": "100 150 250",
+    "min_stun": "1 1.5 2.5",
+    "max_damage": "300 450 750",
+    "max_stun": "3 4.5 7.5",
+    "max_distance": "1267"
+  }
+}

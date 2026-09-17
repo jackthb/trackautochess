@@ -20,7 +20,13 @@
       "zh-tw": "禍亂之源"
     },
     "attack_type": "ranged",
-    "abilities": null,
+    "abilities": [
+      {
+        "id": "bane_fiends_grip",
+        "name": "Fiends Grip",
+        "description": "Active Skill: Activates at Full Mana\nChanneling Spell: Grabs a random enemy chess piece, rendering it unable to act and dealing pure damage."
+      }
+    ],
     "stats": {
       "1_star": {
         "hp": 550,

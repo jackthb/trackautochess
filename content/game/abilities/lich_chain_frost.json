@@ -1,0 +1,23 @@
+{
+  "gameId": "lich_chain_frost",
+  "name": "Chain Frost",
+  "description": "Targeted Active ability: Activates on Full Mana\nReleases an orb of frost that bounces between nearby enemy units, slowing and dealing magical damage each time it hits.",
+  "cooldown": "8 7 6",
+  "mana_cost": "100",
+  "cast_range": "9999",
+  "ability_special": {
+    "damage": "75 125 175",
+    "bonus_jump_damage": "25",
+    "jumps": "3 4 6",
+    "jump_range": "300",
+    "slow_movement_speed": "-50",
+    "slow_attack_speed": "-50",
+    "slow_duration": "3 4 5",
+    "initial_projectile_speed": "1050",
+    "projectile_speed": "800",
+    "vision_radius": "800",
+    "bonus_jumps_per_hero_killed": "0",
+    "bonus_jumps_per_creep_killed": "0",
+    "frostbound_duration": "0"
+  }
+}

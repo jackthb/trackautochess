@@ -1,0 +1,12 @@
+{
+  "gameId": "spe_haunt",
+  "name": "Haunt",
+  "description": "Active ability: Activate on full mana\nCreates a spectral nemesis behind every enemy chess piece to attack them. Spectre and her haunts always attack with Desolate effect to targets that do not have allies around them.",
+  "cooldown": "20 15 10",
+  "mana_cost": "100",
+  "cast_range": "0",
+  "ability_special": {
+    "duration": "4 5 6",
+    "max_count": "3 4 6"
+  }
+}

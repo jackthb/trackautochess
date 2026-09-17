@@ -1,0 +1,14 @@
+{
+  "gameId": "om_multi_cast_aura",
+  "name": "Multicast Aura",
+  "description": "Aura\n Grants all allies around: Have a chance to recast its ability and gain a bloodlust effect with bonus attack speed.",
+  "cooldown": "",
+  "mana_cost": "0",
+  "cast_range": "350 450 550",
+  "ability_special": {
+    "radius": "350 450 550",
+    "multi_per": "30 35 40",
+    "attack_speed_bonus": "20 30 40",
+    "bloodlust_duration": "10"
+  }
+}

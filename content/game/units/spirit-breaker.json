@@ -19,7 +19,13 @@
       "zh-tw": "裂魂人"
     },
     "attack_type": "melee",
-    "abilities": null,
+    "abilities": [
+      {
+        "id": "sb_julizhongji",
+        "name": "Greater Bash",
+        "description": "Passive Ability\nAttacks have a chance to stun and knockback the enemy and deal bonus damage."
+      }
+    ],
     "stats": {
       "1_star": {
         "hp": 600,

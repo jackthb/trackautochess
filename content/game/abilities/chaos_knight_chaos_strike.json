@@ -1,0 +1,16 @@
+{
+  "gameId": "chaos_knight_chaos_strike",
+  "name": "Chaos Strike",
+  "description": "Passive Ability\nChaos Knights attacks have a chance to deal a critical strike of varying strength, in addition to a lifesteal for percentage of the damage.",
+  "cooldown": "",
+  "mana_cost": "",
+  "cast_range": "",
+  "ability_special": {
+    "chance": "20",
+    "crit_min": "125",
+    "crit_max": "150 200 250",
+    "lifesteal": "20",
+    "creep_multiplier": "1.0",
+    "creep_lifesteal_reduction_pct": "70"
+  }
+}

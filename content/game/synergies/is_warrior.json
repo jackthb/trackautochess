@@ -15,13 +15,13 @@
       "en": "Warriors have a double bonus from Fortified Armor while below 50% health.\n\nClass Perk: Fortified Armor\n Active when you have at least (N) different Warrior pieces on board. (Multiple effects stack) \n\n(3) Warriors: All friendly warriors have +3 armour.\n(6) Warriors: All friendly warriors have +12 armour.\n(9) Warriors: Reflect pure damage equivalent to (1.5x current armour) when taking physical and magical damage.",
       "ru": "Бонус Воинов удваивается, если здоровье ниже 50%.\n\nClass Perk: Fortified Armor\n Активен, когда хотя бы (N) разных Воинов на доске. (Эффекты складываются) \n\n(3) Warrior: Все союзные войны получают +3 брони.\n(6) Warrior: Все союзные войны получают +12 брони.\n(9) Warrior: Отражаeт чистый урон, эквивалентный (в 1,5 раза больше текущей брони) при получении физического и магического урона.",
       "zh-cn": "战士棋子在生命值低于50%的时候铜皮铁甲的效果翻倍。\n\n职业技能：铜皮铁甲\n 需要己方场上有至少（N）个不同的此职业的棋子来触发效果（触发的多层效果可以叠加）。\n\n（3）战士：所有友方战士的护甲+3。\n（6）战士：所有友方战士的护甲+12。\n（9）战士：所有友军获得效果：受到物理或魔法伤害时会反弹（当前护甲×1.5）点纯粹伤害。",
-      "zh-tw": "戰士棋子在生命值低於50%的時候銅皮鐵甲的效果翻倍。\n\n職業技能：銅皮鐵甲\n 需要己方場上有至少（N）個不同的此職業的棋子來觸發效果（觸發的多層效果可以疊加）。\n\n（3）戰士：所有友方戰士的護甲+3。\n（6）戰士：所有友方戰士的護甲+12。\n（9）戰士：所有友軍獲得效果：受到物理或魔法傷害時會反彈（當前護甲×1.5）點純粹傷害。"
+      "zh-tw": "戰士棋子在生命值低于50%的時候銅皮鐵甲的效果翻倍。\n\n職業技能：銅皮鐵甲\n 需要己方場上有至少（N）個不同的此職業的棋子來觸發效果（觸發的多層效果可以疊加）。\n\n（3）戰士：所有友方戰士的護甲+3。\n（6）戰士：所有友方戰士的護甲+12。\n（9）戰士：所有友軍獲得效果：受到物理或魔法傷害時會反彈（當前護甲×1.5）點純粹傷害。"
     },
     "description_html": "Warriors have a double bonus from Fortified Armor while below 50% health.\n<h1>Class Perk: Fortified Armor</h1><font color=\"#656585\">Active when you have at least (N) different Warrior pieces on board. (Multiple effects stack) </font><br><br>(3) Warriors: All friendly warriors have +3 armour.<br>(6) Warriors: All friendly warriors have +12 armour.<br>(9) Warriors: Reflect pure damage equivalent to (1.5x current armour) when taking physical and magical damage.",
     "lore": "",
     "lore_i18n": {
       "zh-cn": "战士将力量、领导才能和对武器盔甲的了解结合在一起，在光荣的战斗中一展身手。",
-      "zh-tw": "戰士將力量、領導才能和對武器盔甲的瞭解結合在一起，在光榮的戰鬥中一展身手。"
+      "zh-tw": "戰士將力量、領導才能和對武器盔甲的了解結合在壹起，在光榮的戰鬥中壹展身手。"
     },
     "notes": [],
     "tiers": [

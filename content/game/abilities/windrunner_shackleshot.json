@@ -1,0 +1,17 @@
+{
+  "gameId": "windrunner_shackleshot",
+  "name": "Shackleshot",
+  "description": "Targeted Active ability: Activates on full mana\nBind the target enemy chess piece to the enemy chess piece or tree directly behind it, causing them to bestunned.",
+  "cooldown": "",
+  "mana_cost": "100",
+  "cast_range": "9999",
+  "ability_special": {
+    "AbilityCooldown": "12 9 6",
+    "fail_stun_duration": "1",
+    "stun_duration": "3 4 4",
+    "shackle_distance": "600 800 1000",
+    "arrow_speed": "1600",
+    "shackle_count": "1 1 2",
+    "shackle_angle": "30"
+  }
+}

@@ -19,7 +19,13 @@
       "zh-tw": "暗影薩滿"
     },
     "attack_type": "ranged",
-    "abilities": null,
+    "abilities": [
+      {
+        "id": "lion_voodoo",
+        "name": "Croak!",
+        "description": "Targeted Active ability: Activates on Full Mana\nTransform an enemy into a harmless creature, disabling their attacks, abilities and items."
+      }
+    ],
     "stats": {
       "1_star": {
         "hp": 550,

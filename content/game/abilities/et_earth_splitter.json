@@ -1,0 +1,14 @@
+{
+  "gameId": "et_earth_splitter",
+  "name": "Earth Splitter",
+  "description": "Active ability: Activates on Full Mana\nSends forth a jagged crack in front of Elder Titan. After 3 seconds, the crack implodes, stunning while dealing damage to each enemy based on their maximum life. Half of the damage dealt is Magical damage, while the other half is Physical damage.",
+  "cooldown": "60",
+  "mana_cost": "100",
+  "cast_range": "9999",
+  "ability_special": {
+    "duration": "1.0 1.5 2.0",
+    "damage_base": "20 25 30",
+    "damage_per": "3 4 6",
+    "radius": "250"
+  }
+}

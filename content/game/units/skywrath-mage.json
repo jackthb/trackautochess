@@ -19,7 +19,13 @@
       "zh-tw": "天怒法師"
     },
     "attack_type": "ranged",
-    "abilities": null,
+    "abilities": [
+      {
+        "id": "skywrath_mage_arcane_bolt_container",
+        "name": "Arcane Bolt",
+        "description": "Targeted active ability: Activate on ally skill cast\n Whenever an allied piece casts a skill, the Stormrage Mage will immediately cast a slow-moving Arcane Bolt swarm at the enemy, dealing magic damage to the target."
+      }
+    ],
     "stats": {
       "1_star": {
         "hp": 550,

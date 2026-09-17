@@ -1,0 +1,19 @@
+{
+  "gameId": "razor_plasma_field",
+  "name": "Plasma Field",
+  "description": "Active ability: Activates on full mana\nReleases a wave of energetic plasma that grows in power as it expands, but also zaps on contraction, dealing damage to enemy units caught in its path. Damage and slow increase with distance from Razor. The Plasma Field hits each unit twice, once in each direction.",
+  "cooldown": "10 8 6",
+  "mana_cost": "75",
+  "cast_range": "9999",
+  "ability_special": {
+    "damage_min": "10",
+    "damage_max": "150 200 250",
+    "radius": "450",
+    "total_ability_time": "2.2",
+    "slow_min": "5",
+    "slow_max": "10 15 25",
+    "slow_duration": "1.5",
+    "second_ring_delay": "0",
+    "second_ring_reduction": "0"
+  }
+}

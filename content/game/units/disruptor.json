@@ -16,10 +16,16 @@
       "ko": "디스럽터",
       "ru": "Disruptor",
       "zh-cn": "干扰者",
-      "zh-tw": "干擾者"
+      "zh-tw": "幹擾者"
     },
     "attack_type": "ranged",
-    "abilities": null,
+    "abilities": [
+      {
+        "id": "ability_disruptor_static_storm",
+        "name": "Static Storm",
+        "description": "Active ability: Activates on Full Mana\nCreates a damaging static storm that also silences all enemy chess pieces in the area for the duration. The damage starts off weak, but increases in power over the duration."
+      }
+    ],
     "stats": {
       "1_star": {
         "hp": 1000,

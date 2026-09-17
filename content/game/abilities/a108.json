@@ -1,0 +1,12 @@
+{
+  "gameId": "a108",
+  "name": "Heat Seeking Missile",
+  "description": "Active ability: Activates on Full Mana\nLaunches 3 3 4 rockets to strike random enemy chess pieces.",
+  "cooldown": "6 4 3",
+  "mana_cost": "100",
+  "cast_range": "",
+  "ability_special": {
+    "damage_per_missile": "250 300 350",
+    "missile_count": "3 3 4"
+  }
+}

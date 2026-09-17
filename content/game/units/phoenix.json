@@ -19,7 +19,13 @@
       "zh-tw": "鳳凰"
     },
     "attack_type": "ranged",
-    "abilities": null,
+    "abilities": [
+      {
+        "id": "phoenix_sun_ray",
+        "name": "Sun Ray",
+        "description": "Active Ability: Activate Instant\nPhoenix expels a beam of light at the cost of its own health. The beam damages enemies and heals allies for a base amount plus a percentage of their health. The percentage increases as the beam continues to fire."
+      }
+    ],
     "stats": {
       "1_star": {
         "hp": 850,

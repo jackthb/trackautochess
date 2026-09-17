@@ -15,7 +15,7 @@
       "en": "Counts as a different enemy Demon type.\n\nCLASS PERK: Shuttered Soul\n Active when you have at least (N) different Demon Hunter pieces on board. (Multiple effects stack)\n(2) Demon Hunters: All friendly demons are considered the same type.\n(4) Demon Hunters: All damage dealt is settled as Pure Damage.",
       "ru": "Считается как демон для противника.\n\nCLASS PERK: Shuttered Soul\n Активно когда у вас есть (N) разных Demon Hunter на столе. (Эффекты складываются)\n(2) Demon Hunters: Все союзные демоны считаются одним типом. \n(4) Demon Hunters: Весь урон становится Чистым Уроном.",
       "zh-cn": "恶魔猎手棋子会被同时视为敌方恶魔。\n\n职业技能：破碎灵魂\n 需要己方场上有至少（N）个不同的此职业的棋子来触发效果（触发的多层效果可以叠加）。\n\n（2）恶魔猎手：所有友方恶魔棋子都视为同一种类。\n（4）恶魔猎手：友方棋子造成的所有伤害都结算为纯粹伤害。",
-      "zh-tw": "惡魔獵手棋子會被同時視爲敵方惡魔。\n\n職業技能：破碎靈魂\n 需要己方場上有至少（N）個不同的此職業的棋子來觸發效果（觸發的多層效果可以疊加）。\n\n（2）惡魔獵手：所有友方惡魔棋子都視爲同一種類。\n（4）惡魔獵手：友方棋子造成的所有傷害都結算爲純粹傷害。"
+      "zh-tw": "惡魔獵手棋子會被同時視爲敵方惡魔。\n\n職業技能：破碎靈魂\n 需要己方場上有至少（N）個不同的此職業的棋子來觸發效果（觸發的多層效果可以疊加）。\n\n（2）惡魔獵手：所有友方惡魔棋子都視爲同壹種類。\n（4）惡魔獵手：友方棋子造成的所有傷害都結算爲純粹傷害。"
     },
     "description_html": "Counts as a different enemy Demon type.\n<h1>CLASS PERK: Shuttered Soul</h1><font color=\"#656585\">Active when you have at least (N) different Demon Hunter pieces on board. (Multiple effects stack)</font><br>(2) Demon Hunters: All friendly demons are considered the same type.<br>(4) Demon Hunters: All damage dealt is settled as Pure Damage.",
     "lore": "Demon hunters ritually trade their normal form in exchange for the mastery of demonic powers that enables them to deliver devastating strikes to their prey. This enhanced strength, together with their great agility and magical prowess, makes demon hunters unsuppressible.",
@@ -23,7 +23,7 @@
       "en": "Demon hunters ritually trade their normal form in exchange for the mastery of demonic powers that enables them to deliver devastating strikes to their prey. This enhanced strength, together with their great agility and magical prowess, makes demon hunters unsuppressible.",
       "ru": "Охотники на демонов ритуально отказываются от своего обычного облика в обмен на владение демоническими силами, которые позволяют им наносить сокрушительные удары по своей жертве. Благодаря этой невероятной силе, а также ловкости и магическому мастерству охотники на демонов непобедимы.",
       "zh-cn": "伊利达雷自愿接受了邪能和混乱魔法，正是这样的能量长期威胁着多多岛，但他们相信这是抗击敌人所必需的。",
-      "zh-tw": "伊利達雷自願接受了邪能和混亂魔法，正是這樣的能量長期威脅着多多島，但他們相信這是抗擊敵人所必需的。"
+      "zh-tw": "伊利達雷自願接受了邪能和混亂魔法，正是這樣的能量長期威脅著多多島，但他們相信這是抗擊敵人所必需的。"
     },
     "notes": [],
     "tiers": [

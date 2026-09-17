@@ -1,0 +1,13 @@
+{
+  "gameId": "tb_mohua_new",
+  "name": "Metamorphosis",
+  "description": "Active ability: Activate on Full Mana\nTerrorblade transforms into a powerful demonic form with a ranged attack, removing most of the status effects from himself. Rank 2 or higher Terrorblade also transforms his nearest ally into a demon with a rank equal to the transformed chess piece(no higher than the rank of Terrorblade).",
+  "cooldown": "60",
+  "mana_cost": "100",
+  "cast_range": "",
+  "ability_special": {
+    "mohua_friend_count": "0 1 2",
+    "mohua_tb_hp": "700 1400 2800",
+    "mohua_tb_ad": "80 160 320"
+  }
+}

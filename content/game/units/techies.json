@@ -19,7 +19,13 @@
       "zh-tw": "地精工程師"
     },
     "attack_type": "ranged",
-    "abilities": null,
+    "abilities": [
+      {
+        "id": "chess_tech_bomb",
+        "name": "Explosive Bomb",
+        "description": "Active ability: Activates on Full Mana\nPlant an explosive that automatically detonates after a brief delay, dealing massive physical damage to enemies within a range of 4-grid radius."
+      }
+    ],
     "stats": {
       "1_star": {
         "hp": 1000,

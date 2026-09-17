@@ -1,0 +1,21 @@
+{
+  "gameId": "ringmaster_spotlight",
+  "name": "Spotlight",
+  "description": "Active Ability: Instant\nRingmaster shines a spotlight that sweeps an area. Enemies in the light have a chance to miss their attacks and are revealed if invisible. Non-permanent pieces and illusion pieces hit by the beam will fade away, by taking a Pure damage equal to a percentage of their health each second.",
+  "cooldown": "12 10 8",
+  "mana_cost": "0",
+  "cast_range": "1500",
+  "ability_special": {
+    "radius": "250 350 500",
+    "illusion_percent_damage": "8 12 16",
+    "pulse_interval": "0.1",
+    "duration": "8",
+    "miss_chance": "40 60 80",
+    "initial_speed": "3000",
+    "sweep_speed": "0.75",
+    "sweep_radius": "250 350 500",
+    "linger_duration": "0.3",
+    "spotlight_count": "3",
+    "start_offset": "0"
+  }
+}

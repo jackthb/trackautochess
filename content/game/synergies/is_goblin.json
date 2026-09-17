@@ -15,7 +15,7 @@
       "en": "Species Perk: Nanobots\n Active when you have at least (N) different goblin pieces on board. (Multiple effects stack) \n\n(3)Goblins: Grants a random melee ally +10 armour and +20 health regeneration.\n(6)Goblins: Grants all allies +10 armor and +20 health regeneration.",
       "ru": "Species Perk: Nanobots\n Активна, когда минимум (N) разных Goblin на столе.(Эффекты складываются) \n\n(3)Goblins: Даёт случайному союзнику ближнего боя +10 брони и +20 восстановления здоровья.\n(6)Goblins: Даёт всем союзникам +10 брони и +20 восстановления здоровья.",
       "zh-cn": "种族技能：活体装甲\n 需要己方场上有至少（N）个不同的此种族的棋子来触发效果（触发的多层效果可以叠加）。\n\n（3）地精：使一个随机近战友军的护甲+10，生命回复+20。\n（6）地精：使所有友军护甲+10，生命回复+20。",
-      "zh-tw": "種族技能：活體裝甲\n 需要己方場上有至少（N）個不同的此種族的棋子來觸發效果（觸發的多層效果可以疊加）。\n\n（3）地精：使一個隨機近戰友軍的護甲+10，生命回覆+20。\n（6）地精：使所有友軍護甲+10，生命回覆+20。"
+      "zh-tw": "種族技能：活體裝甲\n 需要己方場上有至少（N）個不同的此種族的棋子來觸發效果（觸發的多層效果可以疊加）。\n\n（3）地精：使壹個隨機近戰友軍的護甲+10，生命回複+20。\n（6）地精：使所有友軍護甲+10，生命回複+20。"
     },
     "description_html": "<h1>Species Perk: Nanobots</h1><font color=\"#656585\">Active when you have at least (N) different goblin pieces on board. (Multiple effects stack) </font><br><br>(3)Goblins: Grants a random melee ally +10 armour and +20 health regeneration.<br>(6)Goblins: Grants all allies+10 armor and +20 health regeneration.",
     "lore": "Goblins are a cunning species with a love for money, explosives, and less-than-reliable technology. Their drive to invent fuels them, giving the brightest among them a boost in stamina and fortitude.",
@@ -23,7 +23,7 @@
       "en": "Goblins are a cunning species with a love for money, explosives, and less-than-reliable technology. Their drive to invent fuels them, giving the brightest among them a boost in stamina and fortitude.",
       "ru": "Goblins — хитрая раса, любящая деньги, взрывчатку и не самую надежную технику. Стремление к изобретениям движет ими, наделяя самых талантливых дополнительной выносливостью и стойкостью.",
       "zh-cn": "地精们起初是科科岛上丛林巨魔的奴隶，而卡加矿石使得地精种族变得令人吃惊的狡猾和聪明。",
-      "zh-tw": "地精們起初是科科島上叢林巨魔的奴隸，而卡加礦石使得地精種族變得令人喫驚的狡猾和聰明。"
+      "zh-tw": "地精們起初是科科島上叢林巨魔的奴隸，而卡加礦石使得地精種族變得令人吃驚的狡猾和聰明。"
     },
     "notes": [],
     "tiers": [

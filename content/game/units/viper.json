@@ -19,7 +19,13 @@
       "zh-tw": "冥界亞龍"
     },
     "attack_type": "ranged",
-    "abilities": null,
+    "abilities": [
+      {
+        "id": "ability_viper_viper_strike",
+        "name": "Viper Strike",
+        "description": "Targeted active ability: Activates on Full Mana\nViper Strike targets an enemy piece with the highest attack damage, reducing its attack speed and dealing ongoing poison. The victim also takes extra damage on hit. magic damage. Attack speed gradually recovers during the poison’s duration."
+      }
+    ],
     "stats": {
       "1_star": {
         "hp": 650,

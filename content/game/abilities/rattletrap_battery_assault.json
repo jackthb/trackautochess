@@ -1,0 +1,15 @@
+{
+  "gameId": "rattletrap_battery_assault",
+  "name": "Battery Assault",
+  "description": "Active ability: Activates on Full Mana\nDischarges high-powered shrapnel at random nearby enemy chess pieces within 2 grids, dealing minor magical damage and ministun.",
+  "cooldown": "12 10 8",
+  "mana_cost": "100",
+  "cast_range": "",
+  "ability_special": {
+    "radius": "275 275 275",
+    "duration": "6 8 10",
+    "interval": "0.7",
+    "damage": "20 40 80",
+    "creep_damage_multiplier": "1"
+  }
+}

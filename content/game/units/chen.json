@@ -19,7 +19,13 @@
       "zh-tw": "上帝之手"
     },
     "attack_type": "ranged",
-    "abilities": null,
+    "abilities": [
+      {
+        "id": "chen_fuhuo",
+        "name": "Holy Persuasion",
+        "description": "Active ability: Activates on full mana\nResurrect the highest-level chess piece that died this round and increase its star level to the same level as the Holy Persuasion."
+      }
+    ],
     "stats": {
       "1_star": {
         "hp": 900,

@@ -19,7 +19,13 @@
       "zh-tw": "先知"
     },
     "attack_type": "ranged",
-    "abilities": null,
+    "abilities": [
+      {
+        "id": "fur_tree",
+        "name": "Natures Call",
+        "description": "Active ability: Activates on Full Mana\nCall treants from random trees surrounding the chessboard to battle for Natures Prophet.\nLevel 1: Summons 1 Treant.\nLevel 2: Summons 2 Treants.\nLevel 3: Summons 2 Greater Treants."
+      }
+    ],
     "stats": {
       "1_star": {
         "hp": 500,

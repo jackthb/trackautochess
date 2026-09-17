@@ -1,0 +1,26 @@
+{
+  "gameId": "lion_finger_of_death",
+  "name": "Finger of Death",
+  "description": "Active ability: Activates on full mana\nTear into an enemy, inflicting a substantial amount of pure damage. For each stack of the Fel Power effect, it will deal additional pure damage",
+  "cooldown": "9 7 5",
+  "mana_cost": "100",
+  "cast_range": "9999",
+  "ability_special": {
+    "damage": "500 750 1000",
+    "damage_per_kill": "0",
+    "grace_period": "3",
+    "damage_delay": "0.25",
+    "cooldown_scepter": "9 7 5",
+    "splash_radius_scepter": "0",
+    "punch_duration": "0",
+    "punch_attack_range": "0",
+    "punch_bonus_damage_base": "0",
+    "punch_bonus_damage_per_stack": "0",
+    "punch_grace_period": "0",
+    "cleave_starting_width": "0",
+    "cleave_ending_width": "0",
+    "cleave_distance": "0",
+    "cleave_damage": "0",
+    "damage_bonus": "100 150 200"
+  }
+}

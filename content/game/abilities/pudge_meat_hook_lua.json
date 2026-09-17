@@ -1,0 +1,17 @@
+{
+  "gameId": "pudge_meat_hook_lua",
+  "name": "Meat Hook",
+  "description": "Targeted Active ability: Activates instantly\nLaunches a bloody hook toward the farthest enemy, dragging it back to Pudge and dealing pure damage, and alias will prioritize attacking this target.",
+  "cooldown": "8 7 5",
+  "mana_cost": "0",
+  "cast_range": "9999",
+  "ability_special": {
+    "hook_speed": "1600.0",
+    "hook_width": "100",
+    "hook_distance": "9999",
+    "vision_radius": "500",
+    "vision_duration": "4.0",
+    "hook_followthrough_constant": "0.65",
+    "hook_damage": "200 300 450"
+  }
+}

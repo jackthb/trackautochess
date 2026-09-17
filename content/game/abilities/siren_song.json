@@ -1,0 +1,13 @@
+{
+  "gameId": "siren_song",
+  "name": "Song of the Siren",
+  "description": "Active: Activate on full mana\nAll enemies in range of the Naga Siren have a chance to be put into a sleep every 0.5 sec, where they cannot act or be attacked. Any non-ability damage will cause the victim to wake up.",
+  "cooldown": "20",
+  "mana_cost": "100",
+  "cast_range": "250 350 450",
+  "ability_special": {
+    "radius": "250 350 450",
+    "duration": "7",
+    "sleep_duration": "2 3 3"
+  }
+}

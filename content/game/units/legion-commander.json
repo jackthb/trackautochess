@@ -19,7 +19,13 @@
       "zh-tw": "軍團指揮官"
     },
     "attack_type": "melee",
-    "abilities": null,
+    "abilities": [
+      {
+        "id": "lc_qianggong",
+        "name": "Press the Attack",
+        "description": "Passive Ability\nAfter being attacked, the legion commander has a chance to immediately carry out a counterattack, with a blood-sucking effect. \nIf the legion commander wins the home battle and survives, the piece will gain a permanent effect: Increased attack power."
+      }
+    ],
     "stats": {
       "1_star": {
         "hp": 800,

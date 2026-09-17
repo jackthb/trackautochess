@@ -19,7 +19,13 @@
       "zh-tw": "電炎絕手"
     },
     "attack_type": "ranged",
-    "abilities": null,
+    "abilities": [
+      {
+        "id": "snapfire_lil_shredder",
+        "name": "Lil' Shredder",
+        "description": "Active ability: Activate on full mana\nSnapfire heats up her mounted turret to rapidly fire attacks that deal physical damage equal to her attack damage per hit. Each attack slows the enemys attack speed and reduces enemys armor, effect stackable."
+      }
+    ],
     "stats": {
       "1_star": {
         "hp": 800,

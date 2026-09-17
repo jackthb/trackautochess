@@ -17,10 +17,16 @@
       "ko": "연금술사",
       "ru": "Alchemist",
       "zh-cn": "炼金术士",
-      "zh-tw": "鍊金術士"
+      "zh-tw": "煉金術士"
     },
     "attack_type": "melee",
-    "abilities": null,
+    "abilities": [
+      {
+        "id": "alchemist_chemical_rage",
+        "name": "Chemical Rage",
+        "description": "Active ability: Activates on Full Mana\nAlchemist causes his Ogre to enter a chemically induced rage, reducing base attack cooldown and increasing movement speed and regenerations. Upon transformation, Alchemist sprays acidic chemicals around him, reducing the armor of nearby enemy pieces."
+      }
+    ],
     "stats": {
       "1_star": {
         "hp": 1050,

@@ -19,7 +19,13 @@
       "zh-tw": "森海飛霞"
     },
     "attack_type": "ranged",
-    "abilities": null,
+    "abilities": [
+      {
+        "id": "hoodwink_acorn_shot_datadriven",
+        "name": "Acorn Shot",
+        "description": "Targeted Active ability: Activates instantly\nHoodwink attacked with an acorn at the target unit. The acorn bounces to nearby targets, bouncing it to several nearby threatening enemy chess pieces, dealing physical damage, and granting a 100% chance for probable effects of all allies’ synergy on its victims."
+      }
+    ],
     "stats": {
       "1_star": {
         "hp": 550,

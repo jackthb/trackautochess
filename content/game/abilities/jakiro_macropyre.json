@@ -1,0 +1,21 @@
+{
+  "gameId": "jakiro_macropyre",
+  "name": "Macropyre",
+  "description": "Jakiro exhales a wide line of lasting flames, which deals damage per second to any enemy units caught in the fire. Switches to Ice Path after cast.",
+  "cooldown": "6 5 4",
+  "mana_cost": "100",
+  "cast_range": "1300",
+  "ability_special": {
+    "damage": "150 200 300",
+    "path_width": "250",
+    "duration": "5.0",
+    "AbilityCastRange": "1300",
+    "burn_interval": "0.5 0.5 0.5",
+    "linger_duration": "2",
+    "pure_damage_type": "0",
+    "pierces_magic_immunity": "0",
+    "ice_edge_path_radius": "0",
+    "ice_edge_linger_duration": "0",
+    "ice_edge_movement_slow": "0"
+  }
+}

@@ -16,10 +16,16 @@
       "ko": "마그누스",
       "ru": "Magnus",
       "zh-cn": "半人猛犸",
-      "zh-tw": "半人猛獁"
+      "zh-tw": "半人猛瑪"
     },
     "attack_type": "melee",
-    "abilities": null,
+    "abilities": [
+      {
+        "id": "mag_reverse_polarity",
+        "name": "Reverse Polarity",
+        "description": "Active ability: Activates on full mana\nMagnus changes the property of matter, sucking all enemies to him and stunning them with a powerful slam and dealing damage."
+      }
+    ],
     "stats": {
       "1_star": {
         "hp": 900,

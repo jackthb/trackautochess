@@ -73,7 +73,8 @@
         {
           "kind": "new",
           "name": "New Relic",
-          "detail": "Serendipity Compass"
+          "detail": "Serendipity Compass",
+          "entityKey": "relic__serendipity-compass"
         },
         {
           "kind": "change",

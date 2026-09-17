@@ -19,7 +19,13 @@
       "zh-tw": "全能騎士"
     },
     "attack_type": "melee",
-    "abilities": null,
+    "abilities": [
+      {
+        "id": "ok_angel",
+        "name": "Guardian Angel",
+        "description": "Active ability: Activated on ally injured\n Summons a Guardian Angel that grants nearby allied pieces a Divine Protection Shield, gains an instant heal and significantly reduces physical and magic damage, and dispels negative effects."
+      }
+    ],
     "stats": {
       "1_star": {
         "hp": 1100,

@@ -1,0 +1,15 @@
+{
+  "gameId": "troll_axe",
+  "name": "Berserkers Rage",
+  "description": "Passive Ability\nEach time the Troll Warlord hits an attack, there is a probability of launching Whirling Axes(Melee) or based on the distance from the target. Whirling Axes(remote), causing physical damage with 1 normal attack, and slow or blinding effect. \nWhen the Troll Warlord switches attack targets, he must launch a whirlwind axe.",
+  "cooldown": "",
+  "mana_cost": "",
+  "cast_range": "",
+  "ability_special": {
+    "axe_per": "25 30 35",
+    "cd_axe_melee": "2.5 1.5 0.5",
+    "cd_axe_ranged": "2.5 1.5 0.5",
+    "damage_axe_melee": "150 250 350",
+    "damage_axe_ranged": "150 250 350"
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "gameId": "chen_fuhuo",
+  "name": "Holy Persuasion",
+  "description": "Active ability: Activates on full mana\nResurrect the highest-level chess piece that died this round and increase its star level to the same level as the Holy Persuasion.",
+  "cooldown": "12 10 8",
+  "mana_cost": "100",
+  "cast_range": "",
+  "ability_special": {
+    "chess_star": "1 2 3"
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "gameId": "muerta_pierce_the_veil",
+  "name": "Pierce the veil",
+  "description": "Passive Ability\nWhen Muerta attacks, she has a chance to shoot another target. \n\nActive ability: Activate when full mana\n Muerta enters the void form, immune to all physical damage, and gains attack power bonus And all her attack damage is magical damage.",
+  "cooldown": "15 12 10",
+  "mana_cost": "100",
+  "cast_range": "",
+  "ability_special": {
+    "duration": "3.5 4 4.5",
+    "transform_duration": "0.35",
+    "base_damage_pct": "100",
+    "modelscale": "0",
+    "bonus_damage": "0",
+    "spell_lifesteal": "0",
+    "spell_amp_steal": "0",
+    "spell_amp_steal_range": "925",
+    "double_shot_chance": "30 40 50"
+  }
+}

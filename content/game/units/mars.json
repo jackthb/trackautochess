@@ -19,7 +19,13 @@
       "zh-tw": "天界戰神"
     },
     "attack_type": "melee",
-    "abilities": null,
+    "abilities": [
+      {
+        "id": "mars_bulwark_attack",
+        "name": "Bulwark",
+        "description": "Passive Ability\nWhenever Mars is attacked from the front or sides, he swings his massive shield to block a certain percentage of the damage.\n\nActive ability: Activates upon completing cooldown.\nAt regular intervals, Mars raises his shield to unleash Gods Rebuke, pushing back enemy chess pieces within 3 grids in front of him and dealing physical damage."
+      }
+    ],
     "stats": {
       "1_star": {
         "hp": 700,

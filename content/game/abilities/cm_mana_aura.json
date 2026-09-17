@@ -1,0 +1,11 @@
+{
+  "gameId": "cm_mana_aura",
+  "name": "Arcane Aura",
+  "description": "Aura: \nGrants periodic mana regeneration for all allied chess pieces.",
+  "cooldown": "",
+  "mana_cost": "",
+  "cast_range": "",
+  "ability_special": {
+    "mana_regain": "8 12 20"
+  }
+}

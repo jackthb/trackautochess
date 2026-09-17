@@ -19,7 +19,13 @@
       "zh-tw": "魚人守衛"
     },
     "attack_type": "melee",
-    "abilities": null,
+    "abilities": [
+      {
+        "id": "slardar_slithereen_crush",
+        "name": "Slithereen Crush",
+        "description": "Active ability: Activates on Full Mana\nSlams the ground, deals physical damage and stun to nearby enemies. Victimcs are slowed afterwards."
+      }
+    ],
     "stats": {
       "1_star": {
         "hp": 800,

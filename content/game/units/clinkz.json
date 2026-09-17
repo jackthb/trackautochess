@@ -16,10 +16,16 @@
       "ko": "클링츠",
       "ru": "Clinkz",
       "zh-cn": "骷髅弓箭手",
-      "zh-tw": "骷髏弓箭手"
+      "zh-tw": "骷髅弓箭手"
     },
     "attack_type": "ranged",
-    "abilities": null,
+    "abilities": [
+      {
+        "id": "clinkz_burning_barrage",
+        "name": "Burning Barrage",
+        "description": "Active ability: Activate on Full Mana\nClinkz shoots multiple burning arrows that hit all enemies in a line. Every shot deals his attack physical damage."
+      }
+    ],
     "stats": {
       "1_star": {
         "hp": 500,

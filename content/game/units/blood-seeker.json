@@ -19,7 +19,13 @@
       "zh-tw": "血魔"
     },
     "attack_type": "melee",
-    "abilities": null,
+    "abilities": [
+      {
+        "id": "bloodseeker_blood_bath_lua",
+        "name": "Blood Rite",
+        "description": "Active ability: Activates on Full Mana\nBloodseeker baptizes an area centred at himself in sacred blood. After the ritual completes, any enemies caught in the area take Pure Damage， and become silenced。"
+      }
+    ],
     "stats": {
       "1_star": {
         "hp": 600,

@@ -16,10 +16,16 @@
       "ko": "예지자",
       "ru": "Oracle",
       "zh-cn": "神谕者",
-      "zh-tw": "神諭者"
+      "zh-tw": "神谕者"
     },
     "attack_type": "ranged",
-    "abilities": null,
+    "abilities": [
+      {
+        "id": "oracle_rain_of_destiny_datadriven",
+        "name": "Rain of Destiny",
+        "description": "Active Ability: Activate on full mana\nBring forth rain to the target area and heal allies in."
+      }
+    ],
     "stats": {
       "1_star": {
         "hp": 550,

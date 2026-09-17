@@ -19,7 +19,13 @@
       "zh-tw": "斧王"
     },
     "attack_type": "melee",
-    "abilities": null,
+    "abilities": [
+      {
+        "id": "axe_berserkers_call",
+        "name": "Berserkers Call",
+        "description": "Active ability: Activates on full mana\nAxe taunts enemies within 1 grid, forcing them to attack him, while he gains bonus armor during the duration."
+      }
+    ],
     "stats": {
       "1_star": {
         "hp": 750,

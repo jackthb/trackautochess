@@ -19,7 +19,13 @@
       "zh-tw": "閃電幽魂"
     },
     "attack_type": "ranged",
-    "abilities": null,
+    "abilities": [
+      {
+        "id": "razor_plasma_field",
+        "name": "Plasma Field",
+        "description": "Active ability: Activates on full mana\nReleases a wave of energetic plasma that grows in power as it expands, but also zaps on contraction, dealing damage to enemy units caught in its path. Damage and slow increase with distance from Razor. The Plasma Field hits each unit twice, once in each direction."
+      }
+    ],
     "stats": {
       "1_star": {
         "hp": 650,

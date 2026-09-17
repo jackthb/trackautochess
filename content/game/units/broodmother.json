@@ -19,7 +19,13 @@
       "zh-tw": "育母蜘蛛"
     },
     "attack_type": "melee",
-    "abilities": null,
+    "abilities": [
+      {
+        "id": "br_web_new",
+        "name": "Silken Bola",
+        "description": "Passive Ability\nThe Broodmother will often entangle the nearest target, making it unable to move and causing attacks to miss. The target will suffer additional magical damage when attacked. If the target dies, a small spider will hatch."
+      }
+    ],
     "stats": {
       "1_star": {
         "hp": 950,

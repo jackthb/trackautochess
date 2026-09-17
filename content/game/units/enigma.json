@@ -19,7 +19,13 @@
       "zh-tw": "謎團"
     },
     "attack_type": "ranged",
-    "abilities": null,
+    "abilities": [
+      {
+        "id": "midnight_pulse_datadriven",
+        "name": "Midnight Pulse",
+        "description": "Active ability: Activates on Full Mana\nSteeps an area of 3-square radius in dark resonance, damaging enemy chess pieces within based on their maximum health."
+      }
+    ],
     "stats": {
       "1_star": {
         "hp": 700,

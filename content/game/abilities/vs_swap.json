@@ -1,0 +1,11 @@
+{
+  "gameId": "vs_swap",
+  "name": "Nether Swap",
+  "description": "Targeted active ability: Instant\nSwap positions with one or more enemy chess pieces whose star level is no higher than(Nether Swap skill level)",
+  "cooldown": "60",
+  "mana_cost": "0",
+  "cast_range": "",
+  "ability_special": {
+    "max_star": "1 2 3"
+  }
+}

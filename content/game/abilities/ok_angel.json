@@ -1,0 +1,15 @@
+{
+  "gameId": "ok_angel",
+  "name": "Guardian Angel",
+  "description": "Active ability: Activated on ally injured\n Summons a Guardian Angel that grants nearby allied pieces a Divine Protection Shield, gains an instant heal and significantly reduces physical and magic damage, and dispels negative effects.",
+  "cooldown": "12 10 8",
+  "mana_cost": "0",
+  "cast_range": "300 400 500",
+  "ability_special": {
+    "duration": "4 5 6",
+    "radius": "300 400 500",
+    "magical_resist": "30 50 70",
+    "physical_resist": "30 50 70",
+    "heal": "200 300 400"
+  }
+}

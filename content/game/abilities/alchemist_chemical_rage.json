@@ -1,0 +1,22 @@
+{
+  "gameId": "alchemist_chemical_rage",
+  "name": "Chemical Rage",
+  "description": "Active ability: Activates on Full Mana\nAlchemist causes his Ogre to enter a chemically induced rage, reducing base attack cooldown and increasing movement speed and regenerations. Upon transformation, Alchemist sprays acidic chemicals around him, reducing the armor of nearby enemy pieces.",
+  "cooldown": "25 20 15",
+  "mana_cost": "100",
+  "cast_range": "9999",
+  "ability_special": {
+    "duration": "15",
+    "transformation_time": "0.35",
+    "base_attack_time": "0.6 0.55 0.5",
+    "bonus_health_regen": "60 80 100",
+    "bonus_mana_regen": "0",
+    "bonus_movespeed": "0",
+    "scepter_gold_damage": "2",
+    "scepter_bonus_damage": "25",
+    "scepter_spell_amp": "5",
+    "armor_reduce": "4 8 12",
+    "acid_duration": "15",
+    "bonus_max_health": "250 500 1000"
+  }
+}

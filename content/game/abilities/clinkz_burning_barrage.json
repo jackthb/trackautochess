@@ -1,0 +1,15 @@
+{
+  "gameId": "clinkz_burning_barrage",
+  "name": "Burning Barrage",
+  "description": "Active ability: Activate on Full Mana\nClinkz shoots multiple burning arrows that hit all enemies in a line. Every shot deals his attack physical damage.",
+  "cooldown": "8 7 6",
+  "mana_cost": "100",
+  "cast_range": "9999",
+  "ability_special": {
+    "wave_count": "4",
+    "range": "800",
+    "damage_pct": "50 75 100",
+    "projectile_width": "125",
+    "archers_use_barrage": "0"
+  }
+}

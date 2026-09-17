@@ -16,7 +16,13 @@
       "zh-tw": "百戲大王"
     },
     "attack_type": "ranged",
-    "abilities": null,
+    "abilities": [
+      {
+        "id": "ringmaster_spotlight",
+        "name": "Spotlight",
+        "description": "Active Ability: Instant\nRingmaster shines a spotlight that sweeps an area. Enemies in the light have a chance to miss their attacks and are revealed if invisible. Non-permanent pieces and illusion pieces hit by the beam will fade away, by taking a Pure damage equal to a percentage of their health each second."
+      }
+    ],
     "stats": {
       "1_star": {
         "hp": 1050,

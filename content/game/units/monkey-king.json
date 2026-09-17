@@ -19,7 +19,13 @@
       "zh-tw": "齊天大聖"
     },
     "attack_type": "melee",
-    "abilities": null,
+    "abilities": [
+      {
+        "id": "mk_ruyibangfa",
+        "name": "Jingu Mastery",
+        "description": "Passive Ability\nAlways sensitive to the moods of its master, the Jingu Bang radiates power when Monkey Kings combat fervor is on full display. Monkey Kings attacks awaken the Jingu Bangs power. Upon the fourth hit of his attack, Monkey King unleashes Boundless Strike, causes critical damage and stun based on normal attacks to enemy pieces in a straight line."
+      }
+    ],
     "stats": {
       "1_star": {
         "hp": 900,

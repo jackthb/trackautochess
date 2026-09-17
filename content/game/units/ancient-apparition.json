@@ -19,7 +19,13 @@
       "zh-tw": "極寒幽魂"
     },
     "attack_type": "ranged",
-    "abilities": null,
+    "abilities": [
+      {
+        "id": "aa_ice_blast",
+        "name": "Chilling Touch",
+        "description": "Passiave Ability\nGrant Ancient Apparition attack speed bonus and trap its target in chilling frost with attack speed decreased and health recharge prevented."
+      }
+    ],
     "stats": {
       "1_star": {
         "hp": 550,

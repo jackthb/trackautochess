@@ -19,7 +19,13 @@
       "zh-tw": "敵法師"
     },
     "attack_type": "melee",
-    "abilities": null,
+    "abilities": [
+      {
+        "id": "am_mana_break",
+        "name": "Mana break",
+        "description": "Passive Ability\nEach attack will drain the mana of the target enemy chess piece, dealing additional physical damage equal to the mana drained.. \n\nActive ability: Activates when conditions are met.\nWhenever a certain amount of mana is drained cumulatively, Anti-Mage will activate the Mana Void, target with a lower mana enemy, and deal magical damage based on the mana lost by the target together with a brief stun to enemies within range."
+      }
+    ],
     "stats": {
       "1_star": {
         "hp": 850,

@@ -1,0 +1,13 @@
+{
+  "gameId": "slark_nengliangzhuanyi",
+  "name": "Essence Shift",
+  "description": "Passive Ability\nSlark steals the attack speed of enemy pieces with his attacks.",
+  "cooldown": "",
+  "mana_cost": "",
+  "cast_range": "",
+  "ability_special": {
+    "speed_per_attack_buff": "10",
+    "speed_per_attack_debuff": "-10",
+    "max_stack_count": "10 15 20"
+  }
+}

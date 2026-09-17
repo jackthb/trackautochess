@@ -15,7 +15,7 @@
       "en": "SPECIES TRAIT: Divided we stand\n Active when you have at least (N) different Kobold pieces on board. (Multiple effects stack)\n\n(2) Kobolds: Each two paired ally pieces on board will summon a replica when battle starts.\n(4) Kobolds: Every unpaired Kobold piece will reshape itself into a non-Kobold ally of the same rank before battle starts.",
       "ru": "SPECIES TRAIT: Divided we stand\n Активна, когда минимум (N) разных Kobolds на столе.(Эффекты складываются)\n\n(2) Kobolds: Каждые две парные союзные фигуры на доске призывают копию в начале боя.\n(4) Kobolds: Каждая непарная фигура Kobold перед началом боя превращается в союзную не-Kobold фигуру того же ранга.",
       "zh-cn": "种族技能：分则能成\n 需要己方场上有至少（N）个不同的此种族的棋子来触发效果（触发的多层效果可以叠加）。\n\n（2）狗头人：为每种两两相同的友方棋子召唤一个复制品。\n（4）狗头人：友方狗头人棋子会将自己塑形为一个同星的非狗头人友方棋子，以凑成两两相同。",
-      "zh-tw": "種族技能：分則能成\n 需要己方場上有至少（N）個不同的此種族的棋子來觸發效果（觸發的多層效果可以疊加）。\n\n（2）狗頭人：爲每種兩兩相同的友方棋子召喚一個複製品。\n（4）狗頭人：友方狗頭人棋子會將自己塑形爲一個同星的非狗頭人友方棋子，以湊成兩兩相同。"
+      "zh-tw": "種族技能：分則能成\n 需要己方場上有至少（N）個不同的此種族的棋子來觸發效果（觸發的多層效果可以疊加）。\n\n（2）狗頭人：爲每種兩兩相同的友方棋子召喚壹個複制品。\n（4）狗頭人：友方狗頭人棋子會將自己塑形爲壹個同星的非狗頭人友方棋子，以湊成兩兩相同。"
     },
     "description_html": "<h1>SPECIES TRAIT: Divided we stand</h1><font color=\"#656585\">Active when you have at least (N) different Kobold pieces on board. (Multiple effects stack)<br><br>(2) Kobolds: Each two paired ally pieces on board will summon a replica when battle starts.<br>(4) Kobolds: Every unpaired Kobold piece will reshape itself into a non-Kobold ally of the same rank before battle starts.",
     "lore": "Aggressive, xenophobic, yet industrious small humanoid creatures living in tunnels and caves deep below the surface. Known for not particularly intelligent, notoriously cowardly and individually weak, the dimunitive beings possess great potential in group combats. A candle on top of the head distinguishes the Kobolds.",
@@ -23,7 +23,7 @@
       "en": "Aggressive, xenophobic, yet industrious small humanoid creatures living in tunnels and caves deep below the surface. Known for not particularly intelligent, notoriously cowardly and individually weak, the dimunitive beings possess great potential in group combats. A candle on top of the head distinguishes the Kobolds.",
       "ru": "Агрессивные и ксенофобные, но трудолюбивые Kobolds живут в подземных тоннелях. Слабые и трусливые поодиночке, они опасны в группе. Отличительный признак — свеча на голове.",
       "zh-cn": "生活在地穴之中的一类生物，矮小龌龊。为了适应阴暗的环境，它们的头上经常顶着燃烧的蜡烛行走。",
-      "zh-tw": "生活在地穴之中的一類生物，矮小齷齪。爲了適應陰暗的環境，它們的頭上經常頂着燃燒的蠟燭行走。"
+      "zh-tw": "生活在地穴之中的壹類生物，矮小龌龊。爲了適應陰暗的環境，它們的頭上經常頂著燃燒的蠟燭行走。"
     },
     "notes": [
       "Due to the specialities of the species, Kobold will not benefit from Auto Combine on Bench.",

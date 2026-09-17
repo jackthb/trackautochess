@@ -19,7 +19,13 @@
       "zh-tw": "獸王"
     },
     "attack_type": "melee",
-    "abilities": null,
+    "abilities": [
+      {
+        "id": "bm_beast",
+        "name": "Call of the Wild",
+        "description": "Active ability: Activates on Full Mana\nBeastmaster summons his powerful companions to aid in the battlefield.\nLevel 1: Summons a Boar.\nLevel 2: Summons a Hawk.\nLevel 3: Summons a Battle Bear with Taunt ability."
+      }
+    ],
     "stats": {
       "1_star": {
         "hp": 650,

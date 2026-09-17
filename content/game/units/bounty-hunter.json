@@ -20,7 +20,13 @@
       "zh-tw": "賞金獵人"
     },
     "attack_type": "melee",
-    "abilities": null,
+    "abilities": [
+      {
+        "id": "bh_shuriken",
+        "name": "Jinada Toss",
+        "description": "Targeted Passive Ability\nGets a bag of gold when killing an enemy for the first time\n\nActive ability: Activates at Full Mana\nthrows a deadly dart at the enemy chess piece with the lowest health, dealing magical damageand a brief Stun."
+      }
+    ],
     "stats": {
       "1_star": {
         "hp": 500,

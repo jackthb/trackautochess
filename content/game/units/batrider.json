@@ -19,7 +19,13 @@
       "zh-tw": "蝙蝠騎士"
     },
     "attack_type": "ranged",
-    "abilities": null,
+    "abilities": [
+      {
+        "id": "batrider_firefly",
+        "name": "Firefly",
+        "description": "Active ability: Activates on Full Mana\nBatrider flis towards the farthest cell which allows him to attack an enemy, laying down a trail of flames from the air. The fire damages any enemies it touches, causing damage over time."
+      }
+    ],
     "stats": {
       "1_star": {
         "hp": 600,

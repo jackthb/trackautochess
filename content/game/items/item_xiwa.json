@@ -15,14 +15,14 @@
       "en": "+10 armor.\n\nActive ability: Instant\n Emits a freezing wave that slows the attack speed and healing effectiveness of enemies within 3 cells by 50% for 5 seconds and deals 100 magical damage.",
       "ru": "+10 брони.\n\nАктивка: мгновенно\nВыпускает ледяную волну, замедляющую скорость атаки и лечение врагов в радиусе 3 клеток на 50% на 5 секунд и наносящую 100 магического урона.",
       "zh-cn": "护甲+10。\n\n主动技能：立即激活\n发出一道寒冷的波动，使3格内的敌人攻击速度-50%，受到的治疗-50%，持续5秒，并造成100点魔法伤害。",
-      "zh-tw": "護甲+10。\n\n主動技能：立即激活\n發出一道寒冷的波動，使3格內的敵人攻擊速度-50%，受到的治療-50%，持續5秒，並造成100點魔法傷害。"
+      "zh-tw": "護甲+10。\n\n主動技能：立即激活\n發出壹道寒冷的波動，使3格內的敵人攻擊速度-50%，受到的治療-50%，持續5秒，並造成100點魔法傷害。"
     },
     "lore": "Said to have belonged to a goddess, today it retains much of its former power.",
     "lore_i18n": {
       "en": "Said to have belonged to a goddess, today it retains much of its former power.",
       "ru": "Said to have belonged to a goddess, today it retains much of its former power.",
       "zh-cn": "据说曾经属于某位女神，至今仍保持大部分神力。",
-      "zh-tw": "據說曾經屬於某位女神，至今仍保持大部分神力。"
+      "zh-tw": "據說曾經屬于某位女神，至今仍保持大部分神力。"
     },
     "quality": "epic",
     "texture": "item_shivas_guard",

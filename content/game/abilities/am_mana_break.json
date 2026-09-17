@@ -1,0 +1,15 @@
+{
+  "gameId": "am_mana_break",
+  "name": "Mana break",
+  "description": "Passive Ability\nEach attack will drain the mana of the target enemy chess piece, dealing additional physical damage equal to the mana drained.. \n\nActive ability: Activates when conditions are met.\nWhenever a certain amount of mana is drained cumulatively, Anti-Mage will activate the Mana Void, target with a lower mana enemy, and deal magical damage based on the mana lost by the target together with a brief stun to enemies within range.",
+  "cooldown": "",
+  "mana_cost": "",
+  "cast_range": "",
+  "ability_special": {
+    "mana_per_hit": "40 60 100",
+    "mana_void_required": "100",
+    "mana_void_damage_per_mana": "2 4 8",
+    "mana_void_ministun": "0.5",
+    "mana_void_aoe_radius": "300 300 400"
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "gameId": "ct_double_edge",
+  "name": "Double Edge",
+  "description": "Targeted Active ability: Activates instant\nCentaur Warrunner strikes a mighty blow at melee range, dealing damage due to a percentage of his Max HP to himself and a small area around the target.",
+  "cooldown": "10 9 8",
+  "mana_cost": "0",
+  "cast_range": "400",
+  "ability_special": {
+    "damage_base": "100 150 200",
+    "damage_per": "10",
+    "radius": "200 225 250"
+  }
+}

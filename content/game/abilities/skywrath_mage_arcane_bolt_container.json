@@ -1,0 +1,11 @@
+{
+  "gameId": "skywrath_mage_arcane_bolt_container",
+  "name": "Arcane Bolt",
+  "description": "Targeted active ability: Activate on ally skill cast\n Whenever an allied piece casts a skill, the Stormrage Mage will immediately cast a slow-moving Arcane Bolt swarm at the enemy, dealing magic damage to the target.",
+  "cooldown": "2",
+  "mana_cost": "0",
+  "cast_range": "",
+  "ability_special": {
+    "damage": "100 200 300"
+  }
+}

@@ -19,7 +19,13 @@
       "zh-tw": "巨牙海民"
     },
     "attack_type": "melee",
-    "abilities": null,
+    "abilities": [
+      {
+        "id": "tusk_walrus_punch_lua",
+        "name": "Walrus PUNCH!",
+        "description": "Active ability: Activates on full mana\nTusk connects with his mighty Walrus Punch, a critical strike so powerful it launches a nearby enemy within 1 grid into the air."
+      }
+    ],
     "stats": {
       "1_star": {
         "hp": 600,

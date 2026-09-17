@@ -19,10 +19,16 @@
       "zh-tw": "雲遊樂手"
     },
     "attack_type": "melee",
-    "abilities": null,
+    "abilities": [
+      {
+        "id": "largo_frogstomp",
+        "name": "Frogstomp",
+        "description": "Largo tosses froglings to an area, they stomps the ground every 1 second, dealing damage and ministuns, enemies in the area have reduced speed."
+      }
+    ],
     "stats": {
       "1_star": {
-        "hp": 800,
+        "hp": 700,
         "mana": 100,
         "atk": [
           50,
@@ -34,7 +40,7 @@
         "atk_range": 205
       },
       "2_star": {
-        "hp": 1600,
+        "hp": 1400,
         "mana": 100,
         "atk": [
           100,
@@ -46,7 +52,7 @@
         "atk_range": 205
       },
       "3_star": {
-        "hp": 3200,
+        "hp": 2800,
         "mana": 100,
         "atk": [
           200,

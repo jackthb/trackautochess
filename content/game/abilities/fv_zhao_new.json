@@ -1,0 +1,16 @@
+{
+  "gameId": "fv_zhao_new",
+  "name": "Time Zone",
+  "description": "Active ability: Activates on full mana.Creates a blister in spacetime, altering the movement, attack speed of all units inside. Allies have increased speed and enemies have decreased speed",
+  "cooldown": "15 12 10",
+  "mana_cost": "100",
+  "cast_range": "",
+  "ability_special": {
+    "radius": "350 400 500",
+    "duration": "6 7 8",
+    "bonus_attack_speed": "30 40 50",
+    "bonus_move_speed": "30 40 50",
+    "reduction_attack_speed": "-30 -40 -50",
+    "reduction_move_speed": "-30 -40 -50"
+  }
+}

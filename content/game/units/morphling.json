@@ -20,7 +20,13 @@
       "zh-tw": "變體精靈"
     },
     "attack_type": "ranged",
-    "abilities": null,
+    "abilities": [
+      {
+        "id": "morphling_waveform",
+        "name": "Waveform",
+        "description": "Passive Ability\n Morphling will transfer his properties between his attack damage and health percentage due to his health status. The higher his health percentage is, the higher the attack speed he gains.\n\nActive Ability: Activates on accumulated attack times\n Morphling dissolves into liquid and surges towards an far-away enemy, dealing magical damage to enemy units on his path."
+      }
+    ],
     "stats": {
       "1_star": {
         "hp": 1000,

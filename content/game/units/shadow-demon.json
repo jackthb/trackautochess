@@ -20,7 +20,13 @@
       "zh-tw": "暗影惡魔"
     },
     "attack_type": "ranged",
-    "abilities": null,
+    "abilities": [
+      {
+        "id": "sd_disseminate",
+        "name": "Disseminate",
+        "description": "Targeted Active ability: Instant Activation>\nApplying the toxic curse of Shadow Demons attacks: Nearby allies will receive damage of the same type as a percentage when taking damage, and nearby enemies will also receive healing as a percentage when receiving healing."
+      }
+    ],
     "stats": {
       "1_star": {
         "hp": 500,

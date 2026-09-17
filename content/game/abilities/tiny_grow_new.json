@@ -5,5 +5,7 @@
   "cooldown": "",
   "mana_cost": "0",
   "cast_range": "9999",
-  "ability_special": {}
+  "ability_special": {
+    "health_per_stack": "100"
+  }
 }

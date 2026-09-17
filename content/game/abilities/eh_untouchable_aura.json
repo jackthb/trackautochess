@@ -1,0 +1,13 @@
+{
+  "gameId": "eh_untouchable_aura",
+  "name": "Untouchable",
+  "description": "Aura: \nGranting allies nearby to slow enemy attacks when attacked.",
+  "cooldown": "",
+  "mana_cost": "",
+  "cast_range": "9999",
+  "ability_special": {
+    "slow_attack_speed": "-20 -30 -40",
+    "slow_duration": "3",
+    "radius": "190"
+  }
+}

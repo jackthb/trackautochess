@@ -1,0 +1,12 @@
+{
+  "gameId": "dw_flower",
+  "name": "Bramble Maze",
+  "description": "Battle Cry Ability: Activates before the battle starts\nCreates a bramble maze to isolate random enemies from battle, victims cannot attack or be attacked until the maze disappears.",
+  "cooldown": "",
+  "mana_cost": "",
+  "cast_range": "",
+  "ability_special": {
+    "duration": "4 3 3",
+    "enemy_count": "1 2 3"
+  }
+}

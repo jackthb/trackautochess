@@ -234,6 +234,84 @@ def get_notes(prefix, loc):
     return notes
 
 
+def extract_lua_string_map(raw_lua, name):
+    """Extract a flat ``key = "value"`` table from Lua source."""
+    source = re.sub(r'--[^\r\n]*', '', raw_lua)
+    match = re.search(re.escape(name) + r'\s*=\s*\{', source)
+    if not match:
+        return {}
+
+    start = match.end()
+    depth = 1
+    pos = start
+    while pos < len(source) and depth > 0:
+        if source[pos] == '{':
+            depth += 1
+        elif source[pos] == '}':
+            depth -= 1
+        pos += 1
+
+    block = source[start:pos - 1]
+    return {
+        key: value
+        for key, quote, value in re.findall(
+            r'([A-Za-z_][A-Za-z0-9_]*)\s*=\s*([\'"])(.*?)\2',
+            block,
+        )
+    }
+
+
+def collect_unit_ability_ids(stars, mapped_ability=None):
+    """Collect unique unit-KV abilities plus the live Lua gameplay ability."""
+    abilities = []
+    for star in sorted(stars):
+        for ability in stars[star].get('abilities', []):
+            if ability not in abilities:
+                abilities.append(ability)
+    if mapped_ability and mapped_ability not in abilities:
+        abilities.append(mapped_ability)
+    return abilities
+
+
+def ability_localized_value(loc, ability, suffix=''):
+    """Read standard tooltip localization, falling back to a plain Lua key."""
+    return loc.get(
+        f'DOTA_Tooltip_ability_{ability}{suffix}',
+        loc.get(f'{ability}{suffix}', ''),
+    )
+
+
+def resolve_tooltip_placeholders(value, numbers):
+    """Substitute VPK ``%field%`` tokens with extracted ability numbers."""
+    return re.sub(
+        r'%([A-Za-z_][A-Za-z0-9_]*)%',
+        lambda match: str(numbers.get(match.group(1), '?')),
+        value,
+    )
+
+
+def flatten_ability_numbers(block):
+    """Flatten modern AbilityValues and legacy AbilitySpecial numeric fields."""
+    out = {}
+    ability_values = block.get('AbilityValues', {})
+    if isinstance(ability_values, dict):
+        for field, value in ability_values.items():
+            if isinstance(value, dict):
+                value = value.get('value')
+            if value is not None and not isinstance(value, dict):
+                out[field] = value
+
+    ability_special = block.get('AbilitySpecial', {})
+    if isinstance(ability_special, dict):
+        for fields in ability_special.values():
+            if not isinstance(fields, dict):
+                continue
+            for field, value in fields.items():
+                if field != 'var_type' and not isinstance(value, dict):
+                    out[field] = value
+    return out
+
+
 # ════════════════════════════════════════════════════════════════════
 # Extraction
 # ════════════════════════════════════════════════════════════════════
@@ -318,6 +396,13 @@ def extract_all(pak):
     abilities_kv = parse_kv(raw_abilities)
     items_kv = parse_kv(raw_items)
     units_kv = parse_kv(raw_units)
+    lua_ability_by_unit = extract_lua_string_map(
+        raw_lua, '_G.chess_ability_list_base',
+    )
+    if not lua_ability_by_unit:
+        raise RuntimeError(
+            'Could not parse _G.chess_ability_list_base from addon_game_mode.lua',
+        )
 
     # Unwrap top-level container (e.g. "DOTAAbilities" { ... })
     if len(abilities_kv) == 1:
@@ -584,8 +669,12 @@ def extract_all(pak):
         for ab in abilities:
             if ab.startswith('is_') or ab in skip:
                 continue
-            ab_name = loc.get(f'DOTA_Tooltip_ability_{ab}', '')
-            ab_desc = strip_html(loc.get(f'DOTA_Tooltip_ability_{ab}_Description', ''))
+            ab_name = ability_localized_value(loc, ab)
+            numbers = flatten_ability_numbers(abilities_kv.get(ab, {}))
+            ab_desc = strip_html(resolve_tooltip_placeholders(
+                ability_localized_value(loc, ab, '_Description'),
+                numbers,
+            ))
             if ab_name:
                 result.append({'id': ab, 'name': strip_html(ab_name), 'description': ab_desc})
         return result
@@ -654,8 +743,11 @@ def extract_all(pak):
         cost_str = star1.get('level', '')
         cost = int(cost_str) if cost_str.isdigit() else None
 
+        unit_ability_ids = collect_unit_ability_ids(
+            stars, lua_ability_by_unit.get(base_id),
+        )
         vpk_syns = get_synergies_for_unit(star1['abilities'])
-        active_abs = get_active_abilities(star1['abilities'])
+        active_abs = get_active_abilities(unit_ability_ids)
 
         stats = {}
         for sl in [1, 2, 3]:
@@ -725,46 +817,40 @@ def extract_all(pak):
     # 5. ABILITIES (non-synergy active abilities used by active units)
     # ════════════════════════════════════════════════════════════════
 
-    def flatten_ability_special(block):
-        """Flatten AbilitySpecial dict into {field: value}."""
-        out = {}
-        ab_special = block.get('AbilitySpecial', {})
-        if isinstance(ab_special, dict):
-            for _, fields in ab_special.items():
-                if isinstance(fields, dict):
-                    for fk, fv in fields.items():
-                        if fk != 'var_type':
-                            out[fk] = fv
-        return out
-
     abilities_out = {}
     seen_abilities = set()
     for base_id, stars in base_units.items():
         if active_unit_ids and base_id not in active_unit_ids:
             continue
-        for sl, sdata in stars.items():
-            for ab in sdata.get('abilities', []):
-                if ab.startswith('is_') or ab in ('no_collision', 'dac_guai_base', '') or ab in seen_abilities:
-                    continue
-                seen_abilities.add(ab)
-                ab_block = abilities_kv.get(ab, {})
-                if not isinstance(ab_block, dict):
-                    continue
-                name = strip_html(loc.get(f'DOTA_Tooltip_ability_{ab}', ''))
-                if not name:
-                    continue
-                desc_html = loc.get(f'DOTA_Tooltip_ability_{ab}_Description', '')
-                cooldown = ab_block.get('AbilityCooldown', '')
-                mana = ab_block.get('AbilityManaCost', '')
-                cast = ab_block.get('AbilityCastRange', '')
-                abilities_out[ab] = {
-                    'name': name,
-                    'description': strip_html(desc_html),
-                    'cooldown': cooldown,
-                    'mana_cost': mana,
-                    'cast_range': cast,
-                    'ability_special': flatten_ability_special(ab_block),
-                }
+        ability_ids = collect_unit_ability_ids(
+            stars, lua_ability_by_unit.get(base_id),
+        )
+        for ab in ability_ids:
+            if ab.startswith('is_') or ab in ('no_collision', 'dac_guai_base', '') or ab in seen_abilities:
+                continue
+            seen_abilities.add(ab)
+            ab_block = abilities_kv.get(ab, {})
+            if not isinstance(ab_block, dict):
+                continue
+            name = strip_html(ability_localized_value(loc, ab))
+            if not name:
+                continue
+            numbers = flatten_ability_numbers(ab_block)
+            desc_html = resolve_tooltip_placeholders(
+                ability_localized_value(loc, ab, '_Description'),
+                numbers,
+            )
+            cooldown = ab_block.get('AbilityCooldown', '')
+            mana = ab_block.get('AbilityManaCost', '')
+            cast = ab_block.get('AbilityCastRange', '')
+            abilities_out[ab] = {
+                'name': name,
+                'description': strip_html(desc_html),
+                'cooldown': cooldown,
+                'mana_cost': mana,
+                'cast_range': cast,
+                'ability_special': numbers,
+            }
 
     # ════════════════════════════════════════════════════════════════
     # 6. TALENTS (from localization talent_<tier><slot>_<field>)

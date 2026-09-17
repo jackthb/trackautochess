@@ -19,7 +19,13 @@
       "zh-tw": "半人馬戰行者"
     },
     "attack_type": "melee",
-    "abilities": null,
+    "abilities": [
+      {
+        "id": "ct_double_edge",
+        "name": "Double Edge",
+        "description": "Targeted Active ability: Activates instant\nCentaur Warrunner strikes a mighty blow at melee range, dealing damage due to a percentage of his Max HP to himself and a small area around the target."
+      }
+    ],
     "stats": {
       "1_star": {
         "hp": 850,

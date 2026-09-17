@@ -19,7 +19,13 @@
       "zh-tw": "原始巨獸"
     },
     "attack_type": "ranged",
-    "abilities": null,
+    "abilities": [
+      {
+        "id": "primal_beast_pulverize_lua",
+        "name": "Pulverize",
+        "description": "Active Targeted ability: Activates on full mana\nPrimal Beast channels his rage, grabbing a nearby victim with highest HP and slamming them into the ground repeatedly, damaging and ministunning any enemy caught in the AoE."
+      }
+    ],
     "stats": {
       "1_star": {
         "hp": 1300,

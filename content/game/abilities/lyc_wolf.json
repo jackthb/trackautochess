@@ -1,0 +1,13 @@
+{
+  "gameId": "lyc_wolf",
+  "name": "Shapeshift",
+  "description": "Active ability: Activates on Full Mana\nLycan assumes his lupine form, granting him bonus health and healing himself for the same amount. Meanwhile summons multiple wolves in nearby vacant grids to battle for Lycan.",
+  "cooldown": "60",
+  "mana_cost": "100",
+  "cast_range": "",
+  "ability_special": {
+    "wolf_count": "2 2 3",
+    "summon_duration": "30",
+    "attack_damage_bonus": "50 75 100"
+  }
+}

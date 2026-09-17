@@ -1,0 +1,20 @@
+{
+  "gameId": "slardar_slithereen_crush",
+  "name": "Slithereen Crush",
+  "description": "Active ability: Activates on Full Mana\nSlams the ground, deals physical damage and stun to nearby enemies. Victimcs are slowed afterwards.",
+  "cooldown": "12 10 8",
+  "mana_cost": "100",
+  "cast_range": "9999",
+  "ability_special": {
+    "crush_radius": "250 300 350",
+    "crush_extra_slow": "-10 -20 -40",
+    "crush_attack_slow_tooltip": "-10 -20 -40",
+    "crush_extra_slow_duration": "2 3 4",
+    "stun_duration": "2 2.5 3",
+    "puddle_duration": "0",
+    "puddle_radius": "0",
+    "crush_damage": "100 125 175",
+    "shard_amp_duration": "5.0",
+    "shard_bonus_radius": "0"
+  }
+}
