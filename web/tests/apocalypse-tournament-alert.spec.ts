@@ -1,72 +1,46 @@
 import { expect, test } from "@playwright/test";
 
-test("home alert links to the Apocalypse Tournament Discord", async ({
-  page,
-}) => {
-  await page.goto("/");
+for (const viewport of [
+  { width: 1440, height: 900 },
+  { width: 390, height: 844 },
+]) {
+  test.describe(`home at ${viewport.width}px`, () => {
+    test.use({ viewport });
 
-  const alert = page.getByRole("link", {
-    name: "Join the Apocalypse Tournament Discord",
+    test("keeps signup and player lookup available without the expired tournament notice", async ({
+      page,
+    }) => {
+      await page.goto("/");
+
+      await expect(page.getByRole("heading", { level: 1 })).toHaveText(
+        /Track\s*Auto Chess/i,
+      );
+      await expect(
+        page.getByRole("textbox", { name: "Email address", exact: true }),
+      ).toBeVisible();
+      await expect(
+        page.getByRole("button", { name: "Sign up", exact: true }),
+      ).toBeEnabled();
+
+      const search = page.getByPlaceholder("Steam profile URL or SteamID64", {
+        exact: true,
+      });
+      await expect(search).toBeVisible();
+      await search.fill("invalid steam profile!");
+      await page.getByRole("button", { name: "Search", exact: true }).click();
+      await expect(search).toHaveAttribute("aria-invalid", "true");
+      await expect(
+        page.getByText("Enter a SteamID64, vanity name, or profile URL.", {
+          exact: true,
+        }),
+      ).toBeVisible();
+
+      await expect(
+        page.getByRole("link", {
+          name: "Join the Apocalypse Tournament Discord",
+        }),
+      ).toHaveCount(0);
+      await expect(page.getByText(/Apocalypse Tournament/)).toHaveCount(0);
+    });
   });
-  await expect(alert).toBeVisible();
-  await expect(alert).toHaveAttribute(
-    "href",
-    "https://discord.gg/rGtg2yJdS",
-  );
-  await expect(alert).toHaveAttribute("target", "_blank");
-  await expect(alert).toHaveAttribute("rel", "noopener noreferrer");
-  await expect(alert).toContainText("Apocalypse Tournament");
-  await expect(alert).toContainText("11–13 September");
-  await expect(alert).toContainText("hosted by Dumpstered & Arthur");
-  await expect(alert).toContainText("Join on Discord");
-  const strip = page.getByRole("status");
-  const palette = await strip.evaluate((element) => {
-    const probe = document.createElement("span");
-    probe.style.color = "var(--text-secondary)";
-    probe.style.background =
-      "color-mix(in srgb, var(--gold) 8%, transparent)";
-    probe.style.borderBottom =
-      "1px solid color-mix(in srgb, var(--gold) 35%, var(--border))";
-    element.appendChild(probe);
-
-    const actual = getComputedStyle(element);
-    const expected = getComputedStyle(probe);
-    const result = {
-      actual: {
-        backgroundColor: actual.backgroundColor,
-        backgroundImage: actual.backgroundImage,
-        borderBottomColor: actual.borderBottomColor,
-        color: actual.color,
-      },
-      expected: {
-        backgroundColor: expected.backgroundColor,
-        backgroundImage: expected.backgroundImage,
-        borderBottomColor: expected.borderBottomColor,
-        color: expected.color,
-      },
-    };
-
-    probe.remove();
-    return result;
-  });
-  expect(palette.actual).toEqual(palette.expected);
-
-  const goldColor = await alert.evaluate((element) => {
-    const probe = document.createElement("span");
-    probe.style.color = "var(--gold)";
-    element.appendChild(probe);
-    const color = getComputedStyle(probe).color;
-    probe.remove();
-    return color;
-  });
-  await alert.hover();
-  await expect(alert).toHaveCSS("color", goldColor);
-  await page.mouse.move(0, 0);
-  await alert.focus();
-  await expect(alert).toHaveCSS("color", goldColor);
-  await expect(alert).toHaveCSS("outline-color", goldColor);
-
-  await expect(
-    page.getByRole("region", { name: "Featured tournament" }),
-  ).toHaveCount(0);
-});
+}
