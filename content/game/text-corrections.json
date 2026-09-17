@@ -6,6 +6,12 @@
       "replace": "furthest",
       "where": ["items_full"],
       "note": "Blink Dagger and Overwhelming Blink misspell 'furthest' as 'farest'."
+    },
+    {
+      "find": "Первая атака после Прыжка за спину всегда становится критическим ударом с максимальным множителем\\.",
+      "replace": "Первая атака после Прыжка за спину всегда становится критическим ударом со случайным множителем.",
+      "where": ["synergies"],
+      "note": "Russian Assassin opening-leap text incorrectly says maximum multiplier; English and Chinese specify random. The nine-Assassin maximum-damage effect remains unchanged."
     }
   ]
 }

@@ -234,31 +234,79 @@ def get_notes(prefix, loc):
     return notes
 
 
+def lua_tokens(source):
+    """Tokenize enough Lua to distinguish table syntax from comments/strings.
+
+    String contents retain their source escapes; this is not a Lua evaluator.
+    """
+    long_pattern = re.compile(r'\[(=*)\[')
+    identifier_pattern = re.compile(r'[A-Za-z_][A-Za-z0-9_]*(?:\.[A-Za-z_][A-Za-z0-9_]*)*')
+    newline_pattern = re.compile(r'[\r\n]')
+    pos = 0
+    while pos < len(source):
+        if source[pos].isspace():
+            pos += 1
+            continue
+        comment = source.startswith('--', pos)
+        start = pos + 2 if comment else pos
+        long_open = long_pattern.match(source, start)
+        if long_open:
+            content_start = long_open.end()
+            close = ']' + long_open.group(1) + ']'
+            end = source.find(close, content_start)
+            if end == -1:
+                return
+            if not comment:
+                yield ('string', source[content_start:end])
+            pos = end + len(close)
+        elif comment:
+            end = newline_pattern.search(source, start)
+            pos = end.start() if end else len(source)
+        elif source[pos] in "\"'":
+            quote = source[pos]
+            start = pos + 1
+            pos = start
+            while pos < len(source) and source[pos] != quote:
+                pos += 2 if source[pos] == '\\' else 1
+            if pos >= len(source):
+                return
+            yield ('string', source[start:pos])
+            pos += 1
+        else:
+            identifier = identifier_pattern.match(source, pos)
+            if identifier:
+                yield ('identifier', identifier.group())
+                pos = identifier.end()
+            else:
+                yield ('symbol', source[pos])
+                pos += 1
+
+
 def extract_lua_string_map(raw_lua, name):
-    """Extract a flat ``key = "value"`` table from Lua source."""
-    source = re.sub(r'--[^\r\n]*', '', raw_lua)
-    match = re.search(re.escape(name) + r'\s*=\s*\{', source)
-    if not match:
+    """Extract a flat literal string table, ignoring commented/quoted Lua."""
+    tokens = list(lua_tokens(raw_lua))
+    for start in range(len(tokens) - 2):
+        if tokens[start:start + 3] == [
+            ('identifier', name), ('symbol', '='), ('symbol', '{'),
+        ]:
+            break
+    else:
         return {}
 
-    start = match.end()
+    result = {}
     depth = 1
-    pos = start
-    while pos < len(source) and depth > 0:
-        if source[pos] == '{':
+    for pos in range(start + 3, len(tokens)):
+        kind, value = tokens[pos]
+        if (kind, value) == ('symbol', '{'):
             depth += 1
-        elif source[pos] == '}':
+        elif (kind, value) == ('symbol', '}'):
             depth -= 1
-        pos += 1
-
-    block = source[start:pos - 1]
-    return {
-        key: value
-        for key, quote, value in re.findall(
-            r'([A-Za-z_][A-Za-z0-9_]*)\s*=\s*([\'"])(.*?)\2',
-            block,
-        )
-    }
+            if depth == 0:
+                return result
+        elif depth == 1 and kind == 'identifier' and pos + 2 < len(tokens):
+            if tokens[pos + 1] == ('symbol', '=') and tokens[pos + 2][0] == 'string':
+                result[value] = tokens[pos + 2][1]
+    return {}
 
 
 def collect_unit_ability_ids(stars, mapped_ability=None):
@@ -1307,7 +1355,8 @@ def main():
         cat_dir.mkdir(parents=True, exist_ok=True)
         for texture, name in textures.items():
             stem = texture.replace('item_custom/', '').replace('custom/', '').replace('item_', '')
-            out_path = cat_dir / f'{stem}.png'
+            output_stem = relic_icon_stem(name) if category == 'relics' else stem
+            out_path = cat_dir / f'{output_stem}.png'
             if out_path.exists():
                 continue
             found = False
