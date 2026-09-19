@@ -1,0 +1,26 @@
+{
+  "date": "2026-09-10",
+  "title": "Rebalance Patch",
+  "source": "https://steamcommunity.com/sharedfiles/filedetails/changelog/1613886175",
+  "entitiesSynced": false,
+  "sourceEntries": [
+    {
+      "sourceId": "1789059131",
+      "date": "2026-09-10",
+      "time": "9:52am",
+      "contentHash": "f022ca52fd924cb0"
+    }
+  ],
+  "sections": [
+    {
+      "heading": "Changes",
+      "entries": [
+        {
+          "kind": "change",
+          "name": "Drodo Notice",
+          "detail": "Due to server restrictions, all matches are hosted locally, please DONOT LEAVE EARLY if you are the HOST. Rank mode is currently closed until solutions on localhosts implemented."
+        }
+      ]
+    }
+  ]
+}

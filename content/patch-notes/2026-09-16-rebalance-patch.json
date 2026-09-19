@@ -1,0 +1,52 @@
+{
+  "date": "2026-09-16",
+  "title": "Rebalance Patch",
+  "source": "https://steamcommunity.com/sharedfiles/filedetails/changelog/1613886175",
+  "entitiesSynced": false,
+  "sourceEntries": [
+    {
+      "sourceId": "1789572817",
+      "date": "2026-09-16",
+      "time": "8:33am",
+      "contentHash": "a6615ff2d6867a1a"
+    },
+    {
+      "sourceId": "1789542131",
+      "date": "2026-09-16",
+      "time": "12:02am",
+      "contentHash": "b1b4767b18e283f3"
+    }
+  ],
+  "sections": [
+    {
+      "heading": "Changes",
+      "entries": [
+        {
+          "kind": "change",
+          "name": "Fix bugs",
+          "detail": "Satan, Linken's Sphere, Ogre Hood, Eye of Skadi, Aegis of Immortals, and Bloodstone their special effects or maximum‑health‑modifying effects missing."
+        },
+        {
+          "kind": "change",
+          "name": "Ranked Mode (Local Host Version) Beta",
+          "detail": "Ranked Mode (Local Host Version) Beta"
+        },
+        {
+          "kind": "change",
+          "name": "Host player point reward rules",
+          "detail": "Upon starting a game, the host player automatically pledges a portion of points for credit. Hosts with better historical credit need to pledge fewer points (three tiers: ‑100 / ‑60 / ‑20). Points will be forfeited if the host quits early. Points will be returned to the host as +120 points upon full completion of the match."
+        },
+        {
+          "kind": "change",
+          "name": "Fixed bugs",
+          "detail": "incorrect rank evaluation caused by point pledging, and unintended loss of point triggered by match abortion."
+        },
+        {
+          "kind": "change",
+          "name": "Badge for Premium local hosts will be awarded later",
+          "detail": "Awakening the Machine"
+        }
+      ]
+    }
+  ]
+}
