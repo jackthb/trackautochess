@@ -1,6 +1,6 @@
 import type { NextApiRequest } from "next";
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { normalizeSteamId64 } from "@dac/shared/steam";
+import { verifiedSteamIdentity } from "./verifiedSteamIdentity";
 
 export interface SessionUser {
   steamId: string | null;
@@ -23,9 +23,5 @@ export async function getSessionUser(
   if (!token) return { steamId: null };
   const { data, error } = await supabase.auth.getUser(token);
   if (error || !data?.user) return { steamId: null };
-  const meta = data.user.user_metadata as
-    | { steam_id?: unknown }
-    | null
-    | undefined;
-  return { steamId: normalizeSteamId64(meta?.steam_id) };
+  return { steamId: verifiedSteamIdentity(data.user) };
 }
