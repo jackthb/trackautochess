@@ -6,7 +6,7 @@
    "observed_at": "2026-07-27T23:29:28+01:00",
    "raw": {
     "data": {
-     "76561198022169086": {
+     "76561198000000101": {
       "chess_hand": "chess_dk,chess_aa,chess_cm,",
       "chess_lineup": "chess_lc1,chess_riki,chess_puck1,chess_lina1,chess_dk1,chess_phx,chess_lyc1,chess_naga1,chess_om1,chess_cm,chess_thd1,chess_lion1,chess_rm1,chess_light1,",
       "curr_rank": 1,
@@ -38,10 +38,10 @@
        }
       },
       "round": 40,
-      "steam_id": "76561198022169086",
+      "steam_id": "76561198000000101",
       "team_id": 11
      },
-     "76561198041650294": {
+     "76561198000000102": {
       "chess_hand": "chess_lina1,chess_sniper1,chess_vs,chess_vs,chess_sniper,chess_sniper,",
       "chess_lineup": "chess_kez1,chess_sm11,chess_sniper1,chess_rubick1,chess_ct11,chess_bs,chess_lina1,",
       "curr_rank": 8,
@@ -68,10 +68,10 @@
        }
       },
       "round": 29,
-      "steam_id": "76561198041650294",
+      "steam_id": "76561198000000102",
       "team_id": 10
      },
-     "76561198054438370": {
+     "76561198000000103": {
       "chess_hand": "chess_lina,chess_luna,chess_light,chess_light,chess_lina,chess_puck,chess_tech,chess_luna1,",
       "chess_lineup": "chess_db1,chess_lion1,chess_kunkka1,chess_luna1,chess_wl,chess_cm1,chess_puck,chess_dk,chess_thd,",
       "curr_rank": 7,
@@ -100,10 +100,10 @@
        }
       },
       "round": 33,
-      "steam_id": "76561198054438370",
+      "steam_id": "76561198000000103",
       "team_id": 7
      },
-     "76561198056498892": {
+     "76561198000000104": {
       "chess_hand": "chess_snap,chess_tk1,chess_clock1,chess_tk,chess_tk,chess_ga,",
       "chess_lineup": "chess_meepo1,chess_snap1,chess_ga1,chess_tk1,chess_gyro,chess_clock1,chess_snap1,chess_shredder1,chess_bh1,chess_ga1,",
       "curr_rank": 4,
@@ -135,10 +135,10 @@
        }
       },
       "round": 39,
-      "steam_id": "76561198056498892",
+      "steam_id": "76561198000000104",
       "team_id": 8
      },
-     "76561198074465891": {
+     "76561198000000105": {
       "chess_hand": "chess_morph,chess_morph,chess_ck1,chess_huskar,chess_sven,chess_huskar,chess_dk,",
       "chess_lineup": "chess_lc1,chess_huskar1,chess_dw1,chess_ck1,chess_pom1,chess_dk,chess_rubick1,chess_troll1,chess_bat1,chess_luna1,",
       "curr_rank": 2,
@@ -169,10 +169,10 @@
        }
       },
       "round": 40,
-      "steam_id": "76561198074465891",
+      "steam_id": "76561198000000105",
       "team_id": 6
      },
-     "76561198259272391": {
+     "76561198000000106": {
       "chess_hand": "chess_io,magic_box,chess_io,magic_box,",
       "chess_lineup": "chess_bs,chess_viper,chess_light1,chess_thd,chess_kunkka1,chess_puck1,chess_dk1,chess_light1,chess_lina1,",
       "curr_rank": 5,
@@ -203,10 +203,10 @@
        }
       },
       "round": 38,
-      "steam_id": "76561198259272391",
+      "steam_id": "76561198000000106",
       "team_id": 13
      },
-     "76561198408444744": {
+     "76561198000000107": {
       "chess_hand": "chess_aa1,chess_et1,chess_cm,",
       "chess_lineup": "chess_rubick1,chess_thd,chess_lina1,chess_ww1,chess_puck1,chess_rm,chess_aa1,chess_naga1,chess_light1,chess_phx1,",
       "curr_rank": 3,
@@ -235,10 +235,10 @@
        }
       },
       "round": 39,
-      "steam_id": "76561198408444744",
+      "steam_id": "76561198000000107",
       "team_id": 9
      },
-     "76561199574035922": {
+     "76561198000000108": {
       "chess_hand": "chess_io,chess_lyc1,chess_fur11,chess_et1,chess_ld,chess_brew1,chess_lyc,",
       "chess_lineup": "chess_ember1,chess_ld1,chess_tp11,chess_tp11,chess_fur11,chess_mk1,chess_eh11,chess_pangolier1,",
       "curr_rank": 6,
@@ -271,7 +271,7 @@
        }
       },
       "round": 34,
-      "steam_id": "76561199574035922",
+      "steam_id": "76561198000000108",
       "team_id": 12
      }
     },
@@ -285,53 +285,53 @@
    "raw": {
     "hehe": 306,
     "info": {
-     "76561198022169086": {
+     "76561198000000101": {
       "hero_index": 241,
       "mmr_level": 20,
       "player_id": 5,
-      "steam_id": "76561198022169086"
+      "steam_id": "76561198000000101"
      },
-     "76561198041650294": {
+     "76561198000000102": {
       "hero_index": 433,
       "mmr_level": 19,
       "player_id": 4,
-      "steam_id": "76561198041650294"
+      "steam_id": "76561198000000102"
      },
-     "76561198054438370": {
+     "76561198000000103": {
       "hero_index": 209,
       "mmr_level": 19,
       "player_id": 0,
-      "steam_id": "76561198054438370"
+      "steam_id": "76561198000000103"
      },
-     "76561198056498892": {
+     "76561198000000104": {
       "hero_index": 337,
       "mmr_level": 16,
       "player_id": 2,
-      "steam_id": "76561198056498892"
+      "steam_id": "76561198000000104"
      },
-     "76561198074465891": {
+     "76561198000000105": {
       "hero_index": 273,
       "mmr_level": 16,
       "player_id": 1,
-      "steam_id": "76561198074465891"
+      "steam_id": "76561198000000105"
      },
-     "76561198259272391": {
+     "76561198000000106": {
       "hero_index": 369,
       "mmr_level": 18,
       "player_id": 7,
-      "steam_id": "76561198259272391"
+      "steam_id": "76561198000000106"
      },
-     "76561198408444744": {
+     "76561198000000107": {
       "hero_index": 401,
       "mmr_level": 20,
       "player_id": 3,
-      "steam_id": "76561198408444744"
+      "steam_id": "76561198000000107"
      },
-     "76561199574035922": {
+     "76561198000000108": {
       "hero_index": 305,
       "mmr_level": 0,
       "player_id": 6,
-      "steam_id": "76561199574035922"
+      "steam_id": "76561198000000108"
      }
     }
    },
@@ -1477,7 +1477,7 @@
    "observed_at": "2026-07-27T23:29:28+01:00",
    "raw": {
     "data": {
-     "76561198022169086": {
+     "76561198000000101": {
       "chess_hand": "chess_dk,chess_aa,chess_cm,",
       "chess_lineup": "chess_lc1,chess_riki,chess_puck1,chess_lina1,chess_dk1,chess_phx,chess_lyc1,chess_naga1,chess_om1,chess_cm,chess_thd1,chess_lion1,chess_rm1,chess_light1,",
       "curr_rank": 1,
@@ -1507,10 +1507,10 @@
        }
       },
       "round": 40,
-      "steam_id": "76561198022169086",
+      "steam_id": "76561198000000101",
       "team_id": 11
      },
-     "76561198041650294": {
+     "76561198000000102": {
       "chess_hand": "chess_lina1,chess_sniper1,chess_vs,chess_vs,chess_sniper,chess_sniper,",
       "chess_lineup": "chess_kez1,chess_sm11,chess_sniper1,chess_rubick1,chess_ct11,chess_bs,chess_lina1,",
       "curr_rank": 8,
@@ -1537,10 +1537,10 @@
        }
       },
       "round": 29,
-      "steam_id": "76561198041650294",
+      "steam_id": "76561198000000102",
       "team_id": 10
      },
-     "76561198054438370": {
+     "76561198000000103": {
       "chess_hand": "chess_lina,chess_luna,chess_light,chess_light,chess_lina,chess_puck,chess_tech,chess_luna1,",
       "chess_lineup": "chess_db1,chess_lion1,chess_kunkka1,chess_luna1,chess_wl,chess_cm1,chess_puck,chess_dk,chess_thd,",
       "curr_rank": 7,
@@ -1569,10 +1569,10 @@
        }
       },
       "round": 33,
-      "steam_id": "76561198054438370",
+      "steam_id": "76561198000000103",
       "team_id": 7
      },
-     "76561198056498892": {
+     "76561198000000104": {
       "chess_hand": "chess_snap,chess_tk1,chess_clock1,chess_tk,chess_tk,chess_ga,",
       "chess_lineup": "chess_meepo1,chess_snap1,chess_ga1,chess_tk1,chess_gyro,chess_clock1,chess_snap1,chess_shredder1,chess_bh1,chess_ga1,",
       "curr_rank": 4,
@@ -1604,10 +1604,10 @@
        }
       },
       "round": 39,
-      "steam_id": "76561198056498892",
+      "steam_id": "76561198000000104",
       "team_id": 8
      },
-     "76561198074465891": {
+     "76561198000000105": {
       "chess_hand": "chess_morph,chess_morph,chess_ck1,chess_huskar,chess_sven,chess_huskar,chess_dk,",
       "chess_lineup": "chess_lc1,chess_huskar1,chess_dw1,chess_ck1,chess_pom1,chess_dk,chess_rubick1,chess_troll1,chess_bat1,chess_luna1,",
       "curr_rank": 2,
@@ -1636,10 +1636,10 @@
        }
       },
       "round": 40,
-      "steam_id": "76561198074465891",
+      "steam_id": "76561198000000105",
       "team_id": 6
      },
-     "76561198259272391": {
+     "76561198000000106": {
       "chess_hand": "chess_io,magic_box,chess_io,magic_box,",
       "chess_lineup": "chess_bs,chess_viper,chess_light1,chess_thd,chess_kunkka1,chess_puck1,chess_dk1,chess_light1,chess_lina1,",
       "curr_rank": 5,
@@ -1670,10 +1670,10 @@
        }
       },
       "round": 38,
-      "steam_id": "76561198259272391",
+      "steam_id": "76561198000000106",
       "team_id": 13
      },
-     "76561198408444744": {
+     "76561198000000107": {
       "chess_hand": "chess_aa1,chess_et1,chess_cm,",
       "chess_lineup": "chess_rubick1,chess_thd,chess_lina1,chess_ww1,chess_puck1,chess_rm,chess_aa1,chess_naga1,chess_light1,chess_phx1,",
       "curr_rank": 3,
@@ -1702,10 +1702,10 @@
        }
       },
       "round": 39,
-      "steam_id": "76561198408444744",
+      "steam_id": "76561198000000107",
       "team_id": 9
      },
-     "76561199574035922": {
+     "76561198000000108": {
       "chess_hand": "chess_io,chess_lyc1,chess_fur11,chess_et1,chess_ld,chess_brew1,chess_lyc,",
       "chess_lineup": "chess_ember1,chess_ld1,chess_tp11,chess_tp11,chess_fur11,chess_mk1,chess_eh11,chess_pangolier1,",
       "curr_rank": 6,
@@ -1738,7 +1738,7 @@
        }
       },
       "round": 34,
-      "steam_id": "76561199574035922",
+      "steam_id": "76561198000000108",
       "team_id": 12
      }
     },

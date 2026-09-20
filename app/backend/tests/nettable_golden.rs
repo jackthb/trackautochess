@@ -28,7 +28,7 @@ fn parser_matches_golden_fixtures() {
 /// (buff strings like "is_warlock:1"). A parser that tests for a "key :" line
 /// before the ">>" data line misreads those data lines as new keys, drops the
 /// whole table, and silently loses all live player state. This fixture is a
-/// real captured dump; assert the table decodes into actual per-player data.
+/// anonymized captured dump; assert the table decodes into per-player data.
 fn assert_player_info_colon_coverage(case_dir: &Path) {
     let decoded = read_json(&case_dir.join("expected_decoded.json"));
     let data = decoded

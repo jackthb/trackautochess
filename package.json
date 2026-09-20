@@ -34,5 +34,6 @@
   "devDependencies": {
     "supabase": "2.105.0",
     "youtube-transcript": "^1.2.1"
-  }
+  },
+  "license": "MIT"
 }
