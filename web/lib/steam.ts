@@ -308,7 +308,7 @@ export function listAvatarUrl(url: string): string {
 }
 
 /**
- * Resolve a vanity URL slug (e.g. "agit142" from steamcommunity.com/id/agit142)
+ * Resolve a vanity URL slug (e.g. "example-player" from steamcommunity.com/id/example-player)
  * to a numeric SteamID64. Steam is the authority for vanity URLs; cached
  * custom_url rows can go stale when users rename or transfer vanity slugs.
  */

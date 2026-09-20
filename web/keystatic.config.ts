@@ -4,7 +4,7 @@ import ReactMarkdown from "react-markdown";
 import remarkBreaks from "remark-breaks";
 import remarkGfm from "remark-gfm";
 
-const githubRepo = "jackthb/dac-tools" as const;
+const githubRepo = "jackthb/trackautochess" as const;
 // The storage *kind* must resolve identically in the browser bundle and on the
 // server, because the client decides whether to read content from the GitHub
 // API (github mode) or from /api/keystatic/tree (local mode). Only NEXT_PUBLIC_*

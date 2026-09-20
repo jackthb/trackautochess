@@ -369,12 +369,15 @@ mod tests {
 
     #[test]
     fn normalize_steam_name_strips_cdata() {
-        assert_eq!(normalize_steam_name("<![CDATA[Jack]]>"), "Jack");
+        assert_eq!(normalize_steam_name("<![CDATA[Player]]>"), "Player");
     }
 
     #[test]
     fn normalize_steam_name_unescapes_xml_entities() {
-        assert_eq!(normalize_steam_name("Jack &amp; Jill"), "Jack & Jill");
+        assert_eq!(
+            normalize_steam_name("Player &amp; Opponent"),
+            "Player & Opponent"
+        );
     }
 
     #[test]
@@ -405,8 +408,8 @@ mod tests {
             handle.join().expect("callback thread should finish");
         }
 
-        assert_eq!(result.steam_id, "76561198022169086");
-        assert_eq!(result.steam_name, "Jack");
+        assert_eq!(result.steam_id, "76561198000000001");
+        assert_eq!(result.steam_name, "Player");
         let session = result
             .supabase_session
             .expect("desktop callback should include Supabase session");
@@ -435,8 +438,8 @@ mod tests {
             .map(|(authority, path)| (authority, format!("/{path}")))
             .unwrap_or((target, "/".to_owned()));
         let query = [
-            ("steam_id", "76561198022169086"),
-            ("steam_name", "Jack"),
+            ("steam_id", "76561198000000001"),
+            ("steam_name", "Player"),
             ("access_token", "access-token"),
             ("refresh_token", "refresh-token"),
             ("expires_in", "3600"),

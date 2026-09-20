@@ -58,3 +58,7 @@ data/vscript_diffs/
 scripts/build-guides/cache/
 
 .vercel
+
+# Local browser test artifacts
+**/test-results/
+**/playwright-report/

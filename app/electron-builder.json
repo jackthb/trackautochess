@@ -69,6 +69,6 @@
   "publish": {
     "provider": "github",
     "owner": "jackthb",
-    "repo": "dac-tools"
+    "repo": "trackautochess"
   }
 }

@@ -1,177 +1,73 @@
-# Track Auto Chess
+# Developer guide
 
-Game tracking and analysis for Dota Auto Chess.
+Track Auto Chess contains a Windows desktop tracker and a Next.js web app. Both use the committed game content and shared UI utilities in this repository.
 
-- **Web** - [trackautochess.com](https://www.trackautochess.com) - player lookup, match history, patch notes, item/unit/synergy/relic/talent guides, and Keystatic content editing.
-- **Desktop App** - Electron + React + Rust tracker that captures Dota console/nettable data locally and syncs processed match data to Supabase.
-- **Patch note scraper** - Local script that polls the Steam Workshop changelog and commits content updates, run hourly by Cronicle on the Pi with a manual GitHub Actions fallback.
+## Install
 
-## Repository layout
+Install Node.js 24 and pnpm 10.32.1. From the repository root:
+
+```sh
+pnpm install --frozen-lockfile
+```
+
+Desktop development also requires a current stable Rust toolchain (at least 1.85) and the Visual Studio C++ build tools. Live capture requires Windows, Dota 2 and the Dota Auto Chess Workshop item.
+
+## Web app
+
+```sh
+pnpm --dir web run dev
+```
+
+Open http://localhost:3000. The development command generates runtime data from `content/` automatically. Game-content pages work without service credentials. The local content editor is at `/keystatic`.
+
+For database-backed features, copy [web/.env.example](../web/.env.example) to `web/.env.local` and configure your own services. The example documents Supabase, Steam authentication, analytics, the game assistant and optional GitHub-backed content editing. Keep service-role keys on the server. A root `.env.local` is not loaded by Next.js.
+
+```sh
+pnpm --dir web run build
+pnpm --dir web run start
+```
+
+The production build generates runtime content and copies the game icons before compiling the site.
+
+## Desktop app
+
+The desktop app includes connection defaults for the official service. Enable local-only mode before development to disable cloud sync. In PowerShell:
+
+```powershell
+$env:DAC_LOCAL_ONLY = "1"
+pnpm --dir app run build:backend
+pnpm --dir app run dev
+```
+
+The backend build writes its binary to `app/backend/dist/headless/`. Electron launches it and exchanges JSON Lines over stdin/stdout.
+
+To build the Windows installer:
+
+```sh
+pnpm --dir app run build:all
+```
+
+Configuration and local capture data live in `%APPDATA%\@dac\desktop` on Windows, or `~/.dac` elsewhere. Set `DAC_DIR` before launching to use a separate development directory. That directory contains `config.json`, captures, local nettable dumps, logs and the upload outbox. Keep these files out of commits.
+
+For an offline parser check:
+
+```sh
+cargo run --manifest-path app/backend/Cargo.toml -- parse-log <path-to-console.log>
+```
+
+## Project layout
 
 | Path | Purpose |
 | --- | --- |
-| `app/` | Electron desktop app, Vite/React renderer, and packaging config. |
-| `app/backend/` | Rust backend spawned by Electron; handles capture, GSI, Steam auth, Supabase sync, diagnostics, and outbox replay. |
-| `web/` | Next.js App Router site and Keystatic CMS. |
-| `content/` | Committed CMS/game content JSON used by the web app and desktop content readers. |
-| `data/` | Non-CMS assets/config and extractor helpers, including icons and parser region config. |
-| `shared/` | Shared React components, styles, and TypeScript utilities consumed by app/web code. |
-| `scripts/` | Root automation for desktop setup/builds, content generation, patch-note scraping, and maintenance tasks. |
-| `supabase/migrations/` | Database and Storage migrations for Supabase. |
+| `app/` | Electron app and React renderer |
+| `app/backend/` | Rust capture, parsing and sync backend |
+| `web/` | Next.js viewer, API routes and content editor |
+| `shared/` | Shared components, styles and utilities |
+| `content/` | Game data, guides and patch notes used by both apps |
+| `data/` | Game icons and extraction helpers |
+| `scripts/` | Build, generation, validation and maintenance tools |
+| `supabase/` | Database migrations, Edge Functions and tests |
 
-## Setup
+Game data is committed under `content/`; `pnpm run web:data` regenerates the web runtime module after edits. Environment settings for standalone maintenance scripts are documented in the root [.env.example](../.env.example).
 
-Install Node dependencies once from the repository root:
-
-```bash
-pnpm install
-```
-
-For the desktop app, also build or verify the Rust backend:
-
-```bash
-npm run install:desktop:backend
-npm run verify:desktop:backend
-```
-
-Environment variables are documented in three example files, one per surface:
-`web/.env.example` for the Next.js app, `.env.example` at the repository root
-for the `scripts/` automation (`generate:supabase-types`,
-`import:legacy-mmr-snapshots`), and `ops/cronicle/.env.example` for the Pi
-poller.
-
-Where each one goes differs, so copy by destination rather than alongside the
-example file:
-
-| Example | Copy to | Loaded by |
-| --- | --- | --- |
-| `web/.env.example` | `web/.env.local` | Next.js |
-| `ops/cronicle/.env.example` | `ops/cronicle/.env` | Cronicle on the Pi |
-| `.env.example` (root), `SUPABASE_PROJECT_ID` / `SUPABASE_SCHEMAS` | nothing — export in your shell | read from `process.env` only |
-| `.env.example` (root), `NEXT_PUBLIC_SUPABASE_URL` / `SUPABASE_SERVICE_ROLE_KEY` | `web/.env.local` | `scripts/import-legacy-mmr-snapshots.mjs`, `scripts/backfill-match-player-synergies.mjs` |
-
-Nothing reads a `.env.local` at the repository root. Because `.gitignore` has
-`*.env.local`, a file created there is silently ignored rather than erroring —
-the symptom is a "missing variable" failure for values you just set.
-
-## Common commands
-
-### Desktop app
-
-```bash
-npm run dev:desktop                 # build/check backend, start Vite, launch Electron
-npm run start:desktop               # build/check backend, build renderer, launch Electron
-npm run build:desktop               # Vite renderer build only
-npm run build:desktop:backend       # Cargo release build copied to app/backend/dist/headless/
-npm run build:desktop:installer     # electron-builder Windows installer
-npm run build:desktop:installer:dir # unpacked electron-builder output
-npm run build:desktop:all           # backend + installer via app scripts
-```
-
-Equivalent app-local commands are available from `app/`, including `pnpm run dev`, `pnpm run dev:vite`, `pnpm run dev:electron`, `pnpm run build:backend`, and `pnpm run build:all`.
-
-### Rust backend
-
-```bash
-cargo run --manifest-path app/backend/Cargo.toml -- daemon
-cargo run --manifest-path app/backend/Cargo.toml -- parse-log <path-to-console.log>
-cargo run --manifest-path app/backend/Cargo.toml -- parse-log-full <path-to-console.log>
-cargo run --manifest-path app/backend/Cargo.toml -- parse-live <path-to-console.log> [local-steam-id]
-cargo test --manifest-path app/backend/Cargo.toml
-```
-
-`main.rs` dispatches twelve subcommands in total. Alongside those above:
-
-| Subcommand | Purpose |
-| --- | --- |
-| `queue <payload.json>` | Queue a payload into the local outbox. |
-| `outbox-list` | List pending outbox payloads. |
-| `outbox-flush` | Replay the outbox to Supabase and report uploaded/failed counts. |
-| `gsi-cfg` | Print the GSI config file contents. |
-| `finalize-log [console.log]` | Recover and upload a match from a `console.log` whose upload never happened. Falls back to the left-early writer. |
-| `finalize-dump <dump>` | Same recovery, from a saved nettable dump. |
-| `timeline-from-log <console.log> <match_id>` | Rebuild and upload just the timeline for a known match. |
-| `timeline-from-dump <dump> <match_id>` | Same, from a saved nettable dump. |
-
-### Web app
-
-```bash
-pnpm --dir web run dev    # generates runtime data, then starts Next.js on port 3000
-pnpm --dir web run build  # generates runtime data, syncs icons, then builds Next.js
-npm run web:data          # regenerate web/generated runtime data from content/
-```
-
-## Data pipeline
-
-Game/CMS data lives in committed JSON files under `content/`. The app, web runtime, scraper, and VPK extractor all use that content shape directly. `data/` is for non-CMS assets/config such as icons and local extractor helper scripts.
-
-```text
-content/*.json  ->  web generated runtime module    ->  web
-content/*.json  ->  Electron/Rust content readers   ->  desktop app
-VPK files       ->  data/extract_vpk.py             ->  content/game + data/icons
-Steam changelog ->  scripts/scrape-patch-notes.mjs  ->  content/patch-notes + content/game
-```
-
-- `node scripts/generate-web-runtime-data.mjs` - build web/generated runtime data from content.
-- `pnpm --dir web run dev` - run the web app and Keystatic at `/keystatic`.
-- `python data/extract_vpk.py` - extract game data into `content/game` and icons into `data/icons`.
-- `node scripts/scrape-patch-notes.mjs` - scrape new patch notes and update content files.
-
-## Runtime data and storage
-
-- Desktop runtime config is stored in `config.json` inside the DAC data dir (`%APPDATA%\@dac\desktop` on Windows, `~/.dac` elsewhere; `DAC_DIR` overrides both). On Windows that is `C:\Users\<user>\AppData\Roaming\@dac\desktop`; `~/.dac` there is the legacy location, copied forward once on upgrade and never written to again.
-- The Rust backend may also use `outbox/`, `replays/`, `captures/`, `nettable_dumps/`, and tracker logs inside that same dir for local-first capture, replay, diagnostics, and retry behavior.
-- Supabase stores public product data in `users`, `player_seasons`, `mmr_snapshots`, `matches`, `match_players`, `match_timelines`, `lineup_snapshots`, `community_builds`, `community_build_votes`, `community_build_comments`, `content_embeddings`, and `site_status`.
-- Supabase Storage bucket `diagnostic-logs` stores uploaded diagnostics. Raw nettable dump logs are never uploaded — they stay local under `nettable_dumps/` in the DAC data dir.
-
-## Automation
-
-- `.github/workflows/release.yml` runs on `v*` tags, builds the Windows Electron app and Rust backend, and uploads installer `.exe` artifacts to the GitHub Release.
-- No workflow is on a live schedule. The old Queen-player and Drodo poll crons (`refresh-queens.yml`, `poll-drodo.yml`, and the `/api/cron/*` routes they called) were removed: `/queens` is capture-driven while `QUEENS_DRODO_VIEW_REFRESH_ENABLED` is `false`, and Drodo background polling stays parked. See [polling.md](polling.md).
-
-### Cronicle jobs on the Pi
-
-Cronicle on the Pi is the live scheduler for the DAC patch-notes scrape. Drodo MMR polling jobs exist in `ops/cronicle/` but are disabled while live fetch is parked (policy in [polling.md](polling.md)). See [ops/cronicle/README.md](../ops/cronicle/README.md) for setup, schedules, and runbook details.
-
-`.github/workflows/scrape-patch-notes.yml` is an emergency fallback and should remain `workflow_dispatch`-only unless Cronicle is down. The scrape lives on the Pi because Steam occasionally serves GitHub-hosted runner IPs an anti-bot response with no changelog content; the Pi's residential IP avoids that.
-
-## Editing content from a phone
-
-The CMS is Keystatic at `/keystatic`. Local development uses local file edits. Production uses GitHub-backed storage when these env vars are set:
-
-```bash
-KEYSTATIC_GITHUB_REPO=jackthb/dac-tools
-KEYSTATIC_GITHUB_CLIENT_ID=<generated-github-app-client-id>
-KEYSTATIC_GITHUB_CLIENT_SECRET=<generated-github-app-client-secret>
-KEYSTATIC_SECRET=<generated-random-secret>
-NEXT_PUBLIC_KEYSTATIC_GITHUB_APP_SLUG=<installed-keystatic-github-app-slug>
-```
-
-Keystatic generates the GitHub App values during its GitHub connection flow; copy those values into Vercel for Production before using the deployed editor.
-
-With no Keystatic branch prefix configured, edits are committed directly to the repository's default branch (`main`).
-
-## UI components
-
-The web app is migrating its hand-rolled interactive UI to [Base UI](https://base-ui.com)
-(`@base-ui/react`) — headless, accessible React primitives from the MUI/Radix
-team — so behaviour like focus management, keyboard navigation, and dismissal is
-handled by a maintained library instead of bespoke code. Styling stays in our CSS
-Modules using the shared design tokens.
-
-This is intentionally incremental. **Migrated so far:** the nav mega-menu
-(`web/components/app/AppNavBar.tsx`, using `NavigationMenu`). **Still to migrate:**
-other custom dropdowns, dialogs/modals, tooltips, and popovers across `web/`.
-When adding or reworking one of those, reach for the Base UI primitive rather than
-hand-rolling state.
-
-## Tech stack
-
-| Layer | Tech |
-|-------|------|
-| Web | Next.js 16, React 19, Base UI, Vercel |
-| CMS | Keystatic + committed JSON |
-| Database | Supabase (PostgreSQL + Storage) |
-| Desktop | Electron, React 19, Vite |
-| Backend | Rust, Cargo |
-| CI | GitHub Actions |
+See [CONTRIBUTING.md](../CONTRIBUTING.md) for validation and test setup, and [THIRD_PARTY_NOTICES.md](../THIRD_PARTY_NOTICES.md) for game-content and font notices.

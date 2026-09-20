@@ -417,8 +417,8 @@ mod tests {
     #[test]
     fn steam_id64_to_account_id_uses_standard_valve_offset() {
         assert_eq!(
-            steam_id64_to_account_id("76561198022169086"),
-            Some("61903358".to_owned())
+            steam_id64_to_account_id("76561198000000001"),
+            Some("39734273".to_owned())
         );
         assert_eq!(steam_id64_to_account_id("not-a-steam-id"), None);
     }

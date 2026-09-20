@@ -42,6 +42,10 @@ The desktop app includes connection defaults for the official service. For local
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for checks and contribution guidance.
 
+Source archives contain the apps and their supporting code, data and setup
+guides. Historical planning notes and private operations files are excluded
+using `.gitattributes`.
+
 ## Licence and third-party material
 
 Original project code is available under the [MIT licence](LICENSE). Game artwork, game-derived content, trademarks, fonts and dependencies retain their respective ownership and terms; see [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md). The MIT licence does not grant rights to those materials.

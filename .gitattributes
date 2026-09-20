@@ -8,3 +8,14 @@
 *.ico binary
 *.vpk binary
 *.dat binary
+
+# Keep private maintainer history and operations in the archive repository.
+# git archive produces the smaller, history-free public source distribution.
+/.cursor export-ignore
+/.mcp.json export-ignore
+/AGENTS.md export-ignore
+/CLAUDE.md export-ignore
+/TODO.md export-ignore
+/ops export-ignore
+/docs/** export-ignore
+/docs/README.md -export-ignore

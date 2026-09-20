@@ -27,16 +27,16 @@ test("Queens page renders the saved ladder snapshot", async ({ page }) => {
 
   if (!QUEENS_DRODO_VIEW_REFRESH_ENABLED) {
     expect(refreshCalls).toBe(0);
-    await expect(page.getByRole("status")).not.toHaveText(
-      "Refreshing Queen profiles..."
-    );
+    await expect(page.getByRole("status").filter({
+      hasText: "Refreshing Queen profiles...",
+    })).toHaveCount(0);
   }
 });
 
 test("player page exposes the profile refresh surface", async ({ page }) => {
-  const playerPath =
-    process.env.SMOKE_PLAYER_PATH ?? "/players/76561198237138642";
+  const playerPath = process.env.SMOKE_PLAYER_PATH;
+  test.skip(!playerPath, "Set SMOKE_PLAYER_PATH to a profile in your test database.");
 
-  await page.goto(playerPath, { waitUntil: "domcontentloaded" });
+  await page.goto(playerPath!, { waitUntil: "domcontentloaded" });
   await expect(page.getByRole("main")).toBeVisible();
 });

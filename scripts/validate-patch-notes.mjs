@@ -2,7 +2,7 @@
 /**
  * Validate patch-note labels, optionally against the newest saved VScript diff.
  *
- * JACK-PC local pipeline (Steam Workshop item 1613886175 must already exist):
+ * Local pipeline (Steam Workshop item 1613886175 must already exist):
  *   npm run patch-notes:local
  *
  * Direct usage:

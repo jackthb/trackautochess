@@ -46,10 +46,6 @@ const QUEEN_LADDER_AUTO_SYNC_INTERVAL: Duration = Duration::from_secs(600);
 const LEFT_MATCH_UPLOAD_GRACE: Duration = Duration::from_secs(30 * 60);
 const POST_GAME_END_BOARD_ATTEMPTS: usize = 10;
 const POST_GAME_DUMP_WAIT: Duration = Duration::from_millis(1200);
-const PREFERRED_CAPTURE_STEAM_IDS: &[&str] = &[
-    "76561198022169086", // Jack
-];
-
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 struct DumpCommandResult {
     transport: &'static str,
@@ -92,9 +88,6 @@ struct NettableState {
     /// Set by `poll_once` when the UI left `DOTA_GAME_UI_DOTA_INGAME`; the
     /// capture loop consumes it to finalize the match (GSI-independent).
     pending_match_end: bool,
-    /// Preferred capture owner for multi-observer lobbies. None means the
-    /// roster is unknown or no preferred owner is present, so capture fails open.
-    capture_owner_steam_id: Option<String>,
     /// Last observed DAC round. Round changes drive frontend notifications and
     /// let us keep parity with the Python capture cascade.
     last_round: Option<i64>,
@@ -220,12 +213,11 @@ impl NettableService {
                             {
                                 emit(event);
                             }
-                            if local_is_capture_owner(&state) {
-                                let needs_upload = finished_match_id_from_rows(&rows)
-                                    .map(|match_id| !end_board_already_uploaded(&state, &match_id))
-                                    .unwrap_or(false);
-                                match fresh_client_from_disk() {
-                                    Ok(client) => {
+                            let needs_upload = finished_match_id_from_rows(&rows)
+                                .map(|match_id| !end_board_already_uploaded(&state, &match_id))
+                                .unwrap_or(false);
+                            match fresh_client_from_disk() {
+                                Ok(client) => {
                                     if let Some(match_id) = finished_match_id_from_rows(&rows) {
                                         if end_board_already_uploaded(&state, &match_id) {
                                             continue;
@@ -287,16 +279,15 @@ impl NettableService {
                                             emit_fallback_finalize(&rows, &emit, "End-board upload failed; saved a partial match from the last live snapshot.");
                                         }
                                     }
-                                    }
-                                    Err(err) if needs_upload => {
-                                        emit(event_json(&NettableIngestError::with_backend_at(
-                                            &format!("end_board upload failed: {err}"),
-                                            &now_iso_utc(),
-                                        )));
-                                        emit_fallback_finalize(&rows, &emit, "End-board upload failed; saved a partial match from the last live snapshot.");
-                                    }
-                                    Err(_) => {}
                                 }
+                                Err(err) if needs_upload => {
+                                    emit(event_json(&NettableIngestError::with_backend_at(
+                                        &format!("end_board upload failed: {err}"),
+                                        &now_iso_utc(),
+                                    )));
+                                    emit_fallback_finalize(&rows, &emit, "End-board upload failed; saved a partial match from the last live snapshot.");
+                                }
+                                Err(_) => {}
                             }
                         }
                     }
@@ -496,18 +487,6 @@ impl NettableService {
             if let Ok(mut state) = state.lock() {
                 state.paused = false;
             }
-            if !local_is_capture_owner(&state) {
-                let owner = capture_owner_steam_id(&state).unwrap_or_else(|| "unknown".to_owned());
-                let message = format!(
-                    "Dota reported post-game; standing down for preferred capture owner {owner}."
-                );
-                emit(event_json(&NettableGameEnded::new(
-                    &message,
-                    None,
-                    &now_iso_utc(),
-                )));
-                return;
-            }
             let rows = chase_post_game_end_board(&state, &cfg, &emit, "Dota reported post-game");
             if upload_end_board_if_present(
                 &state,
@@ -653,7 +632,6 @@ impl NettableService {
 mod tests {
     use super::*;
     use crate::nettable_parser::extract_rows;
-    use std::collections::BTreeMap;
     use std::path::Path;
 
     // The live standings board was dead because the migration hardcoded
@@ -663,12 +641,12 @@ mod tests {
         let fixture = Path::new(env!("CARGO_MANIFEST_DIR"))
             .join("tests/fixtures/nettable_golden/player_info_colon_buffs/console.log");
         let rows = extract_rows(&fixture).expect("fixture parses");
-        let (players, local_ids) = live_players_value(&rows, Some("76561198022169086"));
+        let (players, local_ids) = live_players_value(&rows, Some("76561198000000101"));
 
         let players = players.as_object().expect("players is an object");
         assert!(!players.is_empty(), "expected at least one live player");
         let player = players
-            .get("76561198022169086")
+            .get("76561198000000101")
             .and_then(|p| p.as_object())
             .expect("local player present");
         // Field renames must hold: hero_level→level, curr_rank→placement.
@@ -682,7 +660,7 @@ mod tests {
             player.contains_key("lineup"),
             "raw chess_lineup carried as lineup"
         );
-        assert_eq!(local_ids, vec!["76561198022169086".to_owned()]);
+        assert_eq!(local_ids, vec!["76561198000000101".to_owned()]);
     }
 
     #[test]
@@ -740,62 +718,11 @@ mod tests {
     }
 
     #[test]
-    fn preferred_capture_owner_wins_when_in_roster() {
-        let mut state = NettableState {
-            local_steam_id: Some("76561198022169086".to_owned()),
-            ..NettableState::default()
-        };
-        update_capture_owner_from_rows(
-            &mut state,
-            &player_id_rows(&["76561198000000001", "76561198022169086"]),
-        );
-
-        assert_eq!(
-            state.capture_owner_steam_id.as_deref(),
-            Some("76561198022169086")
-        );
-        assert!(state.local_is_capture_owner());
-    }
-
-    #[test]
-    fn non_preferred_client_stands_down_when_preferred_owner_present() {
-        let mut state = NettableState {
-            local_steam_id: Some("76561198000000001".to_owned()),
-            ..NettableState::default()
-        };
-        update_capture_owner_from_rows(
-            &mut state,
-            &player_id_rows(&["76561198000000001", "76561198022169086"]),
-        );
-
-        assert_eq!(
-            state.capture_owner_steam_id.as_deref(),
-            Some("76561198022169086")
-        );
-        assert!(!state.local_is_capture_owner());
-    }
-
-    #[test]
-    fn capture_election_fails_open_without_preferred_owner() {
-        let mut state = NettableState {
-            local_steam_id: Some("76561198000000001".to_owned()),
-            ..NettableState::default()
-        };
-        update_capture_owner_from_rows(
-            &mut state,
-            &player_id_rows(&["76561198000000001", "76561198000000002"]),
-        );
-
-        assert_eq!(state.capture_owner_steam_id, None);
-        assert!(state.local_is_capture_owner());
-    }
-
-    #[test]
     fn session_dumps_latch_dac_from_round_without_gsi() {
         // GSI never fired; round_info alone must still accumulate dumps so the
         // per-round scrubber can upload later.
         let state = Arc::new(Mutex::new(NettableState {
-            local_steam_id: Some("76561198022169086".to_owned()),
+            local_steam_id: Some("76561198000000101".to_owned()),
             is_dac_match: false,
             ..NettableState::default()
         }));
@@ -815,7 +742,7 @@ mod tests {
     #[test]
     fn parity_events_emit_round_creep_and_personal_elimination() {
         let state = Arc::new(Mutex::new(NettableState {
-            local_steam_id: Some("76561198022169086".to_owned()),
+            local_steam_id: Some("76561198000000101".to_owned()),
             // Session dumps accumulate once DAC is latched (GSI or round
             // evidence). Seed true here so this test stays focused on events.
             is_dac_match: true,
@@ -835,12 +762,12 @@ mod tests {
             (
                 "CustomNetTable_player_info_table",
                 "player_info",
-                serde_json::json!({"data": {"76561198022169086": {"steam_id": "76561198022169086", "team_id": 6, "round": 10, "curr_rank": 4}}}),
+                serde_json::json!({"data": {"76561198000000101": {"steam_id": "76561198000000101", "team_id": 6, "round": 10, "curr_rank": 4}}}),
             ),
             (
                 "CustomNetTable_player_id_table",
                 "player_0",
-                serde_json::json!({"steam_id": "76561198022169086"}),
+                serde_json::json!({"steam_id": "76561198000000101"}),
             ),
         ]);
 
@@ -864,9 +791,9 @@ mod tests {
         // Simulate F23 round tick (no boards) then F20 board dump for the same
         // round. The timeline must keep the board-rich snap, not the first one.
         let state = Arc::new(Mutex::new(NettableState {
-            local_steam_id: Some("76561198022169086".to_owned()),
+            local_steam_id: Some("76561198000000101".to_owned()),
             match_roster_fingerprint: Some(vec![
-                "76561198022169086".to_owned(),
+                "76561198000000101".to_owned(),
                 "76561198000000001".to_owned(),
             ]),
             ..NettableState::default()
@@ -888,7 +815,7 @@ mod tests {
                             "CustomNetTable_player_info_table",
                             "player_info",
                             serde_json::json!({"data": {
-                                "76561198022169086": {"hp": 99, "hero_level": 4, "curr_rank": 1, "player_id": 0},
+                                "76561198000000101": {"hp": 99, "hero_level": 4, "curr_rank": 1, "player_id": 0},
                                 "76561198000000001": {"hp": 100, "hero_level": 3, "curr_rank": 2, "player_id": 1, "chess_lineup": "chess_dazzle"}
                             }}),
                         ),
@@ -909,7 +836,7 @@ mod tests {
                             "CustomNetTable_player_info_table",
                             "player_info",
                             serde_json::json!({"data": {
-                                "76561198022169086": {"hp": 88, "hero_level": 5, "curr_rank": 1, "player_id": 0, "chess_hand": "chess_lion,chess_ck1,"},
+                                "76561198000000101": {"hp": 88, "hero_level": 5, "curr_rank": 1, "player_id": 0, "chess_hand": "chess_lion,chess_ck1,"},
                                 "76561198000000001": {"hp": 90, "hero_level": 4, "curr_rank": 2, "player_id": 1, "chess_lineup": "chess_dazzle,chess_sd"}
                             }}),
                         ),
@@ -956,11 +883,11 @@ mod tests {
         assert_eq!(timeline["last_round"], 1);
         assert_eq!(timeline["rounds"][0]["captured_at"], "2026-06-08T00:01:00Z");
         assert_eq!(
-            timeline["rounds"][0]["players"]["76561198022169086"]["hp"],
+            timeline["rounds"][0]["players"]["76561198000000101"]["hp"],
             88
         );
         assert_eq!(
-            timeline["rounds"][0]["players"]["76561198022169086"]["board"][0]["chess"],
+            timeline["rounds"][0]["players"]["76561198000000101"]["board"][0]["chess"],
             "chess_ck1"
         );
         assert_eq!(
@@ -976,8 +903,8 @@ mod tests {
     #[test]
     fn timeline_does_not_replace_board_rich_snap_with_empty_later_poll() {
         let state = Arc::new(Mutex::new(NettableState {
-            local_steam_id: Some("76561198022169086".to_owned()),
-            match_roster_fingerprint: Some(vec!["76561198022169086".to_owned()]),
+            local_steam_id: Some("76561198000000101".to_owned()),
+            match_roster_fingerprint: Some(vec!["76561198000000101".to_owned()]),
             ..NettableState::default()
         }));
 
@@ -996,7 +923,7 @@ mod tests {
                         (
                             "CustomNetTable_player_info_table",
                             "player_info",
-                            serde_json::json!({"data": {"76561198022169086": {"hp": 99, "hero_level": 4, "curr_rank": 1, "player_id": 0}}}),
+                            serde_json::json!({"data": {"76561198000000101": {"hp": 99, "hero_level": 4, "curr_rank": 1, "player_id": 0}}}),
                         ),
                         (
                             "CustomNetTable_player_id_table",
@@ -1028,7 +955,7 @@ mod tests {
                         (
                             "CustomNetTable_player_info_table",
                             "player_info",
-                            serde_json::json!({"data": {"76561198022169086": {"hp": 88, "hero_level": 5, "curr_rank": 1, "player_id": 0}}}),
+                            serde_json::json!({"data": {"76561198000000101": {"hp": 88, "hero_level": 5, "curr_rank": 1, "player_id": 0}}}),
                         ),
                     ]),
                 },
@@ -1038,11 +965,11 @@ mod tests {
         let timeline = build_match_timeline_from_state(&state, "match-1").expect("timeline builds");
         assert_eq!(timeline["rounds"][0]["captured_at"], "2026-06-08T00:00:00Z");
         assert_eq!(
-            timeline["rounds"][0]["players"]["76561198022169086"]["board"][0]["chess"],
+            timeline["rounds"][0]["players"]["76561198000000101"]["board"][0]["chess"],
             "chess_ck1"
         );
         assert_eq!(
-            timeline["rounds"][0]["players"]["76561198022169086"]["hp"],
+            timeline["rounds"][0]["players"]["76561198000000101"]["hp"],
             99
         );
     }
@@ -1050,8 +977,8 @@ mod tests {
     #[test]
     fn timeline_keeps_unique_rounds_when_polling_many_times_per_round() {
         let state = Arc::new(Mutex::new(NettableState {
-            local_steam_id: Some("76561198022169086".to_owned()),
-            match_roster_fingerprint: Some(vec!["76561198022169086".to_owned()]),
+            local_steam_id: Some("76561198000000101".to_owned()),
+            match_roster_fingerprint: Some(vec!["76561198000000101".to_owned()]),
             ..NettableState::default()
         }));
 
@@ -1072,7 +999,7 @@ mod tests {
                                 (
                                     "CustomNetTable_player_info_table",
                                     "player_info",
-                                    serde_json::json!({"data": {"76561198022169086": {"hp": 100 - round, "hero_level": 5, "curr_rank": 1}}}),
+                                    serde_json::json!({"data": {"76561198000000101": {"hp": 100 - round, "hero_level": 5, "curr_rank": 1}}}),
                                 ),
                             ]),
                         },
@@ -1097,8 +1024,8 @@ mod tests {
     #[test]
     fn timeline_caps_at_eighty_unique_rounds() {
         let state = Arc::new(Mutex::new(NettableState {
-            local_steam_id: Some("76561198022169086".to_owned()),
-            match_roster_fingerprint: Some(vec!["76561198022169086".to_owned()]),
+            local_steam_id: Some("76561198000000101".to_owned()),
+            match_roster_fingerprint: Some(vec!["76561198000000101".to_owned()]),
             ..NettableState::default()
         }));
 
@@ -1118,7 +1045,7 @@ mod tests {
                             (
                                 "CustomNetTable_player_info_table",
                                 "player_info",
-                                serde_json::json!({"data": {"76561198022169086": {"hp": 100 - round, "hero_level": 5, "curr_rank": 1}}}),
+                                serde_json::json!({"data": {"76561198000000101": {"hp": 100 - round, "hero_level": 5, "curr_rank": 1}}}),
                             ),
                         ]),
                     },
@@ -1136,10 +1063,10 @@ mod tests {
     #[test]
     fn timeline_adds_final_round_from_end_board_when_live_round_lags() {
         let state = Arc::new(Mutex::new(NettableState {
-            local_steam_id: Some("76561198022169086".to_owned()),
+            local_steam_id: Some("76561198000000101".to_owned()),
             match_roster_fingerprint: Some(vec![
-                "76561198022169086".to_owned(),
-                "76561198085219046".to_owned(),
+                "76561198000000101".to_owned(),
+                "76561198000000102".to_owned(),
             ]),
             ..NettableState::default()
         }));
@@ -1160,16 +1087,16 @@ mod tests {
                             "CustomNetTable_player_info_table",
                             "player_info",
                             serde_json::json!({"data": {
-                                "76561198022169086": {"hp": 37, "hero_level": 11, "curr_rank": 1},
-                                "76561198085219046": {"hp": 11, "hero_level": 11, "curr_rank": 2}
+                                "76561198000000101": {"hp": 37, "hero_level": 11, "curr_rank": 1},
+                                "76561198000000102": {"hp": 11, "hero_level": 11, "curr_rank": 2}
                             }}),
                         ),
                         (
                             "CustomNetTable_dac_table",
                             "end_board",
                             serde_json::json!({"data": {
-                                "76561198022169086": {"round": 50, "hp": 37, "hero_level": 11, "curr_rank": 1, "chess_lineup": "chess_lion,"},
-                                "76561198085219046": {"round": 50, "hp": 11, "hero_level": 11, "curr_rank": 2, "chess_lineup": "chess_ck1,"}
+                                "76561198000000101": {"round": 50, "hp": 37, "hero_level": 11, "curr_rank": 1, "chess_lineup": "chess_lion,"},
+                                "76561198000000102": {"round": 50, "hp": 11, "hero_level": 11, "curr_rank": 2, "chess_lineup": "chess_ck1,"}
                             }}),
                         ),
                     ]),
@@ -1185,15 +1112,15 @@ mod tests {
         assert_eq!(timeline["rounds"][1]["round"], 50);
         assert_eq!(timeline["rounds"][1]["source"], "end_board");
         assert_eq!(
-            timeline["rounds"][1]["players"]["76561198022169086"]["hp"],
+            timeline["rounds"][1]["players"]["76561198000000101"]["hp"],
             37
         );
         assert_eq!(
-            timeline["rounds"][1]["players"]["76561198085219046"]["hp"],
+            timeline["rounds"][1]["players"]["76561198000000102"]["hp"],
             0
         );
         assert_eq!(
-            timeline["rounds"][1]["players"]["76561198085219046"]["placement"],
+            timeline["rounds"][1]["players"]["76561198000000102"]["placement"],
             2
         );
     }
@@ -1211,7 +1138,7 @@ mod tests {
         let rows = rows_from_json(vec![(
             "CustomNetTable_ranking_top_table",
             "ranking_top",
-            serde_json::json!({"season": "s40", "ranking_top": {"1": {"steam_id": "76561198022169086", "name": "Jack", "rank": 1, "mmr": 4200}}}),
+            serde_json::json!({"season": "s40", "ranking_top": {"1": {"steam_id": "76561198000000101", "name": "Example Player", "rank": 1, "mmr": 4200}}}),
         )]);
 
         let first = maybe_auto_upload_queen_ladder(&state, &rows, &dac_dir).expect("scan event");
@@ -1271,27 +1198,6 @@ mod tests {
         assert_eq!(parsed["kind"], queen_ladder::QUEEN_LADDER_OUTBOX_KIND);
         assert_eq!(parsed["players"].as_array().unwrap().len(), 1);
         let _ = fs::remove_dir_all(dac_dir);
-    }
-
-    fn player_id_rows(steam_ids: &[&str]) -> Vec<NettableRow> {
-        steam_ids
-            .iter()
-            .enumerate()
-            .map(|(idx, steam_id)| {
-                let mut raw = BTreeMap::new();
-                raw.insert(
-                    "steam_id".to_owned(),
-                    crate::nettable_parser::Value::String((*steam_id).to_owned()),
-                );
-                NettableRow {
-                    table_name: "CustomNetTable_player_id_table".to_owned(),
-                    key: format!("player_{idx}"),
-                    raw: crate::nettable_parser::Value::Object(raw),
-                    observed_at: None,
-                    match_started_at: None,
-                }
-            })
-            .collect()
     }
 
     fn rows_from_json(rows: Vec<(&str, &str, serde_json::Value)>) -> Vec<NettableRow> {
@@ -1822,40 +1728,6 @@ fn table_names(rows: &[NettableRow]) -> Vec<String> {
     tables.into_iter().map(str::to_owned).collect()
 }
 
-fn local_is_capture_owner(state: &Arc<Mutex<NettableState>>) -> bool {
-    state
-        .lock()
-        .map(|state| state.local_is_capture_owner())
-        .unwrap_or(true)
-}
-
-fn capture_owner_steam_id(state: &Arc<Mutex<NettableState>>) -> Option<String> {
-    state
-        .lock()
-        .ok()
-        .and_then(|state| state.capture_owner_steam_id.clone())
-}
-
-impl NettableState {
-    fn local_is_capture_owner(&self) -> bool {
-        match self.capture_owner_steam_id.as_deref() {
-            Some(owner) => self.local_steam_id.as_deref() == Some(owner),
-            None => true,
-        }
-    }
-}
-
-fn update_capture_owner_from_rows(state: &mut NettableState, rows: &[NettableRow]) {
-    let roster = roster_steam_ids(rows);
-    if roster.is_empty() {
-        return;
-    }
-    state.capture_owner_steam_id = PREFERRED_CAPTURE_STEAM_IDS
-        .iter()
-        .find(|steam_id| roster.iter().any(|roster_id| roster_id == **steam_id))
-        .map(|steam_id| (*steam_id).to_owned());
-}
-
 fn roster_steam_ids(rows: &[NettableRow]) -> Vec<String> {
     let mut ids = rows
         .iter()
@@ -1923,7 +1795,6 @@ fn maybe_fire_dump_commands<F>(
         *last_dota_focused = false;
         return;
     }
-    let capture_owner = local_is_capture_owner(state);
 
     // One player left with HP: end_board publishes any moment now, so dump
     // dac_table every couple of seconds instead of the relaxed cadence.
@@ -1936,26 +1807,18 @@ fn maybe_fire_dump_commands<F>(
     let now = Instant::now();
     if !*last_dota_focused {
         *last_dota_focused = true;
-        if capture_owner {
-            fire_dump_commands(
-                emit,
-                &[
-                    DumpKey::F23,
-                    DumpKey::F22,
-                    DumpKey::F20,
-                    DumpKey::F24,
-                    DumpKey::F16,
-                    DumpKey::F21,
-                ],
-                "refocus catch-up snapshot",
-            );
-        } else {
-            fire_dump_commands(
-                emit,
-                &[DumpKey::F23, DumpKey::F24],
-                "refocus roster snapshot",
-            );
-        }
+        fire_dump_commands(
+            emit,
+            &[
+                DumpKey::F23,
+                DumpKey::F22,
+                DumpKey::F20,
+                DumpKey::F24,
+                DumpKey::F16,
+                DumpKey::F21,
+            ],
+            "refocus catch-up snapshot",
+        );
         *last_game_info_fire = now;
         *last_player_fire = now;
         *last_metadata_fire = now;
@@ -1964,11 +1827,11 @@ fn maybe_fire_dump_commands<F>(
     if now.duration_since(*last_game_info_fire) >= Duration::from_secs(3) {
         *last_game_info_fire = now;
         fire_dump_commands(emit, &[DumpKey::F23], "game_info");
-        if capture_owner && last_round.unwrap_or(0) >= 1 && !has_hidden_legendary_pool {
+        if last_round.unwrap_or(0) >= 1 && !has_hidden_legendary_pool {
             fire_dump_commands(emit, &[DumpKey::F16], "hidden legendary pool");
         }
     }
-    if capture_owner && now.duration_since(*last_player_fire) >= player_cadence {
+    if now.duration_since(*last_player_fire) >= player_cadence {
         *last_player_fire = now;
         // F21 dumps dac_table, which is where `end_board` (the full 8-player
         // final result) appears at game over. Without firing it here, end_board
@@ -1982,13 +1845,7 @@ fn maybe_fire_dump_commands<F>(
     }
     if now.duration_since(*last_metadata_fire) >= Duration::from_secs(30) {
         *last_metadata_fire = now;
-        if capture_owner {
-            fire_dump_commands(emit, &[DumpKey::F24, DumpKey::F16], "metadata snapshot");
-        } else {
-            // Keep the lightweight roster dump running so a non-owner can
-            // recover if the preferred owner leaves the next lobby.
-            fire_dump_commands(emit, &[DumpKey::F24], "metadata roster snapshot");
-        }
+        fire_dump_commands(emit, &[DumpKey::F24, DumpKey::F16], "metadata snapshot");
     }
 }
 
@@ -2306,17 +2163,6 @@ fn finalize_on_match_left<F>(state: &Arc<Mutex<NettableState>>, cfg: &Config, em
 where
     F: Fn(String) + Send + Sync + 'static,
 {
-    if !local_is_capture_owner(state) {
-        let owner = capture_owner_steam_id(state).unwrap_or_else(|| "unknown".to_owned());
-        let message =
-            format!("Dota left the match; standing down for preferred capture owner {owner}.");
-        emit(event_json(&NettableGameEnded::new(
-            &message,
-            None,
-            &now_iso_utc(),
-        )));
-        return;
-    }
     let rows = chase_post_game_end_board(state, cfg, emit, "Dota left the match");
     // No end board after an explicit post-game chase usually means the local
     // player left before the lobby finished. Don't upload the partial snapshot
@@ -2445,7 +2291,6 @@ fn poll_once(
     }
     state.latest_parsed = parsed_from_rows(&rows);
     state.latest_rows = rows.clone();
-    update_capture_owner_from_rows(&mut state, &rows);
     if cfg.keep_local_nettable_dumps && !rows.is_empty() {
         persist_local_nettable_dump(cfg, &rows);
     }

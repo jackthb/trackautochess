@@ -16,6 +16,18 @@ pnpm run test:patch-notes
 
 The web build generates runtime data from `content/`. Desktop capture changes also need a Windows test with Dota running; a web build cannot validate live capture.
 
+## Profile and authentication tests
+
+The database policy regression suite runs against a disposable local PostgreSQL-compatible engine. Install its isolated dependency once, then run these commands from the repository root:
+
+```sh
+npm install --prefix .local/db-security-test --ignore-scripts --no-audit --no-fund --save-exact @electric-sql/pglite@0.5.8
+node scripts/test-profile-access.mjs
+node --no-warnings=MODULE_TYPELESS_PACKAGE_JSON --import ./scripts/lib/register-ts.mjs scripts/test-verified-steam-identity.mjs
+```
+
+The `.local/` dependency directory is ignored by Git. These tests require no live service credentials; the database suite creates its own test schema and rolls back its regression transaction.
+
 ## Test data and credentials
 
 Use synthetic player identities in fixtures. Do not submit personal game captures, authentication tokens, environment files, diagnostic logs or private keys. Preserve binary format coverage when anonymizing parser fixtures and verify the expected decoded output still matches.
