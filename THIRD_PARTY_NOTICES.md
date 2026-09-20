@@ -6,7 +6,9 @@ The root MIT licence applies to original project code. It does not relicense thi
 
 The repository includes game-related images, icons, names and derived game data, including material under `data/`, `content/` and public asset directories. Dota 2 material and marks belong to Valve and their respective owners; Dota Auto Chess material belongs to Drodo Studio and its respective owners.
 
-**Public-release review remains open:** this notice is attribution, not evidence of redistribution permission. Before publishing a public export, inventory the included game assets and establish applicable redistribution terms, or exclude material whose permission cannot be established. Do not describe the entire repository's contents as MIT-licensed.
+Dota and Dota 2 are trademarks of Valve Corporation. Dota Auto Chess is created by Drodo Studio. Other names and marks belong to their respective owners. Track Auto Chess is an independent community project and is not affiliated with or endorsed by Valve Corporation or Drodo Studio.
+
+Game artwork and other third-party material are included for game identification and reference. They are excluded from the project's MIT licence and remain subject to their owners' rights and any applicable terms. This notice provides attribution; it does not claim a separate permission grant or grant downstream users additional rights to those materials.
 
 ## JetBrains Mono
 
