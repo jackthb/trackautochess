@@ -61,13 +61,17 @@ pub struct NettableService {
 /// Snapshot of a match the local player left before it finished, held until
 /// the user confirms they're not rejoining, the grace window lapses, or a
 /// different lobby starts. Rejoining the same lobby discards it.
-#[derive(Debug)]
+#[derive(Debug, serde::Serialize, serde::Deserialize)]
 struct PendingLeftMatch {
     request: Option<serde_json::Value>,
     steam_id: String,
     timeline: Option<serde_json::Value>,
     roster: Vec<String>,
-    deadline: Instant,
+    expires_at: i64,
+    #[serde(skip)]
+    path: Option<PathBuf>,
+    #[serde(skip)]
+    restored: bool,
 }
 
 impl PendingLeftMatch {
@@ -81,7 +85,60 @@ impl PendingLeftMatch {
         if parse_valid_steam_id64(&steam_id).is_none() {
             return Err("Sign in before saving a match for cloud sync".into());
         }
-        Ok(Self { request, timeline, roster, steam_id, deadline: Instant::now() + LEFT_MATCH_UPLOAD_GRACE })
+        Ok(Self { request, timeline, roster, steam_id,
+            expires_at: chrono::Utc::now().timestamp() + LEFT_MATCH_UPLOAD_GRACE.as_secs() as i64,
+            path: None, restored: false })
+    }
+
+    fn persist(&mut self, dac_dir: &Path) -> Result<(), String> {
+        let payload = serde_json::to_string(self).map_err(|err| err.to_string())?;
+        self.path = Some(Outbox::new(dac_dir.join("held_matches")).enqueue_str(&payload)
+            .map_err(|err| format!("Could not save held match: {err}"))?);
+        Ok(())
+    }
+
+    fn restore(dac_dir: &Path, owner: &str) -> Result<Vec<Self>, String> {
+        let mut pending = Vec::new();
+        for item in Outbox::new(dac_dir.join("held_matches")).list().map_err(|err| err.to_string())? {
+            // Preserve unreadable records for diagnosis; one corrupt file must
+            // not prevent recovery of every other match.
+            let Ok(mut saved) = serde_json::from_str::<Self>(&item.payload) else { continue };
+            if !saved.belongs_to(owner) || parse_valid_steam_id64(owner).is_none() { continue; }
+            saved.path = Some(item.path);
+            saved.restored = true;
+            pending.push(saved);
+        }
+        pending.sort_by_key(|saved| saved.expires_at);
+        Ok(pending)
+    }
+
+    fn remove_saved(&self) -> Result<(), String> {
+        if let Some(path) = &self.path {
+            match fs::remove_file(path) {
+                Ok(()) => {}
+                Err(err) if err.kind() == io::ErrorKind::NotFound => {}
+                Err(err) => return Err(format!("Could not clear held match: {err}")),
+            }
+        }
+        Ok(())
+    }
+
+    fn enqueue_for_upload(&self, cfg: &Config) -> Result<Option<PathBuf>, String> {
+        if !self.belongs_to(&cfg.steam_id) {
+            return Err("Held match belongs to another account; sign back in to sync it".into());
+        }
+        let Some(body) = self.request.as_ref() else { self.remove_saved()?; return Ok(None); };
+        let queued = SupabaseClient::persist_fallback_request(cfg, body, self.timeline.clone())?;
+        // A crash between these operations leaves both copies. The outbox's
+        // stable account/match key makes the subsequent transfer idempotent.
+        self.remove_saved()?;
+        Ok(Some(queued))
+    }
+
+    fn expired_at(&self, now: i64) -> bool { now >= self.expires_at }
+
+    fn can_resolve_from_round(&self, previous_round: Option<i64>) -> bool {
+        !self.restored || previous_round.is_some()
     }
 
     fn belongs_to(&self, current_steam_id: &str) -> bool {
@@ -191,6 +248,7 @@ impl NettableService {
             let mut last_status_fire = Instant::now() - Duration::from_secs(10);
             let mut last_dota_focused = false;
             loop {
+                for event in restore_pending_left_match(&state) { emit(event); }
                 maybe_fire_dump_commands(
                     &state,
                     &emit,
@@ -660,6 +718,98 @@ mod tests {
     use super::*;
     use crate::nettable_parser::extract_rows;
     use std::path::Path;
+
+    fn held_match_fixture() -> (Config, PendingLeftMatch) {
+        let dir = std::env::temp_dir().join(format!("dac-held-{}-{}", std::process::id(),
+            SystemTime::now().duration_since(std::time::UNIX_EPOCH).unwrap().as_nanos()));
+        let cfg = Config {
+            dac_dir: dir, steam_id: "76561197960265729".into(), steam_name: String::new(),
+            replay_enabled: true, keep_local_nettable_dumps: true, local_game_cache_max_gb: 1,
+            local_only: false, supabase_url: "https://example.invalid".into(),
+            supabase_key: String::new(), supabase_auth_url: String::new(),
+            supabase_access_token: "must-not-be-saved".into(), supabase_refresh_token: String::new(),
+            supabase_token_expires_at: String::new(),
+        };
+        let held = PendingLeftMatch::capture(
+            Some(serde_json::json!({"action":"ingest_match","match":{"match_id":"held-test","played_at":"2026-09-21T00:00:00Z"},"players":[]})),
+            Some(serde_json::json!({"match_id":"pending","round_count":12})),
+            vec![cfg.steam_id.clone()], || Ok(cfg.steam_id.clone())).unwrap();
+        (cfg, held)
+    }
+
+    #[test]
+    fn held_match_restart_preserves_deadline_payload_and_owner() {
+        let (cfg, mut held) = held_match_fixture();
+        held.expires_at = 123456;
+        held.persist(&cfg.dac_dir).unwrap();
+        let original = held.request.clone();
+        drop(held); // Discard every in-memory copy, as a process restart does.
+        let restored = PendingLeftMatch::restore(&cfg.dac_dir, &cfg.steam_id).unwrap().pop().unwrap();
+        assert_eq!(restored.request, original);
+        assert_eq!(restored.timeline.unwrap()["round_count"], 12);
+        assert_eq!(restored.expires_at, 123456);
+        assert!(PendingLeftMatch::restore(&cfg.dac_dir, "76561197960265730").unwrap().is_empty());
+        assert!(PendingLeftMatch::restore(&cfg.dac_dir, "").unwrap().is_empty());
+        fs::remove_dir_all(cfg.dac_dir).unwrap();
+    }
+
+    #[test]
+    fn held_match_restart_expiry_and_stale_log_guard() {
+        let (cfg, mut held) = held_match_fixture();
+        held.expires_at = 1000;
+        held.persist(&cfg.dac_dir).unwrap();
+        let restored = PendingLeftMatch::restore(&cfg.dac_dir, &cfg.steam_id).unwrap().pop().unwrap();
+        assert!(!restored.expired_at(999));
+        assert!(restored.expired_at(1000));
+        assert!(restored.expired_at(2000)); // Offline time counts; no new grace period.
+        assert!(!restored.can_resolve_from_round(None)); // Initial stale log read.
+        assert!(restored.can_resolve_from_round(Some(12))); // New round evidence.
+        restored.remove_saved().unwrap();
+        assert!(PendingLeftMatch::restore(&cfg.dac_dir, &cfg.steam_id).unwrap().is_empty());
+        fs::remove_dir_all(cfg.dac_dir).unwrap();
+    }
+
+    #[test]
+    fn held_match_transfer_is_durable_account_bound_and_retryable() {
+        let (mut cfg, mut held) = held_match_fixture();
+        held.persist(&cfg.dac_dir).unwrap();
+        cfg.steam_id = "76561197960265730".into();
+        assert!(held.enqueue_for_upload(&cfg).is_err());
+        assert!(held.path.as_ref().unwrap().exists());
+        cfg.steam_id = held.steam_id.clone();
+        cfg.local_only = true;
+        assert!(held.enqueue_for_upload(&cfg).is_err());
+        cfg.local_only = false;
+        // Disk failure during promotion must leave the source hold intact.
+        fs::write(cfg.dac_dir.join("outbox"), "not a directory").unwrap();
+        assert!(held.enqueue_for_upload(&cfg).is_err());
+        assert!(held.path.as_ref().unwrap().exists());
+        fs::remove_file(cfg.dac_dir.join("outbox")).unwrap();
+        // Simulate a crash after publishing the upload but before removing the hold.
+        let queued = SupabaseClient::persist_fallback_request(&cfg, held.request.as_ref().unwrap(), held.timeline.clone()).unwrap();
+        drop(held);
+        let restored = PendingLeftMatch::restore(&cfg.dac_dir, &cfg.steam_id).unwrap().pop().unwrap();
+        assert_eq!(restored.enqueue_for_upload(&cfg).unwrap(), Some(queued));
+        assert!(PendingLeftMatch::restore(&cfg.dac_dir, &cfg.steam_id).unwrap().is_empty());
+        let uploads = Outbox::new(cfg.dac_dir.join("outbox")).list().unwrap();
+        assert_eq!(uploads.len(), 1);
+        let payload: serde_json::Value = serde_json::from_str(&uploads[0].payload).unwrap();
+        assert_eq!(payload["steam_id"], cfg.steam_id);
+        assert_eq!(payload["timeline"]["round_count"], 12);
+        assert!(!uploads[0].payload.contains("must-not-be-saved"));
+        fs::remove_dir_all(cfg.dac_dir).unwrap();
+    }
+
+    #[test]
+    fn held_match_recovery_skips_partial_and_corrupt_files_without_deleting_them() {
+        let (cfg, mut held) = held_match_fixture();
+        held.persist(&cfg.dac_dir).unwrap();
+        fs::write(cfg.dac_dir.join("held_matches/partial.tmp"), "{").unwrap();
+        fs::write(cfg.dac_dir.join("held_matches/corrupt.json"), "{").unwrap();
+        assert_eq!(PendingLeftMatch::restore(&cfg.dac_dir, &cfg.steam_id).unwrap().len(), 1);
+        assert!(cfg.dac_dir.join("held_matches/corrupt.json").exists());
+        fs::remove_dir_all(cfg.dac_dir).unwrap();
+    }
 
     #[test]
     fn held_match_binds_account_at_capture_after_startup_signin() {
@@ -1383,8 +1533,17 @@ fn handle_rows_for_parity(state: &Arc<Mutex<NettableState>>, rows: &[NettableRow
             // hold: the same roster means a rejoin, so discard it and let the
             // game finalize normally; a different roster proves we're not
             // rejoining, so stage the held snapshot for upload as-is.
-            if let Some(pending) = state.pending_left_match.take() {
+            let may_resolve = state.pending_left_match.as_ref().map(|pending| {
+                pending.can_resolve_from_round(prev)
+                    && Config::load().map(|cfg| pending.belongs_to(&cfg.steam_id)).unwrap_or(false)
+            }).unwrap_or(false);
+            if let Some(pending) = may_resolve.then(|| state.pending_left_match.take()).flatten() {
                 if state.match_roster_fingerprint.as_deref() == Some(pending.roster.as_slice()) {
+                    if let Err(err) = pending.remove_saved() {
+                        events.push(event_json(&NettableIngestError::new(&err)));
+                        state.pending_left_match = Some(pending);
+                        return events;
+                    }
                     events.push(event_json(&NettableMatchLeftResolved::new(
                         "cancelled",
                         None,
@@ -2125,12 +2284,40 @@ fn is_match_end_transition(prev: Option<&str>, next: &str) -> bool {
 /// snapshot so a finished game is always recorded and the UI reacts.
 /// Flush a held left-match snapshot when the grace window lapses or a
 /// different lobby supersedes it. Returns event lines for the caller to emit.
+fn restore_pending_left_match(state: &Arc<Mutex<NettableState>>) -> Vec<String> {
+    let Ok(mut s) = state.lock() else { return vec![] };
+    let Ok(cfg) = Config::load() else { return vec![] };
+    if let Some(pending) = s.pending_left_match.as_mut() {
+        if pending.path.is_none() {
+            if let Err(err) = pending.persist(&cfg.dac_dir) {
+                return vec![event_json(&NettableIngestError::new(&err))];
+            }
+        }
+        return vec![];
+    }
+    if s.pending_left_match_flush.is_some() || cfg.local_only { return vec![]; }
+    match PendingLeftMatch::restore(&cfg.dac_dir, &cfg.steam_id) {
+        Ok(mut held) => {
+            // The newest hold is the one a player can rejoin. Older holds stay
+            // on disk and are recovered after this one is resolved.
+            let Some(pending) = held.pop() else { return vec![] };
+            let expires_at = chrono::DateTime::from_timestamp(pending.expires_at, 0)
+                .map(|at| at.to_rfc3339()).unwrap_or_default();
+            s.pending_left_match = Some(pending);
+            vec![event_json(&NettableMatchLeftPending::new(
+                "Recovered the match you left before the app restarted. Confirm to upload now, or rejoin the match.",
+                &expires_at, &now_iso_utc()))]
+        }
+        Err(err) => vec![event_json(&NettableIngestError::new(&format!("Held-match recovery failed: {err}")))],
+    }
+}
+
 fn tick_pending_left_match(state: &Arc<Mutex<NettableState>>, _cfg: &Config) -> Vec<String> {
     let (staged, expired) = match state.lock() {
         Ok(mut s) => {
             let staged = s.pending_left_match_flush.take();
             let expired = match &s.pending_left_match {
-                Some(pending) if Instant::now() >= pending.deadline => s.pending_left_match.take(),
+                Some(pending) if pending.expired_at(chrono::Utc::now().timestamp()) => s.pending_left_match.take(),
                 _ => None,
             };
             (staged, expired)
@@ -2162,12 +2349,8 @@ fn flush_pending_left_match(
 ) -> Vec<String> {
     let now = now_iso_utc();
     let result = (|| -> Result<Option<String>, String> {
-        let Some(body) = pending.request.as_ref() else { return Ok(None); };
         let cfg = Config::load().map_err(|err| err.to_string())?;
-        if !pending.belongs_to(&cfg.steam_id) {
-            return Err("Held match belongs to another account; sign back in to sync it".into());
-        }
-        let queued = SupabaseClient::persist_fallback_request(&cfg, body, pending.timeline.clone())?;
+        let Some(queued) = pending.enqueue_for_upload(&cfg)? else { return Ok(None); };
         let client = fresh_client_from_disk()?;
         let refreshed = Config::load().map_err(|err| err.to_string())?;
         client.send_persisted_fallback(&refreshed, &queued).map(Some)
@@ -2246,7 +2429,7 @@ where
         let request = SupabaseClient::prepare_fallback_request(&rows, "left_match");
         // The service config predates sign-in/account changes. Bind ownership
         // now, never when a later flush or retry happens.
-        let pending = match PendingLeftMatch::capture(request, timeline, roster, || {
+        let mut pending = match PendingLeftMatch::capture(request, timeline, roster, || {
             Config::load().map(|current| current.steam_id).map_err(|err| err.to_string())
         }) {
             Ok(pending) => pending,
@@ -2255,6 +2438,11 @@ where
                 return;
             }
         };
+        if let Err(err) = pending.persist(&cfg.dac_dir) {
+            emit(event_json(&NettableIngestError::new(&err)));
+            // Retain the in-memory snapshot as well so a transient disk error
+            // does not prevent explicit confirmation during this process.
+        }
         if let Ok(mut s) = state.lock() {
             s.pending_left_match = Some(pending);
         }
