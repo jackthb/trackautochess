@@ -109,7 +109,11 @@ current_round: number | null,
 /**
  * Players still above 0 HP in the latest live snapshot, if known.
  */
-players_alive: number | null, };
+players_alive: number | null,
+/**
+ * Capture outcome, independent of Dota process/UI state.
+ */
+capture_phase: string | null, pending_leave_expires_at: string | null, };
 
 export type NettableSetupProgress = { type: string, stage: string, message: string, };
 

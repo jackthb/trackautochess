@@ -960,6 +960,9 @@ pub struct NettableStatus<'a> {
     pub current_round: Option<i64>,
     /// Players still above 0 HP in the latest live snapshot, if known.
     pub players_alive: Option<u32>,
+    /// Capture outcome, independent of Dota process/UI state.
+    pub capture_phase: Option<String>,
+    pub pending_leave_expires_at: Option<String>,
 }
 
 #[derive(Debug, Serialize, TS)]

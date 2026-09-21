@@ -58,6 +58,7 @@ export interface NetTableStatus {
   current_round: number | null;
   /** Players still above 0 HP in the latest live snapshot, if known. */
   players_alive: number | null;
+  capture_phase?: string | null;
 }
 
 export interface NetTableLaunchOptionsApplied {
@@ -86,7 +87,7 @@ export interface NetTableGameEndedState {
 }
 
 /** A match the user left early; the backend holds its snapshot until the user
- *  confirms the game is over, the window lapses, or they rejoin. */
+ *  chooses to save a partial result, the window lapses, or they rejoin. */
 export interface NetTablePendingLeaveState {
   message: string;
   /** ISO time when the held snapshot auto-uploads as-is. */
@@ -233,6 +234,7 @@ export function useNetTableEvents(): NetTableActivityState {
     const unsubscribe = window.tracker.onEvent((msg: Incoming) => {
       switch (msg.type) {
         case "nettable_status":
+          setPendingLeave(msg.pending_leave_expires_at ? { message: "Match interrupted", expiresAt: msg.pending_leave_expires_at } : null);
           setStatus((prev) => {
             const next: NetTableStatus = {
               autoexec_installed: msg.autoexec_installed,
@@ -253,6 +255,7 @@ export function useNetTableEvents(): NetTableActivityState {
               first_round: msg.first_round ?? null,
               current_round: msg.current_round ?? null,
               players_alive: msg.players_alive ?? null,
+              capture_phase: msg.capture_phase ?? null,
             };
             // Surface a one-time warning when Dota launches but console.log
             // doesn't start writing — that's the empirical "you forgot
@@ -354,7 +357,7 @@ export function useNetTableEvents(): NetTableActivityState {
           );
           push({
             kind: "nettable_game_ended",
-            title: "Match ended",
+            title: msg.match_id ? "Saved — incomplete" : "Checking for a final result",
             detail: msg.message,
             tone: "info",
           });
@@ -376,7 +379,7 @@ export function useNetTableEvents(): NetTableActivityState {
           });
           push({
             kind: "nettable_match_left_pending",
-            title: "Left the match early",
+            title: "Match interrupted",
             detail: msg.message,
             tone: "warning",
           });
@@ -384,11 +387,12 @@ export function useNetTableEvents(): NetTableActivityState {
         }
         case "nettable_match_left_resolved": {
           setPendingLeave(null);
+          window.tracker.sendCommand({ cmd: "nettable_status" });
           push({
             kind: "nettable_match_left_resolved",
             title:
               msg.outcome === "uploaded"
-                ? "Left match uploaded"
+                ? "Saved — incomplete"
                 : msg.outcome === "cancelled"
                   ? "Rejoined the match"
                   : "Left match",
@@ -530,8 +534,10 @@ export function useNetTableEvents(): NetTableActivityState {
     });
 
     window.tracker.sendCommand({ cmd: "nettable_status" });
+    const poll = window.setInterval(() => window.tracker.sendCommand({ cmd: "nettable_status" }), 5000);
 
     return () => {
+      window.clearInterval(poll);
       unsubscribe();
     };
   }, []);

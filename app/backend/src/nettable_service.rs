@@ -207,6 +207,8 @@ struct NettableState {
     /// A held snapshot that a *different* lobby superseded; staged so the
     /// upload happens outside the state lock on the next loop tick.
     pending_left_match_flush: Option<PendingLeftMatch>,
+    capture_phase: Option<String>,
+    capture_owner: String,
 }
 
 impl NettableService {
@@ -735,6 +737,29 @@ mod tests {
             Some(serde_json::json!({"match_id":"pending","round_count":12})),
             vec![cfg.steam_id.clone()], || Ok(cfg.steam_id.clone())).unwrap();
         (cfg, held)
+    }
+
+    #[test]
+    fn capture_status_survives_stale_live_data_and_filters_accounts() {
+        let (cfg, held) = held_match_fixture();
+        let deadline = held.expires_at;
+        let mut state = NettableState {
+            pending_left_match: Some(held),
+            last_ui_state: Some(DOTA_INGAME_STATE.into()),
+            capture_phase: Some("saved_complete".into()),
+            capture_owner: cfg.steam_id.clone(),
+            ..Default::default()
+        };
+        let (phase, expires) = capture_snapshot(&state, &cfg.steam_id);
+        assert_eq!(phase.as_deref(), Some("interrupted"));
+        assert_eq!(chrono::DateTime::parse_from_rfc3339(&expires.unwrap()).unwrap().timestamp(), deadline);
+        assert_eq!(capture_snapshot(&state, "76561197960265730"), (None, None));
+        assert_eq!(capture_snapshot(&state, ""), (None, None));
+        state.pending_left_match_flush = state.pending_left_match.take();
+        assert_eq!(capture_snapshot(&state, &cfg.steam_id), (Some("retrying".into()), None));
+        state.pending_left_match_flush = None;
+        state.capture_phase = Some("saved_partial".into());
+        assert_eq!(capture_snapshot(&state, &cfg.steam_id), (Some("saved_partial".into()), None));
     }
 
     #[test]
@@ -1533,6 +1558,7 @@ fn handle_rows_for_parity(state: &Arc<Mutex<NettableState>>, rows: &[NettableRow
             // hold: the same roster means a rejoin, so discard it and let the
             // game finalize normally; a different roster proves we're not
             // rejoining, so stage the held snapshot for upload as-is.
+            state.capture_phase = None;
             let may_resolve = state.pending_left_match.as_ref().map(|pending| {
                 pending.can_resolve_from_round(prev)
                     && Config::load().map(|cfg| pending.belongs_to(&cfg.steam_id)).unwrap_or(false)
@@ -1839,7 +1865,29 @@ const LOG_ACTIVE_WINDOW: Duration = Duration::from_secs(120);
 /// which left the setup card stuck on "Might be set up" even mid-capture.
 /// We report what we can actually measure: Dota process presence and whether
 /// console.log is being written within the active window.
+fn capture_snapshot(state: &NettableState, owner: &str) -> (Option<String>, Option<String>) {
+    if let Some(pending) = state.pending_left_match.as_ref().filter(|p| p.belongs_to(owner)) {
+        return (Some("interrupted".into()), chrono::DateTime::from_timestamp(pending.expires_at, 0).map(|t| t.to_rfc3339()));
+    }
+    if state.pending_left_match_flush.as_ref().is_some_and(|p| p.belongs_to(owner)) {
+        return (Some("retrying".into()), None);
+    }
+    if !owner.is_empty() && state.capture_owner == owner {
+        return (state.capture_phase.clone(), None);
+    }
+    (None, None)
+}
+
+fn set_capture_phase(state: &Arc<Mutex<NettableState>>, owner: &str, phase: &str) {
+    if let Ok(mut s) = state.lock() {
+        s.capture_phase = Some(phase.to_owned());
+        s.capture_owner = owner.to_owned();
+    }
+}
+
 fn nettable_status_json(state: &Arc<Mutex<NettableState>>) -> String {
+    let owner = Config::load().map(|cfg| cfg.steam_id).unwrap_or_default();
+    let (capture_phase, pending_leave_expires_at) = capture_snapshot(&state.lock().unwrap(), &owner);
     let (paused, log_path, local_steam_id, in_match, first_round, current_round, players_alive) = {
         let state = state.lock().unwrap();
         let players_alive = {
@@ -1923,6 +1971,8 @@ fn nettable_status_json(state: &Arc<Mutex<NettableState>>) -> String {
         first_round,
         current_round,
         players_alive,
+        capture_phase,
+        pending_leave_expires_at,
     })
 }
 
@@ -2089,6 +2139,7 @@ fn end_board_already_uploaded(state: &Arc<Mutex<NettableState>>, match_id: &str)
 }
 
 fn mark_end_board_uploaded(state: &Arc<Mutex<NettableState>>, match_id: &str) {
+    if let Ok(cfg) = Config::load() { set_capture_phase(state, &cfg.steam_id, "saved_complete"); }
     if let Ok(mut state) = state.lock() {
         state
             .uploaded_end_board_match_ids
@@ -2176,6 +2227,7 @@ where
 fn queue_end_board_and_timeline(state: &Arc<Mutex<NettableState>>, rows: &[NettableRow]) -> Result<(), String> {
     let cfg = Config::load().map_err(|err| err.to_string())?;
     if let Some(id) = SupabaseClient::queue_end_board(&cfg, rows)? {
+        set_capture_phase(state, &cfg.steam_id, "retrying");
         if let Some(timeline) = build_match_timeline_from_state(state, &id) {
             SupabaseClient::persist_match_request(&cfg, &serde_json::json!({
                 "action":"upsert_timeline", "timeline":timeline
@@ -2201,6 +2253,7 @@ fn chase_post_game_end_board<F>(
 where
     F: Fn(String) + Send + Sync + 'static,
 {
+    if let Ok(current) = Config::load() { set_capture_phase(state, &current.steam_id, "checking"); }
     let mut rows = latest_rows(state);
     if finished_match_id_from_rows(&rows).is_some() {
         return rows;
@@ -2249,9 +2302,12 @@ fn finalize_without_end_board(state: &Arc<Mutex<NettableState>>, rows: &[Nettabl
     let id = body["match"]["match_id"].as_str().ok_or("Missing fallback ID")?;
     let timeline = build_match_timeline_from_state(state, id);
     let queued = SupabaseClient::persist_fallback_request(&cfg, &body, timeline)?;
+    set_capture_phase(state, &cfg.steam_id, "retrying");
     let client = fresh_client_from_disk()?;
     let refreshed = Config::load().map_err(|err| err.to_string())?;
-    client.send_persisted_fallback(&refreshed, &queued).map(Some)
+    let result = client.send_persisted_fallback(&refreshed, &queued);
+    set_capture_phase(state, &cfg.steam_id, if result.is_ok() { "saved_partial" } else { "retrying" });
+    result.map(Some)
 }
 
 /// The Dota UI state string for "in a match" (note: not `..._STATE_INGAME`).
@@ -2305,7 +2361,7 @@ fn restore_pending_left_match(state: &Arc<Mutex<NettableState>>) -> Vec<String> 
                 .map(|at| at.to_rfc3339()).unwrap_or_default();
             s.pending_left_match = Some(pending);
             vec![event_json(&NettableMatchLeftPending::new(
-                "Recovered the match you left before the app restarted. Confirm to upload now, or rejoin the match.",
+                "Match interrupted. Rejoin to continue tracking, or save a partial result.",
                 &expires_at, &now_iso_utc()))]
         }
         Err(err) => vec![event_json(&NettableIngestError::new(&format!("Held-match recovery failed: {err}")))],
@@ -2348,6 +2404,7 @@ fn flush_pending_left_match(
     reason: &str,
 ) -> Vec<String> {
     let now = now_iso_utc();
+    set_capture_phase(state, &pending.steam_id, "uploading");
     let result = (|| -> Result<Option<String>, String> {
         let cfg = Config::load().map_err(|err| err.to_string())?;
         let Some(queued) = pending.enqueue_for_upload(&cfg)? else { return Ok(None); };
@@ -2366,6 +2423,7 @@ fn flush_pending_left_match(
             ))]
         }
         Ok(Some(match_id)) => {
+            set_capture_phase(state, &pending.steam_id, "saved_partial");
             let mut events = vec![event_json(&NettableMatchLeftResolved::new(
                 "uploaded",
                 Some(&match_id),
@@ -2392,12 +2450,15 @@ fn flush_pending_left_match(
             archive_finished_match_from_disk(state, &match_id, timeline.as_ref(), reason);
             events
         }
-        Ok(None) => vec![event_json(&NettableMatchLeftResolved::new(
+        Ok(None) => {
+            set_capture_phase(state, &pending.steam_id, "unavailable");
+            vec![event_json(&NettableMatchLeftResolved::new(
             "nothing_pending",
             None,
             "The match you left had no usable snapshot to upload.",
             &now,
-        ))],
+        ))]
+        },
     }
 }
 
@@ -2414,6 +2475,7 @@ where
     if finished_match_id_from_rows(&rows).is_none() {
         let roster = roster_steam_ids(&rows);
         if roster.is_empty() {
+            if let Ok(current) = Config::load() { set_capture_phase(state, &current.steam_id, "unavailable"); }
             emit(event_json(&NettableGameEnded::new(
                 "Match ended, but there was no usable snapshot to finalize.",
                 None,
@@ -2447,7 +2509,7 @@ where
             s.pending_left_match = Some(pending);
         }
         emit(event_json(&NettableMatchLeftPending::new(
-            "You left the match before it finished. Confirm the game is over to upload it now; otherwise it uploads as-is when the window lapses. Rejoining the match cancels the upload.",
+            "Match interrupted. Rejoin to continue tracking, or save a partial result. When the waiting period ends, the last captured standings are uploaded as incomplete.",
             &expires_at,
             &now_iso_utc(),
         )));
