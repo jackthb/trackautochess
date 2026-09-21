@@ -134,12 +134,20 @@ const nextConfig: NextConfig = {
 // traces symbolicate instead of pointing at minified frames. Gated on
 // POSTHOG_API_KEY, so local and preview builds without the secret skip the
 // upload rather than fail. deleteAfterUpload keeps the maps off the public CDN.
+const sourceMapUploadEnabled = Boolean(
+  process.env.POSTHOG_API_KEY && process.env.POSTHOG_PROJECT_ID,
+);
+if (process.env.VERCEL_ENV === "production" && !sourceMapUploadEnabled) {
+  console.warn(
+    "[PostHog] Source map uploads are disabled: configure POSTHOG_API_KEY and POSTHOG_PROJECT_ID. Client errors will have minified stack traces.",
+  );
+}
 export default withPostHogConfig(withBotId(nextConfig), {
   personalApiKey: process.env.POSTHOG_API_KEY ?? "",
   projectId: process.env.POSTHOG_PROJECT_ID,
   host: process.env.NEXT_PUBLIC_POSTHOG_HOST || "https://eu.posthog.com",
   sourcemaps: {
-    enabled: Boolean(process.env.POSTHOG_API_KEY),
+    enabled: sourceMapUploadEnabled,
     deleteAfterUpload: true,
   },
 });
