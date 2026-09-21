@@ -1,12 +1,22 @@
 use std::{
     collections::BTreeMap,
-    io::{BufRead, BufReader, Write},
+    io::{Read, Write},
     net::{TcpListener, TcpStream},
     time::{Duration, Instant},
 };
 
 const STEAM_OPENID_URL: &str = "https://steamcommunity.com/openid/login";
 const RETURN_PORT: u16 = 27034;
+const CALLBACK_PATH: &str = "/steam/callback";
+const MAX_REQUEST_LINE_BYTES: usize = 16 * 1024;
+const CALLBACK_READ_TIMEOUT: Duration = Duration::from_secs(2);
+
+fn login_state() -> Result<String, String> {
+    let mut bytes = [0u8; 32];
+    getrandom::getrandom(&mut bytes)
+        .map_err(|err| format!("could not generate login state: {err}"))?;
+    Ok(bytes.iter().map(|byte| format!("{byte:02x}")).collect())
+}
 
 #[derive(Debug, Clone)]
 pub struct SteamLoginResult {
@@ -40,7 +50,8 @@ where
         .set_nonblocking(true)
         .map_err(|err| format!("failed to configure Steam callback listener: {err}"))?;
     let port = listener.local_addr().map_err(|err| err.to_string())?.port();
-    let return_url = format!("http://127.0.0.1:{port}");
+    let state = login_state()?;
+    let return_url = format!("http://127.0.0.1:{port}{CALLBACK_PATH}?state={state}");
     let login_url = supabase_auth_url
         .map(|url| desktop_auth_start_url(url, &return_url))
         .unwrap_or_else(|| steam_openid_login_url(&return_url));
@@ -50,7 +61,11 @@ where
     while Instant::now() < deadline {
         match listener.accept() {
             Ok((stream, _)) => {
-                let params = handle_callback(stream)?;
+                // Unrelated requests must not cancel a pending login.
+                let params = match handle_callback(stream, &state, deadline) {
+                    Ok(params) => params,
+                    Err(_) => continue,
+                };
                 if let Some(error) = params.get("error").filter(|value| !value.trim().is_empty()) {
                     return Err(format!("Supabase auth exchange failed: {error}"));
                 }
@@ -61,7 +76,7 @@ where
                 let steam_id = claimed
                     .rsplit('/')
                     .next()
-                    .filter(|value| value.chars().all(|ch| ch.is_ascii_digit()))
+                    .filter(|value| crate::supabase::parse_valid_steam_id64(value).is_some())
                     .ok_or_else(|| "Steam callback did not include a Steam ID".to_owned())?
                     .to_owned();
                 let name = fetch_steam_name(&steam_id).unwrap_or_else(|| steam_id.clone());
@@ -128,7 +143,7 @@ fn desktop_session_login_from_params(
 ) -> Result<Option<SteamLoginResult>, String> {
     let Some(steam_id) = params
         .get("steam_id")
-        .filter(|value| value.chars().all(|ch| ch.is_ascii_digit()))
+        .filter(|value| crate::supabase::parse_valid_steam_id64(value).is_some())
         .cloned()
     else {
         return Ok(None);
@@ -226,44 +241,75 @@ fn exchange_supabase_session(
     })
 }
 
-fn handle_callback(mut stream: TcpStream) -> Result<BTreeMap<String, String>, String> {
-    let mut reader = BufReader::new(stream.try_clone().map_err(|err| err.to_string())?);
-    let mut first = String::new();
-    reader
-        .read_line(&mut first)
+fn handle_callback(
+    mut stream: TcpStream,
+    expected_state: &str,
+    login_deadline: Instant,
+) -> Result<BTreeMap<String, String>, String> {
+    let deadline = login_deadline.min(Instant::now() + CALLBACK_READ_TIMEOUT);
+    let mut request = Vec::new();
+    loop {
+        let remaining = deadline.saturating_duration_since(Instant::now());
+        if remaining.is_zero() {
+            return Err("Steam callback request timed out".to_owned());
+        }
+        stream
+            .set_read_timeout(Some(remaining))
+            .map_err(|err| err.to_string())?;
+        let mut byte = [0];
+        if stream.read(&mut byte).map_err(|err| err.to_string())? == 0 {
+            return Err("incomplete Steam callback request".to_owned());
+        }
+        request.push(byte[0]);
+        if request.len() > MAX_REQUEST_LINE_BYTES {
+            return Err("Steam callback request too large".to_owned());
+        }
+        // Consume the bounded header block too: closing a TCP socket with
+        // unread request headers can reset the browser before it sees our reply.
+        if request.ends_with(b"\r\n\r\n") {
+            break;
+        }
+    }
+    let first = std::str::from_utf8(&request)
+        .map_err(|err| err.to_string())?
+        .lines()
+        .next()
+        .unwrap_or_default();
+    let params = validate_callback_request(first, expected_state)?;
+    // Do not reflect errors, tokens, or other callback input into HTML.
+    let body = "<!doctype html><body>Login response received. Return to Track Auto Chess.</body>";
+    stream
+        .set_write_timeout(Some(Duration::from_secs(1)))
         .map_err(|err| err.to_string())?;
-    let path = first
-        .split_whitespace()
-        .nth(1)
-        .ok_or_else(|| "bad Steam callback request".to_owned())?;
-    let query = path.split_once('?').map(|(_, query)| query).unwrap_or("");
-    let params = parse_query(query);
-    let ok = params.contains_key("openid.claimed_id")
-        || params
-            .get("access_token")
-            .filter(|value| !value.trim().is_empty())
-            .is_some();
-    let error = params.get("error").filter(|value| !value.trim().is_empty());
-    let message = if ok {
-        "Login successful. You can close this tab.".to_owned()
-    } else if let Some(error) = error {
-        format!("Login failed: {error}")
-    } else {
-        "Login failed. No Steam ID was returned.".to_owned()
-    };
-    let status = if ok { "200 OK" } else { "400 Bad Request" };
-    let body = format!("<!doctype html><body style=\"font-family:sans-serif;padding:48px\"><h2>{message}</h2></body>");
     write!(
         stream,
-        "HTTP/1.1 {status}\r\nContent-Type: text/html\r\nContent-Length: {}\r\nConnection: close\r\n\r\n{body}",
+        "HTTP/1.1 200 OK\r\nContent-Type: text/html\r\nCache-Control: no-store\r\nReferrer-Policy: no-referrer\r\nContent-Length: {}\r\nConnection: close\r\n\r\n{body}",
         body.len()
     )
     .map_err(|err| err.to_string())?;
-    if ok || error.is_some() {
-        Ok(params)
-    } else {
-        Err("Steam callback missing claimed_id".to_owned())
+    Ok(params)
+}
+
+fn validate_callback_request(
+    first: &str,
+    expected_state: &str,
+) -> Result<BTreeMap<String, String>, String> {
+    let mut parts = first.split_whitespace();
+    if parts.next() != Some("GET") {
+        return Err("invalid callback method".to_owned());
     }
+    let target = parts
+        .next()
+        .ok_or_else(|| "missing callback target".to_owned())?;
+    let (path, query) = target.split_once('?').unwrap_or((target, ""));
+    if path != CALLBACK_PATH {
+        return Err("invalid callback path".to_owned());
+    }
+    let params = parse_query(query);
+    if params.get("state").map(String::as_str) != Some(expected_state) {
+        return Err("invalid callback state".to_owned());
+    }
+    Ok(params)
 }
 
 fn verify_assertion(params: &BTreeMap<String, String>) -> Result<(), String> {
@@ -335,7 +381,10 @@ fn dec(value: &str) -> String {
         match bytes[i] {
             b'+' => out.push(b' '),
             b'%' if i + 2 < bytes.len() => {
-                if let Ok(hex) = u8::from_str_radix(&value[i + 1..i + 3], 16) {
+                if let Some(hex) = std::str::from_utf8(&bytes[i + 1..i + 3])
+                    .ok()
+                    .and_then(|text| u8::from_str_radix(text, 16).ok())
+                {
                     out.push(hex);
                     i += 2;
                 }
@@ -359,13 +408,76 @@ fn html_unescape(value: &str) -> String {
 #[cfg(test)]
 mod tests {
     use super::{dec, enc, normalize_steam_name, steam_login_with_opener};
+    use super::{
+        desktop_session_login_from_params, handle_callback, login_state, validate_callback_request,
+        MAX_REQUEST_LINE_BYTES,
+    };
     use std::{
         io::{Read, Write},
-        net::TcpStream,
+        net::{TcpListener, TcpStream},
         sync::{Arc, Mutex},
         thread,
-        time::Duration,
+        time::{Duration, Instant},
     };
+
+    #[test]
+    fn callback_requires_current_state_and_exact_path() {
+        assert!(validate_callback_request(
+            "GET /steam/callback?state=current HTTP/1.1\r\n",
+            "current"
+        )
+        .is_ok());
+        for request in [
+            "GET /steam/callback HTTP/1.1\r\n",
+            "GET /steam/callback?state=old HTTP/1.1\r\n",
+            "GET /other?state=current HTTP/1.1\r\n",
+            "POST /steam/callback?state=current HTTP/1.1\r\n",
+        ] {
+            assert!(validate_callback_request(request, "current").is_err());
+        }
+        assert_ne!(login_state().unwrap(), login_state().unwrap());
+    }
+
+    #[test]
+    fn desktop_callback_rejects_invalid_steam_ids() {
+        for id in [
+            "",
+            "1",
+            "76561197960265727",
+            "76561202255233024",
+            "not-an-id",
+        ] {
+            let params = [
+                ("steam_id".into(), id.into()),
+                ("access_token".into(), "token".into()),
+                ("refresh_token".into(), "token".into()),
+            ]
+            .into_iter()
+            .collect();
+            assert!(desktop_session_login_from_params(&params)
+                .unwrap()
+                .is_none());
+        }
+    }
+
+    #[test]
+    fn callback_bounds_incomplete_and_oversized_requests() {
+        for oversized in [false, true] {
+            let listener = TcpListener::bind("127.0.0.1:0").unwrap();
+            let mut client = TcpStream::connect(listener.local_addr().unwrap()).unwrap();
+            let (server, _) = listener.accept().unwrap();
+            if oversized {
+                client
+                    .write_all(&vec![b'x'; MAX_REQUEST_LINE_BYTES + 1])
+                    .unwrap();
+            }
+            let start = Instant::now();
+            let result = handle_callback(server, "state", start + Duration::from_millis(100));
+            assert!(result.is_err());
+            assert!(start.elapsed() < Duration::from_secs(2));
+        }
+        assert_eq!(dec("%aé"), "aé");
+    }
 
     #[test]
     fn normalize_steam_name_strips_cdata() {
@@ -396,6 +508,25 @@ mod tests {
                 let return_to =
                     query_param(url, "desktop_return_to").expect("desktop_return_to param");
                 let handle = thread::spawn(move || {
+                    // Rejected requests must leave the listener available for
+                    // the legitimate redirect that follows.
+                    let authority = return_to
+                        .strip_prefix("http://")
+                        .unwrap()
+                        .split('/')
+                        .next()
+                        .unwrap();
+                    for target in [
+                        "/steam/callback",
+                        "/steam/callback?state=wrong",
+                        "/wrong?state=wrong",
+                    ] {
+                        let mut stream = TcpStream::connect(authority).unwrap();
+                        write!(stream, "GET {target} HTTP/1.1\r\nHost: {authority}\r\n\r\n")
+                            .unwrap();
+                        let mut response = String::new();
+                        let _ = stream.read_to_string(&mut response);
+                    }
                     send_session_callback(&return_to);
                 });
                 *callback_thread_for_open.lock().unwrap() = Some(handle);
@@ -463,6 +594,6 @@ mod tests {
         stream
             .read_to_string(&mut response)
             .expect("read callback response");
-        assert!(response.contains("Login successful"));
+        assert!(response.contains("Login response received"));
     }
 }

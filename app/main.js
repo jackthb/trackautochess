@@ -22,6 +22,7 @@ const { createReplays } = require("./main/replays.cjs");
 const { createTrackerLog } = require("./main/tracker-log.cjs");
 const { createUpdater } = require("./main/updater.cjs");
 const { createLegendaryOverlay } = require("./main/legendary-overlay.cjs");
+const { externalWebUrl, protectRendererNavigation } = require("./main/navigation.cjs");
 
 protocol.registerSchemesAsPrivileged([
   {
@@ -301,10 +302,7 @@ function createWindow() {
   }
 
   mainWindow.once("ready-to-show", () => mainWindow.show());
-  mainWindow.webContents.setWindowOpenHandler(({ url }) => {
-    shell.openExternal(url);
-    return { action: "deny" };
-  });
+  protectRendererNavigation(mainWindow.webContents, (url) => shell.openExternal(url));
   mainWindow.on("close", () => {
     isQuitting = true;
     app.quit();
@@ -348,9 +346,9 @@ ipcMain.on(CHANNELS.tracker.command, (_event, cmd) => {
 
 ipcMain.handle(CHANNELS.app.openExternal, async (_event, url) => {
   try {
-    const parsed = new URL(String(url || ""));
-    if (parsed.protocol !== "http:" && parsed.protocol !== "https:") return false;
-    await shell.openExternal(parsed.toString());
+    const target = externalWebUrl(url);
+    if (!target) return false;
+    await shell.openExternal(target);
     return true;
   } catch {
     return false;

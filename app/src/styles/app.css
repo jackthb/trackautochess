@@ -77,7 +77,7 @@
   display: block;
   font-family: var(--font-mono);
   font-size: var(--fs-12);
-  line-height: var(--lh-normal);
+  line-height: var(--lh-body);
   min-width: 0;
   max-width: min(900px, 100%);
   overflow: hidden;
@@ -141,7 +141,7 @@
   padding: 32px;
   background:
     radial-gradient(circle at top, color-mix(in srgb, var(--accent) 14%, transparent), transparent 42%),
-    linear-gradient(180deg, var(--bg-deep) 0%, var(--bg) 100%);
+    linear-gradient(180deg, var(--bg-deep) 0%, var(--bg-surface) 100%);
 }
 
 .login-card {

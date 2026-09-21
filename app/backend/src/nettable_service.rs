@@ -28,7 +28,7 @@ use crate::{
     },
     outbox::Outbox,
     queen_ladder,
-    supabase::{finished_match_id_from_rows, fresh_client_from_disk, parse_valid_steam_id64},
+    supabase::{finished_match_id_from_rows, fresh_client_from_disk, parse_valid_steam_id64, SupabaseClient},
 };
 use std::{
     collections::HashSet,
@@ -63,9 +63,30 @@ pub struct NettableService {
 /// different lobby starts. Rejoining the same lobby discards it.
 #[derive(Debug)]
 struct PendingLeftMatch {
-    rows: Vec<NettableRow>,
+    request: Option<serde_json::Value>,
+    steam_id: String,
+    timeline: Option<serde_json::Value>,
     roster: Vec<String>,
     deadline: Instant,
+}
+
+impl PendingLeftMatch {
+    fn capture(
+        request: Option<serde_json::Value>,
+        timeline: Option<serde_json::Value>,
+        roster: Vec<String>,
+        read_current_owner: impl FnOnce() -> Result<String, String>,
+    ) -> Result<Self, String> {
+        let steam_id = read_current_owner()?;
+        if parse_valid_steam_id64(&steam_id).is_none() {
+            return Err("Sign in before saving a match for cloud sync".into());
+        }
+        Ok(Self { request, timeline, roster, steam_id, deadline: Instant::now() + LEFT_MATCH_UPLOAD_GRACE })
+    }
+
+    fn belongs_to(&self, current_steam_id: &str) -> bool {
+        self.steam_id == current_steam_id
+    }
 }
 
 #[derive(Debug, Default)]
@@ -216,6 +237,12 @@ impl NettableService {
                             let needs_upload = finished_match_id_from_rows(&rows)
                                 .map(|match_id| !end_board_already_uploaded(&state, &match_id))
                                 .unwrap_or(false);
+                            if needs_upload {
+                                if let Err(err) = queue_end_board_and_timeline(&state, &rows) {
+                                    emit(event_json(&NettableIngestError::new(&err)));
+                                    continue;
+                                }
+                            }
                             match fresh_client_from_disk() {
                                 Ok(client) => {
                                     if let Some(match_id) = finished_match_id_from_rows(&rows) {
@@ -276,7 +303,8 @@ impl NettableService {
                                                     &now_iso_utc(),
                                                 ),
                                             ));
-                                            emit_fallback_finalize(&rows, &emit, "End-board upload failed; saved a partial match from the last live snapshot.");
+                                            // The complete board and timeline are already durable.
+                                            // Do not create a second, partial identity on network failure.
                                         }
                                     }
                                 }
@@ -285,7 +313,6 @@ impl NettableService {
                                         &format!("end_board upload failed: {err}"),
                                         &now_iso_utc(),
                                     )));
-                                    emit_fallback_finalize(&rows, &emit, "End-board upload failed; saved a partial match from the last live snapshot.");
                                 }
                                 Err(_) => {}
                             }
@@ -496,7 +523,7 @@ impl NettableService {
             ) {
                 return;
             }
-            match finalize_without_end_board(&rows) {
+            match finalize_without_end_board(&state, &rows) {
                 Ok(Some(match_id)) => emit(event_json(&NettableGameEnded::new(
                     "Marked the match finished from the last live snapshot after end_board did not appear.",
                     Some(&match_id),
@@ -633,6 +660,28 @@ mod tests {
     use super::*;
     use crate::nettable_parser::extract_rows;
     use std::path::Path;
+
+    #[test]
+    fn held_match_binds_account_at_capture_after_startup_signin() {
+        let current_owner = std::cell::RefCell::new(String::new());
+        let startup_owner = current_owner.borrow().clone();
+        // Login occurs after service startup, before the match is staged.
+        *current_owner.borrow_mut() = "76561197960265729".to_owned();
+        let pending = PendingLeftMatch::capture(None, None, vec![], || Ok(current_owner.borrow().clone())).unwrap();
+        assert!(!pending.belongs_to(&startup_owner));
+        assert!(pending.belongs_to("76561197960265729"));
+        // A later sign-in must not silently reattribute the held snapshot.
+        *current_owner.borrow_mut() = "76561197960265730".to_owned();
+        assert!(!pending.belongs_to(&current_owner.borrow()));
+        let next = PendingLeftMatch::capture(None, None, vec![], || Ok(current_owner.borrow().clone())).unwrap();
+        assert!(next.belongs_to("76561197960265730"));
+    }
+
+    #[test]
+    fn held_match_does_not_guess_owner_when_config_is_unavailable() {
+        assert!(PendingLeftMatch::capture(None, None, vec![], || Err("invalid config".into())).is_err());
+        assert!(PendingLeftMatch::capture(None, None, vec![], || Ok(String::new())).is_err());
+    }
 
     // The live standings board was dead because the migration hardcoded
     // `players: {}`. This guards the revived extraction against a real dump.
@@ -1900,6 +1949,10 @@ where
     let Some(match_id) = finished_match_id_from_rows(rows) else {
         return false;
     };
+    if let Err(err) = queue_end_board_and_timeline(state, rows) {
+        emit(event_json(&NettableIngestError::new(&err)));
+        return true;
+    }
     let client = match fresh_client_from_disk() {
         Ok(client) => client,
         Err(err) => {
@@ -1907,7 +1960,7 @@ where
                 &format!("{error_context}: {err}"),
                 &now_iso_utc(),
             )));
-            return false;
+            return true;
         }
     };
     if end_board_already_uploaded(state, &match_id) || client.finished_match_has_players(&match_id)
@@ -1956,9 +2009,21 @@ where
                 &format!("{error_context}: {err}"),
                 &now_iso_utc(),
             )));
-            false
+            true // Queued for retry; do not create a conflicting partial match.
         }
     }
+}
+
+fn queue_end_board_and_timeline(state: &Arc<Mutex<NettableState>>, rows: &[NettableRow]) -> Result<(), String> {
+    let cfg = Config::load().map_err(|err| err.to_string())?;
+    if let Some(id) = SupabaseClient::queue_end_board(&cfg, rows)? {
+        if let Some(timeline) = build_match_timeline_from_state(state, &id) {
+            SupabaseClient::persist_match_request(&cfg, &serde_json::json!({
+                "action":"upsert_timeline", "timeline":timeline
+            }))?;
+        }
+    }
+    Ok(())
 }
 
 fn latest_rows(state: &Arc<Mutex<NettableState>>) -> Vec<NettableRow> {
@@ -2019,30 +2084,15 @@ where
     rows
 }
 
-fn finalize_without_end_board(rows: &[NettableRow]) -> Result<Option<String>, String> {
+fn finalize_without_end_board(state: &Arc<Mutex<NettableState>>, rows: &[NettableRow]) -> Result<Option<String>, String> {
+    let Some(body) = SupabaseClient::prepare_fallback_request(rows, "post_game_no_end_board") else { return Ok(None); };
+    let cfg = Config::load().map_err(|err| err.to_string())?;
+    let id = body["match"]["match_id"].as_str().ok_or("Missing fallback ID")?;
+    let timeline = build_match_timeline_from_state(state, id);
+    let queued = SupabaseClient::persist_fallback_request(&cfg, &body, timeline)?;
     let client = fresh_client_from_disk()?;
-    client.upsert_fallback_finished_match(rows, "post_game_no_end_board")
-}
-
-fn emit_fallback_finalize<F>(rows: &[NettableRow], emit: &Arc<F>, message: &str)
-where
-    F: Fn(String) + Send + Sync + 'static,
-{
-    match finalize_without_end_board(rows) {
-        Ok(Some(match_id)) => emit(event_json(&NettableGameEnded::new(
-            message,
-            Some(&match_id),
-            &now_iso_utc(),
-        ))),
-        Ok(None) => emit(event_json(&NettableGameEnded::new(
-            "End-board upload failed, and there was no usable live snapshot to save.",
-            None,
-            &now_iso_utc(),
-        ))),
-        Err(err) => emit(event_json(&NettableIngestError::new(&format!(
-            "fallback finalize after end-board failure failed: {err}"
-        )))),
-    }
+    let refreshed = Config::load().map_err(|err| err.to_string())?;
+    client.send_persisted_fallback(&refreshed, &queued).map(Some)
 }
 
 /// The Dota UI state string for "in a match" (note: not `..._STATE_INGAME`).
@@ -2111,16 +2161,27 @@ fn flush_pending_left_match(
     reason: &str,
 ) -> Vec<String> {
     let now = now_iso_utc();
-    let client = match fresh_client_from_disk() {
-        Ok(client) => client,
+    let result = (|| -> Result<Option<String>, String> {
+        let Some(body) = pending.request.as_ref() else { return Ok(None); };
+        let cfg = Config::load().map_err(|err| err.to_string())?;
+        if !pending.belongs_to(&cfg.steam_id) {
+            return Err("Held match belongs to another account; sign back in to sync it".into());
+        }
+        let queued = SupabaseClient::persist_fallback_request(&cfg, body, pending.timeline.clone())?;
+        let client = fresh_client_from_disk()?;
+        let refreshed = Config::load().map_err(|err| err.to_string())?;
+        client.send_persisted_fallback(&refreshed, &queued).map(Some)
+    })();
+    match result {
         Err(err) => {
-            return vec![event_json(&NettableIngestError::with_backend_at(
+            if let Ok(mut s) = state.lock() {
+                s.pending_left_match_flush = Some(pending);
+            }
+            vec![event_json(&NettableIngestError::with_backend_at(
                 &format!("left-match upload failed: {err}"),
                 &now,
-            ))];
+            ))]
         }
-    };
-    match client.upsert_fallback_finished_match(&pending.rows, reason) {
         Ok(Some(match_id)) => {
             let mut events = vec![event_json(&NettableMatchLeftResolved::new(
                 "uploaded",
@@ -2128,9 +2189,11 @@ fn flush_pending_left_match(
                 "Uploaded the match you left with everyone's last-known standings.",
                 &now,
             ))];
-            let timeline = build_match_timeline_from_state(state, &match_id);
+            let timeline = pending.timeline.clone().map(|mut timeline| {
+                timeline["match_id"] = serde_json::json!(match_id);
+                timeline
+            });
             if let Some(ref timeline) = timeline {
-                let _ = client.upsert_match_timeline(timeline);
                 let round_count = timeline
                     .get("round_count")
                     .and_then(serde_json::Value::as_u64)
@@ -2150,10 +2213,6 @@ fn flush_pending_left_match(
             "nothing_pending",
             None,
             "The match you left had no usable snapshot to upload.",
-            &now,
-        ))],
-        Err(err) => vec![event_json(&NettableIngestError::with_backend_at(
-            &format!("left-match upload failed: {err}"),
             &now,
         ))],
     }
@@ -2183,12 +2242,21 @@ where
             + chrono::Duration::from_std(LEFT_MATCH_UPLOAD_GRACE)
                 .unwrap_or_else(|_| chrono::Duration::minutes(30)))
         .to_rfc3339();
+        let timeline = build_match_timeline_from_state(state, "pending");
+        let request = SupabaseClient::prepare_fallback_request(&rows, "left_match");
+        // The service config predates sign-in/account changes. Bind ownership
+        // now, never when a later flush or retry happens.
+        let pending = match PendingLeftMatch::capture(request, timeline, roster, || {
+            Config::load().map(|current| current.steam_id).map_err(|err| err.to_string())
+        }) {
+            Ok(pending) => pending,
+            Err(err) => {
+                emit(event_json(&NettableIngestError::new(&err)));
+                return;
+            }
+        };
         if let Ok(mut s) = state.lock() {
-            s.pending_left_match = Some(PendingLeftMatch {
-                rows,
-                roster,
-                deadline: Instant::now() + LEFT_MATCH_UPLOAD_GRACE,
-            });
+            s.pending_left_match = Some(pending);
         }
         emit(event_json(&NettableMatchLeftPending::new(
             "You left the match before it finished. Confirm the game is over to upload it now; otherwise it uploads as-is when the window lapses. Rejoining the match cancels the upload.",
@@ -2210,7 +2278,7 @@ where
     ) {
         return;
     }
-    match finalize_without_end_board(&rows) {
+    match finalize_without_end_board(state, &rows) {
         Ok(Some(match_id)) => emit(event_json(&NettableGameEnded::new(
             "Marked the match finished from the last live snapshot (no end board was emitted).",
             Some(&match_id),

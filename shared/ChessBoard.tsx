@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type CSSProperties, type MouseEvent } from "react";
+import { useId, useState, type CSSProperties } from "react";
 import { createPortal } from "react-dom";
 import type { ChessBoardPiece, ItemFullInfo } from "./types";
 import {
@@ -134,14 +134,16 @@ function ChessBoardItemTooltip({
   itemsFull,
   iconUrl,
   style,
+  id,
 }: {
   items: string[];
   itemsFull?: Record<string, ItemFullInfo>;
   iconUrl: (type: string, stem: string) => string;
   style?: CSSProperties;
+  id: string;
 }) {
   return (
-    <span className="chess-board-item-tooltip" role="tooltip" style={style}>
+    <span id={id} className="chess-board-item-tooltip" role="tooltip" style={style}>
       {items.slice(0, 6).map((item, index) => (
         <span className="chess-board-item-row" key={`${item}-tooltip-${index}`}>
           <img
@@ -181,10 +183,11 @@ function ChessBoardPieceView({
     top: number;
     placement: "above" | "below";
   } | null>(null);
+  const itemTooltipId = useId();
 
-  const showItems = (e: MouseEvent<HTMLDivElement>) => {
+  const showItems = (target: HTMLDivElement) => {
     if (piece.items.length === 0) return;
-    const rect = e.currentTarget.getBoundingClientRect();
+    const rect = target.getBoundingClientRect();
     const tooltipWidth = 190;
     const margin = 8;
     const placement = rect.top < 92 ? "below" : "above";
@@ -255,8 +258,13 @@ function ChessBoardPieceView({
       style={style ?? { gridColumn: piece.x, gridRow: displayRow(piece.y) }}
       title={piece.items.length > 0 ? undefined : title}
       aria-label={title}
-      onMouseEnter={showItems}
-      onMouseLeave={hideItems}
+      tabIndex={!tooltipData && piece.items.length > 0 ? 0 : undefined}
+      aria-describedby={!tooltipData && tooltipPos ? itemTooltipId : undefined}
+      onMouseEnter={(event) => showItems(event.currentTarget)}
+      onMouseLeave={(event) => { if (!event.currentTarget.contains(document.activeElement)) hideItems(); }}
+      onFocus={(event) => showItems(event.currentTarget)}
+      onBlur={(event) => { if (!event.currentTarget.contains(event.relatedTarget)) hideItems(); }}
+      onKeyDown={(event) => { if (event.key === "Escape") hideItems(); }}
     >
       {tooltipData ? (
         <TooltipWrap
@@ -265,7 +273,12 @@ function ChessBoardPieceView({
           stars={piece.stars}
           data={tooltipData}
         >
-          <span className="chess-board-piece-tooltip-target">
+          <span
+            className="chess-board-piece-tooltip-target"
+            tabIndex={piece.items.length > 0 ? 0 : undefined}
+            aria-label={title}
+            aria-describedby={tooltipPos ? itemTooltipId : undefined}
+          >
             {pieceVisual}
           </span>
         </TooltipWrap>
@@ -275,6 +288,7 @@ function ChessBoardPieceView({
       {tooltipPos &&
         createPortal(
           <ChessBoardItemTooltip
+            id={itemTooltipId}
             items={piece.items}
             itemsFull={itemsFull}
             iconUrl={iconUrl}

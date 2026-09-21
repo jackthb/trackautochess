@@ -135,7 +135,19 @@ export function GameRowDisplay({
   return (
     <div
       className="game-row"
-      onClick={onClick}
+      role={onClick ? "button" : undefined}
+      tabIndex={onClick ? 0 : undefined}
+      onClick={(event) => {
+        if ((event.target as HTMLElement).closest('a, button, input, select, textarea, [contenteditable="true"]')) return;
+        onClick?.(event);
+      }}
+      onKeyDown={(event) => {
+        if (!onClick || event.target !== event.currentTarget) return;
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          event.currentTarget.click();
+        }
+      }}
       style={{ background: placementBg(p), ...style }}
     >
       <div className="cell">

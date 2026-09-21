@@ -304,8 +304,7 @@ impl SupabaseClient {
 
 pub fn client_with_fresh_session(cfg: &mut Config) -> Result<SupabaseClient, String> {
     ensure_fresh_session(cfg)?;
-    SupabaseClient::from_config(cfg)
-        .ok_or_else(|| "Supabase is not configured.".to_owned())
+    SupabaseClient::from_config(cfg).ok_or_else(|| "Supabase is not configured.".to_owned())
 }
 
 /// Reload config from disk, refresh the Supabase session when needed, and
@@ -336,6 +335,12 @@ pub fn ensure_fresh_session(cfg: &mut Config) -> Result<(), String> {
     // we were waiting for the lock, so re-check against the latest state on
     // disk instead of the possibly-stale copy the caller loaded earlier.
     let on_disk = Config::load().map_err(|err| err.to_string())?;
+    if cfg.steam_id != on_disk.steam_id
+        || cfg.supabase_url != on_disk.supabase_url
+        || on_disk.local_only
+    {
+        return Err("Account or cloud mode changed; retry with current configuration".to_owned());
+    }
     cfg.supabase_access_token = on_disk.supabase_access_token;
     cfg.supabase_refresh_token = on_disk.supabase_refresh_token;
     cfg.supabase_token_expires_at = on_disk.supabase_token_expires_at;
@@ -351,7 +356,7 @@ pub fn ensure_fresh_session(cfg: &mut Config) -> Result<(), String> {
         Ok(session) => session,
         Err(err) => {
             if is_invalid_refresh_token_error(&err) {
-                let _ = cfg.clear_supabase_session();
+                let _ = cfg.save_refreshed_session("", "", None);
                 cfg.supabase_access_token.clear();
                 cfg.supabase_refresh_token.clear();
                 cfg.supabase_token_expires_at.clear();
@@ -359,7 +364,7 @@ pub fn ensure_fresh_session(cfg: &mut Config) -> Result<(), String> {
             return Err(err);
         }
     };
-    cfg.save_supabase_session(
+    cfg.save_refreshed_session(
         &session.access_token,
         &session.refresh_token,
         session.expires_at,
@@ -471,7 +476,9 @@ mod tests {
 
     #[test]
     fn does_not_treat_network_errors_as_invalid_refresh_token() {
-        assert!(!is_invalid_refresh_token_error("status code 503: upstream timeout"));
+        assert!(!is_invalid_refresh_token_error(
+            "status code 503: upstream timeout"
+        ));
         assert!(!is_invalid_refresh_token_error("network unreachable"));
     }
 

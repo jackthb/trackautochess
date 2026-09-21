@@ -1,5 +1,5 @@
 use std::{
-    fs, io,
+    fs, io::{self, Write},
     path::{Path, PathBuf},
 };
 
@@ -32,7 +32,22 @@ impl Outbox {
         let name = format!("{:016x}.json", stable_hash(key));
         let path = self.dir.join(name);
         if !path.exists() {
-            fs::write(&path, payload)?;
+            // A partial write must never become a replayable JSON item. Publish
+            // a fully synced file with a no-clobber hard link on the same disk.
+            let temp = self.dir.join(format!(".{}-{}-{}.tmp", stable_hash(key), std::process::id(),
+                std::time::SystemTime::now().duration_since(std::time::UNIX_EPOCH).unwrap_or_default().as_nanos()));
+            let result = (|| {
+                let mut file = fs::OpenOptions::new().write(true).create_new(true).open(&temp)?;
+                file.write_all(payload.as_bytes())?;
+                file.sync_all()?;
+                match fs::hard_link(&temp, &path) {
+                    Ok(()) => Ok(()),
+                    Err(err) if err.kind() == io::ErrorKind::AlreadyExists => Ok(()),
+                    Err(err) => Err(err),
+                }
+            })();
+            let _ = fs::remove_file(temp);
+            result?;
         }
         Ok(path)
     }
@@ -97,5 +112,19 @@ mod tests {
         assert_eq!(first, second);
         assert_eq!(outbox.list().unwrap().len(), 1);
         let _ = fs::remove_dir_all(dir);
+    }
+
+    #[test]
+    fn restart_preserves_first_payload_and_ignores_incomplete_writes() {
+        let dir = std::env::temp_dir().join(format!("dac-outbox-atomic-{}", SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_nanos()));
+        let outbox = Outbox::new(dir.clone());
+        let path = outbox.enqueue_with_key("same-match", r#"{"played_at":"original"}"#).unwrap();
+        fs::write(dir.join("interrupted.tmp"), "{").unwrap();
+        let restarted = Outbox::new(dir.clone());
+        assert_eq!(restarted.enqueue_with_key("same-match", r#"{"played_at":"later"}"#).unwrap(), path);
+        let items = restarted.list().unwrap();
+        assert_eq!(items.len(), 1);
+        assert_eq!(items[0].payload, r#"{"played_at":"original"}"#);
+        fs::remove_dir_all(dir).unwrap();
     }
 }

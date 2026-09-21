@@ -57,11 +57,11 @@ export async function captureServerEvent(
   distinctId: string,
   properties: ServerEventProperties = {},
   options: ServerEventOptions = {},
-): Promise<void> {
+): Promise<boolean> {
   const token =
     process.env.POSTHOG_PROJECT_TOKEN ||
     process.env.NEXT_PUBLIC_POSTHOG_PROJECT_TOKEN;
-  if (!token || process.env.NEXT_PUBLIC_PRODUCT_ANALYTICS === "false") return;
+  if (!token || process.env.NEXT_PUBLIC_PRODUCT_ANALYTICS === "false") return false;
 
   const eventProperties: Record<string, unknown> = cleanedProperties(properties);
   if (options.personProperties) {
@@ -85,9 +85,13 @@ export async function captureServerEvent(
     });
 
     if (!resp.ok) {
-      console.error("PostHog server capture failed:", resp.status, await resp.text());
+      // Never echo provider response bodies, which may contain submitted data.
+      console.error("PostHog server capture failed:", resp.status);
+      return false;
     }
+    return true;
   } catch (error) {
-    console.error("PostHog server capture failed:", error);
+    console.error("PostHog server capture failed:", error instanceof Error ? error.name : "UnknownError");
+    return false;
   }
 }

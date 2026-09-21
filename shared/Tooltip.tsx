@@ -3,8 +3,9 @@ import {
   useState,
   useRef,
   useCallback,
+  useEffect,
+  useId,
   type ReactNode,
-  type MouseEvent,
 } from "react";
 import { createPortal } from "react-dom";
 import type { UnitFullInfo, SynergyInfo, RelicInfo } from "./types";
@@ -67,10 +68,16 @@ export function TooltipWrap({
     placement: "above" | "below";
   }>({ x: 0, y: 0, placement: "above" });
   const timer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const trigger = useRef<HTMLDivElement>(null);
+  const [focusedTarget, setFocusedTarget] = useState<HTMLElement | null>(null);
+  const [hasFocusableChild, setHasFocusableChild] = useState(false);
+  const tooltipId = useId();
+  const content = buildContent(type, name, stars, count, pieceCount, relicIndex, data);
+  const hasContent = content !== null;
 
-  const show = useCallback((e: MouseEvent) => {
-    const target = e.currentTarget as HTMLElement;
-    timer.current = setTimeout(() => {
+  const show = useCallback((target: HTMLElement, delay = 200) => {
+    clearTimeout(timer.current);
+    const reveal = () => {
       const rect = target.getBoundingClientRect();
       // The tooltip is tall (stats can run ~240px). When the target sits near
       // the top of the viewport, flipping it below keeps it on-screen and
@@ -82,7 +89,9 @@ export function TooltipWrap({
         placement,
       });
       setVisible(true);
-    }, 200);
+    };
+    if (delay === 0) reveal();
+    else timer.current = setTimeout(reveal, delay);
   }, []);
 
   const hide = useCallback(() => {
@@ -90,21 +99,73 @@ export function TooltipWrap({
     setVisible(false);
   }, []);
 
-  const content = buildContent(type, name, stars, count, pieceCount, relicIndex, data);
+  useEffect(() => () => clearTimeout(timer.current), []);
+
+  useEffect(() => {
+    if (!hasContent) {
+      hide();
+      setFocusedTarget(null);
+    }
+  }, [hasContent, hide]);
+
+  useEffect(() => {
+    // A wrapper around a real control must not add a second tab stop. Inspect
+    // rendered descendants so custom child components work as well as DOM nodes.
+    const root = trigger.current;
+    if (!root) return;
+    const update = () => setHasFocusableChild(Boolean(root.querySelector(
+      'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"]), [contenteditable="true"]',
+    )));
+    update();
+    const observer = new MutationObserver(update);
+    observer.observe(root, { subtree: true, childList: true, attributes: true, attributeFilter: ["disabled", "href", "tabindex", "contenteditable"] });
+    return () => observer.disconnect();
+  }, [hasContent]);
+
+  useEffect(() => {
+    if (!visible) return;
+    const target = focusedTarget;
+    if (!target || target === trigger.current) return;
+    const ids = new Set((target.getAttribute("aria-describedby") || "").split(/\s+/).filter(Boolean));
+    ids.add(tooltipId);
+    target.setAttribute("aria-describedby", [...ids].join(" "));
+    return () => {
+      const remaining = (target.getAttribute("aria-describedby") || "").split(/\s+/).filter(id => id && id !== tooltipId);
+      if (remaining.length) target.setAttribute("aria-describedby", remaining.join(" "));
+      else target.removeAttribute("aria-describedby");
+    };
+  }, [visible, tooltipId, focusedTarget]);
+
   if (!content) {
     return <>{children}</>;
   }
 
   return (
     <div
-      onMouseEnter={show}
-      onMouseLeave={hide}
+      ref={trigger}
+      tabIndex={hasFocusableChild ? undefined : 0}
+      aria-label={hasFocusableChild ? undefined : name}
+      aria-describedby={visible && !hasFocusableChild ? tooltipId : undefined}
+      onMouseEnter={(event) => show(event.currentTarget)}
+      onMouseLeave={() => { if (!focusedTarget) hide(); }}
+      onFocus={(event) => {
+        setFocusedTarget(event.target);
+        show(event.currentTarget, 0);
+      }}
+      onBlur={(event) => {
+        if (event.currentTarget.contains(event.relatedTarget)) return;
+        setFocusedTarget(null);
+        hide();
+      }}
+      onKeyDown={(event) => { if (event.key === "Escape") hide(); }}
       style={{ display: "inline-flex", position: "relative" }}
     >
       {children}
       {visible &&
         createPortal(
           <div
+            id={tooltipId}
+            role="tooltip"
             className="tooltip visible"
             style={{
               left: Math.max(4, Math.min(pos.x - 160, window.innerWidth - 324)),

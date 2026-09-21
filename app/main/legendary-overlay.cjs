@@ -242,6 +242,7 @@ function createLegendaryOverlay({
     }
 
     overlayWindow.webContents.setWindowOpenHandler(() => ({ action: "deny" }));
+    overlayWindow.webContents.on("will-navigate", (event) => event.preventDefault());
     overlayWindow.on("closed", () => {
       overlayWindow = null;
     });
