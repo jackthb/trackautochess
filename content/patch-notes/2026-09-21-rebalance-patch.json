@@ -1,0 +1,26 @@
+{
+  "date": "2026-09-21",
+  "title": "Rebalance Patch",
+  "source": "https://steamcommunity.com/sharedfiles/filedetails/changelog/1613886175",
+  "entitiesSynced": false,
+  "sourceEntries": [
+    {
+      "sourceId": "1790047946",
+      "date": "2026-09-21",
+      "time": "8:32pm",
+      "contentHash": "074e19bc998e1e55"
+    }
+  ],
+  "sections": [
+    {
+      "heading": "Changes",
+      "entries": [
+        {
+          "kind": "change",
+          "name": "Rank mode closed tempoparily",
+          "detail": "Rank mode closed tempoparily"
+        }
+      ]
+    }
+  ]
+}
