@@ -1,0 +1,26 @@
+{
+  "date": "2026-09-27",
+  "title": "Rebalance Patch",
+  "source": "https://steamcommunity.com/sharedfiles/filedetails/changelog/1613886175",
+  "entitiesSynced": false,
+  "sourceEntries": [
+    {
+      "sourceId": "1790564918",
+      "date": "2026-09-27",
+      "time": "8:08pm",
+      "contentHash": "3d0bedd01b25c7d3"
+    }
+  ],
+  "sections": [
+    {
+      "heading": "Changes",
+      "entries": [
+        {
+          "kind": "fix",
+          "name": "Fix bug!",
+          "detail": "Fix bug!"
+        }
+      ]
+    }
+  ]
+}
