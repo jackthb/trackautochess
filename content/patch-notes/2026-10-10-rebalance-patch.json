@@ -1,0 +1,37 @@
+{
+  "date": "2026-10-10",
+  "title": "Rebalance Patch",
+  "source": "https://steamcommunity.com/sharedfiles/filedetails/changelog/1613886175",
+  "entitiesSynced": false,
+  "sourceEntries": [
+    {
+      "sourceId": "1791641569",
+      "date": "2026-10-10",
+      "time": "7:12am",
+      "contentHash": "b3fd539b9813a8bd"
+    },
+    {
+      "sourceId": "1791638829",
+      "date": "2026-10-10",
+      "time": "6:27am",
+      "contentHash": "13a6ab95687b03d8"
+    }
+  ],
+  "sections": [
+    {
+      "heading": "Changes",
+      "entries": [
+        {
+          "kind": "fix",
+          "name": "-fix error",
+          "detail": "-fix error"
+        },
+        {
+          "kind": "fix",
+          "name": "-fix bug",
+          "detail": "-fix bug"
+        }
+      ]
+    }
+  ]
+}
