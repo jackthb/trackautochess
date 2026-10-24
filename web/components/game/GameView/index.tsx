@@ -711,8 +711,11 @@ export default function GameView({
             </div>
           )}
 
-          {/* Players table, viewed row pre-expanded */}
-          <div className={styles.matchSection}>
+          {/* Players table, viewed row pre-expanded. translate="no" keeps the
+              browser auto-translator from wrapping text nodes in this subtree
+              in <font>. React's removeChild throws NotFoundError when it
+              deletes a text node that the translator has reparented. */}
+          <div className={styles.matchSection} translate="no">
             <div className={styles.matchSectionHeader}>
               <h3>
                 <span className={styles.sectionBar} />
@@ -740,8 +743,9 @@ export default function GameView({
                           {selectedRound}
                         </strong>
                         <span className={styles.rsMeta}>
-                          / {timeline!.last_round}
-                          {isLastRound ? " final" : ""}
+                          {`/ ${timeline!.last_round}${
+                            isLastRound ? " final" : ""
+                          }`}
                         </span>
                       </div>
                     </div>

@@ -131,15 +131,36 @@ const nextConfig: NextConfig = {
 };
 
 // Upload browser source maps to PostHog during `next build` so client stack
-// traces symbolicate instead of pointing at minified frames. Gated on
-// POSTHOG_API_KEY, so local and preview builds without the secret skip the
-// upload rather than fail. deleteAfterUpload keeps the maps off the public CDN.
+// traces symbolicate instead of pointing at minified frames. Both the API key
+// and the project id are needed: with only one set the upload runs
+// half-configured and fails the build, so treat that as off. Local and preview
+// builds without the secrets skip the upload rather than fail. deleteAfterUpload
+// keeps the maps off the public CDN.
+const sourceMapsEnabled = Boolean(
+  process.env.POSTHOG_API_KEY && process.env.POSTHOG_PROJECT_ID,
+);
+
+// A Vercel production build is meant to upload. If it is not configured, warn in
+// the build log rather than shipping minified stack traces silently — otherwise
+// a missing secret leaves every client crash unreadable with no sign of why.
+if (!sourceMapsEnabled && process.env.VERCEL_ENV === "production") {
+  const missing = [
+    process.env.POSTHOG_API_KEY ? null : "POSTHOG_API_KEY",
+    process.env.POSTHOG_PROJECT_ID ? null : "POSTHOG_PROJECT_ID",
+  ].filter(Boolean);
+  console.warn(
+    `[next-config] PostHog source map upload is off for this production build (missing ${missing.join(
+      ", ",
+    )}). Client stack traces will stay minified until both are set in the Vercel production environment.`,
+  );
+}
+
 export default withPostHogConfig(withBotId(nextConfig), {
   personalApiKey: process.env.POSTHOG_API_KEY ?? "",
   projectId: process.env.POSTHOG_PROJECT_ID,
   host: process.env.NEXT_PUBLIC_POSTHOG_HOST || "https://eu.posthog.com",
   sourcemaps: {
-    enabled: Boolean(process.env.POSTHOG_API_KEY),
+    enabled: sourceMapsEnabled,
     deleteAfterUpload: true,
   },
 });
