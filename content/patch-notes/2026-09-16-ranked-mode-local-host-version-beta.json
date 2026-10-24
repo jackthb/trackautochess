@@ -1,0 +1,53 @@
+{
+  "date": "2026-09-16",
+  "title": "Ranked Mode (Local Host Version) Beta",
+  "category": "notice",
+  "openedOn": "2026-09-16",
+  "source": "https://steamcommunity.com/sharedfiles/filedetails/changelog/1613886175",
+  "sourceEntries": [
+    {
+      "sourceId": "1789542131",
+      "date": "2026-09-16",
+      "time": "12:02am",
+      "contentHash": "1c1ea1a1d84b5557"
+    },
+    {
+      "sourceId": "1789572817",
+      "date": "2026-09-16",
+      "time": "8:33am",
+      "contentHash": "59249234c9715bb4"
+    }
+  ],
+  "sections": [
+    {
+      "heading": "Notice",
+      "entries": [
+        {
+          "kind": "note",
+          "name": "Host player point reward rules",
+          "detail": "Upon starting a game, the host player automatically pledges a portion of points for credit. Hosts with better historical credit need to pledge fewer points (three tiers: -100 / -60 / -20). Points will be forfeited if the host quits early. Points will be returned to the host as +120 points upon full completion of the match."
+        },
+        {
+          "kind": "note",
+          "name": "Badge for Premium local hosts will be awarded later",
+          "detail": "Awakening the Machine"
+        }
+      ]
+    },
+    {
+      "heading": "Bug Fixes",
+      "entries": [
+        {
+          "kind": "fix",
+          "name": "Fixed bugs",
+          "detail": "incorrect rank evaluation caused by point pledging, and unintended loss of point triggered by match abortion."
+        },
+        {
+          "kind": "fix",
+          "name": "Fix bugs",
+          "detail": "Satan, Linken's Sphere, Ogre Hood, Eye of Skadi, Aegis of Immortals, and Bloodstone their special effects or maximum-health-modifying effects missing."
+        }
+      ]
+    }
+  ]
+}

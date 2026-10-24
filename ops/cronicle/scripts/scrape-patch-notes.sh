@@ -41,15 +41,17 @@ git merge --ff-only origin/main
 
 node scripts/scrape-patch-notes.mjs
 
-if [ -z "$(git status --porcelain -- content/)" ]; then
+# Banners are written under web/public/patch-banners. Commit them with the
+# notes; content/game is owned by the VPK refresh and is not part of this job.
+if [ -z "$(git status --porcelain -- content/patch-notes web/public/patch-banners)" ]; then
   echo "No new patch notes."
   exit 0
 fi
 
 git config user.name "jackthb"
 git config user.email "19895932+jackthb@users.noreply.github.com"
-git add content/
-git commit -m "Auto-update DAC patch notes and game data from Steam changelog"
+git add content/patch-notes web/public/patch-banners
+git commit -m "Auto-update DAC patch notes from Steam changelog"
 
 if ! git push origin main; then
   echo "Push rejected, rebasing onto latest origin/main and retrying..." >&2

@@ -125,6 +125,13 @@ const nextConfig: NextConfig = {
       // redirect in pages/synergies.tsx before the App Router migration).
       { source: "/synergies", destination: "/classes", permanent: true },
       { source: "/admin/matches", destination: "/matches", permanent: false },
+      // Slugs that exist on main. Notes that only existed on this branch
+      // are not redirected.
+      { source: "/patch-notes/2026-08-05-rebalance-patch", destination: "/patch-notes/2026-08-05-fixed-a-number-of-bugs", permanent: true },
+      { source: "/patch-notes/2026-09-10-rebalance-patch", destination: "/patch-notes/2026-09-10-hosting-notice", permanent: true },
+      { source: "/patch-notes/2026-09-15-rebalance-patch", destination: "/patch-notes/2026-09-15-ranked-mode-reopening", permanent: true },
+      { source: "/patch-notes/2026-09-16-rebalance-patch", destination: "/patch-notes/2026-09-16-ranked-mode-local-host-version-beta", permanent: true },
+      { source: "/patch-notes/2026-09-19-rebalance-patch", destination: "/patch-notes/2026-09-19-fixed-a-number-of-bugs", permanent: true },
     ];
   },
   skipTrailingSlashRedirect: true,

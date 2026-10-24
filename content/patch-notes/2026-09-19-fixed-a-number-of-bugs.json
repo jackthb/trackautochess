@@ -1,0 +1,196 @@
+{
+  "date": "2026-10-21",
+  "title": "Fixed a number of bugs",
+  "category": "hotfix",
+  "rollup": "bugfixes",
+  "openedOn": "2026-09-19",
+  "source": "https://steamcommunity.com/sharedfiles/filedetails/changelog/1613886175",
+  "sourceEntries": [
+    {
+      "sourceId": "1789817144",
+      "date": "2026-09-19",
+      "time": "4:25am",
+      "contentHash": "f4ca8a529df95dad"
+    },
+    {
+      "sourceId": "1790183480",
+      "date": "2026-09-23",
+      "time": "10:11am",
+      "contentHash": "087c97608a427a3f"
+    },
+    {
+      "sourceId": "1790226968",
+      "date": "2026-09-23",
+      "time": "10:16pm",
+      "contentHash": "f4ca8a529df95dad"
+    },
+    {
+      "sourceId": "1790231021",
+      "date": "2026-09-23",
+      "time": "11:23pm",
+      "contentHash": "f4ca8a529df95dad"
+    },
+    {
+      "sourceId": "1790233580",
+      "date": "2026-09-24",
+      "time": "12:06am",
+      "contentHash": "f4ca8a529df95dad"
+    },
+    {
+      "sourceId": "1790254946",
+      "date": "2026-09-24",
+      "time": "6:02am",
+      "contentHash": "f4ca8a529df95dad"
+    },
+    {
+      "sourceId": "1790267736",
+      "date": "2026-09-24",
+      "time": "9:35am",
+      "contentHash": "f4ca8a529df95dad"
+    },
+    {
+      "sourceId": "1790306006",
+      "date": "2026-09-24",
+      "time": "8:13pm",
+      "contentHash": "f4ca8a529df95dad"
+    },
+    {
+      "sourceId": "1790393777",
+      "date": "2026-09-25",
+      "time": "8:36pm",
+      "contentHash": "f4ca8a529df95dad"
+    },
+    {
+      "sourceId": "1790399063",
+      "date": "2026-09-25",
+      "time": "10:04pm",
+      "contentHash": "f4ca8a529df95dad"
+    },
+    {
+      "sourceId": "1790400545",
+      "date": "2026-09-25",
+      "time": "10:29pm",
+      "contentHash": "f4ca8a529df95dad"
+    },
+    {
+      "sourceId": "1790564918",
+      "date": "2026-09-27",
+      "time": "8:08pm",
+      "contentHash": "f4ca8a529df95dad"
+    },
+    {
+      "sourceId": "1790566982",
+      "date": "2026-09-27",
+      "time": "8:43pm",
+      "contentHash": "f4ca8a529df95dad"
+    },
+    {
+      "sourceId": "1791444333",
+      "date": "2026-10-08",
+      "time": "12:25am",
+      "contentHash": "f4ca8a529df95dad"
+    },
+    {
+      "sourceId": "1791448560",
+      "date": "2026-10-08",
+      "time": "1:36am",
+      "contentHash": "f4ca8a529df95dad"
+    },
+    {
+      "sourceId": "1791638829",
+      "date": "2026-10-10",
+      "time": "6:27am",
+      "contentHash": "f4ca8a529df95dad"
+    },
+    {
+      "sourceId": "1791640346",
+      "date": "2026-10-10",
+      "time": "6:52am",
+      "contentHash": "e3b0c44298fc1c14"
+    },
+    {
+      "sourceId": "1791641569",
+      "date": "2026-10-10",
+      "time": "7:12am",
+      "contentHash": "f4ca8a529df95dad"
+    },
+    {
+      "sourceId": "1791649145",
+      "date": "2026-10-10",
+      "time": "9:19am",
+      "contentHash": "f4ca8a529df95dad"
+    },
+    {
+      "sourceId": "1791776822",
+      "date": "2026-10-11",
+      "time": "8:47pm",
+      "contentHash": "f4ca8a529df95dad"
+    },
+    {
+      "sourceId": "1792075966",
+      "date": "2026-10-15",
+      "time": "7:52am",
+      "contentHash": "f4ca8a529df95dad"
+    },
+    {
+      "sourceId": "1792078474",
+      "date": "2026-10-15",
+      "time": "8:34am",
+      "contentHash": "f4ca8a529df95dad"
+    },
+    {
+      "sourceId": "1792334601",
+      "date": "2026-10-18",
+      "time": "7:43am",
+      "contentHash": "e3b0c44298fc1c14"
+    },
+    {
+      "sourceId": "1792397426",
+      "date": "2026-10-19",
+      "time": "1:10am",
+      "contentHash": "f4ca8a529df95dad"
+    },
+    {
+      "sourceId": "1792414584",
+      "date": "2026-10-19",
+      "time": "5:56am",
+      "contentHash": "f4ca8a529df95dad"
+    },
+    {
+      "sourceId": "1792571846",
+      "date": "2026-10-21",
+      "time": "1:37am",
+      "contentHash": "f4ca8a529df95dad"
+    },
+    {
+      "sourceId": "1792573504",
+      "date": "2026-10-21",
+      "time": "2:05am",
+      "contentHash": "f4ca8a529df95dad"
+    },
+    {
+      "sourceId": "1792573595",
+      "date": "2026-10-21",
+      "time": "2:06am",
+      "contentHash": "f4ca8a529df95dad"
+    },
+    {
+      "sourceId": "1792574438",
+      "date": "2026-10-21",
+      "time": "2:20am",
+      "contentHash": "f4ca8a529df95dad"
+    }
+  ],
+  "sections": [
+    {
+      "heading": "Bug Fixes",
+      "entries": [
+        {
+          "kind": "fix",
+          "name": "Workshop bugfixes",
+          "detail": "27 Workshop posts from Sep 19 through Oct 21 (Sep 19, Sep 23, Sep 24, and 8 more)."
+        }
+      ]
+    }
+  ]
+}

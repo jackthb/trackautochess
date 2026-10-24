@@ -1,6 +1,7 @@
 {
   "date": "2026-08-06",
   "title": "Rebalance Patch",
+  "category": "patch",
   "source": "https://steamcommunity.com/sharedfiles/filedetails/changelog/1613886175",
   "entitiesSynced": false,
   "sourceEntries": [
@@ -8,7 +9,7 @@
       "sourceId": "1786000592",
       "date": "2026-08-06",
       "time": "12:16am",
-      "contentHash": "13a6ab95687b03d8"
+      "contentHash": "b58d55777d4d4b17"
     }
   ],
   "sections": [
@@ -16,9 +17,27 @@
       "heading": "Changes",
       "entries": [
         {
-          "kind": "fix",
-          "name": "-fix bug",
-          "detail": "-fix bug"
+          "kind": "note",
+          "name": "Tune in for the Top of War on Aug 7th - Aug 9th.",
+          "detail": "Tune in for the Top of War on Aug 7th - Aug 9th."
+        },
+        {
+          "kind": "nerf",
+          "name": "Largo",
+          "detail": "Health decreased from 800 to 700",
+          "entityKey": "unit__largo"
+        },
+        {
+          "kind": "nerf",
+          "name": "Grimstroke - Stroke of fate",
+          "detail": "Duration decreased from 10s to 6s, reduction percent decreased from 10/30/60 to 10/30/50",
+          "entityKey": "unit__grimstroke"
+        },
+        {
+          "kind": "removed",
+          "name": "Second Chance",
+          "detail": "Removed",
+          "entityKey": "relic__second-chance"
         }
       ]
     }

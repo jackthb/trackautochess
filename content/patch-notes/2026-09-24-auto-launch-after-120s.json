@@ -1,0 +1,28 @@
+{
+  "date": "2026-09-24",
+  "title": "Auto launch after 120s",
+  "category": "minor",
+  "openedOn": "2026-09-24",
+  "source": "https://steamcommunity.com/sharedfiles/filedetails/changelog/1613886175",
+  "entitiesSynced": false,
+  "sourceEntries": [
+    {
+      "sourceId": "1790260830",
+      "date": "2026-09-24",
+      "time": "7:40am",
+      "contentHash": "69fb23f278916a59"
+    }
+  ],
+  "sections": [
+    {
+      "heading": "Changes",
+      "entries": [
+        {
+          "kind": "change",
+          "name": "Auto launch after 120s",
+          "detail": "Auto launch after 120s"
+        }
+      ]
+    }
+  ]
+}

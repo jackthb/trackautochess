@@ -1,0 +1,27 @@
+{
+  "date": "2026-10-21",
+  "title": "Battle Pass",
+  "category": "notice",
+  "openedOn": "2026-10-21",
+  "source": "https://steamcommunity.com/sharedfiles/filedetails/changelog/1613886175",
+  "sourceEntries": [
+    {
+      "sourceId": "1792566239",
+      "date": "2026-10-21",
+      "time": "12:03am",
+      "contentHash": "772e23871df0d039"
+    }
+  ],
+  "sections": [
+    {
+      "heading": "Notice",
+      "entries": [
+        {
+          "kind": "note",
+          "name": "Now you can activate your steam battle pass manually in the panel opened from top left pass icon.",
+          "detail": "Be patient if you failed and retry."
+        }
+      ]
+    }
+  ]
+}

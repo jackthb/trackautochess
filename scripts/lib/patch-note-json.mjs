@@ -1,6 +1,9 @@
 const PATCH_NOTE_KEY_ORDER = [
   "date",
   "title",
+  "category",
+  "rollup",
+  "openedOn",
   "source",
   "workshopUrl",
   "workshop_url",

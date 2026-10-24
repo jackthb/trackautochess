@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 
-import { classifyPatchNoteKind } from "./patch-note-kind.mjs";
+import { classifyHistoricalPatchNoteKind, classifyPatchNoteKind } from "./patch-note-kind.mjs";
 
 const september7Cases = [
   ["Cooldown increased from 8/6/4s to 8/7/6s", "nerf"],
@@ -157,4 +157,64 @@ test("preserves explicit lifecycle kinds", () => {
   assert.equal(classifyPatchNoteKind("Added a new T3 item"), "new");
   assert.equal(classifyPatchNoteKind("Temporarily removed from the chess pool"), "removed");
   assert.equal(classifyPatchNoteKind("Ability reworked"), "change");
+});
+
+test("classifies hosting notices, ranked announcements, and empty bugfix lines", () => {
+  assert.equal(classifyPatchNoteKind("Fix bug!"), "fix");
+  assert.equal(classifyPatchNoteKind("-fix bug"), "fix");
+  assert.equal(
+    classifyPatchNoteKind(
+      "Drodo Notice: Due to server restrictions, all matches are hosted locally, please DONOT LEAVE EARLY if you are the HOST. Rank mode is currently closed until solutions on localhosts implemented.",
+    ),
+    "note",
+  );
+  assert.equal(
+    classifyPatchNoteKind("Ranked Mode is attempting to reopen. (Any bug during the Beta test please notify us via email!)"),
+    "note",
+  );
+  assert.equal(
+    classifyPatchNoteKind(
+      "Duration decreased from 10s to 6s, reduction percent decreased from 10/30/60 to 10/30/50",
+    ),
+    "nerf",
+  );
+  assert.equal(
+    classifyPatchNoteKind("Rank mode points increased from 10 to 20"),
+    "change",
+  );
+  assert.equal(
+    classifyPatchNoteKind("Rank mode health increased from 10 to 20"),
+    "buff",
+  );
+  assert.equal(
+    classifyPatchNoteKind(
+      "We will fix this gradually and make up for your losses",
+      "Pass priorities are currently unavailable due to Valve servers out of touch.",
+    ),
+    "note",
+  );
+  assert.equal(
+    classifyPatchNoteKind("Shop odds adjusted for courier levels 7 and 8", "The new season of S29"),
+    "change",
+  );
+  assert.equal(
+    classifyPatchNoteKind("Relaunching the client", "Relaunching the client for the new version"),
+    "change",
+  );
+});
+
+test("historical labels ignore names, missing health, and award badges", () => {
+  const necrophos = "The execution damage has been changed from (200/300/400 + 0.6/1.2/1.8 times the target's missing health) to (500/700/900 + 50%/70%/90% of the target's maximum health). Cooldown has been balanced from 8/6/4 seconds to 8/7/6 seconds. <Targeted active ability: Activates on full mana> Use Reaper's Scythe to strike an enemy.";
+  assert.equal(classifyHistoricalPatchNoteKind(necrophos), "change");
+  assert.equal(classifyPatchNoteKind(necrophos, "Necrophos - Reaper's Scythe"), "change");
+  assert.equal(
+    classifyHistoricalPatchNoteKind("♕Queen Top 20: Badge for S34 ♕Queen: 320 Candies"),
+    "change",
+  );
+  assert.equal(
+    classifyPatchNoteKind(
+      "Satan, Linken's Sphere, and Bloodstone their special effects or maximum-health-modifying effects missing.",
+    ),
+    "fix",
+  );
 });

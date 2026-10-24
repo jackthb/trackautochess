@@ -1,0 +1,33 @@
+{
+  "date": "2026-10-08",
+  "title": "Hotfix",
+  "category": "hotfix",
+  "openedOn": "2026-10-08",
+  "source": "https://steamcommunity.com/sharedfiles/filedetails/changelog/1613886175",
+  "entitiesSynced": false,
+  "sourceEntries": [
+    {
+      "sourceId": "1791528504",
+      "date": "2026-10-08",
+      "time": "11:48pm",
+      "contentHash": "898ae4ec1af7a4fa"
+    }
+  ],
+  "sections": [
+    {
+      "heading": "Hotfix",
+      "entries": [
+        {
+          "kind": "fix",
+          "name": "Try to fix match history missing bug",
+          "detail": "Try to fix match history missing bug"
+        },
+        {
+          "kind": "fix",
+          "name": "Dota2 Snapshot projectile is missing and we cannot find it back",
+          "detail": "Dota2 Snapshot projectile is missing and we cannot find it back"
+        }
+      ]
+    }
+  ]
+}

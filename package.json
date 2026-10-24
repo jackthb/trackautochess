@@ -21,7 +21,7 @@
     "generate:types": "npm run generate:ipc-types && npm run generate:supabase-types",
     "build:drodo-core": "node scripts/build-drodo-core.mjs",
     "test:drodo-core": "npm run build:drodo-core && node scripts/smoke-drodo-core.mjs",
-    "test:patch-notes": "node --test scripts/lib/patch-note-kind.test.mjs scripts/validate-patch-notes.test.mjs",
+    "test:patch-notes": "node --test scripts/lib/patch-note-kind.test.mjs scripts/lib/patch-note-changelog.test.mjs scripts/validate-patch-notes.test.mjs web/lib/patchEntryText.test.mjs",
     "validate:patch-notes": "node scripts/validate-patch-notes.mjs",
     "patch-notes:local": "python scripts/extract_vscripts.py --save && node scripts/validate-patch-notes.mjs --diff-latest",
     "test:synergies": "node --no-warnings=MODULE_TYPELESS_PACKAGE_JSON --import ./scripts/lib/register-ts.mjs scripts/smoke-synergies.mjs",

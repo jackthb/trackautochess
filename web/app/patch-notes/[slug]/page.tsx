@@ -16,6 +16,7 @@ import {
   SITE_TITLE,
 } from "@/lib/site";
 import { cleanText, truncate } from "@/lib/text";
+import { entryDetailForDisplay, entryTextForMeta } from "@/lib/patchEntryText.mjs";
 import { DEFAULT_LOCALE, pickLocalized } from "@/lib/i18n";
 import { type EntryKind, KIND_COLOR, KIND_LABEL } from "@/lib/patchKinds";
 import { EntryCommentary } from "@/components/PatchCommentary";
@@ -53,6 +54,9 @@ interface Patch {
   summary?: string;
   entitiesSynced?: boolean;
   entitiesSyncedAt?: string;
+  openedOn?: string;
+  category?: string;
+  rollup?: string;
   sections: PatchSection[];
 }
 
@@ -105,7 +109,8 @@ function buildPatchDescription(patch: Patch): string {
   const firstEntries = patch.sections
     .flatMap((section) => section.entries)
     .slice(0, 2)
-    .map((entry) => cleanText(`${entry.name}: ${entry.detail}`))
+    .map((entry) => entryTextForMeta(entry.name, entry.detail))
+    .map((line) => cleanText(line))
     .join(" ");
 
   return truncate(
@@ -217,8 +222,10 @@ export default async function PatchDetailPage({ params }: Props) {
   const pageUrl = absoluteUrl(pagePath);
   const patchIndexUrl = absoluteUrl("/patch-notes");
   const isLatestPatch = slug === latestPatchSlug();
-  const showSyncStatus =
-    isLatestPatch || typeof patch.entitiesSynced === "boolean";
+  const skipsSyncBadge = patch.category === "notice" || patch.rollup === "bugfixes";
+  const showSyncStatus = !skipsSyncBadge && (
+    isLatestPatch || typeof patch.entitiesSynced === "boolean"
+  );
   const isSynced = patch.entitiesSynced === true;
   const structuredData = [
     {
@@ -226,7 +233,7 @@ export default async function PatchDetailPage({ params }: Props) {
       "@type": "Article",
       headline: localizedTitle,
       description,
-      datePublished: patch.date,
+      datePublished: patch.openedOn || patch.date,
       dateModified: patch.date,
       ...(patch.image ? { image: patch.image } : {}),
       ...(pageUrl ? { url: pageUrl, mainEntityOfPage: pageUrl } : {}),
@@ -365,6 +372,7 @@ export default async function PatchDetailPage({ params }: Props) {
               <div className={styles["section-heading"]}>{section.heading}</div>
               {section.entries.map((entry, index) => {
                 const { href, iconSrc, tooltip } = resolveEntryMeta(entry);
+                const detail = entryDetailForDisplay(entry.name, entry.detail);
 
                 return (
                   <div key={index} className={styles.entry}>
@@ -403,7 +411,9 @@ export default async function PatchDetailPage({ params }: Props) {
                           </span>
                         )}
                       </div>
-                      <div className={styles["entry-detail"]}>{entry.detail}</div>
+                      {detail ? (
+                        <div className={styles["entry-detail"]}>{detail}</div>
+                      ) : null}
                       <EntryCommentary
                         commentary={entry.commentary}
                         evidence={entry.evidence}

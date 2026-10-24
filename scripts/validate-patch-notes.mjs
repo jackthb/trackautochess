@@ -41,7 +41,12 @@ export function validatePatchDocument(patch) {
   const mismatches = [];
 
   for (const { section, entry } of patchEntries(patch)) {
-    const expected = classifyPatchNoteKind(entry.detail);
+    // Notes this scraper wrote carry `category`. Older notes keep main's
+    // label rules, so a name like "new season" or "missing health" is not
+    // reclassified.
+    const expected = patch.category
+      ? classifyPatchNoteKind(entry.detail, entry.name)
+      : classifyPatchNoteKind(entry.detail, "", { rules: "historical" });
     if (entry.kind !== expected) {
       mismatches.push({
         section,
@@ -129,6 +134,7 @@ function parseArguments(argv) {
   let patchPath = null;
   let diffPath = null;
   let useLatestDiff = false;
+  let all = false;
 
   for (let index = 0; index < argv.length; index += 1) {
     const arg = argv[index];
@@ -139,6 +145,8 @@ function parseArguments(argv) {
       diffPath = arg.slice("--diff=".length);
     } else if (arg === "--diff-latest") {
       useLatestDiff = true;
+    } else if (arg === "--all") {
+      all = true;
     } else if (arg === "--help" || arg === "-h") {
       return { help: true };
     } else if (arg.startsWith("-")) {
@@ -150,27 +158,19 @@ function parseArguments(argv) {
     }
   }
 
-  return { patchPath, diffPath, useLatestDiff, help: false };
+  return { patchPath, diffPath, useLatestDiff, all, help: false };
 }
 
 function printUsage() {
   console.log(
     "Usage: node scripts/validate-patch-notes.mjs [patch.json] " +
-      "[--diff path/to/vscripts.diff | --diff-latest]",
+      "[--diff path/to/vscripts.diff | --diff-latest] [--all]",
   );
+  console.log("Without --all, only the newest patch note is checked.");
 }
 
-export function run(argv = process.argv.slice(2)) {
-  const args = parseArguments(argv);
-  if (args.help) {
-    printUsage();
-    return 0;
-  }
-
-  const patchPath = resolve(args.patchPath || newestJsonFile(PATCH_DIR));
-  const patch = JSON.parse(readFileSync(patchPath, "utf8"));
+function reportMismatches(patchPath, patch) {
   const { mismatches } = validatePatchDocument(patch);
-
   console.log(`Patch: ${patch.date || "unknown date"} — ${patch.title || basename(patchPath)}`);
   console.log(`File: ${patchPath}`);
   if (mismatches.length === 0) {
@@ -184,6 +184,40 @@ export function run(argv = process.argv.slice(2)) {
       );
     }
   }
+  return mismatches;
+}
+
+export function run(argv = process.argv.slice(2)) {
+  const args = parseArguments(argv);
+  if (args.help) {
+    printUsage();
+    return 0;
+  }
+
+  if (args.all) {
+    const files = readdirSync(PATCH_DIR).filter((file) => file.endsWith(".json")).sort();
+    let mismatches = 0;
+    let entries = 0;
+    let filesWithMismatches = 0;
+    for (const file of files) {
+      const patchPath = join(PATCH_DIR, file);
+      const patch = JSON.parse(readFileSync(patchPath, "utf8"));
+      const found = reportMismatches(patchPath, patch);
+      entries += patchEntries(patch).length;
+      if (found.length > 0) {
+        filesWithMismatches += 1;
+        mismatches += found.length;
+      }
+    }
+    console.log(
+      `Checked ${files.length} files, ${entries} entries, ${mismatches} mismatches in ${filesWithMismatches} files`,
+    );
+    return mismatches > 0 ? 1 : 0;
+  }
+
+  const patchPath = resolve(args.patchPath || newestJsonFile(PATCH_DIR));
+  const patch = JSON.parse(readFileSync(patchPath, "utf8"));
+  const mismatches = reportMismatches(patchPath, patch);
 
   const diffPath = args.diffPath
     ? resolve(args.diffPath)

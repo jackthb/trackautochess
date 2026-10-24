@@ -1,0 +1,27 @@
+{
+  "date": "2026-09-30",
+  "title": "Pass Priorities",
+  "category": "notice",
+  "openedOn": "2026-09-30",
+  "source": "https://steamcommunity.com/sharedfiles/filedetails/changelog/1613886175",
+  "sourceEntries": [
+    {
+      "sourceId": "1790784280",
+      "date": "2026-09-30",
+      "time": "9:04am",
+      "contentHash": "982069de497cf4c9"
+    }
+  ],
+  "sections": [
+    {
+      "heading": "Notice",
+      "entries": [
+        {
+          "kind": "note",
+          "name": "Pass priorities are currently unavailable due to Valve servers out of touch.",
+          "detail": "We will fix this gradually and make up for your losses"
+        }
+      ]
+    }
+  ]
+}

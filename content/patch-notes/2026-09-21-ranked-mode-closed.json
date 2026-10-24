@@ -1,0 +1,27 @@
+{
+  "date": "2026-09-21",
+  "title": "Ranked Mode Closed",
+  "category": "notice",
+  "openedOn": "2026-09-21",
+  "source": "https://steamcommunity.com/sharedfiles/filedetails/changelog/1613886175",
+  "sourceEntries": [
+    {
+      "sourceId": "1790047946",
+      "date": "2026-09-21",
+      "time": "8:32pm",
+      "contentHash": "4b15d3dae96bf09a"
+    }
+  ],
+  "sections": [
+    {
+      "heading": "Notice",
+      "entries": [
+        {
+          "kind": "note",
+          "name": "Rank mode closed tempoparily",
+          "detail": "Rank mode closed tempoparily"
+        }
+      ]
+    }
+  ]
+}

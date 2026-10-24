@@ -1,0 +1,48 @@
+{
+  "date": "2026-10-11",
+  "title": "Arcade Maintenance",
+  "category": "notice",
+  "openedOn": "2026-10-11",
+  "source": "https://steamcommunity.com/sharedfiles/filedetails/changelog/1613886175",
+  "sourceEntries": [
+    {
+      "sourceId": "1791779118",
+      "date": "2026-10-11",
+      "time": "9:25pm",
+      "contentHash": "7712161be16a1815"
+    },
+    {
+      "sourceId": "1792417788",
+      "date": "2026-10-19",
+      "time": "6:49am",
+      "contentHash": "7712161be16a1815"
+    }
+  ],
+  "sections": [
+    {
+      "heading": "Notice",
+      "entries": [
+        {
+          "kind": "note",
+          "name": "Due to maintenance of the DOTA2 Arcade system, you cannot launch games inside DOTA2 for now.",
+          "detail": "Download Xiaoheihe to play."
+        },
+        {
+          "kind": "note",
+          "name": "Download the Xiaoheihe PC client.",
+          "detail": "Open https://dota.xiaoheihe.cn/ in your system browser. The built-in Dota 2 browser may fail."
+        },
+        {
+          "kind": "note",
+          "name": "If you cannot register within the app, complete quick registration on the Xiaoheihe site.",
+          "detail": "The site is https://www.xiaoheihe.cn/."
+        },
+        {
+          "kind": "note",
+          "name": "If you cannot see any model in recruit panel, pls enhance your dota2 video settings slightly.",
+          "detail": "If you cannot see any model in recruit panel, pls enhance your dota2 video settings slightly."
+        }
+      ]
+    }
+  ]
+}

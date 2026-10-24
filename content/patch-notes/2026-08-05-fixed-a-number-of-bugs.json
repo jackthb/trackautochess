@@ -1,0 +1,40 @@
+{
+  "date": "2026-08-05",
+  "title": "Fixed a number of bugs",
+  "category": "hotfix",
+  "rollup": "bugfixes",
+  "openedOn": "2026-08-05",
+  "source": "https://steamcommunity.com/sharedfiles/filedetails/changelog/1613886175",
+  "sourceEntries": [
+    {
+      "sourceId": "1785945984",
+      "date": "2026-08-05",
+      "time": "9:06am",
+      "contentHash": "13a6ab95687b03d8"
+    },
+    {
+      "sourceId": "1785990481",
+      "date": "2026-08-05",
+      "time": "9:28pm",
+      "contentHash": "9f3911c9fb87cc5a"
+    },
+    {
+      "sourceId": "1785997022",
+      "date": "2026-08-05",
+      "time": "11:17pm",
+      "contentHash": "13a6ab95687b03d8"
+    }
+  ],
+  "sections": [
+    {
+      "heading": "Bug Fixes",
+      "entries": [
+        {
+          "kind": "fix",
+          "name": "Workshop bugfixes",
+          "detail": "3 Workshop posts on Aug 5."
+        }
+      ]
+    }
+  ]
+}
