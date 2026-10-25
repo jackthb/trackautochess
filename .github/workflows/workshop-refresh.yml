@@ -1,0 +1,381 @@
+# Downloads the Dota Auto Chess Workshop VPK anonymously when its published
+# file changes, refreshes game data, and opens or updates one draft pull request.
+# The VPK and extracted Lua are deleted with the runner. Do not upload them.
+name: Refresh Workshop game data
+
+on:
+  schedule:
+    - cron: "0 */6 * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: workshop-refresh
+  cancel-in-progress: false
+
+# The default token can read the repository. Only the publish job can push
+# or open a pull request. Artifact upload and download use the Actions
+# runtime token, so these jobs do not set an actions permission.
+permissions:
+  contents: read
+
+env:
+  DATA_BRANCH: workshop-data-refresh
+  LAST_SEEN: data/workshop-last-seen.json
+  # DepotDownloader 3.4.0, SteamRE release DepotDownloader_3.4.0.
+  # scripts/refresh-workshop.py pins every host archive to these checksums
+  # and refuses to launch a binary that does not match.
+  DEPOTDOWNLOADER_VERSION: "3.4.0"
+  DEPOTDOWNLOADER_LINUX_X64_SHA256: a999dec66b4850fc961bd50366696d23c2d0fad7b18790e6a5647b2f19097a53
+  DEPOTDOWNLOADER_LINUX_X64_BINARY_SHA256: d62a1721564bdb96bacd9285bb5f96180a45202e82a9f85c6a88e5e8ee5f992c
+  VPK_VERSION: "1.4.0"
+  VPK_SHA256: 021a40fa28eece9909dfce6f2b55abfd39fff22ac4a4a18ddf7a10afa4c1232f
+  PNPM_VERSION: "10.32.1"
+  PNPM_SHA256: 9b943b94bc8f55efb993aad8e44b538e6b091e60a9e4a944dcde869855f233e3
+  # Changelog text comes from Node's fetch of the Steam page. This workflow
+  # does not install a browser, Chrome, or ffmpeg.
+  NODE_VERSION: "22.23.4"
+  # node-v22.23.4-linux-x64.tar.xz from nodejs.org SHASUMS256.txt.
+  # actions/setup-node checks the download against that upstream file.
+  NODE_LINUX_X64_SHA256: 1805bcd35e6815559bd2eb97db438d3fdb0eb3a5e6a977b7c1badca76337e9ce
+
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    permissions:
+      contents: read
+      pull-requests: read
+    outputs:
+      decision: ${{ steps.gate.outputs.decision }}
+      manifest_id: ${{ steps.gate.outputs.manifest_id }}
+      manifest_date: ${{ steps.gate.outputs.manifest_date }}
+      manifest_created_at: ${{ steps.gate.outputs.manifest_created_at }}
+      time_updated: ${{ steps.gate.outputs.time_updated }}
+      previous_time_updated: ${{ steps.gate.outputs.previous_time_updated }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          fetch-depth: 1
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
+        with:
+          python-version: "3.12.15"
+
+      - name: Compare published file time_updated
+        id: gate
+        env:
+          # Read-only token from this job's permissions. It lists pull requests
+          # and cannot push or open one. setup-git uses this token for fetch.
+          GH_TOKEN: ${{ github.token }}
+          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+        run: |
+          set -euo pipefail
+          gh auth setup-git
+          python scripts/refresh-workshop.py --verify-pins
+
+          git fetch origin "+refs/heads/${DEFAULT_BRANCH}:refs/remotes/origin/${DEFAULT_BRANCH}"
+          if ! git fetch origin "+refs/heads/${DATA_BRANCH}:refs/remotes/origin/${DATA_BRANCH}"; then
+            echo "No ${DATA_BRANCH} branch yet."
+          fi
+
+          show_last_seen() {
+            local ref="$1"
+            local dest="$2"
+            if git cat-file -e "${ref}:${LAST_SEEN}" 2>/dev/null; then
+              git show "${ref}:${LAST_SEEN}" > "$dest"
+            else
+              echo '{}' > "$dest"
+            fi
+          }
+          show_last_seen "origin/${DEFAULT_BRANCH}" "$RUNNER_TEMP/default-last-seen.json"
+          if git show-ref --verify --quiet "refs/remotes/origin/${DATA_BRANCH}"; then
+            show_last_seen "origin/${DATA_BRANCH}" "$RUNNER_TEMP/branch-last-seen.json"
+          else
+            echo '{}' > "$RUNNER_TEMP/branch-last-seen.json"
+          fi
+
+          gh pr list --head "$DATA_BRANCH" --base "$DEFAULT_BRANCH" --state open \
+            --json number,title,state,body > "$RUNNER_TEMP/open-prs.json"
+          gh pr list --head "$DATA_BRANCH" --base "$DEFAULT_BRANCH" --state closed \
+            --json number,title,state,body > "$RUNNER_TEMP/closed-prs.json"
+
+          python scripts/workshop-refresh-pr.py gate \
+            --default-last-seen "$RUNNER_TEMP/default-last-seen.json" \
+            --branch-last-seen "$RUNNER_TEMP/branch-last-seen.json" \
+            --open-prs "$RUNNER_TEMP/open-prs.json" \
+            --closed-prs "$RUNNER_TEMP/closed-prs.json" \
+            --github-output "$GITHUB_OUTPUT" \
+            --report-output "$RUNNER_TEMP/pr-only-report.json"
+
+      - name: Set up Node.js
+        if: steps.gate.outputs.decision == 'refresh' || steps.gate.outputs.decision == 'pr-only'
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: "22.23.4"
+
+      - name: Install pinned refresh tools
+        if: steps.gate.outputs.decision == 'refresh'
+        run: |
+          set -euo pipefail
+          python -m pip install --require-hashes --no-deps "vpk==${VPK_VERSION}" \
+            --hash "sha256:${VPK_SHA256}"
+          tarball="$RUNNER_TEMP/pnpm-${PNPM_VERSION}.tgz"
+          curl -fsSL -o "$tarball" "https://registry.npmjs.org/pnpm/-/pnpm-${PNPM_VERSION}.tgz"
+          echo "${PNPM_SHA256}  ${tarball}" | sha256sum -c -
+          npm install -g "$tarball"
+          pnpm install --frozen-lockfile
+
+      - name: Refresh game data
+        if: steps.gate.outputs.decision == 'refresh'
+        run: |
+          set -euo pipefail
+          python scripts/refresh-workshop.py --full-checks --cache-dir "$RUNNER_TEMP/workshop-refresh"
+          report="$(find "$RUNNER_TEMP/workshop-refresh" -name report.json -print -quit)"
+          test -n "$report"
+          cp "$report" "$RUNNER_TEMP/refresh-report.json"
+          # The patch is the generated paths only. content/patch-notes stays
+          # out of it, and a symlink, VPK, or Lua file fails the step.
+          python scripts/workshop-refresh-pr.py write-patch \
+            --repo "$GITHUB_WORKSPACE" \
+            --output "$RUNNER_TEMP/refresh.patch"
+          rm -rf "$RUNNER_TEMP/workshop-refresh"
+
+      - name: Collect Steam changelog entries
+        if: steps.gate.outputs.decision == 'refresh' || steps.gate.outputs.decision == 'pr-only'
+        env:
+          TIME_UPDATED: ${{ steps.gate.outputs.time_updated }}
+          PREVIOUS_TIME_UPDATED: ${{ steps.gate.outputs.previous_time_updated }}
+        run: |
+          set -euo pipefail
+          args=(--emit-entries="$RUNNER_TEMP/changelog.json")
+          if [ -n "${TIME_UPDATED}" ]; then
+            args+=(--until="${TIME_UPDATED}")
+          fi
+          if [ -n "${PREVIOUS_TIME_UPDATED}" ]; then
+            args+=(--since="${PREVIOUS_TIME_UPDATED}")
+          fi
+          if [ -z "${TIME_UPDATED}" ]; then
+            echo "No manifest time was available, so changelog entries were not fetched." \
+              | tee "$RUNNER_TEMP/changelog-error.txt"
+          else
+            set +e
+            node scripts/scrape-patch-notes.mjs "${args[@]}" \
+              > "$RUNNER_TEMP/emit.stdout" 2> "$RUNNER_TEMP/emit.stderr"
+            status=$?
+            set -e
+            cat "$RUNNER_TEMP/emit.stdout"
+            cat "$RUNNER_TEMP/emit.stderr" >&2
+            if [ "$status" -ne 0 ]; then
+              {
+                echo "node scripts/scrape-patch-notes.mjs exited ${status}"
+                cat "$RUNNER_TEMP/emit.stderr"
+              } > "$RUNNER_TEMP/changelog-error.txt"
+              echo "::error::Changelog emit failed. The draft pull request body includes the error. No browser was installed."
+            fi
+          fi
+          if [ ! -s "$RUNNER_TEMP/changelog.json" ]; then
+            echo '[]' > "$RUNNER_TEMP/changelog.json"
+          fi
+
+      - name: Pack the refresh result
+        if: steps.gate.outputs.decision == 'refresh' || steps.gate.outputs.decision == 'pr-only'
+        env:
+          PREVIOUS_TIME_UPDATED: ${{ steps.gate.outputs.previous_time_updated }}
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/artifact"
+          if [ -f "$RUNNER_TEMP/refresh-report.json" ]; then
+            cp "$RUNNER_TEMP/refresh-report.json" "$RUNNER_TEMP/artifact/report.json"
+          else
+            cp "$RUNNER_TEMP/pr-only-report.json" "$RUNNER_TEMP/artifact/report.json"
+          fi
+          cp "$RUNNER_TEMP/changelog.json" "$RUNNER_TEMP/artifact/changelog.json"
+          if [ -f "$RUNNER_TEMP/changelog-error.txt" ]; then
+            cp "$RUNNER_TEMP/changelog-error.txt" "$RUNNER_TEMP/artifact/changelog-error.txt"
+          fi
+          if [ -f "$RUNNER_TEMP/refresh.patch" ]; then
+            cp "$RUNNER_TEMP/refresh.patch" "$RUNNER_TEMP/artifact/refresh.patch"
+          fi
+          REPORT_PATH="$RUNNER_TEMP/artifact/report.json" python - <<'PY'
+          import json, os
+          from pathlib import Path
+          path = Path(os.environ["REPORT_PATH"])
+          report = json.loads(path.read_text(encoding="utf-8"))
+          previous = os.environ.get("PREVIOUS_TIME_UPDATED") or ""
+          if previous:
+              report["previous_time_updated"] = previous
+          path.write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
+          PY
+          if find "$RUNNER_TEMP/artifact" -type l | grep -q .; then
+            echo "Refusing to upload a symlink."
+            exit 1
+          fi
+          if find "$RUNNER_TEMP/artifact" -type f \( -name '*.vpk' -o -name '*.lua' \) | grep -q .; then
+            echo "Refusing to upload a VPK or extracted Lua."
+            exit 1
+          fi
+
+      - name: Upload the refresh result
+        if: steps.gate.outputs.decision == 'refresh' || steps.gate.outputs.decision == 'pr-only'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: workshop-refresh
+          path: ${{ runner.temp }}/artifact
+          retention-days: 1
+          if-no-files-found: error
+
+      - name: Unchanged or closed manifest
+        if: steps.gate.outputs.decision == 'noop' || steps.gate.outputs.decision == 'closed'
+        env:
+          DECISION: ${{ steps.gate.outputs.decision }}
+          MANIFEST_ID: ${{ steps.gate.outputs.manifest_id }}
+          TIME_UPDATED: ${{ steps.gate.outputs.time_updated }}
+        run: |
+          set -euo pipefail
+          if [ "$DECISION" = "closed" ]; then
+            echo "A pull request for manifest ${MANIFEST_ID} is already closed. Leaving it closed."
+          else
+            echo "Published file time_updated=${TIME_UPDATED} is already recorded. Skipping Workshop download."
+          fi
+
+  publish:
+    needs: prepare
+    if: needs.prepare.outputs.decision == 'refresh' || needs.prepare.outputs.decision == 'pr-only'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          # Full history. A depth-1 checkout reports unrelated histories when
+          # workshop-data-refresh does not contain main's tip.
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065 # v5.6.0
+        with:
+          python-version: "3.12.15"
+
+      - name: Download the refresh result
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: workshop-refresh
+          path: ${{ runner.temp }}/workshop-refresh
+
+      - name: Push a new commit and open the draft pull request
+        env:
+          GH_TOKEN: ${{ github.token }}
+          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          DECISION: ${{ needs.prepare.outputs.decision }}
+          MANIFEST_ID: ${{ needs.prepare.outputs.manifest_id }}
+        run: |
+          set -euo pipefail
+          # This job's token can push. Configure the helper before fetch.
+          gh auth setup-git
+          artifact="$RUNNER_TEMP/workshop-refresh"
+          test -f "$artifact/report.json"
+          test -f "$artifact/changelog.json"
+          git fetch origin "+refs/heads/${DEFAULT_BRANCH}:refs/remotes/origin/${DEFAULT_BRANCH}"
+          if ! git fetch origin "+refs/heads/${DATA_BRANCH}:refs/remotes/origin/${DATA_BRANCH}"; then
+            echo "No ${DATA_BRANCH} branch yet."
+          fi
+          open_count="$(gh pr list --head "$DATA_BRANCH" --base "$DEFAULT_BRANCH" --state open --json number --jq 'length')"
+          open_pr=false
+          if [ "$open_count" != "0" ]; then
+            open_pr=true
+          fi
+          patch_args=()
+          if [ -f "$artifact/refresh.patch" ]; then
+            patch_args=(--patch "$artifact/refresh.patch")
+          fi
+          workdir="$RUNNER_TEMP/pr-branch"
+          if ! action="$(python scripts/workshop-refresh-pr.py publish-tree \
+              --repo "$GITHUB_WORKSPACE" \
+              --workdir "$workdir" \
+              --default-branch "$DEFAULT_BRANCH" \
+              --data-branch "$DATA_BRANCH" \
+              --decision "$DECISION" \
+              --manifest "$MANIFEST_ID" \
+              --open-pr "$open_pr" \
+              "${patch_args[@]}")"; then
+            exit 1
+          fi
+          case "$action" in
+            skip)
+              echo "No substantive Workshop changes to commit. Leaving ${DATA_BRANCH} where it is."
+              exit 0
+              ;;
+            push)
+              git -C "$workdir" push origin "HEAD:refs/heads/${DATA_BRANCH}"
+              ;;
+            push-lease:*)
+              expected="${action#push-lease:}"
+              # The new commit's parent is current main. This lease runs only
+              # when every commit it replaces was authored and committed by github-actions[bot],
+              # including while a draft pull request is open. A human author or
+              # committer stops the job before this push.
+              # Merge or close the pull request, or remove the non-bot commit, then rerun.
+              # The lease moves the branch ref. The previous tip leaves the branch,
+              # and GitHub may garbage-collect it. The branch stays.
+              git -C "$workdir" push --force-with-lease="refs/heads/${DATA_BRANCH}:${expected}" \
+                origin "HEAD:refs/heads/${DATA_BRANCH}"
+              ;;
+            *)
+              echo "Unexpected publish action: ${action}"
+              exit 1
+              ;;
+          esac
+
+          gh pr list --head "$DATA_BRANCH" --base "$DEFAULT_BRANCH" --state closed \
+            --json number,title,state,body > "$RUNNER_TEMP/closed-now.json"
+          closed_state="$(python scripts/workshop-refresh-pr.py closed-check \
+            --manifest "$MANIFEST_ID" --pulls "$RUNNER_TEMP/closed-now.json")"
+          if [ "$closed_state" = "closed" ]; then
+            echo "A pull request for manifest ${MANIFEST_ID} is already closed. Leaving it closed."
+            exit 0
+          fi
+
+          render_args=(
+            --report "$artifact/report.json"
+            --changelog "$artifact/changelog.json"
+            --output "$RUNNER_TEMP/pr-body.md"
+            --run-url "$RUN_URL"
+          )
+          if [ -f "$artifact/changelog-error.txt" ]; then
+            render_args+=(--changelog-error "$artifact/changelog-error.txt")
+          fi
+          python scripts/workshop-refresh-pr.py render "${render_args[@]}"
+          manifest_date="$(python -c 'import json,sys; print(json.load(open(sys.argv[1], encoding="utf-8")).get("manifest_date") or "")' "$artifact/report.json")"
+          manifest_id="$(python -c 'import json,sys; print(json.load(open(sys.argv[1], encoding="utf-8")).get("manifest_id") or "")' "$artifact/report.json")"
+          title="Refresh Workshop game data (${manifest_date}, manifest ${manifest_id})"
+          if [ "$open_pr" = "true" ]; then
+            gh pr edit "$DATA_BRANCH" --title "$title" --body-file "$RUNNER_TEMP/pr-body.md"
+            draft="$(gh pr view "$DATA_BRANCH" --json isDraft --jq .isDraft)"
+            if [ "$draft" != "true" ]; then
+              gh pr ready "$DATA_BRANCH" --undo
+            fi
+          else
+            created=false
+            for attempt in 1 2 3 4 5; do
+              if gh pr create --draft --base "$DEFAULT_BRANCH" --head "$DATA_BRANCH" \
+                  --title "$title" --body-file "$RUNNER_TEMP/pr-body.md"; then
+                created=true
+                break
+              fi
+              echo "Draft pull request was not created (attempt ${attempt})."
+              sleep $((attempt * 3))
+            done
+            if [ "$created" != "true" ]; then
+              echo "GitHub Actions could not open a pull request. Enable Settings → Actions → General → Allow GitHub Actions to create and approve pull requests."
+              echo "Also enable Settings → General → Automatically delete head branches so a merged refresh branch does not pile up."
+              exit 1
+            fi
+          fi

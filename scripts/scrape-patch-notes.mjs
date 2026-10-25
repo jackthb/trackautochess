@@ -54,9 +54,11 @@ const PAGE_DELAY_MS = 2500;
 const RATE_LIMIT_BACKOFF_MS = [5000, 15000, 45000];
 // Rarely, Steam blocks both the direct fetch and the reader's fetch in the
 // same run (an anti-bot challenge, not just an IP-reputation block). A real
-// browser navigation clears that challenge, so it's the last fallback before
-// giving up. Playwright is not a hard dependency of this script — it's only
-// installed by the workflow when the cheaper fetch paths above have failed.
+// browser navigation clears that challenge, so a full scrape can use it as
+// the last fallback. That browser is not part of workshop-refresh: the
+// scheduled emit path passes --since and --until and never launches one.
+// When Steam blocks that path, it retries through the r.jina.ai reader and
+// then the entries already saved in content/patch-notes.
 
 const REQUEST_HEADERS = {
   "User-Agent":
@@ -74,6 +76,24 @@ const ANNOTATE_PATCH_ARG = process.argv.find((arg) =>
   arg.startsWith("--annotate-patch=")
 );
 const ANNOTATE_PATCH = ANNOTATE_PATCH_ARG?.split("=").slice(1).join("=");
+const EMIT_ENTRIES_ARG = process.argv.find((arg) => arg.startsWith("--emit-entries="));
+if (process.argv.some((arg) => arg.startsWith("--around="))) {
+  throw new Error("--around was removed; pass --since=<exclusive unix seconds> and --until=<inclusive unix seconds>");
+}
+if (process.argv.some((arg) => arg.startsWith("--known-source-id="))) {
+  throw new Error("--known-source-id was removed; pass --since=<exclusive unix seconds> and --until=<inclusive unix seconds>");
+}
+
+function numericFlag(prefix) {
+  const arg = process.argv.find((item) => item.startsWith(prefix));
+  if (!arg) return null;
+  const value = Number(arg.split("=").slice(1).join("="));
+  if (!Number.isFinite(value)) throw new Error(`${prefix}<unix seconds> must be a number`);
+  return value;
+}
+
+const SINCE_SECONDS = numericFlag("--since=");
+const UNTIL_SECONDS = numericFlag("--until=");
 
 function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -741,7 +761,252 @@ function knownEntry(entry, knownSourceEntryIds, knownSourceEntryKeys, existingPa
   return false;
 }
 
+function sourceStamp(entry) {
+  const value = Number(entry?.sourceId);
+  return Number.isFinite(value) ? value : null;
+}
+
+function inRefreshRange(entry, since, until) {
+  const stamp = sourceStamp(entry);
+  if (stamp == null || until == null) return false;
+  if (stamp > until) return false;
+  if (since == null) return stamp === until;
+  return stamp > since;
+}
+
+function pastRefreshRange(entry, since, until) {
+  const stamp = sourceStamp(entry);
+  if (stamp == null) return false;
+  if (since != null) return stamp <= since;
+  if (until != null) return stamp < until;
+  return false;
+}
+
+function blockedChangelogError(err) {
+  return /not a usable Steam page|rate-limited|Could not fetch|fetch failed|ECONN|ENOTFOUND|network/i.test(
+    err?.message || "",
+  );
+}
+
+function entriesFromChangelogHtml(html, since, until) {
+  const entries = parseChangelogEntries(html);
+  const assessment = assessChangelogFetch({ status: 200, html, entries });
+  if (!assessment.ok) {
+    throw new Error(
+      `Changelog file is not a usable Steam page (${assessment.reason}). Refusing to write.`,
+    );
+  }
+  const walkedPast = entries.some((entry) => pastRefreshRange(entry, since, until));
+  if (!assessment.lastPage && !walkedPast) {
+    throw new Error(
+      "Changelog file ended inside the recorded update range. Refusing to write a partial list.",
+    );
+  }
+  return entries.filter((entry) => inRefreshRange(entry, since, until));
+}
+
+async function collectRefreshRange(fetchPage, since, until) {
+  const matched = [];
+  const seen = new Set();
+  for (let page = 1; page <= MAX_CHANGELOG_PAGES; page += 1) {
+    if (page > 1) await sleep(PAGE_DELAY_MS);
+    const result = await fetchPage(page);
+    const entries = result.entries || [];
+    let assessment = assessChangelogFetch({
+      status: result.status ?? 200,
+      html: result.html,
+      entries,
+    });
+    if (
+      !assessment.ok
+      && assessment.reason === "missing-paging-header"
+      && entries.length > 0
+      && typeof result.hasNext === "boolean"
+    ) {
+      assessment = { ok: true, lastPage: !result.hasNext, hasNext: result.hasNext };
+    }
+    if (!assessment.ok) {
+      throw new Error(
+        `Changelog page ${page} is not a usable Steam page (${assessment.reason}). Refusing to write.`,
+      );
+    }
+    if (entries.length > 0 && entries.every((entry) => sourceStamp(entry) == null)) {
+      throw new Error(`Changelog page ${page} has no source ids. Refusing to write.`);
+    }
+    let walkedPast = false;
+    for (const entry of entries) {
+      const stamp = sourceStamp(entry);
+      const sourceId = stamp == null ? "" : String(entry.sourceId);
+      if (sourceId && !seen.has(sourceId) && inRefreshRange(entry, since, until)) {
+        seen.add(sourceId);
+        matched.push(entry);
+      }
+      if (pastRefreshRange(entry, since, until)) walkedPast = true;
+    }
+    if (assessment.lastPage || walkedPast) {
+      matched.sort((a, b) => sourceStamp(a) - sourceStamp(b));
+      return matched;
+    }
+  }
+  throw new Error(
+    `Changelog pagination stopped after ${MAX_CHANGELOG_PAGES} pages before leaving the recorded update range`,
+  );
+}
+
+function savedExcerpt(patch) {
+  const entries = patch.sourceEntries || [];
+  if (entries.length === 1) {
+    const section = (patch.sections || [])[0];
+    const item = section && (section.entries || [])[0];
+    const text = [item?.name, item?.detail].filter(Boolean).join(" — ");
+    if (text) return text;
+  }
+  return patch.title || "";
+}
+
+function savedRangeEntries(since, until) {
+  const matched = [];
+  const seen = new Set();
+  for (const patch of loadExistingPatches()) {
+    for (const entry of patch.sourceEntries || []) {
+      const sourceId = String(entry.sourceId || "");
+      if (!sourceId || seen.has(sourceId)) continue;
+      const shaped = {
+        date: entry.date,
+        time: entry.time,
+        sourceId,
+        docsUrl: entry.docsUrl || null,
+        content: entry.content || savedExcerpt(patch),
+        origin: "saved-patch-notes",
+      };
+      if (!inRefreshRange(shaped, since, until)) continue;
+      seen.add(sourceId);
+      matched.push(shaped);
+    }
+  }
+  matched.sort((a, b) => sourceStamp(a) - sourceStamp(b));
+  return matched;
+}
+
+async function fetchSteamRange(since, until) {
+  return collectRefreshRange(async (page) => {
+    const url = changelogPageUrl(CHANGELOG_FETCH_URL, page);
+    const response = await fetchChangelogResponse(url, `Steam changelog page ${page}`);
+    const entries = response.status === 200 ? parseChangelogEntries(response.html) : [];
+    return { status: response.status, html: response.html, entries };
+  }, since, until);
+}
+
+async function fetchReaderRange(since, until) {
+  return collectRefreshRange(async (page) => {
+    const pageUrl = changelogPageUrl(CHANGELOG_FETCH_URL, page);
+    const response = await fetchChangelogResponse(readerUrlFor(pageUrl), `Text-rendered changelog page ${page}`);
+    const htmlEntries = response.status === 200 ? parseChangelogEntries(response.html) : [];
+    let entries = htmlEntries;
+    if (!htmlEntries.length && response.status === 200) {
+      entries = assignEntryDates(parseChangelogReaderEntries(response.html));
+    }
+    const paging = assessChangelogFetch({ status: response.status, html: response.html, entries });
+    if (paging.ok || paging.reason !== "missing-paging-header") {
+      return { status: response.status, html: response.html, entries };
+    }
+    return { entries, hasNext: hasNextChangelogPage(response.html, page) };
+  }, since, until);
+}
+
+// Posts after the previous time_updated and through the current one, including
+// posts already saved on disk. This does not stop at a known post and does
+// not launch a browser. A missing "Showing X-Y of N entries" header still
+// refuses that fetch. When Steam blocks the runner, the reader is next, then
+// the matching entries already stored in content/patch-notes.
+async function fetchChangelogRange(since, until) {
+  if (until == null) throw new Error("--until=<unix seconds> is required");
+  if (CHANGELOG_FILE) {
+    return entriesFromChangelogHtml(readFileSync(CHANGELOG_FILE, "utf-8"), since, until);
+  }
+
+  let blocked = null;
+  try {
+    return await fetchSteamRange(since, until);
+  } catch (err) {
+    if (!blockedChangelogError(err)) throw err;
+    blocked = err;
+    console.warn(`Direct changelog fetch failed: ${err.message}`);
+  }
+
+  try {
+    const entries = await fetchReaderRange(since, until);
+    if (entries.length > 0) {
+      console.warn(`Text-rendered fallback returned ${entries.length} entries in the recorded update range.`);
+      return entries;
+    }
+    console.warn("Text-rendered fallback returned no entries in the recorded update range.");
+  } catch (err) {
+    console.warn(`Text-rendered fallback failed: ${err.message}`);
+  }
+
+  const saved = savedRangeEntries(since, until);
+  if (saved.length > 0) {
+    console.warn(
+      `Using ${saved.length} changelog entries already saved in content/patch-notes. A newer post may be missing.`,
+    );
+    return saved;
+  }
+  throw blocked || new Error("Could not fetch Steam changelog entries for the recorded update range");
+}
+
+function changelogPayload(entries) {
+  return entries.map((entry) => {
+    const payload = {
+      date: entry.date,
+      time: entry.time,
+      sourceId: entry.sourceId || null,
+      docsUrl: entry.docsUrl || null,
+      excerpt: String(entry.content || "").slice(0, 500),
+      url: entry.sourceId ? `${CHANGELOG_URL}#${entry.sourceId}` : CHANGELOG_URL,
+    };
+    if (entry.origin) payload.origin = entry.origin;
+    return payload;
+  });
+}
+
+async function emitChangelogEntries() {
+  const destination = EMIT_ENTRIES_ARG.split("=").slice(1).join("=");
+  if (!destination) throw new Error("--emit-entries=FILE is required");
+  let entries;
+  if (UNTIL_SECONDS != null) {
+    entries = await fetchChangelogRange(SINCE_SECONDS, UNTIL_SECONDS);
+  } else if (SINCE_SECONDS != null) {
+    throw new Error("--until=<unix seconds> is required with --since");
+  } else {
+    const existingPatches = loadExistingPatches();
+    const knownSourceEntryKeys = new Set(
+      existingPatches.flatMap((patch) => [...collectSourceEntryKeys(patch)]),
+    );
+    const knownSourceEntryIds = new Set(
+      existingPatches.flatMap((patch) => [...collectSourceEntryIds(patch)]),
+    );
+    const isKnown = (entry) => knownEntry(
+      entry,
+      knownSourceEntryIds,
+      knownSourceEntryKeys,
+      existingPatches,
+    );
+    // A caller that does not pass --until still refuses a partial page.
+    // Workshop refresh always passes --since and --until.
+    ({ entries } = await fetchChangelogWithEntries(isKnown));
+  }
+  const payload = changelogPayload(entries);
+  writeFileSync(destination, `${JSON.stringify(payload, null, 2)}\n`);
+  console.log(`Wrote ${payload.length} changelog entries to ${destination}`);
+}
+
 async function main() {
+  if (EMIT_ENTRIES_ARG) {
+    await emitChangelogEntries();
+    return;
+  }
+
   if (ANNOTATE_PATCH) {
     await annotateExistingPatch(ANNOTATE_PATCH);
     return;

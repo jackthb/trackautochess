@@ -127,7 +127,7 @@ Steam changelog ->  scripts/scrape-patch-notes.mjs  ->  content/patch-notes + co
 ## Automation
 
 - `.github/workflows/release.yml` runs on `v*` tags, builds the Windows Electron app and Rust backend, and uploads installer `.exe` artifacts to the GitHub Release.
-- No workflow is on a live schedule. The old Queen-player and Drodo poll crons (`refresh-queens.yml`, `poll-drodo.yml`, and the `/api/cron/*` routes they called) were removed: `/queens` is capture-driven while `QUEENS_DRODO_VIEW_REFRESH_ENABLED` is `false`, and Drodo background polling stays parked. See [polling.md](polling.md).
+- `.github/workflows/workshop-refresh.yml` runs every 6 hours, checks the Workshop item's `time_updated`, downloads the VPK only when it changed, and opens a draft game-data pull request. Each publish rebuilds `workshop-data-refresh` from current `main`, including while a draft pull request is open. See [workshop-refresh.md](workshop-refresh.md). The old Queen-player and Drodo poll crons (`refresh-queens.yml`, `poll-drodo.yml`, and the `/api/cron/*` routes they called) were removed: `/queens` is capture-driven while `QUEENS_DRODO_VIEW_REFRESH_ENABLED` is `false`, and Drodo background polling stays parked. See [polling.md](polling.md).
 
 ### Cronicle jobs on the Pi
 
