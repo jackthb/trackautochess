@@ -1,8 +1,8 @@
 use super::{
-    describe_ureq_error, drodo_courier_api_url, drodo_profile_to_user_payload,
-    drodo_user_row_to_profile, mmr_level_to_app_rank, now_iso_utc, parse_valid_steam_id64,
-    preserve_omitted_drodo_fields, value_number, SupabaseClient, HTTP_TIMEOUT,
-    MATCH_INGEST_HTTP_TIMEOUT,
+    courier_player, describe_ureq_error, drodo_courier_error, drodo_profile_to_user_payload,
+    drodo_user_row_to_profile, fetch_drodo_courier_payload, mmr_level_to_app_rank, now_iso_utc,
+    parse_valid_steam_id64, preserve_omitted_drodo_fields, queen_rank_from_object, value_number,
+    SupabaseClient, HTTP_TIMEOUT, MATCH_INGEST_HTTP_TIMEOUT,
 };
 use crate::config::Config;
 use serde_json::{json, Value};
@@ -18,6 +18,10 @@ const TOKEN_REFRESH_SKEW_SECONDS: i64 = 60;
 /// gets "Already Used" and both writers can clobber each other's config.json
 /// update.
 static SESSION_REFRESH_LOCK: Mutex<()> = Mutex::new(());
+
+fn positive_value_number(value: &Value, key: &str) -> Option<i64> {
+    value_number(value, key).filter(|number| *number > 0)
+}
 
 impl SupabaseClient {
     pub fn from_config(cfg: &Config) -> Option<Self> {
@@ -120,20 +124,12 @@ impl SupabaseClient {
     }
 
     pub fn refresh_drodo_profile(&self, steam_id: &str) -> Result<Value, String> {
-        let api_url = drodo_courier_api_url(&format!("courier/get/@{steam_id}"));
-        let response = ureq::get(&api_url)
-            .timeout(HTTP_TIMEOUT)
-            .call()
-            .map_err(describe_ureq_error)?;
-        let body_text = response.into_string().map_err(|err| err.to_string())?;
-        let body: Value = serde_json::from_str(&body_text).map_err(|err| err.to_string())?;
-        if body.get("err").and_then(Value::as_i64).unwrap_or(-1) != 0 {
-            return Err("Drodo profile API returned an error".to_owned());
+        let body = fetch_drodo_courier_payload(steam_id)?;
+        if let Some(message) = drodo_courier_error(&body) {
+            return Err(message);
         }
-        let drodo_data = body
-            .get("user_info")
-            .and_then(|info| info.get(steam_id))
-            .cloned()
+        let drodo_data = courier_player(&body, steam_id)
+            .map(|info| Value::Object(info.clone()))
             .ok_or_else(|| "Drodo profile was not found for this Steam account.".to_owned())?;
 
         let mut max_season = 0;
@@ -158,12 +154,16 @@ impl SupabaseClient {
         let match_key = (!season.is_empty()).then(|| format!("match_{season}"));
         let mut profile = json!({
             "steam_id": steam_id,
-            "mmr": mmr_key.as_deref().and_then(|key| value_number(&drodo_data, key)),
-            "max_mmr": max_mmr_key.as_deref().and_then(|key| value_number(&drodo_data, key)),
+            "mmr": mmr_key.as_deref().and_then(|key| positive_value_number(&drodo_data, key)),
+            "max_mmr": max_mmr_key.as_deref().and_then(|key| positive_value_number(&drodo_data, key)),
             "mmr_level": value_number(&drodo_data, "mmr_level"),
-            "queen_rank": value_number(&drodo_data, "queen_rank"),
+            "queen_rank": drodo_data
+                .as_object()
+                .and_then(queen_rank_from_object)
+                .map(|rank| json!(rank))
+                .unwrap_or(Value::Null),
             "season": if season.is_empty() { Value::Null } else { json!(season) },
-            "season_games": match_key.as_deref().and_then(|key| value_number(&drodo_data, key)),
+            "season_games": match_key.as_deref().and_then(|key| positive_value_number(&drodo_data, key)),
             "candy": value_number(&drodo_data, "candy"),
             "chicken_count": value_number(&drodo_data, "chicken_count").unwrap_or(0),
             "raw_data": drodo_data,
@@ -194,9 +194,9 @@ impl SupabaseClient {
                 season_rows.push(json!({
                     "steam_id": steam_id,
                     "season": season_key,
-                    "mmr": value_number(profile.get("raw_data").unwrap_or(&Value::Null), &format!("mmr_s{n}")),
-                    "max_mmr": value_number(profile.get("raw_data").unwrap_or(&Value::Null), &format!("max_mmr_s{n}")),
-                    "games_played": value_number(profile.get("raw_data").unwrap_or(&Value::Null), &format!("match_s{n}")),
+                    "mmr": positive_value_number(profile.get("raw_data").unwrap_or(&Value::Null), &format!("mmr_s{n}")),
+                    "max_mmr": positive_value_number(profile.get("raw_data").unwrap_or(&Value::Null), &format!("max_mmr_s{n}")),
+                    "games_played": positive_value_number(profile.get("raw_data").unwrap_or(&Value::Null), &format!("match_s{n}")),
                     "fetched_at": now,
                 }));
             }

@@ -19,11 +19,10 @@
       "data": {
         "drodo_base": "http://autochess.ppbizon.com",
         "steam_id": "76561198022169086",
-        "steam_id_2": "76561198414820633",
         "share_code": ""
       },
       "dataPropertyOrder": {
-        "&": ["drodo_base", "steam_id", "steam_id_2", "share_code"]
+        "&": ["drodo_base", "steam_id", "share_code"]
       },
       "color": null,
       "isPrivate": false,
@@ -34,7 +33,7 @@
       "_type": "request",
       "parentId": "wrk_drodo",
       "name": "GET /courier/get/@{steamId}",
-      "description": "Player profile. Look for mmr_s* / max_mmr_s* / match_s* / queen_rank — currently omitted. mmr_level / chicken_count / candy still present.",
+      "description": "One player. user_info is the flat player object. mmr_sN / max_mmr_sN / match_sN and queen_rank (-1 if not a Queen). Do not comma-separate IDs; that returns err 1200.",
       "url": "{{ _.drodo_base }}/courier/get/@{{ _.steam_id }}",
       "method": "GET",
       "body": {},
@@ -42,27 +41,6 @@
       "headers": [],
       "authentication": {},
       "metaSortKey": -5000,
-      "isPrivate": false,
-      "settingStoreCookies": true,
-      "settingSendCookies": true,
-      "settingDisableRenderRequestBody": false,
-      "settingEncodeUrl": true,
-      "settingRebuildPath": true,
-      "settingFollowRedirects": "global"
-    },
-    {
-      "_id": "req_courier_get_batch",
-      "_type": "request",
-      "parentId": "wrk_drodo",
-      "name": "GET /courier/get/@{id1,id2}",
-      "description": "Batch profile lookup — comma-separated SteamIDs.",
-      "url": "{{ _.drodo_base }}/courier/get/@{{ _.steam_id }},{{ _.steam_id_2 }}",
-      "method": "GET",
-      "body": {},
-      "parameters": [],
-      "headers": [],
-      "authentication": {},
-      "metaSortKey": -4000,
       "isPrivate": false,
       "settingStoreCookies": true,
       "settingSendCookies": true,

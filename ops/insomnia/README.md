@@ -9,8 +9,7 @@ Import `dac-drodo-mmr.json`:
 
 | Request | Notes |
 | --- | --- |
-| `/courier/get/@{steamId}` | Profile — check for missing `mmr_s*` |
-| `/courier/get/@{id1,id2}` | Batch |
+| `/courier/get/@{steamId}` | One profile. Batch URLs return `err: 1200`. |
 | `/shop/v5/courier/getall/@{steamId}` | Cosmetics |
 | `/lineup/get` | Live win boards |
 | `/lineup/str/get` | Share-code import |

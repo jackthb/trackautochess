@@ -459,6 +459,7 @@ export default function PlayerView({
     autoRefreshTriggered.current = true;
 
     let cancelled = false;
+    let settled = false;
     setRefreshing(true);
     void (async () => {
       try {
@@ -496,11 +497,16 @@ export default function PlayerView({
       } catch {
         // Keep the cached stats; the manual Refresh button still works.
       } finally {
+        settled = true;
         if (!cancelled) setRefreshing(false);
       }
     })();
     return () => {
       cancelled = true;
+      // React Strict Mode runs this effect, cleans it up, then runs it again.
+      // If the request never settled, allow that second run. Once it has
+      // settled, keep the one-shot so a history update cannot refetch forever.
+      if (!settled) autoRefreshTriggered.current = false;
     };
   }, [
     steamId,

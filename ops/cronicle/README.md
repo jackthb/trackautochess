@@ -25,11 +25,12 @@ The GitHub Actions schedule for `Scrape DAC Patch Notes` is disabled; that
 workflow remains `workflow_dispatch`-only as an emergency fallback. The old
 `Poll Drodo (MMR snapshots)` GitHub workflow was removed.
 
-**Current status:** Drodo live polling is parked. The Cronicle Drodo job
-definitions ship with `"enabled": 0`, and `scripts/poll-drodo.mjs` also exits
-immediately unless `DRODO_LIVE_FETCH_ENABLED=1` is set. Public `/courier/get`
-no longer returns season MMR, so those jobs should stay off. The patch-notes
-scrape is the only Cronicle job that should run.
+**Current status:** The Drodo poller is un-parked in code
+(`DRODO_BACKGROUND_POLL_ENABLED` in `shared/drodo-core`). Each profile is one
+`/courier/get` call. The Cronicle job definitions still ship with
+`"enabled": 0`, so nothing runs until those jobs are enabled on the Pi after
+this repo is pulled. `DRODO_LIVE_FETCH_ENABLED=1` is only an override for a
+one-off run while the shared flag is off. The patch-notes scrape is unchanged.
 
 Unlike the Drodo poller, the patch-notes scrape commits and pushes to `main`
 directly (`git add content/ && git commit && git push`), using the `/workspace`
@@ -73,8 +74,9 @@ Default login for the packaged image is `admin` / `admin`. Change it first.
 
 ## Cronicle jobs to create
 
-Create the patch-notes **Shell Script** job in the Cronicle UI and leave the
-two Drodo poll jobs disabled until live fetch is un-parked.
+Create the patch-notes **Shell Script** job in the Cronicle UI. After pulling
+a build that includes the single-ID Drodo poller, enable the two Drodo poll
+jobs. Leave them disabled until that code is on the Pi.
 
 ### Daily active poll (disabled)
 

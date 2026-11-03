@@ -9,20 +9,26 @@ Auth: All protected endpoints require `&key=<GetDedicatedServerKey('drodo')>&key
 
 ## Public (no auth)
 
-### `GET /courier/get/@{steamId1,steamId2,...}`
-Player profile lookup. Multiple IDs comma-separated.  
-**Returns:** `user_info`, `notice`, `qq_list`  
-`user_info` per player:
-- `steam_id`, `mmr_level`, `mmr_s42/43`, `max_mmr_s42/43`, `match_s42/43`
-- `queen_rank` when the player is currently ranked on the Queen ladder
+### `GET /courier/get/@{steamId}`
+Player profile lookup. **One Steam ID per request.** As of 2026-10-24,
+`/courier/get/@id1,id2` returns HTTP 200 `{"err":1200,"err_msg":"invalid"}`
+for every separator. Callers pace single-ID requests instead.
+
+**Returns:** `user_info`, `notice`  
+`user_info` is the player object itself (older responses keyed it by Steam ID;
+parsers still accept that shape):
+- `steam_id`, `mmr_level`, `mmr_sN`, `max_mmr_sN`, `match_sN` (highest `N` is the current season; `mmr_s45` is a number, older season fields are often strings)
+- `queen_rank` when the player is on the Queen ladder; `0`, negative, and `-1` mean not a Queen
 - `zhugong` (couriers owned), `onduty_hero`, `onduty_chessboard`
 - `chessboard_list`, `emotion_list`, `chicken_count`, `candy`, `biscuit`
 - `award_season_mmr_level`, `award_available`, `vip_info`
 - `zhugong_count`, `zhugong_total_count`, `is_author`
 
-**Current omission (2026-07):** many accounts no longer receive `mmr_s*`,
-`max_mmr_s*`, `match_s*`, or `queen_rank` on this public endpoint. Cache writes
-must preserve prior season MMR when those keys are absent.
+Cache writes still preserve prior season MMR when those keys are absent.
+An explicit `queen_rank` of `0`, negative, or `-1` is stored as null and is not
+a Queen. That does not clear `users.queen_ladder_rank`; the in-game ladder
+capture still owns drop-offs. A payload that omits `queen_rank` keeps the
+previously parsed rank.
 
 With auth the game also gets: `badgeall`, `match_history` (bundled inside `/game/new`).
 

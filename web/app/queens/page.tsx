@@ -3,7 +3,8 @@ import Link from "next/link";
 import { PageLayout } from "@/components/PageLayout";
 import { pageMetadata, SITE_TITLE } from "@/lib/site";
 import { listAvatarUrl, playerProfilePath } from "@/lib/steam";
-import { effectiveQueenRank, queenDisplayName } from "@/lib/queens";
+import { effectiveQueenRank, queenDisplayName, queenMmr } from "@/lib/queens";
+import { DRODO_MMR_ENABLED } from "@/lib/drodoLive";
 import {
   loadQueensLeaderboard,
   newestQueenLadderSeenAt,
@@ -176,7 +177,7 @@ export default async function QueensPage() {
       <p className={styles.lead}>
         {seasonNormalizing
           ? "Queen players are tracked each season. Rankings will appear here once the ladder has stabilised."
-          : `Known Queen players${season ? ` for ${season.replace(/_/g, " ").toUpperCase()}` : ""}. Ranks come from the in-game Queen ladder capture; the table shows that saved snapshot.`}
+          : `Known Queen players${season ? ` for ${season.replace(/_/g, " ").toUpperCase()}` : ""}. Ranks come from the in-game Queen ladder capture${DRODO_MMR_ENABLED ? ". MMR is the current Drodo season rating." : "; the table shows that saved snapshot."}`}
       </p>
       {error ? (
         <div className={styles.gate}>Failed to load Queen players: {error}</div>
@@ -184,18 +185,20 @@ export default async function QueensPage() {
         <div className={styles.empty}>No Queen players tracked yet.</div>
       ) : (
         <>
-          <div className={`${styles.table} ${styles["queen-table"]}`} role="table">
+          <div className={`${styles.table} ${styles["queen-table"]} ${DRODO_MMR_ENABLED ? styles["queen-table-mmr"] : ""}`} role="table">
             <div className={`${styles.row} ${styles["header-row"]}`}>
               <div className={`${styles.cell} ${styles["cell-rank"]}`}>Rank</div>
                 <div className={`${styles.cell} ${styles["cell-move"]}`}>Move ({QUEEN_MOVE_LOOKBACK_LABEL})</div>
               <div className={styles.cell} aria-hidden="true" />
               <div className={styles.cell}>Player</div>
+              {DRODO_MMR_ENABLED ? <div className={styles.cell}>MMR</div> : null}
               <div className={`${styles.cell} ${styles["hide-sm"]}`}>Wins</div>
               <div className={`${styles.cell} ${styles["hide-sm"]}`}>Games</div>
               <div className={`${styles.cell} ${styles["hide-sm"]}`}>Win rate</div>
             </div>
             {rows.map((row, index) => {
               const ladderRank = effectiveQueenRank(row) ?? index + 1;
+              const mmr = queenMmr(row);
               const display = queenDisplayName(row, ladderRank);
               const isLive =
                 liveSteamIds.has(row.steam_id) ||
@@ -280,6 +283,11 @@ export default async function QueensPage() {
                       </a>
                     ) : null}
                   </div>
+                  {DRODO_MMR_ENABLED ? (
+                    <div className={`${styles.cell} ${styles["cell-mmr"]}`}>
+                      {mmr != null ? mmr.toLocaleString() : "-"}
+                    </div>
+                  ) : null}
                   <div className={`${styles.cell} ${styles["cell-meta"]} ${styles["hide-sm"]}`}>
                     {formatWinTotal(wins)}
                   </div>

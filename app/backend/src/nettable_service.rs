@@ -663,12 +663,14 @@ mod tests {
         let fixture = Path::new(env!("CARGO_MANIFEST_DIR"))
             .join("tests/fixtures/nettable_golden/player_info_colon_buffs/console.log");
         let rows = extract_rows(&fixture).expect("fixture parses");
-        let (players, local_ids) = live_players_value(&rows, Some("76561198022169086"));
+        // The open-source fixture redacts the captured account to this id.
+        let steam_id = "76561198000000101";
+        let (players, local_ids) = live_players_value(&rows, Some(steam_id));
 
         let players = players.as_object().expect("players is an object");
         assert!(!players.is_empty(), "expected at least one live player");
         let player = players
-            .get("76561198022169086")
+            .get(steam_id)
             .and_then(|p| p.as_object())
             .expect("local player present");
         // Field renames must hold: hero_level→level, curr_rank→placement.
@@ -682,7 +684,7 @@ mod tests {
             player.contains_key("lineup"),
             "raw chess_lineup carried as lineup"
         );
-        assert_eq!(local_ids, vec!["76561198022169086".to_owned()]);
+        assert_eq!(local_ids, vec![steam_id.to_owned()]);
     }
 
     #[test]

@@ -125,8 +125,10 @@ export function isCachedQueenProfile(
     "queen_ladder_rank" | "queen_ladder_last_seen_at"
   > | null
 ): boolean {
+  const rank = row?.queen_ladder_rank;
   return Boolean(
-    row && (row.queen_ladder_rank != null || row.queen_ladder_last_seen_at)
+    row &&
+      ((typeof rank === "number" && rank > 0) || row.queen_ladder_last_seen_at)
   );
 }
 

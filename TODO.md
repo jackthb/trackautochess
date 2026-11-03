@@ -27,9 +27,9 @@ Parked and unfinished work. Plan each item separately before implementing.
 
 ## Data / Drodo
 
-- [ ] **Drodo MMR** — `DRODO_MMR_ENABLED` is `false`. Numeric MMR stays hidden until Drodo returns season fields.
+- [x] **Drodo MMR** — Season MMR and Queen rank parse again. `DRODO_MMR_ENABLED` and `DRODO_BACKGROUND_POLL_ENABLED` are on. Cronicle jobs still ship disabled until the Pi enables them.
 
-- [ ] **Queens Drodo refresh** — `QUEENS_DRODO_VIEW_REFRESH_ENABLED` is `false`. `/queens` shows last in-game ladder capture. The GitHub cron and `/api/cron/queens-refresh` were removed. Re-enable when Drodo season MMR is back (flag + a new scheduled caller).
+- [ ] **Queens Drodo refresh** — `QUEENS_DRODO_VIEW_REFRESH_ENABLED` is `false`. `/queens` rank is still the in-game ladder capture; the MMR column reads cached `drodo_mmr`. The GitHub cron and `/api/cron/queens-refresh` were removed. Re-enable the 5-minute view refresh only with a new scheduled caller.
 
 ## Repo hygiene
 

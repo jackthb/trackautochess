@@ -9,12 +9,24 @@ pub use client::{client_with_fresh_session, fresh_client_from_disk};
 pub use matches::finished_match_id_from_rows;
 
 use serde_json::{json, Value};
-use std::{env, time::Duration};
+use std::{
+    env,
+    sync::{
+        atomic::{AtomicUsize, Ordering},
+        Mutex,
+    },
+    thread,
+    time::{Duration, Instant},
+};
 
 const STEAM_ID64_MIN: u64 = 76_561_197_960_265_728;
 const STEAM_ID64_MAX: u64 = 76_561_202_255_233_023;
-const DRODO_COURIER_BATCH_SIZE: usize = 100;
 const HTTP_TIMEOUT: Duration = Duration::from_secs(4);
+const DRODO_HTTP_TIMEOUT: Duration = Duration::from_secs(10);
+/// One courier call per Steam ID. A few may be in flight; starts are spaced
+/// so a queen hydrate does not burst Drodo.
+const DRODO_COURIER_CONCURRENCY: usize = 4;
+const DRODO_COURIER_PACE: Duration = Duration::from_millis(250);
 const MATCH_INGEST_HTTP_TIMEOUT: Duration = Duration::from_secs(15);
 const DRODO_COURIER_API_BASE_URL: &str = "http://autochess.ppbizon.com";
 const QUEENS_REVALIDATE_URL_ENV: &str = "DAC_QUEENS_REVALIDATE_URL";
@@ -77,6 +89,15 @@ fn number_from_object(object: &serde_json::Map<String, Value>, key: &str) -> Opt
     }
 }
 
+fn positive_number_from_object(object: &serde_json::Map<String, Value>, key: &str) -> Option<i64> {
+    number_from_object(object, key).filter(|value| *value > 0)
+}
+
+/// `0`, negatives, and Drodo's non-Queen sentinel `-1` are not a ladder place.
+fn queen_rank_from_object(object: &serde_json::Map<String, Value>) -> Option<i64> {
+    positive_number_from_object(object, "queen_rank")
+}
+
 fn current_drodo_season(object: &serde_json::Map<String, Value>) -> Option<String> {
     object
         .keys()
@@ -101,6 +122,153 @@ pub(crate) fn drodo_courier_api_url(path: &str) -> String {
         DRODO_COURIER_API_BASE_URL,
         path.trim_start_matches('/')
     )
+}
+
+fn drodo_courier_profile_url(steam_id: &str) -> String {
+    drodo_courier_api_url(&format!("courier/get/@{steam_id}"))
+}
+
+fn json_i64(value: &Value) -> Option<i64> {
+    match value {
+        Value::Number(number) => number
+            .as_i64()
+            .or_else(|| number.as_u64().and_then(|n| i64::try_from(n).ok())),
+        Value::String(text) => text.trim().parse::<i64>().ok(),
+        _ => None,
+    }
+}
+
+fn json_steam_id(value: &Value) -> Option<String> {
+    match value {
+        Value::String(text) if !text.trim().is_empty() => Some(text.trim().to_owned()),
+        Value::Number(number) => number.as_u64().map(|id| id.to_string()).or_else(|| {
+            number
+                .as_i64()
+                .filter(|id| *id >= 0)
+                .map(|id| id.to_string())
+        }),
+        _ => None,
+    }
+}
+
+/// `err: 0` is a profile payload. `err: 1200` ("invalid") is what a batch URL
+/// returns, and it must not be stored as a missing player.
+fn drodo_courier_error(payload: &Value) -> Option<String> {
+    let Some(code) = payload.get("err").and_then(json_i64) else {
+        return Some("Drodo API error".to_owned());
+    };
+    if code == 0 {
+        return None;
+    }
+    let detail = payload
+        .get("err_msg")
+        .and_then(Value::as_str)
+        .map(str::trim)
+        .filter(|text| !text.is_empty())
+        .or_else(|| {
+            payload
+                .get("msg")
+                .and_then(Value::as_str)
+                .map(str::trim)
+                .filter(|text| !text.is_empty())
+        })
+        .unwrap_or("Drodo API error");
+    Some(format!("Drodo API error {code}: {detail}"))
+}
+
+/// Current `/courier/get` returns `user_info` as the player object. Older
+/// responses keyed that object by Steam ID.
+fn courier_player<'a>(
+    payload: &'a Value,
+    steam_id: &str,
+) -> Option<&'a serde_json::Map<String, Value>> {
+    let info = payload.get("user_info")?.as_object()?;
+    if let Some(keyed) = info.get(steam_id).and_then(Value::as_object) {
+        return Some(keyed);
+    }
+    if let Some(flat_id) = info.get("steam_id").and_then(json_steam_id) {
+        return (flat_id == steam_id).then_some(info);
+    }
+    let looks_like_profile = info.contains_key("mmr_level") || current_drodo_season(info).is_some();
+    looks_like_profile.then_some(info)
+}
+
+fn fetch_drodo_courier_payload(steam_id: &str) -> Result<Value, String> {
+    let response = ureq::get(&drodo_courier_profile_url(steam_id))
+        .timeout(DRODO_HTTP_TIMEOUT)
+        .call()
+        .map_err(describe_ureq_error)?;
+    if !(200..300).contains(&response.status()) {
+        return Err(format!("Drodo returned HTTP {}", response.status()));
+    }
+    let body = response.into_string().map_err(|err| err.to_string())?;
+    serde_json::from_str(&body).map_err(|err| err.to_string())
+}
+
+struct RequestPace {
+    next_start: Mutex<Instant>,
+    gap: Duration,
+}
+
+impl RequestPace {
+    fn new(gap: Duration) -> Self {
+        Self {
+            next_start: Mutex::new(Instant::now()),
+            gap,
+        }
+    }
+
+    fn wait(&self) {
+        let mut next_start = self
+            .next_start
+            .lock()
+            .unwrap_or_else(|poisoned| poisoned.into_inner());
+        let now = Instant::now();
+        let start = (*next_start).max(now);
+        *next_start = start + self.gap;
+        let delay = start.saturating_duration_since(now);
+        drop(next_start);
+        if !delay.is_zero() {
+            thread::sleep(delay);
+        }
+    }
+}
+
+/// One HTTP call per id, with bounded concurrency and a start-to-start pace.
+fn fetch_drodo_courier_payloads(ids: &[u64]) -> Vec<(u64, Result<Value, String>)> {
+    if ids.is_empty() {
+        return Vec::new();
+    }
+    let pace = RequestPace::new(DRODO_COURIER_PACE);
+    let next = AtomicUsize::new(0);
+    let slots = Mutex::new(vec![None; ids.len()]);
+    let workers = DRODO_COURIER_CONCURRENCY.min(ids.len());
+    thread::scope(|scope| {
+        for _ in 0..workers {
+            scope.spawn(|| loop {
+                let index = next.fetch_add(1, Ordering::Relaxed);
+                if index >= ids.len() {
+                    break;
+                }
+                pace.wait();
+                let steam_id = ids[index];
+                let result = fetch_drodo_courier_payload(&steam_id.to_string());
+                if let Some(slot) = slots
+                    .lock()
+                    .unwrap_or_else(|poisoned| poisoned.into_inner())
+                    .get_mut(index)
+                {
+                    *slot = Some((steam_id, result));
+                }
+            });
+        }
+    });
+    slots
+        .into_inner()
+        .unwrap_or_else(|poisoned| poisoned.into_inner())
+        .into_iter()
+        .flatten()
+        .collect()
 }
 
 pub(crate) fn queens_revalidate_url() -> Option<String> {
@@ -148,8 +316,9 @@ fn drodo_profile_to_user_payload(profile: &Value) -> Value {
         "drodo_last_fetched_at": profile.get("fetched_at").cloned().unwrap_or(Value::Null),
         "drodo_profile_missing": false,
     });
-    // Drodo's public courier payload currently omits season MMR / queen_rank for
-    // many accounts. Never write null over a previously cached value.
+    // A courier payload can still omit season MMR. Never write null over a
+    // previously cached value. An explicit queen_rank of 0 or -1 is handled
+    // by the parser before this payload is built.
     if let Some(obj) = payload.as_object_mut() {
         for (payload_key, profile_key) in [
             ("drodo_mmr", "mmr"),
@@ -605,5 +774,109 @@ mod tests {
             timed_retry["match_id"], timed["match_id"],
             "fallback retries with captured match timing should be idempotent"
         );
+    }
+
+    fn fixture(name: &str) -> Value {
+        let text = match name {
+            "queen" => {
+                include_str!("../../../../shared/fixtures/drodo/queen-76561198839665680.json")
+            }
+            "king" => include_str!("../../../../shared/fixtures/drodo/king-76561198414820633.json"),
+            "missing" => {
+                include_str!(
+                    "../../../../shared/fixtures/drodo/missing-queen-rank-76561198022169086.json"
+                )
+            }
+            "batch" => include_str!("../../../../shared/fixtures/drodo/batch-err-1200.json"),
+            _ => panic!("unknown drodo fixture {name}"),
+        };
+        serde_json::from_str(text).expect("drodo fixture json")
+    }
+
+    #[test]
+    fn courier_profile_url_is_one_steam_id() {
+        let url = drodo_courier_profile_url("76561198839665680");
+        assert_eq!(
+            url,
+            "http://autochess.ppbizon.com/courier/get/@76561198839665680"
+        );
+        assert!(!url.contains(','));
+    }
+
+    #[test]
+    fn flat_courier_fixtures_parse_season_mmr_and_queen_rank() {
+        let queen = fixture("queen");
+        let queen_id = queen["steam_id"].as_str().unwrap();
+        let queen_info = courier_player(&queen, queen_id).expect("queen player");
+        assert_eq!(current_drodo_season(queen_info).as_deref(), Some("s45"));
+        assert_eq!(
+            positive_number_from_object(queen_info, "mmr_s45"),
+            Some(12718)
+        );
+        assert_eq!(
+            positive_number_from_object(queen_info, "max_mmr_s45"),
+            Some(12718)
+        );
+        assert_eq!(
+            positive_number_from_object(queen_info, "match_s45"),
+            Some(324)
+        );
+        assert!(queen["user_info"]["mmr_s45"].is_number());
+        assert!(queen["user_info"]["max_mmr_s45"].is_string());
+        assert_eq!(queen_rank_from_object(queen_info), Some(11));
+
+        let king = fixture("king");
+        let king_id = king["steam_id"].as_str().unwrap();
+        let king_info = courier_player(&king, king_id).expect("king player");
+        assert_eq!(king["user_info"]["queen_rank"], -1);
+        assert_eq!(king["user_info"]["mmr_level"], 37);
+        assert_eq!(queen_rank_from_object(king_info), None);
+        assert_eq!(
+            positive_number_from_object(king_info, "mmr_s45"),
+            Some(3379)
+        );
+        assert_eq!(
+            positive_number_from_object(king_info, "max_mmr_s45"),
+            Some(3381)
+        );
+
+        let missing = fixture("missing");
+        let missing_id = missing["steam_id"].as_str().unwrap();
+        let missing_info = courier_player(&missing, missing_id).expect("unranked player");
+        assert!(missing["user_info"].get("queen_rank").is_none());
+        assert_eq!(queen_rank_from_object(missing_info), None);
+        assert_eq!(positive_number_from_object(missing_info, "mmr_s45"), None);
+        assert_eq!(
+            positive_number_from_object(missing_info, "mmr_s44"),
+            Some(1810)
+        );
+        assert_eq!(
+            queen_rank_from_object(&serde_json::Map::from_iter([(
+                "queen_rank".to_owned(),
+                json!(0)
+            )])),
+            None
+        );
+
+        let keyed = json!({
+            "err": 0,
+            "user_info": {
+                "111": { "mmr_s1": "1200", "queen_rank": "9" }
+            }
+        });
+        let keyed_info = courier_player(&keyed, "111").expect("legacy keyed player");
+        assert_eq!(queen_rank_from_object(keyed_info), Some(9));
+        assert!(courier_player(&keyed, "222").is_none());
+    }
+
+    #[test]
+    fn batch_err_1200_is_an_upstream_error() {
+        let payload = fixture("batch");
+        assert_eq!(
+            drodo_courier_error(&payload).as_deref(),
+            Some("Drodo API error 1200: invalid")
+        );
+        assert!(courier_player(&payload, "76561198839665680").is_none());
+        assert!(drodo_courier_error(&json!({"err": 0, "user_info": {}})).is_none());
     }
 }

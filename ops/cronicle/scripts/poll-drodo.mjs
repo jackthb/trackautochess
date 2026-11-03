@@ -15,6 +15,7 @@ const { SupabaseRest } = await import(supabaseRestUrl);
 
 const {
   activePollOrFilter,
+  DRODO_BACKGROUND_POLL_ENABLED,
   fetchDrodoProfileBatch,
   drodoProfileToUserPayload,
   isQueenProfile,
@@ -26,7 +27,9 @@ const {
 } = await import(drodoCoreUrl);
 
 const DEFAULT_BATCH_SIZE = 200;
-const DEFAULT_ALL_BATCH_SIZE = 10000;
+// Single-ID courier calls are about 1.3–2.6s. At concurrency 4 this stays
+// inside the full-sweep job's 3600s timeout, with room for Supabase writes.
+const DEFAULT_ALL_BATCH_SIZE = 2000;
 
 function argValue(name) {
   const prefix = `${name}=`;
@@ -283,15 +286,18 @@ async function pingHealthcheck(suffix = "", body) {
 }
 
 async function main() {
-  // Drodo public courier no longer returns season MMR. Keep the job installed
-  // but do not hit upstream until DRODO_LIVE_FETCH_ENABLED is flipped back on
-  // in web/lib/drodoLive.ts (and this guard is removed).
-  if (process.env.DRODO_LIVE_FETCH_ENABLED !== "1") {
+  // The shared flag is the product switch. DRODO_LIVE_FETCH_ENABLED=1 still
+  // forces a run when that flag is off. Cronicle job JSON ships disabled;
+  // enabling the job in Cronicle is what actually starts the schedule.
+  if (
+    !DRODO_BACKGROUND_POLL_ENABLED &&
+    process.env.DRODO_LIVE_FETCH_ENABLED !== "1"
+  ) {
     const output = {
       mode: mode(),
       disabled: true,
       reason:
-        "Drodo live fetch is parked — public courier no longer returns season MMR.",
+        "Drodo background poll is off (DRODO_BACKGROUND_POLL_ENABLED). Set DRODO_LIVE_FETCH_ENABLED=1 to force one run.",
       started_at: new Date().toISOString(),
       finished_at: new Date().toISOString(),
       polled: 0,

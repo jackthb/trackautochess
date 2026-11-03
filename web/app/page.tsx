@@ -15,7 +15,7 @@ import { JsonLd } from "@/lib/structuredData";
 export const revalidate = 300;
 
 const description =
-  "Look up any Dota Auto Chess player's rank by Steam vanity URL or SteamID64. Drodo stopped publishing MMR stats, so profiles show rank only.";
+  "Look up any Dota Auto Chess player's rank and MMR by Steam vanity URL or SteamID64.";
 
 export const metadata: Metadata = pageMetadata({
   title: SITE_TITLE,

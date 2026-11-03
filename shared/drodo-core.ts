@@ -1,6 +1,14 @@
 // Source of truth for Drodo polling logic. Run `npm run build:drodo-core` after editing.
 const DRODO_BASE_VALUE = "http://autochess.ppbizon.com";
-const DRODO_COURIER_BATCH_SIZE_VALUE = 200;
+// `/courier/get/@id1,id2` returns HTTP 200 `{"err":1200,"err_msg":"invalid"}`.
+// Every lookup is one Steam ID. Keep a few calls in flight, and space their
+// starts so a poll of hundreds of players does not burst the upstream.
+const DRODO_COURIER_CONCURRENCY_VALUE = 4;
+const DRODO_COURIER_PACE_MS_VALUE = 250;
+/** Season MMR is on the public courier again (verified 2026-10-24). */
+const DRODO_MMR_ENABLED_VALUE = true;
+/** Background poll runs when the Cronicle job is enabled. The job definitions still ship disabled. */
+const DRODO_BACKGROUND_POLL_ENABLED_VALUE = true;
 
 const DRODO_FRESH_TTL_MS_VALUE = 24 * 60 * 60 * 1000;
 const DRODO_MISSING_TTL_MS_VALUE = 7 * 24 * 60 * 60 * 1000;
@@ -24,8 +32,9 @@ function recentSignInCutoffValue(now: Date = new Date()): string {
 }
 
 function activePollOrFilterValue(cutoffIso: string): string {
-  // Queen ladder rank no longer drives the active cohort: Drodo stopped returning
-  // queen_rank / season MMR, and the public board is capture-driven instead.
+  // Queen ladder rank does not define the active cohort. Active means a recent
+  // Steam sign-in; everyone else stays on the weekly cadence. The public board
+  // itself is still the in-game ladder capture.
   return `steam_signed_in_at.gte.${cutoffIso}`;
 }
 
@@ -95,6 +104,17 @@ function positiveNumberFromDrodoDataValue(data: Record<string, unknown>, key: st
   return value !== null && value > 0 ? value : null;
 }
 
+/** `0`, negatives, and Drodo's non-Queen sentinel `-1` are not a ladder place. */
+function queenRankFromDrodoDataValue(data: Record<string, unknown> | null | undefined): number | null {
+  const value = numberFromDrodoDataValue(data, "queen_rank");
+  if (value === null || value <= 0) return null;
+  return value;
+}
+
+function drodoQueenRankExplicitValue(data: Record<string, unknown> | null | undefined): boolean {
+  return !!data && Object.prototype.hasOwnProperty.call(data, "queen_rank");
+}
+
 function valueFromDrodoDataValue(data: Record<string, unknown> | null | undefined, keys: string[]): string | number | null {
   if (!data) return null;
   for (const key of keys) {
@@ -143,7 +163,7 @@ function buildDrodoProfileValue(steamId: string, drodoData: Record<string, unkno
     mmr: mmrKey ? positiveNumberFromDrodoDataValue(drodoData, mmrKey) : null,
     max_mmr: maxMmrKey ? positiveNumberFromDrodoDataValue(drodoData, maxMmrKey) : null,
     mmr_level: positiveNumberFromDrodoDataValue(drodoData, "mmr_level"),
-    queen_rank: numberFromDrodoDataValue(drodoData, "queen_rank"),
+    queen_rank: queenRankFromDrodoDataValue(drodoData),
     last_win_at: lastWinFromDrodoDataValue(drodoData),
     last_top3_at: lastTop3FromDrodoDataValue(drodoData),
     season,
@@ -184,10 +204,9 @@ function hasDrodoStatsValue(profile: DrodoStatsLike | null | undefined, seasonRo
   ) {
     return true;
   }
-  // Rank-only payloads: the public courier stopped returning season MMR but
-  // still returns mmr_level, and the ladder still returns queen rank. A
-  // profile with either is a real Auto Chess profile — marking it "missing"
-  // would blank the very rank the page is now built around.
+  // A profile can still be real when season MMR is absent: mmr_level is the
+  // broad tier, and a positive queen_rank is a ladder place. Marking either
+  // "missing" would blank a rank the page can render.
   if (
     hasPositiveNumericField(profile, "mmr_level") ||
     hasPositiveNumericField(profile, "queen_rank")
@@ -256,7 +275,9 @@ function pollSnapshotFromRowValue(row: PollSnapshotRow): PollSnapshot {
     drodo_season_games: row.drodo_season_games,
     drodo_chicken_count: row.drodo_chicken_count,
     queen_rank:
-      typeof row.queen_ladder_rank === "number" && Number.isFinite(row.queen_ladder_rank)
+      typeof row.queen_ladder_rank === "number" &&
+      Number.isFinite(row.queen_ladder_rank) &&
+      row.queen_ladder_rank > 0
         ? row.queen_ladder_rank
         : null,
     queen_ladder_last_seen_at: row.queen_ladder_last_seen_at,
@@ -297,17 +318,24 @@ function preserveOmittedDrodoFieldsValue(
     mmr_level: next.mmr_level ?? prevMmrLevel,
     season: next.season ?? prevSeason,
     season_games: next.season_games ?? prevSeasonGames,
-    queen_rank: next.queen_rank ?? prevQueenRank,
+    // An explicit 0 / -1 is stored as null and must clear a cached rank.
+    // Only a payload that omits queen_rank keeps the previous value.
+    queen_rank: drodoQueenRankExplicitValue(next.raw_data)
+      ? next.queen_rank
+      : (next.queen_rank ?? prevQueenRank),
   };
 }
 
+function countedQueenRankValue(record: object | null | undefined): boolean {
+  const value = numericField(record, "queen_rank");
+  return value !== null && value > 0;
+}
+
 function isQueenProfileValue(profile: DrodoProfileRow | PollSnapshot | null | undefined, prev: DrodoProfileRow | PollSnapshot | null = null): boolean {
-  const currentRank = numericField(profile, "queen_rank");
-  const previousRank = numericField(prev, "queen_rank");
   const lastSeen = profile && "queen_ladder_last_seen_at" in profile
     ? (profile as PollSnapshot).queen_ladder_last_seen_at
     : null;
-  return currentRank !== null || previousRank !== null || Boolean(lastSeen);
+  return countedQueenRankValue(profile) || countedQueenRankValue(prev) || Boolean(lastSeen);
 }
 
 function profileMetricValue(profile: DrodoProfileRow | PollSnapshot | null | undefined, snapshotKey: keyof PollSnapshot, rowKey: keyof DrodoProfileRow): number | null {
@@ -356,89 +384,175 @@ function upstreamErrorResults(ids: string[], error: Record<string, unknown> = {}
   }));
 }
 
+function isDrodoRecordValue(value: unknown): value is Record<string, unknown> {
+  return !!value && typeof value === "object" && !Array.isArray(value);
+}
+
+/**
+ * `err: 0` is a profile payload. Anything else — including the batch
+ * response `{"err":1200,"err_msg":"invalid"}` — is an upstream failure, not
+ * a missing player.
+ */
+function drodoPayloadErrorValue(payload: unknown): string | null {
+  if (!isDrodoRecordValue(payload)) return "Drodo API error";
+  const err = payload.err;
+  const code = typeof err === "number" ? err : typeof err === "string" ? Number(err) : Number.NaN;
+  if (code === 0) return null;
+  const detail =
+    typeof payload.err_msg === "string" && payload.err_msg.trim()
+      ? payload.err_msg
+      : typeof payload.msg === "string" && payload.msg.trim()
+        ? payload.msg
+        : "Drodo API error";
+  return Number.isFinite(code) ? `Drodo API error ${code}: ${detail}` : detail;
+}
+
+/**
+ * Current `/courier/get` returns `user_info` as the player object itself.
+ * Older responses keyed that object by Steam ID. A single-ID call can be either.
+ */
+function drodoPlayerRecordValue(payload: unknown, steamId: string): Record<string, unknown> | null {
+  if (!isDrodoRecordValue(payload)) return null;
+  const userInfo = payload.user_info;
+  if (!isDrodoRecordValue(userInfo)) return null;
+  const keyed = userInfo[steamId];
+  if (isDrodoRecordValue(keyed)) return keyed;
+  if (userInfo.steam_id != null && String(userInfo.steam_id) !== steamId) return null;
+  if (
+    userInfo.steam_id != null ||
+    "mmr_level" in userInfo ||
+    seasonNumbersValue(userInfo).length > 0
+  ) {
+    return userInfo;
+  }
+  return null;
+}
+
+function drodoCourierProfileUrlValue(steamId: string): string {
+  return `${DRODO_BASE_VALUE}/courier/get/@${encodeURIComponent(steamId)}`;
+}
+
+function delayValue(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+async function mapWithPaceValue<T, R>(
+  items: T[],
+  concurrency: number,
+  paceMs: number,
+  fn: (item: T) => Promise<R>
+): Promise<R[]> {
+  const results = new Array<R>(items.length);
+  let nextIndex = 0;
+  let nextStart = Date.now();
+  const workers = Math.min(Math.max(1, concurrency), items.length);
+
+  async function worker(): Promise<void> {
+    for (;;) {
+      const index = nextIndex;
+      nextIndex += 1;
+      if (index >= items.length) return;
+      const startAt = nextStart;
+      nextStart += paceMs;
+      const wait = startAt - Date.now();
+      if (wait > 0) await delayValue(wait);
+      results[index] = await fn(items[index]);
+    }
+  }
+
+  await Promise.all(Array.from({ length: workers }, () => worker()));
+  return results;
+}
+
+async function fetchOneDrodoProfileValue(
+  steamId: string,
+  adapter: DrodoBatchAdapter,
+  options: FetchDrodoBatchOptions,
+  prevSnapshot: PollSnapshot | null,
+  fetchImpl: typeof fetch
+): Promise<FetchDrodoBatchResult> {
+  const pollMode = options.pollMode ?? "reset";
+  let payload: unknown;
+  try {
+    const response = await fetchImpl(drodoCourierProfileUrlValue(steamId));
+    if (!response.ok) {
+      return upstreamErrorResults([steamId], {
+        status: response.status,
+        message: "Drodo API error",
+      })[0];
+    }
+    payload = await response.json();
+  } catch {
+    return upstreamErrorResults([steamId], {
+      message: "Failed to reach Drodo API",
+    })[0];
+  }
+
+  const upstreamError = drodoPayloadErrorValue(payload);
+  if (upstreamError) {
+    return upstreamErrorResults([steamId], {
+      status: 200,
+      message: upstreamError,
+    })[0];
+  }
+
+  const drodoData = drodoPlayerRecordValue(payload, steamId);
+  if (!drodoData) {
+    const fetchedAt = await adapter.markMissing(steamId);
+    return {
+      steam_id: steamId,
+      ok: false,
+      kind: "missing",
+      error: "Player not found on Drodo",
+      fetchedAt,
+    };
+  }
+
+  const built = buildDrodoProfileValue(steamId, drodoData);
+  const profile = preserveOmittedDrodoFieldsValue(prevSnapshot, built.profile);
+  const { seasonRows } = built;
+  if (!hasDrodoStatsValue(profile, seasonRows)) {
+    const fetchedAt = await adapter.markMissing(steamId);
+    return {
+      steam_id: steamId,
+      ok: false,
+      kind: "missing",
+      error: EMPTY_DRODO_PROFILE_ERROR_VALUE,
+      fetchedAt,
+    };
+  }
+
+  await adapter.persistProfile(profile, seasonRows, {
+    snapshotOnSuccess: options.snapshotOnSuccess,
+    pollMode,
+    hotPoll: options.hotPoll,
+    prevSnapshot,
+  });
+  return { steam_id: steamId, ok: true, profile, seasonRows };
+}
+
 async function fetchDrodoProfileBatchValue(steamIds: unknown[], adapter: DrodoBatchAdapter, options: FetchDrodoBatchOptions = {}): Promise<FetchDrodoBatchResult[]> {
   const ids = normalizeDrodoSteamIdsValue(steamIds);
   if (ids.length === 0) return [];
 
-  if (ids.length > DRODO_COURIER_BATCH_SIZE_VALUE) {
-    const results = [];
-    for (let i = 0; i < ids.length; i += DRODO_COURIER_BATCH_SIZE_VALUE) {
-      results.push(
-        ...(await fetchDrodoProfileBatchValue(
-          ids.slice(i, i + DRODO_COURIER_BATCH_SIZE_VALUE),
-          adapter,
-          options
-        ))
-      );
-    }
-    return results;
-  }
-
-  const pollMode = options.pollMode ?? "reset";
   // Always load prior cache when available — even on manual "reset" polls —
   // so omitted Drodo fields (season MMR, queen_rank) can be preserved.
   const prevSnapshots = adapter.loadPollSnapshots
     ? await adapter.loadPollSnapshots(ids)
     : new Map();
   const fetchImpl = adapter.fetch ?? fetch;
+  const concurrency = options.concurrency ?? DRODO_COURIER_CONCURRENCY_VALUE;
+  const paceMs = options.paceMs ?? DRODO_COURIER_PACE_MS_VALUE;
 
-  let payload;
-  try {
-    const response = await fetchImpl(`${DRODO_BASE_VALUE}/courier/get/@${ids.join(",")}`);
-    if (!response.ok) {
-      return upstreamErrorResults(ids, {
-        status: response.status,
-        error: "Drodo API error",
-      });
-    }
-    payload = await response.json();
-  } catch {
-    return upstreamErrorResults(ids, {
-      error: "Failed to reach Drodo API",
-    });
-  }
-
-  const results = [];
-  for (const steamId of ids) {
-    const drodoData = payload.user_info?.[steamId];
-    if (payload.err !== 0 || !drodoData) {
-      const fetchedAt = await adapter.markMissing(steamId);
-      results.push({
-        steam_id: steamId,
-        ok: false as const,
-        kind: "missing" as const,
-        error: "Player not found on Drodo",
-        fetchedAt,
-      });
-      continue;
-    }
-
-    const prevSnapshot = prevSnapshots.get(steamId) ?? null;
-    const built = buildDrodoProfileValue(steamId, drodoData);
-    const profile = preserveOmittedDrodoFieldsValue(prevSnapshot, built.profile);
-    const { seasonRows } = built;
-    if (!hasDrodoStatsValue(profile, seasonRows)) {
-      const fetchedAt = await adapter.markMissing(steamId);
-      results.push({
-        steam_id: steamId,
-        ok: false as const,
-        kind: "missing" as const,
-        error: EMPTY_DRODO_PROFILE_ERROR_VALUE,
-        fetchedAt,
-      });
-      continue;
-    }
-
-    await adapter.persistProfile(profile, seasonRows, {
-      snapshotOnSuccess: options.snapshotOnSuccess,
-      pollMode,
-      hotPoll: options.hotPoll,
-      prevSnapshot,
-    });
-    results.push({ steam_id: steamId, ok: true as const, profile, seasonRows });
-  }
-
-  return results;
+  return mapWithPaceValue(ids, concurrency, paceMs, (steamId) =>
+    fetchOneDrodoProfileValue(
+      steamId,
+      adapter,
+      options,
+      prevSnapshots.get(steamId) ?? null,
+      fetchImpl
+    )
+  );
 }
 
 function summarizeDrodoResultsValue(results: FetchDrodoBatchResult[]): DrodoResultsSummary {
@@ -458,7 +572,11 @@ function summarizeDrodoResultsValue(results: FetchDrodoBatchResult[]): DrodoResu
 }
 
 export const DRODO_BASE: string = DRODO_BASE_VALUE;
-export const DRODO_COURIER_BATCH_SIZE: number = DRODO_COURIER_BATCH_SIZE_VALUE;
+export const DRODO_COURIER_CONCURRENCY: number = DRODO_COURIER_CONCURRENCY_VALUE;
+export const DRODO_COURIER_PACE_MS: number = DRODO_COURIER_PACE_MS_VALUE;
+export const DRODO_MMR_ENABLED: boolean = DRODO_MMR_ENABLED_VALUE;
+export const DRODO_BACKGROUND_POLL_ENABLED: boolean =
+  DRODO_BACKGROUND_POLL_ENABLED_VALUE;
 
 export const DRODO_FRESH_TTL_MS: number = DRODO_FRESH_TTL_MS_VALUE;
 export const DRODO_MISSING_TTL_MS: number = DRODO_MISSING_TTL_MS_VALUE;
@@ -570,6 +688,10 @@ export interface FetchDrodoBatchOptions {
   snapshotOnSuccess?: boolean;
   pollMode?: "adaptive" | "reset";
   hotPoll?: boolean;
+  /** In-flight single-ID courier calls. Defaults to `DRODO_COURIER_CONCURRENCY`. */
+  concurrency?: number;
+  /** Minimum gap between courier call starts, in milliseconds. */
+  paceMs?: number;
 }
 
 export interface DrodoPersistProfileOptions {
