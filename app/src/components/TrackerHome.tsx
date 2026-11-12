@@ -6,6 +6,7 @@ import type { OutboxFlushedEvent, OutboxStatusEvent } from "../backend-events";
 import type { NetTableActivityState } from "../hooks/useNetTableEvents";
 import { sendBackendRequest } from "../lib/backend-request";
 import { NetTableSetupCard } from "./NetTableSetupCard";
+import { capturePresentation } from "../lib/capture-presentation";
 import { LegendaryPoolOverlay } from "./LegendaryPoolOverlay";
 
 interface TrackerHomeProps {
@@ -32,6 +33,12 @@ export function TrackerHome({ unitsFull, netTable, status }: TrackerHomeProps) {
     queenUploadProgress,
     pendingLeave,
   } = netTable;
+
+  const [savingPartial, setSavingPartial] = useState(false);
+  useEffect(() => {
+    if (!pendingLeave) setSavingPartial(false);
+  }, [pendingLeave]);
+  const captureView = capturePresentation(pendingLeave ? "interrupted" : netStatus?.capture_phase);
 
   const [version, setVersion] = useState("\u2014");
   const [flushingOutbox, setFlushingOutbox] = useState(false);
@@ -72,6 +79,7 @@ export function TrackerHome({ unitsFull, netTable, status }: TrackerHomeProps) {
   }, []);
 
   const confirmMatchEnd = () => {
+    setSavingPartial(true);
     window.tracker?.sendCommand({ cmd: "nettable_confirm_match_end" });
   };
 
@@ -119,22 +127,23 @@ export function TrackerHome({ unitsFull, netTable, status }: TrackerHomeProps) {
   return (
     <div className="settings-tab">
       <div className="settings-container tracker-home">
-        {pendingLeave && (
-          <section className="tracker-pending" aria-label="Pending match upload">
+        {captureView && (
+          <section className="tracker-pending" aria-label="Match capture status" role="status" aria-live="polite">
             <div className="tracker-pending-copy">
-              <div className="tracker-pending-title">Match ready to upload</div>
+              <div className="tracker-pending-title">{savingPartial ? "Saving partial result…" : captureView.title}</div>
               <p className="tracker-pending-detail">
-                Left the lobby early. Upload now, or it goes up automatically at{" "}
-                {autoUploadAt}.
+                {captureView.detail}
+                {pendingLeave && <> A partial result will be saved automatically at {autoUploadAt}.</>}
               </p>
             </div>
-            <button
+            {pendingLeave && <button
               type="button"
+              disabled={savingPartial}
               className="tracker-pending-action"
               onClick={confirmMatchEnd}
             >
-              Upload match
-            </button>
+              {savingPartial ? "Saving…" : "Save partial result"}
+            </button>}
           </section>
         )}
 
@@ -144,6 +153,7 @@ export function TrackerHome({ unitsFull, netTable, status }: TrackerHomeProps) {
           </div>
           <NetTableSetupCard
             status={netStatus}
+            captureLabel={captureView?.title}
             lastApply={launchOptionsApplied}
             progress={launchOptionsProgress}
             resyncProgress={resyncProgress}

@@ -52,7 +52,7 @@ export async function POST(req: Request) {
     );
   }
 
-  await captureServerEvent(
+  const accepted = await captureServerEvent(
     "Beta Waitlist Joined",
     email,
     { source },
@@ -68,5 +68,11 @@ export async function POST(req: Request) {
     }
   );
 
+  if (!accepted) {
+    return Response.json(
+      { ok: false, error: "We couldn't save your signup. Please try again shortly." },
+      { status: 503, headers: { "Retry-After": "30" } },
+    );
+  }
   return Response.json({ ok: true });
 }

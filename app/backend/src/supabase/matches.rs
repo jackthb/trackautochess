@@ -18,6 +18,32 @@ pub(super) const MIN_TRACKED_PLAYERS: usize = 2;
 pub(super) const SAME_GAME_WINDOW_MINUTES: i64 = 30;
 
 impl SupabaseClient {
+    pub(crate) fn prepare_fallback_request(rows: &[NettableRow], reason: &str) -> Option<Value> {
+        let played_at = rows.iter().filter_map(|row| row.observed_at.as_deref())
+            .filter(|at| !at.is_empty()).max().map(str::to_owned).unwrap_or_else(now_iso_utc);
+        let match_row = build_fallback_match_row(rows, reason, &played_at)?;
+        let id = match_row["match_id"].as_str()?;
+        let mut players = match_ingest_player_rows(unify_row_keys(build_fallback_match_players(rows, id, reason)));
+        for player in &mut players {
+            player["played_at"] = json!(played_at);
+            player["created_at"] = json!(played_at);
+        }
+        Some(json!({"action":"ingest_match", "match":match_row, "players":players}))
+    }
+    pub(crate) fn queue_end_board(
+        cfg: &crate::config::Config,
+        rows: &[NettableRow],
+    ) -> Result<Option<String>, String> {
+        let values = rows.iter().map(nettable_row_json).collect::<Vec<_>>();
+        let Some(upload) = build_end_board_upload(&values, &now_iso_utc()) else { return Ok(None); };
+        let match_id = upload.match_row["match_id"].as_str().unwrap_or_default().to_owned();
+        Self::persist_match_request(cfg, &json!({
+            "action":"ingest_match", "match": upload.match_row,
+            "players":match_ingest_player_rows(unify_row_keys(dedupe_match_players(upload.players)))
+        }))?;
+        Ok(Some(match_id))
+    }
+
     pub fn upload_finished_match_from_rows(
         &self,
         rows: &[NettableRow],
@@ -39,7 +65,7 @@ impl SupabaseClient {
     }
 
     pub fn upsert_match_timeline(&self, timeline: &Value) -> Result<(), String> {
-        self.invoke_match_ingest(&json!({
+        self.persist_and_send_match(&json!({
             "action": "upsert_timeline",
             "timeline": timeline,
         }))
@@ -47,37 +73,13 @@ impl SupabaseClient {
     }
 
     pub fn upsert_fallback_finished_match(
-        &self,
-        rows: &[NettableRow],
-        reason: &str,
+        &self, rows: &[NettableRow], reason: &str,
     ) -> Result<Option<String>, String> {
-        let played_at = now_iso_utc();
-        let Some(match_row) = build_fallback_match_row(rows, reason, &played_at) else {
-            return Ok(None);
-        };
-        // The fallback match_id is salted with the upload time, so retriggering
-        // (manual finalize after the end board already landed, a second flush
-        // after a daemon restart) would record the same game under a new id.
-        // If any match with this exact player set exists in the same-game
-        // window, report that one instead of uploading a duplicate.
-        let steam_ids = rows_steam_id_set(rows);
-        if let Ok(existing) = self.find_same_game_match_ids(&steam_ids, &played_at, None, None) {
-            if let Some(existing_id) = existing.into_iter().next() {
-                return Ok(Some(existing_id));
-            }
-        }
-        let match_id = match_row
-            .get("match_id")
-            .and_then(Value::as_str)
-            .unwrap_or_default()
-            .to_owned();
-        let players = unify_row_keys(build_fallback_match_players(rows, &match_id, reason));
-        self.invoke_match_ingest(&json!({
-            "action": "ingest_match",
-            "match": match_row,
-            "players": match_ingest_player_rows(players),
-        }))?;
-        Ok(Some(match_id))
+        let Some(body) = Self::prepare_fallback_request(rows, reason) else { return Ok(None); };
+        let cfg = crate::config::Config::load().map_err(|err| err.to_string())?;
+        self.check_match_account(&cfg)?;
+        let queued = Self::persist_fallback_request(&cfg, &body, None)?;
+        self.send_persisted_fallback(&cfg, &queued).map(Some)
     }
 
     /// Upsert player identities discovered from the in-game Queen ladder.
@@ -99,7 +101,7 @@ impl SupabaseClient {
             .unwrap_or_default()
             .to_owned();
         let players = unify_row_keys(dedupe_match_players(upload.players));
-        self.invoke_match_ingest(&json!({
+        self.persist_and_send_match(&json!({
             "action": "ingest_match",
             "match": upload.match_row,
             "players": match_ingest_player_rows(players),
@@ -110,7 +112,7 @@ impl SupabaseClient {
     /// Match ids whose played_at lies within the same-game window of
     /// `played_at` and whose match_players steam_id set equals `steam_ids`,
     /// optionally restricted to one capture_status.
-    fn find_same_game_match_ids(
+    pub(super) fn find_same_game_match_ids(
         &self,
         steam_ids: &BTreeSet<u64>,
         played_at: &str,
@@ -177,6 +179,7 @@ pub(super) fn same_game_window(played_at: &str) -> Option<(String, String)> {
     Some((fmt(center - window), fmt(center + window)))
 }
 
+#[cfg(test)]
 pub(super) fn rows_steam_id_set(rows: &[NettableRow]) -> BTreeSet<u64> {
     player_id_pairs(rows)
         .iter()

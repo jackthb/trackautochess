@@ -58,8 +58,12 @@ export function MatchHistoryList({
               className={styles.gameRowLink}
               role="link"
               tabIndex={0}
-              onClick={() => router.push(href)}
+              onClick={(event) => {
+                if ((event.target as HTMLElement).closest('a, button, input, select, textarea, [contenteditable="true"]')) return;
+                router.push(href);
+              }}
               onKeyDown={(event) => {
+                if (event.target !== event.currentTarget) return;
                 if (event.key === "Enter" || event.key === " ") {
                   event.preventDefault();
                   router.push(href);

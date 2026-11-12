@@ -1,12 +1,79 @@
 use serde::Serialize;
 use serde_json::{json, Value};
-use std::{env, fs, io, path::PathBuf};
+use std::{
+    env, fs,
+    io::{self, Write},
+    path::{Path, PathBuf},
+    sync::Mutex,
+};
 use ts_rs::TS;
 
 const DEFAULT_SUPABASE_URL: &str = "https://ismxtcfkuwpvfyuojnaa.supabase.co";
 const LEGACY_SUPABASE_URL: &str = "https://xkfxykorskdltcmvgihh.supabase.co";
 const LEGACY_SUPABASE_KEY: &str = "sb_publishable_Tk7hBHGJImbtzxxZzEIgKQ_kwnKuCaK";
 const DEFAULT_SUPABASE_AUTH_URL: &str = "https://www.trackautochess.com/api/auth/steam/callback";
+static CONFIG_LOCK: Mutex<()> = Mutex::new(());
+
+fn disk_lock(path: &Path) -> io::Result<fs::File> {
+    // Lock a stable sidecar: config.json itself is replaced on every commit.
+    let file = fs::OpenOptions::new()
+        .create(true)
+        .read(true)
+        .write(true)
+        .open(path.with_extension("lock"))?;
+    fs2::FileExt::lock_exclusive(&file)?;
+    Ok(file) // Closing the handle releases the OS lock, including on process exit.
+}
+
+fn read_config(path: &Path) -> io::Result<Value> {
+    let body = fs::read_to_string(path)?;
+    let value: Value = serde_json::from_str(body.trim_start_matches('\u{feff}')).map_err(|_| {
+        io::Error::new(
+            io::ErrorKind::InvalidData,
+            "Invalid config.json; original file preserved for recovery",
+        )
+    })?;
+    if !value.is_object() {
+        return Err(io::Error::new(
+            io::ErrorKind::InvalidData,
+            "config.json must be an object; original preserved",
+        ));
+    }
+    Ok(value)
+}
+
+fn atomic_write_config(path: &Path, value: &Value) -> io::Result<()> {
+    let mut random = [0u8; 16];
+    getrandom::getrandom(&mut random).map_err(|err| io::Error::other(err.to_string()))?;
+    let temp = path.with_extension(format!("{:x}.tmp", u128::from_le_bytes(random)));
+    let result = (|| {
+        let mut file = fs::OpenOptions::new()
+            .create_new(true)
+            .write(true)
+            .open(&temp)?;
+        file.write_all(serde_json::to_string_pretty(value)?.as_bytes())?;
+        file.sync_all()?;
+        drop(file);
+        // std::fs::rename replaces files atomically on Windows as well as Unix.
+        fs::rename(&temp, path)
+    })();
+    let _ = fs::remove_file(temp);
+    result
+}
+
+fn update_config(path: &Path, update: impl FnOnce(&mut Value) -> io::Result<()>) -> io::Result<()> {
+    let _guard = CONFIG_LOCK.lock().unwrap_or_else(|err| err.into_inner());
+    let _disk_guard = disk_lock(path)?;
+    let mut value = read_config(path)?;
+    update(&mut value)?;
+    atomic_write_config(path, &value)
+}
+
+fn set_session(value: &mut Value, access: &str, refresh: &str, expires: Option<i64>) {
+    value["supabase_access_token"] = json!(access);
+    value["supabase_refresh_token"] = json!(refresh);
+    value["supabase_token_expires_at"] = json!(expires.map(|v| v.to_string()).unwrap_or_default());
+}
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, TS)]
 pub struct Config {
@@ -33,19 +100,17 @@ pub struct Config {
 
 impl Config {
     pub fn load() -> io::Result<Self> {
+        let _guard = CONFIG_LOCK.lock().unwrap_or_else(|err| err.into_inner());
         let dac_dir = dac_dir();
         fs::create_dir_all(&dac_dir)?;
         let path = dac_dir.join("config.json");
+        let _disk_guard = disk_lock(&path)?;
         if !path.exists() {
-            fs::write(&path, default_config_json())?;
+            atomic_write_config(&path, &parse_config_json(default_config_json()))?;
         }
-        let body = fs::read_to_string(&path)?;
-        let mut value = parse_config_json(&body);
+        let mut value = read_config(&path)?;
         if apply_config_migrations(&mut value) {
-            fs::write(
-                &path,
-                serde_json::to_string_pretty(&value).unwrap_or_else(|_| body.clone()),
-            )?;
+            atomic_write_config(&path, &value)?;
         }
         Ok(Self {
             dac_dir,
@@ -68,51 +133,59 @@ impl Config {
     }
 
     pub fn save_value(&self, key: &str, value_json: &str) -> io::Result<()> {
-        let path = self.dac_dir.join("config.json");
-        let body = fs::read_to_string(&path).unwrap_or_else(|_| default_config_json().to_owned());
-        let mut value = parse_config_json(&body);
-        let parsed = serde_json::from_str(value_json).unwrap_or(Value::Null);
-        if let Value::Object(map) = &mut value {
-            map.insert(key.to_owned(), parsed);
-        }
-        fs::write(path, serde_json::to_string_pretty(&value).unwrap_or(body))
+        let parsed: Value = serde_json::from_str(value_json)?;
+        update_config(&self.dac_dir.join("config.json"), |value| {
+            value[key] = parsed;
+            Ok(())
+        })
     }
 
-    pub fn save_steam_user(&self, steam_id: &str, steam_name: &str) -> io::Result<()> {
-        let path = self.dac_dir.join("config.json");
-        let body = fs::read_to_string(&path).unwrap_or_else(|_| default_config_json().to_owned());
-        let mut value = parse_config_json(&body);
-        if let Value::Object(map) = &mut value {
-            map.insert("steam_id".to_owned(), json!(steam_id));
-            map.insert("steam_name".to_owned(), json!(steam_name));
-        }
-        fs::write(path, serde_json::to_string_pretty(&value).unwrap_or(body))
+    pub fn save_login(&self, login: &crate::steam_auth::SteamLoginResult) -> io::Result<()> {
+        update_config(&self.dac_dir.join("config.json"), |value| {
+            value["steam_id"] = json!(login.steam_id);
+            value["steam_name"] = json!(login.steam_name);
+            if let Some(session) = &login.supabase_session {
+                set_session(
+                    value,
+                    &session.access_token,
+                    &session.refresh_token,
+                    session.expires_at,
+                );
+            } else {
+                set_session(value, "", "", None);
+            }
+            Ok(())
+        })
     }
 
-    pub fn save_supabase_session(
+    pub fn save_refreshed_session(
         &self,
         access_token: &str,
         refresh_token: &str,
         expires_at: Option<i64>,
     ) -> io::Result<()> {
-        let path = self.dac_dir.join("config.json");
-        let body = fs::read_to_string(&path).unwrap_or_else(|_| default_config_json().to_owned());
-        let mut value = parse_config_json(&body);
-        if let Value::Object(map) = &mut value {
-            map.insert("supabase_access_token".to_owned(), json!(access_token));
-            map.insert("supabase_refresh_token".to_owned(), json!(refresh_token));
-            map.insert(
-                "supabase_token_expires_at".to_owned(),
-                json!(expires_at
-                    .map(|value| value.to_string())
-                    .unwrap_or_default()),
-            );
-        }
-        fs::write(path, serde_json::to_string_pretty(&value).unwrap_or(body))
+        update_config(&self.dac_dir.join("config.json"), |value| {
+            if value_string(value, "steam_id") != self.steam_id
+                || value_string(value, "supabase_refresh_token") != self.supabase_refresh_token
+                || value_string(value, "supabase_url") != self.supabase_url
+                || value_bool(value, "local_only", false)
+            {
+                return Err(io::Error::other(
+                    "Session changed during refresh; response discarded",
+                ));
+            }
+            set_session(value, access_token, refresh_token, expires_at);
+            Ok(())
+        })
     }
 
-    pub fn clear_supabase_session(&self) -> io::Result<()> {
-        self.save_supabase_session("", "", None)
+    pub fn logout(&self) -> io::Result<()> {
+        update_config(&self.dac_dir.join("config.json"), |value| {
+            value["steam_id"] = json!("");
+            value["steam_name"] = json!("");
+            set_session(value, "", "", None);
+            Ok(())
+        })
     }
 }
 
@@ -225,7 +298,15 @@ fn value_u64(value: &Value, key: &str, fallback: u64) -> u64 {
         .and_then(|v| {
             v.as_u64()
                 .or_else(|| v.as_i64().and_then(|n| u64::try_from(n).ok()))
-                .or_else(|| v.as_f64().and_then(|n| if n.is_finite() && n >= 0.0 { Some(n as u64) } else { None }))
+                .or_else(|| {
+                    v.as_f64().and_then(|n| {
+                        if n.is_finite() && n >= 0.0 {
+                            Some(n as u64)
+                        } else {
+                            None
+                        }
+                    })
+                })
         })
         .unwrap_or(fallback)
 }
@@ -243,10 +324,123 @@ fn local_only_mode_from(value: &Value) -> bool {
     value_bool(value, "local_only", false)
 }
 
-
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    fn fixture() -> (PathBuf, Config) {
+        let dir = std::env::temp_dir().join(format!(
+            "dac-config-{}",
+            std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .unwrap()
+                .as_nanos()
+        ));
+        fs::create_dir_all(&dir).unwrap();
+        let cfg = Config {
+            dac_dir: dir.clone(),
+            steam_id: "76561198000000001".into(),
+            steam_name: "Player".into(),
+            replay_enabled: false,
+            keep_local_nettable_dumps: true,
+            local_game_cache_max_gb: 5,
+            local_only: false,
+            supabase_url: DEFAULT_SUPABASE_URL.into(),
+            supabase_key: "public".into(),
+            supabase_auth_url: DEFAULT_SUPABASE_AUTH_URL.into(),
+            supabase_access_token: "old-access".into(),
+            supabase_refresh_token: "old-refresh".into(),
+            supabase_token_expires_at: "0".into(),
+        };
+        atomic_write_config(
+            &dir.join("config.json"),
+            &serde_json::to_value(&cfg).unwrap(),
+        )
+        .unwrap();
+        (dir, cfg)
+    }
+
+    #[test]
+    fn stale_refresh_cannot_undo_logout_or_replace_new_login() {
+        let (dir, cfg) = fixture();
+        cfg.logout().unwrap();
+        assert!(cfg.save_refreshed_session("stale", "stale", None).is_err());
+        let value = read_config(&dir.join("config.json")).unwrap();
+        assert_eq!(value["steam_id"], "");
+        assert_eq!(value["supabase_refresh_token"], "");
+        cfg.save_login(&crate::steam_auth::SteamLoginResult {
+            steam_id: "76561198000000002".into(),
+            steam_name: "Other".into(),
+            supabase_session: Some(crate::steam_auth::SupabaseSession {
+                access_token: "new-access".into(),
+                refresh_token: "new-refresh".into(),
+                expires_at: None,
+            }),
+        })
+        .unwrap();
+        assert!(cfg.save_refreshed_session("stale", "stale", None).is_err());
+        assert_eq!(
+            read_config(&dir.join("config.json")).unwrap()["supabase_refresh_token"],
+            "new-refresh"
+        );
+        fs::remove_dir_all(dir).unwrap();
+    }
+
+    #[test]
+    fn refresh_preserves_settings_and_corrupt_config_is_never_overwritten() {
+        let (dir, cfg) = fixture();
+        cfg.save_value("local_game_cache_max_gb", "12").unwrap();
+        cfg.save_refreshed_session("next-access", "next-refresh", Some(10))
+            .unwrap();
+        let path = dir.join("config.json");
+        assert_eq!(read_config(&path).unwrap()["local_game_cache_max_gb"], 12);
+        fs::write(&path, "{broken").unwrap();
+        assert!(read_config(&path).is_err());
+        assert!(cfg.save_value("local_only", "false").is_err());
+        assert_eq!(fs::read_to_string(&path).unwrap(), "{broken");
+        fs::remove_dir_all(dir).unwrap();
+    }
+
+    #[test]
+    fn config_process_writer() {
+        let Some(path) = env::var_os("DAC_TEST_CONFIG_WRITER_PATH") else {
+            return;
+        };
+        for _ in 0..30 {
+            update_config(Path::new(&path), |value| {
+                let before = value["counter"].as_u64().unwrap_or(0);
+                std::thread::sleep(std::time::Duration::from_millis(1));
+                value["counter"] = json!(before + 1);
+                Ok(())
+            })
+            .unwrap();
+        }
+    }
+
+    #[test]
+    fn separate_process_writers_preserve_each_others_updates() {
+        let (dir, _) = fixture();
+        let path = dir.join("config.json");
+        let mut children = Vec::new();
+        for _ in 0..2 {
+            let mut command = std::process::Command::new(std::env::current_exe().unwrap());
+            command
+                .args(["--exact", "config::tests::config_process_writer"])
+                .env("DAC_TEST_CONFIG_WRITER_PATH", &path)
+                .stdout(std::process::Stdio::null());
+            #[cfg(windows)]
+            {
+                use std::os::windows::process::CommandExt;
+                command.creation_flags(0x08000000);
+            }
+            children.push(command.spawn().unwrap());
+        }
+        for mut child in children {
+            assert!(child.wait().unwrap().success());
+        }
+        assert_eq!(read_config(&path).unwrap()["counter"], 60);
+        fs::remove_dir_all(dir).unwrap();
+    }
 
     #[test]
     fn parses_config_fields() {

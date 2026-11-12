@@ -11,6 +11,7 @@ import type {
 
 interface NetTableSetupCardProps {
   status: NetTableStatus | null;
+  captureLabel?: string;
   lastApply: NetTableLaunchOptionsApplied | null;
   progress: string | null;
   resyncProgress: string | null;
@@ -49,6 +50,7 @@ const REQUIRED_FLAGS = [
  */
 export function NetTableSetupCard({
   status,
+  captureLabel,
   lastApply,
   progress,
   resyncProgress,
@@ -172,14 +174,14 @@ export function NetTableSetupCard({
   if (setupHealthy) {
     const trackingDetail = formatTrackingDetail(status, localComp);
     const activelyTracking = tracking || waitingForFocus;
-    const trackingLabel = activelyTracking
+    const trackingLabel = captureLabel ?? (activelyTracking
       ? trackingDetail
         ? `Tracking · ${trackingDetail}`
         : "Tracking in progress"
       : dotaRunning
         ? "Ready"
-        : "Ready — start a match in Dota";
-    const trackingModifier = activelyTracking ? " tracking" : " paused";
+        : "Ready — start a match in Dota");
+    const trackingModifier = activelyTracking && !captureLabel ? " tracking" : " paused";
 
     return (
       <div className="tracker-home-status" role="status" aria-live="polite">
@@ -387,4 +389,3 @@ function QueenUploadControl({
     </div>
   );
 }
-

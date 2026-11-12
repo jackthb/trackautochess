@@ -353,9 +353,7 @@ fn run_daemon() -> io::Result<()> {
                 emit(&event_json(&ConfigUpdated::new(&key)))?;
             }
             BackendCommand::SteamLogout => {
-                cfg.save_value("steam_id", "\"\"")?;
-                cfg.save_value("steam_name", "\"\"")?;
-                cfg.clear_supabase_session()?;
+                cfg.logout()?;
                 cfg.steam_id.clear();
                 cfg.steam_name.clear();
                 cfg.supabase_access_token.clear();
@@ -372,15 +370,10 @@ fn run_daemon() -> io::Result<()> {
                     },
                 ) {
                     Ok(login) => {
-                        cfg.save_steam_user(&login.steam_id, &login.steam_name)?;
+                        cfg.save_login(&login)?;
                         cfg.steam_id = login.steam_id.clone();
                         cfg.steam_name = login.steam_name.clone();
                         if let Some(session) = login.supabase_session {
-                            cfg.save_supabase_session(
-                                &session.access_token,
-                                &session.refresh_token,
-                                session.expires_at,
-                            )?;
                             cfg.supabase_access_token = session.access_token;
                             cfg.supabase_refresh_token = session.refresh_token;
                             cfg.supabase_token_expires_at = session
@@ -388,7 +381,6 @@ fn run_daemon() -> io::Result<()> {
                                 .map(|value| value.to_string())
                                 .unwrap_or_default();
                         } else {
-                            cfg.clear_supabase_session()?;
                             cfg.supabase_access_token.clear();
                             cfg.supabase_refresh_token.clear();
                             cfg.supabase_token_expires_at.clear();

@@ -1,4 +1,4 @@
-name: Build & Release
+name: Build Draft Release Candidate
 
 on:
   push:
@@ -28,6 +28,22 @@ jobs:
       - name: Set up Rust
         uses: dtolnay/rust-toolchain@stable
 
+      - name: Check release tag matches desktop version
+        run: node scripts/verify-desktop-release.mjs --version-only
+
+      - name: Refuse to modify an already published release
+        uses: actions/github-script@v7
+        with:
+          script: |
+            try {
+              const { data: release } = await github.rest.repos.getReleaseByTag({
+                ...context.repo, tag: context.ref.replace('refs/tags/', '')
+              });
+              if (!release.draft) core.setFailed('This tag is already published. Create a new version for a new candidate.');
+            } catch (error) {
+              if (error.status !== 404) throw error;
+            }
+
       - name: Cache Rust build
         uses: Swatinem/rust-cache@v2
         with:
@@ -45,15 +61,27 @@ jobs:
         shell: pwsh
         run: |
           pnpm install --frozen-lockfile
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           pnpm --dir app run build:backend
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           pnpm --dir app run build
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           npm run build:desktop:installer
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
-      - name: Upload release
+      - name: Test release artifact validation
+        run: node --test scripts/verify-desktop-release.test.mjs
+
+      - name: Verify installer and updater files and write checksums
+        id: artifacts
+        run: node scripts/verify-desktop-release.mjs
+
+      # Publication is a separate, manual step after candidate testing and approval.
+      - name: Upload draft release candidate
         uses: softprops/action-gh-release@v2
         with:
-          files: |
-            app/release/*.exe
-            app/release/*.blockmap
-            app/release/latest*.yml
+          draft: true
+          prerelease: ${{ contains(github.ref_name, '-') }}
+          fail_on_unmatched_files: true
+          files: ${{ steps.artifacts.outputs.files }}
           generate_release_notes: true

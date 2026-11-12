@@ -1,38 +1,40 @@
 import type {
   AnchorHTMLAttributes,
   ButtonHTMLAttributes,
-  ElementType,
   ReactNode,
 } from "react";
 
 type ButtonVariant = "ghost" | "primary";
-type ButtonElement = "button" | "a";
 
 interface BaseButtonProps {
-  as?: ButtonElement;
   children: ReactNode;
   className?: string;
   variant?: ButtonVariant;
 }
 
-type SharedButtonProps = BaseButtonProps &
-  (ButtonHTMLAttributes<HTMLButtonElement> | AnchorHTMLAttributes<HTMLAnchorElement>);
+export type SharedButtonProps = BaseButtonProps & (
+  | ({ as?: "button" } & ButtonHTMLAttributes<HTMLButtonElement>)
+  | ({ as: "a" } & AnchorHTMLAttributes<HTMLAnchorElement>)
+);
 
 function buttonClass(variant: ButtonVariant, className?: string) {
   return ["ui-button", `ui-button-${variant}`, className].filter(Boolean).join(" ");
 }
 
-export function Button({
-  as = "button",
-  children,
-  className,
-  variant = "ghost",
-  ...props
-}: SharedButtonProps) {
-  const Component = as as ElementType;
+export function Button(props: SharedButtonProps) {
+  if (props.as === "a") {
+    const { as, children, className, variant = "ghost", ...anchorProps } = props;
+    return (
+      <a className={buttonClass(variant, className)} {...anchorProps}>
+        {children}
+      </a>
+    );
+  }
+
+  const { as, children, className, variant = "ghost", type = "button", ...buttonProps } = props;
   return (
-    <Component className={buttonClass(variant, className)} {...props}>
+    <button type={type} className={buttonClass(variant, className)} {...buttonProps}>
       {children}
-    </Component>
+    </button>
   );
 }

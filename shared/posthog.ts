@@ -2,7 +2,7 @@
  * Lazy-singleton plumbing shared by the desktop renderer and the web viewer.
  *
  * The two apps deliberately configure PostHog differently — the Electron
- * renderer talks to the EU cluster directly and records every session, the web
+ * renderer talks to the EU cluster directly with session replay disabled, the web
  * viewer goes through a first-party `/ingest` proxy and honours a cookie
  * banner — and they import different `posthog-js` entrypoints. What they do NOT
  * differ on is the lifecycle around that config: guard on SSR and on a missing

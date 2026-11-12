@@ -43,9 +43,6 @@ type PostHogClient = {
   register: (properties: Record<string, unknown>) => void;
   reloadFeatureFlags: () => void;
   reset: () => void;
-  startSessionRecording: (
-    override?: boolean | { sampling?: boolean; linked_flag?: boolean },
-  ) => void;
 };
 
 // Reuses the SAME PostHog project as the web viewer, so a person's web + app
@@ -62,9 +59,8 @@ const KEY =
 const API_HOST = "https://eu.i.posthog.com";
 const UI_HOST = "https://eu.posthog.com";
 
-// NOTE: telemetry here is ALWAYS on (observability). The `game-tracking-enabled`
-// kill switch governs the backend capture feature, not this — so the renderer
-// deliberately does not gate its events/replay on any flag.
+// Ordinary product analytics remain independent of backend game capture.
+// Session replay is disabled until an explicit consent flow is implemented.
 
 export const { getPostHog, capture, captureException, identify, reset } =
   createLazyPostHog<PostHogClient>({
@@ -84,22 +80,17 @@ export const { getPostHog, capture, captureException, identify, reset } =
         // the logged-in steam_id rather than anonymous device ids.
         person_profiles: "identified_only",
         surveys: true,
-        // Deliberate product decision (opposite to web): session replay ON.
-        // This is a desktop game tracker with low PII and consenting friends,
-        // so we keep PostHog's default masking and record everything else.
-        disable_session_recording: false,
+        // Do not record desktop sessions without an explicit consent flow.
+        // Keep defensive masking configured if replay is introduced later.
+        disable_session_recording: true,
         session_recording: {
-          maskAllInputs: false,
-          maskTextSelector: undefined,
+          maskAllInputs: true,
+          maskTextSelector: "*",
         },
       });
       // Shared project with the web viewer — tag every desktop event so web
       // funnels/dashboards can filter on `source`.
       posthog.register({ source: "desktop_app" });
 
-      // Force replay on for every desktop app session. Passing `true` overrides
-      // sampling / linked-flag controls for this recording session, so packaged
-      // clients don't silently depend on project defaults.
-      posthog.startSessionRecording(true);
     },
   });
