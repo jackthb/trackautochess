@@ -1,4 +1,7 @@
 import assert from "node:assert/strict";
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 import {
   activePollOrFilter,
   buildDrodoProfile,
@@ -7,10 +10,16 @@ import {
   extractAllSeasons,
   hasDrodoStats,
   isActivePollUser,
+  isQueenProfile,
   EMPTY_DRODO_PROFILE_ERROR,
   fetchDrodoProfileBatch,
   normalizeDrodoSteamIds,
   preserveOmittedDrodoFields,
+  DRODO_BACKGROUND_POLL_ENABLED,
+  DRODO_BASE,
+  DRODO_COURIER_CONCURRENCY,
+  DRODO_COURIER_PACE_MS,
+  DRODO_MMR_ENABLED,
   POLL_ACTIVE_INTERVAL_SECONDS,
   POLL_INACTIVE_INTERVAL_SECONDS,
   QUEENS_REFRESH_COOLDOWN_MS,
@@ -18,11 +27,23 @@ import {
   summarizeDrodoResults,
 } from "../shared/drodo-core.mjs";
 
+const fixtureDir = path.join(
+  path.dirname(fileURLToPath(import.meta.url)),
+  "../shared/fixtures/drodo"
+);
+const drodoFixture = (name) =>
+  JSON.parse(fs.readFileSync(path.join(fixtureDir, name), "utf8"));
+
 assert.deepEqual(normalizeDrodoSteamIds(["1", 1, "", null, undefined, "2"]), [
   "1",
   "2",
 ]);
 
+assert.equal(DRODO_BASE, "http://autochess.ppbizon.com");
+assert.equal(DRODO_COURIER_CONCURRENCY, 4);
+assert.equal(DRODO_COURIER_PACE_MS, 250);
+assert.equal(DRODO_MMR_ENABLED, true);
+assert.equal(DRODO_BACKGROUND_POLL_ENABLED, true);
 assert.equal(POLL_ACTIVE_INTERVAL_SECONDS, 24 * 60 * 60);
 assert.equal(POLL_INACTIVE_INTERVAL_SECONDS, 7 * 24 * 60 * 60);
 assert.equal(QUEENS_REFRESH_COOLDOWN_MS, 5 * 60 * 1000);
@@ -143,35 +164,37 @@ assert.equal(
 
 const persisted = [];
 const markedMissing = [];
+const fetchedUrls = [];
 
 const results = await fetchDrodoProfileBatch(
   ["111", "111", "222", "333", "444"],
   {
     fetch: async (url) => {
-      assert.equal(
-        url,
-        "http://autochess.ppbizon.com/courier/get/@111,222,333,444"
-      );
+      fetchedUrls.push(String(url));
+      assert.equal(String(url).includes(","), false);
+      const steamId = String(url).split("@").at(-1);
+      const keyed = {
+        111: {
+          mmr_s1: "1200",
+          max_mmr_s1: "1300",
+          match_s1: "10",
+          chicken_count: "2",
+          queen_rank: "42",
+        },
+        222: {},
+        444: {
+          max_mmr_s2: "0",
+          match_s2: "0",
+          chicken_count: "0",
+        },
+      };
+      const drodoData = keyed[steamId];
       return {
         ok: true,
-        json: async () => ({
-          err: 0,
-          user_info: {
-            111: {
-              mmr_s1: "1200",
-              max_mmr_s1: "1300",
-              match_s1: "10",
-              chicken_count: "2",
-              queen_rank: "42",
-            },
-            222: {},
-            444: {
-              max_mmr_s2: "0",
-              match_s2: "0",
-              chicken_count: "0",
-            },
-          },
-        }),
+        json: async () =>
+          drodoData
+            ? { err: 0, user_info: { [steamId]: drodoData } }
+            : { err: 0, user_info: {} },
       };
     },
     loadPollSnapshots: async () =>
@@ -203,7 +226,7 @@ const results = await fetchDrodoProfileBatch(
       });
     },
   },
-  { pollMode: "adaptive", snapshotOnSuccess: true }
+  { pollMode: "adaptive", snapshotOnSuccess: true, paceMs: 0 }
 );
 
 assert.deepEqual(
@@ -234,6 +257,15 @@ assert.deepEqual(
   ]
 );
 
+assert.deepEqual(
+  [...fetchedUrls].sort(),
+  [
+    "http://autochess.ppbizon.com/courier/get/@111",
+    "http://autochess.ppbizon.com/courier/get/@222",
+    "http://autochess.ppbizon.com/courier/get/@333",
+    "http://autochess.ppbizon.com/courier/get/@444",
+  ]
+);
 assert.deepEqual(markedMissing, ["222", "333"]);
 assert.deepEqual(persisted, [
   {
@@ -310,7 +342,7 @@ const omitMmrResults = await fetchDrodoProfileBatch(
       });
     },
   },
-  { pollMode: "reset", snapshotOnSuccess: true }
+  { pollMode: "reset", snapshotOnSuccess: true, paceMs: 0 }
 );
 assert.equal(omitMmrResults[0]?.ok, true);
 assert.deepEqual(omitMmrPersisted, [
@@ -344,5 +376,220 @@ assert.deepEqual(upstreamResults, [
     error: "Drodo API error",
   },
 ]);
+
+const queenFixture = drodoFixture("queen-76561198839665680.json");
+const kingFixture = drodoFixture("king-76561198414820633.json");
+const missingRankFixture = drodoFixture("missing-queen-rank-76561198022169086.json");
+const batchErrorFixture = drodoFixture("batch-err-1200.json");
+
+function seasonSummary(built) {
+  return {
+    season: built.profile.season,
+    mmr: built.profile.mmr,
+    max_mmr: built.profile.max_mmr,
+    season_games: built.profile.season_games,
+    queen_rank: built.profile.queen_rank,
+    mmr_level: built.profile.mmr_level,
+    seasons: built.seasonRows.map((row) => ({
+      season: row.season,
+      mmr: row.mmr,
+      max_mmr: row.max_mmr,
+      games_played: row.games_played,
+    })),
+  };
+}
+
+const queenBuilt = buildDrodoProfile(
+  queenFixture.steam_id,
+  queenFixture.user_info
+);
+assert.deepEqual(seasonSummary(queenBuilt), {
+  season: "s45",
+  mmr: 12718,
+  max_mmr: 12718,
+  season_games: 324,
+  queen_rank: 11,
+  mmr_level: 38,
+  seasons: [
+    { season: "s44", mmr: 4406, max_mmr: 4670, games_played: 170 },
+    { season: "s45", mmr: 12718, max_mmr: 12718, games_played: 324 },
+  ],
+});
+assert.equal(typeof queenFixture.user_info.mmr_s45, "number");
+assert.equal(typeof queenFixture.user_info.max_mmr_s45, "string");
+assert.equal(typeof queenFixture.user_info.match_s45, "string");
+assert.equal(isQueenProfile(queenBuilt.profile, null), true);
+
+const kingBuilt = buildDrodoProfile(kingFixture.steam_id, kingFixture.user_info);
+assert.equal(kingFixture.user_info.queen_rank, -1);
+assert.equal(kingFixture.user_info.mmr_level, 37);
+assert.equal(kingBuilt.profile.queen_rank, null);
+assert.equal(kingBuilt.profile.season, "s45");
+assert.equal(kingBuilt.profile.mmr, 3379);
+assert.equal(kingBuilt.profile.max_mmr, 3381);
+assert.equal(kingBuilt.profile.season_games, 20);
+assert.equal(isQueenProfile(kingBuilt.profile, null), false);
+assert.equal(isQueenProfile({ queen_rank: 0 }, null), false);
+assert.equal(isQueenProfile({ queen_rank: -1 }, { queen_rank: -1 }), false);
+
+const missingRankBuilt = buildDrodoProfile(
+  missingRankFixture.steam_id,
+  missingRankFixture.user_info
+);
+assert.equal(
+  Object.prototype.hasOwnProperty.call(missingRankFixture.user_info, "queen_rank"),
+  false
+);
+assert.equal(missingRankBuilt.profile.queen_rank, null);
+assert.equal(missingRankBuilt.profile.season, "s45");
+assert.equal(missingRankBuilt.profile.mmr, null);
+assert.equal(
+  missingRankBuilt.seasonRows.find((row) => row.season === "s44")?.mmr,
+  1810
+);
+assert.equal(isQueenProfile(missingRankBuilt.profile, null), false);
+assert.equal(
+  preserveOmittedDrodoFields(
+    { queen_rank: 14, drodo_mmr: 1000 },
+    missingRankBuilt.profile
+  ).queen_rank,
+  14,
+  "an omitted queen_rank keeps the cached ladder place"
+);
+assert.equal(
+  preserveOmittedDrodoFields(
+    { queen_rank: 14 },
+    kingBuilt.profile
+  ).queen_rank,
+  null,
+  "an explicit -1 clears a cached queen rank"
+);
+
+const flatMarkedMissing = [];
+const flatPersisted = [];
+const flatUrls = [];
+const flatResults = await fetchDrodoProfileBatch(
+  [queenFixture.steam_id, kingFixture.steam_id, missingRankFixture.steam_id],
+  {
+    fetch: async (url) => {
+      flatUrls.push(String(url));
+      const steamId = decodeURIComponent(String(url).split("@").at(-1));
+      const body = {
+        [queenFixture.steam_id]: queenFixture,
+        [kingFixture.steam_id]: kingFixture,
+        [missingRankFixture.steam_id]: missingRankFixture,
+      }[steamId];
+      return { ok: true, json: async () => body };
+    },
+    markMissing: async (steamId) => {
+      flatMarkedMissing.push(steamId);
+      return `missing-${steamId}`;
+    },
+    persistProfile: async (profile) => {
+      flatPersisted.push({
+        steamId: profile.steam_id,
+        mmr: profile.mmr,
+        queen_rank: profile.queen_rank,
+        season: profile.season,
+      });
+    },
+  },
+  { paceMs: 0 }
+);
+assert.deepEqual(flatMarkedMissing, []);
+assert.equal(flatUrls.some((url) => url.includes(",")), false);
+assert.deepEqual(
+  flatPersisted,
+  [
+    { steamId: queenFixture.steam_id, mmr: 12718, queen_rank: 11, season: "s45" },
+    { steamId: kingFixture.steam_id, mmr: 3379, queen_rank: null, season: "s45" },
+    {
+      steamId: missingRankFixture.steam_id,
+      mmr: null,
+      queen_rank: null,
+      season: "s45",
+    },
+  ]
+);
+assert.deepEqual(
+  flatResults.map((result) => result.ok),
+  [true, true, true]
+);
+
+let inFlight = 0;
+let maxInFlight = 0;
+await fetchDrodoProfileBatch(
+  ["1", "2", "3", "4"],
+  {
+    fetch: async () => {
+      inFlight += 1;
+      maxInFlight = Math.max(maxInFlight, inFlight);
+      await new Promise((resolve) => setTimeout(resolve, 30));
+      inFlight -= 1;
+      return {
+        ok: true,
+        json: async () => ({
+          err: 0,
+          user_info: { mmr_level: 10, mmr_s1: "100" },
+        }),
+      };
+    },
+    markMissing: async () => {
+      throw new Error("concurrency probe should persist");
+    },
+    persistProfile: async () => {},
+  },
+  { concurrency: 2, paceMs: 0 }
+);
+assert.equal(maxInFlight, 2);
+
+const batchErrorMarked = [];
+const batchErrorUrls = [];
+const batchErrorResults = await fetchDrodoProfileBatch(
+  ["76561198839665680", "76561198840403868"],
+  {
+    fetch: async (url) => {
+      batchErrorUrls.push(String(url));
+      return { ok: true, status: 200, json: async () => batchErrorFixture };
+    },
+    markMissing: async (steamId) => {
+      batchErrorMarked.push(steamId);
+      return "missing";
+    },
+    persistProfile: async () => {
+      throw new Error("err 1200 must not persist a profile");
+    },
+  },
+  { paceMs: 0 }
+);
+assert.deepEqual(batchErrorFixture, {
+  err: 1200,
+  msg: "系统错误",
+  err_msg: "invalid",
+});
+assert.equal(batchErrorUrls.some((url) => url.includes(",")), false);
+assert.deepEqual(batchErrorMarked, []);
+assert.deepEqual(
+  batchErrorResults.map((result) => ({
+    steamId: result.steam_id,
+    ok: result.ok,
+    kind: result.kind,
+    error: result.error,
+  })),
+  [
+    {
+      steamId: "76561198839665680",
+      ok: false,
+      kind: "upstream_error",
+      error: "Drodo API error 1200: invalid",
+    },
+    {
+      steamId: "76561198840403868",
+      ok: false,
+      kind: "upstream_error",
+      error: "Drodo API error 1200: invalid",
+    },
+  ]
+);
 
 console.log("Drodo core smoke passed");

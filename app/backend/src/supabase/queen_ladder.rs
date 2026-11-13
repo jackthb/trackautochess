@@ -1,7 +1,8 @@
 use super::{
-    current_drodo_season, next_drodo_poll_at, now_iso_utc, number_from_object,
-    parse_valid_steam_id64, queens_revalidate_url, drodo_courier_api_url, SupabaseClient,
-    DRODO_COURIER_BATCH_SIZE, HTTP_TIMEOUT,
+    courier_player, current_drodo_season, drodo_courier_error, fetch_drodo_courier_payloads,
+    next_drodo_poll_at, now_iso_utc, number_from_object, parse_valid_steam_id64,
+    positive_number_from_object, queen_rank_from_object, queens_revalidate_url, SupabaseClient,
+    HTTP_TIMEOUT,
 };
 use crate::{queen_ladder, queen_ladder::QueenPlayer};
 use serde_json::{json, Value};
@@ -163,88 +164,76 @@ impl SupabaseClient {
         }
         let mut user_rows = Vec::new();
         let mut snapshot_rows = Vec::new();
-        for batch in ids.chunks(DRODO_COURIER_BATCH_SIZE) {
+        for (steam_id, fetched) in fetch_drodo_courier_payloads(ids) {
             let fetched_at = now_iso_utc();
-            let joined = batch
-                .iter()
-                .map(u64::to_string)
-                .collect::<Vec<_>>()
-                .join(",");
-            let api_url = drodo_courier_api_url(&format!("courier/get/@{joined}"));
-            let response = ureq::get(&api_url)
-                .timeout(HTTP_TIMEOUT)
-                .call()
-                .map_err(|err| err.to_string())?;
-            if !(200..300).contains(&response.status()) {
-                return Err(format!("Drodo returned HTTP {}", response.status()));
+            // Transport failures and err:1200 are upstream problems. Leave the
+            // cached row alone instead of marking the player missing.
+            let Ok(payload) = fetched else {
+                continue;
+            };
+            if drodo_courier_error(&payload).is_some() {
+                continue;
             }
-            let body = response.into_string().map_err(|err| err.to_string())?;
-            let payload = serde_json::from_str::<Value>(&body).map_err(|err| err.to_string())?;
-            let user_info = payload
-                .get("user_info")
-                .and_then(Value::as_object)
-                .ok_or_else(|| "Drodo response missing user_info".to_owned())?;
-            for steam_id in batch {
-                let key = steam_id.to_string();
-                let Some(info) = user_info.get(&key).and_then(Value::as_object) else {
-                    user_rows.push(json!({
-                        "steam_id": steam_id,
-                        "drodo_last_fetched_at": fetched_at,
-                        "drodo_profile_missing": true,
-                        "next_poll_at": next_drodo_poll_at(600),
-                        "poll_interval_seconds": 600,
-                    }));
-                    continue;
-                };
-                let season = current_drodo_season(info);
-                let mmr = season
-                    .as_deref()
-                    .and_then(|season| number_from_object(info, &format!("mmr_{season}")));
-                let max_mmr = season
-                    .as_deref()
-                    .and_then(|season| number_from_object(info, &format!("max_mmr_{season}")));
-                let season_games = season
-                    .as_deref()
-                    .and_then(|season| number_from_object(info, &format!("match_{season}")));
-                let chicken_count = number_from_object(info, "chicken_count").unwrap_or(0);
-                let mut row = json!({
+            let key = steam_id.to_string();
+            let Some(info) = courier_player(&payload, &key) else {
+                user_rows.push(json!({
                     "steam_id": steam_id,
-                    "drodo_mmr_level": number_from_object(info, "mmr_level"),
-                    "drodo_candy": number_from_object(info, "candy"),
-                    "drodo_chicken_count": chicken_count,
-                    "drodo_raw_data": Value::Object(info.clone()),
                     "drodo_last_fetched_at": fetched_at,
-                    "drodo_profile_missing": false,
+                    "drodo_profile_missing": true,
                     "next_poll_at": next_drodo_poll_at(600),
                     "poll_interval_seconds": 600,
-                });
-                // Omit null season MMR fields so a Drodo response without mmr_s*
-                // cannot wipe previously cached values on upsert.
-                if let Some(obj) = row.as_object_mut() {
-                    if let Some(value) = mmr {
-                        obj.insert("drodo_mmr".to_owned(), json!(value));
-                    }
-                    if let Some(value) = max_mmr {
-                        obj.insert("drodo_max_mmr".to_owned(), json!(value));
-                    }
-                    if let Some(value) = &season {
-                        obj.insert("drodo_season".to_owned(), json!(value));
-                    }
-                    if let Some(value) = season_games {
-                        obj.insert("drodo_season_games".to_owned(), json!(value));
-                    }
+                }));
+                continue;
+            };
+            let season = current_drodo_season(info);
+            let mmr = season
+                .as_deref()
+                .and_then(|season| positive_number_from_object(info, &format!("mmr_{season}")));
+            let max_mmr = season
+                .as_deref()
+                .and_then(|season| positive_number_from_object(info, &format!("max_mmr_{season}")));
+            let season_games = season
+                .as_deref()
+                .and_then(|season| positive_number_from_object(info, &format!("match_{season}")));
+            let queen_rank = queen_rank_from_object(info);
+            let chicken_count = number_from_object(info, "chicken_count").unwrap_or(0);
+            let mut row = json!({
+                "steam_id": steam_id,
+                "drodo_mmr_level": number_from_object(info, "mmr_level"),
+                "drodo_candy": number_from_object(info, "candy"),
+                "drodo_chicken_count": chicken_count,
+                "drodo_raw_data": Value::Object(info.clone()),
+                "drodo_last_fetched_at": fetched_at,
+                "drodo_profile_missing": false,
+                "next_poll_at": next_drodo_poll_at(600),
+                "poll_interval_seconds": 600,
+            });
+            // Omit null season MMR fields so a Drodo response without mmr_s*
+            // cannot wipe previously cached values on upsert.
+            if let Some(obj) = row.as_object_mut() {
+                if let Some(value) = mmr {
+                    obj.insert("drodo_mmr".to_owned(), json!(value));
                 }
-                user_rows.push(row);
-                if mmr.is_some() || season.is_some() {
-                    snapshot_rows.push(json!({
-                        "steam_id": steam_id,
-                        "season": season,
-                        "mmr": mmr,
-                        "chicken_count": chicken_count,
-                        "queen_rank": Value::Null,
-                        "snapshotted_at": fetched_at,
-                    }));
+                if let Some(value) = max_mmr {
+                    obj.insert("drodo_max_mmr".to_owned(), json!(value));
                 }
+                if let Some(value) = &season {
+                    obj.insert("drodo_season".to_owned(), json!(value));
+                }
+                if let Some(value) = season_games {
+                    obj.insert("drodo_season_games".to_owned(), json!(value));
+                }
+            }
+            user_rows.push(row);
+            if mmr.is_some() || season.is_some() {
+                snapshot_rows.push(json!({
+                    "steam_id": steam_id,
+                    "season": season,
+                    "mmr": mmr,
+                    "chicken_count": chicken_count,
+                    "queen_rank": queen_rank.map(|rank| json!(rank)).unwrap_or(Value::Null),
+                    "snapshotted_at": fetched_at,
+                }));
             }
         }
         if !user_rows.is_empty() {

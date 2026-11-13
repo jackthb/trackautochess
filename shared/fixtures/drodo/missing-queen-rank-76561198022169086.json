@@ -1,0 +1,27 @@
+{
+  "err": 0,
+  "msg": "success",
+  "steam_id": "76561198022169086",
+  "user_info": {
+    "onduty_chessboard": "b103",
+    "mmr": 0,
+    "last_match": "1791755835203",
+    "candy": 336,
+    "max_mmr_s44": "2169",
+    "mmr_s45": 0,
+    "match_s44": "57",
+    "match_s45": "1",
+    "onduty_hero": "h421_e000_30.00_p000_t000_n000",
+    "mmr_s44": "1810",
+    "steam_id": "76561198022169086",
+    "biscuit": 0,
+    "zhugong_total_count": 17,
+    "zhugong_count": 17,
+    "match": 1,
+    "mmr_level": 0,
+    "is_author": false,
+    "award_season_mmr_level": 18,
+    "award_available": true,
+    "chicken_count": 0
+  }
+}

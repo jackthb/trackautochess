@@ -1,6 +1,9 @@
 // Generated from shared/drodo-core.ts. Do not edit by hand.
 export declare const DRODO_BASE: string;
-export declare const DRODO_COURIER_BATCH_SIZE: number;
+export declare const DRODO_COURIER_CONCURRENCY: number;
+export declare const DRODO_COURIER_PACE_MS: number;
+export declare const DRODO_MMR_ENABLED: boolean;
+export declare const DRODO_BACKGROUND_POLL_ENABLED: boolean;
 export declare const DRODO_FRESH_TTL_MS: number;
 export declare const DRODO_MISSING_TTL_MS: number;
 export declare const EMPTY_DRODO_PROFILE_ERROR: string;
@@ -97,6 +100,8 @@ export interface FetchDrodoBatchOptions {
     snapshotOnSuccess?: boolean;
     pollMode?: "adaptive" | "reset";
     hotPoll?: boolean;
+    concurrency?: number;
+    paceMs?: number;
 }
 export interface DrodoPersistProfileOptions {
     snapshotOnSuccess?: boolean;
